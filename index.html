@@ -98,7 +98,7 @@
   .hero-card .bar-fill{ height:100%; background:#fff; border-radius:100px; box-shadow:0 0 12px rgba(255,255,255,0.55); }
 
   .section-title{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--label-2); margin:22px 0 10px; }
-  .card, .sop-card, .emp-row{
+  .card, .sop-card, .emp-row, .cat-cell{
     background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
     border:0.5px solid var(--border); border-radius:16px;
   }
@@ -143,11 +143,25 @@
 
   /* ═══ Timeline façon CapCut ═══ */
   .capcut-wrap{ margin-top:12px; }
-  .capcut-timeline{
-    position:relative; height:52px; border-radius:10px; overflow:hidden;
-    background:#000; border:0.5px solid var(--border);
+
+  .capcut-controls{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .capcut-play-btn{
+    width:36px; height:36px; border-radius:50%; background:#fff; color:#000;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .capcut-track{ position:absolute; inset:0; display:flex; }
+  .capcut-play-btn:active{ transform:scale(0.9); }
+  .capcut-play-btn svg{ width:16px; height:16px; }
+  .capcut-play-btn #capcut-play-icon{ margin-left:2px; }
+  .capcut-current-time, .capcut-duration{ font-size:12px; color:var(--label-2); font-variant-numeric:tabular-nums; }
+  .capcut-duration-sep{ font-size:12px; color:var(--label-3); }
+
+  .capcut-timeline{
+    position:relative; height:64px; border-radius:12px; overflow:hidden;
+    background:#000; border:0.5px solid var(--border);
+    touch-action:pan-y; cursor:pointer; user-select:none;
+  }
+  .capcut-track{ position:absolute; inset:0; display:flex; pointer-events:none; }
   .capcut-track img{ flex:1; height:100%; object-fit:cover; display:block; border-right:1px solid rgba(0,0,0,0.4); }
   .capcut-markers{ position:absolute; inset:0; pointer-events:none; }
   .capcut-marker{
@@ -155,14 +169,14 @@
     box-shadow:0 0 4px rgba(255,255,255,0.8);
   }
   .capcut-playhead{
-    position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--red); z-index:3;
-    box-shadow:0 0 6px rgba(255,69,58,0.7);
+    position:absolute; top:-4px; bottom:-4px; width:3px; background:var(--red); z-index:3;
+    box-shadow:0 0 8px rgba(255,69,58,0.8); pointer-events:none;
   }
   .capcut-playhead-handle{
-    position:absolute; top:-5px; left:50%; transform:translateX(-50%);
-    width:12px; height:8px; background:var(--red); border-radius:3px;
+    position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:16px; height:10px; background:var(--red); border-radius:4px;
   }
-  .capcut-time-row{ display:flex; justify-content:space-between; font-size:11px; color:var(--label-2); margin-top:6px; font-variant-numeric:tabular-nums; }
+  .capcut-hint{ font-size:11px; color:var(--label-3); text-align:center; margin-top:8px; }
   .cut-toolbar{ display:flex; gap:8px; margin-top:10px; }
 
   .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
@@ -224,14 +238,13 @@
 
   .cat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
   .cat-cell{
-    background:var(--bg-card); border:0.5px solid var(--border); border-radius:18px;
     padding:18px 12px; text-align:center; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
   .cat-cell:active{ transform:scale(0.96); }
   .cat-cell .cat-icon{ font-size:30px; margin-bottom:10px; }
   .cat-cell .cat-name{ font-size:13.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cat-cell .cat-count{ font-size:11px; color:var(--label-2); margin-top:3px; margin-bottom:10px; }
-  .cat-cell .cat-recent{ text-align:left; border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
+  .cat-cell .cat-recent{ text-align:center; border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
   .cat-cell .cat-recent-item{
     font-size:10.5px; color:var(--label-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     padding:2px 0;
@@ -534,20 +547,26 @@
     <div class="card">
       <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
       <div class="video-frame" id="video-frame">
-        <video id="video-player" style="display:none;" controls></video>
+        <video id="video-player" style="display:none;" playsinline></video>
         <span id="video-placeholder">Aucune vidéo importée</span>
       </div>
 
       <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
+        <div class="capcut-controls">
+          <button class="capcut-play-btn" id="capcut-play-btn">
+            <svg id="capcut-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            <svg id="capcut-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18" rx="1"/><rect x="14" y="3" width="5" height="18" rx="1"/></svg>
+          </button>
+          <span class="capcut-current-time" id="capcut-current-time">0:00</span>
+          <span class="capcut-duration-sep">/</span>
+          <span class="capcut-duration" id="capcut-duration">0:00</span>
+        </div>
         <div class="capcut-timeline" id="capcut-timeline">
           <div class="capcut-track" id="capcut-track"></div>
           <div class="capcut-markers" id="capcut-markers"></div>
           <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
         </div>
-        <div class="capcut-time-row">
-          <span id="capcut-current-time">0:00</span>
-          <span id="capcut-duration">0:00</span>
-        </div>
+        <div class="capcut-hint">Touchez ou glissez sur la frise pour naviguer dans la vidéo</div>
         <div class="cut-toolbar">
           <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
         </div>
@@ -1314,11 +1333,61 @@ document.getElementById('video-input').addEventListener('change', async (e) => {
   }, { once: true })
 
   player.addEventListener('timeupdate', () => {
+    if (isScrubbingTimeline) return
     const pct = player.duration ? (player.currentTime / player.duration) * 100 : 0
     document.getElementById('capcut-playhead').style.left = pct + '%'
     document.getElementById('capcut-current-time').textContent = formatTime(player.currentTime)
   })
+
+  player.addEventListener('play', () => {
+    document.getElementById('capcut-play-icon').style.display = 'none'
+    document.getElementById('capcut-pause-icon').style.display = 'block'
+  })
+  player.addEventListener('pause', () => {
+    document.getElementById('capcut-play-icon').style.display = 'block'
+    document.getElementById('capcut-pause-icon').style.display = 'none'
+  })
 })
+
+document.getElementById('capcut-play-btn').addEventListener('click', () => {
+  const player = document.getElementById('video-player')
+  if (player.paused) player.play(); else player.pause()
+})
+
+// ═══ Navigation tactile sur la frise, façon CapCut (toucher/glisser pour se déplacer) ═══
+let isScrubbingTimeline = false
+const capcutTimelineEl = document.getElementById('capcut-timeline')
+
+function seekFromPointer(clientX) {
+  const player = document.getElementById('video-player')
+  if (!player.duration) return
+  const rect = capcutTimelineEl.getBoundingClientRect()
+  const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+  player.currentTime = pct * player.duration
+  document.getElementById('capcut-playhead').style.left = (pct * 100) + '%'
+  document.getElementById('capcut-current-time').textContent = formatTime(player.currentTime)
+}
+
+capcutTimelineEl.addEventListener('pointerdown', (e) => {
+  const player = document.getElementById('video-player')
+  if (!player.duration) return
+  isScrubbingTimeline = true
+  wasPlayingBeforeScrub = !player.paused
+  player.pause()
+  capcutTimelineEl.setPointerCapture(e.pointerId)
+  seekFromPointer(e.clientX)
+})
+capcutTimelineEl.addEventListener('pointermove', (e) => {
+  if (!isScrubbingTimeline) return
+  seekFromPointer(e.clientX)
+})
+capcutTimelineEl.addEventListener('pointerup', (e) => {
+  if (!isScrubbingTimeline) return
+  isScrubbingTimeline = false
+  const player = document.getElementById('video-player')
+  if (wasPlayingBeforeScrub) player.play()
+})
+let wasPlayingBeforeScrub = false
 
 // Génère une pellicule de vignettes façon CapCut en capturant des images de la vidéo
 async function generateFilmstrip(video) {

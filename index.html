@@ -612,21 +612,20 @@
     </div>
     <div class="subhead" id="analyse-subhead">Chargement...</div>
 
-    <div class="view-toggle" id="analyse-period-toggle">
-      <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
-      <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
-      <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
-    </div>
-
     <div class="hero-card">
       <div class="lbl">Ont consulté cette procédure</div>
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
+      <div class="view-toggle" id="analyse-period-toggle" style="margin:14px 0 0; background:rgba(255,255,255,0.10); border-color:rgba(255,255,255,0.16);">
+        <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
+        <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
+        <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
+      </div>
     </div>
 
     <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
-      <video id="analyse-video" controls></video>
+      <video id="analyse-video" controls playsinline webkit-playsinline></video>
     </div>
 
     <div class="section-title">Étapes de la procédure</div>
@@ -777,7 +776,7 @@
     </div>
     <div class="subhead" id="detail-subhead">—</div>
     <div class="video-frame" id="detail-video-frame" style="display:none;">
-      <video id="detail-video" controls></video>
+      <video id="detail-video" controls playsinline webkit-playsinline></video>
     </div>
     <div id="detail-steps" style="margin-top:16px;"></div>
     <div class="confirm-bar">
@@ -1605,25 +1604,43 @@ async function openAnalyse(procId) {
     videoFrame.style.display = 'none'
   }
 
-  // Étapes (texte + moment de la vidéo si disponible, façon "un clip par étape")
+  // Étapes : texte, et pour les étapes issues d'une vidéo, un vrai clip borné (début → fin de l'étape)
   const stepsListEl = document.getElementById('analyse-steps-list')
   stepsListEl.innerHTML = ''
   if (currentAnalyseData.etapes.length === 0) {
     stepsListEl.innerHTML = '<div class="note">Aucune étape pour le moment.</div>'
   } else {
+    // Calcule les bornes de chaque clip : début = fin de l'étape vidéo précédente (ou 0), fin = son propre timestamp
+    const videoStepsOrdered = currentAnalyseData.etapes
+      .filter(e => e.timestamp_video != null)
+      .sort((a, b) => a.timestamp_video - b.timestamp_video)
+    const clipBounds = new Map()
+    videoStepsOrdered.forEach((e, idx) => {
+      const start = idx === 0 ? 0 : videoStepsOrdered[idx - 1].timestamp_video
+      clipBounds.set(e.id, { start, end: e.timestamp_video })
+    })
+
     currentAnalyseData.etapes.forEach((etape, i) => {
       const div = document.createElement('div')
       div.className = 'detail-step'
-      const hasClip = etape.timestamp_video != null && proc.video_url
+      const bounds = clipBounds.get(etape.id)
+      const hasClip = bounds && proc.video_url
       div.innerHTML = `
         <div class="n">${i + 1}</div>
         <p style="flex:1;">${escapeHtml(etape.texte)}</p>
-        ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(etape.timestamp_video)}</span>` : ''}
+        ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
       `
       if (hasClip) {
         div.querySelector('.badge').onclick = () => {
-          videoEl.currentTime = etape.timestamp_video
           videoEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          videoEl.currentTime = bounds.start
+          const stopAtEnd = () => {
+            if (videoEl.currentTime >= bounds.end) {
+              videoEl.pause()
+              videoEl.removeEventListener('timeupdate', stopAtEnd)
+            }
+          }
+          videoEl.addEventListener('timeupdate', stopAtEnd)
           videoEl.play()
         }
       }
@@ -1777,19 +1794,49 @@ async function openEquipeDetail(procId) {
   document.getElementById('detail-subhead').textContent = proc.categorie || 'Sans catégorie'
 
   const videoFrame = document.getElementById('detail-video-frame')
+  const detailVideoEl = document.getElementById('detail-video')
   if (proc.video_url) {
     videoFrame.style.display = 'block'
-    document.getElementById('detail-video').src = proc.video_url
+    detailVideoEl.src = proc.video_url
   } else {
     videoFrame.style.display = 'none'
   }
 
   const stepsEl = document.getElementById('detail-steps')
   stepsEl.innerHTML = ''
+  const videoStepsOrdered = (etapes || [])
+    .filter(e => e.timestamp_video != null)
+    .sort((a, b) => a.timestamp_video - b.timestamp_video)
+  const clipBounds = new Map()
+  videoStepsOrdered.forEach((e, idx) => {
+    const start = idx === 0 ? 0 : videoStepsOrdered[idx - 1].timestamp_video
+    clipBounds.set(e.id, { start, end: e.timestamp_video })
+  })
+
   ;(etapes || []).forEach((etape, i) => {
     const div = document.createElement('div')
     div.className = 'detail-step'
-    div.innerHTML = `<div class="n">${i+1}</div><p>${escapeHtml(etape.texte)}</p>`
+    const bounds = clipBounds.get(etape.id)
+    const hasClip = bounds && proc.video_url
+    div.innerHTML = `
+      <div class="n">${i+1}</div>
+      <p style="flex:1;">${escapeHtml(etape.texte)}</p>
+      ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
+    `
+    if (hasClip) {
+      div.querySelector('.badge').onclick = () => {
+        detailVideoEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        detailVideoEl.currentTime = bounds.start
+        const stopAtEnd = () => {
+          if (detailVideoEl.currentTime >= bounds.end) {
+            detailVideoEl.pause()
+            detailVideoEl.removeEventListener('timeupdate', stopAtEnd)
+          }
+        }
+        detailVideoEl.addEventListener('timeupdate', stopAtEnd)
+        detailVideoEl.play()
+      }
+    }
     stepsEl.appendChild(div)
   })
 

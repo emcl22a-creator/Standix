@@ -225,6 +225,16 @@
   .detail-step p{font-size:14px; line-height:1.4;}
   .confirm-bar{ margin-top:20px; }
 
+  .view-toggle{
+    display:flex; gap:2px; background:var(--bg-card); border:0.5px solid var(--border);
+    border-radius:100px; padding:3px; margin-bottom:16px;
+  }
+  .view-toggle button{
+    flex:1; text-align:center; font-size:12px; font-weight:600; padding:8px 4px;
+    border-radius:100px; color:var(--label-2);
+  }
+  .view-toggle button.active{ background:#fff; color:#000; }
+
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
 
   .mode-choice-card{ cursor:pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
@@ -447,7 +457,7 @@
   </div>
 
   <div class="screen active" id="p-list">
-    <div class="greeting" id="greeting-text">👋 Bonjour</div>
+    <div class="greeting" id="greeting-text">Bonjour 👋</div>
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
@@ -601,12 +611,27 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;" id="analyse-titre">—</h1>
     </div>
     <div class="subhead" id="analyse-subhead">Chargement...</div>
+
+    <div class="view-toggle" id="analyse-period-toggle">
+      <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
+      <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
+      <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
+    </div>
+
     <div class="hero-card">
-      <div class="lbl">Taux de validation</div>
+      <div class="lbl">Ont consulté cette procédure</div>
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
     </div>
+
+    <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
+      <video id="analyse-video" controls></video>
+    </div>
+
+    <div class="section-title">Étapes de la procédure</div>
+    <div id="analyse-steps-list"></div>
+
     <div class="section-title">Employés assignés</div>
     <div id="analyse-emp-list"></div>
     <div class="section-title">Code d'accès rapide</div>
@@ -1207,7 +1232,7 @@ let allGestionProcedures = []
 async function loadGestionProcedures() {
   const subheadEl = document.getElementById('p-list-subhead')
   const catGridEl = document.getElementById('cat-grid')
-  document.getElementById('greeting-text').textContent = `👋 Bonjour ${currentMembre.nom || ''}`
+  document.getElementById('greeting-text').textContent = `Bonjour ${currentMembre.nom || ''} 👋`
 
   const { data: procedures, error } = await supabase
     .from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
@@ -1548,33 +1573,134 @@ document.getElementById('publish-btn-manual').addEventListener('click', () => pu
 document.getElementById('publish-btn-video').addEventListener('click', () => publishProcedure('create-error-video', 'publish-btn-video'))
 
 // ═══════════ GESTION : analyse ═══════════
+let currentAnalyseData = null
+let currentAnalysePeriod = 'week'
+
 async function openAnalyse(procId) {
   showGestionScreen('p-analyse')
   document.getElementById('analyse-titre').textContent = '...'
   document.getElementById('analyse-subhead').textContent = 'Chargement...'
+  currentAnalysePeriod = 'week'
+  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
   const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
   const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
   const { data: assignations } = await supabase.from('assignations').select('*, membres(*)').eq('procedure_id', procId)
   const { data: validations } = await supabase.from('validations').select('*').eq('procedure_id', procId)
 
+  currentAnalyseData = { proc, etapes: etapes || [], assignations: assignations || [], validations: validations || [] }
+
   document.getElementById('analyse-titre').textContent = proc.titre
   document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans catégorie'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
 
-  const nbAssignes = assignations?.length || 0
-  const nbValides = validations?.length || 0
-  const taux = nbAssignes > 0 ? Math.round((nbValides / nbAssignes) * 100) : 0
+  renderAnalyseStats()
 
-  document.getElementById('analyse-taux').textContent = taux + '%'
-  document.getElementById('analyse-sub').textContent = `${nbValides} sur ${nbAssignes} employés ont validé`
+  // Vidéo (si disponible)
+  const videoFrame = document.getElementById('analyse-video-frame')
+  const videoEl = document.getElementById('analyse-video')
+  if (proc.video_url) {
+    videoFrame.style.display = 'block'
+    videoEl.src = proc.video_url
+  } else {
+    videoFrame.style.display = 'none'
+  }
+
+  // Étapes (texte + moment de la vidéo si disponible, façon "un clip par étape")
+  const stepsListEl = document.getElementById('analyse-steps-list')
+  stepsListEl.innerHTML = ''
+  if (currentAnalyseData.etapes.length === 0) {
+    stepsListEl.innerHTML = '<div class="note">Aucune étape pour le moment.</div>'
+  } else {
+    currentAnalyseData.etapes.forEach((etape, i) => {
+      const div = document.createElement('div')
+      div.className = 'detail-step'
+      const hasClip = etape.timestamp_video != null && proc.video_url
+      div.innerHTML = `
+        <div class="n">${i + 1}</div>
+        <p style="flex:1;">${escapeHtml(etape.texte)}</p>
+        ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(etape.timestamp_video)}</span>` : ''}
+      `
+      if (hasClip) {
+        div.querySelector('.badge').onclick = () => {
+          videoEl.currentTime = etape.timestamp_video
+          videoEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          videoEl.play()
+        }
+      }
+      stepsListEl.appendChild(div)
+    })
+  }
+
+  const qrContainer = document.getElementById('qr-container')
+  qrContainer.innerHTML = '<div style="font-size:11px; color:var(--label-2);">Génération...</div>'
+  const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
+  const QRCodeLib = await ensureQRCode()
+  const canvas = document.createElement('canvas')
+  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 200, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
+  qrContainer.innerHTML = ''
+  qrContainer.appendChild(canvas)
+
+  document.getElementById('qr-download-btn').onclick = async () => {
+    const filename = `qr-${proc.titre.replace(/\s+/g, '-')}.png`
+    const dataUrl = canvas.toDataURL('image/png')
+    // Sur mobile (surtout iPhone), le téléchargement direct ne marche pas toujours :
+    // on propose d'abord le partage natif (qui permet "Enregistrer l'image"), sinon on retombe sur le téléchargement classique.
+    try {
+      const blob = await (await fetch(dataUrl)).blob()
+      const file = new File([blob], filename, { type: 'image/png' })
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: proc.titre })
+        return
+      }
+    } catch (e) { /* on retombe sur le téléchargement classique ci-dessous */ }
+
+    const link = document.createElement('a')
+    link.download = filename
+    link.href = dataUrl
+    link.click()
+  }
+}
+
+window.setAnalysePeriod = function(period) {
+  currentAnalysePeriod = period
+  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
+  renderAnalyseStats()
+}
+
+function renderAnalyseStats() {
+  if (!currentAnalyseData) return
+  const { assignations, validations } = currentAnalyseData
+
+  const now = new Date()
+  let periodStart = null
+  if (currentAnalysePeriod === 'week') {
+    periodStart = new Date(now)
+    const day = (periodStart.getDay() + 6) % 7 // lundi = 0
+    periodStart.setDate(periodStart.getDate() - day)
+    periodStart.setHours(0, 0, 0, 0)
+  } else if (currentAnalysePeriod === 'month') {
+    periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  }
+
+  const validationsInPeriod = periodStart
+    ? validations.filter(v => new Date(v.validated_at) >= periodStart)
+    : validations
+
+  const nbAssignes = assignations.length
+  const nbConsulte = validationsInPeriod.length
+  const taux = nbAssignes > 0 ? Math.round((nbConsulte / nbAssignes) * 100) : 0
+  const periodLabel = currentAnalysePeriod === 'week' ? 'cette semaine' : currentAnalysePeriod === 'month' ? 'ce mois-ci' : 'au total'
+
+  document.getElementById('analyse-taux').textContent = `${nbConsulte} / ${nbAssignes}`
+  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbAssignes} employés ont consulté ${periodLabel}`
   document.getElementById('analyse-bar').style.width = taux + '%'
 
   const empListEl = document.getElementById('analyse-emp-list')
   empListEl.innerHTML = ''
-  if (!assignations || assignations.length === 0) {
+  if (nbAssignes === 0) {
     empListEl.innerHTML = '<div class="note">Aucun employé assigné pour le moment.</div>'
   } else {
-    // Les employés qui n'ont pas encore validé apparaissent en premier (c'est ce qui demande une action)
+    // Les employés qui n'ont pas encore consulté apparaissent en premier (c'est ce qui demande une action)
     const sorted = [...assignations].sort((a, b) => {
       const aDone = validations.some(v => v.membre_id === a.membre_id)
       const bDone = validations.some(v => v.membre_id === b.membre_id)
@@ -1591,26 +1717,10 @@ async function openAnalyse(procId) {
         <div class="check ${validation ? 'done' : ''}"></div>
         <div class="emp-row-name">${escapeHtml(a.membres?.nom || 'Membre')}</div>
         <div class="emp-row-date" style="${validation ? '' : 'color:var(--red);'}">
-          ${validation ? 'validé le ' + new Date(validation.validated_at).toLocaleDateString('fr-FR') : 'non validé'}
+          ${validation ? 'consulté le ' + new Date(validation.validated_at).toLocaleDateString('fr-FR') : 'pas encore consulté'}
         </div>`
       empListEl.appendChild(div)
     }
-  }
-
-  const qrContainer = document.getElementById('qr-container')
-  qrContainer.innerHTML = '<div style="font-size:11px; color:var(--label-2);">Génération...</div>'
-  const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
-  const QRCodeLib = await ensureQRCode()
-  const canvas = document.createElement('canvas')
-  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 200, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
-  qrContainer.innerHTML = ''
-  qrContainer.appendChild(canvas)
-
-  document.getElementById('qr-download-btn').onclick = () => {
-    const link = document.createElement('a')
-    link.download = `qr-${proc.titre.replace(/\s+/g,'-')}.png`
-    link.href = canvas.toDataURL()
-    link.click()
   }
 }
 

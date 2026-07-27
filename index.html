@@ -629,7 +629,7 @@
     <div class="section-title">Étapes de la procédure</div>
     <div id="analyse-steps-list"></div>
 
-    <div class="section-title">Employés assignés</div>
+    <div class="section-title">Employés</div>
     <div id="analyse-emp-list"></div>
     <div class="section-title">Code d'accès rapide</div>
     <div class="card qr-card">
@@ -656,16 +656,15 @@
       <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
     </div>
 
-    <div class="stats-row">
+    <div class="stats-row" style="grid-template-columns:repeat(2,1fr);">
       <div class="stat-mini"><div class="num" id="ga-nb-procedures">—</div><div class="lbl">Procédures</div></div>
       <div class="stat-mini"><div class="num" id="ga-nb-membres">—</div><div class="lbl">Membres</div></div>
-      <div class="stat-mini"><div class="num" id="ga-nb-validations">—</div><div class="lbl">Validations</div></div>
     </div>
 
     <div class="section-title">Procédures les plus en retard</div>
     <div id="ga-late-list"></div>
 
-    <div class="section-title">Membres les plus à jour</div>
+    <div class="section-title">Tous les membres de l'équipe</div>
     <div id="ga-top-membres"></div>
   </div>
 
@@ -1135,34 +1134,34 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 window.loadGlobalAnalyse = async function() {
   const { data: procedures } = await supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id)
   const { data: membres } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
-  const { data: assignations } = await supabase.from('assignations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
   const { data: validations } = await supabase.from('validations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
 
+  const employes = (membres || []).filter(m => m.role === 'equipe')
+  const nbEmployes = employes.length
   const nbProcedures = procedures?.length || 0
   const nbMembres = membres?.length || 0
-  const nbAssignations = assignations?.length || 0
   const nbValidations = validations?.length || 0
-  const taux = nbAssignations > 0 ? Math.round((nbValidations / nbAssignations) * 100) : 0
+  // Chaque employé de l'entreprise doit consulter chaque procédure
+  const nbAttendu = nbProcedures * nbEmployes
+  const taux = nbAttendu > 0 ? Math.round((nbValidations / nbAttendu) * 100) : 0
 
   document.getElementById('ga-taux-global').textContent = taux + '%'
-  document.getElementById('ga-sub-global').textContent = `${nbValidations} validations sur ${nbAssignations} attendues`
+  document.getElementById('ga-sub-global').textContent = `${nbValidations} consultations sur ${nbAttendu} attendues`
   document.getElementById('ga-bar-global').style.width = taux + '%'
   document.getElementById('ga-nb-procedures').textContent = nbProcedures
   document.getElementById('ga-nb-membres').textContent = nbMembres
-  document.getElementById('ga-nb-validations').textContent = nbValidations
 
-  // Procédures les plus en retard (le moins de validations par rapport aux assignations)
+  // Procédures les plus en retard (le moins d'employés qui ont consulté)
   const lateListEl = document.getElementById('ga-late-list')
   lateListEl.innerHTML = ''
   const procStats = (procedures || []).map(proc => {
-    const assignes = (assignations || []).filter(a => a.procedure_id === proc.id).length
     const valides = (validations || []).filter(v => v.procedure_id === proc.id).length
-    const ratio = assignes > 0 ? valides / assignes : 1
-    return { proc, assignes, valides, ratio }
+    const ratio = nbEmployes > 0 ? valides / nbEmployes : 1
+    return { proc, assignes: nbEmployes, valides, ratio }
   }).filter(s => s.assignes > 0).sort((a,b) => a.ratio - b.ratio).slice(0, 3)
 
   if (procStats.length === 0) {
-    lateListEl.innerHTML = '<div class="note">Aucune procédure assignée pour le moment.</div>'
+    lateListEl.innerHTML = '<div class="note">Aucun employé dans l\'entreprise pour le moment.</div>'
   } else {
     procStats.forEach((s, i) => {
       const div = document.createElement('div')
@@ -1171,7 +1170,7 @@ window.loadGlobalAnalyse = async function() {
       div.innerHTML = `
         <div>
           <div class="title">${escapeHtml(s.proc.titre)}</div>
-          <div class="meta">${s.valides}/${s.assignes} validations</div>
+          <div class="meta">${s.valides}/${s.assignes} employés ont consulté</div>
         </div>
         <span class="badge ${s.ratio >= 0.8 ? 'ok' : 'pending'}">${Math.round(s.ratio*100)}%</span>
       `
@@ -1179,25 +1178,25 @@ window.loadGlobalAnalyse = async function() {
     })
   }
 
-  // Membres les plus à jour
+  // Tous les membres de l'équipe
   const topMembresEl = document.getElementById('ga-top-membres')
   topMembresEl.innerHTML = ''
-  const membreStats = (membres || []).map(m => {
+  const membreStats = employes.map(m => {
     const validCount = (validations || []).filter(v => v.membre_id === m.id).length
     return { m, validCount }
-  }).sort((a,b) => b.validCount - a.validCount).slice(0, 5)
+  }).sort((a,b) => b.validCount - a.validCount)
 
   if (membreStats.length === 0) {
-    topMembresEl.innerHTML = '<div class="note">Aucun membre pour le moment.</div>'
+    topMembresEl.innerHTML = '<div class="note">Aucun membre dans l\'équipe pour le moment. Partagez le code d\'invitation dans Paramètres.</div>'
   } else {
     membreStats.forEach((s, i) => {
       const div = document.createElement('div')
       div.className = 'emp-row'
       div.style.animationDelay = (i * 0.05) + 's'
       div.innerHTML = `
-        <div class="check done"></div>
+        <div class="check ${s.validCount > 0 ? 'done' : ''}"></div>
         <div class="emp-row-name">${escapeHtml(s.m.nom)}</div>
-        <div class="emp-row-date">${s.validCount} validation${s.validCount>1?'s':''}</div>
+        <div class="emp-row-date">${s.validCount} consultation${s.validCount>1?'s':''}</div>
       `
       topMembresEl.appendChild(div)
     })
@@ -1284,10 +1283,11 @@ async function openCategoryProcedures(nom) {
   const procsInCategory = allGestionProcedures.filter(p => (p.categorie || 'Sans catégorie') === nom)
   document.getElementById('category-subhead').textContent = `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
 
+  const { count: nbEmployes } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
+
   let cardIndex = 0
   for (const proc of procsInCategory) {
     const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
-    const { count: nbAssignes } = await supabase.from('assignations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const nbEtapes = proc.etapes?.[0]?.count ?? 0
     const div = document.createElement('div')
     div.className = 'sop-card'
@@ -1299,7 +1299,7 @@ async function openCategoryProcedures(nom) {
         <div class="title">${escapeHtml(proc.titre)}</div>
         <div class="meta">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
-      <span class="badge ${nbValidations >= nbAssignes && nbAssignes>0 ? 'ok' : 'pending'}">${nbValidations}/${nbAssignes || 0}</span>
+      <span class="badge ${nbValidations >= nbEmployes && nbEmployes>0 ? 'ok' : 'pending'}">${nbValidations}/${nbEmployes || 0}</span>
     `
     listEl.appendChild(div)
   }
@@ -1582,10 +1582,10 @@ async function openAnalyse(procId) {
 
   const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
   const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
-  const { data: assignations } = await supabase.from('assignations').select('*, membres(*)').eq('procedure_id', procId)
+  const { data: employes } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
   const { data: validations } = await supabase.from('validations').select('*').eq('procedure_id', procId)
 
-  currentAnalyseData = { proc, etapes: etapes || [], assignations: assignations || [], validations: validations || [] }
+  currentAnalyseData = { proc, etapes: etapes || [], employes: employes || [], validations: validations || [] }
 
   document.getElementById('analyse-titre').textContent = proc.titre
   document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans catégorie'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
@@ -1684,7 +1684,7 @@ window.setAnalysePeriod = function(period) {
 
 function renderAnalyseStats() {
   if (!currentAnalyseData) return
-  const { assignations, validations } = currentAnalyseData
+  const { employes, validations } = currentAnalyseData
 
   const now = new Date()
   let periodStart = null
@@ -1701,36 +1701,36 @@ function renderAnalyseStats() {
     ? validations.filter(v => new Date(v.validated_at) >= periodStart)
     : validations
 
-  const nbAssignes = assignations.length
+  const nbEmployes = employes.length
   const nbConsulte = validationsInPeriod.length
-  const taux = nbAssignes > 0 ? Math.round((nbConsulte / nbAssignes) * 100) : 0
+  const taux = nbEmployes > 0 ? Math.round((nbConsulte / nbEmployes) * 100) : 0
   const periodLabel = currentAnalysePeriod === 'week' ? 'cette semaine' : currentAnalysePeriod === 'month' ? 'ce mois-ci' : 'au total'
 
-  document.getElementById('analyse-taux').textContent = `${nbConsulte} / ${nbAssignes}`
-  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbAssignes} employés ont consulté ${periodLabel}`
+  document.getElementById('analyse-taux').textContent = `${nbConsulte} / ${nbEmployes}`
+  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbEmployes} employés ont consulté ${periodLabel}`
   document.getElementById('analyse-bar').style.width = taux + '%'
 
   const empListEl = document.getElementById('analyse-emp-list')
   empListEl.innerHTML = ''
-  if (nbAssignes === 0) {
-    empListEl.innerHTML = '<div class="note">Aucun employé assigné pour le moment.</div>'
+  if (nbEmployes === 0) {
+    empListEl.innerHTML = '<div class="note">Aucun employé dans l\'entreprise pour le moment. Partagez le code d\'invitation dans Paramètres.</div>'
   } else {
     // Les employés qui n'ont pas encore consulté apparaissent en premier (c'est ce qui demande une action)
-    const sorted = [...assignations].sort((a, b) => {
-      const aDone = validations.some(v => v.membre_id === a.membre_id)
-      const bDone = validations.some(v => v.membre_id === b.membre_id)
+    const sorted = [...employes].sort((a, b) => {
+      const aDone = validations.some(v => v.membre_id === a.id)
+      const bDone = validations.some(v => v.membre_id === b.id)
       return aDone - bDone
     })
     let empIndex = 0
-    for (const a of sorted) {
-      const validation = validations.find(v => v.membre_id === a.membre_id)
+    for (const employe of sorted) {
+      const validation = validations.find(v => v.membre_id === employe.id)
       const div = document.createElement('div')
       div.className = 'emp-row'
       div.style.animationDelay = (empIndex * 0.05) + 's'
       empIndex++
       div.innerHTML = `
         <div class="check ${validation ? 'done' : ''}"></div>
-        <div class="emp-row-name">${escapeHtml(a.membres?.nom || 'Membre')}</div>
+        <div class="emp-row-name">${escapeHtml(employe.nom || 'Membre')}</div>
         <div class="emp-row-date" style="${validation ? '' : 'color:var(--red);'}">
           ${validation ? 'consulté le ' + new Date(validation.validated_at).toLocaleDateString('fr-FR') : 'pas encore consulté'}
         </div>`

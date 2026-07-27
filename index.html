@@ -64,10 +64,10 @@
   .logo-pill{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
-  .logo-pill svg{ width:20px; height:24px; }
+  .logo-pill svg{ width:23px; height:27px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
-  .topbar-title .name{ font-size:13.5px; font-weight:700; }
-  .topbar-title .role{ font-size:11px; color:var(--label-2); font-weight:500; }
+  .topbar-title .name{ font-size:14.5px; font-weight:700; }
+  .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -222,7 +222,14 @@
   .icon-choice.selected{ border-color:#fff; background:rgba(255,255,255,0.14); }
   .icon-choice:active{ transform:scale(0.9); }
 
-  .mode-select-btn{ text-align:center; }
+  .mode-choice-card{ cursor:pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+  .mode-choice-card:active{ transform:scale(0.98); }
+  .mode-choice-row{ display:flex; align-items:center; gap:14px; }
+  .mode-choice-icon{ font-size:24px; flex-shrink:0; width:36px; text-align:center; }
+  .mode-choice-text{ flex:1; }
+  .mode-choice-title{ font-size:14.5px; font-weight:700; }
+  .mode-choice-desc{ font-size:12px; color:var(--label-2); margin-top:2px; }
+  .mode-choice-arrow{ font-size:22px; color:var(--label-2); flex-shrink:0; }
 
   .cat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
   .cat-cell{
@@ -432,7 +439,7 @@
   <div class="screen active" id="p-list">
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
-    <button class="btn block" style="margin-bottom:18px;" onclick="showGestionScreen('p-create')">+ Créer une procédure</button>
+    <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
 
@@ -480,54 +487,107 @@
     </div>
 
     <div class="section-title">Comment créer cette procédure ?</div>
-    <button class="btn block mode-select-btn active" data-mode="manual" style="margin-bottom:8px;">Étapes manuelles</button>
-    <button class="btn ghost block mode-select-btn" data-mode="video" style="margin-bottom:8px;">Découper une vidéo manuellement</button>
-    <button class="btn ghost block mode-select-btn" data-mode="ai">✦ L'IA découpe la vidéo</button>
 
-    <div id="mode-manual-section">
-      <div class="section-title">Étapes manuelles</div>
-      <div id="manual-steps-list"></div>
-      <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
-    </div>
-
-    <div id="mode-video-section" style="display:none;">
-      <div class="section-title">Découper une vidéo</div>
-      <div class="card">
-        <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
-        <div class="video-frame" id="video-frame">
-          <video id="video-player" style="display:none;" controls></video>
-          <span id="video-placeholder">Aucune vidéo importée</span>
+    <div class="card mode-choice-card" onclick="goToCreateMode('manual')">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon">✍️</div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">Étapes manuelles</div>
+          <div class="mode-choice-desc">Écrivez chaque étape vous-même</div>
         </div>
-
-        <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
-          <div class="capcut-timeline" id="capcut-timeline">
-            <div class="capcut-track" id="capcut-track"></div>
-            <div class="capcut-markers" id="capcut-markers"></div>
-            <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
-          </div>
-          <div class="capcut-time-row">
-            <span id="capcut-current-time">0:00</span>
-            <span id="capcut-duration">0:00</span>
-          </div>
-          <div class="cut-toolbar">
-            <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
-          </div>
-        </div>
-      </div>
-
-      <div id="video-steps-list"></div>
-      <div class="note">Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.</div>
-    </div>
-
-    <div id="mode-ai-section" style="display:none;">
-      <div class="section-title">L'IA découpe la vidéo</div>
-      <div class="card" style="text-align:center; padding:28px 20px;">
-        <div style="font-size:13px; color:var(--label-2); line-height:1.6;">Bientôt disponible — cette fonctionnalité arrive prochainement.</div>
+        <div class="mode-choice-arrow">›</div>
       </div>
     </div>
 
-    <div class="error-msg" id="create-error"></div>
-    <button class="btn block" style="margin-top:18px;" id="publish-btn">Publier la procédure</button>
+    <div class="card mode-choice-card" onclick="goToCreateMode('video')">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon">🎬</div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">Découper une vidéo</div>
+          <div class="mode-choice-desc">Filmez puis découpez chaque étape</div>
+        </div>
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div>
+
+    <div class="card mode-choice-card" onclick="goToCreateMode('ai')">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon">✦</div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">L'IA découpe la vidéo</div>
+          <div class="mode-choice-desc">Bientôt disponible</div>
+        </div>
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="p-create-manual">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Étapes manuelles</h1>
+    </div>
+    <div class="subhead">Écrivez chaque étape dans l'ordre</div>
+
+    <div id="manual-steps-list"></div>
+    <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
+
+    <div class="error-msg" id="create-error-manual"></div>
+    <button class="btn block" style="margin-top:18px;" id="publish-btn-manual">Publier la procédure</button>
+  </div>
+
+  <div class="screen" id="p-create-video">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Découper une vidéo</h1>
+    </div>
+    <div class="subhead">Importez une vidéo puis coupez chaque étape</div>
+
+    <div class="card">
+      <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
+      <div class="video-frame" id="video-frame">
+        <video id="video-player" style="display:none;" controls></video>
+        <span id="video-placeholder">Aucune vidéo importée</span>
+      </div>
+
+      <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
+        <div class="capcut-timeline" id="capcut-timeline">
+          <div class="capcut-track" id="capcut-track"></div>
+          <div class="capcut-markers" id="capcut-markers"></div>
+          <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
+        </div>
+        <div class="capcut-time-row">
+          <span id="capcut-current-time">0:00</span>
+          <span id="capcut-duration">0:00</span>
+        </div>
+        <div class="cut-toolbar">
+          <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="video-steps-list"></div>
+    <div class="note">Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.</div>
+
+    <div class="error-msg" id="create-error-video"></div>
+    <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
+  </div>
+
+  <div class="screen" id="p-create-ai">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe la vidéo</h1>
+    </div>
+    <div class="subhead">Bientôt disponible</div>
+    <div class="card" style="text-align:center; padding:28px 20px;">
+      <div style="font-size:13px; color:var(--label-2); line-height:1.6;">Cette fonctionnalité arrive prochainement.</div>
+    </div>
   </div>
 
   <div class="screen" id="p-analyse">
@@ -1130,7 +1190,10 @@ window.showGestionScreen = function(id, btn) {
   document.getElementById(id).classList.add('active')
   document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
-  if (id === 'p-create') resetCreateForm()
+}
+window.startNewProcedure = function() {
+  resetCreateForm()
+  showGestionScreen('p-create')
 }
 window.showEquipeScreen = function(id, btn) {
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
@@ -1225,13 +1288,13 @@ function resetCreateForm() {
   document.getElementById('capcut-wrap').style.display = 'none'
   document.getElementById('capcut-track').innerHTML = ''
   document.getElementById('capcut-markers').innerHTML = ''
-  document.getElementById('create-error').textContent = ''
+  document.getElementById('create-error-manual').textContent = ''
+  document.getElementById('create-error-video').textContent = ''
   manualSteps = []
   videoSteps = []
   currentVideoFile = null
   renderManualSteps()
   renderVideoSteps()
-  setCreateMode('manual')
 }
 
 document.querySelectorAll('.icon-choice').forEach(btn => {
@@ -1242,19 +1305,12 @@ document.querySelectorAll('.icon-choice').forEach(btn => {
   })
 })
 
-function setCreateMode(mode) {
-  document.getElementById('mode-manual-section').style.display = mode === 'manual' ? 'block' : 'none'
-  document.getElementById('mode-video-section').style.display = mode === 'video' ? 'block' : 'none'
-  document.getElementById('mode-ai-section').style.display = mode === 'ai' ? 'block' : 'none'
-  document.querySelectorAll('.mode-select-btn').forEach(b => {
-    const isActive = b.dataset.mode === mode
-    b.classList.toggle('active', isActive)
-    b.classList.toggle('ghost', !isActive)
-  })
+function goToCreateMode(mode) {
+  if (mode === 'manual') showGestionScreen('p-create-manual')
+  else if (mode === 'video') showGestionScreen('p-create-video')
+  else showGestionScreen('p-create-ai')
 }
-document.querySelectorAll('.mode-select-btn').forEach(btn => {
-  btn.addEventListener('click', () => setCreateMode(btn.dataset.mode))
-})
+window.goToCreateMode = goToCreateMode
 
 document.getElementById('video-input').addEventListener('change', async (e) => {
   const file = e.target.files[0]
@@ -1380,8 +1436,8 @@ function formatTime(sec) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-document.getElementById('publish-btn').addEventListener('click', async () => {
-  const errorEl = document.getElementById('create-error')
+async function publishProcedure(errorElId, btnId) {
+  const errorEl = document.getElementById(errorElId)
   errorEl.textContent = ''
   const titre = document.getElementById('new-titre').value.trim()
   const categorie = document.getElementById('new-categorie').value.trim()
@@ -1392,7 +1448,7 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
   if (allSteps.length === 0) { errorEl.textContent = 'Ajoutez au moins une étape (manuelle ou vidéo).'; return }
   if (allSteps.some(s => !s.texte.trim())) { errorEl.textContent = 'Chaque étape doit avoir un texte.'; return }
 
-  const publishBtn = document.getElementById('publish-btn')
+  const publishBtn = document.getElementById(btnId)
   setButtonLoading(publishBtn, true)
 
   let videoUrl = null
@@ -1428,7 +1484,9 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
 
   showGestionScreen('p-list')
   loadGestionProcedures()
-})
+}
+document.getElementById('publish-btn-manual').addEventListener('click', () => publishProcedure('create-error-manual', 'publish-btn-manual'))
+document.getElementById('publish-btn-video').addEventListener('click', () => publishProcedure('create-error-video', 'publish-btn-video'))
 
 // ═══════════ GESTION : analyse ═══════════
 async function openAnalyse(procId) {

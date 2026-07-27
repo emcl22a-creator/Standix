@@ -138,7 +138,7 @@
 
   .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
   .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
-  .step-edit-item input{ flex:1; background:none; border:none; font-size:13.5px; padding:0; }
+  .step-edit-item input{ flex:1; background:none; border:none; font-size:16px; padding:0; }
   .step-edit-item .del{ color:var(--red); font-size:16px; flex-shrink:0; }
 
   /* ═══ Timeline façon CapCut ═══ */
@@ -212,16 +212,6 @@
   .confirm-bar{ margin-top:20px; }
 
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
-
-  .icon-picker{ display:flex; gap:8px; flex-wrap:wrap; }
-  .icon-choice{
-    width:38px; height:38px; border-radius:10px; font-size:18px;
-    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
-    display:flex; align-items:center; justify-content:center;
-    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
-  }
-  .icon-choice.selected{ border-color:#fff; background:rgba(255,255,255,0.14); }
-  .icon-choice:active{ transform:scale(0.9); }
 
   .mode-choice-card{ cursor:pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
   .mode-choice-card:active{ transform:scale(0.98); }
@@ -477,20 +467,6 @@
       <div style="margin-top:12px;">
         <label class="f">Catégorie</label>
         <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
-      </div>
-      <div style="margin-top:12px;">
-        <label class="f">Icône de la catégorie</label>
-        <div class="icon-picker" id="icon-picker">
-          <button type="button" class="icon-choice selected" data-icon="📁">📁</button>
-          <button type="button" class="icon-choice" data-icon="🍳">🍳</button>
-          <button type="button" class="icon-choice" data-icon="🍽️">🍽️</button>
-          <button type="button" class="icon-choice" data-icon="💰">💰</button>
-          <button type="button" class="icon-choice" data-icon="📦">📦</button>
-          <button type="button" class="icon-choice" data-icon="🛎️">🛎️</button>
-          <button type="button" class="icon-choice" data-icon="🧹">🧹</button>
-          <button type="button" class="icon-choice" data-icon="✅">✅</button>
-        </div>
-        <input type="hidden" id="new-categorie-icone" value="📁">
       </div>
     </div>
 
@@ -1243,7 +1219,7 @@ async function loadGestionProcedures() {
   const categoriesMap = {}
   procedures.forEach(p => {
     const nom = p.categorie || 'Sans catégorie'
-    if (!categoriesMap[nom]) categoriesMap[nom] = p.categorie_icone || '📁'
+    if (!categoriesMap[nom]) categoriesMap[nom] = '📁'
   })
   Object.entries(categoriesMap).forEach(([nom, icone]) => {
     const procsInCat = procedures.filter(p => (p.categorie || 'Sans catégorie') === nom) // déjà trié du plus récent au plus ancien
@@ -1297,9 +1273,6 @@ async function openCategoryProcedures(nom) {
 function resetCreateForm() {
   document.getElementById('new-titre').value = ''
   document.getElementById('new-categorie').value = ''
-  document.getElementById('new-categorie-icone').value = '📁'
-  document.querySelectorAll('.icon-choice').forEach(b => b.classList.remove('selected'))
-  document.querySelector('.icon-choice[data-icon="📁"]').classList.add('selected')
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'block'
@@ -1314,14 +1287,6 @@ function resetCreateForm() {
   renderManualSteps()
   renderVideoSteps()
 }
-
-document.querySelectorAll('.icon-choice').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.icon-choice').forEach(b => b.classList.remove('selected'))
-    btn.classList.add('selected')
-    document.getElementById('new-categorie-icone').value = btn.dataset.icon
-  })
-})
 
 function goToCreateMode(mode) {
   if (mode === 'manual') showGestionScreen('p-create-manual')
@@ -1459,7 +1424,7 @@ async function publishProcedure(errorElId, btnId) {
   errorEl.textContent = ''
   const titre = document.getElementById('new-titre').value.trim()
   const categorie = document.getElementById('new-categorie').value.trim()
-  const categorieIcone = document.getElementById('new-categorie-icone').value
+  const categorieIcone = '📁'
   const allSteps = [...manualSteps, ...videoSteps]
 
   if (!titre) { errorEl.textContent = 'Le titre est obligatoire.'; return }

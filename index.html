@@ -45,7 +45,7 @@
   }
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
-  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 20px 0; }
+  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 18px 0; }
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{
     0%,100%{ transform:scale(1); }
@@ -57,7 +57,7 @@
     position:relative;
     display:flex; align-items:center;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 16px;
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
   .topbar-left{ display:flex; align-items:center; gap:13px; }
@@ -69,7 +69,7 @@
   .topbar-title .name{ font-size:16px; font-weight:700; }
   .topbar-title .role{ font-size:12.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
-    width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
@@ -210,7 +210,29 @@
   .detail-step p{font-size:14px; line-height:1.4;}
   .confirm-bar{ margin-top:20px; }
 
-  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:2px 14px; margin-bottom:12px; }
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
+
+  .icon-picker{ display:flex; gap:8px; flex-wrap:wrap; }
+  .icon-choice{
+    width:38px; height:38px; border-radius:10px; font-size:18px;
+    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
+  }
+  .icon-choice.selected{ border-color:#fff; background:rgba(255,255,255,0.14); }
+  .icon-choice:active{ transform:scale(0.9); }
+
+  .mode-select-btn{ text-align:center; }
+
+  .cat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .cat-cell{
+    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    padding:14px 8px; text-align:center; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .cat-cell:active{ transform:scale(0.95); }
+  .cat-cell .cat-icon{ font-size:22px; margin-bottom:6px; }
+  .cat-cell .cat-name{ font-size:11.5px; font-weight:600; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cat-cell.active{ border-color:#fff; background:rgba(255,255,255,0.14); }
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
@@ -411,6 +433,7 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="showGestionScreen('p-create')">+ Créer une procédure</button>
+    <div id="cat-grid" class="cat-grid"></div>
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="gestion-search-input" placeholder="Rechercher...">
@@ -434,38 +457,68 @@
         <label class="f">Catégorie</label>
         <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
       </div>
-    </div>
-
-    <div class="section-title">Étapes manuelles</div>
-    <div id="manual-steps-list"></div>
-    <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
-
-    <div class="section-title" style="margin-top:32px;">Découper une vidéo</div>
-    <div class="card">
-      <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
-      <div class="video-frame" id="video-frame">
-        <video id="video-player" style="display:none;" controls></video>
-        <span id="video-placeholder">Aucune vidéo importée</span>
-      </div>
-
-      <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
-        <div class="capcut-timeline" id="capcut-timeline">
-          <div class="capcut-track" id="capcut-track"></div>
-          <div class="capcut-markers" id="capcut-markers"></div>
-          <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
+      <div style="margin-top:12px;">
+        <label class="f">Icône de la catégorie</label>
+        <div class="icon-picker" id="icon-picker">
+          <button type="button" class="icon-choice selected" data-icon="📁">📁</button>
+          <button type="button" class="icon-choice" data-icon="🍳">🍳</button>
+          <button type="button" class="icon-choice" data-icon="🍽️">🍽️</button>
+          <button type="button" class="icon-choice" data-icon="💰">💰</button>
+          <button type="button" class="icon-choice" data-icon="📦">📦</button>
+          <button type="button" class="icon-choice" data-icon="🛎️">🛎️</button>
+          <button type="button" class="icon-choice" data-icon="🧹">🧹</button>
+          <button type="button" class="icon-choice" data-icon="✅">✅</button>
         </div>
-        <div class="capcut-time-row">
-          <span id="capcut-current-time">0:00</span>
-          <span id="capcut-duration">0:00</span>
-        </div>
-        <div class="cut-toolbar">
-          <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
-        </div>
+        <input type="hidden" id="new-categorie-icone" value="📁">
       </div>
     </div>
 
-    <div id="video-steps-list"></div>
-    <div class="note">Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.</div>
+    <div class="section-title">Comment créer cette procédure ?</div>
+    <button class="btn block mode-select-btn active" data-mode="manual" style="margin-bottom:8px;">Étapes manuelles</button>
+    <button class="btn ghost block mode-select-btn" data-mode="video" style="margin-bottom:8px;">Découper une vidéo manuellement</button>
+    <button class="btn ghost block mode-select-btn" data-mode="ai">✦ L'IA découpe la vidéo</button>
+
+    <div id="mode-manual-section">
+      <div class="section-title">Étapes manuelles</div>
+      <div id="manual-steps-list"></div>
+      <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
+    </div>
+
+    <div id="mode-video-section" style="display:none;">
+      <div class="section-title">Découper une vidéo</div>
+      <div class="card">
+        <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
+        <div class="video-frame" id="video-frame">
+          <video id="video-player" style="display:none;" controls></video>
+          <span id="video-placeholder">Aucune vidéo importée</span>
+        </div>
+
+        <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
+          <div class="capcut-timeline" id="capcut-timeline">
+            <div class="capcut-track" id="capcut-track"></div>
+            <div class="capcut-markers" id="capcut-markers"></div>
+            <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
+          </div>
+          <div class="capcut-time-row">
+            <span id="capcut-current-time">0:00</span>
+            <span id="capcut-duration">0:00</span>
+          </div>
+          <div class="cut-toolbar">
+            <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="video-steps-list"></div>
+      <div class="note">Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.</div>
+    </div>
+
+    <div id="mode-ai-section" style="display:none;">
+      <div class="section-title">L'IA découpe la vidéo</div>
+      <div class="card" style="text-align:center; padding:28px 20px;">
+        <div style="font-size:13px; color:var(--label-2); line-height:1.6;">Bientôt disponible — cette fonctionnalité arrive prochainement.</div>
+      </div>
+    </div>
 
     <div class="error-msg" id="create-error"></div>
     <button class="btn block" style="margin-top:18px;" id="publish-btn">Publier la procédure</button>
@@ -1082,9 +1135,12 @@ window.showEquipeScreen = function(id, btn) {
 }
 
 // ═══════════ GESTION : liste ═══════════
+let selectedCategoryFilter = null
+
 async function loadGestionProcedures() {
   const listEl = document.getElementById('procedures-list')
   const subheadEl = document.getElementById('p-list-subhead')
+  const catGridEl = document.getElementById('cat-grid')
   listEl.innerHTML = ''
 
   const { data: procedures, error } = await supabase
@@ -1093,6 +1149,24 @@ async function loadGestionProcedures() {
 
   if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
   subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
+
+  // Grille des catégories (3 colonnes, icône choisie par la personne)
+  catGridEl.innerHTML = ''
+  const categoriesMap = {}
+  procedures.forEach(p => {
+    const nom = p.categorie || 'Sans catégorie'
+    if (!categoriesMap[nom]) categoriesMap[nom] = p.categorie_icone || '📁'
+  })
+  Object.entries(categoriesMap).forEach(([nom, icone]) => {
+    const cell = document.createElement('div')
+    cell.className = 'cat-cell' + (selectedCategoryFilter === nom ? ' active' : '')
+    cell.innerHTML = `<div class="cat-icon">${icone}</div><div class="cat-name">${escapeHtml(nom)}</div>`
+    cell.onclick = () => {
+      selectedCategoryFilter = selectedCategoryFilter === nom ? null : nom
+      loadGestionProcedures()
+    }
+    catGridEl.appendChild(cell)
+  })
 
   if (procedures.length === 0) {
     listEl.innerHTML = `
@@ -1106,6 +1180,7 @@ async function loadGestionProcedures() {
 
   let cardIndex = 0
   for (const proc of procedures) {
+    if (selectedCategoryFilter && (proc.categorie || 'Sans catégorie') !== selectedCategoryFilter) continue
     const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const { count: nbAssignes } = await supabase.from('assignations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const nbEtapes = proc.etapes?.[0]?.count ?? 0
@@ -1136,6 +1211,9 @@ document.getElementById('gestion-search-input').addEventListener('input', (e) =>
 function resetCreateForm() {
   document.getElementById('new-titre').value = ''
   document.getElementById('new-categorie').value = ''
+  document.getElementById('new-categorie-icone').value = '📁'
+  document.querySelectorAll('.icon-choice').forEach(b => b.classList.remove('selected'))
+  document.querySelector('.icon-choice[data-icon="📁"]').classList.add('selected')
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'block'
@@ -1148,7 +1226,30 @@ function resetCreateForm() {
   currentVideoFile = null
   renderManualSteps()
   renderVideoSteps()
+  setCreateMode('manual')
 }
+
+document.querySelectorAll('.icon-choice').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.icon-choice').forEach(b => b.classList.remove('selected'))
+    btn.classList.add('selected')
+    document.getElementById('new-categorie-icone').value = btn.dataset.icon
+  })
+})
+
+function setCreateMode(mode) {
+  document.getElementById('mode-manual-section').style.display = mode === 'manual' ? 'block' : 'none'
+  document.getElementById('mode-video-section').style.display = mode === 'video' ? 'block' : 'none'
+  document.getElementById('mode-ai-section').style.display = mode === 'ai' ? 'block' : 'none'
+  document.querySelectorAll('.mode-select-btn').forEach(b => {
+    const isActive = b.dataset.mode === mode
+    b.classList.toggle('active', isActive)
+    b.classList.toggle('ghost', !isActive)
+  })
+}
+document.querySelectorAll('.mode-select-btn').forEach(btn => {
+  btn.addEventListener('click', () => setCreateMode(btn.dataset.mode))
+})
 
 document.getElementById('video-input').addEventListener('change', async (e) => {
   const file = e.target.files[0]
@@ -1279,6 +1380,7 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
   errorEl.textContent = ''
   const titre = document.getElementById('new-titre').value.trim()
   const categorie = document.getElementById('new-categorie').value.trim()
+  const categorieIcone = document.getElementById('new-categorie-icone').value
   const allSteps = [...manualSteps, ...videoSteps]
 
   if (!titre) { errorEl.textContent = 'Le titre est obligatoire.'; return }
@@ -1303,7 +1405,7 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
 
   const { data: newProc, error: procError } = await supabase
     .from('procedures')
-    .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, video_url: videoUrl, created_by: currentMembre.id })
+    .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, categorie_icone: categorieIcone, video_url: videoUrl, created_by: currentMembre.id })
     .select().single()
 
   if (procError) {

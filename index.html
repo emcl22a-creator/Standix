@@ -640,27 +640,37 @@
 </nav>
 
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" onerror="window.__libError=true"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="window.__libError=true"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js" onerror="window.__libError=true"></script>
-<script>
-  if (window.__libError || typeof window.supabase === 'undefined' || typeof window.QRCode === 'undefined') {
-    window.__procedoLoaded = true
-    var loadingEl = document.getElementById('loading-screen')
-    if (loadingEl) loadingEl.style.display = 'none'
-    document.body.insertAdjacentHTML('beforeend',
-      '<div style="position:fixed; inset:0; z-index:9999; background:#141518; display:flex; align-items:center; justify-content:center; padding:24px;">' +
-        '<div style="text-align:center; max-width:300px;">' +
-          '<p style="color:#fff; font-size:15px; font-weight:600; margin-bottom:8px;">Connexion impossible</p>' +
-          '<p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:20px;">Vérifiez votre connexion internet, puis réessayez.</p>' +
-          '<button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:600; font-size:14px; border:none;">Réessayer</button>' +
-        '</div>' +
-      '</div>'
-    )
-  }
-</script>
 <script type="module">
-const { createClient } = window.supabase
-const QRCode = window.QRCode
+let createClient, QRCode
+
+try {
+  const [supabaseModule, qrcodeModule] = await Promise.all([
+    import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'),
+    import('https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm')
+  ])
+  createClient = supabaseModule.createClient
+  QRCode = qrcodeModule.default
+  if (!createClient) throw new Error('createClient introuvable dans le module Supabase chargé')
+} catch (e) {
+  console.error('Échec du chargement des librairies :', e)
+  window.__procedoLoaded = true
+  const loadingEl = document.getElementById('loading-screen')
+  if (loadingEl) loadingEl.style.display = 'none'
+  document.body.insertAdjacentHTML('beforeend', `
+    <div style="position:fixed; inset:0; z-index:9999; background:#141518; display:flex; align-items:center; justify-content:center; padding:24px;">
+      <div style="text-align:center; max-width:320px;">
+        <p style="color:#fff; font-size:15px; font-weight:600; margin-bottom:8px;">Connexion impossible</p>
+        <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">Vérifiez votre connexion internet, puis réessayez.</p>
+        <div style="background:rgba(255,69,58,0.12); border:1px solid rgba(255,69,58,0.4); border-radius:10px; padding:12px; margin-bottom:20px; text-align:left;">
+          <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">DÉTAIL TECHNIQUE (build v2) :</p>
+          <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : 'Erreur inconnue (pas de message)'}</p>
+        </div>
+        <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:600; font-size:14px; border:none;">Réessayer</button>
+      </div>
+    </div>
+  `)
+  throw e
+}
 
 const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
 const SUPABASE_ANON_KEY = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'

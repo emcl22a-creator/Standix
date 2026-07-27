@@ -8,7 +8,8 @@
 <title>Procédo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root{
@@ -56,7 +57,7 @@
     position:relative;
     display:flex; align-items:center;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 16px;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
   .topbar-left{ display:flex; align-items:center; gap:13px; }
@@ -68,7 +69,7 @@
   .topbar-title .name{ font-size:16px; font-weight:700; }
   .topbar-title .role{ font-size:12.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
-    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    width:44px; height:44px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
@@ -138,6 +139,30 @@
   .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
   .step-edit-item input{ flex:1; background:none; border:none; font-size:13.5px; padding:0; }
   .step-edit-item .del{ color:var(--red); font-size:16px; flex-shrink:0; }
+
+  /* ═══ Timeline façon CapCut ═══ */
+  .capcut-wrap{ margin-top:12px; }
+  .capcut-timeline{
+    position:relative; height:52px; border-radius:10px; overflow:hidden;
+    background:#000; border:0.5px solid var(--border);
+  }
+  .capcut-track{ position:absolute; inset:0; display:flex; }
+  .capcut-track img{ flex:1; height:100%; object-fit:cover; display:block; border-right:1px solid rgba(0,0,0,0.4); }
+  .capcut-markers{ position:absolute; inset:0; pointer-events:none; }
+  .capcut-marker{
+    position:absolute; top:0; bottom:0; width:2px; background:#fff;
+    box-shadow:0 0 4px rgba(255,255,255,0.8);
+  }
+  .capcut-playhead{
+    position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--red); z-index:3;
+    box-shadow:0 0 6px rgba(255,69,58,0.7);
+  }
+  .capcut-playhead-handle{
+    position:absolute; top:-5px; left:50%; transform:translateX(-50%);
+    width:12px; height:8px; background:var(--red); border-radius:3px;
+  }
+  .capcut-time-row{ display:flex; justify-content:space-between; font-size:11px; color:var(--label-2); margin-top:6px; font-variant-numeric:tabular-nums; }
+  .cut-toolbar{ display:flex; gap:8px; margin-top:10px; }
 
   .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
   .stat-mini{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
@@ -400,7 +425,8 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Nouvelle procédure</h1>
     </div>
-    <div class="subhead">Filmez la tâche, ajoutez les étapes une par une</div>
+    <div class="subhead">Écrivez les étapes, ou découpez une vidéo</div>
+
     <div class="card">
       <label class="f">Titre</label>
       <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
@@ -409,18 +435,38 @@
         <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
       </div>
     </div>
+
+    <div class="section-title">Étapes manuelles</div>
+    <div id="manual-steps-list"></div>
+    <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
+
+    <div class="section-title" style="margin-top:32px;">Découper une vidéo</div>
     <div class="card">
-      <label class="f">Vidéo</label>
       <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
       <div class="video-frame" id="video-frame">
         <video id="video-player" style="display:none;" controls></video>
         <span id="video-placeholder">Aucune vidéo importée</span>
       </div>
+
+      <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
+        <div class="capcut-timeline" id="capcut-timeline">
+          <div class="capcut-track" id="capcut-track"></div>
+          <div class="capcut-markers" id="capcut-markers"></div>
+          <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
+        </div>
+        <div class="capcut-time-row">
+          <span id="capcut-current-time">0:00</span>
+          <span id="capcut-duration">0:00</span>
+        </div>
+        <div class="cut-toolbar">
+          <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
+        </div>
+      </div>
     </div>
-    <div class="section-title">Étapes</div>
-    <div id="steps-list"></div>
-    <button class="btn ghost block" style="margin-top:8px;" id="add-step-btn">+ Ajouter une étape ici</button>
-    <div class="note">Chaque étape se lie automatiquement au moment de la vidéo où vous étiez.</div>
+
+    <div id="video-steps-list"></div>
+    <div class="note">Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.</div>
+
     <div class="error-msg" id="create-error"></div>
     <button class="btn block" style="margin-top:18px;" id="publish-btn">Publier la procédure</button>
   </div>
@@ -680,7 +726,8 @@ const SUPABASE_ANON_KEY = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 let currentMembre = null
-let currentSteps = []
+let manualSteps = []
+let videoSteps = []
 let currentVideoFile = null
 let allEquipeProcedures = []
 let scanStream = null
@@ -1092,40 +1139,132 @@ function resetCreateForm() {
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'block'
+  document.getElementById('capcut-wrap').style.display = 'none'
+  document.getElementById('capcut-track').innerHTML = ''
+  document.getElementById('capcut-markers').innerHTML = ''
   document.getElementById('create-error').textContent = ''
-  currentSteps = []
+  manualSteps = []
+  videoSteps = []
   currentVideoFile = null
-  renderSteps()
+  renderManualSteps()
+  renderVideoSteps()
 }
 
-document.getElementById('video-input').addEventListener('change', (e) => {
+document.getElementById('video-input').addEventListener('change', async (e) => {
   const file = e.target.files[0]
   if (!file) return
   currentVideoFile = file
+  videoSteps = []
+  renderVideoSteps()
   const url = URL.createObjectURL(file)
   const player = document.getElementById('video-player')
   player.src = url
   player.style.display = 'block'
   document.getElementById('video-placeholder').style.display = 'none'
+  document.getElementById('capcut-wrap').style.display = 'block'
+
+  player.addEventListener('loadedmetadata', () => {
+    document.getElementById('capcut-duration').textContent = formatTime(player.duration)
+    generateFilmstrip(player)
+  }, { once: true })
+
+  player.addEventListener('timeupdate', () => {
+    const pct = player.duration ? (player.currentTime / player.duration) * 100 : 0
+    document.getElementById('capcut-playhead').style.left = pct + '%'
+    document.getElementById('capcut-current-time').textContent = formatTime(player.currentTime)
+  })
 })
 
-document.getElementById('add-step-btn').addEventListener('click', () => {
+// Génère une pellicule de vignettes façon CapCut en capturant des images de la vidéo
+async function generateFilmstrip(video) {
+  const track = document.getElementById('capcut-track')
+  track.innerHTML = ''
+  const nbThumbs = 8
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  canvas.width = 160
+  canvas.height = 90
+  const originalTime = video.currentTime
+
+  for (let i = 0; i < nbThumbs; i++) {
+    const t = (video.duration / nbThumbs) * (i + 0.5)
+    await new Promise((resolve) => {
+      const onSeeked = () => {
+        video.removeEventListener('seeked', onSeeked)
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+        const img = document.createElement('img')
+        img.src = canvas.toDataURL('image/jpeg', 0.6)
+        track.appendChild(img)
+        resolve()
+      }
+      video.addEventListener('seeked', onSeeked)
+      video.currentTime = t
+    })
+  }
+  video.currentTime = originalTime
+}
+
+document.getElementById('cut-here-btn').addEventListener('click', () => {
   const player = document.getElementById('video-player')
-  const t = currentVideoFile ? (player.currentTime || 0) : null
-  currentSteps.push({ texte: '', timestamp_video: t })
-  renderSteps()
+  const t = player.currentTime || 0
+  videoSteps.push({ texte: '', timestamp_video: t })
+  videoSteps.sort((a, b) => a.timestamp_video - b.timestamp_video)
+  renderVideoSteps()
+  renderCapcutMarkers(player.duration)
 })
 
-function renderSteps() {
-  const listEl = document.getElementById('steps-list')
+function renderCapcutMarkers(duration) {
+  const markersEl = document.getElementById('capcut-markers')
+  markersEl.innerHTML = ''
+  videoSteps.forEach(s => {
+    const pct = duration ? (s.timestamp_video / duration) * 100 : 0
+    const div = document.createElement('div')
+    div.className = 'capcut-marker'
+    div.style.left = pct + '%'
+    markersEl.appendChild(div)
+  })
+}
+
+// ═══ Étapes manuelles (texte seul, pas de vidéo) ═══
+document.getElementById('add-manual-step-btn').addEventListener('click', () => {
+  manualSteps.push({ texte: '' })
+  renderManualSteps()
+})
+
+function renderManualSteps() {
+  const listEl = document.getElementById('manual-steps-list')
   listEl.innerHTML = ''
-  currentSteps.forEach((step, i) => {
+  manualSteps.forEach((step, i) => {
     const div = document.createElement('div')
     div.className = 'step-edit-item'
-    const timeLabel = step.timestamp_video != null ? formatTime(step.timestamp_video) : '—'
-    div.innerHTML = `<span class="range">${timeLabel}</span><input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte)}"><span class="del">✕</span>`
-    div.querySelector('input').addEventListener('input', (e) => { currentSteps[i].texte = e.target.value })
-    div.querySelector('.del').addEventListener('click', () => { currentSteps.splice(i, 1); renderSteps() })
+    div.innerHTML = `<span class="range">${i + 1}</span><input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte)}"><span class="del">✕</span>`
+    div.querySelector('input').addEventListener('input', (e) => { manualSteps[i].texte = e.target.value })
+    div.querySelector('.del').addEventListener('click', () => { manualSteps.splice(i, 1); renderManualSteps() })
+    listEl.appendChild(div)
+  })
+}
+
+// ═══ Étapes issues du découpage vidéo ═══
+function renderVideoSteps() {
+  const listEl = document.getElementById('video-steps-list')
+  listEl.innerHTML = ''
+  if (videoSteps.length > 0) {
+    const title = document.createElement('div')
+    title.className = 'section-title'
+    title.textContent = 'Étapes de la vidéo'
+    listEl.appendChild(title)
+  }
+  videoSteps.forEach((step, i) => {
+    const div = document.createElement('div')
+    div.className = 'step-edit-item'
+    div.innerHTML = `<span class="range">${formatTime(step.timestamp_video)}</span><input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte)}"><span class="del">✕</span>`
+    div.querySelector('input').addEventListener('input', (e) => { videoSteps[i].texte = e.target.value })
+    div.querySelector('.del').addEventListener('click', () => {
+      videoSteps.splice(i, 1)
+      renderVideoSteps()
+      const player = document.getElementById('video-player')
+      renderCapcutMarkers(player.duration)
+    })
     listEl.appendChild(div)
   })
 }
@@ -1140,10 +1279,11 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
   errorEl.textContent = ''
   const titre = document.getElementById('new-titre').value.trim()
   const categorie = document.getElementById('new-categorie').value.trim()
+  const allSteps = [...manualSteps, ...videoSteps]
 
   if (!titre) { errorEl.textContent = 'Le titre est obligatoire.'; return }
-  if (currentSteps.length === 0) { errorEl.textContent = 'Ajoutez au moins une étape.'; return }
-  if (currentSteps.some(s => !s.texte.trim())) { errorEl.textContent = 'Chaque étape doit avoir un texte.'; return }
+  if (allSteps.length === 0) { errorEl.textContent = 'Ajoutez au moins une étape (manuelle ou vidéo).'; return }
+  if (allSteps.some(s => !s.texte.trim())) { errorEl.textContent = 'Chaque étape doit avoir un texte.'; return }
 
   const publishBtn = document.getElementById('publish-btn')
   setButtonLoading(publishBtn, true)
@@ -1172,7 +1312,7 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
     return
   }
 
-  const etapesToInsert = currentSteps.map((s, i) => ({ procedure_id: newProc.id, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video }))
+  const etapesToInsert = allSteps.map((s, i) => ({ procedure_id: newProc.id, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video ?? null }))
   const { error: etapesError } = await supabase.from('etapes').insert(etapesToInsert)
 
   setButtonLoading(publishBtn, false)

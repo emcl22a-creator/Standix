@@ -38,6 +38,11 @@
   @keyframes chaloBreath2{0%,100%{transform:translate(0,0) scale(1.05); opacity:0.65;}50%{transform:translate(-5%,-6%) scale(1); opacity:0.9;}}
   @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
 
+  @media (max-width: 600px){
+    .chalo{ opacity:1; filter:blur(95px); }
+    .chalo-4{ opacity:1; }
+  }
+
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
   .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 20px 0; }
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
@@ -46,11 +51,12 @@
     50%{ transform:scale(1.06); }
   }
 
+  .topbar-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .topbar-card{
     position:relative;
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    display:flex; align-items:center;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 10px 10px 18px;
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
   .topbar-left{ display:flex; align-items:center; gap:13px; }
@@ -63,10 +69,12 @@
   .topbar-title .role{ font-size:12.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(255,255,255,0.14); border:0.5px solid rgba(255,255,255,0.16); color:var(--label);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
-  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.22); }
+  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
   .icon-pill svg{ width:20px; height:20px; }
 
   .screen{display:none; padding:96px 20px 40px;}
@@ -177,7 +185,7 @@
   .detail-step p{font-size:14px; line-height:1.4;}
   .confirm-bar{ margin-top:20px; }
 
-  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:4px 14px; margin-bottom:14px; }
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:2px 14px; margin-bottom:12px; }
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
@@ -196,26 +204,6 @@
   .note{ font-size:12.5px; color:var(--label-2); margin-top:14px; }
 
   .empty-state{ text-align:center; padding:36px 20px 20px; }
-  .empty-state .glow-icon{
-    position:relative; width:72px; height:72px; margin:0 auto 20px;
-    display:flex; align-items:center; justify-content:center;
-    border-radius:50%;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 60%),
-      rgba(255,255,255,0.05);
-    border:0.5px solid rgba(255,255,255,0.16);
-    box-shadow:
-      0 1px 1px rgba(255,255,255,0.2) inset,
-      0 -6px 12px rgba(0,0,0,0.25) inset,
-      0 0 30px rgba(255,255,255,0.08);
-  }
-  .empty-state .glow-icon svg{ width:30px; height:30px; color:#fff; opacity:0.9; }
-  .empty-state .plus-badge{
-    position:absolute; bottom:-2px; right:-2px; width:26px; height:26px; border-radius:50%;
-    background:#fff; display:flex; align-items:center; justify-content:center;
-    box-shadow:0 3px 8px rgba(0,0,0,0.3);
-  }
-  .empty-state .plus-badge svg{ width:13px; height:13px; color:#000; }
   .empty-state h3{ font-size:16px; font-weight:700; margin-bottom:6px; }
   .empty-state p{ font-size:13px; color:var(--label-2); max-width:250px; margin:0 auto; line-height:1.5; }
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
@@ -374,16 +362,18 @@
 <!-- ═══════════════ ESPACE GESTION ═══════════════ -->
 <div class="app" id="gestion-app" style="display:none;">
   <div class="topbar">
-    <div class="topbar-card">
-      <div class="topbar-left">
-        <div class="logo-pill">
-          <svg viewBox="0 0 85 100" fill="none">
-            <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
-          </svg>
-        </div>
-        <div class="topbar-title">
-          <span class="name">Procédo</span>
-          <span class="role">Espace Gestion</span>
+    <div class="topbar-row">
+      <div class="topbar-card">
+        <div class="topbar-left">
+          <div class="logo-pill">
+            <svg viewBox="0 0 85 100" fill="none">
+              <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+            </svg>
+          </div>
+          <div class="topbar-title">
+            <span class="name">Procédo</span>
+            <span class="role">Espace Gestion</span>
+          </div>
         </div>
       </div>
       <button class="icon-pill" onclick="openSettings()" aria-label="Paramètres">
@@ -1060,12 +1050,6 @@ async function loadGestionProcedures() {
   if (procedures.length === 0) {
     listEl.innerHTML = `
       <div class="empty-state">
-        <div class="glow-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <div class="plus-badge">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          </div>
-        </div>
         <h3>Aucune procédure pour le moment</h3>
         <p>Créez la première avec le bouton ci-dessus — décrivez la tâche ou filmez-la, ça ne prend que quelques minutes.</p>
       </div>

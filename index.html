@@ -64,10 +64,10 @@
   .logo-pill{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
-  .logo-pill svg{ width:26px; height:31px; }
+  .logo-pill svg{ width:20px; height:24px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
-  .topbar-title .name{ font-size:16px; font-weight:700; }
-  .topbar-title .role{ font-size:12.5px; color:var(--label-2); font-weight:500; }
+  .topbar-title .name{ font-size:13.5px; font-weight:700; }
+  .topbar-title .role{ font-size:11px; color:var(--label-2); font-weight:500; }
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -434,11 +434,17 @@
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="showGestionScreen('p-create')">+ Créer une procédure</button>
     <div id="cat-grid" class="cat-grid"></div>
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="gestion-search-input" placeholder="Rechercher...">
+  </div>
+
+  <div class="screen" id="p-category">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="category-titre">—</h1>
     </div>
-    <div id="procedures-list"></div>
+    <div class="subhead" id="category-subhead">—</div>
+    <div id="category-procedures-list"></div>
   </div>
 
   <div class="screen" id="p-create">
@@ -1135,42 +1141,26 @@ window.showEquipeScreen = function(id, btn) {
 }
 
 // ═══════════ GESTION : liste ═══════════
-let selectedCategoryFilter = null
+let allGestionProcedures = []
 
 async function loadGestionProcedures() {
-  const listEl = document.getElementById('procedures-list')
   const subheadEl = document.getElementById('p-list-subhead')
   const catGridEl = document.getElementById('cat-grid')
-  listEl.innerHTML = ''
 
   const { data: procedures, error } = await supabase
     .from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
     .order('created_at', { ascending: false })
 
   if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
+  allGestionProcedures = procedures
   subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
 
   // Grille des catégories (3 colonnes, icône choisie par la personne)
   catGridEl.innerHTML = ''
-  const categoriesMap = {}
-  procedures.forEach(p => {
-    const nom = p.categorie || 'Sans catégorie'
-    if (!categoriesMap[nom]) categoriesMap[nom] = p.categorie_icone || '📁'
-  })
-  Object.entries(categoriesMap).forEach(([nom, icone]) => {
-    const cell = document.createElement('div')
-    cell.className = 'cat-cell' + (selectedCategoryFilter === nom ? ' active' : '')
-    cell.innerHTML = `<div class="cat-icon">${icone}</div><div class="cat-name">${escapeHtml(nom)}</div>`
-    cell.onclick = () => {
-      selectedCategoryFilter = selectedCategoryFilter === nom ? null : nom
-      loadGestionProcedures()
-    }
-    catGridEl.appendChild(cell)
-  })
 
   if (procedures.length === 0) {
-    listEl.innerHTML = `
-      <div class="empty-state">
+    catGridEl.innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
         <h3>Aucune procédure pour le moment</h3>
         <p>Créez la première avec le bouton ci-dessus — décrivez la tâche ou filmez-la, ça ne prend que quelques minutes.</p>
       </div>
@@ -1178,9 +1168,31 @@ async function loadGestionProcedures() {
     return
   }
 
+  const categoriesMap = {}
+  procedures.forEach(p => {
+    const nom = p.categorie || 'Sans catégorie'
+    if (!categoriesMap[nom]) categoriesMap[nom] = p.categorie_icone || '📁'
+  })
+  Object.entries(categoriesMap).forEach(([nom, icone]) => {
+    const cell = document.createElement('div')
+    cell.className = 'cat-cell'
+    cell.innerHTML = `<div class="cat-icon">${icone}</div><div class="cat-name">${escapeHtml(nom)}</div>`
+    cell.onclick = () => openCategoryProcedures(nom)
+    catGridEl.appendChild(cell)
+  })
+}
+
+async function openCategoryProcedures(nom) {
+  showGestionScreen('p-category')
+  document.getElementById('category-titre').textContent = nom
+  const listEl = document.getElementById('category-procedures-list')
+  listEl.innerHTML = ''
+
+  const procsInCategory = allGestionProcedures.filter(p => (p.categorie || 'Sans catégorie') === nom)
+  document.getElementById('category-subhead').textContent = `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
+
   let cardIndex = 0
-  for (const proc of procedures) {
-    if (selectedCategoryFilter && (proc.categorie || 'Sans catégorie') !== selectedCategoryFilter) continue
+  for (const proc of procsInCategory) {
     const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const { count: nbAssignes } = await supabase.from('assignations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const nbEtapes = proc.etapes?.[0]?.count ?? 0
@@ -1192,20 +1204,13 @@ async function loadGestionProcedures() {
     div.innerHTML = `
       <div>
         <div class="title">${escapeHtml(proc.titre)}</div>
-        <div class="meta">${escapeHtml(proc.categorie || 'Sans catégorie')} · ${nbEtapes} étape${nbEtapes>1?'s':''}</div>
+        <div class="meta">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
       <span class="badge ${nbValidations >= nbAssignes && nbAssignes>0 ? 'ok' : 'pending'}">${nbValidations}/${nbAssignes || 0}</span>
     `
     listEl.appendChild(div)
   }
 }
-
-document.getElementById('gestion-search-input').addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase()
-  document.querySelectorAll('#procedures-list .sop-card').forEach(card => {
-    card.style.display = card.querySelector('.title').textContent.toLowerCase().includes(q) ? 'flex' : 'none'
-  })
-})
 
 // ═══════════ GESTION : création ═══════════
 function resetCreateForm() {

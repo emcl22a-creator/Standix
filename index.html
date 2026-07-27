@@ -47,41 +47,29 @@
   }
 
   .topbar-card{
-    position:relative; overflow:hidden; isolation:isolate;
+    position:relative;
     display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.03) 55%),
-      rgba(255,255,255,0.05);
-    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:8px 8px 8px 16px;
-    box-shadow:
-      0 1px 1px rgba(255,255,255,0.25) inset,
-      0 -6px 10px rgba(0,0,0,0.25) inset,
-      0 8px 20px rgba(0,0,0,0.30);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 10px 10px 18px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
-  .topbar-card::before{
-    content:''; position:absolute; top:-45%; left:6%; width:46%; height:85%;
-    background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.4), rgba(255,255,255,0) 65%);
-    transform:rotate(-8deg); pointer-events:none; z-index:1;
-  }
-  .topbar-left{ display:flex; align-items:center; gap:12px; position:relative; z-index:2; }
+  .topbar-left{ display:flex; align-items:center; gap:13px; }
   .logo-pill{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
-  .logo-pill svg{ width:20px; height:24px; }
+  .logo-pill svg{ width:26px; height:31px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
-  .topbar-title .name{ font-size:14.5px; font-weight:700; }
-  .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
+  .topbar-title .name{ font-size:16px; font-weight:700; }
+  .topbar-title .role{ font-size:12.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
-    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.16); color:var(--label);
-    position:relative; z-index:2;
+    width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    background:rgba(255,255,255,0.14); border:0.5px solid rgba(255,255,255,0.16); color:var(--label);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
-  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
-  .icon-pill svg{ width:17px; height:17px; }
+  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.22); }
+  .icon-pill svg{ width:20px; height:20px; }
 
-  .screen{display:none; padding:86px 20px 40px;}
+  .screen{display:none; padding:96px 20px 40px;}
   .screen.active{ display:block; animation: screenIn 0.5s cubic-bezier(0.32,0.72,0,1); }
   @keyframes screenIn{
     0%{ opacity:0; transform:translateY(14px) scale(0.985); }
@@ -189,7 +177,7 @@
   .detail-step p{font-size:14px; line-height:1.4;}
   .confirm-bar{ margin-top:20px; }
 
-  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:2px 14px; margin-bottom:14px; }
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:4px 14px; margin-bottom:14px; }
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
@@ -240,6 +228,14 @@
     animation: spin 0.8s linear infinite;
   }
   @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .btn-spinner{
+    display:inline-block; width:15px; height:15px; border-radius:50%;
+    border:2px solid rgba(0,0,0,0.25); border-top-color:#000;
+    animation: spin 0.7s linear infinite; vertical-align:middle;
+  }
+  .btn.ghost .btn-spinner{ border-color:rgba(255,255,255,0.25); border-top-color:#fff; }
+  .btn[data-loading="true"]{ pointer-events:none; opacity:0.85; }
   .login-card{ width:100%; max-width:360px; max-height:92vh; overflow-y:auto; background:var(--bg-card); border:0.5px solid var(--border); border-radius:20px; padding:28px 24px;
     -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%); touch-action:pan-y; }
 
@@ -560,9 +556,6 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <span class="tab-round-label">Procédures</span>
   </button>
-  <button class="tab-round tab-round--primary" onclick="showGestionScreen('p-create', this)">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
   <button class="tab-round tab-round--secondary tab-round--with-label" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
     <span class="tab-round-label">Analyse</span>
@@ -639,20 +632,15 @@
   </button>
 </nav>
 
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" onerror="window.__libError=true"></script>
 <script type="module">
-let createClient, QRCode
+let createClient
 
 try {
-  const [supabaseModule, qrcodeModule] = await Promise.all([
-    import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'),
-    import('https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm')
-  ])
+  const supabaseModule = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
   createClient = supabaseModule.createClient
-  QRCode = qrcodeModule.default
   if (!createClient) throw new Error('createClient introuvable dans le module Supabase chargé')
 } catch (e) {
-  console.error('Échec du chargement des librairies :', e)
+  console.error('Échec du chargement de Supabase :', e)
   window.__procedoLoaded = true
   const loadingEl = document.getElementById('loading-screen')
   if (loadingEl) loadingEl.style.display = 'none'
@@ -662,7 +650,7 @@ try {
         <p style="color:#fff; font-size:15px; font-weight:600; margin-bottom:8px;">Connexion impossible</p>
         <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">Vérifiez votre connexion internet, puis réessayez.</p>
         <div style="background:rgba(255,69,58,0.12); border:1px solid rgba(255,69,58,0.4); border-radius:10px; padding:12px; margin-bottom:20px; text-align:left;">
-          <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">DÉTAIL TECHNIQUE (build v2) :</p>
+          <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">DÉTAIL TECHNIQUE (build v3) :</p>
           <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : 'Erreur inconnue (pas de message)'}</p>
         </div>
         <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:600; font-size:14px; border:none;">Réessayer</button>
@@ -670,6 +658,31 @@ try {
     </div>
   `)
   throw e
+}
+
+// QRCode (génération) et jsQR (lecture caméra) ne sont chargés qu'au moment où
+// on en a vraiment besoin, pas au démarrage — ça accélère nettement l'ouverture de l'app.
+let QRCode = null
+let jsQRLib = null
+async function ensureQRCode() {
+  if (!QRCode) {
+    const mod = await import('https://cdn.jsdelivr.net/npm/qrcode@1.5.3/+esm')
+    QRCode = mod.default
+  }
+  return QRCode
+}
+async function ensureJsQR() {
+  if (!jsQRLib) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script')
+      s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'
+      s.onload = resolve
+      s.onerror = reject
+      document.head.appendChild(s)
+    })
+    jsQRLib = window.jsQR
+  }
+  return jsQRLib
 }
 
 const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
@@ -725,20 +738,24 @@ document.getElementById('login-btn').addEventListener('click', async () => {
   const email = document.getElementById('login-email').value.trim()
   const password = document.getElementById('login-password').value
   const errorEl = document.getElementById('login-error')
+  const btn = document.getElementById('login-btn')
   errorEl.textContent = ''
+  setButtonLoading(btn, true)
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) { errorEl.textContent = "Connexion impossible : " + error.message; return }
+  if (error) { errorEl.textContent = "Connexion impossible : " + error.message; setButtonLoading(btn, false); return }
 
   const { data: membre, error: membreError } = await supabase
     .from('membres').select('*').eq('user_id', data.user.id).single()
 
   if (membreError || !membre) {
     errorEl.textContent = "Aucune fiche membre trouvée pour ce compte. Contactez un administrateur."
+    setButtonLoading(btn, false)
     return
   }
 
   enterApp(membre)
+  setButtonLoading(btn, false)
 })
 
 // ═══ CRÉATION DE COMPTE ═══
@@ -772,8 +789,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
   }
 
   const signupBtn = document.getElementById('signup-btn')
-  signupBtn.disabled = true
-  signupBtn.textContent = 'Création...'
+  setButtonLoading(signupBtn, true)
 
   const { data, error } = await supabase.auth.signUp({ email, password })
 
@@ -783,7 +799,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
     } else {
       errorEl.textContent = "Erreur (" + (error.status || '?') + ") : " + error.message
     }
-    signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+    setButtonLoading(signupBtn, false)
     return
   }
 
@@ -792,7 +808,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
     errorEl.textContent = ''
     errorEl.style.color = 'var(--green)'
     errorEl.textContent = 'Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.'
-    signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+    setButtonLoading(signupBtn, false)
     switchAuthTab('login')
     return
   }
@@ -809,7 +825,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
     }
     if (!entrepriseId) {
       errorEl.textContent = "Impossible de créer l'entreprise, réessayez."
-      signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+      setButtonLoading(signupBtn, false)
       return
     }
     targetEntrepriseId = entrepriseId
@@ -826,8 +842,7 @@ document.getElementById('signup-btn').addEventListener('click', async () => {
     })
     .select().single()
 
-  signupBtn.disabled = false
-  signupBtn.textContent = 'Créer mon compte'
+  setButtonLoading(signupBtn, false)
 
   if (membreError) {
     errorEl.style.color = 'var(--red)'
@@ -905,12 +920,15 @@ document.getElementById('copy-code-btn').addEventListener('click', () => {
 
 document.getElementById('settings-save-btn').addEventListener('click', async () => {
   const errorEl = document.getElementById('settings-error')
+  const btn = document.getElementById('settings-save-btn')
   errorEl.textContent = ''
   const nom = document.getElementById('settings-nom').value.trim()
   const poste = document.getElementById('settings-poste').value.trim()
   if (!nom) { errorEl.textContent = 'Le nom est obligatoire.'; return }
 
+  setButtonLoading(btn, true)
   const { error } = await supabase.from('membres').update({ nom, poste }).eq('id', currentMembre.id)
+  setButtonLoading(btn, false)
   if (error) { errorEl.textContent = "Erreur : " + error.message; return }
   currentMembre.nom = nom
   currentMembre.poste = poste
@@ -1144,8 +1162,7 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
   if (currentSteps.some(s => !s.texte.trim())) { errorEl.textContent = 'Chaque étape doit avoir un texte.'; return }
 
   const publishBtn = document.getElementById('publish-btn')
-  publishBtn.disabled = true
-  publishBtn.textContent = 'Publication...'
+  setButtonLoading(publishBtn, true)
 
   let videoUrl = null
   if (currentVideoFile) {
@@ -1153,7 +1170,7 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, currentVideoFile)
     if (uploadError) {
       errorEl.textContent = "Erreur d'upload vidéo : " + uploadError.message
-      publishBtn.disabled = false; publishBtn.textContent = 'Publier la procédure'
+      setButtonLoading(publishBtn, false)
       return
     }
     const { data: publicUrlData } = supabase.storage.from('procedo-videos').getPublicUrl(path)
@@ -1167,15 +1184,14 @@ document.getElementById('publish-btn').addEventListener('click', async () => {
 
   if (procError) {
     errorEl.textContent = "Erreur : " + procError.message
-    publishBtn.disabled = false; publishBtn.textContent = 'Publier la procédure'
+    setButtonLoading(publishBtn, false)
     return
   }
 
   const etapesToInsert = currentSteps.map((s, i) => ({ procedure_id: newProc.id, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video }))
   const { error: etapesError } = await supabase.from('etapes').insert(etapesToInsert)
 
-  publishBtn.disabled = false
-  publishBtn.textContent = 'Publier la procédure'
+  setButtonLoading(publishBtn, false)
 
   if (etapesError) { errorEl.textContent = "Erreur étapes : " + etapesError.message; return }
 
@@ -1231,10 +1247,12 @@ async function openAnalyse(procId) {
   }
 
   const qrContainer = document.getElementById('qr-container')
-  qrContainer.innerHTML = ''
+  qrContainer.innerHTML = '<div style="font-size:11px; color:var(--label-2);">Génération...</div>'
   const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
+  const QRCodeLib = await ensureQRCode()
   const canvas = document.createElement('canvas')
-  await QRCode.toCanvas(canvas, scanUrl, { width: 200, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
+  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 200, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
+  qrContainer.innerHTML = ''
   qrContainer.appendChild(canvas)
 
   document.getElementById('qr-download-btn').onclick = () => {
@@ -1318,13 +1336,13 @@ async function openEquipeDetail(procId) {
     const errorEl = document.getElementById('confirm-error')
     errorEl.textContent = ''
     const btn = document.getElementById('confirm-btn')
-    btn.disabled = true
+    setButtonLoading(btn, true)
     const { error } = await supabase.from('validations').upsert(
       { procedure_id: proc.id, membre_id: currentMembre.id }, { onConflict: 'procedure_id,membre_id' }
     )
-    btn.disabled = false
-    if (error) { errorEl.textContent = "Erreur : " + error.message; return }
-    btn.textContent = '✓ Validé'
+    if (error) { setButtonLoading(btn, false); errorEl.textContent = "Erreur : " + error.message; return }
+    btn.dataset.originalText = '✓ Validé'
+    setButtonLoading(btn, false)
     loadEquipeProcedures()
   }
 }
@@ -1334,6 +1352,8 @@ window.startScanner = async function() {
   const hintEl = document.getElementById('scan-hint')
   const video = document.getElementById('scan-video')
   try {
+    hintEl.textContent = 'Chargement du scanner...'
+    await ensureJsQR()
     scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
     video.srcObject = scanStream
     await video.play()
@@ -1357,7 +1377,7 @@ function scanLoop() {
     scanCanvas.width = video.videoWidth; scanCanvas.height = video.videoHeight
     scanCtx.drawImage(video, 0, 0, scanCanvas.width, scanCanvas.height)
     const imageData = scanCtx.getImageData(0, 0, scanCanvas.width, scanCanvas.height)
-    const code = jsQR(imageData.data, imageData.width, imageData.height)
+    const code = jsQRLib(imageData.data, imageData.width, imageData.height)
     if (code) { handleScanResult(code.data); return }
   }
   requestAnimationFrame(scanLoop)
@@ -1377,6 +1397,17 @@ function handleScanResult(text) {
     setTimeout(() => openEquipeDetail(procId), 600)
   } else {
     resultZone.innerHTML = `<div class="error-msg">Ce code ne correspond à aucune procédure Procédo.</div>`
+  }
+}
+
+function setButtonLoading(btn, isLoading, loadingText) {
+  if (isLoading) {
+    btn.dataset.originalText = btn.innerHTML
+    btn.dataset.loading = 'true'
+    btn.innerHTML = `<span class="btn-spinner"></span>${loadingText ? ' ' + loadingText : ''}`
+  } else {
+    btn.innerHTML = btn.dataset.originalText || btn.innerHTML
+    btn.dataset.loading = 'false'
   }
 }
 

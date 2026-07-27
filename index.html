@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<title>Procédo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root{
+    --bg:#141518; --bg-card: rgba(255,255,255,0.06);
+    --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
+    --hero-gradient: linear-gradient(150deg, #2C2C34 0%, #1E1E24 40%, #141418 75%, #0C0C10 100%);
+    --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
+    --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
+  }
+  html, body{
+    background:#141518; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+    color:var(--label); font-size:17px; line-height:1.35; letter-spacing:-0.02em;
+    -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden; position:relative;
+  }
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
+  textarea, input{font-family:inherit; color:inherit;}
+
+  .color-halos{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .chalo{ position:absolute; border-radius:50%; filter:blur(120px); opacity:0.8; }
+  .chalo-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
+    background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); animation:chaloBreath1 14s ease-in-out infinite; }
+  .chalo-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
+    background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); animation:chaloBreath2 18s ease-in-out infinite; }
+  .chalo-4{ top:-14%; left:50%; transform:translateX(-50%); width:120vw; height:70vw; max-width:1000px; max-height:600px;
+    background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); opacity:0.9; animation:chaloBreath3 16s ease-in-out infinite; }
+  @keyframes chaloBreath1{0%,100%{transform:translate(0,0) scale(1); opacity:0.7;}50%{transform:translate(6%,4%) scale(1.12); opacity:0.95;}}
+  @keyframes chaloBreath2{0%,100%{transform:translate(0,0) scale(1.05); opacity:0.65;}50%{transform:translate(-5%,-6%) scale(1); opacity:0.9;}}
+  @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
+
+  .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
+  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 20px 0; }
+  .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
+  @keyframes logoBreath{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.06); }
+  }
+
+  .topbar-card{
+    position:relative; overflow:hidden; isolation:isolate;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.03) 55%),
+      rgba(255,255,255,0.05);
+    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:8px 8px 8px 16px;
+    box-shadow:
+      0 1px 1px rgba(255,255,255,0.25) inset,
+      0 -6px 10px rgba(0,0,0,0.25) inset,
+      0 8px 20px rgba(0,0,0,0.30);
+  }
+  .topbar-card::before{
+    content:''; position:absolute; top:-45%; left:6%; width:46%; height:85%;
+    background:radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.4), rgba(255,255,255,0) 65%);
+    transform:rotate(-8deg); pointer-events:none; z-index:1;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:12px; position:relative; z-index:2; }
+  .logo-pill{
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .logo-pill svg{ width:20px; height:24px; }
+  .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
+  .topbar-title .name{ font-size:14.5px; font-weight:700; }
+  .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
+  .icon-pill{
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.16); color:var(--label);
+    position:relative; z-index:2;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+  }
+  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
+  .icon-pill svg{ width:17px; height:17px; }
+
+  .screen{display:none; padding:86px 20px 40px;}
+  .screen.active{ display:block; animation: screenIn 0.5s cubic-bezier(0.32,0.72,0,1); }
+  @keyframes screenIn{
+    0%{ opacity:0; transform:translateY(14px) scale(0.985); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .screen.active{display:block;}
+  h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.02em; margin:6px 0 2px; }
+  .subhead{ font-size:14px; color:var(--label-2); margin-bottom:20px; }
+
+  .hero-card{ position:relative; background:var(--hero-gradient); border:0.5px solid rgba(255,255,255,0.15);
+    border-radius:20px; padding:22px 20px; margin-bottom:16px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+  .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.55); font-weight:500; margin-bottom:10px; }
+  .hero-card .num{ font-size:44px; font-weight:700; color:#fff; letter-spacing:-1.2px; }
+  .hero-card .sub{ font-size:13px; color:rgba(255,255,255,0.55); margin-top:4px; font-weight:500; }
+  .hero-card .bar{ height:10px; background:rgba(255,255,255,0.18); border-radius:100px; overflow:hidden; margin-top:14px; }
+  .hero-card .bar-fill{ height:100%; background:#fff; border-radius:100px; box-shadow:0 0 12px rgba(255,255,255,0.55); }
+
+  .section-title{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--label-2); margin:22px 0 10px; }
+  .card, .sop-card, .emp-row{
+    background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    border:0.5px solid var(--border); border-radius:16px;
+  }
+  .sop-card{ padding:14px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;
+    animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+  .sop-card:active{ transform:scale(0.97); }
+  @keyframes cardIn{
+    0%{ opacity:0; transform:translateY(10px) scale(0.97); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .sop-card .title{ font-size:15px; font-weight:600; letter-spacing:-0.01em; }
+  .sop-card .meta{ font-size:12px; color:var(--label-2); margin-top:3px; }
+  .badge{ font-size:11px; padding:5px 10px; border-radius:100px; white-space:nowrap; font-weight:600; }
+  .badge.ok{background:rgba(48,209,88,0.16); color:var(--green);}
+  .badge.pending{background:rgba(255,159,10,0.16); color:var(--orange);}
+
+  .card{padding:18px; margin-bottom:14px;}
+  label.f{ display:block; font-size:12px; font-weight:600; color:var(--label-2); margin-bottom:8px; }
+  textarea, input[type=text], input[type=email], input[type=password], input[type=file]{
+    width:100%; font-size:16px; border:0.5px solid var(--border); border-radius:12px; padding:12px;
+    background:rgba(255,255,255,0.04); color:var(--label);
+  }
+  textarea:focus, input:focus{ outline:none; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.07); }
+  ::placeholder{color:var(--label-3);}
+
+  .btn{ font-size:14px; font-weight:600; background:#FFFFFF; color:#000000; padding:11px 20px; border-radius:100px;
+    box-shadow:0 4px 14px rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4);
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.15s; }
+  .btn:active{transform:scale(0.94); background:#E5E5EA;}
+  .btn.ghost{ background:rgba(255,255,255,0.10); color:var(--label); box-shadow:none; border:0.5px solid var(--border); }
+  .btn.block{width:100%; text-align:center;}
+  .btn[disabled]{opacity:0.5;}
+
+  .video-frame{ background:#000; border:0.5px solid var(--border); border-radius:16px; aspect-ratio:16/9;
+    display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.5); font-size:13px; overflow:hidden; position:relative; }
+  .video-frame video{width:100%; height:100%; object-fit:contain;}
+
+  .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
+  .step-edit-item input{ flex:1; background:none; border:none; font-size:13.5px; padding:0; }
+  .step-edit-item .del{ color:var(--red); font-size:16px; flex-shrink:0; }
+
+  .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
+  .stat-mini{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+  .stat-mini .num{ font-size:20px; font-weight:700; }
+  .stat-mini .lbl{ font-size:10.5px; color:var(--label-2); margin-top:2px; }
+
+  .emp-row{ display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px;
+    animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; }
+  .emp-row-name{ font-size:13.5px; font-weight:600; flex:1; }
+  .emp-row-date{ font-size:11.5px; color:var(--label-2); }
+  .check{ width:22px; height:22px; border-radius:50%; border:2px solid var(--separator); flex-shrink:0;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), background 0.2s, border-color 0.2s; }
+  .check.done{ animation: checkPop 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes checkPop{
+    0%{ transform:scale(0.6); }
+    60%{ transform:scale(1.15); }
+    100%{ transform:scale(1); }
+  }
+  .check.done{ background:var(--green); border-color:var(--green); position:relative; }
+  .check.done::after{ content:'✓'; color:#000; font-size:12px; font-weight:700; position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); }
+
+  .qr-card{ display:flex; gap:14px; align-items:center; padding:16px; }
+  .qr-visual{ width:96px; height:96px; border-radius:14px; overflow:hidden; flex-shrink:0; background:#fff; display:flex; align-items:center; justify-content:center; }
+  .qr-visual canvas{width:100%; height:100%;}
+  .qr-info{ flex:1; }
+
+  .plan-card{
+    background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+    border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
+  }
+  .plan-card.active{ border-color:rgba(255,255,255,0.5); }
+  .plan-card:active{ transform:scale(0.98); }
+  .plan-head{ display:flex; justify-content:space-between; align-items:center; }
+  .plan-name{ font-size:15px; font-weight:700; display:flex; align-items:center; }
+  .plan-price{ font-size:15px; font-weight:700; }
+  .plan-price span{ font-size:11px; font-weight:500; color:var(--label-2); }
+  .plan-desc{ font-size:12px; color:var(--label-2); margin-top:4px; }
+
+  .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; padding-top:2px; }
+  .back-btn{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); border:0.5px solid var(--border); flex-shrink:0; }
+  .back-btn svg{width:16px; height:16px;}
+  .detail-step{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
+  .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+  .detail-step p{font-size:14px; line-height:1.4;}
+  .confirm-bar{ margin-top:20px; }
+
+  .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:2px 14px; margin-bottom:14px; }
+  .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
+  .search-bar input{background:none; border:none; font-size:16px; width:100%;}
+
+  .scan-wrap{ position:relative; max-width:280px; margin:20px auto 18px; aspect-ratio:1/1; border-radius:24px; overflow:hidden; background:#000; border:0.5px solid var(--border); }
+  .scan-wrap video{ width:100%; height:100%; object-fit:cover; }
+  .scan-frame .corner{ position:absolute; width:34px; height:34px; border-color:#fff; border-style:solid; opacity:0.9; pointer-events:none; }
+  .scan-frame .tl{top:16px; left:16px; border-width:3px 0 0 3px; border-top-left-radius:12px;}
+  .scan-frame .tr{top:16px; right:16px; border-width:3px 3px 0 0; border-top-right-radius:12px;}
+  .scan-frame .bl{bottom:16px; left:16px; border-width:0 0 3px 3px; border-bottom-left-radius:12px;}
+  .scan-frame .br{bottom:16px; right:16px; border-width:0 3px 3px 0; border-bottom-right-radius:12px;}
+  .scan-hint{ text-align:center; font-size:13px; color:var(--label-2); }
+  .scan-result{ margin-top:18px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:16px; display:flex; align-items:center; gap:12px; }
+  .scan-result .icon{ width:38px; height:38px; border-radius:12px; background:var(--green); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .scan-result .icon svg{width:20px; height:20px; color:#000;}
+
+  .note{ font-size:12.5px; color:var(--label-2); margin-top:14px; }
+
+  .empty-state{ text-align:center; padding:36px 20px 20px; }
+  .empty-state .glow-icon{
+    position:relative; width:72px; height:72px; margin:0 auto 20px;
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.02) 60%),
+      rgba(255,255,255,0.05);
+    border:0.5px solid rgba(255,255,255,0.16);
+    box-shadow:
+      0 1px 1px rgba(255,255,255,0.2) inset,
+      0 -6px 12px rgba(0,0,0,0.25) inset,
+      0 0 30px rgba(255,255,255,0.08);
+  }
+  .empty-state .glow-icon svg{ width:30px; height:30px; color:#fff; opacity:0.9; }
+  .empty-state .plus-badge{
+    position:absolute; bottom:-2px; right:-2px; width:26px; height:26px; border-radius:50%;
+    background:#fff; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 3px 8px rgba(0,0,0,0.3);
+  }
+  .empty-state .plus-badge svg{ width:13px; height:13px; color:#000; }
+  .empty-state h3{ font-size:16px; font-weight:700; margin-bottom:6px; }
+  .empty-state p{ font-size:13px; color:var(--label-2); max-width:250px; margin:0 auto; line-height:1.5; }
+  .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
+
+  .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
+
+  .spinner{
+    width:22px; height:22px; border-radius:50%;
+    border:2.5px solid rgba(255,255,255,0.2); border-top-color:#fff;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .login-card{ width:100%; max-width:360px; max-height:92vh; overflow-y:auto; background:var(--bg-card); border:0.5px solid var(--border); border-radius:20px; padding:28px 24px;
+    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%); touch-action:pan-y; }
+
+  .auth-toggle{
+    position:relative; display:flex; gap:0; background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    border-radius:100px; padding:4px; margin-bottom:22px;
+  }
+  .auth-toggle-indicator{
+    position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px);
+    background:#fff; border-radius:100px; z-index:0;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .auth-toggle-btn{
+    position:relative; z-index:1; flex:1; text-align:center; font-size:13px; font-weight:600; padding:9px 0;
+    border-radius:100px; color:var(--label-2); transition: color 0.3s ease;
+  }
+  .auth-toggle-btn.active{ color:#000; }
+
+  .auth-form-wrap{ position:relative; }
+  .auth-form{ display:none; }
+  .auth-form.active{ display:block; animation: authFormIn 0.4s cubic-bezier(0.32,0.72,0,1); }
+  @keyframes authFormIn{
+    0%{ opacity:0; transform:translateY(8px) scale(0.98); }
+    100%{ opacity:1; transform:translateY(0) scale(1); }
+  }
+  .login-card h1{ font-size:22px; margin-bottom:6px; }
+  .login-card .subhead{margin-bottom:20px;}
+
+  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px; display:flex; align-items:center; gap:6px; z-index:10;
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
+  .tab-round{ height:44px; border-radius:100px; display:flex; align-items:center; justify-content:center; gap:6px; padding:0 16px;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s; }
+  .tab-round:active{ transform:scale(0.88); }
+  .tab-round svg{width:19px; height:19px;}
+  .tab-round--secondary{ background:rgba(255,255,255,0.14); color:#fff; border:0.5px solid rgba(255,255,255,0.10); }
+  .tab-round--secondary.active{background:rgba(255,255,255,0.24);}
+  .tab-round-label{font-size:12.5px; font-weight:500; color:#fff;}
+  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4); }
+  .tab-round--primary svg{width:20px; height:20px;}
+</style>
+</head>
+<body>
+
+<div class="color-halos">
+  <div class="chalo chalo-4"></div><div class="chalo chalo-1"></div><div class="chalo chalo-2"></div>
+</div>
+
+<!-- ═══ 0. CHARGEMENT (le temps de vérifier si déjà connecté) ═══ -->
+<div class="login-wrap" id="loading-screen">
+  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <svg viewBox="0 0 85 100" fill="none" style="width:32px; height:38px; opacity:0.9;">
+      <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+    </svg>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
+<div class="login-wrap" id="choice-screen" style="display:none;">
+  <div class="login-card" style="text-align:center;">
+    <div class="brand" style="justify-content:center; margin-bottom:14px;">
+      <span class="mark">
+        <svg viewBox="0 0 85 100" fill="none" style="width:30px; height:35px;">
+          <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+        </svg>
+      </span>
+    </div>
+    <h1>Procédo</h1>
+    <div class="subhead">Choisissez votre espace</div>
+    <button class="btn block" style="margin-bottom:10px;" onclick="chooseSpace('gestion')">Espace Gestion</button>
+    <button class="btn ghost block" onclick="chooseSpace('equipe')">Espace Équipe</button>
+  </div>
+</div>
+
+<!-- ═══ 2. CONNEXION / INSCRIPTION ═══ -->
+<div class="login-wrap" id="login-screen" style="display:none;">
+  <div class="login-card">
+    <button class="back-btn" style="margin-bottom:14px;" onclick="backToChoice()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <h1 id="auth-title">Espace Gestion</h1>
+    <div class="subhead">Connectez-vous ou créez votre compte</div>
+
+    <div class="auth-toggle">
+      <div class="auth-toggle-indicator" id="auth-indicator"></div>
+      <button id="tab-login-btn" class="auth-toggle-btn active" onclick="switchAuthTab('login')">Se connecter</button>
+      <button id="tab-signup-btn" class="auth-toggle-btn" onclick="switchAuthTab('signup')">Créer un compte</button>
+    </div>
+
+    <div class="auth-form-wrap">
+      <!-- Connexion -->
+      <div id="login-form" class="auth-form active">
+        <label class="f">E-mail</label>
+        <input type="email" id="login-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px;">
+        <button class="btn block" id="login-btn">Se connecter</button>
+      </div>
+
+      <!-- Inscription -->
+      <div id="signup-form" class="auth-form">
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <div style="flex:1;">
+            <label class="f">Prénom</label>
+            <input type="text" id="signup-prenom" placeholder="Marie">
+          </div>
+          <div style="flex:1;">
+            <label class="f">Nom</label>
+            <input type="text" id="signup-nom" placeholder="Tissot">
+          </div>
+        </div>
+        <label class="f">E-mail</label>
+        <input type="email" id="signup-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom:16px;">
+
+        <div id="signup-gestion-field">
+          <label class="f">Nom de l'entreprise</label>
+          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;">
+        </div>
+        <div id="signup-equipe-field" style="display:none;">
+          <label class="f">Code de l'entreprise (5 chiffres)</label>
+          <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
+        </div>
+
+        <button class="btn block" id="signup-btn">Créer mon compte</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ ESPACE GESTION ═══════════════ -->
+<div class="app" id="gestion-app" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-card">
+      <div class="topbar-left">
+        <div class="logo-pill">
+          <svg viewBox="0 0 85 100" fill="none">
+            <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+          </svg>
+        </div>
+        <div class="topbar-title">
+          <span class="name">Procédo</span>
+          <span class="role">Espace Gestion</span>
+        </div>
+      </div>
+      <button class="icon-pill" onclick="openSettings()" aria-label="Paramètres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="screen active" id="p-list">
+    <h1 class="pagehead">Mes procédures</h1>
+    <div class="subhead" id="p-list-subhead">Chargement...</div>
+    <button class="btn block" style="margin-bottom:18px;" onclick="showGestionScreen('p-create')">+ Créer une procédure</button>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="gestion-search-input" placeholder="Rechercher...">
+    </div>
+    <div id="procedures-list"></div>
+  </div>
+
+  <div class="screen" id="p-create">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Nouvelle procédure</h1>
+    </div>
+    <div class="subhead">Filmez la tâche, ajoutez les étapes une par une</div>
+    <div class="card">
+      <label class="f">Titre</label>
+      <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
+      <div style="margin-top:12px;">
+        <label class="f">Catégorie</label>
+        <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
+      </div>
+    </div>
+    <div class="card">
+      <label class="f">Vidéo</label>
+      <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
+      <div class="video-frame" id="video-frame">
+        <video id="video-player" style="display:none;" controls></video>
+        <span id="video-placeholder">Aucune vidéo importée</span>
+      </div>
+    </div>
+    <div class="section-title">Étapes</div>
+    <div id="steps-list"></div>
+    <button class="btn ghost block" style="margin-top:8px;" id="add-step-btn">+ Ajouter une étape ici</button>
+    <div class="note">Chaque étape se lie automatiquement au moment de la vidéo où vous étiez.</div>
+    <div class="error-msg" id="create-error"></div>
+    <button class="btn block" style="margin-top:18px;" id="publish-btn">Publier la procédure</button>
+  </div>
+
+  <div class="screen" id="p-analyse">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="analyse-titre">—</h1>
+    </div>
+    <div class="subhead" id="analyse-subhead">Chargement...</div>
+    <div class="hero-card">
+      <div class="lbl">Taux de validation</div>
+      <div class="num" id="analyse-taux">—</div>
+      <div class="sub" id="analyse-sub">—</div>
+      <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-mini"><div class="num" id="analyse-nb-etapes">—</div><div class="lbl">Étapes</div></div>
+      <div class="stat-mini"><div class="num" id="analyse-nb-assignes">—</div><div class="lbl">Assignés</div></div>
+      <div class="stat-mini"><div class="num" id="analyse-nb-valides">—</div><div class="lbl">Validés</div></div>
+    </div>
+    <div class="section-title">Employés assignés</div>
+    <div id="analyse-emp-list"></div>
+    <div class="section-title">Code d'accès rapide</div>
+    <div class="card qr-card">
+      <div class="qr-visual" id="qr-container"></div>
+      <div class="qr-info">
+        <div style="font-weight:600; font-size:13.5px;">À afficher sur le poste</div>
+        <div style="font-size:12px; color:var(--label-2); margin-top:2px;">Ouvre directement cette procédure au scan</div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="btn small" id="qr-download-btn">Télécharger</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analyse générale du compte -->
+  <div class="screen" id="p-global-analyse">
+    <h1 class="pagehead">Analyse générale</h1>
+    <div class="subhead">Vue d'ensemble de votre entreprise</div>
+
+    <div class="hero-card">
+      <div class="lbl">Taux de conformité global</div>
+      <div class="num" id="ga-taux-global">—</div>
+      <div class="sub" id="ga-sub-global">—</div>
+      <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-mini"><div class="num" id="ga-nb-procedures">—</div><div class="lbl">Procédures</div></div>
+      <div class="stat-mini"><div class="num" id="ga-nb-membres">—</div><div class="lbl">Membres</div></div>
+      <div class="stat-mini"><div class="num" id="ga-nb-validations">—</div><div class="lbl">Validations</div></div>
+    </div>
+
+    <div class="section-title">Procédures les plus en retard</div>
+    <div id="ga-late-list"></div>
+
+    <div class="section-title">Membres les plus à jour</div>
+    <div id="ga-top-membres"></div>
+  </div>
+
+  <!-- Paramètres -->
+  <div class="screen" id="p-settings">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+    </div>
+    <div class="subhead">Votre compte et votre abonnement</div>
+
+    <div class="section-title">Informations personnelles</div>
+    <div class="card">
+      <label class="f">Nom complet</label>
+      <input type="text" id="settings-nom" style="margin-bottom:12px;">
+      <label class="f">Poste</label>
+      <input type="text" id="settings-poste" placeholder="Ex : Manager" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="settings-email" disabled style="opacity:0.6;">
+      <button class="btn ghost block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
+      <div class="error-msg" id="settings-error"></div>
+    </div>
+
+    <div class="section-title">Code d'invitation équipe</div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:12px; color:var(--label-2); margin-bottom:10px;">Partagez ce code à votre équipe pour qu'elle puisse créer son compte et accéder aux procédures</div>
+      <div id="settings-code" style="font-size:32px; font-weight:800; letter-spacing:0.3em; margin:8px 0 14px;">—</div>
+      <button class="btn ghost block" id="copy-code-btn">Copier le code</button>
+    </div>
+
+    <div class="section-title">Votre abonnement</div>
+    <div class="plan-card" data-plan="starter">
+      <div class="plan-head">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">49€<span>/mois</span></div>
+      </div>
+      <div class="plan-desc">Jusqu'à 10 membres · fonctionnalités essentielles</div>
+    </div>
+    <div class="plan-card active" data-plan="pro">
+      <div class="plan-head">
+        <div class="plan-name">Pro <span class="badge ok" style="margin-left:6px;">Actuel</span></div>
+        <div class="plan-price">99€<span>/mois</span></div>
+      </div>
+      <div class="plan-desc">Jusqu'à 25 membres · IA incluse · vérification vidéo</div>
+    </div>
+    <div class="plan-card" data-plan="business">
+      <div class="plan-head">
+        <div class="plan-name">Business</div>
+        <div class="plan-price">199€<span>/mois</span></div>
+      </div>
+      <div class="plan-desc">Membres illimités · multi-sites</div>
+    </div>
+
+    <div class="section-title">Compte</div>
+    <button class="btn ghost block" id="logout-btn" style="color:var(--red);">Se déconnecter</button>
+  </div>
+</div>
+
+<nav class="tabbar" id="tabbar-gestion" style="display:none;">
+  <button class="tab-round tab-round--secondary tab-round--with-label active" onclick="showGestionScreen('p-list', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="tab-round-label">Procédures</span>
+  </button>
+  <button class="tab-round tab-round--primary" onclick="showGestionScreen('p-create', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="tab-round tab-round--secondary tab-round--with-label" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    <span class="tab-round-label">Analyse</span>
+  </button>
+</nav>
+
+<!-- ═══════════════ ESPACE ÉQUIPE ═══════════════ -->
+<div class="app" id="equipe-app" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-card">
+      <div class="topbar-left">
+        <div class="logo-pill">
+          <svg viewBox="0 0 85 100" fill="none">
+            <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+          </svg>
+        </div>
+        <div class="topbar-title">
+          <span class="name">Procédo</span>
+          <span class="role">Espace Équipe</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen active" id="e-list">
+    <h1 class="pagehead">Toutes les procédures</h1>
+    <div class="subhead" id="e-list-subhead">Chargement...</div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="equipe-search-input" placeholder="Rechercher une procédure...">
+    </div>
+    <div id="equipe-procedures-list"></div>
+  </div>
+
+  <div class="screen" id="e-detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="detail-titre">—</h1>
+    </div>
+    <div class="subhead" id="detail-subhead">—</div>
+    <div class="video-frame" id="detail-video-frame" style="display:none;">
+      <video id="detail-video" controls></video>
+    </div>
+    <div id="detail-steps" style="margin-top:16px;"></div>
+    <div class="confirm-bar">
+      <button class="btn block" id="confirm-btn">J'ai compris</button>
+      <div class="error-msg" id="confirm-error"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="e-scan">
+    <h1 class="pagehead">Scanner un code</h1>
+    <div class="subhead">Visez le QR code affiché sur votre poste</div>
+    <div class="scan-wrap" id="scan-wrap">
+      <video id="scan-video" autoplay playsinline muted></video>
+      <div class="scan-frame">
+        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      </div>
+    </div>
+    <div class="scan-hint" id="scan-hint">Autorisez la caméra pour scanner</div>
+    <div id="scan-result-zone"></div>
+  </div>
+</div>
+
+<nav class="tabbar" id="tabbar-equipe" style="display:none;">
+  <button class="tab-round tab-round--secondary tab-round--with-label active" onclick="showEquipeScreen('e-list', this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span class="tab-round-label">Procédures</span>
+  </button>
+  <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
+  </button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script type="module">
+let createClient, QRCode
+
+try {
+  const [supabaseModule, qrcodeModule] = await Promise.all([
+    import('https://esm.sh/@supabase/supabase-js@2'),
+    import('https://esm.sh/qrcode@1.5.3')
+  ])
+  createClient = supabaseModule.createClient
+  QRCode = qrcodeModule.default
+} catch (e) {
+  console.error('Échec du chargement des librairies :', e)
+  window.__procedoLoaded = true
+  const loadingEl = document.getElementById('loading-screen')
+  if (loadingEl) loadingEl.style.display = 'none'
+  document.body.insertAdjacentHTML('beforeend', `
+    <div style="position:fixed; inset:0; z-index:9999; background:#141518; display:flex; align-items:center; justify-content:center; padding:24px;">
+      <div style="text-align:center; max-width:300px;">
+        <p style="color:#fff; font-size:15px; font-weight:600; margin-bottom:8px;">Connexion impossible</p>
+        <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:20px;">Vérifiez votre connexion internet, puis réessayez.</p>
+        <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:600; font-size:14px; border:none;">Réessayer</button>
+      </div>
+    </div>
+  `)
+  throw e
+}
+
+const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
+const SUPABASE_ANON_KEY = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+let currentMembre = null
+let currentSteps = []
+let currentVideoFile = null
+let allEquipeProcedures = []
+let scanStream = null
+let scanLoopActive = false
+let selectedSpace = 'gestion' // espace choisi sur le premier écran
+
+// ═══ ÉCRAN 1 : CHOIX DE L'ESPACE ═══
+window.chooseSpace = function(space) {
+  selectedSpace = space
+  document.getElementById('choice-screen').style.display = 'none'
+  document.getElementById('login-screen').style.display = 'flex'
+  document.getElementById('auth-title').textContent = space === 'gestion' ? 'Espace Gestion' : 'Espace Équipe'
+  document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
+  document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
+  switchAuthTab('login')
+  document.getElementById('login-error').textContent = ''
+}
+window.backToChoice = function() {
+  document.getElementById('login-screen').style.display = 'none'
+  document.getElementById('choice-screen').style.display = 'flex'
+}
+
+// ═══ ONGLETS Connexion / Créer un compte ═══
+window.switchAuthTab = function(tab) {
+  const loginBtn = document.getElementById('tab-login-btn')
+  const signupBtn = document.getElementById('tab-signup-btn')
+  const indicator = document.getElementById('auth-indicator')
+  const loginForm = document.getElementById('login-form')
+  const signupForm = document.getElementById('signup-form')
+
+  indicator.style.transform = tab === 'login' ? 'translateX(0%)' : 'translateX(100%)'
+  loginBtn.classList.toggle('active', tab === 'login')
+  signupBtn.classList.toggle('active', tab === 'signup')
+
+  loginForm.classList.remove('active')
+  signupForm.classList.remove('active')
+  if (tab === 'login') { loginForm.classList.add('active') } else { signupForm.classList.add('active') }
+
+  document.getElementById('login-error').textContent = ''
+  document.getElementById('login-error').style.color = 'var(--red)'
+}
+
+// ═══ CONNEXION ═══
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value.trim()
+  const password = document.getElementById('login-password').value
+  const errorEl = document.getElementById('login-error')
+  errorEl.textContent = ''
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) { errorEl.textContent = "Connexion impossible : " + error.message; return }
+
+  const { data: membre, error: membreError } = await supabase
+    .from('membres').select('*').eq('user_id', data.user.id).single()
+
+  if (membreError || !membre) {
+    errorEl.textContent = "Aucune fiche membre trouvée pour ce compte. Contactez un administrateur."
+    return
+  }
+
+  enterApp(membre)
+})
+
+// ═══ CRÉATION DE COMPTE ═══
+document.getElementById('signup-btn').addEventListener('click', async () => {
+  const prenom = document.getElementById('signup-prenom').value.trim()
+  const nom = document.getElementById('signup-nom').value.trim()
+  const email = document.getElementById('signup-email').value.trim()
+  const password = document.getElementById('signup-password').value
+  const entrepriseNom = document.getElementById('signup-entreprise-nom').value.trim()
+  const codeAcces = document.getElementById('signup-code-acces').value.trim()
+  const errorEl = document.getElementById('login-error')
+  errorEl.textContent = ''
+  errorEl.style.color = 'var(--red)'
+
+  if (!prenom || !nom) { errorEl.textContent = 'Merci de renseigner votre prénom et votre nom.'; return }
+  if (!email || !password) { errorEl.textContent = 'E-mail et mot de passe obligatoires.'; return }
+  if (password.length < 6) { errorEl.textContent = 'Le mot de passe doit faire au moins 6 caractères.'; return }
+  if (selectedSpace === 'gestion' && !entrepriseNom) { errorEl.textContent = "Merci d'indiquer le nom de votre entreprise."; return }
+  if (selectedSpace === 'equipe' && !/^\d{5}$/.test(codeAcces)) { errorEl.textContent = 'Le code entreprise doit contenir exactement 5 chiffres.'; return }
+
+  // Pour l'équipe : vérifier que le code correspond bien à une entreprise AVANT de créer le compte
+  let targetEntrepriseId = null
+  if (selectedSpace === 'equipe') {
+    const { data: entreprise, error: entrepriseError } = await supabase
+      .from('entreprises').select('id').eq('code_acces', codeAcces).maybeSingle()
+    if (entrepriseError || !entreprise) {
+      errorEl.textContent = "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire."
+      return
+    }
+    targetEntrepriseId = entreprise.id
+  }
+
+  const signupBtn = document.getElementById('signup-btn')
+  signupBtn.disabled = true
+  signupBtn.textContent = 'Création...'
+
+  const { data, error } = await supabase.auth.signUp({ email, password })
+
+  if (error) {
+    if (error.message.includes('already registered') || error.message.includes('already exists')) {
+      errorEl.textContent = "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter."
+    } else {
+      errorEl.textContent = "Erreur (" + (error.status || '?') + ") : " + error.message
+    }
+    signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+    return
+  }
+
+  if (!data.session) {
+    // Confirmation par e-mail requise avant de pouvoir se connecter
+    errorEl.textContent = ''
+    errorEl.style.color = 'var(--green)'
+    errorEl.textContent = 'Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.'
+    signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+    switchAuthTab('login')
+    return
+  }
+
+  if (selectedSpace === 'gestion') {
+    // Créer une nouvelle entreprise avec un code d'accès unique à 5 chiffres
+    let entrepriseId = null
+    for (let tentative = 0; tentative < 5 && !entrepriseId; tentative++) {
+      const code = String(Math.floor(10000 + Math.random() * 90000))
+      const { data: nouvelleEntreprise, error: entrepriseError } = await supabase
+        .from('entreprises').insert({ nom: entrepriseNom, code_acces: code }).select().single()
+      if (!entrepriseError) entrepriseId = nouvelleEntreprise.id
+      // si erreur (code déjà pris), on boucle et retente avec un autre code
+    }
+    if (!entrepriseId) {
+      errorEl.textContent = "Impossible de créer l'entreprise, réessayez."
+      signupBtn.disabled = false; signupBtn.textContent = 'Créer mon compte'
+      return
+    }
+    targetEntrepriseId = entrepriseId
+  }
+
+  // Créer la fiche membre liée à ce compte, avec le rôle choisi et l'entreprise correspondante
+  const { data: membre, error: membreError } = await supabase
+    .from('membres')
+    .insert({
+      user_id: data.user.id,
+      nom: `${prenom} ${nom}`,
+      role: selectedSpace,
+      entreprise_id: targetEntrepriseId
+    })
+    .select().single()
+
+  signupBtn.disabled = false
+  signupBtn.textContent = 'Créer mon compte'
+
+  if (membreError) {
+    errorEl.style.color = 'var(--red)'
+    errorEl.textContent = "Compte créé mais erreur de profil : " + membreError.message
+    return
+  }
+
+  enterApp(membre)
+})
+
+function enterApp(membre) {
+  currentMembre = membre
+  document.getElementById('loading-screen').style.display = 'none'
+  document.getElementById('login-screen').style.display = 'none'
+  document.getElementById('choice-screen').style.display = 'none'
+
+  if (membre.role === 'gestion') {
+    document.getElementById('gestion-app').style.display = 'block'
+    document.getElementById('tabbar-gestion').style.display = 'flex'
+    loadGestionProcedures()
+  } else {
+    document.getElementById('equipe-app').style.display = 'block'
+    document.getElementById('tabbar-equipe').style.display = 'flex'
+    loadEquipeProcedures().then(() => {
+      const params = new URLSearchParams(window.location.search)
+      const procId = params.get('proc')
+      if (procId) openEquipeDetail(procId)
+    })
+  }
+}
+
+// ═══ PARAMÈTRES ═══
+window.openSettings = async function() {
+  showGestionScreen('p-settings')
+  document.getElementById('settings-nom').value = currentMembre.nom || ''
+  document.getElementById('settings-poste').value = currentMembre.poste || ''
+  const { data: userData } = await supabase.auth.getUser()
+  document.getElementById('settings-email').value = userData?.user?.email || ''
+
+  document.getElementById('settings-code').textContent = '...'
+  const { data: entreprise, error: entrepriseError } = await supabase
+    .from('entreprises').select('code_acces').eq('id', currentMembre.entreprise_id).maybeSingle()
+
+  if (entrepriseError) {
+    console.error('Erreur chargement code entreprise :', entrepriseError)
+    document.getElementById('settings-code').textContent = '—'
+    return
+  }
+
+  if (entreprise && entreprise.code_acces) {
+    document.getElementById('settings-code').textContent = entreprise.code_acces
+  } else {
+    // Cette entreprise n'a pas encore de code (créée avant l'ajout de cette fonctionnalité) : on en génère un
+    let nouveauCode = null
+    for (let tentative = 0; tentative < 5 && !nouveauCode; tentative++) {
+      const code = String(Math.floor(10000 + Math.random() * 90000))
+      const { error: updateError } = await supabase
+        .from('entreprises').update({ code_acces: code }).eq('id', currentMembre.entreprise_id)
+      if (!updateError) nouveauCode = code
+    }
+    document.getElementById('settings-code').textContent = nouveauCode || '—'
+  }
+}
+
+document.getElementById('copy-code-btn').addEventListener('click', () => {
+  const code = document.getElementById('settings-code').textContent
+  if (code && code !== '—') {
+    navigator.clipboard.writeText(code)
+    const btn = document.getElementById('copy-code-btn')
+    const original = btn.textContent
+    btn.textContent = 'Copié !'
+    setTimeout(() => { btn.textContent = original }, 1500)
+  }
+})
+
+document.getElementById('settings-save-btn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('settings-error')
+  errorEl.textContent = ''
+  const nom = document.getElementById('settings-nom').value.trim()
+  const poste = document.getElementById('settings-poste').value.trim()
+  if (!nom) { errorEl.textContent = 'Le nom est obligatoire.'; return }
+
+  const { error } = await supabase.from('membres').update({ nom, poste }).eq('id', currentMembre.id)
+  if (error) { errorEl.textContent = "Erreur : " + error.message; return }
+  currentMembre.nom = nom
+  currentMembre.poste = poste
+  errorEl.style.color = 'var(--green)'
+  errorEl.textContent = 'Enregistré.'
+})
+
+document.querySelectorAll('.plan-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('active'))
+    card.classList.add('active')
+  })
+})
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  await supabase.auth.signOut()
+  currentMembre = null
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('equipe-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('login-email').value = ''
+  document.getElementById('login-password').value = ''
+  document.getElementById('choice-screen').style.display = 'flex'
+})
+
+// ═══ ANALYSE GÉNÉRALE ═══
+window.loadGlobalAnalyse = async function() {
+  const { data: procedures } = await supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id)
+  const { data: membres } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
+  const { data: assignations } = await supabase.from('assignations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
+  const { data: validations } = await supabase.from('validations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
+
+  const nbProcedures = procedures?.length || 0
+  const nbMembres = membres?.length || 0
+  const nbAssignations = assignations?.length || 0
+  const nbValidations = validations?.length || 0
+  const taux = nbAssignations > 0 ? Math.round((nbValidations / nbAssignations) * 100) : 0
+
+  document.getElementById('ga-taux-global').textContent = taux + '%'
+  document.getElementById('ga-sub-global').textContent = `${nbValidations} validations sur ${nbAssignations} attendues`
+  document.getElementById('ga-bar-global').style.width = taux + '%'
+  document.getElementById('ga-nb-procedures').textContent = nbProcedures
+  document.getElementById('ga-nb-membres').textContent = nbMembres
+  document.getElementById('ga-nb-validations').textContent = nbValidations
+
+  // Procédures les plus en retard (le moins de validations par rapport aux assignations)
+  const lateListEl = document.getElementById('ga-late-list')
+  lateListEl.innerHTML = ''
+  const procStats = (procedures || []).map(proc => {
+    const assignes = (assignations || []).filter(a => a.procedure_id === proc.id).length
+    const valides = (validations || []).filter(v => v.procedure_id === proc.id).length
+    const ratio = assignes > 0 ? valides / assignes : 1
+    return { proc, assignes, valides, ratio }
+  }).filter(s => s.assignes > 0).sort((a,b) => a.ratio - b.ratio).slice(0, 3)
+
+  if (procStats.length === 0) {
+    lateListEl.innerHTML = '<div class="note">Aucune procédure assignée pour le moment.</div>'
+  } else {
+    procStats.forEach((s, i) => {
+      const div = document.createElement('div')
+      div.className = 'sop-card'
+      div.style.animationDelay = (i * 0.05) + 's'
+      div.innerHTML = `
+        <div>
+          <div class="title">${escapeHtml(s.proc.titre)}</div>
+          <div class="meta">${s.valides}/${s.assignes} validations</div>
+        </div>
+        <span class="badge ${s.ratio >= 0.8 ? 'ok' : 'pending'}">${Math.round(s.ratio*100)}%</span>
+      `
+      lateListEl.appendChild(div)
+    })
+  }
+
+  // Membres les plus à jour
+  const topMembresEl = document.getElementById('ga-top-membres')
+  topMembresEl.innerHTML = ''
+  const membreStats = (membres || []).map(m => {
+    const validCount = (validations || []).filter(v => v.membre_id === m.id).length
+    return { m, validCount }
+  }).sort((a,b) => b.validCount - a.validCount).slice(0, 5)
+
+  if (membreStats.length === 0) {
+    topMembresEl.innerHTML = '<div class="note">Aucun membre pour le moment.</div>'
+  } else {
+    membreStats.forEach((s, i) => {
+      const div = document.createElement('div')
+      div.className = 'emp-row'
+      div.style.animationDelay = (i * 0.05) + 's'
+      div.innerHTML = `
+        <div class="check done"></div>
+        <div class="emp-row-name">${escapeHtml(s.m.nom)}</div>
+        <div class="emp-row-date">${s.validCount} validation${s.validCount>1?'s':''}</div>
+      `
+      topMembresEl.appendChild(div)
+    })
+  }
+}
+
+// ═══ NAVIGATION (séparée par espace, pas de collision d'ids) ═══
+window.showGestionScreen = function(id, btn) {
+  document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+  document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  if (id === 'p-create') resetCreateForm()
+}
+window.showEquipeScreen = function(id, btn) {
+  document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
+  document.getElementById(id).classList.add('active')
+  document.querySelectorAll('#tabbar-equipe .tab-round').forEach(b => b.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  if (id !== 'e-scan') stopScanner()
+}
+
+// ═══════════ GESTION : liste ═══════════
+async function loadGestionProcedures() {
+  const listEl = document.getElementById('procedures-list')
+  const subheadEl = document.getElementById('p-list-subhead')
+  listEl.innerHTML = ''
+
+  const { data: procedures, error } = await supabase
+    .from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
+    .order('created_at', { ascending: false })
+
+  if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
+  subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
+
+  if (procedures.length === 0) {
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <div class="glow-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div class="plus-badge">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </div>
+        </div>
+        <h3>Aucune procédure pour le moment</h3>
+        <p>Créez la première avec le bouton ci-dessus — décrivez la tâche ou filmez-la, ça ne prend que quelques minutes.</p>
+      </div>
+    `
+    return
+  }
+
+  let cardIndex = 0
+  for (const proc of procedures) {
+    const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
+    const { count: nbAssignes } = await supabase.from('assignations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
+    const nbEtapes = proc.etapes?.[0]?.count ?? 0
+    const div = document.createElement('div')
+    div.className = 'sop-card'
+    div.style.animationDelay = (cardIndex * 0.05) + 's'
+    cardIndex++
+    div.onclick = () => openAnalyse(proc.id)
+    div.innerHTML = `
+      <div>
+        <div class="title">${escapeHtml(proc.titre)}</div>
+        <div class="meta">${escapeHtml(proc.categorie || 'Sans catégorie')} · ${nbEtapes} étape${nbEtapes>1?'s':''}</div>
+      </div>
+      <span class="badge ${nbValidations >= nbAssignes && nbAssignes>0 ? 'ok' : 'pending'}">${nbValidations}/${nbAssignes || 0}</span>
+    `
+    listEl.appendChild(div)
+  }
+}
+
+document.getElementById('gestion-search-input').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase()
+  document.querySelectorAll('#procedures-list .sop-card').forEach(card => {
+    card.style.display = card.querySelector('.title').textContent.toLowerCase().includes(q) ? 'flex' : 'none'
+  })
+})
+
+// ═══════════ GESTION : création ═══════════
+function resetCreateForm() {
+  document.getElementById('new-titre').value = ''
+  document.getElementById('new-categorie').value = ''
+  document.getElementById('video-input').value = ''
+  document.getElementById('video-player').style.display = 'none'
+  document.getElementById('video-placeholder').style.display = 'block'
+  document.getElementById('create-error').textContent = ''
+  currentSteps = []
+  currentVideoFile = null
+  renderSteps()
+}
+
+document.getElementById('video-input').addEventListener('change', (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  currentVideoFile = file
+  const url = URL.createObjectURL(file)
+  const player = document.getElementById('video-player')
+  player.src = url
+  player.style.display = 'block'
+  document.getElementById('video-placeholder').style.display = 'none'
+})
+
+document.getElementById('add-step-btn').addEventListener('click', () => {
+  const player = document.getElementById('video-player')
+  const t = currentVideoFile ? (player.currentTime || 0) : null
+  currentSteps.push({ texte: '', timestamp_video: t })
+  renderSteps()
+})
+
+function renderSteps() {
+  const listEl = document.getElementById('steps-list')
+  listEl.innerHTML = ''
+  currentSteps.forEach((step, i) => {
+    const div = document.createElement('div')
+    div.className = 'step-edit-item'
+    const timeLabel = step.timestamp_video != null ? formatTime(step.timestamp_video) : '—'
+    div.innerHTML = `<span class="range">${timeLabel}</span><input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte)}"><span class="del">✕</span>`
+    div.querySelector('input').addEventListener('input', (e) => { currentSteps[i].texte = e.target.value })
+    div.querySelector('.del').addEventListener('click', () => { currentSteps.splice(i, 1); renderSteps() })
+    listEl.appendChild(div)
+  })
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60); const s = Math.floor(sec % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+document.getElementById('publish-btn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('create-error')
+  errorEl.textContent = ''
+  const titre = document.getElementById('new-titre').value.trim()
+  const categorie = document.getElementById('new-categorie').value.trim()
+
+  if (!titre) { errorEl.textContent = 'Le titre est obligatoire.'; return }
+  if (currentSteps.length === 0) { errorEl.textContent = 'Ajoutez au moins une étape.'; return }
+  if (currentSteps.some(s => !s.texte.trim())) { errorEl.textContent = 'Chaque étape doit avoir un texte.'; return }
+
+  const publishBtn = document.getElementById('publish-btn')
+  publishBtn.disabled = true
+  publishBtn.textContent = 'Publication...'
+
+  let videoUrl = null
+  if (currentVideoFile) {
+    const path = `${currentMembre.entreprise_id}/${Date.now()}_${currentVideoFile.name}`
+    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, currentVideoFile)
+    if (uploadError) {
+      errorEl.textContent = "Erreur d'upload vidéo : " + uploadError.message
+      publishBtn.disabled = false; publishBtn.textContent = 'Publier la procédure'
+      return
+    }
+    const { data: publicUrlData } = supabase.storage.from('procedo-videos').getPublicUrl(path)
+    videoUrl = publicUrlData.publicUrl
+  }
+
+  const { data: newProc, error: procError } = await supabase
+    .from('procedures')
+    .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, video_url: videoUrl, created_by: currentMembre.id })
+    .select().single()
+
+  if (procError) {
+    errorEl.textContent = "Erreur : " + procError.message
+    publishBtn.disabled = false; publishBtn.textContent = 'Publier la procédure'
+    return
+  }
+
+  const etapesToInsert = currentSteps.map((s, i) => ({ procedure_id: newProc.id, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video }))
+  const { error: etapesError } = await supabase.from('etapes').insert(etapesToInsert)
+
+  publishBtn.disabled = false
+  publishBtn.textContent = 'Publier la procédure'
+
+  if (etapesError) { errorEl.textContent = "Erreur étapes : " + etapesError.message; return }
+
+  showGestionScreen('p-list')
+  loadGestionProcedures()
+})
+
+// ═══════════ GESTION : analyse ═══════════
+async function openAnalyse(procId) {
+  showGestionScreen('p-analyse')
+  document.getElementById('analyse-titre').textContent = '...'
+  document.getElementById('analyse-subhead').textContent = 'Chargement...'
+
+  const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
+  const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
+  const { data: assignations } = await supabase.from('assignations').select('*, membres(*)').eq('procedure_id', procId)
+  const { data: validations } = await supabase.from('validations').select('*').eq('procedure_id', procId)
+
+  document.getElementById('analyse-titre').textContent = proc.titre
+  document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans catégorie'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
+
+  const nbAssignes = assignations?.length || 0
+  const nbValides = validations?.length || 0
+  const taux = nbAssignes > 0 ? Math.round((nbValides / nbAssignes) * 100) : 0
+
+  document.getElementById('analyse-taux').textContent = taux + '%'
+  document.getElementById('analyse-sub').textContent = `${nbValides} sur ${nbAssignes} employés ont validé`
+  document.getElementById('analyse-bar').style.width = taux + '%'
+  document.getElementById('analyse-nb-etapes').textContent = etapes?.length || 0
+  document.getElementById('analyse-nb-assignes').textContent = nbAssignes
+  document.getElementById('analyse-nb-valides').textContent = nbValides
+
+  const empListEl = document.getElementById('analyse-emp-list')
+  empListEl.innerHTML = ''
+  if (!assignations || assignations.length === 0) {
+    empListEl.innerHTML = '<div class="note">Aucun employé assigné pour le moment.</div>'
+  } else {
+    let empIndex = 0
+    for (const a of assignations) {
+      const validation = validations.find(v => v.membre_id === a.membre_id)
+      const div = document.createElement('div')
+      div.className = 'emp-row'
+      div.style.animationDelay = (empIndex * 0.05) + 's'
+      empIndex++
+      div.innerHTML = `
+        <div class="check ${validation ? 'done' : ''}"></div>
+        <div class="emp-row-name">${escapeHtml(a.membres?.nom || 'Membre')}</div>
+        <div class="emp-row-date" style="${validation ? '' : 'color:var(--red);'}">
+          ${validation ? 'validé le ' + new Date(validation.validated_at).toLocaleDateString('fr-FR') : 'non validé'}
+        </div>`
+      empListEl.appendChild(div)
+    }
+  }
+
+  const qrContainer = document.getElementById('qr-container')
+  qrContainer.innerHTML = ''
+  const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
+  const canvas = document.createElement('canvas')
+  await QRCode.toCanvas(canvas, scanUrl, { width: 200, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
+  qrContainer.appendChild(canvas)
+
+  document.getElementById('qr-download-btn').onclick = () => {
+    const link = document.createElement('a')
+    link.download = `qr-${proc.titre.replace(/\s+/g,'-')}.png`
+    link.href = canvas.toDataURL()
+    link.click()
+  }
+}
+
+// ═══════════ ÉQUIPE : liste ═══════════
+async function loadEquipeProcedures() {
+  const listEl = document.getElementById('equipe-procedures-list')
+  const subheadEl = document.getElementById('e-list-subhead')
+  listEl.innerHTML = ''
+
+  const { data: procedures, error } = await supabase
+    .from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id).order('titre')
+
+  if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
+
+  const { data: mesValidations } = await supabase.from('validations').select('procedure_id').eq('membre_id', currentMembre.id)
+  const validatedIds = new Set((mesValidations || []).map(v => v.procedure_id))
+
+  allEquipeProcedures = procedures
+  subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''}`
+
+  procedures.forEach((proc, i) => {
+    const div = document.createElement('div')
+    div.className = 'sop-card'
+    div.style.animationDelay = (i * 0.05) + 's'
+    div.onclick = () => openEquipeDetail(proc.id)
+    div.innerHTML = `
+      <div>
+        <div class="title">${escapeHtml(proc.titre)}</div>
+        <div class="meta">${escapeHtml(proc.categorie || 'Sans catégorie')}</div>
+      </div>
+      <div class="check ${validatedIds.has(proc.id) ? 'done' : ''}"></div>`
+    listEl.appendChild(div)
+  })
+}
+
+document.getElementById('equipe-search-input').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase()
+  document.querySelectorAll('#equipe-procedures-list .sop-card').forEach(card => {
+    card.style.display = card.querySelector('.title').textContent.toLowerCase().includes(q) ? 'flex' : 'none'
+  })
+})
+
+// ═══════════ ÉQUIPE : détail ═══════════
+async function openEquipeDetail(procId) {
+  document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
+  document.getElementById('e-detail').classList.add('active')
+
+  const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
+  const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
+
+  if (!proc) { document.getElementById('detail-titre').textContent = 'Procédure introuvable'; return }
+
+  document.getElementById('detail-titre').textContent = proc.titre
+  document.getElementById('detail-subhead').textContent = proc.categorie || 'Sans catégorie'
+
+  const videoFrame = document.getElementById('detail-video-frame')
+  if (proc.video_url) {
+    videoFrame.style.display = 'block'
+    document.getElementById('detail-video').src = proc.video_url
+  } else {
+    videoFrame.style.display = 'none'
+  }
+
+  const stepsEl = document.getElementById('detail-steps')
+  stepsEl.innerHTML = ''
+  ;(etapes || []).forEach((etape, i) => {
+    const div = document.createElement('div')
+    div.className = 'detail-step'
+    div.innerHTML = `<div class="n">${i+1}</div><p>${escapeHtml(etape.texte)}</p>`
+    stepsEl.appendChild(div)
+  })
+
+  document.getElementById('confirm-btn').onclick = async () => {
+    const errorEl = document.getElementById('confirm-error')
+    errorEl.textContent = ''
+    const btn = document.getElementById('confirm-btn')
+    btn.disabled = true
+    const { error } = await supabase.from('validations').upsert(
+      { procedure_id: proc.id, membre_id: currentMembre.id }, { onConflict: 'procedure_id,membre_id' }
+    )
+    btn.disabled = false
+    if (error) { errorEl.textContent = "Erreur : " + error.message; return }
+    btn.textContent = '✓ Validé'
+    loadEquipeProcedures()
+  }
+}
+
+// ═══════════ ÉQUIPE : scanner ═══════════
+window.startScanner = async function() {
+  const hintEl = document.getElementById('scan-hint')
+  const video = document.getElementById('scan-video')
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    video.srcObject = scanStream
+    await video.play()
+    hintEl.textContent = 'Recherche du code en cours...'
+    scanLoopActive = true
+    requestAnimationFrame(scanLoop)
+  } catch (e) {
+    hintEl.textContent = "Caméra indisponible : " + e.message
+  }
+}
+function stopScanner() {
+  scanLoopActive = false
+  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null }
+}
+const scanCanvas = document.createElement('canvas')
+const scanCtx = scanCanvas.getContext('2d')
+function scanLoop() {
+  if (!scanLoopActive) return
+  const video = document.getElementById('scan-video')
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    scanCanvas.width = video.videoWidth; scanCanvas.height = video.videoHeight
+    scanCtx.drawImage(video, 0, 0, scanCanvas.width, scanCanvas.height)
+    const imageData = scanCtx.getImageData(0, 0, scanCanvas.width, scanCanvas.height)
+    const code = jsQR(imageData.data, imageData.width, imageData.height)
+    if (code) { handleScanResult(code.data); return }
+  }
+  requestAnimationFrame(scanLoop)
+}
+function handleScanResult(text) {
+  stopScanner()
+  document.getElementById('scan-hint').textContent = 'Code reconnu'
+  let procId = null
+  try { const url = new URL(text); procId = url.searchParams.get('proc') } catch (e) {}
+  const resultZone = document.getElementById('scan-result-zone')
+  if (procId) {
+    resultZone.innerHTML = `
+      <div class="scan-result">
+        <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div><div style="font-weight:600; font-size:14px;">Code reconnu</div><div style="font-size:12.5px; color:var(--label-2);">Ouverture de la procédure...</div></div>
+      </div>`
+    setTimeout(() => openEquipeDetail(procId), 600)
+  } else {
+    resultZone.innerHTML = `<div class="error-msg">Ce code ne correspond à aucune procédure Procédo.</div>`
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div')
+  div.textContent = str || ''
+  return div.innerHTML
+}
+
+// ═══ RESTER CONNECTÉ : vérifie s'il existe déjà une session au chargement ═══
+try {
+  ;(async function checkExistingSession() {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        const { data: membre } = await supabase
+          .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
+        if (membre) {
+          enterApp(membre)
+          window.__procedoLoaded = true
+          return
+        }
+      }
+    } catch (e) {
+      console.error('Erreur de vérification de session :', e)
+    }
+    // Pas de session valide (ou erreur) : afficher l'écran de choix d'espace
+    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('choice-screen').style.display = 'flex'
+    window.__procedoLoaded = true
+  })()
+} catch (e) {
+  console.error('Erreur au chargement :', e)
+  document.getElementById('loading-screen').style.display = 'none'
+  document.getElementById('choice-screen').style.display = 'flex'
+}
+</script>
+
+<!-- Filet de sécurité : si le script principal (module) échoue à charger
+     (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
+<script>
+  setTimeout(function() {
+    if (!window.__procedoLoaded) {
+      var loading = document.getElementById('loading-screen')
+      var choice = document.getElementById('choice-screen')
+      var login = document.getElementById('login-screen')
+      var gestion = document.getElementById('gestion-app')
+      var equipe = document.getElementById('equipe-app')
+      var loginVisible = login && login.style.display === 'flex'
+      var gestionVisible = gestion && gestion.style.display === 'block'
+      var equipeVisible = equipe && equipe.style.display === 'block'
+      if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
+        if (loading) loading.style.display = 'none'
+        choice.style.display = 'flex'
+      }
+    }
+  }, 6000)
+</script>
+
+</body>
+</html>

@@ -36,33 +36,19 @@
   }
   @supports (height: 100lvh){ .color-halos{ height:100lvh; } }
   .chalo-wrap{ position:absolute; will-change:transform, opacity; }
-
-  /* ═══ Pourquoi plus aucun `filter: blur()` ici ═══
-     Trois calques plein écran floutés sur 90 à 120 px, c'était le dernier gros
-     poste de calcul au démarrage : le flou déborde très largement de l'élément,
-     Safari doit donc peindre une surface bien plus grande que l'écran, trois
-     fois, avant de pouvoir afficher quoi que ce soit. D'où les secondes pendant
-     lesquelles rien ne répondait.
-     Un dégradé radial flouté reste un dégradé radial : j'ai calculé le profil
-     exact du résultat flouté, puis je l'ai réécrit en arrêts de couleur. Écart
-     mesuré avec l'ancien rendu : 2 niveaux sur 255, soit moins de 1 %.
-     Mêmes couleurs, même douceur, coût quasi nul. */
   .chalo{
-    position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
+    width:100%; height:100%; border-radius:50%; opacity:1;
+    filter:blur(120px); transform:translateZ(0); backface-visibility:hidden;
   }
-  .chalo-1{ width:173%; height:172%;
-    background:radial-gradient(ellipse, rgba(52,52,59,0.886) 0.0%, rgba(52,52,59,0.867) 8.3%, rgba(52,52,58,0.812) 16.7%, rgba(52,52,58,0.729) 25.0%, rgba(52,52,58,0.620) 33.3%, rgba(50,50,56,0.498) 41.7%, rgba(51,51,56,0.373) 50.0%, rgba(50,50,54,0.259) 58.3%, rgba(50,50,56,0.161) 66.7%, rgba(44,44,55,0.090) 75.0%, rgba(46,46,46,0.043) 83.3%, rgba(51,51,51,0.020) 91.7%, rgba(0,0,0,0.008) 100.0%, transparent 100%); }
-  .chalo-2{ width:169%; height:168%;
-    background:radial-gradient(ellipse, rgba(60,60,67,0.914) 0.0%, rgba(60,60,67,0.898) 8.3%, rgba(60,60,66,0.847) 16.7%, rgba(60,60,67,0.765) 25.0%, rgba(60,60,66,0.655) 33.3%, rgba(59,59,64,0.529) 41.7%, rgba(58,58,62,0.400) 50.0%, rgba(58,58,62,0.275) 58.3%, rgba(58,58,64,0.173) 66.7%, rgba(53,53,64,0.094) 75.0%, rgba(64,64,64,0.047) 83.3%, rgba(51,51,51,0.020) 91.7%, rgba(0,0,0,0.008) 100.0%, transparent 100%); }
-  .chalo-4{ width:127%; height:190%;
-    background:radial-gradient(ellipse, rgba(58,58,65,0.980) 0.0%, rgba(58,58,65,0.973) 8.3%, rgba(57,57,64,0.941) 16.7%, rgba(57,57,63,0.882) 25.0%, rgba(56,56,62,0.788) 33.3%, rgba(55,55,61,0.659) 41.7%, rgba(53,53,61,0.510) 50.0%, rgba(53,53,59,0.357) 58.3%, rgba(49,49,58,0.224) 66.7%, rgba(49,49,58,0.122) 75.0%, rgba(55,55,55,0.055) 83.3%, rgba(51,51,51,0.020) 91.7%, rgba(0,0,0,0.008) 100.0%, transparent 100%); }
-
   .chalo-wrap-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
     animation:chaloBreath1 14s ease-in-out -3.5s infinite; }
   .chalo-wrap-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
     animation:chaloBreath2 18s ease-in-out -4.5s infinite; }
   .chalo-wrap-4{ top:-14%; left:50%; transform:translate3d(-50%,0,0); width:120vw; height:70vw; max-width:1000px; max-height:600px;
     animation:chaloBreath3 16s ease-in-out -4s infinite; }
+  .chalo-1{ background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); }
+  .chalo-2{ background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); }
+  .chalo-4{ background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); }
 
   @keyframes chaloBreath1{0%,100%{transform:translate3d(0,0,0); opacity:0.7;}50%{transform:translate3d(7%,5%,0); opacity:0.95;}}
   @keyframes chaloBreath2{0%,100%{transform:translate3d(0,0,0); opacity:0.65;}50%{transform:translate3d(-6%,-7%,0); opacity:0.9;}}
@@ -90,12 +76,10 @@
   }
 
   @media (max-width: 600px){
-    .chalo-1{ width:227%; height:226%;
-      background:radial-gradient(ellipse, rgba(73,73,83,0.518) 0.0%, rgba(75,75,83,0.506) 8.3%, rgba(74,74,83,0.471) 16.7%, rgba(75,75,83,0.412) 25.0%, rgba(75,75,81,0.345) 33.3%, rgba(73,73,80,0.275) 41.7%, rgba(74,74,83,0.204) 50.0%, rgba(71,71,85,0.141) 58.3%, rgba(78,78,78,0.090) 66.7%, rgba(73,73,91,0.055) 75.0%, rgba(64,64,64,0.031) 83.3%, rgba(64,64,64,0.016) 91.7%, rgba(128,128,128,0.008) 100.0%, transparent 100%); }
-    .chalo-2{ width:219%; height:217%;
-      background:radial-gradient(ellipse, rgba(83,83,93,0.569) 0.0%, rgba(83,83,92,0.553) 8.3%, rgba(82,82,91,0.514) 16.7%, rgba(82,82,93,0.451) 25.0%, rgba(82,82,93,0.376) 33.3%, rgba(81,81,91,0.298) 41.7%, rgba(81,81,89,0.224) 50.0%, rgba(78,78,92,0.153) 58.3%, rgba(78,78,88,0.102) 66.7%, rgba(85,85,85,0.059) 75.0%, rgba(64,64,96,0.031) 83.3%, rgba(64,64,64,0.016) 91.7%, rgba(128,128,128,0.008) 100.0%, transparent 100%); }
-    .chalo-4{ width:155%; height:247%;
-      background:radial-gradient(ellipse, rgba(80,80,90,0.737) 0.0%, rgba(80,80,90,0.722) 8.3%, rgba(80,80,89,0.675) 16.7%, rgba(79,79,90,0.592) 25.0%, rgba(78,78,88,0.498) 33.3%, rgba(78,78,88,0.396) 41.7%, rgba(78,78,88,0.294) 50.0%, rgba(78,78,88,0.204) 58.3%, rgba(77,77,85,0.129) 66.7%, rgba(81,81,81,0.075) 75.0%, rgba(76,76,76,0.039) 83.3%, rgba(64,64,64,0.016) 91.7%, rgba(128,128,128,0.008) 100.0%, transparent 100%); }
+    .chalo{ filter:blur(90px); }
+    .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
+    .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
+    .chalo-4{ background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
   }
 
 

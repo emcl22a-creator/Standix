@@ -63,12 +63,17 @@
     width:100%; height:100%; border-radius:50%; opacity:1;
     filter:blur(120px); transform:translateZ(0); backface-visibility:hidden;
   }
+  /* Délais négatifs : les animations démarrent à un quart de leur cycle plutôt
+     qu'à l'image zéro. À l'image zéro, les trois halos sont à leur opacité la
+     plus basse — l'écran de chargement les montrait donc systématiquement plus
+     ternes que le reste de l'app, où ils ont déjà dérivé vers le milieu du
+     cycle. Avec ce décalage, le fond est identique dès la première seconde. */
   .chalo-wrap-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
-    animation:chaloBreath1 14s ease-in-out infinite; }
+    animation:chaloBreath1 14s ease-in-out -3.5s infinite; }
   .chalo-wrap-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
-    animation:chaloBreath2 18s ease-in-out infinite; }
+    animation:chaloBreath2 18s ease-in-out -4.5s infinite; }
   .chalo-wrap-4{ top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
-    animation:chaloBreath3 16s ease-in-out infinite; }
+    animation:chaloBreath3 16s ease-in-out -4s infinite; }
   .chalo-1{ background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); }
   .chalo-2{ background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); }
   .chalo-4{ background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); }
@@ -121,11 +126,6 @@
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .logo-pill svg{ width:23px; height:27px; }
-  /* Même animation que sur l'écran de choix, à la taille de la barre.
-     Pas de halo ici : dans une pastille en verre de 23px, il baverait. */
-  .boot-logo--topbar{ width:23px; height:27px; margin:0; }
-  .boot-logo--topbar.play .boot-trace{ animation: bootTraceOnce 1.1s cubic-bezier(0.65,0,0.35,1) both; }
-  .boot-logo--topbar.play .boot-fill{ animation: bootFillOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
   .topbar-title .name{ font-size:14.5px; font-weight:700; }
   .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
@@ -507,6 +507,7 @@
   .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
   .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
+  .cat-date{ font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; font-variant-numeric:tabular-nums; }
   .cat-attention{
     display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700;
     color:var(--orange); background:rgba(255,159,10,0.14); padding:3px 8px; border-radius:100px; margin-bottom:8px;
@@ -548,7 +549,7 @@
      le tracé passe par `stroke-dashoffset`, redessiné image par image sur le
      fil principal, et démarrait sinon pendant que l'écran apparaissait encore. */
   .boot-logo{
-    position:relative; width:34px; height:40px; margin:0 auto 10px;
+    position:relative; width:30px; height:35px; margin:0 auto 14px;
     display:flex; align-items:center; justify-content:center;
   }
   .boot-logo svg{ width:100%; height:100%; overflow:visible; position:relative; z-index:1; }
@@ -567,6 +568,13 @@
   @keyframes bootTraceOnce{ 0%{stroke-dashoffset:411;opacity:1} 62%{stroke-dashoffset:0;opacity:1} 84%{opacity:0} 100%{opacity:0} }
   @keyframes bootFillOnce{ 0%,56%{opacity:0} 82%{opacity:1} 100%{opacity:1} }
   @keyframes bootBreathOnce{ 0%{transform:scale(0.93)} 82%{transform:scale(1.03)} 100%{transform:scale(1)} }
+
+  /* Variante de la barre du haut. Déclarée APRÈS `.boot-logo` : à specificité
+     égale c'est la dernière règle qui l'emporte, et sa taille doit gagner.
+     Pas de halo ici : dans une pastille en verre de 23px, il baverait. */
+  .boot-logo--topbar{ width:23px; height:27px; margin:0; }
+  .boot-logo--topbar.play .boot-trace{ animation: bootTraceOnce 1.1s cubic-bezier(0.65,0,0.35,1) both; }
+  .boot-logo--topbar.play .boot-fill{ animation: bootFillOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
 
   @media (prefers-reduced-motion: reduce){
     .boot-logo--once.play, .boot-logo--once.play .boot-trace, .boot-logo--once.play .boot-fill{ animation:none !important; }
@@ -1562,8 +1570,7 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
-    lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
-    finDuDemarrage()
+    finDuDemarrage('topbar-logo-gestion')
   } else {
     await loadEquipeProcedures()
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
@@ -1573,8 +1580,7 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
-    lancerAnimationLogo(document.getElementById('topbar-logo-equipe'))
-    finDuDemarrage()
+    finDuDemarrage('topbar-logo-equipe')
     const params = new URLSearchParams(window.location.search)
     const procId = params.get('proc')
     if (procId) openEquipeDetail(procId)
@@ -1585,12 +1591,15 @@ async function enterApp(membre) {
 // l'app réellement affichée et posée. Avant ça, tout le processeur sert à
 // l'afficher — c'est ce qui rendait le lancement saccadé sur iPhone.
 let demarrageTermine = false
-function finDuDemarrage() {
+function finDuDemarrage(idLogoBarre) {
   if (demarrageTermine) return
   demarrageTermine = true
   const liberer = () => {
     document.body.classList.remove('booting')
     document.getElementById('loading-screen')?.remove()
+    // Le logo de la barre ne se trace qu'ici : lancé plus tôt, son animation
+    // tombait en même temps que celle d'apparition de l'app et sautait.
+    if (idLogoBarre) lancerAnimationLogo(document.getElementById(idLogoBarre))
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
   else setTimeout(liberer, 600)
@@ -1984,14 +1993,19 @@ function renderCategoryGrid() {
   const oldRects = captureCardPositions(catGridEl)
   catGridEl.innerHTML = ''
 
+  // Départage systématique par ordre alphabétique : sans ça, deux catégories
+  // dont les procédures ont été créées à la même seconde restaient dans
+  // l'ordre où la base les avait renvoyées, et changer de tri ne bougeait
+  // rien à l'écran — le filtre semblait cassé alors qu'il tournait bien.
+  const parNom = (a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' })
   const sorted = [...allCategoriesData].sort((a, b) => {
-    if (currentCatSort === 'az') return a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' })
-    if (currentCatSort === 'new') return b.latestDate - a.latestDate
-    if (currentCatSort === 'old') return a.earliestDate - b.earliestDate
-    return 0
+    if (currentCatSort === 'new') return (b.latestDate - a.latestDate) || parNom(a, b)
+    if (currentCatSort === 'old') return (a.earliestDate - b.earliestDate) || parNom(a, b)
+    return parNom(a, b)
   })
 
-  sorted.forEach(({ nom, icone, procsInCat, avgPct }) => {
+  const triParDate = currentCatSort === 'new' || currentCatSort === 'old'
+  sorted.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
     const recentTitles = procsInCat.slice(0, 3)
     const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
@@ -2018,6 +2032,7 @@ function renderCategoryGrid() {
         <span class="cat-pct" style="color:${ringColor};">${avgPct}%</span>
         <span class="cat-pct-label">consultées</span>
       </div>
+      ${triParDate ? `<div class="cat-date">${new Date(currentCatSort === 'old' ? earliestDate : latestDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}</div>` : ''}
       ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
       <div class="cat-recent">
         ${recentTitles.map(p => `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}
@@ -2138,11 +2153,11 @@ function renderCategoryProceduresList() {
     ? currentCategoryProcsData.filter(d => (d.proc.titre || '').toLowerCase().includes(currentCategoryQuery))
     : currentCategoryProcsData
 
+  const parTitre = (a, b) => (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
   const sorted = [...filtered].sort((a, b) => {
-    if (currentCategorySort === 'az') return (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
-    if (currentCategorySort === 'new') return b.createdAt - a.createdAt
-    if (currentCategorySort === 'old') return a.createdAt - b.createdAt
-    return 0
+    if (currentCategorySort === 'new') return (b.createdAt - a.createdAt) || parTitre(a, b)
+    if (currentCategorySort === 'old') return (a.createdAt - b.createdAt) || parTitre(a, b)
+    return parTitre(a, b)
   })
 
   for (const { proc, nbEtapes, pct } of sorted) {

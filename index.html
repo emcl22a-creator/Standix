@@ -2,14 +2,18 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>Procédo</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ═══ Aucun zoom, nulle part ═══
+     `touch-action: manipulation` supprime le zoom au double-toucher.
+     `text-size-adjust` empêche iOS de grossir le texte tout seul en paysage.
+     Les règles de la frise vidéo (classes) restent prioritaires sur ce `*`. */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
   :root{
     --bg:#141518; --bg-card: rgba(255,255,255,0.06);
     --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
@@ -21,6 +25,7 @@
     background:#141518; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
     color:var(--label); font-size:17px; line-height:1.32; letter-spacing:-0.02em;
     -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden; position:relative;
+    -webkit-text-size-adjust:100%; text-size-adjust:100%;
   }
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
   textarea, input{font-family:inherit; color:inherit;}
@@ -196,7 +201,7 @@
   }
   .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
   .step-edit-item textarea{
-    flex:1; background:none; border:none; font-size:15.5px; padding:0; resize:none; overflow:hidden;
+    flex:1; background:none; border:none; font-size:16px; padding:0; resize:none; overflow:hidden;
     line-height:1.4; font-family:inherit; color:var(--label); min-height:22px;
   }
   .step-edit-item .step-row-bottom{ display:flex; align-items:center; gap:8px; padding-left:34px; }
@@ -312,7 +317,7 @@
   .clip-text-field.on{ display:block; }
   .clip-text-field textarea{
     width:100%; background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
-    padding:13px 14px; font-size:15.5px; font-family:inherit; color:var(--label);
+    padding:13px 14px; font-size:16px; font-family:inherit; color:var(--label);
     resize:none; overflow:hidden; line-height:1.4; min-height:48px;
   }
   .clip-done-btn{ display:none; width:100%; margin-top:10px; }
@@ -461,14 +466,6 @@
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
-  .sort-select{
-    display:block; width:100%; font-family:inherit; font-size:14px; font-weight:600; color:var(--label);
-    background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px;
-    padding:11px 16px; margin-bottom:16px; -webkit-appearance:none; appearance:none;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:right 14px center; background-size:16px;
-  }
-  .sort-select option{ background:#141518; color:#fff; }
 
   .scan-wrap{ position:relative; max-width:280px; margin:20px auto 18px; aspect-ratio:1/1; border-radius:24px; overflow:hidden; background:#000; border:0.5px solid var(--border); }
   .scan-wrap video{ width:100%; height:100%; object-fit:cover; }
@@ -490,6 +487,57 @@
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
+
+  /* ═══ Animation de l'écran de chargement ═══
+     Le contour du logo se trace, le plein se pose dessus, le tout respire,
+     puis s'efface et recommence. Trois animations sur un seul petit SVG :
+     coût négligeable, contrairement au décor de fond. */
+  .boot-logo{
+    position:relative; width:64px; height:75px;
+    display:flex; align-items:center; justify-content:center;
+    animation: bootBreath 2.8s cubic-bezier(0.45,0,0.55,1) infinite;
+  }
+  .boot-logo svg{ width:100%; height:100%; overflow:visible; position:relative; z-index:1; }
+  .boot-glow{
+    position:absolute; width:150%; height:150%; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%);
+    filter:blur(14px); animation: bootGlow 2.8s ease-in-out infinite;
+  }
+  .boot-trace{
+    stroke-dasharray:411; stroke-dashoffset:411;
+    animation: bootTrace 2.8s cubic-bezier(0.65,0,0.35,1) infinite;
+  }
+  .boot-fill{ opacity:0; animation: bootFill 2.8s cubic-bezier(0.22,1,0.36,1) infinite; }
+
+  @keyframes bootTrace{
+    0%   { stroke-dashoffset:411; opacity:1; }
+    42%  { stroke-dashoffset:0;   opacity:1; }
+    58%  { stroke-dashoffset:0;   opacity:0; }
+    100% { stroke-dashoffset:0;   opacity:0; }
+  }
+  @keyframes bootFill{
+    0%, 38% { opacity:0; }
+    56%     { opacity:1; }
+    84%     { opacity:1; }
+    100%    { opacity:0; }
+  }
+  @keyframes bootBreath{
+    0%, 38% { transform:scale(0.97); }
+    58%     { transform:scale(1); }
+    84%     { transform:scale(1); }
+    100%    { transform:scale(1.06); }
+  }
+  @keyframes bootGlow{
+    0%, 40%  { opacity:0; transform:scale(0.8); }
+    62%      { opacity:1; transform:scale(1); }
+    84%      { opacity:0.8; transform:scale(1.05); }
+    100%     { opacity:0; transform:scale(1.2); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .boot-logo, .boot-glow, .boot-trace, .boot-fill{ animation:none !important; }
+    .boot-fill{ opacity:1; }
+    .boot-trace{ opacity:0; }
+  }
 
   .spinner{
     width:22px; height:22px; border-radius:50%;
@@ -550,6 +598,20 @@
 </head>
 <body class="booting">
 
+<script>
+  /* iOS Safari ignore `user-scalable=no` depuis iOS 10 : le seul moyen fiable de
+     bloquer le zoom au pincement est d'intercepter ses événements de geste.
+     Volontairement pas d'écouteur sur `touchmove` : non passif, il ferait
+     attendre le navigateur à chaque défilement et remettrait des saccades. */
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
+    document.addEventListener(type, function (e) { e.preventDefault() }, { passive: false })
+  })
+  /* Certains claviers laissent la page zoomée après une saisie : on la remet à 1. */
+  document.addEventListener('focusout', function () {
+    if (window.visualViewport && window.visualViewport.scale > 1) window.scrollTo(0, window.scrollY)
+  })
+</script>
+
 <div class="color-halos">
   <div class="chalo-wrap chalo-wrap-4"><div class="chalo chalo-4"></div></div>
   <div class="chalo-wrap chalo-wrap-1"><div class="chalo chalo-1"></div></div>
@@ -558,11 +620,14 @@
 
 <!-- ═══ 0. CHARGEMENT (le temps de vérifier si déjà connecté) ═══ -->
 <div class="login-wrap" id="loading-screen">
-  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
-    <svg viewBox="0 0 85 100" fill="none" style="width:32px; height:38px; opacity:0.9;">
-      <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
+  <div class="boot-logo">
+    <div class="boot-glow"></div>
+    <svg viewBox="0 0 85 100" fill="none">
+      <!-- Le contour se dessine, puis le plein apparaît par-dessus.
+           410,25 unités : périmètre exact du tracé, calculé segment par segment. -->
+      <path class="boot-trace" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+      <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"/>
     </svg>
-    <div class="spinner"></div>
   </div>
 </div>
 
@@ -871,7 +936,7 @@
         <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;" id="ai-progress-pct">0%</div>
       </div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-progress-title">Analyse en cours...</div>
-      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">Ça peut prendre quelques minutes selon la durée de la vidéo. Vous pouvez quitter cette page, le traitement continue en arrière-plan.</div>
+      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">Ça peut prendre quelques minutes selon la durée de la vidéo. <b style="color:#fff;">Ne quittez pas cette page</b> tant que l'analyse n'est pas terminée.</div>
     </div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
@@ -2433,7 +2498,7 @@ function createClipEditor(ids, api) {
     const nouvelle = { id: null, texte: '', timestamp_video: t, fin_video: finOriginale }
     steps().splice(selIndex + 1, 0, nouvelle)
     api.onChange?.()
-    select(selIndex + 1)
+    select(selIndex + 1, { lire: false })
   })
 
   // Champ de texte de l'étape sélectionnée, juste sous la frise :
@@ -2448,7 +2513,8 @@ function createClipEditor(ids, api) {
   })
 
   // ── API publique ─────────────────────────────────────────────────────────
-  function select(i) {
+  function select(i, options) {
+    const { lire = true } = options || {}
     stopClipPlayback()
     video()?.pause()
     selIndex = (i == null ? null : i)
@@ -2461,6 +2527,8 @@ function createClipEditor(ids, api) {
     }
     repaint()
     api.onSelect?.(selIndex)
+    // Toucher une étape lance aussitôt son extrait : on voit ce qu'on règle.
+    if (s && dur() && lire) playClip()
   }
 
   function attachVideo() {
@@ -2607,7 +2675,7 @@ document.getElementById('capcut-add-btn')?.addEventListener('click', () => {
   const insertAt = (sel != null) ? sel + 1 : videoSteps.length
   videoSteps.splice(insertAt, 0, newStep)
   renderVideoSteps()
-  capcutEditor?.select(insertAt)
+  capcutEditor?.select(insertAt, { lire: false })
 })
 
 
@@ -2714,10 +2782,33 @@ function renderVideoSteps() {
       if (e.target.closest('textarea, button, .del')) return
       capcutEditor?.select(i)
     })
-    wireMoveButtons(div, videoSteps, i, (newIndex) => { renderVideoSteps(); capcutEditor?.select(newIndex) })
+    wireMoveButtons(div, videoSteps, i, (newIndex) => { renderVideoSteps(); capcutEditor?.select(newIndex, { lire: false }) })
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
+}
+
+/* Joue uniquement la portion [debut, fin] d'une vidéo, puis s'arrête.
+   Utilisé quand on touche une étape : on voit tout de suite le bon passage. */
+function lireExtrait(videoEl, debut, fin) {
+  if (!videoEl) return
+  if (videoEl.__stopExtrait) {
+    videoEl.removeEventListener('timeupdate', videoEl.__stopExtrait)
+    videoEl.__stopExtrait = null
+  }
+  videoEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  videoEl.currentTime = debut
+  const stop = () => {
+    if (videoEl.currentTime >= fin - 0.05) {
+      videoEl.pause()
+      videoEl.removeEventListener('timeupdate', stop)
+      videoEl.__stopExtrait = null
+    }
+  }
+  videoEl.__stopExtrait = stop
+  videoEl.addEventListener('timeupdate', stop)
+  const p = videoEl.play()
+  if (p && p.catch) p.catch(() => {})
 }
 
 function formatTime(sec) {
@@ -2823,13 +2914,27 @@ async function openAnalyse(procId) {
 
   document.getElementById('analyse-edit-btn').onclick = () => openEditProcedure(procId, 'edit')
   document.getElementById('analyse-delete-btn').onclick = async () => {
-    const confirmed = window.confirm(`Supprimer définitivement "${proc.titre}" ? Cette action est irréversible.`)
+    const confirmed = await confirmDialog({
+      titre: 'Supprimer définitivement ?',
+      message: `« ${proc.titre} » et toutes ses étapes seront supprimées. Cette action est irréversible.`,
+      confirmer: 'Supprimer',
+      annuler: 'Annuler',
+    })
     if (!confirmed) return
     const deleteBtn = document.getElementById('analyse-delete-btn')
     setButtonLoading(deleteBtn, true)
     const { error } = await supabase.from('procedures').delete().eq('id', procId)
     setButtonLoading(deleteBtn, false)
-    if (error) { alert("Erreur lors de la suppression : " + error.message); return }
+    if (error) {
+      await confirmDialog({
+        titre: 'Suppression impossible',
+        message: error.message,
+        confirmer: 'Fermer',
+        annuler: 'Réessayer',
+        danger: false,
+      })
+      return
+    }
     showGestionScreen('p-list')
     loadGestionProcedures()
   }
@@ -2883,18 +2988,8 @@ async function openAnalyse(procId) {
         ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
       `
       if (hasClip) {
-        div.querySelector('.badge').onclick = () => {
-          videoEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          videoEl.currentTime = bounds.start
-          const stopAtEnd = () => {
-            if (videoEl.currentTime >= bounds.end) {
-              videoEl.pause()
-              videoEl.removeEventListener('timeupdate', stopAtEnd)
-            }
-          }
-          videoEl.addEventListener('timeupdate', stopAtEnd)
-          videoEl.play()
-        }
+        div.style.cursor = 'pointer'
+        div.onclick = () => lireExtrait(videoEl, bounds.start, bounds.end)
       }
       stepsListEl.appendChild(div)
     })
@@ -3106,18 +3201,9 @@ async function openEquipeDetail(procId) {
       ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
     `
     if (hasClip) {
-      div.querySelector('.badge').onclick = () => {
-        detailVideoEl.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        detailVideoEl.currentTime = bounds.start
-        const stopAtEnd = () => {
-          if (detailVideoEl.currentTime >= bounds.end) {
-            detailVideoEl.pause()
-            detailVideoEl.removeEventListener('timeupdate', stopAtEnd)
-          }
-        }
-        detailVideoEl.addEventListener('timeupdate', stopAtEnd)
-        detailVideoEl.play()
-      }
+      div.style.cursor = 'pointer'
+      // Toute la ligne est cliquable, pas seulement la petite pastille
+      div.onclick = () => lireExtrait(detailVideoEl, bounds.start, bounds.end)
     }
     stepsEl.appendChild(div)
   })
@@ -3412,7 +3498,7 @@ function renderEditSteps() {
     }
     wireMoveButtons(div, editStepsData, i, (newIndex) => {
       renderEditSteps()
-      if (editVideoUrl) ecapEditor?.select(newIndex)
+      if (editVideoUrl) ecapEditor?.select(newIndex, { lire: false })
     })
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
@@ -3433,7 +3519,7 @@ document.getElementById('edit-add-step-btn')?.addEventListener('click', () => {
   const insertAt = (sel != null) ? sel + 1 : editStepsData.length
   editStepsData.splice(insertAt, 0, newStep)
   renderEditSteps()
-  if (editVideoUrl) ecapEditor?.select(insertAt)
+  if (editVideoUrl) ecapEditor?.select(insertAt, { lire: false })
 })
 
 document.getElementById('edit-save-btn')?.addEventListener('click', async () => {

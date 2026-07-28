@@ -176,6 +176,42 @@
      Un demi-halo vert émerge du bord droit — son centre est posé exactement
      sur l'arête, donc seule la moitié se voit. Une trame de petits carreaux
      n'apparaît qu'à deux endroits, révélée par un masque en dégradé. */
+  /* ═══ Pile de deux cartes ═══
+     La carte du dessous dépasse de 26px en bas, comme les cartes de Wallet.
+     On tape sur la languette qui dépasse pour la faire passer devant. */
+  .pile{ position:relative; height:222px; margin-bottom:18px; }
+  .pile-carte{
+    position:absolute; left:0; right:0; top:0; height:196px; margin-bottom:0 !important;
+    transition: transform 0.5s cubic-bezier(0.34,1.2,0.5,1), opacity 0.35s ease;
+  }
+  .pile .devant{ z-index:2; transform:translateY(0) scale(1); opacity:1; }
+  .pile .derriere{ z-index:1; transform:translateY(26px) scale(0.965); opacity:0.94; }
+  .pile-carte .poignee{
+    position:absolute; left:0; right:0; bottom:0; height:26px;
+    display:flex; align-items:center; justify-content:center; gap:5px;
+    font-size:11.5px; font-weight:650; color:var(--label-2);
+    opacity:0; pointer-events:none; transition:opacity 0.3s ease;
+  }
+  .pile-carte .poignee svg{ width:11px; height:11px; }
+  .pile .derriere .poignee{ opacity:1; pointer-events:auto; cursor:pointer; }
+  .pile .devant > *:not(.poignee){ transition:opacity 0.25s ease; }
+
+  /* Carte du dessous : même matière, halo orange pour la distinguer */
+  .panneau-semaine{ padding-bottom:34px; }
+  .ps-halo{
+    position:absolute; right:-33%; top:50%; transform:translateY(-50%);
+    width:66%; aspect-ratio:1; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle,
+      rgba(255,159,10,0.55) 0%, rgba(255,159,10,0.26) 38%, rgba(255,159,10,0.08) 62%, transparent 74%);
+    filter:blur(16px);
+  }
+  .ps-relance{
+    position:relative; display:flex; align-items:center; gap:8px; margin-top:11px;
+    font-size:12px; color:var(--label-2);
+  }
+  .ps-relance b{ color:#fff; font-weight:650; }
+  .ps-relance .pastille{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
   .panneau-accueil{
     position:relative; overflow:hidden;
     /* Fond plein, pas de transparence : le décor ne traverse plus le panneau.
@@ -184,7 +220,7 @@
        cartes de catégories, pour que les deux blocs se répondent. */
     background:linear-gradient(158deg, #1D1E22 0%, #17181B 55%, #131416 100%);
     border:0.5px solid var(--border); border-radius:16px;
-    padding:22px 20px 20px; margin-bottom:18px;
+    padding:22px 20px 20px;
   }
   .pa-halo{
     position:absolute; right:-33%; top:50%; transform:translateY(-50%);
@@ -983,16 +1019,33 @@
   </div>
 
   <div class="screen active" id="p-list">
-    <div class="panneau-accueil">
-      <div class="pa-halo"></div>
-      <div class="pa-carreaux"></div>
-      <div class="pa-salut" id="greeting-text">Bonjour 👋</div>
-      <h1 class="pa-titre">Mes procédures</h1>
-      <div class="pa-sous" id="p-list-subhead">Chargement...</div>
-      <button class="pa-bouton" onclick="startNewProcedure()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Créer une procédure
-      </button>
+    <div class="pile" id="pile-accueil">
+      <div class="panneau-accueil pile-carte devant" data-carte="procedures">
+        <div class="pa-halo"></div>
+        <div class="pa-carreaux"></div>
+        <div class="pa-salut" id="greeting-text">Bonjour 👋</div>
+        <h1 class="pa-titre">Mes procédures</h1>
+        <div class="pa-sous" id="p-list-subhead">Chargement...</div>
+        <button class="pa-bouton" onclick="startNewProcedure()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Créer une procédure
+        </button>
+        <div class="poignee">Mes procédures <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></div>
+      </div>
+
+      <div class="panneau-accueil panneau-semaine pile-carte derriere" data-carte="semaine">
+        <div class="ps-halo"></div>
+        <div class="pa-carreaux"></div>
+        <div class="pa-salut">Cette semaine</div>
+        <h1 class="pa-titre" id="sem-titre">—</h1>
+        <div class="pa-sous" id="sem-sous">—</div>
+        <div class="ps-relance" id="sem-relance"></div>
+        <button class="pa-bouton" onclick="showGestionScreen('p-global-analyse'); loadGlobalAnalyse()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+          Voir l'analyse complète
+        </button>
+        <div class="poignee">Cette semaine <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></div>
+      </div>
     </div>
     <div class="list-tools">
       <div class="dd-filter" id="dd-cat-sort">
@@ -2243,6 +2296,7 @@ async function loadGestionProcedures() {
   catGridEl.innerHTML = ''
 
   if (procedures.length === 0) {
+    renderCarteSemaine()
     subheadEl.textContent = `0 catégorie · 0 procédure · accès complet`
     catGridEl.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
@@ -2319,6 +2373,67 @@ async function loadGestionProcedures() {
 
   window.jalon?.('validations reçues, grille prête')
   renderCategoryGrid()
+  renderCarteSemaine()
+}
+
+/* ═══ Pile de l'accueil ═══
+   Deux cartes empilées : les procédures devant, le bilan de la semaine
+   derrière. Un appui sur la languette qui dépasse les échange. */
+document.getElementById('pile-accueil')?.addEventListener('click', (e) => {
+  if (!e.target.closest('.poignee')) return
+  const pile = document.getElementById('pile-accueil')
+  pile.querySelectorAll('.pile-carte').forEach(c => {
+    const devant = c.classList.contains('devant')
+    c.classList.toggle('devant', !devant)
+    c.classList.toggle('derriere', devant)
+  })
+})
+
+/* Remplit la carte de la semaine à partir de ce qui est déjà en mémoire :
+   aucune requête supplémentaire, tout vient du préchargement. */
+function renderCarteSemaine() {
+  const titre = document.getElementById('sem-titre')
+  const sous = document.getElementById('sem-sous')
+  const relance = document.getElementById('sem-relance')
+  if (!titre) return
+
+  const nbEmployes = cachedEmployes.length
+  const nbProcedures = allGestionProcedures.length
+
+  const debutSemaine = new Date()
+  const jour = (debutSemaine.getDay() + 6) % 7          // lundi = 0
+  debutSemaine.setDate(debutSemaine.getDate() - jour)
+  debutSemaine.setHours(0, 0, 0, 0)
+
+  const vues = cachedValidations.filter(v => new Date(v.validated_at) >= debutSemaine).length
+  const possible = nbProcedures * nbEmployes
+  const taux = possible ? Math.round((vues / possible) * 100) : 0
+
+  if (!nbProcedures) {
+    titre.textContent = 'Rien à suivre'
+    sous.textContent = 'Créez votre première procédure pour voir vos statistiques.'
+    relance.innerHTML = ''
+    return
+  }
+  if (!nbEmployes) {
+    titre.textContent = 'Équipe vide'
+    sous.textContent = "Partagez le code d'invitation dans Paramètres pour suivre les consultations."
+    relance.innerHTML = ''
+    return
+  }
+
+  titre.textContent = taux + '% consultées'
+  sous.textContent = `${vues} consultation${vues > 1 ? 's' : ''} sur ${possible} possibles depuis lundi`
+
+  // La catégorie la plus en retard, celle qui mérite une relance
+  const enRetard = [...allCategoriesData].sort((a, b) => a.avgPct - b.avgPct)[0]
+  if (enRetard && enRetard.avgPct < 100) {
+    const couleur = enRetard.avgPct >= 70 ? 'var(--green)' : enRetard.avgPct >= 30 ? 'var(--orange)' : 'var(--red)'
+    relance.innerHTML = `<span class="pastille" style="background:${couleur};"></span>` +
+      `À relancer : <b>${escapeHtml(enRetard.nom)}</b> · ${enRetard.avgPct}%`
+  } else {
+    relance.innerHTML = `<span class="pastille" style="background:var(--green);"></span>Tout le monde est à jour.`
+  }
 }
 
 // Capture la position actuelle de chaque carte (identifiée par data-key) avant de les réordonner

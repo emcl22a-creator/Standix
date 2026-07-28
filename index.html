@@ -1455,8 +1455,48 @@ async function loadGestionProcedures() {
   renderCategoryGrid()
 }
 
+// Capture la position actuelle de chaque carte (identifiée par data-key) avant de les réordonner
+function captureCardPositions(containerEl) {
+  const rects = new Map()
+  containerEl.querySelectorAll('[data-key]').forEach(el => {
+    rects.set(el.dataset.key, el.getBoundingClientRect())
+  })
+  return rects
+}
+
+// Fait "glisser/mélanger" chaque carte depuis son ancienne position vers sa nouvelle position
+function playCardShuffle(containerEl, oldRects) {
+  containerEl.querySelectorAll('[data-key]').forEach((el, i) => {
+    const oldRect = oldRects.get(el.dataset.key)
+    if (!oldRect) {
+      // Carte totalement nouvelle : simple entrée en fondu/glissement
+      el.classList.add('slide-in')
+      el.style.animationDelay = (i * 0.04) + 's'
+      return
+    }
+    const newRect = el.getBoundingClientRect()
+    const dx = oldRect.left - newRect.left
+    const dy = oldRect.top - newRect.top
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return
+    el.style.zIndex = 5
+    el.style.transition = 'none'
+    el.style.transform = `translate(${dx}px, ${dy}px)`
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        el.style.transition = 'transform 0.5s cubic-bezier(0.22,1,0.36,1)'
+        el.style.transform = ''
+        el.addEventListener('transitionend', () => {
+          el.style.zIndex = ''
+          el.style.transition = ''
+        }, { once: true })
+      })
+    })
+  })
+}
+
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
+  const oldRects = captureCardPositions(catGridEl)
   catGridEl.innerHTML = ''
 
   const sorted = [...allCategoriesData].sort((a, b) => {
@@ -1466,7 +1506,6 @@ function renderCategoryGrid() {
     return 0
   })
 
-  let cardIndex = 0
   sorted.forEach(({ nom, icone, procsInCat, avgPct }) => {
     const recentTitles = procsInCat.slice(0, 3)
     const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
@@ -1475,9 +1514,8 @@ function renderCategoryGrid() {
     const needsAttention = avgPct > 0 && avgPct < 30
 
     const cell = document.createElement('div')
-    cell.className = 'cat-cell slide-in'
-    cell.style.animationDelay = (cardIndex * 0.04) + 's'
-    cardIndex++
+    cell.className = 'cat-cell'
+    cell.dataset.key = nom
     cell.innerHTML = `
       <div class="cat-top">
         <div class="cat-ring-wrap">
@@ -1503,6 +1541,8 @@ function renderCategoryGrid() {
     cell.onclick = () => openCategoryProcedures(nom)
     catGridEl.appendChild(cell)
   })
+
+  playCardShuffle(catGridEl, oldRects)
 }
 
 window.setCatSort = function(sort) {
@@ -1558,6 +1598,7 @@ async function openCategoryProcedures(nom) {
 
 function renderCategoryProceduresList() {
   const listEl = document.getElementById('category-procedures-list')
+  const oldRects = captureCardPositions(listEl)
   listEl.innerHTML = ''
 
   const sorted = [...currentCategoryProcsData].sort((a, b) => {
@@ -1567,7 +1608,6 @@ function renderCategoryProceduresList() {
     return 0
   })
 
-  let cardIndex = 0
   for (const { proc, nbEtapes, pct } of sorted) {
     const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
@@ -1575,9 +1615,8 @@ function renderCategoryProceduresList() {
     const needsAttention = pct > 0 && pct < 30
 
     const div = document.createElement('div')
-    div.className = 'card proc-rich-card slide-in'
-    div.style.animationDelay = (cardIndex * 0.05) + 's'
-    cardIndex++
+    div.className = 'card proc-rich-card'
+    div.dataset.key = proc.id
     div.onclick = () => openAnalyse(proc.id)
     div.innerHTML = `
       <div class="cat-top">
@@ -1600,6 +1639,8 @@ function renderCategoryProceduresList() {
     `
     listEl.appendChild(div)
   }
+
+  playCardShuffle(listEl, oldRects)
 }
 
 // ═══════════ GESTION : création ═══════════

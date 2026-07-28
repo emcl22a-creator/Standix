@@ -177,24 +177,28 @@
      sur l'arête, donc seule la moitié se voit. Une trame de petits carreaux
      n'apparaît qu'à deux endroits, révélée par un masque en dégradé. */
   /* ═══ Pile de deux cartes ═══
-     La carte du dessous dépasse de 26px en bas, comme les cartes de Wallet.
-     On tape sur la languette qui dépasse pour la faire passer devant. */
-  .pile{ position:relative; height:222px; margin-bottom:18px; }
+     La seconde est entièrement cachée derrière la première. On fait glisser
+     du doigt vers la gauche ou la droite : la carte de devant part sur le côté
+     en pivotant légèrement, celle de derrière grandit et prend sa place.
+     Deux points sous la pile signalent qu'il y a une carte de plus. */
+  .pile{ position:relative; height:196px; margin-bottom:26px; touch-action:pan-y; }
   .pile-carte{
     position:absolute; left:0; right:0; top:0; height:196px; margin-bottom:0 !important;
-    transition: transform 0.5s cubic-bezier(0.34,1.2,0.5,1), opacity 0.35s ease;
+    transition: transform 0.46s cubic-bezier(0.34,1.2,0.5,1), opacity 0.34s ease;
+    will-change:transform, opacity;
   }
-  .pile .devant{ z-index:2; transform:translateY(0) scale(1); opacity:1; }
-  .pile .derriere{ z-index:1; transform:translateY(26px) scale(0.965); opacity:0.94; }
-  .pile-carte .poignee{
-    position:absolute; left:0; right:0; bottom:0; height:26px;
-    display:flex; align-items:center; justify-content:center; gap:5px;
-    font-size:11.5px; font-weight:650; color:var(--label-2);
-    opacity:0; pointer-events:none; transition:opacity 0.3s ease;
+  .pile .devant{ z-index:2; transform:none; opacity:1; }
+  .pile .derriere{ z-index:1; transform:scale(0.93) translateY(10px); opacity:0; pointer-events:none; }
+  /* Pendant le glissement, c'est le doigt qui pilote : plus de transition. */
+  .pile.glisse .pile-carte{ transition:none; }
+  .pile.glisse .derriere{ opacity:1; }
+
+  .pile-points{ position:absolute; left:0; right:0; bottom:-18px; display:flex; justify-content:center; gap:6px; }
+  .pile-points i{
+    width:6px; height:6px; border-radius:50%; background:rgba(235,235,245,0.25);
+    transition:background 0.3s ease, transform 0.3s ease; cursor:pointer;
   }
-  .pile-carte .poignee svg{ width:11px; height:11px; }
-  .pile .derriere .poignee{ opacity:1; pointer-events:auto; cursor:pointer; }
-  .pile .devant > *:not(.poignee){ transition:opacity 0.25s ease; }
+  .pile-points i.on{ background:rgba(255,255,255,0.85); transform:scale(1.15); }
 
   /* Carte du dessous : même matière, halo orange pour la distinguer */
   .panneau-semaine{ padding-bottom:34px; }
@@ -218,7 +222,7 @@
        La teinte reste dans la famille sombre de l'app, avec un très léger
        dégradé pour éviter l'aplat mort. Bordure et arrondi restent ceux des
        cartes de catégories, pour que les deux blocs se répondent. */
-    background:linear-gradient(158deg, #1D1E22 0%, #17181B 55%, #131416 100%);
+    background:var(--hero-gradient);
     border:0.5px solid var(--border); border-radius:16px;
     padding:22px 20px 20px;
   }
@@ -1030,7 +1034,6 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Créer une procédure
         </button>
-        <div class="poignee">Mes procédures <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></div>
       </div>
 
       <div class="panneau-accueil panneau-semaine pile-carte derriere" data-carte="semaine">
@@ -1044,8 +1047,8 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
           Voir l'analyse complète
         </button>
-        <div class="poignee">Cette semaine <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg></div>
       </div>
+      <div class="pile-points" id="pile-points"><i class="on"></i><i></i></div>
     </div>
     <div class="list-tools">
       <div class="dd-filter" id="dd-cat-sort">
@@ -2377,17 +2380,76 @@ async function loadGestionProcedures() {
 }
 
 /* ═══ Pile de l'accueil ═══
-   Deux cartes empilées : les procédures devant, le bilan de la semaine
-   derrière. Un appui sur la languette qui dépasse les échange. */
-document.getElementById('pile-accueil')?.addEventListener('click', (e) => {
-  if (!e.target.closest('.poignee')) return
+   Deux cartes superposées : les procédures devant, le bilan de la semaine
+   caché derrière. On fait glisser du doigt à gauche ou à droite pour les
+   échanger — pendant le glissement, c'est le doigt qui pilote directement les
+   deux cartes, et au relâchement on décide de terminer ou de revenir. */
+;(function pileAccueil() {
   const pile = document.getElementById('pile-accueil')
-  pile.querySelectorAll('.pile-carte').forEach(c => {
-    const devant = c.classList.contains('devant')
-    c.classList.toggle('devant', !devant)
-    c.classList.toggle('derriere', devant)
+  if (!pile) return
+  const points = document.getElementById('pile-points')
+  let departX = null, ecart = 0, largeur = 0
+
+  const devant = () => pile.querySelector('.pile-carte.devant')
+  const derriere = () => pile.querySelector('.pile-carte.derriere')
+
+  function basculer() {
+    pile.querySelectorAll('.pile-carte').forEach(c => {
+      const estDevant = c.classList.contains('devant')
+      c.classList.toggle('devant', !estDevant)
+      c.classList.toggle('derriere', estDevant)
+    })
+    const index = [...pile.querySelectorAll('.pile-carte')].findIndex(c => c.classList.contains('devant'))
+    points?.querySelectorAll('i').forEach((p, i) => p.classList.toggle('on', i === index))
+  }
+
+  function nettoyer() {
+    ;[devant(), derriere()].forEach(c => { if (c) { c.style.transform = ''; c.style.opacity = '' } })
+  }
+
+  pile.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('button')) return       // on ne gêne pas les boutons
+    departX = e.clientX
+    ecart = 0
+    largeur = pile.offsetWidth || 1
+    pile.classList.add('glisse')
+    pile.setPointerCapture?.(e.pointerId)
   })
-})
+
+  pile.addEventListener('pointermove', (e) => {
+    if (departX == null) return
+    ecart = e.clientX - departX
+    const avancement = Math.min(1, Math.abs(ecart) / (largeur * 0.55))
+    const d = devant(), r = derriere()
+    if (d) {
+      d.style.transform = `translateX(${ecart}px) rotate(${ecart * 0.022}deg)`
+      d.style.opacity = String(1 - avancement * 0.4)
+    }
+    if (r) {
+      r.style.transform = `scale(${0.93 + avancement * 0.07}) translateY(${(1 - avancement) * 10}px)`
+      r.style.opacity = String(avancement)
+    }
+  })
+
+  function relacher() {
+    if (departX == null) return
+    const fini = Math.abs(ecart) > largeur * 0.24
+    pile.classList.remove('glisse')
+    nettoyer()
+    if (fini) basculer()
+    departX = null
+    ecart = 0
+  }
+  pile.addEventListener('pointerup', relacher)
+  pile.addEventListener('pointercancel', relacher)
+
+  // Les deux points servent aussi de commande
+  points?.addEventListener('click', (e) => {
+    const p = e.target.closest('i')
+    if (!p || p.classList.contains('on')) return
+    basculer()
+  })
+})()
 
 /* Remplit la carte de la semaine à partir de ce qui est déjà en mémoire :
    aucune requête supplémentaire, tout vient du préchargement. */

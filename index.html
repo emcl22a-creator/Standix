@@ -19,7 +19,7 @@
   }
   html, body{
     background:#141518; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
-    color:var(--label); font-size:17px; line-height:1.35; letter-spacing:-0.02em;
+    color:var(--label); font-size:17px; line-height:1.42; letter-spacing:-0.02em;
     -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden; position:relative;
   }
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
@@ -76,7 +76,7 @@
   .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
   .icon-pill svg{ width:20px; height:20px; }
 
-  .screen{display:none; padding:96px 20px 40px;}
+  .screen{display:none; padding:100px 20px 48px;}
   .screen.active{ display:block; animation: screenIn 0.5s cubic-bezier(0.32,0.72,0,1); }
   @keyframes screenIn{
     0%{ opacity:0; transform:translateY(14px) scale(0.985); }
@@ -84,23 +84,23 @@
   }
   .screen.active{display:block;}
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
-  h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.02em; margin:6px 0 2px; }
-  .subhead{ font-size:14px; color:var(--label-2); margin-bottom:20px; }
+  h1.pagehead{ font-size:28px; font-weight:700; letter-spacing:-0.02em; margin:8px 0 4px; }
+  .subhead{ font-size:14.5px; color:var(--label-2); margin-bottom:26px; line-height:1.4; }
 
   .hero-card{ position:relative; background:var(--hero-gradient); border:0.5px solid rgba(255,255,255,0.15);
-    border-radius:20px; padding:22px 20px; margin-bottom:16px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+    border-radius:24px; padding:26px 22px; margin-bottom:18px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
   .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.55); font-weight:500; margin-bottom:10px; }
   .hero-card .num{ font-size:44px; font-weight:700; color:#fff; letter-spacing:-1.2px; }
   .hero-card .sub{ font-size:13px; color:rgba(255,255,255,0.55); margin-top:4px; font-weight:500; }
   .hero-card .bar{ height:10px; background:rgba(255,255,255,0.18); border-radius:100px; overflow:hidden; margin-top:14px; }
   .hero-card .bar-fill{ height:100%; background:#fff; border-radius:100px; box-shadow:0 0 12px rgba(255,255,255,0.55); }
 
-  .section-title{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--label-2); margin:22px 0 10px; }
+  .section-title{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--label-2); margin:30px 0 14px; letter-spacing:0.01em; }
   .card, .sop-card, .emp-row, .cat-cell{
     background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
     border:0.5px solid var(--border); border-radius:16px;
   }
-  .sop-card{ padding:14px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;
+  .sop-card{ padding:16px 18px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;
     animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
   .sop-card:active{ transform:scale(0.97); }
   @keyframes cardIn{
@@ -114,7 +114,7 @@
   .badge.pending{background:rgba(255,159,10,0.16); color:var(--orange);}
   .badge.drift{background:rgba(255,69,58,0.16); color:var(--red);}
 
-  .card{padding:18px; margin-bottom:14px;}
+  .card{padding:20px; margin-bottom:16px;}
   label.f{ display:block; font-size:12px; font-weight:600; color:var(--label-2); margin-bottom:8px; }
   textarea, input[type=text], input[type=email], input[type=password], input[type=file]{
     width:100%; font-size:16px; border:0.5px solid var(--border); border-radius:12px; padding:12px;
@@ -123,10 +123,11 @@
   textarea:focus, input:focus{ outline:none; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.07); }
   ::placeholder{color:var(--label-3);}
 
-  .btn{ font-size:14px; font-weight:600; background:#FFFFFF; color:#000000; padding:11px 20px; border-radius:100px;
+  .btn{ font-size:15px; font-weight:600; background:#FFFFFF; color:#000000; padding:13px 22px; border-radius:100px;
     box-shadow:0 4px 14px rgba(255,255,255,0.18), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.15s; }
   .btn:active{transform:scale(0.94); background:#E5E5EA;}
+  .btn.small{ padding:9px 16px; font-size:12.5px; }
   .btn.ghost{ background:rgba(255,255,255,0.10); color:var(--label); box-shadow:none; border:0.5px solid var(--border); }
   .btn.block{width:100%; text-align:center;}
   .btn[disabled]{opacity:0.5;}
@@ -183,7 +184,7 @@
   .stat-mini .num{ font-size:20px; font-weight:700; }
   .stat-mini .lbl{ font-size:10.5px; color:var(--label-2); margin-top:2px; }
 
-  .emp-row{ display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px;
+  .emp-row{ display:flex; align-items:center; gap:12px; padding:12px 16px; margin-bottom:8px;
     animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; }
   .emp-row-name{ font-size:13.5px; font-weight:600; flex:1; }
   .emp-row-date{ font-size:11.5px; color:var(--label-2); }
@@ -244,8 +245,9 @@
 
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
 
-  .mode-choice-card{ cursor:pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+  .mode-choice-card{ cursor:pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s; }
   .mode-choice-card:active{ transform:scale(0.98); }
+  .mode-choice-card.disabled{ opacity:0.4; pointer-events:none; }
   .mode-choice-row{ display:flex; align-items:center; gap:14px; }
   .mode-choice-icon{ font-size:24px; flex-shrink:0; width:36px; text-align:center; }
   .mode-choice-text{ flex:1; }
@@ -253,13 +255,13 @@
   .mode-choice-desc{ font-size:12px; color:var(--label-2); margin-top:2px; }
   .mode-choice-arrow{ font-size:22px; color:var(--label-2); flex-shrink:0; }
 
-  .cat-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
+  .cat-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
   .cat-cell, .proc-rich-card{
-    padding:16px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    padding:18px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     position:relative; overflow:hidden;
   }
   .cat-cell:active, .proc-rich-card:active{ transform:scale(0.97); }
-  .proc-rich-card{ margin-bottom:10px; }
+  .proc-rich-card{ margin-bottom:12px; }
   .cat-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
   .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
   .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
@@ -494,11 +496,11 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
-    <select id="cat-sort-select" class="sort-select">
-      <option value="az">Croissant A → Z</option>
-      <option value="new">Nouveau → ancien</option>
-      <option value="old">Ancien → nouveau</option>
-    </select>
+    <div class="filter-chips" id="cat-sort-chips" style="margin-bottom:16px;">
+      <button class="active" data-sort="az" onclick="setCatSort('az')">A → Z</button>
+      <button data-sort="new" onclick="setCatSort('new')">Nouveau → ancien</button>
+      <button data-sort="old" onclick="setCatSort('old')">Ancien → nouveau</button>
+    </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
 
@@ -513,6 +515,11 @@
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
+    </div>
+    <div class="filter-chips" id="category-sort-chips" style="margin-bottom:16px;">
+      <button class="active" data-sort="az" onclick="setCategorySort('az')">A → Z</button>
+      <button data-sort="new" onclick="setCategorySort('new')">Nouveau → ancien</button>
+      <button data-sort="old" onclick="setCategorySort('old')">Ancien → nouveau</button>
     </div>
     <div id="category-procedures-list"></div>
   </div>
@@ -536,8 +543,9 @@
     </div>
 
     <div class="section-title">Comment créer cette procédure ?</div>
+    <div class="note" id="mode-choice-note" style="margin-top:0; margin-bottom:10px;">Complétez le titre et la catégorie ci-dessus pour continuer.</div>
 
-    <div class="card mode-choice-card" onclick="goToCreateMode('manual')">
+    <div class="card mode-choice-card disabled" onclick="goToCreateMode('manual')" id="mode-card-manual">
       <div class="mode-choice-row">
         <div class="mode-choice-icon">✍️</div>
         <div class="mode-choice-text">
@@ -548,7 +556,7 @@
       </div>
     </div>
 
-    <div class="card mode-choice-card" onclick="goToCreateMode('video')">
+    <div class="card mode-choice-card disabled" onclick="goToCreateMode('video')" id="mode-card-video">
       <div class="mode-choice-row">
         <div class="mode-choice-icon">🎬</div>
         <div class="mode-choice-text">
@@ -559,7 +567,7 @@
       </div>
     </div>
 
-    <div class="card mode-choice-card" onclick="goToCreateMode('ai')">
+    <div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
       <div class="mode-choice-row">
         <div class="mode-choice-icon">✦</div>
         <div class="mode-choice-text">
@@ -1303,6 +1311,7 @@ window.showGestionScreen = function(id, btn) {
   document.getElementById(id).classList.add('active')
   document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
+  if (id === 'p-create') updateModeCardsState()
 }
 window.startNewProcedure = function() {
   resetCreateForm()
@@ -1427,10 +1436,11 @@ function renderCategoryGrid() {
   })
 }
 
-document.getElementById('cat-sort-select').addEventListener('change', (e) => {
-  currentCatSort = e.target.value
+window.setCatSort = function(sort) {
+  currentCatSort = sort
+  document.querySelectorAll('#cat-sort-chips button').forEach(b => b.classList.toggle('active', b.dataset.sort === sort))
   renderCategoryGrid()
-})
+}
 
 document.getElementById('category-search-input').addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase()
@@ -1440,10 +1450,21 @@ document.getElementById('category-search-input').addEventListener('input', (e) =
   })
 })
 
+let currentCategorySort = 'az'
+window.setCategorySort = function(sort) {
+  currentCategorySort = sort
+  document.querySelectorAll('#category-sort-chips button').forEach(b => b.classList.toggle('active', b.dataset.sort === sort))
+  renderCategoryProceduresList()
+}
+
+let currentCategoryProcsData = []
+
 async function openCategoryProcedures(nom) {
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = nom
   document.getElementById('category-search-input').value = ''
+  currentCategorySort = 'az'
+  document.querySelectorAll('#category-sort-chips button').forEach(b => b.classList.toggle('active', b.dataset.sort === 'az'))
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
@@ -1452,16 +1473,34 @@ async function openCategoryProcedures(nom) {
 
   const { count: nbEmployes } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
 
-  let cardIndex = 0
+  currentCategoryProcsData = []
   for (const proc of procsInCategory) {
     const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const nbEtapes = proc.etapes?.[0]?.count ?? 0
-
     const pct = nbEmployes > 0 ? Math.round(Math.min(1, (nbValidations || 0) / nbEmployes) * 100) : 0
+    currentCategoryProcsData.push({ proc, nbEtapes, pct, createdAt: new Date(proc.created_at).getTime() })
+  }
+
+  renderCategoryProceduresList()
+}
+
+function renderCategoryProceduresList() {
+  const listEl = document.getElementById('category-procedures-list')
+  listEl.innerHTML = ''
+
+  const sorted = [...currentCategoryProcsData].sort((a, b) => {
+    if (currentCategorySort === 'az') return a.proc.titre.localeCompare(b.proc.titre)
+    if (currentCategorySort === 'new') return b.createdAt - a.createdAt
+    if (currentCategorySort === 'old') return a.createdAt - b.createdAt
+    return 0
+  })
+
+  let cardIndex = 0
+  for (const { proc, nbEtapes, pct } of sorted) {
     const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
     const dashoffset = circumference * (1 - pct / 100)
-    const needsAttention = nbEmployes > 0 && pct < 30
+    const needsAttention = pct > 0 && pct < 30
 
     const div = document.createElement('div')
     div.className = 'card proc-rich-card'
@@ -1508,7 +1547,18 @@ function resetCreateForm() {
   currentVideoFile = null
   renderManualSteps()
   renderVideoSteps()
+  updateModeCardsState()
 }
+
+function updateModeCardsState() {
+  const titre = document.getElementById('new-titre').value.trim()
+  const categorie = document.getElementById('new-categorie').value.trim()
+  const isReady = titre.length > 0 && categorie.length > 0
+  document.querySelectorAll('.mode-choice-card').forEach(card => card.classList.toggle('disabled', !isReady))
+  document.getElementById('mode-choice-note').style.display = isReady ? 'none' : 'block'
+}
+document.getElementById('new-titre').addEventListener('input', updateModeCardsState)
+document.getElementById('new-categorie').addEventListener('input', updateModeCardsState)
 
 function goToCreateMode(mode) {
   if (mode === 'manual') showGestionScreen('p-create-manual')

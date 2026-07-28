@@ -482,35 +482,6 @@
   .list-tools{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
   .list-tools .dd-filter{ margin-bottom:0; flex:1; min-width:0; }
 
-  /* ═══ Champ de recherche façon iOS ═══ */
-  .ios-search{
-    display:flex; align-items:center; gap:7px; height:36px; padding:0 10px;
-    background:rgba(118,118,128,0.24); border-radius:10px; margin-bottom:14px;
-  }
-  .ios-search .loupe{ width:16px; height:16px; color:rgba(235,235,245,0.6); flex-shrink:0; }
-  .ios-search input{
-    flex:1; min-width:0; background:none; border:none; padding:0;
-    font-size:16px; font-family:inherit; color:var(--label);
-  }
-  .ios-search input::placeholder{ color:rgba(235,235,245,0.6); }
-  .ios-search input:focus{ outline:none; }
-  .ios-search .effacer{
-    display:none; align-items:center; justify-content:center; flex-shrink:0;
-    width:18px; height:18px; color:rgba(235,235,245,0.45); padding:0;
-  }
-  .ios-search .effacer svg{ width:17px; height:17px; }
-
-  .res-row{
-    display:flex; align-items:center; justify-content:space-between; gap:10px;
-    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
-    padding:12px 14px; margin-bottom:8px; cursor:pointer;
-    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .res-row:active{ transform:scale(0.98); }
-  .res-row .t{ font-size:14.5px; font-weight:600; }
-  .res-row .c{ font-size:11.5px; color:var(--label-2); margin-top:2px; }
-  .res-row .fleche{ width:15px; height:15px; color:var(--label-3); flex-shrink:0; }
-  .res-compte{ font-size:12px; color:var(--label-2); margin-bottom:10px; }
 
   .dd-filter{ position:relative; margin-bottom:14px; }
   .dd-trigger{
@@ -847,14 +818,6 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
-    <div class="ios-search">
-      <svg class="loupe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg>
-      <input type="text" id="accueil-search" placeholder="Rechercher une procédure" autocomplete="off" autocorrect="off" spellcheck="false">
-      <button type="button" class="effacer" id="accueil-clear" aria-label="Effacer">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.5 12.1-1.4 1.4L12 13.4l-2.1 2.1-1.4-1.4L10.6 12 8.5 9.9l1.4-1.4L12 10.6l2.1-2.1 1.4 1.4L13.4 12l2.1 2.1Z"/></svg>
-      </button>
-    </div>
-    <div id="accueil-resultats" style="display:none;"></div>
     <div class="list-tools">
       <div class="dd-filter" id="dd-cat-sort">
         <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
@@ -1888,7 +1851,6 @@ window.loadGlobalAnalyse = function() {
 
 // ═══ NAVIGATION (séparée par espace, pas de collision d'ids) ═══
 window.showGestionScreen = function(id, btn) {
-  if (id !== 'p-list' && typeof reinitialiserRechercheAccueil === 'function') reinitialiserRechercheAccueil()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
   document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
@@ -2194,81 +2156,6 @@ document.addEventListener('click', (e) => {
 
 wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
 
-/* ═══ Recherche de l'accueil ═══
-   Tant que le champ est vide, on voit la grille des catégories. Dès qu'on
-   tape, elle laisse la place aux procédures correspondantes — le tri n'a plus
-   de sens à ce moment-là, il s'efface aussi. C'est le comportement d'une
-   liste iOS : la recherche recouvre le contenu au lieu de le filtrer sur place. */
-let rechercheAccueil = ''
-
-document.getElementById('accueil-search')?.addEventListener('input', (e) => {
-  rechercheAccueil = e.target.value.trim().toLowerCase()
-  majAffichageAccueil()
-})
-
-document.getElementById('accueil-clear')?.addEventListener('click', () => {
-  const champ = document.getElementById('accueil-search')
-  champ.value = ''
-  rechercheAccueil = ''
-  majAffichageAccueil()
-  champ.focus()
-})
-
-function majAffichageAccueil() {
-  const actif = rechercheAccueil.length > 0
-  const grille = document.getElementById('cat-grid')
-  const outils = document.querySelector('#p-list .list-tools')
-  const resultats = document.getElementById('accueil-resultats')
-  const effacer = document.getElementById('accueil-clear')
-  if (grille) grille.style.display = actif ? 'none' : ''
-  if (outils) outils.style.display = actif ? 'none' : ''
-  if (resultats) resultats.style.display = actif ? 'block' : 'none'
-  if (effacer) effacer.style.display = actif ? 'flex' : 'none'
-  if (actif) renderResultatsAccueil()
-}
-
-function renderResultatsAccueil() {
-  const el = document.getElementById('accueil-resultats')
-  if (!el) return
-  const q = rechercheAccueil
-  const trouves = allGestionProcedures.filter(p =>
-    (p.titre || '').toLowerCase().includes(q) ||
-    (p.categorie || 'sans catégorie').toLowerCase().includes(q)
-  )
-
-  if (trouves.length === 0) {
-    el.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à « ${escapeHtml(rechercheAccueil)} ».</p></div>`
-    return
-  }
-
-  el.innerHTML = `<div class="res-compte">${trouves.length} résultat${trouves.length > 1 ? 's' : ''}</div>`
-  trouves
-    .sort((a, b) => (a.titre || '').localeCompare(b.titre || '', 'fr', { sensitivity: 'base' }))
-    .forEach(proc => {
-      const nbEtapes = proc.etapes?.[0]?.count ?? 0
-      const div = document.createElement('div')
-      div.className = 'res-row'
-      div.innerHTML = `
-        <div style="min-width:0;">
-          <div class="t">${escapeHtml(proc.titre)}</div>
-          <div class="c">${escapeHtml(proc.categorie || 'Sans catégorie')} · ${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}</div>
-        </div>
-        <svg class="fleche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
-      `
-      div.onclick = () => openAnalyse(proc.id)
-      el.appendChild(div)
-    })
-}
-
-// Le champ se vide dès qu'on quitte l'accueil, pour y revenir sur la grille
-function reinitialiserRechercheAccueil() {
-  const champ = document.getElementById('accueil-search')
-  if (champ) champ.value = ''
-  rechercheAccueil = ''
-  majAffichageAccueil()
-}
-
-let currentCategoryQuery = ''
 document.getElementById('category-search-input')?.addEventListener('input', (e) => {
   currentCategoryQuery = e.target.value.trim().toLowerCase()
   renderCategoryProceduresList()
@@ -3627,19 +3514,61 @@ window.startScanner = async function(espace) {
   scanEspace = espace === 'gestion' ? 'gestion' : 'equipe'
   const hintEl = scanEl('scan-hint')
   const video = scanEl('scan-video')
-  scanEl('scan-result-zone').innerHTML = ''
+  const zone = scanEl('scan-result-zone')
+  zone.innerHTML = ''
+
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    echecScanner(hintEl, zone, "Ce navigateur ne donne pas accès à la caméra.",
+      "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.")
+    return
+  }
+
   try {
-    hintEl.textContent = 'Chargement du scanner...'
-    await ensureJsQR()
-    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    // On ouvre la caméra AVANT de charger le lecteur de codes : l'autorisation
+    // est demandée tout de suite et l'aperçu s'affiche, même si la
+    // bibliothèque met du temps à arriver. Dans l'autre sens, un réseau lent
+    // laissait l'écran bloqué sur « Chargement » sans rien montrer.
+    hintEl.textContent = 'Ouverture de la caméra...'
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } }, audio: false,
+    })
     video.srcObject = scanStream
-    await video.play()
-    hintEl.textContent = 'Recherche du code en cours...'
+    try { await video.play() } catch (e) { /* l'attribut autoplay prend le relais */ }
+
+    hintEl.textContent = 'Préparation du lecteur...'
+    await ensureJsQR()
+
+    hintEl.textContent = 'Visez le QR code'
     scanLoopActive = true
     requestAnimationFrame(scanLoop)
   } catch (e) {
-    hintEl.textContent = "Caméra indisponible : " + e.message
+    stopScanner()
+    const nom = e && e.name
+    if (nom === 'NotAllowedError' || nom === 'SecurityError') {
+      echecScanner(hintEl, zone, "Accès à la caméra refusé.",
+        "Sur iPhone : Réglages → Safari → Caméra → Autoriser, puis rechargez la page.")
+    } else if (nom === 'NotFoundError' || nom === 'OverconstrainedError') {
+      echecScanner(hintEl, zone, "Aucune caméra détectée sur cet appareil.", '')
+    } else if (nom === 'NotReadableError') {
+      echecScanner(hintEl, zone, "La caméra est déjà utilisée par une autre application.",
+        "Fermez l'app qui l'utilise, puis réessayez.")
+    } else {
+      echecScanner(hintEl, zone, "Le scanner n'a pas pu démarrer.",
+        (nom ? nom + ' — ' : '') + ((e && e.message) || 'raison inconnue'))
+    }
   }
+}
+
+// Message d'échec lisible, avec un bouton pour retenter
+function echecScanner(hintEl, zone, titre, detail) {
+  hintEl.textContent = ''
+  zone.innerHTML = `
+    <div class="card" style="text-align:center;">
+      <div style="font-size:14px; font-weight:600; margin-bottom:4px;">${escapeHtml(titre)}</div>
+      ${detail ? `<div style="font-size:12.5px; color:var(--label-2); line-height:1.45;">${escapeHtml(detail)}</div>` : ''}
+      <button class="btn small" style="margin-top:14px;" id="scan-retry">Réessayer</button>
+    </div>`
+  zone.querySelector('#scan-retry').addEventListener('click', () => startScanner(scanEspace))
 }
 function stopScanner() {
   scanLoopActive = false
@@ -3650,7 +3579,8 @@ const scanCtx = scanCanvas.getContext('2d')
 function scanLoop() {
   if (!scanLoopActive) return
   const video = scanEl('scan-video')
-  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+  if (!video || !jsQRLib) return
+  if (video.readyState === video.HAVE_ENOUGH_DATA && video.videoWidth > 0) {
     scanCanvas.width = video.videoWidth; scanCanvas.height = video.videoHeight
     scanCtx.drawImage(video, 0, 0, scanCanvas.width, scanCanvas.height)
     const imageData = scanCtx.getImageData(0, 0, scanCanvas.width, scanCanvas.height)

@@ -10,11 +10,15 @@
      lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur
      chacun — c'est du temps mort pur, avant même la première requête. -->
 <link rel="preconnect" href="https://tlrtsoahwqhtvtkhssbm.supabase.co" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin><!-- QR code, chargé à la demande -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <!-- La bibliothèque Supabase est indispensable pour afficher quoi que ce soit :
      on la télécharge en parallèle du reste au lieu d'attendre la fin du script. -->
-<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm" crossorigin>
+<!-- La bibliothèque Supabase est servie depuis le même dépôt que cette page :
+     pas de serveur tiers à joindre, et le navigateur la garde en cache d'une
+     visite à l'autre. Elle était auparavant téléchargée depuis jsDelivr, ce qui
+     coûtait entre 30 ms et 2 secondes selon l'humeur du réseau. -->
+<link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
@@ -1415,9 +1419,18 @@
 let createClient
 
 try {
-  window.jalon?.('script exécuté, téléchargement de Supabase')
-  const supabaseModule = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-  window.jalon?.('Supabase prêt')
+  window.jalon?.('script exécuté, chargement de Supabase')
+  let supabaseModule
+  try {
+    supabaseModule = await import('./supabase.js')
+    window.jalon?.('Supabase prêt (fichier local)')
+  } catch (localErr) {
+    // Filet : si le fichier n'a pas encore été déposé dans le dépôt, on retombe
+    // sur le serveur tiers plutôt que de laisser l'app inutilisable.
+    console.warn('supabase.js introuvable en local, repli sur jsDelivr :', localErr && localErr.message)
+    supabaseModule = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+    window.jalon?.('Supabase prêt (jsDelivr, repli)')
+  }
   createClient = supabaseModule.createClient
   if (!createClient) throw new Error('createClient introuvable dans le module Supabase chargé')
 } catch (e) {

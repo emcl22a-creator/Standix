@@ -28,14 +28,14 @@
      Les règles de la frise vidéo (classes) restent prioritaires sur ce `*`. */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
   :root{
-    --bg:#141518; --bg-card: rgba(255,255,255,0.06);
+    --bg:#0C0D0E; --bg-card: rgba(255,255,255,0.06);
     --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
     --hero-gradient: linear-gradient(150deg, #2C2C34 0%, #1E1E24 40%, #141418 75%, #0C0C10 100%);
     --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
     --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
   }
   html, body{
-    background:#141518; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+    background:#0C0D0E; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
     color:var(--label); font-size:17px; line-height:1.32; letter-spacing:-0.02em;
     -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden; position:relative;
     -webkit-text-size-adjust:100%; text-size-adjust:100%;
@@ -57,17 +57,17 @@
   }
   .chalo-1{
     top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
-    background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%);
+    background:radial-gradient(circle, #25252A 0%, #1D1D20 45%, transparent 72%);
     animation:chalo1 14s ease-in-out infinite;
   }
   .chalo-2{
     bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
-    background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%);
+    background:radial-gradient(circle, #2A2A2F 0%, #222225 45%, transparent 72%);
     animation:chalo2 18s ease-in-out infinite;
   }
   .chalo-4{
     top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
-    background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%);
+    background:radial-gradient(circle, #28282C 0%, #1F1F23 48%, transparent 70%);
     opacity:0.9; animation:chalo3 16s ease-in-out infinite;
   }
   @keyframes chalo1{
@@ -85,9 +85,9 @@
 
   @media (max-width: 600px){
     .chalo{ opacity:1; filter:blur(90px); }
-    .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
-    .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
-    .chalo-4{ opacity:1; background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
+    .chalo-1{ background:radial-gradient(circle, #36363C 0%, #2A2A2F 45%, transparent 72%); }
+    .chalo-2{ background:radial-gradient(circle, #3B3B41 0%, #2F2F35 45%, transparent 72%); }
+    .chalo-4{ opacity:1; background:radial-gradient(circle, #38383E 0%, #2C2C32 48%, transparent 70%); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -497,7 +497,7 @@
   .qr-corner.bl{ bottom:-7px; left:-7px; border-right:0; border-top:0; border-bottom-left-radius:7px; }
   .qr-corner.br{ bottom:-7px; right:-7px; border-left:0; border-top:0; border-bottom-right-radius:7px; }
   .qr-plaque-title{
-    color:#141518; font-size:14.5px; font-weight:700; line-height:1.25;
+    color:#0C0D0E; font-size:14.5px; font-weight:700; line-height:1.25;
     margin-top:16px; word-break:break-word;
   }
   .qr-plaque-sub{ color:rgba(20,21,24,0.45); font-size:11px; font-weight:500; margin-top:4px; }
@@ -1309,7 +1309,7 @@
         <div class="qr-plaque-title" id="qr-plaque-title">—</div>
         <div class="qr-plaque-sub">Scannez pour ouvrir la procédure</div>
         <div class="qr-plaque-mark">
-          <svg viewBox="0 0 85 100" fill="none"><path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#141518"/></svg>
+          <svg viewBox="0 0 85 100" fill="none"><path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#0C0D0E"/></svg>
           <span>Procédo</span>
         </div>
       </div>
@@ -1546,7 +1546,7 @@ try {
   console.error('Échec du chargement de Supabase :', e)
   window.__procedoLoaded = true
   document.body.insertAdjacentHTML('beforeend', `
-    <div style="position:fixed; inset:0; z-index:9999; background:#141518; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div style="position:fixed; inset:0; z-index:9999; background:#0C0D0E; display:flex; align-items:center; justify-content:center; padding:24px;">
       <div style="text-align:center; max-width:320px;">
         <p style="color:#fff; font-size:15px; font-weight:600; margin-bottom:8px;">Connexion impossible</p>
         <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">Vérifiez votre connexion internet, puis réessayez.</p>
@@ -3610,7 +3610,7 @@ async function openAnalyse(procId) {
   const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
   const QRCodeLib = await ensureQRCode()
   const canvas = document.createElement('canvas')
-  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 344, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
+  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 344, margin: 1, color: { dark: '#0C0D0E', light: '#FFFFFF' } })
   qrContainer.innerHTML = ''
   qrContainer.appendChild(canvas)
 
@@ -3702,7 +3702,7 @@ function composerFicheQR(qrCanvas, titre) {
 
   // Titre
   let y = marge + cote + 40 + 30
-  g.fillStyle = '#141518'
+  g.fillStyle = '#0C0D0E'
   g.font = '700 34px Inter, -apple-system, system-ui, sans-serif'
   g.textAlign = 'center'
   lignes.forEach(ligne => { g.fillText(ligne, L / 2, y); y += 44 })

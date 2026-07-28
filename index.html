@@ -78,6 +78,12 @@
 
   .screen{display:none; padding:92px 20px 40px;}
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
+  .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
+  @keyframes appShellIn{
+    0%{ opacity:0; transform:scale(0.95); filter:blur(10px); }
+    100%{ opacity:1; transform:scale(1); filter:blur(0); }
+  }
+
   @keyframes screenIn{
     0%{ opacity:0; transform:translateY(18px) scale(0.97); filter:blur(6px); }
     60%{ opacity:1; filter:blur(0); }
@@ -242,6 +248,16 @@
     transition: background 0.15s, color 0.15s, border-color 0.15s;
   }
   .filter-chips button.active{ background:#fff; color:#000; border-color:#fff; }
+
+  .mini-select{
+    display:inline-block; font-family:inherit; font-size:13.5px; font-weight:600; color:var(--label);
+    background:none; border:none; -webkit-appearance:none; appearance:none;
+    padding:4px 20px 4px 0; margin-bottom:2px; cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right center; background-size:13px;
+  }
+  .mini-select option{ background:#141518; color:#fff; }
+  .mini-select-row{ display:flex; align-items:center; gap:16px; margin-bottom:14px; }
 
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
 
@@ -496,10 +512,12 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
-    <div class="filter-chips" id="cat-sort-chips" style="margin-bottom:16px;">
-      <button class="active" data-sort="az" onclick="setCatSort('az')">A → Z</button>
-      <button data-sort="new" onclick="setCatSort('new')">Nouveau → ancien</button>
-      <button data-sort="old" onclick="setCatSort('old')">Ancien → nouveau</button>
+    <div class="mini-select-row">
+      <select class="mini-select" id="cat-sort-select" onchange="setCatSort(this.value)">
+        <option value="az">Trier : A → Z</option>
+        <option value="new">Trier : Nouveau → ancien</option>
+        <option value="old">Trier : Ancien → nouveau</option>
+      </select>
     </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
@@ -516,10 +534,12 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
     </div>
-    <div class="filter-chips" id="category-sort-chips" style="margin-bottom:16px;">
-      <button class="active" data-sort="az" onclick="setCategorySort('az')">A → Z</button>
-      <button data-sort="new" onclick="setCategorySort('new')">Nouveau → ancien</button>
-      <button data-sort="old" onclick="setCategorySort('old')">Ancien → nouveau</button>
+    <div class="mini-select-row">
+      <select class="mini-select" id="category-sort-select" onchange="setCategorySort(this.value)">
+        <option value="az">Trier : A → Z</option>
+        <option value="new">Trier : Nouveau → ancien</option>
+        <option value="old">Trier : Ancien → nouveau</option>
+      </select>
     </div>
     <div id="category-procedures-list"></div>
   </div>
@@ -667,11 +687,11 @@
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
-      <div class="filter-chips" id="analyse-period-toggle" style="margin-top:14px;">
-        <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
-        <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
-        <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
-      </div>
+      <select class="mini-select" id="analyse-period-toggle" style="margin-top:14px; color:rgba(255,255,255,0.85);" onchange="setAnalysePeriod(this.value)">
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois-ci</option>
+        <option value="all">Total</option>
+      </select>
     </div>
 
     <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
@@ -706,11 +726,11 @@
       <div class="num" id="ga-taux-global">—</div>
       <div class="sub" id="ga-sub-global">—</div>
       <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
-      <div class="filter-chips" id="ga-period-toggle" style="margin-top:14px;">
-        <button class="active" data-period="week" onclick="setGaPeriod('week')">Cette semaine</button>
-        <button data-period="month" onclick="setGaPeriod('month')">Ce mois-ci</button>
-        <button data-period="all" onclick="setGaPeriod('all')">Total</button>
-      </div>
+      <select class="mini-select" id="ga-period-toggle" style="margin-top:14px; color:rgba(255,255,255,0.85);" onchange="setGaPeriod(this.value)">
+        <option value="week">Cette semaine</option>
+        <option value="month">Ce mois-ci</option>
+        <option value="all">Total</option>
+      </select>
     </div>
 
     <div class="section-title">Vue d'ensemble</div>
@@ -1099,11 +1119,15 @@ function enterApp(membre) {
   document.getElementById('choice-screen').style.display = 'none'
 
   if (membre.role === 'gestion') {
-    document.getElementById('gestion-app').style.display = 'block'
+    const appEl = document.getElementById('gestion-app')
+    appEl.style.display = 'block'
+    appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
     loadGestionProcedures()
   } else {
-    document.getElementById('equipe-app').style.display = 'block'
+    const appEl = document.getElementById('equipe-app')
+    appEl.style.display = 'block'
+    appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
     loadEquipeProcedures().then(() => {
       const params = new URLSearchParams(window.location.search)
@@ -1200,7 +1224,6 @@ let currentGaPeriod = 'week'
 
 window.setGaPeriod = function(period) {
   currentGaPeriod = period
-  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
   renderGaStats()
 }
 
@@ -1243,7 +1266,7 @@ window.loadGlobalAnalyse = async function() {
   const employes = (membres || []).filter(m => m.role === 'equipe')
   currentGaData = { procedures: procedures || [], membres: membres || [], employes, validations: validations || [] }
   currentGaPeriod = 'week'
-  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
+  document.getElementById('ga-period-toggle').value = 'week'
 
   document.getElementById('ga-nb-procedures').textContent = procedures?.length || 0
   document.getElementById('ga-nb-membres').textContent = membres?.length || 0
@@ -1438,7 +1461,6 @@ function renderCategoryGrid() {
 
 window.setCatSort = function(sort) {
   currentCatSort = sort
-  document.querySelectorAll('#cat-sort-chips button').forEach(b => b.classList.toggle('active', b.dataset.sort === sort))
   renderCategoryGrid()
 }
 
@@ -1453,7 +1475,6 @@ document.getElementById('category-search-input').addEventListener('input', (e) =
 let currentCategorySort = 'az'
 window.setCategorySort = function(sort) {
   currentCategorySort = sort
-  document.querySelectorAll('#category-sort-chips button').forEach(b => b.classList.toggle('active', b.dataset.sort === sort))
   renderCategoryProceduresList()
 }
 
@@ -1464,7 +1485,7 @@ async function openCategoryProcedures(nom) {
   document.getElementById('category-titre').textContent = nom
   document.getElementById('category-search-input').value = ''
   currentCategorySort = 'az'
-  document.querySelectorAll('#category-sort-chips button').forEach(b => b.classList.toggle('active', b.dataset.sort === 'az'))
+  document.getElementById('category-sort-select').value = 'az'
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
@@ -1814,7 +1835,7 @@ async function openAnalyse(procId) {
   document.getElementById('analyse-titre').textContent = '...'
   document.getElementById('analyse-subhead').textContent = 'Chargement...'
   currentAnalysePeriod = 'week'
-  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
+  document.getElementById('analyse-period-toggle').value = 'week'
 
   const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
   const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
@@ -1914,7 +1935,6 @@ async function openAnalyse(procId) {
 
 window.setAnalysePeriod = function(period) {
   currentAnalysePeriod = period
-  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
   renderAnalyseStats()
 }
 

@@ -32,24 +32,35 @@
      Les dégradés radiaux sont déjà très doux : un flou léger suffit, chaque
      calque est promu sur le GPU, et l'animation ne touche plus qu'à la
      translation et à l'opacité (deux propriétés composées, gratuites). */
+  /* ═══ Halos de fond ═══
+     Couleurs, flou et respiration strictement identiques à l'origine.
+     Seule la structure change : le flou est posé sur un calque intérieur qui,
+     lui, ne bouge jamais, pendant que le calque extérieur porte l'animation.
+     Le navigateur calcule donc le flou UNE SEULE FOIS puis se contente de
+     déplacer l'image obtenue. Avant, le flou de 90-120px était recalculé à
+     chaque image parce que l'élément flouté changeait lui-même d'échelle. */
   .color-halos{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .chalo-wrap{ position:absolute; will-change:transform, opacity; }
   .chalo{
-    position:absolute; border-radius:50%; filter:blur(36px); opacity:0.8;
-    will-change:transform, opacity; transform:translateZ(0); backface-visibility:hidden;
+    width:100%; height:100%; border-radius:50%; opacity:1;
+    filter:blur(120px); transform:translateZ(0); backface-visibility:hidden;
   }
-  .chalo-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
-    background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); animation:chaloBreath1 16s ease-in-out infinite; }
-  .chalo-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
-    background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); animation:chaloBreath2 20s ease-in-out infinite; }
-  .chalo-4{ top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
-    background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); opacity:0.9; animation:chaloBreath3 18s ease-in-out infinite; }
-  @keyframes chaloBreath1{0%,100%{transform:translate3d(0,0,0); opacity:0.72;}50%{transform:translate3d(5%,3%,0); opacity:0.95;}}
-  @keyframes chaloBreath2{0%,100%{transform:translate3d(0,0,0); opacity:0.68;}50%{transform:translate3d(-4%,-5%,0); opacity:0.9;}}
-  @keyframes chaloBreath3{0%,100%{transform:translate3d(-50%,0,0); opacity:0.8;}50%{transform:translate3d(-50%,3%,0); opacity:1;}}
+  .chalo-wrap-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
+    animation:chaloBreath1 14s ease-in-out infinite; }
+  .chalo-wrap-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
+    animation:chaloBreath2 18s ease-in-out infinite; }
+  .chalo-wrap-4{ top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
+    animation:chaloBreath3 16s ease-in-out infinite; }
+  .chalo-1{ background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); }
+  .chalo-2{ background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); }
+  .chalo-4{ background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); }
+  @keyframes chaloBreath1{0%,100%{transform:translate(0,0) scale(1); opacity:0.7;}50%{transform:translate(6%,4%) scale(1.12); opacity:0.95;}}
+  @keyframes chaloBreath2{0%,100%{transform:translate(0,0) scale(1.05); opacity:0.65;}50%{transform:translate(-5%,-6%) scale(1); opacity:0.9;}}
+  @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
 
   /* Pendant le démarrage, tout le décor est figé : le processeur est entièrement
      disponible pour afficher l'app. Les animations reprennent une fois en place. */
-  body.booting .chalo,
+  body.booting .chalo-wrap,
   body.booting .brand .mark svg{ animation:none !important; }
   body.booting *{ transition:none !important; }
   /* Une seule animation d'entrée (celle de la coquille) au lieu de trois
@@ -61,14 +72,14 @@
   body.booting .card{ animation:none !important; }
 
   @media (prefers-reduced-motion: reduce){
-    .chalo{ animation:none !important; }
+    .chalo-wrap{ animation:none !important; }
   }
 
   @media (max-width: 600px){
-    .chalo{ opacity:1; filter:blur(30px); }
+    .chalo{ filter:blur(90px); }
     .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
     .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
-    .chalo-4{ opacity:1; background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
+    .chalo-4{ background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
   }
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
@@ -540,7 +551,9 @@
 <body class="booting">
 
 <div class="color-halos">
-  <div class="chalo chalo-4"></div><div class="chalo chalo-1"></div><div class="chalo chalo-2"></div>
+  <div class="chalo-wrap chalo-wrap-4"><div class="chalo chalo-4"></div></div>
+  <div class="chalo-wrap chalo-wrap-1"><div class="chalo chalo-1"></div></div>
+  <div class="chalo-wrap chalo-wrap-2"><div class="chalo chalo-2"></div></div>
 </div>
 
 <!-- ═══ 0. CHARGEMENT (le temps de vérifier si déjà connecté) ═══ -->

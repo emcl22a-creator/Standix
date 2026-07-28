@@ -362,10 +362,33 @@
   .check.done{ background:var(--green); border-color:var(--green); position:relative; }
   .check.done::after{ content:'✓'; color:#000; font-size:12px; font-weight:700; position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); }
 
-  .qr-card{ display:flex; gap:14px; align-items:center; padding:16px; }
-  .qr-visual{ width:96px; height:96px; border-radius:14px; overflow:hidden; flex-shrink:0; background:#fff; display:flex; align-items:center; justify-content:center; }
-  .qr-visual canvas{width:100%; height:100%;}
-  .qr-info{ flex:1; }
+  /* ═══ Fiche QR ═══ Une vraie plaque blanche, comme celle qu'on imprimera. ═══ */
+  .qr-card{ padding:18px; text-align:center; }
+  .qr-plaque{
+    background:#fff; border-radius:20px; padding:20px 18px 16px;
+    max-width:246px; margin:0 auto 14px;
+    box-shadow:0 14px 34px rgba(0,0,0,0.38), 0 2px 6px rgba(0,0,0,0.2);
+  }
+  .qr-frame{ position:relative; width:172px; height:172px; margin:0 auto; }
+  .qr-visual{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .qr-visual canvas{ width:100%; height:100%; display:block; }
+  .qr-corner{ position:absolute; width:17px; height:17px; border:2.5px solid rgba(20,21,24,0.22); }
+  .qr-corner.tl{ top:-7px; left:-7px; border-right:0; border-bottom:0; border-top-left-radius:7px; }
+  .qr-corner.tr{ top:-7px; right:-7px; border-left:0; border-bottom:0; border-top-right-radius:7px; }
+  .qr-corner.bl{ bottom:-7px; left:-7px; border-right:0; border-top:0; border-bottom-left-radius:7px; }
+  .qr-corner.br{ bottom:-7px; right:-7px; border-left:0; border-top:0; border-bottom-right-radius:7px; }
+  .qr-plaque-title{
+    color:#141518; font-size:14.5px; font-weight:700; line-height:1.25;
+    margin-top:16px; word-break:break-word;
+  }
+  .qr-plaque-sub{ color:rgba(20,21,24,0.45); font-size:11px; font-weight:500; margin-top:4px; }
+  .qr-plaque-mark{
+    display:flex; align-items:center; justify-content:center; gap:5px;
+    margin-top:12px; padding-top:11px; border-top:1px solid rgba(20,21,24,0.10);
+  }
+  .qr-plaque-mark svg{ width:9px; height:11px; }
+  .qr-plaque-mark span{ color:rgba(20,21,24,0.4); font-size:10px; font-weight:700; letter-spacing:0.01em; }
+  .qr-hint{ font-size:12px; color:var(--label-2); margin-bottom:12px; line-height:1.4; }
 
   .plan-card{
     background:var(--bg-card); -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
@@ -1090,19 +1113,27 @@
     <div class="section-title">Étapes de la procédure</div>
     <div id="analyse-steps-list"></div>
 
-    <div class="section-title">Employés</div>
-    <div id="analyse-emp-list"></div>
     <div class="section-title">Code d'accès rapide</div>
     <div class="card qr-card">
-      <div class="qr-visual" id="qr-container"></div>
-      <div class="qr-info">
-        <div style="font-weight:600; font-size:13.5px;">À afficher sur le poste</div>
-        <div style="font-size:12px; color:var(--label-2); margin-top:2px;">Ouvre directement cette procédure au scan</div>
-        <div style="display:flex; gap:8px; margin-top:10px;">
-          <button class="btn small" id="qr-download-btn">Télécharger</button>
+      <div class="qr-plaque">
+        <div class="qr-frame">
+          <span class="qr-corner tl"></span><span class="qr-corner tr"></span>
+          <span class="qr-corner bl"></span><span class="qr-corner br"></span>
+          <div class="qr-visual" id="qr-container"></div>
+        </div>
+        <div class="qr-plaque-title" id="qr-plaque-title">—</div>
+        <div class="qr-plaque-sub">Scannez pour ouvrir la procédure</div>
+        <div class="qr-plaque-mark">
+          <svg viewBox="0 0 85 100" fill="none"><path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#141518"/></svg>
+          <span>Procédo</span>
         </div>
       </div>
+      <div class="qr-hint">À imprimer et afficher sur le poste de travail</div>
+      <button class="btn block" id="qr-download-btn">Télécharger la fiche</button>
     </div>
+
+    <div class="section-title">Employés</div>
+    <div id="analyse-emp-list"></div>
 
   </div>
 
@@ -3052,17 +3083,21 @@ async function openAnalyse(procId) {
   }
 
   const qrContainer = document.getElementById('qr-container')
-  qrContainer.innerHTML = '<div style="font-size:11px; color:var(--label-2);">Génération...</div>'
+  qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">Génération...</div>'
+  document.getElementById('qr-plaque-title').textContent = proc.titre
   const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
   const QRCodeLib = await ensureQRCode()
   const canvas = document.createElement('canvas')
-  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 200, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
+  await QRCodeLib.toCanvas(canvas, scanUrl, { width: 344, margin: 1, color: { dark: '#141518', light: '#FFFFFF' } })
   qrContainer.innerHTML = ''
   qrContainer.appendChild(canvas)
 
   document.getElementById('qr-download-btn').onclick = async () => {
-    const filename = `qr-${proc.titre.replace(/\s+/g, '-')}.png`
-    const dataUrl = canvas.toDataURL('image/png')
+    const filename = `${proc.titre.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')}-qr.png`
+    // On n'exporte pas le QR nu mais la fiche entière : titre, consigne et
+    // logo. Un carré noir et blanc collé sur un mur sans rien autour ne dit
+    // à personne ce qu'il ouvre.
+    const dataUrl = composerFicheQR(canvas, proc.titre)
     // Sur mobile (surtout iPhone), le téléchargement direct ne marche pas toujours :
     // on propose d'abord le partage natif (qui permet "Enregistrer l'image"), sinon on retombe sur le téléchargement classique.
     try {
@@ -3079,6 +3114,96 @@ async function openAnalyse(procId) {
     link.href = dataUrl
     link.click()
   }
+}
+
+/* Dessine la fiche à imprimer : plaque blanche, QR, titre de la procédure,
+   consigne de scan et signature Procédo. Rendue en haute définition pour
+   rester nette une fois imprimée. */
+function composerFicheQR(qrCanvas, titre) {
+  const L = 760, cote = 470
+  const marge = 62
+  const c = document.createElement('canvas')
+  const ctx = c.getContext('2d')
+
+  // Mise en page calculée d'abord, pour ajuster la hauteur au titre
+  ctx.font = '700 34px Inter, -apple-system, system-ui, sans-serif'
+  const lignes = decouperTexte(ctx, titre || '', L - marge * 2)
+  const hauteurTitre = lignes.length * 44
+  const H = marge + cote + 40 + hauteurTitre + 30 + 34 + 44 + marge
+
+  c.width = L
+  c.height = H
+  const g = c.getContext('2d')
+
+  // Plaque
+  g.fillStyle = '#FFFFFF'
+  cheminArrondi(g, 0, 0, L, H, 44)
+  g.fill()
+
+  // QR centré
+  const x = (L - cote) / 2
+  g.imageSmoothingEnabled = false
+  g.drawImage(qrCanvas, x, marge, cote, cote)
+
+  // Coins de visée, comme à l'écran
+  g.strokeStyle = 'rgba(20,21,24,0.22)'
+  g.lineWidth = 6
+  g.lineCap = 'round'
+  const b = 40, e = 20
+  ;[[x - e, marge - e, 1, 1], [x + cote + e, marge - e, -1, 1],
+    [x - e, marge + cote + e, 1, -1], [x + cote + e, marge + cote + e, -1, -1]]
+    .forEach(([px, py, sx, sy]) => {
+      g.beginPath()
+      g.moveTo(px, py + sy * b); g.lineTo(px, py); g.lineTo(px + sx * b, py)
+      g.stroke()
+    })
+
+  // Titre
+  let y = marge + cote + 40 + 30
+  g.fillStyle = '#141518'
+  g.font = '700 34px Inter, -apple-system, system-ui, sans-serif'
+  g.textAlign = 'center'
+  lignes.forEach(ligne => { g.fillText(ligne, L / 2, y); y += 44 })
+
+  // Consigne
+  g.fillStyle = 'rgba(20,21,24,0.45)'
+  g.font = '500 24px Inter, -apple-system, system-ui, sans-serif'
+  g.fillText('Scannez pour ouvrir la procédure', L / 2, y + 6)
+
+  // Filet et signature
+  y += 44
+  g.strokeStyle = 'rgba(20,21,24,0.10)'
+  g.lineWidth = 2
+  g.beginPath(); g.moveTo(marge, y); g.lineTo(L - marge, y); g.stroke()
+  g.fillStyle = 'rgba(20,21,24,0.4)'
+  g.font = '700 22px Inter, -apple-system, system-ui, sans-serif'
+  g.fillText('Procédo', L / 2, y + 30)
+
+  return c.toDataURL('image/png')
+}
+
+function decouperTexte(ctx, texte, largeurMax) {
+  const mots = String(texte).split(/\s+/).filter(Boolean)
+  const lignes = []
+  let courante = ''
+  mots.forEach(mot => {
+    const essai = courante ? courante + ' ' + mot : mot
+    if (ctx.measureText(essai).width > largeurMax && courante) {
+      lignes.push(courante); courante = mot
+    } else courante = essai
+  })
+  if (courante) lignes.push(courante)
+  return lignes.slice(0, 3)
+}
+
+function cheminArrondi(ctx, x, y, l, h, r) {
+  ctx.beginPath()
+  ctx.moveTo(x + r, y)
+  ctx.arcTo(x + l, y, x + l, y + h, r)
+  ctx.arcTo(x + l, y + h, x, y + h, r)
+  ctx.arcTo(x, y + h, x, y, r)
+  ctx.arcTo(x, y, x + l, y, r)
+  ctx.closePath()
 }
 
 window.setAnalysePeriod = function(period) {

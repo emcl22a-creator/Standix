@@ -601,6 +601,22 @@
   @keyframes squeletteBalai{ from{ transform:translateX(-100%); } to{ transform:translateX(100%); } }
   .sq-bloc{ background:rgba(255,255,255,0.08); border-radius:8px; }
 
+  /* ═══ Les mêmes carreaux que le panneau d'accueil ═══
+     Posés en calque décoratif, sans toucher au balisage des cartes. Même pas
+     de 20px, mais révélés seulement dans le coin bas droit, là où il n'y a pas
+     de texte — sinon la trame se lirait par-dessus les titres. */
+  .cat-cell, .proc-rich-card, .sop-card{ position:relative; overflow:hidden; }
+  .cat-cell::before, .proc-rich-card::before, .sop-card::before{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.11) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.11) 1px, transparent 1px);
+    background-size:20px 20px;
+    -webkit-mask-image:radial-gradient(ellipse 62% 68% at 96% 96%, #000 6%, transparent 74%);
+    mask-image:radial-gradient(ellipse 62% 68% at 96% 96%, #000 6%, transparent 74%);
+  }
+  /* Les lignes d'employés et les cartes de formulaire restent nues. */
+
   .cat-cell, .proc-rich-card{
     padding:14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     position:relative; overflow:hidden;

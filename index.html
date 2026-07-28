@@ -2255,6 +2255,9 @@ document.addEventListener('click', (e) => {
 
 wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
 
+// Texte tapé dans la recherche de l'écran d'une catégorie
+let currentCategoryQuery = ''
+
 document.getElementById('category-search-input')?.addEventListener('input', (e) => {
   currentCategoryQuery = e.target.value.trim().toLowerCase()
   renderCategoryProceduresList()

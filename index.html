@@ -724,6 +724,17 @@
       return String(j[1]).padStart(6) + ' ms   +' + String(d).padStart(5) + '   ' + j[0]
     }).join('\n')
   }
+  /* La balise preconnect n'est qu'une suggestion, et Safari la suit mal. On
+     force donc l'ouverture de la connexion vers la base en envoyant une
+     requête vide tout de suite. Quand la vraie requête partira, 200 ms plus
+     tard, la poignée de main réseau sera déjà faite — c'est elle qui coûtait
+     plus d'une seconde sur la première requête. */
+  try {
+    fetch('https://tlrtsoahwqhtvtkhssbm.supabase.co/rest/v1/', {
+      method: 'HEAD', mode: 'no-cors', cache: 'no-store', credentials: 'omit',
+    }).catch(function () {})
+  } catch (e) {}
+
   if (/[?&]nofond=1/.test(location.search)) document.body.classList.add('sans-fond')
   if (/[?&]noverre=1/.test(location.search)) document.body.classList.add('sans-verre')
 
@@ -2053,6 +2064,7 @@ window.showEquipeScreen = function(id, btn) {
 let allGestionProcedures = []
 let cachedEmployes = []
 let cachedMembres = []
+let membresDeDepart = null   // liste des membres déjà obtenue à la connexion
 let cachedEntreprise = null
 let cachedValidations = []
 let cachedEtapesByProc = {}
@@ -2071,14 +2083,18 @@ async function loadGestionProcedures() {
   // c'est autant de gagné avant l'affichage.
   const [
     { data: procedures, error },
-    { data: fullMembres },
+    { data: membresFrais },
     { data: entrepriseRow },
   ] = await Promise.all([
     supabase.from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
       .order('created_at', { ascending: false }),
-    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
+    // Déjà obtenus à la connexion : on ne redemande rien
+    membresDeDepart
+      ? Promise.resolve({ data: membresDeDepart })
+      : supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
     supabase.from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle(),
   ])
+  const fullMembres = membresFrais
 
   window.jalon?.('procédures + membres reçus')
   if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
@@ -4362,8 +4378,13 @@ try {
       const { data: { session } } = await supabase.auth.getSession()
       window.jalon?.('session vérifiée')
       if (session) {
-        const { data: membre } = await supabase
-          .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
+        // On récupère d'un coup tous les membres visibles — les règles d'accès
+        // de la base les limitent à l'entreprise de l'utilisateur — puis on
+        // repère sa propre fiche dedans. Une requête au lieu de deux, et
+        // l'équipe est déjà en mémoire pour la suite.
+        const { data: tousMembres } = await supabase.from('membres').select('*')
+        const membre = (tousMembres || []).find(m => m.user_id === session.user.id) || null
+        if (tousMembres && tousMembres.length) membresDeDepart = tousMembres
         window.jalon?.('fiche membre reçue')
         if (membre) {
           enterApp(membre)

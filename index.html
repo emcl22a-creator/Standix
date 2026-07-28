@@ -39,57 +39,57 @@
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
   textarea, input{font-family:inherit; color:inherit;}
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     ARRIÈRE-PLAN — écrit d'un seul jet, sans rien de superflu.
+     Trois taches lumineuses floutées qui respirent lentement. C'est tout :
+     un conteneur, trois éléments, trois animations. Aucune promotion GPU
+     forcée, aucune enveloppe intermédiaire, aucun état figé au démarrage.
+     ═══════════════════════════════════════════════════════════════════════ */
   .color-halos{
-    position:fixed; top:0; left:0; width:100vw; height:100vh;
-    z-index:0; pointer-events:none; overflow:hidden;
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
   }
-  @supports (height: 100lvh){ .color-halos{ height:100lvh; } }
-  .chalo-wrap{ position:absolute; will-change:transform, opacity; }
   .chalo{
-    width:100%; height:100%; border-radius:50%; opacity:1;
-    filter:blur(120px); transform:translateZ(0); backface-visibility:hidden;
+    position:absolute; border-radius:50%; filter:blur(120px); opacity:0.8;
   }
-  .chalo-wrap-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
-    animation:chaloBreath1 14s ease-in-out -3.5s infinite; }
-  .chalo-wrap-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
-    animation:chaloBreath2 18s ease-in-out -4.5s infinite; }
-  .chalo-wrap-4{ top:-14%; left:50%; transform:translate3d(-50%,0,0); width:120vw; height:70vw; max-width:1000px; max-height:600px;
-    animation:chaloBreath3 16s ease-in-out -4s infinite; }
-  .chalo-1{ background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); }
-  .chalo-2{ background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); }
-  .chalo-4{ background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); }
-
-  @keyframes chaloBreath1{0%,100%{transform:translate3d(0,0,0); opacity:0.7;}50%{transform:translate3d(7%,5%,0); opacity:0.95;}}
-  @keyframes chaloBreath2{0%,100%{transform:translate3d(0,0,0); opacity:0.65;}50%{transform:translate3d(-6%,-7%,0); opacity:0.9;}}
-  @keyframes chaloBreath3{0%,100%{transform:translate3d(-50%,0,0); opacity:0.8;}50%{transform:translate3d(-50%,4%,0); opacity:1;}}
-
-  /* Pendant le démarrage, tout le décor est figé : le processeur est entièrement
-     disponible pour afficher l'app. Les animations reprennent une fois en place. */
-  /* Le décor reste strictement immobile tant que l'app n'est pas posée. Il est
-     visible, aux bonnes couleurs, simplement figé : il reprend son mouvement
-     là où il s'était arrêté, donc aucun saut. */
-  body.booting .chalo-wrap,
-  body.calage .chalo-wrap{ animation-play-state:paused !important; }
-  body.booting .brand .mark svg{ animation:none !important; }
-  body.booting *{ transition:none !important; }
-  /* Une seule animation d'entrée (celle de la coquille) au lieu de trois
-     superposées : écran + cartes + coquille se battaient pour le processeur. */
-  body.booting .screen.active,
-  body.booting .same-as-title-in,
-  body.booting .cat-cell,
-  body.booting .sop-card,
-  body.booting .card{ animation:none !important; }
-
-  @media (prefers-reduced-motion: reduce){
-    .chalo-wrap{ animation:none !important; }
+  .chalo-1{
+    top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
+    background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%);
+    animation:chalo1 14s ease-in-out infinite;
+  }
+  .chalo-2{
+    bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
+    background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%);
+    animation:chalo2 18s ease-in-out infinite;
+  }
+  .chalo-4{
+    top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
+    background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%);
+    opacity:0.9; animation:chalo3 16s ease-in-out infinite;
+  }
+  @keyframes chalo1{
+    0%,100%{ transform:translate(0,0) scale(1); opacity:0.70; }
+    50%    { transform:translate(6%,4%) scale(1.12); opacity:0.95; }
+  }
+  @keyframes chalo2{
+    0%,100%{ transform:translate(0,0) scale(1.05); opacity:0.65; }
+    50%    { transform:translate(-5%,-6%) scale(1); opacity:0.90; }
+  }
+  @keyframes chalo3{
+    0%,100%{ transform:translateX(-50%) scale(1); opacity:0.80; }
+    50%    { transform:translateX(-50%) scale(1.15); opacity:1; }
   }
 
   @media (max-width: 600px){
-    .chalo{ filter:blur(90px); }
+    .chalo{ opacity:1; filter:blur(90px); }
     .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
     .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
-    .chalo-4{ background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
+    .chalo-4{ opacity:1; background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
   }
+
+  @media (prefers-reduced-motion: reduce){
+    .chalo{ animation:none; }
+  }
+
 
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
@@ -739,9 +739,9 @@
 </script>
 
 <div class="color-halos">
-  <div class="chalo-wrap chalo-wrap-4"><div class="chalo chalo-4"></div></div>
-  <div class="chalo-wrap chalo-wrap-1"><div class="chalo chalo-1"></div></div>
-  <div class="chalo-wrap chalo-wrap-2"><div class="chalo chalo-2"></div></div>
+  <div class="chalo chalo-4"></div>
+  <div class="chalo chalo-1"></div>
+  <div class="chalo chalo-2"></div>
 </div>
 
 <!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
@@ -1684,10 +1684,6 @@ function finDuDemarrage() {
   demarrageTermine = true
   const liberer = () => {
     document.body.classList.remove('booting')
-    // Le fond ne se remet en mouvement qu'une seconde et demie après
-    // l'affichage, quand plus rien d'autre ne réclame le processeur.
-    document.body.classList.add('calage')
-    setTimeout(() => document.body.classList.remove('calage'), 1500)
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
   else setTimeout(liberer, 600)

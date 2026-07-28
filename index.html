@@ -44,7 +44,15 @@
      Le navigateur calcule donc le flou UNE SEULE FOIS puis se contente de
      déplacer l'image obtenue. Avant, le flou de 90-120px était recalculé à
      chaque image parce que l'élément flouté changeait lui-même d'échelle. */
-  .color-halos{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .color-halos{
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    opacity:0; transition:opacity 0.9s ease;
+  }
+  /* Les halos n'apparaissent qu'une fois l'app posée et cliquable : leur
+     première mise en cache (trois calques flous de 90px) coûte cher, autant
+     la payer quand l'écran est déjà là plutôt qu'au moment de l'afficher. */
+  body.halos-on .color-halos{ opacity:1; }
+  body:not(.halos-on) .chalo-wrap{ animation-play-state:paused; }
   .chalo-wrap{ position:absolute; will-change:transform, opacity; }
   .chalo{
     width:100%; height:100%; border-radius:50%; opacity:1;
@@ -495,24 +503,29 @@
   .boot-logo{
     position:relative; width:40px; height:47px;
     display:flex; align-items:center; justify-content:center;
-    /* Le logo se dessine une seule fois (1,9 s) puis se met à respirer
-       doucement, pour ne pas paraître figé si le chargement s'éternise. */
+  }
+  /* Le tracé du logo passe par `stroke-dashoffset`, que le navigateur doit
+     redessiner image par image sur le fil principal. Si l'animation démarre
+     pendant que ce fil est occupé (téléchargement et analyse du script), son
+     horloge avance sans que rien ne s'affiche : on ne voyait que la fin.
+     Elle n'est donc lancée qu'une fois une vraie image peinte à l'écran. */
+  .boot-logo.play{
     animation: bootBreathOnce 1.9s cubic-bezier(0.22,1,0.36,1) both,
                bootIdle 2.6s ease-in-out 1.9s infinite;
   }
+  .boot-logo.play .boot-trace{ animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both; }
+  .boot-logo.play .boot-fill{ animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-logo.play .boot-glow{ animation: bootGlowOnce 1.9s ease-in-out both; }
   .boot-logo svg{ width:100%; height:100%; overflow:visible; position:relative; z-index:1; }
   .boot-glow{
     position:absolute; width:150%; height:150%; border-radius:50%;
     background:radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%);
-    filter:blur(9px); animation: bootGlowOnce 1.9s ease-in-out both;
+    filter:blur(9px); opacity:0;
   }
   .boot-logo--once .boot-glow{ filter:blur(8px); animation: bootGlowFade 1.9s ease-in-out both; }
   @keyframes bootGlowFade{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.85;transform:scale(1)} 100%{opacity:0;transform:scale(1.1)} }
-  .boot-trace{
-    stroke-dasharray:411; stroke-dashoffset:411;
-    animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both;
-  }
-  .boot-fill{ opacity:0; animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-trace{ stroke-dasharray:411; stroke-dashoffset:411; }
+  .boot-fill{ opacity:0; }
 
   /* Seuls les grands écrans gardent un logo plus généreux ; sur mobile il
      occupait une place démesurée au centre de l'écran de chargement. */
@@ -608,6 +621,17 @@
      bloquer le zoom au pincement est d'intercepter ses événements de geste.
      Volontairement pas d'écouteur sur `touchmove` : non passif, il ferait
      attendre le navigateur à chaque défilement et remettrait des saccades. */
+  /* On attend deux images successives : à la première, le navigateur a
+     réellement peint l'écran de chargement ; on peut alors lancer l'animation
+     du logo en étant sûr qu'elle sera visible du début à la fin. */
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      var el = document.getElementById('boot-logo')
+      if (el) el.classList.add('play')
+      window.__debutAnimLogo = performance.now()
+    })
+  })
+
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
     document.addEventListener(type, function (e) { e.preventDefault() }, { passive: false })
   })
@@ -643,7 +667,7 @@
 
 <!-- ═══ 0. CHARGEMENT (le temps de vérifier si déjà connecté) ═══ -->
 <div class="login-wrap" id="loading-screen">
-  <div class="boot-logo">
+  <div class="boot-logo" id="boot-logo">
     <div class="boot-glow"></div>
     <svg viewBox="0 0 85 100" fill="none">
       <!-- Le contour se dessine, puis le plein apparaît par-dessus.
@@ -1485,10 +1509,11 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
    encore 1,3 s une fois terminé avant de laisser la place à l'app. */
 const DUREE_ANIM_LOGO = 1900
 const MAINTIEN_LOGO = 1300
-const debutChargement = performance.now()
-
 function attendreFinAnimationLogo() {
-  const restant = (DUREE_ANIM_LOGO + MAINTIEN_LOGO) - (performance.now() - debutChargement)
+  // Point de départ : le moment où l'animation a réellement commencé à
+  // s'afficher, pas le moment où le script a été évalué.
+  const debut = window.__debutAnimLogo || performance.now()
+  const restant = (DUREE_ANIM_LOGO + MAINTIEN_LOGO) - (performance.now() - debut)
   return new Promise(resolve => setTimeout(resolve, Math.max(0, restant)))
 }
 
@@ -1542,9 +1567,13 @@ function finDuDemarrage() {
   const liberer = () => {
     document.body.classList.remove('booting')
     document.getElementById('loading-screen')?.remove()
+    // Le décor arrive en dernier, en fondu, une fois l'app affichée et
+    // cliquable. C'est lui le plus coûteux à peindre : hors du chemin critique,
+    // son coût ne bloque plus rien de ce que l'utilisateur attend.
+    setTimeout(() => document.body.classList.add('halos-on'), 350)
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
-  else setTimeout(liberer, 800)
+  else setTimeout(liberer, 600)
 }
 
 // ═══ PARAMÈTRES ═══
@@ -3694,12 +3723,14 @@ try {
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('choice-screen').style.display = 'flex'
     document.body.classList.remove('booting')
+    setTimeout(function(){ document.body.classList.add('halos-on') }, 250)
   })()
 } catch (e) {
   console.error('Erreur au chargement :', e)
   document.getElementById('loading-screen')?.style.setProperty('display', 'none')
   document.getElementById('choice-screen').style.display = 'flex'
   document.body.classList.remove('booting')
+  setTimeout(function(){ document.body.classList.add('halos-on') }, 250)
 }
 </script>
 
@@ -3719,6 +3750,7 @@ try {
       if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
         if (loading) loading.style.display = 'none'
         document.body.classList.remove('booting')
+        document.body.classList.add('halos-on')
         choice.style.display = 'flex'
       }
     }

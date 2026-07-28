@@ -6,6 +6,15 @@
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>Procédo</title>
+<!-- Les trois serveurs contactés au démarrage. Ouvrir la connexion dès la
+     lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur
+     chacun — c'est du temps mort pur, avant même la première requête. -->
+<link rel="preconnect" href="https://tlrtsoahwqhtvtkhssbm.supabase.co" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- La bibliothèque Supabase est indispensable pour afficher quoi que ce soit :
+     on la télécharge en parallèle du reste au lieu d'attendre la fin du script. -->
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
 <style>
@@ -675,7 +684,34 @@
      bloquer le zoom au pincement est d'intercepter ses événements de geste.
      Volontairement pas d'écouteur sur `touchmove` : non passif, il ferait
      attendre le navigateur à chaque défilement et remettrait des saccades. */
-  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
+  /* Chronomètre de démarrage. Inactif par défaut ; s'affiche si on ouvre l'app
+     avec ?debug=1 à la fin de l'adresse. Il note l'heure de chaque étape pour
+     qu'on voie où part le temps au lieu de le supposer. */
+  window.__chrono = []
+  window.jalon = function (nom) {
+    window.__chrono.push([nom, Math.round(performance.now())])
+    if (!/[?&]debug=1/.test(location.search)) return
+    var el = document.getElementById('chrono-debug')
+    if (!el) {
+      el = document.createElement('div')
+      el.id = 'chrono-debug'
+      el.style.cssText = 'position:fixed; top:0; left:0; right:0; z-index:9999;' +
+        'background:rgba(0,0,0,0.88); color:#0F0; font:11px/1.5 ui-monospace,Menlo,monospace;' +
+        'padding:8px 10px; white-space:pre; max-height:45vh; overflow:auto;'
+      document.documentElement.appendChild(el)
+    }
+    var prec = 0
+    el.textContent = window.__chrono.map(function (j) {
+      var d = j[1] - prec; prec = j[1]
+      return String(j[1]).padStart(6) + ' ms   +' + String(d).padStart(5) + '   ' + j[0]
+    }).join('\n')
+  }
+  jalon('page lue')
+  requestAnimationFrame(function () { requestAnimationFrame(function () { jalon('première image affichée') }) })
+
+  // Le point-virgule est indispensable : sans lui, JavaScript rattache le
+  // crochet ouvrant de la ligne suivante à l'appel du dessus et tout casse.
+  ;['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
     document.addEventListener(type, function (e) { e.preventDefault() }, { passive: false })
   })
   /* Filet de sécurité : si iOS a malgré tout zoomé (vieille version en cache,
@@ -1347,7 +1383,9 @@
 let createClient
 
 try {
+  window.jalon?.('script exécuté, téléchargement de Supabase')
   const supabaseModule = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+  window.jalon?.('Supabase prêt')
   createClient = supabaseModule.createClient
   if (!createClient) throw new Error('createClient introuvable dans le module Supabase chargé')
 } catch (e) {
@@ -1605,6 +1643,7 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
+    window.jalon?.('APP AFFICHÉE')
     // Premier placement sans animation : la barre vient d'apparaître, la
     // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
     placerPastilleSansAnimation('tabbar-gestion')
@@ -1621,6 +1660,7 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
+    window.jalon?.('APP AFFICHÉE')
     // Premier placement sans animation : la barre vient d'apparaître, la
     // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
     placerPastilleSansAnimation('tabbar-equipe')
@@ -1983,12 +2023,26 @@ async function loadGestionProcedures() {
   const catGridEl = document.getElementById('cat-grid')
   document.getElementById('greeting-text').textContent = `Bonjour ${currentMembre.nom || ''} 👋`
 
-  const { data: procedures, error } = await supabase
-    .from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
-    .order('created_at', { ascending: false })
+  // Membres et entreprise ne dépendent pas des procédures : les trois requêtes
+  // partent ensemble au lieu de s'attendre. Un aller-retour réseau économisé,
+  // c'est autant de gagné avant l'affichage.
+  const [
+    { data: procedures, error },
+    { data: fullMembres },
+    { data: entrepriseRow },
+  ] = await Promise.all([
+    supabase.from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
+      .order('created_at', { ascending: false }),
+    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
+    supabase.from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle(),
+  ])
 
+  window.jalon?.('procédures + membres reçus')
   if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
   allGestionProcedures = procedures
+  cachedMembres = fullMembres || []
+  cachedEntreprise = entrepriseRow || null
+  cachedEmployes = cachedMembres.filter(m => m.role === 'equipe')
 
   catGridEl.innerHTML = ''
 
@@ -2009,15 +2063,8 @@ async function loadGestionProcedures() {
   // Absolument tout ce dont les autres pages ont besoin est chargé ici, en une
   // seule salve parallèle, pendant que l'écran de chargement est encore affiché.
   // Résultat : une fois l'app ouverte, plus aucune page n'attend le réseau.
-  const [
-    { data: fullMembres },
-    { data: fullValidations },
-    { data: entrepriseRow },
-  ] = await Promise.all([
-    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
-    supabase.from('validations').select('*').in('procedure_id', procIds),
-    supabase.from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle(),
-  ])
+  const { data: fullValidations } = await supabase
+    .from('validations').select('*').in('procedure_id', procIds)
 
   // Les étapes sont de loin la plus grosse table et l'écran d'accueil n'en a
   // pas besoin : on les charge en arrière-plan pendant que l'app s'affiche.
@@ -2033,9 +2080,6 @@ async function loadGestionProcedures() {
     })
     .catch(() => {})
 
-  cachedMembres = fullMembres || []
-  cachedEntreprise = entrepriseRow || null
-  cachedEmployes = cachedMembres.filter(m => m.role === 'equipe')
   cachedValidations = fullValidations || []
 
   // Page "Analyse générale" : prête d'avance, elle s'affichera instantanément
@@ -2077,6 +2121,7 @@ async function loadGestionProcedures() {
     })
   }
 
+  window.jalon?.('validations reçues, grille prête')
   renderCategoryGrid()
 }
 
@@ -2455,6 +2500,9 @@ window.goToCreateMode = goToCreateMode
 
 // ═══════════ GESTION : L'IA découpe la vidéo ═══════════
 let aiVideoFile = null
+let aiVideoDuree = 0        // durée de la vidéo, pour estimer le temps d'analyse
+let aiDebutAnalyse = 0      // heure de démarrage de l'analyse
+let aiNbSondages = 0
 let aiPollTimer = null
 let aiProcedureId = null
 let aiProgressTimer = null
@@ -2470,13 +2518,49 @@ function updateAiRing(pct) {
   if (label) label.textContent = Math.round(pct) + '%'
 }
 
+/* L'ancienne courbe se rapprochait de 90 % sans jamais y arriver : au bout de
+   deux minutes elle semblait bloquée, alors que l'analyse tournait toujours.
+   On affiche maintenant une progression rapportée à une durée estimée, et
+   surtout le temps écoulé en clair — ça se voit tout de suite que ça avance. */
 function startAiProgressSimulation() {
-  updateAiRing(4)
+  aiDebutAnalyse = Date.now()
+  aiNbSondages = 0
+  updateAiRing(3)
   if (aiProgressTimer) clearInterval(aiProgressTimer)
-  // Avance lentement vers 90% sans jamais l'atteindre tant que ce n'est pas vraiment prêt
-  aiProgressTimer = setInterval(() => {
-    if (aiProgressPct < 90) updateAiRing(aiProgressPct + (90 - aiProgressPct) * 0.04)
-  }, 800)
+  aiProgressTimer = setInterval(majProgressionIA, 1000)
+  majProgressionIA()
+}
+
+// Estimation : l'analyse dure grosso modo une fois et demie la durée de la
+// vidéo, avec un plancher d'une minute. Si on dépasse, on ralentit sans bloquer.
+function dureeEstimeeIA() {
+  return Math.max(60, (aiVideoDuree || 120) * 1.5)
+}
+
+function majProgressionIA() {
+  const ecoule = (Date.now() - aiDebutAnalyse) / 1000
+  const estimee = dureeEstimeeIA()
+  let pct = (ecoule / estimee) * 88
+  if (pct > 88) pct = 88 + Math.min(7, (ecoule - estimee) / 60 * 3)   // au-delà : progression lente jusqu'à 95
+  updateAiRing(Math.min(95, pct))
+
+  const min = Math.floor(ecoule / 60), sec = Math.floor(ecoule % 60)
+  const temps = min > 0 ? `${min} min ${String(sec).padStart(2, '0')}` : `${sec} s`
+  const titre = document.getElementById('ai-progress-title')
+  if (titre) titre.textContent = `Analyse en cours · ${temps}`
+
+  const sous = document.getElementById('ai-progress-sub')
+  if (!sous) return
+  if (ecoule > estimee * 2.5) {
+    sous.innerHTML = "C'est plus long que prévu. L'analyse tourne toujours sur le serveur — " +
+      "<b style=\"color:#fff;\">ne quittez pas cette page</b>, le résultat arrivera."
+  } else if (ecoule > estimee) {
+    sous.innerHTML = "Encore un peu de patience, les vidéos longues demandent plus de temps. " +
+      "<b style=\"color:#fff;\">Ne quittez pas cette page.</b>"
+  } else {
+    const reste = Math.max(10, Math.round((estimee - ecoule) / 10) * 10)
+    sous.innerHTML = `Environ ${reste} s restantes. <b style="color:#fff;">Ne quittez pas cette page</b> tant que l'analyse n'est pas terminée.`
+  }
 }
 
 function stopAiProgressSimulation(finalPct) {
@@ -2509,6 +2593,10 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   player.style.display = 'block'
   document.getElementById('ai-video-placeholder').style.display = 'none'
   document.getElementById('ai-launch-btn').disabled = false
+  aiVideoDuree = 0
+  player.addEventListener('loadedmetadata', () => {
+    if (isFinite(player.duration)) aiVideoDuree = player.duration
+  }, { once: true })
 })
 
 document.getElementById('ai-launch-btn')?.addEventListener('click', async () => {
@@ -2569,7 +2657,17 @@ async function pollAiStatus() {
     const data = await checkRes.json()
 
     if (data.status === 'processing') {
-      aiPollTimer = setTimeout(pollAiStatus, 6000)
+      // Si le serveur sait où il en est, on affiche sa vraie valeur
+      if (typeof data.progress === 'number' && data.progress > 0) {
+        stopAiProgressSimulation()
+        updateAiRing(Math.min(95, data.progress))
+      }
+      // On interroge souvent au début, puis on espace : la première minute
+      // était la plus pénalisante, on pouvait attendre 6 s pour rien après la
+      // fin réelle de l'analyse.
+      aiNbSondages++
+      const delai = aiNbSondages < 12 ? 3000 : aiNbSondages < 30 ? 5000 : 8000
+      aiPollTimer = setTimeout(pollAiStatus, delai)
       return
     }
     if (data.status === 'ready') {
@@ -2587,7 +2685,9 @@ async function pollAiStatus() {
     document.getElementById('ai-upload-card').style.display = 'block'
     document.getElementById('ai-error').textContent = data.message || "Une erreur est survenue pendant l'analyse."
   } catch (e) {
-    aiPollTimer = setTimeout(pollAiStatus, 8000)
+    // Coupure réseau passagère : on retente sans rien casser
+    aiNbSondages++
+    aiPollTimer = setTimeout(pollAiStatus, 5000)
   }
 }
 
@@ -4217,9 +4317,11 @@ try {
   ;(async function checkExistingSession() {
     try {
       const { data: { session } } = await supabase.auth.getSession()
+      window.jalon?.('session vérifiée')
       if (session) {
         const { data: membre } = await supabase
           .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
+        window.jalon?.('fiche membre reçue')
         if (membre) {
           enterApp(membre)
           window.__procedoLoaded = true

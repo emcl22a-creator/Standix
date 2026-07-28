@@ -189,6 +189,11 @@
     background:#000; border:0.5px solid var(--border);
     touch-action:pan-y; cursor:pointer; user-select:none;
   }
+  /* En mode réglage de clip, on laisse déborder pour que les deux poignées
+     restent entièrement attrapables, même collées au tout début ou à la fin. */
+  .capcut-timeline.clipmode{ overflow:visible; }
+  .capcut-timeline.clipmode .capcut-track,
+  .capcut-timeline.clipmode .capcut-markers{ border-radius:12px; overflow:hidden; }
   .capcut-track{ position:absolute; inset:0; display:flex; pointer-events:none; }
   .capcut-track img{ flex:1; height:100%; object-fit:cover; display:block; border-right:1px solid rgba(0,0,0,0.4); }
   .capcut-markers{ position:absolute; inset:0; pointer-events:none; }
@@ -205,7 +210,39 @@
     width:16px; height:10px; background:var(--red); border-radius:4px;
   }
   .capcut-hint{ font-size:11px; color:var(--label-3); text-align:center; margin-top:8px; }
-  .cut-toolbar{ display:flex; gap:8px; margin-top:10px; }
+  .cut-toolbar{ display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+
+  /* ═══ Sélection de clip : deux poignées que l'on écarte ou resserre ═══ */
+  .capcut-timeline.clipmode{ touch-action:none; }
+  .clip-band{ position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
+    border-left:2px solid rgba(255,255,255,0.5); border-right:2px solid rgba(255,255,255,0.5); }
+  .clip-band span{ position:absolute; top:4px; left:4px; font-size:9px; font-weight:800; color:#fff;
+    background:rgba(0,0,0,0.65); border-radius:4px; padding:1px 5px; }
+  .clip-mask{ position:absolute; top:0; bottom:0; background:rgba(0,0,0,0.6); pointer-events:none; z-index:2; display:none; }
+  .clip-sel{ position:absolute; top:0; bottom:0; z-index:3; display:none; pointer-events:none;
+    border-top:2px solid #fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.06); }
+  .clip-mask.on, .clip-sel.on{ display:block; }
+  .clip-handle{ position:absolute; top:-1px; bottom:-1px; width:30px; z-index:6; display:none;
+    align-items:center; justify-content:center; touch-action:none; cursor:ew-resize; }
+  .clip-handle.on{ display:flex; }
+  .clip-handle .grip{ width:16px; height:100%; background:#fff; border-radius:6px;
+    display:flex; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,0.7); }
+  .clip-handle .grip::after{ content:''; width:2px; height:20px; background:rgba(0,0,0,0.35); border-radius:2px; }
+  .clip-handle.dragging .grip{ background:#0A84FF; }
+  .clip-info{ display:flex; justify-content:space-between; align-items:center; gap:10px;
+    margin-top:10px; font-size:11.5px; color:var(--label-2); font-variant-numeric:tabular-nums; }
+  .clip-info b{ color:#fff; font-weight:700; }
+
+  .step-edit-item{ cursor:pointer; transition: border-color 0.18s, background 0.18s; }
+  .step-edit-item.selected{ border-color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.07); }
+  .step-move{ display:flex; gap:5px; flex-shrink:0; }
+  .step-move button{
+    width:28px; height:28px; border-radius:9px; background:rgba(255,255,255,0.08);
+    border:0.5px solid var(--border); color:var(--label); font-size:13px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step-move button:active{ background:rgba(255,255,255,0.18); }
+  .step-move button:disabled{ opacity:0.28; }
 
   .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
   .stat-mini{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
@@ -686,11 +723,19 @@
         <div class="capcut-timeline" id="capcut-timeline">
           <div class="capcut-track" id="capcut-track"></div>
           <div class="capcut-markers" id="capcut-markers"></div>
+          <div class="clip-mask" id="capcut-mask-l"></div>
+          <div class="clip-mask" id="capcut-mask-r"></div>
+          <div class="clip-sel" id="capcut-sel"></div>
+          <div class="clip-handle" id="capcut-h-start"><div class="grip"></div></div>
+          <div class="clip-handle" id="capcut-h-end"><div class="grip"></div></div>
           <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
         </div>
-        <div class="capcut-hint">Touchez ou glissez sur la frise pour naviguer dans la vidéo</div>
+        <div class="clip-info" id="capcut-info" style="display:none;"></div>
+        <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
         <div class="cut-toolbar">
-          <button class="btn small" id="cut-here-btn">✂ Couper ici</button>
+          <button type="button" class="btn small" id="capcut-add-btn">+ Étape ici</button>
+          <button type="button" class="btn small ghost" id="capcut-play-clip" style="display:none;">▶ Lire le clip</button>
+          <button type="button" class="btn small ghost" id="capcut-done" style="display:none;">Terminer le réglage</button>
         </div>
       </div>
     </div>
@@ -762,6 +807,25 @@
 
     <div class="video-frame" id="edit-video-frame" style="display:none; margin-bottom:14px;">
       <video id="edit-video-player" controls playsinline webkit-playsinline></video>
+    </div>
+
+    <div class="capcut-wrap" id="ecap-wrap" style="display:none; margin-bottom:16px;">
+      <div class="capcut-timeline" id="ecap-timeline">
+        <div class="capcut-track" id="ecap-track"></div>
+        <div class="capcut-markers" id="ecap-markers"></div>
+        <div class="clip-mask" id="ecap-mask-l"></div>
+        <div class="clip-mask" id="ecap-mask-r"></div>
+        <div class="clip-sel" id="ecap-sel"></div>
+        <div class="clip-handle" id="ecap-h-start"><div class="grip"></div></div>
+        <div class="clip-handle" id="ecap-h-end"><div class="grip"></div></div>
+        <div class="capcut-playhead" id="ecap-playhead"><div class="capcut-playhead-handle"></div></div>
+      </div>
+      <div class="clip-info" id="ecap-info" style="display:none;"></div>
+      <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
+      <div class="cut-toolbar">
+        <button type="button" class="btn small ghost" id="ecap-play-clip" style="display:none;">▶ Lire le clip</button>
+        <button type="button" class="btn small ghost" id="ecap-done" style="display:none;">Terminer le réglage</button>
+      </div>
     </div>
 
     <div class="section-title">Étapes</div>
@@ -1062,8 +1126,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let currentMembre = null
 let manualSteps = []
 let videoSteps = []
+let capcutEditor = null   // éditeur de clip de l'écran de création
+let ecapEditor = null     // éditeur de clip de l'écran de modification
 let currentVideoFile = null
 let allEquipeProcedures = []
+let equipeEtapesByProc = {}
 let scanStream = null
 let scanLoopActive = false
 let selectedSpace = 'gestion' // espace choisi sur le premier écran
@@ -1227,6 +1294,15 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 async function enterApp(membre) {
   currentMembre = membre
 
+  // Préchauffage en tâche de fond : les bibliothèques QR sont téléchargées
+  // pendant que l'utilisateur regarde son accueil, pour que la génération du
+  // QR code et le scanner s'ouvrent sans le moindre délai.
+  const prechauffer = () => {
+    if (membre.role === 'gestion') ensureQRCode().catch(() => {})
+    else ensureJsQR().catch(() => {})
+  }
+  setTimeout(prechauffer, 400)
+
   if (membre.role === 'gestion') {
     await loadGestionProcedures()
     document.getElementById('loading-screen').style.display = 'none'
@@ -1259,14 +1335,19 @@ window.openSettings = async function() {
   const { data: userData } = await supabase.auth.getUser()
   document.getElementById('settings-email').value = userData?.user?.email || ''
 
-  document.getElementById('settings-code').textContent = '...'
-  const { data: entreprise, error: entrepriseError } = await supabase
-    .from('entreprises').select('code_acces').eq('id', currentMembre.entreprise_id).maybeSingle()
-
-  if (entrepriseError) {
-    console.error('Erreur chargement code entreprise :', entrepriseError)
-    document.getElementById('settings-code').textContent = '—'
-    return
+  // Déjà préchargé au démarrage : affichage immédiat, pas d'attente
+  let entreprise = cachedEntreprise
+  if (!entreprise) {
+    document.getElementById('settings-code').textContent = '...'
+    const { data, error: entrepriseError } = await supabase
+      .from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle()
+    if (entrepriseError) {
+      console.error('Erreur chargement code entreprise :', entrepriseError)
+      document.getElementById('settings-code').textContent = '—'
+      return
+    }
+    entreprise = data
+    cachedEntreprise = data
   }
 
   if (entreprise && entreprise.code_acces) {
@@ -1280,6 +1361,7 @@ window.openSettings = async function() {
         .from('entreprises').update({ code_acces: code }).eq('id', currentMembre.entreprise_id)
       if (!updateError) nouveauCode = code
     }
+    if (nouveauCode && cachedEntreprise) cachedEntreprise.code_acces = nouveauCode
     document.getElementById('settings-code').textContent = nouveauCode || '—'
   }
 }
@@ -1373,13 +1455,14 @@ function renderGaStats() {
   document.getElementById('ga-bar-global').style.width = taux + '%'
 }
 
-window.loadGlobalAnalyse = async function() {
-  const { data: procedures } = await supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id)
-  const { data: membres } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
-  const { data: validations } = await supabase.from('validations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
+window.loadGlobalAnalyse = function() {
+  // Toutes ces données ont été préchargées pendant l'écran de démarrage.
+  const procedures = allGestionProcedures
+  const membres = cachedMembres
+  const validations = cachedValidations
 
-  const employes = (membres || []).filter(m => m.role === 'equipe')
-  currentGaData = { procedures: procedures || [], membres: membres || [], employes, validations: validations || [] }
+  const employes = membres.filter(m => m.role === 'equipe')
+  currentGaData = { procedures, membres, employes, validations }
   currentGaPeriod = 'week'
   document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
@@ -1468,6 +1551,8 @@ window.showEquipeScreen = function(id, btn) {
 // ═══════════ GESTION : liste ═══════════
 let allGestionProcedures = []
 let cachedEmployes = []
+let cachedMembres = []
+let cachedEntreprise = null
 let cachedValidations = []
 let cachedEtapesByProc = {}
 
@@ -1501,17 +1586,31 @@ async function loadGestionProcedures() {
 
   const procIds = procedures.map(p => p.id)
 
-  // Tout ce dont la page "Analyse" a besoin est chargé ici, en une fois,
-  // pendant que l'écran de chargement est encore affiché — pour que l'ouverture
-  // d'une procédure ensuite soit instantanée (aucune requête à attendre).
-  const [{ data: fullEmployes }, { data: fullValidations }, { data: fullEtapes }] = await Promise.all([
-    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe'),
+  // ═══ PRÉCHARGEMENT GLOBAL ═══
+  // Absolument tout ce dont les autres pages ont besoin est chargé ici, en une
+  // seule salve parallèle, pendant que l'écran de chargement est encore affiché.
+  // Résultat : une fois l'app ouverte, plus aucune page n'attend le réseau.
+  const [
+    { data: fullMembres },
+    { data: fullValidations },
+    { data: fullEtapes },
+    { data: entrepriseRow },
+  ] = await Promise.all([
+    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
     supabase.from('validations').select('*').in('procedure_id', procIds),
     supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
+    supabase.from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle(),
   ])
 
-  cachedEmployes = fullEmployes || []
+  cachedMembres = fullMembres || []
+  cachedEntreprise = entrepriseRow || null
+  cachedEmployes = cachedMembres.filter(m => m.role === 'equipe')
   cachedValidations = fullValidations || []
+
+  // Page "Analyse générale" : prête d'avance, elle s'affichera instantanément
+  currentGaData = {
+    procedures, membres: cachedMembres, employes: cachedEmployes, validations: cachedValidations,
+  }
   cachedEtapesByProc = {}
   ;(fullEtapes || []).forEach(e => {
     if (!cachedEtapesByProc[e.procedure_id]) cachedEtapesByProc[e.procedure_id] = []
@@ -1582,14 +1681,23 @@ function playCardShuffle(containerEl, oldRects) {
     el.style.zIndex = 5
     el.style.transition = 'none'
     el.style.transform = `translate(${dx}px, ${dy}px)`
+
+    // Filet de sécurité : si l'animation ne démarre pas (onglet en arrière-plan,
+    // écran en cours de transition sur iPhone...), on remet la carte à sa vraie
+    // place au bout de 700 ms. Sans ça, les cartes restent figées à leur ancienne
+    // position et le tri semble ne rien faire alors qu'il a bien eu lieu.
+    const cleanup = () => {
+      el.style.zIndex = ''
+      el.style.transition = ''
+      el.style.transform = ''
+    }
+    const safety = setTimeout(cleanup, 700)
+
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         el.style.transition = 'transform 0.5s cubic-bezier(0.22,1,0.36,1)'
         el.style.transform = ''
-        el.addEventListener('transitionend', () => {
-          el.style.zIndex = ''
-          el.style.transition = ''
-        }, { once: true })
+        el.addEventListener('transitionend', () => { clearTimeout(safety); cleanup() }, { once: true })
       })
     })
   })
@@ -1601,7 +1709,7 @@ function renderCategoryGrid() {
   catGridEl.innerHTML = ''
 
   const sorted = [...allCategoriesData].sort((a, b) => {
-    if (currentCatSort === 'az') return a.nom.localeCompare(b.nom)
+    if (currentCatSort === 'az') return a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' })
     if (currentCatSort === 'new') return b.latestDate - a.latestDate
     if (currentCatSort === 'old') return a.earliestDate - b.earliestDate
     return 0
@@ -1646,53 +1754,70 @@ function renderCategoryGrid() {
   playCardShuffle(catGridEl, oldRects)
 }
 
+// Un seul gestionnaire pour tous les menus « Trier », posé sur le document.
+// Aucun risque qu'un menu ne soit pas branché ou perde son écouteur.
+const sortHandlers = {}
+
 function wireSortDropdown(prefix, onSelect) {
-  const trigger = document.getElementById(prefix + '-trigger')
+  sortHandlers[prefix] = onSelect
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
+  document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
+}
+
+// Applique visuellement un tri à un menu donné (libellé + option cochée)
+function setSortUI(prefix, sortValue) {
   const menu = document.getElementById(prefix + '-menu')
   const label = document.getElementById(prefix + '-label')
-  if (!trigger || !menu || !label) {
-    console.error(`[Procédo] Filtre "${prefix}" introuvable dans la page — élément manquant.`)
-    return
-  }
-  console.log(`[Procédo build v3] Filtre "${prefix}" bien connecté.`)
-
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation()
-    const isOpen = menu.classList.contains('open')
-    document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
-    document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
-    if (!isOpen) { menu.classList.add('open'); trigger.classList.add('open') }
-  })
-
-  menu.querySelectorAll('button').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation()
-      try {
-        label.textContent = btn.dataset.label
-        menu.querySelectorAll('button').forEach(b => b.classList.toggle('selected', b === btn))
-        menu.classList.remove('open')
-        trigger.classList.remove('open')
-        onSelect(btn.dataset.sort)
-      } catch (err) {
-        console.error(`[Procédo] Erreur au clic sur le tri "${prefix}" :`, err)
-      }
-    })
+  if (!menu || !label) return
+  menu.querySelectorAll('button').forEach(b => {
+    const isIt = b.dataset.sort === sortValue
+    b.classList.toggle('selected', isIt)
+    if (isIt) label.textContent = b.dataset.label
   })
 }
 
-document.addEventListener('click', () => {
-  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
-  document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('.dd-trigger')
+  if (trigger) {
+    const filter = trigger.closest('.dd-filter')
+    const menu = filter?.querySelector('.dd-menu')
+    if (!menu) return
+    const wasOpen = menu.classList.contains('open')
+    closeAllDropdowns()
+    if (!wasOpen) { menu.classList.add('open'); trigger.classList.add('open') }
+    e.stopPropagation()
+    return
+  }
+
+  const option = e.target.closest('.dd-menu button[data-sort]')
+  if (option) {
+    const filter = option.closest('.dd-filter')
+    const prefix = filter?.id
+    closeAllDropdowns()
+    if (prefix) {
+      setSortUI(prefix, option.dataset.sort)
+      try {
+        sortHandlers[prefix]?.(option.dataset.sort)
+      } catch (err) {
+        console.error(`[Procédo] Erreur au tri "${prefix}" :`, err)
+      }
+    }
+    e.stopPropagation()
+    return
+  }
+
+  closeAllDropdowns()
 })
 
 wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
 
+let currentCategoryQuery = ''
 document.getElementById('category-search-input')?.addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase()
-  document.querySelectorAll('#category-procedures-list .proc-rich-card').forEach(card => {
-    const name = card.querySelector('.cat-name')?.textContent.toLowerCase() || ''
-    card.style.display = name.includes(q) ? 'block' : 'none'
-  })
+  currentCategoryQuery = e.target.value.trim().toLowerCase()
+  renderCategoryProceduresList()
 })
 
 let currentCategorySort = 'az'
@@ -1700,25 +1825,22 @@ wireSortDropdown('dd-category-sort', (sort) => { currentCategorySort = sort; ren
 
 let currentCategoryProcsData = []
 
-async function openCategoryProcedures(nom) {
+function openCategoryProcedures(nom) {
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = nom
   document.getElementById('category-search-input').value = ''
-  currentCategorySort = 'az'
-  document.getElementById('dd-category-sort-label').textContent = 'Trier : A → Z'
-  document.querySelectorAll('#dd-category-sort-menu button').forEach(b => b.classList.toggle('selected', b.dataset.sort === 'az'))
+  currentCategoryQuery = ''
+  setSortUI('dd-category-sort', currentCategorySort)
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
   const procsInCategory = allGestionProcedures.filter(p => (p.categorie || 'Sans catégorie') === nom)
   document.getElementById('category-subhead').textContent = `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
 
-  const { count: nbEmployes } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
-
-  // Une seule requête pour toutes les validations de ces procédures, au lieu d'une requête par procédure
-  const { data: allValidations } = await supabase.from('validations').select('procedure_id').in('procedure_id', procsInCategory.map(p => p.id))
+  // Tout est déjà en mémoire (préchargé au démarrage) : affichage instantané, zéro attente réseau.
+  const nbEmployes = cachedEmployes.length
   const validationCountByProc = {}
-  ;(allValidations || []).forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
+  cachedValidations.forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
 
   currentCategoryProcsData = []
   for (const proc of procsInCategory) {
@@ -1736,8 +1858,12 @@ function renderCategoryProceduresList() {
   const oldRects = captureCardPositions(listEl)
   listEl.innerHTML = ''
 
-  const sorted = [...currentCategoryProcsData].sort((a, b) => {
-    if (currentCategorySort === 'az') return a.proc.titre.localeCompare(b.proc.titre)
+  const filtered = currentCategoryQuery
+    ? currentCategoryProcsData.filter(d => (d.proc.titre || '').toLowerCase().includes(currentCategoryQuery))
+    : currentCategoryProcsData
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (currentCategorySort === 'az') return (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
     if (currentCategorySort === 'new') return b.createdAt - a.createdAt
     if (currentCategorySort === 'old') return a.createdAt - b.createdAt
     return 0
@@ -1793,6 +1919,7 @@ function resetCreateForm() {
   manualSteps = []
   videoSteps = []
   currentVideoFile = null
+  capcutEditor?.deselect()
   renderManualSteps()
   renderVideoSteps()
   updateModeCardsState()
@@ -1955,6 +2082,319 @@ async function pollAiStatus() {
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÉDITEUR DE CLIP — une seule frise, deux poignées (début / fin) que l'on
+   écarte ou resserre pour régler la portion de vidéo d'une étape.
+   Le même code sert deux fois : à la création (préfixe "capcut") et à la
+   modification d'une procédure existante (préfixe "ecap").
+   ═══════════════════════════════════════════════════════════════════════════ */
+const MIN_CLIP = 0.3 // durée minimale d'un clip, en secondes
+
+function createClipEditor(ids, api) {
+  const g = id => document.getElementById(id)
+  const timeline = g(ids.timeline)
+  if (!timeline) return null
+
+  let selIndex = null
+  let drag = null            // 'start' | 'end' | 'scrub'
+  let wasPlaying = false
+  let rafId = null
+  let clipStopper = null
+
+  const video = () => g(ids.video)
+  const steps = () => (api.getSteps() || [])
+  const current = () => (selIndex != null ? steps()[selIndex] : null)
+  const dur = () => { const v = video(); return (v && isFinite(v.duration) && v.duration > 0) ? v.duration : 0 }
+  const pct = t => { const d = dur(); return d ? Math.min(100, Math.max(0, (t / d) * 100)) : 0 }
+  const clamp = (t) => Math.min(dur(), Math.max(0, t))
+
+  function clipStart(s) { return s.timestamp_video != null ? s.timestamp_video : 0 }
+  function clipEnd(s) { return s.fin_video != null ? s.fin_video : dur() }
+
+  // ── Rendu : bandes des étapes, masques, sélection, poignées ───────────────
+  function paintBands() {
+    const bandsEl = g(ids.markers)
+    if (!bandsEl) return
+    bandsEl.innerHTML = ''
+    const d = dur()
+    if (!d) return
+    steps().forEach((s, i) => {
+      if (s.timestamp_video == null) return
+      const a = pct(clipStart(s)), b = pct(clipEnd(s))
+      const div = document.createElement('div')
+      div.className = 'clip-band'
+      div.style.left = a + '%'
+      div.style.width = Math.max(0.6, b - a) + '%'
+      div.innerHTML = `<span>${i + 1}</span>`
+      bandsEl.appendChild(div)
+    })
+  }
+
+  function paintSelection() {
+    const d = dur()
+    const s = current()
+    const on = !!(s && d)
+    ;[ids.maskL, ids.maskR, ids.sel].forEach(id => g(id)?.classList.toggle('on', on))
+    ;[ids.hStart, ids.hEnd].forEach(id => g(id)?.classList.toggle('on', on))
+    timeline.classList.toggle('clipmode', on)
+
+    const infoEl = g(ids.info)
+    const playBtn = g(ids.playClip)
+    const doneBtn = g(ids.done)
+    if (playBtn) playBtn.style.display = on ? 'block' : 'none'
+    if (doneBtn) doneBtn.style.display = on ? 'block' : 'none'
+    if (g(ids.hint)) g(ids.hint).textContent = on
+      ? 'Glissez les deux poignées pour régler le début et la fin de cette étape'
+      : (ids.prefix === 'capcut'
+          ? 'Placez la lecture puis « + Étape ici », ou touchez une étape pour régler son clip'
+          : 'Touchez une étape ci-dessous pour régler son clip')
+
+    if (!on) { if (infoEl) infoEl.style.display = 'none'; return }
+
+    const a = pct(clipStart(s)), b = pct(clipEnd(s))
+    g(ids.sel).style.left = a + '%'
+    g(ids.sel).style.width = Math.max(0, b - a) + '%'
+    g(ids.maskL).style.left = '0%'
+    g(ids.maskL).style.width = a + '%'
+    g(ids.maskR).style.left = b + '%'
+    g(ids.maskR).style.width = Math.max(0, 100 - b) + '%'
+    g(ids.hStart).style.left = `calc(${a}% - 15px)`
+    g(ids.hEnd).style.left = `calc(${b}% - 15px)`
+
+    if (infoEl) {
+      infoEl.style.display = 'flex'
+      const len = Math.max(0, clipEnd(s) - clipStart(s))
+      infoEl.innerHTML = `<span>Étape ${selIndex + 1}</span>` +
+        `<span><b>${formatTime(clipStart(s))}</b> → <b>${formatTime(clipEnd(s))}</b> · ${len.toFixed(1).replace('.', ',')} s</span>`
+    }
+  }
+
+  function paintPlayhead() {
+    const v = video()
+    if (!v) return
+    const p = pct(v.currentTime || 0)
+    const ph = g(ids.playhead)
+    if (ph) ph.style.left = p + '%'
+    if (ids.curTime && g(ids.curTime)) g(ids.curTime).textContent = formatTime(v.currentTime || 0)
+  }
+
+  function repaint() { paintBands(); paintSelection(); paintPlayhead() }
+
+  // ── Boucle d'animation de la tête de lecture ─────────────────────────────
+  function loop() {
+    paintPlayhead()
+    const v = video()
+    if (v && !v.paused && !v.ended) rafId = requestAnimationFrame(loop)
+  }
+  function startLoop() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(loop) }
+  function stopLoop() { if (rafId) { cancelAnimationFrame(rafId); rafId = null } }
+
+  // ── Interaction ──────────────────────────────────────────────────────────
+  function timeFromX(clientX) {
+    const r = timeline.getBoundingClientRect()
+    const p = Math.min(1, Math.max(0, (clientX - r.left) / r.width))
+    return p * dur()
+  }
+
+  function seek(t) {
+    const v = video()
+    if (!v || !dur()) return
+    v.currentTime = clamp(t)
+    paintPlayhead()
+  }
+
+  function beginDrag(kind, e, handleEl) {
+    if (!dur()) return
+    drag = kind
+    const v = video()
+    wasPlaying = v && !v.paused
+    if (v) v.pause()
+    stopClipPlayback()
+    if (handleEl) { handleEl.classList.add('dragging'); handleEl.setPointerCapture?.(e.pointerId) }
+    else timeline.setPointerCapture?.(e.pointerId)
+    moveDrag(e.clientX)
+  }
+
+  function moveDrag(clientX) {
+    const t = timeFromX(clientX)
+    if (drag === 'scrub') { seek(t); return }
+    const s = current()
+    if (!s) return
+    if (drag === 'start') {
+      s.timestamp_video = clamp(Math.min(t, clipEnd(s) - MIN_CLIP))
+    } else if (drag === 'end') {
+      s.fin_video = clamp(Math.max(t, clipStart(s) + MIN_CLIP))
+    }
+    seek(drag === 'start' ? clipStart(s) : clipEnd(s))
+    paintBands()
+    paintSelection()
+  }
+
+  function endDrag() {
+    if (!drag) return
+    const wasHandle = drag !== 'scrub'
+    drag = null
+    g(ids.hStart)?.classList.remove('dragging')
+    g(ids.hEnd)?.classList.remove('dragging')
+    if (wasHandle) api.onChange?.()
+    else if (wasPlaying) video()?.play()
+  }
+
+  timeline.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.clip-handle')) return
+    beginDrag('scrub', e, null)
+  })
+  timeline.addEventListener('pointermove', (e) => { if (drag === 'scrub') moveDrag(e.clientX) })
+  timeline.addEventListener('pointerup', endDrag)
+  timeline.addEventListener('pointercancel', endDrag)
+
+  ;[['start', ids.hStart], ['end', ids.hEnd]].forEach(([kind, id]) => {
+    const h = g(id)
+    if (!h) return
+    h.addEventListener('pointerdown', (e) => { e.stopPropagation(); e.preventDefault(); beginDrag(kind, e, h) })
+    h.addEventListener('pointermove', (e) => { if (drag === kind) { e.preventDefault(); moveDrag(e.clientX) } })
+    h.addEventListener('pointerup', (e) => { e.stopPropagation(); endDrag() })
+    h.addEventListener('pointercancel', endDrag)
+  })
+
+  // ── Lecture du clip sélectionné uniquement ───────────────────────────────
+  function stopClipPlayback() {
+    const v = video()
+    if (v && clipStopper) { v.removeEventListener('timeupdate', clipStopper); clipStopper = null }
+  }
+
+  function playClip() {
+    const v = video(), s = current()
+    if (!v || !s) return
+    stopClipPlayback()
+    const end = clipEnd(s)
+    v.currentTime = clipStart(s)
+    clipStopper = () => {
+      paintPlayhead()
+      if (v.currentTime >= end - 0.05) { v.pause(); stopClipPlayback() }
+    }
+    v.addEventListener('timeupdate', clipStopper)
+    v.play()
+    startLoop()
+  }
+
+  g(ids.playClip)?.addEventListener('click', playClip)
+  g(ids.done)?.addEventListener('click', () => select(null))
+
+  // ── API publique ─────────────────────────────────────────────────────────
+  function select(i) {
+    stopClipPlayback()
+    video()?.pause()
+    selIndex = (i == null ? null : i)
+    const s = current()
+    if (s) {
+      if (s.timestamp_video == null) s.timestamp_video = 0
+      if (s.fin_video == null) s.fin_video = Math.min(dur() || 0, clipStart(s) + 8)
+      seek(clipStart(s))
+      timeline.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+    repaint()
+    api.onSelect?.(selIndex)
+  }
+
+  function attachVideo() {
+    const v = video()
+    if (!v || v.dataset.clipWired === '1') return
+    v.dataset.clipWired = '1'
+    v.addEventListener('timeupdate', paintPlayhead)
+    v.addEventListener('seeked', paintPlayhead)
+    v.addEventListener('play', startLoop)
+    v.addEventListener('pause', () => { stopLoop(); paintPlayhead() })
+    v.addEventListener('loadedmetadata', () => {
+      if (ids.durTime && g(ids.durTime)) g(ids.durTime).textContent = formatTime(v.duration)
+      repaint()
+    })
+  }
+
+  return {
+    select,
+    deselect: () => select(null),
+    selected: () => selIndex,
+    repaint,
+    attachVideo,
+    playClip,
+    setDurationLabel: () => {
+      const v = video()
+      if (v && ids.durTime && g(ids.durTime)) g(ids.durTime).textContent = formatTime(v.duration || 0)
+    },
+  }
+}
+
+// Pellicule de vignettes. Si la vidéo est distante et que le navigateur refuse
+// la capture (CORS), on garde simplement une frise noire : les poignées marchent quand même.
+async function generateFilmstrip(video, trackEl) {
+  const track = typeof trackEl === 'string' ? document.getElementById(trackEl) : trackEl
+  if (!track || !video || !isFinite(video.duration) || video.duration <= 0) return
+  track.innerHTML = ''
+  const nbThumbs = 10
+  const canvas = document.createElement('canvas')
+  const ctx = canvas.getContext('2d')
+  canvas.width = 160
+  canvas.height = 90
+  const originalTime = video.currentTime
+  const wasPaused = video.paused
+  video.pause()
+
+  try {
+    for (let i = 0; i < nbThumbs; i++) {
+      const t = (video.duration / nbThumbs) * (i + 0.5)
+      await new Promise((resolve, reject) => {
+        const timer = setTimeout(() => { video.removeEventListener('seeked', onSeeked); reject(new Error('timeout')) }, 4000)
+        const onSeeked = () => {
+          clearTimeout(timer)
+          video.removeEventListener('seeked', onSeeked)
+          try {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+            const img = document.createElement('img')
+            img.src = canvas.toDataURL('image/jpeg', 0.6)
+            track.appendChild(img)
+            resolve()
+          } catch (err) { reject(err) }
+        }
+        video.addEventListener('seeked', onSeeked)
+        video.currentTime = t
+      })
+    }
+  } catch (e) {
+    console.warn('Pellicule non générée (vidéo protégée ou trop lente) :', e && e.message)
+  }
+  video.currentTime = originalTime
+  if (!wasPaused) video.play()
+}
+
+// ═══ Instance 1 : écran « Découper une vidéo » (création) ═══
+capcutEditor = createClipEditor({
+  prefix: 'capcut',
+  video: 'video-player', timeline: 'capcut-timeline', markers: 'capcut-markers',
+  maskL: 'capcut-mask-l', maskR: 'capcut-mask-r', sel: 'capcut-sel',
+  hStart: 'capcut-h-start', hEnd: 'capcut-h-end', playhead: 'capcut-playhead',
+  info: 'capcut-info', hint: 'capcut-hint', playClip: 'capcut-play-clip', done: 'capcut-done',
+  curTime: 'capcut-current-time', durTime: 'capcut-duration',
+}, {
+  getSteps: () => videoSteps,
+  onChange: () => renderVideoSteps(),
+  onSelect: () => renderVideoSteps(),
+})
+
+// ═══ Instance 2 : écran « Modifier la procédure » ═══
+ecapEditor = createClipEditor({
+  prefix: 'ecap',
+  video: 'edit-video-player', timeline: 'ecap-timeline', markers: 'ecap-markers',
+  maskL: 'ecap-mask-l', maskR: 'ecap-mask-r', sel: 'ecap-sel',
+  hStart: 'ecap-h-start', hEnd: 'ecap-h-end', playhead: 'ecap-playhead',
+  info: 'ecap-info', hint: 'ecap-hint', playClip: 'ecap-play-clip', done: 'ecap-done',
+}, {
+  getSteps: () => editStepsData,
+  onChange: () => renderEditSteps(),
+  onSelect: () => renderEditSteps(),
+})
+
+// ═══ Import de la vidéo (création) ═══
 document.getElementById('video-input')?.addEventListener('change', async (e) => {
   const file = e.target.files[0]
   if (!file) return
@@ -1968,38 +2408,13 @@ document.getElementById('video-input')?.addEventListener('change', async (e) => 
   document.getElementById('video-placeholder').style.display = 'none'
   document.getElementById('capcut-wrap').style.display = 'block'
 
-  player.addEventListener('loadedmetadata', () => {
+  capcutEditor?.attachVideo()
+
+  player.addEventListener('loadedmetadata', async () => {
     document.getElementById('capcut-duration').textContent = formatTime(player.duration)
-    generateFilmstrip(player)
+    await generateFilmstrip(player, 'capcut-track')
+    capcutEditor?.repaint()
   }, { once: true })
-
-  function updatePlayheadUI() {
-    if (isScrubbingTimeline) return
-    const pct = player.duration ? (player.currentTime / player.duration) * 100 : 0
-    document.getElementById('capcut-playhead').style.left = pct + '%'
-    document.getElementById('capcut-current-time').textContent = formatTime(player.currentTime)
-  }
-
-  let playheadRAF = null
-  function playheadLoop() {
-    updatePlayheadUI()
-    if (!player.paused && !player.ended) playheadRAF = requestAnimationFrame(playheadLoop)
-  }
-
-  player.addEventListener('timeupdate', updatePlayheadUI)
-  player.addEventListener('seeked', updatePlayheadUI)
-
-  player.addEventListener('play', () => {
-    document.getElementById('capcut-play-icon').style.display = 'none'
-    document.getElementById('capcut-pause-icon').style.display = 'block'
-    if (playheadRAF) cancelAnimationFrame(playheadRAF)
-    playheadRAF = requestAnimationFrame(playheadLoop)
-  })
-  player.addEventListener('pause', () => {
-    document.getElementById('capcut-play-icon').style.display = 'block'
-    document.getElementById('capcut-pause-icon').style.display = 'none'
-    if (playheadRAF) cancelAnimationFrame(playheadRAF)
-  })
 })
 
 document.getElementById('capcut-play-btn')?.addEventListener('click', () => {
@@ -2007,88 +2422,47 @@ document.getElementById('capcut-play-btn')?.addEventListener('click', () => {
   if (player.paused) player.play(); else player.pause()
 })
 
-// ═══ Navigation tactile sur la frise, façon CapCut (toucher/glisser pour se déplacer) ═══
-let isScrubbingTimeline = false
-const capcutTimelineEl = document.getElementById('capcut-timeline')
-
-function seekFromPointer(clientX) {
+// ═══ Créer une étape à la position actuelle ═══
+document.getElementById('capcut-add-btn')?.addEventListener('click', () => {
   const player = document.getElementById('video-player')
-  if (!player.duration) return
-  const rect = capcutTimelineEl.getBoundingClientRect()
-  const pct = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
-  player.currentTime = pct * player.duration
-  document.getElementById('capcut-playhead').style.left = (pct * 100) + '%'
-  document.getElementById('capcut-current-time').textContent = formatTime(player.currentTime)
-}
-
-capcutTimelineEl.addEventListener('pointerdown', (e) => {
-  const player = document.getElementById('video-player')
-  if (!player.duration) return
-  isScrubbingTimeline = true
-  wasPlayingBeforeScrub = !player.paused
-  player.pause()
-  capcutTimelineEl.setPointerCapture(e.pointerId)
-  seekFromPointer(e.clientX)
-})
-capcutTimelineEl.addEventListener('pointermove', (e) => {
-  if (!isScrubbingTimeline) return
-  seekFromPointer(e.clientX)
-})
-capcutTimelineEl.addEventListener('pointerup', (e) => {
-  if (!isScrubbingTimeline) return
-  isScrubbingTimeline = false
-  const player = document.getElementById('video-player')
-  if (wasPlayingBeforeScrub) player.play()
-})
-let wasPlayingBeforeScrub = false
-
-// Génère une pellicule de vignettes façon CapCut en capturant des images de la vidéo
-async function generateFilmstrip(video) {
-  const track = document.getElementById('capcut-track')
-  track.innerHTML = ''
-  const nbThumbs = 8
-  const canvas = document.createElement('canvas')
-  const ctx = canvas.getContext('2d')
-  canvas.width = 160
-  canvas.height = 90
-  const originalTime = video.currentTime
-
-  for (let i = 0; i < nbThumbs; i++) {
-    const t = (video.duration / nbThumbs) * (i + 0.5)
-    await new Promise((resolve) => {
-      const onSeeked = () => {
-        video.removeEventListener('seeked', onSeeked)
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-        const img = document.createElement('img')
-        img.src = canvas.toDataURL('image/jpeg', 0.6)
-        track.appendChild(img)
-        resolve()
-      }
-      video.addEventListener('seeked', onSeeked)
-      video.currentTime = t
-    })
-  }
-  video.currentTime = originalTime
-}
-
-document.getElementById('cut-here-btn')?.addEventListener('click', () => {
-  const player = document.getElementById('video-player')
-  const t = player.currentTime || 0
-  videoSteps.push({ texte: '', timestamp_video: t })
-  videoSteps.sort((a, b) => a.timestamp_video - b.timestamp_video)
+  const d = isFinite(player.duration) ? player.duration : 0
+  if (!d) return
+  const start = player.currentTime || 0
+  const end = Math.min(d, start + 8)
+  const sel = capcutEditor?.selected()
+  const newStep = { texte: '', timestamp_video: start, fin_video: end }
+  // La nouvelle étape se place juste après celle qui est sélectionnée, sinon à la fin.
+  const insertAt = (sel != null) ? sel + 1 : videoSteps.length
+  videoSteps.splice(insertAt, 0, newStep)
   renderVideoSteps()
-  renderCapcutMarkers(player.duration)
+  capcutEditor?.select(insertAt)
 })
 
-function renderCapcutMarkers(duration) {
-  const markersEl = document.getElementById('capcut-markers')
-  markersEl.innerHTML = ''
-  videoSteps.forEach(s => {
-    const pct = duration ? (s.timestamp_video / duration) * 100 : 0
-    const div = document.createElement('div')
-    div.className = 'capcut-marker'
-    div.style.left = pct + '%'
-    markersEl.appendChild(div)
+
+// ═══ Déplacer une étape dans la liste (repositionnement) ═══
+function moveStepInArray(arr, from, to) {
+  if (to < 0 || to >= arr.length) return false
+  const [item] = arr.splice(from, 1)
+  arr.splice(to, 0, item)
+  return true
+}
+
+// Petit bloc de boutons ↑ / ↓ commun à toutes les listes d'étapes
+function moveButtonsHtml(i, total) {
+  return `<div class="step-move">
+      <button type="button" class="mv-up" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button>
+      <button type="button" class="mv-down" ${i === total - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button>
+    </div>`
+}
+
+function wireMoveButtons(div, arr, i, onDone) {
+  div.querySelector('.mv-up')?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    if (moveStepInArray(arr, i, i - 1)) onDone(i - 1)
+  })
+  div.querySelector('.mv-down')?.addEventListener('click', (e) => {
+    e.stopPropagation()
+    if (moveStepInArray(arr, i, i + 1)) onDone(i + 1)
   })
 }
 
@@ -2109,11 +2483,15 @@ function renderManualSteps() {
         <div class="step-num">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       </div>
-      <div class="step-row-bottom"><span class="del">✕</span></div>
+      <div class="step-row-bottom">
+        ${moveButtonsHtml(i, manualSteps.length)}
+        <span class="del">✕</span>
+      </div>
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { manualSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
     div.querySelector('.del').addEventListener('click', () => { manualSteps.splice(i, 1); renderManualSteps() })
+    wireMoveButtons(div, manualSteps, i, () => renderManualSteps())
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
@@ -2129,27 +2507,40 @@ function renderVideoSteps() {
     title.textContent = 'Étapes de la vidéo'
     listEl.appendChild(title)
   }
+  const sel = capcutEditor ? capcutEditor.selected() : null
   videoSteps.forEach((step, i) => {
     const div = document.createElement('div')
-    div.className = 'step-edit-item'
+    div.className = 'step-edit-item' + (i === sel ? ' selected' : '')
+    const debut = step.timestamp_video != null ? step.timestamp_video : 0
+    const fin = step.fin_video != null ? step.fin_video : debut
     div.innerHTML = `
       <div class="step-row-top">
         <div class="step-num">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       </div>
       <div class="step-row-bottom">
-        <span class="range">${formatTime(step.timestamp_video)}</span>
+        <span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>
+        <button type="button" class="step-clip-btn">✂ Régler le clip</button>
+        ${moveButtonsHtml(i, videoSteps.length)}
         <span class="del">✕</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { videoSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
-    div.querySelector('.del').addEventListener('click', () => {
+    textarea.addEventListener('focus', (e) => e.stopPropagation())
+    div.querySelector('.del').addEventListener('click', (e) => {
+      e.stopPropagation()
       videoSteps.splice(i, 1)
+      capcutEditor?.deselect()
       renderVideoSteps()
-      const player = document.getElementById('video-player')
-      renderCapcutMarkers(player.duration)
+      capcutEditor?.repaint()
     })
+    div.querySelector('.step-clip-btn').addEventListener('click', (e) => { e.stopPropagation(); capcutEditor?.select(i) })
+    div.addEventListener('click', (e) => {
+      if (e.target.closest('textarea, button, .del')) return
+      capcutEditor?.select(i)
+    })
+    wireMoveButtons(div, videoSteps, i, (newIndex) => { renderVideoSteps(); capcutEditor?.select(newIndex) })
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
@@ -2158,6 +2549,18 @@ function renderVideoSteps() {
 function formatTime(sec) {
   const m = Math.floor(sec / 60); const s = Math.floor(sec % 60)
   return `${m}:${s.toString().padStart(2, '0')}`
+}
+
+// Insertion des étapes. Si la colonne `fin_video` n'existe pas encore en base,
+// on réessaie sans elle : l'app continue de fonctionner (fin déduite comme avant).
+async function insertEtapes(rows) {
+  const res = await supabase.from('etapes').insert(rows)
+  if (res.error && /fin_video/i.test(res.error.message || '')) {
+    console.warn("Colonne fin_video absente en base — insertion sans la fin de clip.")
+    const sansFin = rows.map(({ fin_video, ...reste }) => reste)
+    return await supabase.from('etapes').insert(sansFin)
+  }
+  return res
 }
 
 async function publishProcedure(errorElId, btnId) {
@@ -2199,8 +2602,11 @@ async function publishProcedure(errorElId, btnId) {
     return
   }
 
-  const etapesToInsert = allSteps.map((s, i) => ({ procedure_id: newProc.id, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video ?? null }))
-  const { error: etapesError } = await supabase.from('etapes').insert(etapesToInsert)
+  const etapesToInsert = allSteps.map((s, i) => ({
+    procedure_id: newProc.id, ordre: i + 1, texte: s.texte,
+    timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
+  }))
+  const { error: etapesError } = await insertEtapes(etapesToInsert)
 
   setButtonLoading(publishBtn, false)
 
@@ -2275,14 +2681,21 @@ async function openAnalyse(procId) {
   if (currentAnalyseData.etapes.length === 0) {
     stepsListEl.innerHTML = '<div class="note">Aucune étape pour le moment.</div>'
   } else {
-    // Calcule les bornes de chaque clip : début = fin de l'étape vidéo précédente (ou 0), fin = son propre timestamp
+    // Chaque étape porte son propre début et sa propre fin ; repli sur l'ancien
+    // calcul pour les procédures créées avant l'ajout de la fin de clip.
     const videoStepsOrdered = currentAnalyseData.etapes
       .filter(e => e.timestamp_video != null)
       .sort((a, b) => a.timestamp_video - b.timestamp_video)
     const clipBounds = new Map()
     videoStepsOrdered.forEach((e, idx) => {
-      const start = idx === 0 ? 0 : videoStepsOrdered[idx - 1].timestamp_video
-      clipBounds.set(e.id, { start, end: e.timestamp_video })
+      let start = e.timestamp_video
+      let end = e.fin_video
+      if (end == null) {
+        const suivante = videoStepsOrdered[idx + 1]
+        end = suivante ? suivante.timestamp_video : start + 15
+      }
+      if (end <= start) end = start + 1
+      clipBounds.set(e.id, { start, end })
     })
 
     currentAnalyseData.etapes.forEach((etape, i) => {
@@ -2417,8 +2830,20 @@ async function loadEquipeProcedures() {
 
   if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
 
-  const { data: mesValidations } = await supabase.from('validations').select('procedure_id').eq('membre_id', currentMembre.id)
+  // Étapes de TOUTES les procédures chargées d'un coup, en même temps que mes
+  // validations : chaque fiche s'ouvrira ensuite instantanément.
+  const procIds = procedures.map(p => p.id)
+  const [{ data: mesValidations }, { data: toutesEtapes }] = await Promise.all([
+    supabase.from('validations').select('procedure_id').eq('membre_id', currentMembre.id),
+    supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
+  ])
   const validatedIds = new Set((mesValidations || []).map(v => v.procedure_id))
+
+  equipeEtapesByProc = {}
+  ;(toutesEtapes || []).forEach(e => {
+    if (!equipeEtapesByProc[e.procedure_id]) equipeEtapesByProc[e.procedure_id] = []
+    equipeEtapesByProc[e.procedure_id].push(e)
+  })
 
   allEquipeProcedures = procedures
   subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''}`
@@ -2450,8 +2875,17 @@ async function openEquipeDetail(procId) {
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById('e-detail').classList.add('active')
 
-  const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
-  const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
+  // Données déjà en mémoire dans la quasi-totalité des cas (préchargées au démarrage)
+  let proc = allEquipeProcedures.find(p => p.id === procId)
+  let etapes = equipeEtapesByProc[procId]
+  if (!proc || !etapes) {
+    const [{ data: p }, { data: e }] = await Promise.all([
+      supabase.from('procedures').select('*').eq('id', procId).maybeSingle(),
+      supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
+    ])
+    proc = p || proc
+    etapes = e || []
+  }
 
   if (!proc) { document.getElementById('detail-titre').textContent = 'Procédure introuvable'; return }
 
@@ -2469,13 +2903,22 @@ async function openEquipeDetail(procId) {
 
   const stepsEl = document.getElementById('detail-steps')
   stepsEl.innerHTML = ''
+  // Chaque étape porte maintenant son propre début ET sa propre fin.
+  // Pour les anciennes procédures (fin absente), on retombe sur l'ancien calcul.
   const videoStepsOrdered = (etapes || [])
     .filter(e => e.timestamp_video != null)
     .sort((a, b) => a.timestamp_video - b.timestamp_video)
   const clipBounds = new Map()
   videoStepsOrdered.forEach((e, idx) => {
-    const start = idx === 0 ? 0 : videoStepsOrdered[idx - 1].timestamp_video
-    clipBounds.set(e.id, { start, end: e.timestamp_video })
+    let start = e.timestamp_video
+    let end = e.fin_video
+    if (end == null) {
+      const suivante = videoStepsOrdered[idx + 1]
+      end = suivante ? suivante.timestamp_video : null
+      if (end == null) end = start + 15
+    }
+    if (end <= start) end = start + 1
+    clipBounds.set(e.id, { start, end })
   })
 
   ;(etapes || []).forEach((etape, i) => {
@@ -2601,24 +3044,73 @@ window.openEditProcedure = async function(procId, mode) {
     : 'Modifiez le titre, la catégorie ou les étapes'
   document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
 
-  const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
-  const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
+  // Priorité aux données préchargées : l'écran s'ouvre sans attendre le réseau.
+  let proc = allGestionProcedures.find(p => p.id === procId)
+  let etapes = cachedEtapesByProc[procId]
+  if (!proc || !etapes) {
+    const [{ data: p }, { data: e }] = await Promise.all([
+      supabase.from('procedures').select('*').eq('id', procId).single(),
+      supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
+    ])
+    proc = p || proc
+    etapes = e || []
+  }
+  if (!proc) { document.getElementById('edit-error').textContent = 'Procédure introuvable.'; return }
 
   document.getElementById('edit-titre').value = proc.titre || ''
   document.getElementById('edit-categorie').value = proc.categorie || ''
 
   const videoFrame = document.getElementById('edit-video-frame')
   const videoEl = document.getElementById('edit-video-player')
+  const ecapWrap = document.getElementById('ecap-wrap')
   editVideoUrl = proc.video_url
   if (proc.video_url) {
     videoFrame.style.display = 'block'
+    // crossOrigin permet de fabriquer la pellicule de vignettes. Si le serveur
+    // le refuse, on recharge la vidéo sans : lecture OK, frise simplement noire.
+    videoEl.crossOrigin = 'anonymous'
     videoEl.src = proc.video_url
+    videoEl.onerror = () => {
+      if (videoEl.crossOrigin) {
+        videoEl.removeAttribute('crossorigin')
+        videoEl.crossOrigin = null
+        videoEl.src = proc.video_url
+      }
+    }
+    ecapWrap.style.display = 'block'
+    ecapEditor?.attachVideo()
+    videoEl.addEventListener('loadedmetadata', async () => {
+      editStepsData = normaliserClips(editStepsData, videoEl.duration)
+      renderEditSteps()
+      ecapEditor?.repaint()
+      await generateFilmstrip(videoEl, 'ecap-track')
+      ecapEditor?.repaint()
+    }, { once: true })
   } else {
     videoFrame.style.display = 'none'
+    ecapWrap.style.display = 'none'
   }
 
-  editStepsData = (etapes || []).map(e => ({ id: e.id, texte: e.texte, timestamp_video: e.timestamp_video }))
+  editStepsData = (etapes || []).map(e => ({
+    id: e.id, texte: e.texte,
+    timestamp_video: e.timestamp_video,
+    fin_video: e.fin_video != null ? e.fin_video : null,
+  }))
+  ecapEditor?.deselect()
   renderEditSteps()
+}
+
+// Anciennes procédures : la fin d'un clip n'était pas enregistrée, elle était
+// déduite du début de l'étape suivante. On reconstruit ça une fois pour toutes.
+function normaliserClips(steps, duree) {
+  const avecVideo = steps.filter(s => s.timestamp_video != null)
+  avecVideo.forEach((s, idx) => {
+    if (s.fin_video != null) return
+    const suivante = avecVideo[idx + 1]
+    s.fin_video = suivante ? suivante.timestamp_video : (isFinite(duree) ? duree : s.timestamp_video + 8)
+    if (s.fin_video <= s.timestamp_video) s.fin_video = s.timestamp_video + 1
+  })
+  return steps
 }
 
 function autoResizeTextarea(el) {
@@ -2629,32 +3121,46 @@ function autoResizeTextarea(el) {
 function renderEditSteps() {
   const listEl = document.getElementById('edit-steps-list')
   listEl.innerHTML = ''
+  const sel = ecapEditor ? ecapEditor.selected() : null
   editStepsData.forEach((step, i) => {
     const div = document.createElement('div')
-    div.className = 'step-edit-item'
+    div.className = 'step-edit-item' + (i === sel ? ' selected' : '')
     const hasClip = step.timestamp_video != null && editVideoUrl
+    const debut = step.timestamp_video != null ? step.timestamp_video : 0
+    const fin = step.fin_video != null ? step.fin_video : debut
     div.innerHTML = `
       <div class="step-row-top">
         <div class="step-num">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       </div>
       <div class="step-row-bottom">
-        ${hasClip ? `<span class="range">${formatTime(step.timestamp_video)}</span>` : ''}
-        ${editVideoUrl ? `<button type="button" class="step-clip-btn">🎯 Utiliser la position actuelle</button>` : ''}
+        ${hasClip ? `<span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>` : ''}
+        ${editVideoUrl ? `<button type="button" class="step-clip-btn">✂ Régler le clip</button>` : ''}
+        ${moveButtonsHtml(i, editStepsData.length)}
         <span class="del">✕</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; autoResizeTextarea(e.target) })
-    div.querySelector('.del').addEventListener('click', () => { editStepsData.splice(i, 1); renderEditSteps() })
+    div.querySelector('.del').addEventListener('click', (e) => {
+      e.stopPropagation()
+      editStepsData.splice(i, 1)
+      ecapEditor?.deselect()
+      renderEditSteps()
+      ecapEditor?.repaint()
+    })
     const clipBtn = div.querySelector('.step-clip-btn')
-    if (clipBtn) {
-      clipBtn.addEventListener('click', () => {
-        const videoEl = document.getElementById('edit-video-player')
-        editStepsData[i].timestamp_video = videoEl.currentTime || 0
-        renderEditSteps()
+    if (clipBtn) clipBtn.addEventListener('click', (e) => { e.stopPropagation(); ecapEditor?.select(i) })
+    if (editVideoUrl) {
+      div.addEventListener('click', (e) => {
+        if (e.target.closest('textarea, button, .del')) return
+        ecapEditor?.select(i)
       })
     }
+    wireMoveButtons(div, editStepsData, i, (newIndex) => {
+      renderEditSteps()
+      if (editVideoUrl) ecapEditor?.select(newIndex)
+    })
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
@@ -2662,8 +3168,19 @@ function renderEditSteps() {
 
 document.getElementById('edit-add-step-btn')?.addEventListener('click', () => {
   const videoEl = document.getElementById('edit-video-player')
-  editStepsData.push({ id: null, texte: '', timestamp_video: editVideoUrl ? (videoEl.currentTime || 0) : null })
+  const d = (videoEl && isFinite(videoEl.duration)) ? videoEl.duration : 0
+  const start = editVideoUrl ? (videoEl.currentTime || 0) : null
+  const newStep = {
+    id: null, texte: '',
+    timestamp_video: start,
+    fin_video: editVideoUrl ? Math.min(d || start + 8, start + 8) : null,
+  }
+  // La nouvelle étape se glisse juste après celle qui est sélectionnée, sinon à la fin.
+  const sel = ecapEditor ? ecapEditor.selected() : null
+  const insertAt = (sel != null) ? sel + 1 : editStepsData.length
+  editStepsData.splice(insertAt, 0, newStep)
   renderEditSteps()
+  if (editVideoUrl) ecapEditor?.select(insertAt)
 })
 
 document.getElementById('edit-save-btn')?.addEventListener('click', async () => {
@@ -2686,9 +3203,10 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   // On repart d'une liste propre : on supprime les anciennes étapes et on réinsère la version modifiée
   await supabase.from('etapes').delete().eq('procedure_id', editProcedureId)
   const etapesToInsert = editStepsData.map((s, i) => ({
-    procedure_id: editProcedureId, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video ?? null,
+    procedure_id: editProcedureId, ordre: i + 1, texte: s.texte,
+    timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
   }))
-  const { error: insertError } = await supabase.from('etapes').insert(etapesToInsert)
+  const { error: insertError } = await insertEtapes(etapesToInsert)
   if (insertError) { setButtonLoading(saveBtn, false); errorEl.textContent = insertError.message; return }
 
   if (editMode === 'ai-review') {

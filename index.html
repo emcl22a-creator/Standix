@@ -38,8 +38,10 @@
   @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
 
   @media (max-width: 600px){
-    .chalo{ opacity:1; filter:blur(95px); }
-    .chalo-4{ opacity:1; }
+    .chalo{ opacity:1; filter:blur(90px); }
+    .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
+    .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
+    .chalo-4{ opacity:1; background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
   }
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
@@ -249,15 +251,27 @@
   }
   .filter-chips button.active{ background:#fff; color:#000; border-color:#fff; }
 
-  .mini-select{
-    display:inline-block; font-family:inherit; font-size:13.5px; font-weight:600; color:var(--label);
-    background:none; border:none; -webkit-appearance:none; appearance:none;
-    padding:4px 20px 4px 0; margin-bottom:2px; cursor:pointer;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-    background-repeat:no-repeat; background-position:right center; background-size:13px;
+  .dd-filter{ position:relative; margin-bottom:14px; }
+  .dd-trigger{
+    display:flex; align-items:center; justify-content:space-between; width:100%;
+    font-family:inherit; font-size:13.5px; font-weight:600; color:var(--label);
+    background:none; border:none; padding:4px 0; cursor:pointer;
   }
-  .mini-select option{ background:#141518; color:#fff; }
-  .mini-select-row{ display:flex; align-items:center; gap:16px; margin-bottom:14px; }
+  .dd-trigger svg{ width:14px; height:14px; color:var(--label); flex-shrink:0; transition:transform 0.2s; margin-left:10px; }
+  .dd-trigger.open svg{ transform:rotate(180deg); }
+  .dd-menu{
+    display:none; position:absolute; top:100%; left:0; right:0; margin-top:8px;
+    background:#1C1D20; border:0.5px solid var(--border); border-radius:14px;
+    overflow:hidden; z-index:30; box-shadow:0 10px 30px rgba(0,0,0,0.5);
+  }
+  .dd-menu.open{ display:block; animation: authFormIn 0.2s cubic-bezier(0.22,1,0.36,1); }
+  .dd-menu button{
+    display:block; width:100%; text-align:left; font-family:inherit; font-size:13.5px; font-weight:500;
+    color:var(--label-2); background:none; border:none; padding:12px 16px; border-bottom:0.5px solid var(--separator);
+  }
+  .dd-menu button:last-child{ border-bottom:none; }
+  .dd-menu button.selected{ color:#fff; font-weight:700; }
+  .dd-menu button:active{ background:rgba(255,255,255,0.06); }
 
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
 
@@ -512,12 +526,16 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
-    <div class="mini-select-row">
-      <select class="mini-select" id="cat-sort-select" onchange="setCatSort(this.value)">
-        <option value="az">Trier : A → Z</option>
-        <option value="new">Trier : Nouveau → ancien</option>
-        <option value="old">Trier : Ancien → nouveau</option>
-      </select>
+    <div class="dd-filter" id="dd-cat-sort">
+      <button class="dd-trigger" onclick="toggleDD('dd-cat-sort')">
+        <span id="dd-cat-sort-label">Trier : A → Z</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dd-menu">
+        <button class="selected" onclick="selectDD('dd-cat-sort','az','Trier : A → Z'); setCatSort('az')">A → Z</button>
+        <button onclick="selectDD('dd-cat-sort','new','Trier : Nouveau → ancien'); setCatSort('new')">Nouveau → ancien</button>
+        <button onclick="selectDD('dd-cat-sort','old','Trier : Ancien → nouveau'); setCatSort('old')">Ancien → nouveau</button>
+      </div>
     </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
@@ -534,12 +552,16 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
     </div>
-    <div class="mini-select-row">
-      <select class="mini-select" id="category-sort-select" onchange="setCategorySort(this.value)">
-        <option value="az">Trier : A → Z</option>
-        <option value="new">Trier : Nouveau → ancien</option>
-        <option value="old">Trier : Ancien → nouveau</option>
-      </select>
+    <div class="dd-filter" id="dd-category-sort">
+      <button class="dd-trigger" onclick="toggleDD('dd-category-sort')">
+        <span id="dd-category-sort-label">Trier : A → Z</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dd-menu">
+        <button class="selected" onclick="selectDD('dd-category-sort','az','Trier : A → Z'); setCategorySort('az')">A → Z</button>
+        <button onclick="selectDD('dd-category-sort','new','Trier : Nouveau → ancien'); setCategorySort('new')">Nouveau → ancien</button>
+        <button onclick="selectDD('dd-category-sort','old','Trier : Ancien → nouveau'); setCategorySort('old')">Ancien → nouveau</button>
+      </div>
     </div>
     <div id="category-procedures-list"></div>
   </div>
@@ -687,11 +709,17 @@
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
-      <select class="mini-select" id="analyse-period-toggle" style="margin-top:14px; color:rgba(255,255,255,0.85);" onchange="setAnalysePeriod(this.value)">
-        <option value="week">Cette semaine</option>
-        <option value="month">Ce mois-ci</option>
-        <option value="all">Total</option>
-      </select>
+      <div class="dd-filter" id="dd-analyse-period" style="margin-top:14px;">
+        <button class="dd-trigger" onclick="toggleDD('dd-analyse-period')" style="color:rgba(255,255,255,0.85);">
+          <span id="dd-analyse-period-label">Cette semaine</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu">
+          <button class="selected" onclick="selectDD('dd-analyse-period','week','Cette semaine'); setAnalysePeriod('week')">Cette semaine</button>
+          <button onclick="selectDD('dd-analyse-period','month','Ce mois-ci'); setAnalysePeriod('month')">Ce mois-ci</button>
+          <button onclick="selectDD('dd-analyse-period','all','Total'); setAnalysePeriod('all')">Total</button>
+        </div>
+      </div>
     </div>
 
     <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
@@ -726,11 +754,17 @@
       <div class="num" id="ga-taux-global">—</div>
       <div class="sub" id="ga-sub-global">—</div>
       <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
-      <select class="mini-select" id="ga-period-toggle" style="margin-top:14px; color:rgba(255,255,255,0.85);" onchange="setGaPeriod(this.value)">
-        <option value="week">Cette semaine</option>
-        <option value="month">Ce mois-ci</option>
-        <option value="all">Total</option>
-      </select>
+      <div class="dd-filter" id="dd-ga-period" style="margin-top:14px;">
+        <button class="dd-trigger" onclick="toggleDD('dd-ga-period')" style="color:rgba(255,255,255,0.85);">
+          <span id="dd-ga-period-label">Cette semaine</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu">
+          <button class="selected" onclick="selectDD('dd-ga-period','week','Cette semaine'); setGaPeriod('week')">Cette semaine</button>
+          <button onclick="selectDD('dd-ga-period','month','Ce mois-ci'); setGaPeriod('month')">Ce mois-ci</button>
+          <button onclick="selectDD('dd-ga-period','all','Total'); setGaPeriod('all')">Total</button>
+        </div>
+      </div>
     </div>
 
     <div class="section-title">Vue d'ensemble</div>
@@ -1254,7 +1288,7 @@ function renderGaStats() {
   const periodLabel = currentGaPeriod === 'week' ? 'cette semaine' : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
 
   document.getElementById('ga-taux-global').textContent = `${nbConsulte} / ${nbAttendu}`
-  document.getElementById('ga-sub-global').textContent = `${nbConsulte} sur ${nbAttendu} ont consulté ${periodLabel}`
+  document.getElementById('ga-sub-global').textContent = `${nbConsulte} consultations ${periodLabel} sur ${nbAttendu} possibles (toutes procédures confondues)`
   document.getElementById('ga-bar-global').style.width = taux + '%'
 }
 
@@ -1266,7 +1300,7 @@ window.loadGlobalAnalyse = async function() {
   const employes = (membres || []).filter(m => m.role === 'equipe')
   currentGaData = { procedures: procedures || [], membres: membres || [], employes, validations: validations || [] }
   currentGaPeriod = 'week'
-  document.getElementById('ga-period-toggle').value = 'week'
+  selectDD('dd-ga-period', 'week', 'Cette semaine')
 
   document.getElementById('ga-nb-procedures').textContent = procedures?.length || 0
   document.getElementById('ga-nb-membres').textContent = membres?.length || 0
@@ -1365,11 +1399,11 @@ async function loadGestionProcedures() {
 
   if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
   allGestionProcedures = procedures
-  subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
 
   catGridEl.innerHTML = ''
 
   if (procedures.length === 0) {
+    subheadEl.textContent = `0 catégorie · 0 procédure · accès complet`
     catGridEl.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
         <h3>Aucune procédure pour le moment</h3>
@@ -1386,6 +1420,9 @@ async function loadGestionProcedures() {
     const nom = p.categorie || 'Sans catégorie'
     if (!categoriesMap[nom]) categoriesMap[nom] = '📁'
   })
+
+  const nbCategories = Object.keys(categoriesMap).length
+  subheadEl.textContent = `${nbCategories} catégorie${nbCategories > 1 ? 's' : ''} · ${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
 
   allCategoriesData = []
   for (const [nom, icone] of Object.entries(categoriesMap)) {
@@ -1485,7 +1522,7 @@ async function openCategoryProcedures(nom) {
   document.getElementById('category-titre').textContent = nom
   document.getElementById('category-search-input').value = ''
   currentCategorySort = 'az'
-  document.getElementById('category-sort-select').value = 'az'
+  selectDD('dd-category-sort', 'az', 'Trier : A → Z')
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
@@ -1835,7 +1872,7 @@ async function openAnalyse(procId) {
   document.getElementById('analyse-titre').textContent = '...'
   document.getElementById('analyse-subhead').textContent = 'Chargement...'
   currentAnalysePeriod = 'week'
-  document.getElementById('analyse-period-toggle').value = 'week'
+  selectDD('dd-analyse-period', 'week', 'Cette semaine')
 
   const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
   const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
@@ -1963,7 +2000,7 @@ function renderAnalyseStats() {
   const periodLabel = currentAnalysePeriod === 'week' ? 'cette semaine' : currentAnalysePeriod === 'month' ? 'ce mois-ci' : 'au total'
 
   document.getElementById('analyse-taux').textContent = `${nbConsulte} / ${nbEmployes}`
-  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbEmployes} ont consulté ${periodLabel}`
+  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbEmployes} ont consulté cette procédure`
   document.getElementById('analyse-bar').style.width = taux + '%'
 
   const empListEl = document.getElementById('analyse-emp-list')
@@ -2172,6 +2209,31 @@ function setButtonLoading(btn, isLoading, loadingText) {
     btn.dataset.loading = 'false'
   }
 }
+
+// ═══ Menu déroulant personnalisé (remplace les select natifs) ═══
+window.toggleDD = function(id) {
+  const filterEl = document.getElementById(id)
+  const isOpen = filterEl.querySelector('.dd-menu').classList.contains('open')
+  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
+  document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
+  if (!isOpen) {
+    filterEl.querySelector('.dd-menu').classList.add('open')
+    filterEl.querySelector('.dd-trigger').classList.add('open')
+  }
+}
+window.selectDD = function(id, value, label) {
+  const filterEl = document.getElementById(id)
+  filterEl.querySelector(`#${id}-label`).textContent = label
+  filterEl.querySelectorAll('.dd-menu button').forEach(b => b.classList.toggle('selected', b.textContent === label))
+  filterEl.querySelector('.dd-menu').classList.remove('open')
+  filterEl.querySelector('.dd-trigger').classList.remove('open')
+}
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.dd-filter')) {
+    document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
+    document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
+  }
+})
 
 function escapeHtml(str) {
   const div = document.createElement('div')

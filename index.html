@@ -234,6 +234,14 @@
   }
   .view-toggle button.active{ background:#fff; color:#000; }
 
+  .filter-chips{ display:flex; gap:6px; flex-wrap:wrap; }
+  .filter-chips button{
+    font-size:11px; font-weight:600; padding:5px 12px; border-radius:100px;
+    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.7);
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .filter-chips button.active{ background:#fff; color:#000; border-color:#fff; }
+
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
 
   .mode-choice-card{ cursor:pointer; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
@@ -686,10 +694,15 @@
     <div class="subhead">Vue d'ensemble de votre entreprise</div>
 
     <div class="hero-card">
-      <div class="lbl">Taux de conformité global</div>
+      <div class="lbl">Consultations</div>
       <div class="num" id="ga-taux-global">—</div>
       <div class="sub" id="ga-sub-global">—</div>
       <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
+      <div class="filter-chips" id="ga-period-toggle" style="margin-top:14px;">
+        <button class="active" data-period="week" onclick="setGaPeriod('week')">Semaine</button>
+        <button data-period="month" onclick="setGaPeriod('month')">Mois</button>
+        <button data-period="all" onclick="setGaPeriod('all')">Total</button>
+      </div>
     </div>
 
     <div class="section-title">Vue d'ensemble</div>
@@ -1174,25 +1187,62 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
 })
 
 // ═══ ANALYSE GÉNÉRALE ═══
+let currentGaData = null
+let currentGaPeriod = 'week'
+
+window.setGaPeriod = function(period) {
+  currentGaPeriod = period
+  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
+  renderGaStats()
+}
+
+function renderGaStats() {
+  if (!currentGaData) return
+  const { procedures, employes, validations } = currentGaData
+  const nbEmployes = employes.length
+  const nbProcedures = procedures.length
+
+  const now = new Date()
+  let periodStart = null
+  if (currentGaPeriod === 'week') {
+    periodStart = new Date(now)
+    const day = (periodStart.getDay() + 6) % 7
+    periodStart.setDate(periodStart.getDate() - day)
+    periodStart.setHours(0, 0, 0, 0)
+  } else if (currentGaPeriod === 'month') {
+    periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  }
+
+  const validationsInPeriod = periodStart
+    ? validations.filter(v => new Date(v.validated_at) >= periodStart)
+    : validations
+
+  const nbAttendu = nbProcedures * nbEmployes
+  const nbConsulte = validationsInPeriod.length
+  const taux = nbAttendu > 0 ? Math.round((nbConsulte / nbAttendu) * 100) : 0
+  const periodLabel = currentGaPeriod === 'week' ? 'cette semaine' : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
+
+  document.getElementById('ga-taux-global').textContent = `${nbConsulte} / ${nbAttendu}`
+  document.getElementById('ga-sub-global').textContent = `${nbConsulte} consultations sur ${nbAttendu} attendues ${periodLabel}`
+  document.getElementById('ga-bar-global').style.width = taux + '%'
+}
+
 window.loadGlobalAnalyse = async function() {
   const { data: procedures } = await supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id)
   const { data: membres } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
   const { data: validations } = await supabase.from('validations').select('*').in('procedure_id', (procedures||[]).map(p=>p.id))
 
   const employes = (membres || []).filter(m => m.role === 'equipe')
-  const nbEmployes = employes.length
-  const nbProcedures = procedures?.length || 0
-  const nbMembres = membres?.length || 0
-  const nbValidations = validations?.length || 0
-  // Chaque employé de l'entreprise doit consulter chaque procédure
-  const nbAttendu = nbProcedures * nbEmployes
-  const taux = nbAttendu > 0 ? Math.round((nbValidations / nbAttendu) * 100) : 0
+  currentGaData = { procedures: procedures || [], membres: membres || [], employes, validations: validations || [] }
+  currentGaPeriod = 'week'
+  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
-  document.getElementById('ga-taux-global').textContent = taux + '%'
-  document.getElementById('ga-sub-global').textContent = `${nbValidations} consultations sur ${nbAttendu} attendues`
-  document.getElementById('ga-bar-global').style.width = taux + '%'
-  document.getElementById('ga-nb-procedures').textContent = nbProcedures
-  document.getElementById('ga-nb-membres').textContent = nbMembres
+  document.getElementById('ga-nb-procedures').textContent = procedures?.length || 0
+  document.getElementById('ga-nb-membres').textContent = membres?.length || 0
+
+  renderGaStats()
+
+  const nbEmployes = employes.length
 
   // Procédures les plus regardées par l'équipe
   const lateListEl = document.getElementById('ga-late-list')

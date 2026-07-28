@@ -278,6 +278,15 @@
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
+  .sort-select{
+    display:block; width:100%; font-family:inherit; font-size:14px; font-weight:600; color:var(--label);
+    background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px;
+    padding:11px 16px; margin-bottom:16px; -webkit-appearance:none; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 14px center; background-size:16px;
+  }
+  .sort-select option{ background:#141518; color:#fff; }
+
   .scan-wrap{ position:relative; max-width:280px; margin:20px auto 18px; aspect-ratio:1/1; border-radius:24px; overflow:hidden; background:#000; border:0.5px solid var(--border); }
   .scan-wrap video{ width:100%; height:100%; object-fit:cover; }
   .scan-frame .corner{ position:absolute; width:34px; height:34px; border-color:#fff; border-style:solid; opacity:0.9; pointer-events:none; }
@@ -476,10 +485,11 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="cat-search-input" placeholder="Filtrer les catégories...">
-    </div>
+    <select id="cat-sort-select" class="sort-select">
+      <option value="az">Croissant A → Z</option>
+      <option value="new">Nouveau → ancien</option>
+      <option value="old">Ancien → nouveau</option>
+    </select>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
 
@@ -491,6 +501,10 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;" id="category-titre">—</h1>
     </div>
     <div class="subhead" id="category-subhead">—</div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
+    </div>
     <div id="category-procedures-list"></div>
   </div>
 
@@ -1246,6 +1260,9 @@ window.showEquipeScreen = function(id, btn) {
 // ═══════════ GESTION : liste ═══════════
 let allGestionProcedures = []
 
+let allCategoriesData = []
+let currentCatSort = 'az'
+
 async function loadGestionProcedures() {
   const subheadEl = document.getElementById('p-list-subhead')
   const catGridEl = document.getElementById('cat-grid')
@@ -1259,7 +1276,6 @@ async function loadGestionProcedures() {
   allGestionProcedures = procedures
   subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
 
-  // Grille des catégories (3 colonnes, icône choisie par la personne)
   catGridEl.innerHTML = ''
 
   if (procedures.length === 0) {
@@ -1279,9 +1295,10 @@ async function loadGestionProcedures() {
     const nom = p.categorie || 'Sans catégorie'
     if (!categoriesMap[nom]) categoriesMap[nom] = '📁'
   })
+
+  allCategoriesData = []
   for (const [nom, icone] of Object.entries(categoriesMap)) {
     const procsInCat = procedures.filter(p => (p.categorie || 'Sans catégorie') === nom) // déjà trié du plus récent au plus ancien
-    const recentTitles = procsInCat.slice(0, 3)
 
     // Taux moyen de consultation de la catégorie (moyenne des taux de chaque procédure)
     let avgPct = 0
@@ -1294,10 +1311,33 @@ async function loadGestionProcedures() {
       avgPct = procsInCat.length > 0 ? Math.round((totalRatio / procsInCat.length) * 100) : 0
     }
 
+    allCategoriesData.push({
+      nom, icone, procsInCat, avgPct,
+      latestDate: new Date(procsInCat[0].created_at).getTime(),
+      earliestDate: new Date(procsInCat[procsInCat.length - 1].created_at).getTime()
+    })
+  }
+
+  renderCategoryGrid()
+}
+
+function renderCategoryGrid() {
+  const catGridEl = document.getElementById('cat-grid')
+  catGridEl.innerHTML = ''
+
+  const sorted = [...allCategoriesData].sort((a, b) => {
+    if (currentCatSort === 'az') return a.nom.localeCompare(b.nom)
+    if (currentCatSort === 'new') return b.latestDate - a.latestDate
+    if (currentCatSort === 'old') return a.earliestDate - b.earliestDate
+    return 0
+  })
+
+  sorted.forEach(({ nom, icone, procsInCat, avgPct }) => {
+    const recentTitles = procsInCat.slice(0, 3)
     const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
     const dashoffset = circumference * (1 - avgPct / 100)
-    const needsAttention = nbEmployesTotal > 0 && avgPct < 30
+    const needsAttention = avgPct > 0 && avgPct < 30
 
     const cell = document.createElement('div')
     cell.className = 'cat-cell'
@@ -1325,20 +1365,26 @@ async function loadGestionProcedures() {
     `
     cell.onclick = () => openCategoryProcedures(nom)
     catGridEl.appendChild(cell)
-  }
+  })
 }
 
-document.getElementById('cat-search-input').addEventListener('input', (e) => {
+document.getElementById('cat-sort-select').addEventListener('change', (e) => {
+  currentCatSort = e.target.value
+  renderCategoryGrid()
+})
+
+document.getElementById('category-search-input').addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase()
-  document.querySelectorAll('#cat-grid .cat-cell').forEach(cell => {
-    const name = cell.querySelector('.cat-name')?.textContent.toLowerCase() || ''
-    cell.style.display = name.includes(q) ? 'block' : 'none'
+  document.querySelectorAll('#category-procedures-list .proc-rich-card').forEach(card => {
+    const name = card.querySelector('.cat-name')?.textContent.toLowerCase() || ''
+    card.style.display = name.includes(q) ? 'block' : 'none'
   })
 })
 
 async function openCategoryProcedures(nom) {
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = nom
+  document.getElementById('category-search-input').value = ''
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 

@@ -1416,6 +1416,11 @@ async function loadGestionProcedures() {
 
   const { count: nbEmployesTotal } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
 
+  // Une seule requête pour toutes les validations de toutes les procédures, au lieu d'une requête par procédure
+  const { data: allValidations } = await supabase.from('validations').select('procedure_id').in('procedure_id', procedures.map(p => p.id))
+  const validationCountByProc = {}
+  ;(allValidations || []).forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
+
   const categoriesMap = {}
   procedures.forEach(p => {
     const nom = p.categorie || 'Sans catégorie'
@@ -1434,8 +1439,8 @@ async function loadGestionProcedures() {
     if (nbEmployesTotal > 0) {
       let totalRatio = 0
       for (const p of procsInCat) {
-        const { count: nbVal } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', p.id)
-        totalRatio += Math.min(1, (nbVal || 0) / nbEmployesTotal)
+        const nbVal = validationCountByProc[p.id] || 0
+        totalRatio += Math.min(1, nbVal / nbEmployesTotal)
       }
       avgPct = procsInCat.length > 0 ? Math.round((totalRatio / procsInCat.length) * 100) : 0
     }
@@ -1535,11 +1540,16 @@ async function openCategoryProcedures(nom) {
 
   const { count: nbEmployes } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
 
+  // Une seule requête pour toutes les validations de ces procédures, au lieu d'une requête par procédure
+  const { data: allValidations } = await supabase.from('validations').select('procedure_id').in('procedure_id', procsInCategory.map(p => p.id))
+  const validationCountByProc = {}
+  ;(allValidations || []).forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
+
   currentCategoryProcsData = []
   for (const proc of procsInCategory) {
-    const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
+    const nbValidations = validationCountByProc[proc.id] || 0
     const nbEtapes = proc.etapes?.[0]?.count ?? 0
-    const pct = nbEmployes > 0 ? Math.round(Math.min(1, (nbValidations || 0) / nbEmployes) * 100) : 0
+    const pct = nbEmployes > 0 ? Math.round(Math.min(1, nbValidations / nbEmployes) * 100) : 0
     currentCategoryProcsData.push({ proc, nbEtapes, pct, createdAt: new Date(proc.created_at).getTime() })
   }
 

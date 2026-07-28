@@ -90,6 +90,20 @@
     .chalo{ animation:none; }
   }
 
+  /* ═══ Interrupteurs d'essai ═══
+     Activés en ajoutant ?nofond=1 ou ?noverre=1 à la fin de l'adresse.
+     Ils servent uniquement à isoler ce qui coûte cher à dessiner : on retire
+     un élément, on relance, on compare. Sans ces paramètres, rien ne change. */
+  body.sans-fond .color-halos{ display:none; }
+  body.sans-verre .topbar-card,
+  body.sans-verre .icon-pill,
+  body.sans-verre .tabbar,
+  body.sans-verre .login-card,
+  body.sans-verre .ios-alert{
+    -webkit-backdrop-filter:none !important; backdrop-filter:none !important;
+    background:rgba(30,31,35,0.94) !important;
+  }
+
 
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
@@ -706,6 +720,24 @@
       return String(j[1]).padStart(6) + ' ms   +' + String(d).padStart(5) + '   ' + j[0]
     }).join('\n')
   }
+  if (/[?&]nofond=1/.test(location.search)) document.body.classList.add('sans-fond')
+  if (/[?&]noverre=1/.test(location.search)) document.body.classList.add('sans-verre')
+
+  /* Mesure la fluidité pendant les 5 secondes qui suivent l'affichage de l'app.
+     Un écran fluide produit environ 300 images. Un écran figé pendant 4 s en
+     produit une poignée, avec une pause démesurée entre deux. C'est ce chiffre
+     qui transformera « ça bugue » en quelque chose qu'on peut corriger. */
+  window.mesurerFluidite = function () {
+    var t0 = performance.now(), prec = t0, pire = 0, images = 0
+    function tic(t) {
+      var ecart = t - prec; prec = t; images++
+      if (ecart > pire) pire = ecart
+      if (t - t0 < 5000) requestAnimationFrame(tic)
+      else window.jalon('5 s après : ' + images + ' images · plus longue pause ' + Math.round(pire) + ' ms')
+    }
+    requestAnimationFrame(tic)
+  }
+
   jalon('page lue')
   requestAnimationFrame(function () { requestAnimationFrame(function () { jalon('première image affichée') }) })
 
@@ -1644,6 +1676,7 @@ async function enterApp(membre) {
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
     window.jalon?.('APP AFFICHÉE')
+    window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
     // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
     placerPastilleSansAnimation('tabbar-gestion')
@@ -1661,6 +1694,7 @@ async function enterApp(membre) {
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
     window.jalon?.('APP AFFICHÉE')
+    window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
     // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
     placerPastilleSansAnimation('tabbar-equipe')

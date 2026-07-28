@@ -149,10 +149,15 @@
     display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.5); font-size:13px; overflow:hidden; position:relative; }
   .video-frame video{width:100%; height:100%; object-fit:contain;}
 
-  .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
-  .step-edit-item input{ flex:1; background:none; border:none; font-size:16px; padding:0; }
+  .step-edit-item input{ flex:1; background:none; border:none; font-size:16px; padding:0; min-width:120px; }
   .step-edit-item .del{ color:var(--red); font-size:16px; flex-shrink:0; }
+  .step-clip-btn{
+    font-size:10.5px; font-weight:600; color:var(--label); background:rgba(255,255,255,0.08);
+    border:0.5px solid var(--border); padding:5px 10px; border-radius:100px; flex-shrink:0; white-space:nowrap;
+  }
+  .step-clip-btn:active{ background:rgba(255,255,255,0.16); }
 
   /* ═══ Timeline façon CapCut ═══ */
   .capcut-wrap{ margin-top:12px; }
@@ -707,7 +712,14 @@
     </div>
 
     <div class="card" id="ai-progress-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="spinner" style="margin:0 auto 16px;"></div>
+      <div class="ai-ring-wrap" style="width:76px; height:76px; margin:0 auto 16px; position:relative;">
+        <svg viewBox="0 0 76 76" style="width:76px; height:76px; transform:rotate(-90deg);">
+          <circle cx="38" cy="38" r="34" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="5"/>
+          <circle id="ai-progress-ring" cx="38" cy="38" r="34" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"
+            stroke-dasharray="213.6" stroke-dashoffset="213.6" style="transition:stroke-dashoffset 1s linear;"/>
+        </svg>
+        <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;" id="ai-progress-pct">0%</div>
+      </div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-progress-title">Analyse en cours...</div>
       <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">Ça peut prendre quelques minutes selon la durée de la vidéo. Vous pouvez quitter cette page, le traitement continue en arrière-plan.</div>
     </div>
@@ -718,6 +730,36 @@
       <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
       <button class="btn block" id="ai-view-btn">Voir la procédure</button>
     </div>
+  </div>
+
+  <div class="screen" id="p-edit-procedure">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="edit-titre-header">Modifier</h1>
+    </div>
+    <div class="subhead" id="edit-subhead">Vérifiez et ajustez avant de continuer</div>
+
+    <div class="card">
+      <label class="f">Titre</label>
+      <input type="text" id="edit-titre">
+      <div style="margin-top:12px;">
+        <label class="f">Catégorie</label>
+        <input type="text" id="edit-categorie">
+      </div>
+    </div>
+
+    <div class="video-frame" id="edit-video-frame" style="display:none; margin-bottom:14px;">
+      <video id="edit-video-player" controls playsinline webkit-playsinline></video>
+    </div>
+
+    <div class="section-title">Étapes</div>
+    <div id="edit-steps-list"></div>
+    <button class="btn ghost block" style="margin-top:4px;" id="edit-add-step-btn">+ Ajouter une étape</button>
+
+    <div class="error-msg" id="edit-error"></div>
+    <button class="btn block" style="margin-top:18px;" id="edit-save-btn">Enregistrer les modifications</button>
   </div>
 
   <div class="screen" id="p-analyse">
@@ -760,6 +802,12 @@
           <button class="btn small" id="qr-download-btn">Télécharger</button>
         </div>
       </div>
+    </div>
+
+    <div class="section-title">Gérer</div>
+    <div style="display:flex; gap:8px;">
+      <button class="btn ghost" id="analyse-edit-btn" style="flex:1;">Modifier</button>
+      <button class="btn ghost" id="analyse-delete-btn" style="flex:1; color:var(--red);">Supprimer</button>
     </div>
   </div>
 
@@ -1045,7 +1093,7 @@ window.switchAuthTab = function(tab) {
 }
 
 // ═══ CONNEXION ═══
-document.getElementById('login-btn').addEventListener('click', async () => {
+document.getElementById('login-btn')?.addEventListener('click', async () => {
   const email = document.getElementById('login-email').value.trim()
   const password = document.getElementById('login-password').value
   const errorEl = document.getElementById('login-error')
@@ -1070,7 +1118,7 @@ document.getElementById('login-btn').addEventListener('click', async () => {
 })
 
 // ═══ CRÉATION DE COMPTE ═══
-document.getElementById('signup-btn').addEventListener('click', async () => {
+document.getElementById('signup-btn')?.addEventListener('click', async () => {
   const prenom = document.getElementById('signup-prenom').value.trim()
   const nom = document.getElementById('signup-nom').value.trim()
   const email = document.getElementById('signup-email').value.trim()
@@ -1222,7 +1270,7 @@ window.openSettings = async function() {
   }
 }
 
-document.getElementById('copy-code-btn').addEventListener('click', () => {
+document.getElementById('copy-code-btn')?.addEventListener('click', () => {
   const code = document.getElementById('settings-code').textContent
   if (code && code !== '—') {
     navigator.clipboard.writeText(code)
@@ -1233,7 +1281,7 @@ document.getElementById('copy-code-btn').addEventListener('click', () => {
   }
 })
 
-document.getElementById('settings-save-btn').addEventListener('click', async () => {
+document.getElementById('settings-save-btn')?.addEventListener('click', async () => {
   const errorEl = document.getElementById('settings-error')
   const btn = document.getElementById('settings-save-btn')
   errorEl.textContent = ''
@@ -1258,7 +1306,7 @@ document.querySelectorAll('.plan-card').forEach(card => {
   })
 })
 
-document.getElementById('logout-btn').addEventListener('click', async () => {
+document.getElementById('logout-btn')?.addEventListener('click', async () => {
   await supabase.auth.signOut()
   currentMembre = null
   document.getElementById('gestion-app').style.display = 'none'
@@ -1570,7 +1618,7 @@ window.setCatSort = function(sort) {
   renderCategoryGrid()
 }
 
-document.getElementById('category-search-input').addEventListener('input', (e) => {
+document.getElementById('category-search-input')?.addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase()
   document.querySelectorAll('#category-procedures-list .proc-rich-card').forEach(card => {
     const name = card.querySelector('.cat-name')?.textContent.toLowerCase() || ''
@@ -1690,8 +1738,8 @@ function updateModeCardsState() {
   document.querySelectorAll('.mode-choice-card').forEach(card => card.classList.toggle('disabled', !isReady))
   document.getElementById('mode-choice-note').style.display = isReady ? 'none' : 'block'
 }
-document.getElementById('new-titre').addEventListener('input', updateModeCardsState)
-document.getElementById('new-categorie').addEventListener('input', updateModeCardsState)
+document.getElementById('new-titre')?.addEventListener('input', updateModeCardsState)
+document.getElementById('new-categorie')?.addEventListener('input', updateModeCardsState)
 
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
@@ -1705,6 +1753,32 @@ window.goToCreateMode = goToCreateMode
 let aiVideoFile = null
 let aiPollTimer = null
 let aiProcedureId = null
+let aiProgressTimer = null
+let aiProgressPct = 0
+
+const AI_RING_CIRCUMFERENCE = 213.6
+
+function updateAiRing(pct) {
+  aiProgressPct = pct
+  const ring = document.getElementById('ai-progress-ring')
+  if (ring) ring.style.strokeDashoffset = AI_RING_CIRCUMFERENCE * (1 - pct / 100)
+  const label = document.getElementById('ai-progress-pct')
+  if (label) label.textContent = Math.round(pct) + '%'
+}
+
+function startAiProgressSimulation() {
+  updateAiRing(4)
+  if (aiProgressTimer) clearInterval(aiProgressTimer)
+  // Avance lentement vers 90% sans jamais l'atteindre tant que ce n'est pas vraiment prêt
+  aiProgressTimer = setInterval(() => {
+    if (aiProgressPct < 90) updateAiRing(aiProgressPct + (90 - aiProgressPct) * 0.04)
+  }, 800)
+}
+
+function stopAiProgressSimulation(finalPct) {
+  if (aiProgressTimer) { clearInterval(aiProgressTimer); aiProgressTimer = null }
+  if (finalPct != null) updateAiRing(finalPct)
+}
 
 function resetAiScreen() {
   document.getElementById('ai-video-input').value = ''
@@ -1718,9 +1792,10 @@ function resetAiScreen() {
   aiVideoFile = null
   aiProcedureId = null
   if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+  stopAiProgressSimulation(0)
 }
 
-document.getElementById('ai-video-input').addEventListener('change', (e) => {
+document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (!file) return
   aiVideoFile = file
@@ -1732,7 +1807,7 @@ document.getElementById('ai-video-input').addEventListener('change', (e) => {
   document.getElementById('ai-launch-btn').disabled = false
 })
 
-document.getElementById('ai-launch-btn').addEventListener('click', async () => {
+document.getElementById('ai-launch-btn')?.addEventListener('click', async () => {
   const errorEl = document.getElementById('ai-error')
   errorEl.textContent = ''
   const titre = document.getElementById('new-titre').value.trim()
@@ -1772,6 +1847,7 @@ document.getElementById('ai-launch-btn').addEventListener('click', async () => {
     setButtonLoading(launchBtn, false)
     document.getElementById('ai-upload-card').style.display = 'none'
     document.getElementById('ai-progress-card').style.display = 'block'
+    startAiProgressSimulation()
     pollAiStatus()
   } catch (e) {
     setButtonLoading(launchBtn, false)
@@ -1793,17 +1869,16 @@ async function pollAiStatus() {
       return
     }
     if (data.status === 'ready') {
+      stopAiProgressSimulation(100)
       document.getElementById('ai-progress-card').style.display = 'none'
       document.getElementById('ai-done-card').style.display = 'block'
-      document.getElementById('ai-done-sub').textContent = `${data.nb_etapes} étape${data.nb_etapes > 1 ? 's' : ''} générée${data.nb_etapes > 1 ? 's' : ''} par l'IA`
-      document.getElementById('ai-view-btn').onclick = () => {
-        showGestionScreen('p-list')
-        loadGestionProcedures()
-        openAnalyse(aiProcedureId)
-      }
+      document.getElementById('ai-done-sub').textContent = `${data.nb_etapes} étape${data.nb_etapes > 1 ? 's' : ''} générée${data.nb_etapes > 1 ? 's' : ''} par l'IA — vérifiez et modifiez si besoin avant de publier`
+      document.getElementById('ai-view-btn').textContent = 'Vérifier et publier'
+      document.getElementById('ai-view-btn').onclick = () => openEditProcedure(aiProcedureId, 'ai-review')
       return
     }
     // status === 'error'
+    stopAiProgressSimulation(0)
     document.getElementById('ai-progress-card').style.display = 'none'
     document.getElementById('ai-upload-card').style.display = 'block'
     document.getElementById('ai-error').textContent = data.message || "Une erreur est survenue pendant l'analyse."
@@ -1813,7 +1888,7 @@ async function pollAiStatus() {
 }
 
 
-document.getElementById('video-input').addEventListener('change', async (e) => {
+document.getElementById('video-input')?.addEventListener('change', async (e) => {
   const file = e.target.files[0]
   if (!file) return
   currentVideoFile = file
@@ -1860,7 +1935,7 @@ document.getElementById('video-input').addEventListener('change', async (e) => {
   })
 })
 
-document.getElementById('capcut-play-btn').addEventListener('click', () => {
+document.getElementById('capcut-play-btn')?.addEventListener('click', () => {
   const player = document.getElementById('video-player')
   if (player.paused) player.play(); else player.pause()
 })
@@ -1929,7 +2004,7 @@ async function generateFilmstrip(video) {
   video.currentTime = originalTime
 }
 
-document.getElementById('cut-here-btn').addEventListener('click', () => {
+document.getElementById('cut-here-btn')?.addEventListener('click', () => {
   const player = document.getElementById('video-player')
   const t = player.currentTime || 0
   videoSteps.push({ texte: '', timestamp_video: t })
@@ -1951,7 +2026,7 @@ function renderCapcutMarkers(duration) {
 }
 
 // ═══ Étapes manuelles (texte seul, pas de vidéo) ═══
-document.getElementById('add-manual-step-btn').addEventListener('click', () => {
+document.getElementById('add-manual-step-btn')?.addEventListener('click', () => {
   manualSteps.push({ texte: '' })
   renderManualSteps()
 })
@@ -2048,8 +2123,8 @@ async function publishProcedure(errorElId, btnId) {
   showGestionScreen('p-list')
   loadGestionProcedures()
 }
-document.getElementById('publish-btn-manual').addEventListener('click', () => publishProcedure('create-error-manual', 'publish-btn-manual'))
-document.getElementById('publish-btn-video').addEventListener('click', () => publishProcedure('create-error-video', 'publish-btn-video'))
+document.getElementById('publish-btn-manual')?.addEventListener('click', () => publishProcedure('create-error-manual', 'publish-btn-manual'))
+document.getElementById('publish-btn-video')?.addEventListener('click', () => publishProcedure('create-error-video', 'publish-btn-video'))
 
 // ═══════════ GESTION : analyse ═══════════
 let currentAnalyseData = null
@@ -2068,6 +2143,19 @@ async function openAnalyse(procId) {
   const { data: validations } = await supabase.from('validations').select('*').eq('procedure_id', procId)
 
   currentAnalyseData = { proc, etapes: etapes || [], employes: employes || [], validations: validations || [] }
+
+  document.getElementById('analyse-edit-btn').onclick = () => openEditProcedure(procId, 'edit')
+  document.getElementById('analyse-delete-btn').onclick = async () => {
+    const confirmed = window.confirm(`Supprimer définitivement "${proc.titre}" ? Cette action est irréversible.`)
+    if (!confirmed) return
+    const deleteBtn = document.getElementById('analyse-delete-btn')
+    setButtonLoading(deleteBtn, true)
+    const { error } = await supabase.from('procedures').delete().eq('id', procId)
+    setButtonLoading(deleteBtn, false)
+    if (error) { alert("Erreur lors de la suppression : " + error.message); return }
+    showGestionScreen('p-list')
+    loadGestionProcedures()
+  }
 
   document.getElementById('analyse-titre').textContent = proc.titre
   document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans catégorie'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
@@ -2253,7 +2341,7 @@ async function loadEquipeProcedures() {
   })
 }
 
-document.getElementById('equipe-search-input').addEventListener('input', (e) => {
+document.getElementById('equipe-search-input')?.addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase()
   document.querySelectorAll('#equipe-procedures-list .sop-card').forEach(card => {
     card.style.display = card.querySelector('.title').textContent.toLowerCase().includes(q) ? 'flex' : 'none'
@@ -2422,6 +2510,111 @@ document.addEventListener('click', (e) => {
     document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
     document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
   }
+})
+
+// ═══════════ GESTION : Modifier une procédure (aussi utilisé pour valider la génération IA) ═══════════
+let editProcedureId = null
+let editMode = 'edit' // 'edit' | 'ai-review'
+let editStepsData = [] // { id: uuid|null, texte, timestamp_video }
+let editVideoUrl = null
+
+window.openEditProcedure = async function(procId, mode) {
+  editProcedureId = procId
+  editMode = mode || 'edit'
+  showGestionScreen('p-edit-procedure')
+  document.getElementById('edit-error').textContent = ''
+  document.getElementById('edit-titre-header').textContent = editMode === 'ai-review' ? 'Vérifier les étapes' : 'Modifier la procédure'
+  document.getElementById('edit-subhead').textContent = editMode === 'ai-review'
+    ? "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin"
+    : 'Modifiez le titre, la catégorie ou les étapes'
+  document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
+
+  const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
+  const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
+
+  document.getElementById('edit-titre').value = proc.titre || ''
+  document.getElementById('edit-categorie').value = proc.categorie || ''
+
+  const videoFrame = document.getElementById('edit-video-frame')
+  const videoEl = document.getElementById('edit-video-player')
+  editVideoUrl = proc.video_url
+  if (proc.video_url) {
+    videoFrame.style.display = 'block'
+    videoEl.src = proc.video_url
+  } else {
+    videoFrame.style.display = 'none'
+  }
+
+  editStepsData = (etapes || []).map(e => ({ id: e.id, texte: e.texte, timestamp_video: e.timestamp_video }))
+  renderEditSteps()
+}
+
+function renderEditSteps() {
+  const listEl = document.getElementById('edit-steps-list')
+  listEl.innerHTML = ''
+  editStepsData.forEach((step, i) => {
+    const div = document.createElement('div')
+    div.className = 'step-edit-item'
+    const hasClip = step.timestamp_video != null && editVideoUrl
+    div.innerHTML = `
+      ${hasClip ? `<span class="range">${formatTime(step.timestamp_video)}</span>` : ''}
+      <input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte || '')}">
+      ${editVideoUrl ? `<button type="button" class="step-clip-btn">🎯 Utiliser la position actuelle</button>` : ''}
+      <span class="del">✕</span>
+    `
+    div.querySelector('input').addEventListener('input', (e) => { editStepsData[i].texte = e.target.value })
+    div.querySelector('.del').addEventListener('click', () => { editStepsData.splice(i, 1); renderEditSteps() })
+    const clipBtn = div.querySelector('.step-clip-btn')
+    if (clipBtn) {
+      clipBtn.addEventListener('click', () => {
+        const videoEl = document.getElementById('edit-video-player')
+        editStepsData[i].timestamp_video = videoEl.currentTime || 0
+        renderEditSteps()
+      })
+    }
+    listEl.appendChild(div)
+  })
+}
+
+document.getElementById('edit-add-step-btn')?.addEventListener('click', () => {
+  const videoEl = document.getElementById('edit-video-player')
+  editStepsData.push({ id: null, texte: '', timestamp_video: editVideoUrl ? (videoEl.currentTime || 0) : null })
+  renderEditSteps()
+})
+
+document.getElementById('edit-save-btn')?.addEventListener('click', async () => {
+  const errorEl = document.getElementById('edit-error')
+  errorEl.textContent = ''
+  const titre = document.getElementById('edit-titre').value.trim()
+  const categorie = document.getElementById('edit-categorie').value.trim()
+
+  if (!titre) { errorEl.textContent = 'Le titre est obligatoire.'; return }
+  if (editStepsData.length === 0) { errorEl.textContent = 'Ajoutez au moins une étape.'; return }
+  if (editStepsData.some(s => !s.texte.trim())) { errorEl.textContent = 'Chaque étape doit avoir un texte.'; return }
+
+  const saveBtn = document.getElementById('edit-save-btn')
+  setButtonLoading(saveBtn, true)
+
+  const { error: updateError } = await supabase
+    .from('procedures').update({ titre, categorie }).eq('id', editProcedureId)
+  if (updateError) { setButtonLoading(saveBtn, false); errorEl.textContent = updateError.message; return }
+
+  // On repart d'une liste propre : on supprime les anciennes étapes et on réinsère la version modifiée
+  await supabase.from('etapes').delete().eq('procedure_id', editProcedureId)
+  const etapesToInsert = editStepsData.map((s, i) => ({
+    procedure_id: editProcedureId, ordre: i + 1, texte: s.texte, timestamp_video: s.timestamp_video ?? null,
+  }))
+  const { error: insertError } = await supabase.from('etapes').insert(etapesToInsert)
+  if (insertError) { setButtonLoading(saveBtn, false); errorEl.textContent = insertError.message; return }
+
+  if (editMode === 'ai-review') {
+    await supabase.from('procedures').update({ statut: 'pret' }).eq('id', editProcedureId)
+  }
+
+  setButtonLoading(saveBtn, false)
+  showGestionScreen('p-list')
+  loadGestionProcedures()
+  openAnalyse(editProcedureId)
 })
 
 function escapeHtml(str) {

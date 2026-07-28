@@ -44,15 +44,11 @@
      Le navigateur calcule donc le flou UNE SEULE FOIS puis se contente de
      déplacer l'image obtenue. Avant, le flou de 90-120px était recalculé à
      chaque image parce que l'élément flouté changeait lui-même d'échelle. */
-  .color-halos{
-    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-    opacity:0; transition:opacity 0.9s ease;
-  }
-  /* Les halos n'apparaissent qu'une fois l'app posée et cliquable : leur
-     première mise en cache (trois calques flous de 90px) coûte cher, autant
-     la payer quand l'écran est déjà là plutôt qu'au moment de l'afficher. */
-  body.halos-on .color-halos{ opacity:1; }
-  body:not(.halos-on) .chalo-wrap{ animation-play-state:paused; }
+  /* Le décor est là dès la première image, écran de chargement compris : c'est
+     le même fond partout dans l'app. L'animation du logo, elle, ne démarre
+     qu'une fois cette première image peinte, donc les halos sont déjà en
+     cache quand le tracé commence et ne le font plus saccader. */
+  .color-halos{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
   .chalo-wrap{ position:absolute; will-change:transform, opacity; }
   .chalo{
     width:100%; height:100%; border-radius:50%; opacity:1;
@@ -362,17 +358,30 @@
   .check.done{ background:var(--green); border-color:var(--green); position:relative; }
   .check.done::after{ content:'✓'; color:#000; font-size:12px; font-weight:700; position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); }
 
-  /* ═══ Fiche QR ═══ Une vraie plaque blanche, comme celle qu'on imprimera. ═══ */
-  .qr-card{ padding:18px; text-align:center; }
-  .qr-plaque{
-    background:#fff; border-radius:20px; padding:20px 18px 16px;
-    max-width:246px; margin:0 auto 14px;
-    box-shadow:0 14px 34px rgba(0,0,0,0.38), 0 2px 6px rgba(0,0,0,0.2);
+  /* ═══ Fiche QR ═══ Une vraie plaque blanche, comme celle qu'on imprimera.
+     La carte n'utilise volontairement PAS le verre dépoli des autres cartes :
+     sur Safari, un `backdrop-filter` sur le parent d'un élément blanc avec
+     ombre portée donne des rendus incohérents. Fond plein, rendu fiable. */
+  .qr-card{
+    padding:18px; text-align:center;
+    background:rgba(255,255,255,0.055);
+    -webkit-backdrop-filter:none; backdrop-filter:none;
   }
-  .qr-frame{ position:relative; width:172px; height:172px; margin:0 auto; }
-  .qr-visual{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
-  .qr-visual canvas{ width:100%; height:100%; display:block; }
-  .qr-corner{ position:absolute; width:17px; height:17px; border:2.5px solid rgba(20,21,24,0.22); }
+  .qr-plaque{
+    background:#fff; border-radius:18px; padding:18px 16px 14px;
+    width:100%; max-width:236px; margin:0 auto 14px;
+    box-shadow:0 10px 26px rgba(0,0,0,0.34);
+  }
+  .qr-frame{
+    position:relative; width:100%; max-width:168px; margin:0 auto;
+    aspect-ratio:1 / 1;
+  }
+  .qr-visual{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .qr-visual canvas{ width:100% !important; height:100% !important; display:block; max-width:100%; }
+  @supports not (aspect-ratio: 1 / 1){
+    .qr-frame{ height:168px; }
+  }
+  .qr-corner{ position:absolute; width:16px; height:16px; border:2.5px solid rgba(20,21,24,0.22); }
   .qr-corner.tl{ top:-7px; left:-7px; border-right:0; border-bottom:0; border-top-left-radius:7px; }
   .qr-corner.tr{ top:-7px; right:-7px; border-left:0; border-bottom:0; border-top-right-radius:7px; }
   .qr-corner.bl{ bottom:-7px; left:-7px; border-right:0; border-top:0; border-bottom-left-radius:7px; }
@@ -533,19 +542,19 @@
      horloge avance sans que rien ne s'affiche : on ne voyait que la fin.
      Elle n'est donc lancée qu'une fois une vraie image peinte à l'écran. */
   .boot-logo.play{
-    animation: bootBreathOnce 1.9s cubic-bezier(0.22,1,0.36,1) both,
-               bootIdle 2.6s ease-in-out 1.9s infinite;
+    animation: bootBreathOnce 1.1s cubic-bezier(0.22,1,0.36,1) both,
+               bootIdle 2.6s ease-in-out 1.1s infinite;
   }
-  .boot-logo.play .boot-trace{ animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both; }
-  .boot-logo.play .boot-fill{ animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
-  .boot-logo.play .boot-glow{ animation: bootGlowOnce 1.9s ease-in-out both; }
+  .boot-logo.play .boot-trace{ animation: bootTraceOnce 1.1s cubic-bezier(0.65,0,0.35,1) both; }
+  .boot-logo.play .boot-fill{ animation: bootFillOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-logo.play .boot-glow{ animation: bootGlowOnce 1.1s ease-in-out both; }
   .boot-logo svg{ width:100%; height:100%; overflow:visible; position:relative; z-index:1; }
   .boot-glow{
     position:absolute; width:150%; height:150%; border-radius:50%;
     background:radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%);
     filter:blur(9px); opacity:0;
   }
-  .boot-logo--once .boot-glow{ filter:blur(8px); animation: bootGlowFade 1.9s ease-in-out both; }
+  .boot-logo--once .boot-glow{ filter:blur(8px); }
   @keyframes bootGlowFade{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.85;transform:scale(1)} 100%{opacity:0;transform:scale(1.1)} }
   .boot-trace{ stroke-dasharray:411; stroke-dashoffset:411; }
   .boot-fill{ opacity:0; }
@@ -564,11 +573,14 @@
   /* Variante de l'écran « choix de l'espace » : le logo se dessine une seule
      fois à l'arrivée, puis reste plein. Une boucle infinie serait fatigante
      sur un écran où l'on doit lire et cliquer. */
-  .boot-logo--once{ width:34px; height:40px; margin:0 auto 10px;
-    animation: bootBreathOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
-  .boot-logo--once .boot-trace{ animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both; }
-  .boot-logo--once .boot-fill{ animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
-  .boot-logo--once .boot-glow{ animation: bootGlowOnce 1.9s ease-in-out both; }
+  .boot-logo--once{ width:34px; height:40px; margin:0 auto 10px; }
+  /* Comme sur l'écran de chargement : l'animation ne part qu'une fois l'écran
+     réellement peint. Sans ça, sur mobile, son horloge tournait pendant que
+     l'écran était encore en train d'apparaître et le tracé sautait. */
+  .boot-logo--once.play{ animation: bootBreathOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-logo--once.play .boot-trace{ animation: bootTraceOnce 1.1s cubic-bezier(0.65,0,0.35,1) both; }
+  .boot-logo--once.play .boot-fill{ animation: bootFillOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-logo--once.play .boot-glow{ animation: bootGlowFade 1.1s ease-in-out both; }
   @keyframes bootTraceOnce{ 0%{stroke-dashoffset:411;opacity:1} 62%{stroke-dashoffset:0;opacity:1} 84%{opacity:0} 100%{opacity:0} }
   @keyframes bootFillOnce{ 0%,56%{opacity:0} 82%{opacity:1} 100%{opacity:1} }
   @keyframes bootBreathOnce{ 0%{transform:scale(0.93)} 82%{transform:scale(1.03)} 100%{transform:scale(1)} }
@@ -652,12 +664,6 @@
       var el = document.getElementById('boot-logo')
       if (el) el.classList.add('play')
       window.__debutAnimLogo = performance.now()
-      /* Le décor s'allume pile quand le logo finit de se dessiner (1,9 s) et
-         monte en fondu pendant le maintien de 1,3 s. Deux bénéfices : la mise
-         en cache des halos est payée pendant que l'écran de chargement est
-         encore là, donc elle ne gêne personne ; et l'app apparaît sur un fond
-         déjà en place, sans le voir arriver après coup. */
-      setTimeout(function () { document.body.classList.add('halos-on') }, 1900)
     })
   })
 
@@ -1386,6 +1392,22 @@ let scanStream = null
 let scanLoopActive = false
 let selectedSpace = 'gestion' // espace choisi sur le premier écran
 
+/* Relance proprement l'animation du logo de l'écran de choix. On retire la
+   classe, on force un recalcul, puis on la remet au bout de deux images :
+   l'animation repart donc toujours de zéro et sur un écran déjà affiché. */
+function lancerAnimationLogoChoix() {
+  const el = document.querySelector('#choice-screen .boot-logo--once')
+  if (!el) return
+  el.classList.remove('play')
+  void el.offsetWidth
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('play')))
+}
+
+function afficherEcranChoix() {
+  document.getElementById('choice-screen').style.display = 'flex'
+  lancerAnimationLogoChoix()
+}
+
 // ═══ ÉCRAN 1 : CHOIX DE L'ESPACE ═══
 window.chooseSpace = function(space) {
   selectedSpace = space
@@ -1399,7 +1421,7 @@ window.chooseSpace = function(space) {
 }
 window.backToChoice = function() {
   document.getElementById('login-screen').style.display = 'none'
-  document.getElementById('choice-screen').style.display = 'flex'
+  afficherEcranChoix()
 }
 
 // ═══ ONGLETS Connexion / Créer un compte ═══
@@ -1544,7 +1566,7 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 
 /* L'écran de chargement affiche le logo qui se dessine (1,9 s), puis le garde
    encore 1,3 s une fois terminé avant de laisser la place à l'app. */
-const DUREE_ANIM_LOGO = 1900
+const DUREE_ANIM_LOGO = 1100
 const MAINTIEN_LOGO = 1300
 function attendreFinAnimationLogo() {
   // Point de départ : le moment où l'animation a réellement commencé à
@@ -1604,9 +1626,6 @@ function finDuDemarrage() {
   const liberer = () => {
     document.body.classList.remove('booting')
     document.getElementById('loading-screen')?.remove()
-    // Secours : normalement le décor est déjà allumé depuis la fin du tracé
-    // du logo. Cette ligne ne sert que si le script de démarrage n'a pas tourné.
-    document.body.classList.add('halos-on')
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
   else setTimeout(liberer, 600)
@@ -1696,7 +1715,7 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
   document.getElementById('tabbar-equipe').style.display = 'none'
   document.getElementById('login-email').value = ''
   document.getElementById('login-password').value = ''
-  document.getElementById('choice-screen').style.display = 'flex'
+  afficherEcranChoix()
 })
 
 // ═══ ANALYSE GÉNÉRALE ═══
@@ -1840,6 +1859,7 @@ let cachedMembres = []
 let cachedEntreprise = null
 let cachedValidations = []
 let cachedEtapesByProc = {}
+let preloadEtapes = null   // promesse du chargement différé des étapes
 
 let allCategoriesData = []
 let currentCatSort = 'az'
@@ -1878,14 +1898,26 @@ async function loadGestionProcedures() {
   const [
     { data: fullMembres },
     { data: fullValidations },
-    { data: fullEtapes },
     { data: entrepriseRow },
   ] = await Promise.all([
     supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
     supabase.from('validations').select('*').in('procedure_id', procIds),
-    supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
     supabase.from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle(),
   ])
+
+  // Les étapes sont de loin la plus grosse table et l'écran d'accueil n'en a
+  // pas besoin : on les charge en arrière-plan pendant que l'app s'affiche.
+  // Les écrans qui en dépendent attendent cette promesse — déjà résolue en
+  // pratique le temps qu'on y arrive.
+  preloadEtapes = supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre')
+    .then(({ data }) => {
+      cachedEtapesByProc = {}
+      ;(data || []).forEach(e => {
+        if (!cachedEtapesByProc[e.procedure_id]) cachedEtapesByProc[e.procedure_id] = []
+        cachedEtapesByProc[e.procedure_id].push(e)
+      })
+    })
+    .catch(() => {})
 
   cachedMembres = fullMembres || []
   cachedEntreprise = entrepriseRow || null
@@ -1896,12 +1928,6 @@ async function loadGestionProcedures() {
   currentGaData = {
     procedures, membres: cachedMembres, employes: cachedEmployes, validations: cachedValidations,
   }
-  cachedEtapesByProc = {}
-  ;(fullEtapes || []).forEach(e => {
-    if (!cachedEtapesByProc[e.procedure_id]) cachedEtapesByProc[e.procedure_id] = []
-    cachedEtapesByProc[e.procedure_id].push(e)
-  })
-
   const nbEmployesTotal = cachedEmployes.length
   const validationCountByProc = {}
   cachedValidations.forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
@@ -2991,6 +3017,7 @@ let currentAnalysePeriod = 'week'
 
 async function openAnalyse(procId) {
   showGestionScreen('p-analyse')
+  if (preloadEtapes) await preloadEtapes
   currentAnalysePeriod = 'week'
   document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
@@ -3471,6 +3498,7 @@ window.openEditProcedure = async function(procId, mode) {
     : 'Modifiez le titre, la catégorie ou les étapes'
   document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
 
+  if (preloadEtapes) await preloadEtapes
   // Priorité aux données préchargées : l'écran s'ouvre sans attendre le réseau.
   let proc = allGestionProcedures.find(p => p.id === procId)
   let etapes = cachedEtapesByProc[procId]
@@ -3851,16 +3879,14 @@ try {
     // Le maintien du logo n'a de sens que quand on entre réellement dans l'app.
     window.__procedoLoaded = true
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
-    document.getElementById('choice-screen').style.display = 'flex'
+    afficherEcranChoix()
     document.body.classList.remove('booting')
-    setTimeout(function(){ document.body.classList.add('halos-on') }, 250)
   })()
 } catch (e) {
   console.error('Erreur au chargement :', e)
   document.getElementById('loading-screen')?.style.setProperty('display', 'none')
-  document.getElementById('choice-screen').style.display = 'flex'
+  afficherEcranChoix()
   document.body.classList.remove('booting')
-  setTimeout(function(){ document.body.classList.add('halos-on') }, 250)
 }
 </script>
 
@@ -3880,8 +3906,11 @@ try {
       if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
         if (loading) loading.style.display = 'none'
         document.body.classList.remove('booting')
-        document.body.classList.add('halos-on')
         choice.style.display = 'flex'
+        var logo = choice.querySelector('.boot-logo--once')
+        if (logo) requestAnimationFrame(function () {
+          requestAnimationFrame(function () { logo.classList.add('play') })
+        })
       }
     }
   }, 6000)

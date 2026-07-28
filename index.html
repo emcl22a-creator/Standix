@@ -91,6 +91,7 @@
     60%{ opacity:1; filter:blur(0); }
     100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
   }
+  .same-as-title-in{ animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1) both; }
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
   h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.02em; margin:6px 0 2px; }
   .subhead{ font-size:14px; color:var(--label-2); margin-bottom:18px; line-height:1.35; }
@@ -537,14 +538,14 @@
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
     <div class="dd-filter" id="dd-cat-sort">
-      <button class="dd-trigger" onclick="toggleDD('dd-cat-sort')">
+      <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
         <span id="dd-cat-sort-label">Trier : A → Z</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="dd-menu">
-        <button class="selected" onclick="selectDD('dd-cat-sort','az','Trier : A → Z'); setCatSort('az')">A → Z</button>
-        <button onclick="selectDD('dd-cat-sort','new','Trier : Nouveau → ancien'); setCatSort('new')">Nouveau → ancien</button>
-        <button onclick="selectDD('dd-cat-sort','old','Trier : Ancien → nouveau'); setCatSort('old')">Ancien → nouveau</button>
+      <div class="dd-menu" id="dd-cat-sort-menu">
+        <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+        <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+        <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
       </div>
     </div>
     <div id="cat-grid" class="cat-grid"></div>
@@ -563,14 +564,14 @@
       <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
     </div>
     <div class="dd-filter" id="dd-category-sort">
-      <button class="dd-trigger" onclick="toggleDD('dd-category-sort')">
+      <button type="button" class="dd-trigger" id="dd-category-sort-trigger">
         <span id="dd-category-sort-label">Trier : A → Z</span>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="dd-menu">
-        <button class="selected" onclick="selectDD('dd-category-sort','az','Trier : A → Z'); setCategorySort('az')">A → Z</button>
-        <button onclick="selectDD('dd-category-sort','new','Trier : Nouveau → ancien'); setCategorySort('new')">Nouveau → ancien</button>
-        <button onclick="selectDD('dd-category-sort','old','Trier : Ancien → nouveau'); setCategorySort('old')">Ancien → nouveau</button>
+      <div class="dd-menu" id="dd-category-sort-menu">
+        <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+        <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+        <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
       </div>
     </div>
     <div id="category-procedures-list"></div>
@@ -763,11 +764,17 @@
   </div>
 
   <div class="screen" id="p-analyse">
-    <div class="detail-header">
+    <div class="detail-header" style="align-items:flex-start;">
       <button class="back-btn" onclick="showGestionScreen('p-list')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;" id="analyse-titre">—</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px; flex:1; min-width:0; white-space:normal; word-break:break-word;" id="analyse-titre">—</h1>
+      <button class="back-btn" id="analyse-edit-btn" style="flex-shrink:0;" aria-label="Modifier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+      </button>
+      <button class="back-btn" id="analyse-delete-btn" style="flex-shrink:0;" aria-label="Supprimer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FF453A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      </button>
     </div>
     <div class="subhead" id="analyse-subhead">Chargement...</div>
 
@@ -804,11 +811,6 @@
       </div>
     </div>
 
-    <div class="section-title">Gérer</div>
-    <div style="display:flex; gap:8px;">
-      <button class="btn ghost" id="analyse-edit-btn" style="flex:1;">Modifier</button>
-      <button class="btn ghost" id="analyse-delete-btn" style="flex:1; color:var(--red);">Supprimer</button>
-    </div>
   </div>
 
   <!-- Analyse générale du compte -->
@@ -1212,28 +1214,30 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   enterApp(membre)
 })
 
-function enterApp(membre) {
+async function enterApp(membre) {
   currentMembre = membre
-  document.getElementById('loading-screen').style.display = 'none'
-  document.getElementById('login-screen').style.display = 'none'
-  document.getElementById('choice-screen').style.display = 'none'
 
   if (membre.role === 'gestion') {
+    await loadGestionProcedures()
+    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('login-screen').style.display = 'none'
+    document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('gestion-app')
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
-    loadGestionProcedures()
   } else {
+    await loadEquipeProcedures()
+    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('login-screen').style.display = 'none'
+    document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('equipe-app')
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
-    loadEquipeProcedures().then(() => {
-      const params = new URLSearchParams(window.location.search)
-      const procId = params.get('proc')
-      if (procId) openEquipeDetail(procId)
-    })
+    const params = new URLSearchParams(window.location.search)
+    const procId = params.get('proc')
+    if (procId) openEquipeDetail(procId)
   }
 }
 
@@ -1537,8 +1541,8 @@ function playCardShuffle(containerEl, oldRects) {
   containerEl.querySelectorAll('[data-key]').forEach((el, i) => {
     const oldRect = oldRects.get(el.dataset.key)
     if (!oldRect) {
-      // Carte totalement nouvelle : simple entrée en fondu/glissement
-      el.classList.add('slide-in')
+      // Carte totalement nouvelle : même animation que le titre "Mes procédures"
+      el.classList.add('same-as-title-in')
       el.style.animationDelay = (i * 0.04) + 's'
       return
     }
@@ -1613,10 +1617,38 @@ function renderCategoryGrid() {
   playCardShuffle(catGridEl, oldRects)
 }
 
-window.setCatSort = function(sort) {
-  currentCatSort = sort
-  renderCategoryGrid()
+function wireSortDropdown(prefix, onSelect) {
+  const trigger = document.getElementById(prefix + '-trigger')
+  const menu = document.getElementById(prefix + '-menu')
+  const label = document.getElementById(prefix + '-label')
+  if (!trigger || !menu || !label) return
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const isOpen = menu.classList.contains('open')
+    document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
+    document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
+    if (!isOpen) { menu.classList.add('open'); trigger.classList.add('open') }
+  })
+
+  menu.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation()
+      label.textContent = btn.dataset.label
+      menu.querySelectorAll('button').forEach(b => b.classList.toggle('selected', b === btn))
+      menu.classList.remove('open')
+      trigger.classList.remove('open')
+      onSelect(btn.dataset.sort)
+    })
+  })
 }
+
+document.addEventListener('click', () => {
+  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
+  document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
+})
+
+wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
 
 document.getElementById('category-search-input')?.addEventListener('input', (e) => {
   const q = e.target.value.toLowerCase()
@@ -1627,10 +1659,7 @@ document.getElementById('category-search-input')?.addEventListener('input', (e) 
 })
 
 let currentCategorySort = 'az'
-window.setCategorySort = function(sort) {
-  currentCategorySort = sort
-  renderCategoryProceduresList()
-}
+wireSortDropdown('dd-category-sort', (sort) => { currentCategorySort = sort; renderCategoryProceduresList() })
 
 let currentCategoryProcsData = []
 
@@ -1639,7 +1668,8 @@ async function openCategoryProcedures(nom) {
   document.getElementById('category-titre').textContent = nom
   document.getElementById('category-search-input').value = ''
   currentCategorySort = 'az'
-  selectDD('dd-category-sort', 'az', 'Trier : A → Z')
+  document.getElementById('dd-category-sort-label').textContent = 'Trier : A → Z'
+  document.querySelectorAll('#dd-category-sort-menu button').forEach(b => b.classList.toggle('selected', b.dataset.sort === 'az'))
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
@@ -2486,31 +2516,6 @@ function setButtonLoading(btn, isLoading, loadingText) {
     btn.dataset.loading = 'false'
   }
 }
-
-// ═══ Menu déroulant personnalisé (remplace les select natifs) ═══
-window.toggleDD = function(id) {
-  const filterEl = document.getElementById(id)
-  const isOpen = filterEl.querySelector('.dd-menu').classList.contains('open')
-  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
-  document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
-  if (!isOpen) {
-    filterEl.querySelector('.dd-menu').classList.add('open')
-    filterEl.querySelector('.dd-trigger').classList.add('open')
-  }
-}
-window.selectDD = function(id, value, label) {
-  const filterEl = document.getElementById(id)
-  filterEl.querySelector(`#${id}-label`).textContent = label
-  filterEl.querySelectorAll('.dd-menu button').forEach(b => b.classList.toggle('selected', b.textContent === label))
-  filterEl.querySelector('.dd-menu').classList.remove('open')
-  filterEl.querySelector('.dd-trigger').classList.remove('open')
-}
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.dd-filter')) {
-    document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'))
-    document.querySelectorAll('.dd-trigger.open').forEach(t => t.classList.remove('open'))
-  }
-})
 
 // ═══════════ GESTION : Modifier une procédure (aussi utilisé pour valider la génération IA) ═══════════
 let editProcedureId = null

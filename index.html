@@ -869,6 +869,7 @@
   window.__chrono = []
   window.jalon = function (nom) {
     window.__chrono.push([nom, Math.round(performance.now())])
+    if (/⚠/.test(nom)) console.warn('[Procédo] ' + nom)
     if (!/[?&]debug=1/.test(location.search)) return
     var el = document.getElementById('chrono-debug')
     if (!el) {
@@ -897,8 +898,34 @@
     }).catch(function () {})
   } catch (e) {}
 
+  /* Essai : ?novideo=1 retire les sept éléments vidéo de la page. Deux d'entre
+     eux sont en lecture automatique, et Safari initialise sa chaîne média même
+     sans source. C'est le principal écart avec tes autres apps. */
+  if (/[?&]novideo=1/.test(location.search)) {
+    document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('video').forEach(function (v) { v.remove() })
+      window.jalon('essai : vidéos retirées')
+    })
+  }
+
   if (/[?&]nofond=1/.test(location.search)) document.body.classList.add('sans-fond')
   if (/[?&]noverre=1/.test(location.search)) document.body.classList.add('sans-verre')
+
+  /* ═══ Chien de garde ═══
+     Un rendez-vous toutes les 120 ms. Si le fil principal est occupé, le
+     rendez-vous est manqué et on mesure le retard : c'est exactement la durée
+     pendant laquelle l'app ne répond à rien. Chaque blocage de plus de 250 ms
+     est consigné avec son heure, ce qui permet de le situer par rapport aux
+     autres jalons. */
+  ;(function chienDeGarde() {
+    var attendu = performance.now() + 120
+    setInterval(function () {
+      var maintenant = performance.now()
+      var retard = maintenant - attendu
+      if (retard > 250) window.jalon('⚠ FIGÉ ' + Math.round(retard) + ' ms')
+      attendu = maintenant + 120
+    }, 120)
+  })()
 
   /* Mesure la fluidité pendant les 5 secondes qui suivent l'affichage de l'app.
      Un écran fluide produit environ 300 images. Un écran figé pendant 4 s en
@@ -1916,8 +1943,11 @@ async function enterApp(membre) {
     if (membre.role === 'gestion') ensureQRCode().catch(() => {})
     else ensureJsQR().catch(() => {})
   }
-  if ('requestIdleCallback' in window) requestIdleCallback(prechauffer, { timeout: 6000 })
-  else setTimeout(prechauffer, 2500)
+  // Essai : ?nopreload=1 supprime le téléchargement anticipé des bibliothèques QR
+  if (!/[?&]nopreload=1/.test(location.search)) {
+    if ('requestIdleCallback' in window) requestIdleCallback(prechauffer, { timeout: 6000 })
+    else setTimeout(prechauffer, 2500)
+  }
 
   if (membre.role === 'gestion') {
     await loadGestionProcedures()

@@ -25,20 +25,47 @@
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
   textarea, input{font-family:inherit; color:inherit;}
 
+  /* ═══ Halos de fond ═══
+     Attention perf : un `filter: blur()` de 90-120px sur trois calques plein
+     écran QUI CHANGENT D'ÉCHELLE oblige Safari à recalculer le flou à chaque
+     image, en continu. C'était la cause des saccades au lancement sur iPhone.
+     Les dégradés radiaux sont déjà très doux : un flou léger suffit, chaque
+     calque est promu sur le GPU, et l'animation ne touche plus qu'à la
+     translation et à l'opacité (deux propriétés composées, gratuites). */
   .color-halos{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  .chalo{ position:absolute; border-radius:50%; filter:blur(120px); opacity:0.8; }
+  .chalo{
+    position:absolute; border-radius:50%; filter:blur(36px); opacity:0.8;
+    will-change:transform, opacity; transform:translateZ(0); backface-visibility:hidden;
+  }
   .chalo-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
-    background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); animation:chaloBreath1 14s ease-in-out infinite; }
+    background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); animation:chaloBreath1 16s ease-in-out infinite; }
   .chalo-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
-    background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); animation:chaloBreath2 18s ease-in-out infinite; }
-  .chalo-4{ top:-14%; left:50%; transform:translateX(-50%); width:120vw; height:70vw; max-width:1000px; max-height:600px;
-    background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); opacity:0.9; animation:chaloBreath3 16s ease-in-out infinite; }
-  @keyframes chaloBreath1{0%,100%{transform:translate(0,0) scale(1); opacity:0.7;}50%{transform:translate(6%,4%) scale(1.12); opacity:0.95;}}
-  @keyframes chaloBreath2{0%,100%{transform:translate(0,0) scale(1.05); opacity:0.65;}50%{transform:translate(-5%,-6%) scale(1); opacity:0.9;}}
-  @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
+    background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); animation:chaloBreath2 20s ease-in-out infinite; }
+  .chalo-4{ top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
+    background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); opacity:0.9; animation:chaloBreath3 18s ease-in-out infinite; }
+  @keyframes chaloBreath1{0%,100%{transform:translate3d(0,0,0); opacity:0.72;}50%{transform:translate3d(5%,3%,0); opacity:0.95;}}
+  @keyframes chaloBreath2{0%,100%{transform:translate3d(0,0,0); opacity:0.68;}50%{transform:translate3d(-4%,-5%,0); opacity:0.9;}}
+  @keyframes chaloBreath3{0%,100%{transform:translate3d(-50%,0,0); opacity:0.8;}50%{transform:translate3d(-50%,3%,0); opacity:1;}}
+
+  /* Pendant le démarrage, tout le décor est figé : le processeur est entièrement
+     disponible pour afficher l'app. Les animations reprennent une fois en place. */
+  body.booting .chalo,
+  body.booting .brand .mark svg{ animation:none !important; }
+  body.booting *{ transition:none !important; }
+  /* Une seule animation d'entrée (celle de la coquille) au lieu de trois
+     superposées : écran + cartes + coquille se battaient pour le processeur. */
+  body.booting .screen.active,
+  body.booting .same-as-title-in,
+  body.booting .cat-cell,
+  body.booting .sop-card,
+  body.booting .card{ animation:none !important; }
+
+  @media (prefers-reduced-motion: reduce){
+    .chalo{ animation:none !important; }
+  }
 
   @media (max-width: 600px){
-    .chalo{ opacity:1; filter:blur(90px); }
+    .chalo{ opacity:1; filter:blur(30px); }
     .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
     .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
     .chalo-4{ opacity:1; background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
@@ -162,12 +189,9 @@
     line-height:1.4; font-family:inherit; color:var(--label); min-height:22px;
   }
   .step-edit-item .step-row-bottom{ display:flex; align-items:center; gap:8px; padding-left:34px; }
-  .step-edit-item .del{ color:var(--red); font-size:18px; flex-shrink:0; margin-left:auto; padding:4px; }
-  .step-clip-btn{
-    font-size:11.5px; font-weight:600; color:var(--label); background:rgba(255,255,255,0.08);
-    border:0.5px solid var(--border); padding:7px 12px; border-radius:100px; flex-shrink:0; white-space:nowrap;
-  }
-  .step-clip-btn:active{ background:rgba(255,255,255,0.16); }
+  .step-edit-item .del{ color:var(--red); font-size:18px; flex-shrink:0; margin-left:auto; padding:4px;
+    display:flex; align-items:center; justify-content:center; }
+  .step-edit-item .del svg{ width:17px; height:17px; }
 
   /* ═══ Timeline façon CapCut ═══ */
   .capcut-wrap{ margin-top:12px; }
@@ -232,6 +256,56 @@
   .clip-info{ display:flex; justify-content:space-between; align-items:center; gap:10px;
     margin-top:10px; font-size:11.5px; color:var(--label-2); font-variant-numeric:tabular-nums; }
   .clip-info b{ color:#fff; font-weight:700; }
+
+  /* ═══ Boîte de confirmation façon iOS ═══ */
+  .ios-alert-backdrop{
+    position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:24px;
+    background:rgba(0,0,0,0.45); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+    opacity:0; transition:opacity 0.22s ease;
+  }
+  .ios-alert-backdrop.shown{ opacity:1; }
+  .ios-alert{
+    width:100%; max-width:272px; border-radius:15px; overflow:hidden; text-align:center;
+    background:rgba(44,44,48,0.86); -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%);
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    transform:scale(1.16); opacity:0;
+    transition: transform 0.26s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease;
+  }
+  .ios-alert-backdrop.shown .ios-alert{ transform:scale(1); opacity:1; }
+  .ios-alert-backdrop.closing .ios-alert{ transform:scale(0.95); opacity:0; transition-duration:0.16s; }
+  .ios-alert-body{ padding:19px 16px 17px; }
+  .ios-alert-title{ font-size:17px; font-weight:700; letter-spacing:-0.02em; margin-bottom:4px; }
+  .ios-alert-msg{ font-size:13px; line-height:1.35; color:rgba(235,235,245,0.75); }
+  .ios-alert-actions{ display:flex; border-top:0.5px solid rgba(255,255,255,0.18); }
+  .ios-alert-actions button{
+    flex:1; padding:13px 8px; font-family:inherit; font-size:17px; letter-spacing:-0.02em;
+    color:#0A84FF; background:none; transition:background 0.12s;
+  }
+  .ios-alert-actions button:active{ background:rgba(255,255,255,0.10); }
+  .ios-alert-actions button + button{ border-left:0.5px solid rgba(255,255,255,0.18); }
+  .ios-alert-actions button.danger{ color:var(--red); font-weight:700; }
+
+  /* ═══ Commandes de clip, façon CapCut ═══ */
+  .clip-tools{ display:none; grid-template-columns:repeat(4, 1fr); gap:8px; margin-top:12px; }
+  .clip-tools.on{ display:grid; }
+  .clip-tool{
+    display:flex; flex-direction:column; align-items:center; gap:5px; padding:10px 4px;
+    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    font-size:10.5px; font-weight:600; color:var(--label); line-height:1.1; text-align:center;
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+  }
+  .clip-tool:active{ transform:scale(0.93); background:rgba(255,255,255,0.14); }
+  .clip-tool svg{ width:19px; height:19px; }
+  .clip-tool[disabled]{ opacity:0.35; }
+  .clip-text-field{ display:none; margin-top:12px; }
+  .clip-text-field.on{ display:block; }
+  .clip-text-field textarea{
+    width:100%; background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    padding:13px 14px; font-size:15.5px; font-family:inherit; color:var(--label);
+    resize:none; overflow:hidden; line-height:1.4; min-height:48px;
+  }
+  .clip-done-btn{ display:none; width:100%; margin-top:10px; }
+  .clip-done-btn.on{ display:block; }
 
   .step-edit-item{ cursor:pointer; transition: border-color 0.18s, background 0.18s; }
   .step-edit-item.selected{ border-color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.07); }
@@ -463,7 +537,7 @@
   .tab-round--primary svg{width:20px; height:20px;}
 </style>
 </head>
-<body>
+<body class="booting">
 
 <div class="color-halos">
   <div class="chalo chalo-4"></div><div class="chalo chalo-1"></div><div class="chalo chalo-2"></div>
@@ -733,10 +807,18 @@
         <div class="clip-info" id="capcut-info" style="display:none;"></div>
         <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
         <div class="cut-toolbar">
-          <button type="button" class="btn small" id="capcut-add-btn">+ Étape ici</button>
-          <button type="button" class="btn small ghost" id="capcut-play-clip" style="display:none;">▶ Lire le clip</button>
-          <button type="button" class="btn small ghost" id="capcut-done" style="display:none;">Terminer le réglage</button>
+          <button type="button" class="btn small block" id="capcut-add-btn">+ Découper une étape ici</button>
         </div>
+        <div class="clip-tools" id="capcut-tools">
+          <button type="button" class="clip-tool" id="capcut-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
+          <button type="button" class="clip-tool" id="capcut-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
+          <button type="button" class="clip-tool" id="capcut-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
+          <button type="button" class="clip-tool" id="capcut-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
+        </div>
+        <div class="clip-text-field" id="capcut-text-field">
+          <textarea id="capcut-text" rows="1" placeholder="Que fait-on pendant ce moment ?"></textarea>
+        </div>
+        <button type="button" class="btn ghost clip-done-btn" id="capcut-done">Terminer le réglage</button>
       </div>
     </div>
 
@@ -822,10 +904,16 @@
       </div>
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
-      <div class="cut-toolbar">
-        <button type="button" class="btn small ghost" id="ecap-play-clip" style="display:none;">▶ Lire le clip</button>
-        <button type="button" class="btn small ghost" id="ecap-done" style="display:none;">Terminer le réglage</button>
+      <div class="clip-tools" id="ecap-tools">
+        <button type="button" class="clip-tool" id="ecap-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
+        <button type="button" class="clip-tool" id="ecap-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
+        <button type="button" class="clip-tool" id="ecap-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
+        <button type="button" class="clip-tool" id="ecap-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
       </div>
+      <div class="clip-text-field" id="ecap-text-field">
+        <textarea id="ecap-text" rows="1" placeholder="Que fait-on pendant ce moment ?"></textarea>
+      </div>
+      <button type="button" class="btn ghost clip-done-btn" id="ecap-done">Terminer le réglage</button>
     </div>
 
     <div class="section-title">Étapes</div>
@@ -1294,37 +1382,54 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 async function enterApp(membre) {
   currentMembre = membre
 
-  // Préchauffage en tâche de fond : les bibliothèques QR sont téléchargées
-  // pendant que l'utilisateur regarde son accueil, pour que la génération du
-  // QR code et le scanner s'ouvrent sans le moindre délai.
+  // Préchauffage des bibliothèques QR : utile, mais surtout pas pendant le
+  // premier affichage. On attend que le navigateur soit inoccupé.
   const prechauffer = () => {
     if (membre.role === 'gestion') ensureQRCode().catch(() => {})
     else ensureJsQR().catch(() => {})
   }
-  setTimeout(prechauffer, 400)
+  if ('requestIdleCallback' in window) requestIdleCallback(prechauffer, { timeout: 6000 })
+  else setTimeout(prechauffer, 2500)
 
   if (membre.role === 'gestion') {
     await loadGestionProcedures()
-    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('gestion-app')
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
+    finDuDemarrage()
   } else {
     await loadEquipeProcedures()
-    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('equipe-app')
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
+    finDuDemarrage()
     const params = new URLSearchParams(window.location.search)
     const procId = params.get('proc')
     if (procId) openEquipeDetail(procId)
   }
+}
+
+// Le décor (halos, animations de cartes) ne se remet en marche qu'une fois
+// l'app réellement affichée et posée. Avant ça, tout le processeur sert à
+// l'afficher — c'est ce qui rendait le lancement saccadé sur iPhone.
+let demarrageTermine = false
+function finDuDemarrage() {
+  if (demarrageTermine) return
+  demarrageTermine = true
+  const liberer = () => {
+    document.body.classList.remove('booting')
+    document.getElementById('loading-screen')?.remove()
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
+  else setTimeout(liberer, 800)
 }
 
 // ═══ PARAMÈTRES ═══
@@ -2139,15 +2244,19 @@ function createClipEditor(ids, api) {
     timeline.classList.toggle('clipmode', on)
 
     const infoEl = g(ids.info)
-    const playBtn = g(ids.playClip)
-    const doneBtn = g(ids.done)
-    if (playBtn) playBtn.style.display = on ? 'block' : 'none'
-    if (doneBtn) doneBtn.style.display = on ? 'block' : 'none'
+    g(ids.tools)?.classList.toggle('on', on)
+    g(ids.textField)?.classList.toggle('on', on)
+    g(ids.done)?.classList.toggle('on', on)
+    const textEl = g(ids.text)
+    if (textEl && on && textEl !== document.activeElement) {
+      textEl.value = s.texte || ''
+      autoResizeTextarea(textEl)
+    }
     if (g(ids.hint)) g(ids.hint).textContent = on
-      ? 'Glissez les deux poignées pour régler le début et la fin de cette étape'
+      ? 'Écartez ou resserrez les deux poignées blanches'
       : (ids.prefix === 'capcut'
-          ? 'Placez la lecture puis « + Étape ici », ou touchez une étape pour régler son clip'
-          : 'Touchez une étape ci-dessous pour régler son clip')
+          ? 'Placez la lecture, puis découpez une étape'
+          : 'Touchez une étape pour régler son clip')
 
     if (!on) { if (infoEl) infoEl.style.display = 'none'; return }
 
@@ -2281,6 +2390,50 @@ function createClipEditor(ids, api) {
   g(ids.playClip)?.addEventListener('click', playClip)
   g(ids.done)?.addEventListener('click', () => select(null))
 
+  // ── Commandes façon CapCut ────────────────────────────────────────────────
+  // « Début ici » / « Fin ici » : on place la lecture où l'on veut, puis on
+  // fixe la borne d'un seul geste — plus précis que de viser une poignée.
+  g(ids.setStart)?.addEventListener('click', () => {
+    const s = current(), v = video()
+    if (!s || !v) return
+    s.timestamp_video = clamp(Math.min(v.currentTime, clipEnd(s) - MIN_CLIP))
+    paintBands(); paintSelection(); api.onChange?.()
+  })
+  g(ids.setEnd)?.addEventListener('click', () => {
+    const s = current(), v = video()
+    if (!s || !v) return
+    s.fin_video = clamp(Math.max(v.currentTime, clipStart(s) + MIN_CLIP))
+    paintBands(); paintSelection(); api.onChange?.()
+  })
+
+  // « Diviser » : coupe l'étape en deux à l'endroit de la lecture.
+  g(ids.split)?.addEventListener('click', () => {
+    const s = current(), v = video()
+    if (!s || !v) return
+    const t = v.currentTime
+    if (t <= clipStart(s) + MIN_CLIP || t >= clipEnd(s) - MIN_CLIP) {
+      toast("Placez la lecture au milieu du clip pour le diviser.")
+      return
+    }
+    const finOriginale = clipEnd(s)
+    s.fin_video = t
+    const nouvelle = { id: null, texte: '', timestamp_video: t, fin_video: finOriginale }
+    steps().splice(selIndex + 1, 0, nouvelle)
+    api.onChange?.()
+    select(selIndex + 1)
+  })
+
+  // Champ de texte de l'étape sélectionnée, juste sous la frise :
+  // plus besoin de faire défiler la page pour écrire.
+  const textEl = g(ids.text)
+  textEl?.addEventListener('input', (e) => {
+    const s = current()
+    if (!s) return
+    s.texte = e.target.value
+    autoResizeTextarea(e.target)
+    api.onTextInput?.()
+  })
+
   // ── API publique ─────────────────────────────────────────────────────────
   function select(i) {
     stopClipPlayback()
@@ -2374,11 +2527,14 @@ capcutEditor = createClipEditor({
   maskL: 'capcut-mask-l', maskR: 'capcut-mask-r', sel: 'capcut-sel',
   hStart: 'capcut-h-start', hEnd: 'capcut-h-end', playhead: 'capcut-playhead',
   info: 'capcut-info', hint: 'capcut-hint', playClip: 'capcut-play-clip', done: 'capcut-done',
+  tools: 'capcut-tools', textField: 'capcut-text-field', text: 'capcut-text',
+  setStart: 'capcut-set-start', setEnd: 'capcut-set-end', split: 'capcut-split',
   curTime: 'capcut-current-time', durTime: 'capcut-duration',
 }, {
   getSteps: () => videoSteps,
   onChange: () => renderVideoSteps(),
   onSelect: () => renderVideoSteps(),
+  onTextInput: () => renderVideoSteps(),
 })
 
 // ═══ Instance 2 : écran « Modifier la procédure » ═══
@@ -2388,10 +2544,13 @@ ecapEditor = createClipEditor({
   maskL: 'ecap-mask-l', maskR: 'ecap-mask-r', sel: 'ecap-sel',
   hStart: 'ecap-h-start', hEnd: 'ecap-h-end', playhead: 'ecap-playhead',
   info: 'ecap-info', hint: 'ecap-hint', playClip: 'ecap-play-clip', done: 'ecap-done',
+  tools: 'ecap-tools', textField: 'ecap-text-field', text: 'ecap-text',
+  setStart: 'ecap-set-start', setEnd: 'ecap-set-end', split: 'ecap-split',
 }, {
   getSteps: () => editStepsData,
   onChange: () => renderEditSteps(),
   onSelect: () => renderEditSteps(),
+  onTextInput: () => renderEditSteps(),
 })
 
 // ═══ Import de la vidéo (création) ═══
@@ -2485,12 +2644,14 @@ function renderManualSteps() {
       </div>
       <div class="step-row-bottom">
         ${moveButtonsHtml(i, manualSteps.length)}
-        <span class="del">✕</span>
+        <span class="del">${TRASH_SVG}</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { manualSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
-    div.querySelector('.del').addEventListener('click', () => { manualSteps.splice(i, 1); renderManualSteps() })
+    div.querySelector('.del').addEventListener('click', () => {
+      demanderSuppressionEtape(i + 1, manualSteps[i].texte, () => { manualSteps.splice(i, 1); renderManualSteps() })
+    })
     wireMoveButtons(div, manualSteps, i, () => renderManualSteps())
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
@@ -2520,9 +2681,8 @@ function renderVideoSteps() {
       </div>
       <div class="step-row-bottom">
         <span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>
-        <button type="button" class="step-clip-btn">✂ Régler le clip</button>
         ${moveButtonsHtml(i, videoSteps.length)}
-        <span class="del">✕</span>
+        <span class="del">${TRASH_SVG}</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
@@ -2530,12 +2690,13 @@ function renderVideoSteps() {
     textarea.addEventListener('focus', (e) => e.stopPropagation())
     div.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation()
-      videoSteps.splice(i, 1)
-      capcutEditor?.deselect()
-      renderVideoSteps()
-      capcutEditor?.repaint()
+      demanderSuppressionEtape(i + 1, videoSteps[i].texte, () => {
+        videoSteps.splice(i, 1)
+        capcutEditor?.deselect()
+        renderVideoSteps()
+        capcutEditor?.repaint()
+      })
     })
-    div.querySelector('.step-clip-btn').addEventListener('click', (e) => { e.stopPropagation(); capcutEditor?.select(i) })
     div.addEventListener('click', (e) => {
       if (e.target.closest('textarea, button, .del')) return
       capcutEditor?.select(i)
@@ -3113,6 +3274,86 @@ function normaliserClips(steps, duree) {
   return steps
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   Boîte de confirmation façon iOS. Renvoie une promesse : true si l'action est
+   confirmée, false si elle est annulée. Animation identique à celle d'Apple :
+   le panneau apparaît légèrement agrandi puis se pose à sa taille normale.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler', danger = true }) {
+  return new Promise((resolve) => {
+    const backdrop = document.createElement('div')
+    backdrop.className = 'ios-alert-backdrop'
+    backdrop.innerHTML = `
+      <div class="ios-alert" role="alertdialog" aria-modal="true">
+        <div class="ios-alert-body">
+          <div class="ios-alert-title">${escapeHtml(titre)}</div>
+          ${message ? `<div class="ios-alert-msg">${escapeHtml(message)}</div>` : ''}
+        </div>
+        <div class="ios-alert-actions">
+          <button type="button" class="cancel">${escapeHtml(annuler)}</button>
+          <button type="button" class="${danger ? 'danger' : ''} ok">${escapeHtml(confirmer)}</button>
+        </div>
+      </div>`
+    document.body.appendChild(backdrop)
+    requestAnimationFrame(() => backdrop.classList.add('shown'))
+
+    let done = false
+    const close = (valeur) => {
+      if (done) return
+      done = true
+      backdrop.classList.add('closing')
+      backdrop.classList.remove('shown')
+      setTimeout(() => { backdrop.remove(); resolve(valeur) }, 180)
+    }
+    backdrop.querySelector('.cancel').addEventListener('click', () => close(false))
+    backdrop.querySelector('.ok').addEventListener('click', () => close(true))
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) close(false) })
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { document.removeEventListener('keydown', esc); close(false) }
+    })
+  })
+}
+
+// Petit message flottant, pour les informations qui ne méritent pas une alerte
+let toastTimer = null
+function toast(texte) {
+  let el = document.getElementById('mini-toast')
+  if (!el) {
+    el = document.createElement('div')
+    el.id = 'mini-toast'
+    el.style.cssText = 'position:fixed; left:50%; bottom:118px; transform:translateX(-50%) translateY(10px);' +
+      'z-index:150; background:rgba(44,44,48,0.92); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);' +
+      'border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:11px 20px; font-size:13px;' +
+      'font-weight:600; color:#fff; max-width:88vw; text-align:center; opacity:0;' +
+      'transition:opacity 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1); pointer-events:none;'
+    document.body.appendChild(el)
+  }
+  el.textContent = texte
+  requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)' })
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => {
+    el.style.opacity = '0'
+    el.style.transform = 'translateX(-50%) translateY(10px)'
+  }, 2400)
+}
+
+// Icône corbeille commune à toutes les listes d'étapes
+const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>'
+
+// Demande confirmation avant de retirer une étape, puis exécute la suppression
+async function demanderSuppressionEtape(numero, texte, onConfirme) {
+  const extrait = (texte || '').trim()
+  const ok = await confirmDialog({
+    titre: `Supprimer l'étape ${numero} ?`,
+    message: extrait
+      ? `« ${extrait.length > 60 ? extrait.slice(0, 60) + '…' : extrait} » sera retirée de la procédure.`
+      : 'Cette étape sera retirée de la procédure.',
+    confirmer: 'Supprimer',
+    annuler: 'Annuler',
+  })
+  if (ok) onConfirme()
+}
+
 function autoResizeTextarea(el) {
   el.style.height = 'auto'
   el.style.height = el.scrollHeight + 'px'
@@ -3135,22 +3376,21 @@ function renderEditSteps() {
       </div>
       <div class="step-row-bottom">
         ${hasClip ? `<span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>` : ''}
-        ${editVideoUrl ? `<button type="button" class="step-clip-btn">✂ Régler le clip</button>` : ''}
         ${moveButtonsHtml(i, editStepsData.length)}
-        <span class="del">✕</span>
+        <span class="del">${TRASH_SVG}</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; autoResizeTextarea(e.target) })
     div.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation()
-      editStepsData.splice(i, 1)
-      ecapEditor?.deselect()
-      renderEditSteps()
-      ecapEditor?.repaint()
+      demanderSuppressionEtape(i + 1, editStepsData[i].texte, () => {
+        editStepsData.splice(i, 1)
+        ecapEditor?.deselect()
+        renderEditSteps()
+        ecapEditor?.repaint()
+      })
     })
-    const clipBtn = div.querySelector('.step-clip-btn')
-    if (clipBtn) clipBtn.addEventListener('click', (e) => { e.stopPropagation(); ecapEditor?.select(i) })
     if (editVideoUrl) {
       div.addEventListener('click', (e) => {
         if (e.target.closest('textarea, button, .del')) return
@@ -3243,14 +3483,16 @@ try {
       console.error('Erreur de vérification de session :', e)
     }
     // Pas de session valide (ou erreur) : afficher l'écran de choix d'espace
-    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('choice-screen').style.display = 'flex'
+    document.body.classList.remove('booting')
     window.__procedoLoaded = true
   })()
 } catch (e) {
   console.error('Erreur au chargement :', e)
-  document.getElementById('loading-screen').style.display = 'none'
+  document.getElementById('loading-screen')?.style.setProperty('display', 'none')
   document.getElementById('choice-screen').style.display = 'flex'
+  document.body.classList.remove('booting')
 }
 </script>
 
@@ -3269,6 +3511,7 @@ try {
       var equipeVisible = equipe && equipe.style.display === 'block'
       if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
         if (loading) loading.style.display = 'none'
+        document.body.classList.remove('booting')
         choice.style.display = 'flex'
       }
     }

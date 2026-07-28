@@ -182,8 +182,12 @@
      en pivotant légèrement, celle de derrière grandit et prend sa place.
      Deux points sous la pile signalent qu'il y a une carte de plus. */
   .pile{ position:relative; height:214px; margin-bottom:26px; touch-action:pan-y; }
-  .pile-carte{
-    position:absolute; left:0; right:0; top:0; height:214px; margin-bottom:0 !important;
+  /* Le préfixe `.pile` est indispensable : sans lui, la règle `.panneau-accueil`
+     déclarée plus bas remettait ces cartes en position normale et elles se
+     rangeaient l'une sous l'autre au lieu de se superposer. */
+  .pile .pile-carte{
+    position:absolute; left:0; right:0; top:0; height:214px; margin-bottom:0;
+    display:flex; flex-direction:column;
     /* Courbe d'Apple : départ franc, arrivée qui se pose sans rebondir. */
     transition: transform 0.55s cubic-bezier(0.32,0.72,0,1), opacity 0.4s cubic-bezier(0.32,0.72,0,1);
     will-change:transform, opacity;
@@ -258,10 +262,12 @@
     position:relative; font-size:29px; font-weight:700; letter-spacing:-0.02em;
     color:#fff; margin-top:4px; line-height:1.1;
   }
-  .pa-sous{ position:relative; font-size:12.5px; font-weight:500; color:var(--label-3); margin-top:6px; }
+  .pa-sous{ position:relative; font-size:12.5px; font-weight:500; color:var(--label-3); margin-top:6px; margin-bottom:16px; }
   .pa-bouton{
     position:relative; display:flex; align-items:center; justify-content:center; gap:8px;
-    width:100%; height:46px; margin-top:18px; border-radius:14px;
+    width:100%; height:46px; flex-shrink:0; border-radius:14px;
+    /* Repoussé en bas : le bloc occupe toute la hauteur qu'on lui donne. */
+    margin-top:auto;
     border:0.5px solid var(--border);
     background:rgba(255,255,255,0.10);
     color:#fff; font-family:inherit; font-size:15px; font-weight:700; letter-spacing:-0.02em;
@@ -648,12 +654,16 @@
   .sq-bloc{ background:rgba(255,255,255,0.08); border-radius:8px; }
 
   /* ═══ Les mêmes carreaux que le panneau d'accueil ═══
-     Posés en calque décoratif, sans toucher au balisage des cartes. Même pas
-     de 20px, mais révélés seulement dans le coin bas droit, là où il n'y a pas
-     de texte — sinon la trame se lirait par-dessus les titres. */
-  .cat-cell, .proc-rich-card, .sop-card{ position:relative; overflow:hidden; }
-  .cat-cell::before, .proc-rich-card::before, .sop-card::before{
-    content:''; position:absolute; inset:0; pointer-events:none;
+     Posés en calque décoratif, sans toucher au balisage. Même pas de 20px,
+     révélés seulement dans le coin bas droit, là où il n'y a pas de texte —
+     sinon la trame se lirait par-dessus les titres.
+     Les écrans de création en sont dispensés : ils sont pleins de champs de
+     saisie et de formulaires, une texture décorative n'y a rien à faire. */
+  .card, .hero-card, .cat-cell, .proc-rich-card, .sop-card, .emp-row,
+  .plan-card, .step-edit-item{ position:relative; overflow:hidden; }
+  .card::before, .hero-card::before, .cat-cell::before, .proc-rich-card::before,
+  .sop-card::before, .emp-row::before, .plan-card::before, .step-edit-item::before{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
     background-image:
       linear-gradient(rgba(255,255,255,0.11) 1px, transparent 1px),
       linear-gradient(90deg, rgba(255,255,255,0.11) 1px, transparent 1px);
@@ -661,7 +671,10 @@
     -webkit-mask-image:radial-gradient(ellipse 62% 68% at 96% 96%, #000 6%, transparent 74%);
     mask-image:radial-gradient(ellipse 62% 68% at 96% 96%, #000 6%, transparent 74%);
   }
-  /* Les lignes d'employés et les cartes de formulaire restent nues. */
+  /* Écrans « Nouvelle procédure » : aucune trame. */
+  .sans-carreaux .card::before,
+  .sans-carreaux .step-edit-item::before,
+  .sans-carreaux .hero-card::before{ content:none; }
 
   .cat-cell, .proc-rich-card{
     padding:14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
@@ -1098,7 +1111,7 @@
     <div id="category-procedures-list"></div>
   </div>
 
-  <div class="screen" id="p-create">
+  <div class="screen sans-carreaux" id="p-create">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-list')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1153,7 +1166,7 @@
     </div>
   </div>
 
-  <div class="screen" id="p-create-manual">
+  <div class="screen sans-carreaux" id="p-create-manual">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1169,7 +1182,7 @@
     <button class="btn block" style="margin-top:18px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
 
-  <div class="screen" id="p-create-video">
+  <div class="screen sans-carreaux" id="p-create-video">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1230,7 +1243,7 @@
     <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
   </div>
 
-  <div class="screen" id="p-create-ai">
+  <div class="screen sans-carreaux" id="p-create-ai">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>

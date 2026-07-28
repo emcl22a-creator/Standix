@@ -2052,15 +2052,18 @@ function captureCardPositions(containerEl) {
 
 // Fait "glisser/mélanger" chaque carte depuis son ancienne position vers sa nouvelle position
 function playCardShuffle(containerEl, oldRects) {
+  // Rien à faire au tout premier remplissage d'une liste : l'écran qui vient
+  // de s'ouvrir joue déjà sa propre animation d'entrée. Superposer une
+  // animation par carte par-dessus — chacune partant d'une opacité nulle et
+  // d'un flou — laissait les cartes bloquées invisibles sur iPhone : deux
+  // animations imbriquées avec `filter`, et Safari n'en démarrait qu'une.
+  // Cette fonction ne sert donc plus qu'à ce pour quoi elle a été écrite :
+  // faire glisser les cartes quand on change le tri.
+  const premierRemplissage = oldRects.size === 0
   containerEl.querySelectorAll('[data-key]').forEach((el, i) => {
     const oldRect = oldRects.get(el.dataset.key)
     if (!oldRect) {
-      // Carte totalement nouvelle : même animation que le titre "Mes procédures".
-      // Sauf au tout premier affichage : pendant le démarrage les animations
-      // sont neutralisées, et poser la classe ici les ferait toutes démarrer
-      // d'un coup au moment où on lève la neutralisation — soit une rafale
-      // d'animations juste après l'apparition de l'app.
-      if (!document.body.classList.contains('booting')) {
+      if (!premierRemplissage && !document.body.classList.contains('booting')) {
         el.classList.add('same-as-title-in')
         el.style.animationDelay = (i * 0.04) + 's'
       }
@@ -2150,6 +2153,7 @@ function renderCategoryGrid() {
   })
 
   playCardShuffle(catGridEl, oldRects)
+  garantirVisibilite(catGridEl)
 }
 
 // Un seul gestionnaire pour tous les menus « Trier », posé sur le document.
@@ -2320,6 +2324,26 @@ function renderCategoryProceduresList() {
   }
 
   playCardShuffle(listEl, oldRects)
+  garantirVisibilite(listEl)
+}
+
+/* Dernier rempart : au bout d'une seconde, toute carte encore transparente ou
+   floutée à cause d'une animation qui n'a pas démarré est remise à l'état
+   normal. Une liste vide à l'écran est le pire des défauts — mieux vaut perdre
+   une animation que perdre le contenu. */
+function garantirVisibilite(containerEl) {
+  setTimeout(() => {
+    containerEl.querySelectorAll('[data-key]').forEach(el => {
+      const style = getComputedStyle(el)
+      if (parseFloat(style.opacity) < 0.9) {
+        el.classList.remove('same-as-title-in')
+        el.style.animationDelay = ''
+        el.style.opacity = ''
+        el.style.filter = ''
+        el.style.transform = ''
+      }
+    })
+  }, 1000)
 }
 
 // ═══════════ GESTION : création ═══════════

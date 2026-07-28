@@ -481,15 +481,36 @@
 
   .list-tools{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
   .list-tools .dd-filter{ margin-bottom:0; flex:1; min-width:0; }
-  .voir-toutes{
-    display:flex; align-items:center; gap:6px; flex-shrink:0; white-space:nowrap;
-    font-family:inherit; font-size:12.5px; font-weight:600; color:var(--label);
-    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
-    border-radius:100px; padding:8px 14px;
-    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+
+  /* ═══ Champ de recherche façon iOS ═══ */
+  .ios-search{
+    display:flex; align-items:center; gap:7px; height:36px; padding:0 10px;
+    background:rgba(118,118,128,0.24); border-radius:10px; margin-bottom:14px;
   }
-  .voir-toutes:active{ transform:scale(0.95); background:rgba(255,255,255,0.18); }
-  .voir-toutes svg{ width:13px; height:13px; flex-shrink:0; }
+  .ios-search .loupe{ width:16px; height:16px; color:rgba(235,235,245,0.6); flex-shrink:0; }
+  .ios-search input{
+    flex:1; min-width:0; background:none; border:none; padding:0;
+    font-size:16px; font-family:inherit; color:var(--label);
+  }
+  .ios-search input::placeholder{ color:rgba(235,235,245,0.6); }
+  .ios-search input:focus{ outline:none; }
+  .ios-search .effacer{
+    display:none; align-items:center; justify-content:center; flex-shrink:0;
+    width:18px; height:18px; color:rgba(235,235,245,0.45); padding:0;
+  }
+  .ios-search .effacer svg{ width:17px; height:17px; }
+
+  .res-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    padding:12px 14px; margin-bottom:8px; cursor:pointer;
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .res-row:active{ transform:scale(0.98); }
+  .res-row .t{ font-size:14.5px; font-weight:600; }
+  .res-row .c{ font-size:11.5px; color:var(--label-2); margin-top:2px; }
+  .res-row .fleche{ width:15px; height:15px; color:var(--label-3); flex-shrink:0; }
+  .res-compte{ font-size:12px; color:var(--label-2); margin-bottom:10px; }
 
   .dd-filter{ position:relative; margin-bottom:14px; }
   .dd-trigger{
@@ -826,6 +847,14 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
+    <div class="ios-search">
+      <svg class="loupe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.7" y2="16.7"/></svg>
+      <input type="text" id="accueil-search" placeholder="Rechercher une procédure" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button type="button" class="effacer" id="accueil-clear" aria-label="Effacer">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm3.5 12.1-1.4 1.4L12 13.4l-2.1 2.1-1.4-1.4L10.6 12 8.5 9.9l1.4-1.4L12 10.6l2.1-2.1 1.4 1.4L13.4 12l2.1 2.1Z"/></svg>
+      </button>
+    </div>
+    <div id="accueil-resultats" style="display:none;"></div>
     <div class="list-tools">
       <div class="dd-filter" id="dd-cat-sort">
         <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
@@ -838,10 +867,6 @@
           <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
         </div>
       </div>
-      <button type="button" class="voir-toutes" onclick="voirToutesProcedures()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor"/></svg>
-        Voir les procédures
-      </button>
     </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
@@ -1200,6 +1225,19 @@
   </div>
 
   <!-- Paramètres -->
+  <div class="screen" id="p-scan">
+    <h1 class="pagehead">Scanner un code</h1>
+    <div class="subhead">Visez le QR code affiché sur un poste pour ouvrir sa procédure</div>
+    <div class="scan-wrap">
+      <video id="g-scan-video" autoplay playsinline muted></video>
+      <div class="scan-frame">
+        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      </div>
+    </div>
+    <div class="scan-hint" id="g-scan-hint">Autorisez la caméra pour scanner</div>
+    <div id="g-scan-result-zone"></div>
+  </div>
+
   <div class="screen" id="p-settings">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-list')">
@@ -1266,6 +1304,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
     <span class="tab-round-label">Analyse</span>
   </button>
+  <button class="tab-round tab-round--primary" onclick="showGestionScreen('p-scan', this); startScanner('gestion')" aria-label="Scanner un QR code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
+  </button>
 </nav>
 
 <!-- ═══════════════ ESPACE ÉQUIPE ═══════════════ -->
@@ -1319,7 +1360,7 @@
   <div class="screen" id="e-scan">
     <h1 class="pagehead">Scanner un code</h1>
     <div class="subhead">Visez le QR code affiché sur votre poste</div>
-    <div class="scan-wrap" id="scan-wrap">
+    <div class="scan-wrap">
       <video id="scan-video" autoplay playsinline muted></video>
       <div class="scan-frame">
         <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
@@ -1847,11 +1888,14 @@ window.loadGlobalAnalyse = function() {
 
 // ═══ NAVIGATION (séparée par espace, pas de collision d'ids) ═══
 window.showGestionScreen = function(id, btn) {
+  if (id !== 'p-list' && typeof reinitialiserRechercheAccueil === 'function') reinitialiserRechercheAccueil()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
   document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
   if (id === 'p-create') updateModeCardsState()
+  // La caméra ne doit jamais tourner sur un écran qu'on a quitté
+  if (id !== 'p-scan') stopScanner()
 }
 window.startNewProcedure = function() {
   resetCreateForm()
@@ -2150,6 +2194,80 @@ document.addEventListener('click', (e) => {
 
 wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
 
+/* ═══ Recherche de l'accueil ═══
+   Tant que le champ est vide, on voit la grille des catégories. Dès qu'on
+   tape, elle laisse la place aux procédures correspondantes — le tri n'a plus
+   de sens à ce moment-là, il s'efface aussi. C'est le comportement d'une
+   liste iOS : la recherche recouvre le contenu au lieu de le filtrer sur place. */
+let rechercheAccueil = ''
+
+document.getElementById('accueil-search')?.addEventListener('input', (e) => {
+  rechercheAccueil = e.target.value.trim().toLowerCase()
+  majAffichageAccueil()
+})
+
+document.getElementById('accueil-clear')?.addEventListener('click', () => {
+  const champ = document.getElementById('accueil-search')
+  champ.value = ''
+  rechercheAccueil = ''
+  majAffichageAccueil()
+  champ.focus()
+})
+
+function majAffichageAccueil() {
+  const actif = rechercheAccueil.length > 0
+  const grille = document.getElementById('cat-grid')
+  const outils = document.querySelector('#p-list .list-tools')
+  const resultats = document.getElementById('accueil-resultats')
+  const effacer = document.getElementById('accueil-clear')
+  if (grille) grille.style.display = actif ? 'none' : ''
+  if (outils) outils.style.display = actif ? 'none' : ''
+  if (resultats) resultats.style.display = actif ? 'block' : 'none'
+  if (effacer) effacer.style.display = actif ? 'flex' : 'none'
+  if (actif) renderResultatsAccueil()
+}
+
+function renderResultatsAccueil() {
+  const el = document.getElementById('accueil-resultats')
+  if (!el) return
+  const q = rechercheAccueil
+  const trouves = allGestionProcedures.filter(p =>
+    (p.titre || '').toLowerCase().includes(q) ||
+    (p.categorie || 'sans catégorie').toLowerCase().includes(q)
+  )
+
+  if (trouves.length === 0) {
+    el.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à « ${escapeHtml(rechercheAccueil)} ».</p></div>`
+    return
+  }
+
+  el.innerHTML = `<div class="res-compte">${trouves.length} résultat${trouves.length > 1 ? 's' : ''}</div>`
+  trouves
+    .sort((a, b) => (a.titre || '').localeCompare(b.titre || '', 'fr', { sensitivity: 'base' }))
+    .forEach(proc => {
+      const nbEtapes = proc.etapes?.[0]?.count ?? 0
+      const div = document.createElement('div')
+      div.className = 'res-row'
+      div.innerHTML = `
+        <div style="min-width:0;">
+          <div class="t">${escapeHtml(proc.titre)}</div>
+          <div class="c">${escapeHtml(proc.categorie || 'Sans catégorie')} · ${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}</div>
+        </div>
+        <svg class="fleche" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      `
+      div.onclick = () => openAnalyse(proc.id)
+      el.appendChild(div)
+    })
+}
+
+// Le champ se vide dès qu'on quitte l'accueil, pour y revenir sur la grille
+function reinitialiserRechercheAccueil() {
+  const champ = document.getElementById('accueil-search')
+  if (champ) champ.value = ''
+  rechercheAccueil = ''
+  majAffichageAccueil()
+}
+
 let currentCategoryQuery = ''
 document.getElementById('category-search-input')?.addEventListener('input', (e) => {
   currentCategoryQuery = e.target.value.trim().toLowerCase()
@@ -2161,10 +2279,6 @@ wireSortDropdown('dd-category-sort', (sort) => { currentCategorySort = sort; ren
 
 let currentCategoryProcsData = []
 let toutesProcedures = false   // vrai quand on affiche toutes les procédures
-
-// Appelée avec le nom d'une catégorie, ou sans rien pour afficher toutes
-// les procédures d'un coup — même écran, même recherche, même tri.
-window.voirToutesProcedures = function() { openCategoryProcedures(null) }
 
 function openCategoryProcedures(nom) {
   toutesProcedures = (nom == null)
@@ -3503,9 +3617,17 @@ async function openEquipeDetail(procId) {
 }
 
 // ═══════════ ÉQUIPE : scanner ═══════════
-window.startScanner = async function() {
-  const hintEl = document.getElementById('scan-hint')
-  const video = document.getElementById('scan-video')
+/* Le même scanner sert aux deux espaces : côté équipe il ouvre la fiche à
+   consulter, côté gestion la page d'analyse de la procédure. Les éléments
+   sont dupliqués avec un préfixe pour éviter deux identifiants identiques. */
+let scanEspace = 'equipe'
+const scanEl = (nom) => document.getElementById((scanEspace === 'gestion' ? 'g-' : '') + nom)
+
+window.startScanner = async function(espace) {
+  scanEspace = espace === 'gestion' ? 'gestion' : 'equipe'
+  const hintEl = scanEl('scan-hint')
+  const video = scanEl('scan-video')
+  scanEl('scan-result-zone').innerHTML = ''
   try {
     hintEl.textContent = 'Chargement du scanner...'
     await ensureJsQR()
@@ -3527,7 +3649,7 @@ const scanCanvas = document.createElement('canvas')
 const scanCtx = scanCanvas.getContext('2d')
 function scanLoop() {
   if (!scanLoopActive) return
-  const video = document.getElementById('scan-video')
+  const video = scanEl('scan-video')
   if (video.readyState === video.HAVE_ENOUGH_DATA) {
     scanCanvas.width = video.videoWidth; scanCanvas.height = video.videoHeight
     scanCtx.drawImage(video, 0, 0, scanCanvas.width, scanCanvas.height)
@@ -3538,18 +3660,22 @@ function scanLoop() {
   requestAnimationFrame(scanLoop)
 }
 function handleScanResult(text) {
+  const espace = scanEspace
   stopScanner()
-  document.getElementById('scan-hint').textContent = 'Code reconnu'
+  scanEl('scan-hint').textContent = 'Code reconnu'
   let procId = null
   try { const url = new URL(text); procId = url.searchParams.get('proc') } catch (e) {}
-  const resultZone = document.getElementById('scan-result-zone')
+  const resultZone = scanEl('scan-result-zone')
   if (procId) {
     resultZone.innerHTML = `
       <div class="scan-result">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
         <div><div style="font-weight:600; font-size:14px;">Code reconnu</div><div style="font-size:12.5px; color:var(--label-2);">Ouverture de la procédure...</div></div>
       </div>`
-    setTimeout(() => openEquipeDetail(procId), 600)
+    setTimeout(() => {
+      if (espace === 'gestion') openAnalyse(procId)
+      else openEquipeDetail(procId)
+    }, 600)
   } else {
     resultZone.innerHTML = `<div class="error-msg">Ce code ne correspond à aucune procédure Procédo.</div>`
   }

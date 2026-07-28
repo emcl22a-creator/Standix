@@ -150,13 +150,22 @@
     display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.5); font-size:13px; overflow:hidden; position:relative; }
   .video-frame video{width:100%; height:100%; object-fit:contain;}
 
-  .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 14px; margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px; margin-bottom:10px; }
+  .step-edit-item .step-row-top{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .step-edit-item .step-num{
+    width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px;
+  }
   .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
-  .step-edit-item input{ flex:1; background:none; border:none; font-size:16px; padding:0; min-width:120px; }
-  .step-edit-item .del{ color:var(--red); font-size:16px; flex-shrink:0; }
+  .step-edit-item textarea{
+    flex:1; background:none; border:none; font-size:15.5px; padding:0; resize:none; overflow:hidden;
+    line-height:1.4; font-family:inherit; color:var(--label); min-height:22px;
+  }
+  .step-edit-item .step-row-bottom{ display:flex; align-items:center; gap:8px; padding-left:34px; }
+  .step-edit-item .del{ color:var(--red); font-size:18px; flex-shrink:0; margin-left:auto; padding:4px; }
   .step-clip-btn{
-    font-size:10.5px; font-weight:600; color:var(--label); background:rgba(255,255,255,0.08);
-    border:0.5px solid var(--border); padding:5px 10px; border-radius:100px; flex-shrink:0; white-space:nowrap;
+    font-size:11.5px; font-weight:600; color:var(--label); background:rgba(255,255,255,0.08);
+    border:0.5px solid var(--border); padding:7px 12px; border-radius:100px; flex-shrink:0; white-space:nowrap;
   }
   .step-clip-btn:active{ background:rgba(255,255,255,0.16); }
 
@@ -908,6 +917,7 @@
 
     <div class="section-title">Compte</div>
     <button class="btn ghost block" id="logout-btn" style="color:var(--red);">Se déconnecter</button>
+    <div class="note" style="text-align:center; margin-top:20px;">Version du build : 2026-07-28-v3</div>
   </div>
 </div>
 
@@ -1457,6 +1467,9 @@ window.showEquipeScreen = function(id, btn) {
 
 // ═══════════ GESTION : liste ═══════════
 let allGestionProcedures = []
+let cachedEmployes = []
+let cachedValidations = []
+let cachedEtapesByProc = {}
 
 let allCategoriesData = []
 let currentCatSort = 'az'
@@ -1486,12 +1499,28 @@ async function loadGestionProcedures() {
     return
   }
 
-  const { count: nbEmployesTotal } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
+  const procIds = procedures.map(p => p.id)
 
-  // Une seule requête pour toutes les validations de toutes les procédures, au lieu d'une requête par procédure
-  const { data: allValidations } = await supabase.from('validations').select('procedure_id').in('procedure_id', procedures.map(p => p.id))
+  // Tout ce dont la page "Analyse" a besoin est chargé ici, en une fois,
+  // pendant que l'écran de chargement est encore affiché — pour que l'ouverture
+  // d'une procédure ensuite soit instantanée (aucune requête à attendre).
+  const [{ data: fullEmployes }, { data: fullValidations }, { data: fullEtapes }] = await Promise.all([
+    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe'),
+    supabase.from('validations').select('*').in('procedure_id', procIds),
+    supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
+  ])
+
+  cachedEmployes = fullEmployes || []
+  cachedValidations = fullValidations || []
+  cachedEtapesByProc = {}
+  ;(fullEtapes || []).forEach(e => {
+    if (!cachedEtapesByProc[e.procedure_id]) cachedEtapesByProc[e.procedure_id] = []
+    cachedEtapesByProc[e.procedure_id].push(e)
+  })
+
+  const nbEmployesTotal = cachedEmployes.length
   const validationCountByProc = {}
-  ;(allValidations || []).forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
+  cachedValidations.forEach(v => { validationCountByProc[v.procedure_id] = (validationCountByProc[v.procedure_id] || 0) + 1 })
 
   const categoriesMap = {}
   procedures.forEach(p => {
@@ -1621,7 +1650,11 @@ function wireSortDropdown(prefix, onSelect) {
   const trigger = document.getElementById(prefix + '-trigger')
   const menu = document.getElementById(prefix + '-menu')
   const label = document.getElementById(prefix + '-label')
-  if (!trigger || !menu || !label) return
+  if (!trigger || !menu || !label) {
+    console.error(`[Procédo] Filtre "${prefix}" introuvable dans la page — élément manquant.`)
+    return
+  }
+  console.log(`[Procédo build v3] Filtre "${prefix}" bien connecté.`)
 
   trigger.addEventListener('click', (e) => {
     e.stopPropagation()
@@ -1634,11 +1667,15 @@ function wireSortDropdown(prefix, onSelect) {
   menu.querySelectorAll('button').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation()
-      label.textContent = btn.dataset.label
-      menu.querySelectorAll('button').forEach(b => b.classList.toggle('selected', b === btn))
-      menu.classList.remove('open')
-      trigger.classList.remove('open')
-      onSelect(btn.dataset.sort)
+      try {
+        label.textContent = btn.dataset.label
+        menu.querySelectorAll('button').forEach(b => b.classList.toggle('selected', b === btn))
+        menu.classList.remove('open')
+        trigger.classList.remove('open')
+        onSelect(btn.dataset.sort)
+      } catch (err) {
+        console.error(`[Procédo] Erreur au clic sur le tri "${prefix}" :`, err)
+      }
     })
   })
 }
@@ -2067,10 +2104,18 @@ function renderManualSteps() {
   manualSteps.forEach((step, i) => {
     const div = document.createElement('div')
     div.className = 'step-edit-item'
-    div.innerHTML = `<span class="range">${i + 1}</span><input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte)}"><span class="del">✕</span>`
-    div.querySelector('input').addEventListener('input', (e) => { manualSteps[i].texte = e.target.value })
+    div.innerHTML = `
+      <div class="step-row-top">
+        <div class="step-num">${i + 1}</div>
+        <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
+      </div>
+      <div class="step-row-bottom"><span class="del">✕</span></div>
+    `
+    const textarea = div.querySelector('textarea')
+    textarea.addEventListener('input', (e) => { manualSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
     div.querySelector('.del').addEventListener('click', () => { manualSteps.splice(i, 1); renderManualSteps() })
     listEl.appendChild(div)
+    autoResizeTextarea(textarea)
   })
 }
 
@@ -2087,8 +2132,18 @@ function renderVideoSteps() {
   videoSteps.forEach((step, i) => {
     const div = document.createElement('div')
     div.className = 'step-edit-item'
-    div.innerHTML = `<span class="range">${formatTime(step.timestamp_video)}</span><input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte)}"><span class="del">✕</span>`
-    div.querySelector('input').addEventListener('input', (e) => { videoSteps[i].texte = e.target.value })
+    div.innerHTML = `
+      <div class="step-row-top">
+        <div class="step-num">${i + 1}</div>
+        <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
+      </div>
+      <div class="step-row-bottom">
+        <span class="range">${formatTime(step.timestamp_video)}</span>
+        <span class="del">✕</span>
+      </div>
+    `
+    const textarea = div.querySelector('textarea')
+    textarea.addEventListener('input', (e) => { videoSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
     div.querySelector('.del').addEventListener('click', () => {
       videoSteps.splice(i, 1)
       renderVideoSteps()
@@ -2096,6 +2151,7 @@ function renderVideoSteps() {
       renderCapcutMarkers(player.duration)
     })
     listEl.appendChild(div)
+    autoResizeTextarea(textarea)
   })
 }
 
@@ -2162,15 +2218,26 @@ let currentAnalysePeriod = 'week'
 
 async function openAnalyse(procId) {
   showGestionScreen('p-analyse')
-  document.getElementById('analyse-titre').textContent = '...'
-  document.getElementById('analyse-subhead').textContent = 'Chargement...'
   currentAnalysePeriod = 'week'
   document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
-  const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
-  const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
-  const { data: employes } = await supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
-  const { data: validations } = await supabase.from('validations').select('*').eq('procedure_id', procId)
+  // On utilise en priorité les données déjà préchargées (instantané) ;
+  // si jamais elles manquent (cas rare), on retombe sur une requête fraîche.
+  let proc = allGestionProcedures.find(p => p.id === procId)
+  let etapes = cachedEtapesByProc[procId]
+  let employes = cachedEmployes
+  let validations = cachedValidations.filter(v => v.procedure_id === procId)
+
+  if (!proc) {
+    document.getElementById('analyse-titre').textContent = '...'
+    document.getElementById('analyse-subhead').textContent = 'Chargement...'
+    const res = await supabase.from('procedures').select('*').eq('id', procId).single()
+    proc = res.data
+  }
+  if (!etapes) {
+    const res = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
+    etapes = res.data || []
+  }
 
   currentAnalyseData = { proc, etapes: etapes || [], employes: employes || [], validations: validations || [] }
 
@@ -2554,6 +2621,11 @@ window.openEditProcedure = async function(procId, mode) {
   renderEditSteps()
 }
 
+function autoResizeTextarea(el) {
+  el.style.height = 'auto'
+  el.style.height = el.scrollHeight + 'px'
+}
+
 function renderEditSteps() {
   const listEl = document.getElementById('edit-steps-list')
   listEl.innerHTML = ''
@@ -2562,12 +2634,18 @@ function renderEditSteps() {
     div.className = 'step-edit-item'
     const hasClip = step.timestamp_video != null && editVideoUrl
     div.innerHTML = `
-      ${hasClip ? `<span class="range">${formatTime(step.timestamp_video)}</span>` : ''}
-      <input type="text" placeholder="Décrire cette étape..." value="${escapeHtml(step.texte || '')}">
-      ${editVideoUrl ? `<button type="button" class="step-clip-btn">🎯 Utiliser la position actuelle</button>` : ''}
-      <span class="del">✕</span>
+      <div class="step-row-top">
+        <div class="step-num">${i + 1}</div>
+        <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
+      </div>
+      <div class="step-row-bottom">
+        ${hasClip ? `<span class="range">${formatTime(step.timestamp_video)}</span>` : ''}
+        ${editVideoUrl ? `<button type="button" class="step-clip-btn">🎯 Utiliser la position actuelle</button>` : ''}
+        <span class="del">✕</span>
+      </div>
     `
-    div.querySelector('input').addEventListener('input', (e) => { editStepsData[i].texte = e.target.value })
+    const textarea = div.querySelector('textarea')
+    textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; autoResizeTextarea(e.target) })
     div.querySelector('.del').addEventListener('click', () => { editStepsData.splice(i, 1); renderEditSteps() })
     const clipBtn = div.querySelector('.step-clip-btn')
     if (clipBtn) {
@@ -2578,6 +2656,7 @@ function renderEditSteps() {
       })
     }
     listEl.appendChild(div)
+    autoResizeTextarea(textarea)
   })
 }
 
@@ -2618,7 +2697,7 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
 
   setButtonLoading(saveBtn, false)
   showGestionScreen('p-list')
-  loadGestionProcedures()
+  await loadGestionProcedures()
   openAnalyse(editProcedureId)
 })
 

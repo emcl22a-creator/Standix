@@ -72,18 +72,31 @@
     animation:chaloBreath1 14s ease-in-out -3.5s infinite; }
   .chalo-wrap-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
     animation:chaloBreath2 18s ease-in-out -4.5s infinite; }
-  .chalo-wrap-4{ top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
+  .chalo-wrap-4{ top:-14%; left:50%; transform:translate3d(-50%,0,0); width:120vw; height:70vw; max-width:1000px; max-height:600px;
     animation:chaloBreath3 16s ease-in-out -4s infinite; }
   .chalo-1{ background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); }
   .chalo-2{ background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); }
   .chalo-4{ background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); }
-  @keyframes chaloBreath1{0%,100%{transform:translate(0,0) scale(1); opacity:0.7;}50%{transform:translate(6%,4%) scale(1.12); opacity:0.95;}}
-  @keyframes chaloBreath2{0%,100%{transform:translate(0,0) scale(1.05); opacity:0.65;}50%{transform:translate(-5%,-6%) scale(1); opacity:0.9;}}
-  @keyframes chaloBreath3{0%,100%{transform:translateX(-50%) scale(1); opacity:0.8;}50%{transform:translateX(-50%) scale(1.15); opacity:1;}}
+  /* Plus aucun `scale()` ici, et c'est tout le sujet.
+     Un calque flouté sur 90px dont l'ÉCHELLE change oblige Safari à recalculer
+     le flou à chaque image pour garder la netteté : trois calques plein écran,
+     recalculés en continu, sur toute la durée du cycle. C'est ce qui figeait
+     l'app pendant les premières secondes, au moment où elle a le plus de
+     travail par ailleurs. Avec un simple déplacement, le flou est calculé une
+     seule fois et l'image obtenue est ensuite juste déplacée par le processeur
+     graphique — gratuit. Les couleurs, les opacités et les durées ne changent
+     pas d'un iota ; seule la légère pulsation de taille disparaît. */
+  @keyframes chaloBreath1{0%,100%{transform:translate3d(0,0,0); opacity:0.7;}50%{transform:translate3d(7%,5%,0); opacity:0.95;}}
+  @keyframes chaloBreath2{0%,100%{transform:translate3d(0,0,0); opacity:0.65;}50%{transform:translate3d(-6%,-7%,0); opacity:0.9;}}
+  @keyframes chaloBreath3{0%,100%{transform:translate3d(-50%,0,0); opacity:0.8;}50%{transform:translate3d(-50%,4%,0); opacity:1;}}
 
   /* Pendant le démarrage, tout le décor est figé : le processeur est entièrement
      disponible pour afficher l'app. Les animations reprennent une fois en place. */
+  /* Le décor reste strictement immobile tant que l'app n'est pas posée. Il est
+     visible, aux bonnes couleurs, simplement figé : il reprend son mouvement
+     là où il s'était arrêté, donc aucun saut. */
   body.booting .chalo-wrap,
+  body.calage .chalo-wrap{ animation-play-state:paused !important; }
   body.booting .brand .mark svg{ animation:none !important; }
   body.booting *{ transition:none !important; }
   /* Une seule animation d'entrée (celle de la coquille) au lieu de trois
@@ -1603,6 +1616,10 @@ function finDuDemarrage(idLogoBarre) {
   demarrageTermine = true
   const liberer = () => {
     document.body.classList.remove('booting')
+    // Le fond ne se remet en mouvement qu'une seconde et demie après
+    // l'affichage, quand plus rien d'autre ne réclame le processeur.
+    document.body.classList.add('calage')
+    setTimeout(() => document.body.classList.remove('calage'), 1500)
     // Lancé plus tôt, ce geste tombait en même temps que l'animation
     // d'apparition de l'app et sautait.
     jouerLogoBarre()
@@ -1960,9 +1977,15 @@ function playCardShuffle(containerEl, oldRects) {
   containerEl.querySelectorAll('[data-key]').forEach((el, i) => {
     const oldRect = oldRects.get(el.dataset.key)
     if (!oldRect) {
-      // Carte totalement nouvelle : même animation que le titre "Mes procédures"
-      el.classList.add('same-as-title-in')
-      el.style.animationDelay = (i * 0.04) + 's'
+      // Carte totalement nouvelle : même animation que le titre "Mes procédures".
+      // Sauf au tout premier affichage : pendant le démarrage les animations
+      // sont neutralisées, et poser la classe ici les ferait toutes démarrer
+      // d'un coup au moment où on lève la neutralisation — soit une rafale
+      // d'animations juste après l'apparition de l'app.
+      if (!document.body.classList.contains('booting')) {
+        el.classList.add('same-as-title-in')
+        el.style.animationDelay = (i * 0.04) + 's'
+      }
       return
     }
     const newRect = el.getBoundingClientRect()

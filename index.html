@@ -178,10 +178,11 @@
      n'apparaît qu'à deux endroits, révélée par un masque en dégradé. */
   .panneau-accueil{
     position:relative; overflow:hidden;
-    /* Exactement le verre des cartes de catégories : mêmes variables de fond
-       et de bordure, même arrondi. Ni flou d'arrière-plan, ni reflet, ni ombre
-       portée — les cartes n'en ont pas, le panneau ne doit pas s'en distinguer. */
-    background:var(--bg-card);
+    /* Fond plein, pas de transparence : le décor ne traverse plus le panneau.
+       La teinte reste dans la famille sombre de l'app, avec un très léger
+       dégradé pour éviter l'aplat mort. Bordure et arrondi restent ceux des
+       cartes de catégories, pour que les deux blocs se répondent. */
+    background:linear-gradient(158deg, #1D1E22 0%, #17181B 55%, #131416 100%);
     border:0.5px solid var(--border); border-radius:16px;
     padding:22px 20px 20px; margin-bottom:18px;
   }

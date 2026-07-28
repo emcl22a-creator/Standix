@@ -479,6 +479,18 @@
   }
   .filter-chips button.active{ background:#fff; color:#000; border-color:#fff; }
 
+  .list-tools{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .list-tools .dd-filter{ margin-bottom:0; flex:1; min-width:0; }
+  .voir-toutes{
+    display:flex; align-items:center; gap:6px; flex-shrink:0; white-space:nowrap;
+    font-family:inherit; font-size:12.5px; font-weight:600; color:var(--label);
+    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    border-radius:100px; padding:8px 14px;
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
+  }
+  .voir-toutes:active{ transform:scale(0.95); background:rgba(255,255,255,0.18); }
+  .voir-toutes svg{ width:13px; height:13px; flex-shrink:0; }
+
   .dd-filter{ position:relative; margin-bottom:14px; }
   .dd-trigger{
     display:flex; align-items:center; justify-content:space-between; width:100%;
@@ -535,6 +547,7 @@
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
   .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
   .cat-date{ font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; font-variant-numeric:tabular-nums; }
+  .carte-categorie{ font-size:11px; font-weight:600; color:var(--label-3); margin-top:3px; }
   .cat-attention{
     display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700;
     color:var(--orange); background:rgba(255,159,10,0.14); padding:3px 8px; border-radius:100px; margin-bottom:8px;
@@ -813,16 +826,22 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
-    <div class="dd-filter" id="dd-cat-sort">
-      <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
-        <span id="dd-cat-sort-label">Trier : A → Z</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="dd-menu" id="dd-cat-sort-menu">
-        <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
-        <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
-        <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+    <div class="list-tools">
+      <div class="dd-filter" id="dd-cat-sort">
+        <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
+          <span id="dd-cat-sort-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" id="dd-cat-sort-menu">
+          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+        </div>
       </div>
+      <button type="button" class="voir-toutes" onclick="voirToutesProcedures()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3.5" cy="6" r="1.2" fill="currentColor"/><circle cx="3.5" cy="12" r="1.2" fill="currentColor"/><circle cx="3.5" cy="18" r="1.2" fill="currentColor"/></svg>
+        Voir les procédures
+      </button>
     </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
@@ -2141,18 +2160,32 @@ let currentCategorySort = 'az'
 wireSortDropdown('dd-category-sort', (sort) => { currentCategorySort = sort; renderCategoryProceduresList() })
 
 let currentCategoryProcsData = []
+let toutesProcedures = false   // vrai quand on affiche toutes les procédures
+
+// Appelée avec le nom d'une catégorie, ou sans rien pour afficher toutes
+// les procédures d'un coup — même écran, même recherche, même tri.
+window.voirToutesProcedures = function() { openCategoryProcedures(null) }
 
 function openCategoryProcedures(nom) {
+  toutesProcedures = (nom == null)
   showGestionScreen('p-category')
-  document.getElementById('category-titre').textContent = nom
+  document.getElementById('category-titre').textContent = toutesProcedures ? 'Toutes les procédures' : nom
   document.getElementById('category-search-input').value = ''
+  document.getElementById('category-search-input').placeholder = toutesProcedures
+    ? 'Rechercher parmi toutes les procédures...'
+    : 'Rechercher une procédure...'
   currentCategoryQuery = ''
   setSortUI('dd-category-sort', currentCategorySort)
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
-  const procsInCategory = allGestionProcedures.filter(p => (p.categorie || 'Sans catégorie') === nom)
-  document.getElementById('category-subhead').textContent = `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
+  const procsInCategory = toutesProcedures
+    ? allGestionProcedures
+    : allGestionProcedures.filter(p => (p.categorie || 'Sans catégorie') === nom)
+  const nbCat = new Set(allGestionProcedures.map(p => p.categorie || 'Sans catégorie')).size
+  document.getElementById('category-subhead').textContent = toutesProcedures
+    ? `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''} · ${nbCat} catégorie${nbCat > 1 ? 's' : ''}`
+    : `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
 
   // Tout est déjà en mémoire (préchargé au démarrage) : affichage instantané, zéro attente réseau.
   const nbEmployes = cachedEmployes.length
@@ -2176,7 +2209,12 @@ function renderCategoryProceduresList() {
   listEl.innerHTML = ''
 
   const filtered = currentCategoryQuery
-    ? currentCategoryProcsData.filter(d => (d.proc.titre || '').toLowerCase().includes(currentCategoryQuery))
+    ? currentCategoryProcsData.filter(d => {
+        const titre = (d.proc.titre || '').toLowerCase()
+        // En vue globale, on peut aussi chercher par nom de catégorie
+        const cat = toutesProcedures ? (d.proc.categorie || 'sans catégorie').toLowerCase() : ''
+        return titre.includes(currentCategoryQuery) || (cat && cat.includes(currentCategoryQuery))
+      })
     : currentCategoryProcsData
 
   const parTitre = (a, b) => (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
@@ -2209,6 +2247,7 @@ function renderCategoryProceduresList() {
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
       <div class="cat-name">${escapeHtml(proc.titre)}</div>
+      ${toutesProcedures ? `<div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans catégorie')}</div>` : ''}
       <div class="cat-pct-row">
         <span class="cat-pct" style="color:${ringColor};">${pct}%</span>
         <span class="cat-pct-label">ont consulté</span>
@@ -2216,6 +2255,11 @@ function renderCategoryProceduresList() {
       ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
     `
     listEl.appendChild(div)
+  }
+
+  if (sorted.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à « ${escapeHtml(currentCategoryQuery)} ».</p></div>`
+    return
   }
 
   playCardShuffle(listEl, oldRects)

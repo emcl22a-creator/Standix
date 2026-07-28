@@ -493,7 +493,7 @@
      puis s'efface et recommence. Trois animations sur un seul petit SVG :
      coût négligeable, contrairement au décor de fond. */
   .boot-logo{
-    position:relative; width:64px; height:75px;
+    position:relative; width:40px; height:47px;
     display:flex; align-items:center; justify-content:center;
     /* Le logo se dessine une seule fois (1,9 s) puis se met à respirer
        doucement, pour ne pas paraître figé si le chargement s'éternise. */
@@ -504,7 +504,7 @@
   .boot-glow{
     position:absolute; width:150%; height:150%; border-radius:50%;
     background:radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%);
-    filter:blur(14px); animation: bootGlowOnce 1.9s ease-in-out both;
+    filter:blur(9px); animation: bootGlowOnce 1.9s ease-in-out both;
   }
   .boot-logo--once .boot-glow{ filter:blur(8px); animation: bootGlowFade 1.9s ease-in-out both; }
   @keyframes bootGlowFade{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.85;transform:scale(1)} 100%{opacity:0;transform:scale(1.1)} }
@@ -513,6 +513,13 @@
     animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both;
   }
   .boot-fill{ opacity:0; animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* Seuls les grands écrans gardent un logo plus généreux ; sur mobile il
+     occupait une place démesurée au centre de l'écran de chargement. */
+  @media (min-width: 601px){
+    .boot-logo{ width:56px; height:66px; }
+    .boot-glow{ filter:blur(13px); }
+  }
 
   @keyframes bootIdle{
     0%, 100% { transform:scale(1); }

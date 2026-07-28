@@ -495,44 +495,42 @@
   .boot-logo{
     position:relative; width:64px; height:75px;
     display:flex; align-items:center; justify-content:center;
-    animation: bootBreath 2.8s cubic-bezier(0.45,0,0.55,1) infinite;
+    /* Le logo se dessine une seule fois (1,9 s) puis se met à respirer
+       doucement, pour ne pas paraître figé si le chargement s'éternise. */
+    animation: bootBreathOnce 1.9s cubic-bezier(0.22,1,0.36,1) both,
+               bootIdle 2.6s ease-in-out 1.9s infinite;
   }
   .boot-logo svg{ width:100%; height:100%; overflow:visible; position:relative; z-index:1; }
   .boot-glow{
     position:absolute; width:150%; height:150%; border-radius:50%;
     background:radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%);
-    filter:blur(14px); animation: bootGlow 2.8s ease-in-out infinite;
+    filter:blur(14px); animation: bootGlowOnce 1.9s ease-in-out both;
   }
+  .boot-logo--once .boot-glow{ filter:blur(8px); animation: bootGlowFade 1.9s ease-in-out both; }
+  @keyframes bootGlowFade{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.85;transform:scale(1)} 100%{opacity:0;transform:scale(1.1)} }
   .boot-trace{
     stroke-dasharray:411; stroke-dashoffset:411;
-    animation: bootTrace 2.8s cubic-bezier(0.65,0,0.35,1) infinite;
+    animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both;
   }
-  .boot-fill{ opacity:0; animation: bootFill 2.8s cubic-bezier(0.22,1,0.36,1) infinite; }
+  .boot-fill{ opacity:0; animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
 
-  @keyframes bootTrace{
-    0%   { stroke-dashoffset:411; opacity:1; }
-    42%  { stroke-dashoffset:0;   opacity:1; }
-    58%  { stroke-dashoffset:0;   opacity:0; }
-    100% { stroke-dashoffset:0;   opacity:0; }
+  @keyframes bootIdle{
+    0%, 100% { transform:scale(1); }
+    50%      { transform:scale(1.045); }
   }
-  @keyframes bootFill{
-    0%, 38% { opacity:0; }
-    56%     { opacity:1; }
-    84%     { opacity:1; }
-    100%    { opacity:0; }
-  }
-  @keyframes bootBreath{
-    0%, 38% { transform:scale(0.97); }
-    58%     { transform:scale(1); }
-    84%     { transform:scale(1); }
-    100%    { transform:scale(1.06); }
-  }
-  @keyframes bootGlow{
-    0%, 40%  { opacity:0; transform:scale(0.8); }
-    62%      { opacity:1; transform:scale(1); }
-    84%      { opacity:0.8; transform:scale(1.05); }
-    100%     { opacity:0; transform:scale(1.2); }
-  }
+  /* Variante de l'écran « choix de l'espace » : le logo se dessine une seule
+     fois à l'arrivée, puis reste plein. Une boucle infinie serait fatigante
+     sur un écran où l'on doit lire et cliquer. */
+  .boot-logo--once{ width:34px; height:40px; margin:0 auto 10px;
+    animation: bootBreathOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-logo--once .boot-trace{ animation: bootTraceOnce 1.9s cubic-bezier(0.65,0,0.35,1) both; }
+  .boot-logo--once .boot-fill{ animation: bootFillOnce 1.9s cubic-bezier(0.22,1,0.36,1) both; }
+  .boot-logo--once .boot-glow{ animation: bootGlowOnce 1.9s ease-in-out both; }
+  @keyframes bootTraceOnce{ 0%{stroke-dashoffset:411;opacity:1} 62%{stroke-dashoffset:0;opacity:1} 84%{opacity:0} 100%{opacity:0} }
+  @keyframes bootFillOnce{ 0%,56%{opacity:0} 82%{opacity:1} 100%{opacity:1} }
+  @keyframes bootBreathOnce{ 0%{transform:scale(0.93)} 82%{transform:scale(1.03)} 100%{transform:scale(1)} }
+  @keyframes bootGlowOnce{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.9;transform:scale(1)} 100%{opacity:0.55;transform:scale(1)} }
+
   @media (prefers-reduced-motion: reduce){
     .boot-logo, .boot-glow, .boot-trace, .boot-fill{ animation:none !important; }
     .boot-fill{ opacity:1; }
@@ -606,9 +604,27 @@
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
     document.addEventListener(type, function (e) { e.preventDefault() }, { passive: false })
   })
-  /* Certains claviers laissent la page zoomée après une saisie : on la remet à 1. */
+  /* Filet de sécurité : si iOS a malgré tout zoomé (vieille version en cache,
+     champ ajouté plus tard...), on force le retour à l'échelle 1 en réécrivant
+     brièvement la balise viewport — c'est le seul moyen de dézoomer par script. */
+  function forcerDezoom() {
+    var vp = document.querySelector('meta[name=viewport]')
+    if (!vp) return
+    var contenu = vp.getAttribute('content')
+    vp.setAttribute('content', contenu.replace('maximum-scale=1.0', 'maximum-scale=0.99'))
+    setTimeout(function () { vp.setAttribute('content', contenu) }, 80)
+  }
   document.addEventListener('focusout', function () {
-    if (window.visualViewport && window.visualViewport.scale > 1) window.scrollTo(0, window.scrollY)
+    setTimeout(function () {
+      if (window.visualViewport && window.visualViewport.scale > 1.01) forcerDezoom()
+    }, 60)
+  })
+  document.addEventListener('focusin', function (e) {
+    if (!e.target.matches('input, textarea')) return
+    /* Une police sous 16px est la seule cause du zoom automatique d'iOS.
+       On corrige à la volée si un champ passe entre les mailles du filet. */
+    var taille = parseFloat(getComputedStyle(e.target).fontSize)
+    if (taille && taille < 16) e.target.style.fontSize = '16px'
   })
 </script>
 
@@ -634,12 +650,12 @@
 <!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
 <div class="login-wrap" id="choice-screen" style="display:none;">
   <div class="login-card" style="text-align:center;">
-    <div class="brand" style="justify-content:center; margin-bottom:14px;">
-      <span class="mark">
-        <svg viewBox="0 0 85 100" fill="none" style="width:30px; height:35px;">
-          <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
-        </svg>
-      </span>
+    <div class="boot-logo boot-logo--once">
+      <div class="boot-glow"></div>
+      <svg viewBox="0 0 85 100" fill="none">
+        <path class="boot-trace" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+        <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"/>
+      </svg>
     </div>
     <h1>Procédo</h1>
     <div class="subhead">Choisissez votre espace</div>
@@ -982,6 +998,7 @@
       </div>
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
+      <button type="button" class="btn small ghost block" id="ecap-recaler" style="display:none; margin-top:10px;">⇄ Les extraits sont décalés ? Recaler</button>
       <div class="clip-tools" id="ecap-tools">
         <button type="button" class="clip-tool" id="ecap-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
         <button type="button" class="clip-tool" id="ecap-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
@@ -1457,6 +1474,17 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   enterApp(membre)
 })
 
+/* L'écran de chargement affiche le logo qui se dessine (1,9 s), puis le garde
+   encore 1,3 s une fois terminé avant de laisser la place à l'app. */
+const DUREE_ANIM_LOGO = 1900
+const MAINTIEN_LOGO = 1300
+const debutChargement = performance.now()
+
+function attendreFinAnimationLogo() {
+  const restant = (DUREE_ANIM_LOGO + MAINTIEN_LOGO) - (performance.now() - debutChargement)
+  return new Promise(resolve => setTimeout(resolve, Math.max(0, restant)))
+}
+
 async function enterApp(membre) {
   currentMembre = membre
 
@@ -1471,6 +1499,7 @@ async function enterApp(membre) {
 
   if (membre.role === 'gestion') {
     await loadGestionProcedures()
+    await attendreFinAnimationLogo()
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -1481,6 +1510,7 @@ async function enterApp(membre) {
     finDuDemarrage()
   } else {
     await loadEquipeProcedures()
+    await attendreFinAnimationLogo()
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -2960,22 +2990,7 @@ async function openAnalyse(procId) {
   if (currentAnalyseData.etapes.length === 0) {
     stepsListEl.innerHTML = '<div class="note">Aucune étape pour le moment.</div>'
   } else {
-    // Chaque étape porte son propre début et sa propre fin ; repli sur l'ancien
-    // calcul pour les procédures créées avant l'ajout de la fin de clip.
-    const videoStepsOrdered = currentAnalyseData.etapes
-      .filter(e => e.timestamp_video != null)
-      .sort((a, b) => a.timestamp_video - b.timestamp_video)
-    const clipBounds = new Map()
-    videoStepsOrdered.forEach((e, idx) => {
-      let start = e.timestamp_video
-      let end = e.fin_video
-      if (end == null) {
-        const suivante = videoStepsOrdered[idx + 1]
-        end = suivante ? suivante.timestamp_video : start + 15
-      }
-      if (end <= start) end = start + 1
-      clipBounds.set(e.id, { start, end })
-    })
+    const clipBounds = calculerBornes(currentAnalyseData.etapes, videoEl?.duration)
 
     currentAnalyseData.etapes.forEach((etape, i) => {
       const div = document.createElement('div')
@@ -3172,23 +3187,7 @@ async function openEquipeDetail(procId) {
 
   const stepsEl = document.getElementById('detail-steps')
   stepsEl.innerHTML = ''
-  // Chaque étape porte maintenant son propre début ET sa propre fin.
-  // Pour les anciennes procédures (fin absente), on retombe sur l'ancien calcul.
-  const videoStepsOrdered = (etapes || [])
-    .filter(e => e.timestamp_video != null)
-    .sort((a, b) => a.timestamp_video - b.timestamp_video)
-  const clipBounds = new Map()
-  videoStepsOrdered.forEach((e, idx) => {
-    let start = e.timestamp_video
-    let end = e.fin_video
-    if (end == null) {
-      const suivante = videoStepsOrdered[idx + 1]
-      end = suivante ? suivante.timestamp_video : null
-      if (end == null) end = start + 15
-    }
-    if (end <= start) end = start + 1
-    clipBounds.set(e.id, { start, end })
-  })
+  const clipBounds = calculerBornes(etapes, detailVideoEl?.duration)
 
   ;(etapes || []).forEach((etape, i) => {
     const div = document.createElement('div')
@@ -3292,6 +3291,8 @@ let editProcedureId = null
 let editMode = 'edit' // 'edit' | 'ai-review'
 let editStepsData = [] // { id: uuid|null, texte, timestamp_video }
 let editVideoUrl = null
+let conventionClips = 'fin'   // sens de lecture des horodatages : 'debut' | 'fin'
+let clipsDeduits = false      // vrai si les bornes ont été déduites, pas lues en base
 
 window.openEditProcedure = async function(procId, mode) {
   editProcedureId = procId
@@ -3342,6 +3343,7 @@ window.openEditProcedure = async function(procId, mode) {
     videoEl.addEventListener('loadedmetadata', async () => {
       editStepsData = normaliserClips(editStepsData, videoEl.duration)
       renderEditSteps()
+      majBoutonRecalage()
       ecapEditor?.repaint()
       await generateFilmstrip(videoEl, 'ecap-track')
       ecapEditor?.repaint()
@@ -3351,26 +3353,121 @@ window.openEditProcedure = async function(procId, mode) {
     ecapWrap.style.display = 'none'
   }
 
+  clipsDeduits = false
   editStepsData = (etapes || []).map(e => ({
     id: e.id, texte: e.texte,
     timestamp_video: e.timestamp_video,
     fin_video: e.fin_video != null ? e.fin_video : null,
+    _t: e.timestamp_video,   // horodatage brut conservé pour pouvoir recaler
   }))
   ecapEditor?.deselect()
   renderEditSteps()
+  majBoutonRecalage()
 }
 
-// Anciennes procédures : la fin d'un clip n'était pas enregistrée, elle était
-// déduite du début de l'étape suivante. On reconstruit ça une fois pour toutes.
-function normaliserClips(steps, duree) {
-  const avecVideo = steps.filter(s => s.timestamp_video != null)
+// Le bouton de recalage n'apparaît que quand les bornes ont été déduites
+// (procédure jamais encore vérifiée), pas quand elles viennent de la base.
+function majBoutonRecalage() {
+  const btn = document.getElementById('ecap-recaler')
+  if (!btn) return
+  btn.style.display = (clipsDeduits && editVideoUrl) ? 'block' : 'none'
+}
+
+document.getElementById('ecap-recaler')?.addEventListener('click', () => {
+  const videoEl = document.getElementById('edit-video-player')
+  conventionClips = conventionClips === 'debut' ? 'fin' : 'debut'
+  deriverClips(editStepsData, videoEl?.duration, conventionClips)
+  ecapEditor?.deselect()
+  renderEditSteps()
+  ecapEditor?.repaint()
+  toast('Étapes recalées. Touchez une étape pour vérifier.')
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   BORNES DES CLIPS
+
+   Une étape n'a longtemps eu qu'un seul horodatage, `timestamp_video`, et deux
+   lectures opposées coexistaient :
+     • « fin »   — l'horodatage marque la FIN de l'étape (le point de coupe),
+                   le début étant celui de l'étape précédente. C'est la logique
+                   du bouton « ✂ Couper ici » d'origine, et celle qu'utilise
+                   la fonction d'analyse IA.
+     • « début » — l'horodatage marque le DÉBUT de l'étape, la fin étant le
+                   début de la suivante.
+   Lire les données dans le mauvais sens décale toutes les étapes d'un cran :
+   le texte de l'étape 1 se retrouve sur l'extrait de l'étape 2, etc.
+   On détecte donc la convention à partir des données elles-mêmes.
+   Une fois l'étape enregistrée, `fin_video` existe et la question ne se pose plus.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function detecterConvention(horodatages, duree) {
+  if (!horodatages.length) return 'fin'
+  const premier = horodatages[0]
+  const dernier = horodatages[horodatages.length - 1]
+  const d = isFinite(duree) && duree > 0 ? duree : null
+  // Un premier horodatage à zéro ne peut pas être une fin : ce sont des débuts.
+  if (premier <= 1) return 'debut'
+  // Un dernier horodatage collé à la fin de la vidéo ne peut pas être un début.
+  if (d && dernier >= d - 2) return 'fin'
+  return 'fin'
+}
+
+// Calcule début et fin de chaque étape à partir des horodatages bruts
+function deriverClips(steps, duree, convention) {
+  const avecVideo = steps.filter(s => s._t != null)
   avecVideo.forEach((s, idx) => {
-    if (s.fin_video != null) return
-    const suivante = avecVideo[idx + 1]
-    s.fin_video = suivante ? suivante.timestamp_video : (isFinite(duree) ? duree : s.timestamp_video + 8)
+    if (convention === 'debut') {
+      s.timestamp_video = s._t
+      const suivante = avecVideo[idx + 1]
+      s.fin_video = suivante ? suivante._t : (isFinite(duree) ? duree : s._t + 8)
+    } else {
+      const precedente = avecVideo[idx - 1]
+      s.timestamp_video = precedente ? precedente._t : 0
+      s.fin_video = s._t
+    }
     if (s.fin_video <= s.timestamp_video) s.fin_video = s.timestamp_video + 1
   })
   return steps
+}
+
+// Prépare les étapes chargées : on garde l'horodatage brut de côté pour pouvoir
+// recalculer dans l'autre sens si besoin, puis on déduit les bornes manquantes.
+function normaliserClips(steps, duree) {
+  const aDeduire = steps.filter(s => s.timestamp_video != null && s.fin_video == null)
+  if (aDeduire.length === 0) return steps
+  steps.forEach(s => { if (s._t == null && s.timestamp_video != null) s._t = s.timestamp_video })
+  conventionClips = detecterConvention(aDeduire.map(s => s._t), duree)
+  clipsDeduits = true
+  return deriverClips(steps, duree, conventionClips)
+}
+
+// Même logique, en lecture seule, pour les écrans qui se contentent d'afficher
+function calculerBornes(etapes, duree) {
+  const bornes = new Map()
+  const avecVideo = (etapes || []).filter(e => e.timestamp_video != null)
+    .sort((a, b) => a.timestamp_video - b.timestamp_video)
+  if (!avecVideo.length) return bornes
+
+  const manquantes = avecVideo.filter(e => e.fin_video == null)
+  const convention = manquantes.length
+    ? detecterConvention(manquantes.map(e => e.timestamp_video), duree)
+    : 'debut'
+
+  avecVideo.forEach((e, idx) => {
+    let debut, fin
+    if (e.fin_video != null) {
+      debut = e.timestamp_video
+      fin = e.fin_video
+    } else if (convention === 'debut') {
+      debut = e.timestamp_video
+      fin = avecVideo[idx + 1] ? avecVideo[idx + 1].timestamp_video : (isFinite(duree) ? duree : debut + 15)
+    } else {
+      debut = avecVideo[idx - 1] ? avecVideo[idx - 1].timestamp_video : 0
+      fin = e.timestamp_video
+    }
+    if (fin <= debut) fin = debut + 1
+    bornes.set(e.id, { start: debut, end: fin })
+  })
+  return bornes
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -3581,11 +3678,15 @@ try {
     } catch (e) {
       console.error('Erreur de vérification de session :', e)
     }
-    // Pas de session valide (ou erreur) : afficher l'écran de choix d'espace
+    // Pas de session valide (ou erreur) : afficher l'écran de choix d'espace.
+    // Le drapeau est posé AVANT l'attente, sinon le filet de secours des 6 s
+    // pourrait afficher l'écran de choix pendant qu'on laisse finir l'animation.
+    // Aucune attente ici : l'écran de choix des espaces s'affiche tout de suite.
+    // Le maintien du logo n'a de sens que quand on entre réellement dans l'app.
+    window.__procedoLoaded = true
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('choice-screen').style.display = 'flex'
     document.body.classList.remove('booting')
-    window.__procedoLoaded = true
   })()
 } catch (e) {
   console.error('Erreur au chargement :', e)

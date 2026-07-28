@@ -244,15 +244,31 @@
   .mode-choice-desc{ font-size:12px; color:var(--label-2); margin-top:2px; }
   .mode-choice-arrow{ font-size:22px; color:var(--label-2); flex-shrink:0; }
 
-  .cat-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+  .cat-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
   .cat-cell{
-    padding:18px 12px; text-align:center; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    padding:16px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    position:relative; overflow:hidden;
   }
-  .cat-cell:active{ transform:scale(0.96); }
-  .cat-cell .cat-icon{ font-size:30px; margin-bottom:10px; }
-  .cat-cell .cat-name{ font-size:13.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .cat-cell .cat-count{ font-size:11px; color:var(--label-2); margin-top:3px; margin-bottom:10px; }
-  .cat-cell .cat-recent{ text-align:center; border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
+  .cat-cell:active{ transform:scale(0.97); }
+  .cat-cell .cat-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .cat-cell .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
+  .cat-cell .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
+  .cat-cell .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
+  .cat-cell .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
+  .cat-cell .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .cat-cell .cat-badge{
+    font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--label-2);
+    padding:4px 9px; border-radius:100px; flex-shrink:0;
+  }
+  .cat-cell .cat-name{ font-size:14.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  .cat-cell .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
+  .cat-cell .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
+  .cat-cell .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
+  .cat-cell .cat-attention{
+    display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700;
+    color:var(--orange); background:rgba(255,159,10,0.14); padding:3px 8px; border-radius:100px; margin-bottom:8px;
+  }
+  .cat-cell .cat-recent{ border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
   .cat-cell .cat-recent-item{
     font-size:10.5px; color:var(--label-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     padding:2px 0;
@@ -1251,27 +1267,60 @@ async function loadGestionProcedures() {
     return
   }
 
+  const { count: nbEmployesTotal } = await supabase.from('membres').select('*', { count: 'exact', head: true }).eq('entreprise_id', currentMembre.entreprise_id).eq('role', 'equipe')
+
   const categoriesMap = {}
   procedures.forEach(p => {
     const nom = p.categorie || 'Sans catégorie'
     if (!categoriesMap[nom]) categoriesMap[nom] = '📁'
   })
-  Object.entries(categoriesMap).forEach(([nom, icone]) => {
+  for (const [nom, icone] of Object.entries(categoriesMap)) {
     const procsInCat = procedures.filter(p => (p.categorie || 'Sans catégorie') === nom) // déjà trié du plus récent au plus ancien
     const recentTitles = procsInCat.slice(0, 3)
+
+    // Taux moyen de consultation de la catégorie (moyenne des taux de chaque procédure)
+    let avgPct = 0
+    if (nbEmployesTotal > 0) {
+      let totalRatio = 0
+      for (const p of procsInCat) {
+        const { count: nbVal } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', p.id)
+        totalRatio += Math.min(1, (nbVal || 0) / nbEmployesTotal)
+      }
+      avgPct = procsInCat.length > 0 ? Math.round((totalRatio / procsInCat.length) * 100) : 0
+    }
+
+    const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
+    const circumference = 2 * Math.PI * 20
+    const dashoffset = circumference * (1 - avgPct / 100)
+    const needsAttention = nbEmployesTotal > 0 && avgPct < 30
+
     const cell = document.createElement('div')
     cell.className = 'cat-cell'
     cell.innerHTML = `
-      <div class="cat-icon">${icone}</div>
+      <div class="cat-top">
+        <div class="cat-ring-wrap">
+          <svg viewBox="0 0 46 46">
+            <circle class="cat-ring-bg" cx="23" cy="23" r="20"/>
+            <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
+          </svg>
+          <div class="cat-icon">${icone}</div>
+        </div>
+        <div class="cat-badge">${procsInCat.length}</div>
+      </div>
       <div class="cat-name">${escapeHtml(nom)}</div>
-      <div class="cat-count">${procsInCat.length} procédure${procsInCat.length > 1 ? 's' : ''}</div>
+      <div class="cat-pct-row">
+        <span class="cat-pct" style="color:${ringColor};">${avgPct}%</span>
+        <span class="cat-pct-label">consultées</span>
+      </div>
+      ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
       <div class="cat-recent">
         ${recentTitles.map(p => `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}
       </div>
     `
     cell.onclick = () => openCategoryProcedures(nom)
     catGridEl.appendChild(cell)
-  })
+  }
 }
 
 async function openCategoryProcedures(nom) {

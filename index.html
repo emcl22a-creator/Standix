@@ -660,22 +660,30 @@
 
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px; display:flex; align-items:center; gap:6px; z-index:10;
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
+  /* Pastille glissante : c'est elle qui porte le fond clair de l'onglet actif.
+     Les boutons n'ont donc plus de fond à eux, sinon on verrait deux formes. */
+  .tab-pill{
+    position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
+    background:rgba(255,255,255,0.26); pointer-events:none; opacity:0;
+    transition: transform 0.45s cubic-bezier(0.34,1.4,0.5,1), opacity 0.25s ease;
+  }
   /* Onglets sans texte : icône seule, en ligne quand l'onglet dort, pleine et
      blanche quand on est sur la page. Deux tracés superposés dans chaque
      bouton, on montre l'un ou l'autre. */
-  .tab-round{ width:52px; height:52px; border-radius:100px; display:flex; align-items:center; justify-content:center; padding:0;
-    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s; }
+  .tab-round{ position:relative; z-index:1; width:44px; height:44px; border-radius:100px;
+    display:flex; align-items:center; justify-content:center; padding:0;
+    transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), color 0.25s; }
   .tab-round:active{ transform:scale(0.88); }
-  .tab-round svg{ width:26px; height:26px; }
-  .tab-round--secondary{ background:rgba(255,255,255,0.14); border:0.5px solid rgba(255,255,255,0.10); color:rgba(235,235,245,0.65); }
-  .tab-round--secondary.active{ background:rgba(255,255,255,0.24); color:#fff; }
+  .tab-round svg{ width:23px; height:23px; }
+  .tab-round--secondary{ background:none; border:none; color:rgba(235,235,245,0.6); }
+  .tab-round--secondary.active{ color:#fff; }
   .tab-round .ico-plein{ display:none; }
   .tab-round.active .ico-ligne{ display:none; }
   .tab-round.active .ico-plein{ display:block; }
-  .tab-round--primary{ background:#fff; color:#000; width:52px; height:52px; padding:0; box-shadow:0 4px 12px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4); }
-  .tab-round--primary svg{ width:26px; height:26px; }
+  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4); }
+  .tab-round--primary svg{ width:23px; height:23px; }
 </style>
 </head>
 <body class="booting">
@@ -1264,6 +1272,7 @@
 </div>
 
 <nav class="tabbar" id="tabbar-gestion" style="display:none;">
+  <div class="tab-pill"></div>
   <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
@@ -1340,6 +1349,7 @@
 </div>
 
 <nav class="tabbar" id="tabbar-equipe" style="display:none;">
+  <div class="tab-pill"></div>
   <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
@@ -1611,6 +1621,9 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
+    // Premier placement sans animation : la barre vient d'apparaître, la
+    // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
+    placerPastilleSansAnimation('tabbar-gestion')
     // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
@@ -1624,6 +1637,9 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
+    // Premier placement sans animation : la barre vient d'apparaître, la
+    // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
+    placerPastilleSansAnimation('tabbar-equipe')
     // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
@@ -1854,12 +1870,37 @@ window.loadGlobalAnalyse = function() {
   }
 }
 
+/* Place la pastille sous l'onglet actif. Sur un écran ouvert sans passer par
+   un onglet (détail, création, réglages...), aucun onglet n'est actif : la
+   pastille s'efface au lieu de rester posée sous le mauvais bouton. */
+function placerPastilleSansAnimation(idBarre) {
+  const pastille = document.getElementById(idBarre)?.querySelector('.tab-pill')
+  if (!pastille) return
+  const memeTransition = pastille.style.transition
+  pastille.style.transition = 'none'
+  majPastille(idBarre)
+  void pastille.offsetWidth
+  pastille.style.transition = memeTransition
+}
+
+function majPastille(idBarre) {
+  const barre = document.getElementById(idBarre)
+  if (!barre) return
+  const pastille = barre.querySelector('.tab-pill')
+  const actif = barre.querySelector('.tab-round.active')
+  if (!pastille) return
+  if (!actif) { pastille.style.opacity = '0'; return }
+  pastille.style.transform = `translate(${actif.offsetLeft}px, ${actif.offsetTop}px)`
+  pastille.style.opacity = '1'
+}
+
 // ═══ NAVIGATION (séparée par espace, pas de collision d'ids) ═══
 window.showGestionScreen = function(id, btn) {
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
   document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
+  majPastille('tabbar-gestion')
   if (id === 'p-create') updateModeCardsState()
   // La caméra ne doit jamais tourner sur un écran qu'on a quitté
   if (id !== 'p-scan') stopScanner()
@@ -1881,6 +1922,7 @@ window.showEquipeScreen = function(id, btn) {
   document.getElementById(id).classList.add('active')
   document.querySelectorAll('#tabbar-equipe .tab-round').forEach(b => b.classList.remove('active'))
   if (btn) btn.classList.add('active')
+  majPastille('tabbar-equipe')
   if (id !== 'e-scan') stopScanner()
   remonterEnHaut()
 }

@@ -709,16 +709,10 @@
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
-      <div class="dd-filter" id="dd-analyse-period" style="margin-top:14px;">
-        <button class="dd-trigger" onclick="toggleDD('dd-analyse-period')" style="color:rgba(255,255,255,0.85);">
-          <span id="dd-analyse-period-label">Cette semaine</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="dd-menu">
-          <button class="selected" onclick="selectDD('dd-analyse-period','week','Cette semaine'); setAnalysePeriod('week')">Cette semaine</button>
-          <button onclick="selectDD('dd-analyse-period','month','Ce mois-ci'); setAnalysePeriod('month')">Ce mois-ci</button>
-          <button onclick="selectDD('dd-analyse-period','all','Total'); setAnalysePeriod('all')">Total</button>
-        </div>
+      <div class="filter-chips" id="analyse-period-toggle" style="margin-top:14px;">
+        <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
+        <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
+        <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
       </div>
     </div>
 
@@ -754,20 +748,19 @@
       <div class="num" id="ga-taux-global">—</div>
       <div class="sub" id="ga-sub-global">—</div>
       <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
-      <div class="dd-filter" id="dd-ga-period" style="margin-top:14px;">
-        <button class="dd-trigger" onclick="toggleDD('dd-ga-period')" style="color:rgba(255,255,255,0.85);">
-          <span id="dd-ga-period-label">Cette semaine</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="dd-menu">
-          <button class="selected" onclick="selectDD('dd-ga-period','week','Cette semaine'); setGaPeriod('week')">Cette semaine</button>
-          <button onclick="selectDD('dd-ga-period','month','Ce mois-ci'); setGaPeriod('month')">Ce mois-ci</button>
-          <button onclick="selectDD('dd-ga-period','all','Total'); setGaPeriod('all')">Total</button>
-        </div>
+      <div class="filter-chips" id="ga-period-toggle" style="margin-top:14px;">
+        <button class="active" data-period="week" onclick="setGaPeriod('week')">Cette semaine</button>
+        <button data-period="month" onclick="setGaPeriod('month')">Ce mois-ci</button>
+        <button data-period="all" onclick="setGaPeriod('all')">Total</button>
       </div>
     </div>
 
     <div class="section-title">Vue d'ensemble</div>
+    <div class="emp-row">
+      <div class="check done" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.1); position:relative;"><span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px;">📁</span></div>
+      <div class="emp-row-name">Catégories</div>
+      <div class="emp-row-date" id="ga-nb-categories">—</div>
+    </div>
     <div class="emp-row">
       <div class="check done" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.1); position:relative;"><span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px;">📄</span></div>
       <div class="emp-row-name">Procédures</div>
@@ -1258,6 +1251,7 @@ let currentGaPeriod = 'week'
 
 window.setGaPeriod = function(period) {
   currentGaPeriod = period
+  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
   renderGaStats()
 }
 
@@ -1300,8 +1294,10 @@ window.loadGlobalAnalyse = async function() {
   const employes = (membres || []).filter(m => m.role === 'equipe')
   currentGaData = { procedures: procedures || [], membres: membres || [], employes, validations: validations || [] }
   currentGaPeriod = 'week'
-  selectDD('dd-ga-period', 'week', 'Cette semaine')
+  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
+  const nbCategories = new Set((procedures || []).map(p => p.categorie || 'Sans catégorie')).size
+  document.getElementById('ga-nb-categories').textContent = nbCategories
   document.getElementById('ga-nb-procedures').textContent = procedures?.length || 0
   document.getElementById('ga-nb-membres').textContent = membres?.length || 0
 
@@ -1872,7 +1868,7 @@ async function openAnalyse(procId) {
   document.getElementById('analyse-titre').textContent = '...'
   document.getElementById('analyse-subhead').textContent = 'Chargement...'
   currentAnalysePeriod = 'week'
-  selectDD('dd-analyse-period', 'week', 'Cette semaine')
+  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
   const { data: proc } = await supabase.from('procedures').select('*').eq('id', procId).single()
   const { data: etapes } = await supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre')
@@ -1972,6 +1968,7 @@ async function openAnalyse(procId) {
 
 window.setAnalysePeriod = function(period) {
   currentAnalysePeriod = period
+  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
   renderAnalyseStats()
 }
 

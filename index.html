@@ -245,31 +245,32 @@
   .mode-choice-arrow{ font-size:22px; color:var(--label-2); flex-shrink:0; }
 
   .cat-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
-  .cat-cell{
+  .cat-cell, .proc-rich-card{
     padding:16px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     position:relative; overflow:hidden;
   }
-  .cat-cell:active{ transform:scale(0.97); }
-  .cat-cell .cat-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .cat-cell .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
-  .cat-cell .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
-  .cat-cell .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
-  .cat-cell .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
-  .cat-cell .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
-  .cat-cell .cat-badge{
+  .cat-cell:active, .proc-rich-card:active{ transform:scale(0.97); }
+  .proc-rich-card{ margin-bottom:10px; }
+  .cat-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
+  .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
+  .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
+  .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
+  .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .cat-badge{
     font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
   }
-  .cat-cell .cat-name{ font-size:14.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
-  .cat-cell .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
-  .cat-cell .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
-  .cat-cell .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
-  .cat-cell .cat-attention{
+  .cat-name{ font-size:14.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
+  .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
+  .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
+  .cat-attention{
     display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700;
     color:var(--orange); background:rgba(255,159,10,0.14); padding:3px 8px; border-radius:100px; margin-bottom:8px;
   }
-  .cat-cell .cat-recent{ border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
-  .cat-cell .cat-recent-item{
+  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
+  .cat-recent-item{
     font-size:10.5px; color:var(--label-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
     padding:2px 0;
   }
@@ -475,6 +476,10 @@
     <h1 class="pagehead">Mes procédures</h1>
     <div class="subhead" id="p-list-subhead">Chargement...</div>
     <button class="btn block" style="margin-bottom:18px;" onclick="startNewProcedure()">+ Créer une procédure</button>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="cat-search-input" placeholder="Filtrer les catégories...">
+    </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>
 
@@ -1323,6 +1328,14 @@ async function loadGestionProcedures() {
   }
 }
 
+document.getElementById('cat-search-input').addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase()
+  document.querySelectorAll('#cat-grid .cat-cell').forEach(cell => {
+    const name = cell.querySelector('.cat-name')?.textContent.toLowerCase() || ''
+    cell.style.display = name.includes(q) ? 'block' : 'none'
+  })
+})
+
 async function openCategoryProcedures(nom) {
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = nom
@@ -1338,17 +1351,36 @@ async function openCategoryProcedures(nom) {
   for (const proc of procsInCategory) {
     const { count: nbValidations } = await supabase.from('validations').select('*', { count: 'exact', head: true }).eq('procedure_id', proc.id)
     const nbEtapes = proc.etapes?.[0]?.count ?? 0
+
+    const pct = nbEmployes > 0 ? Math.round(Math.min(1, (nbValidations || 0) / nbEmployes) * 100) : 0
+    const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
+    const circumference = 2 * Math.PI * 20
+    const dashoffset = circumference * (1 - pct / 100)
+    const needsAttention = nbEmployes > 0 && pct < 30
+
     const div = document.createElement('div')
-    div.className = 'sop-card'
+    div.className = 'card proc-rich-card'
     div.style.animationDelay = (cardIndex * 0.05) + 's'
     cardIndex++
     div.onclick = () => openAnalyse(proc.id)
     div.innerHTML = `
-      <div>
-        <div class="title">${escapeHtml(proc.titre)}</div>
-        <div class="meta">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
+      <div class="cat-top">
+        <div class="cat-ring-wrap">
+          <svg viewBox="0 0 46 46">
+            <circle class="cat-ring-bg" cx="23" cy="23" r="20"/>
+            <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
+          </svg>
+          <div class="cat-icon">📄</div>
+        </div>
+        <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
-      <span class="badge ${nbValidations >= nbEmployes && nbEmployes>0 ? 'ok' : 'pending'}">${nbValidations}/${nbEmployes || 0}</span>
+      <div class="cat-name">${escapeHtml(proc.titre)}</div>
+      <div class="cat-pct-row">
+        <span class="cat-pct" style="color:${ringColor};">${pct}%</span>
+        <span class="cat-pct-label">ont consulté</span>
+      </div>
+      ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
     `
     listEl.appendChild(div)
   }

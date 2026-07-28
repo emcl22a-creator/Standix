@@ -694,9 +694,29 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe la vidéo</h1>
     </div>
-    <div class="subhead">Bientôt disponible</div>
-    <div class="card" style="text-align:center; padding:28px 20px;">
-      <div style="font-size:13px; color:var(--label-2); line-height:1.6;">Cette fonctionnalité arrive prochainement.</div>
+    <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
+
+    <div class="card" id="ai-upload-card">
+      <input type="file" id="ai-video-input" accept="video/*" style="margin-bottom:10px;">
+      <div class="video-frame" id="ai-video-frame">
+        <video id="ai-video-player" style="display:none;" playsinline></video>
+        <span id="ai-video-placeholder">Aucune vidéo importée</span>
+      </div>
+      <button class="btn block" style="margin-top:14px;" id="ai-launch-btn" disabled>Lancer l'analyse</button>
+      <div class="error-msg" id="ai-error"></div>
+    </div>
+
+    <div class="card" id="ai-progress-card" style="display:none; text-align:center; padding:28px 20px;">
+      <div class="spinner" style="margin:0 auto 16px;"></div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-progress-title">Analyse en cours...</div>
+      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">Ça peut prendre quelques minutes selon la durée de la vidéo. Vous pouvez quitter cette page, le traitement continue en arrière-plan.</div>
+    </div>
+
+    <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
+      <div style="font-size:32px; margin-bottom:10px;">✅</div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
+      <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
+      <button class="btn block" id="ai-view-btn">Voir la procédure</button>
     </div>
   </div>
 
@@ -1674,11 +1694,124 @@ document.getElementById('new-titre').addEventListener('input', updateModeCardsSt
 document.getElementById('new-categorie').addEventListener('input', updateModeCardsState)
 
 function goToCreateMode(mode) {
+  if (mode === 'ai') resetAiScreen()
   if (mode === 'manual') showGestionScreen('p-create-manual')
   else if (mode === 'video') showGestionScreen('p-create-video')
   else showGestionScreen('p-create-ai')
 }
 window.goToCreateMode = goToCreateMode
+
+// ═══════════ GESTION : L'IA découpe la vidéo ═══════════
+let aiVideoFile = null
+let aiPollTimer = null
+let aiProcedureId = null
+
+function resetAiScreen() {
+  document.getElementById('ai-video-input').value = ''
+  document.getElementById('ai-video-player').style.display = 'none'
+  document.getElementById('ai-video-placeholder').style.display = 'block'
+  document.getElementById('ai-launch-btn').disabled = true
+  document.getElementById('ai-error').textContent = ''
+  document.getElementById('ai-upload-card').style.display = 'block'
+  document.getElementById('ai-progress-card').style.display = 'none'
+  document.getElementById('ai-done-card').style.display = 'none'
+  aiVideoFile = null
+  aiProcedureId = null
+  if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+}
+
+document.getElementById('ai-video-input').addEventListener('change', (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+  aiVideoFile = file
+  const url = URL.createObjectURL(file)
+  const player = document.getElementById('ai-video-player')
+  player.src = url
+  player.style.display = 'block'
+  document.getElementById('ai-video-placeholder').style.display = 'none'
+  document.getElementById('ai-launch-btn').disabled = false
+})
+
+document.getElementById('ai-launch-btn').addEventListener('click', async () => {
+  const errorEl = document.getElementById('ai-error')
+  errorEl.textContent = ''
+  const titre = document.getElementById('new-titre').value.trim()
+  const categorie = document.getElementById('new-categorie').value.trim()
+
+  if (!titre) { errorEl.textContent = 'Le titre est obligatoire (en haut de la page précédente).'; return }
+  if (!aiVideoFile) { errorEl.textContent = 'Importez une vidéo.'; return }
+
+  const launchBtn = document.getElementById('ai-launch-btn')
+  setButtonLoading(launchBtn, true)
+
+  try {
+    // 1. Upload de la vidéo
+    const path = `${currentMembre.entreprise_id}/${Date.now()}_${aiVideoFile.name}`
+    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile)
+    if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
+    const { data: publicUrlData } = supabase.storage.from('procedo-videos').getPublicUrl(path)
+    const videoUrl = publicUrlData.publicUrl
+
+    // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
+    const { data: newProc, error: procError } = await supabase
+      .from('procedures')
+      .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, video_url: videoUrl, created_by: currentMembre.id, statut: 'traitement' })
+      .select().single()
+    if (procError) throw new Error(procError.message)
+    aiProcedureId = newProc.id
+
+    // 3. Démarrage de l'analyse Azure
+    const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ procedure_id: newProc.id, video_url: videoUrl }),
+    })
+    const startData = await startRes.json()
+    if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")
+
+    setButtonLoading(launchBtn, false)
+    document.getElementById('ai-upload-card').style.display = 'none'
+    document.getElementById('ai-progress-card').style.display = 'block'
+    pollAiStatus()
+  } catch (e) {
+    setButtonLoading(launchBtn, false)
+    errorEl.textContent = e.message
+  }
+})
+
+async function pollAiStatus() {
+  try {
+    const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ procedure_id: aiProcedureId }),
+    })
+    const data = await checkRes.json()
+
+    if (data.status === 'processing') {
+      aiPollTimer = setTimeout(pollAiStatus, 6000)
+      return
+    }
+    if (data.status === 'ready') {
+      document.getElementById('ai-progress-card').style.display = 'none'
+      document.getElementById('ai-done-card').style.display = 'block'
+      document.getElementById('ai-done-sub').textContent = `${data.nb_etapes} étape${data.nb_etapes > 1 ? 's' : ''} générée${data.nb_etapes > 1 ? 's' : ''} par l'IA`
+      document.getElementById('ai-view-btn').onclick = () => {
+        showGestionScreen('p-list')
+        loadGestionProcedures()
+        openAnalyse(aiProcedureId)
+      }
+      return
+    }
+    // status === 'error'
+    document.getElementById('ai-progress-card').style.display = 'none'
+    document.getElementById('ai-upload-card').style.display = 'block'
+    document.getElementById('ai-error').textContent = data.message || "Une erreur est survenue pendant l'analyse."
+  } catch (e) {
+    aiPollTimer = setTimeout(pollAiStatus, 8000)
+  }
+}
+
 
 document.getElementById('video-input').addEventListener('change', async (e) => {
   const file = e.target.files[0]

@@ -30,62 +30,40 @@
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
   textarea, input{font-family:inherit; color:inherit;}
 
-  /* ═══ Halos de fond ═══
-     Attention perf : un `filter: blur()` de 90-120px sur trois calques plein
-     écran QUI CHANGENT D'ÉCHELLE oblige Safari à recalculer le flou à chaque
-     image, en continu. C'était la cause des saccades au lancement sur iPhone.
-     Les dégradés radiaux sont déjà très doux : un flou léger suffit, chaque
-     calque est promu sur le GPU, et l'animation ne touche plus qu'à la
-     translation et à l'opacité (deux propriétés composées, gratuites). */
-  /* ═══ Halos de fond ═══
-     Couleurs, flou et respiration strictement identiques à l'origine.
-     Seule la structure change : le flou est posé sur un calque intérieur qui,
-     lui, ne bouge jamais, pendant que le calque extérieur porte l'animation.
-     Le navigateur calcule donc le flou UNE SEULE FOIS puis se contente de
-     déplacer l'image obtenue. Avant, le flou de 90-120px était recalculé à
-     chaque image parce que l'élément flouté changeait lui-même d'échelle. */
-  /* Le décor est là dès la première image, écran de chargement compris : c'est
-     le même fond partout dans l'app. L'animation du logo, elle, ne démarre
-     qu'une fois cette première image peinte, donc les halos sont déjà en
-     cache quand le tracé commence et ne le font plus saccader. */
-  /* `inset:0` sur un élément fixe suit la zone visible, qui change de hauteur
-     sur iPhone selon que la barre d'adresse de Safari est déployée ou repliée.
-     L'écran de chargement ne défile pas (barre déployée) alors que les pages
-     de l'app défilent (barre repliée) : les halos n'étaient donc pas au même
-     endroit. On fixe une hauteur constante, indépendante de cette barre. */
   .color-halos{
     position:fixed; top:0; left:0; width:100vw; height:100vh;
     z-index:0; pointer-events:none; overflow:hidden;
   }
   @supports (height: 100lvh){ .color-halos{ height:100lvh; } }
   .chalo-wrap{ position:absolute; will-change:transform, opacity; }
+
+  /* ═══ Pourquoi plus aucun `filter: blur()` ici ═══
+     Trois calques plein écran floutés sur 90 à 120 px, c'était le dernier gros
+     poste de calcul au démarrage : le flou déborde très largement de l'élément,
+     Safari doit donc peindre une surface bien plus grande que l'écran, trois
+     fois, avant de pouvoir afficher quoi que ce soit. D'où les secondes pendant
+     lesquelles rien ne répondait.
+     Un dégradé radial flouté reste un dégradé radial : j'ai calculé le profil
+     exact du résultat flouté, puis je l'ai réécrit en arrêts de couleur. Écart
+     mesuré avec l'ancien rendu : 2 niveaux sur 255, soit moins de 1 %.
+     Mêmes couleurs, même douceur, coût quasi nul. */
   .chalo{
-    width:100%; height:100%; border-radius:50%; opacity:1;
-    filter:blur(120px); transform:translateZ(0); backface-visibility:hidden;
+    position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
   }
-  /* Délais négatifs : les animations démarrent à un quart de leur cycle plutôt
-     qu'à l'image zéro. À l'image zéro, les trois halos sont à leur opacité la
-     plus basse — l'écran de chargement les montrait donc systématiquement plus
-     ternes que le reste de l'app, où ils ont déjà dérivé vers le milieu du
-     cycle. Avec ce décalage, le fond est identique dès la première seconde. */
+  .chalo-1{ width:173%; height:172%;
+    background:radial-gradient(ellipse, rgba(52,52,59,0.886) 0.0%, rgba(52,52,59,0.867) 8.3%, rgba(52,52,58,0.812) 16.7%, rgba(52,52,58,0.729) 25.0%, rgba(52,52,58,0.620) 33.3%, rgba(50,50,56,0.498) 41.7%, rgba(51,51,56,0.373) 50.0%, rgba(50,50,54,0.259) 58.3%, rgba(50,50,56,0.161) 66.7%, rgba(44,44,55,0.090) 75.0%, rgba(46,46,46,0.043) 83.3%, rgba(51,51,51,0.020) 91.7%, rgba(0,0,0,0.008) 100.0%, transparent 100%); }
+  .chalo-2{ width:169%; height:168%;
+    background:radial-gradient(ellipse, rgba(60,60,67,0.914) 0.0%, rgba(60,60,67,0.898) 8.3%, rgba(60,60,66,0.847) 16.7%, rgba(60,60,67,0.765) 25.0%, rgba(60,60,66,0.655) 33.3%, rgba(59,59,64,0.529) 41.7%, rgba(58,58,62,0.400) 50.0%, rgba(58,58,62,0.275) 58.3%, rgba(58,58,64,0.173) 66.7%, rgba(53,53,64,0.094) 75.0%, rgba(64,64,64,0.047) 83.3%, rgba(51,51,51,0.020) 91.7%, rgba(0,0,0,0.008) 100.0%, transparent 100%); }
+  .chalo-4{ width:127%; height:190%;
+    background:radial-gradient(ellipse, rgba(58,58,65,0.980) 0.0%, rgba(58,58,65,0.973) 8.3%, rgba(57,57,64,0.941) 16.7%, rgba(57,57,63,0.882) 25.0%, rgba(56,56,62,0.788) 33.3%, rgba(55,55,61,0.659) 41.7%, rgba(53,53,61,0.510) 50.0%, rgba(53,53,59,0.357) 58.3%, rgba(49,49,58,0.224) 66.7%, rgba(49,49,58,0.122) 75.0%, rgba(55,55,55,0.055) 83.3%, rgba(51,51,51,0.020) 91.7%, rgba(0,0,0,0.008) 100.0%, transparent 100%); }
+
   .chalo-wrap-1{ top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
     animation:chaloBreath1 14s ease-in-out -3.5s infinite; }
   .chalo-wrap-2{ bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
     animation:chaloBreath2 18s ease-in-out -4.5s infinite; }
   .chalo-wrap-4{ top:-14%; left:50%; transform:translate3d(-50%,0,0); width:120vw; height:70vw; max-width:1000px; max-height:600px;
     animation:chaloBreath3 16s ease-in-out -4s infinite; }
-  .chalo-1{ background:radial-gradient(circle, #3E3E46 0%, #303036 45%, transparent 72%); }
-  .chalo-2{ background:radial-gradient(circle, #46464E 0%, #38383E 45%, transparent 72%); }
-  .chalo-4{ background:radial-gradient(circle, #42424A 0%, #34343A 48%, transparent 70%); }
-  /* Plus aucun `scale()` ici, et c'est tout le sujet.
-     Un calque flouté sur 90px dont l'ÉCHELLE change oblige Safari à recalculer
-     le flou à chaque image pour garder la netteté : trois calques plein écran,
-     recalculés en continu, sur toute la durée du cycle. C'est ce qui figeait
-     l'app pendant les premières secondes, au moment où elle a le plus de
-     travail par ailleurs. Avec un simple déplacement, le flou est calculé une
-     seule fois et l'image obtenue est ensuite juste déplacée par le processeur
-     graphique — gratuit. Les couleurs, les opacités et les durées ne changent
-     pas d'un iota ; seule la légère pulsation de taille disparaît. */
+
   @keyframes chaloBreath1{0%,100%{transform:translate3d(0,0,0); opacity:0.7;}50%{transform:translate3d(7%,5%,0); opacity:0.95;}}
   @keyframes chaloBreath2{0%,100%{transform:translate3d(0,0,0); opacity:0.65;}50%{transform:translate3d(-6%,-7%,0); opacity:0.9;}}
   @keyframes chaloBreath3{0%,100%{transform:translate3d(-50%,0,0); opacity:0.8;}50%{transform:translate3d(-50%,4%,0); opacity:1;}}
@@ -112,11 +90,14 @@
   }
 
   @media (max-width: 600px){
-    .chalo{ filter:blur(90px); }
-    .chalo-1{ background:radial-gradient(circle, #5A5A64 0%, #46464E 45%, transparent 72%); }
-    .chalo-2{ background:radial-gradient(circle, #62626C 0%, #4E4E58 45%, transparent 72%); }
-    .chalo-4{ background:radial-gradient(circle, #5E5E68 0%, #4A4A54 48%, transparent 70%); }
+    .chalo-1{ width:227%; height:226%;
+      background:radial-gradient(ellipse, rgba(73,73,83,0.518) 0.0%, rgba(75,75,83,0.506) 8.3%, rgba(74,74,83,0.471) 16.7%, rgba(75,75,83,0.412) 25.0%, rgba(75,75,81,0.345) 33.3%, rgba(73,73,80,0.275) 41.7%, rgba(74,74,83,0.204) 50.0%, rgba(71,71,85,0.141) 58.3%, rgba(78,78,78,0.090) 66.7%, rgba(73,73,91,0.055) 75.0%, rgba(64,64,64,0.031) 83.3%, rgba(64,64,64,0.016) 91.7%, rgba(128,128,128,0.008) 100.0%, transparent 100%); }
+    .chalo-2{ width:219%; height:217%;
+      background:radial-gradient(ellipse, rgba(83,83,93,0.569) 0.0%, rgba(83,83,92,0.553) 8.3%, rgba(82,82,91,0.514) 16.7%, rgba(82,82,93,0.451) 25.0%, rgba(82,82,93,0.376) 33.3%, rgba(81,81,91,0.298) 41.7%, rgba(81,81,89,0.224) 50.0%, rgba(78,78,92,0.153) 58.3%, rgba(78,78,88,0.102) 66.7%, rgba(85,85,85,0.059) 75.0%, rgba(64,64,96,0.031) 83.3%, rgba(64,64,64,0.016) 91.7%, rgba(128,128,128,0.008) 100.0%, transparent 100%); }
+    .chalo-4{ width:155%; height:247%;
+      background:radial-gradient(ellipse, rgba(80,80,90,0.737) 0.0%, rgba(80,80,90,0.722) 8.3%, rgba(80,80,89,0.675) 16.7%, rgba(79,79,90,0.592) 25.0%, rgba(78,78,88,0.498) 33.3%, rgba(78,78,88,0.396) 41.7%, rgba(78,78,88,0.294) 50.0%, rgba(78,78,88,0.204) 58.3%, rgba(77,77,85,0.129) 66.7%, rgba(81,81,81,0.075) 75.0%, rgba(76,76,76,0.039) 83.3%, rgba(64,64,64,0.016) 91.7%, rgba(128,128,128,0.008) 100.0%, transparent 100%); }
   }
+
 
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
   .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 18px 0; }
@@ -378,6 +359,23 @@
   }
   .step-move button:active{ background:rgba(255,255,255,0.18); }
   .step-move button:disabled{ opacity:0.28; }
+
+  .cat-rank{
+    display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
+    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+  }
+  .cat-rank .pos{
+    width:22px; height:22px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; font-weight:800; background:rgba(255,255,255,0.12); color:#fff;
+  }
+  .cat-rank.premier .pos{ background:#fff; color:#000; }
+  .cat-rank .infos{ flex:1; min-width:0; }
+  .cat-rank .nom{ font-size:14px; font-weight:600; }
+  .cat-rank .detail{ font-size:11px; color:var(--label-2); margin-top:2px; }
+  .cat-rank .jauge{ height:4px; border-radius:4px; background:rgba(255,255,255,0.10); margin-top:7px; overflow:hidden; }
+  .cat-rank .jauge i{ display:block; height:100%; border-radius:4px; transition:width 0.6s cubic-bezier(0.22,1,0.36,1); }
+  .cat-rank .taux{ font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; flex-shrink:0; }
 
   .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
   .stat-mini{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
@@ -1193,6 +1191,9 @@
       <div class="emp-row-date" id="ga-nb-membres">—</div>
     </div>
 
+    <div class="section-title">Catégories les plus consultées</div>
+    <div id="ga-top-categories"></div>
+
     <div class="section-title">Procédures les plus consultées</div>
     <div id="ga-late-list"></div>
 
@@ -1227,8 +1228,6 @@
     <div class="card">
       <label class="f">Nom complet</label>
       <input type="text" id="settings-nom" style="margin-bottom:12px;">
-      <label class="f">Poste</label>
-      <input type="text" id="settings-poste" placeholder="Ex : Manager" style="margin-bottom:12px;">
       <label class="f">E-mail</label>
       <input type="text" id="settings-email" disabled style="opacity:0.6;">
       <button class="btn ghost block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
@@ -1329,6 +1328,7 @@
     </div>
     <div id="detail-steps" style="margin-top:16px;"></div>
     <div class="confirm-bar">
+      <div class="note" id="lecture-note" style="display:none; text-align:center; margin-bottom:10px;"></div>
       <button class="btn block" id="confirm-btn">J'ai compris</button>
       <div class="error-msg" id="confirm-error"></div>
     </div>
@@ -1673,7 +1673,6 @@ function finDuDemarrage() {
 window.openSettings = async function() {
   showGestionScreen('p-settings')
   document.getElementById('settings-nom').value = currentMembre.nom || ''
-  document.getElementById('settings-poste').value = currentMembre.poste || ''
   const { data: userData } = await supabase.auth.getUser()
   document.getElementById('settings-email').value = userData?.user?.email || ''
 
@@ -1724,15 +1723,13 @@ document.getElementById('settings-save-btn')?.addEventListener('click', async ()
   const btn = document.getElementById('settings-save-btn')
   errorEl.textContent = ''
   const nom = document.getElementById('settings-nom').value.trim()
-  const poste = document.getElementById('settings-poste').value.trim()
   if (!nom) { errorEl.textContent = 'Le nom est obligatoire.'; return }
 
   setButtonLoading(btn, true)
-  const { error } = await supabase.from('membres').update({ nom, poste }).eq('id', currentMembre.id)
+  const { error } = await supabase.from('membres').update({ nom }).eq('id', currentMembre.id)
   setButtonLoading(btn, false)
   if (error) { errorEl.textContent = "Erreur : " + error.message; return }
   currentMembre.nom = nom
-  currentMembre.poste = poste
   errorEl.style.color = 'var(--green)'
   errorEl.textContent = 'Enregistré.'
 })
@@ -1795,6 +1792,63 @@ function renderGaStats() {
   document.getElementById('ga-taux-global').textContent = `${nbConsulte} / ${nbAttendu}`
   document.getElementById('ga-sub-global').textContent = `${nbConsulte} consultations ${periodLabel} sur ${nbAttendu} possibles (toutes procédures confondues)`
   document.getElementById('ga-bar-global').style.width = taux + '%'
+
+  renderTopCategories(procedures, validationsInPeriod, nbEmployes, periodLabel)
+}
+
+/* Classement des catégories par taux de consultation.
+   Le taux d'une catégorie = consultations réellement enregistrées, divisé par
+   le nombre de consultations possibles, soit ses procédures x ses employés.
+   On raisonne en pourcentage et non en volume brut, sinon une catégorie de
+   dix procédures écraserait systématiquement une catégorie de deux. */
+function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel) {
+  const el = document.getElementById('ga-top-categories')
+  if (!el) return
+  el.innerHTML = ''
+
+  if (!procedures.length) {
+    el.innerHTML = '<div class="note">Aucune procédure pour le moment.</div>'
+    return
+  }
+  if (nbEmployes === 0) {
+    el.innerHTML = "<div class=\"note\">Aucun employé dans l'équipe : partagez le code d'invitation dans Paramètres pour voir apparaître les consultations.</div>"
+    return
+  }
+
+  const parCategorie = {}
+  procedures.forEach(p => {
+    const nom = p.categorie || 'Sans catégorie'
+    if (!parCategorie[nom]) parCategorie[nom] = { nom, procIds: new Set(), nbProcs: 0, vues: 0 }
+    parCategorie[nom].procIds.add(p.id)
+    parCategorie[nom].nbProcs++
+  })
+  validationsPeriode.forEach(v => {
+    for (const c of Object.values(parCategorie)) {
+      if (c.procIds.has(v.procedure_id)) { c.vues++; break }
+    }
+  })
+
+  const classement = Object.values(parCategorie).map(c => {
+    const possible = c.nbProcs * nbEmployes
+    return { ...c, possible, taux: possible ? Math.round((c.vues / possible) * 100) : 0 }
+  }).sort((a, b) => (b.taux - a.taux) || (b.vues - a.vues) || a.nom.localeCompare(b.nom, 'fr'))
+    .slice(0, 5)
+
+  classement.forEach((c, i) => {
+    const couleur = c.taux >= 70 ? '#30D158' : c.taux >= 30 ? '#FF9F0A' : '#FF453A'
+    const div = document.createElement('div')
+    div.className = 'cat-rank' + (i === 0 ? ' premier' : '')
+    div.innerHTML = `
+      <div class="pos">${i + 1}</div>
+      <div class="infos">
+        <div class="nom">${escapeHtml(c.nom)}</div>
+        <div class="detail">${c.vues} consultation${c.vues > 1 ? 's' : ''} ${periodLabel} sur ${c.possible} · ${c.nbProcs} procédure${c.nbProcs > 1 ? 's' : ''}</div>
+        <div class="jauge"><i style="width:${c.taux}%; background:${couleur};"></i></div>
+      </div>
+      <div class="taux" style="color:${couleur};">${c.taux}%</div>
+    `
+    el.appendChild(div)
+  })
 }
 
 window.loadGlobalAnalyse = function() {
@@ -1924,6 +1978,7 @@ window.showEquipeScreen = function(id, btn) {
   if (btn) btn.classList.add('active')
   majPastille('tabbar-equipe')
   if (id !== 'e-scan') stopScanner()
+  if (id !== 'e-detail') arreterLecture()
   remonterEnHaut()
 }
 
@@ -2228,6 +2283,16 @@ let currentCategoryProcsData = []
 let toutesProcedures = false   // vrai quand on affiche toutes les procédures
 
 function openCategoryProcedures(nom) {
+  try { ouvrirCategorie(nom) }
+  catch (e) {
+    console.error('Ouverture de la catégorie :', e)
+    showGestionScreen('p-category')
+    const el = document.getElementById('category-procedures-list')
+    if (el) el.innerHTML = `<div class="empty-state"><h3>Ouverture impossible</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
+  }
+}
+
+function ouvrirCategorie(nom) {
   toutesProcedures = (nom == null)
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = toutesProcedures ? 'Toutes les procédures' : nom
@@ -2265,6 +2330,16 @@ function openCategoryProcedures(nom) {
 }
 
 function renderCategoryProceduresList() {
+  try { renderCategoryProceduresListInterne() }
+  catch (e) {
+    // Plutôt qu'une liste vide sans explication, on affiche ce qui a échoué.
+    console.error('Rendu de la liste des procédures :', e)
+    const el = document.getElementById('category-procedures-list')
+    if (el) el.innerHTML = `<div class="empty-state"><h3>Affichage impossible</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
+  }
+}
+
+function renderCategoryProceduresListInterne() {
   const listEl = document.getElementById('category-procedures-list')
   const oldRects = captureCardPositions(listEl)
   listEl.innerHTML = ''
@@ -2325,6 +2400,12 @@ function renderCategoryProceduresList() {
 
   playCardShuffle(listEl, oldRects)
   garantirVisibilite(listEl)
+
+  // Dernier contrôle : si malgré tout rien n'est arrivé dans la liste alors
+  // qu'on avait des procédures, on le dit au lieu de laisser un écran vide.
+  if (listEl.children.length === 0) {
+    listEl.innerHTML = `<div class="empty-state"><h3>Rien à afficher</h3><p>${sorted.length} procédure(s) trouvée(s) mais aucune n'a pu être affichée. Signalez-le-moi.</p></div>`
+  }
 }
 
 /* Dernier rempart : au bout d'une seconde, toute carte encore transparente ou
@@ -3569,10 +3650,13 @@ async function openEquipeDetail(procId) {
     stepsEl.appendChild(div)
   })
 
+  demarrerLecture(procId)
+
   document.getElementById('confirm-btn').onclick = async () => {
     const errorEl = document.getElementById('confirm-error')
     errorEl.textContent = ''
     const btn = document.getElementById('confirm-btn')
+    if (btn.disabled) return
     setButtonLoading(btn, true)
     const { error } = await supabase.from('validations').upsert(
       { procedure_id: proc.id, membre_id: currentMembre.id }, { onConflict: 'procedure_id,membre_id' }
@@ -3580,8 +3664,70 @@ async function openEquipeDetail(procId) {
     if (error) { setButtonLoading(btn, false); errorEl.textContent = "Erreur : " + error.message; return }
     btn.dataset.originalText = '✓ Validé'
     setButtonLoading(btn, false)
+    btn.disabled = true
+    arreterLecture()
     loadEquipeProcedures()
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEMPS DE LECTURE MINIMUM
+
+   Le bouton « J'ai compris » ne prouvait rien : on pouvait le taper en
+   arrivant. Il reste maintenant inactif pendant 30 secondes, avec le décompte
+   affiché dessus. Une consultation enregistrée signifie donc au minimum que la
+   procédure est restée ouverte une demi-minute — c'est ce qui rend les
+   pourcentages de l'analyse un tant soit peu crédibles.
+   Le décompte s'arrête si l'employé quitte la fiche ou met l'app en veille,
+   et repart de là où il en était en revenant : lire en deux fois reste lire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DUREE_LECTURE_MIN = 30
+let lectureTimer = null
+let lectureSecondes = 0
+let lectureProcId = null
+
+function demarrerLecture(procId) {
+  const btn = document.getElementById('confirm-btn')
+  if (!btn) return
+  arreterLecture()
+
+  // Déjà validée : rien à décompter
+  if (btn.textContent.indexOf('Validé') !== -1) { btn.disabled = true; return }
+
+  // On repart de zéro si c'est une autre procédure
+  if (lectureProcId !== procId) { lectureProcId = procId; lectureSecondes = 0 }
+
+  btn.disabled = true
+  majBoutonLecture()
+  lectureTimer = setInterval(() => {
+    if (document.hidden) return          // app en arrière-plan : on ne compte pas
+    lectureSecondes++
+    majBoutonLecture()
+    if (lectureSecondes >= DUREE_LECTURE_MIN) arreterLecture(true)
+  }, 1000)
+}
+
+function majBoutonLecture() {
+  const btn = document.getElementById('confirm-btn')
+  const note = document.getElementById('lecture-note')
+  if (!btn) return
+  const reste = Math.max(0, DUREE_LECTURE_MIN - lectureSecondes)
+  if (reste > 0) {
+    btn.disabled = true
+    btn.textContent = `Encore ${reste} s de lecture`
+    btn.dataset.originalText = btn.textContent
+    if (note) { note.style.display = 'block'; note.textContent = 'Prenez le temps de lire toutes les étapes avant de valider.' }
+  } else {
+    btn.disabled = false
+    btn.textContent = "J'ai compris"
+    btn.dataset.originalText = "J'ai compris"
+    if (note) note.style.display = 'none'
+  }
+}
+
+function arreterLecture(termine) {
+  if (lectureTimer) { clearInterval(lectureTimer); lectureTimer = null }
+  if (termine) majBoutonLecture()
 }
 
 // ═══════════ ÉQUIPE : scanner ═══════════

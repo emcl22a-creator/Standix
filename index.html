@@ -528,66 +528,27 @@
 
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
 
-  /* ═══ Animation de l'écran de chargement ═══
-     Le contour du logo se trace, le plein se pose dessus, le tout respire,
-     puis s'efface et recommence. Trois animations sur un seul petit SVG :
-     coût négligeable, contrairement au décor de fond. */
+  /* ═══ Logo animé de l'écran de choix ═══
+     Le contour se trace, le plein se pose dessus. Une seule passe, puis il
+     reste. L'animation n'est lancée qu'une fois l'écran réellement peint :
+     le tracé passe par `stroke-dashoffset`, redessiné image par image sur le
+     fil principal, et démarrait sinon pendant que l'écran apparaissait encore. */
   .boot-logo{
-    position:relative; width:40px; height:47px;
+    position:relative; width:34px; height:40px; margin:0 auto 10px;
     display:flex; align-items:center; justify-content:center;
   }
-  /* Le tracé du logo passe par `stroke-dashoffset`, que le navigateur doit
-     redessiner image par image sur le fil principal. Si l'animation démarre
-     pendant que ce fil est occupé (téléchargement et analyse du script), son
-     horloge avance sans que rien ne s'affiche : on ne voyait que la fin.
-     Elle n'est donc lancée qu'une fois une vraie image peinte à l'écran. */
-  .boot-logo.play{
-    animation: bootBreathOnce 1.1s cubic-bezier(0.22,1,0.36,1) both,
-               bootIdle 2.6s ease-in-out 1.1s infinite;
-  }
-  .boot-logo.play .boot-trace{ animation: bootTraceOnce 1.1s cubic-bezier(0.65,0,0.35,1) both; }
-  .boot-logo.play .boot-fill{ animation: bootFillOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
-  .boot-logo.play .boot-glow{ animation: bootGlowOnce 1.1s ease-in-out both; }
-  .boot-logo svg{ width:100%; height:100%; overflow:visible; position:relative; z-index:1; }
-  .boot-glow{
-    position:absolute; width:150%; height:150%; border-radius:50%;
-    background:radial-gradient(circle, rgba(255,255,255,0.22) 0%, transparent 68%);
-    filter:blur(9px); opacity:0;
-  }
-  .boot-logo--once .boot-glow{ filter:blur(8px); }
-  @keyframes bootGlowFade{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.85;transform:scale(1)} 100%{opacity:0;transform:scale(1.1)} }
+  .boot-logo svg{ width:100%; height:100%; overflow:visible; }
   .boot-trace{ stroke-dasharray:411; stroke-dashoffset:411; }
   .boot-fill{ opacity:0; }
-
-  /* Seuls les grands écrans gardent un logo plus généreux ; sur mobile il
-     occupait une place démesurée au centre de l'écran de chargement. */
-  @media (min-width: 601px){
-    .boot-logo{ width:56px; height:66px; }
-    .boot-glow{ filter:blur(13px); }
-  }
-
-  @keyframes bootIdle{
-    0%, 100% { transform:scale(1); }
-    50%      { transform:scale(1.045); }
-  }
-  /* Variante de l'écran « choix de l'espace » : le logo se dessine une seule
-     fois à l'arrivée, puis reste plein. Une boucle infinie serait fatigante
-     sur un écran où l'on doit lire et cliquer. */
-  .boot-logo--once{ width:34px; height:40px; margin:0 auto 10px; }
-  /* Comme sur l'écran de chargement : l'animation ne part qu'une fois l'écran
-     réellement peint. Sans ça, sur mobile, son horloge tournait pendant que
-     l'écran était encore en train d'apparaître et le tracé sautait. */
-  .boot-logo--once.play{ animation: bootBreathOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
   .boot-logo--once.play .boot-trace{ animation: bootTraceOnce 1.1s cubic-bezier(0.65,0,0.35,1) both; }
   .boot-logo--once.play .boot-fill{ animation: bootFillOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
-  .boot-logo--once.play .boot-glow{ animation: bootGlowFade 1.1s ease-in-out both; }
+  .boot-logo--once.play{ animation: bootBreathOnce 1.1s cubic-bezier(0.22,1,0.36,1) both; }
   @keyframes bootTraceOnce{ 0%{stroke-dashoffset:411;opacity:1} 62%{stroke-dashoffset:0;opacity:1} 84%{opacity:0} 100%{opacity:0} }
   @keyframes bootFillOnce{ 0%,56%{opacity:0} 82%{opacity:1} 100%{opacity:1} }
   @keyframes bootBreathOnce{ 0%{transform:scale(0.93)} 82%{transform:scale(1.03)} 100%{transform:scale(1)} }
-  @keyframes bootGlowOnce{ 0%,56%{opacity:0;transform:scale(0.8)} 80%{opacity:0.9;transform:scale(1)} 100%{opacity:0.55;transform:scale(1)} }
 
   @media (prefers-reduced-motion: reduce){
-    .boot-logo, .boot-glow, .boot-trace, .boot-fill{ animation:none !important; }
+    .boot-logo--once.play, .boot-logo--once.play .boot-trace, .boot-logo--once.play .boot-fill{ animation:none !important; }
     .boot-fill{ opacity:1; }
     .boot-trace{ opacity:0; }
   }
@@ -656,17 +617,6 @@
      bloquer le zoom au pincement est d'intercepter ses événements de geste.
      Volontairement pas d'écouteur sur `touchmove` : non passif, il ferait
      attendre le navigateur à chaque défilement et remettrait des saccades. */
-  /* On attend deux images successives : à la première, le navigateur a
-     réellement peint l'écran de chargement ; on peut alors lancer l'animation
-     du logo en étant sûr qu'elle sera visible du début à la fin. */
-  requestAnimationFrame(function () {
-    requestAnimationFrame(function () {
-      var el = document.getElementById('boot-logo')
-      if (el) el.classList.add('play')
-      window.__debutAnimLogo = performance.now()
-    })
-  })
-
   ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (type) {
     document.addEventListener(type, function (e) { e.preventDefault() }, { passive: false })
   })
@@ -702,14 +652,11 @@
 
 <!-- ═══ 0. CHARGEMENT (le temps de vérifier si déjà connecté) ═══ -->
 <div class="login-wrap" id="loading-screen">
-  <div class="boot-logo" id="boot-logo">
-    <div class="boot-glow"></div>
-    <svg viewBox="0 0 85 100" fill="none">
-      <!-- Le contour se dessine, puis le plein apparaît par-dessus.
-           410,25 unités : périmètre exact du tracé, calculé segment par segment. -->
-      <path class="boot-trace" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
-      <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"/>
+  <div style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+    <svg viewBox="0 0 85 100" fill="none" style="width:32px; height:38px; opacity:0.9;">
+      <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="white"/>
     </svg>
+    <div class="spinner"></div>
   </div>
 </div>
 
@@ -717,7 +664,6 @@
 <div class="login-wrap" id="choice-screen" style="display:none;">
   <div class="login-card" style="text-align:center;">
     <div class="boot-logo boot-logo--once">
-      <div class="boot-glow"></div>
       <svg viewBox="0 0 85 100" fill="none">
         <path class="boot-trace" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="none" stroke="#fff" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
         <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"/>
@@ -1564,18 +1510,6 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   enterApp(membre)
 })
 
-/* L'écran de chargement affiche le logo qui se dessine (1,9 s), puis le garde
-   encore 1,3 s une fois terminé avant de laisser la place à l'app. */
-const DUREE_ANIM_LOGO = 1100
-const MAINTIEN_LOGO = 1300
-function attendreFinAnimationLogo() {
-  // Point de départ : le moment où l'animation a réellement commencé à
-  // s'afficher, pas le moment où le script a été évalué.
-  const debut = window.__debutAnimLogo || performance.now()
-  const restant = (DUREE_ANIM_LOGO + MAINTIEN_LOGO) - (performance.now() - debut)
-  return new Promise(resolve => setTimeout(resolve, Math.max(0, restant)))
-}
-
 async function enterApp(membre) {
   currentMembre = membre
 
@@ -1590,7 +1524,6 @@ async function enterApp(membre) {
 
   if (membre.role === 'gestion') {
     await loadGestionProcedures()
-    await attendreFinAnimationLogo()
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -1601,7 +1534,6 @@ async function enterApp(membre) {
     finDuDemarrage()
   } else {
     await loadEquipeProcedures()
-    await attendreFinAnimationLogo()
     document.getElementById('loading-screen')?.style.setProperty('display', 'none')
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -3143,8 +3075,28 @@ async function openAnalyse(procId) {
   }
 }
 
+/* Tracé du logo Procédo en unités 85 x 100. Le logo n'est qu'une suite de
+   segments droits : on le dessine point par point plutôt que via Path2D,
+   dont le constructeur à partir d'une chaîne SVG n'est pas garanti partout. */
+const LOGO_POINTS = [65.78,3.86,60.26,1.43,53.42,0.00,1.77,0.00,0.00,1.32,0.00,6.62,2.10,13.69,6.18,19.87,11.15,23.95,20.31,26.82,52.10,27.04,56.51,29.80,58.50,34.77,57.17,40.51,53.20,43.71,23.18,44.70,15.56,47.90,9.38,53.42,5.63,59.93,3.86,67.44,3.75,96.91,4.97,99.34,8.28,100.00,15.12,99.34,19.76,97.13,23.62,93.60,27.59,85.10,28.04,70.97,54.19,70.97,60.71,69.76,70.86,64.46,78.81,55.74,82.34,48.57,84.11,41.50,84.44,34.22,83.22,26.27,80.57,19.21,77.37,14.02,71.96,8.17]
+
+function dessinerLogo(ctx, x, y, hauteur, couleur) {
+  const e = hauteur / 100          // le tracé fait 100 unités de haut
+  ctx.save()
+  ctx.fillStyle = couleur
+  ctx.beginPath()
+  for (let i = 0; i < LOGO_POINTS.length; i += 2) {
+    const px = x + LOGO_POINTS[i] * e
+    const py = y + LOGO_POINTS[i + 1] * e
+    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
+  }
+  ctx.closePath()
+  ctx.fill()
+  ctx.restore()
+}
+
 /* Dessine la fiche à imprimer : plaque blanche, QR, titre de la procédure,
-   consigne de scan et signature Procédo. Rendue en haute définition pour
+   consigne de scan et signature Procédo avec son logo. Rendue en haute définition pour
    rester nette une fois imprimée. */
 function composerFicheQR(qrCanvas, titre) {
   const L = 760, cote = 470
@@ -3202,9 +3154,26 @@ function composerFicheQR(qrCanvas, titre) {
   g.strokeStyle = 'rgba(20,21,24,0.10)'
   g.lineWidth = 2
   g.beginPath(); g.moveTo(marge, y); g.lineTo(L - marge, y); g.stroke()
+
+  // Logo + nom, centrés ensemble. Le logo est le même tracé que partout
+  // ailleurs dans l'app, dessiné directement dans le canvas — il manquait
+  // à l'export, seul le mot « Procédo » était écrit.
   g.fillStyle = 'rgba(20,21,24,0.4)'
   g.font = '700 22px Inter, -apple-system, system-ui, sans-serif'
-  g.fillText('Procédo', L / 2, y + 30)
+  const nom = 'Procédo'
+  const largeurNom = g.measureText(nom).width
+  const hLogo = 22
+  const lLogo = hLogo * 0.85          // le tracé fait 85 x 100 unités
+  const espace = 8
+  const totalL = lLogo + espace + largeurNom
+  const xDepart = (L - totalL) / 2
+  const yBase = y + 30
+
+  dessinerLogo(g, xDepart, yBase - hLogo + 2, hLogo, 'rgba(20,21,24,0.4)')
+
+  g.textAlign = 'left'
+  g.fillText(nom, xDepart + lLogo + espace, yBase)
+  g.textAlign = 'center'
 
   return c.toDataURL('image/png')
 }

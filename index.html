@@ -171,30 +171,57 @@
      bleu système d'Apple. Un dégradé du bleu clair vers le bleu profond, une
      lueur en haut à droite pour donner du volume, et un bouton blanc plein
      qui tranche franchement dessus. */
+  /* ═══ Panneau d'accueil ═══
+     Transparent, avec le même arrondi de 16px que les cartes de catégories.
+     Un demi-halo vert émerge du bord droit — son centre est posé exactement
+     sur l'arête, donc seule la moitié se voit. Une trame de petits carreaux
+     n'apparaît qu'à deux endroits, révélée par un masque en dégradé. */
   .panneau-accueil{
     position:relative; overflow:hidden;
-    border-radius:26px; padding:22px 20px 20px; margin-bottom:18px;
-    background:linear-gradient(158deg, #0A84FF 0%, #007AFF 42%, #0040DD 100%);
-    box-shadow:0 14px 34px rgba(0,64,221,0.34), inset 0 1px 0 rgba(255,255,255,0.28);
+    border-radius:16px; padding:22px 20px 20px; margin-bottom:18px;
+    background:rgba(255,255,255,0.05);
+    border:0.5px solid rgba(255,255,255,0.14);
+    -webkit-backdrop-filter:blur(22px) saturate(170%); backdrop-filter:blur(22px) saturate(170%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.22), 0 12px 30px rgba(0,0,0,0.30);
   }
-  .pa-lueur{
-    position:absolute; top:-58%; right:-24%; width:82%; height:130%; pointer-events:none;
-    background:radial-gradient(ellipse, rgba(255,255,255,0.34) 0%, transparent 68%);
+  .pa-halo{
+    position:absolute; right:-33%; top:50%; transform:translateY(-50%);
+    width:66%; aspect-ratio:1; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle,
+      rgba(48,209,88,0.62) 0%, rgba(48,209,88,0.30) 38%, rgba(48,209,88,0.09) 62%, transparent 74%);
+    filter:blur(16px);
   }
-  .pa-salut{ position:relative; font-size:13px; font-weight:600; color:rgba(255,255,255,0.78); }
+  .pa-carreaux{
+    position:absolute; inset:0; pointer-events:none;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.13) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.13) 1px, transparent 1px);
+    background-size:20px 20px;
+    -webkit-mask-image:
+      radial-gradient(ellipse 46% 62% at 84% 74%, #000 8%, transparent 72%),
+      radial-gradient(ellipse 34% 46% at 10% 16%, #000 6%, transparent 74%);
+    mask-image:
+      radial-gradient(ellipse 46% 62% at 84% 74%, #000 8%, transparent 72%),
+      radial-gradient(ellipse 34% 46% at 10% 16%, #000 6%, transparent 74%);
+  }
+  .pa-salut{ position:relative; font-size:13px; font-weight:600; color:var(--label-2); }
+  /* Même graisse et même chasse que le mot « Procédo » de la barre du haut. */
   .pa-titre{
-    position:relative; font-size:29px; font-weight:800; letter-spacing:-0.04em;
-    color:#fff; margin-top:4px; line-height:1.08;
+    position:relative; font-size:29px; font-weight:700; letter-spacing:-0.02em;
+    color:#fff; margin-top:4px; line-height:1.1;
   }
-  .pa-sous{ position:relative; font-size:12.5px; font-weight:500; color:rgba(255,255,255,0.72); margin-top:6px; }
+  .pa-sous{ position:relative; font-size:12.5px; font-weight:500; color:var(--label-3); margin-top:6px; }
   .pa-bouton{
     position:relative; display:flex; align-items:center; justify-content:center; gap:8px;
-    width:100%; height:46px; margin-top:18px; border:none; border-radius:15px;
-    background:#fff; color:#0040DD; font-family:inherit; font-size:15px; font-weight:700;
-    letter-spacing:-0.02em; box-shadow:0 4px 14px rgba(0,0,0,0.18);
-    transition: transform 0.16s cubic-bezier(0.34,1.56,0.64,1), opacity 0.16s;
+    width:100%; height:46px; margin-top:18px; border-radius:14px;
+    border:0.5px solid rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.12);
+    -webkit-backdrop-filter:blur(18px) saturate(160%); backdrop-filter:blur(18px) saturate(160%);
+    color:#fff; font-family:inherit; font-size:15px; font-weight:700; letter-spacing:-0.02em;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.26), 0 6px 18px rgba(0,0,0,0.28);
+    transition: transform 0.16s cubic-bezier(0.34,1.56,0.64,1), background 0.16s;
   }
-  .pa-bouton:active{ transform:scale(0.97); opacity:0.92; }
+  .pa-bouton:active{ transform:scale(0.97); background:rgba(255,255,255,0.22); }
   .pa-bouton svg{ width:17px; height:17px; }
 
   .hero-card{ position:relative; background:var(--hero-gradient); border:0.5px solid rgba(255,255,255,0.15);
@@ -941,7 +968,8 @@
 
   <div class="screen active" id="p-list">
     <div class="panneau-accueil">
-      <div class="pa-lueur"></div>
+      <div class="pa-halo"></div>
+      <div class="pa-carreaux"></div>
       <div class="pa-salut" id="greeting-text">Bonjour 👋</div>
       <h1 class="pa-titre">Mes procédures</h1>
       <div class="pa-sous" id="p-list-subhead">Chargement...</div>

@@ -663,11 +663,11 @@
     <div class="subhead" id="analyse-subhead">Chargement...</div>
 
     <div class="hero-card">
-      <div class="lbl">Ont consulté cette procédure</div>
+      <div class="lbl">Ont consulté</div>
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
-      <div class="view-toggle" id="analyse-period-toggle" style="margin:14px 0 0; background:rgba(255,255,255,0.10); border-color:rgba(255,255,255,0.16);">
+      <div class="filter-chips" id="analyse-period-toggle" style="margin-top:14px;">
         <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
         <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
         <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
@@ -702,13 +702,13 @@
     <div class="subhead">Vue d'ensemble de votre entreprise</div>
 
     <div class="hero-card">
-      <div class="lbl">Consultations</div>
+      <div class="lbl">Ont consulté</div>
       <div class="num" id="ga-taux-global">—</div>
       <div class="sub" id="ga-sub-global">—</div>
       <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
       <div class="filter-chips" id="ga-period-toggle" style="margin-top:14px;">
-        <button class="active" data-period="week" onclick="setGaPeriod('week')">Semaine</button>
-        <button data-period="month" onclick="setGaPeriod('month')">Mois</button>
+        <button class="active" data-period="week" onclick="setGaPeriod('week')">Cette semaine</button>
+        <button data-period="month" onclick="setGaPeriod('month')">Ce mois-ci</button>
         <button data-period="all" onclick="setGaPeriod('all')">Total</button>
       </div>
     </div>
@@ -1231,7 +1231,7 @@ function renderGaStats() {
   const periodLabel = currentGaPeriod === 'week' ? 'cette semaine' : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
 
   document.getElementById('ga-taux-global').textContent = `${nbConsulte} / ${nbAttendu}`
-  document.getElementById('ga-sub-global').textContent = `${nbConsulte} consultations sur ${nbAttendu} attendues ${periodLabel}`
+  document.getElementById('ga-sub-global').textContent = `${nbConsulte} sur ${nbAttendu} ont consulté ${periodLabel}`
   document.getElementById('ga-bar-global').style.width = taux + '%'
 }
 
@@ -1943,7 +1943,7 @@ function renderAnalyseStats() {
   const periodLabel = currentAnalysePeriod === 'week' ? 'cette semaine' : currentAnalysePeriod === 'month' ? 'ce mois-ci' : 'au total'
 
   document.getElementById('analyse-taux').textContent = `${nbConsulte} / ${nbEmployes}`
-  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbEmployes} employés ont consulté ${periodLabel}`
+  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbEmployes} ont consulté ${periodLabel}`
   document.getElementById('analyse-bar').style.width = taux + '%'
 
   const empListEl = document.getElementById('analyse-emp-list')

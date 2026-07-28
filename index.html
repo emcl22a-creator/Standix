@@ -181,14 +181,15 @@
      du doigt vers la gauche ou la droite : la carte de devant part sur le côté
      en pivotant légèrement, celle de derrière grandit et prend sa place.
      Deux points sous la pile signalent qu'il y a une carte de plus. */
-  .pile{ position:relative; height:196px; margin-bottom:26px; touch-action:pan-y; }
+  .pile{ position:relative; height:214px; margin-bottom:26px; touch-action:pan-y; }
   .pile-carte{
-    position:absolute; left:0; right:0; top:0; height:196px; margin-bottom:0 !important;
-    transition: transform 0.46s cubic-bezier(0.34,1.2,0.5,1), opacity 0.34s ease;
+    position:absolute; left:0; right:0; top:0; height:214px; margin-bottom:0 !important;
+    /* Courbe d'Apple : départ franc, arrivée qui se pose sans rebondir. */
+    transition: transform 0.55s cubic-bezier(0.32,0.72,0,1), opacity 0.4s cubic-bezier(0.32,0.72,0,1);
     will-change:transform, opacity;
   }
   .pile .devant{ z-index:2; transform:none; opacity:1; }
-  .pile .derriere{ z-index:1; transform:scale(0.93) translateY(10px); opacity:0; pointer-events:none; }
+  .pile .derriere{ z-index:1; transform:scale(0.94); opacity:0; pointer-events:none; }
   /* Pendant le glissement, c'est le doigt qui pilote : plus de transition. */
   .pile.glisse .pile-carte{ transition:none; }
   .pile.glisse .derriere{ opacity:1; }
@@ -201,12 +202,14 @@
   .pile-points i.on{ background:rgba(255,255,255,0.85); transform:scale(1.15); }
 
   /* Carte du dessous : même matière, halo orange pour la distinguer */
-  .panneau-semaine{ padding-bottom:34px; }
+  .panneau-semaine .ps-relance{ margin-top:9px; }
+  /* Le second halo est légèrement décalé vers le haut : les deux cartes se
+     distinguent par la position de la lumière, non plus par la couleur. */
   .ps-halo{
-    position:absolute; right:-33%; top:50%; transform:translateY(-50%);
-    width:66%; aspect-ratio:1; border-radius:50%; pointer-events:none;
+    position:absolute; left:-30%; top:22%; transform:translateY(-50%);
+    width:62%; aspect-ratio:1; border-radius:50%; pointer-events:none;
     background:radial-gradient(circle,
-      rgba(255,159,10,0.55) 0%, rgba(255,159,10,0.26) 38%, rgba(255,159,10,0.08) 62%, transparent 74%);
+      rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 38%, rgba(255,255,255,0.02) 62%, transparent 74%);
     filter:blur(16px);
   }
   .ps-relance{
@@ -214,7 +217,8 @@
     font-size:12px; color:var(--label-2);
   }
   .ps-relance b{ color:#fff; font-weight:650; }
-  .ps-relance .pastille{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+  .ps-relance .pastille{ width:7px; height:7px; border-radius:50%; flex-shrink:0;
+    background:rgba(255,255,255,0.45) !important; }
 
   .panneau-accueil{
     position:relative; overflow:hidden;
@@ -226,11 +230,13 @@
     border:0.5px solid var(--border); border-radius:16px;
     padding:22px 20px 20px;
   }
+  /* Demi-halo neutre : son centre est posé sur l'arête droite, donc seule la
+     moitié gauche se voit. Blanc translucide, aucune teinte. */
   .pa-halo{
     position:absolute; right:-33%; top:50%; transform:translateY(-50%);
     width:66%; aspect-ratio:1; border-radius:50%; pointer-events:none;
     background:radial-gradient(circle,
-      rgba(48,209,88,0.62) 0%, rgba(48,209,88,0.30) 38%, rgba(48,209,88,0.09) 62%, transparent 74%);
+      rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 38%, rgba(255,255,255,0.02) 62%, transparent 74%);
     filter:blur(16px);
   }
   .pa-carreaux{
@@ -2419,14 +2425,18 @@ async function loadGestionProcedures() {
   pile.addEventListener('pointermove', (e) => {
     if (departX == null) return
     ecart = e.clientX - departX
+    /* Aucune rotation : la carte de devant glisse et se retire légèrement,
+       celle de derrière remonte à sa taille pleine avec un léger contre-
+       mouvement. C'est le vocabulaire d'Apple — de la profondeur, pas du jeu
+       de cartes. */
     const avancement = Math.min(1, Math.abs(ecart) / (largeur * 0.55))
     const d = devant(), r = derriere()
     if (d) {
-      d.style.transform = `translateX(${ecart}px) rotate(${ecart * 0.022}deg)`
-      d.style.opacity = String(1 - avancement * 0.4)
+      d.style.transform = `translateX(${ecart}px) scale(${1 - avancement * 0.06})`
+      d.style.opacity = String(1 - avancement * 0.55)
     }
     if (r) {
-      r.style.transform = `scale(${0.93 + avancement * 0.07}) translateY(${(1 - avancement) * 10}px)`
+      r.style.transform = `translateX(${-ecart * 0.22}px) scale(${0.94 + avancement * 0.06})`
       r.style.opacity = String(avancement)
     }
   })

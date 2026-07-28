@@ -137,10 +137,8 @@
   .topbar-left{ display:flex; align-items:center; gap:10px; }
   .logo-pill{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    /* Remonté d'un cheveu : le bloc de texte a sa masse visuelle plus haut
-       (« Procédo » est gras et plus grand que « Espace Gestion »), donc un
-       centrage purement géométrique fait paraître le logo trop bas. */
-    transform: translateY(-0.5px);
+    /* Calage optique fin par rapport au bloc de texte à deux lignes. */
+    transform: translateY(0.1px);
   }
   .logo-pill svg{ width:23px; height:27px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
@@ -1585,7 +1583,11 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
-    finDuDemarrage('topbar-logo-gestion')
+    // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
+    // suite. L'animation ne repose plus sur un tracé redessiné image par image,
+    // elle peut donc démarrer avec l'app sans la faire saccader.
+    lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
+    finDuDemarrage()
   } else {
     await loadEquipeProcedures()
     document.getElementById('login-screen').style.display = 'none'
@@ -1594,7 +1596,11 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
-    finDuDemarrage('topbar-logo-equipe')
+    // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
+    // suite. L'animation ne repose plus sur un tracé redessiné image par image,
+    // elle peut donc démarrer avec l'app sans la faire saccader.
+    lancerAnimationLogo(document.getElementById('topbar-logo-equipe'))
+    finDuDemarrage()
     const params = new URLSearchParams(window.location.search)
     const procId = params.get('proc')
     if (procId) openEquipeDetail(procId)
@@ -1605,14 +1611,8 @@ async function enterApp(membre) {
 // l'app réellement affichée et posée. Avant ça, tout le processeur sert à
 // l'afficher — c'est ce qui rendait le lancement saccadé sur iPhone.
 let demarrageTermine = false
-function finDuDemarrage(idLogoBarre) {
-  // Le logo de la barre est invisible tant qu'il n'a pas reçu sa classe.
-  // On la lui donne à chaque entrée dans l'app, y compris après une
-  // déconnexion-reconnexion où le reste de cette fonction ne rejoue plus.
-  const jouerLogoBarre = () => {
-    if (idLogoBarre) lancerAnimationLogo(document.getElementById(idLogoBarre))
-  }
-  if (demarrageTermine) { jouerLogoBarre(); return }
+function finDuDemarrage() {
+  if (demarrageTermine) return
   demarrageTermine = true
   const liberer = () => {
     document.body.classList.remove('booting')
@@ -1620,9 +1620,6 @@ function finDuDemarrage(idLogoBarre) {
     // l'affichage, quand plus rien d'autre ne réclame le processeur.
     document.body.classList.add('calage')
     setTimeout(() => document.body.classList.remove('calage'), 1500)
-    // Lancé plus tôt, ce geste tombait en même temps que l'animation
-    // d'apparition de l'app et sautait.
-    jouerLogoBarre()
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
   else setTimeout(liberer, 600)

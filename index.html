@@ -724,13 +724,15 @@
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
   /* ═══ Barre en arc (espace gestion) ═══
-     Le contour est un seul tracé : deux bouts en demi-cercle et une bosse
-     arrondie au milieu. Le verre dépoli est découpé selon ce tracé avec
-     `clip-path`, et le liseré est le même tracé redessiné par-dessus en SVG.
-     Le bouton central est posé DANS la bosse : son sommet reste sous le
-     contour, il fait donc corps avec la barre au lieu de flotter dessus. */
+     Une arche : un bandeau de verre en U renversé, dont le centre est vide et
+     laisse voir la page. Le tracé est une demi-ellipse extérieure suivie d'une
+     demi-ellipse intérieure — l'épaisseur reste d'environ 59px du pied au
+     sommet. Le verre dépoli est découpé selon ce tracé avec `clip-path`, et le
+     liseré est le même tracé redessiné par-dessus en SVG.
+     Les trois boutons sont posés dans le bandeau : un dans chaque pied, un au
+     sommet de la courbe. */
   #tabbar-gestion{
-    width:236px; height:84px; padding:0; display:block; overflow:visible;
+    width:230px; height:88px; padding:0; display:block; overflow:visible;
     background:none; border:none; border-radius:0; box-shadow:none;
     -webkit-backdrop-filter:none; backdrop-filter:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48)) drop-shadow(0 2px 6px rgba(0,0,0,0.3));
@@ -739,13 +741,14 @@
     position:absolute; inset:0;
     background:rgba(255,255,255,0.10);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    -webkit-clip-path:path('M31,22 H78 C92,22 96,2 118,2 C140,2 144,22 158,22 H205 A31,31 0 0 1 205,84 H31 A31,31 0 0 1 31,22 Z'); clip-path:path('M31,22 H78 C92,22 96,2 118,2 C140,2 144,22 158,22 H205 A31,31 0 0 1 205,84 H31 A31,31 0 0 1 31,22 Z');
+    -webkit-clip-path:path('M0,88 A115,88 0 0 1 230,88 L170,88 A55,30 0 0 0 60,88 Z'); clip-path:path('M0,88 A115,88 0 0 1 230,88 L170,88 A55,30 0 0 0 60,88 Z');
   }
-  #tabbar-gestion .contour{ position:absolute; inset:0; width:236px; height:84px; pointer-events:none; }
+  #tabbar-gestion .contour{ position:absolute; inset:0; width:230px; height:88px; pointer-events:none; }
   #tabbar-gestion .tab-round{ position:absolute; }
-  #tabbar-gestion .tab-gauche{ left:25px;  top:31px; }
-  #tabbar-gestion .tab-droite{ left:167px; top:31px; }
-  #tabbar-gestion .tab-round--primary{ left:92px; top:6px; width:52px; height:52px; }
+  /* Un bouton dans chaque pied de l'arche, un au sommet. */
+  #tabbar-gestion .tab-gauche{ left:6px;   top:37px; }
+  #tabbar-gestion .tab-droite{ left:180px; top:37px; }
+  #tabbar-gestion .tab-round--primary{ left:89px; top:3px; width:52px; height:52px; }
   #tabbar-gestion .tab-round--primary svg{ width:25px; height:25px; }
   #tabbar-gestion .tab-pill{ width:44px; height:44px; }
   /* Pastille glissante : c'est elle qui porte le fond clair de l'onglet actif.
@@ -1471,7 +1474,7 @@
 
 <nav class="tabbar" id="tabbar-gestion" style="display:none;">
   <div class="verre"></div>
-  <svg class="contour" viewBox="0 0 236 84" fill="none"><path d="M31,22 H78 C92,22 96,2 118,2 C140,2 144,22 158,22 H205 A31,31 0 0 1 205,84 H31 A31,31 0 0 1 31,22 Z" stroke="rgba(255,255,255,0.20)" stroke-width="1"/></svg>
+  <svg class="contour" viewBox="0 0 236 84" fill="none"><path d="M0,88 A115,88 0 0 1 230,88 L170,88 A55,30 0 0 0 60,88 Z" stroke="rgba(255,255,255,0.20)" stroke-width="1"/></svg>
   <div class="tab-pill"></div>
   <button class="tab-round tab-round--secondary tab-gauche active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>

@@ -110,6 +110,28 @@
 
 
 
+  /* ═══ Carreaux d'arrière-plan ═══
+     Quelques carrés fins posés à des endroits précis, qui apparaissent et
+     s'effacent lentement, chacun à son rythme. Rien ne clignote : la montée
+     dure plus de deux secondes, le maintien deux, la disparition trois. Ils ne
+     travaillent que sur l'opacité et une infime échelle, leur coût est donc
+     nul — et ils restent derrière tout le reste. */
+  .carreaux-fond{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .carreaux-fond i{
+    position:absolute; display:block; border-radius:3px;
+    border:1px solid rgba(255,255,255,0.16);
+    opacity:0; animation:carreauRespire 13s ease-in-out infinite;
+  }
+  .carreaux-fond i.plein{ background:rgba(255,255,255,0.035); border-color:rgba(255,255,255,0.10); }
+  @keyframes carreauRespire{
+    0%   { opacity:0; transform:scale(0.86); }
+    18%  { opacity:1; transform:scale(1); }
+    34%  { opacity:1; transform:scale(1); }
+    58%  { opacity:0; transform:scale(1.1); }
+    100% { opacity:0; transform:scale(0.86); }
+  }
+  @media (prefers-reduced-motion: reduce){ .carreaux-fond i{ animation:none; opacity:0.3; } }
+
   .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
   .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 18px 0; }
   /* L'espace équipe n'a pas de bouton réglages : sa barre se centre aussi. */
@@ -165,116 +187,6 @@
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
   h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.02em; margin:6px 0 2px; }
   .subhead{ font-size:14px; color:var(--label-2); margin-bottom:18px; line-height:1.35; }
-
-  /* ═══ Panneau d'accueil ═══
-     Salutation, titre, compteurs et bouton réunis dans un seul bloc, sur le
-     bleu système d'Apple. Un dégradé du bleu clair vers le bleu profond, une
-     lueur en haut à droite pour donner du volume, et un bouton blanc plein
-     qui tranche franchement dessus. */
-  /* ═══ Panneau d'accueil ═══
-     Transparent, avec le même arrondi de 16px que les cartes de catégories.
-     Un demi-halo vert émerge du bord droit — son centre est posé exactement
-     sur l'arête, donc seule la moitié se voit. Une trame de petits carreaux
-     n'apparaît qu'à deux endroits, révélée par un masque en dégradé. */
-  /* ═══ Pile de deux cartes ═══
-     La seconde est entièrement cachée derrière la première. On fait glisser
-     du doigt vers la gauche ou la droite : la carte de devant part sur le côté
-     en pivotant légèrement, celle de derrière grandit et prend sa place.
-     Deux points sous la pile signalent qu'il y a une carte de plus. */
-  .pile{ position:relative; height:214px; margin-bottom:26px; touch-action:pan-y; }
-  /* Le préfixe `.pile` est indispensable : sans lui, la règle `.panneau-accueil`
-     déclarée plus bas remettait ces cartes en position normale et elles se
-     rangeaient l'une sous l'autre au lieu de se superposer. */
-  .pile .pile-carte{
-    position:absolute; left:0; right:0; top:0; height:214px; margin-bottom:0;
-    display:flex; flex-direction:column;
-    /* Courbe d'Apple : départ franc, arrivée qui se pose sans rebondir. */
-    transition: transform 0.55s cubic-bezier(0.32,0.72,0,1), opacity 0.4s cubic-bezier(0.32,0.72,0,1);
-    will-change:transform, opacity;
-  }
-  .pile .devant{ z-index:2; transform:none; opacity:1; }
-  .pile .derriere{ z-index:1; transform:scale(0.94); opacity:0; pointer-events:none; }
-  /* Pendant le glissement, c'est le doigt qui pilote : plus de transition. */
-  .pile.glisse .pile-carte{ transition:none; }
-  .pile.glisse .derriere{ opacity:1; }
-
-  .pile-points{ position:absolute; left:0; right:0; bottom:-18px; display:flex; justify-content:center; gap:6px; }
-  .pile-points i{
-    width:6px; height:6px; border-radius:50%; background:rgba(235,235,245,0.25);
-    transition:background 0.3s ease, transform 0.3s ease; cursor:pointer;
-  }
-  .pile-points i.on{ background:rgba(255,255,255,0.85); transform:scale(1.15); }
-
-  /* Carte du dessous : même matière, halo orange pour la distinguer */
-  .panneau-semaine .ps-relance{ margin-top:9px; }
-  /* Le second halo est légèrement décalé vers le haut : les deux cartes se
-     distinguent par la position de la lumière, non plus par la couleur. */
-  .ps-halo{
-    position:absolute; left:-30%; top:22%; transform:translateY(-50%);
-    width:62%; aspect-ratio:1; border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle,
-      rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 38%, rgba(255,255,255,0.02) 62%, transparent 74%);
-    filter:blur(16px);
-  }
-  .ps-relance{
-    position:relative; display:flex; align-items:center; gap:8px; margin-top:11px;
-    font-size:12px; color:var(--label-2);
-  }
-  .ps-relance b{ color:#fff; font-weight:650; }
-  .ps-relance .pastille{ width:7px; height:7px; border-radius:50%; flex-shrink:0;
-    background:rgba(255,255,255,0.45) !important; }
-
-  .panneau-accueil{
-    position:relative; overflow:hidden;
-    /* Fond plein, pas de transparence : le décor ne traverse plus le panneau.
-       La teinte reste dans la famille sombre de l'app, avec un très léger
-       dégradé pour éviter l'aplat mort. Bordure et arrondi restent ceux des
-       cartes de catégories, pour que les deux blocs se répondent. */
-    background:var(--hero-gradient);
-    border:0.5px solid var(--border); border-radius:16px;
-    padding:22px 20px 20px;
-  }
-  /* Demi-halo neutre : son centre est posé sur l'arête droite, donc seule la
-     moitié gauche se voit. Blanc translucide, aucune teinte. */
-  .pa-halo{
-    position:absolute; right:-33%; top:50%; transform:translateY(-50%);
-    width:66%; aspect-ratio:1; border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle,
-      rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.07) 38%, rgba(255,255,255,0.02) 62%, transparent 74%);
-    filter:blur(16px);
-  }
-  .pa-carreaux{
-    position:absolute; inset:0; pointer-events:none;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.13) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.13) 1px, transparent 1px);
-    background-size:20px 20px;
-    -webkit-mask-image:
-      radial-gradient(ellipse 46% 62% at 84% 74%, #000 8%, transparent 72%),
-      radial-gradient(ellipse 34% 46% at 10% 16%, #000 6%, transparent 74%);
-    mask-image:
-      radial-gradient(ellipse 46% 62% at 84% 74%, #000 8%, transparent 72%),
-      radial-gradient(ellipse 34% 46% at 10% 16%, #000 6%, transparent 74%);
-  }
-  .pa-salut{ position:relative; font-size:13px; font-weight:600; color:var(--label-2); }
-  /* Même graisse et même chasse que le mot « Procédo » de la barre du haut. */
-  .pa-titre{
-    position:relative; font-size:29px; font-weight:700; letter-spacing:-0.02em;
-    color:#fff; margin-top:4px; line-height:1.1;
-  }
-  .pa-sous{ position:relative; font-size:12.5px; font-weight:500; color:var(--label-3); margin-top:6px; margin-bottom:16px; }
-  .pa-bouton{
-    position:relative; display:flex; align-items:center; justify-content:center; gap:8px;
-    width:100%; height:46px; flex-shrink:0; border-radius:14px;
-    /* Repoussé en bas : le bloc occupe toute la hauteur qu'on lui donne. */
-    margin-top:auto;
-    border:0.5px solid var(--border);
-    background:rgba(255,255,255,0.10);
-    color:#fff; font-family:inherit; font-size:15px; font-weight:700; letter-spacing:-0.02em;
-    transition: transform 0.16s cubic-bezier(0.34,1.56,0.64,1), background 0.16s;
-  }
-  .pa-bouton:active{ transform:scale(0.97); background:rgba(255,255,255,0.20); }
-  .pa-bouton svg{ width:17px; height:17px; }
 
   .hero-card{ position:relative; background:var(--hero-gradient); border:0.5px solid rgba(255,255,255,0.15);
     border-radius:20px; padding:20px 18px; margin-bottom:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
@@ -653,41 +565,6 @@
   @keyframes squeletteBalai{ from{ transform:translateX(-100%); } to{ transform:translateX(100%); } }
   .sq-bloc{ background:rgba(255,255,255,0.08); border-radius:8px; }
 
-  /* ═══ Les mêmes carreaux que le panneau d'accueil ═══
-     Posés en calque décoratif, sans toucher au balisage. Même pas de 20px,
-     révélés seulement dans le coin bas droit, là où il n'y a pas de texte —
-     sinon la trame se lirait par-dessus les titres.
-     Les écrans de création en sont dispensés : ils sont pleins de champs de
-     saisie et de formulaires, une texture décorative n'y a rien à faire. */
-  .card, .hero-card, .cat-cell, .proc-rich-card, .sop-card, .emp-row,
-  .plan-card, .step-edit-item{ position:relative; overflow:hidden; }
-  .card::before, .hero-card::before, .cat-cell::before, .proc-rich-card::before,
-  .sop-card::before, .emp-row::before, .plan-card::before, .step-edit-item::before{
-    content:''; position:absolute; inset:0; pointer-events:none; z-index:0;
-    background-image:
-      linear-gradient(rgba(255,255,255,0.11) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.11) 1px, transparent 1px);
-    background-size:20px 20px;
-    -webkit-mask-image:radial-gradient(ellipse 62% 68% at 96% 96%, #000 6%, transparent 74%);
-    mask-image:radial-gradient(ellipse 62% 68% at 96% 96%, #000 6%, transparent 74%);
-  }
-  /* Les cartes de catégories font la moitié de la largeur : au même réglage,
-     la trame y comptait deux fois plus de carreaux visibles que sur les blocs
-     pleine largeur. On resserre la zone révélée dans le coin, et on l'atténue
-     un peu — le pas reste le même partout, seule la quantité change. */
-  .cat-cell::before{
-    -webkit-mask-image:radial-gradient(ellipse 40% 34% at 102% 102%, #000 0%, transparent 68%);
-    mask-image:radial-gradient(ellipse 40% 34% at 102% 102%, #000 0%, transparent 68%);
-    background-image:
-      linear-gradient(rgba(255,255,255,0.09) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.09) 1px, transparent 1px);
-  }
-
-  /* Écrans « Nouvelle procédure » : aucune trame. */
-  .sans-carreaux .card::before,
-  .sans-carreaux .step-edit-item::before,
-  .sans-carreaux .hero-card::before{ content:none; }
-
   .cat-cell, .proc-rich-card{
     padding:14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     position:relative; overflow:hidden;
@@ -1004,6 +881,25 @@
   })
 </script>
 
+<div class="carreaux-fond">
+  <i class="" style="left:8%; top:14%; width:22px; height:22px; animation-delay:0.0s;"></i>
+  <i class="plein" style="left:17%; top:9%; width:14px; height:14px; animation-delay:2.4s;"></i>
+  <i class="" style="left:11%; top:26%; width:12px; height:12px; animation-delay:6.1s;"></i>
+  <i class="plein" style="left:78%; top:11%; width:18px; height:18px; animation-delay:1.2s;"></i>
+  <i class="" style="left:88%; top:19%; width:26px; height:26px; animation-delay:4.7s;"></i>
+  <i class="" style="left:72%; top:24%; width:12px; height:12px; animation-delay:8.3s;"></i>
+  <i class="plein" style="left:6%; top:52%; width:16px; height:16px; animation-delay:3.5s;"></i>
+  <i class="" style="left:14%; top:61%; width:24px; height:24px; animation-delay:7.2s;"></i>
+  <i class="" style="left:4%; top:71%; width:12px; height:12px; animation-delay:10.4s;"></i>
+  <i class="" style="left:84%; top:56%; width:20px; height:20px; animation-delay:0.8s;"></i>
+  <i class="plein" style="left:91%; top:66%; width:14px; height:14px; animation-delay:5.6s;"></i>
+  <i class="" style="left:77%; top:74%; width:18px; height:18px; animation-delay:9.1s;"></i>
+  <i class="" style="left:46%; top:6%; width:14px; height:14px; animation-delay:6.8s;"></i>
+  <i class="plein" style="left:52%; top:88%; width:20px; height:20px; animation-delay:2.9s;"></i>
+  <i class="" style="left:33%; top:93%; width:12px; height:12px; animation-delay:11.2s;"></i>
+  <i class="" style="left:64%; top:40%; width:16px; height:16px; animation-delay:7.9s;"></i>
+</div>
+
 <div class="color-halos">
   <div class="chalo chalo-4"></div>
   <div class="chalo chalo-1"></div>
@@ -1111,33 +1007,10 @@
   </div>
 
   <div class="screen active" id="p-list">
-    <div class="pile" id="pile-accueil">
-      <div class="panneau-accueil pile-carte devant" data-carte="procedures">
-        <div class="pa-halo"></div>
-        <div class="pa-carreaux"></div>
-        <div class="pa-salut" id="greeting-text">Bonjour 👋</div>
-        <h1 class="pa-titre">Mes procédures</h1>
-        <div class="pa-sous" id="p-list-subhead">Chargement...</div>
-        <button class="pa-bouton" onclick="startNewProcedure()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Créer une procédure
-        </button>
-      </div>
+    <div class="greeting" id="greeting-text">Bonjour 👋</div>
+    <h1 class="pagehead">Mes procédures</h1>
+    <div class="subhead" id="p-list-subhead">Chargement...</div>
 
-      <div class="panneau-accueil panneau-semaine pile-carte derriere" data-carte="semaine">
-        <div class="ps-halo"></div>
-        <div class="pa-carreaux"></div>
-        <div class="pa-salut">Cette semaine</div>
-        <h1 class="pa-titre" id="sem-titre">—</h1>
-        <div class="pa-sous" id="sem-sous">—</div>
-        <div class="ps-relance" id="sem-relance"></div>
-        <button class="pa-bouton" onclick="showGestionScreen('p-global-analyse'); loadGlobalAnalyse()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-          Voir l'analyse complète
-        </button>
-      </div>
-      <div class="pile-points" id="pile-points"><i class="on"></i><i></i></div>
-    </div>
     <div class="list-tools">
       <div class="dd-filter" id="dd-cat-sort">
         <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
@@ -1180,7 +1053,7 @@
     <div id="category-procedures-list"></div>
   </div>
 
-  <div class="screen sans-carreaux" id="p-create">
+  <div class="screen" id="p-create">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-list')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1235,7 +1108,7 @@
     </div>
   </div>
 
-  <div class="screen sans-carreaux" id="p-create-manual">
+  <div class="screen" id="p-create-manual">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1251,7 +1124,7 @@
     <button class="btn block" style="margin-top:18px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
 
-  <div class="screen sans-carreaux" id="p-create-video">
+  <div class="screen" id="p-create-video">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1312,7 +1185,7 @@
     <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
   </div>
 
-  <div class="screen sans-carreaux" id="p-create-ai">
+  <div class="screen" id="p-create-ai">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -1589,8 +1462,8 @@
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
   </button>
-  <button class="tab-round tab-round--primary" onclick="showGestionScreen('p-scan', this); startScanner('gestion')" aria-label="Scanner un QR code">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
+  <button class="tab-round tab-round--primary" onclick="startNewProcedure()" aria-label="Créer une procédure">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
 </nav>
 
@@ -2309,17 +2182,30 @@ function majPastille(idBarre) {
   const pastille = barre.querySelector('.tab-pill')
   const actif = barre.querySelector('.tab-round.active')
   if (!pastille) return
-  if (!actif) { pastille.style.opacity = '0'; return }
+  // Le bouton blanc marque déjà sa page à lui seul : pas de pastille dessous.
+  if (!actif || actif.classList.contains('tab-round--primary')) { pastille.style.opacity = '0'; return }
   pastille.style.transform = `translate(${actif.offsetLeft}px, ${actif.offsetTop}px)`
   pastille.style.opacity = '1'
 }
 
 // ═══ NAVIGATION (séparée par espace, pas de collision d'ids) ═══
+/* À quel onglet correspond chaque écran. Avant, le repère dépendait du bouton
+   sur lequel on venait de taper : en revenant d'une sous-page par le bouton
+   retour, aucun bouton n'était transmis et le repère disparaissait. Il se
+   déduit maintenant de l'écran affiché, quel que soit le chemin emprunté. */
+const ONGLET_PAR_ECRAN = {
+  'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
+  'p-global-analyse': 1,
+  'p-create': 2, 'p-create-manual': 2, 'p-create-video': 2, 'p-create-ai': 2,
+}
+
 window.showGestionScreen = function(id, btn) {
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
-  document.querySelectorAll('#tabbar-gestion .tab-round').forEach(b => b.classList.remove('active'))
-  if (btn) btn.classList.add('active')
+  const boutons = document.querySelectorAll('#tabbar-gestion .tab-round')
+  boutons.forEach(b => b.classList.remove('active'))
+  const index = ONGLET_PAR_ECRAN[id]
+  if (index != null && boutons[index]) boutons[index].classList.add('active')
   majPastille('tabbar-gestion')
   if (id === 'p-create') updateModeCardsState()
   // La caméra ne doit jamais tourner sur un écran qu'on a quitté
@@ -2390,8 +2276,7 @@ async function loadGestionProcedures() {
   catGridEl.innerHTML = ''
 
   if (procedures.length === 0) {
-    renderCarteSemaine()
-    subheadEl.textContent = `0 catégorie · 0 procédure · accès complet`
+      subheadEl.textContent = `0 catégorie · 0 procédure · accès complet`
     catGridEl.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1;">
         <h3>Aucune procédure pour le moment</h3>
@@ -2467,130 +2352,6 @@ async function loadGestionProcedures() {
 
   window.jalon?.('validations reçues, grille prête')
   renderCategoryGrid()
-  renderCarteSemaine()
-}
-
-/* ═══ Pile de l'accueil ═══
-   Deux cartes superposées : les procédures devant, le bilan de la semaine
-   caché derrière. On fait glisser du doigt à gauche ou à droite pour les
-   échanger — pendant le glissement, c'est le doigt qui pilote directement les
-   deux cartes, et au relâchement on décide de terminer ou de revenir. */
-;(function pileAccueil() {
-  const pile = document.getElementById('pile-accueil')
-  if (!pile) return
-  const points = document.getElementById('pile-points')
-  let departX = null, ecart = 0, largeur = 0
-
-  const devant = () => pile.querySelector('.pile-carte.devant')
-  const derriere = () => pile.querySelector('.pile-carte.derriere')
-
-  function basculer() {
-    pile.querySelectorAll('.pile-carte').forEach(c => {
-      const estDevant = c.classList.contains('devant')
-      c.classList.toggle('devant', !estDevant)
-      c.classList.toggle('derriere', estDevant)
-    })
-    const index = [...pile.querySelectorAll('.pile-carte')].findIndex(c => c.classList.contains('devant'))
-    points?.querySelectorAll('i').forEach((p, i) => p.classList.toggle('on', i === index))
-  }
-
-  function nettoyer() {
-    ;[devant(), derriere()].forEach(c => { if (c) { c.style.transform = ''; c.style.opacity = '' } })
-  }
-
-  pile.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('button')) return       // on ne gêne pas les boutons
-    departX = e.clientX
-    ecart = 0
-    largeur = pile.offsetWidth || 1
-    pile.classList.add('glisse')
-    pile.setPointerCapture?.(e.pointerId)
-  })
-
-  pile.addEventListener('pointermove', (e) => {
-    if (departX == null) return
-    ecart = e.clientX - departX
-    /* Aucune rotation : la carte de devant glisse et se retire légèrement,
-       celle de derrière remonte à sa taille pleine avec un léger contre-
-       mouvement. C'est le vocabulaire d'Apple — de la profondeur, pas du jeu
-       de cartes. */
-    const avancement = Math.min(1, Math.abs(ecart) / (largeur * 0.55))
-    const d = devant(), r = derriere()
-    if (d) {
-      d.style.transform = `translateX(${ecart}px) scale(${1 - avancement * 0.06})`
-      d.style.opacity = String(1 - avancement * 0.55)
-    }
-    if (r) {
-      r.style.transform = `translateX(${-ecart * 0.22}px) scale(${0.94 + avancement * 0.06})`
-      r.style.opacity = String(avancement)
-    }
-  })
-
-  function relacher() {
-    if (departX == null) return
-    const fini = Math.abs(ecart) > largeur * 0.24
-    pile.classList.remove('glisse')
-    nettoyer()
-    if (fini) basculer()
-    departX = null
-    ecart = 0
-  }
-  pile.addEventListener('pointerup', relacher)
-  pile.addEventListener('pointercancel', relacher)
-
-  // Les deux points servent aussi de commande
-  points?.addEventListener('click', (e) => {
-    const p = e.target.closest('i')
-    if (!p || p.classList.contains('on')) return
-    basculer()
-  })
-})()
-
-/* Remplit la carte de la semaine à partir de ce qui est déjà en mémoire :
-   aucune requête supplémentaire, tout vient du préchargement. */
-function renderCarteSemaine() {
-  const titre = document.getElementById('sem-titre')
-  const sous = document.getElementById('sem-sous')
-  const relance = document.getElementById('sem-relance')
-  if (!titre) return
-
-  const nbEmployes = cachedEmployes.length
-  const nbProcedures = allGestionProcedures.length
-
-  const debutSemaine = new Date()
-  const jour = (debutSemaine.getDay() + 6) % 7          // lundi = 0
-  debutSemaine.setDate(debutSemaine.getDate() - jour)
-  debutSemaine.setHours(0, 0, 0, 0)
-
-  const vues = cachedValidations.filter(v => new Date(v.validated_at) >= debutSemaine).length
-  const possible = nbProcedures * nbEmployes
-  const taux = possible ? Math.round((vues / possible) * 100) : 0
-
-  if (!nbProcedures) {
-    titre.textContent = 'Rien à suivre'
-    sous.textContent = 'Créez votre première procédure pour voir vos statistiques.'
-    relance.innerHTML = ''
-    return
-  }
-  if (!nbEmployes) {
-    titre.textContent = 'Équipe vide'
-    sous.textContent = "Partagez le code d'invitation dans Paramètres pour suivre les consultations."
-    relance.innerHTML = ''
-    return
-  }
-
-  titre.textContent = taux + '% consultées'
-  sous.textContent = `${vues} consultation${vues > 1 ? 's' : ''} sur ${possible} possibles depuis lundi`
-
-  // La catégorie la plus en retard, celle qui mérite une relance
-  const enRetard = [...allCategoriesData].sort((a, b) => a.avgPct - b.avgPct)[0]
-  if (enRetard && enRetard.avgPct < 100) {
-    const couleur = enRetard.avgPct >= 70 ? 'var(--green)' : enRetard.avgPct >= 30 ? 'var(--orange)' : 'var(--red)'
-    relance.innerHTML = `<span class="pastille" style="background:${couleur};"></span>` +
-      `À relancer : <b>${escapeHtml(enRetard.nom)}</b> · ${enRetard.avgPct}%`
-  } else {
-    relance.innerHTML = `<span class="pastille" style="background:var(--green);"></span>Tout le monde est à jour.`
-  }
 }
 
 // Capture la position actuelle de chaque carte (identifiée par data-key) avant de les réordonner

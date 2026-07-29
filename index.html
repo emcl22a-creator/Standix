@@ -117,12 +117,20 @@
      travaillent que sur l'opacité et une infime échelle, leur coût est donc
      nul — et ils restent derrière tout le reste. */
   .carreaux-fond{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  /* Chaque plaque porte la trame de carreaux de 20px — celle qu'avait le
+     panneau « Mes procédures » — et un masque en dégradé qui ne la révèle
+     qu'en son centre, en se dissipant vers les bords. Elles apparaissent et
+     s'effacent chacune à son rythme. */
   .carreaux-fond i{
-    position:absolute; display:block; border-radius:3px;
-    border:1px solid rgba(255,255,255,0.16);
-    opacity:0; animation:carreauRespire 13s ease-in-out infinite;
+    position:absolute; display:block; opacity:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.13) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.13) 1px, transparent 1px);
+    background-size:20px 20px;
+    -webkit-mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 4%, transparent 72%);
+    mask-image:radial-gradient(ellipse 50% 50% at 50% 50%, #000 4%, transparent 72%);
+    animation:carreauRespire 13s ease-in-out infinite;
   }
-  .carreaux-fond i.plein{ background:rgba(255,255,255,0.035); border-color:rgba(255,255,255,0.10); }
   @keyframes carreauRespire{
     0%   { opacity:0; transform:scale(0.86); }
     18%  { opacity:1; transform:scale(1); }
@@ -618,6 +626,41 @@
   .empty-state{ text-align:center; padding:36px 20px 20px; }
   .empty-state h3{ font-size:16px; font-weight:700; margin-bottom:6px; }
   .empty-state p{ font-size:13px; color:var(--label-2); max-width:250px; margin:0 auto; line-height:1.5; }
+
+  /* ═══ Premier écran, quand rien n'existe encore ═══
+     Centré verticalement dans la place laissée par la barre du haut et la
+     barre d'onglets, avec un dessin au trait au-dessus du texte. */
+  .debut{
+    grid-column:1/-1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; min-height:calc(100vh - 300px); padding:20px;
+  }
+  .debut-dessin{ position:relative; width:132px; height:120px; margin-bottom:26px; }
+  .debut-dessin .lueur{
+    position:absolute; left:50%; top:52%; transform:translate(-50%,-50%);
+    width:150%; height:150%; border-radius:50%; pointer-events:none;
+    background:radial-gradient(circle, rgba(255,255,255,0.13) 0%, transparent 66%);
+    filter:blur(14px); animation:debutLueur 4.5s ease-in-out infinite;
+  }
+  .debut-dessin svg{ position:relative; width:100%; height:100%; overflow:visible; }
+  /* Les deux fiches du fond montent doucement, décalées l'une de l'autre. */
+  .debut-dessin .fond-2{ animation:debutFlotte 5.4s ease-in-out infinite; }
+  .debut-dessin .fond-1{ animation:debutFlotte 5.4s ease-in-out -1.8s infinite; }
+  .debut-dessin .devant{ animation:debutFlotte 5.4s ease-in-out -3.4s infinite; }
+  .debut-dessin .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
+  @keyframes debutFlotte{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+  @keyframes debutLueur{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
+  @keyframes debutSigne{ 0%,100%{ opacity:0.75; } 50%{ opacity:1; } }
+  @media (prefers-reduced-motion: reduce){
+    .debut-dessin *{ animation:none !important; }
+  }
+  .debut h3{ font-size:19px; font-weight:750; letter-spacing:-0.03em; margin-bottom:8px; }
+  .debut p{ font-size:13.5px; color:var(--label-2); max-width:260px; margin:0 auto; line-height:1.55; }
+  .debut .fleche{
+    display:flex; align-items:center; gap:6px; margin-top:22px;
+    font-size:12px; font-weight:600; color:var(--label-3);
+  }
+  .debut .fleche svg{ width:13px; height:13px; animation:debutDescend 2.2s ease-in-out infinite; }
+  @keyframes debutDescend{ 0%,100%{ transform:translateY(0); opacity:0.6; } 50%{ transform:translateY(3px); opacity:1; } }
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
@@ -882,22 +925,14 @@
 </script>
 
 <div class="carreaux-fond">
-  <i class="" style="left:8%; top:14%; width:22px; height:22px; animation-delay:0.0s;"></i>
-  <i class="plein" style="left:17%; top:9%; width:14px; height:14px; animation-delay:2.4s;"></i>
-  <i class="" style="left:11%; top:26%; width:12px; height:12px; animation-delay:6.1s;"></i>
-  <i class="plein" style="left:78%; top:11%; width:18px; height:18px; animation-delay:1.2s;"></i>
-  <i class="" style="left:88%; top:19%; width:26px; height:26px; animation-delay:4.7s;"></i>
-  <i class="" style="left:72%; top:24%; width:12px; height:12px; animation-delay:8.3s;"></i>
-  <i class="plein" style="left:6%; top:52%; width:16px; height:16px; animation-delay:3.5s;"></i>
-  <i class="" style="left:14%; top:61%; width:24px; height:24px; animation-delay:7.2s;"></i>
-  <i class="" style="left:4%; top:71%; width:12px; height:12px; animation-delay:10.4s;"></i>
-  <i class="" style="left:84%; top:56%; width:20px; height:20px; animation-delay:0.8s;"></i>
-  <i class="plein" style="left:91%; top:66%; width:14px; height:14px; animation-delay:5.6s;"></i>
-  <i class="" style="left:77%; top:74%; width:18px; height:18px; animation-delay:9.1s;"></i>
-  <i class="" style="left:46%; top:6%; width:14px; height:14px; animation-delay:6.8s;"></i>
-  <i class="plein" style="left:52%; top:88%; width:20px; height:20px; animation-delay:2.9s;"></i>
-  <i class="" style="left:33%; top:93%; width:12px; height:12px; animation-delay:11.2s;"></i>
-  <i class="" style="left:64%; top:40%; width:16px; height:16px; animation-delay:7.9s;"></i>
+  <i style="left:-4%; top:8%; width:190px; height:160px; animation-delay:0.0s;"></i>
+  <i style="left:62%; top:4%; width:210px; height:175px; animation-delay:3.6s;"></i>
+  <i style="left:-10%; top:34%; width:165px; height:145px; animation-delay:7.4s;"></i>
+  <i style="left:70%; top:30%; width:185px; height:155px; animation-delay:10.8s;"></i>
+  <i style="left:20%; top:52%; width:200px; height:165px; animation-delay:2.1s;"></i>
+  <i style="left:-6%; top:70%; width:175px; height:150px; animation-delay:5.9s;"></i>
+  <i style="left:66%; top:66%; width:195px; height:160px; animation-delay:9.2s;"></i>
+  <i style="left:26%; top:86%; width:180px; height:155px; animation-delay:12.1s;"></i>
 </div>
 
 <div class="color-halos">
@@ -1007,10 +1042,6 @@
   </div>
 
   <div class="screen active" id="p-list">
-    <div class="greeting" id="greeting-text">Bonjour 👋</div>
-    <h1 class="pagehead">Mes procédures</h1>
-    <div class="subhead" id="p-list-subhead">Chargement...</div>
-
     <div class="list-tools">
       <div class="dd-filter" id="dd-cat-sort">
         <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
@@ -2247,9 +2278,11 @@ let allCategoriesData = []
 let currentCatSort = 'az'
 
 async function loadGestionProcedures() {
+  // L'en-tête a été retiré de la page : ces deux repères peuvent être absents.
   const subheadEl = document.getElementById('p-list-subhead')
   const catGridEl = document.getElementById('cat-grid')
-  document.getElementById('greeting-text').textContent = `Bonjour ${currentMembre.nom || ''} 👋`
+  const ecrireSous = (t) => { if (subheadEl) subheadEl.textContent = t }
+  document.getElementById('greeting-text')?.style.setProperty('display', 'none')
 
   // Membres et entreprise ne dépendent pas des procédures : les trois requêtes
   // partent ensemble au lieu de s'attendre. Un aller-retour réseau économisé,
@@ -2267,7 +2300,7 @@ async function loadGestionProcedures() {
   const fullMembres = membresFrais
 
   window.jalon?.('procédures + membres reçus')
-  if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
+  if (error) { ecrireSous("Erreur : " + error.message); return }
   allGestionProcedures = procedures
   cachedMembres = fullMembres || []
   cachedEntreprise = entrepriseRow || null
@@ -2276,11 +2309,39 @@ async function loadGestionProcedures() {
   catGridEl.innerHTML = ''
 
   if (procedures.length === 0) {
-      subheadEl.textContent = `0 catégorie · 0 procédure · accès complet`
+      ecrireSous(`0 catégorie · 0 procédure · accès complet`)
     catGridEl.innerHTML = `
-      <div class="empty-state" style="grid-column:1/-1;">
-        <h3>Aucune procédure pour le moment</h3>
-        <p>Créez la première avec le bouton ci-dessus — décrivez la tâche ou filmez-la, ça ne prend que quelques minutes.</p>
+      <div class="debut">
+        <div class="debut-dessin">
+          <div class="lueur"></div>
+          <svg viewBox="0 0 132 120" fill="none">
+            <!-- deux fiches en retrait, puis celle de devant avec son bouton de lecture -->
+            <rect class="fond-2" x="30" y="8"  width="72" height="52" rx="11"
+                  stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
+            <rect class="fond-1" x="22" y="20" width="88" height="62" rx="13"
+                  stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/>
+            <g class="devant">
+              <rect x="14" y="34" width="104" height="72" rx="15"
+                    fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
+              <circle cx="66" cy="70" r="17" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
+              <path d="M61.5 62.5 L76 70 L61.5 77.5 Z" fill="rgba(255,255,255,0.75)"/>
+              <line x1="30" y1="95" x2="60" y2="95" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="66" y1="95" x2="84" y2="95" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
+            </g>
+            <g class="signe">
+              <circle cx="112" cy="26" r="13" fill="#fff"/>
+              <line x1="112" y1="20" x2="112" y2="32" stroke="#0C0D0E" stroke-width="2.4" stroke-linecap="round"/>
+              <line x1="106" y1="26" x2="118" y2="26" stroke="#0C0D0E" stroke-width="2.4" stroke-linecap="round"/>
+            </g>
+          </svg>
+        </div>
+        <h3>Votre première procédure</h3>
+        <p>Décrivez une tâche étape par étape, ou filmez-la une seule fois — l'IA la découpe pour vous.</p>
+        <div class="fleche">
+          Touchez le bouton
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          en bas de l'écran
+        </div>
       </div>
     `
     return
@@ -2326,7 +2387,7 @@ async function loadGestionProcedures() {
   })
 
   const nbCategories = Object.keys(categoriesMap).length
-  subheadEl.textContent = `${nbCategories} catégorie${nbCategories > 1 ? 's' : ''} · ${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`
+  ecrireSous(`${nbCategories} catégorie${nbCategories > 1 ? 's' : ''} · ${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`)
 
   allCategoriesData = []
   for (const [nom, icone] of Object.entries(categoriesMap)) {

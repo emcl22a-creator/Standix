@@ -710,14 +710,10 @@
 
   .step-edit-item{ cursor:pointer; transition: border-color 0.18s, background 0.18s; }
   .step-edit-item.selected{ border-color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.07); }
-  .step-move{ display:flex; gap:5px; flex-shrink:0; }
-  .step-move button{
-    width:28px; height:28px; border-radius:9px; background:rgba(255,255,255,0.08);
-    border:0.5px solid var(--border); color:var(--label); font-size:13px; line-height:1;
-    display:flex; align-items:center; justify-content:center;
-  }
-  .step-move button:active{ background:rgba(255,255,255,0.18); }
-  .step-move button:disabled{ opacity:0.28; }
+  
+  
+  
+  
 
   .cat-rank{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
@@ -4727,13 +4723,6 @@ document.getElementById('capcut-add-btn')?.addEventListener('click', () => {
 })
 
 
-// ═══ Déplacer une étape dans la liste (repositionnement) ═══
-function moveStepInArray(arr, from, to) {
-  if (to < 0 || to >= arr.length) return false
-  const [item] = arr.splice(from, 1)
-  arr.splice(to, 0, item)
-  return true
-}
 
 // Petit bloc de boutons ↑ / ↓ commun à toutes les listes d'étapes
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -4805,6 +4794,10 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
   function relacher() {
     annulerAttente()
     if (!actif) return
+    // Le relâchement produit un clic : sans ce garde-fou, poser une étape la
+    // sélectionnerait au passage dans l'éditeur, ce qui n'a rien à voir.
+    conteneur.dataset.glissementRecent = '1'
+    setTimeout(() => { delete conteneur.dataset.glissementRecent }, 60)
     const { index, cible } = actif
     conteneur.classList.remove('step-liste-en-cours')
     actif.els.forEach(e => { e.style.transform = ''; e.classList.remove('attrape', 'decale') })
@@ -4850,23 +4843,6 @@ function gripHtml() {
   return '<span class="step-grip" aria-label="Déplacer l\'étape"><i></i><i></i><i></i></span>'
 }
 
-function moveButtonsHtml(i, total) {
-  return `<div class="step-move">
-      <button type="button" class="mv-up" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button>
-      <button type="button" class="mv-down" ${i === total - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button>
-    </div>`
-}
-
-function wireMoveButtons(div, arr, i, onDone) {
-  div.querySelector('.mv-up')?.addEventListener('click', (e) => {
-    e.stopPropagation()
-    if (moveStepInArray(arr, i, i - 1)) onDone(i - 1)
-  })
-  div.querySelector('.mv-down')?.addEventListener('click', (e) => {
-    e.stopPropagation()
-    if (moveStepInArray(arr, i, i + 1)) onDone(i + 1)
-  })
-}
 
 // ═══ Étapes manuelles (texte seul, pas de vidéo) ═══
 document.getElementById('add-manual-step-btn')?.addEventListener('click', () => {
@@ -4954,7 +4930,7 @@ function renderVideoSteps() {
       </div>
       <div class="step-row-bottom">
         <span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>
-        ${moveButtonsHtml(i, videoSteps.length)}
+        ${gripHtml()}
         <span class="del">${TRASH_SVG}</span>
       </div>
     `
@@ -4971,12 +4947,17 @@ function renderVideoSteps() {
       })
     })
     div.addEventListener('click', (e) => {
-      if (e.target.closest('textarea, button, .del')) return
+      if (e.target.closest('textarea, button, .del, .step-grip')) return
+      if (listEl.dataset.glissementRecent) return
       capcutEditor?.select(i)
     })
-    wireMoveButtons(div, videoSteps, i, (newIndex) => { renderVideoSteps(); capcutEditor?.select(newIndex, { lire: false }) })
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
+  })
+
+  activerGlissementEtapes(listEl, () => videoSteps, (nouvelIndex) => {
+    renderVideoSteps()
+    capcutEditor?.select(nouvelIndex, { lire: false })
   })
 }
 
@@ -6536,7 +6517,7 @@ function renderEditSteps() {
       </div>
       <div class="step-row-bottom">
         ${hasClip ? `<span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>` : ''}
-        ${moveButtonsHtml(i, editStepsData.length)}
+        ${gripHtml()}
         <span class="del">${TRASH_SVG}</span>
       </div>
     `
@@ -6553,16 +6534,18 @@ function renderEditSteps() {
     })
     if (editVideoUrl) {
       div.addEventListener('click', (e) => {
-        if (e.target.closest('textarea, button, .del')) return
+        if (e.target.closest('textarea, button, .del, .step-grip')) return
+        if (listEl.dataset.glissementRecent) return
         ecapEditor?.select(i)
       })
     }
-    wireMoveButtons(div, editStepsData, i, (newIndex) => {
-      renderEditSteps()
-      if (editVideoUrl) ecapEditor?.select(newIndex, { lire: false })
-    })
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
+  })
+
+  activerGlissementEtapes(listEl, () => editStepsData, (nouvelIndex) => {
+    renderEditSteps()
+    if (editVideoUrl) ecapEditor?.select(nouvelIndex, { lire: false })
   })
 }
 

@@ -351,6 +351,111 @@
     .ai-ring-wrap.indetermine svg{ animation:none; }
   }
 
+  /* ═════════════════════════════════════════════════════════════════════
+     LE TIROIR DES ÉTABLISSEMENTS
+     Fermé, il ne montre que l'établissement courant : c'est lui le bouton. Il
+     s'élargit sur place, et la carte au logo s'efface le temps du choix — rien
+     n'est poussé, rien ne recouvre l'écran.
+     ═══════════════════════════════════════════════════════════════════ */
+  .verre-barre{
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
+  }
+  .tiroir-ent{
+    display:flex; align-items:center; gap:7px; padding:6px; border-radius:100px;
+    overflow:hidden; max-width:44px; flex-shrink:0;
+    transition:max-width 0.5s cubic-bezier(0.32,0.72,0,1);
+  }
+  .tiroir-ent.ouvert{ max-width:300px; }
+  .tiroir-liste{
+    display:flex; align-items:center; gap:7px;
+    opacity:0; transform:translateX(-8px);
+    transition:opacity 0.34s ease 0.06s, transform 0.44s cubic-bezier(0.32,0.72,0,1) 0.06s;
+  }
+  .tiroir-ent.ouvert .tiroir-liste{ opacity:1; transform:none; }
+  /* La carte au logo s'efface pendant le choix : c'est la même place. */
+  .tiroir-ent.ouvert ~ .topbar-card{ opacity:0; transform:translateX(12px); pointer-events:none; }
+  .topbar-card{ transition:opacity 0.34s ease, transform 0.44s cubic-bezier(0.32,0.72,0,1); }
+
+  /* Le rond : le logo déposé, sinon les initiales. */
+  .rond-ent{
+    position:relative; width:32px; height:32px; flex-shrink:0; border-radius:50%;
+    overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#24262C,#15161A);
+    border:0.5px solid rgba(255,255,255,0.22);
+    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .rond-ent:active{ transform:scale(0.9); }
+  .rond-ent.actif{ border-color:#fff; border-width:1.5px; }
+  .rond-ent img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .rond-ent .ini{
+    position:relative; font-size:11px; font-weight:700; letter-spacing:0.04em;
+    color:rgba(255,255,255,0.92);
+  }
+  .rond-ent.plus{ background:#fff; border-color:transparent; }
+  .rond-ent.plus .ini{ color:#000; font-size:19px; font-weight:500; line-height:0; margin-top:-1px; }
+
+  /* ═══ Liste des établissements dans les réglages ═══ */
+  .etab-ligne{
+    display:flex; align-items:center; gap:12px; width:100%; padding:11px 13px;
+    border-radius:15px; background:var(--bg-card); border:0.5px solid var(--border);
+    margin-bottom:8px; font-family:inherit; text-align:left; color:#fff;
+  }
+  .etab-ligne .rond-ent{ width:38px; height:38px; }
+  .etab-ligne .rond-ent .ini{ font-size:12.5px; }
+  .etab-ligne .tx{ flex:1; min-width:0; }
+  .etab-ligne .nm{ font-size:14px; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .etab-ligne .st{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
+  .etab-ligne .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
+  .etab-ligne.ajout{ border-style:dashed; background:none; }
+  .etab-ligne.ajout .rond-ent{ background:#fff; border-color:transparent; }
+  .etab-ligne.ajout .rond-ent .ini{ color:#000; font-size:19px; font-weight:500; line-height:0; }
+
+  /* ═══ Fenêtre d'un établissement ═══ */
+  .fond-etab{
+    position:fixed; inset:0; z-index:420; display:flex; align-items:center; justify-content:center;
+    padding:24px; background:rgba(0,0,0,0.55);
+    -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+    opacity:0; pointer-events:none; transition:opacity 0.28s ease;
+  }
+  .fond-etab.on{ opacity:1; pointer-events:auto; }
+  .fen-etab{
+    width:100%; max-width:340px; padding:24px 20px 18px; border-radius:26px; text-align:center;
+    background:var(--hero-gradient); border:0.5px solid var(--border);
+    box-shadow:0 24px 60px rgba(0,0,0,0.6);
+    transform:scale(0.92) translateY(12px); opacity:0;
+    transition:transform 0.42s cubic-bezier(0.34,1.4,0.5,1), opacity 0.3s ease;
+  }
+  .fond-etab.on .fen-etab{ transform:none; opacity:1; }
+  .fen-etab h3{ font-size:19px; font-weight:800; letter-spacing:-0.035em; margin-bottom:4px; }
+  .fen-etab .s{ font-size:12.5px; color:var(--label-2); line-height:1.45; margin-bottom:18px; }
+  .fen-etab input[type=text]{ margin-bottom:0; }
+
+  .etab-depot{
+    position:relative; width:96px; height:96px; margin:0 auto 8px; border-radius:50%;
+    overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#24262C,#15161A);
+    border:1.5px dashed rgba(255,255,255,0.28); color:rgba(255,255,255,0.5);
+    transition:border-color 0.2s, transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .etab-depot:active{ transform:scale(0.96); }
+  .etab-depot.rempli{ border-style:solid; border-color:rgba(255,255,255,0.4); }
+  .etab-depot img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .etab-depot .mono{ font-size:28px; font-weight:750; letter-spacing:0.04em; color:rgba(255,255,255,0.5); }
+  .etab-depot .appareil{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px;
+  }
+  .etab-depot .appareil svg{ width:22px; height:22px; }
+  .etab-depot .appareil span{ font-size:9.5px; font-weight:650; color:rgba(255,255,255,0.4); }
+  .etab-depot.rempli .appareil{ display:none; }
+  .etab-legende{ font-size:12px; font-weight:600; color:var(--label-2); margin-bottom:16px; }
+  .etab-legende button{
+    border:none; background:none; font-family:inherit; font-size:12px;
+    font-weight:700; color:var(--blue); padding:0;
+  }
+
   /* ═══ Coche de fin d'analyse ═══
      Même langue que les icônes des modes : cercles en retrait à 16 et 26 %, celui
      de devant à 42 %, et le signe en blanc plein. Le trait de la coche se dessine
@@ -1325,10 +1430,6 @@
   .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
   .cat-date{ font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; font-variant-numeric:tabular-nums; }
   .carte-categorie{ font-size:11px; font-weight:600; color:var(--label-3); margin-top:3px; }
-  .cat-attention{
-    display:inline-flex; align-items:center; gap:4px; font-size:9.5px; font-weight:700;
-    color:var(--orange); background:rgba(255,159,10,0.14); padding:3px 8px; border-radius:100px; margin-bottom:8px;
-  }
   .cat-recent{ border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
   /* Le titre d'une procédure récente et, le cas échéant, son état d'analyse :
      l'indicateur se cale juste au bout du texte, pas au bout de la carte. */
@@ -1857,6 +1958,9 @@
 <div class="app" id="gestion-app" style="display:none;">
   <div class="topbar">
     <div class="topbar-row">
+      <div class="tiroir-ent verre-barre" id="tiroir-ent" style="display:none;">
+        <span class="tiroir-liste" id="tiroir-liste"></span>
+      </div>
       <div class="topbar-card">
         <div class="topbar-left">
           <div class="logo-pill">
@@ -2507,6 +2611,9 @@
       <div class="plan-desc">Membres illimités · multi-sites</div>
     </div>
 
+    <div class="section-title" id="etab-section-titre" style="display:none;">Vos établissements</div>
+    <div id="etab-liste"></div>
+
     <div class="section-title">Langue</div>
     <div class="card">
       <label class="f">Langue de l'application</label>
@@ -2527,6 +2634,32 @@
     <div class="note" style="text-align:center; margin-top:20px;">Version du build : 2026-07-28-v3</div>
   </div>
 </div>
+
+<!-- Ajouter ou modifier un établissement : le même écran pour les deux -->
+<div class="fond-etab" id="fond-etab">
+  <div class="fen-etab" role="dialog" aria-modal="true">
+    <h3 id="etab-titre">Nouvel établissement</h3>
+    <div class="s" id="etab-sous">Son logo apparaîtra dans la barre.</div>
+
+    <button type="button" class="etab-depot" id="etab-depot">
+      <span class="mono" id="etab-mono">?</span>
+      <span class="appareil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L8 6.5H4.5A1.5 1.5 0 0 0 3 8v10a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V8a1.5 1.5 0 0 0-1.5-1.5H16Z"/><circle cx="12" cy="12.8" r="3.6"/></svg>
+        <span>Ajouter</span>
+      </span>
+    </button>
+    <div class="etab-legende" id="etab-legende">Facultatif · les initiales serviront sinon</div>
+
+    <label class="f" style="text-align:left; display:block;">Nom de l'établissement</label>
+    <input type="text" id="etab-nom" placeholder="Ex : Le Comptoir">
+
+    <div class="error-msg" id="etab-erreur"></div>
+    <button type="button" class="btn block" id="etab-ok" style="margin-top:14px;" disabled>Ajouter</button>
+    <button type="button" class="btn ghost block" id="etab-annuler" style="margin-top:8px;">Annuler</button>
+  </div>
+</div>
+
+<input type="file" id="etab-fichier" accept="image/*" style="display:none;">
 
 <nav class="tabbar" id="tabbar-gestion" style="display:none;">
   <div class="groupe">
@@ -3879,6 +4012,7 @@ async function enterApp(membre) {
     lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
     atterrirEnHaut()
     chargerLangue()
+    chargerEtablissements()
     if (cibleQR) ouvrirCibleQR()
     finDuDemarrage()
   } else {
@@ -3931,22 +4065,32 @@ async function ouvrirCibleQR() {
 
   if (currentMembre?.role === 'gestion') { openAnalyse(id); return }
 
-  /* Arrivée depuis l'appareil photo du téléphone : c'est souvent le tout premier
-     contact avec Procédo, juste après la création du compte. On accueille. */
-  if (estNouvelUtilisateur()) {
-    const proc = allEquipeProcedures.find(p => p.id === id)
-    let titre = proc?.titre, categorie = proc?.categorie
-    if (!titre) {
-      const { data } = await supabase.from('procedures')
-        .select('titre, categorie').eq('id', id).maybeSingle()
-      titre = data?.titre; categorie = data?.categorie
-    }
-    if (titre) {
-      marquerBienvenueVue()
-      const ok = await fenetreBienvenue(titre, categorie, true)
-      if (!ok) return
-    }
+  /* Arrivée depuis l'appareil photo du téléphone. On passe TOUJOURS par la
+     fenêtre, comme pour le scanner de l'app : un code peut être mal visé, et
+     atterrir d'un coup dans une procédure sans savoir laquelle est brutal.
+     Les nouveaux ont l'accueil complet avec le Memoji, les habitués la version
+     sobre — mais personne n'entre sans avoir vu le nom. */
+  const proc = allEquipeProcedures.find(p => p.id === id)
+  let titre = proc?.titre, categorie = proc?.categorie
+  if (!titre) {
+    const { data } = await supabase.from('procedures')
+      .select('titre, categorie').eq('id', id).maybeSingle()
+    titre = data?.titre; categorie = data?.categorie
   }
+
+  if (!titre) {
+    await confirmDialog({
+      titre: 'Proc\u00e9dure introuvable',
+      message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe plus, ou qui appartient \u00e0 une autre entreprise.",
+      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+    })
+    return
+  }
+
+  const nouveau = estNouvelUtilisateur()
+  if (nouveau) marquerBienvenueVue()
+  const ok = await fenetreBienvenue(titre, categorie, nouveau)
+  if (!ok) return
 
   openEquipeDetail(id)
 }
@@ -5186,7 +5330,6 @@ function renderCategoryGrid() {
     const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
     const dashoffset = circumference * (1 - avgPct / 100)
-    const needsAttention = avgPct > 0 && avgPct < 30
 
     const cell = document.createElement('div')
     cell.className = 'cat-cell'
@@ -5209,7 +5352,6 @@ function renderCategoryGrid() {
         <span class="cat-pct-label">consultées</span>
       </div>
       ${triParDate ? `<div class="cat-date">${new Date(currentCatSort === 'old' ? earliestDate : latestDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}</div>` : ''}
-      ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
       <div class="cat-recent">
         ${recentTitles.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
       </div>
@@ -5400,7 +5542,6 @@ function renderCategoryProceduresListInterne() {
     const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
     const dashoffset = circumference * (1 - pct / 100)
-    const needsAttention = pct > 0 && pct < 30
 
     const enPanne = proc.statut === 'echec' || analyseBloquee(proc)
     const enAnalyse = proc.statut === 'traitement'
@@ -5431,7 +5572,6 @@ function renderCategoryProceduresListInterne() {
         <span class="cat-pct" style="color:${ringColor};">${pct}%</span>
         <span class="cat-pct-label">ont consulté</span>
       </div>
-      ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
     `
     listEl.appendChild(div)
   }
@@ -8321,6 +8461,316 @@ async function chargerMesEntreprises() {
       </div>`
   }).join('')
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TIROIR DES ÉTABLISSEMENTS
+
+   Il n'apparaît qu'aux gérants qui en ont plusieurs, ou dont l'offre permet le
+   multi-sites. Fermé, il ne montre que l'établissement courant : c'est lui le
+   bouton. Ouvert, les autres se rangent à droite et le « + » ferme la marche.
+
+   Le rond montre le logo déposé, ou les initiales du nom à défaut. Un logo se
+   dépose à deux endroits — la fenêtre du « + » et celle de modification — mais
+   c'est le même écran, donc une seule chose à apprendre et à maintenir.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
+let etabEdite = null            // null = création, sinon l'établissement modifié
+let etabLogoTampon = null       // le logo choisi, pas encore enregistré
+
+/* Les initiales : au plus deux lettres, tirées des mots porteurs. « Le Comptoir
+   du Port » donne LC, pas LCDP — quatre lettres ne tiennent pas dans 32 pixels. */
+function initialesEtab(nom) {
+  const mots = String(nom || '?').trim().split(/\s+/)
+    .filter(m => m.length > 2 || /^[A-Z\u00C0-\u00DD]/.test(m))
+  return mots.map(m => m[0]).slice(0, 2).join('').toUpperCase() || '?'
+}
+
+function rondEtabHtml(e, estActif, attributs) {
+  const dedans = e.logo_url
+    ? `<img src="${escapeHtml(e.logo_url)}" alt="">`
+    : `<span class="ini">${escapeHtml(initialesEtab(e.nom))}</span>`
+  return `<button type="button" class="rond-ent${estActif ? ' actif' : ''}" ${attributs}>${dedans}</button>`
+}
+
+/* Le tiroir n'a de sens qu'à partir de l'offre Multi-sites. Tant que la
+   facturation n'existe pas, la colonne `plan` vaut `pro` par défaut : on montre
+   alors le tiroir à quiconque a déjà plusieurs établissements, pour ne bloquer
+   personne, et à tous les autres pour qu'ils puissent en ajouter un. */
+function multiSitesAutorise() {
+  const plan = (cachedEntreprise?.plan || '').toLowerCase()
+  if (plan === 'solo' || plan === 'equipe' || plan === 'pro') {
+    return mesEtablissements.length > 1
+  }
+  return true
+}
+
+async function chargerEtablissements() {
+  const tiroir = document.getElementById('tiroir-ent')
+  if (!tiroir || currentMembre?.role !== 'gestion') return
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
+  const { data } = await supabase
+    .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url)')
+    .eq('user_id', user.id).eq('role', 'gestion')
+
+  mesEtablissements = (data || [])
+    .filter(a => a.entreprises)
+    .map(a => ({
+      id: a.entreprises.id, nom: a.entreprises.nom,
+      logo_url: a.entreprises.logo_url || null,
+      membre_id: a.id,
+    }))
+
+  peindreTiroir()
+  peindreListeEtab()
+}
+
+/* La même liste dans les réglages, pour changer un logo plus tard. Chaque ligne
+   ouvre la fenêtre déjà remplie : c'est le même écran que la création. */
+function peindreListeEtab() {
+  const el = document.getElementById('etab-liste')
+  const titre = document.getElementById('etab-section-titre')
+  if (!el || !titre) return
+
+  if (!multiSitesAutorise() || !mesEtablissements.length) {
+    el.innerHTML = ''
+    titre.style.display = 'none'
+    return
+  }
+  titre.style.display = 'block'
+
+  el.innerHTML = mesEtablissements.map(e => `
+    <button type="button" class="etab-ligne" data-etab-edit="${e.id}">
+      ${rondEtabHtml(e, e.id === currentMembre?.entreprise_id, '').replace('<button type="button"', '<span').replace('</button>', '</span>')}
+      <span class="tx"><span class="nm">${escapeHtml(e.nom)}</span>
+      <span class="st">${e.logo_url ? 'Logo d\u00e9pos\u00e9' : 'Aucun logo \u00b7 initiales utilis\u00e9es'}${e.id === currentMembre?.entreprise_id ? ' \u00b7 actif' : ''}</span></span>
+      <span class="fl">\u203a</span>
+    </button>`).join('') + `
+    <button type="button" class="etab-ligne ajout" data-etab-plus>
+      <span class="rond-ent plus"><span class="ini">+</span></span>
+      <span class="tx"><span class="nm">Ajouter un \u00e9tablissement</span>
+      <span class="st">Nom et logo</span></span>
+    </button>`
+}
+
+document.getElementById('etab-liste')?.addEventListener('click', (e) => {
+  const l = e.target.closest('[data-etab-edit]')
+  if (l) { ouvrirFenetreEtab(l.dataset.etabEdit); return }
+  if (e.target.closest('[data-etab-plus]')) ouvrirFenetreEtab(null)
+})
+
+function peindreTiroir() {
+  const tiroir = document.getElementById('tiroir-ent')
+  const liste = document.getElementById('tiroir-liste')
+  if (!tiroir || !liste) return
+
+  if (!multiSitesAutorise() || !mesEtablissements.length) {
+    tiroir.style.display = 'none'
+    return
+  }
+  tiroir.style.display = 'flex'
+
+  const courantId = currentMembre?.entreprise_id
+  const courant = mesEtablissements.find(e => e.id === courantId) || mesEtablissements[0]
+  const ouvert = tiroir.classList.contains('ouvert')
+
+  let html = rondEtabHtml(courant, true, 'data-etab-decl')
+  if (ouvert) {
+    html += mesEtablissements
+      .filter(e => e.id !== courant.id)
+      .map(e => rondEtabHtml(e, false, `data-etab="${e.id}"`)).join('')
+    html += '<button type="button" class="rond-ent plus" data-etab-plus><span class="ini">+</span></button>'
+  }
+  liste.innerHTML = html
+}
+
+function fermerTiroir() {
+  const tiroir = document.getElementById('tiroir-ent')
+  if (tiroir?.classList.contains('ouvert')) { tiroir.classList.remove('ouvert'); peindreTiroir() }
+}
+
+/* Un seul gestionnaire, posé sur le document. L'ordre compte : les cas précis
+   d'abord, puis la fermeture. On ne pose PAS de voile invisible par-dessus la
+   page — un voile avalerait le premier appui, et il faudrait toucher deux fois
+   pour atteindre ce qu'on visait. Ici le même geste referme et agit. */
+document.addEventListener('click', (e) => {
+  const tiroir = document.getElementById('tiroir-ent')
+  if (!tiroir || tiroir.style.display === 'none') return
+
+  if (e.target.closest('[data-etab-decl]')) {
+    tiroir.classList.toggle('ouvert'); peindreTiroir(); return
+  }
+  const choix = e.target.closest('[data-etab]')
+  if (choix) { fermerTiroir(); basculerVersEtablissement(choix.dataset.etab); return }
+  if (e.target.closest('[data-etab-plus]')) { fermerTiroir(); ouvrirFenetreEtab(null); return }
+  if (e.target.closest('#tiroir-ent')) return
+
+  fermerTiroir()
+})
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiroir() })
+
+/* Changer d'établissement, c'est changer de fiche membre : on relance l'app avec
+   celle qui a été choisie, ce qui recharge procédures, équipe et droits. */
+async function basculerVersEtablissement(entrepriseId) {
+  const e = mesEtablissements.find(x => x.id === entrepriseId)
+  if (!e || e.id === currentMembre?.entreprise_id) return
+
+  const { data: membre } = await supabase
+    .from('membres').select('*').eq('id', e.membre_id).maybeSingle()
+  if (!membre) return
+
+  currentMembre = membre
+  cachedEntreprise = null
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  await enterApp(membre)
+  toast(e.nom)
+}
+
+/* ── La fenêtre, la même pour créer et pour modifier ──────────────── */
+
+window.ouvrirFenetreEtab = function(entrepriseId) {
+  etabEdite = entrepriseId ? mesEtablissements.find(e => e.id === entrepriseId) : null
+  etabLogoTampon = etabEdite?.logo_url || null
+
+  document.getElementById('etab-titre').textContent =
+    etabEdite ? etabEdite.nom : 'Nouvel \u00e9tablissement'
+  document.getElementById('etab-sous').textContent = etabEdite
+    ? 'Changez son nom ou son logo.'
+    : "Son logo appara\u00eetra dans la barre, \u00e0 c\u00f4t\u00e9 du vôtre."
+  document.getElementById('etab-nom').value = etabEdite?.nom || ''
+  document.getElementById('etab-ok').textContent = etabEdite ? 'Enregistrer' : 'Ajouter'
+  document.getElementById('etab-erreur').textContent = ''
+  majFenetreEtab()
+  document.getElementById('fond-etab').classList.add('on')
+}
+
+function majFenetreEtab() {
+  const nom = document.getElementById('etab-nom').value.trim()
+  const depot = document.getElementById('etab-depot')
+  depot.querySelector('img')?.remove()
+  depot.classList.toggle('rempli', !!etabLogoTampon)
+  if (etabLogoTampon) {
+    const img = document.createElement('img')
+    img.src = etabLogoTampon
+    depot.insertBefore(img, depot.firstChild)
+  }
+  /* Le monogramme se met à jour pendant la frappe : on voit tout de suite ce qui
+     s'affichera si aucun logo n'est déposé. */
+  const mono = document.getElementById('etab-mono')
+  mono.textContent = initialesEtab(nom)
+  mono.style.display = etabLogoTampon ? 'none' : 'block'
+  document.getElementById('etab-legende').innerHTML = etabLogoTampon
+    ? '<button type="button" data-etab-retirer>Retirer le logo</button>'
+    : 'Facultatif \u00b7 les initiales serviront sinon'
+  document.getElementById('etab-ok').disabled = nom.length < 2
+}
+
+function fermerFenetreEtab() {
+  document.getElementById('fond-etab').classList.remove('on')
+}
+
+document.getElementById('etab-nom')?.addEventListener('input', majFenetreEtab)
+document.getElementById('etab-annuler')?.addEventListener('click', fermerFenetreEtab)
+document.getElementById('fond-etab')?.addEventListener('click', (e) => {
+  if (e.target.id === 'fond-etab') fermerFenetreEtab()
+  if (e.target.closest('[data-etab-retirer]')) { etabLogoTampon = null; majFenetreEtab() }
+})
+document.getElementById('etab-depot')?.addEventListener('click', () => {
+  document.getElementById('etab-fichier').click()
+})
+
+/* Le fichier est recadré en carré et réduit à 192 pixels avant d'être envoyé :
+   un logo de quatre mégaoctets n'a aucun intérêt pour un rond de 32 pixels, et
+   il ralentirait la barre à chaque affichage. */
+document.getElementById('etab-fichier')?.addEventListener('change', (ev) => {
+  const f = ev.target.files[0]
+  ev.target.value = ''
+  if (!f) return
+
+  const lecteur = new FileReader()
+  lecteur.onload = () => {
+    const img = new Image()
+    img.onload = () => {
+      const c = document.createElement('canvas')
+      c.width = c.height = 192
+      const ctx = c.getContext('2d')
+      const cote = Math.min(img.width, img.height)
+      ctx.drawImage(img, (img.width - cote) / 2, (img.height - cote) / 2, cote, cote, 0, 0, 192, 192)
+      etabLogoTampon = c.toDataURL('image/webp', 0.85)
+      majFenetreEtab()
+    }
+    img.onerror = () => {
+      document.getElementById('etab-erreur').textContent = "Ce fichier n'est pas une image lisible."
+    }
+    img.src = lecteur.result
+  }
+  lecteur.readAsDataURL(f)
+})
+
+document.getElementById('etab-ok')?.addEventListener('click', async () => {
+  const btn = document.getElementById('etab-ok')
+  const err = document.getElementById('etab-erreur')
+  const nom = document.getElementById('etab-nom').value.trim()
+  err.textContent = ''
+  btn.disabled = true
+  btn.textContent = 'Enregistrement\u2026'
+
+  try {
+    let entrepriseId = etabEdite?.id
+    let logoUrl = etabEdite?.logo_url || null
+
+    // 1. La ligne d'abord : on a besoin de son identifiant pour nommer le logo.
+    if (!entrepriseId) {
+      const code = String(Math.floor(10000 + Math.random() * 90000))
+      const { data, error } = await supabase.from('entreprises')
+        .insert({ nom, code_acces: code }).select('id').single()
+      if (error) throw new Error(error.message)
+      entrepriseId = data.id
+
+      // Le créateur en devient gérant, sinon il ne pourrait pas y entrer.
+      const { data: { user } } = await supabase.auth.getUser()
+      const { error: eM } = await supabase.from('membres')
+        .insert({ user_id: user.id, entreprise_id: entrepriseId, nom: currentMembre?.nom || '', role: 'gestion' })
+      if (eM) throw new Error(eM.message)
+    }
+
+    // 2. Le logo, s'il a changé.
+    if (etabLogoTampon && etabLogoTampon !== etabEdite?.logo_url) {
+      const blob = await (await fetch(etabLogoTampon)).blob()
+      const chemin = `${entrepriseId}/logo-${Date.now()}.webp`
+      const { error: eU } = await supabase.storage.from('procedo-logos')
+        .upload(chemin, blob, { contentType: 'image/webp', upsert: true })
+      if (eU) throw new Error(eU.message)
+      const { data: pub } = supabase.storage.from('procedo-logos').getPublicUrl(chemin)
+      logoUrl = pub?.publicUrl || null
+    } else if (!etabLogoTampon) {
+      logoUrl = null
+    }
+
+    // 3. Le nom et le logo.
+    const { data: maj, error: eMaj } = await supabase.from('entreprises')
+      .update({ nom, logo_url: logoUrl }).eq('id', entrepriseId).select('id')
+    if (eMaj) throw new Error(eMaj.message)
+    if (!maj || maj.length === 0) {
+      throw new Error("La base a refus\u00e9 la modification. Il manque une r\u00e8gle d'acc\u00e8s \u00ab update \u00bb sur la table entreprises.")
+    }
+
+    fermerFenetreEtab()
+    await chargerEtablissements()
+    if (entrepriseId === currentMembre?.entreprise_id && cachedEntreprise) cachedEntreprise.nom = nom
+    toast(etabEdite ? '\u00c9tablissement modifi\u00e9.' : '\u00c9tablissement ajout\u00e9.')
+  } catch (ex) {
+    err.textContent = ex instanceof Error ? ex.message : String(ex)
+  } finally {
+    btn.disabled = false
+    btn.textContent = etabEdite ? 'Enregistrer' : 'Ajouter'
+  }
+})
 
 /* Basculer d'entreprise revient à changer de fiche membre : on relance l'app
    avec celle qui a été choisie, ce qui recharge procédures, équipe et droits. */

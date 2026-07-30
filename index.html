@@ -187,6 +187,16 @@
     font-size:12.5px; font-weight:650; color:var(--blue); flex-shrink:0;
   }
 
+  /* Bandeau affiché quand on arrive par un QR code sans être connecté. */
+  .qr-bandeau{
+    display:flex; flex-direction:column; gap:3px; margin-bottom:18px;
+    padding:13px 15px; border-radius:14px;
+    background:linear-gradient(150deg, rgba(48,209,88,0.16), rgba(48,209,88,0.04));
+    border:0.5px solid rgba(48,209,88,0.3);
+  }
+  .qr-bandeau b{ font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .qr-bandeau span{ font-size:12.5px; color:var(--label-2); line-height:1.45; }
+
   /* ═══════════════════════════════════════════════════════════════════════
      ÉDITEUR DE CLIP — pièces ajoutées
      Les deux pastilles de bornes, la loupe, la bande de couverture et les
@@ -520,7 +530,7 @@
 
   /* ═══ Sélection de clip : deux poignées que l'on écarte ou resserre ═══ */
   .capcut-timeline.clipmode{ touch-action:none; }
-  .clip-band{ position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
+  .clip-band{ -webkit-user-select:none; user-select:none; pointer-events:auto; position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
     border-left:2px solid rgba(255,255,255,0.5); border-right:2px solid rgba(255,255,255,0.5); }
   .clip-band span{ position:absolute; top:4px; left:4px; font-size:9px; font-weight:800; color:#fff;
     background:rgba(0,0,0,0.65); border-radius:4px; padding:1px 5px; }
@@ -579,13 +589,6 @@
   .clip-tool:active{ transform:scale(0.93); background:rgba(255,255,255,0.14); }
   .clip-tool svg{ width:19px; height:19px; }
   .clip-tool[disabled]{ opacity:0.35; }
-  .clip-text-field{ display:none; margin-top:12px; }
-  .clip-text-field.on{ display:block; }
-  .clip-text-field textarea{
-    width:100%; background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
-    padding:13px 14px; font-size:16px; font-family:inherit; color:var(--label);
-    resize:none; overflow:hidden; line-height:1.4; min-height:48px;
-  }
   .clip-done-btn{ display:none; width:100%; margin-top:10px; }
   .clip-done-btn.on{ display:block; }
 
@@ -1568,13 +1571,10 @@
           <button type="button" class="clip-tool" id="capcut-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
           <button type="button" class="clip-tool" id="capcut-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
           <button type="button" class="clip-tool" id="capcut-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
-          <button type="button" class="clip-tool" id="capcut-undo"><span>↩ Annuler</span></button>
+          <button type="button" class="clip-tool" id="capcut-undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg><span>Annuler</span></button>
           <button type="button" class="clip-tool" id="capcut-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
         </div>
-        <div class="clip-text-field" id="capcut-text-field">
-          <textarea id="capcut-text" rows="1" placeholder="Que fait-on pendant ce moment ?"></textarea>
-        </div>
-        <button type="button" class="btn ghost clip-done-btn" id="capcut-done">Terminer le réglage</button>
+                <button type="button" class="btn ghost clip-done-btn" id="capcut-done">Terminer le réglage</button>
         <div class="ed-couv" id="capcut-couv"></div>
         <div class="ed-legende" id="capcut-legende">
           <span><i style="background:var(--green)"></i>couvert</span>
@@ -1685,13 +1685,10 @@
         <button type="button" class="clip-tool" id="ecap-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
         <button type="button" class="clip-tool" id="ecap-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
         <button type="button" class="clip-tool" id="ecap-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
-        <button type="button" class="clip-tool" id="ecap-undo"><span>↩ Annuler</span></button>
+        <button type="button" class="clip-tool" id="ecap-undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg><span>Annuler</span></button>
           <button type="button" class="clip-tool" id="ecap-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
       </div>
-      <div class="clip-text-field" id="ecap-text-field">
-        <textarea id="ecap-text" rows="1" placeholder="Que fait-on pendant ce moment ?"></textarea>
-      </div>
-      <button type="button" class="btn ghost clip-done-btn" id="ecap-done">Terminer le réglage</button>
+            <button type="button" class="btn ghost clip-done-btn" id="ecap-done">Terminer le réglage</button>
         <div class="ed-couv" id="ecap-couv"></div>
         <div class="ed-legende" id="ecap-legende">
           <span><i style="background:var(--green)"></i>couvert</span>
@@ -2154,6 +2151,17 @@ let scanStream = null
 let scanLoopActive = false
 let selectedSpace = 'gestion' // espace choisi sur le premier écran
 
+/* ═══ Arrivée par un QR code ═══
+   L'adresse porte la procédure visée et le code de l'entreprise. On les retient
+   dès le premier instant, parce qu'ils doivent survivre à la création de compte
+   et à la connexion : le but est d'atterrir sur la procédure, quoi qu'il arrive
+   entre-temps. */
+const cibleQR = (function () {
+  const p = new URLSearchParams(window.location.search)
+  const proc = p.get('proc')
+  return proc ? { proc: proc, code: p.get('e') || '' } : null
+})()
+
 /* Affiche l'ossature de l'app sans attendre les données : barre du haut,
    titre, et six cartes en creux. L'utilisateur voit son app tout de suite,
    elle se remplit ensuite. On se souvient de l'espace choisi la dernière fois
@@ -2210,7 +2218,38 @@ function lancerAnimationLogoChoix() {
   lancerAnimationLogo(document.querySelector('#choice-screen .boot-logo--once'))
 }
 
+/* Prépare l'écran d'authentification pour une arrivée par QR : bandeau
+   explicatif, code pré-rempli et masqué, onglet Inscription en avant. */
+async function preparerArriveeQR() {
+  const carte = document.querySelector('#login-screen .login-card') || document.getElementById('login-screen')
+  if (carte && !document.getElementById('qr-bandeau')) {
+    const b = document.createElement('div')
+    b.id = 'qr-bandeau'
+    b.className = 'qr-bandeau'
+    b.innerHTML = '<b>Une procédure vous attend</b><span id="qr-bandeau-sous">Créez votre compte pour la consulter.</span>'
+    carte.insertBefore(b, carte.firstChild)
+  }
+  const champ = document.getElementById('signup-code-acces')
+  if (champ && cibleQR.code) {
+    champ.value = cibleQR.code
+    // Le code est déjà connu : on masque le champ plutôt que de le faire
+    // saisir à quelqu'un qui n'a fait que scanner une affiche.
+    document.getElementById('signup-equipe-field').style.display = 'none'
+  }
+  // On nomme l'entreprise si on peut la retrouver par son code.
+  if (cibleQR.code) {
+    const { data: ent } = await supabase
+      .from('entreprises').select('nom').eq('code_acces', cibleQR.code).maybeSingle()
+    const sous = document.getElementById('qr-bandeau-sous')
+    if (sous && ent?.nom) sous.textContent = `Créez votre compte pour rejoindre « ${ent.nom} » et consulter la procédure.`
+  }
+}
+
 function afficherEcranChoix() {
+  /* Quelqu'un qui scanne un QR est forcément un membre d'équipe : on lui
+     épargne le choix entre les deux espaces et on l'emmène directement à
+     l'inscription, avec le code déjà rempli. */
+  if (cibleQR) { chooseSpace('equipe'); preparerArriveeQR(); return }
   document.getElementById('choice-screen').style.display = 'flex'
   lancerAnimationLogoChoix()
 }
@@ -2405,6 +2444,7 @@ async function enterApp(membre) {
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
     lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
+    if (cibleQR) ouvrirCibleQR()
     finDuDemarrage()
   } else {
     await loadEquipeProcedures()
@@ -2425,10 +2465,21 @@ async function enterApp(membre) {
     // elle peut donc démarrer avec l'app sans la faire saccader.
     lancerAnimationLogo(document.getElementById('topbar-logo-equipe'))
     finDuDemarrage()
-    const params = new URLSearchParams(window.location.search)
-    const procId = params.get('proc')
-    if (procId) openEquipeDetail(procId)
+    if (cibleQR) ouvrirCibleQR()
   }
+}
+
+/* Ouvre la procédure visée par le QR, dans l'espace où l'on se trouve. Un
+   gérant qui scanne son propre QR arrive sur l'analyse de la procédure, pas
+   sur la fiche de lecture : ce n'est pas lui qui doit la consulter. */
+function ouvrirCibleQR() {
+  if (!cibleQR) return
+  const id = cibleQR.proc
+  // On efface le paramètre de l'adresse pour qu'un rechargement plus tard ne
+  // renvoie pas indéfiniment sur la même procédure.
+  try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
+  if (currentMembre?.role === 'gestion') openAnalyse(id)
+  else openEquipeDetail(id)
 }
 
 // Le décor (halos, animations de cartes) ne se remet en marche qu'une fois
@@ -3798,13 +3849,7 @@ function createClipEditor(ids, api) {
 
     const infoEl = g(ids.info)
     g(ids.tools)?.classList.toggle('on', on)
-    g(ids.textField)?.classList.toggle('on', on)
     g(ids.done)?.classList.toggle('on', on)
-    const textEl = g(ids.text)
-    if (textEl && on && textEl !== document.activeElement) {
-      textEl.value = s.texte || ''
-      autoResizeTextarea(textEl)
-    }
     if (g(ids.hint)) g(ids.hint).textContent = on
       ? 'Écartez ou resserrez les deux poignées blanches'
       : (ids.prefix === 'capcut'
@@ -4063,10 +4108,34 @@ function createClipEditor(ids, api) {
     else if (wasPlaying) video()?.play()
   }
 
+  /* Appui long sur la bande d'une étape : on la sélectionne. Un appui court
+     reste un déplacement de la tête de lecture — les deux gestes cohabitent.
+     Le seuil de 6 pixels évite de déclencher la sélection quand le doigt
+     glisse : dans ce cas l'utilisateur cherchait à naviguer. */
+  let attente = null, departLong = null
+  function annulerAttente() {
+    if (attente) { clearTimeout(attente); attente = null }
+    departLong = null
+  }
+
   timeline.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.clip-handle')) return
+    const bande = e.target.closest('.clip-band')
+    if (bande) {
+      departLong = { x: e.clientX, y: e.clientY }
+      const index = [...g(ids.markers).children].indexOf(bande)
+      attente = setTimeout(() => {
+        attente = null
+        drag = null                       // on abandonne le déplacement en cours
+        if (index >= 0) select(index, { lire: false })
+      }, 380)
+    }
     beginDrag('scrub', e, null)
   })
+  timeline.addEventListener('pointermove', (e) => {
+    if (departLong && (Math.abs(e.clientX - departLong.x) > 6 || Math.abs(e.clientY - departLong.y) > 6)) annulerAttente()
+  })
+  ;['pointerup', 'pointercancel'].forEach(ev => timeline.addEventListener(ev, annulerAttente))
   timeline.addEventListener('pointermove', (e) => { if (drag === 'scrub') moveDrag(e.clientX) })
   timeline.addEventListener('pointerup', endDrag)
   timeline.addEventListener('pointercancel', endDrag)
@@ -4176,14 +4245,6 @@ function createClipEditor(ids, api) {
 
   // Champ de texte de l'étape sélectionnée, juste sous la frise :
   // plus besoin de faire défiler la page pour écrire.
-  const textEl = g(ids.text)
-  textEl?.addEventListener('input', (e) => {
-    const s = current()
-    if (!s) return
-    s.texte = e.target.value
-    autoResizeTextarea(e.target)
-    api.onTextInput?.()
-  })
 
   // ── API publique ─────────────────────────────────────────────────────────
   function select(i, options) {
@@ -4208,10 +4269,14 @@ function createClipEditor(ids, api) {
     const v = video()
     if (!v || v.dataset.clipWired === '1') return
     v.dataset.clipWired = '1'
-    v.addEventListener('timeupdate', paintPlayhead)
-    v.addEventListener('seeked', paintPlayhead)
-    v.addEventListener('play', startLoop)
+    /* La tête de lecture ne suivait pas : la boucle d'animation ne démarrait
+       que sur `play`, or Safari émet parfois `playing` sans `play`, et la
+       lecture d'un extrait passe par `seeked`. On couvre donc tous les cas, et
+       `timeupdate` sert de filet même si la boucle n'a pas démarré. */
+    ;['timeupdate', 'seeked', 'seeking', 'loadeddata'].forEach(ev => v.addEventListener(ev, paintPlayhead))
+    ;['play', 'playing'].forEach(ev => v.addEventListener(ev, startLoop))
     v.addEventListener('pause', () => { stopLoop(); paintPlayhead() })
+    v.addEventListener('ended', () => { stopLoop(); paintPlayhead() })
     v.addEventListener('loadedmetadata', () => {
       if (ids.durTime && g(ids.durTime)) g(ids.durTime).textContent = formatTime(v.duration)
       repaint()
@@ -4338,9 +4403,29 @@ document.getElementById('video-input')?.addEventListener('change', async (e) => 
   }, { once: true })
 })
 
+/* Le bouton ne changeait jamais d'icône : rien ne basculait entre le triangle
+   et les deux barres. On écoute donc l'état réel de la vidéo, ce qui reste juste
+   même quand la lecture s'arrête d'elle-même en fin de clip. */
+function majIconePlay(player, prefix) {
+  const play = document.getElementById(prefix + '-play-icon')
+  const pause = document.getElementById(prefix + '-pause-icon')
+  if (!play || !pause) return
+  const enLecture = player && !player.paused && !player.ended
+  play.style.display = enLecture ? 'none' : ''
+  pause.style.display = enLecture ? '' : 'none'
+}
+
 document.getElementById('capcut-play-btn')?.addEventListener('click', () => {
   const player = document.getElementById('video-player')
   if (player.paused) player.play(); else player.pause()
+})
+;['play', 'pause', 'ended'].forEach(ev => {
+  document.getElementById('video-player')?.addEventListener(ev, () => {
+    majIconePlay(document.getElementById('video-player'), 'capcut')
+  })
+  document.getElementById('edit-video-player')?.addEventListener(ev, () => {
+    majIconePlay(document.getElementById('edit-video-player'), 'ecap')
+  })
 })
 
 // ═══ Créer une étape à la position actuelle ═══
@@ -4665,7 +4750,13 @@ async function openAnalyse(procId) {
   const qrContainer = document.getElementById('qr-container')
   qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">Génération...</div>'
   document.getElementById('qr-plaque-title').textContent = proc.titre
-  const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}`
+  /* Le QR porte le code de l'entreprise en plus de la procédure : une personne
+     qui scanne sans compte peut ainsi s'inscrire sans avoir à le demander.
+     Sans ce code, il faudrait lire la table des procédures sans être connecté,
+     ce que les règles d'accès de la base interdisent — à raison. */
+  const codeEnt = cachedEntreprise?.code_acces || ''
+  const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}` +
+    (codeEnt ? `&e=${codeEnt}` : '')
   const QRCodeLib = await ensureQRCode()
   const canvas = document.createElement('canvas')
   await QRCodeLib.toCanvas(canvas, scanUrl, { width: 344, margin: 1, color: { dark: '#0C0D0E', light: '#FFFFFF' } })

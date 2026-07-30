@@ -4163,6 +4163,7 @@ function finDuDemarrage() {
 // ═══ PARAMÈTRES ═══
 window.openSettings = async function() {
   rendreChoixLangueApp()
+  chargerEtablissements()
   showGestionScreen('p-settings')
   document.getElementById('settings-nom').value = currentMembre.nom || ''
   const { data: userData } = await supabase.auth.getUser()
@@ -8498,6 +8499,12 @@ function rondEtabHtml(e, estActif, attributs) {
    alors le tiroir à quiconque a déjà plusieurs établissements, pour ne bloquer
    personne, et à tous les autres pour qu'ils puissent en ajouter un. */
 function multiSitesAutorise() {
+  /* Tant que la facturation n'existe pas, la colonne `plan` est absente et vaut
+     donc une chaîne vide : le tiroir s'affiche pour tout le monde. C'est
+     volontaire — sans lui, personne ne pourrait ajouter un second établissement,
+     et la fonction serait invisible à jamais.
+     Le jour où vous facturez, mettre `plan` à `solo`, `equipe` ou `pro` réserve
+     le tiroir à ceux qui en ont déjà plusieurs. */
   const plan = (cachedEntreprise?.plan || '').toLowerCase()
   if (plan === 'solo' || plan === 'equipe' || plan === 'pro') {
     return mesEtablissements.length > 1
@@ -8512,15 +8519,30 @@ async function chargerEtablissements() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
 
-  const { data } = await supabase
+  /* La colonne `logo_url` peut ne pas exister encore : dans ce cas la requête
+     échoue EN ENTIER et on n'obtient aucun établissement, donc aucun tiroir.
+     C'est ce qui se passe tant que le SQL n'a pas été exécuté. On redemande donc
+     sans elle : le tiroir marche alors avec les initiales, ce qui est déjà
+     l'essentiel. */
+  let { data, error } = await supabase
     .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url)')
     .eq('user_id', user.id).eq('role', 'gestion')
+
+  if (error || !data) {
+    const repli = await supabase
+      .from('membres').select('id, role, entreprise_id, entreprises(id, nom)')
+      .eq('user_id', user.id).eq('role', 'gestion')
+    data = repli.data || []
+    if (repli.error) {
+      console.warn('Proc\u00e9do \u00b7 \u00e9tablissements introuvables :', repli.error.message)
+    }
+  }
 
   mesEtablissements = (data || [])
     .filter(a => a.entreprises)
     .map(a => ({
       id: a.entreprises.id, nom: a.entreprises.nom,
-      logo_url: a.entreprises.logo_url || null,
+      logo_url: a.entreprises.logo_url || null,   // absent = initiales
       membre_id: a.id,
     }))
 

@@ -494,40 +494,32 @@
      L'avatar parle dans une bulle, comme dans une messagerie. Le chiffre est
      dit dans la phrase plutôt qu'affiché dans un anneau : c'est ce qui fait la
      différence entre un tableau de bord et un accueil. */
+  /* Le message d'abord, l'avatar en fin de ligne : on lit ce qui est dit avant
+     de voir qui le dit. */
   .accueil{
-    display:flex; align-items:flex-start; gap:14px;
-    padding:16px 18px; margin-bottom:14px; border-radius:20px;
+    display:flex; align-items:center; gap:14px;
+    padding:15px 18px; margin-bottom:14px; border-radius:20px;
     background:var(--hero-gradient);
     border:0.5px solid var(--border);
   }
+  .accueil-texte{ flex:1; min-width:0; }
+  .accueil-texte .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
+  .accueil-texte .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
+  .accueil-texte .s b{ color:#fff; font-weight:650; }
+  /* L'avatar est une image intégrée à la page : rien à télécharger, elle est là
+     dès la première image affichée. Découpée en rond à 128px, elle reste nette
+     jusqu'à un écran à trois fois la densité. */
   .accueil-av{
-    position:relative; width:52px; height:52px; border-radius:50%; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-    background:linear-gradient(155deg, #FFC978, #FF9F45);
-    box-shadow:0 4px 14px rgba(255,159,69,0.28);
+    position:relative; width:56px; height:56px; border-radius:50%; flex-shrink:0; cursor:pointer;
+    background:#A8D4F5 url('data:image/webp;base64,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') center/cover no-repeat;
+    box-shadow:0 4px 14px rgba(0,0,0,0.28);
     transition:transform 0.2s cubic-bezier(0.34,1.5,0.64,1);
   }
   .accueil-av:active{ transform:scale(0.93); }
-  .accueil-av svg{ width:66%; height:66%; display:block; }
   .accueil-av .dispo{
     position:absolute; right:1px; bottom:1px; width:13px; height:13px; border-radius:50%;
-    background:var(--green); box-shadow:0 0 0 3px #17181C;
+    background:var(--green); box-shadow:0 0 0 3px #1A1B1F;
   }
-  .accueil-bulle{
-    position:relative; flex:1; min-width:0;
-    background:rgba(255,255,255,0.07); border-radius:4px 16px 16px 16px;
-    padding:12px 14px;
-  }
-  /* La petite pointe qui rattache la bulle à l'avatar. */
-  .accueil-bulle::before{
-    content:''; position:absolute; left:-6px; top:0; width:10px; height:14px;
-    background:rgba(255,255,255,0.07);
-    clip-path:polygon(100% 0, 100% 100%, 0 0);
-  }
-  .accueil-bulle .t{ font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
-  .accueil-bulle .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
-  .accueil-bulle .s b{ color:#fff; font-weight:650; }
-
   .list-tools{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
   .list-tools .dd-filter{ margin-bottom:0; flex:1; min-width:0; }
 
@@ -779,24 +771,43 @@
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
   }
+  /* ═══ Pourquoi le libellé est en position absolue ═══
+     Faire varier `max-width` sur le texte le rognait progressivement : on
+     voyait les lettres se faire couper, ce qui ne ressemble à rien de naturel.
+     Le libellé est donc sorti du flux et ne fait plus qu'apparaître en fondu
+     avec un léger glissement — deux propriétés que le processeur graphique
+     gère seul, sans recalcul de mise en page.
+     Seule la largeur du bouton s'anime, et elle est mesurée à l'ouverture pour
+     coller exactement au texte. */
   #tabbar-gestion .tab-round{
-    position:relative; height:46px; min-width:46px; width:auto; padding:0; gap:0;
+    position:relative; height:44.5px; width:44.5px; flex-shrink:0; padding:0; gap:0;
     border-radius:100px; background:none; border:none; color:rgba(235,235,245,0.55);
-    transition: background 0.42s cubic-bezier(0.32,0.72,0,1),
-                color 0.3s ease,
-                padding 0.42s cubic-bezier(0.32,0.72,0,1);
+    justify-content:flex-start; overflow:hidden;
+    transition: width 0.44s cubic-bezier(0.32,0.72,0,1),
+                background-color 0.34s cubic-bezier(0.32,0.72,0,1),
+                color 0.26s ease;
   }
   #tabbar-gestion .tab-round.active{
-    background:#fff; color:#000; padding:0 15px 0 12px; gap:8px;
+    width:var(--w, 150px); background-color:#fff; color:#000;
     box-shadow:0 2px 8px rgba(0,0,0,0.18);
   }
-  #tabbar-gestion .tab-round svg{ width:21px; height:21px; flex-shrink:0; }
-  .tab-label{
-    max-width:0; opacity:0; overflow:hidden; white-space:nowrap;
-    font-size:14px; font-weight:650; letter-spacing:-0.02em;
-    transition: max-width 0.42s cubic-bezier(0.32,0.72,0,1), opacity 0.24s ease;
+  /* L'icône reste à sa place, elle glisse juste un peu vers la gauche. */
+  #tabbar-gestion .tab-round svg{
+    width:21px; height:21px; flex-shrink:0; margin-left:12.5px;
+    transition:margin-left 0.44s cubic-bezier(0.32,0.72,0,1);
   }
-  #tabbar-gestion .tab-round.active .tab-label{ max-width:120px; opacity:1; }
+  #tabbar-gestion .tab-round.active svg{ margin-left:12px; }
+  .tab-label{
+    position:absolute; left:42px; top:50%; white-space:nowrap;
+    font-size:14px; font-weight:650; letter-spacing:-0.02em;
+    opacity:0; transform:translate(-8px, -50%);
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  /* Le texte n'arrive qu'une fois la pilule ouverte, et repart aussitôt. */
+  #tabbar-gestion .tab-round.active .tab-label{
+    opacity:1; transform:translate(0, -50%);
+    transition: opacity 0.24s ease 0.16s, transform 0.34s cubic-bezier(0.32,0.72,0,1) 0.16s;
+  }
   /* Le bouton d'action, détaché du groupe. */
   #tabbar-gestion .tab-round--primary{
     width:52px; height:52px; min-width:52px; padding:0; border-radius:50%;
@@ -1084,13 +1095,12 @@
 
   <div class="screen active" id="p-list">
     <div class="accueil">
-      <div class="accueil-av" id="accueil-avatar" role="button" aria-label="Contacter le support">
-        <svg viewBox="0 0 24 24" fill="#fff"><circle cx="12" cy="8" r="4.2"/><path d="M12 13.8c-4.5 0-8 2.5-8 5.7 0 .8.6 1.4 1.4 1.4h13.2c.8 0 1.4-.6 1.4-1.4 0-3.2-3.5-5.7-8-5.7Z"/></svg>
-        <span class="dispo"></span>
-      </div>
-      <div class="accueil-bulle">
+      <div class="accueil-texte">
         <div class="t" id="accueil-salut">Bonjour 👋</div>
         <div class="s" id="accueil-mot">Chargement…</div>
+      </div>
+      <div class="accueil-av" id="accueil-avatar" role="button" aria-label="Contacter le support">
+        <span class="dispo"></span>
       </div>
     </div>
 
@@ -1946,6 +1956,7 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-gestion').style.display = 'flex'
+    mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
@@ -2260,6 +2271,18 @@ function placerPastilleSansAnimation(idBarre) {
   majPastille(idBarre)
   void pastille.offsetWidth
   pastille.style.transition = memeTransition
+}
+
+/* Mesure la largeur exacte dont chaque onglet a besoin pour afficher son
+   libellé, et l'inscrit dans une variable CSS. On anime ainsi vers une valeur
+   juste au pixel, au lieu d'un maximum arbitraire qui donnait un arrêt sec. */
+function mesurerOnglets() {
+  document.querySelectorAll('#tabbar-gestion .tab-round--secondary').forEach(b => {
+    const lbl = b.querySelector('.tab-label')
+    if (!lbl) return
+    const large = lbl.scrollWidth
+    if (large > 0) b.style.setProperty('--w', Math.ceil(42 + large + 15) + 'px')
+  })
 }
 
 /* L'espace équipe garde sa pastille glissante ; l'espace gestion n'en a plus,

@@ -166,6 +166,45 @@
   h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.02em; margin:6px 0 2px; }
   .subhead{ font-size:14px; color:var(--label-2); margin-bottom:18px; line-height:1.35; }
 
+  /* ═══ Page Analyse ═══ */
+  .ga-segments{
+    display:flex; gap:3px; padding:3px; border-radius:100px;
+    background:rgba(255,255,255,0.07); margin:14px 0 16px;
+  }
+  .ga-segments button{
+    flex:1; text-align:center; font-family:inherit; font-size:12.5px; font-weight:600;
+    padding:8px 0; border:none; border-radius:100px; background:none; color:var(--label-2);
+    transition:background 0.3s cubic-bezier(0.32,0.72,0,1), color 0.25s;
+  }
+  .ga-segments button.active{ background:rgba(255,255,255,0.90); color:#000; }
+
+  .ga-trio{ display:flex; gap:9px; }
+  .ga-tuile{
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    padding:15px 6px 13px; background:var(--bg-card);
+    border:0.5px solid var(--border); border-radius:18px;
+  }
+  .ga-anneau{ position:relative; width:58px; height:58px; }
+  .ga-anneau svg{ transform:rotate(-90deg); display:block; }
+  .ga-anneau .piste{ stroke:rgba(255,255,255,0.10); }
+  /* L'anneau se remplit à l'affichage, comme dans l'app Forme. */
+  .ga-anneau .valeur{
+    stroke-linecap:round;
+    animation:gaRemplir 1.4s cubic-bezier(0.32,0.72,0,1) both;
+  }
+  @keyframes gaRemplir{ from{ stroke-dashoffset:var(--vide); } to{ stroke-dashoffset:var(--cible); } }
+  .ga-anneau .dedans{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font-size:17px; font-weight:850; letter-spacing:-0.04em;
+  }
+  .ga-libelle{
+    font-size:9.5px; font-weight:700; color:var(--label-3); margin-top:9px;
+    text-transform:uppercase; letter-spacing:0.045em;
+  }
+  .ga-detail{ font-size:12px; color:var(--label-3); margin-top:12px; line-height:1.45; }
+
+  @media (prefers-reduced-motion: reduce){ .ga-anneau .valeur{ animation:none; } }
+
   .hero-card{ position:relative; background:var(--hero-gradient); border:0.5px solid rgba(255,255,255,0.15);
     border-radius:20px; padding:20px 18px; margin-bottom:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
   .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.55); font-weight:500; margin-bottom:10px; }
@@ -1434,37 +1473,32 @@
 
   <!-- Analyse générale du compte -->
   <div class="screen" id="p-global-analyse">
-    <h1 class="pagehead">Analyse générale</h1>
+    <h1 class="pagehead">Analyse</h1>
     <div class="subhead">Vue d'ensemble de votre entreprise</div>
 
-    <div class="hero-card">
-      <div class="lbl">Ont consulté</div>
-      <div class="num" id="ga-taux-global">—</div>
-      <div class="sub" id="ga-sub-global">—</div>
-      <div class="bar"><div class="bar-fill" id="ga-bar-global" style="width:0%;"></div></div>
-      <div class="filter-chips" id="ga-period-toggle" style="margin-top:14px;">
-        <button class="active" data-period="week" onclick="setGaPeriod('week')">Cette semaine</button>
-        <button data-period="month" onclick="setGaPeriod('month')">Ce mois-ci</button>
-        <button data-period="all" onclick="setGaPeriod('all')">Total</button>
-      </div>
+    <!-- Période : trois segments, façon iOS, à la place des puces -->
+    <div class="ga-segments" id="ga-period-toggle">
+      <button class="active" data-period="week" onclick="setGaPeriod('week')">Semaine</button>
+      <button data-period="month" onclick="setGaPeriod('month')">Mois</button>
+      <button data-period="all" onclick="setGaPeriod('all')">Total</button>
     </div>
 
-    <div class="section-title">Vue d'ensemble</div>
-    <div class="emp-row">
-      <div class="check done" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.1); position:relative;"><span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px;">📁</span></div>
-      <div class="emp-row-name">Catégories</div>
-      <div class="emp-row-date" id="ga-nb-categories">—</div>
+    <!-- Les trois chiffres clés, en anneaux -->
+    <div class="ga-trio">
+      <div class="ga-tuile">
+        <div class="ga-anneau" id="ga-anneau-taux"></div>
+        <div class="ga-libelle">Consulté</div>
+      </div>
+      <div class="ga-tuile">
+        <div class="ga-anneau" id="ga-anneau-procs"></div>
+        <div class="ga-libelle">Procédures</div>
+      </div>
+      <div class="ga-tuile">
+        <div class="ga-anneau" id="ga-anneau-emp"></div>
+        <div class="ga-libelle">Employés</div>
+      </div>
     </div>
-    <div class="emp-row">
-      <div class="check done" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.1); position:relative;"><span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px;">📄</span></div>
-      <div class="emp-row-name">Procédures</div>
-      <div class="emp-row-date" id="ga-nb-procedures">—</div>
-    </div>
-    <div class="emp-row">
-      <div class="check done" style="background:rgba(255,255,255,0.1); border-color:rgba(255,255,255,0.1); position:relative;"><span style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:11px;">👤</span></div>
-      <div class="emp-row-name">Membres</div>
-      <div class="emp-row-date" id="ga-nb-membres">—</div>
-    </div>
+    <div class="ga-detail" id="ga-sub-global">—</div>
 
     <div class="section-title">Catégories les plus consultées</div>
     <div id="ga-top-categories"></div>
@@ -2125,11 +2159,40 @@ function renderGaStats() {
   const taux = nbAttendu > 0 ? Math.round((nbConsulte / nbAttendu) * 100) : 0
   const periodLabel = currentGaPeriod === 'week' ? 'cette semaine' : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
 
-  document.getElementById('ga-taux-global').textContent = `${nbConsulte} / ${nbAttendu}`
-  document.getElementById('ga-sub-global').textContent = `${nbConsulte} consultations ${periodLabel} sur ${nbAttendu} possibles (toutes procédures confondues)`
-  document.getElementById('ga-bar-global').style.width = taux + '%'
+  const nbCategories = new Set((procedures || []).map(p => p.categorie || 'Sans catégorie')).size
+  const couleurTaux = taux >= 70 ? 'var(--green)' : taux >= 30 ? 'var(--orange)' : 'var(--red)'
+
+  dessinerAnneau('ga-anneau-taux',  taux, couleurTaux, taux + '%')
+  dessinerAnneau('ga-anneau-procs', 100, 'var(--blue)',   String(nbProcedures))
+  dessinerAnneau('ga-anneau-emp',   100, '#BF5AF2',       String(nbEmployes))
+
+  const sous = document.getElementById('ga-sub-global')
+  if (sous) {
+    sous.textContent = nbAttendu > 0
+      ? `${nbConsulte} consultation${nbConsulte > 1 ? 's' : ''} ${periodLabel} sur ${nbAttendu} possibles · ${nbCategories} catégorie${nbCategories > 1 ? 's' : ''}`
+      : "Ajoutez des procédures et des employés pour voir apparaître les consultations."
+  }
 
   renderTopCategories(procedures, validationsInPeriod, nbEmployes, periodLabel)
+}
+
+/* Trace un anneau de progression. Le trait est un cercle dont on ne dessine
+   qu'une fraction, et les deux variables `--vide` et `--cible` servent à
+   l'animation de remplissage définie en CSS. */
+function dessinerAnneau(id, pct, couleur, texte) {
+  const el = document.getElementById(id)
+  if (!el) return
+  const taille = 58, ep = 6, r = (taille - ep) / 2
+  const c = 2 * Math.PI * r
+  const cible = c * (1 - Math.max(0, Math.min(100, pct)) / 100)
+  el.innerHTML = `
+    <svg width="${taille}" height="${taille}">
+      <circle class="piste" cx="${taille / 2}" cy="${taille / 2}" r="${r}" fill="none" stroke-width="${ep}"/>
+      <circle class="valeur" cx="${taille / 2}" cy="${taille / 2}" r="${r}" fill="none" stroke-width="${ep}"
+              stroke="${couleur}" stroke-dasharray="${c}"
+              style="--vide:${c}; --cible:${cible}; stroke-dashoffset:${cible}"/>
+    </svg>
+    <div class="dedans">${escapeHtml(texte)}</div>`
 }
 
 /* Classement des catégories par taux de consultation.
@@ -2197,11 +2260,6 @@ window.loadGlobalAnalyse = function() {
   currentGaData = { procedures, membres, employes, validations }
   currentGaPeriod = 'week'
   document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
-
-  const nbCategories = new Set((procedures || []).map(p => p.categorie || 'Sans catégorie')).size
-  document.getElementById('ga-nb-categories').textContent = nbCategories
-  document.getElementById('ga-nb-procedures').textContent = procedures?.length || 0
-  document.getElementById('ga-nb-membres').textContent = membres?.length || 0
 
   renderGaStats()
 

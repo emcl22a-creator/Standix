@@ -633,7 +633,18 @@
   .detail-step{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
   .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
   .detail-step p{font-size:14px; line-height:1.4;}
-  .confirm-bar{ margin-top:20px; }
+  /* Le bandeau ne s'affiche qu'une fois la procédure consultée. Pendant les
+     30 secondes, l'employé ne voit aucun décompte : il lit, c'est tout. */
+  .confirm-bar{ margin-top:20px; display:none; }
+  .confirm-bar.visible{ display:block; }
+  .confirm-bar.visible .lecture-etat{ animation:bandeauArrive 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+  @keyframes bandeauArrive{
+    from{ opacity:0; transform:translateY(10px); }
+    to  { opacity:1; transform:translateY(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .confirm-bar.visible .lecture-etat{ animation:none; }
+  }
 
   .view-toggle{
     display:flex; gap:2px; background:var(--bg-card); border:0.5px solid var(--border);
@@ -4995,13 +5006,17 @@ function demarrerLecture(procId, dejaConsultee) {
   if (lectureProcId !== procId) { lectureProcId = procId; lectureSecondes = 0 }
   lectureEnregistree = !!dejaConsultee
 
-  if (lectureEnregistree) { afficherLectureFaite(dejaConsultee) ; return }
+  const bandeau = document.getElementById('lecture-etat')?.closest('.confirm-bar')
+  const err = document.getElementById('confirm-error')
+  if (err) err.textContent = ''
 
-  majEtatLecture()
+  if (lectureEnregistree) { afficherLectureFaite(dejaConsultee); return }
+
+  // Rien à l'écran pendant la lecture : le bandeau reste replié.
+  bandeau?.classList.remove('visible')
   lectureTimer = setInterval(() => {
     if (document.hidden) return          // app en arrière-plan : on ne compte pas
     lectureSecondes++
-    majEtatLecture()
     if (lectureSecondes >= DUREE_LECTURE_MIN) enregistrerConsultation()
   }, 1000)
 }
@@ -5010,26 +5025,11 @@ function arreterLecture() {
   if (lectureTimer) { clearInterval(lectureTimer); lectureTimer = null }
 }
 
-/* L'anneau se remplit au fil des secondes ; le texte dit ce qui se passe. */
-function majEtatLecture() {
-  const etat = document.getElementById('lecture-etat')
-  const titre = document.getElementById('lecture-titre')
-  const sous = document.getElementById('lecture-sous')
-  if (!etat) return
-
-  const reste = Math.max(0, DUREE_LECTURE_MIN - lectureSecondes)
-  const pct = Math.round((lectureSecondes / DUREE_LECTURE_MIN) * 100)
-  etat.classList.remove('faite')
-  dessinerAnneauLecture(pct, 'var(--orange)', String(reste))
-  titre.textContent = 'Lecture en cours'
-  sous.textContent = reste > 0
-    ? `Encore ${reste} seconde${reste > 1 ? 's' : ''} et la procédure sera marquée comme consultée`
-    : 'Enregistrement…'
-}
-
 function afficherLectureFaite(quand) {
   const etat = document.getElementById('lecture-etat')
   if (!etat) return
+  etat.closest('.confirm-bar')?.classList.add('visible')
+  etat.style.display = ''
   etat.classList.add('faite')
   dessinerAnneauLecture(100, 'var(--green)', '✓')
   document.getElementById('lecture-titre').textContent = 'Procédure consultée'
@@ -5068,7 +5068,12 @@ async function enregistrerConsultation() {
     // On ne bloque pas la lecture : on signale et on laissera une autre visite retenter.
     lectureEnregistree = false
     const err = document.getElementById('confirm-error')
-    if (err) err.textContent = "La consultation n'a pas pu être enregistrée : " + error.message
+    if (err) {
+      err.textContent = "La consultation n'a pas pu être enregistrée : " + error.message
+      // On déplie le bandeau uniquement pour que le message soit lisible.
+      err.closest('.confirm-bar')?.classList.add('visible')
+      document.getElementById('lecture-etat').style.display = 'none'
+    }
     return
   }
 

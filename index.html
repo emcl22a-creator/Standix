@@ -187,6 +187,33 @@
     font-size:12.5px; font-weight:650; color:var(--blue); flex-shrink:0;
   }
 
+  /* ═══ Procédure en cours d'analyse ═══
+     Une roue qui tourne pendant que l'IA travaille, puis une coche verte
+     jusqu'à ce que le gérant ouvre la procédure. C'est le seul endroit où il
+     apprend que son analyse est terminée s'il a quitté l'écran. */
+  .etat-proc{
+    position:absolute; top:12px; right:12px; width:26px; height:26px;
+    display:flex; align-items:center; justify-content:center; z-index:2;
+  }
+  .etat-proc svg{ width:26px; height:26px; display:block; }
+  .etat-proc .rot{ animation:etatTourne 1.05s linear infinite; transform-origin:center; }
+  @keyframes etatTourne{ to{ transform:rotate(360deg); } }
+  .etat-proc .arc{
+    stroke:#fff; stroke-width:2.4; stroke-linecap:round; fill:none;
+    stroke-dasharray:40 60; opacity:0.9;
+  }
+  .etat-proc .fond-arc{ stroke:rgba(255,255,255,0.14); stroke-width:2.4; fill:none; }
+  .etat-proc.prete{
+    background:var(--green); border-radius:50%; width:22px; height:22px;
+    box-shadow:0 0 0 3px rgba(48,209,88,0.18);
+    animation:etatArrive 0.5s cubic-bezier(0.34,1.5,0.64,1) both;
+  }
+  .etat-proc.prete svg{ width:13px; height:13px; }
+  @keyframes etatArrive{ from{ transform:scale(0.5); opacity:0; } to{ transform:scale(1); opacity:1; } }
+  /* La carte reste sobre : seule l'icône signale l'état, pas de fond coloré. */
+  .cat-cell .etat-proc, .proc-rich-card .etat-proc{ top:10px; right:10px; }
+  .proc-en-cours{ opacity:0.72; }
+
   /* ═══ Image d'une étape manuelle ═══
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
      facultative : l'étape reste valable sans. */
@@ -1542,12 +1569,12 @@
       </div>
     </div>
 
-    <div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
+    <div class="card mode-choice-card" onclick="goToCreateMode('ai')" id="mode-card-ai">
       <div class="mode-choice-row">
         <div class="mode-choice-icon">✦</div>
         <div class="mode-choice-text">
           <div class="mode-choice-title">L'IA découpe la vidéo</div>
-          <div class="mode-choice-desc">Bientôt disponible</div>
+          <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes</div>
         </div>
         <div class="mode-choice-arrow">›</div>
       </div>
@@ -1678,7 +1705,7 @@
         <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;" id="ai-progress-pct">0%</div>
       </div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-progress-title">Analyse en cours...</div>
-      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">Ça peut prendre quelques minutes selon la durée de la vidéo. <b style="color:#fff;">Ne quittez pas cette page</b> tant que l'analyse n'est pas terminée.</div>
+      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
     </div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
@@ -3313,6 +3340,7 @@ async function loadGestionProcedures() {
   window.jalon?.('validations reçues, grille prête')
   renderAccueil()
   renderCategoryGrid()
+  surveillerAnalyses()
 }
 
 /* ═══ Carte d'accueil ═══
@@ -3648,10 +3676,11 @@ function renderCategoryProceduresListInterne() {
     const needsAttention = pct > 0 && pct < 30
 
     const div = document.createElement('div')
-    div.className = 'card proc-rich-card'
+    div.className = 'card proc-rich-card' + (proc.statut === 'traitement' ? ' proc-en-cours' : '')
     div.dataset.key = proc.id
     div.onclick = () => openAnalyse(proc.id)
     div.innerHTML = `
+      ${etatProcedureHtml(proc)}
       <div class="cat-top">
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
@@ -3801,14 +3830,14 @@ function majProgressionIA() {
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
   if (ecoule > estimee * 2.5) {
-    sous.innerHTML = "C'est plus long que prévu. L'analyse tourne toujours sur le serveur — " +
-      "<b style=\"color:#fff;\">ne quittez pas cette page</b>, le résultat arrivera."
+    sous.innerHTML = "C'est plus long que prévu, mais l'analyse tourne toujours. " +
+      "<b style=\"color:#fff;\">Vous pouvez quitter cette page</b>, elle se terminera sans vous."
   } else if (ecoule > estimee) {
-    sous.innerHTML = "Encore un peu de patience, les vidéos longues demandent plus de temps. " +
-      "<b style=\"color:#fff;\">Ne quittez pas cette page.</b>"
+    sous.innerHTML = "Les vidéos longues demandent plus de temps. " +
+      "<b style=\"color:#fff;\">Vous pouvez quitter cette page.</b>"
   } else {
     const reste = Math.max(10, Math.round((estimee - ecoule) / 10) * 10)
-    sous.innerHTML = `Environ ${reste} s restantes. <b style="color:#fff;">Ne quittez pas cette page</b> tant que l'analyse n'est pas terminée.`
+    sous.innerHTML = `Environ ${reste} s restantes. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.`
   }
 }
 
@@ -3920,6 +3949,13 @@ async function pollAiStatus() {
       return
     }
     if (data.status === 'ready') {
+      // On inscrit la fin en base : la carte de la liste passera à la coche,
+      // même si le gérant n'est plus sur cet écran.
+      if (aiProcedureId) {
+        supabase.from('procedures').update({ statut: 'pret' }).eq('id', aiProcedureId).then(() => {}, () => {})
+        const p = allGestionProcedures.find(x => x.id === aiProcedureId)
+        if (p) p.statut = 'pret'
+      }
       stopAiProgressSimulation(100)
       document.getElementById('ai-progress-card').style.display = 'none'
       document.getElementById('ai-done-card').style.display = 'block'
@@ -4883,6 +4919,18 @@ let currentAnalysePeriod = 'week'
 
 async function openAnalyse(procId) {
   showGestionScreen('p-analyse')
+
+  /* La coche verte ne sert qu'à annoncer « ton analyse est prête ». Une fois la
+     procédure ouverte, le message a été reçu : on efface le statut, en base
+     pour que ce soit vrai sur tous les appareils. */
+  const enAttente = allGestionProcedures.find(p => p.id === procId && p.statut === 'pret')
+  if (enAttente) {
+    enAttente.statut = null
+    supabase.from('procedures').update({ statut: null }).eq('id', procId).then(() => {}, () => {})
+    renderCategoryGrid()
+    if (document.getElementById('p-category')?.classList.contains('active')) renderCategoryProceduresList()
+  }
+
   if (preloadEtapes) await preloadEtapes
   currentAnalysePeriod = 'week'
   document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
@@ -5206,6 +5254,81 @@ function renderAnalyseStats() {
 }
 
 // ═══════════ ÉQUIPE : liste ═══════════
+/* Tant qu'une procédure est en traitement, on redemande la liste toutes les
+   quinze secondes : c'est ce qui fait passer la roue à la coche sans que le
+   gérant ait à recharger quoi que ce soit. La surveillance s'arrête d'elle-même
+   quand plus rien n'est en cours. */
+let surveillanceAnalyses = null
+
+function surveillerAnalyses() {
+  const enCours = allGestionProcedures.some(p => p.statut === 'traitement')
+  if (!enCours) {
+    if (surveillanceAnalyses) { clearInterval(surveillanceAnalyses); surveillanceAnalyses = null }
+    return
+  }
+  if (surveillanceAnalyses) return
+  surveillanceAnalyses = setInterval(async () => {
+    if (document.hidden || !currentMembre) return
+
+    const { data } = await supabase.from('procedures')
+      .select('id, statut').eq('entreprise_id', currentMembre.entreprise_id)
+      .in('statut', ['traitement', 'pret'])
+    let change = false
+    ;(data || []).forEach(row => {
+      const p = allGestionProcedures.find(x => x.id === row.id)
+      if (p && p.statut !== row.statut) { p.statut = row.statut; change = true }
+    })
+
+    /* On demande aussi à l'analyse où elle en est. C'est indispensable : c'est
+       le navigateur qui constate la fin du traitement, et si le gérant a quitté
+       l'écran de suivi, plus personne ne le ferait. La surveillance prend donc
+       le relais, depuis n'importe quelle page de l'app. */
+    for (const row of (data || []).filter(r => r.statut === 'traitement')) {
+      try {
+        const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+          body: JSON.stringify({ procedure_id: row.id }),
+        })
+        const etat = await rep.json()
+        if (etat?.status === 'ready') {
+          await supabase.from('procedures').update({ statut: 'pret' }).eq('id', row.id)
+          const p = allGestionProcedures.find(x => x.id === row.id)
+          if (p) { p.statut = 'pret'; change = true }
+        }
+      } catch (e) { /* réseau capricieux : on retentera au tour suivant */ }
+    }
+
+    if (change) {
+      renderCategoryGrid()
+      if (document.getElementById('p-category')?.classList.contains('active')) renderCategoryProceduresList()
+    }
+    surveillerAnalyses()
+  }, 15000)
+}
+
+/* Renvoie le balisage de l'indicateur d'état d'une procédure, ou une chaîne
+   vide si elle est simplement normale.
+   · statut « traitement » → l'IA travaille encore, roue qui tourne
+   · statut « pret »       → l'analyse est finie et le gérant n'a pas encore
+                             ouvert la procédure, coche verte
+   Ouvrir la procédure fait passer le statut à null : la coche disparaît. */
+function etatProcedureHtml(proc) {
+  if (proc?.statut === 'traitement') {
+    return `<div class="etat-proc" title="Analyse en cours">
+      <svg viewBox="0 0 26 26">
+        <circle class="fond-arc" cx="13" cy="13" r="10"/>
+        <circle class="arc rot" cx="13" cy="13" r="10"/>
+      </svg></div>`
+  }
+  if (proc?.statut === 'pret') {
+    return `<div class="etat-proc prete" title="Analyse terminée">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#06210F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"/></svg></div>`
+  }
+  return ''
+}
+
 function estVisiteur() { return currentMembre?.role === 'visiteur' }
 
 /* Affiche le bloc du visiteur, avec le nombre de procédures auxquelles il n'a

@@ -325,16 +325,23 @@
      avertissements. Le tout partagé par les deux éditeurs (création et
      modification), d'où des classes plutôt que des identifiants.
      ═══════════════════════════════════════════════════════════════════════ */
-  .ed-bornes{ display:none; gap:8px; margin-top:10px; }
+  /* Les deux bornes tiennent sur une seule ligne, libellé et valeur à la même
+     hauteur : deux cartes empilées prenaient trois fois la place pour la même
+     information. */
+  .ed-bornes{ display:none; align-items:center; gap:8px; margin-top:10px; }
   .ed-bornes.on{ display:flex; }
   .ed-borne{
-    flex:1; padding:9px 11px; border-radius:13px; background:var(--bg-card);
-    border:1px solid var(--border); transition:border-color 0.2s, background 0.2s;
+    flex:1; min-width:0; display:flex; align-items:center; gap:7px;
+    height:38px; padding:0 12px; border-radius:11px; font-family:inherit;
+    background:var(--bg-card); border:1px solid var(--border);
+    transition:border-color 0.2s, background 0.2s;
   }
   .ed-borne.actif{ border-color:#fff; background:rgba(255,255,255,0.12); }
   .ed-borne .k{ font-size:10px; font-weight:750; color:var(--label-3);
-    text-transform:uppercase; letter-spacing:0.05em; }
-  .ed-borne .v{ font-size:19px; font-weight:800; letter-spacing:-0.04em; margin-top:2px; }
+    text-transform:uppercase; letter-spacing:0.05em; flex-shrink:0; }
+  .ed-borne.actif .k{ color:rgba(255,255,255,0.75); }
+  .ed-borne .v{ font-size:15px; font-weight:800; letter-spacing:-0.03em; color:#fff; }
+  .ed-fleche{ font-size:13px; color:var(--label-3); flex-shrink:0; }
 
   .ed-loupe-bloc{ display:none; margin-top:12px; }
   .ed-loupe-bloc.on{ display:block; }
@@ -1730,8 +1737,9 @@
       <div class="clip-info" id="capcut-info" style="display:none;"></div>
         <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
         <div class="ed-bornes" id="capcut-bornes">
-          <div class="ed-borne actif" data-borne="a"><div class="k">Début</div><div class="v" id="capcut-vd">0:00,0</div></div>
-          <div class="ed-borne" data-borne="b"><div class="k">Fin</div><div class="v" id="capcut-vf">0:00,0</div></div>
+          <button type="button" class="ed-borne actif" data-borne="a"><span class="k">Début</span><span class="v" id="capcut-vd">0:00,0</span></button>
+          <span class="ed-fleche">→</span>
+          <button type="button" class="ed-borne" data-borne="b"><span class="k">Fin</span><span class="v" id="capcut-vf">0:00,0</span></button>
         </div>
         <div class="ed-loupe-bloc" id="capcut-loupe-bloc">
           <div class="ed-loupe-titre">Loupe · <span id="capcut-loupe-fen">± 4 s</span></div>
@@ -1869,8 +1877,9 @@
         <button type="button" class="btn small block" id="ecap-add-btn">+ Découper une étape ici</button>
       </div>
         <div class="ed-bornes" id="ecap-bornes">
-          <div class="ed-borne actif" data-borne="a"><div class="k">Début</div><div class="v" id="ecap-vd">0:00,0</div></div>
-          <div class="ed-borne" data-borne="b"><div class="k">Fin</div><div class="v" id="ecap-vf">0:00,0</div></div>
+          <button type="button" class="ed-borne actif" data-borne="a"><span class="k">Début</span><span class="v" id="ecap-vd">0:00,0</span></button>
+          <span class="ed-fleche">→</span>
+          <button type="button" class="ed-borne" data-borne="b"><span class="k">Fin</span><span class="v" id="ecap-vf">0:00,0</span></button>
         </div>
         <div class="ed-loupe-bloc" id="ecap-loupe-bloc">
           <div class="ed-loupe-titre">Loupe · <span id="ecap-loupe-fen">± 4 s</span></div>
@@ -4172,6 +4181,7 @@ function createClipEditor(ids, api) {
       div.style.background = c + '3A'
       div.style.borderLeftColor = c
       div.style.borderRightColor = c
+      div.dataset.i = i     // le vrai rang de l'étape, pas sa place dans le DOM
       div.innerHTML = `<span style="background:${c};color:#0B0B0D">${i + 1}</span>`
       bandsEl.appendChild(div)
     })
@@ -4387,8 +4397,15 @@ function createClipEditor(ids, api) {
   function paintCouverture() {
     const couv = g(ids.couv), leg = g(ids.legende), al = g(ids.alertes)
     const d = dur()
-    const clips = steps().filter(s => s.timestamp_video != null)
-      .map(s => ({ a: clipStart(s), b: clipEnd(s) })).sort((x, y) => x.a - y.a)
+    /* On ne juge que ce qui est réellement renseigné. Une étape sans borne de
+       fin voyait `clipEnd` lui rendre la fin de la vidéo : plusieurs étapes
+       finissaient donc toutes au même endroit, ce qui fabriquait des trous et
+       des chevauchements qui n'existaient pas. D'où les « trou de 28 s »
+       inexplicables. */
+    const clips = steps()
+      .filter(s => s.timestamp_video != null && s.fin_video != null && s.fin_video > s.timestamp_video)
+      .map(s => ({ a: s.timestamp_video, b: s.fin_video })).sort((x, y) => x.a - y.a)
+    const incompletes = steps().filter(s => s.timestamp_video == null || s.fin_video == null).length
     const montrer = !!(d && clips.length)
     couv?.classList.toggle('on', montrer)
     leg?.classList.toggle('on', montrer)
@@ -4418,6 +4435,10 @@ function createClipEditor(ids, api) {
     if (clips[0].a > 0.5) probs.push({ txt: `${clips[0].a.toFixed(1).replace('.', ',')} s non couvertes au début` })
     const fin = clips[clips.length - 1].b
     if (fin < d - 0.5) probs.push({ txt: `${(d - fin).toFixed(1).replace('.', ',')} s non couvertes à la fin` })
+
+    if (incompletes > 0) {
+      probs.unshift({ txt: `${incompletes} étape${incompletes > 1 ? 's' : ''} sans extrait défini` })
+    }
 
     if (al) al.innerHTML = probs.length
       ? probs.map(p => `<div class="ed-alerte${p.grave ? ' grave' : ''}"><span>${p.txt}</span></div>`).join('')
@@ -4546,13 +4567,16 @@ function createClipEditor(ids, api) {
   timeline.addEventListener('pointerdown', (e) => {
     if (e.target.closest('.clip-handle')) return
     const bande = e.target.closest('.clip-band')
+    departLong = { x: e.clientX, y: e.clientY, surBande: !!bande }
     if (bande) {
-      departLong = { x: e.clientX, y: e.clientY }
-      const index = [...g(ids.markers).children].indexOf(bande)
+      /* Le rang vient de l'attribut posé au dessin, pas de la place dans le
+         document : les étapes sans horodatage ne sont pas dessinées, et compter
+         les enfants désignait donc la mauvaise étape. */
+      const index = parseInt(bande.dataset.i, 10)
       attente = setTimeout(() => {
         attente = null
         drag = null                       // on abandonne le déplacement en cours
-        if (index >= 0) select(index, { lire: false })
+        if (Number.isFinite(index)) select(index, { lire: false })
       }, 380)
     }
     beginDrag('scrub', e, null)
@@ -4560,7 +4584,19 @@ function createClipEditor(ids, api) {
   timeline.addEventListener('pointermove', (e) => {
     if (departLong && (Math.abs(e.clientX - departLong.x) > 6 || Math.abs(e.clientY - departLong.y) > 6)) annulerAttente()
   })
-  ;['pointerup', 'pointercancel'].forEach(ev => timeline.addEventListener(ev, annulerAttente))
+  /* Un appui bref dans le vide désélectionne : c'est le geste attendu pour
+     « je ne travaille plus sur cette étape ». Sur une bande, l'appui bref reste
+     un déplacement de la tête de lecture. */
+  timeline.addEventListener('pointerup', (e) => {
+    const bref = attente !== null
+    const dansLeVide = departLong && !departLong.surBande
+    annulerAttente()
+    if (bref === false && dansLeVide && selIndex != null) {
+      const bougeAPeine = Math.abs(e.clientX - (departLong?.x ?? e.clientX)) < 6
+      if (bougeAPeine) select(null)
+    }
+  })
+  timeline.addEventListener('pointercancel', annulerAttente)
   timeline.addEventListener('pointermove', (e) => { if (drag === 'scrub') moveDrag(e.clientX) })
   timeline.addEventListener('pointerup', endDrag)
   timeline.addEventListener('pointercancel', endDrag)
@@ -5754,8 +5790,20 @@ async function abandonnerAnalyse(proc) {
       if (chemin) await supabase.storage.from('procedo-videos').remove([decodeURIComponent(chemin)])
     }
     await supabase.from('etapes').delete().eq('procedure_id', proc.id)
-    const { error } = await supabase.from('procedures').delete().eq('id', proc.id)
+
+    /* Le piège des règles d'accès : une suppression refusée ne renvoie PAS
+       d'erreur. Elle réussit en ne touchant aucune ligne, et le code croit
+       avoir supprimé. On redemande donc les lignes effacées : si le tableau
+       revient vide, rien n'a été supprimé et il faut le dire. */
+    const { data: effacees, error } = await supabase
+      .from('procedures').delete().eq('id', proc.id).select('id')
     if (error) throw new Error(error.message)
+    if (!effacees || effacees.length === 0) {
+      throw new Error(
+        "La base a refusé la suppression. C'est une règle d'accès : votre compte " +
+        "n'a pas le droit de supprimer une procédure. Il faut ajouter une règle " +
+        "« delete » sur la table procedures dans Supabase.")
+    }
 
     allGestionProcedures = allGestionProcedures.filter(p => p.id !== proc.id)
     toast('Procédure supprimée.')

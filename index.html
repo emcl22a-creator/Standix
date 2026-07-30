@@ -1219,7 +1219,21 @@
   .mode-choice-card:active{ transform:scale(0.98); }
   .mode-choice-card.disabled{ opacity:0.4; pointer-events:none; }
   .mode-choice-row{ display:flex; align-items:center; gap:14px; }
-  .mode-choice-icon{ font-size:24px; flex-shrink:0; width:36px; text-align:center; }
+  /* Les modes portaient des émojis — rendus différemment sur chaque appareil, et
+     jamais alignés entre eux. Ce sont désormais des tuiles arrondies à dégradé,
+     comme les rangées des réglages d'iOS : même gabarit, même épaisseur de trait,
+     une couleur par mode pour qu'on les distingue d'un coup d'œil. */
+  /* Les icônes des modes reprennent la langue du dessin d'accueil : trait blanc,
+     opacités étagées pour la profondeur, aucun aplat de couleur. Les fiches du
+     fond sont à 16 et 26 %, celle de devant à 42 % avec un fond à 5 %, et le
+     signe distinctif en blanc plein — exactement les valeurs du dessin. */
+  .mode-choice-icon{
+    flex-shrink:0; width:46px; height:44px;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .mode-choice-icon svg{ width:44px; height:42px; display:block; overflow:visible; }
+  .mode-choice-card:active .mode-choice-icon{ transform:scale(0.94); }
   .mode-choice-text{ flex:1; }
   .mode-choice-title{ font-size:14.5px; font-weight:700; }
   .mode-choice-desc{ font-size:12px; color:var(--label-2); margin-top:2px; }
@@ -1333,6 +1347,9 @@
   .debut-dessin .fond-1{ animation:debutFlotte 5.4s ease-in-out -1.8s infinite; }
   .debut-dessin .devant{ animation:debutFlotte 5.4s ease-in-out -3.4s infinite; }
   .debut-dessin .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
+  /* Le même battement discret sur le signe des icônes de mode. */
+  .mode-choice-icon .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
+  @media (prefers-reduced-motion: reduce){ .mode-choice-icon .signe{ animation:none; } }
   @keyframes debutFlotte{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
   @keyframes debutLueur{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
   @keyframes debutSigne{ 0%,100%{ opacity:0.75; } 50%{ opacity:1; } }
@@ -1943,7 +1960,7 @@
 
     <div class="card mode-choice-card disabled" onclick="goToCreateMode('manual')" id="mode-card-manual">
       <div class="mode-choice-row">
-        <div class="mode-choice-icon">✍️</div>
+        <div class="mode-choice-icon"><svg viewBox="0 0 52 48" fill="none"><rect x="14" y="2" width="28" height="20" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="10" y="7" width="34" height="24" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><rect x="5" y="13" width="40" height="30" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="12" y1="23" x2="30" y2="23" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/><line x1="12" y1="30" x2="25" y2="30" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/><line x1="12" y1="36" x2="21" y2="36" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/><g class="signe"><path d="M45.5 20.5 33 33l-4.6 1.4 1.4-4.6L42.3 17.3a2.2 2.2 0 0 1 3.2 3.2Z" fill="#0C0D0E" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></g></svg></div>
         <div class="mode-choice-text">
           <div class="mode-choice-title">Étapes manuelles</div>
           <div class="mode-choice-desc">Écrivez chaque étape vous-même</div>
@@ -1954,7 +1971,7 @@
 
     <div class="card mode-choice-card disabled" onclick="goToCreateMode('video')" id="mode-card-video">
       <div class="mode-choice-row">
-        <div class="mode-choice-icon">🎬</div>
+        <div class="mode-choice-icon"><svg viewBox="0 0 52 48" fill="none"><rect x="12" y="3" width="28" height="18" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="8" y="8" width="36" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><rect x="4" y="14" width="44" height="30" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><circle cx="26" cy="29" r="8.4" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M23.8 25.4 30 29l-6.2 3.6Z" fill="rgba(255,255,255,0.75)"/><line x1="26" y1="9" x2="26" y2="48" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2.4 3" opacity="0.55"/></svg></div>
         <div class="mode-choice-text">
           <div class="mode-choice-title">Découper une vidéo</div>
           <div class="mode-choice-desc">Filmez puis découpez chaque étape</div>
@@ -1965,9 +1982,9 @@
 
     <div class="card mode-choice-card disabled" onclick="goToCreateMode('doc')" id="mode-card-doc">
       <div class="mode-choice-row">
-        <div class="mode-choice-icon">📄</div>
+        <div class="mode-choice-icon"><svg viewBox="0 0 52 48" fill="none"><rect x="16" y="2" width="24" height="30" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="12" y="6" width="27" height="34" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><path d="M8 13.5A5 5 0 0 1 13 8.5h13.5L35 17v22.5a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M26.5 8.5V17H35" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" fill="none" stroke-linejoin="round"/><line x1="14" y1="25" x2="28" y2="25" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="31" x2="24" y2="31" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="37" x2="20" y2="37" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/><g class="signe"><path d="M43.6 20.4 45.4 25.6l5.2 1.8-5.2 1.8-1.8 5.2-1.8-5.2-5.2-1.8 5.2-1.8Z" fill="#fff"/></g></svg></div>
         <div class="mode-choice-text">
-          <div class="mode-choice-title">L'IA lit un document</div>
+          <div class="mode-choice-title">L'IA découpe un document</div>
           <div class="mode-choice-desc">Collez un texte, ou déposez un PDF ou un Word</div>
         </div>
         <div class="mode-choice-arrow">›</div>
@@ -1976,7 +1993,7 @@
 
     <div class="card mode-choice-card" onclick="goToCreateMode('ai')" id="mode-card-ai">
       <div class="mode-choice-row">
-        <div class="mode-choice-icon">✦</div>
+        <div class="mode-choice-icon"><svg viewBox="0 0 52 48" fill="none"><rect x="10" y="4" width="28" height="18" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="6" y="9" width="34" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><rect x="3" y="15" width="40" height="28" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><circle cx="23" cy="29" r="7.8" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M21 25.6 26.6 29 21 32.4Z" fill="rgba(255,255,255,0.75)"/><g class="signe"><path d="M43.2 4.4 45 9.6l5.2 1.8-5.2 1.8-1.8 5.2-1.8-5.2-5.2-1.8 5.2-1.8Z" fill="#fff"/><path d="M38.4 21.6l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9Z" fill="#fff" opacity="0.55"/></g></svg></div>
         <div class="mode-choice-text">
           <div class="mode-choice-title">L'IA découpe la vidéo</div>
           <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes · 10 min maximum</div>
@@ -2088,13 +2105,13 @@
     <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
   </div>
 
-  <!-- L'IA lit un document et en tire les étapes -->
+  <!-- L'IA découpe un document et en tire les étapes -->
   <div class="screen" id="p-create-doc">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA lit un document</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe un document</h1>
     </div>
     <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
 
@@ -2451,12 +2468,6 @@
         <div class="plan-price">199€<span>/mois</span></div>
       </div>
       <div class="plan-desc">Membres illimités · multi-sites</div>
-    </div>
-
-    <div class="section-title">Langue</div>
-    <div class="card">
-      <label class="f">Langue de l'application</label>
-      <div class="langue-grille" id="langue-app-gestion"></div>
     </div>
 
     <div class="section-title">Une question ?</div>
@@ -2826,83 +2837,219 @@ let scanLoopActive = false
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const LANGUES = [
-  { code: 'fr', nom: 'Fran\u00e7ais',   drapeau: '\uD83C\uDDEB\uD83C\uDDF7' },
-  { code: 'en', nom: 'English',    drapeau: '\uD83C\uDDEC\uD83C\uDDE7' },
-  { code: 'es', nom: 'Espa\u00f1ol',    drapeau: '\uD83C\uDDEA\uD83C\uDDF8' },
-  { code: 'pt', nom: 'Portugu\u00eas',  drapeau: '\uD83C\uDDF5\uD83C\uDDF9' },
-  { code: 'it', nom: 'Italiano',   drapeau: '\uD83C\uDDEE\uD83C\uDDF9' },
-  { code: 'de', nom: 'Deutsch',    drapeau: '\uD83C\uDDE9\uD83C\uDDEA' },
-  { code: 'ar', nom: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629', drapeau: '\uD83C\uDDF8\uD83C\uDDE6' },
-  { code: 'tr', nom: 'T\u00fcrk\u00e7e',     drapeau: '\uD83C\uDDF9\uD83C\uDDF7' },
-  { code: 'pl', nom: 'Polski',     drapeau: '\uD83C\uDDF5\uD83C\uDDF1' },
-  { code: 'ro', nom: 'Rom\u00e2n\u0103',    drapeau: '\uD83C\uDDF7\uD83C\uDDF4' },
-  { code: 'uk', nom: '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430', drapeau: '\uD83C\uDDFA\uD83C\uDDE6' },
-  { code: 'zh', nom: '\u4e2d\u6587',      drapeau: '\uD83C\uDDE8\uD83C\uDDF3' },
+  { code: 'fr', nom: 'Fran\u00e7ais',  drapeau: '\uD83C\uDDEB\uD83C\uDDF7' },
+  { code: 'en', nom: 'English',   drapeau: '\uD83C\uDDEC\uD83C\uDDE7' },
+  { code: 'es', nom: 'Espa\u00f1ol',   drapeau: '\uD83C\uDDEA\uD83C\uDDF8' },
+  { code: 'pt', nom: 'Portugu\u00eas', drapeau: '\uD83C\uDDF5\uD83C\uDDF9' },
 ]
 
-/* Le dictionnaire de l'app. Il ne couvre que l'espace équipe et les réglages :
-   c'est là que se trouvent les personnes qui ne parlent pas français. L'espace
-   gestion reste en français — le gérant est celui qui a créé l'entreprise.
-   La clé est la phrase française elle-même : pas de code à inventer, et une
-   phrase sans traduction reste simplement en français. */
+/* Le dictionnaire de l'app. Il couvre l'INTÉGRALITÉ de l'espace équipe : les
+   46 libellés du balisage, plus les phrases fixes insérées par le code. Douze
+   langues à moitié traduites valaient moins que quatre qui le sont vraiment —
+   une interface à demi traduite est plus déroutante qu'une interface en français.
+
+   Ajouter une langue revient désormais à ajouter une colonne ici : la mécanique
+   est faite, il ne manque que le texte.
+
+   La clé est la phrase française elle-même. Une phrase absente reste en
+   français plutôt que d'afficher un code technique. */
 const DICO = {
   en: {
-    'Espace \u00c9quipe': 'Team space', 'Proc\u00e9dures': 'Procedures', 'Activit\u00e9': 'Activity',
-    'Mon activit\u00e9': 'My activity', 'Cat\u00e9gories': 'Categories', 'Param\u00e8tres': 'Settings',
-    'Rechercher une proc\u00e9dure': 'Search a procedure', 'Lues': 'Read', 'Temps total': 'Total time',
-    "Jours d'affil\u00e9e": 'Day streak', 'En chiffres': 'In figures', 'Par cat\u00e9gorie': 'By category',
-    'Temps par proc\u00e9dure': 'Time per procedure', 'Il vous reste \u00e0 lire': 'Left to read',
-    'Rien ne vous attend': 'Nothing pending', '\u00c9tapes de la proc\u00e9dure': 'Procedure steps',
-    'Proc\u00e9dure consult\u00e9e': 'Procedure read', 'Aucune \u00e9tape': 'No steps',
-    'Vos informations': 'Your details', 'Nom complet': 'Full name', 'E-mail': 'Email',
-    'Enregistrer': 'Save', 'Vos entreprises': 'Your companies', 'Basculer': 'Switch',
-    'Rejoindre': 'Join', 'Rejoindre une autre entreprise': 'Join another company',
-    'Compte': 'Account', 'Se d\u00e9connecter': 'Sign out', 'Une question ?': 'A question?',
-    '\u00c9crivez-nous': 'Write to us', 'Langue': 'Language', "Langue de l'application": 'App language',
-    'Scanner un QR code': 'Scan a QR code', 'Code reconnu': 'Code recognised',
-    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Open the procedure', "Ce n'est pas celle-l\u00e0": "That's not the one",
-    'Bienvenue': 'Welcome', 'Enregistr\u00e9 \u00e0 l\u2019instant': 'Just saved',
+    // ── navigation et en-têtes ──
+    'Espace \u00c9quipe': 'Team space',
+    'Proc\u00e9dures': 'Procedures',
+    'Activit\u00e9': 'Activity',
+    'Cat\u00e9gories': 'Categories',
+    'Param\u00e8tres': 'Settings',
+    'Scanner un code': 'Scan a code',
+    'Mon activit\u00e9': 'My activity',
+    'Bonjour \uD83D\uDC4B': 'Hello \uD83D\uDC4B',
+    'Chargement\u2026': 'Loading\u2026',
+    // ── accueil et listes ──
+    'Rechercher une proc\u00e9dure': 'Search a procedure',
+    'Rechercher dans cette cat\u00e9gorie': 'Search in this category',
+    'Cat\u00e9gorie': 'Category',
+    '\u00c0 lire': 'To read',
+    'Lue': 'Read',
+    'Lues': 'Read',
+    'Temps total': 'Total time',
+    "Jours d'affil\u00e9e": 'Day streak',
+    'En tout': 'In total',
+    // ── écran d'activité ──
+    'En chiffres': 'In figures',
+    'Par cat\u00e9gorie': 'By category',
+    'Temps par proc\u00e9dure': 'Time per procedure',
+    'Il vous reste \u00e0 lire': 'Left to read',
+    'Rien ne vous attend': 'Nothing pending',
+    'Taux de lecture': 'Reading rate',
+    'Cette semaine': 'This week',
+    'Temps moyen par proc\u00e9dure': 'Average time per procedure',
+    'Journ\u00e9es actives': 'Active days',
+    'Derni\u00e8re lecture': 'Last read',
+    'Plus longue lecture': 'Longest read',
+    // ── fiche d'une procédure ──
+    'Lire dans une autre langue': 'Read in another language',
+    '\u00c9tapes de la proc\u00e9dure': 'Procedure steps',
+    'Lecture en cours': 'Reading',
+    'Proc\u00e9dure consult\u00e9e': 'Procedure read',
+    'Aucune \u00e9tape': 'No steps',
+    'Les autres proc\u00e9dures ne vous sont pas accessibles': 'The other procedures are not available to you',
+    "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Ask your manager for the company code to access them.',
+    // ── scanner ──
+    'Autorisez la cam\u00e9ra pour scanner': 'Allow the camera to scan',
+    'Visez le QR code affich\u00e9 sur votre poste': 'Point at the QR code displayed at your station',
+    'Code reconnu': 'Code recognised',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Open the procedure',
+    "Ce n'est pas celle-l\u00e0": "That's not the one",
+    'Bienvenue': 'Welcome',
+    // ── réglages ──
+    'Votre compte et votre entreprise': 'Your account and your company',
+    'Vos informations': 'Your details',
+    'Nom complet': 'Full name',
+    'E-mail': 'Email',
+    'Enregistrer': 'Save',
+    'Langue': 'Language',
+    "Langue de l'application": 'App language',
+    'Vos entreprises': 'Your companies',
+    'Rejoindre': 'Join',
+    'Rejoindre une autre entreprise': 'Join another company',
+    'D\u00e9bloquer': 'Unlock',
+    "Entrez le code \u00e0 5 chiffres que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
+      'Enter the 5-digit code your manager gave you. It will be remembered: the company will appear in the list above.',
+    'Une question ?': 'A question?',
+    '\u00c9crivez-nous': 'Write to us',
+    'Un souci, une id\u00e9e, une question sur Proc\u00e9do ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
+      'A problem, an idea, a question about Proc\u00e9do? We read everything and reply as soon as we can.',
+    'Compte': 'Account',
+    'Se d\u00e9connecter': 'Sign out',
   },
+
   es: {
-    'Espace \u00c9quipe': 'Espacio Equipo', 'Proc\u00e9dures': 'Procedimientos', 'Activit\u00e9': 'Actividad',
-    'Mon activit\u00e9': 'Mi actividad', 'Cat\u00e9gories': 'Categor\u00edas', 'Param\u00e8tres': 'Ajustes',
-    'Rechercher une proc\u00e9dure': 'Buscar un procedimiento', 'Lues': 'Le\u00eddas', 'Temps total': 'Tiempo total',
-    "Jours d'affil\u00e9e": 'D\u00edas seguidos', 'En chiffres': 'En cifras', 'Par cat\u00e9gorie': 'Por categor\u00eda',
-    'Temps par proc\u00e9dure': 'Tiempo por procedimiento', 'Il vous reste \u00e0 lire': 'Te queda por leer',
-    'Rien ne vous attend': 'Nada pendiente', '\u00c9tapes de la proc\u00e9dure': 'Pasos del procedimiento',
-    'Proc\u00e9dure consult\u00e9e': 'Procedimiento le\u00eddo', 'Aucune \u00e9tape': 'Sin pasos',
-    'Vos informations': 'Tus datos', 'Nom complet': 'Nombre completo', 'E-mail': 'Correo',
-    'Enregistrer': 'Guardar', 'Vos entreprises': 'Tus empresas', 'Basculer': 'Cambiar',
-    'Rejoindre': 'Unirse', 'Rejoindre une autre entreprise': 'Unirse a otra empresa',
-    'Compte': 'Cuenta', 'Se d\u00e9connecter': 'Cerrar sesi\u00f3n', 'Une question ?': '\u00bfUna pregunta?',
-    '\u00c9crivez-nous': 'Escr\u00edbenos', 'Langue': 'Idioma', "Langue de l'application": 'Idioma de la app',
-    'Scanner un QR code': 'Escanear un c\u00f3digo QR', 'Code reconnu': 'C\u00f3digo reconocido',
-    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir el procedimiento', "Ce n'est pas celle-l\u00e0": 'No es este',
+    'Espace \u00c9quipe': 'Espacio Equipo',
+    'Proc\u00e9dures': 'Procedimientos',
+    'Activit\u00e9': 'Actividad',
+    'Cat\u00e9gories': 'Categor\u00edas',
+    'Param\u00e8tres': 'Ajustes',
+    'Scanner un code': 'Escanear un c\u00f3digo',
+    'Mon activit\u00e9': 'Mi actividad',
+    'Bonjour \uD83D\uDC4B': 'Hola \uD83D\uDC4B',
+    'Chargement\u2026': 'Cargando\u2026',
+    'Rechercher une proc\u00e9dure': 'Buscar un procedimiento',
+    'Rechercher dans cette cat\u00e9gorie': 'Buscar en esta categor\u00eda',
+    'Cat\u00e9gorie': 'Categor\u00eda',
+    '\u00c0 lire': 'Por leer',
+    'Lue': 'Le\u00edo',
+    'Lues': 'Le\u00eddos',
+    'Temps total': 'Tiempo total',
+    "Jours d'affil\u00e9e": 'D\u00edas seguidos',
+    'En tout': 'En total',
+    'En chiffres': 'En cifras',
+    'Par cat\u00e9gorie': 'Por categor\u00eda',
+    'Temps par proc\u00e9dure': 'Tiempo por procedimiento',
+    'Il vous reste \u00e0 lire': 'Te queda por leer',
+    'Rien ne vous attend': 'Nada pendiente',
+    'Taux de lecture': 'Tasa de lectura',
+    'Cette semaine': 'Esta semana',
+    'Temps moyen par proc\u00e9dure': 'Tiempo medio por procedimiento',
+    'Journ\u00e9es actives': 'D\u00edas activos',
+    'Derni\u00e8re lecture': '\u00daltima lectura',
+    'Plus longue lecture': 'Lectura m\u00e1s larga',
+    'Lire dans une autre langue': 'Leer en otro idioma',
+    '\u00c9tapes de la proc\u00e9dure': 'Pasos del procedimiento',
+    'Lecture en cours': 'Leyendo',
+    'Proc\u00e9dure consult\u00e9e': 'Procedimiento le\u00eddo',
+    'Aucune \u00e9tape': 'Sin pasos',
+    'Les autres proc\u00e9dures ne vous sont pas accessibles': 'Los dem\u00e1s procedimientos no est\u00e1n disponibles',
+    "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Pide el c\u00f3digo de la empresa a tu responsable para acceder.',
+    'Autorisez la cam\u00e9ra pour scanner': 'Autoriza la c\u00e1mara para escanear',
+    'Visez le QR code affich\u00e9 sur votre poste': 'Apunta al c\u00f3digo QR de tu puesto',
+    'Code reconnu': 'C\u00f3digo reconocido',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir el procedimiento',
+    "Ce n'est pas celle-l\u00e0": 'No es este',
     'Bienvenue': 'Bienvenido',
+    'Votre compte et votre entreprise': 'Tu cuenta y tu empresa',
+    'Vos informations': 'Tus datos',
+    'Nom complet': 'Nombre completo',
+    'E-mail': 'Correo',
+    'Enregistrer': 'Guardar',
+    'Langue': 'Idioma',
+    "Langue de l'application": 'Idioma de la aplicaci\u00f3n',
+    'Vos entreprises': 'Tus empresas',
+    'Rejoindre': 'Unirse',
+    'Rejoindre une autre entreprise': 'Unirse a otra empresa',
+    'D\u00e9bloquer': 'Desbloquear',
+    "Entrez le code \u00e0 5 chiffres que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
+      'Introduce el c\u00f3digo de 5 cifras que te dio tu responsable. Se guardar\u00e1: la empresa aparecer\u00e1 en la lista de arriba.',
+    'Une question ?': '\u00bfUna pregunta?',
+    '\u00c9crivez-nous': 'Escr\u00edbenos',
+    'Un souci, une id\u00e9e, une question sur Proc\u00e9do ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
+      '\u00bfUn problema, una idea, una duda sobre Proc\u00e9do? Lo leemos todo y respondemos lo antes posible.',
+    'Compte': 'Cuenta',
+    'Se d\u00e9connecter': 'Cerrar sesi\u00f3n',
   },
+
   pt: {
-    'Espace \u00c9quipe': 'Espa\u00e7o Equipa', 'Proc\u00e9dures': 'Procedimentos', 'Activit\u00e9': 'Atividade',
-    'Mon activit\u00e9': 'A minha atividade', 'Cat\u00e9gories': 'Categorias', 'Param\u00e8tres': 'Defini\u00e7\u00f5es',
-    'Rechercher une proc\u00e9dure': 'Procurar um procedimento', 'Lues': 'Lidos', 'Temps total': 'Tempo total',
-    "Jours d'affil\u00e9e": 'Dias seguidos', 'En chiffres': 'Em n\u00fameros', 'Par cat\u00e9gorie': 'Por categoria',
-    'Temps par proc\u00e9dure': 'Tempo por procedimento', 'Il vous reste \u00e0 lire': 'Falta ler',
-    'Rien ne vous attend': 'Nada pendente', '\u00c9tapes de la proc\u00e9dure': 'Etapas do procedimento',
-    'Proc\u00e9dure consult\u00e9e': 'Procedimento lido', 'Aucune \u00e9tape': 'Sem etapas',
-    'Vos informations': 'Os seus dados', 'Nom complet': 'Nome completo', 'E-mail': 'E-mail',
-    'Enregistrer': 'Guardar', 'Vos entreprises': 'As suas empresas', 'Basculer': 'Mudar',
-    'Rejoindre': 'Aderir', 'Rejoindre une autre entreprise': 'Aderir a outra empresa',
-    'Compte': 'Conta', 'Se d\u00e9connecter': 'Terminar sess\u00e3o', 'Une question ?': 'Uma pergunta?',
-    '\u00c9crivez-nous': 'Escreva-nos', 'Langue': 'Idioma', "Langue de l'application": 'Idioma da app',
-    'Scanner un QR code': 'Ler um c\u00f3digo QR', 'Code reconnu': 'C\u00f3digo reconhecido',
-    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir o procedimento', "Ce n'est pas celle-l\u00e0": 'N\u00e3o \u00e9 este',
+    'Espace \u00c9quipe': 'Espa\u00e7o Equipa',
+    'Proc\u00e9dures': 'Procedimentos',
+    'Activit\u00e9': 'Atividade',
+    'Cat\u00e9gories': 'Categorias',
+    'Param\u00e8tres': 'Defini\u00e7\u00f5es',
+    'Scanner un code': 'Ler um c\u00f3digo',
+    'Mon activit\u00e9': 'A minha atividade',
+    'Bonjour \uD83D\uDC4B': 'Ol\u00e1 \uD83D\uDC4B',
+    'Chargement\u2026': 'A carregar\u2026',
+    'Rechercher une proc\u00e9dure': 'Procurar um procedimento',
+    'Rechercher dans cette cat\u00e9gorie': 'Procurar nesta categoria',
+    'Cat\u00e9gorie': 'Categoria',
+    '\u00c0 lire': 'Por ler',
+    'Lue': 'Lido',
+    'Lues': 'Lidos',
+    'Temps total': 'Tempo total',
+    "Jours d'affil\u00e9e": 'Dias seguidos',
+    'En tout': 'No total',
+    'En chiffres': 'Em n\u00fameros',
+    'Par cat\u00e9gorie': 'Por categoria',
+    'Temps par proc\u00e9dure': 'Tempo por procedimento',
+    'Il vous reste \u00e0 lire': 'Falta ler',
+    'Rien ne vous attend': 'Nada pendente',
+    'Taux de lecture': 'Taxa de leitura',
+    'Cette semaine': 'Esta semana',
+    'Temps moyen par proc\u00e9dure': 'Tempo m\u00e9dio por procedimento',
+    'Journ\u00e9es actives': 'Dias ativos',
+    'Derni\u00e8re lecture': '\u00daltima leitura',
+    'Plus longue lecture': 'Leitura mais longa',
+    'Lire dans une autre langue': 'Ler noutro idioma',
+    '\u00c9tapes de la proc\u00e9dure': 'Etapas do procedimento',
+    'Lecture en cours': 'A ler',
+    'Proc\u00e9dure consult\u00e9e': 'Procedimento lido',
+    'Aucune \u00e9tape': 'Sem etapas',
+    'Les autres proc\u00e9dures ne vous sont pas accessibles': 'Os outros procedimentos n\u00e3o est\u00e3o dispon\u00edveis',
+    "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Pe\u00e7a o c\u00f3digo da empresa ao seu respons\u00e1vel para aceder.',
+    'Autorisez la cam\u00e9ra pour scanner': 'Autorize a c\u00e2mara para ler',
+    'Visez le QR code affich\u00e9 sur votre poste': 'Aponte ao c\u00f3digo QR do seu posto',
+    'Code reconnu': 'C\u00f3digo reconhecido',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir o procedimento',
+    "Ce n'est pas celle-l\u00e0": 'N\u00e3o \u00e9 este',
     'Bienvenue': 'Bem-vindo',
-  },
-  ar: {
-    'Espace \u00c9quipe': '\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u0641\u0631\u064a\u0642', 'Proc\u00e9dures': '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
-    'Activit\u00e9': '\u0627\u0644\u0646\u0634\u0627\u0637', 'Cat\u00e9gories': '\u0627\u0644\u0641\u0626\u0627\u062a', 'Param\u00e8tres': '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a',
-    'Lues': '\u0645\u0642\u0631\u0648\u0621\u0629', 'Temps total': '\u0627\u0644\u0648\u0642\u062a \u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a',
-    'Se d\u00e9connecter': '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c', 'Langue': '\u0627\u0644\u0644\u063a\u0629',
-    'Acc\u00e9der \u00e0 la proc\u00e9dure': '\u0641\u062a\u062d \u0627\u0644\u0625\u062c\u0631\u0627\u0621', 'Bienvenue': '\u0645\u0631\u062d\u0628\u0627\u064b',
+    'Votre compte et votre entreprise': 'A sua conta e a sua empresa',
+    'Vos informations': 'Os seus dados',
+    'Nom complet': 'Nome completo',
+    'E-mail': 'E-mail',
+    'Enregistrer': 'Guardar',
+    'Langue': 'Idioma',
+    "Langue de l'application": 'Idioma da aplica\u00e7\u00e3o',
+    'Vos entreprises': 'As suas empresas',
+    'Rejoindre': 'Aderir',
+    'Rejoindre une autre entreprise': 'Aderir a outra empresa',
+    'D\u00e9bloquer': 'Desbloquear',
+    "Entrez le code \u00e0 5 chiffres que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
+      'Introduza o c\u00f3digo de 5 algarismos que o seu respons\u00e1vel lhe deu. Ser\u00e1 guardado: a empresa aparecer\u00e1 na lista acima.',
+    'Une question ?': 'Uma pergunta?',
+    '\u00c9crivez-nous': 'Escreva-nos',
+    'Un souci, une id\u00e9e, une question sur Proc\u00e9do ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
+      'Um problema, uma ideia, uma d\u00favida sobre o Proc\u00e9do? Lemos tudo e respondemos o mais depressa poss\u00edvel.',
+    'Compte': 'Conta',
+    'Se d\u00e9connecter': 'Terminar sess\u00e3o',
   },
 }
 
@@ -2932,16 +3079,16 @@ function t(phrase) {
    ou un nom de catégorie ne figure pas dans le dictionnaire, il ne risque donc
    jamais d'être modifié. */
 function appliquerLangue() {
+  /* Seul l'espace équipe est traduit, et il l'est entièrement. L'espace gestion
+     reste en français : c'est celui du gérant, qui a créé l'entreprise. Mieux
+     vaut un espace complètement traduit que deux à moitié. */
   const racines = [
     document.getElementById('equipe-app'),
     document.getElementById('tabbar-equipe'),
-    document.getElementById('gestion-app'),
-    document.getElementById('tabbar-gestion'),
   ].filter(Boolean)
 
   const dico = DICO[langueApp]
   document.documentElement.lang = langueApp
-  document.documentElement.dir = langueApp === 'ar' ? 'rtl' : 'ltr'
 
   for (const racine of racines) {
     const parcours = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT)

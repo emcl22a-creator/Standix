@@ -761,45 +761,50 @@
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
-  /* ═══ Barre en arc (espace gestion) ═══
-     Une arche de verre en U renversé, dont le centre reste vide. Le contour
-     n'est pas dessiné à la main : je calcule la ligne médiane de l'arc, je la
-     décale de part et d'autre le long de sa normale, et je referme par un
-     demi-cercle à chaque pied. L'épaisseur du bandeau est donc rigoureusement
-     constante et les extrémités parfaitement rondes.
-     Le verre est découpé selon ce contour avec `clip-path`, le liseré est le
-     même tracé redessiné en SVG, et les trois boutons sont posés aux
-     coordonnées exactes de la ligne médiane. */
+  /* ═══ Barre d'onglets (espace gestion) ═══
+     Deux éléments distincts : un groupe en verre qui contient les onglets, et
+     un bouton d'action détaché à droite. L'onglet actif ne reçoit pas une
+     pastille par-dessus — c'est lui qui se déploie, prend un fond blanc et
+     laisse apparaître son libellé. La largeur s'anime, d'où l'effet de
+     glissement d'un onglet à l'autre. */
   #tabbar-gestion{
-    width:230.5px; height:105.1px; padding:0; display:block; overflow:visible;
+    display:flex; align-items:center; gap:10px; width:auto; height:auto; padding:0;
     background:none; border:none; border-radius:0; box-shadow:none;
     -webkit-backdrop-filter:none; backdrop-filter:none;
-    filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48)) drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+    filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48));
   }
-  #tabbar-gestion .verre{
-    position:absolute; inset:0;
-    background:rgba(255,255,255,0.10);
+  #tabbar-gestion .groupe{
+    display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    -webkit-clip-path:path('M50.7,87.2 L51.3,85.5 L52.0,83.9 L52.8,82.2 L53.7,80.6 L54.8,78.9 L55.9,77.2 L57.2,75.6 L58.6,73.9 L60.1,72.3 L61.8,70.7 L63.6,69.1 L65.5,67.6 L67.5,66.0 L69.7,64.6 L71.9,63.2 L74.3,61.8 L76.7,60.6 L79.3,59.4 L82.0,58.2 L84.7,57.2 L87.5,56.2 L90.4,55.4 L93.4,54.6 L96.4,53.9 L99.5,53.3 L102.6,52.9 L105.7,52.5 L108.9,52.2 L112.1,52.1 L115.3,52.0 L118.5,52.1 L121.6,52.2 L124.8,52.5 L128.0,52.9 L131.1,53.3 L134.1,53.9 L137.1,54.6 L140.1,55.4 L143.0,56.2 L145.8,57.2 L148.6,58.2 L151.2,59.4 L153.8,60.6 L156.3,61.8 L158.6,63.2 L160.9,64.6 L163.0,66.0 L165.0,67.6 L167.0,69.1 L168.7,70.7 L170.4,72.3 L171.9,73.9 L173.3,75.6 L174.6,77.2 L175.8,78.9 L176.8,80.6 L177.7,82.2 L178.5,83.9 L179.2,85.5 L179.8,87.2 A26.0,26.0 0 0 1 229.2,71.0 L227.7,66.6 L225.9,62.4 L223.9,58.2 L221.6,54.2 L219.2,50.3 L216.5,46.5 L213.7,42.8 L210.7,39.2 L207.5,35.8 L204.1,32.6 L200.6,29.5 L197.0,26.5 L193.2,23.7 L189.2,21.0 L185.2,18.5 L181.0,16.1 L176.8,13.9 L172.4,11.9 L168.0,10.0 L163.4,8.3 L158.8,6.7 L154.2,5.3 L149.4,4.1 L144.7,3.0 L139.8,2.1 L135.0,1.3 L130.1,0.7 L125.1,0.3 L120.2,0.1 L115.3,0.0 L110.3,0.1 L105.4,0.3 L100.5,0.7 L95.6,1.3 L90.7,2.1 L85.9,3.0 L81.1,4.1 L76.4,5.3 L71.7,6.7 L67.1,8.3 L62.6,10.0 L58.1,11.9 L53.8,13.9 L49.5,16.1 L45.3,18.5 L41.3,21.0 L37.4,23.7 L33.6,26.5 L29.9,29.5 L26.4,32.6 L23.1,35.8 L19.9,39.2 L16.8,42.8 L14.0,46.5 L11.4,50.3 L8.9,54.2 L6.7,58.2 L4.6,62.4 L2.8,66.6 L1.3,71.0 A26.0,26.0 0 0 1 50.7,87.2 Z'); clip-path:path('M50.7,87.2 L51.3,85.5 L52.0,83.9 L52.8,82.2 L53.7,80.6 L54.8,78.9 L55.9,77.2 L57.2,75.6 L58.6,73.9 L60.1,72.3 L61.8,70.7 L63.6,69.1 L65.5,67.6 L67.5,66.0 L69.7,64.6 L71.9,63.2 L74.3,61.8 L76.7,60.6 L79.3,59.4 L82.0,58.2 L84.7,57.2 L87.5,56.2 L90.4,55.4 L93.4,54.6 L96.4,53.9 L99.5,53.3 L102.6,52.9 L105.7,52.5 L108.9,52.2 L112.1,52.1 L115.3,52.0 L118.5,52.1 L121.6,52.2 L124.8,52.5 L128.0,52.9 L131.1,53.3 L134.1,53.9 L137.1,54.6 L140.1,55.4 L143.0,56.2 L145.8,57.2 L148.6,58.2 L151.2,59.4 L153.8,60.6 L156.3,61.8 L158.6,63.2 L160.9,64.6 L163.0,66.0 L165.0,67.6 L167.0,69.1 L168.7,70.7 L170.4,72.3 L171.9,73.9 L173.3,75.6 L174.6,77.2 L175.8,78.9 L176.8,80.6 L177.7,82.2 L178.5,83.9 L179.2,85.5 L179.8,87.2 A26.0,26.0 0 0 1 229.2,71.0 L227.7,66.6 L225.9,62.4 L223.9,58.2 L221.6,54.2 L219.2,50.3 L216.5,46.5 L213.7,42.8 L210.7,39.2 L207.5,35.8 L204.1,32.6 L200.6,29.5 L197.0,26.5 L193.2,23.7 L189.2,21.0 L185.2,18.5 L181.0,16.1 L176.8,13.9 L172.4,11.9 L168.0,10.0 L163.4,8.3 L158.8,6.7 L154.2,5.3 L149.4,4.1 L144.7,3.0 L139.8,2.1 L135.0,1.3 L130.1,0.7 L125.1,0.3 L120.2,0.1 L115.3,0.0 L110.3,0.1 L105.4,0.3 L100.5,0.7 L95.6,1.3 L90.7,2.1 L85.9,3.0 L81.1,4.1 L76.4,5.3 L71.7,6.7 L67.1,8.3 L62.6,10.0 L58.1,11.9 L53.8,13.9 L49.5,16.1 L45.3,18.5 L41.3,21.0 L37.4,23.7 L33.6,26.5 L29.9,29.5 L26.4,32.6 L23.1,35.8 L19.9,39.2 L16.8,42.8 L14.0,46.5 L11.4,50.3 L8.9,54.2 L6.7,58.2 L4.6,62.4 L2.8,66.6 L1.3,71.0 A26.0,26.0 0 0 1 50.7,87.2 Z');
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
   }
-  #tabbar-gestion .contour{ position:absolute; inset:0; width:230.5px; height:105.1px; pointer-events:none; }
-  /* Les trois boutons sont posés sur la ligne médiane du bandeau : leurs
-     coordonnées sont calculées sur la courbe, pas placées à l'estime. */
-  #tabbar-gestion .tab-round{ position:absolute; width:40px; height:40px; }
-  #tabbar-gestion .tab-gauche{ left:6px;    top:59.1px; }
-  #tabbar-gestion .tab-droite{ left:184.5px; top:59.1px; }
-  #tabbar-gestion .tab-round--primary{ left:93.3px; top:4px; width:44px; height:44px; }
-  #tabbar-gestion .tab-round--primary svg{ width:21px; height:21px; }
-  #tabbar-gestion .tab-round svg{ width:20px; height:20px; }
-  /* La pastille circule SUR la ligne médiane : elle épouse la courbe au lieu
-     de la traverser en ligne droite. */
-  #tabbar-gestion .tab-pill{
-    width:40px; height:40px; left:0; top:0;
-    offset-path:path('M26.0,79.1 L27.1,76.1 L28.3,73.1 L29.7,70.2 L31.3,67.4 L33.1,64.6 L35.0,61.8 L37.0,59.2 L39.2,56.6 L41.6,54.1 L44.1,51.6 L46.8,49.3 L49.5,47.0 L52.4,44.9 L55.5,42.8 L58.6,40.8 L61.9,39.0 L65.3,37.2 L68.7,35.6 L72.3,34.1 L75.9,32.7 L79.6,31.5 L83.4,30.3 L87.2,29.3 L91.1,28.4 L95.1,27.7 L99.1,27.1 L103.1,26.6 L107.1,26.3 L111.2,26.1 L115.3,26.0 L119.3,26.1 L123.4,26.3 L127.4,26.6 L131.5,27.1 L135.4,27.7 L139.4,28.4 L143.3,29.3 L147.1,30.3 L150.9,31.5 L154.6,32.7 L158.3,34.1 L161.8,35.6 L165.3,37.2 L168.6,39.0 L171.9,40.8 L175.1,42.8 L178.1,44.9 L181.0,47.0 L183.8,49.3 L186.4,51.6 L188.9,54.1 L191.3,56.6 L193.5,59.2 L195.6,61.8 L197.5,64.6 L199.2,67.4 L200.8,70.2 L202.2,73.1 L203.5,76.1 L204.5,79.1'); offset-rotate:0deg; offset-distance:0%;
-    transition:offset-distance 0.62s cubic-bezier(0.32,0.72,0,1), opacity 0.25s ease;
+  #tabbar-gestion .tab-round{
+    position:relative; height:46px; min-width:46px; width:auto; padding:0; gap:0;
+    border-radius:100px; background:none; border:none; color:rgba(235,235,245,0.55);
+    transition: background 0.42s cubic-bezier(0.32,0.72,0,1),
+                color 0.3s ease,
+                padding 0.42s cubic-bezier(0.32,0.72,0,1);
   }
-  /* Pastille glissante : c'est elle qui porte le fond clair de l'onglet actif.
-     Les boutons n'ont donc plus de fond à eux, sinon on verrait deux formes. */
+  #tabbar-gestion .tab-round.active{
+    background:#fff; color:#000; padding:0 15px 0 12px; gap:8px;
+    box-shadow:0 2px 8px rgba(0,0,0,0.18);
+  }
+  #tabbar-gestion .tab-round svg{ width:21px; height:21px; flex-shrink:0; }
+  .tab-label{
+    max-width:0; opacity:0; overflow:hidden; white-space:nowrap;
+    font-size:14px; font-weight:650; letter-spacing:-0.02em;
+    transition: max-width 0.42s cubic-bezier(0.32,0.72,0,1), opacity 0.24s ease;
+  }
+  #tabbar-gestion .tab-round.active .tab-label{ max-width:120px; opacity:1; }
+  /* Le bouton d'action, détaché du groupe. */
+  #tabbar-gestion .tab-round--primary{
+    width:52px; height:52px; min-width:52px; padding:0; border-radius:50%;
+    background:#fff; color:#000; border:0.5px solid rgba(255,255,255,0.5);
+    box-shadow:0 6px 20px rgba(255,255,255,0.18), 0 3px 10px rgba(0,0,0,0.4);
+  }
+  #tabbar-gestion .tab-round--primary svg{ width:24px; height:24px; }
+
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
     background:rgba(255,255,255,0.26); pointer-events:none; opacity:0;
@@ -1531,17 +1536,18 @@
 </div>
 
 <nav class="tabbar" id="tabbar-gestion" style="display:none;">
-  <div class="verre"></div>
-  <svg class="contour" viewBox="0 0 236 84" fill="none"><path d="M50.7,87.2 L51.3,85.5 L52.0,83.9 L52.8,82.2 L53.7,80.6 L54.8,78.9 L55.9,77.2 L57.2,75.6 L58.6,73.9 L60.1,72.3 L61.8,70.7 L63.6,69.1 L65.5,67.6 L67.5,66.0 L69.7,64.6 L71.9,63.2 L74.3,61.8 L76.7,60.6 L79.3,59.4 L82.0,58.2 L84.7,57.2 L87.5,56.2 L90.4,55.4 L93.4,54.6 L96.4,53.9 L99.5,53.3 L102.6,52.9 L105.7,52.5 L108.9,52.2 L112.1,52.1 L115.3,52.0 L118.5,52.1 L121.6,52.2 L124.8,52.5 L128.0,52.9 L131.1,53.3 L134.1,53.9 L137.1,54.6 L140.1,55.4 L143.0,56.2 L145.8,57.2 L148.6,58.2 L151.2,59.4 L153.8,60.6 L156.3,61.8 L158.6,63.2 L160.9,64.6 L163.0,66.0 L165.0,67.6 L167.0,69.1 L168.7,70.7 L170.4,72.3 L171.9,73.9 L173.3,75.6 L174.6,77.2 L175.8,78.9 L176.8,80.6 L177.7,82.2 L178.5,83.9 L179.2,85.5 L179.8,87.2 A26.0,26.0 0 0 1 229.2,71.0 L227.7,66.6 L225.9,62.4 L223.9,58.2 L221.6,54.2 L219.2,50.3 L216.5,46.5 L213.7,42.8 L210.7,39.2 L207.5,35.8 L204.1,32.6 L200.6,29.5 L197.0,26.5 L193.2,23.7 L189.2,21.0 L185.2,18.5 L181.0,16.1 L176.8,13.9 L172.4,11.9 L168.0,10.0 L163.4,8.3 L158.8,6.7 L154.2,5.3 L149.4,4.1 L144.7,3.0 L139.8,2.1 L135.0,1.3 L130.1,0.7 L125.1,0.3 L120.2,0.1 L115.3,0.0 L110.3,0.1 L105.4,0.3 L100.5,0.7 L95.6,1.3 L90.7,2.1 L85.9,3.0 L81.1,4.1 L76.4,5.3 L71.7,6.7 L67.1,8.3 L62.6,10.0 L58.1,11.9 L53.8,13.9 L49.5,16.1 L45.3,18.5 L41.3,21.0 L37.4,23.7 L33.6,26.5 L29.9,29.5 L26.4,32.6 L23.1,35.8 L19.9,39.2 L16.8,42.8 L14.0,46.5 L11.4,50.3 L8.9,54.2 L6.7,58.2 L4.6,62.4 L2.8,66.6 L1.3,71.0 A26.0,26.0 0 0 1 50.7,87.2 Z" stroke="rgba(255,255,255,0.20)" stroke-width="1"/></svg>
-  <div class="tab-pill"></div>
-  <button class="tab-round tab-round--secondary tab-gauche active" data-arc="0" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
+  <div class="groupe">
+  <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
+    <span class="tab-label">Procédures</span>
   </button>
-  <button class="tab-round tab-round--secondary tab-droite" data-arc="100" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()" aria-label="Analyse">
+  <button class="tab-round tab-round--secondary" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()" aria-label="Analyse">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
+    <span class="tab-label">Analyse</span>
   </button>
+  </div>
   <button class="tab-round tab-round--primary" onclick="startNewProcedure()" aria-label="Créer une procédure">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
@@ -2256,25 +2262,17 @@ function placerPastilleSansAnimation(idBarre) {
   pastille.style.transition = memeTransition
 }
 
-/* Certains navigateurs anciens ne savent pas déplacer un élément le long
-   d'une courbe : on retombe alors sur un glissement en ligne droite. */
-const suitLaCourbe = window.CSS && CSS.supports && CSS.supports('offset-path', "path('M0,0 L1,1')")
-
+/* L'espace équipe garde sa pastille glissante ; l'espace gestion n'en a plus,
+   son onglet actif se déploie tout seul. La fonction ne fait donc rien quand
+   la barre ne contient pas de pastille. */
 function majPastille(idBarre) {
   const barre = document.getElementById(idBarre)
   if (!barre) return
   const pastille = barre.querySelector('.tab-pill')
   const actif = barre.querySelector('.tab-round.active')
   if (!pastille) return
-  // Le bouton blanc marque déjà sa page à lui seul : pas de pastille dessous.
   if (!actif || actif.classList.contains('tab-round--primary')) { pastille.style.opacity = '0'; return }
-
-  const surArc = actif.dataset.arc
-  if (surArc != null && suitLaCourbe) {
-    pastille.style.offsetDistance = surArc + '%'
-  } else {
-    pastille.style.transform = `translate(${actif.offsetLeft}px, ${actif.offsetTop}px)`
-  }
+  pastille.style.transform = `translate(${actif.offsetLeft}px, ${actif.offsetTop}px)`
   pastille.style.opacity = '1'
 }
 
@@ -2286,7 +2284,8 @@ function majPastille(idBarre) {
 const ONGLET_PAR_ECRAN = {
   'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
   'p-global-analyse': 1,
-  'p-create': 2, 'p-create-manual': 2, 'p-create-video': 2, 'p-create-ai': 2,
+  // Les écrans de création n'allument aucun onglet : le « + » déclenche une
+  // action, il ne désigne pas une page et n'a pas d'état actif.
 }
 
 window.showGestionScreen = function(id, btn) {

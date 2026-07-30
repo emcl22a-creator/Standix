@@ -858,19 +858,19 @@
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
-  /* ═══ Barre d'onglets (espace gestion) ═══
+  /* ═══ Barre d'onglets (les deux espaces) ═══
      Deux éléments distincts : un groupe en verre qui contient les onglets, et
      un bouton d'action détaché à droite. L'onglet actif ne reçoit pas une
      pastille par-dessus — c'est lui qui se déploie, prend un fond blanc et
      laisse apparaître son libellé. La largeur s'anime, d'où l'effet de
      glissement d'un onglet à l'autre. */
-  #tabbar-gestion{
+  #tabbar-gestion, #tabbar-equipe{
     display:flex; align-items:center; gap:10px; width:auto; height:auto; padding:0;
     background:none; border:none; border-radius:0; box-shadow:none;
     -webkit-backdrop-filter:none; backdrop-filter:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48));
   }
-  #tabbar-gestion .groupe{
+  #tabbar-gestion .groupe, #tabbar-equipe .groupe{
     display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
     background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -884,7 +884,7 @@
      gère seul, sans recalcul de mise en page.
      Seule la largeur du bouton s'anime, et elle est mesurée à l'ouverture pour
      coller exactement au texte. */
-  #tabbar-gestion .tab-round{
+  #tabbar-gestion .tab-round, #tabbar-equipe .tab-round{
     position:relative; height:44.5px; width:44.5px; flex-shrink:0; padding:0; gap:0;
     border-radius:100px; background:none; border:none; color:rgba(235,235,245,0.55);
     justify-content:flex-start; overflow:hidden;
@@ -892,16 +892,16 @@
                 background-color 0.34s cubic-bezier(0.32,0.72,0,1),
                 color 0.26s ease;
   }
-  #tabbar-gestion .tab-round.active{
+  #tabbar-gestion .tab-round.active, #tabbar-equipe .tab-round.active{
     width:var(--w, 150px); background-color:#fff; color:#000;
     box-shadow:0 2px 8px rgba(0,0,0,0.18);
   }
   /* L'icône reste à sa place, elle glisse juste un peu vers la gauche. */
-  #tabbar-gestion .tab-round svg{
+  #tabbar-gestion .tab-round svg, #tabbar-equipe .tab-round svg{
     width:21px; height:21px; flex-shrink:0; margin-left:12.5px;
     transition:margin-left 0.44s cubic-bezier(0.32,0.72,0,1);
   }
-  #tabbar-gestion .tab-round.active svg{ margin-left:12px; }
+  #tabbar-gestion .tab-round.active svg, #tabbar-equipe .tab-round.active svg{ margin-left:12px; }
   .tab-label{
     position:absolute; left:42px; top:50%; white-space:nowrap;
     font-size:14px; font-weight:650; letter-spacing:-0.02em;
@@ -909,17 +909,17 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
   }
   /* Le texte n'arrive qu'une fois la pilule ouverte, et repart aussitôt. */
-  #tabbar-gestion .tab-round.active .tab-label{
+  #tabbar-gestion .tab-round.active .tab-label, #tabbar-equipe .tab-round.active .tab-label{
     opacity:1; transform:translate(0, -50%);
     transition: opacity 0.24s ease 0.16s, transform 0.34s cubic-bezier(0.32,0.72,0,1) 0.16s;
   }
   /* Le bouton d'action, détaché du groupe. */
-  #tabbar-gestion .tab-round--primary{
+  #tabbar-gestion .tab-round--primary, #tabbar-equipe .tab-round--primary{
     width:52px; height:52px; min-width:52px; padding:0; border-radius:50%;
     background:#fff; color:#000; border:0.5px solid rgba(255,255,255,0.5);
     box-shadow:0 6px 20px rgba(255,255,255,0.18), 0 3px 10px rgba(0,0,0,0.4);
   }
-  #tabbar-gestion .tab-round--primary svg{ width:24px; height:24px; }
+  #tabbar-gestion .tab-round--primary svg, #tabbar-equipe .tab-round--primary svg{ width:24px; height:24px; }
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
@@ -1823,12 +1823,14 @@
 </div>
 
 <nav class="tabbar" id="tabbar-equipe" style="display:none;">
-  <div class="tab-pill"></div>
+  <div class="groupe">
   <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
+    <span class="tab-label">Procédures</span>
   </button>
-  <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()">
+  </div>
+  <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()" aria-label="Scanner un QR code">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
   </button>
 </nav>
@@ -2174,6 +2176,7 @@ async function enterApp(membre) {
     appEl.style.display = 'block'
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
+    mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
@@ -2500,7 +2503,7 @@ function placerPastilleSansAnimation(idBarre) {
    libellé, et l'inscrit dans une variable CSS. On anime ainsi vers une valeur
    juste au pixel, au lieu d'un maximum arbitraire qui donnait un arrêt sec. */
 function mesurerOnglets() {
-  document.querySelectorAll('#tabbar-gestion .tab-round--secondary').forEach(b => {
+  document.querySelectorAll('#tabbar-gestion .tab-round--secondary, #tabbar-equipe .tab-round--secondary').forEach(b => {
     const lbl = b.querySelector('.tab-label')
     if (!lbl) return
     const large = lbl.scrollWidth
@@ -2558,12 +2561,18 @@ window.startNewProcedure = function() {
   resetCreateForm()
   showGestionScreen('p-create')
 }
+/* Comme côté gestion : le repère suit l'écran affiché, pas le bouton tapé.
+   Le scanner et les réglages n'allument aucun onglet — le bouton blanc se
+   signale à lui seul. */
+const ONGLET_EQUIPE_PAR_ECRAN = { 'e-list': 0, 'e-category': 0, 'e-detail': 0 }
+
 window.showEquipeScreen = function(id, btn) {
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
-  document.querySelectorAll('#tabbar-equipe .tab-round').forEach(b => b.classList.remove('active'))
-  if (btn) btn.classList.add('active')
-  majPastille('tabbar-equipe')
+  const boutons = document.querySelectorAll('#tabbar-equipe .tab-round')
+  boutons.forEach(b => b.classList.remove('active'))
+  const index = ONGLET_EQUIPE_PAR_ECRAN[id]
+  if (index != null && boutons[index]) boutons[index].classList.add('active')
   if (id !== 'e-scan') stopScanner()
   if (id !== 'e-detail') arreterLecture()
   remonterEnHaut()
@@ -4366,10 +4375,10 @@ function renderEquipeCategories() {
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
             <circle class="cat-ring-bg" cx="23" cy="23" r="19"></circle>
-            <circle class="cat-ring-fg" cx="23" cy="23" r="19"
+            <circle class="cat-ring-fill" cx="23" cy="23" r="19"
               stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
           </svg>
-          <span class="cat-ring-emoji">${pct === 100 ? '✓' : '📄'}</span>
+          <span class="cat-icon">${pct === 100 ? '✓' : '📄'}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>

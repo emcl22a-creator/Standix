@@ -8534,7 +8534,7 @@ async function chargerEtablissements() {
       .eq('user_id', user.id).eq('role', 'gestion')
     data = repli.data || []
     if (repli.error) {
-      console.warn('Proc\u00e9do \u00b7 \u00e9tablissements introuvables :', repli.error.message)
+      console.warn('Proc\u00e9do \u00b7 \u00e9tablissements :', repli.error.message)
     }
   }
 
@@ -8545,6 +8545,24 @@ async function chargerEtablissements() {
       logo_url: a.entreprises.logo_url || null,   // absent = initiales
       membre_id: a.id,
     }))
+
+  /* Filet : si la lecture groupée n'a rien donné — relation absente, règle
+     d'accès, colonne manquante — on va chercher l'entreprise courante seule.
+     Sans ça le tiroir restait invisible, et on ne pouvait même pas en ajouter
+     un second : la fonction était inatteignable. */
+  if (!mesEtablissements.length && currentMembre?.entreprise_id) {
+    const { data: ent, error: eEnt } = await supabase
+      .from('entreprises').select('id, nom').eq('id', currentMembre.entreprise_id).maybeSingle()
+    if (ent) {
+      mesEtablissements = [{
+        id: ent.id, nom: ent.nom,
+        logo_url: cachedEntreprise?.logo_url || null,
+        membre_id: currentMembre.id,
+      }]
+    } else if (eEnt) {
+      console.warn('Proc\u00e9do \u00b7 entreprise courante :', eEnt.message)
+    }
+  }
 
   peindreTiroir()
   peindreListeEtab()
@@ -8598,16 +8616,11 @@ function peindreTiroir() {
   const courantId = currentMembre?.entreprise_id
   const courant = mesEtablissements.find(e => e.id === courantId) || mesEtablissements[0]
 
-  /* Avec un seul établissement, il n'y a rien vers quoi basculer : le tiroir n'a
-     plus qu'un usage, ajouter le suivant. Le replier reviendrait à cacher un
-     bouton derrière un geste qui ne révèle rien d'autre. On le laisse donc
-     ouvert : le cercle de l'établissement, puis le « + », et c'est tout.
-     Dès qu'il y en a deux, le pliage reprend son sens et revient. */
-  const seul = mesEtablissements.length === 1
-  if (seul) tiroir.classList.add('ouvert')
-  const ouvert = seul || tiroir.classList.contains('ouvert')
+  /* Fermé par défaut, toujours : on ne voit que l'établissement courant, et c'est
+     lui le bouton. L'appui déplie, découvre les autres et le « + ». */
+  const ouvert = tiroir.classList.contains('ouvert')
 
-  let html = rondEtabHtml(courant, true, seul ? '' : 'data-etab-decl')
+  let html = rondEtabHtml(courant, true, 'data-etab-decl')
   if (ouvert) {
     html += mesEtablissements
       .filter(e => e.id !== courant.id)
@@ -8638,13 +8651,10 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-etab-plus]')) { fermerTiroir(); ouvrirFenetreEtab(null); return }
   if (e.target.closest('#tiroir-ent')) return
 
-  // Avec un seul établissement, le tiroir reste ouvert : rien à replier.
-  if (mesEtablissements.length > 1) fermerTiroir()
+  fermerTiroir()
 })
 
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && mesEtablissements.length > 1) fermerTiroir()
-})
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiroir() })
 
 /* Changer d'établissement, c'est changer de fiche membre : on relance l'app avec
    celle qui a été choisie, ce qui recharge procédures, équipe et droits. */

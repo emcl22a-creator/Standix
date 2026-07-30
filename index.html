@@ -369,16 +369,46 @@
   .tiroir-ent{
     display:flex; align-items:center; gap:7px; padding:6px; border-radius:100px;
     overflow:hidden; max-width:44px; flex-shrink:0;
-    transition:max-width 0.5s cubic-bezier(0.32,0.72,0,1);
+    /* À la fermeture, la largeur attend que les ronds soient partis ; à
+       l'ouverture, elle part devant pour leur faire de la place. */
+    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0.16s;
   }
+  .tiroir-ent.ouvert{ transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0s; }
   .tiroir-ent:empty, .tiroir-ent.masque{ display:none; }
   .tiroir-ent.ouvert{ max-width:300px; }
-  .tiroir-liste{
-    display:flex; align-items:center; gap:7px;
-    opacity:0; transform:translateX(-8px);
-    transition:opacity 0.34s ease 0.06s, transform 0.44s cubic-bezier(0.32,0.72,0,1) 0.06s;
+  /* La liste NE S'EFFACE PLUS. C'était le défaut : le cercle de l'établissement
+     courant vivait dedans, et se retrouvait donc invisible tiroir fermé — on ne
+     voyait qu'une pastille de verre vide. Seuls les AUTRES ronds s'animent. */
+  .tiroir-liste{ display:flex; align-items:center; gap:7px; }
+
+  /* Les autres établissements et le « + » sont toujours dans le document : c'est
+     ce qui permet de les animer à la fermeture aussi bien qu'à l'ouverture. Les
+     retirer du document les faisait disparaître d'un coup, sans transition. */
+  .tiroir-autres{ display:flex; align-items:center; gap:7px; }
+  .tiroir-autres .rond-ent{
+    opacity:0; transform:scale(0.5) translateX(-16px);
+    transition:opacity 0.26s ease, transform 0.42s cubic-bezier(0.34,1.35,0.5,1);
   }
-  .tiroir-ent.ouvert .tiroir-liste{ opacity:1; transform:none; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent{ opacity:1; transform:none; }
+
+  /* La cascade. Les délais diffèrent selon le sens : à l'ouverture les ronds
+     arrivent de gauche à droite, à la fermeture ils partent de droite à gauche.
+     Sans ça, la fermeture serait la lecture à l'envers du même mouvement — ce
+     qui se voit, et se voit mal. */
+  .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.14s, 0.14s; }
+  .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.10s, 0.10s; }
+  .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.06s, 0.06s; }
+  .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.03s, 0.03s; }
+  .tiroir-autres .rond-ent:nth-child(n+5){ transition-delay:0s, 0s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.04s, 0.04s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.09s, 0.09s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.14s, 0.14s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.19s, 0.19s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(n+5){ transition-delay:0.24s, 0.24s; }
+
+  @media (prefers-reduced-motion: reduce){
+    .tiroir-autres .rond-ent{ transition:none; }
+  }
   /* La carte au logo s'efface pendant le choix : c'est la même place. */
   .tiroir-ent.ouvert ~ .topbar-card{ opacity:0; transform:translateX(12px); pointer-events:none; }
   .topbar-card{ transition:opacity 0.34s ease, transform 0.44s cubic-bezier(0.32,0.72,0,1); }
@@ -8663,16 +8693,17 @@ function peindreTiroir() {
 
   /* Fermé par défaut, toujours : on ne voit que l'établissement courant, et c'est
      lui le bouton. L'appui déplie, découvre les autres et le « + ». */
-  const ouvert = tiroir.classList.contains('ouvert')
+  /* Tout est écrit d'un coup : le rond courant, puis les autres dans leur
+     enveloppe. Rien n'est ajouté ni retiré à l'ouverture — c'est le CSS qui
+     révèle, ce qui permet d'animer la fermeture aussi. */
+  const autres = mesEtablissements
+    .filter(e => e.id && e.id !== courant.id)
+    .map(e => rondEtabHtml(e, false, `data-etab="${e.id}"`)).join('')
 
-  let html = rondEtabHtml(courant, true, 'data-etab-decl')
-  if (ouvert) {
-    html += mesEtablissements
-      .filter(e => e.id && e.id !== courant.id)
-      .map(e => rondEtabHtml(e, false, `data-etab="${e.id}"`)).join('')
-    html += '<button type="button" class="rond-ent plus" data-etab-plus><span class="ini">+</span></button>'
-  }
-  liste.innerHTML = html
+  liste.innerHTML = rondEtabHtml(courant, true, 'data-etab-decl') +
+    '<span class="tiroir-autres">' + autres +
+    '<button type="button" class="rond-ent plus" data-etab-plus><span class="ini">+</span></button>' +
+    '</span>'
 }
 
 function fermerTiroir() {

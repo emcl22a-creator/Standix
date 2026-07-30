@@ -124,7 +124,7 @@
   .topbar-card{
     position:relative;
     display:flex; align-items:center;
-    background:rgba(255,255,255,0.15); -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
+    background:rgba(255,255,255,0.07); -webkit-backdrop-filter:blur(50px) saturate(170%); backdrop-filter:blur(50px) saturate(170%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
@@ -140,7 +140,7 @@
   .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(255,255,255,0.15); -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
+    background:rgba(255,255,255,0.07); -webkit-backdrop-filter:blur(50px) saturate(170%); backdrop-filter:blur(50px) saturate(170%);
     border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
@@ -239,6 +239,10 @@
     animation:etatArrive 0.5s cubic-bezier(0.34,1.5,0.64,1) both;
   }
   .etat-proc.prete svg{ width:11px; height:11px; }
+  /* Une analyse en panne se signale, mais sans crier : même gabarit que les
+     autres indicateurs, seule la couleur change. */
+  .etat-proc.souci{ animation:etatArrive 0.4s cubic-bezier(0.34,1.5,0.64,1) both; }
+  .cat-recent-item .etat-proc.souci svg{ width:13px; height:13px; }
   @keyframes etatArrive{ from{ transform:scale(0.5); opacity:0; } to{ transform:scale(1); opacity:1; } }
   /* Une procédure en cours d'analyse n'est pas consultable : rien à ouvrir,
      ses étapes n'existent pas encore. On la montre estompée et sourde au
@@ -1121,7 +1125,7 @@
   .login-card .subhead{margin-bottom:20px;}
 
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:rgba(255,255,255,0.15); -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
+    background:rgba(255,255,255,0.07); -webkit-backdrop-filter:blur(50px) saturate(170%); backdrop-filter:blur(50px) saturate(170%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
@@ -1137,14 +1141,15 @@
     -webkit-backdrop-filter:none; backdrop-filter:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48));
   }
-  /* Le verre était trop transparent : on voyait la page à travers, surtout
-     au-dessus d'une vidéo claire. Le flou passe de 24 à 44 pixels et la teinte
-     de 10 à 15 % — assez pour dépolir, pas assez pour opacifier. */
+  /* Deux réglages à ne pas confondre : la TEINTE opacifie, le FLOU brouille.
+     Une teinte basse laisse voir à travers, un flou élevé rend illisible ce
+     qu'on voit. On veut les deux : 7 % de teinte pour la transparence, 50 px
+     de flou pour que le fond ne soit plus qu'une tache de couleur. */
   #tabbar-gestion .groupe, #tabbar-equipe .groupe{
     display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
-    background:rgba(255,255,255,0.15); border:0.5px solid rgba(255,255,255,0.20);
-    -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.16);
+    background:rgba(255,255,255,0.07); border:0.5px solid rgba(255,255,255,0.18);
+    -webkit-backdrop-filter:blur(50px) saturate(170%); backdrop-filter:blur(50px) saturate(170%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
   }
   /* ═══ Pourquoi le libellé est en position absolue ═══
      Faire varier `max-width` sur le texte le rognait progressivement : on
@@ -3559,7 +3564,17 @@ function renderCategoryGrid() {
         ${recentTitles.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
       </div>
     `
-    cell.onclick = () => openCategoryProcedures(nom)
+    /* Sur la carte d'une catégorie, un titre en panne mène directement à la
+       reprise : sinon il faudrait ouvrir la catégorie pour s'en apercevoir. */
+    cell.onclick = (e) => {
+      const ligne = e.target.closest('.cat-recent-item')
+      if (ligne) {
+        const titre = ligne.querySelector('.txt')?.textContent
+        const p = procsInCat.find(x => x.titre === titre)
+        if (p && (p.statut === 'echec' || analyseBloquee(p))) { proposerReprise(p); return }
+      }
+      openCategoryProcedures(nom)
+    }
     catGridEl.appendChild(cell)
   })
 
@@ -3737,10 +3752,13 @@ function renderCategoryProceduresListInterne() {
     const dashoffset = circumference * (1 - pct / 100)
     const needsAttention = pct > 0 && pct < 30
 
+    const enPanne = proc.statut === 'echec' || analyseBloquee(proc)
     const div = document.createElement('div')
-    div.className = 'card proc-rich-card' + (proc.statut === 'traitement' ? ' proc-en-cours' : '')
+    // Une analyse en panne redevient cliquable : c'est le seul moyen de la
+    // relancer. Seule celle qui travaille vraiment reste sourde au toucher.
+    div.className = 'card proc-rich-card' + (proc.statut === 'traitement' && !enPanne ? ' proc-en-cours' : '')
     div.dataset.key = proc.id
-    div.onclick = () => openAnalyse(proc.id)
+    div.onclick = () => enPanne ? proposerReprise(proc) : openAnalyse(proc.id)
     div.innerHTML = `
       <div class="cat-top">
         <div class="cat-ring-wrap">
@@ -5438,7 +5456,9 @@ function renderAnalyseStats() {
 let surveillanceAnalyses = null
 
 function surveillerAnalyses() {
-  const enCours = allGestionProcedures.some(p => p.statut === 'traitement')
+  // Inutile d'interroger indéfiniment une analyse qui n'avance plus : elle est
+  // signalée à l'écran, c'est au gérant de la relancer.
+  const enCours = allGestionProcedures.some(p => p.statut === 'traitement' && !analyseBloquee(p))
   if (!enCours) {
     if (surveillanceAnalyses) { clearInterval(surveillanceAnalyses); surveillanceAnalyses = null }
     return
@@ -5461,6 +5481,8 @@ function surveillerAnalyses() {
        l'écran de suivi, plus personne ne le ferait. La surveillance prend donc
        le relais, depuis n'importe quelle page de l'app. */
     for (const row of (data || []).filter(r => r.statut === 'traitement')) {
+      const enMemoire = allGestionProcedures.find(x => x.id === row.id)
+      if (enMemoire && analyseBloquee(enMemoire)) continue
       try {
         const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
           method: 'POST',
@@ -5484,13 +5506,33 @@ function surveillerAnalyses() {
   }, 15000)
 }
 
+/* Au-delà de ce délai, une analyse encore « en traitement » n'avance
+   manifestement plus : Azure a lâché, ou personne n'a constaté la fin. */
+const ANALYSE_LIMITE_MIN = 25
+
+function analyseBloquee(proc) {
+  if (proc?.statut !== 'traitement') return false
+  const depart = new Date(proc.created_at || 0).getTime()
+  if (!depart) return false
+  return (Date.now() - depart) / 60000 > ANALYSE_LIMITE_MIN
+}
+
 /* Renvoie le balisage de l'indicateur d'état d'une procédure, ou une chaîne
    vide si elle est simplement normale.
-   · statut « traitement » → l'IA travaille encore, roue qui tourne
-   · statut « pret »       → l'analyse est finie et le gérant n'a pas encore
-                             ouvert la procédure, coche verte
+   · « traitement »          → l'IA travaille, roue qui tourne
+   · « traitement » trop long → point d'exclamation orange, l'analyse a lâché
+   · « pret »                → analyse finie, pas encore ouverte, coche verte
+   · « echec »               → point d'exclamation rouge
    Ouvrir la procédure fait passer le statut à null : la coche disparaît. */
 function etatProcedureHtml(proc) {
+  const alerte = (couleur, titre) => `<div class="etat-proc souci" title="${titre}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="${couleur}" stroke-width="2.6" stroke-linecap="round">
+        <circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12" y2="16.6"/>
+      </svg></div>`
+
+  if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a échoué — touchez pour relancer")
+  if (analyseBloquee(proc)) return alerte('#FF9F0A', "L'analyse semble bloquée — touchez pour relancer")
+
   if (proc?.statut === 'traitement') {
     return `<div class="etat-proc" title="Analyse en cours">
       <svg viewBox="0 0 26 26">
@@ -5504,6 +5546,58 @@ function etatProcedureHtml(proc) {
         <polyline points="20 6 9 17 4 12"/></svg></div>`
   }
   return ''
+}
+
+/* Reprise d'une analyse en panne. On efface les étapes éventuellement écrites à
+   moitié, on remet le compteur à zéro et on redemande une indexation neuve —
+   avec un identifiant Azure vierge, sinon `ai-check` interrogerait l'ancienne
+   analyse, celle qui a justement échoué. */
+async function proposerReprise(proc) {
+  const bloquee = analyseBloquee(proc)
+  const raison = proc.erreur_ia ? proc.erreur_ia + ' ' : ''
+
+  if (!proc.video_url) {
+    await confirmDialog({
+      titre: 'Aucune vidéo',
+      message: raison + "Cette procédure n'a pas de vidéo associée : l'analyse ne peut pas être relancée. Modifiez-la à la main ou supprimez-la.",
+      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+    })
+    return
+  }
+
+  const ok = await confirmDialog({
+    titre: bloquee ? 'Analyse bloquée' : "L'analyse a échoué",
+    message: raison + (bloquee
+      ? `L'analyse tourne depuis plus de ${ANALYSE_LIMITE_MIN} minutes, ce qui n'est pas normal. Relancer depuis le début ?`
+      : 'Relancer l\'analyse de cette vidéo ?'),
+    confirmer: "Relancer l'analyse",
+    annuler: 'Fermer',
+    danger: false,
+  })
+  if (!ok) return
+
+  try {
+    await supabase.from('etapes').delete().eq('procedure_id', proc.id)
+    await supabase.from('procedures')
+      .update({ statut: 'traitement', erreur_ia: null, azure_video_id: null }).eq('id', proc.id)
+
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ procedure_id: proc.id, video_url: proc.video_url }),
+    })
+    const data = await rep.json()
+    if (!rep.ok || data.error) throw new Error(data.error || "Le démarrage a échoué")
+
+    toast('Analyse relancée.')
+    await loadGestionProcedures()
+  } catch (e) {
+    await confirmDialog({
+      titre: 'Impossible de relancer',
+      message: e instanceof Error ? e.message : String(e),
+      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+    })
+  }
 }
 
 function estVisiteur() { return currentMembre?.role === 'visiteur' }

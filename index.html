@@ -248,7 +248,9 @@
      ses étapes n'existent pas encore. On la montre estompée et sourde au
      toucher, plutôt que d'ouvrir une page vide. */
   .proc-en-cours{ opacity:0.72; }
-  .proc-rich-card.proc-en-cours{ pointer-events:none; cursor:default; }
+  /* Une analyse en cours reste touchable : c'est le seul moyen de l'abandonner.
+     Elle est simplement estompée pour montrer qu'elle n'est pas consultable. */
+  .proc-en-cours-doux{ opacity:0.72; }
 
   /* ═══ Image d'une étape manuelle ═══
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
@@ -650,6 +652,9 @@
 
   /* ═══ Sélection de clip : deux poignées que l'on écarte ou resserre ═══ */
   .capcut-timeline.clipmode{ touch-action:none; }
+  /* La bande de l'étape choisie ressort par un liseré clair par-dessus sa
+     couleur : on sait laquelle on règle sans perdre le repère de couleur. */
+  .clip-band.sel{ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.9); }
   .clip-band{ -webkit-user-select:none; user-select:none; pointer-events:auto; position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
     border-left:2px solid rgba(255,255,255,0.5); border-right:2px solid rgba(255,255,255,0.5); }
   .clip-band span{ position:absolute; top:4px; left:4px; font-size:9px; font-weight:800; color:#fff;
@@ -1141,6 +1146,37 @@
     -webkit-backdrop-filter:none; backdrop-filter:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48));
   }
+  /* ═══ Frise zoomable ═══
+     C'est la convention de toutes les applications de montage : la frise n'est
+     pas figée à la largeur de l'écran, on l'agrandit et on la fait défiler.
+     À ×8, une seconde occupe huit fois plus de place — on cale au dixième sans
+     loupe. La fenêtre garde la tête de lecture visible en la suivant. */
+  .frise-fenetre{
+    overflow-x:auto; overflow-y:visible; -webkit-overflow-scrolling:touch;
+    scrollbar-width:none; padding:6px 0;
+  }
+  .frise-fenetre::-webkit-scrollbar{ display:none; }
+  .frise-fenetre .capcut-timeline{ min-width:100%; }
+
+  .zoom-frise{ display:flex; align-items:center; gap:7px; margin-top:9px; }
+  .zoom-btn{
+    width:32px; height:32px; border-radius:10px; flex-shrink:0;
+    border:0.5px solid var(--border); background:rgba(255,255,255,0.08);
+    color:#fff; font-size:16px; font-weight:700; font-family:inherit;
+  }
+  .zoom-btn:active{ background:rgba(255,255,255,0.18); }
+  .zoom-btn:disabled{ opacity:0.3; }
+  .zoom-val{ font-size:12px; font-weight:700; color:var(--label-2); min-width:26px; text-align:center; }
+  /* « Étapes liées » : le montage par report, là encore une convention des vraies
+     applications. Quand c'est actif, déplacer une borne déplace celle de la
+     voisine : la vidéo reste couverte, aucun trou ne peut apparaître. */
+  .zoom-lien{
+    margin-left:auto; height:32px; padding:0 13px; border-radius:10px;
+    border:0.5px solid var(--border); background:rgba(255,255,255,0.08);
+    color:var(--label-2); font-size:11.5px; font-weight:650; font-family:inherit;
+  }
+  .zoom-lien.active{ background:rgba(255,255,255,0.9); color:#000; border-color:transparent; }
+
   /* Deux réglages à ne pas confondre : la TEINTE opacifie, le FLOU brouille.
      Une teinte basse laisse voir à travers, un flou élevé rend illisible ce
      qu'on voit. On veut les deux : 7 % de teinte pour la transparence, 50 px
@@ -1675,7 +1711,7 @@
           <span class="capcut-duration-sep">/</span>
           <span class="capcut-duration" id="capcut-duration">0:00</span>
         </div>
-        <div class="capcut-timeline" id="capcut-timeline">
+        <div class="frise-fenetre" id="capcut-fenetre"><div class="capcut-timeline" id="capcut-timeline">
           <div class="capcut-track" id="capcut-track"></div>
           <div class="capcut-markers" id="capcut-markers"></div>
           <div class="clip-mask" id="capcut-mask-l"></div>
@@ -1684,8 +1720,14 @@
           <div class="clip-handle" id="capcut-h-start"><div class="grip"></div></div>
           <div class="clip-handle" id="capcut-h-end"><div class="grip"></div></div>
           <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
-        </div>
-        <div class="clip-info" id="capcut-info" style="display:none;"></div>
+        </div></div>
+        <div class="zoom-frise">
+        <button type="button" class="zoom-btn" id="capcut-zoom-moins" aria-label="Dezoomer">−</button>
+        <span class="zoom-val" id="capcut-zoom-val">x1</span>
+        <button type="button" class="zoom-btn" id="capcut-zoom-plus" aria-label="Zoomer">+</button>
+        <button type="button" class="zoom-lien active" id="capcut-lien">Etapes liees</button>
+      </div>
+      <div class="clip-info" id="capcut-info" style="display:none;"></div>
         <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
         <div class="ed-bornes" id="capcut-bornes">
           <div class="ed-borne actif" data-borne="a"><div class="k">Début</div><div class="v" id="capcut-vd">0:00,0</div></div>
@@ -1758,6 +1800,8 @@
       </div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-progress-title">Analyse en cours...</div>
       <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
+      <button type="button" class="btn ghost block" id="ai-annuler"
+              style="margin-top:18px; color:var(--red);">Abandonner et supprimer</button>
     </div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
@@ -1803,7 +1847,7 @@
         <span class="capcut-duration-sep">/</span>
         <span class="capcut-duration" id="ecap-duration">0:00</span>
       </div>
-      <div class="capcut-timeline" id="ecap-timeline">
+      <div class="frise-fenetre" id="ecap-fenetre"><div class="capcut-timeline" id="ecap-timeline">
         <div class="capcut-track" id="ecap-track"></div>
         <div class="capcut-markers" id="ecap-markers"></div>
         <div class="clip-mask" id="ecap-mask-l"></div>
@@ -1812,6 +1856,12 @@
         <div class="clip-handle" id="ecap-h-start"><div class="grip"></div></div>
         <div class="clip-handle" id="ecap-h-end"><div class="grip"></div></div>
         <div class="capcut-playhead" id="ecap-playhead"><div class="capcut-playhead-handle"></div></div>
+      </div></div>
+      <div class="zoom-frise">
+        <button type="button" class="zoom-btn" id="ecap-zoom-moins" aria-label="Dezoomer">−</button>
+        <span class="zoom-val" id="ecap-zoom-val">x1</span>
+        <button type="button" class="zoom-btn" id="ecap-zoom-plus" aria-label="Zoomer">+</button>
+        <button type="button" class="zoom-lien active" id="ecap-lien">Etapes liees</button>
       </div>
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
@@ -3753,12 +3803,16 @@ function renderCategoryProceduresListInterne() {
     const needsAttention = pct > 0 && pct < 30
 
     const enPanne = proc.statut === 'echec' || analyseBloquee(proc)
+    const enAnalyse = proc.statut === 'traitement'
     const div = document.createElement('div')
-    // Une analyse en panne redevient cliquable : c'est le seul moyen de la
-    // relancer. Seule celle qui travaille vraiment reste sourde au toucher.
-    div.className = 'card proc-rich-card' + (proc.statut === 'traitement' && !enPanne ? ' proc-en-cours' : '')
+    // Toutes les cartes restent cliquables : une analyse en cours mène à une
+    // fenêtre où l'on peut l'abandonner, une analyse en panne à sa reprise.
+    div.className = 'card proc-rich-card' + (enAnalyse && !enPanne ? ' proc-en-cours-doux' : '')
     div.dataset.key = proc.id
-    div.onclick = () => enPanne ? proposerReprise(proc) : openAnalyse(proc.id)
+    div.onclick = () =>
+      enPanne ? proposerReprise(proc) :
+      enAnalyse ? proposerAbandon(proc) :
+      openAnalyse(proc.id)
     div.innerHTML = `
       <div class="cat-top">
         <div class="cat-ring-wrap">
@@ -4078,6 +4132,9 @@ function createClipEditor(ids, api) {
 
   let selIndex = null
   let borneActive = 'a'      // la borne que la loupe et l'affichage suivent
+  let zoom = 1               // facteur d'agrandissement de la frise
+  let etapesLiees = true     // montage par report : la voisine suit
+  let refaire = []           // pile de rétablissement
   let histo = []             // pile d'annulation
   const PXS = 42             // pixels par seconde dans la loupe
   let drag = null            // 'start' | 'end' | 'scrub'
@@ -4106,10 +4163,16 @@ function createClipEditor(ids, api) {
       if (s.timestamp_video == null) return
       const a = pct(clipStart(s)), b = pct(clipEnd(s))
       const div = document.createElement('div')
-      div.className = 'clip-band'
+      div.className = 'clip-band' + (i === selIndex ? ' sel' : '')
       div.style.left = a + '%'
       div.style.width = Math.max(0.6, b - a) + '%'
-      div.innerHTML = `<span>${i + 1}</span>`
+      // Chaque étape a sa couleur, reprise sur son numéro dans la liste : c'est
+      // ce qui relie d'un coup d'œil un morceau de frise à son texte.
+      const c = COULEUR_ETAPE(i)
+      div.style.background = c + '3A'
+      div.style.borderLeftColor = c
+      div.style.borderRightColor = c
+      div.innerHTML = `<span style="background:${c};color:#0B0B0D">${i + 1}</span>`
       bandsEl.appendChild(div)
     })
   }
@@ -4173,20 +4236,31 @@ function createClipEditor(ids, api) {
      Pièces ajoutées : pastilles de bornes, loupe, couverture, avertissements
      ═══════════════════════════════════════════════════════════════════════ */
 
+  function instantane() {
+    return JSON.stringify(steps().map(s => ({ a: s.timestamp_video, b: s.fin_video })))
+  }
+
   function memoriser() {
-    histo.push(JSON.stringify(steps().map(s => ({ a: s.timestamp_video, b: s.fin_video }))))
+    histo.push(instantane())
     if (histo.length > 40) histo.shift()
+    // Une action neuve rend le rétablissement caduc : on repart de cette branche.
+    refaire = []
     const u = g(ids.undo); if (u) u.disabled = false
+  }
+
+  function restaurer(etat) {
+    const parse = JSON.parse(etat)
+    steps().forEach((s, i) => {
+      if (!parse[i]) return
+      s.timestamp_video = parse[i].a
+      s.fin_video = parse[i].b
+    })
   }
 
   function annuler() {
     if (!histo.length) return
-    const etat = JSON.parse(histo.pop())
-    steps().forEach((s, i) => {
-      if (!etat[i]) return
-      s.timestamp_video = etat[i].a
-      s.fin_video = etat[i].b
-    })
+    refaire.push(instantane())
+    restaurer(histo.pop())
     const u = g(ids.undo); if (u) u.disabled = !histo.length
     repaint()
     api.onChange?.()
@@ -4200,6 +4274,15 @@ function createClipEditor(ids, api) {
     if (!s) return { min: 0, max: dur() }
     const avant = selIndex > 0 && liste[selIndex - 1].timestamp_video != null ? clipEnd(liste[selIndex - 1]) : 0
     const apres = selIndex < liste.length - 1 && liste[selIndex + 1].timestamp_video != null ? clipStart(liste[selIndex + 1]) : dur()
+    if (etapesLiees) {
+      // La voisine doit conserver au moins la durée minimale : c'est elle qui
+      // fixe la limite, pas sa borne actuelle.
+      const pRec = selIndex > 0 ? liste[selIndex - 1] : null
+      const sUiv = selIndex < liste.length - 1 ? liste[selIndex + 1] : null
+      return borneActive === 'a'
+        ? { min: pRec ? clipStart(pRec) + MIN_CLIP : 0, max: clipEnd(s) - MIN_CLIP }
+        : { min: clipStart(s) + MIN_CLIP, max: sUiv ? clipEnd(sUiv) - MIN_CLIP : dur() }
+    }
     return borneActive === 'a'
       ? { min: avant, max: clipEnd(s) - MIN_CLIP }
       : { min: clipStart(s) + MIN_CLIP, max: apres }
@@ -4229,6 +4312,18 @@ function createClipEditor(ids, api) {
     const arrondi = Math.round(v * 10) / 10
     if (borneActive === 'a') s.timestamp_video = arrondi
     else s.fin_video = arrondi
+
+    /* Montage par report : la borne partagée avec la voisine bouge avec elle.
+       C'est ce qui empêche d'ouvrir un trou entre deux étapes — ce que les
+       applications de montage appellent un « ripple edit ». */
+    if (etapesLiees) {
+      const liste = steps()
+      const voisine = borneActive === 'a' ? liste[selIndex - 1] : liste[selIndex + 1]
+      if (voisine && voisine.timestamp_video != null) {
+        if (borneActive === 'a') voisine.fin_video = arrondi
+        else voisine.timestamp_video = arrondi
+      }
+    }
     return colle
   }
 
@@ -4329,6 +4424,44 @@ function createClipEditor(ids, api) {
       : '<div class="ed-ok">✓ Toute la vidéo est couverte, sans chevauchement</div>'
   }
 
+  /* ═══ Zoom de la frise ═══
+     Tous les enfants de la frise sont positionnés en pourcentage : il suffit
+     d'élargir la frise pour que tout s'étire ensemble, sans recalculer une
+     seule position. La fenêtre parente se charge du défilement. */
+  function appliquerZoom(garderVisible) {
+    const fen = g(ids.fenetre)
+    if (!fen) return
+    timeline.style.width = (zoom * 100) + '%'
+    const v = g(ids.zoomVal); if (v) v.textContent = '\u00d7' + zoom
+    const m = g(ids.zoomMoins); if (m) m.disabled = zoom <= 1
+    const pl = g(ids.zoomPlus); if (pl) pl.disabled = zoom >= 8
+    if (garderVisible) centrerSur(garderVisible)
+  }
+
+  /* Amener un instant au milieu de la fenêtre. Sans ça, zoomer perdrait de vue
+     l'endroit que l'on réglait. */
+  function centrerSur(t) {
+    const fen = g(ids.fenetre)
+    const d = dur()
+    if (!fen || !d) return
+    const largeur = timeline.scrollWidth || fen.clientWidth * zoom
+    fen.scrollLeft = Math.max(0, (t / d) * largeur - fen.clientWidth / 2)
+  }
+
+  /* La tête de lecture reste visible pendant la lecture : dès qu'elle approche
+     d'un bord, la fenêtre se recale. C'est ce que fait toute app de montage. */
+  function suivreTete() {
+    const fen = g(ids.fenetre)
+    const v = video(), d = dur()
+    if (!fen || !v || !d || zoom <= 1) return
+    const largeur = timeline.scrollWidth || fen.clientWidth * zoom
+    const x = (v.currentTime / d) * largeur
+    const marge = fen.clientWidth * 0.15
+    if (x < fen.scrollLeft + marge || x > fen.scrollLeft + fen.clientWidth - marge) {
+      fen.scrollLeft = Math.max(0, x - fen.clientWidth / 2)
+    }
+  }
+
   function repaint() { paintBands(); paintSelection(); paintPlayhead(); paintBornes(); paintLoupe(); paintCouverture() }
 
   /* ── Boucle d'animation de la tête de lecture ─────────────────────────────
@@ -4340,6 +4473,7 @@ function createClipEditor(ids, api) {
      Le coût est d'une écriture de style par image, c'est-à-dire rien. */
   function loop() {
     paintPlayhead()
+    suivreTete()
     const wrap = ids.wrap ? g(ids.wrap) : null
     const visible = wrap ? wrap.offsetParent !== null : true
     rafId = visible ? requestAnimationFrame(loop) : null
@@ -4493,6 +4627,20 @@ function createClipEditor(ids, api) {
   loupeEl?.addEventListener('pointercancel', finLoupe)
 
   g(ids.undo)?.addEventListener('click', annuler)
+
+  g(ids.zoomMoins)?.addEventListener('click', () => {
+    zoom = Math.max(1, zoom - 1); appliquerZoom(valeurBorne() || video()?.currentTime || 0)
+  })
+  g(ids.zoomPlus)?.addEventListener('click', () => {
+    zoom = Math.min(8, zoom + 1); appliquerZoom(valeurBorne() || video()?.currentTime || 0)
+  })
+  g(ids.lien)?.addEventListener('click', (e) => {
+    etapesLiees = !etapesLiees
+    e.currentTarget.classList.toggle('active', etapesLiees)
+    toast(etapesLiees
+      ? "Étapes liées : la voisine suit, aucun trou possible."
+      : "Étapes indépendantes : vous pouvez laisser un blanc entre deux étapes.")
+  })
   if (g(ids.undo)) g(ids.undo).disabled = true
 
   g(ids.playClip)?.addEventListener('click', playClip)
@@ -4539,7 +4687,11 @@ function createClipEditor(ids, api) {
 
   // ── API publique ─────────────────────────────────────────────────────────
   function select(i, options) {
-    const { lire = true } = options || {}
+    /* `defiler` sert au réordonnancement : déplacer une étape la sélectionne,
+       mais la personne regarde sa liste, pas la frise. Faire remonter l'écran
+       à ce moment-là lui fait perdre son geste des yeux. */
+    const { lire = true, defiler = true } = options || {}
+    borneActive = 'a'
     stopClipPlayback()
     video()?.pause()
     selIndex = (i == null ? null : i)
@@ -4548,7 +4700,7 @@ function createClipEditor(ids, api) {
       if (s.timestamp_video == null) s.timestamp_video = 0
       if (s.fin_video == null) s.fin_video = Math.min(dur() || 0, clipStart(s) + 8)
       seek(clipStart(s))
-      timeline.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      if (defiler) timeline.scrollIntoView({ behavior: 'smooth', block: 'center' })
     }
     repaint()
     api.onSelect?.(selIndex)
@@ -4568,6 +4720,8 @@ function createClipEditor(ids, api) {
     ;['play', 'playing'].forEach(ev => v.addEventListener(ev, startLoop))
     ;['pause', 'ended'].forEach(ev => v.addEventListener(ev, paintPlayhead))
     startLoop()   // et on la lance tout de suite, sans attendre une lecture
+    zoom = 1
+    appliquerZoom()
     v.addEventListener('loadedmetadata', () => {
       if (ids.durTime && g(ids.durTime)) g(ids.durTime).textContent = formatTime(v.duration)
       repaint()
@@ -4639,6 +4793,8 @@ capcutEditor = createClipEditor({
   info: 'capcut-info', hint: 'capcut-hint', playClip: 'capcut-play-clip', done: 'capcut-done',
   tools: 'capcut-tools', textField: 'capcut-text-field', text: 'capcut-text',
   setStart: 'capcut-set-start', setEnd: 'capcut-set-end', split: 'capcut-split',
+  fenetre: 'capcut-fenetre', zoomMoins: 'capcut-zoom-moins', zoomPlus: 'capcut-zoom-plus',
+  zoomVal: 'capcut-zoom-val', lien: 'capcut-lien',
   bornes: 'capcut-bornes', vd: 'capcut-vd', vf: 'capcut-vf',
   loupeBloc: 'capcut-loupe-bloc', loupe: 'capcut-loupe', loupeBande: 'capcut-loupe-bande',
   loupeZone: 'capcut-loupe-zone', loupeFen: 'capcut-loupe-fen',
@@ -4661,6 +4817,8 @@ ecapEditor = createClipEditor({
   tools: 'ecap-tools', textField: 'ecap-text-field', text: 'ecap-text',
   setStart: 'ecap-set-start', setEnd: 'ecap-set-end', split: 'ecap-split',
   curTime: 'ecap-current-time', durTime: 'ecap-duration',
+  fenetre: 'ecap-fenetre', zoomMoins: 'ecap-zoom-moins', zoomPlus: 'ecap-zoom-plus',
+  zoomVal: 'ecap-zoom-val', lien: 'ecap-lien',
   bornes: 'ecap-bornes', vd: 'ecap-vd', vf: 'ecap-vf',
   loupeBloc: 'ecap-loupe-bloc', loupe: 'ecap-loupe', loupeBande: 'ecap-loupe-bande',
   loupeZone: 'ecap-loupe-zone', loupeFen: 'ecap-loupe-fen',
@@ -4718,6 +4876,29 @@ document.getElementById('ecap-play-btn')?.addEventListener('click', () => {
 
 /* « Découper une étape ici » sur l'écran de modification : même geste qu'à la
    création — une nouvelle étape de 8 secondes à la position de lecture. */
+/* Abandon depuis l'écran de suivi : on arrête le sondage, on supprime, et on
+   revient à la liste. */
+document.getElementById('ai-annuler')?.addEventListener('click', async () => {
+  const proc = allGestionProcedures.find(p => p.id === aiProcedureId) ||
+    { id: aiProcedureId, titre: document.getElementById('new-titre')?.value || '' }
+  if (!proc.id) return
+
+  // On récupère l'adresse de la vidéo si elle n'est pas déjà en mémoire.
+  if (!proc.video_url) {
+    const { data } = await supabase.from('procedures').select('video_url').eq('id', proc.id).maybeSingle()
+    if (data?.video_url) proc.video_url = data.video_url
+  }
+
+  const supprime = await abandonnerAnalyse(proc)
+  if (!supprime) return
+
+  if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+  stopAiProgressSimulation(0)
+  aiProcedureId = null
+  showGestionScreen('p-list')
+  loadGestionProcedures()
+})
+
 document.getElementById('ecap-add-btn')?.addEventListener('click', () => {
   const player = document.getElementById('edit-video-player')
   const d = isFinite(player?.duration) ? player.duration : 0
@@ -4771,6 +4952,11 @@ document.getElementById('capcut-add-btn')?.addEventListener('click', () => {
    recalculée. L'ordre réel du tableau n'est modifié qu'au relâchement.
    ═══════════════════════════════════════════════════════════════════════════ */
 const DELAI_APPUI_LONG = 340
+
+/* Palette des étapes. Elle tourne au-delà de huit étapes, ce qui suffit : deux
+   étapes de même couleur seront alors très éloignées sur la frise. */
+const PALETTE_ETAPES = ['#30D158', '#0A84FF', '#FF9F0A', '#BF5AF2', '#FF375F', '#64D2FF', '#FFD60A', '#5E5CE6']
+const COULEUR_ETAPE = (i) => PALETTE_ETAPES[i % PALETTE_ETAPES.length]
 
 function activerGlissementEtapes(conteneur, donnerTableau, apres) {
   if (!conteneur || conteneur.dataset.glissementPret === '1') return
@@ -4892,7 +5078,7 @@ function renderManualSteps() {
     div.className = 'step-edit-item'
     div.innerHTML = `
       <div class="step-row-top">
-        <div class="step-num">${i + 1}</div>
+        <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       </div>
       <div class="step-img">
@@ -4959,7 +5145,7 @@ function renderVideoSteps() {
     const fin = step.fin_video != null ? step.fin_video : debut
     div.innerHTML = `
       <div class="step-row-top">
-        <div class="step-num">${i + 1}</div>
+        <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       </div>
       <div class="step-row-bottom">
@@ -4991,7 +5177,7 @@ function renderVideoSteps() {
 
   activerGlissementEtapes(listEl, () => videoSteps, (nouvelIndex) => {
     renderVideoSteps()
-    capcutEditor?.select(nouvelIndex, { lire: false })
+    capcutEditor?.select(nouvelIndex, { lire: false, defiler: false })
   })
 }
 
@@ -5548,6 +5734,59 @@ function etatProcedureHtml(proc) {
   return ''
 }
 
+/* Abandon d'une analyse : la personne ne veut plus de cette procédure. On
+   supprime tout — la ligne, ses étapes, et la vidéo déposée. Azure continuera
+   son calcul dans le vide, mais plus rien ne l'attend de notre côté. */
+async function abandonnerAnalyse(proc) {
+  const ok = await confirmDialog({
+    titre: 'Abandonner cette procédure ?',
+    message: `« ${proc.titre || 'Cette procédure'} » sera supprimée, avec sa vidéo et l'analyse en cours. C'est définitif.`,
+    confirmer: 'Supprimer',
+    annuler: 'Garder',
+    danger: true,
+  })
+  if (!ok) return false
+
+  try {
+    // La vidéo d'abord : une fois la procédure effacée, on n'aurait plus son adresse.
+    if (proc.video_url) {
+      const chemin = proc.video_url.split('/procedo-videos/')[1]
+      if (chemin) await supabase.storage.from('procedo-videos').remove([decodeURIComponent(chemin)])
+    }
+    await supabase.from('etapes').delete().eq('procedure_id', proc.id)
+    const { error } = await supabase.from('procedures').delete().eq('id', proc.id)
+    if (error) throw new Error(error.message)
+
+    allGestionProcedures = allGestionProcedures.filter(p => p.id !== proc.id)
+    toast('Procédure supprimée.')
+    return true
+  } catch (e) {
+    await confirmDialog({
+      titre: 'Suppression impossible',
+      message: e instanceof Error ? e.message : String(e),
+      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+    })
+    return false
+  }
+}
+
+/* Une procédure en cours d'analyse n'est pas consultable — ses étapes n'existent
+   pas encore. La toucher propose donc la seule chose utile : y renoncer. */
+async function proposerAbandon(proc) {
+  const depuis = proc.created_at ? Math.round((Date.now() - new Date(proc.created_at).getTime()) / 60000) : null
+  const ok = await confirmDialog({
+    titre: 'Analyse en cours',
+    message: `« ${proc.titre} » est encore en cours d'analyse` +
+      (depuis != null ? ` depuis ${depuis} minute${depuis > 1 ? 's' : ''}` : '') +
+      `. Vous ne pouvez pas la consulter avant la fin. Si vous n'en voulez plus, supprimez-la.`,
+    confirmer: 'Supprimer',
+    annuler: 'Attendre',
+    danger: true,
+  })
+  if (!ok) return
+  if (await abandonnerAnalyse(proc)) loadGestionProcedures()
+}
+
 /* Reprise d'une analyse en panne. On efface les étapes éventuellement écrites à
    moitié, on remet le compteur à zéro et on redemande une indexation neuve —
    avec un identifiant Azure vierge, sinon `ai-check` interrogerait l'ancienne
@@ -5571,10 +5810,12 @@ async function proposerReprise(proc) {
       ? `L'analyse tourne depuis plus de ${ANALYSE_LIMITE_MIN} minutes, ce qui n'est pas normal. Relancer depuis le début ?`
       : 'Relancer l\'analyse de cette vidéo ?'),
     confirmer: "Relancer l'analyse",
-    annuler: 'Fermer',
+    annuler: 'Supprimer',
     danger: false,
   })
-  if (!ok) return
+  // « Supprimer » occupe le bouton d'annulation : sur une analyse en panne,
+  // renoncer est aussi légitime que réessayer.
+  if (!ok) { await abandonnerAnalyse(proc) && loadGestionProcedures(); return }
 
   try {
     await supabase.from('etapes').delete().eq('procedure_id', proc.id)
@@ -6728,7 +6969,7 @@ function renderEditSteps() {
     const fin = step.fin_video != null ? step.fin_video : debut
     div.innerHTML = `
       <div class="step-row-top">
-        <div class="step-num">${i + 1}</div>
+        <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       </div>
       <div class="step-row-bottom">
@@ -6761,7 +7002,7 @@ function renderEditSteps() {
 
   activerGlissementEtapes(listEl, () => editStepsData, (nouvelIndex) => {
     renderEditSteps()
-    if (editVideoUrl) ecapEditor?.select(nouvelIndex, { lire: false })
+    if (editVideoUrl) ecapEditor?.select(nouvelIndex, { lire: false, defiler: false })
   })
 }
 

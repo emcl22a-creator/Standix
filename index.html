@@ -341,6 +341,34 @@
     font-size:11.5px; font-weight:700; flex-shrink:0; padding:0;
   }
 
+  /* ═══ Anneau d'analyse sans avancement connu ═══
+     Quand personne ne sait où en est le calcul, l'anneau tourne au lieu de se
+     remplir. Un mouvement continu dit « ça travaille » sans prétendre savoir
+     combien il reste — ce qu'un pourcentage, lui, prétend toujours. */
+  .ai-ring-wrap.indetermine svg{ animation:aiTourne 1.15s linear infinite; transform-origin:50% 50%; }
+  @keyframes aiTourne{ to{ transform:rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce){
+    .ai-ring-wrap.indetermine svg{ animation:none; }
+  }
+
+  /* ═══ Coche de fin d'analyse ═══
+     Même langue que les icônes des modes : cercles en retrait à 16 et 26 %, celui
+     de devant à 42 %, et le signe en blanc plein. Le trait de la coche se dessine
+     au lieu d'apparaître — c'est le moment où l'analyse aboutit, il mérite ce
+     dixième de seconde. */
+  .coche-dessin{ width:66px; height:60px; margin:0 auto 12px; }
+  .coche-dessin svg{ width:100%; height:100%; display:block; overflow:visible; }
+  .coche-dessin .trace{
+    stroke-dasharray:22; stroke-dashoffset:22;
+    animation:cocheTrace 0.5s cubic-bezier(0.65,0,0.35,1) 0.15s forwards;
+  }
+  @keyframes cocheTrace{ to{ stroke-dashoffset:0; } }
+  .coche-dessin .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
+  @media (prefers-reduced-motion: reduce){
+    .coche-dessin .trace{ animation:none; stroke-dashoffset:0; }
+    .coche-dessin .signe{ animation:none; }
+  }
+
   /* ═══ Création à partir d'un document ═══ */
   .doc-ou{
     display:flex; align-items:center; gap:12px; margin:16px 0 14px;
@@ -1266,6 +1294,11 @@
   .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
   .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
   .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  /* Le fichier et la coche reprennent la langue des icônes de mode : trait
+     blanc, mêmes épaisseurs, mêmes opacités. À 18 pixels on ne peut pas étager
+     trois plans comme sur les grandes icônes — on garde le contour de devant
+     à 75 % et les lignes de contenu à 35 %, ce qui donne le même grain. */
+  .cat-icon svg{ width:17px; height:17px; display:block; }
   .cat-badge{
     font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
@@ -1506,7 +1539,11 @@
   #tabbar-gestion .groupe, #tabbar-equipe .groupe{
     display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
     background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    /* Même teinte et même liseré que la barre du haut, mais un flou plus élevé :
+       un flou s'atténue près des bords, et sur une pastille étroite les bords sont
+       partout. À 24 px comme la carte du logo, le résultat paraît plus net ici.
+       48 px redonne le même grain à l'œil. */
+    -webkit-backdrop-filter:blur(48px) saturate(180%); backdrop-filter:blur(48px) saturate(180%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
   }
   /* ═══ Pourquoi le libellé est en position absolue ═══
@@ -2183,7 +2220,7 @@
     </div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div style="font-size:32px; margin-bottom:10px;">✅</div>
+      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><circle cx="26" cy="24" r="16.5" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><circle cx="26" cy="24" r="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"/></g></svg></div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
       <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
       <button class="btn block" id="ai-view-btn">Voir la procédure</button>
@@ -2862,6 +2899,15 @@ const LANGUES = [
 const DICO = {
   en: {
     // ── espace gestion ──
+    "Vous pouvez quitter cette page": "You can leave this page",
+    "la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "the procedure will appear in your list as soon as it is ready.",
+    "Envoi de la vidéo": "Uploading the video",
+    "La vidéo part vers le service d'analyse.": "The video is being sent to the analysis service.",
+    "Transcription de la parole": "Transcribing the speech",
+    "Le service écoute la vidéo et retranscrit ce qui est dit.": "The service listens to the video and writes down what is said.",
+    "Rédaction des étapes": "Writing the steps",
+    "L'IA relit la transcription et en tire les étapes.": "The AI reads the transcript and draws the steps from it.",
+    "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "This is taking longer than usual, but the analysis is still running.",
     "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Paste your text below, or drop a file. The AI will draw steps from it that you can",
     ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Beyond that, the analysis gets long and the cutting less reliable — film one procedure per video instead.",
     "+ Ajouter une étape": "+ Add a step",
@@ -3064,6 +3110,13 @@ const DICO = {
 
   es: {
     // ── espace gestion ──
+    "Envoi de la vidéo": "Envío del vídeo",
+    "La vidéo part vers le service d'analyse.": "El vídeo se envía al servicio de análisis.",
+    "Transcription de la parole": "Transcripción del habla",
+    "Le service écoute la vidéo et retranscrit ce qui est dit.": "El servicio escucha el vídeo y transcribe lo que se dice.",
+    "Rédaction des étapes": "Redacción de los pasos",
+    "L'IA relit la transcription et en tire les étapes.": "La IA relee la transcripción y extrae los pasos.",
+    "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Está tardando más de lo habitual, pero el análisis sigue en marcha.",
     "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Pega tu texto abajo, o suelta un archivo. La IA extraerá pasos que podrás",
     ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Más allá, el análisis se alarga y el corte es menos fiable — graba mejor un procedimiento por vídeo.",
     "+ Ajouter une étape": "+ Añadir un paso",
@@ -3260,6 +3313,13 @@ const DICO = {
 
   pt: {
     // ── espace gestion ──
+    "Envoi de la vidéo": "Envio do vídeo",
+    "La vidéo part vers le service d'analyse.": "O vídeo está a ser enviado para o serviço de análise.",
+    "Transcription de la parole": "Transcrição da fala",
+    "Le service écoute la vidéo et retranscrit ce qui est dit.": "O serviço ouve o vídeo e transcreve o que é dito.",
+    "Rédaction des étapes": "Redação das etapas",
+    "L'IA relit la transcription et en tire les étapes.": "A IA relê a transcrição e extrai as etapas.",
+    "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Está a demorar mais do que o habitual, mas a análise continua a correr.",
     "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Cole o seu texto abaixo, ou largue um ficheiro. A IA extrairá etapas que poderá",
     ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Acima disso, a análise demora e o corte é menos fiável — filme antes um procedimento por vídeo.",
     "+ Ajouter une étape": "+ Adicionar uma etapa",
@@ -5361,7 +5421,7 @@ function renderCategoryProceduresListInterne() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon">📄</div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M14 2.6H7.4A2.4 2.4 0 0 0 5 5v14a2.4 2.4 0 0 0 2.4 2.4h9.2A2.4 2.4 0 0 0 19 19V7.6Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.6v5h5" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="8.4" y1="13" x2="14.4" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8.4" y1="16.8" x2="12.4" y2="16.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg></div>
         </div>
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
@@ -5668,45 +5728,82 @@ function updateAiRing(pct) {
    deux minutes elle semblait bloquée, alors que l'analyse tournait toujours.
    On affiche maintenant une progression rapportée à une durée estimée, et
    surtout le temps écoulé en clair — ça se voit tout de suite que ça avance. */
+/* ═══ SUIVI DE L'ANALYSE ═══
+
+   L'ancienne version fabriquait un pourcentage à partir d'une estimation : elle
+   annonçait « 5 % · environ 170 s restantes » sans rien savoir de ce qui se
+   passait réellement. Quand l'analyse prenait plus longtemps, le chiffre mentait,
+   et quand elle finissait plus tôt il ne servait à rien.
+
+   On n'affiche plus que ce qu'on sait vraiment :
+   • l'étape en cours — envoi, transcription, rédaction ;
+   • le pourcentage d'Azure quand il en donne un, et rien sinon ;
+   • le temps écoulé, qui lui n'est pas une estimation.
+
+   Sans pourcentage, l'anneau tourne au lieu de se remplir : un mouvement continu
+   dit « ça travaille » sans prétendre savoir où ça en est. */
+
+let aiEtapeCourante = 'envoi'      // envoi → transcription → redaction
+let aiProgresAzure = null          // le vrai pourcentage, quand Azure en donne un
+
+const AI_ETAPES = {
+  envoi:         { titre: 'Envoi de la vid\u00e9o', sous: "La vid\u00e9o part vers le service d'analyse." },
+  transcription: { titre: 'Transcription de la parole', sous: "Le service \u00e9coute la vid\u00e9o et retranscrit ce qui est dit." },
+  redaction:     { titre: 'R\u00e9daction des \u00e9tapes', sous: "L'IA relit la transcription et en tire les \u00e9tapes." },
+}
+
 function startAiProgressSimulation() {
   aiDebutAnalyse = Date.now()
   aiNbSondages = 0
-  updateAiRing(3)
+  aiEtapeCourante = 'envoi'
+  aiProgresAzure = null
   if (aiProgressTimer) clearInterval(aiProgressTimer)
   aiProgressTimer = setInterval(majProgressionIA, 1000)
   majProgressionIA()
 }
 
-// Estimation : l'analyse dure grosso modo une fois et demie la durée de la
-// vidéo, avec un plancher d'une minute. Si on dépasse, on ralentit sans bloquer.
-function dureeEstimeeIA() {
-  return Math.max(60, (aiVideoDuree || 120) * 1.5)
+/* Appelée à chaque sondage : l'étape vient de ce que répond le serveur, le
+   pourcentage aussi. Rien n'est deviné ici. */
+function signalerEtapeIA(etape, progres) {
+  aiEtapeCourante = etape
+  aiProgresAzure = (typeof progres === 'number' && progres >= 0 && progres <= 100) ? progres : null
+  majProgressionIA()
 }
 
 function majProgressionIA() {
   const ecoule = (Date.now() - aiDebutAnalyse) / 1000
-  const estimee = dureeEstimeeIA()
-  let pct = (ecoule / estimee) * 88
-  if (pct > 88) pct = 88 + Math.min(7, (ecoule - estimee) / 60 * 3)   // au-delà : progression lente jusqu'à 95
-  updateAiRing(Math.min(95, pct))
-
   const min = Math.floor(ecoule / 60), sec = Math.floor(ecoule % 60)
   const temps = min > 0 ? `${min} min ${String(sec).padStart(2, '0')}` : `${sec} s`
+
+  const info = AI_ETAPES[aiEtapeCourante] || AI_ETAPES.envoi
   const titre = document.getElementById('ai-progress-title')
-  if (titre) titre.textContent = `Analyse en cours · ${temps}`
+  if (titre) titre.textContent = `${t(info.titre)} \u00b7 ${temps}`
+
+  const anneau = document.getElementById('ai-progress-card')?.querySelector('.ai-ring-wrap')
+  const pctEl = document.getElementById('ai-progress-pct')
+
+  if (aiProgresAzure != null) {
+    // Azure donne un vrai avancement : on le montre tel quel.
+    anneau?.classList.remove('indetermine')
+    updateAiRing(aiProgresAzure)
+    if (pctEl) pctEl.textContent = Math.round(aiProgresAzure) + '%'
+  } else {
+    /* Aucun avancement connu : l'anneau tourne. Mieux vaut un mouvement franc
+       qu'un chiffre inventé. */
+    anneau?.classList.add('indetermine')
+    updateAiRing(28)
+    if (pctEl) pctEl.textContent = ''
+  }
 
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
-  if (ecoule > estimee * 2.5) {
-    sous.innerHTML = "C'est plus long que prévu, mais l'analyse tourne toujours. " +
-      "<b style=\"color:#fff;\">Vous pouvez quitter cette page</b>, elle se terminera sans vous."
-  } else if (ecoule > estimee) {
-    sous.innerHTML = "Les vidéos longues demandent plus de temps. " +
-      "<b style=\"color:#fff;\">Vous pouvez quitter cette page.</b>"
-  } else {
-    const reste = Math.max(10, Math.round((estimee - ecoule) / 10) * 10)
-    sous.innerHTML = `Environ ${reste} s restantes. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.`
+
+  let phrase = t(info.sous)
+  if (ecoule > 15 * 60) {
+    phrase = t("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }
+  sous.innerHTML = `${phrase} <b style="color:#fff;">${t('Vous pouvez quitter cette page')}</b> \u2014 ` +
+    escapeHtml(t("la proc\u00e9dure appara\u00eetra dans votre liste d\u00e8s qu'elle sera pr\u00eate."))
 }
 
 function stopAiProgressSimulation(finalPct) {
@@ -5877,11 +5974,10 @@ async function pollAiStatus() {
     const data = await checkRes.json()
 
     if (data.status === 'processing') {
-      // Si le serveur sait où il en est, on affiche sa vraie valeur
-      if (typeof data.progress === 'number' && data.progress > 0) {
-        stopAiProgressSimulation()
-        updateAiRing(Math.min(95, data.progress))
-      }
+      /* Le serveur nous dit où il en est : dès qu'il répond « en traitement »,
+         c'est que la vidéo est arrivée et qu'Azure l'écoute. Le pourcentage vient
+         d'Azure quand il en fournit un ; sinon l'anneau tourne. */
+      signalerEtapeIA('transcription', data.progress)
       // On interroge souvent au début, puis on espace : la première minute
       // était la plus pénalisante, on pouvait attendre 6 s pour rien après la
       // fin réelle de l'analyse.
@@ -5890,6 +5986,12 @@ async function pollAiStatus() {
       aiPollTimer = setTimeout(pollAiStatus, delai)
       return
     }
+    if (data.status === 'redaction') {
+      signalerEtapeIA('redaction', null)
+      aiPollTimer = setTimeout(pollAiStatus, 2500)
+      return
+    }
+
     if (data.status === 'ready') {
       // On inscrit la fin en base : la carte de la liste passera à la coche,
       // même si le gérant n'est plus sur cet écran.
@@ -5902,8 +6004,13 @@ async function pollAiStatus() {
       document.getElementById('ai-progress-card').style.display = 'none'
       document.getElementById('ai-done-card').style.display = 'block'
       document.getElementById('ai-done-sub').textContent = `${data.nb_etapes} étape${data.nb_etapes > 1 ? 's' : ''} générée${data.nb_etapes > 1 ? 's' : ''} par l'IA — vérifiez et modifiez si besoin avant de publier`
-      document.getElementById('ai-view-btn').textContent = 'Vérifier et publier'
-      document.getElementById('ai-view-btn').onclick = () => openEditProcedure(aiProcedureId, 'ai-review')
+      /* « Vérifier et publier » annonçait deux corvées. « Voir la procédure » dit
+         ce qu'on obtient, et la vérification vient d'elle-même une fois qu'on y est. */
+      document.getElementById('ai-view-btn').textContent = 'Voir la procédure'
+      /* On ouvre la fiche, pas l'éditeur. Arriver directement en mode modification
+   suggère qu'il y a du travail à faire alors qu'on vient seulement de demander
+   à voir. Le bouton « Modifier » est sur la fiche, à portée de doigt. */
+document.getElementById('ai-view-btn').onclick = () => openAnalyse(aiProcedureId)
       return
     }
     // status === 'error'
@@ -7915,7 +8022,7 @@ function renderEquipeCategories() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="19"
               stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
           </svg>
-          <span class="cat-icon">${pct === 100 ? '✓' : '📄'}</span>
+          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M14 2.6H7.4A2.4 2.4 0 0 0 5 5v14a2.4 2.4 0 0 0 2.4 2.4h9.2A2.4 2.4 0 0 0 19 19V7.6Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.6v5h5" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="8.4" y1="13" x2="14.4" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8.4" y1="16.8" x2="12.4" y2="16.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
@@ -7983,7 +8090,7 @@ function ficheEquipe(proc) {
           <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${couleur}"
             stroke-dasharray="${circonference}" stroke-dashoffset="${decalage}"/>
         </svg>
-        <div class="cat-icon">${lue ? '\u2713' : '\ud83d\udcc4'}</div>
+        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M14 2.6H7.4A2.4 2.4 0 0 0 5 5v14a2.4 2.4 0 0 0 2.4 2.4h9.2A2.4 2.4 0 0 0 19 19V7.6Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.6v5h5" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="8.4" y1="13" x2="14.4" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8.4" y1="16.8" x2="12.4" y2="16.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>

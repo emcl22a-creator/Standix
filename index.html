@@ -187,15 +187,41 @@
     font-size:12.5px; font-weight:650; color:var(--blue); flex-shrink:0;
   }
 
+  /* ═══ Réordonner les étapes au doigt ═══
+     Les deux flèches obligeaient à taper plusieurs fois pour déplacer une
+     étape de trois rangs. Un appui long la soulève, on la pose où l'on veut. */
+  .step-grip{
+    display:flex; flex-direction:column; gap:3px; padding:8px 6px; flex-shrink:0;
+    cursor:grab; touch-action:none; opacity:0.4; transition:opacity 0.2s;
+  }
+  .step-grip i{ display:block; width:16px; height:1.5px; border-radius:2px; background:#fff; }
+  .step-edit-item:active .step-grip, .step-edit-item.attrape .step-grip{ opacity:0.9; }
+
+  .step-edit-item{ touch-action:pan-y; }
+  /* L'étape soulevée : elle passe au-dessus, s'agrandit à peine et porte une
+     ombre portée pour qu'on sente qu'elle a quitté la pile. */
+  .step-edit-item.attrape{
+    position:relative; z-index:20;
+    background:rgba(255,255,255,0.13);
+    border-color:rgba(255,255,255,0.4);
+    box-shadow:0 14px 34px rgba(0,0,0,0.5);
+    transform:scale(1.025);
+    transition:box-shadow 0.2s, background 0.2s, border-color 0.2s;
+  }
+  .step-edit-item.attrape textarea{ pointer-events:none; }
+  /* Les autres coulissent pour laisser la place. */
+  .step-edit-item.decale{ transition:transform 0.22s cubic-bezier(0.32,0.72,0,1); }
+  .step-liste-en-cours{ -webkit-user-select:none; user-select:none; }
+
   /* ═══ Procédure en cours d'analyse ═══
      Une roue qui tourne pendant que l'IA travaille, puis une coche verte
      jusqu'à ce que le gérant ouvre la procédure. C'est le seul endroit où il
      apprend que son analyse est terminée s'il a quitté l'écran. */
   .etat-proc{
-    position:absolute; top:12px; right:12px; width:26px; height:26px;
-    display:flex; align-items:center; justify-content:center; z-index:2;
+    width:19px; height:19px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
   }
-  .etat-proc svg{ width:26px; height:26px; display:block; }
+  .etat-proc svg{ width:19px; height:19px; display:block; }
   .etat-proc .rot{ animation:etatTourne 1.05s linear infinite; transform-origin:center; }
   @keyframes etatTourne{ to{ transform:rotate(360deg); } }
   .etat-proc .arc{
@@ -203,16 +229,22 @@
     stroke-dasharray:40 60; opacity:0.9;
   }
   .etat-proc .fond-arc{ stroke:rgba(255,255,255,0.14); stroke-width:2.4; fill:none; }
+  /* La coche est posée sur un rond de verre teinté de vert : le même langage
+     que les cartes de l'app, plutôt qu'une pastille pleine. */
   .etat-proc.prete{
-    background:var(--green); border-radius:50%; width:22px; height:22px;
-    box-shadow:0 0 0 3px rgba(48,209,88,0.18);
+    width:19px; height:19px; border-radius:50%;
+    background:rgba(48,209,88,0.22);
+    border:0.5px solid rgba(48,209,88,0.55);
+    -webkit-backdrop-filter:blur(8px) saturate(180%); backdrop-filter:blur(8px) saturate(180%);
     animation:etatArrive 0.5s cubic-bezier(0.34,1.5,0.64,1) both;
   }
-  .etat-proc.prete svg{ width:13px; height:13px; }
+  .etat-proc.prete svg{ width:11px; height:11px; }
   @keyframes etatArrive{ from{ transform:scale(0.5); opacity:0; } to{ transform:scale(1); opacity:1; } }
-  /* La carte reste sobre : seule l'icône signale l'état, pas de fond coloré. */
-  .cat-cell .etat-proc, .proc-rich-card .etat-proc{ top:10px; right:10px; }
+  /* Une procédure en cours d'analyse n'est pas consultable : rien à ouvrir,
+     ses étapes n'existent pas encore. On la montre estompée et sourde au
+     toucher, plutôt que d'ouvrir une page vide. */
   .proc-en-cours{ opacity:0.72; }
+  .proc-rich-card.proc-en-cours{ pointer-events:none; cursor:default; }
 
   /* ═══ Image d'une étape manuelle ═══
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
@@ -914,7 +946,13 @@
     font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
   }
-  .cat-name{ font-size:14.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
+  /* Le nom et son indicateur d'état partagent une ligne : le texte prend la
+     place disponible, l'icône se cale juste à sa suite. */
+  .cat-name{
+    display:flex; align-items:center; gap:6px; margin-bottom:2px;
+    font-size:14.5px; font-weight:700; color:var(--label);
+  }
+  .cat-name .txt{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
   /* Côté équipe, le compteur est un rapport (« 2/2 lues ») et non un
@@ -3496,7 +3534,6 @@ function renderCategoryGrid() {
     cell.className = 'cat-cell' + (statut === 'traitement' ? ' proc-en-cours' : '')
     cell.dataset.key = nom
     cell.innerHTML = `
-      ${etatProcedureHtml({ statut })}
       <div class="cat-top">
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
@@ -3508,7 +3545,7 @@ function renderCategoryGrid() {
         </div>
         <div class="cat-badge">${procsInCat.length}</div>
       </div>
-      <div class="cat-name">${escapeHtml(nom)}</div>
+      <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span>${etatProcedureHtml({ statut })}</div>
       <div class="cat-pct-row">
         <span class="cat-pct" style="color:${ringColor};">${avgPct}%</span>
         <span class="cat-pct-label">consultées</span>
@@ -3702,7 +3739,6 @@ function renderCategoryProceduresListInterne() {
     div.dataset.key = proc.id
     div.onclick = () => openAnalyse(proc.id)
     div.innerHTML = `
-      ${etatProcedureHtml(proc)}
       <div class="cat-top">
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
@@ -3714,7 +3750,7 @@ function renderCategoryProceduresListInterne() {
         </div>
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
-      <div class="cat-name">${escapeHtml(proc.titre)}</div>
+      <div class="cat-name"><span class="txt">${escapeHtml(proc.titre)}</span>${etatProcedureHtml(proc)}</div>
       ${toutesProcedures ? `<div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans catégorie')}</div>` : ''}
       <div class="cat-pct-row">
         <span class="cat-pct" style="color:${ringColor};">${pct}%</span>
@@ -4700,6 +4736,120 @@ function moveStepInArray(arr, from, to) {
 }
 
 // Petit bloc de boutons ↑ / ↓ commun à toutes les listes d'étapes
+/* ═══════════════════════════════════════════════════════════════════════════
+   RÉORDONNER LES ÉTAPES AU DOIGT
+
+   Un appui maintenu soulève l'étape, on la déplace, on la pose. Les voisines
+   coulissent pour montrer où elle va atterrir.
+
+   Le principe : rien ne bouge dans le document pendant le geste. On mesure la
+   position de chaque étape au départ, puis on ne joue que sur des `transform`
+   — c'est le processeur graphique qui travaille, la mise en page n'est jamais
+   recalculée. L'ordre réel du tableau n'est modifié qu'au relâchement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DELAI_APPUI_LONG = 340
+
+function activerGlissementEtapes(conteneur, donnerTableau, apres) {
+  if (!conteneur || conteneur.dataset.glissementPret === '1') return
+  conteneur.dataset.glissementPret = '1'
+
+  let attente = null, depart = null, actif = null
+
+  function elements() { return [...conteneur.querySelectorAll('.step-edit-item')] }
+
+  function annulerAttente() {
+    if (attente) { clearTimeout(attente); attente = null }
+    depart = null
+  }
+
+  function souleverPuisSuivre(index, el, yDoigt) {
+    const els = elements()
+    actif = {
+      index, el, yDoigt,
+      cible: index,
+      mesures: els.map(e => { const r = e.getBoundingClientRect(); return { haut: r.top, hauteur: r.height, milieu: r.top + r.height / 2 } }),
+      els,
+    }
+    conteneur.classList.add('step-liste-en-cours')
+    el.classList.add('attrape')
+    els.forEach(e => { if (e !== el) e.classList.add('decale') })
+    if (navigator.vibrate) { try { navigator.vibrate(12) } catch (e) {} }
+  }
+
+  function suivre(y) {
+    if (!actif) return
+    const dy = y - actif.yDoigt
+    actif.el.style.transform = `translateY(${dy}px) scale(1.025)`
+
+    // Où l'étape atterrirait-elle si on relâchait maintenant ?
+    const centre = actif.mesures[actif.index].milieu + dy
+    let cible = actif.index
+    for (let i = 0; i < actif.mesures.length; i++) {
+      if (i === actif.index) continue
+      if (i < actif.index && centre <= actif.mesures[i].milieu) { cible = Math.min(cible, i) }
+      if (i > actif.index && centre >= actif.mesures[i].milieu) { cible = Math.max(cible, i) }
+    }
+    actif.cible = cible
+
+    // Les voisines coulissent de la hauteur de l'étape soulevée.
+    const h = actif.mesures[actif.index].hauteur + 10   // + la marge entre étapes
+    actif.els.forEach((e, i) => {
+      if (i === actif.index) return
+      let d = 0
+      if (cible < actif.index && i >= cible && i < actif.index) d = h
+      if (cible > actif.index && i > actif.index && i <= cible) d = -h
+      e.style.transform = d ? `translateY(${d}px)` : ''
+    })
+  }
+
+  function relacher() {
+    annulerAttente()
+    if (!actif) return
+    const { index, cible } = actif
+    conteneur.classList.remove('step-liste-en-cours')
+    actif.els.forEach(e => { e.style.transform = ''; e.classList.remove('attrape', 'decale') })
+    actif = null
+    if (cible !== index) {
+      // On demande le tableau au moment du relâchement : il a pu être remplacé
+      // depuis le branchement (réinitialisation du formulaire, par exemple).
+      const tableau = donnerTableau()
+      const [item] = tableau.splice(index, 1)
+      tableau.splice(cible, 0, item)
+    }
+    apres?.(cible)
+  }
+
+  conteneur.addEventListener('pointerdown', (e) => {
+    // Le texte, la corbeille et les boutons de photo gardent leur usage normal.
+    if (e.target.closest('textarea, button, .del, input')) return
+    const item = e.target.closest('.step-edit-item')
+    if (!item) return
+    const index = elements().indexOf(item)
+    if (index < 0) return
+    depart = { x: e.clientX, y: e.clientY }
+    // La poignée réagit tout de suite, le reste de la carte après un appui long.
+    const surPoignee = !!e.target.closest('.step-grip')
+    if (surPoignee) { e.preventDefault(); souleverPuisSuivre(index, item, e.clientY); return }
+    attente = setTimeout(() => { attente = null; souleverPuisSuivre(index, item, e.clientY) }, DELAI_APPUI_LONG)
+  })
+
+  conteneur.addEventListener('pointermove', (e) => {
+    // Un doigt qui glisse avant la fin du délai : la personne fait défiler.
+    if (depart && !actif && (Math.abs(e.clientY - depart.y) > 8 || Math.abs(e.clientX - depart.x) > 8)) annulerAttente()
+    if (!actif) return
+    e.preventDefault()
+    suivre(e.clientY)
+  })
+
+  ;['pointerup', 'pointercancel', 'pointerleave'].forEach(ev => conteneur.addEventListener(ev, relacher))
+}
+
+/* Poignée de déplacement. Elle remplace les deux flèches : trois traits, le
+   geste universel du « prends-moi et déplace-moi ». */
+function gripHtml() {
+  return '<span class="step-grip" aria-label="Déplacer l\'étape"><i></i><i></i><i></i></span>'
+}
+
 function moveButtonsHtml(i, total) {
   return `<div class="step-move">
       <button type="button" class="mv-up" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button>
@@ -4746,7 +4896,7 @@ function renderManualSteps() {
         <input type="file" accept="image/*" class="fichier">
       </div>
       <div class="step-row-bottom">
-        ${moveButtonsHtml(i, manualSteps.length)}
+        ${gripHtml()}
         <span class="del">${TRASH_SVG}</span>
       </div>
     `
@@ -4774,10 +4924,11 @@ function renderManualSteps() {
     div.querySelector('.del').addEventListener('click', () => {
       demanderSuppressionEtape(i + 1, manualSteps[i].texte, () => { manualSteps.splice(i, 1); renderManualSteps() })
     })
-    wireMoveButtons(div, manualSteps, i, () => renderManualSteps())
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
+
+  activerGlissementEtapes(listEl, () => manualSteps, () => renderManualSteps())
 }
 
 // ═══ Étapes issues du découpage vidéo ═══
@@ -5352,7 +5503,7 @@ function etatProcedureHtml(proc) {
   }
   if (proc?.statut === 'pret') {
     return `<div class="etat-proc prete" title="Analyse terminée">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#06210F" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#4AE07A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"/></svg></div>`
   }
   return ''
@@ -5434,9 +5585,12 @@ async function loadEquipeProcedures() {
   const { data: procedures, error } = await requete
   if (error) { console.error(error); return }
 
+  // Une procédure encore en analyse n'a aucune étape : inutile de la proposer.
+  const pretes = (procedures || []).filter(p => p.statut !== 'traitement')
+
   // Étapes de TOUTES les procédures et mes validations, chargées d'un coup :
   // chaque fiche s'ouvrira ensuite instantanément.
-  const procIds = procedures.map(p => p.id)
+  const procIds = pretes.map(p => p.id)
   const [{ data: mesValidations }, { data: toutesEtapes }] = await Promise.all([
     supabase.from('validations').select('procedure_id').eq('membre_id', currentMembre.id),
     supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
@@ -5449,7 +5603,7 @@ async function loadEquipeProcedures() {
     equipeEtapesByProc[e.procedure_id].push(e)
   })
 
-  allEquipeProcedures = procedures
+  allEquipeProcedures = pretes
   renderEquipeAccueil()
   renderEquipeCategories()
   renderBlocVisiteur()
@@ -5527,7 +5681,7 @@ function renderEquipeCategories() {
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
-      <div class="cat-name">${escapeHtml(nom)}</div>
+      <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
       <div class="cat-pct-row"><span class="cat-lues" style="color:${couleur}">${lues}/${procs.length} lues</span></div>
       <div class="cat-recent">${procs.slice(0, 2).map(p =>
         `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}</div>`

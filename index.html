@@ -2391,7 +2391,9 @@ document.querySelectorAll('.plan-card').forEach(card => {
   })
 })
 
-document.getElementById('logout-btn')?.addEventListener('click', async () => {
+/* La déconnexion est appelée depuis les deux espaces : elle doit exister sur
+   `window`, sinon le bouton de l'espace équipe reste muet. */
+window.signOut = async function() {
   await supabase.auth.signOut()
   currentMembre = null
   document.getElementById('gestion-app').style.display = 'none'
@@ -2401,7 +2403,9 @@ document.getElementById('logout-btn')?.addEventListener('click', async () => {
   document.getElementById('login-email').value = ''
   document.getElementById('login-password').value = ''
   afficherEcranChoix()
-})
+}
+
+document.getElementById('logout-btn')?.addEventListener('click', () => signOut())
 
 // ═══ ANALYSE GÉNÉRALE ═══
 let currentGaData = null
@@ -4790,6 +4794,184 @@ async function openEquipeDetail(procId) {
 
   demarrerLecture(procId, dejaConsultee)
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RÉGLAGES DE L'ESPACE ÉQUIPE
+
+   Un même compte peut appartenir à plusieurs entreprises : chaque adhésion est
+   une ligne dans la table des membres. La liste se déduit donc directement de
+   la base, et un code saisi une fois reste acquis — il crée une ligne qui ne
+   disparaît plus, sans rien stocker sur le téléphone.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let mesAdhesions = []
+
+window.openEquipeSettings = async function() {
+  showEquipeScreen('e-settings')
+  document.getElementById('es-nom').value = currentMembre?.nom || ''
+  const { data: { user } } = await supabase.auth.getUser()
+  document.getElementById('es-email').value = user?.email || ''
+  chargerMesEntreprises()
+}
+
+async function chargerMesEntreprises() {
+  const el = document.getElementById('es-entreprises')
+  if (!el) return
+  el.innerHTML = '<div class="note">Chargement…</div>'
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) { el.innerHTML = '<div class="note">Session expirée.</div>'; return }
+
+  const { data, error } = await supabase
+    .from('membres').select('*, entreprises(id, nom)').eq('user_id', user.id)
+
+  if (error) { el.innerHTML = `<div class="note">Erreur : ${escapeHtml(error.message)}</div>`; return }
+  mesAdhesions = data || []
+
+  if (!mesAdhesions.length) {
+    el.innerHTML = "<div class=\"note\">Vous n'appartenez à aucune entreprise.</div>"
+    return
+  }
+
+  el.innerHTML = mesAdhesions.map(a => {
+    const actuelle = a.id === currentMembre?.id
+    const nom = a.entreprises?.nom || 'Entreprise'
+    const role = a.role === 'gestion' ? 'Gestion' : 'Équipe'
+    return `
+      <div class="ent-ligne${actuelle ? ' actuelle' : ''}" data-membre="${a.id}">
+        <div class="ent-info">
+          <div class="ent-nom">${escapeHtml(nom)}</div>
+          <div class="ent-role">${role}${actuelle ? ' · entreprise active' : ''}</div>
+        </div>
+        ${actuelle
+          ? '<span class="ent-marque"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>'
+          : '<span class="ent-basculer">Basculer</span>'}
+      </div>`
+  }).join('')
+}
+
+/* Basculer d'entreprise revient à changer de fiche membre : on relance l'app
+   avec celle qui a été choisie, ce qui recharge procédures, équipe et droits. */
+document.getElementById('es-entreprises')?.addEventListener('click', async (e) => {
+  const ligne = e.target.closest('.ent-ligne')
+  if (!ligne || ligne.classList.contains('actuelle')) return
+  const adhesion = mesAdhesions.find(a => a.id === ligne.dataset.membre)
+  if (!adhesion) return
+
+  const ok = await confirmDialog({
+    titre: "Changer d'entreprise",
+    message: `Basculer vers « ${adhesion.entreprises?.nom || 'cette entreprise'} » ? L'app va se recharger avec ses procédures.`,
+    confirmer: 'Basculer',
+    annuler: 'Annuler',
+    danger: false,
+  })
+  if (!ok) return
+
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('equipe-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  document.getElementById('tabbar-equipe').style.display = 'none'
+  await enterApp(adhesion)
+})
+
+document.getElementById('es-save')?.addEventListener('click', async () => {
+  const btn = document.getElementById('es-save')
+  const err = document.getElementById('es-error')
+  const nom = document.getElementById('es-nom').value.trim()
+  err.style.color = 'var(--red)'
+  err.textContent = ''
+  if (!nom) { err.textContent = 'Le nom ne peut pas être vide.'; return }
+  setButtonLoading(btn, true)
+  const { error } = await supabase.from('membres').update({ nom }).eq('id', currentMembre.id)
+  setButtonLoading(btn, false)
+  if (error) { err.textContent = 'Erreur : ' + error.message; return }
+  currentMembre.nom = nom
+  err.style.color = 'var(--green)'
+  err.textContent = 'Enregistré.'
+})
+
+document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
+  const btn = document.getElementById('es-rejoindre')
+  const err = document.getElementById('es-code-error')
+  const code = document.getElementById('es-code').value.trim()
+  err.style.color = 'var(--red)'
+  err.textContent = ''
+  if (!/^\d{5}$/.test(code)) { err.textContent = 'Le code comporte 5 chiffres.'; return }
+
+  setButtonLoading(btn, true)
+  const { data: ent } = await supabase
+    .from('entreprises').select('id, nom').eq('code_acces', code).maybeSingle()
+
+  if (!ent) { setButtonLoading(btn, false); err.textContent = 'Aucune entreprise avec ce code.'; return }
+  if (mesAdhesions.some(a => a.entreprise_id === ent.id)) {
+    setButtonLoading(btn, false)
+    err.textContent = 'Vous appartenez déjà à cette entreprise.'
+    return
+  }
+
+  const { data: { user } } = await supabase.auth.getUser()
+  const { error } = await supabase.from('membres').insert({
+    user_id: user.id, nom: currentMembre?.nom || '', role: 'equipe', entreprise_id: ent.id,
+  })
+  setButtonLoading(btn, false)
+  if (error) { err.textContent = 'Erreur : ' + error.message; return }
+
+  document.getElementById('es-code').value = ''
+  err.style.color = 'var(--green)'
+  err.textContent = `« ${ent.nom} » ajoutée. Elle restera dans votre liste.`
+  chargerMesEntreprises()
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GÉRER L'ÉQUIPE (espace gestion)
+   ═══════════════════════════════════════════════════════════════════════════ */
+window.openMembres = async function() {
+  showGestionScreen('p-membres')
+  const liste = document.getElementById('pm-liste')
+  const sous = document.getElementById('pm-subhead')
+  liste.innerHTML = '<div class="note">Chargement…</div>'
+
+  const { data, error } = await supabase
+    .from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
+    .order('created_at', { ascending: true })
+
+  if (error) { liste.innerHTML = `<div class="note">Erreur : ${escapeHtml(error.message)}</div>`; return }
+
+  const membres = data || []
+  const gerants = membres.filter(m => m.role === 'gestion').length
+  sous.textContent = `${membres.length} utilisateur${membres.length > 1 ? 's' : ''} · ${gerants} en gestion · ${membres.length - gerants} en équipe`
+
+  liste.innerHTML = membres.map(m => {
+    const soi = m.id === currentMembre.id
+    const initiales = (m.nom || '?').trim().split(/\s+/).map(x => x[0]).slice(0, 2).join('').toUpperCase()
+    return `
+      <div class="pm-ligne">
+        <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${escapeHtml(initiales)}</div>
+        <div class="pm-info">
+          <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
+          <div class="pm-role">${m.role === 'gestion' ? 'Gestion' : 'Équipe'} · depuis le ${m.created_at ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}</div>
+        </div>
+        ${soi ? '' : `<button class="pm-suppr" data-membre="${m.id}" data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>`}
+      </div>`
+  }).join('')
+}
+
+document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('.pm-suppr')
+  if (!btn) return
+  const ok = await confirmDialog({
+    titre: 'Retirer cet utilisateur ?',
+    message: `${btn.dataset.nom || 'Cette personne'} perdra l'accès aux procédures de l'entreprise. Son compte Procédo n'est pas supprimé : elle pourra rejoindre une autre entreprise.`,
+    confirmer: 'Retirer',
+    annuler: 'Annuler',
+    danger: true,
+  })
+  if (!ok) return
+  const { error } = await supabase.from('membres').delete().eq('id', btn.dataset.membre)
+  if (error) { alert('Erreur : ' + error.message); return }
+  openMembres()
+})
 
 /* ═══════════════════════════════════════════════════════════════════════════
    TEMPS DE LECTURE

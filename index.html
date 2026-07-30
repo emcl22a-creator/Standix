@@ -308,6 +308,28 @@
   .contact-carte .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .contact-carte .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
 
+  /* ═══ Création à partir d'un document ═══ */
+  .doc-ou{
+    display:flex; align-items:center; gap:12px; margin:16px 0 14px;
+    font-size:11px; font-weight:700; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.06em;
+  }
+  .doc-ou::before, .doc-ou::after{
+    content:''; flex:1; height:0.5px; background:rgba(255,255,255,0.12);
+  }
+  .doc-fichier-etat{
+    display:flex; align-items:center; gap:11px; margin-top:10px;
+    padding:11px 13px; border-radius:13px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .doc-fichier-etat .ic{ font-size:19px; flex-shrink:0; }
+  .doc-fichier-etat .tx{ flex:1; min-width:0; }
+  .doc-fichier-etat .n{
+    font-size:13.5px; font-weight:650; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis;
+  }
+  .doc-fichier-etat .s{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
+
   /* ═══ Accueil après un scan ═══
      Une fenêtre à elle, pas une boîte de dialogue ordinaire : c'est le premier
      contact avec la procédure, il vaut mieux qu'il soit accueillant. */
@@ -1862,6 +1884,17 @@
       </div>
     </div>
 
+    <div class="card mode-choice-card disabled" onclick="goToCreateMode('doc')" id="mode-card-doc">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon">📄</div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">L'IA lit un document</div>
+          <div class="mode-choice-desc">Collez un texte, ou déposez un PDF ou un Word</div>
+        </div>
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div>
+
     <div class="card mode-choice-card" onclick="goToCreateMode('ai')" id="mode-card-ai">
       <div class="mode-choice-row">
         <div class="mode-choice-icon">✦</div>
@@ -1974,6 +2007,43 @@
 
     <div class="error-msg" id="create-error-video"></div>
     <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
+  </div>
+
+  <!-- L'IA lit un document et en tire les étapes -->
+  <div class="screen" id="p-create-doc">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA lit un document</h1>
+    </div>
+    <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
+
+    <div class="card" id="doc-saisie-card">
+      <div class="note" style="margin-bottom:12px;">
+        Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes
+        que vous pourrez <b style="color:#fff;">relire et corriger</b> avant publication.
+      </div>
+
+      <label class="f">Votre texte</label>
+      <textarea id="doc-texte" rows="7" placeholder="Collez ici votre procédure, votre note de service, votre mode d'emploi…"></textarea>
+
+      <div class="doc-ou"><span>ou</span></div>
+
+      <input type="file" id="doc-fichier" accept=".pdf,.docx,.txt,.md,text/plain">
+      <div class="doc-fichier-etat" id="doc-fichier-etat" style="display:none;"></div>
+
+      <button class="btn block" style="margin-top:14px;" id="doc-generer" disabled>Générer les étapes</button>
+      <div class="error-msg" id="doc-erreur"></div>
+    </div>
+
+    <div class="card" id="doc-attente-card" style="display:none; text-align:center; padding:28px 20px;">
+      <div class="ga-anneau" id="doc-anneau" style="margin:0 auto 16px;"></div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:4px;">L'IA lit votre document…</div>
+      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;">
+        Quelques secondes. Vous relirez chaque étape ensuite.
+      </div>
+    </div>
   </div>
 
   <div class="screen" id="p-create-ai">
@@ -2992,8 +3062,27 @@ async function ouvrirCibleQR() {
   // On efface le paramètre de l'adresse pour qu'un rechargement plus tard ne
   // renvoie pas indéfiniment sur la même procédure.
   try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
-  if (currentMembre?.role === 'gestion') openAnalyse(id)
-  else openEquipeDetail(id)
+
+  if (currentMembre?.role === 'gestion') { openAnalyse(id); return }
+
+  /* Arrivée depuis l'appareil photo du téléphone : c'est souvent le tout premier
+     contact avec Procédo, juste après la création du compte. On accueille. */
+  if (estNouvelUtilisateur()) {
+    const proc = allEquipeProcedures.find(p => p.id === id)
+    let titre = proc?.titre, categorie = proc?.categorie
+    if (!titre) {
+      const { data } = await supabase.from('procedures')
+        .select('titre, categorie').eq('id', id).maybeSingle()
+      titre = data?.titre; categorie = data?.categorie
+    }
+    if (titre) {
+      marquerBienvenueVue()
+      const ok = await fenetreBienvenue(titre, categorie)
+      if (!ok) return
+    }
+  }
+
+  openEquipeDetail(id)
 }
 
 /* Renvoie true si l'app a été relancée sur une autre entreprise — dans ce cas
@@ -4505,11 +4594,206 @@ document.getElementById('new-categorie')?.addEventListener('input', updateModeCa
 
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
+  if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
   if (mode === 'manual') showGestionScreen('p-create-manual')
   else if (mode === 'video') showGestionScreen('p-create-video')
   else showGestionScreen('p-create-ai')
 }
 window.goToCreateMode = goToCreateMode
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GESTION : L'IA LIT UN DOCUMENT
+
+   Le texte peut venir de trois endroits : collé à la main, extrait d'un PDF, ou
+   extrait d'un Word. L'extraction se fait dans le navigateur — le fichier ne
+   quitte jamais l'appareil, seul son texte part vers l'IA. C'est plus rapide,
+   moins cher, et plus respectueux de ce que contiennent ces documents.
+
+   Le résultat n'est pas publié directement : il remplit l'éditeur d'étapes
+   manuelles, où la personne relit, corrige et complète avant de publier.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DOC_TAILLE_MAX = 12 * 1024 * 1024      // 12 Mo
+const DOC_TEXTE_MAX = 60000                  // au-delà, on tronque avant d'envoyer
+let docTexteExtrait = ''
+let docNomFichier = ''
+
+function resetDocScreen() {
+  docTexteExtrait = ''
+  docNomFichier = ''
+  const t = document.getElementById('doc-texte'); if (t) t.value = ''
+  const f = document.getElementById('doc-fichier'); if (f) f.value = ''
+  const e = document.getElementById('doc-fichier-etat'); if (e) e.style.display = 'none'
+  const err = document.getElementById('doc-erreur'); if (err) err.textContent = ''
+  document.getElementById('doc-saisie-card').style.display = 'block'
+  document.getElementById('doc-attente-card').style.display = 'none'
+  majBoutonDoc()
+}
+
+function texteDocCourant() {
+  const saisi = (document.getElementById('doc-texte')?.value || '').trim()
+  return saisi || docTexteExtrait
+}
+
+function majBoutonDoc() {
+  const btn = document.getElementById('doc-generer')
+  if (!btn) return
+  const t = texteDocCourant()
+  btn.disabled = t.length < 40
+  const err = document.getElementById('doc-erreur')
+  if (err && t.length > 0 && t.length < 40) {
+    err.style.color = 'var(--label-3)'
+    err.textContent = 'Encore un peu de texte : il en faut au moins quelques phrases.'
+  } else if (err && err.style.color === 'var(--label-3)') {
+    err.textContent = ''
+  }
+}
+
+document.getElementById('doc-texte')?.addEventListener('input', () => {
+  // Un texte collé remplace le fichier : on ne mélange pas les deux sources.
+  if (document.getElementById('doc-texte').value.trim()) {
+    docTexteExtrait = ''
+    const e = document.getElementById('doc-fichier-etat'); if (e) e.style.display = 'none'
+  }
+  majBoutonDoc()
+})
+
+/* ── Extraction du texte selon le type de fichier ────────────────────── */
+
+let mammothLib = null, pdfjsLib = null
+
+async function ensureMammoth() {
+  if (mammothLib) return mammothLib
+  const m = await import('https://cdn.jsdelivr.net/npm/mammoth@1.8.0/+esm')
+  mammothLib = m.default || m
+  return mammothLib
+}
+
+async function ensurePdfjs() {
+  if (pdfjsLib) return pdfjsLib
+  const m = await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.min.mjs')
+  m.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.6.82/build/pdf.worker.min.mjs'
+  pdfjsLib = m
+  return pdfjsLib
+}
+
+async function extraireTexte(fichier) {
+  const nom = fichier.name.toLowerCase()
+
+  if (nom.endsWith('.txt') || nom.endsWith('.md') || fichier.type === 'text/plain') {
+    return await fichier.text()
+  }
+
+  if (nom.endsWith('.docx')) {
+    const mammoth = await ensureMammoth()
+    const buffer = await fichier.arrayBuffer()
+    const res = await mammoth.extractRawText({ arrayBuffer: buffer })
+    return res.value || ''
+  }
+
+  if (nom.endsWith('.pdf')) {
+    const pdfjs = await ensurePdfjs()
+    const buffer = await fichier.arrayBuffer()
+    const doc = await pdfjs.getDocument({ data: buffer }).promise
+    const morceaux = []
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i)
+      const contenu = await page.getTextContent()
+      morceaux.push(contenu.items.map(x => x.str).join(' '))
+    }
+    return morceaux.join('\n\n')
+  }
+
+  if (nom.endsWith('.doc')) {
+    throw new Error("Les fichiers .doc (ancien format Word) ne peuvent pas \u00eatre lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.")
+  }
+
+  throw new Error("Format non reconnu. Acceptés : PDF, Word (.docx), texte (.txt).")
+}
+
+document.getElementById('doc-fichier')?.addEventListener('change', async (e) => {
+  const fichier = e.target.files[0]
+  const etat = document.getElementById('doc-fichier-etat')
+  const err = document.getElementById('doc-erreur')
+  err.style.color = 'var(--red)'
+  err.textContent = ''
+  if (!fichier) return
+
+  if (fichier.size > DOC_TAILLE_MAX) {
+    err.textContent = 'Fichier trop lourd : 12 Mo maximum.'
+    e.target.value = ''
+    return
+  }
+
+  etat.style.display = 'flex'
+  etat.innerHTML = `<span class="ic">\u23F3</span><span class="tx">
+    <span class="n">${escapeHtml(fichier.name)}</span>
+    <span class="s">Lecture du document\u2026</span></span>`
+
+  try {
+    const texte = (await extraireTexte(fichier)).replace(/\s+\n/g, '\n').trim()
+    if (texte.length < 40) {
+      throw new Error("Ce document ne contient presque pas de texte. S'il s'agit d'un PDF scann\u00e9, l'image du texte ne peut pas \u00eatre lue.")
+    }
+    docTexteExtrait = texte
+    docNomFichier = fichier.name
+    document.getElementById('doc-texte').value = ''
+    const mots = texte.split(/\s+/).length
+    etat.innerHTML = `<span class="ic">\u2705</span><span class="tx">
+      <span class="n">${escapeHtml(fichier.name)}</span>
+      <span class="s">${mots.toLocaleString('fr-FR')} mots lus</span></span>`
+  } catch (ex) {
+    docTexteExtrait = ''
+    etat.style.display = 'none'
+    e.target.value = ''
+    err.textContent = ex instanceof Error ? ex.message : String(ex)
+  }
+  majBoutonDoc()
+})
+
+/* ── Envoi à l'IA, puis relecture dans l'éditeur manuel ────────────── */
+
+document.getElementById('doc-generer')?.addEventListener('click', async () => {
+  const err = document.getElementById('doc-erreur')
+  err.style.color = 'var(--red)'
+  err.textContent = ''
+
+  const titre = document.getElementById('new-titre').value.trim()
+  const categorie = document.getElementById('new-categorie').value.trim()
+  let texte = texteDocCourant()
+  if (!titre) { err.textContent = 'Le titre est obligatoire (page pr\u00e9c\u00e9dente).'; return }
+  if (texte.length > DOC_TEXTE_MAX) texte = texte.slice(0, DOC_TEXTE_MAX)
+
+  document.getElementById('doc-saisie-card').style.display = 'none'
+  document.getElementById('doc-attente-card').style.display = 'block'
+  dessinerAnneau('doc-anneau', 100, 'var(--blue)', '\u2726')
+
+  try {
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-texte`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ titre, categorie, texte }),
+    })
+    const data = await rep.json()
+    if (!rep.ok || data.error) throw new Error(data.error || 'La g\u00e9n\u00e9ration a \u00e9chou\u00e9.')
+    if (!Array.isArray(data.etapes) || data.etapes.length === 0) {
+      throw new Error("L'IA n'a pas trouv\u00e9 d'\u00e9tapes dans ce document. Il d\u00e9crit peut-\u00eatre une situation plut\u00f4t qu'une marche \u00e0 suivre.")
+    }
+
+    /* On remplit l'éditeur manuel plutôt que de publier : la personne relit,
+       corrige, ajoute une photo si elle veut, puis publie elle-même. L'IA
+       propose, elle ne décide pas. */
+    manualSteps = data.etapes.map(e => ({ texte: String(e.texte || e).trim() })).filter(e => e.texte)
+    renderManualSteps()
+    showGestionScreen('p-create-manual')
+    toast(`${manualSteps.length} \u00e9tape${manualSteps.length > 1 ? 's' : ''} propos\u00e9e${manualSteps.length > 1 ? 's' : ''} \u00b7 relisez avant de publier`)
+    resetDocScreen()
+  } catch (ex) {
+    document.getElementById('doc-attente-card').style.display = 'none'
+    document.getElementById('doc-saisie-card').style.display = 'block'
+    err.textContent = ex instanceof Error ? ex.message : String(ex)
+  }
+})
 
 // ═══════════ GESTION : L'IA découpe la vidéo ═══════════
 let aiVideoFile = null
@@ -7412,10 +7696,33 @@ async function confirmerOuvertureScan(procId, espace) {
     return
   }
 
-  const ok = await fenetreBienvenue(titre, categorie)
-  if (!ok) return
+  /* La fenêtre de bienvenue est un moment de découverte : elle n'a de sens que
+     la première fois. Un employé qui scanne son dixième QR de la semaine n'a pas
+     besoin qu'on lui souhaite la bienvenue — il veut sa procédure. */
+  if (espace !== 'gestion' && estNouvelUtilisateur()) {
+    marquerBienvenueVue()
+    const ok = await fenetreBienvenue(titre, categorie)
+    if (!ok) return
+  }
+
   if (espace === 'gestion') openAnalyse(procId)
   else openEquipeDetail(procId)
+}
+
+/* Nouvel utilisateur : quelqu'un qui n'a encore consulté aucune procédure, et
+   à qui l'on n'a pas déjà souhaité la bienvenue sur cet appareil. Les deux
+   conditions se complètent : la première vient de la base et vaut partout, la
+   seconde évite de répéter l'accueil à quelqu'un qui scanne deux fois avant
+   d'avoir lu quoi que ce soit. */
+function estNouvelUtilisateur() {
+  if (currentMembre?.role === 'gestion') return false
+  try { if (localStorage.getItem('procedo_bienvenue') === '1') return false } catch (e) {}
+  const aDejaLu = (mesLectures || []).length > 0 || (equipeLues && equipeLues.size > 0)
+  return !aDejaLu
+}
+
+function marquerBienvenueVue() {
+  try { localStorage.setItem('procedo_bienvenue', '1') } catch (e) {}
 }
 
 /* Fenêtre d'accueil : le Memoji salue, la procédure est nommée, un bouton pour

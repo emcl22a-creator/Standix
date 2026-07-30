@@ -8597,9 +8597,17 @@ function peindreTiroir() {
 
   const courantId = currentMembre?.entreprise_id
   const courant = mesEtablissements.find(e => e.id === courantId) || mesEtablissements[0]
-  const ouvert = tiroir.classList.contains('ouvert')
 
-  let html = rondEtabHtml(courant, true, 'data-etab-decl')
+  /* Avec un seul établissement, il n'y a rien vers quoi basculer : le tiroir n'a
+     plus qu'un usage, ajouter le suivant. Le replier reviendrait à cacher un
+     bouton derrière un geste qui ne révèle rien d'autre. On le laisse donc
+     ouvert : le cercle de l'établissement, puis le « + », et c'est tout.
+     Dès qu'il y en a deux, le pliage reprend son sens et revient. */
+  const seul = mesEtablissements.length === 1
+  if (seul) tiroir.classList.add('ouvert')
+  const ouvert = seul || tiroir.classList.contains('ouvert')
+
+  let html = rondEtabHtml(courant, true, seul ? '' : 'data-etab-decl')
   if (ouvert) {
     html += mesEtablissements
       .filter(e => e.id !== courant.id)
@@ -8630,10 +8638,13 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-etab-plus]')) { fermerTiroir(); ouvrirFenetreEtab(null); return }
   if (e.target.closest('#tiroir-ent')) return
 
-  fermerTiroir()
+  // Avec un seul établissement, le tiroir reste ouvert : rien à replier.
+  if (mesEtablissements.length > 1) fermerTiroir()
 })
 
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiroir() })
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mesEtablissements.length > 1) fermerTiroir()
+})
 
 /* Changer d'établissement, c'est changer de fiche membre : on relance l'app avec
    celle qui a été choisie, ce qui recharge procédures, équipe et droits. */

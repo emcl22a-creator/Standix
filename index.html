@@ -308,6 +308,39 @@
   .contact-carte .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .contact-carte .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
 
+  /* ═══ Choix de la langue ═══ */
+  .langue-grille{ display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
+  .langue-choix{
+    display:flex; align-items:center; gap:9px; padding:10px 12px; border-radius:12px;
+    border:1px solid var(--border); background:var(--bg-card); color:#fff;
+    font-family:inherit; font-size:13px; font-weight:600; text-align:left;
+    transition:border-color 0.2s, background 0.2s;
+  }
+  .langue-choix .dr{ font-size:17px; line-height:1; flex-shrink:0; }
+  .langue-choix .nm{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .langue-choix.actif{ border-color:#fff; background:rgba(255,255,255,0.12); }
+  .langue-choix .coche{ color:var(--green); font-weight:800; flex-shrink:0; }
+
+  /* Le bouton de langue sur une fiche de procédure */
+  .langue-proc{
+    display:flex; align-items:center; gap:10px; text-align:left; margin-bottom:6px;
+  }
+  .langue-proc .ic{ font-size:16px; flex-shrink:0; }
+  .langue-proc .tx{ flex:1; min-width:0; }
+  .langue-proc .fl{ color:var(--label-3); flex-shrink:0; }
+  .langue-proc.traduit{ border-color:rgba(10,132,255,0.4); background:rgba(10,132,255,0.10); }
+
+  /* Bandeau rappelant qu'on lit une traduction */
+  .traduction-note{
+    display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:12px;
+    background:rgba(10,132,255,0.10); border:0.5px solid rgba(10,132,255,0.28);
+    font-size:11.5px; color:var(--label-2); line-height:1.4; margin-bottom:10px;
+  }
+  .traduction-note button{
+    border:none; background:none; color:var(--blue); font-family:inherit;
+    font-size:11.5px; font-weight:700; flex-shrink:0; padding:0;
+  }
+
   /* ═══ Création à partir d'un document ═══ */
   .doc-ou{
     display:flex; align-items:center; gap:12px; margin:16px 0 14px;
@@ -367,6 +400,15 @@
   }
   .bienvenue .proc .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .bienvenue .proc .c{ font-size:11.5px; color:var(--label-3); margin-top:3px; }
+  /* Version sobre, pour quelqu'un qui connaît déjà : une coche, pas un Memoji. */
+  .bienvenue .code-ic{
+    width:54px; height:54px; margin:0 auto 14px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:25px; font-weight:800; color:#06210F; background:var(--green);
+    box-shadow:0 0 0 6px rgba(48,209,88,0.14);
+    animation:salutArrive 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .bienvenue-fond.sobre .bienvenue{ padding-top:22px; }
   .bienvenue .btn{ margin-top:16px; }
   .bienvenue .refus{
     display:block; width:100%; margin-top:10px; padding:9px; border:none; background:none;
@@ -411,9 +453,9 @@
   .med-liste{ display:flex; flex-direction:column; gap:2px; }
   .med-ligne{ display:flex; align-items:center; gap:13px; padding:9px 2px; }
   .med-ligne + .med-ligne{ border-top:0.5px solid rgba(255,255,255,0.08); }
-  .med-ligne .txt{ flex:1; min-width:0; }
-  .med-ligne .nom{ font-size:13.5px; font-weight:700; letter-spacing:-0.02em; text-transform:capitalize; }
-  .med-ligne .cond{ font-size:11.5px; color:var(--label-2); margin-top:2px; }
+  .med-ligne .txt{ flex:1; min-width:0; display:block; }
+  .med-ligne .nom{ display:block; font-size:13.5px; font-weight:700; letter-spacing:-0.02em; text-transform:capitalize; }
+  .med-ligne .cond{ display:block; font-size:11.5px; color:var(--label-2); margin-top:2px; }
 
   /* ═══ Mon activité (espace équipe) ═══ */
   /* Les trois tuiles n'affichaient pas la même chose — un anneau de 58 px d'un
@@ -465,10 +507,10 @@
     width:22px; flex-shrink:0; font-size:11px; font-weight:800;
     color:var(--label-3); text-align:center;
   }
-  .ma-ligne .info{ flex:1; min-width:0; }
-  .ma-ligne .nom{ font-size:14px; font-weight:650; letter-spacing:-0.02em;
+  .ma-ligne .info{ flex:1; min-width:0; display:block; }
+  .ma-ligne .nom{ display:block; font-size:14px; font-weight:650; letter-spacing:-0.02em;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .ma-ligne .quand{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
+  .ma-ligne .quand{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
   .ma-ligne .duree{ font-size:14px; font-weight:750; flex-shrink:0; }
   .ma-ligne .jauge{ height:4px; border-radius:4px; background:rgba(255,255,255,0.09);
     margin-top:6px; overflow:hidden; }
@@ -2220,6 +2262,12 @@
       <video id="analyse-video" controls playsinline webkit-playsinline></video>
     </div>
 
+    <button type="button" class="btn ghost block langue-proc" id="detail-langue">
+      <span class="ic">🌐</span>
+      <span class="tx" id="detail-langue-txt">Lire dans une autre langue</span>
+      <span class="fl">›</span>
+    </button>
+
     <div class="section-title">Étapes de la procédure</div>
     <div id="analyse-steps-list"></div>
 
@@ -2576,6 +2624,12 @@
       <div class="error-msg" id="es-error"></div>
     </div>
 
+    <div class="section-title">Langue</div>
+    <div class="card">
+      <label class="f">Langue de l'application</label>
+      <div class="langue-grille" id="langue-app"></div>
+    </div>
+
     <div class="section-title">Vos entreprises</div>
     <div id="es-entreprises"></div>
 
@@ -2713,6 +2767,161 @@ let equipeCatCourante = null
 let equipeCatQuery = ''
 let scanStream = null
 let scanLoopActive = false
+/* ═══════════════════════════════════════════════════════════════════════════
+   LANGUES
+
+   Deux choses distinctes, et il ne faut pas les confondre :
+
+   • la langue de L'APP — les libellés, les boutons, les messages. Elle se
+     choisit dans les réglages et vaut pour toute la navigation.
+   • la langue d'UNE PROCÉDURE — son titre et ses étapes. Elle se choisit sur la
+     fiche elle-même, parce qu'on peut vouloir lire une consigne en portugais
+     tout en gardant l'app en français.
+
+   La procédure d'origine reste la référence : rien n'est écrit en base. Une
+   traduction est une aide à la lecture, pas une nouvelle version officielle —
+   distinction qui compte pour une consigne de travail.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const LANGUES = [
+  { code: 'fr', nom: 'Fran\u00e7ais',   drapeau: '\uD83C\uDDEB\uD83C\uDDF7' },
+  { code: 'en', nom: 'English',    drapeau: '\uD83C\uDDEC\uD83C\uDDE7' },
+  { code: 'es', nom: 'Espa\u00f1ol',    drapeau: '\uD83C\uDDEA\uD83C\uDDF8' },
+  { code: 'pt', nom: 'Portugu\u00eas',  drapeau: '\uD83C\uDDF5\uD83C\uDDF9' },
+  { code: 'it', nom: 'Italiano',   drapeau: '\uD83C\uDDEE\uD83C\uDDF9' },
+  { code: 'de', nom: 'Deutsch',    drapeau: '\uD83C\uDDE9\uD83C\uDDEA' },
+  { code: 'ar', nom: '\u0627\u0644\u0639\u0631\u0628\u064a\u0629', drapeau: '\uD83C\uDDF8\uD83C\uDDE6' },
+  { code: 'tr', nom: 'T\u00fcrk\u00e7e',     drapeau: '\uD83C\uDDF9\uD83C\uDDF7' },
+  { code: 'pl', nom: 'Polski',     drapeau: '\uD83C\uDDF5\uD83C\uDDF1' },
+  { code: 'ro', nom: 'Rom\u00e2n\u0103',    drapeau: '\uD83C\uDDF7\uD83C\uDDF4' },
+  { code: 'uk', nom: '\u0423\u043a\u0440\u0430\u0457\u043d\u0441\u044c\u043a\u0430', drapeau: '\uD83C\uDDFA\uD83C\uDDE6' },
+  { code: 'zh', nom: '\u4e2d\u6587',      drapeau: '\uD83C\uDDE8\uD83C\uDDF3' },
+]
+
+/* Le dictionnaire de l'app. Il ne couvre que l'espace équipe et les réglages :
+   c'est là que se trouvent les personnes qui ne parlent pas français. L'espace
+   gestion reste en français — le gérant est celui qui a créé l'entreprise.
+   La clé est la phrase française elle-même : pas de code à inventer, et une
+   phrase sans traduction reste simplement en français. */
+const DICO = {
+  en: {
+    'Espace \u00c9quipe': 'Team space', 'Proc\u00e9dures': 'Procedures', 'Activit\u00e9': 'Activity',
+    'Mon activit\u00e9': 'My activity', 'Cat\u00e9gories': 'Categories', 'Param\u00e8tres': 'Settings',
+    'Rechercher une proc\u00e9dure': 'Search a procedure', 'Lues': 'Read', 'Temps total': 'Total time',
+    "Jours d'affil\u00e9e": 'Day streak', 'En chiffres': 'In figures', 'Par cat\u00e9gorie': 'By category',
+    'Temps par proc\u00e9dure': 'Time per procedure', 'Il vous reste \u00e0 lire': 'Left to read',
+    'Rien ne vous attend': 'Nothing pending', '\u00c9tapes de la proc\u00e9dure': 'Procedure steps',
+    'Proc\u00e9dure consult\u00e9e': 'Procedure read', 'Aucune \u00e9tape': 'No steps',
+    'Vos informations': 'Your details', 'Nom complet': 'Full name', 'E-mail': 'Email',
+    'Enregistrer': 'Save', 'Vos entreprises': 'Your companies', 'Basculer': 'Switch',
+    'Rejoindre': 'Join', 'Rejoindre une autre entreprise': 'Join another company',
+    'Compte': 'Account', 'Se d\u00e9connecter': 'Sign out', 'Une question ?': 'A question?',
+    '\u00c9crivez-nous': 'Write to us', 'Langue': 'Language', "Langue de l'application": 'App language',
+    'Scanner un QR code': 'Scan a QR code', 'Code reconnu': 'Code recognised',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Open the procedure', "Ce n'est pas celle-l\u00e0": "That's not the one",
+    'Bienvenue': 'Welcome', 'Enregistr\u00e9 \u00e0 l\u2019instant': 'Just saved',
+  },
+  es: {
+    'Espace \u00c9quipe': 'Espacio Equipo', 'Proc\u00e9dures': 'Procedimientos', 'Activit\u00e9': 'Actividad',
+    'Mon activit\u00e9': 'Mi actividad', 'Cat\u00e9gories': 'Categor\u00edas', 'Param\u00e8tres': 'Ajustes',
+    'Rechercher une proc\u00e9dure': 'Buscar un procedimiento', 'Lues': 'Le\u00eddas', 'Temps total': 'Tiempo total',
+    "Jours d'affil\u00e9e": 'D\u00edas seguidos', 'En chiffres': 'En cifras', 'Par cat\u00e9gorie': 'Por categor\u00eda',
+    'Temps par proc\u00e9dure': 'Tiempo por procedimiento', 'Il vous reste \u00e0 lire': 'Te queda por leer',
+    'Rien ne vous attend': 'Nada pendiente', '\u00c9tapes de la proc\u00e9dure': 'Pasos del procedimiento',
+    'Proc\u00e9dure consult\u00e9e': 'Procedimiento le\u00eddo', 'Aucune \u00e9tape': 'Sin pasos',
+    'Vos informations': 'Tus datos', 'Nom complet': 'Nombre completo', 'E-mail': 'Correo',
+    'Enregistrer': 'Guardar', 'Vos entreprises': 'Tus empresas', 'Basculer': 'Cambiar',
+    'Rejoindre': 'Unirse', 'Rejoindre une autre entreprise': 'Unirse a otra empresa',
+    'Compte': 'Cuenta', 'Se d\u00e9connecter': 'Cerrar sesi\u00f3n', 'Une question ?': '\u00bfUna pregunta?',
+    '\u00c9crivez-nous': 'Escr\u00edbenos', 'Langue': 'Idioma', "Langue de l'application": 'Idioma de la app',
+    'Scanner un QR code': 'Escanear un c\u00f3digo QR', 'Code reconnu': 'C\u00f3digo reconocido',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir el procedimiento', "Ce n'est pas celle-l\u00e0": 'No es este',
+    'Bienvenue': 'Bienvenido',
+  },
+  pt: {
+    'Espace \u00c9quipe': 'Espa\u00e7o Equipa', 'Proc\u00e9dures': 'Procedimentos', 'Activit\u00e9': 'Atividade',
+    'Mon activit\u00e9': 'A minha atividade', 'Cat\u00e9gories': 'Categorias', 'Param\u00e8tres': 'Defini\u00e7\u00f5es',
+    'Rechercher une proc\u00e9dure': 'Procurar um procedimento', 'Lues': 'Lidos', 'Temps total': 'Tempo total',
+    "Jours d'affil\u00e9e": 'Dias seguidos', 'En chiffres': 'Em n\u00fameros', 'Par cat\u00e9gorie': 'Por categoria',
+    'Temps par proc\u00e9dure': 'Tempo por procedimento', 'Il vous reste \u00e0 lire': 'Falta ler',
+    'Rien ne vous attend': 'Nada pendente', '\u00c9tapes de la proc\u00e9dure': 'Etapas do procedimento',
+    'Proc\u00e9dure consult\u00e9e': 'Procedimento lido', 'Aucune \u00e9tape': 'Sem etapas',
+    'Vos informations': 'Os seus dados', 'Nom complet': 'Nome completo', 'E-mail': 'E-mail',
+    'Enregistrer': 'Guardar', 'Vos entreprises': 'As suas empresas', 'Basculer': 'Mudar',
+    'Rejoindre': 'Aderir', 'Rejoindre une autre entreprise': 'Aderir a outra empresa',
+    'Compte': 'Conta', 'Se d\u00e9connecter': 'Terminar sess\u00e3o', 'Une question ?': 'Uma pergunta?',
+    '\u00c9crivez-nous': 'Escreva-nos', 'Langue': 'Idioma', "Langue de l'application": 'Idioma da app',
+    'Scanner un QR code': 'Ler um c\u00f3digo QR', 'Code reconnu': 'C\u00f3digo reconhecido',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir o procedimento', "Ce n'est pas celle-l\u00e0": 'N\u00e3o \u00e9 este',
+    'Bienvenue': 'Bem-vindo',
+  },
+  ar: {
+    'Espace \u00c9quipe': '\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u0641\u0631\u064a\u0642', 'Proc\u00e9dures': '\u0627\u0644\u0625\u062c\u0631\u0627\u0621\u0627\u062a',
+    'Activit\u00e9': '\u0627\u0644\u0646\u0634\u0627\u0637', 'Cat\u00e9gories': '\u0627\u0644\u0641\u0626\u0627\u062a', 'Param\u00e8tres': '\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a',
+    'Lues': '\u0645\u0642\u0631\u0648\u0621\u0629', 'Temps total': '\u0627\u0644\u0648\u0642\u062a \u0627\u0644\u0625\u062c\u0645\u0627\u0644\u064a',
+    'Se d\u00e9connecter': '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062e\u0631\u0648\u062c', 'Langue': '\u0627\u0644\u0644\u063a\u0629',
+    'Acc\u00e9der \u00e0 la proc\u00e9dure': '\u0641\u062a\u062d \u0627\u0644\u0625\u062c\u0631\u0627\u0621', 'Bienvenue': '\u0645\u0631\u062d\u0628\u0627\u064b',
+  },
+}
+
+let langueApp = 'fr'
+
+function chargerLangue() {
+  try { langueApp = localStorage.getItem('procedo_langue') || 'fr' } catch (e) { langueApp = 'fr' }
+  appliquerLangue()
+}
+
+function definirLangue(code) {
+  langueApp = code
+  try { localStorage.setItem('procedo_langue', code) } catch (e) {}
+  appliquerLangue()
+}
+
+/* Traduit une phrase si le dictionnaire la connaît, la laisse telle quelle
+   sinon. Une phrase manquante reste en français : c'est moins gênant qu'un
+   libellé vide ou qu'un code technique à l'écran. */
+function t(phrase) {
+  if (langueApp === 'fr') return phrase
+  return DICO[langueApp]?.[phrase] || phrase
+}
+
+/* Parcourt les textes de l'espace équipe et remplace ceux que le dictionnaire
+   connaît. On ne touche qu'aux correspondances EXACTES : un titre de procédure
+   ou un nom de catégorie ne figure pas dans le dictionnaire, il ne risque donc
+   jamais d'être modifié. */
+function appliquerLangue() {
+  const racines = [
+    document.getElementById('equipe-app'),
+    document.getElementById('tabbar-equipe'),
+  ].filter(Boolean)
+
+  const dico = DICO[langueApp]
+  document.documentElement.lang = langueApp
+  document.documentElement.dir = langueApp === 'ar' ? 'rtl' : 'ltr'
+
+  for (const racine of racines) {
+    const parcours = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT)
+    const aTraiter = []
+    let n
+    while ((n = parcours.nextNode())) aTraiter.push(n)
+
+    for (const noeud of aTraiter) {
+      const brut = noeud.nodeValue.trim()
+      if (!brut) continue
+      // On garde l'original une fois pour toutes : sans lui, repasser en
+      // français après deux changements de langue serait impossible.
+      if (!noeud.__vo) noeud.__vo = brut
+      const cible = langueApp === 'fr' ? noeud.__vo : (dico?.[noeud.__vo] || noeud.__vo)
+      if (noeud.nodeValue.trim() !== cible) noeud.nodeValue = noeud.nodeValue.replace(brut, cible)
+    }
+    // Les textes d'invite des champs de saisie
+    racine.querySelectorAll('[placeholder]').forEach(el => {
+      if (!el.__vo) el.__vo = el.getAttribute('placeholder')
+      el.setAttribute('placeholder', langueApp === 'fr' ? el.__vo : (dico?.[el.__vo] || el.__vo))
+    })
+  }
+}
+
 let selectedSpace = 'gestion' // espace choisi sur le premier écran
 
 /* ═══ Arrivée par un QR code ═══
@@ -3026,6 +3235,7 @@ async function enterApp(membre) {
     appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     document.getElementById('tabbar-equipe').style.display = 'flex'
     mesurerOnglets()
+    chargerLangue()
     window.jalon?.('APP AFFICHÉE')
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
@@ -3077,7 +3287,7 @@ async function ouvrirCibleQR() {
     }
     if (titre) {
       marquerBienvenueVue()
-      const ok = await fenetreBienvenue(titre, categorie)
+      const ok = await fenetreBienvenue(titre, categorie, true)
       if (!ok) return
     }
   }
@@ -7272,6 +7482,13 @@ async function openEquipeDetail(procId) {
      c'était un défaut d'affichage ou une procédure incomplète. Elle le dit
      maintenant. Le cas arrive quand une analyse automatique a échoué : la
      procédure existe, ses étapes n'ont jamais été écrites. */
+  // On repart du français à chaque ouverture : une traduction est liée à une
+  // consultation, pas au compte.
+  procCouranteId = procId
+  langueProcCourante = 'fr'
+  document.getElementById('trad-note')?.remove()
+  majBoutonLangueProc()
+
   if (!etapes || etapes.length === 0) {
     stepsEl.innerHTML = `<div class="empty-state">
       <h3>Aucune étape</h3>
@@ -7294,6 +7511,7 @@ let mesAdhesions = []
 
 window.openEquipeSettings = async function() {
   showEquipeScreen('e-settings')
+  rendreChoixLangueApp()
   document.getElementById('es-nom').value = currentMembre?.nom || ''
   const { data: { user } } = await supabase.auth.getUser()
   document.getElementById('es-email').value = user?.email || ''
@@ -7587,6 +7805,160 @@ async function enregistrerConsultation() {
   loadEquipeProcedures()
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHOIX DES LANGUES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function rendreChoixLangueApp() {
+  const zone = document.getElementById('langue-app')
+  if (!zone) return
+  zone.innerHTML = LANGUES.map(l => `
+    <button type="button" class="langue-choix${l.code === langueApp ? ' actif' : ''}" data-langue="${l.code}">
+      <span class="dr">${l.drapeau}</span>
+      <span class="nm">${l.nom}</span>
+      ${l.code === langueApp ? '<span class="coche">\u2713</span>' : ''}
+    </button>`).join('')
+}
+
+document.getElementById('langue-app')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-langue]')
+  if (!b) return
+  definirLangue(b.dataset.langue)
+  rendreChoixLangueApp()
+  toast(LANGUES.find(l => l.code === langueApp)?.nom || '')
+})
+
+/* ── Traduction d'une procédure ───────────────────────────────────
+
+   Les traductions sont gardées en mémoire le temps de la session : relire la
+   même procédure dans la même langue ne recoute rien et ne fait pas attendre.
+   Rien n'est écrit en base : l'original reste la référence. */
+const traductionsEnCache = {}
+let langueProcCourante = 'fr'
+let procCouranteId = null
+
+async function choisirLangueProcedure() {
+  const choix = await fenetreLangues(langueProcCourante)
+  if (!choix) return
+  if (choix === langueProcCourante) return
+
+  if (choix === 'fr') {
+    langueProcCourante = 'fr'
+    openEquipeDetail(procCouranteId)
+    return
+  }
+
+  const cle = procCouranteId + ':' + choix
+  const btn = document.getElementById('detail-langue')
+  const txtBtn = document.getElementById('detail-langue-txt')
+
+  if (!traductionsEnCache[cle]) {
+    if (txtBtn) txtBtn.textContent = 'Traduction en cours\u2026'
+    if (btn) btn.disabled = true
+    try {
+      const etapes = [...document.querySelectorAll('#detail-steps .detail-step p')].map(e => e.textContent)
+      const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-traduire`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({
+          langue: choix,
+          titre: document.getElementById('detail-titre').textContent,
+          etapes,
+        }),
+      })
+      const data = await rep.json()
+      if (!rep.ok || data.error) throw new Error(data.error || 'La traduction a \u00e9chou\u00e9.')
+      traductionsEnCache[cle] = data
+    } catch (ex) {
+      if (btn) btn.disabled = false
+      majBoutonLangueProc()
+      await confirmDialog({
+        titre: 'Traduction impossible',
+        message: ex instanceof Error ? ex.message : String(ex),
+        confirmer: 'Compris', annuler: 'Fermer', danger: false,
+      })
+      return
+    }
+    if (btn) btn.disabled = false
+  }
+
+  langueProcCourante = choix
+  appliquerTraduction(traductionsEnCache[cle])
+}
+
+function appliquerTraduction(trad) {
+  document.getElementById('detail-titre').textContent = trad.titre
+  const lignes = [...document.querySelectorAll('#detail-steps .detail-step p')]
+  trad.etapes.forEach((texte, i) => { if (lignes[i]) lignes[i].textContent = texte })
+  majBoutonLangueProc()
+
+  /* Un bandeau rappelle qu'on lit une traduction, avec le retour à l'original à
+     portée de doigt. Une consigne de travail traduite automatiquement peut
+     comporter une nuance perdue : autant que ce soit dit. */
+  const steps = document.getElementById('detail-steps')
+  if (steps && !document.getElementById('trad-note')) {
+    const note = document.createElement('div')
+    note.className = 'traduction-note'
+    note.id = 'trad-note'
+    note.innerHTML = `<span style="flex:1">Traduction automatique. L'original fran\u00e7ais fait foi.</span>
+      <button type="button">Revenir au fran\u00e7ais</button>`
+    note.querySelector('button').addEventListener('click', () => {
+      langueProcCourante = 'fr'
+      openEquipeDetail(procCouranteId)
+    })
+    steps.parentNode.insertBefore(note, steps)
+  }
+}
+
+function majBoutonLangueProc() {
+  const txt = document.getElementById('detail-langue-txt')
+  const btn = document.getElementById('detail-langue')
+  if (!txt || !btn) return
+  const l = LANGUES.find(x => x.code === langueProcCourante)
+  btn.classList.toggle('traduit', langueProcCourante !== 'fr')
+  txt.textContent = langueProcCourante === 'fr'
+    ? 'Lire dans une autre langue'
+    : `${l?.drapeau || ''} ${l?.nom || ''}`
+}
+
+document.getElementById('detail-langue')?.addEventListener('click', choisirLangueProcedure)
+
+/* Fenêtre de choix de langue, réutilisée telle quelle par la fiche. */
+function fenetreLangues(courante) {
+  return new Promise((resoudre) => {
+    const fond = document.createElement('div')
+    fond.className = 'bienvenue-fond'
+    fond.innerHTML = `
+      <div class="bienvenue" role="dialog" aria-modal="true" style="max-width:340px;">
+        <h3 style="margin-bottom:4px;">Lire dans quelle langue ?</h3>
+        <div class="intro" style="margin-bottom:16px;">La traduction est automatique. L'original fran\u00e7ais reste la r\u00e9f\u00e9rence.</div>
+        <div class="langue-grille">
+          ${LANGUES.map(l => `
+            <button type="button" class="langue-choix${l.code === courante ? ' actif' : ''}" data-l="${l.code}">
+              <span class="dr">${l.drapeau}</span><span class="nm">${l.nom}</span>
+              ${l.code === courante ? '<span class="coche">\u2713</span>' : ''}
+            </button>`).join('')}
+        </div>
+        <button type="button" class="refus">Annuler</button>
+      </div>`
+    document.body.appendChild(fond)
+    requestAnimationFrame(() => fond.classList.add('shown'))
+
+    let fait = false
+    const fermer = (valeur) => {
+      if (fait) return
+      fait = true
+      fond.classList.remove('shown')
+      setTimeout(() => { fond.remove(); resoudre(valeur) }, 300)
+    }
+    fond.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-l]')
+      if (b) { fermer(b.dataset.l); return }
+      if (e.target === fond || e.target.classList.contains('refus')) fermer(null)
+    })
+  })
+}
+
 // ═══════════ ÉQUIPE : scanner ═══════════
 /* Le même scanner sert aux deux espaces : côté équipe il ouvre la fiche à
    consulter, côté gestion la page d'analyse de la procédure. Les éléments
@@ -7699,9 +8071,13 @@ async function confirmerOuvertureScan(procId, espace) {
   /* La fenêtre de bienvenue est un moment de découverte : elle n'a de sens que
      la première fois. Un employé qui scanne son dixième QR de la semaine n'a pas
      besoin qu'on lui souhaite la bienvenue — il veut sa procédure. */
-  if (espace !== 'gestion' && estNouvelUtilisateur()) {
-    marquerBienvenueVue()
-    const ok = await fenetreBienvenue(titre, categorie)
+  if (espace !== 'gestion') {
+    /* Personne n'entre dans une procédure sans l'avoir confirmé : c'était trop
+       direct, et un QR peut être mal visé. Les nouveaux ont l'accueil complet
+       avec le Memoji, les autres une confirmation sobre. */
+    const nouveau = estNouvelUtilisateur()
+    if (nouveau) marquerBienvenueVue()
+    const ok = await fenetreBienvenue(titre, categorie, nouveau)
     if (!ok) return
   }
 
@@ -7728,16 +8104,18 @@ function marquerBienvenueVue() {
 /* Fenêtre d'accueil : le Memoji salue, la procédure est nommée, un bouton pour
    y entrer. On voit ce qu'on a scanné avant d'y aller — et si le code n'était
    pas le bon, on s'en aperçoit tout de suite. */
-function fenetreBienvenue(titre, categorie) {
+function fenetreBienvenue(titre, categorie, avecAccueil) {
   return new Promise((resoudre) => {
     const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
     const fond = document.createElement('div')
-    fond.className = 'bienvenue-fond'
+    fond.className = 'bienvenue-fond' + (avecAccueil ? '' : ' sobre')
     fond.innerHTML = `
       <div class="bienvenue" role="dialog" aria-modal="true">
-        <div class="salut"></div>
-        <h3>${prenom ? 'Bienvenue ' + escapeHtml(prenom) : 'Bienvenue'}</h3>
-        <div class="intro">Vous avez scann\u00e9 le code de cette proc\u00e9dure.</div>
+        ${avecAccueil ? '<div class="salut"></div>' : '<div class="code-ic">\u2713</div>'}
+        <h3>${avecAccueil ? (prenom ? 'Bienvenue ' + escapeHtml(prenom) : 'Bienvenue') : 'Code reconnu'}</h3>
+        <div class="intro">${avecAccueil
+          ? 'Vous avez scann\u00e9 le code de cette proc\u00e9dure.'
+          : 'Ce code correspond \u00e0 la proc\u00e9dure suivante.'}</div>
         <div class="proc">
           <div class="t">${escapeHtml(titre)}</div>
           ${categorie ? `<div class="c">${escapeHtml(categorie)}</div>` : ''}

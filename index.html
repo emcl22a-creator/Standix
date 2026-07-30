@@ -2544,6 +2544,11 @@ async function enterApp(membre) {
   }
 
   if (membre.role === 'gestion') {
+    /* On désigne explicitement l'écran d'accueil. Sans ça, l'écran resté actif
+       d'une session précédente réapparaissait : se déconnecter depuis une fiche
+       de procédure puis recréer un compte ramenait sur cette fiche, parce que
+       rien ne remettait la navigation à zéro. */
+    showGestionScreen('p-list')
     await loadGestionProcedures()
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -2564,6 +2569,7 @@ async function enterApp(membre) {
     if (cibleQR) ouvrirCibleQR()
     finDuDemarrage()
   } else {
+    showEquipeScreen('e-list')
     await loadEquipeProcedures()
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -2753,6 +2759,11 @@ document.querySelectorAll('.plan-card').forEach(card => {
 window.signOut = async function() {
   await supabase.auth.signOut()
   currentMembre = null
+  // On revient sur les écrans d'accueil des deux espaces, sinon le prochain
+  // compte hériterait de la dernière page consultée.
+  document.querySelectorAll('#gestion-app .screen, #equipe-app .screen').forEach(s => s.classList.remove('active'))
+  document.getElementById('p-list')?.classList.add('active')
+  document.getElementById('e-list')?.classList.add('active')
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
   document.getElementById('tabbar-gestion').style.display = 'none'

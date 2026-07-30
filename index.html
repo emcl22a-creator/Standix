@@ -290,11 +290,16 @@
   }
   .recherche-fine:focus-within{ background:rgba(255,255,255,0.09); border-color:var(--border); }
   .recherche-fine svg{ width:15px; height:15px; color:var(--label-3); flex-shrink:0; }
-  .recherche-fine input{
-    flex:1; min-width:0; background:none; border:none; outline:none;
-    font-family:inherit; font-size:16px; color:#fff; padding:0;
+  /* Le sélecteur d'attribut est indispensable : sans lui, la règle générale
+     `input[type=text]` déclarée plus bas l'emporte à spécificité égale et le
+     champ retrouve sa bordure, son fond et sa largeur pleine. */
+  .recherche-fine input[type=text]{
+    flex:1; min-width:0; width:auto; height:auto;
+    background:none; border:none; outline:none; border-radius:0;
+    font-family:inherit; font-size:16px; color:#fff; padding:0; margin:0;
   }
-  .recherche-fine input::placeholder{ color:var(--label-3); font-size:13.5px; }
+  .recherche-fine input[type=text]:focus{ background:none; border:none; }
+  .recherche-fine input[type=text]::placeholder{ color:var(--label-3); font-size:13.5px; }
   .e-resultats{ margin-top:10px; }
 
   .ga-trio{ display:flex; gap:9px; }
@@ -750,6 +755,9 @@
   .cat-name{ font-size:14.5px; font-weight:700; color:var(--label); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:2px; }
   .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
+  /* Côté équipe, le compteur est un rapport (« 2/2 lues ») et non un
+     pourcentage : il tient sur la même ligne à une taille plus mesurée. */
+  .cat-lues{ font-size:14.5px; font-weight:750; letter-spacing:-0.02em; }
   .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
   .cat-date{ font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; font-variant-numeric:tabular-nums; }
   .carte-categorie{ font-size:11px; font-weight:600; color:var(--label-3); margin-top:3px; }
@@ -4623,8 +4631,9 @@ function renderEquipeCategories() {
         <div class="cat-badge">${procs.length}</div>
       </div>
       <div class="cat-name">${escapeHtml(nom)}</div>
-      <div class="cat-pct-row"><span style="color:${couleur}">${lues}/${procs.length} lues</span></div>
-      <div class="cat-recent">${procs.slice(0, 2).map(p => `<div>${escapeHtml(p.titre)}</div>`).join('')}</div>`
+      <div class="cat-pct-row"><span class="cat-lues" style="color:${couleur}">${lues}/${procs.length} lues</span></div>
+      <div class="cat-recent">${procs.slice(0, 2).map(p =>
+        `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}</div>`
     grille.appendChild(cell)
   })
 }

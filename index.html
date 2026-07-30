@@ -1803,7 +1803,7 @@
         <div class="mode-choice-icon">✦</div>
         <div class="mode-choice-text">
           <div class="mode-choice-title">L'IA découpe la vidéo</div>
-          <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes</div>
+          <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes · 10 min maximum</div>
         </div>
         <div class="mode-choice-arrow">›</div>
       </div>
@@ -1922,6 +1922,7 @@
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
 
     <div class="card" id="ai-upload-card">
+      <div class="note" style="margin-bottom:12px;">L'IA travaille au mieux sur des vidéos de <b style="color:#fff;">moins de 10 minutes</b>. Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.</div>
       <input type="file" id="ai-video-input" accept="video/*" style="margin-bottom:10px;">
       <div class="video-frame" id="ai-video-frame">
         <video id="ai-video-player" style="display:none;" playsinline></video>
@@ -4539,8 +4540,41 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   aiVideoDuree = 0
   player.addEventListener('loadedmetadata', () => {
     if (isFinite(player.duration)) aiVideoDuree = player.duration
+    verifierDureeVideo()
   }, { once: true })
 })
+
+/* Deux seuils. Au-delà de 10 minutes on prévient : l'analyse marche encore mais
+   elle devient longue et le découpage moins sûr. Au-delà de 20, on refuse : la
+   transcription dépasse ce que le modèle peut mettre en forme d'un seul tenant,
+   et l'échec est quasi certain. Mieux vaut le dire avant l'envoi qu'après dix
+   minutes d'attente. */
+const DUREE_CONSEILLEE = 10 * 60
+const DUREE_REFUSEE = 20 * 60
+
+function verifierDureeVideo() {
+  const err = document.getElementById('ai-error')
+  const btn = document.getElementById('ai-launch-btn')
+  if (!err || !btn) return
+
+  if (!aiVideoDuree) { err.textContent = ''; btn.disabled = false; return }
+
+  const min = Math.round(aiVideoDuree / 60)
+  if (aiVideoDuree > DUREE_REFUSEE) {
+    err.style.color = 'var(--red)'
+    err.textContent = `Cette vidéo dure ${min} minutes. Au-delà de 20 minutes, l'analyse échoue presque à coup sûr. Filmez une procédure par vidéo, ou découpez celle-ci.`
+    btn.disabled = true
+    return
+  }
+  if (aiVideoDuree > DUREE_CONSEILLEE) {
+    err.style.color = 'var(--orange)'
+    err.textContent = `Cette vidéo dure ${min} minutes. L'analyse va prendre du temps et le découpage sera moins précis — vous pouvez lancer, mais une vidéo plus courte donne un bien meilleur résultat.`
+    btn.disabled = false
+    return
+  }
+  err.textContent = ''
+  btn.disabled = false
+}
 
 document.getElementById('ai-launch-btn')?.addEventListener('click', async () => {
   const errorEl = document.getElementById('ai-error')
@@ -6519,8 +6553,18 @@ async function loadEquipeProcedures() {
     supabase.from('validations').select('procedure_id, validated_at, duree_lecture').eq('membre_id', currentMembre.id),
     supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
   ])
-  equipeLues = new Set((mesValidations || []).map(v => v.procedure_id))
-  mesLectures = mesValidations || []   // avec la date et la durée, pour l'écran d'activité
+  /* La colonne `duree_lecture` peut ne pas exister encore en base : dans ce cas
+     la requête échoue en entier et on perdait TOUTES les lectures, donc les
+     coches de « déjà lu ». On redemande alors sans elle. */
+  let lectures = mesValidations
+  if (!lectures) {
+    const repli = await supabase.from('validations')
+      .select('procedure_id, validated_at').eq('membre_id', currentMembre.id)
+    lectures = repli.data || []
+  }
+
+  equipeLues = new Set(lectures.map(v => v.procedure_id))
+  mesLectures = lectures   // avec la date et la durée, pour l'écran d'activité
 
   equipeEtapesByProc = {}
   ;(toutesEtapes || []).forEach(e => {
@@ -6774,6 +6818,17 @@ async function openEquipeDetail(procId) {
     }
     stepsEl.appendChild(div)
   })
+
+  /* Une procédure sans étape affichait une zone vide, et on ne savait pas si
+     c'était un défaut d'affichage ou une procédure incomplète. Elle le dit
+     maintenant. Le cas arrive quand une analyse automatique a échoué : la
+     procédure existe, ses étapes n'ont jamais été écrites. */
+  if (!etapes || etapes.length === 0) {
+    stepsEl.innerHTML = `<div class="empty-state">
+      <h3>Aucune étape</h3>
+      <p>Cette procédure n'a pas encore d'étapes. Prévenez votre responsable :
+      il doit les ajouter avant que la procédure soit utilisable.</p></div>`
+  }
 
   demarrerLecture(procId, dejaConsultee)
 }

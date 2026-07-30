@@ -701,15 +701,28 @@
 
   /* ═══ Page Analyse ═══ */
   .ga-segments{
-    display:flex; gap:3px; padding:3px; border-radius:100px;
+    position:relative; display:flex; gap:0; padding:3px; border-radius:100px;
     background:rgba(255,255,255,0.07); margin:14px 0 16px;
   }
-  .ga-segments button{
-    flex:1; text-align:center; font-family:inherit; font-size:12.5px; font-weight:600;
-    padding:8px 0; border:none; border-radius:100px; background:none; color:var(--label-2);
-    transition:background 0.3s cubic-bezier(0.32,0.72,0,1), color 0.25s;
+  .ga-segments::before{
+    content:''; position:absolute; top:3px; bottom:3px; left:3px;
+    width:var(--largeur, 0px); transform:translateX(var(--depart, 0px));
+    background:rgba(255,255,255,0.92); border-radius:100px; z-index:0;
+    transition:transform 0.44s cubic-bezier(0.32,0.72,0,1),
+               width 0.44s cubic-bezier(0.32,0.72,0,1);
   }
-  .ga-segments button.active{ background:rgba(255,255,255,0.90); color:#000; }
+  .ga-segments.sans-glisse::before{ transition:none; }
+  .ga-segments button{
+    position:relative; z-index:1; flex:1; text-align:center;
+    font-family:inherit; font-size:12.5px; font-weight:600;
+    padding:8px 0; border:none; border-radius:100px; background:none;
+    color:var(--label-2); transition:color 0.28s ease;
+  }
+  .ga-segments button.active{ color:#000; }
+
+  @media (prefers-reduced-motion: reduce){
+    .ga-segments::before{ transition:none; }
+  }
 
   /* Recherche discrète : pas d'encadré marqué, juste un fond légèrement
      éclairci qui s'affirme quand le champ prend le focus. */
@@ -1092,13 +1105,37 @@
   }
   .view-toggle button.active{ background:#fff; color:#000; }
 
-  .filter-chips{ display:flex; gap:6px; flex-wrap:wrap; }
-  .filter-chips button{
-    font-size:11px; font-weight:600; padding:5px 12px; border-radius:100px;
-    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.16); color:rgba(255,255,255,0.7);
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  /* ═══ Bascule de période ═══
+     Même animation que la barre d'onglets : une pastille blanche qui GLISSE
+     jusqu'au segment choisi, avec le même ressort. L'ancien effet changeait
+     brutalement la couleur de fond de chaque bouton — trois clignotements au
+     lieu d'un mouvement. */
+  .filter-chips{
+    position:relative; display:flex; gap:0; padding:3px; border-radius:100px;
+    background:rgba(255,255,255,0.07); border:0.5px solid rgba(255,255,255,0.10);
   }
-  .filter-chips button.active{ background:#fff; color:#000; border-color:#fff; }
+  /* La pastille est un seul élément qui se déplace, pas trois fonds qui
+     s'allument : c'est ce qui donne le glissement. */
+  .filter-chips::before{
+    content:''; position:absolute; top:3px; bottom:3px; left:3px;
+    width:var(--largeur, 0px); transform:translateX(var(--depart, 0px));
+    background:#fff; border-radius:100px; z-index:0;
+    transition:transform 0.44s cubic-bezier(0.32,0.72,0,1),
+               width 0.44s cubic-bezier(0.32,0.72,0,1);
+  }
+  .filter-chips.sans-glisse::before{ transition:none; }
+  .filter-chips button{
+    position:relative; z-index:1; flex:1; min-width:0; text-align:center;
+    font-family:inherit; font-size:11.5px; font-weight:650;
+    padding:7px 10px; border:none; border-radius:100px; background:none;
+    color:rgba(235,235,245,0.62); white-space:nowrap;
+    transition:color 0.28s ease;
+  }
+  .filter-chips button.active{ color:#000; }
+
+  @media (prefers-reduced-motion: reduce){
+    .filter-chips::before{ transition:none; }
+  }
 
   /* ═══ Carte d'accueil ═══
      L'avatar parle dans une bulle, comme dans une messagerie. Le chiffre est
@@ -2262,12 +2299,6 @@
       <video id="analyse-video" controls playsinline webkit-playsinline></video>
     </div>
 
-    <button type="button" class="btn ghost block langue-proc" id="detail-langue">
-      <span class="ic">🌐</span>
-      <span class="tx" id="detail-langue-txt">Lire dans une autre langue</span>
-      <span class="fl">›</span>
-    </button>
-
     <div class="section-title">Étapes de la procédure</div>
     <div id="analyse-steps-list"></div>
 
@@ -2422,6 +2453,12 @@
       <div class="plan-desc">Membres illimités · multi-sites</div>
     </div>
 
+    <div class="section-title">Langue</div>
+    <div class="card">
+      <label class="f">Langue de l'application</label>
+      <div class="langue-grille" id="langue-app-gestion"></div>
+    </div>
+
     <div class="section-title">Une question ?</div>
     <div class="accueil contact-carte" role="button" tabindex="0" id="contact-gestion">
       <div class="accueil-texte">
@@ -2558,7 +2595,12 @@
     <div class="video-frame" id="detail-video-frame" style="display:none;">
       <video id="detail-video" controls playsinline webkit-playsinline></video>
     </div>
-    <div id="detail-steps" style="margin-top:16px;"></div>
+    <button type="button" class="btn ghost block langue-proc" id="detail-langue" style="margin-top:16px;">
+      <span class="ic">🌐</span>
+      <span class="tx" id="detail-langue-txt">Lire dans une autre langue</span>
+      <span class="fl">›</span>
+    </button>
+    <div id="detail-steps" style="margin-top:12px;"></div>
     <div class="confirm-bar">
       <div class="lecture-etat" id="lecture-etat">
         <div class="lecture-anneau" id="lecture-anneau"></div>
@@ -2893,6 +2935,8 @@ function appliquerLangue() {
   const racines = [
     document.getElementById('equipe-app'),
     document.getElementById('tabbar-equipe'),
+    document.getElementById('gestion-app'),
+    document.getElementById('tabbar-gestion'),
   ].filter(Boolean)
 
   const dico = DICO[langueApp]
@@ -3223,6 +3267,7 @@ async function enterApp(membre) {
     // elle peut donc démarrer avec l'app sans la faire saccader.
     lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
     atterrirEnHaut()
+    chargerLangue()
     if (cibleQR) ouvrirCibleQR()
     finDuDemarrage()
   } else {
@@ -3362,6 +3407,7 @@ function finDuDemarrage() {
 
 // ═══ PARAMÈTRES ═══
 window.openSettings = async function() {
+  rendreChoixLangueApp()
   showGestionScreen('p-settings')
   document.getElementById('settings-nom').value = currentMembre.nom || ''
   const { data: userData } = await supabase.auth.getUser()
@@ -3472,9 +3518,48 @@ document.getElementById('logout-btn')?.addEventListener('click', () => signOut()
 let currentGaData = null
 let currentGaPeriod = 'week'
 
+/* Place la pastille sous le segment actif. Les largeurs sont MESURÉES plutôt que
+   devinées : « Cette semaine » et « Total » n'occupent pas la même place, et une
+   pastille de largeur fixe glisserait à côté de sa cible.
+
+   `immediat` sert à la première pose : quand l'écran s'affiche, la pastille doit
+   être déjà en place, pas la rejoindre en glissant depuis la gauche. */
+function placerPastille(conteneur, immediat) {
+  if (!conteneur) return
+  const actif = conteneur.querySelector('button.active')
+  if (!actif) return
+
+  const poser = () => {
+    const bande = conteneur.getBoundingClientRect()
+    const bouton = actif.getBoundingClientRect()
+    if (!bouton.width) return          // écran encore masqué : rien à mesurer
+    conteneur.style.setProperty('--largeur', bouton.width + 'px')
+    conteneur.style.setProperty('--depart', (bouton.left - bande.left - 3) + 'px')
+  }
+
+  if (immediat) {
+    conteneur.classList.add('sans-glisse')
+    poser()
+    // On rend le glissement au tour suivant, sinon la pose initiale s'anime.
+    requestAnimationFrame(() => requestAnimationFrame(() => conteneur.classList.remove('sans-glisse')))
+  } else {
+    poser()
+  }
+}
+
+/* Les bascules vivent dans des écrans masqués au chargement : rien n'est
+   mesurable tant qu'ils ne sont pas visibles. On repose donc la pastille à
+   chaque affichage d'écran, et au redimensionnement. */
+function reposerPastilles(immediat) {
+  placerPastille(document.getElementById('analyse-period-toggle'), immediat)
+  placerPastille(document.getElementById('ga-period-toggle'), immediat)
+}
+window.addEventListener('resize', () => reposerPastilles(true))
+
 window.setGaPeriod = function(period) {
   currentGaPeriod = period
   document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
+  placerPastille(document.getElementById('ga-period-toggle'))
   renderGaStats()
 }
 
@@ -4153,6 +4238,9 @@ window.showGestionScreen = function(id, btn) {
   // La caméra ne doit jamais tourner sur un écran qu'on a quitté
   if (id !== 'p-scan') stopScanner()
   remonterEnHaut()
+  /* Un écran qui vient d'apparaître peut enfin être mesuré : on y pose la
+     pastille de période sans animation, pour qu'elle soit déjà en place. */
+  requestAnimationFrame(() => reposerPastilles(true))
 }
 
 // Le document défile d'un seul bloc, tous écrans confondus : sans ça, en
@@ -6800,6 +6888,7 @@ function cheminArrondi(ctx, x, y, l, h, r) {
 window.setAnalysePeriod = function(period) {
   currentAnalysePeriod = period
   document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
+  placerPastille(document.getElementById('analyse-period-toggle'))
   renderAnalyseStats()
 }
 
@@ -7809,24 +7898,31 @@ async function enregistrerConsultation() {
    CHOIX DES LANGUES
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Le même sélecteur dans les deux espaces : le gérant a autant de raisons de
+   changer de langue que ses équipiers. */
 function rendreChoixLangueApp() {
-  const zone = document.getElementById('langue-app')
-  if (!zone) return
-  zone.innerHTML = LANGUES.map(l => `
+  const balisage = LANGUES.map(l => `
     <button type="button" class="langue-choix${l.code === langueApp ? ' actif' : ''}" data-langue="${l.code}">
       <span class="dr">${l.drapeau}</span>
       <span class="nm">${l.nom}</span>
       ${l.code === langueApp ? '<span class="coche">\u2713</span>' : ''}
     </button>`).join('')
+
+  for (const id of ['langue-app', 'langue-app-gestion']) {
+    const zone = document.getElementById(id)
+    if (zone) zone.innerHTML = balisage
+  }
 }
 
-document.getElementById('langue-app')?.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-langue]')
-  if (!b) return
-  definirLangue(b.dataset.langue)
-  rendreChoixLangueApp()
-  toast(LANGUES.find(l => l.code === langueApp)?.nom || '')
-})
+for (const id of ['langue-app', 'langue-app-gestion']) {
+  document.getElementById(id)?.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-langue]')
+    if (!b) return
+    definirLangue(b.dataset.langue)
+    rendreChoixLangueApp()
+    toast(LANGUES.find(l => l.code === langueApp)?.nom || '')
+  })
+}
 
 /* ── Traduction d'une procédure ───────────────────────────────────
 

@@ -2472,14 +2472,74 @@ async function enterApp(membre) {
 /* Ouvre la procédure visée par le QR, dans l'espace où l'on se trouve. Un
    gérant qui scanne son propre QR arrive sur l'analyse de la procédure, pas
    sur la fiche de lecture : ce n'est pas lui qui doit la consulter. */
-function ouvrirCibleQR() {
+let qrPropositionFaite = false
+
+async function ouvrirCibleQR() {
   if (!cibleQR) return
+
+  /* Cas fréquent en pratique : la personne est connectée, mais dans une autre
+     entreprise que celle du QR. Sans rien faire, elle verrait « Procédure
+     introuvable » sans comprendre pourquoi. On identifie l'entreprise du code
+     et on lui propose d'y aller. */
+  if (cibleQR.code && currentMembre && !qrPropositionFaite) {
+    qrPropositionFaite = true
+    if (await proposerEntrepriseDuQR(cibleQR.code)) return   // l'app est relancée
+  }
+
   const id = cibleQR.proc
   // On efface le paramètre de l'adresse pour qu'un rechargement plus tard ne
   // renvoie pas indéfiniment sur la même procédure.
   try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
   if (currentMembre?.role === 'gestion') openAnalyse(id)
   else openEquipeDetail(id)
+}
+
+/* Renvoie true si l'app a été relancée sur une autre entreprise — dans ce cas
+   l'ouverture de la procédure se fera au tour suivant. */
+async function proposerEntrepriseDuQR(code) {
+  const { data: ent } = await supabase
+    .from('entreprises').select('id, nom').eq('code_acces', code).maybeSingle()
+
+  // Code inconnu, ou déjà la bonne entreprise : rien à proposer.
+  if (!ent || ent.id === currentMembre.entreprise_id) return false
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return false
+
+  // Peut-être appartient-elle déjà à cette entreprise, sans y être en ce moment.
+  const { data: dejaMembre } = await supabase
+    .from('membres').select('*').eq('user_id', user.id).eq('entreprise_id', ent.id).maybeSingle()
+
+  const nom = ent.nom || 'cette entreprise'
+  const ok = await confirmDialog({
+    titre: dejaMembre ? "Changer d'entreprise ?" : 'Rejoindre cette entreprise ?',
+    message: dejaMembre
+      ? `Cette procédure appartient à « ${nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?`
+      : `Cette procédure appartient à « ${nom} », dont vous ne faites pas encore partie. La rejoindre pour pouvoir la consulter ?`,
+    confirmer: dejaMembre ? 'Basculer' : 'Rejoindre',
+    annuler: 'Non merci',
+    danger: false,
+  })
+  if (!ok) return false
+
+  let membre = dejaMembre
+  if (!membre) {
+    const { data, error } = await supabase.from('membres').insert({
+      user_id: user.id,
+      nom: currentMembre?.nom || '',
+      role: 'equipe',
+      entreprise_id: ent.id,
+    }).select().single()
+    if (error) { toast("Impossible de rejoindre : " + error.message); return false }
+    membre = data
+  }
+
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('equipe-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  document.getElementById('tabbar-equipe').style.display = 'none'
+  await enterApp(membre)
+  return true
 }
 
 // Le décor (halos, animations de cartes) ne se remet en marche qu'une fois

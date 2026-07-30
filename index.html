@@ -187,6 +187,70 @@
     font-size:12.5px; font-weight:650; color:var(--blue); flex-shrink:0;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     ÉDITEUR DE CLIP — pièces ajoutées
+     Les deux pastilles de bornes, la loupe, la bande de couverture et les
+     avertissements. Le tout partagé par les deux éditeurs (création et
+     modification), d'où des classes plutôt que des identifiants.
+     ═══════════════════════════════════════════════════════════════════════ */
+  .ed-bornes{ display:none; gap:8px; margin-top:10px; }
+  .ed-bornes.on{ display:flex; }
+  .ed-borne{
+    flex:1; padding:9px 11px; border-radius:13px; background:var(--bg-card);
+    border:1px solid var(--border); transition:border-color 0.2s, background 0.2s;
+  }
+  .ed-borne.actif{ border-color:#fff; background:rgba(255,255,255,0.12); }
+  .ed-borne .k{ font-size:10px; font-weight:750; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.05em; }
+  .ed-borne .v{ font-size:19px; font-weight:800; letter-spacing:-0.04em; margin-top:2px; }
+
+  .ed-loupe-bloc{ display:none; margin-top:12px; }
+  .ed-loupe-bloc.on{ display:block; }
+  .ed-loupe-titre{ font-size:11px; font-weight:750; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:7px; }
+  .ed-loupe{
+    position:relative; height:56px; border-radius:12px; overflow:hidden;
+    background:rgba(255,255,255,0.04); border:0.5px solid var(--border);
+    touch-action:none; cursor:grab;
+  }
+  .ed-loupe .bande{ position:absolute; top:0; bottom:0; display:flex; }
+  .ed-loupe .bande i{ flex-shrink:0; height:100%; }
+  .ed-loupe .axe{
+    position:absolute; left:50%; top:0; bottom:0; width:2px; background:#fff;
+    transform:translateX(-50%); z-index:3; pointer-events:none;
+  }
+  .ed-loupe .axe::before{
+    content:''; position:absolute; top:0; left:-5px; width:12px; height:5px;
+    border-radius:0 0 3px 3px; background:#fff;
+  }
+  .ed-loupe .zone{ position:absolute; top:0; bottom:0; background:rgba(48,209,88,0.16);
+    z-index:1; pointer-events:none; }
+  .ed-loupe .grad{ position:absolute; bottom:2px; font-size:8.5px;
+    color:rgba(255,255,255,0.45); transform:translateX(-50%); z-index:2; pointer-events:none; }
+  .ed-aide{ font-size:11px; color:var(--label-3); text-align:center; margin-top:6px; }
+
+  .ed-couv{ display:none; height:6px; border-radius:6px; overflow:hidden; margin-top:14px; gap:1px; }
+  .ed-couv.on{ display:flex; }
+  .ed-couv i{ display:block; }
+  .ed-legende{ display:none; gap:12px; margin-top:7px; font-size:10px; color:var(--label-3); }
+  .ed-legende.on{ display:flex; }
+  .ed-legende span{ display:flex; align-items:center; gap:4px; }
+  .ed-legende i{ width:7px; height:7px; border-radius:2px; display:block; }
+  .ed-alertes{ margin-top:11px; }
+  .ed-alerte{
+    display:flex; align-items:center; gap:9px; padding:9px 11px; border-radius:12px;
+    font-size:12px; margin-bottom:6px; background:rgba(255,159,10,0.12);
+    border:0.5px solid rgba(255,159,10,0.28);
+  }
+  .ed-alerte.grave{ background:rgba(255,69,58,0.12); border-color:rgba(255,69,58,0.3); }
+  .ed-ok{
+    display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px;
+    font-size:12px; background:rgba(48,209,88,0.12);
+    border:0.5px solid rgba(48,209,88,0.28); margin-top:11px;
+  }
+  /* La poignée verdit quand l'aimant l'accroche à la borne d'une voisine. */
+  .clip-handle.colle .grip{ background:var(--green); }
+
   /* ═══ État de lecture ═══
      Ce n'est plus l'employé qui déclare avoir compris : l'app constate qu'il
      est resté sur la fiche. Le bandeau montre donc un état, pas une action. */
@@ -1075,6 +1139,15 @@
      l'app ne fasse quoi que ce soit. Un iPhone récent donne 120, un plus ancien
      60. Si on lit 30 ici, c'est le mode économie d'énergie qui bride Safari —
      et aucune optimisation du code n'y changera rien. */
+  /* App mise en veille, onglet changé, écran verrouillé : on coupe le son.
+     Sans ça, une vidéo lancée continuait de jouer en arrière-plan. */
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) return
+    document.querySelectorAll('video').forEach(function (v) {
+      try { if (!v.paused) v.pause() } catch (e) {}
+    })
+  })
+
   ;(function cadenceEcran() {
     var n = 0, t0 = null
     function tic(t) {
@@ -1475,6 +1548,19 @@
         </div>
         <div class="clip-info" id="capcut-info" style="display:none;"></div>
         <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
+        <div class="ed-bornes" id="capcut-bornes">
+          <div class="ed-borne actif" data-borne="a"><div class="k">Début</div><div class="v" id="capcut-vd">0:00,0</div></div>
+          <div class="ed-borne" data-borne="b"><div class="k">Fin</div><div class="v" id="capcut-vf">0:00,0</div></div>
+        </div>
+        <div class="ed-loupe-bloc" id="capcut-loupe-bloc">
+          <div class="ed-loupe-titre">Loupe · <span id="capcut-loupe-fen">± 4 s</span></div>
+          <div class="ed-loupe" id="capcut-loupe">
+            <div class="bande" id="capcut-loupe-bande"></div>
+            <div class="zone" id="capcut-loupe-zone"></div>
+            <div class="axe"></div>
+          </div>
+          <div class="ed-aide">Faites glisser pour affiner au dixième de seconde</div>
+        </div>
         <div class="cut-toolbar">
           <button type="button" class="btn small block" id="capcut-add-btn">+ Découper une étape ici</button>
         </div>
@@ -1482,12 +1568,20 @@
           <button type="button" class="clip-tool" id="capcut-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
           <button type="button" class="clip-tool" id="capcut-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
           <button type="button" class="clip-tool" id="capcut-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
+          <button type="button" class="clip-tool" id="capcut-undo"><span>↩ Annuler</span></button>
           <button type="button" class="clip-tool" id="capcut-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
         </div>
         <div class="clip-text-field" id="capcut-text-field">
           <textarea id="capcut-text" rows="1" placeholder="Que fait-on pendant ce moment ?"></textarea>
         </div>
         <button type="button" class="btn ghost clip-done-btn" id="capcut-done">Terminer le réglage</button>
+        <div class="ed-couv" id="capcut-couv"></div>
+        <div class="ed-legende" id="capcut-legende">
+          <span><i style="background:var(--green)"></i>couvert</span>
+          <span><i style="background:rgba(255,255,255,.12)"></i>trou</span>
+          <span><i style="background:var(--red)"></i>chevauchement</span>
+        </div>
+        <div class="ed-alertes" id="capcut-alertes"></div>
       </div>
     </div>
 
@@ -1573,17 +1667,38 @@
       </div>
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
+        <div class="ed-bornes" id="ecap-bornes">
+          <div class="ed-borne actif" data-borne="a"><div class="k">Début</div><div class="v" id="ecap-vd">0:00,0</div></div>
+          <div class="ed-borne" data-borne="b"><div class="k">Fin</div><div class="v" id="ecap-vf">0:00,0</div></div>
+        </div>
+        <div class="ed-loupe-bloc" id="ecap-loupe-bloc">
+          <div class="ed-loupe-titre">Loupe · <span id="ecap-loupe-fen">± 4 s</span></div>
+          <div class="ed-loupe" id="ecap-loupe">
+            <div class="bande" id="ecap-loupe-bande"></div>
+            <div class="zone" id="ecap-loupe-zone"></div>
+            <div class="axe"></div>
+          </div>
+          <div class="ed-aide">Faites glisser pour affiner au dixième de seconde</div>
+        </div>
       <button type="button" class="btn small ghost block" id="ecap-recaler" style="display:none; margin-top:10px;">⇄ Les extraits sont décalés ? Recaler</button>
       <div class="clip-tools" id="ecap-tools">
         <button type="button" class="clip-tool" id="ecap-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
         <button type="button" class="clip-tool" id="ecap-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
         <button type="button" class="clip-tool" id="ecap-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
-        <button type="button" class="clip-tool" id="ecap-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
+        <button type="button" class="clip-tool" id="ecap-undo"><span>↩ Annuler</span></button>
+          <button type="button" class="clip-tool" id="ecap-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
       </div>
       <div class="clip-text-field" id="ecap-text-field">
         <textarea id="ecap-text" rows="1" placeholder="Que fait-on pendant ce moment ?"></textarea>
       </div>
       <button type="button" class="btn ghost clip-done-btn" id="ecap-done">Terminer le réglage</button>
+        <div class="ed-couv" id="ecap-couv"></div>
+        <div class="ed-legende" id="ecap-legende">
+          <span><i style="background:var(--green)"></i>couvert</span>
+          <span><i style="background:rgba(255,255,255,.12)"></i>trou</span>
+          <span><i style="background:var(--red)"></i>chevauchement</span>
+        </div>
+        <div class="ed-alertes" id="ecap-alertes"></div>
     </div>
 
     <div class="section-title">Étapes</div>
@@ -2789,6 +2904,7 @@ const ONGLET_PAR_ECRAN = {
 }
 
 window.showGestionScreen = function(id, btn) {
+  arreterToutesLesVideos()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
   const boutons = document.querySelectorAll('#tabbar-gestion .tab-round')
@@ -2808,6 +2924,19 @@ window.showGestionScreen = function(id, btn) {
 function remonterEnHaut() {
   window.scrollTo({ top: 0, behavior: 'auto' })
 }
+
+/* Une vidéo lancée continuait de jouer après qu'on ait quitté sa page : rien ne
+   l'arrêtait, puisqu'on ne change pas réellement de page mais seulement d'écran
+   affiché. On entendait donc le son d'une vidéo devenue invisible.
+   Toutes les vidéos sont donc mises en pause à chaque changement d'écran, et la
+   lecture d'extrait en cours est coupée. */
+function arreterToutesLesVideos() {
+  document.querySelectorAll('video').forEach(v => {
+    if (v.id === 'scan-video' || v.id === 'g-scan-video') return   // la caméra, gérée par stopScanner
+    try { if (!v.paused) v.pause() } catch (e) {}
+  })
+  try { stopClipPlayback?.() } catch (e) {}
+}
 window.startNewProcedure = function() {
   resetCreateForm()
   showGestionScreen('p-create')
@@ -2818,6 +2947,7 @@ window.startNewProcedure = function() {
 const ONGLET_EQUIPE_PAR_ECRAN = { 'e-list': 0, 'e-category': 0, 'e-detail': 0 }
 
 window.showEquipeScreen = function(id, btn) {
+  arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
   const boutons = document.querySelectorAll('#tabbar-equipe .tab-round')
@@ -3621,6 +3751,9 @@ function createClipEditor(ids, api) {
   if (!timeline) return null
 
   let selIndex = null
+  let borneActive = 'a'      // la borne que la loupe et l'affichage suivent
+  let histo = []             // pile d'annulation
+  const PXS = 42             // pixels par seconde dans la loupe
   let drag = null            // 'start' | 'end' | 'scrub'
   let wasPlaying = false
   let rafId = null
@@ -3707,7 +3840,167 @@ function createClipEditor(ids, api) {
     if (ids.curTime && g(ids.curTime)) g(ids.curTime).textContent = formatTime(v.currentTime || 0)
   }
 
-  function repaint() { paintBands(); paintSelection(); paintPlayhead() }
+  /* ═══════════════════════════════════════════════════════════════════════
+     Pièces ajoutées : pastilles de bornes, loupe, couverture, avertissements
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  function memoriser() {
+    histo.push(JSON.stringify(steps().map(s => ({ a: s.timestamp_video, b: s.fin_video }))))
+    if (histo.length > 40) histo.shift()
+    const u = g(ids.undo); if (u) u.disabled = false
+  }
+
+  function annuler() {
+    if (!histo.length) return
+    const etat = JSON.parse(histo.pop())
+    steps().forEach((s, i) => {
+      if (!etat[i]) return
+      s.timestamp_video = etat[i].a
+      s.fin_video = etat[i].b
+    })
+    const u = g(ids.undo); if (u) u.disabled = !histo.length
+    repaint()
+    api.onChange?.()
+  }
+
+  /* Les bornes ne peuvent pas empiéter sur les étapes voisines : on contraint
+     plutôt que de laisser fabriquer un chevauchement à corriger ensuite. */
+  function limitesBorne() {
+    const s = current()
+    const liste = steps()
+    if (!s) return { min: 0, max: dur() }
+    const avant = selIndex > 0 && liste[selIndex - 1].timestamp_video != null ? clipEnd(liste[selIndex - 1]) : 0
+    const apres = selIndex < liste.length - 1 && liste[selIndex + 1].timestamp_video != null ? clipStart(liste[selIndex + 1]) : dur()
+    return borneActive === 'a'
+      ? { min: avant, max: clipEnd(s) - MIN_CLIP }
+      : { min: clipStart(s) + MIN_CLIP, max: apres }
+  }
+
+  function valeurBorne() {
+    const s = current()
+    if (!s) return 0
+    return borneActive === 'a' ? clipStart(s) : clipEnd(s)
+  }
+
+  /* Pose la borne active, en la contraignant et en l'accrochant éventuellement
+     à la borne d'une étape voisine. Renvoie true si l'aimant a mordu. */
+  function poserBorne(v, avecAimant) {
+    const s = current()
+    if (!s) return false
+    const l = limitesBorne()
+    v = Math.max(l.min, Math.min(l.max, v))
+    let colle = false
+    if (avecAimant) {
+      const cibles = [0, dur()]
+      steps().forEach((e, i) => { if (i !== selIndex && e.timestamp_video != null) cibles.push(clipStart(e), clipEnd(e)) })
+      for (const c of cibles) {
+        if (Math.abs(v - c) < 0.6) { v = c; colle = true; break }
+      }
+    }
+    const arrondi = Math.round(v * 10) / 10
+    if (borneActive === 'a') s.timestamp_video = arrondi
+    else s.fin_video = arrondi
+    return colle
+  }
+
+  function tcd(s) {
+    const m = Math.floor(s / 60), r = Math.floor(s % 60)
+    return m + ':' + String(r).padStart(2, '0') + ',' + Math.floor((s % 1) * 10)
+  }
+
+  function paintBornes() {
+    const s = current()
+    const bl = g(ids.bornes), lb = g(ids.loupeBloc)
+    bl?.classList.toggle('on', !!s)
+    lb?.classList.toggle('on', !!s)
+    if (!s) return
+    if (g(ids.vd)) g(ids.vd).textContent = tcd(clipStart(s))
+    if (g(ids.vf)) g(ids.vf).textContent = tcd(clipEnd(s))
+    bl?.querySelectorAll('.ed-borne').forEach(el => {
+      el.classList.toggle('actif', el.dataset.borne === borneActive)
+    })
+  }
+
+  /* La loupe montre les quelques secondes autour de la borne active, avec un
+     axe fixe au centre : on fait glisser la bande sous l'axe. */
+  function paintLoupe() {
+    const s = current()
+    const loupe = g(ids.loupe)
+    if (!s || !loupe || !dur()) return
+    const v = valeurBorne()
+    const demi = (loupe.clientWidth || 300) / 2 / PXS
+    if (g(ids.loupeFen)) g(ids.loupeFen).textContent = '± ' + demi.toFixed(1) + ' s'
+    const de = v - demi
+    const bande = g(ids.loupeBande)
+    if (bande) {
+      bande.style.width = (dur() * PXS) + 'px'
+      bande.style.left = (-de * PXS) + 'px'
+      if (!bande.dataset.rempli) {
+        let h = ''
+        const n = Math.max(12, Math.round(dur() / 2))
+        for (let i = 0; i < n; i++) {
+          const t = 190 + (i / n) * 90
+          h += `<i style="flex:1;background:linear-gradient(160deg,hsl(${t},14%,${26 + (i % 3) * 5}%),hsl(${t},12%,15%));border-right:1px solid rgba(0,0,0,.35)"></i>`
+        }
+        bande.innerHTML = h
+        bande.dataset.rempli = '1'
+      }
+    }
+    const z = g(ids.loupeZone)
+    if (z) {
+      z.style.left = ((clipStart(s) - de) * PXS) + 'px'
+      z.style.width = ((clipEnd(s) - clipStart(s)) * PXS) + 'px'
+    }
+    loupe.querySelectorAll('.grad').forEach(e => e.remove())
+    let grad = ''
+    for (let t = Math.ceil(de); t <= Math.floor(v + demi); t++) {
+      if (t < 0 || t > dur()) continue
+      grad += `<span class="grad" style="left:${(t - de) * PXS}px">${formatTime(t)}</span>`
+    }
+    loupe.insertAdjacentHTML('beforeend', grad)
+  }
+
+  function paintCouverture() {
+    const couv = g(ids.couv), leg = g(ids.legende), al = g(ids.alertes)
+    const d = dur()
+    const clips = steps().filter(s => s.timestamp_video != null)
+      .map(s => ({ a: clipStart(s), b: clipEnd(s) })).sort((x, y) => x.a - y.a)
+    const montrer = !!(d && clips.length)
+    couv?.classList.toggle('on', montrer)
+    leg?.classList.toggle('on', montrer)
+    if (!montrer) { if (al) al.innerHTML = ''; return }
+
+    const seg = []
+    let t = 0
+    clips.forEach(c => {
+      if (c.a > t) seg.push(['trou', t, c.a])
+      if (c.a < t) seg.push(['double', c.a, Math.min(t, c.b)])
+      seg.push(['ok', Math.max(t, c.a), c.b])
+      t = Math.max(t, c.b)
+    })
+    if (t < d) seg.push(['trou', t, d])
+    if (couv) couv.innerHTML = seg.filter(x => x[2] - x[1] > 0.05).map(x => {
+      const c = x[0] === 'ok' ? 'var(--green)' : x[0] === 'trou' ? 'rgba(255,255,255,.12)' : 'var(--red)'
+      return `<i style="flex:${x[2] - x[1]};background:${c}"></i>`
+    }).join('')
+
+    /* On signale, on ne corrige pas : un trou peut être volontaire. */
+    const probs = []
+    for (let i = 1; i < clips.length; i++) {
+      const ecart = clips[i].a - clips[i - 1].b
+      if (ecart > 0.5) probs.push({ txt: `Trou de ${ecart.toFixed(1).replace('.', ',')} s avant l'étape ${i + 1}` })
+      if (ecart < -0.5) probs.push({ grave: true, txt: `Les étapes ${i} et ${i + 1} se recoupent sur ${(-ecart).toFixed(1).replace('.', ',')} s` })
+    }
+    if (clips[0].a > 0.5) probs.push({ txt: `${clips[0].a.toFixed(1).replace('.', ',')} s non couvertes au début` })
+    const fin = clips[clips.length - 1].b
+    if (fin < d - 0.5) probs.push({ txt: `${(d - fin).toFixed(1).replace('.', ',')} s non couvertes à la fin` })
+
+    if (al) al.innerHTML = probs.length
+      ? probs.map(p => `<div class="ed-alerte${p.grave ? ' grave' : ''}"><span>${p.txt}</span></div>`).join('')
+      : '<div class="ed-ok">✓ Toute la vidéo est couverte, sans chevauchement</div>'
+  }
+
+  function repaint() { paintBands(); paintSelection(); paintPlayhead(); paintBornes(); paintLoupe(); paintCouverture() }
 
   // ── Boucle d'animation de la tête de lecture ─────────────────────────────
   function loop() {
@@ -3739,6 +4032,7 @@ function createClipEditor(ids, api) {
     wasPlaying = v && !v.paused
     if (v) v.pause()
     stopClipPlayback()
+    if (kind !== 'scrub') memoriser()
     if (handleEl) { handleEl.classList.add('dragging'); handleEl.setPointerCapture?.(e.pointerId) }
     else timeline.setPointerCapture?.(e.pointerId)
     moveDrag(e.clientX)
@@ -3749,22 +4043,22 @@ function createClipEditor(ids, api) {
     if (drag === 'scrub') { seek(t); return }
     const s = current()
     if (!s) return
-    if (drag === 'start') {
-      s.timestamp_video = clamp(Math.min(t, clipEnd(s) - MIN_CLIP))
-    } else if (drag === 'end') {
-      s.fin_video = clamp(Math.max(t, clipStart(s) + MIN_CLIP))
-    }
-    seek(drag === 'start' ? clipStart(s) : clipEnd(s))
-    paintBands()
-    paintSelection()
+    // La borne suivie devient celle qu'on tire, et l'aimant l'accroche aux
+    // bornes voisines : c'est ce qui supprime les trous d'une demi-seconde.
+    borneActive = drag === 'start' ? 'a' : 'b'
+    const colle = poserBorne(t, true)
+    const h = g(drag === 'start' ? ids.hStart : ids.hEnd)
+    h?.classList.toggle('colle', colle)
+    seek(valeurBorne())
+    paintBands(); paintSelection(); paintBornes(); paintLoupe(); paintCouverture()
   }
 
   function endDrag() {
     if (!drag) return
     const wasHandle = drag !== 'scrub'
     drag = null
-    g(ids.hStart)?.classList.remove('dragging')
-    g(ids.hEnd)?.classList.remove('dragging')
+    g(ids.hStart)?.classList.remove('dragging', 'colle')
+    g(ids.hEnd)?.classList.remove('dragging', 'colle')
     if (wasHandle) api.onChange?.()
     else if (wasPlaying) video()?.play()
   }
@@ -3807,6 +4101,40 @@ function createClipEditor(ids, api) {
     startLoop()
   }
 
+  // ── Pastilles de bornes : choisir celle que la loupe suit ────────────────
+  g(ids.bornes)?.addEventListener('click', (e) => {
+    const b = e.target.closest('.ed-borne')
+    if (!b) return
+    borneActive = b.dataset.borne
+    seek(valeurBorne())
+    paintBornes(); paintLoupe()
+  })
+
+  // ── Loupe : on fait glisser la bande sous l'axe fixe ─────────────────────
+  let departLoupe = null
+  const loupeEl = g(ids.loupe)
+  loupeEl?.addEventListener('pointerdown', (e) => {
+    if (!current() || !dur()) return
+    e.preventDefault()
+    departLoupe = { x: e.clientX, v: valeurBorne() }
+    memoriser()
+    loupeEl.setPointerCapture?.(e.pointerId)
+    video()?.pause()
+  })
+  loupeEl?.addEventListener('pointermove', (e) => {
+    if (!departLoupe) return
+    e.preventDefault()
+    poserBorne(departLoupe.v - (e.clientX - departLoupe.x) / PXS, false)
+    seek(valeurBorne())
+    paintBands(); paintSelection(); paintBornes(); paintLoupe(); paintCouverture()
+  })
+  const finLoupe = () => { if (departLoupe) { departLoupe = null; api.onChange?.() } }
+  loupeEl?.addEventListener('pointerup', finLoupe)
+  loupeEl?.addEventListener('pointercancel', finLoupe)
+
+  g(ids.undo)?.addEventListener('click', annuler)
+  if (g(ids.undo)) g(ids.undo).disabled = true
+
   g(ids.playClip)?.addEventListener('click', playClip)
   g(ids.done)?.addEventListener('click', () => select(null))
 
@@ -3816,14 +4144,16 @@ function createClipEditor(ids, api) {
   g(ids.setStart)?.addEventListener('click', () => {
     const s = current(), v = video()
     if (!s || !v) return
+    memoriser()
     s.timestamp_video = clamp(Math.min(v.currentTime, clipEnd(s) - MIN_CLIP))
-    paintBands(); paintSelection(); api.onChange?.()
+    repaint(); api.onChange?.()
   })
   g(ids.setEnd)?.addEventListener('click', () => {
     const s = current(), v = video()
     if (!s || !v) return
+    memoriser()
     s.fin_video = clamp(Math.max(v.currentTime, clipStart(s) + MIN_CLIP))
-    paintBands(); paintSelection(); api.onChange?.()
+    repaint(); api.onChange?.()
   })
 
   // « Diviser » : coupe l'étape en deux à l'endroit de la lecture.
@@ -3835,6 +4165,7 @@ function createClipEditor(ids, api) {
       toast("Placez la lecture au milieu du clip pour le diviser.")
       return
     }
+    memoriser()
     const finOriginale = clipEnd(s)
     s.fin_video = t
     const nouvelle = { id: null, texte: '', timestamp_video: t, fin_video: finOriginale }
@@ -3952,6 +4283,10 @@ capcutEditor = createClipEditor({
   info: 'capcut-info', hint: 'capcut-hint', playClip: 'capcut-play-clip', done: 'capcut-done',
   tools: 'capcut-tools', textField: 'capcut-text-field', text: 'capcut-text',
   setStart: 'capcut-set-start', setEnd: 'capcut-set-end', split: 'capcut-split',
+  bornes: 'capcut-bornes', vd: 'capcut-vd', vf: 'capcut-vf',
+  loupeBloc: 'capcut-loupe-bloc', loupe: 'capcut-loupe', loupeBande: 'capcut-loupe-bande',
+  loupeZone: 'capcut-loupe-zone', loupeFen: 'capcut-loupe-fen',
+  couv: 'capcut-couv', legende: 'capcut-legende', alertes: 'capcut-alertes', undo: 'capcut-undo',
   curTime: 'capcut-current-time', durTime: 'capcut-duration',
 }, {
   getSteps: () => videoSteps,
@@ -3969,6 +4304,10 @@ ecapEditor = createClipEditor({
   info: 'ecap-info', hint: 'ecap-hint', playClip: 'ecap-play-clip', done: 'ecap-done',
   tools: 'ecap-tools', textField: 'ecap-text-field', text: 'ecap-text',
   setStart: 'ecap-set-start', setEnd: 'ecap-set-end', split: 'ecap-split',
+  bornes: 'ecap-bornes', vd: 'ecap-vd', vf: 'ecap-vf',
+  loupeBloc: 'ecap-loupe-bloc', loupe: 'ecap-loupe', loupeBande: 'ecap-loupe-bande',
+  loupeZone: 'ecap-loupe-zone', loupeFen: 'ecap-loupe-fen',
+  couv: 'ecap-couv', legende: 'ecap-legende', alertes: 'ecap-alertes', undo: 'ecap-undo',
 }, {
   getSteps: () => editStepsData,
   onChange: () => renderEditSteps(),
@@ -4742,6 +5081,7 @@ document.getElementById('e-avatar')?.addEventListener('click', async () => {
 
 // ═══════════ ÉQUIPE : détail ═══════════
 async function openEquipeDetail(procId) {
+  arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById('e-detail').classList.add('active')
   remonterEnHaut()

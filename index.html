@@ -284,6 +284,25 @@
   }
   .detail-step-img img{ width:100%; display:block; }
 
+  /* ═══ Mon activité (espace équipe) ═══ */
+  .ma-ligne{
+    display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
+    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+  }
+  .ma-ligne .rang{
+    width:22px; flex-shrink:0; font-size:11px; font-weight:800;
+    color:var(--label-3); text-align:center;
+  }
+  .ma-ligne .info{ flex:1; min-width:0; }
+  .ma-ligne .nom{ font-size:14px; font-weight:650; letter-spacing:-0.02em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ma-ligne .quand{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
+  .ma-ligne .duree{ font-size:14px; font-weight:750; flex-shrink:0; }
+  .ma-ligne .jauge{ height:4px; border-radius:4px; background:rgba(255,255,255,0.09);
+    margin-top:6px; overflow:hidden; }
+  .ma-ligne .jauge i{ display:block; height:100%; border-radius:4px; }
+  .ma-vide{ font-size:12.5px; color:var(--label-2); line-height:1.5; padding:2px 0 6px; }
+
   /* ═══ Bloc du visiteur ═══
      Aucune carte floutée : ce serait un faux verrou, puisqu'il faudrait
      d'abord charger les données pour les masquer. On dit simplement ce qui
@@ -662,15 +681,22 @@
   /* La bande de l'étape choisie ressort par un liseré clair par-dessus sa
      couleur : on sait laquelle on règle sans perdre le repère de couleur. */
   .clip-band.sel{ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.9); }
-  .clip-band{ -webkit-user-select:none; user-select:none; pointer-events:auto; position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
-    border-left:2px solid rgba(255,255,255,0.5); border-right:2px solid rgba(255,255,255,0.5); }
+    /* Chaque étape porte deux bords marqués : son entrée à gauche, sa sortie à
+     droite, dans sa couleur. On voit donc les bornes de toutes les étapes en
+     même temps, pas seulement celles de l'étape choisie. */
+  .clip-band{
+    -webkit-user-select:none; user-select:none; pointer-events:auto;
+    position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
+    border-left:3px solid rgba(255,255,255,0.5); border-right:3px solid rgba(255,255,255,0.5);
+    border-radius:2px;
+  }
   .clip-band span{ position:absolute; top:4px; left:4px; font-size:9px; font-weight:800; color:#fff;
     background:rgba(0,0,0,0.65); border-radius:4px; padding:1px 5px; }
   .clip-mask{ position:absolute; top:0; bottom:0; background:rgba(0,0,0,0.6); pointer-events:none; z-index:2; display:none; }
   .clip-sel{ position:absolute; top:0; bottom:0; z-index:3; display:none; pointer-events:none;
     border-top:2px solid #fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.06); }
   .clip-mask.on, .clip-sel.on{ display:block; }
-  .clip-handle{ position:absolute; top:-1px; bottom:-1px; width:30px; z-index:6; display:none;
+  .clip-handle{ position:absolute; top:-1px; bottom:-1px; width:26px; z-index:6; display:none;
     align-items:center; justify-content:center; touch-action:none; cursor:ew-resize; }
   .clip-handle.on{ display:flex; }
   .clip-handle .grip{ width:16px; height:100%; background:#fff; border-radius:6px;
@@ -1732,7 +1758,7 @@
         <button type="button" class="zoom-btn" id="capcut-zoom-moins" aria-label="Dezoomer">−</button>
         <span class="zoom-val" id="capcut-zoom-val">x1</span>
         <button type="button" class="zoom-btn" id="capcut-zoom-plus" aria-label="Zoomer">+</button>
-        <button type="button" class="zoom-lien active" id="capcut-lien">Etapes liees</button>
+        <button type="button" class="zoom-lien" id="capcut-lien">Étapes liées</button>
       </div>
       <div class="clip-info" id="capcut-info" style="display:none;"></div>
         <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
@@ -1869,7 +1895,7 @@
         <button type="button" class="zoom-btn" id="ecap-zoom-moins" aria-label="Dezoomer">−</button>
         <span class="zoom-val" id="ecap-zoom-val">x1</span>
         <button type="button" class="zoom-btn" id="ecap-zoom-plus" aria-label="Zoomer">+</button>
-        <button type="button" class="zoom-lien active" id="ecap-lien">Etapes liees</button>
+        <button type="button" class="zoom-lien" id="ecap-lien">Étapes liées</button>
       </div>
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
@@ -2235,6 +2261,30 @@
     </div>
   </div>
 
+  <!-- Mon activité : ce que l'employé a lu, et le temps qu'il y a passé -->
+  <div class="screen" id="e-analyse">
+    <h1 class="pagehead">Mon activité</h1>
+    <div class="subhead" id="ma-sous">—</div>
+
+    <div class="ga-trio" style="margin-top:16px;">
+      <div class="ga-tuile"><div class="ga-anneau" id="ma-anneau-lues"></div><div class="ga-libelle">Lues</div></div>
+      <div class="ga-tuile"><div class="mf-chiffre" id="ma-temps">—</div><div class="ga-libelle">Temps total</div></div>
+      <div class="ga-tuile"><div class="mf-chiffre" id="ma-jours">—</div><div class="ga-libelle">Jours actifs</div></div>
+    </div>
+
+    <div class="section-title">En chiffres</div>
+    <div class="card" id="ma-chiffres"></div>
+
+    <div class="section-title">Temps par procédure</div>
+    <div id="ma-temps-liste"></div>
+
+    <div class="section-title">Par catégorie</div>
+    <div id="ma-categories"></div>
+
+    <div class="section-title" id="ma-reste-titre">Il vous reste à lire</div>
+    <div id="ma-reste"></div>
+  </div>
+
   <div class="screen" id="e-settings">
     <div class="pagehead-row">
       <button class="back-btn" onclick="showEquipeScreen('e-list')" aria-label="Retour">
@@ -2290,6 +2340,11 @@
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
     <span class="tab-label">Procédures</span>
+  </button>
+  <button class="tab-round tab-round--secondary" onclick="showEquipeScreen('e-analyse', this); renderMonActivite()" aria-label="Mon activité">
+    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
+    <span class="tab-label">Activité</span>
   </button>
   </div>
   <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()" aria-label="Scanner un QR code">
@@ -2372,6 +2427,7 @@ let currentVideoFile = null
 let allEquipeProcedures = []
 let equipeEtapesByProc = {}
 let equipeLues = new Set()      // identifiants des procédures que j'ai lues
+let mesLectures = []            // mes validations, avec date et durée
 let equipeCatCourante = null
 let equipeCatQuery = ''
 let scanStream = null
@@ -3058,6 +3114,138 @@ window.loadGlobalAnalyse = function() {
 
 }
 
+/* ══════════════════════════════════════════════════════════════════════════════
+   MON ACTIVITÉ (espace équipe)
+
+   Tout se calcule sur ce qui est déjà en mémoire : mes validations, avec leur
+   date et le temps passé, et la liste des procédures. Aucune requête de plus.
+
+   Une précaution sur le temps : il n'est connu que depuis que l'app le mesure.
+   Les lectures antérieures n'ont pas de durée, et on le dit plutôt que
+   d'afficher zéro comme si la personne n'avait rien lu.
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+function dureeLisible(s) {
+  if (!s || s < 1) return '\u2014'
+  if (s < 60) return Math.round(s) + ' s'
+  const m = Math.floor(s / 60), r = Math.round(s % 60)
+  if (m < 60) return m + ' min' + (r ? ' ' + String(r).padStart(2, '0') : '')
+  return Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0')
+}
+
+window.renderMonActivite = function() {
+  const procs = allEquipeProcedures || []
+  const lectures = mesLectures || []
+  const total = procs.length
+  const lues = procs.filter(p => equipeLues.has(p.id)).length
+  const pct = total ? Math.round((lues / total) * 100) : 0
+
+  // Anneau et compteurs de tête
+  dessinerAnneau('ma-anneau-lues', pct, pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--orange)' : 'var(--red)', pct + '%')
+
+  const avecDuree = lectures.filter(v => Number(v.duree_lecture) > 0)
+  const tempsTotal = avecDuree.reduce((s, v) => s + Number(v.duree_lecture), 0)
+  document.getElementById('ma-temps').textContent = tempsTotal ? dureeLisible(tempsTotal) : '\u2014'
+
+  const jours = new Set(lectures.filter(v => v.validated_at)
+    .map(v => new Date(v.validated_at).toDateString()))
+  document.getElementById('ma-jours').textContent = jours.size
+
+  const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
+  document.getElementById('ma-sous').textContent = total
+    ? `${lues} proc\u00e9dure${lues > 1 ? 's' : ''} lue${lues > 1 ? 's' : ''} sur ${total}`
+    : 'Aucune proc\u00e9dure publi\u00e9e pour le moment.'
+
+  // ── En chiffres ──
+  const dates = lectures.filter(v => v.validated_at).map(v => new Date(v.validated_at).getTime()).sort((a, b) => b - a)
+  const cette = new Date(); cette.setDate(cette.getDate() - ((cette.getDay() + 6) % 7)); cette.setHours(0, 0, 0, 0)
+  const semaine = lectures.filter(v => v.validated_at && new Date(v.validated_at) >= cette).length
+  const moyenne = avecDuree.length ? tempsTotal / avecDuree.length : 0
+  const plusLongue = avecDuree.slice().sort((a, b) => Number(b.duree_lecture) - Number(a.duree_lecture))[0]
+  const nomPlusLongue = plusLongue ? (procs.find(p => p.id === plusLongue.procedure_id)?.titre || '\u2014') : null
+
+  const lignes = [
+    ['Taux de lecture', pct + ' %'],
+    ['Cette semaine', semaine + ' lecture' + (semaine > 1 ? 's' : '')],
+    ['Temps moyen par proc\u00e9dure', moyenne ? dureeLisible(moyenne) : '\u2014'],
+    ['Journ\u00e9es actives', jours.size + ' jour' + (jours.size > 1 ? 's' : '')],
+    ['Derni\u00e8re lecture', dates.length ? ilYA(dates[0]) : '\u2014'],
+  ]
+  if (nomPlusLongue) lignes.push(['Plus longue lecture', nomPlusLongue])
+
+  document.getElementById('ma-chiffres').innerHTML = lignes
+    .map(([k, v]) => `<div class="mf-ligne"><span class="k">${k}</span><span class="v">${escapeHtml(String(v))}</span></div>`)
+    .join('')
+
+  // ── Temps par procédure ──
+  const parDuree = lectures
+    .map(v => ({ v, proc: procs.find(p => p.id === v.procedure_id) }))
+    .filter(x => x.proc)
+    .sort((a, b) => Number(b.v.duree_lecture || 0) - Number(a.v.duree_lecture || 0))
+
+  const maxDuree = Math.max(1, ...parDuree.map(x => Number(x.v.duree_lecture) || 0))
+  const listeEl = document.getElementById('ma-temps-liste')
+
+  if (!parDuree.length) {
+    listeEl.innerHTML = '<div class="ma-vide">Vous n\'avez encore consult\u00e9 aucune proc\u00e9dure. Le temps pass\u00e9 sur chacune appara\u00eetra ici.</div>'
+  } else {
+    listeEl.innerHTML = parDuree.map((x, i) => {
+      const d = Number(x.v.duree_lecture) || 0
+      const coul = COULEUR_ETAPE(i)
+      return `<div class="ma-ligne">
+        <span class="rang">${i + 1}</span>
+        <span class="info">
+          <span class="nom">${escapeHtml(x.proc.titre)}</span>
+          <span class="quand">${x.v.validated_at ? 'lue ' + ilYA(new Date(x.v.validated_at).getTime()) : 'lue'}</span>
+          <span class="jauge"><i style="width:${d ? (d / maxDuree * 100) : 0}%;background:${coul}"></i></span>
+        </span>
+        <span class="duree" style="color:${d ? coul : 'var(--label-3)'}">${dureeLisible(d)}</span>
+      </div>`
+    }).join('')
+    if (!avecDuree.length) {
+      listeEl.insertAdjacentHTML('afterbegin',
+        '<div class="ma-vide">Le temps pass\u00e9 n\'est mesur\u00e9 que depuis peu : vos lectures plus anciennes n\'en ont pas.</div>')
+    }
+  }
+
+  // ── Par catégorie ──
+  const parCat = {}
+  procs.forEach(p => {
+    const nom = p.categorie || 'Sans cat\u00e9gorie'
+    if (!parCat[nom]) parCat[nom] = { total: 0, lues: 0 }
+    parCat[nom].total++
+    if (equipeLues.has(p.id)) parCat[nom].lues++
+  })
+  const cats = Object.entries(parCat).sort((a, b) => (b[1].lues / b[1].total) - (a[1].lues / a[1].total))
+  document.getElementById('ma-categories').innerHTML = cats.length
+    ? cats.map(([nom, c]) => {
+        const pc = Math.round((c.lues / c.total) * 100)
+        const coul = pc === 100 ? 'var(--green)' : pc >= 34 ? 'var(--orange)' : 'var(--red)'
+        return `<div class="ma-ligne">
+          <span class="info"><span class="nom">${escapeHtml(nom)}</span>
+          <span class="jauge"><i style="width:${pc}%;background:${coul}"></i></span></span>
+          <span class="duree" style="color:${coul}">${c.lues}/${c.total}</span>
+        </div>`
+      }).join('')
+    : '<div class="ma-vide">Aucune cat\u00e9gorie.</div>'
+
+  // ── Ce qui reste ──
+  const reste = procs.filter(p => !equipeLues.has(p.id))
+  document.getElementById('ma-reste-titre').textContent =
+    reste.length ? `Il vous reste \u00e0 lire \u00b7 ${reste.length}` : 'Rien ne vous attend'
+  document.getElementById('ma-reste').innerHTML = reste.length
+    ? reste.map(p => `<div class="sop-card" data-proc="${p.id}">
+        <div><div class="title">${escapeHtml(p.titre)}</div>
+        <div class="meta">${escapeHtml(p.categorie || 'Sans cat\u00e9gorie')}</div></div>
+        <span class="badge drift">\u2014</span></div>`).join('')
+    : '<div class="ma-vide">Vous avez lu toutes les proc\u00e9dures publi\u00e9es. Bravo.</div>'
+}
+
+document.getElementById('ma-reste')?.addEventListener('click', (e) => {
+  const c = e.target.closest('[data-proc]')
+  if (c) openEquipeDetail(c.dataset.proc)
+})
+
 /* ═══ Liste des membres, triable ═══ */
 let triMembres = 'actifs'
 
@@ -3301,7 +3489,7 @@ window.startNewProcedure = function() {
 /* Comme côté gestion : le repère suit l'écran affiché, pas le bouton tapé.
    Le scanner et les réglages n'allument aucun onglet — le bouton blanc se
    signale à lui seul. */
-const ONGLET_EQUIPE_PAR_ECRAN = { 'e-list': 0, 'e-category': 0, 'e-detail': 0 }
+const ONGLET_EQUIPE_PAR_ECRAN = { 'e-list': 0, 'e-category': 0, 'e-detail': 0, 'e-analyse': 1 }
 
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
@@ -4142,7 +4330,11 @@ function createClipEditor(ids, api) {
   let selIndex = null
   let borneActive = 'a'      // la borne que la loupe et l'affichage suivent
   let zoom = 1               // facteur d'agrandissement de la frise
-  let etapesLiees = true     // montage par report : la voisine suit
+  /* Par défaut, une borne S'ARRÊTE à l'étape voisine : on ne peut pas entrer
+     dedans. Le bouton « Étapes liées » permet d'activer le report, où la
+     voisine reculerait pour laisser passer — utile, mais ce n'est pas ce
+     qu'on attend en premier. */
+  let etapesLiees = false
   let refaire = []           // pile de rétablissement
   let histo = []             // pile d'annulation
   const PXS = 42             // pixels par seconde dans la loupe
@@ -4222,8 +4414,17 @@ function createClipEditor(ids, api) {
     g(ids.maskL).style.width = a + '%'
     g(ids.maskR).style.left = b + '%'
     g(ids.maskR).style.width = Math.max(0, 100 - b) + '%'
-    g(ids.hStart).style.left = `calc(${a}% - 15px)`
-    g(ids.hEnd).style.left = `calc(${b}% - 15px)`
+    /* Les poignées se posent À L'INTÉRIEUR de l'étape, pas à cheval sur ses
+       bords. À cheval, leur zone tactile de 30 px débordait de part et d'autre :
+       appuyer au milieu d'une étape courte — 8 px de large à l'échelle ×1 —
+       revenait à saisir sa borne de fin, et l'étape se terminait sous le doigt.
+       À l'intérieur, le centre de l'étape reste libre pour l'appui long. */
+    const largeurBande = timeline.getBoundingClientRect().width * (b - a) / 100
+    const largeurPoignee = Math.min(26, Math.max(10, largeurBande / 2 - 1))
+    g(ids.hStart).style.width = largeurPoignee + 'px'
+    g(ids.hEnd).style.width = largeurPoignee + 'px'
+    g(ids.hStart).style.left = `${a}%`
+    g(ids.hEnd).style.left = `calc(${b}% - ${largeurPoignee}px)`
 
     if (infoEl) {
       infoEl.style.display = 'flex'
@@ -5972,10 +6173,11 @@ async function loadEquipeProcedures() {
   // chaque fiche s'ouvrira ensuite instantanément.
   const procIds = pretes.map(p => p.id)
   const [{ data: mesValidations }, { data: toutesEtapes }] = await Promise.all([
-    supabase.from('validations').select('procedure_id').eq('membre_id', currentMembre.id),
+    supabase.from('validations').select('procedure_id, validated_at, duree_lecture').eq('membre_id', currentMembre.id),
     supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
   ])
   equipeLues = new Set((mesValidations || []).map(v => v.procedure_id))
+  mesLectures = mesValidations || []   // avec la date et la durée, pour l'écran d'activité
 
   equipeEtapesByProc = {}
   ;(toutesEtapes || []).forEach(e => {
@@ -6486,10 +6688,21 @@ async function enregistrerConsultation() {
   if (lectureEnregistree || !lectureProcId || !currentMembre) return
   lectureEnregistree = true
 
+  /* On inscrit le temps réellement passé sur la fiche. C'est la seule mesure
+     honnête dont on dispose : le décompte s'arrête dès que l'app passe en
+     arrière-plan, donc ces secondes ont vraiment été passées devant l'écran. */
   const { error } = await supabase.from('validations').upsert(
-    { procedure_id: lectureProcId, membre_id: currentMembre.id },
+    { procedure_id: lectureProcId, membre_id: currentMembre.id, duree_lecture: lectureSecondes },
     { onConflict: 'procedure_id,membre_id' }
   )
+  // Si la colonne n'existe pas encore en base, on réessaie sans elle.
+  if (error && /duree_lecture/i.test(error.message || '')) {
+    const repli = await supabase.from('validations').upsert(
+      { procedure_id: lectureProcId, membre_id: currentMembre.id },
+      { onConflict: 'procedure_id,membre_id' }
+    )
+    if (!repli.error) { afficherLectureFaite(true); loadEquipeProcedures(); return }
+  }
 
   if (error) {
     // On ne bloque pas la lecture : on signale et on laissera une autre visite retenter.

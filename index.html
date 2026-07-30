@@ -124,7 +124,7 @@
   .topbar-card{
     position:relative;
     display:flex; align-items:center;
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    background:rgba(255,255,255,0.15); -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
@@ -140,7 +140,7 @@
   .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    background:rgba(255,255,255,0.15); -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
     border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
@@ -949,6 +949,13 @@
     font-size:14.5px; font-weight:700; color:var(--label);
   }
   .cat-name .txt{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .cat-recent-item .txt{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* Dans la liste des titres récents, le texte est plus petit : l'indicateur
+     se met à l'échelle pour ne pas écraser la ligne. */
+  .cat-recent-item .etat-proc{ width:13px; height:13px; }
+  .cat-recent-item .etat-proc svg{ width:13px; height:13px; }
+  .cat-recent-item .etat-proc.prete{ width:13px; height:13px; }
+  .cat-recent-item .etat-proc.prete svg{ width:8px; height:8px; }
   .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
   /* Côté équipe, le compteur est un rapport (« 2/2 lues ») et non un
@@ -962,8 +969,11 @@
     color:var(--orange); background:rgba(255,159,10,0.14); padding:3px 8px; border-radius:100px; margin-bottom:8px;
   }
   .cat-recent{ border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
+  /* Le titre d'une procédure récente et, le cas échéant, son état d'analyse :
+     l'indicateur se cale juste au bout du texte, pas au bout de la carte. */
   .cat-recent-item{
-    font-size:10.5px; color:var(--label-2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    display:flex; align-items:center; gap:5px;
+    font-size:10.5px; color:var(--label-2);
     padding:2px 0;
   }
   .cat-cell.active{ border-color:#fff; background:rgba(255,255,255,0.14); }
@@ -1111,7 +1121,7 @@
   .login-card .subhead{margin-bottom:20px;}
 
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    background:rgba(255,255,255,0.15); -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
@@ -1127,11 +1137,14 @@
     -webkit-backdrop-filter:none; backdrop-filter:none;
     filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48));
   }
+  /* Le verre était trop transparent : on voyait la page à travers, surtout
+     au-dessus d'une vidéo claire. Le flou passe de 24 à 44 pixels et la teinte
+     de 10 à 15 % — assez pour dépolir, pas assez pour opacifier. */
   #tabbar-gestion .groupe, #tabbar-equipe .groupe{
     display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
-    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
+    background:rgba(255,255,255,0.15); border:0.5px solid rgba(255,255,255,0.20);
+    -webkit-backdrop-filter:blur(44px) saturate(190%); backdrop-filter:blur(44px) saturate(190%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.16);
   }
   /* ═══ Pourquoi le libellé est en position absolue ═══
      Faire varier `max-width` sur le texte le rognait progressivement : on
@@ -1813,7 +1826,6 @@
           </div>
           <div class="ed-aide">Faites glisser pour affiner au dixième de seconde</div>
         </div>
-      <button type="button" class="btn small ghost block" id="ecap-recaler" style="display:none; margin-top:10px;">⇄ Les extraits sont décalés ? Recaler</button>
       <div class="clip-tools" id="ecap-tools">
         <button type="button" class="clip-tool" id="ecap-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
         <button type="button" class="clip-tool" id="ecap-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
@@ -3380,13 +3392,8 @@ async function loadGestionProcedures() {
       avgPct = procsInCat.length > 0 ? Math.round((totalRatio / procsInCat.length) * 100) : 0
     }
 
-    // État de la catégorie : une analyse en cours l'emporte sur une analyse
-    // terminée, pour que la roue reste visible tant que quelque chose tourne.
-    const etatCat = procsInCat.some(p => p.statut === 'traitement') ? 'traitement'
-      : procsInCat.some(p => p.statut === 'pret') ? 'pret' : null
-
     allCategoriesData.push({
-      nom, icone, procsInCat, avgPct, statut: etatCat,
+      nom, icone, procsInCat, avgPct,
       latestDate: new Date(procsInCat[0].created_at).getTime(),
       earliestDate: new Date(procsInCat[procsInCat.length - 1].created_at).getTime()
     })
@@ -3519,7 +3526,7 @@ function renderCategoryGrid() {
   })
 
   const triParDate = currentCatSort === 'new' || currentCatSort === 'old'
-  sorted.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate, statut }) => {
+  sorted.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
     const recentTitles = procsInCat.slice(0, 3)
     const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
@@ -3527,7 +3534,7 @@ function renderCategoryGrid() {
     const needsAttention = avgPct > 0 && avgPct < 30
 
     const cell = document.createElement('div')
-    cell.className = 'cat-cell' + (statut === 'traitement' ? ' proc-en-cours' : '')
+    cell.className = 'cat-cell'
     cell.dataset.key = nom
     cell.innerHTML = `
       <div class="cat-top">
@@ -3541,7 +3548,7 @@ function renderCategoryGrid() {
         </div>
         <div class="cat-badge">${procsInCat.length}</div>
       </div>
-      <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span>${etatProcedureHtml({ statut })}</div>
+      <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
       <div class="cat-pct-row">
         <span class="cat-pct" style="color:${ringColor};">${avgPct}%</span>
         <span class="cat-pct-label">consultées</span>
@@ -3549,7 +3556,7 @@ function renderCategoryGrid() {
       ${triParDate ? `<div class="cat-date">${new Date(currentCatSort === 'old' ? earliestDate : latestDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: '2-digit' })}</div>` : ''}
       ${needsAttention ? `<div class="cat-attention">⚠︎ À relancer</div>` : ''}
       <div class="cat-recent">
-        ${recentTitles.map(p => `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}
+        ${recentTitles.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
       </div>
     `
     cell.onclick = () => openCategoryProcedures(nom)
@@ -4093,18 +4100,27 @@ function createClipEditor(ids, api) {
     const d = dur()
     const s = current()
     const on = !!(s && d)
+    /* Les outils de montage restent affichés dès qu'une vidéo est chargée, même
+       sans étape choisie : on n'a plus à deviner qu'il faut d'abord toucher une
+       étape pour les faire apparaître. Seules les poignées et les masques,
+       qui n'ont de sens que sur une étape précise, restent conditionnels. */
+    const outillageVisible = !!d
     ;[ids.maskL, ids.maskR, ids.sel].forEach(id => g(id)?.classList.toggle('on', on))
     ;[ids.hStart, ids.hEnd].forEach(id => g(id)?.classList.toggle('on', on))
     timeline.classList.toggle('clipmode', on)
 
     const infoEl = g(ids.info)
-    g(ids.tools)?.classList.toggle('on', on)
+    g(ids.tools)?.classList.toggle('on', outillageVisible)
     g(ids.done)?.classList.toggle('on', on)
     if (g(ids.hint)) g(ids.hint).textContent = on
       ? 'Écartez ou resserrez les deux poignées blanches'
       : (ids.prefix === 'capcut'
           ? 'Placez la lecture, puis découpez une étape'
           : 'Touchez une étape pour régler son clip')
+
+    ;[ids.setStart, ids.setEnd, ids.split, ids.playClip].forEach(id => {
+      const b = g(id); if (b) b.disabled = !on
+    })
 
     if (!on) { if (infoEl) infoEl.style.display = 'none'; return }
 
@@ -6288,7 +6304,6 @@ window.openEditProcedure = async function(procId, mode) {
     videoEl.addEventListener('loadedmetadata', async () => {
       editStepsData = normaliserClips(editStepsData, videoEl.duration)
       renderEditSteps()
-      majBoutonRecalage()
       ecapEditor?.repaint()
       await generateFilmstrip(videoEl, 'ecap-track')
       ecapEditor?.repaint()
@@ -6299,62 +6314,35 @@ window.openEditProcedure = async function(procId, mode) {
   }
 
   clipsDeduits = false
-  editStepsData = (etapes || []).map(e => ({
+  let brutes = (etapes || []).map(e => ({
     id: e.id, texte: e.texte,
     timestamp_video: e.timestamp_video,
     fin_video: e.fin_video != null ? e.fin_video : null,
     _t: e.timestamp_video,   // horodatage brut conservé pour pouvoir recaler
   }))
-  ecapEditor?.deselect()
+
+  /* À la première vérification d'une découpe automatique, on rapproche les
+     doublons. Une procédure déjà vérifiée n'y passe pas : ses étapes sont
+     celles que l'utilisateur a validées, on n'y touche plus. */
+  if (mode === 'ai-review') {
+    const avant = brutes.length
+    brutes = nettoyerEtapesIA(brutes, document.getElementById('edit-video-player')?.duration)
+    if (brutes.length < avant) {
+      toast(`${avant - brutes.length} doublon${avant - brutes.length > 1 ? 's' : ''} rapproché${avant - brutes.length > 1 ? 's' : ''} · vérifiez le découpage`)
+    }
+  }
+
+  editStepsData = brutes
   renderEditSteps()
-  majBoutonRecalage()
+
+  /* On sélectionne la première étape dès l'ouverture. Sans elle, les pastilles
+     de bornes et la loupe s'afficheraient vides, ce qui est plus déroutant
+     qu'utile. `lire: false` pour ne pas lancer la vidéo dans la figure. */
+  if (editVideoUrl && editStepsData.length) ecapEditor?.select(0, { lire: false })
+  else ecapEditor?.deselect()
 }
 
-// Le bouton de recalage n'apparaît que quand les bornes ont été déduites
-// (procédure jamais encore vérifiée), pas quand elles viennent de la base.
-function majBoutonRecalage() {
-  const btn = document.getElementById('ecap-recaler')
-  if (!btn) return
-  btn.style.display = (clipsDeduits && editVideoUrl) ? 'block' : 'none'
-}
 
-document.getElementById('ecap-recaler')?.addEventListener('click', () => {
-  const videoEl = document.getElementById('edit-video-player')
-  conventionClips = conventionClips === 'debut' ? 'fin' : 'debut'
-  deriverClips(editStepsData, videoEl?.duration, conventionClips)
-  ecapEditor?.deselect()
-  renderEditSteps()
-  ecapEditor?.repaint()
-  toast('Étapes recalées. Touchez une étape pour vérifier.')
-})
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   BORNES DES CLIPS
-
-   Une étape n'a longtemps eu qu'un seul horodatage, `timestamp_video`, et deux
-   lectures opposées coexistaient :
-     • « fin »   — l'horodatage marque la FIN de l'étape (le point de coupe),
-                   le début étant celui de l'étape précédente. C'est la logique
-                   du bouton « ✂ Couper ici » d'origine, et celle qu'utilise
-                   la fonction d'analyse IA.
-     • « début » — l'horodatage marque le DÉBUT de l'étape, la fin étant le
-                   début de la suivante.
-   Lire les données dans le mauvais sens décale toutes les étapes d'un cran :
-   le texte de l'étape 1 se retrouve sur l'extrait de l'étape 2, etc.
-   On détecte donc la convention à partir des données elles-mêmes.
-   Une fois l'étape enregistrée, `fin_video` existe et la question ne se pose plus.
-   ═══════════════════════════════════════════════════════════════════════════ */
-function detecterConvention(horodatages, duree) {
-  if (!horodatages.length) return 'fin'
-  const premier = horodatages[0]
-  const dernier = horodatages[horodatages.length - 1]
-  const d = isFinite(duree) && duree > 0 ? duree : null
-  // Un premier horodatage à zéro ne peut pas être une fin : ce sont des débuts.
-  if (premier <= 1) return 'debut'
-  // Un dernier horodatage collé à la fin de la vidéo ne peut pas être un début.
-  if (d && dernier >= d - 2) return 'fin'
-  return 'fin'
-}
 
 // Calcule début et fin de chaque étape à partir des horodatages bruts
 function deriverClips(steps, duree, convention) {
@@ -6376,6 +6364,140 @@ function deriverClips(steps, duree, convention) {
 
 // Prépare les étapes chargées : on garde l'horodatage brut de côté pour pouvoir
 // recalculer dans l'autre sens si besoin, puis on déduit les bornes manquantes.
+/* ═══════════════════════════════════════════════════════════════════════════
+   NETTOYAGE DES ÉTAPES PRODUITES PAR L'IA
+
+   L'analyse renvoie souvent deux fois la même action, formulée autrement :
+   « Ajouter une cuillère de moutarde » puis « Ajouter une cuillère de moutarde
+   dans le bol ». Elle produit aussi des extraits d'une seconde, parfois
+   plusieurs sur le même instant. Ces doublons se retrouvaient tels quels dans
+   l'écran de vérification, et c'est à l'utilisateur qu'il revenait de faire le
+   ménage.
+
+   On les rapproche donc avant affichage. Le nettoyage est prudent : il ne
+   fusionne que ce qui se ressemble vraiment et se suit dans le temps, et il ne
+   supprime jamais de texte — il garde la formulation la plus complète.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const MOTS_NOMBRES = {
+  un: '1', une: '1', deux: '2', trois: '3', quatre: '4', cinq: '5',
+  six: '6', sept: '7', huit: '8', neuf: '9', dix: '10', demi: '0.5',
+}
+
+/* Réduit une phrase à ses mots porteurs de sens : sans accents, sans
+   ponctuation, sans articles ni prépositions, et avec les nombres écrits en
+   chiffres — c'est ce qui rapproche « 2 grosses cuillères » de « deux grosses
+   cuillères ». */
+const MOTS_VIDES = new Set(['le','la','les','un','une','des','du','de','d','au','aux','a','à','dans','sur','sous',
+  'et','ou','puis','ensuite','avec','pour','en','par','son','sa','ses','ce','cet','cette','il','elle','on',
+  'jusqu','jusque','que','qui','quo','selon','bien','tout','toute','plus','moins'])
+
+function motsUtiles(texte) {
+  const brut = (texte || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')   // on retire les accents
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .split(/\s+/).filter(Boolean)
+  const mots = []
+  for (const m of brut) {
+    const n = MOTS_NOMBRES[m] || m
+    if (MOTS_VIDES.has(n)) continue
+    mots.push(n)
+  }
+  return mots
+}
+
+/* Proportion de mots communs (indice de Jaccard). Deux formulations d'une même
+   action partagent l'essentiel de leur vocabulaire. */
+function ressemblance(a, b) {
+  const A = new Set(motsUtiles(a)), B = new Set(motsUtiles(b))
+  if (!A.size || !B.size) return 0
+  let communs = 0
+  A.forEach(m => { if (B.has(m)) communs++ })
+  return communs / (A.size + B.size - communs)
+}
+
+/* Vrai si l'une des deux phrases dit tout ce que dit l'autre, en plus long :
+   c'est le cas typique du doublon enrichi. */
+function contient(a, b) {
+  const A = motsUtiles(a), B = motsUtiles(b)
+  const [court, long] = A.length <= B.length ? [A, new Set(B)] : [B, new Set(A)]
+  if (!court.length) return false
+  return court.every(m => long.has(m))
+}
+
+function nettoyerEtapesIA(etapes, duree) {
+  if (!etapes || etapes.length < 2) return etapes || []
+
+  // On travaille dans l'ordre du temps, sinon deux doublons éloignés dans la
+  // liste ne se verraient jamais.
+  const tri = etapes.slice().sort((a, b) => (a.timestamp_video ?? 0) - (b.timestamp_video ?? 0))
+  const sortie = []
+
+  for (const e of tri) {
+    const prec = sortie[sortie.length - 1]
+    if (!prec) { sortie.push({ ...e }); continue }
+
+    const debut = e.timestamp_video ?? 0
+    const finPrec = prec.fin_video ?? prec.timestamp_video ?? 0
+    const proches = Math.abs(debut - (prec.timestamp_video ?? 0)) < 6 || debut <= finPrec + 1
+
+    const memeAction = contient(prec.texte, e.texte) || ressemblance(prec.texte, e.texte) >= 0.62
+
+    if (proches && memeAction) {
+      // Fusion : on garde la formulation la plus riche et l'étendue des deux.
+      const plusComplet = motsUtiles(e.texte).length > motsUtiles(prec.texte).length ? e.texte : prec.texte
+      prec.texte = plusComplet
+      prec.timestamp_video = Math.min(prec.timestamp_video ?? debut, debut)
+      prec.fin_video = Math.max(prec.fin_video ?? 0, e.fin_video ?? debut)
+      continue
+    }
+    sortie.push({ ...e })
+  }
+
+  /* Plusieurs étapes annoncées au même instant : l'analyse a repéré les actions
+     mais pas su les situer. Aucune ne peut alors avoir de durée, puisque la
+     suivante commence là où la précédente débute. On partage donc l'intervalle
+     jusqu'au prochain instant distinct, à parts égales. */
+  let g = 0
+  while (g < sortie.length) {
+    let fin = g
+    while (fin + 1 < sortie.length &&
+           Math.abs((sortie[fin + 1].timestamp_video ?? 0) - (sortie[g].timestamp_video ?? 0)) < 0.5) fin++
+    if (fin > g) {
+      const debutGroupe = sortie[g].timestamp_video ?? 0
+      const nb = fin - g + 1
+      const finGroupe = sortie[fin + 1]?.timestamp_video ?? duree ?? (debutGroupe + nb * 3)
+      const pas = Math.max(1, (finGroupe - debutGroupe) / nb)
+      for (let k = g; k <= fin; k++) {
+        sortie[k].timestamp_video = debutGroupe + pas * (k - g)
+        sortie[k].fin_video = debutGroupe + pas * (k - g + 1)
+      }
+    }
+    g = fin + 1
+  }
+
+  /* Les extraits d'une seconde ne montrent rien. Quand la borne de fin est
+     manifestement fausse, on l'étire jusqu'au début de l'étape suivante —
+     c'est ce que l'utilisateur aurait fait à la main. */
+  const DUREE_MINI = 2
+  for (let i = 0; i < sortie.length; i++) {
+    const s = sortie[i]
+    if (s.timestamp_video == null) continue
+    const suivante = sortie[i + 1]
+    const plafond = suivante?.timestamp_video ?? duree ?? null
+    if (s.fin_video == null || s.fin_video - s.timestamp_video < DUREE_MINI) {
+      s.fin_video = plafond != null ? Math.max(s.timestamp_video + 0.5, plafond) : s.timestamp_video + DUREE_MINI
+    }
+    // Jamais au-delà de la suivante : on ne fabrique pas de chevauchement.
+    if (plafond != null && s.fin_video > plafond) s.fin_video = plafond
+    s.timestamp_video = Math.round(s.timestamp_video * 10) / 10
+    s.fin_video = Math.round(s.fin_video * 10) / 10
+  }
+
+  return sortie
+}
+
 function normaliserClips(steps, duree) {
   const aDeduire = steps.filter(s => s.timestamp_video != null && s.fin_video == null)
   if (aDeduire.length === 0) return steps

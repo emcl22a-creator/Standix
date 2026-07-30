@@ -187,6 +187,63 @@
     font-size:12.5px; font-weight:650; color:var(--blue); flex-shrink:0;
   }
 
+  /* ═══ Image d'une étape manuelle ═══
+     Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
+     facultative : l'étape reste valable sans. */
+  .step-img{ display:flex; align-items:center; gap:10px; margin-top:10px; }
+  .step-img-vignette{
+    width:56px; height:56px; border-radius:11px; flex-shrink:0; overflow:hidden;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; position:relative;
+  }
+  .step-img-vignette img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .step-img-vignette svg{ width:19px; height:19px; color:var(--label-3); }
+  .step-img-vignette .att{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,0.55); font-size:9px; font-weight:700;
+  }
+  .step-img-actions{ flex:1; min-width:0; display:flex; gap:7px; }
+  .step-img-actions button{
+    flex:1; height:32px; border-radius:9px; border:0.5px solid var(--border);
+    background:rgba(255,255,255,0.07); color:#fff; font-family:inherit;
+    font-size:11.5px; font-weight:650;
+  }
+  .step-img-actions button:active{ background:rgba(255,255,255,0.16); }
+  .step-img-actions button.retirer{ flex:0 0 auto; padding:0 12px; color:var(--red); }
+  .step-img input[type=file]{ display:none; }
+
+  /* Côté employé : l'image au-dessus du texte de l'étape. */
+  .detail-step-img{
+    width:100%; border-radius:12px; overflow:hidden; margin-top:9px;
+    border:0.5px solid var(--border); background:#000;
+  }
+  .detail-step-img img{ width:100%; display:block; }
+
+  /* ═══ Bloc du visiteur ═══
+     Aucune carte floutée : ce serait un faux verrou, puisqu'il faudrait
+     d'abord charger les données pour les masquer. On dit simplement ce qui
+     existe et comment y accéder. */
+  .visiteur{
+    margin-top:16px; padding:16px 18px; border-radius:20px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .visiteur-tete{ display:flex; align-items:flex-start; gap:13px; }
+  .visiteur-cadenas{
+    width:38px; height:38px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.08); color:var(--label-2);
+  }
+  .visiteur-cadenas svg{ width:19px; height:19px; }
+  .visiteur-txt{ flex:1; min-width:0; }
+  .visiteur-txt .t{ font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .visiteur-txt .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
+  .visiteur-code{ display:flex; gap:8px; margin-top:14px; }
+  .visiteur-code input[type=text]{
+    flex:1; min-width:0; width:auto; margin:0; text-align:center;
+    font-size:19px; font-weight:700; letter-spacing:0.3em;
+  }
+  .visiteur-code .btn{ width:auto; flex-shrink:0; padding:0 18px; }
+
   /* Bandeau affiché quand on arrive par un QR code sans être connecté. */
   .qr-bandeau{
     display:flex; flex-direction:column; gap:3px; margin-bottom:18px;
@@ -1651,10 +1708,22 @@
     </div>
 
     <div class="video-frame" id="edit-video-frame" style="display:none; margin-bottom:14px;">
-      <video id="edit-video-player" controls playsinline webkit-playsinline></video>
+      <video id="edit-video-player" playsinline webkit-playsinline></video>
     </div>
 
     <div class="capcut-wrap" id="ecap-wrap" style="display:none; margin-bottom:16px;">
+      <!-- Mêmes commandes que l'écran de découpe : la barre native de Safari
+           n'affichait ni la position en clair ni la durée, et elle ne se
+           coordonnait pas avec la frise. -->
+      <div class="capcut-controls">
+        <button class="capcut-play-btn" id="ecap-play-btn">
+          <svg id="ecap-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+          <svg id="ecap-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18" rx="1"/><rect x="14" y="3" width="5" height="18" rx="1"/></svg>
+        </button>
+        <span class="capcut-current-time" id="ecap-current-time">0:00</span>
+        <span class="capcut-duration-sep">/</span>
+        <span class="capcut-duration" id="ecap-duration">0:00</span>
+      </div>
       <div class="capcut-timeline" id="ecap-timeline">
         <div class="capcut-track" id="ecap-track"></div>
         <div class="capcut-markers" id="ecap-markers"></div>
@@ -1667,6 +1736,9 @@
       </div>
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
+      <div class="cut-toolbar">
+        <button type="button" class="btn small block" id="ecap-add-btn">+ Découper une étape ici</button>
+      </div>
         <div class="ed-bornes" id="ecap-bornes">
           <div class="ed-borne actif" data-borne="a"><div class="k">Début</div><div class="v" id="ecap-vd">0:00,0</div></div>
           <div class="ed-borne" data-borne="b"><div class="k">Fin</div><div class="v" id="ecap-vf">0:00,0</div></div>
@@ -1959,6 +2031,24 @@
     </div>
 
     <div id="e-resultats" class="e-resultats" style="display:none;"></div>
+
+    <!-- Visible uniquement pour un visiteur arrivé par QR code -->
+    <div class="visiteur" id="e-visiteur" style="display:none;">
+      <div class="visiteur-tete">
+        <div class="visiteur-cadenas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>
+        </div>
+        <div class="visiteur-txt">
+          <div class="t" id="e-visiteur-titre">Les autres procédures ne vous sont pas accessibles</div>
+          <div class="s">Demandez le code de l'entreprise à votre responsable pour y accéder.</div>
+        </div>
+      </div>
+      <div class="visiteur-code">
+        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" placeholder="00000">
+        <button class="btn" id="e-visiteur-valider">Débloquer</button>
+      </div>
+      <div class="error-msg" id="e-visiteur-erreur"></div>
+    </div>
 
     <div id="e-bloc-categories">
       <div class="section-title">Catégories</div>
@@ -2512,25 +2602,28 @@ async function proposerEntrepriseDuQR(code) {
 
   const nom = ent.nom || 'cette entreprise'
   const ok = await confirmDialog({
-    titre: dejaMembre ? "Changer d'entreprise ?" : 'Rejoindre cette entreprise ?',
+    titre: dejaMembre ? "Changer d'entreprise ?" : 'Consulter cette procédure ?',
     message: dejaMembre
       ? `Cette procédure appartient à « ${nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?`
-      : `Cette procédure appartient à « ${nom} », dont vous ne faites pas encore partie. La rejoindre pour pouvoir la consulter ?`,
-    confirmer: dejaMembre ? 'Basculer' : 'Rejoindre',
-    annuler: 'Non merci',
+      : `Cette procédure appartient à « ${nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.`,
+    confirmer: dejaMembre ? 'Basculer' : 'Consulter',
+    annuler: 'Annuler',
     danger: false,
   })
   if (!ok) return false
 
   let membre = dejaMembre
   if (!membre) {
+    /* Adhésion « visiteur » : rattachée à une seule procédure. C'est ce qui
+       permet de n'afficher que celle-là, sans jamais charger les autres. */
     const { data, error } = await supabase.from('membres').insert({
       user_id: user.id,
       nom: currentMembre?.nom || '',
-      role: 'equipe',
+      role: 'visiteur',
       entreprise_id: ent.id,
+      procedure_visitee: cibleQR.proc,
     }).select().single()
-    if (error) { toast("Impossible de rejoindre : " + error.message); return false }
+    if (error) { toast("Accès impossible : " + error.message); return false }
     membre = data
   }
 
@@ -4107,11 +4200,18 @@ function createClipEditor(ids, api) {
 
   function repaint() { paintBands(); paintSelection(); paintPlayhead(); paintBornes(); paintLoupe(); paintCouverture() }
 
-  // ── Boucle d'animation de la tête de lecture ─────────────────────────────
+  /* ── Boucle d'animation de la tête de lecture ─────────────────────────────
+     Elle tournait uniquement pendant la lecture, ce qui la rendait dépendante
+     des événements émis par le navigateur — et Safari est capricieux là-dessus :
+     lecture depuis les commandes natives, reprise après une recherche, sortie
+     de veille, autant d'occasions de ne pas recevoir le `play` attendu.
+     Elle tourne donc maintenant en continu tant que l'éditeur est à l'écran.
+     Le coût est d'une écriture de style par image, c'est-à-dire rien. */
   function loop() {
     paintPlayhead()
-    const v = video()
-    if (v && !v.paused && !v.ended) rafId = requestAnimationFrame(loop)
+    const wrap = ids.wrap ? g(ids.wrap) : null
+    const visible = wrap ? wrap.offsetParent !== null : true
+    rafId = visible ? requestAnimationFrame(loop) : null
   }
   function startLoop() { if (rafId) cancelAnimationFrame(rafId); rafId = requestAnimationFrame(loop) }
   function stopLoop() { if (rafId) { cancelAnimationFrame(rafId); rafId = null } }
@@ -4335,8 +4435,8 @@ function createClipEditor(ids, api) {
        `timeupdate` sert de filet même si la boucle n'a pas démarré. */
     ;['timeupdate', 'seeked', 'seeking', 'loadeddata'].forEach(ev => v.addEventListener(ev, paintPlayhead))
     ;['play', 'playing'].forEach(ev => v.addEventListener(ev, startLoop))
-    v.addEventListener('pause', () => { stopLoop(); paintPlayhead() })
-    v.addEventListener('ended', () => { stopLoop(); paintPlayhead() })
+    ;['pause', 'ended'].forEach(ev => v.addEventListener(ev, paintPlayhead))
+    startLoop()   // et on la lance tout de suite, sans attendre une lecture
     v.addEventListener('loadedmetadata', () => {
       if (ids.durTime && g(ids.durTime)) g(ids.durTime).textContent = formatTime(v.duration)
       repaint()
@@ -4401,7 +4501,7 @@ async function generateFilmstrip(video, trackEl) {
 
 // ═══ Instance 1 : écran « Découper une vidéo » (création) ═══
 capcutEditor = createClipEditor({
-  prefix: 'capcut',
+  prefix: 'capcut', wrap: 'capcut-wrap',
   video: 'video-player', timeline: 'capcut-timeline', markers: 'capcut-markers',
   maskL: 'capcut-mask-l', maskR: 'capcut-mask-r', sel: 'capcut-sel',
   hStart: 'capcut-h-start', hEnd: 'capcut-h-end', playhead: 'capcut-playhead',
@@ -4422,13 +4522,14 @@ capcutEditor = createClipEditor({
 
 // ═══ Instance 2 : écran « Modifier la procédure » ═══
 ecapEditor = createClipEditor({
-  prefix: 'ecap',
+  prefix: 'ecap', wrap: 'ecap-wrap',
   video: 'edit-video-player', timeline: 'ecap-timeline', markers: 'ecap-markers',
   maskL: 'ecap-mask-l', maskR: 'ecap-mask-r', sel: 'ecap-sel',
   hStart: 'ecap-h-start', hEnd: 'ecap-h-end', playhead: 'ecap-playhead',
   info: 'ecap-info', hint: 'ecap-hint', playClip: 'ecap-play-clip', done: 'ecap-done',
   tools: 'ecap-tools', textField: 'ecap-text-field', text: 'ecap-text',
   setStart: 'ecap-set-start', setEnd: 'ecap-set-end', split: 'ecap-split',
+  curTime: 'ecap-current-time', durTime: 'ecap-duration',
   bornes: 'ecap-bornes', vd: 'ecap-vd', vf: 'ecap-vf',
   loupeBloc: 'ecap-loupe-bloc', loupe: 'ecap-loupe', loupeBande: 'ecap-loupe-bande',
   loupeZone: 'ecap-loupe-zone', loupeFen: 'ecap-loupe-fen',
@@ -4478,6 +4579,26 @@ function majIconePlay(player, prefix) {
 document.getElementById('capcut-play-btn')?.addEventListener('click', () => {
   const player = document.getElementById('video-player')
   if (player.paused) player.play(); else player.pause()
+})
+document.getElementById('ecap-play-btn')?.addEventListener('click', () => {
+  const player = document.getElementById('edit-video-player')
+  if (player.paused) player.play(); else player.pause()
+})
+
+/* « Découper une étape ici » sur l'écran de modification : même geste qu'à la
+   création — une nouvelle étape de 8 secondes à la position de lecture. */
+document.getElementById('ecap-add-btn')?.addEventListener('click', () => {
+  const player = document.getElementById('edit-video-player')
+  const d = isFinite(player?.duration) ? player.duration : 0
+  if (!d) { toast("Chargez d'abord la vidéo."); return }
+  const debut = player.currentTime || 0
+  const fin = Math.min(d, debut + 8)
+  const sel = ecapEditor?.selected()
+  const nouvelle = { id: null, texte: '', timestamp_video: debut, fin_video: fin }
+  const position = sel != null ? sel + 1 : editStepsData.length
+  editStepsData.splice(position, 0, nouvelle)
+  renderEditSteps()
+  ecapEditor?.select(position, { lire: false })
 })
 ;['play', 'pause', 'ended'].forEach(ev => {
   document.getElementById('video-player')?.addEventListener(ev, () => {
@@ -4549,6 +4670,16 @@ function renderManualSteps() {
         <div class="step-num">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       </div>
+      <div class="step-img">
+        <div class="step-img-vignette">${step.image_url
+          ? `<img src="${step.image_url}" alt="">`
+          : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
+        <div class="step-img-actions">
+          <button type="button" class="choisir">${step.image_url || step.imageFichier ? 'Changer la photo' : 'Ajouter une photo'}</button>
+          ${step.image_url || step.imageFichier ? '<button type="button" class="retirer">Retirer</button>' : ''}
+        </div>
+        <input type="file" accept="image/*" class="fichier">
+      </div>
       <div class="step-row-bottom">
         ${moveButtonsHtml(i, manualSteps.length)}
         <span class="del">${TRASH_SVG}</span>
@@ -4556,6 +4687,25 @@ function renderManualSteps() {
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { manualSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
+
+    /* La photo n'est pas envoyée tout de suite : on la garde de côté et elle
+       part avec la publication, en même temps que le reste. Inutile d'occuper
+       le réseau pour une étape qui sera peut-être supprimée. */
+    const champFichier = div.querySelector('.fichier')
+    div.querySelector('.choisir').addEventListener('click', () => champFichier.click())
+    champFichier.addEventListener('change', (e) => {
+      const f = e.target.files[0]
+      if (!f) return
+      if (f.size > 6 * 1024 * 1024) { toast('Photo trop lourde : 6 Mo maximum.'); return }
+      manualSteps[i].imageFichier = f
+      manualSteps[i].image_url = null
+      renderManualSteps()
+    })
+    div.querySelector('.retirer')?.addEventListener('click', () => {
+      manualSteps[i].imageFichier = null
+      manualSteps[i].image_url = null
+      renderManualSteps()
+    })
     div.querySelector('.del').addEventListener('click', () => {
       demanderSuppressionEtape(i + 1, manualSteps[i].texte, () => { manualSteps.splice(i, 1); renderManualSteps() })
     })
@@ -4645,10 +4795,15 @@ function formatTime(sec) {
 // Insertion des étapes. Si la colonne `fin_video` n'existe pas encore en base,
 // on réessaie sans elle : l'app continue de fonctionner (fin déduite comme avant).
 async function insertEtapes(rows) {
-  const res = await supabase.from('etapes').insert(rows)
+  let res = await supabase.from('etapes').insert(rows)
+  // Replis successifs si la base n'a pas encore les colonnes ajoutées.
+  if (res.error && /image_url/i.test(res.error.message || '')) {
+    console.warn("Colonne image_url absente en base — insertion sans les photos.")
+    res = await supabase.from('etapes').insert(rows.map(({ image_url, ...reste }) => reste))
+  }
   if (res.error && /fin_video/i.test(res.error.message || '')) {
     console.warn("Colonne fin_video absente en base — insertion sans la fin de clip.")
-    const sansFin = rows.map(({ fin_video, ...reste }) => reste)
+    const sansFin = rows.map(({ fin_video, image_url, ...reste }) => reste)
     return await supabase.from('etapes').insert(sansFin)
   }
   return res
@@ -4693,9 +4848,22 @@ async function publishProcedure(errorElId, btnId) {
     return
   }
 
+  /* Les photos partent maintenant, une fois la procédure créée : on a besoin de
+     son identifiant pour ranger les fichiers proprement. Une photo qui échoue
+     n'empêche pas la publication — l'étape sera simplement sans image. */
+  for (const s of allSteps) {
+    if (!s.imageFichier) continue
+    const ext = (s.imageFichier.name.split('.').pop() || 'jpg').toLowerCase()
+    const chemin = `${currentMembre.entreprise_id}/${newProc.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
+    const { error: envoiErr } = await supabase.storage.from('procedo-videos').upload(chemin, s.imageFichier)
+    if (envoiErr) { console.warn('Photo non envoyée :', envoiErr.message); continue }
+    s.image_url = supabase.storage.from('procedo-videos').getPublicUrl(chemin).data?.publicUrl || null
+  }
+
   const etapesToInsert = allSteps.map((s, i) => ({
     procedure_id: newProc.id, ordre: i + 1, texte: s.texte,
     timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
+    image_url: s.image_url ?? null,
   }))
   const { error: etapesError } = await insertEtapes(etapesToInsert)
 
@@ -5038,9 +5206,80 @@ function renderAnalyseStats() {
 }
 
 // ═══════════ ÉQUIPE : liste ═══════════
+function estVisiteur() { return currentMembre?.role === 'visiteur' }
+
+/* Affiche le bloc du visiteur, avec le nombre de procédures auxquelles il n'a
+   pas accès. Ce nombre vient d'un simple comptage : on ne rapatrie aucun titre,
+   aucune étape, rien d'autre que le total. */
+async function renderBlocVisiteur() {
+  const bloc = document.getElementById('e-visiteur')
+  const grille = document.getElementById('e-bloc-categories')
+  if (!bloc) return
+
+  if (!estVisiteur()) {
+    bloc.style.display = 'none'
+    if (grille) grille.style.display = ''
+    return
+  }
+
+  bloc.style.display = 'block'
+  // La grille des catégories n'a pas de sens avec une seule procédure.
+  if (grille) grille.style.display = 'none'
+
+  const { count } = await supabase
+    .from('procedures').select('id', { count: 'exact', head: true })
+    .eq('entreprise_id', currentMembre.entreprise_id)
+
+  const autres = Math.max(0, (count || 0) - 1)
+  const titre = document.getElementById('e-visiteur-titre')
+  if (titre) {
+    titre.textContent = autres > 0
+      ? `${autres} autre${autres > 1 ? 's' : ''} procédure${autres > 1 ? 's' : ''} dans cette entreprise`
+      : "Les autres procédures ne vous sont pas accessibles"
+  }
+}
+
+/* Le code transforme l'adhésion visiteur en adhésion d'équipe : c'est la base
+   qui change de rôle, pas seulement l'affichage. */
+document.getElementById('e-visiteur-valider')?.addEventListener('click', async () => {
+  const btn = document.getElementById('e-visiteur-valider')
+  const err = document.getElementById('e-visiteur-erreur')
+  const code = document.getElementById('e-visiteur-champ').value.trim()
+  err.style.color = 'var(--red)'
+  err.textContent = ''
+  if (!/^\d{5}$/.test(code)) { err.textContent = 'Le code comporte 5 chiffres.'; return }
+
+  setButtonLoading(btn, true)
+  const { data: ent } = await supabase
+    .from('entreprises').select('id').eq('code_acces', code).maybeSingle()
+
+  if (!ent || ent.id !== currentMembre.entreprise_id) {
+    setButtonLoading(btn, false)
+    err.textContent = "Ce code ne correspond pas à cette entreprise."
+    return
+  }
+
+  const { error } = await supabase.from('membres')
+    .update({ role: 'equipe', procedure_visitee: null }).eq('id', currentMembre.id)
+  setButtonLoading(btn, false)
+  if (error) { err.textContent = 'Erreur : ' + error.message; return }
+
+  currentMembre.role = 'equipe'
+  currentMembre.procedure_visitee = null
+  err.style.color = 'var(--green)'
+  err.textContent = 'Accès complet débloqué.'
+  loadEquipeProcedures()
+})
+
 async function loadEquipeProcedures() {
-  const { data: procedures, error } = await supabase
-    .from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id).order('titre')
+  /* Un visiteur arrivé par QR n'a accès qu'à la procédure scannée. On ne
+     demande donc que celle-là : les autres ne sont jamais chargées, il n'y a
+     rien à masquer ni à contourner côté navigateur. */
+  const requete = estVisiteur()
+    ? supabase.from('procedures').select('*').eq('id', currentMembre.procedure_visitee)
+    : supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id).order('titre')
+
+  const { data: procedures, error } = await requete
   if (error) { console.error(error); return }
 
   // Étapes de TOUTES les procédures et mes validations, chargées d'un coup :
@@ -5061,6 +5300,7 @@ async function loadEquipeProcedures() {
   allEquipeProcedures = procedures
   renderEquipeAccueil()
   renderEquipeCategories()
+  renderBlocVisiteur()
 }
 
 /* Salutation et anneaux de l'employé. Les trois chiffres répondent à sa seule
@@ -5281,15 +5521,25 @@ async function openEquipeDetail(procId) {
     div.className = 'detail-step'
     const bounds = clipBounds.get(etape.id)
     const hasClip = bounds && proc.video_url
+    /* L'étape peut porter une photo du résultat attendu. On la met sous le
+       texte, en pleine largeur : c'est souvent elle qui dit le mieux à quoi
+       l'on doit arriver. */
     div.innerHTML = `
       <div class="n">${i+1}</div>
-      <p style="flex:1;">${escapeHtml(etape.texte)}</p>
+      <div style="flex:1; min-width:0;">
+        <p>${escapeHtml(etape.texte)}</p>
+        ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}
+      </div>
       ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
     `
     if (hasClip) {
       div.style.cursor = 'pointer'
-      // Toute la ligne est cliquable, pas seulement la petite pastille
-      div.onclick = () => lireExtrait(detailVideoEl, bounds.start, bounds.end)
+      // Toute la ligne est cliquable, sauf la photo : on ne veut pas lancer la
+      // vidéo quand quelqu'un cherche simplement à mieux voir l'image.
+      div.onclick = (e) => {
+        if (e.target.closest('.detail-step-img')) return
+        lireExtrait(detailVideoEl, bounds.start, bounds.end)
+      }
     }
     stepsEl.appendChild(div)
   })

@@ -362,43 +362,74 @@
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
   }
-  /* Le tiroir est visible par défaut. Il vit à l'intérieur de l'espace, lui-même
-     masqué tant qu'on n'est pas connecté : il ne peut donc pas apparaître trop
-     tôt. Le masquer en dur était l'erreur — il suffisait qu'une requête échoue
-     pour qu'il ne réapparaisse jamais. */
-  .tiroir-ent{
-    display:flex; align-items:center; gap:7px; padding:6px; border-radius:100px;
-    overflow:hidden; max-width:44px; flex-shrink:0;
-    /* À la fermeture, la largeur attend que les ronds soient partis ; à
-       l'ouverture, elle part devant pour leur faire de la place. */
-    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0.16s;
-  }
-  .tiroir-ent.ouvert{ transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0s; }
-  .tiroir-ent:empty, .tiroir-ent.masque{ display:none; }
-  .tiroir-ent.ouvert{ max-width:300px; }
-  /* La liste NE S'EFFACE PLUS. C'était le défaut : le cercle de l'établissement
-     courant vivait dedans, et se retrouvait donc invisible tiroir fermé — on ne
-     voyait qu'une pastille de verre vide. Seuls les AUTRES ronds s'animent. */
-  .tiroir-liste{ display:flex; align-items:center; gap:7px; }
+  /* ═════════════════════════════════════════════════════════════════
+     LE TIROIR DES ÉTABLISSEMENTS
 
-  /* Les autres établissements et le « + » sont toujours dans le document : c'est
-     ce qui permet de les animer à la fermeture aussi bien qu'à l'ouverture. Les
-     retirer du document les faisait disparaître d'un coup, sans transition. */
+     Plus de pastille de verre autour : le cercle sombre occupe toute la place,
+     comme le bouton des réglages à l'autre bout de la barre. Même diamètre,
+     même présence.
+
+     Le tiroir garde une largeur FIXE de 44 px dans la barre. Ce qui s'ouvre est
+     posé par-dessus, en absolu : rien ne pousse, rien ne se décale, et le
+     dépliage se fait vers la droite, là où se trouve la carte au logo — qui
+     s'efface le temps du choix.
+
+     Les mouvements reprennent la courbe de la barre d'onglets :
+     0,44 s, cubic-bezier(0.32, 0.72, 0, 1).
+     ═════════════════════════════════════════════════════════════════ */
+  .topbar-row{ position:relative; }
+
+  .tiroir-ent{
+    /* 46 px : exactement le diamètre du bouton des réglages, à l'autre bout de
+       la barre. Les deux ronds se répondent. */
+    position:relative; width:46px; height:46px; flex:0 0 46px;
+  }
+  .tiroir-ent.masque{ display:none; }
+
+  /* Posée en absolu : sa largeur ne compte pas dans la barre, donc rien ne bouge
+     quand elle s'étend. */
+  .tiroir-liste{
+    position:absolute; left:0; top:0; z-index:12;
+    display:flex; align-items:center; gap:7px;
+  }
+
+  .rond-ent{
+    position:relative; width:46px; height:46px; flex-shrink:0; border-radius:50%;
+    overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg,#2A2C33,#17181C);
+    border:0.5px solid rgba(255,255,255,0.20);
+    box-shadow:0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
+    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .rond-ent:active{ transform:scale(0.92); }
+  .rond-ent.actif{ border-color:rgba(255,255,255,0.55); border-width:1.5px; }
+  .rond-ent img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .rond-ent .ini{
+    position:relative; font-size:14px; font-weight:700; letter-spacing:0.04em;
+    color:rgba(255,255,255,0.92);
+  }
+  .rond-ent.plus{ background:#fff; border-color:transparent; }
+  .rond-ent.plus .ini{ color:#000; font-size:24px; font-weight:400; line-height:0; margin-top:-2px; }
+
+  /* Les autres établissements et le « + » restent dans le document en
+     permanence : c'est ce qui permet de les animer à la fermeture autant qu'à
+     l'ouverture. Les retirer les faisait disparaître d'un coup. */
   .tiroir-autres{ display:flex; align-items:center; gap:7px; }
   .tiroir-autres .rond-ent{
-    opacity:0; transform:scale(0.5) translateX(-16px);
-    transition:opacity 0.26s ease, transform 0.42s cubic-bezier(0.34,1.35,0.5,1);
+    opacity:0; transform:scale(0.4) translateX(-22px); pointer-events:none;
+    transition:opacity 0.26s ease, transform 0.44s cubic-bezier(0.32,0.72,0,1);
   }
-  .tiroir-ent.ouvert .tiroir-autres .rond-ent{ opacity:1; transform:none; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent{
+    opacity:1; transform:none; pointer-events:auto;
+  }
 
-  /* La cascade. Les délais diffèrent selon le sens : à l'ouverture les ronds
+  /* La cascade. Les délais s'inversent selon le sens : à l'ouverture les ronds
      arrivent de gauche à droite, à la fermeture ils partent de droite à gauche.
-     Sans ça, la fermeture serait la lecture à l'envers du même mouvement — ce
-     qui se voit, et se voit mal. */
-  .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.14s, 0.14s; }
-  .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.10s, 0.10s; }
-  .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.06s, 0.06s; }
-  .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.03s, 0.03s; }
+     Sans ça, refermer serait la lecture à l'envers du même mouvement. */
+  .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.16s, 0.16s; }
+  .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.12s, 0.12s; }
+  .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.08s, 0.08s; }
+  .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.04s, 0.04s; }
   .tiroir-autres .rond-ent:nth-child(n+5){ transition-delay:0s, 0s; }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.04s, 0.04s; }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.09s, 0.09s; }
@@ -406,46 +437,13 @@
   .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.19s, 0.19s; }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(n+5){ transition-delay:0.24s, 0.24s; }
 
-  @media (prefers-reduced-motion: reduce){
-    .tiroir-autres .rond-ent{ transition:none; }
-  }
-  /* La carte au logo s'efface pendant le choix : c'est la même place. */
-  .tiroir-ent.ouvert ~ .topbar-card{ opacity:0; transform:translateX(12px); pointer-events:none; }
+  /* La carte au logo s'efface pendant le choix : c'est sa place qu'on occupe. */
   .topbar-card{ transition:opacity 0.34s ease, transform 0.44s cubic-bezier(0.32,0.72,0,1); }
+  .tiroir-ent.ouvert ~ .topbar-card{ opacity:0; transform:translateX(10px); pointer-events:none; }
 
-  /* Le rond : le logo déposé, sinon les initiales. */
-  .rond-ent{
-    position:relative; width:32px; height:32px; flex-shrink:0; border-radius:50%;
-    overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(160deg,#24262C,#15161A);
-    border:0.5px solid rgba(255,255,255,0.22);
-    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  @media (prefers-reduced-motion: reduce){
+    .tiroir-autres .rond-ent, .topbar-card{ transition:none; }
   }
-  .rond-ent:active{ transform:scale(0.9); }
-  .rond-ent.actif{ border-color:#fff; border-width:1.5px; }
-  .rond-ent img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .rond-ent .ini{
-    position:relative; font-size:11px; font-weight:700; letter-spacing:0.04em;
-    color:rgba(255,255,255,0.92);
-  }
-  .rond-ent.plus{ background:#fff; border-color:transparent; }
-  .rond-ent.plus .ini{ color:#000; font-size:19px; font-weight:500; line-height:0; margin-top:-1px; }
-
-  /* ═══ Liste des établissements dans les réglages ═══ */
-  .etab-ligne{
-    display:flex; align-items:center; gap:12px; width:100%; padding:11px 13px;
-    border-radius:15px; background:var(--bg-card); border:0.5px solid var(--border);
-    margin-bottom:8px; font-family:inherit; text-align:left; color:#fff;
-  }
-  .etab-ligne .rond-ent{ width:38px; height:38px; }
-  .etab-ligne .rond-ent .ini{ font-size:12.5px; }
-  .etab-ligne .tx{ flex:1; min-width:0; }
-  .etab-ligne .nm{ font-size:14px; font-weight:650; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .etab-ligne .st{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
-  .etab-ligne .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
-  .etab-ligne.ajout{ border-style:dashed; background:none; }
-  .etab-ligne.ajout .rond-ent{ background:#fff; border-color:transparent; }
-  .etab-ligne.ajout .rond-ent .ini{ color:#000; font-size:19px; font-weight:500; line-height:0; }
 
   /* ═══ Fenêtre d'un établissement ═══ */
   .fond-etab{
@@ -1993,7 +1991,7 @@
 <div class="app" id="gestion-app" style="display:none;">
   <div class="topbar">
     <div class="topbar-row">
-      <div class="tiroir-ent verre-barre" id="tiroir-ent">
+      <div class="tiroir-ent" id="tiroir-ent">
         <span class="tiroir-liste" id="tiroir-liste"></span>
       </div>
       <div class="topbar-card">
@@ -2718,7 +2716,7 @@
 <div class="app" id="equipe-app" style="display:none;">
   <div class="topbar">
     <div class="topbar-row">
-      <div class="tiroir-ent verre-barre" id="tiroir-ent-eq">
+      <div class="tiroir-ent" id="tiroir-ent-eq">
         <span class="tiroir-liste" id="tiroir-liste-eq"></span>
       </div>
       <div class="topbar-card">

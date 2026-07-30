@@ -187,6 +187,30 @@
     font-size:12.5px; font-weight:650; color:var(--blue); flex-shrink:0;
   }
 
+  /* ═══ Fiche d'un membre ═══ */
+  .mf-tete{
+    display:flex; align-items:center; gap:14px; margin-top:14px;
+    padding:16px 18px; border-radius:20px;
+    background:var(--hero-gradient); border:0.5px solid var(--border);
+  }
+  .mf-av{
+    width:52px; height:52px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; font-weight:750; color:#fff;
+    background:linear-gradient(155deg, #9BC4FF, #5E9BFF);
+  }
+  .mf-resume{ flex:1; min-width:0; font-size:12.5px; color:var(--label-2); line-height:1.45; }
+  .mf-resume b{ color:#fff; font-weight:650; }
+  .mf-chiffre{ font-size:23px; font-weight:850; letter-spacing:-0.045em; }
+  .mf-ligne{
+    display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    padding:9px 0; border-top:0.5px solid rgba(255,255,255,0.07);
+  }
+  .mf-ligne:first-child{ border-top:none; }
+  .mf-ligne .k{ font-size:12.5px; color:var(--label-2); }
+  .mf-ligne .v{ font-size:13px; font-weight:650; text-align:right; }
+  .emp-row{ cursor:pointer; }
+
   /* ═══ Utilisateurs de l'entreprise ═══ */
   .pm-ligne{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
@@ -1251,6 +1275,37 @@
     <div id="category-procedures-list"></div>
   </div>
 
+  <div class="screen" id="p-membre-fiche">
+    <div class="pagehead-row">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" id="mf-nom" style="margin:0; font-size:20px;">—</h1>
+    </div>
+    <div class="subhead" id="mf-role">—</div>
+
+    <div class="mf-tete">
+      <div class="mf-av" id="mf-av">—</div>
+      <div class="ga-anneau" id="mf-anneau"></div>
+      <div class="mf-resume" id="mf-resume">—</div>
+    </div>
+
+    <div class="ga-trio" style="margin-top:12px;">
+      <div class="ga-tuile"><div class="mf-chiffre" id="mf-lues">—</div><div class="ga-libelle">Lues</div></div>
+      <div class="ga-tuile"><div class="mf-chiffre" id="mf-reste">—</div><div class="ga-libelle">À lire</div></div>
+      <div class="ga-tuile"><div class="mf-chiffre" id="mf-serie">—</div><div class="ga-libelle">Jours actifs</div></div>
+    </div>
+
+    <div class="section-title">Activité</div>
+    <div class="card" id="mf-activite"></div>
+
+    <div class="section-title">Procédures consultées</div>
+    <div id="mf-faites"></div>
+
+    <div class="section-title">Pas encore consultées</div>
+    <div id="mf-restantes"></div>
+  </div>
+
   <div class="screen" id="p-membres">
     <div class="pagehead-row">
       <button class="back-btn" onclick="openSettings()" aria-label="Retour">
@@ -1585,6 +1640,20 @@
     <div id="ga-late-list"></div>
 
     <div class="section-title">Tous les membres de l'équipe</div>
+    <div class="list-tools">
+      <div class="dd-filter" id="dd-membres-sort">
+        <button class="dd-trigger" id="dd-membres-sort-trigger" type="button">
+          <span class="dd-label">Trier : les plus actifs</span>
+          <svg class="dd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" id="dd-membres-sort-menu">
+          <button type="button" data-sort="actifs" class="selected">Les plus actifs</button>
+          <button type="button" data-sort="inactifs">Les moins actifs</button>
+          <button type="button" data-sort="az">Nom A → Z</button>
+          <button type="button" data-sort="recents">Arrivés récemment</button>
+        </div>
+      </div>
+    </div>
     <div id="ga-top-membres"></div>
   </div>
 
@@ -2343,6 +2412,7 @@ function renderGaStats() {
   }
 
   renderTopCategories(procedures, validationsInPeriod, nbEmployes, periodLabel)
+  renderMembresListe()
 }
 
 /* Trace un anneau de progression. Le trait est un cercle dont on ne dessine
@@ -2462,29 +2532,152 @@ window.loadGlobalAnalyse = function() {
     })
   }
 
-  // Tous les membres de l'équipe
-  const topMembresEl = document.getElementById('ga-top-membres')
-  topMembresEl.innerHTML = ''
-  const membreStats = employes.map(m => {
-    const validCount = (validations || []).filter(v => v.membre_id === m.id).length
-    return { m, validCount }
-  }).sort((a,b) => b.validCount - a.validCount)
+}
 
-  if (membreStats.length === 0) {
-    topMembresEl.innerHTML = '<div class="note">Aucun membre dans l\'équipe pour le moment. Partagez le code d\'invitation dans Paramètres.</div>'
-  } else {
-    membreStats.forEach((s, i) => {
-      const div = document.createElement('div')
-      div.className = 'emp-row'
-      div.style.animationDelay = (i * 0.05) + 's'
-      div.innerHTML = `
-        <div class="check ${s.validCount > 0 ? 'done' : ''}"></div>
-        <div class="emp-row-name">${escapeHtml(s.m.nom)}</div>
-        <div class="emp-row-date">${s.validCount} consultation${s.validCount>1?'s':''}</div>
-      `
-      topMembresEl.appendChild(div)
-    })
+/* ═══ Liste des membres, triable ═══ */
+let triMembres = 'actifs'
+
+function renderMembresListe() {
+  const el = document.getElementById('ga-top-membres')
+  if (!el || !currentGaData) return
+  const { employes, procedures, validations } = currentGaData
+  el.innerHTML = ''
+
+  if (!employes.length) {
+    el.innerHTML = '<div class="note">Aucun membre dans l\'équipe pour le moment. Partagez le code d\'invitation dans Paramètres.</div>'
+    return
   }
+
+  const stats = employes.map(m => {
+    const siennes = (validations || []).filter(v => v.membre_id === m.id)
+    const derniere = siennes.length
+      ? Math.max(...siennes.map(v => new Date(v.validated_at).getTime()))
+      : 0
+    return { m, nb: siennes.length, derniere, arrivee: new Date(m.created_at || 0).getTime() }
+  })
+
+  const trie =
+    triMembres === 'inactifs' ? stats.sort((a, b) => (a.nb - b.nb) || a.m.nom.localeCompare(b.m.nom, 'fr')) :
+    triMembres === 'az'       ? stats.sort((a, b) => a.m.nom.localeCompare(b.m.nom, 'fr')) :
+    triMembres === 'recents'  ? stats.sort((a, b) => b.arrivee - a.arrivee) :
+                                stats.sort((a, b) => (b.nb - a.nb) || a.m.nom.localeCompare(b.m.nom, 'fr'))
+
+  const total = procedures.length
+  trie.forEach((s, i) => {
+    const pct = total ? Math.round((s.nb / total) * 100) : 0
+    const div = document.createElement('div')
+    div.className = 'emp-row'
+    div.style.animationDelay = (i * 0.04) + 's'
+    div.dataset.membre = s.m.id
+    div.innerHTML = `
+      <div class="check ${s.nb > 0 ? 'done' : ''}"></div>
+      <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}</div>
+      <div class="emp-row-date">${s.nb}/${total} · ${pct}%</div>`
+    el.appendChild(div)
+  })
+}
+
+document.getElementById('ga-top-membres')?.addEventListener('click', (e) => {
+  const ligne = e.target.closest('.emp-row')
+  if (ligne?.dataset.membre) openFicheMembre(ligne.dataset.membre)
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FICHE D'UN MEMBRE
+   Tout se calcule sur les données déjà chargées : aucune requête de plus.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function openFicheMembre(membreId) {
+  if (!currentGaData) return
+  const { employes, membres, procedures, validations } = currentGaData
+  const m = (employes || []).concat(membres || []).find(x => x.id === membreId)
+  if (!m) return
+
+  showGestionScreen('p-membre-fiche')
+
+  const siennes = (validations || []).filter(v => v.membre_id === m.id)
+  const total = procedures.length
+  const lues = siennes.length
+  const pct = total ? Math.round((lues / total) * 100) : 0
+  const couleur = pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--orange)' : 'var(--red)'
+  const initiales = (m.nom || '?').trim().split(/\s+/).map(x => x[0]).slice(0, 2).join('').toUpperCase()
+
+  document.getElementById('mf-nom').textContent = m.nom || 'Sans nom'
+  document.getElementById('mf-role').textContent =
+    (m.role === 'gestion' ? 'Gestion' : 'Équipe') +
+    (m.created_at ? ' · arrivé le ' + dateCourte(m.created_at) : '')
+  document.getElementById('mf-av').textContent = initiales
+  dessinerAnneau('mf-anneau', pct, couleur, pct + '%')
+
+  document.getElementById('mf-lues').textContent = lues
+  document.getElementById('mf-reste').textContent = Math.max(0, total - lues)
+
+  // Nombre de journées distinctes où la personne a consulté quelque chose
+  const jours = new Set(siennes.map(v => new Date(v.validated_at).toDateString()))
+  document.getElementById('mf-serie').textContent = jours.size
+
+  const dates = siennes.map(v => new Date(v.validated_at).getTime()).sort((a, b) => b - a)
+  const derniere = dates[0] || null
+  const premiere = dates[dates.length - 1] || null
+
+  document.getElementById('mf-resume').innerHTML = total === 0
+    ? "Aucune procédure publiée pour l'instant."
+    : `A consulté <b>${lues} procédure${lues > 1 ? 's' : ''}</b> sur ${total}.` +
+      (derniere ? ` Dernière activité ${ilYA(derniere)}.` : ' Aucune activité pour le moment.')
+
+  // Tableau d'activité
+  const cette = new Date(); const jour = (cette.getDay() + 6) % 7
+  cette.setDate(cette.getDate() - jour); cette.setHours(0, 0, 0, 0)
+  const semaine = siennes.filter(v => new Date(v.validated_at) >= cette).length
+  const mois = siennes.filter(v => {
+    const d = new Date(v.validated_at)
+    return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear()
+  }).length
+
+  document.getElementById('mf-activite').innerHTML = [
+    ['Taux de consultation', pct + ' %'],
+    ['Cette semaine', semaine + ' consultation' + (semaine > 1 ? 's' : '')],
+    ['Ce mois-ci', mois + ' consultation' + (mois > 1 ? 's' : '')],
+    ['Journées actives', jours.size + ' jour' + (jours.size > 1 ? 's' : '')],
+    ['Première consultation', premiere ? dateCourte(premiere) : '—'],
+    ['Dernière consultation', derniere ? dateCourte(derniere) + ' · ' + ilYA(derniere) : '—'],
+  ].map(([k, v]) => `<div class="mf-ligne"><span class="k">${k}</span><span class="v">${escapeHtml(String(v))}</span></div>`).join('')
+
+  // Ce qu'elle a lu, et ce qui reste
+  const lu = new Map(siennes.map(v => [v.procedure_id, v.validated_at]))
+  const faites = procedures.filter(p => lu.has(p.id))
+  const restantes = procedures.filter(p => !lu.has(p.id))
+
+  document.getElementById('mf-faites').innerHTML = faites.length
+    ? faites.map(p => `
+        <div class="sop-card">
+          <div><div class="title">${escapeHtml(p.titre)}</div>
+          <div class="meta">${escapeHtml(p.categorie || 'Sans catégorie')} · le ${dateCourte(lu.get(p.id))}</div></div>
+          <span class="badge ok">✓</span>
+        </div>`).join('')
+    : '<div class="note">Aucune procédure consultée pour le moment.</div>'
+
+  document.getElementById('mf-restantes').innerHTML = restantes.length
+    ? restantes.map(p => `
+        <div class="sop-card">
+          <div><div class="title">${escapeHtml(p.titre)}</div>
+          <div class="meta">${escapeHtml(p.categorie || 'Sans catégorie')}</div></div>
+          <span class="badge drift">—</span>
+        </div>`).join('')
+    : '<div class="note">Tout a été consulté.</div>'
+}
+
+function dateCourte(v) {
+  return new Date(v).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+/* « il y a 3 jours », « hier », « aujourd'hui » — plus parlant qu'une date. */
+function ilYA(ms) {
+  const jours = Math.floor((Date.now() - ms) / 86400000)
+  if (jours <= 0) return "aujourd'hui"
+  if (jours === 1) return 'hier'
+  if (jours < 7) return `il y a ${jours} jours`
+  if (jours < 31) return `il y a ${Math.floor(jours / 7)} semaine${jours >= 14 ? 's' : ''}`
+  return `il y a ${Math.floor(jours / 30)} mois`
 }
 
 /* Place la pastille sous l'onglet actif. Sur un écran ouvert sans passer par
@@ -2533,7 +2726,7 @@ function majPastille(idBarre) {
    déduit maintenant de l'écran affiché, quel que soit le chemin emprunté. */
 const ONGLET_PAR_ECRAN = {
   'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
-  'p-global-analyse': 1,
+  'p-global-analyse': 1, 'p-membre-fiche': 1,
   // Les écrans de création n'allument aucun onglet : le « + » déclenche une
   // action, il ne désigne pas une page et n'a pas d'état actif.
 }
@@ -2952,6 +3145,18 @@ document.addEventListener('click', (e) => {
 })
 
 wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
+
+wireSortDropdown('dd-membres-sort', (valeur) => {
+  triMembres = valeur
+  const libelles = {
+    actifs: 'les plus actifs', inactifs: 'les moins actifs',
+    az: 'nom A → Z', recents: 'arrivés récemment',
+  }
+  const lbl = document.querySelector('#dd-membres-sort .dd-label')
+  if (lbl) lbl.textContent = 'Trier : ' + (libelles[valeur] || valeur)
+  renderMembresListe()
+})
+
 
 // Texte tapé dans la recherche de l'écran d'une catégorie
 let currentCategoryQuery = ''

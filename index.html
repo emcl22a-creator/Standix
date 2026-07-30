@@ -308,6 +308,25 @@
   .contact-carte .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .contact-carte .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
 
+  /* ═══ Titre de section avec un bouton d'aide ═══ */
+  .titre-avec-aide{ display:flex; align-items:center; gap:7px; margin:22px 0 10px; }
+  .btn-aide{
+    width:22px; height:22px; border-radius:50%; flex-shrink:0; border:none; padding:0;
+    background:rgba(255,255,255,0.09); color:var(--label-2);
+    display:flex; align-items:center; justify-content:center;
+    transition:background 0.2s, color 0.2s, transform 0.16s cubic-bezier(0.34,1.5,0.64,1);
+  }
+  .btn-aide svg{ width:13px; height:13px; }
+  .btn-aide:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); color:#fff; }
+
+  /* ═══ Explication des médailles ═══ */
+  .med-liste{ display:flex; flex-direction:column; gap:2px; }
+  .med-ligne{ display:flex; align-items:center; gap:13px; padding:9px 2px; }
+  .med-ligne + .med-ligne{ border-top:0.5px solid rgba(255,255,255,0.08); }
+  .med-ligne .txt{ flex:1; min-width:0; }
+  .med-ligne .nom{ font-size:13.5px; font-weight:700; letter-spacing:-0.02em; text-transform:capitalize; }
+  .med-ligne .cond{ font-size:11.5px; color:var(--label-2); margin-top:2px; }
+
   /* ═══ Mon activité (espace équipe) ═══ */
   /* Les trois tuiles n'affichaient pas la même chose — un anneau de 58 px d'un
      côté, un chiffre de l'autre — et leurs libellés se retrouvaient à des
@@ -318,8 +337,8 @@
      Elle change d'aspect à chaque palier de jours consécutifs : éteinte, bronze,
      argent, or, or incandescent, puis légendaire. C'est le seul endroit de
      l'app qui récompense l'assiduité plutôt que de la mesurer. */
-  .ma-medaille{ position:relative; width:58px; height:58px; }
-  .ma-medaille svg{ width:58px; height:58px; display:block; }
+  .ma-medaille{ position:relative; width:58px; height:58px; flex-shrink:0; display:inline-block; }
+  .ma-medaille svg{ display:block; }
   .ma-medaille .nb{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-size:19px; font-weight:850; letter-spacing:-0.04em;
@@ -1679,6 +1698,7 @@
     <div class="mf-tete">
       <div class="mf-av" id="mf-av">—</div>
       <div class="ga-anneau" id="mf-anneau"></div>
+      <div id="mf-medaille"></div>
       <div class="mf-resume" id="mf-resume">—</div>
     </div>
 
@@ -2097,7 +2117,12 @@
     <div class="section-title">Procédures les plus consultées</div>
     <div id="ga-late-list"></div>
 
-    <div class="section-title">Tous les membres de l'équipe</div>
+    <div class="titre-avec-aide">
+      <span class="section-title" style="margin:0;">Tous les membres de l'équipe</span>
+      <button type="button" class="btn-aide" id="aide-medailles" aria-label="À quoi correspondent les médailles ?">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><path d="M12 7.6v.1"/></svg>
+      </button>
+    </div>
     <div class="list-tools">
       <div class="dd-filter" id="dd-membres-sort">
         <button class="dd-trigger" id="dd-membres-sort-trigger" type="button">
@@ -2187,8 +2212,8 @@
     <div class="section-title">Une question ?</div>
     <div class="accueil contact-carte" role="button" tabindex="0" id="contact-gestion">
       <div class="accueil-texte">
-        <div class="t">Écrivez-moi</div>
-        <div class="s">Un souci, une idée, une question sur Procédo ? Je lis tout et je réponds dans la journée.</div>
+        <div class="t">Écrivez-nous</div>
+        <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
@@ -2401,8 +2426,8 @@
     <div class="section-title">Une question ?</div>
     <div class="accueil contact-carte" role="button" tabindex="0" id="contact-equipe">
       <div class="accueil-texte">
-        <div class="t">Écrivez-moi</div>
-        <div class="s">Un souci, une idée, une question sur Procédo ? Je lis tout et je réponds dans la journée.</div>
+        <div class="t">Écrivez-nous</div>
+        <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
@@ -3308,28 +3333,82 @@ function palierMedaille(serie) {
 
 /* Dessine la médaille du palier courant. Le disque est un dégradé, ceint d'un
    liseré, avec les branches d'une couronne de laurier de part et d'autre. */
-function dessinerMedaille(serie) {
-  const el = document.getElementById('ma-medaille')
-  if (!el) return
-  const p = palierMedaille(serie)
-  const id = 'med' + p.min
+/* La médaille est réutilisée à trois tailles : dans la tuile d'activité, sur la
+   ligne d'un membre et sur sa fiche. On produit donc du balisage plutôt que de
+   viser un élément précis. Le dégradé porte un identifiant unique : plusieurs
+   médailles coexistent sur un même écran. */
+let compteurMedaille = 0
 
-  el.innerHTML = `
-    ${p.halo ? `<span class="halo" style="background:radial-gradient(circle, ${p.halo}, transparent 70%)"></span>` : ''}
-    ${p.couronne ? '<span class="couronne"></span>' : ''}
-    <svg viewBox="0 0 58 58" aria-hidden="true">
+function medailleHtml(serie, taille) {
+  const p = palierMedaille(serie)
+  const id = 'med' + (++compteurMedaille)
+  const petite = taille < 40
+  return `<span class="ma-medaille${petite ? ' petite' : ''}" style="width:${taille}px;height:${taille}px"
+        data-palier="${p.nom}" title="${serie} jour${serie > 1 ? 's' : ''} d'affil\u00e9e \u00b7 m\u00e9daille ${p.nom}">
+    ${p.halo && !petite ? `<span class="halo" style="background:radial-gradient(circle, ${p.halo}, transparent 70%)"></span>` : ''}
+    ${p.couronne && !petite ? '<span class="couronne"></span>' : ''}
+    <svg viewBox="0 0 58 58" aria-hidden="true" style="width:${taille}px;height:${taille}px">
       <defs>
         <linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="${p.a}"/><stop offset="100%" stop-color="${p.b}"/>
         </linearGradient>
       </defs>
+      ${petite ? '' : `
       <path d="M14 24c-3 5-2 12 3 16" fill="none" stroke="${p.b}" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
-      <path d="M44 24c3 5 2 12-3 16" fill="none" stroke="${p.b}" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
-      <circle cx="29" cy="29" r="17.5" fill="url(#${id})" stroke="${p.trait}" stroke-width="1.6"/>
-      <circle cx="29" cy="29" r="13.5" fill="none" stroke="${p.trait}" stroke-width="0.8" opacity="0.55"/>
+      <path d="M44 24c3 5 2 12-3 16" fill="none" stroke="${p.b}" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>`}
+      <circle cx="29" cy="29" r="${petite ? 22 : 17.5}" fill="url(#${id})" stroke="${p.trait}" stroke-width="${petite ? 2.4 : 1.6}"/>
+      <circle cx="29" cy="29" r="${petite ? 17 : 13.5}" fill="none" stroke="${p.trait}" stroke-width="1" opacity="0.5"/>
     </svg>
-    <span class="nb" style="color:${p.texte}">${serie}</span>`
-  el.dataset.palier = p.nom
+    <span class="nb" style="color:${p.texte};font-size:${Math.round(taille * 0.34)}px">${serie}</span>
+  </span>`
+}
+
+function dessinerMedaille(serie) {
+  const el = document.getElementById('ma-medaille')
+  if (!el) return
+  el.outerHTML = medailleHtml(serie, 58).replace('class="ma-medaille"', 'class="ma-medaille" id="ma-medaille"')
+}
+
+/* Fenêtre d'explication des médailles. On y montre les vraies médailles, pas une
+   description : c'est plus court à lire et ça se retient mieux. */
+function expliquerMedailles() {
+  const fond = document.createElement('div')
+  fond.className = 'ios-alert-backdrop'
+  const lignes = PALIERS_MEDAILLE.map((p, i) => {
+    const suivant = PALIERS_MEDAILLE[i + 1]
+    const cond = p.min === 0 ? 'Aucune lecture r\u00e9cente'
+      : suivant ? `De ${p.min} \u00e0 ${suivant.min - 1} jours d'affil\u00e9e`
+      : `${p.min} jours d'affil\u00e9e et plus`
+    const exemple = p.min === 0 ? 0 : (suivant ? p.min : p.min)
+    return `<div class="med-ligne">${medailleHtml(exemple, 38)}
+      <span class="txt"><span class="nom">${p.nom}</span><span class="cond">${cond}</span></span></div>`
+  }).join('')
+
+  fond.innerHTML = `
+    <div class="ios-alert" role="alertdialog" aria-modal="true">
+      <div class="ios-alert-body">
+        <div class="ios-alert-title">Les m\u00e9dailles</div>
+        <div class="ios-alert-msg">Elles r\u00e9compensent la r\u00e9gularit\u00e9 : le nombre de jours cons\u00e9cutifs o\u00f9 la personne a consult\u00e9 au moins une proc\u00e9dure. Un jour manqu\u00e9 remet le compteur \u00e0 z\u00e9ro.</div>
+        <div class="med-liste">${lignes}</div>
+      </div>
+      <div class="ios-alert-actions"><button type="button" class="ok">Compris</button></div>
+    </div>`
+  document.body.appendChild(fond)
+  requestAnimationFrame(() => fond.classList.add('shown'))
+
+  const fermer = () => {
+    fond.classList.add('closing'); fond.classList.remove('shown')
+    setTimeout(() => fond.remove(), 180)
+  }
+  fond.querySelector('.ok').addEventListener('click', fermer)
+  fond.addEventListener('click', (e) => { if (e.target === fond) fermer() })
+}
+
+document.getElementById('aide-medailles')?.addEventListener('click', expliquerMedailles)
+
+/* Série d'un membre donné, à partir des validations de toute l'entreprise. */
+function serieDuMembre(membreId, validations) {
+  return serieConsecutive((validations || []).filter(v => v.membre_id === membreId)).serie
 }
 
 window.renderMonActivite = function() {
@@ -3490,15 +3569,18 @@ function renderMembresListe() {
 
   const total = procedures.length
   trie.forEach((s, i) => {
-    const pct = total ? Math.round((s.nb / total) * 100) : 0
     const div = document.createElement('div')
     div.className = 'emp-row'
     div.style.animationDelay = (i * 0.04) + 's'
     div.dataset.membre = s.m.id
+    /* La médaille remplace le compteur : « 1/4 · 25 % » ne disait pas si la
+       personne vient régulièrement, seulement combien elle a lu. La série de
+       jours consécutifs dit l'assiduité, qui est la vraie question. */
+    const serie = serieDuMembre(s.m.id, validations)
     div.innerHTML = `
       <div class="check ${s.nb > 0 ? 'done' : ''}"></div>
       <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}</div>
-      <div class="emp-row-date">${s.nb}/${total} · ${pct}%</div>`
+      ${medailleHtml(serie, 30)}`
     el.appendChild(div)
   })
 }
@@ -3533,6 +3615,11 @@ function openFicheMembre(membreId) {
     (m.created_at ? ' · arrivé le ' + dateCourte(m.created_at) : '')
   document.getElementById('mf-av').textContent = initiales
   dessinerAnneau('mf-anneau', pct, couleur, pct + '%')
+
+  // Sa médaille de série, à côté de son anneau de lecture.
+  const serieM = serieDuMembre(m.id, validations)
+  const zoneMed = document.getElementById('mf-medaille')
+  if (zoneMed) zoneMed.innerHTML = medailleHtml(serieM, 44)
 
   document.getElementById('mf-lues').textContent = lues
   document.getElementById('mf-reste').textContent = Math.max(0, total - lues)

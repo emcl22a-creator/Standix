@@ -32,6 +32,7 @@
     --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
     --hero-gradient: linear-gradient(150deg, #2C2C34 0%, #1E1E24 40%, #141418 75%, #0C0C10 100%);
     --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
+    --blue:#0A84FF; --purple:#BF5AF2;   /* utilisées par les anneaux de l'analyse */
     --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
   }
   html, body{
@@ -177,6 +178,23 @@
     transition:background 0.3s cubic-bezier(0.32,0.72,0,1), color 0.25s;
   }
   .ga-segments button.active{ background:rgba(255,255,255,0.90); color:#000; }
+
+  /* Recherche discrète : pas d'encadré marqué, juste un fond légèrement
+     éclairci qui s'affirme quand le champ prend le focus. */
+  .recherche-fine{
+    display:flex; align-items:center; gap:9px; height:38px; padding:0 13px;
+    margin:14px 0 4px; border-radius:100px;
+    background:rgba(255,255,255,0.05); border:0.5px solid transparent;
+    transition:background 0.25s, border-color 0.25s;
+  }
+  .recherche-fine:focus-within{ background:rgba(255,255,255,0.09); border-color:var(--border); }
+  .recherche-fine svg{ width:15px; height:15px; color:var(--label-3); flex-shrink:0; }
+  .recherche-fine input{
+    flex:1; min-width:0; background:none; border:none; outline:none;
+    font-family:inherit; font-size:16px; color:#fff; padding:0;
+  }
+  .recherche-fine input::placeholder{ color:var(--label-3); font-size:13.5px; }
+  .e-resultats{ margin-top:10px; }
 
   .ga-trio{ display:flex; gap:9px; }
   .ga-tuile{
@@ -550,7 +568,7 @@
      jusqu'à un écran à trois fois la densité. */
   .accueil-av{
     position:relative; width:56px; height:56px; border-radius:50%; flex-shrink:0; cursor:pointer;
-    background:#A8D4F5 url('data:image/webp;base64,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') center/cover no-repeat;
+    background:#A8D4F5 url('data:image/webp;base64,UklGRl4UAABXRUJQVlA4WAoAAAAQAAAAfwAAfwAAQUxQSGEDAAABDrratqfRI1thTlpmzkEwM55OfuiCR0AddczLjBVDF6p2u+CAr2vkIVvvUvV+/iQ5Ihw4kts2d6RPFo30okJ+gIUynTBRSHLuxj3jZz//5vtmlmMU//nZ8T0bq9xjmxiEblJCIMlFh86+/+JNNhDrF9EfYkIyuNhhAsnZW8988yqzbDdji+wGyRhFLf031dbadhi3EJSccuDik9y73Igigx1Eoo/a4RNWUxKa4FArJdeO/Gxf4E5Mh6RET1X9eWRtwjS4c8X2G29sD7Ug0lO1vrHdjQvUth7at7ulhZJRVWvbKPnuJORbrdjWwimR+Uap38FAbrySexFLom1ckYShxN7JJ992tUpsiK/K6jTkzh8yjVoyo+oPNVnGTU5kPJ9po62lU7xqHRlL8FWfaovqBEn9NBZtqeGJPzOvztBrYGKk2NsY6XubDtzkCGkK9FkXsmZbnaJErUNhppz3dfYuc47vssrTFOquWlHeUCfpc1aYu2wFOaylMj3nThtFhvu1vdz71ty8Mc84lI9Yd93iEDaBx6y7b55h0FuQ5X+1xX2I1MvTwW5AQvgyayoAo9YhyGB95zu3DkGvNcNAvs06ilUDmJhJv2YtFFB/nWSkv450X4RxzUhfMVz1rtXGgfBdTEw/vW4VSUIfCdxkHcs29TbDDwQNwsT00ZaCkVZ6ahbRELWXBG6xiiexWwLvWMWTuguGK16J4EHEVzTdo52GAtJ3jYBSmfZHu4UIyh91Kja+VzsOaRpsOPByu4EJL5c7SDn3RdbGhOiLimngZnuOeuqTMCk5pQ1UeK05yej3WRMVUcVoMv+ljaAGqvnkQau44slzNoIbiDQfYh/EzHpuI7iB52HDK4Wm5wGryFKNaURGVDmLDv+FtpBBDd+gw3+PDsnFscP/+zPCO/7vHv7vPv7/Hv7/Pv64B3/chz/uxR/348974Od9fwPzXvx5P/66B/66D/66F/66H/y6J/66L/66N/y6P/6+B/y+D/6+F/y+H/6+J/y+L/6+N/y+P37eA3zeB37eC3zeD3zeE37eF3zeG3zeH3zeI3zeJ37eK3zeL3zeM3zeN3zeO3zeP3zdA3zdB3zdC3rdD3zdE3zdF3zdG3rdH3zdI3rdJ3rdK3rdL3rdM3rd999m3Tt83T8BAFZQOCDWEAAAEEEAnQEqgACAAD5FGopDoqGhGjn3TCgERLMAYhEArS8vfxHnIWd+6/h7kKTW9g/877ufm9/nf1V93X3h+4N+pvSk/bf1AftV+5HvWf5T1a/4j1AP5n/1esp9Cvy4/ZP/s//V/cj2oP//mgHbV/Wfya8//xv6r/F/mTzV4jvx37wfpfy09o/An5Tf0/qI/jn8+/xHzGcxbZ3/l+od7efR/9b/b/3Q5svrt5pf+q/Nj1hvFI8e9gD+V/13/W/3b3Xv6v/qf6H9xP9l7lfzP/A/9L/KfAT/Jf59/ov8D/k/+N/i//n/zPuz9mn7h+xz+qbNeXBu4l+uDu529cjBdPI+4A7BWnU7hsh38iHeVmYns9fwFsuLr/wTFMTlvGQ4eC7z3FHbSd+lGuSrR5AE1yxQyct+Fl9qNbn6/srDDeo/2K0DNGwACGxKJQu+qjoguIZu9tipyv6Rk6WymTtCkeHTsgPJzfVdDb9yyJGOCa+QTZ/tDehoCqeZ/+06Fh+dRefQ9rtdUupTsSet7Dq9my6JHmFy5pUyiFviABuYYF8anyQU7XQBp1PvBASuBN3vPgI62jQ7WOw7yhpG7GlZUcdPog5FKeOU1S5GM4fWX6UmVcl1U2gYKGLeSgq5LTvx7YpwYPXS9CgY6xoiLrLanyHyQN+9lvny1MybvvnL8icr6mULJVrLUAFBSqzZe21x6rMstAD+/tAcKHUd+XBRhPPacAc7hnc+L48C+XrNzEiQR8pc10t6DlN5jl9bi+zJxJeU8laLKYHW9HTRLO/AUFsjLLnraHuW5z/UiSl+fOddhHPVkiuzRnANMxl5bhf2b4tjcu83vun5n3/ziDbpz6V5dHid9N74zyj9N3+XEL9UDz4YkQnLRVc/9K71p/GdY6gPgwu70UrL8IrvdcSaX4ns73UZc9VAAUDfsQKB48OziCqh283WKOikgMP4+f3EPbJMn6uAnRbsEuk0/Pjfwn0NF5vS1oOw9C9aLCoLHV9YTI7EIWtkUJ3I0NfE9qNENEPNklK/sNavD8DNGDmhm+9yoDjgwx/vEo4dRVNYqV/jdHnBcq/xztN+hBP9dwqh59+zIRtPxureZCRiaIvnlsqGywX/+Mpe/L5hKKFCEVOUqCxTCLjN40abtV7IppW8+pInDtP/kTo6UQ4mkFBvs9Y1zyfYUpidbGFaeOQuSWoa/q8BU8v6jKgK+C4jpKGEZD2hQ2cjJVPHuah8MU1Secwz7Lmfgae+OTmiwL1XfIjg4t+c2CBOwIssI/gjq8UHedboHVDRtgV11w2iWafzEWiCSjAwVwau2agyY8McFFveOHp7G2PGyayJmjP5Kp/BAmkKAk3vSHZY7p/9AHcE6++v1UYXH1xk/DNCAccczj0B1UJJ+I0rus9fgnpd19eodr7/Z9Ps31bJRypAf4BuxT9LhLeQMH2dE6nJogwtA92r4xDByviQ6a2AOw9PnOjVKbKcRkzvThkRc/q3cBA97wj8TvEXXDQnournnKKZRHj38Cad9goydHj00Me19JsKaAgPoHe/6uyE6C0GEyieSiOGMorjyvn4oLmIO8yheEJwaJyJytzQOzFZ+QjTf0JBwMyxNkd7jFPpMgQPTnuCPou4UFGEqIgMXimgTJSn7glF7XlfXKqHtphoW7FTR5FiVlhD7DJo4PQxHElRBkS8IOxKxS6xfZ9NOiCPVkF5IOF91kRjh33PmQ/6HxCm72lzwpsD9owzwyjmA3YlziLI56WyD+c3SNgm6Mr776Y1M7qqbIk745yrwa82O5AZOe3oiwVOrHBoTwmFvyuG4S2ClsQxAEtFoCg2uirlqxaYyRWShtBTNL6Brz8/tHzt2bY/Ii7nZs8a3gVIIvafnuKULVjEcm8tYvyEGPoMFGZJFm83OshzW3cQ+V37xft4nIi88JhvXkS283nwyjHgEGHPUQ1cKDL8yvbw8E7d8420ZtBiWSSq1nJlk1f76jBBWKWkQeVEEe5R3wLGxwfSpKfCeN8TszvUPDu4hMrlh9ZFTMDTsGPidp81sxKS+7sUIe2JJ6EhSwOjxQPIOa2ZHpTCNTka3eMWFpOj+c3BsDfykty55ht1C80nVPrqTrb8lUD9cbtr9Hh5AYa3FU9qKDKo12eHMsqGn5XBZfonE+tkxzA4RUi4OA9BAggqlJVO/PcLKVmk8LAebAOcpMJ9uC2cvRZ6eNtIA6pWZRyW8DJs2veEBSks72aqK03p+w3xAKBUNYUkG51gpsNVkM3jSIrRQsWOCzH+onumXlsxsRfG69ZbpFBd2Dul6uYRNDWfUL1Yol8F/oEaQ6R1BbDXsVcSLIlYp6JzsM4J2+WQ1qWFQs8+cdR7olgDgi/p/FyIAa6sb4OCMPhb38roSZzCgO2MxFsMSb2sel/D+yWboGYgWM5e/FyfUB9/i0fLQPf+Tm6h55vk9efTBMLiUZFQGvFgFMtBdy/+e8lfBBhFKyXgD2ftTE/AdEbEpRnJhMyylHCua0Y9pEoNV3Ak8EGDSCDfk2w/vBgD/+MB7oUf3DYZSDkTVB6fHM80MkiQGN2bUSo+Mhs/GUxF06IDkFG5osg9uJplDeDQTP3UBaiL1Y+b3w23W95oKRrI7TfwVPgTJZ/SI28j5rSVM5hlNaEJTY2epG8yTA6R11eDfqAa6GplaxmSA3fkXbcuQ98Xk9dNFwvt23xCoRnI8Igqxj1WPB/TbgnBoOF52d2+qlQXA23j9f7fKClRad/u9ep9XXMoWDC8PZ7Y/3E59pNyqrvQsa9rwSfFqKho8DiG21daRmtCjTBMSmb3o/TzYYQpmIG4YZYEgXQVqim/IX6XAiRv+u8j125VWO7yG6kVbDO8Y0fy4s2XT3WXOvk0Tmr9YyF/wTH3P4GyajqF8v4lHhzetPk/E4hV7zEbvd22t0FLfTfsGqVZTkUXnqglfI+cHO3pjMMkaUVqlmQV6/lVSJ82gMNO/eHpzEQzWcCmSgZ0lNjbDy2hU5ZmxRx3Nw7znBD9FVFXf1mbaMI+BJwT9ebB9H9stobznnPBuTI0rYSkz+3JS1cGyDGr1aXUEoqlcs980rZ0iQ3FBlLgVVTgK5qaSgf2HnXmfvb+//vMbCd7HvcL3j9vmjKeEiC5AJSw9j4V424PQL/2YwRPP66zARu7oU0bnZ/aRPk7ec1sWCLAvDXh499AQXKsyrlTzE0FJ5pSknRuI8LoTzgHT+af3IsAXbnf0p3FNzWm/BoSonmjI1BxjHgyocaRhK56cC+vBo5K1iwWtYVqvJvH0qhNIedLLXiUdCgsn9ybrSwEJ7YVR7Wx+m4yUO5aS3LkuOdT/+QaKe2Xlbw9D2mVZvYGrAIo7dQRqULpsBFYmN9CzoYdauhxN5QEriUPgBPFL/pedIjG82lU3/V2bX8G6HrNzS/qAUsyqf7fmaBvWy2l39QYMadvNPxdUzQFTOO48iLFsUdnnLUswWUPibY4L1pzWUqMwO3UVIBhGUi3I5U3H9FHodLXqHcRerLmLcdU2OZKk/64gdt0H5Uq/1A0WICumu1o5gqjTIqi1DfBPgRuc82IZXcRu7zU3AP8UFbn+cFrvEsovG0RTjYFmng/4asw4cYB6QrG9ViDeC+IIonfbVD5Ztm7nadkczSGirejwJFmiBhjL4JLzkS7bk3B0EUUvw4JhjbpqAuMosOgFpTeC1ydZ/Q2/oYRdAx3Bd2MqE2LQpT5nri8S6bdePSneTRwNLel0uj7pcEcOZYvc0wVBj5R5hfTd/kzzVE2bNXf5IP18ydTrDj6liNc0KgYptdVORj1O8gjkTQcjiJhwp7sMcbGRvUDeUyuD9jASexBnPXsgNEDP6VkOZrJpGcYT3vHXg+cy93WwMPfZZVwTecxlR550Wk0//GRfUoDoH88nySzR6fpQlH87WigfhoyVRFfufG43Fx//o2750AFjN1kdpelBN1Py9zpUO82snY48jmLilxUR854n6PKS7Q+vP6dDIO0sPk4KXTaYf3fidKVdk5WQbmlMAFYrs7gsmnsUU5JmlLJ/QFwk2qMLB6k+d8mF8eM5vnfmUNVfZUOWG3TWF81TbcNAdinovzpL1dbYLIVvEtcmp3Kh5oy1srZ7dh/jFRFbJC8UHaWdO8s8pfBjtGdMOlWD1T/hzYNjfV6+4EHMBneBoDSAa49fGMzjg+D97AAfguvauYu1RFM2zFXMva90f/U2nIIqEMF3jAn2uE4D87xXt64KLCrrwFOqe3oi/6M9+PJYVd2jlBXbROvYKvFsXO1TIW8eoeOWNsfrmfsVfUN9O4xdU62VO8nUsCj6/qyacz+ztle/oP/lLz68qtFUfIKv/E4D5EjV6Y/Ruwuhdi6NrpPKEa2PWVtEOXn4HeJH5kw9bDP+Iti0Q9l/bP2JIg9hQ6VcBnEOIM40f4F5gW3kChTCv3B/qNihS4C8sAGuu+iCM7/Jpqjg/Fwa0tKQjdefF8FxV6ZIsT6Q03uy9x2l06QTjC9lNhi8qWgvMjSpsav9FgOauPdDaiyKkMV+CIO+Ti5/AuyrejIfBvKgp4hU61UvPi2AxGGK3iD2X8MMrjjGBU8y2H+OgH886cSOSbjX3u5BarFZAMoM2WlOLd8HWylustiZhdDXFezuacH6MsHlC+AnD7sPjGnzGqlm5GIPPyQiHg1SbBLIjdpaphKk4uG8SMWYVvVUdHim/9XN6j6olo3d9NGXHuLdNKiv0TuxiVL0kJG1rsHMPR9LQ7VBmU7XUZ3Kop0mcjJc1aY90PhgEI8hAkXpGdMzM6Mg0bIW1FzqIqVfeGlO+XRsGmC2hNHPqh5GXvDn71cVaNGXXKs0y9d5A/2wyjWRzf4VDoCQj3w9FLMWA+Dhh0VytkoweD953TV/HlaQUolVY8woTRjegrmYH54RRMBRCtBP5Ya80er/8zMvufT06rLbI/MIzCBOqUcAhMWyYrRGdDjUMM/pntFcDZbraw0USvVEzeLeAowr5gztHfOflyjXkzstUHevDDmJm/fSg9hd1YLLM135r2uVaQifmVcYd/x3rjRBqy6O4DOCQKgUBlgTYjobe4go0B08bGlcsBqGTUb45lLTsvMakyQl4Jcln3JetR1WKrX4NDsXHjbl6ZRwxfd4qffUAvWZjcI5iACNdjxWD2QlrWh0InTsSqi2IbIIJs+W3C9y2TFcphO76nthrx/yhy3K8Ox/BvB/+b9sLoy2SAFLbv9EbjH/RqmXqtZmKDs76nz/JuPKGeK1DSZs9Hn/rBTRnO8SK5K7CR4O0GsgE9u6jcs9ywnY3mKnPKZgRjByVefAWski/8sXLE7dW8VqDWJwLEM+rZZrM+c2v8YZ4JLkqeWGNRSPiwKMwolgIom2hgmQ2DeEKjTdiR/b+P3nLOnGn1mMHdztZq5Udm5cwNmtH0Q7ZJvkj9eqLIzEy3lzo3x1NWaffZIp0sRbznfADKLo5I6mXeRnu+V6OmXzWQNPzTLYGJ9lgSbgIR5sAN0+TTF8ndleRxntXtRvB7LgRTUeKcBfWsyW0jbMGL8SauuiqEVc+g/tARszAk1n8lc/b7+a5VCsrld2vEk9TodFzpJXZ/vUfyivWKWgX4OLh15vziClkc6bDEXNLt6J4SX3YQ+za8nMoGoK9RQH1d4XyYaixFqcYE1qG9WSzXqqWLIB+PhRc8RCkm353hVl3eC2fznJ5d8c8J4Mivtwa4pCXowEQuB1TrhSIr2NPZ+o9xDhNIC7pvw290saW8zJKnyuF0V/7d7IDeAAAA=') center/cover no-repeat;
     box-shadow:0 4px 14px rgba(0,0,0,0.28);
     transition:transform 0.2s cubic-bezier(0.34,1.5,0.64,1);
   }
@@ -1618,12 +1636,51 @@
   </div>
 
   <div class="screen active" id="e-list">
-    <h1 class="pagehead">Toutes les procédures</h1>
-    <div class="subhead" id="e-list-subhead">Chargement...</div>
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="equipe-search-input" placeholder="Rechercher une procédure...">
+    <div class="accueil">
+      <div class="accueil-texte">
+        <div class="t" id="e-salut">Bonjour 👋</div>
+        <div class="s" id="e-mot">Chargement…</div>
+      </div>
+      <div class="accueil-av" id="e-avatar" role="button" aria-label="Contacter le support">
+        <span class="dispo"></span>
+      </div>
     </div>
+
+    <!-- Les trois chiffres de l'employé, comme les anneaux du gérant -->
+    <div class="ga-trio">
+      <div class="ga-tuile"><div class="ga-anneau" id="e-anneau-lues"></div><div class="ga-libelle">Lues</div></div>
+      <div class="ga-tuile"><div class="ga-anneau" id="e-anneau-total"></div><div class="ga-libelle">En tout</div></div>
+      <div class="ga-tuile"><div class="ga-anneau" id="e-anneau-reste"></div><div class="ga-libelle">À lire</div></div>
+    </div>
+
+    <div class="recherche-fine">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="e-recherche" placeholder="Rechercher une procédure">
+    </div>
+
+    <div id="e-resultats" class="e-resultats" style="display:none;"></div>
+
+    <div id="e-bloc-categories">
+      <div class="section-title">Catégories</div>
+      <div class="cat-grid" id="e-cat-grid"></div>
+    </div>
+  </div>
+
+  <!-- Procédures d'une catégorie, côté équipe -->
+  <div class="screen" id="e-category">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-list', document.querySelector('#tabbar-equipe .tab-round'))">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" id="e-cat-titre" style="margin:0; font-size:20px;">Catégorie</h1>
+    </div>
+    <div class="subhead" id="e-cat-sous">—</div>
+
+    <div class="recherche-fine">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="e-cat-recherche" placeholder="Rechercher dans cette catégorie">
+    </div>
+
     <div id="equipe-procedures-list"></div>
   </div>
 
@@ -1745,6 +1802,9 @@ let ecapEditor = null     // éditeur de clip de l'écran de modification
 let currentVideoFile = null
 let allEquipeProcedures = []
 let equipeEtapesByProc = {}
+let equipeLues = new Set()      // identifiants des procédures que j'ai lues
+let equipeCatCourante = null
+let equipeCatQuery = ''
 let scanStream = null
 let scanLoopActive = false
 let selectedSpace = 'gestion' // espace choisi sur le premier écran
@@ -1761,7 +1821,7 @@ function afficherCoquille(espace) {
   barre.style.display = 'flex'
 
   if (espace === 'equipe') {
-    const liste = document.getElementById('equipe-procedures-list')
+    const liste = document.getElementById('e-cat-grid')
     if (liste && !liste.children.length) {
       liste.innerHTML = Array.from({ length: 5 }).map(() => `
         <div class="sop-card squelette">
@@ -2164,7 +2224,7 @@ function renderGaStats() {
 
   dessinerAnneau('ga-anneau-taux',  taux, couleurTaux, taux + '%')
   dessinerAnneau('ga-anneau-procs', 100, 'var(--blue)',   String(nbProcedures))
-  dessinerAnneau('ga-anneau-emp',   100, '#BF5AF2',       String(nbEmployes))
+  dessinerAnneau('ga-anneau-emp',   100, 'var(--purple)', String(nbEmployes))
 
   const sous = document.getElementById('ga-sub-global')
   if (sous) {
@@ -4112,23 +4172,18 @@ function renderAnalyseStats() {
 
 // ═══════════ ÉQUIPE : liste ═══════════
 async function loadEquipeProcedures() {
-  const listEl = document.getElementById('equipe-procedures-list')
-  const subheadEl = document.getElementById('e-list-subhead')
-  listEl.innerHTML = ''   // remplace les coquilles d'attente
-
   const { data: procedures, error } = await supabase
     .from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id).order('titre')
+  if (error) { console.error(error); return }
 
-  if (error) { subheadEl.textContent = "Erreur : " + error.message; return }
-
-  // Étapes de TOUTES les procédures chargées d'un coup, en même temps que mes
-  // validations : chaque fiche s'ouvrira ensuite instantanément.
+  // Étapes de TOUTES les procédures et mes validations, chargées d'un coup :
+  // chaque fiche s'ouvrira ensuite instantanément.
   const procIds = procedures.map(p => p.id)
   const [{ data: mesValidations }, { data: toutesEtapes }] = await Promise.all([
     supabase.from('validations').select('procedure_id').eq('membre_id', currentMembre.id),
     supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
   ])
-  const validatedIds = new Set((mesValidations || []).map(v => v.procedure_id))
+  equipeLues = new Set((mesValidations || []).map(v => v.procedure_id))
 
   equipeEtapesByProc = {}
   ;(toutesEtapes || []).forEach(e => {
@@ -4137,28 +4192,174 @@ async function loadEquipeProcedures() {
   })
 
   allEquipeProcedures = procedures
-  subheadEl.textContent = `${procedures.length} procédure${procedures.length > 1 ? 's' : ''}`
+  renderEquipeAccueil()
+  renderEquipeCategories()
+}
 
-  procedures.forEach((proc, i) => {
-    const div = document.createElement('div')
-    div.className = 'sop-card'
-    div.style.animationDelay = (i * 0.05) + 's'
-    div.onclick = () => openEquipeDetail(proc.id)
-    div.innerHTML = `
-      <div>
-        <div class="title">${escapeHtml(proc.titre)}</div>
-        <div class="meta">${escapeHtml(proc.categorie || 'Sans catégorie')}</div>
+/* Salutation et anneaux de l'employé. Les trois chiffres répondent à sa seule
+   question : combien j'en ai lu, combien il en reste. */
+function renderEquipeAccueil() {
+  const h = new Date().getHours()
+  const bonjour = h < 6 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir'
+  const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
+  const salut = document.getElementById('e-salut')
+  if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
+
+  const total = allEquipeProcedures.length
+  const lues = allEquipeProcedures.filter(p => equipeLues.has(p.id)).length
+  const reste = total - lues
+  const pct = total ? Math.round((lues / total) * 100) : 0
+
+  const mot = document.getElementById('e-mot')
+  if (mot) {
+    mot.innerHTML = !total
+      ? "Aucune procédure pour l'instant. Votre responsable vous prévient dès qu'il en publie une."
+      : reste === 0
+        ? "Vous avez tout lu. Rien ne vous attend."
+        : `Il vous reste <b>${reste} procédure${reste > 1 ? 's' : ''}</b> à lire.`
+  }
+
+  const couleur = pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--orange)' : 'var(--red)'
+  dessinerAnneau('e-anneau-lues',  pct, couleur, pct + '%')
+  dessinerAnneau('e-anneau-total', 100, 'var(--blue)', String(total))
+  dessinerAnneau('e-anneau-reste', total ? Math.round((reste / total) * 100) : 0,
+                 reste ? 'var(--orange)' : 'var(--green)', String(reste))
+}
+
+/* Grille des catégories, exactement celle de l'espace gestion : anneau de
+   progression, nom, nombre de procédures et aperçu des titres récents. */
+function renderEquipeCategories() {
+  const grille = document.getElementById('e-cat-grid')
+  if (!grille) return
+  grille.innerHTML = ''
+
+  if (!allEquipeProcedures.length) {
+    grille.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+      <h3>Aucune procédure</h3><p>Votre responsable vous prévient dès qu'il en publie une.</p></div>`
+    return
+  }
+
+  const parCat = {}
+  allEquipeProcedures.forEach(p => {
+    const nom = p.categorie || 'Sans catégorie'
+    if (!parCat[nom]) parCat[nom] = []
+    parCat[nom].push(p)
+  })
+
+  Object.keys(parCat).sort((a, b) => a.localeCompare(b, 'fr')).forEach(nom => {
+    const procs = parCat[nom]
+    const lues = procs.filter(p => equipeLues.has(p.id)).length
+    const pct = Math.round((lues / procs.length) * 100)
+    const couleur = pct === 100 ? 'var(--green)' : pct >= 34 ? 'var(--orange)' : 'var(--red)'
+    const c = 2 * Math.PI * 19
+
+    const cell = document.createElement('div')
+    cell.className = 'cat-cell'
+    cell.onclick = () => openEquipeCategorie(nom)
+    cell.innerHTML = `
+      <div class="cat-top">
+        <div class="cat-ring-wrap">
+          <svg viewBox="0 0 46 46">
+            <circle class="cat-ring-bg" cx="23" cy="23" r="19"></circle>
+            <circle class="cat-ring-fg" cx="23" cy="23" r="19"
+              stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
+          </svg>
+          <span class="cat-ring-emoji">${pct === 100 ? '✓' : '📄'}</span>
+        </div>
+        <div class="cat-badge">${procs.length}</div>
       </div>
-      <div class="check ${validatedIds.has(proc.id) ? 'done' : ''}"></div>`
-    listEl.appendChild(div)
+      <div class="cat-name">${escapeHtml(nom)}</div>
+      <div class="cat-pct-row"><span style="color:${couleur}">${lues}/${procs.length} lues</span></div>
+      <div class="cat-recent">${procs.slice(0, 2).map(p => `<div>${escapeHtml(p.titre)}</div>`).join('')}</div>`
+    grille.appendChild(cell)
   })
 }
 
-document.getElementById('equipe-search-input')?.addEventListener('input', (e) => {
-  const q = e.target.value.toLowerCase()
-  document.querySelectorAll('#equipe-procedures-list .sop-card').forEach(card => {
-    card.style.display = card.querySelector('.title').textContent.toLowerCase().includes(q) ? 'flex' : 'none'
+/* Écran d'une catégorie : ses procédures, avec sa propre recherche. */
+function openEquipeCategorie(nom) {
+  equipeCatCourante = nom
+  equipeCatQuery = ''
+  const champ = document.getElementById('e-cat-recherche')
+  if (champ) champ.value = ''
+  document.getElementById('e-cat-titre').textContent = nom
+  document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
+  document.getElementById('e-category').classList.add('active')
+  remonterEnHaut()
+  renderEquipeCatListe()
+}
+
+function renderEquipeCatListe() {
+  const listEl = document.getElementById('equipe-procedures-list')
+  if (!listEl) return
+  const dansCat = allEquipeProcedures.filter(p => (p.categorie || 'Sans catégorie') === equipeCatCourante)
+  const q = equipeCatQuery
+  const vues = q ? dansCat.filter(p => p.titre.toLowerCase().includes(q)) : dansCat
+
+  const lues = dansCat.filter(p => equipeLues.has(p.id)).length
+  document.getElementById('e-cat-sous').textContent =
+    `${dansCat.length} procédure${dansCat.length > 1 ? 's' : ''} · ${lues} lue${lues > 1 ? 's' : ''}`
+
+  listEl.innerHTML = ''
+  if (!vues.length) {
+    listEl.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à votre recherche.</p></div>`
+    return
+  }
+  vues.forEach(proc => listEl.appendChild(ficheEquipe(proc)))
+}
+
+/* Une fiche de procédure, réutilisée par la catégorie et par la recherche. */
+function ficheEquipe(proc) {
+  const div = document.createElement('div')
+  div.className = 'sop-card'
+  div.onclick = () => openEquipeDetail(proc.id)
+  div.innerHTML = `
+    <div>
+      <div class="title">${escapeHtml(proc.titre)}</div>
+      <div class="meta">${escapeHtml(proc.categorie || 'Sans catégorie')}</div>
+    </div>
+    <div class="check ${equipeLues.has(proc.id) ? 'done' : ''}"></div>`
+  return div
+}
+
+
+/* Recherche de l'accueil : elle cherche dans toutes les procédures, toutes
+   catégories confondues, et remplace la grille par ses résultats le temps de
+   la saisie. */
+document.getElementById('e-recherche')?.addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase()
+  const zone = document.getElementById('e-resultats')
+  const bloc = document.getElementById('e-bloc-categories')
+  if (!zone || !bloc) return
+
+  if (!q) { zone.style.display = 'none'; zone.innerHTML = ''; bloc.style.display = ''; return }
+
+  bloc.style.display = 'none'
+  zone.style.display = 'block'
+  zone.innerHTML = ''
+  const trouves = allEquipeProcedures.filter(p =>
+    p.titre.toLowerCase().includes(q) || (p.categorie || '').toLowerCase().includes(q))
+
+  if (!trouves.length) {
+    zone.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à « ${escapeHtml(q)} ».</p></div>`
+    return
+  }
+  trouves.forEach(p => zone.appendChild(ficheEquipe(p)))
+})
+
+// Recherche à l'intérieur d'une catégorie
+document.getElementById('e-cat-recherche')?.addEventListener('input', (e) => {
+  equipeCatQuery = e.target.value.trim().toLowerCase()
+  renderEquipeCatListe()
+})
+
+// Le support, joignable depuis l'avatar comme côté gestion
+document.getElementById('e-avatar')?.addEventListener('click', async () => {
+  const ok = await confirmDialog({
+    titre: 'On est là',
+    message: "Une question sur une procédure ? Écrivez-nous, quelqu'un vous répond dans la journée.",
+    confirmer: 'Nous écrire', annuler: 'Plus tard', danger: false,
   })
+  if (ok) window.location.href = 'mailto:support@frizz-instant.com?subject=' + encodeURIComponent('Procédo — question')
 })
 
 // ═══════════ ÉQUIPE : détail ═══════════

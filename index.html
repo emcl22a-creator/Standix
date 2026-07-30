@@ -3047,8 +3047,13 @@ function openFicheMembre(membreId) {
     return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear()
   }).length
 
+  // Consultations du jour : on compare la date, pas l'horodatage
+  const dateDuJour = new Date().toDateString()
+  const nbAujourdhui = siennes.filter(v => new Date(v.validated_at).toDateString() === dateDuJour).length
+
   document.getElementById('mf-activite').innerHTML = [
     ['Taux de consultation', pct + ' %'],
+    ["Aujourd'hui", nbAujourdhui + ' consultation' + (nbAujourdhui > 1 ? 's' : '')],
     ['Cette semaine', semaine + ' consultation' + (semaine > 1 ? 's' : '')],
     ['Ce mois-ci', mois + ' consultation' + (mois > 1 ? 's' : '')],
     ['Journées actives', jours.size + ' jour' + (jours.size > 1 ? 's' : '')],
@@ -3341,8 +3346,13 @@ async function loadGestionProcedures() {
       avgPct = procsInCat.length > 0 ? Math.round((totalRatio / procsInCat.length) * 100) : 0
     }
 
+    // État de la catégorie : une analyse en cours l'emporte sur une analyse
+    // terminée, pour que la roue reste visible tant que quelque chose tourne.
+    const etatCat = procsInCat.some(p => p.statut === 'traitement') ? 'traitement'
+      : procsInCat.some(p => p.statut === 'pret') ? 'pret' : null
+
     allCategoriesData.push({
-      nom, icone, procsInCat, avgPct,
+      nom, icone, procsInCat, avgPct, statut: etatCat,
       latestDate: new Date(procsInCat[0].created_at).getTime(),
       earliestDate: new Date(procsInCat[procsInCat.length - 1].created_at).getTime()
     })
@@ -3475,7 +3485,7 @@ function renderCategoryGrid() {
   })
 
   const triParDate = currentCatSort === 'new' || currentCatSort === 'old'
-  sorted.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
+  sorted.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate, statut }) => {
     const recentTitles = procsInCat.slice(0, 3)
     const ringColor = avgPct >= 70 ? '#30D158' : avgPct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
@@ -3483,9 +3493,10 @@ function renderCategoryGrid() {
     const needsAttention = avgPct > 0 && avgPct < 30
 
     const cell = document.createElement('div')
-    cell.className = 'cat-cell'
+    cell.className = 'cat-cell' + (statut === 'traitement' ? ' proc-en-cours' : '')
     cell.dataset.key = nom
     cell.innerHTML = `
+      ${etatProcedureHtml({ statut })}
       <div class="cat-top">
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
@@ -3930,6 +3941,13 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     document.getElementById('ai-progress-card').style.display = 'block'
     startAiProgressSimulation()
     pollAiStatus()
+
+    /* La procédure existe en base, mais rien en mémoire ne le savait : en allant
+       tout de suite dans les catégories, elle n'apparaissait pas. La grille est
+       construite à partir de `allCategoriesData`, qui n'est reconstruit que par
+       le chargement complet — on le relance donc, sans attendre sa fin pour ne
+       pas retarder l'affichage de la progression. */
+    loadGestionProcedures().catch(() => {})
   } catch (e) {
     setButtonLoading(launchBtn, false)
     errorEl.textContent = e.message

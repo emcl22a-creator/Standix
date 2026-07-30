@@ -124,7 +124,7 @@
   .topbar-card{
     position:relative;
     display:flex; align-items:center;
-    background:rgba(14,14,18,0.70); -webkit-backdrop-filter:blur(60px) saturate(140%); backdrop-filter:blur(60px) saturate(140%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(44px) saturate(180%); backdrop-filter:blur(44px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
@@ -140,7 +140,7 @@
   .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(14,14,18,0.70); -webkit-backdrop-filter:blur(60px) saturate(140%); backdrop-filter:blur(60px) saturate(140%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(44px) saturate(180%); backdrop-filter:blur(44px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
@@ -307,6 +307,26 @@
   .contact-carte:active{ transform:scale(0.985); }
   .contact-carte .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .contact-carte .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
+
+  /* ═══ Détail d'un échec d'analyse ═══
+     La cause exacte est écrite en base par la fonction serveur. La montrer ici
+     évite d'avoir à ouvrir Supabase pour comprendre ce qui s'est passé. */
+  .ai-detail{
+    margin-top:14px; padding:12px 13px; border-radius:14px;
+    background:rgba(255,69,58,0.08); border:0.5px solid rgba(255,69,58,0.22);
+    text-align:left;
+  }
+  .ai-detail .t{
+    font-size:10px; font-weight:750; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:7px;
+  }
+  .ai-detail pre{
+    font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size:10.5px; line-height:1.5; color:var(--label-2);
+    white-space:pre-wrap; word-break:break-word; margin-bottom:10px;
+    max-height:190px; overflow-y:auto;
+    -webkit-user-select:text; user-select:text;
+  }
 
   /* ═══ Titre de section avec un bouton d'aide ═══ */
   .titre-avec-aide{ display:flex; align-items:center; gap:7px; margin:22px 0 10px; }
@@ -1268,7 +1288,7 @@
   .login-card .subhead{margin-bottom:20px;}
 
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:rgba(14,14,18,0.70); -webkit-backdrop-filter:blur(60px) saturate(140%); backdrop-filter:blur(60px) saturate(140%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(44px) saturate(180%); backdrop-filter:blur(44px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
@@ -1321,13 +1341,13 @@
      de flou pour que le fond ne soit plus qu'une tache de couleur. */
   #tabbar-gestion .groupe, #tabbar-equipe .groupe{
     display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
-    /* Du flou, pas du verre : la teinte est sombre, jamais blanche. Elle est
-       assez dense pour que le contraste des icônes ne dépende plus de ce qui
-       passe derrière — à 34 % d'opacité, au-dessus d'une vidéo claire, l'onglet
-       inactif devenait presque invisible. */
-    background:rgba(14,14,18,0.70); border:0.5px solid rgba(255,255,255,0.20);
-    -webkit-backdrop-filter:blur(60px) saturate(140%); backdrop-filter:blur(60px) saturate(140%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
+    /* Le verre : teinte blanche légère, flou généreux, liseré clair et reflet
+       intérieur. La lisibilité des icônes ne repose plus sur lui mais sur la
+       pastille de l'onglet, juste en dessous — le verre peut donc rester
+       transparent sans que rien ne disparaisse. */
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
+    -webkit-backdrop-filter:blur(44px) saturate(180%); backdrop-filter:blur(44px) saturate(180%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
   }
   /* ═══ Pourquoi le libellé est en position absolue ═══
      Faire varier `max-width` sur le texte le rognait progressivement : on
@@ -1340,10 +1360,11 @@
   #tabbar-gestion .tab-round, #tabbar-equipe .tab-round{
     position:relative; height:44.5px; width:44.5px; flex-shrink:0; padding:0; gap:0;
     border-radius:100px; border:none;
-    /* L'onglet inactif portait un texte à 55 % sur fond transparent : selon la
-       page derrière, il disparaissait. Il a maintenant son propre fond et une
-       couleur franche, il reste donc lisible partout. */
-    background:rgba(255,255,255,0.10); color:rgba(235,235,245,0.90);
+    /* Sur un verre transparent, une icône blanche disparaît dès qu'une vidéo
+       claire passe derrière. L'onglet inactif porte donc sa propre pastille
+       sombre : l'icône a toujours un fond à elle, quoi qu'il y ait dessous, et
+       le verre du conteneur reste libre d'être transparent. */
+    background:rgba(18,18,22,0.55); color:rgba(255,255,255,0.92);
     justify-content:flex-start; overflow:hidden;
     transition: width 0.44s cubic-bezier(0.32,0.72,0,1),
                 background-color 0.34s cubic-bezier(0.32,0.72,0,1),
@@ -1935,6 +1956,11 @@
       </div>
       <button class="btn block" style="margin-top:14px;" id="ai-launch-btn" disabled>Lancer l'analyse</button>
       <div class="error-msg" id="ai-error"></div>
+      <div class="ai-detail" id="ai-detail" style="display:none;">
+        <div class="t">Détail technique</div>
+        <pre id="ai-detail-texte"></pre>
+        <button type="button" class="btn small ghost block" id="ai-copier">Copier ce détail</button>
+      </div>
     </div>
 
     <div class="card" id="ai-progress-card" style="display:none; text-align:center; padding:28px 20px;">
@@ -4523,6 +4549,8 @@ function resetAiScreen() {
   document.getElementById('ai-video-placeholder').style.display = 'block'
   document.getElementById('ai-launch-btn').disabled = true
   document.getElementById('ai-error').textContent = ''
+  const detail = document.getElementById('ai-detail')
+  if (detail) detail.style.display = 'none'
   document.getElementById('ai-upload-card').style.display = 'block'
   document.getElementById('ai-progress-card').style.display = 'none'
   document.getElementById('ai-done-card').style.display = 'none'
@@ -4636,6 +4664,38 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   }
 })
 
+/* Affiche la cause exacte, telle que la fonction serveur l'a inscrite sur la
+   procédure. Sans ça, il fallait ouvrir Supabase pour la lire — et sans elle on
+   ne peut que deviner. */
+async function afficherDetailEchec(procId, message) {
+  const bloc = document.getElementById('ai-detail')
+  const texte = document.getElementById('ai-detail-texte')
+  if (!bloc || !texte) return
+
+  let detail = message || ''
+  if (procId) {
+    const { data } = await supabase.from('procedures')
+      .select('erreur_ia, azure_video_id, statut').eq('id', procId).maybeSingle()
+    if (data) {
+      detail = [
+        data.erreur_ia || message || '(aucun d\u00e9tail enregistr\u00e9)',
+        '',
+        'proc\u00e9dure : ' + procId,
+        'statut : ' + (data.statut || '\u2014'),
+        'vid\u00e9o Azure : ' + (data.azure_video_id || '\u2014'),
+      ].join('\n')
+    }
+  }
+  texte.textContent = detail
+  bloc.style.display = detail ? 'block' : 'none'
+}
+
+document.getElementById('ai-copier')?.addEventListener('click', async () => {
+  const t = document.getElementById('ai-detail-texte')?.textContent || ''
+  try { await navigator.clipboard.writeText(t); toast('D\u00e9tail copi\u00e9.') }
+  catch (e) { toast("La copie a \u00e9chou\u00e9 \u2014 s\u00e9lectionnez le texte \u00e0 la main.") }
+})
+
 async function pollAiStatus() {
   try {
     const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
@@ -4679,7 +4739,9 @@ async function pollAiStatus() {
     stopAiProgressSimulation(0)
     document.getElementById('ai-progress-card').style.display = 'none'
     document.getElementById('ai-upload-card').style.display = 'block'
+    document.getElementById('ai-error').style.color = 'var(--red)'
     document.getElementById('ai-error').textContent = data.message || "Une erreur est survenue pendant l'analyse."
+    afficherDetailEchec(aiProcedureId, data.message)
   } catch (e) {
     // Coupure réseau passagère : on retente sans rien casser
     aiNbSondages++
@@ -6769,15 +6831,29 @@ async function openEquipeDetail(procId) {
     etapes = e || []
   }
 
-  if (!proc) { document.getElementById('detail-titre').textContent = 'Procédure introuvable'; return }
+  if (!proc) {
+    document.getElementById('detail-titre').textContent = 'Procédure introuvable'
+    document.getElementById('detail-steps').innerHTML = ''
+    // Sans ça, le bandeau de la procédure précédente restait affiché ici.
+    arreterLecture()
+    document.getElementById('lecture-etat')?.closest('.confirm-bar')?.classList.remove('visible')
+    return
+  }
 
-  // Déjà consultée ? On récupère la date pour l'afficher plutôt que de relancer
-  // un décompte inutile.
+  /* Déjà consultée, et récemment ? Une consultation vieille de plus de douze
+     heures ne compte plus : le bandeau disparaît et le décompte repart, ce qui
+     invite à relire. C'est l'intérêt d'une procédure de travail — elle se relit,
+     elle ne se coche pas une fois pour toutes. */
   let dejaConsultee = false
   if (equipeLues?.has(procId)) {
     const { data: v } = await supabase.from('validations')
       .select('validated_at').eq('procedure_id', procId).eq('membre_id', currentMembre.id).maybeSingle()
-    dejaConsultee = v?.validated_at || true
+    const quand = v?.validated_at ? new Date(v.validated_at).getTime() : 0
+    const fraiche = quand > 0 && (Date.now() - quand) < DELAI_RELECTURE
+    dejaConsultee = fraiche ? v.validated_at : false
+    // Une lecture périmée remet le chronomètre à zéro : on ne valide pas une
+    // relecture avec les secondes d'il y a trois jours.
+    if (!fraiche) { lectureProcId = null; lectureSecondes = 0 }
   }
 
   document.getElementById('detail-titre').textContent = proc.titre
@@ -7027,6 +7103,11 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
    et reprend là où il s'était arrêté : lire en deux fois reste lire.
    ═══════════════════════════════════════════════════════════════════════════ */
 const DUREE_LECTURE_MIN = 30
+
+/* Au-delà de ce délai, une procédure repasse « à relire » : le bandeau
+   « Procédure consultée » disparaît et le décompte se relance. Douze heures,
+   c'est-à-dire d'un service à l'autre. */
+const DELAI_RELECTURE = 12 * 60 * 60 * 1000
 let lectureTimer = null
 let lectureSecondes = 0
 let lectureProcId = null
@@ -7094,14 +7175,26 @@ async function enregistrerConsultation() {
   /* On inscrit le temps réellement passé sur la fiche. C'est la seule mesure
      honnête dont on dispose : le décompte s'arrête dès que l'app passe en
      arrière-plan, donc ces secondes ont vraiment été passées devant l'écran. */
+  /* On rafraîchit explicitement la date : sans elle, une relecture mettrait à
+     jour la ligne sans changer `validated_at`, et la procédure resterait
+     éternellement périmée. Et le temps s'ajoute au précédent, puisque c'est bien
+     le total passé sur cette procédure que l'on veut connaître. */
+  const precedent = (mesLectures || []).find(v => v.procedure_id === lectureProcId)
+  const cumul = Number(precedent?.duree_lecture || 0) + lectureSecondes
+
   const { error } = await supabase.from('validations').upsert(
-    { procedure_id: lectureProcId, membre_id: currentMembre.id, duree_lecture: lectureSecondes },
+    {
+      procedure_id: lectureProcId,
+      membre_id: currentMembre.id,
+      duree_lecture: cumul,
+      validated_at: new Date().toISOString(),
+    },
     { onConflict: 'procedure_id,membre_id' }
   )
   // Si la colonne n'existe pas encore en base, on réessaie sans elle.
   if (error && /duree_lecture/i.test(error.message || '')) {
     const repli = await supabase.from('validations').upsert(
-      { procedure_id: lectureProcId, membre_id: currentMembre.id },
+      { procedure_id: lectureProcId, membre_id: currentMembre.id, validated_at: new Date().toISOString() },
       { onConflict: 'procedure_id,membre_id' }
     )
     if (!repli.error) { afficherLectureFaite(true); loadEquipeProcedures(); return }

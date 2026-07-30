@@ -2683,6 +2683,9 @@
 <div class="app" id="equipe-app" style="display:none;">
   <div class="topbar">
     <div class="topbar-row">
+      <div class="tiroir-ent verre-barre" id="tiroir-ent-eq" style="display:none;">
+        <span class="tiroir-liste" id="tiroir-liste-eq"></span>
+      </div>
       <div class="topbar-card">
       <div class="topbar-left">
         <div class="logo-pill">
@@ -4026,6 +4029,7 @@ async function enterApp(membre) {
     document.getElementById('tabbar-equipe').style.display = 'flex'
     mesurerOnglets()
     chargerLangue()
+    chargerEtablissements()
     window.jalon?.('APP AFFICHÉE')
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
@@ -8512,9 +8516,23 @@ function multiSitesAutorise() {
   return true
 }
 
+/* Le tiroir sert dans les deux espaces. La différence est ce que fait le « + » :
+   un gérant crée un établissement, un employé en rejoint un avec le code que son
+   responsable lui a donné. Le geste est le même, l'action diffère. */
+function elementTiroir() {
+  return currentMembre?.role === 'gestion'
+    ? document.getElementById('tiroir-ent')
+    : document.getElementById('tiroir-ent-eq')
+}
+function elementListeTiroir() {
+  return currentMembre?.role === 'gestion'
+    ? document.getElementById('tiroir-liste')
+    : document.getElementById('tiroir-liste-eq')
+}
+
 async function chargerEtablissements() {
-  const tiroir = document.getElementById('tiroir-ent')
-  if (!tiroir || currentMembre?.role !== 'gestion') return
+  const tiroir = elementTiroir()
+  if (!tiroir || !currentMembre) return
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
@@ -8524,14 +8542,20 @@ async function chargerEtablissements() {
      C'est ce qui se passe tant que le SQL n'a pas été exécuté. On redemande donc
      sans elle : le tiroir marche alors avec les initiales, ce qui est déjà
      l'essentiel. */
-  let { data, error } = await supabase
+  const gerant = currentMembre.role === 'gestion'
+
+  let requete = supabase
     .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url)')
-    .eq('user_id', user.id).eq('role', 'gestion')
+    .eq('user_id', user.id)
+  if (gerant) requete = requete.eq('role', 'gestion')
+  let { data, error } = await requete
 
   if (error || !data) {
-    const repli = await supabase
+    let repli = supabase
       .from('membres').select('id, role, entreprise_id, entreprises(id, nom)')
-      .eq('user_id', user.id).eq('role', 'gestion')
+      .eq('user_id', user.id)
+    if (gerant) repli = repli.eq('role', 'gestion')
+    repli = await repli
     data = repli.data || []
     if (repli.error) {
       console.warn('Proc\u00e9do \u00b7 \u00e9tablissements :', repli.error.message)
@@ -8603,8 +8627,8 @@ document.getElementById('etab-liste')?.addEventListener('click', (e) => {
 })
 
 function peindreTiroir() {
-  const tiroir = document.getElementById('tiroir-ent')
-  const liste = document.getElementById('tiroir-liste')
+  const tiroir = elementTiroir()
+  const liste = elementListeTiroir()
   if (!tiroir || !liste) return
 
   if (!multiSitesAutorise() || !mesEtablissements.length) {
@@ -8631,7 +8655,7 @@ function peindreTiroir() {
 }
 
 function fermerTiroir() {
-  const tiroir = document.getElementById('tiroir-ent')
+  const tiroir = elementTiroir()
   if (tiroir?.classList.contains('ouvert')) { tiroir.classList.remove('ouvert'); peindreTiroir() }
 }
 
@@ -8640,7 +8664,7 @@ function fermerTiroir() {
    page — un voile avalerait le premier appui, et il faudrait toucher deux fois
    pour atteindre ce qu'on visait. Ici le même geste referme et agit. */
 document.addEventListener('click', (e) => {
-  const tiroir = document.getElementById('tiroir-ent')
+  const tiroir = elementTiroir()
   if (!tiroir || tiroir.style.display === 'none') return
 
   if (e.target.closest('[data-etab-decl]')) {
@@ -8648,7 +8672,15 @@ document.addEventListener('click', (e) => {
   }
   const choix = e.target.closest('[data-etab]')
   if (choix) { fermerTiroir(); basculerVersEtablissement(choix.dataset.etab); return }
-  if (e.target.closest('[data-etab-plus]')) { fermerTiroir(); ouvrirFenetreEtab(null); return }
+  if (e.target.closest('[data-etab-plus]')) {
+    fermerTiroir()
+    /* Un gérant crée ; un employé rejoint avec un code. Deux actions distinctes
+       derrière le même bouton, parce que c'est la même intention : « j'en veux
+       un de plus ». */
+    if (currentMembre?.role === 'gestion') ouvrirFenetreEtab(null)
+    else { openEquipeSettings(); setTimeout(() => document.getElementById('es-code')?.focus(), 400) }
+    return
+  }
   if (e.target.closest('#tiroir-ent')) return
 
   fermerTiroir()

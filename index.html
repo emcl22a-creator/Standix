@@ -387,23 +387,32 @@
   .tiroir-ent.masque{ display:none; }
 
   /* Posée en absolu : sa largeur ne compte pas dans la barre, donc rien ne bouge
-     quand elle s'étend. */
+     quand elle s'étend.
+
+     C'est ELLE qui porte le verre, pas les ronds : fermée, elle épouse
+     exactement le cercle unique et se lit donc comme un rond de verre ; ouverte,
+     elle s'étire en pastille autour de tous. Le verre se déplie avec le tiroir
+     au lieu d'être répété sur chaque cercle. */
   .tiroir-liste{
     position:absolute; left:0; top:0; z-index:12;
-    display:flex; align-items:center; gap:7px;
+    display:flex; align-items:center; gap:0;
+    border-radius:100px;
+    background:rgba(255,255,255,0.10);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18);
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
 
   /* Le même verre que le bouton des réglages, à l'autre bout de la barre :
      mêmes valeurs exactes de teinte, de flou, de liseré et d'ombre. Les deux
      ronds sont taillés dans la même matière. */
+  /* Les ronds sont transparents : le verre est derrière eux, porté par le
+     tiroir. Superposer deux verres aurait doublé la teinte et le flou. */
   .rond-ent{
     position:relative; width:46px; height:46px; flex-shrink:0; border-radius:50%;
     overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.10);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18);
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
-    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+    background:none; border:none;
+    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
   }
   /* Le verre est transparent : sans un fond sous les initiales, elles
      s'évanouiraient au-dessus d'un contenu clair. Un voile sombre léger, posé
@@ -415,7 +424,9 @@
   /* Un logo recouvre tout : le voile n'a plus lieu d'être. */
   .rond-ent.a-logo::before{ display:none; }
   .rond-ent:active{ transform:scale(0.92); }
-  .rond-ent.actif{ border-color:rgba(255,255,255,0.55); border-width:1.5px; }
+  /* L'établissement courant se signale par un anneau intérieur, pas par une
+     bordure : le rond n'en a plus, et une bordure repousserait son contenu. */
+  .rond-ent.actif{ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.55); }
   .rond-ent img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
   .rond-ent .ini{
     position:relative; font-size:14px; font-weight:700; letter-spacing:0.04em;
@@ -427,7 +438,16 @@
   /* Les autres établissements et le « + » restent dans le document en
      permanence : c'est ce qui permet de les animer à la fermeture autant qu'à
      l'ouverture. Les retirer les faisait disparaître d'un coup. */
-  .tiroir-autres{ display:flex; align-items:center; gap:7px; }
+  /* Le groupe des autres se replie sur zéro : sans ça il garderait sa largeur,
+     et le verre resterait étiré même tiroir fermé. */
+  .tiroir-autres{
+    display:flex; align-items:center; gap:0; max-width:0; overflow:hidden;
+    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0.16s;
+  }
+  .tiroir-ent.ouvert .tiroir-autres{
+    max-width:280px;
+    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0s;
+  }
   .tiroir-autres .rond-ent{
     opacity:0; transform:scale(0.4) translateX(-22px); pointer-events:none;
     transition:opacity 0.26s ease, transform 0.44s cubic-bezier(0.32,0.72,0,1);
@@ -1595,9 +1615,15 @@
   /* ═══ Premier écran, quand rien n'existe encore ═══
      Centré verticalement dans la place laissée par la barre du haut et la
      barre d'onglets, avec un dessin au trait au-dessus du texte. */
+  /* La hauteur est MESURÉE, pas devinée : `100vh - 300px` supposait une hauteur
+     fixe pour ce qui précède, et le dessin se retrouvait trop haut sur un grand
+     écran, coupé sur un petit. La variable est posée au rendu, à partir de la
+     position réelle de la grille et de la hauteur réelle de la barre.
+     `dvh` plutôt que `vh` : sur téléphone, `vh` ignore la barre d'adresse. */
   .debut{
-    grid-column:1/-1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; min-height:calc(100vh - 300px); padding:20px;
+    grid-column:1/-1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    min-height:var(--debut-h, calc(100dvh - 300px)); padding:20px 20px 8px;
   }
   .debut-dessin{ position:relative; width:132px; height:120px; margin-bottom:26px; }
   .debut-dessin .lueur{
@@ -4031,11 +4057,13 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) { errorEl.textContent = "Connexion impossible : " + error.message; setButtonLoading(btn, false); return }
 
-  const { data: membre, error: membreError } = await supabase
-    .from('membres').select('*').eq('user_id', data.user.id).single()
+  const { fiches, erreur } = await lireFichesMembre(data.user.id)
+  const membre = choisirFicheMembre(fiches, selectedSpace)
 
-  if (membreError || !membre) {
-    errorEl.textContent = "Aucune fiche membre trouvée pour ce compte. Contactez un administrateur."
+  if (!membre) {
+    errorEl.textContent = erreur
+      ? "Impossible de lire votre fiche : " + erreur
+      : "Aucune fiche membre trouv\u00e9e pour ce compte. Contactez un administrateur."
     setButtonLoading(btn, false)
     return
   }
@@ -4196,6 +4224,50 @@ document.getElementById('bandeau-bloc-copier')?.addEventListener('click', async 
   try { await navigator.clipboard.writeText(t); toast('D\u00e9tail copi\u00e9.') }
   catch (e) { toast('S\u00e9lectionnez le texte \u00e0 la main.') }
 })
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHOISIR LA BONNE FICHE MEMBRE
+
+   Une personne peut avoir PLUSIEURS fiches : une par entreprise. C'est le cas
+   d'un employé qui travaille dans deux établissements, et de tout gérant qui en
+   ajoute un second.
+
+   Les lectures utilisaient `.single()` et `.maybeSingle()`, qui exigent une
+   ligne et UNE SEULE : dès la deuxième, la requête échoue. D'où le « Aucune
+   fiche membre trouvée pour ce compte » sur un compte parfaitement valide, et
+   l'app qui restait au chargement au démarrage.
+
+   On lit donc TOUTES les fiches, et on choisit :
+   • celle de l'espace où la personne était la dernière fois,
+   • sinon celle de l'espace qu'elle vient de choisir à l'écran de connexion,
+   • sinon la plus ancienne, qui est son entreprise d'origine.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function choisirFicheMembre(fiches, espaceVoulu) {
+  const liste = (fiches || []).filter(Boolean)
+  if (!liste.length) return null
+  if (liste.length === 1) return liste[0]
+
+  let prefere = espaceVoulu
+  if (!prefere) {
+    try { prefere = localStorage.getItem('procedo_espace') } catch (e) { prefere = null }
+  }
+
+  // Entre plusieurs fiches du même rôle, la plus ancienne : c'est l'entreprise
+  // d'origine, celle où l'on s'attend à revenir.
+  const parAnciennete = [...liste].sort((a, b) =>
+    new Date(a.created_at || 0) - new Date(b.created_at || 0))
+
+  return parAnciennete.find(m => m.role === prefere) || parAnciennete[0]
+}
+
+/* Lit les fiches d'un compte sans jamais exiger qu'il n'y en ait qu'une. */
+async function lireFichesMembre(userId) {
+  const { data, error } = await supabase
+    .from('membres').select('*').eq('user_id', userId)
+  if (error) return { fiches: [], erreur: error.message }
+  return { fiches: data || [], erreur: null }
+}
 
 async function enterApp(membre) {
   currentMembre = membre
@@ -5341,6 +5413,8 @@ async function loadGestionProcedures() {
   if (procedures.length === 0) {
     renderAccueil()
       ecrireSous(`0 catégorie · 0 procédure · accès complet`)
+    // On mesure APRÈS avoir écrit : la grille doit exister pour être située.
+    requestAnimationFrame(() => ajusterHauteurDebut())
     catGridEl.innerHTML = `
       <div class="debut">
         <div class="debut-dessin">
@@ -5551,6 +5625,21 @@ function playCardShuffle(containerEl, oldRects) {
     })
   })
 }
+
+/* Cale l'état vide entre ce qui le précède et la barre d'onglets, quelle que
+   soit la taille de l'écran. Sans ça, le dessin flottait trop haut sur grand
+   écran et se retrouvait sous la barre sur petit. */
+function ajusterHauteurDebut() {
+  const debut = document.querySelector('#cat-grid .debut, #e-cat-grid .debut')
+  if (!debut) return
+  const haut = Math.round(debut.getBoundingClientRect().top + window.scrollY)
+  const barre = document.getElementById('tabbar-gestion')?.offsetHeight
+    || document.getElementById('tabbar-equipe')?.offsetHeight || 88
+  // 22 px de respiration sous le texte, pour qu'il ne touche pas la barre.
+  debut.style.setProperty('--debut-h', `calc(100dvh - ${haut}px - ${barre + 22}px)`)
+}
+window.addEventListener('resize', ajusterHauteurDebut)
+window.addEventListener('orientationchange', () => setTimeout(ajusterHauteurDebut, 120))
 
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
@@ -10435,8 +10524,9 @@ try {
            pendant que la fiche membre arrive — sur une connexion lente, il
            passait devant et recouvrait l'app. */
         window.__procedoSessionEnCours = true
-        const { data: membre } = await supabase
-          .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
+        const { data: fiches } = await supabase
+          .from('membres').select('*').eq('user_id', session.user.id)
+        const membre = choisirFicheMembre(fiches)
         window.jalon?.('fiche membre reçue (via la bibliothèque)')
         if (membre) {
           enterApp(membre)

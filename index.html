@@ -3930,6 +3930,13 @@ async function preparerArriveeQR() {
 }
 
 function afficherEcranChoix() {
+  /* Verrou : si un espace est déjà à l'écran, ou si une fiche membre est en
+     mémoire, on ne montre rien par-dessus. C'est ce qui manquait — un appel
+     tardif recouvrait l'app déjà ouverte. */
+  if (currentMembre) return
+  if (document.getElementById('gestion-app')?.style.display === 'block') return
+  if (document.getElementById('equipe-app')?.style.display === 'block') return
+
   /* Quelqu'un qui scanne un QR est forcément un membre d'équipe : on lui
      épargne le choix entre les deux espaces et on l'emmène directement à
      l'inscription, avec le code déjà rempli. */
@@ -4097,6 +4104,13 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 async function enterApp(membre) {
   currentMembre = membre
   try { localStorage.setItem('procedo_espace', membre.role) } catch (e) {}
+
+  /* On masque les écrans d'accueil AVANT toute attente. Ils l'étaient après le
+     chargement des procédures : sur une connexion lente, plusieurs secondes
+     s'écoulaient pendant lesquelles un autre chemin pouvait afficher l'écran de
+     choix — et les deux se superposaient, comme sur mobile. */
+  document.getElementById('login-screen').style.display = 'none'
+  document.getElementById('choice-screen').style.display = 'none'
 
   // Préchauffage des bibliothèques QR : utile, mais surtout pas pendant le
   // premier affichage. On attend que le navigateur soit inoccupé.
@@ -10317,6 +10331,11 @@ try {
           window.jalon?.('test : appel direct à la base')
         } catch (e) { window.jalon?.('test : appel direct échoué') }
 
+        /* Une session existe : on le signale tout de suite. Le filet de secours
+           des six secondes s'en sert pour ne PAS afficher l'écran de choix
+           pendant que la fiche membre arrive — sur une connexion lente, il
+           passait devant et recouvrait l'app. */
+        window.__procedoSessionEnCours = true
         const { data: membre } = await supabase
           .from('membres').select('*').eq('user_id', session.user.id).maybeSingle()
         window.jalon?.('fiche membre reçue (via la bibliothèque)')
@@ -10357,7 +10376,11 @@ try {
       var loginVisible = login && login.style.display === 'flex'
       var gestionVisible = gestion && gestion.style.display === 'block'
       var equipeVisible = equipe && equipe.style.display === 'block'
-      if (!loginVisible && !gestionVisible && !equipeVisible && choice) {
+      /* Une session en cours de vérification compte comme une app en route : sur
+         une connexion lente ce contrôle dépassait les six secondes, et le filet
+         affichait l'écran de choix par-dessus l'app qui arrivait juste après. */
+      var sessionEnCours = !!window.__procedoSessionEnCours
+      if (!loginVisible && !gestionVisible && !equipeVisible && !sessionEnCours && choice) {
         document.body.classList.remove('booting')
         choice.style.display = 'flex'
         var logo = choice.querySelector('.boot-logo--once')

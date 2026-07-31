@@ -590,6 +590,27 @@
   .offre-carte.conseillee .offre-cta{ background:#fff; color:#000; border-color:transparent; }
   .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
 
+  /* ═══ Tiroir des langues, sur la fiche d'une procédure ═══
+     Il réutilise les classes du tiroir des établissements : même verre, même
+     dépliage, même cascade. Une seule mécanique à comprendre et à maintenir. */
+  .tiroir-langue{ margin-bottom:6px; }
+  .tiroir-langue .rond-ent .code{
+    position:relative; font-size:12px; font-weight:750; letter-spacing:0.03em;
+    color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.65), 0 0 9px rgba(0,0,0,0.45);
+  }
+  .tiroir-langue .rond-ent .terre{ position:relative; width:21px; height:21px; display:block; }
+
+  /* Pendant la traduction, le globe tourne. Un mouvement continu dit « ça
+     travaille » sans prétendre savoir combien de temps ça prendra. */
+  .tiroir-langue .rond-ent.patiente .terre{
+    animation:terreTourne 1.6s linear infinite; transform-origin:50% 50%;
+  }
+  @keyframes terreTourne{ to{ transform:rotate(360deg); } }
+  .tiroir-langue .rond-ent.patiente{ opacity:0.75; }
+  @media (prefers-reduced-motion: reduce){
+    .tiroir-langue .rond-ent.patiente .terre{ animation:none; }
+  }
+
   /* ═══ Liste des établissements dans les réglages ═══
      Chaque ligne annonce l'ACTION possible, pas seulement l'état. « Aucun logo ·
      initiales utilisées » décrivait une situation sans dire qu'on pouvait la
@@ -3029,11 +3050,9 @@
     <div class="video-frame" id="detail-video-frame" style="display:none;">
       <video id="detail-video" controls playsinline webkit-playsinline></video>
     </div>
-    <button type="button" class="btn ghost block langue-proc" id="detail-langue" style="margin-top:16px;">
-      <span class="ic">🌐</span>
-      <span class="tx" id="detail-langue-txt">Lire dans une autre langue</span>
-      <span class="fl">›</span>
-    </button>
+    <div class="tiroir-ent tiroir-langue" id="tiroir-langue" style="margin-top:16px;">
+      <span class="tiroir-liste" id="tiroir-langue-liste"></span>
+    </div>
     <div id="detail-steps" style="margin-top:12px;"></div>
     <div class="confirm-bar">
       <div class="lecture-etat" id="lecture-etat">
@@ -9760,10 +9779,63 @@ const traductionsEnCache = {}
 let langueProcCourante = 'fr'
 let procCouranteId = null
 
-async function choisirLangueProcedure() {
-  const choix = await fenetreLangues(langueProcCourante)
-  if (!choix) return
-  if (choix === langueProcCourante) return
+/* Le globe, dans la langue des icônes de création : trait blanc, aucun aplat. */
+const ICONE_TERRE = `<svg class="terre" viewBox="0 0 24 24" fill="none"
+  stroke="rgba(255,255,255,0.88)" stroke-width="1.7" stroke-linecap="round">
+  <circle cx="12" cy="12" r="9"/>
+  <ellipse cx="12" cy="12" rx="3.8" ry="9"/>
+  <line x1="3.4" y1="9" x2="20.6" y2="9"/>
+  <line x1="3.4" y1="15" x2="20.6" y2="15"/>
+</svg>`
+
+function rondLangueHtml(code, estTete) {
+  const l = LANGUES.find(x => x.code === code)
+  const dedans = (estTete && langueProcCourante === 'fr')
+    ? ICONE_TERRE
+    : `<span class="code">${(l?.code || '').toUpperCase()}</span>`
+  // La tête porte déjà la langue lue : les autres sont toutes des choix.
+  const classes = 'rond-ent'
+  const attr = estTete ? 'data-langue-decl' : `data-langue-choix="${code}"`
+  return `<button type="button" class="${classes}" ${attr}
+    aria-label="${escapeHtml(l?.nom || code)}">${dedans}</button>`
+}
+
+/* Le tiroir ne se dessine que sur la fiche d'une procédure, et seulement pour
+   quelqu'un qui lit — traduire n'a de sens que là. */
+function peindreTiroirLangue() {
+  const liste = document.getElementById('tiroir-langue-liste')
+  if (!liste) return
+
+  const autres = LANGUES.filter(l => l.code !== langueProcCourante)
+    .map(l => rondLangueHtml(l.code, false)).join('')
+
+  liste.innerHTML = rondLangueHtml(langueProcCourante, true) +
+    '<span class="tiroir-autres">' + autres + '</span>'
+}
+
+function fermerTiroirLangue() {
+  const t = document.getElementById('tiroir-langue')
+  if (t?.classList.contains('ouvert')) { t.classList.remove('ouvert'); peindreTiroirLangue() }
+}
+
+document.addEventListener('click', (e) => {
+  const t = document.getElementById('tiroir-langue')
+  if (!t || t.offsetParent === null) return          // fiche non affichée
+
+  if (e.target.closest('[data-langue-decl]')) {
+    t.classList.toggle('ouvert'); peindreTiroirLangue(); return
+  }
+  const choix = e.target.closest('[data-langue-choix]')
+  if (choix) { fermerTiroirLangue(); traduireProcedure(choix.dataset.langueChoix); return }
+  if (e.target.closest('#tiroir-langue')) return
+
+  fermerTiroirLangue()
+})
+
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiroirLangue() })
+
+async function traduireProcedure(choix) {
+  if (!choix || choix === langueProcCourante) return
 
   if (choix === 'fr') {
     langueProcCourante = 'fr'
@@ -9772,12 +9844,12 @@ async function choisirLangueProcedure() {
   }
 
   const cle = procCouranteId + ':' + choix
-  const btn = document.getElementById('detail-langue')
-  const txtBtn = document.getElementById('detail-langue-txt')
+  const tete = document.querySelector('#tiroir-langue-liste > .rond-ent')
 
   if (!traductionsEnCache[cle]) {
-    if (txtBtn) txtBtn.textContent = 'Traduction en cours\u2026'
-    if (btn) btn.disabled = true
+    /* Pendant l'attente, le rond de tête tourne : on ne fige pas l'écran pour
+       une traduction, et on ne prétend pas non plus connaître sa durée. */
+    tete?.classList.add('patiente')
     try {
       const etapes = [...document.querySelectorAll('#detail-steps .detail-step p')].map(e => e.textContent)
       const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-traduire`, {
@@ -9793,8 +9865,7 @@ async function choisirLangueProcedure() {
       if (!rep.ok || data.error) throw new Error(data.error || 'La traduction a \u00e9chou\u00e9.')
       traductionsEnCache[cle] = data
     } catch (ex) {
-      if (btn) btn.disabled = false
-      majBoutonLangueProc()
+      tete?.classList.remove('patiente')
       await confirmDialog({
         titre: 'Traduction impossible',
         message: ex instanceof Error ? ex.message : String(ex),
@@ -9802,11 +9873,12 @@ async function choisirLangueProcedure() {
       })
       return
     }
-    if (btn) btn.disabled = false
+    tete?.classList.remove('patiente')
   }
 
   langueProcCourante = choix
   appliquerTraduction(traductionsEnCache[cle])
+  peindreTiroirLangue()
 }
 
 function appliquerTraduction(trad) {
@@ -9833,53 +9905,9 @@ function appliquerTraduction(trad) {
   }
 }
 
+/* Conservé sous son ancien nom : la fiche l'appelle à chaque ouverture. */
 function majBoutonLangueProc() {
-  const txt = document.getElementById('detail-langue-txt')
-  const btn = document.getElementById('detail-langue')
-  if (!txt || !btn) return
-  const l = LANGUES.find(x => x.code === langueProcCourante)
-  btn.classList.toggle('traduit', langueProcCourante !== 'fr')
-  txt.textContent = langueProcCourante === 'fr'
-    ? 'Lire dans une autre langue'
-    : `${l?.drapeau || ''} ${l?.nom || ''}`
-}
-
-document.getElementById('detail-langue')?.addEventListener('click', choisirLangueProcedure)
-
-/* Fenêtre de choix de langue, réutilisée telle quelle par la fiche. */
-function fenetreLangues(courante) {
-  return new Promise((resoudre) => {
-    const fond = document.createElement('div')
-    fond.className = 'bienvenue-fond'
-    fond.innerHTML = `
-      <div class="bienvenue" role="dialog" aria-modal="true" style="max-width:340px;">
-        <h3 style="margin-bottom:4px;">Lire dans quelle langue ?</h3>
-        <div class="intro" style="margin-bottom:16px;">La traduction est automatique. L'original fran\u00e7ais reste la r\u00e9f\u00e9rence.</div>
-        <div class="langue-grille">
-          ${LANGUES.map(l => `
-            <button type="button" class="langue-choix${l.code === courante ? ' actif' : ''}" data-l="${l.code}">
-              <span class="dr">${l.drapeau}</span><span class="nm">${l.nom}</span>
-              ${l.code === courante ? '<span class="coche">\u2713</span>' : ''}
-            </button>`).join('')}
-        </div>
-        <button type="button" class="refus">Annuler</button>
-      </div>`
-    document.body.appendChild(fond)
-    requestAnimationFrame(() => fond.classList.add('shown'))
-
-    let fait = false
-    const fermer = (valeur) => {
-      if (fait) return
-      fait = true
-      fond.classList.remove('shown')
-      setTimeout(() => { fond.remove(); resoudre(valeur) }, 300)
-    }
-    fond.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-l]')
-      if (b) { fermer(b.dataset.l); return }
-      if (e.target === fond || e.target.classList.contains('refus')) fermer(null)
-    })
-  })
+  peindreTiroirLangue()
 }
 
 // ═══════════ ÉQUIPE : scanner ═══════════

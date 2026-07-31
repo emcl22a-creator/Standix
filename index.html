@@ -269,6 +269,24 @@
      Elle est simplement estompée pour montrer qu'elle n'est pas consultable. */
   .proc-en-cours-doux{ opacity:0.72; }
 
+  /* ═══ L'étape que la vidéo est en train de montrer ═══
+     Sans repère, on lance un extrait et on perd de vue à quel texte il
+     correspond — surtout sur seize étapes, où la liste défile. Un contour bleu
+     suffit : c'est un état, pas une action, donc ni fond plein ni gras. */
+  /* La règle de base de `.detail-step` est déclarée plus bas et pose sa propre
+     bordure : on écrit donc la bordure ENTIÈRE ici, pas seulement sa couleur,
+     sinon la déclaration suivante l'écrase. */
+  .detail-step.en-lecture{
+    border:1.5px solid rgba(94,160,255,0.62) !important;
+    background:rgba(94,160,255,0.09) !important;
+  }
+  .detail-step.en-lecture .n{
+    background:rgba(94,160,255,0.22); color:#9CC5FF;
+  }
+  .detail-step.en-lecture .badge.ok{
+    background:rgba(94,160,255,0.20); color:#9CC5FF;
+  }
+
   /* ═══ Image d'une étape manuelle ═══
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
      facultative : l'étape reste valable sans. */
@@ -966,29 +984,6 @@
   .pm-rang:active{ transform:scale(0.9); }
   .pm-rang svg{ width:18px; height:18px; display:block; }
 
-  /* ═══ Créer ou rejoindre ═══
-     Les deux gestes se ressemblent à l'énoncé et n'ont rien à voir dans les
-     faits : l'un vous rend responsable, l'autre vous rend lecteur. La fenêtre
-     les sépare franchement plutôt que de les cacher derrière un seul « + ». */
-  .ajout-choix{
-    display:flex; align-items:center; gap:13px; width:100%; margin-top:10px;
-    padding:14px 14px; border-radius:18px;
-    background:var(--bg-card); border:0.5px solid var(--border);
-    font-family:inherit; text-align:left; color:#fff;
-    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
-  }
-  .ajout-choix:active{ transform:scale(0.985); background:rgba(255,255,255,0.08); }
-  .ajout-choix .ic{
-    flex-shrink:0; width:36px; height:36px; border-radius:11px;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
-  }
-  .ajout-choix .ic svg{ width:20px; height:20px; display:block; }
-  .ajout-choix .tx{ flex:1; min-width:0; }
-  .ajout-choix .tx .t{ display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
-  .ajout-choix .tx .s{ display:block; font-size:12px; color:var(--label-3); line-height:1.45; margin-top:3px; }
-  .ajout-choix .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
 
   /* ═══ Félicitations ═══
      Même forme que la carte d'accueil : le texte à gauche, le visage à droite
@@ -1697,6 +1692,13 @@
     transition: transform 0.26s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease;
   }
   .ios-alert-backdrop.shown .ios-alert{ transform:scale(1); opacity:1; }
+  .ios-alert-champ{
+    width:100%; margin-top:13px; height:42px; padding:0 13px;
+    border-radius:11px; border:0.5px solid rgba(255,255,255,0.18);
+    background:rgba(255,255,255,0.08); color:#fff;
+    font-family:inherit; font-size:16px; text-align:center;
+  }
+  .ios-alert-champ:focus{ outline:none; border-color:rgba(255,255,255,0.42); }
   .ios-alert-backdrop.closing .ios-alert{ transform:scale(0.95); opacity:0; transition-duration:0.16s; }
   .ios-alert-body{ padding:19px 16px 17px; }
   .ios-alert-title{ font-size:17px; font-weight:700; letter-spacing:-0.02em; margin-bottom:4px; }
@@ -1826,7 +1828,7 @@
   .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; padding-top:2px; }
   .back-btn{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); border:0.5px solid var(--border); flex-shrink:0; }
   .back-btn svg{width:16px; height:16px;}
-  .detail-step{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
+  .detail-step{ transition:border-color 0.3s ease, background 0.3s ease; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
   .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
   .detail-step p{font-size:14px; line-height:1.4;}
   /* Le bandeau ne s'affiche qu'une fois la procédure consultée. Pendant les
@@ -2639,6 +2641,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;" id="category-titre">—</h1>
+      <button type="button" class="icon-pill" id="cat-renommer" aria-label="Renommer la catégorie"
+              title="Renommer la catégorie" style="margin-left:auto;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+        </svg>
+      </button>
     </div>
     <div class="subhead" id="category-subhead">—</div>
     <div class="search-bar">
@@ -3355,48 +3363,6 @@
   <div class="screen" id="etab-section-titre" style="display:none;"></div>
 </div>
 
-<!-- Créer ou rejoindre : deux gestes très différents -->
-<div class="fond-promu" id="fond-ajout">
-  <div class="fen-promu" role="dialog" aria-modal="true">
-    <div class="accueil promu-carte contact-carte">
-      <div class="accueil-texte">
-        <div class="t">Ajouter une entreprise</div>
-        <div class="s">Deux gestes très différents : en créer une dont vous serez responsable,
-          ou en rejoindre une dont quelqu'un d'autre l'est.</div>
-      </div>
-      <div class="accueil-av"><span class="dispo"></span></div>
-    </div>
-
-    <button type="button" class="ajout-choix" id="ajout-creer">
-      <span class="ic">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/>
-          <path d="M12 11.4v5.2M9.4 14h5.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
-        </svg>
-      </span>
-      <span class="tx"><span class="t">Créer un établissement</span>
-        <span class="s">Vous en êtes responsable. Vous obtenez un code à partager à votre équipe.</span></span>
-      <span class="fl">›</span>
-    </button>
-
-    <button type="button" class="ajout-choix" id="ajout-rejoindre">
-      <span class="ic">
-        <svg viewBox="0 0 24 24" fill="none">
-          <rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/>
-          <rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/>
-          <rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/>
-          <path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      <span class="tx"><span class="t">Rejoindre avec un code</span>
-        <span class="s">Vous y entrez comme membre d'équipe, pour lire ses procédures.</span></span>
-      <span class="fl">›</span>
-    </button>
-
-    <button type="button" class="btn ghost block" id="ajout-annuler" style="margin-top:10px;">Annuler</button>
-  </div>
-</div>
-
 <!-- Aucune entreprise rattachée à ce compte -->
 <div class="fond-promu" id="fond-orphelin">
   <div class="fen-promu" role="dialog" aria-modal="true">
@@ -3452,6 +3418,8 @@
 
     <div class="error-msg" id="etab-erreur"></div>
     <button type="button" class="btn block" id="etab-ok" style="margin-top:14px;" disabled>Ajouter</button>
+      <button type="button" class="btn ghost block" id="etab-supprimer"
+              style="margin-top:8px; color:var(--red); display:none;">Supprimer cet établissement</button>
     <button type="button" class="btn ghost block" id="etab-annuler" style="margin-top:8px;">Annuler</button>
   </div>
 </div>
@@ -3732,11 +3700,11 @@
             <path d="M12 11.4v5.2M9.4 14h5.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
           </svg>
         </span>
-        <span class="reg-nm">Ajouter une entreprise</span>
+        <span class="reg-nm">Créer une entreprise</span>
         <span class="fl">›</span>
       </button>
     </div>
-    <div class="reg-note">Créez-en une dont vous serez responsable, ou rejoignez-en une avec son code.</div>
+    <div class="reg-note">Vous en serez responsable, et vous obtiendrez un code à partager à votre équipe. Pour rejoindre une entreprise existante, utilisez le code reçu à l'inscription.</div>
 
     <!-- Conservés hors écran : la fenêtre de rattachement s'appuie dessus. -->
     <input type="text" id="es-code" style="display:none;">
@@ -7120,10 +7088,94 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
 const DUREE_CONSEILLEE = 10 * 60
 const DUREE_REFUSEE = 20 * 60
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE POIDS DE LA VIDÉO, ET SA BANDE SON
+
+   Deux problèmes distincts, deux réponses.
+
+   1. Supabase refuse les envois au-delà de 50 Mo. Un enregistrement d'écran de
+      dix minutes en 1080p en pèse trois cents : l'envoi échouait, et le message
+      d'erreur ne disait pas quoi faire. On le dit AVANT, avec la marche à
+      suivre.
+
+   2. Azure n'analyse que la parole — `indexingPreset: 'AudioOnly'`. Lui envoyer
+      la vidéo entière lui fait télécharger cinquante mégaoctets pour n'en lire
+      que la bande son. On extrait donc l'audio dans le navigateur et on ne lui
+      donne que ça : l'analyse démarre plus vite, et le trafic sortant de
+      Supabase — facturé au gigaoctet — s'effondre.
+
+      La vidéo, elle, reste : c'est elle qu'on rejoue extrait par extrait dans
+      la fiche. On ne la remplace pas, on épargne seulement son transport.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const VIDEO_POIDS_MAX = 45 * 1024 * 1024   // 45 Mo : marge sous la limite de 50
+
+function poidsLisible(o) {
+  return o >= 1024 * 1024 ? Math.round(o / 1024 / 1024) + ' Mo'
+       : Math.round(o / 1024) + ' Ko'
+}
+
+/* Extrait la bande son et la réécrit en WAV mono à 16 kHz — le format que la
+   reconnaissance vocale attend, et le plus léger qui ne perde rien de la parole.
+   Renvoie `null` si le navigateur ne sait pas décoder ce format : on retombe
+   alors sur la vidéo, comme avant. */
+async function extraireBandeSon(fichier) {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext
+    if (!Ctx) return null
+
+    const brut = await fichier.arrayBuffer()
+    const ctx = new Ctx()
+    const decode = await ctx.decodeAudioData(brut)
+    ctx.close()
+
+    // Mono, 16 kHz : la voix n'a besoin de rien de plus.
+    const secondes = decode.duration
+    const hors = new OfflineAudioContext(1, Math.ceil(secondes * 16000), 16000)
+    const source = hors.createBufferSource()
+    source.buffer = decode
+    source.connect(hors.destination)
+    source.start()
+    const rendu = await hors.startRendering()
+
+    // WAV 16 bits : aucun encodeur à charger, lu partout.
+    const ech = rendu.getChannelData(0)
+    const octets = new ArrayBuffer(44 + ech.length * 2)
+    const vue = new DataView(octets)
+    const txt = (pos, s) => { for (let i = 0; i < s.length; i++) vue.setUint8(pos + i, s.charCodeAt(i)) }
+    txt(0, 'RIFF'); vue.setUint32(4, 36 + ech.length * 2, true); txt(8, 'WAVE')
+    txt(12, 'fmt '); vue.setUint32(16, 16, true); vue.setUint16(20, 1, true)
+    vue.setUint16(22, 1, true); vue.setUint32(24, 16000, true)
+    vue.setUint32(28, 16000 * 2, true); vue.setUint16(32, 2, true); vue.setUint16(34, 16, true)
+    txt(36, 'data'); vue.setUint32(40, ech.length * 2, true)
+    for (let i = 0; i < ech.length; i++) {
+      const v = Math.max(-1, Math.min(1, ech[i]))
+      vue.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7FFF, true)
+    }
+    return new Blob([octets], { type: 'audio/wav' })
+  } catch (e) {
+    console.warn('Proc\u00e9do \u00b7 bande son non extraite :', e?.message || e)
+    return null
+  }
+}
+
 function verifierDureeVideo() {
   const err = document.getElementById('ai-error')
   const btn = document.getElementById('ai-launch-btn')
   if (!err || !btn) return
+
+  /* Le poids d'abord : c'est le refus le plus fréquent, et le seul qui échouait
+     jusqu'ici sans rien expliquer. */
+  if (aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX) {
+    err.style.color = 'var(--red)'
+    err.innerHTML = `Cette vid\u00e9o p\u00e8se <b>${poidsLisible(aiVideoFile.size)}</b>, ` +
+      `au-del\u00e0 des 45 Mo accept\u00e9s.<br>` +
+      `Pour un enregistrement d'\u00e9cran : refaites-le en 720p plut\u00f4t qu'en 1080p, ` +
+      `ou coupez-le en deux proc\u00e9dures. Pour une vid\u00e9o de t\u00e9l\u00e9phone : filmez en 720p ` +
+      `dans les r\u00e9glages de l'appareil photo.`
+    btn.disabled = true
+    return
+  }
 
   if (!aiVideoDuree) { err.textContent = ''; btn.disabled = false; return }
 
@@ -7158,11 +7210,37 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
   try {
     // 1. Upload de la vidéo
-    const path = `${currentMembre.entreprise_id}/${Date.now()}_${aiVideoFile.name}`
+    /* Dernier rempart sur le poids : le contrôle à la sélection peut être
+       contourné si le fichier change sans repasser par l'événement. */
+    if (aiVideoFile.size > VIDEO_POIDS_MAX) {
+      throw new Error(`Cette vid\u00e9o p\u00e8se ${poidsLisible(aiVideoFile.size)}, au-del\u00e0 des 45 Mo ` +
+        `accept\u00e9s. Refaites l'enregistrement en 720p, ou coupez-le en deux proc\u00e9dures.`)
+    }
+
+    const base = `${currentMembre.entreprise_id}/${Date.now()}`
+
+    // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
+    const path = `${base}_${aiVideoFile.name}`
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile)
     if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
     const { data: publicUrlData } = supabase.storage.from('procedo-videos').getPublicUrl(path)
     const videoUrl = publicUrlData.publicUrl
+
+    /* La bande son, pour l'analyse seule. Azure ne lit que la parole : lui
+       envoyer la vidéo entière lui ferait télécharger des dizaines de mégaoctets
+       pour n'en garder que quelques-uns. Si l'extraction échoue — format
+       exotique, navigateur récalcitrant — on lui donne la vidéo, comme avant. */
+    let urlPourAnalyse = videoUrl
+    const bandeSon = await extraireBandeSon(aiVideoFile)
+    if (bandeSon) {
+      const cheminSon = `${base}_son.wav`
+      const { error: errSon } = await supabase.storage.from('procedo-videos')
+        .upload(cheminSon, bandeSon, { contentType: 'audio/wav' })
+      if (!errSon) {
+        urlPourAnalyse = supabase.storage.from('procedo-videos').getPublicUrl(cheminSon).data.publicUrl
+        window.jalon?.(`bande son : ${poidsLisible(bandeSon.size)} au lieu de ${poidsLisible(aiVideoFile.size)}`)
+      }
+    }
 
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
     const { data: newProc, error: procError } = await supabase
@@ -7176,7 +7254,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
-      body: JSON.stringify({ procedure_id: newProc.id, video_url: videoUrl }),
+      // L'analyse reçoit la bande son ; la fiche gardera la vidéo.
+      body: JSON.stringify({ procedure_id: newProc.id, video_url: urlPourAnalyse }),
     })
     const startData = await startRes.json()
     if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")
@@ -8401,6 +8480,109 @@ function renderVideoSteps() {
 
 /* Joue uniquement la portion [debut, fin] d'une vidéo, puis s'arrête.
    Utilisé quand on touche une étape : on voit tout de suite le bon passage. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENOMMER UNE CATÉGORIE
+
+   La catégorie n'est pas une table : c'est une colonne de texte sur chaque
+   procédure. La renommer, c'est donc réécrire ce texte sur toutes celles qui la
+   portent — d'un seul appel, filtré sur l'ancien nom.
+
+   Conséquence à connaître : deux catégories fusionnent si on donne à l'une le
+   nom de l'autre. C'est cohérent avec ce qu'est une catégorie ici, et c'est même
+   le seul moyen de les regrouper. On prévient donc au lieu d'interdire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+document.getElementById('cat-renommer')?.addEventListener('click', async () => {
+  const ancien = currentCategoryName
+  if (!ancien) return
+
+  const nouveau = await demanderTexte({
+    titre: 'Renommer la cat\u00e9gorie',
+    message: `Toutes les proc\u00e9dures class\u00e9es dans \u00ab ${ancien} \u00bb suivront.`,
+    valeur: ancien,
+    placeholder: 'Nom de la cat\u00e9gorie',
+    confirmer: 'Renommer',
+  })
+  if (!nouveau || nouveau === ancien) return
+
+  // Une catégorie de ce nom existe déjà : on le dit, on ne l'empêche pas.
+  const existe = allGestionProcedures.some(p =>
+    (p.categorie || '').toLowerCase() === nouveau.toLowerCase())
+  if (existe) {
+    const ok = await confirmDialog({
+      titre: `Fusionner avec ${nouveau} ?`,
+      message: `Une cat\u00e9gorie \u00ab ${nouveau} \u00bb existe d\u00e9j\u00e0. Les proc\u00e9dures de \u00ab ${ancien} \u00bb ` +
+        `la rejoindront, et \u00ab ${ancien} \u00bb dispara\u00eetra.`,
+      confirmer: 'Fusionner',
+      annuler: 'Annuler',
+      danger: false,
+    })
+    if (!ok) return
+  }
+
+  const { data, error } = await supabase.from('procedures')
+    .update({ categorie: nouveau })
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .eq('categorie', ancien)
+    .select('id')
+
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  if (!data || !data.length) {
+    toast("La base a refus\u00e9 la modification.")
+    return
+  }
+
+  allGestionProcedures.forEach(p => { if (p.categorie === ancien) p.categorie = nouveau })
+  currentCategoryName = nouveau
+  document.getElementById('category-titre').textContent = nouveau
+  /* On relit tout : les regroupements par catégorie sont recalculés au
+     chargement, et c'est le seul endroit qui les construit. Redessiner sans
+     recharger laisserait l'ancienne catégorie dans la grille. */
+  await loadGestionProcedures()
+  renderCategoryProceduresList()
+  toast(`${data.length} proc\u00e9dure${data.length > 1 ? 's' : ''} reclass\u00e9e${data.length > 1 ? 's' : ''}.`)
+})
+
+/* Marque une étape comme « en cours de lecture », et une seule. */
+function marquerEtapeEnLecture(el) {
+  document.querySelectorAll('.detail-step.en-lecture').forEach(x => x.classList.remove('en-lecture'))
+  if (el) el.classList.add('en-lecture')
+}
+
+/* Suit la vidéo pendant qu'elle joue et déplace la marque toute seule : quelqu'un
+   qui lance l'extrait 3 et laisse tourner voit la marque passer à 4, puis à 5.
+   C'est ce qui fait la différence entre un repère et une simple sélection. */
+let suiviLecture = null
+
+function attacherSuiviLecture(videoEl, liste) {
+  detacherSuiviLecture(videoEl)
+  if (!videoEl || !liste) return
+
+  const suivre = () => {
+    const t = videoEl.currentTime
+    let trouvee = null
+    liste.querySelectorAll('.detail-step[data-debut]').forEach(el => {
+      const d = parseFloat(el.dataset.debut), f = parseFloat(el.dataset.fin)
+      if (t >= d && t < f) trouvee = el
+    })
+    if (trouvee && !trouvee.classList.contains('en-lecture')) marquerEtapeEnLecture(trouvee)
+  }
+
+  suiviLecture = { videoEl, suivre }
+  videoEl.addEventListener('timeupdate', suivre)
+  // La marque reste à l'arrêt : on vient de regarder cette étape-là.
+  videoEl.addEventListener('pause', suivre)
+}
+
+function detacherSuiviLecture(videoEl) {
+  if (suiviLecture) {
+    suiviLecture.videoEl.removeEventListener('timeupdate', suiviLecture.suivre)
+    suiviLecture.videoEl.removeEventListener('pause', suiviLecture.suivre)
+    suiviLecture = null
+  }
+  document.querySelectorAll('.detail-step.en-lecture').forEach(x => x.classList.remove('en-lecture'))
+}
+
 function lireExtrait(videoEl, debut, fin) {
   if (!videoEl) return
   if (videoEl.__stopExtrait) {
@@ -8626,6 +8808,7 @@ async function openAnalyse(procId) {
   // Étapes : texte, et pour les étapes issues d'une vidéo, un vrai clip borné (début → fin de l'étape)
   const stepsListEl = document.getElementById('analyse-steps-list')
   stepsListEl.innerHTML = ''
+  detacherSuiviLecture(videoEl)
   if (currentAnalyseData.etapes.length === 0) {
     stepsListEl.innerHTML = '<div class="note">Aucune étape pour le moment.</div>'
   } else {
@@ -8643,11 +8826,18 @@ async function openAnalyse(procId) {
       `
       if (hasClip) {
         div.style.cursor = 'pointer'
-        div.onclick = () => lireExtrait(videoEl, bounds.start, bounds.end)
+        div.dataset.debut = bounds.start
+        div.dataset.fin = bounds.end
+        div.onclick = () => {
+          marquerEtapeEnLecture(div)
+          lireExtrait(videoEl, bounds.start, bounds.end)
+        }
       }
       stepsListEl.appendChild(div)
     })
   }
+
+  attacherSuiviLecture(videoEl, stepsListEl)
 
   const qrContainer = document.getElementById('qr-container')
   qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">Génération...</div>'
@@ -9733,7 +9923,7 @@ function carteOffre(o, opts = {}) {
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
-    ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne et par mois</b>.</div>` : ''}
+    ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne / par mois</b>.</div>` : ''}
     <div class="offre-etiq">Ce que vous d\u00e9bloquez</div>
     <div class="offre-phares">
       ${o.phares.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
@@ -9758,8 +9948,8 @@ window.renderAbonnements = function() {
   const nomEnt = cachedEntreprise?.nom || 'votre \u00e9tablissement'
   if (titre) {
     titre.innerHTML = n > 1
-      ? `Vous \u00eates <b>${n}</b> chez<br>${escapeHtml(nomEnt)}`
-      : `Vous d\u00e9marrez seul chez<br>${escapeHtml(nomEnt)}`
+      ? `Vous \u00eates <b>${n} membres</b><br>chez ${escapeHtml(nomEnt)}`
+      : `Vous d\u00e9marrez seul<br>chez ${escapeHtml(nomEnt)}`
   }
   if (sous) {
     sous.innerHTML = `L'offre <b>${mienne.nom}</b> est faite pour une \u00e9quipe de cette taille.`
@@ -9768,8 +9958,8 @@ window.renderAbonnements = function() {
   const estActuelle = mienne.cle === actuel
   document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
     classe: ' vedette' + (estActuelle ? ' actuelle' : ''),
-    ruban: estActuelle ? 'Votre offre' : 'Votre taille',
-    cta: estActuelle ? 'Offre en cours'
+    ruban: estActuelle ? 'En cours' : 'Recommandée',
+    cta: estActuelle ? 'Votre abonnement actuel'
       : (mienne.prix === null ? 'Nous \u00e9crire' : 'Commencer avec ' + mienne.nom),
     annuel: !estActuelle,
     membres: n,
@@ -9780,8 +9970,8 @@ window.renderAbonnements = function() {
     .filter(o => o.cle !== mienne.cle)
     .map(o => carteOffre(o, {
       classe: o.cle === actuel ? ' actuelle' : '',
-      ruban: o.cle === actuel ? 'Votre offre' : '',
-      cta: o.cle === actuel ? 'Offre en cours'
+      ruban: o.cle === actuel ? 'En cours' : '',
+      cta: o.cle === actuel ? 'Votre abonnement actuel'
         : (o.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + o.nom),
       /* Développées elles aussi : quelqu'un qui déplie les autres offres veut
          comparer, et comparer des titres seuls ne dit rien. */
@@ -10099,10 +10289,10 @@ document.addEventListener('click', (e) => {
        gestionnaire peut très bien vouloir la seconde.
        Côté équipe la question ne se pose pas : on ne crée pas d'entreprise
        depuis là. */
-    /* Le même choix des deux côtés : n'importe qui peut créer une entreprise ou
-       en rejoindre une. Rien ne justifie de réserver la création à ceux qui
-       gèrent déjà — c'est ainsi qu'on devient gérant. */
-    montrerChoixAjout()
+    /* On ne rejoint plus une entreprise depuis l'app : on la crée. Rejoindre se
+       fait à l'inscription, avec le code reçu de son responsable — c'est le seul
+       moment où la question se pose vraiment. */
+    ouvrirFenetreEtab(null)
     return
   }
   if (e.target.closest('#tiroir-ent')) return
@@ -10149,6 +10339,12 @@ window.ouvrirFenetreEtab = function(entrepriseId) {
     : "Son logo appara\u00eetra dans la barre, \u00e0 c\u00f4t\u00e9 du vôtre."
   document.getElementById('etab-nom').value = etabEdite?.nom || ''
   document.getElementById('etab-ok').textContent = etabEdite ? 'Enregistrer' : 'Ajouter'
+  /* On ne supprime qu'un établissement existant, et jamais le dernier : quelqu'un
+     sans entreprise se retrouverait devant une app vide. */
+  const boutonSuppr = document.getElementById('etab-supprimer')
+  if (boutonSuppr) {
+    boutonSuppr.style.display = (etabEdite && mesEtablissements.length > 1) ? 'block' : 'none'
+  }
   document.getElementById('etab-erreur').textContent = ''
   majFenetreEtab()
   document.getElementById('fond-etab').classList.add('on')
@@ -10217,6 +10413,74 @@ document.getElementById('etab-fichier')?.addEventListener('change', (ev) => {
   lecteur.readAsDataURL(f)
 })
 
+document.getElementById('etab-supprimer')?.addEventListener('click', async () => {
+  if (!etabEdite) return
+  const nom = etabEdite.nom || 'cet \u00e9tablissement'
+
+  const ok = await confirmDialog({
+    titre: `Supprimer ${nom} ?`,
+    message: `Toutes ses proc\u00e9dures, ses \u00e9tapes et son \u00e9quipe seront effac\u00e9es. ` +
+      `C'est d\u00e9finitif : rien ne permet de revenir en arri\u00e8re.`,
+    confirmer: 'Supprimer',
+    annuler: 'Annuler',
+    danger: true,
+  })
+  if (!ok) return
+
+  const btn = document.getElementById('etab-supprimer')
+  btn.disabled = true
+  btn.textContent = 'Suppression\u2026'
+
+  try {
+    /* On efface dans l'ordre des dépendances : les étapes tiennent aux
+       procédures, les procédures à l'entreprise. Si la base est configurée en
+       cascade, ces trois appels sont redondants — mais inoffensifs, et ils
+       garantissent le résultat quand elle ne l'est pas. */
+    const { data: procs } = await supabase.from('procedures')
+      .select('id').eq('entreprise_id', etabEdite.id)
+    for (const pr of (procs || [])) {
+      await supabase.from('etapes').delete().eq('procedure_id', pr.id)
+    }
+    await supabase.from('procedures').delete().eq('entreprise_id', etabEdite.id)
+    await supabase.from('membres').delete().eq('entreprise_id', etabEdite.id)
+
+    const { data, error } = await supabase.from('entreprises')
+      .delete().eq('id', etabEdite.id).select('id')
+    if (error) throw new Error(error.message)
+    if (!data || !data.length) {
+      throw new Error("La base a refus\u00e9 la suppression. Ex\u00e9cutez migration-etablissements.sql : " +
+        "il manque la r\u00e8gle d'acc\u00e8s \u00ab delete \u00bb sur la table entreprises.")
+    }
+
+    const partait = etabEdite.id === currentMembre?.entreprise_id
+    fermerFenetreEtab()
+    try { localStorage.removeItem('procedo_membre') } catch (e) {}
+
+    if (partait) {
+      // On était dedans : il faut aller ailleurs avant que l'écran ne parle du vide.
+      const { data: { user } } = await supabase.auth.getUser()
+      const { fiches } = await lireFichesMembre(user?.id)
+      const suivante = choisirFicheMembre(fiches)
+      cachedEntreprise = null
+      if (suivante) { await enterApp(suivante); toast(`${nom} a \u00e9t\u00e9 supprim\u00e9.`); return }
+      document.getElementById('gestion-app').style.display = 'none'
+      document.getElementById('equipe-app').style.display = 'none'
+      document.getElementById('tabbar-gestion').style.display = 'none'
+      document.getElementById('tabbar-equipe').style.display = 'none'
+      document.getElementById('choice-screen').style.display = 'flex'
+    } else {
+      await chargerEtablissements()
+    }
+    toast(`${nom} a \u00e9t\u00e9 supprim\u00e9.`)
+  } catch (ex) {
+    document.getElementById('etab-erreur').textContent =
+      ex instanceof Error ? ex.message : String(ex)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Supprimer cet \u00e9tablissement'
+  }
+})
+
 document.getElementById('etab-ok')?.addEventListener('click', async () => {
   const btn = document.getElementById('etab-ok')
   const err = document.getElementById('etab-erreur')
@@ -10234,35 +10498,60 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const code = String(Math.floor(10000 + Math.random() * 90000))
       const { data, error } = await supabase.from('entreprises')
         .insert({ nom, code_acces: code }).select('id').single()
-      if (error) throw new Error(error.message)
+      if (error) {
+        throw new Error(/row-level security|permission|policy/i.test(error.message)
+          ? "La base refuse la cr\u00e9ation. Ex\u00e9cutez migration-etablissements.sql : " +
+            "il manque la r\u00e8gle d'acc\u00e8s \u00ab insert \u00bb sur la table entreprises."
+          : error.message)
+      }
+      if (!data?.id) throw new Error("L'entreprise n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e : la base n'a rien renvoy\u00e9.")
       entrepriseId = data.id
 
       // Le créateur en devient gérant, sinon il ne pourrait pas y entrer.
       const { data: { user } } = await supabase.auth.getUser()
       const { error: eM } = await supabase.from('membres')
         .insert({ user_id: user.id, entreprise_id: entrepriseId, nom: currentMembre?.nom || '', role: 'gestion' })
-      if (eM) throw new Error(eM.message)
+      if (eM) {
+        throw new Error(/row-level security|permission|policy/i.test(eM.message)
+          ? "L'entreprise est cr\u00e9\u00e9e mais vous n'y \u00eates pas rattach\u00e9 : il manque la r\u00e8gle " +
+            "d'acc\u00e8s \u00ab insert \u00bb sur la table membres. Ex\u00e9cutez migration-promotion.sql."
+          : eM.message)
+      }
     }
 
-    // 2. Le logo, s'il a changé.
+    // 2. Le logo, s'il a changé. Il a besoin de l'identifiant, d'où son rang.
+    let logoAChange = false
     if (etabLogoTampon && etabLogoTampon !== etabEdite?.logo_url) {
       const blob = await (await fetch(etabLogoTampon)).blob()
       const chemin = `${entrepriseId}/logo-${Date.now()}.webp`
       const { error: eU } = await supabase.storage.from('procedo-logos')
         .upload(chemin, blob, { contentType: 'image/webp', upsert: true })
-      if (eU) throw new Error(eU.message)
+      if (eU) throw new Error("D\u00e9p\u00f4t du logo refus\u00e9 : " + eU.message)
       const { data: pub } = supabase.storage.from('procedo-logos').getPublicUrl(chemin)
       logoUrl = pub?.publicUrl || null
-    } else if (!etabLogoTampon) {
+      logoAChange = true
+    } else if (!etabLogoTampon && etabEdite?.logo_url) {
       logoUrl = null
+      logoAChange = true
     }
 
-    // 3. Le nom et le logo.
-    const { data: maj, error: eMaj } = await supabase.from('entreprises')
-      .update({ nom, logo_url: logoUrl }).eq('id', entrepriseId).select('id')
-    if (eMaj) throw new Error(eMaj.message)
-    if (!maj || maj.length === 0) {
-      throw new Error("La base a refus\u00e9 la modification. Il manque une r\u00e8gle d'acc\u00e8s \u00ab update \u00bb sur la table entreprises.")
+    /* 3. La mise à jour n'a lieu QUE si elle a quelque chose à dire. Elle était
+          jusqu'ici systématique : une création sans logo réécrivait un nom qu'on
+          venait d'écrire, et si la règle d'accès « update » manquait, tout
+          échouait APRÈS que l'entreprise ait été créée. On se retrouvait avec une
+          entreprise en base, un message d'erreur à l'écran, et rien qui marche. */
+    const aMettreAJour = etabEdite
+      ? { ...(nom !== etabEdite.nom ? { nom } : {}), ...(logoAChange ? { logo_url: logoUrl } : {}) }
+      : (logoAChange ? { logo_url: logoUrl } : {})
+
+    if (Object.keys(aMettreAJour).length) {
+      const { data: maj, error: eMaj } = await supabase.from('entreprises')
+        .update(aMettreAJour).eq('id', entrepriseId).select('id')
+      if (eMaj) throw new Error(eMaj.message)
+      if (!maj || maj.length === 0) {
+        throw new Error("La base a refus\u00e9 la modification. Ex\u00e9cutez migration-etablissements.sql : " +
+          "il manque la r\u00e8gle d'acc\u00e8s \u00ab update \u00bb sur la table entreprises.")
+      }
     }
 
     fermerFenetreEtab()
@@ -10435,27 +10724,6 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 /* La même fenêtre sert à deux moments : un compte sans entreprise, et quelqu'un
    qui veut en rejoindre une de plus. Le besoin est le même — un code à saisir —
    seule la sortie diffère : se déconnecter dans un cas, annuler dans l'autre. */
-function montrerChoixAjout() {
-  document.getElementById('fond-ajout')?.classList.add('on')
-}
-
-document.getElementById('ajout-annuler')?.addEventListener('click', () => {
-  document.getElementById('fond-ajout')?.classList.remove('on')
-})
-document.getElementById('fond-ajout')?.addEventListener('click', (e) => {
-  if (e.target.id === 'fond-ajout') e.currentTarget.classList.remove('on')
-})
-document.getElementById('es-ajouter')?.addEventListener('click', () => montrerChoixAjout())
-
-document.getElementById('ajout-creer')?.addEventListener('click', () => {
-  document.getElementById('fond-ajout')?.classList.remove('on')
-  ouvrirFenetreEtab(null)
-})
-document.getElementById('ajout-rejoindre')?.addEventListener('click', () => {
-  document.getElementById('fond-ajout')?.classList.remove('on')
-  montrerOrphelin(true)
-})
-
 function montrerOrphelin(enPlus) {
   const f = document.getElementById('fond-orphelin')
   if (!f) return
@@ -11666,6 +11934,47 @@ function calculerBornes(etapes, duree) {
    confirmée, false si elle est annulée. Animation identique à celle d'Apple :
    le panneau apparaît légèrement agrandi puis se pose à sa taille normale.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Une fenêtre pour SAISIR quelque chose, sur le modèle de la fenêtre de
+   confirmation. `prompt()` du navigateur aurait suffi techniquement, mais il
+   ouvre une boîte système grise au milieu d'une app soignée — et sur iPhone,
+   il peut être bloqué sans prévenir. */
+function demanderTexte({ titre, message, valeur = '', placeholder = '', confirmer = 'Valider', annuler = 'Annuler' }) {
+  return new Promise((resolve) => {
+    const backdrop = document.createElement('div')
+    backdrop.className = 'ios-alert-backdrop'
+    backdrop.innerHTML = `
+      <div class="ios-alert" role="dialog" aria-modal="true">
+        <div class="ios-alert-body">
+          <div class="ios-alert-title">${escapeHtml(titre)}</div>
+          ${message ? `<div class="ios-alert-msg">${escapeHtml(message)}</div>` : ''}
+          <input type="text" class="ios-alert-champ" value="${escapeHtml(valeur)}"
+                 placeholder="${escapeHtml(placeholder)}" maxlength="60">
+        </div>
+        <div class="ios-alert-actions">
+          <button type="button" class="cancel">${escapeHtml(annuler)}</button>
+          <button type="button" class="ok">${escapeHtml(confirmer)}</button>
+        </div>
+      </div>`
+    document.body.appendChild(backdrop)
+    requestAnimationFrame(() => backdrop.classList.add('shown'))
+
+    const champ = backdrop.querySelector('.ios-alert-champ')
+    setTimeout(() => { champ?.focus(); champ?.select() }, 220)
+
+    const fermer = (v) => {
+      backdrop.classList.add('closing')
+      setTimeout(() => { backdrop.remove(); resolve(v) }, 180)
+    }
+    backdrop.querySelector('.cancel').onclick = () => fermer(null)
+    backdrop.querySelector('.ok').onclick = () => fermer((champ.value || '').trim() || null)
+    champ.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); fermer((champ.value || '').trim() || null) }
+      if (e.key === 'Escape') fermer(null)
+    })
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) fermer(null) })
+  })
+}
+
 function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler', danger = true }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')

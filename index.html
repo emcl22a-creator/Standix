@@ -619,7 +619,9 @@
     position:absolute; top:-9px; left:16px; padding:3px 11px; border-radius:100px;
     background:#fff; color:#000; font-size:9.5px; font-weight:800; letter-spacing:0.04em;
   }
-  .offre-carte.actuelle .offre-ruban{ background:var(--green); color:#06210F; }
+  /* Pas de vert sur cette page : le bleu du halo suffit, et le vert dit
+     « terminé » ailleurs dans l'app — ici rien n'est terminé. */
+  .offre-carte.actuelle .offre-ruban{ background:#5EA0FF; color:#04213F; }
 
   /* L'en-tête : le nom, la taille, le prix. Pas de dessin — il était étiré et
      n'apportait rien qu'un chiffre ne dise mieux. */
@@ -646,6 +648,20 @@
   }
   .offre-phares{ display:flex; flex-direction:column; gap:16px; margin-top:14px; }
   .offre-phare{ display:flex; gap:13px; }
+  /* L'avantage qui fait acheter se voit avant les autres : un cadre, un fond
+     bleuté, un titre plus grand. Le bleu de la page, pas le vert de l'app. */
+  .offre-phare.vedette{
+    padding:14px; border-radius:16px;
+    background:rgba(94,160,255,0.10);
+    border:0.5px solid rgba(94,160,255,0.26);
+  }
+  .offre-phare.vedette .p{
+    width:34px; height:34px; border-radius:11px;
+    background:rgba(94,160,255,0.18); border-color:rgba(94,160,255,0.34);
+  }
+  .offre-phare.vedette .p svg{ width:19px; height:19px; }
+  .offre-phare.vedette .t{ font-size:15.5px; letter-spacing:-0.03em; }
+  .offre-phare.vedette .s{ color:var(--label-2); }
   .offre-phare .p{
     flex-shrink:0; width:30px; height:30px; border-radius:9px; margin-top:1px;
     display:flex; align-items:center; justify-content:center;
@@ -669,9 +685,9 @@
     background:rgba(255,255,255,0.08); color:#fff; border:0.5px solid var(--border);
     height:42px; font-size:13px;
   }
-  .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
+  .offre-carte.actuelle .offre-cta{ background:none; color:#5EA0FF; }
   .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:11px; }
-  .offre-annuel b{ color:var(--green); font-weight:700; }
+  .offre-annuel b{ color:#5EA0FF; font-weight:700; }
 
   /* ═══════════════════════════════════════════════════════════════════
      LES RÉGLAGES
@@ -825,7 +841,9 @@
   .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px; }
   .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
   .abo-hi b{ color:#fff; font-weight:650; }
-  .offre-annuel b{ color:var(--green); font-weight:700; }
+  /* Le bleu du halo, et lui seul. Le vert dit « terminé » ailleurs dans l'app :
+     l'employer ici pour un prix brouillerait les deux. */
+  .offre-annuel b{ color:#5EA0FF; font-weight:700; }
 
   @keyframes contenuEntre{
     from{ opacity:0; transform:translateY(12px); }
@@ -995,6 +1013,7 @@
   .promu-carte .accueil-av{
     animation:promuArrive 0.62s cubic-bezier(0.34,1.42,0.5,1) 0.1s both;
   }
+
   @keyframes promuArrive{
     from{ opacity:0; transform:scale(0.62) translateY(8px); }
     to{ opacity:1; transform:none; }
@@ -3177,7 +3196,7 @@
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre offre</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Abonnement</h1>
     </div>
 
     <div class="abo-scene">
@@ -3240,7 +3259,7 @@
     <div class="reg-titre">Abonnement</div>
     <div class="reg-groupe">
       <button type="button" class="reg-ligne" id="ouvrir-abonnement">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="reg-nm">Votre offre</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="reg-nm">Abonnement</span>
         <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
       </button>
     </div>
@@ -3339,7 +3358,7 @@
 <!-- Créer ou rejoindre : deux gestes très différents -->
 <div class="fond-promu" id="fond-ajout">
   <div class="fen-promu" role="dialog" aria-modal="true">
-    <div class="accueil promu-carte">
+    <div class="accueil promu-carte contact-carte">
       <div class="accueil-texte">
         <div class="t">Ajouter une entreprise</div>
         <div class="s">Deux gestes très différents : en créer une dont vous serez responsable,
@@ -3705,14 +3724,24 @@
 
     <div style="margin-top:14px;" id="es-entreprises"></div>
 
-    <div class="card" style="margin-top:10px;">
-      <label class="f">Rejoindre une autre entreprise</label>
-      <div class="note" style="margin:0 0 10px;">Entrez le code à 5 chiffres que son responsable vous a communiqué. Elle s'ajoutera à la liste au-dessus.</div>
-      <input type="text" id="es-code" inputmode="numeric" maxlength="5" placeholder="00000"
-             style="text-align:center; font-size:22px; letter-spacing:0.3em; font-weight:700; margin-bottom:12px;">
-      <button class="btn block" id="es-rejoindre">Rejoindre</button>
-      <div class="error-msg" id="es-code-error"></div>
+    <div class="reg-groupe" style="margin-top:10px;">
+      <button type="button" class="reg-ligne" id="es-ajouter">
+        <span class="reg-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M12 11.4v5.2M9.4 14h5.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="reg-nm">Ajouter une entreprise</span>
+        <span class="fl">›</span>
+      </button>
     </div>
+    <div class="reg-note">Créez-en une dont vous serez responsable, ou rejoignez-en une avec son code.</div>
+
+    <!-- Conservés hors écran : la fenêtre de rattachement s'appuie dessus. -->
+    <input type="text" id="es-code" style="display:none;">
+    <button type="button" id="es-rejoindre" style="display:none;"></button>
+    <div class="error-msg" id="es-code-error" style="display:none;"></div>
 
     <div class="reg-titre">Partir</div>
     <div class="reg-groupe">
@@ -9631,6 +9660,8 @@ const OFFRES = [
   {
     cle: 'essentiel', nom: 'Essentiel', max: 5, prix: 39,
     phares: [
+      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe',
+        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o. Dix vid\u00e9os par mois." },
       { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es', s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
       { p: 'main', t: 'Cr\u00e9ation depuis vos documents', s: "Un PDF, un Word, une note de service : l'IA en tire les \u00e9tapes." },
     ],
@@ -9639,7 +9670,8 @@ const OFFRES = [
   {
     cle: 'equipe', nom: '\u00c9quipe', max: 15, prix: 79,
     phares: [
-      { p: 'video', t: 'Analyse vid\u00e9o illimit\u00e9e', s: "Filmez le geste en parlant, l'IA d\u00e9coupe la vid\u00e9o en \u00e9tapes minut\u00e9es." },
+      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe \u2014 sans limite',
+        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o. Autant de vid\u00e9os que vous voulez." },
       { p: 'monde', t: 'Chacun lit dans sa langue', s: 'Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez.' },
       { p: 'suivi', t: 'Vous savez qui a lu quoi', s: 'Par personne, par cat\u00e9gorie, avec le temps pass\u00e9 sur chaque proc\u00e9dure.' },
     ],
@@ -9648,6 +9680,8 @@ const OFFRES = [
   {
     cle: 'pro', nom: 'Pro', max: 40, prix: 149,
     phares: [
+      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe \u2014 sans limite',
+        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o." },
       { p: 'sites', t: 'Plusieurs \u00e9tablissements', s: 'Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe.' },
       { p: 'suivi', t: 'Vue consolid\u00e9e', s: "Comparez vos sites d'un coup d'\u0153il, sans changer de compte." },
     ],
@@ -9656,6 +9690,8 @@ const OFFRES = [
   {
     cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
     phares: [
+      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe \u2014 sans limite',
+        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o." },
       { p: 'main', t: 'On s\'installe avec vous', s: 'Reprise de vos proc\u00e9dures existantes et formation de vos responsables.' },
       { p: 'infini', t: 'Un interlocuteur d\u00e9di\u00e9', s: 'Une personne qui conna\u00eet votre organisation, joignable directement.' },
     ],
@@ -9698,14 +9734,15 @@ function carteOffre(o, opts = {}) {
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
     ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne et par mois</b>.</div>` : ''}
-    ${opts.detaille ? `<div class="offre-etiq">Ce que vous d\u00e9bloquez</div>
+    <div class="offre-etiq">Ce que vous d\u00e9bloquez</div>
     <div class="offre-phares">
-      ${o.phares.map(f => `<div class="offre-phare">
+      ${o.phares.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
         <span class="p">${PICTOS[f.p]}</span>
         <span><span class="t">${f.t}</span><span class="s">${f.s}</span></span>
       </div>`).join('')}
     </div>
-    <div class="offre-aussi">${o.aussi}</div>` : `<div class="offre-aussi">${o.phares.map(f => f.t).join(' \u00b7 ')}</div>`}
+    ${true ? `
+    <div class="offre-aussi">${o.aussi}</div>` : ''}
     ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${opts.cta}</button>` : ''}
     ${opts.annuel && o.prix !== null ? `<div class="offre-annuel">ou <b>${Math.round(o.prix * 0.8)} \u20ac</b> par mois, pay\u00e9 \u00e0 l'ann\u00e9e</div>` : ''}
   </div>`
@@ -9746,6 +9783,10 @@ window.renderAbonnements = function() {
       ruban: o.cle === actuel ? 'Votre offre' : '',
       cta: o.cle === actuel ? 'Offre en cours'
         : (o.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + o.nom),
+      /* Développées elles aussi : quelqu'un qui déplie les autres offres veut
+         comparer, et comparer des titres seuls ne dit rien. */
+      membres: n,
+      detaille: true,
     })).join('')
 
   const rappel = document.getElementById('abo-actuel')
@@ -10058,8 +10099,10 @@ document.addEventListener('click', (e) => {
        gestionnaire peut très bien vouloir la seconde.
        Côté équipe la question ne se pose pas : on ne crée pas d'entreprise
        depuis là. */
-    if (currentMembre?.role === 'gestion') montrerChoixAjout()
-    else montrerOrphelin(true)
+    /* Le même choix des deux côtés : n'importe qui peut créer une entreprise ou
+       en rejoindre une. Rien ne justifie de réserver la création à ceux qui
+       gèrent déjà — c'est ainsi qu'on devient gérant. */
+    montrerChoixAjout()
     return
   }
   if (e.target.closest('#tiroir-ent')) return
@@ -10223,6 +10266,22 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
     }
 
     fermerFenetreEtab()
+
+    /* Créé depuis l'espace équipe : la personne devient responsable de cette
+       entreprise-là. On l'y emmène, sinon elle vient de fonder quelque chose
+       qu'elle ne voit nulle part. */
+    if (!etabEdite && currentMembre?.role !== 'gestion') {
+      const { data: { user } } = await supabase.auth.getUser()
+      const { data: fiche } = await supabase.from('membres').select('*')
+        .eq('user_id', user.id).eq('entreprise_id', entrepriseId).maybeSingle()
+      if (fiche) {
+        cachedEntreprise = null
+        await enterApp(fiche)
+        toast(`${nom} est cr\u00e9\u00e9e. Vous en \u00eates responsable.`)
+        return
+      }
+    }
+
     await chargerEtablissements()
     if (entrepriseId === currentMembre?.entreprise_id && cachedEntreprise) cachedEntreprise.nom = nom
     toast(etabEdite ? '\u00c9tablissement modifi\u00e9.' : '\u00c9tablissement ajout\u00e9.')
@@ -10386,6 +10445,8 @@ document.getElementById('ajout-annuler')?.addEventListener('click', () => {
 document.getElementById('fond-ajout')?.addEventListener('click', (e) => {
   if (e.target.id === 'fond-ajout') e.currentTarget.classList.remove('on')
 })
+document.getElementById('es-ajouter')?.addEventListener('click', () => montrerChoixAjout())
+
 document.getElementById('ajout-creer')?.addEventListener('click', () => {
   document.getElementById('fond-ajout')?.classList.remove('on')
   ouvrirFenetreEtab(null)

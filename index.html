@@ -450,7 +450,7 @@
   /* Le « + » est noir sur blanc : l'ombre portée qui détache les initiales sur le
      verre n'a plus lieu d'être ici, et elle formait un halo autour du signe. */
   .rond-ent.plus .ini{
-    color:#000; font-size:20px; font-weight:400; line-height:0; margin-top:-1px;
+    color:#000; font-size:23px; font-weight:400; line-height:0; margin-top:-1px;
     text-shadow:none;
   }
 
@@ -581,6 +581,95 @@
   .ligne-reglage .st{ display:block; font-size:12px; color:var(--label-3); margin-top:2px; }
   .ligne-reglage .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     LES OFFRES
+     La page s'ouvre comme un accueil : le nombre de membres est déjà connu, et
+     UNE SEULE offre est proposée. Les autres restent à un doigt. Pas de
+     comparaison à faire, une décision à prendre.
+     ═════════════════════════════════════════════════════════════════ */
+  .abo-scene{
+    position:relative; margin-top:14px; padding:24px 16px 18px; border-radius:26px;
+    background:linear-gradient(168deg,#17181D,#101114);
+    border:0.5px solid var(--border); overflow:hidden;
+  }
+  .abo-halo{
+    position:absolute; top:-90px; left:50%; transform:translateX(-50%);
+    width:300px; height:200px; pointer-events:none;
+    background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
+  }
+  .abo-hi{ position:relative; text-align:center; margin-bottom:18px; padding-top:6px; }
+  .abo-hi h2{
+    font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px;
+  }
+  .abo-hi p{
+    font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto;
+  }
+  .abo-hi b{ color:#fff; font-weight:650; }
+
+  .offre-carte{
+    position:relative; padding:16px 15px; border-radius:20px;
+    background:var(--bg-card); border:1px solid var(--border); margin-bottom:9px;
+  }
+  .offre-carte.vedette{ border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.08); }
+  .offre-ruban{
+    position:absolute; top:-9px; left:15px; padding:3px 10px; border-radius:100px;
+    background:#fff; color:#000; font-size:9.5px; font-weight:800; letter-spacing:0.03em;
+  }
+  .offre-carte.actuelle .offre-ruban{ background:var(--green); color:#06210F; }
+  .offre-tete{ display:flex; align-items:flex-start; gap:11px; margin-bottom:10px; }
+  .offre-ic{ flex-shrink:0; width:40px; height:38px; }
+  .offre-ic svg{ width:40px; height:38px; display:block; overflow:visible; }
+  .offre-txt{ flex:1; min-width:0; }
+  .offre-nom{ font-size:16px; font-weight:800; letter-spacing:-0.035em; }
+  .offre-taille{ font-size:12px; color:var(--label-2); margin-top:2px; }
+  .offre-prix{ text-align:right; flex-shrink:0; }
+  .offre-prix .v{ font-size:21px; font-weight:850; letter-spacing:-0.05em; line-height:1; }
+  .offre-prix .u{ display:block; font-size:10px; color:var(--label-3); font-weight:600; margin-top:3px; }
+  .offre-pts{ display:flex; flex-direction:column; gap:6px; }
+  .offre-pt{ display:flex; gap:8px; font-size:12.5px; line-height:1.4; }
+  .offre-pt svg{ width:13px; height:13px; flex-shrink:0; margin-top:2px; }
+  .offre-pt.suite{ color:var(--label-2); }
+  .offre-pt b{ font-weight:650; }
+  .offre-cta{
+    width:100%; height:46px; margin-top:14px; border:none; border-radius:14px;
+    font-family:inherit; font-size:14px; font-weight:700; background:#fff; color:#000;
+  }
+  .offre-carte:not(.vedette) .offre-cta{
+    background:rgba(255,255,255,0.08); color:#fff; border:0.5px solid var(--border);
+    height:42px; font-size:13px;
+  }
+  .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
+  /* L'annuel se dit sous le prix plutôt que par une bascule : une bascule
+     demande un choix avant même d'avoir choisi l'offre. */
+  .offre-annuel{
+    font-size:11.5px; color:var(--label-3); text-align:center; margin-top:9px;
+  }
+  .offre-annuel b{ color:var(--green); font-weight:700; }
+
+  .abo-conf{
+    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;
+    font-size:10.5px; color:var(--label-3); font-weight:600;
+  }
+  /* Les autres offres n'apparaissent qu'à la demande. */
+  #abo-liste{ display:none; margin-top:12px; }
+  #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* ═══ Ligne de réglage avec icône au trait ═══ */
+  .ligne-reglage{
+    display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px;
+    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
+    font-family:inherit; text-align:left; color:#fff;
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .ligne-reglage:active{ transform:scale(0.985); }
+  .ligne-reglage .ic-trait{ flex-shrink:0; width:44px; height:40px; display:flex;
+    align-items:center; justify-content:center; }
+  .ligne-reglage .ic-trait svg{ width:44px; height:40px; overflow:visible; }
+  .ligne-reglage .tx{ flex:1; min-width:0; }
+  .ligne-reglage .nm{ display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
+  .ligne-reglage .st{ display:block; font-size:12px; color:var(--label-3); margin-top:2px; }
+  .ligne-reglage .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
+
   /* ═══ Les offres ═══
      Chaque offre porte une icône dans la langue des quatre modes de création :
      fiches en retrait à 16 et 26 %, celle de devant à 42 % sur un fond à 5 %,
@@ -621,6 +710,31 @@
   }
   .offre-carte.conseillee .offre-cta{ background:#fff; color:#000; border-color:transparent; }
   .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
+
+  /* ═══ Arrivée du contenu après un changement d'établissement ═══
+     Seul le CONTENU se rejoue. La barre du haut, la barre du bas et le tiroir
+     restent immobiles : ce sont les procédures qui changent, pas le cadre.
+     L'animation est posée sur les enfants directs de l'écran, jamais sur l'écran
+     lui-même — une transformation sur un ancêtre dérèglerait tout ce qui est
+     positionné de manière fixe à l'intérieur. */
+  @keyframes contenuEntre{
+    from{ opacity:0; transform:translateY(12px); }
+    to{ opacity:1; transform:none; }
+  }
+  .contenu-entre > *{
+    animation:contenuEntre 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  /* Un léger décalage entre les blocs : ils arrivent de haut en bas, comme on
+     lit. Au-delà du quatrième on n'échelonne plus, sinon le bas de l'écran
+     attendrait trop longtemps. */
+  .contenu-entre > *:nth-child(1){ animation-delay:0s; }
+  .contenu-entre > *:nth-child(2){ animation-delay:0.05s; }
+  .contenu-entre > *:nth-child(3){ animation-delay:0.1s; }
+  .contenu-entre > *:nth-child(n+4){ animation-delay:0.14s; }
+
+  @media (prefers-reduced-motion: reduce){
+    .contenu-entre > *{ animation:none; }
+  }
 
   /* ═══ Tiroir des langues, sur la fiche d'une procédure ═══
      Il réutilise les classes du tiroir des établissements : même verre, même
@@ -2833,25 +2947,33 @@
     <div id="g-scan-result-zone"></div>
   </div>
 
-  <!-- Les offres -->
+  <!-- Les offres, présentées comme un accueil -->
   <div class="screen" id="p-abonnement">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Les offres</h1>
-    </div>
-    <div class="subhead">Le prix suit le nombre d'établissements. Les procédures ne sont jamais limitées.</div>
-
-    <div class="filter-chips" id="abo-periode" style="margin-top:14px;">
-      <button type="button" data-periode="mois" class="active">Mensuel</button>
-      <button type="button" data-periode="an">Annuel − 20 %</button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre offre</h1>
     </div>
 
-    <div id="abo-liste"></div>
+    <div class="abo-scene">
+      <div class="abo-halo"></div>
+      <div class="abo-hi">
+        <h2 id="abo-titre">—</h2>
+        <p id="abo-sous">—</p>
+      </div>
+      <div id="abo-vedette"></div>
+      <div class="abo-conf">
+        <span>✓ Sans engagement</span>
+        <span>✓ 14 jours d'essai</span>
+        <span>✓ Sans carte</span>
+      </div>
+      <button type="button" class="btn ghost block" id="abo-autres" style="margin-top:14px;">Voir les autres offres</button>
+      <div id="abo-liste"></div>
+    </div>
 
-    <div class="note" style="text-align:center; margin-top:18px;">
-      Prix hors taxes. Changement d'offre à tout moment, sans engagement sur le mensuel.
+    <div class="note" style="text-align:center; margin-top:16px;">
+      Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.
     </div>
   </div>
 
@@ -4747,7 +4869,6 @@ function placerPastille(conteneur, immediat) {
 function reposerPastilles(immediat) {
   placerPastille(document.getElementById('analyse-period-toggle'), immediat)
   placerPastille(document.getElementById('ga-period-toggle'), immediat)
-  placerPastille(document.getElementById('abo-periode'), immediat)
 }
 window.addEventListener('resize', () => reposerPastilles(true))
 
@@ -8936,186 +9057,185 @@ async function chargerMesEntreprises() {
    le nombre de fiches dessinées dit la même chose que le prix.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const F1 = 'rgba(255,255,255,0.16)'
-const F2 = 'rgba(255,255,255,0.26)'
-const AV = 'rgba(255,255,255,0.42)'
-const LG = 'rgba(255,255,255,0.22)'
+const AV_O = 'rgba(255,255,255,0.75)'
+const LG_O = 'rgba(255,255,255,0.35)'
+const F2_O = 'rgba(255,255,255,0.26)'
 
-const ICONES_OFFRE = {
-  // Une seule fiche : un établissement, l'essentiel.
-  essentiel: `<svg viewBox="0 0 46 42" fill="none">
-    <rect x="10" y="6" width="26" height="30" rx="6" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
-    <line x1="16" y1="16" x2="30" y2="16" stroke="${AV}" stroke-width="1.6" stroke-linecap="round"/>
-    <line x1="16" y1="22" x2="27" y2="22" stroke="${LG}" stroke-width="1.6" stroke-linecap="round"/>
-    <line x1="16" y1="28" x2="23" y2="28" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
-  </svg>`,
-
-  // Trois fiches en profondeur, et l'étincelle : l'IA sans limite.
-  pro: `<svg viewBox="0 0 46 42" fill="none">
-    <rect x="14" y="2" width="24" height="26" rx="5" stroke="${F1}" stroke-width="1.4"/>
-    <rect x="10" y="6" width="26" height="28" rx="6" stroke="${F2}" stroke-width="1.4"/>
-    <rect x="5" y="11" width="27" height="27" rx="6" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
-    <line x1="11" y1="20" x2="26" y2="20" stroke="${AV}" stroke-width="1.6" stroke-linecap="round"/>
-    <line x1="11" y1="26" x2="22" y2="26" stroke="${LG}" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M38.6 4.4 40 8.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"/>
-  </svg>`,
-
-  // Trois bâtiments côte à côte : plusieurs établissements.
-  multi: `<svg viewBox="0 0 46 42" fill="none">
-    <rect x="2" y="14" width="13" height="24" rx="4" stroke="${F2}" stroke-width="1.4"/>
-    <rect x="31" y="14" width="13" height="24" rx="4" stroke="${F2}" stroke-width="1.4"/>
-    <rect x="15" y="6" width="16" height="32" rx="5" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
-    <line x1="20" y1="16" x2="26" y2="16" stroke="${AV}" stroke-width="1.6" stroke-linecap="round"/>
-    <line x1="20" y1="23" x2="26" y2="23" stroke="${LG}" stroke-width="1.6" stroke-linecap="round"/>
-    <line x1="20" y1="30" x2="26" y2="30" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
-  </svg>`,
-
-  // Un réseau : des points reliés à un centre.
-  entreprise: `<svg viewBox="0 0 46 42" fill="none">
-    <line x1="23" y1="21" x2="8" y2="9" stroke="${F2}" stroke-width="1.4"/>
-    <line x1="23" y1="21" x2="38" y2="9" stroke="${F2}" stroke-width="1.4"/>
-    <line x1="23" y1="21" x2="8" y2="33" stroke="${F2}" stroke-width="1.4"/>
-    <line x1="23" y1="21" x2="38" y2="33" stroke="${F2}" stroke-width="1.4"/>
-    <circle cx="8" cy="9" r="4" stroke="${F1}" stroke-width="1.4"/>
-    <circle cx="38" cy="9" r="4" stroke="${F1}" stroke-width="1.4"/>
-    <circle cx="8" cy="33" r="4" stroke="${F1}" stroke-width="1.4"/>
-    <circle cx="38" cy="33" r="4" stroke="${F1}" stroke-width="1.4"/>
-    <circle cx="23" cy="21" r="8" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
-  </svg>`,
+/* Une silhouette par palier : une personne, un petit groupe, une équipe. Le
+   dessin dit la taille avant que le chiffre soit lu. */
+function silhouettes(n) {
+  const pos = [[20,15],[9,17],[31,17],[14,13],[26,13]]
+  let p = ''
+  for (let i = 0; i < n; i++) {
+    const teinte = i === 0 ? AV_O : (i < 3 ? LG_O : F2_O)
+    const trait = i === 0 ? 1.7 : 1.5
+    const r = i === 0 ? 5 : 4
+    const b = i === 0 ? 8 : 6.5
+    p += `<circle cx="${pos[i][0]}" cy="${pos[i][1]}" r="${r}" stroke="${teinte}" stroke-width="${trait}"/>`
+    p += `<path d="M${pos[i][0] - b} ${pos[i][1] + 15}a${b} ${b} 0 0 1 ${b * 2} 0" stroke="${teinte}" stroke-width="${trait}" stroke-linecap="round"/>`
+  }
+  return `<svg viewBox="0 0 40 38" fill="none">${p}</svg>`
 }
 
 const COCHE_OFFRE = '<svg viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
 
+/* Les paliers suivent le NOMBRE DE MEMBRES. C'est la seule mesure qui grandit
+   avec l'usage : les procédures, elles, ne sont jamais limitées — les limiter
+   pousserait à en écrire moins, alors que l'outil ne vaut que si l'on en écrit
+   beaucoup. */
 const OFFRES = [
   {
-    cle: 'essentiel', nom: 'Essentiel', prix: 39, icone: 'essentiel',
-    taille: '1 \u00e9tablissement',
+    cle: 'essentiel', nom: 'Essentiel', max: 5, prix: 39, gens: 1,
+    taille: "Jusqu'\u00e0 5 membres",
     points: [
       '<b>Proc\u00e9dures illimit\u00e9es</b>',
-      '\u00c9tapes \u00e9crites, photos, d\u00e9coupage vid\u00e9o \u00e0 la main',
+      'Photos, \u00e9tapes \u00e9crites, QR code au poste',
       'Cr\u00e9ation depuis un PDF ou un Word',
-      'QR code par proc\u00e9dure, \u00e0 afficher au poste',
-      '<b>10 vid\u00e9os analys\u00e9es par l\'IA</b> par mois',
+      '10 vid\u00e9os analys\u00e9es par l\'IA par mois',
     ],
   },
   {
-    cle: 'pro', nom: 'Pro', prix: 79, icone: 'pro', conseillee: true,
-    taille: '1 \u00e9tablissement, membres illimit\u00e9s',
+    cle: 'equipe', nom: '\u00c9quipe', max: 15, prix: 79, gens: 3,
+    taille: "Jusqu'\u00e0 15 membres",
     points: [
       'Tout Essentiel, plus :',
       '<b>Analyse vid\u00e9o illimit\u00e9e</b>',
-      '<b>Traduction des proc\u00e9dures</b> pour chaque employ\u00e9',
-      'Suivi d\u00e9taill\u00e9 par personne et par cat\u00e9gorie',
-      'M\u00e9dailles et suivi d\'assiduit\u00e9',
+      '<b>Traduction</b> pour chaque employ\u00e9',
+      'Suivi par personne et par cat\u00e9gorie',
     ],
   },
   {
-    cle: 'multi', nom: 'Multi-sites', prix: 179, icone: 'multi',
-    taille: "Jusqu'\u00e0 5 \u00e9tablissements",
+    cle: 'pro', nom: 'Pro', max: 40, prix: 149, gens: 5,
+    taille: "Jusqu'\u00e0 40 membres",
     points: [
-      'Tout Pro, plus :',
-      '<b>Plusieurs \u00e9tablissements</b> sous un m\u00eame compte',
+      'Tout \u00c9quipe, plus :',
+      '<b>Plusieurs \u00e9tablissements</b>',
       'Logo propre \u00e0 chaque enseigne',
-      'Proc\u00e9dures partag\u00e9es entre les sites',
       'Vue consolid\u00e9e de toutes les \u00e9quipes',
     ],
   },
   {
-    cle: 'entreprise', nom: 'Entreprise', prix: null, icone: 'entreprise',
-    taille: 'Au-del\u00e0 de 5 \u00e9tablissements',
+    cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null, gens: 5,
+    taille: 'Membres illimit\u00e9s',
     points: [
-      'Tout Multi-sites, plus :',
+      'Tout Pro, plus :',
       'Accompagnement \u00e0 la mise en place',
       'Interlocuteur d\u00e9di\u00e9',
-      'Connexion par votre annuaire',
       'Engagement de disponibilit\u00e9 \u00e9crit',
     ],
   },
 ]
 
-let aboAnnuel = false
+function nombreDeMembres() {
+  // La fiche du gérant compte : c'est quelqu'un de l'équipe.
+  return Math.max(1, (cachedMembres || []).length)
+}
 
-function prixOffre(o) {
-  if (o.prix === null) return { v: 'Sur devis', u: '' }
-  const p = aboAnnuel ? Math.round(o.prix * 0.8) : o.prix
-  return { v: p + '\u20ac', u: aboAnnuel ? "par mois, pay\u00e9 \u00e0 l'ann\u00e9e" : 'par mois' }
+function offrePourTaille(n) {
+  return OFFRES.find(o => n <= o.max) || OFFRES[OFFRES.length - 1]
 }
 
 function planActuel() {
-  return (cachedEntreprise?.plan || 'pro').toLowerCase()
+  return (cachedEntreprise?.plan || '').toLowerCase()
+}
+
+function carteOffre(o, opts = {}) {
+  const p = o.prix === null ? 'Sur devis' : o.prix + '\u20ac'
+  const u = o.prix === null ? '' : 'par mois'
+  const annuel = o.prix === null ? '' :
+    `<div class="offre-annuel">ou <b>${Math.round(o.prix * 0.8)} \u20ac</b> par mois, pay\u00e9 \u00e0 l'ann\u00e9e</div>`
+
+  return `<div class="offre-carte${opts.classe || ''}">
+    ${opts.ruban ? `<span class="offre-ruban">${opts.ruban}</span>` : ''}
+    <div class="offre-tete">
+      <span class="offre-ic">${silhouettes(o.gens)}</span>
+      <span class="offre-txt">
+        <span class="offre-nom">${o.nom}</span>
+        <span class="offre-taille">${o.taille}</span>
+      </span>
+      <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
+    </div>
+    <div class="offre-pts">
+      ${o.points.map(t => /^Tout /.test(t)
+        ? `<div class="offre-pt suite"><span>${t}</span></div>`
+        : `<div class="offre-pt">${COCHE_OFFRE}<span>${t}</span></div>`).join('')}
+    </div>
+    ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${opts.cta}</button>` : ''}
+    ${opts.annuel ? annuel : ''}
+  </div>`
 }
 
 window.renderAbonnements = function() {
-  const el = document.getElementById('abo-liste')
-  if (!el) return
+  const n = nombreDeMembres()
+  const mienne = offrePourTaille(n)
   const actuel = planActuel()
 
-  el.innerHTML = OFFRES.map(o => {
-    const p = prixOffre(o)
-    const estActuel = o.cle === actuel
-    const classes = 'offre-carte' + (estActuel ? ' actuelle' : (o.conseillee ? ' conseillee' : ''))
-    const ruban = estActuel ? 'Votre offre' : (o.conseillee ? 'Le plus choisi' : '')
+  const titre = document.getElementById('abo-titre')
+  const sous = document.getElementById('abo-sous')
+  const nomEnt = cachedEntreprise?.nom || 'votre \u00e9tablissement'
+  if (titre) {
+    titre.innerHTML = n > 1
+      ? `Vous \u00eates <b>${n}</b> chez<br>${escapeHtml(nomEnt)}`
+      : `Vous d\u00e9marrez seul chez<br>${escapeHtml(nomEnt)}`
+  }
+  if (sous) {
+    sous.innerHTML = `L'offre <b>${mienne.nom}</b> est faite pour une \u00e9quipe de cette taille.`
+  }
 
-    return `<div class="${classes}">
-      ${ruban ? `<span class="offre-ruban">${ruban}</span>` : ''}
-      <div class="offre-tete">
-        <span class="offre-ic">${ICONES_OFFRE[o.icone]}</span>
-        <span class="offre-txt">
-          <span class="offre-nom">${o.nom}</span>
-          <span class="offre-taille">${o.taille}</span>
-        </span>
-        <span class="offre-prix"><span class="v">${p.v}</span><span class="u">${p.u}</span></span>
-      </div>
-      <div class="offre-pts">
-        ${o.points.map((t, i) => i === 0 && /^Tout /.test(t)
-          ? `<div class="offre-pt suite"><span>${t}</span></div>`
-          : `<div class="offre-pt"><span class="c">${COCHE_OFFRE}</span><span>${t}</span></div>`).join('')}
-      </div>
-      <button type="button" class="offre-cta" data-offre="${o.cle}">
-        ${estActuel ? 'Offre en cours' : (o.prix === null ? 'Nous contacter' : 'Choisir ' + o.nom)}
-      </button>
-    </div>`
-  }).join('')
+  const estActuelle = mienne.cle === actuel
+  document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
+    classe: ' vedette' + (estActuelle ? ' actuelle' : ''),
+    ruban: estActuelle ? 'Votre offre' : 'Votre taille',
+    cta: estActuelle ? 'Offre en cours'
+      : (mienne.prix === null ? 'Nous \u00e9crire' : 'Commencer avec ' + mienne.nom),
+    annuel: !estActuelle,
+  })
 
-  // Le rappel dans les réglages suit l'offre en cours.
+  document.getElementById('abo-liste').innerHTML = OFFRES
+    .filter(o => o.cle !== mienne.cle)
+    .map(o => carteOffre(o, {
+      classe: o.cle === actuel ? ' actuelle' : '',
+      ruban: o.cle === actuel ? 'Votre offre' : '',
+      cta: o.cle === actuel ? 'Offre en cours'
+        : (o.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + o.nom),
+    })).join('')
+
   const rappel = document.getElementById('abo-actuel')
-  const o = OFFRES.find(x => x.cle === actuel)
-  if (rappel && o) {
-    rappel.textContent = o.prix === null
-      ? `Offre ${o.nom}`
-      : `Offre ${o.nom} \u00b7 ${o.prix} \u20ac par mois`
+  if (rappel) {
+    const o = OFFRES.find(x => x.cle === actuel)
+    rappel.textContent = o
+      ? (o.prix === null ? `Offre ${o.nom}` : `Offre ${o.nom} \u00b7 ${o.prix} \u20ac par mois`)
+      : `${n} membre${n > 1 ? 's' : ''} \u00b7 offre ${mienne.nom} conseill\u00e9e`
   }
 }
 
 document.getElementById('ouvrir-abonnement')?.addEventListener('click', () => {
+  document.getElementById('abo-liste')?.classList.remove('ouvert')
+  const b = document.getElementById('abo-autres')
+  if (b) { b.style.display = 'block'; b.textContent = 'Voir les autres offres' }
   renderAbonnements()
   showGestionScreen('p-abonnement')
 })
 
-document.getElementById('abo-periode')?.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-periode]')
-  if (!b) return
-  aboAnnuel = b.dataset.periode === 'an'
-  document.querySelectorAll('#abo-periode button')
-    .forEach(x => x.classList.toggle('active', x === b))
-  placerPastille(document.getElementById('abo-periode'))
-  renderAbonnements()
+document.getElementById('abo-autres')?.addEventListener('click', (e) => {
+  document.getElementById('abo-liste')?.classList.add('ouvert')
+  e.currentTarget.style.display = 'none'
 })
 
-document.getElementById('abo-liste')?.addEventListener('click', async (e) => {
+document.getElementById('p-abonnement')?.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-offre]')
   if (!b) return
   const o = OFFRES.find(x => x.cle === b.dataset.offre)
   if (!o || o.cle === planActuel()) return
 
-  /* Le paiement n'est pas encore branché. Plutôt que de faire semblant, on le
-     dit et on ouvre le courriel : un client qui écrit vaut mieux qu'un client
-     qui bute sur un bouton mort. */
+  /* Le paiement n'est pas encore branché. Plutôt que de faire semblant, on le dit
+     et on ouvre le courriel : un client qui écrit vaut mieux qu'un client qui
+     bute sur un bouton mort. */
   const ok = await confirmDialog({
     titre: o.prix === null ? 'Offre Entreprise' : `Passer \u00e0 ${o.nom}`,
     message: o.prix === null
       ? "Cette offre se construit avec vous. \u00c9crivez-nous et nous revenons vers vous rapidement."
-      : `${o.nom} \u00e0 ${prixOffre(o).v} ${prixOffre(o).u}. Le paiement en ligne arrive bient\u00f4t \u2014 en attendant, \u00e9crivez-nous et nous activons votre offre.`,
+      : `${o.nom} \u00e0 ${o.prix} \u20ac par mois. Le paiement en ligne arrive bient\u00f4t \u2014 en attendant, \u00e9crivez-nous et nous activons votre offre.`,
     confirmer: '\u00c9crire',
     annuler: 'Plus tard',
     danger: false,
@@ -9139,6 +9259,19 @@ let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
 /* Vrai pendant un changement d'établissement : l'app se recharge, mais son cadre
    ne doit pas se rejouer. */
 let basculeSansAnimation = false
+
+/* Fait entrer le contenu de l'écran courant, et lui seul. La barre du haut, la
+   barre du bas et le tiroir n'appartiennent pas à l'écran : ils ne bougent donc
+   pas. La classe est retirée à la fin, sans quoi elle empêcherait toute nouvelle
+   arrivée — une animation ne rejoue pas si la classe est déjà là. */
+function rejouerContenu() {
+  const ecran = document.querySelector('#gestion-app .screen.active, #equipe-app .screen.active')
+  if (!ecran) return
+  ecran.classList.remove('contenu-entre')
+  void ecran.offsetWidth
+  ecran.classList.add('contenu-entre')
+  setTimeout(() => ecran.classList.remove('contenu-entre'), 900)
+}
 let etabEdite = null            // null = création, sinon l'établissement modifié
 let etabLogoTampon = null       // le logo choisi, pas encore enregistré
 
@@ -9397,6 +9530,7 @@ async function basculerVersEtablissement(entrepriseId) {
   basculeSansAnimation = true
   await enterApp(membre)
   basculeSansAnimation = false
+  rejouerContenu()
   toast(e.nom)
 }
 

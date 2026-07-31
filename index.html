@@ -287,6 +287,116 @@
     background:rgba(94,160,255,0.20); color:#9CC5FF;
   }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     DÉCOUPER UNE VIDÉO — UN SEUL GESTE
+
+     Découper à la main, c'est regarder et dire « ici ça s'arrête ». Rien d'autre.
+     Le bouton fait donc les deux : il lance la vidéo, puis il ferme l'étape en
+     cours à chaque appui. Comme un chronomètre de tours.
+
+     L'ancien éditeur — frise à zoom, poignées, loupe, barre d'outils, jauge de
+     couverture — demandait de comprendre le montage avant de pouvoir s'en
+     servir. Ce qui a été coupé se corrige après, dans la liste : c'est là qu'on
+     relit, donc c'est là qu'on rectifie.
+     ═════════════════════════════════════════════════════════════════ */
+  .dv-depot{ position:relative; margin-top:14px; }
+  .dv-depot input[type=file]{
+    position:absolute; inset:0; opacity:0; width:100%; height:100%; z-index:2;
+  }
+  .dv-cadre{
+    position:relative; border-radius:20px; overflow:hidden; background:#000;
+    border:0.5px solid var(--border); aspect-ratio:16/9;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:var(--label-3);
+  }
+  .dv-cadre video{ width:100%; height:100%; display:block; object-fit:contain; }
+
+  /* La frise fait deux centimètres : on la lit, on ne la manipule pas. */
+  .dv-frise{
+    position:relative; height:26px; margin-top:12px; border-radius:9px; overflow:hidden;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+  }
+  .dv-seg{
+    position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);
+    background:rgba(94,160,255,0.30); display:flex; align-items:center;
+    justify-content:center; font-size:9.5px; font-weight:800; color:#fff;
+  }
+  .dv-seg.sel{ background:rgba(94,160,255,0.62); }
+  .dv-tete{
+    position:absolute; top:0; bottom:0; left:0; width:2px; background:#fff; z-index:4;
+    box-shadow:0 0 8px rgba(255,255,255,0.7); pointer-events:none;
+  }
+  .dv-tps{
+    display:flex; justify-content:space-between; padding:6px 2px 0;
+    font-size:11px; color:var(--label-3);
+    font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  .dv-geste{ padding:14px 0 4px; }
+  .dv-geste button{
+    width:100%; height:56px; border:none; border-radius:18px; font-family:inherit;
+    font-size:16px; font-weight:750; display:flex; align-items:center;
+    justify-content:center; gap:10px; background:#fff; color:#000;
+    transition:background 0.18s, color 0.18s;
+  }
+  .dv-geste button.coupe{ background:#5EA0FF; color:#04203F; }
+  .dv-geste svg{ width:21px; height:21px; }
+  .dv-aide{
+    font-size:11.5px; color:var(--label-3); text-align:center;
+    padding:9px 18px 0; line-height:1.45;
+  }
+
+  /* L'étape en train de se faire, tant qu'on n'a pas coupé. */
+  .etape-montage{
+    display:flex; gap:11px; padding:10px; border-radius:15px; align-items:center;
+    background:var(--bg-card); border:1px solid transparent; margin-bottom:8px;
+  }
+  .etape-montage.sel{ border-color:rgba(94,160,255,0.5); background:rgba(94,160,255,0.10); }
+  .etape-montage .vig{
+    width:56px; height:32px; border-radius:7px; flex-shrink:0; background:#000;
+    border:0.5px solid var(--border); overflow:hidden;
+  }
+  .etape-montage .vig canvas{ width:100%; height:100%; display:block; }
+  .etape-montage .tx{ flex:1; min-width:0; }
+  .etape-montage textarea{
+    width:100%; border:none; background:none; color:#fff; font-family:inherit;
+    font-size:13.5px; font-weight:600; line-height:1.35; resize:none; padding:0; outline:none;
+  }
+  .etape-montage textarea::placeholder{ color:var(--label-3); font-weight:500; }
+  .etape-montage i{
+    display:block; font-style:normal; font-size:10.5px; color:var(--label-3);
+    font-family:ui-monospace, monospace; margin-top:3px;
+  }
+  .etape-montage .sup{
+    width:30px; height:30px; border-radius:50%; border:none; flex-shrink:0;
+    background:rgba(255,255,255,0.07); color:var(--label-3);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .etape-montage .sup svg{ width:15px; height:15px; }
+
+  .dv-encours{
+    display:flex; gap:11px; padding:10px; border-radius:15px; align-items:center;
+    border:1px dashed rgba(94,160,255,0.5); margin-bottom:8px;
+    font-size:13.5px; font-weight:600; color:var(--label-2);
+  }
+  .dv-encours .vig{
+    width:56px; height:32px; border-radius:7px; flex-shrink:0; background:#000;
+    border:0.5px solid var(--border); overflow:hidden;
+  }
+  .dv-encours .vig canvas{ width:100%; height:100%; display:block; }
+  .dv-encours i{
+    display:block; font-style:normal; font-size:10.5px; color:var(--label-3);
+    font-family:ui-monospace, monospace; margin-top:3px; font-weight:500;
+  }
+
+  .dv-plus{
+    width:100%; margin-top:6px; height:40px; border:none; border-radius:13px;
+    background:none; color:var(--label-3); font-family:inherit;
+    font-size:12.5px; font-weight:600;
+  }
+  .dv-avance{ display:none; }
+  .dv-avance.on{ display:block; }
+
   /* ═══ Image d'une étape manuelle ═══
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
      facultative : l'étape reste valable sans. */
@@ -2807,88 +2917,45 @@
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Découper une vidéo</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Découper la vidéo</h1>
     </div>
-    <div class="subhead">Importez une vidéo puis coupez chaque étape</div>
 
-    <div class="card">
-      <input type="file" id="video-input" accept="video/*" style="margin-bottom:10px;">
-      <div class="video-frame" id="video-frame">
-        <video id="video-player" style="display:none;" playsinline></video>
-        <span id="video-placeholder">Aucune vidéo importée</span>
-      </div>
-
-      <div class="capcut-wrap" id="capcut-wrap" style="display:none;">
-        <div class="capcut-controls">
-          <button class="capcut-play-btn" id="capcut-play-btn">
-            <svg id="capcut-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg>
-            <svg id="capcut-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18" rx="1"/><rect x="14" y="3" width="5" height="18" rx="1"/></svg>
-          </button>
-          <span class="capcut-current-time" id="capcut-current-time">0:00</span>
-          <span class="capcut-duration-sep">/</span>
-          <span class="capcut-duration" id="capcut-duration">0:00</span>
-        </div>
-        <div class="frise-fenetre" id="capcut-fenetre"><div class="capcut-timeline" id="capcut-timeline">
-          <div class="capcut-track" id="capcut-track"></div>
-          <div class="capcut-markers" id="capcut-markers"></div>
-          <div class="clip-mask" id="capcut-mask-l"></div>
-          <div class="clip-mask" id="capcut-mask-r"></div>
-          <div class="clip-sel" id="capcut-sel"></div>
-          <div class="clip-handle" id="capcut-h-start"><div class="grip"></div></div>
-          <div class="clip-handle" id="capcut-h-end"><div class="grip"></div></div>
-          <div class="capcut-playhead" id="capcut-playhead"><div class="capcut-playhead-handle"></div></div>
-        </div></div>
-        <div class="zoom-frise">
-        <button type="button" class="zoom-btn" id="capcut-zoom-moins" aria-label="Dezoomer">−</button>
-        <span class="zoom-val" id="capcut-zoom-val">x1</span>
-        <button type="button" class="zoom-btn" id="capcut-zoom-plus" aria-label="Zoomer">+</button>
-        <button type="button" class="zoom-lien" id="capcut-lien">Étapes liées</button>
-      </div>
-      <div class="clip-info" id="capcut-info" style="display:none;"></div>
-        <div class="capcut-hint" id="capcut-hint">Glissez sur la frise pour naviguer dans la vidéo</div>
-        <div class="ed-bornes" id="capcut-bornes">
-          <button type="button" class="ed-borne actif" data-borne="a"><span class="k">Début</span><span class="v" id="capcut-vd">0:00,0</span></button>
-          <span class="ed-fleche">→</span>
-          <button type="button" class="ed-borne" data-borne="b"><span class="k">Fin</span><span class="v" id="capcut-vf">0:00,0</span></button>
-        </div>
-        <div class="ed-loupe-bloc" id="capcut-loupe-bloc">
-          <div class="ed-loupe-titre">Loupe · <span id="capcut-loupe-fen">± 4 s</span></div>
-          <div class="ed-loupe" id="capcut-loupe">
-            <div class="bande" id="capcut-loupe-bande"></div>
-            <div class="zone" id="capcut-loupe-zone"></div>
-            <div class="axe"></div>
-          </div>
-          <div class="ed-aide">Faites glisser pour affiner au dixième de seconde</div>
-        </div>
-        <div class="cut-toolbar">
-          <button type="button" class="btn small block" id="capcut-add-btn">+ Découper une étape ici</button>
-        </div>
-        <div class="clip-tools" id="capcut-tools">
-          <button type="button" class="clip-tool" id="capcut-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"/><polyline points="10 7 15 12 10 17"/><line x1="19" y1="12" x2="15" y2="12"/></svg><span>Début ici</span></button>
-          <button type="button" class="clip-tool" id="capcut-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"/><polyline points="14 7 9 12 14 17"/><line x1="5" y1="12" x2="9" y2="12"/></svg><span>Fin ici</span></button>
-          <button type="button" class="clip-tool" id="capcut-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"/><circle cx="6" cy="18" r="2.6"/><line x1="20" y1="4" x2="8.1" y2="15.9"/><line x1="14.5" y1="14.5" x2="20" y2="20"/><line x1="8.1" y1="8.1" x2="12" y2="12"/></svg><span>Diviser</span></button>
-          <button type="button" class="clip-tool" id="capcut-undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg><span>Annuler</span></button>
-          <button type="button" class="clip-tool" id="capcut-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"/></svg><span>Lire</span></button>
-        </div>
-                <button type="button" class="btn ghost clip-done-btn" id="capcut-done">Terminer le réglage</button>
-        <div class="ed-couv" id="capcut-couv"></div>
-        <div class="ed-legende" id="capcut-legende">
-          <span><i style="background:var(--green)"></i>couvert</span>
-          <span><i style="background:rgba(255,255,255,.12)"></i>trou</span>
-          <span><i style="background:var(--red)"></i>chevauchement</span>
-        </div>
-        <div class="ed-alertes" id="capcut-alertes"></div>
+    <div class="dv-depot" id="dv-depot">
+      <input type="file" id="video-input" accept="video/*">
+      <div class="dv-cadre" id="dv-cadre">
+        <video id="video-player" style="display:none;" playsinline webkit-playsinline></video>
+        <span id="video-placeholder">Touchez pour choisir une vidéo</span>
       </div>
     </div>
 
-    <div id="video-steps-list"></div>
-    <div class="note">Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.</div>
+    <div id="dv-travail" style="display:none;">
+      <!-- La frise : un témoin, pas un outil. On la touche pour se déplacer. -->
+      <div class="dv-frise" id="dv-frise"><div class="dv-tete" id="dv-tete"></div></div>
+      <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
 
-    <div class="error-msg" id="create-error-video"></div>
-    <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
+      <div class="dv-geste">
+        <button type="button" id="dv-bouton">
+          <svg viewBox="0 0 24 24" fill="currentColor" id="dv-icone"><path d="M8 5v14l11-7z"/></svg>
+          <span id="dv-libelle">Lancer la vidéo</span>
+        </button>
+        <div class="dv-aide" id="dv-aide">Regardez, et touchez le bouton chaque fois qu'une étape se termine.</div>
+      </div>
+
+      <div id="video-steps-list"></div>
+
+      <button type="button" class="dv-plus" id="dv-plus">Aller plus loin</button>
+      <div class="dv-avance" id="dv-avance">
+        <button type="button" class="ligne" id="dv-recommencer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
+          <span class="nm">Tout recommencer</span>
+        </button>
+      </div>
+
+      <div class="error-msg" id="create-error-video"></div>
+      <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
+    </div>
   </div>
 
-  <!-- L'IA découpe un document et en tire les étapes -->
   <div class="screen" id="p-create-doc">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')">
@@ -3833,7 +3900,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 let currentMembre = null
 let manualSteps = []
 let videoSteps = []
-let capcutEditor = null   // éditeur de clip de l'écran de création
 let ecapEditor = null     // éditeur de clip de l'écran de modification
 let currentVideoFile = null
 let allEquipeProcedures = []
@@ -6712,15 +6778,13 @@ function resetCreateForm() {
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'block'
-  document.getElementById('capcut-wrap').style.display = 'none'
-  document.getElementById('capcut-track').innerHTML = ''
-  document.getElementById('capcut-markers').innerHTML = ''
+  document.getElementById('dv-travail').style.display = 'none'
+  document.getElementById('dv-avance').classList.remove('on')
   document.getElementById('create-error-manual').textContent = ''
   document.getElementById('create-error-video').textContent = ''
   manualSteps = []
   videoSteps = []
   currentVideoFile = null
-  capcutEditor?.deselect()
   renderManualSteps()
   renderVideoSteps()
   updateModeCardsState()
@@ -8081,28 +8145,11 @@ async function generateFilmstrip(video, trackEl) {
   if (!wasPaused) video.play()
 }
 
-// ═══ Instance 1 : écran « Découper une vidéo » (création) ═══
-capcutEditor = createClipEditor({
-  prefix: 'capcut', wrap: 'capcut-wrap',
-  video: 'video-player', timeline: 'capcut-timeline', markers: 'capcut-markers',
-  maskL: 'capcut-mask-l', maskR: 'capcut-mask-r', sel: 'capcut-sel',
-  hStart: 'capcut-h-start', hEnd: 'capcut-h-end', playhead: 'capcut-playhead',
-  info: 'capcut-info', hint: 'capcut-hint', playClip: 'capcut-play-clip', done: 'capcut-done',
-  tools: 'capcut-tools', textField: 'capcut-text-field', text: 'capcut-text',
-  setStart: 'capcut-set-start', setEnd: 'capcut-set-end', split: 'capcut-split',
-  fenetre: 'capcut-fenetre', zoomMoins: 'capcut-zoom-moins', zoomPlus: 'capcut-zoom-plus',
-  zoomVal: 'capcut-zoom-val', lien: 'capcut-lien',
-  bornes: 'capcut-bornes', vd: 'capcut-vd', vf: 'capcut-vf',
-  loupeBloc: 'capcut-loupe-bloc', loupe: 'capcut-loupe', loupeBande: 'capcut-loupe-bande',
-  loupeZone: 'capcut-loupe-zone', loupeFen: 'capcut-loupe-fen',
-  couv: 'capcut-couv', legende: 'capcut-legende', alertes: 'capcut-alertes', undo: 'capcut-undo',
-  curTime: 'capcut-current-time', durTime: 'capcut-duration',
-}, {
-  getSteps: () => videoSteps,
-  onChange: () => renderVideoSteps(),
-  onSelect: () => renderVideoSteps(),
-  onTextInput: () => renderVideoSteps(),
-})
+/* L'éditeur de clip de l'écran de création a été retiré : frise à zoom, poignées,
+   loupe et barre d'outils demandaient de comprendre le montage avant de pouvoir
+   s'en servir. Le découpage se fait désormais d'un seul bouton, pendant la
+   lecture. `createClipEditor` reste employé par l'écran de correction. */
+
 
 // ═══ Instance 2 : écran « Modifier la procédure » ═══
 ecapEditor = createClipEditor({
@@ -8139,14 +8186,14 @@ document.getElementById('video-input')?.addEventListener('change', async (e) => 
   player.src = url
   player.style.display = 'block'
   document.getElementById('video-placeholder').style.display = 'none'
-  document.getElementById('capcut-wrap').style.display = 'block'
-
-  capcutEditor?.attachVideo()
+  document.getElementById('dv-travail').style.display = 'block'
+  dvDebutEnCours = 0
+  dvSelection = null
+  dvMajGeste()
 
   player.addEventListener('loadedmetadata', async () => {
-    document.getElementById('capcut-duration').textContent = formatTime(player.duration)
+    dvMajFrise()
     await generateFilmstrip(player, 'capcut-track')
-    capcutEditor?.repaint()
   }, { once: true })
 })
 
@@ -8162,10 +8209,6 @@ function majIconePlay(player, prefix) {
   pause.style.display = enLecture ? '' : 'none'
 }
 
-document.getElementById('capcut-play-btn')?.addEventListener('click', () => {
-  const player = document.getElementById('video-player')
-  if (player.paused) player.play(); else player.pause()
-})
 document.getElementById('ecap-play-btn')?.addEventListener('click', () => {
   const player = document.getElementById('edit-video-player')
   if (player.paused) player.play(); else player.pause()
@@ -8218,21 +8261,10 @@ document.getElementById('ecap-add-btn')?.addEventListener('click', () => {
   })
 })
 
-// ═══ Créer une étape à la position actuelle ═══
-document.getElementById('capcut-add-btn')?.addEventListener('click', () => {
-  const player = document.getElementById('video-player')
-  const d = isFinite(player.duration) ? player.duration : 0
-  if (!d) return
-  const start = player.currentTime || 0
-  const end = Math.min(d, start + 8)
-  const sel = capcutEditor?.selected()
-  const newStep = { texte: '', timestamp_video: start, fin_video: end }
-  // La nouvelle étape se place juste après celle qui est sélectionnée, sinon à la fin.
-  const insertAt = (sel != null) ? sel + 1 : videoSteps.length
-  videoSteps.splice(insertAt, 0, newStep)
-  renderVideoSteps()
-  capcutEditor?.select(insertAt, { lire: false })
-})
+/* Le bouton « découper une étape ici » a disparu avec l'ancienne barre d'outils :
+   le bouton unique fait ce travail pendant la lecture. */
+
+
 
 
 
@@ -8425,125 +8457,244 @@ function renderManualSteps() {
 }
 
 // ═══ Étapes issues du découpage vidéo ═══
-function renderVideoSteps() {
-  const listEl = document.getElementById('video-steps-list')
-  listEl.innerHTML = ''
-  if (videoSteps.length > 0) {
-    const title = document.createElement('div')
-    title.className = 'section-title'
-    title.textContent = 'Étapes de la vidéo'
-    listEl.appendChild(title)
-  }
-  const sel = capcutEditor ? capcutEditor.selected() : null
-  videoSteps.forEach((step, i) => {
-    const div = document.createElement('div')
-    div.className = 'step-edit-item' + (i === sel ? ' selected' : '')
-    const debut = step.timestamp_video != null ? step.timestamp_video : 0
-    const fin = step.fin_video != null ? step.fin_video : debut
-    div.innerHTML = `
-      <div class="step-row-top">
-        <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
-        <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
-      </div>
-      <div class="step-row-bottom">
-        <span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>
-        ${gripHtml()}
-        <span class="del">${TRASH_SVG}</span>
-      </div>
-    `
-    const textarea = div.querySelector('textarea')
-    textarea.addEventListener('input', (e) => { videoSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
-    textarea.addEventListener('focus', (e) => e.stopPropagation())
-    div.querySelector('.del').addEventListener('click', (e) => {
-      e.stopPropagation()
-      demanderSuppressionEtape(i + 1, videoSteps[i].texte, () => {
-        videoSteps.splice(i, 1)
-        capcutEditor?.deselect()
-        renderVideoSteps()
-        capcutEditor?.repaint()
-      })
-    })
-    div.addEventListener('click', (e) => {
-      if (e.target.closest('textarea, button, .del, .step-grip')) return
-      if (listEl.dataset.glissementRecent) return
-      capcutEditor?.select(i)
-    })
-    listEl.appendChild(div)
-    autoResizeTextarea(textarea)
-  })
-
-  activerGlissementEtapes(listEl, () => videoSteps, (nouvelIndex) => {
-    renderVideoSteps()
-    capcutEditor?.select(nouvelIndex, { lire: false, defiler: false })
-  })
-}
-
-/* Joue uniquement la portion [debut, fin] d'une vidéo, puis s'arrête.
-   Utilisé quand on touche une étape : on voit tout de suite le bon passage. */
 /* ═══════════════════════════════════════════════════════════════════════════
-   RENOMMER UNE CATÉGORIE
+   DÉCOUPER UNE VIDÉO — UN SEUL GESTE
 
-   La catégorie n'est pas une table : c'est une colonne de texte sur chaque
-   procédure. La renommer, c'est donc réécrire ce texte sur toutes celles qui la
-   portent — d'un seul appel, filtré sur l'ancien nom.
+   On regarde, et on marque la fin de chaque étape au passage. Le bouton fait
+   les deux : il lance la lecture, puis il ferme l'étape en cours à chaque
+   appui, comme un chronomètre de tours.
 
-   Conséquence à connaître : deux catégories fusionnent si on donne à l'une le
-   nom de l'autre. C'est cohérent avec ce qu'est une catégorie ici, et c'est même
-   le seul moyen de les regrouper. On prévient donc au lieu d'interdire.
+   Ce qui a été coupé se corrige ensuite dans la liste — c'est là qu'on relit,
+   donc c'est là qu'on rectifie. Aucune poignée à attraper, aucune frise à
+   comprendre.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-document.getElementById('cat-renommer')?.addEventListener('click', async () => {
-  const ancien = currentCategoryName
-  if (!ancien) return
+let dvDebutEnCours = 0        // début de l'étape que l'on est en train de vivre
+let dvSelection = null
 
-  const nouveau = await demanderTexte({
-    titre: 'Renommer la cat\u00e9gorie',
-    message: `Toutes les proc\u00e9dures class\u00e9es dans \u00ab ${ancien} \u00bb suivront.`,
-    valeur: ancien,
-    placeholder: 'Nom de la cat\u00e9gorie',
-    confirmer: 'Renommer',
-  })
-  if (!nouveau || nouveau === ancien) return
+function dvLecteur() { return document.getElementById('video-player') }
 
-  // Une catégorie de ce nom existe déjà : on le dit, on ne l'empêche pas.
-  const existe = allGestionProcedures.some(p =>
-    (p.categorie || '').toLowerCase() === nouveau.toLowerCase())
-  if (existe) {
-    const ok = await confirmDialog({
-      titre: `Fusionner avec ${nouveau} ?`,
-      message: `Une cat\u00e9gorie \u00ab ${nouveau} \u00bb existe d\u00e9j\u00e0. Les proc\u00e9dures de \u00ab ${ancien} \u00bb ` +
-        `la rejoindront, et \u00ab ${ancien} \u00bb dispara\u00eetra.`,
-      confirmer: 'Fusionner',
-      annuler: 'Annuler',
-      danger: false,
-    })
-    if (!ok) return
+function dvFmt(s) {
+  if (!isFinite(s)) return '0:00'
+  return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0')
+}
+
+/* Une vignette : l'image de la vidéo à l'instant voulu, prise au canevas. Rien
+   n'est ré-encodé, c'est un simple dessin. */
+function dvVignette(canvas, seconde) {
+  const v = dvLecteur()
+  if (!v || !v.videoWidth) return
+  const clone = document.createElement('video')
+  clone.src = v.src
+  clone.muted = true
+  clone.addEventListener('loadeddata', () => {
+    clone.currentTime = Math.min(seconde, (clone.duration || 1) - 0.05)
+  }, { once: true })
+  clone.addEventListener('seeked', () => {
+    try { canvas.getContext('2d').drawImage(clone, 0, 0, canvas.width, canvas.height) } catch (e) {}
+    clone.src = ''
+  }, { once: true })
+}
+
+function dvMajGeste() {
+  const v = dvLecteur()
+  const b = document.getElementById('dv-bouton')
+  const ic = document.getElementById('dv-icone')
+  const lib = document.getElementById('dv-libelle')
+  const aide = document.getElementById('dv-aide')
+  if (!b) return
+
+  if (!v || v.paused) {
+    b.classList.remove('coupe')
+    ic.innerHTML = '<path d="M8 5v14l11-7z"/>'
+    lib.textContent = videoSteps.length ? 'Reprendre la vid\u00e9o' : 'Lancer la vid\u00e9o'
+    aide.textContent = videoSteps.length
+      ? "Corrigez les textes ci-dessous, ou reprenez pour continuer \u00e0 d\u00e9couper."
+      : "Regardez, et touchez le bouton chaque fois qu'une \u00e9tape se termine."
+  } else {
+    b.classList.add('coupe')
+    ic.innerHTML = '<rect x="4" y="5" width="16" height="14" rx="3"/>'
+    lib.textContent = "Terminer l'\u00e9tape " + (videoSteps.length + 1)
+    aide.textContent = "Touchez d\u00e8s que ce geste-l\u00e0 est fini."
   }
+}
 
-  const { data, error } = await supabase.from('procedures')
-    .update({ categorie: nouveau })
-    .eq('entreprise_id', currentMembre.entreprise_id)
-    .eq('categorie', ancien)
-    .select('id')
+function dvMajFrise() {
+  const f = document.getElementById('dv-frise')
+  const v = dvLecteur()
+  if (!f || !v) return
+  const duree = v.duration || 1
 
-  if (error) { toast('\u00c9chec : ' + error.message); return }
-  if (!data || !data.length) {
-    toast("La base a refus\u00e9 la modification.")
+  f.querySelectorAll('.dv-seg').forEach(s => s.remove())
+  videoSteps.forEach((e, i) => {
+    const d = document.createElement('div')
+    d.className = 'dv-seg' + (i === dvSelection ? ' sel' : '')
+    d.style.left = (e.timestamp_video / duree * 100) + '%'
+    d.style.width = ((e.fin_video - e.timestamp_video) / duree * 100) + '%'
+    d.textContent = i + 1
+    d.addEventListener('click', (ev) => {
+      ev.stopPropagation()
+      dvSelection = i; v.currentTime = e.timestamp_video
+      renderVideoSteps(); dvMajFrise()
+    })
+    f.insertBefore(d, document.getElementById('dv-tete'))
+  })
+
+  document.getElementById('dv-tete').style.left = (v.currentTime / duree * 100) + '%'
+  document.getElementById('dv-t').textContent = dvFmt(v.currentTime)
+  document.getElementById('dv-d').textContent = dvFmt(duree)
+}
+
+/* Le geste unique. */
+document.getElementById('dv-bouton')?.addEventListener('click', () => {
+  const v = dvLecteur()
+  if (!v || !v.src) return
+
+  if (v.paused) {
+    dvDebutEnCours = v.currentTime
+    v.play().catch(() => {})
+    dvMajGeste()
     return
   }
 
-  allGestionProcedures.forEach(p => { if (p.categorie === ancien) p.categorie = nouveau })
-  currentCategoryName = nouveau
-  document.getElementById('category-titre').textContent = nouveau
-  /* On relit tout : les regroupements par catégorie sont recalculés au
-     chargement, et c'est le seul endroit qui les construit. Redessiner sans
-     recharger laisserait l'ancienne catégorie dans la grille. */
-  await loadGestionProcedures()
-  renderCategoryProceduresList()
-  toast(`${data.length} proc\u00e9dure${data.length > 1 ? 's' : ''} reclass\u00e9e${data.length > 1 ? 's' : ''}.`)
+  // On ferme l'étape en cours ; la suivante commence ici.
+  if (v.currentTime - dvDebutEnCours < 0.5) return
+  videoSteps.push({
+    texte: '',
+    timestamp_video: dvDebutEnCours,
+    fin_video: v.currentTime,
+  })
+  dvDebutEnCours = v.currentTime
+  dvSelection = videoSteps.length - 1
+  dvMajGeste(); renderVideoSteps(); dvMajFrise()
 })
 
-/* Marque une étape comme « en cours de lecture », et une seule. */
+/* La frise et le chronomètre suivent la lecture. On écrit directement dans le
+   texte plutôt que de redessiner la liste à chaque image : soixante rendus par
+   seconde feraient perdre le curseur de saisie. */
+dvLecteur()?.addEventListener('timeupdate', () => {
+  dvMajFrise()
+  const ch = document.getElementById('dv-chrono')
+  const v = dvLecteur()
+  if (ch && v) ch.textContent = `depuis ${dvFmt(dvDebutEnCours)} \u00b7 ${Math.round(v.currentTime - dvDebutEnCours)} s`
+  else if (v && !v.paused && v.currentTime - dvDebutEnCours > 0.3) renderVideoSteps()
+})
+
+dvLecteur()?.addEventListener('pause', () => { dvMajGeste(); renderVideoSteps() })
+dvLecteur()?.addEventListener('play', dvMajGeste)
+
+/* Arrivé au bout : on ferme la dernière étape toute seule. Sans ça, ce qui a été
+   filmé après la dernière coupe serait perdu. */
+dvLecteur()?.addEventListener('ended', () => {
+  const v = dvLecteur()
+  if (v && v.duration - dvDebutEnCours > 0.5) {
+    videoSteps.push({ texte: '', timestamp_video: dvDebutEnCours, fin_video: v.duration })
+    dvSelection = videoSteps.length - 1
+  }
+  dvMajGeste(); renderVideoSteps(); dvMajFrise()
+})
+
+document.getElementById('dv-frise')?.addEventListener('click', (e) => {
+  if (e.target.closest('.dv-seg')) return
+  const v = dvLecteur()
+  if (!v || !v.duration) return
+  const r = e.currentTarget.getBoundingClientRect()
+  v.currentTime = Math.max(0, Math.min(v.duration, (e.clientX - r.left) / r.width * v.duration))
+  if (!v.paused) dvDebutEnCours = Math.min(dvDebutEnCours, v.currentTime)
+  dvMajFrise()
+})
+
+document.getElementById('dv-plus')?.addEventListener('click', (e) => {
+  const av = document.getElementById('dv-avance')
+  av.classList.toggle('on')
+  e.currentTarget.textContent = av.classList.contains('on') ? 'Replier' : 'Aller plus loin'
+})
+
+document.getElementById('dv-recommencer')?.addEventListener('click', async () => {
+  if (!videoSteps.length) return
+  const ok = await confirmDialog({
+    titre: 'Tout recommencer ?',
+    message: `Les ${videoSteps.length} \u00e9tapes d\u00e9coup\u00e9es seront effac\u00e9es. La vid\u00e9o reste en place.`,
+    confirmer: 'Recommencer', annuler: 'Annuler', danger: true,
+  })
+  if (!ok) return
+  videoSteps = []
+  dvSelection = null
+  const v = dvLecteur()
+  if (v) { v.pause(); v.currentTime = 0 }
+  dvDebutEnCours = 0
+  dvMajGeste(); renderVideoSteps(); dvMajFrise()
+})
+
+function renderVideoSteps(listEl) {
+  const el = document.getElementById('video-steps-list')
+  if (!el) return
+  el.innerHTML = ''
+
+  videoSteps.forEach((step, i) => {
+    const div = document.createElement('div')
+    div.className = 'etape-montage' + (i === dvSelection ? ' sel' : '')
+    div.innerHTML = `
+      <span class="vig"><canvas width="160" height="90"></canvas></span>
+      <span class="tx">
+        <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
+        <i>${dvFmt(step.timestamp_video)} \u2192 ${dvFmt(step.fin_video)} \u00b7 ${Math.round(step.fin_video - step.timestamp_video)} s</i>
+      </span>
+      <button type="button" class="sup" aria-label="Supprimer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+      </button>`
+
+    dvVignette(div.querySelector('canvas'), step.timestamp_video)
+
+    const ta = div.querySelector('textarea')
+    ta.addEventListener('input', (e) => {
+      videoSteps[i].texte = e.target.value
+      autoResizeTextarea(e.target)
+    })
+    ta.addEventListener('focus', () => { dvSelection = i; dvMajFrise() })
+    setTimeout(() => autoResizeTextarea(ta), 0)
+
+    div.querySelector('.sup').addEventListener('click', (e) => {
+      e.stopPropagation()
+      demanderSuppressionEtape(i + 1, videoSteps[i].texte, () => {
+        videoSteps.splice(i, 1)
+        dvSelection = null
+        renderVideoSteps(); dvMajFrise(); dvMajGeste()
+      })
+    })
+
+    div.addEventListener('click', (e) => {
+      if (e.target.closest('textarea') || e.target.closest('.sup')) return
+      dvSelection = i
+      const v = dvLecteur()
+      if (v) v.currentTime = step.timestamp_video
+      renderVideoSteps(); dvMajFrise()
+    })
+
+    el.appendChild(div)
+  })
+
+  /* L'\u00e9tape en train de se faire : on voit ce qu'on est en train de d\u00e9couper. */
+  const v = dvLecteur()
+  if (v && !v.paused && v.currentTime - dvDebutEnCours > 0.3) {
+    const c = document.createElement('div')
+    c.className = 'dv-encours'
+    c.innerHTML = `<span class="vig"><canvas width="160" height="90"></canvas></span>
+      <span>\u00c9tape ${videoSteps.length + 1} en cours\u2026
+        <i id="dv-chrono">depuis ${dvFmt(dvDebutEnCours)} \u00b7 ${Math.round(v.currentTime - dvDebutEnCours)} s</i></span>`
+    dvVignette(c.querySelector('canvas'), dvDebutEnCours)
+    el.appendChild(c)
+  }
+
+  /* On garde le r\u00e9ordonnancement au doigt : c'est le seul geste de l'ancien
+     \u00e9diteur qui servait vraiment. */
+  activerGlissementEtapes(el, () => videoSteps, () => {
+    dvSelection = null
+    renderVideoSteps(); dvMajFrise()
+  })
+}
+
+
 function marquerEtapeEnLecture(el) {
   document.querySelectorAll('.detail-step.en-lecture').forEach(x => x.classList.remove('en-lecture'))
   if (el) el.classList.add('en-lecture')

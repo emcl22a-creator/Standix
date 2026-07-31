@@ -5452,9 +5452,15 @@ window.signOut = async function() {
   document.getElementById('equipe-app').style.display = 'none'
   document.getElementById('tabbar-gestion').style.display = 'none'
   document.getElementById('tabbar-equipe').style.display = 'none'
-  // Le repère n'a plus de sens une fois déconnecté : le compte suivant pourrait
-  // ne pas avoir cette fiche, et hériterait d'un choix qui n'est pas le sien.
-  try { localStorage.removeItem('procedo_membre') } catch (e) {}
+  /* Le repère et les copies locales n'ont plus de sens une fois déconnecté : le
+     compte suivant sur ce téléphone ne doit hériter ni du choix ni des
+     procédures de quelqu'un d'autre. */
+  try {
+    localStorage.removeItem('procedo_membre')
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('procedo_grille_'))
+      .forEach(k => localStorage.removeItem(k))
+  } catch (e) {}
   document.getElementById('login-email').value = ''
   document.getElementById('login-password').value = ''
   afficherEcranChoix()
@@ -6276,12 +6282,86 @@ let preloadEtapes = null   // promesse du chargement différé des étapes
 let allCategoriesData = []
 let currentCatSort = 'az'
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LISTE EST DÉJÀ LÀ
+
+   À l'ouverture, l'écran restait vide une à deux secondes : le temps de demander
+   la liste à la base et d'attendre la réponse.
+
+   On garde donc une copie sur l'appareil à chaque chargement réussi. À
+   l'ouverture suivante, on affiche cette copie SANS RIEN DEMANDER — d'où
+   l'instantané — puis on interroge la base en arrière-plan. Si rien n'a changé,
+   rien ne bouge à l'écran ; sinon la différence apparaît une seconde plus tard.
+
+   Ce qu'on garde, c'est la GRILLE DÉJÀ CALCULÉE, pas les procédures brutes : les
+   pourcentages de lecture dépendent d'une seconde requête, et on ne peut donc
+   pas les recalculer sans réseau. Les redessiner faux pendant une seconde serait
+   pire que d'attendre.
+
+   Deux précautions. La copie est rangée PAR ENTREPRISE — quelqu'un qui bascule
+   d'un établissement à l'autre ne doit pas voir les procédures du précédent,
+   même une seconde. Et on n'y met que de quoi dessiner : une liste complète
+   remplirait les cinq mégaoctets du navigateur, et le rangement échouerait en
+   silence.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function cleCache(entrepriseId) { return 'procedo_grille_' + entrepriseId }
+
+function rangerGrille(entrepriseId, categories, sous) {
+  try {
+    const leger = (categories || []).map(c => ({
+      nom: c.nom, icone: c.icone, avgPct: c.avgPct,
+      latestDate: c.latestDate, earliestDate: c.earliestDate,
+      procsInCat: (c.procsInCat || []).map(p => ({
+        id: p.id, titre: p.titre, categorie: p.categorie, statut: p.statut,
+        created_at: p.created_at, video_url: p.video_url, image_url: p.image_url,
+        etapes: p.etapes,
+      })),
+    }))
+    localStorage.setItem(cleCache(entrepriseId), JSON.stringify({ quand: Date.now(), sous, categories: leger }))
+  } catch (e) {
+    // Mémoire pleine ou navigation privée : on s'en passe, ce n'est qu'un confort.
+    console.warn('Proc\u00e9do \u00b7 grille non mise en cache :', e?.message || e)
+  }
+}
+
+function lireGrille(entrepriseId) {
+  try {
+    const brut = localStorage.getItem(cleCache(entrepriseId))
+    if (!brut) return null
+    const { categories, sous } = JSON.parse(brut)
+    return Array.isArray(categories) && categories.length ? { categories, sous } : null
+  } catch (e) { return null }
+}
+
+/* Deux grilles sont-elles identiques à l'œil ? Si oui, on ne redessine pas :
+   redessiner ferait clignoter les cartes et perdrait la position de défilement,
+   pour aboutir exactement au même écran. */
+function memeGrille(a, b) {
+  if (!a || !b || a.length !== b.length) return false
+  const cle = (c) => c.nom + ':' + c.avgPct + ':' +
+    (c.procsInCat || []).map(p => [p.id, p.titre, p.statut, p.image_url,
+      p.etapes?.[0]?.count ?? ''].join('|')).join('~')
+  return a.map(cle).join('\u00a7') === b.map(cle).join('\u00a7')
+}
+
 async function loadGestionProcedures() {
   // L'en-tête a été retiré de la page : ces deux repères peuvent être absents.
   const subheadEl = document.getElementById('p-list-subhead')
   const catGridEl = document.getElementById('cat-grid')
   const ecrireSous = (t) => { if (subheadEl) subheadEl.textContent = t }
   document.getElementById('greeting-text')?.style.setProperty('display', 'none')
+
+  /* La copie d'abord : l'écran se remplit avant même que la requête parte. */
+  const entrepriseId = currentMembre.entreprise_id
+  const copie = lireGrille(entrepriseId)
+  if (copie) {
+    allCategoriesData = copie.categories
+    allGestionProcedures = copie.categories.flatMap(c => c.procsInCat || [])
+    renderCategoryGrid()
+    ecrireSous(copie.sous || '')
+    window.jalon?.('grille affich\u00e9e depuis la copie locale')
+  }
 
   // Membres et entreprise ne dépendent pas des procédures : les trois requêtes
   // partent ensemble au lieu de s'attendre. Un aller-retour réseau économisé,
@@ -6299,13 +6379,22 @@ async function loadGestionProcedures() {
   const fullMembres = membresFrais
 
   window.jalon?.('procédures + membres reçus')
-  if (error) { ecrireSous("Erreur : " + error.message); return }
+  if (error) {
+    /* Si la copie est déjà à l'écran, une panne réseau ne doit pas l'effacer :
+       on garde ce qui est là et on le signale, sans vider la page. */
+    if (copie) { toast('Liste non actualis\u00e9e : ' + error.message); return }
+    ecrireSous("Erreur : " + error.message); return
+  }
   allGestionProcedures = procedures
   cachedMembres = fullMembres || []
   cachedEntreprise = entrepriseRow || null
   cachedEmployes = cachedMembres.filter(m => m.role === 'equipe')
 
-  catGridEl.innerHTML = ''
+  /* On NE VIDE PAS la grille si la copie est à l'écran : on ne sait pas encore
+     si quelque chose a changé. La vider ici la faisait disparaître juste avant
+     qu'on décide de ne pas la redessiner — l'écran finissait vide.
+     `renderCategoryGrid` vide de toute façon avant de redessiner. */
+  if (!copie) catGridEl.innerHTML = ''
 
   if (procedures.length === 0) {
     renderAccueil()
@@ -6413,7 +6502,20 @@ async function loadGestionProcedures() {
     })
   }
 
-  window.jalon?.('validations reçues, grille prête')
+  window.jalon?.('validations re\u00e7ues, grille pr\u00eate')
+
+  /* Rien n'a bougé depuis la dernière ouverture : l'écran est déjà juste, on le
+     laisse tel quel. C'est le cas le plus fréquent — et c'est lui qui rend
+     l'ouverture instantanée au lieu de simplement rapide. */
+  const inchangee = copie && memeGrille(copie.categories, allCategoriesData)
+  rangerGrille(entrepriseId, allCategoriesData, document.getElementById('p-list-subhead')?.textContent || '')
+
+  if (inchangee) {
+    window.jalon?.('grille inchang\u00e9e, aucun redessin')
+    surveillerAnalyses()
+    return
+  }
+
   renderAccueil()
   renderCategoryGrid()
   surveillerAnalyses()

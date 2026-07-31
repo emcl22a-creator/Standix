@@ -849,7 +849,13 @@
   /* ═══ Tiroir des langues, sur la fiche d'une procédure ═══
      Il réutilise les classes du tiroir des établissements : même verre, même
      dépliage, même cascade. Une seule mécanique à comprendre et à maintenir. */
-  .tiroir-langue{ margin-bottom:6px; }
+  /* Le tiroir de langue est un outil de lecture, pas une navigation : il se tient
+     un cran en dessous de celui des établissements. */
+  .tiroir-langue{ margin-bottom:6px; width:38px; height:38px; flex:0 0 38px; }
+  .tiroir-langue .tiroir-liste{ height:38px; padding:3px; }
+  .tiroir-langue .rond-ent{ width:32px; height:32px; }
+  .tiroir-langue .rond-ent .code{ font-size:10.5px; }
+  .tiroir-langue .rond-ent .terre{ width:17px; height:17px; }
   .tiroir-langue .rond-ent .code{
     position:relative; font-size:12px; font-weight:750; letter-spacing:0.03em;
     color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.65), 0 0 9px rgba(0,0,0,0.45);

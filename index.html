@@ -934,17 +934,24 @@
   }
   .pm-recherche.remplie .vider{ display:flex; align-items:center; justify-content:center; }
 
-  /* Le bouton de promotion : une flèche qui monte, dans la langue de l'app. */
-  .pm-promo{
-    width:34px; height:34px; border-radius:50%; flex-shrink:0; border:none; padding:0;
+  /* Changer le rang : même tuile de verre que les réglages, glyphe au trait.
+     Pas de vert ni de rouge — monter et descendre ne sont ni un succès ni un
+     danger, ce sont deux mouvements symétriques. */
+  .pm-rang{
+    width:34px; height:34px; border-radius:10px; flex-shrink:0; border:none; padding:0;
     display:flex; align-items:center; justify-content:center;
-    background:rgba(48,209,88,0.14); color:var(--green);
+    background:rgba(255,255,255,0.08);
+    border:0.5px solid rgba(255,255,255,0.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .pm-promo:active{ transform:scale(0.9); }
-  .pm-promo svg{ width:17px; height:17px; }
+  .pm-rang:active{ transform:scale(0.9); }
+  .pm-rang svg{ width:18px; height:18px; display:block; }
 
-  /* ═══ Félicitations ═══ */
+  /* ═══ Félicitations ═══
+     Même forme que la carte d'accueil : le texte à gauche, le visage à droite
+     avec sa pastille verte. On ne crée pas un objet de plus pour une occasion
+     unique — on réutilise celui que la personne connaît déjà. */
   .fond-promu{
     position:fixed; inset:0; z-index:460; display:flex; align-items:center; justify-content:center;
     padding:24px; background:rgba(0,0,0,0.6);
@@ -953,41 +960,27 @@
   }
   .fond-promu.on{ opacity:1; pointer-events:auto; }
   .fen-promu{
-    position:relative; width:100%; max-width:340px; padding:28px 22px 20px;
-    border-radius:28px; text-align:center; overflow:hidden;
-    background:linear-gradient(168deg,#1E2026,#141519);
-    border:0.5px solid var(--border);
-    box-shadow:0 26px 64px rgba(0,0,0,0.62);
-    transform:scale(0.9) translateY(14px); opacity:0;
+    position:relative; width:100%; max-width:360px;
+    transform:scale(0.92) translateY(14px); opacity:0;
     transition:transform 0.46s cubic-bezier(0.34,1.4,0.5,1), opacity 0.32s ease;
   }
   .fond-promu.on .fen-promu{ transform:none; opacity:1; }
-  .fen-promu .lueur{
-    position:absolute; top:-70px; left:50%; transform:translateX(-50%);
-    width:260px; height:180px; pointer-events:none;
-    background:radial-gradient(ellipse, rgba(48,209,88,0.26), transparent 66%);
-  }
-  .fen-promu .visage{
-    position:relative; width:118px; height:118px; display:block; margin:0 auto 14px;
-    animation:promuArrive 0.62s cubic-bezier(0.34,1.42,0.5,1) 0.08s both;
+  /* La carte reprend l'accueil, avec un fond un cran plus présent : c'est un
+     moment, pas une ligne de plus dans une liste. */
+  .promu-carte{ background:linear-gradient(160deg,#1E2026,#141519); }
+  .promu-carte .accueil-av{
+    animation:promuArrive 0.62s cubic-bezier(0.34,1.42,0.5,1) 0.1s both;
   }
   @keyframes promuArrive{
-    from{ opacity:0; transform:scale(0.6) translateY(10px); }
+    from{ opacity:0; transform:scale(0.62) translateY(8px); }
     to{ opacity:1; transform:none; }
   }
-  .fen-promu h3{
-    position:relative; font-size:21px; font-weight:850; letter-spacing:-0.04em; margin-bottom:8px;
-  }
-  .fen-promu .s{
-    position:relative; font-size:13.5px; color:var(--label-2); line-height:1.5;
-    margin-bottom:20px;
-  }
-  .fen-promu .s b{ color:#fff; font-weight:700; }
   .fen-promu .avert{
-    position:relative; font-size:11.5px; color:var(--label-3); line-height:1.45; margin-top:12px;
+    font-size:11.5px; color:var(--label-3); line-height:1.45;
+    margin-top:12px; text-align:center;
   }
   @media (prefers-reduced-motion: reduce){
-    .fen-promu .visage{ animation:none; }
+    .promu-carte .accueil-av{ animation:none; }
   }
 
   /* ═══ Fenêtre d'un établissement ═══ */
@@ -2658,6 +2651,11 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Gérer l'équipe</h1>
     </div>
     <div class="subhead" id="pm-subhead">—</div>
+    <div class="filter-chips" id="pm-tri" style="margin-top:14px;">
+      <button type="button" data-tri="az" class="active">A → Z</button>
+      <button type="button" data-tri="neuf">Nouveau</button>
+      <button type="button" data-tri="vieux">Ancien</button>
+    </div>
     <div class="pm-recherche">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="16.2" y1="16.2" x2="20.6" y2="20.6"/></svg>
       <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
@@ -3277,7 +3275,7 @@
       <div id="settings-code" style="font-size:38px; font-weight:850; letter-spacing:0.28em; margin:10px 0 16px;">—</div>
       <button class="btn block" id="copy-code-btn">Copier le code</button>
     </div>
-    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder à vos procédures. Il ne donne aucun droit de modification.</div>
+    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder aux procédures. Il ne donne aucun droit de modification.</div>
   </div>
 
   <!-- Sous-page : les établissements -->
@@ -3310,15 +3308,18 @@
   <div class="screen" id="etab-section-titre" style="display:none;"></div>
 </div>
 
-<!-- Félicitations : cette personne vient d'être promue -->
+<!-- Félicitations : même forme que la carte d'accueil « Bonjour prénom » -->
 <div class="fond-promu" id="fond-promu">
   <div class="fen-promu" role="dialog" aria-modal="true">
-    <div class="lueur"></div>
-    <img class="visage" id="promu-visage" alt="" src="data:image/webp;base64,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">
-    <h3>Félicitations <span id="promu-prenom"></span></h3>
-    <div class="s">Vous êtes désormais <b>gestionnaire</b> de <span id="promu-entreprise">votre entreprise</span>.
-      Vous pouvez créer des procédures, suivre l'équipe et gérer les accès.</div>
-    <button type="button" class="btn block" id="promu-entrer">Accéder à l'espace Gestion</button>
+    <div class="accueil promu-carte">
+      <div class="accueil-texte">
+        <div class="t" id="promu-titre">Félicitations</div>
+        <div class="s">Vous êtes désormais <b>gestionnaire</b> de <span id="promu-entreprise">votre entreprise</span>.
+          Créez des procédures, suivez l'équipe, gérez les accès.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+    <button type="button" class="btn block" id="promu-entrer" style="margin-top:14px;">Accéder à l'espace Gestion</button>
     <div class="avert">L'espace Équipe ne vous sera plus accessible : vous êtes maintenant de l'autre côté.</div>
   </div>
 </div>
@@ -4806,6 +4807,15 @@ async function enterApp(membre) {
      choix — et les deux se superposaient, comme sur mobile. */
   document.getElementById('login-screen').style.display = 'none'
   document.getElementById('choice-screen').style.display = 'none'
+
+  /* Les deux espaces s'excluent. On masque LES DEUX avant d'en montrer un :
+     quelqu'un qui passe de l'équipe à la gestion — une promotion, par exemple —
+     gardait l'ancien affiché sous le nouveau, et voyait les deux à la fois. */
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('equipe-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  document.getElementById('tabbar-equipe').style.display = 'none'
+
   armerSurveillance()
 
   /* Le tiroir se dessine TOUT DE SUITE, avec ce qu'on sait déjà : la fiche
@@ -5207,6 +5217,7 @@ function placerPastille(conteneur, immediat) {
    mesurable tant qu'ils ne sont pas visibles. On repose donc la pastille à
    chaque affichage d'écran, et au redimensionnement. */
 function reposerPastilles(immediat) {
+  placerPastille(document.getElementById('pm-tri'), immediat)
   placerPastille(document.getElementById('analyse-period-toggle'), immediat)
   placerPastille(document.getElementById('ga-period-toggle'), immediat)
 }
@@ -6140,10 +6151,13 @@ function renderAccueil() {
   const possible = nbProcs * nbEmp
   const taux = possible ? Math.round((cachedValidations.length / possible) * 100) : 0
   const phrase =
-    taux >= 80 ? `Votre équipe suit très bien. <b>${taux} %</b> de vos procédures ont été lues.` :
-    taux >= 50 ? `Ça avance. <b>${taux} %</b> de vos procédures ont été lues par l'équipe.` :
-    taux >= 20 ? `<b>${taux} %</b> de vos procédures ont été lues. Un rappel à l'équipe ne ferait pas de mal.` :
-                 `Seulement <b>${taux} %</b> de vos procédures ont été lues. Affichez les QR codes sur les postes.`
+    /* « VOS procédures » ne vaut que pour le fondateur. Un gestionnaire promu
+       n'en est pas propriétaire : lui dire « vos » sonne faux, et laisse croire
+       qu'il porte une responsabilité qui n'est pas la sienne. */
+    taux >= 80 ? `L'équipe suit très bien. <b>${taux} %</b> des procédures ont été lues.` :
+    taux >= 50 ? `Ça avance. <b>${taux} %</b> des procédures ont été lues par l'équipe.` :
+    taux >= 20 ? `<b>${taux} %</b> des procédures ont été lues. Un rappel à l'équipe ne ferait pas de mal.` :
+                 `Seulement <b>${taux} %</b> des procédures ont été lues. Affichez les QR codes sur les postes.`
   mot.innerHTML = phrase
 }
 
@@ -6265,7 +6279,7 @@ function renderCategoryGrid() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
         </div>
         <div class="cat-badge">${procsInCat.length}</div>
       </div>
@@ -6485,7 +6499,7 @@ function renderCategoryProceduresListInterne() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></div>
         </div>
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
@@ -9085,7 +9099,7 @@ function renderEquipeCategories() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="19"
               stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
           </svg>
-          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</span>
+          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
@@ -9153,7 +9167,7 @@ function ficheEquipe(proc) {
           <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${couleur}"
             stroke-dasharray="${circonference}" stroke-dashoffset="${decalage}"/>
         </svg>
-        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</div>
+        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>
@@ -10104,7 +10118,8 @@ async function verifierPromotion(membre) {
   if (!membre.promu_par || membre.promu_vu) return
 
   const prenom = (membre.nom || '').trim().split(' ')[0]
-  document.getElementById('promu-prenom').textContent = prenom || ''
+  document.getElementById('promu-titre').textContent =
+    prenom ? `F\u00e9licitations ${prenom} \uD83C\uDF89` : 'F\u00e9licitations \uD83C\uDF89'
   document.getElementById('promu-entreprise').textContent =
     cachedEntreprise?.nom || 'votre entreprise'
 
@@ -10141,6 +10156,7 @@ document.getElementById('fond-promu')?.addEventListener('click', (e) => {
 
 let membresEquipe = []
 let filtreEquipe = ''
+let triEquipe = 'az'
 
 /* Le fondateur : le gestionnaire qui n'a été promu par personne. Tant que la
    colonne n'existe pas, tous les gestionnaires en sont — l'app reste utilisable
@@ -10197,11 +10213,24 @@ function peindreEquipe() {
     return
   }
 
-  const jePeuxPromouvoir = estFondateur(currentMembre)
+  /* Le tri s'applique après le filtre : on trie ce qu'on voit, pas ce qu'on
+     cherche. À nom égal, l'ancienneté départage — sans quoi deux homéonymes
+     changeraient de place à chaque affichage. */
+  const parNom = (a, b) => (a.nom || '').localeCompare(b.nom || '', 'fr', { sensitivity: 'base' })
+  const parDate = (a, b) => new Date(a.created_at || 0) - new Date(b.created_at || 0)
+  const tries = [...vus].sort((a, b) =>
+    triEquipe === 'neuf' ? (parDate(b, a) || parNom(a, b))
+    : triEquipe === 'vieux' ? (parDate(a, b) || parNom(a, b))
+    : (parNom(a, b) || parDate(a, b)))
 
-  liste.innerHTML = vus.map(m => {
+  const jePeuxChangerLeRang = estFondateur(currentMembre)
+
+  liste.innerHTML = tries.map(m => {
     const soi = m.id === currentMembre.id
-    const promouvable = jePeuxPromouvoir && !soi && m.role !== 'gestion'
+    const promouvable = jePeuxChangerLeRang && !soi && m.role !== 'gestion'
+    /* On ne rétrograde pas un fondateur : ce serait se retirer soi-même la
+       dernière clé de l'entreprise. */
+    const retrogradable = jePeuxChangerLeRang && !soi && m.role === 'gestion' && !estFondateur(m)
     const date = m.created_at
       ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
       : '\u2014'
@@ -10216,9 +10245,19 @@ function peindreEquipe() {
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
           <div class="pm-role">${rang} \u00b7 depuis le ${date}</div>
         </div>
-        ${promouvable ? `<button type="button" class="pm-promo" data-promo="${m.id}"
-          data-nom="${escapeHtml(m.nom || '')}" aria-label="Promouvoir en gestion" title="Promouvoir en gestion">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6"/><path d="m6 12 6-6 6 6"/></svg>
+        ${promouvable ? `<button type="button" class="pm-rang" data-promo="${m.id}"
+          data-nom="${escapeHtml(m.nom || '')}" aria-label="Passer en gestion" title="Passer en gestion">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 19.4V5.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M6.6 11 12 5.6 17.4 11" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>` : ''}
+        ${retrogradable ? `<button type="button" class="pm-rang" data-retro="${m.id}"
+          data-nom="${escapeHtml(m.nom || '')}" aria-label="Repasser en \u00e9quipe" title="Repasser en \u00e9quipe">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 4.6v13.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M17.4 13 12 18.4 6.6 13" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </button>` : ''}
         ${soi ? '' : `<button type="button" class="pm-suppr" data-membre="${m.id}" data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
@@ -10233,6 +10272,15 @@ document.getElementById('pm-chercher')?.addEventListener('input', (e) => {
   document.querySelector('.pm-recherche')?.classList.toggle('remplie', !!filtreEquipe)
   peindreEquipe()
 })
+document.getElementById('pm-tri')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-tri]')
+  if (!b) return
+  triEquipe = b.dataset.tri
+  document.querySelectorAll('#pm-tri button').forEach(x => x.classList.toggle('active', x === b))
+  placerPastille(document.getElementById('pm-tri'))
+  peindreEquipe()
+})
+
 document.getElementById('pm-vider')?.addEventListener('click', () => {
   filtreEquipe = ''
   const champ = document.getElementById('pm-chercher')
@@ -10289,6 +10337,46 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   if (m) { m.role = 'gestion'; m.promu_par = currentMembre.id }
   peindreEquipe()
   toast(`${nom} est d\u00e9sormais en gestion.`)
+})
+
+document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-retro]')
+  if (!btn) return
+  if (!estFondateur(currentMembre)) return
+
+  const nom = btn.dataset.nom || 'cette personne'
+  const ok = await confirmDialog({
+    titre: `Repasser ${nom} en \u00e9quipe ?`,
+    message: `${nom} perdra l'acc\u00e8s \u00e0 la gestion et retrouvera l'espace \u00c9quipe. ` +
+      `Les proc\u00e9dures qu'elle a cr\u00e9\u00e9es restent en place.`,
+    confirmer: 'Repasser en \u00e9quipe',
+    annuler: 'Annuler',
+    danger: true,
+  })
+  if (!ok) return
+
+  /* On efface aussi la trace de promotion : si cette personne est promue à
+     nouveau plus tard, elle doit revoir les félicitations. */
+  let { data, error } = await supabase.from('membres')
+    .update({ role: 'equipe', promu_par: null, promu_le: null, promu_vu: false })
+    .eq('id', btn.dataset.retro).select('id')
+
+  if (error) {
+    const repli = await supabase.from('membres')
+      .update({ role: 'equipe' }).eq('id', btn.dataset.retro).select('id')
+    data = repli.data; error = repli.error
+  }
+
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  if (!data || !data.length) {
+    toast("La base a refus\u00e9 la modification. Ex\u00e9cutez migration-promotion.sql.")
+    return
+  }
+
+  const m = membresEquipe.find(x => x.id === btn.dataset.retro)
+  if (m) { m.role = 'equipe'; m.promu_par = null }
+  peindreEquipe()
+  toast(`${nom} est repass\u00e9 en \u00e9quipe.`)
 })
 
 document.getElementById('pm-liste')?.addEventListener('click', async (e) => {

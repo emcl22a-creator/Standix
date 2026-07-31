@@ -1974,7 +1974,11 @@
      blanc, mêmes épaisseurs, mêmes opacités. À 18 pixels on ne peut pas étager
      trois plans comme sur les grandes icônes — on garde le contour de devant
      à 75 % et les lignes de contenu à 35 %, ce qui donne le même grain. */
-  .cat-icon svg{ width:17px; height:17px; display:block; }
+  /* `.cat-ring-wrap svg` fait tourner l'anneau de − 90° pour que sa jauge parte
+     du haut. Ce sélecteur atteignait AUSSI le svg de l'icône, qui était donc
+     affichée couchée. C'est pour ça qu'elle n'a jamais semblé droite, quel que
+     soit le dessin. */
+  .cat-icon svg{ width:17px; height:17px; display:block; transform:none; }
   .cat-badge{
     font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
@@ -3313,8 +3317,8 @@
   <div class="fen-promu" role="dialog" aria-modal="true">
     <div class="accueil promu-carte">
       <div class="accueil-texte">
-        <div class="t">Aucune entreprise</div>
-        <div class="s">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 5 chiffres
+        <div class="t" id="orph-titre">Aucune entreprise</div>
+        <div class="s" id="orph-texte">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 5 chiffres
           que votre responsable vous a communiqué.</div>
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
@@ -3324,6 +3328,7 @@
     <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
     <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
     <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
+    <button type="button" class="btn ghost block" id="orph-annuler" style="margin-top:6px; display:none;">Annuler</button>
   </div>
 </div>
 
@@ -6308,7 +6313,7 @@ function renderCategoryGrid() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></div>
         </div>
         <div class="cat-badge">${procsInCat.length}</div>
       </div>
@@ -6528,7 +6533,7 @@ function renderCategoryProceduresListInterne() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
         </div>
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
@@ -9128,7 +9133,7 @@ function renderEquipeCategories() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="19"
               stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
           </svg>
-          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</span>
+          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
@@ -9196,7 +9201,7 @@ function ficheEquipe(proc) {
           <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${couleur}"
             stroke-dasharray="${circonference}" stroke-dashoffset="${decalage}"/>
         </svg>
-        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</div>
+        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>
@@ -9883,7 +9888,7 @@ document.addEventListener('click', (e) => {
        derrière le même bouton, parce que c'est la même intention : « j'en veux
        un de plus ». */
     if (currentMembre?.role === 'gestion') ouvrirFenetreEtab(null)
-    else { openEquipeSettings(); setTimeout(() => document.getElementById('es-code')?.focus(), 400) }
+    else montrerOrphelin(true)
     return
   }
   if (e.target.closest('#tiroir-ent')) return
@@ -10197,14 +10202,40 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 
 /* ── Un compte sans entreprise ───────────────────────────────── */
 
-function montrerOrphelin() {
+/* La même fenêtre sert à deux moments : un compte sans entreprise, et quelqu'un
+   qui veut en rejoindre une de plus. Le besoin est le même — un code à saisir —
+   seule la sortie diffère : se déconnecter dans un cas, annuler dans l'autre. */
+function montrerOrphelin(enPlus) {
   const f = document.getElementById('fond-orphelin')
   if (!f) return
-  document.getElementById('orph-erreur').textContent = ''
-  document.getElementById('orph-code').value = ''
+
+  const el = (i) => document.getElementById(i)
+  el('orph-erreur').textContent = ''
+  el('orph-code').value = ''
+
+  if (enPlus) {
+    el('orph-titre').textContent = 'Rejoindre une entreprise'
+    el('orph-texte').textContent =
+      "Entrez le code \u00e0 5 chiffres que son responsable vous a communiqu\u00e9. " +
+      "Elle s'ajoutera \u00e0 celles que vous avez d\u00e9j\u00e0."
+    el('orph-sortir').style.display = 'none'
+    el('orph-annuler').style.display = 'block'
+  } else {
+    el('orph-titre').textContent = 'Aucune entreprise'
+    el('orph-texte').textContent =
+      "Votre compte n'est rattach\u00e9 \u00e0 aucune entreprise. Entrez le code \u00e0 5 chiffres " +
+      "que votre responsable vous a communiqu\u00e9."
+    el('orph-sortir').style.display = 'block'
+    el('orph-annuler').style.display = 'none'
+  }
+
   f.classList.add('on')
-  setTimeout(() => document.getElementById('orph-code')?.focus(), 320)
+  setTimeout(() => el('orph-code')?.focus(), 320)
 }
+
+document.getElementById('orph-annuler')?.addEventListener('click', () => {
+  document.getElementById('fond-orphelin')?.classList.remove('on')
+})
 
 document.getElementById('orph-sortir')?.addEventListener('click', () => {
   document.getElementById('fond-orphelin')?.classList.remove('on')

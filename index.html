@@ -590,7 +590,7 @@
      comptent sont détaillés, le reste tient sur une ligne.
      ═════════════════════════════════════════════════════════════════ */
   .abo-scene{
-    position:relative; margin-top:14px; padding:24px 16px 18px; border-radius:26px;
+    position:relative; margin-top:14px; padding:28px 16px 22px; border-radius:28px;
     background:linear-gradient(168deg,#17181D,#101114);
     border:0.5px solid var(--border); overflow:hidden;
   }
@@ -599,20 +599,20 @@
     width:320px; height:210px; pointer-events:none;
     background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
   }
-  .abo-hi{ position:relative; text-align:center; margin-bottom:18px; padding-top:6px; }
-  .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px; }
+  .abo-hi{ position:relative; text-align:center; margin-bottom:22px; padding-top:8px; }
+  .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.2; margin-bottom:9px; }
   .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
   .abo-hi b{ color:#fff; font-weight:650; }
   .abo-conf{
-    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;
+    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:18px;
     font-size:10.5px; color:var(--label-3); font-weight:600;
   }
   #abo-liste{ display:none; margin-top:12px; }
   #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
 
   .offre-carte{
-    position:relative; padding:18px 16px 16px; border-radius:22px;
-    background:var(--bg-card); border:1px solid var(--border); margin-bottom:10px;
+    position:relative; padding:22px 18px 18px; border-radius:24px;
+    background:var(--bg-card); border:1px solid var(--border); margin-bottom:12px;
   }
   .offre-carte.vedette{ border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.07); }
   .offre-ruban{
@@ -631,31 +631,38 @@
   .offre-prix .v{ font-size:26px; font-weight:850; letter-spacing:-0.055em; line-height:1; }
   .offre-prix .u{ display:block; font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:4px; }
   .offre-parmembre{
-    font-size:11.5px; color:var(--label-3); margin-top:9px;
-    padding-top:9px; border-top:0.5px solid var(--border);
+    font-size:12px; color:var(--label-3); line-height:1.5; margin-top:14px;
+    padding-top:14px; border-top:0.5px solid var(--border);
   }
   .offre-parmembre b{ color:#fff; font-weight:700; }
 
   /* Les avantages qui comptent : titre net, une phrase qui dit ce qu'on y gagne. */
-  .offre-phares{ display:flex; flex-direction:column; gap:12px; margin-top:14px; }
-  .offre-phare{ display:flex; gap:11px; }
+  /* Un intertitre discret : il dit que ce qui suit est ce qu'on GAGNE, et non
+     une liste de plus. */
+  .offre-etiq{
+    font-size:10.5px; font-weight:750; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.06em;
+    margin-top:20px; padding-top:16px; border-top:0.5px solid var(--border);
+  }
+  .offre-phares{ display:flex; flex-direction:column; gap:16px; margin-top:14px; }
+  .offre-phare{ display:flex; gap:13px; }
   .offre-phare .p{
-    flex-shrink:0; width:26px; height:26px; border-radius:8px; margin-top:1px;
+    flex-shrink:0; width:30px; height:30px; border-radius:9px; margin-top:1px;
     display:flex; align-items:center; justify-content:center;
     background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
   }
-  .offre-phare .p svg{ width:15px; height:15px; display:block; }
+  .offre-phare .p svg{ width:17px; height:17px; display:block; }
   .offre-phare .t{ display:block; font-size:14px; font-weight:700; letter-spacing:-0.02em; }
-  .offre-phare .s{ display:block; font-size:12.5px; color:var(--label-2); line-height:1.45; margin-top:2px; }
+  .offre-phare .s{ display:block; font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:4px; }
 
   .offre-aussi{
-    font-size:12px; color:var(--label-3); line-height:1.5;
-    margin-top:13px; padding-top:12px; border-top:0.5px solid var(--border);
+    font-size:12.5px; color:var(--label-3); line-height:1.55;
+    margin-top:18px; padding-top:16px; border-top:0.5px solid var(--border);
   }
   .offre-aussi b{ color:var(--label-2); font-weight:600; }
 
   .offre-cta{
-    width:100%; height:48px; margin-top:15px; border:none; border-radius:15px;
+    width:100%; height:50px; margin-top:20px; border:none; border-radius:15px;
     font-family:inherit; font-size:14.5px; font-weight:700; background:#fff; color:#000;
   }
   .offre-carte:not(.vedette) .offre-cta{
@@ -663,7 +670,7 @@
     height:42px; font-size:13px;
   }
   .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
-  .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:9px; }
+  .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:11px; }
   .offre-annuel b{ color:var(--green); font-weight:700; }
 
   /* ═══════════════════════════════════════════════════════════════════
@@ -9311,7 +9318,7 @@ const OFFRES = [
       { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es', s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
       { p: 'main', t: 'Cr\u00e9ation depuis vos documents', s: "Un PDF, un Word, une note de service : l'IA en tire les \u00e9tapes." },
     ],
-    aussi: '\u00c9tapes \u00e9crites et photos \u00b7 QR code \u00e0 afficher au poste \u00b7 suivi des lectures \u00b7 <b>10 vid\u00e9os analys\u00e9es par mois</b>',
+    aussi: '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste, suivi des lectures, <b>10 vid\u00e9os analys\u00e9es par mois</b>.',
   },
   {
     cle: 'equipe', nom: '\u00c9quipe', max: 15, prix: 79,
@@ -9320,7 +9327,7 @@ const OFFRES = [
       { p: 'monde', t: 'Chacun lit dans sa langue', s: 'Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez.' },
       { p: 'suivi', t: 'Vous savez qui a lu quoi', s: 'Par personne, par cat\u00e9gorie, avec le temps pass\u00e9 sur chaque proc\u00e9dure.' },
     ],
-    aussi: 'Tout Essentiel \u00b7 m\u00e9dailles d\'assiduit\u00e9 \u00b7 relance des retardataires',
+    aussi: 'M\u00e9dailles d\'assiduit\u00e9, relance des retardataires, <b>et tout ce que contient Essentiel</b>.',
   },
   {
     cle: 'pro', nom: 'Pro', max: 40, prix: 149,
@@ -9328,7 +9335,7 @@ const OFFRES = [
       { p: 'sites', t: 'Plusieurs \u00e9tablissements', s: 'Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe.' },
       { p: 'suivi', t: 'Vue consolid\u00e9e', s: "Comparez vos sites d'un coup d'\u0153il, sans changer de compte." },
     ],
-    aussi: 'Tout \u00c9quipe \u00b7 proc\u00e9dures partag\u00e9es entre les sites',
+    aussi: 'Proc\u00e9dures partag\u00e9es entre les sites, <b>et tout ce que contient \u00c9quipe</b>.',
   },
   {
     cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
@@ -9336,7 +9343,7 @@ const OFFRES = [
       { p: 'main', t: 'On s\'installe avec vous', s: 'Reprise de vos proc\u00e9dures existantes et formation de vos responsables.' },
       { p: 'infini', t: 'Un interlocuteur d\u00e9di\u00e9', s: 'Une personne qui conna\u00eet votre organisation, joignable directement.' },
     ],
-    aussi: 'Tout Pro \u00b7 connexion par votre annuaire \u00b7 engagement de disponibilit\u00e9 \u00e9crit',
+    aussi: 'Connexion par votre annuaire, engagement de disponibilit\u00e9 \u00e9crit, <b>et tout ce que contient Pro</b>.',
   },
 ]
 
@@ -9375,7 +9382,8 @@ function carteOffre(o, opts = {}) {
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
     ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne et par mois</b>.</div>` : ''}
-    ${opts.detaille ? `<div class="offre-phares">
+    ${opts.detaille ? `<div class="offre-etiq">Ce que vous d\u00e9bloquez</div>
+    <div class="offre-phares">
       ${o.phares.map(f => `<div class="offre-phare">
         <span class="p">${PICTOS[f.p]}</span>
         <span><span class="t">${f.t}</span><span class="s">${f.s}</span></span>

@@ -766,7 +766,13 @@
     background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
   }
   .abo-hi{ position:relative; text-align:center; margin-bottom:22px; padding-top:8px; }
-  .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.2; margin-bottom:9px; }
+  /* La même écriture que les titres de page — « Paramètres », « Abonnement » :
+     700 de graisse et − 0,02 em d'espacement. Le 850 et le − 0,05 em précédents
+     venaient d'ailleurs, et cette page détonnait dans l'app. */
+  .abo-hi h2{
+    font-size:24px; font-weight:700; letter-spacing:-0.02em;
+    line-height:1.25; margin-bottom:9px;
+  }
   .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
   .abo-hi b{ color:#fff; font-weight:650; }
   /* La promesse tient en une phrase : autant la mettre là où l'on hésite, juste
@@ -802,10 +808,10 @@
      n'apportait rien qu'un chiffre ne dise mieux. */
   .offre-tete{ display:flex; align-items:flex-start; gap:12px; }
   .offre-txt{ flex:1; min-width:0; }
-  .offre-nom{ display:block; font-size:19px; font-weight:850; letter-spacing:-0.04em; }
+  .offre-nom{ display:block; font-size:19px; font-weight:700; letter-spacing:-0.02em; }
   .offre-taille{ display:block; font-size:12.5px; color:var(--label-2); margin-top:3px; }
   .offre-prix{ text-align:right; flex-shrink:0; }
-  .offre-prix .v{ font-size:26px; font-weight:850; letter-spacing:-0.055em; line-height:1; }
+  .offre-prix .v{ font-size:26px; font-weight:700; letter-spacing:-0.02em; line-height:1; }
   .offre-prix .u{ display:block; font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:4px; }
   .offre-parmembre{
     font-size:12px; color:var(--label-3); line-height:1.5; margin-top:14px;
@@ -1013,9 +1019,6 @@
   /* ═══ La page des offres ═══
      Ces règles avaient disparu en réécrivant le bloc voisin : la page s'affichait
      sans son cadre, sans son halo et sans ses rassurances. */
-  .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px; }
-  .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
-  .abo-hi b{ color:#fff; font-weight:650; }
   /* Le bleu du halo, et lui seul. Le vert dit « terminé » ailleurs dans l'app :
      l'employer ici pour un prix brouillerait les deux. */
   .offre-annuel b{ color:#5EA0FF; font-weight:700; }
@@ -1745,7 +1748,24 @@
   .video-frame video{width:100%; height:100%; object-fit:contain;}
 
   .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px; margin-bottom:10px; }
+  /* Le champ occupait toute la ligne sans se distinguer du reste : on ne voyait
+     pas où écrire, ni jusqu'où. Il a maintenant son propre cadre, comme tous les
+     champs de l'app, et il s'étend en hauteur à mesure qu'on tape. */
   .step-edit-item .step-row-top{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+  .step-edit-item textarea{
+    min-height:44px; padding:11px 12px !important;
+    border-radius:12px !important;
+    background:rgba(255,255,255,0.06) !important;
+    border:0.5px solid rgba(255,255,255,0.14) !important;
+    font-size:15px !important; line-height:1.45 !important;
+    transition:border-color 0.2s, background 0.2s;
+  }
+  .step-edit-item textarea:focus{
+    outline:none;
+    border-color:rgba(94,160,255,0.55) !important;
+    background:rgba(94,160,255,0.07) !important;
+  }
+  .step-edit-item textarea::placeholder{ color:var(--label-3); }
   .step-edit-item .step-num{
     width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff;
     display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px;
@@ -2966,6 +2986,7 @@
       <button type="button" class="oter" style="display:none;">Retirer</button>
     </div>
 
+    <div class="section-title" style="margin-top:22px;">Les étapes</div>
     <div id="manual-steps-list"></div>
     <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
 
@@ -6805,10 +6826,71 @@ function openCategoryProcedures(nom) {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENOMMER UNE CATÉGORIE
+
+   La catégorie n'est pas une table : c'est une colonne de texte sur chaque
+   procédure. La renommer, c'est réécrire ce texte sur toutes celles qui la
+   portent — d'un seul appel, filtré sur l'ancien nom.
+
+   Conséquence à connaître : deux catégories fusionnent si on donne à l'une le
+   nom de l'autre. C'est cohérent avec ce qu'est une catégorie ici, et c'est même
+   le seul moyen de les regrouper. On prévient donc au lieu d'interdire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+document.getElementById('cat-renommer')?.addEventListener('click', async () => {
+  /* Le nom courant se lit dans le titre : c'est la seule source de vérité, la
+     page ne le garde nulle part ailleurs. */
+  const ancien = (document.getElementById('category-titre')?.textContent || '').trim()
+  if (!ancien || toutesProcedures) return
+
+  const nouveau = await demanderTexte({
+    titre: 'Renommer la cat\u00e9gorie',
+    message: `Toutes les proc\u00e9dures class\u00e9es dans \u00ab ${ancien} \u00bb suivront.`,
+    valeur: ancien,
+    placeholder: 'Nom de la cat\u00e9gorie',
+    confirmer: 'Renommer',
+  })
+  if (!nouveau || nouveau === ancien) return
+
+  // Une catégorie de ce nom existe déjà : on le dit, on ne l'empêche pas.
+  const existe = allGestionProcedures.some(p =>
+    (p.categorie || '').toLowerCase() === nouveau.toLowerCase())
+  if (existe) {
+    const ok = await confirmDialog({
+      titre: `Fusionner avec ${nouveau} ?`,
+      message: `Une cat\u00e9gorie \u00ab ${nouveau} \u00bb existe d\u00e9j\u00e0. Les proc\u00e9dures de \u00ab ${ancien} \u00bb ` +
+        `la rejoindront, et \u00ab ${ancien} \u00bb dispara\u00eetra.`,
+      confirmer: 'Fusionner', annuler: 'Annuler', danger: false,
+    })
+    if (!ok) return
+  }
+
+  const { data, error } = await supabase.from('procedures')
+    .update({ categorie: nouveau })
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .eq('categorie', ancien)
+    .select('id')
+
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  if (!data || !data.length) { toast('La base a refus\u00e9 la modification.'); return }
+
+  document.getElementById('category-titre').textContent = nouveau
+  /* On recharge : les regroupements par catégorie sont construits au chargement,
+     et c'est le seul endroit qui les construit. */
+  await loadGestionProcedures()
+  ouvrirCategorie(nouveau)
+  toast(`${data.length} proc\u00e9dure${data.length > 1 ? 's' : ''} reclass\u00e9e${data.length > 1 ? 's' : ''}.`)
+})
+
 function ouvrirCategorie(nom) {
   toutesProcedures = (nom == null)
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = toutesProcedures ? 'Toutes les procédures' : nom
+  /* Rien à renommer quand on regarde tout : « Toutes les procédures » n'est pas
+     une catégorie, c'est une vue. */
+  const btnRenommer = document.getElementById('cat-renommer')
+  if (btnRenommer) btnRenommer.style.display = toutesProcedures ? 'none' : 'flex'
   document.getElementById('category-search-input').value = ''
   document.getElementById('category-search-input').placeholder = toutesProcedures
     ? 'Rechercher parmi toutes les procédures...'

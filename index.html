@@ -38,7 +38,7 @@
   html, body{
     background:#0C0D0E; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
     color:var(--label); font-size:17px; line-height:1.32; letter-spacing:-0.02em;
-    -webkit-font-smoothing:antialiased; min-height:100vh; overflow-x:hidden; position:relative;
+    -webkit-font-smoothing:antialiased; min-height:100dvh; overflow-x:hidden; position:relative;
     -webkit-text-size-adjust:100%; text-size-adjust:100%;
   }
   button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit; padding:0;}
@@ -111,7 +111,17 @@
 
 
 
-  .app{ position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto; min-height:100vh; padding-bottom:120px; }
+  /* `100vh` dépasse l'écran réellement visible sur téléphone : il ignore la barre
+     d'adresse. La page était donc TOUJOURS plus haute que l'écran, même avec deux
+     catégories, d'où ce grand vide sous la barre d'onglets. `100dvh` suit la
+     hauteur réellement disponible.
+
+     Le dégagement du bas est porté par l'écran, pas par l'app : ici il
+     s'ajoutait à celui de l'écran, et les deux se cumulaient. */
+  .app{
+    position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto;
+    min-height:100dvh;
+  }
   .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 18px 0; }
 
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
@@ -148,7 +158,14 @@
   .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
   .icon-pill svg{ width:20px; height:20px; }
 
-  .screen{display:none; padding:92px 20px 40px;}
+  /* Le bas réserve exactement la place de la barre d'onglets : sa hauteur, son
+     décalage, et un peu d'air. Rien de plus — c'est constant, quel que soit le
+     nombre de catégories, puisque la barre ne change pas de taille. Le contenu,
+     lui, pousse naturellement. */
+  .screen{
+    display:none;
+    padding:92px 20px calc(66px + max(20px, env(safe-area-inset-bottom)) + 18px);
+  }
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
   @keyframes appShellIn{
@@ -654,7 +671,12 @@
   /* Une ligne qui détruit n'a ni tuile ni chevron : rien à explorer, seulement
      un acte. Elle est centrée et rouge, comme chez Apple. */
   .reg-ligne.danger{ justify-content:center; padding:13px 14px; }
-  .reg-ligne.danger .reg-nm{ flex:0; font-size:15px; font-weight:650; color:var(--red); }
+  /* `flex:0` mettait la base à zéro : le libellé se repliait sur lui-même.
+     `flex:none` le laisse à sa largeur naturelle. */
+  .reg-ligne.danger .reg-nm{
+    flex:none; white-space:nowrap;
+    font-size:15px; font-weight:650; color:var(--red);
+  }
 
   .reg-note{
     font-size:12px; color:var(--label-3); line-height:1.5;
@@ -681,6 +703,9 @@
   }
   .etab-ligne .rond-ent .ini{ font-size:13px; }
   .etab-ligne .rond-ent.plus{ background:#fff; border-color:transparent; }
+  .etab-ligne .rond-ent.plus .ini{
+    color:#000; font-size:26px; font-weight:400; line-height:0; margin-top:-1px; text-shadow:none;
+  }
   .etab-ligne .tx{ flex:1; min-width:0; }
   .etab-ligne .nm{
     display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em;
@@ -703,6 +728,32 @@
      et le signe distinctif en blanc plein. Ce qui change d'une offre à l'autre,
      c'est le NOMBRE de fiches — une, deux, plusieurs, un réseau. Le dessin dit
      donc la même chose que le prix. */
+  /* ═══ La page des offres ═══
+     Ces règles avaient disparu en réécrivant le bloc voisin : la page s'affichait
+     sans son cadre, sans son halo et sans ses rassurances. */
+  .abo-scene{
+    position:relative; margin-top:14px; padding:24px 16px 18px; border-radius:26px;
+    background:linear-gradient(168deg,#17181D,#101114);
+    border:0.5px solid var(--border); overflow:hidden;
+  }
+  .abo-halo{
+    position:absolute; top:-90px; left:50%; transform:translateX(-50%);
+    width:300px; height:200px; pointer-events:none;
+    background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
+  }
+  .abo-hi{ position:relative; text-align:center; margin-bottom:18px; padding-top:6px; }
+  .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px; }
+  .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
+  .abo-hi b{ color:#fff; font-weight:650; }
+  .abo-conf{
+    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;
+    font-size:10.5px; color:var(--label-3); font-weight:600;
+  }
+  .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:9px; }
+  .offre-annuel b{ color:var(--green); font-weight:700; }
+  #abo-liste{ display:none; margin-top:12px; }
+  #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
+
   .offre-carte{
     position:relative; padding:18px 16px; border-radius:20px;
     background:var(--bg-card); border:1px solid var(--border); margin-bottom:11px;
@@ -6079,7 +6130,7 @@ function renderCategoryGrid() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon">${icone}</div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M2.8 17V6.6a1.8 1.8 0 0 1 1.8-1.8h4.1l1.8 2.2h7.1a1.8 1.8 0 0 1 1.8 1.8v1.9" stroke="rgba(255,255,255,0.35)" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.4 10.7h19.2l-1.7 7.6a2 2 0 0 1-1.9 1.5H6a2 2 0 0 1-2-1.5Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
         </div>
         <div class="cat-badge">${procsInCat.length}</div>
       </div>
@@ -6299,7 +6350,7 @@ function renderCategoryProceduresListInterne() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4.2" y="3.4" width="15.6" height="17.2" rx="2.6" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><path d="M9 3.4v2.2h6V3.4" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8" y1="10.4" x2="16" y2="10.4" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="14.2" x2="16" y2="14.2" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="18" x2="12.6" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4.4" y="4.4" width="15.2" height="16.2" rx="2.6" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><rect x="9" y="2.6" width="6" height="3.6" rx="1.4" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><line x1="8" y1="11.2" x2="16" y2="11.2" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="14.6" x2="16" y2="14.6" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="18" x2="12.4" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg></div>
         </div>
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
@@ -8899,7 +8950,7 @@ function renderEquipeCategories() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="19"
               stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
           </svg>
-          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 8A1.8 1.8 0 0 1 4.4 6.2h4l1.7 2.1h8A1.8 1.8 0 0 1 20 10.1v1.1" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M3.4 11.2h18.2l-2 7.2a1.8 1.8 0 0 1-1.7 1.3H5.1a1.8 1.8 0 0 1-1.7-1.3Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/></svg>`}</span>
+          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M2.8 17V6.6a1.8 1.8 0 0 1 1.8-1.8h4.1l1.8 2.2h7.1a1.8 1.8 0 0 1 1.8 1.8v1.9" stroke="rgba(255,255,255,0.35)" stroke-width="1.6" stroke-linejoin="round"/><path d="M2.4 10.7h19.2l-1.7 7.6a2 2 0 0 1-1.9 1.5H6a2 2 0 0 1-2-1.5Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/></svg>`}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
@@ -8967,7 +9018,7 @@ function ficheEquipe(proc) {
           <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${couleur}"
             stroke-dasharray="${circonference}" stroke-dashoffset="${decalage}"/>
         </svg>
-        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><rect x="4.2" y="3.4" width="15.6" height="17.2" rx="2.6" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><path d="M9 3.4v2.2h6V3.4" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8" y1="10.4" x2="16" y2="10.4" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="14.2" x2="16" y2="14.2" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="18" x2="12.6" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</div>
+        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><rect x="4.4" y="4.4" width="15.2" height="16.2" rx="2.6" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><rect x="9" y="2.6" width="6" height="3.6" rx="1.4" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><line x1="8" y1="11.2" x2="16" y2="11.2" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="14.6" x2="16" y2="14.6" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="18" x2="12.4" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>

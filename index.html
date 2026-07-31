@@ -769,6 +769,15 @@
   .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.2; margin-bottom:9px; }
   .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
   .abo-hi b{ color:#fff; font-weight:650; }
+  /* La promesse tient en une phrase : autant la mettre là où l'on hésite, juste
+     avant d'aller comparer les autres offres. */
+  .abo-egal{
+    margin-top:18px; padding:12px 14px; border-radius:14px;
+    background:rgba(94,160,255,0.10); border:0.5px solid rgba(94,160,255,0.24);
+    font-size:12.5px; color:var(--label-2); line-height:1.5; text-align:center;
+  }
+  .abo-egal b{ color:#fff; font-weight:700; }
+
   .abo-conf{
     display:flex; align-items:center; justify-content:center; gap:14px; margin-top:18px;
     font-size:10.5px; color:var(--label-3); font-weight:600;
@@ -3350,7 +3359,9 @@
         <span>✓ 14 jours d'essai</span>
         <span>✓ Sans carte</span>
       </div>
-      <button type="button" class="btn ghost block" id="abo-autres" style="margin-top:14px;">Voir les autres offres</button>
+      <div class="abo-egal">Toutes les offres donnent accès à <b>tout</b>.
+        Seule la taille de l'équipe change le prix.</div>
+      <button type="button" class="btn ghost block" id="abo-autres" style="margin-top:10px;">Voir les autres offres</button>
       <div id="abo-liste"></div>
     </div>
 
@@ -10170,48 +10181,43 @@ const PICTOS = {
    avantages PHARES, détaillés — ce qu'on y gagne, en une phrase — puis le reste
    sur une seule ligne. Une liste à puces de dix lignes ne se lit pas ; deux
    promesses expliquées, oui. */
-const OFFRES = [
-  {
-    cle: 'essentiel', nom: 'Essentiel', max: 5, prix: 39,
-    phares: [
-      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe',
-        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o. Dix vid\u00e9os par mois." },
-      { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es', s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
-      { p: 'main', t: 'Cr\u00e9ation depuis vos documents', s: "Un PDF, un Word, une note de service : l'IA en tire les \u00e9tapes." },
-    ],
-    aussi: '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste, suivi des lectures, <b>10 vid\u00e9os analys\u00e9es par mois</b>.',
-  },
-  {
-    cle: 'equipe', nom: '\u00c9quipe', max: 15, prix: 79,
-    phares: [
-      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe \u2014 sans limite',
-        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o. Autant de vid\u00e9os que vous voulez." },
-      { p: 'monde', t: 'Chacun lit dans sa langue', s: 'Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez.' },
-      { p: 'suivi', t: 'Vous savez qui a lu quoi', s: 'Par personne, par cat\u00e9gorie, avec le temps pass\u00e9 sur chaque proc\u00e9dure.' },
-    ],
-    aussi: 'M\u00e9dailles d\'assiduit\u00e9, relance des retardataires, <b>et tout ce que contient Essentiel</b>.',
-  },
-  {
-    cle: 'pro', nom: 'Pro', max: 40, prix: 149,
-    phares: [
-      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe \u2014 sans limite',
-        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o." },
-      { p: 'sites', t: 'Plusieurs \u00e9tablissements', s: 'Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe.' },
-      { p: 'suivi', t: 'Vue consolid\u00e9e', s: "Comparez vos sites d'un coup d'\u0153il, sans changer de compte." },
-    ],
-    aussi: 'Proc\u00e9dures partag\u00e9es entre les sites, <b>et tout ce que contient \u00c9quipe</b>.',
-  },
-  {
-    cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
-    phares: [
-      { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe \u2014 sans limite',
-        s: "Montrez le geste en le commentant. L'IA transcrit, d\u00e9taille chaque \u00e9tape et l'horodate sur la vid\u00e9o." },
-      { p: 'main', t: 'On s\'installe avec vous', s: 'Reprise de vos proc\u00e9dures existantes et formation de vos responsables.' },
-      { p: 'infini', t: 'Un interlocuteur d\u00e9di\u00e9', s: 'Une personne qui conna\u00eet votre organisation, joignable directement.' },
-    ],
-    aussi: 'Connexion par votre annuaire, engagement de disponibilit\u00e9 \u00e9crit, <b>et tout ce que contient Pro</b>.',
-  },
+/* Les avantages sont les MÊMES pour toutes les offres. Elles ne diffèrent que
+   par la taille de l'équipe.
+
+   Découper les fonctions par palier obligerait un restaurant de quatre
+   personnes à payer le prix d'une chaîne pour traduire ses procédures. Le prix
+   suit ce qui coûte vraiment — le nombre de gens qui s'en servent — et rien
+   d'autre. C'est aussi plus simple à vendre : il n'y a qu'une question à se
+   poser, et c'est celle dont on connaît déjà la réponse. */
+const AVANTAGES = [
+  { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe',
+    s: "Montrez le geste en le commentant \u00e0 voix haute. L'IA \u00e9coute, d\u00e9coupe la vid\u00e9o " +
+       "en \u00e9tapes num\u00e9rot\u00e9es et horodate chacune. Sans limite de vid\u00e9os." },
+  { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es',
+    s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
+  { p: 'main', t: 'Cr\u00e9ation depuis vos documents',
+    s: "Un PDF, un Word, une note de service : l'IA en tire les \u00e9tapes." },
+  { p: 'monde', t: 'Chacun lit dans sa langue',
+    s: "Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez." },
+  { p: 'suivi', t: 'Vous savez qui a lu quoi',
+    s: "Par personne, par cat\u00e9gorie, avec le temps pass\u00e9 sur chaque proc\u00e9dure." },
+  { p: 'sites', t: 'Plusieurs \u00e9tablissements',
+    s: "Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe." },
 ]
+
+const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste, m\u00e9dailles ' +
+  'd\'assiduit\u00e9, relance des retardataires, vue consolid\u00e9e de vos sites.'
+
+/* Les paliers suivent le NOMBRE DE MEMBRES, et c'est tout ce qui les sépare. */
+const OFFRES = [
+  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,        prix: 39 },
+  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,       prix: 79 },
+  { cle: 'pro',        nom: 'Pro',        max: 40,       prix: 149 },
+  { cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
+    devis: "Au-del\u00e0 de quarante personnes, on en discute : accompagnement \u00e0 la mise " +
+           "en place, interlocuteur d\u00e9di\u00e9, engagement de disponibilit\u00e9 \u00e9crit." },
+]
+
 
 function nombreDeMembres() {
   return Math.max(1, (cachedMembres || []).length)
@@ -10248,15 +10254,15 @@ function carteOffre(o, opts = {}) {
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
     ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne / par mois</b>.</div>` : ''}
-    <div class="offre-etiq">Ce que vous d\u00e9bloquez</div>
+    ${opts.detaille ? `<div class="offre-etiq">Tout est compris</div>
     <div class="offre-phares">
-      ${o.phares.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
+      ${AVANTAGES.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
         <span class="p">${PICTOS[f.p]}</span>
         <span><span class="t">${f.t}</span><span class="s">${f.s}</span></span>
       </div>`).join('')}
     </div>
-    ${true ? `
-    <div class="offre-aussi">${o.aussi}</div>` : ''}
+    <div class="offre-aussi">${AUSSI}</div>`
+    : `<div class="offre-aussi">${o.devis || 'Les m\u00eames fonctionnalit\u00e9s, sans exception.'}</div>`}
     ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${opts.cta}</button>` : ''}
     ${opts.annuel && o.prix !== null ? `<div class="offre-annuel">ou <b>${Math.round(o.prix * 0.8)} \u20ac</b> par mois, pay\u00e9 \u00e0 l'ann\u00e9e</div>` : ''}
   </div>`
@@ -10300,7 +10306,6 @@ window.renderAbonnements = function() {
       /* Développées elles aussi : quelqu'un qui déplie les autres offres veut
          comparer, et comparer des titres seuls ne dit rien. */
       membres: n,
-      detaille: true,
     })).join('')
 
   const rappel = document.getElementById('abo-actuel')

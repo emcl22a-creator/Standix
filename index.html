@@ -629,16 +629,17 @@
      le rythme des réglages d'iOS. */
   .reg-filet{ height:0.5px; background:var(--border); margin-left:54px; }
 
+  /* La tuile reprend le verre de l'app plutôt que les aplats colorés d'iOS, et
+     le glyphe est dessiné au trait comme les icônes de création : contour de
+     devant à 78 %, second plan à 32 %. */
   .reg-ic{
-    width:30px; height:30px; border-radius:8px; flex-shrink:0;
+    width:32px; height:32px; border-radius:9px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.08);
+    border:0.5px solid rgba(255,255,255,0.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
   }
-  .reg-ic svg{ width:18px; height:18px; display:block; }
-  .ic-bleu{ background:linear-gradient(160deg,#4DA2FF,#0A6ED1); }
-  .ic-violet{ background:linear-gradient(160deg,#B18CFF,#7A4DD6); }
-  .ic-vert{ background:linear-gradient(160deg,#5BD97A,#22A544); }
-  .ic-orange{ background:linear-gradient(160deg,#FFB84D,#E07A12); }
-  .ic-gris{ background:linear-gradient(160deg,#8E8E93,#5A5A60); }
+  .reg-ic svg{ width:19px; height:19px; display:block; }
 
   .reg-nm{ flex:1; min-width:0; font-size:15px; font-weight:600; letter-spacing:-0.02em; }
   .reg-val{
@@ -3011,8 +3012,7 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
 
-    <!-- 1. QUI VOUS ÊTES — en tête, comme la fiche Apple ID -->
-    <button type="button" class="reg-identite" id="reg-identite">
+    <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
       <span class="av" id="reg-initiales">—</span>
       <span class="tx">
         <span class="nm" id="reg-nom">—</span>
@@ -3021,87 +3021,50 @@
       <span class="fl">›</span>
     </button>
 
-    <div class="card" id="reg-identite-form" style="display:none;">
-      <label class="f">Nom complet</label>
-      <input type="text" id="settings-nom" style="margin-bottom:12px;">
-      <label class="f">E-mail</label>
-      <input type="text" id="settings-email" disabled style="opacity:0.6;">
-      <button class="btn block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
-      <div class="error-msg" id="settings-error"></div>
-    </div>
-
-    <!-- 2. VOTRE ENTREPRISE -->
     <div class="reg-titre">Votre entreprise</div>
     <div class="reg-groupe">
       <button type="button" class="reg-ligne" onclick="openMembres()">
-        <span class="reg-ic ic-bleu">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0"/><circle cx="17" cy="9.4" r="2.4"/><path d="M15.2 19a4.4 4.4 0 0 1 5.4-4.3"/></svg>
-        </span>
-        <span class="reg-nm">Équipe</span>
-        <span class="reg-val" id="reg-nb-membres">—</span>
-        <span class="fl">›</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/><circle cx="17.4" cy="9.6" r="2.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Équipe</span>
+        <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet"></div>
-      <button type="button" class="reg-ligne" id="reg-code">
-        <span class="reg-ic ic-violet">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8"/><rect x="13.6" y="3.4" width="7" height="7" rx="1.8"/><rect x="3.4" y="13.6" width="7" height="7" rx="1.8"/><path d="M13.6 13.6h3v3M20.6 20.6h-3v-3"/></svg>
-        </span>
-        <span class="reg-nm">Code d'invitation</span>
-        <span class="reg-val mono" id="settings-code">—</span>
-        <span class="fl" id="copy-code-btn">⧉</span>
+      <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-code')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="reg-nm">Code d'invitation</span>
+        <span class="reg-val mono" id="reg-code-val">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet" id="reg-filet-etabs" style="display:none;"></div>
+      <button type="button" class="reg-ligne" id="reg-ligne-etabs" style="display:none;"
+              onclick="showGestionScreen('p-reg-etabs')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/></svg></span><span class="reg-nm">Établissements</span>
+        <span class="reg-val" id="reg-nb-etabs">—</span><span class="fl">›</span>
       </button>
     </div>
-    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder aux procédures.</div>
 
-    <!-- 3. VOS ÉTABLISSEMENTS -->
-    <div class="reg-titre" id="etab-section-titre" style="display:none;">Vos établissements</div>
-    <div id="etab-liste"></div>
-    <div class="reg-note" id="etab-section-note" style="display:none;">
-      Touchez un établissement pour changer son nom ou déposer son logo.
-      Sans logo, ce sont ses initiales qui s'affichent dans la barre du haut.
-    </div>
-
-    <!-- 4. ABONNEMENT -->
     <div class="reg-titre">Abonnement</div>
     <div class="reg-groupe">
       <button type="button" class="reg-ligne" id="ouvrir-abonnement">
-        <span class="reg-ic ic-vert">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.4l5.9-.8Z"/></svg>
-        </span>
-        <span class="reg-nm">Votre offre</span>
-        <span class="reg-val" id="abo-actuel">—</span>
-        <span class="fl">›</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/></svg></span><span class="reg-nm">Votre offre</span>
+        <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
       </button>
     </div>
 
-    <!-- 5. PRÉFÉRENCES -->
     <div class="reg-titre">Préférences</div>
     <div class="reg-groupe">
-      <button type="button" class="reg-ligne" id="reg-langue">
-        <span class="reg-ic ic-orange">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.8"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8"/></svg>
-        </span>
-        <span class="reg-nm">Langue</span>
-        <span class="reg-val" id="reg-langue-val">Français</span>
-        <span class="fl">›</span>
+      <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-langue')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Langue</span>
+        <span class="reg-val" id="reg-langue-val">Français</span><span class="fl">›</span>
       </button>
     </div>
-    <div class="langue-grille" id="langue-app-gestion" style="display:none; margin-top:9px;"></div>
 
-    <!-- 6. ASSISTANCE -->
-    <div class="reg-titre">Assistance</div>
-    <div class="reg-groupe">
-      <button type="button" class="reg-ligne" id="contact-gestion">
-        <span class="reg-ic ic-gris">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 6.6A2.2 2.2 0 0 1 5.6 4.4h12.8a2.2 2.2 0 0 1 2.2 2.2v10.8a2.2 2.2 0 0 1-2.2 2.2H5.6a2.2 2.2 0 0 1-2.2-2.2Z"/><path d="m3.8 6.4 8.2 6 8.2-6"/></svg>
-        </span>
-        <span class="reg-nm">Écrivez-nous</span>
-        <span class="fl">›</span>
-      </button>
+    <div class="reg-titre">Une question ?</div>
+    <div class="accueil contact-carte" role="button" tabindex="0" id="contact-gestion">
+      <div class="accueil-texte">
+        <div class="t">Écrivez-nous</div>
+        <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
     </div>
-    <div class="reg-note">Un souci, une idée, une question ? Nous lisons tout et répondons au plus vite.</div>
 
-    <!-- 7. COMPTE — le départ en dernier, comme chez Apple -->
     <div class="reg-titre">Compte</div>
     <div class="reg-groupe">
       <button type="button" class="reg-ligne danger" id="logout-btn">
@@ -3111,6 +3074,69 @@
 
     <div class="reg-version">Procédo · version 2026-07-30</div>
   </div>
+
+  <!-- Sous-page : le compte -->
+  <div class="screen" id="p-reg-compte">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre compte</h1>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <label class="f">Nom complet</label>
+      <input type="text" id="settings-nom" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="settings-email" disabled style="opacity:0.6;">
+      <button class="btn block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
+      <div class="error-msg" id="settings-error"></div>
+    </div>
+    <div class="reg-note">Votre nom apparaît dans l'équipe et sur les procédures que vous publiez. L'adresse ne peut pas être modifiée ici.</div>
+  </div>
+
+  <!-- Sous-page : le code d'invitation -->
+  <div class="screen" id="p-reg-code">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Code d'invitation</h1>
+    </div>
+    <div class="card" style="text-align:center; margin-top:14px;">
+      <div id="settings-code" style="font-size:38px; font-weight:850; letter-spacing:0.28em; margin:10px 0 16px;">—</div>
+      <button class="btn block" id="copy-code-btn">Copier le code</button>
+    </div>
+    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder à vos procédures. Il ne donne aucun droit de modification.</div>
+  </div>
+
+  <!-- Sous-page : les établissements -->
+  <div class="screen" id="p-reg-etabs">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Établissements</h1>
+    </div>
+    <div style="margin-top:14px;" id="etab-liste"></div>
+    <div class="reg-note" id="etab-section-note">
+      Touchez un établissement pour changer son nom ou déposer son logo.
+      Sans logo, ce sont ses initiales qui s'affichent dans la barre du haut.
+    </div>
+  </div>
+
+  <!-- Sous-page : la langue -->
+  <div class="screen" id="p-reg-langue">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Langue</h1>
+    </div>
+    <div class="langue-grille" id="langue-app-gestion" style="margin-top:14px;"></div>
+    <div class="reg-note">La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.</div>
+  </div>
+
+  <div class="screen" id="etab-section-titre" style="display:none;"></div>
 </div>
 
 <!-- Ajouter ou modifier un établissement : le même écran pour les deux -->
@@ -4818,6 +4844,21 @@ function peindreReglages() {
     el('reg-nb-membres').textContent = n ? `${n} membre${n > 1 ? 's' : ''}` : '\u2014'
   }
 
+  // Le code se lit aussi depuis la liste, sans entrer dans sa page.
+  const code = cachedEntreprise?.code_acces || ''
+  if (el('reg-code-val')) el('reg-code-val').textContent = code || '\u2014'
+  if (el('settings-code')) el('settings-code').textContent = code || '\u2014'
+
+  /* La ligne des établissements n'apparaît qu'à ceux qui en ont plusieurs, ou
+     dont l'offre le permet : ailleurs elle n'aurait rien à montrer. */
+  const ne = (mesEtablissements || []).length
+  const montrer = ne > 0 && multiSitesAutorise()
+  if (el('reg-ligne-etabs')) el('reg-ligne-etabs').style.display = montrer ? 'flex' : 'none'
+  if (el('reg-filet-etabs')) el('reg-filet-etabs').style.display = montrer ? 'block' : 'none'
+  if (el('reg-nb-etabs')) {
+    el('reg-nb-etabs').textContent = ne > 1 ? `${ne} \u00e9tablissements` : '1 \u00e9tablissement'
+  }
+
   const l = LANGUES.find(x => x.code === langueApp)
   if (el('reg-langue-val')) el('reg-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
 
@@ -4825,22 +4866,9 @@ function peindreReglages() {
   if (el('reg-email')) el('reg-email').textContent = el('settings-email')?.value || '\u2014'
 }
 
-/* La fiche du haut déplie le formulaire : on ne quitte pas la page pour changer
-   un nom, et on ne montre pas deux champs à quelqu'un qui ne fait que passer. */
-document.getElementById('reg-identite')?.addEventListener('click', () => {
-  const f = document.getElementById('reg-identite-form')
-  if (!f) return
-  const ouvert = f.style.display === 'block'
-  f.style.display = ouvert ? 'none' : 'block'
-  if (!ouvert) setTimeout(() => document.getElementById('settings-nom')?.focus(), 120)
-})
-
-/* Idem pour la langue : la grille n'apparaît qu'à la demande. */
-document.getElementById('reg-langue')?.addEventListener('click', () => {
-  const g = document.getElementById('langue-app-gestion')
-  if (!g) return
-  g.style.display = g.style.display === 'grid' ? 'none' : 'grid'
-})
+/* Chaque réglage a sa page : on y entre, on en revient. C'est la navigation
+   d'iOS, et elle vaut mieux qu'un dépliage — une page peut expliquer, respirer,
+   et l'on sait toujours où l'on se trouve. */
 
 window.openSettings = async function() {
   rendreChoixLangueApp()
@@ -9516,19 +9544,12 @@ async function chargerEtablissements() {
    ouvre la fenêtre déjà remplie : c'est le même écran que la création. */
 function peindreListeEtab() {
   const el = document.getElementById('etab-liste')
-  const titre = document.getElementById('etab-section-titre')
-  if (!el || !titre) return
+  if (!el) return
 
   if (!multiSitesAutorise() || !mesEtablissements.length) {
     el.innerHTML = ''
-    titre.style.display = 'none'
-    const n = document.getElementById('etab-section-note')
-    if (n) n.style.display = 'none'
     return
   }
-  titre.style.display = 'block'
-  const note = document.getElementById('etab-section-note')
-  if (note) note.style.display = 'block'
 
   el.innerHTML = mesEtablissements.map(e => {
     const actif = e.id === currentMembre?.entreprise_id

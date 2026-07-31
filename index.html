@@ -948,6 +948,30 @@
   .pm-rang:active{ transform:scale(0.9); }
   .pm-rang svg{ width:18px; height:18px; display:block; }
 
+  /* ═══ Créer ou rejoindre ═══
+     Les deux gestes se ressemblent à l'énoncé et n'ont rien à voir dans les
+     faits : l'un vous rend responsable, l'autre vous rend lecteur. La fenêtre
+     les sépare franchement plutôt que de les cacher derrière un seul « + ». */
+  .ajout-choix{
+    display:flex; align-items:center; gap:13px; width:100%; margin-top:10px;
+    padding:14px 14px; border-radius:18px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+    font-family:inherit; text-align:left; color:#fff;
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
+  }
+  .ajout-choix:active{ transform:scale(0.985); background:rgba(255,255,255,0.08); }
+  .ajout-choix .ic{
+    flex-shrink:0; width:36px; height:36px; border-radius:11px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
+  }
+  .ajout-choix .ic svg{ width:20px; height:20px; display:block; }
+  .ajout-choix .tx{ flex:1; min-width:0; }
+  .ajout-choix .tx .t{ display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .ajout-choix .tx .s{ display:block; font-size:12px; color:var(--label-3); line-height:1.45; margin-top:3px; }
+  .ajout-choix .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
+
   /* ═══ Félicitations ═══
      Même forme que la carte d'accueil : le texte à gauche, le visage à droite
      avec sa pastille verte. On ne crée pas un objet de plus pour une occasion
@@ -3310,6 +3334,48 @@
   </div>
 
   <div class="screen" id="etab-section-titre" style="display:none;"></div>
+</div>
+
+<!-- Créer ou rejoindre : deux gestes très différents -->
+<div class="fond-promu" id="fond-ajout">
+  <div class="fen-promu" role="dialog" aria-modal="true">
+    <div class="accueil promu-carte">
+      <div class="accueil-texte">
+        <div class="t">Ajouter une entreprise</div>
+        <div class="s">Deux gestes très différents : en créer une dont vous serez responsable,
+          ou en rejoindre une dont quelqu'un d'autre l'est.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+
+    <button type="button" class="ajout-choix" id="ajout-creer">
+      <span class="ic">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/>
+          <path d="M12 11.4v5.2M9.4 14h5.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="tx"><span class="t">Créer un établissement</span>
+        <span class="s">Vous en êtes responsable. Vous obtenez un code à partager à votre équipe.</span></span>
+      <span class="fl">›</span>
+    </button>
+
+    <button type="button" class="ajout-choix" id="ajout-rejoindre">
+      <span class="ic">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/>
+          <rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/>
+          <rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/>
+          <path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="tx"><span class="t">Rejoindre avec un code</span>
+        <span class="s">Vous y entrez comme membre d'équipe, pour lire ses procédures.</span></span>
+      <span class="fl">›</span>
+    </button>
+
+    <button type="button" class="btn ghost block" id="ajout-annuler" style="margin-top:10px;">Annuler</button>
+  </div>
 </div>
 
 <!-- Aucune entreprise rattachée à ce compte -->
@@ -9887,7 +9953,13 @@ document.addEventListener('click', (e) => {
     /* Un gérant crée ; un employé rejoint avec un code. Deux actions distinctes
        derrière le même bouton, parce que c'est la même intention : « j'en veux
        un de plus ». */
-    if (currentMembre?.role === 'gestion') ouvrirFenetreEtab(null)
+    /* Côté gestion, le « + » ne crée plus directement : il demande d'abord LEQUEL
+       des deux gestes on veut. Créer une entreprise et en rejoindre une sont
+       deux choses opposées — responsable d'un côté, lecteur de l'autre — et un
+       gestionnaire peut très bien vouloir la seconde.
+       Côté équipe la question ne se pose pas : on ne crée pas d'entreprise
+       depuis là. */
+    if (currentMembre?.role === 'gestion') montrerChoixAjout()
     else montrerOrphelin(true)
     return
   }
@@ -10205,6 +10277,25 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 /* La même fenêtre sert à deux moments : un compte sans entreprise, et quelqu'un
    qui veut en rejoindre une de plus. Le besoin est le même — un code à saisir —
    seule la sortie diffère : se déconnecter dans un cas, annuler dans l'autre. */
+function montrerChoixAjout() {
+  document.getElementById('fond-ajout')?.classList.add('on')
+}
+
+document.getElementById('ajout-annuler')?.addEventListener('click', () => {
+  document.getElementById('fond-ajout')?.classList.remove('on')
+})
+document.getElementById('fond-ajout')?.addEventListener('click', (e) => {
+  if (e.target.id === 'fond-ajout') e.currentTarget.classList.remove('on')
+})
+document.getElementById('ajout-creer')?.addEventListener('click', () => {
+  document.getElementById('fond-ajout')?.classList.remove('on')
+  ouvrirFenetreEtab(null)
+})
+document.getElementById('ajout-rejoindre')?.addEventListener('click', () => {
+  document.getElementById('fond-ajout')?.classList.remove('on')
+  montrerOrphelin(true)
+})
+
 function montrerOrphelin(enPlus) {
   const f = document.getElementById('fond-orphelin')
   if (!f) return
@@ -10260,6 +10351,11 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) throw new Error('Session expir\u00e9e. Reconnectez-vous.')
 
+    // Déjà dedans ? On le dit plutôt que de créer une seconde fiche.
+    const { data: dejaLa } = await supabase.from('membres')
+      .select('id').eq('user_id', user.id).eq('entreprise_id', ent.id).maybeSingle()
+    if (dejaLa) throw new Error(`Vous faites d\u00e9j\u00e0 partie de ${ent.nom}.`)
+
     const { data: cree, error } = await supabase.from('membres')
       .insert({ user_id: user.id, entreprise_id: ent.id, nom: '', role: 'equipe' })
       .select('*').maybeSingle()
@@ -10267,8 +10363,12 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
     if (!cree) throw new Error("La base a refus\u00e9 l'adh\u00e9sion.")
 
     document.getElementById('fond-orphelin').classList.remove('on')
+
+    /* On entre dans la nouvelle entreprise comme MEMBRE D'ÉQUIPE, quel que soit
+       le rang qu'on occupe ailleurs. Être gestionnaire chez l'un ne donne aucun
+       droit chez l'autre — c'est à son responsable de promouvoir, s'il le veut. */
     await enterApp(cree)
-    toast(`Bienvenue chez ${ent.nom}.`)
+    toast(`Bienvenue chez ${ent.nom}. Vous y \u00eates membre d'\u00e9quipe.`)
   } catch (ex) {
     err.textContent = ex instanceof Error ? ex.message : String(ex)
   } finally {
@@ -10421,6 +10521,13 @@ function peindreEquipe() {
     /* On ne rétrograde pas un fondateur : ce serait se retirer soi-même la
        dernière clé de l'entreprise. */
     const retrogradable = jePeuxChangerLeRang && !soi && m.role === 'gestion' && !estFondateur(m)
+
+    /* Qui peut retirer qui.
+       Le fondateur retire n'importe qui, des deux espaces. Un gestionnaire promu
+       ne retire que des membres d'équipe : il ne doit pas pouvoir écarter ses
+       pairs, encore moins celui qui l'a nommé. Un pouvoir reçu ne sert pas à
+       défaire celui qui l'a donné. */
+    const supprimable = !soi && (jePeuxChangerLeRang || m.role !== 'gestion')
     const date = m.created_at
       ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
       : '\u2014'
@@ -10449,7 +10556,7 @@ function peindreEquipe() {
             <path d="M17.4 13 12 18.4 6.6 13" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>` : ''}
-        ${soi ? '' : `<button type="button" class="pm-suppr" data-membre="${m.id}" data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer">
+        ${!supprimable ? '' : `<button type="button" class="pm-suppr" data-membre="${m.id}" data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
         </button>`}
       </div>`
@@ -10572,6 +10679,15 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   const btn = e.target.closest('.pm-suppr')
   if (!btn) return
+
+  /* Deuxième verrou : le bouton n'est déjà pas affiché, mais un droit ne se garde
+     pas sur la seule absence d'un bouton. */
+  const cible = membresEquipe.find(x => x.id === btn.dataset.membre)
+  if (cible?.role === 'gestion' && !estFondateur(currentMembre)) {
+    toast("Seul le fondateur peut retirer un gestionnaire.")
+    return
+  }
+
   const ok = await confirmDialog({
     titre: 'Retirer cet utilisateur ?',
     message: `${btn.dataset.nom || 'Cette personne'} perdra l'accès aux procédures de l'entreprise. Son compte Procédo n'est pas supprimé : elle pourra rejoindre une autre entreprise.`,

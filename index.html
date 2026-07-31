@@ -464,8 +464,13 @@
   /* Un filet de verre entre chaque rond. L'espacement vit À L'INTÉRIEUR du groupe
      qui se replie : posé sur la liste, il aurait subsisté tiroir fermé et la
      pastille n'aurait plus été un cercle parfait. */
+  /* AUCUN remplissage ici, et l'écart est porté par les ronds eux-mêmes. Un
+     remplissage ne descend jamais sous sa valeur, même avec `max-width:0` : le
+     groupe replié gardait donc 4 px, la pastille faisait 50 px de large pour 46
+     de haut, et n'était plus un cercle. Une marge, elle, disparaît avec le
+     contenu qu'elle espace. */
   .tiroir-autres{
-    display:flex; align-items:center; gap:4px; padding-left:4px;
+    display:flex; align-items:center; gap:0;
     max-width:0; overflow:hidden;
     transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1);
   }
@@ -475,6 +480,7 @@
      la carte au logo n'avait pas — les deux moitiés du geste ne s'accordaient
      donc jamais. Même courbe, même durée : un seul mouvement. */
   .tiroir-autres .rond-ent{
+    margin-left:4px;
     opacity:0; transform:scale(0.55) translateX(-16px); pointer-events:none;
     transition:opacity 0.44s cubic-bezier(0.32,0.72,0,1),
                transform 0.44s cubic-bezier(0.32,0.72,0,1);

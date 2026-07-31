@@ -431,16 +431,22 @@
      mais d'une ombre portée sous les lettres. Elle les détache de ce qui passe
      derrière sans rien opacifier. */
   .rond-ent .ini{
-    position:relative; font-size:14px; font-weight:700; letter-spacing:0.04em;
+    position:relative; font-size:16px; font-weight:700; letter-spacing:0.03em;
     color:#fff;
     text-shadow:0 1px 3px rgba(0,0,0,0.65), 0 0 9px rgba(0,0,0,0.45);
   }
   /* Le « + » est une action, pas un établissement : il se distingue par une
      taille moindre plutôt que par une couleur de plus. */
   .rond-ent.plus{
-    width:38px; height:38px; background:#fff; border-color:transparent;
+    width:34px; height:34px; background:#fff; border-color:transparent;
+    margin-left:3px;   /* il est plus petit : un peu plus d'air le recentre */
   }
-  .rond-ent.plus .ini{ color:#000; font-size:21px; font-weight:400; line-height:0; margin-top:-1px; }
+  /* Le « + » est noir sur blanc : l'ombre portée qui détache les initiales sur le
+     verre n'a plus lieu d'être ici, et elle formait un halo autour du signe. */
+  .rond-ent.plus .ini{
+    color:#000; font-size:19px; font-weight:400; line-height:0; margin-top:-1px;
+    text-shadow:none;
+  }
 
   /* Les autres établissements et le « + » restent dans le document en
      permanence : c'est ce qui permet de les animer à la fermeture autant qu'à
@@ -449,28 +455,29 @@
      et le verre resterait étiré même tiroir fermé. */
   /* La largeur du verre suit : à l'ouverture elle part devant pour faire de la
      place, à la fermeture elle attend que les ronds soient rentrés. */
+  /* Un filet de verre entre chaque rond. L'espacement vit À L'INTÉRIEUR du groupe
+     qui se replie : posé sur la liste, il aurait subsisté tiroir fermé et la
+     pastille n'aurait plus été un cercle parfait. */
   .tiroir-autres{
-    display:flex; align-items:center; gap:0; max-width:0; overflow:hidden;
-    transition:max-width 0.4s cubic-bezier(0.4,0,0.2,1) 0.14s;
+    display:flex; align-items:center; gap:5px; padding-left:5px;
+    max-width:0; overflow:hidden;
+    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0.1s;
   }
   .tiroir-ent.ouvert .tiroir-autres{
     max-width:300px;
-    transition:max-width 0.46s cubic-bezier(0.24,0.9,0.32,1) 0s;
+    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0s;
   }
-  /* À la fermeture : les ronds se retirent VITE et vers la gauche, en rétrécissant
-     — ils rentrent derrière le premier. Courbe d'entrée franche, sans rebond :
-     un objet qu'on range ne rebondit pas.
-     À l'ouverture : ils ressortent avec un léger ressort, comme la barre
-     d'onglets, mais un cran plus vif pour rester nets à cette taille. */
+  /* UNE SEULE COURBE pour tout ce qui bouge ici : celle de la barre d'onglets,
+     0,44 s et cubic-bezier(0.32, 0.72, 0, 1). Les ronds avaient un ressort que
+     la carte au logo n'avait pas — les deux moitiés du geste ne s'accordaient
+     donc jamais. Même courbe, même durée : un seul mouvement. */
   .tiroir-autres .rond-ent{
-    opacity:0; transform:scale(0.34) translateX(-30px); pointer-events:none;
-    transition:opacity 0.2s cubic-bezier(0.4,0,1,1),
-               transform 0.32s cubic-bezier(0.55,0,0.85,0.35);
+    opacity:0; transform:scale(0.42) translateX(-26px); pointer-events:none;
+    transition:opacity 0.26s ease,
+               transform 0.44s cubic-bezier(0.32,0.72,0,1);
   }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent{
     opacity:1; transform:none; pointer-events:auto;
-    transition:opacity 0.24s ease-out,
-               transform 0.5s cubic-bezier(0.28,1.16,0.42,1);
   }
 
   /* Le rond de tête se creuse légèrement quand le tiroir est ouvert : il cède la
@@ -487,19 +494,33 @@
      arrivent de gauche à droite, à la fermeture ils partent de droite à gauche.
      Les pas sont resserrés — 40 millisecondes — pour que l'ensemble se lise
      comme un seul geste et non comme quatre départs séparés. */
+  /* La cascade. Les délais s'inversent selon le sens : à l'ouverture les ronds
+     arrivent de gauche à droite APRÈS le départ de la carte, à la fermeture ils
+     partent de droite à gauche AVANT son retour. */
   .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.12s, 0.12s; }
   .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.08s, 0.08s; }
   .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.04s, 0.04s; }
   .tiroir-autres .rond-ent:nth-child(n+4){ transition-delay:0s, 0s; }
-  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.02s, 0.02s; }
-  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.06s, 0.06s; }
-  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.10s, 0.10s; }
-  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.14s, 0.14s; }
-  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(n+5){ transition-delay:0.18s, 0.18s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.08s, 0.08s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.12s, 0.12s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.16s, 0.16s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(4){ transition-delay:0.20s, 0.20s; }
+  .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(n+5){ transition-delay:0.24s, 0.24s; }
 
-  /* La carte au logo s'efface pendant le choix : c'est sa place qu'on occupe. */
-  .topbar-card{ transition:opacity 0.34s ease, transform 0.44s cubic-bezier(0.32,0.72,0,1); }
-  .tiroir-ent.ouvert ~ .topbar-card{ opacity:0; transform:translateX(10px); pointer-events:none; }
+  /* La carte au logo s'efface pendant le choix : c'est sa place qu'on occupe.
+     L'ordre compte. À l'ouverture elle part la première, sans délai, et les ronds
+     la suivent : la place se libère avant qu'on l'occupe. À la fermeture c'est
+     l'inverse — elle attend que les ronds soient rentrés. Sans cet ordre, les
+     deux se croisaient au milieu du geste. */
+  .topbar-card{
+    transition:opacity 0.26s ease 0.16s,
+               transform 0.44s cubic-bezier(0.32,0.72,0,1) 0.12s;
+  }
+  .tiroir-ent.ouvert ~ .topbar-card{
+    opacity:0; transform:translateX(14px); pointer-events:none;
+    transition:opacity 0.2s ease 0s,
+               transform 0.44s cubic-bezier(0.32,0.72,0,1) 0s;
+  }
 
   @media (prefers-reduced-motion: reduce){
     .tiroir-autres .rond-ent, .topbar-card{ transition:none; }
@@ -5980,7 +6001,7 @@ function renderCategoryProceduresListInterne() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
               stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M14 2.6H7.4A2.4 2.4 0 0 0 5 5v14a2.4 2.4 0 0 0 2.4 2.4h9.2A2.4 2.4 0 0 0 19 19V7.6Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.6v5h5" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="8.4" y1="13" x2="14.4" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8.4" y1="16.8" x2="12.4" y2="16.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4.2" y="3.4" width="15.6" height="17.2" rx="2.6" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><path d="M9 3.4v2.2h6V3.4" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8" y1="10.4" x2="16" y2="10.4" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="14.2" x2="16" y2="14.2" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="18" x2="12.6" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg></div>
         </div>
         <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
       </div>
@@ -8580,7 +8601,7 @@ function renderEquipeCategories() {
             <circle class="cat-ring-fill" cx="23" cy="23" r="19"
               stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
           </svg>
-          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M14 2.6H7.4A2.4 2.4 0 0 0 5 5v14a2.4 2.4 0 0 0 2.4 2.4h9.2A2.4 2.4 0 0 0 19 19V7.6Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.6v5h5" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="8.4" y1="13" x2="14.4" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8.4" y1="16.8" x2="12.4" y2="16.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</span>
+          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M2.6 8A1.8 1.8 0 0 1 4.4 6.2h4l1.7 2.1h8A1.8 1.8 0 0 1 20 10.1v1.1" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M3.4 11.2h18.2l-2 7.2a1.8 1.8 0 0 1-1.7 1.3H5.1a1.8 1.8 0 0 1-1.7-1.3Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/></svg>`}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
@@ -8648,7 +8669,7 @@ function ficheEquipe(proc) {
           <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${couleur}"
             stroke-dasharray="${circonference}" stroke-dashoffset="${decalage}"/>
         </svg>
-        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M14 2.6H7.4A2.4 2.4 0 0 0 5 5v14a2.4 2.4 0 0 0 2.4 2.4h9.2A2.4 2.4 0 0 0 19 19V7.6Z" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><path d="M14 2.6v5h5" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><line x1="8.4" y1="13" x2="14.4" y2="13" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8.4" y1="16.8" x2="12.4" y2="16.8" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</div>
+        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><rect x="4.2" y="3.4" width="15.6" height="17.2" rx="2.6" stroke="rgba(255,255,255,0.75)" stroke-width="1.7"/><path d="M9 3.4v2.2h6V3.4" stroke="rgba(255,255,255,0.75)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8" y1="10.4" x2="16" y2="10.4" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="14.2" x2="16" y2="14.2" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/><line x1="8" y1="18" x2="12.6" y2="18" stroke="rgba(255,255,255,0.35)" stroke-width="1.7" stroke-linecap="round"/></svg>`}</div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>

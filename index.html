@@ -3630,41 +3630,33 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
-    <div class="subhead">Votre compte et votre entreprise</div>
 
-    <div class="section-title">Vos informations</div>
-    <div class="card">
-      <label class="f">Nom complet</label>
-      <input type="text" id="es-nom" style="margin-bottom:12px;">
-      <label class="f">E-mail</label>
-      <input type="text" id="es-email" disabled style="opacity:0.6;">
-      <button class="btn ghost block" style="margin-top:14px;" id="es-save">Enregistrer</button>
-      <div class="error-msg" id="es-error"></div>
+    <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">
+      <span class="av" id="es-initiales">—</span>
+      <span class="tx">
+        <span class="nm" id="es-nom-affiche">—</span>
+        <span class="st" id="es-email-affiche">—</span>
+      </span>
+      <span class="fl">›</span>
+    </button>
+
+    <div class="reg-titre">Votre entreprise</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-entreprises')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/></svg></span><span class="reg-nm">Vos entreprises</span>
+        <span class="reg-val" id="es-nb-ent">—</span><span class="fl">›</span>
+      </button>
     </div>
 
-    <div class="section-title">Langue</div>
-    <div class="card">
-      <label class="f">Langue de l'application</label>
-      <div class="langue-grille" id="langue-app"></div>
+    <div class="reg-titre">Préférences</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-langue')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Langue</span>
+        <span class="reg-val" id="es-langue-val">Français</span><span class="fl">›</span>
+      </button>
     </div>
 
-    <div class="section-title">Vos entreprises</div>
-    <div id="es-entreprises"></div>
-
-    <div class="card" style="margin-top:10px;">
-      <label class="f">Rejoindre une autre entreprise</label>
-      <div class="note" style="margin:0 0 10px;">Entrez le code à 5 chiffres que votre responsable vous a communiqué. Il sera retenu : l'entreprise apparaîtra dans la liste au-dessus.</div>
-      <input type="text" id="es-code" inputmode="numeric" maxlength="5" placeholder="00000"
-             style="text-align:center; font-size:22px; letter-spacing:0.3em; font-weight:700; margin-bottom:12px;">
-      <button class="btn block" id="es-rejoindre">Rejoindre</button>
-      <div class="error-msg" id="es-code-error"></div>
-    </div>
-
-    <button type="button" class="btn ghost block" id="es-quitter"
-            style="margin-top:10px; color:var(--red);">Quitter cette entreprise</button>
-    <div class="note" style="margin-top:8px;">Vous perdrez l'accès à ses procédures. Votre compte Procédo reste actif : vous pourrez rejoindre une autre entreprise avec un nouveau code.</div>
-
-    <div class="section-title">Une question ?</div>
+    <div class="reg-titre">Une question ?</div>
     <div class="accueil contact-carte" role="button" tabindex="0" id="contact-equipe">
       <div class="accueil-texte">
         <div class="t">Écrivez-nous</div>
@@ -3673,8 +3665,74 @@
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
 
-    <div class="section-title">Compte</div>
-    <button class="btn ghost block" onclick="signOut()">Se déconnecter</button>
+    <div class="reg-titre">Compte</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne danger" onclick="signOut()">
+        <span class="reg-nm">Se déconnecter</span>
+      </button>
+    </div>
+
+    <div class="reg-version">Procédo · version 2026-07-30</div>
+  </div>
+
+  <!-- Sous-page : le compte -->
+  <div class="screen" id="e-reg-compte">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre compte</h1>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <label class="f">Nom complet</label>
+      <input type="text" id="es-nom" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="es-email" disabled style="opacity:0.6;">
+      <button class="btn block" style="margin-top:14px;" id="es-save">Enregistrer</button>
+      <div class="error-msg" id="es-error"></div>
+    </div>
+    <div class="reg-note">Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.</div>
+  </div>
+
+  <!-- Sous-page : les entreprises -->
+  <div class="screen" id="e-reg-entreprises">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos entreprises</h1>
+    </div>
+
+    <div style="margin-top:14px;" id="es-entreprises"></div>
+
+    <div class="card" style="margin-top:10px;">
+      <label class="f">Rejoindre une autre entreprise</label>
+      <div class="note" style="margin:0 0 10px;">Entrez le code à 5 chiffres que son responsable vous a communiqué. Elle s'ajoutera à la liste au-dessus.</div>
+      <input type="text" id="es-code" inputmode="numeric" maxlength="5" placeholder="00000"
+             style="text-align:center; font-size:22px; letter-spacing:0.3em; font-weight:700; margin-bottom:12px;">
+      <button class="btn block" id="es-rejoindre">Rejoindre</button>
+      <div class="error-msg" id="es-code-error"></div>
+    </div>
+
+    <div class="reg-titre">Partir</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne danger" id="es-quitter">
+        <span class="reg-nm">Quitter cette entreprise</span>
+      </button>
+    </div>
+    <div class="reg-note">Vous perdrez l'accès à ses procédures. Votre compte Procédo reste actif : vous pourrez en rejoindre une autre avec un nouveau code.</div>
+  </div>
+
+  <!-- Sous-page : la langue -->
+  <div class="screen" id="e-reg-langue">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Langue</h1>
+    </div>
+    <div class="langue-grille" id="langue-app" style="margin-top:14px;"></div>
+    <div class="reg-note">La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.</div>
   </div>
 
   <div class="screen" id="e-scan">
@@ -5157,6 +5215,7 @@ function peindreReglages() {
 
   const l = LANGUES.find(x => x.code === langueApp)
   if (el('reg-langue-val')) el('reg-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
+  peindreReglagesEquipe()
 
   // L'adresse vient du champ, qui est rempli au chargement du compte.
   if (el('reg-email')) el('reg-email').textContent = el('settings-email')?.value || '\u2014'
@@ -6581,7 +6640,9 @@ function renderCategoryProceduresListInterne() {
     const dashoffset = circumference * (1 - pct / 100)
 
     const enPanne = proc.statut === 'echec' || analyseBloquee(proc)
-    const enAnalyse = proc.statut === 'traitement'
+    // `redaction` est l'étape où l'IA met en forme les étapes : c'est encore une
+    // analyse en cours, et la carte doit le dire.
+    const enAnalyse = proc.statut === 'traitement' || proc.statut === 'redaction'
     const div = document.createElement('div')
     // Toutes les cartes restent cliquables : une analyse en cours mène à une
     // fenêtre où l'on peut l'abandonner, une analyse en panne à sa reprise.
@@ -8809,7 +8870,8 @@ let surveillanceAnalyses = null
 function surveillerAnalyses() {
   // Inutile d'interroger indéfiniment une analyse qui n'avance plus : elle est
   // signalée à l'écran, c'est au gérant de la relancer.
-  const enCours = allGestionProcedures.some(p => p.statut === 'traitement' && !analyseBloquee(p))
+  const enCours = allGestionProcedures.some(p =>
+    (p.statut === 'traitement' || p.statut === 'redaction') && !analyseBloquee(p))
   if (!enCours) {
     if (surveillanceAnalyses) { clearInterval(surveillanceAnalyses); surveillanceAnalyses = null }
     return
@@ -8818,20 +8880,30 @@ function surveillerAnalyses() {
   surveillanceAnalyses = setInterval(async () => {
     if (document.hidden || !currentMembre) return
 
+    /* On lit TOUS les états, sans filtre. Le filtre précédent ne demandait que
+       « traitement » et « prêt » : une procédure passée à « rédaction » n'était
+       pas renvoyée, son état local restait « traitement », et la roue tournait
+       indéfiniment alors que l'analyse était finie. */
     const { data } = await supabase.from('procedures')
       .select('id, statut').eq('entreprise_id', currentMembre.entreprise_id)
-      .in('statut', ['traitement', 'pret'])
     let change = false
     ;(data || []).forEach(row => {
       const p = allGestionProcedures.find(x => x.id === row.id)
-      if (p && p.statut !== row.statut) { p.statut = row.statut; change = true }
+      if (!p || p.statut === row.statut) return
+      /* Passage à « prêt » : l'analyse vient d'aboutir. La coche verte remplace
+         la roue, et on le dit — le gérant a pu quitter l'écran de suivi. */
+      const vientDeFinir = row.statut === 'pret' &&
+        (p.statut === 'traitement' || p.statut === 'redaction')
+      p.statut = row.statut
+      change = true
+      if (vientDeFinir) toast(`\u00ab ${p.titre} \u00bb est pr\u00eate.`)
     })
 
     /* On demande aussi à l'analyse où elle en est. C'est indispensable : c'est
        le navigateur qui constate la fin du traitement, et si le gérant a quitté
        l'écran de suivi, plus personne ne le ferait. La surveillance prend donc
        le relais, depuis n'importe quelle page de l'app. */
-    for (const row of (data || []).filter(r => r.statut === 'traitement')) {
+    for (const row of (data || []).filter(r => r.statut === 'traitement' || r.statut === 'redaction')) {
       const enMemoire = allGestionProcedures.find(x => x.id === row.id)
       if (enMemoire && analyseBloquee(enMemoire)) continue
       try {
@@ -8850,6 +8922,14 @@ function surveillerAnalyses() {
     }
 
     if (change) {
+      /* On redécide s'il faut continuer : sans ça, la boucle tournait pour
+         toujours dès qu'elle avait démarré une fois. */
+      const resteEnCours = allGestionProcedures.some(x =>
+        (x.statut === 'traitement' || x.statut === 'redaction') && !analyseBloquee(x))
+      if (!resteEnCours && surveillanceAnalyses) {
+        clearInterval(surveillanceAnalyses)
+        surveillanceAnalyses = null
+      }
       renderCategoryGrid()
       if (document.getElementById('p-category')?.classList.contains('active')) renderCategoryProceduresList()
     }
@@ -8884,7 +8964,7 @@ function etatProcedureHtml(proc) {
   if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a échoué — touchez pour relancer")
   if (analyseBloquee(proc)) return alerte('#FF9F0A', "L'analyse semble bloquée — touchez pour relancer")
 
-  if (proc?.statut === 'traitement') {
+  if (proc?.statut === 'traitement' || proc?.statut === 'redaction') {
     return `<div class="etat-proc" title="Analyse en cours">
       <svg viewBox="0 0 26 26">
         <circle class="fond-arc" cx="13" cy="13" r="10"/>
@@ -9454,9 +9534,28 @@ async function openEquipeDetail(procId) {
    ═══════════════════════════════════════════════════════════════════════════ */
 let mesAdhesions = []
 
+/* Les valeurs à droite de chaque ligne : on sait ce que contient une page sans
+   l'ouvrir. C'est tout l'intérêt de cette grammaire, et elle vaut ici comme
+   côté gestion — les deux espaces se ressemblent désormais. */
+function peindreReglagesEquipe() {
+  const el = (i) => document.getElementById(i)
+  const nom = currentMembre?.nom || ''
+  if (el('es-nom-affiche')) el('es-nom-affiche').textContent = nom || 'Votre compte'
+  if (el('es-initiales')) el('es-initiales').textContent = initialesEtab(nom)
+  if (el('es-email-affiche')) el('es-email-affiche').textContent = el('es-email')?.value || '\u2014'
+
+  const n = (mesAdhesions || []).length
+  if (el('es-nb-ent')) {
+    el('es-nb-ent').textContent = n > 1 ? `${n} entreprises` : (n === 1 ? '1 entreprise' : '\u2014')
+  }
+  const l = LANGUES.find(x => x.code === langueApp)
+  if (el('es-langue-val')) el('es-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
+}
+
 window.openEquipeSettings = async function() {
   showEquipeScreen('e-settings')
   rendreChoixLangueApp()
+  peindreReglagesEquipe()
   document.getElementById('es-nom').value = currentMembre?.nom || ''
   const { data: { user } } = await supabase.auth.getUser()
   document.getElementById('es-email').value = user?.email || ''
@@ -10855,6 +10954,7 @@ for (const id of ['langue-app', 'langue-app-gestion']) {
     definirLangue(b.dataset.langue)
     rendreChoixLangueApp()
     peindreReglages()
+    peindreReglagesEquipe()
     toast(LANGUES.find(l => l.code === langueApp)?.nom || '')
   })
 }

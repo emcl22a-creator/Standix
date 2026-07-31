@@ -3308,19 +3308,37 @@
   <div class="screen" id="etab-section-titre" style="display:none;"></div>
 </div>
 
+<!-- Aucune entreprise rattachée à ce compte -->
+<div class="fond-promu" id="fond-orphelin">
+  <div class="fen-promu" role="dialog" aria-modal="true">
+    <div class="accueil promu-carte">
+      <div class="accueil-texte">
+        <div class="t">Aucune entreprise</div>
+        <div class="s">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 5 chiffres
+          que votre responsable vous a communiqué.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" placeholder="00000"
+           style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
+    <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
+    <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
+    <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
+  </div>
+</div>
+
 <!-- Félicitations : même forme que la carte d'accueil « Bonjour prénom » -->
 <div class="fond-promu" id="fond-promu">
   <div class="fen-promu" role="dialog" aria-modal="true">
     <div class="accueil promu-carte">
       <div class="accueil-texte">
-        <div class="t" id="promu-titre">Félicitations</div>
-        <div class="s">Vous êtes désormais <b>gestionnaire</b> de <span id="promu-entreprise">votre entreprise</span>.
-          Créez des procédures, suivez l'équipe, gérez les accès.</div>
+        <div class="t" id="promu-titre">—</div>
+        <div class="s" id="promu-texte">—</div>
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
-    <button type="button" class="btn block" id="promu-entrer" style="margin-top:14px;">Accéder à l'espace Gestion</button>
-    <div class="avert">L'espace Équipe ne vous sera plus accessible : vous êtes maintenant de l'autre côté.</div>
+    <button type="button" class="btn block" id="promu-entrer" style="margin-top:14px;">—</button>
+    <div class="avert" id="promu-avert">—</div>
   </div>
 </div>
 
@@ -3570,6 +3588,10 @@
       <button class="btn block" id="es-rejoindre">Rejoindre</button>
       <div class="error-msg" id="es-code-error"></div>
     </div>
+
+    <button type="button" class="btn ghost block" id="es-quitter"
+            style="margin-top:10px; color:var(--red);">Quitter cette entreprise</button>
+    <div class="note" style="margin-top:8px;">Vous perdrez l'accès à ses procédures. Votre compte Procédo reste actif : vous pourrez rejoindre une autre entreprise avec un nouveau code.</div>
 
     <div class="section-title">Une question ?</div>
     <div class="accueil contact-carte" role="button" tabindex="0" id="contact-equipe">
@@ -4574,10 +4596,16 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
   const membre = choisirFicheMembre(fiches, selectedSpace)
 
   if (!membre) {
-    errorEl.textContent = erreur
-      ? "Impossible de lire votre fiche : " + erreur
-      : "Aucune fiche membre trouv\u00e9e pour ce compte. Contactez un administrateur."
     setButtonLoading(btn, false)
+    if (erreur) {
+      errorEl.textContent = 'Impossible de lire votre fiche : ' + erreur
+      return
+    }
+    /* Compte valide, mais rattaché à aucune entreprise : ce n'est pas une erreur
+       de connexion, c'est une étape qui manque. On ouvre le champ du code plutôt
+       que d'afficher un refus. */
+    document.getElementById('login-screen').style.display = 'none'
+    montrerOrphelin()
     return
   }
 
@@ -4889,6 +4917,7 @@ async function enterApp(membre) {
     mesurerOnglets()
     chargerLangue()
     chargerEtablissements()
+    setTimeout(() => verifierPromotion(membre), 700)
     window.jalon?.('APP AFFICHÉE')
     desarmerSurveillance()
     window.mesurerFluidite?.()
@@ -10112,24 +10141,154 @@ document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
    cherchera ses procédures à lire.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-async function verifierPromotion(membre) {
-  if (!membre || membre.role !== 'gestion') return
-  // Pas promu, ou félicitations déjà vues : rien à dire.
-  if (!membre.promu_par || membre.promu_vu) return
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUITTER UNE ENTREPRISE, ET N'EN AVOIR AUCUNE
 
+   Partir doit être aussi simple qu'entrer. Et quelqu'un qui se reconnecte sans
+   entreprise ne doit pas tomber sur un écran vide : on lui dit ce qui manque et
+   on lui donne le champ pour le réparer, là où il est.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+document.getElementById('es-quitter')?.addEventListener('click', async () => {
+  const nom = cachedEntreprise?.nom || 'cette entreprise'
+  const ok = await confirmDialog({
+    titre: `Quitter ${nom} ?`,
+    message: `Vous perdrez l'acc\u00e8s \u00e0 ses proc\u00e9dures et votre historique de lectures. ` +
+      `Votre compte Proc\u00e9do reste actif : vous pourrez rejoindre une autre entreprise avec un code.`,
+    confirmer: 'Quitter',
+    annuler: 'Rester',
+    danger: true,
+  })
+  if (!ok) return
+
+  const { data, error } = await supabase.from('membres')
+    .delete().eq('id', currentMembre.id).select('id')
+
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  if (!data || !data.length) {
+    toast("La base a refus\u00e9 le d\u00e9part. V\u00e9rifiez la r\u00e8gle \u00ab delete \u00bb sur la table membres.")
+    return
+  }
+
+  /* On efface le repère du dernier établissement : il désigne une fiche qui
+     n'existe plus, et rouvrirait sur une entreprise qu'on vient de quitter. */
+  try { localStorage.removeItem('procedo_membre') } catch (e) {}
+
+  const restantes = await lireFichesMembre((await supabase.auth.getUser()).data.user?.id)
+  const suivante = choisirFicheMembre(restantes.fiches)
+
+  currentMembre = null
+  cachedEntreprise = null
+
+  if (suivante) {
+    // Il lui reste une autre entreprise : on l'y emmène plutôt que de le sortir.
+    await enterApp(suivante)
+    toast(`Vous avez quitt\u00e9 ${nom}.`)
+    return
+  }
+
+  document.getElementById('gestion-app').style.display = 'none'
+  document.getElementById('equipe-app').style.display = 'none'
+  document.getElementById('tabbar-gestion').style.display = 'none'
+  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('choice-screen').style.display = 'flex'
+  toast(`Vous avez quitt\u00e9 ${nom}.`)
+})
+
+/* ── Un compte sans entreprise ───────────────────────────────── */
+
+function montrerOrphelin() {
+  const f = document.getElementById('fond-orphelin')
+  if (!f) return
+  document.getElementById('orph-erreur').textContent = ''
+  document.getElementById('orph-code').value = ''
+  f.classList.add('on')
+  setTimeout(() => document.getElementById('orph-code')?.focus(), 320)
+}
+
+document.getElementById('orph-sortir')?.addEventListener('click', () => {
+  document.getElementById('fond-orphelin')?.classList.remove('on')
+  signOut()
+})
+
+document.getElementById('orph-entrer')?.addEventListener('click', async () => {
+  const btn = document.getElementById('orph-entrer')
+  const err = document.getElementById('orph-erreur')
+  const code = (document.getElementById('orph-code').value || '').trim()
+  err.textContent = ''
+
+  if (code.length !== 5) { err.textContent = 'Le code compte 5 chiffres.'; return }
+  btn.disabled = true
+  btn.textContent = 'V\u00e9rification\u2026'
+
+  try {
+    const { data: ent } = await supabase.from('entreprises')
+      .select('id, nom').eq('code_acces', code).maybeSingle()
+    if (!ent) throw new Error("Aucune entreprise ne correspond \u00e0 ce code.")
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) throw new Error('Session expir\u00e9e. Reconnectez-vous.')
+
+    const { data: cree, error } = await supabase.from('membres')
+      .insert({ user_id: user.id, entreprise_id: ent.id, nom: '', role: 'equipe' })
+      .select('*').maybeSingle()
+    if (error) throw new Error(error.message)
+    if (!cree) throw new Error("La base a refus\u00e9 l'adh\u00e9sion.")
+
+    document.getElementById('fond-orphelin').classList.remove('on')
+    await enterApp(cree)
+    toast(`Bienvenue chez ${ent.nom}.`)
+  } catch (ex) {
+    err.textContent = ex instanceof Error ? ex.message : String(ex)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Rejoindre'
+  }
+})
+
+async function verifierPromotion(membre) {
+  if (!membre) return
+
+  /* Deux annonces, une seule fenêtre. On les distingue avec les colonnes qu'on
+     a déjà : `promu_le` marque le dernier changement de rang, `promu_vu` dit si
+     la personne en a été avertie. Le rôle actuel donne le sens du changement.
+
+     Pourquoi annoncer une rétrogradation ? Parce que sans elle, quelqu'un
+     rouvre l'app, ne retrouve plus la gestion, et croit à une panne. Un
+     changement subi se dit ; c'est le minimum. */
+  if (membre.promu_vu) return
+  if (!membre.promu_le) return
+
+  const promu = membre.role === 'gestion'
   const prenom = (membre.nom || '').trim().split(' ')[0]
-  document.getElementById('promu-titre').textContent =
-    prenom ? `F\u00e9licitations ${prenom} \uD83C\uDF89` : 'F\u00e9licitations \uD83C\uDF89'
-  document.getElementById('promu-entreprise').textContent =
-    cachedEntreprise?.nom || 'votre entreprise'
+  const ent = cachedEntreprise?.nom || 'votre entreprise'
+  const el = (i) => document.getElementById(i)
+
+  if (promu) {
+    el('promu-titre').textContent = prenom ? `F\u00e9licitations ${prenom} \uD83C\uDF89` : 'F\u00e9licitations \uD83C\uDF89'
+    el('promu-texte').innerHTML =
+      `Vous \u00eates d\u00e9sormais <b>gestionnaire</b> de ${escapeHtml(ent)}. ` +
+      `Cr\u00e9ez des proc\u00e9dures, suivez l'\u00e9quipe, g\u00e9rez les acc\u00e8s.`
+    el('promu-entrer').textContent = "Acc\u00e9der \u00e0 l'espace Gestion"
+    el('promu-avert').textContent =
+      "L'espace \u00c9quipe ne vous sera plus accessible : vous \u00eates maintenant de l'autre c\u00f4t\u00e9."
+  } else {
+    el('promu-titre').textContent = prenom ? `Bonjour ${prenom}` : 'Bonjour'
+    el('promu-texte').innerHTML =
+      `Votre r\u00f4le a chang\u00e9 chez ${escapeHtml(ent)} : vous faites de nouveau partie de <b>l'\u00e9quipe</b>. ` +
+      `Vous retrouvez les proc\u00e9dures \u00e0 lire et le scanner de QR codes.`
+    el('promu-entrer').textContent = "Acc\u00e9der \u00e0 l'espace \u00c9quipe"
+    el('promu-avert').textContent =
+      "L'espace Gestion ne vous est plus accessible. Vos proc\u00e9dures cr\u00e9\u00e9es restent en place."
+  }
 
   const fond = document.getElementById('fond-promu')
   if (!fond) return
   fond.classList.add('on')
 
   /* On marque comme vue TOUT DE SUITE, pas à la fermeture : si la personne
-     ferme l'app sans toucher au bouton, la fête ne doit pas recommencer à
-     chaque ouverture. */
+     ferme l'app sans toucher au bouton, l'annonce ne doit pas revenir à chaque
+     ouverture. */
   membre.promu_vu = true
   supabase.from('membres').update({ promu_vu: true }).eq('id', membre.id)
     .then(({ error }) => { if (error) console.warn('Proc\u00e9do \u00b7 promu_vu :', error.message) })
@@ -10358,7 +10517,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   /* On efface aussi la trace de promotion : si cette personne est promue à
      nouveau plus tard, elle doit revoir les félicitations. */
   let { data, error } = await supabase.from('membres')
-    .update({ role: 'equipe', promu_par: null, promu_le: null, promu_vu: false })
+    .update({ role: 'equipe', promu_par: null, promu_le: new Date().toISOString(), promu_vu: false })
     .eq('id', btn.dataset.retro).select('id')
 
   if (error) {
@@ -11421,6 +11580,11 @@ try {
         const { data: fiches } = await supabase
           .from('membres').select('*').eq('user_id', session.user.id)
         const membre = choisirFicheMembre(fiches)
+        if (!membre && (fiches || []).length === 0) {
+          window.__procedoLoaded = true
+          montrerOrphelin()
+          return
+        }
         window.jalon?.('fiche membre reçue (via la bibliothèque)')
         if (membre) {
           enterApp(membre)

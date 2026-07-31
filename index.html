@@ -583,6 +583,90 @@
   .bandeau-bloc #bandeau-bloc-recharger{ background:#fff; color:#000; border-color:transparent; }
 
   /* ═══════════════════════════════════════════════════════════════════
+     LA PAGE DES OFFRES
+     Le prix suit le nombre de membres, et il est ramené au membre : c'est le
+     seul chiffre qu'un restaurateur peut comparer à quelque chose qu'il connaît.
+     Les avantages ne sont pas une liste à puces de plus : les deux ou trois qui
+     comptent sont détaillés, le reste tient sur une ligne.
+     ═════════════════════════════════════════════════════════════════ */
+  .abo-scene{
+    position:relative; margin-top:14px; padding:24px 16px 18px; border-radius:26px;
+    background:linear-gradient(168deg,#17181D,#101114);
+    border:0.5px solid var(--border); overflow:hidden;
+  }
+  .abo-halo{
+    position:absolute; top:-96px; left:50%; transform:translateX(-50%);
+    width:320px; height:210px; pointer-events:none;
+    background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
+  }
+  .abo-hi{ position:relative; text-align:center; margin-bottom:18px; padding-top:6px; }
+  .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px; }
+  .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
+  .abo-hi b{ color:#fff; font-weight:650; }
+  .abo-conf{
+    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;
+    font-size:10.5px; color:var(--label-3); font-weight:600;
+  }
+  #abo-liste{ display:none; margin-top:12px; }
+  #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
+
+  .offre-carte{
+    position:relative; padding:18px 16px 16px; border-radius:22px;
+    background:var(--bg-card); border:1px solid var(--border); margin-bottom:10px;
+  }
+  .offre-carte.vedette{ border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.07); }
+  .offre-ruban{
+    position:absolute; top:-9px; left:16px; padding:3px 11px; border-radius:100px;
+    background:#fff; color:#000; font-size:9.5px; font-weight:800; letter-spacing:0.04em;
+  }
+  .offre-carte.actuelle .offre-ruban{ background:var(--green); color:#06210F; }
+
+  /* L'en-tête : le nom, la taille, le prix. Pas de dessin — il était étiré et
+     n'apportait rien qu'un chiffre ne dise mieux. */
+  .offre-tete{ display:flex; align-items:flex-start; gap:12px; }
+  .offre-txt{ flex:1; min-width:0; }
+  .offre-nom{ display:block; font-size:19px; font-weight:850; letter-spacing:-0.04em; }
+  .offre-taille{ display:block; font-size:12.5px; color:var(--label-2); margin-top:3px; }
+  .offre-prix{ text-align:right; flex-shrink:0; }
+  .offre-prix .v{ font-size:26px; font-weight:850; letter-spacing:-0.055em; line-height:1; }
+  .offre-prix .u{ display:block; font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:4px; }
+  .offre-parmembre{
+    font-size:11.5px; color:var(--label-3); margin-top:9px;
+    padding-top:9px; border-top:0.5px solid var(--border);
+  }
+  .offre-parmembre b{ color:#fff; font-weight:700; }
+
+  /* Les avantages qui comptent : titre net, une phrase qui dit ce qu'on y gagne. */
+  .offre-phares{ display:flex; flex-direction:column; gap:12px; margin-top:14px; }
+  .offre-phare{ display:flex; gap:11px; }
+  .offre-phare .p{
+    flex-shrink:0; width:26px; height:26px; border-radius:8px; margin-top:1px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
+  }
+  .offre-phare .p svg{ width:15px; height:15px; display:block; }
+  .offre-phare .t{ display:block; font-size:14px; font-weight:700; letter-spacing:-0.02em; }
+  .offre-phare .s{ display:block; font-size:12.5px; color:var(--label-2); line-height:1.45; margin-top:2px; }
+
+  .offre-aussi{
+    font-size:12px; color:var(--label-3); line-height:1.5;
+    margin-top:13px; padding-top:12px; border-top:0.5px solid var(--border);
+  }
+  .offre-aussi b{ color:var(--label-2); font-weight:600; }
+
+  .offre-cta{
+    width:100%; height:48px; margin-top:15px; border:none; border-radius:15px;
+    font-family:inherit; font-size:14.5px; font-weight:700; background:#fff; color:#000;
+  }
+  .offre-carte:not(.vedette) .offre-cta{
+    background:rgba(255,255,255,0.08); color:#fff; border:0.5px solid var(--border);
+    height:42px; font-size:13px;
+  }
+  .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
+  .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:9px; }
+  .offre-annuel b{ color:var(--green); font-weight:700; }
+
+  /* ═══════════════════════════════════════════════════════════════════
      LES RÉGLAGES
 
      La grammaire d'iOS : des GROUPES de lignes, chacune avec sa tuile colorée à
@@ -731,70 +815,11 @@
   /* ═══ La page des offres ═══
      Ces règles avaient disparu en réécrivant le bloc voisin : la page s'affichait
      sans son cadre, sans son halo et sans ses rassurances. */
-  .abo-scene{
-    position:relative; margin-top:14px; padding:24px 16px 18px; border-radius:26px;
-    background:linear-gradient(168deg,#17181D,#101114);
-    border:0.5px solid var(--border); overflow:hidden;
-  }
-  .abo-halo{
-    position:absolute; top:-90px; left:50%; transform:translateX(-50%);
-    width:300px; height:200px; pointer-events:none;
-    background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
-  }
-  .abo-hi{ position:relative; text-align:center; margin-bottom:18px; padding-top:6px; }
   .abo-hi h2{ font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px; }
   .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
   .abo-hi b{ color:#fff; font-weight:650; }
-  .abo-conf{
-    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;
-    font-size:10.5px; color:var(--label-3); font-weight:600;
-  }
-  .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:9px; }
   .offre-annuel b{ color:var(--green); font-weight:700; }
-  #abo-liste{ display:none; margin-top:12px; }
-  #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
 
-  .offre-carte{
-    position:relative; padding:18px 16px; border-radius:20px;
-    background:var(--bg-card); border:1px solid var(--border); margin-bottom:11px;
-    transition:border-color 0.25s, background 0.25s;
-  }
-  .offre-carte.conseillee{ border-color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.07); }
-  .offre-carte.actuelle{ border-color:var(--green); }
-  .offre-ruban{
-    position:absolute; top:-9px; left:16px; padding:3px 10px; border-radius:100px;
-    background:#fff; color:#000; font-size:10px; font-weight:800; letter-spacing:0.02em;
-  }
-  .offre-carte.actuelle .offre-ruban{ background:var(--green); color:#06210F; }
-  .offre-tete{ display:flex; align-items:flex-start; gap:13px; margin-bottom:12px; }
-  .offre-ic{ flex-shrink:0; width:46px; height:42px; }
-  .offre-ic svg{ width:46px; height:42px; display:block; overflow:visible; }
-  .offre-txt{ flex:1; min-width:0; }
-  .offre-nom{ font-size:17px; font-weight:800; letter-spacing:-0.035em; }
-  .offre-taille{ font-size:12.5px; color:var(--label-2); margin-top:2px; }
-  .offre-prix{ text-align:right; flex-shrink:0; }
-  .offre-prix .v{ font-size:23px; font-weight:850; letter-spacing:-0.05em; line-height:1; }
-  .offre-prix .u{ display:block; font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; }
-  .offre-pts{ display:flex; flex-direction:column; gap:7px; }
-  .offre-pt{ display:flex; align-items:flex-start; gap:9px; font-size:12.5px; line-height:1.4; }
-  .offre-pt .c{ flex-shrink:0; margin-top:1px; }
-  .offre-pt .c svg{ width:14px; height:14px; display:block; }
-  .offre-pt b{ font-weight:650; }
-  .offre-pt.suite{ color:var(--label-2); }
-  .offre-cta{
-    width:100%; height:44px; margin-top:15px; border:none; border-radius:13px;
-    font-family:inherit; font-size:13.5px; font-weight:700;
-    background:rgba(255,255,255,0.10); color:#fff; border:0.5px solid var(--border);
-  }
-  .offre-carte.conseillee .offre-cta{ background:#fff; color:#000; border-color:transparent; }
-  .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
-
-  /* ═══ Arrivée du contenu après un changement d'établissement ═══
-     Seul le CONTENU se rejoue. La barre du haut, la barre du bas et le tiroir
-     restent immobiles : ce sont les procédures qui changent, pas le cadre.
-     L'animation est posée sur les enfants directs de l'écran, jamais sur l'écran
-     lui-même — une transformation sur un ancêtre dérèglerait tout ce qui est
-     positionné de manière fixe à l'intérieur. */
   @keyframes contenuEntre{
     from{ opacity:0; transform:translateY(12px); }
     to{ opacity:1; transform:none; }
@@ -9262,77 +9287,60 @@ async function chargerMesEntreprises() {
    le nombre de fiches dessinées dit la même chose que le prix.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-const AV_O = 'rgba(255,255,255,0.75)'
-const LG_O = 'rgba(255,255,255,0.35)'
-const F2_O = 'rgba(255,255,255,0.26)'
+const AV_O = 'rgba(255,255,255,0.78)'
+const LG_O = 'rgba(255,255,255,0.32)'
 
-/* Une silhouette par palier : une personne, un petit groupe, une équipe. Le
-   dessin dit la taille avant que le chiffre soit lu. */
-function silhouettes(n) {
-  const pos = [[20,15],[9,17],[31,17],[14,13],[26,13]]
-  let p = ''
-  for (let i = 0; i < n; i++) {
-    const teinte = i === 0 ? AV_O : (i < 3 ? LG_O : F2_O)
-    const trait = i === 0 ? 1.7 : 1.5
-    const r = i === 0 ? 5 : 4
-    const b = i === 0 ? 8 : 6.5
-    p += `<circle cx="${pos[i][0]}" cy="${pos[i][1]}" r="${r}" stroke="${teinte}" stroke-width="${trait}"/>`
-    p += `<path d="M${pos[i][0] - b} ${pos[i][1] + 15}a${b} ${b} 0 0 1 ${b * 2} 0" stroke="${teinte}" stroke-width="${trait}" stroke-linecap="round"/>`
-  }
-  return `<svg viewBox="0 0 40 38" fill="none">${p}</svg>`
+/* Un pictogramme par avantage phare, dans la langue des icônes de création. */
+const PICTOS = {
+  video: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="5.4" width="18.8" height="13.2" rx="3" stroke="${AV_O}" stroke-width="1.7"/><path d="M10 9.6 15.4 12 10 14.4Z" fill="${AV_O}"/></svg>`,
+  monde: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="${AV_O}" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="${LG_O}" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  infini: `<svg viewBox="0 0 24 24" fill="none"><path d="M8.4 12a3.4 3.4 0 1 1 3.6 3.4c-2.4 0-3.6-6.8-6-6.8a3.4 3.4 0 0 0 0 6.8c2.4 0 3.6-6.8 6-6.8a3.4 3.4 0 0 1 0 6.8" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  suivi: `<svg viewBox="0 0 24 24" fill="none"><line x1="5.4" y1="19.4" x2="5.4" y2="12.6" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19.4" x2="12" y2="7.6" stroke="${AV_O}" stroke-width="2" stroke-linecap="round"/><line x1="18.6" y1="19.4" x2="18.6" y2="10.4" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/></svg>`,
+  sites: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="${AV_O}" stroke-width="1.7"/></svg>`,
+  main: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v9.2M8.4 7l3.6-3.6L15.6 7" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.6 14.4v3.4a2.6 2.6 0 0 0 2.6 2.6h9.6a2.6 2.6 0 0 0 2.6-2.6v-3.4" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
 }
 
-const COCHE_OFFRE = '<svg viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
-
-/* Les paliers suivent le NOMBRE DE MEMBRES. C'est la seule mesure qui grandit
-   avec l'usage : les procédures, elles, ne sont jamais limitées — les limiter
-   pousserait à en écrire moins, alors que l'outil ne vaut que si l'on en écrit
-   beaucoup. */
+/* Les paliers suivent le NOMBRE DE MEMBRES. Chaque offre annonce deux ou trois
+   avantages PHARES, détaillés — ce qu'on y gagne, en une phrase — puis le reste
+   sur une seule ligne. Une liste à puces de dix lignes ne se lit pas ; deux
+   promesses expliquées, oui. */
 const OFFRES = [
   {
-    cle: 'essentiel', nom: 'Essentiel', max: 5, prix: 39, gens: 1,
-    taille: "Jusqu'\u00e0 5 membres",
-    points: [
-      '<b>Proc\u00e9dures illimit\u00e9es</b>',
-      'Photos, \u00e9tapes \u00e9crites, QR code au poste',
-      'Cr\u00e9ation depuis un PDF ou un Word',
-      '10 vid\u00e9os analys\u00e9es par l\'IA par mois',
+    cle: 'essentiel', nom: 'Essentiel', max: 5, prix: 39,
+    phares: [
+      { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es', s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
+      { p: 'main', t: 'Cr\u00e9ation depuis vos documents', s: "Un PDF, un Word, une note de service : l'IA en tire les \u00e9tapes." },
     ],
+    aussi: '\u00c9tapes \u00e9crites et photos \u00b7 QR code \u00e0 afficher au poste \u00b7 suivi des lectures \u00b7 <b>10 vid\u00e9os analys\u00e9es par mois</b>',
   },
   {
-    cle: 'equipe', nom: '\u00c9quipe', max: 15, prix: 79, gens: 3,
-    taille: "Jusqu'\u00e0 15 membres",
-    points: [
-      'Tout Essentiel, plus :',
-      '<b>Analyse vid\u00e9o illimit\u00e9e</b>',
-      '<b>Traduction</b> pour chaque employ\u00e9',
-      'Suivi par personne et par cat\u00e9gorie',
+    cle: 'equipe', nom: '\u00c9quipe', max: 15, prix: 79,
+    phares: [
+      { p: 'video', t: 'Analyse vid\u00e9o illimit\u00e9e', s: "Filmez le geste en parlant, l'IA d\u00e9coupe la vid\u00e9o en \u00e9tapes minut\u00e9es." },
+      { p: 'monde', t: 'Chacun lit dans sa langue', s: 'Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez.' },
+      { p: 'suivi', t: 'Vous savez qui a lu quoi', s: 'Par personne, par cat\u00e9gorie, avec le temps pass\u00e9 sur chaque proc\u00e9dure.' },
     ],
+    aussi: 'Tout Essentiel \u00b7 m\u00e9dailles d\'assiduit\u00e9 \u00b7 relance des retardataires',
   },
   {
-    cle: 'pro', nom: 'Pro', max: 40, prix: 149, gens: 5,
-    taille: "Jusqu'\u00e0 40 membres",
-    points: [
-      'Tout \u00c9quipe, plus :',
-      '<b>Plusieurs \u00e9tablissements</b>',
-      'Logo propre \u00e0 chaque enseigne',
-      'Vue consolid\u00e9e de toutes les \u00e9quipes',
+    cle: 'pro', nom: 'Pro', max: 40, prix: 149,
+    phares: [
+      { p: 'sites', t: 'Plusieurs \u00e9tablissements', s: 'Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe.' },
+      { p: 'suivi', t: 'Vue consolid\u00e9e', s: "Comparez vos sites d'un coup d'\u0153il, sans changer de compte." },
     ],
+    aussi: 'Tout \u00c9quipe \u00b7 proc\u00e9dures partag\u00e9es entre les sites',
   },
   {
-    cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null, gens: 5,
-    taille: 'Membres illimit\u00e9s',
-    points: [
-      'Tout Pro, plus :',
-      'Accompagnement \u00e0 la mise en place',
-      'Interlocuteur d\u00e9di\u00e9',
-      'Engagement de disponibilit\u00e9 \u00e9crit',
+    cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
+    phares: [
+      { p: 'main', t: 'On s\'installe avec vous', s: 'Reprise de vos proc\u00e9dures existantes et formation de vos responsables.' },
+      { p: 'infini', t: 'Un interlocuteur d\u00e9di\u00e9', s: 'Une personne qui conna\u00eet votre organisation, joignable directement.' },
     ],
+    aussi: 'Tout Pro \u00b7 connexion par votre annuaire \u00b7 engagement de disponibilit\u00e9 \u00e9crit',
   },
 ]
 
 function nombreDeMembres() {
-  // La fiche du gérant compte : c'est quelqu'un de l'équipe.
   return Math.max(1, (cachedMembres || []).length)
 }
 
@@ -9344,29 +9352,38 @@ function planActuel() {
   return (cachedEntreprise?.plan || '').toLowerCase()
 }
 
+/* Le prix ramené au membre : c'est le seul chiffre qu'un restaurateur peut
+   comparer à quelque chose qu'il connaît — un café, une heure de main-d'œuvre. */
+function prixParMembre(o, n) {
+  if (o.prix === null || !n) return null
+  return (o.prix / n).toFixed(2).replace('.', ',')
+}
+
 function carteOffre(o, opts = {}) {
+  const n = opts.membres || 0
   const p = o.prix === null ? 'Sur devis' : o.prix + '\u20ac'
   const u = o.prix === null ? '' : 'par mois'
-  const annuel = o.prix === null ? '' :
-    `<div class="offre-annuel">ou <b>${Math.round(o.prix * 0.8)} \u20ac</b> par mois, pay\u00e9 \u00e0 l'ann\u00e9e</div>`
+  const pm = opts.detaille ? prixParMembre(o, n) : null
 
   return `<div class="offre-carte${opts.classe || ''}">
     ${opts.ruban ? `<span class="offre-ruban">${opts.ruban}</span>` : ''}
     <div class="offre-tete">
-      <span class="offre-ic">${silhouettes(o.gens)}</span>
       <span class="offre-txt">
         <span class="offre-nom">${o.nom}</span>
-        <span class="offre-taille">${o.taille}</span>
+        <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `Jusqu'\u00e0 ${o.max} membres`}</span>
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
-    <div class="offre-pts">
-      ${o.points.map(t => /^Tout /.test(t)
-        ? `<div class="offre-pt suite"><span>${t}</span></div>`
-        : `<div class="offre-pt">${COCHE_OFFRE}<span>${t}</span></div>`).join('')}
+    ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne et par mois</b>.</div>` : ''}
+    ${opts.detaille ? `<div class="offre-phares">
+      ${o.phares.map(f => `<div class="offre-phare">
+        <span class="p">${PICTOS[f.p]}</span>
+        <span><span class="t">${f.t}</span><span class="s">${f.s}</span></span>
+      </div>`).join('')}
     </div>
+    <div class="offre-aussi">${o.aussi}</div>` : `<div class="offre-aussi">${o.phares.map(f => f.t).join(' \u00b7 ')}</div>`}
     ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${opts.cta}</button>` : ''}
-    ${opts.annuel ? annuel : ''}
+    ${opts.annuel && o.prix !== null ? `<div class="offre-annuel">ou <b>${Math.round(o.prix * 0.8)} \u20ac</b> par mois, pay\u00e9 \u00e0 l'ann\u00e9e</div>` : ''}
   </div>`
 }
 
@@ -9394,6 +9411,8 @@ window.renderAbonnements = function() {
     cta: estActuelle ? 'Offre en cours'
       : (mienne.prix === null ? 'Nous \u00e9crire' : 'Commencer avec ' + mienne.nom),
     annuel: !estActuelle,
+    membres: n,
+    detaille: true,
   })
 
   document.getElementById('abo-liste').innerHTML = OFFRES

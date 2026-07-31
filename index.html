@@ -445,6 +445,63 @@
     .tiroir-autres .rond-ent, .topbar-card{ transition:none; }
   }
 
+  /* ═══ Ligne de réglage avec icône au trait ═══ */
+  .ligne-reglage{
+    display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px;
+    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
+    font-family:inherit; text-align:left; color:#fff;
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .ligne-reglage:active{ transform:scale(0.985); }
+  .ligne-reglage .ic-trait{ flex-shrink:0; width:44px; height:40px; display:flex;
+    align-items:center; justify-content:center; }
+  .ligne-reglage .ic-trait svg{ width:44px; height:40px; overflow:visible; }
+  .ligne-reglage .tx{ flex:1; min-width:0; }
+  .ligne-reglage .nm{ display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
+  .ligne-reglage .st{ display:block; font-size:12px; color:var(--label-3); margin-top:2px; }
+  .ligne-reglage .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
+
+  /* ═══ Les offres ═══
+     Chaque offre porte une icône dans la langue des quatre modes de création :
+     fiches en retrait à 16 et 26 %, celle de devant à 42 % sur un fond à 5 %,
+     et le signe distinctif en blanc plein. Ce qui change d'une offre à l'autre,
+     c'est le NOMBRE de fiches — une, deux, plusieurs, un réseau. Le dessin dit
+     donc la même chose que le prix. */
+  .offre-carte{
+    position:relative; padding:18px 16px; border-radius:20px;
+    background:var(--bg-card); border:1px solid var(--border); margin-bottom:11px;
+    transition:border-color 0.25s, background 0.25s;
+  }
+  .offre-carte.conseillee{ border-color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.07); }
+  .offre-carte.actuelle{ border-color:var(--green); }
+  .offre-ruban{
+    position:absolute; top:-9px; left:16px; padding:3px 10px; border-radius:100px;
+    background:#fff; color:#000; font-size:10px; font-weight:800; letter-spacing:0.02em;
+  }
+  .offre-carte.actuelle .offre-ruban{ background:var(--green); color:#06210F; }
+  .offre-tete{ display:flex; align-items:flex-start; gap:13px; margin-bottom:12px; }
+  .offre-ic{ flex-shrink:0; width:46px; height:42px; }
+  .offre-ic svg{ width:46px; height:42px; display:block; overflow:visible; }
+  .offre-txt{ flex:1; min-width:0; }
+  .offre-nom{ font-size:17px; font-weight:800; letter-spacing:-0.035em; }
+  .offre-taille{ font-size:12.5px; color:var(--label-2); margin-top:2px; }
+  .offre-prix{ text-align:right; flex-shrink:0; }
+  .offre-prix .v{ font-size:23px; font-weight:850; letter-spacing:-0.05em; line-height:1; }
+  .offre-prix .u{ display:block; font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; }
+  .offre-pts{ display:flex; flex-direction:column; gap:7px; }
+  .offre-pt{ display:flex; align-items:flex-start; gap:9px; font-size:12.5px; line-height:1.4; }
+  .offre-pt .c{ flex-shrink:0; margin-top:1px; }
+  .offre-pt .c svg{ width:14px; height:14px; display:block; }
+  .offre-pt b{ font-weight:650; }
+  .offre-pt.suite{ color:var(--label-2); }
+  .offre-cta{
+    width:100%; height:44px; margin-top:15px; border:none; border-radius:13px;
+    font-family:inherit; font-size:13.5px; font-weight:700;
+    background:rgba(255,255,255,0.10); color:#fff; border:0.5px solid var(--border);
+  }
+  .offre-carte.conseillee .offre-cta{ background:#fff; color:#000; border-color:transparent; }
+  .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
+
   /* ═══ Fenêtre d'un établissement ═══ */
   .fond-etab{
     position:fixed; inset:0; z-index:420; display:flex; align-items:center; justify-content:center;
@@ -2589,6 +2646,28 @@
     <div id="g-scan-result-zone"></div>
   </div>
 
+  <!-- Les offres -->
+  <div class="screen" id="p-abonnement">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Les offres</h1>
+    </div>
+    <div class="subhead">Le prix suit le nombre d'établissements. Les procédures ne sont jamais limitées.</div>
+
+    <div class="filter-chips" id="abo-periode" style="margin-top:14px;">
+      <button type="button" data-periode="mois" class="active">Mensuel</button>
+      <button type="button" data-periode="an">Annuel − 20 %</button>
+    </div>
+
+    <div id="abo-liste"></div>
+
+    <div class="note" style="text-align:center; margin-top:18px;">
+      Prix hors taxes. Changement d'offre à tout moment, sans engagement sur le mensuel.
+    </div>
+  </div>
+
   <div class="screen" id="p-settings">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-list')">
@@ -2622,27 +2701,22 @@
     </div>
 
     <div class="section-title">Votre abonnement</div>
-    <div class="plan-card" data-plan="starter">
-      <div class="plan-head">
-        <div class="plan-name">Starter</div>
-        <div class="plan-price">49€<span>/mois</span></div>
-      </div>
-      <div class="plan-desc">Jusqu'à 10 membres · fonctionnalités essentielles</div>
-    </div>
-    <div class="plan-card active" data-plan="pro">
-      <div class="plan-head">
-        <div class="plan-name">Pro <span class="badge ok" style="margin-left:6px;">Actuel</span></div>
-        <div class="plan-price">99€<span>/mois</span></div>
-      </div>
-      <div class="plan-desc">Jusqu'à 25 membres · IA incluse · vérification vidéo</div>
-    </div>
-    <div class="plan-card" data-plan="business">
-      <div class="plan-head">
-        <div class="plan-name">Business</div>
-        <div class="plan-price">199€<span>/mois</span></div>
-      </div>
-      <div class="plan-desc">Membres illimités · multi-sites</div>
-    </div>
+    <button type="button" class="ligne-reglage" id="ouvrir-abonnement">
+      <span class="ic-trait">
+        <svg viewBox="0 0 44 40" fill="none">
+          <rect x="12" y="2" width="24" height="15" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.4"/>
+          <rect x="8" y="6" width="29" height="17" rx="5" stroke="rgba(255,255,255,0.26)" stroke-width="1.4"/>
+          <rect x="3" y="11" width="34" height="22" rx="6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
+          <line x1="3" y1="18" x2="37" y2="18" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
+          <line x1="9" y1="26" x2="18" y2="26" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="tx">
+        <span class="nm">Voir les offres</span>
+        <span class="st" id="abo-actuel">Offre Pro · 79 € par mois</span>
+      </span>
+      <span class="fl">›</span>
+    </button>
 
     <div class="section-title" id="etab-section-titre" style="display:none;">Vos établissements</div>
     <div id="etab-liste"></div>
@@ -4346,6 +4420,7 @@ function placerPastille(conteneur, immediat) {
 function reposerPastilles(immediat) {
   placerPastille(document.getElementById('analyse-period-toggle'), immediat)
   placerPastille(document.getElementById('ga-period-toggle'), immediat)
+  placerPastille(document.getElementById('abo-periode'), immediat)
 }
 window.addEventListener('resize', () => reposerPastilles(true))
 
@@ -8504,6 +8579,205 @@ async function chargerMesEntreprises() {
       </div>`
   }).join('')
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES OFFRES
+
+   Le prix suit le nombre d'établissements, jamais le nombre de procédures :
+   limiter les procédures pousserait à en écrire moins, alors que l'outil ne vaut
+   que si l'on en écrit beaucoup. Ce qui monte en gamme, c'est l'analyse vidéo —
+   la seule chose qui coûte réellement de l'argent à chaque usage.
+
+   Chaque offre porte une icône dans la langue des quatre modes de création, et
+   le nombre de fiches dessinées dit la même chose que le prix.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const F1 = 'rgba(255,255,255,0.16)'
+const F2 = 'rgba(255,255,255,0.26)'
+const AV = 'rgba(255,255,255,0.42)'
+const LG = 'rgba(255,255,255,0.22)'
+
+const ICONES_OFFRE = {
+  // Une seule fiche : un établissement, l'essentiel.
+  essentiel: `<svg viewBox="0 0 46 42" fill="none">
+    <rect x="10" y="6" width="26" height="30" rx="6" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
+    <line x1="16" y1="16" x2="30" y2="16" stroke="${AV}" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="16" y1="22" x2="27" y2="22" stroke="${LG}" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="16" y1="28" x2="23" y2="28" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>`,
+
+  // Trois fiches en profondeur, et l'étincelle : l'IA sans limite.
+  pro: `<svg viewBox="0 0 46 42" fill="none">
+    <rect x="14" y="2" width="24" height="26" rx="5" stroke="${F1}" stroke-width="1.4"/>
+    <rect x="10" y="6" width="26" height="28" rx="6" stroke="${F2}" stroke-width="1.4"/>
+    <rect x="5" y="11" width="27" height="27" rx="6" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
+    <line x1="11" y1="20" x2="26" y2="20" stroke="${AV}" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="11" y1="26" x2="22" y2="26" stroke="${LG}" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M38.6 4.4 40 8.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"/>
+  </svg>`,
+
+  // Trois bâtiments côte à côte : plusieurs établissements.
+  multi: `<svg viewBox="0 0 46 42" fill="none">
+    <rect x="2" y="14" width="13" height="24" rx="4" stroke="${F2}" stroke-width="1.4"/>
+    <rect x="31" y="14" width="13" height="24" rx="4" stroke="${F2}" stroke-width="1.4"/>
+    <rect x="15" y="6" width="16" height="32" rx="5" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
+    <line x1="20" y1="16" x2="26" y2="16" stroke="${AV}" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="20" y1="23" x2="26" y2="23" stroke="${LG}" stroke-width="1.6" stroke-linecap="round"/>
+    <line x1="20" y1="30" x2="26" y2="30" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
+  </svg>`,
+
+  // Un réseau : des points reliés à un centre.
+  entreprise: `<svg viewBox="0 0 46 42" fill="none">
+    <line x1="23" y1="21" x2="8" y2="9" stroke="${F2}" stroke-width="1.4"/>
+    <line x1="23" y1="21" x2="38" y2="9" stroke="${F2}" stroke-width="1.4"/>
+    <line x1="23" y1="21" x2="8" y2="33" stroke="${F2}" stroke-width="1.4"/>
+    <line x1="23" y1="21" x2="38" y2="33" stroke="${F2}" stroke-width="1.4"/>
+    <circle cx="8" cy="9" r="4" stroke="${F1}" stroke-width="1.4"/>
+    <circle cx="38" cy="9" r="4" stroke="${F1}" stroke-width="1.4"/>
+    <circle cx="8" cy="33" r="4" stroke="${F1}" stroke-width="1.4"/>
+    <circle cx="38" cy="33" r="4" stroke="${F1}" stroke-width="1.4"/>
+    <circle cx="23" cy="21" r="8" fill="rgba(255,255,255,0.05)" stroke="${AV}" stroke-width="1.6"/>
+  </svg>`,
+}
+
+const COCHE_OFFRE = '<svg viewBox="0 0 24 24" fill="none" stroke="#30D158" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'
+
+const OFFRES = [
+  {
+    cle: 'essentiel', nom: 'Essentiel', prix: 39, icone: 'essentiel',
+    taille: '1 \u00e9tablissement',
+    points: [
+      '<b>Proc\u00e9dures illimit\u00e9es</b>',
+      '\u00c9tapes \u00e9crites, photos, d\u00e9coupage vid\u00e9o \u00e0 la main',
+      'Cr\u00e9ation depuis un PDF ou un Word',
+      'QR code par proc\u00e9dure, \u00e0 afficher au poste',
+      '<b>10 vid\u00e9os analys\u00e9es par l\'IA</b> par mois',
+    ],
+  },
+  {
+    cle: 'pro', nom: 'Pro', prix: 79, icone: 'pro', conseillee: true,
+    taille: '1 \u00e9tablissement, membres illimit\u00e9s',
+    points: [
+      'Tout Essentiel, plus :',
+      '<b>Analyse vid\u00e9o illimit\u00e9e</b>',
+      '<b>Traduction des proc\u00e9dures</b> pour chaque employ\u00e9',
+      'Suivi d\u00e9taill\u00e9 par personne et par cat\u00e9gorie',
+      'M\u00e9dailles et suivi d\'assiduit\u00e9',
+    ],
+  },
+  {
+    cle: 'multi', nom: 'Multi-sites', prix: 179, icone: 'multi',
+    taille: "Jusqu'\u00e0 5 \u00e9tablissements",
+    points: [
+      'Tout Pro, plus :',
+      '<b>Plusieurs \u00e9tablissements</b> sous un m\u00eame compte',
+      'Logo propre \u00e0 chaque enseigne',
+      'Proc\u00e9dures partag\u00e9es entre les sites',
+      'Vue consolid\u00e9e de toutes les \u00e9quipes',
+    ],
+  },
+  {
+    cle: 'entreprise', nom: 'Entreprise', prix: null, icone: 'entreprise',
+    taille: 'Au-del\u00e0 de 5 \u00e9tablissements',
+    points: [
+      'Tout Multi-sites, plus :',
+      'Accompagnement \u00e0 la mise en place',
+      'Interlocuteur d\u00e9di\u00e9',
+      'Connexion par votre annuaire',
+      'Engagement de disponibilit\u00e9 \u00e9crit',
+    ],
+  },
+]
+
+let aboAnnuel = false
+
+function prixOffre(o) {
+  if (o.prix === null) return { v: 'Sur devis', u: '' }
+  const p = aboAnnuel ? Math.round(o.prix * 0.8) : o.prix
+  return { v: p + '\u20ac', u: aboAnnuel ? "par mois, pay\u00e9 \u00e0 l'ann\u00e9e" : 'par mois' }
+}
+
+function planActuel() {
+  return (cachedEntreprise?.plan || 'pro').toLowerCase()
+}
+
+window.renderAbonnements = function() {
+  const el = document.getElementById('abo-liste')
+  if (!el) return
+  const actuel = planActuel()
+
+  el.innerHTML = OFFRES.map(o => {
+    const p = prixOffre(o)
+    const estActuel = o.cle === actuel
+    const classes = 'offre-carte' + (estActuel ? ' actuelle' : (o.conseillee ? ' conseillee' : ''))
+    const ruban = estActuel ? 'Votre offre' : (o.conseillee ? 'Le plus choisi' : '')
+
+    return `<div class="${classes}">
+      ${ruban ? `<span class="offre-ruban">${ruban}</span>` : ''}
+      <div class="offre-tete">
+        <span class="offre-ic">${ICONES_OFFRE[o.icone]}</span>
+        <span class="offre-txt">
+          <span class="offre-nom">${o.nom}</span>
+          <span class="offre-taille">${o.taille}</span>
+        </span>
+        <span class="offre-prix"><span class="v">${p.v}</span><span class="u">${p.u}</span></span>
+      </div>
+      <div class="offre-pts">
+        ${o.points.map((t, i) => i === 0 && /^Tout /.test(t)
+          ? `<div class="offre-pt suite"><span>${t}</span></div>`
+          : `<div class="offre-pt"><span class="c">${COCHE_OFFRE}</span><span>${t}</span></div>`).join('')}
+      </div>
+      <button type="button" class="offre-cta" data-offre="${o.cle}">
+        ${estActuel ? 'Offre en cours' : (o.prix === null ? 'Nous contacter' : 'Choisir ' + o.nom)}
+      </button>
+    </div>`
+  }).join('')
+
+  // Le rappel dans les réglages suit l'offre en cours.
+  const rappel = document.getElementById('abo-actuel')
+  const o = OFFRES.find(x => x.cle === actuel)
+  if (rappel && o) {
+    rappel.textContent = o.prix === null
+      ? `Offre ${o.nom}`
+      : `Offre ${o.nom} \u00b7 ${o.prix} \u20ac par mois`
+  }
+}
+
+document.getElementById('ouvrir-abonnement')?.addEventListener('click', () => {
+  renderAbonnements()
+  showGestionScreen('p-abonnement')
+})
+
+document.getElementById('abo-periode')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-periode]')
+  if (!b) return
+  aboAnnuel = b.dataset.periode === 'an'
+  document.querySelectorAll('#abo-periode button')
+    .forEach(x => x.classList.toggle('active', x === b))
+  placerPastille(document.getElementById('abo-periode'))
+  renderAbonnements()
+})
+
+document.getElementById('abo-liste')?.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-offre]')
+  if (!b) return
+  const o = OFFRES.find(x => x.cle === b.dataset.offre)
+  if (!o || o.cle === planActuel()) return
+
+  /* Le paiement n'est pas encore branché. Plutôt que de faire semblant, on le
+     dit et on ouvre le courriel : un client qui écrit vaut mieux qu'un client
+     qui bute sur un bouton mort. */
+  const ok = await confirmDialog({
+    titre: o.prix === null ? 'Offre Entreprise' : `Passer \u00e0 ${o.nom}`,
+    message: o.prix === null
+      ? "Cette offre se construit avec vous. \u00c9crivez-nous et nous revenons vers vous rapidement."
+      : `${o.nom} \u00e0 ${prixOffre(o).v} ${prixOffre(o).u}. Le paiement en ligne arrive bient\u00f4t \u2014 en attendant, \u00e9crivez-nous et nous activons votre offre.`,
+    confirmer: '\u00c9crire',
+    annuler: 'Plus tard',
+    danger: false,
+  })
+  if (ok) ouvrirContact()
+})
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE TIROIR DES ÉTABLISSEMENTS

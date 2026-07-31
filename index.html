@@ -4483,6 +4483,17 @@ function choisirFicheMembre(fiches, espaceVoulu) {
   if (!liste.length) return null
   if (liste.length === 1) return liste[0]
 
+  /* D'abord la DERNIÈRE fiche ouverte. Quelqu'un qui bascule sur son second
+     établissement puis recharge la page doit y rester : sans ce repère, il
+     revenait sur le premier à chaque rechargement, et le changement semblait
+     ne pas avoir pris. */
+  let derniere = null
+  try { derniere = localStorage.getItem('procedo_membre') } catch (e) {}
+  if (derniere) {
+    const trouvee = liste.find(m => String(m.id) === String(derniere))
+    if (trouvee) return trouvee
+  }
+
   let prefere = espaceVoulu
   if (!prefere) {
     try { prefere = localStorage.getItem('procedo_espace') } catch (e) { prefere = null }
@@ -4506,7 +4517,11 @@ async function lireFichesMembre(userId) {
 
 async function enterApp(membre) {
   currentMembre = membre
-  try { localStorage.setItem('procedo_espace', membre.role) } catch (e) {}
+  try {
+    localStorage.setItem('procedo_espace', membre.role)
+    // Le repère du rechargement : on retient la fiche, donc l'établissement.
+    localStorage.setItem('procedo_membre', String(membre.id))
+  } catch (e) {}
 
   /* On masque les écrans d'accueil AVANT toute attente. Ils l'étaient après le
      chargement des procédures : sur une connexion lente, plusieurs secondes
@@ -4808,6 +4823,9 @@ window.signOut = async function() {
   document.getElementById('equipe-app').style.display = 'none'
   document.getElementById('tabbar-gestion').style.display = 'none'
   document.getElementById('tabbar-equipe').style.display = 'none'
+  // Le repère n'a plus de sens une fois déconnecté : le compte suivant pourrait
+  // ne pas avoir cette fiche, et hériterait d'un choix qui n'est pas le sien.
+  try { localStorage.removeItem('procedo_membre') } catch (e) {}
   document.getElementById('login-email').value = ''
   document.getElementById('login-password').value = ''
   afficherEcranChoix()

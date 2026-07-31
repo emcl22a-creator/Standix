@@ -287,6 +287,44 @@
     background:rgba(94,160,255,0.20); color:#9CC5FF;
   }
 
+  /* L'image en tête de la fiche, et sur la carte. */
+  .analyse-couv{
+    margin-top:14px; border-radius:18px; overflow:hidden;
+    border:0.5px solid var(--border); background:#000;
+  }
+  .analyse-couv img{ width:100%; display:block; }
+  .carte-couv{
+    margin:-14px -14px 12px; border-bottom:0.5px solid var(--border);
+    background:#000; max-height:104px; overflow:hidden;
+  }
+  .carte-couv img{ width:100%; display:block; object-fit:cover; }
+
+  /* ═══ L'image de la procédure ═══
+     Une seule image pour l'ensemble, distincte des photos d'étape. Les
+     procédures sans vidéo n'avaient rien à montrer sur leur carte : une liste de
+     titres se ressemble toute. */
+  .couv{
+    position:relative; display:flex; align-items:center; gap:12px; margin-top:14px;
+    padding:11px 12px; border-radius:16px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .couv input[type=file]{ position:absolute; inset:0; opacity:0; width:100%; height:100%; z-index:2; }
+  .couv .vign{
+    width:56px; height:42px; border-radius:9px; flex-shrink:0; overflow:hidden;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .couv .vign svg{ width:21px; height:21px; }
+  .couv .vign img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .couv .tx{ flex:1; min-width:0; }
+  .couv .tx .t{ display:block; font-size:13.5px; font-weight:650; letter-spacing:-0.02em; }
+  .couv .tx .s{ display:block; font-size:11.5px; color:var(--label-3); line-height:1.4; margin-top:2px; }
+  .couv .oter{
+    position:relative; z-index:3; border:none; background:rgba(255,255,255,0.10);
+    color:var(--red); font-family:inherit; font-size:11.5px; font-weight:650;
+    padding:6px 11px; border-radius:100px; flex-shrink:0;
+  }
+
   /* ═══════════════════════════════════════════════════════════════════
      DÉCOUPER UNE VIDÉO — UN SEUL GESTE
 
@@ -2751,9 +2789,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;" id="category-titre">—</h1>
-      <button type="button" class="icon-pill" id="cat-renommer" aria-label="Renommer la catégorie"
+      <button type="button" class="back-btn" id="cat-renommer" aria-label="Renommer la catégorie"
               title="Renommer la catégorie" style="margin-left:auto;">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
           <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
         </svg>
       </button>
@@ -2904,6 +2942,20 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Étapes manuelles</h1>
     </div>
     <div class="subhead">Écrivez chaque étape dans l'ordre</div>
+
+    <div class="couv" id="couv-manuel">
+      <input type="file" accept="image/*" class="fichier">
+      <span class="vign">
+        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/>
+        </svg>
+      </span>
+      <span class="tx">
+        <span class="t">Image de la procédure</span>
+        <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
+      </span>
+      <button type="button" class="oter" style="display:none;">Retirer</button>
+    </div>
 
     <div id="manual-steps-list"></div>
     <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
@@ -3128,6 +3180,20 @@
     </div>
 
     <div class="section-title">Étapes</div>
+    <div class="couv" id="couv-edit">
+      <input type="file" accept="image/*" class="fichier">
+      <span class="vign">
+        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/>
+        </svg>
+      </span>
+      <span class="tx">
+        <span class="t">Image de la procédure</span>
+        <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
+      </span>
+      <button type="button" class="oter" style="display:none;">Retirer</button>
+    </div>
+
     <div id="edit-steps-list"></div>
     <button class="btn ghost block" style="margin-top:4px;" id="edit-add-step-btn">+ Ajouter une étape</button>
 
@@ -3155,13 +3221,11 @@
       <div class="num" id="analyse-taux">—</div>
       <div class="sub" id="analyse-sub">—</div>
       <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
-      <div class="filter-chips" id="analyse-period-toggle" style="margin-top:14px;">
-        <button class="active" data-period="week" onclick="setAnalysePeriod('week')">Cette semaine</button>
-        <button data-period="month" onclick="setAnalysePeriod('month')">Ce mois-ci</button>
-        <button data-period="all" onclick="setAnalysePeriod('all')">Total</button>
-      </div>
+      <!-- Le filtre de période a été retiré : sur UNE procédure, ce qui compte est
+         de savoir qui l'a lue, pas quand. Le total est la seule réponse utile. -->
     </div>
 
+    <div class="analyse-couv" id="analyse-couverture" style="display:none;"></div>
     <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
       <video id="analyse-video" controls playsinline webkit-playsinline></video>
     </div>
@@ -5440,7 +5504,6 @@ function placerPastille(conteneur, immediat) {
    chaque affichage d'écran, et au redimensionnement. */
 function reposerPastilles(immediat) {
   placerPastille(document.getElementById('pm-tri'), immediat)
-  placerPastille(document.getElementById('analyse-period-toggle'), immediat)
   placerPastille(document.getElementById('ga-period-toggle'), immediat)
 }
 window.addEventListener('resize', () => reposerPastilles(true))
@@ -6716,6 +6779,7 @@ function renderCategoryProceduresListInterne() {
       enAnalyse ? proposerAbandon(proc) :
       openAnalyse(proc.id)
     div.innerHTML = `
+      ${proc.image_url ? `<div class="carte-couv"><img src="${escapeHtml(proc.image_url)}" alt=""></div>` : ''}
       <div class="cat-top">
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
@@ -6785,6 +6849,7 @@ function resetCreateForm() {
   manualSteps = []
   videoSteps = []
   currentVideoFile = null
+  reinitialiserCouverture(null)
   renderManualSteps()
   renderVideoSteps()
   updateModeCardsState()
@@ -8469,6 +8534,102 @@ function renderManualSteps() {
    comprendre.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'IMAGE DE LA PROCÉDURE
+
+   Une seule image pour l'ensemble, distincte des photos d'étape. Les procédures
+   sans vidéo n'avaient rien à montrer sur leur carte, et une liste de titres se
+   ressemble toute.
+
+   Comme pour les photos d'étape, le fichier n'est pas envoyé tout de suite : il
+   attend la publication. Inutile d'occuper le réseau pour une procédure qui sera
+   peut-être abandonnée.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let couvertureFichier = null    // en attente d'envoi
+let couvertureUrl = null        // déjà en ligne
+let couvertureARetirer = false
+
+function peindreCouverture() {
+  document.querySelectorAll('.couv').forEach(bloc => {
+    const vign = bloc.querySelector('.vign')
+    const oter = bloc.querySelector('.oter')
+    const sous = bloc.querySelector('.tx .s')
+    const source = couvertureFichier ? URL.createObjectURL(couvertureFichier) : couvertureUrl
+
+    if (source) {
+      vign.innerHTML = `<img src="${source}" alt="">`
+      oter.style.display = 'block'
+      sous.textContent = couvertureFichier ? "Sera envoy\u00e9e \u00e0 la publication." : 'En place.'
+    } else {
+      vign.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`
+      oter.style.display = 'none'
+      sous.textContent = "Elle appara\u00eet sur sa carte et en t\u00eate de la fiche. Facultative."
+    }
+  })
+}
+
+function reinitialiserCouverture(url) {
+  couvertureFichier = null
+  couvertureUrl = url || null
+  couvertureARetirer = false
+  document.querySelectorAll('.couv input[type=file]').forEach(c => { c.value = '' })
+  peindreCouverture()
+}
+
+document.addEventListener('change', (e) => {
+  const champ = e.target.closest('.couv input[type=file]')
+  if (!champ) return
+  const f = champ.files[0]
+  if (!f) return
+  if (f.size > 6 * 1024 * 1024) {
+    toast('Image trop lourde : 6 Mo maximum.')
+    champ.value = ''
+    return
+  }
+  couvertureFichier = f
+  couvertureARetirer = false
+  peindreCouverture()
+})
+
+document.addEventListener('click', (e) => {
+  const oter = e.target.closest('.couv .oter')
+  if (!oter) return
+  e.preventDefault()
+  /* On note le retrait au lieu d'effacer tout de suite : tant qu'on n'a pas
+     enregistré, on peut encore changer d'avis. */
+  couvertureARetirer = !!couvertureUrl
+  couvertureFichier = null
+  couvertureUrl = null
+  document.querySelectorAll('.couv input[type=file]').forEach(c => { c.value = '' })
+  peindreCouverture()
+})
+
+/* Envoie l'image si elle a changé, et renvoie l'adresse à écrire en base.
+   Une image qui échoue n'empêche rien : la procédure sera simplement sans elle. */
+async function envoyerCouverture(procedureId) {
+  if (couvertureARetirer && !couvertureFichier) return null
+  if (!couvertureFichier) return couvertureUrl
+  try {
+    const ext = (couvertureFichier.name.split('.').pop() || 'jpg').toLowerCase()
+    const chemin = `${currentMembre.entreprise_id}/${procedureId}/couverture-${Date.now()}.${ext}`
+    const { error } = await supabase.storage.from('procedo-videos')
+      .upload(chemin, couvertureFichier, { upsert: true })
+    if (error) throw error
+    return supabase.storage.from('procedo-videos').getPublicUrl(chemin).data?.publicUrl || null
+  } catch (ex) {
+    console.warn('Proc\u00e9do \u00b7 image de couverture non envoy\u00e9e :', ex?.message || ex)
+    return couvertureUrl
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DÉCOUPER UNE VIDÉO — UN SEUL GESTE
+
+   On regarde, et on marque la fin de chaque étape au passage : le bouton lance
+   la lecture, puis ferme l'étape en cours à chaque appui.
+   ════════════════════════════════════════════════════════════════════════════ */
+
 let dvDebutEnCours = 0        // début de l'étape que l'on est en train de vivre
 let dvSelection = null
 
@@ -8828,6 +8989,16 @@ async function publishProcedure(errorElId, btnId) {
     s.image_url = supabase.storage.from('procedo-videos').getPublicUrl(chemin).data?.publicUrl || null
   }
 
+  /* L'image de la procédure part après sa création : on a besoin de son
+     identifiant pour ranger le fichier. Si la colonne n'existe pas encore, la
+     mise à jour échoue en silence et la procédure reste publiée. */
+  const urlCouv = await envoyerCouverture(newProc.id)
+  if (urlCouv) {
+    const { error: eCouv } = await supabase.from('procedures')
+      .update({ image_url: urlCouv }).eq('id', newProc.id)
+    if (eCouv) console.warn('Proc\u00e9do \u00b7 image non enregistr\u00e9e :', eCouv.message)
+  }
+
   const etapesToInsert = allSteps.map((s, i) => ({
     procedure_id: newProc.id, ordre: i + 1, texte: s.texte,
     timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
@@ -8847,7 +9018,9 @@ document.getElementById('publish-btn-video')?.addEventListener('click', () => pu
 
 // ═══════════ GESTION : analyse ═══════════
 let currentAnalyseData = null
-let currentAnalysePeriod = 'week'
+/* Figé sur le total : le filtre de période a été retiré de l'écran. La constante
+   reste parce que le calcul des statistiques s'en sert. */
+const currentAnalysePeriod = 'all'
 
 /* Ouvrir une procédure traverse une douzaine d'attentes : lectures en base,
    préchargement, chargement du QR. Si l'on ouvre A, qu'on revient, puis qu'on
@@ -8877,12 +9050,11 @@ async function openAnalyse(procId) {
   }
 
   if (preloadEtapes) await preloadEtapes
-  currentAnalysePeriod = 'week'
-  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
   // On utilise en priorité les données déjà préchargées (instantané) ;
   // si jamais elles manquent (cas rare), on retombe sur une requête fraîche.
   let proc = allGestionProcedures.find(p => p.id === procId)
+  if (proc?.image_url) reinitialiserCouverture(proc.image_url)
   let etapes = cachedEtapesByProc[procId]
   let employes = cachedEmployes
   let validations = cachedValidations.filter(v => v.procedure_id === procId)
@@ -8949,6 +9121,14 @@ async function openAnalyse(procId) {
   // Vidéo (si disponible)
   const videoFrame = document.getElementById('analyse-video-frame')
   const videoEl = document.getElementById('analyse-video')
+  /* L'image de la procédure, en tête de la fiche. Elle ne remplace pas la vidéo :
+     une procédure peut avoir les deux, et la vidéo vient dessous. */
+  const couvEl = document.getElementById('analyse-couverture')
+  if (couvEl) {
+    couvEl.innerHTML = proc.image_url ? `<img src="${escapeHtml(proc.image_url)}" alt="">` : ''
+    couvEl.style.display = proc.image_url ? 'block' : 'none'
+  }
+
   if (proc.video_url) {
     videoFrame.style.display = 'block'
     videoEl.src = proc.video_url
@@ -9164,13 +9344,6 @@ function cheminArrondi(ctx, x, y, l, h, r) {
   ctx.arcTo(x, y + h, x, y, r)
   ctx.arcTo(x, y, x + l, y, r)
   ctx.closePath()
-}
-
-window.setAnalysePeriod = function(period) {
-  currentAnalysePeriod = period
-  document.querySelectorAll('#analyse-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
-  placerPastille(document.getElementById('analyse-period-toggle'))
-  renderAnalyseStats()
 }
 
 function renderAnalyseStats() {
@@ -11807,6 +11980,7 @@ window.openEditProcedure = async function(procId, mode) {
     ? "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin"
     : 'Modifiez le titre, la catégorie ou les étapes'
   document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
+  reinitialiserCouverture(null)
 
   if (preloadEtapes) await preloadEtapes
   // Priorité aux données préchargées : l'écran s'ouvre sans attendre le réseau.
@@ -12285,8 +12459,19 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   const saveBtn = document.getElementById('edit-save-btn')
   setButtonLoading(saveBtn, true)
 
-  const { error: updateError } = await supabase
-    .from('procedures').update({ titre, categorie }).eq('id', editProcedureId)
+  /* L'image de la procédure part avec le reste. Si la colonne n'existe pas
+     encore, la mise à jour échoue entièrement : on retente alors sans elle,
+     plutôt que de perdre le titre et la catégorie pour une image. */
+  const urlCouv = await envoyerCouverture(editProcedureId)
+
+  let { error: updateError } = await supabase
+    .from('procedures').update({ titre, categorie, image_url: urlCouv }).eq('id', editProcedureId)
+  if (updateError && /image_url/i.test(updateError.message || '')) {
+    console.warn('Proc\u00e9do \u00b7 colonne image_url absente sur procedures.')
+    const repli = await supabase.from('procedures')
+      .update({ titre, categorie }).eq('id', editProcedureId)
+    updateError = repli.error
+  }
   if (updateError) { setButtonLoading(saveBtn, false); errorEl.textContent = updateError.message; return }
 
   // On repart d'une liste propre : on supprime les anciennes étapes et on réinsère la version modifiée

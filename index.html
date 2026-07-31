@@ -382,7 +382,7 @@
   .tiroir-ent{
     /* 46 px : exactement le diamètre du bouton des réglages, à l'autre bout de
        la barre. Les deux ronds se répondent. */
-    position:relative; width:46px; height:46px; flex:0 0 46px;
+    position:relative; width:44.5px; height:44.5px; flex:0 0 44.5px;
     /* Le flou d'arrière-plan a besoin d'une couche à lui pour échantillonner ce
        qui passe derrière. Sans cette isolation, il peut ne rien produire selon
        l'ordre de composition — le rond apparaît alors plat, sans verre. */
@@ -398,8 +398,13 @@
      elle s'étire en pastille autour de tous. Le verre se déplie avec le tiroir
      au lieu d'être répété sur chaque cercle. */
   .tiroir-liste{
-    position:absolute; left:0; top:0; z-index:12;
+    position:absolute; left:-5px; top:-5px; z-index:12;
     display:flex; align-items:center; gap:0;
+    /* 5 px de remplissage et 4 px d'écart : exactement le gabarit du groupe
+       d'onglets en bas de l'écran. Les ronds touchaient le bord de la pastille,
+       ce qui n'arrive jamais dans la barre. Le décalage de − 5 px compense le
+       remplissage pour que le rond reste aligné sur les autres éléments. */
+    padding:5px;
     border-radius:100px;
     background:rgba(255,255,255,0.10);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -417,11 +422,16 @@
      ce qui n'évoquait rien de physique. */
   .tiroir-liste > .rond-ent{ z-index:2; }
   .rond-ent{
-    position:relative; width:46px; height:46px; flex-shrink:0; border-radius:50%;
+    position:relative; width:44.5px; height:44.5px; flex-shrink:0; border-radius:50%;
     overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
     background:none; border:none;
     transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
   }
+  /* L'établissement en cours se remplit de blanc, initiales en noir : exactement
+     l'onglet actif de la barre du bas. Il se détache seul, sans anneau ni
+     ornement, et les autres restent en verre. */
+  .tiroir-liste > .rond-ent{ background:rgba(255,255,255,0.94); }
+  .tiroir-liste > .rond-ent .ini{ color:#0C0D0E; text-shadow:none; }
   .rond-ent:active{ transform:scale(0.92); }
   /* L'établissement courant ne porte plus d'anneau : dans le tiroir fermé c'est
      forcément lui qu'on voit, et dans la liste la mention « actif » le dit déjà.
@@ -439,7 +449,7 @@
      taille moindre plutôt que par une couleur de plus. */
   .rond-ent.plus{
     width:34px; height:34px; background:#fff; border-color:transparent;
-    margin-left:3px;   /* il est plus petit : un peu plus d'air le recentre */
+    margin-left:2px;   /* il est plus petit : un peu plus d'air le recentre */
   }
   /* Le « + » est noir sur blanc : l'ombre portée qui détache les initiales sur le
      verre n'a plus lieu d'être ici, et elle formait un halo autour du signe. */
@@ -459,9 +469,9 @@
      qui se replie : posé sur la liste, il aurait subsisté tiroir fermé et la
      pastille n'aurait plus été un cercle parfait. */
   .tiroir-autres{
-    display:flex; align-items:center; gap:5px; padding-left:5px;
+    display:flex; align-items:center; gap:4px; padding-left:4px;
     max-width:0; overflow:hidden;
-    transition:max-width 0.44s cubic-bezier(0.32,0.72,0,1) 0.1s;
+    transition:max-width 0.32s cubic-bezier(0.32,0.72,0,1) 0.06s;
   }
   .tiroir-ent.ouvert .tiroir-autres{
     max-width:300px;
@@ -472,12 +482,14 @@
      la carte au logo n'avait pas — les deux moitiés du geste ne s'accordaient
      donc jamais. Même courbe, même durée : un seul mouvement. */
   .tiroir-autres .rond-ent{
-    opacity:0; transform:scale(0.42) translateX(-26px); pointer-events:none;
-    transition:opacity 0.26s ease,
-               transform 0.44s cubic-bezier(0.32,0.72,0,1);
+    opacity:0; transform:scale(0.42) translateX(-24px); pointer-events:none;
+    transition:opacity 0.18s ease,
+               transform 0.3s cubic-bezier(0.32,0.72,0,1);
   }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent{
     opacity:1; transform:none; pointer-events:auto;
+    transition:opacity 0.26s ease,
+               transform 0.44s cubic-bezier(0.32,0.72,0,1);
   }
 
   /* Le rond de tête se creuse légèrement quand le tiroir est ouvert : il cède la
@@ -497,9 +509,9 @@
   /* La cascade. Les délais s'inversent selon le sens : à l'ouverture les ronds
      arrivent de gauche à droite APRÈS le départ de la carte, à la fermeture ils
      partent de droite à gauche AVANT son retour. */
-  .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.12s, 0.12s; }
-  .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.08s, 0.08s; }
-  .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.04s, 0.04s; }
+  .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.09s, 0.09s; }
+  .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.06s, 0.06s; }
+  .tiroir-autres .rond-ent:nth-child(3){ transition-delay:0.03s, 0.03s; }
   .tiroir-autres .rond-ent:nth-child(n+4){ transition-delay:0s, 0s; }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(1){ transition-delay:0.08s, 0.08s; }
   .tiroir-ent.ouvert .tiroir-autres .rond-ent:nth-child(2){ transition-delay:0.12s, 0.12s; }
@@ -512,9 +524,13 @@
      la suivent : la place se libère avant qu'on l'occupe. À la fermeture c'est
      l'inverse — elle attend que les ronds soient rentrés. Sans cet ordre, les
      deux se croisaient au milieu du geste. */
+  /* À LA FERMETURE, la carte attend VRAIMENT que les ronds soient rentrés. Elle
+     revenait à 0,16 s alors que le dernier rond bougeait encore jusqu'à 0,56 s :
+     les deux se chevauchaient au milieu du geste. Elle part maintenant à 0,3 s,
+     quand la pastille a fini de se refermer. */
   .topbar-card{
-    transition:opacity 0.26s ease 0.16s,
-               transform 0.44s cubic-bezier(0.32,0.72,0,1) 0.12s;
+    transition:opacity 0.24s ease 0.32s,
+               transform 0.4s cubic-bezier(0.32,0.72,0,1) 0.3s;
   }
   .tiroir-ent.ouvert ~ .topbar-card{
     opacity:0; transform:translateX(14px); pointer-events:none;
@@ -4410,7 +4426,12 @@ async function enterApp(membre) {
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('gestion-app')
     appEl.style.display = 'block'
-    appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
+    if (basculeSansAnimation) {
+      // On retire la classe sans la remettre : aucune animation ne peut rejouer.
+      appEl.classList.remove('app-shell-in')
+    } else {
+      appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
+    }
     document.getElementById('tabbar-gestion').style.display = 'flex'
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
@@ -4422,8 +4443,8 @@ async function enterApp(membre) {
     // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
-    lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
-    atterrirEnHaut()
+    if (!basculeSansAnimation) lancerAnimationLogo(document.getElementById('topbar-logo-gestion'))
+    if (!basculeSansAnimation) atterrirEnHaut()
     chargerLangue()
     chargerEtablissements()
     if (cibleQR) ouvrirCibleQR()
@@ -4435,7 +4456,12 @@ async function enterApp(membre) {
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('equipe-app')
     appEl.style.display = 'block'
-    appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
+    if (basculeSansAnimation) {
+      // On retire la classe sans la remettre : aucune animation ne peut rejouer.
+      appEl.classList.remove('app-shell-in')
+    } else {
+      appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
+    }
     document.getElementById('tabbar-equipe').style.display = 'flex'
     mesurerOnglets()
     chargerLangue()
@@ -4449,7 +4475,7 @@ async function enterApp(membre) {
     // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
-    lancerAnimationLogo(document.getElementById('topbar-logo-equipe'))
+    if (!basculeSansAnimation) lancerAnimationLogo(document.getElementById('topbar-logo-equipe'))
     atterrirEnHaut()
     finDuDemarrage()
     if (cibleQR) ouvrirCibleQR()
@@ -9113,6 +9139,9 @@ document.getElementById('abo-liste')?.addEventListener('click', async (e) => {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
+/* Vrai pendant un changement d'établissement : l'app se recharge, mais son cadre
+   ne doit pas se rejouer. */
+let basculeSansAnimation = false
 let etabEdite = null            // null = création, sinon l'établissement modifié
 let etabLogoTampon = null       // le logo choisi, pas encore enregistré
 
@@ -9363,9 +9392,14 @@ async function basculerVersEtablissement(entrepriseId) {
 
   currentMembre = membre
   cachedEntreprise = null
-  document.getElementById('gestion-app').style.display = 'none'
-  document.getElementById('tabbar-gestion').style.display = 'none'
+
+  /* On ne masque plus l'app avant de recharger. Le faire rejouait l'animation
+     d'entrée : la barre du haut et celle du bas repartaient de zéro, alors qu'on
+     change seulement de contenu. Ce sont les procédures qui changent, pas le
+     cadre — le cadre doit rester immobile. */
+  basculeSansAnimation = true
   await enterApp(membre)
+  basculeSansAnimation = false
   toast(e.nom)
 }
 

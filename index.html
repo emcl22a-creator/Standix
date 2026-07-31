@@ -565,110 +565,136 @@
   }
   .bandeau-bloc #bandeau-bloc-recharger{ background:#fff; color:#000; border-color:transparent; }
 
-  /* ═══ Ligne de réglage avec icône au trait ═══ */
-  .ligne-reglage{
-    display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px;
-    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
-    font-family:inherit; text-align:left; color:#fff;
-    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .ligne-reglage:active{ transform:scale(0.985); }
-  .ligne-reglage .ic-trait{ flex-shrink:0; width:44px; height:40px; display:flex;
-    align-items:center; justify-content:center; }
-  .ligne-reglage .ic-trait svg{ width:44px; height:40px; overflow:visible; }
-  .ligne-reglage .tx{ flex:1; min-width:0; }
-  .ligne-reglage .nm{ display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
-  .ligne-reglage .st{ display:block; font-size:12px; color:var(--label-3); margin-top:2px; }
-  .ligne-reglage .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
-
   /* ═══════════════════════════════════════════════════════════════════
-     LES OFFRES
-     La page s'ouvre comme un accueil : le nombre de membres est déjà connu, et
-     UNE SEULE offre est proposée. Les autres restent à un doigt. Pas de
-     comparaison à faire, une décision à prendre.
+     LES RÉGLAGES
+
+     La grammaire d'iOS : des GROUPES de lignes, chacune avec sa tuile colorée à
+     gauche, son libellé, sa valeur à droite et son chevron. Un filet sépare les
+     lignes d'un même groupe ; un titre en petites capitales annonce chaque
+     groupe ; une note explicative peut suivre.
+
+     L'ordre suit celui d'Apple : qui vous êtes, puis ce que vous gérez, puis ce
+     que vous payez, puis vos préférences, puis l'aide, et le départ en dernier.
      ═════════════════════════════════════════════════════════════════ */
-  .abo-scene{
-    position:relative; margin-top:14px; padding:24px 16px 18px; border-radius:26px;
-    background:linear-gradient(168deg,#17181D,#101114);
-    border:0.5px solid var(--border); overflow:hidden;
-  }
-  .abo-halo{
-    position:absolute; top:-90px; left:50%; transform:translateX(-50%);
-    width:300px; height:200px; pointer-events:none;
-    background:radial-gradient(ellipse, rgba(94,160,255,0.22), transparent 66%);
-  }
-  .abo-hi{ position:relative; text-align:center; margin-bottom:18px; padding-top:6px; }
-  .abo-hi h2{
-    font-size:24px; font-weight:850; letter-spacing:-0.05em; line-height:1.15; margin-bottom:7px;
-  }
-  .abo-hi p{
-    font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto;
-  }
-  .abo-hi b{ color:#fff; font-weight:650; }
 
-  .offre-carte{
-    position:relative; padding:16px 15px; border-radius:20px;
-    background:var(--bg-card); border:1px solid var(--border); margin-bottom:9px;
-  }
-  .offre-carte.vedette{ border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.08); }
-  .offre-ruban{
-    position:absolute; top:-9px; left:15px; padding:3px 10px; border-radius:100px;
-    background:#fff; color:#000; font-size:9.5px; font-weight:800; letter-spacing:0.03em;
-  }
-  .offre-carte.actuelle .offre-ruban{ background:var(--green); color:#06210F; }
-  .offre-tete{ display:flex; align-items:flex-start; gap:11px; margin-bottom:10px; }
-  .offre-ic{ flex-shrink:0; width:40px; height:38px; }
-  .offre-ic svg{ width:40px; height:38px; display:block; overflow:visible; }
-  .offre-txt{ flex:1; min-width:0; }
-  .offre-nom{ font-size:16px; font-weight:800; letter-spacing:-0.035em; }
-  .offre-taille{ font-size:12px; color:var(--label-2); margin-top:2px; }
-  .offre-prix{ text-align:right; flex-shrink:0; }
-  .offre-prix .v{ font-size:21px; font-weight:850; letter-spacing:-0.05em; line-height:1; }
-  .offre-prix .u{ display:block; font-size:10px; color:var(--label-3); font-weight:600; margin-top:3px; }
-  .offre-pts{ display:flex; flex-direction:column; gap:6px; }
-  .offre-pt{ display:flex; gap:8px; font-size:12.5px; line-height:1.4; }
-  .offre-pt svg{ width:13px; height:13px; flex-shrink:0; margin-top:2px; }
-  .offre-pt.suite{ color:var(--label-2); }
-  .offre-pt b{ font-weight:650; }
-  .offre-cta{
-    width:100%; height:46px; margin-top:14px; border:none; border-radius:14px;
-    font-family:inherit; font-size:14px; font-weight:700; background:#fff; color:#000;
-  }
-  .offre-carte:not(.vedette) .offre-cta{
-    background:rgba(255,255,255,0.08); color:#fff; border:0.5px solid var(--border);
-    height:42px; font-size:13px;
-  }
-  .offre-carte.actuelle .offre-cta{ background:none; color:var(--green); }
-  /* L'annuel se dit sous le prix plutôt que par une bascule : une bascule
-     demande un choix avant même d'avoir choisi l'offre. */
-  .offre-annuel{
-    font-size:11.5px; color:var(--label-3); text-align:center; margin-top:9px;
-  }
-  .offre-annuel b{ color:var(--green); font-weight:700; }
-
-  .abo-conf{
-    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:14px;
-    font-size:10.5px; color:var(--label-3); font-weight:600;
-  }
-  /* Les autres offres n'apparaissent qu'à la demande. */
-  #abo-liste{ display:none; margin-top:12px; }
-  #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
-
-  /* ═══ Ligne de réglage avec icône au trait ═══ */
-  .ligne-reglage{
-    display:flex; align-items:center; gap:12px; width:100%; padding:12px 14px;
-    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
+  /* La fiche du haut : qui vous êtes. */
+  .reg-identite{
+    display:flex; align-items:center; gap:14px; width:100%; margin-top:14px;
+    padding:15px 15px; border-radius:20px;
+    background:var(--bg-card); border:0.5px solid var(--border);
     font-family:inherit; text-align:left; color:#fff;
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .ligne-reglage:active{ transform:scale(0.985); }
-  .ligne-reglage .ic-trait{ flex-shrink:0; width:44px; height:40px; display:flex;
-    align-items:center; justify-content:center; }
-  .ligne-reglage .ic-trait svg{ width:44px; height:40px; overflow:visible; }
-  .ligne-reglage .tx{ flex:1; min-width:0; }
-  .ligne-reglage .nm{ display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
-  .ligne-reglage .st{ display:block; font-size:12px; color:var(--label-3); margin-top:2px; }
-  .ligne-reglage .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
+  .reg-identite:active{ transform:scale(0.99); }
+  .reg-identite .av{
+    width:52px; height:52px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:750; letter-spacing:0.03em; color:#fff;
+    background:rgba(255,255,255,0.10);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .reg-identite .tx{ flex:1; min-width:0; }
+  .reg-identite .nm{
+    display:block; font-size:17px; font-weight:750; letter-spacing:-0.03em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .reg-identite .st{
+    display:block; font-size:12.5px; color:var(--label-3); margin-top:3px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .reg-identite .fl{ color:var(--label-3); font-size:19px; flex-shrink:0; }
+
+  /* Le titre d'un groupe. */
+  .reg-titre{
+    font-size:11px; font-weight:750; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.06em;
+    margin:22px 4px 8px;
+  }
+
+  /* Le groupe : une carte qui tient plusieurs lignes. */
+  .reg-groupe{
+    border-radius:18px; overflow:hidden;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .reg-ligne{
+    display:flex; align-items:center; gap:12px; width:100%;
+    padding:11px 14px 11px 12px; border:none; background:none;
+    font-family:inherit; text-align:left; color:#fff;
+    transition:background 0.18s;
+  }
+  .reg-ligne:active{ background:rgba(255,255,255,0.06); }
+  /* Le filet s'arrête à l'aplomb du texte, pas de la tuile : c'est ce qui donne
+     le rythme des réglages d'iOS. */
+  .reg-filet{ height:0.5px; background:var(--border); margin-left:54px; }
+
+  .reg-ic{
+    width:30px; height:30px; border-radius:8px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .reg-ic svg{ width:18px; height:18px; display:block; }
+  .ic-bleu{ background:linear-gradient(160deg,#4DA2FF,#0A6ED1); }
+  .ic-violet{ background:linear-gradient(160deg,#B18CFF,#7A4DD6); }
+  .ic-vert{ background:linear-gradient(160deg,#5BD97A,#22A544); }
+  .ic-orange{ background:linear-gradient(160deg,#FFB84D,#E07A12); }
+  .ic-gris{ background:linear-gradient(160deg,#8E8E93,#5A5A60); }
+
+  .reg-nm{ flex:1; min-width:0; font-size:15px; font-weight:600; letter-spacing:-0.02em; }
+  .reg-val{
+    font-size:14px; color:var(--label-3); flex-shrink:0;
+    max-width:45%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .reg-val.mono{
+    font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing:0.14em; color:#fff; font-weight:650;
+  }
+  .reg-ligne .fl{ color:var(--label-3); font-size:19px; flex-shrink:0; }
+  /* Une ligne qui détruit n'a ni tuile ni chevron : rien à explorer, seulement
+     un acte. Elle est centrée et rouge, comme chez Apple. */
+  .reg-ligne.danger{ justify-content:center; padding:13px 14px; }
+  .reg-ligne.danger .reg-nm{ flex:0; font-size:15px; font-weight:650; color:var(--red); }
+
+  .reg-note{
+    font-size:12px; color:var(--label-3); line-height:1.5;
+    margin:8px 6px 0; text-align:left;
+  }
+  .reg-version{
+    font-size:11.5px; color:var(--label-3); text-align:center; margin-top:26px;
+  }
+
+  /* La liste des établissements adopte la même carte groupée. */
+  .etab-ligne{
+    display:flex; align-items:center; gap:12px; width:100%; padding:11px 13px;
+    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
+    margin-bottom:8px; font-family:inherit; text-align:left; color:#fff;
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .etab-ligne:active{ transform:scale(0.985); }
+  .etab-ligne .rond-ent{
+    width:42px; height:42px;
+    background:rgba(255,255,255,0.10);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+  .etab-ligne .rond-ent .ini{ font-size:13px; }
+  .etab-ligne .rond-ent.plus{ background:#fff; border-color:transparent; }
+  .etab-ligne .tx{ flex:1; min-width:0; }
+  .etab-ligne .nm{
+    display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .etab-ligne .st{ display:block; font-size:12px; color:var(--label-3); margin-top:3px; }
+  .etab-ligne .st b{ color:var(--blue); font-weight:650; }
+  .etab-ligne .ici{
+    display:inline-block; margin-left:7px; padding:2px 7px; border-radius:100px;
+    background:rgba(48,209,88,0.16); color:var(--green);
+    font-size:9.5px; font-weight:750; text-transform:uppercase; letter-spacing:0.04em;
+    vertical-align:2px;
+  }
+  .etab-ligne .fl{ color:var(--label-3); font-size:18px; flex-shrink:0; }
+  .etab-ligne.ajout{ border-style:dashed; background:none; }
 
   /* ═══ Les offres ═══
      Chaque offre porte une icône dans la langue des quatre modes de création :
@@ -2979,70 +3005,111 @@
 
   <div class="screen" id="p-settings">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-list')">
+      <button class="back-btn" onclick="showGestionScreen('p-list')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
-    <div class="subhead">Votre compte et votre abonnement</div>
 
-    <div class="section-title">Informations personnelles</div>
-    <div class="card">
-      <label class="f">Nom complet</label>
-      <input type="text" id="settings-nom" style="margin-bottom:12px;">
-      <label class="f">E-mail</label>
-      <input type="text" id="settings-email" disabled style="opacity:0.6;">
-      <button class="btn ghost block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
-      <div class="error-msg" id="settings-error"></div>
-    </div>
-
-    <div class="section-title">Votre équipe</div>
-    <button class="btn ghost block" onclick="openMembres()" style="display:flex; align-items:center; justify-content:space-between; text-align:left;">
-      <span>Gérer l'équipe</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:15px; height:15px; opacity:0.5;"><polyline points="9 18 15 12 9 6"/></svg>
-    </button>
-
-    <div class="section-title">Code d'invitation équipe</div>
-    <div class="card" style="text-align:center;">
-      <div style="font-size:12px; color:var(--label-2); margin-bottom:10px;">Partagez ce code à votre équipe pour qu'elle puisse créer son compte et accéder aux procédures</div>
-      <div id="settings-code" style="font-size:32px; font-weight:800; letter-spacing:0.3em; margin:8px 0 14px;">—</div>
-      <button class="btn ghost block" id="copy-code-btn">Copier le code</button>
-    </div>
-
-    <div class="section-title">Votre abonnement</div>
-    <button type="button" class="ligne-reglage" id="ouvrir-abonnement">
+    <!-- 1. QUI VOUS ÊTES — en tête, comme la fiche Apple ID -->
+    <button type="button" class="reg-identite" id="reg-identite">
+      <span class="av" id="reg-initiales">—</span>
       <span class="tx">
-        <span class="nm">Voir les offres</span>
-        <span class="st" id="abo-actuel">Offre Pro · 79 € par mois</span>
+        <span class="nm" id="reg-nom">—</span>
+        <span class="st" id="reg-email">—</span>
       </span>
       <span class="fl">›</span>
     </button>
 
-    <div class="section-title" id="etab-section-titre" style="display:none;">Vos établissements</div>
-    <div class="note" id="etab-section-note" style="display:none; margin:-2px 4px 12px; text-align:left;">
+    <div class="card" id="reg-identite-form" style="display:none;">
+      <label class="f">Nom complet</label>
+      <input type="text" id="settings-nom" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="settings-email" disabled style="opacity:0.6;">
+      <button class="btn block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
+      <div class="error-msg" id="settings-error"></div>
+    </div>
+
+    <!-- 2. VOTRE ENTREPRISE -->
+    <div class="reg-titre">Votre entreprise</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="openMembres()">
+        <span class="reg-ic ic-bleu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0"/><circle cx="17" cy="9.4" r="2.4"/><path d="M15.2 19a4.4 4.4 0 0 1 5.4-4.3"/></svg>
+        </span>
+        <span class="reg-nm">Équipe</span>
+        <span class="reg-val" id="reg-nb-membres">—</span>
+        <span class="fl">›</span>
+      </button>
+      <div class="reg-filet"></div>
+      <button type="button" class="reg-ligne" id="reg-code">
+        <span class="reg-ic ic-violet">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8"/><rect x="13.6" y="3.4" width="7" height="7" rx="1.8"/><rect x="3.4" y="13.6" width="7" height="7" rx="1.8"/><path d="M13.6 13.6h3v3M20.6 20.6h-3v-3"/></svg>
+        </span>
+        <span class="reg-nm">Code d'invitation</span>
+        <span class="reg-val mono" id="settings-code">—</span>
+        <span class="fl" id="copy-code-btn">⧉</span>
+      </button>
+    </div>
+    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder aux procédures.</div>
+
+    <!-- 3. VOS ÉTABLISSEMENTS -->
+    <div class="reg-titre" id="etab-section-titre" style="display:none;">Vos établissements</div>
+    <div id="etab-liste"></div>
+    <div class="reg-note" id="etab-section-note" style="display:none;">
       Touchez un établissement pour changer son nom ou déposer son logo.
       Sans logo, ce sont ses initiales qui s'affichent dans la barre du haut.
     </div>
-    <div id="etab-liste"></div>
 
-    <div class="section-title">Langue</div>
-    <div class="card">
-      <label class="f">Langue de l'application</label>
-      <div class="langue-grille" id="langue-app-gestion"></div>
+    <!-- 4. ABONNEMENT -->
+    <div class="reg-titre">Abonnement</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" id="ouvrir-abonnement">
+        <span class="reg-ic ic-vert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.2l2.6 5.4 5.9.8-4.3 4.2 1 5.9-5.2-2.8-5.2 2.8 1-5.9L3.5 9.4l5.9-.8Z"/></svg>
+        </span>
+        <span class="reg-nm">Votre offre</span>
+        <span class="reg-val" id="abo-actuel">—</span>
+        <span class="fl">›</span>
+      </button>
     </div>
 
-    <div class="section-title">Une question ?</div>
-    <div class="accueil contact-carte" role="button" tabindex="0" id="contact-gestion">
-      <div class="accueil-texte">
-        <div class="t">Écrivez-nous</div>
-        <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
-      </div>
-      <div class="accueil-av"><span class="dispo"></span></div>
+    <!-- 5. PRÉFÉRENCES -->
+    <div class="reg-titre">Préférences</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" id="reg-langue">
+        <span class="reg-ic ic-orange">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.8"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8"/></svg>
+        </span>
+        <span class="reg-nm">Langue</span>
+        <span class="reg-val" id="reg-langue-val">Français</span>
+        <span class="fl">›</span>
+      </button>
+    </div>
+    <div class="langue-grille" id="langue-app-gestion" style="display:none; margin-top:9px;"></div>
+
+    <!-- 6. ASSISTANCE -->
+    <div class="reg-titre">Assistance</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" id="contact-gestion">
+        <span class="reg-ic ic-gris">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.4 6.6A2.2 2.2 0 0 1 5.6 4.4h12.8a2.2 2.2 0 0 1 2.2 2.2v10.8a2.2 2.2 0 0 1-2.2 2.2H5.6a2.2 2.2 0 0 1-2.2-2.2Z"/><path d="m3.8 6.4 8.2 6 8.2-6"/></svg>
+        </span>
+        <span class="reg-nm">Écrivez-nous</span>
+        <span class="fl">›</span>
+      </button>
+    </div>
+    <div class="reg-note">Un souci, une idée, une question ? Nous lisons tout et répondons au plus vite.</div>
+
+    <!-- 7. COMPTE — le départ en dernier, comme chez Apple -->
+    <div class="reg-titre">Compte</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne danger" id="logout-btn">
+        <span class="reg-nm">Se déconnecter</span>
+      </button>
     </div>
 
-    <div class="section-title">Compte</div>
-    <button class="btn ghost block" id="logout-btn" style="color:var(--red);">Se déconnecter</button>
-    <div class="note" style="text-align:center; margin-top:20px;">Version du build : 2026-07-30 · tiroir des établissements</div>
+    <div class="reg-version">Procédo · version 2026-07-30</div>
   </div>
 </div>
 
@@ -4736,13 +4803,54 @@ function finDuDemarrage() {
 }
 
 // ═══ PARAMÈTRES ═══
+/* Remplit la fiche du haut et les valeurs affichées à droite de chaque ligne.
+   Une valeur à droite évite d'ouvrir la page pour savoir ce qu'elle contient :
+   c'est tout l'intérêt de la grammaire d'iOS. */
+function peindreReglages() {
+  const nom = currentMembre?.nom || ''
+  const el = (i) => document.getElementById(i)
+
+  if (el('reg-nom')) el('reg-nom').textContent = nom || 'Votre compte'
+  if (el('reg-initiales')) el('reg-initiales').textContent = initialesEtab(nom)
+
+  const n = (cachedMembres || []).length
+  if (el('reg-nb-membres')) {
+    el('reg-nb-membres').textContent = n ? `${n} membre${n > 1 ? 's' : ''}` : '\u2014'
+  }
+
+  const l = LANGUES.find(x => x.code === langueApp)
+  if (el('reg-langue-val')) el('reg-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
+
+  // L'adresse vient du champ, qui est rempli au chargement du compte.
+  if (el('reg-email')) el('reg-email').textContent = el('settings-email')?.value || '\u2014'
+}
+
+/* La fiche du haut déplie le formulaire : on ne quitte pas la page pour changer
+   un nom, et on ne montre pas deux champs à quelqu'un qui ne fait que passer. */
+document.getElementById('reg-identite')?.addEventListener('click', () => {
+  const f = document.getElementById('reg-identite-form')
+  if (!f) return
+  const ouvert = f.style.display === 'block'
+  f.style.display = ouvert ? 'none' : 'block'
+  if (!ouvert) setTimeout(() => document.getElementById('settings-nom')?.focus(), 120)
+})
+
+/* Idem pour la langue : la grille n'apparaît qu'à la demande. */
+document.getElementById('reg-langue')?.addEventListener('click', () => {
+  const g = document.getElementById('langue-app-gestion')
+  if (!g) return
+  g.style.display = g.style.display === 'grid' ? 'none' : 'grid'
+})
+
 window.openSettings = async function() {
   rendreChoixLangueApp()
   chargerEtablissements()
+  peindreReglages()
   showGestionScreen('p-settings')
   document.getElementById('settings-nom').value = currentMembre.nom || ''
   const { data: userData } = await supabase.auth.getUser()
   document.getElementById('settings-email').value = userData?.user?.email || ''
+  document.getElementById('reg-email').textContent = document.getElementById('settings-email').value || '—'
 
   // Déjà préchargé au démarrage : affichage immédiat, pas d'attente
   let entreprise = cachedEntreprise
@@ -9223,7 +9331,7 @@ window.renderAbonnements = function() {
     const o = OFFRES.find(x => x.cle === actuel)
     rappel.textContent = o
       ? (o.prix === null ? `Offre ${o.nom}` : `Offre ${o.nom} \u00b7 ${o.prix} \u20ac par mois`)
-      : `${n} membre${n > 1 ? 's' : ''} \u00b7 offre ${mienne.nom} conseill\u00e9e`
+      : `${mienne.nom} conseill\u00e9e`
   }
 }
 
@@ -9970,6 +10078,7 @@ for (const id of ['langue-app', 'langue-app-gestion']) {
     if (!b) return
     definirLangue(b.dataset.langue)
     rendreChoixLangueApp()
+    peindreReglages()
     toast(LANGUES.find(l => l.code === langueApp)?.nom || '')
   })
 }

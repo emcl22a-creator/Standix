@@ -393,14 +393,27 @@
     display:flex; align-items:center; gap:7px;
   }
 
+  /* Le même verre que le bouton des réglages, à l'autre bout de la barre :
+     mêmes valeurs exactes de teinte, de flou, de liseré et d'ombre. Les deux
+     ronds sont taillés dans la même matière. */
   .rond-ent{
     position:relative; width:46px; height:46px; flex-shrink:0; border-radius:50%;
     overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(160deg,#2A2C33,#17181C);
-    border:0.5px solid rgba(255,255,255,0.20);
-    box-shadow:0 2px 8px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10);
-    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+    background:rgba(255,255,255,0.10);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18);
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
+  /* Le verre est transparent : sans un fond sous les initiales, elles
+     s'évanouiraient au-dessus d'un contenu clair. Un voile sombre léger, posé
+     seulement derrière le texte, garde la lecture sûre sans opacifier le rond. */
+  .rond-ent:not(.plus)::before{
+    content:''; position:absolute; inset:0; border-radius:50%;
+    background:radial-gradient(circle, rgba(12,13,14,0.62), rgba(12,13,14,0.20) 72%, transparent);
+  }
+  /* Un logo recouvre tout : le voile n'a plus lieu d'être. */
+  .rond-ent.a-logo::before{ display:none; }
   .rond-ent:active{ transform:scale(0.92); }
   .rond-ent.actif{ border-color:rgba(255,255,255,0.55); border-width:1.5px; }
   .rond-ent img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
@@ -8807,7 +8820,8 @@ function rondEtabHtml(e, estActif, attributs) {
   const dedans = e.logo_url
     ? `<img src="${escapeHtml(e.logo_url)}" alt="">`
     : `<span class="ini">${escapeHtml(initialesEtab(e.nom))}</span>`
-  return `<button type="button" class="rond-ent${estActif ? ' actif' : ''}" ${attributs}>${dedans}</button>`
+  const classes = 'rond-ent' + (estActif ? ' actif' : '') + (e.logo_url ? ' a-logo' : '')
+  return `<button type="button" class="${classes}" ${attributs}>${dedans}</button>`
 }
 
 /* Le tiroir n'a de sens qu'à partir de l'offre Multi-sites. Tant que la

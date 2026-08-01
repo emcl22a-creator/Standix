@@ -217,7 +217,18 @@
   #p-global-analyse .an-trois{ margin-top:28px; padding:19px 0; }
   /* `!important` parce que la règle de base de `.an-tete` est déclarée plus bas
      dans la feuille et l'emporterait sinon à égalité de spécificité. */
-  #p-global-analyse .an-tete{ margin-top:38px !important; padding-top:24px !important; }
+  /* Une section suit un bouton « voir plus » : 26 px suffisent, 38 creusaient un
+     trou. La première section n'a ni filet ni marge, elle est en haut de page. */
+  #p-global-analyse .an-tete{ margin-top:26px !important; padding-top:22px !important; }
+  /* La première section n'a ni filet ni marge : elle est en haut de page.
+     `:first-of-type` ne fonctionne pas ici — les `.an-tete` ne sont pas les
+     premiers `div` de l'écran. On la désigne donc par sa position réelle. */
+  #p-global-analyse .subhead + .an-tete{
+    margin-top:6px !important; padding-top:0 !important; border-top:none !important;
+  }
+  /* La barre flottante mesure 66 px : le bas de page doit la dépasser, sinon la
+     dernière ligne se lit à travers le verre. */
+  #p-global-analyse{ padding-bottom:calc(110px + max(20px, env(safe-area-inset-bottom))) !important; }
   #p-membre .an-tete{ margin-top:34px !important; padding-top:22px !important; }
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
@@ -440,8 +451,27 @@
   /* ═══ Voir plus ═══
      Trois lignes suffisent à répondre « qui suit ». Le reste se déplie pour ceux
      qui veulent vérifier, sans allonger la page pour tous les autres. */
+  /* ═══ Les lignes de l'analyse ═══
+     Sans le bloc de tête, la page n'est plus qu'une suite de listes : elles
+     doivent donc être légères. Chaque ligne perd sa carte et ne garde qu'un filet
+     en dessous — c'est ce qui rend une liste lisible quand il n'y a qu'elle. */
+  #p-global-analyse .emp-row,
+  #p-global-analyse .cat-rank{
+    background:none !important; border:none !important; border-radius:0 !important;
+    border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
+    padding:13px 2px !important; margin:0 !important;
+  }
+  #p-global-analyse .emp-row:last-of-type,
+  #p-global-analyse .cat-rank:last-of-type{ border-bottom:none !important; }
+  #p-global-analyse .cat-rank .pos{
+    background:none !important; border:none !important;
+    color:var(--label-3) !important; font-size:12px !important;
+    width:16px !important; height:auto !important;
+  }
+  #p-global-analyse .cat-rank.premier .pos{ color:#fff !important; }
+
   .an-plus{
-    width:100%; margin-top:12px; height:38px; border:none; border-radius:12px;
+    width:100%; margin-top:14px; height:38px; border:none; border-radius:12px;
     background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
     color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
   }
@@ -3503,26 +3533,6 @@
     <h1 class="pagehead">Analyse</h1>
     <div class="subhead" id="ga-entreprise">—</div>
 
-    <div class="ga-segments" id="ga-period-toggle">
-      <button class="active" data-period="week" onclick="setGaPeriod('week')">Semaine</button>
-      <button data-period="month" onclick="setGaPeriod('month')">Mois</button>
-      <button data-period="all" onclick="setGaPeriod('all')">Total</button>
-    </div>
-
-    <!-- Le taux, seul : c'est la réponse à la question qu'on se pose en ouvrant. -->
-    <div class="an-heros">
-      <div class="an-n" id="ga-taux">—<span>%</span></div>
-      <div class="an-q">des procédures ont été lues</div>
-    </div>
-
-    <div class="an-dit" id="ga-sub-global">—</div>
-
-    <div class="an-trois">
-      <div class="un"><div class="v" id="ga-lues">—</div><div class="l">Procédures lues</div></div>
-      <div class="un"><div class="v" id="ga-lectures">—</div><div class="l">Lectures</div></div>
-      <div class="un"><div class="v" id="ga-moyenne">—</div><div class="l">Par procédure</div></div>
-    </div>
-
     <div class="an-tete">
       <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="rgba(255,255,255,0.26)" stroke-width="1.5" stroke-linecap="round"/><circle cx="9.5" cy="7" r="4.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M3 19.5a6.5 6.5 0 0 1 13 0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/></svg></span>
       <b>Équipe</b>
@@ -6133,14 +6143,11 @@ function placerPastille(conteneur, immediat) {
    chaque affichage d'écran, et au redimensionnement. */
 function reposerPastilles(immediat) {
   placerPastille(document.getElementById('pm-tri'), immediat)
-  placerPastille(document.getElementById('ga-period-toggle'), immediat)
 }
 window.addEventListener('resize', () => reposerPastilles(true))
 
 window.setGaPeriod = function(period) {
   currentGaPeriod = period
-  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === period))
-  placerPastille(document.getElementById('ga-period-toggle'))
   renderGaStats()
 }
 
@@ -6182,15 +6189,12 @@ function renderGaStats() {
   if (!currentGaData) return
   const { procedures, employes, validations } = currentGaData
   const nbEmployes = employes.length
-  const nbProcedures = procedures.length
 
   const debut = debutPeriode(currentGaPeriod)
   const dansPeriode = debut
     ? validations.filter(v => new Date(v.validated_at) >= debut)
     : validations
 
-  const attendu = nbProcedures * nbEmployes
-  const taux = attendu > 0 ? Math.round((dansPeriode.length / attendu) * 100) : 0
   const libelle = currentGaPeriod === 'week' ? 'cette semaine'
     : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
 
@@ -6199,35 +6203,6 @@ function renderGaStats() {
   if (el('ga-entreprise')) {
     el('ga-entreprise').textContent = (cachedEntreprise?.nom || 'Votre entreprise') + ' \u00b7 ' + libelle
   }
-  if (el('ga-taux')) el('ga-taux').innerHTML = taux + '<span>%</span>'
-
-  /* L'écart avec la période précédente. Un taux seul ne dit pas s'il monte ou
-     s'il descend — c'est pourtant la première chose qu'on veut savoir. */
-
-  // Ce qu'il manque, dit en une phrase.
-  const manque = Math.max(0, attendu - dansPeriode.length)
-  const jamais = procedures.filter(p =>
-    !validations.some(v => v.procedure_id === p.id)).length
-  const inactifs = employes.filter(e =>
-    !dansPeriode.some(v => v.membre_id === e.id))
-
-  if (el('ga-sub-global')) {
-    el('ga-sub-global').innerHTML = attendu === 0
-      ? "Ajoutez des proc\u00e9dures et des membres pour voir appara\u00eetre les lectures."
-      : manque === 0
-        ? "Toute l'\u00e9quipe est \u00e0 jour."
-        : `Il manque <b>${manque} lecture${manque > 1 ? 's' : ''}</b> pour que toute l'\u00e9quipe soit \u00e0 jour.` +
-          (inactifs.length ? ` <b>${escapeHtml(inactifs[0].nom || 'Quelqu\'un')}</b> n'a rien ouvert ${libelle}.` : '')
-  }
-
-  // Les trois repères.
-  const luesDistinctes = new Set(dansPeriode.map(v => v.procedure_id)).size
-  const secondes = dansPeriode.reduce((t, v) => t + Number(v.duree_lecture || 0), 0)
-  const moyenne = dansPeriode.length ? secondes / dansPeriode.length : 0
-  if (el('ga-lues')) el('ga-lues').innerHTML = `${luesDistinctes}<em>/${nbProcedures}</em>`
-  if (el('ga-lectures')) el('ga-lectures').textContent = dansPeriode.length
-  if (el('ga-moyenne')) el('ga-moyenne').textContent = moyenne ? dureeLisible(moyenne) : '\u2014'
-
   renderTopCategories(procedures, dansPeriode, nbEmployes, libelle)
   renderMembresListe()
   renderAtraiter(procedures, validations, employes, dansPeriode, libelle)
@@ -6381,7 +6356,6 @@ window.loadGlobalAnalyse = function() {
   const employes = membres.filter(m => m.role === 'equipe')
   currentGaData = { procedures, membres, employes, validations }
   currentGaPeriod = 'week'
-  document.querySelectorAll('#ga-period-toggle button').forEach(b => b.classList.toggle('active', b.dataset.period === 'week'))
 
   renderGaStats()
 

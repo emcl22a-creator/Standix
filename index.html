@@ -148,6 +148,47 @@
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
   .topbar-title .name{ font-size:14.5px; font-weight:700; }
   .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
+  /* ═══ Le compte est partagé ═══ */
+  /* Un point sur le bouton des réglages : c'est le seul endroit où l'on peut
+     agir, donc le seul endroit où la pastille a un sens. */
+  .icon-pill.alerte::after{
+    content:''; position:absolute; top:1px; right:1px;
+    width:11px; height:11px; border-radius:50%;
+    background:var(--red); border:2px solid #16171B;
+    animation:pastilleArrive 0.4s cubic-bezier(0.34,1.5,0.5,1) both;
+  }
+  @keyframes pastilleArrive{ from{ transform:scale(0); } to{ transform:none; } }
+
+  .alerte-partage{
+    margin-top:14px; padding:15px; border-radius:18px;
+    background:rgba(255,159,10,0.10); border:0.5px solid rgba(255,159,10,0.30);
+  }
+  .alerte-partage .tete{ display:flex; align-items:flex-start; gap:11px; }
+  .alerte-partage .pic{
+    width:32px; height:32px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,159,10,0.16); border:0.5px solid rgba(255,159,10,0.28);
+  }
+  .alerte-partage .pic svg{ width:18px; height:18px; }
+  .alerte-partage .tx{ flex:1; min-width:0; }
+  .alerte-partage .tx b{ display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .alerte-partage .tx i{
+    display:block; font-style:normal; font-size:12px; color:var(--label-2); margin-top:2px;
+  }
+  .alerte-partage .s{
+    font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:11px;
+  }
+  .alerte-partage .actions{ display:flex; gap:8px; margin-top:13px; }
+  .alerte-partage .principal{
+    flex:1; height:38px; border:none; border-radius:12px;
+    background:#fff; color:#000; font-family:inherit; font-size:13px; font-weight:700;
+  }
+  .alerte-partage .secondaire{
+    height:38px; padding:0 15px; border-radius:12px;
+    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
+  }
+
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -298,6 +339,141 @@
     background:#000; max-height:104px; overflow:hidden;
   }
   .carte-couv img{ width:100%; display:block; object-fit:cover; }
+
+  /* ═══ Les appareils ═══ */
+  .app-ligne{
+    display:flex; align-items:center; gap:12px; padding:12px;
+    border-radius:15px; background:var(--bg-card); border:0.5px solid var(--border);
+    margin-bottom:8px;
+  }
+  .app-ligne.moi{ border-color:rgba(94,160,255,0.45); background:rgba(94,160,255,0.08); }
+  .app-ligne.revoque{ opacity:0.5; }
+  .app-ligne .ic{
+    width:36px; height:36px; border-radius:11px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
+  }
+  .app-ligne .ic svg{ width:19px; height:19px; }
+  .app-ligne .tx{ flex:1; min-width:0; }
+  .app-ligne .nm{ display:block; font-size:14px; font-weight:650; letter-spacing:-0.02em; }
+  .app-ligne .st{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
+  .app-ligne .ici{
+    display:inline-block; margin-left:7px; padding:2px 7px; border-radius:100px;
+    background:rgba(94,160,255,0.20); color:#9CC5FF;
+    font-size:9.5px; font-weight:750; text-transform:uppercase; letter-spacing:0.04em;
+    vertical-align:1px;
+  }
+  .app-ligne .oter{
+    border:none; background:rgba(255,255,255,0.08); color:var(--red);
+    font-family:inherit; font-size:11.5px; font-weight:650;
+    padding:7px 12px; border-radius:100px; flex-shrink:0;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════
+     L'ANALYSE, ET LA FICHE D'UN MEMBRE
+
+     Retenue d'Apple, langage des icônes de création. Un chiffre en grand, des
+     listes nues séparées par un filet, et de la respiration avant chaque
+     section. Les pictogrammes reprennent les opacités des quatre modes de
+     création : 16 et 26 % en retrait, 42 % pour le trait de devant.
+
+     Aucun anneau, aucune tuile, aucun aplat de couleur : la couleur ne sert
+     qu'à signaler ce qui ne va pas.
+     ═════════════════════════════════════════════════════════════════ */
+
+  .an-heros{ margin-top:30px; }
+  .an-n{ font-size:78px; font-weight:800; letter-spacing:-0.065em; line-height:0.86; }
+  .an-n span{ font-size:31px; font-weight:700; color:var(--label-3); letter-spacing:-0.03em; }
+  .an-q{ font-size:15px; color:var(--label-2); font-weight:600; margin-top:10px; }
+  /* Le même bleu que les liens de section. Le vert dit « terminé » ailleurs dans
+     l'app : l'employer pour une évolution brouillerait les deux. */
+  .an-ev{
+    display:inline-flex; align-items:center; gap:4px; margin-top:12px;
+    padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:700;
+    background:rgba(94,160,255,0.14); color:#5EA0FF;
+  }
+  .an-ev.baisse{ background:rgba(255,159,10,0.14); color:var(--orange); }
+  .an-dit{ font-size:14.5px; line-height:1.5; color:var(--label-2); margin-top:22px; }
+  .an-dit b{ color:#fff; font-weight:700; }
+
+  .an-trois{
+    display:flex; margin-top:22px; padding:15px 0;
+    border-top:0.5px solid var(--border); border-bottom:0.5px solid var(--border);
+  }
+  .an-trois .un{ flex:1; text-align:center; position:relative; }
+  .an-trois .un + .un::before{
+    content:''; position:absolute; left:0; top:2px; bottom:2px;
+    width:0.5px; background:var(--border);
+  }
+  .an-trois .v{ font-size:19px; font-weight:750; letter-spacing:-0.035em; }
+  .an-trois .v em{ font-style:normal; font-size:12px; color:var(--label-3); font-weight:650; }
+  .an-trois .l{ font-size:11px; color:var(--label-3); font-weight:600; margin-top:4px; }
+
+  .an-tete{
+    display:flex; align-items:center; gap:10px;
+    margin:32px 0 2px; padding-top:20px; border-top:0.5px solid var(--border);
+  }
+  .an-ic{ flex-shrink:0; width:26px; height:24px; }
+  .an-ic svg{ width:26px; height:24px; display:block; }
+  .an-tete b{ flex:1; font-size:16px; font-weight:700; letter-spacing:-0.025em; }
+  .an-lien{
+    border:none; background:none; padding:0; font-family:inherit;
+    font-size:13px; color:#5EA0FF; font-weight:600;
+  }
+
+  /* Une ligne : médaille ou pastille, nom, détail, valeur. */
+  .an-lg{
+    display:flex; align-items:center; gap:13px; width:100%; padding:12px 0;
+    border:none; background:none; border-bottom:0.5px solid rgba(255,255,255,0.055);
+    color:#fff; font-family:inherit; text-align:left;
+  }
+  .an-lg:last-of-type{ border-bottom:none; }
+  .an-lg .rg{ width:16px; font-size:12px; font-weight:800; color:var(--label-3); flex-shrink:0; }
+  .an-lg .co{ flex:1; min-width:0; }
+  .an-lg .nm{
+    display:block; font-size:14.5px; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .an-lg .st{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
+  .an-lg .ba{
+    display:block; height:4px; border-radius:100px; background:rgba(255,255,255,0.07);
+    margin-top:7px; overflow:hidden;
+  }
+  .an-lg .ba i{ display:block; height:100%; border-radius:100px; background:rgba(255,255,255,0.42); }
+  .an-lg.bas .ba i{ background:rgba(255,159,10,0.62); }
+  .an-lg .vl{ font-size:14.5px; font-weight:650; color:var(--label-2); flex-shrink:0; }
+  .an-lg .vl.chaud{ color:var(--orange); }
+  .an-lg .vl.froid{ color:var(--red); }
+  .an-lg .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
+  .an-lg .pt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; background:var(--orange); }
+  .an-lg .pt.rouge{ background:var(--red); }
+  .an-lg .pt.vert{ background:var(--green); }
+  .an-vide{ font-size:13px; color:var(--label-3); padding:16px 0; }
+
+  /* ═══ La fiche d'un membre ═══ */
+  .fm-tete{ display:flex; align-items:center; gap:15px; margin-top:16px; }
+  .fm-co{ flex:1; min-width:0; }
+  /* Sans cercle d'initiales, le nom prend la place : c'est lui qu'on lit. */
+  .fm-nom{ font-size:26px; font-weight:700; letter-spacing:-0.03em; }
+  .fm-rl{ font-size:13px; color:var(--label-3); font-weight:600; margin-top:3px; }
+  .fm-tete .ma-medaille{ width:46px; height:46px; }
+  .fm-tete .ma-medaille .nb{ font-size:16px; }
+  .fm-serie{ font-size:12.5px; color:var(--label-2); text-align:right; margin-top:6px; }
+  .fm-serie b{ color:#fff; font-weight:700; }
+
+  .fm-courbe{ display:flex; gap:5px; align-items:flex-end; height:52px; margin-top:6px; }
+  .fm-courbe span{ flex:1; border-radius:3px; background:rgba(255,255,255,0.14); min-height:3px; }
+  .fm-courbe span.haut{ background:rgba(255,255,255,0.42); }
+  .fm-jours{ display:flex; gap:5px; margin-top:8px; }
+  .fm-jours span{ flex:1; text-align:center; font-size:9.5px; color:var(--label-3); font-weight:650; }
+
+  .fm-actions{ margin-top:30px; padding-top:20px; border-top:0.5px solid var(--border); }
+  .fm-actions button{
+    width:100%; height:46px; border-radius:15px; margin-bottom:9px;
+    background:rgba(255,255,255,0.07); border:0.5px solid var(--border); color:#fff;
+    font-family:inherit; font-size:14.5px; font-weight:650;
+  }
+  .fm-actions button.danger{ color:var(--red); }
 
   /* ═══ L'image de la procédure ═══
      Une seule image pour l'ensemble, distincte des photos d'étape. Les
@@ -1145,7 +1321,7 @@
   .pm-rang svg{ width:18px; height:18px; display:block; }
 
 
-  /* ═══ Félicitations ═══
+  /* ═══ Changement de rôle ═══
      Même forme que la carte d'accueil : le texte à gauche, le visage à droite
      avec sa pastille verte. On ne crée pas un objet de plus pour une occasion
      unique — on réutilise celui que la personne connaît déjà. */
@@ -1165,7 +1341,10 @@
   /* La carte reprend l'accueil, avec un fond un cran plus présent : c'est un
      moment, pas une ligne de plus dans une liste. */
   .promu-carte{ background:linear-gradient(160deg,#1E2026,#141519); }
+  /* Plus petit que sur la carte d'accueil : ici le visage accompagne une
+     annonce, il ne l'occupe pas. */
   .promu-carte .accueil-av{
+    width:56px; height:56px;
     animation:promuArrive 0.62s cubic-bezier(0.34,1.42,0.5,1) 0.1s both;
   }
 
@@ -1284,7 +1463,7 @@
   }
   .bienvenue-fond.shown .bienvenue{ transform:scale(1) translateY(0); opacity:1; }
   .bienvenue .salut{
-    width:104px; height:104px; margin:0 auto 14px;
+    width:72px; height:72px; margin:0 auto 14px;
     background:url('data:image/webp;base64,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') center/contain no-repeat;
     filter:drop-shadow(0 8px 18px rgba(0,0,0,0.4));
     animation:salutArrive 0.7s cubic-bezier(0.22,1,0.36,1) 0.1s both;
@@ -3290,62 +3469,102 @@
   <!-- Analyse générale du compte -->
   <div class="screen" id="p-global-analyse">
     <h1 class="pagehead">Analyse</h1>
-    <div class="subhead">Vue d'ensemble de votre entreprise</div>
+    <div class="subhead" id="ga-entreprise">—</div>
 
-    <!-- Période : trois segments, façon iOS, à la place des puces -->
     <div class="ga-segments" id="ga-period-toggle">
       <button class="active" data-period="week" onclick="setGaPeriod('week')">Semaine</button>
       <button data-period="month" onclick="setGaPeriod('month')">Mois</button>
       <button data-period="all" onclick="setGaPeriod('all')">Total</button>
     </div>
 
-    <!-- Les trois chiffres clés, en anneaux -->
-    <div class="ga-trio">
-      <div class="ga-tuile">
-        <div class="ga-anneau" id="ga-anneau-taux"></div>
-        <div class="ga-libelle">Consulté</div>
-      </div>
-      <div class="ga-tuile">
-        <div class="ga-anneau" id="ga-anneau-procs"></div>
-        <div class="ga-libelle">Procédures</div>
-      </div>
-      <div class="ga-tuile">
-        <div class="ga-anneau" id="ga-anneau-emp"></div>
-        <div class="ga-libelle">Employés</div>
-      </div>
+    <!-- Le taux, seul : c'est la réponse à la question qu'on se pose en ouvrant. -->
+    <div class="an-heros">
+      <div class="an-n" id="ga-taux">—<span>%</span></div>
+      <div class="an-q">des procédures ont été lues</div>
+      <div><span class="an-ev" id="ga-ecart" style="display:none;"></span></div>
     </div>
-    <div class="ga-detail" id="ga-sub-global">—</div>
 
-    <div class="section-title">Catégories les plus consultées</div>
-    <div id="ga-top-categories"></div>
+    <div class="an-dit" id="ga-sub-global">—</div>
 
-    <div class="section-title">Procédures les plus consultées</div>
-    <div id="ga-late-list"></div>
-
-    <div class="titre-avec-aide">
-      <span class="section-title" style="margin:0;">Tous les membres de l'équipe</span>
-      <button type="button" class="btn-aide" id="aide-medailles" aria-label="À quoi correspondent les médailles ?">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v6"/><path d="M12 7.6v.1"/></svg>
-      </button>
+    <div class="an-trois">
+      <div class="un"><div class="v" id="ga-lues">—</div><div class="l">Procédures lues</div></div>
+      <div class="un"><div class="v" id="ga-lectures">—</div><div class="l">Lectures</div></div>
+      <div class="un"><div class="v" id="ga-moyenne">—</div><div class="l">Par procédure</div></div>
     </div>
-    <div class="list-tools">
-      <div class="dd-filter" id="dd-membres-sort">
-        <button class="dd-trigger" id="dd-membres-sort-trigger" type="button">
-          <span class="dd-label">Trier : les plus actifs</span>
-          <svg class="dd-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="dd-menu" id="dd-membres-sort-menu">
-          <button type="button" data-sort="actifs" class="selected">Les plus actifs</button>
-          <button type="button" data-sort="inactifs">Les moins actifs</button>
-          <button type="button" data-sort="az">Nom A → Z</button>
-          <button type="button" data-sort="recents">Arrivés récemment</button>
-        </div>
-      </div>
+
+    <div class="an-tete">
+      <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="rgba(255,255,255,0.26)" stroke-width="1.5" stroke-linecap="round"/><circle cx="9.5" cy="7" r="4.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M3 19.5a6.5 6.5 0 0 1 13 0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+      <b>Équipe</b>
+      <button type="button" class="an-lien" id="ga-tri-membres">Les plus actifs</button>
     </div>
     <div id="ga-top-membres"></div>
+
+    <div class="an-tete">
+      <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><path d="M2.5 7.5A2.5 2.5 0 0 1 5 5h4.5l2 2.6H21a2.5 2.5 0 0 1 2.5 2.5v8.4A2.5 2.5 0 0 1 21 21H5a2.5 2.5 0 0 1-2.5-2.5Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linejoin="round"/><line x1="2.5" y1="11.4" x2="23.5" y2="11.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.4"/></svg></span>
+      <b>Catégories</b>
+    </div>
+    <div id="ga-top-categories"></div>
+
+    <div class="an-tete">
+      <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="7" y="1.5" width="15" height="11" rx="3" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="2.5" y="6" width="19" height="15" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M7 13.5 10 16.5 16.5 10" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <b>À traiter</b>
+    </div>
+    <div id="ga-late-list"></div>
   </div>
 
-  <!-- Paramètres -->
+  <!-- La fiche d'un membre -->
+  <div class="screen" id="p-membre">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Équipe</h1>
+    </div>
+
+    <div class="fm-tete">
+      <div class="fm-co">
+        <div class="fm-nom" id="fm-nom">—</div>
+        <div class="fm-rl" id="fm-role">—</div>
+      </div>
+      <div id="fm-medaille"></div>
+    </div>
+    <div class="fm-serie" id="fm-serie"></div>
+
+    <div class="ga-segments" id="fm-periode">
+      <button class="active" data-fm="week">Semaine</button>
+      <button data-fm="month">Mois</button>
+      <button data-fm="all">Total</button>
+    </div>
+
+    <div class="an-heros">
+      <div class="an-n" id="fm-temps">—</div>
+      <div class="an-q" id="fm-temps-q">passées dans l'app</div>
+      <div><span class="an-ev" id="fm-ecart" style="display:none;"></span></div>
+    </div>
+
+    <div class="an-trois">
+      <div class="un"><div class="v" id="fm-lues">—</div><div class="l">Procédures lues</div></div>
+      <div class="un"><div class="v" id="fm-lectures">—</div><div class="l">Lectures</div></div>
+      <div class="un"><div class="v" id="fm-moyenne">—</div><div class="l">Par procédure</div></div>
+    </div>
+
+    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="13" cy="12" r="10.2" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><circle cx="13" cy="12" r="7.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M13 7.6V12l3.2 2" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Ses journées</b></div>
+    <div class="fm-courbe" id="fm-courbe"></div>
+    <div class="fm-jours" id="fm-jours"></div>
+
+    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="8" y="1.5" width="13" height="9" rx="2.5" stroke="rgba(255,255,255,0.16)" stroke-width="1.4"/><rect x="5" y="5" width="16" height="11" rx="3" stroke="rgba(255,255,255,0.26)" stroke-width="1.4"/><rect x="2.5" y="9" width="17" height="12.5" rx="3.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="6" y1="14" x2="14" y2="14" stroke="rgba(255,255,255,0.42)" stroke-width="1.5" stroke-linecap="round"/></svg></span><b>Où il passe son temps</b></div>
+    <div id="fm-top"></div>
+
+    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="3" y="3.5" width="17" height="17" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="11.5" y1="8" x2="11.5" y2="13" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round"/><circle cx="11.5" cy="16" r=".9" fill="rgba(255,255,255,0.42)"/></svg></span><b>Ce qu'il n'a pas lu</b></div>
+    <div id="fm-reste"></div>
+
+    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="8" y="1.5" width="10" height="21" rx="2.6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="11.5" y1="19.5" x2="14.5" y2="19.5" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Ses appareils</b>
+      <span class="an-lien" id="fm-nb-app"></span></div>
+    <div id="fm-appareils"></div>
+
+    <div class="fm-actions" id="fm-actions"></div>
+  </div>
+
   <div class="screen" id="p-scan">
     <h1 class="pagehead">Scanner un code</h1>
     <div class="subhead">Visez le QR code affiché sur un poste pour ouvrir sa procédure</div>
@@ -3399,6 +3618,23 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
 
+    <div class="alerte-partage" id="alerte-partage" style="display:none;">
+      <div class="tete">
+        <span class="pic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.6 21.4 20H2.6Z"/><line x1="12" y1="9.6" x2="12" y2="14"/><circle cx="12" cy="17" r="0.6" fill="#FF9F0A"/>
+          </svg>
+        </span>
+        <span class="tx"><b>Un compte est partagé</b><i id="alerte-detail">—</i></span>
+      </div>
+      <div class="s">Procédo compte les lectures par personne. Tant que plusieurs employés
+        utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.</div>
+      <div class="actions">
+        <button type="button" class="principal" id="alerte-equipe">Voir l'équipe</button>
+        <button type="button" class="secondaire" id="alerte-classer">Ignorer</button>
+      </div>
+    </div>
+
     <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
       <span class="av" id="reg-initiales">—</span>
       <span class="tx">
@@ -3437,6 +3673,17 @@
 
     <div class="reg-titre">Préférences</div>
     <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
+        <span class="reg-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/>
+            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="reg-nm">Vos appareils</span>
+        <span class="reg-val" id="p-nb-appareils">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-langue')">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Langue</span>
         <span class="reg-val" id="reg-langue-val">Français</span><span class="fl">›</span>
@@ -3546,7 +3793,7 @@
   </div>
 </div>
 
-<!-- Félicitations : même forme que la carte d'accueil « Bonjour prénom » -->
+<!-- Changement de rôle : même forme que la carte d'accueil -->
 <div class="fond-promu" id="fond-promu">
   <div class="fen-promu" role="dialog" aria-modal="true">
     <div class="accueil promu-carte">
@@ -3800,6 +4047,17 @@
 
     <div class="reg-titre">Préférences</div>
     <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
+        <span class="reg-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/>
+            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="reg-nm">Vos appareils</span>
+        <span class="reg-val" id="e-nb-appareils">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-langue')">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Langue</span>
         <span class="reg-val" id="es-langue-val">Français</span><span class="fl">›</span>
@@ -3881,6 +4139,19 @@
       </button>
     </div>
     <div class="reg-note">Vous perdrez l'accès à ses procédures. Votre compte Procédo reste actif : vous pourrez en rejoindre une autre avec un nouveau code.</div>
+  </div>
+
+  <!-- Sous-page : les appareils -->
+  <div class="screen" id="reg-appareils">
+    <div class="detail-header">
+      <button class="back-btn" id="app-retour" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos appareils</h1>
+    </div>
+    <div id="app-liste" style="margin-top:14px;"></div>
+    <div class="reg-note">Un compte peut être utilisé sur trois appareils. Au-delà, le plus ancien est déconnecté. Retirez un appareil pour en libérer la place.</div>
+    <div class="reg-note" style="margin-top:10px;">Chaque personne de l'équipe devrait avoir son propre compte : c'est ce qui permet de savoir qui a lu quoi, et c'est compris dans votre abonnement.</div>
   </div>
 
   <!-- Sous-page : la langue -->
@@ -5109,6 +5380,256 @@ async function lireFichesMembre(userId) {
   return { fiches: data || [], erreur: null }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   TROIS APPAREILS PAR COMPTE
+
+   Empêche qu'une équipe de dix personnes partage un seul compte pour payer
+   l'abonnement le moins cher. Au-delà de trois appareils, le plus ancien est
+   déconnecté.
+
+   On compte les APPAREILS DISTINCTS, pas les lectures simultanées : le problème
+   n'est pas que deux personnes lisent en même temps, c'est que dix se partagent
+   un compte.
+
+   L'empreinte est tirée du navigateur et rangée sur l'appareil. Elle n'identifie
+   personne — c'est un numéro tiré au sort la première fois, rien de plus. Elle
+   ne survit pas à un effacement des données du navigateur : quelqu'un de
+   déterminé peut donc reprendre une place. Ce n'est pas un verrou, c'est un
+   garde-fou — et c'est suffisant, parce que l'équipe qui partage un compte perd
+   surtout le suivi individuel qu'elle a payé.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const APPAREILS_MAX = 3
+const RYTHME_PRESENCE = 5 * 60 * 1000     // on se signale toutes les cinq minutes
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TROIS APPAREILS PAR COMPTE, COMPTÉS PAR LE SERVEUR
+
+   Empêche qu'une équipe de dix personnes partage un seul compte pour payer
+   l'abonnement le moins cher.
+
+   Le comptage se fait CÔTÉ SERVEUR, dans la fonction `presence`. Elle calcule
+   l'empreinte à partir de l'adresse réseau, que le navigateur ne choisit pas et
+   ne peut pas effacer — contrairement à une empreinte rangée localement, qui
+   disparaissait au premier nettoyage et changeait d'un navigateur à l'autre.
+
+   Comme Netflix : on compte les appareils ACTIFS dans les trente dernières
+   minutes. Au-delà de trois, le plus ancien est déconnecté, et c'est le dernier
+   arrivé qui reste — sans quoi une équipe qui partage tournerait sur les trois
+   mêmes téléphones sans jamais s'en apercevoir.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let minuteurPresence = null
+
+/* ─── L'alerte au responsable ────────────────────────────────────────────────
+   Le serveur signale les comptes partagés ; l'app les montre au responsable,
+   là où il peut agir. Un point rouge sur le bouton des réglages, et une carte
+   dedans qui dit qui est concerné.
+
+   Le ton n'accuse pas l'employé : il rappelle ce que le partage fait perdre au
+   responsable. C'est lui qui doit créer les comptes manquants, pas l'employé. */
+
+let alertesPartage = []
+
+async function chargerAlertesPartage() {
+  if (currentMembre?.role !== 'gestion' || !currentMembre?.entreprise_id) return
+  try {
+    const { data, error } = await supabase.from('alertes_partage')
+      .select('id, membre_id, nb_appareils, creee_le, vue')
+      .eq('entreprise_id', currentMembre.entreprise_id)
+      .eq('vue', false)
+    if (error) return          // table absente : rien à signaler
+    alertesPartage = data || []
+    peindreAlertePartage()
+  } catch (e) { /* rien à signaler */ }
+}
+
+function peindreAlertePartage() {
+  const carte = document.getElementById('alerte-partage')
+  const detail = document.getElementById('alerte-detail')
+  const pastille = document.querySelector('#gestion-app .icon-pill')
+
+  const n = alertesPartage.length
+  if (pastille) pastille.classList.toggle('alerte', n > 0)
+  if (!carte) return
+
+  if (!n) { carte.style.display = 'none'; return }
+
+  carte.style.display = 'block'
+  if (detail) {
+    /* On nomme les personnes quand on peut : « le compte de Karim » est
+       actionnable, « un compte » ne l'est pas. */
+    const noms = alertesPartage
+      .map(a => (cachedMembres || []).find(m => m.id === a.membre_id)?.nom)
+      .filter(Boolean)
+    const max = Math.max(...alertesPartage.map(a => a.nb_appareils))
+    detail.textContent = noms.length
+      ? (noms.length === 1
+        ? `Le compte de ${noms[0]} est utilis\u00e9 sur ${max} appareils.`
+        : `${noms.length} comptes sont utilis\u00e9s sur plusieurs appareils : ${noms.join(', ')}.`)
+      : `Un compte est utilis\u00e9 sur ${max} appareils.`
+  }
+}
+
+document.getElementById('alerte-equipe')?.addEventListener('click', () => openMembres())
+
+document.getElementById('alerte-classer')?.addEventListener('click', async () => {
+  const ok = await confirmDialog({
+    titre: 'Ignorer ce signalement ?',
+    message: "Il repara\u00eetra si le partage continue. Cr\u00e9er un compte par personne " +
+      "reste le seul moyen de savoir qui a lu quoi.",
+    confirmer: 'Ignorer', annuler: 'Annuler', danger: false,
+  })
+  if (!ok) return
+  const ids = alertesPartage.map(a => a.id)
+  await supabase.from('alertes_partage').update({ vue: true }).in('id', ids)
+  alertesPartage = []
+  peindreAlertePartage()
+})
+
+/* Se signale au serveur. Renvoie `false` si cet appareil-ci vient d'être
+   déconnecté parce qu'il dépassait la limite. */
+async function signalerPresence(membre) {
+  if (!membre?.id) return true
+  try {
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/presence`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ membre_id: membre.id, entreprise_id: membre.entreprise_id }),
+    })
+    const data = await rep.json()
+    return !data?.bloque
+  } catch (ex) {
+    /* Fonction non déployée, réseau coupé : on laisse passer. Mieux vaut ne pas
+       compter que de bloquer quelqu'un de légitime. */
+    console.warn('Proc\u00e9do \u00b7 pr\u00e9sence :', ex?.message || ex)
+    return true
+  }
+}
+
+/* On se re-signale régulièrement : c'est ce qui permet au serveur de savoir qui
+   est ENCORE là, et donc de libérer la place de ceux qui sont partis. */
+function lancerSuiviPresence(membre) {
+  arreterSuiviPresence()
+  minuteurPresence = setInterval(async () => {
+    const ok = await signalerPresence(membre)
+    if (!ok) {
+      arreterSuiviPresence()
+      await supabase.auth.signOut()
+      location.reload()
+    }
+  }, RYTHME_PRESENCE)
+}
+
+function arreterSuiviPresence() {
+  if (minuteurPresence) { clearInterval(minuteurPresence); minuteurPresence = null }
+}
+
+/* Ce qu'on montre à quelqu'un dont l'appareil vient d'être déconnecté. Le ton
+   n'est pas accusateur : on explique ce qu'on perd, et ce qu'il faut demander. */
+async function fenetreTropDAppareils() {
+  await confirmDialog({
+    titre: 'Trop d\'appareils',
+    message: `Ce compte est d\u00e9j\u00e0 utilis\u00e9 sur ${APPAREILS_MAX} appareils. ` +
+      `Cet appareil-ci a \u00e9t\u00e9 d\u00e9connect\u00e9.\n\n` +
+      `Proc\u00e9do compte les lectures par personne : si votre \u00e9quipe partage un seul ` +
+      `compte, votre responsable ne sait pas qui a lu quoi. Demandez-lui votre ` +
+      `propre acc\u00e8s \u2014 c'est compris dans votre abonnement.`,
+    confirmer: 'Compris', annuler: 'Fermer', danger: false,
+  })
+}
+
+/* ─── La page des appareils ─────────────────────────────────────────────── */
+
+window.ouvrirAppareils = async function() {
+  if (currentMembre?.role === 'gestion') showGestionScreen('reg-appareils')
+  else showEquipeScreen('reg-appareils')
+  document.getElementById('app-liste').innerHTML = '<div class="note">Chargement\u2026</div>'
+  await peindreAppareils()
+}
+
+document.getElementById('app-retour')?.addEventListener('click', () => {
+  if (currentMembre?.role === 'gestion') showGestionScreen('p-settings')
+  else showEquipeScreen('e-settings')
+})
+
+function quandLisible(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const minutes = Math.floor((Date.now() - d) / 60000)
+  if (minutes < 2) return 'en ce moment'
+  if (minutes < 60) return `il y a ${minutes} min`
+  if (minutes < 1440) return `il y a ${Math.floor(minutes / 60)} h`
+  const jours = Math.floor(minutes / 1440)
+  if (jours === 1) return 'hier'
+  if (jours < 7) return `il y a ${jours} jours`
+  return 'le ' + d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+}
+
+async function peindreAppareils() {
+  const el = document.getElementById('app-liste')
+  if (!el || !currentMembre?.id) return
+
+  const { data, error } = await supabase.from('presences')
+    .select('id, empreinte, nom, reseau, premiere_fois, derniere_fois, revoquee')
+    .eq('membre_id', currentMembre.id)
+    .order('derniere_fois', { ascending: false })
+
+  if (error) {
+    el.innerHTML = `<div class="note">Impossible de lire vos appareils : ${escapeHtml(error.message)}<br>Ex\u00e9cutez migration-presences.sql.</div>`
+    return
+  }
+
+  const liste = data || []
+  const recent = Date.now() - 30 * 60000
+  const actifs = liste.filter(a => !a.revoquee && new Date(a.derniere_fois) > recent)
+
+  const val = `${actifs.length} sur ${APPAREILS_MAX}`
+  for (const id of ['e-nb-appareils', 'p-nb-appareils']) {
+    const e = document.getElementById(id)
+    if (e) e.textContent = val
+  }
+
+  if (!liste.length) {
+    el.innerHTML = '<div class="note">Aucun appareil enregistr\u00e9 pour le moment.</div>'
+    return
+  }
+
+  el.innerHTML = liste.map(a => {
+    const vivant = !a.revoquee && new Date(a.derniere_fois) > recent
+    return `<div class="app-ligne${vivant ? ' moi' : ''}${a.revoquee ? ' revoque' : ''}">
+      <span class="ic">
+        <svg viewBox="0 0 24 24" fill="none">
+          <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/>
+          <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="tx">
+        <span class="nm">${escapeHtml(a.nom || 'Appareil')}${vivant ? '<span class="ici">actif</span>' : ''}</span>
+        <span class="st">${a.revoquee ? 'D\u00e9connect\u00e9' : quandLisible(a.derniere_fois)}${a.reseau ? ' \u00b7 ' + escapeHtml(a.reseau) : ''}</span>
+      </span>
+      <button type="button" class="oter" data-appareil="${a.id}"
+        data-nom="${escapeHtml(a.nom || 'cet appareil')}">Retirer</button>
+    </div>`
+  }).join('')
+}
+
+document.getElementById('app-liste')?.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-appareil]')
+  if (!b) return
+  const ok = await confirmDialog({
+    titre: `Retirer ${b.dataset.nom} ?`,
+    message: "Cet appareil sera d\u00e9connect\u00e9 et lib\u00e9rera une place. " +
+      "Il pourra revenir plus tard s'il en reste une.",
+    confirmer: 'Retirer', annuler: 'Annuler', danger: true,
+  })
+  if (!ok) return
+  const { error } = await supabase.from('presences').delete().eq('id', b.dataset.appareil)
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  await peindreAppareils()
+  toast('Appareil retir\u00e9.')
+})
+
 async function enterApp(membre) {
   currentMembre = membre
   try {
@@ -5123,6 +5644,24 @@ async function enterApp(membre) {
      choix — et les deux se superposaient, comme sur mobile. */
   document.getElementById('login-screen').style.display = 'none'
   document.getElementById('choice-screen').style.display = 'none'
+
+  /* Avant tout : cet appareil a-t-il le droit d'entrer ? On le demande au
+     serveur, ici plutôt qu'à la connexion, pour couvrir aussi la reprise de
+     session. */
+  const autorise = await signalerPresence(membre)
+  if (!autorise) {
+    await supabase.auth.signOut()
+    currentMembre = null
+    document.getElementById('gestion-app').style.display = 'none'
+    document.getElementById('equipe-app').style.display = 'none'
+    document.getElementById('tabbar-gestion').style.display = 'none'
+    document.getElementById('tabbar-equipe').style.display = 'none'
+    document.getElementById('login-screen').style.display = 'flex'
+    window.__procedoLoaded = true
+    await fenetreTropDAppareils()
+    return
+  }
+  lancerSuiviPresence(membre)
 
   /* Les deux espaces s'excluent. On masque LES DEUX avant d'en montrer un :
      quelqu'un qui passe de l'équipe à la gestion — une promotion, par exemple —
@@ -5185,7 +5724,8 @@ async function enterApp(membre) {
     chargerLangue()
     chargerEtablissements()
     // Une fois les procédures chargées, l'entreprise est connue : on peut la nommer.
-    setTimeout(() => verifierPromotion(membre), 700)
+    verifierPromotion(membre)          // tout de suite : c'est la première chose à dire
+    chargerAlertesPartage()
     if (cibleQR) ouvrirCibleQR()
     finDuDemarrage()
   } else {
@@ -5205,7 +5745,7 @@ async function enterApp(membre) {
     mesurerOnglets()
     chargerLangue()
     chargerEtablissements()
-    setTimeout(() => verifierPromotion(membre), 700)
+    verifierPromotion(membre)          // tout de suite : c'est la première chose à dire
     window.jalon?.('APP AFFICHÉE')
     desarmerSurveillance()
     window.mesurerFluidite?.()
@@ -5259,20 +5799,31 @@ async function ouvrirCibleQR() {
     titre = data?.titre; categorie = data?.categorie
   }
 
-  if (!titre) {
-    await confirmDialog({
-      titre: 'Proc\u00e9dure introuvable',
-      message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe plus, ou qui appartient \u00e0 une autre entreprise.",
-      confirmer: 'Compris', annuler: 'Fermer', danger: false,
-    })
-    return
-  }
-
   const nouveau = estNouvelUtilisateur()
   if (nouveau) marquerBienvenueVue()
-  const ok = await fenetreBienvenue(titre, categorie, nouveau)
-  if (!ok) return
 
+  /* La fenêtre apparaît MAINTENANT, même si le nom n'est pas encore connu. Elle
+     attendait jusqu'ici la réponse de la base : un aller-retour réseau pendant
+     lequel l'écran restait noir après le scan. Le nom se pose ensuite. */
+  const attente = fenetreBienvenue(titre, categorie, nouveau)
+
+  if (promesseTitre) {
+    const { data } = await promesseTitre
+    titre = data?.titre; categorie = data?.categorie
+    if (!titre) {
+      fermerFenetreBienvenue()
+      await confirmDialog({
+        titre: 'Proc\u00e9dure introuvable',
+        message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe plus, ou qui appartient \u00e0 une autre entreprise.",
+        confirmer: 'Compris', annuler: 'Fermer', danger: false,
+      })
+      return
+    }
+    majFenetreBienvenue(titre, categorie)
+  }
+
+  const ok = await attente
+  if (!ok) return
   openEquipeDetail(id)
 }
 
@@ -5388,6 +5939,8 @@ window.openSettings = async function() {
   rendreChoixLangueApp()
   chargerEtablissements()
   peindreReglages()
+  peindreAppareils()
+  chargerAlertesPartage()
   showGestionScreen('p-settings')
   document.getElementById('settings-nom').value = currentMembre.nom || ''
   const { data: userData } = await supabase.auth.getUser()
@@ -5476,6 +6029,7 @@ window.signOut = async function() {
   /* Le repère et les copies locales n'ont plus de sens une fois déconnecté : le
      compte suivant sur ce téléphone ne doit hériter ni du choix ni des
      procédures de quelqu'un d'autre. */
+  arreterSuiviPresence()
   try {
     localStorage.removeItem('procedo_membre')
     Object.keys(localStorage)
@@ -5553,49 +6107,161 @@ window.setGaPeriod = function(period) {
   renderGaStats()
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANALYSE
+
+   Le taux d'abord, en grand : c'est la réponse à la question qu'on se pose en
+   ouvrant la page. Puis ce qu'il manque, en une phrase. Puis l'équipe, les
+   catégories, et ce qu'il reste à traiter.
+
+   Les anneaux ont disparu : trois cercles côte à côte demandaient d'être
+   interprétés, là où un seul chiffre répond.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Un temps lisible : « 38 min », « 2 h 40 ». Les secondes n'intéressent
+   personne au-delà de la minute. */
+function dureeLisible(secondes) {
+  const s = Math.max(0, Math.round(secondes || 0))
+  if (s < 60) return s + ' s'
+  const min = Math.round(s / 60)
+  if (min < 60) return min + ' min'
+  const h = Math.floor(min / 60), reste = min % 60
+  return reste ? `${h} h ${String(reste).padStart(2, '0')}` : `${h} h`
+}
+
+function debutPeriode(periode) {
+  const now = new Date()
+  if (periode === 'week') {
+    const d = new Date(now)
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7))
+    d.setHours(0, 0, 0, 0)
+    return d
+  }
+  if (periode === 'month') return new Date(now.getFullYear(), now.getMonth(), 1)
+  return null
+}
+
 function renderGaStats() {
   if (!currentGaData) return
   const { procedures, employes, validations } = currentGaData
   const nbEmployes = employes.length
   const nbProcedures = procedures.length
 
-  const now = new Date()
-  let periodStart = null
-  if (currentGaPeriod === 'week') {
-    periodStart = new Date(now)
-    const day = (periodStart.getDay() + 6) % 7
-    periodStart.setDate(periodStart.getDate() - day)
-    periodStart.setHours(0, 0, 0, 0)
-  } else if (currentGaPeriod === 'month') {
-    periodStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  }
-
-  const validationsInPeriod = periodStart
-    ? validations.filter(v => new Date(v.validated_at) >= periodStart)
+  const debut = debutPeriode(currentGaPeriod)
+  const dansPeriode = debut
+    ? validations.filter(v => new Date(v.validated_at) >= debut)
     : validations
 
-  const nbAttendu = nbProcedures * nbEmployes
-  const nbConsulte = validationsInPeriod.length
-  const taux = nbAttendu > 0 ? Math.round((nbConsulte / nbAttendu) * 100) : 0
-  const periodLabel = currentGaPeriod === 'week' ? 'cette semaine' : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
+  const attendu = nbProcedures * nbEmployes
+  const taux = attendu > 0 ? Math.round((dansPeriode.length / attendu) * 100) : 0
+  const libelle = currentGaPeriod === 'week' ? 'cette semaine'
+    : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total'
 
-  const nbCategories = new Set((procedures || []).map(p => p.categorie || 'Sans catégorie')).size
-  const couleurTaux = taux >= 70 ? 'var(--green)' : taux >= 30 ? 'var(--orange)' : 'var(--red)'
+  const el = (i) => document.getElementById(i)
 
-  dessinerAnneau('ga-anneau-taux',  taux, couleurTaux, taux + '%')
-  dessinerAnneau('ga-anneau-procs', 100, 'var(--blue)',   String(nbProcedures))
-  dessinerAnneau('ga-anneau-emp',   100, 'var(--purple)', String(nbEmployes))
+  if (el('ga-entreprise')) {
+    el('ga-entreprise').textContent = (cachedEntreprise?.nom || 'Votre entreprise') + ' \u00b7 ' + libelle
+  }
+  if (el('ga-taux')) el('ga-taux').innerHTML = taux + '<span>%</span>'
 
-  const sous = document.getElementById('ga-sub-global')
-  if (sous) {
-    sous.textContent = nbAttendu > 0
-      ? `${nbConsulte} consultation${nbConsulte > 1 ? 's' : ''} ${periodLabel} sur ${nbAttendu} possibles · ${nbCategories} catégorie${nbCategories > 1 ? 's' : ''}`
-      : "Ajoutez des procédures et des employés pour voir apparaître les consultations."
+  /* L'écart avec la période précédente. Un taux seul ne dit pas s'il monte ou
+     s'il descend — c'est pourtant la première chose qu'on veut savoir. */
+  const ecartEl = el('ga-ecart')
+  if (ecartEl) {
+    if (debut && attendu > 0) {
+      const duree = Date.now() - debut.getTime()
+      const avantDebut = new Date(debut.getTime() - duree)
+      const avant = validations.filter(v => {
+        const t = new Date(v.validated_at)
+        return t >= avantDebut && t < debut
+      }).length
+      const tauxAvant = Math.round((avant / attendu) * 100)
+      const pts = taux - tauxAvant
+      ecartEl.style.display = 'inline-flex'
+      ecartEl.classList.toggle('baisse', pts < 0)
+      ecartEl.textContent = pts === 0
+        ? 'Stable par rapport \u00e0 la p\u00e9riode pr\u00e9c\u00e9dente'
+        : `${pts > 0 ? '\u2191' : '\u2193'} ${Math.abs(pts)} pts par rapport \u00e0 la p\u00e9riode pr\u00e9c\u00e9dente`
+    } else {
+      ecartEl.style.display = 'none'
+    }
   }
 
-  renderTopCategories(procedures, validationsInPeriod, nbEmployes, periodLabel)
+  // Ce qu'il manque, dit en une phrase.
+  const manque = Math.max(0, attendu - dansPeriode.length)
+  const jamais = procedures.filter(p =>
+    !validations.some(v => v.procedure_id === p.id)).length
+  const inactifs = employes.filter(e =>
+    !dansPeriode.some(v => v.membre_id === e.id))
+
+  if (el('ga-sub-global')) {
+    el('ga-sub-global').innerHTML = attendu === 0
+      ? "Ajoutez des proc\u00e9dures et des membres pour voir appara\u00eetre les lectures."
+      : manque === 0
+        ? "Toute l'\u00e9quipe est \u00e0 jour."
+        : `Il manque <b>${manque} lecture${manque > 1 ? 's' : ''}</b> pour que toute l'\u00e9quipe soit \u00e0 jour.` +
+          (inactifs.length ? ` <b>${escapeHtml(inactifs[0].nom || 'Quelqu\'un')}</b> n'a rien ouvert ${libelle}.` : '')
+  }
+
+  // Les trois repères.
+  const luesDistinctes = new Set(dansPeriode.map(v => v.procedure_id)).size
+  const secondes = dansPeriode.reduce((t, v) => t + Number(v.duree_lecture || 0), 0)
+  const moyenne = dansPeriode.length ? secondes / dansPeriode.length : 0
+  if (el('ga-lues')) el('ga-lues').innerHTML = `${luesDistinctes}<em>/${nbProcedures}</em>`
+  if (el('ga-lectures')) el('ga-lectures').textContent = dansPeriode.length
+  if (el('ga-moyenne')) el('ga-moyenne').textContent = moyenne ? dureeLisible(moyenne) : '\u2014'
+
+  renderTopCategories(procedures, dansPeriode, nbEmployes, libelle)
   renderMembresListe()
+  renderAtraiter(procedures, validations, employes, dansPeriode, libelle)
 }
+
+/* Ce qu'il reste à faire. Chaque ligne est elle-même l'action : on la touche, on
+   arrive là où l'on peut régler le problème. Un bouton unique « relancer
+   l'équipe » ne disait ni qui relancer, ni pourquoi. */
+function renderAtraiter(procedures, validations, employes, dansPeriode, libelle) {
+  const el = document.getElementById('ga-late-list')
+  if (!el) return
+
+  const jamais = procedures.filter(p => !validations.some(v => v.procedure_id === p.id))
+  const inactifs = employes.filter(e => !dansPeriode.some(v => v.membre_id === e.id))
+
+  const lignes = []
+  if (jamais.length) {
+    lignes.push({
+      rouge: true,
+      titre: `${jamais.length} proc\u00e9dure${jamais.length > 1 ? 's' : ''} jamais ouverte${jamais.length > 1 ? 's' : ''}`,
+      sous: jamais.slice(0, 2).map(p => p.titre).join(', ') + (jamais.length > 2 ? '\u2026' : ''),
+      aller: () => openAnalyse(jamais[0].id),
+    })
+  }
+  inactifs.slice(0, 2).forEach(e => {
+    lignes.push({
+      rouge: true,
+      titre: `${e.nom || 'Un membre'} n'a rien lu`,
+      sous: `Aucune lecture ${libelle}`,
+      aller: () => ouvrirFicheMembre(e.id),
+    })
+  })
+
+  if (!lignes.length) {
+    el.innerHTML = '<div class="an-vide">Rien \u00e0 signaler : tout le monde suit.</div>'
+    return
+  }
+
+  el.innerHTML = lignes.map((l, i) => `
+    <button type="button" class="an-lg" data-traiter="${i}">
+      <span class="pt${l.rouge ? ' rouge' : ''}"></span>
+      <span class="co"><span class="nm">${escapeHtml(l.titre)}</span>
+      <span class="st">${escapeHtml(l.sous)}</span></span>
+      <span class="fl">\u203a</span>
+    </button>`).join('')
+
+  el.querySelectorAll('[data-traiter]').forEach(b => {
+    b.addEventListener('click', () => lignes[+b.dataset.traiter].aller())
+  })
+}
+
 
 /* Trace un anneau de progression. Le trait est un cercle dont on ne dessine
    qu'une fraction, et les deux variables `--vide` et `--cible` servent à
@@ -5749,13 +6415,6 @@ function carteDeProcedure(procId) {
    d'afficher zéro comme si la personne n'avait rien lu.
    ══════════════════════════════════════════════════════════════════════════════ */
 
-function dureeLisible(s) {
-  if (!s || s < 1) return '\u2014'
-  if (s < 60) return Math.round(s) + ' s'
-  const m = Math.floor(s / 60), r = Math.round(s % 60)
-  if (m < 60) return m + ' min' + (r ? ' ' + String(r).padStart(2, '0') : '')
-  return Math.floor(m / 60) + ' h ' + String(m % 60).padStart(2, '0')
-}
 
 /* ═══ SÉRIE DE JOURS CONSÉCUTIFS ═══
    On compte les journées qui se suivent sans trou, en remontant depuis la
@@ -6008,6 +6667,273 @@ document.getElementById('ma-reste')?.addEventListener('click', (e) => {
 })
 
 /* ═══ Liste des membres, triable ═══ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FICHE D'UN MEMBRE
+
+   Chaque nom de l'onglet Analyse l'ouvre. Elle répond aux questions qu'un
+   responsable se pose sur une personne : combien de temps elle passe dans
+   l'app, sur quoi, ce qu'elle n'a pas lu, et depuis quels appareils.
+
+   Tout vient de `duree_lecture` sur les validations — la colonne existe déjà.
+   Quand elle est absente ou nulle, on n'invente pas de durée : on affiche les
+   lectures sans le temps, plutôt qu'un chiffre faux.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let ficheMembreId = null
+let fmPeriode = 'week'
+
+function fmDebutPeriode() {
+  const now = new Date()
+  if (fmPeriode === 'week') {
+    const d = new Date(now); const j = (d.getDay() + 6) % 7
+    d.setDate(d.getDate() - j); d.setHours(0, 0, 0, 0); return d
+  }
+  if (fmPeriode === 'month') return new Date(now.getFullYear(), now.getMonth(), 1)
+  return null
+}
+
+/* La période précédente, de même longueur : c'est à elle qu'on se compare. */
+function fmPeriodePrecedente() {
+  const debut = fmDebutPeriode()
+  if (!debut) return null
+  const fin = new Date(debut)
+  const avant = new Date(debut)
+  if (fmPeriode === 'week') avant.setDate(avant.getDate() - 7)
+  else avant.setMonth(avant.getMonth() - 1)
+  return { avant, fin }
+}
+
+function fmLibellePeriode() {
+  return fmPeriode === 'week' ? 'cette semaine'
+    : fmPeriode === 'month' ? 'ce mois-ci' : 'depuis le d\u00e9but'
+}
+
+window.ouvrirFicheMembre = function(membreId) {
+  ficheMembreId = membreId
+  fmPeriode = 'week'
+  document.querySelectorAll('#fm-periode button').forEach(b => {
+    b.classList.toggle('active', b.dataset.fm === 'week')
+  })
+  showGestionScreen('p-membre')
+  peindreFicheMembre()
+}
+
+document.getElementById('fm-periode')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-fm]')
+  if (!b) return
+  fmPeriode = b.dataset.fm
+  document.querySelectorAll('#fm-periode button').forEach(x => {
+    x.classList.toggle('active', x === b)
+  })
+  peindreFicheMembre()
+})
+
+async function peindreFicheMembre() {
+  if (!ficheMembreId || !currentGaData) return
+  const { employes, procedures, validations } = currentGaData
+  const m = (employes || []).concat(cachedMembres || []).find(x => x.id === ficheMembreId)
+  if (!m) return
+
+  const el = (id) => document.getElementById(id)
+  el('fm-nom').textContent = m.nom || 'Sans nom'
+  el('fm-role').textContent = (m.role === 'gestion' ? 'Gestion' : '\u00c9quipe') +
+    (m.created_at ? ' \u00b7 depuis ' + new Date(m.created_at)
+      .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : '')
+
+  const siennes = (validations || []).filter(v => v.membre_id === m.id)
+  const serie = serieConsecutive(siennes).serie
+  el('fm-medaille').innerHTML = medailleHtml(serie, 46, true)
+  el('fm-serie').innerHTML = serie
+    ? `<b>${serie} jour${serie > 1 ? 's' : ''}</b> d'affil\u00e9e`
+    : 'Aucune s\u00e9rie en cours'
+
+  // ─── Le temps sur la période choisie ───
+  const debut = fmDebutPeriode()
+  const dedans = debut ? siennes.filter(v => new Date(v.validated_at) >= debut) : siennes
+  const secondes = dedans.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+
+  /* Le temps en gros : on sépare l'unité du nombre pour qu'elle soit plus
+     discrète, comme sur le taux de la page d'analyse. */
+  el('fm-temps').innerHTML = secondes
+    ? dureeLisible(secondes).replace(/([a-z]+)/gi, '<span> $1 </span>').trim()
+    : `${dedans.length}<span> lecture${dedans.length > 1 ? 's' : ''}</span>`
+  el('fm-temps-q').textContent = secondes
+    ? `pass\u00e9es dans l'app ${fmLibellePeriode()}`
+    : `${fmLibellePeriode()}`
+
+  /* L'écart avec la période précédente. On ne l'affiche que s'il y a de quoi
+     comparer : un « +100 % » depuis zéro ne veut rien dire. */
+  const prec = fmPeriodePrecedente()
+  const ev = el('fm-ecart')
+  if (prec && secondes) {
+    const avantS = siennes
+      .filter(v => { const d = new Date(v.validated_at); return d >= prec.avant && d < prec.fin })
+      .reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+    if (avantS > 0) {
+      const diff = secondes - avantS
+      const signe = diff >= 0 ? '\u2191' : '\u2193'
+      ev.textContent = `${signe} ${dureeLisible(Math.abs(diff))} par rapport \u00e0 ` +
+        (fmPeriode === 'week' ? 'la semaine derni\u00e8re' : 'au mois dernier')
+      ev.classList.toggle('baisse', diff < 0)
+      ev.style.display = ''
+    } else ev.style.display = 'none'
+  } else ev.style.display = 'none'
+
+  // ─── Les trois repères ───
+  const lues = new Set(dedans.map(v => v.procedure_id)).size
+  el('fm-lues').innerHTML = `${lues}<em>/${(procedures || []).length}</em>`
+  el('fm-lectures').textContent = dedans.length
+  el('fm-moyenne').textContent = secondes && dedans.length
+    ? dureeLisible(Math.round(secondes / dedans.length)) : '\u2014'
+
+  // ─── Ses journées ───
+  peindreCourbeMembre(siennes)
+
+  // ─── Où il passe son temps ───
+  const parProc = {}
+  dedans.forEach(v => {
+    const k = v.procedure_id
+    if (!parProc[k]) parProc[k] = { s: 0, n: 0 }
+    parProc[k].s += Number(v.duree_lecture || 0)
+    parProc[k].n += 1
+  })
+  const top = Object.entries(parProc)
+    .map(([id, d]) => ({ proc: (procedures || []).find(p => p.id === id), ...d }))
+    .filter(x => x.proc)
+    .sort((a, b) => (b.s - a.s) || (b.n - a.n))
+    .slice(0, 4)
+  const maxS = Math.max(1, ...top.map(x => x.s || x.n))
+
+  el('fm-top').innerHTML = top.length ? top.map((x, i) => `
+    <button type="button" class="an-lg" data-proc="${x.proc.id}">
+      <span class="rg">${i + 1}</span>
+      <span class="co"><span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
+        <span class="st">${x.n} lecture${x.n > 1 ? 's' : ''}</span>
+        <span class="ba"><i style="width:${Math.round((x.s || x.n) / maxS * 100)}%"></i></span></span>
+      <span class="vl">${x.s ? dureeLisible(x.s) : ''}</span>
+    </button>`).join('')
+    : `<div class="an-vide">Aucune lecture ${fmLibellePeriode()}.</div>`
+
+  // ─── Ce qu'il n'a pas lu ───
+  const lu = new Set(siennes.map(v => v.procedure_id))
+  const reste = (procedures || []).filter(p => !lu.has(p.id))
+  el('fm-reste').innerHTML = reste.length ? reste.slice(0, 5).map(p => `
+    <button type="button" class="an-lg" data-proc="${p.id}">
+      <span class="pt rouge"></span>
+      <span class="co"><span class="nm">${escapeHtml(p.titre || 'Sans titre')}</span>
+        <span class="st">${escapeHtml(p.categorie || 'Sans cat\u00e9gorie')}</span></span>
+      <span class="fl">\u203a</span>
+    </button>`).join('')
+    : '<div class="an-vide">Tout a \u00e9t\u00e9 lu.</div>'
+
+  // ─── Ses appareils ───
+  peindreAppareilsMembre(m.id)
+
+  // ─── Les actions du responsable ───
+  peindreActionsMembre(m)
+}
+
+/* Les sept derniers jours, en barres. */
+function peindreCourbeMembre(validations) {
+  const jours = []
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i)
+    const fin = new Date(d); fin.setDate(fin.getDate() + 1)
+    const dedans = validations.filter(v => {
+      const q = new Date(v.validated_at); return q >= d && q < fin
+    })
+    jours.push({
+      d,
+      valeur: dedans.reduce((s, v) => s + Number(v.duree_lecture || 0), 0) || dedans.length,
+    })
+  }
+  const max = Math.max(1, ...jours.map(j => j.valeur))
+  const seuil = max * 0.55
+
+  document.getElementById('fm-courbe').innerHTML = jours.map(j =>
+    `<span class="${j.valeur >= seuil && j.valeur > 0 ? 'haut' : ''}" ` +
+    `style="height:${j.valeur ? Math.max(6, j.valeur / max * 100) : 3}%"></span>`).join('')
+
+  const noms = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
+  document.getElementById('fm-jours').innerHTML = jours
+    .map(j => `<span>${noms[j.d.getDay()]}</span>`).join('')
+}
+
+async function peindreAppareilsMembre(membreId) {
+  const el = document.getElementById('fm-appareils')
+  const compteur = document.getElementById('fm-nb-app')
+  if (!el) return
+  try {
+    const { data, error } = await supabase.from('presences')
+      .select('nom, reseau, derniere_fois, revoquee')
+      .eq('membre_id', membreId)
+      .order('derniere_fois', { ascending: false })
+    if (error) throw error
+
+    const liste = data || []
+    const recent = Date.now() - 30 * 60000
+    const actifs = liste.filter(a => !a.revoquee && new Date(a.derniere_fois) > recent)
+    if (compteur) compteur.textContent = liste.length ? `${actifs.length} sur ${APPAREILS_MAX}` : ''
+
+    el.innerHTML = liste.length ? liste.slice(0, 3).map(a => {
+      const vivant = !a.revoquee && new Date(a.derniere_fois) > recent
+      return `<div class="an-lg statique">
+        <span class="pt${vivant ? ' vert' : ''}"></span>
+        <span class="co"><span class="nm">${escapeHtml(a.nom || 'Appareil')}</span>
+          <span class="st">${a.revoquee ? 'D\u00e9connect\u00e9' : quandLisible(a.derniere_fois)}</span></span>
+      </div>`
+    }).join('') : '<div class="an-vide">Aucun appareil enregistr\u00e9.</div>'
+  } catch (e) {
+    el.innerHTML = '<div class="an-vide">Appareils non disponibles.</div>'
+    if (compteur) compteur.textContent = ''
+  }
+}
+
+function peindreActionsMembre(m) {
+  const el = document.getElementById('fm-actions')
+  if (!el) return
+  /* Seul le fondateur promeut et retire : la même règle que dans la liste
+     d'équipe. Un promu ne peut retirer que des membres d'équipe. */
+  const moiFondateur = currentMembre?.role === 'gestion' && !currentMembre?.promu_par
+  const peutPromouvoir = moiFondateur && m.role !== 'gestion'
+  const peutRetrograder = moiFondateur && m.role === 'gestion' && m.promu_par
+  const peutRetirer = moiFondateur || (currentMembre?.role === 'gestion' && m.role !== 'gestion')
+
+  let html = ''
+  if (peutPromouvoir) html += '<button type="button" data-fm-act="promouvoir">Passer en gestion</button>'
+  if (peutRetrograder) html += '<button type="button" data-fm-act="retrograder">Repasser en \u00e9quipe</button>'
+  if (peutRetirer && m.id !== currentMembre?.id) {
+    html += '<button type="button" class="danger" data-fm-act="retirer">Retirer de l\'\u00e9quipe</button>'
+  }
+  el.innerHTML = html
+}
+
+document.getElementById('fm-actions')?.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-fm-act]')
+  if (!b || !ficheMembreId) return
+  const m = (currentGaData?.employes || []).concat(cachedMembres || [])
+    .find(x => x.id === ficheMembreId)
+  if (!m) return
+
+  /* On délègue aux boutons de la liste d'équipe : mêmes confirmations, mêmes
+     vérifications de droits, un seul endroit où la règle est écrite. */
+  openMembres()
+  setTimeout(() => {
+    const sel = b.dataset.fmAct === 'retirer' ? '[data-retirer]' : '[data-promo]'
+    document.querySelector(`#pm-liste ${sel}[data-nom]`)
+    const cible = [...document.querySelectorAll(`#pm-liste ${sel}`)]
+      .find(x => x.closest('[data-membre]')?.dataset.membre === m.id
+        || x.dataset.promo === m.id || x.dataset.retirer === m.id)
+    if (cible) cible.click()
+  }, 260)
+})
+
+/* Un clic sur une procédure de la fiche ouvre cette procédure. */
+document.getElementById('p-membre')?.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-proc]')
+  if (b) openAnalyse(b.dataset.proc)
+})
+
 let triMembres = 'actifs'
 
 function renderMembresListe() {
@@ -10294,6 +11220,7 @@ window.openEquipeSettings = async function() {
   showEquipeScreen('e-settings')
   rendreChoixLangueApp()
   peindreReglagesEquipe()
+  peindreAppareils()
   document.getElementById('es-nom').value = currentMembre?.nom || ''
   const { data: { user } } = await supabase.auth.getUser()
   document.getElementById('es-email').value = user?.email || ''
@@ -11332,12 +12259,14 @@ async function verifierPromotion(membre) {
   if (!membre.promu_le) return
 
   const promu = membre.role === 'gestion'
-  const prenom = (membre.nom || '').trim().split(' ')[0]
   const ent = cachedEntreprise?.nom || 'votre entreprise'
   const el = (i) => document.getElementById(i)
 
   if (promu) {
-    el('promu-titre').textContent = prenom ? `F\u00e9licitations ${prenom} \uD83C\uDF89` : 'F\u00e9licitations \uD83C\uDF89'
+    /* Ni félicitations ni bravo : l'app n'est pas en position de féliciter
+       quelqu'un pour une décision prise par son patron. Elle annonce le fait, et
+       c'est tout ce qu'on attend d'elle. */
+    el('promu-titre').textContent = 'Vous passez en espace Gestion'
     el('promu-texte').innerHTML =
       `Vous \u00eates d\u00e9sormais <b>gestionnaire</b> de ${escapeHtml(ent)}. ` +
       `Cr\u00e9ez des proc\u00e9dures, suivez l'\u00e9quipe, g\u00e9rez les acc\u00e8s.`
@@ -11345,7 +12274,7 @@ async function verifierPromotion(membre) {
     el('promu-avert').textContent =
       "L'espace \u00c9quipe ne vous sera plus accessible : vous \u00eates maintenant de l'autre c\u00f4t\u00e9."
   } else {
-    el('promu-titre').textContent = prenom ? `Bonjour ${prenom}` : 'Bonjour'
+    el('promu-titre').textContent = 'Vous repassez en espace \u00c9quipe'
     el('promu-texte').innerHTML =
       `Votre r\u00f4le a chang\u00e9 chez ${escapeHtml(ent)} : vous faites de nouveau partie de <b>l'\u00e9quipe</b>. ` +
       `Vous retrouvez les proc\u00e9dures \u00e0 lire et le scanner de QR codes.`
@@ -12086,6 +13015,25 @@ function marquerBienvenueVue() {
 /* Fenêtre d'accueil : le Memoji salue, la procédure est nommée, un bouton pour
    y entrer. On voit ce qu'on a scanné avant d'y aller — et si le code n'était
    pas le bon, on s'en aperçoit tout de suite. */
+/* Pose le nom de la procédure dans une fenêtre déjà ouverte : la fenêtre apparaît
+   avant que le nom soit lu en base, il se met en place ensuite. */
+function majFenetreBienvenue(titre, categorie) {
+  const f = document.querySelector('.bienvenue-fond')
+  if (!f) return
+  const t = f.querySelector('.proc .t')
+  if (t) t.textContent = titre || ''
+  const c = f.querySelector('.proc .c')
+  if (c) c.textContent = categorie || ''
+  else if (categorie) {
+    f.querySelector('.proc')?.insertAdjacentHTML('beforeend',
+      `<div class="c">${escapeHtml(categorie)}</div>`)
+  }
+}
+
+function fermerFenetreBienvenue() {
+  document.querySelector('.bienvenue-fond')?.remove()
+}
+
 function fenetreBienvenue(titre, categorie, avecAccueil) {
   return new Promise((resoudre) => {
     const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
@@ -12094,12 +13042,10 @@ function fenetreBienvenue(titre, categorie, avecAccueil) {
     fond.innerHTML = `
       <div class="bienvenue" role="dialog" aria-modal="true">
         ${avecAccueil ? '<div class="salut"></div>' : '<div class="code-ic">\u2713</div>'}
-        <h3>${avecAccueil ? (prenom ? 'Bienvenue ' + escapeHtml(prenom) : 'Bienvenue') : 'Code reconnu'}</h3>
-        <div class="intro">${avecAccueil
-          ? 'Vous avez scann\u00e9 le code de cette proc\u00e9dure.'
-          : 'Ce code correspond \u00e0 la proc\u00e9dure suivante.'}</div>
+        <h3>Code reconnu</h3>
+        <div class="intro">Ce code correspond \u00e0 la proc\u00e9dure suivante.</div>
         <div class="proc">
-          <div class="t">${escapeHtml(titre)}</div>
+          <div class="t">${escapeHtml(titre || '\u2026')}</div>
           ${categorie ? `<div class="c">${escapeHtml(categorie)}</div>` : ''}
         </div>
         <button type="button" class="btn block ouvrir">Acc\u00e9der \u00e0 la proc\u00e9dure</button>

@@ -223,7 +223,7 @@
   /* La première section n'a ni filet ni marge : elle est en haut de page.
      `:first-of-type` ne fonctionne pas ici — les `.an-tete` ne sont pas les
      premiers `div` de l'écran. On la désigne donc par sa position réelle. */
-  #p-global-analyse .subhead + .an-tete{
+  #p-global-analyse .an-gain + .an-tete{
     margin-top:6px !important; padding-top:0 !important; border-top:none !important;
   }
   /* La barre flottante mesure 66 px : le bas de page doit la dépasser, sinon la
@@ -469,6 +469,20 @@
     width:16px !important; height:auto !important;
   }
   #p-global-analyse .cat-rank.premier .pos{ color:#fff !important; }
+
+  /* ═══ Le temps gagné ═══
+     Même grammaire que la carte « Bonjour prénom » : même écart, même marge
+     intérieure, même rayon. Seul le visage laisse place à un dessin au trait,
+     dans le langage des icônes de création. */
+  .an-gain{ margin-top:0 !important; margin-bottom:24px !important; }
+  .an-gain-ic{
+    /* 70 px, comme le visage de la carte d'accueil : les deux cartes doivent
+       avoir exactement la même silhouette. */
+    width:70px; height:70px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.055); border:0.5px solid var(--border);
+  }
+  .an-gain-ic svg{ width:33px; height:33px; display:block; }
 
   .an-plus{
     width:100%; margin-top:14px; height:38px; border:none; border-radius:12px;
@@ -3530,8 +3544,25 @@
 
   <!-- Analyse générale du compte -->
   <div class="screen" id="p-global-analyse">
-    <h1 class="pagehead">Analyse</h1>
-    <div class="subhead" id="ga-entreprise">—</div>
+    <!-- Ni titre ni sous-titre : l'onglet du bas dit déjà « Analyse », et la carte
+         du temps ouvre la page. Deux lignes de moins à lire pour rien. -->
+
+    <!-- Le temps gagné : la seule chose de cette page qui réponde à
+         « pourquoi je paie cet abonnement ». -->
+    <div class="accueil an-gain" id="an-gain" style="display:none;">
+      <div class="accueil-texte">
+        <div class="t" id="an-gain-t">—</div>
+        <div class="s" id="an-gain-s">—</div>
+      </div>
+      <div class="an-gain-ic">
+        <svg viewBox="0 0 28 28" fill="none">
+          <path d="M8 3h12M8 25h12" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M9.5 3v4.2c0 3 4.5 4.6 4.5 6.8s-4.5 3.8-4.5 6.8V25" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linejoin="round"/>
+          <path d="M18.5 3v4.2c0 3-4.5 4.6-4.5 6.8s4.5 3.8 4.5 6.8V25" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linejoin="round"/>
+          <path d="M11 21.5c0-1.8 3-2.8 3-2.8s3 1 3 2.8Z" fill="rgba(255,255,255,0.42)"/>
+        </svg>
+      </div>
+    </div>
 
     <div class="an-tete">
       <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="rgba(255,255,255,0.26)" stroke-width="1.5" stroke-linecap="round"/><circle cx="9.5" cy="7" r="4.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M3 19.5a6.5 6.5 0 0 1 13 0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/></svg></span>
@@ -3553,8 +3584,14 @@
     <div id="ga-top-categories"></div>
 
     <div class="an-tete">
-      <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="7" y="1.5" width="15" height="11" rx="3" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="2.5" y="6" width="19" height="15" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M7 13.5 10 16.5 16.5 10" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-      <b>À traiter</b>
+      <span class="an-ic">
+        <svg viewBox="0 0 26 24" fill="none">
+          <circle cx="13" cy="12" r="10.2" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
+          <circle cx="13" cy="12" r="7.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
+          <path d="M13 7.6V12l3.2 2" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <b>Temps de lecture</b>
     </div>
     <div id="ga-late-list"></div>
   </div>
@@ -6200,59 +6237,137 @@ function renderGaStats() {
 
   const el = (i) => document.getElementById(i)
 
-  if (el('ga-entreprise')) {
-    el('ga-entreprise').textContent = (cachedEntreprise?.nom || 'Votre entreprise') + ' \u00b7 ' + libelle
-  }
   renderTopCategories(procedures, dansPeriode, nbEmployes, libelle)
   renderMembresListe()
-  renderAtraiter(procedures, validations, employes, dansPeriode, libelle)
+  renderGainTemps(dansPeriode, libelle)
+  renderTempsLecture(procedures, dansPeriode, libelle)
 }
 
 /* Ce qu'il reste à faire. Chaque ligne est elle-même l'action : on la touche, on
    arrive là où l'on peut régler le problème. Un bouton unique « relancer
    l'équipe » ne disait ni qui relancer, ni pourquoi. */
-function renderAtraiter(procedures, validations, employes, dansPeriode, libelle) {
+/* ═══════════════════════════════════════════════════════════════════════════
+   OÙ L'ÉQUIPE PASSE SON TEMPS
+
+   Le classement des procédures par temps de lecture cumulé. C'est le troisième
+   axe de la page : qui lit, dans quelle catégorie, et sur quoi.
+
+   Ce que ça révèle, et qui ne se voit nulle part ailleurs : une procédure qui
+   prend beaucoup plus de temps que les autres est souvent mal écrite, pas plus
+   importante. Le temps moyen par lecture le dit mieux que le total, on affiche
+   donc les deux.
+
+   Quand `duree_lecture` est vide — la colonne peut ne rien contenir sur les
+   anciennes validations — on classe par nombre de lectures et on n'affiche
+   aucune durée, plutôt qu'un zéro qui ferait croire à une mesure.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TEMPS PASSÉ SUR LES PROCÉDURES
+
+   Le vrai temps, pas une estimation : la somme des secondes réellement passées
+   sur les fiches. Le décompte tourne uniquement quand une procédure est
+   ouverte, et se met en pause dès que l'app passe en arrière-plan ou que la
+   fiche est quittée — voir `demarrerLecture`.
+
+   C'est donc un chiffre qu'un gérant peut défendre : ces minutes ont été
+   passées devant l'écran, à lire. Rien n'est extrapolé, rien n'est multiplié
+   par un coefficient inventé.
+
+   Conséquence à accepter : le chiffre est plus petit qu'une estimation, et il
+   reste vide tant que personne n'a lu. C'est le prix de l'honnêteté, et c'est
+   le bon prix — un gérant qui découvre qu'on a gonflé ses chiffres ne fait
+   plus confiance à aucun des autres.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+function renderGainTemps(dansPeriode, libelle) {
+  const carte = document.getElementById('an-gain')
+  if (!carte) return
+
+  const avecDuree = dansPeriode.filter(v => Number(v.duree_lecture) > 0)
+  const secondes = avecDuree.reduce((s, v) => s + Number(v.duree_lecture), 0)
+
+  /* Sans une seule durée mesur\u00e9e, la carte n'a rien \u00e0 dire : elle se tait
+     plut\u00f4t que d'afficher z\u00e9ro. Cela arrive sur les toutes premi\u00e8res semaines,
+     et sur les lectures ant\u00e9rieures \u00e0 la mise en place de la mesure. */
+  if (!secondes) { carte.style.display = 'none'; return }
+
+  carte.style.display = ''
+
+  const lecteurs = new Set(avecDuree.map(v => v.membre_id)).size
+  const moyenne = Math.round(secondes / avecDuree.length)
+
+  document.getElementById('an-gain-t').textContent =
+    `${dureeLisible(secondes)} pass\u00e9es sur vos proc\u00e9dures`
+
+  document.getElementById('an-gain-s').innerHTML =
+    `<b>${lecteurs} personne${lecteurs > 1 ? 's' : ''}</b> ${libelle}, ` +
+    `${dureeLisible(moyenne)} par lecture en moyenne.`
+}
+
+function renderTempsLecture(procedures, dansPeriode, libelle) {
   const el = document.getElementById('ga-late-list')
   if (!el) return
 
-  const jamais = procedures.filter(p => !validations.some(v => v.procedure_id === p.id))
-  const inactifs = employes.filter(e => !dansPeriode.some(v => v.membre_id === e.id))
-
-  const lignes = []
-  if (jamais.length) {
-    lignes.push({
-      rouge: true,
-      titre: `${jamais.length} proc\u00e9dure${jamais.length > 1 ? 's' : ''} jamais ouverte${jamais.length > 1 ? 's' : ''}`,
-      sous: jamais.slice(0, 2).map(p => p.titre).join(', ') + (jamais.length > 2 ? '\u2026' : ''),
-      aller: () => openAnalyse(jamais[0].id),
-    })
-  }
-  inactifs.slice(0, 2).forEach(e => {
-    lignes.push({
-      rouge: true,
-      titre: `${e.nom || 'Un membre'} n'a rien lu`,
-      sous: `Aucune lecture ${libelle}`,
-      aller: () => ouvrirFicheMembre(e.id),
-    })
+  const parProc = {}
+  dansPeriode.forEach(v => {
+    if (!parProc[v.procedure_id]) parProc[v.procedure_id] = { s: 0, n: 0 }
+    parProc[v.procedure_id].s += Number(v.duree_lecture || 0)
+    parProc[v.procedure_id].n += 1
   })
 
-  if (!lignes.length) {
-    el.innerHTML = '<div class="an-vide">Rien \u00e0 signaler : tout le monde suit.</div>'
+  const classement = Object.entries(parProc)
+    .map(([id, d]) => ({ proc: procedures.find(p => p.id === id), ...d }))
+    .filter(x => x.proc)
+    .sort((a, b) => (b.s - a.s) || (b.n - a.n))
+
+  if (!classement.length) {
+    el.innerHTML = `<div class="an-vide">Aucune lecture ${escapeHtml(libelle)}.</div>`
     return
   }
 
-  el.innerHTML = lignes.map((l, i) => `
-    <button type="button" class="an-lg" data-traiter="${i}">
-      <span class="pt${l.rouge ? ' rouge' : ''}"></span>
-      <span class="co"><span class="nm">${escapeHtml(l.titre)}</span>
-      <span class="st">${escapeHtml(l.sous)}</span></span>
-      <span class="fl">\u203a</span>
-    </button>`).join('')
+  const total = classement.reduce((t, x) => t + x.s, 0)
+  const max = Math.max(1, ...classement.map(x => x.s || x.n))
+  const visibles = tempsDeplie ? classement : classement.slice(0, 3)
 
-  el.querySelectorAll('[data-traiter]').forEach(b => {
-    b.addEventListener('click', () => lignes[+b.dataset.traiter].aller())
+  el.innerHTML = visibles.map((x, i) => {
+    const moyenne = x.n ? Math.round(x.s / x.n) : 0
+    /* Une proc\u00e9dure qui prend deux fois la moyenne g\u00e9n\u00e9rale m\u00e9rite un coup d'\u0153il :
+       souvent elle est trop longue, ou mal d\u00e9coup\u00e9e. */
+    const moyGenerale = dansPeriode.length ? total / dansPeriode.length : 0
+    const longue = moyGenerale > 0 && moyenne > moyGenerale * 1.8
+    return `
+      <button type="button" class="an-lg" data-tps="${escapeHtml(x.proc.id)}">
+        <span class="rg">${i + 1}</span>
+        <span class="co">
+          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
+          <span class="st">${x.n} lecture${x.n > 1 ? 's' : ''}${
+            x.s ? ' \u00b7 ' + dureeLisible(moyenne) + ' en moyenne' : ''
+          }${longue ? ' \u00b7 plus long que la moyenne' : ''}</span>
+          <span class="ba"><i style="width:${Math.round((x.s || x.n) / max * 100)}%"></i></span>
+        </span>
+        <span class="vl${longue ? ' chaud' : ''}">${x.s ? dureeLisible(x.s) : x.n}</span>
+      </button>`
+  }).join('')
+
+  if (classement.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'an-plus'
+    const reste = classement.length - 3
+    b.textContent = tempsDeplie ? 'Replier'
+      : (reste === 1 ? 'Voir la derni\u00e8re' : `Voir les ${reste} autres`)
+    b.addEventListener('click', () => {
+      tempsDeplie = !tempsDeplie
+      renderTempsLecture(procedures, dansPeriode, libelle)
+    })
+    el.appendChild(b)
+  }
+
+  el.querySelectorAll('[data-tps]').forEach(b => {
+    b.addEventListener('click', () => openAnalyse(b.dataset.tps))
   })
 }
+
 
 
 /* Trace un anneau de progression. Le trait est un cercle dont on ne dessine
@@ -6946,6 +7061,7 @@ document.getElementById('p-membre')?.addEventListener('click', (e) => {
 let triMembres = 'actifs'
 let membresDeplies = false
 let categoriesDepliees = false
+let tempsDeplie = false
 
 function renderMembresListe() {
   const el = document.getElementById('ga-top-membres')

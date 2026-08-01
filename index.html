@@ -207,6 +207,18 @@
     display:none;
     padding:92px 20px calc(66px + max(20px, env(safe-area-inset-bottom)) + 18px);
   }
+
+  /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
+     liste qu'on parcourt. Quatre pixels de plus de chaque côté, et de l'espace
+     entre les blocs. */
+  #p-global-analyse, #p-membre{ padding-left:24px; padding-right:24px; }
+  #p-global-analyse .an-heros{ margin-top:38px; }
+  #p-global-analyse .an-dit{ margin-top:26px; }
+  #p-global-analyse .an-trois{ margin-top:28px; padding:19px 0; }
+  /* `!important` parce que la règle de base de `.an-tete` est déclarée plus bas
+     dans la feuille et l'emporterait sinon à égalité de spécificité. */
+  #p-global-analyse .an-tete{ margin-top:38px !important; padding-top:24px !important; }
+  #p-membre .an-tete{ margin-top:34px !important; padding-top:22px !important; }
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
   @keyframes appShellIn{
@@ -415,6 +427,26 @@
   }
   .an-ic{ flex-shrink:0; width:26px; height:24px; }
   .an-ic svg{ width:26px; height:24px; display:block; }
+  /* Le point d'information : discret, collé au titre, et il ne prend pas la
+     place du lien de tri qui reste à droite. */
+  .an-aide{
+    width:20px; height:20px; padding:0; border:none; background:none;
+    color:var(--label-3); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .an-aide svg{ width:16px; height:16px; display:block; }
+  .an-aide:active{ color:var(--label-2); }
+
+  /* ═══ Voir plus ═══
+     Trois lignes suffisent à répondre « qui suit ». Le reste se déplie pour ceux
+     qui veulent vérifier, sans allonger la page pour tous les autres. */
+  .an-plus{
+    width:100%; margin-top:12px; height:38px; border:none; border-radius:12px;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
+  }
+  .an-plus:active{ background:rgba(255,255,255,0.10); }
+
   .an-tete b{ flex:1; font-size:16px; font-weight:700; letter-spacing:-0.025em; }
   .an-lien{
     border:none; background:none; padding:0; font-family:inherit;
@@ -3481,7 +3513,6 @@
     <div class="an-heros">
       <div class="an-n" id="ga-taux">—<span>%</span></div>
       <div class="an-q">des procédures ont été lues</div>
-      <div><span class="an-ev" id="ga-ecart" style="display:none;"></span></div>
     </div>
 
     <div class="an-dit" id="ga-sub-global">—</div>
@@ -3495,6 +3526,12 @@
     <div class="an-tete">
       <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="rgba(255,255,255,0.26)" stroke-width="1.5" stroke-linecap="round"/><circle cx="9.5" cy="7" r="4.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M3 19.5a6.5 6.5 0 0 1 13 0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/></svg></span>
       <b>Équipe</b>
+      <button type="button" class="an-aide" id="aide-medailles" aria-label="À quoi servent les médailles ?">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/>
+          <circle cx="12" cy="7.6" r="0.7" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
       <button type="button" class="an-lien" id="ga-tri-membres">Les plus actifs</button>
     </div>
     <div id="ga-top-membres"></div>
@@ -6166,26 +6203,6 @@ function renderGaStats() {
 
   /* L'écart avec la période précédente. Un taux seul ne dit pas s'il monte ou
      s'il descend — c'est pourtant la première chose qu'on veut savoir. */
-  const ecartEl = el('ga-ecart')
-  if (ecartEl) {
-    if (debut && attendu > 0) {
-      const duree = Date.now() - debut.getTime()
-      const avantDebut = new Date(debut.getTime() - duree)
-      const avant = validations.filter(v => {
-        const t = new Date(v.validated_at)
-        return t >= avantDebut && t < debut
-      }).length
-      const tauxAvant = Math.round((avant / attendu) * 100)
-      const pts = taux - tauxAvant
-      ecartEl.style.display = 'inline-flex'
-      ecartEl.classList.toggle('baisse', pts < 0)
-      ecartEl.textContent = pts === 0
-        ? 'Stable par rapport \u00e0 la p\u00e9riode pr\u00e9c\u00e9dente'
-        : `${pts > 0 ? '\u2191' : '\u2193'} ${Math.abs(pts)} pts par rapport \u00e0 la p\u00e9riode pr\u00e9c\u00e9dente`
-    } else {
-      ecartEl.style.display = 'none'
-    }
-  }
 
   // Ce qu'il manque, dit en une phrase.
   const manque = Math.max(0, attendu - dansPeriode.length)
@@ -6318,9 +6335,11 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     const possible = c.nbProcs * nbEmployes
     return { ...c, possible, taux: possible ? Math.round((c.vues / possible) * 100) : 0 }
   }).sort((a, b) => (b.taux - a.taux) || (b.vues - a.vues) || a.nom.localeCompare(b.nom, 'fr'))
-    .slice(0, 5)
 
-  classement.forEach((c, i) => {
+  /* Trois lignes, comme pour l'équipe. Le reste se déplie. */
+  const visibles = categoriesDepliees ? classement : classement.slice(0, 3)
+
+  visibles.forEach((c, i) => {
     const couleur = c.taux >= 70 ? '#30D158' : c.taux >= 30 ? '#FF9F0A' : '#FF453A'
     const div = document.createElement('div')
     div.className = 'cat-rank' + (i === 0 ? ' premier' : '')
@@ -6335,6 +6354,22 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     `
     el.appendChild(div)
   })
+
+  if (classement.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'an-plus'
+    b.textContent = categoriesDepliees
+      ? 'Replier'
+      : (classement.length - 3 === 1
+        ? 'Voir la derni\u00e8re'
+        : `Voir les ${classement.length - 3} autres`)
+    b.addEventListener('click', () => {
+      categoriesDepliees = !categoriesDepliees
+      renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel)
+    })
+    el.appendChild(b)
+  }
 }
 
 window.loadGlobalAnalyse = function() {
@@ -6935,6 +6970,8 @@ document.getElementById('p-membre')?.addEventListener('click', (e) => {
 })
 
 let triMembres = 'actifs'
+let membresDeplies = false
+let categoriesDepliees = false
 
 function renderMembresListe() {
   const el = document.getElementById('ga-top-membres')
@@ -6962,7 +6999,12 @@ function renderMembresListe() {
                                 stats.sort((a, b) => (b.nb - a.nb) || a.m.nom.localeCompare(b.m.nom, 'fr'))
 
   const total = procedures.length
-  trie.forEach((s, i) => {
+
+  /* Trois lignes suffisent à répondre « qui suit ». Le reste se déplie : la page
+     reste courte pour tout le monde, et complète pour qui veut vérifier. */
+  const visibles = membresDeplies ? trie : trie.slice(0, 3)
+
+  visibles.forEach((s, i) => {
     const div = document.createElement('div')
     div.className = 'emp-row'
     div.style.animationDelay = (i * 0.04) + 's'
@@ -6977,6 +7019,19 @@ function renderMembresListe() {
       ${medailleHtml(serie, 30)}`
     el.appendChild(div)
   })
+
+  if (trie.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'an-plus'
+    b.textContent = membresDeplies
+      ? 'Replier'
+      : (trie.length - 3 === 1
+        ? 'Voir la derni\u00e8re'
+        : `Voir les ${trie.length - 3} autres`)
+    b.addEventListener('click', () => { membresDeplies = !membresDeplies; renderMembresListe() })
+    el.appendChild(b)
+  }
 }
 
 document.getElementById('ga-top-membres')?.addEventListener('click', (e) => {

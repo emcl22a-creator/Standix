@@ -211,10 +211,9 @@
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
      liste qu'on parcourt. Quatre pixels de plus de chaque côté, et de l'espace
      entre les blocs. */
-  #p-global-analyse, #p-membre{ padding-left:24px; padding-right:24px; }
-  #p-global-analyse .an-heros{ margin-top:38px; }
-  #p-global-analyse .an-dit{ margin-top:26px; }
-  #p-global-analyse .an-trois{ margin-top:28px; padding:19px 0; }
+  /* Aucun retrait particulier, aucune compensation : l'analyse garde les 20 px
+     de `.screen`, et sa carte commence exactement où commence celle de la page
+     des procédures. Les bords s'alignent d'une page à l'autre. */
   /* `!important` parce que la règle de base de `.an-tete` est déclarée plus bas
      dans la feuille et l'emporterait sinon à égalité de spécificité. */
   /* Une section suit un bouton « voir plus » : 26 px suffisent, 38 creusaient un
@@ -229,7 +228,7 @@
   /* La barre flottante mesure 66 px : le bas de page doit la dépasser, sinon la
      dernière ligne se lit à travers le verre. */
   #p-global-analyse{ padding-bottom:calc(110px + max(20px, env(safe-area-inset-bottom))) !important; }
-  #p-membre .an-tete{ margin-top:34px !important; padding-top:22px !important; }
+  #p-membre .an-tete{ margin-top:30px !important; padding-top:22px !important; }
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
   @keyframes appShellIn{
@@ -441,11 +440,11 @@
   /* Le point d'information : discret, collé au titre, et il ne prend pas la
      place du lien de tri qui reste à droite. */
   .an-aide{
-    width:20px; height:20px; padding:0; border:none; background:none;
+    width:24px; height:24px; padding:0; border:none; background:none;
     color:var(--label-3); flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
   }
-  .an-aide svg{ width:16px; height:16px; display:block; }
+  .an-aide svg{ width:19px; height:19px; display:block; }
   .an-aide:active{ color:var(--label-2); }
 
   /* ═══ Voir plus ═══
@@ -476,13 +475,13 @@
      dans le langage des icônes de création. */
   .an-gain{ margin-top:0 !important; margin-bottom:24px !important; }
   .an-gain-ic{
-    /* 70 px, comme le visage de la carte d'accueil : les deux cartes doivent
-       avoir exactement la même silhouette. */
-    width:70px; height:70px; border-radius:50%; flex-shrink:0;
+    /* Plus petit que le visage de l'accueil : ici le dessin accompagne un
+       chiffre, il ne porte pas la carte. */
+    width:52px; height:52px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
     background:rgba(255,255,255,0.055); border:0.5px solid var(--border);
   }
-  .an-gain-ic svg{ width:33px; height:33px; display:block; }
+  .an-gain-ic svg{ width:24px; height:24px; display:block; }
 
   .an-plus{
     width:100%; margin-top:14px; height:38px; border:none; border-radius:12px;
@@ -2176,6 +2175,10 @@
     font-size:11px; font-weight:800; background:rgba(255,255,255,0.12); color:#fff;
   }
   .cat-rank.premier .pos{ background:#fff; color:#000; }
+  /* Les lignes du temps de lecture s'ouvrent : on le montre à l'appui, comme
+     partout ailleurs dans l'app. Les catégories, elles, ne bougent pas. */
+  .cat-rank.cliquable{ cursor:pointer; transition:transform 0.16s, background 0.2s; }
+  .cat-rank.cliquable:active{ transform:scale(0.985); background:rgba(255,255,255,0.07); }
   .cat-rank .infos{ flex:1; min-width:0; }
   .cat-rank .nom{ font-size:14px; font-weight:600; }
   .cat-rank .detail{ font-size:11px; color:var(--label-2); margin-top:2px; }
@@ -6296,12 +6299,16 @@ function renderGainTemps(dansPeriode, libelle) {
   const lecteurs = new Set(avecDuree.map(v => v.membre_id)).size
   const moyenne = Math.round(secondes / avecDuree.length)
 
+  /* On nomme ce que ce temps représente : de la formation qui s'est faite toute
+     seule. Le chiffre brut ne le disait pas. */
   document.getElementById('an-gain-t').textContent =
-    `${dureeLisible(secondes)} pass\u00e9es sur vos proc\u00e9dures`
+    `${dureeLisible(secondes)} de formation ${libelle}`
 
+  /* Le verbe s'accorde aussi : « 1 personne se sont formée » ne passe pas. */
+  const pl = lecteurs > 1
   document.getElementById('an-gain-s').innerHTML =
-    `<b>${lecteurs} personne${lecteurs > 1 ? 's' : ''}</b> ${libelle}, ` +
-    `${dureeLisible(moyenne)} par lecture en moyenne.`
+    `<b>${lecteurs} personne${pl ? 's' : ''}</b> ${pl ? 'se sont form\u00e9es seules' : "s'est form\u00e9e seule"} ` +
+    `sur vos proc\u00e9dures, ${dureeLisible(moyenne)} par lecture.`
 }
 
 function renderTempsLecture(procedures, dansPeriode, libelle) {
@@ -6329,24 +6336,31 @@ function renderTempsLecture(procedures, dansPeriode, libelle) {
   const max = Math.max(1, ...classement.map(x => x.s || x.n))
   const visibles = tempsDeplie ? classement : classement.slice(0, 3)
 
+  /* Le même gabarit qu'une catégorie : même carte, même pastille de rang, même
+     jauge colorée, même valeur à droite. Deux listes qui se suivent sur la même
+     page doivent se ressembler, sinon l'œil croit à deux choses différentes. */
   el.innerHTML = visibles.map((x, i) => {
     const moyenne = x.n ? Math.round(x.s / x.n) : 0
-    /* Une proc\u00e9dure qui prend deux fois la moyenne g\u00e9n\u00e9rale m\u00e9rite un coup d'\u0153il :
-       souvent elle est trop longue, ou mal d\u00e9coup\u00e9e. */
+    /* Une proc\u00e9dure qui prend bien plus que la moyenne m\u00e9rite un coup d'\u0153il :
+       souvent elle est trop longue, ou mal d\u00e9coup\u00e9e. La couleur suit la m\u00eame
+       logique que les cat\u00e9gories \u2014 vert, orange, rouge. */
     const moyGenerale = dansPeriode.length ? total / dansPeriode.length : 0
-    const longue = moyGenerale > 0 && moyenne > moyGenerale * 1.8
+    const ratio = moyGenerale > 0 ? moyenne / moyGenerale : 1
+    const couleur = ratio <= 1.2 ? '#30D158' : ratio <= 1.8 ? '#FF9F0A' : '#FF453A'
+    const part = Math.round((x.s || x.n) / max * 100)
     return `
-      <button type="button" class="an-lg" data-tps="${escapeHtml(x.proc.id)}">
-        <span class="rg">${i + 1}</span>
-        <span class="co">
-          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
-          <span class="st">${x.n} lecture${x.n > 1 ? 's' : ''}${
-            x.s ? ' \u00b7 ' + dureeLisible(moyenne) + ' en moyenne' : ''
-          }${longue ? ' \u00b7 plus long que la moyenne' : ''}</span>
-          <span class="ba"><i style="width:${Math.round((x.s || x.n) / max * 100)}%"></i></span>
-        </span>
-        <span class="vl${longue ? ' chaud' : ''}">${x.s ? dureeLisible(x.s) : x.n}</span>
-      </button>`
+      <div class="cat-rank cliquable${i === 0 ? ' premier' : ''}" role="button" tabindex="0"
+           data-tps="${escapeHtml(x.proc.id)}">
+        <div class="pos">${i + 1}</div>
+        <div class="infos">
+          <div class="nom">${escapeHtml(x.proc.titre || 'Sans titre')}</div>
+          <div class="detail">${x.n} lecture${x.n > 1 ? 's' : ''} ${escapeHtml(libelle)}${
+            x.s ? ' \u00b7 ' + dureeLisible(moyenne) + ' par lecture' : ''
+          }</div>
+          <div class="jauge"><i style="width:${part}%; background:${couleur};"></i></div>
+        </div>
+        <div class="taux" style="color:${couleur};">${x.s ? dureeLisible(x.s) : x.n}</div>
+      </div>`
   }).join('')
 
   if (classement.length > 3) {

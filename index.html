@@ -2400,6 +2400,41 @@
   .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; padding-top:2px; }
   .back-btn{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); border:0.5px solid var(--border); flex-shrink:0; }
   .back-btn svg{width:16px; height:16px;}
+  /* ═══ Le fil des étapes, côté équipe ═══
+     La même forme qu'à la création : un trait relie les cases, et l'ordre se voit
+     sans qu'on ait à le lire. */
+  #detail-steps.etapes-fil{ position:relative; padding-left:38px; }
+  #detail-steps.etapes-fil::before{
+    content:''; position:absolute; left:14px; top:8px; bottom:12px; width:1.5px;
+    background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
+  }
+  #detail-steps.etapes-fil .detail-step{
+    position:relative; background:none !important; border:none !important;
+    border-radius:0 !important; padding:0 0 20px !important; margin:0 !important;
+  }
+  #detail-steps.etapes-fil .detail-step.en-lecture::after{
+    content:''; position:absolute; left:-51px; top:-4px; bottom:12px; width:2.5px;
+    border-radius:2px; background:var(--blue);
+  }
+  .et-co{ flex:1; min-width:0; }
+
+  /* La case. Elle porte le numéro tant qu'elle n'est pas cochée : on ne perd pas
+     le repère de l'ordre en gagnant celui de l'avancement. */
+  .et-coche{
+    position:absolute; left:-38px; top:-2px; width:29px; height:29px;
+    border-radius:50%; border:1.6px solid rgba(255,255,255,0.22);
+    background:rgba(255,255,255,0.04); color:var(--label-3);
+    font-family:inherit; font-size:12px; font-weight:800; padding:0;
+    display:flex; align-items:center; justify-content:center;
+    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s, border-color 0.2s;
+  }
+  .et-coche:active{ transform:scale(0.86); }
+  .et-coche.f{
+    background:var(--blue); border-color:var(--blue); color:#04203F; font-size:14px;
+  }
+  /* Une étape faite s'efface un peu : l'œil va d'abord à ce qui reste. */
+  #detail-steps.etapes-fil .detail-step.faite p{ color:var(--label-2); }
+
   .detail-step{ transition:border-color 0.3s ease, background 0.3s ease; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
   .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
   /* `pre-line` conserve les retours à la ligne saisis à la rédaction : le HTML
@@ -2914,7 +2949,11 @@
      `margin-left` de 12,5 px prévu pour les onglets, où l'icône doit laisser la
      place au libellé qui glisse à sa droite. */
   #tabbar .tab-round--primary{ justify-content:center; }
-  #tabbar .tab-round--primary svg{ width:24px; height:24px; margin-left:0; }
+  /* Un pouce de moins et un pixel plus bas : le « + » et le QR paraissaient
+     légèrement hauts dans leur rond, et un peu gros pour lui. */
+  #tabbar .tab-round--primary svg{
+    width:22px; height:22px; margin-left:0; transform:translateY(1px);
+  }
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
@@ -3319,10 +3358,9 @@
   </div>
 
   <div class="screen" id="p-create">
+    <!-- Pas de flèche de retour : on arrive ici par le « + », et la barre du bas
+         suffit à repartir. Une flèche de plus à côté du titre n'ajoutait rien. -->
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-list')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-      </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Nouvelle procédure</h1>
     </div>
     <div class="subhead">Écrivez les étapes, ou découpez une vidéo</div>
@@ -11819,6 +11857,90 @@ document.getElementById('e-avatar')?.addEventListener('click', async () => {
 })
 
 // ═══════════ ÉQUIPE : détail ═══════════
+/* ═══════════════════════════════════════════════════════════════════════════
+   COCHER LES ÉTAPES
+
+   L'employé coche chaque étape en la réalisant. Deux effets, et le second
+   compte plus que le premier.
+
+   Il retrouve où il en était après une interruption — en cuisine, on est
+   interrompu tout le temps, et relire trois étapes pour savoir laquelle on
+   venait de finir est exactement ce qui décourage d'ouvrir l'app.
+
+   Et le temps mesuré devient un temps d'EXÉCUTION, pas de lecture. « Fermeture
+   de caisse : 22 minutes en moyenne » apprend quelque chose de vrai sur
+   l'établissement ; « 40 secondes de lecture » n'apprend rien.
+
+   Les cases vivent dans `validations.etapes_faites`, une colonne JSON. Si elle
+   n'existe pas encore en base, tout continue de fonctionner : les cases sont
+   simplement oubliées à la fermeture.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let etapesFaites = new Set()
+let etapesTotal = 0
+let colonneCochesAbsente = false
+
+function basculerEtape(etapeId) {
+  if (etapesFaites.has(etapeId)) etapesFaites.delete(etapeId)
+  else {
+    etapesFaites.add(etapeId)
+    if (navigator.vibrate) navigator.vibrate(8)
+  }
+  peindreCoches()
+  enregistrerCoches()
+}
+
+function peindreCoches() {
+  document.querySelectorAll('#detail-steps .detail-step').forEach((div, i) => {
+    const b = div.querySelector('.et-coche')
+    if (!b) return
+    const faite = etapesFaites.has(b.dataset.etape)
+    b.classList.toggle('f', faite)
+    b.textContent = faite ? '\u2713' : String(i + 1)
+    div.classList.toggle('faite', faite)
+  })
+  majBandeauCoches()
+}
+
+/* Le bandeau du bas dit où l'on en est, et félicite à la dernière case. */
+function majBandeauCoches() {
+  const etat = document.getElementById('lecture-etat')
+  if (!etat || !etapesTotal) return
+  const n = etapesFaites.size
+  const fini = n === etapesTotal
+
+  etat.closest('.confirm-bar')?.classList.add('visible')
+  etat.style.display = ''
+  etat.classList.toggle('faite', fini)
+  dessinerAnneauLecture(
+    Math.round((n / etapesTotal) * 100),
+    fini ? 'var(--green)' : 'var(--blue)',
+    fini ? '\u2713' : `${n}/${etapesTotal}`,
+  )
+  document.getElementById('lecture-titre').textContent = fini
+    ? 'Proc\u00e9dure termin\u00e9e' : 'En cours'
+  document.getElementById('lecture-sous').textContent = fini
+    ? 'Les ' + etapesTotal + ' \u00e9tapes sont faites'
+    : 'Cochez chaque \u00e9tape en la r\u00e9alisant'
+}
+
+async function enregistrerCoches() {
+  if (colonneCochesAbsente || !lectureProcId || !currentMembre) return
+  const { error } = await supabase.from('validations').upsert({
+    procedure_id: lectureProcId,
+    membre_id: currentMembre.id,
+    etapes_faites: [...etapesFaites],
+    validated_at: new Date().toISOString(),
+  }, { onConflict: 'procedure_id,membre_id' })
+
+  /* La colonne peut ne pas exister : on cesse d'essayer plutôt que de répéter
+     l'erreur à chaque case cochée. Les cases restent utilisables à l'écran. */
+  if (error && /etapes_faites/i.test(error.message || '')) {
+    colonneCochesAbsente = true
+    console.warn('Proc\u00e9do \u00b7 colonne etapes_faites absente : les coches ne seront pas gard\u00e9es.')
+  }
+}
+
 async function openEquipeDetail(procId) {
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
@@ -11899,7 +12021,13 @@ async function openEquipeDetail(procId) {
 
   const stepsEl = document.getElementById('detail-steps')
   detacherSuiviLecture(detailVideoEl)
+  /* On reprend les cases déjà cochées lors d'une visite précédente. */
+  const dejaLu = (mesLectures || []).find(v => v.procedure_id === procId)
+  etapesFaites = new Set(Array.isArray(dejaLu?.etapes_faites) ? dejaLu.etapes_faites : [])
+  etapesTotal = (etapes || []).length
+
   stepsEl.innerHTML = ''
+  stepsEl.classList.add('etapes-fil')
   const clipBounds = calculerBornes(etapes, detailVideoEl?.duration)
 
   ;(etapes || []).forEach((etape, i) => {
@@ -11910,9 +12038,16 @@ async function openEquipeDetail(procId) {
     /* L'étape peut porter une photo du résultat attendu. On la met sous le
        texte, en pleine largeur : c'est souvent elle qui dit le mieux à quoi
        l'on doit arriver. */
+    /* La case remplace le numéro. Ce n'est pas un détail d'affichage : cocher
+       accompagne le TRAVAIL, là où lire n'accompagne que la lecture. On retrouve
+       où l'on en était après une interruption — ce qui arrive tout le temps en
+       cuisine — et le temps mesuré devient un temps d'exécution. */
+    const faite = etapesFaites.has(etape.id)
+    if (faite) div.classList.add('faite')
     div.innerHTML = `
-      <div class="n">${i+1}</div>
-      <div style="flex:1; min-width:0;">
+      <button type="button" class="et-coche${faite ? ' f' : ''}" data-etape="${escapeHtml(etape.id)}"
+              aria-label="\u00c9tape ${i + 1}">${faite ? '\u2713' : (i + 1)}</button>
+      <div class="et-co">
         <p>${escapeHtml(etape.texte)}</p>
         ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}
       </div>
@@ -11929,14 +12064,21 @@ async function openEquipeDetail(procId) {
     // Toute la ligne est cliquable, sauf la photo : on ne veut pas lancer la
     // vidéo quand quelqu'un cherche simplement à mieux voir l'image.
     div.onclick = (e) => {
-      if (e.target.closest('.detail-step-img')) return
+      if (e.target.closest('.detail-step-img, .et-coche')) return
       marquerEtapeEnLecture(div)
       if (hasClip) lireExtrait(detailVideoEl, bounds.start, bounds.end)
     }
+
+    div.querySelector('.et-coche')?.addEventListener('click', (e) => {
+      e.stopPropagation()
+      basculerEtape(etape.id)
+    })
+
     stepsEl.appendChild(div)
   })
 
   attacherSuiviLecture(detailVideoEl, stepsEl)
+  majBandeauCoches()
 
   /* Une procédure sans étape affichait une zone vide, et on ne savait pas si
      c'était un défaut d'affichage ou une procédure incomplète. Elle le dit

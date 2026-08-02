@@ -2462,17 +2462,22 @@
   /* ═══ Le fil des étapes, côté équipe ═══
      La même forme qu'à la création : un trait relie les cases, et l'ordre se voit
      sans qu'on ait à le lire. */
-  #detail-steps.etapes-fil{ position:relative; padding-left:38px; }
+  #detail-steps.etapes-fil{ position:relative; padding-left:42px; margin-top:4px; }
   #detail-steps.etapes-fil::before{
-    content:''; position:absolute; left:14px; top:8px; bottom:12px; width:1.5px;
+    content:''; position:absolute; left:14px; top:9px; bottom:18px; width:1.5px;
     background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
   }
+  /* L'employé lit debout, souvent d'assez loin, et son doigt doit trouver la
+     bonne case du premier coup. On desserre légèrement : 28 px entre les étapes
+     au lieu de 20, et un peu d'air entre les lignes du texte. C'est un écran de
+     lecture, pas un écran de saisie. */
   #detail-steps.etapes-fil .detail-step{
     position:relative; background:none !important; border:none !important;
-    border-radius:0 !important; padding:0 0 20px !important; margin:0 !important;
+    border-radius:0 !important; padding:0 0 28px !important; margin:0 !important;
   }
+  #detail-steps.etapes-fil .detail-step p{ line-height:1.55; }
   #detail-steps.etapes-fil .detail-step.en-lecture::after{
-    content:''; position:absolute; left:-51px; top:-4px; bottom:12px; width:2.5px;
+    content:''; position:absolute; left:-55px; top:-5px; bottom:16px; width:2.5px;
     border-radius:2px; background:var(--blue);
   }
   .et-co{ flex:1; min-width:0; }
@@ -2480,7 +2485,7 @@
   /* La case. Elle porte le numéro tant qu'elle n'est pas cochée : on ne perd pas
      le repère de l'ordre en gagnant celui de l'avancement. */
   .et-coche{
-    position:absolute; left:-38px; top:-2px; width:29px; height:29px;
+    position:absolute; left:-42px; top:-3px; width:29px; height:29px;
     border-radius:50%; border:1.6px solid rgba(255,255,255,0.22);
     background:rgba(255,255,255,0.04); color:var(--label-3);
     font-family:inherit; font-size:12px; font-weight:800; padding:0;

@@ -684,6 +684,31 @@
   .couv .tx{ flex:1; min-width:0; }
   .couv .tx .t{ display:block; font-size:13.5px; font-weight:650; letter-spacing:-0.02em; }
   .couv .tx .s{ display:block; font-size:11.5px; color:var(--label-3); line-height:1.4; margin-top:2px; }
+  /* ═══ La zone d'image, sur les écrans de création ═══
+     La maquette montrait une zone en pointillés, dessin centré : c'est la forme
+     universelle du « déposez ici », et elle se distingue tout de suite d'un champ
+     rempli. La ligne horizontale ressemblait à un réglage, pas à une invitation.
+
+     Une fois la photo choisie, la zone redevient une ligne : il n'y a plus rien
+     à déposer, seulement quelque chose à montrer. */
+  #p-create-manual .couv:not(.remplie),
+  #p-create-video .couv:not(.remplie){
+    flex-direction:column; text-align:center; gap:11px;
+    padding:26px 18px; border-radius:18px;
+    border:1.5px dashed rgba(255,255,255,0.16);
+    background:rgba(255,255,255,0.025);
+  }
+  #p-create-manual .couv:not(.remplie) .vign,
+  #p-create-video .couv:not(.remplie) .vign{
+    width:52px; height:52px; border:none; background:none;
+  }
+  #p-create-manual .couv:not(.remplie) .vign svg,
+  #p-create-video .couv:not(.remplie) .vign svg{ width:46px; height:46px; }
+  #p-create-manual .couv:not(.remplie) .tx .t,
+  #p-create-video .couv:not(.remplie) .tx .t{ font-size:14.5px; font-weight:650; }
+  #p-create-manual .couv:not(.remplie) .tx .s,
+  #p-create-video .couv:not(.remplie) .tx .s{ margin-top:4px; line-height:1.45; }
+
   .couv .oter{
     position:relative; z-index:3; border:none; background:rgba(255,255,255,0.10);
     color:var(--red); font-family:inherit; font-size:11.5px; font-weight:650;
@@ -1437,6 +1462,15 @@
   /* Le tiroir de langue est un outil de lecture, pas une navigation : il se tient
      un cran en dessous de celui des établissements. */
   .tiroir-langue{ margin-bottom:6px; width:38px; height:38px; flex:0 0 38px; }
+
+  /* Ce tiroir-ci est à droite de l'écran : il doit s'ouvrir vers la GAUCHE, sinon
+     il sort de la page. On ancre la liste à droite et on inverse l'ordre des
+     ronds, pour que la langue courante reste sous le doigt. */
+  .tiroir-langue .tiroir-liste{ left:auto; right:0; flex-direction:row-reverse; }
+  .tiroir-langue .tiroir-autres{ flex-direction:row-reverse; }
+  .tiroir-langue .tiroir-autres .rond-ent{ margin-left:0; margin-right:4px; }
+  .tiroir-langue .tiroir-autres .rond-ent{ transform:scale(0.55) translateX(16px); }
+  .tiroir-langue.ouvert .tiroir-autres .rond-ent{ transform:none; }
   .tiroir-langue .tiroir-liste{ height:38px; padding:3px; }
   .tiroir-langue .rond-ent{ width:32px; height:32px; }
   .tiroir-langue .rond-ent .code{ font-size:10.5px; }
@@ -10480,12 +10514,24 @@ function peindreCouverture() {
     const sous = bloc.querySelector('.tx .s')
     const source = couvertureFichier ? URL.createObjectURL(couvertureFichier) : couvertureUrl
 
+    /* La zone de dépôt devient une ligne dès qu'une photo est là : il n'y a plus
+       rien à déposer, seulement quelque chose à montrer. */
+    bloc.classList.toggle('remplie', !!source)
+
     if (source) {
       vign.innerHTML = `<img src="${source}" alt="">`
       oter.style.display = 'block'
       sous.textContent = couvertureFichier ? "Sera envoy\u00e9e \u00e0 la publication." : 'En place.'
     } else {
-      vign.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`
+      /* Le dessin des icônes de création : trois plans, le trait de devant à
+         42 %, le fond à 5 %. */
+      vign.innerHTML = `<svg viewBox="0 0 52 48" fill="none">
+        <rect x="14" y="3" width="26" height="17" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
+        <rect x="8" y="10" width="34" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="2"/>
+        <rect x="3" y="18" width="40" height="27" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2"/>
+        <circle cx="12" cy="27" r="2.4" fill="rgba(255,255,255,0.42)"/>
+        <path d="m41 40-9-9-7 7-3.5-3.5L3 44" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>`
       oter.style.display = 'none'
       sous.textContent = "Elle appara\u00eet sur sa carte et en t\u00eate de la fiche. Facultative."
     }

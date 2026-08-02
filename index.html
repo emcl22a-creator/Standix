@@ -321,6 +321,31 @@
   .man-fil .del{ margin-left:auto; }
 
   /* Le dernier maillon : le geste se comprend avant le texte. */
+  /* Le fil de l'écran vidéo : même construction, avec la vignette à la place de
+     la photo. */
+  .man-fil .etape-montage .vig{
+    width:78px; height:44px; border-radius:9px; overflow:hidden; flex-shrink:0;
+    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+  }
+  .man-fil .etape-montage .vig canvas{ width:100%; height:100%; object-fit:cover; display:block; }
+  .man-fil .etape-montage.sel .step-num-dess{ filter:drop-shadow(0 0 7px rgba(94,160,255,0.5)); }
+  .man-fil .sup{ margin-left:auto; background:none; border:none; padding:0; color:var(--label-3); }
+  .man-fil .sup svg{ width:17px; height:17px; }
+
+  /* La bande bleue : ce que l'IA a fait, et ce qu'on attend de vous. Elle ne
+     dit pas « c'est prêt » mais « relisez » — c'est le gérant qui sait. */
+  .bande-ia{
+    display:flex; align-items:flex-start; gap:10px; padding:11px 13px;
+    border-radius:14px; margin-top:14px; font-size:12.5px; line-height:1.45;
+    color:var(--label-2);
+    background:rgba(94,160,255,0.10); border:0.5px solid rgba(94,160,255,0.24);
+  }
+  .bande-ia b{ color:#fff; font-weight:650; }
+  .bande-ia .p{
+    width:7px; height:7px; border-radius:50%; background:var(--blue);
+    flex-shrink:0; margin-top:5px;
+  }
+
   .man-plus{
     position:relative; display:flex; align-items:center; gap:0;
     background:none; border:none; padding:0; width:100%; text-align:left;
@@ -3472,6 +3497,16 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Découper la vidéo</h1>
     </div>
+    <div class="subhead">Marquez les étapes pendant la lecture</div>
+
+    <!-- Le même début que les trois autres modes : catégorie, titre, puis la
+         source. Un seul patron, quatre façons d'y arriver. -->
+    <div class="man-lbl">Catégorie</div>
+    <input type="text" class="man-champ" id="vid-categorie" placeholder="Ex : Cuisine">
+    <div class="man-lbl">Titre</div>
+    <input type="text" class="man-champ" id="vid-titre" placeholder="Ex : Fermeture de caisse">
+
+    <div class="man-lbl">La vidéo</div>
 
     <div class="dv-depot" id="dv-depot">
       <input type="file" id="video-input" accept="video/*">
@@ -3508,7 +3543,8 @@
         <button type="button" class="oter" style="display:none;">Retirer</button>
       </div>
 
-      <div id="video-steps-list"></div>
+      <div class="man-lbl">Les étapes<span class="n" id="vid-compte">0</span></div>
+      <div class="man-fil" id="video-steps-list"></div>
 
       <button type="button" class="dv-plus" id="dv-plus">Aller plus loin</button>
       <div class="dv-avance" id="dv-avance">
@@ -3531,6 +3567,15 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe un document</h1>
     </div>
     <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
+
+    <!-- Le même début que les autres modes. Les étapes, elles, arrivent sur
+         l'écran de vérification — c'est là qu'on retrouve le fil. -->
+    <div class="man-lbl">Catégorie</div>
+    <input type="text" class="man-champ" id="doc-categorie" placeholder="Ex : Cuisine">
+    <div class="man-lbl">Titre</div>
+    <input type="text" class="man-champ" id="doc-titre" placeholder="Ex : Fermeture de caisse">
+
+    <div class="man-lbl">Le document</div>
 
     <div class="card" id="doc-saisie-card">
       <div class="note" style="margin-bottom:12px;">
@@ -3709,7 +3754,14 @@
       <button type="button" class="oter" style="display:none;">Retirer</button>
     </div>
 
-    <div id="edit-steps-list"></div>
+    <!-- Ce que l'IA a fait, et ce qu'on attend du gérant. Elle ne dit pas
+         « c'est prêt » mais « relisez » : c'est lui qui connaît son métier. -->
+    <div class="bande-ia" id="edit-bande-ia" style="display:none;">
+      <span class="p"></span>
+      <span id="edit-bande-txt">—</span>
+    </div>
+
+    <div class="man-fil" id="edit-steps-list"></div>
     <button class="btn ghost block" style="margin-top:4px;" id="edit-add-step-btn">+ Ajouter une étape</button>
 
     <div class="error-msg" id="edit-error"></div>
@@ -8585,7 +8637,7 @@ function updateModeCardsState() {
    cet instant : cette fonction préfère le champ déjà rempli, donc au chargement
    elle renvoyait celui de la page des étapes — l'écouteur se posait sur un champ
    qu'on ne remplit jamais ici, et les quatre modes restaient verrouillés. */
-;['new-titre', 'new-categorie', 'man-titre', 'man-categorie'].forEach(id => {
+;['new-titre', 'new-categorie', 'man-titre', 'man-categorie', 'vid-titre', 'vid-categorie', 'doc-titre', 'doc-categorie'].forEach(id => {
   document.getElementById(id)?.addEventListener('input', updateModeCardsState)
 })
 
@@ -10662,19 +10714,24 @@ function renderVideoSteps(listEl) {
   const el = document.getElementById('video-steps-list')
   if (!el) return
   el.innerHTML = ''
+  const compte = document.getElementById('vid-compte')
+  if (compte) compte.textContent = videoSteps.length
 
   videoSteps.forEach((step, i) => {
     const div = document.createElement('div')
-    div.className = 'etape-montage' + (i === dvSelection ? ' sel' : '')
+    /* Le même fil qu'à la création manuelle : numéro dessiné, trait, extrait
+       monté sur l'étape. La vignette prend la place de la photo. */
+    div.className = 'step-edit-item etape-montage' + (i === dvSelection ? ' sel' : '')
     div.innerHTML = `
-      <span class="vig"><canvas width="160" height="90"></canvas></span>
-      <span class="tx">
-        <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
-        <i>${dvFmt(step.timestamp_video)} \u2192 ${dvFmt(step.fin_video)} \u00b7 ${Math.round(step.fin_video - step.timestamp_video)} s</i>
-      </span>
-      <button type="button" class="sup" aria-label="Supprimer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-      </button>`
+      <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+      <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
+      <div class="step-bas">
+        <span class="vig"><canvas width="160" height="90"></canvas></span>
+        <span class="badge extrait">\u25b6 ${dvFmt(step.timestamp_video)}\u2013${dvFmt(step.fin_video)}</span>
+        <button type="button" class="sup del" aria-label="Supprimer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>`
 
     dvVignette(div.querySelector('canvas'), step.timestamp_video)
 
@@ -10813,11 +10870,13 @@ async function insertEtapes(rows) {
    les propose aussi, pour qui les remplit avant de choisir son mode. On prend
    celui qui est rempli, en donnant la priorité à la page où l'on se trouve. */
 function champManuel(quoi) {
-  const ici = document.getElementById('man-' + quoi)
-  const avant = document.getElementById('new-' + quoi)
-  if (ici && ici.value.trim()) return ici
-  if (avant && avant.value.trim()) return avant
-  return ici || avant
+  /* Trois pages peuvent porter ces champs : l'écran de choix, celui des étapes
+     manuelles et celui du découpage vidéo. On prend le premier qui est rempli,
+     en commençant par l'écran affiché. */
+  const ordre = ['man-', 'vid-', 'doc-', 'new-'].map(pre => document.getElementById(pre + quoi))
+  const visible = ordre.find(e => e && e.offsetParent !== null && e.value.trim())
+  if (visible) return visible
+  return ordre.find(e => e && e.value.trim()) || ordre.find(Boolean)
 }
 
 async function publishProcedure(errorElId, btnId) {
@@ -14150,6 +14209,14 @@ window.openEditProcedure = async function(procId, mode) {
     ? "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin"
     : 'Modifiez le titre, la catégorie ou les étapes'
   document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
+
+  const bande = document.getElementById('edit-bande-ia')
+  if (bande) {
+    bande.style.display = editMode === 'ai-review' ? 'flex' : 'none'
+    document.getElementById('edit-bande-txt').innerHTML =
+      "L'IA a d\u00e9coup\u00e9 la proc\u00e9dure. <b>Relisez chaque \u00e9tape</b> avant de publier : " +
+      "c'est vous qui connaissez le geste."
+  }
   reinitialiserCouverture(null)
 
   if (preloadEtapes) await preloadEtapes
@@ -14593,10 +14660,8 @@ function renderEditSteps() {
     const debut = step.timestamp_video != null ? step.timestamp_video : 0
     const fin = step.fin_video != null ? step.fin_video : debut
     div.innerHTML = `
-      <div class="step-row-top">
-        <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
-        <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
-      </div>
+      <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+      <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       ${hasClip ? '' : `<div class="step-img">
           <div class="step-img-vignette">${step.image_url
             ? `<img src="${step.image_url}" alt="">`

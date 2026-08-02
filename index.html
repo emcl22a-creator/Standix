@@ -345,16 +345,16 @@
   }
 
   /* L'image en tête de la fiche, et sur la carte. */
+  /* Une photo de téléphone est souvent en portrait : à pleine largeur, elle
+     occupait tout l'écran et il fallait faire défiler pour atteindre les étapes.
+     On plafonne la hauteur et on recadre — l'image sert à reconnaître la
+     procédure, pas à être contemplée. */
   .analyse-couv{
     margin-top:14px; border-radius:18px; overflow:hidden;
     border:0.5px solid var(--border); background:#000;
+    max-height:180px;
   }
-  .analyse-couv img{ width:100%; display:block; }
-  .carte-couv{
-    margin:-14px -14px 12px; border-bottom:0.5px solid var(--border);
-    background:#000; max-height:104px; overflow:hidden;
-  }
-  .carte-couv img{ width:100%; display:block; object-fit:cover; }
+  .analyse-couv img{ width:100%; height:100%; max-height:180px; object-fit:cover; display:block; }
 
   /* ═══ Les appareils ═══ */
   .app-ligne{
@@ -759,11 +759,13 @@
 
 
   /* Côté employé : l'image au-dessus du texte de l'étape. */
+  /* Même raison pour la photo d'une étape : elle illustre un geste, elle ne doit
+     pas pousser l'étape suivante hors de l'écran. */
   .detail-step-img{
     width:100%; border-radius:12px; overflow:hidden; margin-top:9px;
-    border:0.5px solid var(--border); background:#000;
+    border:0.5px solid var(--border); background:#000; max-height:220px;
   }
-  .detail-step-img img{ width:100%; display:block; }
+  .detail-step-img img{ width:100%; max-height:220px; object-fit:cover; display:block; }
 
   /* ═══ Disparition d'une carte ═══
      La carte se replie sur elle-même et les suivantes remontent. Sans ça, la
@@ -2726,8 +2728,15 @@
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
-  .groupe{ display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
-    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.14); }
+  /* La règle d'origine, avec son identifiant. J'avais réécrit une version sans
+     identifiant : moins spécifique, elle était écrasée par ce qui suit, et le
+     groupe perdait son verre — il ne restait que les ronds. */
+  #tabbar-gestion .groupe, #tabbar-equipe .groupe{
+    display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
+  }
 
   /* ═══ Barre d'onglets (les deux espaces) ═══
      Deux éléments distincts : un groupe en verre qui contient les onglets, et
@@ -7508,10 +7517,7 @@ function mesurerOnglets() {
     const lbl = b.querySelector('.tab-label')
     if (!lbl) return
     const large = lbl.scrollWidth
-    /* Un plancher de 120 px : si la mesure échoue — barre encore masquée, police
-       pas chargée — l'onglet actif se repliait en rond et le libellé disparaissait.
-       Mieux vaut une pastille un peu large qu'un bouton qui a perdu son nom. */
-    b.style.setProperty('--w', Math.max(120, Math.ceil(42 + large + 15)) + 'px')
+    if (large > 0) b.style.setProperty('--w', Math.ceil(42 + large + 15) + 'px')
   })
 }
 
@@ -8315,7 +8321,6 @@ function renderCategoryProceduresListInterne() {
       enAnalyse ? proposerAbandon(proc) :
       openAnalyse(proc.id)
     div.innerHTML = `
-      ${proc.image_url ? `<div class="carte-couv"><img src="${escapeHtml(proc.image_url)}" alt=""></div>` : ''}
       <div class="cat-top">
         <div class="cat-ring-wrap">
           <svg viewBox="0 0 46 46">
@@ -11456,7 +11461,6 @@ function ficheEquipe(proc) {
   div.dataset.key = proc.id
   div.onclick = () => openEquipeDetail(proc.id)
   div.innerHTML = `
-    ${proc.image_url ? `<div class="carte-couv"><img src="${escapeHtml(proc.image_url)}" alt="" loading="lazy"></div>` : ''}
     <div class="cat-top">
       <div class="cat-ring-wrap">
         <svg viewBox="0 0 46 46">
@@ -13743,6 +13747,9 @@ window.openEditProcedure = async function(procId, mode) {
     id: e.id, texte: e.texte,
     timestamp_video: e.timestamp_video,
     fin_video: e.fin_video != null ? e.fin_video : null,
+    /* La photo de l'étape était oubliée ici : ouvrir la modification l'effaçait
+       de l'écran, et l'enregistrement la perdait pour de bon. */
+    image_url: e.image_url || null,
     _t: e.timestamp_video,   // horodatage brut conservé pour pouvoir recaler
   }))
 

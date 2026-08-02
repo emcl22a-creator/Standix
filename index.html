@@ -2910,7 +2910,11 @@
     background:#fff; color:#000; border:0.5px solid rgba(255,255,255,0.5);
     box-shadow:0 6px 20px rgba(255,255,255,0.18), 0 3px 10px rgba(0,0,0,0.4);
   }
-  #tabbar .tab-round--primary svg{ width:24px; height:24px; }
+  /* Le bouton principal est un rond : son dessin se centre. Il héritait du
+     `margin-left` de 12,5 px prévu pour les onglets, où l'icône doit laisser la
+     place au libellé qui glisse à sa droite. */
+  #tabbar .tab-round--primary{ justify-content:center; }
+  #tabbar .tab-round--primary svg{ width:24px; height:24px; margin-left:0; }
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
@@ -3324,11 +3328,11 @@
     <div class="subhead">Écrivez les étapes, ou découpez une vidéo</div>
 
     <div class="card">
-      <label class="f">Titre</label>
-      <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
+      <label class="f">Catégorie</label>
+      <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
       <div style="margin-top:12px;">
-        <label class="f">Catégorie</label>
-        <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
+        <label class="f">Titre</label>
+        <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
       </div>
     </div>
 
@@ -3368,7 +3372,7 @@
       </div>
     </div>
 
-    <div class="card mode-choice-card" onclick="goToCreateMode('ai')" id="mode-card-ai">
+    <div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
       <div class="mode-choice-row">
         <div class="mode-choice-icon"><svg viewBox="0 0 52 48" fill="none"><rect x="10" y="4" width="28" height="18" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="6" y="9" width="34" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><rect x="3" y="15" width="40" height="28" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><circle cx="23" cy="29" r="7.8" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M21 25.6 26.6 29 21 32.4Z" fill="rgba(255,255,255,0.75)"/><g class="signe"><path d="M43.2 4.4 45 9.6l5.2 1.8-5.2 1.8-1.8 5.2-1.8-5.2-5.2-1.8 5.2-1.8Z" fill="#fff"/><path d="M38.4 21.6l.9 2.6 2.6.9-2.6.9-.9 2.6-.9-2.6-2.6-.9 2.6-.9Z" fill="#fff" opacity="0.55"/></g></svg></div>
         <div class="mode-choice-text">
@@ -3391,10 +3395,10 @@
 
     <!-- Titre et catégorie sont ici, et plus seulement sur l'écran précédent :
          c'est ce qui permet à la même page de servir à créer ET à modifier. -->
-    <div class="man-lbl">Titre</div>
-    <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
     <div class="man-lbl">Catégorie</div>
     <input type="text" class="man-champ" id="man-categorie" placeholder="Ex : Cuisine">
+    <div class="man-lbl">Titre</div>
+    <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
 
     <div class="man-lbl">Image de la procédure</div>
     <div class="couv man-couv" id="couv-manuel">
@@ -8539,8 +8543,13 @@ function updateModeCardsState() {
   document.querySelectorAll('.mode-choice-card').forEach(card => card.classList.toggle('disabled', !isReady))
   document.getElementById('mode-choice-note').style.display = isReady ? 'none' : 'block'
 }
-champManuel('titre')?.addEventListener('input', updateModeCardsState)
-champManuel('categorie')?.addEventListener('input', updateModeCardsState)
+/* On écoute les QUATRE champs, pas seulement ceux que `champManuel` désigne à
+   cet instant : cette fonction préfère le champ déjà rempli, donc au chargement
+   elle renvoyait celui de la page des étapes — l'écouteur se posait sur un champ
+   qu'on ne remplit jamais ici, et les quatre modes restaient verrouillés. */
+;['new-titre', 'new-categorie', 'man-titre', 'man-categorie'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', updateModeCardsState)
+})
 
 /* ═══════════════════════════════════════════════════════════════════════════
    UNE SEULE PAGE POUR CRÉER ET POUR MODIFIER

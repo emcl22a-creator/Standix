@@ -3741,6 +3741,21 @@
     <div id="an-temps-liste" style="margin-top:12px;"></div>
   </div>
 
+  <!-- Le même écran que dans l'espace équipe. Il faut son jumeau ici : les deux
+       espaces sont deux conteneurs distincts, et `showGestionScreen` ne trouve
+       pas un écran qui vit dans l'autre — d'où la page vide. -->
+  <div class="screen" id="p-reg-appareils">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos appareils</h1>
+    </div>
+    <div id="p-app-liste" style="margin-top:14px;"></div>
+    <div class="reg-note">Un compte peut être utilisé sur trois appareils. Au-delà, le plus ancien est déconnecté. Retirez un appareil pour en libérer la place.</div>
+    <div class="reg-note" style="margin-top:10px;">Chaque personne de l'équipe devrait avoir son propre compte : c'est ce qui permet de savoir qui a lu quoi, et c'est compris dans votre abonnement.</div>
+  </div>
+
   <div class="screen" id="p-membre">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
@@ -5789,9 +5804,11 @@ async function fenetreTropDAppareils() {
 /* ─── La page des appareils ─────────────────────────────────────────────── */
 
 window.ouvrirAppareils = async function() {
-  if (currentMembre?.role === 'gestion') showGestionScreen('reg-appareils')
+  const gestion = currentMembre?.role === 'gestion'
+  if (gestion) showGestionScreen('p-reg-appareils')
   else showEquipeScreen('reg-appareils')
-  document.getElementById('app-liste').innerHTML = '<div class="note">Chargement\u2026</div>'
+  const el = document.getElementById(gestion ? 'p-app-liste' : 'app-liste')
+  if (el) el.innerHTML = '<div class="note">Chargement\u2026</div>'
   await peindreAppareils()
 }
 
@@ -5814,7 +5831,9 @@ function quandLisible(iso) {
 }
 
 async function peindreAppareils() {
-  const el = document.getElementById('app-liste')
+  /* Chaque espace a sa propre liste : on écrit dans celle de l'espace courant. */
+  const el = document.getElementById(
+    currentMembre?.role === 'gestion' ? 'p-app-liste' : 'app-liste')
   if (!el || !currentMembre?.id) return
 
   const { data, error } = await supabase.from('presences')
@@ -5861,7 +5880,7 @@ async function peindreAppareils() {
   }).join('')
 }
 
-document.getElementById('app-liste')?.addEventListener('click', async (e) => {
+document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-appareil]')
   if (!b) return
   const ok = await confirmDialog({

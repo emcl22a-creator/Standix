@@ -203,9 +203,12 @@
      décalage, et un peu d'air. Rien de plus — c'est constant, quel que soit le
      nombre de catégories, puisque la barre ne change pas de taille. Le contenu,
      lui, pousse naturellement. */
+  /* La barre du bas mesure 54,5 px et flotte à 20 px du bord : il faut dégager
+     au moins 75 px, plus une marge d'air. Le compte était trop juste, et le
+     dernier bloc — le bandeau de lecture, par exemple — passait dessous. */
   .screen{
     display:none;
-    padding:92px 20px calc(66px + max(20px, env(safe-area-inset-bottom)) + 18px);
+    padding:92px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
@@ -271,6 +274,54 @@
      Les deux flèches obligeaient à taper plusieurs fois pour déplacer une
      étape de trois rangs. Un appui long la soulève, on la pose où l'on veut. */
   .step-edit-item:active .step-grip, .step-edit-item.attrape
+  /* ═══ Les étapes manuelles, en fil ═══
+     Un trait relie les numéros et dit l'ordre sans qu'on ait à le lire. Une
+     procédure EST une suite : la forme le montre au lieu de l'énoncer. */
+  .man-lbl{
+    font-size:12.5px; font-weight:650; color:var(--label-3); margin:20px 0 8px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .man-lbl .n{ font-weight:600; }
+  .man-champ{
+    width:100%; background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+    border-radius:13px; padding:12px 13px; color:#fff; font-family:inherit;
+    font-size:15px; font-weight:500; letter-spacing:-0.02em;
+  }
+  .man-champ::placeholder{ color:var(--label-3); }
+  .man-champ:focus{ outline:none; border-color:rgba(94,160,255,0.55); }
+
+  .man-fil{ position:relative; padding-left:38px; }
+  /* Le trait s'arrête avant le dernier maillon : il relie, il ne dépasse pas. */
+  .man-fil::before{
+    content:''; position:absolute; left:14px; top:8px; bottom:34px; width:1.5px;
+    background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
+  }
+  .man-fil .step-edit-item{
+    position:relative; background:none; border:none; border-radius:0;
+    padding:0 0 18px; margin:0;
+  }
+  .man-fil .step-num-dess{ position:absolute; left:-38px; top:-2px; width:29px; height:29px; }
+  .man-fil .step-num-dess svg{ width:29px; height:29px; display:block; }
+  .man-fil textarea{
+    width:100%; background:none; border:none; padding:0; resize:none;
+    color:#fff; font-family:inherit; font-size:14.5px; line-height:1.45;
+    font-weight:500; letter-spacing:-0.02em;
+  }
+  .man-fil textarea:focus{ outline:none; }
+  .man-fil textarea::placeholder{ color:var(--label-3); }
+  .man-fil .step-bas{ display:flex; align-items:center; gap:10px; margin-top:9px; }
+  .man-fil .del{ margin-left:auto; }
+
+  /* Le dernier maillon : le geste se comprend avant le texte. */
+  .man-plus{
+    position:relative; display:flex; align-items:center; gap:0;
+    background:none; border:none; padding:0; width:100%; text-align:left;
+    color:var(--label-2); font-family:inherit; font-size:14.5px; font-weight:600;
+  }
+  .man-plus .d{ position:absolute; left:-38px; top:-3px; width:29px; height:29px; }
+  .man-plus .d svg{ width:29px; height:29px; display:block; }
+  .man-plus:active{ opacity:0.6; }
+
   .step-edit-item{ touch-action:pan-y; }
   /* L'étape soulevée : elle passe au-dessus, s'agrandit à peine et porte une
      ombre portée pour qu'on sente qu'elle a quitté la pile. */
@@ -2352,7 +2403,11 @@
   .detail-step p{ font-size:14px; line-height:1.45; white-space:pre-line; }
   /* Le bandeau ne s'affiche qu'une fois la procédure consultée. Pendant les
      30 secondes, l'employé ne voit aucun décompte : il lit, c'est tout. */
-  .confirm-bar{ margin-top:20px; display:none; }
+  .confirm-bar{ margin-top:20px; margin-bottom:8px; display:none; }
+
+  /* La ligne du titre des étapes accueille le sélecteur de langue à droite. */
+  .detail-etapes-tete{ margin-top:22px; margin-bottom:10px; }
+  .detail-etapes-tete .tiroir-langue{ margin-bottom:0; }
   .confirm-bar.visible{ display:block; }
   .confirm-bar.visible .lecture-etat{ animation:bandeauArrive 0.5s cubic-bezier(0.22,1,0.36,1) both; }
   @keyframes bandeauArrive{
@@ -3312,33 +3367,45 @@
 
   <div class="screen" id="p-create-manual">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-create')">
+      <button class="back-btn" id="man-retour" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Étapes manuelles</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="man-titre-page">Étapes manuelles</h1>
     </div>
-    <div class="subhead">Écrivez chaque étape dans l'ordre</div>
+    <div class="subhead" id="man-sous">Écrivez chaque étape dans l’ordre</div>
 
-    <div class="couv" id="couv-manuel">
+    <!-- Titre et catégorie sont ici, et plus seulement sur l'écran précédent :
+         c'est ce qui permet à la même page de servir à créer ET à modifier. -->
+    <div class="man-lbl">Titre</div>
+    <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
+    <div class="man-lbl">Catégorie</div>
+    <input type="text" class="man-champ" id="man-categorie" placeholder="Ex : Cuisine">
+
+    <div class="man-lbl">Image de la procédure</div>
+    <div class="couv man-couv" id="couv-manuel">
       <input type="file" accept="image/*" class="fichier">
       <span class="vign">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/>
+        <svg viewBox="0 0 32 32" fill="none">
+          <rect x="9" y="3" width="20" height="15" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
+          <rect x="5" y="7" width="23" height="17" rx="4.5" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/>
+          <rect x="2" y="11" width="24" height="18" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.7"/>
+          <circle cx="8.5" cy="17" r="1.9" fill="rgba(255,255,255,0.42)"/>
+          <path d="m26 25-6.5-6.5-5 5-2.5-2.5L2 29" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
       <span class="tx">
-        <span class="t">Image de la procédure</span>
-        <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
+        <span class="t">Ajouter une photo</span>
+        <span class="s">Elle apparaît en tête de la fiche. Facultative.</span>
       </span>
       <button type="button" class="oter" style="display:none;">Retirer</button>
     </div>
 
-    <div class="section-title" style="margin-top:22px;">Les étapes</div>
-    <div id="manual-steps-list"></div>
-    <button class="btn ghost block" style="margin-top:4px;" id="add-manual-step-btn">+ Ajouter une étape</button>
+    <div class="man-lbl">Les étapes<span class="n" id="man-compte">0</span></div>
+    <div class="man-fil" id="manual-steps-list"></div>
 
     <div class="error-msg" id="create-error-manual"></div>
-    <button class="btn block" style="margin-top:18px;" id="publish-btn-manual">Publier la procédure</button>
+    <button class="btn ghost block" style="margin-top:14px;" id="man-annuler">Annuler les modifications</button>
+    <button class="btn block" style="margin-top:9px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
 
   <div class="screen" id="p-create-video">
@@ -4115,7 +4182,7 @@
   </button>
   </div>
   <button class="tab-round tab-round--primary" onclick="startNewProcedure()" aria-label="Créer une procédure">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
   </button>
 </nav>
 
@@ -4238,10 +4305,16 @@
     <div class="video-frame" id="detail-video-frame" style="display:none;">
       <video id="detail-video" controls playsinline webkit-playsinline></video>
     </div>
-    <div class="tiroir-ent tiroir-langue" id="tiroir-langue" style="margin-top:16px;">
-      <span class="tiroir-liste" id="tiroir-langue-liste"></span>
+    <!-- Le sélecteur de langue était seul au milieu d'un grand vide. Il rejoint la
+         ligne du titre des étapes : même place, aucun espace perdu, et la fiche
+         équipe prend la même forme que celle de la gestion. -->
+    <div class="section-title detail-etapes-tete">
+      <span>Étapes de la procédure</span>
+      <div class="tiroir-ent tiroir-langue" id="tiroir-langue">
+        <span class="tiroir-liste" id="tiroir-langue-liste"></span>
+      </div>
     </div>
-    <div id="detail-steps" style="margin-top:12px;"></div>
+    <div id="detail-steps"></div>
     <div class="confirm-bar">
       <div class="lecture-etat" id="lecture-etat">
         <div class="lecture-anneau" id="lecture-anneau"></div>
@@ -4459,7 +4532,7 @@
   <button class="tab-round tab-round--secondary" onclick="showEquipeScreen('e-analyse', this); renderMonActivite()" aria-label="Mon activité">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
-    <span class="tab-label">Activité</span>
+    <span class="tab-label">Analyse</span>
   </button>
   </div>
   <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()" aria-label="Scanner un QR code">
@@ -8412,8 +8485,8 @@ function garantirVisibilite(containerEl) {
 
 // ═══════════ GESTION : création ═══════════
 function resetCreateForm() {
-  document.getElementById('new-titre').value = ''
-  document.getElementById('new-categorie').value = ''
+  champManuel('titre').value = ''
+  champManuel('categorie').value = ''
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'block'
@@ -8431,19 +8504,120 @@ function resetCreateForm() {
 }
 
 function updateModeCardsState() {
-  const titre = document.getElementById('new-titre').value.trim()
-  const categorie = document.getElementById('new-categorie').value.trim()
+  const titre = champManuel('titre').value.trim()
+  const categorie = champManuel('categorie').value.trim()
   const isReady = titre.length > 0 && categorie.length > 0
   document.querySelectorAll('.mode-choice-card').forEach(card => card.classList.toggle('disabled', !isReady))
   document.getElementById('mode-choice-note').style.display = isReady ? 'none' : 'block'
 }
-document.getElementById('new-titre')?.addEventListener('input', updateModeCardsState)
-document.getElementById('new-categorie')?.addEventListener('input', updateModeCardsState)
+champManuel('titre')?.addEventListener('input', updateModeCardsState)
+champManuel('categorie')?.addEventListener('input', updateModeCardsState)
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UNE SEULE PAGE POUR CRÉER ET POUR MODIFIER
+
+   `manEdition` porte l'identifiant de la procédure en cours de modification, ou
+   `null` en création. Tout le reste de l'écran s'y adapte : le titre, le bouton
+   du bas, ce que fait « Annuler ».
+
+   L'intérêt n'est pas d'économiser du code, c'est qu'il n'existe plus qu'UNE
+   façon d'écrire une procédure. Deux écrans qui font la même chose finissent
+   toujours par diverger — l'un reçoit une amélioration, l'autre non.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let manEdition = null      // identifiant de la procédure modifiée, ou null
+let manDepart = null       // copie de l'état enregistré, pour pouvoir revenir
+
+window.ouvrirEtapesManuelles = async function(procId) {
+  manEdition = procId || null
+  showGestionScreen('p-create-manual')
+
+  const el = (i) => document.getElementById(i)
+  el('man-titre-page').textContent = manEdition ? 'Modifier la proc\u00e9dure' : '\u00c9tapes manuelles'
+  el('man-sous').textContent = manEdition
+    ? 'Vos changements ne partent qu\'\u00e0 l\'enregistrement'
+    : '\u00c9crivez chaque \u00e9tape dans l\'ordre'
+  el('publish-btn-manual').textContent = manEdition
+    ? 'Enregistrer les modifications' : 'Publier la proc\u00e9dure'
+  el('man-annuler').textContent = manEdition
+    ? 'Annuler les modifications' : 'Tout effacer'
+  el('create-error-manual').textContent = ''
+
+  if (!manEdition) {
+    /* En création, on reprend ce qui a été saisi sur l'écran précédent. */
+    el('man-titre').value = document.getElementById('new-titre')?.value || ''
+    el('man-categorie').value = document.getElementById('new-categorie')?.value || ''
+    if (!manualSteps.length) manualSteps = [{ texte: '' }]
+    reinitialiserCouverture(null)
+    manDepart = etatManuel()
+    renderManualSteps()
+    return
+  }
+
+  el('man-titre').value = '\u2014'
+  manualSteps = []
+  renderManualSteps()
+
+  const [{ data: proc }, { data: etapes }] = await Promise.all([
+    supabase.from('procedures').select('*').eq('id', procId).single(),
+    supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
+  ])
+  if (!proc) { el('create-error-manual').textContent = 'Proc\u00e9dure introuvable.'; return }
+
+  el('man-titre').value = proc.titre || ''
+  el('man-categorie').value = proc.categorie || ''
+  reinitialiserCouverture(proc.image_url || null)
+  manualSteps = (etapes || []).map(e => ({
+    id: e.id, texte: e.texte || '', image_url: e.image_url || null,
+  }))
+  if (!manualSteps.length) manualSteps = [{ texte: '' }]
+
+  manDepart = etatManuel()
+  renderManualSteps()
+}
+
+/* Une empreinte de l'état, pour savoir où revenir. */
+function etatManuel() {
+  return JSON.stringify({
+    titre: document.getElementById('man-titre')?.value || '',
+    categorie: document.getElementById('man-categorie')?.value || '',
+    etapes: manualSteps.map(s => ({ id: s.id || null, texte: s.texte, image_url: s.image_url || null })),
+  })
+}
+
+document.getElementById('man-annuler')?.addEventListener('click', async () => {
+  const ok = await confirmDialog({
+    titre: manEdition ? 'Annuler les modifications ?' : 'Tout effacer ?',
+    message: manEdition
+      ? "La proc\u00e9dure reviendra telle qu'elle est enregistr\u00e9e. Ce que vous venez d'\u00e9crire sera perdu."
+      : "Le titre, la cat\u00e9gorie et toutes les \u00e9tapes seront effac\u00e9s.",
+    confirmer: manEdition ? 'Annuler les modifications' : 'Tout effacer',
+    annuler: 'Continuer \u00e0 \u00e9crire',
+    danger: true,
+  })
+  if (!ok) return
+
+  if (manEdition) {
+    /* On relit la base plutôt que de faire confiance à une copie en mémoire :
+       c'est la seule source dont on soit sûr. */
+    ouvrirEtapesManuelles(manEdition)
+  } else {
+    document.getElementById('man-titre').value = ''
+    document.getElementById('man-categorie').value = ''
+    manualSteps = [{ texte: '' }]
+    reinitialiserCouverture(null)
+    renderManualSteps()
+  }
+})
+
+document.getElementById('man-retour')?.addEventListener('click', () => {
+  showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
+})
 
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
-  if (mode === 'manual') showGestionScreen('p-create-manual')
+  if (mode === 'manual') { ouvrirEtapesManuelles(null); return }
   else if (mode === 'video') showGestionScreen('p-create-video')
   else showGestionScreen('p-create-ai')
 }
@@ -8606,8 +8780,8 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
   err.style.color = 'var(--red)'
   err.textContent = ''
 
-  const titre = document.getElementById('new-titre').value.trim()
-  const categorie = document.getElementById('new-categorie').value.trim()
+  const titre = champManuel('titre').value.trim()
+  const categorie = champManuel('categorie').value.trim()
   let texte = texteDocCourant()
   if (!titre) { err.textContent = 'Le titre est obligatoire (page pr\u00e9c\u00e9dente).'; return }
   if (texte.length > DOC_TEXTE_MAX) texte = texte.slice(0, DOC_TEXTE_MAX)
@@ -8903,8 +9077,8 @@ function verifierDureeVideo() {
 document.getElementById('ai-launch-btn')?.addEventListener('click', async () => {
   const errorEl = document.getElementById('ai-error')
   errorEl.textContent = ''
-  const titre = document.getElementById('new-titre').value.trim()
-  const categorie = document.getElementById('new-categorie').value.trim()
+  const titre = champManuel('titre').value.trim()
+  const categorie = champManuel('categorie').value.trim()
 
   if (!titre) { errorEl.textContent = 'Le titre est obligatoire (en haut de la page précédente).'; return }
   if (!aiVideoFile) { errorEl.textContent = 'Importez une vidéo.'; return }
@@ -9860,7 +10034,7 @@ document.getElementById('ecap-play-btn')?.addEventListener('click', () => {
    revient à la liste. */
 document.getElementById('ai-annuler')?.addEventListener('click', async () => {
   const proc = allGestionProcedures.find(p => p.id === aiProcedureId) ||
-    { id: aiProcedureId, titre: document.getElementById('new-titre')?.value || '' }
+    { id: aiProcedureId, titre: champManuel('titre')?.value || '' }
   if (!proc.id) return
 
   // On récupère l'adresse de la vidéo si elle n'est pas déjà en mémoire.
@@ -10032,10 +10206,25 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
 
 
 // ═══ Étapes manuelles (texte seul, pas de vidéo) ═══
-document.getElementById('add-manual-step-btn')?.addEventListener('click', () => {
-  manualSteps.push({ texte: '' })
-  renderManualSteps()
-})
+/* Les deux dessins du fil, dans la palette des icônes de création : retrait à
+   16 %, trait de devant à 42 %, fond à 5 %. */
+function numeroEtapeDess(n) {
+  return `<svg viewBox="0 0 30 30" fill="none">
+    <rect x="8" y="2" width="18" height="14" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.6"/>
+    <rect x="2" y="7" width="22" height="20" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.7"/>
+    <text x="13" y="21" text-anchor="middle" font-family="Inter,sans-serif" font-size="11"
+          font-weight="800" fill="rgba(255,255,255,0.86)">${n}</text>
+  </svg>`
+}
+
+function plusEtapeDess() {
+  return `<svg viewBox="0 0 30 30" fill="none">
+    <rect x="8" y="2" width="18" height="14" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.6"/>
+    <rect x="2" y="7" width="22" height="20" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-dasharray="3.5 3"/>
+    <line x1="13" y1="13" x2="13" y2="21" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="9" y1="17" x2="17" y2="17" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>`
+}
 
 function renderManualSteps() {
   const listEl = document.getElementById('manual-steps-list')
@@ -10043,11 +10232,12 @@ function renderManualSteps() {
   manualSteps.forEach((step, i) => {
     const div = document.createElement('div')
     div.className = 'step-edit-item'
+    /* Le numéro est dessiné dans le langage des icônes de création : une fiche en
+       profondeur, avec son chiffre dedans. Il se pose sur le fil, à gauche. */
     div.innerHTML = `
-      <div class="step-row-top">
-        <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
-        <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
-      </div>
+      <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+      <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
+      <div class="step-bas">
       <div class="step-img">
         <div class="step-img-vignette">${step.image_url
           ? `<img src="${step.image_url}" alt="">`
@@ -10057,8 +10247,7 @@ function renderManualSteps() {
         </button>
         <input type="file" accept="image/*" class="fichier">
       </div>
-      <div class="step-row-bottom">
-                <span class="del">${TRASH_SVG}</span>
+      <span class="del">${TRASH_SVG}</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
@@ -10104,6 +10293,25 @@ function renderManualSteps() {
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
+
+  /* « Ajouter une étape » devient le dernier maillon du fil, en pointillés : le
+     geste se comprend avant qu'on ait lu le texte. */
+  const plus = document.createElement('button')
+  plus.type = 'button'
+  plus.className = 'man-plus'
+  plus.innerHTML = `<span class="d">${plusEtapeDess()}</span>Ajouter une \u00e9tape`
+  plus.addEventListener('click', () => {
+    manualSteps.push({ texte: '' })
+    renderManualSteps()
+    /* On donne le clavier à la nouvelle étape : sans ça il faut viser un champ
+       vide qu'on vient tout juste de créer. */
+    const champs = listEl.querySelectorAll('textarea')
+    champs[champs.length - 1]?.focus()
+  })
+  listEl.appendChild(plus)
+
+  const compte = document.getElementById('man-compte')
+  if (compte) compte.textContent = manualSteps.length
 
   activerGlissementEtapes(listEl, () => manualSteps, () => renderManualSteps())
 }
@@ -10525,11 +10733,22 @@ async function insertEtapes(rows) {
   return res
 }
 
+/* Le titre et la catégorie sont saisis sur l'écran des étapes ; l'écran précédent
+   les propose aussi, pour qui les remplit avant de choisir son mode. On prend
+   celui qui est rempli, en donnant la priorité à la page où l'on se trouve. */
+function champManuel(quoi) {
+  const ici = document.getElementById('man-' + quoi)
+  const avant = document.getElementById('new-' + quoi)
+  if (ici && ici.value.trim()) return ici
+  if (avant && avant.value.trim()) return avant
+  return ici || avant
+}
+
 async function publishProcedure(errorElId, btnId) {
   const errorEl = document.getElementById(errorElId)
   errorEl.textContent = ''
-  const titre = document.getElementById('new-titre').value.trim()
-  const categorie = document.getElementById('new-categorie').value.trim()
+  const titre = champManuel('titre').value.trim()
+  const categorie = champManuel('categorie').value.trim()
   const categorieIcone = '📁'
   const allSteps = [...manualSteps, ...videoSteps]
 
@@ -10553,10 +10772,22 @@ async function publishProcedure(errorElId, btnId) {
     videoUrl = publicUrlData.publicUrl
   }
 
-  const { data: newProc, error: procError } = await supabase
-    .from('procedures')
-    .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, categorie_icone: categorieIcone, video_url: videoUrl, created_by: currentMembre.id })
-    .select().single()
+  /* En modification, on met à jour la ligne existante au lieu d'en créer une
+     nouvelle. Le reste du parcours — photos, étapes, couverture — est le même :
+     c'est ce qui permet à une seule page de servir aux deux. */
+  const { data: newProc, error: procError } = manEdition
+    ? await supabase.from('procedures')
+        .update({ titre, categorie, categorie_icone: categorieIcone })
+        .eq('id', manEdition).select().single()
+    : await supabase.from('procedures')
+        .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, categorie_icone: categorieIcone, video_url: videoUrl, created_by: currentMembre.id })
+        .select().single()
+
+  /* Les anciennes étapes sont remplacées : c'est plus sûr que de rapprocher
+     ligne à ligne, et l'ordre reste celui de l'écran. */
+  if (manEdition && !procError) {
+    await supabase.from('etapes').delete().eq('procedure_id', manEdition)
+  }
 
   if (procError) {
     errorEl.textContent = "Erreur : " + procError.message
@@ -10597,8 +10828,15 @@ async function publishProcedure(errorElId, btnId) {
 
   if (etapesError) { errorEl.textContent = "Erreur étapes : " + etapesError.message; return }
 
-  showGestionScreen('p-list')
+  /* Après une modification, on revient sur la fiche : c'est de là qu'on venait,
+     et c'est là qu'on veut vérifier le résultat. */
+  const modifiait = manEdition
+  manEdition = null
+  manualSteps = []
+  videoSteps = []
   loadGestionProcedures()
+  if (modifiait) { openAnalyse(modifiait); toast('Modifications enregistr\u00e9es') }
+  else showGestionScreen('p-list')
 }
 document.getElementById('publish-btn-manual')?.addEventListener('click', () => publishProcedure('create-error-manual', 'publish-btn-manual'))
 document.getElementById('publish-btn-video')?.addEventListener('click', () => publishProcedure('create-error-video', 'publish-btn-video'))
@@ -10667,7 +10905,13 @@ async function openAnalyse(procId) {
 
   currentAnalyseData = { proc, etapes: etapes || [], employes: employes || [], validations: validations || [] }
 
-  document.getElementById('analyse-edit-btn').onclick = () => openEditProcedure(procId, 'edit')
+  /* Une procédure sans vidéo se modifie sur la page des étapes manuelles — la
+     même qui a servi à l'écrire. Celles qui ont une vidéo gardent leur éditeur :
+     régler des bornes au dixième de seconde demande un autre outil. */
+  document.getElementById('analyse-edit-btn').onclick = () => {
+    if (proc.video_url) openEditProcedure(procId, 'edit')
+    else ouvrirEtapesManuelles(procId)
+  }
   document.getElementById('analyse-delete-btn').onclick = async () => {
     const confirmed = await confirmDialog({
       titre: 'Supprimer définitivement ?',

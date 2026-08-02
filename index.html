@@ -2722,46 +2722,12 @@
      faible sur une grande surface — mais deux éléments qui se font face en haut
      et en bas de l'écran doivent porter la même matière, pas une matière
      corrigée. */
-  /* ═════════════════════════════════════════════════════════════════
-     LA BARRE DU BAS
-
-     Bâtie sur le même plan que la barre du haut : une carte de verre qui porte
-     les onglets, et un bouton rond à côté — exactement comme la carte du logo
-     et le bouton des réglages se répondent en haut de l'écran.
-
-     Deux conséquences, et c'est tout l'intérêt.
-
-     Un seul verre, pas deux : le groupe portait son propre fond à l'intérieur
-     d'un autre, ce qui dessinait un cadre en trop.
-
-     Et surtout, plus aucun `transform`. Le rail occupe toute la largeur et
-     centre par `justify-content`, comme `.topbar-row`. Sur Safari iOS, un
-     `transform` sur un élément à `backdrop-filter` crée un contexte de rendu
-     séparé et le flou disparaît — c'est ce qui empêchait le verre de prendre.
-     ═════════════════════════════════════════════════════════════════ */
-  .barre{
-    position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
-    left:0; right:0; z-index:10;
-    align-items:center; justify-content:center; gap:10px;
-    pointer-events:none;      /* le rail laisse passer les touchers */
-  }
-  .barre > *{ pointer-events:auto; }
-
-  /* Le même verre que `.topbar-card`, aux mêmes valeurs. */
-  .barre-carte{
-    display:flex; align-items:center; gap:4px;
-    padding:5px; border-radius:100px;
-    background:rgba(255,255,255,0.10);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18);
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
-  }
-
-  /* Le bouton « + » garde sa taille et son verre à lui, comme le bouton des
-     réglages en haut. */
-  .barre > .tab-round--primary{
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25);
-  }
+  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
+  .groupe{ display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
+    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.14); }
 
   /* ═══ Barre d'onglets (les deux espaces) ═══
      Deux éléments distincts : un groupe en verre qui contient les onglets, et
@@ -4086,9 +4052,9 @@
   </div>
 </div>
 
-<nav class="barre" id="tabbar-gestion" style="display:none;">
+<nav class="tabbar" id="tabbar-gestion" style="display:none;">
   
-  <div class="barre-carte">
+  <div class="groupe">
   <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
@@ -4433,9 +4399,9 @@
   </div>
 </div>
 
-<nav class="barre" id="tabbar-equipe" style="display:none;">
+<nav class="tabbar" id="tabbar-equipe" style="display:none;">
   
-  <div class="barre-carte">
+  <div class="groupe">
   <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
@@ -7628,7 +7594,7 @@ window.showEquipeScreen = function(id, btn) {
   const index = ONGLET_EQUIPE_PAR_ECRAN[id]
   if (index != null && boutons[index]) boutons[index].classList.add('active')
   if (id !== 'e-scan') stopScanner()
-  if (id !== 'e-detail') arreterLecture()
+  if (id !== 'e-detail') quitterLecture()
   remonterEnHaut()
 
   peindreTiroir()
@@ -13042,6 +13008,12 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
    Le décompte se met en pause si la fiche est quittée ou l'app mise en veille,
    et reprend là où il s'était arrêté : lire en deux fois reste lire.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Au bout d'une minute sans un geste, on s'assure que quelqu'un est bien là. */
+const INACTIVITE_MAX = 60 * 1000
+let derniereActivite = 0
+let lectureBase = 0            // temps déjà en base avant cette visite
+let veilleAvertie = false
+
 const DUREE_LECTURE_MIN = 30
 
 /* Au-delà de ce délai, une procédure repasse « à relire » : le bandeau
@@ -13056,7 +13028,12 @@ let lectureEnregistree = false
 function demarrerLecture(procId, dejaConsultee) {
   arreterLecture()
 
-  if (lectureProcId !== procId) { lectureProcId = procId; lectureSecondes = 0 }
+  if (lectureProcId !== procId) {
+    lectureProcId = procId
+    lectureSecondes = 0
+    const precedent = (mesLectures || []).find(v => v.procedure_id === procId)
+    lectureBase = Number(precedent?.duree_lecture || 0)
+  }
   lectureEnregistree = !!dejaConsultee
 
   const bandeau = document.getElementById('lecture-etat')?.closest('.confirm-bar')
@@ -13067,15 +13044,106 @@ function demarrerLecture(procId, dejaConsultee) {
 
   // Rien à l'écran pendant la lecture : le bandeau reste replié.
   bandeau?.classList.remove('visible')
+  derniereActivite = Date.now()
+  veilleAvertie = false
+
   lectureTimer = setInterval(() => {
     if (document.hidden) return          // app en arrière-plan : on ne compte pas
+
+    /* L'écran n'a pas bougé depuis une minute : on demande une confirmation avant
+       de continuer à compter. Sans ça, un téléphone posé sur le plan de travail
+       accumulerait des heures que personne n'a passées à lire. */
+    if (Date.now() - derniereActivite > INACTIVITE_MAX) {
+      if (!veilleAvertie) { veilleAvertie = true; demanderSiPresent() }
+      return
+    }
+
     lectureSecondes++
-    if (lectureSecondes >= DUREE_LECTURE_MIN) enregistrerConsultation()
+    /* La consultation s'enregistre au seuil, mais le compteur CONTINUE : c'est le
+       temps total passé sur la fiche qu'on veut, pas le temps jusqu'à validation.
+       Il s'arrêtait ici, d'où les trente secondes partout. */
+    if (lectureSecondes >= DUREE_LECTURE_MIN && !lectureEnregistree) enregistrerConsultation()
   }, 1000)
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « VOUS ÊTES TOUJOURS LÀ ? »
+
+   Un téléphone posé sur le plan de travail, écran allumé sur une procédure,
+   accumulerait des heures que personne n'a passées à lire. Le temps affiché au
+   responsable perdrait alors tout sens.
+
+   Au bout d'une minute sans un seul geste, on pose donc la question. Le
+   décompte reprend dès qu'on répond, et rien ne se perd.
+
+   Ce que la fenêtre ne dit PAS, et c'est délibéré : qu'un chronomètre tourne.
+   Personne ne doit lire une procédure en se sachant chronométré — on lirait
+   vite au lieu de lire bien, et la mesure deviendrait fausse pour la raison
+   même qui la rend utile. La question porte sur la lecture, pas sur le temps.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tout geste compte : toucher, faire défiler, appuyer sur une touche. */
+;['pointerdown', 'touchstart', 'keydown', 'scroll', 'wheel'].forEach(ev => {
+  document.addEventListener(ev, () => { derniereActivite = Date.now() }, { passive: true, capture: true })
+})
+
+async function demanderSiPresent() {
+  const ok = await confirmDialog({
+    titre: 'Vous en \u00eates o\u00f9 ?',
+    message: "Cette proc\u00e9dure est ouverte depuis un moment sans que rien ne bouge. " +
+      "Reprenez o\u00f9 vous en \u00e9tiez, ou revenez-y plus tard.",
+    confirmer: 'Je continue',
+    annuler: 'Je reviendrai',
+    danger: false,
+  })
+
+  derniereActivite = Date.now()
+  veilleAvertie = false
+
+  /* « Je reviendrai » : on écrit ce qui a été lu et on ferme la fiche. Rien
+     n'est perdu, et le temps resté à l'écran ensuite ne sera pas compté. */
+  if (!ok) {
+    quitterLecture()
+    if (currentMembre?.role === 'gestion') showGestionScreen('p-list')
+    else showEquipeScreen('e-list')
+  }
 }
 
 function arreterLecture() {
   if (lectureTimer) { clearInterval(lectureTimer); lectureTimer = null }
+}
+
+/* Quitter la fiche : on écrit le temps de la visite.
+
+   C'est ce qui manquait. Le temps n'était inscrit qu'une fois, au seuil de
+   trente secondes, et plus jamais ensuite : toutes les lectures finissaient
+   donc à trente secondes, quelle que soit leur durée réelle. */
+function quitterLecture() {
+  arreterLecture()
+  if (!lectureProcId || !currentMembre || lectureSecondes < 3) return
+  /* Sous trois secondes, on ne retient rien : c'est un passage, pas une
+     lecture. Écrire une seconde salirait la moyenne pour rien. */
+  ecrireTempsLecture()
+}
+
+async function ecrireTempsLecture() {
+  const total = lectureBase + lectureSecondes
+  try {
+    await supabase.from('validations').upsert({
+      procedure_id: lectureProcId,
+      membre_id: currentMembre.id,
+      duree_lecture: total,
+      validated_at: new Date().toISOString(),
+    }, { onConflict: 'procedure_id,membre_id' })
+    /* On tient la copie locale à jour : sans ça, rouvrir la fiche dans la foulée
+       repartirait de l'ancienne base et perdrait ce qu'on vient d'écrire. */
+    const l = (mesLectures || []).find(v => v.procedure_id === lectureProcId)
+    if (l) l.duree_lecture = total
+    lectureBase = total
+    lectureSecondes = 0
+  } catch (e) {
+    console.warn('Proc\u00e9do \u00b7 temps de lecture non \u00e9crit :', e?.message || e)
+  }
 }
 
 function afficherLectureFaite(quand) {
@@ -13108,7 +13176,9 @@ function dessinerAnneauLecture(pct, couleur, texte) {
 
 /* C'est l'app qui enregistre, sans rien demander. */
 async function enregistrerConsultation() {
-  arreterLecture()
+  /* On n'arrête PAS le compteur : la personne continue peut-être à lire, et son
+     temps réel nous intéresse. Le décompte s'arrêtera en quittant la fiche, et
+     `quitterLecture` écrira le total. */
   if (lectureEnregistree || !lectureProcId || !currentMembre) return
   lectureEnregistree = true
 
@@ -13119,8 +13189,11 @@ async function enregistrerConsultation() {
      jour la ligne sans changer `validated_at`, et la procédure resterait
      éternellement périmée. Et le temps s'ajoute au précédent, puisque c'est bien
      le total passé sur cette procédure que l'on veut connaître. */
-  const precedent = (mesLectures || []).find(v => v.procedure_id === lectureProcId)
-  const cumul = Number(precedent?.duree_lecture || 0) + lectureSecondes
+  /* `lectureBase` est le total déjà en base au début de cette visite. On écrit
+     toujours `base + secondes de la visite` : l'écriture peut donc être répétée
+     sans jamais compter deux fois. C'est ce qui permet de sauver aussi à la
+     sortie de la fiche. */
+  const cumul = lectureBase + lectureSecondes
 
   const { error } = await supabase.from('validations').upsert(
     {

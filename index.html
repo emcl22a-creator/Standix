@@ -497,6 +497,11 @@
      intérieure, même rayon. Seul le visage laisse place à un dessin au trait,
      dans le langage des icônes de création. */
   .an-gain{ margin-top:0 !important; margin-bottom:24px !important; }
+  /* Une seule taille dans cette carte : le titre et la phrase disent la même
+     chose, l'un ne doit pas écraser l'autre. */
+  .an-gain .accueil-texte .t,
+  .an-gain .accueil-texte .s{ font-size:14.5px; line-height:1.45; }
+  .an-gain .accueil-texte .s{ margin-top:5px; }
   .an-gain-ic{
     /* Plus petit que le visage de l'accueil : ici le dessin accompagne un
        chiffre, il ne porte pas la carte. */
@@ -505,6 +510,10 @@
     background:rgba(255,255,255,0.055); border:0.5px solid var(--border);
   }
   .an-gain-ic svg{ width:24px; height:24px; display:block; }
+
+  .an-compte{
+    font-size:13px; color:var(--label-3); font-weight:600; flex:1;
+  }
 
   .an-plus{
     width:100%; margin-top:14px; height:38px; border:none; border-radius:12px;
@@ -2220,6 +2229,11 @@
 
   .emp-row{ display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px;
     animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; }
+  .emp-row-sous{
+    display:block; font-size:11.5px; color:var(--label-3);
+    font-weight:500; margin-top:2px;
+  }
+
   .emp-row-name{ font-size:13.5px; font-weight:600; flex:1; }
   .emp-row-date{ font-size:11.5px; color:var(--label-2); }
   .check{ width:22px; height:22px; border-radius:50%; border:2px solid var(--separator); flex-shrink:0;
@@ -2231,6 +2245,12 @@
     100%{ transform:scale(1); }
   }
   .check.done{ background:var(--green); border-color:var(--green); position:relative; }
+  /* Dans l'analyse, la coche prend le bleu des liens — celui de « Les plus
+     actifs ». Ailleurs dans l'app le vert dit « terminé » et garde son sens ;
+     ici il s'agit seulement de dire qui a lu, pas de valider quelque chose. */
+  #p-global-analyse .check.done{ background:#5EA0FF; border-color:#5EA0FF; }
+  #p-global-analyse .check.done::after{ color:#04203F; }
+
   .check.done::after{ content:'✓'; color:#000; font-size:12px; font-weight:700; position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); }
 
   /* ═══ Fiche QR ═══ Une vraie plaque blanche, comme celle qu'on imprimera.
@@ -3642,13 +3662,57 @@
             <path d="M13 7.6V12l3.2 2" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </span>
-        <b>Qui passe le plus de temps</b>
+        <b>Le temps de chacun</b>
       </div>
       <div id="ga-late-list"></div>
     </div>
   </div>
 
   <!-- La fiche d'un membre -->
+  <div class="screen" id="p-an-equipe">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Équipe</h1>
+    </div>
+    <div class="list-tools" style="margin-top:6px;">
+      <span class="an-compte" id="p-an-equipe-compte">—</span>
+      <div class="dd-filter" id="dd-an-equipe-sort">
+        <button type="button" class="dd-trigger" id="dd-an-equipe-sort-trigger">
+          <span id="dd-an-equipe-sort-label">Les plus actifs</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" id="dd-an-equipe-sort-menu">
+          <button type="button" class="selected" data-sort="actifs" data-label="Les plus actifs">Les plus actifs</button>
+          <button type="button" data-sort="retard" data-label="Les moins actifs">Les moins actifs</button>
+          <button type="button" data-sort="az" data-label="A → Z">A → Z</button>
+        </div>
+      </div>
+    </div>
+    <div id="an-equipe-liste" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="screen" id="p-an-categories">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Catégories</h1>
+    </div>
+    <div id="an-categories-liste" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="screen" id="p-an-temps">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Le temps de chacun</h1>
+    </div>
+    <div id="an-temps-liste" style="margin-top:12px;"></div>
+  </div>
+
   <div class="screen" id="p-membre">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
@@ -6356,7 +6420,7 @@ function renderGainTemps(dansPeriode, libelle) {
   /* Le verbe s'accorde aussi : \u00ab 1 personne se sont form\u00e9e \u00bb ne passe pas. */
   const pl = lecteurs > 1
   document.getElementById('an-gain-s').innerHTML =
-    `<b>${lecteurs} personne${pl ? 's' : ''}</b> ${pl ? 'se sont form\u00e9es seules' : "s'est form\u00e9e seule"} ` +
+    `<b>${lecteurs} personne${pl ? 's' : ''}</b> ${pl ? 'se sont form\u00e9es' : "s'est form\u00e9e"} ` +
     `sur vos proc\u00e9dures.`
 }
 
@@ -6373,8 +6437,8 @@ function renderGainTemps(dansPeriode, libelle) {
    Le détail par procédure est ce qui rend la carte utile : « 42 min » ne dit
    rien, « 42 min dont 25 sur le Plan HACCP » dit que quelqu'un a buté dessus.
    ═══════════════════════════════════════════════════════════════════════════ */
-function renderTempsLecture(procedures, dansPeriode, libelle) {
-  const el = document.getElementById('ga-late-list')
+function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
+  const el = cible || document.getElementById('ga-late-list')
   if (!el) return
 
   const employes = currentGaData?.employes || []
@@ -6392,7 +6456,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle) {
     .map(([id, d]) => ({ membre: employes.find(e => e.id === id), ...d }))
     .filter(x => x.membre)
     .sort((a, b) => b.total - a.total)
-    .slice(0, 3)
+  const visibles = tout ? classement : classement.slice(0, 3)
 
   if (!classement.length) {
     el.innerHTML = `<div class="an-vide">Aucun temps mesur\u00e9 ${escapeHtml(libelle)}.</div>`
@@ -6401,7 +6465,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle) {
 
   const max = classement[0].total
 
-  el.innerHTML = classement.map((x, i) => {
+  el.innerHTML = visibles.map((x, i) => {
     /* Les procédures de cette personne, de la plus longue à la plus courte. On
        en montre trois : au-delà, la carte devient un tableau. */
     const siennes = Object.entries(x.procs)
@@ -6426,6 +6490,17 @@ function renderTempsLecture(procedures, dansPeriode, libelle) {
         <div class="taux" style="color:${couleur};">${dureeLisible(x.total)}</div>
       </div>`
   }).join('')
+
+  if (!tout && classement.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'an-plus'
+    b.textContent = classement.length - 3 === 1
+      ? 'Voir la derni\u00e8re'
+      : `Voir les ${classement.length - 3} autres`
+    b.addEventListener('click', () => ouvrirAnTemps())
+    el.appendChild(b)
+  }
 
   el.querySelectorAll('[data-membre]').forEach(b => {
     b.addEventListener('click', () => ouvrirFicheMembre(b.dataset.membre))
@@ -6459,8 +6534,10 @@ function dessinerAnneau(id, pct, couleur, texte, unite) {
    le nombre de consultations possibles, soit ses procédures x ses employés.
    On raisonne en pourcentage et non en volume brut, sinon une catégorie de
    dix procédures écraserait systématiquement une catégorie de deux. */
-function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel) {
-  const el = document.getElementById('ga-top-categories')
+/* `cible` et `tout` permettent de réutiliser ce rendu sur la page entière :
+   mêmes lignes, même grammaire, un seul endroit qui les dessine. */
+function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel, cible, tout) {
+  const el = cible || document.getElementById('ga-top-categories')
   if (!el) return
   el.innerHTML = ''
 
@@ -6492,7 +6569,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
   }).sort((a, b) => (b.taux - a.taux) || (b.vues - a.vues) || a.nom.localeCompare(b.nom, 'fr'))
 
   /* Trois lignes, comme pour l'équipe. Le reste se déplie. */
-  const visibles = categoriesDepliees ? classement : classement.slice(0, 3)
+  const visibles = tout ? classement : classement.slice(0, 3)
 
   visibles.forEach((c, i) => {
     const couleur = c.taux >= 70 ? '#30D158' : c.taux >= 30 ? '#FF9F0A' : '#FF453A'
@@ -6510,19 +6587,14 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     el.appendChild(div)
   })
 
-  if (classement.length > 3) {
+  if (!tout && classement.length > 3) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = categoriesDepliees
-      ? 'Replier'
-      : (classement.length - 3 === 1
-        ? 'Voir la derni\u00e8re'
-        : `Voir les ${classement.length - 3} autres`)
-    b.addEventListener('click', () => {
-      categoriesDepliees = !categoriesDepliees
-      renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel)
-    })
+    b.textContent = classement.length - 3 === 1
+      ? 'Voir la derni\u00e8re'
+      : `Voir les ${classement.length - 3} autres`
+    b.addEventListener('click', () => ouvrirAnCategories())
     el.appendChild(b)
   }
 }
@@ -7125,7 +7197,7 @@ document.getElementById('p-membre')?.addEventListener('click', (e) => {
 
 let triMembres = 'actifs'
 let membresDeplies = false
-let categoriesDepliees = false
+let anEquipeSort = 'actifs'
 
 function renderMembresListe() {
   const el = document.getElementById('ga-top-membres')
@@ -7174,18 +7246,114 @@ function renderMembresListe() {
     el.appendChild(div)
   })
 
+  /* Le bouton ouvre une page entière plutôt que de déplier sur place : au-delà
+     de trois lignes, on ne consulte plus, on cherche — et chercher demande une
+     page à soi, avec son tri et son compte. */
   if (trie.length > 3) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = membresDeplies
-      ? 'Replier'
-      : (trie.length - 3 === 1
-        ? 'Voir la derni\u00e8re'
-        : `Voir les ${trie.length - 3} autres`)
-    b.addEventListener('click', () => { membresDeplies = !membresDeplies; renderMembresListe() })
+    b.textContent = trie.length - 3 === 1
+      ? 'Voir la derni\u00e8re'
+      : `Voir les ${trie.length - 3} autres`
+    b.addEventListener('click', () => ouvrirAnEquipe())
     el.appendChild(b)
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TROIS PAGES ENTIÈRES
+
+   Chaque section de l'analyse n'en montre que trois lignes. Ces pages montrent
+   tout, avec le même dessin — mêmes lignes, même grammaire — pour qu'on ne se
+   demande pas où l'on est arrivé.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+window.ouvrirAnEquipe = function() {
+  showGestionScreen('p-an-equipe')
+  peindreAnEquipe()
+}
+
+function peindreAnEquipe() {
+  const el = document.getElementById('an-equipe-liste')
+  if (!el || !currentGaData) return
+  const { employes, procedures, validations } = currentGaData
+  const debut = debutPeriode(currentGaPeriod)
+  const dansPeriode = debut
+    ? validations.filter(v => new Date(v.validated_at) >= debut) : validations
+
+  const stats = employes.map(m => {
+    const siennes = dansPeriode.filter(v => v.membre_id === m.id)
+    return {
+      m,
+      nb: new Set(siennes.map(v => v.procedure_id)).size,
+      serie: serieConsecutive(validations.filter(v => v.membre_id === m.id)).serie,
+      temps: siennes.reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
+    }
+  })
+
+  const trie = [...stats].sort((a, b) => {
+    if (anEquipeSort === 'az') return (a.m.nom || '').localeCompare(b.m.nom || '', 'fr')
+    if (anEquipeSort === 'retard') return (a.nb - b.nb) || (a.temps - b.temps)
+    return (b.nb - a.nb) || (b.temps - a.temps)
+  })
+
+  const total = procedures.length
+  document.getElementById('p-an-equipe-compte').textContent =
+    `${employes.length} personne${employes.length > 1 ? 's' : ''}`
+
+  el.innerHTML = trie.length ? trie.map(s => `
+    <div class="emp-row" data-membre="${escapeHtml(s.m.id)}">
+      <div class="check ${s.nb > 0 ? 'done' : ''}"></div>
+      <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
+        <span class="emp-row-sous">${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}${
+          s.temps ? ' \u00b7 ' + dureeLisible(s.temps) : ''}</span>
+      </div>
+      ${medailleHtml(s.serie, 30)}
+    </div>`).join('')
+    : '<div class="an-vide">Aucun membre dans l\'\u00e9quipe.</div>'
+
+  el.querySelectorAll('[data-membre]').forEach(l => {
+    l.addEventListener('click', () => ouvrirFicheMembre(l.dataset.membre))
+  })
+}
+
+window.ouvrirAnCategories = function() {
+  showGestionScreen('p-an-categories')
+  peindreAnCategories()
+}
+
+/* Les trois pages partagent le même besoin : la période courante et son
+   libellé. On le calcule une fois. */
+function periodeCourante() {
+  const debut = debutPeriode(currentGaPeriod)
+  return {
+    dansPeriode: debut
+      ? currentGaData.validations.filter(v => new Date(v.validated_at) >= debut)
+      : currentGaData.validations,
+    libelle: currentGaPeriod === 'week' ? 'cette semaine'
+      : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total',
+  }
+}
+
+function peindreAnCategories() {
+  const el = document.getElementById('an-categories-liste')
+  if (!el || !currentGaData) return
+  const { dansPeriode, libelle } = periodeCourante()
+  renderTopCategories(currentGaData.procedures, dansPeriode,
+    currentGaData.employes.length, libelle, el, true)
+}
+
+window.ouvrirAnTemps = function() {
+  showGestionScreen('p-an-temps')
+  peindreAnTemps()
+}
+
+function peindreAnTemps() {
+  const el = document.getElementById('an-temps-liste')
+  if (!el || !currentGaData) return
+  const { dansPeriode, libelle } = periodeCourante()
+  renderTempsLecture(currentGaData.procedures, dansPeriode, libelle, el, true)
 }
 
 document.getElementById('ga-top-membres')?.addEventListener('click', (e) => {
@@ -7931,6 +8099,7 @@ wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategor
 
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */
+wireSortDropdown('dd-an-equipe-sort', (sort) => { anEquipeSort = sort; peindreAnEquipe() })
 wireSortDropdown('dd-e-cat-sort', (sort) => { equipeCatSort = sort; renderEquipeCategories() })
 wireSortDropdown('dd-e-proc-sort', (sort) => { equipeProcSort = sort; renderEquipeCatListe() })
 

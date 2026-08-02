@@ -555,13 +555,10 @@
      dans le langage des icônes de création. */
   .an-gain{ margin-top:0 !important; margin-bottom:24px !important; }
   /* Une seule taille dans cette carte : le titre et la phrase disent la même
-     chose, l'un ne doit pas écraser l'autre. */
-  .an-gain .accueil-texte .t,
-  /* Une seule taille dans cette carte. Il faut nommer les deux sélecteurs
-     séparément : groupés, seul le second l'emportait sur la règle de base. */
+     chose, l'un ne doit pas écraser l'autre. Les deux sélecteurs sont nommés
+     séparément — groupés, seul le second l'emportait sur la règle de base. */
   .an-gain .accueil-texte .t{ font-size:14.5px; font-weight:700; line-height:1.45; }
-  .an-gain .accueil-texte .s{ font-size:14.5px; line-height:1.45; }
-  .an-gain .accueil-texte .s{ margin-top:5px; }
+  .an-gain .accueil-texte .s{ font-size:14.5px; line-height:1.45; margin-top:5px; }
   .an-gain-ic{
     /* Plus petit que le visage de l'accueil : ici le dessin accompagne un
        chiffre, il ne porte pas la carte. */
@@ -2798,6 +2795,12 @@
      faible sur une grande surface — mais deux éléments qui se font face en haut
      et en bas de l'écran doivent porter la même matière, pas une matière
      corrigée. */
+  /* Le bouton principal porte les deux dessins ; l'espace courant décide lequel
+     se montre. */
+  #tabbar .ic-equipe{ display:none; }
+  #tabbar[data-espace="equipe"] .ic-gestion{ display:none; }
+  #tabbar[data-espace="equipe"] .ic-equipe{ display:block; }
+
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
@@ -2805,7 +2808,7 @@
   /* La règle d'origine, avec son identifiant. J'avais réécrit une version sans
      identifiant : moins spécifique, elle était écrasée par ce qui suit, et le
      groupe perdait son verre — il ne restait que les ronds. */
-  #tabbar-gestion .groupe, #tabbar-equipe .groupe{
+  #tabbar .groupe{
     display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
     background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -2818,7 +2821,7 @@
      pastille par-dessus — c'est lui qui se déploie, prend un fond blanc et
      laisse apparaître son libellé. La largeur s'anime, d'où l'effet de
      glissement d'un onglet à l'autre. */
-  #tabbar-gestion, #tabbar-equipe{
+  #tabbar{
     display:flex; align-items:center; gap:10px; width:auto; height:auto; padding:0;
     background:none; border:none; border-radius:0; box-shadow:none;
     -webkit-backdrop-filter:none; backdrop-filter:none;
@@ -2859,7 +2862,11 @@
      Une teinte basse laisse voir à travers, un flou élevé rend illisible ce
      qu'on voit. On veut les deux : 7 % de teinte pour la transparence, 50 px
      de flou pour que le fond ne soit plus qu'une tache de couleur. */
-  #tabbar-gestion .groupe, #tabbar-equipe  /* ═══ Pourquoi le libellé est en position absolue ═══
+  /* Le verre du groupe. Ce sélecteur était coupé en deux par le commentaire qui
+     suit : le navigateur lisait un sélecteur inachevé et jetait la règle avec.
+     Le groupe n'avait donc AUCUN fond — il ne restait que les ronds blancs. */
+
+  /* ═══ Pourquoi le libellé est en position absolue ═══
      Faire varier `max-width` sur le texte le rognait progressivement : on
      voyait les lettres se faire couper, ce qui ne ressemble à rien de naturel.
      Le libellé est donc sorti du flux et ne fait plus qu'apparaître en fondu
@@ -2867,7 +2874,7 @@
      gère seul, sans recalcul de mise en page.
      Seule la largeur du bouton s'anime, et elle est mesurée à l'ouverture pour
      coller exactement au texte. */
-  #tabbar-gestion .tab-round, #tabbar-equipe .tab-round{
+  #tabbar .tab-round{
     position:relative; height:44.5px; width:44.5px; flex-shrink:0; padding:0; gap:0;
     border-radius:100px; border:none;
     background:none; color:rgba(235,235,245,0.55);
@@ -2876,16 +2883,16 @@
                 background-color 0.34s cubic-bezier(0.32,0.72,0,1),
                 color 0.26s ease;
   }
-  #tabbar-gestion .tab-round.active, #tabbar-equipe .tab-round.active{
+  #tabbar .tab-round.active{
     width:var(--w, 150px); background-color:#fff; color:#000;
     box-shadow:0 2px 8px rgba(0,0,0,0.18);
   }
   /* L'icône reste à sa place, elle glisse juste un peu vers la gauche. */
-  #tabbar-gestion .tab-round svg, #tabbar-equipe .tab-round svg{
+  #tabbar .tab-round svg{
     width:21px; height:21px; flex-shrink:0; margin-left:12.5px;
     transition:margin-left 0.44s cubic-bezier(0.32,0.72,0,1);
   }
-  #tabbar-gestion .tab-round.active svg, #tabbar-equipe .tab-round.active svg{ margin-left:12px; }
+  #tabbar .tab-round.active svg{ margin-left:12px; }
   .tab-label{
     position:absolute; left:42px; top:50%; white-space:nowrap;
     font-size:14px; font-weight:650; letter-spacing:-0.02em;
@@ -2893,17 +2900,17 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
   }
   /* Le texte n'arrive qu'une fois la pilule ouverte, et repart aussitôt. */
-  #tabbar-gestion .tab-round.active .tab-label, #tabbar-equipe .tab-round.active .tab-label{
+  #tabbar .tab-round.active .tab-label{
     opacity:1; transform:translate(0, -50%);
     transition: opacity 0.24s ease 0.16s, transform 0.34s cubic-bezier(0.32,0.72,0,1) 0.16s;
   }
   /* Le bouton d'action, détaché du groupe. */
-  #tabbar-gestion .tab-round--primary, #tabbar-equipe .tab-round--primary{
+  #tabbar .tab-round--primary{
     width:52px; height:52px; min-width:52px; padding:0; border-radius:50%;
     background:#fff; color:#000; border:0.5px solid rgba(255,255,255,0.5);
     box-shadow:0 6px 20px rgba(255,255,255,0.18), 0 3px 10px rgba(0,0,0,0.4);
   }
-  #tabbar-gestion .tab-round--primary svg, #tabbar-equipe .tab-round--primary svg{ width:24px; height:24px; }
+  #tabbar .tab-round--primary svg{ width:24px; height:24px; }
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
@@ -4175,24 +4182,7 @@
   </div>
 </div>
 
-<nav class="tabbar" id="tabbar-gestion" style="display:none;">
-  
-  <div class="groupe">
-  <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
-    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
-    <span class="tab-label">Procédures</span>
-  </button>
-  <button class="tab-round tab-round--secondary" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()" aria-label="Analyse">
-    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
-    <span class="tab-label">Analyse</span>
-  </button>
-  </div>
-  <button class="tab-round tab-round--primary" onclick="startNewProcedure()" aria-label="Créer une procédure">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
-</nav>
+
 
 <!-- ═══════════════ ESPACE ÉQUIPE ═══════════════ -->
 <div class="app" id="equipe-app" style="display:none;">
@@ -4273,7 +4263,7 @@
   <!-- Procédures d'une catégorie, côté équipe -->
   <div class="screen" id="e-category">
     <div class="detail-header">
-      <button class="back-btn" onclick="showEquipeScreen('e-list', document.querySelector('#tabbar-equipe .tab-round'))">
+      <button class="back-btn" onclick="showEquipeScreen('e-list', document.querySelector('#tabbar .tab-round'))">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h1 class="pagehead" id="e-cat-titre" style="margin:0; font-size:20px;">Catégorie</h1>
@@ -4529,22 +4519,30 @@
   </div>
 </div>
 
-<nav class="tabbar" id="tabbar-equipe" style="display:none;">
-  
+<!-- UNE SEULE barre pour les deux espaces.
+
+     Il y en avait deux, au balisage et au style rigoureusement identiques — et
+     pourtant elles ne rendaient pas pareil à l'écran. Plutôt que de chercher
+     indéfiniment ce qui les distinguait, on n'en garde qu'une : deux choses
+     identiques ne peuvent plus diverger si elles n'en font qu'une.
+
+     Les actions changent selon l'espace, pas la barre. -->
+<nav class="tabbar" id="tabbar" style="display:none;">
   <div class="groupe">
-  <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
-    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
-    <span class="tab-label">Procédures</span>
-  </button>
-  <button class="tab-round tab-round--secondary" onclick="showEquipeScreen('e-analyse', this); renderMonActivite()" aria-label="Mon activité">
-    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
-    <span class="tab-label">Analyse</span>
-  </button>
+    <button class="tab-round tab-round--secondary active" id="tb-procedures" aria-label="Procédures">
+      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
+      <span class="tab-label">Procédures</span>
+    </button>
+    <button class="tab-round tab-round--secondary" id="tb-analyse" aria-label="Analyse">
+      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
+      <span class="tab-label">Analyse</span>
+    </button>
   </div>
-  <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()" aria-label="Scanner un QR code">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
+  <button class="tab-round tab-round--primary" id="tb-principal" aria-label="Action">
+    <span class="ic-gestion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+    <span class="ic-equipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg></span>
   </button>
 </nav>
 
@@ -5314,9 +5312,9 @@ function appliquerLangue() {
      en français — c'est tout ou rien. */
   const racines = [
     document.getElementById('equipe-app'),
-    document.getElementById('tabbar-equipe'),
+    document.getElementById('tabbar'),
     document.getElementById('gestion-app'),
-    document.getElementById('tabbar-gestion'),
+    document.getElementById('tabbar'),
   ].filter(Boolean)
 
   const dico = DICO[langueApp]
@@ -5364,7 +5362,7 @@ const cibleQR = (function () {
    pour savoir laquelle des deux montrer. */
 function afficherCoquille(espace) {
   const appEl = document.getElementById(espace === 'equipe' ? 'equipe-app' : 'gestion-app')
-  const barre = document.getElementById(espace === 'equipe' ? 'tabbar-equipe' : 'tabbar-gestion')
+  const barre = document.getElementById('tabbar')
   if (!appEl || appEl.style.display === 'block') return
   appEl.style.display = 'block'
   barre.style.display = 'flex'
@@ -6012,8 +6010,8 @@ async function enterApp(membre) {
     currentMembre = null
     document.getElementById('gestion-app').style.display = 'none'
     document.getElementById('equipe-app').style.display = 'none'
-    document.getElementById('tabbar-gestion').style.display = 'none'
-    document.getElementById('tabbar-equipe').style.display = 'none'
+    document.getElementById('tabbar').style.display = 'none'
+    document.getElementById('tabbar').style.display = 'none'
     document.getElementById('login-screen').style.display = 'flex'
     window.__procedoLoaded = true
     await fenetreTropDAppareils()
@@ -6026,8 +6024,8 @@ async function enterApp(membre) {
      gardait l'ancien affiché sous le nouveau, et voyait les deux à la fois. */
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar-gestion').style.display = 'none'
-  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
 
   armerSurveillance()
 
@@ -6066,14 +6064,14 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
-    document.getElementById('tabbar-gestion').style.display = 'flex'
+    document.getElementById('tabbar').style.display = 'flex'
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
     desarmerSurveillance()
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
     // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
-    placerPastilleSansAnimation('tabbar-gestion')
+    placerPastilleSansAnimation('tabbar')
     // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
@@ -6099,7 +6097,7 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
-    document.getElementById('tabbar-equipe').style.display = 'flex'
+    document.getElementById('tabbar').style.display = 'flex'
     mesurerOnglets()
     chargerLangue()
     chargerEtablissements()
@@ -6109,7 +6107,7 @@ async function enterApp(membre) {
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
     // pastille doit déjà être au bon endroit, pas y glisser depuis la gauche.
-    placerPastilleSansAnimation('tabbar-equipe')
+    placerPastilleSansAnimation('tabbar')
     // Le logo est invisible tant qu'il n'a pas sa classe : on la pose tout de
     // suite. L'animation ne repose plus sur un tracé redessiné image par image,
     // elle peut donc démarrer avec l'app sans la faire saccader.
@@ -6230,8 +6228,8 @@ async function proposerEntrepriseDuQR(code) {
 
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar-gestion').style.display = 'none'
-  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
   await enterApp(membre)
   return true
 }
@@ -6382,8 +6380,8 @@ window.signOut = async function() {
   document.getElementById('e-list')?.classList.add('active')
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar-gestion').style.display = 'none'
-  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
   /* Le repère et les copies locales n'ont plus de sens une fois déconnecté : le
      compte suivant sur ce téléphone ne doit hériter ni du choix ni des
      procédures de quelqu'un d'autre. */
@@ -7624,7 +7622,7 @@ function placerPastilleSansAnimation(idBarre) {
    libellé, et l'inscrit dans une variable CSS. On anime ainsi vers une valeur
    juste au pixel, au lieu d'un maximum arbitraire qui donnait un arrêt sec. */
 function mesurerOnglets() {
-  document.querySelectorAll('#tabbar-gestion .tab-round--secondary, #tabbar-equipe .tab-round--secondary').forEach(b => {
+  document.querySelectorAll('#tabbar .tab-round--secondary').forEach(b => {
     const lbl = b.querySelector('.tab-label')
     if (!lbl) return
     const large = lbl.scrollWidth
@@ -7656,6 +7654,27 @@ function majPastille(idBarre) {
    sur lequel on venait de taper : en revenant d'une sous-page par le bouton
    retour, aucun bouton n'était transmis et le repère disparaissait. Il se
    déduit maintenant de l'écran affiché, quel que soit le chemin emprunté. */
+/* Les trois boutons de la barre unique. Leur action dépend de l'espace où l'on
+   se trouve, pas de la barre : c'est ce qui permet de n'en avoir qu'une. */
+function espaceCourant() {
+  return document.getElementById('equipe-app')?.style.display !== 'none' ? 'equipe' : 'gestion'
+}
+
+document.getElementById('tb-procedures')?.addEventListener('click', function() {
+  if (espaceCourant() === 'equipe') showEquipeScreen('e-list', this)
+  else showGestionScreen('p-list', this)
+})
+
+document.getElementById('tb-analyse')?.addEventListener('click', function() {
+  if (espaceCourant() === 'equipe') { showEquipeScreen('e-analyse', this); renderMonActivite() }
+  else { showGestionScreen('p-global-analyse', this); loadGlobalAnalyse() }
+})
+
+document.getElementById('tb-principal')?.addEventListener('click', function() {
+  if (espaceCourant() === 'equipe') { showEquipeScreen('e-scan', this); startScanner() }
+  else startNewProcedure()
+})
+
 const ONGLET_PAR_ECRAN = {
   'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
   /* `p-membre-fiche` n'a jamais existé : l'écran s'appelle `p-membre`. Et les
@@ -7671,11 +7690,12 @@ window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
-  const boutons = document.querySelectorAll('#tabbar-gestion .tab-round')
+  const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
   const index = ONGLET_PAR_ECRAN[id]
   if (index != null && boutons[index]) boutons[index].classList.add('active')
-  majPastille('tabbar-gestion')
+  document.getElementById('tabbar')?.setAttribute('data-espace', 'gestion')
+  majPastille('tabbar')
   if (id === 'p-create') updateModeCardsState()
   // La caméra ne doit jamais tourner sur un écran qu'on a quitté
   if (id !== 'p-scan') stopScanner()
@@ -7732,8 +7752,9 @@ window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
-  const boutons = document.querySelectorAll('#tabbar-equipe .tab-round')
+  const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
+  document.getElementById('tabbar')?.setAttribute('data-espace', 'equipe')
   const index = ONGLET_EQUIPE_PAR_ECRAN[id]
   if (index != null && boutons[index]) boutons[index].classList.add('active')
   if (id !== 'e-scan') stopScanner()
@@ -8112,8 +8133,8 @@ function ajusterHauteurDebut() {
   const debut = document.querySelector('#cat-grid .debut, #e-cat-grid .debut')
   if (!debut) return
   const haut = Math.round(debut.getBoundingClientRect().top + window.scrollY)
-  const barre = document.getElementById('tabbar-gestion')?.offsetHeight
-    || document.getElementById('tabbar-equipe')?.offsetHeight || 88
+  const barre = document.getElementById('tabbar')?.offsetHeight
+    || document.getElementById('tabbar')?.offsetHeight || 88
   // 22 px de respiration sous le texte, pour qu'il ne touche pas la barre.
   debut.style.setProperty('--debut-h', `calc(100dvh - ${haut}px - ${barre + 22}px)`)
 }
@@ -12646,8 +12667,8 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
       if (suivante) { await enterApp(suivante); toast(`${nom} a \u00e9t\u00e9 supprim\u00e9.`); return }
       document.getElementById('gestion-app').style.display = 'none'
       document.getElementById('equipe-app').style.display = 'none'
-      document.getElementById('tabbar-gestion').style.display = 'none'
-      document.getElementById('tabbar-equipe').style.display = 'none'
+      document.getElementById('tabbar').style.display = 'none'
+      document.getElementById('tabbar').style.display = 'none'
       document.getElementById('choice-screen').style.display = 'flex'
     } else {
       await chargerEtablissements()
@@ -12782,8 +12803,8 @@ document.getElementById('es-entreprises')?.addEventListener('click', async (e) =
 
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar-gestion').style.display = 'none'
-  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
   await enterApp(adhesion)
 })
 
@@ -12894,8 +12915,8 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar-gestion').style.display = 'none'
-  document.getElementById('tabbar-equipe').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
+  document.getElementById('tabbar').style.display = 'none'
   document.getElementById('choice-screen').style.display = 'flex'
   toast(`Vous avez quitt\u00e9 ${nom}.`)
 })

@@ -494,6 +494,9 @@
   /* Une seule taille dans cette carte : le titre et la phrase disent la même
      chose, l'un ne doit pas écraser l'autre. */
   .an-gain .accueil-texte .t,
+  /* Une seule taille dans cette carte. Il faut nommer les deux sélecteurs
+     séparément : groupés, seul le second l'emportait sur la règle de base. */
+  .an-gain .accueil-texte .t{ font-size:14.5px; font-weight:700; line-height:1.45; }
   .an-gain .accueil-texte .s{ font-size:14.5px; line-height:1.45; }
   .an-gain .accueil-texte .s{ margin-top:5px; }
   .an-gain-ic{
@@ -1872,6 +1875,10 @@
   .emp-row{ cursor:pointer; }
 
   /* ═══ Utilisateurs de l'entreprise ═══ */
+  /* La ligne s'ouvre : on le montre à l'appui, comme partout ailleurs. */
+  .pm-ligne[data-fiche]{ cursor:pointer; transition:transform 0.16s, background 0.2s; }
+  .pm-ligne[data-fiche]:active{ transform:scale(0.985); background:rgba(255,255,255,0.07); }
+
   .pm-ligne{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
     background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
@@ -2267,11 +2274,6 @@
     100%{ transform:scale(1); }
   }
   .check.done{ background:var(--green); border-color:var(--green); position:relative; }
-  /* Dans l'analyse, la coche prend le bleu des liens — celui de « Les plus
-     actifs ». Ailleurs dans l'app le vert dit « terminé » et garde son sens ;
-     ici il s'agit seulement de dire qui a lu, pas de valider quelque chose. */
-  #p-global-analyse .check.done{ background:#5EA0FF; border-color:#5EA0FF; }
-  #p-global-analyse .check.done::after{ color:#04203F; }
 
   .check.done::after{ content:'✓'; color:#000; font-size:12px; font-weight:700; position:absolute; top:50%; left:50%; transform:translate(-50%,-52%); }
 
@@ -2720,31 +2722,14 @@
      faible sur une grande surface — mais deux éléments qui se font face en haut
      et en bas de l'écran doivent porter la même matière, pas une matière
      corrigée. */
-  /* ═══ La barre du bas ═══
-     Deux éléments plutôt qu'un, et c'est ce qui fait revenir le flou.
-
-     Le `nav` est un rail invisible qui occupe toute la largeur et centre son
-     contenu. Il ne porte ni fond ni flou. L'enveloppe intérieure porte le verre,
-     et surtout : elle n'a AUCUN `transform`.
-
-     C'est le nœud du problème. Sur Safari iOS, un `transform` sur un élément à
-     `backdrop-filter` crée un contexte de rendu séparé : le navigateur n'a plus
-     accès à ce qui défile derrière, et le flou disparaît. Centrer par
-     `justify-content` donne exactement la même position sans y toucher. */
-  .tabbar{
-    position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
-    left:0; right:0; z-index:10;
-    justify-content:center; align-items:center;
-    pointer-events:none;      /* le rail laisse passer les touchers */
-  }
-  .tabbar-inner{
-    display:flex; align-items:center; gap:22px; padding:5px 8px;
-    border-radius:100px; pointer-events:auto;
-    background:rgba(255,255,255,0.10);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18);
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
-  }
+  /* La barre d'origine, en un seul élément. J'avais essayé de la scinder en un
+     rail et une enveloppe pour récupérer le flou sur iOS : ça marchait, mais ça
+     ajoutait un cadre visible autour des boutons. Le rendu d'origine passe
+     avant. */
+  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
   /* ═══ Barre d'onglets (les deux espaces) ═══
      Deux éléments distincts : un groupe en verre qui contient les onglets, et
@@ -3247,7 +3232,7 @@
       <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
       <button type="button" class="vider" id="pm-vider" aria-label="Effacer">×</button>
     </div>
-    <div class="note" style="margin-top:12px;">Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Procédo reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.</div>
+    <div class="note" style="margin-top:12px;">Touchez une personne pour voir son activité en détail : temps passé, procédures lues, ce qu'il lui reste. Les flèches changent son rôle, la croix la retire de l'entreprise.</div>
     <div id="pm-liste" style="margin-top:14px;"></div>
   </div>
 
@@ -4080,23 +4065,22 @@
 </div>
 
 <nav class="tabbar" id="tabbar-gestion" style="display:none;">
-  <div class="tabbar-inner">
-    <div class="groupe">
-    <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
-      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
-      <span class="tab-label">Procédures</span>
-    </button>
-    <button class="tab-round tab-round--secondary" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()" aria-label="Analyse">
-      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
-      <span class="tab-label">Analyse</span>
-    </button>
-    </div>
-    <button class="tab-round tab-round--primary" onclick="startNewProcedure()" aria-label="Créer une procédure">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    </button>
-</div>
+  
+  <div class="groupe">
+  <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
+    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
+    <span class="tab-label">Procédures</span>
+  </button>
+  <button class="tab-round tab-round--secondary" onclick="showGestionScreen('p-global-analyse', this); loadGlobalAnalyse()" aria-label="Analyse">
+    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
+    <span class="tab-label">Analyse</span>
+  </button>
+  </div>
+  <button class="tab-round tab-round--primary" onclick="startNewProcedure()" aria-label="Créer une procédure">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
 </nav>
 
 <!-- ═══════════════ ESPACE ÉQUIPE ═══════════════ -->
@@ -4428,23 +4412,22 @@
 </div>
 
 <nav class="tabbar" id="tabbar-equipe" style="display:none;">
-  <div class="tabbar-inner">
-    <div class="groupe">
-    <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
-      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
-      <span class="tab-label">Procédures</span>
-    </button>
-    <button class="tab-round tab-round--secondary" onclick="showEquipeScreen('e-analyse', this); renderMonActivite()" aria-label="Mon activité">
-      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
-      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
-      <span class="tab-label">Activité</span>
-    </button>
-    </div>
-    <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()" aria-label="Scanner un QR code">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
-    </button>
-</div>
+  
+  <div class="groupe">
+  <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
+    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
+    <span class="tab-label">Procédures</span>
+  </button>
+  <button class="tab-round tab-round--secondary" onclick="showEquipeScreen('e-analyse', this); renderMonActivite()" aria-label="Mon activité">
+    <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+    <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="16.4" y="9" width="3.2" height="12" rx="1.6"/><rect x="10.4" y="3" width="3.2" height="18" rx="1.6"/><rect x="4.4" y="13" width="3.2" height="8" rx="1.6"/></svg>
+    <span class="tab-label">Activité</span>
+  </button>
+  </div>
+  <button class="tab-round tab-round--primary" onclick="showEquipeScreen('e-scan', this); startScanner()" aria-label="Scanner un QR code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="4" height="4"/><rect x="13" y="7" width="4" height="4"/><rect x="7" y="13" width="4" height="4"/></svg>
+  </button>
 </nav>
 
 <script type="module">
@@ -7277,7 +7260,6 @@ function renderMembresListe() {
        jours consécutifs dit l'assiduité, qui est la vraie question. */
     const serie = serieDuMembre(s.m.id, validations)
     div.innerHTML = `
-      <div class="check ${s.nb > 0 ? 'done' : ''}"></div>
       <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}</div>
       ${medailleHtml(serie, 30)}`
     el.appendChild(div)
@@ -7341,7 +7323,6 @@ function peindreAnEquipe() {
 
   el.innerHTML = trie.length ? trie.map(s => `
     <div class="emp-row" data-membre="${escapeHtml(s.m.id)}">
-      <div class="check ${s.nb > 0 ? 'done' : ''}"></div>
       <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
         <span class="emp-row-sous">${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}${
           s.temps ? ' \u00b7 ' + dureeLisible(s.temps) : ''}</span>
@@ -12856,7 +12837,7 @@ function peindreEquipe() {
       : '\u00c9quipe'
 
     return `
-      <div class="pm-ligne">
+      <div class="pm-ligne" data-fiche="${escapeHtml(m.id)}" role="button" tabindex="0">
         <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
@@ -12907,6 +12888,14 @@ document.getElementById('pm-vider')?.addEventListener('click', () => {
 })
 
 /* ── La promotion ───────────────────────────────────────── */
+document.getElementById('pm-liste')?.addEventListener('click', (e) => {
+  /* Toute la ligne ouvre la fiche, sauf les boutons de rôle et de retrait : ce
+     sont des actions, pas une consultation. */
+  if (e.target.closest('button')) return
+  const ligne = e.target.closest('[data-fiche]')
+  if (ligne) ouvrirFicheMembre(ligne.dataset.fiche)
+})
+
 document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-promo]')
   if (!btn) return

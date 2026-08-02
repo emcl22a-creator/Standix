@@ -10483,14 +10483,18 @@ async function openAnalyse(procId) {
         <p style="flex:1;">${escapeHtml(etape.texte)}</p>
         ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
       `
+      /* Le contour bleu vaut pour TOUTES les étapes, avec ou sans vidéo : c'est
+         un repère de lecture, pas une commande de lecteur. Quelqu'un qui suit une
+         procédure écrite en a autant besoin — il doit retrouver où il en était
+         après avoir levé les yeux sur son plan de travail. */
+      div.style.cursor = 'pointer'
       if (hasClip) {
-        div.style.cursor = 'pointer'
         div.dataset.debut = bounds.start
         div.dataset.fin = bounds.end
-        div.onclick = () => {
-          marquerEtapeEnLecture(div)
-          lireExtrait(videoEl, bounds.start, bounds.end)
-        }
+      }
+      div.onclick = () => {
+        marquerEtapeEnLecture(div)
+        if (hasClip) lireExtrait(videoEl, bounds.start, bounds.end)
       }
       stepsListEl.appendChild(div)
     })
@@ -11364,20 +11368,20 @@ async function openEquipeDetail(procId) {
       </div>
       ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
     `
+    /* Les mêmes repères que côté gestion, et pour TOUTES les étapes : l'employé
+       qui apprend un geste doit pouvoir marquer où il en est, que la procédure
+       soit filmée ou écrite. */
+    div.style.cursor = 'pointer'
     if (hasClip) {
-      div.style.cursor = 'pointer'
-      /* Les mêmes repères que côté gestion : l'étape qu'on regarde se marque, et
-         la marque suit la vidéo. Un employé en a plus besoin qu'un gérant — c'est
-         lui qui apprend le geste. */
       div.dataset.debut = bounds.start
       div.dataset.fin = bounds.end
-      // Toute la ligne est cliquable, sauf la photo : on ne veut pas lancer la
-      // vidéo quand quelqu'un cherche simplement à mieux voir l'image.
-      div.onclick = (e) => {
-        if (e.target.closest('.detail-step-img')) return
-        marquerEtapeEnLecture(div)
-        lireExtrait(detailVideoEl, bounds.start, bounds.end)
-      }
+    }
+    // Toute la ligne est cliquable, sauf la photo : on ne veut pas lancer la
+    // vidéo quand quelqu'un cherche simplement à mieux voir l'image.
+    div.onclick = (e) => {
+      if (e.target.closest('.detail-step-img')) return
+      marquerEtapeEnLecture(div)
+      if (hasClip) lireExtrait(detailVideoEl, bounds.start, bounds.end)
     }
     stepsEl.appendChild(div)
   })

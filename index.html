@@ -270,13 +270,7 @@
   /* ═══ Réordonner les étapes au doigt ═══
      Les deux flèches obligeaient à taper plusieurs fois pour déplacer une
      étape de trois rangs. Un appui long la soulève, on la pose où l'on veut. */
-  .step-grip{
-    display:flex; flex-direction:column; gap:3px; padding:8px 6px; flex-shrink:0;
-    cursor:grab; touch-action:none; opacity:0.4; transition:opacity 0.2s;
-  }
-  .step-grip i{ display:block; width:16px; height:1.5px; border-radius:2px; background:#fff; }
-  .step-edit-item:active .step-grip, .step-edit-item.attrape .step-grip{ opacity:0.9; }
-
+  .step-edit-item:active .step-grip, .step-edit-item.attrape
   .step-edit-item{ touch-action:pan-y; }
   /* L'étape soulevée : elle passe au-dessus, s'agrandit à peine et porte une
      ombre portée pour qu'on sente qu'elle a quitté la pile. */
@@ -733,15 +727,33 @@
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     background:rgba(0,0,0,0.55); font-size:9px; font-weight:700;
   }
-  .step-img-actions{ flex:1; min-width:0; display:flex; gap:7px; }
-  .step-img-actions button{
-    flex:1; height:32px; border-radius:9px; border:0.5px solid var(--border);
-    background:rgba(255,255,255,0.07); color:#fff; font-family:inherit;
-    font-size:11.5px; font-weight:650;
+  /* ═══ La photo d'une étape ═══
+     La vignette EST la commande : on la touche pour choisir, la remplacer ou la
+     retirer. Le bouton séparé doublait la cible sans rien ajouter, et sur un
+     téléphone deux cibles côte à côte se manquent. */
+  .step-img{ display:flex; align-items:center; gap:11px; margin-top:10px; }
+  .step-img-vignette{
+    width:56px; height:56px; border-radius:11px; flex-shrink:0; overflow:hidden;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    display:flex; align-items:center; justify-content:center; position:relative;
+    transition:transform 0.16s, border-color 0.2s;
   }
-  .step-img-actions button:active{ background:rgba(255,255,255,0.16); }
-  .step-img-actions button.retirer{ flex:0 0 auto; padding:0 12px; color:var(--red); }
+  .step-img-vignette:active{ transform:scale(0.94); border-color:rgba(255,255,255,0.3); }
+  .step-img-vignette img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .step-img-vignette svg{ width:19px; height:19px; color:var(--label-3); }
+  /* Le petit « + » dit que la vignette se touche, là où un cadre vide ne dit rien. */
+  .step-img-vignette .att{
+    position:absolute; right:-3px; bottom:-3px; width:19px; height:19px;
+    border-radius:50%; background:#fff; color:#000; border:2px solid var(--bg-card);
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; line-height:0;
+  }
+  .img-toucher{
+    flex:1; min-width:0; text-align:left; border:none; background:none; padding:0;
+    color:var(--label-3); font-family:inherit; font-size:12.5px; font-weight:600;
+  }
   .step-img input[type=file]{ display:none; }
+
 
   /* Côté employé : l'image au-dessus du texte de l'étape. */
   .detail-step-img{
@@ -2159,6 +2171,16 @@
     transition: transform 0.26s cubic-bezier(0.22,1,0.36,1), opacity 0.2s ease;
   }
   .ios-alert-backdrop.shown .ios-alert{ transform:scale(1); opacity:1; }
+  .ios-alert-choix{ display:flex; flex-direction:column; }
+  .ios-alert-choix button{
+    height:46px; border:none; background:none; color:var(--blue);
+    font-family:inherit; font-size:16px; font-weight:500;
+    border-top:0.5px solid rgba(255,255,255,0.14);
+  }
+  .ios-alert-choix button:active{ background:rgba(255,255,255,0.07); }
+  .ios-alert-choix button.danger{ color:var(--red); }
+  .ios-alert-choix button.annuler{ font-weight:650; }
+
   .ios-alert-champ{
     width:100%; margin-top:13px; height:42px; padding:0 13px;
     border-radius:11px; border:0.5px solid rgba(255,255,255,0.18);
@@ -9932,15 +9954,13 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
 
   conteneur.addEventListener('pointerdown', (e) => {
     // Le texte, la corbeille et les boutons de photo gardent leur usage normal.
-    if (e.target.closest('textarea, button, .del, input')) return
+    if (e.target.closest('textarea, button, .del, input, .img-toucher')) return
     const item = e.target.closest('.step-edit-item')
     if (!item) return
     const index = elements().indexOf(item)
     if (index < 0) return
     depart = { x: e.clientX, y: e.clientY }
-    // La poignée réagit tout de suite, le reste de la carte après un appui long.
-    const surPoignee = !!e.target.closest('.step-grip')
-    if (surPoignee) { e.preventDefault(); souleverPuisSuivre(index, item, e.clientY); return }
+    /* Plus de poignée : l'appui long sur la carte est le seul geste. */
     attente = setTimeout(() => { attente = null; souleverPuisSuivre(index, item, e.clientY) }, DELAI_APPUI_LONG)
   })
 
@@ -9957,9 +9977,9 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
 
 /* Poignée de déplacement. Elle remplace les deux flèches : trois traits, le
    geste universel du « prends-moi et déplace-moi ». */
-function gripHtml() {
-  return '<span class="step-grip" aria-label="Déplacer l\'étape"><i></i><i></i><i></i></span>'
-}
+/* Les trois barres de déplacement ont été retirées : l'appui long sur la carte
+   fait déjà le même travail, et sur un téléphone une poignée de seize pixels se
+   manque une fois sur deux. La carte entière est une cible bien plus sûre. */
 
 
 // ═══ Étapes manuelles (texte seul, pas de vidéo) ═══
@@ -9983,15 +10003,13 @@ function renderManualSteps() {
         <div class="step-img-vignette">${step.image_url
           ? `<img src="${step.image_url}" alt="">`
           : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
-        <div class="step-img-actions">
-          <button type="button" class="choisir">${step.image_url || step.imageFichier ? 'Changer la photo' : 'Ajouter une photo'}</button>
-          ${step.image_url || step.imageFichier ? '<button type="button" class="retirer">Retirer</button>' : ''}
-        </div>
+        <button type="button" class="img-toucher" aria-label="Photo de l'étape">
+          <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
+        </button>
         <input type="file" accept="image/*" class="fichier">
       </div>
       <div class="step-row-bottom">
-        ${gripHtml()}
-        <span class="del">${TRASH_SVG}</span>
+                <span class="del">${TRASH_SVG}</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
@@ -10001,17 +10019,33 @@ function renderManualSteps() {
        part avec la publication, en même temps que le reste. Inutile d'occuper
        le réseau pour une étape qui sera peut-être supprimée. */
     const champFichier = div.querySelector('.fichier')
-    div.querySelector('.choisir').addEventListener('click', () => champFichier.click())
+    /* La vignette EST la commande. Sans photo, elle ouvre directement le
+       sélecteur — poser une question quand il n'y a qu'une réponse serait un
+       geste de trop. Avec une photo, elle propose de remplacer ou de retirer. */
+    const toucherPhoto = async () => {
+      if (!(manualSteps[i].image_url || manualSteps[i].imageFichier)) { champFichier.click(); return }
+      const choix = await choisirAction({
+        titre: `Photo de l'\u00e9tape ${i + 1}`,
+        options: [
+          { cle: 'changer', libelle: 'Remplacer la photo' },
+          { cle: 'retirer', libelle: 'Retirer la photo', danger: true },
+        ],
+      })
+      if (choix === 'changer') champFichier.click()
+      if (choix === 'retirer') {
+        manualSteps[i].imageFichier = null
+        manualSteps[i].image_url = null
+        renderManualSteps()
+      }
+    }
+    div.querySelector('.step-img-vignette')?.addEventListener('click', toucherPhoto)
+    div.querySelector('.img-toucher')?.addEventListener('click', toucherPhoto)
+
     champFichier.addEventListener('change', (e) => {
       const f = e.target.files[0]
       if (!f) return
       if (f.size > 6 * 1024 * 1024) { toast('Photo trop lourde : 6 Mo maximum.'); return }
       manualSteps[i].imageFichier = f
-      manualSteps[i].image_url = null
-      renderManualSteps()
-    })
-    div.querySelector('.retirer')?.addEventListener('click', () => {
-      manualSteps[i].imageFichier = null
       manualSteps[i].image_url = null
       renderManualSteps()
     })
@@ -13802,6 +13836,35 @@ function calculerBornes(etapes, duree) {
    confirmation. `prompt()` du navigateur aurait suffi techniquement, mais il
    ouvre une boîte système grise au milieu d'une app soignée — et sur iPhone,
    il peut être bloqué sans prévenir. */
+/* Une fenêtre à deux ou trois choix, sur le modèle des fenêtres de confirmation.
+   Renvoie la clé choisie, ou `null` si l'on ferme. */
+function choisirAction({ titre, options }) {
+  return new Promise((resoudre) => {
+    const fond = document.createElement('div')
+    fond.className = 'ios-alert-backdrop'
+    fond.innerHTML = `
+      <div class="ios-alert" role="dialog" aria-modal="true">
+        <div class="ios-alert-body"><div class="ios-alert-title">${escapeHtml(titre)}</div></div>
+        <div class="ios-alert-choix">
+          ${options.map(o => `<button type="button"${o.danger ? ' class="danger"' : ''}
+            data-cle="${escapeHtml(o.cle)}">${escapeHtml(o.libelle)}</button>`).join('')}
+          <button type="button" class="annuler" data-cle="">Annuler</button>
+        </div>
+      </div>`
+    document.body.appendChild(fond)
+    requestAnimationFrame(() => fond.classList.add('shown'))
+
+    const fermer = (v) => {
+      fond.classList.add('closing')
+      setTimeout(() => { fond.remove(); resoudre(v) }, 180)
+    }
+    fond.querySelectorAll('[data-cle]').forEach(b => {
+      b.addEventListener('click', () => fermer(b.dataset.cle || null))
+    })
+    fond.addEventListener('click', (e) => { if (e.target === fond) fermer(null) })
+  })
+}
+
 function demanderTexte({ titre, message, valeur = '', placeholder = '', confirmer = 'Valider', annuler = 'Annuler' }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
@@ -13934,14 +13997,60 @@ function renderEditSteps() {
         <div class="step-num" style="background:${COULEUR_ETAPE(i)};color:#0B0B0D">${i + 1}</div>
         <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       </div>
+      ${hasClip ? '' : `<div class="step-img">
+          <div class="step-img-vignette">${step.image_url
+            ? `<img src="${step.image_url}" alt="">`
+            : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
+          <button type="button" class="img-toucher" aria-label="Photo de l'étape">
+            <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
+          </button>
+          <input type="file" accept="image/*" class="fichier">
+      </div>`}
       <div class="step-row-bottom">
         ${hasClip ? `<span class="range">${formatTime(debut)} → ${formatTime(fin)}</span>` : ''}
-        ${gripHtml()}
-        <span class="del">${TRASH_SVG}</span>
+                <span class="del">${TRASH_SVG}</span>
       </div>
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; autoResizeTextarea(e.target) })
+
+    /* La photo, pour les étapes sans extrait vidéo. Les mêmes gestes qu'à la
+       création : la vignette est la commande, et elle propose de remplacer ou de
+       retirer quand une photo est déjà là. */
+    const champFichier = div.querySelector('.fichier')
+    if (champFichier) {
+      const toucherPhoto = async () => {
+        if (!(editStepsData[i].image_url || editStepsData[i].imageFichier)) { champFichier.click(); return }
+        const choix = await choisirAction({
+          titre: `Photo de l'\u00e9tape ${i + 1}`,
+          options: [
+            { cle: 'changer', libelle: 'Remplacer la photo' },
+            { cle: 'retirer', libelle: 'Retirer la photo', danger: true },
+          ],
+        })
+        if (choix === 'changer') champFichier.click()
+        if (choix === 'retirer') {
+          /* On note le retrait au lieu d'effacer tout de suite : tant qu'on n'a
+             pas enregistré, on peut encore changer d'avis. */
+          editStepsData[i].imageARetirer = !!editStepsData[i].image_url
+          editStepsData[i].image_url = null
+          editStepsData[i].imageFichier = null
+          renderEditSteps()
+        }
+      }
+      div.querySelector('.step-img-vignette')?.addEventListener('click', toucherPhoto)
+      div.querySelector('.img-toucher')?.addEventListener('click', toucherPhoto)
+
+      champFichier.addEventListener('change', (e) => {
+        const f = e.target.files[0]
+        if (!f) return
+        if (f.size > 6 * 1024 * 1024) { toast('Photo trop lourde : 6 Mo maximum.'); return }
+        editStepsData[i].imageFichier = f
+        editStepsData[i].image_url = null
+        editStepsData[i].imageARetirer = false
+        renderEditSteps()
+      })
+    }
     div.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation()
       demanderSuppressionEtape(i + 1, editStepsData[i].texte, () => {
@@ -13953,7 +14062,7 @@ function renderEditSteps() {
     })
     if (editVideoUrl) {
       div.addEventListener('click', (e) => {
-        if (e.target.closest('textarea, button, .del, .step-grip')) return
+        if (e.target.closest('textarea, button, .del, .img-toucher')) return
         if (listEl.dataset.glissementRecent) return
         ecapEditor?.select(i)
       })

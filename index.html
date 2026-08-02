@@ -277,6 +277,20 @@
   /* ═══ Les étapes manuelles, en fil ═══
      Un trait relie les numéros et dit l'ordre sans qu'on ait à le lire. Une
      procédure EST une suite : la forme le montre au lieu de l'énoncer. */
+  /* Le rappel de ce qu'on écrit : discret, mais toujours là. Sans lui, on entre
+     dans une page d'étapes sans savoir de quelle procédure il s'agit — ce qui
+     arrive vite quand on en crée plusieurs à la suite. */
+  .rappel-proc{
+    display:flex; align-items:center; gap:7px; width:100%; margin-top:14px;
+    padding:9px 12px; border-radius:12px; text-align:left;
+    background:rgba(255,255,255,0.045); border:0.5px solid var(--border);
+    font-family:inherit; font-size:12.5px; color:var(--label-2); font-weight:600;
+  }
+  .rappel-proc .tx{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rappel-proc .tx b{ color:#fff; font-weight:700; }
+  .rappel-proc .c{ flex-shrink:0; font-size:11.5px; color:var(--blue); font-weight:650; }
+  .rappel-proc:active{ background:rgba(255,255,255,0.08); }
+
   .man-lbl{
     font-size:12.5px; font-weight:650; color:var(--label-3); margin:20px 0 8px;
     display:flex; align-items:center; justify-content:space-between;
@@ -3495,12 +3509,23 @@
     </div>
     <div class="subhead" id="man-sous">Écrivez chaque étape dans l’ordre</div>
 
-    <!-- Titre et catégorie sont ici, et plus seulement sur l'écran précédent :
-         c'est ce qui permet à la même page de servir à créer ET à modifier. -->
-    <div class="man-lbl">Catégorie</div>
-    <input type="text" class="man-champ" id="man-categorie" placeholder="Ex : Cuisine">
-    <div class="man-lbl">Titre</div>
-    <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
+    <!-- Catégorie et titre n'apparaissent QU'EN MODIFICATION. À la création ils
+         ont déjà été demandés sur l'écran précédent, et les redemander donnerait
+         l'impression de recommencer. En modification il faut bien pouvoir les
+         corriger : c'est le seul endroit où ils ont leur place. -->
+    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
+         pour le corriger. On entre directement dans le travail. -->
+    <button type="button" class="rappel-proc" data-rappel>
+      <span class="tx"><b>—</b></span>
+      <span class="c">Modifier</span>
+    </button>
+
+    <div id="man-entete" style="display:none;">
+      <div class="man-lbl">Catégorie</div>
+      <input type="text" class="man-champ" id="man-categorie" placeholder="Ex : Cuisine">
+      <div class="man-lbl">Titre</div>
+      <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
+    </div>
 
     <div class="man-lbl">Image de la procédure</div>
     <div class="couv man-couv" id="couv-manuel">
@@ -3538,14 +3563,14 @@
     </div>
     <div class="subhead">Marquez les étapes pendant la lecture</div>
 
-    <!-- Le même début que les trois autres modes : catégorie, titre, puis la
-         source. Un seul patron, quatre façons d'y arriver. -->
-    <div class="man-lbl">Catégorie</div>
-    <input type="text" class="man-champ" id="vid-categorie" placeholder="Ex : Cuisine">
-    <div class="man-lbl">Titre</div>
-    <input type="text" class="man-champ" id="vid-titre" placeholder="Ex : Fermeture de caisse">
-
     <div class="man-lbl">La vidéo</div>
+
+    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
+         pour le corriger. On entre directement dans le travail. -->
+    <button type="button" class="rappel-proc" data-rappel>
+      <span class="tx"><b>—</b></span>
+      <span class="c">Modifier</span>
+    </button>
 
     <div class="dv-depot" id="dv-depot">
       <input type="file" id="video-input" accept="video/*">
@@ -3607,14 +3632,15 @@
     </div>
     <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
 
-    <!-- Le même début que les autres modes. Les étapes, elles, arrivent sur
-         l'écran de vérification — c'est là qu'on retrouve le fil. -->
-    <div class="man-lbl">Catégorie</div>
-    <input type="text" class="man-champ" id="doc-categorie" placeholder="Ex : Cuisine">
-    <div class="man-lbl">Titre</div>
-    <input type="text" class="man-champ" id="doc-titre" placeholder="Ex : Fermeture de caisse">
 
     <div class="man-lbl">Le document</div>
+
+    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
+         pour le corriger. On entre directement dans le travail. -->
+    <button type="button" class="rappel-proc" data-rappel>
+      <span class="tx"><b>—</b></span>
+      <span class="c">Modifier</span>
+    </button>
 
     <div class="card" id="doc-saisie-card">
       <div class="note" style="margin-bottom:12px;">
@@ -3651,6 +3677,13 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe la vidéo</h1>
     </div>
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
+
+    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
+         pour le corriger. On entre directement dans le travail. -->
+    <button type="button" class="rappel-proc" data-rappel>
+      <span class="tx"><b>—</b></span>
+      <span class="c">Modifier</span>
+    </button>
 
     <div class="card" id="ai-upload-card">
       <div class="note" style="margin-bottom:12px;">L'IA travaille au mieux sur des vidéos de <b style="color:#fff;">moins de 10 minutes</b>. Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.</div>
@@ -8676,7 +8709,7 @@ function updateModeCardsState() {
    cet instant : cette fonction préfère le champ déjà rempli, donc au chargement
    elle renvoyait celui de la page des étapes — l'écouteur se posait sur un champ
    qu'on ne remplit jamais ici, et les quatre modes restaient verrouillés. */
-;['new-titre', 'new-categorie', 'man-titre', 'man-categorie', 'vid-titre', 'vid-categorie', 'doc-titre', 'doc-categorie'].forEach(id => {
+;['new-titre', 'new-categorie', 'man-titre', 'man-categorie', ].forEach(id => {
   document.getElementById(id)?.addEventListener('input', updateModeCardsState)
 })
 
@@ -8709,6 +8742,7 @@ window.ouvrirEtapesManuelles = async function(procId) {
   el('man-annuler').textContent = manEdition
     ? 'Annuler les modifications' : 'Tout effacer'
   el('create-error-manual').textContent = ''
+  el('man-entete').style.display = manEdition ? 'block' : 'none'
 
   if (!manEdition) {
     /* En création, on reprend ce qui a été saisi sur l'écran précédent. */
@@ -8781,11 +8815,25 @@ document.getElementById('man-retour')?.addEventListener('click', () => {
   showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
 })
 
+/* Le rappel affiche ce qui a été saisi à l'écran précédent, et y ramène. */
+function majRappelProc() {
+  const titre = document.getElementById('new-titre')?.value.trim() || 'Sans titre'
+  const cat = document.getElementById('new-categorie')?.value.trim()
+  document.querySelectorAll('[data-rappel] .tx').forEach(el => {
+    el.innerHTML = `<b>${escapeHtml(titre)}</b>${cat ? ' \u00b7 ' + escapeHtml(cat) : ''}`
+  })
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-rappel]')) showGestionScreen('p-create')
+})
+
 function goToCreateMode(mode) {
+  majRappelProc()
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
   if (mode === 'manual') { ouvrirEtapesManuelles(null); return }
-  else if (mode === 'video') showGestionScreen('p-create-video')
+  else if (mode === 'video') { ouvrirMontageVideo(null); return }
   else showGestionScreen('p-create-ai')
 }
 window.goToCreateMode = goToCreateMode
@@ -10156,6 +10204,79 @@ ecapEditor = createClipEditor({
 })
 
 // ═══ Import de la vidéo (création) ═══
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'IA DÉPOSE SES ÉTAPES DANS LE MONTAGE
+
+   Il y avait deux écrans pour la même chose : le découpage à la main, et la
+   « vérification » de ce que l'IA avait produit. Deux écrans qui font le même
+   travail finissent toujours par diverger — l'un reçoit une amélioration,
+   l'autre non.
+
+   Désormais l'IA dépose ses étapes dans le montage, et l'on continue là où elle
+   s'est arrêtée : on peut ajuster une borne, en ajouter une qu'elle a manquée,
+   supprimer un doublon. Le bouton dit « Terminer l'étape 4 » alors qu'elle en a
+   produit trois — c'est exactement ce qu'un écran séparé interdisait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let dvEdition = null      // identifiant de la procédure ouverte, ou null en création
+
+window.ouvrirMontageVideo = async function(procId) {
+  dvEdition = procId || null
+  showGestionScreen('p-create-video')
+
+  const el = (i) => document.getElementById(i)
+  el('create-error-video').textContent = ''
+  el('publish-btn-video').textContent = dvEdition
+    ? 'Enregistrer les modifications' : 'Publier la proc\u00e9dure'
+
+  if (!dvEdition) { majRappelProc(); return }
+
+  const [{ data: proc }, { data: etapes }] = await Promise.all([
+    supabase.from('procedures').select('*').eq('id', procId).single(),
+    supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
+  ])
+  if (!proc) { el('create-error-video').textContent = 'Proc\u00e9dure introuvable.'; return }
+
+  /* Le rappel montre la procédure ouverte, pas celle qu'on était en train de
+     créer. */
+  document.querySelectorAll('[data-rappel] .tx').forEach(x => {
+    x.innerHTML = `<b>${escapeHtml(proc.titre || 'Sans titre')}</b>` +
+      (proc.categorie ? ' \u00b7 ' + escapeHtml(proc.categorie) : '')
+  })
+
+  currentVideoFile = null
+  reinitialiserCouverture(proc.image_url || null)
+
+  const player = el('video-player')
+  player.src = proc.video_url || ''
+  player.style.display = proc.video_url ? 'block' : 'none'
+  el('video-placeholder').style.display = proc.video_url ? 'none' : 'block'
+  el('dv-travail').style.display = 'block'
+
+  /* Les bornes sont déduites quand elles manquent : une étape sans fin prend le
+     début de la suivante. C'est ce que fait déjà la fiche. */
+  const bornes = calculerBornes(etapes || [], null)
+  videoSteps = (etapes || []).map(e => {
+    const b = bornes.get(e.id)
+    return {
+      id: e.id, texte: e.texte || '',
+      timestamp_video: b ? b.start : (e.timestamp_video || 0),
+      fin_video: b ? b.end : (e.fin_video || 0),
+      image_url: e.image_url || null,
+    }
+  })
+
+  dvDebutEnCours = videoSteps.length ? videoSteps[videoSteps.length - 1].fin_video : 0
+  dvSelection = null
+  dvMajGeste()
+  renderVideoSteps()
+
+  player.addEventListener('loadedmetadata', async () => {
+    dvMajFrise()
+    await generateFilmstrip(player, 'capcut-track')
+  }, { once: true })
+}
+
 document.getElementById('video-input')?.addEventListener('change', async (e) => {
   const file = e.target.files[0]
   if (!file) return
@@ -10924,7 +11045,7 @@ function champManuel(quoi) {
   /* Trois pages peuvent porter ces champs : l'écran de choix, celui des étapes
      manuelles et celui du découpage vidéo. On prend le premier qui est rempli,
      en commençant par l'écran affiché. */
-  const ordre = ['man-', 'vid-', 'doc-', 'new-'].map(pre => document.getElementById(pre + quoi))
+  const ordre = ['man-', 'new-'].map(pre => document.getElementById(pre + quoi))
   const visible = ordre.find(e => e && e.offsetParent !== null && e.value.trim())
   if (visible) return visible
   return ordre.find(e => e && e.value.trim()) || ordre.find(Boolean)
@@ -10961,18 +11082,19 @@ async function publishProcedure(errorElId, btnId) {
   /* En modification, on met à jour la ligne existante au lieu d'en créer une
      nouvelle. Le reste du parcours — photos, étapes, couverture — est le même :
      c'est ce qui permet à une seule page de servir aux deux. */
-  const { data: newProc, error: procError } = manEdition
+  const enCours = manEdition || dvEdition
+  const { data: newProc, error: procError } = enCours
     ? await supabase.from('procedures')
         .update({ titre, categorie, categorie_icone: categorieIcone })
-        .eq('id', manEdition).select().single()
+        .eq('id', enCours).select().single()
     : await supabase.from('procedures')
         .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, categorie_icone: categorieIcone, video_url: videoUrl, created_by: currentMembre.id })
         .select().single()
 
   /* Les anciennes étapes sont remplacées : c'est plus sûr que de rapprocher
      ligne à ligne, et l'ordre reste celui de l'écran. */
-  if (manEdition && !procError) {
-    await supabase.from('etapes').delete().eq('procedure_id', manEdition)
+  if (enCours && !procError) {
+    await supabase.from('etapes').delete().eq('procedure_id', enCours)
   }
 
   if (procError) {
@@ -11016,8 +11138,9 @@ async function publishProcedure(errorElId, btnId) {
 
   /* Après une modification, on revient sur la fiche : c'est de là qu'on venait,
      et c'est là qu'on veut vérifier le résultat. */
-  const modifiait = manEdition
+  const modifiait = manEdition || dvEdition
   manEdition = null
+  dvEdition = null
   manualSteps = []
   videoSteps = []
   loadGestionProcedures()
@@ -11094,8 +11217,10 @@ async function openAnalyse(procId) {
   /* Une procédure sans vidéo se modifie sur la page des étapes manuelles — la
      même qui a servi à l'écrire. Celles qui ont une vidéo gardent leur éditeur :
      régler des bornes au dixième de seconde demande un autre outil. */
+  /* Une procédure se modifie là où elle a été écrite : le montage si elle a une
+     vidéo, le fil des étapes sinon. Plus d'éditeur à part. */
   document.getElementById('analyse-edit-btn').onclick = () => {
-    if (proc.video_url) openEditProcedure(procId, 'edit')
+    if (proc.video_url) ouvrirMontageVideo(procId)
     else ouvrirEtapesManuelles(procId)
   }
   document.getElementById('analyse-delete-btn').onclick = async () => {
@@ -12018,9 +12143,12 @@ function majBandeauCoches() {
   if (!etat || !etapesTotal) return
   const n = etapesFaites.size
   const fini = n === etapesTotal
+  /* Visible dès l'ouverture, même à 0 sur 8 : c'est ce qui dit à quoi servent les
+     cases. Un bandeau qui apparaît en cours de route ne s'explique pas. */
 
   etat.closest('.confirm-bar')?.classList.add('visible')
   etat.style.display = ''
+  etat.classList.remove('pointe')
   etat.classList.toggle('faite', fini)
   dessinerAnneauLecture(
     Math.round((n / etapesTotal) * 100),
@@ -13644,10 +13772,11 @@ function demarrerLecture(procId, dejaConsultee) {
   const err = document.getElementById('confirm-error')
   if (err) err.textContent = ''
 
-  if (lectureEnregistree) { afficherLectureFaite(dejaConsultee); return }
-
-  // Rien à l'écran pendant la lecture : le bandeau reste replié.
-  bandeau?.classList.remove('visible')
+  /* Le bandeau reste ouvert en permanence : il montre l'avancement des cases,
+     dès 0 sur 8. Il ne dit plus rien de la consultation enregistrée — le membre
+     n'a pas à savoir qu'un seuil a été franchi. */
+  bandeau?.classList.add('visible')
+  majBandeauCoches()
   derniereActivite = Date.now()
   veilleAvertie = false
 
@@ -13750,18 +13879,16 @@ async function ecrireTempsLecture() {
   }
 }
 
-function afficherLectureFaite(quand) {
-  const etat = document.getElementById('lecture-etat')
-  if (!etat) return
-  etat.closest('.confirm-bar')?.classList.add('visible')
-  etat.style.display = ''
-  etat.classList.add('faite')
-  dessinerAnneauLecture(100, 'var(--green)', '✓')
-  document.getElementById('lecture-titre').textContent = 'Procédure consultée'
-  document.getElementById('lecture-sous').textContent =
-    quand && quand !== true
-      ? 'Enregistré le ' + new Date(quand).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
-      : "Enregistré à l'instant"
+/* L'enregistrement de la consultation ne se voit plus.
+
+   Le membre n'a pas à savoir qu'un seuil a été franchi à trente secondes : cette
+   information ne l'aide pas à travailler, et savoir qu'on est mesuré change la
+   façon de lire — on parcourt au lieu de lire, et la mesure devient fausse pour
+   la raison même qui la rend utile.
+
+   Ce qu'il voit à la place, en permanence : où il en est dans ses étapes. */
+function afficherLectureFaite() {
+  majBandeauCoches()
 }
 
 function dessinerAnneauLecture(pct, couleur, texte) {

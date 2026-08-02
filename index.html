@@ -2722,14 +2722,46 @@
      faible sur une grande surface — mais deux éléments qui se font face en haut
      et en bas de l'écran doivent porter la même matière, pas une matière
      corrigée. */
-  /* La barre d'origine, en un seul élément. J'avais essayé de la scinder en un
-     rail et une enveloppe pour récupérer le flou sur iOS : ça marchait, mais ça
-     ajoutait un cadre visible autour des boutons. Le rendu d'origine passe
-     avant. */
-  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
+  /* ═════════════════════════════════════════════════════════════════
+     LA BARRE DU BAS
+
+     Bâtie sur le même plan que la barre du haut : une carte de verre qui porte
+     les onglets, et un bouton rond à côté — exactement comme la carte du logo
+     et le bouton des réglages se répondent en haut de l'écran.
+
+     Deux conséquences, et c'est tout l'intérêt.
+
+     Un seul verre, pas deux : le groupe portait son propre fond à l'intérieur
+     d'un autre, ce qui dessinait un cadre en trop.
+
+     Et surtout, plus aucun `transform`. Le rail occupe toute la largeur et
+     centre par `justify-content`, comme `.topbar-row`. Sur Safari iOS, un
+     `transform` sur un élément à `backdrop-filter` crée un contexte de rendu
+     séparé et le flou disparaît — c'est ce qui empêchait le verre de prendre.
+     ═════════════════════════════════════════════════════════════════ */
+  .barre{
+    position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
+    left:0; right:0; z-index:10;
+    align-items:center; justify-content:center; gap:10px;
+    pointer-events:none;      /* le rail laisse passer les touchers */
+  }
+  .barre > *{ pointer-events:auto; }
+
+  /* Le même verre que `.topbar-card`, aux mêmes valeurs. */
+  .barre-carte{
+    display:flex; align-items:center; gap:4px;
+    padding:5px; border-radius:100px;
+    background:rgba(255,255,255,0.10);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(255,255,255,0.18);
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+  }
+
+  /* Le bouton « + » garde sa taille et son verre à lui, comme le bouton des
+     réglages en haut. */
+  .barre > .tab-round--primary{
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25);
+  }
 
   /* ═══ Barre d'onglets (les deux espaces) ═══
      Deux éléments distincts : un groupe en verre qui contient les onglets, et
@@ -2778,17 +2810,7 @@
      Une teinte basse laisse voir à travers, un flou élevé rend illisible ce
      qu'on voit. On veut les deux : 7 % de teinte pour la transparence, 50 px
      de flou pour que le fond ne soit plus qu'une tache de couleur. */
-  #tabbar-gestion .groupe, #tabbar-equipe .groupe{
-    display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
-    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
-    /* Même teinte et même liseré que la barre du haut, mais un flou plus élevé :
-       un flou s'atténue près des bords, et sur une pastille étroite les bords sont
-       partout. À 24 px comme la carte du logo, le résultat paraît plus net ici.
-       48 px redonne le même grain à l'œil. */
-    -webkit-backdrop-filter:blur(48px) saturate(180%); backdrop-filter:blur(48px) saturate(180%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
-  }
-  /* ═══ Pourquoi le libellé est en position absolue ═══
+  #tabbar-gestion .groupe, #tabbar-equipe  /* ═══ Pourquoi le libellé est en position absolue ═══
      Faire varier `max-width` sur le texte le rognait progressivement : on
      voyait les lettres se faire couper, ce qui ne ressemble à rien de naturel.
      Le libellé est donc sorti du flux et ne fait plus qu'apparaître en fondu
@@ -4064,9 +4086,9 @@
   </div>
 </div>
 
-<nav class="tabbar" id="tabbar-gestion" style="display:none;">
+<nav class="barre" id="tabbar-gestion" style="display:none;">
   
-  <div class="groupe">
+  <div class="barre-carte">
   <button class="tab-round tab-round--secondary active" onclick="showGestionScreen('p-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>
@@ -4411,9 +4433,9 @@
   </div>
 </div>
 
-<nav class="tabbar" id="tabbar-equipe" style="display:none;">
+<nav class="barre" id="tabbar-equipe" style="display:none;">
   
-  <div class="groupe">
+  <div class="barre-carte">
   <button class="tab-round tab-round--secondary active" onclick="showEquipeScreen('e-list', this)" aria-label="Procédures">
     <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"/><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"/></svg>

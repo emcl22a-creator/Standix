@@ -2698,18 +2698,13 @@
      faible sur une grande surface — mais deux éléments qui se font face en haut
      et en bas de l'écran doivent porter la même matière, pas une matière
      corrigée. */
-  /* La barre est centrée par des marges, PAS par `transform`.
+  /* Exactement la matière de `.topbar-card` et `.icon-pill` : même fond, même
+     flou, même liseret, même ombre. Les trois éléments flottants de l'app
+     portent le même verre.
 
-     C'est la cause du flou faible : sur Safari iOS, un `transform` sur un
-     élément qui porte un `backdrop-filter` dégrade ou annule le flou — il crée
-     un contexte de rendu séparé, et le navigateur n'a plus accès à ce qu'il y a
-     derrière. La carte du haut n'a pas de `transform`, d'où son verre net avec
-     exactement les mêmes valeurs.
-
-     `left:0; right:0; margin-inline:auto; width:fit-content` centre aussi bien,
-     sans toucher au rendu. */
-  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
-    left:0; right:0; margin-inline:auto; width:-moz-fit-content; width:fit-content;
+     Le `transform` de centrage est celui d'origine : c'est lui qui donne à la
+     barre sa position exacte, et la changer la déplaçait. */
+  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
@@ -3118,6 +3113,7 @@
     </div>
 
     <div class="list-tools">
+      <div class="section-title" style="margin:0;">Catégories</div>
       <div class="dd-filter" id="dd-cat-sort">
         <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
           <span id="dd-cat-sort-label">Trier : A → Z</span>

@@ -660,8 +660,7 @@
   .fm-nom{ font-size:26px; font-weight:700; letter-spacing:-0.03em; }
   .fm-rl{ font-size:13px; color:var(--label-3); font-weight:600; margin-top:3px; }
   .fm-tete .ma-medaille{ width:46px; height:46px; }
-  .fm-tete .ma-medaille .nb{ font-size:16px; }
-  .fm-serie{ font-size:12.5px; color:var(--label-2); text-align:right; margin-top:6px; }
+  .fm-tete  .fm-serie{ font-size:12.5px; color:var(--label-2); text-align:right; margin-top:6px; }
   .fm-serie b{ color:#fff; font-weight:700; }
 
   .fm-courbe{ display:flex; gap:5px; align-items:flex-end; height:52px; margin-top:6px; }
@@ -1809,17 +1808,12 @@
      Du verre teinté, pas du métal : le même vocabulaire que les barres et les
      cartes de l'app. La teinte, le liseré et la lueur viennent du palier, portés
      par des variables — une seule règle sert donc aux six paliers. */
+  /* La médaille n'est plus qu'un cadre : le fond, le bord et la lumière sont
+     dans le dessin lui-même. Un rond en CSS par-dessus un hexagone en SVG
+     aurait rogné les pointes. */
   .ma-medaille{
-    position:relative; flex-shrink:0; border-radius:50%; overflow:hidden;
-    display:inline-flex; align-items:center; justify-content:center;
-    border:1px solid var(--bd);
-    background:radial-gradient(circle at 32% 26%, var(--t55), var(--t18) 62%, transparent);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.28), var(--lueur);
-    -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
-  }
-  .ma-medaille .nb{
-    position:relative; z-index:2; font-weight:850; letter-spacing:-0.04em;
-    text-shadow:0 1px 6px rgba(0,0,0,0.45);
+    position:relative; flex-shrink:0; display:inline-flex;
+    align-items:center; justify-content:center; line-height:0;
   }
 
   /* Ouverture en buée : la médaille arrive floue et légèrement trop grande,
@@ -1831,7 +1825,7 @@
   }
   @keyframes medailleChiffre{ from{ opacity:0; } to{ opacity:1; } }
   .ma-medaille.arrive{ animation:medailleBuee 0.72s cubic-bezier(0.22,1,0.36,1) both; }
-  .ma-medaille.arrive .nb{ animation:medailleChiffre 0.5s ease-out 0.22s both; }
+  .ma-medaille.arrive text{ animation:medailleChiffre 0.5s ease-out 0.22s both; }
   @media (prefers-reduced-motion: reduce){
     .ma-medaille.arrive, .ma-medaille.arrive .nb{ animation:none; }
   }
@@ -7014,12 +7008,18 @@ function serieConsecutive(lectures) {
 /* Les paliers de la médaille. Chacun change la matière, pas seulement la
    couleur : on doit voir d'un coup d'œil qu'on a franchi un cap. */
 const PALIERS_MEDAILLE = [
-  { min: 0,  nom: 'éteinte',    t: '255,255,255', lueur: null,                    vif: false },
-  { min: 1,  nom: 'bronze',     t: '224,162,106', lueur: null,                    vif: true  },
-  { min: 3,  nom: 'argent',     t: '226,232,240', lueur: null,                    vif: true  },
-  { min: 7,  nom: 'or',         t: '255,214,80',  lueur: 'rgba(255,214,80,.22)',  vif: true  },
-  { min: 14, nom: 'ardente',    t: '255,140,40',  lueur: 'rgba(255,140,30,.28)',  vif: true  },
-  { min: 30, nom: 'légendaire', t: '150,140,255', lueur: 'rgba(150,120,255,.32)', vif: true  },
+  /* Trois teintes par palier au lieu d'une : le haut de la matière, le bas, et
+     la lumière du bord. C'est ce qui donne le relief — une couleur plate n'a
+     jamais l'air d'un objet qu'on a gagné.
+
+     `lueur` n'apparaît qu'à partir d'une semaine : un halo sur chaque médaille
+     ne distinguerait plus rien. */
+  { min: 0,  nom: '\u00e9teinte',    haut:'#3A3A3E', bas:'#232326', bord:'rgba(255,255,255,0.14)', lueur:null,                       chiffre:'rgba(235,235,245,0.40)' },
+  { min: 1,  nom: 'cuivre',     haut:'#C88A5A', bas:'#7A4A28', bord:'rgba(255,208,168,0.75)', lueur:null,                       chiffre:'#FFE6D2' },
+  { min: 3,  nom: 'argent',     haut:'#F2F5FA', bas:'#98A2B4', bord:'rgba(255,255,255,0.95)', lueur:null,                       chiffre:'#3A4152' },
+  { min: 7,  nom: 'or',         haut:'#FFE168', bas:'#C48B00', bord:'rgba(255,238,170,0.92)', lueur:'rgba(255,214,10,0.42)',    chiffre:'#5A3E00' },
+  { min: 14, nom: 'ardente',    haut:'#FFB84D', bas:'#D2450A', bord:'rgba(255,214,160,0.92)', lueur:'rgba(255,120,20,0.50)',    chiffre:'#4A1500' },
+  { min: 30, nom: 'l\u00e9gendaire', haut:'#C99BFF', bas:'#5B2BC4', bord:'rgba(232,210,255,0.95)', lueur:'rgba(150,90,255,0.55)',    chiffre:'#2A0A5C' },
 ]
 
 function palierMedaille(serie) {
@@ -7036,19 +7036,55 @@ function palierMedaille(serie) {
    médailles coexistent sur un même écran. */
 let compteurMedaille = 0
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA MÉDAILLE
+
+   Un hexagone taillé, dont les trois plans ne reçoivent pas la même lumière :
+   le haut s'éclaircit, la gauche s'assombrit, et un éclat spéculaire se pose en
+   haut à gauche. C'est ce qui donne le volume — sans aucune ombre portée, qui
+   aurait sali les listes.
+
+   Chaque médaille porte ses propres dégradés, avec un identifiant unique : deux
+   médailles côte à côte partageraient sinon la même définition, et la seconde
+   prendrait la couleur de la première.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let medailleNo = 0
+
 function medailleHtml(serie, taille, animer) {
   const p = palierMedaille(serie)
-  const eteinte = serie === 0
-  const style = [
-    `width:${taille}px`, `height:${taille}px`,
-    `--t55:rgba(${p.t},${eteinte ? 0.07 : 0.34})`,
-    `--t18:rgba(${p.t},${eteinte ? 0.03 : 0.12})`,
-    `--bd:rgba(${p.t},${eteinte ? 0.14 : 0.48})`,
-    `--lueur:${p.lueur ? '0 0 20px ' + p.lueur : '0 0 0 rgba(0,0,0,0)'}`,
-  ].join(';')
-  return `<span class="ma-medaille${animer ? ' arrive' : ''}" style="${style}"
-        data-palier="${p.nom}" title="${serie} jour${serie > 1 ? 's' : ''} d'affil\u00e9e \u00b7 m\u00e9daille ${p.nom}">
-    <span class="nb" style="color:${eteinte ? 'rgba(235,235,245,.4)' : '#fff'};font-size:${Math.round(taille * 0.34)}px">${serie}</span>
+  const id = ++medailleNo
+  const HEX = '24,3 41.2,13.5 41.2,34.5 24,45 6.8,34.5 6.8,13.5'
+
+  return `<span class="ma-medaille${animer ? ' arrive' : ''}"
+    style="width:${taille}px;height:${taille}px"
+    data-palier="${p.nom}" title="${serie} jour${serie > 1 ? 's' : ''} d'affil\u00e9e \u00b7 m\u00e9daille ${p.nom}">
+    <svg viewBox="0 0 48 48" width="${taille}" height="${taille}" fill="none">
+      <defs>
+        <linearGradient id="mg${id}" x1="0" y1="0" x2="0.35" y2="1">
+          <stop offset="0" stop-color="${p.haut}"/>
+          <stop offset="0.52" stop-color="${p.bas}"/>
+          <stop offset="1" stop-color="${p.haut}" stop-opacity="0.72"/>
+        </linearGradient>
+        <radialGradient id="me${id}" cx="0.32" cy="0.24" r="0.62">
+          <stop offset="0" stop-color="#fff" stop-opacity="0.62"/>
+          <stop offset="0.55" stop-color="#fff" stop-opacity="0.06"/>
+          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+        </radialGradient>
+        ${p.lueur ? `<filter id="mh${id}" x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="${(taille / 12).toFixed(1)}" result="f"/>
+          <feMerge><feMergeNode in="f"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>` : ''}
+      </defs>
+      ${p.lueur ? `<polygon points="${HEX}" fill="${p.lueur}" filter="url(#mh${id})" opacity="0.9"/>` : ''}
+      <polygon points="${HEX}" fill="url(#mg${id})" stroke="${p.bord}" stroke-width="1.1" stroke-linejoin="round"/>
+      <polygon points="24,3 41.2,13.5 24,24 6.8,13.5" fill="#fff" opacity="0.20"/>
+      <polygon points="6.8,13.5 24,24 24,45 6.8,34.5" fill="#000" opacity="0.16"/>
+      <polygon points="${HEX}" fill="url(#me${id})"/>
+      <text x="24" y="29" text-anchor="middle" font-family="Inter,sans-serif"
+            font-size="14.5" font-weight="850"
+            letter-spacing="-0.5" fill="${p.chiffre}">${serie}</text>
+    </svg>
   </span>`
 }
 
@@ -10589,12 +10625,11 @@ function renderManualSteps() {
   plus.className = 'man-plus'
   plus.innerHTML = `<span class="d">${plusEtapeDess()}</span>Ajouter une \u00e9tape`
   plus.addEventListener('click', () => {
+    /* On n'ouvre PAS le clavier sur la nouvelle étape. Il masque la moitié de
+       l'écran et fait sauter la page au moment où l'on veut justement voir ce
+       qu'on vient d'ajouter. Ajouter et écrire sont deux gestes distincts. */
     manualSteps.push({ texte: '' })
     renderManualSteps()
-    /* On donne le clavier à la nouvelle étape : sans ça il faut viser un champ
-       vide qu'on vient tout juste de créer. */
-    const champs = listEl.querySelectorAll('textarea')
-    champs[champs.length - 1]?.focus()
   })
   listEl.appendChild(plus)
 

@@ -3350,6 +3350,20 @@
         <div class="dv-aide" id="dv-aide">Regardez, et touchez le bouton chaque fois qu'une étape se termine.</div>
       </div>
 
+      <div class="couv" id="couv-video">
+        <input type="file" accept="image/*" class="fichier">
+        <span class="vign">
+          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/>
+          </svg>
+        </span>
+        <span class="tx">
+          <span class="t">Image de la procédure</span>
+          <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
+        </span>
+        <button type="button" class="oter" style="display:none;">Retirer</button>
+      </div>
+
       <div id="video-steps-list"></div>
 
       <button type="button" class="dv-plus" id="dv-plus">Aller plus loin</button>
@@ -3646,7 +3660,6 @@
             <circle cx="12" cy="7.6" r="0.7" fill="currentColor" stroke="none"/>
           </svg>
         </button>
-        <button type="button" class="an-lien" id="ga-tri-membres">Les plus actifs</button>
       </div>
       <div id="ga-top-membres"></div>
     </div>
@@ -4186,6 +4199,7 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;" id="detail-titre">—</h1>
     </div>
     <div class="subhead" id="detail-subhead">—</div>
+    <div class="analyse-couv" id="detail-couverture" style="display:none;"></div>
     <div class="video-frame" id="detail-video-frame" style="display:none;">
       <video id="detail-video" controls playsinline webkit-playsinline></video>
     </div>
@@ -11434,6 +11448,7 @@ function ficheEquipe(proc) {
   div.dataset.key = proc.id
   div.onclick = () => openEquipeDetail(proc.id)
   div.innerHTML = `
+    ${proc.image_url ? `<div class="carte-couv"><img src="${escapeHtml(proc.image_url)}" alt="" loading="lazy"></div>` : ''}
     <div class="cat-top">
       <div class="cat-ring-wrap">
         <svg viewBox="0 0 46 46">
@@ -11538,6 +11553,15 @@ async function openEquipeDetail(procId) {
 
   const videoFrame = document.getElementById('detail-video-frame')
   const detailVideoEl = document.getElementById('detail-video')
+  /* L'image de la procédure, comme côté gestion. Elle était proposée à la
+     création mais n'apparaîssait nulle part pour l'équipe — or c'est justement
+     eux qui en ont l'usage : elle dit d'un coup d'œil de quoi il s'agit. */
+  const couvEq = document.getElementById('detail-couverture')
+  if (couvEq) {
+    couvEq.innerHTML = proc.image_url ? `<img src="${escapeHtml(proc.image_url)}" alt="">` : ''
+    couvEq.style.display = proc.image_url ? 'block' : 'none'
+  }
+
   if (proc.video_url) {
     videoFrame.style.display = 'block'
     detailVideoEl.src = proc.video_url

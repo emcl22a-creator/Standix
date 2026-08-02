@@ -309,7 +309,15 @@
   }
   .man-fil textarea:focus{ outline:none; }
   .man-fil textarea::placeholder{ color:var(--label-3); }
-  .man-fil .step-bas{ display:flex; align-items:center; gap:10px; margin-top:9px; }
+  .man-fil .step-bas{ display:flex; align-items:flex-end; gap:10px; margin-top:10px; }
+
+  /* Dans le fil, la photo est un carré nu — sans son libellé à côté. Le cadre
+     dit déjà ce qu'il attend, et la ligne reste courte. */
+  .man-fil .step-img{ margin-top:0; }
+  .man-fil .step-img-vignette{ width:78px; height:78px; border-radius:12px; }
+  .man-fil .step-img-vignette svg{ width:22px; height:22px; }
+  .man-fil .img-toucher{ display:none; }
+  .man-fil .del{ margin-left:auto; }
   .man-fil .del{ margin-left:auto; }
 
   /* Le dernier maillon : le geste se comprend avant le texte. */

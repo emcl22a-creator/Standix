@@ -349,12 +349,16 @@
      occupait tout l'écran et il fallait faire défiler pour atteindre les étapes.
      On plafonne la hauteur et on recadre — l'image sert à reconnaître la
      procédure, pas à être contemplée. */
+  /* Le cadre garde toujours la même hauteur ; l'image s'y inscrit ENTIÈRE, aussi
+     grande que possible. `contain` plutôt que `cover` : on montrait auparavant un
+     morceau recadré, ce qui coupait le haut et le bas d'une photo verticale. Une
+     image qui représente la procédure doit se voir en entier. */
   .analyse-couv{
-    margin-top:14px; border-radius:18px; overflow:hidden;
-    border:0.5px solid var(--border); background:#000;
-    max-height:180px;
+    margin-top:14px; height:180px; border-radius:18px; overflow:hidden;
+    border:0.5px solid var(--border); background:rgba(255,255,255,0.04);
+    display:flex; align-items:center; justify-content:center;
   }
-  .analyse-couv img{ width:100%; height:100%; max-height:180px; object-fit:cover; display:block; }
+  .analyse-couv img{ max-width:100%; max-height:100%; width:auto; height:auto; display:block; }
 
   /* ═══ Les appareils ═══ */
   .app-ligne{
@@ -761,11 +765,15 @@
   /* Côté employé : l'image au-dessus du texte de l'étape. */
   /* Même raison pour la photo d'une étape : elle illustre un geste, elle ne doit
      pas pousser l'étape suivante hors de l'écran. */
+  /* Carrée et centrée : la photo illustre un geste, elle n'a pas à tenir toute la
+     largeur ni à repousser l'étape suivante hors de l'écran. */
   .detail-step-img{
-    width:100%; border-radius:12px; overflow:hidden; margin-top:9px;
-    border:0.5px solid var(--border); background:#000; max-height:220px;
+    width:150px; height:150px; margin:11px auto 2px;
+    border-radius:14px; overflow:hidden;
+    border:0.5px solid var(--border); background:rgba(255,255,255,0.04);
+    display:flex; align-items:center; justify-content:center;
   }
-  .detail-step-img img{ width:100%; max-height:220px; object-fit:cover; display:block; }
+  .detail-step-img img{ width:100%; height:100%; object-fit:cover; display:block; }
 
   /* ═══ Disparition d'une carte ═══
      La carte se replie sur elle-même et les suivantes remontent. Sans ça, la
@@ -2338,7 +2346,10 @@
   .back-btn svg{width:16px; height:16px;}
   .detail-step{ transition:border-color 0.3s ease, background 0.3s ease; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
   .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
-  .detail-step p{font-size:14px; line-height:1.4;}
+  /* `pre-line` conserve les retours à la ligne saisis à la rédaction : le HTML
+     les avale sinon, et une étape écrite en plusieurs lignes arrivait en un seul
+     bloc. Les espaces multiples restent réduits. */
+  .detail-step p{ font-size:14px; line-height:1.45; white-space:pre-line; }
   /* Le bandeau ne s'affiche qu'une fois la procédure consultée. Pendant les
      30 secondes, l'employé ne voit aucun décompte : il lit, c'est tout. */
   .confirm-bar{ margin-top:20px; display:none; }
@@ -7566,7 +7577,11 @@ function majPastille(idBarre) {
    déduit maintenant de l'écran affiché, quel que soit le chemin emprunté. */
 const ONGLET_PAR_ECRAN = {
   'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
-  'p-global-analyse': 1, 'p-membre-fiche': 1,
+  /* `p-membre-fiche` n'a jamais existé : l'écran s'appelle `p-membre`. Et les
+     trois pages complètes de l'analyse manquaient. Sur tous ces écrans, aucun
+     onglet ne s'allumait — la barre paraissait éteinte. */
+  'p-global-analyse': 1, 'p-membre': 1,
+  'p-an-equipe': 1, 'p-an-categories': 1, 'p-an-temps': 1,
   // Les écrans de création n'allument aucun onglet : le « + » déclenche une
   // action, il ne désigne pas une page et n'a pas d'état actif.
 }

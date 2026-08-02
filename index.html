@@ -7508,9 +7508,17 @@ function mesurerOnglets() {
     const lbl = b.querySelector('.tab-label')
     if (!lbl) return
     const large = lbl.scrollWidth
-    if (large > 0) b.style.setProperty('--w', Math.ceil(42 + large + 15) + 'px')
+    /* Un plancher de 120 px : si la mesure échoue — barre encore masquée, police
+       pas chargée — l'onglet actif se repliait en rond et le libellé disparaissait.
+       Mieux vaut une pastille un peu large qu'un bouton qui a perdu son nom. */
+    b.style.setProperty('--w', Math.max(120, Math.ceil(42 + large + 15)) + 'px')
   })
 }
+
+/* On remesure quand la police arrive : mesurée avec la police de secours, la
+   largeur est fausse de quelques pixels et le libellé se retrouve rogné. */
+if (document.fonts?.ready) document.fonts.ready.then(mesurerOnglets)
+window.addEventListener('resize', mesurerOnglets)
 
 /* L'espace équipe garde sa pastille glissante ; l'espace gestion n'en a plus,
    son onglet actif se déploie tout seul. La fonction ne fait donc rien quand

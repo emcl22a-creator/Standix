@@ -2678,7 +2678,18 @@
      faible sur une grande surface — mais deux éléments qui se font face en haut
      et en bas de l'écran doivent porter la même matière, pas une matière
      corrigée. */
-  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
+  /* La barre est centrée par des marges, PAS par `transform`.
+
+     C'est la cause du flou faible : sur Safari iOS, un `transform` sur un
+     élément qui porte un `backdrop-filter` dégrade ou annule le flou — il crée
+     un contexte de rendu séparé, et le navigateur n'a plus accès à ce qu'il y a
+     derrière. La carte du haut n'a pas de `transform`, d'où son verre net avec
+     exactement les mêmes valeurs.
+
+     `left:0; right:0; margin-inline:auto; width:fit-content` centre aussi bien,
+     sans toucher au rendu. */
+  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom));
+    left:0; right:0; margin-inline:auto; width:-moz-fit-content; width:fit-content;
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
@@ -12994,9 +13005,15 @@ function peindreTiroirLangue() {
     '<span class="tiroir-autres">' + autres + '</span>'
 }
 
+/* On ne REDESSINE PAS à l'ouverture ni à la fermeture : c'était la cause de
+   l'absence d'animation. `peindreTiroirLangue` remplace tout le contenu, donc
+   les ronds sont des éléments neufs — et une transition CSS ne joue pas sur un
+   élément qui vient d'apparaître : le navigateur n'a pas d'état précédent d'où
+   partir. Il suffit de basculer la classe et de laisser le CSS travailler, comme
+   le fait le tiroir des entreprises. */
 function fermerTiroirLangue() {
   const t = document.getElementById('tiroir-langue')
-  if (t?.classList.contains('ouvert')) { t.classList.remove('ouvert'); peindreTiroirLangue() }
+  if (t?.classList.contains('ouvert')) t.classList.remove('ouvert')
 }
 
 document.addEventListener('click', (e) => {
@@ -13004,7 +13021,8 @@ document.addEventListener('click', (e) => {
   if (!t || t.offsetParent === null) return          // fiche non affichée
 
   if (e.target.closest('[data-langue-decl]')) {
-    t.classList.toggle('ouvert'); peindreTiroirLangue(); return
+    t.classList.toggle('ouvert')
+    return
   }
   const choix = e.target.closest('[data-langue-choix]')
   if (choix) { fermerTiroirLangue(); traduireProcedure(choix.dataset.langueChoix); return }

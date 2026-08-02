@@ -441,17 +441,18 @@
   }
   /* Dans une carte, la tête de section n'a plus besoin de filet ni de grande
      marge : c'est la carte qui sépare désormais. */
-  .an-bloc .an-tete{
+  /* Il faut l'identifiant dans le sélecteur : `#p-global-analyse .an-tete` pose
+     26 px de marge, et l'emporterait même avec `!important` des deux côtés — une
+     règle à identifiant bat toujours une règle à classes. C'est ce qui creusait
+     un grand vide en haut de chaque carte. */
+  #p-global-analyse .an-bloc .an-tete{
     margin:0 0 6px !important; padding-top:0 !important; border-top:none !important;
   }
-  /* Et les lignes perdent leur propre carte : elles sont déjà dans une. */
-  .an-bloc .cat-rank{
-    background:none !important; border:none !important; border-radius:0 !important;
-    padding:12px 2px !important; margin:0 !important;
-    border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
-  }
-  .an-bloc .cat-rank:last-of-type{ border-bottom:none !important; }
-  .an-bloc .an-plus{ margin-top:4px; margin-bottom:6px; }
+  /* Les lignes perdent déjà leur carte par la règle `#p-global-analyse .cat-rank`
+     plus bas : inutile de la réécrire ici. On ajuste seulement leur retrait, pour
+     que leur texte s'aligne sur le titre de la carte. */
+  #p-global-analyse .an-bloc .cat-rank{ padding-left:0 !important; padding-right:0 !important; }
+  #p-global-analyse .an-bloc .an-plus{ margin-top:4px; margin-bottom:6px; }
 
   .an-tete{
     display:flex; align-items:center; gap:10px;
@@ -1922,7 +1923,6 @@
   }
   .recherche-fine input[type=text]:focus{ background:none; border:none; }
   .recherche-fine input[type=text]::placeholder{ color:var(--label-3); font-size:13.5px; }
-  .e-resultats{ margin-top:10px; }
 
   .ga-trio{ display:flex; gap:9px; }
   .ga-tuile{
@@ -1998,6 +1998,11 @@
   .sop-card .meta{ font-size:12px; color:var(--label-2); margin-top:3px; }
   .badge{ font-size:11px; padding:5px 10px; border-radius:100px; white-space:nowrap; font-weight:600; }
   .badge.ok{background:rgba(48,209,88,0.16); color:var(--green);}
+  /* La pastille d'un extrait vidéo. Elle portait le vert de « terminé », ce qui
+     laissait croire à une étape validée : c'est seulement un moment de la vidéo.
+     Le bleu de l'étape en cours de lecture est le bon signal — les deux parlent
+     de la même chose. */
+  .badge.extrait{ background:rgba(94,160,255,0.16); color:#5EA0FF; }
   .badge.pending{background:rgba(255,159,10,0.16); color:var(--orange);}
   .badge.drift{background:rgba(255,69,58,0.16); color:var(--red);}
 
@@ -2668,16 +2673,13 @@
   .login-card h1{ font-size:22px; margin-bottom:6px; }
   .login-card .subhead{margin-bottom:20px;}
 
-  /* Le verre de la barre est plus dense que celui du bouton réglages, alors que
-     leurs valeurs étaient identiques — et c'est voulu.
-
-     Un même flou se lit moins bien sur une grande surface : le bouton fait
-     46 px et flotte sur le halo coloré du haut, où le flou a de la matière à
-     brouiller. La barre fait plus de 300 px de large et se pose sur le fond
-     sombre du bas, presque uniforme : il n'y a rien à flouter, donc rien à voir.
-     Il faut monter le flou et le fond pour obtenir le MÊME effet perçu. */
+  /* Exactement le verre de `.topbar-card` : même fond, même flou, même
+     saturation. J'avais renforcé les valeurs pour compenser un effet perçu plus
+     faible sur une grande surface — mais deux éléments qui se font face en haut
+     et en bas de l'écran doivent porter la même matière, pas une matière
+     corrigée. */
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:rgba(255,255,255,0.17); -webkit-backdrop-filter:blur(44px) saturate(200%); backdrop-filter:blur(44px) saturate(200%);
+    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
     border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
     box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
 
@@ -4026,21 +4028,6 @@
       </div>
     </div>
 
-    <!-- Les trois chiffres de l'employé, comme les anneaux du gérant -->
-    <div class="ga-trio">
-      <div class="ga-tuile"><div class="ga-anneau" id="e-anneau-lues"></div><div class="ga-libelle">Lues</div></div>
-      <div class="ga-tuile"><div class="ga-anneau" id="e-anneau-total"></div><div class="ga-libelle">En tout</div></div>
-      <div class="ga-tuile"><div class="ga-anneau" id="e-anneau-reste"></div><div class="ga-libelle">À lire</div></div>
-    </div>
-
-    <div class="recherche-fine">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="e-recherche" placeholder="Rechercher une procédure">
-    </div>
-
-    <div id="e-resultats" class="e-resultats" style="display:none;"></div>
-
-    <!-- Visible uniquement pour un visiteur arrivé par QR code -->
     <div class="visiteur" id="e-visiteur" style="display:none;">
       <div class="visiteur-tete">
         <div class="visiteur-cadenas">
@@ -4059,7 +4046,21 @@
     </div>
 
     <div id="e-bloc-categories">
-      <div class="section-title">Catégories</div>
+      <div class="list-tools">
+        <div class="section-title" style="margin:0;">Catégories</div>
+      <div class="dd-filter" id="dd-e-cat-sort">
+        <button type="button" class="dd-trigger" id="dd-e-cat-sort-trigger">
+          <span id="dd-e-cat-sort-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" id="dd-e-cat-sort-menu">
+          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+          <button type="button" data-sort="reste" data-label="Trier : À lire d'abord">À lire d'abord</button>
+        </div>
+      </div>
+      </div>
       <div class="cat-grid" id="e-cat-grid"></div>
     </div>
   </div>
@@ -4074,10 +4075,23 @@
     </div>
     <div class="subhead" id="e-cat-sous">—</div>
 
-    <div class="recherche-fine">
+    <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="e-cat-recherche" placeholder="Rechercher dans cette catégorie">
+      <input type="text" id="e-cat-recherche" placeholder="Rechercher une procédure...">
     </div>
+
+      <div class="dd-filter" id="dd-e-proc-sort" style="margin-bottom:12px;">
+        <button type="button" class="dd-trigger" id="dd-e-proc-sort-trigger">
+          <span id="dd-e-proc-sort-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" id="dd-e-proc-sort-menu">
+          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+          <button type="button" data-sort="reste" data-label="Trier : À lire d'abord">À lire d'abord</button>
+        </div>
+      </div>
 
     <div id="equipe-procedures-list"></div>
   </div>
@@ -4396,6 +4410,10 @@ let allEquipeProcedures = []
 let equipeEtapesByProc = {}
 let equipeLues = new Set()      // identifiants des procédures que j'ai lues
 let mesLectures = []            // mes validations, avec date et durée
+/* Les deux tris de l'espace équipe. Ils vivent à côté de la catégorie courante :
+   ce sont les trois choses qui décrivent ce que l'employé regarde. */
+let equipeCatSort = 'az'
+let equipeProcSort = 'az'
 let equipeCatCourante = null
 let equipeCatQuery = ''
 let scanStream = null
@@ -6320,7 +6338,6 @@ function renderGainTemps(dansPeriode, libelle) {
 
   carte.style.display = ''
   const lecteurs = new Set(avecDuree.map(v => v.membre_id)).size
-  const moyenne = Math.round(secondes / avecDuree.length)
 
   document.getElementById('an-gain-t').textContent =
     `${dureeLisible(secondes)} de formation ${libelle}`
@@ -6329,7 +6346,7 @@ function renderGainTemps(dansPeriode, libelle) {
   const pl = lecteurs > 1
   document.getElementById('an-gain-s').innerHTML =
     `<b>${lecteurs} personne${pl ? 's' : ''}</b> ${pl ? 'se sont form\u00e9es seules' : "s'est form\u00e9e seule"} ` +
-    `sur vos proc\u00e9dures, ${dureeLisible(moyenne)} par lecture.`
+    `sur vos proc\u00e9dures.`
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7639,6 +7656,10 @@ async function loadGestionProcedures() {
   rangerGrille(entrepriseId, allCategoriesData, document.getElementById('p-list-subhead')?.textContent || '')
 
   if (inchangee) {
+    /* On ne redessine pas la grille, mais le mot d'accueil doit être écrit :
+       il part de « Chargement… » dans le balisage, et restait donc bloqué là
+       à chaque ouverture depuis la copie locale — c'est-à-dire presque toujours. */
+    renderAccueil()
     window.jalon?.('grille inchang\u00e9e, aucun redessin')
     surveillerAnalyses()
     return
@@ -7896,6 +7917,11 @@ document.addEventListener('click', (e) => {
 })
 
 wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
+
+/* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
+   gestion : un seul endroit décide de ce qu'un menu de tri fait. */
+wireSortDropdown('dd-e-cat-sort', (sort) => { equipeCatSort = sort; renderEquipeCategories() })
+wireSortDropdown('dd-e-proc-sort', (sort) => { equipeProcSort = sort; renderEquipeCatListe() })
 
 wireSortDropdown('dd-membres-sort', (valeur) => {
   triMembres = valeur
@@ -10455,7 +10481,7 @@ async function openAnalyse(procId) {
       div.innerHTML = `
         <div class="n">${i + 1}</div>
         <p style="flex:1;">${escapeHtml(etape.texte)}</p>
-        ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
+        ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
       `
       if (hasClip) {
         div.style.cursor = 'pointer'
@@ -11080,10 +11106,6 @@ function renderEquipeAccueil() {
   }
 
   const couleur = pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--orange)' : 'var(--red)'
-  dessinerAnneau('e-anneau-lues',  pct, couleur, pct + '%')
-  dessinerAnneau('e-anneau-total', 100, 'var(--blue)', String(total))
-  dessinerAnneau('e-anneau-reste', total ? Math.round((reste / total) * 100) : 0,
-                 reste ? 'var(--orange)' : 'var(--green)', String(reste))
 }
 
 /* Grille des catégories, exactement celle de l'espace gestion : anneau de
@@ -11106,7 +11128,20 @@ function renderEquipeCategories() {
     parCat[nom].push(p)
   })
 
-  Object.keys(parCat).sort((a, b) => a.localeCompare(b, 'fr')).forEach(nom => {
+  /* Le même tri que côté gestion, plus une entrée propre à l'employé :
+     « À lire d'abord » remonte les catégories où il lui reste le plus à lire. */
+  const dateCat = (n) => Math.max(...parCat[n].map(p => new Date(p.created_at || 0).getTime()))
+  const resteCat = (n) => parCat[n].filter(p => !equipeLues.has(p.id)).length
+
+  Object.keys(parCat).sort((a, b) => {
+    if (equipeCatSort === 'new') return dateCat(b) - dateCat(a)
+    if (equipeCatSort === 'old') return dateCat(a) - dateCat(b)
+    if (equipeCatSort === 'reste') {
+      const d = resteCat(b) - resteCat(a)
+      if (d) return d
+    }
+    return a.localeCompare(b, 'fr')
+  }).forEach(nom => {
     const procs = parCat[nom]
     const lues = procs.filter(p => equipeLues.has(p.id)).length
     const pct = Math.round((lues / procs.length) * 100)
@@ -11165,7 +11200,19 @@ function renderEquipeCatListe() {
     listEl.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à votre recherche.</p></div>`
     return
   }
-  vues.forEach(proc => listEl.appendChild(ficheEquipe(proc)))
+  /* Le même tri que les catégories, avec la même entrée propre à l'employé :
+     « À lire d'abord » remonte ce qu'il n'a pas encore ouvert. */
+  const triees = [...vues].sort((a, b) => {
+    if (equipeProcSort === 'new') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
+    if (equipeProcSort === 'old') return new Date(a.created_at || 0) - new Date(b.created_at || 0)
+    if (equipeProcSort === 'reste') {
+      const d = (equipeLues.has(a.id) ? 1 : 0) - (equipeLues.has(b.id) ? 1 : 0)
+      if (d) return d
+    }
+    return (a.titre || '').localeCompare(b.titre || '', 'fr')
+  })
+
+  triees.forEach(proc => listEl.appendChild(ficheEquipe(proc)))
 }
 
 /* Une fiche de procédure, réutilisée par la catégorie et par la recherche.
@@ -11209,26 +11256,6 @@ function ficheEquipe(proc) {
 /* Recherche de l'accueil : elle cherche dans toutes les procédures, toutes
    catégories confondues, et remplace la grille par ses résultats le temps de
    la saisie. */
-document.getElementById('e-recherche')?.addEventListener('input', (e) => {
-  const q = e.target.value.trim().toLowerCase()
-  const zone = document.getElementById('e-resultats')
-  const bloc = document.getElementById('e-bloc-categories')
-  if (!zone || !bloc) return
-
-  if (!q) { zone.style.display = 'none'; zone.innerHTML = ''; bloc.style.display = ''; return }
-
-  bloc.style.display = 'none'
-  zone.style.display = 'block'
-  zone.innerHTML = ''
-  const trouves = allEquipeProcedures.filter(p =>
-    p.titre.toLowerCase().includes(q) || (p.categorie || '').toLowerCase().includes(q))
-
-  if (!trouves.length) {
-    zone.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à « ${escapeHtml(q)} ».</p></div>`
-    return
-  }
-  trouves.forEach(p => zone.appendChild(ficheEquipe(p)))
-})
 
 // Recherche à l'intérieur d'une catégorie
 document.getElementById('e-cat-recherche')?.addEventListener('input', (e) => {
@@ -11317,6 +11344,7 @@ async function openEquipeDetail(procId) {
   }
 
   const stepsEl = document.getElementById('detail-steps')
+  detacherSuiviLecture(detailVideoEl)
   stepsEl.innerHTML = ''
   const clipBounds = calculerBornes(etapes, detailVideoEl?.duration)
 
@@ -11334,19 +11362,27 @@ async function openEquipeDetail(procId) {
         <p>${escapeHtml(etape.texte)}</p>
         ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}
       </div>
-      ${hasClip ? `<span class="badge ok" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
+      ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
     `
     if (hasClip) {
       div.style.cursor = 'pointer'
+      /* Les mêmes repères que côté gestion : l'étape qu'on regarde se marque, et
+         la marque suit la vidéo. Un employé en a plus besoin qu'un gérant — c'est
+         lui qui apprend le geste. */
+      div.dataset.debut = bounds.start
+      div.dataset.fin = bounds.end
       // Toute la ligne est cliquable, sauf la photo : on ne veut pas lancer la
       // vidéo quand quelqu'un cherche simplement à mieux voir l'image.
       div.onclick = (e) => {
         if (e.target.closest('.detail-step-img')) return
+        marquerEtapeEnLecture(div)
         lireExtrait(detailVideoEl, bounds.start, bounds.end)
       }
     }
     stepsEl.appendChild(div)
   })
+
+  attacherSuiviLecture(detailVideoEl, stepsEl)
 
   /* Une procédure sans étape affichait une zone vide, et on ne savait pas si
      c'était un défaut d'affichage ou une procédure incomplète. Elle le dit

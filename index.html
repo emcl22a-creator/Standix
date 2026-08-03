@@ -744,12 +744,14 @@
      servir. Ce qui a été coupé se corrige après, dans la liste : c'est là qu'on
      relit, donc c'est là qu'on rectifie.
      ═════════════════════════════════════════════════════════════════ */
-  .dv-depot{ position:relative; margin-top:14px; }
+  .dv-depot{ position:relative; margin-top:0; }
   .dv-depot input[type=file]{
     position:absolute; inset:0; opacity:0; width:100%; height:100%; z-index:2;
   }
+  /* Même rayon que `.video-frame`, le cadre de l'écran de l'IA : les deux
+     écrans accueillent une vidéo, ils doivent l'encadrer pareil. */
   .dv-cadre{
-    position:relative; border-radius:20px; overflow:hidden; background:#000;
+    position:relative; border-radius:16px; overflow:hidden; background:#000;
     border:0.5px solid var(--border); aspect-ratio:16/9;
     display:flex; align-items:center; justify-content:center;
     font-size:13px; color:var(--label-3);
@@ -3517,11 +3519,12 @@
          ont déjà été demandés sur l'écran précédent, et les redemander donnerait
          l'impression de recommencer. En modification il faut bien pouvoir les
          corriger : c'est le seul endroit où ils ont leur place. -->
-    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
-         pour le corriger. On entre directement dans le travail. -->
+    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
+         dire garder quatre copies du même champ, qui finiraient par diverger. On
+         revient d'un pas en arrière, là où il a été saisi. -->
     <button type="button" class="rappel-proc" data-rappel>
       <span class="tx"><b>—</b></span>
-      <span class="c">Modifier</span>
+      <span class="c">Revenir</span>
     </button>
 
     <div id="man-entete" style="display:none;">
@@ -3567,20 +3570,25 @@
     </div>
     <div class="subhead">Marquez les étapes pendant la lecture</div>
 
-    <div class="man-lbl">La vidéo</div>
-
-    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
-         pour le corriger. On entre directement dans le travail. -->
+    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
+         dire garder quatre copies du même champ, qui finiraient par diverger. On
+         revient d'un pas en arrière, là où il a été saisi. -->
     <button type="button" class="rappel-proc" data-rappel>
       <span class="tx"><b>—</b></span>
-      <span class="c">Modifier</span>
+      <span class="c">Revenir</span>
     </button>
 
-    <div class="dv-depot" id="dv-depot">
-      <input type="file" id="video-input" accept="video/*">
-      <div class="dv-cadre" id="dv-cadre">
-        <video id="video-player" style="display:none;" playsinline webkit-playsinline></video>
-        <span id="video-placeholder">Touchez pour choisir une vidéo</span>
+    <!-- La même carte que l'écran de l'IA : une note qui cadre l'attente, le
+         choix du fichier, puis le lecteur. Deux écrans qui font entrer une
+         vidéo doivent l'accueillir pareil. -->
+    <div class="card" id="dv-carte">
+      <div class="note" style="margin-bottom:12px;">Filmez le geste une fois, calmement. Vous marquerez les étapes vous-même pendant la lecture — <b style="color:#fff;">un appui à chaque fin d'étape</b>, rien de plus.</div>
+      <div class="dv-depot" id="dv-depot">
+        <input type="file" id="video-input" accept="video/*">
+        <div class="dv-cadre" id="dv-cadre">
+          <video id="video-player" style="display:none;" playsinline webkit-playsinline></video>
+          <span id="video-placeholder">Aucune vidéo importée</span>
+        </div>
       </div>
     </div>
 
@@ -3639,11 +3647,12 @@
 
     <div class="man-lbl">Le document</div>
 
-    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
-         pour le corriger. On entre directement dans le travail. -->
+    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
+         dire garder quatre copies du même champ, qui finiraient par diverger. On
+         revient d'un pas en arrière, là où il a été saisi. -->
     <button type="button" class="rappel-proc" data-rappel>
       <span class="tx"><b>—</b></span>
-      <span class="c">Modifier</span>
+      <span class="c">Revenir</span>
     </button>
 
     <div class="card" id="doc-saisie-card">
@@ -3682,19 +3691,25 @@
     </div>
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
 
-    <!-- Le titre n'est plus redemandé : il est rappelé en une ligne, avec un lien
-         pour le corriger. On entre directement dans le travail. -->
+    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
+         dire garder quatre copies du même champ, qui finiraient par diverger. On
+         revient d'un pas en arrière, là où il a été saisi. -->
     <button type="button" class="rappel-proc" data-rappel>
       <span class="tx"><b>—</b></span>
-      <span class="c">Modifier</span>
+      <span class="c">Revenir</span>
     </button>
 
     <div class="card" id="ai-upload-card">
       <div class="note" style="margin-bottom:12px;">L'IA travaille au mieux sur des vidéos de <b style="color:#fff;">moins de 10 minutes</b>. Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.</div>
-      <input type="file" id="ai-video-input" accept="video/*" style="margin-bottom:10px;">
-      <div class="video-frame" id="ai-video-frame">
-        <video id="ai-video-player" style="display:none;" playsinline></video>
-        <span id="ai-video-placeholder">Aucune vidéo importée</span>
+      <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
+           l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
+           montage, et c'est le plus propre des deux. -->
+      <div class="dv-depot">
+        <input type="file" id="ai-video-input" accept="video/*">
+        <div class="video-frame" id="ai-video-frame">
+          <video id="ai-video-player" style="display:none;" playsinline></video>
+          <span id="ai-video-placeholder">Aucune vidéo importée</span>
+        </div>
       </div>
       <button class="btn block" style="margin-top:14px;" id="ai-launch-btn" disabled>Lancer l'analyse</button>
       <div class="error-msg" id="ai-error"></div>

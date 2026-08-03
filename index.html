@@ -585,12 +585,16 @@
      Sans le bloc de tête, la page n'est plus qu'une suite de listes : elles
      doivent donc être légères. Chaque ligne perd sa carte et ne garde qu'un filet
      en dessous — c'est ce qui rend une liste lisible quand il n'y a qu'elle. */
+  /* Pas d'animation d'ouverture ici. Elle a du sens sur une liste qu'on vient
+     de charger — les procédures qui arrivent une à une. Sur trois lignes de
+     résumé dans une carte, elle fait clignoter la page à chaque retour, et le
+     décalage entre les lignes donne l'impression que ça rame. */
   #p-global-analyse .emp-row,
   #p-global-analyse .cat-rank{
     background:none !important; border:none !important; border-radius:0 !important;
     border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
     padding:10px 2px !important; margin:0 !important;
-  }
+   animation:none !important; }
   #p-global-analyse .emp-row:last-of-type,
   #p-global-analyse .cat-rank:last-of-type{ border-bottom:none !important; }
   #p-global-analyse .cat-rank .pos{
@@ -6945,7 +6949,6 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     const n = x.lecteurs.size
     const div = document.createElement('div')
     div.className = 'emp-row'
-    div.style.animationDelay = (i * 0.04) + 's'
     div.dataset.proc = x.proc.id
     div.innerHTML = `
       <div class="emp-row-name">${escapeHtml(x.proc.titre || 'Sans titre')}
@@ -7463,7 +7466,6 @@ function renderMembresListe() {
   visibles.forEach((s, i) => {
     const div = document.createElement('div')
     div.className = 'emp-row'
-    div.style.animationDelay = (i * 0.04) + 's'
     div.dataset.membre = s.m.id
     /* Le temps total, et non plus une série de jours : ce que la personne a
        réellement passé sur vos procédures. */

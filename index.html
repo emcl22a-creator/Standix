@@ -279,38 +279,40 @@
      procédure EST une suite : la forme le montre au lieu de l'énoncer. */
 
   .man-lbl{
-    font-size:12.5px; font-weight:650; color:var(--label-3); margin:20px 0 8px;
+    font-size:12.5px; font-weight:650; color:var(--label-3); margin:24px 0 10px;
     display:flex; align-items:center; justify-content:space-between;
   }
   .man-lbl .n{ font-weight:600; }
   .man-champ{
     width:100%; background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
-    border-radius:13px; padding:12px 13px; color:#fff; font-family:inherit;
+    border-radius:14px; padding:14px 14px; color:#fff; font-family:inherit;
     font-size:15px; font-weight:500; letter-spacing:-0.02em;
   }
   .man-champ::placeholder{ color:var(--label-3); }
   .man-champ:focus{ outline:none; border-color:rgba(94,160,255,0.55); }
 
-  .man-fil{ position:relative; padding-left:42px; }
+  /* L'écran de saisie respire un peu plus que les fiches de lecture : on y
+     revient corriger, ajouter, supprimer — il faut de la place pour viser. */
+  .man-fil{ position:relative; padding-left:44px; margin-top:4px; }
   /* Le trait s'arrête avant le dernier maillon : il relie, il ne dépasse pas. */
   .man-fil::before{
-    content:''; position:absolute; left:16px; top:8px; bottom:34px; width:1.5px;
+    content:''; position:absolute; left:17px; top:8px; bottom:34px; width:1.5px;
     background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
   }
   .man-fil .step-edit-item{
     position:relative; background:none; border:none; border-radius:0;
-    padding:0 0 18px; margin:0;
+    padding:0 0 26px; margin:0;
   }
-  .man-fil .step-num-dess{ position:absolute; left:-42px; top:-3px; width:33px; height:33px; }
+  .man-fil .step-num-dess{ position:absolute; left:-44px; top:-4px; width:33px; height:33px; }
   .man-fil .step-num-dess svg{ width:33px; height:33px; display:block; }
   .man-fil textarea{
     width:100%; background:none; border:none; padding:0; resize:none;
-    color:#fff; font-family:inherit; font-size:14.5px; line-height:1.45;
+    color:#fff; font-family:inherit; font-size:14.5px; line-height:1.55;
     font-weight:500; letter-spacing:-0.02em;
   }
   .man-fil textarea:focus{ outline:none; }
   .man-fil textarea::placeholder{ color:var(--label-3); }
-  .man-fil .step-bas{ display:flex; align-items:flex-end; gap:10px; margin-top:10px; }
+  .man-fil .step-bas{ display:flex; align-items:flex-end; gap:11px; margin-top:12px; }
 
   /* Dans le fil, la photo est un carré nu — sans son libellé à côté. Le cadre
      dit déjà ce qu'il attend, et la ligne reste courte. */
@@ -368,7 +370,7 @@
     background:none; border:none; padding:0; width:100%; text-align:left;
     color:var(--label-2); font-family:inherit; font-size:14.5px; font-weight:600;
   }
-  .man-plus .d{ position:absolute; left:-42px; top:-4px; width:33px; height:33px; }
+  .man-plus .d{ position:absolute; left:-44px; top:-5px; width:33px; height:33px; }
   .man-plus .d svg{ width:33px; height:33px; display:block; }
   .man-plus:active{ opacity:0.6; }
 
@@ -3588,7 +3590,8 @@
       <button type="button" class="oter" style="display:none;">Retirer</button>
     </div>
 
-    <div class="man-lbl">Les étapes<span class="n" id="man-compte">0</span></div>
+    <!-- Pas de titre ici : le fil des étapes se reconnaît tout seul, et le
+         compteur ne répétait que ce qu'on voit déjà. -->
     <div class="man-fil" id="manual-steps-list"></div>
 
     <div class="error-msg" id="create-error-manual"></div>
@@ -10272,19 +10275,19 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
    facettes, en matière neutre. Toute l'app parle ainsi d'une seule géométrie —
    la fiche empilée pour les procédures, l'hexagone pour ce qui se compte. */
 function numeroEtapeDess(n, taille) {
-  /* La taille est écrite DANS le dessin, pas seulement en CSS. Un SVG sans
-     `width` ni `height` n'a aucune dimension propre : si la règle qui devait la
-     lui donner ne s'applique pas — mauvaise classe, sélecteur trop faible — il
-     disparaît purement et simplement. C'est ce qui arrivait dans la fiche
-     gestion. */
+  /* Un rond plutôt qu'un hexagone. La forme à facettes appelait le regard à
+     chaque étape : sur une procédure de quinze lignes, quinze petits bijoux
+     valent moins qu'un repère discret. Le numéro compte, pas son écrin.
+
+     La taille est écrite DANS le dessin, pas seulement en CSS : un SVG sans
+     `width` ni `height` disparaît si la règle censée la lui donner ne
+     s'applique pas. */
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
-             fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)"
-             stroke-width="1.5" stroke-linejoin="round"/>
-    <polygon points="14,1.5 25.3,8 14,14.5 2.7,8" fill="#fff" opacity="0.10"/>
-    <text x="14" y="18.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="11"
-          font-weight="800" fill="rgba(255,255,255,0.86)">${n}</text>
+    <circle cx="15" cy="15" r="12.6" fill="rgba(255,255,255,0.05)"
+            stroke="rgba(255,255,255,0.30)" stroke-width="1.4"/>
+    <text x="15" y="19.4" text-anchor="middle" font-family="Inter,sans-serif" font-size="12"
+          font-weight="750" fill="rgba(255,255,255,0.86)">${n}</text>
   </svg>`
 }
 
@@ -10292,12 +10295,12 @@ function numeroEtapeDess(n, taille) {
    dedans. Garder la forme entre les deux états évite le saut visuel — seule la
    couleur change, comme quand on coche une case. */
 function cocheFaiteDess(taille) {
+  /* Même rond, rempli. Garder la forme entre les deux états évite le saut
+     visuel : seule la couleur change, comme quand on coche une case. */
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
-             fill="#5EA0FF" stroke="rgba(200,225,255,0.9)" stroke-width="1.2" stroke-linejoin="round"/>
-    <polygon points="14,1.5 25.3,8 14,14.5 2.7,8" fill="#fff" opacity="0.22"/>
-    <path d="M9.8 14.4 12.9 17.4 18.4 11.4" stroke="#04203F" stroke-width="2.1"
+    <circle cx="15" cy="15" r="12.6" fill="#5EA0FF"/>
+    <path d="M10 15.2 13.4 18.6 20 11.8" stroke="#04203F" stroke-width="2.2"
           stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`
 }
@@ -10305,11 +10308,10 @@ function cocheFaiteDess(taille) {
 function plusEtapeDess(taille) {
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
-             fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)"
-             stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="3.5 3"/>
-    <line x1="14" y1="10" x2="14" y2="19" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
-    <line x1="9.5" y1="14.5" x2="18.5" y2="14.5" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
+    <circle cx="15" cy="15" r="12.6" fill="rgba(255,255,255,0.04)"
+            stroke="rgba(255,255,255,0.28)" stroke-width="1.4" stroke-dasharray="3.4 3"/>
+    <line x1="15" y1="10.6" x2="15" y2="19.4" stroke="rgba(255,255,255,0.45)" stroke-width="1.7" stroke-linecap="round"/>
+    <line x1="10.6" y1="15" x2="19.4" y2="15" stroke="rgba(255,255,255,0.45)" stroke-width="1.7" stroke-linecap="round"/>
   </svg>`
 }
 
@@ -10404,8 +10406,6 @@ function renderManualSteps() {
   })
   listEl.appendChild(plus)
 
-  const compte = document.getElementById('man-compte')
-  if (compte) compte.textContent = manualSteps.length
 
   activerGlissementEtapes(listEl, () => manualSteps, () => renderManualSteps())
 }
@@ -10688,7 +10688,6 @@ function renderVideoSteps(listEl) {
   if (!el) return
   el.innerHTML = ''
   const compte = document.getElementById('vid-compte')
-  if (compte) compte.textContent = videoSteps.length
 
   videoSteps.forEach((step, i) => {
     const div = document.createElement('div')

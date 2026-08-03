@@ -316,6 +316,17 @@
 
   /* Dans le fil, la photo est un carré nu — sans son libellé à côté. Le cadre
      dit déjà ce qu'il attend, et la ligne reste courte. */
+  /* La croix de retrait. Elle ne s'affiche que sur une vignette pleine : sur un
+     cadre vide, elle n'aurait rien à retirer et brouillerait le geste d'ajout. */
+  .step-img{ position:relative; }
+  .img-oter{
+    position:absolute; top:-7px; right:-7px; width:22px; height:22px;
+    border-radius:50%; border:1.5px solid var(--bg); background:var(--red);
+    color:#fff; font-family:inherit; font-size:14px; font-weight:700; line-height:1;
+    display:flex; align-items:center; justify-content:center; padding:0; z-index:3;
+  }
+  .img-oter:active{ opacity:0.7; }
+
   .man-fil .step-img{ margin-top:0; }
   .man-fil .step-img-vignette{ width:78px; height:78px; border-radius:12px; }
   .man-fil .step-img-vignette svg{ width:22px; height:22px; }
@@ -482,10 +493,14 @@
   .etat-proc .fond-arc{ stroke:rgba(255,255,255,0.14); stroke-width:2.4; fill:none; }
   /* La coche est posée sur un rond de verre teinté de vert : le même langage
      que les cartes de l'app, plutôt qu'une pastille pleine. */
+  /* La coche reprend le blanc de la roue qui la précède. Le vert annonçait un
+     succès là où il n'y a qu'un achèvement — et surtout il ne ressemblait à
+     rien de ce qui tournait une seconde plus tôt : on ne voyait pas que c'était
+     la même chose, arrivée au bout. */
   .etat-proc.prete{
     width:19px; height:19px; border-radius:50%;
-    background:rgba(48,209,88,0.22);
-    border:0.5px solid rgba(48,209,88,0.55);
+    background:rgba(255,255,255,0.14);
+    border:0.5px solid rgba(255,255,255,0.30);
     -webkit-backdrop-filter:blur(8px) saturate(180%); backdrop-filter:blur(8px) saturate(180%);
     animation:etatArrive 0.5s cubic-bezier(0.34,1.5,0.64,1) both;
   }
@@ -530,12 +545,14 @@
      grande que possible. `contain` plutôt que `cover` : on montrait auparavant un
      morceau recadré, ce qui coupait le haut et le bas d'une photo verticale. Une
      image qui représente la procédure doit se voir en entier. */
-  .analyse-couv{
-    margin-top:14px; height:180px; border-radius:18px; overflow:hidden;
-    border:0.5px solid var(--border); background:rgba(255,255,255,0.04);
-    display:flex; align-items:center; justify-content:center;
+  /* Plus de cadre autour de l'image : le fond gris et le filet dessinaient une
+     boîte dont l'image n'occupait qu'une partie, et on voyait la boîte avant la
+     photo. Il ne reste que l'image, centrée, aux angles arrondis. */
+  .analyse-couv{ margin-top:14px; display:flex; align-items:center; justify-content:center; }
+  .analyse-couv img{
+    max-width:100%; max-height:220px; width:auto; height:auto;
+    display:block; border-radius:18px;
   }
-  .analyse-couv img{ max-width:100%; max-height:100%; width:auto; height:auto; display:block; }
 
   /* ═══ Les appareils ═══ */
   .app-ligne{
@@ -1062,8 +1079,10 @@
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
      facultative : l'étape reste valable sans. */
   .step-img{ display:flex; align-items:center; gap:10px; margin-top:10px; }
-  .step-img-vignette{
-    width:56px; height:56px; border-radius:11px; flex-shrink:0; overflow:hidden;
+/* Plus petite. Dans une liste de saisie, la vignette rappelle qu'une photo
+     existe — elle n'a pas à la montrer en grand : c'est le texte qu'on relit. */
+    .step-img-vignette{
+    width:76px; height:76px; border-radius:11px; flex-shrink:0; overflow:hidden;
     background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
     display:flex; align-items:center; justify-content:center; position:relative;
   }
@@ -3784,9 +3803,9 @@
     <div class="man-fil" id="manual-steps-list"></div>
 
     <div class="error-msg" id="create-error-manual"></div>
-    <button class="btn ghost block man-annuler-geste" style="margin-top:16px;" id="man-defaire" disabled aria-label="Annuler la dernière action">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.3-9.3L3 7"/></svg>
-    </button>
+    <!-- Le bouton d'annulation a été retiré : trois boutons empilés au bas d'un
+         écran de saisie — annuler un geste, tout effacer, publier — se ressemblent
+         trop pour qu'on les distingue d'un coup d'œil. Reste ce qui compte. -->
     <button class="btn ghost block" style="margin-top:9px;" id="man-annuler">Annuler les modifications</button>
     <button class="btn block" style="margin-top:9px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
@@ -3874,8 +3893,9 @@
 
     <div class="card" id="doc-saisie-card">
       <div class="note" style="margin-bottom:12px;">
-        Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes
-        que vous pourrez <b style="color:#fff;">relire et corriger</b> avant publication.
+        Collez un texte, déposez un fichier, ou <b style="color:#fff;">photographiez vos pages</b>
+        — même écrites à la main. L'IA en tirera des étapes que vous pourrez
+        <b style="color:#fff;">relire et corriger</b> avant publication.
       </div>
 
       <label class="f">Votre texte</label>
@@ -5134,7 +5154,7 @@ const LANGUES = [
   { code: 'fr', nom: 'Fran\u00e7ais',  drapeau: '\uD83C\uDDEB\uD83C\uDDF7' },
   { code: 'en', nom: 'English',   drapeau: '\uD83C\uDDEC\uD83C\uDDE7' },
   { code: 'es', nom: 'Espa\u00f1ol',   drapeau: '\uD83C\uDDEA\uD83C\uDDF8' },
-  { code: 'pt', nom: 'Portugu\u00eas', drapeau: '\uD83C\uDDF5\uD83C\uDDF9' },
+  { code: 'de', nom: 'Deutsch',    drapeau: '\uD83C\uDDE9\uD83C\uDDEA' },
 ]
 
 /* Le dictionnaire de l'app. Il couvre l'INTÉGRALITÉ de l'espace équipe : les
@@ -8473,6 +8493,10 @@ function captureCardPositions(containerEl) {
 }
 
 // Fait "glisser/mélanger" chaque carte depuis son ancienne position vers sa nouvelle position
+/* Ce qui a déjà joué son animation d'arrivée, pour ne pas la rejouer. Vidé au
+   changement d'établissement : ce sont d'autres catégories. */
+let dejaEntre = new Set()
+
 function playCardShuffle(containerEl, oldRects) {
   // Rien à faire au tout premier remplissage d'une liste : l'écran qui vient
   // de s'ouvrir joue déjà sa propre animation d'entrée. Superposer une
@@ -8485,7 +8509,16 @@ function playCardShuffle(containerEl, oldRects) {
   containerEl.querySelectorAll('[data-key]').forEach((el, i) => {
     const oldRect = oldRects.get(el.dataset.key)
     if (!oldRect) {
-      if (!premierRemplissage && !document.body.classList.contains('booting')) {
+      /* « Pas de position précédente » ne veut pas dire « nouvelle » : la grille
+         est vidée à chaque changement de page, et une catégorie qui existe depuis
+         des semaines se retrouvait donc sans passé à chaque retour. Elle rejouait
+         son arrivée indéfiniment.
+
+         On tient donc la liste de ce qui a DÉJÀ salué. Une carte n'entre qu'une
+         fois, quel que soit le nombre d'allers-retours. */
+      const deja = dejaEntre.has(el.dataset.key)
+      dejaEntre.add(el.dataset.key)
+      if (!deja && !premierRemplissage && !document.body.classList.contains('booting')) {
         el.classList.add('same-as-title-in')
         el.style.animationDelay = (i * 0.04) + 's'
       }
@@ -11439,27 +11472,33 @@ function memoriserEtat() {
 }
 
 function majBoutonDefaire() {
-  const b = document.getElementById('man-defaire')
-  if (b) b.disabled = pileEtats.length === 0
 }
 
-document.getElementById('man-defaire')?.addEventListener('click', () => {
-  const avant = pileEtats.pop()
-  if (avant === undefined) return
-  const ouEtaitOn = window.scrollY
-  manualSteps = JSON.parse(avant)
+
+function renderManualSteps() {
+/* Retirer la photo d'une étape. Il n'y avait aucun moyen de le faire : une
+   photo posée par erreur restait là pour toujours. */
+document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
+  const croix = e.target.closest('.img-oter')
+  if (!croix) return
+  e.preventDefault()
+  e.stopPropagation()
+  const ligne = croix.closest('[data-index]')
+  const i = Number(ligne?.dataset.index)
+  if (!Number.isInteger(i) || !manualSteps[i]) return
+  manualSteps[i].image_url = null
+  manualSteps[i].imageFichier = null
+  manualSteps[i].imageARetirer = true
   renderManualSteps()
-  window.scrollTo({ top: ouEtaitOn })
-  majBoutonDefaire()
   if (navigator.vibrate) navigator.vibrate(6)
 })
 
-function renderManualSteps() {
   const listEl = document.getElementById('manual-steps-list')
   listEl.innerHTML = ''
   manualSteps.forEach((step, i) => {
     const div = document.createElement('div')
     div.className = 'step-edit-item'
+    div.dataset.index = i
     /* Le numéro est dessiné dans le langage des icônes de création : une fiche en
        profondeur, avec son chiffre dedans. Il se pose sur le fil, à gauche. */
     div.innerHTML = `
@@ -11467,10 +11506,14 @@ function renderManualSteps() {
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       <div class="step-bas">
       <div class="step-img">
-        <div class="step-img-vignette">${step.image_url
+        <div class="step-img-vignette${step.image_url || step.imageFichier ? ' pleine' : ''}">${step.image_url
           ? `<img data-fichier="${escapeHtml(cheminFichier(step.image_url))}" alt="">`
-          : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
-        <button type="button" class="img-toucher" aria-label="Photo de l'étape">
+          : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}${step.image_url || step.imageFichier
+          ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
+          : ''}${step.image_url || step.imageFichier
+          ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
+          : ''}</div>
+        <button type="button" class="img-toucher"button type="button" class="img-toucher" aria-label="Photo de l'étape">
           <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
         </button>
         <input type="file" accept="image/*" class="fichier">
@@ -12640,7 +12683,7 @@ function etatProcedureHtml(proc) {
   }
   if (proc?.statut === 'pret') {
     return `<div class="etat-proc prete" title="Analyse terminée">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#4AE07A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="20 6 9 17 4 12"/></svg></div>`
   }
   return ''
@@ -13907,6 +13950,7 @@ async function basculerVersEtablissement(entrepriseId) {
      d'entrée : la barre du haut et celle du bas repartaient de zéro, alors qu'on
      change seulement de contenu. Ce sont les procédures qui changent, pas le
      cadre — le cadre doit rester immobile. */
+  dejaEntre = new Set()
   basculeSansAnimation = true
   await enterApp(membre)
   basculeSansAnimation = false
@@ -15881,12 +15925,30 @@ function autoResizeTextarea(el) {
 }
 
 function renderEditSteps() {
+/* Retirer la photo d'une étape. Il n'y avait aucun moyen de le faire : une
+   photo posée par erreur restait là pour toujours. */
+document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
+  const croix = e.target.closest('.img-oter')
+  if (!croix) return
+  e.preventDefault()
+  e.stopPropagation()
+  const ligne = croix.closest('[data-index]')
+  const i = Number(ligne?.dataset.index)
+  if (!Number.isInteger(i) || !editStepsData[i]) return
+  editStepsData[i].image_url = null
+  editStepsData[i].imageFichier = null
+  editStepsData[i].imageARetirer = true
+  renderEditSteps()
+  if (navigator.vibrate) navigator.vibrate(6)
+})
+
   const listEl = document.getElementById('edit-steps-list')
   listEl.innerHTML = ''
   const sel = ecapEditor ? ecapEditor.selected() : null
   editStepsData.forEach((step, i) => {
     const div = document.createElement('div')
     div.className = 'step-edit-item' + (i === sel ? ' selected' : '')
+    div.dataset.index = i
     const hasClip = step.timestamp_video != null && editVideoUrl
     const debut = step.timestamp_video != null ? step.timestamp_video : 0
     const fin = step.fin_video != null ? step.fin_video : debut
@@ -15894,9 +15956,11 @@ function renderEditSteps() {
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       ${hasClip ? '' : `<div class="step-img">
-          <div class="step-img-vignette">${step.image_url
+          <div class="step-img-vignette${step.image_url || step.imageFichier ? ' pleine' : ''}">${step.image_url
             ? `<img data-fichier="${escapeHtml(cheminFichier(step.image_url))}" alt="">`
-            : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
+            : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}${step.image_url || step.imageFichier
+            ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
+            : ''}</div>
           <button type="button" class="img-toucher" aria-label="Photo de l'étape">
             <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
           </button>

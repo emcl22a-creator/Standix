@@ -4381,8 +4381,8 @@
     </div>
 
     <div class="an-intro">
-      <div class="t">Qui fait quoi chez vous</div>
-      <div class="s">Définissez les postes de votre établissement. Chaque membre choisira le sien — c'est ce qui vous permettra un jour de comparer <b>la cuisine et la salle</b>.</div>
+      <div class="t">Qui fait quoi dans l'entreprise</div>
+      <div class="s">Définissez les postes de votre établissement. Chaque membre choisira le sien.</div>
     </div>
 
     <!-- La saisie passe AU-DESSUS de la liste : on vient sur cette page pour
@@ -7052,7 +7052,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
           <span class="st">${c.nbProcs} proc\u00e9dure${c.nbProcs > 1 ? 's' : ''}${
             n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
         </span>
-        <span class="vl">${c.total ? dureeLisible(c.total) : '\u2014'}</span>
+        ${tempsTotalHtml(c.total, false, periodLabel)}
       </button>`
   }).join('')
 
@@ -7430,13 +7430,21 @@ function renderMembresListe() {
     return
   }
 
+  /* Le mois en cours, comme les deux autres sections. Elles montraient trois
+     fenêtres différentes de la même semaine : Équipe le total depuis toujours,
+     Catégories et Procédures le mois. Trois chiffres qui ne se comparent pas,
+     empilés sur le même écran. */
+  const debutMois = new Date()
+  debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+
   const stats = employes.map(m => {
     const siennes = (validations || []).filter(v => v.membre_id === m.id)
+    const duMois = siennes.filter(v => new Date(v.validated_at) >= debutMois)
     const derniere = siennes.length
       ? Math.max(...siennes.map(v => new Date(v.validated_at).getTime()))
       : 0
-    const total = siennes.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
-    return { m, nb: siennes.length, derniere, total,
+    const total = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+    return { m, nb: duMois.length, derniere, total,
              arrivee: new Date(m.created_at || 0).getTime() }
   })
 
@@ -7463,7 +7471,7 @@ function renderMembresListe() {
       <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
         <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) : 'Poste non d\u00e9fini'}</span>
       </div>
-      ${tempsTotalHtml(s.total)}`
+      ${tempsTotalHtml(s.total, false, 'ce mois-ci')}`
     el.appendChild(div)
   })
 

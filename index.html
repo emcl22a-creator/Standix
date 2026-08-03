@@ -6688,7 +6688,11 @@ function ouvrirContact() {
     '\n\n\u2014\n' + (currentMembre?.nom || '') + ' \u00b7 espace ' + espace)
   window.location.href = `mailto:support@frizz-instant.com?subject=${sujet}&body=${corps}`
 }
-;['contact-gestion', 'contact-equipe'].forEach(id => {
+/* Les avatars de l'accueil ouvrent la MÊME fenêtre que la carte « Écrivez-nous »
+   des réglages. Ils avaient chacun leur texte, plus court et différent : deux
+   portes vers le même endroit doivent dire la même chose, sinon on croit
+   arriver ailleurs. */
+;['contact-gestion', 'contact-equipe', 'accueil-avatar', 'e-avatar'].forEach(id => {
   const el = document.getElementById(id)
   el?.addEventListener('click', ouvrirContact)
   el?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ouvrirContact() } })
@@ -8136,16 +8140,6 @@ function renderAccueil() {
 }
 
 /* Un appui sur l'avatar ouvre le support, avec la même fenêtre que partout. */
-document.getElementById('accueil-avatar')?.addEventListener('click', async () => {
-  const ok = await confirmDialog({
-    titre: 'On est là',
-    message: "Une question, un blocage ? Écrivez-nous, quelqu'un vous répond dans la journée.",
-    confirmer: 'Nous écrire',
-    annuler: 'Plus tard',
-    danger: false,
-  })
-  if (ok) window.location.href = 'mailto:support@frizz-instant.com?subject=' + encodeURIComponent('Procédo — besoin d\'aide')
-})
 
 // Capture la position actuelle de chaque carte (identifiée par data-key) avant de les réordonner
 function captureCardPositions(containerEl) {
@@ -12221,14 +12215,6 @@ document.getElementById('e-cat-recherche')?.addEventListener('input', (e) => {
 })
 
 // Le support, joignable depuis l'avatar comme côté gestion
-document.getElementById('e-avatar')?.addEventListener('click', async () => {
-  const ok = await confirmDialog({
-    titre: 'On est là',
-    message: "Une question sur une procédure ? Écrivez-nous, quelqu'un vous répond dans la journée.",
-    confirmer: 'Nous écrire', annuler: 'Plus tard', danger: false,
-  })
-  if (ok) window.location.href = 'mailto:support@frizz-instant.com?subject=' + encodeURIComponent('Procédo — question')
-})
 
 // ═══════════ ÉQUIPE : détail ═══════════
 /* ═══════════════════════════════════════════════════════════════════════════

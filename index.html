@@ -562,6 +562,10 @@
     width:24px; height:24px; padding:0; border:none; background:none;
     color:var(--label-3); flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
+    /* La médaille fait 30 px et la ligne a 13 px de marge à droite : son centre
+       tombe donc à 28 px du bord. Le bouton en fait 24, son centre à 12. On le
+       décale de la différence pour qu'il s'aligne sur la colonne. */
+    margin-right:16px;
   }
   .an-aide svg{ width:19px; height:19px; display:block; }
   .an-aide:active{ color:var(--label-2); }
@@ -2392,7 +2396,7 @@
   .stat-mini .num{ font-size:20px; font-weight:700; }
   .stat-mini .lbl{ font-size:10.5px; color:var(--label-2); margin-top:2px; }
 
-  .emp-row{ display:flex; align-items:center; gap:10px; padding:10px 14px; margin-bottom:6px;
+  .emp-row{ display:flex; align-items:center; gap:9px; padding:8px 13px; margin-bottom:4px;
     animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; }
   .emp-row-sous{
     display:block; font-size:11.5px; color:var(--label-3);
@@ -2500,18 +2504,16 @@
 
   /* La case. Elle porte le numéro tant qu'elle n'est pas cochée : on ne perd pas
      le repère de l'ordre en gagnant celui de l'avancement. */
+  /* La case n'est plus qu'un cadre : c'est l'hexagone dessiné qui porte la forme,
+     la matière et le chiffre. Même dessin qu'à la création, même vocabulaire. */
   .et-coche{
     position:absolute; left:-42px; top:-3px; width:29px; height:29px;
-    border-radius:50%; border:1.6px solid rgba(255,255,255,0.22);
-    background:rgba(255,255,255,0.04); color:var(--label-3);
-    font-family:inherit; font-size:12px; font-weight:800; padding:0;
+    border:none; background:none; padding:0; line-height:0;
     display:flex; align-items:center; justify-content:center;
-    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s, border-color 0.2s;
+    transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
   }
+  .et-coche svg{ width:29px; height:29px; display:block; }
   .et-coche:active{ transform:scale(0.86); }
-  .et-coche.f{
-    background:var(--blue); border-color:var(--blue); color:#04203F; font-size:14px;
-  }
   /* Une étape faite s'efface un peu : l'œil va d'abord à ce qui reste. */
   #detail-steps.etapes-fil .detail-step.faite p{ color:var(--label-2); }
 
@@ -10532,21 +10534,40 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
 // ═══ Étapes manuelles (texte seul, pas de vidéo) ═══
 /* Les deux dessins du fil, dans la palette des icônes de création : retrait à
    16 %, trait de devant à 42 %, fond à 5 %. */
+/* Le numéro d'une étape reprend l'hexagone de la médaille : même forme, mêmes
+   facettes, en matière neutre. Toute l'app parle ainsi d'une seule géométrie —
+   la fiche empilée pour les procédures, l'hexagone pour ce qui se compte. */
 function numeroEtapeDess(n) {
   return `<svg viewBox="0 0 30 30" fill="none">
-    <rect x="8" y="2" width="18" height="14" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.6"/>
-    <rect x="2" y="7" width="22" height="20" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.7"/>
-    <text x="13" y="21" text-anchor="middle" font-family="Inter,sans-serif" font-size="11"
+    <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
+             fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)"
+             stroke-width="1.5" stroke-linejoin="round"/>
+    <polygon points="14,1.5 25.3,8 14,14.5 2.7,8" fill="#fff" opacity="0.10"/>
+    <text x="14" y="18.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="11"
           font-weight="800" fill="rgba(255,255,255,0.86)">${n}</text>
+  </svg>`
+}
+
+/* L'hexagone une fois l'étape faite : même forme, matiere bleue, une coche
+   dedans. Garder la forme entre les deux états évite le saut visuel — seule la
+   couleur change, comme quand on coche une case. */
+function cocheFaiteDess() {
+  return `<svg viewBox="0 0 30 30" fill="none">
+    <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
+             fill="#5EA0FF" stroke="rgba(200,225,255,0.9)" stroke-width="1.2" stroke-linejoin="round"/>
+    <polygon points="14,1.5 25.3,8 14,14.5 2.7,8" fill="#fff" opacity="0.22"/>
+    <path d="M9.8 14.4 12.9 17.4 18.4 11.4" stroke="#04203F" stroke-width="2.1"
+          stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`
 }
 
 function plusEtapeDess() {
   return `<svg viewBox="0 0 30 30" fill="none">
-    <rect x="8" y="2" width="18" height="14" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.6"/>
-    <rect x="2" y="7" width="22" height="20" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-dasharray="3.5 3"/>
-    <line x1="13" y1="13" x2="13" y2="21" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
-    <line x1="9" y1="17" x2="17" y2="17" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
+    <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
+             fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)"
+             stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="3.5 3"/>
+    <line x1="14" y1="10" x2="14" y2="19" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="9.5" y1="14.5" x2="18.5" y2="14.5" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
   </svg>`
 }
 
@@ -12170,7 +12191,7 @@ function peindreCoches() {
     if (!b) return
     const faite = etapesFaites.has(b.dataset.etape)
     b.classList.toggle('f', faite)
-    b.textContent = faite ? '\u2713' : String(i + 1)
+    b.innerHTML = faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)
     div.classList.toggle('faite', faite)
   })
   majBandeauCoches()
@@ -12323,7 +12344,7 @@ async function openEquipeDetail(procId) {
     if (faite) div.classList.add('faite')
     div.innerHTML = `
       <button type="button" class="et-coche${faite ? ' f' : ''}" data-etape="${escapeHtml(etape.id)}"
-              aria-label="\u00c9tape ${i + 1}">${faite ? '\u2713' : (i + 1)}</button>
+              aria-label="\u00c9tape ${i + 1}">${faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)}</button>
       <div class="et-co">
         <p>${escapeHtml(etape.texte)}</p>
         ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}

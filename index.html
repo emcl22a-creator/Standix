@@ -2303,8 +2303,11 @@
     opacity:0; transition:opacity 0.22s ease;
   }
   .ios-alert-backdrop.shown{ opacity:1; }
+  /* La fenêtre était un calque d'iOS : 272 px de large, boutons à 17 px, bleu
+     système. Elle passe aux mesures de l'app — rayon de 20 comme les cartes,
+     texte à la même échelle, notre bleu. Une boîte empruntée se remarque. */
   .ios-alert{
-    width:100%; max-width:272px; border-radius:15px; overflow:hidden; text-align:center;
+    width:100%; max-width:310px; border-radius:20px; overflow:hidden; text-align:center;
     background:rgba(44,44,48,0.86); -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%);
     box-shadow:0 20px 60px rgba(0,0,0,0.6);
     transform:scale(1.16); opacity:0;
@@ -2313,8 +2316,8 @@
   .ios-alert-backdrop.shown .ios-alert{ transform:scale(1); opacity:1; }
   .ios-alert-choix{ display:flex; flex-direction:column; }
   .ios-alert-choix button{
-    height:46px; border:none; background:none; color:var(--blue);
-    font-family:inherit; font-size:16px; font-weight:500;
+    height:48px; border:none; background:none; color:var(--blue);
+    font-family:inherit; font-size:15.5px; font-weight:650;
     border-top:0.5px solid rgba(255,255,255,0.14);
   }
   .ios-alert-choix button:active{ background:rgba(255,255,255,0.07); }
@@ -2329,13 +2332,13 @@
   }
   .ios-alert-champ:focus{ outline:none; border-color:rgba(255,255,255,0.42); }
   .ios-alert-backdrop.closing .ios-alert{ transform:scale(0.95); opacity:0; transition-duration:0.16s; }
-  .ios-alert-body{ padding:19px 16px 17px; }
-  .ios-alert-title{ font-size:17px; font-weight:700; letter-spacing:-0.02em; margin-bottom:4px; }
-  .ios-alert-msg{ font-size:13px; line-height:1.35; color:rgba(235,235,245,0.75); }
+  .ios-alert-body{ padding:22px 20px 19px; }
+  .ios-alert-title{ font-size:16.5px; font-weight:750; letter-spacing:-0.03em; margin-bottom:6px; }
+  .ios-alert-msg{ font-size:13px; line-height:1.5; color:var(--label-2); }
   .ios-alert-actions{ display:flex; border-top:0.5px solid rgba(255,255,255,0.18); }
   .ios-alert-actions button{
-    flex:1; padding:13px 8px; font-family:inherit; font-size:17px; letter-spacing:-0.02em;
-    color:#0A84FF; background:none; transition:background 0.12s;
+    flex:1; padding:15px 8px; font-family:inherit; font-size:15.5px; font-weight:650; letter-spacing:-0.025em;
+    color:var(--blue); background:none; transition:background 0.12s;
   }
   .ios-alert-actions button:active{ background:rgba(255,255,255,0.10); }
   .ios-alert-actions button + button{ border-left:0.5px solid rgba(255,255,255,0.18); }
@@ -2470,8 +2473,10 @@
   /* ═══ Le fil des étapes, côté équipe ═══
      La même forme qu'à la création : un trait relie les cases, et l'ordre se voit
      sans qu'on ait à le lire. */
-  #detail-steps.etapes-fil{ position:relative; padding-left:42px; margin-top:4px; }
-  #detail-steps.etapes-fil::before{
+  #detail-steps.etapes-fil,
+  #analyse-steps-list.etapes-fil{ position:relative; padding-left:42px; margin-top:4px; }
+  #detail-steps.etapes-fil::before,
+  #analyse-steps-list.etapes-fil::before{
     content:''; position:absolute; left:14px; top:9px; bottom:18px; width:1.5px;
     background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
   }
@@ -2479,12 +2484,15 @@
      bonne case du premier coup. On desserre légèrement : 28 px entre les étapes
      au lieu de 20, et un peu d'air entre les lignes du texte. C'est un écran de
      lecture, pas un écran de saisie. */
-  #detail-steps.etapes-fil .detail-step{
+  #detail-steps.etapes-fil .detail-step,
+  #analyse-steps-list.etapes-fil .detail-step{
     position:relative; background:none !important; border:none !important;
     border-radius:0 !important; padding:0 0 28px !important; margin:0 !important;
   }
-  #detail-steps.etapes-fil .detail-step p{ line-height:1.55; }
-  #detail-steps.etapes-fil .detail-step.en-lecture::after{
+  #detail-steps.etapes-fil .detail-step p,
+  #analyse-steps-list.etapes-fil .detail-step p{ line-height:1.55; }
+  #detail-steps.etapes-fil .detail-step.en-lecture::after,
+  #analyse-steps-list.etapes-fil .detail-step.en-lecture::after{
     content:''; position:absolute; left:-55px; top:-5px; bottom:16px; width:2.5px;
     border-radius:2px; background:var(--blue);
   }
@@ -3849,15 +3857,7 @@
     </div>
     <div class="subhead" id="analyse-subhead">Chargement...</div>
 
-    <div class="hero-card">
-      <div class="lbl">Ont consulté</div>
-      <div class="num" id="analyse-taux">—</div>
-      <div class="sub" id="analyse-sub">—</div>
-      <div class="bar"><div class="bar-fill" id="analyse-bar" style="width:0%;"></div></div>
-      <!-- Le filtre de période a été retiré : sur UNE procédure, ce qui compte est
-         de savoir qui l'a lue, pas quand. Le total est la seule réponse utile. -->
-    </div>
-
+    
     <div class="analyse-couv" id="analyse-couverture" style="display:none;"></div>
     <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
       <video id="analyse-video" controls playsinline webkit-playsinline></video>
@@ -11316,6 +11316,10 @@ async function openAnalyse(procId) {
   // Étapes : texte, et pour les étapes issues d'une vidéo, un vrai clip borné (début → fin de l'étape)
   const stepsListEl = document.getElementById('analyse-steps-list')
   stepsListEl.innerHTML = ''
+  /* Le même fil qu'à la création : le gérant voit sa procédure sous la forme où
+     il l'a écrite, et sous celle où son équipe la lira. Trois formes pour la
+     même chose en étaient deux de trop. */
+  stepsListEl.classList.add('etapes-fil')
   detacherSuiviLecture(videoEl)
   if (currentAnalyseData.etapes.length === 0) {
     stepsListEl.innerHTML = '<div class="note">Aucune étape pour le moment.</div>'
@@ -11328,9 +11332,12 @@ async function openAnalyse(procId) {
       const bounds = clipBounds.get(etape.id)
       const hasClip = bounds && proc.video_url
       div.innerHTML = `
-        <div class="n">${i + 1}</div>
-        <p style="flex:1;">${escapeHtml(etape.texte)}</p>
-        ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
+        <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+        <div class="et-co">
+          <p>${escapeHtml(etape.texte)}</p>
+          ${hasClip ? `<span class="badge extrait" style="cursor:pointer;">\u25b6 ${formatTime(bounds.start)}\u2013${formatTime(bounds.end)}</span>` : ''}
+          ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}
+        </div>
       `
       /* Le contour bleu vaut pour TOUTES les étapes, avec ou sans vidéo : c'est
          un repère de lecture, pas une commande de lecteur. Quelqu'un qui suit une
@@ -11551,9 +11558,6 @@ function renderAnalyseStats() {
   const taux = nbEmployes > 0 ? Math.round((nbConsulte / nbEmployes) * 100) : 0
   const periodLabel = currentAnalysePeriod === 'week' ? 'cette semaine' : currentAnalysePeriod === 'month' ? 'ce mois-ci' : 'au total'
 
-  document.getElementById('analyse-taux').textContent = `${nbConsulte} / ${nbEmployes}`
-  document.getElementById('analyse-sub').textContent = `${nbConsulte} sur ${nbEmployes} ont consulté cette procédure`
-  document.getElementById('analyse-bar').style.width = taux + '%'
 
   const empListEl = document.getElementById('analyse-emp-list')
   empListEl.innerHTML = ''
@@ -13761,7 +13765,10 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   })
   if (!ok) return
   const { error } = await supabase.from('membres').delete().eq('id', btn.dataset.membre)
-  if (error) { alert('Erreur : ' + error.message); return }
+  /* `alert()` ouvre la boîte du navigateur : elle porte le nom du site, ne suit
+     pas le thème sombre, et casse net l'impression d'application. Le toast dit
+     la même chose sans sortir de l'app. */
+  if (error) { toast('Retrait impossible : ' + error.message); return }
   openMembres()
 })
 

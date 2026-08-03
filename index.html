@@ -8975,15 +8975,15 @@ const DUREE_REFUSEE = 10 * 60
       la fiche. On ne la remplace pas, on épargne seulement son transport.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Ce plafond n'est pas un choix : Supabase refuse l'envoi au-delà de sa propre
-   limite, réglée dans le tableau de bord (Storage → Settings → Upload file size
-   limit). Tant qu'elle vaut 50 Mo, une vidéo de dix minutes ne passera pas,
-   quoi qu'on écrive ici.
+/* Ce plafond n'est pas un choix : le plan gratuit de Supabase refuse tout envoi
+   au-delà de 50 Mo, et cette limite n'est pas réglable. Écrire un chiffre plus
+   élevé ici ne ferait qu'échouer APRÈS deux minutes de transfert, au lieu de
+   refuser proprement avant.
 
-   La valeur ci-dessous doit rester LÉGÈREMENT SOUS celle du tableau de bord :
-   c'est ce qui permet de refuser poliment avant l'envoi plutôt que d'échouer
-   après deux minutes de transfert. */
-const VIDEO_POIDS_MAX = 190 * 1024 * 1024
+   La durée, elle, monte à dix minutes : ce qui bloque n'est pas la longueur mais
+   la définition. Dix minutes en 720p tiennent sous 45 Mo ; les mêmes en 1080p en
+   font trois fois plus. Le message de refus le dit, avec le réglage à changer. */
+const VIDEO_POIDS_MAX = 45 * 1024 * 1024
 
 function poidsLisible(o) {
   return o >= 1024 * 1024 ? Math.round(o / 1024 / 1024) + ' Mo'
@@ -9043,11 +9043,12 @@ function verifierDureeVideo() {
      jusqu'ici sans rien expliquer. */
   if (aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX) {
     err.style.color = 'var(--red)'
+    const minutes = aiVideoDuree ? Math.max(1, Math.round(aiVideoDuree / 60)) : 10
     err.innerHTML = `Cette vid\u00e9o p\u00e8se <b>${poidsLisible(aiVideoFile.size)}</b>, ` +
       `au-del\u00e0 des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo accept\u00e9s.<br>` +
-      `Pour un enregistrement d'\u00e9cran : refaites-le en 720p plut\u00f4t qu'en 1080p, ` +
-      `ou coupez-le en deux proc\u00e9dures. Pour une vid\u00e9o de t\u00e9l\u00e9phone : filmez en 720p ` +
-      `dans les r\u00e9glages de l'appareil photo.`
+      `C'est la <b>d\u00e9finition</b> qui p\u00e8se, pas la dur\u00e9e : ${minutes} min en 720p ` +
+      `tiennent largement, les m\u00eames en 1080p font trois fois plus.<br>` +
+      `Sur iPhone : R\u00e9glages \u2192 Appareil photo \u2192 Enregistrer vid\u00e9o \u2192 <b>720p HD \u00e0 30 i/s</b>.`
     btn.disabled = true
     return
   }

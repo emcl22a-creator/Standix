@@ -701,6 +701,37 @@
   .temps-total.grand b{ font-size:19px; letter-spacing:-0.04em; }
   .temps-total.grand i{ font-size:11.5px; margin-top:3px; }
 
+  /* La ligne des pages d'analyse : la même que la page Équipe. Un filet, pas
+     de carte — vingt lignes restent parcourables. */
+  /* La roue de consultation, en tête de la liste des employés. */
+  .emp-roue{
+    display:flex; align-items:center; gap:14px; margin-bottom:6px;
+    padding:15px 16px; border-radius:18px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .emp-roue .roue{ width:58px; height:58px; flex-shrink:0; }
+  .emp-roue .tx{ flex:1; min-width:0; }
+  .emp-roue .t{ font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
+  .emp-roue .s{ font-size:12px; color:var(--label-2); margin-top:3px; line-height:1.45; }
+  .emp-roue .s b{ color:#fff; font-weight:650; }
+  .emp-liste .an-lig .pt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  .an-lig{
+    display:flex; align-items:center; gap:12px; width:100%;
+    padding:12px 2px; background:none; border:none;
+    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    font-family:inherit; text-align:left; color:inherit;
+  }
+  .an-lig:last-of-type{ border-bottom:none; }
+  .an-lig:active{ opacity:0.6; }
+  .an-lig .co{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .an-lig .nm{ font-size:14.5px; font-weight:600; }
+  .an-lig .st{ font-size:11.5px; color:var(--label-3); margin-top:1px; }
+  .an-lig .vl{ font-size:14px; font-weight:650; color:var(--label-2); flex-shrink:0; }
+  .an-lig .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
+  .an-seg{ margin-top:16px; }
+  .an-vide{ font-size:13px; color:var(--label-3); padding:14px 2px; }
+
   .an-compte{
     font-size:13px; color:var(--label-3); font-weight:600; flex:1;
   }
@@ -3962,7 +3993,7 @@
             <path d="M13 7.6V12l3.2 2" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </span>
-        <b>Le temps de chacun</b>
+        <b>Procédures</b>
       </div>
       <div id="ga-late-list"></div>
     </div>
@@ -3980,8 +4011,8 @@
     <!-- Une page qui s'ouvre sur une liste nue ne dit pas ce qu'on peut y faire.
          Deux lignes suffisent à l'apprendre, et on ne les relit pas. -->
     <div class="an-intro">
-      <div class="t">Qui suit, et qui décroche</div>
-      <div class="s">Touchez une personne pour voir <b>son temps de lecture</b>, les procédures qu'elle a ouvertes et celles qu'elle n'a jamais lues.</div>
+      <div class="t" id="an-eq-titre">—</div>
+      <div class="s" id="an-eq-sous">—</div>
     </div>
 
     <div class="list-tools" style="margin-top:20px;">
@@ -4010,8 +4041,12 @@
     </div>
 
     <div class="an-intro">
-      <div class="t">Ce qui est suivi, ce qui ne l'est pas</div>
-      <div class="s">Quelles parties de votre métier sont suivies, et lesquelles restent lettre morte. Touchez-en une pour <b>voir ses procédures</b>.</div>
+      <div class="t">Où part le temps de votre équipe</div>
+      <div class="s">Une catégorie qui absorbe des heures est soit essentielle, soit mal expliquée. Touchez-en une pour <b>voir ses procédures</b>.</div>
+    </div>
+    <div class="ga-segments an-seg">
+      <button class="active" data-an-periode="month">Ce mois</button>
+      <button data-an-periode="all">Total</button>
     </div>
     <div id="an-categories-liste" style="margin-top:12px;"></div>
   </div>
@@ -4021,12 +4056,16 @@
       <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Le temps de chacun</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Procédures</h1>
     </div>
 
     <div class="an-intro">
-      <div class="t">Où part le temps</div>
-      <div class="s">Qui passe le plus de temps sur vos procédures, et sur lesquelles. Touchez un nom pour <b>son analyse complète</b>.</div>
+      <div class="t">Ce qui occupe le plus votre équipe</div>
+      <div class="s">Une procédure qui absorbe deux heures par mois mérite un regard : soit elle est essentielle, soit elle est mal écrite.</div>
+    </div>
+    <div class="ga-segments an-seg">
+      <button class="active" data-an-periode="month">Ce mois</button>
+      <button data-an-periode="all">Total</button>
     </div>
     <div id="an-temps-liste" style="margin-top:12px;"></div>
   </div>
@@ -4065,16 +4104,14 @@
       <div id="fm-medaille"></div>
     </div>
 
-    <div class="ga-segments" id="fm-periode">
-      <button class="active" data-fm="week">Semaine</button>
-      <button data-fm="month">Mois</button>
-      <button data-fm="all">Total</button>
-    </div>
+    <!-- Plus de sélecteur : les deux durées qui comptent — ce mois et le total —
+         sont affichées côte à côte. Un filtre pour deux valeurs coûtait un geste
+         et cachait toujours l'une des deux. -->
 
     <div class="fm-trois">
-      <div class="un"><div class="v" id="fm-temps">—</div><div class="l">De lecture</div></div>
+      <div class="un"><div class="v" id="fm-temps">—</div><div class="l">Ce mois-ci</div></div>
+      <div class="un"><div class="v" id="fm-total">—</div><div class="l">Au total</div></div>
       <div class="un"><div class="v" id="fm-lues">—</div><div class="l">Procédures lues</div></div>
-      <div class="un"><div class="v" id="fm-moyenne">—</div><div class="l">Par procédure</div></div>
     </div>
 
     <div class="fm-titre">Où il passe son temps</div>
@@ -4083,8 +4120,8 @@
     <div class="fm-titre">Ce qu'il n'a pas lu</div>
     <div id="fm-reste"></div>
 
-    <div class="fm-titre">Ses appareils</div>
-    <div id="fm-appareils"></div>
+    <!-- « Ses appareils » retiré : la fiche répond à une seule question — que
+         dois-je faire pour cette personne. Le matériel n'y aide pas. -->
 
     <div class="fm-actions" id="fm-actions"></div>
   </div>
@@ -4174,6 +4211,11 @@
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/><circle cx="17.4" cy="9.6" r="2.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
+        <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/></svg></span>
+          <span class="reg-nm">Les postes</span>
+          <span class="reg-fl">›</span>
+        </button>
       <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-code')">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="reg-nm">Code d'invitation</span>
@@ -4234,6 +4276,21 @@
   </div>
 
   <!-- Sous-page : le compte -->
+  <div class="screen" id="p-reg-poste">
+    <div class="detail-header">
+      <button class="back-btn" id="poste-retour" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre poste</h1>
+    </div>
+    <div class="an-intro">
+      <div class="t">Quel est votre rôle ici ?</div>
+      <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
+    </div>
+    <div id="mon-poste-liste" style="margin-top:14px;"></div>
+    <div class="reg-note" id="mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
+  </div>
+
   <div class="screen" id="p-reg-compte">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
@@ -4268,6 +4325,32 @@
   </div>
 
   <!-- Sous-page : les établissements -->
+  <!-- Les postes de l'entreprise. Une liste fermée plutôt qu'un champ libre :
+       « serveur », « Serveur », « serveuse » et « svr » rendraient toute
+       analyse par poste inexploitable. -->
+  <div class="screen" id="p-reg-postes">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Les postes</h1>
+    </div>
+
+    <div class="an-intro">
+      <div class="t">Qui fait quoi chez vous</div>
+      <div class="s">Définissez les postes de votre établissement. Chaque membre choisira le sien — c'est ce qui vous permettra un jour de comparer <b>la cuisine et la salle</b>.</div>
+    </div>
+
+    <div id="postes-liste" style="margin-top:14px;"></div>
+
+    <div class="man-lbl">Ajouter un poste</div>
+    <div style="display:flex; gap:8px;">
+      <input type="text" class="man-champ" id="poste-nouveau" placeholder="Ex : Cuisine" style="flex:1;">
+      <button class="btn" id="poste-ajouter" style="width:auto; padding:0 18px; height:auto;">Ajouter</button>
+    </div>
+    <div class="error-msg" id="poste-erreur"></div>
+  </div>
+
   <div class="screen" id="p-reg-etabs">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
@@ -4537,6 +4620,12 @@
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/></svg></span><span class="reg-nm">Vos entreprises</span>
         <span class="reg-val" id="es-nb-ent">—</span><span class="fl">›</span>
       </button>
+        <button type="button" class="reg-ligne" onclick="ouvrirMonPoste()">
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/></svg></span>
+          <span class="reg-nm">Votre poste</span>
+          <span class="reg-val" id="e-mon-poste">—</span>
+          <span class="reg-fl">›</span>
+        </button>
     </div>
 
     <div class="reg-titre">Préférences</div>
@@ -6668,7 +6757,7 @@ function renderGaStats() {
 
   renderTopCategories(procedures, dansPeriode, nbEmployes, libelle)
   renderMembresListe()
-  renderGainTemps(dansPeriode, libelle)
+  renderGainTemps(validations, procedures)
   renderTempsLecture(procedures, dansPeriode, libelle)
 }
 
@@ -6697,31 +6786,31 @@ function renderGaStats() {
    sur les fiches. Le décompte tourne uniquement quand une procédure est
    ouverte, et se met en pause dès que l'app passe en arrière-plan.
    ═══════════════════════════════════════════════════════════════════════════ */
-function renderGainTemps(dansPeriode, libelle) {
+/* La carte du haut. Elle dit le mois, pas la semaine : sur sept jours, une
+   équipe de cinq personnes affiche souvent zéro, et une carte qui affiche zéro
+   ne convainc personne. Le mois donne un chiffre qui existe. */
+function renderGainTemps(validations, procedures) {
   const carte = document.getElementById('an-gain')
   if (!carte) return
   carte.style.display = ''
 
-  const avecDuree = dansPeriode.filter(v => Number(v.duree_lecture) > 0)
-  const secondes = avecDuree.reduce((s, v) => s + Number(v.duree_lecture), 0)
-  const lecteurs = new Set(avecDuree.map(v => v.membre_id)).size
+  const debutMois = new Date()
+  debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+  const duMois = (validations || []).filter(v => new Date(v.validated_at) >= debutMois)
+
+  const secondes = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  const lecteurs = new Set(duMois.filter(v => Number(v.duree_lecture)).map(v => v.membre_id)).size
   const t = document.getElementById('an-gain-t')
   const s = document.getElementById('an-gain-s')
 
-  /* La carte ne se tait plus. Elle se cachait quand rien n'était mesuré — c'est
-     précisément le moment où le gérant a besoin qu'on lui dise à quoi sert ce
-     qu'il vient de construire. Une page qui commence par du vide ne convainc
-     personne. */
   if (!secondes) {
     t.textContent = 'Chaque lecture est une explication en moins'
     s.innerHTML = 'D\u00e8s que votre \u00e9quipe ouvrira vos proc\u00e9dures, ' +
-      'vous verrez ici <b>le temps que vous n\'avez plus \u00e0 passer \u00e0 expliquer</b>.'
+      "vous verrez ici <b>le temps que vous n'avez plus \u00e0 passer \u00e0 expliquer</b>."
     return
   }
 
-  t.textContent = `${dureeLisible(secondes)} de formation ${libelle}`
-
-  /* Le verbe s'accorde aussi : « 1 personne se sont formée » ne passe pas. */
+  t.textContent = `${dureeLisible(secondes)} de formation ce mois-ci`
   const pl = lecteurs > 1
   s.innerHTML = `<b>${lecteurs} personne${pl ? 's' : ''}</b> ` +
     `${pl ? 'se sont form\u00e9es' : "s'est form\u00e9e"} sans que vous ayez eu \u00e0 l'expliquer.`
@@ -6740,73 +6829,61 @@ function renderGainTemps(dansPeriode, libelle) {
    Le détail par procédure est ce qui rend la carte utile : « 42 min » ne dit
    rien, « 42 min dont 25 sur le Plan HACCP » dit que quelqu'un a buté dessus.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Les procédures où l'équipe passe le plus de temps.
+
+   Avant, cette section classait les PERSONNES. Mais un gérant qui regarde son
+   analyse ne cherche pas qui lit le plus — il cherche ce qui occupe son équipe.
+   Une procédure qui absorbe deux heures par mois est soit essentielle, soit mal
+   écrite ; dans les deux cas c'est là qu'il faut regarder. */
 function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
   const el = cible || document.getElementById('ga-late-list')
   if (!el) return
 
-  const employes = currentGaData?.employes || []
-  const parMembre = {}
+  const parProc = {}
   dansPeriode.forEach(v => {
     const s = Number(v.duree_lecture || 0)
     if (!s) return
-    if (!parMembre[v.membre_id]) parMembre[v.membre_id] = { total: 0, procs: {} }
-    parMembre[v.membre_id].total += s
-    parMembre[v.membre_id].procs[v.procedure_id] =
-      (parMembre[v.membre_id].procs[v.procedure_id] || 0) + s
+    if (!parProc[v.procedure_id]) parProc[v.procedure_id] = { total: 0, lecteurs: new Set() }
+    parProc[v.procedure_id].total += s
+    parProc[v.procedure_id].lecteurs.add(v.membre_id)
   })
 
-  const classement = Object.entries(parMembre)
-    .map(([id, d]) => ({ membre: employes.find(e => e.id === id), ...d }))
-    .filter(x => x.membre)
+  const classement = Object.entries(parProc)
+    .map(([id, d]) => ({ proc: procedures.find(x => x.id === id), ...d }))
+    .filter(x => x.proc)
     .sort((a, b) => b.total - a.total)
-  const visibles = tout ? classement : classement.slice(0, 3)
 
   if (!classement.length) {
     el.innerHTML = `<div class="an-vide">Aucun temps mesur\u00e9 ${escapeHtml(libelle)}.</div>`
     return
   }
 
-  const max = classement[0].total
+  const visibles = tout ? classement : classement.slice(0, 3)
 
-  el.innerHTML = visibles.map((x, i) => {
-    /* Les procédures de cette personne, de la plus longue à la plus courte. On
-       en montre trois : au-delà, la carte devient un tableau. */
-    const siennes = Object.entries(x.procs)
-      .map(([pid, s]) => ({ proc: procedures.find(p => p.id === pid), s }))
-      .filter(y => y.proc)
-      .sort((a, b) => b.s - a.s)
-      .slice(0, 3)
-
-    const couleur = i === 0 ? '#30D158' : i === 1 ? '#5EA0FF' : 'rgba(255,255,255,0.42)'
-
+  el.innerHTML = visibles.map((x) => {
+    const n = x.lecteurs.size
     return `
-      <div class="cat-rank cliquable${i === 0 ? ' premier' : ''}" role="button" tabindex="0"
-           data-membre="${escapeHtml(x.membre.id)}">
-        <div class="pos">${i + 1}</div>
-        <div class="infos">
-          <div class="nom">${escapeHtml(x.membre.nom || 'Sans nom')}</div>
-          <div class="detail">${siennes.map(y =>
-            escapeHtml(y.proc.titre || 'Sans titre') + ' ' + dureeLisible(y.s)
-          ).join(' \u00b7 ')}</div>
-          <div class="jauge"><i style="width:${Math.round(x.total / max * 100)}%; background:${couleur};"></i></div>
-        </div>
-        <div class="taux" style="color:${couleur};">${dureeLisible(x.total)}</div>
-      </div>`
+      <button type="button" class="an-lig" data-proc="${escapeHtml(x.proc.id)}">
+        <span class="co">
+          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
+          <span class="st">${escapeHtml(x.proc.categorie || 'Sans cat\u00e9gorie')} \u00b7 ${n} personne${n > 1 ? 's' : ''}</span>
+        </span>
+        <span class="vl">${dureeLisible(x.total)}</span>
+        <span class="fl">\u203a</span>
+      </button>`
   }).join('')
 
   if (!tout && classement.length > 3) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = classement.length - 3 === 1
-      ? 'Voir la derni\u00e8re'
-      : `Voir les ${classement.length - 3} autres`
-    b.addEventListener('click', () => ouvrirAnTemps())
+    b.textContent = `Voir les ${classement.length - 3} autres`
+    b.addEventListener('click', () => ouvrirAnProcedures())
     el.appendChild(b)
   }
 
-  el.querySelectorAll('[data-membre]').forEach(b => {
-    b.addEventListener('click', () => ouvrirFicheMembre(b.dataset.membre))
+  el.querySelectorAll('[data-proc]').forEach(x => {
+    x.addEventListener('click', () => openAnalyse(x.dataset.proc))
   })
 }
 
@@ -6839,67 +6916,74 @@ function dessinerAnneau(id, pct, couleur, texte, unite) {
    dix procédures écraserait systématiquement une catégorie de deux. */
 /* `cible` et `tout` permettent de réutiliser ce rendu sur la page entière :
    mêmes lignes, même grammaire, un seul endroit qui les dessine. */
+/* Les catégories où l'équipe passe le plus de temps.
+
+   Avant, on classait par taux de consultation. Mais un taux élevé sur une
+   catégorie d'une seule procédure ne dit rien ; le temps, lui, se compare
+   d'une catégorie à l'autre quelle que soit leur taille. */
 function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel, cible, tout) {
   const el = cible || document.getElementById('ga-top-categories')
   if (!el) return
   el.innerHTML = ''
 
   if (!procedures.length) {
-    el.innerHTML = '<div class="note">Aucune procédure pour le moment.</div>'
-    return
-  }
-  if (nbEmployes === 0) {
-    el.innerHTML = "<div class=\"note\">Aucun employé dans l'équipe : partagez le code d'invitation dans Paramètres pour voir apparaître les consultations.</div>"
+    el.innerHTML = '<div class="an-vide">Aucune proc\u00e9dure pour le moment.</div>'
     return
   }
 
-  const parCategorie = {}
+  /* À quelle catégorie appartient chaque procédure. */
+  const catDe = {}
+  procedures.forEach(p => { catDe[p.id] = p.categorie || 'Sans cat\u00e9gorie' })
+
+  const parCat = {}
   procedures.forEach(p => {
-    const nom = p.categorie || 'Sans catégorie'
-    if (!parCategorie[nom]) parCategorie[nom] = { nom, procIds: new Set(), nbProcs: 0, vues: 0 }
-    parCategorie[nom].procIds.add(p.id)
-    parCategorie[nom].nbProcs++
+    const nom = catDe[p.id]
+    if (!parCat[nom]) parCat[nom] = { nom, total: 0, nbProcs: 0, lecteurs: new Set() }
+    parCat[nom].nbProcs++
   })
   validationsPeriode.forEach(v => {
-    for (const c of Object.values(parCategorie)) {
-      if (c.procIds.has(v.procedure_id)) { c.vues++; break }
-    }
+    const nom = catDe[v.procedure_id]
+    if (!nom || !parCat[nom]) return
+    parCat[nom].total += Number(v.duree_lecture || 0)
+    parCat[nom].lecteurs.add(v.membre_id)
   })
 
-  const classement = Object.values(parCategorie).map(c => {
-    const possible = c.nbProcs * nbEmployes
-    return { ...c, possible, taux: possible ? Math.round((c.vues / possible) * 100) : 0 }
-  }).sort((a, b) => (b.taux - a.taux) || (b.vues - a.vues) || a.nom.localeCompare(b.nom, 'fr'))
+  const classement = Object.values(parCat)
+    .sort((a, b) => (b.total - a.total) || a.nom.localeCompare(b.nom, 'fr'))
 
-  /* Trois lignes, comme pour l'équipe. Le reste se déplie. */
+  if (!classement.some(c => c.total)) {
+    el.innerHTML = `<div class="an-vide">Aucun temps mesur\u00e9 ${escapeHtml(periodLabel)}.</div>`
+    return
+  }
+
   const visibles = tout ? classement : classement.slice(0, 3)
 
-  visibles.forEach((c, i) => {
-    const couleur = c.taux >= 70 ? '#30D158' : c.taux >= 30 ? '#FF9F0A' : '#FF453A'
-    const div = document.createElement('div')
-    div.className = 'cat-rank' + (i === 0 ? ' premier' : '')
-    div.innerHTML = `
-      <div class="pos">${i + 1}</div>
-      <div class="infos">
-        <div class="nom">${escapeHtml(c.nom)}</div>
-        <div class="detail">${c.vues} consultation${c.vues > 1 ? 's' : ''} ${periodLabel} sur ${c.possible} · ${c.nbProcs} procédure${c.nbProcs > 1 ? 's' : ''}</div>
-        <div class="jauge"><i style="width:${c.taux}%; background:${couleur};"></i></div>
-      </div>
-      <div class="taux" style="color:${couleur};">${c.taux}%</div>
-    `
-    el.appendChild(div)
-  })
+  el.innerHTML = visibles.map(c => {
+    const n = c.lecteurs.size
+    return `
+      <button type="button" class="an-lig" data-cat="${escapeHtml(c.nom)}">
+        <span class="co">
+          <span class="nm">${escapeHtml(c.nom)}</span>
+          <span class="st">${c.nbProcs} proc\u00e9dure${c.nbProcs > 1 ? 's' : ''}${
+            n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
+        </span>
+        <span class="vl">${c.total ? dureeLisible(c.total) : '\u2014'}</span>
+        <span class="fl">\u203a</span>
+      </button>`
+  }).join('')
 
   if (!tout && classement.length > 3) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = classement.length - 3 === 1
-      ? 'Voir la derni\u00e8re'
-      : `Voir les ${classement.length - 3} autres`
+    b.textContent = `Voir les ${classement.length - 3} autres`
     b.addEventListener('click', () => ouvrirAnCategories())
     el.appendChild(b)
   }
+
+  el.querySelectorAll('[data-cat]').forEach(x => {
+    x.addEventListener('click', () => openCategory(x.dataset.cat))
+  })
 }
 
 window.loadGlobalAnalyse = function() {
@@ -7038,7 +7122,9 @@ function tempsTotalHtml(secondes, grand) {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 let ficheMembreId = null
-let fmPeriode = 'week'
+/* Plus de sélecteur à l'écran : la liste « où il passe son temps » montre le
+   mois en cours, et les deux durées qui comptent sont dans les trois cases. */
+let fmPeriode = 'month'
 
 function fmDebutPeriode() {
   const now = new Date()
@@ -7068,23 +7154,9 @@ function fmLibellePeriode() {
 
 window.ouvrirFicheMembre = function(membreId) {
   ficheMembreId = membreId
-  fmPeriode = 'week'
-  document.querySelectorAll('#fm-periode button').forEach(b => {
-    b.classList.toggle('active', b.dataset.fm === 'week')
-  })
   showGestionScreen('p-membre')
   peindreFicheMembre()
 }
-
-document.getElementById('fm-periode')?.addEventListener('click', (e) => {
-  const b = e.target.closest('[data-fm]')
-  if (!b) return
-  fmPeriode = b.dataset.fm
-  document.querySelectorAll('#fm-periode button').forEach(x => {
-    x.classList.toggle('active', x === b)
-  })
-  peindreFicheMembre()
-})
 
 async function peindreFicheMembre() {
   if (!ficheMembreId || !currentGaData) return
@@ -7106,9 +7178,17 @@ async function peindreFicheMembre() {
      série, sa dernière lecture. C'est ce qu'on lit avant de décider quoi
      faire pour elle. */
   const derniere = siennes.map(v => new Date(v.validated_at)).sort((a, b) => b - a)[0]
+  /* Le poste passe devant le rôle : « Cuisine » dit quelque chose de la personne,
+     « Équipe » ne dit que son niveau d'accès. */
+  const debutMois = new Date()
+  debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+  const ceMois = siennes
+    .filter(v => new Date(v.validated_at) >= debutMois)
+    .reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+
   el('fm-sous').innerHTML = [
-    role,
-    totalToutesPeriodes ? `<b>${dureeLisible(totalToutesPeriodes)} au total</b>` : 'aucune lecture',
+    m.poste ? `<b>${escapeHtml(m.poste)}</b>` : role,
+    ceMois ? `${dureeLisible(ceMois)} ce mois-ci` : 'rien ce mois-ci',
     derniere ? 'derni\u00e8re lecture ' + ilYA(derniere) : 'jamais rien lu',
   ].join(' \u00b7 ')
 
@@ -7119,14 +7199,12 @@ async function peindreFicheMembre() {
 
   /* Dans une case de 110 px, le nombre et son unité tiennent ensemble : plus
      besoin de les séparer comme sur le grand chiffre d'avant. */
-  el('fm-temps').textContent = secondes ? dureeLisible(secondes) : '\u2014'
+  el('fm-temps').textContent = ceMois ? dureeLisible(ceMois) : '\u2014'
+  el('fm-total').textContent = totalToutesPeriodes ? dureeLisible(totalToutesPeriodes) : '\u2014'
 
   // ─── Les trois repères ───
   const lues = new Set(dedans.map(v => v.procedure_id)).size
   el('fm-lues').innerHTML = `${lues}<em>/${(procedures || []).length}</em>`
-  
-  el('fm-moyenne').textContent = secondes && dedans.length
-    ? dureeLisible(Math.round(secondes / dedans.length)) : '\u2014'
 
   // ─── Ses journées ───
   peindreCourbeMembre(siennes)
@@ -7167,7 +7245,6 @@ async function peindreFicheMembre() {
     : '<div class="an-vide">Tout a \u00e9t\u00e9 lu.</div>'
 
   // ─── Ses appareils ───
-  peindreAppareilsMembre(m.id)
 
   // ─── Les actions du responsable ───
   peindreActionsMembre(m)
@@ -7193,33 +7270,6 @@ function peindreCourbeMembre(validations) {
   /* Les journées en barres ne sont plus affichées : la forme retenue montre
      d'abord ce qu'il lit et ce qu'il évite. Le rythme est une curiosité ;
      savoir quoi faire pour cette personne est le vrai besoin. */
-}
-
-async function peindreAppareilsMembre(membreId) {
-  const el = document.getElementById('fm-appareils')
-  if (!el) return
-  try {
-    const { data, error } = await supabase.from('presences')
-      .select('nom, reseau, derniere_fois, revoquee')
-      .eq('membre_id', membreId)
-      .order('derniere_fois', { ascending: false })
-    if (error) throw error
-
-    const liste = data || []
-    const recent = Date.now() - 30 * 60000
-    const actifs = liste.filter(a => !a.revoquee && new Date(a.derniere_fois) > recent)
-
-    el.innerHTML = liste.length ? liste.slice(0, 3).map(a => {
-      const vivant = !a.revoquee && new Date(a.derniere_fois) > recent
-      return `<div class="an-lg statique">
-        <span class="pt${vivant ? ' vert' : ''}"></span>
-        <span class="co"><span class="nm">${escapeHtml(a.nom || 'Appareil')}</span>
-          <span class="st">${a.revoquee ? 'D\u00e9connect\u00e9' : quandLisible(a.derniere_fois)}</span></span>
-      </div>`
-    }).join('') : '<div class="an-vide">Aucun appareil enregistr\u00e9.</div>'
-  } catch (e) {
-    el.innerHTML = '<div class="an-vide">Appareils non disponibles.</div>'
-  }
 }
 
 function peindreActionsMembre(m) {
@@ -7312,7 +7362,9 @@ function renderMembresListe() {
     /* Le temps total, et non plus une série de jours : ce que la personne a
        réellement passé sur vos procédures. */
         div.innerHTML = `
-      <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}</div>
+      <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
+        <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) : 'Poste non d\u00e9fini'}</span>
+      </div>
       ${tempsTotalHtml(s.total)}`
     el.appendChild(div)
   })
@@ -7345,10 +7397,44 @@ window.ouvrirAnEquipe = function() {
   peindreAnEquipe()
 }
 
+/* Le mot d'introduction de la page Équipe. Il ne décrit plus la page — on voit
+   bien que c'est une liste — il dit ce que l'équipe a produit. Un gérant qui
+   lit « 4 h 20 de formation » comprend en une seconde ce que son abonnement lui
+   a rendu ; « touchez une personne » ne lui apprenait rien. */
+function peindreIntroEquipe(employes, validations) {
+  const t = document.getElementById('an-eq-titre')
+  const s = document.getElementById('an-eq-sous')
+  if (!t || !s) return
+
+  const total = validations.reduce((x, v) => x + Number(v.duree_lecture || 0), 0)
+  const actifs = new Set(validations.filter(v => Number(v.duree_lecture)).map(v => v.membre_id)).size
+  const jamais = employes.length - actifs
+
+  if (!total) {
+    t.textContent = 'Votre \u00e9quipe n\u2019a pas encore commenc\u00e9'
+    s.innerHTML = "D\u00e8s la premi\u00e8re lecture, vous verrez ici <b>le temps de formation</b> " +
+      "que vos proc\u00e9dures ont fait gagner \u00e0 votre \u00e9tablissement."
+    return
+  }
+
+  t.textContent = dureeLisible(total) + ' de formation, sans vous'
+  /* La seconde phrase change selon ce qui est le plus utile à savoir. Quand
+     quelqu'un n'a rien lu, c'est ça l'information ; sinon, c'est la moyenne. */
+  if (jamais > 0) {
+    s.innerHTML = `<b>${jamais} personne${jamais > 1 ? 's' : ''}</b> ` +
+      `${jamais > 1 ? "n'ont" : "n'a"} encore rien lu. Touchez un nom pour voir ce qu'il lui reste.`
+  } else {
+    const moyenne = Math.round(total / Math.max(1, actifs))
+    s.innerHTML = `Toute l'\u00e9quipe s'y est mise, <b>${dureeLisible(moyenne)} par personne</b> en moyenne. ` +
+      `C'est autant d'explications que vous n'avez pas eu \u00e0 donner.`
+  }
+}
+
 function peindreAnEquipe() {
   const el = document.getElementById('an-equipe-liste')
   if (!el || !currentGaData) return
   const { employes, procedures, validations } = currentGaData
+  peindreIntroEquipe(employes, validations)
   const debut = debutPeriode(currentGaPeriod)
   const dansPeriode = debut
     ? validations.filter(v => new Date(v.validated_at) >= debut) : validations
@@ -7380,7 +7466,7 @@ function peindreAnEquipe() {
     <div class="emp-row" data-membre="${escapeHtml(s.m.id)}">
       <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
         <!-- Le temps de la période ferait doublon avec le total, à droite. -->
-        <span class="emp-row-sous">${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}</span>
+        <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) + ' \u00b7 ' : ''}${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}</span>
       </div>
       ${tempsTotalHtml(s.total)}
       <span class="fl">\u203a</span>
@@ -7413,9 +7499,10 @@ function periodeCourante() {
 function peindreAnCategories() {
   const el = document.getElementById('an-categories-liste')
   if (!el || !currentGaData) return
-  const { dansPeriode, libelle } = periodeCourante()
-  renderTopCategories(currentGaData.procedures, dansPeriode,
-    currentGaData.employes.length, libelle, el, true)
+  /* Ces pages ont leur propre filtre — mois ou total — indépendant de celui de
+     la page d'analyse : on y vient pour creuser, pas pour suivre. */
+  renderTopCategories(currentGaData.procedures, anValidationsPeriode(),
+    currentGaData.employes.length, anLibelle(), el, true)
 }
 
 window.ouvrirAnTemps = function() {
@@ -7426,8 +7513,7 @@ window.ouvrirAnTemps = function() {
 function peindreAnTemps() {
   const el = document.getElementById('an-temps-liste')
   if (!el || !currentGaData) return
-  const { dansPeriode, libelle } = periodeCourante()
-  renderTempsLecture(currentGaData.procedures, dansPeriode, libelle, el, true)
+  renderTempsLecture(currentGaData.procedures, anValidationsPeriode(), anLibelle(), el, true)
 }
 
 document.getElementById('ga-top-membres')?.addEventListener('click', (e) => {
@@ -8600,6 +8686,173 @@ document.getElementById('man-retour')?.addEventListener('click', () => {
   showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
 })
 
+
+/* Les trois pages complètes de l'analyse. Elles partagent la même forme : un
+   mot d'introduction, un filtre de période, puis des lignes sobres. */
+
+let anPeriodeLongue = 'month'   // 'month' | 'all'
+
+function anLibelle() {
+  return anPeriodeLongue === 'all' ? 'depuis le d\u00e9but' : 'ce mois-ci'
+}
+
+function anValidationsPeriode() {
+  const v = currentGaData?.validations || []
+  if (anPeriodeLongue === 'all') return v
+  const debut = new Date()
+  debut.setDate(1); debut.setHours(0, 0, 0, 0)
+  return v.filter(x => new Date(x.validated_at) >= debut)
+}
+
+window.ouvrirAnCategories = function() {
+  showGestionScreen('p-an-categories')
+  peindreAnCategories()
+}
+
+window.ouvrirAnProcedures = function() {
+  showGestionScreen('p-an-temps')
+  peindreAnTemps()
+}
+
+document.querySelectorAll('[data-an-periode]').forEach(b => {
+  b.addEventListener('click', () => {
+    anPeriodeLongue = b.dataset.anPeriode
+    document.querySelectorAll('[data-an-periode]').forEach(x => {
+      x.classList.toggle('active', x.dataset.anPeriode === anPeriodeLongue)
+    })
+    peindreAnCategories()
+    peindreAnTemps()
+  })
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES POSTES
+
+   Le patron définit la liste, chaque membre choisit le sien. Une liste fermée
+   plutôt qu'un champ libre : « serveur », « Serveur », « serveuse » et
+   « svr » rendraient toute analyse par poste inexploitable.
+
+   On stocke le NOM du poste sur le membre, et non un identifiant : si le patron
+   supprime un poste, on ne perd pas l'information de ceux qui l'avaient.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let postesEntreprise = []
+
+async function chargerPostes() {
+  if (!currentMembre?.entreprise_id) return []
+  const { data, error } = await supabase.from('postes')
+    .select('*').eq('entreprise_id', currentMembre.entreprise_id).order('ordre')
+  /* La table peut ne pas exister encore : l'app continue sans les postes plutôt
+     que de casser les réglages entiers. */
+  if (error) { console.warn('Proc\u00e9do \u00b7 postes indisponibles :', error.message); return [] }
+  postesEntreprise = data || []
+  return postesEntreprise
+}
+
+window.ouvrirPostes = async function() {
+  showGestionScreen('p-reg-postes')
+  document.getElementById('poste-erreur').textContent = ''
+  document.getElementById('postes-liste').innerHTML = '<div class="an-vide">Chargement\u2026</div>'
+  await chargerPostes()
+  peindrePostes()
+}
+
+function peindrePostes() {
+  const el = document.getElementById('postes-liste')
+  if (!el) return
+  if (!postesEntreprise.length) {
+    el.innerHTML = '<div class="an-vide">Aucun poste pour le moment. Ajoutez-en un ci-dessous.</div>'
+    return
+  }
+  el.innerHTML = postesEntreprise.map(p => `
+    <div class="an-lig">
+      <span class="co"><span class="nm">${escapeHtml(p.nom)}</span></span>
+      <button type="button" class="oter" data-poste="${escapeHtml(p.id)}">Retirer</button>
+    </div>`).join('')
+
+  el.querySelectorAll('[data-poste]').forEach(b => {
+    b.addEventListener('click', async () => {
+      const nom = postesEntreprise.find(x => x.id === b.dataset.poste)?.nom || 'ce poste'
+      const ok = await confirmDialog({
+        titre: 'Retirer ' + nom + ' ?',
+        message: "Les personnes qui l'ont choisi le gardent : seul le choix dispara\u00eet pour les prochaines.",
+        confirmer: 'Retirer', annuler: 'Annuler', danger: true,
+      })
+      if (!ok) return
+      await supabase.from('postes').delete().eq('id', b.dataset.poste)
+      await chargerPostes()
+      peindrePostes()
+    })
+  })
+}
+
+document.getElementById('poste-ajouter')?.addEventListener('click', async () => {
+  const champ = document.getElementById('poste-nouveau')
+  const err = document.getElementById('poste-erreur')
+  const nom = champ.value.trim()
+  err.textContent = ''
+  if (!nom) { err.textContent = 'Donnez un nom au poste.'; return }
+  if (postesEntreprise.some(p => p.nom.toLowerCase() === nom.toLowerCase())) {
+    err.textContent = 'Ce poste existe d\u00e9j\u00e0.'; return
+  }
+  const { error } = await supabase.from('postes').insert({
+    entreprise_id: currentMembre.entreprise_id, nom, ordre: postesEntreprise.length,
+  })
+  if (error) { err.textContent = 'Enregistrement impossible : ' + error.message; return }
+  champ.value = ''
+  await chargerPostes()
+  peindrePostes()
+})
+
+/* ─── Le choix du membre ─── */
+
+window.ouvrirMonPoste = async function() {
+  const gestion = currentMembre?.role === 'gestion'
+  if (gestion) showGestionScreen('p-reg-poste')
+  else showEquipeScreen('p-reg-poste')
+  document.getElementById('mon-poste-liste').innerHTML = '<div class="an-vide">Chargement\u2026</div>'
+  await chargerPostes()
+  peindreMonPoste()
+}
+
+function peindreMonPoste() {
+  const el = document.getElementById('mon-poste-liste')
+  const vide = document.getElementById('mon-poste-vide')
+  if (!el) return
+  vide.style.display = postesEntreprise.length ? 'none' : ''
+  el.innerHTML = postesEntreprise.map(p => {
+    const choisi = currentMembre?.poste === p.nom
+    return `
+      <button type="button" class="an-lig" data-choix="${escapeHtml(p.nom)}">
+        <span class="co"><span class="nm">${escapeHtml(p.nom)}</span></span>
+        ${choisi ? '<span class="vl" style="color:var(--blue);">\u2713</span>' : ''}
+      </button>`
+  }).join('')
+
+  el.querySelectorAll('[data-choix]').forEach(b => {
+    b.addEventListener('click', async () => {
+      const nom = b.dataset.choix
+      /* On écrit d'abord à l'écran, on enregistre ensuite : le choix doit
+         paraître immédiat, même sur un réseau lent. */
+      currentMembre.poste = currentMembre.poste === nom ? null : nom
+      peindreMonPoste()
+      majLignePoste()
+      const { error } = await supabase.from('membres')
+        .update({ poste: currentMembre.poste }).eq('id', currentMembre.id)
+      if (error) toast('Enregistrement impossible : ' + error.message)
+    })
+  })
+}
+
+function majLignePoste() {
+  const el = document.getElementById('e-mon-poste')
+  if (el) el.textContent = currentMembre?.poste || 'Non d\u00e9fini'
+}
+
+document.getElementById('poste-retour')?.addEventListener('click', () => {
+  if (currentMembre?.role === 'gestion') showGestionScreen('p-settings')
+  else showEquipeScreen('e-settings')
+})
 
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
@@ -11326,31 +11579,55 @@ function renderAnalyseStats() {
 
   const empListEl = document.getElementById('analyse-emp-list')
   empListEl.innerHTML = ''
+
   if (nbEmployes === 0) {
-    empListEl.innerHTML = '<div class="note">Aucun employé dans l\'entreprise pour le moment. Partagez le code d\'invitation dans Paramètres.</div>'
-  } else {
-    // Les employés qui n'ont pas encore consulté apparaissent en premier (c'est ce qui demande une action)
-    const sorted = [...employes].sort((a, b) => {
-      const aDone = validations.some(v => v.membre_id === a.id)
-      const bDone = validations.some(v => v.membre_id === b.id)
-      return aDone - bDone
-    })
-    let empIndex = 0
-    for (const employe of sorted) {
-      const validation = validations.find(v => v.membre_id === employe.id)
-      const div = document.createElement('div')
-      div.className = 'emp-row'
-      div.style.animationDelay = (empIndex * 0.05) + 's'
-      empIndex++
-      div.innerHTML = `
-        <div class="check ${validation ? 'done' : ''}"></div>
-        <div class="emp-row-name">${escapeHtml(employe.nom || 'Membre')}</div>
-        <div class="emp-row-date" style="${validation ? '' : 'color:var(--red);'}">
-          ${validation ? 'consulté le ' + new Date(validation.validated_at).toLocaleDateString('fr-FR') : 'pas encore consulté'}
-        </div>`
-      empListEl.appendChild(div)
-    }
+    empListEl.innerHTML = "<div class=\"an-vide\">Aucun employ\u00e9 dans l'entreprise pour le moment. " +
+      "Partagez le code d'invitation dans Param\u00e8tres.</div>"
+    return
   }
+
+  /* La roue avant la liste. Un pourcentage se lit en un dixième de seconde ;
+     compter les coches vertes d'une liste de quinze demande un effort. */
+  const vus = employes.filter(e => validations.some(v => v.membre_id === e.id)).length
+  const pct = Math.round((vus / nbEmployes) * 100)
+  const couleur = pct >= 80 ? 'var(--green)' : pct >= 40 ? 'var(--orange)' : 'var(--red)'
+
+  const tete = document.createElement('div')
+  tete.className = 'emp-roue'
+  tete.innerHTML = `
+    <div class="roue" id="emp-anneau"></div>
+    <div class="tx">
+      <div class="t">${vus} sur ${nbEmployes} ${vus > 1 ? 'ont' : 'a'} vu cette proc\u00e9dure</div>
+      <div class="s">${pct === 100
+        ? "Toute l'\u00e9quipe l'a ouverte au moins une fois."
+        : `Il reste <b>${nbEmployes - vus} personne${nbEmployes - vus > 1 ? 's' : ''}</b> \u00e0 relancer.`}</div>
+    </div>`
+  empListEl.appendChild(tete)
+  dessinerAnneau('emp-anneau', pct, couleur, pct + '%')
+
+  /* Ceux qui n'ont pas lu passent devant : c'est eux qui demandent une action. */
+  const ordre = [...employes].sort((a, b) => {
+    const av = validations.some(v => v.membre_id === a.id)
+    const bv = validations.some(v => v.membre_id === b.id)
+    return av - bv
+  })
+
+  const liste = document.createElement('div')
+  liste.className = 'emp-liste'
+  liste.innerHTML = ordre.map(e => {
+    const v = validations.find(x => x.membre_id === e.id)
+    const quand = v ? ilYA(new Date(v.validated_at)) : null
+    return `
+      <div class="an-lig">
+        <span class="pt" style="background:${v ? 'var(--green)' : 'var(--red)'}"></span>
+        <span class="co">
+          <span class="nm">${escapeHtml(e.nom || 'Membre')}</span>
+          <span class="st">${e.poste ? escapeHtml(e.poste) : 'Poste non d\u00e9fini'}</span>
+        </span>
+        <span class="vl" style="${v ? '' : 'color:var(--red);'}">${v ? quand : 'jamais'}</span>
+      </div>`
+  }).join('')
+  empListEl.appendChild(liste)
 }
 
 // ═══════════ ÉQUIPE : liste ═══════════

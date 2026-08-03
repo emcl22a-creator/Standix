@@ -6754,8 +6754,12 @@ window.setGaPeriod = function(period) {
 function dureeLisible(secondes) {
   const s = Math.max(0, Math.round(secondes || 0))
   if (s < 60) return s + ' s'
+
+  /* On arrondit à la minute, puis on décide du passage aux heures. 59 min 59
+     s'affiche donc « 1 h » : c'est voulu, personne ne dit « 60 minutes ». */
   const min = Math.round(s / 60)
   if (min < 60) return min + ' min'
+
   const h = Math.floor(min / 60), reste = min % 60
   return reste ? `${h} h ${String(reste).padStart(2, '0')}` : `${h} h`
 }
@@ -12288,12 +12292,24 @@ function majBandeauCoches() {
 
 async function enregistrerCoches() {
   if (colonneCochesAbsente || !lectureProcId || !currentMembre) return
+
+  /* Un `upsert` réécrit la LIGNE ENTIÈRE : les colonnes absentes repartent à
+     NULL. En omettant `duree_lecture`, cocher une case effaçait tout le temps
+     déjà mesuré — et comme la copie locale servait de base à la visite
+     suivante, le compteur repartait de zéro à chaque fois.
+
+     On envoie donc aussi le temps courant, exactement comme l'autre écriture. */
+  const total = lectureBase + lectureSecondes
   const { error } = await supabase.from('validations').upsert({
     procedure_id: lectureProcId,
     membre_id: currentMembre.id,
     etapes_faites: [...etapesFaites],
+    duree_lecture: total,
     validated_at: new Date().toISOString(),
   }, { onConflict: 'procedure_id,membre_id' })
+
+  const l = (mesLectures || []).find(v => v.procedure_id === lectureProcId)
+  if (l) l.duree_lecture = total
 
   /* La colonne peut ne pas exister : on cesse d'essayer plutôt que de répéter
      l'erreur à chaque case cochée. Les cases restent utilisables à l'écran. */
@@ -13919,6 +13935,13 @@ function demarrerLecture(procId, dejaConsultee) {
     }
 
     lectureSecondes++
+
+    /* On enregistre toutes les trente secondes, sans attendre la sortie. Fermer
+       l'onglet, verrouiller le téléphone ou perdre le réseau ne déclenche pas
+       toujours la sortie propre : sans ça, une lecture de dix minutes pouvait
+       ne rien laisser. */
+    if (lectureSecondes % 30 === 0) ecrireTempsLecture()
+
     /* La consultation s'enregistre au seuil, mais le compteur CONTINUE : c'est le
        temps total passé sur la fiche qu'on veut, pas le temps jusqu'à validation.
        Il s'arrêtait ici, d'où les trente secondes partout. */
@@ -13989,16 +14012,24 @@ function quitterLecture() {
 async function ecrireTempsLecture() {
   const total = lectureBase + lectureSecondes
   try {
-    await supabase.from('validations').upsert({
+    /* Le défaut symétrique de l'autre écriture : sans `etapes_faites`, l'upsert
+       remettait les cases cochées à NULL. Les deux écritures envoient désormais
+       la ligne complète, quel que soit ce qui les a déclenchées. */
+    const ligne = {
       procedure_id: lectureProcId,
       membre_id: currentMembre.id,
       duree_lecture: total,
       validated_at: new Date().toISOString(),
-    }, { onConflict: 'procedure_id,membre_id' })
+    }
+    if (!colonneCochesAbsente) ligne.etapes_faites = [...etapesFaites]
+    await supabase.from('validations').upsert(ligne, { onConflict: 'procedure_id,membre_id' })
     /* On tient la copie locale à jour : sans ça, rouvrir la fiche dans la foulée
        repartirait de l'ancienne base et perdrait ce qu'on vient d'écrire. */
     const l = (mesLectures || []).find(v => v.procedure_id === lectureProcId)
-    if (l) l.duree_lecture = total
+    if (l) {
+      l.duree_lecture = total
+      if (!colonneCochesAbsente) l.etapes_faites = [...etapesFaites]
+    }
     lectureBase = total
     lectureSecondes = 0
   } catch (e) {

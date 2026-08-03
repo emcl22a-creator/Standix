@@ -7048,9 +7048,15 @@ function renderGainTemps(validations, procedures) {
   }
 
   t.textContent = `${dureeLisible(secondes)} de formation ce mois-ci`
+  /* « Sans que vous ayez eu à l'expliquer » sonnait comme un reproche déguisé —
+     comme si expliquer à son équipe était une corvée dont on se débarrasse. On
+     dit plutôt ce qui est vrai et vérifiable : ces lectures ont eu lieu, elles
+     sont tracées, et ça compte le jour d'un contrôle. */
   const pl = lecteurs > 1
+  const procs = new Set(duMois.filter(v => Number(v.duree_lecture)).map(v => v.procedure_id)).size
   s.innerHTML = `<b>${lecteurs} personne${pl ? 's' : ''}</b> ` +
-    `${pl ? 'se sont form\u00e9es' : "s'est form\u00e9e"} sans que vous ayez eu \u00e0 l'expliquer.`
+    `${pl ? 'ont ouvert' : 'a ouvert'} <b>${procs} proc\u00e9dure${procs > 1 ? 's' : ''}</b>. ` +
+    `Chaque lecture est dat\u00e9e et nominative.`
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7742,22 +7748,40 @@ function peindreIntroEquipe(employes, validations) {
     return
   }
 
-  t.textContent = dureeLisible(total) + ' de formation, sans vous'
-  /* La seconde phrase change selon ce qui est le plus utile à savoir. Quand
-     quelqu'un n'a rien lu, c'est ça l'information ; sinon, c'est la moyenne. */
-  if (jamais > 0) {
-    s.innerHTML = `<b>${jamais} personne${jamais > 1 ? 's' : ''}</b> ` +
-      `${jamais > 1 ? "n'ont" : "n'a"} encore rien lu. Touchez un nom pour voir ce qu'il lui reste.`
-  } else {
+  /* « Sans vous » laissait entendre que l'équipe se forme MALGRÉ le responsable.
+     Ce qu'il veut savoir, c'est où il en est de sa couverture : combien de gens
+     sont à jour, et qui manque à l'appel. On nomme donc la personne quand il
+     n'en reste qu'une — un nom est actionnable, un compte ne l'est pas. */
+  t.textContent = actifs > 1
+    ? `${actifs} sur ${employes.length} se sont form\u00e9s ce mois-ci`
+    : `1 sur ${employes.length} s'est form\u00e9 ce mois-ci`
+
+  if (jamais === 0) {
     const moyenne = Math.round(total / Math.max(1, actifs))
-    s.innerHTML = `Toute l'\u00e9quipe s'y est mise, <b>${dureeLisible(moyenne)} par personne</b> en moyenne. ` +
-      `C'est autant d'explications que vous n'avez pas eu \u00e0 donner.`
+    s.innerHTML = `Toute votre \u00e9quipe est \u00e0 jour, <b>${dureeLisible(moyenne)} par personne</b> en moyenne. ` +
+      `Votre \u00e9tablissement peut le prouver.`
+  } else if (jamais === 1) {
+    const seul = employes.find(e => !validations.some(v =>
+      v.membre_id === e.id && Number(v.duree_lecture)))
+    s.innerHTML = seul?.nom
+      ? `Il ne manque que <b>${escapeHtml(seul.nom)}</b>. Touchez son nom pour voir ce qu'il lui reste \u00e0 lire.`
+      : `Il ne manque qu'<b>une personne</b>. Touchez son nom pour voir ce qu'il lui reste.`
+  } else {
+    s.innerHTML = `<b>${jamais} personnes</b> n'ont encore rien ouvert. ` +
+      `Touchez un nom pour voir ce qu'il lui reste \u00e0 lire.`
   }
 }
 
 function peindreAnEquipe() {
   const el = document.getElementById('an-equipe-liste')
   if (!el || !currentGaData) return
+
+  /* On relève où chaque ligne se trouve AVANT de reconstruire la liste. Après
+     coup, `playCardShuffle` compare les deux positions et fait glisser chacune
+     de l'ancienne à la nouvelle. C'est la même mécanique que le tri de
+     « Gérer l'équipe » — deux listes qui se réordonnent doivent le faire pareil,
+     sinon on croit avoir changé d'écran. */
+  const positions = captureCardPositions(el)
   const { employes, procedures, validations } = currentGaData
   peindreIntroEquipe(employes, validations)
   /* Cette page a son propre filtre — mois ou total — comme les deux autres
@@ -7788,7 +7812,7 @@ function peindreAnEquipe() {
     `${employes.length} personne${employes.length > 1 ? 's' : ''}`
 
   el.innerHTML = trie.length ? trie.map(s => `
-    <div class="emp-row" data-membre="${escapeHtml(s.m.id)}">
+    <div class="emp-row" data-membre="${escapeHtml(s.m.id)}" data-key="${escapeHtml(s.m.id)}">
       <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
         <!-- Le temps de la période ferait doublon avec le total, à droite. -->
         <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) + ' \u00b7 ' : ''}${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}</span>
@@ -7801,6 +7825,9 @@ function peindreAnEquipe() {
   el.querySelectorAll('[data-membre]').forEach(l => {
     l.addEventListener('click', () => ouvrirFicheMembre(l.dataset.membre))
   })
+
+  playCardShuffle(el, positions)
+  garantirVisibilite(el)
 }
 
 window.ouvrirAnCategories = function() {

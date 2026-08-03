@@ -4739,6 +4739,24 @@
   </div>
 
   <!-- Sous-page : les appareils -->
+  <!-- Le jumeau de `p-reg-poste`. Les deux espaces sont deux conteneurs
+       distincts : `showEquipeScreen` ne trouve pas un écran qui vit dans
+       l'autre, et la page s'ouvrait vide. -->
+  <div class="screen" id="e-reg-poste">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre poste</h1>
+    </div>
+    <div class="an-intro">
+      <div class="t">Quel est votre rôle ici ?</div>
+      <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
+    </div>
+    <div id="e-mon-poste-liste" style="margin-top:14px;"></div>
+    <div class="reg-note" id="e-mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
+  </div>
+
   <div class="screen" id="reg-appareils">
     <div class="detail-header">
       <button class="back-btn" id="app-retour" aria-label="Retour">
@@ -8826,15 +8844,18 @@ document.getElementById('poste-ajouter')?.addEventListener('click', async () => 
 window.ouvrirMonPoste = async function() {
   const gestion = currentMembre?.role === 'gestion'
   if (gestion) showGestionScreen('p-reg-poste')
-  else showEquipeScreen('p-reg-poste')
-  document.getElementById('mon-poste-liste').innerHTML = '<div class="an-vide">Chargement\u2026</div>'
+  else showEquipeScreen('e-reg-poste')
+  const el = document.getElementById(gestion ? 'mon-poste-liste' : 'e-mon-poste-liste')
+  if (el) el.innerHTML = '<div class="an-vide">Chargement\u2026</div>'
   await chargerPostes()
   peindreMonPoste()
 }
 
 function peindreMonPoste() {
-  const el = document.getElementById('mon-poste-liste')
-  const vide = document.getElementById('mon-poste-vide')
+  /* Chaque espace a son écran : on peint celui de l'espace courant. */
+  const gestion = currentMembre?.role === 'gestion'
+  const el = document.getElementById(gestion ? 'mon-poste-liste' : 'e-mon-poste-liste')
+  const vide = document.getElementById(gestion ? 'mon-poste-vide' : 'e-mon-poste-vide')
   if (!el) return
   vide.style.display = postesEntreprise.length ? 'none' : ''
   el.innerHTML = postesEntreprise.map(p => {
@@ -12084,7 +12105,9 @@ function renderEquipeCategories() {
       </div>
       <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
       <div class="cat-pct-row"><span class="cat-lues" style="color:${couleur}">${lues}/${procs.length} lues</span></div>
-      <div class="cat-recent">${procs.slice(0, 2).map(p =>
+      <div class="cat-recent">${[...procs]
+        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+        .slice(0, 3).map(p =>
         `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}</div>`
     grille.appendChild(cell)
   })

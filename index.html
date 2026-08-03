@@ -741,8 +741,10 @@
   .an-seg{ margin-top:16px; }
   .an-vide{ font-size:13px; color:var(--label-3); padding:14px 2px; }
 
+  /* Sans `flex:1`, le tri se pose juste après le compte au lieu d'être poussé
+     à l'autre bout : les deux se lisent d'un seul mouvement d'œil. */
   .an-compte{
-    font-size:13px; color:var(--label-3); font-weight:600; flex:1;
+    font-size:13px; color:var(--label-3); font-weight:600;
   }
 
   .an-plus{
@@ -4028,6 +4030,11 @@
       <div class="s" id="an-eq-sous">—</div>
     </div>
 
+    <div class="ga-segments an-seg">
+      <button class="active" data-an-periode="month">Ce mois</button>
+      <button data-an-periode="all">Total</button>
+    </div>
+
     <div class="list-tools" style="margin-top:20px;">
       <span class="an-compte" id="p-an-equipe-compte">—</span>
       <div class="dd-filter" id="dd-an-equipe-sort">
@@ -7037,8 +7044,38 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
   })
 }
 
+/* Relit les membres et les lectures, puis repeint si quelque chose a changé.
+   Silencieuse : une erreur réseau laisse simplement les chiffres précédents. */
+async function rafraichirAnalyse() {
+  if (!currentMembre?.entreprise_id) return
+  try {
+    const procIds = (allGestionProcedures || []).map(p => p.id)
+    if (!procIds.length) return
+
+    const [{ data: membres }, { data: validations }] = await Promise.all([
+      supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
+      supabase.from('validations').select('*').in('procedure_id', procIds),
+    ])
+    if (!membres || !validations) return
+
+    cachedMembres = membres
+    cachedValidations = validations
+    const employes = membres.filter(m => m.role === 'equipe')
+    currentGaData = { procedures: allGestionProcedures, membres, employes, validations }
+
+    /* On ne repeint que si l'écran d'analyse est encore à l'écran : l'appel est
+       asynchrone, l'utilisateur a pu partir ailleurs entre-temps. */
+    if (document.getElementById('p-global-analyse')?.classList.contains('active')) {
+      renderGaStats()
+    }
+  } catch (e) {
+    console.warn('Proc\u00e9do \u00b7 analyse non rafra\u00eechie :', e?.message || e)
+  }
+}
+
 window.loadGlobalAnalyse = function() {
-  // Toutes ces données ont été préchargées pendant l'écran de démarrage.
+  /* On peint d'abord avec ce qui a été préchargé au démarrage : la page
+     apparaît instantanément. */
   const procedures = allGestionProcedures
   const membres = cachedMembres
   const validations = cachedValidations
@@ -7048,6 +7085,12 @@ window.loadGlobalAnalyse = function() {
   currentGaPeriod = 'week'
 
   renderGaStats()
+
+  /* ... PUIS on relit la base. Sans ça, la page montrait indéfiniment l'état du
+     démarrage : quelqu'un qui lisait une procédure pendant que le gérant avait
+     l'app ouverte n'apparaissait jamais, et le temps restait à zéro jusqu'au
+     rechargement complet. C'est exactement ce qui se voyait à l'écran. */
+  rafraichirAnalyse()
 
   /* Un vieux bloc remplissait AUSSI `ga-late-list` ici même : il s'exécutait
      après `renderTempsLecture` et écrasait son rendu par des cartes à pastille.
@@ -7462,9 +7505,9 @@ function peindreAnEquipe() {
   if (!el || !currentGaData) return
   const { employes, procedures, validations } = currentGaData
   peindreIntroEquipe(employes, validations)
-  const debut = debutPeriode(currentGaPeriod)
-  const dansPeriode = debut
-    ? validations.filter(v => new Date(v.validated_at) >= debut) : validations
+  /* Cette page a son propre filtre — mois ou total — comme les deux autres
+     pages complètes de l'analyse. */
+  const dansPeriode = anValidationsPeriode()
 
   const stats = employes.map(m => {
     const siennes = dansPeriode.filter(v => v.membre_id === m.id)
@@ -7472,8 +7515,8 @@ function peindreAnEquipe() {
       m,
       nb: new Set(siennes.map(v => v.procedure_id)).size,
       temps: siennes.reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
-      /* Le total ne dépend pas de la période choisie : c'est ce que la personne
-         a passé sur vos procédures depuis qu'elle est là. */
+      /* Le temps affiché suit désormais le filtre de la page : un filtre qui
+         ne change rien à l'écran est pire que pas de filtre du tout. */
       total: validations.filter(v => v.membre_id === m.id)
         .reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
     }
@@ -7495,7 +7538,7 @@ function peindreAnEquipe() {
         <!-- Le temps de la période ferait doublon avec le total, à droite. -->
         <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) + ' \u00b7 ' : ''}${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}</span>
       </div>
-      ${tempsTotalHtml(s.total)}
+      ${tempsTotalHtml(s.temps, false, anLibelle())}
       <span class="fl">\u203a</span>
     </div>`).join('')
     : '<div class="an-vide">Aucun membre dans l\'\u00e9quipe.</div>'
@@ -8739,6 +8782,7 @@ document.querySelectorAll('[data-an-periode]').forEach(b => {
     })
     peindreAnCategories()
     peindreAnTemps()
+    peindreAnEquipe()
   })
 })
 

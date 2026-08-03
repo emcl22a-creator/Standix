@@ -277,19 +277,6 @@
   /* ═══ Les étapes manuelles, en fil ═══
      Un trait relie les numéros et dit l'ordre sans qu'on ait à le lire. Une
      procédure EST une suite : la forme le montre au lieu de l'énoncer. */
-  /* Le rappel de ce qu'on écrit : discret, mais toujours là. Sans lui, on entre
-     dans une page d'étapes sans savoir de quelle procédure il s'agit — ce qui
-     arrive vite quand on en crée plusieurs à la suite. */
-  .rappel-proc{
-    display:flex; align-items:center; gap:7px; width:100%; margin-top:14px;
-    padding:9px 12px; border-radius:12px; text-align:left;
-    background:rgba(255,255,255,0.045); border:0.5px solid var(--border);
-    font-family:inherit; font-size:12.5px; color:var(--label-2); font-weight:600;
-  }
-  .rappel-proc .tx{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .rappel-proc .tx b{ color:#fff; font-weight:700; }
-  .rappel-proc .c{ flex-shrink:0; font-size:11.5px; color:var(--blue); font-weight:650; }
-  .rappel-proc:active{ background:rgba(255,255,255,0.08); }
 
   .man-lbl{
     font-size:12.5px; font-weight:650; color:var(--label-3); margin:20px 0 8px;
@@ -616,19 +603,10 @@
      intérieure, même rayon. Seul le visage laisse place à un dessin au trait,
      dans le langage des icônes de création. */
   .an-gain{ margin-top:0 !important; margin-bottom:24px !important; }
-  /* Une seule taille dans cette carte : le titre et la phrase disent la même
-     chose, l'un ne doit pas écraser l'autre. Les deux sélecteurs sont nommés
-     séparément — groupés, seul le second l'emportait sur la règle de base. */
-  .an-gain .accueil-texte .t{ font-size:14.5px; font-weight:700; line-height:1.45; }
-  .an-gain .accueil-texte .s{ font-size:14.5px; line-height:1.45; margin-top:5px; }
-  .an-gain-ic{
-    /* Plus petit que le visage de l'accueil : ici le dessin accompagne un
-       chiffre, il ne porte pas la carte. */
-    width:52px; height:52px; border-radius:50%; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.055); border:0.5px solid var(--border);
-  }
-  .an-gain-ic svg{ width:24px; height:24px; display:block; }
+  /* Aucune taille propre : la carte suit l'échelle de « Bonjour prénom » — titre
+     à 16, phrase à 12,5. J'avais forcé 14,5 partout pour égaliser les deux
+     lignes ; ça marchait sur cette carte, mais ça cassait le rapport que l'app
+     tient partout ailleurs entre un titre et sa phrase. */
 
   .an-compte{
     font-size:13px; color:var(--label-3); font-weight:600; flex:1;
@@ -3541,14 +3519,6 @@
          ont déjà été demandés sur l'écran précédent, et les redemander donnerait
          l'impression de recommencer. En modification il faut bien pouvoir les
          corriger : c'est le seul endroit où ils ont leur place. -->
-    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
-         dire garder quatre copies du même champ, qui finiraient par diverger. On
-         revient d'un pas en arrière, là où il a été saisi. -->
-    <button type="button" class="rappel-proc" data-rappel>
-      <span class="tx"><b>—</b></span>
-      <span class="c">Revenir</span>
-    </button>
-
     <div id="man-entete" style="display:none;">
       <div class="man-lbl">Catégorie</div>
       <input type="text" class="man-champ" id="man-categorie" placeholder="Ex : Cuisine">
@@ -3592,14 +3562,6 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Découper la vidéo</h1>
     </div>
     <div class="subhead">Marquez les étapes pendant la lecture</div>
-
-    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
-         dire garder quatre copies du même champ, qui finiraient par diverger. On
-         revient d'un pas en arrière, là où il a été saisi. -->
-    <button type="button" class="rappel-proc" data-rappel>
-      <span class="tx"><b>—</b></span>
-      <span class="c">Revenir</span>
-    </button>
 
     <!-- La même carte que l'écran de l'IA : une note qui cadre l'attente, le
          choix du fichier, puis le lecteur. Deux écrans qui font entrer une
@@ -3671,17 +3633,6 @@
     </div>
     <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
 
-
-    <div class="man-lbl">Le document</div>
-
-    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
-         dire garder quatre copies du même champ, qui finiraient par diverger. On
-         revient d'un pas en arrière, là où il a été saisi. -->
-    <button type="button" class="rappel-proc" data-rappel>
-      <span class="tx"><b>—</b></span>
-      <span class="c">Revenir</span>
-    </button>
-
     <div class="card" id="doc-saisie-card">
       <div class="note" style="margin-bottom:12px;">
         Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes
@@ -3717,14 +3668,6 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe la vidéo</h1>
     </div>
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
-
-    <!-- Le titre est rappelé, pas rééditable ici. Le modifier sur place voudrait
-         dire garder quatre copies du même champ, qui finiraient par diverger. On
-         revient d'un pas en arrière, là où il a été saisi. -->
-    <button type="button" class="rappel-proc" data-rappel>
-      <span class="tx"><b>—</b></span>
-      <span class="c">Revenir</span>
-    </button>
 
     <div class="card" id="ai-upload-card">
       <div class="note" style="margin-bottom:12px;">L'IA travaille au mieux sur des vidéos de <b style="color:#fff;">moins de 10 minutes</b>. Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.</div>
@@ -3945,14 +3888,6 @@
       <div class="accueil-texte">
         <div class="t" id="an-gain-t">—</div>
         <div class="s" id="an-gain-s">—</div>
-      </div>
-      <div class="an-gain-ic">
-        <svg viewBox="0 0 28 28" fill="none">
-          <path d="M8 3h12M8 25h12" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round"/>
-          <path d="M9.5 3v4.2c0 3 4.5 4.6 4.5 6.8s-4.5 3.8-4.5 6.8V25" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linejoin="round"/>
-          <path d="M18.5 3v4.2c0 3-4.5 4.6-4.5 6.8s4.5 3.8 4.5 6.8V25" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linejoin="round"/>
-          <path d="M11 21.5c0-1.8 3-2.8 3-2.8s3 1 3 2.8Z" fill="rgba(255,255,255,0.42)"/>
-        </svg>
       </div>
     </div>
 
@@ -8910,21 +8845,8 @@ document.getElementById('man-retour')?.addEventListener('click', () => {
   showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
 })
 
-/* Le rappel affiche ce qui a été saisi à l'écran précédent, et y ramène. */
-function majRappelProc() {
-  const titre = document.getElementById('new-titre')?.value.trim() || 'Sans titre'
-  const cat = document.getElementById('new-categorie')?.value.trim()
-  document.querySelectorAll('[data-rappel] .tx').forEach(el => {
-    el.innerHTML = `<b>${escapeHtml(titre)}</b>${cat ? ' \u00b7 ' + escapeHtml(cat) : ''}`
-  })
-}
-
-document.addEventListener('click', (e) => {
-  if (e.target.closest('[data-rappel]')) showGestionScreen('p-create')
-})
 
 function goToCreateMode(mode) {
-  majRappelProc()
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
   if (mode === 'manual') { ouvrirEtapesManuelles(null); return }
@@ -10324,7 +10246,7 @@ window.ouvrirMontageVideo = async function(procId) {
   el('publish-btn-video').textContent = dvEdition
     ? 'Enregistrer les modifications' : 'Publier la proc\u00e9dure'
 
-  if (!dvEdition) { majRappelProc(); return }
+  if (!dvEdition) return
 
   const [{ data: proc }, { data: etapes }] = await Promise.all([
     supabase.from('procedures').select('*').eq('id', procId).single(),
@@ -10332,12 +10254,6 @@ window.ouvrirMontageVideo = async function(procId) {
   ])
   if (!proc) { el('create-error-video').textContent = 'Proc\u00e9dure introuvable.'; return }
 
-  /* Le rappel montre la procédure ouverte, pas celle qu'on était en train de
-     créer. */
-  document.querySelectorAll('[data-rappel] .tx').forEach(x => {
-    x.innerHTML = `<b>${escapeHtml(proc.titre || 'Sans titre')}</b>` +
-      (proc.categorie ? ' \u00b7 ' + escapeHtml(proc.categorie) : '')
-  })
 
   currentVideoFile = null
   reinitialiserCouverture(proc.image_url || null)

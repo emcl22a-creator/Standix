@@ -795,8 +795,26 @@
   .emp-liste .an-lig .pt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
   /* La même barre que la recherche d'une catégorie, avec son bouton à côté. */
+  /* La liste des postes, dans la fenêtre d'arrivée. Des lignes pleine largeur :
+     on choisit du doigt, dans une cuisine, souvent debout. */
+  .poste-fen .poste-choix{
+    max-height:min(46vh, 320px); overflow-y:auto;
+    border-top:0.5px solid rgba(255,255,255,0.10);
+  }
+  .poste-fen .poste-choix button{
+    display:block; width:100%; padding:14px 18px; border:none; background:none;
+    border-bottom:0.5px solid rgba(255,255,255,0.07);
+    font-family:inherit; font-size:15.5px; font-weight:600; color:#fff; text-align:left;
+  }
+  .poste-fen .poste-choix button:last-child{ border-bottom:none; }
+  .poste-fen .poste-choix button:active{ background:rgba(255,255,255,0.07); }
+
   .poste-saisie{ display:flex; align-items:center; gap:9px; margin-top:16px; }
-  .poste-saisie .search-bar{ flex:1; min-width:0; }
+  /* La barre de recherche porte une marge basse de 12 px, utile là où elle
+     surplombe une liste. Ici elle décalait le bouton vers le haut : à hauteur
+     égale, deux éléments centrés ne le sont plus si l'un est plus « lourd » que
+     l'autre. On l'annule. */
+  .poste-saisie .search-bar{ flex:1; min-width:0; margin-bottom:0; }
   .poste-ajouter{
     flex-shrink:0; height:38px; padding:0 18px; border:none; border-radius:100px;
     background:#fff; color:#000; font-family:inherit; font-size:14px; font-weight:700;
@@ -6567,6 +6585,10 @@ async function enterApp(membre) {
     finDuDemarrage()
     if (cibleQR) ouvrirCibleQR()
   }
+
+  /* Une fois l'app à l'écran, pas avant : la question arrive sur une interface
+     qu'on reconnaît, pas sur un fond gris de chargement. */
+  setTimeout(() => proposerPosteALArrivee(), 700)
 }
 
 /* Ouvre la procédure visée par le QR, dans l'espace où l'on se trouve. Un
@@ -9142,6 +9164,92 @@ function peindreMonPoste() {
         .update({ poste: currentMembre.poste }).eq('id', currentMembre.id)
       if (error) toast('Enregistrement impossible : ' + error.message)
     })
+  })
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHOISIR SON POSTE EN ARRIVANT
+
+   Un employé qui vient de rejoindre une entreprise choisit son poste tout de
+   suite. Plus tard, il ne le fera pas : les réglages sont l'endroit où l'on va
+   quand quelque chose ne va pas, pas où l'on passe par curiosité.
+
+   Trois garde-fous :
+   • rien ne s'ouvre si le patron n'a pas encore défini de postes ;
+   • rien ne s'ouvre si la personne en a déjà un ;
+   • on ne redemande pas à quelqu'un qui a déjà refusé — la mémoire locale garde
+     la trace du « plus tard », sinon la fenêtre revient à chaque ouverture et
+     devient un obstacle plutôt qu'un service.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+async function proposerPosteALArrivee() {
+  if (currentMembre?.role !== 'equipe') return
+  if (currentMembre?.poste) return
+  if (!currentMembre?.entreprise_id) return
+
+  const cle = 'procedo_poste_passe_' + currentMembre.id
+  try { if (localStorage.getItem(cle)) return } catch (e) {}
+
+  await chargerPostes()
+  if (!postesEntreprise.length) return   // le patron n'en a pas encore défini
+
+  const choisi = await choisirPosteFenetre()
+  if (choisi === null) {
+    /* « Plus tard ». On le retient : redemander à chaque ouverture
+       transformerait un service en corvée. Le réglage reste accessible. */
+    try { localStorage.setItem(cle, '1') } catch (e) {}
+    return
+  }
+
+  currentMembre.poste = choisi
+  majLignePoste()
+  const { error } = await supabase.from('membres')
+    .update({ poste: choisi }).eq('id', currentMembre.id)
+  if (error) toast('Poste non enregistr\u00e9 : ' + error.message)
+  else toast('Bienvenue \u00b7 ' + choisi)
+}
+
+/* La fenêtre elle-même. Elle rend le nom du poste choisi, ou `null` si la
+   personne préfère le faire plus tard. */
+function choisirPosteFenetre() {
+  return new Promise((resolve) => {
+    const fond = document.createElement('div')
+    fond.className = 'ios-alert-backdrop'
+    fond.innerHTML = `
+      <div class="ios-alert poste-fen" role="dialog" aria-modal="true">
+        <div class="ios-alert-body">
+          <div class="ios-alert-title">Quel est votre poste ?</div>
+          <div class="ios-alert-msg">Choisissez celui qui vous correspond. Vous pourrez le changer dans les r\u00e9glages.</div>
+        </div>
+        <div class="poste-choix">
+          ${postesEntreprise.map(p => `
+            <button type="button" data-poste-choix="${escapeHtml(p.nom)}">${escapeHtml(p.nom)}</button>`).join('')}
+        </div>
+        <div class="ios-alert-actions">
+          <button type="button" class="cancel">Plus tard</button>
+        </div>
+      </div>`
+    document.body.appendChild(fond)
+    requestAnimationFrame(() => fond.classList.add('shown'))
+
+    let fait = false
+    const fermer = (valeur) => {
+      if (fait) return
+      fait = true
+      fond.classList.remove('shown')
+      setTimeout(() => fond.remove(), 220)
+      resolve(valeur)
+    }
+
+    fond.querySelectorAll('[data-poste-choix]').forEach(b => {
+      b.addEventListener('click', () => {
+        if (navigator.vibrate) navigator.vibrate(8)
+        fermer(b.dataset.posteChoix)
+      })
+    })
+    fond.querySelector('.cancel').addEventListener('click', () => fermer(null))
+    /* On ne ferme PAS en touchant le fond : un geste de trop ne doit pas
+       escamoter une question qu'on ne reposera plus. */
   })
 }
 

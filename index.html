@@ -639,6 +639,55 @@
   #p-an-temps .fl,
   #p-an-equipe .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
 
+  /* ═══ La fiche d'un membre ═══
+     Mêmes lignes sobres que la page Équipe : un filet, pas de carte. On vient de
+     là, on doit s'y retrouver. */
+  .fm-qui{
+    display:flex; align-items:center; gap:14px; margin-top:14px;
+    padding:16px 18px; border-radius:20px;
+    background:var(--hero-gradient); border:0.5px solid var(--border);
+  }
+  .fm-qui .co{ flex:1; min-width:0; }
+  .fm-qui .nm{ font-size:18px; font-weight:750; letter-spacing:-0.035em; }
+  .fm-qui .s{ font-size:12.5px; color:var(--label-2); margin-top:4px; line-height:1.5; }
+  .fm-qui .s b{ color:#fff; font-weight:650; }
+
+  .fm-trois{ display:flex; gap:8px; margin-top:16px; }
+  .fm-trois .un{
+    flex:1; padding:13px 10px; border-radius:14px; text-align:center;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .fm-trois .v{ font-size:20px; font-weight:800; letter-spacing:-0.04em; }
+  .fm-trois .l{ font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
+
+  .fm-titre{
+    font-size:12px; font-weight:650; color:var(--label-3);
+    margin:24px 0 4px; text-transform:uppercase; letter-spacing:0.06em;
+  }
+
+  /* La ligne, exactement celle de la page Équipe. */
+  /* Les lignes sont des boutons : on les remet à plat pour qu'elles ressemblent
+     à du texte et non à des contrôles. */
+  button.fm-lig{
+    width:100%; background:none; border:none; padding:12px 2px;
+    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    font-family:inherit; text-align:left; color:inherit;
+  }
+  button.fm-lig:active{ opacity:0.6; }
+  .fm-lig .co{ display:flex; flex-direction:column; }
+
+  .fm-lig{
+    display:flex; align-items:center; gap:12px; padding:12px 2px;
+    border-bottom:0.5px solid rgba(255,255,255,0.055);
+  }
+  .fm-lig:last-child{ border-bottom:none; }
+  .fm-lig .co{ flex:1; min-width:0; }
+  .fm-lig .nm{ font-size:14.5px; font-weight:600; }
+  .fm-lig .st{ font-size:11.5px; color:var(--label-3); margin-top:1px; }
+  .fm-lig .vl{ font-size:14px; font-weight:650; color:var(--label-2); flex-shrink:0; }
+  .fm-lig .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
+  .fm-lig .pt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
   .an-compte{
     font-size:13px; color:var(--label-3); font-weight:600; flex:1;
   }
@@ -686,7 +735,6 @@
   .an-vide{ font-size:13px; color:var(--label-3); padding:16px 0; }
 
   /* ═══ La fiche d'un membre ═══ */
-  .fm-tete{ display:flex; align-items:center; gap:15px; margin-top:16px; }
   .fm-co{ flex:1; min-width:0; }
   /* Sans cercle d'initiales, le nom prend la place : c'est lui qu'on lit. */
   .fm-nom{ font-size:26px; font-weight:700; letter-spacing:-0.03em; }
@@ -4045,14 +4093,16 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Équipe</h1>
     </div>
 
-    <div class="fm-tete">
-      <div class="fm-co">
-        <div class="fm-nom" id="fm-nom">—</div>
-        <div class="fm-rl" id="fm-role">—</div>
+    <!-- L'en-tête porte tout ce qu'on sait de la personne en une ligne : son rôle,
+         sa série, sa dernière lecture. La médaille à droite, comme dans la liste
+         d'où l'on vient. -->
+    <div class="fm-qui">
+      <div class="co">
+        <div class="nm" id="fm-nom">—</div>
+        <div class="s" id="fm-sous">—</div>
       </div>
       <div id="fm-medaille"></div>
     </div>
-    <div class="fm-serie" id="fm-serie"></div>
 
     <div class="ga-segments" id="fm-periode">
       <button class="active" data-fm="week">Semaine</button>
@@ -4060,30 +4110,19 @@
       <button data-fm="all">Total</button>
     </div>
 
-    <div class="an-heros">
-      <div class="an-n" id="fm-temps">—</div>
-      <div class="an-q" id="fm-temps-q">passées dans l'app</div>
-      <div><span class="an-ev" id="fm-ecart" style="display:none;"></span></div>
-    </div>
-
-    <div class="an-trois">
+    <div class="fm-trois">
+      <div class="un"><div class="v" id="fm-temps">—</div><div class="l">De lecture</div></div>
       <div class="un"><div class="v" id="fm-lues">—</div><div class="l">Procédures lues</div></div>
-      <div class="un"><div class="v" id="fm-lectures">—</div><div class="l">Lectures</div></div>
       <div class="un"><div class="v" id="fm-moyenne">—</div><div class="l">Par procédure</div></div>
     </div>
 
-    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="13" cy="12" r="10.2" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><circle cx="13" cy="12" r="7.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path d="M13 7.6V12l3.2 2" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Ses journées</b></div>
-    <div class="fm-courbe" id="fm-courbe"></div>
-    <div class="fm-jours" id="fm-jours"></div>
-
-    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="8" y="1.5" width="13" height="9" rx="2.5" stroke="rgba(255,255,255,0.16)" stroke-width="1.4"/><rect x="5" y="5" width="16" height="11" rx="3" stroke="rgba(255,255,255,0.26)" stroke-width="1.4"/><rect x="2.5" y="9" width="17" height="12.5" rx="3.5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="6" y1="14" x2="14" y2="14" stroke="rgba(255,255,255,0.42)" stroke-width="1.5" stroke-linecap="round"/></svg></span><b>Où il passe son temps</b></div>
+    <div class="fm-titre">Où il passe son temps</div>
     <div id="fm-top"></div>
 
-    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="3" y="3.5" width="17" height="17" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="11.5" y1="8" x2="11.5" y2="13" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round"/><circle cx="11.5" cy="16" r=".9" fill="rgba(255,255,255,0.42)"/></svg></span><b>Ce qu'il n'a pas lu</b></div>
+    <div class="fm-titre">Ce qu'il n'a pas lu</div>
     <div id="fm-reste"></div>
 
-    <div class="an-tete"><span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><rect x="8" y="1.5" width="10" height="21" rx="2.6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><line x1="11.5" y1="19.5" x2="14.5" y2="19.5" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"/></svg></span><b>Ses appareils</b>
-      <span class="an-lien" id="fm-nb-app"></span></div>
+    <div class="fm-titre">Ses appareils</div>
     <div id="fm-appareils"></div>
 
     <div class="fm-actions" id="fm-actions"></div>
@@ -7373,53 +7412,34 @@ async function peindreFicheMembre() {
 
   const el = (id) => document.getElementById(id)
   el('fm-nom').textContent = m.nom || 'Sans nom'
-  el('fm-role').textContent = (m.role === 'gestion' ? 'Gestion' : '\u00c9quipe') +
-    (m.created_at ? ' \u00b7 depuis ' + new Date(m.created_at)
-      .toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' }) : '')
+  const role = m.role === 'gestion' ? 'Gestion' : '\u00c9quipe'
 
   const siennes = (validations || []).filter(v => v.membre_id === m.id)
   const serie = serieConsecutive(siennes).serie
   el('fm-medaille').innerHTML = medailleHtml(serie, 46, true)
-  el('fm-serie').innerHTML = serie
-    ? `<b>${serie} jour${serie > 1 ? 's' : ''}</b> d'affil\u00e9e`
-    : 'Aucune s\u00e9rie en cours'
+  /* Tout ce qu'on sait de la personne tient en une ligne : son rôle, sa
+     série, sa dernière lecture. C'est ce qu'on lit avant de décider quoi
+     faire pour elle. */
+  const derniere = siennes.map(v => new Date(v.validated_at)).sort((a, b) => b - a)[0]
+  el('fm-sous').innerHTML = [
+    role,
+    serie ? `<b>${serie} jour${serie > 1 ? 's' : ''} d'affil\u00e9e</b>` : 'aucune s\u00e9rie',
+    derniere ? 'derni\u00e8re lecture ' + ilYA(derniere) : 'jamais rien lu',
+  ].join(' \u00b7 ')
 
   // ─── Le temps sur la période choisie ───
   const debut = fmDebutPeriode()
   const dedans = debut ? siennes.filter(v => new Date(v.validated_at) >= debut) : siennes
   const secondes = dedans.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
 
-  /* Le temps en gros : on sépare l'unité du nombre pour qu'elle soit plus
-     discrète, comme sur le taux de la page d'analyse. */
-  el('fm-temps').innerHTML = secondes
-    ? dureeLisible(secondes).replace(/([a-z]+)/gi, '<span> $1 </span>').trim()
-    : `${dedans.length}<span> lecture${dedans.length > 1 ? 's' : ''}</span>`
-  el('fm-temps-q').textContent = secondes
-    ? `pass\u00e9es dans l'app ${fmLibellePeriode()}`
-    : `${fmLibellePeriode()}`
-
-  /* L'écart avec la période précédente. On ne l'affiche que s'il y a de quoi
-     comparer : un « +100 % » depuis zéro ne veut rien dire. */
-  const prec = fmPeriodePrecedente()
-  const ev = el('fm-ecart')
-  if (prec && secondes) {
-    const avantS = siennes
-      .filter(v => { const d = new Date(v.validated_at); return d >= prec.avant && d < prec.fin })
-      .reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
-    if (avantS > 0) {
-      const diff = secondes - avantS
-      const signe = diff >= 0 ? '\u2191' : '\u2193'
-      ev.textContent = `${signe} ${dureeLisible(Math.abs(diff))} par rapport \u00e0 ` +
-        (fmPeriode === 'week' ? 'la semaine derni\u00e8re' : 'au mois dernier')
-      ev.classList.toggle('baisse', diff < 0)
-      ev.style.display = ''
-    } else ev.style.display = 'none'
-  } else ev.style.display = 'none'
+  /* Dans une case de 110 px, le nombre et son unité tiennent ensemble : plus
+     besoin de les séparer comme sur le grand chiffre d'avant. */
+  el('fm-temps').textContent = secondes ? dureeLisible(secondes) : '\u2014'
 
   // ─── Les trois repères ───
   const lues = new Set(dedans.map(v => v.procedure_id)).size
   el('fm-lues').innerHTML = `${lues}<em>/${(procedures || []).length}</em>`
-  el('fm-lectures').textContent = dedans.length
+  
   el('fm-moyenne').textContent = secondes && dedans.length
     ? dureeLisible(Math.round(secondes / dedans.length)) : '\u2014'
 
@@ -7439,15 +7459,13 @@ async function peindreFicheMembre() {
     .filter(x => x.proc)
     .sort((a, b) => (b.s - a.s) || (b.n - a.n))
     .slice(0, 4)
-  const maxS = Math.max(1, ...top.map(x => x.s || x.n))
 
-  el('fm-top').innerHTML = top.length ? top.map((x, i) => `
-    <button type="button" class="an-lg" data-proc="${x.proc.id}">
-      <span class="rg">${i + 1}</span>
+  el('fm-top').innerHTML = top.length ? top.map((x) => `
+    <button type="button" class="fm-lig" data-proc="${x.proc.id}">
       <span class="co"><span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
-        <span class="st">${x.n} lecture${x.n > 1 ? 's' : ''}</span>
-        <span class="ba"><i style="width:${Math.round((x.s || x.n) / maxS * 100)}%"></i></span></span>
+        <span class="st">${x.n} lecture${x.n > 1 ? 's' : ''}</span></span>
       <span class="vl">${x.s ? dureeLisible(x.s) : ''}</span>
+      <span class="fl">\u203a</span>
     </button>`).join('')
     : `<div class="an-vide">Aucune lecture ${fmLibellePeriode()}.</div>`
 
@@ -7455,8 +7473,8 @@ async function peindreFicheMembre() {
   const lu = new Set(siennes.map(v => v.procedure_id))
   const reste = (procedures || []).filter(p => !lu.has(p.id))
   el('fm-reste').innerHTML = reste.length ? reste.slice(0, 5).map(p => `
-    <button type="button" class="an-lg" data-proc="${p.id}">
-      <span class="pt rouge"></span>
+    <button type="button" class="fm-lig" data-proc="${p.id}">
+      <span class="pt" style="background:var(--red)"></span>
       <span class="co"><span class="nm">${escapeHtml(p.titre || 'Sans titre')}</span>
         <span class="st">${escapeHtml(p.categorie || 'Sans cat\u00e9gorie')}</span></span>
       <span class="fl">\u203a</span>
@@ -7487,18 +7505,13 @@ function peindreCourbeMembre(validations) {
   const max = Math.max(1, ...jours.map(j => j.valeur))
   const seuil = max * 0.55
 
-  document.getElementById('fm-courbe').innerHTML = jours.map(j =>
-    `<span class="${j.valeur >= seuil && j.valeur > 0 ? 'haut' : ''}" ` +
-    `style="height:${j.valeur ? Math.max(6, j.valeur / max * 100) : 3}%"></span>`).join('')
-
-  const noms = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
-  document.getElementById('fm-jours').innerHTML = jours
-    .map(j => `<span>${noms[j.d.getDay()]}</span>`).join('')
+  /* Les journées en barres ne sont plus affichées : la forme retenue montre
+     d'abord ce qu'il lit et ce qu'il évite. Le rythme est une curiosité ;
+     savoir quoi faire pour cette personne est le vrai besoin. */
 }
 
 async function peindreAppareilsMembre(membreId) {
   const el = document.getElementById('fm-appareils')
-  const compteur = document.getElementById('fm-nb-app')
   if (!el) return
   try {
     const { data, error } = await supabase.from('presences')
@@ -7510,7 +7523,6 @@ async function peindreAppareilsMembre(membreId) {
     const liste = data || []
     const recent = Date.now() - 30 * 60000
     const actifs = liste.filter(a => !a.revoquee && new Date(a.derniere_fois) > recent)
-    if (compteur) compteur.textContent = liste.length ? `${actifs.length} sur ${APPAREILS_MAX}` : ''
 
     el.innerHTML = liste.length ? liste.slice(0, 3).map(a => {
       const vivant = !a.revoquee && new Date(a.derniere_fois) > recent
@@ -7522,7 +7534,6 @@ async function peindreAppareilsMembre(membreId) {
     }).join('') : '<div class="an-vide">Aucun appareil enregistr\u00e9.</div>'
   } catch (e) {
     el.innerHTML = '<div class="an-vide">Appareils non disponibles.</div>'
-    if (compteur) compteur.textContent = ''
   }
 }
 

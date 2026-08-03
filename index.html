@@ -9592,7 +9592,6 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const path = `${base}_${aiVideoFile.name}`
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile)
     if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
-    const { data: publicUrlData } = supabase.storage.from('procedo-videos').getPublicUrl(path)
     const videoUrl = publicUrlData.publicUrl
 
     /* La bande son, pour l'analyse seule. Azure ne lit que la parole : lui
@@ -9605,7 +9604,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       const { error: errSon } = await supabase.storage.from('procedo-videos')
         .upload(cheminSon, son.blob, { contentType: 'audio/wav' })
       if (!errSon) {
-        urlPourAnalyse = supabase.storage.from('procedo-videos').getPublicUrl(cheminSon).data.publicUrl
+        /* Azure télécharge le fichier lui-même : il lui faut une adresse valide
+           assez longtemps pour toute l'analyse, mais qui finit par expirer.
+           Six heures couvrent largement le pire des cas. */
+        const { data: sig } = await supabase.storage.from('procedo-videos')
+          .createSignedUrl(cheminSon, 6 * 3600)
+        urlPourAnalyse = sig?.signedUrl || urlPourAnalyse
         window.jalon?.(`bande son : ${poidsLisible(son.blob.size)} au lieu de ${poidsLisible(aiVideoFile.size)}`)
       }
     }
@@ -10539,7 +10543,7 @@ window.ouvrirMontageVideo = async function(procId) {
   reinitialiserCouverture(proc.image_url || null)
 
   const player = el('video-player')
-  player.src = proc.video_url || ''
+  player.src = (await urlSignee(proc.video_url)) || ''
   player.style.display = proc.video_url ? 'block' : 'none'
   el('video-placeholder').style.display = proc.video_url ? 'none' : 'block'
   el('dv-travail').style.display = 'block'
@@ -10849,7 +10853,7 @@ function renderManualSteps() {
       <div class="step-bas">
       <div class="step-img">
         <div class="step-img-vignette">${step.image_url
-          ? `<img src="${step.image_url}" alt="">`
+          ? `<img data-fichier="${escapeHtml(cheminFichier(step.image_url))}" alt="">`
           : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
         <button type="button" class="img-toucher" aria-label="Photo de l'étape">
           <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
@@ -10901,6 +10905,7 @@ function renderManualSteps() {
     })
     if (i === etapeNeuve) div.classList.add('neuve')
     listEl.appendChild(div)
+  signerMedias(listEl)
     autoResizeTextarea(textarea)
   })
   etapeNeuve = -1
@@ -11033,7 +11038,9 @@ async function envoyerCouverture(procedureId) {
     const { error } = await supabase.storage.from('procedo-videos')
       .upload(chemin, couvertureFichier, { upsert: true })
     if (error) throw error
-    return supabase.storage.from('procedo-videos').getPublicUrl(chemin).data?.publicUrl || null
+    /* On stocke le CHEMIN, pas une adresse : les adresses signées expirent, une
+         adresse gardée en base serait morte au bout d'une heure. */
+      return chemin
   } catch (ex) {
     console.warn('Proc\u00e9do \u00b7 image de couverture non envoy\u00e9e :', ex?.message || ex)
     return couvertureUrl
@@ -11391,8 +11398,7 @@ async function publishProcedure(errorElId, btnId) {
       setButtonLoading(publishBtn, false)
       return
     }
-    const { data: publicUrlData } = supabase.storage.from('procedo-videos').getPublicUrl(path)
-    videoUrl = publicUrlData.publicUrl
+    videoUrl = path
   }
 
   /* En modification, on met à jour la ligne existante au lieu d'en créer une
@@ -11428,7 +11434,7 @@ async function publishProcedure(errorElId, btnId) {
     const chemin = `${currentMembre.entreprise_id}/${newProc.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
     const { error: envoiErr } = await supabase.storage.from('procedo-videos').upload(chemin, s.imageFichier)
     if (envoiErr) { console.warn('Photo non envoyée :', envoiErr.message); continue }
-    s.image_url = supabase.storage.from('procedo-videos').getPublicUrl(chemin).data?.publicUrl || null
+    s.image_url = chemin
   }
 
   /* L'image de la procédure part après sa création : on a besoin de son
@@ -11583,13 +11589,14 @@ async function openAnalyse(procId) {
      une procédure peut avoir les deux, et la vidéo vient dessous. */
   const couvEl = document.getElementById('analyse-couverture')
   if (couvEl) {
-    couvEl.innerHTML = proc.image_url ? `<img src="${escapeHtml(proc.image_url)}" alt="">` : ''
+    couvEl.innerHTML = proc.image_url ? `<img data-fichier="${escapeHtml(cheminFichier(proc.image_url))}" alt="">` : ''
     couvEl.style.display = proc.image_url ? 'block' : 'none'
+    signerMedias(couvEl)
   }
 
   if (proc.video_url) {
     videoFrame.style.display = 'block'
-    videoEl.src = proc.video_url
+    videoEl.src = (await urlSignee(proc.video_url)) || ''
   } else {
     videoFrame.style.display = 'none'
   }
@@ -11617,7 +11624,7 @@ async function openAnalyse(procId) {
         <div class="et-co">
           <p>${escapeHtml(etape.texte)}</p>
           ${hasClip ? `<span class="badge extrait" style="cursor:pointer;">\u25b6 ${formatTime(bounds.start)}\u2013${formatTime(bounds.end)}</span>` : ''}
-          ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}
+          ${etape.image_url ? `<div class="detail-step-img"><img data-fichier="${escapeHtml(cheminFichier(etape.image_url))}" alt="" loading="lazy"></div>` : ''}
         </div>
       `
       /* Le contour bleu vaut pour TOUTES les étapes, avec ou sans vidéo : c'est
@@ -11635,6 +11642,7 @@ async function openAnalyse(procId) {
       }
       stepsListEl.appendChild(div)
     })
+  signerMedias(stepsListEl)
   }
 
   attacherSuiviLecture(videoEl, stepsListEl)
@@ -12599,13 +12607,14 @@ async function openEquipeDetail(procId) {
      eux qui en ont l'usage : elle dit d'un coup d'œil de quoi il s'agit. */
   const couvEq = document.getElementById('detail-couverture')
   if (couvEq) {
-    couvEq.innerHTML = proc.image_url ? `<img src="${escapeHtml(proc.image_url)}" alt="">` : ''
+    couvEq.innerHTML = proc.image_url ? `<img data-fichier="${escapeHtml(cheminFichier(proc.image_url))}" alt="">` : ''
     couvEq.style.display = proc.image_url ? 'block' : 'none'
+    signerMedias(couvEq)
   }
 
   if (proc.video_url) {
     videoFrame.style.display = 'block'
-    detailVideoEl.src = proc.video_url
+    detailVideoEl.src = (await urlSignee(proc.video_url)) || ''
   } else {
     videoFrame.style.display = 'none'
   }
@@ -12640,7 +12649,7 @@ async function openEquipeDetail(procId) {
               aria-label="\u00c9tape ${i + 1}">${faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)}</button>
       <div class="et-co">
         <p>${escapeHtml(etape.texte)}</p>
-        ${etape.image_url ? `<div class="detail-step-img"><img src="${escapeHtml(etape.image_url)}" alt="" loading="lazy"></div>` : ''}
+        ${etape.image_url ? `<div class="detail-step-img"><img data-fichier="${escapeHtml(cheminFichier(etape.image_url))}" alt="" loading="lazy"></div>` : ''}
       </div>
       ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
     `
@@ -12669,6 +12678,7 @@ async function openEquipeDetail(procId) {
   })
 
   attacherSuiviLecture(detailVideoEl, stepsEl)
+  signerMedias(stepsEl)
   majBandeauCoches()
 
   /* Une procédure sans étape affichait une zone vide, et on ne savait pas si
@@ -14819,12 +14829,12 @@ window.openEditProcedure = async function(procId, mode) {
     // crossOrigin permet de fabriquer la pellicule de vignettes. Si le serveur
     // le refuse, on recharge la vidéo sans : lecture OK, frise simplement noire.
     videoEl.crossOrigin = 'anonymous'
-    videoEl.src = proc.video_url
-    videoEl.onerror = () => {
+    videoEl.src = (await urlSignee(proc.video_url)) || ''
+    videoEl.onerror = async () => {
       if (videoEl.crossOrigin) {
         videoEl.removeAttribute('crossorigin')
         videoEl.crossOrigin = null
-        videoEl.src = proc.video_url
+        videoEl.src = (await urlSignee(proc.video_url)) || ''
       }
     }
     ecapWrap.style.display = 'block'
@@ -15241,7 +15251,7 @@ function renderEditSteps() {
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       ${hasClip ? '' : `<div class="step-img">
           <div class="step-img-vignette">${step.image_url
-            ? `<img src="${step.image_url}" alt="">`
+            ? `<img data-fichier="${escapeHtml(cheminFichier(step.image_url))}" alt="">`
             : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}</div>
           <button type="button" class="img-toucher" aria-label="Photo de l'étape">
             <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
@@ -15382,6 +15392,74 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   await loadGestionProcedures()
   openAnalyse(editProcedureId)
 })
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES FICHIERS SONT PRIVÉS
+
+   Avant, chaque vidéo et chaque photo était servie par une adresse PUBLIQUE :
+   n'importe qui la connaissant pouvait la regarder, sans compte, sans
+   appartenir à l'entreprise. Les adresses ne sont pas devinables, mais elles
+   circulent — historique du navigateur, journaux serveur, lien partagé par
+   erreur. C'est une sécurité par obscurité, et elle ne tient pas devant un
+   client qui pose la question.
+
+   Désormais : le compartiment est privé, et chaque affichage demande une
+   adresse SIGNÉE, valable une heure, délivrée uniquement à quelqu'un que
+   Supabase reconnaît comme membre de l'entreprise.
+
+   Les anciennes lignes contiennent une URL complète, les nouvelles un chemin :
+   `cheminFichier` accepte les deux, pour que rien ne se casse au passage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const SIGNATURE_DUREE = 3600            // une heure
+const signatures = new Map()            // chemin → { url, expire }
+
+function cheminFichier(valeur) {
+  if (!valeur) return null
+  const v = String(valeur)
+  if (!v.startsWith('http')) return v
+  /* Une ancienne adresse publique. On en extrait le chemin, quelle que soit la
+     forme exacte de l'URL. */
+  const m = v.match(/\/procedo-videos\/(.+?)(?:\?|$)/)
+  return m ? decodeURIComponent(m[1]) : null
+}
+
+async function urlSignee(valeur) {
+  const chemin = cheminFichier(valeur)
+  if (!chemin) return null
+
+  /* On garde les signatures en mémoire : une fiche de quinze étapes avec photo
+     ferait sinon quinze allers-retours au serveur à chaque ouverture. On les
+     renouvelle une minute avant l'échéance, pour qu'une vidéo commencée ne
+     s'interrompe pas en cours de lecture. */
+  const connue = signatures.get(chemin)
+  if (connue && connue.expire > Date.now() + 60000) return connue.url
+
+  try {
+    const { data, error } = await supabase.storage.from('procedo-videos')
+      .createSignedUrl(chemin, SIGNATURE_DUREE)
+    if (error || !data?.signedUrl) throw error || new Error('sans adresse')
+    signatures.set(chemin, { url: data.signedUrl, expire: Date.now() + SIGNATURE_DUREE * 1000 })
+    return data.signedUrl
+  } catch (e) {
+    console.warn('Proc\u00e9do \u00b7 adresse non sign\u00e9e :', e?.message || e)
+    return null
+  }
+}
+
+/* Les gabarits sont écrits d'un seul tenant et ne peuvent pas attendre. Ils
+   posent donc `data-fichier`, et cette fonction remplit les `src` une fois le
+   contenu en place. Les images arrivent avec un léger retard, invisible en
+   pratique, et la page ne bloque jamais. */
+async function signerMedias(racine) {
+  const cibles = (racine || document).querySelectorAll('[data-fichier]:not([data-signe])')
+  await Promise.all([...cibles].map(async el => {
+    el.setAttribute('data-signe', '1')
+    const url = await urlSignee(el.getAttribute('data-fichier'))
+    if (url) el.src = url
+    else el.closest('.detail-step-img, .analyse-couv, .step-img-vignette')?.remove()
+  }))
+}
 
 function escapeHtml(str) {
   const div = document.createElement('div')

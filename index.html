@@ -928,22 +928,22 @@
      Une fois la photo choisie, la zone redevient une ligne : il n'y a plus rien
      à déposer, seulement quelque chose à montrer. */
   #p-create-manual .couv:not(.remplie),
-  #p-create-video .couv:not(.remplie){
+  .couv-depot:not(.remplie){
     flex-direction:column; text-align:center; gap:11px;
     padding:26px 18px; border-radius:18px;
     border:1.5px dashed rgba(255,255,255,0.16);
     background:rgba(255,255,255,0.025);
   }
   #p-create-manual .couv:not(.remplie) .vign,
-  #p-create-video .couv:not(.remplie) .vign{
+  .couv-depot:not(.remplie) .vign{
     width:52px; height:52px; border:none; background:none;
   }
   #p-create-manual .couv:not(.remplie) .vign svg,
-  #p-create-video .couv:not(.remplie) .vign svg{ width:46px; height:46px; }
+  .couv-depot:not(.remplie) .vign svg{ width:46px; height:46px; }
   #p-create-manual .couv:not(.remplie) .tx .t,
-  #p-create-video .couv:not(.remplie) .tx .t{ font-size:14.5px; font-weight:650; }
+  .couv-depot:not(.remplie) .tx .t{ font-size:14.5px; font-weight:650; }
   #p-create-manual .couv:not(.remplie) .tx .s,
-  #p-create-video .couv:not(.remplie) .tx .s{ margin-top:4px; line-height:1.45; }
+  .couv-depot:not(.remplie) .tx .s{ margin-top:4px; line-height:1.45; }
 
   .couv .oter{
     position:relative; z-index:3; border:none; background:rgba(255,255,255,0.10);
@@ -1106,8 +1106,11 @@
      pas pousser l'étape suivante hors de l'écran. */
   /* Carrée et centrée : la photo illustre un geste, elle n'a pas à tenir toute la
      largeur ni à repousser l'étape suivante hors de l'écran. */
+  /* À gauche et plus petite. Centrée et large, elle prenait le pas sur le
+     texte de l'étape — or elle l'illustre, elle ne le remplace pas. Alignée sur
+     la marge du texte, l'œil descend en ligne droite d'une étape à l'autre. */
   .detail-step-img{
-    width:150px; height:150px; margin:11px auto 2px;
+    width:104px; height:104px; margin:10px 0 2px;
     border-radius:14px; overflow:hidden;
     border:0.5px solid var(--border); background:rgba(255,255,255,0.04);
     display:flex; align-items:center; justify-content:center;
@@ -3758,7 +3761,7 @@
       <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
     </div>
 
-        <div class="couv man-couv" id="couv-manuel">
+        <div class="couv couv-depot" id="couv-manuel">
       <input type="file" accept="image/*" class="fichier">
       <span class="vign">
         <svg viewBox="0 0 32 32" fill="none">
@@ -3981,14 +3984,13 @@
     </div>
     <div class="subhead" id="edit-subhead">Vérifiez et ajustez avant de continuer</div>
 
-    <div class="card">
-      <label class="f">Titre</label>
-      <input type="text" id="edit-titre">
-      <div style="margin-top:12px;">
-        <label class="f">Catégorie</label>
-        <input type="text" id="edit-categorie">
-      </div>
-    </div>
+    <!-- Catégorie avant Titre, et les mêmes champs qu'à la création. Deux écrans
+         qui demandent la même chose doivent la demander pareil : sinon on croit
+         remplir autre chose. -->
+    <div class="man-lbl">Catégorie</div>
+    <input type="text" class="man-champ" id="edit-categorie" placeholder="Ex : Cuisine">
+    <div class="man-lbl">Titre</div>
+    <input type="text" class="man-champ" id="edit-titre" placeholder="Ex : Fermeture de caisse">
 
     <div class="video-frame" id="edit-video-frame" style="display:none; margin-bottom:14px;">
       <video id="edit-video-player" playsinline webkit-playsinline></video>
@@ -4060,15 +4062,21 @@
     </div>
 
     <div class="section-title">Étapes</div>
-    <div class="couv" id="couv-edit">
+<!-- La même zone de dépôt qu'à la création : pointillés quand elle est
+         vide, aperçu quand elle est remplie. La rangée avec sa vignette carrée
+         appartenait à une version précédente de l'écran. -->
+    <div class="couv couv-depot" id="couv-edit">
       <input type="file" accept="image/*" class="fichier">
       <span class="vign">
-        <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.34)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/>
+        <svg viewBox="0 0 40 34" fill="none">
+          <rect x="9" y="2" width="22" height="14" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.8"/>
+          <rect x="2.5" y="7.5" width="35" height="24" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.40)" stroke-width="1.8"/>
+          <circle cx="11" cy="15" r="2.2" fill="rgba(255,255,255,0.40)"/>
+          <path d="m36 28-8-8-6 6-3-3-16 8" stroke="rgba(255,255,255,0.40)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </span>
       <span class="tx">
-        <span class="t">Image de la procédure</span>
+        <span class="t">Ajouter une photo</span>
         <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
       </span>
       <button type="button" class="oter" style="display:none;">Retirer</button>
@@ -4083,6 +4091,14 @@
 
     <div class="man-fil" id="edit-steps-list"></div>
     <button class="btn ghost block" style="margin-top:4px;" id="edit-add-step-btn">+ Ajouter une étape</button>
+
+    <!-- Annuler la dernière manipulation, comme à la création. Il n'y en avait
+         aucune ici : `ecap-undo` appartient au découpage vidéo et ne touche pas
+         aux étapes. -->
+    <button type="button" class="btn ghost block man-annuler-geste" style="margin-top:12px;"
+            id="edit-defaire" disabled aria-label="Annuler la dernière action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.3-9.3L3 7"/></svg>
+    </button>
 
     <div class="error-msg" id="edit-error"></div>
     <button class="btn block" style="margin-top:18px;" id="edit-save-btn">Enregistrer les modifications</button>
@@ -9497,6 +9513,33 @@ async function attendreEtapesIA(procId) {
   throw new Error("L\u2019analyse prend trop de temps. R\u00e9essayez, ou \u00e9crivez les \u00e9tapes vous-m\u00eame.")
 }
 
+/* L'annulation de l'écran de modification. Elle a sa PROPRE pile : les deux
+   écrans ne travaillent pas sur la même liste, et partager la pile ferait
+   ressurgir les étapes d'une création dans une modification. */
+let pileEdition = []
+
+function memoriserEdition() {
+  pileEdition.push(JSON.stringify(editStepsData))
+  if (pileEdition.length > PILE_MAX) pileEdition.shift()
+  majBoutonDefaireEdit()
+}
+
+function majBoutonDefaireEdit() {
+  const b = document.getElementById('edit-defaire')
+  if (b) b.disabled = pileEdition.length === 0
+}
+
+document.getElementById('edit-defaire')?.addEventListener('click', () => {
+  const avant = pileEdition.pop()
+  if (avant === undefined) return
+  const ouEtaitOn = window.scrollY
+  editStepsData = JSON.parse(avant)
+  renderEditSteps()
+  window.scrollTo({ top: ouEtaitOn })
+  majBoutonDefaireEdit()
+  if (navigator.vibrate) navigator.vibrate(6)
+})
+
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
@@ -12170,7 +12213,7 @@ async function openAnalyse(procId) {
   const couvEl = document.getElementById('analyse-couverture')
   if (couvEl) {
     couvEl.innerHTML = proc.image_url ? `<img data-fichier="${escapeHtml(cheminFichier(proc.image_url))}" alt="">` : ''
-    couvEl.style.display = proc.image_url ? 'block' : 'none'
+    couvEl.style.display = proc.image_url ? 'flex' : 'none'
     signerMedias(couvEl)
   }
 
@@ -13188,7 +13231,7 @@ async function openEquipeDetail(procId) {
   const couvEq = document.getElementById('detail-couverture')
   if (couvEq) {
     couvEq.innerHTML = proc.image_url ? `<img data-fichier="${escapeHtml(cheminFichier(proc.image_url))}" alt="">` : ''
-    couvEq.style.display = proc.image_url ? 'block' : 'none'
+    couvEq.style.display = proc.image_url ? 'flex' : 'none'
     signerMedias(couvEq)
   }
 
@@ -15384,6 +15427,7 @@ let conventionClips = 'fin'   // sens de lecture des horodatages : 'debut' | 'fi
 let clipsDeduits = false      // vrai si les bornes ont été déduites, pas lues en base
 
 window.openEditProcedure = async function(procId, mode) {
+  pileEdition = []
   editProcedureId = procId
   editMode = mode || 'edit'
   showGestionScreen('p-edit-procedure')
@@ -15906,7 +15950,8 @@ function renderEditSteps() {
     div.querySelector('.del').addEventListener('click', (e) => {
       e.stopPropagation()
       demanderSuppressionEtape(i + 1, editStepsData[i].texte, () => {
-        editStepsData.splice(i, 1)
+        memoriserEdition()
+      editStepsData.splice(i, 1)
         ecapEditor?.deselect()
         renderEditSteps()
         ecapEditor?.repaint()
@@ -15927,9 +15972,11 @@ function renderEditSteps() {
     renderEditSteps()
     if (editVideoUrl) ecapEditor?.select(nouvelIndex, { lire: false, defiler: false })
   })
+  majBoutonDefaireEdit()
 }
 
 document.getElementById('edit-add-step-btn')?.addEventListener('click', () => {
+  memoriserEdition()
   const videoEl = document.getElementById('edit-video-player')
   const d = (videoEl && isFinite(videoEl.duration)) ? videoEl.duration : 0
   const start = editVideoUrl ? (videoEl.currentTime || 0) : null

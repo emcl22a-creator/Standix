@@ -304,18 +304,18 @@
   .man-champ::placeholder{ color:var(--label-3); }
   .man-champ:focus{ outline:none; border-color:rgba(94,160,255,0.55); }
 
-  .man-fil{ position:relative; padding-left:38px; }
+  .man-fil{ position:relative; padding-left:42px; }
   /* Le trait s'arrête avant le dernier maillon : il relie, il ne dépasse pas. */
   .man-fil::before{
-    content:''; position:absolute; left:14px; top:8px; bottom:34px; width:1.5px;
+    content:''; position:absolute; left:16px; top:8px; bottom:34px; width:1.5px;
     background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
   }
   .man-fil .step-edit-item{
     position:relative; background:none; border:none; border-radius:0;
     padding:0 0 18px; margin:0;
   }
-  .man-fil .step-num-dess{ position:absolute; left:-38px; top:-2px; width:29px; height:29px; }
-  .man-fil .step-num-dess svg{ width:29px; height:29px; display:block; }
+  .man-fil .step-num-dess{ position:absolute; left:-42px; top:-3px; width:33px; height:33px; }
+  .man-fil .step-num-dess svg{ width:33px; height:33px; display:block; }
   .man-fil textarea{
     width:100%; background:none; border:none; padding:0; resize:none;
     color:#fff; font-family:inherit; font-size:14.5px; line-height:1.45;
@@ -360,13 +360,29 @@
     flex-shrink:0; margin-top:5px;
   }
 
+  /* L'étape qu'on vient d'ajouter arrive en glissant depuis le fil, avec un
+     léger dépassement. Seules les DEUX propriétés que le processeur graphique
+     gère seul sont animées — aucun recalcul de mise en page, donc aucun à-coup
+     sur une liste de quinze étapes. */
+  @keyframes etapeArrive{
+    from{ opacity:0; transform:translateY(-8px) scale(0.97); }
+    to{ opacity:1; transform:none; }
+  }
+  .man-fil .step-edit-item.neuve{
+    animation:etapeArrive 0.42s cubic-bezier(0.34,1.42,0.5,1) both;
+  }
+  /* Le numéro arrive juste après, comme s'il se posait sur le fil. */
+  .man-fil .step-edit-item.neuve .step-num-dess{
+    animation:etapeArrive 0.36s cubic-bezier(0.34,1.56,0.64,1) 0.08s both;
+  }
+
   .man-plus{
     position:relative; display:flex; align-items:center; gap:0;
     background:none; border:none; padding:0; width:100%; text-align:left;
     color:var(--label-2); font-family:inherit; font-size:14.5px; font-weight:600;
   }
-  .man-plus .d{ position:absolute; left:-38px; top:-3px; width:29px; height:29px; }
-  .man-plus .d svg{ width:29px; height:29px; display:block; }
+  .man-plus .d{ position:absolute; left:-42px; top:-4px; width:33px; height:33px; }
+  .man-plus .d svg{ width:33px; height:33px; display:block; }
   .man-plus:active{ opacity:0.6; }
 
   .step-edit-item{ touch-action:pan-y; }
@@ -562,10 +578,13 @@
     width:24px; height:24px; padding:0; border:none; background:none;
     color:var(--label-3); flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    /* La médaille fait 30 px et la ligne a 13 px de marge à droite : son centre
-       tombe donc à 28 px du bord. Le bouton en fait 24, son centre à 12. On le
-       décale de la différence pour qu'il s'aligne sur la colonne. */
-    margin-right:16px;
+    /* Dans l'analyse, les lignes sont aplaties et n'ont que 2 px de retrait à
+       droite. La médaille fait 30 px : son centre tombe donc à 17 px du bord. Le
+       bouton en fait 24, son centre à 12 — il lui faut 5 px pour s'aligner.
+
+       J'avais calculé sur les 13 px de la règle générale, sans voir que l'analyse
+       les remplace. */
+    margin-right:5px;
   }
   .an-aide svg{ width:19px; height:19px; display:block; }
   .an-aide:active{ color:var(--label-2); }
@@ -836,11 +855,6 @@
     font-family:ui-monospace, monospace; margin-top:3px; font-weight:500;
   }
 
-  .dv-plus{
-    width:100%; margin-top:6px; height:40px; border:none; border-radius:13px;
-    background:none; color:var(--label-3); font-family:inherit;
-    font-size:12.5px; font-weight:600;
-  }
   .dv-avance{ display:none; }
   .dv-avance.on{ display:block; }
 
@@ -2480,10 +2494,10 @@
      La même forme qu'à la création : un trait relie les cases, et l'ordre se voit
      sans qu'on ait à le lire. */
   #detail-steps.etapes-fil,
-  #analyse-steps-list.etapes-fil{ position:relative; padding-left:42px; margin-top:4px; }
+  #analyse-steps-list.etapes-fil{ position:relative; padding-left:45px; margin-top:4px; }
   #detail-steps.etapes-fil::before,
   #analyse-steps-list.etapes-fil::before{
-    content:''; position:absolute; left:14px; top:9px; bottom:18px; width:1.5px;
+    content:''; position:absolute; left:16px; top:9px; bottom:18px; width:1.5px;
     background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
   }
   /* L'employé lit debout, souvent d'assez loin, et son doigt doit trouver la
@@ -2508,13 +2522,21 @@
      le repère de l'ordre en gagnant celui de l'avancement. */
   /* La case n'est plus qu'un cadre : c'est l'hexagone dessiné qui porte la forme,
      la matière et le chiffre. Même dessin qu'à la création, même vocabulaire. */
+  /* Le numéro de la fiche gestion. Il n'avait aucune règle : les styles du fil
+     sont écrits pour `.man-fil`, et cette liste porte `.etapes-fil`. Le dessin
+     sortait donc sans taille ni position — invisible ou déformé. */
+  #analyse-steps-list.etapes-fil .step-num-dess{
+    position:absolute; left:-45px; top:-4px; width:33px; height:33px; line-height:0;
+  }
+  #analyse-steps-list.etapes-fil .step-num-dess svg{ width:33px; height:33px; display:block; }
+
   .et-coche{
-    position:absolute; left:-42px; top:-3px; width:29px; height:29px;
+    position:absolute; left:-45px; top:-4px; width:33px; height:33px;
     border:none; background:none; padding:0; line-height:0;
     display:flex; align-items:center; justify-content:center;
     transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
   }
-  .et-coche svg{ width:29px; height:29px; display:block; }
+  .et-coche svg{ width:33px; height:33px; display:block; }
   .et-coche:active{ transform:scale(0.86); }
   /* Une étape faite s'efface un peu : l'œil va d'abord à ce qui reste. */
   #detail-steps.etapes-fil .detail-step.faite p{ color:var(--label-2); }
@@ -3557,7 +3579,8 @@
     <div class="man-fil" id="manual-steps-list"></div>
 
     <div class="error-msg" id="create-error-manual"></div>
-    <button class="btn ghost block" style="margin-top:14px;" id="man-annuler">Annuler les modifications</button>
+    <button class="btn ghost block" style="margin-top:16px;" id="man-retour-bas">Revenir en arrière</button>
+    <button class="btn ghost block" style="margin-top:9px;" id="man-annuler">Annuler les modifications</button>
     <button class="btn block" style="margin-top:9px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
 
@@ -3622,8 +3645,9 @@
       <div class="man-lbl">Les étapes<span class="n" id="vid-compte">0</span></div>
       <div class="man-fil" id="video-steps-list"></div>
 
-      <button type="button" class="dv-plus" id="dv-plus">Aller plus loin</button>
-      <div class="dv-avance" id="dv-avance">
+      <!-- « Aller plus loin » cachait une seule action derrière un repli : autant
+           la montrer. Un tiroir pour un bouton coûte un geste et n'apprend rien. -->
+      <div class="dv-avance on" id="dv-avance">
         <button type="button" class="ligne" id="dv-recommencer">
           <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
           <span class="nm">Tout recommencer</span>
@@ -3631,7 +3655,10 @@
       </div>
 
       <div class="error-msg" id="create-error-video"></div>
-      <button class="btn block" style="margin-top:18px;" id="publish-btn-video">Publier la procédure</button>
+      <!-- Le retour est ici aussi, pas seulement en haut : arrivé en bas d'une
+           longue liste d'étapes, remonter chercher la flèche est une corvée. -->
+      <button class="btn ghost block" style="margin-top:16px;" id="vid-retour-bas">Revenir en arrière</button>
+      <button class="btn block" style="margin-top:9px;" id="publish-btn-video">Publier la procédure</button>
     </div>
   </div>
 
@@ -3914,7 +3941,7 @@
 
     <!-- Le temps gagné : la seule chose de cette page qui réponde à
          « pourquoi je paie cet abonnement ». -->
-    <div class="accueil an-gain" id="an-gain" style="display:none;">
+    <div class="accueil an-gain" id="an-gain">
       <div class="accueil-texte">
         <div class="t" id="an-gain-t">—</div>
         <div class="s" id="an-gain-s">—</div>
@@ -6720,25 +6747,31 @@ function renderGaStats() {
 function renderGainTemps(dansPeriode, libelle) {
   const carte = document.getElementById('an-gain')
   if (!carte) return
+  carte.style.display = ''
 
   const avecDuree = dansPeriode.filter(v => Number(v.duree_lecture) > 0)
   const secondes = avecDuree.reduce((s, v) => s + Number(v.duree_lecture), 0)
-
-  /* Sans une seule dur\u00e9e mesur\u00e9e, la carte n'a rien \u00e0 dire : elle se tait
-     plut\u00f4t que d'afficher z\u00e9ro. */
-  if (!secondes) { carte.style.display = 'none'; return }
-
-  carte.style.display = ''
   const lecteurs = new Set(avecDuree.map(v => v.membre_id)).size
+  const t = document.getElementById('an-gain-t')
+  const s = document.getElementById('an-gain-s')
 
-  document.getElementById('an-gain-t').textContent =
-    `${dureeLisible(secondes)} de formation ${libelle}`
+  /* La carte ne se tait plus. Elle se cachait quand rien n'était mesuré — c'est
+     précisément le moment où le gérant a besoin qu'on lui dise à quoi sert ce
+     qu'il vient de construire. Une page qui commence par du vide ne convainc
+     personne. */
+  if (!secondes) {
+    t.textContent = 'Chaque lecture est une explication en moins'
+    s.innerHTML = 'D\u00e8s que votre \u00e9quipe ouvrira vos proc\u00e9dures, ' +
+      'vous verrez ici <b>le temps que vous n\'avez plus \u00e0 passer \u00e0 expliquer</b>.'
+    return
+  }
 
-  /* Le verbe s'accorde aussi : \u00ab 1 personne se sont form\u00e9e \u00bb ne passe pas. */
+  t.textContent = `${dureeLisible(secondes)} de formation ${libelle}`
+
+  /* Le verbe s'accorde aussi : « 1 personne se sont formée » ne passe pas. */
   const pl = lecteurs > 1
-  document.getElementById('an-gain-s').innerHTML =
-    `<b>${lecteurs} personne${pl ? 's' : ''}</b> ${pl ? 'se sont form\u00e9es' : "s'est form\u00e9e"} ` +
-    `sur vos proc\u00e9dures.`
+  s.innerHTML = `<b>${lecteurs} personne${pl ? 's' : ''}</b> ` +
+    `${pl ? 'se sont form\u00e9es' : "s'est form\u00e9e"} sans que vous ayez eu \u00e0 l'expliquer.`
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -8864,6 +8897,15 @@ document.getElementById('man-annuler')?.addEventListener('click', async () => {
   }
 })
 
+/* Le même retour, en haut et en bas de page. */
+document.getElementById('man-retour-bas')?.addEventListener('click', () => {
+  showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
+})
+
+document.getElementById('vid-retour-bas')?.addEventListener('click', () => {
+  showGestionScreen(dvEdition ? 'p-analyse' : 'p-create')
+})
+
 document.getElementById('man-retour')?.addEventListener('click', () => {
   showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
 })
@@ -10552,8 +10594,14 @@ function activerGlissementEtapes(conteneur, donnerTableau, apres) {
 /* Le numéro d'une étape reprend l'hexagone de la médaille : même forme, mêmes
    facettes, en matière neutre. Toute l'app parle ainsi d'une seule géométrie —
    la fiche empilée pour les procédures, l'hexagone pour ce qui se compte. */
-function numeroEtapeDess(n) {
-  return `<svg viewBox="0 0 30 30" fill="none">
+function numeroEtapeDess(n, taille) {
+  /* La taille est écrite DANS le dessin, pas seulement en CSS. Un SVG sans
+     `width` ni `height` n'a aucune dimension propre : si la règle qui devait la
+     lui donner ne s'applique pas — mauvaise classe, sélecteur trop faible — il
+     disparaît purement et simplement. C'est ce qui arrivait dans la fiche
+     gestion. */
+  const T = taille || 33
+  return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
     <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
              fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)"
              stroke-width="1.5" stroke-linejoin="round"/>
@@ -10566,8 +10614,9 @@ function numeroEtapeDess(n) {
 /* L'hexagone une fois l'étape faite : même forme, matiere bleue, une coche
    dedans. Garder la forme entre les deux états évite le saut visuel — seule la
    couleur change, comme quand on coche une case. */
-function cocheFaiteDess() {
-  return `<svg viewBox="0 0 30 30" fill="none">
+function cocheFaiteDess(taille) {
+  const T = taille || 33
+  return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
     <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
              fill="#5EA0FF" stroke="rgba(200,225,255,0.9)" stroke-width="1.2" stroke-linejoin="round"/>
     <polygon points="14,1.5 25.3,8 14,14.5 2.7,8" fill="#fff" opacity="0.22"/>
@@ -10576,8 +10625,9 @@ function cocheFaiteDess() {
   </svg>`
 }
 
-function plusEtapeDess() {
-  return `<svg viewBox="0 0 30 30" fill="none">
+function plusEtapeDess(taille) {
+  const T = taille || 33
+  return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
     <polygon points="14,1.5 25.3,8 25.3,21 14,27.5 2.7,21 2.7,8"
              fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)"
              stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="3.5 3"/>
@@ -10585,6 +10635,10 @@ function plusEtapeDess() {
     <line x1="9.5" y1="14.5" x2="18.5" y2="14.5" stroke="rgba(255,255,255,0.42)" stroke-width="1.8" stroke-linecap="round"/>
   </svg>`
 }
+
+/* Le rang de l'étape qui vient d'être ajoutée, pour ne l'animer qu'une fois.
+   Sans ce garde-fou, toute la liste rejouerait l'animation à chaque frappe. */
+let etapeNeuve = -1
 
 function renderManualSteps() {
   const listEl = document.getElementById('manual-steps-list')
@@ -10650,9 +10704,11 @@ function renderManualSteps() {
     div.querySelector('.del').addEventListener('click', () => {
       demanderSuppressionEtape(i + 1, manualSteps[i].texte, () => { manualSteps.splice(i, 1); renderManualSteps() })
     })
+    if (i === etapeNeuve) div.classList.add('neuve')
     listEl.appendChild(div)
     autoResizeTextarea(textarea)
   })
+  etapeNeuve = -1
 
   /* « Ajouter une étape » devient le dernier maillon du fil, en pointillés : le
      geste se comprend avant qu'on ait lu le texte. */
@@ -10665,7 +10721,9 @@ function renderManualSteps() {
        l'écran et fait sauter la page au moment où l'on veut justement voir ce
        qu'on vient d'ajouter. Ajouter et écrire sont deux gestes distincts. */
     manualSteps.push({ texte: '' })
+    etapeNeuve = manualSteps.length - 1
     renderManualSteps()
+    if (navigator.vibrate) navigator.vibrate(6)
   })
   listEl.appendChild(plus)
 
@@ -10931,11 +10989,6 @@ document.getElementById('dv-frise')?.addEventListener('click', (e) => {
   dvMajFrise()
 })
 
-document.getElementById('dv-plus')?.addEventListener('click', (e) => {
-  const av = document.getElementById('dv-avance')
-  av.classList.toggle('on')
-  e.currentTarget.textContent = av.classList.contains('on') ? 'Replier' : 'Aller plus loin'
-})
 
 document.getElementById('dv-recommencer')?.addEventListener('click', async () => {
   if (!videoSteps.length) return

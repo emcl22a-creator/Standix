@@ -428,6 +428,17 @@
     color:var(--label-3); font-weight:600;
   }
 
+  .vid-ia{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    margin-top:14px !important;
+  }
+  .vid-ia svg{ width:19px; height:19px; flex-shrink:0; color:var(--blue); }
+  .vid-ia:disabled{ opacity:0.55; }
+  .vid-ia-note{
+    font-size:12px; color:var(--label-3); line-height:1.5;
+    margin-top:8px; text-align:center;
+  }
+
   .man-plus{
     position:relative; display:flex; align-items:center; gap:0;
     background:none; border:none; padding:0; width:100%; text-align:left;
@@ -3679,8 +3690,8 @@
       <div class="mode-choice-row">
         <div class="mode-choice-icon"><svg viewBox="0 0 52 48" fill="none"><rect x="12" y="3" width="28" height="18" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><rect x="8" y="8" width="36" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><rect x="4" y="14" width="44" height="30" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><circle cx="26" cy="29" r="8.4" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round" fill="none"/><path d="M23.8 25.4 30 29l-6.2 3.6Z" fill="rgba(255,255,255,0.75)"/><line x1="26" y1="9" x2="26" y2="48" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-dasharray="2.4 3" opacity="0.55"/></svg></div>
         <div class="mode-choice-text">
-          <div class="mode-choice-title">Découper une vidéo</div>
-          <div class="mode-choice-desc">Filmez puis découpez chaque étape</div>
+          <div class="mode-choice-title">Vous découpez, l’IA rédige</div>
+          <div class="mode-choice-desc">Marquez où chaque étape s’arrête, l’IA écrit le texte</div>
         </div>
         <div class="mode-choice-arrow">›</div>
       </div>
@@ -3764,15 +3775,15 @@
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Découper la vidéo</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vous découpez, l’IA rédige</h1>
     </div>
-    <div class="subhead">Marquez les étapes pendant la lecture</div>
+    <div class="subhead">Marquez les coupures, l’IA rédige ensuite</div>
 
     <!-- La même carte que l'écran de l'IA : une note qui cadre l'attente, le
          choix du fichier, puis le lecteur. Deux écrans qui font entrer une
          vidéo doivent l'accueillir pareil. -->
     <div class="card" id="dv-carte">
-      <div class="note" style="margin-bottom:12px;">Filmez le geste une fois, calmement. Vous marquerez les étapes vous-même pendant la lecture — <b style="color:#fff;">un appui à chaque fin d'étape</b>, rien de plus.</div>
+      <div class="note" style="margin-bottom:12px;">Filmez en expliquant à voix haute, puis <b style="color:#fff;">un appui à chaque fin d’étape</b>. L’IA pourra ensuite écrire le texte de chacune à partir de ce que vous avez dit.</div>
       <div class="dv-depot" id="dv-depot">
         <input type="file" id="video-input" accept="video/*">
         <div class="dv-cadre" id="dv-cadre">
@@ -3801,6 +3812,18 @@
 
       <div class="man-lbl">Les étapes<span class="n" id="vid-compte">0</span></div>
       <div class="man-fil" id="video-steps-list"></div>
+
+      <!-- Compléter avec l'IA. Le découpage reste à la personne — c'est elle qui
+           sait où une étape commence. L'IA écoute ce qui a été dit pendant chaque
+           extrait et l'écrit. Deux gestes distincts, dans le bon ordre. -->
+      <button type="button" class="btn ghost block vid-ia" id="vid-ia" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 3.2l1.7 4.3 4.3 1.7-4.3 1.7L12 15.2l-1.7-4.3L6 9.2l4.3-1.7z" fill="currentColor" opacity="0.9"/>
+          <path d="M18.4 14.6l.85 2.15 2.15.85-2.15.85-.85 2.15-.85-2.15L15.4 17.6l2.15-.85z" fill="currentColor" opacity="0.55"/>
+        </svg>
+        <span id="vid-ia-txt">Compléter avec l’IA</span>
+      </button>
+      <div class="vid-ia-note" id="vid-ia-note"></div>
 
       <!-- « Aller plus loin » cachait une seule action derrière un repli : autant
            la montrer. Un tiroir pour un bouton coûte un geste et n'apprend rien. -->
@@ -9157,6 +9180,188 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('[data-aide-temps]')) expliquerComptage()
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMPLÉTER LES ÉTAPES DÉCOUPÉES
+
+   La personne découpe elle-même — c'est elle qui sait où une étape commence, et
+   aucune IA ne le devine mieux qu'elle. L'IA écoute ensuite ce qui a été dit et
+   écrit le texte de chacune.
+
+   POURQUOI ON PASSE PAR UNE PROCÉDURE TEMPORAIRE
+   Le circuit d'analyse (`ai-start` → Azure → `ai-check`) est bâti autour d'une
+   procédure : il lui faut une ligne en base pour y ranger son résultat. Plutôt
+   que d'écrire un second circuit qui ferait la même chose, on crée une ligne
+   invisible, on récupère ses étapes, et on l'efface.
+
+   Elle porte `statut: 'ia_temp'` : la liste des procédures n'affiche que
+   « pret » et « traitement », elle n'apparaît donc nulle part. Et elle est
+   effacée même en cas d'échec — c'est le rôle du `finally`.
+
+   CE QU'ON NE FAIT PAS
+   On n'écrase jamais un texte déjà saisi. Quelqu'un qui a rédigé trois étapes
+   sur huit garde les trois : l'IA ne remplit que les vides.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let iaCompletionEnCours = false
+
+function majBoutonIA() {
+  const b = document.getElementById('vid-ia')
+  const note = document.getElementById('vid-ia-note')
+  if (!b) return
+
+  const nb = videoSteps.length
+  const vides = videoSteps.filter(s => !String(s.texte || '').trim()).length
+
+  b.style.display = nb ? 'flex' : 'none'
+  if (!nb) { note.textContent = ''; return }
+
+  b.disabled = iaCompletionEnCours || vides === 0
+  document.getElementById('vid-ia-txt').textContent = iaCompletionEnCours
+    ? 'L\u2019IA \u00e9coute la vid\u00e9o\u2026'
+    : 'Compl\u00e9ter avec l\u2019IA'
+
+  if (iaCompletionEnCours) {
+    note.textContent = 'Une \u00e0 deux minutes. Vous pouvez continuer \u00e0 d\u00e9couper.'
+  } else if (!vides) {
+    note.textContent = 'Toutes vos \u00e9tapes ont d\u00e9j\u00e0 un texte.'
+  } else {
+    note.textContent = `${vides} \u00e9tape${vides > 1 ? 's' : ''} sans texte. ` +
+      `L\u2019IA \u00e9crira \u00e0 partir de ce que vous avez dit pendant chacune.`
+  }
+}
+
+document.getElementById('vid-ia')?.addEventListener('click', completerEtapesAvecIA)
+
+async function completerEtapesAvecIA() {
+  if (iaCompletionEnCours) return
+  const note = document.getElementById('vid-ia-note')
+
+  if (!currentVideoFile && !editVideoUrl) {
+    note.textContent = 'Importez d\u2019abord une vid\u00e9o.'
+    return
+  }
+
+  let tempId = null
+  iaCompletionEnCours = true
+  majBoutonIA()
+
+  try {
+    /* 1. La bande son. C'est elle qu'Azure écoute — dix fois plus légère que la
+       vidéo, et il n'a que faire de l'image. */
+    let urlAnalyse = null
+    const base = `${currentMembre.entreprise_id}/${Date.now()}_ia`
+
+    if (currentVideoFile) {
+      const son = await extraireBandeSon(currentVideoFile)
+      if (son && son.crete < SON_SEUIL) {
+        throw new Error("Cette vid\u00e9o n\u2019a pas de son. L\u2019IA \u00e9crit \u00e0 partir de ce que vous dites : sans parole, elle n\u2019a rien \u00e0 transcrire.")
+      }
+      const fichier = son ? son.blob : currentVideoFile
+      const chemin = son ? `${base}_son.wav` : `${base}_${currentVideoFile.name}`
+      const { error: errEnvoi } = await supabase.storage.from('procedo-videos')
+        .upload(chemin, fichier, { contentType: son ? 'audio/wav' : currentVideoFile.type })
+      if (errEnvoi) throw new Error('Envoi impossible : ' + errEnvoi.message)
+
+      const { data: sig } = await supabase.storage.from('procedo-videos')
+        .createSignedUrl(chemin, 6 * 3600)
+      urlAnalyse = sig?.signedUrl
+    } else {
+      /* Vidéo déjà en ligne (modification d'une procédure) : on la signe. */
+      urlAnalyse = await urlSignee(editVideoUrl)
+    }
+    if (!urlAnalyse) throw new Error('Adresse de la vid\u00e9o introuvable.')
+
+    /* 2. La procédure temporaire, invisible dans la liste. */
+    const { data: temp, error: errTemp } = await supabase.from('procedures').insert({
+      titre: 'Analyse en cours',
+      categorie: champManuel('categorie')?.value?.trim() || 'Sans cat\u00e9gorie',
+      entreprise_id: currentMembre.entreprise_id,
+      created_by: currentMembre.id,
+      statut: 'ia_temp',
+    }).select('id').single()
+    if (errTemp) throw new Error(errTemp.message)
+    tempId = temp.id
+
+    /* 3. L'analyse, puis l'attente. */
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ procedure_id: tempId, video_url: urlAnalyse }),
+    })
+    const dep = await rep.json()
+    if (!rep.ok || dep.error) throw new Error(dep.error || "L\u2019analyse n\u2019a pas d\u00e9marr\u00e9.")
+
+    const textes = await attendreEtapesIA(tempId)
+    if (!textes.length) {
+      throw new Error("L\u2019IA n\u2019a rien tir\u00e9 de cette vid\u00e9o. V\u00e9rifiez que la parole est audible.")
+    }
+
+    /* 4. On répartit. Les deux listes sont dans le même ordre chronologique :
+       la première étape vide reçoit le premier texte disponible, et ainsi de
+       suite. Quand l'IA en a trouvé moins que de coupures, les dernières
+       restent vides plutôt que de recevoir un texte qui ne les concerne pas. */
+    let pris = 0
+    let remplies = 0
+    videoSteps.forEach(s => {
+      if (String(s.texte || '').trim()) return
+      if (pris >= textes.length) return
+      s.texte = textes[pris++]
+      remplies++
+    })
+
+    renderVideoSteps()
+    const reste = videoSteps.filter(s => !String(s.texte || '').trim()).length
+    note.textContent = reste
+      ? `${remplies} \u00e9tape${remplies > 1 ? 's' : ''} \u00e9crite${remplies > 1 ? 's' : ''}. ` +
+        `${reste} sans texte : l\u2019IA n\u2019a pas entendu de parole \u00e0 ces moments-l\u00e0.`
+      : `${remplies} \u00e9tape${remplies > 1 ? 's' : ''} \u00e9crite${remplies > 1 ? 's' : ''}. Relisez-les avant de publier.`
+    if (navigator.vibrate) navigator.vibrate(10)
+
+  } catch (e) {
+    note.textContent = e?.message || String(e)
+  } finally {
+    /* La ligne temporaire disparaît quoi qu'il arrive. Une analyse qui échoue
+       ne doit pas laisser de trace dans la base. */
+    if (tempId) {
+      await supabase.from('etapes').delete().eq('procedure_id', tempId)
+      await supabase.from('procedures').delete().eq('id', tempId)
+    }
+    iaCompletionEnCours = false
+    majBoutonIA()
+  }
+}
+
+/* Interroge le serveur jusqu'à ce que les étapes soient prêtes, puis les lit.
+   On espace les demandes : la première minute est celle où ça peut aboutir
+   vite, ensuite ça ne sert à rien d'insister toutes les trois secondes. */
+async function attendreEtapesIA(procId) {
+  const debut = Date.now()
+  let tour = 0
+
+  while (Date.now() - debut < 8 * 60000) {
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({ procedure_id: procId }),
+    })
+    const data = await rep.json()
+
+    if (data.status === 'ready') {
+      const { data: etapes } = await supabase.from('etapes')
+        .select('texte').eq('procedure_id', procId).order('ordre')
+      return (etapes || []).map(e => String(e.texte || '').trim()).filter(Boolean)
+    }
+    if (data.status === 'error' || data.error) {
+      throw new Error(data.error || "L\u2019analyse a \u00e9chou\u00e9.")
+    }
+
+    tour++
+    const delai = tour < 12 ? 3000 : tour < 30 ? 5000 : 8000
+    await new Promise(r => setTimeout(r, delai))
+  }
+  throw new Error("L\u2019analyse prend trop de temps. R\u00e9essayez, ou \u00e9crivez les \u00e9tapes vous-m\u00eame.")
+}
+
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
@@ -11515,6 +11720,7 @@ function renderVideoSteps(listEl) {
     dvSelection = null
     renderVideoSteps(); dvMajFrise()
   })
+  majBoutonIA()
 }
 
 

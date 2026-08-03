@@ -3756,7 +3756,7 @@
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
 
     <div class="card" id="ai-upload-card">
-      <div class="note" style="margin-bottom:12px;">L'analyse accepte les vidéos jusqu'à <b style="color:#fff;">10 minutes</b>. Filmez une procédure par vidéo, en expliquant chaque geste à voix haute — c'est la parole que l'IA découpe.</div>
+      <div class="note" style="margin-bottom:12px;"><b style="color:#fff;">Expliquez chaque geste à voix haute</b> : c'est la parole que l'IA écoute pour découper les étapes, pas l'image. Une procédure par vidéo, jusqu'à 10 minutes.</div>
       <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
            l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
            montage, et c'est le plus propre des deux. -->
@@ -9303,12 +9303,29 @@ async function extraireBandeSon(fichier) {
       const v = Math.max(-1, Math.min(1, ech[i]))
       vue.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7FFF, true)
     }
-    return new Blob([octets], { type: 'audio/wav' })
+    /* On mesure au passage le niveau sonore. Ça ne coûte rien — on tient déjà
+       tous les échantillons — et ça évite d'envoyer à Azure une bande muette qui
+       reviendrait vide après cinq minutes d'attente et une facture.
+
+       On prend la crête plutôt que la moyenne : une vidéo où quelqu'un parle dix
+       secondes sur cinq minutes a une moyenne quasi nulle, mais elle contient
+       bien de la parole à découper. */
+    let crete = 0
+    for (let i = 0; i < ech.length; i++) {
+      const a = Math.abs(ech[i])
+      if (a > crete) crete = a
+    }
+
+    return { blob: new Blob([octets], { type: 'audio/wav' }), crete }
   } catch (e) {
     console.warn('Proc\u00e9do \u00b7 bande son non extraite :', e?.message || e)
     return null
   }
 }
+
+/* Sous ce seuil, il n'y a rien à transcrire. 0,01 ≈ −40 dB : au-dessus du bruit
+   de fond d'un micro, très en dessous d'une voix. */
+const SON_SEUIL = 0.01
 
 function verifierDureeVideo() {
   const err = document.getElementById('ai-error')
@@ -9364,6 +9381,15 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         `accept\u00e9s. Refaites l'enregistrement en 720p, ou coupez-le en deux proc\u00e9dures.`)
     }
 
+    /* On extrait la bande son AVANT d'envoyer quoi que ce soit. Si elle est
+       muette, on refuse tout de suite : transférer 40 Mo puis attendre cinq
+       minutes pour annoncer l'échec serait la pire façon de l'apprendre. */
+    const son = await extraireBandeSon(aiVideoFile)
+
+    if (son && son.crete < SON_SEUIL) {
+      throw new Error('SANS_SON')
+    }
+
     const base = `${currentMembre.entreprise_id}/${Date.now()}`
 
     // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
@@ -9378,14 +9404,13 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        pour n'en garder que quelques-uns. Si l'extraction échoue — format
        exotique, navigateur récalcitrant — on lui donne la vidéo, comme avant. */
     let urlPourAnalyse = videoUrl
-    const bandeSon = await extraireBandeSon(aiVideoFile)
-    if (bandeSon) {
+    if (son) {
       const cheminSon = `${base}_son.wav`
       const { error: errSon } = await supabase.storage.from('procedo-videos')
-        .upload(cheminSon, bandeSon, { contentType: 'audio/wav' })
+        .upload(cheminSon, son.blob, { contentType: 'audio/wav' })
       if (!errSon) {
         urlPourAnalyse = supabase.storage.from('procedo-videos').getPublicUrl(cheminSon).data.publicUrl
-        window.jalon?.(`bande son : ${poidsLisible(bandeSon.size)} au lieu de ${poidsLisible(aiVideoFile.size)}`)
+        window.jalon?.(`bande son : ${poidsLisible(son.blob.size)} au lieu de ${poidsLisible(aiVideoFile.size)}`)
       }
     }
 
@@ -9421,6 +9446,28 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     loadGestionProcedures().catch(() => {})
   } catch (e) {
     setButtonLoading(launchBtn, false)
+
+    /* La vidéo muette n'est pas une erreur de l'app : c'est une vidéo qui ne
+       convient pas à ce mode. On l'annonce comme une consigne, avec la porte de
+       sortie — pas comme une ligne rouge qui dit « ça n'a pas marché ».
+
+       La nuance compte : « l'app ne sait pas faire » décourage, « voilà comment
+       obtenir un bon résultat » aide. */
+    if (e.message === 'SANS_SON') {
+      errorEl.textContent = ''
+      const versMontage = await confirmDialog({
+        titre: 'Filmez en expliquant \u00e0 voix haute',
+        message: "L'IA \u00e9coute ce que vous dites pour d\u00e9couper les \u00e9tapes. " +
+          "Cette vid\u00e9o n'a pas de son \u2014 elle ne saurait pas o\u00f9 couper.\n\n" +
+          "Refilmez en commentant vos gestes, ou marquez les \u00e9tapes vous-m\u00eame.",
+        confirmer: 'Marquer les \u00e9tapes moi-m\u00eame',
+        annuler: 'Je refilme',
+        danger: false,
+      })
+      if (versMontage) ouvrirMontageVideo(null)
+      return
+    }
+
     errorEl.textContent = e.message
   }
 })

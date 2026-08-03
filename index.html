@@ -729,6 +729,26 @@
   }
   .poste-ajouter:active{ opacity:0.7; }
 
+  /* L'état vide d'une section : le dessin, ce qui manque, le geste qui le
+     résout. Centré, parce qu'il n'y a rien à aligner à gauche. */
+  .an-neant{ text-align:center; padding:20px 8px 8px; }
+  .an-neant .d{
+    display:flex; align-items:center; justify-content:center;
+    width:44px; height:40px; margin:0 auto 12px;
+  }
+  .an-neant .d svg{ width:44px; height:40px; display:block; }
+  .an-neant .t{ font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .an-neant .s{
+    font-size:12.5px; color:var(--label-2); line-height:1.5;
+    margin-top:5px; max-width:270px; margin-left:auto; margin-right:auto;
+  }
+  .an-neant-btn{
+    margin-top:14px; height:38px; padding:0 18px; border:none; border-radius:100px;
+    background:rgba(255,255,255,0.08); border:0.5px solid var(--border); color:#fff;
+    font-family:inherit; font-size:13.5px; font-weight:650;
+  }
+  .an-neant-btn:active{ opacity:0.65; }
+
   .an-lig{
     display:flex; align-items:center; gap:12px; width:100%;
     padding:12px 2px; background:none; border:none;
@@ -6935,7 +6955,11 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     .sort((a, b) => b.total - a.total)
 
   if (!classement.length) {
-    el.innerHTML = `<div class="an-vide">Aucun temps mesur\u00e9 ${escapeHtml(libelle)}.</div>`
+    el.innerHTML = vide({
+      dessin: NEANT_PROCEDURE,
+      titre: 'Rien de lu ce mois-ci',
+      phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe.",
+    })
     return
   }
 
@@ -7009,13 +7033,63 @@ function libelleVoirAutres(n) {
   return n === 1 ? "Voir l'autre" : `Voir les ${n} autres`
 }
 
+/* L'état vide d'une section. Une phrase grise centrée ne dit rien : elle ne fait
+   que constater. Ici on montre le dessin de la section, on nomme ce qui manque
+   et on donne le geste qui le résout.
+
+   Trois sections vides d'affilée, c'est ce que voit quiconque crée sa deuxième
+   entreprise — le pire moment pour paraître inachevé. */
+function vide({ dessin, titre, phrase, action, geste }) {
+  return `
+    <div class="an-neant">
+      <span class="d">${dessin}</span>
+      <div class="t">${escapeHtml(titre)}</div>
+      <div class="s">${escapeHtml(phrase)}</div>
+      ${action ? `<button type="button" class="an-neant-btn" data-neant="${escapeHtml(geste)}">${escapeHtml(action)}</button>` : ''}
+    </div>`
+}
+
+/* Les trois dessins, dans la palette des icônes de section : un plan derrière à
+   16 %, le trait de devant à 42 %, le fond à 5 %. */
+const NEANT_EQUIPE = `<svg viewBox="0 0 44 40" fill="none">
+  <circle cx="31" cy="13" r="5" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
+  <path d="M22 32a9 9 0 0 1 18 0" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="16" cy="11" r="6.6" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2"/>
+  <path d="M4 33a12 12 0 0 1 24 0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linecap="round"/>
+</svg>`
+
+const NEANT_CATEGORIE = `<svg viewBox="0 0 44 40" fill="none">
+  <path d="M11 9.5A2.6 2.6 0 0 1 13.6 7h5.6l2.6 3.2H35a2.6 2.6 0 0 1 2.6 2.6" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M5 15.5A2.8 2.8 0 0 1 7.8 12.7h6l2.8 3.4H36a2.8 2.8 0 0 1 2.8 2.8v12.3A2.8 2.8 0 0 1 36 34H7.8A2.8 2.8 0 0 1 5 31.2Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"/>
+</svg>`
+
+const NEANT_PROCEDURE = `<svg viewBox="0 0 44 40" fill="none">
+  <path d="M17 4h10l7.6 7.6V27a3 3 0 0 1-3 3h-1.4" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M11 10.6h9.6l7.4 7.4V33a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M20.6 10.6V18H28" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"/>
+  <line x1="16" y1="24" x2="23" y2="24" stroke="rgba(255,255,255,0.42)" stroke-width="1.9" stroke-linecap="round"/>
+  <line x1="16" y1="29" x2="20.5" y2="29" stroke="rgba(255,255,255,0.26)" stroke-width="1.9" stroke-linecap="round"/>
+</svg>`
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-neant]')
+  if (!b) return
+  if (b.dataset.neant === 'inviter') showGestionScreen('p-reg-code')
+  if (b.dataset.neant === 'creer') startNewProcedure()
+})
+
 function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel, cible, tout) {
   const el = cible || document.getElementById('ga-top-categories')
   if (!el) return
   el.innerHTML = ''
 
   if (!procedures.length) {
-    el.innerHTML = '<div class="an-vide">Aucune proc\u00e9dure pour le moment.</div>'
+    el.innerHTML = vide({
+      dessin: NEANT_CATEGORIE,
+      titre: 'Aucune cat\u00e9gorie',
+      phrase: "Les cat\u00e9gories se cr\u00e9ent toutes seules \u00e0 mesure que vous ajoutez des proc\u00e9dures \u2014 Cuisine, Salle, Bar\u2026",
+      action: 'Cr\u00e9er une proc\u00e9dure', geste: 'creer',
+    })
     return
   }
 
@@ -7040,7 +7114,11 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     .sort((a, b) => (b.total - a.total) || a.nom.localeCompare(b.nom, 'fr'))
 
   if (!classement.some(c => c.total)) {
-    el.innerHTML = `<div class="an-vide">Aucun temps mesur\u00e9 ${escapeHtml(periodLabel)}.</div>`
+    el.innerHTML = vide({
+      dessin: NEANT_CATEGORIE,
+      titre: 'Rien de lu ce mois-ci',
+      phrase: "Vos cat\u00e9gories existent, mais personne ne les a encore ouvertes ce mois-ci.",
+    })
     return
   }
 
@@ -7429,7 +7507,12 @@ function renderMembresListe() {
   el.innerHTML = ''
 
   if (!employes.length) {
-    el.innerHTML = '<div class="note">Aucun membre dans l\'équipe pour le moment. Partagez le code d\'invitation dans Paramètres.</div>'
+    el.innerHTML = vide({
+      dessin: NEANT_EQUIPE,
+      titre: 'Personne pour l\'instant',
+      phrase: "Invitez votre \u00e9quipe avec le code de l'entreprise. C'est \u00e0 partir de l\u00e0 que vous saurez qui suit vos proc\u00e9dures.",
+      action: 'Voir le code d\'invitation', geste: 'inviter',
+    })
     return
   }
 
@@ -8063,6 +8146,14 @@ async function loadGestionProcedures() {
         </div>
       </div>
     `
+    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
+       entreprise sans procédure laissait en mémoire les lectures de la
+       précédente : la carte du haut annonçait « 4 min de formation » pendant
+       que les trois sections en dessous disaient « aucun membre » et
+       « aucune procédure ». Un chiffre venu d'ailleurs. */
+    cachedValidations = []
+    cachedEtapesByProc = {}
+    currentGaData = { procedures: [], membres: cachedMembres || [], employes: [], validations: [] }
     return
   }
 

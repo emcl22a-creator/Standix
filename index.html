@@ -2059,7 +2059,22 @@
   .lecture-anneau{ position:relative; width:44px; height:44px; flex-shrink:0; }
   .lecture-anneau svg{ transform:rotate(-90deg); display:block; }
   .lecture-anneau .piste{ stroke:rgba(255,255,255,0.10); }
-  .lecture-anneau .valeur{ stroke-linecap:round; transition:stroke-dashoffset 1s linear; }
+  /* Le trait glisse jusqu'à sa nouvelle position, dans les deux sens : cocher
+     l'avance, décocher le fait reculer. La courbe part vite et finit doucement,
+     comme les anneaux d'activité d'Apple. */
+  .lecture-anneau .valeur{
+    stroke-linecap:round;
+    transition: stroke-dashoffset 0.62s cubic-bezier(0.32,0.72,0,1), stroke 0.4s ease;
+  }
+
+  /* Le chiffre bascule : il sort par le haut, revient par le bas. */
+  @keyframes anneauBascule{
+    0%{ transform:translateY(0); opacity:1; }
+    45%{ transform:translateY(-7px); opacity:0; }
+    55%{ transform:translateY(7px); opacity:0; }
+    100%{ transform:translateY(0); opacity:1; }
+  }
+  .lecture-anneau .dedans.bascule{ animation:anneauBascule 0.32s ease both; }
   .lecture-anneau .dedans{
     position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
     font-size:13px; font-weight:800; letter-spacing:-0.03em;
@@ -14150,12 +14165,37 @@ function dessinerAnneauLecture(pct, couleur, texte) {
   const el = document.getElementById('lecture-anneau')
   if (!el) return
   const t = 44, ep = 4, r = (t - ep) / 2, c = 2 * Math.PI * r
+  const offset = c * (1 - Math.min(100, Math.max(0, pct)) / 100)
+
+  /* On ne redessine PLUS le cercle à chaque coche : on déplace seulement son
+     tracé. Un élément qui vient de naître n'a pas d'état précédent, donc rien à
+     animer — la transition CSS était écrite depuis toujours, elle ne pouvait
+     simplement jamais s'appliquer. Le cercle sautait d'une position à l'autre. */
+  const dejaLa = el.querySelector('.valeur')
+  if (dejaLa) {
+    dejaLa.setAttribute('stroke', couleur)
+    dejaLa.style.strokeDashoffset = offset
+    const dedans = el.querySelector('.dedans')
+    if (dedans) {
+      dedans.style.color = couleur
+      /* Le chiffre change au milieu du parcours du trait, pas au début : sinon
+         il annonce un résultat que le cercle n'a pas encore atteint. */
+      if (dedans.textContent !== texte) {
+        dedans.classList.remove('bascule')
+        void dedans.offsetWidth
+        dedans.classList.add('bascule')
+        setTimeout(() => { dedans.textContent = texte }, 130)
+      }
+    }
+    return
+  }
+
   el.innerHTML = `
     <svg width="${t}" height="${t}">
       <circle class="piste" cx="${t/2}" cy="${t/2}" r="${r}" fill="none" stroke-width="${ep}"/>
       <circle class="valeur" cx="${t/2}" cy="${t/2}" r="${r}" fill="none" stroke-width="${ep}"
               stroke="${couleur}" stroke-dasharray="${c}"
-              stroke-dashoffset="${c * (1 - Math.min(100, pct) / 100)}"/>
+              style="stroke-dashoffset:${offset}"/>
     </svg>
     <div class="dedans" style="color:${couleur}">${escapeHtml(texte)}</div>`
 }

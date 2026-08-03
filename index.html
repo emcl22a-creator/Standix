@@ -6787,8 +6787,6 @@ function debutPeriode(periode) {
 function renderGaStats() {
   if (!currentGaData) return
   const { procedures, employes, validations } = currentGaData
-  const nbEmployes = employes.length
-
   const debut = debutPeriode(currentGaPeriod)
   const dansPeriode = debut
     ? validations.filter(v => new Date(v.validated_at) >= debut)
@@ -6799,6 +6797,7 @@ function renderGaStats() {
 
   const el = (i) => document.getElementById(i)
 
+  const nbEmployes = (currentGaData?.employes || []).length
   renderTopCategories(procedures, dansPeriode, nbEmployes, libelle)
   renderMembresListe()
   renderGainTemps(validations, procedures)
@@ -7050,36 +7049,10 @@ window.loadGlobalAnalyse = function() {
 
   renderGaStats()
 
-  const nbEmployes = employes.length
-
-  // Procédures les plus regardées par l'équipe
-  const lateListEl = document.getElementById('ga-late-list')
-  lateListEl.innerHTML = ''
-  const procStats = (procedures || []).map(proc => {
-    const valides = (validations || []).filter(v => v.procedure_id === proc.id).length
-    const ratio = nbEmployes > 0 ? valides / nbEmployes : 0
-    return { proc, assignes: nbEmployes, valides, ratio }
-  }).sort((a,b) => b.valides - a.valides).slice(0, 5)
-
-  if (procStats.length === 0 || procStats.every(s => s.valides === 0)) {
-    lateListEl.innerHTML = '<div class="note">Aucune procédure consultée pour le moment.</div>'
-  } else {
-    procStats.forEach((s, i) => {
-      const ringColor = s.ratio >= 0.7 ? 'ok' : s.ratio >= 0.3 ? 'pending' : 'drift'
-      const div = document.createElement('div')
-      div.className = 'sop-card'
-      div.style.animationDelay = (i * 0.05) + 's'
-      div.innerHTML = `
-        <div>
-          <div class="title">${escapeHtml(s.proc.titre)}</div>
-          <div class="meta">${s.valides} employé${s.valides>1?'s':''} sur ${s.assignes} ont consulté</div>
-        </div>
-        <span class="badge ${ringColor}">${s.valides}</span>
-      `
-      lateListEl.appendChild(div)
-    })
-  }
-
+  /* Un vieux bloc remplissait AUSSI `ga-late-list` ici même : il s'exécutait
+     après `renderTempsLecture` et écrasait son rendu par des cartes à pastille.
+     C'est pour ça que la section Procédures gardait son ancienne présentation
+     malgré mes changements. Retiré. */
 }
 
 /* Fait disparaître une carte en la repliant, puis rend la main. Les hauteurs

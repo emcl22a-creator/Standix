@@ -293,7 +293,7 @@
 
   /* L'écran de saisie respire un peu plus que les fiches de lecture : on y
      revient corriger, ajouter, supprimer — il faut de la place pour viser. */
-  .man-fil{ position:relative; padding-left:44px; margin-top:4px; }
+  .man-fil{ position:relative; padding-left:44px; margin-top:26px; }
   /* Le trait s'arrête avant le dernier maillon : il relie, il ne dépasse pas. */
   .man-fil::before{
     content:''; position:absolute; left:17px; top:8px; bottom:34px; width:1.5px;
@@ -364,6 +364,61 @@
   .man-fil .step-edit-item.neuve .step-num-dess{
     animation:etapeArrive 0.36s cubic-bezier(0.34,1.56,0.64,1) 0.08s both;
   }
+
+  /* Le bouton d'annulation : une icône seule, plus étroite qu'un bouton pleine
+     largeur — c'est un geste ponctuel, pas une action principale. */
+  .man-annuler-geste{
+    width:52px !important; margin-left:auto; margin-right:auto;
+    display:flex; align-items:center; justify-content:center; padding:0;
+  }
+  .man-annuler-geste svg{ width:19px; height:19px; }
+  .man-annuler-geste:disabled{ opacity:0.3; }
+
+  /* La zone de photos. Vide, c'est un dépôt en pointillés ; remplie, c'est une
+     liste de pages qu'on réordonne. */
+  .doc-photos{ position:relative; margin-top:10px; }
+  .doc-photos input[type=file]{
+    position:absolute; inset:0; opacity:0; width:100%; height:100%; z-index:2;
+  }
+  .doc-photos.remplie input[type=file]{ display:none; }
+  .doc-photos-vide{
+    border:1.5px dashed rgba(255,255,255,0.16); border-radius:18px;
+    padding:24px 18px; text-align:center; background:rgba(255,255,255,0.025);
+  }
+  .doc-photos-vide .d{ display:block; width:46px; height:42px; margin:0 auto 10px; }
+  .doc-photos-vide .d svg{ width:46px; height:42px; }
+  .doc-photos-vide b{ display:block; font-size:14.5px; font-weight:650; }
+  .doc-photos-vide span{
+    display:block; font-size:12.5px; color:var(--label-3); margin-top:4px; line-height:1.45;
+  }
+
+  .doc-page{
+    display:flex; align-items:center; gap:12px; padding:9px 10px;
+    border-radius:14px; margin-bottom:8px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+    touch-action:none;
+  }
+  .doc-page .rg{
+    width:26px; height:26px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    font-size:12px; font-weight:750;
+  }
+  .doc-page .vg{
+    width:44px; height:44px; border-radius:10px; overflow:hidden; flex-shrink:0;
+    background:#000; border:0.5px solid var(--border);
+  }
+  .doc-page .vg img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .doc-page .nm{
+    flex:1; min-width:0; font-size:13px; color:var(--label-2);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .doc-page .oter{
+    flex-shrink:0; border:none; background:none; color:var(--red);
+    font-family:inherit; font-size:12.5px; font-weight:650; padding:6px 4px;
+  }
+  .doc-page.saisie{ opacity:0.55; transform:scale(0.98); }
+  .doc-photo-plus{ margin-top:4px !important; }
 
   .man-plus{
     position:relative; display:flex; align-items:center; gap:0;
@@ -3652,8 +3707,7 @@
       <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
     </div>
 
-    <div class="man-lbl">Image de la procédure</div>
-    <div class="couv man-couv" id="couv-manuel">
+        <div class="couv man-couv" id="couv-manuel">
       <input type="file" accept="image/*" class="fichier">
       <span class="vign">
         <svg viewBox="0 0 32 32" fill="none">
@@ -3676,7 +3730,9 @@
     <div class="man-fil" id="manual-steps-list"></div>
 
     <div class="error-msg" id="create-error-manual"></div>
-    <button class="btn ghost block" style="margin-top:16px;" id="man-retour-bas">Revenir en arrière</button>
+    <button class="btn ghost block man-annuler-geste" style="margin-top:16px;" id="man-defaire" disabled aria-label="Annuler la dernière action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.3-9.3L3 7"/></svg>
+    </button>
     <button class="btn ghost block" style="margin-top:9px;" id="man-annuler">Annuler les modifications</button>
     <button class="btn block" style="margin-top:9px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
@@ -3773,6 +3829,29 @@
 
       <input type="file" id="doc-fichier" accept=".pdf,.docx,.txt,.md,text/plain">
       <div class="doc-fichier-etat" id="doc-fichier-etat" style="display:none;"></div>
+
+      <div class="doc-ou"><span>ou</span></div>
+
+      <!-- Photographier un texte. Une recette tient rarement sur une seule page :
+           on en accepte plusieurs, et c'est l'ordre qui fait le sens. -->
+      <div class="doc-photos" id="doc-photos">
+        <input type="file" id="doc-photo-input" accept="image/*" multiple>
+        <div class="doc-photos-vide" id="doc-photos-vide">
+          <span class="d">
+            <svg viewBox="0 0 52 48" fill="none">
+              <rect x="14" y="3" width="26" height="17" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="2"/>
+              <rect x="8" y="10" width="34" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="2"/>
+              <rect x="3" y="18" width="40" height="27" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2"/>
+              <circle cx="12" cy="27" r="2.4" fill="rgba(255,255,255,0.42)"/>
+              <path d="m41 40-9-9-7 7-3.5-3.5L3 44" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <b>Photographier le texte</b>
+          <span>Plusieurs pages possibles — vous les remettrez dans l’ordre.</span>
+        </div>
+        <div class="doc-photos-liste" id="doc-photos-liste"></div>
+      </div>
+      <button type="button" class="btn ghost block doc-photo-plus" id="doc-photo-plus" style="display:none;">Ajouter une page</button>
 
       <button class="btn block" style="margin-top:14px;" id="doc-generer" disabled>Générer les étapes</button>
       <div class="error-msg" id="doc-erreur"></div>
@@ -8861,10 +8940,6 @@ document.getElementById('man-annuler')?.addEventListener('click', async () => {
 })
 
 /* Le même retour, en haut et en bas de page. */
-document.getElementById('man-retour-bas')?.addEventListener('click', () => {
-  showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
-})
-
 document.getElementById('vid-retour-bas')?.addEventListener('click', () => {
   showGestionScreen(dvEdition ? 'p-analyse' : 'p-create')
 })
@@ -9106,6 +9181,9 @@ function resetDocScreen() {
   document.getElementById('doc-saisie-card').style.display = 'block'
   document.getElementById('doc-attente-card').style.display = 'none'
   majBoutonDoc()
+  docPages.forEach(p => URL.revokeObjectURL(p.apercu))
+  docPages = []
+  peindrePages()
 }
 
 function texteDocCourant() {
@@ -9113,11 +9191,120 @@ function texteDocCourant() {
   return saisi || docTexteExtrait
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   PHOTOGRAPHIER UN TEXTE
+
+   Une recette manuscrite, une fiche plastifiée, une page de classeur : on la
+   photographie plutôt que de la retaper. Plusieurs pages sont acceptées, et
+   l'ordre compte — c'est lui qui fait la suite des étapes.
+
+   On envoie les images à Claude, qui les lit directement. Un outil de
+   reconnaissance de caractères classique bute sur une écriture manuscrite, une
+   photo de travers ou un éclairage de cuisine ; Claude s'en accommode, et il
+   comprend en même temps ce qu'il lit.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const DOC_PAGES_MAX = 8
+const DOC_PAGE_POIDS_MAX = 4 * 1024 * 1024
+let docPages = []   // { fichier, apercu }
+
+document.getElementById('doc-photo-input')?.addEventListener('change', (e) => {
+  ajouterPages([...e.target.files])
+  e.target.value = ''
+})
+document.getElementById('doc-photo-plus')?.addEventListener('click', () => {
+  document.getElementById('doc-photo-input').click()
+})
+
+function ajouterPages(fichiers) {
+  const err = document.getElementById('doc-erreur')
+  const place = DOC_PAGES_MAX - docPages.length
+  if (place <= 0) {
+    err.style.color = 'var(--orange)'
+    err.textContent = `${DOC_PAGES_MAX} pages au maximum. Au-del\u00e0, c'est un manuel entier : d\u00e9coupez-le en plusieurs proc\u00e9dures.`
+    return
+  }
+
+  const trop = fichiers.filter(f => f.size > DOC_PAGE_POIDS_MAX)
+  const bons = fichiers.filter(f => f.size <= DOC_PAGE_POIDS_MAX).slice(0, place)
+
+  if (trop.length) {
+    err.style.color = 'var(--orange)'
+    err.textContent = `${trop.length} photo${trop.length > 1 ? 's' : ''} trop lourde${trop.length > 1 ? 's' : ''} (plus de 4 Mo). ` +
+      `Sur iPhone : R\u00e9glages \u2192 Appareil photo \u2192 Formats \u2192 Haute efficacit\u00e9.`
+  } else if (err.style.color === 'var(--orange)') {
+    err.textContent = ''
+  }
+
+  bons.forEach(f => docPages.push({ fichier: f, apercu: URL.createObjectURL(f) }))
+
+  /* Une photo remplace le texte collé : on ne mélange pas les sources, sinon
+     personne ne sait ce que l'IA a vraiment lu. */
+  if (docPages.length) {
+    document.getElementById('doc-texte').value = ''
+    docTexteExtrait = ''
+    const e = document.getElementById('doc-fichier-etat'); if (e) e.style.display = 'none'
+  }
+  peindrePages()
+}
+
+function peindrePages() {
+  const zone = document.getElementById('doc-photos')
+  const vide = document.getElementById('doc-photos-vide')
+  const liste = document.getElementById('doc-photos-liste')
+  const plus = document.getElementById('doc-photo-plus')
+  if (!liste) return
+
+  zone.classList.toggle('remplie', docPages.length > 0)
+  vide.style.display = docPages.length ? 'none' : ''
+  plus.style.display = (docPages.length && docPages.length < DOC_PAGES_MAX) ? '' : 'none'
+
+  liste.innerHTML = docPages.map((p, i) => `
+    <div class="doc-page" data-page="${i}">
+      <span class="rg">${i + 1}</span>
+      <span class="vg"><img src="${p.apercu}" alt=""></span>
+      <span class="nm">${escapeHtml(p.fichier.name)}</span>
+      <button type="button" class="oter" data-oter="${i}">Retirer</button>
+    </div>`).join('')
+
+  liste.querySelectorAll('[data-oter]').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.stopPropagation()
+      const i = Number(b.dataset.oter)
+      URL.revokeObjectURL(docPages[i].apercu)
+      docPages.splice(i, 1)
+      peindrePages()
+      majBoutonDoc()
+    })
+  })
+
+  /* L'appui long réordonne, comme les étapes. Même geste, même endroit du
+     cerveau — on n'apprend pas deux façons de faire la même chose. */
+  activerGlissementEtapes(liste, () => docPages, () => { peindrePages(); majBoutonDoc() })
+  majBoutonDoc()
+}
+
+/* Les images partent en base64. C'est plus lourd qu'un envoi binaire, mais ça
+   traverse la fonction serveur sans manipulation particulière — et à huit pages
+   de quatre mégaoctets, on reste très en dessous des limites. */
+async function pagesEnBase64() {
+  return Promise.all(docPages.map(p => new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve({
+      type: p.fichier.type || 'image/jpeg',
+      donnees: String(r.result).split(',')[1],
+    })
+    r.onerror = () => reject(new Error('Photo illisible : ' + p.fichier.name))
+    r.readAsDataURL(p.fichier)
+  })))
+}
+
 function majBoutonDoc() {
   const btn = document.getElementById('doc-generer')
   if (!btn) return
   const t = texteDocCourant()
-  btn.disabled = t.length < 40
+  /* Des photos suffisent : c'est Claude qui en tirera le texte. */
+  btn.disabled = docPages.length === 0 && t.length < 40
   const err = document.getElementById('doc-erreur')
   if (err && t.length > 0 && t.length < 40) {
     err.style.color = 'var(--label-3)'
@@ -9250,7 +9437,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-texte`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-      body: JSON.stringify({ titre, categorie, texte }),
+        body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64() }),
     })
     const data = await rep.json()
     if (!rep.ok || data.error) throw new Error(data.error || 'La g\u00e9n\u00e9ration a \u00e9chou\u00e9.')
@@ -10839,6 +11026,39 @@ function plusEtapeDess(taille) {
    Sans ce garde-fou, toute la liste rejouerait l'animation à chaque frappe. */
 let etapeNeuve = -1
 
+/* ═══ Annuler la dernière action ═══
+   Le bouton disait « Revenir en arrière » et changeait de page : deux sens pour
+   la même formule. Il défait maintenant la dernière manipulation — une étape
+   ajoutée, supprimée, réordonnée — et rien d'autre.
+
+   On garde des copies complètes plutôt que des opérations inversées : c'est plus
+   coûteux en mémoire, mais une copie ne peut pas se tromper, là où une opération
+   inversée mal écrite corrompt silencieusement les données. */
+const PILE_MAX = 25
+let pileEtats = []
+
+function memoriserEtat() {
+  pileEtats.push(JSON.stringify(manualSteps))
+  if (pileEtats.length > PILE_MAX) pileEtats.shift()
+  majBoutonDefaire()
+}
+
+function majBoutonDefaire() {
+  const b = document.getElementById('man-defaire')
+  if (b) b.disabled = pileEtats.length === 0
+}
+
+document.getElementById('man-defaire')?.addEventListener('click', () => {
+  const avant = pileEtats.pop()
+  if (avant === undefined) return
+  const ouEtaitOn = window.scrollY
+  manualSteps = JSON.parse(avant)
+  renderManualSteps()
+  window.scrollTo({ top: ouEtaitOn })
+  majBoutonDefaire()
+  if (navigator.vibrate) navigator.vibrate(6)
+})
+
 function renderManualSteps() {
   const listEl = document.getElementById('manual-steps-list')
   listEl.innerHTML = ''
@@ -10919,10 +11139,17 @@ function renderManualSteps() {
   plus.addEventListener('click', () => {
     /* On n'ouvre PAS le clavier sur la nouvelle étape. Il masque la moitié de
        l'écran et fait sauter la page au moment où l'on veut justement voir ce
-       qu'on vient d'ajouter. Ajouter et écrire sont deux gestes distincts. */
+       qu'on vient d'ajouter. Ajouter et écrire sont deux gestes distincts.
+
+       Vider la liste avant de la reconstruire raccourcit la page d'un coup : le
+       navigateur ramène alors le défilement dans les nouvelles limites, et on se
+       retrouve en haut. On note où l'on était pour y revenir. */
+    const ouEtaitOn = window.scrollY
+    memoriserEtat()
     manualSteps.push({ texte: '' })
     etapeNeuve = manualSteps.length - 1
     renderManualSteps()
+    window.scrollTo({ top: ouEtaitOn })
     if (navigator.vibrate) navigator.vibrate(6)
   })
   listEl.appendChild(plus)
@@ -12988,6 +13215,11 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
    c'est le même écran, donc une seule chose à apprendre et à maintenir.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Trois établissements par compte. Ce n'est pas une contrainte technique mais un
+   choix : au-delà, on ne gère plus des restaurants, on gère un groupe — et un
+   groupe a besoin d'autre chose qu'un sélecteur dans une barre. */
+const ETABLISSEMENTS_MAX = 3
+
 let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
 /* Vrai pendant un changement d'établissement : l'app se recharge, mais son cadre
    ne doit pas se rejouer. */
@@ -13208,9 +13440,15 @@ function peindreTiroir() {
     .filter(e => e.id && e.id !== courant.id)
     .map(e => rondEtabHtml(e, false, `data-etab="${e.id}"`)).join('')
 
+  /* Le « + » disparaît quand la limite est atteinte. Proposer un geste qu'on
+     refusera ensuite est la façon la plus sûre d'agacer quelqu'un. */
+  const peutAjouter = mesEtablissements.length < ETABLISSEMENTS_MAX
+
   liste.innerHTML = rondEtabHtml(courant, true, 'data-etab-decl') +
     '<span class="tiroir-autres">' + autres +
-    '<button type="button" class="rond-ent plus" data-etab-plus><span class="ini">+</span></button>' +
+    (peutAjouter
+      ? '<button type="button" class="rond-ent plus" data-etab-plus><span class="ini">+</span></button>'
+      : '') +
     '</span>'
 }
 
@@ -13446,6 +13684,15 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
   try {
     let entrepriseId = etabEdite?.id
     let logoUrl = etabEdite?.logo_url || null
+
+    /* On refuse AVANT d'écrire quoi que ce soit : créer la ligne puis
+       s'apercevoir qu'elle est en trop laisserait une entreprise orpheline. */
+    if (!entrepriseId && mesEtablissements.length >= ETABLISSEMENTS_MAX) {
+      throw new Error(
+        `Vous g\u00e9rez d\u00e9j\u00e0 ${ETABLISSEMENTS_MAX} \u00e9tablissements, le maximum par compte. ` +
+        `Retirez-en un pour en cr\u00e9er un autre, ou \u00e9crivez-nous si vous g\u00e9rez un groupe.`
+      )
+    }
 
     // 1. La ligne d'abord : on a besoin de son identifiant pour nommer le logo.
     if (!entrepriseId) {

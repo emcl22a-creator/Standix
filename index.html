@@ -587,7 +587,7 @@
   #p-global-analyse .cat-rank{
     background:none !important; border:none !important; border-radius:0 !important;
     border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
-    padding:13px 2px !important; margin:0 !important;
+    padding:10px 2px !important; margin:0 !important;
   }
   #p-global-analyse .emp-row:last-of-type,
   #p-global-analyse .cat-rank:last-of-type{ border-bottom:none !important; }
@@ -602,11 +602,42 @@
      Même grammaire que la carte « Bonjour prénom » : même écart, même marge
      intérieure, même rayon. Seul le visage laisse place à un dessin au trait,
      dans le langage des icônes de création. */
-  .an-gain{ margin-top:0 !important; margin-bottom:24px !important; }
+  /* Un peu plus d'air que la carte d'accueil : celle-ci porte deux phrases
+     complètes, là où l'autre porte une salutation et une ligne. */
+  .an-gain{
+    margin-top:0 !important; margin-bottom:24px !important;
+    padding:18px 20px !important;
+  }
+  .an-gain .accueil-texte .s{ margin-top:5px; line-height:1.5; }
   /* Aucune taille propre : la carte suit l'échelle de « Bonjour prénom » — titre
      à 16, phrase à 12,5. J'avais forcé 14,5 partout pour égaliser les deux
      lignes ; ça marchait sur cette carte, mais ça cassait le rapport que l'app
      tient partout ailleurs entre un titre et sa phrase. */
+
+  /* Le mot d'introduction, dans la matière de la carte d'accueil. */
+  .an-intro{
+    padding:16px 18px; border-radius:20px; margin-top:14px;
+    background:var(--hero-gradient); border:0.5px solid var(--border);
+  }
+  .an-intro .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
+  .an-intro .s{ font-size:12.5px; color:var(--label-2); margin-top:5px; line-height:1.5; }
+  .an-intro .s b{ color:#fff; font-weight:650; }
+
+  /* Sur cette page, les lignes ne sont plus des cartes : un filet suffit, et
+     vingt personnes restent parcourables. */
+  #p-an-categories .cat-rank,
+  #p-an-temps .emp-row,
+  #p-an-equipe .emp-row{
+    background:none !important; border:none !important; border-radius:0 !important;
+    border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
+    padding:12px 2px !important; margin:0 !important;
+  }
+  #p-an-categories .cat-rank:last-of-type,
+  #p-an-temps .emp-row:last-of-type,
+  #p-an-equipe .emp-row:last-of-type{ border-bottom:none !important; }
+  #p-an-categories .fl,
+  #p-an-temps .fl,
+  #p-an-equipe .fl{ color:var(--label-3); font-size:17px; flex-shrink:0; }
 
   .an-compte{
     font-size:13px; color:var(--label-3); font-weight:600; flex:1;
@@ -2394,7 +2425,7 @@
     animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; }
   .emp-row-sous{
     display:block; font-size:11.5px; color:var(--label-3);
-    font-weight:500; margin-top:2px;
+    font-weight:500; margin-top:1px;
   }
 
   .emp-row-name{ font-size:13.5px; font-weight:600; flex:1; }
@@ -3936,7 +3967,15 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Équipe</h1>
     </div>
-    <div class="list-tools" style="margin-top:6px;">
+
+    <!-- Une page qui s'ouvre sur une liste nue ne dit pas ce qu'on peut y faire.
+         Deux lignes suffisent à l'apprendre, et on ne les relit pas. -->
+    <div class="an-intro">
+      <div class="t">Qui suit, et qui décroche</div>
+      <div class="s">Touchez une personne pour voir <b>son temps de lecture</b>, les procédures qu'elle a ouvertes et celles qu'elle n'a jamais lues.</div>
+    </div>
+
+    <div class="list-tools" style="margin-top:20px;">
       <span class="an-compte" id="p-an-equipe-compte">—</span>
       <div class="dd-filter" id="dd-an-equipe-sort">
         <button type="button" class="dd-trigger" id="dd-an-equipe-sort-trigger">
@@ -3960,6 +3999,11 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Catégories</h1>
     </div>
+
+    <div class="an-intro">
+      <div class="t">Ce qui est suivi, ce qui ne l'est pas</div>
+      <div class="s">Quelles parties de votre métier sont suivies, et lesquelles restent lettre morte. Touchez-en une pour <b>voir ses procédures</b>.</div>
+    </div>
     <div id="an-categories-liste" style="margin-top:12px;"></div>
   </div>
 
@@ -3969,6 +4013,11 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Le temps de chacun</h1>
+    </div>
+
+    <div class="an-intro">
+      <div class="t">Où part le temps</div>
+      <div class="s">Qui passe le plus de temps sur vos procédures, et sur lesquelles. Touchez un nom pour <b>son analyse complète</b>.</div>
     </div>
     <div id="an-temps-liste" style="margin-top:12px;"></div>
   </div>
@@ -7635,6 +7684,7 @@ function peindreAnEquipe() {
           s.temps ? ' \u00b7 ' + dureeLisible(s.temps) : ''}</span>
       </div>
       ${medailleHtml(s.serie, 30)}
+      <span class="fl">\u203a</span>
     </div>`).join('')
     : '<div class="an-vide">Aucun membre dans l\'\u00e9quipe.</div>'
 

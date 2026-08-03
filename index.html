@@ -709,12 +709,21 @@
     padding:15px 16px; border-radius:18px;
     background:var(--bg-card); border:0.5px solid var(--border);
   }
-  .emp-roue .roue{ width:58px; height:58px; flex-shrink:0; }
+  .emp-roue .ga-anneau{ flex-shrink:0; }
   .emp-roue .tx{ flex:1; min-width:0; }
   .emp-roue .t{ font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
   .emp-roue .s{ font-size:12px; color:var(--label-2); margin-top:3px; line-height:1.45; }
   .emp-roue .s b{ color:#fff; font-weight:650; }
   .emp-liste .an-lig .pt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  /* La même barre que la recherche d'une catégorie, avec son bouton à côté. */
+  .poste-saisie{ display:flex; align-items:center; gap:9px; margin-top:16px; }
+  .poste-saisie .search-bar{ flex:1; min-width:0; }
+  .poste-ajouter{
+    flex-shrink:0; height:38px; padding:0 18px; border:none; border-radius:100px;
+    background:#fff; color:#000; font-family:inherit; font-size:14px; font-weight:700;
+  }
+  .poste-ajouter:active{ opacity:0.7; }
 
   .an-lig{
     display:flex; align-items:center; gap:12px; width:100%;
@@ -4341,14 +4350,19 @@
       <div class="s">Définissez les postes de votre établissement. Chaque membre choisira le sien — c'est ce qui vous permettra un jour de comparer <b>la cuisine et la salle</b>.</div>
     </div>
 
-    <div id="postes-liste" style="margin-top:14px;"></div>
-
-    <div class="man-lbl">Ajouter un poste</div>
-    <div style="display:flex; gap:8px;">
-      <input type="text" class="man-champ" id="poste-nouveau" placeholder="Ex : Cuisine" style="flex:1;">
-      <button class="btn" id="poste-ajouter" style="width:auto; padding:0 18px; height:auto;">Ajouter</button>
+    <!-- La saisie passe AU-DESSUS de la liste : on vient sur cette page pour
+         ajouter, pas pour relire. Ce qu'on cherche doit être sous le pouce dès
+         l'ouverture, sans faire défiler une liste qui s'allonge. -->
+    <div class="poste-saisie">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <input type="text" id="poste-nouveau" placeholder="Ex : Serveur">
+      </div>
+      <button type="button" class="poste-ajouter" id="poste-ajouter">Ajouter</button>
     </div>
     <div class="error-msg" id="poste-erreur"></div>
+
+    <div id="postes-liste" style="margin-top:16px;"></div>
   </div>
 
   <div class="screen" id="p-reg-etabs">
@@ -6877,7 +6891,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = `Voir les ${classement.length - 3} autres`
+    b.textContent = libelleVoirAutres(classement.length - 3)
     b.addEventListener('click', () => ouvrirAnProcedures())
     el.appendChild(b)
   }
@@ -6921,6 +6935,11 @@ function dessinerAnneau(id, pct, couleur, texte, unite) {
    Avant, on classait par taux de consultation. Mais un taux élevé sur une
    catégorie d'une seule procédure ne dit rien ; le temps, lui, se compare
    d'une catégorie à l'autre quelle que soit leur taille. */
+/* « Voir les 1 autres » ne se dit pas. Une seule formule, employée partout. */
+function libelleVoirAutres(n) {
+  return n === 1 ? "Voir l'autre" : `Voir les ${n} autres`
+}
+
 function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel, cible, tout) {
   const el = cible || document.getElementById('ga-top-categories')
   if (!el) return
@@ -6976,7 +6995,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = `Voir les ${classement.length - 3} autres`
+    b.textContent = libelleVoirAutres(classement.length - 3)
     b.addEventListener('click', () => ouvrirAnCategories())
     el.appendChild(b)
   }
@@ -7376,9 +7395,7 @@ function renderMembresListe() {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = trie.length - 3 === 1
-      ? 'Voir la derni\u00e8re'
-      : `Voir les ${trie.length - 3} autres`
+    b.textContent = libelleVoirAutres(trie.length - 3)
     b.addEventListener('click', () => ouvrirAnEquipe())
     el.appendChild(b)
   }
@@ -11592,10 +11609,13 @@ function renderAnalyseStats() {
   const pct = Math.round((vus / nbEmployes) * 100)
   const couleur = pct >= 80 ? 'var(--green)' : pct >= 40 ? 'var(--orange)' : 'var(--red)'
 
+  /* `ga-anneau` n'est pas décoratif : c'est cette classe qui fait pivoter le
+     tracé d'un quart de tour et centre le pourcentage dedans. Sans elle, l'arc
+     part de trois heures et le texte tombe sous la carte. */
   const tete = document.createElement('div')
   tete.className = 'emp-roue'
   tete.innerHTML = `
-    <div class="roue" id="emp-anneau"></div>
+    <div class="ga-anneau" id="emp-anneau"></div>
     <div class="tx">
       <div class="t">${vus} sur ${nbEmployes} ${vus > 1 ? 'ont' : 'a'} vu cette proc\u00e9dure</div>
       <div class="s">${pct === 100

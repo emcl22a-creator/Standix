@@ -3257,13 +3257,19 @@
     padding:56px 24px 74px; text-align:center; pointer-events:none;
     background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0.78) 100%);
   }
+  /* La même écriture que les titres de page : même taille, même graisse, même
+     resserrement. Un texte posé sur une image n'a pas de raison d'avoir sa
+     propre typographie. */
+  /* Exactement `.pagehead` et `.subhead`, l'ombre en plus. Un titre posé sur une
+     image n'a pas de raison d'avoir sa propre typographie — seule l'ombre
+     s'ajoute, pour qu'il reste lisible sur une scène claire. */
   .scan-mot b{
-    display:block; font-size:19px; font-weight:750; letter-spacing:-0.035em;
-    text-shadow:0 2px 14px rgba(0,0,0,0.8);
+    display:block; font-size:26px; font-weight:700; letter-spacing:-0.02em;
+    line-height:1.2; text-shadow:0 2px 16px rgba(0,0,0,0.85);
   }
   .scan-mot span{
-    display:block; font-size:13px; color:rgba(255,255,255,0.78); margin-top:5px;
-    line-height:1.45; text-shadow:0 2px 12px rgba(0,0,0,0.8);
+    display:block; font-size:14px; color:var(--label-2); margin-top:6px;
+    line-height:1.35; text-shadow:0 2px 12px rgba(0,0,0,0.85);
   }
 
   /* Le message d'échec. Il respire : collé sous le viseur, il ressemblait à une
@@ -3314,7 +3320,9 @@
     background:rgba(255,255,255,0.16); backdrop-filter:blur(20px);
     display:flex; align-items:center; justify-content:center; color:#fff;
   }
-  .scan-lampe svg{ width:19px; height:19px; }
+  /* Le dessin d'une torche est plus haut que large : centré sur sa boîte, il
+     paraît posé trop bas dans le rond. On le remonte d'un pixel. */
+  .scan-lampe svg{ width:20px; height:20px; display:block; margin-top:-1px; }
   .scan-lampe.on{ background:#fff; color:#000; }
   .scan-lampe:active{ transform:scale(0.92); }
 
@@ -4718,8 +4726,8 @@
   </div>
 
   <div class="screen" id="p-scan">
-    <h1 class="pagehead">Scanner un code</h1>
-    <div class="subhead">Visez le QR code affiché sur un poste pour ouvrir sa procédure</div>
+    <!-- Le titre et la consigne vivent DANS l'image, en bas. Les avoir aussi
+         au-dessus les affichait deux fois. -->
     <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
          arrondi, une cible qui éclaircit la zone utile, et un rayon qui la
          balaie pour dire que ça cherche. Un viseur immobile laisse croire que
@@ -4739,7 +4747,7 @@
       </div>
 
       <div class="scan-outils">
-        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 3h7.2l-.6 4.4a2 2 0 0 1-.7 1.3l-.9.7v13.1a1.5 1.5 0 0 1-3 0V9.4l-.9-.7a2 2 0 0 1-.7-1.3z"/><line x1="8" y1="7" x2="16" y2="7"/></svg></button>
+        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"/><line x1="9" y1="6.4" x2="15" y2="6.4"/><line x1="12" y1="12.5" x2="12" y2="15"/></svg></button>
       </div>
     </div>
     <div id="g-scan-result-zone"></div>
@@ -5381,8 +5389,6 @@
   </div>
 
   <div class="screen" id="e-scan">
-    <h1 class="pagehead">Scanner un code</h1>
-    <div class="subhead">Visez le QR code affiché sur votre poste</div>
     <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
          arrondi, une cible qui éclaircit la zone utile, et un rayon qui la
          balaie pour dire que ça cherche. Un viseur immobile laisse croire que
@@ -5402,7 +5408,7 @@
       </div>
 
       <div class="scan-outils">
-        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 3h7.2l-.6 4.4a2 2 0 0 1-.7 1.3l-.9.7v13.1a1.5 1.5 0 0 1-3 0V9.4l-.9-.7a2 2 0 0 1-.7-1.3z"/><line x1="8" y1="7" x2="16" y2="7"/></svg></button>
+        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"/><line x1="9" y1="6.4" x2="15" y2="6.4"/><line x1="12" y1="12.5" x2="12" y2="15"/></svg></button>
       </div>
     </div>
     <div id="scan-result-zone"></div>
@@ -15710,7 +15716,8 @@ window.startScanner = async function(espace) {
     hintEl.textContent = 'Préparation du lecteur...'
     await ensureJsQR()
 
-    hintEl.textContent = 'Visez le QR code'
+    /* Le lecteur tourne : on revient au texte d'origine, complet. */
+    remettreConsigne(hintEl)
     scanLoopActive = true
     requestAnimationFrame(scanLoop)
   } catch (e) {
@@ -15739,6 +15746,14 @@ window.startScanner = async function(espace) {
    pas, il faut aller la changer dans les réglages, et personne ne sait où.
 
    On détecte donc l'appareil et on donne les touches à suivre, dans l'ordre. */
+/* La consigne sous le titre, dans l'image. Elle sert aussi à dire où en est
+   l'ouverture de la caméra — mais elle revient toujours à son texte d'origine. */
+const CONSIGNE = 'Visez le QR code affich\u00e9 sur votre poste'
+
+function remettreConsigne(el) {
+  if (el) el.textContent = CONSIGNE
+}
+
 function cheminReglagesCamera() {
   const ua = navigator.userAgent
   const iOS = /iPad|iPhone|iPod/.test(ua) ||
@@ -15799,7 +15814,10 @@ function cheminReglagesCamera() {
 }
 
 function echecScanner(hintEl, zone, titre, detail, refus) {
-  if (hintEl) hintEl.textContent = ''
+  /* On NE VIDE PLUS la consigne. « Scanner un code / Visez le QR code » reste
+     affiché quoi qu'il arrive : c'est le titre de la page, pas un indicateur
+     d'état. Le vider laissait un cadre noir sans le moindre mot. */
+  remettreConsigne(hintEl)
 
   /* Sans le refus explicite, on garde le message court : inutile d'expliquer
      comment rétablir une autorisation quand le problème vient d'ailleurs. */

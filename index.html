@@ -883,9 +883,44 @@
   .fm-trois .v{ font-size:20px; font-weight:800; letter-spacing:-0.04em; }
   .fm-trois .l{ font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
 
-  /* Les deux listes reprennent les 20 px de la carte du haut, titres compris :
-     le texte part de la même verticale du haut de l'écran jusqu'en bas. */
-  #fm-top, .fm-rep, #p-membre .fm-titre{ padding-left:20px; padding-right:20px; }
+  /* ═══ Le carrousel des deux périodes ═══ */
+
+  /* Le défilement horizontal natif, avec aimantation. Les panneaux débordent
+     des marges de l'écran pour que le suivant s'annonce dès qu'on effleure. */
+  .fm-piste{
+    display:flex; overflow-x:auto; overflow-y:hidden;
+    scroll-snap-type:x mandatory; scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    margin:0 -20px; padding:0;
+  }
+  .fm-piste::-webkit-scrollbar{ display:none; }
+  .fm-pan{
+    flex:0 0 100%; min-width:100%; scroll-snap-align:center;
+    padding:0 20px;
+  }
+
+  /* La barre de position : deux traits, celui de la page active en blanc. */
+  .fm-barre{ display:flex; gap:6px; justify-content:center; margin-top:20px; }
+  .fm-barre button{
+    border:none; background:none; padding:8px 3px; cursor:pointer;
+  }
+  .fm-barre span{
+    display:block; width:34px; height:3px; border-radius:2px;
+    background:rgba(255,255,255,0.16);
+    transition:background 0.28s ease, width 0.28s cubic-bezier(0.22,1,0.36,1);
+  }
+  .fm-barre button.on span{ background:#fff; width:44px; }
+
+  .fm-periode-mot{
+    text-align:center; font-size:12px; font-weight:650; color:var(--label-3);
+    margin-top:2px; letter-spacing:-0.01em;
+  }
+
+  /* Les listes s'alignent sur le bouton retour : il démarre à la marge de
+     l'écran, elles aussi. Les 20 px que j'avais ajoutés les décalaient de la
+     colonne où commence tout le reste de la page. */
+  #fm-top, .fm-rep, #p-membre .fm-titre{ padding-left:0; padding-right:0; }
+  .fm-lg, .fm-rep .l{ padding-left:0; padding-right:0; }
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
     margin:24px 0 4px; text-transform:uppercase; letter-spacing:0.06em;
@@ -4624,14 +4659,34 @@
       </h1>
     </div>
 
-    <!-- L'anneau segmenté : une part par procédure, proportionnelle au temps.
-         Toucher une ligne pâlit les autres parts et affiche celle-là seule. -->
-    <div class="fm-segm">
-      <div class="svg" id="fm-anneau"></div>
+    <!-- Deux panneaux côte à côte : le mois en cours, puis depuis le début. On
+         passe de l'un à l'autre en glissant. Le défilement horizontal natif
+         s'occupe de tout — on voit les deux pendant le geste, ça s'aimante à
+         l'arrivée, et l'inertie du doigt est celle du système. Écrire cette
+         animation à la main donnerait toujours quelque chose de moins fluide.
+
+         L'anneau segmenté : une part par procédure, proportionnelle au temps.
+         Toucher une ligne pâlit les autres et affiche celle-là seule. -->
+    <div class="fm-piste" id="fm-piste">
+      <section class="fm-pan" data-periode="month">
+        <div class="fm-segm"><div class="svg" id="fm-anneau-month"></div></div>
+        <div class="fm-titre">Ce qui a occupé son temps</div>
+        <div id="fm-top-month"></div>
+      </section>
+      <section class="fm-pan" data-periode="all">
+        <div class="fm-segm"><div class="svg" id="fm-anneau-all"></div></div>
+        <div class="fm-titre">Ce qui a occupé son temps</div>
+        <div id="fm-top-all"></div>
+      </section>
     </div>
 
-    <div class="fm-titre">Ce qui a occupé son temps</div>
-    <div id="fm-top"></div>
+    <!-- La barre de position. Elle dit qu'il y a une seconde page — sans elle,
+         personne ne devine qu'on peut glisser. -->
+    <div class="fm-barre" id="fm-barre">
+      <button type="button" data-va="month" aria-label="Ce mois-ci"><span></span></button>
+      <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
+    </div>
+    <div class="fm-periode-mot" id="fm-periode-mot">Ce mois-ci</div>
 
     <div class="fm-titre">Activité</div>
     <!-- Les quatre repères sur le même modèle : une icône, un intitulé, une
@@ -7826,11 +7881,15 @@ window.ouvrirFicheMembre = function(membreId) {
    rien de plus. */
 const FM_TEINTES = ['#5EA0FF', '#30D158', '#FF9F0A', '#BF5AF2', '#FF9F5A', '#64D2FF']
 
-let fmClasse = []      // les procédures classées, avec leur couleur
-let fmSurTotal = false // faux : le mois en cours · vrai : depuis le début
-let fmMembre = null    // le membre affiché, pour repeindre sans tout relire
-let fmDeplie = false
-let fmTotalMois = 0
+/* Les deux périodes vivent en parallèle : chacune a son classement, son total
+   et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau
+   voisin serait vide pendant le glissement, et c'est justement le moment où on
+   le regarde. */
+let fmVues = {
+  month: { classe: [], total: 0, deplie: false },
+  all:   { classe: [], total: 0, deplie: false },
+}
+let fmPeriode = 'month'   // la page visible
 
 async function peindreFicheMembre() {
   if (!ficheMembreId || !currentGaData) return
@@ -7842,78 +7901,65 @@ async function peindreFicheMembre() {
   el('fm-nom').textContent = m.nom || 'Sans nom'
   el('fm-poste').textContent = m.poste || ''
 
-  fmMembre = m
   const siennes = (validations || []).filter(v => v.membre_id === ficheMembreId)
-
-  /* La fenêtre de temps : le mois en cours, ou tout depuis le début. On bascule
-     d'un glissement latéral, pas d'un bouton — la page est déjà dense, et le
-     geste se retient mieux qu'un sélecteur de plus. */
   const debutMois = new Date()
   debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
-  const duMois = fmSurTotal
-    ? siennes
-    : siennes.filter(v => new Date(v.validated_at) >= debutMois)
+  const duMois = siennes.filter(v => new Date(v.validated_at) >= debutMois)
 
-  fmTotalMois = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  for (const [cle, lot] of [['month', duMois], ['all', siennes]]) {
+    const vue = fmVues[cle]
+    vue.total = lot.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
 
-  /* Le classement : une entrée par procédure de l'entreprise, celles qui ont
-     du temps d'abord. Les jamais ouvertes restent dans la liste — c'est là
-     qu'on veut les voir — mais elles n'ont pas de part dans l'anneau. */
-  fmClasse = (procedures || []).map(p => {
-    const dessus = duMois.filter(v => v.procedure_id === p.id)
-    return {
-      proc: p,
-      secondes: dessus.reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
-      fois: dessus.length,
-    }
-  }).sort((a, b) => b.secondes - a.secondes)
+    /* Une entrée par procédure de l'entreprise, celles qui ont du temps d'abord.
+       Les jamais ouvertes restent dans la liste — c'est là qu'on veut les voir —
+       mais elles n'ont pas de part dans l'anneau. */
+    vue.classe = (procedures || []).map(pr => {
+      const dessus = lot.filter(v => v.procedure_id === pr.id)
+      return {
+        proc: pr,
+        secondes: dessus.reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
+        fois: dessus.length,
+      }
+    }).sort((a, b) => b.secondes - a.secondes)
 
-  let t = 0
-  fmClasse.forEach(x => { if (x.secondes) x.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+    let t = 0
+    vue.classe.forEach(x => { if (x.secondes) x.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
 
-  dessinerAnneauMembre()
-  fmDeplie = false
-  peindreClassementMembre()
+    vue.deplie = false
+    dessinerAnneauMembre(cle)
+    peindreClassementMembre(cle)
+  }
 
-  // ─── L'activité ───
-  /* Ces deux compteurs ne suivent PAS le glissement : ils disent toujours le
-     mois d'un côté et le total de l'autre. C'est leur intérêt — les faire
-     changer ensemble reviendrait à afficher deux fois le même nombre. */
-  const vraimentCeMois = siennes.filter(v => new Date(v.validated_at) >= debutMois)
-  el('fm-nb-mois').textContent = vraimentCeMois.length
+  majBarrePeriode()
+
+  // ─── L'activité, commune aux deux pages ───
+  el('fm-nb-mois').textContent = duMois.length
   el('fm-nb-total').textContent = siennes.length
 
-  const derniere = siennes
-    .map(v => new Date(v.validated_at))
-    .sort((a, b) => b - a)[0]
+  const derniere = siennes.map(v => new Date(v.validated_at)).sort((a, b) => b - a)[0]
   el('fm-derniere').textContent = derniere ? ilYA(derniere) : 'jamais'
-
   el('fm-arrivee').textContent = m.created_at
     ? 'le ' + new Date(m.created_at).toLocaleDateString('fr-FR')
     : '\u2014'
-
 }
 
-/* L'anneau. Chaque part occupe une fraction du tour proportionnelle à son temps,
-   moins trois pixels pour que les parts ne se touchent pas. */
-function dessinerAnneauMembre() {
-  const zone = document.getElementById('fm-anneau')
+/* L'anneau d'une période. Chaque part occupe une fraction du tour proportionnelle
+   à son temps. Les bouts sont arrondis : une extrémité ronde déborde de la moitié
+   de l'épaisseur à chaque bout, on retire donc `ep` à la longueur et on décale le
+   départ d'une demi-épaisseur, sinon les parts se chevauchent. */
+function dessinerAnneauMembre(cle) {
+  const zone = document.getElementById('fm-anneau-' + cle)
   if (!zone) return
 
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
-  const ECART = 5          // le blanc entre deux parts, en pixels d'arc
-  const vus = fmClasse.filter(x => x.secondes)
+  const ECART = 5
+  const vus = fmVues[cle].classe.filter(x => x.secondes)
   const somme = vus.reduce((s, x) => s + x.secondes, 0)
 
-  /* Les bouts sont ARRONDIS. Une extrémité ronde déborde de la moitié de
-     l'épaisseur à chaque bout : si on ne raccourcit pas le tracé d'autant, les
-     parts se chevauchent et l'écart disparaît. On retire donc `ep` à la
-     longueur, et on décale le départ d'une demi-épaisseur. */
   let pos = 0
   const arcs = vus.map((x, i) => {
     const frac = x.secondes / somme
-    const plage = circ * frac
-    const len = Math.max(0.1, plage - ECART - ep)
+    const len = Math.max(0.1, circ * frac - ECART - ep)
     const depart = circ * pos + ECART / 2 + ep / 2
     pos += frac
     return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
@@ -7921,13 +7967,11 @@ function dessinerAnneauMembre() {
       stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
   }).join('')
 
-  /* L'anneau se dévoile d'un seul tour : un masque en forme d'anneau, dessiné
-     par une aiguille invisible qui fait le tour du cadran. Les parts sont déjà
-     en place dessous — c'est le masque qui bouge, pas elles.
-
-     Un seul mouvement continu plutôt que quatre morceaux qui s'assemblent :
-     l'anneau se lit comme un objet entier. */
-  const idMasque = 'fm-masque-' + Date.now()
+  /* L'anneau se dévoile d'un seul tour : un masque en forme d'anneau, dessiné par
+     une aiguille invisible qui fait le tour du cadran. Les parts sont déjà en
+     place dessous — c'est le masque qui bouge. Son bout est DROIT : arrondi, sa
+     demi-épaisseur débordait avant midi et laissait voir la dernière couleur. */
+  const idMasque = 'fm-masque-' + cle + '-' + Date.now()
   zone.innerHTML = `
     <svg width="${T}" height="${T}">
       <defs>
@@ -7937,89 +7981,37 @@ function dessinerAnneauMembre() {
                   stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
         </mask>
       </defs>
-      <!-- Plus de cercle de fond : il dessinait un anneau gris complet derrière
-           les parts, et l'œil voyait un cercle plein là où il n'y a que quatre
-           arcs. Ce qui manque doit se lire comme un vide, pas comme du gris. -->
       <g mask="url(#${idMasque})">${arcs}</g>
     </svg>
     <div class="dedans">
-      <span class="v" id="fm-anneau-v">\u2014</span>
-      <span class="u" id="fm-anneau-u">\u2014</span>
-      <span class="n" id="fm-anneau-n">\u2014</span>
+      <span class="v"></span><span class="u"></span><span class="n"></span>
     </div>`
 
-  centreAnneauMembre(null)
+  centreAnneauMembre(cle, null)
 
   const aiguille = zone.querySelector('.fm-aiguille')
   if (aiguille) {
-    /* On laisse un souffle avant de lancer : sans lui, le navigateur applique
-       la valeur finale d'emblée et rien ne s'anime. */
     requestAnimationFrame(() => {
       requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
     })
   }
 }
 
-/* Le centre : le total quand rien n'est choisi, la procédure seule sinon. */
-/* Toucher n'importe où sur la fiche ramène au total. Sans ça, il fallait
-   retrouver la ligne qu'on avait choisie pour en sortir — un geste qu'on ne
-   devine pas. On écoute l'écran entier et on ignore ce qui vient d'une ligne :
-   c'est elle qui gère son propre cas. */
-document.getElementById('p-membre')?.addEventListener('click', (e) => {
-  if (e.target.closest('[data-part]') || e.target.closest('.fm-plus')) return
-  const choisie = document.querySelector('#fm-top .fm-lg.choisi')
-  if (!choisie) return
-  choisie.classList.remove('choisi')
-  document.querySelectorAll('#fm-anneau [data-arc]').forEach(a => a.classList.remove('pale'))
-  centreAnneauMembre(null)
-})
-
-/* Glisser vers la gauche ou la droite bascule entre le mois et le total.
-
-   On exige un mouvement franchement horizontal — au moins 60 px, et deux fois
-   plus large que haut. Sans cette seconde condition, un simple défilement du
-   pouce déclencherait la bascule à chaque fois. */
-;(() => {
-  const ecran = document.getElementById('p-membre')
-  if (!ecran) return
-  let x0 = null, y0 = null
-
-  ecran.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1) { x0 = null; return }
-    x0 = e.touches[0].clientX
-    y0 = e.touches[0].clientY
-  }, { passive: true })
-
-  ecran.addEventListener('touchend', (e) => {
-    if (x0 == null) return
-    const dx = e.changedTouches[0].clientX - x0
-    const dy = e.changedTouches[0].clientY - y0
-    x0 = null
-    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return
-
-    /* Les deux sens font la même chose : on ne va qu'entre deux états, et
-       imposer un sens pour l'aller et l'autre pour le retour ne s'apprend pas. */
-    fmSurTotal = !fmSurTotal
-    if (navigator.vibrate) navigator.vibrate(8)
-    toast(fmSurTotal ? 'Depuis le d\u00e9but' : 'Ce mois-ci')
-    peindreFicheMembre()
-  }, { passive: true })
-})()
-
-function centreAnneauMembre(choix) {
-  const v = document.getElementById('fm-anneau-v')
-  const u = document.getElementById('fm-anneau-u')
-  const n = document.getElementById('fm-anneau-n')
+/* Le centre : le total quand rien n'est choisi, la procédure seule sinon.
+   Toujours en minutes — « 1,2 » demande une conversion pour être comparé au
+   « 31 min » affiché juste en dessous ; « 72 » se compare tout seul. */
+function centreAnneauMembre(cle, choix) {
+  const zone = document.getElementById('fm-anneau-' + cle)
+  if (!zone) return
+  const v = zone.querySelector('.v'), u = zone.querySelector('.u'), n = zone.querySelector('.n')
   if (!v) return
 
+  const vue = fmVues[cle]
   if (!choix) {
-    /* Toujours en minutes, jamais en heures. « 1,2 » demande un effort de
-       conversion pour être comparé à « 31 min » affiché juste en dessous ;
-       « 72 » se compare tout seul. */
-    const vus = fmClasse.filter(x => x.secondes).length
-    v.textContent = String(Math.round(fmTotalMois / 60))
-    u.textContent = fmSurTotal ? 'minutes au total' : 'minutes ce mois-ci'
-    n.textContent = `${vus} proc\u00e9dure${vus > 1 ? 's' : ''} sur ${fmClasse.length}`
+    const vus = vue.classe.filter(x => x.secondes).length
+    v.textContent = String(Math.round(vue.total / 60))
+    u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
+    n.textContent = `${vus} proc\u00e9dure${vus > 1 ? 's' : ''} sur ${vue.classe.length}`
     return
   }
 
@@ -8030,10 +8022,9 @@ function centreAnneauMembre(choix) {
 }
 
 /* Fait glisser le bouton de son ancienne position à la nouvelle. On le pose
-   d'abord là où il était, puis on le libère : le navigateur anime la différence.
-   C'est la même mécanique que le tri de la page Équipe. */
-function glisserBouton(ancienHaut) {
-  const b = document.querySelector('#fm-top .fm-plus')
+   d'abord là où il était, puis on le libère : le navigateur anime la différence. */
+function glisserBouton(cle, ancienHaut) {
+  const b = document.querySelector('#fm-top-' + cle + ' .fm-plus')
   if (!b || ancienHaut == null) return
   const ecart = ancienHaut - b.getBoundingClientRect().top
   if (!ecart) return
@@ -8045,18 +8036,50 @@ function glisserBouton(ancienHaut) {
   })
 }
 
-/* Le classement. Trois lignes, puis un bouton qui déplie le reste. */
-function peindreClassementMembre(animerDes) {
-  const el = document.getElementById('fm-top')
+/* La barre de position et le mot sous elle. On écoute le défilement de la piste
+   plutôt que la fin du geste : la barre suit le doigt au lieu d'attendre. */
+function majBarrePeriode() {
+  document.querySelectorAll('#fm-barre [data-va]').forEach(b => {
+    b.classList.toggle('on', b.dataset.va === fmPeriode)
+  })
+  const mot = document.getElementById('fm-periode-mot')
+  if (mot) mot.textContent = fmPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+}
+
+;(() => {
+  const piste = document.getElementById('fm-piste')
+  if (!piste) return
+
+  piste.addEventListener('scroll', () => {
+    const page = piste.scrollLeft > piste.clientWidth / 2 ? 'all' : 'month'
+    if (page === fmPeriode) return
+    fmPeriode = page
+    majBarrePeriode()
+    if (navigator.vibrate) navigator.vibrate(6)
+  }, { passive: true })
+
+  /* On peut aussi toucher un trait de la barre : tout le monde ne pense pas à
+     glisser, et un repère qu'on voit sans pouvoir l'utiliser agace. */
+  document.querySelectorAll('#fm-barre [data-va]').forEach(b => {
+    b.addEventListener('click', () => {
+      piste.scrollTo({ left: b.dataset.va === 'all' ? piste.clientWidth : 0, behavior: 'smooth' })
+    })
+  })
+})()
+
+/* Le classement d'une période. Trois lignes, puis un bouton qui déplie le reste. */
+function peindreClassementMembre(cle, animerDes) {
+  const el = document.getElementById('fm-top-' + cle)
   if (!el) return
 
-  if (!fmClasse.length) {
+  const vue = fmVues[cle]
+  if (!vue.classe.length) {
     el.innerHTML = '<div class="an-vide">Aucune proc\u00e9dure dans cette entreprise.</div>'
     return
   }
 
-  const vus = fmClasse.filter(x => x.secondes)
-  const visibles = fmDeplie ? fmClasse : fmClasse.slice(0, 3)
+  const vus = vue.classe.filter(x => x.secondes)
+  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, 3)
 
   el.innerHTML = visibles.map((x, rang) => {
     const i = vus.indexOf(x)
@@ -8076,34 +8099,31 @@ function peindreClassementMembre(animerDes) {
       </button>`
   }).join('')
 
-  if (fmClasse.length > 3) {
+  if (vue.classe.length > 3) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'fm-plus'
-    b.textContent = fmDeplie ? 'Voir moins' : libelleVoirAutres(fmClasse.length - 3)
+    b.textContent = vue.deplie ? 'Voir moins' : libelleVoirAutres(vue.classe.length - 3)
     b.addEventListener('click', () => {
-      /* On relève où se trouve le bouton AVANT de redessiner : il glissera de
-         son ancienne position à la nouvelle, au lieu de sauter. */
       const avantBouton = b.getBoundingClientRect().top
-
-      if (fmDeplie) {
+      if (vue.deplie) {
         /* On replie : les lignes en trop s'effacent d'abord, on redessine après.
            Les faire disparaître d'un coup donnerait un à-coup. */
         const enTrop = [...el.querySelectorAll('.fm-lg')].slice(3)
-        enTrop.forEach((l, i) => {
-          l.style.animationDelay = ((enTrop.length - 1 - i) * 0.04) + 's'
+        enTrop.forEach((l, k) => {
+          l.style.animationDelay = ((enTrop.length - 1 - k) * 0.04) + 's'
           l.classList.add('part')
         })
         setTimeout(() => {
-          fmDeplie = false
-          peindreClassementMembre()
-          glisserBouton(avantBouton)
+          vue.deplie = false
+          peindreClassementMembre(cle)
+          glisserBouton(cle, avantBouton)
         }, 240 + enTrop.length * 40)
         return
       }
-      fmDeplie = true
-      peindreClassementMembre(3)
-      glisserBouton(avantBouton)
+      vue.deplie = true
+      peindreClassementMembre(cle, 3)
+      glisserBouton(cle, avantBouton)
     })
     el.appendChild(b)
   }
@@ -8113,19 +8133,18 @@ function peindreClassementMembre(animerDes) {
       const i = Number(b.dataset.part)
       const actif = b.classList.contains('choisi')
       el.querySelectorAll('[data-part]').forEach(x => x.classList.remove('choisi'))
-      const arcs = document.querySelectorAll('#fm-anneau [data-arc]')
+      const arcs = document.querySelectorAll('#fm-anneau-' + cle + ' [data-arc]')
 
       /* Toucher à nouveau la même ligne ramène au total. Sans ça, il faudrait
          deviner où appuyer pour sortir de la sélection. */
       if (actif) {
         arcs.forEach(a => a.classList.remove('pale'))
-        centreAnneauMembre(null)
+        centreAnneauMembre(cle, null)
         return
       }
       b.classList.add('choisi')
       arcs.forEach((a, k) => a.classList.toggle('pale', k !== i))
-      const vus = fmClasse.filter(x => x.secondes)
-      centreAnneauMembre(i >= 0 ? vus[i] : fmClasse.find(x => !x.secondes &&
+      centreAnneauMembre(cle, i >= 0 ? vus[i] : vue.classe.find(x => !x.secondes &&
         x.proc.titre === b.querySelector('.nm').textContent))
     })
   })

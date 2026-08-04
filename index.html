@@ -766,15 +766,86 @@
   /* ═══ La fiche d'un membre ═══
      Mêmes lignes sobres que la page Équipe : un filet, pas de carte. On vient de
      là, on doit s'y retrouver. */
-  .fm-qui{
-    display:flex; align-items:center; gap:14px; margin-top:14px;
-    padding:16px 18px; border-radius:20px;
-    background:var(--hero-gradient); border:0.5px solid var(--border);
+/* ═══ La fiche d'un membre ═══ */
+
+  /* Le poste suit le nom, séparé d'un point. Il n'est pas encadré : ce n'est
+     pas une étiquette qu'on accroche à quelqu'un, c'est la suite de son nom. */
+  .fm-nom-ligne{ display:flex; align-items:baseline; gap:0; min-width:0; }
+  .fm-nom-ligne #fm-nom{
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:1;
   }
-  .fm-qui .co{ flex:1; min-width:0; }
-  .fm-qui .nm{ font-size:18px; font-weight:750; letter-spacing:-0.035em; }
-  .fm-qui .s{ font-size:12.5px; color:var(--label-2); margin-top:4px; line-height:1.5; }
-  .fm-qui .s b{ color:#fff; font-weight:650; }
+  .fm-nom-ligne .poste{
+    font-size:14px; font-weight:600; color:var(--label-3);
+    letter-spacing:-0.02em; flex-shrink:0; white-space:nowrap;
+  }
+  .fm-nom-ligne .poste:not(:empty)::before{ content:' \00b7 '; white-space:pre; }
+
+  /* L'anneau segmenté. */
+  .fm-segm{ display:flex; justify-content:center; padding:20px 0 2px; }
+  .fm-segm .svg{ position:relative; width:214px; height:214px; }
+  .fm-segm svg{ transform:rotate(-90deg); display:block; }
+  .fm-segm .arc{
+    stroke-linecap:butt;
+    transition:stroke-dasharray 0.8s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+  }
+  .fm-segm .arc.pale{ opacity:0.20; }
+  .fm-segm .dedans{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+  }
+  .fm-segm .dedans .v{ font-size:36px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
+  .fm-segm .dedans .u{ font-size:12px; color:var(--label-3); font-weight:650; margin-top:4px; }
+  .fm-segm .dedans .n{
+    font-size:12px; font-weight:650; margin-top:8px; max-width:132px;
+    text-align:center; line-height:1.3; color:var(--label-2);
+  }
+
+  /* Les lignes du classement. */
+  .fm-lg{
+    display:flex; align-items:center; gap:11px; padding:11px 2px; width:100%;
+    background:none; border:none; border-bottom:0.5px solid rgba(255,255,255,0.055);
+    font-family:inherit; text-align:left; color:inherit;
+  }
+  .fm-lg:last-of-type{ border-bottom:none; }
+  .fm-lg:active{ opacity:0.6; }
+  .fm-lg .pt{ width:11px; height:11px; border-radius:3px; flex-shrink:0; }
+  .fm-lg .co{ flex:1; min-width:0; display:flex; flex-direction:column; }
+  .fm-lg .nm{ font-size:14.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .fm-lg .st{ font-size:11.5px; color:var(--label-3); margin-top:1px; }
+  .fm-lg .vl{ font-size:14px; font-weight:650; color:var(--label-2); flex-shrink:0; }
+  .fm-lg.choisi .nm{ color:#fff; }
+
+  .fm-plus{
+    width:100%; height:42px; margin-top:12px; border-radius:100px;
+    background:rgba(255,255,255,0.055); border:0.5px solid var(--border);
+    color:var(--label-2); font-family:inherit; font-size:13.5px; font-weight:650;
+  }
+  .fm-plus:active{ opacity:0.6; }
+
+  /* L'activité : deux colonnes, puis deux repères de temps. */
+  .fm-act{ display:flex; gap:8px; margin-top:8px; }
+  .fm-act .col{
+    flex:1; padding:14px 10px; border-radius:16px; text-align:center;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .fm-act .col .v{ font-size:24px; font-weight:800; letter-spacing:-0.045em; line-height:1; }
+  .fm-act .col .l{ font-size:10.5px; color:var(--label-3); font-weight:650; margin-top:5px; }
+  .fm-act .col .q{ font-size:11px; color:var(--label-2); font-weight:600; margin-top:2px; }
+
+  .fm-rep{ margin-top:12px; }
+  .fm-rep .l{
+    display:flex; align-items:center; gap:11px; padding:11px 2px;
+    border-bottom:0.5px solid rgba(255,255,255,0.055);
+  }
+  .fm-rep .l:last-child{ border-bottom:none; }
+  .fm-rep .ic{
+    width:28px; height:28px; border-radius:8px; flex-shrink:0; display:flex;
+    align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+  }
+  .fm-rep .ic svg{ width:14px; height:14px; color:rgba(255,255,255,0.72); }
+  .fm-rep .nm{ flex:1; min-width:0; font-size:13.5px; color:var(--label-2); font-weight:600; }
+  .fm-rep .vl{ font-size:13.5px; font-weight:650; flex-shrink:0; }
 
   .fm-trois{ display:flex; gap:8px; margin-top:16px; }
   .fm-trois .un{
@@ -4386,38 +4457,38 @@
       <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Équipe</h1>
+      <!-- Le nom et le poste sur une même ligne, séparés d'un point. Le poste
+           n'est pas un badge : c'est la suite du nom, pas une étiquette qu'on
+           lui accroche. -->
+      <h1 class="pagehead fm-nom-ligne" style="margin:0; font-size:20px;">
+        <span id="fm-nom">—</span><span class="poste" id="fm-poste"></span>
+      </h1>
     </div>
 
-    <!-- L'en-tête porte tout ce qu'on sait de la personne en une ligne : son rôle,
-         sa série, sa dernière lecture. La médaille à droite, comme dans la liste
-         d'où l'on vient. -->
-    <div class="fm-qui">
-      <div class="co">
-        <div class="nm" id="fm-nom">—</div>
-        <div class="s" id="fm-sous">—</div>
-      </div>
-      <div id="fm-medaille"></div>
+    <!-- L'anneau segmenté : une part par procédure, proportionnelle au temps.
+         Toucher une ligne pâlit les autres parts et affiche celle-là seule. -->
+    <div class="fm-segm">
+      <div class="svg" id="fm-anneau"></div>
     </div>
 
-    <!-- Plus de sélecteur : les deux durées qui comptent — ce mois et le total —
-         sont affichées côte à côte. Un filtre pour deux valeurs coûtait un geste
-         et cachait toujours l'une des deux. -->
-
-    <div class="fm-trois">
-      <div class="un"><div class="v" id="fm-temps">—</div><div class="l">Ce mois-ci</div></div>
-      <div class="un"><div class="v" id="fm-total">—</div><div class="l">Au total</div></div>
-      <div class="un"><div class="v" id="fm-lues">—</div><div class="l">Procédures lues</div></div>
-    </div>
-
-    <div class="fm-titre">Où il passe son temps</div>
+    <div class="fm-titre">Ce qui a occupé son temps</div>
     <div id="fm-top"></div>
 
-    <div class="fm-titre">Ce qu'il n'a pas lu</div>
-    <div id="fm-reste"></div>
-
-    <!-- « Ses appareils » retiré : la fiche répond à une seule question — que
-         dois-je faire pour cette personne. Le matériel n'y aide pas. -->
+    <div class="fm-titre">Activité</div>
+    <div class="fm-act">
+      <div class="col"><div class="v" id="fm-nb-mois">—</div><div class="l">Consultations</div><div class="q">ce mois-ci</div></div>
+      <div class="col"><div class="v" id="fm-nb-total">—</div><div class="l">Consultations</div><div class="q">au total</div></div>
+    </div>
+    <div class="fm-rep">
+      <div class="l">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.8"/></svg></span>
+        <span class="nm">Dernière consultation</span><span class="vl" id="fm-derniere">—</span>
+      </div>
+      <div class="l">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><line x1="3.5" y1="9.5" x2="20.5" y2="9.5"/><line x1="8" y1="3" x2="8" y2="6.5"/><line x1="16" y1="3" x2="16" y2="6.5"/></svg></span>
+        <span class="nm">Dans l’équipe depuis</span><span class="vl" id="fm-arrivee">—</span>
+      </div>
+    </div>
 
     <div class="fm-actions" id="fm-actions"></div>
   </div>
@@ -7541,35 +7612,9 @@ function tempsTotalHtml(secondes, grand, libelle) {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 let ficheMembreId = null
-/* Plus de sélecteur à l'écran : la liste « où il passe son temps » montre le
-   mois en cours, et les deux durées qui comptent sont dans les trois cases. */
-let fmPeriode = 'month'
 
-function fmDebutPeriode() {
-  const now = new Date()
-  if (fmPeriode === 'week') {
-    const d = new Date(now); const j = (d.getDay() + 6) % 7
-    d.setDate(d.getDate() - j); d.setHours(0, 0, 0, 0); return d
-  }
-  if (fmPeriode === 'month') return new Date(now.getFullYear(), now.getMonth(), 1)
-  return null
-}
 
-/* La période précédente, de même longueur : c'est à elle qu'on se compare. */
-function fmPeriodePrecedente() {
-  const debut = fmDebutPeriode()
-  if (!debut) return null
-  const fin = new Date(debut)
-  const avant = new Date(debut)
-  if (fmPeriode === 'week') avant.setDate(avant.getDate() - 7)
-  else avant.setMonth(avant.getMonth() - 1)
-  return { avant, fin }
-}
 
-function fmLibellePeriode() {
-  return fmPeriode === 'week' ? 'cette semaine'
-    : fmPeriode === 'month' ? 'ce mois-ci' : 'depuis le d\u00e9but'
-}
 
 window.ouvrirFicheMembre = function(membreId) {
   ficheMembreId = membreId
@@ -7577,119 +7622,198 @@ window.ouvrirFicheMembre = function(membreId) {
   peindreFicheMembre()
 }
 
+/* Les couleurs des parts. Six teintes distinctes, reprises dans l'ordre au-delà.
+   Elles ne signifient rien en soi — elles servent à relier une part à sa ligne,
+   rien de plus. */
+const FM_TEINTES = ['#5EA0FF', '#30D158', '#FF9F0A', '#BF5AF2', '#FF9F5A', '#64D2FF']
+
+let fmClasse = []      // les procédures classées, avec leur couleur
+let fmDeplie = false
+let fmTotalMois = 0
+
 async function peindreFicheMembre() {
   if (!ficheMembreId || !currentGaData) return
   const { employes, procedures, validations } = currentGaData
   const m = (employes || []).concat(cachedMembres || []).find(x => x.id === ficheMembreId)
   if (!m) return
 
-  const el = (id) => document.getElementById(id)
+  const el = (i) => document.getElementById(i)
   el('fm-nom').textContent = m.nom || 'Sans nom'
-  const role = m.role === 'gestion' ? 'Gestion' : '\u00c9quipe'
+  el('fm-poste').textContent = m.poste || ''
 
-  const siennes = (validations || []).filter(v => v.membre_id === m.id)
-  /* Le temps total ne dépend pas de la période choisie : c'est ce que la
-     personne a passé sur vos procédures depuis qu'elle est là. */
-  const totalToutesPeriodes = siennes.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  const siennes = (validations || []).filter(v => v.membre_id === ficheMembreId)
 
-  el('fm-medaille').innerHTML = tempsTotalHtml(totalToutesPeriodes, true)
-  /* Tout ce qu'on sait de la personne tient en une ligne : son rôle, sa
-     série, sa dernière lecture. C'est ce qu'on lit avant de décider quoi
-     faire pour elle. */
-  const derniere = siennes.map(v => new Date(v.validated_at)).sort((a, b) => b - a)[0]
-  /* Le poste passe devant le rôle : « Cuisine » dit quelque chose de la personne,
-     « Équipe » ne dit que son niveau d'accès. */
   const debutMois = new Date()
   debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
-  const ceMois = siennes
-    .filter(v => new Date(v.validated_at) >= debutMois)
-    .reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  const duMois = siennes.filter(v => new Date(v.validated_at) >= debutMois)
 
-  el('fm-sous').innerHTML = [
-    m.poste ? `<b>${escapeHtml(m.poste)}</b>` : role,
-    ceMois ? `${dureeLisible(ceMois)} ce mois-ci` : 'rien ce mois-ci',
-    derniere ? 'derni\u00e8re lecture ' + ilYA(derniere) : 'jamais rien lu',
-  ].join(' \u00b7 ')
+  fmTotalMois = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
 
-  // ─── Le temps sur la période choisie ───
-  const debut = fmDebutPeriode()
-  const dedans = debut ? siennes.filter(v => new Date(v.validated_at) >= debut) : siennes
-  const secondes = dedans.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  /* Le classement : une entrée par procédure de l'entreprise, celles qui ont
+     du temps d'abord. Les jamais ouvertes restent dans la liste — c'est là
+     qu'on veut les voir — mais elles n'ont pas de part dans l'anneau. */
+  fmClasse = (procedures || []).map(p => {
+    const dessus = duMois.filter(v => v.procedure_id === p.id)
+    return {
+      proc: p,
+      secondes: dessus.reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
+      fois: dessus.length,
+    }
+  }).sort((a, b) => b.secondes - a.secondes)
 
-  /* Dans une case de 110 px, le nombre et son unité tiennent ensemble : plus
-     besoin de les séparer comme sur le grand chiffre d'avant. */
-  el('fm-temps').textContent = ceMois ? dureeLisible(ceMois) : '\u2014'
-  el('fm-total').textContent = totalToutesPeriodes ? dureeLisible(totalToutesPeriodes) : '\u2014'
+  let t = 0
+  fmClasse.forEach(x => { if (x.secondes) x.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
 
-  // ─── Les trois repères ───
-  const lues = new Set(dedans.map(v => v.procedure_id)).size
-  el('fm-lues').innerHTML = `${lues}<em>/${(procedures || []).length}</em>`
+  dessinerAnneauMembre()
+  fmDeplie = false
+  peindreClassementMembre()
 
-  // ─── Ses journées ───
-  peindreCourbeMembre(siennes)
+  // ─── L'activité ───
+  el('fm-nb-mois').textContent = duMois.length
+  el('fm-nb-total').textContent = siennes.length
 
-  // ─── Où il passe son temps ───
-  const parProc = {}
-  dedans.forEach(v => {
-    const k = v.procedure_id
-    if (!parProc[k]) parProc[k] = { s: 0, n: 0 }
-    parProc[k].s += Number(v.duree_lecture || 0)
-    parProc[k].n += 1
-  })
-  const top = Object.entries(parProc)
-    .map(([id, d]) => ({ proc: (procedures || []).find(p => p.id === id), ...d }))
-    .filter(x => x.proc)
-    .sort((a, b) => (b.s - a.s) || (b.n - a.n))
-    .slice(0, 4)
+  const derniere = siennes
+    .map(v => new Date(v.validated_at))
+    .sort((a, b) => b - a)[0]
+  el('fm-derniere').textContent = derniere ? ilYA(derniere) : 'jamais'
 
-  el('fm-top').innerHTML = top.length ? top.map((x) => `
-    <button type="button" class="fm-lig" data-proc="${x.proc.id}">
-      <span class="co"><span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
-        <span class="st">${x.n} lecture${x.n > 1 ? 's' : ''}</span></span>
-      <span class="vl">${x.s ? dureeLisible(x.s) : ''}</span>
-      <span class="fl">\u203a</span>
-    </button>`).join('')
-    : `<div class="an-vide">Aucune lecture ${fmLibellePeriode()}.</div>`
+  el('fm-arrivee').textContent = m.created_at
+    ? 'le ' + new Date(m.created_at).toLocaleDateString('fr-FR')
+    : '\u2014'
 
-  // ─── Ce qu'il n'a pas lu ───
-  const lu = new Set(siennes.map(v => v.procedure_id))
-  const reste = (procedures || []).filter(p => !lu.has(p.id))
-  el('fm-reste').innerHTML = reste.length ? reste.slice(0, 5).map(p => `
-    <button type="button" class="fm-lig" data-proc="${p.id}">
-      <span class="pt" style="background:var(--red)"></span>
-      <span class="co"><span class="nm">${escapeHtml(p.titre || 'Sans titre')}</span>
-        <span class="st">${escapeHtml(p.categorie || 'Sans cat\u00e9gorie')}</span></span>
-      <span class="fl">\u203a</span>
-    </button>`).join('')
-    : '<div class="an-vide">Tout a \u00e9t\u00e9 lu.</div>'
-
-  // ─── Ses appareils ───
-
-  // ─── Les actions du responsable ───
   peindreActionsMembre(m)
 }
 
-/* Les sept derniers jours, en barres. */
-function peindreCourbeMembre(validations) {
-  const jours = []
-  for (let i = 6; i >= 0; i--) {
-    const d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() - i)
-    const fin = new Date(d); fin.setDate(fin.getDate() + 1)
-    const dedans = validations.filter(v => {
-      const q = new Date(v.validated_at); return q >= d && q < fin
-    })
-    jours.push({
-      d,
-      valeur: dedans.reduce((s, v) => s + Number(v.duree_lecture || 0), 0) || dedans.length,
-    })
-  }
-  const max = Math.max(1, ...jours.map(j => j.valeur))
-  const seuil = max * 0.55
+/* L'anneau. Chaque part occupe une fraction du tour proportionnelle à son temps,
+   moins trois pixels pour que les parts ne se touchent pas. */
+function dessinerAnneauMembre() {
+  const zone = document.getElementById('fm-anneau')
+  if (!zone) return
 
-  /* Les journées en barres ne sont plus affichées : la forme retenue montre
-     d'abord ce qu'il lit et ce qu'il évite. Le rythme est une curiosité ;
-     savoir quoi faire pour cette personne est le vrai besoin. */
+  const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const vus = fmClasse.filter(x => x.secondes)
+  const somme = vus.reduce((s, x) => s + x.secondes, 0)
+
+  let pos = 0
+  const arcs = vus.map((x, i) => {
+    const frac = x.secondes / somme
+    const len = Math.max(0, circ * frac - 3)
+    const dep = -circ * pos
+    pos += frac
+    return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+      stroke="${x.couleur}" stroke-width="${ep}"
+      stroke-dasharray="0 ${circ}" data-len="${len}" data-circ="${circ}"
+      stroke-dashoffset="${dep}"/>`
+  }).join('')
+
+  zone.innerHTML = `
+    <svg width="${T}" height="${T}">
+      <circle cx="${T/2}" cy="${T/2}" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="${ep}"/>
+      ${arcs}
+    </svg>
+    <div class="dedans">
+      <span class="v" id="fm-anneau-v">\u2014</span>
+      <span class="u" id="fm-anneau-u">\u2014</span>
+      <span class="n" id="fm-anneau-n">\u2014</span>
+    </div>`
+
+  centreAnneauMembre(null)
+
+  /* Les parts se dessinent l'une après l'autre. On part de zéro et on étire :
+     poser la longueur finale d'emblée ne montrerait rien. */
+  zone.querySelectorAll('[data-arc]').forEach((a, i) => {
+    setTimeout(() => {
+      a.setAttribute('stroke-dasharray', `${a.dataset.len} ${a.dataset.circ}`)
+    }, 140 + i * 120)
+  })
 }
+
+/* Le centre : le total quand rien n'est choisi, la procédure seule sinon. */
+function centreAnneauMembre(choix) {
+  const v = document.getElementById('fm-anneau-v')
+  const u = document.getElementById('fm-anneau-u')
+  const n = document.getElementById('fm-anneau-n')
+  if (!v) return
+
+  if (!choix) {
+    const vus = fmClasse.filter(x => x.secondes).length
+    v.textContent = fmTotalMois < 3600
+      ? String(Math.round(fmTotalMois / 60))
+      : (fmTotalMois / 3600).toFixed(1).replace('.', ',')
+    u.textContent = fmTotalMois < 3600 ? 'minutes ce mois-ci' : 'heures ce mois-ci'
+    n.textContent = `${vus} proc\u00e9dure${vus > 1 ? 's' : ''} sur ${fmClasse.length}`
+    return
+  }
+
+  v.textContent = choix.secondes ? String(Math.round(choix.secondes / 60)) : '0'
+  u.textContent = choix.secondes ? 'minutes' : 'jamais ouverte'
+  n.textContent = escapeHtml(choix.proc.titre || 'Sans titre') +
+    (choix.fois ? ` \u00b7 ${choix.fois} fois` : '')
+}
+
+/* Le classement. Trois lignes, puis un bouton qui déplie le reste. */
+function peindreClassementMembre() {
+  const el = document.getElementById('fm-top')
+  if (!el) return
+
+  if (!fmClasse.length) {
+    el.innerHTML = '<div class="an-vide">Aucune proc\u00e9dure dans cette entreprise.</div>'
+    return
+  }
+
+  const vus = fmClasse.filter(x => x.secondes)
+  const visibles = fmDeplie ? fmClasse : fmClasse.slice(0, 3)
+
+  el.innerHTML = visibles.map(x => {
+    const i = vus.indexOf(x)
+    return `
+      <button type="button" class="fm-lg" data-part="${i}">
+        <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
+        <span class="co">
+          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
+          <span class="st">${escapeHtml(x.proc.categorie || 'Sans cat\u00e9gorie')}${
+            x.fois ? ' \u00b7 ' + x.fois + ' consultation' + (x.fois > 1 ? 's' : '') : ''}</span>
+        </span>
+        <span class="vl"${x.secondes ? '' : ' style="color:var(--label-3)"'}>${
+          x.secondes ? dureeLisible(x.secondes) : 'jamais'}</span>
+      </button>`
+  }).join('')
+
+  if (fmClasse.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'fm-plus'
+    b.textContent = fmDeplie ? 'Voir moins' : libelleVoirAutres(fmClasse.length - 3)
+    b.addEventListener('click', () => {
+      fmDeplie = !fmDeplie
+      peindreClassementMembre()
+    })
+    el.appendChild(b)
+  }
+
+  el.querySelectorAll('[data-part]').forEach(b => {
+    b.addEventListener('click', () => {
+      const i = Number(b.dataset.part)
+      const actif = b.classList.contains('choisi')
+      el.querySelectorAll('[data-part]').forEach(x => x.classList.remove('choisi'))
+      const arcs = document.querySelectorAll('#fm-anneau [data-arc]')
+
+      /* Toucher à nouveau la même ligne ramène au total. Sans ça, il faudrait
+         deviner où appuyer pour sortir de la sélection. */
+      if (actif) {
+        arcs.forEach(a => a.classList.remove('pale'))
+        centreAnneauMembre(null)
+        return
+      }
+      b.classList.add('choisi')
+      arcs.forEach((a, k) => a.classList.toggle('pale', k !== i))
+      const vus = fmClasse.filter(x => x.secondes)
+      centreAnneauMembre(i >= 0 ? vus[i] : fmClasse.find(x => !x.secondes &&
+        x.proc.titre === b.querySelector('.nm').textContent))
+    })
+  })
+}
+
 
 function peindreActionsMembre(m) {
   const el = document.getElementById('fm-actions')

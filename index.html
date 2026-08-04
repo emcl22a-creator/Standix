@@ -3202,7 +3202,7 @@
      démesurée est le moyen le plus simple de noircir tout ce qui l'entoure
      sans ajouter d'élément par-dessus la vidéo. */
   .scan-cible{
-    position:absolute; left:50%; top:46%; transform:translate(-50%, -50%);
+    position:absolute; left:50%; top:40%; transform:translate(-50%, -50%);
     width:min(62vw, 200px); aspect-ratio:1/1; border-radius:26px;
     background:rgba(255,255,255,0.08);
     box-shadow:0 0 0 9999px rgba(0,0,0,0.45);
@@ -3214,26 +3214,64 @@
   .scan-cible .bl{ bottom:-2px; left:-2px; border-width:0 0 3.5px 3.5px; border-bottom-left-radius:14px; }
   .scan-cible .br{ bottom:-2px; right:-2px; border-width:0 3.5px 3.5px 0; border-bottom-right-radius:14px; }
 
-  /* Le rayon qui balaie. Il dit que ça cherche : un viseur immobile laisse
-     croire que l'app a gelé. */
-  .scan-rayon{
-    position:absolute; left:0; right:0; height:56%; border-radius:26px;
-    background:linear-gradient(180deg,
-      rgba(94,160,255,0) 0%, rgba(94,160,255,0.40) 70%, rgba(94,160,255,0.60) 100%);
-    animation:scanBalaye 2.4s cubic-bezier(0.45,0,0.55,1) infinite;
-  }
-  @keyframes scanBalaye{
-    0%{ top:-56%; } 50%{ top:100%; } 50.01%{ top:100%; } 100%{ top:-56%; }
-  }
-
+  /* Le titre et la consigne, en bas de l'image. Un dégradé sous eux les détache
+     du fond quelle que soit la scène filmée — un plan de travail blanc rendrait
+     du texte blanc illisible. */
   .scan-mot{
-    position:absolute; left:0; right:0; bottom:76px; text-align:center;
-    padding:0 26px; pointer-events:none;
+    position:absolute; left:0; right:0; bottom:0;
+    padding:56px 24px 74px; text-align:center; pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0.78) 100%);
   }
   .scan-mot b{
-    font-size:16px; font-weight:700; letter-spacing:-0.03em;
-    text-shadow:0 2px 12px rgba(0,0,0,0.7);
+    display:block; font-size:19px; font-weight:750; letter-spacing:-0.035em;
+    text-shadow:0 2px 14px rgba(0,0,0,0.8);
   }
+  .scan-mot span{
+    display:block; font-size:13px; color:rgba(255,255,255,0.78); margin-top:5px;
+    line-height:1.45; text-shadow:0 2px 12px rgba(0,0,0,0.8);
+  }
+
+  /* Le message d'échec. Il respire : collé sous le viseur, il ressemblait à une
+     légende de l'image alors que c'est lui qu'il faut lire. */
+  .scan-echec{
+    margin-top:26px; padding:22px 20px; border-radius:20px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .scan-echec .ic{
+    width:46px; height:46px; border-radius:14px; margin:0 auto 14px;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,69,58,0.13); border:0.5px solid rgba(255,69,58,0.26);
+    color:var(--red);
+  }
+  .scan-echec .ic svg{ width:23px; height:23px; }
+  .scan-echec .t{ font-size:16px; font-weight:750; letter-spacing:-0.03em; text-align:center; }
+  .scan-echec .s{
+    font-size:13px; color:var(--label-2); line-height:1.5;
+    margin-top:7px; text-align:center;
+  }
+  .scan-echec .pas{
+    margin:18px 0 0; padding:0; list-style:none;
+    counter-reset:pas;
+  }
+  .scan-echec .pas li{
+    position:relative; counter-increment:pas;
+    padding:11px 0 11px 38px; font-size:13.5px; line-height:1.45;
+    border-bottom:0.5px solid rgba(255,255,255,0.055);
+  }
+  .scan-echec .pas li:last-child{ border-bottom:none; }
+  .scan-echec .pas li::before{
+    content:counter(pas); position:absolute; left:0; top:10px;
+    width:24px; height:24px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; font-weight:750; color:var(--label-2);
+    background:rgba(255,255,255,0.07); border:0.5px solid var(--border);
+  }
+  .scan-echec .pas b{ font-weight:700; color:#fff; }
+  .scan-echec .repli{
+    font-size:12px; color:var(--label-3); line-height:1.45; margin-top:14px;
+    padding-top:13px; border-top:0.5px solid rgba(255,255,255,0.055);
+  }
+  .scan-echec .btn{ margin-top:18px; }
 
   .scan-outils{ position:absolute; left:16px; right:16px; bottom:16px; display:flex; justify-content:flex-end; }
   .scan-lampe{
@@ -4636,13 +4674,17 @@
       <div class="scan-cible">
         <span class="c tl"></span><span class="c tr"></span>
         <span class="c bl"></span><span class="c br"></span>
-        <span class="scan-rayon"></span>
       </div>
-      <div class="scan-mot"><b id="g-scan-hint">Visez le QR code</b></div>
+
+      <!-- Le titre et la consigne au BAS de l'image : en haut, ils se posaient
+           sur ce qu'on cherche à cadrer. -->
+      <div class="scan-mot">
+        <b>Scanner un code</b>
+        <span id="g-scan-hint">Visez le QR code affiché sur votre poste</span>
+      </div>
+
       <div class="scan-outils">
-        <button type="button" class="scan-lampe" aria-label="Lampe">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></svg>
-        </button>
+        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 3h7.2l-.6 4.4a2 2 0 0 1-.7 1.3l-.9.7v13.1a1.5 1.5 0 0 1-3 0V9.4l-.9-.7a2 2 0 0 1-.7-1.3z"/><line x1="8" y1="7" x2="16" y2="7"/></svg></button>
       </div>
     </div>
     <div id="g-scan-result-zone"></div>
@@ -5295,13 +5337,17 @@
       <div class="scan-cible">
         <span class="c tl"></span><span class="c tr"></span>
         <span class="c bl"></span><span class="c br"></span>
-        <span class="scan-rayon"></span>
       </div>
-      <div class="scan-mot"><b id="scan-hint">Visez le QR code</b></div>
+
+      <!-- Le titre et la consigne au BAS de l'image : en haut, ils se posaient
+           sur ce qu'on cherche à cadrer. -->
+      <div class="scan-mot">
+        <b>Scanner un code</b>
+        <span id="scan-hint">Visez le QR code affiché sur votre poste</span>
+      </div>
+
       <div class="scan-outils">
-        <button type="button" class="scan-lampe" aria-label="Lampe">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></svg>
-        </button>
+        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.4 3h7.2l-.6 4.4a2 2 0 0 1-.7 1.3l-.9.7v13.1a1.5 1.5 0 0 1-3 0V9.4l-.9-.7a2 2 0 0 1-.7-1.3z"/><line x1="8" y1="7" x2="16" y2="7"/></svg></button>
       </div>
     </div>
     <div id="scan-result-zone"></div>
@@ -15652,8 +15698,8 @@ window.startScanner = async function(espace) {
     stopScanner()
     const nom = e && e.name
     if (nom === 'NotAllowedError' || nom === 'SecurityError') {
-      echecScanner(hintEl, zone, "Accès à la caméra refusé.",
-        "Sur iPhone : Réglages → Safari → Caméra → Autoriser, puis rechargez la page.")
+      /* Le cinquième argument déclenche la marche à suivre détaillée. */
+      echecScanner(hintEl, zone, '', '', true)
     } else if (nom === 'NotFoundError' || nom === 'OverconstrainedError') {
       echecScanner(hintEl, zone, "Aucune caméra détectée sur cet appareil.", '')
     } else if (nom === 'NotReadableError') {
@@ -15667,13 +15713,101 @@ window.startScanner = async function(espace) {
 }
 
 // Message d'échec lisible, avec un bouton pour retenter
-function echecScanner(hintEl, zone, titre, detail) {
-  hintEl.textContent = ''
+/* Le chemin exact pour rendre la caméra, selon l'appareil et le navigateur.
+
+   Un message générique — « autorisez la caméra » — ne sert à rien : une fois
+   refusée, l'autorisation ne se redemande plus. Le navigateur ne la reposera
+   pas, il faut aller la changer dans les réglages, et personne ne sait où.
+
+   On détecte donc l'appareil et on donne les touches à suivre, dans l'ordre. */
+function cheminReglagesCamera() {
+  const ua = navigator.userAgent
+  const iOS = /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const android = /Android/.test(ua)
+
+  /* Sur iOS, TOUS les navigateurs utilisent le moteur de Safari : le chemin est
+     le même quel que soit celui qu'on a installé. */
+  if (iOS) {
+    return {
+      appareil: 'iPhone',
+      etapes: [
+        'Touchez le <b>\u1d00A</b> \u00e0 gauche de la barre d\u2019adresse, en haut',
+        'Choisissez <b>R\u00e9glages du site web</b>',
+        'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
+        'Revenez ici et touchez <b>R\u00e9essayer</b>',
+      ],
+      repli: 'Si le menu n\u2019appara\u00eet pas : R\u00e9glages \u2192 Safari \u2192 Cam\u00e9ra \u2192 Demander ou Autoriser.',
+    }
+  }
+
+  if (android) {
+    const chrome = /Chrome|CriOS/.test(ua) && !/EdgA|OPR|SamsungBrowser/.test(ua)
+    const samsung = /SamsungBrowser/.test(ua)
+    if (samsung) {
+      return {
+        appareil: 'Samsung Internet',
+        etapes: [
+          'Touchez le <b>cadenas</b> \u00e0 gauche de l\u2019adresse',
+          'Choisissez <b>Autorisations</b>',
+          'Activez <b>Cam\u00e9ra</b>',
+          'Revenez ici et touchez <b>R\u00e9essayer</b>',
+        ],
+        repli: 'Ou : Param\u00e8tres du t\u00e9l\u00e9phone \u2192 Applications \u2192 Samsung Internet \u2192 Autorisations \u2192 Appareil photo.',
+      }
+    }
+    return {
+      appareil: chrome ? 'Chrome' : 'votre navigateur',
+      etapes: [
+        'Touchez le <b>cadenas</b> \u00e0 gauche de l\u2019adresse',
+        'Choisissez <b>Autorisations</b> ou <b>Param\u00e8tres du site</b>',
+        'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
+        'Revenez ici et touchez <b>R\u00e9essayer</b>',
+      ],
+      repli: 'Ou : Param\u00e8tres du t\u00e9l\u00e9phone \u2192 Applications \u2192 Chrome \u2192 Autorisations \u2192 Appareil photo.',
+    }
+  }
+
+  return {
+    appareil: 'ordinateur',
+    etapes: [
+      'Touchez l\u2019ic\u00f4ne \u00e0 gauche de la barre d\u2019adresse',
+      'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
+      'Rechargez la page',
+    ],
+    repli: '',
+  }
+}
+
+function echecScanner(hintEl, zone, titre, detail, refus) {
+  if (hintEl) hintEl.textContent = ''
+
+  /* Sans le refus explicite, on garde le message court : inutile d'expliquer
+     comment rétablir une autorisation quand le problème vient d'ailleurs. */
+  if (!refus) {
+    zone.innerHTML = `
+      <div class="scan-echec">
+        <div class="t">${escapeHtml(titre)}</div>
+        ${detail ? `<div class="s">${escapeHtml(detail)}</div>` : ''}
+        <button type="button" class="btn block" id="scan-retry">R\u00e9essayer</button>
+      </div>`
+    zone.querySelector('#scan-retry').addEventListener('click', () => startScanner(scanEspace))
+    return
+  }
+
+  const c = cheminReglagesCamera()
   zone.innerHTML = `
-    <div class="card" style="text-align:center;">
-      <div style="font-size:14px; font-weight:600; margin-bottom:4px;">${escapeHtml(titre)}</div>
-      ${detail ? `<div style="font-size:12.5px; color:var(--label-2); line-height:1.45;">${escapeHtml(detail)}</div>` : ''}
-      <button class="btn small" style="margin-top:14px;" id="scan-retry">Réessayer</button>
+    <div class="scan-echec">
+      <span class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+      </span>
+      <div class="t">La cam\u00e9ra est bloqu\u00e9e</div>
+      <div class="s">Votre navigateur a refus\u00e9 l\u2019acc\u00e8s. Il ne le redemandera pas tout seul \u2014 voici comment le r\u00e9tablir sur ${escapeHtml(c.appareil)}.</div>
+      <ol class="pas">
+        ${c.etapes.map(e => `<li>${e}</li>`).join('')}
+      </ol>
+      ${c.repli ? `<div class="repli">${c.repli}</div>` : ''}
+      <button type="button" class="btn block" id="scan-retry">R\u00e9essayer</button>
     </div>`
   zone.querySelector('#scan-retry').addEventListener('click', () => startScanner(scanEspace))
 }

@@ -883,6 +883,11 @@
   .fm-trois .v{ font-size:20px; font-weight:800; letter-spacing:-0.04em; }
   .fm-trois .l{ font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
 
+  /* Les deux listes s'alignent sur la carte d'introduction de la page Équipe :
+     mêmes 18 px de marge intérieure, pour que le texte parte de la même
+     verticale d'un écran à l'autre. */
+  #fm-top, .fm-rep{ padding:0 18px; }
+  .fm-titre{ padding:0 18px; }
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
     margin:24px 0 4px; text-transform:uppercase; letter-spacing:0.06em;
@@ -3835,10 +3840,14 @@
     <!-- Les mêmes champs que les écrans de modification : même libellé, même
            cadre, même taille. Une carte supplémentaire autour de deux champs
            n'apportait qu'un cadre de plus à lire. -->
-      <div class="man-lbl">Catégorie</div>
-      <input type="text" class="man-champ" id="new-categorie" placeholder="Ex : Cuisine">
-      <div class="man-lbl">Titre</div>
-      <input type="text" class="man-champ" id="new-titre" placeholder="Ex : Fermeture de caisse">
+      <div class="card">
+        <label class="f">Catégorie</label>
+        <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
+        <div style="margin-top:12px;">
+          <label class="f">Titre</label>
+          <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
+        </div>
+      </div>
 
     <div class="section-title">Comment créer cette procédure ?</div>
     <div class="note" id="mode-choice-note" style="margin-top:0; margin-bottom:10px;">Complétez le titre et la catégorie ci-dessus pour continuer.</div>
@@ -3902,10 +3911,14 @@
          l'impression de recommencer. En modification il faut bien pouvoir les
          corriger : c'est le seul endroit où ils ont leur place. -->
     <div id="man-entete" style="display:none;">
-      <div class="man-lbl">Catégorie</div>
-      <input type="text" class="man-champ" id="man-categorie" placeholder="Ex : Cuisine">
-      <div class="man-lbl">Titre</div>
-      <input type="text" class="man-champ" id="man-titre" placeholder="Ex : Fermeture de caisse">
+      <div class="card">
+        <label class="f">Catégorie</label>
+        <input type="text" id="man-categorie" placeholder="Ex : Cuisine">
+        <div style="margin-top:12px;">
+          <label class="f">Titre</label>
+          <input type="text" id="man-titre" placeholder="Ex : Fermeture de caisse">
+        </div>
+      </div>
     </div>
 
         <div class="couv couv-depot" id="couv-manuel">
@@ -3953,10 +3966,14 @@
          modification il faut bien pouvoir les corriger — et c'était impossible :
          une procédure vidéo gardait son titre pour toujours. -->
     <div id="dv-entete" style="display:none;">
-      <div class="man-lbl">Catégorie</div>
-      <input type="text" class="man-champ" id="dv-categorie" placeholder="Ex : Cuisine">
-      <div class="man-lbl">Titre</div>
-      <input type="text" class="man-champ" id="dv-titre" placeholder="Ex : Fermeture de caisse">
+      <div class="card">
+        <label class="f">Catégorie</label>
+        <input type="text" id="dv-categorie" placeholder="Ex : Cuisine">
+        <div style="margin-top:12px;">
+          <label class="f">Titre</label>
+          <input type="text" id="dv-titre" placeholder="Ex : Fermeture de caisse">
+        </div>
+      </div>
     </div>
 
     <!-- La même carte que l'écran de l'IA : une note qui cadre l'attente, le
@@ -4142,10 +4159,14 @@
     <!-- Catégorie avant Titre, et les mêmes champs qu'à la création. Deux écrans
          qui demandent la même chose doivent la demander pareil : sinon on croit
          remplir autre chose. -->
-    <div class="man-lbl">Catégorie</div>
-    <input type="text" class="man-champ" id="edit-categorie" placeholder="Ex : Cuisine">
-    <div class="man-lbl">Titre</div>
-    <input type="text" class="man-champ" id="edit-titre" placeholder="Ex : Fermeture de caisse">
+    <div class="card">
+      <label class="f">Catégorie</label>
+      <input type="text" id="edit-categorie" placeholder="Ex : Cuisine">
+      <div style="margin-top:12px;">
+        <label class="f">Titre</label>
+        <input type="text" id="edit-titre" placeholder="Ex : Fermeture de caisse">
+      </div>
+    </div>
 
     <div class="video-frame" id="edit-video-frame" style="display:none; margin-bottom:14px;">
       <video id="edit-video-player" playsinline webkit-playsinline></video>
@@ -7755,7 +7776,9 @@ function dessinerAnneauMembre() {
                   stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
         </mask>
       </defs>
-      <circle cx="${T/2}" cy="${T/2}" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="${ep}"/>
+      <!-- Plus de cercle de fond : il dessinait un anneau gris complet derrière
+           les parts, et l'œil voyait un cercle plein là où il n'y a que quatre
+           arcs. Ce qui manque doit se lire comme un vide, pas comme du gris. -->
       <g mask="url(#${idMasque})">${arcs}</g>
     </svg>
     <div class="dedans">

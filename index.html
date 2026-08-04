@@ -278,6 +278,21 @@
      Un trait relie les numéros et dit l'ordre sans qu'on ait à le lire. Une
      procédure EST une suite : la forme le montre au lieu de l'énoncer. */
 
+  /* Le choix du type d'enregistrement. Deux blocs pleine largeur plutôt que
+     deux segments : les libellés font une ligne et demie chacun. */
+  .ai-type{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .ai-type button{
+    display:flex; flex-direction:column; gap:3px; width:100%;
+    padding:13px 16px; border-radius:16px; text-align:left;
+    background:var(--bg-card); border:0.5px solid var(--border);
+    color:#fff; font-family:inherit;
+  }
+  .ai-type button .t{ font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
+  .ai-type button .s{ font-size:12px; color:var(--label-2); line-height:1.35; }
+  .ai-type button.on{ background:#fff; border-color:#fff; color:#000; }
+  .ai-type button.on .s{ color:rgba(0,0,0,0.58); }
+  .ai-type button:active{ opacity:0.75; }
+
   .man-lbl{
     font-size:12.5px; font-weight:650; color:var(--label-3); margin:24px 0 10px;
     display:flex; align-items:center; justify-content:space-between;
@@ -4287,6 +4302,20 @@
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
 
     <div class="card" id="ai-upload-card">
+    <!-- Deux usages, deux traitements. Le libellé ne parle pas de réglage
+         technique : la personne sait ce qu'elle a filmé, pas ce qu'Azure doit
+         en faire. -->
+    <div class="ai-type">
+      <button type="button" class="on" data-ai-type="geste">
+        <span class="t">Vous filmez un geste</span>
+        <span class="s">Cuisine, machine, manipulation</span>
+      </button>
+      <button type="button" data-ai-type="ecran">
+        <span class="t">Vous enregistrez votre écran</span>
+        <span class="s">Un logiciel, un site — l’IA lira le texte affiché</span>
+      </button>
+    </div>
+
       <div class="note" style="margin-bottom:12px;"><b style="color:#fff;">Expliquez chaque geste à voix haute</b> : c'est surtout la parole que l'IA écoute pour découper les étapes. Une procédure par vidéo, jusqu'à 10 minutes.</div>
       <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
            l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
@@ -10571,6 +10600,16 @@ document.getElementById('edit-defaire')?.addEventListener('click', () => {
   if (navigator.vibrate) navigator.vibrate(6)
 })
 
+/* Le choix du type d'enregistrement. */
+document.querySelectorAll('[data-ai-type]').forEach(b => {
+  b.addEventListener('click', () => {
+    document.querySelectorAll('[data-ai-type]').forEach(x => x.classList.remove('on'))
+    b.classList.add('on')
+    aiEcran = b.dataset.aiType === 'ecran'
+    if (navigator.vibrate) navigator.vibrate(6)
+  })
+})
+
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
   if (mode === 'doc') { resetDocScreen(); showGestionScreen('p-create-doc'); return }
@@ -10887,6 +10926,16 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
 })
 
 // ═══════════ GESTION : L'IA découpe la vidéo ═══════════
+/* Le type d'enregistrement, choisi avant l'analyse.
+
+   `false` — on filme un geste : seule la parole porte le sens. On envoie la
+   bande son, l'analyse est rapide et ne coûte presque rien.
+
+   `true` — on enregistre un écran : le sens est ÉCRIT dedans, noms de
+   transactions, libellés de champs. On envoie la vidéo pour qu'Azure lise ce
+   qui est affiché. Plus lent, plus cher — on ne le paie que quand ça sert. */
+let aiEcran = false
+
 let aiVideoFile = null
 let aiVideoDuree = 0        // durée de la vidéo, pour estimer le temps d'analyse
 let aiDebutAnalyse = 0      // heure de démarrage de l'analyse
@@ -11211,8 +11260,11 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        envoyer la vidéo entière lui ferait télécharger des dizaines de mégaoctets
        pour n'en garder que quelques-uns. Si l'extraction échoue — format
        exotique, navigateur récalcitrant — on lui donne la vidéo, comme avant. */
+    /* En mode écran, on envoie la VIDÉO : sans image, Azure n'aurait rien à
+       lire, et on paierait le préréglage complet pour le même résultat qu'avant.
+       Les deux vont ensemble — le réglage et le fichier. */
     let urlPourAnalyse = videoUrl
-    if (son) {
+    if (son && !aiEcran) {
       const cheminSon = `${base}_son.wav`
       const { error: errSon } = await supabase.storage.from('procedo-videos')
         .upload(cheminSon, son.blob, { contentType: 'audio/wav' })
@@ -11239,8 +11291,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
-      // L'analyse reçoit la bande son ; la fiche gardera la vidéo.
-      body: JSON.stringify({ procedure_id: newProc.id, video_url: urlPourAnalyse }),
+      // La bande son pour un geste filmé ; la vidéo entière pour un écran.
+      body: JSON.stringify({
+        procedure_id: newProc.id,
+        video_url: urlPourAnalyse,
+        avec_image: aiEcran,
+      }),
     })
     const startData = await startRes.json()
     if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")

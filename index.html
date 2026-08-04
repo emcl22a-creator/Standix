@@ -883,10 +883,9 @@
   .fm-trois .v{ font-size:20px; font-weight:800; letter-spacing:-0.04em; }
   .fm-trois .l{ font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
 
-  /* Aucun retrait supplémentaire : les listes touchent les marges de l'écran,
-     comme sur la page Équipe. Les 18 px que j'avais posés copiaient la marge
-     INTÉRIEURE d'une carte — mais sans carte autour, ce retrait ne s'explique
-     par rien et donne l'impression d'un cadre invisible. */
+  /* Les deux listes reprennent les 20 px de la carte du haut, titres compris :
+     le texte part de la même verticale du haut de l'écran jusqu'en bas. */
+  #fm-top, .fm-rep, #p-membre .fm-titre{ padding-left:20px; padding-right:20px; }
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
     margin:24px 0 4px; text-transform:uppercase; letter-spacing:0.06em;
@@ -991,15 +990,20 @@
   /* Le bouton d'aide, dans l'angle de la carte. La carte prend `position:relative`
      pour qu'il s'y accroche plutôt que de flotter dans l'écran. */
   #an-gain{ position:relative; }
+  /* Le bouton d'aide sur la LIGNE du titre, calé à droite. En position absolue
+     dans l'angle, il flottait au-dessus du texte sans lui appartenir. */
+  .gain-ligne{ display:flex; align-items:flex-start; gap:10px; }
+  .gain-ligne .t{ flex:1; min-width:0; }
+
   .gain-aide{
-    position:absolute; top:12px; right:12px; width:26px; height:26px;
+    flex-shrink:0; margin-top:-1px; width:26px; height:26px;
     border:none; background:none; padding:0; color:var(--label-3);
     display:flex; align-items:center; justify-content:center;
   }
   .gain-aide svg{ width:19px; height:19px; }
   .gain-aide:active{ opacity:0.55; }
   /* Le titre ne passe pas sous le bouton. */
-  #an-gain-t{ padding-right:32px; }
+
 
 /* Un peu d'air entre le mot d'introduction et le filtre : collés, on croit
      que le second commente le premier. */
@@ -4338,11 +4342,13 @@
       <!-- L'explication du comptage vit désormais ici, et ici seulement. Trois
            boutons identiques sur trois sections voisines donnaient à croire
            qu'ils disaient trois choses différentes. -->
-      <button type="button" class="an-aide gain-aide" data-aide-temps aria-label="Comment le temps est compté">
+      <div class="accueil-texte">
+        <div class="gain-ligne">
+          <div class="t" id="an-gain-t">—</div>
+          <button type="button" class="an-aide gain-aide" data-aide-temps aria-label="Comment le temps est compté">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><line x1="12" y1="11" x2="12" y2="16.5"/><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"/></svg>
       </button>
-      <div class="accueil-texte">
-        <div class="t" id="an-gain-t">—</div>
+        </div>
         <div class="s" id="an-gain-s">—</div>
       </div>
     </div>
@@ -7677,6 +7683,8 @@ window.ouvrirFicheMembre = function(membreId) {
 const FM_TEINTES = ['#5EA0FF', '#30D158', '#FF9F0A', '#BF5AF2', '#FF9F5A', '#64D2FF']
 
 let fmClasse = []      // les procédures classées, avec leur couleur
+let fmSurTotal = false // faux : le mois en cours · vrai : depuis le début
+let fmMembre = null    // le membre affiché, pour repeindre sans tout relire
 let fmDeplie = false
 let fmTotalMois = 0
 
@@ -7690,11 +7698,17 @@ async function peindreFicheMembre() {
   el('fm-nom').textContent = m.nom || 'Sans nom'
   el('fm-poste').textContent = m.poste || ''
 
+  fmMembre = m
   const siennes = (validations || []).filter(v => v.membre_id === ficheMembreId)
 
+  /* La fenêtre de temps : le mois en cours, ou tout depuis le début. On bascule
+     d'un glissement latéral, pas d'un bouton — la page est déjà dense, et le
+     geste se retient mieux qu'un sélecteur de plus. */
   const debutMois = new Date()
   debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
-  const duMois = siennes.filter(v => new Date(v.validated_at) >= debutMois)
+  const duMois = fmSurTotal
+    ? siennes
+    : siennes.filter(v => new Date(v.validated_at) >= debutMois)
 
   fmTotalMois = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
 
@@ -7718,7 +7732,11 @@ async function peindreFicheMembre() {
   peindreClassementMembre()
 
   // ─── L'activité ───
-  el('fm-nb-mois').textContent = duMois.length
+  /* Ces deux compteurs ne suivent PAS le glissement : ils disent toujours le
+     mois d'un côté et le total de l'autre. C'est leur intérêt — les faire
+     changer ensemble reviendrait à afficher deux fois le même nombre. */
+  const vraimentCeMois = siennes.filter(v => new Date(v.validated_at) >= debutMois)
+  el('fm-nb-mois').textContent = vraimentCeMois.length
   el('fm-nb-total').textContent = siennes.length
 
   const derniere = siennes
@@ -7812,6 +7830,38 @@ document.getElementById('p-membre')?.addEventListener('click', (e) => {
   centreAnneauMembre(null)
 })
 
+/* Glisser vers la gauche ou la droite bascule entre le mois et le total.
+
+   On exige un mouvement franchement horizontal — au moins 60 px, et deux fois
+   plus large que haut. Sans cette seconde condition, un simple défilement du
+   pouce déclencherait la bascule à chaque fois. */
+;(() => {
+  const ecran = document.getElementById('p-membre')
+  if (!ecran) return
+  let x0 = null, y0 = null
+
+  ecran.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) { x0 = null; return }
+    x0 = e.touches[0].clientX
+    y0 = e.touches[0].clientY
+  }, { passive: true })
+
+  ecran.addEventListener('touchend', (e) => {
+    if (x0 == null) return
+    const dx = e.changedTouches[0].clientX - x0
+    const dy = e.changedTouches[0].clientY - y0
+    x0 = null
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) return
+
+    /* Les deux sens font la même chose : on ne va qu'entre deux états, et
+       imposer un sens pour l'aller et l'autre pour le retour ne s'apprend pas. */
+    fmSurTotal = !fmSurTotal
+    if (navigator.vibrate) navigator.vibrate(8)
+    toast(fmSurTotal ? 'Depuis le d\u00e9but' : 'Ce mois-ci')
+    peindreFicheMembre()
+  }, { passive: true })
+})()
+
 function centreAnneauMembre(choix) {
   const v = document.getElementById('fm-anneau-v')
   const u = document.getElementById('fm-anneau-u')
@@ -7824,7 +7874,7 @@ function centreAnneauMembre(choix) {
        « 72 » se compare tout seul. */
     const vus = fmClasse.filter(x => x.secondes).length
     v.textContent = String(Math.round(fmTotalMois / 60))
-    u.textContent = 'minutes ce mois-ci'
+    u.textContent = fmSurTotal ? 'minutes au total' : 'minutes ce mois-ci'
     n.textContent = `${vus} proc\u00e9dure${vus > 1 ? 's' : ''} sur ${fmClasse.length}`
     return
   }

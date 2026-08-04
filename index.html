@@ -1626,13 +1626,6 @@
     white-space:pre-wrap; word-break:break-word; max-height:120px; overflow-y:auto;
     -webkit-user-select:text; user-select:text;
   }
-  .bandeau-bloc .a{ display:flex; gap:8px; margin-top:11px; }
-  .bandeau-bloc button{
-    flex:1; height:36px; border:none; border-radius:11px; font-family:inherit;
-    font-size:12.5px; font-weight:650; background:rgba(255,255,255,0.10);
-    color:#fff; border:0.5px solid var(--border);
-  }
-  .bandeau-bloc #bandeau-bloc-recharger{ background:#fff; color:#000; border-color:transparent; }
 
   /* ═══════════════════════════════════════════════════════════════════
      LA PAGE DES OFFRES
@@ -5057,12 +5050,7 @@
   </div>
 </div>
 
-  <div class="s" id="bandeau-bloc-detail">—</div>
-  <div class="a">
-    <button type="button" id="bandeau-bloc-copier">Copier le détail</button>
-    <button type="button" id="bandeau-bloc-recharger">Recharger</button>
-  </div>
-</div>
+  
 
 
 
@@ -5439,6 +5427,12 @@
 <!-- Bandeau de diagnostic : n'apparaît que si le chargement se bloque -->
 <div class="bandeau-bloc" id="bandeau-bloc">
   <div class="t">Le chargement n'aboutit pas</div>
+  <!-- Le détail technique reste : il sert quand on nous écrit. Les boutons
+       « Copier le détail » et « Recharger » ont été retirés — ce bandeau dit ce
+       qui ne va pas, il n'a pas à proposer des outils de débogage à quelqu'un
+       qui veut juste ouvrir ses procédures. -->
+  <div class="s" id="bandeau-bloc-detail">—</div>
+</div>
 
 <!-- UNE SEULE barre pour les deux espaces.
 
@@ -6593,12 +6587,6 @@ window.addEventListener('unhandledrejection', (e) => {
 })
 window.addEventListener('error', (e) => { derniereErreur = e.message })
 
-document.getElementById('bandeau-bloc-recharger')?.addEventListener('click', () => location.reload())
-document.getElementById('bandeau-bloc-copier')?.addEventListener('click', async () => {
-  const t = document.getElementById('bandeau-bloc-detail')?.textContent || ''
-  try { await navigator.clipboard.writeText(t); toast('D\u00e9tail copi\u00e9.') }
-  catch (e) { toast('S\u00e9lectionnez le texte \u00e0 la main.') }
-})
 
 /* ═══════════════════════════════════════════════════════════════════════════
    CHOISIR LA BONNE FICHE MEMBRE

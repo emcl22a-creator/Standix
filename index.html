@@ -898,6 +898,10 @@
   /* Le titre ne passe pas sous le bouton. */
   #an-gain-t{ padding-right:32px; }
 
+/* Un peu d'air entre le mot d'introduction et le filtre : collés, on croit
+     que le second commente le premier. */
+  .an-intro + .an-periode-dd{ margin-top:18px; }
+
   .an-lig{
     display:flex; align-items:center; gap:12px; width:100%;
     padding:12px 2px; background:none; border:none;
@@ -1112,8 +1116,6 @@
     font-family:ui-monospace, monospace; margin-top:3px; font-weight:500;
   }
 
-  .dv-avance{ display:none; }
-  .dv-avance.on{ display:block; }
 
   /* ═══ Image d'une étape manuelle ═══
      Une photo du résultat attendu vaut souvent mieux qu'une phrase. Elle est
@@ -1638,19 +1640,6 @@
     font-family:inherit; text-align:left; color:#fff;
     transition:background 0.18s;
   }
-  /* Un filet entre deux lignes voisines. Le retrait de 46 px le fait partir
-     après l'icône et non sous elle : sans ça, il coupe le groupe en deux au lieu
-     de séparer les lignes. */
-  .reg-ligne + .reg-ligne{
-    border-top:0.5px solid rgba(255,255,255,0.075);
-    background-clip:padding-box;
-  }
-  .reg-ligne + .reg-ligne::before{
-    content:''; position:absolute; left:0; top:-0.5px; width:46px; height:0.5px;
-    background:var(--bg-card);
-  }
-  .reg-ligne{ position:relative; }
-  .reg-ligne.danger + .reg-ligne, .reg-ligne + .reg-ligne.danger{ border-top:none; }
 
   .reg-ligne:active{ background:rgba(255,255,255,0.06); }
   /* Le filet s'arrête à l'aplomb du texte, pas de la tuile : c'est ce qui donne
@@ -3926,14 +3915,9 @@
       </button>
       <div class="vid-ia-note" id="vid-ia-note"></div>
 
-      <!-- « Aller plus loin » cachait une seule action derrière un repli : autant
-           la montrer. Un tiroir pour un bouton coûte un geste et n'apprend rien. -->
-      <div class="dv-avance on" id="dv-avance">
-        <button type="button" class="ligne" id="dv-recommencer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.5 15a9 9 0 1 0 2.1-9.4L1 10"/></svg>
-          <span class="nm">Tout recommencer</span>
-        </button>
-      </div>
+      <!-- « Tout recommencer » retiré de la modification : effacer d'un coup les
+           étapes d'une procédure déjà publiée n'est pas une correction, c'est une
+           destruction — et le bouton était juste au-dessus de « Enregistrer ». -->
 
       <div class="error-msg" id="create-error-video"></div>
       <!-- Le retour est ici aussi, pas seulement en haut : arrivé en bas d'une
@@ -4523,6 +4507,8 @@
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/><circle cx="17.4" cy="9.6" r="2.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="reg-nm">Équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
+        <!-- Le filet du groupe : le même que partout ailleurs. -->
+        <div class="reg-filet"></div>
         <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"/><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"/><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"/></svg></span>
           <span class="reg-nm">Les postes</span>
@@ -9023,7 +9009,6 @@ function resetCreateForm() {
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'block'
   document.getElementById('dv-travail').style.display = 'none'
-  document.getElementById('dv-avance').classList.remove('on')
   document.getElementById('create-error-manual').textContent = ''
   document.getElementById('create-error-video').textContent = ''
   manualSteps = []
@@ -11971,21 +11956,6 @@ document.getElementById('dv-frise')?.addEventListener('click', (e) => {
 })
 
 
-document.getElementById('dv-recommencer')?.addEventListener('click', async () => {
-  if (!videoSteps.length) return
-  const ok = await confirmDialog({
-    titre: 'Tout recommencer ?',
-    message: `Les ${videoSteps.length} \u00e9tapes d\u00e9coup\u00e9es seront effac\u00e9es. La vid\u00e9o reste en place.`,
-    confirmer: 'Recommencer', annuler: 'Annuler', danger: true,
-  })
-  if (!ok) return
-  videoSteps = []
-  dvSelection = null
-  const v = dvLecteur()
-  if (v) { v.pause(); v.currentTime = 0 }
-  dvDebutEnCours = 0
-  dvMajGeste(); renderVideoSteps(); dvMajFrise()
-})
 
 function renderVideoSteps(listEl) {
   const el = document.getElementById('video-steps-list')
@@ -13435,9 +13405,12 @@ async function openEquipeDetail(procId) {
               aria-label="\u00c9tape ${i + 1}">${faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)}</button>
       <div class="et-co">
         <p>${escapeHtml(etape.texte)}</p>
+        <!-- La durée est À L'INTÉRIEUR du bloc de texte, après le paragraphe.
+             En voisine du texte, elle en rognait la largeur : la ligne étant
+             horizontale, chaque phrase perdait la place de la pastille. -->
+        ${hasClip ? `<span class="badge extrait" style="cursor:pointer;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
         ${etape.image_url ? `<div class="detail-step-img"><img data-fichier="${escapeHtml(cheminFichier(etape.image_url))}" alt="" loading="lazy"></div>` : ''}
       </div>
-      ${hasClip ? `<span class="badge extrait" style="cursor:pointer; flex-shrink:0;">▶ ${formatTime(bounds.start)}–${formatTime(bounds.end)}</span>` : ''}
     `
     /* Les mêmes repères que côté gestion, et pour TOUTES les étapes : l'employé
        qui apprend un geste doit pouvoir marquer où il en est, que la procédure

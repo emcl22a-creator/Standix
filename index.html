@@ -4634,23 +4634,28 @@
       <div class="t">Ce qui occupe le plus votre équipe</div>
       <div class="s">Une procédure qui absorbe deux heures par mois mérite un regard : soit elle est essentielle, soit elle est mal écrite.</div>
     </div>
-    <div class="dd-filter an-periode-dd">
-      <button type="button" class="dd-trigger" data-an-trigger>
-        <span data-an-label>Ce mois</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="dd-menu" data-an-menu>
-        <button type="button" class="selected" data-an-periode="month">Ce mois</button>
-        <button type="button" data-an-periode="all">Total</button>
-      </div>
-    </div>
-    <!-- Le même anneau segmenté que la fiche d'un membre : une part par entrée,
-         proportionnelle au temps. Toucher une ligne pâlit les autres parts. -->
-    <div class="fm-segm">
-      <div class="svg" id="an-anneau-proc"></div>
+    <!-- Deux panneaux côte à côte, comme la fiche d'un membre : le mois en cours,
+         puis depuis le début. Le déroulant a été retiré — on glisse. Le défilement
+         horizontal natif s'occupe de l'animation : on voit les deux pendant le
+         geste, ça s'aimante à l'arrivée, et l'inertie est celle du système. -->
+    <div class="fm-piste" id="an-piste-proc">
+      <section class="fm-pan" data-periode="month">
+        <div class="fm-segm"><div class="svg" id="an-anneau-proc-month"></div></div>
+        <div class="fm-titre">Ce qui occupe le plus</div>
+        <div id="an-top-proc-month"></div>
+      </section>
+      <section class="fm-pan" data-periode="all">
+        <div class="fm-segm"><div class="svg" id="an-anneau-proc-all"></div></div>
+        <div class="fm-titre">Ce qui occupe le plus</div>
+        <div id="an-top-proc-all"></div>
+      </section>
     </div>
 
-    <div id="an-temps-liste" style="margin-top:12px;"></div>
+    <div class="fm-barre" id="an-barre-proc">
+      <button type="button" data-va="month" aria-label="Ce mois-ci"><span></span></button>
+      <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
+    </div>
+    <div class="fm-periode-mot" id="an-mot-proc">Ce mois-ci</div>
   </div>
 
   <!-- Le même écran que dans l'espace équipe. Il faut son jumeau ici : les deux
@@ -7562,13 +7567,6 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     return
   }
 
-  /* Le même anneau que pour les catégories, sur la page complète seulement. */
-  if (tout) {
-    dessinerAnneauAnalyse('an-anneau-proc',
-      classement.map(x => ({ nom: x.proc.titre || 'Sans titre', secondes: x.total })), libelle)
-    brancherAnneauAnalyse('proc', libelle)
-  }
-
   const visibles = tout ? classement : classement.slice(0, 3)
 
   /* La même forme que la section Équipe : une ligne nue, le nom au-dessus de
@@ -8559,11 +8557,271 @@ window.ouvrirAnTemps = function() {
   peindreAnTemps()
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE DES PROCÉDURES
+
+   Même construction que la fiche d'un membre : deux panneaux qu'on fait glisser,
+   un anneau segmenté par période, et le classement en dessous. Deux pages qui
+   montrent la même chose — où part le temps — doivent se lire pareil.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let anProcVues = { month: { classe: [], total: 0, deplie: false },
+                   all:   { classe: [], total: 0, deplie: false } }
+let anProcPeriode = 'month'
+
 function peindreAnTemps() {
-  const el = document.getElementById('an-temps-liste')
-  if (!el || !currentGaData) return
-  renderTempsLecture(currentGaData.procedures, anValidationsPeriode(), anLibelle(), el, true)
+  if (!currentGaData) return
+  const { procedures, validations } = currentGaData
+
+  const debutMois = new Date()
+  debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+  const duMois = (validations || []).filter(v => new Date(v.validated_at) >= debutMois)
+
+  for (const [cle, lot] of [['month', duMois], ['all', validations || []]]) {
+    const vue = anProcVues[cle]
+    const parProc = {}
+    lot.forEach(v => {
+      const s = Number(v.duree_lecture || 0)
+      if (!s) return
+      if (!parProc[v.procedure_id]) parProc[v.procedure_id] = { total: 0, lecteurs: new Set() }
+      parProc[v.procedure_id].total += s
+      parProc[v.procedure_id].lecteurs.add(v.membre_id)
+    })
+
+    vue.classe = Object.entries(parProc)
+      .map(([id, d]) => ({ proc: (procedures || []).find(x => x.id === id), ...d }))
+      .filter(x => x.proc)
+      .sort((a, b) => b.total - a.total)
+
+    vue.total = vue.classe.reduce((s, x) => s + x.total, 0)
+    vue.classe.forEach((x, k) => { x.couleur = FM_TEINTES[k % FM_TEINTES.length] })
+
+    vue.deplie = false
+    dessinerAnneauProc(cle)
+    peindreClassementProc(cle)
+  }
+  majBarreProc()
 }
+
+/* L'anneau d'une période. Même géométrie que celui de la fiche membre : bouts
+   arrondis, donc on retire `ep` à la longueur et on décale d'une demi-épaisseur,
+   sinon les parts se chevauchent. */
+function dessinerAnneauProc(cle) {
+  const zone = document.getElementById('an-anneau-proc-' + cle)
+  if (!zone) return
+
+  const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const ECART = 5
+  const vue = anProcVues[cle]
+  const vus = vue.classe.filter(x => x.total)
+  const somme = vus.reduce((s, x) => s + x.total, 0)
+
+  if (!vus.length || !somme) {
+    zone.innerHTML = ''
+    zone.closest('.fm-segm')?.style.setProperty('display', 'none')
+    return
+  }
+  zone.closest('.fm-segm')?.style.removeProperty('display')
+
+  let pos = 0
+  const arcs = vus.map((x, i) => {
+    const frac = x.total / somme
+    const len = Math.max(0.1, circ * frac - ECART - ep)
+    const depart = circ * pos + ECART / 2 + ep / 2
+    pos += frac
+    return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+      stroke="${x.couleur}" stroke-width="${ep}"
+      stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
+  }).join('')
+
+  /* L'anneau se dévoile d'un seul tour : une aiguille invisible fait le tour du
+     cadran et révèle les parts, déjà en place dessous. Son bout est DROIT —
+     arrondi, sa demi-épaisseur déborderait avant midi et laisserait voir la
+     dernière couleur. */
+  const idMasque = 'an-proc-masque-' + cle + '-' + Date.now()
+  zone.innerHTML = `
+    <svg width="${T}" height="${T}">
+      <defs>
+        <mask id="${idMasque}">
+          <circle class="fm-aiguille" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+                  stroke="#fff" stroke-width="${ep + 3}"
+                  stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+        </mask>
+      </defs>
+      <g mask="url(#${idMasque})">${arcs}</g>
+    </svg>
+    <div class="dedans">
+      <span class="v"></span><span class="u"></span><span class="n"></span>
+    </div>`
+
+  centreAnneauProc(cle, null)
+
+  const aiguille = zone.querySelector('.fm-aiguille')
+  if (aiguille) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
+    })
+  }
+}
+
+/* Toujours en minutes : « 1,2 » demande une conversion pour être comparé au
+   « 31 min » affiché juste en dessous ; « 72 » se compare tout seul. */
+function centreAnneauProc(cle, choix) {
+  const zone = document.getElementById('an-anneau-proc-' + cle)
+  if (!zone) return
+  const v = zone.querySelector('.v'), u = zone.querySelector('.u'), n = zone.querySelector('.n')
+  if (!v) return
+
+  const vue = anProcVues[cle]
+  if (!choix) {
+    v.textContent = String(Math.round(vue.total / 60))
+    u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
+    n.textContent = `${vue.classe.length} proc\u00e9dure${vue.classe.length > 1 ? 's' : ''}`
+    return
+  }
+  v.textContent = String(Math.round(choix.total / 60))
+  u.textContent = 'minutes'
+  n.textContent = escapeHtml(choix.proc.titre || 'Sans titre')
+}
+
+/* Le classement. Trois lignes, puis un bouton qui déplie le reste — la forme
+   exacte de la fiche d'un membre. */
+function peindreClassementProc(cle, animerDes) {
+  const el = document.getElementById('an-top-proc-' + cle)
+  if (!el) return
+
+  const vue = anProcVues[cle]
+  if (!vue.classe.length) {
+    el.innerHTML = vide({
+      dessin: NEANT_PROCEDURE,
+      titre: cle === 'all' ? 'Rien de lu pour l\u2019instant' : 'Rien de lu ce mois-ci',
+      phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe.",
+    })
+    return
+  }
+
+  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, 3)
+
+  el.innerHTML = visibles.map((x, rang) => {
+    const n = x.lecteurs.size
+    const neuve = animerDes != null && rang >= animerDes
+    return `
+      <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
+              ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
+              data-part="${rang}" data-proc="${escapeHtml(x.proc.id)}">
+        <span class="pt" style="background:${x.couleur}"></span>
+        <span class="co">
+          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
+          <span class="st">${escapeHtml(x.proc.categorie || 'Sans cat\u00e9gorie')}${
+            n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
+        </span>
+        <span class="vl">${dureeLisible(x.total)}</span>
+      </button>`
+  }).join('')
+
+  if (vue.classe.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'fm-plus'
+    b.textContent = vue.deplie ? 'Voir moins' : 'Voir plus'
+    b.addEventListener('click', () => {
+      const avant = b.getBoundingClientRect().top
+      if (vue.deplie) {
+        const enTrop = [...el.querySelectorAll('.fm-lg')].slice(3)
+        enTrop.forEach((l, k) => {
+          l.style.animationDelay = ((enTrop.length - 1 - k) * 0.04) + 's'
+          l.classList.add('part')
+        })
+        setTimeout(() => {
+          vue.deplie = false
+          peindreClassementProc(cle)
+          glisserBoutonProc(cle, avant)
+        }, 240 + enTrop.length * 40)
+        return
+      }
+      vue.deplie = true
+      peindreClassementProc(cle, 3)
+      glisserBoutonProc(cle, avant)
+    })
+    el.appendChild(b)
+  }
+
+  /* Toucher une ligne éclaire sa part, comme sur la fiche d'un membre. Un appui
+     long ouvre la procédure : le geste court sert à comparer, le long à aller
+     voir. Deux intentions distinctes, deux gestes distincts. */
+  el.querySelectorAll('[data-part]').forEach(b => {
+    let minuteur = null
+    let ouverte = false
+
+    const ouvrir = () => { ouverte = true; openAnalyse(b.dataset.proc) }
+    b.addEventListener('pointerdown', () => {
+      ouverte = false
+      minuteur = setTimeout(ouvrir, 550)
+    })
+    const annuler = () => { if (minuteur) { clearTimeout(minuteur); minuteur = null } }
+    b.addEventListener('pointerup', annuler)
+    b.addEventListener('pointerleave', annuler)
+    b.addEventListener('pointercancel', annuler)
+
+    b.addEventListener('click', () => {
+      if (ouverte) return
+      const i = Number(b.dataset.part)
+      const actif = b.classList.contains('choisi')
+      el.querySelectorAll('[data-part]').forEach(x => x.classList.remove('choisi'))
+      const arcs = document.querySelectorAll('#an-anneau-proc-' + cle + ' [data-arc]')
+
+      if (actif) {
+        arcs.forEach(a => a.classList.remove('pale'))
+        centreAnneauProc(cle, null)
+        return
+      }
+      b.classList.add('choisi')
+      arcs.forEach((a, k) => a.classList.toggle('pale', k !== i))
+      centreAnneauProc(cle, vue.classe[i])
+    })
+  })
+}
+
+function glisserBoutonProc(cle, ancienHaut) {
+  const b = document.querySelector('#an-top-proc-' + cle + ' .fm-plus')
+  if (!b || ancienHaut == null) return
+  const ecart = ancienHaut - b.getBoundingClientRect().top
+  if (!ecart) return
+  b.style.transition = 'none'
+  b.style.transform = `translateY(${ecart}px)`
+  requestAnimationFrame(() => {
+    b.classList.add('glisse')
+    b.style.transform = 'translateY(0)'
+  })
+}
+
+function majBarreProc() {
+  document.querySelectorAll('#an-barre-proc [data-va]').forEach(b => {
+    b.classList.toggle('on', b.dataset.va === anProcPeriode)
+  })
+  const mot = document.getElementById('an-mot-proc')
+  if (mot) mot.textContent = anProcPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+}
+
+;(() => {
+  const piste = document.getElementById('an-piste-proc')
+  if (!piste) return
+
+  piste.addEventListener('scroll', () => {
+    const page = piste.scrollLeft > piste.clientWidth / 2 ? 'all' : 'month'
+    if (page === anProcPeriode) return
+    anProcPeriode = page
+    majBarreProc()
+    if (navigator.vibrate) navigator.vibrate(6)
+  }, { passive: true })
+
+  document.querySelectorAll('#an-barre-proc [data-va]').forEach(b => {
+    b.addEventListener('click', () => {
+      piste.scrollTo({ left: b.dataset.va === 'all' ? piste.clientWidth : 0, behavior: 'smooth' })
+    })
+  })
+})()
+
 
 /* Le résumé de l'analyse ne s'ouvre plus. C'est un aperçu — trois lignes pour
    savoir où en est l'équipe —, pas un point d'entrée. La fiche d'un membre

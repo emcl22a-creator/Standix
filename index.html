@@ -3151,17 +3151,65 @@
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
 
-  .scan-wrap{ position:relative; max-width:280px; margin:20px auto 18px; aspect-ratio:1/1; border-radius:24px; overflow:hidden; background:#000; border:0.5px solid var(--border); }
-  .scan-wrap video{ width:100%; height:100%; object-fit:cover; }
-  .scan-frame .corner{ position:absolute; width:34px; height:34px; border-color:#fff; border-style:solid; opacity:0.9; pointer-events:none; }
-  .scan-frame .tl{top:16px; left:16px; border-width:3px 0 0 3px; border-top-left-radius:12px;}
-  .scan-frame .tr{top:16px; right:16px; border-width:3px 3px 0 0; border-top-right-radius:12px;}
-  .scan-frame .bl{bottom:16px; left:16px; border-width:0 0 3px 3px; border-bottom-left-radius:12px;}
-  .scan-frame .br{bottom:16px; right:16px; border-width:0 3px 3px 0; border-bottom-right-radius:12px;}
-  .scan-hint{ text-align:center; font-size:13px; color:var(--label-2); }
+  /* ═══ Le viseur ═══ */
   .scan-result{ margin-top:18px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:16px; display:flex; align-items:center; gap:12px; }
   .scan-result .icon{ width:38px; height:38px; border-radius:12px; background:var(--green); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .scan-result .icon svg{width:20px; height:20px; color:#000;}
+  .scan-vue{
+    position:relative; margin-top:16px; height:calc(100vh - 300px);
+    max-height:460px; min-height:320px;
+    border-radius:26px; overflow:hidden; background:#000;
+    border:0.5px solid var(--border);
+  }
+  .scan-vue video{ width:100%; height:100%; object-fit:cover; display:block; }
+
+  /* La cible éclaircit la zone utile et assombrit le reste. L'ombre portée
+     démesurée est le moyen le plus simple de noircir tout ce qui l'entoure
+     sans ajouter d'élément par-dessus la vidéo. */
+  .scan-cible{
+    position:absolute; left:50%; top:46%; transform:translate(-50%, -50%);
+    width:min(62vw, 200px); aspect-ratio:1/1; border-radius:26px;
+    background:rgba(255,255,255,0.08);
+    box-shadow:0 0 0 9999px rgba(0,0,0,0.45);
+    pointer-events:none;
+  }
+  .scan-cible .c{ position:absolute; width:30px; height:30px; border-color:#fff; border-style:solid; }
+  .scan-cible .tl{ top:-2px; left:-2px; border-width:3.5px 0 0 3.5px; border-top-left-radius:14px; }
+  .scan-cible .tr{ top:-2px; right:-2px; border-width:3.5px 3.5px 0 0; border-top-right-radius:14px; }
+  .scan-cible .bl{ bottom:-2px; left:-2px; border-width:0 0 3.5px 3.5px; border-bottom-left-radius:14px; }
+  .scan-cible .br{ bottom:-2px; right:-2px; border-width:0 3.5px 3.5px 0; border-bottom-right-radius:14px; }
+
+  /* Le rayon qui balaie. Il dit que ça cherche : un viseur immobile laisse
+     croire que l'app a gelé. */
+  .scan-rayon{
+    position:absolute; left:0; right:0; height:56%; border-radius:26px;
+    background:linear-gradient(180deg,
+      rgba(94,160,255,0) 0%, rgba(94,160,255,0.40) 70%, rgba(94,160,255,0.60) 100%);
+    animation:scanBalaye 2.4s cubic-bezier(0.45,0,0.55,1) infinite;
+  }
+  @keyframes scanBalaye{
+    0%{ top:-56%; } 50%{ top:100%; } 50.01%{ top:100%; } 100%{ top:-56%; }
+  }
+
+  .scan-mot{
+    position:absolute; left:0; right:0; bottom:76px; text-align:center;
+    padding:0 26px; pointer-events:none;
+  }
+  .scan-mot b{
+    font-size:16px; font-weight:700; letter-spacing:-0.03em;
+    text-shadow:0 2px 12px rgba(0,0,0,0.7);
+  }
+
+  .scan-outils{ position:absolute; left:16px; right:16px; bottom:16px; display:flex; justify-content:flex-end; }
+  .scan-lampe{
+    width:44px; height:44px; border-radius:50%; border:none; padding:0;
+    background:rgba(255,255,255,0.16); backdrop-filter:blur(20px);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .scan-lampe svg{ width:19px; height:19px; }
+  .scan-lampe.on{ background:#fff; color:#000; }
+  .scan-lampe:active{ transform:scale(0.92); }
+
 
   .note{ font-size:12.5px; color:var(--label-2); margin-top:14px; }
 
@@ -4417,18 +4465,11 @@
 
     <div class="list-tools" style="margin-top:20px;">
       <span class="an-compte" id="p-an-equipe-compte">—</span>
-      <div class="dd-filter" id="dd-an-equipe-sort">
-        <button type="button" class="dd-trigger" id="dd-an-equipe-sort-trigger">
-          <span id="dd-an-equipe-sort-label">Les plus actifs</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-        <div class="dd-menu" id="dd-an-equipe-sort-menu">
-          <button type="button" class="selected" data-sort="actifs" data-label="Les plus actifs">Les plus actifs</button>
-          <button type="button" data-sort="retard" data-label="Les moins actifs">Les moins actifs</button>
-          <button type="button" data-sort="az" data-label="A → Z">A → Z</button>
-        </div>
-      </div>
+      <!-- Le tri a été retiré : trois façons d'ordonner cinq personnes, c'est un
+           choix à faire avant de lire. Le classement par temps décroissant répond
+           déjà à la question qu'on se pose en ouvrant la page. -->
     </div>
+
     <div id="an-equipe-liste" style="margin-top:12px;"></div>
   </div>
 
@@ -4551,13 +4592,24 @@
   <div class="screen" id="p-scan">
     <h1 class="pagehead">Scanner un code</h1>
     <div class="subhead">Visez le QR code affiché sur un poste pour ouvrir sa procédure</div>
-    <div class="scan-wrap">
+    <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
+         arrondi, une cible qui éclaircit la zone utile, et un rayon qui la
+         balaie pour dire que ça cherche. Un viseur immobile laisse croire que
+         l'app a gelé. -->
+    <div class="scan-vue">
       <video id="g-scan-video" autoplay playsinline muted></video>
-      <div class="scan-frame">
-        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="scan-cible">
+        <span class="c tl"></span><span class="c tr"></span>
+        <span class="c bl"></span><span class="c br"></span>
+        <span class="scan-rayon"></span>
+      </div>
+      <div class="scan-mot"><b id="g-scan-hint">Visez le QR code</b></div>
+      <div class="scan-outils">
+        <button type="button" class="scan-lampe" aria-label="Lampe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></svg>
+        </button>
       </div>
     </div>
-    <div class="scan-hint" id="g-scan-hint">Autorisez la caméra pour scanner</div>
     <div id="g-scan-result-zone"></div>
   </div>
 
@@ -5199,13 +5251,24 @@
   <div class="screen" id="e-scan">
     <h1 class="pagehead">Scanner un code</h1>
     <div class="subhead">Visez le QR code affiché sur votre poste</div>
-    <div class="scan-wrap">
+    <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
+         arrondi, une cible qui éclaircit la zone utile, et un rayon qui la
+         balaie pour dire que ça cherche. Un viseur immobile laisse croire que
+         l'app a gelé. -->
+    <div class="scan-vue">
       <video id="scan-video" autoplay playsinline muted></video>
-      <div class="scan-frame">
-        <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="scan-cible">
+        <span class="c tl"></span><span class="c tr"></span>
+        <span class="c bl"></span><span class="c br"></span>
+        <span class="scan-rayon"></span>
+      </div>
+      <div class="scan-mot"><b id="scan-hint">Visez le QR code</b></div>
+      <div class="scan-outils">
+        <button type="button" class="scan-lampe" aria-label="Lampe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L10 22l8.5-11.5H12z"/></svg>
+        </button>
       </div>
     </div>
-    <div class="scan-hint" id="scan-hint">Autorisez la caméra pour scanner</div>
     <div id="scan-result-zone"></div>
   </div>
 </div>
@@ -7998,7 +8061,6 @@ document.getElementById('p-membre')?.addEventListener('click', (e) => {
 
 let triMembres = 'actifs'
 let membresDeplies = false
-let anEquipeSort = 'actifs'
 
 function renderMembresListe() {
   const el = document.getElementById('ga-top-membres')
@@ -8160,8 +8222,9 @@ function peindreAnEquipe() {
   })
 
   const trie = [...stats].sort((a, b) => {
-    if (anEquipeSort === 'az') return (a.m.nom || '').localeCompare(b.m.nom || '', 'fr')
-    if (anEquipeSort === 'retard') return (a.nb - b.nb) || (a.temps - b.temps)
+    /* Du plus actif au moins actif. À nombre de lectures égal, le temps
+       départage : deux personnes qui ont ouvert trois procédures n'y ont pas
+       passé le même temps. */
     return (b.nb - a.nb) || (b.temps - a.temps)
   })
 
@@ -8924,7 +8987,6 @@ wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategor
 
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */
-wireSortDropdown('dd-an-equipe-sort', (sort) => { anEquipeSort = sort; peindreAnEquipe() })
 wireSortDropdown('dd-e-cat-sort', (sort) => { equipeCatSort = sort; renderEquipeCategories() })
 wireSortDropdown('dd-e-proc-sort', (sort) => { equipeProcSort = sort; renderEquipeCatListe() })
 
@@ -15524,6 +15586,7 @@ window.startScanner = async function(espace) {
       video: { facingMode: { ideal: 'environment' } }, audio: false,
     })
     video.srcObject = scanStream
+    brancherLampe(scanStream)
     try { await video.play() } catch (e) { /* l'attribut autoplay prend le relais */ }
 
     hintEl.textContent = 'Préparation du lecteur...'
@@ -15709,6 +15772,39 @@ function handleScanResult(text) {
     resultZone.innerHTML = `<div class="error-msg">Ce code ne correspond à aucune procédure Procédo.</div>`
   }
 }
+
+/* La lampe du téléphone. Une cuisine est souvent sombre, et un QR code collé
+   sur un plan de travail inox renvoie mal la lumière ambiante.
+
+   Toutes les caméras ne l'exposent pas : sur celles qui ne savent pas, le
+   bouton disparaît plutôt que de rester là sans rien faire. */
+let fluxScan = null
+
+function brancherLampe(flux) {
+  fluxScan = flux
+  const piste = flux?.getVideoTracks?.()[0]
+  const possible = !!piste?.getCapabilities?.().torch
+
+  document.querySelectorAll('.scan-lampe').forEach(b => {
+    b.style.display = possible ? 'flex' : 'none'
+    b.classList.remove('on')
+  })
+}
+
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('.scan-lampe')
+  if (!b) return
+  const piste = fluxScan?.getVideoTracks?.()[0]
+  if (!piste) return
+  const allumee = !b.classList.contains('on')
+  try {
+    await piste.applyConstraints({ advanced: [{ torch: allumee }] })
+    b.classList.toggle('on', allumee)
+  } catch (err) {
+    console.warn('Proc\u00e9do \u00b7 lampe indisponible :', err?.message || err)
+    b.style.display = 'none'
+  }
+})
 
 function setButtonLoading(btn, isLoading, loadingText) {
   if (isLoading) {

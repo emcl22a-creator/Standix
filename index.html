@@ -800,6 +800,11 @@
     transition:stroke-dashoffset 1.4s cubic-bezier(0.32,0.72,0,1);
   }
   .fm-segm .arc.pale{ opacity:0.20; }
+
+  /* Sur les pages d'analyse, les parts se touchent : le doigt vise un trait de
+     17 px, ce qui est étroit mais suffisant pour un anneau de 214. */
+  #an-anneau-cat .arc, #an-anneau-proc .arc{ cursor:pointer; }
+  #an-anneau-cat svg, #an-anneau-proc svg{ pointer-events:auto; }
   .fm-segm .dedans{
     position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:center;
@@ -830,6 +835,7 @@
   .fm-lg .st{ font-size:11.5px; color:var(--label-3); margin-top:1px; }
   .fm-lg .vl{ font-size:14px; font-weight:650; color:var(--label-2); flex-shrink:0; }
   .fm-lg.choisi .nm{ color:#fff; }
+
 
   /* Les lignes qui se déplient arrivent une à une, en glissant depuis le haut.
      Sans ça, trois lignes surgissent d'un coup et on ne sait pas si la page a
@@ -4614,6 +4620,12 @@
         <button type="button" data-an-periode="all">Total</button>
       </div>
     </div>
+    <!-- Le même anneau segmenté que la fiche d'un membre : une part par entrée,
+         proportionnelle au temps. Toucher une ligne pâlit les autres parts. -->
+    <div class="fm-segm">
+      <div class="svg" id="an-anneau-cat"></div>
+    </div>
+
     <div id="an-categories-liste" style="margin-top:12px;"></div>
   </div>
 
@@ -4639,6 +4651,12 @@
         <button type="button" data-an-periode="all">Total</button>
       </div>
     </div>
+    <!-- Le même anneau segmenté que la fiche d'un membre : une part par entrée,
+         proportionnelle au temps. Toucher une ligne pâlit les autres parts. -->
+    <div class="fm-segm">
+      <div class="svg" id="an-anneau-proc"></div>
+    </div>
+
     <div id="an-temps-liste" style="margin-top:12px;"></div>
   </div>
 
@@ -7556,6 +7574,13 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     return
   }
 
+  /* Le même anneau que pour les catégories, sur la page complète seulement. */
+  if (tout) {
+    dessinerAnneauAnalyse('an-anneau-proc',
+      classement.map(x => ({ nom: x.proc.titre || 'Sans titre', secondes: x.total })), libelle)
+    brancherAnneauAnalyse('proc', libelle)
+  }
+
   const visibles = tout ? classement : classement.slice(0, 3)
 
   /* La même forme que la section Équipe : une ligne nue, le nom au-dessus de
@@ -7581,7 +7606,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = libelleVoirAutres(classement.length - 3)
+    b.textContent = 'Voir plus'
     b.addEventListener('click', () => ouvrirAnProcedures())
     el.appendChild(b)
   }
@@ -7715,6 +7740,14 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     return
   }
 
+  /* Sur la page complète, l'anneau accompagne le classement. `tout` distingue
+     la page entière du résumé de l'analyse, où il n'aurait pas sa place. */
+  if (tout) {
+    dessinerAnneauAnalyse('an-anneau-cat',
+      classement.map(c => ({ nom: c.nom, secondes: c.total })), periodLabel)
+    brancherAnneauAnalyse('cat', periodLabel)
+  }
+
   const visibles = tout ? classement : classement.slice(0, 3)
 
   el.innerHTML = visibles.map(c => {
@@ -7734,7 +7767,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = libelleVoirAutres(classement.length - 3)
+    b.textContent = 'Voir plus'
     b.addEventListener('click', () => ouvrirAnCategories())
     el.appendChild(b)
   }
@@ -8395,6 +8428,133 @@ function periodeCourante() {
     libelle: currentGaPeriod === 'week' ? 'cette semaine'
       : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total',
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANNEAU DES PAGES CATÉGORIES ET PROCÉDURES
+
+   Le même objet que sur la fiche d'un membre : une part par entrée, large à
+   proportion du temps passé dessus. Un classement dit l'ordre ; l'anneau dit
+   les écarts — qu'une catégorie absorbe la moitié du temps ne se voit pas dans
+   une liste, où elle n'est qu'une ligne parmi d'autres.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let anAnneaux = { cat: [], proc: [] }
+
+/* Dessine l'anneau d'une page. `entrees` : [{ nom, secondes }], déjà triées. */
+function dessinerAnneauAnalyse(zoneId, entrees, libelle) {
+  const zone = document.getElementById(zoneId)
+  if (!zone) return
+
+  const vus = entrees.filter(x => x.secondes > 0)
+  const total = vus.reduce((s, x) => s + x.secondes, 0)
+
+  /* Rien à montrer : on efface plutôt que de laisser un cercle vide, qui
+     ressemblerait à un chargement bloqué. */
+  if (!vus.length || !total) {
+    zone.innerHTML = ''
+    zone.closest('.fm-segm')?.style.setProperty('display', 'none')
+    return
+  }
+  zone.closest('.fm-segm')?.style.removeProperty('display')
+
+  vus.forEach((x, i) => { x.couleur = FM_TEINTES[i % FM_TEINTES.length] })
+
+  const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const ECART = 5
+
+  let pos = 0
+  const arcs = vus.map((x, i) => {
+    const frac = x.secondes / total
+    const len = Math.max(0.1, circ * frac - ECART - ep)
+    const depart = circ * pos + ECART / 2 + ep / 2
+    pos += frac
+    return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+      stroke="${x.couleur}" stroke-width="${ep}"
+      stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
+  }).join('')
+
+  const idMasque = 'an-masque-' + zoneId + '-' + Date.now()
+  zone.innerHTML = `
+    <svg width="${T}" height="${T}">
+      <defs>
+        <mask id="${idMasque}">
+          <circle class="fm-aiguille" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+                  stroke="#fff" stroke-width="${ep + 3}"
+                  stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+        </mask>
+      </defs>
+      <g mask="url(#${idMasque})">${arcs}</g>
+    </svg>
+    <div class="dedans">
+      <span class="v"></span><span class="u"></span><span class="n"></span>
+    </div>`
+
+  const cle = zoneId.endsWith('cat') ? 'cat' : 'proc'
+  anAnneaux[cle] = vus
+  centreAnneauAnalyse(cle, null, libelle)
+
+  const aiguille = zone.querySelector('.fm-aiguille')
+  if (aiguille) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
+    })
+  }
+}
+
+/* Le centre : le total quand rien n'est choisi, l'entrée seule sinon. Toujours
+   en minutes, comme sur la fiche d'un membre — pour se comparer aux durées
+   affichées juste en dessous sans conversion mentale. */
+function centreAnneauAnalyse(cle, choix, libelle) {
+  const zone = document.getElementById('an-anneau-' + cle)
+  if (!zone) return
+  const v = zone.querySelector('.v'), u = zone.querySelector('.u'), n = zone.querySelector('.n')
+  if (!v) return
+
+  const vus = anAnneaux[cle] || []
+  if (!choix) {
+    const total = vus.reduce((s, x) => s + x.secondes, 0)
+    v.textContent = String(Math.round(total / 60))
+    u.textContent = 'minutes ' + (libelle || '')
+    n.textContent = `${vus.length} ${cle === 'cat' ? 'cat\u00e9gorie' : 'proc\u00e9dure'}${vus.length > 1 ? 's' : ''}`
+    return
+  }
+
+  v.textContent = String(Math.round(choix.secondes / 60))
+  u.textContent = 'minutes'
+  n.textContent = escapeHtml(choix.nom || '')
+}
+
+/* On écoute l'ANNEAU, pas les lignes. Sur ces pages, toucher une ligne ouvre
+   déjà la catégorie ou la procédure — lui ajouter un second rôle rendrait le
+   geste imprévisible : on voudrait naviguer et on sélectionnerait une part.
+
+   Sur la fiche d'un membre la question ne se posait pas : ses lignes ne mènent
+   nulle part. */
+function brancherAnneauAnalyse(cle, libelle) {
+  const zone = document.getElementById('an-anneau-' + cle)
+  if (!zone || zone.dataset.branche === '1') return
+  zone.dataset.branche = '1'
+
+  zone.addEventListener('click', (e) => {
+    const arc = e.target.closest('[data-arc]')
+    const vus = anAnneaux[cle] || []
+    const arcs = zone.querySelectorAll('[data-arc]')
+
+    /* Toucher le centre, ou une part déjà choisie, ramène au total. */
+    if (!arc || arc.classList.contains('choisi')) {
+      arcs.forEach(a => a.classList.remove('pale', 'choisi'))
+      centreAnneauAnalyse(cle, null, libelle)
+      return
+    }
+    const i = Number(arc.dataset.arc)
+    arcs.forEach((a, k) => {
+      a.classList.toggle('pale', k !== i)
+      a.classList.toggle('choisi', k === i)
+    })
+    centreAnneauAnalyse(cle, vus[i], libelle)
+    if (navigator.vibrate) navigator.vibrate(6)
+  })
 }
 
 function peindreAnCategories() {

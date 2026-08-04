@@ -784,9 +784,14 @@
   .fm-segm{ display:flex; justify-content:center; padding:20px 0 2px; }
   .fm-segm .svg{ position:relative; width:214px; height:214px; }
   .fm-segm svg{ transform:rotate(-90deg); display:block; }
-  .fm-segm .arc{
-    stroke-linecap:butt;
-    transition:stroke-dasharray 0.8s cubic-bezier(0.22,1,0.36,1), opacity 0.45s ease;
+  /* Les bouts sont arrondis : chaque part se termine par un demi-cercle.
+     Elle n'anime plus sa longueur — c'est le masque qui la révèle. */
+  .fm-segm .arc{ stroke-linecap:round; transition:opacity 0.45s ease; }
+
+  /* L'aiguille du masque : c'est elle qui fait le tour. */
+  .fm-segm .fm-aiguille{
+    stroke-linecap:round;
+    transition:stroke-dashoffset 1.4s cubic-bezier(0.32,0.72,0,1);
   }
   .fm-segm .arc.pale{ opacity:0.20; }
   .fm-segm .dedans{
@@ -822,17 +827,8 @@
   }
   .fm-plus:active{ opacity:0.6; }
 
-  /* L'activité : deux colonnes, puis deux repères de temps. */
-  .fm-act{ display:flex; gap:8px; margin-top:8px; }
-  .fm-act .col{
-    flex:1; padding:14px 10px; border-radius:16px; text-align:center;
-    background:var(--bg-card); border:0.5px solid var(--border);
-  }
-  .fm-act .col .v{ font-size:24px; font-weight:800; letter-spacing:-0.045em; line-height:1; }
-  .fm-act .col .l{ font-size:10.5px; color:var(--label-3); font-weight:650; margin-top:5px; }
-  .fm-act .col .q{ font-size:11px; color:var(--label-2); font-weight:600; margin-top:2px; }
-
-  .fm-rep{ margin-top:12px; }
+  /* Les quatre repères d'activité, tous sur le même modèle. */
+  .fm-rep{ margin-top:6px; }
   .fm-rep .l{
     display:flex; align-items:center; gap:11px; padding:11px 2px;
     border-bottom:0.5px solid rgba(255,255,255,0.055);
@@ -1023,14 +1019,6 @@
   .fm-courbe span.haut{ background:rgba(255,255,255,0.42); }
   .fm-jours{ display:flex; gap:5px; margin-top:8px; }
   .fm-jours span{ flex:1; text-align:center; font-size:9.5px; color:var(--label-3); font-weight:650; }
-
-  .fm-actions{ margin-top:30px; padding-top:20px; border-top:0.5px solid var(--border); }
-  .fm-actions button{
-    width:100%; height:46px; border-radius:15px; margin-bottom:9px;
-    background:rgba(255,255,255,0.07); border:0.5px solid var(--border); color:#fff;
-    font-family:inherit; font-size:14.5px; font-weight:650;
-  }
-  .fm-actions button.danger{ color:var(--red); }
 
   /* ═══ L'image de la procédure ═══
      Une seule image pour l'ensemble, distincte des photos d'étape. Les
@@ -4475,11 +4463,18 @@
     <div id="fm-top"></div>
 
     <div class="fm-titre">Activité</div>
-    <div class="fm-act">
-      <div class="col"><div class="v" id="fm-nb-mois">—</div><div class="l">Consultations</div><div class="q">ce mois-ci</div></div>
-      <div class="col"><div class="v" id="fm-nb-total">—</div><div class="l">Consultations</div><div class="q">au total</div></div>
-    </div>
+    <!-- Les quatre repères sur le même modèle : une icône, un intitulé, une
+         valeur à droite. Deux grandes cases pour deux nombres cassaient la
+         lecture d'une liste qui, en dessous, disait la même chose autrement. -->
     <div class="fm-rep">
+      <div class="l">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="15"/></svg></span>
+        <span class="nm">Consultations ce mois-ci</span><span class="vl" id="fm-nb-mois">—</span>
+      </div>
+      <div class="l">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18V9"/><path d="M9.3 18V5"/><path d="M14.7 18v-6"/><path d="M20 18V3"/></svg></span>
+        <span class="nm">Consultations au total</span><span class="vl" id="fm-nb-total">—</span>
+      </div>
       <div class="l">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.8"/></svg></span>
         <span class="nm">Dernière consultation</span><span class="vl" id="fm-derniere">—</span>
@@ -7691,25 +7686,44 @@ function dessinerAnneauMembre() {
   if (!zone) return
 
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const ECART = 5          // le blanc entre deux parts, en pixels d'arc
   const vus = fmClasse.filter(x => x.secondes)
   const somme = vus.reduce((s, x) => s + x.secondes, 0)
 
+  /* Les bouts sont ARRONDIS. Une extrémité ronde déborde de la moitié de
+     l'épaisseur à chaque bout : si on ne raccourcit pas le tracé d'autant, les
+     parts se chevauchent et l'écart disparaît. On retire donc `ep` à la
+     longueur, et on décale le départ d'une demi-épaisseur. */
   let pos = 0
   const arcs = vus.map((x, i) => {
     const frac = x.secondes / somme
-    const len = Math.max(0, circ * frac - 3)
-    const dep = -circ * pos
+    const plage = circ * frac
+    const len = Math.max(0.1, plage - ECART - ep)
+    const depart = circ * pos + ECART / 2 + ep / 2
     pos += frac
     return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
       stroke="${x.couleur}" stroke-width="${ep}"
-      stroke-dasharray="0 ${circ}" data-len="${len}" data-circ="${circ}"
-      stroke-dashoffset="${dep}"/>`
+      stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
   }).join('')
 
+  /* L'anneau se dévoile d'un seul tour : un masque en forme d'anneau, dessiné
+     par une aiguille invisible qui fait le tour du cadran. Les parts sont déjà
+     en place dessous — c'est le masque qui bouge, pas elles.
+
+     Un seul mouvement continu plutôt que quatre morceaux qui s'assemblent :
+     l'anneau se lit comme un objet entier. */
+  const idMasque = 'fm-masque-' + Date.now()
   zone.innerHTML = `
     <svg width="${T}" height="${T}">
+      <defs>
+        <mask id="${idMasque}">
+          <circle class="fm-aiguille" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+                  stroke="#fff" stroke-width="${ep + 3}"
+                  stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+        </mask>
+      </defs>
       <circle cx="${T/2}" cy="${T/2}" r="${r}" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="${ep}"/>
-      ${arcs}
+      <g mask="url(#${idMasque})">${arcs}</g>
     </svg>
     <div class="dedans">
       <span class="v" id="fm-anneau-v">\u2014</span>
@@ -7719,13 +7733,14 @@ function dessinerAnneauMembre() {
 
   centreAnneauMembre(null)
 
-  /* Les parts se dessinent l'une après l'autre. On part de zéro et on étire :
-     poser la longueur finale d'emblée ne montrerait rien. */
-  zone.querySelectorAll('[data-arc]').forEach((a, i) => {
-    setTimeout(() => {
-      a.setAttribute('stroke-dasharray', `${a.dataset.len} ${a.dataset.circ}`)
-    }, 140 + i * 120)
-  })
+  const aiguille = zone.querySelector('.fm-aiguille')
+  if (aiguille) {
+    /* On laisse un souffle avant de lancer : sans lui, le navigateur applique
+       la valeur finale d'emblée et rien ne s'anime. */
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
+    })
+  }
 }
 
 /* Le centre : le total quand rien n'est choisi, la procédure seule sinon. */

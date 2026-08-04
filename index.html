@@ -5039,37 +5039,6 @@
   </div>
 </div>
 
-<!-- Ajouter ou modifier un établissement : le même écran pour les deux -->
-<div class="fond-etab" id="fond-etab">
-  <div class="fen-etab" role="dialog" aria-modal="true">
-    <h3 id="etab-titre">Nouvel établissement</h3>
-    <div class="s" id="etab-sous">Son logo apparaîtra dans la barre.</div>
-
-    <button type="button" class="etab-depot" id="etab-depot">
-      <span class="mono" id="etab-mono">?</span>
-      <span class="appareil">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L8 6.5H4.5A1.5 1.5 0 0 0 3 8v10a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V8a1.5 1.5 0 0 0-1.5-1.5H16Z"/><circle cx="12" cy="12.8" r="3.6"/></svg>
-        <span>Ajouter</span>
-      </span>
-    </button>
-    <div class="etab-legende" id="etab-legende">Facultatif · les initiales serviront sinon</div>
-
-    <label class="f" style="text-align:left; display:block;">Nom de l'établissement</label>
-    <input type="text" id="etab-nom" placeholder="Ex : Le Comptoir">
-
-    <div class="error-msg" id="etab-erreur"></div>
-    <button type="button" class="btn block" id="etab-ok" style="margin-top:14px;" disabled>Ajouter</button>
-      <button type="button" class="btn ghost block" id="etab-supprimer"
-              style="margin-top:8px; color:var(--red); display:none;">Supprimer cet établissement</button>
-    <button type="button" class="btn ghost block" id="etab-annuler" style="margin-top:8px;">Annuler</button>
-  </div>
-</div>
-
-<input type="file" id="etab-fichier" accept="image/*" style="display:none;">
-
-<!-- Bandeau de diagnostic : n'apparaît que si le chargement se bloque -->
-<div class="bandeau-bloc" id="bandeau-bloc">
-  <div class="t">Le chargement n'aboutit pas</div>
   <div class="s" id="bandeau-bloc-detail">—</div>
   <div class="a">
     <button type="button" id="bandeau-bloc-copier">Copier le détail</button>
@@ -5417,6 +5386,41 @@
     <div id="scan-result-zone"></div>
   </div>
 </div>
+
+<!-- La fenêtre d'établissement vit HORS des deux apps : elle était enfermée
+     dans celle de gestion, donc masquée côté équipe. Un employé appuyait sur
+     « Créer une entreprise » et ne voyait rien s'ouvrir. -->
+<!-- Ajouter ou modifier un établissement : le même écran pour les deux -->
+<div class="fond-etab" id="fond-etab">
+  <div class="fen-etab" role="dialog" aria-modal="true">
+    <h3 id="etab-titre">Nouvel établissement</h3>
+    <div class="s" id="etab-sous">Son logo apparaîtra dans la barre.</div>
+
+    <button type="button" class="etab-depot" id="etab-depot">
+      <span class="mono" id="etab-mono">?</span>
+      <span class="appareil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L8 6.5H4.5A1.5 1.5 0 0 0 3 8v10a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V8a1.5 1.5 0 0 0-1.5-1.5H16Z"/><circle cx="12" cy="12.8" r="3.6"/></svg>
+        <span>Ajouter</span>
+      </span>
+    </button>
+    <div class="etab-legende" id="etab-legende">Facultatif · les initiales serviront sinon</div>
+
+    <label class="f" style="text-align:left; display:block;">Nom de l'établissement</label>
+    <input type="text" id="etab-nom" placeholder="Ex : Le Comptoir">
+
+    <div class="error-msg" id="etab-erreur"></div>
+    <button type="button" class="btn block" id="etab-ok" style="margin-top:14px;" disabled>Ajouter</button>
+      <button type="button" class="btn ghost block" id="etab-supprimer"
+              style="margin-top:8px; color:var(--red); display:none;">Supprimer cet établissement</button>
+    <button type="button" class="btn ghost block" id="etab-annuler" style="margin-top:8px;">Annuler</button>
+  </div>
+</div>
+
+<input type="file" id="etab-fichier" accept="image/*" style="display:none;">
+
+<!-- Bandeau de diagnostic : n'apparaît que si le chargement se bloque -->
+<div class="bandeau-bloc" id="bandeau-bloc">
+  <div class="t">Le chargement n'aboutit pas</div>
 
 <!-- UNE SEULE barre pour les deux espaces.
 
@@ -6837,11 +6841,16 @@ async function peindreAppareils() {
     return
   }
 
-  const liste = data || []
+  /* La liste ne montre QUE les appareils encore rattachés. Ceux qu'on a
+     déconnectés n'ont plus rien à y faire. */
+  const liste = (data || []).filter(a => !a.revoquee)
   const recent = Date.now() - 30 * 60000
-  const actifs = liste.filter(a => !a.revoquee && new Date(a.derniere_fois) > recent)
+  const actifs = liste.filter(a => new Date(a.derniere_fois) > recent)
 
-  const val = `${actifs.length} sur ${APPAREILS_MAX}`
+  /* Le compteur dit ce que la liste montre. Il comptait les appareils actifs
+     dans la demi-heure, alors que la liste les affichait tous — deux nombres
+     différents pour la même chose, et c'est le petit qui était annoncé. */
+  const val = `${liste.length} sur ${APPAREILS_MAX}`
   for (const id of ['e-nb-appareils', 'p-nb-appareils']) {
     const e = document.getElementById(id)
     if (e) e.textContent = val
@@ -6852,8 +6861,17 @@ async function peindreAppareils() {
     return
   }
 
+  /* Un même téléphone peut apparaître plusieurs fois : l'appareil est reconnu à
+     son réseau, et passer du wifi à la 4G le fait compter comme un nouveau. On
+     le dit, sinon on croit à une intrusion. */
+  const noteReseau = liste.length > 1
+    ? '<div class="note" style="margin:0 0 12px;">Un m\u00eame t\u00e9l\u00e9phone peut figurer plusieurs fois : ' +
+      'il est reconnu \u00e0 son r\u00e9seau, et passer du wifi \u00e0 la 4G cr\u00e9e une nouvelle ligne. ' +
+      'Retirez celles que vous ne reconnaissez pas.</div>'
+    : ''
+
   el.innerHTML = liste.map(a => {
-    const vivant = !a.revoquee && new Date(a.derniere_fois) > recent
+    const vivant = new Date(a.derniere_fois) > recent
     return `<div class="app-ligne${vivant ? ' moi' : ''}${a.revoquee ? ' revoque' : ''}">
       <span class="ic">
         <svg viewBox="0 0 24 24" fill="none">
@@ -6869,6 +6887,7 @@ async function peindreAppareils() {
         data-nom="${escapeHtml(a.nom || 'cet appareil')}">Retirer</button>
     </div>`
   }).join('')
+  el.insertAdjacentHTML('afterbegin', noteReseau)
 }
 
 document.addEventListener('click', async (e) => {
@@ -9728,7 +9747,7 @@ function choisirPosteFenetre() {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6"/><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6"/><line x1="3" y1="12.6" x2="21" y2="12.6"/></svg>
           </span>
           <div class="t">Quel est votre poste ?</div>
-          <div class="s">Votre responsable vous retrouvera plus facilement.<br>Vous pourrez le changer dans les r\u00e9glages.</div>
+          <div class="s">Vous pourrez le changer dans les r\u00e9glages.</div>
         </div>
 
         <div class="poste-choix">
@@ -14407,6 +14426,16 @@ async function basculerVersEtablissement(entrepriseId) {
 }
 
 /* ── La fenêtre, la même pour créer et pour modifier ──────────────── */
+
+/* « Créer une entreprise », dans les réglages de l'espace équipe. Le bouton
+   existait mais n'était branché nulle part : on appuyait, rien ne se passait.
+
+   On réutilise la même fenêtre que la gestion — elle vit dans l'app de gestion,
+   mais c'est une fenêtre superposée, elle s'affiche par-dessus n'importe quel
+   espace. */
+document.getElementById('es-ajouter')?.addEventListener('click', () => {
+  ouvrirFenetreEtab(null)
+})
 
 window.ouvrirFenetreEtab = function(entrepriseId) {
   etabEdite = entrepriseId ? mesEtablissements.find(e => e.id === entrepriseId) : null

@@ -811,14 +811,6 @@
     text-align:center; line-height:1.3; color:var(--label-2);
   }
 
-  /* Les listes de la fiche se posent dans une carte, comme partout ailleurs.
-     Nues sur le fond, elles couraient d'un bord à l'autre alors que le reste de
-     l'app garde ses 18 px de marge intérieure — la page paraissait plus large
-     que les autres. */
-  .fm-carte{
-    margin-top:6px; padding:4px 18px; border-radius:20px;
-    background:var(--bg-card); border:0.5px solid var(--border);
-  }
 
   /* Les lignes du classement. */
   .fm-lg{
@@ -829,7 +821,7 @@
   /* `:last-of-type` compte les BALISES, pas les classes : dans une liste suivie
      du bouton « Voir les autres », il désignait le bouton et non la dernière
      ligne — qui gardait donc son filet, là où l'activité n'en avait pas. */
-  .fm-carte > *:last-child{ border-bottom:none; }
+  .fm-lg:last-child, .fm-rep .l:last-child{ border-bottom:none; }
   .fm-lg:has(+ .fm-plus){ border-bottom:none; }
   .fm-lg:active{ opacity:0.6; }
   .fm-lg .pt{ width:11px; height:11px; border-radius:3px; flex-shrink:0; }
@@ -843,10 +835,14 @@
      Sans ça, trois lignes surgissent d'un coup et on ne sait pas si la page a
      changé ou si elle s'est rechargée. */
   @keyframes fmLigneArrive{
-    from{ opacity:0; transform:translateY(-8px); }
-    to{ opacity:1; transform:translateY(0); }
+    from{ opacity:0; transform:translateY(-10px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
   }
   .fm-lg.neuve{ animation:fmLigneArrive 0.34s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* Le bouton descend et remonte avec les lignes, au lieu de sauter d'un
+     endroit à l'autre. Il fait partie du bloc, pas du décor. */
+  .fm-plus.glisse{ transition:transform 0.42s cubic-bezier(0.22,1,0.36,1); }
 
   /* En repliant, celles qui partent s'effacent vers le haut. On les laisse en
      place le temps de l'animation, puis on redessine. */
@@ -4495,13 +4491,13 @@
     </div>
 
     <div class="fm-titre">Ce qui a occupé son temps</div>
-    <div class="fm-carte" id="fm-top"></div>
+    <div id="fm-top"></div>
 
     <div class="fm-titre">Activité</div>
     <!-- Les quatre repères sur le même modèle : une icône, un intitulé, une
          valeur à droite. Deux grandes cases pour deux nombres cassaient la
          lecture d'une liste qui, en dessous, disait la même chose autrement. -->
-    <div class="fm-carte fm-rep">
+    <div class="fm-rep">
       <div class="l">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="15"/></svg></span>
         <span class="nm">Consultations ce mois-ci</span><span class="vl" id="fm-nb-mois">—</span>
@@ -7781,6 +7777,19 @@ function dessinerAnneauMembre() {
 }
 
 /* Le centre : le total quand rien n'est choisi, la procédure seule sinon. */
+/* Toucher n'importe où sur la fiche ramène au total. Sans ça, il fallait
+   retrouver la ligne qu'on avait choisie pour en sortir — un geste qu'on ne
+   devine pas. On écoute l'écran entier et on ignore ce qui vient d'une ligne :
+   c'est elle qui gère son propre cas. */
+document.getElementById('p-membre')?.addEventListener('click', (e) => {
+  if (e.target.closest('[data-part]') || e.target.closest('.fm-plus')) return
+  const choisie = document.querySelector('#fm-top .fm-lg.choisi')
+  if (!choisie) return
+  choisie.classList.remove('choisi')
+  document.querySelectorAll('#fm-anneau [data-arc]').forEach(a => a.classList.remove('pale'))
+  centreAnneauMembre(null)
+})
+
 function centreAnneauMembre(choix) {
   const v = document.getElementById('fm-anneau-v')
   const u = document.getElementById('fm-anneau-u')
@@ -7788,11 +7797,12 @@ function centreAnneauMembre(choix) {
   if (!v) return
 
   if (!choix) {
+    /* Toujours en minutes, jamais en heures. « 1,2 » demande un effort de
+       conversion pour être comparé à « 31 min » affiché juste en dessous ;
+       « 72 » se compare tout seul. */
     const vus = fmClasse.filter(x => x.secondes).length
-    v.textContent = fmTotalMois < 3600
-      ? String(Math.round(fmTotalMois / 60))
-      : (fmTotalMois / 3600).toFixed(1).replace('.', ',')
-    u.textContent = fmTotalMois < 3600 ? 'minutes ce mois-ci' : 'heures ce mois-ci'
+    v.textContent = String(Math.round(fmTotalMois / 60))
+    u.textContent = 'minutes ce mois-ci'
     n.textContent = `${vus} proc\u00e9dure${vus > 1 ? 's' : ''} sur ${fmClasse.length}`
     return
   }
@@ -7801,6 +7811,22 @@ function centreAnneauMembre(choix) {
   u.textContent = choix.secondes ? 'minutes' : 'jamais ouverte'
   n.textContent = escapeHtml(choix.proc.titre || 'Sans titre') +
     (choix.fois ? ` \u00b7 ${choix.fois} fois` : '')
+}
+
+/* Fait glisser le bouton de son ancienne position à la nouvelle. On le pose
+   d'abord là où il était, puis on le libère : le navigateur anime la différence.
+   C'est la même mécanique que le tri de la page Équipe. */
+function glisserBouton(ancienHaut) {
+  const b = document.querySelector('#fm-top .fm-plus')
+  if (!b || ancienHaut == null) return
+  const ecart = ancienHaut - b.getBoundingClientRect().top
+  if (!ecart) return
+  b.style.transition = 'none'
+  b.style.transform = `translateY(${ecart}px)`
+  requestAnimationFrame(() => {
+    b.classList.add('glisse')
+    b.style.transform = 'translateY(0)'
+  })
 }
 
 /* Le classement. Trois lignes, puis un bouton qui déplie le reste. */
@@ -7840,6 +7866,10 @@ function peindreClassementMembre(animerDes) {
     b.className = 'fm-plus'
     b.textContent = fmDeplie ? 'Voir moins' : libelleVoirAutres(fmClasse.length - 3)
     b.addEventListener('click', () => {
+      /* On relève où se trouve le bouton AVANT de redessiner : il glissera de
+         son ancienne position à la nouvelle, au lieu de sauter. */
+      const avantBouton = b.getBoundingClientRect().top
+
       if (fmDeplie) {
         /* On replie : les lignes en trop s'effacent d'abord, on redessine après.
            Les faire disparaître d'un coup donnerait un à-coup. */
@@ -7848,11 +7878,16 @@ function peindreClassementMembre(animerDes) {
           l.style.animationDelay = ((enTrop.length - 1 - i) * 0.04) + 's'
           l.classList.add('part')
         })
-        setTimeout(() => { fmDeplie = false; peindreClassementMembre() }, 240 + enTrop.length * 40)
+        setTimeout(() => {
+          fmDeplie = false
+          peindreClassementMembre()
+          glisserBouton(avantBouton)
+        }, 240 + enTrop.length * 40)
         return
       }
       fmDeplie = true
       peindreClassementMembre(3)
+      glisserBouton(avantBouton)
     })
     el.appendChild(b)
   }

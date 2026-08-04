@@ -3836,14 +3836,13 @@
     </div>
     <div class="subhead">Écrivez les étapes, ou découpez une vidéo</div>
 
-    <div class="card">
-      <label class="f">Catégorie</label>
-      <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
-      <div style="margin-top:12px;">
-        <label class="f">Titre</label>
-        <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
-      </div>
-    </div>
+    <!-- Les mêmes champs que les écrans de modification : même libellé, même
+           cadre, même taille. Une carte supplémentaire autour de deux champs
+           n'apportait qu'un cadre de plus à lire. -->
+      <div class="man-lbl">Catégorie</div>
+      <input type="text" class="man-champ" id="new-categorie" placeholder="Ex : Cuisine">
+      <div class="man-lbl">Titre</div>
+      <input type="text" class="man-champ" id="new-titre" placeholder="Ex : Fermeture de caisse">
 
     <div class="section-title">Comment créer cette procédure ?</div>
     <div class="note" id="mode-choice-note" style="margin-top:0; margin-bottom:10px;">Complétez le titre et la catégorie ci-dessus pour continuer.</div>

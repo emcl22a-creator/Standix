@@ -922,6 +922,12 @@
     margin-top:2px; letter-spacing:-0.01em;
   }
 
+  /* Les pages d'analyse gardent les marges de l'écran, comme la carte
+     « Bonjour prénom ». Seule la piste déborde — il faut qu'elle touche les
+     bords pour que le panneau voisin s'annonce dès qu'on effleure. */
+  #an-piste-proc, #an-piste-cat{ margin:0 -20px; }
+  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{ padding:0 20px; }
+
   /* Les listes s'alignent sur le bouton retour : il démarre à la marge de
      l'écran, elles aussi. Les 20 px que j'avais ajoutés les décalaient de la
      colonne où commence tout le reste de la page. */
@@ -1083,7 +1089,15 @@
 
 /* Un peu d'air entre le mot d'introduction et le filtre : collés, on croit
      que le second commente le premier. */
-  .an-intro + .an-periode-dd{ margin-top:18px; }
+  /* Le compte à gauche, le filtre à droite. `.dd-filter` prend `flex:1` par
+     défaut ailleurs — ici on lui rend sa largeur naturelle, sinon il pousserait
+     le compte contre le bord. */
+  .an-rangee{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-top:18px;
+  }
+  .an-rangee .dd-filter{ flex:0 0 auto; }
+  .an-rangee .an-compte{ flex:1; min-width:0; }
 
   .an-lig{
     display:flex; align-items:center; gap:12px; width:100%;
@@ -4570,22 +4584,24 @@
       <div class="s" id="an-eq-sous">—</div>
     </div>
 
-    <div class="dd-filter an-periode-dd">
-      <button type="button" class="dd-trigger" data-an-trigger>
-        <span data-an-label>Ce mois</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="dd-menu" data-an-menu>
-        <button type="button" class="selected" data-an-periode="month">Ce mois</button>
-        <button type="button" data-an-periode="all">Total</button>
-      </div>
-    </div>
+    <!-- Le compte et le filtre sur une seule ligne : ils disent la même chose —
+         de qui parle-t-on, et sur quelle période. Les séparer faisait deux
+         rangées pour une seule idée.
 
-    <div class="list-tools" style="margin-top:20px;">
+         Le tri a été retiré : trois façons d'ordonner cinq personnes, c'est un
+         choix à faire avant de lire. -->
+    <div class="an-rangee">
       <span class="an-compte" id="p-an-equipe-compte">—</span>
-      <!-- Le tri a été retiré : trois façons d'ordonner cinq personnes, c'est un
-           choix à faire avant de lire. Le classement par temps décroissant répond
-           déjà à la question qu'on se pose en ouvrant la page. -->
+      <div class="dd-filter an-periode-dd">
+        <button type="button" class="dd-trigger" data-an-trigger>
+          <span data-an-label>Ce mois</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dd-menu" data-an-menu>
+          <button type="button" class="selected" data-an-periode="month">Ce mois</button>
+          <button type="button" data-an-periode="all">Total</button>
+        </div>
+      </div>
     </div>
 
     <div id="an-equipe-liste" style="margin-top:12px;"></div>
@@ -4599,27 +4615,26 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Catégories</h1>
     </div>
 
-    <div class="an-intro">
-      <div class="t">Où part le temps de votre équipe</div>
-      <div class="s">Une catégorie qui absorbe des heures est soit essentielle, soit mal expliquée. Touchez-en une pour <b>voir ses procédures</b>.</div>
-    </div>
-    <div class="dd-filter an-periode-dd">
-      <button type="button" class="dd-trigger" data-an-trigger>
-        <span data-an-label>Ce mois</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="dd-menu" data-an-menu>
-        <button type="button" class="selected" data-an-periode="month">Ce mois</button>
-        <button type="button" data-an-periode="all">Total</button>
-      </div>
-    </div>
-    <!-- Le même anneau segmenté que la fiche d'un membre : une part par entrée,
-         proportionnelle au temps. Toucher une ligne pâlit les autres parts. -->
-    <div class="fm-segm">
-      <div class="svg" id="an-anneau-cat"></div>
+        <!-- Deux panneaux côte à côte, comme la page des procédures : le mois en
+         cours, puis depuis le début. Le déroulant a été retiré — on glisse. -->
+    <div class="fm-piste" id="an-piste-cat">
+      <section class="fm-pan" data-periode="month">
+        <div class="fm-segm"><div class="svg" id="an-anneau-cat-month"></div></div>
+        <div class="fm-titre">Où part le temps</div>
+        <div id="an-top-cat-month"></div>
+      </section>
+      <section class="fm-pan" data-periode="all">
+        <div class="fm-segm"><div class="svg" id="an-anneau-cat-all"></div></div>
+        <div class="fm-titre">Où part le temps</div>
+        <div id="an-top-cat-all"></div>
+      </section>
     </div>
 
-    <div id="an-categories-liste" style="margin-top:12px;"></div>
+    <div class="fm-barre" id="an-barre-cat">
+      <button type="button" data-va="month" aria-label="Ce mois-ci"><span></span></button>
+      <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
+    </div>
+    <div class="fm-periode-mot" id="an-mot-cat">Ce mois-ci</div>
   </div>
 
   <div class="screen" id="p-an-temps">
@@ -4630,11 +4645,7 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Procédures</h1>
     </div>
 
-    <div class="an-intro">
-      <div class="t">Ce qui occupe le plus votre équipe</div>
-      <div class="s">Une procédure qui absorbe deux heures par mois mérite un regard : soit elle est essentielle, soit elle est mal écrite.</div>
-    </div>
-    <!-- Deux panneaux côte à côte, comme la fiche d'un membre : le mois en cours,
+        <!-- Deux panneaux côte à côte, comme la fiche d'un membre : le mois en cours,
          puis depuis le début. Le déroulant a été retiré — on glisse. Le défilement
          horizontal natif s'occupe de l'animation : on voit les deux pendant le
          geste, ça s'aimante à l'arrivée, et l'inertie est celle du système. -->
@@ -7729,14 +7740,6 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     return
   }
 
-  /* Sur la page complète, l'anneau accompagne le classement. `tout` distingue
-     la page entière du résumé de l'analyse, où il n'aurait pas sa place. */
-  if (tout) {
-    dessinerAnneauAnalyse('an-anneau-cat',
-      classement.map(c => ({ nom: c.nom, secondes: c.total })), periodLabel)
-    brancherAnneauAnalyse('cat', periodLabel)
-  }
-
   const visibles = tout ? classement : classement.slice(0, 3)
 
   el.innerHTML = visibles.map(c => {
@@ -8344,7 +8347,7 @@ function peindreIntroEquipe(employes, validations) {
       : `Il ne manque qu'<b>une personne</b>. Touchez son nom pour le d\u00e9tail de son activit\u00e9.`
   } else {
     s.innerHTML = `Touchez un nom pour le <b>d\u00e9tail de son activit\u00e9</b> : ` +
-      `ce qui l'occupe, ce qu'il n'a pas ouvert, et depuis quand.`
+      `ce qui l'occupe et ce qu'il n'a pas ouvert.`
   }
 }
 
@@ -8425,42 +8428,73 @@ function periodeCourante() {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   L'ANNEAU DES PAGES CATÉGORIES ET PROCÉDURES
 
-   Le même objet que sur la fiche d'un membre : une part par entrée, large à
-   proportion du temps passé dessus. Un classement dit l'ordre ; l'anneau dit
-   les écarts — qu'une catégorie absorbe la moitié du temps ne se voit pas dans
-   une liste, où elle n'est qu'une ligne parmi d'autres.
-   ═══════════════════════════════════════════════════════════════════════════ */
 
-let anAnneaux = { cat: [], proc: [] }
 
-/* Dessine l'anneau d'une page. `entrees` : [{ nom, secondes }], déjà triées. */
-function dessinerAnneauAnalyse(zoneId, entrees, libelle) {
-  const zone = document.getElementById(zoneId)
+
+/* La page des catégories, bâtie exactement comme celle des procédures : deux
+   panneaux qu'on fait glisser, un anneau par période, le classement en dessous.
+   Deux pages qui répondent à la même question doivent se lire pareil. */
+
+let anCatVues = { month: { classe: [], total: 0, deplie: false },
+                  all:   { classe: [], total: 0, deplie: false } }
+let anCatPeriode = 'month'
+
+function peindreAnCategories() {
+  if (!currentGaData) return
+  const { procedures, validations } = currentGaData
+
+  const debutMois = new Date()
+  debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+  const duMois = (validations || []).filter(v => new Date(v.validated_at) >= debutMois)
+
+  for (const [cle, lot] of [['month', duMois], ['all', validations || []]]) {
+    const vue = anCatVues[cle]
+    const parCat = {}
+
+    lot.forEach(v => {
+      const s = Number(v.duree_lecture || 0)
+      if (!s) return
+      const pr = (procedures || []).find(x => x.id === v.procedure_id)
+      if (!pr) return
+      const nom = pr.categorie || 'Sans cat\u00e9gorie'
+      if (!parCat[nom]) parCat[nom] = { nom, total: 0, lecteurs: new Set(), procs: new Set() }
+      parCat[nom].total += s
+      parCat[nom].lecteurs.add(v.membre_id)
+      parCat[nom].procs.add(pr.id)
+    })
+
+    vue.classe = Object.values(parCat).sort((a, b) => b.total - a.total)
+    vue.total = vue.classe.reduce((s, x) => s + x.total, 0)
+    vue.classe.forEach((x, n) => { x.couleur = FM_TEINTES[n % FM_TEINTES.length] })
+
+    vue.deplie = false
+    dessinerAnneauCat(cle)
+    peindreClassementCat(cle)
+  }
+  majBarreCat()
+}
+
+function dessinerAnneauCat(cle) {
+  const zone = document.getElementById('an-anneau-cat-' + cle)
   if (!zone) return
 
-  const vus = entrees.filter(x => x.secondes > 0)
-  const total = vus.reduce((s, x) => s + x.secondes, 0)
+  const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const ECART = 5
+  const vue = anCatVues[cle]
+  const vus = vue.classe.filter(x => x.total)
+  const somme = vus.reduce((s, x) => s + x.total, 0)
 
-  /* Rien à montrer : on efface plutôt que de laisser un cercle vide, qui
-     ressemblerait à un chargement bloqué. */
-  if (!vus.length || !total) {
+  if (!vus.length || !somme) {
     zone.innerHTML = ''
     zone.closest('.fm-segm')?.style.setProperty('display', 'none')
     return
   }
   zone.closest('.fm-segm')?.style.removeProperty('display')
 
-  vus.forEach((x, i) => { x.couleur = FM_TEINTES[i % FM_TEINTES.length] })
-
-  const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
-  const ECART = 5
-
   let pos = 0
   const arcs = vus.map((x, i) => {
-    const frac = x.secondes / total
+    const frac = x.total / somme
     const len = Math.max(0.1, circ * frac - ECART - ep)
     const depart = circ * pos + ECART / 2 + ep / 2
     pos += frac
@@ -8469,7 +8503,7 @@ function dessinerAnneauAnalyse(zoneId, entrees, libelle) {
       stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
   }).join('')
 
-  const idMasque = 'an-masque-' + zoneId + '-' + Date.now()
+  const idMasque = 'an-cat-masque-' + cle + '-' + Date.now()
   zone.innerHTML = `
     <svg width="${T}" height="${T}">
       <defs>
@@ -8485,9 +8519,7 @@ function dessinerAnneauAnalyse(zoneId, entrees, libelle) {
       <span class="v"></span><span class="u"></span><span class="n"></span>
     </div>`
 
-  const cle = zoneId.endsWith('cat') ? 'cat' : 'proc'
-  anAnneaux[cle] = vus
-  centreAnneauAnalyse(cle, null, libelle)
+  centreAnneauCat(cle, null)
 
   const aiguille = zone.querySelector('.fm-aiguille')
   if (aiguille) {
@@ -8497,69 +8529,157 @@ function dessinerAnneauAnalyse(zoneId, entrees, libelle) {
   }
 }
 
-/* Le centre : le total quand rien n'est choisi, l'entrée seule sinon. Toujours
-   en minutes, comme sur la fiche d'un membre — pour se comparer aux durées
-   affichées juste en dessous sans conversion mentale. */
-function centreAnneauAnalyse(cle, choix, libelle) {
-  const zone = document.getElementById('an-anneau-' + cle)
+function centreAnneauCat(cle, choix) {
+  const zone = document.getElementById('an-anneau-cat-' + cle)
   if (!zone) return
   const v = zone.querySelector('.v'), u = zone.querySelector('.u'), n = zone.querySelector('.n')
   if (!v) return
 
-  const vus = anAnneaux[cle] || []
+  const vue = anCatVues[cle]
   if (!choix) {
-    const total = vus.reduce((s, x) => s + x.secondes, 0)
-    v.textContent = String(Math.round(total / 60))
-    u.textContent = 'minutes ' + (libelle || '')
-    n.textContent = `${vus.length} ${cle === 'cat' ? 'cat\u00e9gorie' : 'proc\u00e9dure'}${vus.length > 1 ? 's' : ''}`
+    v.textContent = String(Math.round(vue.total / 60))
+    u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
+    n.textContent = `${vue.classe.length} cat\u00e9gorie${vue.classe.length > 1 ? 's' : ''}`
+    return
+  }
+  v.textContent = String(Math.round(choix.total / 60))
+  u.textContent = 'minutes'
+  n.textContent = escapeHtml(choix.nom)
+}
+
+function peindreClassementCat(cle, animerDes) {
+  const el = document.getElementById('an-top-cat-' + cle)
+  if (!el) return
+
+  const vue = anCatVues[cle]
+  if (!vue.classe.length) {
+    el.innerHTML = vide({
+      dessin: NEANT_CATEGORIE,
+      titre: cle === 'all' ? 'Aucune lecture pour l\u2019instant' : 'Aucune lecture ce mois-ci',
+      phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici o\u00f9 part le temps de votre \u00e9quipe.",
+    })
     return
   }
 
-  v.textContent = String(Math.round(choix.secondes / 60))
-  u.textContent = 'minutes'
-  n.textContent = escapeHtml(choix.nom || '')
-}
+  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, 3)
 
-/* On écoute l'ANNEAU, pas les lignes. Sur ces pages, toucher une ligne ouvre
-   déjà la catégorie ou la procédure — lui ajouter un second rôle rendrait le
-   geste imprévisible : on voudrait naviguer et on sélectionnerait une part.
+  el.innerHTML = visibles.map((x, rang) => {
+    const nb = x.procs.size, gens = x.lecteurs.size
+    const neuve = animerDes != null && rang >= animerDes
+    return `
+      <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
+              ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
+              data-part="${rang}" data-cat-nom="${escapeHtml(x.nom)}">
+        <span class="pt" style="background:${x.couleur}"></span>
+        <span class="co">
+          <span class="nm">${escapeHtml(x.nom)}</span>
+          <span class="st">${nb} proc\u00e9dure${nb > 1 ? 's' : ''}${
+            gens ? ' \u00b7 ' + gens + ' personne' + (gens > 1 ? 's' : '') : ''}</span>
+        </span>
+        <span class="vl">${dureeLisible(x.total)}</span>
+      </button>`
+  }).join('')
 
-   Sur la fiche d'un membre la question ne se posait pas : ses lignes ne mènent
-   nulle part. */
-function brancherAnneauAnalyse(cle, libelle) {
-  const zone = document.getElementById('an-anneau-' + cle)
-  if (!zone || zone.dataset.branche === '1') return
-  zone.dataset.branche = '1'
-
-  zone.addEventListener('click', (e) => {
-    const arc = e.target.closest('[data-arc]')
-    const vus = anAnneaux[cle] || []
-    const arcs = zone.querySelectorAll('[data-arc]')
-
-    /* Toucher le centre, ou une part déjà choisie, ramène au total. */
-    if (!arc || arc.classList.contains('choisi')) {
-      arcs.forEach(a => a.classList.remove('pale', 'choisi'))
-      centreAnneauAnalyse(cle, null, libelle)
-      return
-    }
-    const i = Number(arc.dataset.arc)
-    arcs.forEach((a, k) => {
-      a.classList.toggle('pale', k !== i)
-      a.classList.toggle('choisi', k === i)
+  if (vue.classe.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'fm-plus'
+    b.textContent = vue.deplie ? 'Voir moins' : 'Voir plus'
+    b.addEventListener('click', () => {
+      const avant = b.getBoundingClientRect().top
+      if (vue.deplie) {
+        const enTrop = [...el.querySelectorAll('.fm-lg')].slice(3)
+        enTrop.forEach((l, k) => {
+          l.style.animationDelay = ((enTrop.length - 1 - k) * 0.04) + 's'
+          l.classList.add('part')
+        })
+        setTimeout(() => {
+          vue.deplie = false
+          peindreClassementCat(cle)
+          glisserBoutonCat(cle, avant)
+        }, 240 + enTrop.length * 40)
+        return
+      }
+      vue.deplie = true
+      peindreClassementCat(cle, 3)
+      glisserBoutonCat(cle, avant)
     })
-    centreAnneauAnalyse(cle, vus[i], libelle)
-    if (navigator.vibrate) navigator.vibrate(6)
+    el.appendChild(b)
+  }
+
+  /* Toucher éclaire la part ; un appui long ouvre la catégorie. Le geste court
+     sert à comparer, le long à aller voir — comme sur la page des procédures. */
+  el.querySelectorAll('[data-part]').forEach(b => {
+    let minuteur = null, ouverte = false
+
+    b.addEventListener('pointerdown', () => {
+      ouverte = false
+      minuteur = setTimeout(() => { ouverte = true; openCategory(b.dataset.catNom) }, 550)
+    })
+    const annuler = () => { if (minuteur) { clearTimeout(minuteur); minuteur = null } }
+    b.addEventListener('pointerup', annuler)
+    b.addEventListener('pointerleave', annuler)
+    b.addEventListener('pointercancel', annuler)
+
+    b.addEventListener('click', () => {
+      if (ouverte) return
+      const i = Number(b.dataset.part)
+      const actif = b.classList.contains('choisi')
+      el.querySelectorAll('[data-part]').forEach(x => x.classList.remove('choisi'))
+      const arcs = document.querySelectorAll('#an-anneau-cat-' + cle + ' [data-arc]')
+
+      if (actif) {
+        arcs.forEach(a => a.classList.remove('pale'))
+        centreAnneauCat(cle, null)
+        return
+      }
+      b.classList.add('choisi')
+      arcs.forEach((a, k) => a.classList.toggle('pale', k !== i))
+      centreAnneauCat(cle, vue.classe[i])
+    })
   })
 }
 
-function peindreAnCategories() {
-  const el = document.getElementById('an-categories-liste')
-  if (!el || !currentGaData) return
-  /* Ces pages ont leur propre filtre — mois ou total — indépendant de celui de
-     la page d'analyse : on y vient pour creuser, pas pour suivre. */
-  renderTopCategories(currentGaData.procedures, anValidationsPeriode(),
-    currentGaData.employes.length, anLibelle(), el, true)
+function glisserBoutonCat(cle, ancienHaut) {
+  const b = document.querySelector('#an-top-cat-' + cle + ' .fm-plus')
+  if (!b || ancienHaut == null) return
+  const ecart = ancienHaut - b.getBoundingClientRect().top
+  if (!ecart) return
+  b.style.transition = 'none'
+  b.style.transform = `translateY(${ecart}px)`
+  requestAnimationFrame(() => {
+    b.classList.add('glisse')
+    b.style.transform = 'translateY(0)'
+  })
 }
+
+function majBarreCat() {
+  document.querySelectorAll('#an-barre-cat [data-va]').forEach(b => {
+    b.classList.toggle('on', b.dataset.va === anCatPeriode)
+  })
+  const mot = document.getElementById('an-mot-cat')
+  if (mot) mot.textContent = anCatPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+}
+
+;(() => {
+  const piste = document.getElementById('an-piste-cat')
+  if (!piste) return
+
+  piste.addEventListener('scroll', () => {
+    const page = piste.scrollLeft > piste.clientWidth / 2 ? 'all' : 'month'
+    if (page === anCatPeriode) return
+    anCatPeriode = page
+    majBarreCat()
+    if (navigator.vibrate) navigator.vibrate(6)
+  }, { passive: true })
+
+  document.querySelectorAll('#an-barre-cat [data-va]').forEach(b => {
+    b.addEventListener('click', () => {
+      piste.scrollTo({ left: b.dataset.va === 'all' ? piste.clientWidth : 0, behavior: 'smooth' })
+    })
+  })
+})()
+
 
 window.ouvrirAnTemps = function() {
   showGestionScreen('p-an-temps')

@@ -323,8 +323,10 @@
   /* Le halo se déforme DERRIÈRE l'anneau, qui reste net. Chez Apple le
      mouvement est toujours dans la lueur, jamais dans l'objet. */
   .ia-fig .halo{
-    position:absolute; inset:-3px; border-radius:50%;
-    filter:blur(3.5px); opacity:0.7;
+    /* Serré contre l'anneau : débordant, il faisait une auréole qui attirait
+       l'œil plus que la forme elle-même. */
+    position:absolute; inset:-1.5px; border-radius:50%;
+    filter:blur(2.5px); opacity:0.55;
     background:conic-gradient(from 180deg, transparent 0 50%, var(--c2) 70%, var(--c1) 88%, transparent 100%);
     animation:iaGalet 6.4s ease-in-out infinite reverse, iaTourne 5.2s linear infinite;
   }
@@ -606,14 +608,25 @@
      succès là où il n'y a qu'un achèvement — et surtout il ne ressemblait à
      rien de ce qui tournait une seconde plus tôt : on ne voyait pas que c'était
      la même chose, arrivée au bout. */
-  .etat-proc.prete{
-    width:19px; height:19px; border-radius:50%;
-    background:rgba(255,255,255,0.14);
-    border:0.5px solid rgba(255,255,255,0.30);
-    -webkit-backdrop-filter:blur(8px) saturate(180%); backdrop-filter:blur(8px) saturate(180%);
-    animation:etatArrive 0.5s cubic-bezier(0.34,1.5,0.64,1) both;
+  /* Plus de pastille grise derrière : l'anneau de l'IA n'en a pas, celui-ci
+     non plus. Le trait dessine la forme, rien ne la remplit. */
+  /* La coche ne surgit pas : elle se DESSINE. Le cercle fait son tour, puis le
+     trait se trace — exactement le geste de l'anneau qui se dévoile pendant
+     l'analyse. Le passage de l'un à l'autre se lit comme une suite, pas comme
+     le remplacement d'un signe par un autre. */
+  .etat-proc.prete{ width:19px; height:19px; }
+  .etat-proc.prete circle{
+    stroke-dasharray:66; stroke-dashoffset:66;
+    animation:iaCercleTrace 0.5s cubic-bezier(0.32,0.72,0,1) both;
+    transform:rotate(-90deg); transform-origin:center;
   }
-  .etat-proc.prete svg{ width:11px; height:11px; }
+  .etat-proc.prete polyline{
+    stroke-dasharray:14; stroke-dashoffset:14;
+    animation:iaCocheTrace 0.28s cubic-bezier(0.4,0,0.2,1) 0.34s both;
+  }
+  @keyframes iaCercleTrace{ to{ stroke-dashoffset:0; } }
+  @keyframes iaCocheTrace{ to{ stroke-dashoffset:0; } }
+  .etat-proc.prete svg{ width:19px; height:19px; }
   /* Une analyse en panne se signale, mais sans crier : même gabarit que les
      autres indicateurs, seule la couleur change. */
   .etat-proc.souci{ animation:etatArrive 0.4s cubic-bezier(0.34,1.5,0.64,1) both; }
@@ -3291,7 +3304,7 @@
   .cat-recent-item .etat-proc{ width:13px; height:13px; }
   .cat-recent-item .etat-proc svg{ width:13px; height:13px; }
   .cat-recent-item .etat-proc.prete{ width:13px; height:13px; }
-  .cat-recent-item .etat-proc.prete svg{ width:8px; height:8px; }
+  .cat-recent-item .etat-proc.prete svg{ width:13px; height:13px; }
   .cat-pct-row{ display:flex; align-items:baseline; gap:5px; margin-bottom:8px; }
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
   /* Côté équipe, le compteur est un rapport (« 2/2 lues ») et non un
@@ -4349,10 +4362,14 @@
     </div>
 
     <div class="card" id="doc-attente-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="ga-anneau" id="doc-anneau" style="margin:0 auto 16px;"></div>
-      <div style="font-size:14px; font-weight:600; margin-bottom:4px;">L'IA lit votre document…</div>
-      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;">
-        Quelques secondes. Vous relirez chaque étape ensuite.
+      <div class="ia-fig g" style="margin:0 auto 20px;">
+        <span class="halo"></span><span class="lum"></span>
+      </div>
+      <!-- « L'IA lit votre document » décrivait la machine. On dit plutôt ce
+           qu'on obtient, et ce qu'on en fera : une procédure, qu'on relira. -->
+      <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;">Votre procédure s’écrit</div>
+      <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;">
+        Vous relirez chaque étape avant de publier.
       </div>
     </div>
   </div>
@@ -4413,7 +4430,7 @@
     </div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/><circle cx="26" cy="24" r="16.5" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/><circle cx="26" cy="24" r="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"/></g></svg></div>
+      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"/><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"/><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFini)" stroke-width="1.6"/><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFini)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"/></g></svg></div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
       <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
       <button class="btn block" id="ai-view-btn">Voir la procédure</button>
@@ -5531,6 +5548,17 @@
 <input type="file" id="etab-fichier" accept="image/*" style="display:none;">
 
 <!-- Bandeau de diagnostic : n'apparaît que si le chargement se bloque -->
+<!-- Le dégradé de la marque IA, défini une seule fois. Chaque coche le
+     référence par son nom : le déclarer dans chaque SVG créerait autant
+     d'identifiants identiques dans la page, ce qui n'est pas valide. -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <linearGradient id="iaFini" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2F6FC"/><stop offset="0.5" stop-color="#93A4C0"/><stop offset="1" stop-color="#4E5B72"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <div class="bandeau-bloc" id="bandeau-bloc">
   <div class="t">Le chargement n'aboutit pas</div>
   <!-- Le détail technique reste : il sert quand on nous écrit. Les boutons
@@ -10957,7 +10985,6 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
 
   document.getElementById('doc-saisie-card').style.display = 'none'
   document.getElementById('doc-attente-card').style.display = 'block'
-  dessinerAnneau('doc-anneau', 100, 'var(--blue)', '\u2726')
 
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-texte`, {
@@ -12657,6 +12684,14 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { manualSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
 
+    /* Le champ ne s'ajustait qu'à LA SAISIE. Rempli par l'IA — ou relu après
+       coup —, il gardait sa hauteur d'une ligne et coupait le texte au milieu.
+       On l'ajuste donc aussi à l'affichage.
+
+       Au prochain rendu plutôt que tout de suite : `scrollHeight` vaut zéro
+       tant que l'élément n'est pas dans la page. */
+    requestAnimationFrame(() => autoResizeTextarea(textarea))
+
     /* La photo n'est pas envoyée tout de suite : on la garde de côté et elle
        part avec la publication, en même temps que le reste. Inutile d'occuper
        le réseau pour une étape qui sera peut-être supprimée. */
@@ -13018,6 +13053,10 @@ function renderVideoSteps(listEl) {
     const ta = div.querySelector('textarea')
     ta.addEventListener('input', (e) => {
       videoSteps[i].texte = e.target.value
+    /* Même correctif que les deux autres fils : le champ s'ajuste à l'affichage,
+       pas seulement à la saisie. Les textes écrits par l'IA s'ouvraient coupés
+       à la première ligne. */
+    requestAnimationFrame(() => autoResizeTextarea(textarea))
       autoResizeTextarea(e.target)
     })
     ta.addEventListener('focus', () => { dvSelection = i; dvMajFrise() })
@@ -13762,8 +13801,24 @@ function surveillerAnalyses() {
         clearInterval(surveillanceAnalyses)
         surveillanceAnalyses = null
       }
+        /* On repeint TOUT ce qui peut montrer l'état d'une procédure. Ne repeindre
+         que la grille laissait la roue tourner sur les autres écrans : la fiche
+         ouverte, la recherche, la liste d'une catégorie. L'état avait changé en
+         mémoire, mais personne ne le redessinait là où on regardait. */
       renderCategoryGrid()
-      if (document.getElementById('p-category')?.classList.contains('active')) renderCategoryProceduresList()
+      const actif = (id) => document.getElementById(id)?.classList.contains('active')
+      if (actif('p-category')) renderCategoryProceduresList()
+      if (actif('e-list') || actif('e-category')) renderEquipeCategories()
+
+      /* La fiche ouverte porte elle aussi l'état : si c'est celle qui vient
+         d'aboutir, on la recharge pour que ses étapes apparaissent. */
+      if (actif('p-analyse') && currentAnalyseData?.procedure) {
+        const id = currentAnalyseData.procedure.id
+        const misAJour = allGestionProcedures.find(x => x.id === id)
+        if (misAJour?.statut === 'pret' && currentAnalyseData.procedure.statut !== 'pret') {
+          openAnalyse(id)
+        }
+      }
     }
     surveillerAnalyses()
   }, 15000)
@@ -13797,16 +13852,23 @@ function etatProcedureHtml(proc) {
   if (analyseBloquee(proc)) return alerte('#FF9F0A', "L'analyse semble bloquée — touchez pour relancer")
 
   if (proc?.statut === 'traitement' || proc?.statut === 'redaction') {
+    /* La marque de l'IA, pas une roue de chargement quelconque : c'est bien
+       elle qui travaille, et le même signe la désigne partout dans l'app. */
     return `<div class="etat-proc" title="Analyse en cours">
-      <svg viewBox="0 0 26 26">
-        <circle class="fond-arc" cx="13" cy="13" r="10"/>
-        <circle class="arc rot" cx="13" cy="13" r="10"/>
-      </svg></div>`
+      <span class="ia-fig s"><span class="lum"></span></span>
+    </div>`
   }
   if (proc?.statut === 'pret') {
+    /* La même famille que l'anneau de l'IA : un cercle fin dans la même
+       palette, la coche à l'intérieur. C'est le même travail qui s'achève —
+       le passage de l'un à l'autre doit se lire comme une suite, pas comme
+       le remplacement d'un signe par un autre. */
     return `<div class="etat-proc prete" title="Analyse terminée">
-      <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.92)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="20 6 9 17 4 12"/></svg></div>`
+      <svg viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"/>
+        <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)"
+                  stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg></div>`
   }
   return ''
 }
@@ -17242,6 +17304,9 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; autoResizeTextarea(e.target) })
+    /* Même correctif qu'à la création : le champ s'ajuste aussi à l'affichage,
+       sinon une étape longue s'ouvre coupée à la première ligne. */
+    requestAnimationFrame(() => autoResizeTextarea(textarea))
 
     /* La photo, pour les étapes sans extrait vidéo. Les mêmes gestes qu'à la
        création : la vignette est la commande, et elle propose de remplacer ou de

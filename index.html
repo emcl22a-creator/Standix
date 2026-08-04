@@ -3226,7 +3226,10 @@
   .scan-result .icon{ width:38px; height:38px; border-radius:12px; background:var(--green); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
   .scan-result .icon svg{width:20px; height:20px; color:#000;}
   .scan-vue{
-    position:relative; margin-top:16px; height:calc(100vh - 300px);
+    /* Aucune marge haute : le viseur commence à la même ligne que la carte
+       « Bonjour prénom » de la page des procédures. Passer d'un onglet à l'autre
+       ne doit pas faire sauter le contenu. */
+    position:relative; margin-top:0; height:calc(100vh - 280px);
     max-height:460px; min-height:320px;
     border-radius:26px; overflow:hidden; background:#000;
     border:0.5px solid var(--border);
@@ -3254,7 +3257,7 @@
      du texte blanc illisible. */
   .scan-mot{
     position:absolute; left:0; right:0; bottom:0;
-    padding:56px 24px 74px; text-align:center; pointer-events:none;
+    padding:48px 24px 70px; text-align:center; pointer-events:none;
     background:linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.62) 58%, rgba(0,0,0,0.78) 100%);
   }
   /* La même écriture que les titres de page : même taille, même graisse, même
@@ -3264,11 +3267,11 @@
      image n'a pas de raison d'avoir sa propre typographie — seule l'ombre
      s'ajoute, pour qu'il reste lisible sur une scène claire. */
   .scan-mot b{
-    display:block; font-size:26px; font-weight:700; letter-spacing:-0.02em;
+    display:block; font-size:20px; font-weight:700; letter-spacing:-0.025em;
     line-height:1.2; text-shadow:0 2px 16px rgba(0,0,0,0.85);
   }
   .scan-mot span{
-    display:block; font-size:14px; color:var(--label-2); margin-top:6px;
+    display:block; font-size:13px; color:var(--label-2); margin-top:4px;
     line-height:1.35; text-shadow:0 2px 12px rgba(0,0,0,0.85);
   }
 
@@ -4743,7 +4746,7 @@
            sur ce qu'on cherche à cadrer. -->
       <div class="scan-mot">
         <b>Scanner un code</b>
-        <span id="g-scan-hint">Visez le QR code affiché sur votre poste</span>
+        <span id="g-scan-hint">Visez le QR code</span>
       </div>
 
       <div class="scan-outils">
@@ -5404,7 +5407,7 @@
            sur ce qu'on cherche à cadrer. -->
       <div class="scan-mot">
         <b>Scanner un code</b>
-        <span id="scan-hint">Visez le QR code affiché sur votre poste</span>
+        <span id="scan-hint">Visez le QR code</span>
       </div>
 
       <div class="scan-outils">
@@ -5745,7 +5748,7 @@ const DICO = {
     "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Ask your manager for the company code to access them.',
     // ── scanner ──
     'Autorisez la cam\u00e9ra pour scanner': 'Allow the camera to scan',
-    'Visez le QR code affich\u00e9 sur votre poste': 'Point at the QR code displayed at your station',
+    'Visez le QR code': 'Point at the QR code',
     'Code reconnu': 'Code recognised',
     'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Open the procedure',
     "Ce n'est pas celle-l\u00e0": "That's not the one",
@@ -5949,7 +5952,7 @@ const DICO = {
     'Les autres proc\u00e9dures ne vous sont pas accessibles': 'Los dem\u00e1s procedimientos no est\u00e1n disponibles',
     "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Pide el c\u00f3digo de la empresa a tu responsable para acceder.',
     'Autorisez la cam\u00e9ra pour scanner': 'Autoriza la c\u00e1mara para escanear',
-    'Visez le QR code affich\u00e9 sur votre poste': 'Apunta al c\u00f3digo QR de tu puesto',
+    'Visez le QR code': 'Apunta al c\u00f3digo QR',
     'Code reconnu': 'C\u00f3digo reconocido',
     'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir el procedimiento',
     "Ce n'est pas celle-l\u00e0": 'No es este',
@@ -6152,7 +6155,7 @@ const DICO = {
     'Les autres proc\u00e9dures ne vous sont pas accessibles': 'Os outros procedimentos n\u00e3o est\u00e3o dispon\u00edveis',
     "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Pe\u00e7a o c\u00f3digo da empresa ao seu respons\u00e1vel para aceder.',
     'Autorisez la cam\u00e9ra pour scanner': 'Autorize a c\u00e2mara para ler',
-    'Visez le QR code affich\u00e9 sur votre poste': 'Aponte ao c\u00f3digo QR do seu posto',
+    'Visez le QR code': 'Aponte ao c\u00f3digo QR',
     'Code reconnu': 'C\u00f3digo reconhecido',
     'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Abrir o procedimento',
     "Ce n'est pas celle-l\u00e0": 'N\u00e3o \u00e9 este',
@@ -15748,7 +15751,7 @@ window.startScanner = async function(espace) {
    On détecte donc l'appareil et on donne les touches à suivre, dans l'ordre. */
 /* La consigne sous le titre, dans l'image. Elle sert aussi à dire où en est
    l'ouverture de la caméra — mais elle revient toujours à son texte d'origine. */
-const CONSIGNE = 'Visez le QR code affich\u00e9 sur votre poste'
+const CONSIGNE = 'Visez le QR code'
 
 function remettreConsigne(el) {
   if (el) el.textContent = CONSIGNE

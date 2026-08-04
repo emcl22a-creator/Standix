@@ -778,7 +778,9 @@
     font-size:14px; font-weight:600; color:var(--label-3);
     letter-spacing:-0.02em; flex-shrink:0; white-space:nowrap;
   }
-  .fm-nom-ligne .poste:not(:empty)::before{ content:' \00b7 '; white-space:pre; }
+  /* En CSS, l'espace qui SUIT un échappement le termine : `\00b7 ` ne rend que
+     le point, l'espace est avalé. On écrit donc le caractère tel quel. */
+  .fm-nom-ligne .poste:not(:empty)::before{ content:' · '; white-space:pre; }
 
   /* L'anneau segmenté. */
   .fm-segm{ display:flex; justify-content:center; padding:20px 0 2px; }
@@ -789,8 +791,12 @@
   .fm-segm .arc{ stroke-linecap:round; transition:opacity 0.45s ease; }
 
   /* L'aiguille du masque : c'est elle qui fait le tour. */
+  /* L'aiguille du masque a un bout DROIT. Arrondie, sa demi-épaisseur débordait
+     en arrière du point de départ — c'est-à-dire juste avant midi, là où se
+     termine la dernière part. On voyait donc un fragment de la dernière couleur
+     avant que l'animation ne commence. */
   .fm-segm .fm-aiguille{
-    stroke-linecap:round;
+    stroke-linecap:butt;
     transition:stroke-dashoffset 1.4s cubic-bezier(0.32,0.72,0,1);
   }
   .fm-segm .arc.pale{ opacity:0.20; }
@@ -805,13 +811,26 @@
     text-align:center; line-height:1.3; color:var(--label-2);
   }
 
+  /* Les listes de la fiche se posent dans une carte, comme partout ailleurs.
+     Nues sur le fond, elles couraient d'un bord à l'autre alors que le reste de
+     l'app garde ses 18 px de marge intérieure — la page paraissait plus large
+     que les autres. */
+  .fm-carte{
+    margin-top:6px; padding:4px 18px; border-radius:20px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+
   /* Les lignes du classement. */
   .fm-lg{
     display:flex; align-items:center; gap:11px; padding:11px 2px; width:100%;
     background:none; border:none; border-bottom:0.5px solid rgba(255,255,255,0.055);
     font-family:inherit; text-align:left; color:inherit;
   }
-  .fm-lg:last-of-type{ border-bottom:none; }
+  /* `:last-of-type` compte les BALISES, pas les classes : dans une liste suivie
+     du bouton « Voir les autres », il désignait le bouton et non la dernière
+     ligne — qui gardait donc son filet, là où l'activité n'en avait pas. */
+  .fm-carte > *:last-child{ border-bottom:none; }
+  .fm-lg:has(+ .fm-plus){ border-bottom:none; }
   .fm-lg:active{ opacity:0.6; }
   .fm-lg .pt{ width:11px; height:11px; border-radius:3px; flex-shrink:0; }
   .fm-lg .co{ flex:1; min-width:0; display:flex; flex-direction:column; }
@@ -819,6 +838,23 @@
   .fm-lg .st{ font-size:11.5px; color:var(--label-3); margin-top:1px; }
   .fm-lg .vl{ font-size:14px; font-weight:650; color:var(--label-2); flex-shrink:0; }
   .fm-lg.choisi .nm{ color:#fff; }
+
+  /* Les lignes qui se déplient arrivent une à une, en glissant depuis le haut.
+     Sans ça, trois lignes surgissent d'un coup et on ne sait pas si la page a
+     changé ou si elle s'est rechargée. */
+  @keyframes fmLigneArrive{
+    from{ opacity:0; transform:translateY(-8px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  .fm-lg.neuve{ animation:fmLigneArrive 0.34s cubic-bezier(0.22,1,0.36,1) both; }
+
+  /* En repliant, celles qui partent s'effacent vers le haut. On les laisse en
+     place le temps de l'animation, puis on redessine. */
+  @keyframes fmLignePart{
+    from{ opacity:1; transform:translateY(0); }
+    to{ opacity:0; transform:translateY(-8px); }
+  }
+  .fm-lg.part{ animation:fmLignePart 0.24s ease both; pointer-events:none; }
 
   .fm-plus{
     width:100%; height:42px; margin-top:12px; border-radius:100px;
@@ -4442,7 +4478,7 @@
 
   <div class="screen" id="p-membre">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+      <button class="back-btn" onclick="ouvrirAnEquipe()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
       <!-- Le nom et le poste sur une même ligne, séparés d'un point. Le poste
@@ -4460,13 +4496,13 @@
     </div>
 
     <div class="fm-titre">Ce qui a occupé son temps</div>
-    <div id="fm-top"></div>
+    <div class="fm-carte" id="fm-top"></div>
 
     <div class="fm-titre">Activité</div>
     <!-- Les quatre repères sur le même modèle : une icône, un intitulé, une
          valeur à droite. Deux grandes cases pour deux nombres cassaient la
          lecture d'une liste qui, en dessous, disait la même chose autrement. -->
-    <div class="fm-rep">
+    <div class="fm-carte fm-rep">
       <div class="l">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="13"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="15"/></svg></span>
         <span class="nm">Consultations ce mois-ci</span><span class="vl" id="fm-nb-mois">—</span>
@@ -4485,7 +4521,10 @@
       </div>
     </div>
 
-    <div class="fm-actions" id="fm-actions"></div>
+    <!-- « Passer en gestion » et « Retirer de l'équipe » ont été retirés : une
+         fiche qui décrit quelqu'un ne devrait pas porter le bouton qui l'exclut.
+         Ces deux gestes vivent dans Paramètres → Équipe, là où l'on va quand on
+         veut administrer, pas quand on veut comprendre. -->
   </div>
 
   <div class="screen" id="p-scan">
@@ -7676,7 +7715,6 @@ async function peindreFicheMembre() {
     ? 'le ' + new Date(m.created_at).toLocaleDateString('fr-FR')
     : '\u2014'
 
-  peindreActionsMembre(m)
 }
 
 /* L'anneau. Chaque part occupe une fraction du tour proportionnelle à son temps,
@@ -7767,7 +7805,7 @@ function centreAnneauMembre(choix) {
 }
 
 /* Le classement. Trois lignes, puis un bouton qui déplie le reste. */
-function peindreClassementMembre() {
+function peindreClassementMembre(animerDes) {
   const el = document.getElementById('fm-top')
   if (!el) return
 
@@ -7779,10 +7817,13 @@ function peindreClassementMembre() {
   const vus = fmClasse.filter(x => x.secondes)
   const visibles = fmDeplie ? fmClasse : fmClasse.slice(0, 3)
 
-  el.innerHTML = visibles.map(x => {
+  el.innerHTML = visibles.map((x, rang) => {
     const i = vus.indexOf(x)
+    const neuve = animerDes != null && rang >= animerDes
     return `
-      <button type="button" class="fm-lg" data-part="${i}">
+      <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
+              ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
+              data-part="${i}">
         <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
         <span class="co">
           <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
@@ -7800,8 +7841,19 @@ function peindreClassementMembre() {
     b.className = 'fm-plus'
     b.textContent = fmDeplie ? 'Voir moins' : libelleVoirAutres(fmClasse.length - 3)
     b.addEventListener('click', () => {
-      fmDeplie = !fmDeplie
-      peindreClassementMembre()
+      if (fmDeplie) {
+        /* On replie : les lignes en trop s'effacent d'abord, on redessine après.
+           Les faire disparaître d'un coup donnerait un à-coup. */
+        const enTrop = [...el.querySelectorAll('.fm-lg')].slice(3)
+        enTrop.forEach((l, i) => {
+          l.style.animationDelay = ((enTrop.length - 1 - i) * 0.04) + 's'
+          l.classList.add('part')
+        })
+        setTimeout(() => { fmDeplie = false; peindreClassementMembre() }, 240 + enTrop.length * 40)
+        return
+      }
+      fmDeplie = true
+      peindreClassementMembre(3)
     })
     el.appendChild(b)
   }
@@ -7830,44 +7882,7 @@ function peindreClassementMembre() {
 }
 
 
-function peindreActionsMembre(m) {
-  const el = document.getElementById('fm-actions')
-  if (!el) return
-  /* Seul le fondateur promeut et retire : la même règle que dans la liste
-     d'équipe. Un promu ne peut retirer que des membres d'équipe. */
-  const moiFondateur = currentMembre?.role === 'gestion' && !currentMembre?.promu_par
-  const peutPromouvoir = moiFondateur && m.role !== 'gestion'
-  const peutRetrograder = moiFondateur && m.role === 'gestion' && m.promu_par
-  const peutRetirer = moiFondateur || (currentMembre?.role === 'gestion' && m.role !== 'gestion')
 
-  let html = ''
-  if (peutPromouvoir) html += '<button type="button" data-fm-act="promouvoir">Passer en gestion</button>'
-  if (peutRetrograder) html += '<button type="button" data-fm-act="retrograder">Repasser en \u00e9quipe</button>'
-  if (peutRetirer && m.id !== currentMembre?.id) {
-    html += '<button type="button" class="danger" data-fm-act="retirer">Retirer de l\'\u00e9quipe</button>'
-  }
-  el.innerHTML = html
-}
-
-document.getElementById('fm-actions')?.addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-fm-act]')
-  if (!b || !ficheMembreId) return
-  const m = (currentGaData?.employes || []).concat(cachedMembres || [])
-    .find(x => x.id === ficheMembreId)
-  if (!m) return
-
-  /* On délègue aux boutons de la liste d'équipe : mêmes confirmations, mêmes
-     vérifications de droits, un seul endroit où la règle est écrite. */
-  openMembres()
-  setTimeout(() => {
-    const sel = b.dataset.fmAct === 'retirer' ? '[data-retirer]' : '[data-promo]'
-    document.querySelector(`#pm-liste ${sel}[data-nom]`)
-    const cible = [...document.querySelectorAll(`#pm-liste ${sel}`)]
-      .find(x => x.closest('[data-membre]')?.dataset.membre === m.id
-        || x.dataset.promo === m.id || x.dataset.retirer === m.id)
-    if (cible) cible.click()
-  }, 260)
-})
 
 /* Un clic sur une procédure de la fiche ouvre cette procédure. */
 document.getElementById('p-membre')?.addEventListener('click', (e) => {
@@ -8105,103 +8120,9 @@ function peindreAnTemps() {
   renderTempsLecture(currentGaData.procedures, anValidationsPeriode(), anLibelle(), el, true)
 }
 
-document.getElementById('ga-top-membres')?.addEventListener('click', (e) => {
-  const ligne = e.target.closest('.emp-row')
-  if (ligne?.dataset.membre) openFicheMembre(ligne.dataset.membre)
-})
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   FICHE D'UN MEMBRE
-   Tout se calcule sur les données déjà chargées : aucune requête de plus.
-   ═══════════════════════════════════════════════════════════════════════════ */
-function openFicheMembre(membreId) {
-  if (!currentGaData) return
-  const { employes, membres, procedures, validations } = currentGaData
-  const m = (employes || []).concat(membres || []).find(x => x.id === membreId)
-  if (!m) return
-
-  showGestionScreen('p-membre-fiche')
-
-  const siennes = (validations || []).filter(v => v.membre_id === m.id)
-  const total = procedures.length
-  const lues = siennes.length
-  const pct = total ? Math.round((lues / total) * 100) : 0
-  const couleur = pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--orange)' : 'var(--red)'
-
-  document.getElementById('mf-nom').textContent = m.nom || 'Sans nom'
-  document.getElementById('mf-role').textContent =
-    (m.role === 'gestion' ? 'Gestion' : 'Équipe') +
-    (m.created_at ? ' · arrivé le ' + dateCourte(m.created_at) : '')
-  dessinerAnneau('mf-anneau', pct, couleur, pct + '%')
-
-  // Le temps qu'il a passé sur vos procédures, à côté de son anneau de lecture.
-    const totalM = (validations || []).filter(v => v.membre_id === m.id)
-      .reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
-  const zoneMed = document.getElementById('mf-medaille')
-  if (zoneMed) zoneMed.innerHTML = tempsTotalHtml(totalM, true)
-
-  document.getElementById('mf-lues').textContent = lues
-  document.getElementById('mf-reste').textContent = Math.max(0, total - lues)
-
-  // Nombre de journées distinctes où la personne a consulté quelque chose
-  const jours = new Set(siennes.map(v => new Date(v.validated_at).toDateString()))
-  document.getElementById('mf-serie').textContent = jours.size
-
-  const dates = siennes.map(v => new Date(v.validated_at).getTime()).sort((a, b) => b - a)
-  const derniere = dates[0] || null
-  const premiere = dates[dates.length - 1] || null
-
-  document.getElementById('mf-resume').innerHTML = total === 0
-    ? "Aucune procédure publiée pour l'instant."
-    : `A consulté <b>${lues} procédure${lues > 1 ? 's' : ''}</b> sur ${total}.` +
-      (derniere ? ` Dernière activité ${ilYA(derniere)}.` : ' Aucune activité pour le moment.')
-
-  // Tableau d'activité
-  const cette = new Date(); const jour = (cette.getDay() + 6) % 7
-  cette.setDate(cette.getDate() - jour); cette.setHours(0, 0, 0, 0)
-  const semaine = siennes.filter(v => new Date(v.validated_at) >= cette).length
-  const mois = siennes.filter(v => {
-    const d = new Date(v.validated_at)
-    return d.getMonth() === new Date().getMonth() && d.getFullYear() === new Date().getFullYear()
-  }).length
-
-  // Consultations du jour : on compare la date, pas l'horodatage
-  const dateDuJour = new Date().toDateString()
-  const nbAujourdhui = siennes.filter(v => new Date(v.validated_at).toDateString() === dateDuJour).length
-
-  document.getElementById('mf-activite').innerHTML = [
-    ['Taux de consultation', pct + ' %'],
-    ["Aujourd'hui", nbAujourdhui + ' consultation' + (nbAujourdhui > 1 ? 's' : '')],
-    ['Cette semaine', semaine + ' consultation' + (semaine > 1 ? 's' : '')],
-    ['Ce mois-ci', mois + ' consultation' + (mois > 1 ? 's' : '')],
-    ['Journées actives', jours.size + ' jour' + (jours.size > 1 ? 's' : '')],
-    ['Première consultation', premiere ? dateCourte(premiere) : '—'],
-    ['Dernière consultation', derniere ? dateCourte(derniere) + ' · ' + ilYA(derniere) : '—'],
-  ].map(([k, v]) => `<div class="mf-ligne"><span class="k">${k}</span><span class="v">${escapeHtml(String(v))}</span></div>`).join('')
-
-  // Ce qu'elle a lu, et ce qui reste
-  const lu = new Map(siennes.map(v => [v.procedure_id, v.validated_at]))
-  const faites = procedures.filter(p => lu.has(p.id))
-  const restantes = procedures.filter(p => !lu.has(p.id))
-
-  document.getElementById('mf-faites').innerHTML = faites.length
-    ? faites.map(p => `
-        <div class="sop-card">
-          <div><div class="title">${escapeHtml(p.titre)}</div>
-          <div class="meta">${escapeHtml(p.categorie || 'Sans catégorie')} · le ${dateCourte(lu.get(p.id))}</div></div>
-          <span class="badge ok">✓</span>
-        </div>`).join('')
-    : '<div class="note">Aucune procédure consultée pour le moment.</div>'
-
-  document.getElementById('mf-restantes').innerHTML = restantes.length
-    ? restantes.map(p => `
-        <div class="sop-card">
-          <div><div class="title">${escapeHtml(p.titre)}</div>
-          <div class="meta">${escapeHtml(p.categorie || 'Sans catégorie')}</div></div>
-          <span class="badge drift">—</span>
-        </div>`).join('')
-    : '<div class="note">Tout a été consulté.</div>'
-}
+/* Le résumé de l'analyse ne s'ouvre plus. C'est un aperçu — trois lignes pour
+   savoir où en est l'équipe —, pas un point d'entrée. La fiche d'un membre
+   s'ouvre depuis la page Équipe complète, où tout le monde figure. */
 
 function dateCourte(v) {
   return new Date(v).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })

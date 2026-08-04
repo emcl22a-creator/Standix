@@ -11291,7 +11291,13 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const path = `${base}_${aiVideoFile.name}`
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile)
     if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
-    const videoUrl = publicUrlData.publicUrl
+    /* On garde le CHEMIN, pas une URL publique. Le bucket est privé depuis le
+     passage aux liens signés : `getPublicUrl` rendait une adresse qui ne
+     s'ouvre plus. La fiche signera ce chemin au moment de lire la vidéo.
+
+     C'est d'ici que venait « Can't find variable: publicUrlData » : la ligne
+     qui créait cette variable a été retirée, son usage est resté. */
+  const videoUrl = path
 
     /* La bande son, pour l'analyse seule. Azure ne lit que la parole : lui
        envoyer la vidéo entière lui ferait télécharger des dizaines de mégaoctets
@@ -11314,6 +11320,17 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         urlPourAnalyse = sig?.signedUrl || urlPourAnalyse
         window.jalon?.(`bande son : ${poidsLisible(son.blob.size)} au lieu de ${poidsLisible(aiVideoFile.size)}`)
       }
+    }
+
+    /* Si on en est resté au chemin — mode écran, ou extraction du son échouée —
+       il faut le signer avant de le donner à Azure. Le bucket est privé : un
+       chemin nu ne s'ouvre pas, et l'analyse échouerait sans qu'on sache
+       pourquoi. */
+    if (urlPourAnalyse === videoUrl) {
+      const { data: sigVid } = await supabase.storage.from('procedo-videos')
+        .createSignedUrl(videoUrl, 6 * 3600)
+      if (!sigVid?.signedUrl) throw new Error("Impossible de pr\u00e9parer la vid\u00e9o pour l'analyse.")
+      urlPourAnalyse = sigVid.signedUrl
     }
 
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)

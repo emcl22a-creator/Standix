@@ -883,11 +883,10 @@
   .fm-trois .v{ font-size:20px; font-weight:800; letter-spacing:-0.04em; }
   .fm-trois .l{ font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
 
-  /* Les deux listes s'alignent sur la carte d'introduction de la page Équipe :
-     mêmes 18 px de marge intérieure, pour que le texte parte de la même
-     verticale d'un écran à l'autre. */
-  #fm-top, .fm-rep{ padding:0 18px; }
-  .fm-titre{ padding:0 18px; }
+  /* Aucun retrait supplémentaire : les listes touchent les marges de l'écran,
+     comme sur la page Équipe. Les 18 px que j'avais posés copiaient la marge
+     INTÉRIEURE d'une carte — mais sans carte autour, ce retrait ne s'explique
+     par rien et donne l'impression d'un cadre invisible. */
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
     margin:24px 0 4px; text-transform:uppercase; letter-spacing:0.06em;

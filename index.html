@@ -293,7 +293,13 @@
 
   /* L'écran de saisie respire un peu plus que les fiches de lecture : on y
      revient corriger, ajouter, supprimer — il faut de la place pour viser. */
-  .man-fil{ position:relative; padding-left:44px; margin-top:26px; }
+/* Le fil se termine par « Ajouter une étape ». Les boutons qui suivent
+     — tout effacer, publier — n'appartiennent plus à la liste : sans espace,
+     « Ajouter une étape » et « Annuler » se lisaient comme deux choix du même
+     groupe. Le blanc dit où la liste s'arrête. */
+  .man-fil{ margin-bottom:8px; }
+
+    .man-fil{ position:relative; padding-left:44px; margin-top:26px; }
   /* Le trait s'arrête avant le dernier maillon : il relie, il ne dépasse pas. */
   .man-fil::before{
     content:''; position:absolute; left:17px; top:8px; bottom:34px; width:1.5px;
@@ -313,6 +319,27 @@
   .man-fil textarea:focus{ outline:none; }
   .man-fil textarea::placeholder{ color:var(--label-3); }
   .man-fil .step-bas{ display:flex; align-items:flex-end; gap:11px; margin-top:12px; }
+
+  /* Sur l'écran de montage, la durée passe SOUS le texte et prend la ligne à
+     elle seule. Le texte retrouve toute la largeur : c'est lui qu'on relit. */
+  /* Le fil du montage suivait une ligne horizontale : vignette, texte, durée,
+     corbeille. Sur un téléphone, le texte héritait de moins d'un tiers de la
+     largeur — « Entrer la transaction » s'écrivait sur huit lignes.
+
+     Il suit désormais la construction de la saisie manuelle : numéro à gauche,
+     texte pleine largeur, durée en dessous. Ces règles arrivent après les
+     anciennes et les remplacent. */
+  .man-fil .etape-montage{
+    display:block; padding:0 0 26px; border-radius:0;
+    background:none; border:none; gap:0;
+  }
+  .man-fil .etape-montage .vig{ display:none; }
+  .man-fil .etape-montage.sel{ background:none; border-color:transparent; }
+  .man-fil .etape-montage textarea{ font-size:14.5px; font-weight:500; line-height:1.55; }
+
+  .etape-montage .step-bas{ align-items:center; margin-top:9px; }
+  .etape-montage .badge.extrait{ margin-top:0; }
+  .etape-montage .sup{ margin-left:auto; }
 
   /* Dans le fil, la photo est un carré nu — sans son libellé à côté. Le cadre
      dit déjà ce qu'il attend, et la ligne reste courte. */
@@ -1129,7 +1156,7 @@
      texte de l'étape — or elle l'illustre, elle ne le remplace pas. Alignée sur
      la marge du texte, l'œil descend en ligne droite d'une étape à l'autre. */
   .detail-step-img{
-    width:104px; height:104px; margin:10px 0 2px;
+    width:88px; height:88px; margin:10px 0 2px;
     border-radius:14px; overflow:hidden;
     border:0.5px solid var(--border); background:rgba(255,255,255,0.04);
     display:flex; align-items:center; justify-content:center;
@@ -2414,7 +2441,16 @@
      laissait croire à une étape validée : c'est seulement un moment de la vidéo.
      Le bleu de l'étape en cours de lecture est le bon signal — les deux parlent
      de la même chose. */
-  .badge.extrait{ background:rgba(94,160,255,0.16); color:#5EA0FF; }
+  /* La durée de l'extrait passe SOUS le texte de l'étape. À côté, elle
+     rognait la largeur du texte : sur un téléphone, une phrase de dix mots
+     passait sur deux lignes pour lui faire place. En dessous, elle ne coûte
+     rien à la lecture et se touche aussi bien. */
+  .badge.extrait{
+    background:rgba(94,160,255,0.16); color:#5EA0FF;
+    display:inline-flex; align-items:center; margin-top:7px;
+  }
+  .et-co .badge.extrait{ display:inline-flex; }
+  .et-co p + .badge.extrait{ margin-top:8px; }
   .badge.pending{background:rgba(255,159,10,0.16); color:var(--orange);}
   .badge.drift{background:rgba(255,69,58,0.16); color:var(--red);}
 
@@ -3806,7 +3842,7 @@
     <!-- Le bouton d'annulation a été retiré : trois boutons empilés au bas d'un
          écran de saisie — annuler un geste, tout effacer, publier — se ressemblent
          trop pour qu'on les distingue d'un coup d'œil. Reste ce qui compte. -->
-    <button class="btn ghost block" style="margin-top:9px;" id="man-annuler">Annuler les modifications</button>
+    <button class="btn ghost block" style="margin-top:30px;" id="man-annuler">Annuler les modifications</button>
     <button class="btn block" style="margin-top:9px;" id="publish-btn-manual">Publier la procédure</button>
   </div>
 
@@ -3815,9 +3851,21 @@
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Vous découpez, l’IA rédige</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="dv-titre-page">Vous découpez, l’IA rédige</h1>
     </div>
-    <div class="subhead">Marquez les coupures, l’IA rédige ensuite</div>
+    <div class="subhead" id="dv-sous">Marquez les coupures, l’IA rédige ensuite</div>
+
+    <!-- Catégorie et titre n'apparaissent QU'EN MODIFICATION, comme sur l'écran
+         des étapes manuelles. À la création ils ont déjà été demandés sur l'écran
+         précédent ; les redemander donnerait l'impression de recommencer. En
+         modification il faut bien pouvoir les corriger — et c'était impossible :
+         une procédure vidéo gardait son titre pour toujours. -->
+    <div id="dv-entete" style="display:none;">
+      <div class="man-lbl">Catégorie</div>
+      <input type="text" class="man-champ" id="dv-categorie" placeholder="Ex : Cuisine">
+      <div class="man-lbl">Titre</div>
+      <input type="text" class="man-champ" id="dv-titre" placeholder="Ex : Fermeture de caisse">
+    </div>
 
     <!-- La même carte que l'écran de l'IA : une note qui cadre l'attente, le
          choix du fichier, puis le lecteur. Deux écrans qui font entrer une
@@ -3850,7 +3898,7 @@
            déjà une vignette de son premier plan, et demander une photo en plus
            revenait à faire choisir entre deux couvertures pour la même fiche. -->
 
-      <div class="man-lbl">Les étapes<span class="n" id="vid-compte">0</span></div>
+      <!-- Titre retiré, comme sur l'écran manuel : le fil se reconnaît tout seul. -->
       <div class="man-fil" id="video-steps-list"></div>
 
       <!-- Compléter avec l'IA. Le découpage reste à la personne — c'est elle qui
@@ -3952,7 +4000,7 @@
     <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
 
     <div class="card" id="ai-upload-card">
-      <div class="note" style="margin-bottom:12px;"><b style="color:#fff;">Expliquez chaque geste à voix haute</b> : c'est la parole que l'IA écoute pour découper les étapes, pas l'image. Une procédure par vidéo, jusqu'à 10 minutes.</div>
+      <div class="note" style="margin-bottom:12px;"><b style="color:#fff;">Expliquez chaque geste à voix haute</b> : c'est surtout la parole que l'IA écoute pour découper les étapes. Une procédure par vidéo, jusqu'à 10 minutes.</div>
       <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
            l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
            montage, et c'est le plus propre des deux. -->
@@ -4110,12 +4158,12 @@
     </div>
 
     <div class="man-fil" id="edit-steps-list"></div>
-    <button class="btn ghost block" style="margin-top:4px;" id="edit-add-step-btn">+ Ajouter une étape</button>
+    <button class="btn ghost block" style="margin-top:6px;" id="edit-add-step-btn">+ Ajouter une étape</button>
 
     <!-- Annuler la dernière manipulation, comme à la création. Il n'y en avait
          aucune ici : `ecap-undo` appartient au découpage vidéo et ne touche pas
          aux étapes. -->
-    <button type="button" class="btn ghost block man-annuler-geste" style="margin-top:12px;"
+    <button type="button" class="btn ghost block man-annuler-geste" style="margin-top:30px;"
             id="edit-defaire" disabled aria-label="Annuler la dernière action">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M3.5 13a9 9 0 1 0 2.3-9.3L3 7"/></svg>
     </button>
@@ -11145,6 +11193,15 @@ window.ouvrirMontageVideo = async function(procId) {
   el('publish-btn-video').textContent = dvEdition
     ? 'Enregistrer les modifications' : 'Publier la proc\u00e9dure'
 
+  /* En modification, l'écran ne parle plus de découpage : on vient corriger une
+     procédure qui existe, pas en fabriquer une. */
+  el('dv-titre-page').textContent = dvEdition
+    ? 'Modifier la proc\u00e9dure' : 'Vous d\u00e9coupez, l\u2019IA r\u00e9dige'
+  el('dv-sous').textContent = dvEdition
+    ? "Vos changements ne partent qu'\u00e0 l'enregistrement"
+    : 'Marquez les coupures, l\u2019IA r\u00e9dige ensuite'
+  el('dv-entete').style.display = dvEdition ? 'block' : 'none'
+
   if (!dvEdition) return
 
   const [{ data: proc }, { data: etapes }] = await Promise.all([
@@ -11153,6 +11210,9 @@ window.ouvrirMontageVideo = async function(procId) {
   ])
   if (!proc) { el('create-error-video').textContent = 'Proc\u00e9dure introuvable.'; return }
 
+
+  el('dv-categorie').value = proc.categorie || ''
+  el('dv-titre').value = proc.titre || ''
 
   currentVideoFile = null
   reinitialiserCouverture(proc.image_url || null)
@@ -11875,7 +11935,6 @@ function renderVideoSteps(listEl) {
   const el = document.getElementById('video-steps-list')
   if (!el) return
   el.innerHTML = ''
-  const compte = document.getElementById('vid-compte')
 
   videoSteps.forEach((step, i) => {
     const div = document.createElement('div')
@@ -11886,14 +11945,17 @@ function renderVideoSteps(listEl) {
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
       <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
       <div class="step-bas">
-        <span class="vig"><canvas width="160" height="90"></canvas></span>
+        <!-- La vignette du premier plan a été retirée. Posée à côté du texte, elle
+             lui laissait moins d'un tiers de la largeur : « Entrer la transaction »
+             s'écrivait sur huit lignes. Et elle n'apprenait rien — une image fixe de
+             la première demi-seconde ne dit pas ce que l'étape contient. La durée,
+             elle, suffit à se repérer, et le bouton la rejoue. -->
         <span class="badge extrait">\u25b6 ${dvFmt(step.timestamp_video)}\u2013${dvFmt(step.fin_video)}</span>
         <button type="button" class="sup del" aria-label="Supprimer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
         </button>
       </div>`
 
-    dvVignette(div.querySelector('canvas'), step.timestamp_video)
 
     const ta = div.querySelector('textarea')
     ta.addEventListener('input', (e) => {
@@ -12034,7 +12096,9 @@ function champManuel(quoi) {
   /* Trois pages peuvent porter ces champs : l'écran de choix, celui des étapes
      manuelles et celui du découpage vidéo. On prend le premier qui est rempli,
      en commençant par l'écran affiché. */
-  const ordre = ['man-', 'new-'].map(pre => document.getElementById(pre + quoi))
+  /* `dv-` s'ajoute pour la modification d'une procédure vidéo : sans lui, la
+     publication reprenait le titre de l'écran de création, resté vide. */
+  const ordre = ['dv-', 'man-', 'new-'].map(pre => document.getElementById(pre + quoi))
   const visible = ordre.find(e => e && e.offsetParent !== null && e.value.trim())
   if (visible) return visible
   return ordre.find(e => e && e.value.trim()) || ordre.find(Boolean)

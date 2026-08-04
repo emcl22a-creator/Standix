@@ -7588,7 +7588,10 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     el.appendChild(div)
   })
 
-  if (!tout && classement.length > 3) {
+  /* Le bouton s'affiche même avec trois entrées ou moins : la page complète ne
+     se contente plus d'allonger la liste, elle porte l'anneau et le classement
+     par période. Il y a donc toujours quelque chose de plus à y voir. */
+  if (!tout) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
@@ -7749,7 +7752,10 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
       </button>`
   }).join('')
 
-  if (!tout && classement.length > 3) {
+  /* Le bouton s'affiche même avec trois entrées ou moins : la page complète ne
+     se contente plus d'allonger la liste, elle porte l'anneau et le classement
+     par période. Il y a donc toujours quelque chose de plus à y voir. */
+  if (!tout) {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
@@ -8323,6 +8329,9 @@ function peindreIntroEquipe(employes, validations) {
     ? `${actifs} sur ${employes.length} se sont form\u00e9s ce mois-ci`
     : `1 sur ${employes.length} s'est form\u00e9 ce mois-ci`
 
+  /* Le compte de ceux qui n'ont rien ouvert a été retiré : le titre le dit déjà
+     — « 3 sur 5 », les deux autres se déduisent. Répéter le manque juste en
+     dessous en faisait un reproche là où le chiffre suffisait. */
   if (jamais === 0) {
     const moyenne = Math.round(total / Math.max(1, actifs))
     s.innerHTML = `Toute votre \u00e9quipe est \u00e0 jour, <b>${dureeLisible(moyenne)} par personne</b> en moyenne. ` +
@@ -8331,11 +8340,11 @@ function peindreIntroEquipe(employes, validations) {
     const seul = employes.find(e => !validations.some(v =>
       v.membre_id === e.id && Number(v.duree_lecture)))
     s.innerHTML = seul?.nom
-      ? `Il ne manque que <b>${escapeHtml(seul.nom)}</b>. Touchez son nom pour voir ce qu'il lui reste \u00e0 lire.`
-      : `Il ne manque qu'<b>une personne</b>. Touchez son nom pour voir ce qu'il lui reste.`
+      ? `Il ne manque que <b>${escapeHtml(seul.nom)}</b>. Touchez son nom pour le d\u00e9tail de son activit\u00e9.`
+      : `Il ne manque qu'<b>une personne</b>. Touchez son nom pour le d\u00e9tail de son activit\u00e9.`
   } else {
-    s.innerHTML = `<b>${jamais} personnes</b> n'ont encore rien ouvert. ` +
-      `Touchez un nom pour voir ce qu'il lui reste \u00e0 lire.`
+    s.innerHTML = `Touchez un nom pour le <b>d\u00e9tail de son activit\u00e9</b> : ` +
+      `ce qui l'occupe, ce qu'il n'a pas ouvert, et depuis quand.`
   }
 }
 

@@ -1427,10 +1427,14 @@
   .dv-cadre video{ width:100%; height:100%; display:block; object-fit:contain; }
 
   /* La frise fait deux centimètres : on la lit, on ne la manipule pas. */
+  /* La frise laisse DÉBORDER les poignées : elles dépassent de 12 px en haut et en
+     bas pour être attrapables. Le calque `.dv-fond` rogne les segments à sa
+     place — sans lui, ils sortiraient du cadre arrondi. */
   .dv-frise{
-    position:relative; height:26px; margin-top:12px; border-radius:9px; overflow:hidden;
+    position:relative; height:26px; margin-top:22px; border-radius:9px; overflow:visible;
     background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
   }
+  .dv-fond{ position:absolute; inset:0; border-radius:9px; overflow:hidden; }
   .dv-seg{
     position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);
     background:rgba(94,160,255,0.30); display:flex; align-items:center;
@@ -1455,11 +1459,17 @@
 
      La zone de saisie déborde largement du trait — 22 px de large pour 2 px
      visibles. Un trait de 2 px ne se saisit pas au doigt. */
+  /* La zone de saisie DÉBORDE de la frise, en haut comme en bas : 26 px de haut
+     ne suffisent pas à attraper un trait au doigt. Elle fait 44 px de large et
+     dépasse de 12 px de chaque côté — invisible, mais on l'attrape du premier
+     coup au lieu de viser. */
   .dv-poi{
-    position:absolute; top:0; bottom:0; width:22px; margin-left:-11px;
+    position:absolute; top:-12px; bottom:-12px; width:44px; margin-left:-22px;
     z-index:6; cursor:ew-resize; touch-action:none;
     display:flex; align-items:center; justify-content:center;
   }
+  /* Le trait, lui, ne dépasse pas : il s'arrête aux bords de la frise. */
+  .dv-poi::before{ margin:12px 0; }
   .dv-poi::before{
     content:''; width:2px; height:100%; border-radius:2px;
     background:#fff; box-shadow:0 0 6px rgba(0,0,0,0.5);
@@ -1485,7 +1495,35 @@
   .dv-poi.tire .val{ opacity:1; transform:translateX(-50%) scale(1); }
 
   /* Le bouton de lecture, sous la frise et à gauche du temps. */
-  .dv-barre{ display:flex; align-items:center; gap:11px; padding:9px 2px 0; }
+  /* Les commandes, dans le coin bas gauche de l'image. */
+  .dv-cmd{
+    position:absolute; left:10px; bottom:10px; z-index:5;
+    display:flex; align-items:center; gap:8px;
+  }
+  .dv-rond{
+    width:38px; height:38px; border-radius:50%; border:none; padding:0; flex-shrink:0;
+    background:rgba(0,0,0,0.45); backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border:0.5px solid rgba(255,255,255,0.18); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dv-rond svg{ width:17px; height:17px; display:block; }
+  .dv-rond:active{ transform:scale(0.9); }
+  #dv-play .ic-pause{ display:none; }
+  #dv-play.joue .ic-play{ display:none; }
+  #dv-play.joue .ic-pause{ display:block; }
+
+  /* « Compléter avec l'IA » au-dessus de « Publier » : sans fond ni bordure,
+     pour ne pas concurrencer le bouton principal. */
+  .dv-ia-bas{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%; padding:14px 0 13px; margin-top:14px;
+    background:none; border:none; color:#fff;
+    font-family:inherit; font-size:15px; font-weight:650; letter-spacing:-0.02em;
+  }
+  .dv-ia-bas:disabled{ color:var(--label-3); }
+  .dv-ia-bas:disabled .ia-fig{ opacity:0.35; }
+  .dv-ia-bas:active{ opacity:0.6; }
   .dv-play{
     width:34px; height:34px; border-radius:50%; border:none; padding:0; flex-shrink:0;
     background:rgba(255,255,255,0.10); border:0.5px solid var(--border); color:#fff;
@@ -4465,7 +4503,20 @@
       <div class="dv-depot" id="dv-depot">
         <input type="file" id="video-input" accept="video/*">
         <div class="dv-cadre" id="dv-cadre">
-          <video id="video-player" style="display:none;" playsinline="" webkit-playsinline=""></video>
+          <video id="video-player" style="display:none;" playsinline="" webkit-playsinline="" preload="metadata"></video>
+
+            <!-- Les commandes vivent DANS l'image, au coin bas gauche : c'est
+                 là qu'on regarde quand on découpe. Sous la vidéo, il fallait
+                 quitter l'image des yeux pour appuyer. -->
+            <div class="dv-cmd" id="dv-cmd" style="display:none;">
+              <button type="button" class="dv-rond" id="dv-play" aria-label="Lecture">
+                <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
+                <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"/><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"/></svg>
+              </button>
+              <button type="button" class="dv-rond" id="dv-recul" aria-label="Reculer de cinq secondes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>
+              </button>
+            </div>
           <!-- Le cadre noir disait « aucune vidéo importée » : il constatait au lieu
                  d'inviter. Pointillés, icône et une phrase disent ce qu'on attend. -->
             <div class="dv-vide" id="video-placeholder">
@@ -4481,16 +4532,8 @@
 
     <div id="dv-travail" style="display:none;">
       <!-- La frise : un témoin, pas un outil. On la touche pour se déplacer. -->
-      <div class="dv-frise" id="dv-frise"><div class="dv-tete" id="dv-tete"></div></div>
-      <!-- Mettre en pause sans quitter l'écran : on découpe en regardant, et il
-           faut pouvoir s'arrêter pour ajuster une coupure. -->
-      <div class="dv-barre">
-        <button type="button" class="dv-play" id="dv-play" aria-label="Lecture">
-          <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
-          <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"/><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"/></svg>
-        </button>
-        <div class="dv-tps" style="flex:1;"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
-      </div>
+      <div class="dv-frise" id="dv-frise"><div class="dv-fond" id="dv-fond"></div><div class="dv-tete" id="dv-tete"></div></div>
+      <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
 
       <div class="dv-geste">
         <button type="button" id="dv-bouton">
@@ -4523,7 +4566,17 @@
       <div class="error-msg" id="create-error-video"></div>
       <!-- Le retour est ici aussi, pas seulement en haut : arrivé en bas d'une
            longue liste d'étapes, remonter chercher la flèche est une corvée. -->
-      <button class="btn ghost block" style="margin-top:16px;" id="vid-retour-bas">Revenir en arrière</button>
+      <!-- « Compléter les étapes avec l'IA », juste au-dessus de la publication :
+           c'est le dernier geste avant de publier, et l'endroit où l'on se
+           demande « est-ce que tout est écrit ? ».
+
+           Sans fond ni bordure : ce n'est pas une action à faire, c'en est une
+           qu'on PEUT faire. Un bouton plein l'aurait mise au même rang que
+           « Publier ». -->
+      <button type="button" class="dv-ia-bas" id="vid-ia-bas" style="display:none;">
+        <span class="ia-fig m"><span class="lum"></span></span>
+        <span id="vid-ia-bas-txt">Compléter les étapes avec l’IA</span>
+      </button>
       <button class="btn block" style="margin-top:9px;" id="publish-btn-video">Publier la procédure</button>
     </div>
   </div>
@@ -10424,9 +10477,6 @@ document.getElementById('man-annuler')?.addEventListener('click', async () => {
 })
 
 /* Le même retour, en haut et en bas de page. */
-document.getElementById('vid-retour-bas')?.addEventListener('click', () => {
-  showGestionScreen(dvEdition ? 'p-analyse' : 'p-create')
-})
 
 document.getElementById('man-retour')?.addEventListener('click', () => {
   showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
@@ -10786,6 +10836,21 @@ document.addEventListener('click', (e) => {
 let iaCompletionEnCours = false
 
 function majBoutonIA() {
+  /* Deux boutons pour la même action : celui du haut, sous les étapes, et celui
+     du bas, juste avant « Publier ». C'est l'endroit où l'on se pose la question
+     qui diffère, pas l'action. */
+  const bas = document.getElementById('vid-ia-bas')
+  if (bas) {
+    const nbTot = videoSteps.length
+    const videsTot = videoSteps.filter(s => !String(s.texte || '').trim()).length
+    bas.style.display = nbTot ? 'flex' : 'none'
+    bas.disabled = iaCompletionEnCours || videsTot === 0
+    const txt = document.getElementById('vid-ia-bas-txt')
+    if (txt) txt.textContent = iaCompletionEnCours
+      ? 'L\u2019IA \u00e9coute la vid\u00e9o\u2026'
+      : (videsTot ? 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA' : 'Toutes vos \u00e9tapes ont un texte')
+  }
+
   const b = document.getElementById('vid-ia')
   const note = document.getElementById('vid-ia-note')
   if (!b) return
@@ -10812,6 +10877,7 @@ function majBoutonIA() {
 }
 
 document.getElementById('vid-ia')?.addEventListener('click', completerEtapesAvecIA)
+document.getElementById('vid-ia-bas')?.addEventListener('click', completerEtapesAvecIA)
 
 async function completerEtapesAvecIA() {
   if (iaCompletionEnCours) return
@@ -12642,6 +12708,11 @@ document.getElementById('video-input')?.addEventListener('change', async (e) => 
   const player = document.getElementById('video-player')
   player.src = url
   player.style.display = 'block'
+  /* La vidéo s'affiche TOUT DE SUITE, sur sa première image. Elle restait noire
+     jusqu'à ce qu'on appuie sur « Lancer » — on croyait l'import raté.
+     `load()` demande au navigateur d'aller chercher cette première image. */
+  player.load()
+  document.getElementById('dv-cmd').style.display = 'flex'
   document.getElementById('video-placeholder').style.display = 'none'
   document.getElementById('dv-travail').style.display = 'block'
   dvDebutEnCours = 0
@@ -13240,7 +13311,9 @@ function dvMajFrise() {
       dvSelection = i; v.currentTime = e.timestamp_video
       renderVideoSteps(); dvMajFrise()
     })
-    f.insertBefore(d, document.getElementById('dv-tete'))
+    /* Les segments vont dans le calque rogné, pas dans la frise : sinon leurs
+       coins déborderaient du cadre arrondi. */
+    ;(document.getElementById('dv-fond') || f).appendChild(d)
   })
 
   /* Une poignée par coupure. La dernière étape se termine à la fin de la vidéo :
@@ -13353,6 +13426,16 @@ function majBoutonLecture() {
   if (!v) return
   ;['play', 'pause', 'ended'].forEach(ev => v.addEventListener(ev, majBoutonLecture))
 })()
+
+/* Reculer de cinq secondes. C'est le geste qu'on fait vingt fois en découpant :
+   on appuie trop tard, on revient un peu en arrière, on regarde à nouveau. */
+document.getElementById('dv-recul')?.addEventListener('click', () => {
+  const v = dvLecteur()
+  if (!v) return
+  v.currentTime = Math.max(0, v.currentTime - 5)
+  dvMajFrise()
+  if (navigator.vibrate) navigator.vibrate(6)
+})
 
 document.getElementById('dv-play')?.addEventListener('click', () => {
   const v = dvLecteur()

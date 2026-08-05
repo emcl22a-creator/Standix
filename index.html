@@ -1427,14 +1427,28 @@
   .dv-cadre video{ width:100%; height:100%; display:block; object-fit:contain; }
 
   /* La frise fait deux centimètres : on la lit, on ne la manipule pas. */
-  /* La frise laisse DÉBORDER les poignées : elles dépassent de 12 px en haut et en
-     bas pour être attrapables. Le calque `.dv-fond` rogne les segments à sa
-     place — sans lui, ils sortiraient du cadre arrondi. */
-  .dv-frise{
-    position:relative; height:26px; margin-top:22px; border-radius:9px; overflow:visible;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+  /* ═══ LA FRISE ═══
+
+     Une fenêtre qui défile, et dedans une frise cinq fois plus large que
+     l'écran. Sans ce zoom, une étape de trois secondes sur une vidéo de deux
+     minutes fait deux pixels : on ne peut ni la voir, ni la saisir.
+
+     Elle est aussi plus ÉPAISSE — 44 px au lieu de 26. Ce n'est pas décoratif :
+     on y attrape des traits au doigt, et un doigt fait 8 mm. */
+  .dv-vue{
+    position:relative; margin-top:22px;
+    overflow-x:auto; overflow-y:visible;
+    -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    padding:12px 0;
   }
-  .dv-fond{ position:absolute; inset:0; border-radius:9px; overflow:hidden; }
+  .dv-vue::-webkit-scrollbar{ display:none; }
+
+  .dv-frise{
+    position:relative; height:44px; border-radius:11px;
+    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    width:var(--zoom-l, 100%); min-width:100%;
+  }
+  .dv-fond{ position:absolute; inset:0; border-radius:11px; overflow:hidden; }
   .dv-seg{
     position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);
     background:rgba(94,160,255,0.30); display:flex; align-items:center;
@@ -1468,8 +1482,41 @@
     z-index:6; cursor:ew-resize; touch-action:none;
     display:flex; align-items:center; justify-content:center;
   }
-  /* Le trait, lui, ne dépasse pas : il s'arrête aux bords de la frise. */
   .dv-poi::before{ margin:12px 0; }
+
+  /* La tête de lecture se saisit aussi : on tire dedans pour parcourir la vidéo.
+     Sa zone déborde comme celle des coupures, et elle passe DEVANT. */
+  .dv-tete{
+    position:absolute; top:-12px; bottom:-12px; width:44px; margin-left:-22px;
+    z-index:8; touch-action:none; background:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dv-tete::before{
+    content:''; width:2.5px; height:100%; margin:12px 0; border-radius:2px;
+    background:#fff; box-shadow:0 0 10px rgba(255,255,255,0.85);
+  }
+  .dv-tete::after{
+    content:''; position:absolute; top:2px; width:11px; height:11px;
+    border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.5);
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .dv-tete.tire::after{ transform:scale(1.3); }
+
+  /* Les deux outils sous la frise. */
+  .dv-outils{ display:flex; align-items:center; gap:8px; padding:2px 0 0; }
+  .dv-zoom, .dv-annuler{
+    display:flex; align-items:center; gap:7px; padding:9px 14px;
+    border-radius:100px; border:0.5px solid var(--border);
+    background:rgba(255,255,255,0.06); color:var(--label-2);
+    font-family:inherit; font-size:12.5px; font-weight:650;
+  }
+  .dv-zoom svg, .dv-annuler svg{ width:15px; height:15px; flex-shrink:0; }
+  .dv-zoom .ic-serre{ display:none; }
+  .dv-zoom.large .ic-large{ display:none; }
+  .dv-zoom.large .ic-serre{ display:block; }
+  .dv-annuler{ margin-left:auto; }
+  .dv-annuler:disabled{ opacity:0.35; }
+  .dv-zoom:active, .dv-annuler:not(:disabled):active{ transform:scale(0.94); }
   .dv-poi::before{
     content:''; width:2px; height:100%; border-radius:2px;
     background:#fff; box-shadow:0 0 6px rgba(0,0,0,0.5);
@@ -4513,9 +4560,6 @@
                 <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
                 <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"/><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"/></svg>
               </button>
-              <button type="button" class="dv-rond" id="dv-recul" aria-label="Reculer de cinq secondes">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>
-              </button>
             </div>
           <!-- Le cadre noir disait « aucune vidéo importée » : il constatait au lieu
                  d'inviter. Pointillés, icône et une phrase disent ce qu'on attend. -->
@@ -4532,7 +4576,31 @@
 
     <div id="dv-travail" style="display:none;">
       <!-- La frise : un témoin, pas un outil. On la touche pour se déplacer. -->
-      <div class="dv-frise" id="dv-frise"><div class="dv-fond" id="dv-fond"></div><div class="dv-tete" id="dv-tete"></div></div>
+      <!-- La frise vit dans une FENÊTRE qui défile. Zoomée cinq fois par défaut :
+           à l'échelle de la vidéo entière, une étape de trois secondes sur deux
+           minutes fait deux pixels — impossible à viser, encore moins à déplacer. -->
+      <div class="dv-vue" id="dv-vue">
+        <div class="dv-frise" id="dv-frise">
+          <div class="dv-fond" id="dv-fond"></div>
+          <div class="dv-tete" id="dv-tete"></div>
+        </div>
+      </div>
+
+      <div class="dv-outils">
+        <button type="button" class="dv-zoom" id="dv-zoom" aria-label="Voir toute la vidéo">
+          <svg class="ic-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 4 4 4 4 9"/><polyline points="15 4 20 4 20 9"/><polyline points="9 20 4 20 4 15"/><polyline points="15 20 20 20 20 15"/></svg>
+          <svg class="ic-serre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 9 9 9 4"/><polyline points="20 9 15 9 15 4"/><polyline points="4 15 9 15 9 20"/><polyline points="20 15 15 15 15 20"/></svg>
+          <span id="dv-zoom-txt">Tout voir</span>
+        </button>
+
+        <!-- Annuler la dernière coupure. Rien à voir avec un retour de cinq
+             secondes : on vient de fermer une étape au mauvais moment et on veut
+             la reprendre, pas seulement reculer dans la vidéo. -->
+        <button type="button" class="dv-annuler" id="dv-annuler" disabled aria-label="Annuler la dernière coupure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>
+          Annuler la coupure
+        </button>
+      </div>
       <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
 
       <div class="dv-geste">
@@ -13293,6 +13361,130 @@ function dvMajGeste() {
   }
 }
 
+/* ═══ LE ZOOM DE LA FRISE ═══
+
+   Cinq fois par défaut. À l'échelle de la vidéo entière, une étape de trois
+   secondes sur deux minutes fait deux pixels : on ne peut ni la lire, ni
+   attraper sa coupure. Le bouton « Tout voir » rend la vue d'ensemble quand on
+   veut vérifier le découpage complet. */
+let dvZoom = 5
+
+function dvAppliquerZoom() {
+  const f = document.getElementById('dv-frise')
+  const b = document.getElementById('dv-zoom')
+  if (!f) return
+  f.style.setProperty('--zoom-l', (dvZoom * 100) + '%')
+  if (b) {
+    b.classList.toggle('large', dvZoom === 1)
+    const t = document.getElementById('dv-zoom-txt')
+    if (t) t.textContent = dvZoom === 1 ? 'Rapprocher' : 'Tout voir'
+  }
+}
+
+/* Garde la tête de lecture dans la fenêtre pendant que la vidéo avance. Sans
+   ça, elle sortirait de l'écran au bout de vingt secondes et on découperait
+   à l'aveugle. */
+function dvSuivreTete() {
+  const vue = document.getElementById('dv-vue')
+  const tete = document.getElementById('dv-tete')
+  if (!vue || !tete || dvZoom === 1) return
+  const x = tete.offsetLeft
+  const marge = vue.clientWidth * 0.35
+  if (x < vue.scrollLeft + marge || x > vue.scrollLeft + vue.clientWidth - marge) {
+    vue.scrollTo({ left: Math.max(0, x - vue.clientWidth / 2), behavior: 'smooth' })
+  }
+}
+
+document.getElementById('dv-zoom')?.addEventListener('click', () => {
+  dvZoom = dvZoom === 1 ? 5 : 1
+  dvAppliquerZoom()
+  dvMajFrise()
+  dvSuivreTete()
+  if (navigator.vibrate) navigator.vibrate(6)
+})
+
+/* ═══ TIRER LA TÊTE DE LECTURE ═══
+   Le trait blanc suit la vidéo ; le tirer déplace la vidéo. C'est le même objet
+   dans les deux sens — c'est ce qui rend le déplacement évident. */
+;(() => {
+  const tete = document.getElementById('dv-tete')
+  if (!tete) return
+  let tire = false, jouait = false
+
+  const placer = (clientX) => {
+    const f = document.getElementById('dv-frise')
+    const v = dvLecteur()
+    if (!f || !v) return
+    const r = f.getBoundingClientRect()
+    const duree = v.duration || 1
+    let t = (clientX - r.left) / r.width * duree
+    v.currentTime = Math.max(0, Math.min(duree, t))
+    dvMajFrise()
+  }
+
+  tete.addEventListener('pointerdown', (e) => {
+    e.preventDefault(); e.stopPropagation()
+    const v = dvLecteur()
+    tire = true
+    jouait = v && !v.paused
+    v?.pause()
+    tete.classList.add('tire')
+    tete.setPointerCapture?.(e.pointerId)
+    placer(e.clientX)
+  })
+  tete.addEventListener('pointermove', (e) => {
+    if (!tire) return
+    e.preventDefault()
+    placer(e.clientX)
+  })
+  const relacher = () => {
+    if (!tire) return
+    tire = false
+    tete.classList.remove('tire')
+    if (jouait) dvLecteur()?.play()
+  }
+  tete.addEventListener('pointerup', relacher)
+  tete.addEventListener('pointercancel', relacher)
+})()
+
+/* ═══ ANNULER LA DERNIÈRE COUPURE ═══
+
+   On vient de fermer une étape au mauvais moment : on la retire, et la vidéo
+   repart de là où cette étape commençait. C'est le geste qu'on cherche quand on
+   a appuyé trop tôt — pas un recul de quelques secondes.
+
+   Une étape qui porte déjà du texte n'est pas effacée sans confirmation : ce
+   serait perdre un travail de rédaction pour un geste de découpage. */
+function majBoutonAnnuler() {
+  const b = document.getElementById('dv-annuler')
+  if (b) b.disabled = videoSteps.length === 0
+}
+
+document.getElementById('dv-annuler')?.addEventListener('click', async () => {
+  if (!videoSteps.length) return
+  const derniere = videoSteps[videoSteps.length - 1]
+
+  if (String(derniere.texte || '').trim()) {
+    const ok = await confirmDialog({
+      titre: 'Retirer cette \u00e9tape ?',
+      message: `\u00ab ${derniere.texte.slice(0, 60)} \u00bb sera effac\u00e9e avec sa coupure.`,
+      confirmer: 'Retirer',
+      annuler: 'Garder',
+      danger: true,
+    })
+    if (!ok) return
+  }
+
+  const debut = derniere.timestamp_video
+  videoSteps.pop()
+  dvDebutEnCours = debut
+  dvSelection = videoSteps.length ? videoSteps.length - 1 : null
+  const v = dvLecteur()
+  if (v) v.currentTime = debut
+  dvMajGeste(); renderVideoSteps(); dvMajFrise()
+  if (navigator.vibrate) navigator.vibrate(8)
+})
+
 function dvMajFrise() {
   const f = document.getElementById('dv-frise')
   const v = dvLecteur()
@@ -13333,6 +13525,8 @@ function dvMajFrise() {
   document.getElementById('dv-t').textContent = dvFmt(v.currentTime)
   document.getElementById('dv-d').textContent = dvFmt(duree)
   majBoutonLecture()
+  majBoutonAnnuler()
+  dvAppliquerZoom()
 }
 
 /* ═══ DÉPLACER UNE COUPURE ═══
@@ -13427,15 +13621,6 @@ function majBoutonLecture() {
   ;['play', 'pause', 'ended'].forEach(ev => v.addEventListener(ev, majBoutonLecture))
 })()
 
-/* Reculer de cinq secondes. C'est le geste qu'on fait vingt fois en découpant :
-   on appuie trop tard, on revient un peu en arrière, on regarde à nouveau. */
-document.getElementById('dv-recul')?.addEventListener('click', () => {
-  const v = dvLecteur()
-  if (!v) return
-  v.currentTime = Math.max(0, v.currentTime - 5)
-  dvMajFrise()
-  if (navigator.vibrate) navigator.vibrate(6)
-})
 
 document.getElementById('dv-play')?.addEventListener('click', () => {
   const v = dvLecteur()
@@ -13473,6 +13658,9 @@ document.getElementById('dv-bouton')?.addEventListener('click', () => {
    seconde feraient perdre le curseur de saisie. */
 dvLecteur()?.addEventListener('timeupdate', () => {
   dvMajFrise()
+  /* La fenêtre suit la tête : zoomée cinq fois, celle-ci sortirait de l'écran
+     au bout de vingt secondes et on découperait à l'aveugle. */
+  dvSuivreTete()
   const ch = document.getElementById('dv-chrono')
   const v = dvLecteur()
   if (ch && v) ch.textContent = `depuis ${dvFmt(dvDebutEnCours)} \u00b7 ${Math.round(v.currentTime - dvDebutEnCours)} s`

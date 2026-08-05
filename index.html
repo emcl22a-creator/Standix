@@ -329,9 +329,17 @@
     animation:iaGalet 6.4s ease-in-out infinite reverse, iaTourne 5.2s linear infinite;
   }
 
-  .ia-fig.g{ width:112px; height:112px; --trait:14px; }
+  /* 112 px prenait la moitié de la carte. À 78, l'anneau reste le point de
+     mire sans écraser le texte qui le suit — c'est lui qu'on lit. */
+  .ia-fig.g{ width:78px; height:78px; --trait:9px; }
   .ia-fig.m{ width:26px;  height:26px;  --trait:5px; }
-  .ia-fig.s{ width:17px;  height:17px;  --trait:3.5px; }
+  .ia-fig.s{ width:15px; height:15px; --trait:2.6px; }
+
+  /* Sur une carte de procédure, l'anneau se pose à côté d'un titre : il doit se
+     voir sans peser. Plus petit ET plus fin — les deux ensemble, sinon un trait
+     épais sur un petit cercle donne une pastille, pas un anneau. */
+  .etat-proc .ia-fig.s{ width:13px; height:13px; --trait:2.1px; }
+  .cat-recent-item .etat-proc .ia-fig.s{ width:11px; height:11px; --trait:1.8px; }
 
   .ia-fig .lum, .ia-fig .halo{
     -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - var(--trait)), #000 0);
@@ -589,7 +597,7 @@
      jusqu'à ce que le gérant ouvre la procédure. C'est le seul endroit où il
      apprend que son analyse est terminée s'il a quitté l'écran. */
   .etat-proc{
-    width:19px; height:19px; flex-shrink:0;
+    width:13px; height:13px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
   }
   .etat-proc svg{ width:19px; height:19px; display:block; }
@@ -3315,7 +3323,7 @@
   .cat-recent-item .txt{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   /* Dans la liste des titres récents, le texte est plus petit : l'indicateur
      se met à l'échelle pour ne pas écraser la ligne. */
-  .cat-recent-item .etat-proc{ width:13px; height:13px; }
+  .cat-recent-item .etat-proc{ width:11px; height:11px; }
   .cat-recent-item .etat-proc svg{ width:13px; height:13px; }
   .cat-recent-item .etat-proc.prete{ width:13px; height:13px; }
   .cat-recent-item .etat-proc.prete svg{ width:13px; height:13px; }
@@ -4379,7 +4387,7 @@
     </div>
 
     <div class="card" id="doc-attente-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="ia-fig g" style="margin:0 auto 20px;">
+      <div class="ia-fig g" style="margin:0 auto 18px;">
         <span class="halo"></span><span class="lum"></span>
       </div>
       <!-- « L'IA lit votre document » décrivait la machine. On dit plutôt ce
@@ -4436,12 +4444,15 @@
     </div>
 
     <div class="card" id="ai-progress-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="ia-fig g" style="margin:0 auto 20px;">
+      <div class="ia-fig g" style="margin:0 auto 18px;">
         <span class="halo"></span><span class="lum"></span>
         <span class="pct" id="ai-progress-pct">0%</span>
       </div>
-      <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-progress-title">Analyse en cours...</div>
-      <div style="font-size:12.5px; color:var(--label-2); line-height:1.5;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
+      <!-- Même présentation que la carte du document : un titre de 19 px, une
+           phrase de 13 en dessous. Deux écrans qui font attendre pour la même
+           raison ne doivent pas se présenter différemment. -->
+      <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Votre procédure s’écrit</div>
+      <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
       <button type="button" class="btn ghost block" id="ai-annuler" style="margin-top:18px; color:var(--red);">Abandonner et supprimer</button>
     </div>
 
@@ -11097,8 +11108,12 @@ function majProgressionIA() {
   const temps = min > 0 ? `${min} min ${String(sec).padStart(2, '0')}` : `${sec} s`
 
   const info = AI_ETAPES[aiEtapeCourante] || AI_ETAPES.envoi
+  /* Le titre ne change plus à chaque étape. « Transcription de la parole · 14 s »
+     décrivait la machine et changeait toutes les vingt secondes ; on annonce
+     plutôt ce qu'on obtient, une bonne fois. Le détail de l'étape et le temps
+     écoulé passent dans la phrase du dessous, où ils ne bousculent rien. */
   const titre = document.getElementById('ai-progress-title')
-  if (titre) titre.textContent = `${t(info.titre)} \u00b7 ${temps}`
+  if (titre) titre.textContent = t('Votre proc\u00e9dure s\u2019\u00e9crit')
 
   /* L'anneau tourne toujours — c'est son mouvement qui dit que ça travaille,
      plus une jauge. On n'affiche le chiffre QUE si Azure en donne un vrai : un
@@ -11112,7 +11127,7 @@ function majProgressionIA() {
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
 
-  let phrase = t(info.sous)
+  let phrase = `${t(info.titre)} \u00b7 ${temps}. ` + t(info.sous)
   if (ecoule > 15 * 60) {
     phrase = t("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }

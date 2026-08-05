@@ -1037,29 +1037,15 @@
   /* Les pages d'analyse gardent les marges de l'écran, comme la carte
      « Bonjour prénom ». Seule la piste déborde — il faut qu'elle touche les
      bords pour que le panneau voisin s'annonce dès qu'on effleure. */
+  /* La piste doit toucher les bords pour que le panneau voisin s'annonce dès
+     qu'on effleure : elle sort donc des 20 px de l'écran, et ses panneaux les
+     rendent à l'intérieur. Le compte retombe exactement sur 20. */
   #an-piste-proc, #an-piste-cat{ margin:0 -20px; }
-  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{ padding:0 38px; }
+  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{ padding:0 20px; }
 
-  /* Les mêmes 18 px que la carte « Bonjour prénom » et que la fiche d'un
-     membre : d'un écran à l'autre, le texte part de la même verticale. */
-  #p-an-temps .fm-barre, #p-an-temps .fm-periode-mot, #p-an-temps .fm-titre,
-  #p-an-categories .fm-barre, #p-an-categories .fm-periode-mot, #p-an-categories .fm-titre{
-    padding-left:18px; padding-right:18px;
-  }
 
-  /* Toute la page reprend les 20 px de la carte « Bonjour prénom », SAUF
-     l'en-tête : le bouton retour et le nom restent à la marge de l'écran, comme
-     sur toutes les autres pages. Deux alignements différents, mais chacun se
-     justifie — l'en-tête appartient à la navigation, le reste au contenu.
-
-     Seule la piste déborde, pour que le panneau voisin s'annonce dès qu'on
-     effleure ; ses panneaux rendent le retrait à l'intérieur. */
   #p-membre .fm-piste{ margin:0 -20px; }
-  #p-membre .fm-piste .fm-pan{ padding:0 38px; }
-  #p-membre .fm-barre,
-  #p-membre .fm-periode-mot,
-  #p-membre .fm-titre,
-  #p-membre .fm-rep{ padding-left:18px; padding-right:18px; }
+  #p-membre .fm-piste .fm-pan{ padding:0 20px; }
   .fm-lg, .fm-rep .l{ padding-left:0; padding-right:0; }
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
@@ -1202,7 +1188,11 @@
   #an-gain{ position:relative; }
   /* Le bouton d'aide sur la LIGNE du titre, calé à droite. En position absolue
      dans l'angle, il flottait au-dessus du texte sans lui appartenir. */
-  .gain-ligne{ display:flex; align-items:flex-start; gap:10px; }
+  /* Le bouton se cale sur la PREMIÈRE ligne du titre, pas au milieu du bloc :
+     `baseline` alignerait sa base sur celle du texte, ce qui le fait descendre
+     quand le titre passe sur deux lignes. `flex-start` le garde en haut, et
+     l'angle est là où l'œil va le chercher. */
+  .gain-ligne{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
   .gain-ligne .t{ flex:1; min-width:0; }
 
   .gain-aide{
@@ -7727,8 +7717,12 @@ function renderGainTemps(validations, procedures) {
      sont tracées, et ça compte le jour d'un contrôle. */
   const pl = lecteurs > 1
   const procs = new Set(duMois.filter(v => Number(v.duree_lecture)).map(v => v.procedure_id)).size
-  s.innerHTML = `<b>${lecteurs} personne${pl ? 's' : ''}</b> ` +
-    `${pl ? 'ont ouvert' : 'a ouvert'} <b>${procs} proc\u00e9dure${procs > 1 ? 's' : ''}</b>. ` +
+  /* « 1 personne a ouvert 5 procédures » recomptait ce que la page affiche
+     déjà en dessous. On dit plutôt à QUOI ça sert : ce temps est du travail
+     qu'on n'a pas eu à refaire, et il est prouvable. */
+  const parPersonne = Math.round(secondes / Math.max(1, lecteurs) / 60)
+  s.innerHTML = `Soit <b>${parPersonne} minute${parPersonne > 1 ? 's' : ''} par personne</b> ` +
+    `que vous n'avez pas eu \u00e0 expliquer vous-m\u00eame. ` +
     `Chaque lecture est dat\u00e9e et nominative.`
 }
 

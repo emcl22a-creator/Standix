@@ -3310,6 +3310,11 @@
   .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
   .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
   .cat-icon{ display:flex; align-items:center; justify-content:center; font-size:24px; }
+
+  /* Quand le conteneur porte un anneau, le dessin se pose DEDANS — sinon il
+     s'affiche à côté. Le sélecteur ne vise que ce cas : ailleurs le conteneur
+     n'a pas de taille, et c'est le dessin qui la donne. */
+  .cat-ring-wrap > svg ~ .cat-icon{ position:absolute; inset:0; }
   /* Le fichier et la coche reprennent la langue des icônes de mode : trait
      blanc, mêmes épaisseurs, mêmes opacités. À 18 pixels on ne peut pas étager
      trois plans comme sur les grandes icônes — on garde le contour de devant
@@ -3324,8 +3329,10 @@
   /* La fiche d'une procédure : 29 px côté équipe, où c'est le seul repère de la
      ligne. Côté gestion on garde la taille d'origine — la carte y porte déjà
      l'état de l'analyse, l'icône n'a pas à dominer. */
-  #equipe-app .proc-rich-card .cat-icon svg{ width:29px; height:29px; }
-  #gestion-app .proc-rich-card .cat-icon svg{ width:17px; height:17px; }
+  #equipe-app .proc-rich-card .cat-icon svg{ width:26px; height:26px; }
+  /* En gestion le dessin vit dans l'anneau coloré : il ne peut pas grandir
+     autant, sinon il touche le trait. 20 px laissent l'anneau respirer. */
+  #gestion-app .proc-rich-card .cat-icon svg{ width:20px; height:20px; }
   .cat-badge{
     font-size:11px; font-weight:700; margin-top:3px; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;

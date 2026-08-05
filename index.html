@@ -1452,10 +1452,15 @@
   }
   .dv-piste::-webkit-scrollbar{ display:none; }
 
+  /* La largeur est posée EN PIXELS par le code.
+
+     En pourcentage, elle se calculait sur la zone de contenu de la piste — que
+     le retrait de la moitié de l'écran de chaque côté avait réduite à zéro. La
+     frise faisait donc 500 % de rien. */
   .dv-frise{
     position:relative; height:44px; border-radius:11px;
     background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
-    width:var(--zoom-l, 100%); min-width:100%; flex-shrink:0;
+    flex-shrink:0;
   }
   .dv-fond{ position:absolute; inset:0; border-radius:11px; overflow:hidden; }
   /* Pendant le geste, la frise se signale légèrement : on sait qu'on la tient. */
@@ -13386,9 +13391,13 @@ let dvZoom = 5
 
 function dvAppliquerZoom() {
   const f = document.getElementById('dv-frise')
+  const vue = document.getElementById('dv-vue')
   const b = document.getElementById('dv-zoom')
-  if (!f) return
-  f.style.setProperty('--zoom-l', (dvZoom * 100) + '%')
+  if (!f || !vue) return
+  /* Largeur visible × zoom, en pixels. À ×1 la frise occupe exactement l'écran ;
+     à ×5 elle en fait cinq fois la largeur et défile sous le trait. */
+  const large = Math.round(vue.clientWidth * dvZoom)
+  if (large > 0) f.style.width = large + 'px'
   if (b) {
     /* Le pincement donne des valeurs continues : on compare à un seuil plutôt
        qu'à l'égalité stricte, sinon le bouton resterait bloqué sur un libellé. */
@@ -13564,16 +13573,19 @@ function dvMajFrise() {
     brancherPoignee(poi, i)
   })
 
-  /* Le retrait dépend de la largeur de l'écran : on le repose à chaque dessin
-     plutôt qu'une seule fois, car la frise peut apparaître avant que la page ait
-     sa taille définitive. */
+  /* L'ORDRE compte : la largeur de la frise, puis le retrait de la piste, puis
+     seulement la position. Placer la piste avant de connaître la largeur revient
+     à diviser par zéro — le trait se retrouvait n'importe où.
+
+     On repose tout à chaque dessin plutôt qu'une fois pour toutes : la frise
+     peut apparaître avant que la page ait sa taille définitive. */
+  dvAppliquerZoom()
   dvPoserRetrait()
   dvPistePourTemps()
   document.getElementById('dv-t').textContent = dvFmt(v.currentTime)
   document.getElementById('dv-d').textContent = dvFmt(duree)
   majBoutonLecture()
   majBoutonAnnuler()
-  dvAppliquerZoom()
 }
 
 /* ═══ DÉPLACER UNE COUPURE ═══

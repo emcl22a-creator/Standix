@@ -1440,13 +1440,15 @@
     overflow:hidden;
   }
 
-  /* La piste défile sous le trait. Elle porte un retrait de la MOITIÉ de
-     l'écran de chaque côté : sans lui, l'instant zéro ne pourrait jamais
-     atteindre le centre, et la fin non plus. */
+  /* La piste défile sous le trait. Le retrait de la moitié de l'écran de chaque
+     côté — pour que l'instant zéro puisse atteindre le centre — est posé EN
+     PIXELS par le code, pas en pourcentage.
+
+     `padding:0 50%` faisait 100 % de retrait au total : la zone de contenu
+     tombait à zéro et la frise, large de 100 %, devenait invisible. */
   .dv-piste{
     overflow-x:auto; overflow-y:visible;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    padding:0 50%;
   }
   .dv-piste::-webkit-scrollbar{ display:none; }
 
@@ -13421,8 +13423,21 @@ document.getElementById('dv-zoom')?.addEventListener('click', () => {
 
    On garde le défilement NATIF plutôt qu'un geste à la main : il a l'inertie,
    le rebond, et le pincement du navigateur. Aucun code ne les imite bien. */
-let dvPilote = null      // 'video' | 'doigt' | null
+let dvPilote = null      // 'doigt' quand la main tient la piste
 let dvRelache = null
+let dvAttendu = -1       // la position que le code vient d'écrire
+
+/* Le retrait, en pixels : la moitié de la largeur visible de chaque côté. */
+function dvPoserRetrait() {
+  const vue = document.getElementById('dv-vue')
+  const piste = document.getElementById('dv-piste')
+  if (!vue || !piste) return
+  const moitie = Math.round(vue.clientWidth / 2)
+  if (!moitie) return
+  piste.style.paddingLeft = moitie + 'px'
+  piste.style.paddingRight = moitie + 'px'
+}
+window.addEventListener('resize', () => { dvPoserRetrait(); dvPistePourTemps() })
 
 function dvPistePourTemps() {
   const piste = document.getElementById('dv-piste')
@@ -13430,9 +13445,12 @@ function dvPistePourTemps() {
   const v = dvLecteur()
   if (!piste || !f || !v || dvPilote === 'doigt') return
   const duree = v.duration || 1
-  dvPilote = 'video'
-  piste.scrollLeft = (v.currentTime / duree) * f.offsetWidth
-  requestAnimationFrame(() => { if (dvPilote === 'video') dvPilote = null })
+  /* On note la position écrite plutôt que de lever un drapeau le temps d'une
+     image : l'événement de défilement arrive quand le navigateur veut, souvent
+     après. Le drapeau retombait avant lui, et le défilement de la vidéo était
+     pris pour un geste — la lecture se mettait en pause toute seule. */
+  dvAttendu = (v.currentTime / duree) * f.offsetWidth
+  piste.scrollLeft = dvAttendu
 }
 
 ;(() => {
@@ -13443,9 +13461,11 @@ function dvPistePourTemps() {
   let jouait = false
 
   piste.addEventListener('scroll', () => {
-    if (dvPilote === 'video') return
     const v = dvLecteur()
     if (!v) return
+    /* Le défilement que le code vient d'écrire ne compte pas : deux pixels de
+       tolérance, car le navigateur arrondit. */
+    if (dvPilote !== 'doigt' && Math.abs(piste.scrollLeft - dvAttendu) < 2) return
 
     /* Premier mouvement du doigt : on met la vidéo en pause, sinon elle
        continuerait d'avancer et lutterait contre la main. */
@@ -13544,7 +13564,10 @@ function dvMajFrise() {
     brancherPoignee(poi, i)
   })
 
-  /* Le trait ne bouge plus : c'est la piste qui se place sous lui. */
+  /* Le retrait dépend de la largeur de l'écran : on le repose à chaque dessin
+     plutôt qu'une seule fois, car la frise peut apparaître avant que la page ait
+     sa taille définitive. */
+  dvPoserRetrait()
   dvPistePourTemps()
   document.getElementById('dv-t').textContent = dvFmt(v.currentTime)
   document.getElementById('dv-d').textContent = dvFmt(duree)

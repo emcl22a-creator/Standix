@@ -3312,13 +3312,14 @@
   /* L'anneau coloré retiré, l'icône flottait dans une boîte de 46 px vide.
      Elle occupe désormais toute la place : un dossier de 30 px posé dans une
      tuile de 46, comme les icônes des réglages. */
-  /* Pas de tuile autour du dossier : le dessin se suffit. Un carré derrière une
-     icône déjà dessinée ajoute une forme sans ajouter de sens. */
-  .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
+  /* Le conteneur épousait la taille de l'ancien anneau : 46 px pour un dessin
+     de 26, donc dix pixels de vide tout autour. Il ne mesure plus rien — c'est
+     le dessin qui donne la taille, et la carte se resserre d'autant. */
+  .cat-ring-wrap{ position:relative; flex-shrink:0; display:flex; }
   .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
   .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
   .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
-  .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:24px; }
+  .cat-icon{ display:flex; align-items:center; justify-content:center; font-size:24px; }
   /* Le fichier et la coche reprennent la langue des icônes de mode : trait
      blanc, mêmes épaisseurs, mêmes opacités. À 18 pixels on ne peut pas étager
      trois plans comme sur les grandes icônes — on garde le contour de devant
@@ -3330,7 +3331,11 @@
   .cat-icon svg{ width:26px; height:26px; display:block; transform:none; }
   /* Sur la fiche d'une procédure, le dessin va un cran plus loin : la carte est
      pleine largeur, elle a la place, et c'est le seul repère visuel de la ligne. */
-  .proc-rich-card .cat-icon svg{ width:29px; height:29px; }
+  /* La fiche d'une procédure : 29 px côté équipe, où c'est le seul repère de la
+     ligne. Côté gestion on garde la taille d'origine — la carte y porte déjà
+     l'état de l'analyse, l'icône n'a pas à dominer. */
+  #equipe-app .proc-rich-card .cat-icon svg{ width:29px; height:29px; }
+  #gestion-app .proc-rich-card .cat-icon svg{ width:17px; height:17px; }
   .cat-badge{
     font-size:11px; font-weight:700; margin-top:3px; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
@@ -3467,7 +3472,26 @@
   }
   .scan-echec .btn{ margin-top:18px; }
 
-  .scan-outils{ position:absolute; left:16px; right:16px; bottom:16px; display:flex; justify-content:flex-end; }
+  /* Les deux commandes aux deux coins de l'image. */
+  .scan-outils{
+    position:absolute; left:16px; right:16px; bottom:16px;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .scan-cam{
+    width:44px; height:44px; border-radius:50%; border:none; padding:0;
+    background:rgba(255,255,255,0.16); backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    display:flex; align-items:center; justify-content:center; color:#fff;
+  }
+  .scan-cam svg{ width:20px; height:20px; display:block; }
+  .scan-cam .ic-off{ display:none; }
+  /* Éteinte, la commande passe en plein : c'est un état, pas une action
+     disponible. La même bascule que la lampe. */
+  .scan-cam.eteinte{ background:#fff; color:#000; }
+  .scan-cam.eteinte .ic-on{ display:none; }
+  .scan-cam.eteinte .ic-off{ display:block; }
+  .scan-cam:active{ transform:scale(0.92); }
+
   .scan-lampe{
     width:44px; height:44px; border-radius:50%; border:none; padding:0;
     background:rgba(255,255,255,0.16); backdrop-filter:blur(20px);
@@ -3627,26 +3651,6 @@
   #tabbar[data-espace="equipe"] #tb-analyse{ display:none; }
   #tabbar[data-espace="equipe"] .ic-gestion{ display:none; }
   #tabbar[data-espace="equipe"] .ic-equipe{ display:block; }
-
-  /* Même verre que la barre du bas, même hauteur : les deux se lisent comme
-     une seule rangée flottante, l'une centrée, l'autre au coin. */
-  .cam-bascule{
-    position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:18px;
-    width:52px; height:52px; border-radius:50%; z-index:60;
-    display:flex; align-items:center; justify-content:center; padding:0;
-    background:rgba(255,255,255,0.10); backdrop-filter:blur(24px);
-    -webkit-backdrop-filter:blur(24px);
-    border:0.5px solid rgba(255,255,255,0.14); color:#fff;
-    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .cam-bascule:active{ transform:scale(0.9); }
-  .cam-bascule svg{ width:22px; height:22px; }
-  .cam-bascule .ic-off{ display:none; }
-  /* Caméra éteinte : le bouton passe en plein pour dire que c'est un état, pas
-     une simple action disponible. */
-  .cam-bascule.eteinte{ background:#fff; color:#000; border-color:#fff; }
-  .cam-bascule.eteinte .ic-on{ display:none; }
-  .cam-bascule.eteinte .ic-off{ display:block; }
 
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -4952,6 +4956,12 @@
       </div>
 
       <div class="scan-outils">
+        <!-- La caméra à gauche, la lampe à droite : deux commandes du même objet,
+             posées aux deux coins de l'image qu'elles pilotent. -->
+        <button type="button" class="scan-cam" aria-label="Éteindre la caméra">
+          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.4"/></svg>
+          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+        </button>
         <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
       </div>
     </div>
@@ -5575,6 +5585,12 @@
       </div>
 
       <div class="scan-outils">
+        <!-- La caméra à gauche, la lampe à droite : deux commandes du même objet,
+             posées aux deux coins de l'image qu'elles pilotent. -->
+        <button type="button" class="scan-cam" aria-label="Éteindre la caméra">
+          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.4"/></svg>
+          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+        </button>
         <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
       </div>
     </div>
@@ -5641,15 +5657,6 @@
      identiques ne peuvent plus diverger si elles n'en font qu'une.
 
      Les actions changent selon l'espace, pas la barre. -->
-<!-- Éteindre la caméra sans quitter l'écran. Elle tourne tant que le scanner
-     est ouvert : sur un téléphone posé sur un plan de travail, ça chauffe et ça
-     vide la batterie. Le bouton ne s'affiche que là où il y a une caméra à
-     éteindre — ailleurs il ne ferait rien, et un bouton qui ne fait rien
-     inquiète plus qu'il ne sert. -->
-<button type="button" class="cam-bascule" id="cam-bascule" style="display:none;" aria-label="Éteindre la caméra">
-  <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.4"/></svg>
-  <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
-</button>
 
 <nav class="tabbar" id="tabbar" style="display:none;">
   <div class="groupe">
@@ -16680,15 +16687,18 @@ function echecScanner(hintEl, zone, titre, detail, refus) {
 let camEteinte = false
 
 function majBoutonCamera() {
-  const b = document.getElementById('cam-bascule')
-  if (!b) return
-  const surScanner = document.getElementById('e-scan')?.classList.contains('active')
-  b.style.display = surScanner ? 'flex' : 'none'
-  b.classList.toggle('eteinte', camEteinte)
-  b.setAttribute('aria-label', camEteinte ? 'Rallumer la cam\u00e9ra' : '\u00c9teindre la cam\u00e9ra')
+  /* Les deux espaces ont leur propre viseur, donc leur propre bouton. */
+  document.querySelectorAll('.scan-cam').forEach(b => {
+    b.classList.toggle('eteinte', camEteinte)
+    b.setAttribute('aria-label', camEteinte ? 'Rallumer la cam\u00e9ra' : '\u00c9teindre la cam\u00e9ra')
+  })
 }
 
-document.getElementById('cam-bascule')?.addEventListener('click', () => {
+/* On écoute le document plutôt que chaque bouton : ils sont deux, et le
+   viseur est redessiné à chaque ouverture. */
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.scan-cam')) return
+  ;(() => {
   camEteinte = !camEteinte
   if (camEteinte) {
     stopScanner()
@@ -16701,6 +16711,7 @@ document.getElementById('cam-bascule')?.addEventListener('click', () => {
   }
   majBoutonCamera()
   if (navigator.vibrate) navigator.vibrate(6)
+  })()
 })
 
 function stopScanner() {

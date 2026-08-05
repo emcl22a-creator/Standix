@@ -1383,6 +1383,29 @@
     display:flex; align-items:center; justify-content:center;
     font-size:13px; color:var(--label-3);
   }
+  /* Le cadre vide devient une invitation : pointillés plutôt que noir plein,
+     et il se resserre — il occupait la moitié de l'écran pour ne rien dire. */
+  .dv-cadre:has(.dv-vide){
+    background:rgba(255,255,255,0.02); border:1.5px dashed rgba(255,255,255,0.16);
+    aspect-ratio:auto; min-height:220px;
+  }
+  .dv-vide{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:26px 22px; gap:0;
+  }
+  .dv-vide .ic{
+    width:62px; height:62px; border-radius:19px; margin-bottom:14px;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+    color:rgba(255,255,255,0.72);
+  }
+  .dv-vide .ic svg{ width:29px; height:29px; }
+  .dv-vide .t{ font-size:17px; font-weight:700; letter-spacing:-0.03em; }
+  .dv-vide .s{
+    font-size:12.5px; color:var(--label-3); line-height:1.5;
+    margin-top:5px; max-width:240px;
+  }
+
   .dv-cadre video{ width:100%; height:100%; display:block; object-fit:contain; }
 
   /* La frise fait deux centimètres : on la lit, on ne la manipule pas. */
@@ -4368,12 +4391,22 @@
          choix du fichier, puis le lecteur. Deux écrans qui font entrer une
          vidéo doivent l'accueillir pareil. -->
     <div class="card" id="dv-carte">
-      <div class="note" style="margin-bottom:12px;">Filmez en expliquant à voix haute, puis <b style="color:#fff;">un appui à chaque fin d’étape</b>. L’IA pourra ensuite écrire le texte de chacune à partir de ce que vous avez dit.</div>
+      <!-- La consigne longue est retirée : elle expliquait le découpage avant
+             même qu'il y ait une vidéo. Elle réapparaît au bon moment, sous le
+             bouton de coupe. -->
       <div class="dv-depot" id="dv-depot">
         <input type="file" id="video-input" accept="video/*">
         <div class="dv-cadre" id="dv-cadre">
           <video id="video-player" style="display:none;" playsinline="" webkit-playsinline=""></video>
-          <span id="video-placeholder">Aucune vidéo importée</span>
+          <!-- Le cadre noir disait « aucune vidéo importée » : il constatait au lieu
+                 d'inviter. Pointillés, icône et une phrase disent ce qu'on attend. -->
+            <div class="dv-vide" id="video-placeholder">
+              <span class="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.6"/></svg>
+              </span>
+              <span class="t">Ajoutez votre vidéo</span>
+              <span class="s">Filmez la tâche en expliquant à voix haute.<br>Dix minutes maximum.</span>
+            </div>
         </div>
       </div>
     </div>
@@ -9316,17 +9349,28 @@ function ouvrirDepuisCarte(ecran) {
   if (!origineOuverture) return
   ecran.style.setProperty('--ox', origineOuverture.x)
   ecran.style.setProperty('--oy', origineOuverture.y)
-  void ecran.offsetWidth
   ecran.classList.add('nait')
   origineOuverture = null
   ecran.addEventListener('animationend', () => ecran.classList.remove('nait'), { once: true })
 }
 
+/* Les deux gestes dans le BON ORDRE : la naissance d'abord, l'activation
+   ensuite. C'était tout le problème — ajouter « active » puis « nait »
+   laissait le navigateur démarrer l'ancienne animation avant de la remplacer,
+   et on voyait les deux l'une par-dessus l'autre.
+
+   Les écrans de l'espace équipe s'activent à la main, sans passer par
+   `showEquipeScreen` : ils appellent cette fonction directement. */
+function activerAvecNaissance(ecran) {
+  if (!ecran) return
+  ouvrirDepuisCarte(ecran)
+  ecran.classList.add('active')
+}
+
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
-  document.getElementById(id).classList.add('active')
-  ouvrirDepuisCarte(document.getElementById(id))
+  activerAvecNaissance(document.getElementById(id))
   const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
   const index = ONGLET_PAR_ECRAN[id]
@@ -9393,8 +9437,7 @@ const ONGLET_EQUIPE_PAR_ECRAN = { 'e-list': 0, 'e-category': 0, 'e-detail': 0 }
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
-  document.getElementById(id).classList.add('active')
-  ouvrirDepuisCarte(document.getElementById(id))
+  activerAvecNaissance(document.getElementById(id))
   /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
      quittant le scanner on repart caméra allumée — sinon on reviendrait sur un
      écran noir sans se rappeler pourquoi. */
@@ -10167,7 +10210,7 @@ function resetCreateForm() {
   champManuel('categorie').value = ''
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
-  document.getElementById('video-placeholder').style.display = 'block'
+  document.getElementById('video-placeholder').style.display = 'flex'
   document.getElementById('dv-travail').style.display = 'none'
   document.getElementById('create-error-manual').textContent = ''
   document.getElementById('create-error-video').textContent = ''
@@ -12475,7 +12518,7 @@ window.ouvrirMontageVideo = async function(procId) {
   const player = el('video-player')
   player.src = (await urlSignee(proc.video_url)) || ''
   player.style.display = proc.video_url ? 'block' : 'none'
-  el('video-placeholder').style.display = proc.video_url ? 'none' : 'block'
+  el('video-placeholder').style.display = proc.video_url ? 'none' : 'flex'
   el('dv-travail').style.display = 'block'
 
   /* Les bornes sont déduites quand elles manquent : une étape sans fin prend le
@@ -14359,7 +14402,7 @@ function openEquipeCategorie(nom) {
   if (champ) champ.value = ''
   document.getElementById('e-cat-titre').textContent = nom
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
-  document.getElementById('e-category').classList.add('active')
+  activerAvecNaissance(document.getElementById('e-category'))
   remonterEnHaut()
   renderEquipeCatListe()
 }
@@ -14545,7 +14588,7 @@ async function openEquipeDetail(procId) {
   const perime = () => monTour !== ouvertureCourante
   arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
-  document.getElementById('e-detail').classList.add('active')
+  activerAvecNaissance(document.getElementById('e-detail'))
   remonterEnHaut()
 
   /* Les données sont déjà en mémoire dans la plupart des cas. Mais le cache peut

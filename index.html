@@ -231,6 +231,31 @@
   #p-global-analyse{ padding-bottom:calc(110px + max(20px, env(safe-area-inset-bottom))) !important; }
   #p-membre .an-tete{ margin-top:30px !important; padding-top:22px !important; }
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
+
+  /* ═══ L'ÉCRAN QUI NAÎT DE LA CARTE TOUCHÉE ═══
+
+     L'ancienne entrée montait de 18 px : douce, mais rien ne reliait l'écran à
+     ce qu'on venait de toucher. On ne savait pas d'où il venait, donc le bouton
+     retour paraissait arbitraire.
+
+     Ici l'écran grandit DEPUIS la carte : son point d'origine est la position
+     réelle de celle-ci, mesurée au moment du clic et passée en variables. Sans
+     cette mesure, l'agrandissement partirait toujours du même endroit — juste
+     pour la carte du milieu, faux pour toutes les autres. */
+  .screen.active.nait{
+    animation:ecranNait 0.46s cubic-bezier(0.32,0.72,0,1);
+    transform-origin:var(--ox, 50%) var(--oy, 40%);
+  }
+  @keyframes ecranNait{
+    0%{ opacity:0; transform:scale(0.32); border-radius:34px; }
+    38%{ opacity:1; }
+    100%{ opacity:1; transform:scale(1); border-radius:0; }
+  }
+
+  /* Le mouvement se coupe si le système demande moins d'animation. */
+  @media (prefers-reduced-motion: reduce){
+    .screen.active.nait{ animation:none; }
+  }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
   @keyframes appShellIn{
     0%{ opacity:0; transform:scale(0.95); filter:blur(10px); }
@@ -9262,10 +9287,46 @@ const ONGLET_PAR_ECRAN = {
   // action, il ne désigne pas une page et n'a pas d'état actif.
 }
 
+/* ═══ D'OÙ L'ÉCRAN DOIT NAÎTRE ═══
+
+   On retient la position de la dernière carte touchée. La mesure se fait ICI,
+   au clic — pas dans la fonction d'affichage : à ce moment-là l'ancien écran est
+   déjà masqué et la carte n'existe plus dans la page.
+
+   La position est convertie en pourcentage de la fenêtre, parce que c'est
+   l'unité qu'attend `transform-origin` sur un élément qui occupe tout l'écran. */
+let origineOuverture = null
+
+document.addEventListener('click', (e) => {
+  const carte = e.target.closest('.cat-cell, .proc-rich-card, .an-lig, .emp-row, .fm-lg, .cat-recent-item')
+  if (!carte) { origineOuverture = null; return }
+  const r = carte.getBoundingClientRect()
+  origineOuverture = {
+    x: ((r.left + r.width / 2) / window.innerWidth * 100).toFixed(1) + '%',
+    y: ((r.top + r.height / 2) / window.innerHeight * 100).toFixed(1) + '%',
+  }
+}, true)   // en capture : on mesure avant que l'écran ne change
+
+/* Pose l'origine sur l'écran qui s'ouvre, et retire la classe quand c'est fini —
+   sinon elle resterait et le prochain affichage rejouerait la même naissance
+   depuis une position périmée. */
+function ouvrirDepuisCarte(ecran) {
+  if (!ecran) return
+  ecran.classList.remove('nait')
+  if (!origineOuverture) return
+  ecran.style.setProperty('--ox', origineOuverture.x)
+  ecran.style.setProperty('--oy', origineOuverture.y)
+  void ecran.offsetWidth
+  ecran.classList.add('nait')
+  origineOuverture = null
+  ecran.addEventListener('animationend', () => ecran.classList.remove('nait'), { once: true })
+}
+
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
+  ouvrirDepuisCarte(document.getElementById(id))
   const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
   const index = ONGLET_PAR_ECRAN[id]
@@ -9333,6 +9394,7 @@ window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
+  ouvrirDepuisCarte(document.getElementById(id))
   /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
      quittant le scanner on repart caméra allumée — sinon on reviendrait sur un
      écran noir sans se rappeler pourquoi. */

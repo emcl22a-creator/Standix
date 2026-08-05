@@ -4618,13 +4618,12 @@
       <!-- Titre retiré, comme sur l'écran manuel : le fil se reconnaît tout seul. -->
       <div class="man-fil" id="video-steps-list"></div>
 
-      <!-- Compléter avec l'IA. Le découpage reste à la personne — c'est elle qui
-           sait où une étape commence. L'IA écoute ce qui a été dit pendant chaque
-           extrait et l'écrit. Deux gestes distincts, dans le bon ordre. -->
-      <button type="button" class="btn ghost block vid-ia" id="vid-ia" style="display:none;">
-        
-        <span class="ia-fig m"><span class="lum"></span></span><span id="vid-ia-txt">Compléter avec l’IA</span>
-      </button>
+      <!-- Le bouton « Compléter avec l'IA » a été retiré d'ici : il faisait
+           doublon avec celui placé juste au-dessus de « Publier ». Deux boutons
+           identiques à deux endroits laissent croire à deux actions.
+
+           Celui du bas est mieux placé : c'est là qu'on se demande « est-ce que
+           tout est écrit ? », juste avant de publier. -->
       <div class="vid-ia-note" id="vid-ia-note"></div>
 
       <!-- « Tout recommencer » retiré de la modification : effacer d'un coup les
@@ -10904,9 +10903,9 @@ document.addEventListener('click', (e) => {
 let iaCompletionEnCours = false
 
 function majBoutonIA() {
-  /* Deux boutons pour la même action : celui du haut, sous les étapes, et celui
-     du bas, juste avant « Publier ». C'est l'endroit où l'on se pose la question
-     qui diffère, pas l'action. */
+  /* Un seul bouton, juste au-dessus de « Publier ». Celui qui vivait sous les
+     étapes a été retiré : deux boutons identiques à deux endroits laissaient
+     croire à deux actions différentes. */
   const bas = document.getElementById('vid-ia-bas')
   if (bas) {
     const nbTot = videoSteps.length
@@ -10919,21 +10918,13 @@ function majBoutonIA() {
       : (videsTot ? 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA' : 'Toutes vos \u00e9tapes ont un texte')
   }
 
-  const b = document.getElementById('vid-ia')
+  /* La note explicative reste : elle dit combien d'étapes attendent un texte,
+     et elle est utile juste au-dessus du bouton du bas. */
   const note = document.getElementById('vid-ia-note')
-  if (!b) return
-
+  if (!note) return
   const nb = videoSteps.length
   const vides = videoSteps.filter(s => !String(s.texte || '').trim()).length
-
-  b.style.display = nb ? 'flex' : 'none'
   if (!nb) { note.textContent = ''; return }
-
-  b.disabled = iaCompletionEnCours || vides === 0
-  document.getElementById('vid-ia-txt').textContent = iaCompletionEnCours
-    ? 'L\u2019IA \u00e9coute la vid\u00e9o\u2026'
-    : 'Compl\u00e9ter avec l\u2019IA'
-
   if (iaCompletionEnCours) {
     note.textContent = 'Une \u00e0 deux minutes. Vous pouvez continuer \u00e0 d\u00e9couper.'
   } else if (!vides) {
@@ -10944,7 +10935,6 @@ function majBoutonIA() {
   }
 }
 
-document.getElementById('vid-ia')?.addEventListener('click', completerEtapesAvecIA)
 document.getElementById('vid-ia-bas')?.addEventListener('click', completerEtapesAvecIA)
 
 async function completerEtapesAvecIA() {

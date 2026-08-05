@@ -3300,17 +3300,27 @@
   .sq-bloc{ background:rgba(255,255,255,0.08); border-radius:8px; }
 
   .cat-cell, .proc-rich-card{
-    padding:14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    padding:15px 15px 14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
     position:relative; overflow:hidden;
   }
   .cat-cell:active, .proc-rich-card:active{ transform:scale(0.97); }
   .proc-rich-card{ margin-bottom:12px; }
-  .cat-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
+  /* L'icône et le compteur s'alignent en HAUT, pas au centre : le compteur
+     est une étiquette, il se pose au coin, il ne flotte pas à mi-hauteur d'une
+     tuile de 46 px. */
+  .cat-top{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; }
+  /* L'anneau coloré retiré, l'icône flottait dans une boîte de 46 px vide.
+     Elle occupe désormais toute la place : un dossier de 30 px posé dans une
+     tuile de 46, comme les icônes des réglages. */
+  .cat-ring-wrap{
+    position:relative; width:46px; height:46px; flex-shrink:0;
+    border-radius:14px; background:rgba(255,255,255,0.055);
+    border:0.5px solid var(--border);
+  }
   .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
   .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
   .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
-  .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .cat-icon{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:24px; }
   /* Le fichier et la coche reprennent la langue des icônes de mode : trait
      blanc, mêmes épaisseurs, mêmes opacités. À 18 pixels on ne peut pas étager
      trois plans comme sur les grandes icônes — on garde le contour de devant
@@ -3319,16 +3329,21 @@
      du haut. Ce sélecteur atteignait AUSSI le svg de l'icône, qui était donc
      affichée couchée. C'est pour ça qu'elle n'a jamais semblé droite, quel que
      soit le dessin. */
-  .cat-icon svg{ width:17px; height:17px; display:block; transform:none; }
+  .cat-icon svg{ width:26px; height:26px; display:block; transform:none; }
+  /* Sur la fiche d'une procédure, le dessin va un cran plus loin : la carte est
+     pleine largeur, elle a la place, et c'est le seul repère visuel de la ligne. */
+  .proc-rich-card .cat-icon svg{ width:29px; height:29px; }
   .cat-badge{
-    font-size:10.5px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--label-2);
+    font-size:11px; font-weight:700; margin-top:3px; background:rgba(255,255,255,0.08); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
   }
   /* Le nom et son indicateur d'état partagent une ligne : le texte prend la
      place disponible, l'icône se cale juste à sa suite. */
+  /* Le nom prend plus de corps : c'est la seule chose qu'on cherche en
+     balayant la grille. */
   .cat-name{
-    display:flex; align-items:center; gap:6px; margin-bottom:2px;
-    font-size:14.5px; font-weight:700; color:var(--label);
+    display:flex; align-items:center; gap:6px; margin-bottom:3px;
+    font-size:16px; font-weight:700; letter-spacing:-0.03em; color:var(--label);
   }
   .cat-name .txt{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cat-recent-item .txt{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -3342,11 +3357,10 @@
   .cat-pct{ font-size:20px; font-weight:800; letter-spacing:-0.02em; }
   /* Côté équipe, le compteur est un rapport (« 2/2 lues ») et non un
      pourcentage : il tient sur la même ligne à une taille plus mesurée. */
-  .cat-lues{ font-size:14.5px; font-weight:750; letter-spacing:-0.02em; }
   .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
   .cat-date{ font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; font-variant-numeric:tabular-nums; }
   .carte-categorie{ font-size:11px; font-weight:600; color:var(--label-3); margin-top:3px; }
-  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:8px; margin-top:2px; }
+  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:9px; margin-top:10px; }
   /* Le titre d'une procédure récente et, le cas échéant, son état d'analyse :
      l'indicateur se cale juste au bout du texte, pas au bout de la carte. */
   .cat-recent-item{
@@ -14202,19 +14216,17 @@ function renderEquipeCategories() {
     cell.onclick = () => openEquipeCategorie(nom)
     cell.innerHTML = `
       <div class="cat-top">
-        <div class="cat-ring-wrap">
-          <svg viewBox="0 0 46 46">
-            <circle class="cat-ring-bg" cx="23" cy="23" r="19"></circle>
-            <circle class="cat-ring-fill" cx="23" cy="23" r="19"
-              stroke="${couleur}" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}"></circle>
-          </svg>
-          <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</span>
+        <!-- Même carte que l'espace gestion : pas d'anneau coloré. Vert, orange ou
+             rouge selon le taux de lecture, il faisait d'une catégorie un bulletin
+             de notes — et le rouge disait « problème » là où il n'y avait qu'une
+             procédure récente. -->
+          <div class="cat-ring-wrap">
+            <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
       <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-      <div class="cat-pct-row"><span class="cat-lues" style="color:${couleur}">${lues}/${procs.length} lues</span></div>
-      <div class="cat-recent">${[...procs]
+            <div class="cat-recent">${[...procs]
         .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
         .slice(0, 3).map(p =>
         `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}</div>`
@@ -14274,9 +14286,6 @@ function renderEquipeCatListe() {
 function ficheEquipe(proc) {
   const lue = equipeLues.has(proc.id)
   const nbEtapes = (equipeEtapesByProc[proc.id] || []).length
-  const couleur = lue ? '#30D158' : 'rgba(235,235,245,0.30)'
-  const circonference = 2 * Math.PI * 20
-  const decalage = lue ? 0 : circonference
 
   const div = document.createElement('div')
   div.className = 'card proc-rich-card'
@@ -14284,13 +14293,11 @@ function ficheEquipe(proc) {
   div.onclick = () => openEquipeDetail(proc.id)
   div.innerHTML = `
     <div class="cat-top">
-      <div class="cat-ring-wrap">
-        <svg viewBox="0 0 46 46">
-          <circle class="cat-ring-bg" cx="23" cy="23" r="20"/>
-          <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${couleur}"
-            stroke-dasharray="${circonference}" stroke-dashoffset="${decalage}"/>
-        </svg>
-        <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</div>
+      <!-- L'anneau coloré est retiré : la coche verte dit déjà que c'est lu, et
+             l'anneau gris autour d'une procédure non lue ressemblait à une jauge
+             à zéro plutôt qu'à « pas encore ouverte ». -->
+        <div class="cat-ring-wrap">
+          <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>

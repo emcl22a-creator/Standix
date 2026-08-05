@@ -3312,11 +3312,9 @@
   /* L'anneau coloré retiré, l'icône flottait dans une boîte de 46 px vide.
      Elle occupe désormais toute la place : un dossier de 30 px posé dans une
      tuile de 46, comme les icônes des réglages. */
-  .cat-ring-wrap{
-    position:relative; width:46px; height:46px; flex-shrink:0;
-    border-radius:14px; background:rgba(255,255,255,0.055);
-    border:0.5px solid var(--border);
-  }
+  /* Pas de tuile autour du dossier : le dessin se suffit. Un carré derrière une
+     icône déjà dessinée ajoute une forme sans ajouter de sens. */
+  .cat-ring-wrap{ position:relative; width:46px; height:46px; flex-shrink:0; }
   .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
   .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
   .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
@@ -3629,6 +3627,26 @@
   #tabbar[data-espace="equipe"] #tb-analyse{ display:none; }
   #tabbar[data-espace="equipe"] .ic-gestion{ display:none; }
   #tabbar[data-espace="equipe"] .ic-equipe{ display:block; }
+
+  /* Même verre que la barre du bas, même hauteur : les deux se lisent comme
+     une seule rangée flottante, l'une centrée, l'autre au coin. */
+  .cam-bascule{
+    position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:18px;
+    width:52px; height:52px; border-radius:50%; z-index:60;
+    display:flex; align-items:center; justify-content:center; padding:0;
+    background:rgba(255,255,255,0.10); backdrop-filter:blur(24px);
+    -webkit-backdrop-filter:blur(24px);
+    border:0.5px solid rgba(255,255,255,0.14); color:#fff;
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .cam-bascule:active{ transform:scale(0.9); }
+  .cam-bascule svg{ width:22px; height:22px; }
+  .cam-bascule .ic-off{ display:none; }
+  /* Caméra éteinte : le bouton passe en plein pour dire que c'est un état, pas
+     une simple action disponible. */
+  .cam-bascule.eteinte{ background:#fff; color:#000; border-color:#fff; }
+  .cam-bascule.eteinte .ic-on{ display:none; }
+  .cam-bascule.eteinte .ic-off{ display:block; }
 
   .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
     background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
@@ -5623,6 +5641,16 @@
      identiques ne peuvent plus diverger si elles n'en font qu'une.
 
      Les actions changent selon l'espace, pas la barre. -->
+<!-- Éteindre la caméra sans quitter l'écran. Elle tourne tant que le scanner
+     est ouvert : sur un téléphone posé sur un plan de travail, ça chauffe et ça
+     vide la batterie. Le bouton ne s'affiche que là où il y a une caméra à
+     éteindre — ailleurs il ne ferait rien, et un bouton qui ne fait rien
+     inquiète plus qu'il ne sert. -->
+<button type="button" class="cam-bascule" id="cam-bascule" style="display:none;" aria-label="Éteindre la caméra">
+  <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.4"/></svg>
+  <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+</button>
+
 <nav class="tabbar" id="tabbar" style="display:none;">
   <div class="groupe">
     <button class="tab-round tab-round--secondary active" id="tb-procedures" aria-label="Procédures">
@@ -9285,6 +9313,11 @@ window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   document.getElementById(id).classList.add('active')
+  /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
+     quittant le scanner on repart caméra allumée — sinon on reviendrait sur un
+     écran noir sans se rappeler pourquoi. */
+  if (id !== 'e-scan') camEteinte = false
+  majBoutonCamera()
   const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
   document.getElementById('tabbar')?.setAttribute('data-espace', 'equipe')
@@ -14221,7 +14254,7 @@ function renderEquipeCategories() {
              de notes — et le rouge disait « problème » là où il n'y avait qu'une
              procédure récente. -->
           <div class="cat-ring-wrap">
-            <span class="cat-icon">${pct === 100 ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg>`}</span>
+            <span class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></span>
         </div>
         <div class="cat-badge">${procs.length}</div>
       </div>
@@ -14229,7 +14262,9 @@ function renderEquipeCategories() {
             <div class="cat-recent">${[...procs]
         .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
         .slice(0, 3).map(p =>
-        `<div class="cat-recent-item">${escapeHtml(p.titre)}</div>`).join('')}</div>`
+        /* Le titre dans un `.txt` comme côté gestion : sans lui, la règle de
+                 coupure ne s'applique pas et un nom long passe à la ligne. */
+              `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span></div>`).join('')}</div>`
     grille.appendChild(cell)
   })
 }
@@ -14297,7 +14332,7 @@ function ficheEquipe(proc) {
              l'anneau gris autour d'une procédure non lue ressemblait à une jauge
              à zéro plutôt qu'à « pas encore ouverte ». -->
         <div class="cat-ring-wrap">
-          <div class="cat-icon">${lue ? `<svg viewBox="0 0 24 24" fill="none"><path d="M6 12.4 10.2 16.6 18 8.4" stroke="#30D158" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>` : `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg>`}</div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>
@@ -16633,6 +16668,41 @@ function echecScanner(hintEl, zone, titre, detail, refus) {
     </div>`
   zone.querySelector('#scan-retry').addEventListener('click', () => startScanner(scanEspace))
 }
+/* ═══ LE BOUTON QUI ÉTEINT LA CAMÉRA ═══
+
+   Il n'apparaît que sur l'écran du scanner, côté équipe. Partout ailleurs il
+   n'y a pas de caméra à éteindre, et un bouton qui ne fait rien inquiète plus
+   qu'il ne sert.
+
+   Éteindre libère vraiment le capteur : la pastille verte de l'iPhone s'éteint.
+   C'est le point important — masquer l'image sans couper le flux laisserait
+   croire que la caméra est arrêtée alors qu'elle filme encore. */
+let camEteinte = false
+
+function majBoutonCamera() {
+  const b = document.getElementById('cam-bascule')
+  if (!b) return
+  const surScanner = document.getElementById('e-scan')?.classList.contains('active')
+  b.style.display = surScanner ? 'flex' : 'none'
+  b.classList.toggle('eteinte', camEteinte)
+  b.setAttribute('aria-label', camEteinte ? 'Rallumer la cam\u00e9ra' : '\u00c9teindre la cam\u00e9ra')
+}
+
+document.getElementById('cam-bascule')?.addEventListener('click', () => {
+  camEteinte = !camEteinte
+  if (camEteinte) {
+    stopScanner()
+    const z = scanEl('scan-result-zone')
+    if (z) z.innerHTML = ''
+    const h = scanEl('scan-hint')
+    if (h) h.textContent = 'Cam\u00e9ra \u00e9teinte'
+  } else {
+    startScanner(scanEspace || 'equipe')
+  }
+  majBoutonCamera()
+  if (navigator.vibrate) navigator.vibrate(6)
+})
+
 function stopScanner() {
   scanLoopActive = false
   if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null }

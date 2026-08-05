@@ -1040,12 +1040,27 @@
   /* La piste doit toucher les bords pour que le panneau voisin s'annonce dès
      qu'on effleure : elle sort donc des 20 px de l'écran, et ses panneaux les
      rendent à l'intérieur. Le compte retombe exactement sur 20. */
+  /* Le contenu s'aligne sur le TEXTE de la carte « Bonjour prénom », pas sur son
+     bord : c'est le texte qu'on lit, et c'est lui qui donne la colonne. La carte
+     ajoute 20 px à l'écran, ces pages en font autant.
+
+     La piste doit toucher les bords pour que le panneau voisin s'annonce dès
+     qu'on effleure : elle sort des 20 px de l'écran, et ses panneaux rendent
+     les 40 px à l'intérieur. */
   #an-piste-proc, #an-piste-cat{ margin:0 -20px; }
-  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{ padding:0 20px; }
+  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{ padding:0 40px; }
+  #p-an-temps .fm-barre, #p-an-temps .fm-periode-mot, #p-an-temps .fm-titre,
+  #p-an-categories .fm-barre, #p-an-categories .fm-periode-mot, #p-an-categories .fm-titre{
+    padding-left:20px; padding-right:20px;
+  }
 
 
+  /* Même colonne que les deux pages d'analyse. Seul l'en-tête — bouton retour et
+     nom — reste à la marge de l'écran : il appartient à la navigation. */
   #p-membre .fm-piste{ margin:0 -20px; }
-  #p-membre .fm-piste .fm-pan{ padding:0 20px; }
+  #p-membre .fm-piste .fm-pan{ padding:0 40px; }
+  #p-membre .fm-barre, #p-membre .fm-periode-mot,
+  #p-membre .fm-titre, #p-membre .fm-rep{ padding-left:20px; padding-right:20px; }
   .fm-lg, .fm-rep .l{ padding-left:0; padding-right:0; }
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
@@ -3180,7 +3195,7 @@
      de voir qui le dit. */
   .accueil{
     display:flex; align-items:center; gap:14px;
-    padding:15px 18px; margin-bottom:14px; border-radius:20px;
+    padding:15px 20px; margin-bottom:14px; border-radius:20px;
     background:var(--hero-gradient);
     border:0.5px solid var(--border);
   }
@@ -7706,7 +7721,6 @@ function renderGainTemps(validations, procedures) {
   const duMois = (validations || []).filter(v => new Date(v.validated_at) >= debutMois)
 
   const secondes = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
-  const lecteurs = new Set(duMois.filter(v => Number(v.duree_lecture)).map(v => v.membre_id)).size
   const t = document.getElementById('an-gain-t')
   const s = document.getElementById('an-gain-s')
 
@@ -7722,15 +7736,13 @@ function renderGainTemps(validations, procedures) {
      comme si expliquer à son équipe était une corvée dont on se débarrasse. On
      dit plutôt ce qui est vrai et vérifiable : ces lectures ont eu lieu, elles
      sont tracées, et ça compte le jour d'un contrôle. */
-  const pl = lecteurs > 1
-  const procs = new Set(duMois.filter(v => Number(v.duree_lecture)).map(v => v.procedure_id)).size
   /* « 1 personne a ouvert 5 procédures » recomptait ce que la page affiche
      déjà en dessous. On dit plutôt à QUOI ça sert : ce temps est du travail
      qu'on n'a pas eu à refaire, et il est prouvable. */
-  const parPersonne = Math.round(secondes / Math.max(1, lecteurs) / 60)
-  s.innerHTML = `Soit <b>${parPersonne} minute${parPersonne > 1 ? 's' : ''} par personne</b> ` +
-    `que vous n'avez pas eu \u00e0 expliquer vous-m\u00eame. ` +
-    `Chaque lecture est dat\u00e9e et nominative.`
+  /* La phrase « soit N minutes par personne » a été retirée : elle redécoupait
+     le chiffre du titre sans rien apprendre. Il ne reste que ce qui compte —
+     ces lectures sont tracées. */
+  s.innerHTML = 'Chaque lecture est dat\u00e9e et nominative.'
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

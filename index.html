@@ -1447,6 +1447,56 @@
     font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
   }
 
+  /* ═══ LES TRAITS DÉPLAÇABLES ═══
+
+     Chaque coupure porte un trait blanc qu'on peut faire glisser. Le geste est
+     rare mais indispensable : on appuie toujours un peu trop tard, et sans lui
+     il fallait tout refaire pour rattraper une demi-seconde.
+
+     La zone de saisie déborde largement du trait — 22 px de large pour 2 px
+     visibles. Un trait de 2 px ne se saisit pas au doigt. */
+  .dv-poi{
+    position:absolute; top:0; bottom:0; width:22px; margin-left:-11px;
+    z-index:6; cursor:ew-resize; touch-action:none;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dv-poi::before{
+    content:''; width:2px; height:100%; border-radius:2px;
+    background:#fff; box-shadow:0 0 6px rgba(0,0,0,0.5);
+    transition:width 0.15s ease, box-shadow 0.15s ease;
+  }
+  .dv-poi::after{
+    content:''; position:absolute; top:50%; margin-top:-7px;
+    width:12px; height:14px; border-radius:4px; background:#fff;
+    box-shadow:0 1px 4px rgba(0,0,0,0.4);
+    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .dv-poi:active::after, .dv-poi.tire::after{ transform:scale(1.22); }
+  .dv-poi.tire::before{ width:3px; box-shadow:0 0 12px rgba(255,255,255,0.8); }
+
+  /* Le temps de la coupure, montré pendant qu'on la déplace. */
+  .dv-poi .val{
+    position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) scale(0.9);
+    padding:3px 8px; border-radius:7px; white-space:nowrap;
+    background:#fff; color:#000; font-size:11px; font-weight:750;
+    font-variant-numeric:tabular-nums; opacity:0; pointer-events:none;
+    transition:opacity 0.14s ease, transform 0.14s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .dv-poi.tire .val{ opacity:1; transform:translateX(-50%) scale(1); }
+
+  /* Le bouton de lecture, sous la frise et à gauche du temps. */
+  .dv-barre{ display:flex; align-items:center; gap:11px; padding:9px 2px 0; }
+  .dv-play{
+    width:34px; height:34px; border-radius:50%; border:none; padding:0; flex-shrink:0;
+    background:rgba(255,255,255,0.10); border:0.5px solid var(--border); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dv-play svg{ width:15px; height:15px; display:block; }
+  .dv-play .ic-pause{ display:none; }
+  .dv-play.joue .ic-play{ display:none; }
+  .dv-play.joue .ic-pause{ display:block; }
+  .dv-play:active{ transform:scale(0.9); }
+
   .dv-geste{ padding:14px 0 4px; }
   .dv-geste button{
     width:100%; height:56px; border:none; border-radius:18px; font-family:inherit;
@@ -4432,7 +4482,15 @@
     <div id="dv-travail" style="display:none;">
       <!-- La frise : un témoin, pas un outil. On la touche pour se déplacer. -->
       <div class="dv-frise" id="dv-frise"><div class="dv-tete" id="dv-tete"></div></div>
-      <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
+      <!-- Mettre en pause sans quitter l'écran : on découpe en regardant, et il
+           faut pouvoir s'arrêter pour ajuster une coupure. -->
+      <div class="dv-barre">
+        <button type="button" class="dv-play" id="dv-play" aria-label="Lecture">
+          <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
+          <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"/><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"/></svg>
+        </button>
+        <div class="dv-tps" style="flex:1;"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
+      </div>
 
       <div class="dv-geste">
         <button type="button" id="dv-bouton">
@@ -13185,10 +13243,123 @@ function dvMajFrise() {
     f.insertBefore(d, document.getElementById('dv-tete'))
   })
 
+  /* Une poignée par coupure. La dernière étape se termine à la fin de la vidéo :
+     sa borne n'est pas déplaçable, elle n'appartient à personne. */
+  f.querySelectorAll('.dv-poi').forEach(x => x.remove())
+  videoSteps.slice(0, -1).forEach((e, i) => {
+    const poi = document.createElement('div')
+    poi.className = 'dv-poi'
+    poi.style.left = (e.fin_video / duree * 100) + '%'
+    poi.innerHTML = `<span class="val">${dvFmt(e.fin_video)}</span>`
+    poi.dataset.coupure = i
+    f.appendChild(poi)
+    brancherPoignee(poi, i)
+  })
+
   document.getElementById('dv-tete').style.left = (v.currentTime / duree * 100) + '%'
   document.getElementById('dv-t').textContent = dvFmt(v.currentTime)
   document.getElementById('dv-d').textContent = dvFmt(duree)
+  majBoutonLecture()
 }
+
+/* ═══ DÉPLACER UNE COUPURE ═══
+
+   On appuie toujours un peu trop tard : le geste vient après ce qu'on a vu.
+   Sans moyen de rattraper, il fallait tout refaire pour une demi-seconde.
+
+   La vidéo suit le doigt pendant qu'on tire — c'est ça qui rend le réglage
+   précis : on voit l'image exacte où la coupure va tomber, au lieu de viser
+   un chiffre. */
+const COUPURE_MINI = 1   // une étape d'une seconde ne montre rien
+
+function brancherPoignee(poi, i) {
+  const f = document.getElementById('dv-frise')
+  const v = dvLecteur()
+  if (!f || !v) return
+
+  let tire = false
+  let jouaitAvant = false
+
+  const bornes = () => {
+    const avant = i > 0 ? videoSteps[i - 1].fin_video : 0
+    const apres = videoSteps[i + 1] ? videoSteps[i + 1].fin_video : (v.duration || 0)
+    return [avant + COUPURE_MINI, apres - COUPURE_MINI]
+  }
+
+  const placer = (clientX) => {
+    const r = f.getBoundingClientRect()
+    const duree = v.duration || 1
+    const [min, max] = bornes()
+    let t = (clientX - r.left) / r.width * duree
+    t = Math.max(min, Math.min(max, t))
+
+    /* Les deux étapes voisines se partagent l'instant : la fin de l'une EST le
+       début de l'autre. Ne bouger qu'une seule des deux ouvrirait un trou. */
+    videoSteps[i].fin_video = t
+    if (videoSteps[i + 1]) videoSteps[i + 1].timestamp_video = t
+
+    poi.style.left = (t / duree * 100) + '%'
+    poi.querySelector('.val').textContent = dvFmt(t)
+    v.currentTime = t
+  }
+
+  poi.addEventListener('pointerdown', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    tire = true
+    jouaitAvant = !v.paused
+    v.pause()
+    poi.classList.add('tire')
+    poi.setPointerCapture(e.pointerId)
+    placer(e.clientX)
+  })
+
+  poi.addEventListener('pointermove', (e) => {
+    if (!tire) return
+    e.preventDefault()
+    placer(e.clientX)
+  })
+
+  const relacher = () => {
+    if (!tire) return
+    tire = false
+    poi.classList.remove('tire')
+    /* On redessine tout : les durées affichées sous chaque étape ont changé. */
+    renderVideoSteps()
+    dvMajFrise()
+    if (jouaitAvant) v.play()
+    if (navigator.vibrate) navigator.vibrate(6)
+  }
+  poi.addEventListener('pointerup', relacher)
+  poi.addEventListener('pointercancel', relacher)
+}
+
+/* ═══ LECTURE ET PAUSE ═══
+   On découpe en regardant : il faut pouvoir s'arrêter pour ajuster sans quitter
+   l'écran ni perdre sa position. */
+function majBoutonLecture() {
+  const b = document.getElementById('dv-play')
+  const v = dvLecteur()
+  if (!b || !v) return
+  b.classList.toggle('joue', !v.paused)
+  b.setAttribute('aria-label', v.paused ? 'Lecture' : 'Pause')
+}
+
+/* Le bouton suit l'état réel du lecteur, pas seulement nos clics : la vidéo
+   démarre aussi depuis le bouton de découpe, ou s'arrête seule à la fin. Sans
+   ces écouteurs, l'icône mentirait sur ce qui se passe. */
+;(() => {
+  const v = document.getElementById('video-player')
+  if (!v) return
+  ;['play', 'pause', 'ended'].forEach(ev => v.addEventListener(ev, majBoutonLecture))
+})()
+
+document.getElementById('dv-play')?.addEventListener('click', () => {
+  const v = dvLecteur()
+  if (!v) return
+  if (v.paused) v.play(); else v.pause()
+  majBoutonLecture()
+})
 
 /* Le geste unique. */
 document.getElementById('dv-bouton')?.addEventListener('click', () => {

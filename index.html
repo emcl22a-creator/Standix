@@ -1436,19 +1436,29 @@
      Elle est aussi plus ÉPAISSE — 44 px au lieu de 26. Ce n'est pas décoratif :
      on y attrape des traits au doigt, et un doigt fait 8 mm. */
   .dv-vue{
-    position:relative; margin-top:22px;
+    position:relative; margin-top:22px; padding:12px 0;
+    overflow:hidden;
+  }
+
+  /* La piste défile sous le trait. Elle porte un retrait de la MOITIÉ de
+     l'écran de chaque côté : sans lui, l'instant zéro ne pourrait jamais
+     atteindre le centre, et la fin non plus. */
+  .dv-piste{
     overflow-x:auto; overflow-y:visible;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;
-    padding:12px 0;
+    padding:0 50%;
   }
-  .dv-vue::-webkit-scrollbar{ display:none; }
+  .dv-piste::-webkit-scrollbar{ display:none; }
 
   .dv-frise{
     position:relative; height:44px; border-radius:11px;
     background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
-    width:var(--zoom-l, 100%); min-width:100%;
+    width:var(--zoom-l, 100%); min-width:100%; flex-shrink:0;
   }
   .dv-fond{ position:absolute; inset:0; border-radius:11px; overflow:hidden; }
+  /* Pendant le geste, la frise se signale légèrement : on sait qu'on la tient. */
+  .dv-frise{ touch-action:none; transition:box-shadow 0.15s ease; }
+  .dv-frise.tire{ box-shadow:0 0 0 1.5px rgba(255,255,255,0.28); }
   .dv-seg{
     position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);
     background:rgba(94,160,255,0.30); display:flex; align-items:center;
@@ -1484,23 +1494,24 @@
   }
   .dv-poi::before{ margin:12px 0; }
 
-  /* La tête de lecture se saisit aussi : on tire dedans pour parcourir la vidéo.
-     Sa zone déborde comme celle des coupures, et elle passe DEVANT. */
+  /* La tête de lecture, telle qu'elle était : un simple trait blanc. La pastille
+     ronde que j'avais ajoutée faisait un objet de plus dans une frise qui en
+     porte déjà beaucoup. Le geste se prend sur toute la frise, pas sur le trait
+     — il n'a donc pas besoin d'être saisissable, ni de le montrer. */
+  /* Le trait ne bouge plus : il est planté au milieu, du haut au bas de la vue.
+     C'est la piste qui glisse dessous. */
   .dv-tete{
-    position:absolute; top:-12px; bottom:-12px; width:44px; margin-left:-22px;
-    z-index:8; touch-action:none; background:none;
-    display:flex; align-items:center; justify-content:center;
+    position:absolute; top:4px; bottom:4px; left:50%; width:2.5px; margin-left:-1.25px;
+    background:#fff; z-index:6; border-radius:2px;
+    box-shadow:0 0 10px rgba(255,255,255,0.8);
+    pointer-events:none;
   }
+  /* Une petite pointe en haut, comme sur un curseur de montage. */
   .dv-tete::before{
-    content:''; width:2.5px; height:100%; margin:12px 0; border-radius:2px;
-    background:#fff; box-shadow:0 0 10px rgba(255,255,255,0.85);
+    content:''; position:absolute; top:-4px; left:50%; margin-left:-5px;
+    border-left:5px solid transparent; border-right:5px solid transparent;
+    border-top:6px solid #fff;
   }
-  .dv-tete::after{
-    content:''; position:absolute; top:2px; width:11px; height:11px;
-    border-radius:50%; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,0.5);
-    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .dv-tete.tire::after{ transform:scale(1.3); }
 
   /* Les deux outils sous la frise. */
   .dv-outils{ display:flex; align-items:center; gap:8px; padding:2px 0 0; }
@@ -4579,11 +4590,19 @@
       <!-- La frise vit dans une FENÊTRE qui défile. Zoomée cinq fois par défaut :
            à l'échelle de la vidéo entière, une étape de trois secondes sur deux
            minutes fait deux pixels — impossible à viser, encore moins à déplacer. -->
+      <!-- La frise à la manière de CapCut : le trait blanc ne bouge PAS. Il reste au
+           milieu, et c'est la vidéo qui défile dessous. Ce qui est passé est à gauche,
+           ce qui reste à droite.
+
+           L'avantage n'est pas qu'esthétique : l'instant qu'on regarde est toujours
+           au même endroit de l'écran. On n'a plus à chercher le trait des yeux. -->
       <div class="dv-vue" id="dv-vue">
-        <div class="dv-frise" id="dv-frise">
-          <div class="dv-fond" id="dv-fond"></div>
-          <div class="dv-tete" id="dv-tete"></div>
+        <div class="dv-piste" id="dv-piste">
+          <div class="dv-frise" id="dv-frise">
+            <div class="dv-fond" id="dv-fond"></div>
+          </div>
         </div>
+        <div class="dv-tete" id="dv-tete"></div>
       </div>
 
       <div class="dv-outils">
@@ -4624,7 +4643,7 @@
 
            Celui du bas est mieux placé : c'est là qu'on se demande « est-ce que
            tout est écrit ? », juste avant de publier. -->
-      <div class="vid-ia-note" id="vid-ia-note"></div>
+      
 
       <!-- « Tout recommencer » retiré de la modification : effacer d'un coup les
            étapes d'une procédure déjà publiée n'est pas une correction, c'est une
@@ -4644,6 +4663,10 @@
         <span class="ia-fig m"><span class="lum"></span></span>
         <span id="vid-ia-bas-txt">Compléter les étapes avec l’IA</span>
       </button>
+      <!-- La note vit SOUS le bouton. Elle était restée où l'ancien bouton se
+           trouvait, tout en haut : les messages d'erreur s'affichaient à un
+           endroit qu'on ne regardait pas, et l'action semblait sans effet. -->
+      <div class="vid-ia-note" id="vid-ia-note"></div>
       <button class="btn block" style="margin-top:9px;" id="publish-btn-video">Publier la procédure</button>
     </div>
   </div>
@@ -13365,76 +13388,86 @@ function dvAppliquerZoom() {
   if (!f) return
   f.style.setProperty('--zoom-l', (dvZoom * 100) + '%')
   if (b) {
-    b.classList.toggle('large', dvZoom === 1)
+    /* Le pincement donne des valeurs continues : on compare à un seuil plutôt
+       qu'à l'égalité stricte, sinon le bouton resterait bloqué sur un libellé. */
+    const entier = dvZoom <= 1.05
+    b.classList.toggle('large', entier)
     const t = document.getElementById('dv-zoom-txt')
-    if (t) t.textContent = dvZoom === 1 ? 'Rapprocher' : 'Tout voir'
+    if (t) t.textContent = entier ? 'Rapprocher' : 'Tout voir'
   }
 }
 
-/* Garde la tête de lecture dans la fenêtre pendant que la vidéo avance. Sans
-   ça, elle sortirait de l'écran au bout de vingt secondes et on découperait
-   à l'aveugle. */
-function dvSuivreTete() {
-  const vue = document.getElementById('dv-vue')
-  const tete = document.getElementById('dv-tete')
-  if (!vue || !tete || dvZoom === 1) return
-  const x = tete.offsetLeft
-  const marge = vue.clientWidth * 0.35
-  if (x < vue.scrollLeft + marge || x > vue.scrollLeft + vue.clientWidth - marge) {
-    vue.scrollTo({ left: Math.max(0, x - vue.clientWidth / 2), behavior: 'smooth' })
-  }
-}
+/* Le trait étant fixe, il n'y a plus rien à suivre : la piste se replace
+   d'elle-même sous lui à chaque image. */
+function dvSuivreTete() { dvPistePourTemps() }
 
 document.getElementById('dv-zoom')?.addEventListener('click', () => {
-  dvZoom = dvZoom === 1 ? 5 : 1
+  dvZoom = dvZoom <= 1.05 ? 5 : 1
   dvAppliquerZoom()
   dvMajFrise()
   dvSuivreTete()
   if (navigator.vibrate) navigator.vibrate(6)
 })
 
-/* ═══ TIRER LA TÊTE DE LECTURE ═══
-   Le trait blanc suit la vidéo ; le tirer déplace la vidéo. C'est le même objet
-   dans les deux sens — c'est ce qui rend le déplacement évident. */
-;(() => {
-  const tete = document.getElementById('dv-tete')
-  if (!tete) return
-  let tire = false, jouait = false
+/* ═══ LE DÉFILEMENT PILOTE LA VIDÉO ═══
 
-  const placer = (clientX) => {
-    const f = document.getElementById('dv-frise')
+   Le trait est fixe au centre : la position de la vidéo, c'est donc la position
+   du défilement. Les deux sont liés dans les DEUX sens — la vidéo avance, la
+   piste glisse ; on fait glisser la piste, la vidéo suit.
+
+   Le piège est la boucle : écrire dans l'un déclenche l'événement de l'autre, qui
+   réécrit dans le premier, et l'image se met à trembler. Le drapeau `pilote`
+   dit qui a la main à cet instant, et l'autre se tait.
+
+   On garde le défilement NATIF plutôt qu'un geste à la main : il a l'inertie,
+   le rebond, et le pincement du navigateur. Aucun code ne les imite bien. */
+let dvPilote = null      // 'video' | 'doigt' | null
+let dvRelache = null
+
+function dvPistePourTemps() {
+  const piste = document.getElementById('dv-piste')
+  const f = document.getElementById('dv-frise')
+  const v = dvLecteur()
+  if (!piste || !f || !v || dvPilote === 'doigt') return
+  const duree = v.duration || 1
+  dvPilote = 'video'
+  piste.scrollLeft = (v.currentTime / duree) * f.offsetWidth
+  requestAnimationFrame(() => { if (dvPilote === 'video') dvPilote = null })
+}
+
+;(() => {
+  const piste = document.getElementById('dv-piste')
+  const f = document.getElementById('dv-frise')
+  if (!piste || !f) return
+
+  let jouait = false
+
+  piste.addEventListener('scroll', () => {
+    if (dvPilote === 'video') return
     const v = dvLecteur()
-    if (!f || !v) return
-    const r = f.getBoundingClientRect()
+    if (!v) return
+
+    /* Premier mouvement du doigt : on met la vidéo en pause, sinon elle
+       continuerait d'avancer et lutterait contre la main. */
+    if (dvPilote !== 'doigt') {
+      dvPilote = 'doigt'
+      jouait = !v.paused
+      v.pause()
+    }
+
     const duree = v.duration || 1
-    let t = (clientX - r.left) / r.width * duree
+    const t = (piste.scrollLeft / Math.max(1, f.offsetWidth)) * duree
     v.currentTime = Math.max(0, Math.min(duree, t))
     dvMajFrise()
-  }
 
-  tete.addEventListener('pointerdown', (e) => {
-    e.preventDefault(); e.stopPropagation()
-    const v = dvLecteur()
-    tire = true
-    jouait = v && !v.paused
-    v?.pause()
-    tete.classList.add('tire')
-    tete.setPointerCapture?.(e.pointerId)
-    placer(e.clientX)
-  })
-  tete.addEventListener('pointermove', (e) => {
-    if (!tire) return
-    e.preventDefault()
-    placer(e.clientX)
-  })
-  const relacher = () => {
-    if (!tire) return
-    tire = false
-    tete.classList.remove('tire')
-    if (jouait) dvLecteur()?.play()
-  }
-  tete.addEventListener('pointerup', relacher)
-  tete.addEventListener('pointercancel', relacher)
+    /* Le navigateur ne prévient pas de la fin d'un défilement : on la déduit
+       d'un silence de 140 ms. */
+    clearTimeout(dvRelache)
+    dvRelache = setTimeout(() => {
+      dvPilote = null
+      if (jouait) { jouait = false; dvLecteur()?.play() }
+    }, 140)
+  }, { passive: true })
 })()
 
 /* ═══ ANNULER LA DERNIÈRE COUPURE ═══
@@ -13511,7 +13544,8 @@ function dvMajFrise() {
     brancherPoignee(poi, i)
   })
 
-  document.getElementById('dv-tete').style.left = (v.currentTime / duree * 100) + '%'
+  /* Le trait ne bouge plus : c'est la piste qui se place sous lui. */
+  dvPistePourTemps()
   document.getElementById('dv-t').textContent = dvFmt(v.currentTime)
   document.getElementById('dv-d').textContent = dvFmt(duree)
   majBoutonLecture()
@@ -13660,26 +13694,6 @@ dvLecteur()?.addEventListener('timeupdate', () => {
 dvLecteur()?.addEventListener('pause', () => { dvMajGeste(); renderVideoSteps() })
 dvLecteur()?.addEventListener('play', dvMajGeste)
 
-/* Arrivé au bout : on ferme la dernière étape toute seule. Sans ça, ce qui a été
-   filmé après la dernière coupe serait perdu. */
-dvLecteur()?.addEventListener('ended', () => {
-  const v = dvLecteur()
-  if (v && v.duration - dvDebutEnCours > 0.5) {
-    videoSteps.push({ texte: '', timestamp_video: dvDebutEnCours, fin_video: v.duration })
-    dvSelection = videoSteps.length - 1
-  }
-  dvMajGeste(); renderVideoSteps(); dvMajFrise()
-})
-
-document.getElementById('dv-frise')?.addEventListener('click', (e) => {
-  if (e.target.closest('.dv-seg')) return
-  const v = dvLecteur()
-  if (!v || !v.duration) return
-  const r = e.currentTarget.getBoundingClientRect()
-  v.currentTime = Math.max(0, Math.min(v.duration, (e.clientX - r.left) / r.width * v.duration))
-  if (!v.paused) dvDebutEnCours = Math.min(dvDebutEnCours, v.currentTime)
-  dvMajFrise()
-})
 
 
 

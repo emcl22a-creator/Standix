@@ -246,6 +246,24 @@
     animation:ecranNait 0.46s cubic-bezier(0.32,0.72,0,1);
     transform-origin:var(--ox, 50%) var(--oy, 40%);
   }
+
+  /* C'ÉTAIT ÇA, LA DEUXIÈME ANIMATION.
+
+     Les cartes de la liste ont leur propre entrée — `cardIn`, `cardSlideIn`.
+     Elles se déclenchaient PENDANT que l'écran grandissait : on voyait deux
+     mouvements superposés, l'écran qui naît et les cartes qui montent dedans.
+
+     Pendant la naissance, l'écran bouge en bloc. Son contenu ne bouge pas. */
+  .screen.nait .sop-card,
+  .screen.nait .emp-row,
+  .screen.nait .cat-cell,
+  .screen.nait .proc-rich-card,
+  .screen.nait .slide-in,
+  .screen.nait .contenu-entre > *,
+  .screen.nait .fm-lg,
+  .screen.nait .an-lig{
+    animation:none !important;
+  }
   @keyframes ecranNait{
     0%{ opacity:0; transform:scale(0.32); border-radius:34px; }
     38%{ opacity:1; }
@@ -9351,7 +9369,17 @@ function ouvrirDepuisCarte(ecran) {
   ecran.style.setProperty('--oy', origineOuverture.y)
   ecran.classList.add('nait')
   origineOuverture = null
-  ecran.addEventListener('animationend', () => ecran.classList.remove('nait'), { once: true })
+  /* On NE retire PAS la classe à la fin de l'animation : les cartes
+     reprendraient leur entrée à ce moment-là, et on retomberait sur deux
+     mouvements — décalés au lieu de superposés.
+
+     Elle est retirée au changement d'écran suivant, quand celui-ci est déjà
+     masqué : plus rien ne peut rejouer. */
+}
+
+/* Remet tous les écrans à zéro avant d'en ouvrir un autre. */
+function oublierNaissances() {
+  document.querySelectorAll('.screen.nait').forEach(s => s.classList.remove('nait'))
 }
 
 /* Les deux gestes dans le BON ORDRE : la naissance d'abord, l'activation
@@ -9363,6 +9391,7 @@ function ouvrirDepuisCarte(ecran) {
    `showEquipeScreen` : ils appellent cette fonction directement. */
 function activerAvecNaissance(ecran) {
   if (!ecran) return
+  oublierNaissances()
   ouvrirDepuisCarte(ecran)
   ecran.classList.add('active')
 }

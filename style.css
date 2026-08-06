@@ -135,6 +135,49 @@
   }
   @keyframes pastilleArrive{ from{ transform:scale(0); } to{ transform:none; } }
 
+/* ═══ L'ALERTE D'ESSAI ═══
+     Même motif que `.alerte-partage` — tuile de 32, titre de 14,5, deux boutons
+     de 38 — mais en BLEU. L'ambre signale une faute à corriger ; la fin d'un
+     essai n'en est pas une, elle était prévue depuis le premier jour. */
+  .alerte-essai{
+    margin-top:14px; padding:15px; border-radius:18px;
+    background:rgba(10,132,255,0.10); border:0.5px solid rgba(10,132,255,0.30);
+  }
+  .alerte-essai .tete{ display:flex; align-items:flex-start; gap:11px; }
+  .alerte-essai .pic{
+    width:32px; height:32px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(10,132,255,0.16); border:0.5px solid rgba(10,132,255,0.3);
+  }
+  .alerte-essai .pic svg{ width:18px; height:18px; }
+  .alerte-essai .tx{ flex:1; min-width:0; }
+  .alerte-essai .tx b{ display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .alerte-essai .tx i{
+    display:block; font-style:normal; font-size:12px;
+    color:var(--label-2); margin-top:2px;
+  }
+  .alerte-essai .s{ font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:11px; }
+  .alerte-essai .s b{ color:#fff; font-weight:650; }
+  .alerte-essai .actions{ display:flex; gap:8px; margin-top:13px; }
+  .alerte-essai .principal{
+    flex:1; height:38px; border:none; border-radius:12px;
+    background:#fff; color:#000; font-family:inherit; font-size:13px; font-weight:700;
+  }
+  .alerte-essai .secondaire{
+    height:38px; padding:0 15px; border-radius:12px;
+    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
+  }
+  /* La jauge des jours écoulés, comme celles des pages d'analyse. */
+  .alerte-essai .jauge{
+    height:5px; border-radius:3px; margin-top:11px;
+    background:rgba(255,255,255,0.09); overflow:hidden;
+  }
+  .alerte-essai .jauge i{ display:block; height:100%; border-radius:3px; background:var(--blue); }
+
+  /* Ce qui est fermé quand l'essai a expiré. */
+  body.abo-expire [data-etab-plus]{ opacity:0.4; pointer-events:none; }
+
   .alerte-partage{
     margin-top:14px; padding:15px; border-radius:18px;
     background:rgba(255,159,10,0.10); border:0.5px solid rgba(255,159,10,0.30);
@@ -559,7 +602,7 @@
   /* Le bouton porte l'anneau, puis la coche. Même famille que celui de la page
      vidéo — mais plein, car ici c'est l'action principale. */
   .doc-generer{ display:flex; align-items:center; justify-content:center; gap:10px; }
-  .doc-generer .ia-fig{ flex-shrink:0; }
+  .doc-generer .ia-mot{ flex-shrink:0; }
   .doc-generer > span:last-child{
     transition:opacity 0.25s ease, max-width 0.35s cubic-bezier(0.32,0.72,0,1);
     max-width:280px; overflow:hidden; white-space:nowrap;
@@ -569,8 +612,8 @@
   .doc-generer.travaille{ gap:0; }
   .doc-generer .ia-coche{ display:none; width:24px; height:24px; flex-shrink:0; }
   .doc-generer .ia-coche svg{ width:24px; height:24px; display:block; }
-  .doc-generer:disabled .ia-fig{ opacity:1; }
-  .doc-generer.fini .ia-fig{ display:none; }
+  .doc-generer:disabled .ia-mot{ opacity:1; }
+  .doc-generer.fini .ia-mot{ display:none; }
   .doc-generer.fini .ia-coche{
     display:block;
     animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
@@ -1167,9 +1210,12 @@
     margin:0 -20px; padding:0;
   }
   .fm-piste::-webkit-scrollbar{ display:none; }
+  /* Aucun retrait ici : l'écran le donne déjà. Les 20 px qui restaient s'y
+     ajoutaient, et le contenu des panneaux partait plus loin que les titres —
+     le fameux « padding + padding ». */
   .fm-pan{
     flex:0 0 100%; min-width:100%; scroll-snap-align:center;
-    padding:0 20px;
+    padding:0;
   }
 
   /* La barre de position : deux traits, celui de la page active en blanc. */
@@ -1548,6 +1594,28 @@
      Ambre, pas rouge : le rouge dit « erreur », or rien n'est en faute ici. On
      prévient, on n'alarme pas. Et il reste DANS l'étape — une mise en garde
      séparée de son geste se lit trop tard. */
+  /* ═══ LA MARQUE « AI » DANS LES BOUTONS ═══
+
+     Le même dégradé que l'anneau, appliqué aux lettres. Dans un bouton, l'anneau
+     qui tourne entrait en concurrence avec le texte à côté : deux choses qui
+     bougent, dont une qui ne veut rien dire de plus qu'un mot. Les grands
+     anneaux des écrans d'attente restent, eux — là, le mouvement EST
+     l'information. */
+  .ia-mot{
+    font-size:13.5px; font-weight:850; letter-spacing:0.02em;
+    line-height:1; flex-shrink:0; user-select:none;
+    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #6FBEFF 100%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+  }
+  /* Sur un bouton blanc, des lettres blanches n'existent pas. */
+  .btn:not(.ghost):not(.dv-ia-bas) .ia-mot{
+    background:linear-gradient(118deg, #2E93F0 0%, #2E93F0 46%, #0B4E8C 100%);
+    -webkit-background-clip:text; background-clip:text;
+  }
+  /* Éteint, le bouton pâlit — la marque garde sa couleur, comme l'anneau. */
+  button:disabled .ia-mot{ opacity:1; }
+
   .et-attention{
     display:flex; align-items:flex-start; gap:8px;
     margin-top:9px; padding:9px 11px; border-radius:11px;
@@ -1588,6 +1656,9 @@
   #p-membre .fm-piste, #an-piste-proc, #an-piste-cat{
     margin-left:-32px; margin-right:-32px;
   }
+  /* Les pistes sortent de 32 px pour toucher les bords ; leurs panneaux les
+     rendent à l'intérieur. Le compte retombe exactement sur la colonne des
+     titres. */
   #p-membre .fm-piste .fm-pan,
   #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{
     padding-left:32px; padding-right:32px;
@@ -1754,7 +1825,7 @@
   /* L'anneau garde sa lumière même quand le bouton est éteint. Il était assombri
      avec le reste — or pendant le travail c'est la SEULE chose à l'écran, et une
      lumière éteinte donne l'impression que rien ne tourne. */
-  .dv-ia-bas:disabled .ia-fig{ opacity:1; }
+  .dv-ia-bas:disabled .ia-mot{ opacity:1; }
   .dv-ia-bas:active{ opacity:0.6; }
 
   /* TROIS ÉTATS.
@@ -1775,7 +1846,7 @@
   .dv-ia-bas.fini #vid-ia-bas-txt{ opacity:0; max-width:0; }
   .dv-ia-bas.travaille, .dv-ia-bas.fini{ gap:0; }
 
-  .dv-ia-bas.fini .ia-fig{ display:none; }
+  .dv-ia-bas.fini .ia-mot{ display:none; }
   .dv-ia-bas.fini .ia-coche{
     display:block;
     animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
@@ -3150,9 +3221,36 @@
     border:0.5px solid var(--border); border-radius:16px;
   }
   .sop-card{ padding:14px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;
-    animation: cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
   .sop-card:active{ transform:scale(0.97); }
-  @keyframes cardIn{
+  /* L'animation d'entrée ne joue QUE sur ce qui vient d'apparaître. Elle était
+     posée sur toutes les cartes : elle rejouait à chaque retour sur la page, et
+     finissait par ne plus rien signifier. */
+  .sop-card.neuf, .emp-row.neuf, .cat-cell.neuf, .proc-rich-card.neuf{
+    animation:cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both;
+  }
+
+  /* La sortie. Une catégorie qui s'efface parce que sa dernière procédure part
+     doit se voir partir — sinon on doute d'avoir supprimé la bonne chose. */
+  .sop-card.part, .emp-row.part, .cat-cell.part, .proc-rich-card.part{
+    animation:cardOut 0.3s cubic-bezier(0.4,0,1,1) both;
+    pointer-events:none;
+  }
+  @keyframes cardOut{
+    0%{ opacity:1; transform:scale(1); max-height:200px; }
+    100%{ opacity:0; transform:scale(0.92); max-height:0;
+          margin-top:0; margin-bottom:0; padding-top:0; padding-bottom:0; }
+  }
+
+  /* Quelqu'un qui a demandé moins de mouvement n'en reçoit aucun. */
+  @media (prefers-reduced-motion: reduce){
+    .sop-card.neuf, .emp-row.neuf, .cat-cell.neuf, .proc-rich-card.neuf,
+    .sop-card.part, .emp-row.part, .cat-cell.part, .proc-rich-card.part{
+      animation:none;
+    }
+  }
+
+@keyframes cardIn{
     0%{ opacity:0; transform:translateY(10px) scale(0.97); }
     100%{ opacity:1; transform:translateY(0) scale(1); }
   }

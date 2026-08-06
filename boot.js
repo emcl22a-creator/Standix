@@ -1,5 +1,4 @@
-
-  /* iOS Safari ignore `user-scalable=no` depuis iOS 10 : le seul moyen fiable de
+/* iOS Safari ignore `user-scalable=no` depuis iOS 10 : le seul moyen fiable de
      bloquer le zoom au pincement est d'intercepter ses événements de geste.
      Volontairement pas d'écouteur sur `touchmove` : non passif, il ferait
      attendre le navigateur à chaque défilement et remettrait des saccades. */

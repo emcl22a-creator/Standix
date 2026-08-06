@@ -2844,6 +2844,10 @@ function renderMembresListe() {
     b.addEventListener('click', () => ouvrirAnEquipe())
     el.appendChild(b)
   }
+
+  /* Seules les nouveautés s'animent. */
+  marquerLesNeufs(document.querySelector('.screen.active') || document.body,
+                  'renderMembresListe', '.emp-row')
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -3669,6 +3673,13 @@ window.showGestionScreen = function(id, btn) {
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
+  /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
+     fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
+  lireEtatAbonnement().then(() => {
+    dessinerAlerteEssai('essai-proc')
+    dessinerAlerteEssai('essai-reglages')
+    appliquerBlocageEssai()
+  })
   const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
   const index = ONGLET_PAR_ECRAN[id]
@@ -3737,6 +3748,13 @@ window.showEquipeScreen = function(id, btn) {
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
+  /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
+     fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
+  lireEtatAbonnement().then(() => {
+    dessinerAlerteEssai('essai-proc')
+    dessinerAlerteEssai('essai-reglages')
+    appliquerBlocageEssai()
+  })
   /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
      quittant le scanner on repart caméra allumée — sinon on reviendrait sur un
      écran noir sans se rappeler pourquoi. */
@@ -4197,6 +4215,10 @@ function renderCategoryGrid() {
 
   playCardShuffle(catGridEl, oldRects)
   garantirVisibilite(catGridEl)
+
+  /* Seules les nouveautés s'animent. */
+  marquerLesNeufs(document.querySelector('.screen.active') || document.body,
+                  'renderCategoryGrid', '.cat-cell')
 }
 
 // Un seul gestionnaire pour tous les menus « Trier », posé sur le document.
@@ -4406,6 +4428,10 @@ function renderCategoryProceduresList() {
     const el = document.getElementById('category-procedures-list')
     if (el) el.innerHTML = `<div class="empty-state"><h3>Affichage impossible</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
   }
+
+  /* Seules les nouveautés s'animent. */
+  marquerLesNeufs(document.querySelector('.screen.active') || document.body,
+                  'renderCategoryProceduresList', '.sop-card, .proc-rich-card')
 }
 
 function renderCategoryProceduresListInterne() {
@@ -5065,6 +5091,12 @@ async function completerEtapesAvecIA() {
   const jalon = (m) => { if (note) { note.classList.remove('erreur'); note.textContent = m } }
 
   try {
+    jalon('Pr\u00e9paration de la vid\u00e9o\u2026')
+    if (currentVideoFile) {
+      currentVideoFile = await comprimerVideo(currentVideoFile, (pct) => {
+        jalon(`Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
+      })
+    }
     jalon('1/5 \u00b7 Pr\u00e9paration de la bande son\u2026')
     /* 1. La bande son. C'est elle qu'Azure écoute — dix fois plus légère que la
        vidéo, et il n'a que faire de l'image. */
@@ -5267,6 +5299,171 @@ let docNomFichier = ''
    La zone montre trois entrées — coller, photo, fichier — et chacune ouvre son
    bloc. Avant, les trois étaient dépliées en même temps, séparées par des « ou » :
    l'écran faisait trois écrans, et la photo se retrouvait tout en bas. */
+/* ═══════════════════════════════════════════════════════════════════════
+   L'ESSAI GRATUIT
+   ═══════════════════════════════════════════════════════════════════════
+
+   Quatorze jours, puis un choix. Trois états seulement : `essai`, `actif`,
+   `expire`.
+
+   LE CALCUL VIENT DU SERVEUR, jamais du téléphone. Une horloge se recule ;
+   une fonction Postgres, non. C'est la seule raison pour laquelle
+   `etat_abonnement` existe côté base plutôt qu'ici.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+let etatAbo = null   // { statut, jours_restants, fin_essai }
+
+async function lireEtatAbonnement() {
+  if (!currentMembre?.entreprise_id) return null
+  const { data, error } = await supabase
+    .rpc('etat_abonnement', { p_entreprise: currentMembre.entreprise_id })
+  if (error || !data || !data.length) {
+    /* Sans réponse, on n'enferme personne : la migration n'est peut-être pas
+       passée. Bloquer un client parce qu'une colonne manque serait pire que
+       de laisser passer quelques jours de trop. */
+    etatAbo = null
+    return null
+  }
+  etatAbo = data[0]
+  return etatAbo
+}
+
+function dateLisible(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+}
+
+/* L'alerte, dans le langage des autres alertes de l'app : tuile de 32 px,
+   titre de 14,5, deux boutons de 38. Rien de nouveau à apprendre. */
+function dessinerAlerteEssai(hote) {
+  const zone = document.getElementById(hote)
+  if (!zone) return
+  if (!etatAbo || etatAbo.statut === 'actif') { zone.style.display = 'none'; return }
+
+  const fini = etatAbo.statut === 'expire'
+  const j = etatAbo.jours_restants
+  const nbProc = (allGestionProcedures || []).length
+  const nbMembres = (cachedMembres || []).length || 1
+
+  /* BLEU, PAS AMBRE. L'ambre signale une faute — un compte partagé en est une.
+     La fin d'un essai n'en est pas une : c'était prévu depuis le premier jour,
+     et le client n'a rien fait de mal. Un ambre employé partout ne signalerait
+     plus rien. */
+  zone.className = 'alerte-essai'
+  zone.style.display = 'block'
+  zone.innerHTML = `
+    <div class="tete">
+      <span class="pic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/><polyline points="12 6.6 12 12 15.8 14.2"/>
+        </svg>
+      </span>
+      <span class="tx">
+        <b>${fini ? 'Votre essai est termin\u00e9'
+                  : `${j} jour${j > 1 ? 's' : ''} d\u2019essai restant${j > 1 ? 's' : ''}`}</b>
+        <i>${fini ? `${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''} conserv\u00e9e${nbProc > 1 ? 's' : ''}`
+                  : `Jusqu\u2019au ${dateLisible(etatAbo.fin_essai)}`}</i>
+      </span>
+    </div>
+    ${fini ? '' : `<div class="jauge"><i style="width:${Math.round((14 - j) / 14 * 100)}%"></i></div>`}
+    <div class="s">${fini
+      ? `Vous \u00eates <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> : votre formule est \u00e0
+         <b>39 \u20ac par mois</b>, ou 29 \u20ac en r\u00e9glant l\u2019ann\u00e9e. Tout revient d\u00e8s le paiement.`
+      : `Vous pouvez activer votre abonnement d\u00e8s maintenant :
+         <b>les jours restants vous sont offerts</b>, le premier pr\u00e9l\u00e8vement
+         n\u2019aura lieu qu\u2019au ${dateLisible(etatAbo.fin_essai)}.`}</div>
+    <div class="actions">
+      <button type="button" class="principal" data-abo-ouvrir>${
+        fini ? 'Voir les formules' : 'Choisir mon abonnement'}</button>
+      <button type="button" class="secondaire" data-abo-plus-tard>Plus tard</button>
+    </div>`
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-abo-ouvrir]')) { showGestionScreen('p-abonnement'); return }
+  if (e.target.closest('[data-abo-plus-tard]')) {
+    const z = e.target.closest('.alerte-essai')
+    if (z) z.style.display = 'none'
+  }
+})
+
+/* Ce qui devient impossible une fois l'essai fini. On ne cache pas : on
+   désactive et on l'écrit. Un bouton qui disparaît laisse croire à une panne ;
+   un bouton éteint qui dit pourquoi laisse comprendre. */
+function appliquerBlocageEssai() {
+  const expire = etatAbo && etatAbo.statut === 'expire'
+  document.body.classList.toggle('abo-expire', !!expire)
+
+  /* Créer une entreprise : fermé. Sans ça, on recommencerait un essai tous
+     les quinze jours en changeant de nom. */
+  document.querySelectorAll('[data-etab-plus]').forEach(b => {
+    b.disabled = !!expire
+    b.title = expire ? 'Disponible avec un abonnement' : ''
+  })
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CE QUI EST NOUVEAU, ET CE QUI NE L'EST PLUS
+   ═══════════════════════════════════════════════════════════════════════
+
+   Une animation d'apparition dit : « ceci vient d'arriver ». Rejouée à chaque
+   retour sur la page, elle ne dit plus rien — elle fatigue, et pire, elle fait
+   croire que quelque chose a changé alors que non.
+
+   On retient donc ce qu'on a déjà montré. Un élément ne s'anime qu'à sa
+   PREMIÈRE apparition ; ensuite il est simplement là.
+
+   La mémoire vit le temps de la session. Rouvrir l'app remet tout à plat, et
+   c'est voulu : une entrée en scène au lancement est agréable, c'est la
+   répétition qui lasse.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+const dejaMontres = new Map()   // liste -> Set de clés
+
+function marquerLesNeufs(conteneur, liste, selecteur) {
+  const zone = typeof conteneur === 'string' ? document.getElementById(conteneur) : conteneur
+  if (!zone) return
+  if (!dejaMontres.has(liste)) dejaMontres.set(liste, new Set())
+  const vus = dejaMontres.get(liste)
+
+  zone.querySelectorAll(selecteur).forEach((el, i) => {
+    const cle = el.dataset.key || el.dataset.id || el.textContent.slice(0, 40)
+    if (vus.has(cle)) {
+      el.classList.add('deja-vu')       // pas d'animation
+      return
+    }
+    vus.add(cle)
+    el.classList.add('neuf')
+    /* Un léger décalage quand plusieurs arrivent ensemble : au premier
+       affichage d'une liste, elles se posent l'une après l'autre plutôt que
+       toutes d'un bloc. Plafonné à six — au-delà, l'attente se voit. */
+    el.style.animationDelay = Math.min(i, 6) * 0.035 + 's'
+  })
+}
+
+/* ═══ LA DISPARITION ═══
+
+   Une catégorie s'efface quand sa dernière procédure part. Sans animation, elle
+   disparaît entre deux images : on doute d'avoir supprimé la bonne chose.
+
+   On la fait partir DEVANT les yeux, puis on redessine. */
+function faireDisparaitre(el, ensuite) {
+  if (!el) { if (ensuite) ensuite(); return }
+  el.classList.add('part')
+  const fin = () => { el.removeEventListener('animationend', fin); if (ensuite) ensuite() }
+  el.addEventListener('animationend', fin)
+  /* Filet : si l'animation ne se déclenche pas — onglet en arrière-plan,
+     mouvement réduit — on continue quand même. */
+  setTimeout(fin, 400)
+}
+
+/* Une clé retirée de la mémoire pourra réapparaître en s'animant : c'est juste,
+   puisqu'elle aura vraiment été recréée. */
+function oublierCle(liste, cle) {
+  dejaMontres.get(liste)?.delete(cle)
+}
+
 function ouvrirVoieDoc(voie) {
   const blocs = { coller: 'doc-bloc-texte', photo: 'doc-bloc-photos', fichier: 'doc-bloc-fichier' }
   Object.entries(blocs).forEach(([v, id]) => {
@@ -5869,6 +6066,151 @@ async function extraireBandeSon(fichier) {
    de fond d'un micro, très en dessous d'une voix. */
 const SON_SEUIL = 0.01
 
+/* ═══ LA COMPRESSION AVANT L'ENVOI ═══
+
+   Un iPhone filme en 4K à 60 images par seconde. Cinq minutes pèsent alors
+   700 Mo, là où le même geste tient dans 90 Mo en 1080p à 30 images.
+
+   Ce n'est pas qu'une question de facture. Chaque lecture par un employé
+   retransfère le fichier : une vidéo huit fois plus lourde coûte huit fois plus
+   cher À CHAQUE CONSULTATION, et met huit fois plus de temps à s'ouvrir sur le
+   téléphone de quelqu'un qui a les mains occupées.
+
+   Trente images par seconde suffisent pour montrer un geste. Le soixante sert
+   au sport ; ici il double le poids sans rien montrer de plus — Azure lui-même
+   n'échantillonne que quelques images par seconde.
+
+   La compression se fait DANS LE NAVIGATEUR, avant l'envoi. Aucun service à
+   ajouter, et la vidéo d'origine ne quitte jamais le téléphone. */
+/* ═══ COMBIEN DE TEMPS LE TÉLÉPHONE GARDE LE FICHIER ═══
+
+   Une vidéo de procédure ne change jamais : une fois publiée, elle est figée.
+   Rien ne justifie de la retransférer chaque fois qu'un employé la rouvre.
+
+   Sans cette consigne, Supabase demande au navigateur de ne rien garder plus
+   d'une heure. Un cuisinier qui revoit la même procédure trois fois dans la
+   semaine la télécharge trois fois — et vous la payez trois fois.
+
+   Un an. Si une vidéo devait changer, elle changerait de nom : le chemin porte
+   un horodatage, donc l'ancienne adresse ne sert plus à rien. */
+const CACHE_LONG = '31536000'   // un an, en secondes
+
+const VIDEO_LARGEUR_MAX = 1920
+const VIDEO_HAUTEUR_MAX = 1080
+const VIDEO_IMAGES_S = 30
+/* 2,5 Mb/s. À 4, cinq minutes pèsent encore 150 Mo — trop pour un fichier qu'un
+   employé retransfère à chaque consultation. À 2,5 on tombe à 90 Mo, et la
+   différence ne se voit pas sur un geste filmé : ce n'est ni un paysage ni un
+   mouvement rapide, c'est une main qui fait quelque chose devant un plan fixe. */
+const VIDEO_DEBIT = 2_500_000
+
+/* Le navigateur sait-il enregistrer ? Safari sur iPhone ne l'a appris que
+   récemment. Sans ce test, on planterait au lieu d'envoyer l'original. */
+function peutComprimer() {
+  return typeof MediaRecorder !== 'undefined' &&
+         typeof HTMLCanvasElement.prototype.captureStream === 'function'
+}
+
+function formatEnregistrable() {
+  for (const t of ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm']) {
+    if (MediaRecorder.isTypeSupported?.(t)) return t
+  }
+  return ''
+}
+
+async function comprimerVideo(fichier, surAvancee) {
+  if (!peutComprimer()) return fichier
+  const type = formatEnregistrable()
+  if (!type) return fichier
+
+  const lecteur = document.createElement('video')
+  lecteur.src = URL.createObjectURL(fichier)
+  lecteur.muted = false
+  lecteur.playsInline = true
+
+  try {
+    await new Promise((ok, non) => {
+      lecteur.onloadedmetadata = ok
+      lecteur.onerror = () => non(new Error('lecture impossible'))
+      setTimeout(() => non(new Error('trop long')), 15000)
+    })
+
+    /* Déjà raisonnable : on n'y touche pas. Recomprimer une vidéo déjà
+       compressée ne fait que perdre de la qualité. */
+    const large = lecteur.videoWidth, haut = lecteur.videoHeight
+    if (!large || !haut) return fichier
+    if (large <= VIDEO_LARGEUR_MAX && haut <= VIDEO_HAUTEUR_MAX &&
+        fichier.size < 100 * 1024 * 1024) {
+      return fichier
+    }
+
+    /* On garde les proportions : une vidéo filmée verticalement le reste. */
+    const ratio = Math.min(VIDEO_LARGEUR_MAX / large, VIDEO_HAUTEUR_MAX / haut, 1)
+    const L = Math.round(large * ratio / 2) * 2   // pair : exigé par les codecs
+    const H = Math.round(haut * ratio / 2) * 2
+
+    const toile = document.createElement('canvas')
+    toile.width = L; toile.height = H
+    const ctx = toile.getContext('2d')
+
+    const flux = toile.captureStream(VIDEO_IMAGES_S)
+
+    /* LE SON DOIT SUIVRE. C'est lui qu'Azure écoute : une vidéo comprimée sans
+       audio rendrait l'analyse inutile. */
+    try {
+      const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
+      const source = ctxAudio.createMediaElementSource(lecteur)
+      const dest = ctxAudio.createMediaStreamDestination()
+      source.connect(dest)
+      source.connect(ctxAudio.destination)
+      dest.stream.getAudioTracks().forEach(t => flux.addTrack(t))
+    } catch (e) {
+      /* Sans son, la compression n'a plus d'intérêt : on renvoie l'original. */
+      return fichier
+    }
+
+    const morceaux = []
+    const enr = new MediaRecorder(flux, { mimeType: type, videoBitsPerSecond: VIDEO_DEBIT })
+    enr.ondataavailable = (e) => { if (e.data.size) morceaux.push(e.data) }
+
+    const fini = new Promise((ok) => { enr.onstop = ok })
+    enr.start(1000)
+    lecteur.muted = true          // on ne fait pas écouter la vidéo à la personne
+    await lecteur.play()
+
+    let arret = false
+    const dessiner = () => {
+      if (arret) return
+      ctx.drawImage(lecteur, 0, 0, L, H)
+      if (surAvancee && lecteur.duration) {
+        surAvancee(Math.min(99, Math.round(lecteur.currentTime / lecteur.duration * 100)))
+      }
+      requestAnimationFrame(dessiner)
+    }
+    dessiner()
+
+    await new Promise((ok) => { lecteur.onended = ok })
+    arret = true
+    enr.stop()
+    await fini
+
+    const sortie = new Blob(morceaux, { type })
+    /* Si la compression a grossi le fichier — ça arrive sur une vidéo déjà
+       optimisée — on garde l'original. */
+    if (sortie.size >= fichier.size) return fichier
+
+    const ext = type.includes('mp4') ? 'mp4' : 'webm'
+    return new File([sortie], (fichier.name || 'video').replace(/\.[^.]+$/, '') + '.' + ext,
+                    { type })
+  } catch (e) {
+    /* La compression échoue ? On envoie l'original. Elle est un confort, pas une
+       condition : refuser la vidéo serait pire que l'envoyer lourde. */
+    return fichier
+  } finally {
+    URL.revokeObjectURL(lecteur.src)
+  }
+}
+
 function verifierDureeVideo() {
   const err = document.getElementById('ai-error')
   const btn = document.getElementById('ai-launch-btn')
@@ -5919,6 +6261,23 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   launchBtn.classList.add('travaille')
   launchBtn.disabled = true
 
+  /* On comprime MAINTENANT, pas à l'import : l'aperçu doit rester immédiat.
+     La personne voit sa vidéo tout de suite, et le travail se fait au moment
+     où elle accepte d'attendre. */
+  if (aiVideoFile) {
+    const avant = aiVideoFile.size
+    errorEl.style.color = 'var(--label-3)'
+    errorEl.textContent = 'Pr\u00e9paration de la vid\u00e9o\u2026'
+    aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
+      errorEl.textContent = `Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
+    })
+    errorEl.textContent = ''
+    errorEl.style.color = 'var(--red)'
+    if (aiVideoFile.size < avant) {
+      console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192', poidsLisible(aiVideoFile.size))
+    }
+  }
+
   try {
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
@@ -5941,7 +6300,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
     // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
     const path = `${base}_${aiVideoFile.name}`
-    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile)
+    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile, { cacheControl: CACHE_LONG })
     if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
     /* On garde le CHEMIN, pas une URL publique. Le bucket est privé depuis le
      passage aux liens signés : `getPublicUrl` rendait une adresse qui ne
@@ -7501,7 +7860,7 @@ async function envoyerCouverture(procedureId) {
     const ext = (couvertureFichier.name.split('.').pop() || 'jpg').toLowerCase()
     const chemin = `${currentMembre.entreprise_id}/${procedureId}/couverture-${Date.now()}.${ext}`
     const { error } = await supabase.storage.from('procedo-videos')
-      .upload(chemin, couvertureFichier, { upsert: true })
+      .upload(chemin, couvertureFichier, { upsert: true, cacheControl: CACHE_LONG })
     if (error) throw error
     /* On stocke le CHEMIN, pas une adresse : les adresses signées expirent, une
          adresse gardée en base serait morte au bout d'une heure. */
@@ -8185,7 +8544,7 @@ async function publishProcedure(errorElId, btnId) {
   let videoUrl = null
   if (currentVideoFile) {
     const path = `${currentMembre.entreprise_id}/${Date.now()}_${currentVideoFile.name}`
-    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, currentVideoFile)
+    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, currentVideoFile, { cacheControl: CACHE_LONG })
     if (uploadError) {
       errorEl.textContent = "Erreur d'upload vidéo : " + uploadError.message
       setButtonLoading(publishBtn, false)
@@ -8225,7 +8584,7 @@ async function publishProcedure(errorElId, btnId) {
     if (!s.imageFichier) continue
     const ext = (s.imageFichier.name.split('.').pop() || 'jpg').toLowerCase()
     const chemin = `${currentMembre.entreprise_id}/${newProc.id}/${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`
-    const { error: envoiErr } = await supabase.storage.from('procedo-videos').upload(chemin, s.imageFichier)
+    const { error: envoiErr } = await supabase.storage.from('procedo-videos').upload(chemin, s.imageFichier, { cacheControl: CACHE_LONG })
     if (envoiErr) { console.warn('Photo non envoyée :', envoiErr.message); continue }
     s.image_url = chemin
   }
@@ -8366,6 +8725,22 @@ async function openAnalyse(procId) {
     showGestionScreen('p-list')
     const carte = carteDeProcedure(procId)
     if (carte) await replierCarte(carte)
+
+    /* La catégorie se vide-t-elle ? Si cette procédure était la dernière, sa
+       catégorie va disparaître du prochain dessin. On la fait partir DEVANT les
+       yeux plutôt qu'entre deux images — sinon on doute d'avoir supprimé la
+       bonne chose. */
+    const cat = proc?.categorie
+    const restantes = allGestionProcedures.filter(
+      x => x.id !== procId && x.categorie === cat).length
+    if (cat && restantes === 0) {
+      const cellule = document.querySelector(`.cat-cell[data-key="${CSS.escape(cat)}"]`)
+      if (cellule) {
+        await new Promise(r => faireDisparaitre(cellule, r))
+        oublierCle('renderCategoryGrid', cat)
+      }
+    }
+
     allGestionProcedures = allGestionProcedures.filter(x => x.id !== procId)
     loadGestionProcedures()
   }
@@ -10328,7 +10703,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const blob = await (await fetch(etabLogoTampon)).blob()
       const chemin = `${entrepriseId}/logo-${Date.now()}.webp`
       const { error: eU } = await supabase.storage.from('procedo-logos')
-        .upload(chemin, blob, { contentType: 'image/webp', upsert: true })
+        .upload(chemin, blob, { contentType: 'image/webp', upsert: true, cacheControl: CACHE_LONG })
       if (eU) throw new Error("D\u00e9p\u00f4t du logo refus\u00e9 : " + eU.message)
       const { data: pub } = supabase.storage.from('procedo-logos').getPublicUrl(chemin)
       logoUrl = pub?.publicUrl || null

@@ -563,6 +563,48 @@
     position:absolute; inset:0; opacity:0; width:100%; height:100%; z-index:2;
   }
   .doc-photos.remplie input[type=file]{ display:none; }
+  /* La zone de dépôt du document : la même que celle de la vidéo. */
+  /* Le bouton porte l'anneau, puis la coche. Même famille que celui de la page
+     vidéo — mais plein, car ici c'est l'action principale. */
+  .doc-generer{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  .doc-generer .ia-fig{ flex-shrink:0; }
+  .doc-generer .ia-coche{ display:none; width:24px; height:24px; flex-shrink:0; }
+  .doc-generer .ia-coche svg{ width:24px; height:24px; display:block; }
+  .doc-generer:disabled .ia-fig{ opacity:1; }
+  .doc-generer.fini .ia-fig{ display:none; }
+  .doc-generer.fini .ia-coche{
+    display:block;
+    animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
+  }
+
+  .doc-zone{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:30px 22px; border-radius:18px;
+    border:1.5px dashed rgba(255,255,255,0.16); background:rgba(255,255,255,0.02);
+    margin-bottom:14px;
+  }
+  .doc-zone .ic{
+    width:62px; height:62px; border-radius:19px; margin-bottom:14px;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+    color:rgba(255,255,255,0.72);
+  }
+  .doc-zone .ic svg{ width:29px; height:29px; }
+  .doc-zone .t{ font-size:17px; font-weight:700; letter-spacing:-0.03em; }
+  .doc-zone .s{
+    font-size:12.5px; color:var(--label-3); line-height:1.5;
+    margin-top:5px; max-width:240px;
+  }
+  /* Les trois entrées rappelées en petit : discret, mais présent. */
+  .doc-zone .trois{
+    display:flex; align-items:center; justify-content:center; gap:16px; margin-top:16px;
+  }
+  .doc-zone .trois > span{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    font-size:11px; color:var(--label-3); font-weight:650;
+  }
+  .doc-zone .trois svg{ width:20px; height:20px; color:rgba(255,255,255,0.5); }
+
   .doc-photos-vide{
     border:1.5px dashed rgba(255,255,255,0.16); border-radius:18px;
     padding:24px 18px; text-align:center; background:rgba(255,255,255,0.025);
@@ -1592,7 +1634,10 @@
     font-family:inherit; font-size:15px; font-weight:650; letter-spacing:-0.02em;
   }
   .dv-ia-bas:disabled{ color:var(--label-3); }
-  .dv-ia-bas:disabled .ia-fig{ opacity:0.35; }
+  /* L'anneau garde sa lumière même quand le bouton est éteint. Il était assombri
+     avec le reste — or pendant le travail c'est la SEULE chose à l'écran, et une
+     lumière éteinte donne l'impression que rien ne tourne. */
+  .dv-ia-bas:disabled .ia-fig{ opacity:1; }
   .dv-ia-bas:active{ opacity:0.6; }
 
   /* TROIS ÉTATS.
@@ -4733,21 +4778,31 @@
     <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
 
     <div class="card" id="doc-saisie-card">
-      <div class="note" style="margin-bottom:12px;">
-        Collez un texte, déposez un fichier, ou <b style="color:#fff;">photographiez vos pages</b>
-        — même écrites à la main. L'IA en tirera des étapes que vous pourrez
-        <b style="color:#fff;">relire et corriger</b> avant publication.
-      </div>
+      <!-- Une seule zone de dépôt, comme sur la page vidéo : pointillés, icône,
+             une phrase. Les deux écrans deviennent jumeaux.
+
+             Les deux séparateurs « ou » ont disparu : ils enterraient la photo
+             sous deux niveaux, et personne ne descendait jusque-là. -->
+        <div class="doc-zone" id="doc-zone">
+          <span class="ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6"/><line x1="8.6" y1="16.4" x2="13" y2="16.4"/></svg>
+          </span>
+          <span class="t">Ajoutez votre document</span>
+          <span class="s">L’IA lit le texte et en tire les étapes, dans l’ordre.</span>
+          <span class="trois">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><line x1="8" y1="14.3" x2="16" y2="14.3"/></svg>Coller</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.6"/></svg>Photo</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6.5"/><polyline points="7.5 8 12 3.5 16.5 8"/><line x1="12" y1="3.5" x2="12" y2="15"/></svg>Fichier</span>
+          </span>
+        </div>
 
       <label class="f">Votre texte</label>
       <textarea id="doc-texte" rows="7" placeholder="Collez ici votre procédure, votre note de service, votre mode d'emploi…"></textarea>
 
-      <div class="doc-ou"><span>ou</span></div>
 
       <input type="file" id="doc-fichier" accept=".pdf,.docx,.txt,.md,text/plain">
       <div class="doc-fichier-etat" id="doc-fichier-etat" style="display:none;"></div>
 
-      <div class="doc-ou"><span>ou</span></div>
 
       <!-- Photographier un texte. Une recette tient rarement sur une seule page :
            on en accepte plusieurs, et c'est l'ordre qui fait le sens. -->
@@ -4770,7 +4825,19 @@
       </div>
       <button type="button" class="btn ghost block doc-photo-plus" id="doc-photo-plus" style="display:none;">Ajouter une page</button>
 
-      <button class="btn block" style="margin-top:14px;" id="doc-generer" disabled="">Générer les étapes</button>
+      <!-- L'anneau de l'IA plutôt qu'une étoile : le même signe que partout ailleurs
+           dans l'app, et il devient une coche quand c'est fini. -->
+      <button class="btn block doc-generer" style="margin-top:14px;" id="doc-generer" disabled="">
+        <span class="ia-fig m"><span class="lum"></span></span>
+        <span class="ia-coche">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"/>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)"
+                      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span id="doc-generer-txt">Générer les étapes</span>
+      </button>
       <div class="error-msg" id="doc-erreur"></div>
     </div>
 
@@ -5443,7 +5510,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 16h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 17h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -5802,7 +5869,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 16h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 17h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -11037,7 +11104,13 @@ async function completerEtapesAvecIA() {
   iaCompletionEnCours = true
   majBoutonIA()
 
+  /* Le déroulé s'affiche étape par étape. Quand ça échoue, on sait OÙ : la
+     dernière ligne affichée est le point de rupture. C'est ce qui manquait pour
+     corriger la vraie cause plutôt que de deviner. */
+  const jalon = (m) => { if (note) { note.classList.remove('erreur'); note.textContent = m } }
+
   try {
+    jalon('1/5 \u00b7 Pr\u00e9paration de la bande son\u2026')
     /* 1. La bande son. C'est elle qu'Azure écoute — dix fois plus légère que la
        vidéo, et il n'a que faire de l'image. */
     let urlAnalyse = null
@@ -11052,6 +11125,7 @@ async function completerEtapesAvecIA() {
       const chemin = son ? `${base}_son.wav` : `${base}_${currentVideoFile.name}`
       const { error: errEnvoi } = await supabase.storage.from('procedo-videos')
         .upload(chemin, fichier, { contentType: son ? 'audio/wav' : currentVideoFile.type })
+      jalon('2/5 \u00b7 Envoi de la bande son\u2026')
       if (errEnvoi) throw new Error('Envoi impossible : ' + errEnvoi.message)
 
       const { data: sig } = await supabase.storage.from('procedo-videos')
@@ -11071,6 +11145,7 @@ async function completerEtapesAvecIA() {
       created_by: currentMembre.id,
       statut: 'ia_temp',
     }).select('id').single()
+    jalon('3/5 \u00b7 Ouverture de l\u2019analyse\u2026')
     if (errTemp) throw new Error(errTemp.message)
     tempId = temp.id
 
@@ -11080,9 +11155,11 @@ async function completerEtapesAvecIA() {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({ procedure_id: tempId, video_url: urlAnalyse }),
     })
+    jalon('4/5 \u00b7 D\u00e9marrage du service\u2026')
     const dep = await rep.json()
     if (!rep.ok || dep.error) throw new Error(dep.error || "L\u2019analyse n\u2019a pas d\u00e9marr\u00e9.")
 
+    jalon('5/5 \u00b7 L\u2019IA \u00e9coute la vid\u00e9o\u2026')
     const textes = await attendreEtapesIA(tempId)
     if (!textes.length) {
       throw new Error("L\u2019IA n\u2019a rien tir\u00e9 de cette vid\u00e9o. V\u00e9rifiez que la parole est audible.")
@@ -11486,6 +11563,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
   if (!titre) { err.textContent = 'Le titre est obligatoire (page pr\u00e9c\u00e9dente).'; return }
   if (texte.length > DOC_TEXTE_MAX) texte = texte.slice(0, DOC_TEXTE_MAX)
 
+  document.getElementById('doc-generer').classList.remove('fini')
   document.getElementById('doc-saisie-card').style.display = 'none'
   document.getElementById('doc-attente-card').style.display = 'block'
 

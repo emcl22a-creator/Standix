@@ -321,6 +321,20 @@
 
   /* Le choix du type d'enregistrement. Deux blocs pleine largeur plutôt que
      deux segments : les libellés font une ligne et demie chacun. */
+  /* Ce que l'IA analyse, annoncé au lieu d'être demandé. */
+  .ia-ecoute{
+    padding:13px 15px; border-radius:15px; margin-bottom:14px;
+    background:var(--bg-card); border:0.5px solid var(--border);
+  }
+  .ia-ecoute .tt{
+    font-size:11px; font-weight:700; color:var(--label-3);
+    text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;
+  }
+  .ia-ecoute .lg{ display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13px; }
+  .ia-ecoute .lg svg{ width:18px; height:18px; color:rgba(255,255,255,0.62); flex-shrink:0; }
+  .ia-ecoute .lg span{ color:var(--label-2); line-height:1.4; }
+  .ia-ecoute .lg b{ color:#fff; font-weight:650; }
+
   .ai-type{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
   .ai-type button{
     display:flex; flex-direction:column; gap:3px; width:100%;
@@ -4653,15 +4667,15 @@
                  quitter l'image des yeux pour appuyer. -->
             <div class="dv-cmd" id="dv-cmd" style="display:none;">
               <button type="button" class="dv-rond" id="dv-play" aria-label="Lecture">
-                <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg>
-                <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"/><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"/></svg>
+                <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>
+                <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"></rect><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"></rect></svg>
               </button>
             </div>
           <!-- Le cadre noir disait « aucune vidéo importée » : il constatait au lieu
                  d'inviter. Pointillés, icône et une phrase disent ce qu'on attend. -->
             <div class="dv-vide" id="video-placeholder">
               <span class="ic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.6"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.6"></circle></svg>
               </span>
               <span class="t">Ajoutez votre vidéo</span>
               <span class="s">Filmez la tâche en expliquant à voix haute.<br>Dix minutes maximum.</span>
@@ -4692,16 +4706,16 @@
 
       <div class="dv-outils">
         <button type="button" class="dv-zoom" id="dv-zoom" aria-label="Voir toute la vidéo">
-          <svg class="ic-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 4 4 4 4 9"/><polyline points="15 4 20 4 20 9"/><polyline points="9 20 4 20 4 15"/><polyline points="15 20 20 20 20 15"/></svg>
-          <svg class="ic-serre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 9 9 9 4"/><polyline points="20 9 15 9 15 4"/><polyline points="4 15 9 15 9 20"/><polyline points="20 15 15 15 15 20"/></svg>
+          <svg class="ic-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 4 4 4 4 9"></polyline><polyline points="15 4 20 4 20 9"></polyline><polyline points="9 20 4 20 4 15"></polyline><polyline points="15 20 20 20 20 15"></polyline></svg>
+          <svg class="ic-serre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 9 9 9 4"></polyline><polyline points="20 9 15 9 15 4"></polyline><polyline points="4 15 9 15 9 20"></polyline><polyline points="20 15 15 15 15 20"></polyline></svg>
           <span id="dv-zoom-txt">Tout voir</span>
         </button>
 
         <!-- Annuler la dernière coupure. Rien à voir avec un retour de cinq
              secondes : on vient de fermer une étape au mauvais moment et on veut
              la reprendre, pas seulement reculer dans la vidéo. -->
-        <button type="button" class="dv-annuler" id="dv-annuler" disabled aria-label="Annuler la dernière coupure">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg>
+        <button type="button" class="dv-annuler" id="dv-annuler" disabled="" aria-label="Annuler la dernière coupure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
           Annuler la coupure
         </button>
       </div>
@@ -4750,9 +4764,8 @@
              même dégradé : c'est le même travail qui s'achève, pas un autre signe. -->
         <span class="ia-coche">
           <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"/>
-            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)"
-                      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
           </svg>
         </span>
         <span id="vid-ia-bas-txt">Compléter les étapes avec l’IA</span>
@@ -4785,14 +4798,14 @@
              sous deux niveaux, et personne ne descendait jusque-là. -->
         <div class="doc-zone" id="doc-zone">
           <span class="ic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6"/><line x1="8.6" y1="16.4" x2="13" y2="16.4"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"></path><path d="M13.6 3v5h5"></path><line x1="8.6" y1="12.6" x2="15.4" y2="12.6"></line><line x1="8.6" y1="16.4" x2="13" y2="16.4"></line></svg>
           </span>
           <span class="t">Ajoutez votre document</span>
           <span class="s">L’IA lit le texte et en tire les étapes, dans l’ordre.</span>
           <span class="trois">
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><line x1="8" y1="14.3" x2="16" y2="14.3"/></svg>Coller</span>
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.6"/></svg>Photo</span>
-            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6.5"/><polyline points="7.5 8 12 3.5 16.5 8"/><line x1="12" y1="3.5" x2="12" y2="15"/></svg>Fichier</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"></rect><line x1="8" y1="14.3" x2="16" y2="14.3"></line></svg>Coller</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.6"></circle></svg>Photo</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6.5"></path><polyline points="7.5 8 12 3.5 16.5 8"></polyline><line x1="12" y1="3.5" x2="12" y2="15"></line></svg>Fichier</span>
           </span>
         </div>
 
@@ -4831,9 +4844,8 @@
         <span class="ia-fig m"><span class="lum"></span></span>
         <span class="ia-coche">
           <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"/>
-            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)"
-                      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
           </svg>
         </span>
         <span id="doc-generer-txt">Générer les étapes</span>
@@ -4859,26 +4871,26 @@
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe la vidéo</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Partez d’une vidéo</h1>
     </div>
-    <div class="subhead">Filmez la tâche en expliquant à voix haute, l'IA génère les étapes</div>
+    <div class="subhead">L’IA en tirera des étapes, que vous relirez.</div>
 
     <div class="card" id="ai-upload-card">
     <!-- Deux usages, deux traitements. Le libellé ne parle pas de réglage
          technique : la personne sait ce qu'elle a filmé, pas ce qu'Azure doit
          en faire. -->
-    <div class="ai-type">
-      <button type="button" class="on" data-ai-type="geste">
-        <span class="t">Vous filmez un geste</span>
-        <span class="s">Cuisine, machine, manipulation</span>
-      </button>
-      <button type="button" data-ai-type="ecran">
-        <span class="t">Vous enregistrez votre écran</span>
-        <span class="s">Un logiciel, un site — l’IA lira le texte affiché</span>
-      </button>
-    </div>
+    <div class="ia-ecoute">
+          <div class="tt">Ce que l’IA analyse</div>
+          <div class="lg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><line x1="12" y1="18" x2="12" y2="21.5"></line></svg>
+            <span><b>Vos paroles</b> — ce que vous expliquez pendant chaque geste</span>
+          </div>
+          <div class="lg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg>
+            <span><b>Ce qui est visible</b> — objets, personnes, texte à l’écran</span>
+          </div></div>
 
-      <div class="note" style="margin-bottom:12px;"><b style="color:#fff;">Expliquez chaque geste à voix haute</b> : c'est surtout la parole que l'IA écoute pour découper les étapes. Une procédure par vidéo, jusqu'à 10 minutes.</div>
+      
       <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
            l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
            montage, et c'est le plus propre des deux. -->
@@ -4886,10 +4898,17 @@
         <input type="file" id="ai-video-input" accept="video/*">
         <div class="video-frame" id="ai-video-frame">
           <video id="ai-video-player" style="display:none;" playsinline=""></video>
-          <span id="ai-video-placeholder">Aucune vidéo importée</span>
+          <span id="ai-video-placeholder" class="dv-vide">
+              <span class="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"></rect><path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" stroke="none"></path></svg>
+              </span>
+              <span class="t">Ajoutez votre vidéo</span>
+              <span class="s">Filmez la tâche en expliquant à voix haute.<br>Dix minutes maximum · 45 Mo</span></span>
         </div>
       </div>
-      <button class="btn block" style="margin-top:14px;" id="ai-launch-btn" disabled="">Lancer l'analyse</button>
+      <button class="btn block doc-generer" style="margin-top:14px;" id="ai-launch-btn" disabled=""><span class="ia-fig m"><span class="lum"></span></span>
+        <span class="ia-coche"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle><polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></span>
+        <span>Générer les étapes</span></button>
       <div class="error-msg" id="ai-error"></div>
       <div class="ai-detail" id="ai-detail" style="display:none;">
         <div class="t">Détail technique</div>
@@ -5367,8 +5386,8 @@
         <!-- La caméra à gauche, la lampe à droite : deux commandes du même objet,
              posées aux deux coins de l'image qu'elles pilotent. -->
         <button type="button" class="scan-cam" aria-label="Éteindre la caméra">
-          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.4"/></svg>
-          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.4"></circle></svg>
+          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><line x1="3" y1="3" x2="21" y2="21"></line></svg>
         </button>
         <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
       </div>
@@ -5510,7 +5529,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 17h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 18h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -5869,7 +5888,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 17h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 18h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -5996,8 +6015,8 @@
         <!-- La caméra à gauche, la lampe à droite : deux commandes du même objet,
              posées aux deux coins de l'image qu'elles pilotent. -->
         <button type="button" class="scan-cam" aria-label="Éteindre la caméra">
-          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><circle cx="12" cy="12.2" r="3.4"/></svg>
-          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
+          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.4"></circle></svg>
+          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><line x1="3" y1="3" x2="21" y2="21"></line></svg>
         </button>
         <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
       </div>
@@ -11269,15 +11288,8 @@ document.getElementById('edit-defaire')?.addEventListener('click', () => {
   if (navigator.vibrate) navigator.vibrate(6)
 })
 
-/* Le choix du type d'enregistrement. */
-document.querySelectorAll('[data-ai-type]').forEach(b => {
-  b.addEventListener('click', () => {
-    document.querySelectorAll('[data-ai-type]').forEach(x => x.classList.remove('on'))
-    b.classList.add('on')
-    aiEcran = b.dataset.aiType === 'ecran'
-    if (navigator.vibrate) navigator.vibrate(6)
-  })
-})
+/* Le code du choix geste/écran est retiré avec ses boutons : l'image est
+   toujours analysée, c'est `ai-start` qui le décide désormais. */
 
 function goToCreateMode(mode) {
   if (mode === 'ai') resetAiScreen()
@@ -11603,7 +11615,6 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
    `true` — on enregistre un écran : le sens est ÉCRIT dedans, noms de
    transactions, libellés de champs. On envoie la vidéo pour qu'Azure lise ce
    qui est affiché. Plus lent, plus cher — on ne le paie que quand ça sert. */
-let aiEcran = false
 
 let aiVideoFile = null
 let aiVideoDuree = 0        // durée de la vidéo, pour estimer le temps d'analyse
@@ -11932,7 +11943,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        lire, et on paierait le préréglage complet pour le même résultat qu'avant.
        Les deux vont ensemble — le réglage et le fichier. */
     let urlPourAnalyse = videoUrl
-    if (son && !aiEcran) {
+    if (son && !true) {
       const cheminSon = `${base}_son.wav`
       const { error: errSon } = await supabase.storage.from('procedo-videos')
         .upload(cheminSon, son.blob, { contentType: 'audio/wav' })
@@ -11974,7 +11985,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       body: JSON.stringify({
         procedure_id: newProc.id,
         video_url: urlPourAnalyse,
-        avec_image: aiEcran,
+        avec_image: true,
       }),
     })
     const startData = await startRes.json()

@@ -2570,10 +2570,25 @@ function dessinerAnneauMembre(cle) {
   let pos = 0
   const arcs = vus.map((x, i) => {
     const frac = x.secondes / somme
-    const len = Math.max(0.1, circ * frac - ECART - ep)
-    const depart = circ * pos + ECART / 2 + ep / 2
+    const brut = circ * frac          // la part, telle quelle
+
+    /* LES BOUTS ARRONDIS DÉBORDENT.
+
+       Un trait à bout rond dépasse d'une demi-épaisseur de chaque côté : il
+       occupe toujours `longueur + épaisseur`. On retranchait donc l'épaisseur —
+       correct, sauf pour les petites parts.
+
+       Une part de 10 px demandait une longueur de 10 − 5 − 17 = −12. Le plancher
+       la ramenait à 0,1, mais ses deux bouts ronds la faisaient QUAND MÊME
+       occuper 17 px : elle mordait sur sa voisine.
+
+       En dessous du seuil, on passe donc à un bout DROIT. La part est plus
+       carrée, mais elle reste chez elle. */
+    const rond = brut > ECART + ep * 1.6
+    const len = rond ? brut - ECART - ep : Math.max(1, brut - ECART)
+    const depart = circ * pos + ECART / 2 + (rond ? ep / 2 : 0)
     pos += frac
-    return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+    return `<circle class="arc${rond ? '' : ' droit'}" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
       stroke="${x.couleur}" stroke-width="${ep}"
       stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
   }).join('')
@@ -3676,7 +3691,6 @@ window.showGestionScreen = function(id, btn) {
   /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
      fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
   lireEtatAbonnement().then(() => {
-    dessinerAlerteEssai('essai-proc')
     dessinerAlerteEssai('essai-reglages')
     appliquerBlocageEssai()
   })
@@ -3751,7 +3765,6 @@ window.showEquipeScreen = function(id, btn) {
   /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
      fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
   lireEtatAbonnement().then(() => {
-    dessinerAlerteEssai('essai-proc')
     dessinerAlerteEssai('essai-reglages')
     appliquerBlocageEssai()
   })
@@ -10028,9 +10041,14 @@ const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au po
 
 /* Les paliers suivent le NOMBRE DE MEMBRES, et c'est tout ce qui les sépare. */
 const OFFRES = [
-  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,        prix: 39 },
-  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,       prix: 79 },
-  { cle: 'pro',        nom: 'Pro',        max: 40,       prix: 149 },
+  /* Le prix mensuel est celui qu'on affiche ; l'annuel se règle en une fois et
+     revient à vingt pour cent de moins. Seul « Essentiel » est branché sur
+     Stripe pour l'instant — les autres attendent d'avoir un client qui les
+     demande. Construire quatre offres pour zéro client serait du code à
+     maintenir sans personne pour s'en servir. */
+  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,        prix: 49, an: 468, stripe: true },
+  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,       prix: 99 },
+  { cle: 'pro',        nom: 'Pro',        max: 40,       prix: 239 },
   { cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
     devis: "Au-del\u00e0 de quarante personnes, on en discute : accompagnement \u00e0 la mise " +
            "en place, interlocuteur d\u00e9di\u00e9, engagement de disponibilit\u00e9 \u00e9crit." },
@@ -10154,20 +10172,81 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   const o = OFFRES.find(x => x.cle === b.dataset.offre)
   if (!o || o.cle === planActuel()) return
 
-  /* Le paiement n'est pas encore branché. Plutôt que de faire semblant, on le dit
-     et on ouvre le courriel : un client qui écrit vaut mieux qu'un client qui
-     bute sur un bouton mort. */
-  const ok = await confirmDialog({
-    titre: o.prix === null ? 'Offre Entreprise' : `Passer \u00e0 ${o.nom}`,
-    message: o.prix === null
-      ? "Cette offre se construit avec vous. \u00c9crivez-nous et nous revenons vers vous rapidement."
-      : `${o.nom} \u00e0 ${o.prix} \u20ac par mois. Le paiement en ligne arrive bient\u00f4t \u2014 en attendant, \u00e9crivez-nous et nous activons votre offre.`,
-    confirmer: '\u00c9crire',
-    annuler: 'Plus tard',
-    danger: false,
-  })
-  if (ok) ouvrirContact()
+  /* Les offres qui n'ont pas encore de tarif Stripe : on écrit, on ne fait pas
+     semblant. Un bouton qui ouvre une page de paiement vide coûte plus cher
+     qu'un bouton qui dit « écrivez-nous ». */
+  if (!o.stripe) {
+    const ok = await confirmDialog({
+      titre: o.prix === null ? 'Offre Entreprise' : `Offre ${o.nom}`,
+      message: o.prix === null
+        ? "Cette offre se construit avec vous. \u00c9crivez-nous et nous revenons vers vous rapidement."
+        : `${o.nom} \u00e0 ${o.prix} \u20ac par mois. \u00c9crivez-nous pour l'activer, nous r\u00e9pondons dans la journ\u00e9e.`,
+      confirmer: 'Nous \u00e9crire',
+      annuler: 'Fermer',
+    })
+    if (ok) window.location.href = 'mailto:Procedo.off@gmail.com?subject=' +
+      encodeURIComponent('Offre ' + o.nom)
+    return
+  }
+
+  /* ═══ LE PAIEMENT ═══
+     On demande une adresse au serveur, puis on y va. Le montant n'est JAMAIS
+     envoyé d'ici : il est écrit dans la fonction Edge. Sinon n'importe qui
+     modifierait ce que son téléphone envoie et s'abonnerait à un euro. */
+  const formule = await confirmDialog({
+    titre: `${o.nom} \u00b7 ${o.prix} \u20ac par mois`,
+    message: `Jusqu'\u00e0 ${o.max} membres, 30 analyses IA par mois, proc\u00e9dures illimit\u00e9es.\n\n` +
+             `En r\u00e9glant l'ann\u00e9e : ${o.an} \u20ac, soit ${Math.round(o.an / 12)} \u20ac par mois.`,
+    confirmer: `Payer ${o.prix} \u20ac par mois`,
+    annuler: `Payer l'ann\u00e9e \u00b7 ${o.an} \u20ac`,
+  }) ? 'mensuel' : 'annuel'
+
+  b.disabled = true
+  const libelle = b.textContent
+  b.textContent = 'Ouverture du paiement\u2026'
+
+  try {
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      body: JSON.stringify({
+        entreprise_id: currentMembre.entreprise_id,
+        formule,
+        retour: window.location.origin + window.location.pathname,
+      }),
+    })
+    const data = await rep.json()
+    if (!rep.ok || !data.url) throw new Error(data.error || "Le paiement n'a pas pu s'ouvrir.")
+    window.location.href = data.url
+  } catch (err) {
+    b.disabled = false
+    b.textContent = libelle
+    await confirmDialog({
+      titre: 'Paiement indisponible',
+      message: String(err?.message || err),
+      confirmer: 'Fermer',
+      annuler: 'R\u00e9essayer',
+      danger: false,
+    })
+  }
 })
+
+/* Au retour de Stripe. L'adresse dit « paiement=ok », mais on N'ACTIVE RIEN
+   ici : n'importe qui peut taper cette adresse. On relit simplement l'état
+   depuis la base, où le webhook l'aura posé. */
+;(async () => {
+  const p = new URLSearchParams(window.location.search).get('paiement')
+  if (!p) return
+  history.replaceState({}, '', window.location.pathname)
+  if (p === 'annule') return
+  /* Le webhook arrive en une seconde ou deux : on laisse le temps, puis on
+     relit. Si rien n'a changé, l'écran d'essai reste — ce qui est honnête. */
+  await new Promise(r => setTimeout(r, 2500))
+  await lireEtatAbonnement()
+  dessinerAlerteEssai('essai-reglages')
+  appliquerBlocageEssai()
+  if (etatAbo?.statut === 'actif') toast('Votre abonnement est actif. Merci !')
+})()
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE TIROIR DES ÉTABLISSEMENTS

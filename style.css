@@ -1099,6 +1099,9 @@
   /* Les bouts sont arrondis : chaque part se termine par un demi-cercle.
      Elle n'anime plus sa longueur — c'est le masque qui la révèle. */
   .fm-segm .arc{ stroke-linecap:round; transition:opacity 0.45s ease; }
+  /* Une part trop courte pour deux bouts ronds en reçoit des droits : sinon
+     l'arrondi déborde de 17 px et mord sur la couleur voisine. */
+  .fm-segm .arc.droit{ stroke-linecap:butt; }
 
   /* L'aiguille du masque : c'est elle qui fait le tour. */
   /* L'aiguille du masque a un bout DROIT. Arrondie, sa demi-épaisseur débordait
@@ -1392,6 +1395,10 @@
   /* Le bouton d'aide, dans l'angle de la carte. La carte prend `position:relative`
      pour qu'il s'y accroche plutôt que de flotter dans l'écran. */
   #an-gain{ position:relative; }
+  /* Le bouton d'aide remonte vers le bord. La carte a 20 px de retrait à droite ;
+     un rond de 26 px calé dedans paraît flotter au milieu de nulle part. On le
+     colle presque au bord — 6 px — pour qu'il s'appuie sur quelque chose. */
+  #an-gain .gain-aide{ margin-right:-14px; }
   /* Le bouton d'aide sur la LIGNE du titre, calé à droite. En position absolue
      dans l'angle, il flottait au-dessus du texte sans lui appartenir. */
   /* Le bouton se cale sur la PREMIÈRE ligne du titre, pas au milieu du bloc :
@@ -1602,7 +1609,7 @@
      anneaux des écrans d'attente restent, eux — là, le mouvement EST
      l'information. */
   .ia-mot{
-    font-size:13.5px; font-weight:850; letter-spacing:0.02em;
+    font-size:15px; font-weight:850; letter-spacing:0.02em;
     line-height:1; flex-shrink:0; user-select:none;
     background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #6FBEFF 100%);
     -webkit-background-clip:text; background-clip:text;
@@ -1650,6 +1657,13 @@
      voie. */
   #p-membre, #p-an-temps, #p-an-categories{
     padding-left:32px; padding-right:32px;
+  }
+  /* Le bouton retour remonte de 5 px vers le bord. Un rond de 34 px paraissait
+     plus éloigné que le texte aligné sous lui : l'œil suit le bord du cercle,
+     pas celui de sa boîte. */
+  #p-membre .back-btn, #p-an-temps .back-btn, #p-an-categories .back-btn,
+  #p-membre .an-tete .back-btn{
+    margin-left:-5px;
   }
   /* Les pistes touchent les bords — il faut que le panneau voisin s'annonce dès
      qu'on effleure — et leurs panneaux rendent la marge à l'intérieur. */

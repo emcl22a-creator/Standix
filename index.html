@@ -5443,7 +5443,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 15h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 16h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -5802,7 +5802,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 15h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 16h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -11116,7 +11116,12 @@ async function completerEtapesAvecIA() {
     if (navigator.vibrate) navigator.vibrate(10)
 
   } catch (e) {
+    /* L'erreur se voit : en rouge, et précédée de sa cause. Elle s'affichait
+       dans la même teinte grise que les messages ordinaires, au point de passer
+       pour une simple explication. */
     note.textContent = e?.message || String(e)
+    note.classList.add('erreur')
+    setTimeout(() => note.classList.remove('erreur'), 12000)
   } finally {
     /* La ligne temporaire disparaît quoi qu'il arrive. Une analyse qui échoue
        ne doit pas laisser de trace dans la base. */
@@ -13434,10 +13439,14 @@ function dvMajGeste() {
   const aide = document.getElementById('dv-aide')
   if (!b) return
 
-  if (!v || v.paused) {
+  /* Le bouton n'annonce « Lancer la vidéo » QUE tant que rien n'a commencé.
+     Dès qu'on a dépassé le début, il coupe — en lecture comme en pause — et son
+     libellé doit le dire, sinon on croit qu'il faut relancer pour continuer. */
+  const rienCommence = !v || (v.paused && !videoSteps.length && v.currentTime < 0.3)
+  if (rienCommence) {
     b.classList.remove('coupe')
     ic.innerHTML = '<path d="M8 5v14l11-7z"/>'
-    lib.textContent = videoSteps.length ? 'Reprendre la vid\u00e9o' : 'Lancer la vid\u00e9o'
+    lib.textContent = 'Lancer la vid\u00e9o'
     aide.textContent = videoSteps.length
       ? "Corrigez les textes ci-dessous, ou reprenez pour continuer \u00e0 d\u00e9couper."
       : "Regardez, et touchez le bouton chaque fois qu'une \u00e9tape se termine."
@@ -13761,15 +13770,36 @@ document.getElementById('dv-bouton')?.addEventListener('click', () => {
   const v = dvLecteur()
   if (!v || !v.src) return
 
-  if (v.paused) {
-    dvDebutEnCours = v.currentTime
+  /* Rien n'est encore commencé : ce premier appui lance la vidéo. */
+  if (v.paused && !videoSteps.length && v.currentTime < 0.3) {
+    dvDebutEnCours = 0
     v.play().catch(() => {})
     dvMajGeste()
     return
   }
 
-  // On ferme l'étape en cours ; la suivante commence ici.
-  if (v.currentTime - dvDebutEnCours < 0.5) return
+  /* À L'ARRÊT, LE BOUTON COUPE QUAND MÊME.
+
+     Avant, en pause il relançait la lecture ET remplaçait le début de l'étape
+     en cours par la position courante : le découpage repartait de zéro sans
+     rien dire. Depuis qu'il existe un vrai bouton pause, ce n'est plus à lui
+     de relancer — chaque bouton fait UNE chose. */
+  if (v.currentTime - dvDebutEnCours < 0.5) {
+    /* Trop court pour être une étape. On le DIT, au lieu de ne rien faire : un
+       bouton qui reste muet donne l'impression d'être cassé, et c'est
+       exactement ce qu'on ressentait. */
+    const aide = document.getElementById('dv-aide')
+    if (aide && !aide.dataset.avant) {
+      aide.dataset.avant = aide.textContent
+      aide.textContent = 'Une \u00e9tape doit durer au moins une seconde.'
+      setTimeout(() => {
+        if (aide.dataset.avant) { aide.textContent = aide.dataset.avant; delete aide.dataset.avant }
+      }, 2200)
+    }
+    if (navigator.vibrate) navigator.vibrate([8, 40, 8])
+    return
+  }
+
   videoSteps.push({
     texte: '',
     timestamp_video: dvDebutEnCours,
@@ -13778,6 +13808,7 @@ document.getElementById('dv-bouton')?.addEventListener('click', () => {
   dvDebutEnCours = v.currentTime
   dvSelection = videoSteps.length - 1
   dvMajGeste(); renderVideoSteps(); dvMajFrise()
+  if (navigator.vibrate) navigator.vibrate(10)
 })
 
 /* La frise et le chronomètre suivent la lecture. On écrit directement dans le

@@ -1,4 +1,3 @@
-
 let createClient
 
 try {
@@ -5054,7 +5053,16 @@ async function completerEtapesAvecIA() {
       categorie: champManuel('categorie')?.value?.trim() || 'Sans cat\u00e9gorie',
       entreprise_id: currentMembre.entreprise_id,
       created_by: currentMembre.id,
-      statut: 'ia_temp',
+      /* CHANGEMENT DE MÉTHODE.
+
+       La ligne temporaire naissait avec le statut « ia_temp » — une valeur que
+       rien d'autre n'emploie. Si la colonne porte une contrainte de valeurs
+       admises (le cas courant), l'insertion échouait et tout s'arrêtait là,
+       avant même qu'Azure soit appelé.
+
+       On repart d'un statut que la base connaît déjà. La ligne reste invisible
+       grâce à son titre, et elle est supprimée quoi qu'il arrive. */
+      statut: 'traitement',
     }).select('id').single()
     jalon('3/5 \u00b7 Ouverture de l\u2019analyse\u2026')
     if (errTemp) throw new Error(errTemp.message)
@@ -5208,6 +5216,32 @@ const DOC_TAILLE_MAX = 12 * 1024 * 1024      // 12 Mo
 const DOC_TEXTE_MAX = 60000                  // au-delà, on tronque avant d'envoyer
 let docTexteExtrait = ''
 let docNomFichier = ''
+
+/* ═══ LES TROIS VOIES DU DOCUMENT ═══
+
+   La zone montre trois entrées — coller, photo, fichier — et chacune ouvre son
+   bloc. Avant, les trois étaient dépliées en même temps, séparées par des « ou » :
+   l'écran faisait trois écrans, et la photo se retrouvait tout en bas. */
+function ouvrirVoieDoc(voie) {
+  const blocs = { coller: 'doc-bloc-texte', photo: 'doc-bloc-photos', fichier: 'doc-bloc-fichier' }
+  Object.entries(blocs).forEach(([v, id]) => {
+    const b = document.getElementById(id)
+    if (b) b.style.display = v === voie ? 'block' : 'none'
+  })
+  document.querySelectorAll('.doc-voie').forEach(b => b.classList.toggle('on', b.dataset.voie === voie))
+
+  /* La photo et le fichier ouvrent directement le sélecteur : un bloc qui
+     s'affiche pour qu'on y touche encore serait un geste de trop. */
+  if (voie === 'photo') document.getElementById('doc-photo-input')?.click()
+  if (voie === 'fichier') document.getElementById('doc-fichier')?.click()
+  if (voie === 'coller') document.getElementById('doc-texte')?.focus()
+  if (navigator.vibrate) navigator.vibrate(6)
+}
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.doc-voie')
+  if (b) ouvrirVoieDoc(b.dataset.voie)
+})
 
 function resetDocScreen() {
   docTexteExtrait = ''

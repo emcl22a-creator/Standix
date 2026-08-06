@@ -606,16 +606,18 @@
     </div>
 
     <div class="card" id="doc-attente-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="ia-fig g" style="margin:0 auto 18px;">
-        <span class="halo"></span><span class="lum"></span>
-      </div>
-      <!-- « L'IA lit votre document » décrivait la machine. On dit plutôt ce
-           qu'on obtient, et ce qu'on en fera : une procédure, qu'on relira. -->
-      <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;">Votre procédure s’écrit</div>
-      <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;">
-        Vous relirez chaque étape avant de publier.
-      </div>
-    </div>
+        <div class="ia-fig g" style="margin:0 auto 18px;">
+          <span class="halo"></span><span class="lum"></span>
+          <span class="pct" id="doc-attente-pct">0%</span>
+          <span class="ia-coche-g">
+            <svg viewBox="0 0 24 24" fill="none">
+              <polyline points="6.5 12.4 10.4 16.3 17.5 8.4" stroke="url(#iaFini)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+          </span>
+        </div>
+        <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="doc-attente-title">Votre procédure s’écrit</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="doc-attente-sub">Vous relirez chaque étape avant de publier.</div>
+        <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="doc-attente-annuler">Abandonner et supprimer</button></div>
   </div>
 
   <div class="screen" id="p-create-ai">
@@ -631,16 +633,12 @@
     <!-- Deux usages, deux traitements. Le libellé ne parle pas de réglage
          technique : la personne sait ce qu'elle a filmé, pas ce qu'Azure doit
          en faire. -->
-    <div class="dv-depot">
+    <div class="ai-legende"><span class="t">Ajoutez votre vidéo</span>
+        <span class="s">Filmez la tâche en expliquant à voix haute · dix minutes maximum</span></div><div class="dv-depot">
         <input type="file" id="ai-video-input" accept="video/*">
         <div class="video-frame" id="ai-video-frame">
           <video id="ai-video-player" style="display:none;" playsinline=""></video>
-          <span id="ai-video-placeholder" class="dv-vide">
-              <span class="ic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"></rect><path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" stroke="none"></path></svg>
-              </span>
-              <span class="t">Ajoutez votre vidéo</span>
-              <span class="s">Filmez la tâche en expliquant à voix haute.<br>Dix minutes maximum · 45 Mo</span></span>
+          <span id="ai-video-placeholder" class="ai-vide"></span>
         </div>
       </div><div class="ia-ecoute">
           <div class="tt">Ce que l’IA analyse</div>
@@ -670,17 +668,18 @@
     </div>
 
     <div class="card" id="ai-progress-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="ia-fig g" style="margin:0 auto 18px;">
-        <span class="halo"></span><span class="lum"></span>
-        <span class="pct" id="ai-progress-pct">0%</span>
-      </div>
-      <!-- Même présentation que la carte du document : un titre de 19 px, une
-           phrase de 13 en dessous. Deux écrans qui font attendre pour la même
-           raison ne doivent pas se présenter différemment. -->
-      <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Votre procédure s’écrit</div>
-      <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
-      <button type="button" class="btn ghost block" id="ai-annuler" style="margin-top:18px; color:var(--red);">Abandonner et supprimer</button>
-    </div>
+        <div class="ia-fig g" style="margin:0 auto 18px;">
+          <span class="halo"></span><span class="lum"></span>
+          <span class="pct" id="ai-progress-pct">0%</span>
+          <span class="ia-coche-g">
+            <svg viewBox="0 0 24 24" fill="none">
+              <polyline points="6.5 12.4 10.4 16.3 17.5 8.4" stroke="url(#iaFini)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+          </span>
+        </div>
+        <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Votre procédure s’écrit</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
+        <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
       <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFini)" stroke-width="1.6"></circle><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFini)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"></path></g></svg></div>
@@ -1281,7 +1280,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 20h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 22h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -1640,7 +1639,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 20h</div>
+    <div class="reg-version">Procédo · version 2026-08-06 · 22h</div>
   </div>
 
   <!-- Sous-page : le compte -->

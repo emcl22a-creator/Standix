@@ -4957,6 +4957,7 @@ document.addEventListener('click', (e) => {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 let iaCompletionEnCours = false
+let docMinuteur = null
 
 /* Vrai pendant les quelques secondes où la coche s'affiche, après une réussite. */
 let iaVientDeFinir = false
@@ -5505,6 +5506,22 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
   document.getElementById('doc-saisie-card').style.display = 'none'
   document.getElementById('doc-attente-card').style.display = 'block'
 
+  /* Une progression EST attendue dès qu'un anneau tourne avec un chiffre au
+     milieu. Ici on ne peut pas la connaître : l'appel à Claude ne rend rien
+     avant d'avoir fini. On avance donc régulièrement jusqu'à 90 %, et les dix
+     derniers pour cent attendent la vraie réponse — c'est honnête : le chiffre
+     dit « ça avance », jamais « c'est bientôt fini ». */
+  const figDoc = document.querySelector('#doc-attente-card .ia-fig')
+  figDoc?.classList.remove('fini')
+  let pctDoc = 0
+  const pctDocEl = document.getElementById('doc-attente-pct')
+  if (pctDocEl) pctDocEl.textContent = '0%'
+  clearInterval(docMinuteur)
+  docMinuteur = setInterval(() => {
+    pctDoc = Math.min(90, pctDoc + (pctDoc < 60 ? 4 : 1.5))
+    if (pctDocEl) pctDocEl.textContent = Math.round(pctDoc) + '%'
+  }, 700)
+
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-texte`, {
       method: 'POST',
@@ -5522,10 +5539,19 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
        propose, elle ne décide pas. */
     manualSteps = data.etapes.map(e => ({ texte: String(e.texte || e).trim() })).filter(e => e.texte)
     renderManualSteps()
+/* On termine à 100 %, la coche prend la place du chiffre, puis on passe à
+       la relecture. Sauter cette seconde donnerait l'impression que rien ne
+       s'est passé — l'écran changerait avant qu'on ait vu le résultat. */
+clearInterval(docMinuteur)
+if (pctDocEl) pctDocEl.textContent = '100%'
+figDoc?.classList.add('fini')
+await new Promise(r => setTimeout(r, 900))
+
     showGestionScreen('p-create-manual')
     toast(`${manualSteps.length} \u00e9tape${manualSteps.length > 1 ? 's' : ''} propos\u00e9e${manualSteps.length > 1 ? 's' : ''} \u00b7 relisez avant de publier`)
     resetDocScreen()
   } catch (ex) {
+    clearInterval(docMinuteur)
     document.getElementById('doc-attente-card').style.display = 'none'
     document.getElementById('doc-saisie-card').style.display = 'block'
     err.textContent = ex instanceof Error ? ex.message : String(ex)
@@ -5639,6 +5665,11 @@ function stopAiProgressSimulation(finalPct) {
      s'il y en a un, et la carte cède la place à celle de réussite. */
   const pctEl = document.getElementById('ai-progress-pct')
   if (pctEl && finalPct != null) pctEl.textContent = Math.round(finalPct) + '%'
+
+  /* Fin de l'analyse vidéo : même achèvement que pour le document — le chiffre
+     s'efface, la coche prend sa place au centre de l'anneau. */
+  const figAi = document.querySelector('#ai-progress-card .ia-fig')
+  if (figAi) figAi.classList.toggle('fini', finalPct != null && finalPct >= 100)
 }
 
 function resetAiScreen() {
@@ -5827,7 +5858,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   if (!aiVideoFile) { errorEl.textContent = 'Importez une vidéo.'; return }
 
   const launchBtn = document.getElementById('ai-launch-btn')
-  setButtonLoading(launchBtn, true)
+  /* PAS de `setButtonLoading` ici : il remplaçait tout le contenu du bouton par
+     une roue grise ordinaire, et l'anneau de l'IA disparaissait avec. On garde
+     l'anneau, on efface seulement le texte — la même bascule que sur l'écran de
+     découpage. */
+  launchBtn.classList.add('travaille')
+  launchBtn.disabled = true
 
   try {
     // 1. Upload de la vidéo
@@ -5917,7 +5953,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const startData = await startRes.json()
     if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")
 
-    setButtonLoading(launchBtn, false)
+    launchBtn.classList.remove('travaille'); launchBtn.disabled = false
     document.getElementById('ai-upload-card').style.display = 'none'
     document.getElementById('ai-progress-card').style.display = 'block'
     startAiProgressSimulation()
@@ -5930,7 +5966,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        pas retarder l'affichage de la progression. */
     loadGestionProcedures().catch(() => {})
   } catch (e) {
-    setButtonLoading(launchBtn, false)
+    launchBtn.classList.remove('travaille'); launchBtn.disabled = false
 
     /* La vidéo muette n'est pas une erreur de l'app : c'est une vidéo qui ne
        convient pas à ce mode. On l'annonce comme une consigne, avec la porte de

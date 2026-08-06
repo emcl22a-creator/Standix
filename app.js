@@ -120,8 +120,7 @@ const DICO = {
     "la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "the procedure will appear in your list as soon as it is ready.",
     "Envoi de la vidéo": "Uploading the video",
     "La vidéo part vers le service d'analyse.": "The video is being sent to the analysis service.",
-    "Transcription de la parole": "Transcribing the speech",
-    "Le service écoute la vidéo et retranscrit ce qui est dit.": "The service listens to the video and writes down what is said.",
+    "Analyse de la vidéo": "Analysing the video",
     "Rédaction des étapes": "Writing the steps",
     "L'IA relit la transcription et en tire les étapes.": "The AI reads the transcript and draws the steps from it.",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "This is taking longer than usual, but the analysis is still running.",
@@ -329,8 +328,7 @@ const DICO = {
     // ── espace gestion ──
     "Envoi de la vidéo": "Envío del vídeo",
     "La vidéo part vers le service d'analyse.": "El vídeo se envía al servicio de análisis.",
-    "Transcription de la parole": "Transcripción del habla",
-    "Le service écoute la vidéo et retranscrit ce qui est dit.": "El servicio escucha el vídeo y transcribe lo que se dice.",
+    "Analyse de la vidéo": "Análisis del vídeo",
     "Rédaction des étapes": "Redacción de los pasos",
     "L'IA relit la transcription et en tire les étapes.": "La IA relee la transcripción y extrae los pasos.",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Está tardando más de lo habitual, pero el análisis sigue en marcha.",
@@ -532,8 +530,7 @@ const DICO = {
     // ── espace gestion ──
     "Envoi de la vidéo": "Envio do vídeo",
     "La vidéo part vers le service d'analyse.": "O vídeo está a ser enviado para o serviço de análise.",
-    "Transcription de la parole": "Transcrição da fala",
-    "Le service écoute la vidéo et retranscrit ce qui est dit.": "O serviço ouve o vídeo e transcreve o que é dito.",
+    "Analyse de la vidéo": "Análise do vídeo",
     "Rédaction des étapes": "Redação das etapas",
     "L'IA relit la transcription et en tire les étapes.": "A IA relê a transcrição e extrai as etapas.",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Está a demorar mais do que o habitual, mas a análise continua a correr.",
@@ -1383,8 +1380,42 @@ async function peindreAppareils() {
 
   /* La liste ne montre QUE les appareils encore rattachés. Ceux qu'on a
      déconnectés n'ont plus rien à y faire. */
-  const liste = (data || []).filter(a => !a.revoquee)
+  const brut = (data || []).filter(a => !a.revoquee)
   const recent = Date.now() - 30 * 60000
+
+  /* ═══ UN TÉLÉPHONE, UNE LIGNE ═══
+
+     La base garde une trace par réseau : le même iPhone passant du wifi à la 4G
+     produisait deux lignes, et le compteur annonçait deux appareils. On voyait
+     « 3 sur 3 » avec un seul téléphone en main, et on croyait à une intrusion.
+
+     On regroupe donc sur ce qui identifie vraiment l'appareil : son nom. Deux
+     lignes portant « iPhone de Léa » sont le même téléphone, quel que soit le
+     réseau par lequel il est passé.
+
+     L'empreinte ne convient pas pour ça : c'est justement elle qui change avec
+     le réseau. C'est la cause du problème, pas sa solution. */
+  const parAppareil = new Map()
+  for (const a of brut) {
+    const cle = String(a.nom || 'Appareil').trim().toLowerCase()
+    const connu = parAppareil.get(cle)
+    if (!connu) {
+      parAppareil.set(cle, { ...a, lignes: [a.id], reseaux: a.reseau ? [a.reseau] : [] })
+      continue
+    }
+    /* On garde la visite la plus récente : c'est elle qui dit si l'appareil est
+       actif en ce moment. */
+    if (new Date(a.derniere_fois) > new Date(connu.derniere_fois)) {
+      connu.derniere_fois = a.derniere_fois
+    }
+    if (new Date(a.premiere_fois) < new Date(connu.premiere_fois)) {
+      connu.premiere_fois = a.premiere_fois
+    }
+    connu.lignes.push(a.id)
+    if (a.reseau && !connu.reseaux.includes(a.reseau)) connu.reseaux.push(a.reseau)
+  }
+  const liste = [...parAppareil.values()]
+    .sort((a, b) => new Date(b.derniere_fois) - new Date(a.derniere_fois))
   const actifs = liste.filter(a => new Date(a.derniere_fois) > recent)
 
   /* Le compteur dit ce que la liste montre. Il comptait les appareils actifs
@@ -1404,11 +1435,10 @@ async function peindreAppareils() {
   /* Un même téléphone peut apparaître plusieurs fois : l'appareil est reconnu à
      son réseau, et passer du wifi à la 4G le fait compter comme un nouveau. On
      le dit, sinon on croit à une intrusion. */
-  const noteReseau = liste.length > 1
-    ? '<div class="note" style="margin:0 0 12px;">Un m\u00eame t\u00e9l\u00e9phone peut figurer plusieurs fois : ' +
-      'il est reconnu \u00e0 son r\u00e9seau, et passer du wifi \u00e0 la 4G cr\u00e9e une nouvelle ligne. ' +
-      'Retirez celles que vous ne reconnaissez pas.</div>'
-    : ''
+  /* La note qui expliquait les doublons de réseau est retirée : il n'y a plus de
+     doublons à justifier. Une explication qui survit à son problème devient une
+     inquiétude gratuite. */
+  const noteReseau = ''
 
   el.innerHTML = liste.map(a => {
     const vivant = new Date(a.derniere_fois) > recent
@@ -1421,9 +1451,13 @@ async function peindreAppareils() {
       </span>
       <span class="tx">
         <span class="nm">${escapeHtml(a.nom || 'Appareil')}${vivant ? '<span class="ici">actif</span>' : ''}</span>
-        <span class="st">${a.revoquee ? 'D\u00e9connect\u00e9' : quandLisible(a.derniere_fois)}${a.reseau ? ' \u00b7 ' + escapeHtml(a.reseau) : ''}</span>
+        <span class="st">${quandLisible(a.derniere_fois)}${
+            a.reseaux.length > 1
+              ? ' \u00b7 ' + a.reseaux.length + ' r\u00e9seaux'
+              : (a.reseaux[0] ? ' \u00b7 ' + escapeHtml(a.reseaux[0]) : '')
+          }</span>
       </span>
-      <button type="button" class="oter" data-appareil="${a.id}"
+      <button type="button" class="oter" data-appareil="${a.lignes.join(',')}"
         data-nom="${escapeHtml(a.nom || 'cet appareil')}">Retirer</button>
     </div>`
   }).join('')
@@ -1440,7 +1474,11 @@ document.addEventListener('click', async (e) => {
     confirmer: 'Retirer', annuler: 'Annuler', danger: true,
   })
   if (!ok) return
-  const { error } = await supabase.from('presences').delete().eq('id', b.dataset.appareil)
+  /* Une ligne d'écran peut recouvrir PLUSIEURS lignes en base — le même
+     téléphone vu par deux réseaux. Les retirer toutes : n'en effacer qu'une
+     ferait réapparaître l'appareil au rechargement. */
+  const lignes = String(b.dataset.appareil || '').split(',').filter(Boolean)
+  const { error } = await supabase.from('presences').delete().in('id', lignes)
   if (error) { toast('\u00c9chec : ' + error.message); return }
   await peindreAppareils()
   toast('Appareil retir\u00e9.')
@@ -3630,6 +3668,7 @@ window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
+  ajusterChampsVisibles()
   const boutons = document.querySelectorAll('#tabbar .tab-round')
   boutons.forEach(b => b.classList.remove('active'))
   const index = ONGLET_PAR_ECRAN[id]
@@ -3697,6 +3736,7 @@ window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
+  ajusterChampsVisibles()
   /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
      quittant le scanner on repart caméra allumée — sinon on reviendrait sur un
      écran noir sans se rappeler pourquoi. */
@@ -5604,7 +5644,10 @@ let aiProgresAzure = null          // le vrai pourcentage, quand Azure en donne 
 
 const AI_ETAPES = {
   envoi:         { titre: 'Envoi de la vid\u00e9o', sous: "La vid\u00e9o part vers le service d'analyse." },
-  transcription: { titre: 'Transcription de la parole', sous: "Le service \u00e9coute la vid\u00e9o et retranscrit ce qui est dit." },
+  /* « Transcription de la parole » ne dit plus ce qui se passe : l'image est
+     analysée en même temps que le son. Et la phrase du dessous décrivait la
+     machine — elle occupait une ligne sans rien apprendre. */
+  transcription: { titre: 'Analyse de la vid\u00e9o', sous: '' },
   redaction:     { titre: 'R\u00e9daction des \u00e9tapes', sous: "L'IA relit la transcription et en tire les \u00e9tapes." },
 }
 
@@ -5651,7 +5694,10 @@ function majProgressionIA() {
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
 
-  let phrase = `${t(info.titre)} \u00b7 ${temps}. ` + t(info.sous)
+  /* La phrase du dessous peut être vide : on ne laisse alors ni point orphelin
+     ni espace en trop. */
+  let phrase = `${t(info.titre)} \u00b7 ${temps}.`
+  if (info.sous) phrase += ' ' + t(info.sous)
   if (ecoule > 15 * 60) {
     phrase = t("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }
@@ -5703,6 +5749,10 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   player.addEventListener('loadedmetadata', () => {
     if (isFinite(player.duration)) aiVideoDuree = player.duration
     verifierDureeVideo()
+    /* Safari sur iPhone ne peint AUCUNE image tant qu'on n'a pas demandé une
+       position. `load()` ne suffit pas : le lecteur reste noir. On avance d'un
+       dixième de seconde, ce qui force le rendu d'une vraie image. */
+    try { player.currentTime = 0.1 } catch (e) {}
   }, { once: true })
 })
 
@@ -7202,6 +7252,16 @@ function memoriserEtat() {
 function majBoutonDefaire() {
 }
 
+
+/* Un champ masqué mesure zéro : `scrollHeight` ne vaut rien tant que l'écran
+   n'est pas affiché. Les étapes venant de l'IA arrivaient donc coupées à une
+   ligne, parce qu'on les dessinait avant de montrer la page. On repasse dessus
+   une fois l'écran à l'écran. */
+function ajusterChampsVisibles() {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.screen.active textarea').forEach(t => autoResizeTextarea(t))
+  })
+}
 
 function renderManualSteps() {
 /* Retirer la photo d'une étape. Il n'y avait aucun moyen de le faire : une

@@ -1202,20 +1202,10 @@
      La piste doit toucher les bords pour que le panneau voisin s'annonce dès
      qu'on effleure : elle sort des 20 px de l'écran, et ses panneaux rendent
      les 40 px à l'intérieur. */
-  #an-piste-proc, #an-piste-cat{ margin:0 -20px; }
-  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{ padding:0 40px; }
-  #p-an-temps .fm-barre, #p-an-temps .fm-periode-mot, #p-an-temps .fm-titre,
-  #p-an-categories .fm-barre, #p-an-categories .fm-periode-mot, #p-an-categories .fm-titre{
-    padding-left:20px; padding-right:20px;
-  }
 
 
   /* Même colonne que les deux pages d'analyse. Seul l'en-tête — bouton retour et
      nom — reste à la marge de l'écran : il appartient à la navigation. */
-  #p-membre .fm-piste{ margin:0 -20px; }
-  #p-membre .fm-piste .fm-pan{ padding:0 40px; }
-  #p-membre .fm-barre, #p-membre .fm-periode-mot,
-  #p-membre .fm-titre, #p-membre .fm-rep{ padding-left:20px; padding-right:20px; }
   .fm-lg, .fm-rep .l{ padding-left:0; padding-right:0; }
   .fm-titre{
     font-size:12px; font-weight:650; color:var(--label-3);
@@ -1547,6 +1537,29 @@
 
      Elle est aussi plus ÉPAISSE — 44 px au lieu de 26. Ce n'est pas décoratif :
      on y attrape des traits au doigt, et un doigt fait 8 mm. */
+  /* « Recommencer le découpage » : en blanc plein, comme les actions principales.
+     Le bouton de coupe est bleu — celui-ci ne coupe pas, il remet à zéro. */
+  #dv-bouton.refaire{
+    background:#fff; color:#000;
+  }
+  #dv-bouton.refaire svg{ fill:#000; }
+
+  /* ═══ LE POINT DE VIGILANCE ═══
+     Ambre, pas rouge : le rouge dit « erreur », or rien n'est en faute ici. On
+     prévient, on n'alarme pas. Et il reste DANS l'étape — une mise en garde
+     séparée de son geste se lit trop tard. */
+  .et-attention{
+    display:flex; align-items:flex-start; gap:8px;
+    margin-top:9px; padding:9px 11px; border-radius:11px;
+    background:rgba(255,159,10,0.10);
+    border:0.5px solid rgba(255,159,10,0.26);
+    color:#FFB340;
+  }
+  .et-attention svg{ width:15px; height:15px; flex-shrink:0; margin-top:1px; }
+  .et-attention span{ font-size:13px; font-weight:600; line-height:1.4; }
+  /* Une étape faite estompe aussi sa mise en garde. */
+  #detail-steps.etapes-fil .detail-step.faite .et-attention{ opacity:0.45; }
+
   .dv-vue{
     position:relative; margin-top:22px; padding:12px 0;
     overflow:hidden;
@@ -1558,6 +1571,35 @@
 
      `padding:0 50%` faisait 100 % de retrait au total : la zone de contenu
      tombait à zéro et la frise, large de 100 %, devenait invisible. */
+/* ═══ LA MARGE DES PAGES D'ANALYSE ═══
+
+     Une seule valeur commande tout : l'écran, les titres, les listes, et le
+     retrait que la piste doit rendre à ses panneaux. Avant, chaque élément
+     portait sa propre règle — d'où des colonnes qui ne s'alignaient pas.
+
+     32 px plutôt que 20 : sur ces pages, il n'y a ni carte ni cadre pour tenir
+     le contenu. C'est le blanc qui fait la mise en page, et il faut qu'il se
+     voie. */
+  #p-membre, #p-an-temps, #p-an-categories{
+    padding-left:32px; padding-right:32px;
+  }
+  /* Les pistes touchent les bords — il faut que le panneau voisin s'annonce dès
+     qu'on effleure — et leurs panneaux rendent la marge à l'intérieur. */
+  #p-membre .fm-piste, #an-piste-proc, #an-piste-cat{
+    margin-left:-32px; margin-right:-32px;
+  }
+  #p-membre .fm-piste .fm-pan,
+  #an-piste-proc .fm-pan, #an-piste-cat .fm-pan{
+    padding-left:32px; padding-right:32px;
+  }
+  /* Tout le reste hérite de l'écran : aucune règle par élément, donc aucune
+     colonne qui dérive. */
+  #p-membre .fm-titre, #p-membre .fm-rep, #p-membre .fm-barre, #p-membre .fm-periode-mot,
+  #p-an-temps .fm-titre, #p-an-temps .fm-barre, #p-an-temps .fm-periode-mot,
+  #p-an-categories .fm-titre, #p-an-categories .fm-barre, #p-an-categories .fm-periode-mot{
+    padding-left:0; padding-right:0;
+  }
+
   .dv-piste{
     overflow-x:auto; overflow-y:hidden;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;

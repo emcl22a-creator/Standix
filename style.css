@@ -1,5 +1,4 @@
-
-  /* ═══ Aucun zoom, nulle part ═══
+/* ═══ Aucun zoom, nulle part ═══
      `touch-action: manipulation` supprime le zoom au double-toucher.
      `text-size-adjust` empêche iOS de grossir le texte tout seul en paysage.
      Les règles de la frise vidéo (classes) restent prioritaires sur ce `*`. */
@@ -592,6 +591,20 @@
   .doc-zone .trois{
     display:flex; align-items:center; justify-content:center; gap:16px; margin-top:16px;
   }
+  /* Les trois entrées sont des BOUTONS : chacune ouvre sa voie. */
+  .doc-zone .doc-voie{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:9px 12px; border-radius:12px; border:0.5px solid transparent;
+    background:none; color:var(--label-3);
+    font-family:inherit; font-size:11px; font-weight:650;
+  }
+  .doc-zone .doc-voie svg{ width:20px; height:20px; color:rgba(255,255,255,0.5); }
+  .doc-zone .doc-voie.on{
+    background:rgba(255,255,255,0.09); border-color:var(--border); color:#fff;
+  }
+  .doc-zone .doc-voie.on svg{ color:#fff; }
+  .doc-zone .doc-voie:active{ transform:scale(0.94); }
+
   .doc-zone .trois > span{
     display:flex; flex-direction:column; align-items:center; gap:6px;
     font-size:11px; color:var(--label-3); font-weight:650;
@@ -1482,8 +1495,13 @@
      `padding:0 50%` faisait 100 % de retrait au total : la zone de contenu
      tombait à zéro et la frise, large de 100 %, devenait invisible. */
   .dv-piste{
-    overflow-x:auto; overflow-y:visible;
+    overflow-x:auto; overflow-y:hidden;
     -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    /* `pan-x` SEUL : la frise ne se déplace plus que sur l'horizontale. Avec
+       `pinch-zoom` en plus, iOS autorisait un léger glissement vertical qui
+       faisait trembler la piste sous le doigt. */
+    touch-action:pan-x;
+    overscroll-behavior-x:contain;
   }
   .dv-piste::-webkit-scrollbar{ display:none; }
 
@@ -1503,8 +1521,8 @@
      écrit à la main, que le défilement natif a remplacé. `pan-x` autorise le
      glissement horizontal — c'est exactement ce qu'on veut — et laisse le
      pincement au navigateur. */
-  .dv-frise{ touch-action:pan-x pinch-zoom; transition:box-shadow 0.15s ease; }
-  .dv-piste{ touch-action:pan-x pinch-zoom; }
+  .dv-frise{ touch-action:pan-x; transition:box-shadow 0.15s ease; }
+
   .dv-frise.tire{ box-shadow:0 0 0 1.5px rgba(255,255,255,0.28); }
   .dv-seg{
     position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);

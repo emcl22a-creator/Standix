@@ -1464,7 +1464,12 @@
   }
   .dv-fond{ position:absolute; inset:0; border-radius:11px; overflow:hidden; }
   /* Pendant le geste, la frise se signale légèrement : on sait qu'on la tient. */
-  .dv-frise{ touch-action:none; transition:box-shadow 0.15s ease; }
+  /* `touch-action:none` empêchait le défilement au doigt : il restait d'un geste
+     écrit à la main, que le défilement natif a remplacé. `pan-x` autorise le
+     glissement horizontal — c'est exactement ce qu'on veut — et laisse le
+     pincement au navigateur. */
+  .dv-frise{ touch-action:pan-x pinch-zoom; transition:box-shadow 0.15s ease; }
+  .dv-piste{ touch-action:pan-x pinch-zoom; }
   .dv-frise.tire{ box-shadow:0 0 0 1.5px rgba(255,255,255,0.28); }
   .dv-seg{
     position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);
@@ -1589,6 +1594,34 @@
   .dv-ia-bas:disabled{ color:var(--label-3); }
   .dv-ia-bas:disabled .ia-fig{ opacity:0.35; }
   .dv-ia-bas:active{ opacity:0.6; }
+
+  /* TROIS ÉTATS.
+
+     Au repos  : l'anneau et le texte.
+     Pendant   : l'anneau seul — le texte disparaît, il n'y a plus rien à décider
+                 et une phrase qui reste sous un bouton désactivé donne envie
+                 d'appuyer encore.
+     À la fin  : la coche, quelques secondes, puis retour au repos. */
+  .dv-ia-bas .ia-coche{ display:none; width:24px; height:24px; flex-shrink:0; }
+  .dv-ia-bas .ia-coche svg{ width:24px; height:24px; display:block; }
+
+  .dv-ia-bas #vid-ia-bas-txt{
+    transition:opacity 0.25s ease, max-width 0.35s cubic-bezier(0.32,0.72,0,1);
+    max-width:280px; overflow:hidden; white-space:nowrap;
+  }
+  .dv-ia-bas.travaille #vid-ia-bas-txt,
+  .dv-ia-bas.fini #vid-ia-bas-txt{ opacity:0; max-width:0; }
+  .dv-ia-bas.travaille, .dv-ia-bas.fini{ gap:0; }
+
+  .dv-ia-bas.fini .ia-fig{ display:none; }
+  .dv-ia-bas.fini .ia-coche{
+    display:block;
+    animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
+  }
+  @keyframes cocheArrive{
+    0%{ transform:scale(0.4); opacity:0; }
+    100%{ transform:scale(1); opacity:1; }
+  }
   .dv-play{
     width:34px; height:34px; border-radius:50%; border:none; padding:0; flex-shrink:0;
     background:rgba(255,255,255,0.10); border:0.5px solid var(--border); color:#fff;
@@ -4668,13 +4701,25 @@
            « Publier ». -->
       <button type="button" class="dv-ia-bas" id="vid-ia-bas" style="display:none;">
         <span class="ia-fig m"><span class="lum"></span></span>
+        <!-- La coche prend la place de l'anneau quand c'est fini. Elle porte le
+             même dégradé : c'est le même travail qui s'achève, pas un autre signe. -->
+        <span class="ia-coche">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"/>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)"
+                      stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
         <span id="vid-ia-bas-txt">Compléter les étapes avec l’IA</span>
       </button>
       <!-- La note vit SOUS le bouton. Elle était restée où l'ancien bouton se
            trouvait, tout en haut : les messages d'erreur s'affichaient à un
            endroit qu'on ne regardait pas, et l'action semblait sans effet. -->
       <div class="vid-ia-note" id="vid-ia-note"></div>
-      <button class="btn block" style="margin-top:9px;" id="publish-btn-video">Publier la procédure</button>
+      <!-- Un vrai écart avant « Publier » : neuf pixels collaient le bouton à la
+           note de l'IA, et les deux se lisaient comme un seul bloc. Publier est un
+           geste définitif — il doit se détacher de ce qui le précède. -->
+      <button class="btn block" style="margin-top:32px;" id="publish-btn-video">Publier la procédure</button>
     </div>
   </div>
 
@@ -10448,6 +10493,10 @@ function resetCreateForm() {
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'flex'
+  /* Les commandes de lecture suivent la vidéo : sans image, il n'y a rien à
+     mettre en pause, et un bouton qui ne fait rien fait douter du reste. */
+  const _cmd = document.getElementById('dv-cmd')
+  if (_cmd) _cmd.style.display = 'none'
   document.getElementById('dv-travail').style.display = 'none'
   document.getElementById('create-error-manual').textContent = ''
   document.getElementById('create-error-video').textContent = ''
@@ -10941,11 +10990,16 @@ function majBoutonIA() {
     const nbTot = videoSteps.length
     const videsTot = videoSteps.filter(s => !String(s.texte || '').trim()).length
     bas.style.display = nbTot ? 'flex' : 'none'
-    bas.disabled = iaCompletionEnCours || videsTot === 0
+    bas.disabled = iaCompletionEnCours || iaVientDeFinir || videsTot === 0
+    /* Pendant le travail : l'anneau seul. À la fin : la coche. Le texte
+       disparaît dans les deux cas — il n'y a plus rien à décider, et une phrase
+       sous un bouton éteint donne envie d'appuyer encore. */
+    bas.classList.toggle('travaille', iaCompletionEnCours)
+    bas.classList.toggle('fini', iaVientDeFinir && !iaCompletionEnCours)
     const txt = document.getElementById('vid-ia-bas-txt')
-    if (txt) txt.textContent = iaCompletionEnCours
-      ? 'L\u2019IA \u00e9coute la vid\u00e9o\u2026'
-      : (videsTot ? 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA' : 'Toutes vos \u00e9tapes ont un texte')
+    if (txt) txt.textContent = videsTot
+      ? 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA'
+      : 'Toutes vos \u00e9tapes ont un texte'
   }
 
   /* La note explicative reste : elle dit combien d'étapes attendent un texte,
@@ -11045,6 +11099,12 @@ async function completerEtapesAvecIA() {
     })
 
     renderVideoSteps()
+
+    /* La coche, le temps qu'on la voie. Trois secondes : assez pour remarquer
+       que c'est fini, trop peu pour qu'on attende qu'elle parte. */
+    iaVientDeFinir = true
+    setTimeout(() => { iaVientDeFinir = false; majBoutonIA() }, 3000)
+
     const reste = videoSteps.filter(s => !String(s.texte || '').trim()).length
     note.textContent = reste
       ? `${remplies} \u00e9tape${remplies > 1 ? 's' : ''} \u00e9crite${remplies > 1 ? 's' : ''}. ` +
@@ -12760,6 +12820,11 @@ window.ouvrirMontageVideo = async function(procId) {
   player.src = (await urlSignee(proc.video_url)) || ''
   player.style.display = proc.video_url ? 'block' : 'none'
   el('video-placeholder').style.display = proc.video_url ? 'none' : 'flex'
+  /* Les commandes suivent la vidéo : elles n'apparaissent QUE s'il y en a une.
+     À la modification d'une procédure, la vidéo est déjà là — il ne faut pas
+     les masquer comme sur un formulaire vide. */
+  const _cmd = document.getElementById('dv-cmd')
+  if (_cmd) _cmd.style.display = proc.video_url ? 'flex' : 'none'
   el('dv-travail').style.display = 'block'
 
   /* Les bornes sont déduites quand elles manquent : une étape sans fin prend le

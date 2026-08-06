@@ -1,0 +1,1870 @@
+<!DOCTYPE html><html lang="fr"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<title>Procédo</title>
+<!-- Les trois serveurs contactés au démarrage. Ouvrir la connexion dès la
+     lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur
+     chacun — c'est du temps mort pur, avant même la première requête. -->
+<link rel="preconnect" href="https://tlrtsoahwqhtvtkhssbm.supabase.co" crossorigin="">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin=""><!-- QR code, chargé à la demande -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<!-- La bibliothèque Supabase est indispensable pour afficher quoi que ce soit :
+     on la télécharge en parallèle du reste au lieu d'attendre la fin du script. -->
+<!-- La bibliothèque Supabase est servie depuis le même dépôt que cette page :
+     pas de serveur tiers à joindre, et le navigateur la garde en cache d'une
+     visite à l'autre. Elle était auparavant téléchargée depuis jsDelivr, ce qui
+     coûtait entre 30 ms et 2 secondes selon l'humeur du réseau. -->
+<link rel="modulepreload" href="./supabase.js">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"></noscript>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="booting">
+
+
+
+
+<div class="color-halos">
+  <div class="chalo chalo-4"></div>
+  <div class="chalo chalo-1"></div>
+  <div class="chalo chalo-2"></div>
+</div>
+
+<!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
+<div class="login-wrap" id="choice-screen" style="display:none;">
+  <div class="login-card" style="text-align:center;">
+    <div class="boot-logo boot-logo--once">
+      <div class="boot-glow"></div>
+      <svg viewBox="0 0 85 100" fill="none">
+        <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"></path>
+      </svg>
+    </div>
+    <h1>Procédo</h1>
+    <div class="subhead">Choisissez votre espace</div>
+    <button class="btn block" style="margin-bottom:10px;" onclick="chooseSpace('gestion')">Espace Gestion</button>
+    <button class="btn ghost block" onclick="chooseSpace('equipe')">Espace Équipe</button>
+  </div>
+</div>
+
+<!-- ═══ 2. CONNEXION / INSCRIPTION ═══ -->
+<div class="login-wrap" id="login-screen" style="display:none;">
+  <div class="login-card">
+    <button class="back-btn" style="margin-bottom:14px;" onclick="backToChoice()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <h1 id="auth-title">Espace Gestion</h1>
+    <div class="subhead">Connectez-vous ou créez votre compte</div>
+
+    <div class="auth-toggle">
+      <div class="auth-toggle-indicator" id="auth-indicator"></div>
+      <button id="tab-login-btn" class="auth-toggle-btn active" onclick="switchAuthTab('login')">Se connecter</button>
+      <button id="tab-signup-btn" class="auth-toggle-btn" onclick="switchAuthTab('signup')">Créer un compte</button>
+    </div>
+
+    <div class="auth-form-wrap">
+      <!-- Connexion -->
+      <div id="login-form" class="auth-form active">
+        <label class="f">E-mail</label>
+        <input type="email" id="login-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px;">
+        <button class="btn block" id="login-btn">Se connecter</button>
+      </div>
+
+      <!-- Inscription -->
+      <div id="signup-form" class="auth-form">
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <div style="flex:1;">
+            <label class="f">Prénom</label>
+            <input type="text" id="signup-prenom" placeholder="Marie">
+          </div>
+          <div style="flex:1;">
+            <label class="f">Nom</label>
+            <input type="text" id="signup-nom" placeholder="Tissot">
+          </div>
+        </div>
+        <label class="f">E-mail</label>
+        <input type="email" id="signup-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom:16px;">
+
+        <div id="signup-gestion-field">
+          <label class="f">Nom de l'entreprise</label>
+          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;">
+        </div>
+        <div id="signup-equipe-field" style="display:none;">
+          <label class="f">Code de l'entreprise (5 chiffres)</label>
+          <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
+        </div>
+
+        <button class="btn block" id="signup-btn">Créer mon compte</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="login-error"></div>
+  </div>
+</div>
+
+<!-- ═══════════════ ESPACE GESTION ═══════════════ -->
+<div class="app" id="gestion-app" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="tiroir-ent" id="tiroir-ent">
+        <span class="tiroir-liste" id="tiroir-liste"></span>
+      </div>
+      <div class="topbar-card">
+        <div class="topbar-left">
+          <div class="logo-pill">
+            <div class="boot-logo boot-logo--topbar" id="topbar-logo-gestion">
+              <svg viewBox="0 0 85 100" fill="none">
+                <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="topbar-title">
+            <span class="name">Procédo</span>
+            <span class="role">Espace Gestion</span>
+          </div>
+        </div>
+      </div>
+      <button class="icon-pill" onclick="openSettings()" aria-label="Paramètres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="screen active" id="p-list">
+    <div class="accueil">
+      <div class="accueil-texte">
+        <div class="t" id="accueil-salut">Bonjour 👋</div>
+        <div class="s" id="accueil-mot">Chargement…</div>
+      </div>
+      <div class="accueil-av" id="accueil-avatar" role="button" aria-label="Contacter le support">
+        <span class="dispo"></span>
+      </div>
+    </div>
+
+    <div class="list-tools">
+      <div class="section-title" style="margin:0;">Catégories</div>
+      <div class="dd-filter" id="dd-cat-sort">
+        <button type="button" class="dd-trigger" id="dd-cat-sort-trigger">
+          <span id="dd-cat-sort-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="dd-menu" id="dd-cat-sort-menu">
+          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+        </div>
+      </div>
+    </div>
+    <div id="cat-grid" class="cat-grid"></div>
+  </div>
+
+  <div class="screen" id="p-category">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="category-titre">—</h1>
+      <button type="button" class="back-btn" id="cat-renommer" aria-label="Renommer la catégorie" title="Renommer la catégorie" style="margin-left:auto;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;">
+          <path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
+        </svg>
+      </button>
+    </div>
+    <div class="subhead" id="category-subhead">—</div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
+    </div>
+    <div class="dd-filter" id="dd-category-sort">
+      <button type="button" class="dd-trigger" id="dd-category-sort-trigger">
+        <span id="dd-category-sort-label">Trier : A → Z</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div class="dd-menu" id="dd-category-sort-menu">
+        <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+        <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+        <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+      </div>
+    </div>
+    <div id="category-procedures-list"></div>
+  </div>
+
+  <div class="screen" id="p-membre-fiche">
+    <div class="pagehead-row">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" id="mf-nom" style="margin:0; font-size:20px;">—</h1>
+    </div>
+    <div class="subhead" id="mf-role">—</div>
+
+    <div class="mf-tete">
+      <div class="ga-anneau" id="mf-anneau"></div>
+      <div id="mf-medaille"></div>
+      <div class="mf-resume" id="mf-resume">—</div>
+    </div>
+
+    <div class="ga-trio" style="margin-top:12px;">
+      <div class="ga-tuile"><div class="mf-chiffre" id="mf-lues">—</div><div class="ga-libelle">Lues</div></div>
+      <div class="ga-tuile"><div class="mf-chiffre" id="mf-reste">—</div><div class="ga-libelle">À lire</div></div>
+      <div class="ga-tuile"><div class="mf-chiffre" id="mf-serie">—</div><div class="ga-libelle" style="display:none;">Jours actifs</div></div>
+    </div>
+
+    <div class="section-title">Activité</div>
+    <div class="card" id="mf-activite"></div>
+
+    <div class="section-title">Procédures consultées</div>
+    <div id="mf-faites"></div>
+
+    <div class="section-title">Pas encore consultées</div>
+    <div id="mf-restantes"></div>
+  </div>
+
+  <div class="screen" id="p-membres">
+    <div class="pagehead-row">
+      <button class="back-btn" onclick="openSettings()" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Gérer l'équipe</h1>
+    </div>
+    <div class="subhead" id="pm-subhead">—</div>
+    <div class="filter-chips" id="pm-tri" style="margin-top:14px;">
+      <button type="button" data-tri="az" class="active">A → Z</button>
+      <button type="button" data-tri="neuf">Nouveau</button>
+      <button type="button" data-tri="vieux">Ancien</button>
+    </div>
+    <div class="pm-recherche">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.2" y1="16.2" x2="20.6" y2="20.6"></line></svg>
+      <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
+      <button type="button" class="vider" id="pm-vider" aria-label="Effacer">×</button>
+    </div>
+    <div class="note" style="margin-top:12px;">Touchez une personne pour voir son activité en détail : temps passé, procédures lues, ce qu'il lui reste. Les flèches changent son rôle, la croix la retire de l'entreprise.</div>
+    <div id="pm-liste" style="margin-top:14px;"></div>
+  </div>
+
+  <div class="screen" id="p-create">
+    <!-- Pas de flèche de retour : on arrive ici par le « + », et la barre du bas
+         suffit à repartir. Une flèche de plus à côté du titre n'ajoutait rien. -->
+    <div class="detail-header">
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Nouvelle procédure</h1>
+    </div>
+    <div class="subhead">Écrivez les étapes, ou découpez une vidéo</div>
+
+    <!-- Les mêmes champs que les écrans de modification : même libellé, même
+           cadre, même taille. Une carte supplémentaire autour de deux champs
+           n'apportait qu'un cadre de plus à lire. -->
+      <div class="card">
+        <label class="f">Catégorie</label>
+        <input type="text" id="new-categorie" placeholder="Ex : Cuisine">
+        <div style="margin-top:12px;">
+          <label class="f">Titre</label>
+          <input type="text" id="new-titre" placeholder="Ex : Fermeture de caisse">
+        </div>
+      </div>
+
+    <div class="section-title">Comment créer cette procédure ?</div>
+    <div class="note" id="mode-choice-note" style="margin-top:0; margin-bottom:10px;">Complétez le titre et la catégorie ci-dessus pour continuer.</div>
+
+    <!-- L'ordre va du plus au moins probable, pas du plus simple au plus
+         complexe. Le premier choix est celui qu'on prend sans lire les autres :
+         il doit être celui qui répond à la plupart des cas.
+
+         C'est une hypothèse, pas une mesure — aucun usage réel ne l'appuie
+         encore. À revoir dès qu'on saura ce que les gens choisissent. -->
+      <div class="card mode-choice-card disabled" onclick="goToCreateMode('manual')" id="mode-card-manual">
+      <div class="mode-choice-row">
+        <!-- Pas de marque IA ici : c'est le seul mode où personne n'intervient
+             à votre place. -->
+        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M14 5h11l7 7v14a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M8 11h11l7 7v14a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path><path d="M19 11v7h7" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path><line x1="13" y1="24" x2="21" y2="24" stroke="rgba(255,255,255,0.42)" stroke-width="1.9" stroke-linecap="round"></line><line x1="13" y1="29" x2="18" y2="29" stroke="rgba(255,255,255,0.16)" stroke-width="1.9" stroke-linecap="round"></line><path d="M33 21.5a2.3 2.3 0 0 1 3.3 3.3l-6.6 6.6-4.3 1 1-4.3z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path></svg></div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">Étapes manuelles</div>
+          <div class="mode-choice-desc">Écrivez chaque étape vous-même</div>
+        </div>
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div><div class="card mode-choice-card disabled" onclick="goToCreateMode('video')" id="mode-card-video">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="10" y="5" width="28" height="18" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="4" y="11" width="28" height="18" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2"></rect><path d="m15 16 6 4-6 4z" fill="url(#iaFini)"></path><line x1="4" y1="34.5" x2="14" y2="34.5" stroke="url(#iaFini)" stroke-width="2" stroke-linecap="round"></line><line x1="18" y1="34.5" x2="26" y2="34.5" stroke="url(#iaFini)" stroke-width="2" stroke-linecap="round"></line><line x1="30" y1="34.5" x2="38" y2="34.5" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linecap="round"></line></svg></div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">Vous découpez, l’IA rédige</div>
+          <div class="mode-choice-desc">Marquez où chaque étape s’arrête, l’IA écrit le texte</div>
+        </div>
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div><div class="card mode-choice-card disabled" onclick="goToCreateMode('doc')" id="mode-card-doc">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M17 4h10l7 7v15a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M10 10h10l7.5 7.5V33a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><path d="M20 10v7.5h7.5" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><line x1="15" y1="24" x2="23" y2="24" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line><line x1="15" y1="29" x2="20" y2="29" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line></svg></div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">L'IA découpe un document</div>
+          <div class="mode-choice-desc">Collez un texte, ou déposez un PDF ou un Word</div>
+        </div>
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div><div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
+      <div class="mode-choice-row">
+        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="11" y="6" width="27" height="20" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="5" y="12" width="27" height="20" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2"></rect><circle cx="18.5" cy="22" r="5.6" stroke="url(#iaFini)" stroke-width="2"></circle><path d="m16.6 19.4 4.4 2.6-4.4 2.6z" fill="url(#iaFini)"></path></svg></div>
+        <div class="mode-choice-text">
+          <div class="mode-choice-title">L'IA découpe la vidéo</div>
+          <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes · 10 min maximum</div>
+        </div>
+
+      
+
+      
+
+      
+        <div class="mode-choice-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="p-create-manual">
+    <div class="detail-header">
+      <button class="back-btn" id="man-retour" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="man-titre-page">Étapes manuelles</h1>
+    </div>
+    <div class="subhead" id="man-sous">Écrivez chaque étape dans l’ordre</div>
+
+    <!-- Catégorie et titre n'apparaissent QU'EN MODIFICATION. À la création ils
+         ont déjà été demandés sur l'écran précédent, et les redemander donnerait
+         l'impression de recommencer. En modification il faut bien pouvoir les
+         corriger : c'est le seul endroit où ils ont leur place. -->
+    <div id="man-entete" style="display:none;">
+      <div class="card">
+        <label class="f">Catégorie</label>
+        <input type="text" id="man-categorie" placeholder="Ex : Cuisine">
+        <div style="margin-top:12px;">
+          <label class="f">Titre</label>
+          <input type="text" id="man-titre" placeholder="Ex : Fermeture de caisse">
+        </div>
+      </div>
+    </div>
+
+        <div class="couv couv-depot" id="couv-manuel">
+      <input type="file" accept="image/*" class="fichier">
+      <span class="vign">
+        <svg viewBox="0 0 32 32" fill="none">
+          <rect x="9" y="3" width="20" height="15" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.5"></rect>
+          <rect x="5" y="7" width="23" height="17" rx="4.5" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"></rect>
+          <rect x="2" y="11" width="24" height="18" rx="5" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.7"></rect>
+          <circle cx="8.5" cy="17" r="1.9" fill="rgba(255,255,255,0.42)"></circle>
+          <path d="m26 25-6.5-6.5-5 5-2.5-2.5L2 29" stroke="rgba(255,255,255,0.42)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span class="tx">
+        <span class="t">Ajouter une photo</span>
+        <span class="s">Elle apparaît en tête de la fiche. Facultative.</span>
+      </span>
+      <button type="button" class="oter" style="display:none;">Retirer</button>
+    </div>
+
+    <!-- Pas de titre ici : le fil des étapes se reconnaît tout seul, et le
+         compteur ne répétait que ce qu'on voit déjà. -->
+    <div class="man-fil" id="manual-steps-list"></div>
+
+    <div class="error-msg" id="create-error-manual"></div>
+    <!-- Le bouton d'annulation a été retiré : trois boutons empilés au bas d'un
+         écran de saisie — annuler un geste, tout effacer, publier — se ressemblent
+         trop pour qu'on les distingue d'un coup d'œil. Reste ce qui compte. -->
+    <button class="btn ghost block" style="margin-top:30px;" id="man-annuler">Annuler les modifications</button>
+    <button class="btn block" style="margin-top:9px;" id="publish-btn-manual">Publier la procédure</button>
+  </div>
+
+  <div class="screen" id="p-create-video">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="dv-titre-page">Vous découpez, l’IA rédige</h1>
+    </div>
+    <div class="subhead" id="dv-sous">Marquez les coupures, l’IA rédige ensuite</div>
+
+    <!-- Catégorie et titre n'apparaissent QU'EN MODIFICATION, comme sur l'écran
+         des étapes manuelles. À la création ils ont déjà été demandés sur l'écran
+         précédent ; les redemander donnerait l'impression de recommencer. En
+         modification il faut bien pouvoir les corriger — et c'était impossible :
+         une procédure vidéo gardait son titre pour toujours. -->
+    <div id="dv-entete" style="display:none;">
+      <div class="card">
+        <label class="f">Catégorie</label>
+        <input type="text" id="dv-categorie" placeholder="Ex : Cuisine">
+        <div style="margin-top:12px;">
+          <label class="f">Titre</label>
+          <input type="text" id="dv-titre" placeholder="Ex : Fermeture de caisse">
+        </div>
+      </div>
+    </div>
+
+    <!-- La même carte que l'écran de l'IA : une note qui cadre l'attente, le
+         choix du fichier, puis le lecteur. Deux écrans qui font entrer une
+         vidéo doivent l'accueillir pareil. -->
+    <div class="card" id="dv-carte">
+      <!-- La consigne longue est retirée : elle expliquait le découpage avant
+             même qu'il y ait une vidéo. Elle réapparaît au bon moment, sous le
+             bouton de coupe. -->
+      <div class="dv-depot" id="dv-depot">
+        <input type="file" id="video-input" accept="video/*">
+        <div class="dv-cadre" id="dv-cadre">
+          <video id="video-player" style="display:none;" playsinline="" webkit-playsinline="" preload="metadata"></video>
+
+            <!-- Les commandes vivent DANS l'image, au coin bas gauche : c'est
+                 là qu'on regarde quand on découpe. Sous la vidéo, il fallait
+                 quitter l'image des yeux pour appuyer. -->
+            <div class="dv-cmd" id="dv-cmd" style="display:none;">
+              <button type="button" class="dv-rond" id="dv-play" aria-label="Lecture">
+                <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>
+                <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"></rect><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"></rect></svg>
+              </button>
+            </div>
+          <!-- Le cadre noir disait « aucune vidéo importée » : il constatait au lieu
+                 d'inviter. Pointillés, icône et une phrase disent ce qu'on attend. -->
+            <div class="dv-vide" id="video-placeholder">
+              <span class="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.6"></circle></svg>
+              </span>
+              <span class="t">Ajoutez votre vidéo</span>
+              <span class="s">Filmez la tâche en expliquant à voix haute.<br>Dix minutes maximum.</span>
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="dv-travail" style="display:none;">
+      <!-- La frise : un témoin, pas un outil. On la touche pour se déplacer. -->
+      <!-- La frise vit dans une FENÊTRE qui défile. Zoomée cinq fois par défaut :
+           à l'échelle de la vidéo entière, une étape de trois secondes sur deux
+           minutes fait deux pixels — impossible à viser, encore moins à déplacer. -->
+      <!-- La frise à la manière de CapCut : le trait blanc ne bouge PAS. Il reste au
+           milieu, et c'est la vidéo qui défile dessous. Ce qui est passé est à gauche,
+           ce qui reste à droite.
+
+           L'avantage n'est pas qu'esthétique : l'instant qu'on regarde est toujours
+           au même endroit de l'écran. On n'a plus à chercher le trait des yeux. -->
+      <div class="dv-vue" id="dv-vue">
+        <div class="dv-piste" id="dv-piste">
+          <div class="dv-frise" id="dv-frise">
+            <div class="dv-fond" id="dv-fond"></div>
+          </div>
+        </div>
+        <div class="dv-tete" id="dv-tete"></div>
+      </div>
+
+      <div class="dv-outils">
+        <button type="button" class="dv-zoom" id="dv-zoom" aria-label="Voir toute la vidéo">
+          <svg class="ic-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 4 4 4 4 9"></polyline><polyline points="15 4 20 4 20 9"></polyline><polyline points="9 20 4 20 4 15"></polyline><polyline points="15 20 20 20 20 15"></polyline></svg>
+          <svg class="ic-serre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 9 9 9 4"></polyline><polyline points="20 9 15 9 15 4"></polyline><polyline points="4 15 9 15 9 20"></polyline><polyline points="20 15 15 15 15 20"></polyline></svg>
+          <span id="dv-zoom-txt">Tout voir</span>
+        </button>
+
+        <!-- Annuler la dernière coupure. Rien à voir avec un retour de cinq
+             secondes : on vient de fermer une étape au mauvais moment et on veut
+             la reprendre, pas seulement reculer dans la vidéo. -->
+        <button type="button" class="dv-annuler" id="dv-annuler" disabled="" aria-label="Annuler la dernière coupure">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
+          Annuler la coupure
+        </button>
+      </div>
+      <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
+
+      <div class="dv-geste">
+        <button type="button" id="dv-bouton">
+          <svg viewBox="0 0 24 24" fill="currentColor" id="dv-icone"><path d="M8 5v14l11-7z"></path></svg>
+          <span id="dv-libelle">Lancer la vidéo</span>
+        </button>
+        <div class="dv-aide" id="dv-aide">Regardez, et touchez le bouton chaque fois qu'une étape se termine.</div>
+      </div>
+
+      <!-- Pas d'image de présentation ici : la vidéo EST la présentation. On tire
+           déjà une vignette de son premier plan, et demander une photo en plus
+           revenait à faire choisir entre deux couvertures pour la même fiche. -->
+
+      <!-- Titre retiré, comme sur l'écran manuel : le fil se reconnaît tout seul. -->
+      <div class="man-fil" id="video-steps-list"></div>
+
+      <!-- Le bouton « Compléter avec l'IA » a été retiré d'ici : il faisait
+           doublon avec celui placé juste au-dessus de « Publier ». Deux boutons
+           identiques à deux endroits laissent croire à deux actions.
+
+           Celui du bas est mieux placé : c'est là qu'on se demande « est-ce que
+           tout est écrit ? », juste avant de publier. -->
+      
+
+      <!-- « Tout recommencer » retiré de la modification : effacer d'un coup les
+           étapes d'une procédure déjà publiée n'est pas une correction, c'est une
+           destruction — et le bouton était juste au-dessus de « Enregistrer ». -->
+
+      <div class="error-msg" id="create-error-video"></div>
+      <!-- Le retour est ici aussi, pas seulement en haut : arrivé en bas d'une
+           longue liste d'étapes, remonter chercher la flèche est une corvée. -->
+      <!-- « Compléter les étapes avec l'IA », juste au-dessus de la publication :
+           c'est le dernier geste avant de publier, et l'endroit où l'on se
+           demande « est-ce que tout est écrit ? ».
+
+           Sans fond ni bordure : ce n'est pas une action à faire, c'en est une
+           qu'on PEUT faire. Un bouton plein l'aurait mise au même rang que
+           « Publier ». -->
+      <button type="button" class="dv-ia-bas" id="vid-ia-bas" style="display:none;">
+        <span class="ia-fig m"><span class="lum"></span></span>
+        <!-- La coche prend la place de l'anneau quand c'est fini. Elle porte le
+             même dégradé : c'est le même travail qui s'achève, pas un autre signe. -->
+        <span class="ia-coche">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+        </span>
+        <span id="vid-ia-bas-txt">Compléter les étapes avec l’IA</span>
+      </button>
+      <!-- La note vit SOUS le bouton. Elle était restée où l'ancien bouton se
+           trouvait, tout en haut : les messages d'erreur s'affichaient à un
+           endroit qu'on ne regardait pas, et l'action semblait sans effet. -->
+      <div class="vid-ia-note" id="vid-ia-note"></div>
+      <!-- Un vrai écart avant « Publier » : neuf pixels collaient le bouton à la
+           note de l'IA, et les deux se lisaient comme un seul bloc. Publier est un
+           geste définitif — il doit se détacher de ce qui le précède. -->
+      <button class="btn block" style="margin-top:32px;" id="publish-btn-video">Publier la procédure</button>
+    </div>
+  </div>
+
+  <div class="screen" id="p-create-doc">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">L'IA découpe un document</h1>
+    </div>
+    <div class="subhead">Une consigne écrite, une fiche, un mode d'emploi</div>
+
+    <div class="card" id="doc-saisie-card">
+      <!-- Une seule zone de dépôt, comme sur la page vidéo : pointillés, icône,
+             une phrase. Les deux écrans deviennent jumeaux.
+
+             Les deux séparateurs « ou » ont disparu : ils enterraient la photo
+             sous deux niveaux, et personne ne descendait jusque-là. -->
+        <div class="doc-zone" id="doc-zone">
+          <span class="ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"></path><path d="M13.6 3v5h5"></path><line x1="8.6" y1="12.6" x2="15.4" y2="12.6"></line><line x1="8.6" y1="16.4" x2="13" y2="16.4"></line></svg>
+          </span>
+          <span class="t">Ajoutez votre document</span>
+          <span class="s">L’IA lit le texte et en tire les étapes, dans l’ordre.</span>
+          <span class="trois">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="12" rx="2.5"></rect><line x1="8" y1="14.3" x2="16" y2="14.3"></line></svg>Coller</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.6"></circle></svg>Photo</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6.5"></path><polyline points="7.5 8 12 3.5 16.5 8"></polyline><line x1="12" y1="3.5" x2="12" y2="15"></line></svg>Fichier</span>
+          </span>
+        </div>
+
+      <label class="f">Votre texte</label>
+      <textarea id="doc-texte" rows="7" placeholder="Collez ici votre procédure, votre note de service, votre mode d'emploi…"></textarea>
+
+
+      <input type="file" id="doc-fichier" accept=".pdf,.docx,.txt,.md,text/plain">
+      <div class="doc-fichier-etat" id="doc-fichier-etat" style="display:none;"></div>
+
+
+      <!-- Photographier un texte. Une recette tient rarement sur une seule page :
+           on en accepte plusieurs, et c'est l'ordre qui fait le sens. -->
+      <div class="doc-photos" id="doc-photos">
+        <input type="file" id="doc-photo-input" accept="image/*" multiple="">
+        <div class="doc-photos-vide" id="doc-photos-vide">
+          <span class="d">
+            <svg viewBox="0 0 52 48" fill="none">
+              <rect x="14" y="3" width="26" height="17" rx="5" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect>
+              <rect x="8" y="10" width="34" height="22" rx="6" stroke="rgba(255,255,255,0.26)" stroke-width="2"></rect>
+              <rect x="3" y="18" width="40" height="27" rx="7" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2"></rect>
+              <circle cx="12" cy="27" r="2.4" fill="rgba(255,255,255,0.42)"></circle>
+              <path d="m41 40-9-9-7 7-3.5-3.5L3 44" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+          <b>Photographier le texte</b>
+          <span>Plusieurs pages possibles — vous les remettrez dans l’ordre.</span>
+        </div>
+        <div class="doc-photos-liste" id="doc-photos-liste"></div>
+      </div>
+      <button type="button" class="btn ghost block doc-photo-plus" id="doc-photo-plus" style="display:none;">Ajouter une page</button>
+
+      <!-- L'anneau de l'IA plutôt qu'une étoile : le même signe que partout ailleurs
+           dans l'app, et il devient une coche quand c'est fini. -->
+      <button class="btn block doc-generer" style="margin-top:14px;" id="doc-generer" disabled="">
+        <span class="ia-fig m"><span class="lum"></span></span>
+        <span class="ia-coche">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg>
+        </span>
+        <span id="doc-generer-txt">Générer les étapes</span>
+      </button>
+      <div class="error-msg" id="doc-erreur"></div>
+    </div>
+
+    <div class="card" id="doc-attente-card" style="display:none; text-align:center; padding:28px 20px;">
+      <div class="ia-fig g" style="margin:0 auto 18px;">
+        <span class="halo"></span><span class="lum"></span>
+      </div>
+      <!-- « L'IA lit votre document » décrivait la machine. On dit plutôt ce
+           qu'on obtient, et ce qu'on en fera : une procédure, qu'on relira. -->
+      <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;">Votre procédure s’écrit</div>
+      <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;">
+        Vous relirez chaque étape avant de publier.
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="p-create-ai">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Partez d’une vidéo</h1>
+    </div>
+    <div class="subhead">L’IA en tirera des étapes, que vous relirez.</div>
+
+    <div class="card" id="ai-upload-card">
+    <!-- Deux usages, deux traitements. Le libellé ne parle pas de réglage
+         technique : la personne sait ce qu'elle a filmé, pas ce qu'Azure doit
+         en faire. -->
+    <div class="ia-ecoute">
+          <div class="tt">Ce que l’IA analyse</div>
+          <div class="lg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><line x1="12" y1="18" x2="12" y2="21.5"></line></svg>
+            <span><b>Vos paroles</b> — ce que vous expliquez pendant chaque geste</span>
+          </div>
+          <div class="lg">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg>
+            <span><b>Ce qui est visible</b> — objets, personnes, texte à l’écran</span>
+          </div></div>
+
+      
+      <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
+           l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
+           montage, et c'est le plus propre des deux. -->
+      <div class="dv-depot">
+        <input type="file" id="ai-video-input" accept="video/*">
+        <div class="video-frame" id="ai-video-frame">
+          <video id="ai-video-player" style="display:none;" playsinline=""></video>
+          <span id="ai-video-placeholder" class="dv-vide">
+              <span class="ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"></rect><path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" stroke="none"></path></svg>
+              </span>
+              <span class="t">Ajoutez votre vidéo</span>
+              <span class="s">Filmez la tâche en expliquant à voix haute.<br>Dix minutes maximum · 45 Mo</span></span>
+        </div>
+      </div>
+      <button class="btn block doc-generer" style="margin-top:14px;" id="ai-launch-btn" disabled=""><span class="ia-fig m"><span class="lum"></span></span>
+        <span class="ia-coche"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle><polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></span>
+        <span>Générer les étapes</span></button>
+      <div class="error-msg" id="ai-error"></div>
+      <div class="ai-detail" id="ai-detail" style="display:none;">
+        <div class="t">Détail technique</div>
+        <pre id="ai-detail-texte"></pre>
+        <button type="button" class="btn small ghost block" id="ai-copier">Copier ce détail</button>
+      </div>
+    </div>
+
+    <div class="card" id="ai-progress-card" style="display:none; text-align:center; padding:28px 20px;">
+      <div class="ia-fig g" style="margin:0 auto 18px;">
+        <span class="halo"></span><span class="lum"></span>
+        <span class="pct" id="ai-progress-pct">0%</span>
+      </div>
+      <!-- Même présentation que la carte du document : un titre de 19 px, une
+           phrase de 13 en dessous. Deux écrans qui font attendre pour la même
+           raison ne doivent pas se présenter différemment. -->
+      <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Votre procédure s’écrit</div>
+      <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub">L'analyse tourne sur nos serveurs. <b style="color:#fff;">Vous pouvez quitter cette page</b> — la procédure apparaîtra dans votre liste dès qu'elle sera prête.</div>
+      <button type="button" class="btn ghost block" id="ai-annuler" style="margin-top:18px; color:var(--red);">Abandonner et supprimer</button>
+    </div>
+
+    <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
+      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFini)" stroke-width="1.6"></circle><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFini)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"></path></g></svg></div>
+      <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
+      <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
+      <button class="btn block" id="ai-view-btn">Voir la procédure</button>
+    </div>
+  </div>
+
+  <div class="screen" id="p-edit-procedure">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="edit-titre-header">Modifier</h1>
+    </div>
+    <div class="subhead" id="edit-subhead">Vérifiez et ajustez avant de continuer</div>
+
+    <!-- Catégorie avant Titre, et les mêmes champs qu'à la création. Deux écrans
+         qui demandent la même chose doivent la demander pareil : sinon on croit
+         remplir autre chose. -->
+    <div class="card">
+      <label class="f">Catégorie</label>
+      <input type="text" id="edit-categorie" placeholder="Ex : Cuisine">
+      <div style="margin-top:12px;">
+        <label class="f">Titre</label>
+        <input type="text" id="edit-titre" placeholder="Ex : Fermeture de caisse">
+      </div>
+    </div>
+
+    <div class="video-frame" id="edit-video-frame" style="display:none; margin-bottom:14px;">
+      <video id="edit-video-player" playsinline="" webkit-playsinline=""></video>
+    </div>
+
+    <div class="capcut-wrap" id="ecap-wrap" style="display:none; margin-bottom:16px;">
+      <!-- Mêmes commandes que l'écran de découpe : la barre native de Safari
+           n'affichait ni la position en clair ni la durée, et elle ne se
+           coordonnait pas avec la frise. -->
+      <div class="capcut-controls">
+        <button class="capcut-play-btn" id="ecap-play-btn">
+          <svg id="ecap-play-icon" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+          <svg id="ecap-pause-icon" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="5" y="3" width="5" height="18" rx="1"></rect><rect x="14" y="3" width="5" height="18" rx="1"></rect></svg>
+        </button>
+        <span class="capcut-current-time" id="ecap-current-time">0:00</span>
+        <span class="capcut-duration-sep">/</span>
+        <span class="capcut-duration" id="ecap-duration">0:00</span>
+      </div>
+      <div class="frise-fenetre" id="ecap-fenetre"><div class="capcut-timeline" id="ecap-timeline">
+        <div class="capcut-track" id="ecap-track"></div>
+        <div class="capcut-markers" id="ecap-markers"></div>
+        <div class="clip-mask" id="ecap-mask-l"></div>
+        <div class="clip-mask" id="ecap-mask-r"></div>
+        <div class="clip-sel" id="ecap-sel"></div>
+        <div class="clip-handle" id="ecap-h-start"><div class="grip"></div></div>
+        <div class="clip-handle" id="ecap-h-end"><div class="grip"></div></div>
+        <div class="capcut-playhead" id="ecap-playhead"><div class="capcut-playhead-handle"></div></div>
+      </div></div>
+      <div class="zoom-frise">
+        <button type="button" class="zoom-btn" id="ecap-zoom-moins" aria-label="Dezoomer">−</button>
+        <span class="zoom-val" id="ecap-zoom-val">x1</span>
+        <button type="button" class="zoom-btn" id="ecap-zoom-plus" aria-label="Zoomer">+</button>
+        <button type="button" class="zoom-lien" id="ecap-lien">Étapes liées</button>
+      </div>
+      <div class="clip-info" id="ecap-info" style="display:none;"></div>
+      <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
+      <div class="cut-toolbar">
+        <button type="button" class="btn small block" id="ecap-add-btn">+ Découper une étape ici</button>
+      </div>
+        <div class="ed-bornes" id="ecap-bornes">
+          <button type="button" class="ed-borne actif" data-borne="a"><span class="k">Début</span><span class="v" id="ecap-vd">0:00,0</span></button>
+          <span class="ed-fleche">→</span>
+          <button type="button" class="ed-borne" data-borne="b"><span class="k">Fin</span><span class="v" id="ecap-vf">0:00,0</span></button>
+        </div>
+        <div class="ed-loupe-bloc" id="ecap-loupe-bloc">
+          <div class="ed-loupe-titre">Loupe · <span id="ecap-loupe-fen">± 4 s</span></div>
+          <div class="ed-loupe" id="ecap-loupe">
+            <div class="bande" id="ecap-loupe-bande"></div>
+            <div class="zone" id="ecap-loupe-zone"></div>
+            <div class="axe"></div>
+          </div>
+          <div class="ed-aide">Faites glisser pour affiner au dixième de seconde</div>
+        </div>
+      <div class="clip-tools" id="ecap-tools">
+        <button type="button" class="clip-tool" id="ecap-set-start"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="4" x2="5" y2="20"></line><polyline points="10 7 15 12 10 17"></polyline><line x1="19" y1="12" x2="15" y2="12"></line></svg><span>Début ici</span></button>
+        <button type="button" class="clip-tool" id="ecap-set-end"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="4" x2="19" y2="20"></line><polyline points="14 7 9 12 14 17"></polyline><line x1="5" y1="12" x2="9" y2="12"></line></svg><span>Fin ici</span></button>
+        <button type="button" class="clip-tool" id="ecap-split"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.6"></circle><circle cx="6" cy="18" r="2.6"></circle><line x1="20" y1="4" x2="8.1" y2="15.9"></line><line x1="14.5" y1="14.5" x2="20" y2="20"></line><line x1="8.1" y1="8.1" x2="12" y2="12"></line></svg><span>Diviser</span></button>
+        <button type="button" class="clip-tool" id="ecap-undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg><span>Annuler</span></button>
+          <button type="button" class="clip-tool" id="ecap-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg><span>Lire</span></button>
+      </div>
+            <button type="button" class="btn ghost clip-done-btn" id="ecap-done">Terminer le réglage</button>
+        <div class="ed-couv" id="ecap-couv"></div>
+        <div class="ed-legende" id="ecap-legende">
+          <span><i style="background:var(--green)"></i>couvert</span>
+          <span><i style="background:rgba(255,255,255,.12)"></i>trou</span>
+          <span><i style="background:var(--red)"></i>chevauchement</span>
+        </div>
+        <div class="ed-alertes" id="ecap-alertes"></div>
+    </div>
+
+    <div class="section-title">Étapes</div>
+<!-- La même zone de dépôt qu'à la création : pointillés quand elle est
+         vide, aperçu quand elle est remplie. La rangée avec sa vignette carrée
+         appartenait à une version précédente de l'écran. -->
+    <div class="couv couv-depot" id="couv-edit">
+      <input type="file" accept="image/*" class="fichier">
+      <span class="vign">
+        <svg viewBox="0 0 40 34" fill="none">
+          <rect x="9" y="2" width="22" height="14" rx="4" stroke="rgba(255,255,255,0.16)" stroke-width="1.8"></rect>
+          <rect x="2.5" y="7.5" width="35" height="24" rx="6" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.40)" stroke-width="1.8"></rect>
+          <circle cx="11" cy="15" r="2.2" fill="rgba(255,255,255,0.40)"></circle>
+          <path d="m36 28-8-8-6 6-3-3-16 8" stroke="rgba(255,255,255,0.40)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </span>
+      <span class="tx">
+        <span class="t">Ajouter une photo</span>
+        <span class="s">Elle apparaît sur sa carte et en tête de la fiche. Facultative.</span>
+      </span>
+      <button type="button" class="oter" style="display:none;">Retirer</button>
+    </div>
+
+    <!-- Ce que l'IA a fait, et ce qu'on attend du gérant. Elle ne dit pas
+         « c'est prêt » mais « relisez » : c'est lui qui connaît son métier. -->
+    <div class="bande-ia" id="edit-bande-ia" style="display:none;">
+      <span class="ia-fig s"><span class="lum"></span></span>
+      <span id="edit-bande-txt">—</span>
+    </div>
+
+    <div class="man-fil" id="edit-steps-list"></div>
+    <button class="btn ghost block" style="margin-top:6px;" id="edit-add-step-btn">+ Ajouter une étape</button>
+
+    <!-- Annuler la dernière manipulation, comme à la création. Il n'y en avait
+         aucune ici : `ecap-undo` appartient au découpage vidéo et ne touche pas
+         aux étapes. -->
+    <button type="button" class="btn ghost block man-annuler-geste" style="margin-top:30px;" id="edit-defaire" disabled="" aria-label="Annuler la dernière action">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"></path><path d="M3.5 13a9 9 0 1 0 2.3-9.3L3 7"></path></svg>
+    </button>
+
+    <div class="error-msg" id="edit-error"></div>
+    <button class="btn block" style="margin-top:18px;" id="edit-save-btn">Enregistrer les modifications</button>
+  </div>
+
+  <div class="screen" id="p-analyse">
+    <div class="detail-header" style="align-items:flex-start;">
+      <button class="back-btn" onclick="showGestionScreen('p-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px; flex:1; min-width:0; white-space:normal; word-break:break-word;" id="analyse-titre">—</h1>
+      <button class="back-btn" id="analyse-edit-btn" style="flex-shrink:0;" aria-label="Modifier">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+      </button>
+      <button class="back-btn" id="analyse-delete-btn" style="flex-shrink:0;" aria-label="Supprimer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FF453A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      </button>
+    </div>
+    <div class="subhead titre-cat" id="analyse-subhead">—</div>
+
+    
+    <div class="analyse-couv" id="analyse-couverture" style="display:none;"></div>
+    <div class="video-frame" id="analyse-video-frame" style="display:none; margin-bottom:16px;">
+      <video id="analyse-video" controls="" playsinline="" webkit-playsinline=""></video>
+    </div>
+
+    <div class="section-title">Étapes de la procédure</div>
+    <div id="analyse-steps-list"></div>
+
+    <div class="section-title">Code d'accès rapide</div>
+    <div class="card qr-card">
+      <div class="qr-plaque">
+        <div class="qr-frame">
+          <span class="qr-corner tl"></span><span class="qr-corner tr"></span>
+          <span class="qr-corner bl"></span><span class="qr-corner br"></span>
+          <div class="qr-visual" id="qr-container"></div>
+        </div>
+        <div class="qr-plaque-title" id="qr-plaque-title">—</div>
+        <div class="qr-plaque-sub">Scannez pour ouvrir la procédure</div>
+        <div class="qr-plaque-mark">
+          <svg viewBox="0 0 85 100" fill="none"><path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#0C0D0E"></path></svg>
+          <span>Procédo</span>
+        </div>
+      </div>
+      <div class="qr-hint">À imprimer et afficher sur le poste de travail</div>
+      <button class="btn block" id="qr-download-btn">Télécharger la fiche</button>
+    </div>
+
+    <div class="section-title">Employés</div>
+    <div id="analyse-emp-list"></div>
+
+  </div>
+
+  <!-- Analyse générale du compte -->
+  <div class="screen" id="p-global-analyse">
+    <!-- Ni titre ni sous-titre : l'onglet du bas dit déjà « Analyse », et la carte
+         du temps ouvre la page. Deux lignes de moins à lire pour rien. -->
+
+    <!-- Le temps gagné : la seule chose de cette page qui réponde à
+         « pourquoi je paie cet abonnement ». -->
+    <div class="accueil an-gain" id="an-gain">
+      <!-- L'explication du comptage vit désormais ici, et ici seulement. Trois
+           boutons identiques sur trois sections voisines donnaient à croire
+           qu'ils disaient trois choses différentes. -->
+      <div class="accueil-texte">
+        <div class="gain-ligne">
+          <div class="t" id="an-gain-t">—</div>
+          <button type="button" class="an-aide gain-aide" data-aide-temps="" aria-label="Comment le temps est compté">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>
+      </button>
+        </div>
+        <div class="s" id="an-gain-s">—</div>
+      </div>
+    </div>
+
+    <!-- L'équipe passe en dernier. Les deux premières sections disent où part le
+         temps ; celle-ci dit qui le passe. On regarde d'abord ce qui occupe, ensuite
+         seulement qui s'en occupe — et une liste de noms placée en tête donnait à
+         la page un air de contrôle. -->
+    <div class="an-bloc">
+      <div class="an-tete">
+        <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><path d="M2.5 7.5A2.5 2.5 0 0 1 5 5h4.5l2 2.6H21a2.5 2.5 0 0 1 2.5 2.5v8.4A2.5 2.5 0 0 1 21 21H5a2.5 2.5 0 0 1-2.5-2.5Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linejoin="round"></path><line x1="2.5" y1="11.4" x2="23.5" y2="11.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.4"></line></svg></span>
+        <b>Catégories</b>
+      </div>
+      <div id="ga-top-categories"></div>
+    </div>
+
+    <div class="an-bloc">
+      <div class="an-tete">
+        <span class="an-ic">
+          <!-- Le document de la barre du bas, en profondeur comme les autres
+               icônes de section : une horloge disait le temps, pas l'objet. -->
+          <svg viewBox="0 0 26 24" fill="none">
+            <path d="M9 1.5h6.5L21 7v10a2.4 2.4 0 0 1-2.4 2.4h-1.2" stroke="rgba(255,255,255,0.20)" stroke-width="1.5" stroke-linejoin="round"></path>
+            <path d="M5.5 4.5h6.6L18 10v9.6a2.4 2.4 0 0 1-2.4 2.4H7.9a2.4 2.4 0 0 1-2.4-2.4Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linejoin="round"></path>
+            <path d="M12.1 4.5V10H18" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linejoin="round"></path>
+            <line x1="9" y1="14" x2="14.5" y2="14" stroke="rgba(255,255,255,0.42)" stroke-width="1.5" stroke-linecap="round"></line>
+            <line x1="9" y1="17.4" x2="12.6" y2="17.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.5" stroke-linecap="round"></line>
+          </svg>
+        </span>
+        <b>Procédures</b>
+      </div>
+      <div id="ga-late-list"></div>
+    </div>
+
+    <div class="an-bloc">
+      <div class="an-tete">
+        <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="rgba(255,255,255,0.26)" stroke-width="1.5"></circle><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="rgba(255,255,255,0.26)" stroke-width="1.5" stroke-linecap="round"></path><circle cx="9.5" cy="7" r="4.2" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"></circle><path d="M3 19.5a6.5 6.5 0 0 1 13 0" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6" stroke-linecap="round"></path></svg></span>
+        <b>Équipe</b>
+              </div>
+      <div id="ga-top-membres"></div>
+    </div>
+  </div>
+
+  <!-- La fiche d'un membre -->
+  <div class="screen" id="p-an-equipe">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Équipe</h1>
+    </div>
+
+    <!-- Une page qui s'ouvre sur une liste nue ne dit pas ce qu'on peut y faire.
+         Deux lignes suffisent à l'apprendre, et on ne les relit pas. -->
+    <div class="an-intro">
+      <div class="t" id="an-eq-titre">—</div>
+      <div class="s" id="an-eq-sous">—</div>
+    </div>
+
+    <!-- Le compte et le filtre sur une seule ligne : ils disent la même chose —
+         de qui parle-t-on, et sur quelle période. Les séparer faisait deux
+         rangées pour une seule idée.
+
+         Le tri a été retiré : trois façons d'ordonner cinq personnes, c'est un
+         choix à faire avant de lire. -->
+    <div class="an-rangee">
+      <span class="an-compte" id="p-an-equipe-compte">—</span>
+      <div class="dd-filter an-periode-dd">
+        <button type="button" class="dd-trigger" data-an-trigger="">
+          <span data-an-label="">Ce mois</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="dd-menu" data-an-menu="">
+          <button type="button" class="selected" data-an-periode="month">Ce mois</button>
+          <button type="button" data-an-periode="all">Total</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="an-equipe-liste" style="margin-top:12px;"></div>
+  </div>
+
+  <div class="screen" id="p-an-categories">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Catégories</h1>
+    </div>
+
+        <!-- Deux panneaux côte à côte, comme la page des procédures : le mois en
+         cours, puis depuis le début. Le déroulant a été retiré — on glisse. -->
+    <div class="fm-piste" id="an-piste-cat">
+      <section class="fm-pan" data-periode="month">
+        <div class="fm-segm"><div class="svg" id="an-anneau-cat-month"></div></div>
+        <div class="fm-titre">Où part le temps</div>
+        <div id="an-top-cat-month"></div>
+      </section>
+      <section class="fm-pan" data-periode="all">
+        <div class="fm-segm"><div class="svg" id="an-anneau-cat-all"></div></div>
+        <div class="fm-titre">Où part le temps</div>
+        <div id="an-top-cat-all"></div>
+      </section>
+    </div>
+
+    <div class="fm-barre" id="an-barre-cat">
+      <button type="button" data-va="month" aria-label="Ce mois-ci"><span></span></button>
+      <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
+    </div>
+    <div class="fm-periode-mot" id="an-mot-cat">Ce mois-ci</div>
+  </div>
+
+  <div class="screen" id="p-an-temps">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-global-analyse')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Procédures</h1>
+    </div>
+
+        <!-- Deux panneaux côte à côte, comme la fiche d'un membre : le mois en cours,
+         puis depuis le début. Le déroulant a été retiré — on glisse. Le défilement
+         horizontal natif s'occupe de l'animation : on voit les deux pendant le
+         geste, ça s'aimante à l'arrivée, et l'inertie est celle du système. -->
+    <div class="fm-piste" id="an-piste-proc">
+      <section class="fm-pan" data-periode="month">
+        <div class="fm-segm"><div class="svg" id="an-anneau-proc-month"></div></div>
+        <div class="fm-titre">Ce qui occupe le plus</div>
+        <div id="an-top-proc-month"></div>
+      </section>
+      <section class="fm-pan" data-periode="all">
+        <div class="fm-segm"><div class="svg" id="an-anneau-proc-all"></div></div>
+        <div class="fm-titre">Ce qui occupe le plus</div>
+        <div id="an-top-proc-all"></div>
+      </section>
+    </div>
+
+    <div class="fm-barre" id="an-barre-proc">
+      <button type="button" data-va="month" aria-label="Ce mois-ci"><span></span></button>
+      <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
+    </div>
+    <div class="fm-periode-mot" id="an-mot-proc">Ce mois-ci</div>
+  </div>
+
+  <!-- Le même écran que dans l'espace équipe. Il faut son jumeau ici : les deux
+       espaces sont deux conteneurs distincts, et `showGestionScreen` ne trouve
+       pas un écran qui vit dans l'autre — d'où la page vide. -->
+  <div class="screen" id="p-reg-appareils">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos appareils</h1>
+    </div>
+    <div id="p-app-liste" style="margin-top:14px;"></div>
+    <div class="reg-note">Un compte peut être utilisé sur trois appareils. Au-delà, le plus ancien est déconnecté. Retirez un appareil pour en libérer la place.</div>
+    <div class="reg-note" style="margin-top:10px;">Chaque personne de l'équipe devrait avoir son propre compte : c'est ce qui permet de savoir qui a lu quoi, et c'est compris dans votre abonnement.</div>
+  </div>
+
+  <div class="screen" id="p-membre">
+    <div class="detail-header">
+      <button class="back-btn" onclick="ouvrirAnEquipe()" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <!-- Le nom et le poste sur une même ligne, séparés d'un point. Le poste
+           n'est pas un badge : c'est la suite du nom, pas une étiquette qu'on
+           lui accroche. -->
+      <h1 class="pagehead fm-nom-ligne" style="margin:0; font-size:20px;">
+        <span id="fm-nom">—</span><span class="poste" id="fm-poste"></span>
+      </h1>
+    </div>
+
+    <!-- Deux panneaux côte à côte : le mois en cours, puis depuis le début. On
+         passe de l'un à l'autre en glissant. Le défilement horizontal natif
+         s'occupe de tout — on voit les deux pendant le geste, ça s'aimante à
+         l'arrivée, et l'inertie du doigt est celle du système. Écrire cette
+         animation à la main donnerait toujours quelque chose de moins fluide.
+
+         L'anneau segmenté : une part par procédure, proportionnelle au temps.
+         Toucher une ligne pâlit les autres et affiche celle-là seule. -->
+    <div class="fm-piste" id="fm-piste">
+      <section class="fm-pan" data-periode="month">
+        <div class="fm-segm"><div class="svg" id="fm-anneau-month"></div></div>
+        <div class="fm-titre">Ce qui a occupé son temps</div>
+        <div id="fm-top-month"></div>
+      </section>
+      <section class="fm-pan" data-periode="all">
+        <div class="fm-segm"><div class="svg" id="fm-anneau-all"></div></div>
+        <div class="fm-titre">Ce qui a occupé son temps</div>
+        <div id="fm-top-all"></div>
+      </section>
+    </div>
+
+    <!-- La barre de position. Elle dit qu'il y a une seconde page — sans elle,
+         personne ne devine qu'on peut glisser. -->
+    <div class="fm-barre" id="fm-barre">
+      <button type="button" data-va="month" aria-label="Ce mois-ci"><span></span></button>
+      <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
+    </div>
+    <div class="fm-periode-mot" id="fm-periode-mot">Ce mois-ci</div>
+
+    <div class="fm-titre">Activité</div>
+    <!-- Les quatre repères sur le même modèle : une icône, un intitulé, une
+         valeur à droite. Deux grandes cases pour deux nombres cassaient la
+         lecture d'une liste qui, en dessous, disait la même chose autrement. -->
+    <div class="fm-rep">
+      <!-- Les deux compteurs de consultations ont été retirés : l'anneau et le
+           classement disent déjà combien de fois chaque procédure a été ouverte,
+           ligne par ligne. Un total isolé n'apprenait rien de plus. -->
+            <div class="l">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg></span>
+        <span class="nm">Dernière consultation</span><span class="vl" id="fm-derniere">—</span>
+      </div>
+      <div class="l">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"></rect><line x1="3.5" y1="9.5" x2="20.5" y2="9.5"></line><line x1="8" y1="3" x2="8" y2="6.5"></line><line x1="16" y1="3" x2="16" y2="6.5"></line></svg></span>
+        <span class="nm">Dans l’équipe depuis</span><span class="vl" id="fm-arrivee">—</span>
+      </div>
+    </div>
+
+    <!-- « Passer en gestion » et « Retirer de l'équipe » ont été retirés : une
+         fiche qui décrit quelqu'un ne devrait pas porter le bouton qui l'exclut.
+         Ces deux gestes vivent dans Paramètres → Équipe, là où l'on va quand on
+         veut administrer, pas quand on veut comprendre. -->
+  </div>
+
+  <div class="screen" id="p-scan">
+    <!-- Le titre et la consigne vivent DANS l'image, en bas. Les avoir aussi
+         au-dessus les affichait deux fois. -->
+    <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
+         arrondi, une cible qui éclaircit la zone utile, et un rayon qui la
+         balaie pour dire que ça cherche. Un viseur immobile laisse croire que
+         l'app a gelé. -->
+    <div class="scan-vue">
+      <video id="g-scan-video" autoplay="" playsinline="" muted=""></video>
+      <div class="scan-cible">
+        <span class="c tl"></span><span class="c tr"></span>
+        <span class="c bl"></span><span class="c br"></span>
+      </div>
+
+      <!-- Le titre et la consigne au BAS de l'image : en haut, ils se posaient
+           sur ce qu'on cherche à cadrer. -->
+      <div class="scan-mot">
+        <b>Scanner un code</b>
+        <span id="g-scan-hint">Visez le QR code</span>
+      </div>
+
+      <div class="scan-outils">
+        <!-- La caméra à gauche, la lampe à droite : deux commandes du même objet,
+             posées aux deux coins de l'image qu'elles pilotent. -->
+        <button type="button" class="scan-cam" aria-label="Éteindre la caméra">
+          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.4"></circle></svg>
+          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><line x1="3" y1="3" x2="21" y2="21"></line></svg>
+        </button>
+        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
+      </div>
+    </div>
+    <div id="g-scan-result-zone"></div>
+  </div>
+
+  <!-- Les offres, présentées comme un accueil -->
+  <div class="screen" id="p-abonnement">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Abonnement</h1>
+    </div>
+
+    <div class="abo-scene">
+      <div class="abo-halo"></div>
+      <div class="abo-hi">
+        <h2 id="abo-titre">—</h2>
+        <p id="abo-sous">—</p>
+      </div>
+      <div id="abo-vedette"></div>
+      <div class="abo-conf">
+        <span>✓ Sans engagement</span>
+        <span>✓ 14 jours d'essai</span>
+        <span>✓ Sans carte</span>
+      </div>
+      <div class="abo-egal">Toutes les offres donnent accès à <b>tout</b>.
+        Seule la taille de l'équipe change le prix.</div>
+      <button type="button" class="btn ghost block" id="abo-autres" style="margin-top:10px;">Voir les autres offres</button>
+      <div id="abo-liste"></div>
+    </div>
+
+    <div class="note" style="text-align:center; margin-top:16px;">
+      Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.
+    </div>
+  </div>
+
+  <div class="screen" id="p-settings">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-list')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+    </div>
+
+    <div class="alerte-partage" id="alerte-partage" style="display:none;">
+      <div class="tete">
+        <span class="pic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.6 21.4 20H2.6Z"></path><line x1="12" y1="9.6" x2="12" y2="14"></line><circle cx="12" cy="17" r="0.6" fill="#FF9F0A"></circle>
+          </svg>
+        </span>
+        <span class="tx"><b>Un compte est partagé</b><i id="alerte-detail">—</i></span>
+      </div>
+      <div class="s">Procédo compte les lectures par personne. Tant que plusieurs employés
+        utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.</div>
+      <div class="actions">
+        <button type="button" class="principal" id="alerte-equipe">Voir l'équipe</button>
+        <button type="button" class="secondaire" id="alerte-classer">Ignorer</button>
+      </div>
+    </div>
+
+    <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
+      <span class="av" id="reg-initiales">—</span>
+      <span class="tx">
+        <span class="nm" id="reg-nom">—</span>
+        <span class="st" id="reg-email">—</span>
+      </span>
+      <span class="fl">›</span>
+    </button>
+
+    <div class="reg-titre">Votre entreprise</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="openMembres()">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Équipe</span>
+        <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
+      </button>
+        <!-- Le filet du groupe : le même que partout ailleurs. -->
+        <div class="reg-filet"></div>
+        <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></line></svg></span>
+          <span class="reg-nm">Les postes</span>
+          <span class="reg-fl">›</span>
+        </button>
+      <div class="reg-filet"></div>
+      <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-code')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect><rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></rect><rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></rect><path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Code d'invitation</span>
+        <span class="reg-val mono" id="reg-code-val">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet" id="reg-filet-etabs" style="display:none;"></div>
+      <button type="button" class="reg-ligne" id="reg-ligne-etabs" style="display:none;" onclick="showGestionScreen('p-reg-etabs')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></rect><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></rect><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect></svg></span><span class="reg-nm">Établissements</span>
+        <span class="reg-val" id="reg-nb-etabs">—</span><span class="fl">›</span>
+      </button>
+    </div>
+
+    <div class="reg-titre">Abonnement</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" id="ouvrir-abonnement">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
+        <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
+      </button>
+    </div>
+
+    <div class="reg-titre">Préférences</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
+        <span class="reg-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect>
+            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"></line>
+          </svg>
+        </span>
+        <span class="reg-nm">Vos appareils</span>
+        <span class="reg-val" id="p-nb-appareils">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet"></div>
+      <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-langue')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></circle><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></ellipse><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"></line><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"></line></svg></span><span class="reg-nm">Langue</span>
+        <span class="reg-val" id="reg-langue-val">Français</span><span class="fl">›</span>
+      </button>
+    </div>
+
+    <div class="reg-titre">Une question ?</div>
+    <div class="accueil contact-carte" role="button" tabindex="0" id="contact-gestion">
+      <div class="accueil-texte">
+        <div class="t">Écrivez-nous</div>
+        <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+
+    <div class="reg-titre">Compte</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne danger" id="logout-btn">
+        <span class="reg-nm">Se déconnecter</span>
+      </button>
+    </div>
+
+    <div class="reg-version">Procédo · version 2026-08-06 · 19h</div>
+  </div>
+
+  <!-- Sous-page : le compte -->
+  <div class="screen" id="p-reg-poste">
+    <div class="detail-header">
+      <button class="back-btn" id="poste-retour" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre poste</h1>
+    </div>
+    <div class="an-intro">
+      <div class="t">Quel est votre rôle ici ?</div>
+      <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
+    </div>
+    <div id="mon-poste-liste" style="margin-top:14px;"></div>
+    <div class="reg-note" id="mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
+  </div>
+
+  <div class="screen" id="p-reg-compte">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre compte</h1>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <label class="f">Nom complet</label>
+      <input type="text" id="settings-nom" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="settings-email" disabled="" style="opacity:0.6;">
+      <button class="btn block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
+      <div class="error-msg" id="settings-error"></div>
+    </div>
+    <div class="reg-note">Votre nom apparaît dans l'équipe et sur les procédures que vous publiez. L'adresse ne peut pas être modifiée ici.</div>
+  </div>
+
+  <!-- Sous-page : le code d'invitation -->
+  <div class="screen" id="p-reg-code">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Code d'invitation</h1>
+    </div>
+    <div class="card" style="text-align:center; margin-top:14px;">
+      <div id="settings-code" style="font-size:38px; font-weight:850; letter-spacing:0.28em; margin:10px 0 16px;">—</div>
+      <button class="btn block" id="copy-code-btn">Copier le code</button>
+    </div>
+    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder aux procédures. Il ne donne aucun droit de modification.</div>
+  </div>
+
+  <!-- Sous-page : les établissements -->
+  <!-- Les postes de l'entreprise. Une liste fermée plutôt qu'un champ libre :
+       « serveur », « Serveur », « serveuse » et « svr » rendraient toute
+       analyse par poste inexploitable. -->
+  <div class="screen" id="p-reg-postes">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Les postes</h1>
+    </div>
+
+    <div class="an-intro">
+      <div class="t">Qui fait quoi dans l'entreprise</div>
+      <div class="s">Définissez les postes de votre établissement. Chaque membre choisira le sien.</div>
+    </div>
+
+    <!-- La saisie passe AU-DESSUS de la liste : on vient sur cette page pour
+         ajouter, pas pour relire. Ce qu'on cherche doit être sous le pouce dès
+         l'ouverture, sans faire défiler une liste qui s'allonge. -->
+    <div class="poste-saisie">
+      <div class="search-bar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <input type="text" id="poste-nouveau" placeholder="Ex : Serveur">
+      </div>
+      <button type="button" class="poste-ajouter" id="poste-ajouter">Ajouter</button>
+    </div>
+    <div class="error-msg" id="poste-erreur"></div>
+
+    <div id="postes-liste" style="margin-top:16px;"></div>
+  </div>
+
+  <div class="screen" id="p-reg-etabs">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Établissements</h1>
+    </div>
+    <div style="margin-top:14px;" id="etab-liste"></div>
+    <div class="reg-note" id="etab-section-note">
+      Touchez un établissement pour changer son nom ou déposer son logo.
+      Sans logo, ce sont ses initiales qui s'affichent dans la barre du haut.
+    </div>
+  </div>
+
+  <!-- Sous-page : la langue -->
+  <div class="screen" id="p-reg-langue">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Langue</h1>
+    </div>
+    <div class="langue-grille" id="langue-app-gestion" style="margin-top:14px;"></div>
+    <div class="reg-note">La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.</div>
+  </div>
+
+  <div class="screen" id="etab-section-titre" style="display:none;"></div>
+</div>
+
+<!-- Aucune entreprise rattachée à ce compte -->
+<div class="fond-promu" id="fond-orphelin">
+  <div class="fen-promu" role="dialog" aria-modal="true">
+    <div class="accueil promu-carte">
+      <div class="accueil-texte">
+        <div class="t" id="orph-titre">Aucune entreprise</div>
+        <div class="s" id="orph-texte">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 5 chiffres
+          que votre responsable vous a communiqué.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" placeholder="00000" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
+    <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
+    <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
+    <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
+    <button type="button" class="btn ghost block" id="orph-annuler" style="margin-top:6px; display:none;">Annuler</button>
+  </div>
+</div>
+
+<!-- Changement de rôle : même forme que la carte d'accueil -->
+<div class="fond-promu" id="fond-promu">
+  <div class="fen-promu" role="dialog" aria-modal="true">
+    <div class="accueil promu-carte">
+      <div class="accueil-texte">
+        <div class="t" id="promu-titre">—</div>
+        <div class="s" id="promu-texte">—</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+    <button type="button" class="btn block" id="promu-entrer" style="margin-top:14px;">—</button>
+    <div class="avert" id="promu-avert">—</div>
+  </div>
+</div>
+
+  
+
+
+
+<!-- ═══════════════ ESPACE ÉQUIPE ═══════════════ -->
+<div class="app" id="equipe-app" style="display:none;">
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="tiroir-ent" id="tiroir-ent-eq">
+        <span class="tiroir-liste" id="tiroir-liste-eq"></span>
+      </div>
+      <div class="topbar-card">
+      <div class="topbar-left">
+        <div class="logo-pill">
+          <div class="boot-logo boot-logo--topbar" id="topbar-logo-equipe">
+            <svg viewBox="0 0 85 100" fill="none">
+              <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"></path>
+            </svg>
+          </div>
+        </div>
+        <div class="topbar-title">
+          <span class="name">Procédo</span>
+          <span class="role">Espace Équipe</span>
+        </div>
+      </div>
+      </div>
+      <button class="icon-pill" onclick="openEquipeSettings()" aria-label="Paramètres">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="screen active" id="e-list">
+    <div class="accueil">
+      <div class="accueil-texte">
+        <div class="t" id="e-salut">Bonjour 👋</div>
+        <div class="s" id="e-mot">Chargement…</div>
+      </div>
+      <div class="accueil-av" id="e-avatar" role="button" aria-label="Contacter le support">
+        <span class="dispo"></span>
+      </div>
+    </div>
+
+    <div class="visiteur" id="e-visiteur" style="display:none;">
+      <div class="visiteur-tete">
+        <div class="visiteur-cadenas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"></rect><path d="M8 11V7.5a4 4 0 0 1 8 0V11"></path></svg>
+        </div>
+        <div class="visiteur-txt">
+          <div class="t" id="e-visiteur-titre">Les autres procédures ne vous sont pas accessibles</div>
+          <div class="s">Demandez le code de l'entreprise à votre responsable pour y accéder.</div>
+        </div>
+      </div>
+      <div class="visiteur-code">
+        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" placeholder="00000">
+        <button class="btn" id="e-visiteur-valider">Débloquer</button>
+      </div>
+      <div class="error-msg" id="e-visiteur-erreur"></div>
+    </div>
+
+    <div id="e-bloc-categories">
+      <div class="list-tools">
+        <div class="section-title" style="margin:0;">Catégories</div>
+      <div class="dd-filter" id="dd-e-cat-sort">
+        <button type="button" class="dd-trigger" id="dd-e-cat-sort-trigger">
+          <span id="dd-e-cat-sort-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="dd-menu" id="dd-e-cat-sort-menu">
+          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+          <button type="button" data-sort="reste" data-label="Trier : À lire d'abord">À lire d'abord</button>
+        </div>
+      </div>
+      </div>
+      <div class="cat-grid" id="e-cat-grid"></div>
+    </div>
+  </div>
+
+  <!-- Procédures d'une catégorie, côté équipe -->
+  <div class="screen" id="e-category">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-list', document.querySelector('#tabbar .tab-round'))">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" id="e-cat-titre" style="margin:0; font-size:20px;">Catégorie</h1>
+    </div>
+    <div class="subhead" id="e-cat-sous">—</div>
+
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="e-cat-recherche" placeholder="Rechercher une procédure...">
+    </div>
+
+      <div class="dd-filter" id="dd-e-proc-sort" style="margin-bottom:12px;">
+        <button type="button" class="dd-trigger" id="dd-e-proc-sort-trigger">
+          <span id="dd-e-proc-sort-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="dd-menu" id="dd-e-proc-sort-menu">
+          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+          <button type="button" data-sort="reste" data-label="Trier : À lire d'abord">À lire d'abord</button>
+        </div>
+      </div>
+
+    <div id="equipe-procedures-list"></div>
+  </div>
+
+  <div class="screen" id="e-detail">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-list')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="detail-titre">—</h1>
+    </div>
+    <div class="subhead titre-cat" id="detail-subhead">—</div>
+    <div class="analyse-couv" id="detail-couverture" style="display:none;"></div>
+    <div class="video-frame" id="detail-video-frame" style="display:none;">
+      <video id="detail-video" controls="" playsinline="" webkit-playsinline=""></video>
+    </div>
+    <!-- Le sélecteur de langue était seul au milieu d'un grand vide. Il rejoint la
+         ligne du titre des étapes : même place, aucun espace perdu, et la fiche
+         équipe prend la même forme que celle de la gestion. -->
+    <div class="section-title detail-etapes-tete">
+      <span>Étapes de la procédure</span>
+      <div class="tiroir-ent tiroir-langue" id="tiroir-langue">
+        <span class="tiroir-liste" id="tiroir-langue-liste"></span>
+      </div>
+    </div>
+    <div id="detail-steps"></div>
+    <div class="confirm-bar">
+      <div class="lecture-etat" id="lecture-etat">
+        <div class="lecture-anneau" id="lecture-anneau"></div>
+        <div class="lecture-txt">
+          <div class="t" id="lecture-titre">Lecture en cours</div>
+          <div class="s" id="lecture-sous">—</div>
+        </div>
+      </div>
+      <div class="error-msg" id="confirm-error"></div>
+    </div>
+  </div>
+
+  <!-- Mon activité : ce que l'employé a lu, et le temps qu'il y a passé -->
+  <div class="screen" id="e-settings">
+    <div class="pagehead-row">
+      <button class="back-btn" onclick="showEquipeScreen('e-list')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+    </div>
+
+    <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">
+      <span class="av" id="es-initiales">—</span>
+      <span class="tx">
+        <span class="nm" id="es-nom-affiche">—</span>
+        <span class="st" id="es-email-affiche">—</span>
+      </span>
+      <span class="fl">›</span>
+    </button>
+
+    <div class="reg-titre">Votre entreprise</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-entreprises')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></rect><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></rect><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect></svg></span><span class="reg-nm">Vos entreprises</span>
+        <span class="reg-val" id="es-nb-ent">—</span><span class="fl">›</span>
+      </button>
+        <button type="button" class="reg-ligne" onclick="ouvrirMonPoste()">
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></line></svg></span>
+          <span class="reg-nm">Votre poste</span>
+          <span class="reg-val" id="e-mon-poste">—</span>
+          <span class="reg-fl">›</span>
+        </button>
+    </div>
+
+    <div class="reg-titre">Préférences</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
+        <span class="reg-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></rect>
+            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"></line>
+          </svg>
+        </span>
+        <span class="reg-nm">Vos appareils</span>
+        <span class="reg-val" id="e-nb-appareils">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet"></div>
+      <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-langue')">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.7"></circle><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6"></ellipse><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"></line><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="rgba(255,255,255,0.32)" stroke-width="1.6" stroke-linecap="round"></line></svg></span><span class="reg-nm">Langue</span>
+        <span class="reg-val" id="es-langue-val">Français</span><span class="fl">›</span>
+      </button>
+    </div>
+
+    <div class="reg-titre">Une question ?</div>
+    <div class="accueil contact-carte" role="button" tabindex="0" id="contact-equipe">
+      <div class="accueil-texte">
+        <div class="t">Écrivez-nous</div>
+        <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
+      </div>
+      <div class="accueil-av"><span class="dispo"></span></div>
+    </div>
+
+    <div class="reg-titre">Compte</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne danger" onclick="signOut()">
+        <span class="reg-nm">Se déconnecter</span>
+      </button>
+    </div>
+
+    <div class="reg-version">Procédo · version 2026-08-06 · 19h</div>
+  </div>
+
+  <!-- Sous-page : le compte -->
+  <div class="screen" id="e-reg-compte">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre compte</h1>
+    </div>
+    <div class="card" style="margin-top:14px;">
+      <label class="f">Nom complet</label>
+      <input type="text" id="es-nom" style="margin-bottom:12px;">
+      <label class="f">E-mail</label>
+      <input type="text" id="es-email" disabled="" style="opacity:0.6;">
+      <button class="btn block" style="margin-top:14px;" id="es-save">Enregistrer</button>
+      <div class="error-msg" id="es-error"></div>
+    </div>
+    <div class="reg-note">Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.</div>
+  </div>
+
+  <!-- Sous-page : les entreprises -->
+  <div class="screen" id="e-reg-entreprises">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos entreprises</h1>
+    </div>
+
+    <div style="margin-top:14px;" id="es-entreprises"></div>
+
+    <div class="reg-groupe" style="margin-top:10px;">
+      <button type="button" class="reg-ligne" id="es-ajouter">
+        <span class="reg-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"></path>
+            <path d="M12 11.4v5.2M9.4 14h5.2" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linecap="round"></path>
+          </svg>
+        </span>
+        <span class="reg-nm">Créer une entreprise</span>
+        <span class="fl">›</span>
+      </button>
+    </div>
+    <div class="reg-note">Vous en serez responsable, et vous obtiendrez un code à partager à votre équipe. Pour rejoindre une entreprise existante, utilisez le code reçu à l'inscription.</div>
+
+    <!-- Conservés hors écran : la fenêtre de rattachement s'appuie dessus. -->
+    <input type="text" id="es-code" style="display:none;">
+    <button type="button" id="es-rejoindre" style="display:none;"></button>
+    <div class="error-msg" id="es-code-error" style="display:none;"></div>
+
+    <div class="reg-titre">Partir</div>
+    <div class="reg-groupe">
+      <button type="button" class="reg-ligne danger" id="es-quitter">
+        <span class="reg-nm">Quitter cette entreprise</span>
+      </button>
+    </div>
+    <div class="reg-note">Vous perdrez l'accès à ses procédures. Votre compte Procédo reste actif : vous pourrez en rejoindre une autre avec un nouveau code.</div>
+  </div>
+
+  <!-- Sous-page : les appareils -->
+  <!-- Le jumeau de `p-reg-poste`. Les deux espaces sont deux conteneurs
+       distincts : `showEquipeScreen` ne trouve pas un écran qui vit dans
+       l'autre, et la page s'ouvrait vide. -->
+  <div class="screen" id="e-reg-poste">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Votre poste</h1>
+    </div>
+    <div class="an-intro">
+      <div class="t">Quel est votre rôle ici ?</div>
+      <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
+    </div>
+    <div id="e-mon-poste-liste" style="margin-top:14px;"></div>
+    <div class="reg-note" id="e-mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
+  </div>
+
+  <div class="screen" id="reg-appareils">
+    <div class="detail-header">
+      <button class="back-btn" id="app-retour" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos appareils</h1>
+    </div>
+    <div id="app-liste" style="margin-top:14px;"></div>
+    <div class="reg-note">Un compte peut être utilisé sur trois appareils. Au-delà, le plus ancien est déconnecté. Retirez un appareil pour en libérer la place.</div>
+    <div class="reg-note" style="margin-top:10px;">Chaque personne de l'équipe devrait avoir son propre compte : c'est ce qui permet de savoir qui a lu quoi, et c'est compris dans votre abonnement.</div>
+  </div>
+
+  <!-- Sous-page : la langue -->
+  <div class="screen" id="e-reg-langue">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Langue</h1>
+    </div>
+    <div class="langue-grille" id="langue-app" style="margin-top:14px;"></div>
+    <div class="reg-note">La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.</div>
+  </div>
+
+  <div class="screen" id="e-scan">
+    <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
+         arrondi, une cible qui éclaircit la zone utile, et un rayon qui la
+         balaie pour dire que ça cherche. Un viseur immobile laisse croire que
+         l'app a gelé. -->
+    <div class="scan-vue">
+      <video id="scan-video" autoplay="" playsinline="" muted=""></video>
+      <div class="scan-cible">
+        <span class="c tl"></span><span class="c tr"></span>
+        <span class="c bl"></span><span class="c br"></span>
+      </div>
+
+      <!-- Le titre et la consigne au BAS de l'image : en haut, ils se posaient
+           sur ce qu'on cherche à cadrer. -->
+      <div class="scan-mot">
+        <b>Scanner un code</b>
+        <span id="scan-hint">Visez le QR code</span>
+      </div>
+
+      <div class="scan-outils">
+        <!-- La caméra à gauche, la lampe à droite : deux commandes du même objet,
+             posées aux deux coins de l'image qu'elles pilotent. -->
+        <button type="button" class="scan-cam" aria-label="Éteindre la caméra">
+          <svg class="ic-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><circle cx="12" cy="12.2" r="3.4"></circle></svg>
+          <svg class="ic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"></path><line x1="3" y1="3" x2="21" y2="21"></line></svg>
+        </button>
+        <button type="button" class="scan-lampe" aria-label="Lampe torche"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
+      </div>
+    </div>
+    <div id="scan-result-zone"></div>
+  </div>
+</div>
+
+<!-- La fenêtre d'établissement vit HORS des deux apps : elle était enfermée
+     dans celle de gestion, donc masquée côté équipe. Un employé appuyait sur
+     « Créer une entreprise » et ne voyait rien s'ouvrir. -->
+<!-- Ajouter ou modifier un établissement : le même écran pour les deux -->
+<div class="fond-etab" id="fond-etab">
+  <div class="fen-etab" role="dialog" aria-modal="true">
+    <h3 id="etab-titre">Nouvel établissement</h3>
+    <div class="s" id="etab-sous">Son logo apparaîtra dans la barre.</div>
+
+    <button type="button" class="etab-depot" id="etab-depot">
+      <span class="mono" id="etab-mono">?</span>
+      <span class="appareil">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L8 6.5H4.5A1.5 1.5 0 0 0 3 8v10a1.5 1.5 0 0 0 1.5 1.5h15A1.5 1.5 0 0 0 21 18V8a1.5 1.5 0 0 0-1.5-1.5H16Z"></path><circle cx="12" cy="12.8" r="3.6"></circle></svg>
+        <span>Ajouter</span>
+      </span>
+    </button>
+    <div class="etab-legende" id="etab-legende">Facultatif · les initiales serviront sinon</div>
+
+    <label class="f" style="text-align:left; display:block;">Nom de l'établissement</label>
+    <input type="text" id="etab-nom" placeholder="Ex : Le Comptoir">
+
+    <div class="error-msg" id="etab-erreur"></div>
+    <button type="button" class="btn block" id="etab-ok" style="margin-top:14px;" disabled="">Ajouter</button>
+      <button type="button" class="btn ghost block" id="etab-supprimer" style="margin-top:8px; color:var(--red); display:none;">Supprimer cet établissement</button>
+    <button type="button" class="btn ghost block" id="etab-annuler" style="margin-top:8px;">Annuler</button>
+  </div>
+</div>
+
+<input type="file" id="etab-fichier" accept="image/*" style="display:none;">
+
+<!-- Bandeau de diagnostic : n'apparaît que si le chargement se bloque -->
+<!-- Le dégradé de la marque IA, défini une seule fois. Chaque coche le
+     référence par son nom : le déclarer dans chaque SVG créerait autant
+     d'identifiants identiques dans la page, ce qui n'est pas valide. -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <defs>
+    <linearGradient id="iaFini" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"></stop><stop offset="0.55" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#6FBEFF"></stop>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div class="bandeau-bloc" id="bandeau-bloc">
+  <div class="t">Le chargement n'aboutit pas</div>
+  <!-- Le détail technique reste : il sert quand on nous écrit. Les boutons
+       « Copier le détail » et « Recharger » ont été retirés — ce bandeau dit ce
+       qui ne va pas, il n'a pas à proposer des outils de débogage à quelqu'un
+       qui veut juste ouvrir ses procédures. -->
+  <div class="s" id="bandeau-bloc-detail">—</div>
+</div>
+
+<!-- UNE SEULE barre pour les deux espaces.
+
+     Il y en avait deux, au balisage et au style rigoureusement identiques — et
+     pourtant elles ne rendaient pas pareil à l'écran. Plutôt que de chercher
+     indéfiniment ce qui les distinguait, on n'en garde qu'une : deux choses
+     identiques ne peuvent plus diverger si elles n'en font qu'une.
+
+     Les actions changent selon l'espace, pas la barre. -->
+
+<nav class="tabbar" id="tabbar" style="display:none;">
+  <div class="groupe">
+    <button class="tab-round tab-round--secondary active" id="tb-procedures" aria-label="Procédures">
+      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2H6.5A2.5 2.5 0 0 0 4 4.5v15A2.5 2.5 0 0 0 6.5 22h11a2.5 2.5 0 0 0 2.5-2.5V8.8h-5.3a1.5 1.5 0 0 1-1.5-1.5V2Zm-5 10.2h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Zm0 4h7.6a.9.9 0 0 1 0 1.8H8.2a.9.9 0 0 1 0-1.8Z"></path><path d="M15.1 2.3v4.4c0 .3.2.5.5.5h4.2L15.1 2.3Z"></path></svg>
+      <span class="tab-label">Procédures</span>
+    </button>
+    <!-- L'onglet Analyse ne concerne que la gestion : l'espace équipe n'a plus de
+         page d'activité. Il est masqué côté équipe plutôt que dupliqué. -->
+    <button class="tab-round tab-round--secondary" id="tb-analyse" aria-label="Analyse">
+      <svg class="ico-ligne" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="20" x2="6" y2="14"></line><line x1="12" y1="20" x2="12" y2="8"></line><line x1="18" y1="20" x2="18" y2="4"></line></svg>
+      <svg class="ico-plein" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="13" width="4" height="8" rx="1.6"></rect><rect x="10" y="7" width="4" height="14" rx="1.6"></rect><rect x="16" y="3" width="4" height="18" rx="1.6"></rect></svg>
+      <span class="tab-label">Analyse</span>
+    </button>
+      </div>
+  <button class="tab-round tab-round--primary" id="tb-principal" aria-label="Action">
+    <span class="ic-gestion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></span>
+    <span class="ic-equipe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="7" width="4" height="4"></rect><rect x="13" y="7" width="4" height="4"></rect><rect x="7" y="13" width="4" height="4"></rect></svg></span>
+  </button>
+</nav>
+
+<script src="boot.js"></script>
+<script type="module" src="app.js"></script>
+
+<!-- Filet de sécurité : si le script principal (module) échoue à charger
+     (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
+
+
+
+
+</body></html>

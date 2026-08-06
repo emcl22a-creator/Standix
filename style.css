@@ -583,6 +583,16 @@
      À la fin, le pourcentage s'efface et une coche prend sa place au centre.
      L'anneau reste — c'est lui qui devient le signe de l'achèvement, pas un
      autre dessin qui viendrait le remplacer. */
+  /* Le passage de la zone de dépôt à l'écran d'attente. Sans mouvement, la
+     page saute : on ne comprend pas qu'on vient de lancer quelque chose. */
+  #ai-progress-card, #doc-attente-card{
+    animation:attenteArrive 0.42s cubic-bezier(0.32,0.72,0,1) both;
+  }
+  @keyframes attenteArrive{
+    0%{ opacity:0; transform:scale(0.94) translateY(10px); }
+    100%{ opacity:1; transform:none; }
+  }
+
   .ia-fig .ia-coche-g{
     position:absolute; inset:0; display:none;
     align-items:center; justify-content:center;
@@ -597,18 +607,16 @@
   /* L'anneau cesse de tourner : ce qui tourne dit « ça travaille ». */
   .ia-fig.fini .lum{ animation:none; }
 
+  /* À la ligne, pas au centre : c'est un titre de section, pas une annonce. */
   .ai-legende{
-    text-align:center; margin-bottom:12px;
+    text-align:left; margin-bottom:10px;
     transition:opacity 0.25s ease, max-height 0.3s ease, margin 0.3s ease;
     max-height:90px; overflow:hidden;
   }
   /* Une fois la vidéo là, la légende n'a plus rien à dire. */
   .ai-legende.cache{ opacity:0; max-height:0; margin-bottom:0; }
   .ai-legende .t{ display:block; font-size:17px; font-weight:700; letter-spacing:-0.03em; }
-  .ai-legende .s{
-    display:block; font-size:12.5px; color:var(--label-3);
-    line-height:1.5; margin-top:4px;
-  }
+
   .ai-vide{
     display:block; width:100%; aspect-ratio:16/9; border-radius:16px;
     background:rgba(255,255,255,0.02);
@@ -3483,8 +3491,20 @@
   }
   .et-coche svg{ width:33px; height:33px; display:block; }
   .et-coche:active{ transform:scale(0.86); }
-  /* Une étape faite s'efface un peu : l'œil va d'abord à ce qui reste. */
+  /* Une étape faite s'efface un peu : l'œil va d'abord à ce qui reste.
+
+     L'IMAGE S'EFFACE AUSSI. Seul le texte pâlissait, et une photo restée en
+     pleine lumière au-dessus d'un texte éteint attirait l'œil vers l'étape
+     qu'on venait justement de terminer. */
   #detail-steps.etapes-fil .detail-step.faite p{ color:var(--label-2); }
+  #detail-steps.etapes-fil .detail-step .detail-step-img,
+  #detail-steps.etapes-fil .detail-step .detail-step-video{
+    transition:opacity 0.3s ease;
+  }
+  #detail-steps.etapes-fil .detail-step.faite .detail-step-img,
+  #detail-steps.etapes-fil .detail-step.faite .detail-step-video{
+    opacity:0.42;
+  }
 
   .detail-step{ transition:border-color 0.3s ease, background 0.3s ease; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
   .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }

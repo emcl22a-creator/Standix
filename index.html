@@ -10981,6 +10981,9 @@ document.addEventListener('click', (e) => {
 
 let iaCompletionEnCours = false
 
+/* Vrai pendant les quelques secondes où la coche s'affiche, après une réussite. */
+let iaVientDeFinir = false
+
 function majBoutonIA() {
   /* Un seul bouton, juste au-dessus de « Publier ». Celui qui vivait sous les
      étapes a été retiré : deux boutons identiques à deux endroits laissaient

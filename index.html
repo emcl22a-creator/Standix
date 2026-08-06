@@ -633,11 +633,10 @@
     <!-- Deux usages, deux traitements. Le libellé ne parle pas de réglage
          technique : la personne sait ce qu'elle a filmé, pas ce qu'Azure doit
          en faire. -->
-    <div class="ai-legende"><span class="t">Ajoutez votre vidéo</span>
-        <span class="s">Filmez la tâche en expliquant à voix haute · dix minutes maximum</span></div><div class="dv-depot">
+    <div class="ai-legende"><span class="t">Ajoutez votre vidéo</span></div><div class="dv-depot">
         <input type="file" id="ai-video-input" accept="video/*">
         <div class="video-frame" id="ai-video-frame">
-          <video id="ai-video-player" style="display:none;" playsinline=""></video>
+          <video id="ai-video-player" style="display:none;" playsinline="" preload="metadata" muted=""></video>
           <span id="ai-video-placeholder" class="ai-vide"></span>
         </div>
       </div><div class="ia-ecoute">
@@ -1280,7 +1279,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 22h</div>
+    <div class="reg-version">Procédo · version 2026-08-07 · 02h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -1575,9 +1574,7 @@
   <!-- Mon activité : ce que l'employé a lu, et le temps qu'il y a passé -->
   <div class="screen" id="e-settings">
     <div class="pagehead-row">
-      <button class="back-btn" onclick="showEquipeScreen('e-list')" aria-label="Retour">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
+      
       <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
 
@@ -1639,7 +1636,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-06 · 22h</div>
+    <div class="reg-version">Procédo · version 2026-08-07 · 02h</div>
   </div>
 
   <!-- Sous-page : le compte -->

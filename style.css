@@ -1395,10 +1395,26 @@
   /* Le bouton d'aide, dans l'angle de la carte. La carte prend `position:relative`
      pour qu'il s'y accroche plutôt que de flotter dans l'écran. */
   #an-gain{ position:relative; }
-  /* Le bouton d'aide remonte vers le bord. La carte a 20 px de retrait à droite ;
-     un rond de 26 px calé dedans paraît flotter au milieu de nulle part. On le
-     colle presque au bord — 6 px — pour qu'il s'appuie sur quelque chose. */
-  #an-gain .gain-aide{ margin-right:-14px; }
+  /* Le bouton d'aide se pose à égale distance du haut et de la droite.
+
+     La carte a 18 px de retrait en haut et 20 à droite. Le bouton était aligné
+     sur le texte, donc plus bas et plus rentré : il flottait sans s'appuyer sur
+     rien. On le sort du flux et on le place en absolu, à 18 px des deux bords —
+     l'œil voit alors un angle, pas un objet perdu.
+
+     Le rond fait 26 px, son dessin 19 : les 3,5 px de vide autour ne comptent
+     pas dans ce qu'on voit. On les retranche pour que la DISTANCE VISIBLE soit
+     bien de 18. */
+  #an-gain{ position:relative; }
+  #an-gain .gain-aide{
+    position:absolute;
+    top:calc(18px - 3.5px);
+    right:calc(18px - 3.5px);
+    margin:0;
+  }
+  /* La ligne rend la place qu'occupait le bouton : sans ça, le titre garderait
+     un espace vide à sa droite. */
+  #an-gain .gain-ligne{ padding-right:26px; }
   /* Le bouton d'aide sur la LIGNE du titre, calé à droite. En position absolue
      dans l'angle, il flottait au-dessus du texte sans lui appartenir. */
   /* Le bouton se cale sur la PREMIÈRE ligne du titre, pas au milieu du bloc :
@@ -1797,6 +1813,21 @@
   }
   .dv-poi:active::after, .dv-poi.tire::after{ transform:scale(1.22); }
   .dv-poi.tire::before{ width:3px; box-shadow:0 0 12px rgba(255,255,255,0.8); }
+
+  /* ═══ LA PRISE ═══
+     Le carré visible fait 12 px, mais la zone touchable en fait 44 — la largeur
+     d'un doigt. C'est déjà le cas ; ce qui manquait, c'est de le VOIR : sous
+     le doigt, la poignée grossit franchement pour qu'on sache qu'on la tient. */
+  .dv-poi.tire::after{
+    transform:scale(1.5);
+    box-shadow:0 2px 10px rgba(0,0,0,0.55), 0 0 0 4px rgba(255,255,255,0.16);
+  }
+  /* La piste figée ne défile plus : le défilement natif lutterait contre le
+     doigt qui tire la poignée. */
+  .dv-piste.fige{
+    overflow-x:hidden;
+    touch-action:none;
+  }
 
   /* Le temps de la coupure, montré pendant qu'on la déplace. */
   .dv-poi .val{

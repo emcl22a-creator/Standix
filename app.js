@@ -2567,6 +2567,12 @@ function dessinerAnneauMembre(cle) {
   const vus = fmVues[cle].classe.filter(x => x.secondes)
   const somme = vus.reduce((s, x) => s + x.secondes, 0)
 
+  /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
+     mangeraient un tiers du cercle et les couleurs se bousculeraient. L'ensemble
+     ne dépasse jamais le huitième du tour ; chaque écart reste au-dessus de
+     1,5 px — en dessous, deux couleurs paraissent se toucher. */
+  const ecart = Math.max(1.5, Math.min(ECART, (circ / 8) / Math.max(1, vus.length)))
+
   let pos = 0
   const arcs = vus.map((x, i) => {
     const frac = x.secondes / somme
@@ -2584,9 +2590,9 @@ function dessinerAnneauMembre(cle) {
 
        En dessous du seuil, on passe donc à un bout DROIT. La part est plus
        carrée, mais elle reste chez elle. */
-    const rond = brut > ECART + ep * 1.6
-    const len = rond ? brut - ECART - ep : Math.max(1, brut - ECART)
-    const depart = circ * pos + ECART / 2 + (rond ? ep / 2 : 0)
+    const rond = brut > ecart + ep * 1.6
+    const len = rond ? brut - ecart - ep : Math.max(1, brut - ecart)
+    const depart = circ * pos + ecart / 2 + (rond ? ep / 2 : 0)
     pos += frac
     return `<circle class="arc${rond ? '' : ' droit'}" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
       stroke="${x.couleur}" stroke-width="${ep}"
@@ -3066,13 +3072,26 @@ function dessinerAnneauCat(cle) {
   }
   zone.closest('.fm-segm')?.style.removeProperty('display')
 
+  /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
+     mangeraient un tiers du cercle et les couleurs se bousculeraient. L'ensemble
+     ne dépasse jamais le huitième du tour ; chaque écart reste au-dessus de
+     1,5 px — en dessous, deux couleurs paraissent se toucher. */
+  const ecart = Math.max(1.5, Math.min(ECART, (circ / 8) / Math.max(1, vus.length)))
+
   let pos = 0
   const arcs = vus.map((x, i) => {
     const frac = x.total / somme
-    const len = Math.max(0.1, circ * frac - ECART - ep)
-    const depart = circ * pos + ECART / 2 + ep / 2
+    const brut = circ * frac
+
+    /* Un trait à bout rond dépasse d'une demi-épaisseur de chaque côté : il
+       occupe toujours `longueur + épaisseur`. Une part trop courte n'a pas la
+       place de porter deux arrondis — elle mordrait sur sa voisine. On lui
+       donne alors un bout DROIT : plus carré, mais chez elle. */
+    const rond = brut > ecart + ep * 1.6
+    const len = rond ? brut - ecart - ep : Math.max(1, brut - ecart)
+    const depart = circ * pos + ecart / 2 + (rond ? ep / 2 : 0)
     pos += frac
-    return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+    return `<circle class="arc${rond ? '' : ' droit'}" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
       stroke="${x.couleur}" stroke-width="${ep}"
       stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
   }).join('')
@@ -3326,13 +3345,26 @@ function dessinerAnneauProc(cle) {
   }
   zone.closest('.fm-segm')?.style.removeProperty('display')
 
+  /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
+     mangeraient un tiers du cercle et les couleurs se bousculeraient. L'ensemble
+     ne dépasse jamais le huitième du tour ; chaque écart reste au-dessus de
+     1,5 px — en dessous, deux couleurs paraissent se toucher. */
+  const ecart = Math.max(1.5, Math.min(ECART, (circ / 8) / Math.max(1, vus.length)))
+
   let pos = 0
   const arcs = vus.map((x, i) => {
     const frac = x.total / somme
-    const len = Math.max(0.1, circ * frac - ECART - ep)
-    const depart = circ * pos + ECART / 2 + ep / 2
+    const brut = circ * frac
+
+    /* Un trait à bout rond dépasse d'une demi-épaisseur de chaque côté : il
+       occupe toujours `longueur + épaisseur`. Une part trop courte n'a pas la
+       place de porter deux arrondis — elle mordrait sur sa voisine. On lui
+       donne alors un bout DROIT : plus carré, mais chez elle. */
+    const rond = brut > ecart + ep * 1.6
+    const len = rond ? brut - ecart - ep : Math.max(1, brut - ecart)
+    const depart = circ * pos + ecart / 2 + (rond ? ep / 2 : 0)
     pos += frac
-    return `<circle class="arc" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+    return `<circle class="arc${rond ? '' : ' droit'}" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
       stroke="${x.couleur}" stroke-width="${ep}"
       stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
   }).join('')
@@ -7331,6 +7363,15 @@ window.ouvrirMontageVideo = async function(procId) {
   renderVideoSteps()
 
   player.addEventListener('loadedmetadata', async () => {
+    /* LE BOUTON SE REDESSINE ICI, pas plus tôt.
+
+       `dvMajGeste()` a déjà été appelé juste au-dessus, mais la vidéo n'avait
+       pas encore livré sa durée : `v.duration` valait NaN, le test « tout est
+       découpé ? » répondait non, et le bouton restait sur « Terminer l'étape 6 »
+       alors qu'il n'y avait plus rien à terminer.
+
+       On le redessine une fois la durée connue. */
+    dvMajGeste()
     dvMajFrise()
     await generateFilmstrip(player, 'capcut-track')
   }, { once: true })
@@ -8020,6 +8061,8 @@ document.getElementById('dv-zoom')?.addEventListener('click', () => {
    On garde le défilement NATIF plutôt qu'un geste à la main : il a l'inertie,
    le rebond, et le pincement du navigateur. Aucun code ne les imite bien. */
 let dvPilote = null      // 'doigt' quand la main tient la piste
+/* Vrai pendant qu'on règle une coupure : la piste ne suit plus la vidéo. */
+let dvFige = false
 let dvRelache = null
 let dvAttendu = -1       // la position que le code vient d'écrire
 
@@ -8039,7 +8082,7 @@ function dvPistePourTemps() {
   const piste = document.getElementById('dv-piste')
   const f = document.getElementById('dv-frise')
   const v = dvLecteur()
-  if (!piste || !f || !v || dvPilote === 'doigt') return
+  if (!piste || !f || !v || dvPilote === 'doigt' || dvFige) return
   const duree = v.duration || 1
   /* On note la position écrite plutôt que de lever un drapeau le temps d'une
      image : l'événement de défilement arrive quand le navigateur veut, souvent
@@ -8224,6 +8267,22 @@ function brancherPoignee(poi, i) {
     v.pause()
     poi.classList.add('tire')
     poi.setPointerCapture(e.pointerId)
+
+    /* ═══ LA PISTE SE FIGE ═══
+
+       Le trait de lecture est au centre, et la piste se replace sous lui à
+       chaque changement d'instant. Or régler une coupure CHANGE l'instant : la
+       piste glissait donc sous le doigt pendant qu'on tirait la poignée.
+
+       On tirait vers la droite, tout partait vers la gauche, et la poignée
+       semblait fuir. Impossible à viser.
+
+       Pendant le réglage, la piste ne bouge plus : la poignée reste exactement
+       où le doigt la pose. */
+    dvFige = true
+    document.getElementById('dv-piste')?.classList.add('fige')
+    if (navigator.vibrate) navigator.vibrate(8)
+
     placer(e.clientX)
   })
 
@@ -8236,6 +8295,14 @@ function brancherPoignee(poi, i) {
   const relacher = () => {
     if (!tire) return
     tire = false
+
+    /* La piste retrouve sa liberté, et se replace sous le trait à l'endroit où
+       l'on vient de fixer la coupure. À poser APRÈS le test : sans lui, un
+       relâchement qui ne nous concerne pas dégelait la piste au milieu du geste
+       de quelqu'un d'autre. */
+    dvFige = false
+    document.getElementById('dv-piste')?.classList.remove('fige')
+    dvPistePourTemps()
     poi.classList.remove('tire')
     /* On redessine tout : les durées affichées sous chaque étape ont changé. */
     renderVideoSteps()

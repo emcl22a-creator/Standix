@@ -5011,16 +5011,20 @@ function majBoutonIA() {
     const nbTot = videoSteps.length
     const videsTot = videoSteps.filter(s => !String(s.texte || '').trim()).length
     bas.style.display = nbTot ? 'flex' : 'none'
-    bas.disabled = iaCompletionEnCours || iaVientDeFinir || videsTot === 0
+    /* Le bouton reste ACTIF tant qu'il y a des étapes. Être éteint sans rien
+       dire de plus qu'une phrase grise laissait croire à une panne — et quand
+       on vidait un texte, il ne se réveillait pas.
+
+       Son libellé ne change plus non plus : « Compléter les étapes avec l'IA »,
+       toujours. C'est la note du dessous qui dit où l'on en est. */
+    bas.disabled = iaCompletionEnCours || iaVientDeFinir
     /* Pendant le travail : l'anneau seul. À la fin : la coche. Le texte
        disparaît dans les deux cas — il n'y a plus rien à décider, et une phrase
        sous un bouton éteint donne envie d'appuyer encore. */
     bas.classList.toggle('travaille', iaCompletionEnCours)
     bas.classList.toggle('fini', iaVientDeFinir && !iaCompletionEnCours)
     const txt = document.getElementById('vid-ia-bas-txt')
-    if (txt) txt.textContent = videsTot
-      ? 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA'
-      : 'Toutes vos \u00e9tapes ont un texte'
+    if (txt) txt.textContent = 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA'
   }
 
   /* La note explicative reste : elle dit combien d'étapes attendent un texte,
@@ -7554,6 +7558,29 @@ function dvMajGeste() {
      Dès qu'on a dépassé le début, il coupe — en lecture comme en pause — et son
      libellé doit le dire, sinon on croit qu'il faut relancer pour continuer. */
   const rienCommence = !v || (v.paused && !videoSteps.length && v.currentTime < 0.3)
+
+  /* ═══ LA VIDÉO EST ENTIÈREMENT DÉCOUPÉE ═══
+
+     Il ne reste rien à fermer : proposer « Terminer l'étape 7 » serait proposer
+     un geste impossible. Le bouton offre alors la seule chose qui ait du sens à
+     ce moment-là — tout reprendre.
+
+     Une demi-seconde de tolérance : une vidéo ne s'arrête jamais exactement sur
+     sa dernière image. */
+  const dureeTot = v && isFinite(v.duration) ? v.duration : 0
+  const toutDecoupe = dureeTot > 0 && videoSteps.length > 0 && (dureeTot - dvDebutEnCours) < 0.5
+
+  if (toutDecoupe) {
+    b.classList.remove('coupe')
+    b.classList.add('refaire')
+    ic.innerHTML = '<path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/>'
+    lib.textContent = 'Recommencer le d\u00e9coupage'
+    aide.textContent = "Toute la vid\u00e9o est d\u00e9coup\u00e9e. Corrigez les textes ci-dessous, " +
+      "ou reprenez le d\u00e9coupage depuis le d\u00e9but."
+    return
+  }
+  b.classList.remove('refaire')
+
   if (rienCommence) {
     b.classList.remove('coupe')
     ic.innerHTML = '<path d="M8 5v14l11-7z"/>'
@@ -7877,9 +7904,30 @@ document.getElementById('dv-play')?.addEventListener('click', () => {
 })
 
 /* Le geste unique. */
-document.getElementById('dv-bouton')?.addEventListener('click', () => {
+document.getElementById('dv-bouton')?.addEventListener('click', async () => {
   const v = dvLecteur()
   if (!v || !v.src) return
+
+  /* Tout est découpé : le bouton recommence. On demande confirmation — c'est
+     tout le travail qui disparaît, textes déjà écrits compris. */
+  if (document.getElementById('dv-bouton').classList.contains('refaire')) {
+    const ok = await confirmDialog({
+      titre: 'Recommencer le d\u00e9coupage ?',
+      message: `Vos ${videoSteps.length} \u00e9tapes seront effac\u00e9es, textes compris.`,
+      confirmer: 'Recommencer',
+      annuler: 'Garder',
+      danger: true,
+    })
+    if (!ok) return
+    videoSteps = []
+    dvDebutEnCours = 0
+    dvSelection = null
+    v.currentTime = 0
+    v.pause()
+    dvMajGeste(); renderVideoSteps(); dvMajFrise()
+    if (navigator.vibrate) navigator.vibrate(10)
+    return
+  }
 
   /* Rien n'est encore commencé : ce premier appui lance la vidéo. */
   if (v.paused && !videoSteps.length && v.currentTime < 0.3) {
@@ -7970,7 +8018,7 @@ function renderVideoSteps(listEl) {
 
     const ta = div.querySelector('textarea')
     ta.addEventListener('input', (e) => {
-      videoSteps[i].texte = e.target.value
+      videoSteps[i].texte = e.target.value; majBoutonIA()
     /* Même correctif que les deux autres fils : le champ s'ajuste à l'affichage,
        pas seulement à la saisie. Les textes écrits par l'IA s'ouvraient coupés
        à la première ligne. */
@@ -8368,6 +8416,10 @@ async function openAnalyse(procId) {
         <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
         <div class="et-co">
           <p>${escapeHtml(etape.texte)}</p>
+          ${etape.attention ? `<div class="et-attention">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+            <span>${escapeHtml(etape.attention)}</span>
+          </div>` : ''}
           ${hasClip ? `<span class="badge extrait" style="cursor:pointer;">\u25b6 ${formatTime(bounds.start)}\u2013${formatTime(bounds.end)}</span>` : ''}
           ${etape.image_url ? `<div class="detail-step-img"><img data-fichier="${escapeHtml(cheminFichier(etape.image_url))}" alt="" loading="lazy"></div>` : ''}
         </div>
@@ -12255,7 +12307,7 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
       </div>
     `
     const textarea = div.querySelector('textarea')
-    textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; autoResizeTextarea(e.target) })
+    textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; majBoutonIA(); autoResizeTextarea(e.target) })
     /* Même correctif qu'à la création : le champ s'ajuste aussi à l'affichage,
        sinon une étape longue s'ouvre coupée à la première ligne. */
     requestAnimationFrame(() => autoResizeTextarea(textarea))

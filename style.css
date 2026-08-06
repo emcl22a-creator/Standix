@@ -560,6 +560,13 @@
      vidéo — mais plein, car ici c'est l'action principale. */
   .doc-generer{ display:flex; align-items:center; justify-content:center; gap:10px; }
   .doc-generer .ia-fig{ flex-shrink:0; }
+  .doc-generer > span:last-child{
+    transition:opacity 0.25s ease, max-width 0.35s cubic-bezier(0.32,0.72,0,1);
+    max-width:280px; overflow:hidden; white-space:nowrap;
+  }
+  /* Pendant le travail : l'anneau seul, centré. */
+  .doc-generer.travaille > span:last-child{ opacity:0; max-width:0; }
+  .doc-generer.travaille{ gap:0; }
   .doc-generer .ia-coche{ display:none; width:24px; height:24px; flex-shrink:0; }
   .doc-generer .ia-coche svg{ width:24px; height:24px; display:block; }
   .doc-generer:disabled .ia-fig{ opacity:1; }
@@ -568,6 +575,47 @@
     display:block;
     animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
   }
+
+  /* ═══ L'ÉCRAN VIDÉO ═══
+     La légende vit HORS du cadre : elle explique, elle ne se touche pas. Dedans,
+     il n'y a que la vidéo — ou son absence. */
+  /* ═══ LA COCHE DANS LE GRAND ANNEAU ═══
+     À la fin, le pourcentage s'efface et une coche prend sa place au centre.
+     L'anneau reste — c'est lui qui devient le signe de l'achèvement, pas un
+     autre dessin qui viendrait le remplacer. */
+  .ia-fig .ia-coche-g{
+    position:absolute; inset:0; display:none;
+    align-items:center; justify-content:center;
+  }
+  .ia-fig .ia-coche-g svg{ width:44%; height:44%; display:block; }
+  .ia-fig.fini .pct{ opacity:0; }
+  .ia-fig.fini .ia-coche-g{
+    display:flex;
+    animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
+  }
+  .ia-fig .pct{ transition:opacity 0.2s ease; }
+  /* L'anneau cesse de tourner : ce qui tourne dit « ça travaille ». */
+  .ia-fig.fini .lum{ animation:none; }
+
+  .ai-legende{
+    text-align:center; margin-bottom:12px;
+    transition:opacity 0.25s ease, max-height 0.3s ease, margin 0.3s ease;
+    max-height:90px; overflow:hidden;
+  }
+  /* Une fois la vidéo là, la légende n'a plus rien à dire. */
+  .ai-legende.cache{ opacity:0; max-height:0; margin-bottom:0; }
+  .ai-legende .t{ display:block; font-size:17px; font-weight:700; letter-spacing:-0.03em; }
+  .ai-legende .s{
+    display:block; font-size:12.5px; color:var(--label-3);
+    line-height:1.5; margin-top:4px;
+  }
+  .ai-vide{
+    display:block; width:100%; aspect-ratio:16/9; border-radius:16px;
+    background:rgba(255,255,255,0.02);
+    border:1.5px dashed rgba(255,255,255,0.16);
+  }
+  /* De l'air entre la vidéo et ce que l'IA analyse. */
+  #ai-upload-card .ia-ecoute{ margin-top:20px; }
 
   .doc-zone{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
@@ -592,6 +640,14 @@
     display:flex; align-items:center; justify-content:center; gap:16px; margin-top:16px;
   }
   /* Les trois entrées sont des BOUTONS : chacune ouvre sa voie. */
+  /* Le bloc choisi ARRIVE : sans mouvement, on ne remarque pas qu'un élément
+     vient d'apparaître plus bas dans la page. */
+  .doc-bloc{ animation:blocArrive 0.34s cubic-bezier(0.32,0.72,0,1) both; }
+  @keyframes blocArrive{
+    0%{ opacity:0; transform:translateY(-8px); max-height:0; }
+    100%{ opacity:1; transform:none; max-height:900px; }
+  }
+
   .doc-zone .doc-voie{
     display:flex; flex-direction:column; align-items:center; gap:6px;
     padding:9px 12px; border-radius:12px; border:0.5px solid transparent;

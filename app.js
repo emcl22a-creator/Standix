@@ -2576,7 +2576,15 @@ async function peindreFicheMembre() {
    complet reste dans la liste en dessous, où il est à sa place.
    ═══════════════════════════════════════════════════════════════════════ */
 
-const ANNEAU_PARTS_MAX = 7
+/* CINQ PARTS AU PLUS, le gris compris.
+
+   Sept étaient encore trop : à sept couleurs, on ne distingue plus laquelle est
+   laquelle sans revenir à la légende à chaque fois. Quatre couleurs et un gris
+   se lisent d'un regard — c'est à peu près la limite de ce qu'on retient.
+
+   Le gris ne paraît QUE s'il rassemble quelque chose : avec trois procédures,
+   il n'y a rien à regrouper et l'anneau n'en montre que trois. */
+const ANNEAU_PARTS_MAX = 5
 const ANNEAU_GRIS = 'rgba(235,235,245,0.28)'
 
 /* ═══ AUCUNE PART TROP PETITE POUR SES ARRONDIS ═══
@@ -5229,7 +5237,10 @@ function majBoutonIA() {
     /* « Compléter les étapes avec l'IA » ne disait pas qui fait quoi : on croyait
        devoir compléter soi-même, avec son aide. Le titre de la page annonce
        « Vous découpez, l'IA rédige » — le bouton reprend ces mots. */
-    if (txt) txt.textContent = 'L\u2019IA r\u00e9dige mes \u00e9tapes'
+    /* Sans le mot « IA » : la marque AI est déjà dans le bouton, juste à
+       gauche. L'écrire deux fois dans le même bouton le dit moins fort, pas
+       plus. */
+    if (txt) txt.textContent = 'R\u00e9diger mes \u00e9tapes'
   }
 
   /* La note explicative reste : elle dit combien d'étapes attendent un texte,
@@ -5270,59 +5281,54 @@ async function completerEtapesAvecIA() {
   const jalon = (m) => { if (note) { note.classList.remove('erreur'); note.textContent = m } }
 
   try {
-    jalon('Pr\u00e9paration de la vid\u00e9o\u2026')
+    /* La préparation est la PREMIÈRE étape, pas une attente séparée : elle
+       porte donc son numéro comme les autres. */
+    jalon('1/5 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026')
     if (currentVideoFile) {
       currentVideoFile = await comprimerVideo(currentVideoFile, (pct) => {
         jalon(pct >= 100
-          ? 'Finalisation de la vid\u00e9o\u2026'
-          : `Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
+          ? '1/5 \u00b7 Finalisation de la vid\u00e9o\u2026'
+          : `1/5 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
       })
     }
-    jalon('1/5 \u00b7 Pr\u00e9paration de la bande son\u2026')
-    /* 1. La bande son. C'est elle qu'Azure écoute — dix fois plus légère que la
-       vidéo, et il n'a que faire de l'image. */
+    jalon('2/5 \u00b7 Envoi de la vid\u00e9o\u2026')
+    /* ═══ ON ENVOIE LA VIDÉO, PLUS SEULEMENT LE SON ═══
+
+       On extrayait la bande son pour l'alléger, en pensant qu'Azure n'avait que
+       faire de l'image. Mais on lui demandait le mode `Default`, qui analyse
+       AUSSI ce qui est visible : il cherchait des images dans un fichier qui
+       n'en contenait aucune. L'analyse n'aboutissait jamais, et le pourcentage
+       restait suspendu.
+
+       La vidéo comprimée pèse plus lourd — 94 Mo contre 5 — mais c'est ce que le
+       service attend, et c'est ce qui permet de lire les objets, les gestes et
+       le texte à l'écran. C'est précisément ce qu'on vend. */
     let urlAnalyse = null
     const base = `${currentMembre.entreprise_id}/${Date.now()}_ia`
-
     if (currentVideoFile) {
-      const son = await extraireBandeSon(currentVideoFile)
-      if (son && son.crete < SON_SEUIL) {
-        throw new Error("Cette vid\u00e9o n\u2019a pas de son. L\u2019IA \u00e9crit \u00e0 partir de ce que vous dites : sans parole, elle n\u2019a rien \u00e0 transcrire.")
-      }
-      const fichier = son ? son.blob : currentVideoFile
-      const chemin = son ? `${base}_son.wav` : `${base}_${currentVideoFile.name}`
-      const { error: errEnvoi } = await supabase.storage.from('procedo-videos')
-        .upload(chemin, fichier, { contentType: son ? 'audio/wav' : currentVideoFile.type })
-      jalon('2/5 \u00b7 Envoi de la bande son\u2026')
-      if (errEnvoi) throw new Error('Envoi impossible : ' + errEnvoi.message)
-
-      const { data: sig } = await supabase.storage.from('procedo-videos')
-        .createSignedUrl(chemin, 6 * 3600)
-      urlAnalyse = sig?.signedUrl
-    } else {
-      /* Vidéo déjà en ligne (modification d'une procédure) : on la signe. */
-      urlAnalyse = await urlSignee(editVideoUrl)
+      const chemin = `${base}.webm`
+      const { error: eUp } = await supabase.storage.from('procedo-videos')
+        .upload(chemin, currentVideoFile, {
+          contentType: currentVideoFile.type || 'video/webm',
+          cacheControl: CACHE_LONG,
+        })
+      if (eUp) throw new Error(eUp.message)
+      jalon('3/5 \u00b7 Vid\u00e9o re\u00e7ue\u2026')
+      const { data: sig, error: eSig } = await supabase.storage.from('procedo-videos')
+        .createSignedUrl(chemin, 60 * 60 * 3)
+      if (eSig) throw new Error(eSig.message)
+      urlAnalyse = sig.signedUrl
+    } else if (editVideoUrl) {
+      /* Une vidéo déjà en ligne : on signe simplement son adresse. */
+      const { data: sig, error: eSig } = await supabase.storage.from('procedo-videos')
+        .createSignedUrl(editVideoUrl, 60 * 60 * 3)
+      if (eSig) throw new Error(eSig.message)
+      urlAnalyse = sig.signedUrl
+      jalon('3/5 \u00b7 Vid\u00e9o retrouv\u00e9e\u2026')
     }
-    if (!urlAnalyse) throw new Error('Adresse de la vid\u00e9o introuvable.')
+    if (!urlAnalyse) throw new Error("Aucune vid\u00e9o \u00e0 analyser.")
 
-    /* 2. La procédure temporaire, invisible dans la liste. */
-    const { data: temp, error: errTemp } = await supabase.from('procedures').insert({
-      titre: 'Analyse en cours',
-      categorie: champManuel('categorie')?.value?.trim() || 'Sans cat\u00e9gorie',
-      entreprise_id: currentMembre.entreprise_id,
-      created_by: currentMembre.id,
-      /* CHANGEMENT DE MÉTHODE.
-
-       La ligne temporaire naissait avec le statut « ia_temp » — une valeur que
-       rien d'autre n'emploie. Si la colonne porte une contrainte de valeurs
-       admises (le cas courant), l'insertion échouait et tout s'arrêtait là,
-       avant même qu'Azure soit appelé.
-
-       On repart d'un statut que la base connaît déjà. La ligne reste invisible
-       grâce à son titre, et elle est supprimée quoi qu'il arrive. */
-      statut: 'traitement',
-    }).select('id').single()
-    jalon('3/5 \u00b7 Ouverture de l\u2019analyse\u2026')
+    jalon('4/5 \u00b7 Ouverture de l\u2019analyse\u2026')
     if (errTemp) throw new Error(errTemp.message)
     tempId = temp.id
 
@@ -5332,11 +5338,11 @@ async function completerEtapesAvecIA() {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({ procedure_id: tempId, video_url: urlAnalyse }),
     })
-    jalon('4/5 \u00b7 D\u00e9marrage du service\u2026')
+    
     const dep = await rep.json()
     if (!rep.ok || dep.error) throw new Error(dep.error || "L\u2019analyse n\u2019a pas d\u00e9marr\u00e9.")
 
-    jalon('5/5 \u00b7 L\u2019IA \u00e9coute la vid\u00e9o\u2026')
+    jalon('5/5 \u00b7 Analyse du son et de l\u2019image\u2026')
     const textes = await attendreEtapesIA(tempId)
     if (!textes.length) {
       throw new Error("L\u2019IA n\u2019a rien tir\u00e9 de cette vid\u00e9o. V\u00e9rifiez que la parole est audible.")
@@ -6620,6 +6626,19 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   launchBtn.classList.add('travaille')
   launchBtn.disabled = true
 
+  /* ═══ ON PASSE TOUT DE SUITE À L'ÉCRAN D'ATTENTE ═══
+
+     La carte de progression — le grand anneau avec son pourcentage — ne
+     s'affichait qu'À LA FIN, une fois la vidéo envoyée et l'analyse lancée.
+     Toute la préparation se déroulait donc sur la page de dépôt, en petit sous
+     le bouton : deux attentes de suite, dont la première au mauvais endroit.
+
+     On bascule dès le clic. C'est le geste qui dit « c'est parti », et il doit
+     arriver au moment du clic. */
+  document.getElementById('ai-upload-card').style.display = 'none'
+  document.getElementById('ai-progress-card').style.display = 'block'
+  startAiProgressSimulation()
+
   /* On comprime MAINTENANT, pas à l'import : l'aperçu doit rester immédiat.
      La personne voit sa vidéo tout de suite, et le travail se fait au moment
      où elle accepte d'attendre. */
@@ -6635,11 +6654,11 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
        Les jalons sont donc numérotés d'un bout à l'autre : la préparation
        devient la première sur six, pas une attente séparée. */
-    errorEl.textContent = '1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026'
+    signalerEtapeIA('1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026')
     aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-      errorEl.textContent = pct >= 100
+      signalerEtapeIA(pct >= 100
         ? '1/6 \u00b7 Finalisation de la vid\u00e9o\u2026'
-        : `1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
+        : `1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
     })
     errorEl.textContent = ''
     errorEl.style.color = 'var(--red)'
@@ -6649,7 +6668,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   }
 
   try {
-    errorEl.textContent = '2/6 \u00b7 Envoi de la vid\u00e9o\u2026'
+    signalerEtapeIA('2/6 \u00b7 Envoi de la vid\u00e9o\u2026')
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
@@ -6718,8 +6737,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       urlPourAnalyse = sigVid.signedUrl
     }
 
-    errorEl.textContent = '3/6 \u00b7 Vid\u00e9o re\u00e7ue\u2026'
-    errorEl.textContent = '4/6 \u00b7 Cr\u00e9ation de la proc\u00e9dure\u2026'
+    signalerEtapeIA('3/6 \u00b7 Vid\u00e9o re\u00e7ue\u2026')
+    signalerEtapeIA('4/6 \u00b7 Cr\u00e9ation de la proc\u00e9dure\u2026')
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
     const { data: newProc, error: procError } = await supabase
       .from('procedures')
@@ -6728,7 +6747,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     if (procError) throw new Error(procError.message)
     aiProcedureId = newProc.id
 
-    errorEl.textContent = '5/6 \u00b7 L\u2019IA \u00e9coute et regarde\u2026'
+    signalerEtapeIA('5/6 \u00b7 L\u2019IA \u00e9coute et regarde\u2026')
     // 3. Démarrage de l'analyse Azure
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
@@ -6748,9 +6767,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
            une seule chose. */
     launchBtn.classList.add('fini')
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
-    document.getElementById('ai-upload-card').style.display = 'none'
-    document.getElementById('ai-progress-card').style.display = 'block'
-    startAiProgressSimulation()
+    /* La bascule a eu lieu au clic — il ne reste qu'à sonder. */
     pollAiStatus()
 
     /* La procédure existe en base, mais rien en mémoire ne le savait : en allant
@@ -6761,6 +6778,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     loadGestionProcedures().catch(() => {})
   } catch (e) {
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
+
+    /* ON REVIENT À LA PAGE DE DÉPÔT. Sans ça, l'échec laissait l'écran
+       d'attente ouvert sur un anneau figé : la personne voyait le message
+       d'erreur derrière, sans moyen de recommencer. */
+    stopAiProgressSimulation()
+    document.getElementById('ai-progress-card').style.display = 'none'
+    document.getElementById('ai-upload-card').style.display = 'block'
+
 
     /* La vidéo muette n'est pas une erreur de l'app : c'est une vidéo qui ne
        convient pas à ce mode. On l'annonce comme une consigne, avec la porte de
@@ -9561,6 +9586,8 @@ function renderAnalyseStats() {
    quand plus rien n'est en cours. */
 let surveillanceAnalyses = null
 
+let rechargerApresAnalyse = false
+
 function surveillerAnalyses() {
   // Inutile d'interroger indéfiniment une analyse qui n'avance plus : elle est
   // signalée à l'écran, c'est au gérant de la relancer.
@@ -9590,7 +9617,17 @@ function surveillerAnalyses() {
         (p.statut === 'traitement' || p.statut === 'redaction')
       p.statut = row.statut
       change = true
-      if (vientDeFinir) toast(`\u00ab ${p.titre} \u00bb est pr\u00eate.`)
+      if (vientDeFinir) {
+        toast(`\u00ab ${p.titre} \u00bb est pr\u00eate.`)
+        /* ON RECHARGE DEPUIS LA BASE, on ne se contente pas de modifier l'objet
+           en mémoire.
+
+           Les listes de catégories travaillent sur des copies filtrées : changer
+           `p.statut` dans `allGestionProcedures` ne touchait pas la copie que la
+           page affichait. L'état était juste en mémoire, faux à l'écran, et la
+           roue tournait sur une analyse terminée depuis longtemps. */
+        rechargerApresAnalyse = true
+      }
     })
 
     /* On demande aussi à l'analyse où elle en est. C'est indispensable : c'est
@@ -9628,6 +9665,15 @@ function surveillerAnalyses() {
          que la grille laissait la roue tourner sur les autres écrans : la fiche
          ouverte, la recherche, la liste d'une catégorie. L'état avait changé en
          mémoire, mais personne ne le redessinait là où on regardait. */
+      /* Une analyse vient d'aboutir : on relit tout plutôt que de repeindre des
+         copies périmées. C'est un aller-retour de plus, une fois par analyse —
+         le prix d'un écran qui dit la vérité. */
+      if (rechargerApresAnalyse) {
+        rechargerApresAnalyse = false
+        loadGestionProcedures().catch(() => {})
+        return
+      }
+
       renderCategoryGrid()
       const actif = (id) => document.getElementById(id)?.classList.contains('active')
       if (actif('p-category')) renderCategoryProceduresList()
@@ -10551,7 +10597,10 @@ function offrePourTaille(n) {
 }
 
 function planActuel() {
-  return (cachedEntreprise?.plan || '').toLowerCase()
+  /* `abonnement_palier` d'abord : c'est la colonne que le webhook Stripe
+     renseigne au paiement. `plan` est l'ancien nom, gardé en second pour les
+     entreprises créées avant. */
+  return (cachedEntreprise?.abonnement_palier || cachedEntreprise?.plan || '').toLowerCase()
 }
 
 /* Le prix ramené au membre : c'est le seul chiffre qu'un restaurateur peut
@@ -10589,7 +10638,7 @@ function carteOffre(o, opts = {}) {
     </div>
     <div class="offre-aussi">${AUSSI}</div>`
     : `<div class="offre-aussi">${o.devis || 'Les m\u00eames fonctionnalit\u00e9s, sans exception.'}</div>`}
-    ${opts.cta && o.prix !== null ? `
+    ${opts.cta && o.prix !== null && !opts.enCours ? `
     <div class="offre-rythme">
       <button type="button" class="rlg${rythmeChoisi === 'mensuel' ? ' on' : ''}" data-rythme="mensuel">
         <span class="rd"><i></i></span>
@@ -10600,8 +10649,12 @@ function carteOffre(o, opts = {}) {
         <span class="tx"><b>${Math.round(o.prix * 0.8)} \u20ac / mois</b><span>${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an</span></span>
       </button>
     </div>` : ''}
-    ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${
-      o.prix === null ? opts.cta
+    ${opts.cta ? `<button type="button" class="offre-cta${opts.enCours ? ' encours' : ''}"
+      ${opts.enCours ? 'disabled' : ''} data-offre="${o.cle}">${
+      /* L'offre déjà payée ne propose pas de la repayer : le bouton dit ce
+         qu'elle est, et ne fait rien. */
+      opts.enCours ? opts.cta
+      : o.prix === null ? opts.cta
       /* Le bouton annonce EXACTEMENT ce qui sera pr\u00e9lev\u00e9. \u00ab Activer \u00bb tout court
          laisse d\u00e9couvrir le montant sur la page de paiement \u2014 c'est l\u00e0 qu'on
          renonce. */
@@ -10609,13 +10662,27 @@ function carteOffre(o, opts = {}) {
         ? `Activer \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an`
         : `Activer \u00b7 ${o.prix} \u20ac par mois`
     }</button>` : ''}
+    ${opts.gerer ? `
+    <!-- Résilier doit être aussi simple que souscrire : le lien est ICI, sous
+         l'offre, pas caché dans un recoin des paramètres. -->
+    <button type="button" class="offre-gerer" data-abo-gerer>G\u00e9rer ou r\u00e9silier mon abonnement</button>` : ''}
   </div>`
 }
 
 window.renderAbonnements = function() {
   const n = nombreDeMembres()
-  const mienne = offrePourTaille(n)
   const actuel = planActuel()
+
+  /* ═══ CE QU'ON MONTRE EN PREMIER ═══
+
+     Quand on paie déjà, c'est SON offre qui vient en tête — pas celle que la
+     taille de l'équipe suggère. Un client qui a pris « Équipe » et qui voit
+     « Essentiel » en vedette croit s'être trompé, ou avoir été rétrogradé.
+
+     Sans abonnement, on revient à la recommandation par la taille : c'est ce
+     qu'il y a de plus utile à quelqu'un qui n'a pas encore choisi. */
+  const payee = actuel ? OFFRES.find(o => o.cle === actuel) : null
+  const mienne = payee || offrePourTaille(n)
 
   const titre = document.getElementById('abo-titre')
   const sous = document.getElementById('abo-sous')
@@ -10626,13 +10693,17 @@ window.renderAbonnements = function() {
       : `Vous d\u00e9marrez seul<br>chez ${escapeHtml(nomEnt)}`
   }
   if (sous) {
-    sous.innerHTML = `L'offre <b>${mienne.nom}</b> est faite pour une \u00e9quipe de cette taille.`
+    sous.innerHTML = payee
+      ? `Vous \u00eates abonn\u00e9 \u00e0 l'offre <b>${mienne.nom}</b>.`
+      : `L'offre <b>${mienne.nom}</b> est faite pour une \u00e9quipe de cette taille.`
   }
 
   const estActuelle = mienne.cle === actuel
   document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
     classe: ' vedette' + (estActuelle ? ' actuelle' : ''),
     ruban: estActuelle ? 'En cours' : 'Recommandée',
+    enCours: estActuelle,
+    gerer: estActuelle,
     cta: estActuelle ? 'Votre abonnement actuel'
       : (mienne.prix === null ? 'Nous \u00e9crire' : 'Commencer avec ' + mienne.nom),
     annuel: !estActuelle,
@@ -10675,6 +10746,46 @@ document.getElementById('abo-autres')?.addEventListener('click', (e) => {
 })
 
 document.getElementById('p-abonnement')?.addEventListener('click', async (e) => {
+  /* ═══ GÉRER OU RÉSILIER ═══
+
+     On ouvre le portail de Stripe : résiliation, changement de carte, factures,
+     changement d'offre. Écrire ce formulaire nous-mêmes voudrait dire gérer les
+     remboursements au prorata et les factures conformes — un terrain où
+     l'erreur coûte cher.
+
+     L'accès reste ouvert jusqu'à la fin de la période payée : c'est ce que
+     Stripe fait par défaut, et c'est juste. */
+  const g = e.target.closest('[data-abo-gerer]')
+  if (g) {
+    g.disabled = true
+    const av = g.textContent
+    g.textContent = 'Ouverture\u2026'
+    try {
+      const rep = await fetch(`${SUPABASE_URL}/functions/v1/stripe-portail`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({
+          entreprise_id: currentMembre.entreprise_id,
+          retour: window.location.origin + window.location.pathname,
+        }),
+      })
+      const data = await rep.json()
+      if (!rep.ok || !data.url) throw new Error(data.error || 'Le portail n\u2019a pas pu s\u2019ouvrir.')
+      window.location.href = data.url
+    } catch (err) {
+      g.disabled = false
+      g.textContent = av
+      await confirmDialog({
+        titre: 'Gestion indisponible',
+        message: String(err?.message || err),
+        confirmer: 'Fermer',
+        annuler: null,
+        danger: false,
+      })
+    }
+    return
+  }
+
   /* Le choix du rythme : on retient et on redessine. Rien d'autre — c'est le
      bouton d'action qui déclenche le paiement. */
   const r = e.target.closest('[data-rythme]')
@@ -10689,6 +10800,28 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   if (!b) return
   const o = OFFRES.find(x => x.cle === b.dataset.offre)
   if (!o || o.cle === planActuel()) return
+
+  /* ═══ ON NE DESCEND PAS SOUS SA PROPRE ÉQUIPE ═══
+
+     Passer de Pro à Essentiel avec douze personnes mettrait sept d'entre elles
+     dehors — sans qu'elles aient rien fait, et sans qu'on les ait prévenues.
+
+     C'est précisément ce que le portail Stripe NE SAIT PAS faire : il ne
+     connaît ni vos membres ni leur nombre. C'est pour cela que le changement
+     d'offre doit se faire ici, et pas là-bas. */
+  const combien = nombreDeMembres()
+  if (o.max !== Infinity && combien > o.max) {
+    await confirmDialog({
+      titre: `Votre \u00e9quipe est trop grande pour ${o.nom}`,
+      message: `Vous \u00eates ${combien} membres, et cette offre en autorise ${o.max}.\n\n` +
+        `Retirez d'abord ${combien - o.max} personne${combien - o.max > 1 ? 's' : ''} ` +
+        `dans Param\u00e8tres \u2192 Votre \u00e9quipe, puis revenez changer d'offre.`,
+      confirmer: 'J\u2019ai compris',
+      annuler: null,
+      danger: false,
+    })
+    return
+  }
 
   /* Les offres qui n'ont pas encore de tarif Stripe : on écrit, on ne fait pas
      semblant. Un bouton qui ouvre une page de paiement vide coûte plus cher

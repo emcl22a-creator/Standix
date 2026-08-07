@@ -511,16 +511,16 @@
            qu'on PEUT faire. Un bouton plein l'aurait mise au même rang que
            « Publier ». -->
       <button type="button" class="dv-ia-bas" id="vid-ia-bas" style="display:none;">
-        <span class="ia-mot">AI</span>
-        <!-- La coche prend la place de l'anneau quand c'est fini. Elle porte le
-             même dégradé : c'est le même travail qui s'achève, pas un autre signe. -->
-        <span class="ia-coche">
+        <span class="ia-case"><span class="ia-mot">AI</span><span class="ia-fig m ia-roue"><span class="lum"></span></span><span class="ia-coche">
           <svg viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
             <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
           </svg>
-        </span>
-        <span id="vid-ia-bas-txt">Compléter les étapes avec l’IA</span>
+        </span></span>
+        <!-- La coche prend la place de l'anneau quand c'est fini. Elle porte le
+             même dégradé : c'est le même travail qui s'achève, pas un autre signe. -->
+        
+        <span id="vid-ia-bas-txt">L’IA rédige mes étapes</span>
       </button>
       <!-- La note vit SOUS le bouton. Elle était restée où l'ancien bouton se
            trouvait, tout en haut : les messages d'erreur s'affichaient à un
@@ -1184,7 +1184,7 @@
       <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
 
-    <div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
+    <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
       <div class="tete">
         <span class="pic">
           <svg viewBox="0 0 24 24" fill="none" stroke="#FF9F0A" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -1278,7 +1278,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-07 · 19h</div>
+    <div class="reg-version">Procédo · version 2026-08-08 · 05h</div>
   </div>
 
   <!-- Sous-page : le compte -->
@@ -1635,7 +1635,7 @@
       </button>
     </div>
 
-    <div class="reg-version">Procédo · version 2026-08-07 · 19h</div>
+    <div class="reg-version">Procédo · version 2026-08-08 · 05h</div>
   </div>
 
   <!-- Sous-page : le compte -->

@@ -173,6 +173,17 @@
     color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
   }
 
+  /* L'alerte s'en va devant les yeux quand on dit « plus tard ». */
+  .alerte-essai.part{
+    animation:alertePart 0.32s cubic-bezier(0.4,0,1,1) both;
+    pointer-events:none;
+  }
+  @keyframes alertePart{
+    0%{ opacity:1; transform:scale(1); max-height:260px; }
+    100%{ opacity:0; transform:scale(0.94); max-height:0;
+          margin-top:0; padding-top:0; padding-bottom:0; }
+  }
+
   .alerte-essai{
     margin-top:14px; padding:15px; border-radius:18px;
     background:rgba(10,132,255,0.10); border:0.5px solid rgba(10,132,255,0.30);
@@ -2472,7 +2483,6 @@
   }
   .offre-phare .p svg{ width:17px; height:17px; display:block; }
   .offre-phare .t{ display:block; font-size:14px; font-weight:700; letter-spacing:-0.02em; }
-  .offre-phare .s{ display:block; font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:4px; }
 
   .offre-aussi{
     font-size:12.5px; color:var(--label-3); line-height:1.55;
@@ -3574,6 +3584,111 @@
   .clip-info b{ color:#fff; font-weight:700; }
 
   /* ═══ Boîte de confirmation façon iOS ═══ */
+/* ═══ LA FENÊTRE PROCÉDO ═══
+     Le halo est ce qu'on ne trouve nulle part ailleurs : c'est lui qui fait
+     reconnaître l'application, même sur une question banale. Sa couleur suit la
+     nature de l'acte — rouge quand c'est irréversible, vert quand c'est
+     accompli, bleu le reste du temps. */
+  .fen-pro{
+    position:relative; width:100%; max-width:318px;
+    border-radius:26px; overflow:hidden;
+    background:linear-gradient(168deg, #1D1E23, #141518);
+    border:0.5px solid rgba(255,255,255,0.14);
+    box-shadow:0 28px 66px rgba(0,0,0,0.66);
+    transform:scale(0.94); opacity:0;
+    transition:transform 0.28s cubic-bezier(0.34,1.4,0.64,1), opacity 0.22s ease;
+  }
+  .ios-alert-backdrop.shown .fen-pro{ transform:scale(1); opacity:1; }
+  .ios-alert-backdrop.closing .fen-pro{ transform:scale(0.95); opacity:0; transition-duration:0.16s; }
+
+  .fen-halo{
+    position:absolute; top:-72px; left:50%; transform:translateX(-50%);
+    width:250px; height:145px; pointer-events:none; filter:blur(26px);
+  }
+  .fen-halo.bleu { background:radial-gradient(ellipse, rgba(94,160,255,0.34), transparent 68%); }
+  .fen-halo.rouge{ background:radial-gradient(ellipse, rgba(255,69,58,0.30), transparent 68%); }
+  .fen-halo.vert { background:radial-gradient(ellipse, rgba(48,209,88,0.28), transparent 68%); }
+
+  .fen-co{ position:relative; padding:26px 22px 18px; text-align:center; }
+  .fen-ic{
+    width:54px; height:54px; border-radius:18px; margin:0 auto 15px;
+    display:grid; place-items:center; color:#fff;
+    background:rgba(255,255,255,0.07); border:0.5px solid var(--border);
+  }
+  .fen-ic svg{ width:25px; height:25px; display:block; }
+  .fen-ic.rouge{ background:rgba(255,69,58,0.14); border-color:rgba(255,69,58,0.34); color:#FF6961; }
+  .fen-ic.vert { background:rgba(48,209,88,0.14); border-color:rgba(48,209,88,0.32); color:#5FDE84; }
+
+  .fen-t{ font-size:18.5px; font-weight:800; letter-spacing:-0.038em; line-height:1.25; }
+  .fen-s{
+    font-size:13.5px; color:var(--label-2); line-height:1.5; margin-top:8px;
+    white-space:pre-line;
+  }
+
+  /* Les boutons sont EMPILÉS. Côte à côte, on tape à côté une fois sur dix — et
+     une fois sur dix, ici, c'est une procédure effacée par erreur. */
+  .fen-ac{ display:flex; flex-direction:column; gap:8px; padding:0 18px 18px; }
+  .fen-p{
+    width:100%; height:48px; border:none; border-radius:15px;
+    background:#fff; color:#000; font-family:inherit; font-size:15px; font-weight:750;
+  }
+  .fen-p.rouge{ background:#FF453A; color:#fff; }
+  .fen-p:active{ transform:scale(0.98); }
+  .fen-a{
+    width:100%; height:44px; border-radius:15px;
+    border:0.5px solid var(--border); background:rgba(255,255,255,0.05);
+    color:var(--label-2); font-family:inherit; font-size:14px; font-weight:650;
+  }
+  .fen-a:active{ background:rgba(255,255,255,0.09); }
+
+  /* Le champ de saisie prend la place du dessin : une tuile au-dessus d'un
+     champ ferait deux points d'attention là où il n'y a qu'une chose à faire. */
+  .fen-champ{
+    width:100%; height:46px; margin-top:16px; padding:0 14px;
+    border-radius:14px; border:0.5px solid var(--border);
+    background:rgba(255,255,255,0.06); color:#fff;
+    font-family:inherit; font-size:15px; text-align:center;
+  }
+  .fen-champ:focus{
+    outline:none; border-color:rgba(94,160,255,0.5);
+    background:rgba(94,160,255,0.08);
+  }
+  .fen-champ::placeholder{ color:var(--label-3); }
+
+  /* ═══ UN ÉTABLISSEMENT QUI S'EN VA ═══
+     Il se rétracte devant les yeux plutôt que de disparaître entre deux images.
+     Trois cents millisecondes suffisent à lever le doute sur ce qu'on a
+     supprimé. */
+  [data-etab].part{
+    animation:etabPart 0.32s cubic-bezier(0.4,0,1,1) both;
+    pointer-events:none;
+  }
+  @keyframes etabPart{
+    0%{ opacity:1; transform:scale(1); }
+    100%{ opacity:0; transform:scale(0.7); }
+  }
+
+  /* Le passage à l'autre entreprise. Le fondu évite le clignotement d'un écran
+     qui se vide puis se remplit : on comprend qu'on CHANGE d'endroit, au lieu
+     de croire à une panne. */
+  body.bascule-etab #gestion-app,
+  body.bascule-etab #equipe-app,
+  body.bascule-etab #tabbar{
+    opacity:0;
+    transform:scale(0.985);
+    transition:opacity 0.2s ease, transform 0.3s cubic-bezier(0.32,0.72,0,1);
+  }
+  #gestion-app, #equipe-app, #tabbar{
+    transition:opacity 0.32s ease, transform 0.4s cubic-bezier(0.32,0.72,0,1);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    [data-etab].part{ animation:none; }
+    body.bascule-etab #gestion-app,
+    body.bascule-etab #equipe-app,
+    body.bascule-etab #tabbar{ transition:none; }
+  }
+
   .ios-alert-backdrop{
     position:fixed; inset:0; z-index:200; display:flex; align-items:center; justify-content:center; padding:24px;
     background:rgba(0,0,0,0.45); -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);

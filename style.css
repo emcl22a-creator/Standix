@@ -2451,7 +2451,10 @@
     margin-top:20px; padding-top:16px; border-top:0.5px solid var(--border);
   }
   .offre-phares{ display:flex; flex-direction:column; gap:16px; margin-top:14px; }
-  .offre-phare{ display:flex; gap:13px; }
+  /* `align-items:center` : sans lui, le titre se calait en HAUT de la tuile.
+     Un texte d'une seule ligne à côté d'un carré de 34 px paraissait alors
+     flotter au-dessus du dessin plutôt qu'à sa hauteur. */
+  .offre-phare{ display:flex; gap:13px; align-items:center; }
   /* L'avantage qui fait acheter se voit avant les autres : un cadre, un fond
      bleuté, un titre plus grand. Le bleu de la page, pas le vert de l'app. */
   .offre-phare.vedette{
@@ -2477,7 +2480,7 @@
   .offre-phare.vedette .t{ font-size:15.5px; letter-spacing:-0.03em; }
   .offre-phare.vedette .s{ color:var(--label-2); }
   .offre-phare .p{
-    flex-shrink:0; width:30px; height:30px; border-radius:9px; margin-top:1px;
+    flex-shrink:0; width:30px; height:30px; border-radius:9px;
     display:flex; align-items:center; justify-content:center;
     background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
   }

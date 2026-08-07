@@ -1,0 +1,280 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#0C0D0E">
+<title>Procédo — Conditions d'utilisation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--l2:rgba(235,235,245,.64);--l3:rgba(235,235,245,.32);--bord:rgba(255,255,255,.09)}
+  html{scroll-behavior:smooth}
+  body{background:#0C0D0E;color:#fff;font-family:'Inter',-apple-system,system-ui,sans-serif;
+    letter-spacing:-.02em;-webkit-font-smoothing:antialiased}
+
+  /* L'en-tête, avec le halo de l'application */
+  .tete{position:relative;overflow:hidden;padding:82px 22px 62px;text-align:center;
+    border-bottom:0.5px solid var(--bord)}
+  .halo{position:absolute;top:-150px;left:50%;transform:translateX(-50%);
+    width:620px;height:340px;pointer-events:none;filter:blur(60px);
+    background:radial-gradient(ellipse,rgba(94,160,255,.30),transparent 66%)}
+  .marque{position:relative;display:inline-flex;align-items:center;gap:9px;margin-bottom:26px}
+  .marque svg{width:19px;height:23px;display:block}
+  .marque span{font-size:14.5px;font-weight:700;letter-spacing:-.02em}
+  .tete h1{position:relative;font-size:38px;font-weight:700;letter-spacing:-.02em;line-height:1.12}
+  .tete .maj{position:relative;font-size:12px;color:var(--l3);font-weight:650;
+    margin-top:16px;text-transform:uppercase;letter-spacing:.09em}
+
+  .page{max-width:680px;margin:0 auto;padding:0 22px 110px}
+
+  .som{margin-top:38px;padding:20px 22px;border-radius:20px;
+    background:rgba(255,255,255,.035);border:0.5px solid var(--bord)}
+  .som .tt{font-size:10.5px;font-weight:750;color:var(--l3);text-transform:uppercase;
+    letter-spacing:.09em;margin-bottom:13px}
+  .som ol{list-style:none;counter-reset:s}
+  .som li{counter-increment:s;padding:5px 0}
+  .som a{display:flex;gap:12px;font-size:13.5px;color:var(--l2);text-decoration:none;line-height:1.4}
+  .som a::before{content:counter(s,decimal-leading-zero);flex-shrink:0;font-size:11px;
+    font-weight:800;color:rgba(94,160,255,.75);padding-top:2px;font-variant-numeric:tabular-nums}
+  .som a:hover{color:#fff}
+
+  article{margin-top:52px;scroll-margin-top:24px}
+  article .num{display:flex;align-items:center;gap:11px;margin-bottom:12px}
+  article .num i{font-style:normal;font-size:11px;font-weight:850;
+    color:rgba(94,160,255,.8);letter-spacing:.08em;font-variant-numeric:tabular-nums}
+  article .num em{flex:1;height:0.5px;background:var(--bord);display:block}
+  h2{font-size:23px;font-weight:700;letter-spacing:-.02em;line-height:1.22}
+  h3{font-size:14px;font-weight:700;letter-spacing:-.02em;margin:24px 0 2px;color:#fff}
+  p{font-size:14.5px;color:var(--l2);line-height:1.72;margin-top:12px}
+  p b,li b,td b{color:#fff;font-weight:650}
+  ul{margin-top:12px;list-style:none}
+  li{font-size:14.5px;color:var(--l2);line-height:1.65;padding:5px 0 5px 20px;position:relative}
+  li::before{content:'';position:absolute;left:3px;top:13px;width:5px;height:5px;
+    border-radius:50%;background:rgba(94,160,255,.55)}
+
+  .cle{margin-top:18px;padding:20px 22px;border-radius:18px;
+    background:linear-gradient(160deg,rgba(255,159,10,.13),rgba(255,159,10,.04));
+    border:0.5px solid rgba(255,159,10,.3)}
+  .cle .t{font-size:12px;font-weight:800;color:#FFB340;text-transform:uppercase;
+    letter-spacing:.09em;margin-bottom:10px}
+  .cle p{color:#FFD9A8;font-size:14px;margin-top:0}
+  .cle p+p{margin-top:11px}
+  .cle b{color:#FFEFD9;font-weight:750}
+
+  table{width:100%;border-collapse:collapse;margin-top:16px;font-size:13.5px}
+  th{text-align:left;font-size:10px;font-weight:800;color:var(--l3);text-transform:uppercase;
+    letter-spacing:.08em;padding:0 12px 9px;border-bottom:0.5px solid var(--bord)}
+  td{padding:12px;border-bottom:0.5px solid rgba(255,255,255,.05);color:var(--l2);
+    vertical-align:top;line-height:1.5}
+  td:first-child{color:#fff;font-weight:700;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+
+  .pied{margin-top:64px;padding-top:28px;border-top:0.5px solid var(--bord);
+    font-size:12.5px;color:var(--l3);line-height:1.8}
+  .pied b{color:rgba(235,235,245,.7);font-weight:700}
+  a{color:#7FB6FF;text-decoration:none}
+  a:hover{text-decoration:underline}
+</style></head><body>
+
+<div class="tete">
+  <span class="halo"></span>
+  <span class="marque">
+    <svg viewBox="0 0 85 100" fill="none"><path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#fff"/></svg>
+    <span>Procédo</span>
+  </span>
+  <h1>Conditions<br>d'utilisation</h1>
+</div>
+
+<div class="page">
+
+<div class="som">
+  <div class="tt">Sommaire</div>
+  <ol>
+    <li><a href="#a1">Qui édite Procédo</a></li>
+    <li><a href="#a2">Le compte et l'entreprise</a></li>
+    <li><a href="#a3">Abonnement, essai et paiement</a></li>
+    <li><a href="#a4">Ce qui vous appartient</a></li>
+    <li><a href="#a5">Confidentialité entre entreprises</a></li>
+    <li><a href="#a6">Ce que l'intelligence artificielle ne garantit pas</a></li>
+    <li><a href="#a7">Nos sous-traitants</a></li>
+    <li><a href="#a8">Données personnelles</a></li>
+    <li><a href="#a9">Ce que vous ne pouvez pas publier</a></li>
+    <li><a href="#a10">Disponibilité et responsabilité</a></li>
+    <li><a href="#a11">Modification et fin</a></li>
+    <li><a href="#a12">Droit applicable</a></li>
+  </ol>
+</div>
+
+<article id="a1"><div class="num"><i>ARTICLE 01</i><em></em></div>
+<h2>Qui édite Procédo</h2>
+<p>Procédo est édité par <b>Adrien Moine</b>, entrepreneur individuel immatriculé sous le
+SIRET <b>100 403 401 00019</b>. Contact : <a href="mailto:Procedo.off@gmail.com">Procedo.off@gmail.com</a>.</p>
+<p>Procédo est une application web permettant à une entreprise de créer, conserver et
+diffuser ses procédures internes, avec l'aide de services d'analyse automatique.</p>
+</article>
+
+<article id="a2"><div class="num"><i>ARTICLE 02</i><em></em></div>
+<h2>Le compte et l'entreprise</h2>
+<p>L'utilisation suppose un compte personnel. <b>Chaque personne doit avoir le sien</b> :
+un compte partagé rend impossible le suivi nominatif des lectures, qui est l'une des
+raisons d'être du service.</p>
+<p>Une entreprise est créée par une personne, qui en devient le <b>fondateur</b>. Elle
+seule peut la supprimer. Les autres membres reçoivent un rôle — gestion ou équipe —
+attribué par le fondateur.</p>
+<p>Vous êtes responsable de la confidentialité de votre mot de passe et des actions
+menées depuis votre compte.</p>
+</article>
+
+<article id="a3"><div class="num"><i>ARTICLE 03</i><em></em></div>
+<h2>Abonnement, essai et paiement</h2>
+<p>Toute nouvelle entreprise bénéficie d'un <b>essai de quatorze jours</b>, sans carte
+bancaire et sans engagement. À son terme, l'accès aux procédures est suspendu jusqu'à
+souscription — <b>rien n'est supprimé</b>.</p>
+<p>Les abonnements sont mensuels ou annuels. Le paiement est traité par <b>Stripe</b> ;
+nous ne conservons aucune donnée bancaire.</p>
+<ul>
+  <li>L'abonnement <b>mensuel</b> est sans engagement, résiliable à tout moment. La
+      résiliation prend effet à la fin de la période payée.</li>
+  <li>L'abonnement <b>annuel</b> est réglé en une fois. Il couvre douze mois et n'est pas
+      remboursable au prorata, sauf accord écrit.</li>
+  <li>Chaque offre inclut un nombre de membres et un quota mensuel d'analyses
+      automatiques. Le quota se remet à zéro le premier de chaque mois et ne se reporte
+      pas.</li>
+</ul>
+<p>Les prix sont indiqués hors taxes. En tant qu'entrepreneur individuel en franchise de
+TVA, aucune TVA n'est facturée à ce jour.</p>
+</article>
+
+<article id="a4"><div class="num"><i>ARTICLE 04</i><em></em></div>
+<h2>Ce qui vous appartient</h2>
+<p><b>Vos vidéos, photos, textes et procédures restent votre propriété.</b> Nous ne
+faisons que les héberger et les traiter pour vous rendre le service. Nous ne les
+utilisons pas à d'autres fins — ni pour entraîner un modèle, ni pour les montrer à
+quiconque hors de votre entreprise.</p>
+<p>Vous nous accordez uniquement le droit technique de les stocker, de les transmettre à
+nos sous-traitants et de les afficher à vos membres.</p>
+</article>
+
+<article id="a5"><div class="num"><i>ARTICLE 05</i><em></em></div>
+<h2>Confidentialité entre entreprises</h2>
+<p>Les données de chaque entreprise sont cloisonnées au niveau de la base : un membre
+d'une entreprise ne peut lire ni les procédures, ni les vidéos, ni la liste des employés
+d'une autre. Les vidéos sont conservées dans un espace privé, accessible uniquement par
+des liens temporaires délivrés aux membres autorisés.</p>
+<p>Cette étanchéité a été vérifiée par des tests d'intrusion menés le 8 août 2026. Nous la
+contrôlons à nouveau après toute modification des règles d'accès.</p>
+</article>
+
+<article id="a6"><div class="num"><i>ARTICLE 06</i><em></em></div>
+<h2>Ce que l'intelligence artificielle ne garantit pas</h2>
+<p>Procédo utilise des services automatiques pour transcrire vos vidéos, en lire le
+contenu visible et en rédiger des étapes.</p>
+
+<div class="cle">
+  <div class="t">À lire avant toute utilisation</div>
+  <p><b>Ces services peuvent se tromper.</b> Ils peuvent mal entendre un mot, omettre une
+  précaution, ou formuler une étape de manière ambiguë.</p>
+  <p><b>Une procédure produite par l'analyse automatique devient visible par vos équipes
+  dès que l'analyse s'achève</b>, sans relecture préalable. Il vous revient d'ouvrir
+  chaque procédure générée, de la vérifier et de la corriger — ou de la retirer si elle
+  ne convient pas.</p>
+  <p>Une procédure diffusée engage votre entreprise, jamais Procédo, <b>en particulier
+  lorsqu'elle concerne la sécurité des personnes</b>. Vous restez seul responsable de son
+  exactitude et de sa conformité aux règles qui vous sont applicables.</p>
+</div>
+
+<p>Les mises en garde éventuellement ajoutées par l'analyse proviennent uniquement de ce
+qui a été dit ou montré dans votre vidéo. <b>Aucune consigne de sécurité n'est
+inventée</b>, et l'absence de mise en garde ne signifie pas l'absence de danger.</p>
+</article>
+
+<article id="a7"><div class="num"><i>ARTICLE 07</i><em></em></div>
+<h2>Nos sous-traitants</h2>
+<p>Pour rendre le service, vos contenus transitent par les prestataires suivants :</p>
+<table>
+  <tr><th>Prestataire</th><th>Rôle</th><th>Ce qui transite</th></tr>
+  <tr><td>Supabase</td><td>Hébergement des données et des fichiers</td>
+      <td>Comptes, procédures, vidéos, photos</td></tr>
+  <tr><td>Microsoft Azure</td><td>Transcription et analyse d'image</td>
+      <td>La bande son et les images de vos vidéos</td></tr>
+  <tr><td>Anthropic</td><td>Rédaction des étapes</td>
+      <td>La transcription et les éléments reconnus</td></tr>
+  <tr><td>Stripe</td><td>Paiement</td><td>Vos informations de facturation</td></tr>
+  <tr><td>Netlify</td><td>Diffusion de l'application</td><td>Aucune donnée métier</td></tr>
+</table>
+<p>Ces prestataires agissent sur nos instructions et sont soumis à leurs propres
+engagements de confidentialité. Les traitements ont lieu au sein de l'Union européenne
+lorsque le prestataire le permet.</p>
+</article>
+
+<article id="a8"><div class="num"><i>ARTICLE 08</i><em></em></div>
+<h2>Données personnelles</h2>
+<p>Une vidéo de procédure contient souvent des <b>visages et des voix</b> : ce sont des
+données personnelles au sens du RGPD.</p>
+<p>Dans cette relation, <b>votre entreprise est responsable de traitement</b> et Procédo
+est sous-traitant. Il vous appartient d'informer vos employés que leurs gestes et leur
+voix peuvent être enregistrés, et de recueillir les autorisations nécessaires.</p>
+<p>Chaque personne dispose d'un droit d'accès, de rectification et de suppression de ses
+données. Ces demandes peuvent être adressées à votre employeur ou directement à
+<a href="mailto:Procedo.off@gmail.com">Procedo.off@gmail.com</a>.</p>
+<h3>Durée de conservation</h3>
+<ul>
+  <li>Vos contenus sont conservés tant que votre abonnement est actif.</li>
+  <li>Après résiliation, ils restent disponibles <b>quatre-vingt-dix jours</b>, pendant
+      lesquels vous pouvez les récupérer ou reprendre l'abonnement.</li>
+  <li>Passé ce délai, ils sont supprimés définitivement.</li>
+  <li>Les données de facturation sont conservées dix ans, comme la loi l'impose.</li>
+</ul>
+</article>
+
+<article id="a9"><div class="num"><i>ARTICLE 09</i><em></em></div>
+<h2>Ce que vous ne pouvez pas publier</h2>
+<p>Vous vous engagez à ne pas déposer sur Procédo de contenu :</p>
+<ul>
+  <li>illicite, ou portant atteinte aux droits d'un tiers ;</li>
+  <li>filmant une personne qui n'a pas été informée de l'enregistrement ;</li>
+  <li>contenant des données sensibles au sens du RGPD — santé, opinions, origine ;</li>
+  <li>sans rapport avec la formation interne de votre entreprise.</li>
+</ul>
+<p>Nous pouvons <b>suspendre un compte ou retirer un contenu</b> qui nous serait signalé
+comme manifestement illicite, sans préavis lorsque la gravité l'exige. Nous vous en
+informons dans les meilleurs délais et vous pouvez contester par écrit.</p>
+</article>
+
+<article id="a10"><div class="num"><i>ARTICLE 10</i><em></em></div>
+<h2>Disponibilité et responsabilité</h2>
+<p>Procédo est fourni tel quel. Nous mettons tout en œuvre pour maintenir le service
+accessible, sans pouvoir garantir une disponibilité ininterrompue : nous dépendons de
+prestataires tiers et d'un réseau que nous ne maîtrisons pas.</p>
+<p>Notre responsabilité, si elle était engagée, ne pourrait excéder les sommes que vous
+avez effectivement versées au cours des douze derniers mois.</p>
+<p>Nous ne saurions être tenus responsables des conséquences d'une procédure mal rédigée,
+mal comprise ou mal appliquée au sein de votre entreprise.</p>
+</article>
+
+<article id="a11"><div class="num"><i>ARTICLE 11</i><em></em></div>
+<h2>Modification et fin</h2>
+<p>Ces conditions peuvent évoluer. Toute modification substantielle vous sera notifiée
+<b>trente jours avant</b> son entrée en vigueur. Si elle ne vous convient pas, vous pouvez
+résilier sans frais avant cette date.</p>
+<p>Vous pouvez cesser d'utiliser Procédo à tout moment et demander la suppression de vos
+données. Nous pouvons résilier votre accès en cas de manquement grave à ces conditions,
+après vous en avoir informé.</p>
+</article>
+
+<article id="a12"><div class="num"><i>ARTICLE 12</i><em></em></div>
+<h2>Droit applicable</h2>
+<p>Ces conditions sont soumises au <b>droit français</b>. En cas de différend, nous
+chercherons d'abord une solution amiable. À défaut, et pour un professionnel, les
+tribunaux compétents seront ceux du ressort du siège de l'éditeur.</p>
+<p>Le médiateur de la consommation peut être saisi pour les litiges avec un consommateur,
+dans les conditions prévues par le code de la consommation.</p>
+</article>
+
+<div class="pied">
+  Version en vigueur le <b>8 août 2026</b>.<br><br>
+  <b>Procédo</b> — Adrien Moine, entrepreneur individuel<br>
+  SIRET 100 403 401 00019 · <a href="mailto:Procedo.off@gmail.com">Procedo.off@gmail.com</a><br>
+  Hébergement : Netlify et Supabase.
+</div>
+
+</div>
+</body></html>

@@ -3498,7 +3498,15 @@
 
   /* La sortie. Une catégorie qui s'efface parce que sa dernière procédure part
      doit se voir partir — sinon on doute d'avoir supprimé la bonne chose. */
-  .sop-card.part, .emp-row.part, .cat-cell.part, .proc-rich-card.part{
+  /* Le départ ANNULE l'arrivée.
+
+     Une cellule peut porter `neuf` et `part` en même temps : elle vient
+     d'apparaître, et on supprime aussitôt sa dernière procédure. Les deux
+     animations se jouaient alors ensemble — elle grandissait en rétrécissant,
+     d'où ce sursaut. La règle plus spécifique l'emporte. */
+  .sop-card.part, .emp-row.part, .cat-cell.part, .proc-rich-card.part,
+  .sop-card.neuf.part, .emp-row.neuf.part,
+  .cat-cell.neuf.part, .proc-rich-card.neuf.part{
     animation:cardOut 0.3s cubic-bezier(0.4,0,1,1) both;
     pointer-events:none;
   }

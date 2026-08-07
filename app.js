@@ -2672,7 +2672,12 @@ function dessinerAnneauMembre(cle) {
 
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const ECART = 5
-  const vus = regrouperParts(fmVues[cle].classe.filter(x => x.secondes), x => x.secondes)
+  /* `> 0` explicitement. `filter(x => x.secondes)` écartait déjà le zéro, mais
+     pas une valeur d'une fraction de seconde — une procédure ouverte par erreur
+     puis refermée comptait comme lue, et se retrouvait dans le gris. Une demi
+     seconde n'est pas une lecture. */
+  const vus = regrouperParts(
+    fmVues[cle].classe.filter(x => x.secondes >= 1), x => x.secondes)
   const somme = vus.reduce((s, x) => s + x.secondes, 0)
 
   /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
@@ -2822,7 +2827,16 @@ function peindreClassementMembre(cle, animerDes) {
   }
 
   const vus = vue.classe.filter(x => x.secondes)
-  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, 3)
+  /* L'ANNEAU ET LA LISTE DOIVENT DIRE LA MÊME CHOSE.
+
+     L'anneau regroupe les plus petites parts sous un gris « N autres », mais la
+     liste n'en montrait que trois : on voyait une couleur au cercle sans jamais
+     la retrouver en dessous. On ne pouvait pas savoir ce qu'elle valait.
+
+     La liste montre donc autant de lignes que l'anneau a de parts. */
+  const nbParts = regrouperParts(vue.classe.filter(x => x.total || x.secondes),
+                                 x => x.total || x.secondes || 0).length
+  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, Math.max(3, nbParts - 1))
 
   el.innerHTML = visibles.map((x, rang) => {
     const i = vus.indexOf(x)
@@ -5540,8 +5554,7 @@ function dessinerAlerteEssai(hote) {
       ? `Vous \u00eates <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> : votre formule est \u00e0
          <b>39 \u20ac par mois</b>, ou 29 \u20ac en r\u00e9glant l\u2019ann\u00e9e. Tout revient d\u00e8s le paiement.`
       : `Vous pouvez activer votre abonnement d\u00e8s maintenant :
-         <b>les jours restants vous sont offerts</b>, le premier pr\u00e9l\u00e8vement
-         n\u2019aura lieu qu\u2019au ${dateLisible(etatAbo.fin_essai)}.`}</div>
+         <b>les jours restants vous sont offerts</b>.`}</div>
     <div class="actions">
       <button type="button" class="principal" data-abo-ouvrir>${
         fini ? 'Voir les formules' : 'Choisir mon abonnement'}</button>
@@ -5550,10 +5563,22 @@ function dessinerAlerteEssai(hote) {
 }
 
 document.addEventListener('click', (e) => {
-  if (e.target.closest('[data-abo-ouvrir]')) { showGestionScreen('p-abonnement'); return }
+  if (e.target.closest('[data-abo-ouvrir]')) {
+    /* DESSINER AVANT D'OUVRIR : l'écran existe mais son contenu est fabriqué à
+       la demande. Sans cet appel, on arrivait sur une page vide. */
+    renderAbonnements()
+    showGestionScreen('p-abonnement')
+    return
+  }
   if (e.target.closest('[data-abo-plus-tard]')) {
     const z = e.target.closest('.alerte-essai')
-    if (z) z.style.display = 'none'
+    if (!z) return
+    /* Elle s'en va DEVANT les yeux : disparaître entre deux images laisse
+       croire à une fausse manipulation. */
+    z.classList.add('part')
+    const fin = () => { z.style.display = 'none'; z.classList.remove('part') }
+    z.addEventListener('animationend', fin, { once: true })
+    setTimeout(fin, 400)
   }
 })
 
@@ -8509,6 +8534,8 @@ function brancherPoignee(poi, i) {
 
   let tire = false
   let jouaitAvant = false
+  let tVise = null
+  let attenteImage = false
 
   const bornes = () => {
     const avant = i > 0 ? videoSteps[i - 1].fin_video : 0
@@ -8516,11 +8543,22 @@ function brancherPoignee(poi, i) {
     return [avant + COUPURE_MINI, apres - COUPURE_MINI]
   }
 
+  /* ═══ LE DÉCALAGE DE PRISE ═══
+
+     C'est LA différence avec CapCut. On posait la coupure sous le doigt dès le
+     premier contact : la poignée sautait, et on perdait le point qu'on visait
+     avant même d'avoir commencé à bouger.
+
+     On retient l'écart entre le doigt et la poignée au moment où on l'attrape,
+     et on le conserve pendant tout le geste. La poignée ne bouge pas d'un pixel
+     tant que le doigt ne bouge pas — exactement comme on tient un objet. */
+  let ecartPrise = 0
+
   const placer = (clientX) => {
     const r = f.getBoundingClientRect()
     const duree = v.duration || 1
     const [min, max] = bornes()
-    let t = (clientX - r.left) / r.width * duree
+    let t = (clientX - ecartPrise - r.left) / r.width * duree
     t = Math.max(min, Math.min(max, t))
 
     /* Les deux étapes voisines se partagent l'instant : la fin de l'une EST le
@@ -8530,7 +8568,25 @@ function brancherPoignee(poi, i) {
 
     poi.style.left = (t / duree * 100) + '%'
     poi.querySelector('.val').textContent = dvFmt(t)
-    v.currentTime = t
+
+    /* LA VIDÉO SUIT, MAIS PAS À CHAQUE PIXEL.
+
+       Chaque écriture de `currentTime` demande au décodeur de retrouver une
+       image. Un doigt qui glisse produit soixante événements par seconde : le
+       décodeur prend du retard, et le geste devient poussif.
+
+       On ne lui demande qu'une image par rafraîchissement, et seulement quand
+       il a fini la précédente. Le trait, lui, suit le doigt sans attendre. */
+    tVise = t
+    if (!attenteImage) {
+      attenteImage = true
+      requestAnimationFrame(() => {
+        attenteImage = false
+        if (tVise != null && Math.abs(v.currentTime - tVise) > 0.02) {
+          try { v.currentTime = tVise } catch (e) {}
+        }
+      })
+    }
   }
 
   poi.addEventListener('pointerdown', (e) => {
@@ -8557,7 +8613,10 @@ function brancherPoignee(poi, i) {
     document.getElementById('dv-piste')?.classList.add('fige')
     if (navigator.vibrate) navigator.vibrate(8)
 
-    placer(e.clientX)
+    /* On note où le doigt s'est posé par rapport à la poignée, et on NE
+       DÉPLACE RIEN. Le premier mouvement partira d'ici. */
+    const rp = poi.getBoundingClientRect()
+    ecartPrise = e.clientX - (rp.left + rp.width / 2)
   })
 
   poi.addEventListener('pointermove', (e) => {
@@ -8578,7 +8637,13 @@ function brancherPoignee(poi, i) {
     document.getElementById('dv-piste')?.classList.remove('fige')
     dvPistePourTemps()
     poi.classList.remove('tire')
-    /* On redessine tout : les durées affichées sous chaque étape ont changé. */
+    /* La vidéo rejoint la position finale AVANT le redessin : sinon elle
+       continuait de chercher son image pendant qu'on refaisait la frise, et
+       l'écran sautait une dernière fois au moment où l'on lâche. */
+    if (tVise != null) { try { v.currentTime = tVise } catch (e) {} }
+    tVise = null
+
+    /* On redessine : les durées affichées sous chaque étape ont changé. */
     renderVideoSteps()
     dvMajFrise()
     if (jouaitAvant) v.play()
@@ -10369,7 +10434,7 @@ const PICTOS = {
   marqueAI: `<span class="ia-mot" style="font-size:14px;">AI</span>`,
   video: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="5.4" width="18.8" height="13.2" rx="3" stroke="${AV_O}" stroke-width="1.7"/><path d="M10 9.6 15.4 12 10 14.4Z" fill="${AV_O}"/></svg>`,
   monde: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="${AV_O}" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="${LG_O}" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-  infini: `<svg viewBox="0 0 24 24" fill="none"><path d="M8.4 12a3.4 3.4 0 1 1 3.6 3.4c-2.4 0-3.6-6.8-6-6.8a3.4 3.4 0 0 0 0 6.8c2.4 0 3.6-6.8 6-6.8a3.4 3.4 0 0 1 0 6.8" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round"/></svg>`,
+  infini: `<svg viewBox="0 0 24 24" fill="none"><path d="M6.6 8.6a3.4 3.4 0 1 0 0 6.8c2.5 0 3.3-2.4 5.4-3.4s2.9-3.4 5.4-3.4a3.4 3.4 0 1 1 0 6.8c-2.5 0-3.3-2.4-5.4-3.4S9.1 8.6 6.6 8.6Z" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
   suivi: `<svg viewBox="0 0 24 24" fill="none"><line x1="5.4" y1="19.4" x2="5.4" y2="12.6" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19.4" x2="12" y2="7.6" stroke="${AV_O}" stroke-width="2" stroke-linecap="round"/><line x1="18.6" y1="19.4" x2="18.6" y2="10.4" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/></svg>`,
   sites: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="${AV_O}" stroke-width="1.7"/></svg>`,
   main: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v9.2M8.4 7l3.6-3.6L15.6 7" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.6 14.4v3.4a2.6 2.6 0 0 0 2.6 2.6h9.6a2.6 2.6 0 0 0 2.6-2.6v-3.4" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
@@ -10396,14 +10461,17 @@ let rythmeChoisi = 'annuel'
 const AVANTAGES = [
   /* L'argument de tête porte la marque AI plutôt qu'un dessin : c'est le nom de
      ce qu'on vend, et il se lit même de loin. */
-  { p: 'marqueAI', vedette: true, t: 'L\'IA \u00e9coute et regarde',
+  /* « L'IA écoute et regarde » décrivait la machine ; ce titre-ci dit ce qu'on
+     y gagne. Deux minutes est un chiffre vérifiable, pas une promesse creuse —
+     c'est à peu près ce que dure une démonstration de geste. */
+  { p: 'marqueAI', vedette: true, t: 'Deux minutes de vid\u00e9o, une proc\u00e9dure \u00e9crite',
     s: "Elle entend ce que vous expliquez et lit ce qui est visible \u2014 objets, gestes, " +
        "texte \u00e0 l'\u00e9cran. Elle en tire des \u00e9tapes num\u00e9rot\u00e9es que vous relisez." },
   { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es',
     s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
   /* QUATRE, et non trois. On les nomme : « trois façons de créer » ne dit ni
      lesquelles ni pourquoi on en aurait besoin. */
-  { p: 'main', t: 'Quatre fa\u00e7ons de cr\u00e9er',
+  { p: 'main', t: 'Quatre fa\u00e7ons de cr\u00e9er une proc\u00e9dure',
     s: "\u00c9crivez \u00e0 la main, filmez et d\u00e9coupez vous-m\u00eame, laissez l'IA d\u00e9couper, " +
        "ou partez d'un document existant." },
   { p: 'monde', t: 'Chacun lit dans sa langue',
@@ -10475,7 +10543,10 @@ function carteOffre(o, opts = {}) {
     <div class="offre-phares">
       ${AVANTAGES.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
         <span class="p">${PICTOS[f.p]}</span>
-        <span><span class="t">${f.t}</span><span class="s">${f.s}</span></span>
+        <!-- Les explications ont été retirées. Six titres se lisent d'un regard ;
+             six titres suivis chacun d'une phrase deviennent un paragraphe qu'on
+             saute. Le titre dit déjà ce qu'on achète. -->
+        <span><span class="t">${f.t}</span></span>
       </div>`).join('')}
     </div>
     <div class="offre-aussi">${AUSSI}</div>`
@@ -11109,6 +11180,25 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
     }
 
     const partait = etabEdite.id === currentMembre?.entreprise_id
+
+    /* ═══ LA LIGNE S'EN VA DEVANT LES YEUX ═══
+
+       La base a effacé, la fenêtre se ferme, et la liste se redessine sans elle :
+       entre deux images, l'établissement disparaît sans qu'on l'ait vu partir. On
+       se demande alors si c'est bien le bon qu'on a supprimé.
+
+       On le fait donc partir AVANT de fermer. Trois cents millisecondes suffisent
+       à lever le doute. */
+    const ligne = document.querySelector(`[data-etab="${etabEdite.id}"]`)
+    if (ligne) {
+      await new Promise(r => {
+        ligne.classList.add('part')
+        const fin = () => r()
+        ligne.addEventListener('animationend', fin, { once: true })
+        setTimeout(fin, 400)
+      })
+    }
+
     fermerFenetreEtab()
     try { localStorage.removeItem('procedo_membre') } catch (e) {}
 
@@ -11118,7 +11208,17 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
       const { fiches } = await lireFichesMembre(user?.id)
       const suivante = choisirFicheMembre(fiches)
       cachedEntreprise = null
-      if (suivante) { await enterApp(suivante); toast(`${nom} a \u00e9t\u00e9 supprim\u00e9.`); return }
+      if (suivante) {
+        /* On passe dans l'autre entreprise. Le fondu évite le clignotement d'un
+           écran qui se vide puis se remplit — on comprend qu'on CHANGE d'endroit,
+           au lieu de croire que l'application a bugué. */
+        document.body.classList.add('bascule-etab')
+        await new Promise(r => setTimeout(r, 220))
+        await enterApp(suivante)
+        document.body.classList.remove('bascule-etab')
+        toast(`${nom} a \u00e9t\u00e9 supprim\u00e9. Vous \u00eates maintenant dans ${suivante.entreprise_nom || 'votre autre \u00e9tablissement'}.`)
+        return
+      }
       document.getElementById('gestion-app').style.display = 'none'
       document.getElementById('equipe-app').style.display = 'none'
       document.getElementById('tabbar').style.display = 'none'
@@ -12982,13 +13082,20 @@ function choisirAction({ titre, options }) {
   return new Promise((resoudre) => {
     const fond = document.createElement('div')
     fond.className = 'ios-alert-backdrop'
+    /* Une liste de choix : pas de dessin, pas de halo coloré. Un pictogramme
+       devrait représenter plusieurs actions à la fois — il n'en existe pas. Le
+       halo reste bleu, comme toute question ouverte. */
     fond.innerHTML = `
-      <div class="ios-alert" role="dialog" aria-modal="true">
-        <div class="ios-alert-body"><div class="ios-alert-title">${escapeHtml(titre)}</div></div>
-        <div class="ios-alert-choix">
-          ${options.map(o => `<button type="button"${o.danger ? ' class="danger"' : ''}
+      <div class="fen-pro" role="dialog" aria-modal="true">
+        <span class="fen-halo bleu"></span>
+        <div class="fen-co" style="padding-bottom:6px;">
+          <div class="fen-t">${escapeHtml(titre)}</div>
+        </div>
+        <div class="fen-ac">
+          ${options.map(o => `<button type="button"
+            class="${o.danger ? 'fen-p rouge' : 'fen-p'}"
             data-cle="${escapeHtml(o.cle)}">${escapeHtml(o.libelle)}</button>`).join('')}
-          <button type="button" class="annuler" data-cle="">Annuler</button>
+          <button type="button" class="fen-a annuler" data-cle="">Annuler</button>
         </div>
       </div>`
     document.body.appendChild(fond)
@@ -13009,17 +13116,20 @@ function demanderTexte({ titre, message, valeur = '', placeholder = '', confirme
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
     backdrop.className = 'ios-alert-backdrop'
+    /* Une saisie : le champ prend la place du dessin. Une tuile au-dessus d'un
+       champ ferait deux points d'attention là où il n'y a qu'une chose à faire. */
     backdrop.innerHTML = `
-      <div class="ios-alert" role="dialog" aria-modal="true">
-        <div class="ios-alert-body">
-          <div class="ios-alert-title">${escapeHtml(titre)}</div>
-          ${message ? `<div class="ios-alert-msg">${escapeHtml(message)}</div>` : ''}
-          <input type="text" class="ios-alert-champ" value="${escapeHtml(valeur)}"
+      <div class="fen-pro" role="dialog" aria-modal="true">
+        <span class="fen-halo bleu"></span>
+        <div class="fen-co">
+          <div class="fen-t">${escapeHtml(titre)}</div>
+          ${message ? `<div class="fen-s">${escapeHtml(message)}</div>` : ''}
+          <input type="text" class="fen-champ" value="${escapeHtml(valeur)}"
                  placeholder="${escapeHtml(placeholder)}" maxlength="60">
         </div>
-        <div class="ios-alert-actions">
-          <button type="button" class="cancel">${escapeHtml(annuler)}</button>
-          <button type="button" class="ok">${escapeHtml(confirmer)}</button>
+        <div class="fen-ac">
+          <button type="button" class="fen-p ok">${escapeHtml(confirmer)}</button>
+          <button type="button" class="fen-a cancel">${escapeHtml(annuler)}</button>
         </div>
       </div>`
     document.body.appendChild(backdrop)
@@ -13042,22 +13152,60 @@ function demanderTexte({ titre, message, valeur = '', placeholder = '', confirme
   })
 }
 
-function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler', danger = true }) {
+/* `accompli` : la fenêtre annonce une réussite plutôt qu'une question. Vert,
+   coche ronde, et généralement un seul bouton. */
+const ICONE_POUBELLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="3.5 6.2 20.5 6.2"/>
+  <path d="M8.5 6.2V4.4a1.6 1.6 0 0 1 1.6-1.6h3.8a1.6 1.6 0 0 1 1.6 1.6v1.8"/>
+  <path d="M18.2 6.2V19a2 2 0 0 1-2 2H7.8a2 2 0 0 1-2-2V6.2"/>
+  <line x1="10.4" y1="11" x2="10.4" y2="16.6"/><line x1="13.6" y1="11" x2="13.6" y2="16.6"/></svg>`
+
+const ICONE_COCHE_RONDE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/><polyline points="8 12.4 11 15.4 16.2 9.2"/></svg>`
+
+const ICONE_QUESTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.4 2.5c-.7.3-.9.8-.9 1.5v.4"/>
+  <line x1="12" y1="16.8" x2="12" y2="16.8"/></svg>`
+
+function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler',
+                         danger = true, accompli = false }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
     backdrop.className = 'ios-alert-backdrop'
-    backdrop.innerHTML = `
-      <div class="ios-alert" role="alertdialog" aria-modal="true">
-        <div class="ios-alert-body">
-          <div class="ios-alert-title">${escapeHtml(titre)}</div>
-          ${message ? `<div class="ios-alert-msg">${escapeHtml(message)}</div>` : ''}
+    /* ═══ LA FENÊTRE PROCÉDO ═══
+
+     Elle ne ressemble plus à une boîte de dialogue du système. Le halo est ce
+     qu'on ne trouve nulle part ailleurs — c'est lui qui fait qu'on reconnaît
+     l'application, même sur une question aussi banale qu'une suppression.
+
+     Sa couleur suit la nature de l'acte : rouge quand c'est irréversible, vert
+     quand c'est accompli, bleu le reste du temps. On sait ce qui se joue avant
+     d'avoir lu le titre.
+
+     LES BOUTONS SONT EMPILÉS. Côte à côte, on tape à côté une fois sur dix — et
+     une fois sur dix, ici, c'est une procédure effacée par erreur. L'action
+     principale est en haut, sous le pouce ; l'annulation en dessous, plus
+     discrète et plus basse. */
+  const teinte = danger ? 'rouge' : (accompli ? 'vert' : 'bleu')
+
+  backdrop.innerHTML = `
+      <div class="fen-pro" role="alertdialog" aria-modal="true">
+        <span class="fen-halo ${teinte}"></span>
+        <div class="fen-co">
+          <span class="fen-ic ${teinte}">${danger ? ICONE_POUBELLE
+            : accompli ? ICONE_COCHE_RONDE : ICONE_QUESTION}</span>
+          <div class="fen-t">${escapeHtml(titre)}</div>
+          ${message ? `<div class="fen-s">${escapeHtml(message)}</div>` : ''}
         </div>
-        <div class="ios-alert-actions">
+        <div class="fen-ac">
+          <button type="button" class="fen-p ${danger ? 'rouge' : ''} ok">${escapeHtml(confirmer)}</button>
           <!-- Le bouton d'annulation disparaît si on ne lui donne pas de nom :
                une fenêtre qui ne fait qu'expliquer n'a rien à annuler, et un
                bouton vide à côté de « Compris » n'appelle que le doute. -->
-          ${annuler ? `<button type="button" class="cancel">${escapeHtml(annuler)}</button>` : ''}
-          <button type="button" class="${danger ? 'danger' : ''} ok">${escapeHtml(confirmer)}</button>
+          ${annuler ? `<button type="button" class="fen-a cancel">${escapeHtml(annuler)}</button>` : ''}
         </div>
       </div>`
     document.body.appendChild(backdrop)

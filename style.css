@@ -139,6 +139,40 @@
      Même motif que `.alerte-partage` — tuile de 32, titre de 14,5, deux boutons
      de 38 — mais en BLEU. L'ambre signale une faute à corriger ; la fin d'un
      essai n'en est pas une, elle était prévue depuis le premier jour. */
+/* ═══ DES GENS ATTENDENT À LA PORTE ═══
+     ROUGE, et non ambre. C'est la seule alerte de l'app qui coûte un client si
+     on l'ignore : quelqu'un veut entrer, et il y a de l'argent en jeu. Les
+     autres alertes signalent une chose à corriger ; celle-ci, une chose à
+     décider. */
+  .alerte-demandes{
+    margin-top:14px; padding:15px; border-radius:18px;
+    background:rgba(255,69,58,0.10); border:0.5px solid rgba(255,69,58,0.32);
+  }
+  .alerte-demandes .tete{ display:flex; align-items:flex-start; gap:11px; }
+  .alerte-demandes .pic{
+    width:32px; height:32px; border-radius:10px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(255,69,58,0.16); border:0.5px solid rgba(255,69,58,0.3);
+  }
+  .alerte-demandes .pic svg{ width:18px; height:18px; }
+  .alerte-demandes .tx{ flex:1; min-width:0; }
+  .alerte-demandes .tx b{ display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
+  .alerte-demandes .tx i{
+    display:block; font-style:normal; font-size:12px;
+    color:#FF9A92; margin-top:2px; font-weight:600;
+  }
+  .alerte-demandes .s{ font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:11px; }
+  .alerte-demandes .actions{ display:flex; gap:8px; margin-top:13px; }
+  .alerte-demandes .principal{
+    flex:1; height:38px; border:none; border-radius:12px;
+    background:#fff; color:#000; font-family:inherit; font-size:13px; font-weight:700;
+  }
+  .alerte-demandes .secondaire{
+    height:38px; padding:0 15px; border-radius:12px;
+    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
+  }
+
   .alerte-essai{
     margin-top:14px; padding:15px; border-radius:18px;
     background:rgba(10,132,255,0.10); border:0.5px solid rgba(10,132,255,0.30);
@@ -1828,6 +1862,10 @@
     overflow-x:hidden;
     touch-action:none;
   }
+  /* La poignée passe DEVANT la piste et capte le geste en premier. Sans cette
+     priorité, le défilement horizontal de la piste attrapait le doigt avant
+     elle : on croyait tirer la coupure, on faisait défiler la frise. */
+  .dv-poi{ z-index:12; touch-action:none; }
 
   /* Le temps de la coupure, montré pendant qu'on la déplace. */
   .dv-poi .val{
@@ -1880,7 +1918,37 @@
                  et une phrase qui reste sous un bouton désactivé donne envie
                  d'appuyer encore.
      À la fin  : la coche, quelques secondes, puis retour au repos. */
-  .dv-ia-bas .ia-coche{ display:none; width:24px; height:24px; flex-shrink:0; }
+/* ═══ LA MARQUE DEVIENT L'ANNEAU ═══
+
+     Au repos, on lit « AI » : c'est le nom de ce qu'on demande. Dès qu'on
+     appuie, les lettres s'effacent et l'anneau prend leur place — exactement
+     leur place, puisqu'ils occupent la même case.
+
+     Deux éléments superposés plutôt qu'un remplacement : rien ne saute, rien ne
+     se décale. La marque rétrécit, l'anneau grandit, et le texte glisse hors
+     champ pendant ce temps. Ce qui reste est centré. */
+  .dv-ia-bas{ position:relative; }
+  .dv-ia-bas .ia-mot,
+  .dv-ia-bas .ia-roue{
+    grid-area:1 / 1;
+    transition:opacity 0.24s ease, transform 0.34s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  /* La case commune. */
+  .dv-ia-bas .ia-case{
+    display:grid; place-items:center; width:24px; height:24px; flex-shrink:0;
+  }
+  .dv-ia-bas .ia-roue{ display:grid; opacity:0; transform:scale(0.5); }
+  .dv-ia-bas.travaille .ia-mot{ opacity:0; transform:scale(0.5); }
+  .dv-ia-bas.travaille .ia-roue{ opacity:1; transform:scale(1); }
+  .dv-ia-bas.fini .ia-mot,
+  .dv-ia-bas.fini .ia-roue{ opacity:0; transform:scale(0.5); }
+
+  .dv-ia-bas .ia-coche{
+    grid-area:1 / 1; opacity:0; transform:scale(0.5);
+    transition:opacity 0.24s ease, transform 0.34s cubic-bezier(0.34,1.4,0.64,1);
+    width:24px; height:24px;
+  }
+  .dv-ia-bas.fini .ia-coche{ display:block; opacity:1; transform:scale(1); }
   .dv-ia-bas .ia-coche svg{ width:24px; height:24px; display:block; }
 
   .dv-ia-bas #vid-ia-bas-txt{
@@ -2077,15 +2145,6 @@
   .langue-proc.traduit{ border-color:rgba(10,132,255,0.4); background:rgba(10,132,255,0.10); }
 
   /* Bandeau rappelant qu'on lit une traduction */
-  .traduction-note{
-    display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:12px;
-    background:rgba(10,132,255,0.10); border:0.5px solid rgba(10,132,255,0.28);
-    font-size:11.5px; color:var(--label-2); line-height:1.4; margin-bottom:10px;
-  }
-  .traduction-note button{
-    border:none; background:none; color:var(--blue); font-family:inherit;
-    font-size:11.5px; font-weight:700; flex-shrink:0; padding:0;
-  }
 
   /* ═══ Anneau d'analyse sans avancement connu ═══
      Quand personne ne sait où en est le calcul, l'anneau tourne au lieu de se
@@ -2389,6 +2448,16 @@
     background:rgba(94,160,255,0.10);
     border:0.5px solid rgba(94,160,255,0.26);
   }
+  /* Sur la tuile de tête, la marque AI remplace le dessin : elle doit rester
+     lisible sur un fond bleuté, d'où le dégradé clair plutôt que le bleu foncé
+     des boutons blancs. */
+  .offre-phare .p .ia-mot{
+    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #6FBEFF 100%);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    font-weight:850; letter-spacing:0.02em; line-height:1;
+  }
+
   .offre-phare.vedette .p{
     width:34px; height:34px; border-radius:11px;
     background:rgba(94,160,255,0.18); border-color:rgba(94,160,255,0.34);
@@ -2420,6 +2489,36 @@
     height:42px; font-size:13px;
   }
   .offre-carte.actuelle .offre-cta{ background:none; color:#5EA0FF; }
+/* ═══ MENSUEL OU ANNUEL ═══
+     Deux boutons radio, entre les avantages et l'action. On voit les DEUX prix
+     en même temps : un interrupteur cache toujours la moitié de l'information,
+     et ce qu'on ne voit pas ne convainc pas. */
+  .offre-rythme{
+    display:flex; gap:8px; margin-top:16px;
+    padding-top:16px; border-top:0.5px solid var(--border);
+  }
+  .offre-rythme .rlg{
+    flex:1; display:flex; align-items:center; gap:9px;
+    padding:11px 12px; border-radius:14px; text-align:left;
+    background:rgba(255,255,255,0.04); border:1px solid transparent;
+    color:#fff; font-family:inherit;
+  }
+  .offre-rythme .rlg.on{
+    border-color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.09);
+  }
+  .offre-rythme .rlg:active{ transform:scale(0.98); }
+  .offre-rythme .rd{
+    width:18px; height:18px; border-radius:50%; flex-shrink:0;
+    border:1.5px solid var(--label-3);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .offre-rythme .rlg.on .rd{ border-color:#fff; background:#fff; }
+  .offre-rythme .rd i{ width:7px; height:7px; border-radius:50%; background:#000; display:none; }
+  .offre-rythme .rlg.on .rd i{ display:block; }
+  .offre-rythme .tx b{ display:block; font-size:13px; font-weight:700; }
+  .offre-rythme .tx span{ display:block; font-size:10.5px; color:var(--label-3); margin-top:1px; }
+  .offre-rythme .rlg.on .tx span{ color:var(--label-2); }
+
   .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:11px; }
   .offre-annuel b{ color:#5EA0FF; font-weight:700; }
 
@@ -2614,22 +2713,42 @@
   .tiroir-langue .tiroir-liste{ height:38px; padding:3px; }
   .tiroir-langue .rond-ent{ width:32px; height:32px; }
   .tiroir-langue .rond-ent .code{ font-size:10.5px; }
-  .tiroir-langue .rond-ent .terre{ width:17px; height:17px; }
   .tiroir-langue .rond-ent .code{
     position:relative; font-size:12px; font-weight:750; letter-spacing:0.03em;
     color:#fff; text-shadow:0 1px 3px rgba(0,0,0,0.65), 0 0 9px rgba(0,0,0,0.45);
   }
-  .tiroir-langue .rond-ent .terre{ position:relative; width:21px; height:21px; display:block; }
 
   /* Pendant la traduction, le globe tourne. Un mouvement continu dit « ça
      travaille » sans prétendre savoir combien de temps ça prendra. */
-  .tiroir-langue .rond-ent.patiente .terre{
-    animation:terreTourne 1.6s linear infinite; transform-origin:50% 50%;
+  /* ═══ LE GLOBE TOURNE SUR SON AXE ═══
+
+     Il pivotait comme une roue : le dessin entier faisait un tour, méridien
+     compris. Un globe ne fait pas ça — son contour reste immobile, c'est ce
+     qu'il y a DESSUS qui défile.
+
+     On anime donc le seul méridien, en écrasant son ellipse jusqu'à la ligne
+     puis en la rouvrant de l'autre côté. C'est exactement ce que fait un
+     méridien qui passe devant nous.
+
+     Deux règles se contredisaient aussi sur la taille — 17 px dans l'une,
+     21 dans l'autre. Un carré qui n'en est pas un tourne de travers. */
+  .tiroir-langue .rond-ent .terre{
+    width:21px; height:21px; display:block; position:relative;
   }
-  @keyframes terreTourne{ to{ transform:rotate(360deg); } }
+  .tiroir-langue .rond-ent .terre ellipse{
+    transform-origin:12px 12px;
+    transform-box:view-box;
+  }
+  .tiroir-langue .rond-ent.patiente .terre ellipse{
+    animation:meridien 1.5s ease-in-out infinite;
+  }
+  @keyframes meridien{
+    0%,100%{ transform:scaleX(1); }
+    50%    { transform:scaleX(0.06); }
+  }
+
   .tiroir-langue .rond-ent.patiente{ opacity:0.75; }
   @media (prefers-reduced-motion: reduce){
-    .tiroir-langue .rond-ent.patiente .terre{ animation:none; }
   }
 
   /* ═══ Liste des établissements dans les réglages ═══

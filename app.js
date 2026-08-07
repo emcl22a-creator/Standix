@@ -21,13 +21,13 @@ try {
   document.body.insertAdjacentHTML('beforeend', `
     <div style="position:fixed; inset:0; z-index:9999; background:#0C0D0E; display:flex; align-items:center; justify-content:center; padding:24px;">
       <div style="text-align:center; max-width:320px;">
-        <p style="color:#fff; font-size:15px; font-weight:600; margin-bottom:8px;">Connexion impossible</p>
+        <p style="color:#fff; font-size:15px; font-weight:300; margin-bottom:8px;">Connexion impossible</p>
         <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">Vérifiez votre connexion internet, puis réessayez.</p>
         <div style="background:rgba(255,69,58,0.12); border:1px solid rgba(255,69,58,0.4); border-radius:10px; padding:12px; margin-bottom:20px; text-align:left;">
           <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">DÉTAIL TECHNIQUE (build v3) :</p>
           <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : 'Erreur inconnue (pas de message)'}</p>
         </div>
-        <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:600; font-size:14px; border:none;">Réessayer</button>
+        <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:300; font-size:14px; border:none;">Réessayer</button>
       </div>
     </div>
   `)
@@ -238,7 +238,7 @@ const DICO = {
     "avant publication.": "before publishing.",
     "chevauchement": "overlap",
     "couvert": "covered",
-    "moins de 10 minutes": "under 10 minutes",
+    "moins de 5 minutes": "under 5 minutes",
     "ou": "or",
     "relire et corriger": "review and correct",
     "trou": "gap",
@@ -446,7 +446,7 @@ const DICO = {
     "avant publication.": "antes de publicar.",
     "chevauchement": "solapamiento",
     "couvert": "cubierto",
-    "moins de 10 minutes": "menos de 10 minutos",
+    "moins de 5 minutes": "menos de 5 minutos",
     "ou": "o",
     "relire et corriger": "revisar y corregir",
     "trou": "hueco",
@@ -648,7 +648,7 @@ const DICO = {
     "avant publication.": "antes de publicar.",
     "chevauchement": "sobreposição",
     "couvert": "coberto",
-    "moins de 10 minutes": "menos de 10 minutos",
+    "moins de 5 minutes": "menos de 5 minutos",
     "ou": "ou",
     "relire et corriger": "rever e corrigir",
     "trou": "lacuna",
@@ -880,8 +880,7 @@ async function preparerArriveeQR() {
   }
   // On nomme l'entreprise si on peut la retrouver par son code.
   if (cibleQR.code) {
-    const { data: ent } = await supabase
-      .from('entreprises').select('nom').eq('code_acces', cibleQR.code).maybeSingle()
+    const ent = await entrepriseParCode(cibleQR.code)
     const sous = document.getElementById('qr-bandeau-sous')
     if (sous && ent?.nom) sous.textContent = `Créez votre compte pour rejoindre « ${ent.nom} » et consulter la procédure.`
   }
@@ -993,8 +992,8 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   // Pour l'équipe : vérifier que le code correspond bien à une entreprise AVANT de créer le compte
   let targetEntrepriseId = null
   if (selectedSpace === 'equipe') {
-    const { data: entreprise, error: entrepriseError } = await supabase
-      .from('entreprises').select('id').eq('code_acces', codeAcces).maybeSingle()
+    const entreprise = await entrepriseParCode(codeAcces)
+    const entrepriseError = null
     if (entrepriseError || !entreprise) {
       errorEl.textContent = "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire."
       return
@@ -1688,8 +1687,7 @@ async function ouvrirCibleQR() {
 /* Renvoie true si l'app a été relancée sur une autre entreprise — dans ce cas
    l'ouverture de la procédure se fera au tour suivant. */
 async function proposerEntrepriseDuQR(code) {
-  const { data: ent } = await supabase
-    .from('entreprises').select('id, nom').eq('code_acces', code).maybeSingle()
+  const ent = await entrepriseParCode(code)
 
   // Code inconnu, ou déjà la bonne entreprise : rien à proposer.
   if (!ent || ent.id === currentMembre.entreprise_id) return false
@@ -1750,7 +1748,7 @@ function finDuDemarrage() {
     document.body.classList.remove('booting')
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
-  else setTimeout(liberer, 600)
+  else setTimeout(liberer, 300)
 }
 
 // ═══ PARAMÈTRES ═══
@@ -2399,7 +2397,7 @@ function replierCarte(el) {
     let fini = false
     const finir = () => { if (fini) return; fini = true; resoudre() }
     el.addEventListener('animationend', finir, { once: true })
-    setTimeout(finir, 600)   // filet, si l'animation ne démarre pas
+    setTimeout(finir, 300)   // filet, si l'animation ne démarre pas
   })
 }
 
@@ -5673,6 +5671,23 @@ function oublierCle(liste, cle) {
    celui qui veut entrer s'il reste de la place.
    ═══════════════════════════════════════════════════════════════════════ */
 
+/* ═══ RETROUVER UNE ENTREPRISE PAR SON CODE ═══
+
+   La table `entreprises` ne se lit plus : on ne voit que celles dont on est
+   membre. C'est ce qui empêche un concurrent de lire la liste de vos clients.
+
+   Mais rejoindre une entreprise consiste justement à la trouver AVANT d'en être
+   membre. Cette fonction côté base répond à un code exact, et à rien d'autre :
+   elle rend l'identifiant et le nom, jamais une liste. Il faut connaître le
+   code pour obtenir quoi que ce soit. */
+async function entrepriseParCode(code) {
+  const propre = String(code || '').trim().toUpperCase()
+  if (!propre) return null
+  const { data, error } = await supabase.rpc('entreprise_par_code', { p_code: propre })
+  if (error || !data || !data.length) return null
+  return data[0]
+}
+
 async function placesRestantes(entrepriseId) {
   const { data, error } = await supabase
     .rpc('places_restantes', { p_entreprise: entrepriseId })
@@ -6271,18 +6286,21 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   }, { once: true })
 })
 
-/* Deux seuils. Au-delà de 10 minutes on prévient : l'analyse marche encore mais
+/* Deux seuils. Au-delà de 5 minutes on prévient : l'analyse marche encore mais
    elle devient longue et le découpage moins sûr. Au-delà de 20, on refuse : la
    transcription dépasse ce que le modèle peut mettre en forme d'un seul tenant,
    et l'échec est quasi certain. Mieux vaut le dire avant l'envoi qu'après dix
    minutes d'attente. */
-/* Dix minutes passent sans aucune réserve : c'est la durée d'une vraie
+/* Cinq minutes passent sans aucune réserve : c'est la durée d'une vraie
    procédure filmée, et l'analyse la traite bien. Au-delà on refuse — la
    transcription dépasse ce que le modèle met en forme d'un seul tenant, et
    l'échec est quasi certain. Mieux vaut le dire avant l'envoi qu'après dix
    minutes d'attente. */
-const DUREE_CONSEILLEE = 10 * 60
-const DUREE_REFUSEE = 10 * 60
+const DUREE_CONSEILLEE = 5 * 60
+/* Cinq minutes. Au-delà, l'analyse marcherait encore, mais deux choses la
+   déconseillent : le coût Azure suit la durée à la minute près, et surtout une
+   procédure de dix minutes ne se suit pas — on la regarde une fois, jamais deux. */
+const DUREE_REFUSEE = 5 * 60
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE POIDS DE LA VIDÉO, ET SA BANDE SON
@@ -6304,15 +6322,16 @@ const DUREE_REFUSEE = 10 * 60
       la fiche. On ne la remplace pas, on épargne seulement son transport.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Ce plafond n'est pas un choix : le plan gratuit de Supabase refuse tout envoi
-   au-delà de 50 Mo, et cette limite n'est pas réglable. Écrire un chiffre plus
-   élevé ici ne ferait qu'échouer APRÈS deux minutes de transfert, au lieu de
-   refuser proprement avant.
+/* 150 Mo.
 
-   La durée, elle, monte à dix minutes : ce qui bloque n'est pas la longueur mais
-   la définition. Dix minutes en 720p tiennent sous 45 Mo ; les mêmes en 1080p en
-   font trois fois plus. Le message de refus le dit, avec le réglage à changer. */
-const VIDEO_POIDS_MAX = 45 * 1024 * 1024
+   Le plafond était à 45 Mo, hérité d'une époque où l'on n'osait pas comprimer.
+   Depuis, l'application réduit elle-même en 1080p à 30 images : cinq minutes
+   pesent alors 94 Mo. À 45, on refusait donc des vidéos que l'on savait traiter.
+
+   150 laisse la marge nécessaire — une scène très détaillée se comprime moins
+   bien qu'un plan fixe — tout en écartant ce qui n'a manifestement pas été
+   comprimé : une 4K brute de cinq minutes en fait sept cents. */
+const VIDEO_POIDS_MAX = 150 * 1024 * 1024
 
 function poidsLisible(o) {
   return o >= 1024 * 1024 ? Math.round(o / 1024 / 1024) + ' Mo'
@@ -6559,12 +6578,13 @@ function verifierDureeVideo() {
      jusqu'ici sans rien expliquer. */
   if (aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX) {
     err.style.color = 'var(--red)'
-    const minutes = aiVideoDuree ? Math.max(1, Math.round(aiVideoDuree / 60)) : 10
+    /* Le conseil de filmer en 720p n'a plus lieu d'être : l'application comprime
+       elle-même en 1080p à 30 images avant d'envoyer. Si la vidéo reste trop
+       lourde APRÈS ça, c'est qu'elle est trop longue — pas trop définie. */
     err.innerHTML = `Cette vid\u00e9o p\u00e8se <b>${poidsLisible(aiVideoFile.size)}</b>, ` +
       `au-del\u00e0 des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo accept\u00e9s.<br>` +
-      `C'est la <b>d\u00e9finition</b> qui p\u00e8se, pas la dur\u00e9e : ${minutes} min en 720p ` +
-      `tiennent largement, les m\u00eames en 1080p font trois fois plus.<br>` +
-      `Sur iPhone : R\u00e9glages \u2192 Appareil photo \u2192 Enregistrer vid\u00e9o \u2192 <b>720p HD \u00e0 30 i/s</b>.`
+      `Filmez une s\u00e9quence plus courte : <b>cinq minutes suffisent</b> pour montrer ` +
+      `un geste, et une proc\u00e9dure plus br\u00e8ve se suit mieux.`
     btn.disabled = true
     return
   }
@@ -6574,7 +6594,7 @@ function verifierDureeVideo() {
   const min = Math.round(aiVideoDuree / 60)
   if (aiVideoDuree > DUREE_REFUSEE) {
     err.style.color = 'var(--red)'
-    err.textContent = `Cette vidéo dure ${min} minutes. L'analyse accepte jusqu'à 10 minutes : ` +
+    err.textContent = `Cette vidéo dure ${min} minutes. L'analyse accepte jusqu'à 5 minutes : ` +
       `filmez une procédure par vidéo, ou découpez celle-ci en deux.`
     btn.disabled = true
     return
@@ -6627,8 +6647,11 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
     if (aiVideoFile.size > VIDEO_POIDS_MAX) {
-      throw new Error(`Cette vid\u00e9o p\u00e8se ${poidsLisible(aiVideoFile.size)}, au-del\u00e0 des 45 Mo ` +
-        `accept\u00e9s. Refaites l'enregistrement en 720p, ou coupez-le en deux proc\u00e9dures.`)
+      /* Le plafond est lu, jamais recopié : deux chiffres qui disent la même chose
+         finissent toujours par diverger. */
+        throw new Error(`Cette vid\u00e9o p\u00e8se ${poidsLisible(aiVideoFile.size)}, au-del\u00e0 des ` +
+          `${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo accept\u00e9s. Filmez une s\u00e9quence ` +
+          `plus courte : cinq minutes suffisent pour montrer un geste.`)
     }
 
     /* On extrait la bande son AVANT d'envoyer quoi que ce soit. Si elle est
@@ -9824,8 +9847,7 @@ document.getElementById('e-visiteur-valider')?.addEventListener('click', async (
   if (!/^\d{5}$/.test(code)) { err.textContent = 'Le code comporte 5 chiffres.'; return }
 
   setButtonLoading(btn, true)
-  const { data: ent } = await supabase
-    .from('entreprises').select('id').eq('code_acces', code).maybeSingle()
+  const ent = await entrepriseParCode(code)
 
   if (!ent || ent.id !== currentMembre.entreprise_id) {
     setButtonLoading(btn, false)
@@ -10464,7 +10486,9 @@ const AVANTAGES = [
   /* « L'IA écoute et regarde » décrivait la machine ; ce titre-ci dit ce qu'on
      y gagne. Deux minutes est un chiffre vérifiable, pas une promesse creuse —
      c'est à peu près ce que dure une démonstration de geste. */
-  { p: 'marqueAI', vedette: true, t: 'Deux minutes de vid\u00e9o, une proc\u00e9dure \u00e9crite',
+  /* Sobre : l'IA est un outil de création, pas un numéro de magie. Annoncer
+     « deux minutes » promettait un temps qu'on ne maîtrise pas. */
+  { p: 'marqueAI', vedette: true, t: 'L\'IA \u00e9crit vos proc\u00e9dures',
     s: "Elle entend ce que vous expliquez et lit ce qui est visible \u2014 objets, gestes, " +
        "texte \u00e0 l'\u00e9cran. Elle en tire des \u00e9tapes num\u00e9rot\u00e9es que vous relisez." },
   { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es',
@@ -10538,7 +10562,7 @@ function carteOffre(o, opts = {}) {
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
-    ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac par personne / par mois</b>.</div>` : ''}
+    ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac personne / mois</b>.</div>` : ''}
     ${opts.detaille ? `<div class="offre-etiq">Tout est compris</div>
     <div class="offre-phares">
       ${AVANTAGES.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
@@ -11396,8 +11420,7 @@ document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
   if (!/^\d{5}$/.test(code)) { err.textContent = 'Le code comporte 5 chiffres.'; return }
 
   setButtonLoading(btn, true)
-  const { data: ent } = await supabase
-    .from('entreprises').select('id, nom').eq('code_acces', code).maybeSingle()
+  const ent = await entrepriseParCode(code)
 
   if (!ent) { setButtonLoading(btn, false); err.textContent = 'Aucune entreprise avec ce code.'; return }
   if (mesAdhesions.some(a => a.entreprise_id === ent.id)) {
@@ -11537,8 +11560,7 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
   btn.textContent = 'V\u00e9rification\u2026'
 
   try {
-    const { data: ent } = await supabase.from('entreprises')
-      .select('id, nom').eq('code_acces', code).maybeSingle()
+    const ent = await entrepriseParCode(code)
     if (!ent) throw new Error("Aucune entreprise ne correspond \u00e0 ce code.")
 
     const { data: { user } } = await supabase.auth.getUser()
@@ -12711,7 +12733,7 @@ function handleScanResult(text) {
     resultZone.innerHTML = `
       <div class="scan-result">
         <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-        <div><div style="font-weight:600; font-size:14px;">Code reconnu</div><div style="font-size:12.5px; color:var(--label-2);">Ouverture de la procédure...</div></div>
+        <div><div style="font-weight:300; font-size:14px;">Code reconnu</div><div style="font-size:12.5px; color:var(--label-2);">Ouverture de la procédure...</div></div>
       </div>`
     setTimeout(() => confirmerOuvertureScan(procId, espace), 400)
   } else {
@@ -13238,7 +13260,7 @@ function toast(texte) {
     el.style.cssText = 'position:fixed; left:50%; bottom:118px; transform:translateX(-50%) translateY(10px);' +
       'z-index:150; background:rgba(44,44,48,0.92); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);' +
       'border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:11px 20px; font-size:13px;' +
-      'font-weight:600; color:#fff; max-width:88vw; text-align:center; opacity:0;' +
+      'font-weight:300; color:#fff; max-width:88vw; text-align:center; opacity:0;' +
       'transition:opacity 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1); pointer-events:none;'
     document.body.appendChild(el)
   }

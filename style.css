@@ -663,6 +663,14 @@
     display:block;
     animation:cocheArrive 0.45s cubic-bezier(0.34,1.5,0.64,1) both;
   }
+  /* La coche PREND LA PLACE de l'anneau, elle ne se pose pas dessus.
+
+     C'était le défaut : la coche apparaissait, l'anneau restait à tourner
+     dessous, et l'on voyait deux cercles superposés avec un point brillant qui
+     tournait encore autour. Trois formes pour dire une seule chose — c'est
+     fini. */
+  .doc-generer.fini .ia-roue,
+  .doc-generer.fini .ia-mot{ opacity:0; transform:scale(0.5); }
 
   /* ═══ L'ÉCRAN VIDÉO ═══
      La légende vit HORS du cadre : elle explique, elle ne se touche pas. Dedans,
@@ -1488,7 +1496,10 @@
     display:flex; align-items:center; justify-content:space-between;
     gap:12px; margin-top:18px;
   }
-  .an-rangee .dd-filter{ flex:0 0 auto; }
+  /* La marge basse de 14 px que `.dd-filter` porte partout ailleurs poussait le
+     filtre sous le compte : deux rangées pour une seule idée. Dans cette rangée,
+     il n'a rien à pousser — c'est la rangée elle-même qui espace. */
+  .an-rangee .dd-filter{ flex:0 0 auto; margin-bottom:0; }
   .an-rangee .an-compte{ flex:1; min-width:0; }
 
   .an-lig{
@@ -1938,6 +1949,25 @@
      Deux éléments superposés plutôt qu'un remplacement : rien ne saute, rien ne
      se décale. La marque rétrécit, l'anneau grandit, et le texte glisse hors
      champ pendant ce temps. Ce qui reste est centré. */
+  /* Le bouton « Générer les étapes » suit la même métamorphose que celui du
+     découpage : les lettres AI cèdent la place à l'anneau, dans la même case. */
+  #ai-launch-btn .ia-case{
+    display:grid; place-items:center; width:24px; height:24px; flex-shrink:0;
+  }
+  #ai-launch-btn .ia-mot,
+  #ai-launch-btn .ia-roue,
+  #ai-launch-btn .ia-coche{
+    grid-area:1 / 1;
+    transition:opacity 0.24s ease, transform 0.34s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  #ai-launch-btn .ia-roue{ display:grid; opacity:0; transform:scale(0.5); }
+  #ai-launch-btn .ia-coche{ display:block; opacity:0; transform:scale(0.5); width:24px; height:24px; }
+  #ai-launch-btn.travaille .ia-mot{ opacity:0; transform:scale(0.5); }
+  #ai-launch-btn.travaille .ia-roue{ opacity:1; transform:scale(1); }
+  #ai-launch-btn.fini .ia-mot,
+  #ai-launch-btn.fini .ia-roue{ opacity:0; transform:scale(0.5); }
+  #ai-launch-btn.fini .ia-coche{ opacity:1; transform:scale(1); }
+
   .dv-ia-bas{ position:relative; }
   .dv-ia-bas .ia-mot,
   .dv-ia-bas .ia-roue{
@@ -3670,6 +3700,39 @@
 
   /* Un lien qui se comporte comme une ligne de réglage. */
   a.reg-ligne{ text-decoration:none; }
+
+  /* Une précision collée au titre, en petit. La page ne montre QUE l'espace
+     équipe : sans cette mention, un gérant qui ne se voit pas dans la liste
+     croit à un oubli. */
+  .titre-precision{
+    display:block; font-size:11.5px; font-weight:600;
+    color:var(--label-3); letter-spacing:-0.01em; margin-top:1px;
+  }
+
+  /* ═══ L'ÉCRAN « AUCUNE ENTREPRISE » ═══
+
+     Une image à lui seul, plus grande que l'avatar habituel. C'est le premier
+     écran que voit quelqu'un qui n'a encore rien : autant qu'il soit accueillant
+     plutôt qu'administratif.
+
+     `#fond-orphelin` cible cet écran ET LUI SEUL — le même personnage sert
+     ailleurs, sur la carte de promotion et la fiche de contact, où il ne doit
+     pas changer. */
+  #fond-orphelin .promu-carte .accueil-av{
+    width:104px; height:104px;
+    /* Le RACCOURCI `background`, et non `background-image`. La règle générale
+       utilise le raccourci : il redéfinit TOUTES les propriétés d'arrière-plan
+       d'un coup, image comprise. Écrire `background-image` seul ne suffisait
+       donc pas — l'ancienne image revenait par le raccourci. */
+    background:url('aucune-entreprise.png') center/contain no-repeat;
+    margin-right:-6px;   /* l'image a sa propre marge : on la rattrape */
+  }
+  /* La pastille verte n'a plus lieu d'être : elle signalait une personne
+     joignable, pas une invitation à entrer. */
+  #fond-orphelin .promu-carte .accueil-av .dispo{ display:none; }
+
+  /* La carte respire : l'image prend plus de place, le texte doit suivre. */
+  #fond-orphelin .promu-carte{ align-items:center; padding-top:20px; padding-bottom:20px; }
 
   /* ═══ UN ÉTABLISSEMENT QUI S'EN VA ═══
      Il se rétracte devant les yeux plutôt que de disparaître entre deux images.

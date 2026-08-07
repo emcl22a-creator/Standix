@@ -2149,7 +2149,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     div.dataset.proc = x.proc.id
     div.innerHTML = `
       <div class="emp-row-name">${escapeHtml(x.proc.titre || 'Sans titre')}
-        <span class="emp-row-sous">${escapeHtml(x.proc.categorie || 'Sans cat\u00e9gorie')}${
+        <span class="emp-row-sous">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans cat\u00e9gorie'))}${
           n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
       </div>
       ${tempsTotalHtml(x.total, false, libelle)}`
@@ -2771,7 +2771,7 @@ function centreAnneauMembre(cle, choix) {
 
   v.textContent = choix.secondes ? String(Math.round(choix.secondes / 60)) : '0'
   u.textContent = choix.secondes ? 'minutes' : 'jamais ouverte'
-  n.textContent = escapeHtml(choix.proc.titre || 'Sans titre') +
+  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || 'Autres') : (choix.proc?.titre || 'Sans titre')) +
     (choix.fois ? ` \u00b7 ${choix.fois} fois` : '')
 }
 
@@ -2840,9 +2840,13 @@ function peindreClassementMembre(cle, animerDes) {
      la retrouver en dessous. On ne pouvait pas savoir ce qu'elle valait.
 
      La liste montre donc autant de lignes que l'anneau a de parts. */
-  const nbParts = regrouperParts(vue.classe.filter(x => x.total || x.secondes),
-                                 x => x.total || x.secondes || 0).length
-  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, Math.max(3, nbParts - 1))
+  /* La légende dit exactement ce que l'anneau montre : même calcul, mêmes
+  parts, gris compris. Repliée elle suit l'anneau ; dépliée elle montre
+  tout le détail. */
+  const partsAnneau = regrouperParts(
+    vue.classe.filter(x => (x.secondes || x.total || 0) > 0),
+    x => x.secondes || x.total || 0)
+  const visibles = vue.deplie ? vue.classe : partsAnneau
 
   el.innerHTML = visibles.map((x, rang) => {
     const i = vus.indexOf(x)
@@ -2853,8 +2857,10 @@ function peindreClassementMembre(cle, animerDes) {
               data-part="${i}">
         <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
         <span class="co">
-          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
-          <span class="st">${escapeHtml(x.proc.categorie || 'Sans cat\u00e9gorie')}${
+          <!-- La part grise ne désigne aucune procédure : elle en réunit plusieurs. -->
+          <span class="nm">${x.estAutres ? escapeHtml(x.nom || 'Autres')
+            : escapeHtml(x.proc?.titre || 'Sans titre')}</span>
+          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans cat\u00e9gorie'))}${
             x.fois ? ' \u00b7 ' + x.fois + ' consultation' + (x.fois > 1 ? 's' : '') : ''}</span>
         </span>
         <span class="vl"${x.secondes ? '' : ' style="color:var(--label-3)"'}>${
@@ -2908,7 +2914,7 @@ function peindreClassementMembre(cle, animerDes) {
       b.classList.add('choisi')
       arcs.forEach((a, k) => a.classList.toggle('pale', k !== i))
       centreAnneauMembre(cle, i >= 0 ? vus[i] : vue.classe.find(x => !x.secondes &&
-        x.proc.titre === b.querySelector('.nm').textContent))
+        x.proc?.titre === b.querySelector('.nm').textContent))
     })
   })
 }
@@ -3288,7 +3294,20 @@ function peindreClassementCat(cle, animerDes) {
     return
   }
 
-  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, 3)
+  /* ═══ LA LÉGENDE DIT EXACTEMENT CE QUE L'ANNEAU MONTRE ═══
+
+     L'anneau réunit les plus petites parts sous un gris « N autres ». La liste,
+     elle, montrait les procédures une à une avec leurs propres couleurs : on
+     voyait donc du gris au cercle sans jamais le retrouver en dessous, et des
+     couleurs en dessous qui n'existaient pas au cercle.
+
+     Les deux partent maintenant du MÊME calcul. Repliée, la liste montre les
+     parts de l'anneau — gris compris. Dépliée, elle montre tout le détail, où
+     chaque procédure retrouve son nom et son temps exact. */
+  const partsAnneau = regrouperParts(
+    vue.classe.filter(x => (x.total || x.secondes || 0) > 0),
+    x => x.total || x.secondes || 0)
+  const visibles = vue.deplie ? vue.classe : partsAnneau
 
   el.innerHTML = visibles.map((x, rang) => {
     const nb = x.procs.size, gens = x.lecteurs.size
@@ -3553,7 +3572,7 @@ function centreAnneauProc(cle, choix) {
   }
   v.textContent = String(Math.round(choix.total / 60))
   u.textContent = 'minutes'
-  n.textContent = escapeHtml(choix.proc.titre || 'Sans titre')
+  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || 'Autres') : (choix.proc?.titre || 'Sans titre'))
 }
 
 /* Le classement. Trois lignes, puis un bouton qui déplie le reste — la forme
@@ -3572,7 +3591,20 @@ function peindreClassementProc(cle, animerDes) {
     return
   }
 
-  const visibles = vue.deplie ? vue.classe : vue.classe.slice(0, 3)
+  /* ═══ LA LÉGENDE DIT EXACTEMENT CE QUE L'ANNEAU MONTRE ═══
+
+     L'anneau réunit les plus petites parts sous un gris « N autres ». La liste,
+     elle, montrait les procédures une à une avec leurs propres couleurs : on
+     voyait donc du gris au cercle sans jamais le retrouver en dessous, et des
+     couleurs en dessous qui n'existaient pas au cercle.
+
+     Les deux partent maintenant du MÊME calcul. Repliée, la liste montre les
+     parts de l'anneau — gris compris. Dépliée, elle montre tout le détail, où
+     chaque procédure retrouve son nom et son temps exact. */
+  const partsAnneau = regrouperParts(
+    vue.classe.filter(x => (x.total || x.secondes || 0) > 0),
+    x => x.total || x.secondes || 0)
+  const visibles = vue.deplie ? vue.classe : partsAnneau
 
   el.innerHTML = visibles.map((x, rang) => {
     const n = x.lecteurs.size
@@ -3580,11 +3612,13 @@ function peindreClassementProc(cle, animerDes) {
     return `
       <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
               ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
-              data-part="${rang}" data-proc="${escapeHtml(x.proc.id)}">
+              data-part="${rang}" ${x.estAutres ? '' : `data-proc="${escapeHtml(x.proc.id)}"`}>
         <span class="pt" style="background:${x.couleur}"></span>
         <span class="co">
-          <span class="nm">${escapeHtml(x.proc.titre || 'Sans titre')}</span>
-          <span class="st">${escapeHtml(x.proc.categorie || 'Sans cat\u00e9gorie')}${
+          <!-- La part grise ne désigne aucune procédure : elle en réunit plusieurs. -->
+          <span class="nm">${x.estAutres ? escapeHtml(x.nom || 'Autres')
+            : escapeHtml(x.proc?.titre || 'Sans titre')}</span>
+          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans cat\u00e9gorie'))}${
             n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
         </span>
         <span class="vl">${dureeLisible(x.total)}</span>
@@ -5648,8 +5682,20 @@ function marquerLesNeufs(conteneur, liste, selecteur) {
    On la fait partir DEVANT les yeux, puis on redessine. */
 function faireDisparaitre(el, ensuite) {
   if (!el) { if (ensuite) ensuite(); return }
+  /* On retire `neuf` avant d'ajouter `part` : une cellule qui vient d'apparaître
+     et qu'on supprime aussitôt jouait les deux animations à la fois. */
+  el.classList.remove('neuf')
   el.classList.add('part')
-  const fin = () => { el.removeEventListener('animationend', fin); if (ensuite) ensuite() }
+  /* Une seule fois : `animationend` se déclenche par animation, et le filet
+     ci-dessous peut arriver en plus. Sans ce verrou, la suite s'exécutait
+     deux fois — et la grille se redessinait deux fois de suite. */
+  let clos = false
+  const fin = () => {
+    if (clos) return
+    clos = true
+    el.removeEventListener('animationend', fin)
+    if (ensuite) ensuite()
+  }
   el.addEventListener('animationend', fin)
   /* Filet : si l'animation ne se déclenche pas — onglet en arrière-plan,
      mouvement réduit — on continue quand même. */
@@ -6258,7 +6304,12 @@ function resetAiScreen() {
   document.getElementById('ai-video-input').value = ''
   document.getElementById('ai-video-player').style.display = 'none'
   document.getElementById('ai-video-placeholder').style.display = 'block'
-  document.getElementById('ai-launch-btn').disabled = true
+  /* Le bouton retrouve son état neuf. Sans ces deux lignes, il gardait la coche
+     et l'anneau de l'analyse précédente : on revenait sur la page avec un bouton
+     qui disait « c'est fait » alors qu'il n'y avait rien à faire. */
+  const bLance = document.getElementById('ai-launch-btn')
+  bLance.classList.remove('travaille', 'fini')
+  bLance.disabled = true
   document.getElementById('ai-error').textContent = ''
   const detail = document.getElementById('ai-detail')
   if (detail) detail.style.display = 'none'
@@ -6626,18 +6677,17 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   launchBtn.classList.add('travaille')
   launchBtn.disabled = true
 
-  /* ═══ ON PASSE TOUT DE SUITE À L'ÉCRAN D'ATTENTE ═══
+  /* ═══ DEUX ATTENTES, CHACUNE À SA PLACE ═══
 
-     La carte de progression — le grand anneau avec son pourcentage — ne
-     s'affichait qu'À LA FIN, une fois la vidéo envoyée et l'analyse lancée.
-     Toute la préparation se déroulait donc sur la page de dépôt, en petit sous
-     le bouton : deux attentes de suite, dont la première au mauvais endroit.
+     La préparation et l'envoi durent quelques secondes : ça se passe SUR LE
+     BOUTON, l'anneau tourne à la place des lettres. On ne change pas d'écran
+     pour trois secondes — la personne verrait la page disparaître et revenir.
 
-     On bascule dès le clic. C'est le geste qui dit « c'est parti », et il doit
-     arriver au moment du clic. */
-  document.getElementById('ai-upload-card').style.display = 'none'
-  document.getElementById('ai-progress-card').style.display = 'block'
-  startAiProgressSimulation()
+     L'analyse, elle, dure plusieurs minutes : on bascule alors sur l'écran
+     dédié, avec le grand anneau et son pourcentage. C'est là qu'on accepte
+     d'attendre, et l'écran ne fait plus que ça.
+
+     La bascule se fait plus bas, au moment où l'analyse démarre vraiment. */
 
   /* On comprime MAINTENANT, pas à l'import : l'aperçu doit rester immédiat.
      La personne voit sa vidéo tout de suite, et le travail se fait au moment
@@ -6645,20 +6695,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   if (aiVideoFile) {
     const avant = aiVideoFile.size
     errorEl.style.color = 'var(--label-3)'
-    /* ═══ UNE SEULE PROGRESSION, PAS DEUX ═══
-
-       La compression et l'analyse s'affichaient comme deux chargements
-       distincts : le premier finissait, l'écran repartait de zéro, et l'on
-       croyait à un recommencement. Vu de la personne qui attend, c'est UN seul
-       travail — elle a demandé des étapes, elle attend des étapes.
-
-       Les jalons sont donc numérotés d'un bout à l'autre : la préparation
-       devient la première sur six, pas une attente séparée. */
-    signalerEtapeIA('1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026')
+    /* Les trois premières étapes durent quelques secondes : elles s'affichent
+       sous le bouton, dont l'anneau tourne. On ne change pas d'écran pour si
+       peu — la page disparaîtrait et reviendrait aussitôt. */
+    errorEl.textContent = '1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o'
     aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-      signalerEtapeIA(pct >= 100
-        ? '1/6 \u00b7 Finalisation de la vid\u00e9o\u2026'
-        : `1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
+      errorEl.textContent = pct >= 100
+        ? '1/3 \u00b7 Finalisation de la vid\u00e9o\u2026'
+        : `1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
     })
     errorEl.textContent = ''
     errorEl.style.color = 'var(--red)'
@@ -6668,7 +6712,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   }
 
   try {
-    signalerEtapeIA('2/6 \u00b7 Envoi de la vid\u00e9o\u2026')
+    errorEl.textContent = '2/3 \u00b7 Envoi de la vid\u00e9o'
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
@@ -6737,8 +6781,15 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       urlPourAnalyse = sigVid.signedUrl
     }
 
-    signalerEtapeIA('3/6 \u00b7 Vid\u00e9o re\u00e7ue\u2026')
-    signalerEtapeIA('4/6 \u00b7 Cr\u00e9ation de la proc\u00e9dure\u2026')
+    errorEl.textContent = '3/3 \u00b7 Vid\u00e9o re\u00e7ue'
+/* ═══ ON BASCULE MAINTENANT ═══
+       La vidéo est arrivée ; ce qui suit dure des minutes. C'est le moment de
+       quitter la page de dépôt pour l'écran d'attente — pas avant, sinon on
+       change d'écran pour trois secondes. */
+    document.getElementById('ai-upload-card').style.display = 'none'
+    document.getElementById('ai-progress-card').style.display = 'block'
+    startAiProgressSimulation()
+    signalerEtapeIA('Cr\u00e9ation de la proc\u00e9dure\u2026')
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
     const { data: newProc, error: procError } = await supabase
       .from('procedures')
@@ -6747,7 +6798,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     if (procError) throw new Error(procError.message)
     aiProcedureId = newProc.id
 
-    signalerEtapeIA('5/6 \u00b7 L\u2019IA \u00e9coute et regarde\u2026')
+    signalerEtapeIA('L\u2019IA \u00e9coute et regarde\u2026')
     // 3. Démarrage de l'analyse Azure
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',

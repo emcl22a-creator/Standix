@@ -658,6 +658,14 @@
   .doc-generer .ia-coche{ display:none; width:24px; height:24px; flex-shrink:0; }
   .doc-generer .ia-coche svg{ width:24px; height:24px; display:block; }
   .doc-generer:disabled .ia-mot{ opacity:1; }
+  /* Le bouton reste à pleine lumière pendant qu'il travaille.
+
+     `.btn[disabled]` le passait à 50 % d'opacité — c'est juste pour un bouton
+     qu'on ne peut PAS actionner, mais faux ici : il travaille. L'anneau qui
+     tourne dit déjà qu'il est occupé ; l'assombrir en plus donne l'impression
+     que le clic n'a pas pris. */
+  .doc-generer.travaille[disabled],
+  .doc-generer.fini[disabled]{ opacity:1; }
   .doc-generer.fini .ia-mot{ display:none; }
   .doc-generer.fini .ia-coche{
     display:block;
@@ -2536,6 +2544,57 @@
      Deux boutons radio, entre les avantages et l'action. On voit les DEUX prix
      en même temps : un interrupteur cache toujours la moitié de l'information,
      et ce qu'on ne voit pas ne convainc pas. */
+/* L'offre en cours : le bouton dit ce qu'elle est, sans inviter à rien. */
+/* Le lien de gestion : discret sous l'offre, mais présent. On ne cache pas la
+     porte de sortie — la loi l'interdit, et un client qui la cherche sans la
+     trouver part quand même, en mauvais termes. */
+/* ═══════════════════════════════════════════════════════════════════════
+     LES TABLETTES
+     ═══════════════════════════════════════════════════════════════════════
+
+     L'application est une colonne de 460 px centrée — taillée pour un téléphone.
+     Sur un iPad, elle restait à 460 px au milieu de six cents pixels de vide :
+     lisible, mais ridicule, et il fallait approcher l'écran pour lire.
+
+     `zoom` agrandit TOUT dans les mêmes proportions — textes, tuiles, marges,
+     rayons, épaisseurs de trait. C'est ce qu'on veut : la même interface, plus
+     grande. Redessiner une mise en page à deux colonnes serait un autre travail,
+     et une autre application à maintenir.
+
+     Pourquoi pas `transform: scale` : il déplace les éléments sans changer la
+     place qu'ils occupent, ce qui casse le défilement et les positions fixes.
+     `zoom` recalcule la mise en page pour de bon.
+
+     Les téléphones ne sont pas touchés : rien ne s'applique sous 768 px. */
+
+  /* Les paliers visent une colonne occupant les deux tiers de la largeur : assez
+     grande pour se lire de loin, assez étroite pour que l'œil ne balaye pas. */
+  @media (min-width: 768px)  { body{ zoom: 1.30; } }   /* iPad portrait   */
+  @media (min-width: 900px)  { body{ zoom: 1.50; } }
+  @media (min-width: 1100px) { body{ zoom: 1.70; } }   /* iPad paysage    */
+  @media (min-width: 1300px) { body{ zoom: 1.90; } }   /* iPad Pro        */
+
+  /* Au-delà, on cesse de grossir : une interface de téléphone étirée sur un
+     grand écran devient caricaturale. Le vide autour vaut mieux. */
+  @media (min-width: 1600px) { body{ zoom: 2.00; } }
+
+  .offre-gerer{
+    width:100%; margin-top:10px; padding:11px 0;
+    border:none; background:none;
+    color:var(--label-2); font-family:inherit;
+    font-size:13px; font-weight:600; text-decoration:underline;
+    text-underline-offset:3px; text-decoration-color:var(--label-3);
+  }
+  .offre-gerer:active{ opacity:0.55; }
+  .offre-gerer:disabled{ color:var(--label-3); text-decoration:none; }
+
+  .offre-cta.encours{
+    background:rgba(255,255,255,0.10);
+    color:var(--label-2);
+    border:0.5px solid var(--border);
+    font-weight:650;
+  }
+
   .offre-rythme{
     display:flex; gap:8px; margin-top:16px;
     padding-top:16px; border-top:0.5px solid var(--border);

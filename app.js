@@ -1717,6 +1717,9 @@ async function proposerEntrepriseDuQR(code) {
   if (!membre) {
     /* Adhésion « visiteur » : rattachée à une seule procédure. C'est ce qui
        permet de n'afficher que celle-là, sans jamais charger les autres. */
+    /* La place est-elle libre ? Si l'entreprise est complète, la demande est
+       déposée et l'on s'arrête ici. */
+    if (!(await verifierPlaceLibre(ent.id, ent.nom))) return
     const { data, error } = await supabase.from('membres').insert({
       user_id: user.id,
       nom: currentMembre?.nom || '',
@@ -2558,13 +2561,118 @@ async function peindreFicheMembre() {
    à son temps. Les bouts sont arrondis : une extrémité ronde déborde de la moitié
    de l'épaisseur à chaque bout, on retire donc `ep` à la longueur et on décale le
    départ d'une demi-épaisseur, sinon les parts se chevauchent. */
+/* ═══════════════════════════════════════════════════════════════════════
+   UN ANNEAU NE PORTE PAS CINQUANTE PARTS
+   ═══════════════════════════════════════════════════════════════════════
+
+   À cinquante procédures, chaque part fait deux pour cent : trois pixels de
+   couleur. On ne distingue rien, la palette ne compte que huit teintes qui se
+   répètent, et les petites parts perdent leurs bouts arrondis faute de place —
+   d'où ces segments carrés au milieu des ronds.
+
+   Le problème n'est pas le dessin : c'est qu'un anneau de cinquante parts ne
+   dit RIEN. Personne ne lit ça.
+
+   On garde donc les plus grosses, et on réunit le reste sous « Autres ». Sept
+   parts se lisent, se distinguent, et gardent chacune leurs arrondis. Le détail
+   complet reste dans la liste en dessous, où il est à sa place.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+const ANNEAU_PARTS_MAX = 7
+const ANNEAU_GRIS = 'rgba(235,235,245,0.28)'
+
+/* ═══ AUCUNE PART TROP PETITE POUR SES ARRONDIS ═══
+
+   Même regroupées à sept, les parts peuvent rester minuscules : cinquante
+   procédures d'égale importance donnent six parts de 2 % et un gros « autres ».
+   Sous le seuil, on leur retirait leurs bouts ronds — d'où ces segments carrés
+   au milieu des arrondis.
+
+   On donne donc à chacune la longueur MINIMALE qui porte deux arrondis, et on
+   reprend le manque sur les plus grosses, au prorata. L'anneau ment légèrement
+   sur les proportions — mais un segment de trois pixels ne disait déjà rien de
+   juste, et les chiffres exacts sont dans la liste en dessous.
+
+   C'est ce que fait tout logiciel de graphique : on n'affiche pas une part
+   qu'on ne peut pas voir. */
+function fractionsLisibles(parts, valeur, circ, mini) {
+  const somme = parts.reduce((t, x) => t + valeur(x), 0)
+  if (!somme) return parts.map(() => 0)
+
+  const brutes = parts.map(x => valeur(x) / somme)
+  const fracMini = mini / circ
+  /* Impossible de contenter tout le monde : on partage à égalité. */
+  if (fracMini * parts.length >= 1) return parts.map(() => 1 / parts.length)
+
+  const petites = brutes.map(f => f < fracMini)
+  const manque = brutes.reduce((t, f, i) => t + (petites[i] ? fracMini - f : 0), 0)
+  const grosses = brutes.reduce((t, f, i) => t + (petites[i] ? 0 : f), 0)
+  if (!grosses) return parts.map(() => 1 / parts.length)
+
+  return brutes.map((f, i) => petites[i] ? fracMini : f - manque * (f / grosses))
+}
+
+/* Sous ce seuil, une part ne se lit plus : elle occupe trois pixels et sa
+   couleur ne se distingue pas de sa voisine. */
+const ANNEAU_SEUIL = 0.03   // trois pour cent du tour
+
+function regrouperParts(vus, valeur) {
+  const somme = vus.reduce((t, x) => t + valeur(x), 0)
+  if (!somme) return vus
+
+  /* ═══ ON REGROUPE PAR PROPORTION, PAS PAR RANG ═══
+
+     Compter les lignes ne dit rien : cinq procédures dont une minuscule, et
+     cette dernière était gardée puis GROSSIE au minimum lisible — elle mentait
+     sans raison, parce qu'elles étaient moins de sept.
+
+     Le seuil s'adapte au vrai déséquilibre : ce qui pèse moins de trois pour
+     cent part dans le gris, qu'il y ait cinq procédures ou cinquante. Le
+     plafond de sept reste, pour le cas où vingt parts dépasseraient le seuil. */
+  /* LE SEUIL S'ADAPTE. Fixe à trois pour cent, cinquante procédures d'égale
+     importance passaient TOUTES en dessous : l'anneau devenait un disque gris.
+
+     On ne descend donc jamais sous les plus grosses : le seuil est le plus
+     petit des deux — trois pour cent, ou la moitié d'une part moyenne. Ainsi il
+     y a toujours quelque chose à montrer. */
+  const seuil = Math.min(ANNEAU_SEUIL, 0.5 / vus.length)
+  const grosses = vus.filter(x => valeur(x) / somme >= seuil)
+  const petites = vus.filter(x => valeur(x) / somme < seuil)
+
+  /* Rien à regrouper : on rend la liste telle quelle. */
+  if (!petites.length && grosses.length <= ANNEAU_PARTS_MAX) return vus
+
+  const tri = [...grosses].sort((a, b) => valeur(b) - valeur(a))
+  /* Une place est réservée à « autres » dès qu'il y aura quelque chose à y
+     mettre — des petites écartées, ou des grosses en trop. Sinon le plafond de
+     sept devenait huit avec le gris. */
+  const deborde = petites.length > 0 || tri.length > ANNEAU_PARTS_MAX
+  const place = deborde ? ANNEAU_PARTS_MAX - 1 : ANNEAU_PARTS_MAX
+  const gardees = tri.slice(0, place)
+  const reste = [...tri.slice(place), ...petites]
+  if (!reste.length) return gardees
+  const total = reste.reduce((t, x) => t + valeur(x), 0)
+  if (!total) return gardees
+
+  /* « Autres » en gris, jamais en couleur : une teinte de plus laisserait croire
+     à une catégorie réelle. Le gris dit « ceci n'est pas une part, c'est ce qui
+     reste ». */
+  const modele = reste[0]
+  const autres = { ...modele, couleur: ANNEAU_GRIS, estAutres: true, _reste: reste.length }
+  if ('total' in modele) autres.total = total
+  if ('secondes' in modele) autres.secondes = total
+  autres.nom = `${reste.length} autres`
+  autres.titre = autres.nom
+  return [...gardees, autres]
+}
+
 function dessinerAnneauMembre(cle) {
   const zone = document.getElementById('fm-anneau-' + cle)
   if (!zone) return
 
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const ECART = 5
-  const vus = fmVues[cle].classe.filter(x => x.secondes)
+  const vus = regrouperParts(fmVues[cle].classe.filter(x => x.secondes), x => x.secondes)
   const somme = vus.reduce((s, x) => s + x.secondes, 0)
 
   /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
@@ -2574,8 +2682,11 @@ function dessinerAnneauMembre(cle) {
   const ecart = Math.max(1.5, Math.min(ECART, (circ / 8) / Math.max(1, vus.length)))
 
   let pos = 0
+  /* La longueur minimale qui porte deux bouts ronds. */
+  const fracs = fractionsLisibles(vus, x => x.secondes, circ, ecart + ep * 1.7)
+
   const arcs = vus.map((x, i) => {
-    const frac = x.secondes / somme
+    const frac = fracs[i]
     const brut = circ * frac          // la part, telle quelle
 
     /* LES BOUTS ARRONDIS DÉBORDENT.
@@ -3062,7 +3173,7 @@ function dessinerAnneauCat(cle) {
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const ECART = 5
   const vue = anCatVues[cle]
-  const vus = vue.classe.filter(x => x.total)
+  const vus = regrouperParts(vue.classe.filter(x => x.total), x => x.total)
   const somme = vus.reduce((s, x) => s + x.total, 0)
 
   if (!vus.length || !somme) {
@@ -3079,8 +3190,11 @@ function dessinerAnneauCat(cle) {
   const ecart = Math.max(1.5, Math.min(ECART, (circ / 8) / Math.max(1, vus.length)))
 
   let pos = 0
+  /* La longueur minimale qui porte deux bouts ronds. */
+  const fracs = fractionsLisibles(vus, x => x.total, circ, ecart + ep * 1.7)
+
   const arcs = vus.map((x, i) => {
-    const frac = x.total / somme
+    const frac = fracs[i]
     const brut = circ * frac
 
     /* Un trait à bout rond dépasse d'une demi-épaisseur de chaque côté : il
@@ -3335,7 +3449,7 @@ function dessinerAnneauProc(cle) {
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const ECART = 5
   const vue = anProcVues[cle]
-  const vus = vue.classe.filter(x => x.total)
+  const vus = regrouperParts(vue.classe.filter(x => x.total), x => x.total)
   const somme = vus.reduce((s, x) => s + x.total, 0)
 
   if (!vus.length || !somme) {
@@ -3352,8 +3466,11 @@ function dessinerAnneauProc(cle) {
   const ecart = Math.max(1.5, Math.min(ECART, (circ / 8) / Math.max(1, vus.length)))
 
   let pos = 0
+  /* La longueur minimale qui porte deux bouts ronds. */
+  const fracs = fractionsLisibles(vus, x => x.total, circ, ecart + ep * 1.7)
+
   const arcs = vus.map((x, i) => {
-    const frac = x.total / somme
+    const frac = fracs[i]
     const brut = circ * frac
 
     /* Un trait à bout rond dépasse d'une demi-épaisseur de chaque côté : il
@@ -3724,6 +3841,7 @@ window.showGestionScreen = function(id, btn) {
      fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
   lireEtatAbonnement().then(() => {
     dessinerAlerteEssai('essai-reglages')
+    peindreDemandesAcces()
     appliquerBlocageEssai()
   })
   const boutons = document.querySelectorAll('#tabbar .tab-round')
@@ -3798,6 +3916,7 @@ window.showEquipeScreen = function(id, btn) {
      fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
   lireEtatAbonnement().then(() => {
     dessinerAlerteEssai('essai-reglages')
+    peindreDemandesAcces()
     appliquerBlocageEssai()
   })
   /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
@@ -5095,7 +5214,10 @@ function majBoutonIA() {
     bas.classList.toggle('travaille', iaCompletionEnCours)
     bas.classList.toggle('fini', iaVientDeFinir && !iaCompletionEnCours)
     const txt = document.getElementById('vid-ia-bas-txt')
-    if (txt) txt.textContent = 'Compl\u00e9ter les \u00e9tapes avec l\u2019IA'
+    /* « Compléter les étapes avec l'IA » ne disait pas qui fait quoi : on croyait
+       devoir compléter soi-même, avec son aide. Le titre de la page annonce
+       « Vous découpez, l'IA rédige » — le bouton reprend ces mots. */
+    if (txt) txt.textContent = 'L\u2019IA r\u00e9dige mes \u00e9tapes'
   }
 
   /* La note explicative reste : elle dit combien d'étapes attendent un texte,
@@ -5139,7 +5261,9 @@ async function completerEtapesAvecIA() {
     jalon('Pr\u00e9paration de la vid\u00e9o\u2026')
     if (currentVideoFile) {
       currentVideoFile = await comprimerVideo(currentVideoFile, (pct) => {
-        jalon(`Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
+        jalon(pct >= 100
+          ? 'Finalisation de la vid\u00e9o\u2026'
+          : `Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
       })
     }
     jalon('1/5 \u00b7 Pr\u00e9paration de la bande son\u2026')
@@ -5508,6 +5632,126 @@ function faireDisparaitre(el, ensuite) {
 function oublierCle(liste, cle) {
   dejaMontres.get(liste)?.delete(cle)
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   L'ENTREPRISE EST COMPLÈTE
+   ═══════════════════════════════════════════════════════════════════════
+
+   L'abonnement plafonne le nombre de membres. Au-delà, on ne referme pas la
+   porte en silence : on garde la demande, et on prévient le gérant.
+
+   Refuser sans trace serait doublement mauvais. La personne ne comprend pas et
+   réessaie ; le gérant ignore que son équipe s'agrandit, donc il ne passe
+   jamais au palier supérieur. Tout le monde perd.
+
+   LE COMPTE SE FAIT EN BASE. Compter côté téléphone reviendrait à demander à
+   celui qui veut entrer s'il reste de la place.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+async function placesRestantes(entrepriseId) {
+  const { data, error } = await supabase
+    .rpc('places_restantes', { p_entreprise: entrepriseId })
+  /* Sans réponse — la migration n'est peut-être pas passée — on laisse entrer.
+     Bloquer quelqu'un parce qu'une colonne manque serait pire que d'accepter
+     un membre de trop. */
+  if (error || data == null) return null
+  return data
+}
+
+/* Renvoie true si la personne peut entrer. Sinon dépose sa demande et le lui
+   dit. */
+async function verifierPlaceLibre(entrepriseId, nomEntreprise) {
+  const places = await placesRestantes(entrepriseId)
+  if (places === null || places > 0) return true
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    /* `upsert` plutôt qu'`insert` : quelqu'un qui réessaie dix fois ne doit pas
+       produire dix lignes rouges chez le gérant. */
+    await supabase.from('demandes_acces').upsert({
+      entreprise_id: entrepriseId,
+      user_id: user.id,
+      /* Le nom vient du COMPTE de celui qui demande, pas de `currentMembre` —
+         cette variable décrit le membre de l'entreprise où l'on se trouve, pas
+         le visiteur. Le gérant aurait vu son propre nom dans la liste. */
+      nom: user.user_metadata?.nom || user.user_metadata?.full_name || '',
+      email: user.email || '',
+    }, { onConflict: 'entreprise_id,user_id' })
+  }
+
+  await confirmDialog({
+    titre: 'Cette entreprise est compl\u00e8te',
+    message: `« ${nomEntreprise || 'Cette entreprise'} » a atteint le nombre de membres de son ` +
+      `abonnement.\n\nVotre demande a \u00e9t\u00e9 transmise \u00e0 la personne qui la g\u00e8re. ` +
+      `Elle vous ouvrira l'acc\u00e8s d\u00e8s qu'une place se lib\u00e8re.`,
+    confirmer: 'J\u2019ai compris',
+    annuler: 'Fermer',
+  })
+  return false
+}
+
+/* ═══ LE BANDEAU ROUGE CHEZ LE GÉRANT ═══
+
+   Rouge, et non ambre : il y a de l'argent en jeu et quelqu'un attend. C'est
+   la seule alerte de l'app qui coûte un client si on l'ignore. */
+async function peindreDemandesAcces() {
+  const zone = document.getElementById('demandes-acces')
+  if (!zone || !currentMembre?.entreprise_id) return
+  if (currentMembre.role !== 'gestion') { zone.style.display = 'none'; return }
+
+  const { data, error } = await supabase
+    .from('demandes_acces')
+    .select('id, nom, email, created_at')
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .order('created_at', { ascending: false })
+
+  if (error || !data || !data.length) { zone.style.display = 'none'; return }
+
+  /* On nomme les gens. « 3 personnes attendent » reste une statistique ;
+     « Marc, Julie et 1 autre » sont des collègues à qui l'on ferme la porte. */
+  const noms = data.map(d => (d.nom || d.email || 'Quelqu\u2019un').split(' ')[0])
+  const liste = noms.length === 1 ? noms[0]
+    : noms.length === 2 ? `${noms[0]} et ${noms[1]}`
+    : `${noms[0]}, ${noms[1]} et ${noms.length - 2} autre${noms.length > 3 ? 's' : ''}`
+
+  zone.style.display = 'block'
+  zone.innerHTML = `
+    <div class="tete">
+      <span class="pic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FF6961" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/>
+        </svg>
+      </span>
+      <span class="tx">
+        <b>${data.length} personne${data.length > 1 ? 's' : ''} ne peu${data.length > 1 ? 'vent' : 't'} pas entrer</b>
+        <i>${escapeHtml(liste)}</i>
+      </span>
+    </div>
+    <div class="s">Votre \u00e9quipe a atteint le nombre de membres de votre abonnement.
+      Passez \u00e0 l'offre sup\u00e9rieure pour leur ouvrir l'acc\u00e8s.</div>
+    <div class="actions">
+      <button type="button" class="principal" data-abo-ouvrir>Voir les offres</button>
+      <button type="button" class="secondaire" data-demandes-voir>Qui attend ?</button>
+    </div>`
+}
+
+document.addEventListener('click', async (e) => {
+  if (!e.target.closest('[data-demandes-voir]')) return
+  const { data } = await supabase
+    .from('demandes_acces')
+    .select('nom, email, created_at')
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .order('created_at', { ascending: false })
+  await confirmDialog({
+    titre: 'En attente d\u2019une place',
+    message: (data || []).map(d =>
+      `• ${d.nom || d.email || 'Quelqu\u2019un'}`).join('\n') || 'Personne pour l\u2019instant.',
+    confirmer: 'Fermer',
+    annuler: 'Voir les offres',
+  }) || showGestionScreen('p-abonnement')
+})
 
 function ouvrirVoieDoc(voie) {
   const blocs = { coller: 'doc-bloc-texte', photo: 'doc-bloc-photos', fichier: 'doc-bloc-fichier' }
@@ -6234,9 +6478,34 @@ async function comprimerVideo(fichier, surAvancee) {
     }
     dessiner()
 
-    await new Promise((ok) => { lecteur.onended = ok })
+    /* LA LECTURE PEUT NE JAMAIS « FINIR ».
+
+       On attendait `onended` seul. Si l'événement ne vient pas — onglet mis en
+       arrière-plan, lecture interrompue par le système — la promesse ne se
+       résout jamais et le compteur reste figé pour toujours.
+
+       On surveille donc aussi la position : arrivé à la fin, on clôt. */
+    await new Promise((ok) => {
+      let clos = false
+      const finir = () => { if (!clos) { clos = true; ok() } }
+      lecteur.onended = finir
+      const veille = setInterval(() => {
+        if (lecteur.currentTime >= lecteur.duration - 0.15 || lecteur.paused) {
+          clearInterval(veille); finir()
+        }
+      }, 400)
+      setTimeout(() => { clearInterval(veille); finir() },
+                 (lecteur.duration + 20) * 1000)
+    })
+
     arret = true
     enr.stop()
+
+    /* 99 → 100. Le compteur était plafonné à 99 pour ne pas annoncer la fin
+       avant l'heure, mais rien ne le passait à 100 : il restait bloqué là
+       pendant que l'encodeur terminait, et on croyait à une panne. */
+    if (surAvancee) surAvancee(100)
+
     await fini
 
     const sortie = new Blob(morceaux, { type })
@@ -6314,7 +6583,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     errorEl.style.color = 'var(--label-3)'
     errorEl.textContent = 'Pr\u00e9paration de la vid\u00e9o\u2026'
     aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-      errorEl.textContent = `Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
+      /* À 100 %, l'encodeur travaille encore quelques secondes. On le dit plutôt
+         que de laisser un chiffre immobile : un compteur bloqué inquiète plus
+         qu'une phrase qui explique. */
+      errorEl.textContent = pct >= 100
+        ? 'Finalisation de la vid\u00e9o\u2026'
+        : `Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
     })
     errorEl.textContent = ''
     errorEl.style.color = 'var(--red)'
@@ -8310,9 +8584,31 @@ function brancherPoignee(poi, i) {
     if (jouaitAvant) v.play()
     if (navigator.vibrate) navigator.vibrate(6)
   }
-  poi.addEventListener('pointerup', relacher)
-  poi.addEventListener('pointercancel', relacher)
+  /* ═══ LE RELÂCHEMENT DOIT TOUJOURS ARRIVER ═══
+
+     Ces écouteurs étaient posés sur la poignée elle-même. Or `dvMajFrise()`
+     recrée les poignées : si quoi que ce soit redessinait la frise pendant le
+     geste, l'ancienne poignée disparaîssait avec son écouteur, le relâchement
+     n'arrivait jamais, et la piste restait FIGÉE POUR DE BON — exactement ce
+     qu'on observait : plus moyen de faire glisser quoi que ce soit, même
+     pendant la lecture.
+
+     Sur la fenêtre, l'écouteur survit à la disparition de son élément. */
+  window.addEventListener('pointerup', relacher)
+  window.addEventListener('pointercancel', relacher)
+  poi.addEventListener('lostpointercapture', relacher)
 }
+
+/* ═══ LE FILET ═══
+   Si malgré tout la piste restait figée — un geste interrompu par un appel,
+   l'écran qui s'éteint — le premier doigt levé la libère. Un état bloquant
+   doit toujours avoir une porte de sortie. */
+document.addEventListener('pointerup', () => {
+  if (!dvFige) return
+  if (document.querySelector('.dv-poi.tire')) return   // un geste est en cours
+  dvFige = false
+  document.getElementById('dv-piste')?.classList.remove('fige')
+}, true)
 
 /* ═══ LECTURE ET PAUSE ═══
    On découpe en regardant : il faut pouvoir s'arrêter pour ajuster sans quitter
@@ -10067,6 +10363,10 @@ const LG_O = 'rgba(255,255,255,0.32)'
 
 /* Un pictogramme par avantage phare, dans la langue des icônes de création. */
 const PICTOS = {
+  /* Pas un dessin : les deux lettres, avec le dégradé de l'anneau. C'est la
+     même marque que sur les boutons — l'œil la reconnaît d'un écran à l'autre.
+     Un œil stylisé aurait dit « regarder » ; « AI » dit ce que c'est. */
+  marqueAI: `<span class="ia-mot" style="font-size:14px;">AI</span>`,
   video: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="5.4" width="18.8" height="13.2" rx="3" stroke="${AV_O}" stroke-width="1.7"/><path d="M10 9.6 15.4 12 10 14.4Z" fill="${AV_O}"/></svg>`,
   monde: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="${AV_O}" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="${LG_O}" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
   infini: `<svg viewBox="0 0 24 24" fill="none"><path d="M8.4 12a3.4 3.4 0 1 1 3.6 3.4c-2.4 0-3.6-6.8-6-6.8a3.4 3.4 0 0 0 0 6.8c2.4 0 3.6-6.8 6-6.8a3.4 3.4 0 0 1 0 6.8" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round"/></svg>`,
@@ -10087,14 +10387,25 @@ const PICTOS = {
    suit ce qui coûte vraiment — le nombre de gens qui s'en servent — et rien
    d'autre. C'est aussi plus simple à vendre : il n'y a qu'une question à se
    poser, et c'est celle dont on connaît déjà la réponse. */
+/* Mensuel ou annuel. Le choix vit DANS la carte de l'offre, pas au-dessus :
+   quand il y aura quatre paliers, chacun portera le sien. Un interrupteur
+   unique devrait piloter toutes les offres à la fois, ce qui ne veut rien dire
+   quand on n'en regarde qu'une. */
+let rythmeChoisi = 'annuel'
+
 const AVANTAGES = [
-  { p: 'video', vedette: true, t: 'Filmez, l\'IA d\u00e9coupe',
-    s: "Montrez le geste en le commentant \u00e0 voix haute. L'IA \u00e9coute, d\u00e9coupe la vid\u00e9o " +
-       "en \u00e9tapes num\u00e9rot\u00e9es et horodate chacune. Sans limite de vid\u00e9os." },
+  /* L'argument de tête porte la marque AI plutôt qu'un dessin : c'est le nom de
+     ce qu'on vend, et il se lit même de loin. */
+  { p: 'marqueAI', vedette: true, t: 'L\'IA \u00e9coute et regarde',
+    s: "Elle entend ce que vous expliquez et lit ce qui est visible \u2014 objets, gestes, " +
+       "texte \u00e0 l'\u00e9cran. Elle en tire des \u00e9tapes num\u00e9rot\u00e9es que vous relisez." },
   { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es',
     s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
-  { p: 'main', t: 'Cr\u00e9ation depuis vos documents',
-    s: "Un PDF, un Word, une note de service : l'IA en tire les \u00e9tapes." },
+  /* QUATRE, et non trois. On les nomme : « trois façons de créer » ne dit ni
+     lesquelles ni pourquoi on en aurait besoin. */
+  { p: 'main', t: 'Quatre fa\u00e7ons de cr\u00e9er',
+    s: "\u00c9crivez \u00e0 la main, filmez et d\u00e9coupez vous-m\u00eame, laissez l'IA d\u00e9couper, " +
+       "ou partez d'un document existant." },
   { p: 'monde', t: 'Chacun lit dans sa langue',
     s: "Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez." },
   { p: 'suivi', t: 'Vous savez qui a lu quoi',
@@ -10109,15 +10420,18 @@ const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au po
 /* Les paliers suivent le NOMBRE DE MEMBRES, et c'est tout ce qui les sépare. */
 const OFFRES = [
   /* Le prix mensuel est celui qu'on affiche ; l'annuel se règle en une fois et
-     revient à vingt pour cent de moins. Seul « Essentiel » est branché sur
-     Stripe pour l'instant — les autres attendent d'avoir un client qui les
-     demande. Construire quatre offres pour zéro client serait du code à
-     maintenir sans personne pour s'en servir. */
-  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,        prix: 49, an: 468, stripe: true },
-  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,       prix: 99 },
-  { cle: 'pro',        nom: 'Pro',        max: 40,       prix: 239 },
+     revient à vingt pour cent de moins.
+
+     Le prix par membre BAISSE à chaque palier — 9,80 €, 6,60 €, 5,97 €, 4,99 €.
+     C'est ce qui donne envie de monter : le client y gagne toujours, et nos
+     coûts ne suivent pas la même pente puisque le nombre d'analyses double
+     quand les membres triplent. */
+  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,   analyses: 30,  prix: 49,  an: 468,  stripe: true },
+  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,  analyses: 60,  prix: 99,  an: 948,  stripe: true },
+  { cle: 'pro',        nom: 'Pro',        max: 40,  analyses: 120, prix: 239, an: 2268, stripe: true },
+  { cle: 'reseau',     nom: 'R\u00e9seau',     max: 100, analyses: 250, prix: 499, an: 4788, stripe: true },
   { cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
-    devis: "Au-del\u00e0 de quarante personnes, on en discute : accompagnement \u00e0 la mise " +
+    devis: "Au-del\u00e0 de cent personnes, on en discute : accompagnement \u00e0 la mise " +
            "en place, interlocuteur d\u00e9di\u00e9, engagement de disponibilit\u00e9 \u00e9crit." },
 ]
 
@@ -10166,8 +10480,26 @@ function carteOffre(o, opts = {}) {
     </div>
     <div class="offre-aussi">${AUSSI}</div>`
     : `<div class="offre-aussi">${o.devis || 'Les m\u00eames fonctionnalit\u00e9s, sans exception.'}</div>`}
-    ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${opts.cta}</button>` : ''}
-    ${opts.annuel && o.prix !== null ? `<div class="offre-annuel">ou <b>${Math.round(o.prix * 0.8)} \u20ac</b> par mois, pay\u00e9 \u00e0 l'ann\u00e9e</div>` : ''}
+    ${opts.cta && o.prix !== null ? `
+    <div class="offre-rythme">
+      <button type="button" class="rlg${rythmeChoisi === 'mensuel' ? ' on' : ''}" data-rythme="mensuel">
+        <span class="rd"><i></i></span>
+        <span class="tx"><b>${o.prix} \u20ac / mois</b><span>Sans engagement</span></span>
+      </button>
+      <button type="button" class="rlg${rythmeChoisi === 'annuel' ? ' on' : ''}" data-rythme="annuel">
+        <span class="rd"><i></i></span>
+        <span class="tx"><b>${Math.round(o.prix * 0.8)} \u20ac / mois</b><span>${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an</span></span>
+      </button>
+    </div>` : ''}
+    ${opts.cta ? `<button type="button" class="offre-cta" data-offre="${o.cle}">${
+      o.prix === null ? opts.cta
+      /* Le bouton annonce EXACTEMENT ce qui sera pr\u00e9lev\u00e9. \u00ab Activer \u00bb tout court
+         laisse d\u00e9couvrir le montant sur la page de paiement \u2014 c'est l\u00e0 qu'on
+         renonce. */
+      : rythmeChoisi === 'annuel'
+        ? `Activer \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an`
+        : `Activer \u00b7 ${o.prix} \u20ac par mois`
+    }</button>` : ''}
   </div>`
 }
 
@@ -10234,6 +10566,16 @@ document.getElementById('abo-autres')?.addEventListener('click', (e) => {
 })
 
 document.getElementById('p-abonnement')?.addEventListener('click', async (e) => {
+  /* Le choix du rythme : on retient et on redessine. Rien d'autre — c'est le
+     bouton d'action qui déclenche le paiement. */
+  const r = e.target.closest('[data-rythme]')
+  if (r) {
+    rythmeChoisi = r.dataset.rythme
+    renderAbonnements()
+    if (navigator.vibrate) navigator.vibrate(6)
+    return
+  }
+
   const b = e.target.closest('[data-offre]')
   if (!b) return
   const o = OFFRES.find(x => x.cle === b.dataset.offre)
@@ -10260,13 +10602,9 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      On demande une adresse au serveur, puis on y va. Le montant n'est JAMAIS
      envoyé d'ici : il est écrit dans la fonction Edge. Sinon n'importe qui
      modifierait ce que son téléphone envoie et s'abonnerait à un euro. */
-  const formule = await confirmDialog({
-    titre: `${o.nom} \u00b7 ${o.prix} \u20ac par mois`,
-    message: `Jusqu'\u00e0 ${o.max} membres, 30 analyses IA par mois, proc\u00e9dures illimit\u00e9es.\n\n` +
-             `En r\u00e9glant l'ann\u00e9e : ${o.an} \u20ac, soit ${Math.round(o.an / 12)} \u20ac par mois.`,
-    confirmer: `Payer ${o.prix} \u20ac par mois`,
-    annuler: `Payer l'ann\u00e9e \u00b7 ${o.an} \u20ac`,
-  }) ? 'mensuel' : 'annuel'
+  /* Le rythme est déjà choisi dans la carte : plus de fenêtre ici. Une question
+     posée deux fois fait douter de la première réponse. */
+  const formule = rythmeChoisi
 
   b.disabled = true
   const libelle = b.textContent
@@ -10278,6 +10616,9 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({
         entreprise_id: currentMembre.entreprise_id,
+        /* On envoie le NOM de l'offre, jamais son prix. Le serveur seul sait ce
+           que coûte « equipe ». */
+        offre: o.cle,
         formule,
         retour: window.location.origin + window.location.pathname,
       }),
@@ -11108,6 +11449,9 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
       .select('id').eq('user_id', user.id).eq('entreprise_id', ent.id).maybeSingle()
     if (dejaLa) throw new Error(`Vous faites d\u00e9j\u00e0 partie de ${ent.nom}.`)
 
+    /* La place est-elle libre ? Si l'entreprise est complète, la demande est
+       déposée et l'on s'arrête ici. */
+    if (!(await verifierPlaceLibre(ent.id, ent.nom))) return
     const { data: cree, error } = await supabase.from('membres')
       .insert({ user_id: user.id, entreprise_id: ent.id, nom: '', role: 'equipe' })
       .select('*').maybeSingle()
@@ -11898,19 +12242,20 @@ function appliquerTraduction(trad) {
   /* Un bandeau rappelle qu'on lit une traduction, avec le retour à l'original à
      portée de doigt. Une consigne de travail traduite automatiquement peut
      comporter une nuance perdue : autant que ce soit dit. */
-  const steps = document.getElementById('detail-steps')
-  if (steps && !document.getElementById('trad-note')) {
-    const note = document.createElement('div')
-    note.className = 'traduction-note'
-    note.id = 'trad-note'
-    note.innerHTML = `<span style="flex:1">Traduction automatique. L'original fran\u00e7ais fait foi.</span>
-      <button type="button">Revenir au fran\u00e7ais</button>`
-    note.querySelector('button').addEventListener('click', () => {
-      langueProcCourante = 'fr'
-      openEquipeDetail(procCouranteId)
-    })
-    steps.parentNode.insertBefore(note, steps)
-  }
+  /* LE BANDEAU A ÉTÉ RETIRÉ.
+
+     Il disait « traduction automatique, l'original français fait foi » et
+     offrait un retour au français. Trois raisons de le supprimer :
+
+     La langue choisie est déjà visible en haut, dans le rond des langues — on
+     sait qu'on lit une traduction, on vient de la demander.
+
+     Revenir au français se fait au même endroit, en un geste. Un second chemin
+     vers la même action encombre sans rien apporter.
+
+     Et surtout : un employé qui ne lit pas le français n'a que faire de savoir
+     que l'original fait foi. On lui rappelle sa dépendance sans lui donner de
+     moyen d'agir. */
 }
 
 /* Conservé sous son ancien nom : la fiche l'appelle à chaque ouverture. */

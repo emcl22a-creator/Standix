@@ -171,7 +171,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Drag to fine-tune to a tenth of a second",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Film the task while explaining out loud, the AI writes the steps",
     "Filmez puis découpez chaque étape": "Film, then cut each step",
-    "Filmez une fois, l'IA repère les étapes · 10 min maximum": "Film once, the AI finds the steps · 10 min maximum",
+    "Filmez une fois, l'IA repère les étapes · 5 min maximum": "Film once, the AI finds the steps · 5 min maximum",
     "Fin": "End",
     "Fin ici": "End here",
     "Glissez sur la frise pour naviguer dans la vidéo": "Drag the timeline to move through the video",
@@ -379,7 +379,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Arrastra para ajustar a la décima de segundo",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Graba la tarea explicando en voz alta, la IA genera los pasos",
     "Filmez puis découpez chaque étape": "Graba y luego corta cada paso",
-    "Filmez une fois, l'IA repère les étapes · 10 min maximum": "Graba una vez, la IA detecta los pasos · 10 min máximo",
+    "Filmez une fois, l'IA repère les étapes · 5 min maximum": "Graba una vez, la IA detecta los pasos · 5 min máximo",
     "Fin": "Fin",
     "Fin ici": "Fin aquí",
     "Glissez sur la frise pour naviguer dans la vidéo": "Desliza por la línea de tiempo para navegar por el vídeo",
@@ -581,7 +581,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Arraste para ajustar ao décimo de segundo",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Filme a tarefa explicando em voz alta, a IA gera as etapas",
     "Filmez puis découpez chaque étape": "Filme e depois corte cada etapa",
-    "Filmez une fois, l'IA repère les étapes · 10 min maximum": "Filme uma vez, a IA deteta as etapas · 10 min no máximo",
+    "Filmez une fois, l'IA repère les étapes · 5 min maximum": "Filme uma vez, a IA deteta as etapas · 5 min no máximo",
     "Fin": "Fim",
     "Fin ici": "Fim aqui",
     "Glissez sur la frise pour naviguer dans la vidéo": "Deslize na linha de tempo para navegar no vídeo",
@@ -6299,7 +6299,7 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
 const DUREE_CONSEILLEE = 5 * 60
 /* Cinq minutes. Au-delà, l'analyse marcherait encore, mais deux choses la
    déconseillent : le coût Azure suit la durée à la minute près, et surtout une
-   procédure de dix minutes ne se suit pas — on la regarde une fois, jamais deux. */
+   procédure de dix minutes ne se suivrait pas — on la regarde une fois, jamais deux. */
 const DUREE_REFUSEE = 5 * 60
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6626,14 +6626,20 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   if (aiVideoFile) {
     const avant = aiVideoFile.size
     errorEl.style.color = 'var(--label-3)'
-    errorEl.textContent = 'Pr\u00e9paration de la vid\u00e9o\u2026'
+    /* ═══ UNE SEULE PROGRESSION, PAS DEUX ═══
+
+       La compression et l'analyse s'affichaient comme deux chargements
+       distincts : le premier finissait, l'écran repartait de zéro, et l'on
+       croyait à un recommencement. Vu de la personne qui attend, c'est UN seul
+       travail — elle a demandé des étapes, elle attend des étapes.
+
+       Les jalons sont donc numérotés d'un bout à l'autre : la préparation
+       devient la première sur six, pas une attente séparée. */
+    errorEl.textContent = '1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026'
     aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-      /* À 100 %, l'encodeur travaille encore quelques secondes. On le dit plutôt
-         que de laisser un chiffre immobile : un compteur bloqué inquiète plus
-         qu'une phrase qui explique. */
       errorEl.textContent = pct >= 100
-        ? 'Finalisation de la vid\u00e9o\u2026'
-        : `Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
+        ? '1/6 \u00b7 Finalisation de la vid\u00e9o\u2026'
+        : `1/6 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
     })
     errorEl.textContent = ''
     errorEl.style.color = 'var(--red)'
@@ -6643,6 +6649,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   }
 
   try {
+    errorEl.textContent = '2/6 \u00b7 Envoi de la vid\u00e9o\u2026'
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
@@ -6711,6 +6718,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       urlPourAnalyse = sigVid.signedUrl
     }
 
+    errorEl.textContent = '3/6 \u00b7 Vid\u00e9o re\u00e7ue\u2026'
+    errorEl.textContent = '4/6 \u00b7 Cr\u00e9ation de la proc\u00e9dure\u2026'
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
     const { data: newProc, error: procError } = await supabase
       .from('procedures')
@@ -6719,6 +6728,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     if (procError) throw new Error(procError.message)
     aiProcedureId = newProc.id
 
+    errorEl.textContent = '5/6 \u00b7 L\u2019IA \u00e9coute et regarde\u2026'
     // 3. Démarrage de l'analyse Azure
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
@@ -6733,6 +6743,10 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const startData = await startRes.json()
     if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")
 
+    /* La coche remplace l'anneau. Sans cette classe, l'anneau continuait de
+           tourner sous la coche — deux cercles et un point brillant pour dire
+           une seule chose. */
+    launchBtn.classList.add('fini')
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
     document.getElementById('ai-upload-card').style.display = 'none'
     document.getElementById('ai-progress-card').style.display = 'block'

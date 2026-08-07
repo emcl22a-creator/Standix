@@ -10701,6 +10701,20 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      posée deux fois fait douter de la première réponse. */
   const formule = rythmeChoisi
 
+  /* L'acceptation au moment de payer. Ce que Stripe présente ensuite est SON
+     contrat, pas le nôtre : sans ce passage, les conditions de Procédo ne
+     seraient jamais acceptées par quelqu'un qui paie. */
+  const accepte = await confirmDialog({
+    titre: 'Avant de continuer',
+    message: 'En souscrivant, vous acceptez les conditions d\u2019utilisation de Proc\u00e9do.\n\n' +
+      'Elles pr\u00e9cisent notamment que les proc\u00e9dures r\u00e9dig\u00e9es par l\u2019IA doivent \u00eatre ' +
+      'relues par vos soins avant d\u2019\u00eatre suivies.',
+    confirmer: 'J\u2019accepte et je continue',
+    annuler: 'Lire les conditions',
+    danger: false,
+  })
+  if (!accepte) { window.open('cgu.html', '_blank', 'noopener'); return }
+
   b.disabled = true
   const libelle = b.textContent
   b.textContent = 'Ouverture du paiement\u2026'

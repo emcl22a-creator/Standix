@@ -2063,7 +2063,19 @@ function renderGainTemps(validations, procedures) {
 
   const debutMois = new Date()
   debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
-  const duMois = (validations || []).filter(v => new Date(v.validated_at) >= debutMois)
+  /* ═══ ON NE COMPTE QUE LES LECTURES DE MEMBRES EXISTANTS ═══
+
+     La carte additionnait TOUTES les validations du mois, y compris celles de
+     personnes ayant quitté l'entreprise depuis. Leurs lignes restent en base
+     — c'est voulu, elles font foi le jour d'un contrôle — mais elles ne
+     doivent plus entrer dans un total qu'on compare aux fiches.
+
+     Résultat : la carte annonçait vingt minutes quand l'unique membre en avait
+     quatorze. Le chiffre n'était pas faux, il répondait à une autre question. */
+  const membresConnus = new Set(
+    (currentGaData?.employes || []).concat(cachedMembres || []).map(m => m.id))
+  const duMois = (validations || []).filter(v =>
+    new Date(v.validated_at) >= debutMois && membresConnus.has(v.membre_id))
 
   const secondes = duMois.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
   const t = document.getElementById('an-gain-t')
@@ -2846,7 +2858,23 @@ function peindreClassementMembre(cle, animerDes) {
   const partsAnneau = regrouperParts(
     vue.classe.filter(x => (x.secondes || x.total || 0) > 0),
     x => x.secondes || x.total || 0)
-  const visibles = vue.deplie ? vue.classe : partsAnneau
+  /* ═══ CE QUI EST GRIS RESTE GRIS UNE FOIS DÉPLIÉ ═══
+
+     Repliée, la liste montrait « 3 autres » en gris. Dépliée, elle rendait à
+     ces trois procédures leurs couleurs d'origine — trois teintes vives qui
+     n'existaient nulle part dans l'anneau.
+
+     On promet donc la couleur : ce qui a été réuni sous le gris le garde. Le
+     dépliage révèle CE QUE contient la part grise, il ne redistribue pas les
+     couleurs. */
+  const grises = new Set()
+  const partGrise = partsAnneau.find(x => x.estAutres)
+  if (partGrise) {
+    const montrees = new Set(partsAnneau.filter(x => !x.estAutres))
+    vue.classe.forEach(x => { if (!montrees.has(x)) grises.add(x) })
+  }
+  const visibles = (vue.deplie ? vue.classe : partsAnneau).map(x =>
+    grises.has(x) ? { ...x, couleur: ANNEAU_GRIS } : x)
 
   el.innerHTML = visibles.map((x, rang) => {
     const i = vus.indexOf(x)
@@ -3307,7 +3335,23 @@ function peindreClassementCat(cle, animerDes) {
   const partsAnneau = regrouperParts(
     vue.classe.filter(x => (x.total || x.secondes || 0) > 0),
     x => x.total || x.secondes || 0)
-  const visibles = vue.deplie ? vue.classe : partsAnneau
+  /* ═══ CE QUI EST GRIS RESTE GRIS UNE FOIS DÉPLIÉ ═══
+
+     Repliée, la liste montrait « 3 autres » en gris. Dépliée, elle rendait à
+     ces trois procédures leurs couleurs d'origine — trois teintes vives qui
+     n'existaient nulle part dans l'anneau.
+
+     On promet donc la couleur : ce qui a été réuni sous le gris le garde. Le
+     dépliage révèle CE QUE contient la part grise, il ne redistribue pas les
+     couleurs. */
+  const grises = new Set()
+  const partGrise = partsAnneau.find(x => x.estAutres)
+  if (partGrise) {
+    const montrees = new Set(partsAnneau.filter(x => !x.estAutres))
+    vue.classe.forEach(x => { if (!montrees.has(x)) grises.add(x) })
+  }
+  const visibles = (vue.deplie ? vue.classe : partsAnneau).map(x =>
+    grises.has(x) ? { ...x, couleur: ANNEAU_GRIS } : x)
 
   el.innerHTML = visibles.map((x, rang) => {
     const nb = x.procs.size, gens = x.lecteurs.size
@@ -3604,7 +3648,23 @@ function peindreClassementProc(cle, animerDes) {
   const partsAnneau = regrouperParts(
     vue.classe.filter(x => (x.total || x.secondes || 0) > 0),
     x => x.total || x.secondes || 0)
-  const visibles = vue.deplie ? vue.classe : partsAnneau
+  /* ═══ CE QUI EST GRIS RESTE GRIS UNE FOIS DÉPLIÉ ═══
+
+     Repliée, la liste montrait « 3 autres » en gris. Dépliée, elle rendait à
+     ces trois procédures leurs couleurs d'origine — trois teintes vives qui
+     n'existaient nulle part dans l'anneau.
+
+     On promet donc la couleur : ce qui a été réuni sous le gris le garde. Le
+     dépliage révèle CE QUE contient la part grise, il ne redistribue pas les
+     couleurs. */
+  const grises = new Set()
+  const partGrise = partsAnneau.find(x => x.estAutres)
+  if (partGrise) {
+    const montrees = new Set(partsAnneau.filter(x => !x.estAutres))
+    vue.classe.forEach(x => { if (!montrees.has(x)) grises.add(x) })
+  }
+  const visibles = (vue.deplie ? vue.classe : partsAnneau).map(x =>
+    grises.has(x) ? { ...x, couleur: ANNEAU_GRIS } : x)
 
   el.innerHTML = visibles.map((x, rang) => {
     const n = x.lecteurs.size
@@ -3807,6 +3867,18 @@ document.getElementById('tb-procedures')?.addEventListener('click', function() {
   else showGestionScreen('p-list', this)
 })
 
+document.getElementById('tb-accueil')?.addEventListener('click', function() {
+  /* L'accueil n'existe pas encore côté mobile : on renvoie sur la liste, qui
+     est la page d'arrivée naturelle. À remplacer le jour où l'écran existe. */
+  if (espaceCourant() === 'equipe') showEquipeScreen('e-list', this)
+  else showGestionScreen('p-list', this)
+})
+
+document.getElementById('tb-reglages')?.addEventListener('click', function() {
+  if (espaceCourant() === 'equipe') showEquipeScreen('e-settings', this)
+  else showGestionScreen('p-settings', this)
+})
+
 document.getElementById('tb-analyse')?.addEventListener('click', function() {
   showGestionScreen('p-global-analyse', this)
   loadGlobalAnalyse()
@@ -3817,16 +3889,62 @@ document.getElementById('tb-principal')?.addEventListener('click', function() {
   else startNewProcedure()
 })
 
-const ONGLET_PAR_ECRAN = {
-  'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
-  /* `p-membre-fiche` n'a jamais existé : l'écran s'appelle `p-membre`. Et les
-     trois pages complètes de l'analyse manquaient. Sur tous ces écrans, aucun
-     onglet ne s'allumait — la barre paraissait éteinte. */
-  'p-global-analyse': 1, 'p-membre': 1,
-  'p-an-equipe': 1, 'p-an-categories': 1, 'p-an-temps': 1,
-  // Les écrans de création n'allument aucun onglet : le « + » déclenche une
-  // action, il ne désigne pas une page et n'a pas d'état actif.
+/* Allume l'onglet correspondant à l'écran, et fait glisser la capsule.
+
+   La capsule se place par la GAUCHE, pas par un `transform` : `left` en
+   pourcentage suit la largeur de la barre, qui change entre gestion et
+   équipe. Un décalage en pixels aurait fallu être recalculé. */
+function poserOngletActif(id) {
+  const barre = document.getElementById('tabbar')
+  if (!barre) return
+  const items = [...barre.querySelectorAll('.tb-item')]
+  items.forEach(b => b.classList.remove('active'))
+
+  const capsule = document.getElementById('tbPill')
+  const index = ONGLET_PAR_ECRAN[id]
+
+  if (index == null || !items[index]) {
+    /* Aucun onglet ne correspond — les écrans de création, par exemple.
+       La capsule s'efface plutôt que de rester sous un onglet éteint. */
+    capsule?.classList.add('hors')
+    return
+  }
+
+  items[index].classList.add('active')
+  if (capsule) {
+    capsule.classList.remove('hors')
+    /* On compte les onglets VISIBLES : côté équipe, Accueil et Analyse sont
+       masqués et la barre n'en montre que trois. */
+    /* On mesure l'onglet plutôt que de calculer un pourcentage.
+
+       Le calcul en `20% + 2px` ignorait le padding de 7 px de la barre : la
+       capsule tombait 12 px trop à droite. Lire la position réelle évite
+       d'avoir à refaire cette arithmétique à chaque changement de marge. */
+    const nav = capsule.parentElement
+    const r = items[index].getBoundingClientRect()
+    const rn = nav.getBoundingClientRect()
+    if (r.width) {
+      capsule.style.left = (r.left - rn.left + 2) + 'px'
+      capsule.style.width = (r.width - 4) + 'px'
+    }
+  }
 }
+
+const ONGLET_PAR_ECRAN = {
+  /* Les index suivent l'ordre de la barre : Accueil 0, Procédures 1, « + » 2,
+     Analyse 3, Réglages 4. Le « + » n'apparaît dans aucune ligne — il
+     déclenche une action, il ne désigne pas une page. */
+  'p-list': 1, 'p-category': 1, 'p-analyse': 1, 'p-edit-procedure': 1,
+  'p-global-analyse': 3, 'p-membre': 3,
+  'p-an-equipe': 3, 'p-an-categories': 3, 'p-an-temps': 3,
+  'p-settings': 4, 'p-reg-poste': 4, 'p-reg-compte': 4, 'p-reg-code': 4,
+  'p-reg-postes': 4, 'p-reg-etabs': 4, 'p-reg-langue': 4, 'p-reg-appareils': 4,
+  'p-abonnement': 4, 'p-membres': 4,
+  'e-list': 1, 'e-category': 1, 'e-detail': 1,
+  'e-settings': 4, 'e-reg-compte': 4, 'e-reg-entreprises': 4,
+  'e-reg-poste': 4, 'e-reg-langue': 4,
+}
+
 
 /* ═══ D'OÙ L'ÉCRAN DOIT NAÎTRE ═══
 
@@ -3898,10 +4016,7 @@ window.showGestionScreen = function(id, btn) {
     peindreDemandesAcces()
     appliquerBlocageEssai()
   })
-  const boutons = document.querySelectorAll('#tabbar .tab-round')
-  boutons.forEach(b => b.classList.remove('active'))
-  const index = ONGLET_PAR_ECRAN[id]
-  if (index != null && boutons[index]) boutons[index].classList.add('active')
+  poserOngletActif(id)
   document.getElementById('tabbar')?.setAttribute('data-espace', 'gestion')
   majPastille('tabbar')
   if (id === 'p-create') updateModeCardsState()
@@ -6233,8 +6348,10 @@ const AI_ETAPES = {
   redaction:     { titre: 'R\u00e9daction des \u00e9tapes', sous: "L'IA relit la transcription et en tire les \u00e9tapes." },
 }
 
+var aiPalierDepuis = null
 function startAiProgressSimulation() {
   aiDebutAnalyse = Date.now()
+  aiPalierDepuis = null
   aiNbSondages = 0
   aiEtapeCourante = 'envoi'
   aiProgresAzure = null
@@ -6270,8 +6387,16 @@ function majProgressionIA() {
      de mentir sur une attente de deux minutes. */
   const pctEl = document.getElementById('ai-progress-pct')
   if (pctEl) {
-    pctEl.textContent = aiProgresAzure != null ? Math.round(aiProgresAzure) + '%' : ''
+    /* Le chiffre est PLAFONNÉ à 98 tant que l'analyse n'est pas rendue.
+
+       Azure annonce 99 % dès qu'il a fini d'écouter, puis reste là pendant
+       toute l'indexation — parfois deux ou trois minutes. Un 99 % immobile se
+       lit comme un plantage ; 98 % laisse voir qu'il reste quelque chose à
+       faire. Le 100 % ne vient qu'avec la procédure. */
+    const brut = aiProgresAzure
+    pctEl.textContent = brut != null ? Math.min(98, Math.round(brut)) + '%' : ''
   }
+
 
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
@@ -6280,9 +6405,23 @@ function majProgressionIA() {
      ni espace en trop. */
   let phrase = `${t(info.titre)} \u00b7 ${temps}.`
   if (info.sous) phrase += ' ' + t(info.sous)
+  /* Le palier de fin a son propre message. Sans lui, on voit un chiffre figé
+     sans savoir si quelque chose avance encore — c'est exactement le moment
+     où l'on ferme l'onglet. */
+  if (aiProgresAzure != null && aiProgresAzure >= 97) {
+    if (aiPalierDepuis == null) aiPalierDepuis = Date.now()
+    const auPalier = (Date.now() - aiPalierDepuis) / 1000
+    if (auPalier > 25) {
+      phrase = t('L\u2019\u00e9coute est termin\u00e9e. L\u2019IA met la proc\u00e9dure au propre \u2014 ') +
+               t('c\u2019est la derni\u00e8re \u00e9tape, elle prend souvent une \u00e0 trois minutes.')
+    }
+  } else {
+    aiPalierDepuis = null
+  }
   if (ecoule > 15 * 60) {
     phrase = t("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }
+
   sous.innerHTML = `${phrase} <b style="color:#fff;">${t('Vous pouvez quitter cette page')}</b> \u2014 ` +
     escapeHtml(t("la proc\u00e9dure appara\u00eetra dans votre liste d\u00e8s qu'elle sera pr\u00eate."))
 }
@@ -6633,15 +6772,30 @@ function verifierDureeVideo() {
 
   /* Le poids d'abord : c'est le refus le plus fréquent, et le seul qui échouait
      jusqu'ici sans rien expliquer. */
+  /* Le poids brut ne décide de rien : la vidéo sera recomprimée au lancement,
+     en 1080p à 30 images. Une prise de 213 Mo en 60 images retombe couramment
+     sous les 60 après ce passage.
+
+     On ne refuse donc PLUS ici. On prévient seulement, quand le fichier est
+     assez lourd pour que la compression prenne un moment — une attente qu'on
+     n'a pas annoncée passe pour un blocage. */
   if (aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX) {
+    if (peutComprimer()) {
+      err.style.color = 'var(--label-2)'
+      err.innerHTML = `Cette vidéo pèse <b>${poidsLisible(aiVideoFile.size)}</b>. ` +
+        `Elle sera allégée avant l'envoi — comptez une minute de plus au lancement.`
+      btn.disabled = false
+      return
+    }
+    /* Sans compression possible — navigateur trop ancien — le refus reste, mais
+       le conseil devient juste : c'est la définition et la fluidité qui pèsent,
+       pas la durée. Filmer plus court ne servirait à rien ici. */
     err.style.color = 'var(--red)'
-    /* Le conseil de filmer en 720p n'a plus lieu d'être : l'application comprime
-       elle-même en 1080p à 30 images avant d'envoyer. Si la vidéo reste trop
-       lourde APRÈS ça, c'est qu'elle est trop longue — pas trop définie. */
-    err.innerHTML = `Cette vid\u00e9o p\u00e8se <b>${poidsLisible(aiVideoFile.size)}</b>, ` +
-      `au-del\u00e0 des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo accept\u00e9s.<br>` +
-      `Filmez une s\u00e9quence plus courte : <b>cinq minutes suffisent</b> pour montrer ` +
-      `un geste, et une proc\u00e9dure plus br\u00e8ve se suit mieux.`
+    err.innerHTML = `Cette vidéo pèse <b>${poidsLisible(aiVideoFile.size)}</b>, ` +
+      `au-delà des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo acceptés, ` +
+      `et votre navigateur ne sait pas l'alléger.<br>` +
+      `Refilmez en <b>1080p à 30 images par seconde</b> : c'est la fluidité qui ` +
+      `pèse, pas la durée.`
     btn.disabled = true
     return
   }
@@ -6716,13 +6870,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
-    if (aiVideoFile.size > VIDEO_POIDS_MAX) {
-      /* Le plafond est lu, jamais recopié : deux chiffres qui disent la même chose
-         finissent toujours par diverger. */
-        throw new Error(`Cette vid\u00e9o p\u00e8se ${poidsLisible(aiVideoFile.size)}, au-del\u00e0 des ` +
-          `${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo accept\u00e9s. Filmez une s\u00e9quence ` +
-          `plus courte : cinq minutes suffisent pour montrer un geste.`)
-    }
+    /* Ce contrôle vient APRÈS la compression : c'est le poids réel de ce qu'on
+     s'apprête à envoyer qui compte, pas celui du fichier d'origine. */
+  if (aiVideoFile.size > VIDEO_POIDS_MAX) {
+    throw new Error(`Même allégée, cette vidéo pèse ${poidsLisible(aiVideoFile.size)}, ` +
+      `au-delà des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo acceptés. ` +
+      `Filmez une séquence plus courte.`)
+  }
+
 
     /* On extrait la bande son AVANT d'envoyer quoi que ce soit. Si elle est
        muette, on refuse tout de suite : transférer 40 Mo puis attendre cinq

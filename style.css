@@ -4752,3 +4752,181 @@
   .tab-round.active .ico-plein{ display:block; }
   .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4); }
   .tab-round--primary svg{ width:23px; height:23px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LA BARRE D'ONGLETS — cinq entrées, verre liquide
+
+   Elle remplace la pilule à trois onglets. Deux différences qui comptent :
+
+   · les cinq libellés sont toujours visibles — on sait ce que contient
+     chaque onglet sans y aller ;
+   · la capsule active GLISSE d'un onglet à l'autre au lieu d'apparaître
+     sous chacun. Le mouvement dit d'où l'on vient, ce qu'un simple
+     changement de couleur ne dit pas.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tabbar{
+  position:fixed;z-index:1000;
+  left:50%;bottom:calc(12px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);
+  width:min(calc(100% - 24px), 520px);
+  padding:7px;border-radius:30px;
+  background:linear-gradient(135deg, rgba(55,55,58,.72), rgba(35,35,38,.52));
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:0 18px 45px rgba(0,0,0,.45),
+             0 3px 12px rgba(0,0,0,.28),
+             inset 0 1px 0 rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(28px) saturate(180%);
+  backdrop-filter:blur(28px) saturate(180%);
+  /* Sans `isolation`, la capsule en verre se mélangerait au fond de la barre
+     au lieu de se poser dessus. */
+  isolation:isolate;
+}
+
+/* Le reflet du haut : une ligne d'un pixel qui ne va pas jusqu'aux bords.
+   C'est ce qui donne l'impression d'une surface bombée. */
+.tabbar::before{
+  content:'';position:absolute;left:8%;right:8%;top:1px;height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  opacity:.9;pointer-events:none;
+}
+
+.tb-nav{
+  position:relative;
+  display:grid;grid-template-columns:repeat(5,1fr);
+  align-items:center;height:68px;
+}
+
+/* ─── La capsule active ─── */
+.tb-pill{
+  position:absolute;top:3px;bottom:3px;
+  width:calc(20% - 4px);left:2px;
+  border-radius:23px;
+  background:linear-gradient(145deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+  border:1px solid rgba(255,255,255,.13);
+  box-shadow:0 5px 14px rgba(0,0,0,.18),
+             inset 0 1px 0 rgba(255,255,255,.16);
+  -webkit-backdrop-filter:blur(18px) saturate(180%);
+  backdrop-filter:blur(18px) saturate(180%);
+  transition:left .32s cubic-bezier(.22,.8,.2,1);
+  pointer-events:none;
+}
+/* Tant qu'aucun onglet n'est actif — pendant la création, par exemple — la
+   capsule s'efface plutôt que de rester sous un onglet éteint. */
+.tb-pill.hors{opacity:0;transition:opacity .2s ease, left .32s cubic-bezier(.22,.8,.2,1)}
+
+/* ─── Les entrées ─── */
+.tb-item{
+  position:relative;z-index:2;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:3px;border:0;background:transparent;padding:0;cursor:pointer;
+  color:rgba(255,255,255,.58);font-family:inherit;
+  transition:color .25s ease, transform .18s ease;
+}
+.tb-item:active{transform:scale(.92)}
+.tb-item.active{color:#fff}
+
+.tb-ic{
+  width:22px;height:22px;display:flex;align-items:center;justify-content:center;
+  transition:transform .3s cubic-bezier(.22,.8,.2,1);
+}
+.tb-item.active .tb-ic{transform:translateY(-1px) scale(1.05)}
+.tb-ic svg{
+  width:21px;height:21px;stroke:currentColor;stroke-width:1.9;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+
+.tb-lb{
+  /* 9,5 px et un peu de resserrement : sur un écran de 390 px, chaque onglet
+     ne dispose que de 96 px moins les marges. « Accueil » et « Procédures »
+     se touchaient. */
+  font-size:9.5px;line-height:12px;font-weight:500;letter-spacing:-.2px;
+  white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  padding:0 2px;
+  transition:opacity .2s ease, transform .25s ease;
+}
+.tb-item.active .tb-lb{font-weight:600}
+
+/* ─── Le bouton central ─── */
+.tb-plus{
+  position:relative;width:48px;height:48px;margin-bottom:12px;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(145deg, rgba(80,80,84,.9), rgba(42,42,45,.72));
+  color:#fff;
+  box-shadow:0 10px 24px rgba(0,0,0,.4),
+             0 3px 8px rgba(0,0,0,.24),
+             inset 0 1px 1px rgba(255,255,255,.18);
+  -webkit-backdrop-filter:blur(20px) saturate(180%);
+  backdrop-filter:blur(20px) saturate(180%);
+  transition:transform .18s ease, box-shadow .2s ease;
+}
+.tb-plus::before{
+  content:'';position:absolute;inset:2px;border-radius:inherit;
+  background:linear-gradient(140deg, rgba(255,255,255,.16), transparent 50%);
+  pointer-events:none;
+}
+.tb-plus svg{
+  position:relative;z-index:2;width:23px;height:23px;
+  stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;
+}
+.tb-item:active .tb-plus{
+  transform:scale(.88);
+  box-shadow:0 5px 12px rgba(0,0,0,.3), inset 0 1px 2px rgba(0,0,0,.2);
+}
+
+/* L'icône du bouton dépend de l'espace : un « + » côté gestion, un QR côté
+   équipe. C'est la barre qui porte l'attribut, comme avant. */
+.tb-creer .ic-equipe{display:none}
+.tabbar[data-espace="equipe"] .tb-creer .ic-gestion{display:none}
+.tabbar[data-espace="equipe"] .tb-creer .ic-equipe{display:flex}
+
+/* Côté équipe, ni Analyse ni Accueil : l'espace n'a que sa liste. Les onglets
+   sont masqués et la grille se resserre — cinq colonnes dont deux vides
+   laisseraient des trous. */
+.tabbar[data-espace="equipe"] #tb-accueil,
+.tabbar[data-espace="equipe"] #tb-analyse{display:none}
+.tabbar[data-espace="equipe"] .tb-nav{grid-template-columns:repeat(3,1fr)}
+.tabbar[data-espace="equipe"] .tb-pill{width:calc(33.3333% - 4px)}
+
+/* ─── Les petits écrans ─── */
+@media (max-width:370px){
+  .tabbar{width:calc(100% - 16px);bottom:calc(8px + env(safe-area-inset-bottom))}
+  .tb-nav{height:64px}
+  .tb-lb{font-size:9px}
+  .tb-plus{width:45px;height:45px;margin-bottom:10px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .tb-pill{transition:none}
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT, CENTRÉE
+
+   Le bouton des réglages est parti — ils ont leur onglet dans la barre du
+   bas maintenant, et deux entrées pour la même page se contredisaient.
+
+   Ce qui reste — le logo et le nom — se centre. Aligné à gauche, l'espace
+   laissé par le bouton disparu se lisait comme un manque.
+   ═══════════════════════════════════════════════════════════════════════ */
+.topbar-row{justify-content:center}
+.topbar-card{
+  /* La carte ne s'étire plus sur toute la largeur : elle prend la taille de
+     son contenu, ce qui permet de la centrer vraiment. */
+  flex:0 0 auto;
+  justify-content:center;
+}
+.topbar-left{justify-content:center}
+
+/* Le tiroir de l'entreprise sort du flux.
+
+   Il occupait 46 px dans la rangée et poussait la carte de 28 px vers la
+   droite — elle paraissait centrée sur la place restante, pas sur l'écran.
+   Posé en absolu à gauche, il garde sa place à l'œil sans peser sur le
+   centrage. */
+.topbar-row > .tiroir-ent{
+  position:absolute;left:0;top:50%;transform:translateY(-50%);
+}

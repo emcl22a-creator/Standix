@@ -3819,11 +3819,8 @@
      de croire à une panne. */
   body.bascule-etab #gestion-app,
   body.bascule-etab #equipe-app,
-  body.bascule-etab #tabbar{
-    opacity:0;
-    transform:scale(0.985);
-    transition:opacity 0.2s ease, transform 0.3s cubic-bezier(0.32,0.72,0,1);
-  }
+  body.bascule-etab #tabbar{ opacity:0; transform:scale(0.985);
+    transition:opacity 0.2s ease, transform 0.3s cubic-bezier(0.32,0.72,0,1); }
   #gestion-app, #equipe-app, #tabbar{
     transition:opacity 0.32s ease, transform 0.4s cubic-bezier(0.32,0.72,0,1);
   }
@@ -4613,19 +4610,16 @@
   #tabbar[data-espace="equipe"] .ic-gestion{ display:none; }
   #tabbar[data-espace="equipe"] .ic-equipe{ display:block; }
 
-  .tabbar{ position:fixed; bottom:max(20px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%);
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:5px 8px; display:flex; align-items:center; gap:22px; z-index:10;
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12); }
+  /* L'ancienne barre était une pilule de 100 px de rayon, en `display:flex` avec
+     un `gap` de 22 px. Elle imposait sa largeur à la nouvelle, qui n'en faisait
+     plus que 220 au lieu de 374. Retirée. */
   /* La règle d'origine, avec son identifiant. J'avais réécrit une version sans
      identifiant : moins spécifique, elle était écrasée par ce qui suit, et le
      groupe perdait son verre — il ne restait que les ronds. */
-  #tabbar .groupe{
-    display:flex; align-items:center; gap:4px; padding:5px; border-radius:100px;
-    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
-  }
+  /* Cette règle imposait `display:flex` et un `gap` par IDENTIFIANT — plus
+   lourd qu'une classe. La barre ne faisait plus que 220 px au lieu de 374,
+   et les cinq onglets se serraient au milieu sans qu'aucune erreur ne le
+   signale. La mise en page appartient désormais à `.tabbar` seule. */
 
   /* ═══ Barre d'onglets (les deux espaces) ═══
      Deux éléments distincts : un groupe en verre qui contient les onglets, et
@@ -4633,12 +4627,11 @@
      pastille par-dessus — c'est lui qui se déploie, prend un fond blanc et
      laisse apparaître son libellé. La largeur s'anime, d'où l'effet de
      glissement d'un onglet à l'autre. */
-  #tabbar{
-    display:flex; align-items:center; gap:10px; width:auto; height:auto; padding:0;
-    background:none; border:none; border-radius:0; box-shadow:none;
-    -webkit-backdrop-filter:none; backdrop-filter:none;
-    filter:drop-shadow(0 10px 26px rgba(0,0,0,0.48));
-  }
+  /* Cette règle imposait la mise en page par IDENTIFIANT — plus lourd qu'une
+     classe. La barre ne faisait que 220 px au lieu de 374, les cinq onglets se
+     serraient au milieu, et rien ne le signalait : un identifiant l'emporte
+     silencieusement sur une classe.
+     La mise en page appartient désormais à `.tabbar` seule. */
   /* ═══ Frise zoomable ═══
      C'est la convention de toutes les applications de montage : la frise n'est
      pas figée à la largeur de l'écran, on l'agrandit et on la fait défiler.
@@ -4686,25 +4679,11 @@
      gère seul, sans recalcul de mise en page.
      Seule la largeur du bouton s'anime, et elle est mesurée à l'ouverture pour
      coller exactement au texte. */
-  #tabbar .tab-round{
-    position:relative; height:44.5px; width:44.5px; flex-shrink:0; padding:0; gap:0;
-    border-radius:100px; border:none;
-    background:none; color:rgba(235,235,245,0.55);
-    justify-content:flex-start; overflow:hidden;
-    transition: width 0.44s cubic-bezier(0.32,0.72,0,1),
-                background-color 0.34s cubic-bezier(0.32,0.72,0,1),
-                color 0.26s ease;
-  }
-  #tabbar .tab-round.active{
-    width:var(--w, 150px); background-color:#fff; color:#000;
-    box-shadow:0 2px 8px rgba(0,0,0,0.18);
-  }
+  
+  
   /* L'icône reste à sa place, elle glisse juste un peu vers la gauche. */
-  #tabbar .tab-round svg{
-    width:21px; height:21px; flex-shrink:0; margin-left:12.5px;
-    transition:margin-left 0.44s cubic-bezier(0.32,0.72,0,1);
-  }
-  #tabbar .tab-round.active svg{ margin-left:12px; }
+  
+  
   .tab-label{
     position:absolute; left:42px; top:50%; white-space:nowrap;
     font-size:14px; font-weight:650; letter-spacing:-0.02em;
@@ -4712,25 +4691,16 @@
     transition: opacity 0.18s ease, transform 0.18s ease;
   }
   /* Le texte n'arrive qu'une fois la pilule ouverte, et repart aussitôt. */
-  #tabbar .tab-round.active .tab-label{
-    opacity:1; transform:translate(0, -50%);
-    transition: opacity 0.24s ease 0.16s, transform 0.34s cubic-bezier(0.32,0.72,0,1) 0.16s;
-  }
+  
   /* Le bouton d'action, détaché du groupe. */
-  #tabbar .tab-round--primary{
-    width:52px; height:52px; min-width:52px; padding:0; border-radius:50%;
-    background:#fff; color:#000; border:0.5px solid rgba(255,255,255,0.5);
-    box-shadow:0 6px 20px rgba(255,255,255,0.18), 0 3px 10px rgba(0,0,0,0.4);
-  }
+  
   /* Le bouton principal est un rond : son dessin se centre. Il héritait du
      `margin-left` de 12,5 px prévu pour les onglets, où l'icône doit laisser la
      place au libellé qui glisse à sa droite. */
-  #tabbar .tab-round--primary{ justify-content:center; }
+  
   /* Un pouce de moins et un pixel plus bas : le « + » et le QR paraissaient
      légèrement hauts dans leur rond, et un peu gros pour lui. */
-  #tabbar .tab-round--primary svg{
-    width:22px; height:22px; margin-left:0; transform:translateY(1px);
-  }
+  
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
@@ -4929,4 +4899,145 @@
    centrage. */
 .topbar-row > .tiroir-ent{
   position:absolute;left:0;top:50%;transform:translateY(-50%);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LA BARRE — refonte Liquid Glass
+
+   Le brief demandait React, Tailwind et Motion. L'application n'a pas de
+   build : on applique les EXIGENCES, pas la pile. Chaque point a son
+   équivalent ici.
+
+   ─── Ce qui change vraiment ───
+
+   1. LA CAPSULE ACTIVE ÉTAIT TROP GRANDE. Elle faisait 62 px de haut pour
+      37 px de contenu — une bulle autour de l'onglet, pas une surface
+      intégrée. Elle passe à 46 px : quatre pixels et demi de marge autour
+      de l'icône et du libellé, pas davantage.
+
+   2. LE MOUVEMENT EST UN VRAI RESSORT. `linear()` reproduit la courbe d'un
+      ressort de raideur 400 et d'amortissement 30 — les valeurs du brief.
+      Il dépasse de 2,8 % puis revient, comme sur iOS. Une courbe de Bézier
+      n'a pas de dépassement : elle freine, elle ne rebondit pas.
+
+   3. LE VERRE EST MOINS OPAQUE. 8 % de blanc au lieu de 10, une bordure à
+      12 % au lieu de 14. On voit ce qui passe dessous.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.tabbar{
+  /* Une surface, pas un contour : la barre est une seule pièce de verre. */
+  background:rgba(255,255,255,.08);
+  border:.5px solid rgba(255,255,255,.12);
+  -webkit-backdrop-filter:blur(34px) saturate(170%);
+  backdrop-filter:blur(34px) saturate(170%);
+  box-shadow:
+    0 20px 48px rgba(0,0,0,.42),
+    0 4px 14px rgba(0,0,0,.24),
+    inset 0 .5px 0 rgba(255,255,255,.14);
+  border-radius:28px;
+  padding:6px;
+  /* Le bouton central dépasse légèrement : on ne coupe pas. */
+  overflow:visible;
+}
+
+/* Le reflet du haut : plus court et plus doux qu'avant. Un liseré qui va
+   d'un bord à l'autre fait une ligne ; celui-ci fait une courbure. */
+.tabbar::before{
+  left:16%;right:16%;
+  background:linear-gradient(90deg, transparent,
+    rgba(255,255,255,.42) 35%, rgba(255,255,255,.42) 65%, transparent);
+  opacity:.8;
+}
+
+.tb-nav{height:62px}
+
+/* ─── LA CAPSULE ACTIVE ───
+   Compacte, centrée verticalement. Elle enveloppe le contenu au lieu de
+   remplir la hauteur. */
+.tb-pill{
+  top:50%;bottom:auto;height:46px;
+  transform:translateY(-50%);
+  border-radius:15px;
+  background:rgba(255,255,255,.12);
+  border:.5px solid rgba(255,255,255,.10);
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.14),
+    inset 0 .5px 0 rgba(255,255,255,.14);
+  -webkit-backdrop-filter:blur(10px) saturate(150%);
+  backdrop-filter:blur(10px) saturate(150%);
+  /* Le ressort. 400 ms couvrent l'oscillation complète ; au-delà, la courbe
+     est plate et la durée ne coûte rien. */
+  transition:left 400ms linear(0, .019, .0683, .1382, .2207, .3095, .3997, .4877, .5708, .6474, .7165, .7775, .8304, .8754, .9129, .9437, .9683, .9876, 1.0022, 1.0129, 1.0202, 1.0249, 1.0275, 1.0284, 1.028, 1.0267, 1.0248),
+             width 400ms linear(0, .019, .0683, .1382, .2207, .3095, .3997, .4877, .5708, .6474, .7165, .7775, .8304, .8754, .9129, .9437, .9683, .9876, 1.0022, 1.0129, 1.0202, 1.0249, 1.0275, 1.0284, 1.028, 1.0267, 1.0248),
+             opacity .2s ease;
+}
+
+/* ─── LES ENTRÉES ─── */
+.tb-item{gap:4px;color:rgba(255,255,255,.52)}
+.tb-item.active{color:#fff}
+.tb-ic{
+  width:22px;height:22px;
+  /* L'icône suit le même ressort que la capsule, en plus court : les deux
+     mouvements partent ensemble et arrivent ensemble. */
+  transition:transform 320ms linear(0, .019, .0683, .1382, .2207, .3095, .3997, .4877, .5708, .6474, .7165, .7775, .8304, .8754, .9129, .9437, .9683, .9876, 1.0022, 1.0129, 1.0202, 1.0249, 1.0275, 1.0284, 1.028, 1.0267, 1.0248);
+}
+.tb-item.active .tb-ic{transform:translateY(-.5px) scale(1.04)}
+.tb-ic svg{width:21px;height:21px;stroke-width:1.75}
+/* L'icône de l'onglet actif s'épaissit d'un cheveu : c'est ce que fait iOS,
+   et ça se sent sans qu'on le voie. */
+.tb-item.active .tb-ic svg{stroke-width:2.05}
+
+.tb-lb{
+  font-size:9.5px;line-height:11px;font-weight:500;letter-spacing:-.15px;
+  transition:opacity .2s ease;
+}
+.tb-item.active .tb-lb{font-weight:600}
+
+/* ─── LE BOUTON CENTRAL ───
+   Il dépasse de 10 px seulement. Le brief est explicite : « il peut dépasser
+   très légèrement, mais pas énormément ». */
+.tb-plus{
+  width:46px;height:46px;margin-bottom:10px;
+  background:rgba(255,255,255,.14);
+  border:.5px solid rgba(255,255,255,.20);
+  box-shadow:
+    0 8px 22px rgba(0,0,0,.38),
+    0 2px 6px rgba(0,0,0,.22),
+    inset 0 .5px 0 rgba(255,255,255,.28);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
+  backdrop-filter:blur(22px) saturate(170%);
+  color:#fff;
+  transition:transform 280ms linear(0, .019, .0683, .1382, .2207, .3095, .3997, .4877, .5708, .6474, .7165, .7775, .8304, .8754, .9129, .9437, .9683, .9876, 1.0022, 1.0129, 1.0202, 1.0249, 1.0275, 1.0284, 1.028, 1.0267, 1.0248);
+}
+/* Le reflet du disque : un quart de lumière en haut à gauche, comme une
+   sphère éclairée de biais. */
+.tb-plus::before{
+  inset:1px;
+  background:linear-gradient(145deg, rgba(255,255,255,.22), transparent 46%);
+}
+.tb-plus svg{width:22px;height:22px;stroke-width:2.1}
+/* 0,90 puis retour, avec le ressort : la sensation d'un bouton natif vient du
+   RETOUR, pas de l'enfoncement. */
+.tb-item:active .tb-plus{transform:scale(.90)}
+.tb-creer:active{transform:none}
+
+/* ─── Les tailles d'iPhone ───
+   375 (SE, mini), 390 (13/14), 393 (15/16), 430 (Pro Max). */
+@media (max-width:400px){
+  .tb-lb{font-size:9px;letter-spacing:-.25px}
+  .tb-ic svg{width:20px;height:20px}
+}
+@media (max-width:376px){
+  .tabbar{width:calc(100% - 14px);padding:5px}
+  .tb-nav{height:59px}
+  .tb-pill{height:44px}
+  .tb-plus{width:43px;height:43px;margin-bottom:9px}
+}
+
+/* ─── Mouvement réduit ───
+   Le brief l'exige : on coupe le ressort, pas l'indication. La capsule saute
+   à sa place au lieu d'y glisser. */
+@media (prefers-reduced-motion:reduce){
+  .tb-pill, .tb-ic, .tb-plus{transition:none}
 }

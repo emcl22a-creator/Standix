@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>liquidGL — 5 matières de navbar</title>
+<title>Navbar liquidGL</title>
 <style>
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -66,9 +66,9 @@
     align-items:center; justify-content:center; gap:5px;
     color:rgba(233,236,245,.74)}
   .tab.on{color:#fff}
-  .tab svg{width:25px; height:25px; display:block;
+  .tab svg{width:22px; height:22px; display:block;
     filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
-  .tab span{font-size:12.5px; font-weight:700; line-height:1;
+  .tab span{font-size:11.5px; font-weight:700; line-height:1;
     text-shadow:0 1px 2px rgba(0,0,0,.45)}
 
   .cap{position:fixed; z-index:150; font-size:10.5px; font-weight:600;
@@ -99,7 +99,7 @@
   </div>
 </div>
 
-<div class="help">Touche C — masquer les légendes</div>
+
 
 <script>
 /* ==== liquidGL v2.0.1 - moteur officiel inline, aucune modification ==== */
@@ -4373,80 +4373,42 @@ function iconSVG(name, filled){
 
 /* ---------------- les 5 matières ----------------
    Seules les options du moteur changent d'une barre à l'autre. */
-const PRESETS = [
-  { nom:'Cristal',      note:'refraction .010 · frost 0',
-    bar:{refraction:0.010, bevelDepth:0.08, bevelWidth:0.15, frost:0,   aberration:0,    magnify:1.00},
-    len:{refraction:0.016, bevelDepth:0.09, bevelWidth:0.26, frost:0,   aberration:0,    magnify:1.03} },
-
-  { nom:'Amazon',       note:'refraction .015 · frost 1',
-    bar:{refraction:0.015, bevelDepth:0.10, bevelWidth:0.20, frost:1,   aberration:0,    magnify:1.00},
-    len:{refraction:0.020, bevelDepth:0.08, bevelWidth:0.32, frost:0.8, aberration:0,    magnify:1.05} },
-
-  { nom:'Bombée',       note:'biseau profond .18',
-    bar:{refraction:0.030, bevelDepth:0.18, bevelWidth:0.30, frost:0.6, aberration:0,    magnify:1.00},
-    len:{refraction:0.036, bevelDepth:0.14, bevelWidth:0.38, frost:0.5, aberration:0,    magnify:1.07} },
-
-  { nom:'Frost léger',  note:'frost 2 · biseau doux',
-    bar:{refraction:0.012, bevelDepth:0.07, bevelWidth:0.18, frost:2,   aberration:0,    magnify:1.00},
-    len:{refraction:0.016, bevelDepth:0.07, bevelWidth:0.30, frost:1.6, aberration:0,    magnify:1.04} },
-
-  { nom:'Loupe',        note:'magnify 1.10 · aberration .12',
-    bar:{refraction:0.020, bevelDepth:0.12, bevelWidth:0.26, frost:0.5, aberration:0.12, magnify:1.10},
-    len:{refraction:0.026, bevelDepth:0.10, bevelWidth:0.34, frost:0.4, aberration:0.18, magnify:1.14} }
-];
+const P = {
+  /* Valeurs exactes du fichier que tu as valide - aucune retouche. */
+  bar:{ refraction:0.01, aberration:0, bevelDepth:0.08, bevelWidth:0.15, frost:1,   magnify:1.00 },
+  len:{ refraction:0.02, aberration:0, bevelDepth:0.10, bevelWidth:0.24, frost:0.8, magnify:1.04 }
+};
 
 /* ---------------- géométrie ---------------- */
-const BW = 640, BH = 74, GAP = 26, R = BH/2;
-const TOTAL = PRESETS.length*BH + (PRESETS.length-1)*GAP;
+const BW = 460, BH = 64, R = BH/2;
 
-const bars = [];
-PRESETS.forEach((p, k) => {
-  const top  = Math.round((window.innerHeight - TOTAL)/2 + k*(BH+GAP));
-  const left = Math.round((window.innerWidth - BW)/2);
-  const tw   = BW / TABS.length;
+const top  = Math.round((window.innerHeight - BH)/2);
+const left = Math.round((window.innerWidth  - BW)/2);
+const tw   = BW / TABS.length;
 
-  const bar = document.createElement('div');
-  bar.className = 'lgbar';
-  bar.id = 'bar'+k;
-  Object.assign(bar.style, {
-    left:left+'px', top:top+'px',
-    width:BW+'px', height:BH+'px', borderRadius:R+'px'
-  });
-  bar.innerHTML = '<div class="tabs">' + TABS.map((t, i) =>
-    '<div class="tab'+(i===0?' on':'')+'">'+iconSVG(t.i, i===0)+'<span>'+t.l+'</span></div>'
-  ).join('') + '</div>';
-  document.body.appendChild(bar);
+const bar = document.createElement('div');
+bar.className = 'lgbar'; bar.id = 'bar';
+Object.assign(bar.style, {left:left+'px', top:top+'px',
+  width:BW+'px', height:BH+'px', borderRadius:R+'px'});
+bar.innerHTML = '<div class="tabs">' + TABS.map((t, i) =>
+  '<div class="tab'+(i===0?' on':'')+'">'+iconSVG(t.i, i===0)+'<span>'+t.l+'</span></div>'
+).join('') + '</div>';
+document.body.appendChild(bar);
 
-  const lens = document.createElement('div');
-  lens.className = 'lglens';
-  lens.id = 'lens'+k;
-  Object.assign(lens.style, {
-    left:Math.round(left+3)+'px', top:Math.round(top+6)+'px',
-    width:Math.round(tw-6)+'px', height:(BH-12)+'px',
-    borderRadius:((BH-12)/2)+'px'
-  });
-  document.body.appendChild(lens);
-
-  const cap = document.createElement('div');
-  cap.className = 'cap';
-  cap.style.left = (left - 150) + 'px';
-  cap.style.top  = (top + BH/2 - 7) + 'px';
-  cap.innerHTML = '<b>'+p.nom+'</b><br>'+p.note;
-  document.body.appendChild(cap);
-
-  bars.push(p);
-});
+const lens = document.createElement('div');
+lens.className = 'lglens'; lens.id = 'lens';
+Object.assign(lens.style, {
+  left:Math.round(left+3)+'px', top:Math.round(top+6)+'px',
+  width:Math.round(tw-6)+'px', height:(BH-12)+'px',
+  borderRadius:((BH-12)/2)+'px'});
+document.body.appendChild(lens);
 
 /* ---------------- init du moteur officiel ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  const base = {
-    snapshot:"body", resolution:2.0, specular:false,
-    reveal:"none", tilt:false
-  };
-  PRESETS.forEach((p, k) => {
-    liquidGL({ ...base, target:'#bar'+k,  ...p.bar, shadow:true  });
-    liquidGL({ ...base, target:'#lens'+k, ...p.len, shadow:false });
-  });
+  const base = {snapshot:"body", resolution:2.0, specular:false,
+                reveal:"none", tilt:false};
+  liquidGL({ ...base, target:'#bar',  ...P.bar, shadow:true  });
+  liquidGL({ ...base, target:'#lens', ...P.len, shadow:false });
 });
 
 addEventListener('keydown', e => {

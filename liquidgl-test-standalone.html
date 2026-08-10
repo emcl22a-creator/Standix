@@ -3,19 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>liquidGL — rendu brut</title>
+<title>liquidGL — 5 matières de navbar</title>
 <style>
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
-    background:#0a0a12;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    overflow:hidden;
+    background:#0a0a12; overflow:hidden;
+    font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
 
-  /* ---------- ARRIÈRE-PLAN DÉTAILLÉ ---------- */
-  /* Le decor doit rester en flux normal : liquidGL ignore
-     tout element position:fixed lors de son snapshot. */
+  /* ---------- DÉCOR (flux normal : liquidGL ignore tout position:fixed) ---------- */
   .scene{position:relative; width:100%; height:100vh; overflow:hidden}
 
   .halos{
@@ -28,17 +26,12 @@
       radial-gradient(36% 44% at 28% 82%, rgba(90,40,200,.50), transparent 70%),
       radial-gradient(32% 40% at 74% 88%, rgba(255,110,90,.45), transparent 70%);
   }
-
   .beams{
     position:absolute; inset:0;
-    background:repeating-linear-gradient(
-      90deg,
-      rgba(200,160,255,0) 0px,
-      rgba(200,160,255,.13) 22px,
-      rgba(255,150,220,.10) 44px,
-      rgba(200,160,255,0) 88px);
+    background:repeating-linear-gradient(90deg,
+      rgba(200,160,255,0) 0px, rgba(200,160,255,.13) 22px,
+      rgba(255,150,220,.10) 44px, rgba(200,160,255,0) 88px);
   }
-
   .grid{
     position:absolute; inset:0;
     background-image:
@@ -46,81 +39,47 @@
       linear-gradient(to bottom, rgba(255,255,255,.10) 1px, transparent 1px);
     background-size:44px 44px;
   }
-
-  .figures{position:absolute; left:0; right:0; bottom:14%; height:230px}
-  .fig{
-    position:absolute; bottom:0; width:60px; height:180px;
-    background:rgba(6,4,16,.74);
-    border-radius:30px 30px 8px 8px;
-  }
-  .fig::before{
-    content:""; position:absolute; top:-30px; left:50%; transform:translateX(-50%);
-    width:30px; height:30px; border-radius:50%; background:rgba(6,4,16,.74);
-  }
-
-  .title{
-    position:absolute; left:0; right:0; top:44%;
-    text-align:center; color:rgba(255,255,255,.92);
-    font-size:76px; font-weight:900; letter-spacing:.03em; line-height:1;
-  }
-  .subtitle{
-    position:absolute; left:0; right:0; top:calc(44% + 84px);
+  .figures{position:absolute; left:0; right:0; bottom:4%; height:230px}
+  .fig{position:absolute; bottom:0; width:60px; height:180px;
+    background:rgba(6,4,16,.74); border-radius:30px 30px 8px 8px}
+  .fig::before{content:""; position:absolute; top:-30px; left:50%;
+    transform:translateX(-50%); width:30px; height:30px;
+    border-radius:50%; background:rgba(6,4,16,.74)}
+  .title{position:absolute; left:0; right:0; top:6%; text-align:center;
+    color:rgba(255,255,255,.92); font-size:64px; font-weight:900;
+    letter-spacing:.03em; line-height:1}
+  .subtitle{position:absolute; left:0; right:0; top:calc(6% + 72px);
     text-align:center; color:rgba(255,255,255,.60);
-    font-size:20px; font-weight:700; letter-spacing:.18em;
-  }
-
-  .dots{position:absolute; left:0; right:0; bottom:9%; display:flex; justify-content:center; gap:64px}
-  .dot{width:22px; height:22px; border-radius:50%; background:#fff}
-  .dot.y{background:#ffd75a}
-
-  .stripes{
-    position:absolute; left:0; right:0; top:8%; height:56px;
+    font-size:18px; font-weight:700; letter-spacing:.18em}
+  .stripes{position:absolute; left:0; right:0; top:0; height:44px; opacity:.55;
     background:repeating-linear-gradient(135deg,
-      rgba(255,255,255,.85) 0 14px,
-      rgba(255,255,255,0) 14px 28px);
-    opacity:.55;
-  }
+      rgba(255,255,255,.85) 0 14px, rgba(255,255,255,0) 14px 28px)}
 
-  /* ---------- CIBLE liquidGL ---------- */
-  /* Aucun style de verre ici : uniquement la géométrie et la position.
-     Tout le rendu optique vient du moteur liquidGL. */
-  .lg-bar{
-    position:fixed;
-    left:calc(50% - 230px);
-    top:calc(50% - 32px);
-    width:460px;
-    height:64px;
-    border-radius:32px;
-    z-index:100;
-  }
+  /* ---------- CIBLES liquidGL ----------
+     Aucun style de verre ici : uniquement géométrie, position et contenu.
+     Toute l'optique vient du moteur officiel. */
+  .lgbar{position:fixed; z-index:100}
+  .lglens{position:fixed; z-index:101; pointer-events:none}
 
-  /* Seconde piece de verre : la lentille active.
-     Fixed elle aussi, donc ignoree du snapshot comme la grande barre. */
-  .panel{
-    position:fixed; top:14px; right:14px; width:238px; z-index:200;
-    background:rgba(14,15,22,.9); border:1px solid rgba(255,255,255,.1);
-    border-radius:14px; padding:11px 12px 13px; color:#e8eaf2; font-size:11px;
-  }
-  .panel.hidden{display:none}
-  .panel h4{margin:0 0 8px; font-size:9.5px; letter-spacing:.09em;
-    text-transform:uppercase; color:rgba(255,255,255,.45); font-weight:600}
-  .panel h4+*{margin-top:0}
-  .panel h4:not(:first-child){margin-top:12px}
-  .row{display:flex; align-items:center; gap:7px; margin:4px 0}
-  .row label{flex:0 0 84px; color:rgba(255,255,255,.66)}
-  .row input{flex:1; accent-color:#8b8cf0; height:13px}
-  .row b{flex:0 0 32px; text-align:right; font-variant-numeric:tabular-nums}
-  .panel .foot{margin-top:9px; font-size:9.5px; color:rgba(255,255,255,.35); line-height:1.4}
+  .tabs{position:absolute; inset:0; display:flex; align-items:center; z-index:5}
+  .tab{flex:1 1 0; height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:5px;
+    color:rgba(233,236,245,.74)}
+  .tab.on{color:#fff}
+  .tab svg{width:25px; height:25px; display:block;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+  .tab span{font-size:12.5px; font-weight:700; line-height:1;
+    text-shadow:0 1px 2px rgba(0,0,0,.45)}
 
-  .lg-lens{
-    position:fixed;
-    left:calc(50% - 224px);
-    top:calc(50% - 26px);
-    width:132px;
-    height:52px;
-    border-radius:26px;
-    z-index:101;
-  }
+  .cap{position:fixed; z-index:150; font-size:10.5px; font-weight:600;
+    letter-spacing:.10em; text-transform:uppercase;
+    color:rgba(255,255,255,.55); white-space:nowrap; pointer-events:none}
+  .cap b{color:rgba(255,255,255,.9); font-weight:700}
+  body.clean .cap{display:none}
+
+  .help{position:fixed; left:14px; bottom:12px; z-index:150; font-size:10.5px;
+    color:rgba(255,255,255,.35)}
+  body.clean .help{display:none}
 </style>
 </head>
 <body>
@@ -133,29 +92,14 @@
   <div class="title">GLADIATORS</div>
   <div class="subtitle">DIE SHOW DER GIGANTEN</div>
   <div class="figures">
-    <div class="fig" style="left:8%"></div>
-    <div class="fig" style="left:19%"></div>
-    <div class="fig" style="left:30%"></div>
-    <div class="fig" style="left:41%"></div>
-    <div class="fig" style="left:52%"></div>
-    <div class="fig" style="left:63%"></div>
-    <div class="fig" style="left:74%"></div>
-    <div class="fig" style="left:85%"></div>
-  </div>
-  <div class="dots">
-    <div class="dot"></div><div class="dot y"></div><div class="dot"></div>
-    <div class="dot y"></div><div class="dot"></div>
+    <div class="fig" style="left:6%"></div><div class="fig" style="left:17%"></div>
+    <div class="fig" style="left:28%"></div><div class="fig" style="left:39%"></div>
+    <div class="fig" style="left:50%"></div><div class="fig" style="left:61%"></div>
+    <div class="fig" style="left:72%"></div><div class="fig" style="left:83%"></div>
   </div>
 </div>
 
-<div class="lg-bar"></div>
-<div class="lg-lens"></div>
-
-<div class="panel" id="panel">
-  <h4>Grande barre</h4><div id="gBar"></div>
-  <h4>Lentille active</h4><div id="gLens"></div>
-  <div class="foot">Touche H pour masquer. Les uniformes sont relus a chaque frame : rien n'est modifie dans le moteur.</div>
-</div>
+<div class="help">Touche C — masquer les légendes</div>
 
 <script>
 /* ==== liquidGL v2.0.1 - moteur officiel inline, aucune modification ==== */
@@ -4390,60 +4334,124 @@
 
 </script>
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
+/* ---------------- icônes ---------------- */
+const ICO = {
+  home:{
+    line:'<path d="M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z"/>',
+    fill:'<path d="M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H5.4a2.2 2.2 0 0 1-2.2-2.2z"/>'
+  },
+  clip:{
+    line:'<path d="M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z"/>'
+        +'<path d="M8 5.2H6.8A2.8 2.8 0 0 0 4 8v11.2a2.8 2.8 0 0 0 2.8 2.8h10.4a2.8 2.8 0 0 0 2.8-2.8V8a2.8 2.8 0 0 0-2.8-2.8H16"/>'
+        +'<path d="M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6"/>',
+    fill:''
+  },
+  chart:{
+    line:'<path d="M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2"/><path d="M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6"/>',
+    fill:''
+  },
+  gear:{
+    line:'<path d="M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    fill:''
+  }
+};
+const TABS = [
+  {l:'Accueil',    i:'home'},
+  {l:'Procédures', i:'clip'},
+  {l:'Analyse',    i:'chart'},
+  {l:'Réglages',   i:'gear'}
+];
 
-    const bar = liquidGL({
-      snapshot: "body", target: ".lg-bar", resolution: 2.0,
-      refraction: 0.01, aberration: 0,
-      bevelDepth: 0.08, bevelWidth: 0.15,
-      frost: 1,
-      shadow: true, specular: false, reveal: "none", tilt: false, magnify: 1
-    });
+function iconSVG(name, filled){
+  const d = ICO[name];
+  if (filled && d.fill)
+    return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none">'+d.fill+'</svg>';
+  return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'
+       + (filled ? 2.5 : 1.9)
+       + '" stroke-linecap="round" stroke-linejoin="round">'+d.line+'</svg>';
+}
 
-    const lens = liquidGL({
-      snapshot: "body", target: ".lg-lens", resolution: 2.0,
-      refraction: 0.02, aberration: 0,
-      bevelDepth: 0.10, bevelWidth: 0.24,
-      frost: 0.8,
-      shadow: false, specular: false, reveal: "none", tilt: false, magnify: 1.04
-    });
+/* ---------------- les 5 matières ----------------
+   Seules les options du moteur changent d'une barre à l'autre. */
+const PRESETS = [
+  { nom:'Cristal',      note:'refraction .010 · frost 0',
+    bar:{refraction:0.010, bevelDepth:0.08, bevelWidth:0.15, frost:0,   aberration:0,    magnify:1.00},
+    len:{refraction:0.016, bevelDepth:0.09, bevelWidth:0.26, frost:0,   aberration:0,    magnify:1.03} },
 
-    /* Panneau : on ne fait que muter lens.options, relu a chaque frame
-       par le renderer officiel (ligne 2503-2508 de liquidGL.js). */
-    const CTRL = [
-      ["refraction", "Refraction", 0, 0.12, 0.002],
-      ["aberration", "Aberration", 0, 0.6,  0.01],
-      ["bevelDepth", "Biseau prof.", 0, 0.5, 0.005],
-      ["bevelWidth", "Biseau larg.", 0.02, 0.6, 0.005],
-      ["frost",      "Frost",       0, 4,   0.1],
-      ["magnify",    "Magnify",     0.85, 1.4, 0.01]
-    ];
+  { nom:'Amazon',       note:'refraction .015 · frost 1',
+    bar:{refraction:0.015, bevelDepth:0.10, bevelWidth:0.20, frost:1,   aberration:0,    magnify:1.00},
+    len:{refraction:0.020, bevelDepth:0.08, bevelWidth:0.32, frost:0.8, aberration:0,    magnify:1.05} },
 
-    function mount(host, inst, id){
-      host.innerHTML = CTRL.map(([k, label, min, max, step]) => `
-        <div class="row">
-          <label for="${id}_${k}">${label}</label>
-          <input id="${id}_${k}" type="range" min="${min}" max="${max}"
-                 step="${step}" value="${inst.options[k]}">
-          <b id="${id}v_${k}">${inst.options[k]}</b>
-        </div>`).join("");
-      CTRL.forEach(([k]) => {
-        const el = document.getElementById(id + "_" + k);
-        el.addEventListener("input", () => {
-          inst.options[k] = parseFloat(el.value);
-          document.getElementById(id + "v_" + k).textContent = el.value;
-        });
-      });
-    }
+  { nom:'Bombée',       note:'biseau profond .18',
+    bar:{refraction:0.030, bevelDepth:0.18, bevelWidth:0.30, frost:0.6, aberration:0,    magnify:1.00},
+    len:{refraction:0.036, bevelDepth:0.14, bevelWidth:0.38, frost:0.5, aberration:0,    magnify:1.07} },
 
-    mount(document.getElementById("gBar"),  bar,  "b");
-    mount(document.getElementById("gLens"), lens, "l");
+  { nom:'Frost léger',  note:'frost 2 · biseau doux',
+    bar:{refraction:0.012, bevelDepth:0.07, bevelWidth:0.18, frost:2,   aberration:0,    magnify:1.00},
+    len:{refraction:0.016, bevelDepth:0.07, bevelWidth:0.30, frost:1.6, aberration:0,    magnify:1.04} },
 
-    addEventListener("keydown", e => {
-      if (e.key === "h" || e.key === "H")
-        document.getElementById("panel").classList.toggle("hidden");
-    });
+  { nom:'Loupe',        note:'magnify 1.10 · aberration .12',
+    bar:{refraction:0.020, bevelDepth:0.12, bevelWidth:0.26, frost:0.5, aberration:0.12, magnify:1.10},
+    len:{refraction:0.026, bevelDepth:0.10, bevelWidth:0.34, frost:0.4, aberration:0.18, magnify:1.14} }
+];
+
+/* ---------------- géométrie ---------------- */
+const BW = 640, BH = 74, GAP = 26, R = BH/2;
+const TOTAL = PRESETS.length*BH + (PRESETS.length-1)*GAP;
+
+const bars = [];
+PRESETS.forEach((p, k) => {
+  const top  = Math.round((window.innerHeight - TOTAL)/2 + k*(BH+GAP));
+  const left = Math.round((window.innerWidth - BW)/2);
+  const tw   = BW / TABS.length;
+
+  const bar = document.createElement('div');
+  bar.className = 'lgbar';
+  bar.id = 'bar'+k;
+  Object.assign(bar.style, {
+    left:left+'px', top:top+'px',
+    width:BW+'px', height:BH+'px', borderRadius:R+'px'
   });
+  bar.innerHTML = '<div class="tabs">' + TABS.map((t, i) =>
+    '<div class="tab'+(i===0?' on':'')+'">'+iconSVG(t.i, i===0)+'<span>'+t.l+'</span></div>'
+  ).join('') + '</div>';
+  document.body.appendChild(bar);
+
+  const lens = document.createElement('div');
+  lens.className = 'lglens';
+  lens.id = 'lens'+k;
+  Object.assign(lens.style, {
+    left:Math.round(left+3)+'px', top:Math.round(top+6)+'px',
+    width:Math.round(tw-6)+'px', height:(BH-12)+'px',
+    borderRadius:((BH-12)/2)+'px'
+  });
+  document.body.appendChild(lens);
+
+  const cap = document.createElement('div');
+  cap.className = 'cap';
+  cap.style.left = (left - 150) + 'px';
+  cap.style.top  = (top + BH/2 - 7) + 'px';
+  cap.innerHTML = '<b>'+p.nom+'</b><br>'+p.note;
+  document.body.appendChild(cap);
+
+  bars.push(p);
+});
+
+/* ---------------- init du moteur officiel ---------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const base = {
+    snapshot:"body", resolution:2.0, specular:false,
+    reveal:"none", tilt:false
+  };
+  PRESETS.forEach((p, k) => {
+    liquidGL({ ...base, target:'#bar'+k,  ...p.bar, shadow:true  });
+    liquidGL({ ...base, target:'#lens'+k, ...p.len, shadow:false });
+  });
+});
+
+addEventListener('keydown', e => {
+  if (e.key === 'c' || e.key === 'C') document.body.classList.toggle('clean');
+});
 </script>
 </body>
 </html>

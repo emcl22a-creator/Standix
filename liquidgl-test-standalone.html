@@ -4334,6 +4334,7 @@
 
 </script>
 <script>
+(() => {
 /* ---------------- icônes ---------------- */
 const ICO = {
   home:{
@@ -4382,13 +4383,13 @@ const P = {
 /* ---------------- géométrie ---------------- */
 const BW = 460, BH = 64, R = BH/2;
 
-const top  = Math.round((window.innerHeight - BH)/2);
-const left = Math.round((window.innerWidth  - BW)/2);
+const barTop  = Math.round((window.innerHeight - BH)/2);
+const barLeft = Math.round((window.innerWidth  - BW)/2);
 const tw   = BW / TABS.length;
 
 const bar = document.createElement('div');
 bar.className = 'lgbar'; bar.id = 'bar';
-Object.assign(bar.style, {left:left+'px', top:top+'px',
+Object.assign(bar.style, {left:barLeft+'px', top:barTop+'px',
   width:BW+'px', height:BH+'px', borderRadius:R+'px'});
 bar.innerHTML = '<div class="tabs">' + TABS.map((t, i) =>
   '<div class="tab'+(i===0?' on':'')+'">'+iconSVG(t.i, i===0)+'<span>'+t.l+'</span></div>'
@@ -4398,7 +4399,7 @@ document.body.appendChild(bar);
 const lens = document.createElement('div');
 lens.className = 'lglens'; lens.id = 'lens';
 Object.assign(lens.style, {
-  left:Math.round(left+3)+'px', top:Math.round(top+6)+'px',
+  left:Math.round(barLeft+3)+'px', top:Math.round(barTop+6)+'px',
   width:Math.round(tw-6)+'px', height:(BH-12)+'px',
   borderRadius:((BH-12)/2)+'px'});
 document.body.appendChild(lens);
@@ -4414,6 +4415,8 @@ document.addEventListener("DOMContentLoaded", () => {
 addEventListener('keydown', e => {
   if (e.key === 'c' || e.key === 'C') document.body.classList.toggle('clean');
 });
+
+})();
 </script>
 </body>
 </html>

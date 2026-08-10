@@ -84,14 +84,26 @@
   /* ---------- CIBLE liquidGL ---------- */
   /* Aucun style de verre ici : uniquement la géométrie et la position.
      Tout le rendu optique vient du moteur liquidGL. */
-  .liquidGL{
+  .lg-bar{
     position:fixed;
-    left:50%; top:50%;
-    transform:translate(-50%,-50%);
+    left:calc(50% - 230px);
+    top:calc(50% - 32px);
     width:460px;
     height:64px;
     border-radius:32px;
     z-index:100;
+  }
+
+  /* Seconde piece de verre : la lentille active.
+     Fixed elle aussi, donc ignoree du snapshot comme la grande barre. */
+  .lg-lens{
+    position:fixed;
+    left:calc(50% - 224px);
+    top:calc(50% - 26px);
+    width:132px;
+    height:52px;
+    border-radius:26px;
+    z-index:101;
   }
 </style>
 </head>
@@ -120,7 +132,8 @@
   </div>
 </div>
 
-<div class="liquidGL"></div>
+<div class="lg-bar"></div>
+<div class="lg-lens"></div>
 
 <script>
 /* ==== liquidGL v2.0.1 - moteur officiel inline, aucune modification ==== */
@@ -4356,20 +4369,39 @@
 </script>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
+
+    /* 1. La grande barre — leger frost, comme Amazon */
     liquidGL({
       snapshot: "body",
-      target: ".liquidGL",
+      target: ".lg-bar",
       resolution: 2.0,
       refraction: 0.01,
       aberration: 0,
       bevelDepth: 0.08,
       bevelWidth: 0.15,
-      frost: 0,
+      frost: 3,
       shadow: true,
       specular: false,
       reveal: "none",
       tilt: false,
       magnify: 1
+    });
+
+    /* 2. La lentille active — bombee plus court, legere magnification */
+    liquidGL({
+      snapshot: "body",
+      target: ".lg-lens",
+      resolution: 2.0,
+      refraction: 0.02,
+      aberration: 0,
+      bevelDepth: 0.14,
+      bevelWidth: 0.30,
+      frost: 2,
+      shadow: false,
+      specular: false,
+      reveal: "none",
+      tilt: false,
+      magnify: 1.06
     });
   });
 </script>

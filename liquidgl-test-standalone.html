@@ -96,6 +96,22 @@
 
   /* Seconde piece de verre : la lentille active.
      Fixed elle aussi, donc ignoree du snapshot comme la grande barre. */
+  .panel{
+    position:fixed; top:14px; right:14px; width:238px; z-index:200;
+    background:rgba(14,15,22,.9); border:1px solid rgba(255,255,255,.1);
+    border-radius:14px; padding:11px 12px 13px; color:#e8eaf2; font-size:11px;
+  }
+  .panel.hidden{display:none}
+  .panel h4{margin:0 0 8px; font-size:9.5px; letter-spacing:.09em;
+    text-transform:uppercase; color:rgba(255,255,255,.45); font-weight:600}
+  .panel h4+*{margin-top:0}
+  .panel h4:not(:first-child){margin-top:12px}
+  .row{display:flex; align-items:center; gap:7px; margin:4px 0}
+  .row label{flex:0 0 84px; color:rgba(255,255,255,.66)}
+  .row input{flex:1; accent-color:#8b8cf0; height:13px}
+  .row b{flex:0 0 32px; text-align:right; font-variant-numeric:tabular-nums}
+  .panel .foot{margin-top:9px; font-size:9.5px; color:rgba(255,255,255,.35); line-height:1.4}
+
   .lg-lens{
     position:fixed;
     left:calc(50% - 224px);
@@ -134,6 +150,12 @@
 
 <div class="lg-bar"></div>
 <div class="lg-lens"></div>
+
+<div class="panel" id="panel">
+  <h4>Grande barre</h4><div id="gBar"></div>
+  <h4>Lentille active</h4><div id="gLens"></div>
+  <div class="foot">Touche H pour masquer. Les uniformes sont relus a chaque frame : rien n'est modifie dans le moteur.</div>
+</div>
 
 <script>
 /* ==== liquidGL v2.0.1 - moteur officiel inline, aucune modification ==== */
@@ -4370,38 +4392,56 @@
 <script>
   document.addEventListener("DOMContentLoaded", () => {
 
-    /* 1. La grande barre — leger frost, comme Amazon */
-    liquidGL({
-      snapshot: "body",
-      target: ".lg-bar",
-      resolution: 2.0,
-      refraction: 0.01,
-      aberration: 0,
-      bevelDepth: 0.08,
-      bevelWidth: 0.15,
-      frost: 3,
-      shadow: true,
-      specular: false,
-      reveal: "none",
-      tilt: false,
-      magnify: 1
+    const bar = liquidGL({
+      snapshot: "body", target: ".lg-bar", resolution: 2.0,
+      refraction: 0.01, aberration: 0,
+      bevelDepth: 0.08, bevelWidth: 0.15,
+      frost: 1,
+      shadow: true, specular: false, reveal: "none", tilt: false, magnify: 1
     });
 
-    /* 2. La lentille active — bombee plus court, legere magnification */
-    liquidGL({
-      snapshot: "body",
-      target: ".lg-lens",
-      resolution: 2.0,
-      refraction: 0.02,
-      aberration: 0,
-      bevelDepth: 0.14,
-      bevelWidth: 0.30,
-      frost: 2,
-      shadow: false,
-      specular: false,
-      reveal: "none",
-      tilt: false,
-      magnify: 1.06
+    const lens = liquidGL({
+      snapshot: "body", target: ".lg-lens", resolution: 2.0,
+      refraction: 0.02, aberration: 0,
+      bevelDepth: 0.10, bevelWidth: 0.24,
+      frost: 0.8,
+      shadow: false, specular: false, reveal: "none", tilt: false, magnify: 1.04
+    });
+
+    /* Panneau : on ne fait que muter lens.options, relu a chaque frame
+       par le renderer officiel (ligne 2503-2508 de liquidGL.js). */
+    const CTRL = [
+      ["refraction", "Refraction", 0, 0.12, 0.002],
+      ["aberration", "Aberration", 0, 0.6,  0.01],
+      ["bevelDepth", "Biseau prof.", 0, 0.5, 0.005],
+      ["bevelWidth", "Biseau larg.", 0.02, 0.6, 0.005],
+      ["frost",      "Frost",       0, 4,   0.1],
+      ["magnify",    "Magnify",     0.85, 1.4, 0.01]
+    ];
+
+    function mount(host, inst, id){
+      host.innerHTML = CTRL.map(([k, label, min, max, step]) => `
+        <div class="row">
+          <label for="${id}_${k}">${label}</label>
+          <input id="${id}_${k}" type="range" min="${min}" max="${max}"
+                 step="${step}" value="${inst.options[k]}">
+          <b id="${id}v_${k}">${inst.options[k]}</b>
+        </div>`).join("");
+      CTRL.forEach(([k]) => {
+        const el = document.getElementById(id + "_" + k);
+        el.addEventListener("input", () => {
+          inst.options[k] = parseFloat(el.value);
+          document.getElementById(id + "v_" + k).textContent = el.value;
+        });
+      });
+    }
+
+    mount(document.getElementById("gBar"),  bar,  "b");
+    mount(document.getElementById("gLens"), lens, "l");
+
+    addEventListener("keydown", e => {
+      if (e.key === "h" || e.key === "H")
+        document.getElementById("panel").classList.toggle("hidden");
     });
   });
 </script>

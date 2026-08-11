@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Navbar liquidGL</title>
+<title>Navbar liquidGL — config</title>
 <style>
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
@@ -13,9 +13,8 @@
     -webkit-font-smoothing:antialiased;
   }
 
-  /* ---------- DÉCOR (flux normal : liquidGL ignore tout position:fixed) ---------- */
+  /* ---------- DECOR (flux normal : liquidGL ignore tout position:fixed) ---------- */
   .scene{position:relative; width:100%; height:100vh; overflow:hidden}
-
   .halos{
     position:absolute; inset:-10%;
     background:
@@ -45,19 +44,17 @@
   .fig::before{content:""; position:absolute; top:-30px; left:50%;
     transform:translateX(-50%); width:30px; height:30px;
     border-radius:50%; background:rgba(6,4,16,.74)}
-  .title{position:absolute; left:0; right:0; top:6%; text-align:center;
+  .title{position:absolute; left:0; right:0; top:14%; text-align:center;
     color:rgba(255,255,255,.92); font-size:64px; font-weight:900;
     letter-spacing:.03em; line-height:1}
-  .subtitle{position:absolute; left:0; right:0; top:calc(6% + 72px);
+  .subtitle{position:absolute; left:0; right:0; top:calc(14% + 72px);
     text-align:center; color:rgba(255,255,255,.60);
     font-size:18px; font-weight:700; letter-spacing:.18em}
   .stripes{position:absolute; left:0; right:0; top:0; height:44px; opacity:.55;
     background:repeating-linear-gradient(135deg,
       rgba(255,255,255,.85) 0 14px, rgba(255,255,255,0) 14px 28px)}
 
-  /* ---------- CIBLES liquidGL ----------
-     Aucun style de verre ici : uniquement géométrie, position et contenu.
-     Toute l'optique vient du moteur officiel. */
+  /* ---------- CIBLES liquidGL : geometrie seule, aucune optique CSS ---------- */
   .lgbar{position:fixed; z-index:100}
   .lglens{position:fixed; z-index:101; pointer-events:none}
 
@@ -71,15 +68,37 @@
   .tab span{font-size:11.5px; font-weight:700; line-height:1;
     text-shadow:0 1px 2px rgba(0,0,0,.45)}
 
-  .cap{position:fixed; z-index:150; font-size:10.5px; font-weight:600;
-    letter-spacing:.10em; text-transform:uppercase;
-    color:rgba(255,255,255,.55); white-space:nowrap; pointer-events:none}
-  .cap b{color:rgba(255,255,255,.9); font-weight:700}
-  body.clean .cap{display:none}
+  /* ---------- PANNEAU ---------- */
+  .panel{
+    position:fixed; top:14px; right:14px; width:250px; z-index:200;
+    background:rgba(14,15,22,.92); border:1px solid rgba(255,255,255,.1);
+    border-radius:14px; padding:11px 12px 12px; color:#e8eaf2; font-size:11px;
+  }
+  .panel.hidden{display:none}
+  .panel h4{margin:0 0 7px; font-size:9.5px; letter-spacing:.09em;
+    text-transform:uppercase; color:rgba(255,255,255,.45); font-weight:600}
+  .panel h4:not(:first-child){margin-top:11px}
+  .row{display:flex; align-items:center; gap:7px; margin:4px 0}
+  .row label{flex:0 0 80px; color:rgba(255,255,255,.66)}
+  .row input{flex:1; accent-color:#8b8cf0; height:13px; min-width:0}
+  .row b{flex:0 0 34px; text-align:right; font-variant-numeric:tabular-nums;
+    font-weight:600}
 
-  .help{position:fixed; left:14px; bottom:12px; z-index:150; font-size:10.5px;
-    color:rgba(255,255,255,.35)}
-  body.clean .help{display:none}
+  /* ---------- COMPTEUR DE CONFIG ---------- */
+  .cfg{margin-top:11px; border-top:1px solid rgba(255,255,255,.1); padding-top:9px}
+  .cfg pre{
+    margin:0; padding:8px; border-radius:8px;
+    background:rgba(0,0,0,.42); color:#c9d2ff;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:9.5px; line-height:1.5; white-space:pre; overflow-x:auto;
+  }
+  .cfg button{
+    margin-top:7px; width:100%; padding:6px 0; cursor:pointer;
+    background:rgba(139,140,240,.18); color:#dcdcff; font-size:10.5px;
+    font-weight:600; border:1px solid rgba(139,140,240,.4); border-radius:7px;
+  }
+  .cfg button:hover{background:rgba(139,140,240,.3)}
+  .cfg .n{margin-top:6px; font-size:9px; color:rgba(255,255,255,.34); line-height:1.4}
 </style>
 </head>
 <body>
@@ -99,7 +118,16 @@
   </div>
 </div>
 
-
+<div class="panel" id="panel">
+  <h4>Grande barre</h4><div id="gBar"></div>
+  <h4>Lentille active</h4><div id="gLens"></div>
+  <div class="cfg">
+    <h4 style="margin-top:0">Config actuelle</h4>
+    <pre id="cfgOut"></pre>
+    <button id="cfgCopy" type="button">Copier la config</button>
+    <div class="n">Touche H pour masquer le panneau.</div>
+  </div>
+</div>
 
 <script>
 /* ==== liquidGL v2.0.1 - moteur officiel inline, aucune modification ==== */
@@ -4335,7 +4363,8 @@
 </script>
 <script>
 (() => {
-/* ---------------- icônes ---------------- */
+
+/* ---------------- icones ---------------- */
 const ICO = {
   home:{
     line:'<path d="M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z"/>',
@@ -4344,76 +4373,130 @@ const ICO = {
   clip:{
     line:'<path d="M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z"/>'
         +'<path d="M8 5.2H6.8A2.8 2.8 0 0 0 4 8v11.2a2.8 2.8 0 0 0 2.8 2.8h10.4a2.8 2.8 0 0 0 2.8-2.8V8a2.8 2.8 0 0 0-2.8-2.8H16"/>'
-        +'<path d="M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6"/>',
-    fill:''
+        +'<path d="M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6"/>', fill:''
   },
   chart:{
-    line:'<path d="M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2"/><path d="M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6"/>',
-    fill:''
+    line:'<path d="M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2"/><path d="M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6"/>', fill:''
   },
   gear:{
-    line:'<path d="M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
-    fill:''
+    line:'<path d="M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>', fill:''
   }
 };
 const TABS = [
-  {l:'Accueil',    i:'home'},
-  {l:'Procédures', i:'clip'},
-  {l:'Analyse',    i:'chart'},
-  {l:'Réglages',   i:'gear'}
+  {l:'Accueil', i:'home'}, {l:'Procédures', i:'clip'},
+  {l:'Analyse', i:'chart'}, {l:'Réglages', i:'gear'}
 ];
-
 function iconSVG(name, filled){
   const d = ICO[name];
   if (filled && d.fill)
     return '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none">'+d.fill+'</svg>';
   return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="'
-       + (filled ? 2.5 : 1.9)
-       + '" stroke-linecap="round" stroke-linejoin="round">'+d.line+'</svg>';
+       + (filled ? 2.5 : 1.9) + '" stroke-linecap="round" stroke-linejoin="round">'
+       + d.line + '</svg>';
 }
 
-/* ---------------- les 5 matières ----------------
-   Seules les options du moteur changent d'une barre à l'autre. */
+/* ---------------- valeurs de depart : celles que tu as validees ---------------- */
 const P = {
-  /* Valeurs exactes du fichier que tu as valide - aucune retouche. */
   bar:{ refraction:0.01, aberration:0, bevelDepth:0.08, bevelWidth:0.15, frost:1,   magnify:1.00 },
   len:{ refraction:0.02, aberration:0, bevelDepth:0.10, bevelWidth:0.24, frost:0.8, magnify:1.04 }
 };
 
-/* ---------------- géométrie ---------------- */
+/* ---------------- geometrie ---------------- */
 const BW = 460, BH = 64, R = BH/2;
-
 const barTop  = Math.round((window.innerHeight - BH)/2);
 const barLeft = Math.round((window.innerWidth  - BW)/2);
-const tw   = BW / TABS.length;
+const tw = BW / TABS.length;
 
-const bar = document.createElement('div');
-bar.className = 'lgbar'; bar.id = 'bar';
-Object.assign(bar.style, {left:barLeft+'px', top:barTop+'px',
+const barEl = document.createElement('div');
+barEl.className = 'lgbar'; barEl.id = 'bar';
+Object.assign(barEl.style, {left:barLeft+'px', top:barTop+'px',
   width:BW+'px', height:BH+'px', borderRadius:R+'px'});
-bar.innerHTML = '<div class="tabs">' + TABS.map((t, i) =>
+barEl.innerHTML = '<div class="tabs">' + TABS.map((t, i) =>
   '<div class="tab'+(i===0?' on':'')+'">'+iconSVG(t.i, i===0)+'<span>'+t.l+'</span></div>'
 ).join('') + '</div>';
-document.body.appendChild(bar);
+document.body.appendChild(barEl);
 
-const lens = document.createElement('div');
-lens.className = 'lglens'; lens.id = 'lens';
-Object.assign(lens.style, {
+const lensEl = document.createElement('div');
+lensEl.className = 'lglens'; lensEl.id = 'lens';
+Object.assign(lensEl.style, {
   left:Math.round(barLeft+3)+'px', top:Math.round(barTop+6)+'px',
   width:Math.round(tw-6)+'px', height:(BH-12)+'px',
   borderRadius:((BH-12)/2)+'px'});
-document.body.appendChild(lens);
+document.body.appendChild(lensEl);
 
-/* ---------------- init du moteur officiel ---------------- */
+/* ---------------- moteur officiel ---------------- */
 document.addEventListener("DOMContentLoaded", () => {
   const base = {snapshot:"body", resolution:2.0, specular:false,
                 reveal:"none", tilt:false};
-  liquidGL({ ...base, target:'#bar',  ...P.bar, shadow:true  });
-  liquidGL({ ...base, target:'#lens', ...P.len, shadow:false });
+
+  const bar  = liquidGL({ ...base, target:'#bar',  ...P.bar, shadow:true  });
+  const lens = liquidGL({ ...base, target:'#lens', ...P.len, shadow:false });
+
+  const CTRL = [
+    ["refraction", "Refraction",  0,    0.12, 0.002, 3],
+    ["aberration", "Aberration",  0,    0.6,  0.01,  2],
+    ["bevelDepth", "Biseau prof", 0,    0.5,  0.005, 3],
+    ["bevelWidth", "Biseau larg", 0.02, 0.6,  0.005, 3],
+    ["frost",      "Frost",       0,    4,    0.1,   1],
+    ["magnify",    "Magnify",     0.85, 1.4,  0.01,  2]
+  ];
+
+  const out  = document.getElementById('cfgOut');
+
+  /* Le compteur : relit les options reellement utilisees par le renderer */
+  function refreshConfig(){
+    const fmt = (inst) => CTRL.map(([k,,,,,dp]) =>
+      '  ' + (k+':').padEnd(12) + Number(inst.options[k]).toFixed(dp)
+    ).join('\n');
+    out.textContent =
+      'bar {\n'  + fmt(bar)  + '\n}\n' +
+      'lens {\n' + fmt(lens) + '\n}';
+  }
+
+  function mount(host, inst, id){
+    host.innerHTML = CTRL.map(([k, label, min, max, step, dp]) => `
+      <div class="row">
+        <label for="${id}_${k}">${label}</label>
+        <input id="${id}_${k}" type="range" min="${min}" max="${max}"
+               step="${step}" value="${inst.options[k]}">
+        <b id="${id}v_${k}">${Number(inst.options[k]).toFixed(dp)}</b>
+      </div>`).join("");
+    CTRL.forEach(([k,,,,,dp]) => {
+      const el = document.getElementById(id + "_" + k);
+      el.addEventListener("input", () => {
+        inst.options[k] = parseFloat(el.value);
+        document.getElementById(id + "v_" + k).textContent =
+          Number(el.value).toFixed(dp);
+        refreshConfig();
+      });
+    });
+  }
+
+  mount(document.getElementById("gBar"),  bar,  "b");
+  mount(document.getElementById("gLens"), lens, "l");
+  refreshConfig();
+
+  document.getElementById('cfgCopy').addEventListener('click', (e) => {
+    const txt = out.textContent;
+    const done = () => { e.target.textContent = 'Copie !';
+      setTimeout(() => e.target.textContent = 'Copier la config', 1400); };
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(done, () => fallback(txt, done));
+    } else fallback(txt, done);
+  });
+
+  function fallback(txt, done){
+    const ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch(err) {}
+    ta.remove();
+  }
 });
 
 addEventListener('keydown', e => {
-  if (e.key === 'c' || e.key === 'C') document.body.classList.toggle('clean');
+  if (e.key === 'h' || e.key === 'H')
+    document.getElementById('panel').classList.toggle('hidden');
 });
 
 })();

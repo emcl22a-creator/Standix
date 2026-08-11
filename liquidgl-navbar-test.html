@@ -1,21 +1,3 @@
-/* Options OFFICIELLES de liquidGL, identiques a celles de la barre.
-   Deux instances distinctes, deux jeux de valeurs independants. */
-const LENS = {
-  resolution:  2.0,
-  reveal:      'none',   // 'none' | 'fade'
-  refraction:  0.02,
-  aberration:  0,
-  bevelDepth:  0.14,
-  bevelWidth:  0.22,
-  frost:       0,
-  magnify:     1.2,
-  specular:    true,
-  shadow:      false,
-  tilt:        false,
-  tiltFactor:  5,
-  tiltEase:    400,
-};
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -33,7 +15,6 @@ const LENS = {
     background:#0a0a12;
     font-family:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     -webkit-font-smoothing:antialiased;
-    overflow:hidden;
   }
 
   /* Decor : en flux normal, liquidGL ignore tout position:fixed */
@@ -62,12 +43,6 @@ const LENS = {
     width:280px; height:55px; border-radius:27.5px;
     z-index:10;
   }
-  /* Conteneur decoupe : le canvas plein ecran de liquidGL est rogne
-     a la forme exacte de la capsule, ce qui supprime le rectangle. */
-  .lensClip{
-    position:absolute; left:50%; top:50%;
-    pointer-events:none; z-index:20; overflow:hidden;
-  }
   .lens{
     background:transparent;
     position:absolute; left:50%; top:50%;
@@ -75,7 +50,6 @@ const LENS = {
     z-index:20;                 /* au-dessus de la navbar */
     pointer-events:none;
     will-change:transform,width,height;
-    overflow:hidden;
   }
 
   /* Couche des onglets : au-dessus de la navbar, sous la lentille */
@@ -4396,6 +4370,10 @@ const REFORM_AT = 0.80;         // debut de la reformation
 let TRAVEL_MS = 600;
 const GEO = { restW: 62, restH: 46, movingW: 0.70, overflow: 6, travelMs: 600 };
 const TAB_CENTERS = [35.5, 105.1667, 174.8333, 244.5];
+/* Options OFFICIELLES de liquidGL, identiques a celles de la barre.
+   Deux instances distinctes, deux jeux de valeurs independants. */
+
+
 const ICON = {
   size:        22,     // taille de base des icones, en px
   magnify:     1.30,   // grossissement dans la lentille
@@ -4536,8 +4514,9 @@ const lensEl = document.getElementById('lens');
 const geom = { x: TAB_CENTERS[0], w: REST_W, h: REST_H, r: REST_H / 2 };
 let anim = null;
 
-function applyLensStyle() {
-  // Pendant le trajet, on module les options du MOTEUR, pas du CSS.
+// Pendant le trajet, on module les options OFFICIELLES du moteur.
+// A l'arret motionK = 0 : le cercle revient a ses valeurs de repos.
+function applyLensMotion() {
   if (!lensLens || !lensLens.options) return;
   const k = motionK;
   const mix = (a, b) => a + (b - a) * k;
@@ -4587,7 +4566,7 @@ function tick() {
     }
     render();
     applyGeom();
-    applyLensStyle();
+    applyLensMotion();
   }
   requestAnimationFrame(tick);
 }
@@ -4619,18 +4598,25 @@ const BAR = {
   tiltEase:    400,
 };
 
+
+/* Options OFFICIELLES de liquidGL, identiques a celles de la barre.
+   Deux instances distinctes, deux jeux de valeurs independants. */
 const LENS = {
-  blurPx:      0,      // le cercle n'est PAS floute
-  saturate:    1.15,   // legere reprise de couleur
-  brightness:  1.08,   // le verre eclaircit un peu
-  contrast:    1.05,
-  tintAlpha:   0.10,   // voile blanc tres leger
-  tintColor:   '#ffffff',
-  edgeAlpha:   0.22,   // liseré du bord
-  edgeWidth:   1,      // epaisseur du liseré, en px
-  shadowAlpha: 0.18,   // ombre portee
-  shadowBlur:  10,
+  resolution:  2.0,
+  reveal:      'none',   // 'none' | 'fade'
+  refraction:  0.02,
+  aberration:  0,
+  bevelDepth:  0.14,
+  bevelWidth:  0.22,
+  frost:       0,
+  magnify:     1.2,
+  specular:    true,
+  shadow:      false,
+  tilt:        false,
+  tiltFactor:  5,
+  tiltEase:    400,
 };
+
 
 let barLens = null;
 let lensLens = null;
@@ -4652,72 +4638,6 @@ const toLiquidGL = (c) => ({
   reveal: c.reveal,
 });
 
-const hexToRgb = (x) => {
-  const n = parseInt(x.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-};
-
-/* Les uniformes sont relus a chaque frame depuis instance.options :
-   muter cet objet suffit, aucun rechargement du moteur. */
-const engineOpts = (c) => ({
-  reveal: c.reveal,
-  resolution: c.resolution,
-  refraction: c.refraction,
-  aberration: c.aberration,
-  bevelDepth: c.bevelDepth,
-  bevelWidth: c.bevelWidth,
-  frost: c.frost,
-  magnify: c.magnify,
-  specular: c.specular,
-  shadow: c.shadow,
-  tilt: c.tilt,
-  tiltFactor: c.tiltFactor,
-  tiltEase: c.tiltEase,
-});
-
-const applyEngines = () => {
-  if (barLens && barLens.options) Object.assign(barLens.options, engineOpts(BAR));
-  if (lensLens && lensLens.options) Object.assign(lensLens.options, engineOpts(LENS));
-};
-
-const applyBarEngineUnused = () => {
-  if (!barLens || !barLens.options) return;
-  Object.assign(barLens.options, {
-    refraction: BAR.refraction,
-    aberration: BAR.aberration,
-    bevelDepth: BAR.bevelDepth,
-    bevelWidth: BAR.bevelWidth,
-    frost: BAR.frost,
-    magnify: BAR.magnify,
-    specular: BAR.specular,
-    shadow: BAR.shadow,
-    tilt: BAR.tilt,
-    tiltFactor: BAR.tiltFactor,
-    tiltEase: BAR.tiltEase,
-  });
-};
-
-const applyCss = (el, c) => {
-  const [r, g, bl] = hexToRgb(c.tintColor || '#000000');
-  el.style.background = c.tintAlpha > 0
-    ? `rgba(${r},${g},${bl},${c.tintAlpha})`
-    : 'transparent';
-  const f = [];
-  if (c.blurPx > 0) f.push(`blur(${c.blurPx}px)`);
-  if (c.saturate !== 1) f.push(`saturate(${c.saturate})`);
-  if (c.brightness !== 1) f.push(`brightness(${c.brightness})`);
-  if (c.contrast && c.contrast !== 1) f.push(`contrast(${c.contrast})`);
-  const v = f.join(' ');
-  el.style.backdropFilter = v;
-  el.style.webkitBackdropFilter = v;
-  if (c.edgeAlpha !== undefined) {
-    el.style.boxShadow =
-      `inset 0 0 0 ${c.edgeWidth}px rgba(255,255,255,${c.edgeAlpha})` +
-      (c.shadowAlpha > 0
-        ? `, 0 2px ${c.shadowBlur}px rgba(0,0,0,${c.shadowAlpha})`
-        : '');
-  }
-};
 
 
 /* ============================================================
@@ -4833,7 +4753,7 @@ function buildPanel() {
 
 function applyAll() {
   applyEngines();
-  applyLensStyle();
+  applyLensMotion();
   REST_W = GEO.restW; REST_H = GEO.restH;
   MOVING_W = GEO.movingW; OVERFLOW = GEO.overflow; TRAVEL_MS = GEO.travelMs;
   if (!anim) { geom.w = REST_W; geom.h = REST_H; geom.r = Math.min(REST_W, REST_H) / 2; }
@@ -4846,9 +4766,22 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   applyGeom();
   // Deux geometries independantes, un seul jeu de parametres.
-  applyLensStyle();
-  barLens  = liquidGL({ ...toLiquidGL(BAR),  target: '#navbar' });
-  lensLens = liquidGL({ ...toLiquidGL(LENS), target: '#lens' });
+  barLens = liquidGL({
+    ...toLiquidGL(BAR),
+    target: '#navbar',
+    on: { init: (l) => console.log('liquidGL bar ready', l.options) },
+  });
+  lensLens = liquidGL({
+    ...toLiquidGL(LENS),
+    target: '#lens',
+    on: { init: (l) => console.log('liquidGL lens ready', l.options) },
+  });
+
+  // API officielle : les elements qui bougent ou changent doivent etre
+  // declares pour que le moteur reactualise son snapshot (ligne 4132).
+  if (typeof liquidGL.registerDynamic === 'function') {
+    liquidGL.registerDynamic(['#tabs', '#lens']);
+  }
   tabsEl.addEventListener('click', e => {
     const t = e.target.closest('.tab');
     if (t) goTo(+t.dataset.i);

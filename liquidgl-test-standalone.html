@@ -4360,7 +4360,7 @@ const ICONS = {
   clip:{line:'M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6',
         fill:'M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.9 10h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 13.5h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 17h3.4a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z'},
   chart:{line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',
-         fill:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6'},
+         fill:'M3.4 3.4h2v15.4h15.2v2H5.4a2 2 0 0 1-2-2z M7.1 13.3h2.4v5.5H7.1z M11.8 8.1h2.4v10.7h-2.4z M16.5 10.6h2.4v8.2h-2.4z'},
   gear:{line:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z M15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z',
         fill:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2zM15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z'},
 };
@@ -4392,9 +4392,17 @@ function heightAt(k) {
 const tabsEl = document.getElementById('tabs');
 let activeTab = 0;
 
+/*
+  Le remplissage blanc ne depend PAS de activeTab :
+  - calque NORMAL  : tous les items en outline gris, echelle 1
+  - calque MAGNIFIE: tous les items en filled blanc, echelle magnifiee
+  Seul lensMask decide de ce qui est visible. L'ancien item se vide donc
+  progressivement quand la lentille le quitte, le nouveau se remplit en
+  arrivant, et un item traverse se remplit puis se vide.
+*/
 function buildRow(variant) {
   return NAMES.map((n, i) => {
-    const on = variant === 'mag' || i === activeTab;
+    const on = variant === 'mag';
     const sc = variant === 'mag' ? MAG_ICON : 1;
     const sl = variant === 'mag' ? MAG_LABEL : 1;
     return `<div class="tab" data-i="${i}" style="left:${TAB_CENTERS[i] - 31}px">
@@ -4470,7 +4478,6 @@ function tick() {
       geom.x = anim.to; geom.w = REST_W; geom.h = REST_H; geom.r = REST_H / 2;
       anim = null;
       console.log('TRAVEL END');
-      render();
     }
     applyGeom();
     applyMasks();

@@ -1,3 +1,21 @@
+/* Options OFFICIELLES de liquidGL, identiques a celles de la barre.
+   Deux instances distinctes, deux jeux de valeurs independants. */
+const LENS = {
+  resolution:  2.0,
+  reveal:      'none',   // 'none' | 'fade'
+  refraction:  0.02,
+  aberration:  0,
+  bevelDepth:  0.14,
+  bevelWidth:  0.22,
+  frost:       0,
+  magnify:     1.2,
+  specular:    true,
+  shadow:      false,
+  tilt:        false,
+  tiltFactor:  5,
+  tiltEase:    400,
+};
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -43,6 +61,12 @@
     margin-left:-140px; margin-top:-27.5px;
     width:280px; height:55px; border-radius:27.5px;
     z-index:10;
+  }
+  /* Conteneur decoupe : le canvas plein ecran de liquidGL est rogne
+     a la forme exacte de la capsule, ce qui supprime le rectangle. */
+  .lensClip{
+    position:absolute; left:50%; top:50%;
+    pointer-events:none; z-index:20; overflow:hidden;
   }
   .lens{
     background:transparent;
@@ -4386,13 +4410,11 @@ const LAYOUT = {
 const MOTION = {
   iconZoom:    1.30,   // zoom des icones au pic du trajet
   labelZoom:   1.25,   // zoom du texte au pic du trajet
-  blurPx:      0,      // flou du cercle pendant le trajet
-  brightness:  1.18,   // eclat du verre pendant le trajet
-  saturate:    1.25,
-  tintAlpha:   0.16,   // voile pendant le trajet
-  edgeAlpha:   0.45,   // liseré pendant le trajet
-  shadowAlpha: 0.30,
-  shadowBlur:  16,
+  refraction:  0.05,   // refraction du cercle au pic
+  magnify:     1.45,   // loupe du cercle au pic
+  frost:       0,      // flou du cercle au pic
+  bevelDepth:  0.22,   // biseau du cercle au pic
+  aberration:  0.15,   // dispersion au pic
   curve:       1.0,    // 1 = cloche douce, >1 = pic plus tardif
 };
 
@@ -4515,20 +4537,16 @@ const geom = { x: TAB_CENTERS[0], w: REST_W, h: REST_H, r: REST_H / 2 };
 let anim = null;
 
 function applyLensStyle() {
+  // Pendant le trajet, on module les options du MOTEUR, pas du CSS.
+  if (!lensLens || !lensLens.options) return;
   const k = motionK;
   const mix = (a, b) => a + (b - a) * k;
-  applyCss(lensEl, {
-    blurPx:      mix(LENS.blurPx,      MOTION.blurPx),
-    saturate:    mix(LENS.saturate,    MOTION.saturate),
-    brightness:  mix(LENS.brightness,  MOTION.brightness),
-    contrast:    LENS.contrast,
-    tintAlpha:   mix(LENS.tintAlpha,   MOTION.tintAlpha),
-    tintColor:   LENS.tintColor,
-    edgeAlpha:   mix(LENS.edgeAlpha,   MOTION.edgeAlpha),
-    edgeWidth:   LENS.edgeWidth,
-    shadowAlpha: mix(LENS.shadowAlpha, MOTION.shadowAlpha),
-    shadowBlur:  mix(LENS.shadowBlur,  MOTION.shadowBlur),
-  });
+  const o = lensLens.options;
+  o.refraction = mix(LENS.refraction, MOTION.refraction);
+  o.magnify    = mix(LENS.magnify,    MOTION.magnify);
+  o.frost      = mix(LENS.frost,      MOTION.frost);
+  o.bevelDepth = mix(LENS.bevelDepth, MOTION.bevelDepth);
+  o.aberration = mix(LENS.aberration, MOTION.aberration);
 }
 
 function applyGeom() {
@@ -4587,6 +4605,7 @@ function tick() {
    parametres du projet, appliques en temps reel via instance.options. */
 const BAR = {
   resolution:  2.0,
+  reveal:      'none',   // 'none' | 'fade'
   refraction:  0.01,
   aberration:  0,
   bevelDepth:  0.08,
@@ -4614,6 +4633,7 @@ const LENS = {
 };
 
 let barLens = null;
+let lensLens = null;
 
 const toLiquidGL = (c) => ({
   snapshot: 'body',
@@ -4629,7 +4649,7 @@ const toLiquidGL = (c) => ({
   tilt: c.tilt,
   tiltFactor: c.tiltFactor,
   tiltEase: c.tiltEase,
-  reveal: 'none',
+  reveal: c.reveal,
 });
 
 const hexToRgb = (x) => {
@@ -4639,7 +4659,28 @@ const hexToRgb = (x) => {
 
 /* Les uniformes sont relus a chaque frame depuis instance.options :
    muter cet objet suffit, aucun rechargement du moteur. */
-const applyBarEngine = () => {
+const engineOpts = (c) => ({
+  reveal: c.reveal,
+  resolution: c.resolution,
+  refraction: c.refraction,
+  aberration: c.aberration,
+  bevelDepth: c.bevelDepth,
+  bevelWidth: c.bevelWidth,
+  frost: c.frost,
+  magnify: c.magnify,
+  specular: c.specular,
+  shadow: c.shadow,
+  tilt: c.tilt,
+  tiltFactor: c.tiltFactor,
+  tiltEase: c.tiltEase,
+});
+
+const applyEngines = () => {
+  if (barLens && barLens.options) Object.assign(barLens.options, engineOpts(BAR));
+  if (lensLens && lensLens.options) Object.assign(lensLens.options, engineOpts(LENS));
+};
+
+const applyBarEngineUnused = () => {
   if (!barLens || !barLens.options) return;
   Object.assign(barLens.options, {
     refraction: BAR.refraction,
@@ -4682,6 +4723,15 @@ const applyCss = (el, c) => {
 /* ============================================================
    Panneau de reglages : BAR, CERCLE, ICONES, TEXTE — separes
    ============================================================ */
+/* Presets officiels du README de liquidGL */
+const PRESETS = {
+  Default: { refraction: 0,     bevelDepth: 0.052, bevelWidth: 0.211, frost: 2,   shadow: true,  specular: true  },
+  Alien:   { refraction: 0.073, bevelDepth: 0.2,   bevelWidth: 0.156, frost: 2,   shadow: true,  specular: false },
+  Pulse:   { refraction: 0.03,  bevelDepth: 0,     bevelWidth: 0.273, frost: 0,   shadow: false, specular: false },
+  Frost:   { refraction: 0,     bevelDepth: 0.035, bevelWidth: 0.119, frost: 0.9, shadow: true,  specular: true  },
+  Edge:    { refraction: 0.047, bevelDepth: 0.136, bevelWidth: 0.076, frost: 2,   shadow: true,  specular: false },
+};
+
 const CTRL = [
   ['GRANDE BARRE — liquidGL', BAR, [
     ['refraction','refraction',0,0.2,0.002],
@@ -4693,28 +4743,26 @@ const CTRL = [
     ['resolution','resolution',0.5,3,0.1],
     ['tiltFactor','tiltFactor',0,20,0.5],
     ['tiltEase','tiltEase',50,1200,10],
-  ], ['specular','shadow','tilt']],
-  ['CERCLE ACTIF', LENS, [
-    ['blurPx','Flou (px)',0,20,0.5],
-    ['saturate','Saturation',0.5,3,0.05],
-    ['brightness','Luminosite',0.5,2,0.05],
-    ['contrast','Contraste',0.5,2,0.05],
-    ['tintAlpha','Voile opacite',0,0.6,0.01],
-    ['edgeAlpha','Liseré opacite',0,1,0.01],
-    ['edgeWidth','Liseré epaisseur',0,4,0.5],
-    ['shadowAlpha','Ombre opacite',0,1,0.01],
-    ['shadowBlur','Ombre flou',0,30,1],
-  ], []],
+  ], ['specular','shadow','tilt','revealFade'], 'BAR'],
+  ['CERCLE ACTIF — liquidGL', LENS, [
+    ['refraction','refraction',0,0.2,0.002],
+    ['aberration','aberration',0,1,0.01],
+    ['bevelDepth','bevelDepth',0,0.5,0.005],
+    ['bevelWidth','bevelWidth',0.02,0.6,0.005],
+    ['frost','frost',0,4,0.05],
+    ['magnify','magnify',1,2,0.01],
+    ['resolution','resolution',0.5,3,0.1],
+    ['tiltFactor','tiltFactor',0,20,0.5],
+    ['tiltEase','tiltEase',50,1200,10],
+  ], ['specular','shadow','tilt','revealFade'], 'LENS'],
   ['EFFETS PENDANT LE TRAJET', MOTION, [
     ['iconZoom','Zoom icones',1,2.5,0.01],
     ['labelZoom','Zoom texte',1,2.5,0.01],
-    ['blurPx','Flou (px)',0,20,0.5],
-    ['brightness','Luminosite',0.5,2.5,0.01],
-    ['saturate','Saturation',0.5,3,0.05],
-    ['tintAlpha','Voile opacite',0,0.8,0.01],
-    ['edgeAlpha','Liseré opacite',0,1,0.01],
-    ['shadowAlpha','Ombre opacite',0,1,0.01],
-    ['shadowBlur','Ombre flou',0,40,1],
+    ['refraction','refraction au pic',0,0.2,0.002],
+    ['magnify','magnify au pic',1,2.5,0.01],
+    ['frost','frost au pic',0,4,0.05],
+    ['bevelDepth','bevelDepth au pic',0,0.5,0.005],
+    ['aberration','aberration au pic',0,1,0.01],
     ['curve','Courbe du pic',0.3,3,0.05],
   ], []],
   ['ICONES', ICON, [
@@ -4739,23 +4787,44 @@ const CTRL = [
 
 function buildPanel() {
   const p = document.getElementById('panel');
-  p.innerHTML = CTRL.map(([title, obj, sliders, toggles], gi) =>
+  p.innerHTML = CTRL.map(([title, obj, sliders, toggles, presetFor], gi) =>
     `<h4>${title}</h4>` +
+    (presetFor
+      ? `<div class="row" style="flex-wrap:wrap;gap:4px">` +
+        Object.keys(PRESETS).map(n =>
+          `<button data-preset="${n}" data-for="${gi}"
+            style="flex:1;min-width:44px;padding:3px 0;font-size:9.5px;cursor:pointer;
+                   background:rgba(139,140,240,.18);color:#dcdcff;
+                   border:1px solid rgba(139,140,240,.4);border-radius:5px">${n}</button>`
+        ).join('') + `</div>`
+      : '') +
     sliders.map(([k, lab, mn, mx, st], si) =>
       `<div class="row"><label>${lab}</label>
        <input type="range" data-g="${gi}" data-k="${k}" min="${mn}" max="${mx}" step="${st}" value="${obj[k]}">
        <b id="v${gi}_${si}">${obj[k]}</b></div>`).join('') +
-    toggles.map(k =>
-      `<div class="row"><label>${k}</label>
-       <input type="checkbox" data-g="${gi}" data-k="${k}" ${obj[k] ? 'checked' : ''}></div>`).join('')
-  ).join('') + `<div class="hint">Tous les reglages s'appliquent en temps reel. Les effets de trajet ne sont visibles que pendant un changement de page.</div>`;
+    toggles.map(k => {
+      const isReveal = k === 'revealFade';
+      const checked = isReveal ? obj.reveal === 'fade' : obj[k];
+      return `<div class="row"><label>${isReveal ? 'reveal (fade)' : k}</label>
+       <input type="checkbox" data-g="${gi}" data-k="${k}" ${checked ? 'checked' : ''}></div>`;
+    }).join('')
+  ).join('') + `<div class="hint">Tous les reglages liquidGL sont ceux du depot. frost est un rayon de flou en px. Les effets de trajet ne sont visibles que pendant un changement de page.</div>`;
+
+  p.addEventListener('click', e => {
+    const btn = e.target.closest('button[data-preset]');
+    if (!btn) return;
+    Object.assign(CTRL[+btn.dataset.for][1], PRESETS[btn.dataset.preset]);
+    buildPanel();
+    applyAll();
+  });
 
   p.addEventListener('input', e => {
     const el = e.target;
     const gi = +el.dataset.g, k = el.dataset.k;
     if (!k) return;
     const obj = CTRL[gi][1];
-    obj[k] = el.type === 'checkbox' ? el.checked : parseFloat(el.value);
+    if (k === 'revealFade') obj.reveal = el.checked ? 'fade' : 'none';
+    else obj[k] = el.type === 'checkbox' ? el.checked : parseFloat(el.value);
     const b = el.parentElement.querySelector('b');
     if (b) b.textContent = obj[k];
     applyAll();
@@ -4763,7 +4832,7 @@ function buildPanel() {
 }
 
 function applyAll() {
-  applyBarEngine();
+  applyEngines();
   applyLensStyle();
   REST_W = GEO.restW; REST_H = GEO.restH;
   MOVING_W = GEO.movingW; OVERFLOW = GEO.overflow; TRAVEL_MS = GEO.travelMs;
@@ -4778,7 +4847,8 @@ document.addEventListener('DOMContentLoaded', () => {
   applyGeom();
   // Deux geometries independantes, un seul jeu de parametres.
   applyLensStyle();
-  barLens = liquidGL({ ...toLiquidGL(BAR), target: '#navbar' });
+  barLens  = liquidGL({ ...toLiquidGL(BAR),  target: '#navbar' });
+  lensLens = liquidGL({ ...toLiquidGL(LENS), target: '#lens' });
   tabsEl.addEventListener('click', e => {
     const t = e.target.closest('.tab');
     if (t) goTo(+t.dataset.i);

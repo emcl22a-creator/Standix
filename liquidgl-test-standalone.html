@@ -4351,20 +4351,25 @@ const OVERFLOW = 6;             // +3 px en haut, +3 px en bas
 const REFORM_AT = 0.80;         // debut de la reformation
 const TRAVEL_MS = 600;
 const TAB_CENTERS = [35.5, 105.1667, 174.8333, 244.5];
-const LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
 const MAG_ICON = 1.30, MAG_LABEL = 1.25;
 
+/* ---- Icones et textes : reconstruits ---- */
+const LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
+const NAMES  = ['home', 'clip', 'chart', 'gear'];
 const ICONS = {
-  home:{line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
-        fill:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H5.4a2.2 2.2 0 0 1-2.2-2.2z'},
-  clip:{line:'M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6',
-        fill:'M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.9 10h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 13.5h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 17h3.4a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z'},
-  chart:{line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',
-         fill:'M3.4 3.4h2v15.4h15.2v2H5.4a2 2 0 0 1-2-2z M7.1 13.3h2.4v5.5H7.1z M11.8 8.1h2.4v10.7h-2.4z M16.5 10.6h2.4v8.2h-2.4z'},
-  gear:{line:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z M15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z',
-        fill:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2zM15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z'},
+  home:{
+    line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
+    fill:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H5.4a2.2 2.2 0 0 1-2.2-2.2z'},
+  clip:{
+    line:'M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6',
+    fill:'M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.9 10h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 13.5h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 17h3.4a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z'},
+  chart:{
+    line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',
+    fill:'M3.4 3.4h2v15.4h15.2v2H5.4a2 2 0 0 1-2-2z M7.1 13.3h2.4v5.5H7.1z M11.8 8.1h2.4v10.7h-2.4z M16.5 10.6h2.4v8.2h-2.4z'},
+  gear:{
+    line:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z M15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z',
+    fill:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2zM15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z'},
 };
-const NAMES = ['home','clip','chart','gear'];
 
 /* ---- courbes de forme, toutes basees sur travelProgress ---- */
 const cl = x => x < 0 ? 0 : x > 1 ? 1 : x;
@@ -4400,20 +4405,21 @@ let activeTab = 0;
   progressivement quand la lentille le quitte, le nouveau se remplit en
   arrivant, et un item traverse se remplit puis se vide.
 */
+/* Calque NORMAL : tout en outline gris. Calque MAGNIFIE : tout en filled
+   blanc. Seul lensMask decide de ce qui est blanc. */
 function buildRow(variant) {
-  return NAMES.map((n, i) => {
-    const on = variant === 'mag';
-    const sc = variant === 'mag' ? MAG_ICON : 1;
-    const sl = variant === 'mag' ? MAG_LABEL : 1;
-    return `<div class="tab" data-i="${i}" style="left:${TAB_CENTERS[i] - 31}px">
+  const on = variant === 'mag';
+  const si = on ? MAG_ICON : 1;
+  const sl = on ? MAG_LABEL : 1;
+  return NAMES.map((n, i) =>
+    `<div class="tab" data-i="${i}" style="left:${TAB_CENTERS[i] - 31}px">
       <svg width="22" height="22" viewBox="0 0 24 24"
-        style="transform:scale(${sc});transform-origin:center"
+        style="transform:scale(${si});transform-origin:center"
         fill="${on ? 'currentColor' : 'none'}" stroke="${on ? 'none' : 'currentColor'}"
         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
         <path d="${ICONS[n][on ? 'fill' : 'line']}"/></svg>
       <span style="transform:scale(${sl});transform-origin:center">${LABELS[i]}</span>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
 function render() {
@@ -4495,8 +4501,9 @@ const MATERIAL = {
   aberration: 0,
   bevelDepth: 0.12,   // bord plus lisible
   bevelWidth: 0.18,
-  frost: 0,           // aucun voile : centre transparent
-  specular: true,     // reflet de bord, pas de fond
+  // Flou exact 3 px : le shader calcule radius = frost * 4 (ligne 2068).
+  frost: 0.75,
+  specular: false,    // aucun halo dans la barre
   reveal: 'none',
   tilt: false,
 };
@@ -4505,7 +4512,7 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   applyGeom();
   // Deux geometries independantes, un seul jeu de parametres.
-  liquidGL({ ...MATERIAL, target: '#navbar', shadow: true, magnify: 1 });
+  liquidGL({ ...MATERIAL, target: '#navbar', shadow: false, magnify: 1 });
   liquidGL({ ...MATERIAL, target: '#lens', shadow: false, magnify: 1.2 });
   tabsEl.addEventListener('click', e => {
     const t = e.target.closest('.tab');

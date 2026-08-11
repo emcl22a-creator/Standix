@@ -63,14 +63,28 @@
   .tab{
     position:absolute; top:0; height:100%; width:62px;
     display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:2px; cursor:pointer;
+    cursor:pointer;
   }
   .tab svg{display:block}
-  .tab span{line-height:1;white-space:nowrap;font-size:9.5px;font-weight:500}
+  .tab span{line-height:1;white-space:nowrap}
   .layer{position:absolute;inset:0;pointer-events:none}
   .layerNormal{pointer-events:auto}
   .layerNormal{color:#CBCDCF}
   .layerMag{color:#FFFFFF}
+
+  /* ---- panneau de reglages ---- */
+  #panel{position:fixed;top:12px;right:12px;width:250px;max-height:96vh;overflow:auto;
+    background:rgba(14,15,22,.93);border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;padding:10px 12px 12px;color:#e8eaf2;font-size:11px;z-index:9999}
+  #panel h4{margin:10px 0 6px;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+    color:rgba(255,255,255,.5);font-weight:600}
+  #panel h4:first-child{margin-top:0}
+  #panel .row{display:flex;align-items:center;gap:7px;margin:4px 0}
+  #panel label{flex:0 0 96px;color:rgba(255,255,255,.7)}
+  #panel input[type=range]{flex:1;accent-color:#8b8cf0;height:13px;min-width:0}
+  #panel input[type=checkbox]{accent-color:#8b8cf0}
+  #panel b{flex:0 0 36px;text-align:right;font-variant-numeric:tabular-nums}
+  #panel .hint{margin-top:8px;font-size:9px;color:rgba(255,255,255,.35);line-height:1.4}
 </style>
 </head>
 <body>
@@ -84,6 +98,10 @@
   <div class="navbar" id="navbar"></div>
   <div class="tabs" id="tabs" data-liquid-ignore></div>
   <div class="lens" id="lens"></div>
+</div>
+
+<div id="panel" data-liquid-ignore></div>
+<div style="display:none">
 </div>
 
 <script>
@@ -4346,13 +4364,26 @@ SOFTWARE.
    Geometrie : source de verite unique
    ============================================================ */
 const BAR_W = 280, BAR_H = 55;
-const REST_W = 62, REST_H = 46;
-const MOVING_W = 0.70;          // largeur pendant le trajet
-const OVERFLOW = 6;             // +3 px en haut, +3 px en bas
+let REST_W = 62, REST_H = 46;
+let MOVING_W = 0.70;            // largeur pendant le trajet
+let OVERFLOW = 6;               // +3 px en haut, +3 px en bas
 const REFORM_AT = 0.80;         // debut de la reformation
-const TRAVEL_MS = 600;
+let TRAVEL_MS = 600;
+const GEO = { restW: 62, restH: 46, movingW: 0.70, overflow: 6, travelMs: 600 };
 const TAB_CENTERS = [35.5, 105.1667, 174.8333, 244.5];
-const MAG_ICON = 1.30, MAG_LABEL = 1.25;
+const ICON = {
+  size:        22,     // taille de base des icones, en px
+  magnify:     1.30,   // grossissement dans la lentille
+  strokeWidth: 1.8,    // epaisseur du trait
+};
+const LAYOUT = {
+  gap:         6,      // espace entre l'icone et le texte, en px
+};
+const LABEL = {
+  size:        9.5,    // taille de base du texte, en px
+  magnify:     1.25,   // grossissement dans la lentille
+  weight:      500,    // graisse
+};
 
 /* ---- Icones et textes : reconstruits ---- */
 const LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
@@ -4410,16 +4441,16 @@ let activeTab = 0;
    blanc. Seul lensMask decide de ce qui est blanc. */
 function buildRow(variant) {
   const on = variant === 'mag';
-  const si = on ? MAG_ICON : 1;
-  const sl = on ? MAG_LABEL : 1;
+  const si = on ? ICON.magnify : 1;
+  const sl = on ? LABEL.magnify : 1;
   return NAMES.map((n, i) =>
-    `<div class="tab" data-i="${i}" style="left:${TAB_CENTERS[i] - 31}px">
-      <svg width="22" height="22" viewBox="0 0 24 24"
+    `<div class="tab" data-i="${i}" style="left:${TAB_CENTERS[i] - 31}px;gap:${LAYOUT.gap}px">
+      <svg width="${ICON.size}" height="${ICON.size}" viewBox="0 0 24 24"
         style="transform:scale(${si});transform-origin:center"
         fill="${on ? 'currentColor' : 'none'}" stroke="${on ? 'none' : 'currentColor'}"
-        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
+        stroke-width="${ICON.strokeWidth}" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
         <path d="${ICONS[n][on ? 'fill' : 'line']}"/></svg>
-      <span style="transform:scale(${sl});transform-origin:center">${LABELS[i]}</span>
+      <span style="transform:scale(${sl});transform-origin:center;font-size:${LABEL.size}px;font-weight:${LABEL.weight}">${LABELS[i]}</span>
     </div>`).join('');
 }
 
@@ -4506,17 +4537,19 @@ function tick() {
    ============================================================ */
 const BAR = {
   blurPx:      3,      // flou Apple, en px (backdrop-filter CSS)
-  saturate:    1.6,    // saturation du fond floute
+  saturate:    1.0,    // 1 = aucune saturation ajoutee
   brightness:  1.0,
   refraction:  0.012,  // deviation optique liquidGL
   aberration:  0,      // dispersion chromatique
-  bevelDepth:  0.10,   // profondeur du biseau
-  bevelWidth:  0.16,   // largeur du biseau
+  bevelDepth:  0,      // 0 = aucun degrade vertical dans la barre
+  bevelWidth:  0.04,   // biseau tres fin, juste le bord
   frost:       0,      // 0 = aucun flou shader (le flou vient du CSS)
   specular:    false,  // reflet interne
   shadow:      false,  // halo / ombre portee
   magnify:     1,      // grossissement du fond
   resolution:  2.0,
+  tintAlpha:   0,      // 0 = aucun voile de couleur
+  tintColor:   '#000000',
 };
 
 const LENS = {
@@ -4532,6 +4565,8 @@ const LENS = {
   shadow:      false,
   magnify:     1.20,   // loupe sur le contenu
   resolution:  2.0,
+  tintAlpha:   0,
+  tintColor:   '#000000',
 };
 
 const toLiquidGL = (c) => ({
@@ -4549,7 +4584,16 @@ const toLiquidGL = (c) => ({
   tilt: false,
 });
 
+const hexToRgb = (x) => {
+  const n = parseInt(x.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
 const applyCss = (el, c) => {
+  const [r, g, bl] = hexToRgb(c.tintColor || '#000000');
+  el.style.background = c.tintAlpha > 0
+    ? `rgba(${r},${g},${bl},${c.tintAlpha})`
+    : 'transparent';
   const f = [];
   if (c.blurPx > 0) f.push(`blur(${c.blurPx}px)`);
   if (c.saturate !== 1) f.push(`saturate(${c.saturate})`);
@@ -4559,7 +4603,94 @@ const applyCss = (el, c) => {
   el.style.webkitBackdropFilter = v;
 };
 
+
+/* ============================================================
+   Panneau de reglages : BAR, CERCLE, ICONES, TEXTE — separes
+   ============================================================ */
+const CTRL = [
+  ['GRANDE BARRE', BAR, [
+    ['blurPx','Flou (px)',0,20,0.5],
+    ['saturate','Saturation',0.5,3,0.05],
+    ['brightness','Luminosite',0.5,2,0.05],
+    ['refraction','Refraction',0,0.12,0.002],
+    ['aberration','Aberration',0,0.6,0.01],
+    ['bevelDepth','Biseau profondeur',0,0.5,0.005],
+    ['bevelWidth','Biseau largeur',0.02,0.6,0.005],
+    ['frost','Frost shader',0,4,0.05],
+    ['magnify','Magnification',1,1.6,0.01],
+    ['tintAlpha','Teinte opacite',0,1,0.01],
+  ], ['specular','shadow']],
+  ['CERCLE ACTIF', LENS, [
+    ['blurPx','Flou (px)',0,20,0.5],
+    ['saturate','Saturation',0.5,3,0.05],
+    ['brightness','Luminosite',0.5,2,0.05],
+    ['refraction','Refraction',0,0.12,0.002],
+    ['aberration','Aberration',0,0.6,0.01],
+    ['bevelDepth','Biseau profondeur',0,0.5,0.005],
+    ['bevelWidth','Biseau largeur',0.02,0.6,0.005],
+    ['frost','Frost shader',0,4,0.05],
+    ['magnify','Magnification',1,1.6,0.01],
+    ['tintAlpha','Teinte opacite',0,1,0.01],
+  ], ['specular','shadow']],
+  ['ICONES', ICON, [
+    ['size','Taille (px)',10,40,0.5],
+    ['magnify','Zoom lentille',1,2,0.01],
+    ['strokeWidth','Epaisseur trait',0.5,4,0.1],
+  ], []],
+  ['ESPACEMENT', LAYOUT, [
+    ['gap','Icone / texte (px)',0,20,0.5],
+  ], []],
+  ['TEXTE', LABEL, [
+    ['size','Taille (px)',5,20,0.5],
+    ['magnify','Zoom lentille',1,2,0.01],
+    ['weight','Graisse',300,800,100],
+  ], []],
+  ['GEOMETRIE', GEO, [
+    ['restW','Largeur repos',30,120,1],
+    ['restH','Hauteur repos',20,80,1],
+    ['movingW','Largeur trajet',0.4,1,0.01],
+    ['overflow','Hauteur ajoutee',0,30,0.5],
+    ['travelMs','Duree (ms)',150,1500,10],
+  ], []],
+];
+
+function buildPanel() {
+  const p = document.getElementById('panel');
+  p.innerHTML = CTRL.map(([title, obj, sliders, toggles], gi) =>
+    `<h4>${title}</h4>` +
+    sliders.map(([k, lab, mn, mx, st], si) =>
+      `<div class="row"><label>${lab}</label>
+       <input type="range" data-g="${gi}" data-k="${k}" min="${mn}" max="${mx}" step="${st}" value="${obj[k]}">
+       <b id="v${gi}_${si}">${obj[k]}</b></div>`).join('') +
+    toggles.map(k =>
+      `<div class="row"><label>${k}</label>
+       <input type="checkbox" data-g="${gi}" data-k="${k}" ${obj[k] ? 'checked' : ''}></div>`).join('')
+  ).join('') + `<div class="hint">Refraction, biseau, frost et magnification demandent un rechargement du moteur : ils sont appliques au prochain trajet.</div>`;
+
+  p.addEventListener('input', e => {
+    const el = e.target;
+    const gi = +el.dataset.g, k = el.dataset.k;
+    if (!k) return;
+    const obj = CTRL[gi][1];
+    obj[k] = el.type === 'checkbox' ? el.checked : parseFloat(el.value);
+    const b = el.parentElement.querySelector('b');
+    if (b) b.textContent = obj[k];
+    applyAll();
+  });
+}
+
+function applyAll() {
+  applyCss(document.getElementById('navbar'), BAR);
+  applyCss(lensEl, LENS);
+  REST_W = GEO.restW; REST_H = GEO.restH;
+  MOVING_W = GEO.movingW; OVERFLOW = GEO.overflow; TRAVEL_MS = GEO.travelMs;
+  if (!anim) { geom.w = REST_W; geom.h = REST_H; geom.r = Math.min(REST_W, REST_H) / 2; }
+  render();
+  applyGeom();
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  buildPanel();
   render();
   applyGeom();
   // Deux geometries independantes, un seul jeu de parametres.

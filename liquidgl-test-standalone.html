@@ -57,7 +57,8 @@
   .tabs{
     position:absolute; left:50%; top:50%;
     margin-left:-140px; margin-top:-27.5px;
-    width:280px; height:55px; z-index:15;
+    width:280px; height:55px;
+    z-index:30;   /* au-dessus du canvas liquidGL (maxZ - 1) */
   }
   .tab{
     position:absolute; top:0; height:100%; width:62px;
@@ -81,7 +82,7 @@
 
   <!-- Deux geometries independantes, aucune fusion -->
   <div class="navbar" id="navbar"></div>
-  <div class="tabs" id="tabs"></div>
+  <div class="tabs" id="tabs" data-liquid-ignore></div>
   <div class="lens" id="lens"></div>
 </div>
 
@@ -4494,26 +4495,74 @@ function tick() {
 /* ============================================================
    liquidGL : navbar et lentille, MEME materiau, DEUX objets
    ============================================================ */
-const MATERIAL = {
+/* ============================================================
+   REGLAGES — deux jeux totalement independants.
+   BAR  = la grande navbar
+   LENS = le cercle qui contient l'icone et le texte
+   ============================================================ */
+const BAR = {
+  blurPx:      3,      // flou Apple, en px (backdrop-filter CSS)
+  saturate:    1.6,    // saturation du fond floute
+  brightness:  1.0,
+  refraction:  0.012,  // deviation optique liquidGL
+  aberration:  0,      // dispersion chromatique
+  bevelDepth:  0.10,   // profondeur du biseau
+  bevelWidth:  0.16,   // largeur du biseau
+  frost:       0,      // 0 = aucun flou shader (le flou vient du CSS)
+  specular:    false,  // reflet interne
+  shadow:      false,  // halo / ombre portee
+  magnify:     1,      // grossissement du fond
+  resolution:  2.0,
+};
+
+const LENS = {
+  blurPx:      0,      // le cercle n'est PAS floute
+  saturate:    1.0,
+  brightness:  1.0,
+  refraction:  0.020,
+  aberration:  0,
+  bevelDepth:  0.14,
+  bevelWidth:  0.22,
+  frost:       0,
+  specular:    false,
+  shadow:      false,
+  magnify:     1.20,   // loupe sur le contenu
+  resolution:  2.0,
+};
+
+const toLiquidGL = (c) => ({
   snapshot: 'body',
-  resolution: 2.0,
-  refraction: 0.012,
-  aberration: 0,
-  bevelDepth: 0.12,   // bord plus lisible
-  bevelWidth: 0.18,
-  // Flou exact 3 px : le shader calcule radius = frost * 4 (ligne 2068).
-  frost: 0.75,
-  specular: false,    // aucun halo dans la barre
+  resolution: c.resolution,
+  refraction: c.refraction,
+  aberration: c.aberration,
+  bevelDepth: c.bevelDepth,
+  bevelWidth: c.bevelWidth,
+  frost: c.frost,
+  specular: c.specular,
+  shadow: c.shadow,
+  magnify: c.magnify,
   reveal: 'none',
   tilt: false,
+});
+
+const applyCss = (el, c) => {
+  const f = [];
+  if (c.blurPx > 0) f.push(`blur(${c.blurPx}px)`);
+  if (c.saturate !== 1) f.push(`saturate(${c.saturate})`);
+  if (c.brightness !== 1) f.push(`brightness(${c.brightness})`);
+  const v = f.join(' ');
+  el.style.backdropFilter = v;
+  el.style.webkitBackdropFilter = v;
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   render();
   applyGeom();
   // Deux geometries independantes, un seul jeu de parametres.
-  liquidGL({ ...MATERIAL, target: '#navbar', shadow: false, magnify: 1 });
-  liquidGL({ ...MATERIAL, target: '#lens', shadow: false, magnify: 1.2 });
+  applyCss(document.getElementById('navbar'), BAR);
+  applyCss(lensEl, LENS);
+  liquidGL({ ...toLiquidGL(BAR),  target: '#navbar' });
+  liquidGL({ ...toLiquidGL(LENS), target: '#lens' });
   tabsEl.addEventListener('click', e => {
     const t = e.target.closest('.tab');
     if (t) goTo(+t.dataset.i);

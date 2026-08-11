@@ -4517,6 +4517,13 @@ const engineOpts = (c) => ({
   tiltEase: c.tiltEase,
 });
 
+/* AJOUT : flou gaussien CSS. Seule chose ajoutee hors moteur. */
+function applyBlur(el, c) {
+  const v = c.cssBlur > 0 ? `blur(${c.cssBlur}px)` : '';
+  el.style.backdropFilter = v;
+  el.style.webkitBackdropFilter = v;
+}
+
 function applyEngines() {
   const sync = (inst, c) => {
     if (!inst || !inst.options) return;
@@ -4532,6 +4539,8 @@ function applyEngines() {
   };
   sync(barLens, BAR);
   sync(lensLens, LENS);
+  applyBlur(document.getElementById('navbar'), BAR);
+  applyBlur(lensEl, LENS);
 }
 
 function applyLensMotion() {
@@ -4682,6 +4691,7 @@ const CTRL = [
     ['resolution','resolution',0.5,3,0.1],
     ['tiltFactor','tiltFactor',0,20,0.5],
     ['tiltEase','tiltEase',50,1200,10],
+    ['cssBlur','Flou CSS (px)',0,20,0.5],
   ], ['specular','shadow','tilt','revealFade'], 'BAR'],
   ['CERCLE ACTIF — liquidGL', LENS, [
     ['refraction','refraction',0,0.2,0.002],
@@ -4693,6 +4703,7 @@ const CTRL = [
     ['resolution','resolution',0.5,3,0.1],
     ['tiltFactor','tiltFactor',0,20,0.5],
     ['tiltEase','tiltEase',50,1200,10],
+    ['cssBlur','Flou CSS (px)',0,20,0.5],
   ], ['specular','shadow','tilt','revealFade'], 'LENS'],
   ['EFFETS PENDANT LE TRAJET', MOTION, [
     ['iconZoom','Zoom icones',1,2.5,0.01],

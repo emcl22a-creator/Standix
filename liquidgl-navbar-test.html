@@ -4380,6 +4380,24 @@ const ICON = {
 const LAYOUT = {
   gap:         6,      // espace entre l'icone et le texte, en px
 };
+
+/* Effets actifs UNIQUEMENT pendant le changement de page.
+   A l'arret, tout revient a 1 : aucun zoom, aucun effet. */
+const MOTION = {
+  iconZoom:    1.30,   // zoom des icones au pic du trajet
+  labelZoom:   1.25,   // zoom du texte au pic du trajet
+  blurPx:      0,      // flou du cercle pendant le trajet
+  brightness:  1.18,   // eclat du verre pendant le trajet
+  saturate:    1.25,
+  tintAlpha:   0.16,   // voile pendant le trajet
+  edgeAlpha:   0.45,   // liseré pendant le trajet
+  shadowAlpha: 0.30,
+  shadowBlur:  16,
+  curve:       1.0,    // 1 = cloche douce, >1 = pic plus tardif
+};
+
+/* Intensite du mouvement : 0 au repos, 1 au pic du trajet. */
+let motionK = 0;
 const LABEL = {
   size:        9.5,    // taille de base du texte, en px
   magnify:     1.25,   // grossissement dans la lentille
@@ -4442,8 +4460,9 @@ let activeTab = 0;
    blanc. Seul lensMask decide de ce qui est blanc. */
 function buildRow(variant) {
   const on = variant === 'mag';
-  const si = on ? ICON.magnify : 1;
-  const sl = on ? LABEL.magnify : 1;
+  // Le zoom ne s'applique QUE pendant le trajet : a l'arret motionK = 0.
+  const si = on ? 1 + (MOTION.iconZoom - 1) * motionK : 1;
+  const sl = on ? 1 + (MOTION.labelZoom - 1) * motionK : 1;
   return NAMES.map((n, i) =>
     `<div class="tab" data-i="${i}" style="left:${TAB_CENTERS[i] - 31}px;gap:${LAYOUT.gap}px">
       <svg width="${ICON.size}" height="${ICON.size}" viewBox="0 0 24 24"
@@ -4495,6 +4514,23 @@ const lensEl = document.getElementById('lens');
 const geom = { x: TAB_CENTERS[0], w: REST_W, h: REST_H, r: REST_H / 2 };
 let anim = null;
 
+function applyLensStyle() {
+  const k = motionK;
+  const mix = (a, b) => a + (b - a) * k;
+  applyCss(lensEl, {
+    blurPx:      mix(LENS.blurPx,      MOTION.blurPx),
+    saturate:    mix(LENS.saturate,    MOTION.saturate),
+    brightness:  mix(LENS.brightness,  MOTION.brightness),
+    contrast:    LENS.contrast,
+    tintAlpha:   mix(LENS.tintAlpha,   MOTION.tintAlpha),
+    tintColor:   LENS.tintColor,
+    edgeAlpha:   mix(LENS.edgeAlpha,   MOTION.edgeAlpha),
+    edgeWidth:   LENS.edgeWidth,
+    shadowAlpha: mix(LENS.shadowAlpha, MOTION.shadowAlpha),
+    shadowBlur:  mix(LENS.shadowBlur,  MOTION.shadowBlur),
+  });
+}
+
 function applyGeom() {
   lensEl.style.width = geom.w + 'px';
   lensEl.style.height = geom.h + 'px';
@@ -4517,13 +4553,23 @@ function tick() {
     geom.w = REST_W * widthAt(k);
     geom.h = heightAt(k);
     geom.r = Math.min(geom.w, geom.h) / 2;
+
+    // Cloche : 0 au depart, 1 au milieu, 0 a l'arrivee.
+    // A l'arret motionK vaut 0 : aucun zoom, aucun effet.
+    motionK = Math.pow(Math.sin(k * Math.PI), MOTION.curve);
+
     if (k >= 1) {
-      geom.x = anim.to; geom.w = REST_W; geom.h = REST_H; geom.r = REST_H / 2;
+      geom.x = anim.to;
+      geom.w = REST_W;
+      geom.h = REST_H;
+      geom.r = Math.min(REST_W, REST_H) / 2;
       anim = null;
+      motionK = 0;
       console.log('TRAVEL END');
     }
+    render();
     applyGeom();
-    applyMasks();
+    applyLensStyle();
   }
   requestAnimationFrame(tick);
 }
@@ -4536,21 +4582,22 @@ function tick() {
    BAR  = la grande navbar
    LENS = le cercle qui contient l'icone et le texte
    ============================================================ */
+/* Options OFFICIELLES de liquidGL (defaults, ligne 4052 du moteur).
+   Aucune couche CSS n'est ajoutee a la barre : ce sont les vrais
+   parametres du projet, appliques en temps reel via instance.options. */
 const BAR = {
-  blurPx:      3,      // flou Apple, en px (backdrop-filter CSS)
-  saturate:    1.0,    // 1 = aucune saturation ajoutee
-  brightness:  1.0,
-  refraction:  0.012,  // deviation optique liquidGL
-  aberration:  0,      // dispersion chromatique
-  bevelDepth:  0,      // 0 = aucun degrade vertical dans la barre
-  bevelWidth:  0.04,   // biseau tres fin, juste le bord
-  frost:       0,      // 0 = aucun flou shader (le flou vient du CSS)
-  specular:    false,  // reflet interne
-  shadow:      false,  // halo / ombre portee
-  magnify:     1,      // grossissement du fond
   resolution:  2.0,
-  tintAlpha:   0,      // 0 = aucun voile de couleur
-  tintColor:   '#000000',
+  refraction:  0.01,
+  aberration:  0,
+  bevelDepth:  0.08,
+  bevelWidth:  0.15,
+  frost:       0,
+  magnify:     1,
+  specular:    true,
+  shadow:      true,
+  tilt:        false,
+  tiltFactor:  5,
+  tiltEase:    400,
 };
 
 const LENS = {
@@ -4566,6 +4613,8 @@ const LENS = {
   shadowBlur:  10,
 };
 
+let barLens = null;
+
 const toLiquidGL = (c) => ({
   snapshot: 'body',
   resolution: c.resolution,
@@ -4577,13 +4626,34 @@ const toLiquidGL = (c) => ({
   specular: c.specular,
   shadow: c.shadow,
   magnify: c.magnify,
+  tilt: c.tilt,
+  tiltFactor: c.tiltFactor,
+  tiltEase: c.tiltEase,
   reveal: 'none',
-  tilt: false,
 });
 
 const hexToRgb = (x) => {
   const n = parseInt(x.slice(1), 16);
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+};
+
+/* Les uniformes sont relus a chaque frame depuis instance.options :
+   muter cet objet suffit, aucun rechargement du moteur. */
+const applyBarEngine = () => {
+  if (!barLens || !barLens.options) return;
+  Object.assign(barLens.options, {
+    refraction: BAR.refraction,
+    aberration: BAR.aberration,
+    bevelDepth: BAR.bevelDepth,
+    bevelWidth: BAR.bevelWidth,
+    frost: BAR.frost,
+    magnify: BAR.magnify,
+    specular: BAR.specular,
+    shadow: BAR.shadow,
+    tilt: BAR.tilt,
+    tiltFactor: BAR.tiltFactor,
+    tiltEase: BAR.tiltEase,
+  });
 };
 
 const applyCss = (el, c) => {
@@ -4613,18 +4683,17 @@ const applyCss = (el, c) => {
    Panneau de reglages : BAR, CERCLE, ICONES, TEXTE — separes
    ============================================================ */
 const CTRL = [
-  ['GRANDE BARRE', BAR, [
-    ['blurPx','Flou (px)',0,20,0.5],
-    ['saturate','Saturation',0.5,3,0.05],
-    ['brightness','Luminosite',0.5,2,0.05],
-    ['refraction','Refraction',0,0.12,0.002],
-    ['aberration','Aberration',0,0.6,0.01],
-    ['bevelDepth','Biseau profondeur',0,0.5,0.005],
-    ['bevelWidth','Biseau largeur',0.02,0.6,0.005],
-    ['frost','Frost shader',0,4,0.05],
-    ['magnify','Magnification',1,1.6,0.01],
-    ['tintAlpha','Teinte opacite',0,1,0.01],
-  ], ['specular','shadow']],
+  ['GRANDE BARRE — liquidGL', BAR, [
+    ['refraction','refraction',0,0.2,0.002],
+    ['aberration','aberration',0,1,0.01],
+    ['bevelDepth','bevelDepth',0,0.5,0.005],
+    ['bevelWidth','bevelWidth',0.02,0.6,0.005],
+    ['frost','frost',0,4,0.05],
+    ['magnify','magnify',1,2,0.01],
+    ['resolution','resolution',0.5,3,0.1],
+    ['tiltFactor','tiltFactor',0,20,0.5],
+    ['tiltEase','tiltEase',50,1200,10],
+  ], ['specular','shadow','tilt']],
   ['CERCLE ACTIF', LENS, [
     ['blurPx','Flou (px)',0,20,0.5],
     ['saturate','Saturation',0.5,3,0.05],
@@ -4636,9 +4705,20 @@ const CTRL = [
     ['shadowAlpha','Ombre opacite',0,1,0.01],
     ['shadowBlur','Ombre flou',0,30,1],
   ], []],
+  ['EFFETS PENDANT LE TRAJET', MOTION, [
+    ['iconZoom','Zoom icones',1,2.5,0.01],
+    ['labelZoom','Zoom texte',1,2.5,0.01],
+    ['blurPx','Flou (px)',0,20,0.5],
+    ['brightness','Luminosite',0.5,2.5,0.01],
+    ['saturate','Saturation',0.5,3,0.05],
+    ['tintAlpha','Voile opacite',0,0.8,0.01],
+    ['edgeAlpha','Liseré opacite',0,1,0.01],
+    ['shadowAlpha','Ombre opacite',0,1,0.01],
+    ['shadowBlur','Ombre flou',0,40,1],
+    ['curve','Courbe du pic',0.3,3,0.05],
+  ], []],
   ['ICONES', ICON, [
     ['size','Taille (px)',10,40,0.5],
-    ['magnify','Zoom lentille',1,2,0.01],
     ['strokeWidth','Epaisseur trait',0.5,4,0.1],
   ], []],
   ['ESPACEMENT', LAYOUT, [
@@ -4646,7 +4726,6 @@ const CTRL = [
   ], []],
   ['TEXTE', LABEL, [
     ['size','Taille (px)',5,20,0.5],
-    ['magnify','Zoom lentille',1,2,0.01],
     ['weight','Graisse',300,800,100],
   ], []],
   ['GEOMETRIE', GEO, [
@@ -4669,7 +4748,7 @@ function buildPanel() {
     toggles.map(k =>
       `<div class="row"><label>${k}</label>
        <input type="checkbox" data-g="${gi}" data-k="${k}" ${obj[k] ? 'checked' : ''}></div>`).join('')
-  ).join('') + `<div class="hint">Refraction, biseau, frost et magnification demandent un rechargement du moteur : ils sont appliques au prochain trajet.</div>`;
+  ).join('') + `<div class="hint">Tous les reglages s'appliquent en temps reel. Les effets de trajet ne sont visibles que pendant un changement de page.</div>`;
 
   p.addEventListener('input', e => {
     const el = e.target;
@@ -4684,8 +4763,8 @@ function buildPanel() {
 }
 
 function applyAll() {
-  applyCss(document.getElementById('navbar'), BAR);
-  applyCss(lensEl, LENS);
+  applyBarEngine();
+  applyLensStyle();
   REST_W = GEO.restW; REST_H = GEO.restH;
   MOVING_W = GEO.movingW; OVERFLOW = GEO.overflow; TRAVEL_MS = GEO.travelMs;
   if (!anim) { geom.w = REST_W; geom.h = REST_H; geom.r = Math.min(REST_W, REST_H) / 2; }
@@ -4698,9 +4777,8 @@ document.addEventListener('DOMContentLoaded', () => {
   render();
   applyGeom();
   // Deux geometries independantes, un seul jeu de parametres.
-  applyCss(document.getElementById('navbar'), BAR);
-  applyCss(lensEl, LENS);
-  liquidGL({ ...toLiquidGL(BAR),  target: '#navbar' });
+  applyLensStyle();
+  barLens = liquidGL({ ...toLiquidGL(BAR), target: '#navbar' });
   tabsEl.addEventListener('click', e => {
     const t = e.target.closest('.tab');
     if (t) goTo(+t.dataset.i);

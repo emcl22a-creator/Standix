@@ -45,6 +45,7 @@
     z-index:10;
   }
   .lens{
+    background:transparent;   /* aucun fond : la presence vient de l'optique */
     position:absolute; left:50%; top:50%;
     width:62px; height:46px; border-radius:23px;
     z-index:20;                 /* au-dessus de la navbar */
@@ -4346,7 +4347,7 @@ SOFTWARE.
 const BAR_W = 280, BAR_H = 55;
 const REST_W = 62, REST_H = 46;
 const MOVING_W = 0.70;          // largeur pendant le trajet
-const OVERFLOW = 8;             // +4 px en haut, +4 px en bas
+const OVERFLOW = 6;             // +3 px en haut, +3 px en bas
 const REFORM_AT = 0.80;         // debut de la reformation
 const TRAVEL_MS = 600;
 const TAB_CENTERS = [35.5, 105.1667, 174.8333, 244.5];
@@ -4371,9 +4372,13 @@ const sm = x => { const t = cl(x); return t * t * (3 - 2 * t); };
 const sr = (a, b, x) => sm((x - a) / (b - a));
 
 function widthAt(k) {
-  if (k < 0.2) return 1 + (MOVING_W - 1) * sr(0, 0.2, k);
-  if (k < REFORM_AT) return MOVING_W;
-  return MOVING_W + (1 - MOVING_W) * sr(REFORM_AT, 1, k);
+  let w;
+  if (k < 0.2) w = 1 + (MOVING_W - 1) * sr(0, 0.2, k);
+  else if (k < REFORM_AT) w = MOVING_W;
+  else w = MOVING_W + (1 - MOVING_W) * sr(REFORM_AT, 1, k);
+  // Contrainte : la capsule reste toujours plus large que haute.
+  const minW = (heightAt(k) + 6) / REST_W;
+  return Math.min(1, Math.max(w, minW));
 }
 function heightAt(k) {
   // 0 -> REST, montee continue, MAX a 80 %, retour exact a REST a 100 %
@@ -4479,12 +4484,12 @@ function tick() {
 const MATERIAL = {
   snapshot: 'body',
   resolution: 2.0,
-  refraction: 0.01,
+  refraction: 0.012,
   aberration: 0,
-  bevelDepth: 0.08,
-  bevelWidth: 0.15,
-  frost: 0,
-  specular: false,
+  bevelDepth: 0.12,   // bord plus lisible
+  bevelWidth: 0.18,
+  frost: 0,           // aucun voile : centre transparent
+  specular: true,     // reflet de bord, pas de fond
   reveal: 'none',
   tilt: false,
 };

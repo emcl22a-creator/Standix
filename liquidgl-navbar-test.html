@@ -45,12 +45,13 @@
     z-index:10;
   }
   .lens{
-    background:transparent;   /* aucun fond : la presence vient de l'optique */
+    background:transparent;
     position:absolute; left:50%; top:50%;
     width:62px; height:46px; border-radius:23px;
     z-index:20;                 /* au-dessus de la navbar */
     pointer-events:none;
     will-change:transform,width,height;
+    overflow:hidden;
   }
 
   /* Couche des onglets : au-dessus de la navbar, sous la lentille */
@@ -4554,19 +4555,15 @@ const BAR = {
 
 const LENS = {
   blurPx:      0,      // le cercle n'est PAS floute
-  saturate:    1.0,
-  brightness:  1.0,
-  refraction:  0.020,
-  aberration:  0,
-  bevelDepth:  0.14,
-  bevelWidth:  0.22,
-  frost:       0,
-  specular:    false,
-  shadow:      false,
-  magnify:     1.20,   // loupe sur le contenu
-  resolution:  2.0,
-  tintAlpha:   0,
-  tintColor:   '#000000',
+  saturate:    1.15,   // legere reprise de couleur
+  brightness:  1.08,   // le verre eclaircit un peu
+  contrast:    1.05,
+  tintAlpha:   0.10,   // voile blanc tres leger
+  tintColor:   '#ffffff',
+  edgeAlpha:   0.22,   // liseré du bord
+  edgeWidth:   1,      // epaisseur du liseré, en px
+  shadowAlpha: 0.18,   // ombre portee
+  shadowBlur:  10,
 };
 
 const toLiquidGL = (c) => ({
@@ -4598,9 +4595,17 @@ const applyCss = (el, c) => {
   if (c.blurPx > 0) f.push(`blur(${c.blurPx}px)`);
   if (c.saturate !== 1) f.push(`saturate(${c.saturate})`);
   if (c.brightness !== 1) f.push(`brightness(${c.brightness})`);
+  if (c.contrast && c.contrast !== 1) f.push(`contrast(${c.contrast})`);
   const v = f.join(' ');
   el.style.backdropFilter = v;
   el.style.webkitBackdropFilter = v;
+  if (c.edgeAlpha !== undefined) {
+    el.style.boxShadow =
+      `inset 0 0 0 ${c.edgeWidth}px rgba(255,255,255,${c.edgeAlpha})` +
+      (c.shadowAlpha > 0
+        ? `, 0 2px ${c.shadowBlur}px rgba(0,0,0,${c.shadowAlpha})`
+        : '');
+  }
 };
 
 
@@ -4624,14 +4629,13 @@ const CTRL = [
     ['blurPx','Flou (px)',0,20,0.5],
     ['saturate','Saturation',0.5,3,0.05],
     ['brightness','Luminosite',0.5,2,0.05],
-    ['refraction','Refraction',0,0.12,0.002],
-    ['aberration','Aberration',0,0.6,0.01],
-    ['bevelDepth','Biseau profondeur',0,0.5,0.005],
-    ['bevelWidth','Biseau largeur',0.02,0.6,0.005],
-    ['frost','Frost shader',0,4,0.05],
-    ['magnify','Magnification',1,1.6,0.01],
-    ['tintAlpha','Teinte opacite',0,1,0.01],
-  ], ['specular','shadow']],
+    ['contrast','Contraste',0.5,2,0.05],
+    ['tintAlpha','Voile opacite',0,0.6,0.01],
+    ['edgeAlpha','Liseré opacite',0,1,0.01],
+    ['edgeWidth','Liseré epaisseur',0,4,0.5],
+    ['shadowAlpha','Ombre opacite',0,1,0.01],
+    ['shadowBlur','Ombre flou',0,30,1],
+  ], []],
   ['ICONES', ICON, [
     ['size','Taille (px)',10,40,0.5],
     ['magnify','Zoom lentille',1,2,0.01],
@@ -4697,7 +4701,6 @@ document.addEventListener('DOMContentLoaded', () => {
   applyCss(document.getElementById('navbar'), BAR);
   applyCss(lensEl, LENS);
   liquidGL({ ...toLiquidGL(BAR),  target: '#navbar' });
-  liquidGL({ ...toLiquidGL(LENS), target: '#lens' });
   tabsEl.addEventListener('click', e => {
     const t = e.target.closest('.tab');
     if (t) goTo(+t.dataset.i);

@@ -883,11 +883,28 @@ let navEspace = null
    la replacer d'après l'écran la ferait revenir en arrière sous le doigt. */
 let navDepuisBarre = false
 
+/* La barre se mesure elle-même pour placer ses onglets et fabriquer son filtre.
+   Masquée, elle mesure ZÉRO : les onglets naissent à zéro pixel de large et le
+   filtre n'est jamais construit — donc plus de verre, ni sur la barre, ni sur
+   les surfaces du haut qui pointent vers ce même filtre.
+
+   On attend donc qu'elle soit réellement à l'écran. Cent vingt images, soit
+   deux secondes : au-delà, c'est qu'elle ne s'affichera pas, et insister ne
+   servirait qu'à faire tourner une boucle pour rien. */
 function configurerBarre(espace) {
   if (navEspace === espace) return
   navEspace = espace
   const c = espace === 'equipe' ? NAV_EQUIPE : NAV_GESTION
-  window.navbarConfigurer?.(c.libelles, c.dessins(), 0)
+  let essais = 0
+  const poser = () => {
+    const b = document.getElementById('bar')
+    if (!b || !b.getBoundingClientRect().width) {
+      if (essais++ < 120) requestAnimationFrame(poser)
+      return
+    }
+    window.navbarConfigurer?.(c.libelles, c.dessins(), 0)
+  }
+  poser()
 }
 
 window.onNavigate = function (index) {
@@ -1683,8 +1700,8 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
-    configurerBarre('gestion')
     afficherBarre(true)
+    configurerBarre('gestion')
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
     desarmerSurveillance()
@@ -1717,8 +1734,8 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
-    configurerBarre('equipe')
     afficherBarre(true)
+    configurerBarre('equipe')
     mesurerOnglets()
     chargerLangue()
     chargerEtablissements()

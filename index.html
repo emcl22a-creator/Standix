@@ -137,8 +137,7 @@
      partout depuis dix ans. Le résultat à l'écran est le même — c'est la
      fonction `svg()` du script qui porte maintenant la forme dans le canal
      alpha, au lieu de la porter en noir et blanc. */
-  .layer{position:absolute;inset:0;z-index:20;pointer-events:none;
-    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}
+  .layer{position:absolute;inset:0;z-index:20;pointer-events:none;}
   .layer--normal{color:#CBCDCF;pointer-events:auto}
   .layer--lens{color:#FFFFFF}
   .tab{position:absolute;top:0;height:100%;
@@ -2773,37 +2772,50 @@ function frame(now) {
     buildFilter('lens-filter', Math.round(g.width), Math.round(g.height), Math.round(g.radius), 0);
   }
 
-  const OVF = 40, E = 4, F = 3;
-  const mx = cx - g.width / 2 - E,
-        my = OVF + BAR_H / 2 - g.height / 2 - E - Y_SHIFT;
-  /* Le même dessin qu'avant — un fond, une capsule floutée par-dessus — mais
-     enfermé dans un <mask> SVG. Ce qui en sort n'est plus une image noire et
-     blanche : c'est une image dont la TRANSPARENCE porte la forme. Le pochoir
-     CSS la lit alors dans son mode par défaut, celui que tous les navigateurs
-     appliquent, WebKit compris.
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE POCHOIR EST UNE FORME, PLUS UNE IMAGE
 
-     Le masquage à l'intérieur d'un SVG, lui, fonctionne partout depuis
-     toujours : c'est du SVG 1.1, pas une propriété CSS récente. */
-  const svg = (fill, base) =>
-    `<svg xmlns='http://www.w3.org/2000/svg' width='${BAR_W}' height='${BAR_H + 2 * OVF}'>` +
-    `<defs>` +
-    `<filter id='f'><feGaussianBlur stdDeviation='${F / 3}'/></filter>` +
-    `<mask id='m'>` +
-    `<rect width='100%' height='100%' fill='${base}'/>` +
-    `<rect x='${mx.toFixed(2)}' y='${my.toFixed(2)}' width='${(g.width + E * 2).toFixed(2)}' ` +
-    `height='${(g.height + E * 2).toFixed(2)}' rx='${(g.radius + E).toFixed(2)}' ` +
-    `fill='${fill}' filter='url(#f)'/>` +
-    `</mask>` +
-    `</defs>` +
-    `<rect width='100%' height='100%' fill='#000' mask='url(#m)'/></svg>`;
-  const url = (m) => `url("data:image/svg+xml,${encodeURIComponent(m)}")`;
-  const pos = `0px ${-OVF}px`, size = `${BAR_W}px ${BAR_H + 2 * OVF}px`;
-  for (const [el, m] of [[lNorm, svg('#000', '#fff')], [lLens, svg('#fff', '#000')]]) {
-    const u = url(m);
-    el.style.webkitMaskImage = u; el.style.maskImage = u;
-    el.style.webkitMaskPosition = pos; el.style.maskPosition = pos;
-    el.style.webkitMaskSize = size; el.style.maskSize = size;
-  }
+     Chaque image, la boucle fabriquait deux SVG en `data:` et les posait en
+     `mask-image`. Chrome les décode à la volée. WebKit — donc tout navigateur
+     sur iPhone — décode les images de masque de façon ASYNCHRONE : tant que la
+     nouvelle n'est pas prête, le pochoir ne vaut rien et le calque disparaît en
+     entier. Soixante images par seconde, soixante décodages en retard : la
+     barre se vidait pendant tout le glissement, puis revenait à l'arrêt.
+
+     `clip-path` n'est pas une image, c'est une géométrie. Elle est lue
+     immédiatement, sans décodage, sans allocation. Plus rien à attendre.
+
+     Ce qu'on perd : les 3 px de fondu au bord de la découpe, qu'un flou
+     gaussien donnait à l'image. Un contour franc les remplace. Sur une capsule
+     en mouvement, l'œil ne s'y arrête pas — et c'est le prix d'une barre qui
+     ne clignote plus.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const E = 4;
+  const rx = cx - g.width / 2 - E;
+  const ry = BAR_H / 2 - g.height / 2 - E - Y_SHIFT;
+  const rw = g.width + E * 2, rh = g.height + E * 2;
+  const rr = Math.min(g.radius + E, rw / 2, rh / 2);
+
+  /* La capsule, en coordonnées du calque. */
+  const capsule =
+    `M${(rx + rr).toFixed(2)} ${ry.toFixed(2)}` +
+    `H${(rx + rw - rr).toFixed(2)}` +
+    `A${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${(rx + rw).toFixed(2)} ${(ry + rr).toFixed(2)}` +
+    `V${(ry + rh - rr).toFixed(2)}` +
+    `A${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${(rx + rw - rr).toFixed(2)} ${(ry + rh).toFixed(2)}` +
+    `H${(rx + rr).toFixed(2)}` +
+    `A${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${rx.toFixed(2)} ${(ry + rh - rr).toFixed(2)}` +
+    `V${(ry + rr).toFixed(2)}` +
+    `A${rr.toFixed(2)} ${rr.toFixed(2)} 0 0 1 ${(rx + rr).toFixed(2)} ${ry.toFixed(2)}Z`;
+
+  /* Le calque gris : toute la barre, MOINS la capsule. Le trou vient de la
+     règle pair-impair — deux contours superposés s'annulent. Le rectangle
+     déborde largement en haut et en bas, pour que la capsule puisse sortir de
+     la barre sans que sa découpe soit coupée net. */
+  const dehors = `M-40 -40H${(BAR_W + 40).toFixed(2)}V${(BAR_H + 40).toFixed(2)}H-40Z`;
+
+  lNorm.style.clipPath = `path(evenodd, '${dehors}${capsule}')`;
+  lLens.style.clipPath = `path('${capsule}')`;
 
   // ---- Le contenu subit TOUS les effets du verre ----
   // Le calque magnifie est masque par la capsule : les icones et les

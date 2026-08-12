@@ -5104,3 +5104,44 @@
      lise comme deux objets séparés. */
   gap:8px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LE TIROIR DE L'ENTREPRISE — la matière de la barre
+
+   La carte du logo avait déjà été alignée ; le tiroir, non. Il gardait son
+   verre d'origine — blanc à 10 %, flou de 24 px, bordure à 18 % — pendant
+   que sa voisine et la barre du bas partagent le verre `liquid-glass`.
+
+   Trois surfaces dans un même écran, deux matières : l'œil le sent avant
+   de savoir pourquoi.
+
+   Rien n'est touché côté barre : on reprend seulement ses variables.
+   ═══════════════════════════════════════════════════════════════════════ */
+.tiroir-liste{
+  /* Ni fond ni bordure propres : tout vient des pseudo-éléments, comme dans
+     `.glassDiv`. Une bordure par-dessus le creux ferait un double contour. */
+  background:none;
+  border:none;
+  isolation:isolate;
+  box-shadow:0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18);
+}
+/* La teinte et le creux : c'est l'ombre interne en négatif qui donne son
+   épaisseur au verre. Sans elle, on obtient une vitre plate. */
+.tiroir-liste::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px)
+             var(--shadow-color, #000);
+  background-color:rgba(var(--tint-color, 255,255,255), var(--tint-opacity, .06));
+}
+/* La réfraction : le même filtre SVG que la barre. Il déforme ce qui passe
+   dessous au lieu de simplement le flouter. */
+.tiroir-liste::after{
+  content:'';position:absolute;inset:0;z-index:-1;
+  border-radius:inherit;
+  backdrop-filter:url(#bar-filter);
+  -webkit-backdrop-filter:url(#bar-filter);
+}
+/* Le contenu passe au-dessus de la teinte. */
+.tiroir-liste > *{position:relative;z-index:2}

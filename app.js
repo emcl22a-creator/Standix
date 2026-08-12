@@ -1045,69 +1045,76 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
     return
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     L'ENTREPRISE ET SON FONDATEUR NAISSENT ENSEMBLE
+
+     Avant, l'app faisait deux écritures à la suite : l'entreprise, puis la
+     fiche membre. La première était refusée — non pas à l'insertion, mais à la
+     RELECTURE. `.insert().select()` oblige Postgres à relire la ligne créée, et
+     la règle de lecture ne montre que les entreprises dont on est déjà membre.
+     À cet instant la fiche n'existait pas encore : l'entreprise naissait, se
+     jugeait invisible, et tout était annulé.
+
+     Une seule fonction côté base fait désormais les deux d'un trait. Elle règle
+     le refus, mais surtout elle supprime le cas où la première écriture réussit
+     et la seconde échoue : plus d'entreprise sans fondateur, jamais.
+
+     Elle rattache la fiche à `auth.uid()`, jamais à un identifiant venu du
+     navigateur, et refuse tout appel sans session. */
+  let membre = null
+
   if (selectedSpace === 'gestion') {
-    // Créer une nouvelle entreprise avec un code d'accès unique à 5 chiffres
-    /* On ne retente QUE sur une collision de code.
+    const { data: fiche, error: erreurCreation } = await supabase
+      .rpc('creer_entreprise_et_fondateur', {
+        p_nom_entreprise: entrepriseNom,
+        p_nom_membre: `${prenom} ${nom}`,
+      })
 
-       Avant, la boucle avalait toutes les erreurs : un refus RLS (403) était
-       pris pour un code déjà attribué, on retentait cinq fois pour rien, et
-       l'utilisateur lisait « réessayez » sans savoir quoi réessayer.
-       On garde désormais la dernière erreur pour pouvoir la dire. */
-    let entrepriseId = null
-    let erreurEntreprise = null
-    for (let tentative = 0; tentative < 5 && !entrepriseId; tentative++) {
-      const code = String(Math.floor(10000 + Math.random() * 90000))
-      const { data: nouvelleEntreprise, error: entrepriseError } = await supabase
-        .from('entreprises').insert({ nom: entrepriseNom, code_acces: code }).select().single()
-      if (!entrepriseError) { entrepriseId = nouvelleEntreprise.id; break }
-      erreurEntreprise = entrepriseError
-      /* 23505 = contrainte d'unicité violée, donc un code déjà pris. Tout le
-         reste ne se résoudra pas en retentant. */
-      if (entrepriseError.code !== '23505') break
-    }
-
-    if (!entrepriseId) {
-      const e = erreurEntreprise || {}
-      const msg = (e.message || '').toLowerCase()
-      if (e.code === '42501' || e.status === 403 || msg.includes('row-level security')) {
-        /* Le compte existe, mais la session n'est pas établie — typiquement
-           quand la confirmation par e-mail est exigée. Sans session,
-           `auth.uid()` vaut null et toute règle qui s'appuie dessus refuse. */
-        errorEl.textContent = "Votre compte est créé, mais la session n'est pas encore " +
-          "active. Confirmez votre e-mail, connectez-vous, et l'entreprise sera créée."
+    if (erreurCreation || !fiche) {
+      const e = erreurCreation || {}
+      if (e.code === '28000') {
+        errorEl.textContent = "Votre compte est créé, mais la session n'est pas " +
+          "active. Connectez-vous pour créer votre entreprise."
       } else if (e.code === '23505') {
-        errorEl.textContent = "Tous les codes d'accès essayés sont déjà pris. " +
+        errorEl.textContent = "Aucun code d'accès libre pour le moment. " +
           "Retentez dans un instant."
+      } else if (e.code === 'PGRST202' || /function .*creer_entreprise/i.test(e.message || '')) {
+        /* La fonction n'existe pas encore en base. On le dit clairement plutôt
+           que de laisser lire « Réessayez » à quelqu'un qui réessaiera en vain. */
+        errorEl.textContent = "La création d'entreprise n'est pas installée sur " +
+          "la base. Exécutez migration-creation-entreprise.sql."
       } else {
         errorEl.textContent = "Impossible de créer l'entreprise" +
           (e.code ? ' (' + e.code + ')' : '') + '. ' + (e.message || 'Réessayez.')
       }
-      console.error('[entreprises] insertion refusée :', erreurEntreprise)
+      console.error('[entreprises] création refusée :', erreurCreation)
       setButtonLoading(signupBtn, false)
       return
     }
-    targetEntrepriseId = entrepriseId
-  }
 
-  // Créer la fiche membre liée à ce compte, avec le rôle choisi et l'entreprise correspondante
-  const { data: membre, error: membreError } = await supabase
-    .from('membres')
-    .insert({
-      user_id: data.user.id,
-      nom: `${prenom} ${nom}`,
-      role: selectedSpace,
-      entreprise_id: targetEntrepriseId
-    })
-    .select().single()
+    membre = fiche
+  } else {
+    // Espace équipe : on rejoint une entreprise existante, il n'y a rien à créer.
+    const { data: fiche, error: membreError } = await supabase
+      .from('membres')
+      .insert({
+        user_id: data.user.id,
+        nom: `${prenom} ${nom}`,
+        role: selectedSpace,
+        entreprise_id: targetEntrepriseId
+      })
+      .select().single()
+
+    if (membreError) {
+      errorEl.style.color = 'var(--red)'
+      errorEl.textContent = "Compte créé mais erreur de profil : " + membreError.message
+      setButtonLoading(signupBtn, false)
+      return
+    }
+    membre = fiche
+  }
 
   setButtonLoading(signupBtn, false)
-
-  if (membreError) {
-    errorEl.style.color = 'var(--red)'
-    errorEl.textContent = "Compte créé mais erreur de profil : " + membreError.message
-    return
-  }
-
   enterApp(membre)
 })
 

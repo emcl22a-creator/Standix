@@ -3893,41 +3893,25 @@ document.getElementById('tb-procedures')?.addEventListener('click', function() {
   else showGestionScreen('p-list', this)
 })
 
-document.getElementById('tb-accueil')?.addEventListener('click', function() {
-  /* L'accueil n'existe pas encore côté mobile : on renvoie sur la liste, qui
-     est la page d'arrivée naturelle. À remplacer le jour où l'écran existe. */
-  if (espaceCourant() === 'equipe') showEquipeScreen('e-list', this)
-  else showGestionScreen('p-list', this)
-})
-
-document.getElementById('tb-reglages')?.addEventListener('click', function() {
-  if (espaceCourant() === 'equipe') showEquipeScreen('e-settings', this)
-  else showGestionScreen('p-settings', this)
-})
-
 document.getElementById('tb-analyse')?.addEventListener('click', function() {
   showGestionScreen('p-global-analyse', this)
   loadGlobalAnalyse()
 })
 
-document.getElementById('tb-principal')?.addEventListener('click', function() {
-  if (espaceCourant() === 'equipe') { showEquipeScreen('e-scan', this); startScanner() }
-  else startNewProcedure()
-})
+/* L'onglet central de la barre n'existe plus sous cet identifiant : la barre
+   du bas gère ses propres clics. Le geste « nouvelle procédure » reste
+   accessible par `onTabPrincipal`, appelée ailleurs. */
 
 /* Allume l'onglet correspondant à l'écran, et fait glisser la capsule.
 
    La capsule se place par la GAUCHE, pas par un `transform` : `left` en
    pourcentage suit la largeur de la barre, qui change entre gestion et
    équipe. Un décalage en pixels aurait fallu être recalculé. */
-/* `poserOngletActif` est désormais fournie par navbar.js : c'est elle qui
-   allume l'onglet et fait glisser la capsule. On garde un repli au cas où le
-   script ne serait pas encore chargé. */
-function poserOngletActif(id) {
-  if (window.poserOngletActif && window.poserOngletActif !== poserOngletActif) {
-    window.poserOngletActif(id)
-  }
-}
+/* La barre du bas gère elle-même son onglet actif : elle écoute ses propres
+   clics et n'a besoin de rien depuis ici. Cette fonction ne fait donc plus
+   rien — on la garde parce que le reste du code l'appelle à chaque
+   changement d'écran. */
+function poserOngletActif(id) {}
 
 const ONGLET_PAR_ECRAN = {
   /* Les index suivent l'ordre de la barre : Accueil 0, Procédures 1, « + » 2,

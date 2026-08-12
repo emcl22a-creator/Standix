@@ -829,90 +829,24 @@ function afficherBarre(montrer) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES ONGLETS DE LA BARRE
+   OÙ MÈNENT LES QUATRE ONGLETS
 
-   Les deux espaces n'ont pas les mêmes pages. La Gestion en a quatre —
-   les libellés livrés avec la barre, tels quels. L'Équipe en a trois :
-   ses procédures, le scanner, ses réglages. Elle n'a plus de page d'analyse,
-   retirée parce qu'elle montrait à l'employé son propre temps mesuré.
+   La barre ne connaît qu'un index, de 0 à 3. C'est ici qu'il devient une page.
+   `onNavigate` est déclarée dans le script de la barre ; on la remplace, sans
+   toucher à son code.
 
-   Rien de tout cela ne vit dans la barre : elle ne connaît que des libellés,
-   des dessins et un index. C'est ici que l'index devient une page.
+   Accueil et Procédures mènent au même écran tant que l'écran d'accueil mobile
+   n'existe pas. C'est ce que dit le document de reprise.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Le seul dessin qui manquait aux quatre livrés. Trois carrés de repérage et
-   quelques modules : la forme qu'on reconnaît sans avoir à la lire. */
-const NAV_ICONE_QR = {
-  line: 'M4.6 3h3.8A1.6 1.6 0 0 1 10 4.6v3.8A1.6 1.6 0 0 1 8.4 10H4.6A1.6 1.6 0 0 1 3 8.4V4.6A1.6 1.6 0 0 1 4.6 3z M15.6 3h3.8A1.6 1.6 0 0 1 21 4.6v3.8A1.6 1.6 0 0 1 19.4 10h-3.8A1.6 1.6 0 0 1 14 8.4V4.6A1.6 1.6 0 0 1 15.6 3z M4.6 14h3.8A1.6 1.6 0 0 1 10 15.6v3.8A1.6 1.6 0 0 1 8.4 21H4.6A1.6 1.6 0 0 1 3 19.4v-3.8A1.6 1.6 0 0 1 4.6 14z M14 14h3.2v3.2H14z M17.8 17.8H21V21h-3.2z M14 19.4h2.2V21H14z M19.4 14H21v2.2h-1.6z',
-  fill: 'M4.6 3h3.8A1.6 1.6 0 0 1 10 4.6v3.8A1.6 1.6 0 0 1 8.4 10H4.6A1.6 1.6 0 0 1 3 8.4V4.6A1.6 1.6 0 0 1 4.6 3z M15.6 3h3.8A1.6 1.6 0 0 1 21 4.6v3.8A1.6 1.6 0 0 1 19.4 10h-3.8A1.6 1.6 0 0 1 14 8.4V4.6A1.6 1.6 0 0 1 15.6 3z M4.6 14h3.8A1.6 1.6 0 0 1 10 15.6v3.8A1.6 1.6 0 0 1 8.4 21H4.6A1.6 1.6 0 0 1 3 19.4v-3.8A1.6 1.6 0 0 1 4.6 14z M14 14h3.2v3.2H14z M17.8 17.8H21V21h-3.2z M14 19.4h2.2V21H14z M19.4 14H21v2.2h-1.6z',
-}
-
 /* Au chargement, la barre est dans le document mais l'app n'est pas ouverte :
-   elle flottait par-dessus l'écran de choix et celui de connexion. */
+   elle flotterait par-dessus l'écran de choix et celui de connexion. */
 afficherBarre(false)
 
-function navIcones(...noms) {
-  const livres = window.navbarIcones || {}
-  return noms.map(n => (n === 'qr' ? NAV_ICONE_QR : livres[n])).filter(Boolean)
-}
-
-/* Les libellés de la Gestion sont ceux de la barre livrée, au caractère près. */
-const NAV_GESTION = {
-  libelles: ['Accueil', 'Procedures', 'Analyse', 'Reglages'],
-  dessins: () => navIcones('accueil', 'procedures', 'analyse', 'reglages'),
-  aller: [
-    () => showGestionScreen('p-list'),
-    () => showGestionScreen('p-list'),
-    () => { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() },
-    () => openSettings(),
-  ],
-}
-
-const NAV_EQUIPE = {
-  libelles: ['Procedures', 'QR code', 'Reglages'],
-  dessins: () => navIcones('procedures', 'qr', 'reglages'),
-  aller: [
-    () => showEquipeScreen('e-list'),
-    () => { showEquipeScreen('e-scan'); startScanner('equipe') },
-    () => openEquipeSettings(),
-  ],
-}
-
-let navEspace = null
-/* Vrai pendant qu'une page s'ouvre DEPUIS un onglet. La capsule y est déjà :
-   la replacer d'après l'écran la ferait revenir en arrière sous le doigt. */
-let navDepuisBarre = false
-
-/* La barre se mesure elle-même pour placer ses onglets et fabriquer son filtre.
-   Masquée, elle mesure ZÉRO : les onglets naissent à zéro pixel de large et le
-   filtre n'est jamais construit — donc plus de verre, ni sur la barre, ni sur
-   les surfaces du haut qui pointent vers ce même filtre.
-
-   On attend donc qu'elle soit réellement à l'écran. Cent vingt images, soit
-   deux secondes : au-delà, c'est qu'elle ne s'affichera pas, et insister ne
-   servirait qu'à faire tourner une boucle pour rien. */
-function configurerBarre(espace) {
-  if (navEspace === espace) return
-  navEspace = espace
-  const c = espace === 'equipe' ? NAV_EQUIPE : NAV_GESTION
-  let essais = 0
-  const poser = () => {
-    const b = document.getElementById('bar')
-    if (!b || !b.getBoundingClientRect().width) {
-      if (essais++ < 120) requestAnimationFrame(poser)
-      return
-    }
-    window.navbarConfigurer?.(c.libelles, c.dessins(), 0)
-  }
-  poser()
-}
-
 window.onNavigate = function (index) {
-  const c = navEspace === 'equipe' ? NAV_EQUIPE : NAV_GESTION
-  const aller = c.aller[index]
-  if (!aller) return
-  navDepuisBarre = true
-  try { aller() } finally { navDepuisBarre = false }
+  if (index === 0 || index === 1) showGestionScreen('p-list')
+  else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
+  else if (index === 3) openSettings()
 }
 
 function afficherCoquille(espace) {
@@ -1701,7 +1635,6 @@ async function enterApp(membre) {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
     afficherBarre(true)
-    configurerBarre('gestion')
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
     desarmerSurveillance()
@@ -1735,7 +1668,6 @@ async function enterApp(membre) {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
     afficherBarre(true)
-    configurerBarre('equipe')
     mesurerOnglets()
     chargerLangue()
     chargerEtablissements()
@@ -4025,12 +3957,9 @@ document.getElementById('tb-analyse')?.addEventListener('click', function() {
 /* Le repère suit l'écran, pas le bouton touché : en revenant d'une sous-page
    par la flèche de retour, aucun bouton n'est transmis, et c'est pourtant là
    qu'on a le plus besoin de savoir où l'on est. */
-function poserOngletActif(id) {
-  if (navDepuisBarre) return
-  const table = navEspace === 'equipe' ? ONGLET_EQUIPE_PAR_ECRAN : ONGLET_PAR_ECRAN
-  const i = table[id]
-  if (i != null) window.navbarActif?.(i)
-}
+/* La barre place elle-même sa capsule au clic. Rien à faire d'ici pour
+   l'instant — on la garde parce que le reste du code l'appelle. */
+function poserOngletActif(id) {}
 
 const ONGLET_PAR_ECRAN = {
   /* Gestion : Accueil 0, Procédures 1, Analyse 2, Réglages 3.

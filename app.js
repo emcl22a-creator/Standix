@@ -808,12 +808,31 @@ const cibleQR = (function () {
    titre, et six cartes en creux. L'utilisateur voit son app tout de suite,
    elle se remplit ensuite. On se souvient de l'espace choisi la dernière fois
    pour savoir laquelle des deux montrer. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   MONTRER OU MASQUER LA BARRE DU BAS
+
+   Elle s'appelait `tabbar`. Elle s'appelle `bar` depuis le passage au verre
+   liquide, et le code la cherchait encore sous son ancien nom : `getElementById`
+   rendait `null`, et lire `.style` sur null arrête net la fonction en cours.
+   C'est ce qui faisait échouer l'entrée dans l'app juste après l'inscription.
+
+   On passe par une fonction plutôt que par un appel direct : l'accès protégé
+   ne s'écrit pas à gauche d'une affectation, et une barre absente ne doit
+   jamais interrompre ce qui l'entoure.
+
+   `display:''` et non `'flex'` : la barre porte sa propre géométrie — position
+   absolue, largeur calculée, capsule placée au pixel. Lui imposer `flex`
+   déplacerait ses onglets. On rend la main au style d'origine. */
+function afficherBarre(montrer) {
+  const b = document.getElementById('bar')
+  if (b) b.style.display = montrer ? '' : 'none'
+}
+
 function afficherCoquille(espace) {
   const appEl = document.getElementById(espace === 'equipe' ? 'equipe-app' : 'gestion-app')
-  const barre = document.getElementById('tabbar')
   if (!appEl || appEl.style.display === 'block') return
   appEl.style.display = 'block'
-  barre.style.display = 'flex'
+  afficherBarre(true)
 
   if (espace === 'equipe') {
     const liste = document.getElementById('e-cat-grid')
@@ -1533,8 +1552,8 @@ async function enterApp(membre) {
     currentMembre = null
     document.getElementById('gestion-app').style.display = 'none'
     document.getElementById('equipe-app').style.display = 'none'
-    document.getElementById('tabbar').style.display = 'none'
-    document.getElementById('tabbar').style.display = 'none'
+    afficherBarre(false)
+    afficherBarre(false)
     document.getElementById('login-screen').style.display = 'flex'
     window.__procedoLoaded = true
     await fenetreTropDAppareils()
@@ -1547,8 +1566,8 @@ async function enterApp(membre) {
      gardait l'ancien affiché sous le nouveau, et voyait les deux à la fois. */
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
+  afficherBarre(false)
+  afficherBarre(false)
 
   armerSurveillance()
 
@@ -1587,7 +1606,7 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
-    document.getElementById('tabbar').style.display = 'flex'
+    afficherBarre(true)
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
     desarmerSurveillance()
@@ -1620,7 +1639,7 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
-    document.getElementById('tabbar').style.display = 'flex'
+    afficherBarre(true)
     mesurerOnglets()
     chargerLangue()
     chargerEtablissements()
@@ -1757,8 +1776,8 @@ async function proposerEntrepriseDuQR(code) {
 
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
+  afficherBarre(false)
+  afficherBarre(false)
   await enterApp(membre)
   return true
 }
@@ -1909,8 +1928,8 @@ window.signOut = async function() {
   document.getElementById('e-list')?.classList.add('active')
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
+  afficherBarre(false)
+  afficherBarre(false)
   /* Le repère et les copies locales n'ont plus de sens une fois déconnecté : le
      compte suivant sur ce téléphone ne doit hériter ni du choix ni des
      procédures de quelqu'un d'autre. */
@@ -11595,8 +11614,8 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
       }
       document.getElementById('gestion-app').style.display = 'none'
       document.getElementById('equipe-app').style.display = 'none'
-      document.getElementById('tabbar').style.display = 'none'
-      document.getElementById('tabbar').style.display = 'none'
+      afficherBarre(false)
+      afficherBarre(false)
       document.getElementById('choice-screen').style.display = 'flex'
     } else {
       await chargerEtablissements()
@@ -11740,8 +11759,8 @@ document.getElementById('es-entreprises')?.addEventListener('click', async (e) =
 
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
+  afficherBarre(false)
+  afficherBarre(false)
   await enterApp(adhesion)
 })
 
@@ -11851,8 +11870,8 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 
   document.getElementById('gestion-app').style.display = 'none'
   document.getElementById('equipe-app').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
-  document.getElementById('tabbar').style.display = 'none'
+  afficherBarre(false)
+  afficherBarre(false)
   document.getElementById('choice-screen').style.display = 'flex'
   toast(`Vous avez quitt\u00e9 ${nom}.`)
 })

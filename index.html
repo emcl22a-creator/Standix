@@ -34,6 +34,22 @@
     --shadow-spread:-8px;
     --shadow-color:#000000;
     --outer-shadow-blur:17px;
+
+    /* ═══ LA MATIÈRE DU VERRE ═══
+       La réfraction passait par un filtre SVG appelé en `url()`. WebKit —
+       donc TOUT navigateur sur iPhone, Chrome compris — n'accepte dans un
+       `backdrop-filter` que les fonctions courtes. Un `url()` y est ignoré
+       en silence : plus de verre du tout.
+
+       On emploie donc ce qu'il sait faire. Le flou et la saturation ne
+       déforment pas, ils dépolissent — c'est la matière qu'Apple a utilisée
+       pendant huit ans, et elle rend la même chose sur les deux écrans.
+
+       Le jour où WebKit implémentera `url()`, il suffira de remettre
+       `url(#bar-filter)` et `url(#lens-filter)` ici, et `VERRE_SVG` à true
+       dans le script. Rien d'autre n'aura bougé. */
+    --verre-bar:blur(20px) saturate(180%);
+    --verre-lens:saturate(150%) brightness(1.08);
   }
   .glassDiv{
     position:absolute;
@@ -51,10 +67,10 @@
   .glassDiv::after{
     content:'';position:absolute;inset:0;z-index:-1;
     border-radius:inherit;
-    backdrop-filter:url(#bar-filter);
-    -webkit-backdrop-filter:url(#bar-filter);
+    backdrop-filter:var(--verre-bar);
+    -webkit-backdrop-filter:var(--verre-bar);
   }
-  #lens{--lens-filter:url(#lens-filter)}
+  #lens{--lens-filter:var(--verre-lens)}
   #lens::after{
     backdrop-filter:var(--lens-filter);
     -webkit-backdrop-filter:var(--lens-filter);
@@ -110,9 +126,19 @@
        restent lisibles au-dessus du verre. */
     z-index:5;pointer-events:none;
   }
+  /* Le pochoir découpe désormais par TRANSPARENCE, plus par clarté.
+
+     `mask-mode:luminance` n'existe pas dans WebKit : le pochoir y était ignoré,
+     les deux calques s'affichaient entiers l'un sur l'autre, et chaque onglet
+     montrait son icône au trait ET son icône pleine, son libellé deux fois.
+     C'est ce qui rendait la barre grossière sur iPhone.
+
+     Le découpage par transparence est le mode par défaut, et il est reconnu
+     partout depuis dix ans. Le résultat à l'écran est le même — c'est la
+     fonction `svg()` du script qui porte maintenant la forme dans le canal
+     alpha, au lieu de la porter en noir et blanc. */
   .layer{position:absolute;inset:0;z-index:20;pointer-events:none;
-    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
-    -webkit-mask-mode:luminance;mask-mode:luminance;}
+    -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;}
   .layer--normal{color:#CBCDCF;pointer-events:auto}
   .layer--lens{color:#FFFFFF}
   .tab{position:absolute;top:0;height:100%;
@@ -2128,7 +2154,15 @@ const AV = {
   specSat:      12,     // Specular Saturation
 };
 
+/* Repasser à true rebranche la réfraction par filtre SVG, le jour où WebKit
+   acceptera `url()` dans un `backdrop-filter`. Tant qu'elle n'est lue par
+   personne, la fabriquer coûterait deux cartes de déplacement dessinées au
+   canevas à chaque changement de taille de la capsule — sur un téléphone, ce
+   travail se sent. */
+const VERRE_SVG = false;
+
 function buildFilter(id, w, h, radius, blurOverride, scaleMul) {
+  if (!VERRE_SVG) return;
   if (w < 2 || h < 2) return;
   const heightFn = SURFACE_FNS[AV.surface];
   const clampedBezel = Math.min(AV.bezel, radius - 1, Math.min(w, h) / 2 - 1);
@@ -2728,7 +2762,7 @@ function frame(now) {
   if (afterOn !== lensGlassOn) {
     lensGlassOn = afterOn;
     lensEl.style.setProperty('--lens-filter',
-      afterOn ? 'url(#lens-filter)' : 'none');
+      afterOn ? 'saturate(150%) brightness(1.08)' : 'none');
   }
 
   const key = Math.round(g.width) + '|' + Math.round(g.height) + '|' + Math.round(g.radius);
@@ -2742,13 +2776,26 @@ function frame(now) {
   const OVF = 40, E = 4, F = 3;
   const mx = cx - g.width / 2 - E,
         my = OVF + BAR_H / 2 - g.height / 2 - E - Y_SHIFT;
+  /* Le même dessin qu'avant — un fond, une capsule floutée par-dessus — mais
+     enfermé dans un <mask> SVG. Ce qui en sort n'est plus une image noire et
+     blanche : c'est une image dont la TRANSPARENCE porte la forme. Le pochoir
+     CSS la lit alors dans son mode par défaut, celui que tous les navigateurs
+     appliquent, WebKit compris.
+
+     Le masquage à l'intérieur d'un SVG, lui, fonctionne partout depuis
+     toujours : c'est du SVG 1.1, pas une propriété CSS récente. */
   const svg = (fill, base) =>
     `<svg xmlns='http://www.w3.org/2000/svg' width='${BAR_W}' height='${BAR_H + 2 * OVF}'>` +
+    `<defs>` +
     `<filter id='f'><feGaussianBlur stdDeviation='${F / 3}'/></filter>` +
+    `<mask id='m'>` +
     `<rect width='100%' height='100%' fill='${base}'/>` +
     `<rect x='${mx.toFixed(2)}' y='${my.toFixed(2)}' width='${(g.width + E * 2).toFixed(2)}' ` +
     `height='${(g.height + E * 2).toFixed(2)}' rx='${(g.radius + E).toFixed(2)}' ` +
-    `fill='${fill}' filter='url(#f)'/></svg>`;
+    `fill='${fill}' filter='url(#f)'/>` +
+    `</mask>` +
+    `</defs>` +
+    `<rect width='100%' height='100%' fill='#000' mask='url(#m)'/></svg>`;
   const url = (m) => `url("data:image/svg+xml,${encodeURIComponent(m)}")`;
   const pos = `0px ${-OVF}px`, size = `${BAR_W}px ${BAR_H + 2 * OVF}px`;
   for (const [el, m] of [[lNorm, svg('#000', '#fff')], [lLens, svg('#fff', '#000')]]) {

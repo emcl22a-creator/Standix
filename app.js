@@ -1028,16 +1028,42 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 
   if (selectedSpace === 'gestion') {
     // Créer une nouvelle entreprise avec un code d'accès unique à 5 chiffres
+    /* On ne retente QUE sur une collision de code.
+
+       Avant, la boucle avalait toutes les erreurs : un refus RLS (403) était
+       pris pour un code déjà attribué, on retentait cinq fois pour rien, et
+       l'utilisateur lisait « réessayez » sans savoir quoi réessayer.
+       On garde désormais la dernière erreur pour pouvoir la dire. */
     let entrepriseId = null
+    let erreurEntreprise = null
     for (let tentative = 0; tentative < 5 && !entrepriseId; tentative++) {
       const code = String(Math.floor(10000 + Math.random() * 90000))
       const { data: nouvelleEntreprise, error: entrepriseError } = await supabase
         .from('entreprises').insert({ nom: entrepriseNom, code_acces: code }).select().single()
-      if (!entrepriseError) entrepriseId = nouvelleEntreprise.id
-      // si erreur (code déjà pris), on boucle et retente avec un autre code
+      if (!entrepriseError) { entrepriseId = nouvelleEntreprise.id; break }
+      erreurEntreprise = entrepriseError
+      /* 23505 = contrainte d'unicité violée, donc un code déjà pris. Tout le
+         reste ne se résoudra pas en retentant. */
+      if (entrepriseError.code !== '23505') break
     }
+
     if (!entrepriseId) {
-      errorEl.textContent = "Impossible de créer l'entreprise, réessayez."
+      const e = erreurEntreprise || {}
+      const msg = (e.message || '').toLowerCase()
+      if (e.code === '42501' || e.status === 403 || msg.includes('row-level security')) {
+        /* Le compte existe, mais la session n'est pas établie — typiquement
+           quand la confirmation par e-mail est exigée. Sans session,
+           `auth.uid()` vaut null et toute règle qui s'appuie dessus refuse. */
+        errorEl.textContent = "Votre compte est créé, mais la session n'est pas encore " +
+          "active. Confirmez votre e-mail, connectez-vous, et l'entreprise sera créée."
+      } else if (e.code === '23505') {
+        errorEl.textContent = "Tous les codes d'accès essayés sont déjà pris. " +
+          "Retentez dans un instant."
+      } else {
+        errorEl.textContent = "Impossible de créer l'entreprise" +
+          (e.code ? ' (' + e.code + ')' : '') + '. ' + (e.message || 'Réessayez.')
+      }
+      console.error('[entreprises] insertion refusée :', erreurEntreprise)
       setButtonLoading(signupBtn, false)
       return
     }
@@ -3894,39 +3920,12 @@ document.getElementById('tb-principal')?.addEventListener('click', function() {
    La capsule se place par la GAUCHE, pas par un `transform` : `left` en
    pourcentage suit la largeur de la barre, qui change entre gestion et
    équipe. Un décalage en pixels aurait fallu être recalculé. */
+/* `poserOngletActif` est désormais fournie par navbar.js : c'est elle qui
+   allume l'onglet et fait glisser la capsule. On garde un repli au cas où le
+   script ne serait pas encore chargé. */
 function poserOngletActif(id) {
-  const barre = document.getElementById('tabbar')
-  if (!barre) return
-  const items = [...barre.querySelectorAll('.tb-item')]
-  items.forEach(b => b.classList.remove('active'))
-
-  const capsule = document.getElementById('tbPill')
-  const index = ONGLET_PAR_ECRAN[id]
-
-  if (index == null || !items[index]) {
-    /* Aucun onglet ne correspond — les écrans de création, par exemple.
-       La capsule s'efface plutôt que de rester sous un onglet éteint. */
-    capsule?.classList.add('hors')
-    return
-  }
-
-  items[index].classList.add('active')
-  if (capsule) {
-    capsule.classList.remove('hors')
-    /* On compte les onglets VISIBLES : côté équipe, Accueil et Analyse sont
-       masqués et la barre n'en montre que trois. */
-    /* On mesure l'onglet plutôt que de calculer un pourcentage.
-
-       Le calcul en `20% + 2px` ignorait le padding de 7 px de la barre : la
-       capsule tombait 12 px trop à droite. Lire la position réelle évite
-       d'avoir à refaire cette arithmétique à chaque changement de marge. */
-    const nav = capsule.parentElement
-    const r = items[index].getBoundingClientRect()
-    const rn = nav.getBoundingClientRect()
-    if (r.width) {
-      capsule.style.left = (r.left - rn.left + 2) + 'px'
-      capsule.style.width = (r.width - 4) + 'px'
-    }
+  if (window.poserOngletActif && window.poserOngletActif !== poserOngletActif) {
+    window.poserOngletActif(id)
   }
 }
 
@@ -6412,8 +6411,8 @@ function majProgressionIA() {
     if (aiPalierDepuis == null) aiPalierDepuis = Date.now()
     const auPalier = (Date.now() - aiPalierDepuis) / 1000
     if (auPalier > 25) {
-      phrase = t('L\u2019\u00e9coute est termin\u00e9e. L\u2019IA met la proc\u00e9dure au propre \u2014 ') +
-               t('c\u2019est la derni\u00e8re \u00e9tape, elle prend souvent une \u00e0 trois minutes.')
+      phrase = t('L’écoute est terminée. L’IA met la procédure au propre — ') +
+               t('c’est la dernière étape, elle prend souvent une à trois minutes.')
     }
   } else {
     aiPalierDepuis = null

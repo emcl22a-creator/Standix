@@ -5041,3 +5041,66 @@
 @media (prefers-reduced-motion:reduce){
   .tb-pill, .tb-ic, .tb-plus{transition:none}
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LA CARTE DU LOGO — la matière de la navbar
+
+   Elle avait son propre verre : blanc à 10 %, flou de 24 px, bordure à 18 %.
+   La barre du bas, elle, utilise le verre `liquid-glass` : teinte à 6 %,
+   ombre interne de 17 px en creux, et une réfraction en filtre SVG.
+
+   Deux verres différents dans un même écran, et l'œil sent que ce sont deux
+   objets — alors que ce sont deux éléments de la même interface. On aligne
+   la carte sur la barre.
+   ═══════════════════════════════════════════════════════════════════════ */
+.topbar-card{
+  /* Ni fond ni bordure propres : tout vient des pseudo-éléments, comme dans
+     `.glassDiv`. Une bordure en plus du creux ferait un double contour. */
+  background:none;
+  border:none;
+  isolation:isolate;
+  box-shadow:0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18);
+}
+/* La teinte et le creux : c'est ce qui donne l'épaisseur au verre. Sans le
+   `inset` négatif, on obtient une vitre plate. */
+.topbar-card::before{
+  content:'';position:absolute;inset:0;z-index:1;
+  border-radius:inherit;pointer-events:none;
+  box-shadow:inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px)
+             var(--shadow-color, #000);
+  background-color:rgba(var(--tint-color, 255,255,255), var(--tint-opacity, .06));
+}
+/* La réfraction : le même filtre SVG que la barre. C'est lui qui déforme ce
+   qui passe dessous, au lieu de simplement le flouter. */
+.topbar-card::after{
+  content:'';position:absolute;inset:0;z-index:-1;
+  border-radius:inherit;
+  backdrop-filter:url(#bar-filter);
+  -webkit-backdrop-filter:url(#bar-filter);
+}
+/* Le contenu passe au-dessus de la teinte. */
+.topbar-card > *{position:relative;z-index:2}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LE HAUT DE PAGE — les deux blocs collés, centrés ensemble
+
+   Le tiroir de l'entreprise était sorti du flux pour ne pas décaler la carte.
+   Résultat : les deux flottaient séparément, l'un à gauche, l'autre au milieu.
+
+   Ils reviennent tous les deux dans la ligne, séparés de 8 px, et c'est le
+   COUPLE qui se centre. Deux objets de même matière posés côte à côte se
+   lisent comme un seul ensemble.
+   ═══════════════════════════════════════════════════════════════════════ */
+.topbar-row > .tiroir-ent{
+  /* Retour dans le flux : c'est ce qui permet au couple de se centrer. */
+  position:relative;left:auto;top:auto;transform:none;
+  flex:0 0 auto;
+}
+.topbar-row{
+  display:flex;align-items:center;justify-content:center;
+  /* 8 px : assez pour qu'on distingue deux surfaces, trop peu pour qu'on les
+     lise comme deux objets séparés. */
+  gap:8px;
+}

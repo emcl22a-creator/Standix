@@ -828,6 +828,76 @@ function afficherBarre(montrer) {
   if (b) b.style.display = montrer ? '' : 'none'
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ONGLETS DE LA BARRE
+
+   Les deux espaces n'ont pas les mêmes pages. La Gestion en a quatre —
+   les libellés livrés avec la barre, tels quels. L'Équipe en a trois :
+   ses procédures, le scanner, ses réglages. Elle n'a plus de page d'analyse,
+   retirée parce qu'elle montrait à l'employé son propre temps mesuré.
+
+   Rien de tout cela ne vit dans la barre : elle ne connaît que des libellés,
+   des dessins et un index. C'est ici que l'index devient une page.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Le seul dessin qui manquait aux quatre livrés. Trois carrés de repérage et
+   quelques modules : la forme qu'on reconnaît sans avoir à la lire. */
+const NAV_ICONE_QR = {
+  line: 'M4.6 3h3.8A1.6 1.6 0 0 1 10 4.6v3.8A1.6 1.6 0 0 1 8.4 10H4.6A1.6 1.6 0 0 1 3 8.4V4.6A1.6 1.6 0 0 1 4.6 3z M15.6 3h3.8A1.6 1.6 0 0 1 21 4.6v3.8A1.6 1.6 0 0 1 19.4 10h-3.8A1.6 1.6 0 0 1 14 8.4V4.6A1.6 1.6 0 0 1 15.6 3z M4.6 14h3.8A1.6 1.6 0 0 1 10 15.6v3.8A1.6 1.6 0 0 1 8.4 21H4.6A1.6 1.6 0 0 1 3 19.4v-3.8A1.6 1.6 0 0 1 4.6 14z M14 14h3.2v3.2H14z M17.8 17.8H21V21h-3.2z M14 19.4h2.2V21H14z M19.4 14H21v2.2h-1.6z',
+  fill: 'M4.6 3h3.8A1.6 1.6 0 0 1 10 4.6v3.8A1.6 1.6 0 0 1 8.4 10H4.6A1.6 1.6 0 0 1 3 8.4V4.6A1.6 1.6 0 0 1 4.6 3z M15.6 3h3.8A1.6 1.6 0 0 1 21 4.6v3.8A1.6 1.6 0 0 1 19.4 10h-3.8A1.6 1.6 0 0 1 14 8.4V4.6A1.6 1.6 0 0 1 15.6 3z M4.6 14h3.8A1.6 1.6 0 0 1 10 15.6v3.8A1.6 1.6 0 0 1 8.4 21H4.6A1.6 1.6 0 0 1 3 19.4v-3.8A1.6 1.6 0 0 1 4.6 14z M14 14h3.2v3.2H14z M17.8 17.8H21V21h-3.2z M14 19.4h2.2V21H14z M19.4 14H21v2.2h-1.6z',
+}
+
+/* Au chargement, la barre est dans le document mais l'app n'est pas ouverte :
+   elle flottait par-dessus l'écran de choix et celui de connexion. */
+afficherBarre(false)
+
+function navIcones(...noms) {
+  const livres = window.navbarIcones || {}
+  return noms.map(n => (n === 'qr' ? NAV_ICONE_QR : livres[n])).filter(Boolean)
+}
+
+/* Les libellés de la Gestion sont ceux de la barre livrée, au caractère près. */
+const NAV_GESTION = {
+  libelles: ['Accueil', 'Procedures', 'Analyse', 'Reglages'],
+  dessins: () => navIcones('accueil', 'procedures', 'analyse', 'reglages'),
+  aller: [
+    () => showGestionScreen('p-list'),
+    () => showGestionScreen('p-list'),
+    () => { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() },
+    () => openSettings(),
+  ],
+}
+
+const NAV_EQUIPE = {
+  libelles: ['Procedures', 'QR code', 'Reglages'],
+  dessins: () => navIcones('procedures', 'qr', 'reglages'),
+  aller: [
+    () => showEquipeScreen('e-list'),
+    () => { showEquipeScreen('e-scan'); startScanner('equipe') },
+    () => openEquipeSettings(),
+  ],
+}
+
+let navEspace = null
+/* Vrai pendant qu'une page s'ouvre DEPUIS un onglet. La capsule y est déjà :
+   la replacer d'après l'écran la ferait revenir en arrière sous le doigt. */
+let navDepuisBarre = false
+
+function configurerBarre(espace) {
+  if (navEspace === espace) return
+  navEspace = espace
+  const c = espace === 'equipe' ? NAV_EQUIPE : NAV_GESTION
+  window.navbarConfigurer?.(c.libelles, c.dessins(), 0)
+}
+
+window.onNavigate = function (index) {
+  const c = navEspace === 'equipe' ? NAV_EQUIPE : NAV_GESTION
+  const aller = c.aller[index]
+  if (!aller) return
+  navDepuisBarre = true
+  try { aller() } finally { navDepuisBarre = false }
+}
+
 function afficherCoquille(espace) {
   const appEl = document.getElementById(espace === 'equipe' ? 'equipe-app' : 'gestion-app')
   if (!appEl || appEl.style.display === 'block') return
@@ -1613,6 +1683,7 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
+    configurerBarre('gestion')
     afficherBarre(true)
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
@@ -1646,6 +1717,7 @@ async function enterApp(membre) {
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
     }
+    configurerBarre('equipe')
     afficherBarre(true)
     mesurerOnglets()
     chargerLangue()
@@ -3933,25 +4005,31 @@ document.getElementById('tb-analyse')?.addEventListener('click', function() {
    La capsule se place par la GAUCHE, pas par un `transform` : `left` en
    pourcentage suit la largeur de la barre, qui change entre gestion et
    équipe. Un décalage en pixels aurait fallu être recalculé. */
-/* La barre du bas gère elle-même son onglet actif : elle écoute ses propres
-   clics et n'a besoin de rien depuis ici. Cette fonction ne fait donc plus
-   rien — on la garde parce que le reste du code l'appelle à chaque
-   changement d'écran. */
-function poserOngletActif(id) {}
+/* Le repère suit l'écran, pas le bouton touché : en revenant d'une sous-page
+   par la flèche de retour, aucun bouton n'est transmis, et c'est pourtant là
+   qu'on a le plus besoin de savoir où l'on est. */
+function poserOngletActif(id) {
+  if (navDepuisBarre) return
+  const table = navEspace === 'equipe' ? ONGLET_EQUIPE_PAR_ECRAN : ONGLET_PAR_ECRAN
+  const i = table[id]
+  if (i != null) window.navbarActif?.(i)
+}
 
 const ONGLET_PAR_ECRAN = {
-  /* Les index suivent l'ordre de la barre : Accueil 0, Procédures 1, « + » 2,
-     Analyse 3, Réglages 4. Le « + » n'apparaît dans aucune ligne — il
-     déclenche une action, il ne désigne pas une page. */
-  'p-list': 1, 'p-category': 1, 'p-analyse': 1, 'p-edit-procedure': 1,
-  'p-global-analyse': 3, 'p-membre': 3,
-  'p-an-equipe': 3, 'p-an-categories': 3, 'p-an-temps': 3,
-  'p-settings': 4, 'p-reg-poste': 4, 'p-reg-compte': 4, 'p-reg-code': 4,
-  'p-reg-postes': 4, 'p-reg-etabs': 4, 'p-reg-langue': 4, 'p-reg-appareils': 4,
-  'p-abonnement': 4, 'p-membres': 4,
-  'e-list': 1, 'e-category': 1, 'e-detail': 1,
-  'e-settings': 4, 'e-reg-compte': 4, 'e-reg-entreprises': 4,
-  'e-reg-poste': 4, 'e-reg-langue': 4,
+  /* Gestion : Accueil 0, Procédures 1, Analyse 2, Réglages 3.
+
+     `p-list` est rattachée à Accueil, pas à Procédures. Les deux onglets y
+     mènent tant que l'écran d'accueil n'existe pas ; il fallait en choisir un,
+     et c'est bien l'écran d'ouverture de l'app. */
+  'p-list': 0,
+  'p-category': 1, 'p-analyse': 1, 'p-edit-procedure': 1,
+  'p-create': 1, 'p-create-manual': 1, 'p-create-video': 1,
+  'p-create-doc': 1, 'p-create-ai': 1,
+  'p-global-analyse': 2, 'p-membre': 2, 'p-membre-fiche': 2,
+  'p-an-equipe': 2, 'p-an-categories': 2, 'p-an-temps': 2,
+  'p-settings': 3, 'p-reg-poste': 3, 'p-reg-compte': 3, 'p-reg-code': 3,
+  'p-reg-postes': 3, 'p-reg-etabs': 3, 'p-reg-langue': 3, 'p-reg-appareils': 3,
+  'p-abonnement': 3, 'p-membres': 3,
 }
 
 
@@ -4083,7 +4161,13 @@ window.startNewProcedure = function() {
    mesuré, ce qui ne l'aide pas à travailler et lui rappelle qu'on le compte.
    Ce qui restait d'utile — « il vous reste 3 procédures à lire » — est déjà
    sur la liste, là où il peut agir dessus. */
-const ONGLET_EQUIPE_PAR_ECRAN = { 'e-list': 0, 'e-category': 0, 'e-detail': 0 }
+const ONGLET_EQUIPE_PAR_ECRAN = {
+  /* Équipe : Procédures 0, QR code 1, Réglages 2. */
+  'e-list': 0, 'e-category': 0, 'e-detail': 0,
+  'e-scan': 1,
+  'e-settings': 2, 'e-reg-compte': 2, 'e-reg-entreprises': 2,
+  'e-reg-poste': 2, 'e-reg-langue': 2, 'reg-appareils': 2,
+}
 
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
@@ -4102,11 +4186,7 @@ window.showEquipeScreen = function(id, btn) {
      écran noir sans se rappeler pourquoi. */
   if (id !== 'e-scan') camEteinte = false
   majBoutonCamera()
-  const boutons = document.querySelectorAll('#tabbar .tab-round')
-  boutons.forEach(b => b.classList.remove('active'))
-  document.getElementById('tabbar')?.setAttribute('data-espace', 'equipe')
-  const index = ONGLET_EQUIPE_PAR_ECRAN[id]
-  if (index != null && boutons[index]) boutons[index].classList.add('active')
+  poserOngletActif(id)
   if (id !== 'e-scan') stopScanner()
   if (id !== 'e-detail') quitterLecture()
   remonterEnHaut()

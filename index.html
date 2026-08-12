@@ -67,22 +67,14 @@
      Ici : marge fixe de 23 pt, largeur bornee pour rester correcte
      du petit telephone a la tablette. */
   #bar{
-    /* FIXE, et non plus absolue : la barre reste sous le pouce au lieu de
-       partir avec la page. En absolu elle se posait au bas du DOCUMENT — sur
-       un écran d'ordinateur, où `style.css` agrandit tout de 1,9, elle se
-       retrouvait 620 px sous la fenêtre. */
+    /* FIXE : la barre reste sous le pouce au lieu de partir avec la page.
+       En absolu elle se posait au bas du DOCUMENT. */
     position:fixed;
     left:50%;
-    /* LE VOL, à la manière d'Apple.
-
-       Leur barre flottante ne se pose pas sur le bord : elle laisse passer le
-       trait d'accueil en dessous, puis garde encore un peu d'air. D'où les deux
-       termes — la zone sûre de l'appareil, plus 12 pt.
-
-       Le plancher de 23 px est la marge latérale mesurée sur la capture Amazon
-       Prime, en tête de ce fichier : là où il n'y a pas de zone sûre — un
-       ordinateur, un iPhone à bouton — la barre garde le même écart en bas
-       qu'à gauche et à droite. L'œil voit alors une marge égale tout autour. */
+    /* LE VOL : la zone sûre de l'appareil, plus 12 pt — la barre laisse passer
+       le trait d'accueil sous elle. Le plancher de 23 px est la marge latérale
+       mesurée plus haut : là où il n'y a pas de zone sûre, l'écart est le même
+       en bas qu'à gauche et à droite. */
     bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
     width:min(calc(100vw - 46px), 520px);
     height:var(--bar-h);
@@ -2589,16 +2581,16 @@ function layout() {
 
   // La capsule remplit l'interieur de la barre, marge PAD partout.
   LENS.REST_H = BAR_H - PAD_TOP - PAD;
-  LENS.REST_W = (BAR_W - 2 * PAD) / LABELS.length;
+  LENS.REST_W = (BAR_W - 2 * PAD) / 4;
   LENS.BASE_W = LENS.REST_W;
 
   // Les 4 centres : la premiere capsule commence a PAD, la derniere
   // finit a PAD du bord oppose. Marge laterale = marge verticale.
   const half = LENS.REST_W / 2;
-  CENTERS = LABELS.map((_, i) => PAD + half + LENS.REST_W * i);
+  CENTERS = [0, 1, 2, 3].map((i) => PAD + half + LENS.REST_W * i);
 }
-let LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
-let ICONS = [
+const LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
+const ICONS = [
   {line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
    fill:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H5.4a2.2 2.2 0 0 1-2.2-2.2z M9.3 21.8v-6.4h5.4v6.4z'},
   {line:'M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6',
@@ -2834,44 +2826,5 @@ function onNavigate(index) {
   // console.log('onglet', index, LABELS[index]);
   // votre routeur ici
 }
-
-/* ============================================================
-   PONT AVEC L'APPLICATION
-
-   Procédo a deux espaces qui n'ont pas les mêmes pages : quatre
-   onglets en Gestion, trois en Équipe. La barre doit donc pouvoir
-   se reconfigurer en cours de route.
-
-   Rien de la mécanique du verre n'est touché. Ces trois fonctions
-   ne font qu'exposer ce qui existait déjà : `rebuild`, `lens` et
-   `active`.
-   ============================================================ */
-
-/* Les quatre dessins livrés, nommés pour que l'app les compose. */
-window.navbarIcones = {
-  accueil:    ICONS[0],
-  procedures: ICONS[1],
-  analyse:    ICONS[2],
-  reglages:   ICONS[3],
-};
-
-/* Change les onglets. Appelée à chaque entrée dans un espace. */
-window.navbarConfigurer = function (libelles, dessins, actif) {
-  if (!Array.isArray(libelles) || !libelles.length) return;
-  LABELS = libelles;
-  ICONS = dessins;
-  active = Math.max(0, Math.min(actif || 0, LABELS.length - 1));
-  contentW.length = 0;
-  rebuild();
-};
-
-/* Déplace la capsule sans passer par un clic : c'est ce qui permet
-   au repère de suivre quand on navigue par une carte ou une flèche
-   de retour. */
-window.navbarActif = function (index) {
-  if (index == null || index < 0 || index >= CENTERS.length) return;
-  active = index;
-  if (lens.goTo(CENTERS[active] - BAR_W / 2)) swellStart = performance.now();
-};
 </script>
 </body></html>

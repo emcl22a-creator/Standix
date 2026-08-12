@@ -23,9 +23,13 @@
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
-    --glass-radius:27.5px;
-    --tint-color:255,255,255;
-    --tint-opacity:0.06;
+    --bar-h:72px;              /* HAUTEUR DE LA BARRE : tout en decoule */
+    --glass-radius:calc(var(--bar-h) / 2);
+    /* Teinte NOIRE : elle assombrit le fond vu a travers la barre,
+       ce qui detache les libelles blancs. En contrepartie le verre
+       perd du relief, compense par un lisere clair plus marque. */
+    --tint-color:0,0,0;
+    --tint-opacity:0.20;
     --shadow-blur:17px;
     --shadow-spread:-8px;
     --shadow-color:#000000;
@@ -66,7 +70,7 @@
     left:50%;
     bottom:calc(28px + env(safe-area-inset-bottom, 0px));
     width:min(calc(100vw - 46px), 520px);
-    height:62px;
+    height:var(--bar-h);
     margin-left:0;
     transform:translateX(-50%) scale(1) translateZ(0);
     /* origine en bas : la barre grandit vers le haut, son bord
@@ -78,7 +82,7 @@
     will-change:transform;
     backface-visibility:hidden;
     -webkit-backface-visibility:hidden;
-    --glass-radius:31px;
+    --glass-radius:calc(var(--bar-h) / 2);
     z-index:10;
   }
   /* Gris translucide du repos. Il monte a mesure que le verre
@@ -89,6 +93,9 @@
     border-radius:inherit;pointer-events:none;
     background:rgba(150,150,155,0.18);
   }
+  /* Illumination de la barre. Une COUCHE, pas un filter : un filter
+     sur #bar creerait un contexte d'empilement et couperait le
+     backdrop-filter de son ::after, donc le verre disparaitrait. */
   #lens{
     --glass-radius:23px;
     top:50%;left:0;
@@ -103,9 +110,9 @@
   .layer--lens{color:#FFFFFF}
   .tab{position:absolute;top:0;height:100%;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:5px;cursor:pointer}
+    gap:calc(var(--bar-h) * 0.081);cursor:pointer}
   .tab svg{display:block;transform-origin:center}
-  .tab span{font-size:9.5px;font-weight:500;line-height:1;white-space:nowrap;
+  .tab span{font-size:calc(var(--bar-h) * 0.153);font-weight:500;line-height:1;white-space:nowrap;
     transform-origin:center}
 </style>
 </head>
@@ -1961,6 +1968,7 @@
   <div class="layer layer--normal" id="lNorm"></div>
   <div class="layer layer--lens" id="lLens"></div>
 </div>
+
 <script>
 /* ============================================================
    VERRE — code EXACT de archisvaze/liquid-glass (index.html)
@@ -2163,8 +2171,8 @@ const LENS = {
   REST_W: 74,        // largeur au repos : 62 + 6 px de chaque cote
   REST_H: 46,
   // Ressort de position : la lentille a une vraie inertie.
-  STIFFNESS: 120,   // accorde avec TRAVEL_MS : le ressort finit seul
-  DAMPING: 22,      // legerement sur-amorti : aucun rebond de position
+  STIFFNESS: 200,   // plus vif : la fin de course ne traine plus
+  DAMPING: 28,      // sur-amorti : aucun depassement de position
   // Fenetre d'observation de la vitesse, comme accelerationWindowDuration
   // dans LiquidLensView (0.3 s).
   WINDOW_MS: 300,
@@ -2433,7 +2441,12 @@ class ActiveLens {
     //   2. elle englobe entierement l'icone ET le texte
     // La premiere evite qu'un simple survol, capsule etiree, ne le
     // declenche en plein trajet.
-    const settled = Math.abs(this.targetX - this.x) <= LENS.ARRIVE_PX;
+    // Seuil PROPORTIONNEL a la distance. Avec un seuil fixe, un long
+    // trajet passe bien plus de temps a ramper sur les derniers pixels
+    // qu'un court : le rebond demarrait tard et on sentait une latence.
+    const distTot = Math.abs(this.targetX - this.startX) || 1;
+    const seuil = Math.max(LENS.ARRIVE_PX, distTot * 0.04);
+    const settled = Math.abs(this.targetX - this.x) <= seuil;
     if (this.phase === 'travel' && !this.contained && settled && containedNow(g)) {
       this.contained = true;
       // La position n'est pas figee : le ressort finit de porter la
@@ -2535,7 +2548,8 @@ class ActiveLens {
    ============================================================ */
 // La largeur est lue sur le DOM : elle suit la taille de l'ecran.
 let BAR_W = 298;
-const BAR_H = 62;
+// lue depuis le CSS : une seule valeur a changer, --bar-h
+let BAR_H = 62;
 const SIDE_PAD = 5.5;   // marge entre la capsule et le bord interieur
 let CENTERS = [];
 
@@ -2554,20 +2568,22 @@ const Y_SHIFT = (PAD - PAD_TOP) / 2;
 
 function layout() {
   const bar = document.getElementById('bar');
-  BAR_W = bar.getBoundingClientRect().width;
+  const rb = bar.getBoundingClientRect();
+  BAR_W = rb.width;
+  BAR_H = rb.height;
 
   // La capsule remplit l'interieur de la barre, marge PAD partout.
   LENS.REST_H = BAR_H - PAD_TOP - PAD;
-  LENS.REST_W = (BAR_W - 2 * PAD) / 4;
+  LENS.REST_W = (BAR_W - 2 * PAD) / LABELS.length;
   LENS.BASE_W = LENS.REST_W;
 
   // Les 4 centres : la premiere capsule commence a PAD, la derniere
   // finit a PAD du bord oppose. Marge laterale = marge verticale.
   const half = LENS.REST_W / 2;
-  CENTERS = [0, 1, 2, 3].map((i) => PAD + half + LENS.REST_W * i);
+  CENTERS = LABELS.map((_, i) => PAD + half + LENS.REST_W * i);
 }
-const LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
-const ICONS = [
+let LABELS = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
+let ICONS = [
   {line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
    fill:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H5.4a2.2 2.2 0 0 1-2.2-2.2z M9.3 21.8v-6.4h5.4v6.4z'},
   {line:'M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6',
@@ -2590,8 +2606,6 @@ const barEl = document.getElementById('bar');
 const BAR_SWELL = 0.032;   // +3,2 % : le grossissement se voit franchement
 // Ressort critique plutot qu'un lissage exponentiel : sa VITESSE est
 // continue, donc le basculement de cible ne produit aucune saccade.
-const BAR_GLOW   = 0.075;  // teinte ajoutee au sommet : la barre s'eclaircit
-const BAR_BRIGHT = 0.10;   // eclat general au sommet
 // La cible est 1 tant que la capsule n'a pas touche, puis 0. Avec une
 // raideur elevee, la barre atteint quasiment son maximum meme sur le
 // trajet le plus court : le grossissement est donc le MEME que les
@@ -2618,9 +2632,10 @@ let active = 0;
 const contentW = [];
 
 function row(el, filled) {
+  const ICON_PX = Math.round(BAR_H * 0.355);
   el.innerHTML = CENTERS.map((c, i) => `
     <div class="tab" data-i="${i}" style="left:${c - LENS.REST_W / 2}px;width:${LENS.REST_W}px">
-      <svg width="22" height="22" viewBox="0 0 24 24"
+      <svg width="${ICON_PX}" height="${ICON_PX}" viewBox="0 0 24 24"
         fill="${filled ? 'currentColor' : 'none'}"
         stroke="${filled ? 'none' : 'currentColor'}"
         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
@@ -2774,19 +2789,8 @@ function frame(now) {
   }
   barEl.style.transform =
     `translateX(-50%) scale(${(1 + BAR_SWELL * barFollow).toFixed(6)}) translateZ(0)`;
-  // Illumination : elle arrive et repart exactement avec le
-  // grossissement, puisqu'elle est pilotee par la meme valeur.
-  barEl.style.setProperty('--tint-opacity',
-    (0.06 + BAR_GLOW * barFollow).toFixed(4));
-  const br = 1 + BAR_BRIGHT * barFollow;
-  barEl.style.filter = `brightness(${br.toFixed(4)})`;
-  // La capsule et les onglets sont ENFANTS de la barre : ils heritent
-  // de son filtre et de sa teinte. On annule les deux sur eux, pour
-  // que seule la barre s'illumine.
-  const inv = `brightness(${(1 / br).toFixed(4)})`;
-  lensEl.style.filter = inv;
-  lensEl.style.setProperty('--tint-opacity', '0.06');
-  lNorm.style.filter = inv;
+
+  // Aucune illumination : la barre ne fait que grossir.
 
   const mv = g.bulge;
   const si = 1 + (ZOOM_ICON - 1) * mv, sl = 1 + (ZOOM_LABEL - 1) * mv;
@@ -2800,7 +2804,7 @@ function frame(now) {
   // et la teinte a 6 %.
   // Ni eclat ni halo : le texte et les icones brillaient trop.
   // Seuls restent le grossissement et un leger gain de contraste.
-  lLens.style.filter = `${inv} contrast(${(1 + 0.10 * mv).toFixed(3)})`;
+  lLens.style.filter = `contrast(${(1 + 0.10 * mv).toFixed(3)})`;
   lLens.style.opacity = String(1 - 0.06 * mv);
 
   requestAnimationFrame(frame);
@@ -2815,5 +2819,44 @@ function onNavigate(index) {
   // console.log('onglet', index, LABELS[index]);
   // votre routeur ici
 }
+
+/* ============================================================
+   PONT AVEC L'APPLICATION
+
+   Procédo a deux espaces qui n'ont pas les mêmes pages : quatre
+   onglets en Gestion, trois en Équipe. La barre doit donc pouvoir
+   se reconfigurer en cours de route.
+
+   Rien de la mécanique du verre n'est touché. Ces trois fonctions
+   ne font qu'exposer ce qui existait déjà : `rebuild`, `lens` et
+   `active`.
+   ============================================================ */
+
+/* Les quatre dessins livrés, nommés pour que l'app les compose. */
+window.navbarIcones = {
+  accueil:    ICONS[0],
+  procedures: ICONS[1],
+  analyse:    ICONS[2],
+  reglages:   ICONS[3],
+};
+
+/* Change les onglets. Appelée à chaque entrée dans un espace. */
+window.navbarConfigurer = function (libelles, dessins, actif) {
+  if (!Array.isArray(libelles) || !libelles.length) return;
+  LABELS = libelles;
+  ICONS = dessins;
+  active = Math.max(0, Math.min(actif || 0, LABELS.length - 1));
+  contentW.length = 0;
+  rebuild();
+};
+
+/* Déplace la capsule sans passer par un clic : c'est ce qui permet
+   au repère de suivre quand on navigue par une carte ou une flèche
+   de retour. */
+window.navbarActif = function (index) {
+  if (index == null || index < 0 || index >= CENTERS.length) return;
+  active = index;
+  if (lens.goTo(CENTERS[active] - BAR_W / 2)) swellStart = performance.now();
+};
 </script>
 </body></html>

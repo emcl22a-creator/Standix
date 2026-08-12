@@ -67,8 +67,23 @@
      Ici : marge fixe de 23 pt, largeur bornee pour rester correcte
      du petit telephone a la tablette. */
   #bar{
+    /* FIXE, et non plus absolue : la barre reste sous le pouce au lieu de
+       partir avec la page. En absolu elle se posait au bas du DOCUMENT — sur
+       un écran d'ordinateur, où `style.css` agrandit tout de 1,9, elle se
+       retrouvait 620 px sous la fenêtre. */
+    position:fixed;
     left:50%;
-    bottom:calc(28px + env(safe-area-inset-bottom, 0px));
+    /* LE VOL, à la manière d'Apple.
+
+       Leur barre flottante ne se pose pas sur le bord : elle laisse passer le
+       trait d'accueil en dessous, puis garde encore un peu d'air. D'où les deux
+       termes — la zone sûre de l'appareil, plus 12 pt.
+
+       Le plancher de 23 px est la marge latérale mesurée sur la capture Amazon
+       Prime, en tête de ce fichier : là où il n'y a pas de zone sûre — un
+       ordinateur, un iPhone à bouton — la barre garde le même écart en bas
+       qu'à gauche et à droite. L'œil voit alors une marge égale tout autour. */
+    bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
     width:min(calc(100vw - 46px), 520px);
     height:var(--bar-h);
     margin-left:0;

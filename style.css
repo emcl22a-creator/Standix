@@ -107,12 +107,18 @@
   }
 
   .topbar-row{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  /* Aucune matière ici : ni fond, ni flou, ni liseré, ni ombre. Il ne reste que
+     la géométrie — la forme, la place, le remplissage.
+
+     Le verre est posé plus bas, en un seul endroit, avec la recette exacte de
+     `.glassDiv`. Tant que ces déclarations restaient là, elles s'ajoutaient à
+     celle du bas : la carte portait le verre de la barre PLUS un flou de 24 px
+     et une saturation de 180 % hérités de l'ancienne. Deux matières
+     superposées, donc jamais celle de la barre. */
   .topbar-card{
     position:relative;
     display:flex; align-items:center;
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:10px 20px 10px 18px;
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+    border-radius:100px; padding:10px 20px 10px 18px;
   }
   .topbar-left{ display:flex; align-items:center; gap:10px; }
   .logo-pill{
@@ -2250,18 +2256,16 @@
      exactement le cercle unique et se lit donc comme un rond de verre ; ouverte,
      elle s'étire en pastille autour de tous. Le verre se déplie avec le tiroir
      au lieu d'être répété sur chaque cercle. */
+  /* Comme la carte du logo : plus aucune matière ici, seulement la géométrie.
+     Le verre vient d'un seul endroit, en bas de cette feuille. */
   .tiroir-liste{
     position:absolute; left:0; top:0; z-index:12;
     display:flex; align-items:center; gap:0;
     /* Hauteur et remplissage FIXES : rien ne grossit. Seule la largeur change,
        et la pastille est ancrée à gauche — elle ne peut donc s'étendre que vers
-       la droite. Fermée, elle fait 46 px de côté, comme le bouton des réglages. */
+       la droite. Fermée, elle fait 46 px de côté. */
     height:46px; padding:4px;
     border-radius:100px;
-    background:rgba(255,255,255,0.10);
-    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18);
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
   }
 
   /* Le même verre que le bouton des réglages, à l'autre bout de la barre :

@@ -5450,22 +5450,31 @@
   --plus-courbe-entree:cubic-bezier(0.1, 0.4, 0.5, 1.2);
 }
 
-/* La matière. Sous la barre — c'est ce qui la fait passer au travers. */
+/* LA MATIÈRE EST COUPÉE À L'ARÊTE, COMME LE BOUTON.
+
+   Elle s'étendait jusqu'au bas de l'écran, sous la barre. Or la barre est du
+   VERRE : elle laisse passer la lumière. On voyait donc une lueur orange
+   derrière la navbar pendant toute l'animation — une flaque qui n'avait rien
+   à faire là.
+
+   Le cadre s'arrête à l'arête haute. La matière n'existe plus qu'au-dessus,
+   elle sort du bord et rien ne transparaît. */
 .liquide{
-  position:fixed; left:0; right:0; bottom:0; height:220px; z-index:9;
+  position:fixed; left:0; right:0; top:0;
+  bottom:calc(var(--plus-bas) + var(--bar-h));
+  overflow:hidden; z-index:9;
   pointer-events:none; filter:url(#fusion);
   visibility:hidden;
 }
 body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
 
-/* Le socle vit entièrement derrière la barre : son sommet effleure l'arête
-   haute sans jamais la dépasser. On ne le voit jamais ; on ne voit que ce
-   qu'il produit, le cou. */
+/* Le socle prend racine SUR l'arête et pousse vers le haut. Ses coordonnées
+   sont celles du cadre, dont le bas est désormais cette arête. */
 .socle{
   position:absolute; left:var(--plus-cx); transform:translateX(-50%);
-  bottom:calc(var(--plus-bas) + 34px);
+  bottom:0;
   width:calc(var(--plus-larg) * 0.5); height:0;
-  border-radius:20px; background:#F58A15;
+  border-radius:20px 20px 0 0; background:#F58A15;
 }
 
 /* LE COU DE LA VERSION VALIDÉE, RENDU TEL QUEL.
@@ -5494,21 +5503,32 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
 
    Le cou vit maintenant pendant que le bouton est encore là. Ce n'est pas une
    asymétrie de style, c'est la conséquence du découpage. */
-/* Le cou, lui, se renverse vraiment : `reverse` joue les images à l'envers, ce
-   qui est ici exact — l'éclaboussure se produit au DÉPART quand le bouton
-   arrive, et à la FIN quand il repart. */
+/* ═══ PAS DE `reverse` À L'ENTRÉE ═══
+
+   `couGoutte` finit par l'éclaboussure — la matière qui s'étale à 85 % de la
+   largeur. Jouée à l'envers, cette image passait en PREMIER : une flaque large
+   s'étalait sous le bouton avant même qu'il ne bouge.
+
+   L'éclaboussure appartient au contact. À l'arrivée elle a un sens ; au départ
+   elle n'en a aucun. L'entrée a donc sa propre suite : la matière se rassemble,
+   pousse, et se retire — sans jamais s'étaler. */
+@keyframes couEntree{
+  0%  { height:0;    width:calc(var(--plus-larg) * 0.45); }
+  38% { height:40px; width:26px; }
+  74% { height:20px; width:16px; }
+  100%{ height:0;    width:calc(var(--plus-larg) * 0.45); }
+}
 body.plus-vu .socle{
-  animation:couGoutte 0.26s cubic-bezier(0.3, 0, 0.6, 1) reverse;
+  animation:couEntree 0.26s cubic-bezier(0.3, 0, 0.6, 1);
 }
 body.plus-part .socle{
   animation:couGoutte 0.26s cubic-bezier(0.4, 0, 0.3, 1);
 }
 
-/* La bulle double le bouton dans la matière. Même repère — l'arête de la barre
-   — sinon les deux se désolidarisent. */
+/* La bulle double le bouton dans la matière. Même cadre, donc même repère :
+   l'arête de la barre. */
 .bulle{
-  position:absolute; left:var(--plus-cx);
-  bottom:calc(var(--plus-bas) + var(--bar-h));
+  position:absolute; left:var(--plus-cx); bottom:0;
   width:var(--plus-larg); height:var(--plus-h);
   border-radius:calc(var(--plus-h) / 2); background:#F58A15;
   transform:translate(-50%, var(--plus-repos)) scale(0.62);

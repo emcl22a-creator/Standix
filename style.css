@@ -4897,16 +4897,24 @@
     position:relative; display:flex; gap:0; background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
     border-radius:100px; padding:4px; margin-bottom:22px;
   }
+  /* La pastille qui glisse sous l'onglet choisi. Elle était blanche — la
+     dernière surface de l'app à l'être, alors que tous les gestes principaux
+     sont passés à l'ambre. Un blanc isolé au milieu d'une page orange se lit
+     comme un oubli. */
   .auth-toggle-indicator{
     position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px);
-    background:#fff; border-radius:100px; z-index:0;
+    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    border-radius:100px; z-index:0;
+    box-shadow:0 4px 14px rgba(255,122,24,0.26);
     transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
   }
   .auth-toggle-btn{
     position:relative; z-index:1; flex:1; text-align:center; font-size:13px; font-weight:600; padding:9px 0;
     border-radius:100px; color:var(--label-2); transition: color 0.3s ease;
   }
-  .auth-toggle-btn.active{ color:#000; }
+  /* Texte sombre sur l'orange, comme sur les boutons : à cette clarté, du
+     blanc perdrait le contraste que le noir garde sans effort. */
+  .auth-toggle-btn.active{ color:#2A1400; font-weight:750; }
 
   .auth-form-wrap{ position:relative; }
   .auth-form{ display:none; }
@@ -5098,7 +5106,7 @@
   isolation:isolate;
   box-shadow:
     0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18),
-    inset 0 0 0 0.5px var(--filet, rgba(255,255,255,0.13));
+    inset 0 0 0 0.5px var(--filet);
 }
 /* La teinte et le creux : c'est ce qui donne l'épaisseur au verre. Sans le
    `inset` négatif, on obtient une vitre plate. */
@@ -5274,9 +5282,11 @@
    le dessin d'abord, le texte ensuite. Les deux cartes ont la même peau, pas
    la même forme — c'est ce qui empêche les deux pages de se confondre.
    ═══════════════════════════════════════════════════════════════════════════ */
-.hero-ia{ padding:16px 0 20px; }
+.hero-ia{ padding:12px 0 16px; }
 .hero-ia .hero-txt{ padding:0 20px; }
-.hero-ia h2{ font-size:20px; letter-spacing:-0.045em; }
+.hero-ia h2{ font-size:19px; letter-spacing:-0.045em; margin-bottom:6px; }
+.hero-ia p{ font-size:13px; margin-bottom:14px; }
+.hero-ia .hero-cta{ height:44px; font-size:14px; }
 
 /* 74 % de la largeur, centrée. À 100 % la carte montait à 430 px et mangeait
    la moitié de l'écran ; ici elle en fait 383 et le reste de la page tient
@@ -5285,8 +5295,8 @@
    `width` et `height` sont déclarés dans le balisage : sans eux, la page se
    décale au moment où l'image arrive, et le titre saute sous les yeux. */
 .hero-img{
-  display:block; width:74%; height:auto;
-  margin:0 auto 10px;
+  display:block; width:56%; height:auto;
+  margin:0 auto 4px;
   pointer-events:none; user-select:none;
 }
 

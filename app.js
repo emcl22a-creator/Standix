@@ -4256,7 +4256,20 @@ function oublierNaissances() {
    bouton suivra tout seul. */
 function majBoutonPlus(idEcran) {
   const montre = idEcran === 'p-list'
+  const etait = document.body.classList.contains('plus-vu')
   document.body.classList.toggle('plus-vu', montre)
+
+  /* La chute ne peut pas être une transition : elle a sa propre déformation.
+     On pose une classe le temps qu'elle dure, et on la retire — sinon elle
+     rejouerait au moindre changement d'écran suivant. */
+  if (etait && !montre) {
+    document.body.classList.remove('plus-part')
+    void document.body.offsetWidth
+    document.body.classList.add('plus-part')
+    clearTimeout(majBoutonPlus._t)
+    majBoutonPlus._t = setTimeout(
+      () => document.body.classList.remove('plus-part'), 320)
+  }
   if (!montre) return
 
   const barre = document.getElementById('bar')
@@ -4857,8 +4870,149 @@ async function peindreDernieresProcedures() {
   })
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DERNIÈRES ACTIVITÉS DE L'ENTREPRISE
+
+   Quatre sources, toutes déjà en mémoire sauf une : les arrivées, les
+   promotions, les lectures, et les accès refusés faute de place. On les mêle,
+   on trie par date, on garde les cinq plus récentes.
+
+   CE QUI MANQUE, ET POURQUOI : les départs et les retraits. Quand on retire
+   quelqu'un, la ligne de `membres` est effacée — il ne reste ni son nom, ni la
+   date, ni qui l'a retiré. Une information qu'on n'écrit pas ne se retrouve
+   pas. Il faudra un journal pour les garder.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function peindreActivites() {
+  const zone = document.getElementById('accueil-activites')
+  if (!zone) return
+
+  const membres = cachedMembres || []
+  const nomDe = (id) => membres.find(m => m.id === id)?.nom || 'Quelqu\u2019un'
+  const faits = []
+
+  /* Les arrivées. On saute la fiche du fondateur : « X a rejoint » le jour de
+     la création de l'entreprise n'apprend rien à celui qui l'a créée. */
+  membres.forEach(m => {
+    if (m.role === 'gestion' && !m.promu_par) return
+    if (!m.created_at) return
+    faits.push({
+      quand: Date.parse(m.created_at), genre: 'arrivee',
+      texte: `<b>${escapeHtml(m.nom || 'Quelqu\u2019un')}</b> a rejoint l\u2019équipe`,
+      detail: m.poste ? escapeHtml(m.poste) : '',
+    })
+  })
+
+  membres.forEach(m => {
+    if (!m.promu_le) return
+    faits.push({
+      quand: Date.parse(m.promu_le), genre: 'promotion',
+      texte: `<b>${escapeHtml(m.nom || 'Quelqu\u2019un')}</b> est passé\u00b7e en gestion`,
+      detail: m.promu_par ? 'par ' + escapeHtml(nomDe(m.promu_par)) : '',
+    })
+  })
+
+  /* Les lectures. Une par personne et par procédure suffit : dix lignes
+     « Karim a lu » d'affilée noieraient tout le reste. */
+  const vues = new Set()
+  ;(cachedValidations || []).forEach(v => {
+    const cle = v.membre_id + '|' + v.procedure_id
+    if (vues.has(cle)) return
+    vues.add(cle)
+    const proc = (allGestionProcedures || []).find(p => p.id === v.procedure_id)
+    if (!proc) return
+    faits.push({
+      quand: Date.parse(v.validated_at), genre: 'lecture',
+      texte: `<b>${escapeHtml(nomDe(v.membre_id))}</b> a lu ${escapeHtml(proc.titre || 'une procédure')}`,
+      detail: v.duree_lecture ? dureeLisible(v.duree_lecture) : '',
+    })
+  })
+
+  /* Les accès refusés. Seule source qui demande une requête — la table peut ne
+     pas exister encore, on se tait alors plutôt que d'échouer. */
+  if (currentMembre?.role === 'gestion') {
+    const { data } = await supabase
+      .from('demandes_acces')
+      .select('nom, email, created_at')
+      .eq('entreprise_id', currentMembre.entreprise_id)
+      .order('created_at', { ascending: false })
+      .limit(5)
+    ;(data || []).forEach(d => {
+      faits.push({
+        quand: Date.parse(d.created_at), genre: 'refus',
+        texte: `<b>${escapeHtml(d.nom || d.email || 'Quelqu\u2019un')}</b> n\u2019a pas pu vous rejoindre`,
+        detail: 'abonnement complet',
+      })
+    })
+  }
+
+  /* ═══ LES LECTURES NE DOIVENT PAS TOUT MANGER ═══
+
+     Une équipe de cinq personnes produit des dizaines de lectures par semaine,
+     là où une arrivée ou un refus d'accès est rare. Trié par date seule, le
+     bloc n'affichait que des lectures — et c'est justement l'événement le moins
+     urgent, celui qu'on retrouve en détail sur la page Analyse.
+
+     On en garde deux au plus. Le reste de la place revient à ce qui n'apparaît
+     nulle part ailleurs. */
+  const parDate = (a, b) => b.quand - a.quand
+  const lectures = faits.filter(f => f.quand && f.genre === 'lecture').sort(parDate).slice(0, 2)
+  const autres = faits.filter(f => f.quand && f.genre !== 'lecture').sort(parDate)
+
+  const recents = [...autres, ...lectures].sort(parDate).slice(0, 5)
+
+  if (!recents.length) { zone.innerHTML = ''; return }
+
+  const DESSINS = {
+    arrivee:   '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="19" y1="7" x2="19" y2="13"/><line x1="16" y1="10" x2="22" y2="10"/>',
+    promotion: '<path d="M12 3.2l2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.2 6.8 19.1 8 13.3l-4.4-4 5.9-.7z"/>',
+    lecture:   '<path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><path d="M8.8 16.6l2 2 4-4.4"/>',
+    refus:     '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="16.5" y1="7.5" x2="21.5" y2="12.5"/><line x1="21.5" y1="7.5" x2="16.5" y2="12.5"/>',
+  }
+
+  zone.innerHTML = `
+    <div class="rec-bloc">
+      <div class="rec-tete">
+        <span class="rec-pic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="8.8"/><path d="M12 6.8V12l3.6 2.2"/>
+          </svg>
+        </span>
+        <span class="rec-t">Dernières activités</span>
+      </div>
+      ${recents.map(f => `
+        <div class="act-l">
+          <span class="act-ic act-${f.genre}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">${DESSINS[f.genre]}</svg>
+          </span>
+          <span class="act-co">
+            <span class="act-tx">${f.texte}</span>
+            ${f.detail ? `<span class="act-de">${f.detail}</span>` : ''}
+          </span>
+          <span class="act-q">${depuisQuandCourt(f.quand)}</span>
+        </div>`).join('')}
+    </div>`
+}
+
+/* « 2 min », « 3 h », « hier », « 12 mars ». Court, parce que cette colonne est
+   étroite et qu'on ne la lit qu'en passant. */
+function depuisQuandCourt(t) {
+  if (!t) return ''
+  const m = Math.round((Date.now() - t) / 60000)
+  if (m < 2) return 'à l\u2019instant'
+  if (m < 60) return m + ' min'
+  const h = Math.round(m / 60)
+  if (h < 24) return h + ' h'
+  const j = Math.round(h / 24)
+  if (j === 1) return 'hier'
+  if (j < 8) return j + ' j'
+  return new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+}
+
 function renderAccueil() {
   peindreAnalyseEnCours()
+  peindreActivites()
   peindreDernieresProcedures()
   const salut = document.getElementById('accueil-salut')
   const mot = document.getElementById('accueil-mot')

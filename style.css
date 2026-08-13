@@ -106,7 +106,11 @@
     50%{ transform:scale(1.06); }
   }
 
-  .topbar-row{ display:flex; align-items:center; justify-content:center; gap:10px; }
+  /* EN COLONNE. La rangée était horizontale : les deux points se plaçaient
+     À CÔTÉ de la piste au lieu d'être dessous, poussés au bord droit de
+     l'écran. Un seul enfant — la barre de l'espace équipe — s'en trouve
+     simplement centré, ce qu'il était déjà. */
+  .topbar-row{ display:flex; flex-direction:column; align-items:center; justify-content:center; }
   /* Aucune matière ici : ni fond, ni flou, ni liseré, ni ombre. Il ne reste que
      la géométrie — la forme, la place, le remplissage.
 
@@ -284,12 +288,10 @@
        92 px laissaient donc VINGT pixels de vide sous elle, alors que le reste
        de l'app respire par des marges de 14 à 20.
 
-       On descend à 82 : dix pixels de jeu. À 74 la carte venait toucher la
-       pilule — deux objets qui flottent ont besoin de se voir séparés, sinon
-       ils paraissent collés l'un à l'autre.
-
-       La barre du haut ne bouge pas : c'est le contenu qui remonte. */
-    padding:82px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
+       La barre du haut mesure désormais 92 px — 16 de marge, 56 de pilule,
+       12 pour les deux points ajoutés dessous. À 87, la page passait CINQ
+       pixels au-dessus d'elle. On repart de sa hauteur réelle plus quinze. */
+    padding:107px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
@@ -5506,26 +5508,21 @@ body.plus-vu .liquide{ visibility:visible; }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
 
-/* LA CHUTE. Une goutte ne remonte pas son film : elle résiste en se détachant,
-   puis elle est happée. Le cou se reforme VERS LE BAS et la masse s'élargit à
-   l'impact — l'éclaboussure. */
-@keyframes couChute{
-  0%  { height:0;    width:12px; }
-  40% { height:44px; width:20px; }
-  72% { height:16px; width:calc(var(--plus-larg) * 0.85); }
-  100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
-}
 body.plus-vu .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) 0.06s; }
-body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
+/* Le même cou qu'à l'aller, joué à l'envers : la matière se reforme, s'étire,
+   puis s'éteint. `reverse` évite d'écrire une seconde suite d'images-clés qui
+   aurait fini par diverger de la première. */
+body.plus-part .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) reverse; }
 
 .bulle{
   position:absolute; left:var(--plus-cx); bottom:var(--plus-bas);
   width:var(--plus-larg); height:var(--plus-h);
   border-radius:calc(var(--plus-h) / 2); background:#F58A15;
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
-  /* Cet état est aussi celui du RETOUR : la courbe déclarée ici est donc celle
-     de la chute. Elle amorce vers le haut — le nombre négatif — puis tombe. */
-  transition:transform 0.26s cubic-bezier(0.5,-0.2,0.9,0.6),
+  /* Cet état est aussi celui du RETOUR. La courbe est désormais la MÊME qu'à
+     l'aller : le bouton redescend avec le même ressort, dépassant légèrement
+     sous la barre avant de se caler. Aller et retour se répondent. */
+  transition:transform 0.40s cubic-bezier(0.34,1.62,0.5,1),
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 
@@ -5545,8 +5542,8 @@ body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
      trop basse ferait un saut de taille au lieu d'une éclosion. */
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
   opacity:0; pointer-events:none;
-  transition:transform 0.26s cubic-bezier(0.5,-0.2,0.9,0.6),
-             opacity 0.1s linear 0.14s,
+  transition:transform 0.40s cubic-bezier(0.34,1.62,0.5,1),
+             opacity 0.1s linear 0.22s,
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 .plus-flot svg{ width:21px; height:21px; display:block; }
@@ -5650,6 +5647,35 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
    deux pièces flottent au-dessus de la page et doivent se ressembler — c'est
    ce qui dit qu'elles ne font pas partie du contenu.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ LA PISTE DU HAUT ═══
+   Deux panneaux, chacun de la largeur visible, calés au centre par le
+   navigateur. La carte d'origine à gauche, les établissements à droite. */
+.haut-piste{
+  display:flex; width:100%; min-width:0;
+  overflow-x:auto; overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none; -ms-overflow-style:none;
+}
+.haut-piste::-webkit-scrollbar{ display:none; }
+.haut-pan{
+  flex:0 0 100%;
+  display:flex; justify-content:center;
+  scroll-snap-align:center; scroll-snap-stop:always;
+}
+
+/* Les deux points. Sans eux, rien ne dit qu'un second panneau existe — on ne
+   glisse pas au hasard sur une barre qui n'a jamais bougé. */
+.haut-points{
+  display:flex; justify-content:center; gap:5px;
+  margin-top:7px; height:5px;
+}
+.haut-points span{
+  width:5px; height:5px; border-radius:50%;
+  background:rgba(255,255,255,0.16);
+  transition:background 0.22s, width 0.22s;
+}
+.haut-points span.on{ width:14px; border-radius:3px; background:rgba(255,173,51,0.75); }
+
 .topbar-pilule{
   position:relative; isolation:isolate;
   display:flex; align-items:center; gap:8px;

@@ -6341,16 +6341,17 @@ function dessinerAlerteEssai(hote) {
   const nbProc = (allGestionProcedures || []).length
   const nbMembres = (cachedMembres || []).length || 1
 
-  /* BLEU, PAS AMBRE. L'ambre signale une faute — un compte partagé en est une.
-     La fin d'un essai n'en est pas une : c'était prévu depuis le premier jour,
-     et le client n'a rien fait de mal. Un ambre employé partout ne signalerait
-     plus rien. */
+  /* Le raisonnement d'origine — bleu, parce qu'un essai qui se termine n'est
+     pas une faute — était juste, mais il n'a été appliqué qu'au DESSIN. La
+     plaque et le cadre sont ambre depuis le passage à cette palette : un trait
+     bleu au milieu ne se lisait plus comme un signal, seulement comme un
+     oubli. Le dessin rejoint donc son entourage. */
   zone.className = 'alerte-essai'
   zone.style.display = 'block'
   zone.innerHTML = `
     <div class="tete">
       <span class="pic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#4DA3FF" stroke-width="1.9"
+        <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.9"
              stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="9"/><polyline points="12 6.6 12 12 15.8 14.2"/>
         </svg>
@@ -11806,10 +11807,19 @@ function offrePourTaille(n) {
 }
 
 function planActuel() {
-  /* `abonnement_palier` d'abord : c'est la colonne que le webhook Stripe
-     renseigne au paiement. `plan` est l'ancien nom, gardé en second pour les
-     entreprises créées avant. */
-  return (cachedEntreprise?.abonnement_palier || cachedEntreprise?.plan || '').toLowerCase()
+  /* ═══ DEUX CONDITIONS, PAS UNE ═══
+
+     Cette fonction se rabattait sur la colonne `plan` quand `abonnement_palier`
+     était vide. Or `plan` vaut « pro » sur TOUTES les entreprises — c'est un
+     vestige qui n'a jamais été mis à jour. Résultat : n'importe quel compte,
+     même en essai, se croyait abonné au palier Pro. Et comme il n'a pas de
+     client Stripe derrière, « Gérer mon abonnement » échouait en 400.
+
+     On ne lit donc plus que `abonnement_palier`, et seulement si le statut dit
+     que l'abonnement est actif. Un palier sans statut actif, c'est un
+     abonnement résilié ou jamais payé. */
+  if (cachedEntreprise?.abonnement_statut !== 'actif') return ''
+  return (cachedEntreprise?.abonnement_palier || '').toLowerCase()
 }
 
 /* Le prix ramené au membre : c'est le seul chiffre qu'un restaurateur peut
@@ -11830,7 +11840,8 @@ function carteOffre(o, opts = {}) {
     <div class="offre-tete">
       <span class="offre-txt">
         <span class="offre-nom">${o.nom}</span>
-        <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `Jusqu'\u00e0 ${o.max} membres`}</span>
+        <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `Jusqu'\u00e0 ${o.max} membres`}${
+          o.analyses ? ` \u00b7 ${o.analyses} analyses vid\u00e9o / mois` : ''}</span>
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
@@ -11966,6 +11977,18 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      Stripe fait par défaut, et c'est juste. */
   const g = e.target.closest('[data-abo-gerer]')
   if (g) {
+    /* Sans client Stripe, il n'y a pas de portail à ouvrir : la fonction
+       serveur répondait 400 et l'app affichait une erreur brute. On le dit
+       nous-mêmes, en clair, avant d'appeler. */
+    if (!cachedEntreprise?.stripe_client_id) {
+      await confirmDialog({
+        titre: 'Aucun abonnement à gérer',
+        message: "Ce compte n'a pas encore d'abonnement payant. Choisissez une "
+          + "offre pour en activer un.",
+        confirmer: 'Compris', annuler: 'Fermer', danger: false,
+      })
+      return
+    }
     g.disabled = true
     const av = g.textContent
     g.textContent = 'Ouverture\u2026'

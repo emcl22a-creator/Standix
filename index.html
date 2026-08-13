@@ -336,37 +336,12 @@
          annoncerait « aucune analyse en cours » occuperait la place sans rien
          apprendre : mieux vaut qu'il n'existe pas. -->
     <div id="accueil-encours"></div>
+
+    <!-- Les trois dernières procédures créées. -->
+    <div id="accueil-recentes"></div>
   </div>
 
   <div class="screen" id="p-list">
-    <!-- ═══ DEUX GESTES, PAS UNE CARTE ═══
-
-         Il y avait ici la même carte d'ouverture que sur l'Accueil : titre,
-         phrase, bord allumé. Deux cartes de même forme sur deux onglets
-         voisins, et les pages se confondaient — sans compter qu'elle repoussait
-         la liste hors de l'écran.
-
-         Sur cette page, le contenu c'est la liste. Il ne reste donc que ce
-         qu'on ne peut pas y mettre : créer, et scanner. -->
-    <div class="p-gestes">
-      <button type="button" class="hero-cta" onclick="startNewProcedure()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
-             stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        Créer une procédure
-      </button>
-      <button type="button" class="hero-qr" aria-label="Scanner un QR code"
-              onclick="showGestionScreen('p-scan'); startScanner('gestion')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-             stroke-linejoin="round">
-          <rect x="3" y="3" width="7" height="7" rx="1.8"/>
-          <rect x="14" y="3" width="7" height="7" rx="1.8"/>
-          <rect x="3" y="14" width="7" height="7" rx="1.8"/>
-          <path d="M14 14h3.2v3.2H14zM17.8 17.8H21V21h-3.2zM14 19.4h2.2V21H14zM19.4 14H21v2.2h-1.6z"
-                fill="currentColor" stroke="none"/>
-        </svg>
-      </button>
-    </div>
-
     <div class="list-tools">
       <div class="section-title" style="margin:0;">Catégories</div>
       <div class="dd-filter" id="dd-cat-sort">
@@ -2061,6 +2036,15 @@
          un dégradé par échelle de dessin. `logoOr` pour le logo, qui vit dans
          un repère de 85 sur 100 ; `logoOrIc` pour toutes les icônes, qui
          vivent dans 24 sur 24. -->
+    <!-- LA FUSION. On floute, puis on durcit l'alpha : deux formes proches se
+         soudent, et quand elles s'éloignent le cou s'amincit jusqu'à rompre.
+         Rien n'est dessiné — c'est le seuil qui fabrique la goutte. -->
+    <filter id="fusion">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="flou"></feGaussianBlur>
+      <feColorMatrix in="flou" mode="matrix"
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="dur"></feColorMatrix>
+      <feComposite in="SourceGraphic" in2="dur" operator="atop"></feComposite>
+    </filter>
     <linearGradient id="logoOr" x1="0" y1="0" x2="85" y2="100" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FF6A00"></stop>
       <stop offset="0.6" stop-color="#FF9A1F"></stop>
@@ -2116,6 +2100,22 @@
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
 <svg id="svg-defs" width="0" height="0" style="position:absolute"></svg>
+
+<!-- ═══ LE BOUTON DE CRÉATION ═══
+
+     Trois plans, et l'ordre compte : la MATIÈRE sous la barre, la BARRE, puis
+     le BOUTON net au-dessus. C'est cet empilement qui fait que la goutte semble
+     traverser la barre — aucun masque, aucun découpage.
+
+     Le « + » ne peut pas passer par le filtre de fusion, il deviendrait flou :
+     d'où la séparation entre ce qui coule et ce qui se lit. -->
+<div class="liquide" aria-hidden="true"><span class="socle"></span><span class="bulle"></span></div>
+
+<button type="button" class="plus-flot" id="plus-flot"
+        aria-label="Créer une procédure" onclick="startNewProcedure()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+       stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+</button>
 
 <div class="glassDiv" id="bar">
   <div class="glassDiv" id="lens"><div id="lensGray"></div></div>
@@ -2333,8 +2333,14 @@ const LENS = {
   REST_W: 74,        // largeur au repos : 62 + 6 px de chaque cote
   REST_H: 46,
   // Ressort de position : la lentille a une vraie inertie.
-  STIFFNESS: 200,   // plus vif : la fin de course ne traine plus
-  DAMPING: 28,      // sur-amorti : aucun depassement de position
+  STIFFNESS: 340,   // plus vif : la fin de course ne traine plus.
+                    // Monte de 200 a 340 : le ressort converge en 1/racine(k),
+                    // soit un tiers de temps en moins. Sans danger ici — le pas
+                    // est plafonne a 1/45 s, et k x pas au carre vaut 0,17,
+                    // tres loin du seuil de divergence.
+  DAMPING: 37,      // sur-amorti : aucun depassement de position.
+                    // Cale sur la raideur : 2 x racine(340) = 36,9. Toute autre
+                    // valeur ferait depasser la cible ou trainer la fin.
   // Fenetre d'observation de la vitesse, comme accelerationWindowDuration
   // dans LiquidLensView (0.3 s).
   WINDOW_MS: 300,
@@ -2365,12 +2371,15 @@ const LENS = {
   LAND_A2: 0.10,     // 2e rebond : entre moyen et faible
   LAND_A3: 0.06,     // 3e rebond : faible
   LAND_A4: 0.03,     // 4e rebond : faible
-  LAND_PERIOD: 120,  // duree d'un rebond, en ms.
+  LAND_PERIOD: 80,  // duree d'un rebond, en ms.
                      // Ramene de 150 a 120 : les quatre rebonds sont tous
                      // joues, simplement plus serres. Le TRAJET n'est pas
                      // touche — seule la queue d'oscillation se raccourcit.
-  TRAVEL_MS: 560,    // > temps de convergence du ressort (450 ms)
-  LAND_MS: 480,      // exactement 4 x LAND_PERIOD : fin a zero.
+  TRAVEL_MS: 420,    // > temps de convergence du ressort (~345 ms).
+                     // Doit rester SUPERIEUR a cette convergence : plus court,
+                     // la capsule serait declaree arrivee alors qu'elle bouge
+                     // encore, et le rebond s'enchainerait en plein vol.
+  LAND_MS: 320,      // exactement 4 x LAND_PERIOD : fin a zero.
                      // Ce multiple doit etre EXACT : la quatrieme amplitude
                      // s'eteint pile a la fin. Un autre rapport couperait le
                      // dernier rebond en plein mouvement.
@@ -2508,7 +2517,15 @@ class ActiveLens {
         const rest = this.targetX - this.x;
         if (Math.abs(rest) > 0.4) {
           // convergence douce, la forme continue d'etre calculee plus bas
-          this.x += rest * Math.min(1, 6 * Math.min(dt, 1 / 45));
+          /* 14 et non 6. À 6, la capsule grignotait dix pour cent de l'écart
+             restant par image : plus de deux cents millisecondes après la fin
+             annoncée du trajet, pour parcourir moins d'un pixel. On ne voyait
+             pas ce glissement, on sentait seulement que ça n'en finissait pas.
+
+             À 14, la même approche se referme en moins de cent millisecondes.
+             Elle reste progressive — ce n'est pas un saut, ce qui produisait
+             justement l'à-coup que ce code corrigeait. */
+          this.x += rest * Math.min(1, 14 * Math.min(dt, 1 / 45));
           this.v = 0;
           this.deform = Math.max(0, this.deform * 0.85);
         } else {

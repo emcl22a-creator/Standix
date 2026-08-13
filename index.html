@@ -55,7 +55,15 @@
     position:absolute;
     border-radius:var(--glass-radius);
     isolation:isolate;
-    box-shadow:0px 4px var(--outer-shadow-blur) rgba(0,0,0,0.18);
+    /* Un filet clair d'un demi-pixel sur tout le contour, en plus de l'ombre
+       portée. Il dessine l'arête de la pièce là où la lumière la frôle : sans
+       lui, le verre se dissout dans le noir et la barre n'a plus de forme.
+
+       En ombre interne plutôt qu'en bordure : une bordure épaissirait la boîte
+       et décalerait tout ce qu'elle contient d'un demi-pixel. */
+    box-shadow:
+      0px 4px var(--outer-shadow-blur) rgba(0,0,0,0.18),
+      inset 0 0 0 0.5px var(--filet, rgba(255,255,255,0.13));
   }
   .glassDiv::before{
     content:'';position:absolute;inset:0;z-index:1;
@@ -82,10 +90,21 @@
      cote, soit 88,6 % de la largeur. Hauteur 62 pt.
      Ici : marge fixe de 23 pt, largeur bornee pour rester correcte
      du petit telephone a la tablette. */
+  /* Le rebond de l'onglet déjà actif. Court, sans dépassement : il accuse
+     réception, il ne réclame pas l'attention. */
+  @keyframes ongletRebond{
+    0%{ transform:scale(1) }
+    38%{ transform:scale(0.90) }
+    100%{ transform:scale(1) }
+  }
+  .tab.rebond{ animation:ongletRebond 0.42s cubic-bezier(0.34,1.56,0.64,1); }
+  @media (prefers-reduced-motion: reduce){ .tab.rebond{ animation:none } }
+
   #bar{
     /* FIXE : la barre reste sous le pouce au lieu de partir avec la page.
        En absolu elle se posait au bas du DOCUMENT. */
     position:fixed;
+    pointer-events:auto;
     left:50%;
     /* LE VOL : la zone sûre de l'appareil, plus 12 pt — la barre laisse passer
        le trait d'accueil sous elle. Le plancher de 23 px est la marge latérale
@@ -138,7 +157,9 @@
      fonction `svg()` du script qui porte maintenant la forme dans le canal
      alpha, au lieu de la porter en noir et blanc. */
   .layer{position:absolute;inset:0;z-index:20;pointer-events:none;}
-  .layer--normal{color:#CBCDCF;pointer-events:auto}
+  /* Plus de zone sensible ici : le découpage y ferait des trous. La barre s'en
+     charge, elle est d'un seul tenant. */
+  .layer--normal{color:#CBCDCF}
   /* L'ONGLET SOUS LA CAPSULE PORTE LA COULEUR DU LOGO.
 
      Deux techniques, parce qu'un dessin et un texte ne se peignent pas de la
@@ -288,78 +309,26 @@
     <div class="hero hero-ia">
       <span class="hero-lueur"></span>
 
-      <!-- UNE FEUILLE DE PROCÉDURE, ET L'ANNEAU DE L'APP POSÉ DESSUS.
+      <!-- Le dessin est une image, plus un tracé. Elle porte déjà son anneau,
+           donc celui du code n'a plus lieu d'être ici : deux anneaux côte à
+           côte, dont un seul réagit, serait pire que zéro.
 
-           L'anneau n'est pas redessiné : c'est le vrai, celui de `.ia-fig`,
-           avec son dégradé conique et sa rotation. Le reproduire en SVG aurait
-           donné deux marques à entretenir, qui auraient fini par diverger. -->
-      <span class="hero-scene" aria-hidden="true">
-        <svg viewBox="0 0 240 168" fill="none">
-          <defs>
-            <linearGradient id="hoFeuille" x1="66" y1="8" x2="176" y2="160" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFC46B"/><stop offset="0.52" stop-color="#FF9A1F"/><stop offset="1" stop-color="#9C4400"/>
-            </linearGradient>
-            <linearGradient id="hoOmbre" x1="0" y1="0" x2="1" y2="1">
-              <stop stop-color="#FF9A1F" stop-opacity="0.13"/><stop offset="1" stop-color="#FF6A00" stop-opacity="0.02"/>
-            </linearGradient>
-            <!-- Le voile de lumière : blanc en haut à gauche, rien ailleurs. -->
-            <linearGradient id="hoLumiere" x1="70" y1="12" x2="150" y2="120" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFFFFF" stop-opacity="0.26"/>
-              <stop offset="0.45" stop-color="#FFFFFF" stop-opacity="0.05"/>
-              <stop offset="1" stop-color="#000000" stop-opacity="0.10"/>
-            </linearGradient>
-            <linearGradient id="hoPli" x1="142" y1="14" x2="166" y2="39" gradientUnits="userSpaceOnUse">
-              <stop stop-color="#FFF0D8"/><stop offset="1" stop-color="#FFC98A"/>
-            </linearGradient>
-          </defs>
-
-          <!-- Deux feuilles derrière : une procédure en appelle d'autres. -->
-          <g transform="rotate(-13 120 84)" opacity="0.55">
-            <rect x="62" y="20" width="112" height="132" rx="13"
-                  fill="url(#hoOmbre)" stroke="#FFAD33" stroke-opacity="0.22"/>
-          </g>
-          <g transform="rotate(-6.5 120 84)" opacity="0.8">
-            <rect x="66" y="17" width="112" height="134" rx="13"
-                  fill="url(#hoOmbre)" stroke="#FFAD33" stroke-opacity="0.28"/>
-          </g>
-
-          <!-- La feuille rédigée. Trois couches lui donnent son épaisseur :
-               le dégradé de fond, un voile clair en haut à gauche d'où vient la
-               lumière, et une ombre portée sous elle. Le coin replié a sa
-               propre ombre — sans elle il paraît peint, pas plié. -->
-          <ellipse cx="122" cy="156" rx="58" ry="9" fill="#000" fill-opacity="0.34"/>
-          <g transform="rotate(2 120 84)">
-            <path d="M74 14h68l24 25v106a10 10 0 0 1-10 10H74a10 10 0 0 1-10-10V24a10 10 0 0 1 10-10z"
-                  fill="url(#hoFeuille)"/>
-            <path d="M74 14h68l24 25v106a10 10 0 0 1-10 10H74a10 10 0 0 1-10-10V24a10 10 0 0 1 10-10z"
-                  fill="url(#hoLumiere)"/>
-            <path d="M142 39l24 0-24-25z" fill="#000" fill-opacity="0.16"/>
-            <path d="M142 14v25h24z" fill="url(#hoPli)"/>
-            <g stroke="#FFF4E6" stroke-opacity="0.80" stroke-width="5" stroke-linecap="round">
-              <line x1="82" y1="60" x2="118" y2="60"/>
-              <line x1="82" y1="80" x2="148" y2="80"/>
-              <line x1="82" y1="100" x2="148" y2="100"/>
-              <line x1="82" y1="120" x2="130" y2="120"/>
-            </g>
-          </g>
-
-          <circle cx="30" cy="30" r="2.2" fill="#FFAD33" fill-opacity="0.6"/>
-          <circle cx="214" cy="140" r="1.8" fill="#FFC46B" fill-opacity="0.5"/>
-          <circle cx="206" cy="28" r="1.6" fill="#FFC46B" fill-opacity="0.4"/>
-        </svg>
-
-        <span class="hero-anneau">
-          <span class="ia-fig g"><span class="halo"></span><span class="lum"></span></span>
-        </span>
-      </span>
+           `alt` vide et `aria-hidden` : c'est un décor, un lecteur d'écran n'a
+           rien à en dire. Le titre juste en dessous porte le sens. -->
+      <img class="hero-img" src="accueil-ia.webp" alt="" aria-hidden="true"
+           width="700" height="495" decoding="async">
 
       <div class="hero-txt">
         <h2>Créer des procédures avec l’IA</h2>
         <p>Filmez le geste une seule fois. L’IA le découpe en étapes et les rédige.</p>
+        <!-- « Créer avec l'IA » plutôt que « Créer une procédure avec l'IA » :
+             le titre juste au-dessus dit déjà la phrase entière, et un bouton
+             qui répète son titre mot pour mot se lit deux fois pour rien.
+             La caméra, elle, reste : elle annonce le geste — on va filmer. -->
         <button type="button" class="hero-cta" onclick="ouvrirMontageVideo()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linejoin="round"><rect x="2.6" y="6" width="13" height="12" rx="2.6"/><path d="M15.6 11l5.8-3.4v8.8L15.6 13z"/></svg>
-          Filmer une procédure
+          Créer avec l’IA
         </button>
       </div>
     </div>
@@ -2807,7 +2776,10 @@ const barEl = document.getElementById('bar');
 // Elle ne part pas au clic : elle reagit au mouvement reel de la
 // capsule, filtre par un lissage. Elle enfle donc APRES elle et se
 // repose APRES elle, a son propre rythme.
-const BAR_SWELL = 0.032;   // +3,2 % : le grossissement se voit franchement
+const BAR_SWELL = 0.014;   // +1,4 % : on le sent sans le voir grossir.
+                           // À 3,2 % la barre entière enflait à chaque
+                           // changement de page — un mouvement de cette taille
+                           // sur un objet permanent finit par distraire.
 // Ressort critique plutot qu'un lissage exponentiel : sa VITESSE est
 // continue, donc le basculement de cible ne produit aucune saccade.
 // La cible est 1 tant que la capsule n'a pas touche, puis 0. Avec une
@@ -2816,11 +2788,18 @@ const BAR_SWELL = 0.032;   // +3,2 % : le grossissement se voit franchement
 // pages soient voisines ou opposees.
 const BAR_K = 1000;        // raideur elevee : montee et retour rapides,
                            // et amplitude quasi identique quelle que
-                           // soit la distance parcourue
+                           // soit la distance parcourue.
+                           //
+                           // NE PAS MONTER cette valeur. Le ressort est integre
+                           // pas a pas, avec un pas plafonne a 1/45 s. Au-dela
+                           // de ~1200, le calcul devient instable : il depasse
+                           // sa cible au lieu de la rejoindre. Essaye a 1900,
+                           // la barre gonflait de 13,8 % au lieu de 1,4.
+                           // La duree se regle par BAR_MIN_UP, pas par ici.
 // Duree minimale de montee. Entre deux onglets voisins, la capsule
 // touche la cible des le depart : sans ce plancher, la barre n'aurait
 // pas le temps de grossir et l'amplitude dependrait de la distance.
-const BAR_MIN_UP = 200;
+const BAR_MIN_UP = 70;
 let swellStart = 0;
 const BAR_D = 2 * Math.sqrt(BAR_K);   // amortissement critique, zero rebond
 let barFollow = 0;
@@ -2857,12 +2836,40 @@ requestAnimationFrame(() => {
 
 layout();
 const lens = new ActiveLens(CENTERS[0] - BAR_W / 2);
-lNorm.addEventListener('click', (e) => {
-  const t = e.target.closest('.tab');
-  if (!t) return;
-  active = +t.dataset.i;
+/* ═══ LE CLIC ÉCOUTE LA BARRE, PLUS LE CALQUE ═══
+
+   Le calque gris est découpé par `clip-path` pour laisser voir le calque blanc
+   sous la capsule. Or `clip-path` ne découpe pas que l'image : il découpe aussi
+   la zone sensible. Le trou tombait pile sur l'onglet actif, qui devenait donc
+   intouchable — ni animation, ni navigation, rien.
+
+   On écoute la barre elle-même, qui n'est pas découpée, et on déduit l'onglet
+   de l'endroit touché. Les onglets font tous la même largeur : une division
+   suffit. Aucune dépendance à ce que le découpage laisse passer. */
+barEl.addEventListener('click', (e) => {
+  const r = barEl.getBoundingClientRect();
+  const i = Math.max(0, Math.min(LABELS.length - 1,
+    Math.floor((e.clientX - r.left - PAD) / LENS.REST_W)));
+
+  const memeOnglet = i === active;
+  active = i;
   lens.goTo(CENTERS[active] - BAR_W / 2);
   swellStart = performance.now();
+
+  /* Toucher l'onglet où l'on est déjà ne déplace pas la capsule : sans réponse,
+     on croit que le doigt n'a pas porté. Un rebond bref le dit, et le routeur
+     ramène à la page principale de la section. */
+  if (memeOnglet) {
+    [lNorm, lLens].forEach(c => {
+      const t = c.querySelectorAll('.tab')[i];
+      if (!t) return;
+      t.classList.remove('rebond');
+      void t.offsetWidth;
+      t.classList.add('rebond');
+      setTimeout(() => t.classList.remove('rebond'), 420);
+    });
+  }
+
   if (typeof onNavigate === 'function') onNavigate(active);
 });
 

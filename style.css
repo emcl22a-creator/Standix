@@ -5429,8 +5429,11 @@
   --plus-monte:-6px;
   /* UNE SEULE COURBE, UNE SEULE DURÉE, pour l'aller comme pour le retour.
      C'est ce qui garantit qu'ils se répondent. */
-  --plus-duree:0.36s;
-  --plus-courbe:cubic-bezier(0.34, 1.62, 0.5, 1);
+  /* 280 ms, et un ressort discret : le bouton dépasse de trois pixels au lieu
+     de six. Le grand rebond appelait l'attention sur un objet qui n'a rien à
+     annoncer — il se pose, c'est tout. */
+  --plus-duree:0.28s;
+  --plus-courbe:cubic-bezier(0.34, 1.32, 0.5, 1);
 }
 
 /* La matière. Sous la barre — c'est ce qui la fait passer au travers. */
@@ -5451,20 +5454,19 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
   border-radius:20px; background:#F58A15;
 }
 
-/* LE COU PART DE ZÉRO ET Y REVIENT.
+/* UNE GOUTTE QUI SE FORME, PAS QUI TOMBE.
 
-   C'était le défaut : la première image le posait déjà à 22 px, et il naissait
-   d'un coup sous un bouton encore caché. Il monte maintenant depuis rien,
-   s'étire jusqu'à 58, s'affine jusqu'au fil de six pixels, puis rompt.
+   Le cou montait à 58 px et s'affinait jusqu'au fil de six : c'était une goutte
+   qui s'étire et se rompt, longue et théâtrale. Trop.
 
-   240 ms contre 360 pour le bouton : le fil casse à mi-course et le bouton
-   finit son ressort seul. C'est ce que fait une vraie goutte. */
+   Ici, une simple enflure. La matière gonfle sous le bouton, l'accompagne un
+   court instant, et se résorbe. Elle reste LARGE — 34 px au plus mince contre
+   six avant : c'est ce qui distingue une formation d'une chute. Rien ne
+   s'étire, rien ne casse. */
 @keyframes couGoutte{
-  0%  { height:0;    width:calc(var(--plus-larg) * 0.5); }
-  22% { height:44px; width:26px; }
-  52% { height:58px; width:18px; }
-  82% { height:28px; width:6px;  }
-  100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
+  0%  { height:0;    width:calc(var(--plus-larg) * 0.55); }
+  45% { height:26px; width:38px; }
+  100%{ height:0;    width:calc(var(--plus-larg) * 0.55); }
 }
 /* ═══ LE COU N'A PAS LE MÊME TEMPO DANS LES DEUX SENS ═══
 
@@ -5480,10 +5482,10 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
    Le cou vit maintenant pendant que le bouton est encore là. Ce n'est pas une
    asymétrie de style, c'est la conséquence du découpage. */
 body.plus-vu .socle{
-  animation:couGoutte 0.24s cubic-bezier(0.5, 0, 0.3, 1) 0.06s;
+  animation:couGoutte 0.17s cubic-bezier(0.4, 0, 0.4, 1) 0.05s;
 }
 body.plus-part .socle{
-  animation:couGoutte 0.17s cubic-bezier(0.4, 0, 0.35, 1);
+  animation:couGoutte 0.15s cubic-bezier(0.4, 0, 0.4, 1);
 }
 
 /* La bulle double le bouton dans la matière. Même repère — l'arête de la barre

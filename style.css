@@ -214,9 +214,14 @@
   .alerte-essai .s{ font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:11px; }
   .alerte-essai .s b{ color:#fff; font-weight:650; }
   .alerte-essai .actions{ display:flex; gap:8px; margin-top:13px; }
+  /* Même matière que tous les gestes principaux de l'app. Il était resté blanc,
+     comme l'était `.btn` avant qu'on ne le passe à l'ambre : deux styles pour un
+     même rang, et l'œil ne sait plus lequel est LE geste. */
   .alerte-essai .principal{
     flex:1; height:38px; border:none; border-radius:12px;
-    background:#fff; color:#000; font-family:inherit; font-size:13px; font-weight:700;
+    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    color:#2A1400; font-family:inherit; font-size:13px; font-weight:750;
+    box-shadow:0 5px 15px rgba(255,122,24,0.22);
   }
   .alerte-essai .secondaire{
     height:38px; padding:0 15px; border-radius:12px;

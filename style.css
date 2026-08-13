@@ -5461,11 +5461,24 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
   82% { height:28px; width:6px;  }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
-/* 60 ms de retard : le bouton doit avoir franchi l'arête avant que la matière
-   ne se montre. Sans ce décalage, on voit la goutte avant le rectangle. */
-body.plus-vu .socle,
-body.plus-part .socle{
+/* ═══ LE COU N'A PAS LE MÊME TEMPO DANS LES DEUX SENS ═══
+
+   À L'ENTRÉE, 60 ms de retard : le bouton doit avoir franchi l'arête avant que
+   la matière ne se montre, sinon on voit la goutte avant le rectangle.
+
+   À LA SORTIE, aucun retard et c'est plus court. Le cadre coupe le bouton dès
+   qu'il repasse sous l'arête — vers soixante millisecondes — alors que le cou
+   culminait à deux cents. On voyait donc la goutte s'agiter SEULE, sans le
+   rectangle : les deux sens paraissaient différents alors que la courbe était
+   la même.
+
+   Le cou vit maintenant pendant que le bouton est encore là. Ce n'est pas une
+   asymétrie de style, c'est la conséquence du découpage. */
+body.plus-vu .socle{
   animation:couGoutte 0.24s cubic-bezier(0.5, 0, 0.3, 1) 0.06s;
+}
+body.plus-part .socle{
+  animation:couGoutte 0.17s cubic-bezier(0.4, 0, 0.35, 1);
 }
 
 /* La bulle double le bouton dans la matière. Même repère — l'arête de la barre

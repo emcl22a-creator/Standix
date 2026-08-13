@@ -7196,8 +7196,33 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
     // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
     const path = `${base}_${aiVideoFile.name}`
+    /* ═══ UN ENVOI QUI NE RÉPOND JAMAIS ═══
+
+       Sans limite de temps, une requête qui reste en suspens laisse l'anneau
+       tourner indéfiniment : rien à lire, rien à corriger. On lui accorde
+       quatre-vingt-dix secondes — trois mégaoctets en prennent deux, même sur
+       un réseau médiocre — puis on le dit.
+
+       On trace aussi le fichier : son nom, son type et son poids. Un nom vide
+       ou un type inattendu suffisent à faire échouer un dépôt, et c'est
+       invisible autrement. */
+    console.log('[envoi] fichier', {
+      nom: aiVideoFile.name, type: aiVideoFile.type,
+      poids: aiVideoFile.size, chemin: path,
+    })
     etape(`envoi de ${poidsLisible(aiVideoFile.size)} vers le stockage…`)
-    const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile, { cacheControl: CACHE_LONG })
+
+    const limite = (promesse, secondes, quoi) => Promise.race([
+      promesse,
+      new Promise((_, rejeter) => setTimeout(
+        () => rejeter(new Error(`${quoi} : aucune réponse après ${secondes} s.`)),
+        secondes * 1000)),
+    ])
+
+    const { error: uploadError } = await limite(
+      supabase.storage.from('procedo-videos')
+        .upload(path, aiVideoFile, { cacheControl: CACHE_LONG }),
+      90, "L'envoi de la vidéo")
     if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
     etape(`vidéo envoyée en ${chrono()}`)
     /* On garde le CHEMIN, pas une URL publique. Le bucket est privé depuis le
@@ -7237,8 +7262,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        pourquoi. */
     if (urlPourAnalyse === videoUrl) {
       etape('préparation du lien d’analyse…')
-      const { data: sigVid } = await supabase.storage.from('procedo-videos')
-        .createSignedUrl(videoUrl, 6 * 3600)
+      const { data: sigVid } = await limite(supabase.storage.from('procedo-videos')
+        .createSignedUrl(videoUrl, 6 * 3600), 30, 'La préparation du lien')
       if (!sigVid?.signedUrl) throw new Error("Impossible de pr\u00e9parer la vid\u00e9o pour l'analyse.")
       urlPourAnalyse = sigVid.signedUrl
     }

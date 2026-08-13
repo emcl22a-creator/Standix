@@ -313,7 +313,18 @@
   }
   /* La barre flottante mesure 66 px : le bas de page doit la dépasser, sinon la
      dernière ligne se lit à travers le verre. */
-  #p-global-analyse{ padding-bottom:calc(110px + max(20px, env(safe-area-inset-bottom))) !important; }
+  /* L'ESPACE DU HAUT, RAMENÉ À QUINZE PIXELS.
+
+     La carte du logo s'arrête cinq pixels plus haut sur cette page que sur les
+     autres — elle n'y porte pas le même contenu. Le retrait commun de 87 px y
+     laissait donc VINGT pixels de vide au lieu de quinze.
+
+     82 rétablit la mesure, et rapproche du même coup le bouton d'information de
+     la carte : c'est le premier élément de la page, il se cale sur elle. */
+  #p-global-analyse{
+    padding-top:82px !important;
+    padding-bottom:calc(110px + max(20px, env(safe-area-inset-bottom))) !important;
+  }
   #p-membre .an-tete{ margin-top:30px !important; padding-top:22px !important; }
   .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
 

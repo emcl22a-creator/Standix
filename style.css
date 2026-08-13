@@ -5483,10 +5483,15 @@ body.plus-vu .liquide{ visibility:visible; }
 
    Le cou démarre maintenant avec 50 ms de retard et ne monte qu'à 52 px, en
    deçà du bouton : c'est lui qui est tiré, pas lui qui tire. */
+/* Le cou doit avoir FINI avant le bouton, pas après. Il montait à 52 px et
+   traînait cent millisecondes au-delà de l'arrivée : la goutte restait pendue
+   sous un bouton déjà posé, et c'est elle qu'on regardait en dernier.
+
+   Il culmine maintenant à 42 et s'éteint à 230 ms, quand le bouton se pose. */
 @keyframes couMonte{
-  0%  { height:22px; width:calc(var(--plus-larg) * 0.5); }
-  45% { height:52px; width:26px; }
-  78% { height:30px; width:11px; }
+  0%  { height:16px; width:calc(var(--plus-larg) * 0.5); }
+  40% { height:42px; width:24px; }
+  74% { height:22px; width:10px; }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
 
@@ -5499,7 +5504,7 @@ body.plus-vu .liquide{ visibility:visible; }
   72% { height:16px; width:calc(var(--plus-larg) * 0.85); }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
-body.plus-vu .socle{ animation:couMonte 0.26s cubic-bezier(0.34,0.9,0.4,1) 0.05s; }
+body.plus-vu .socle{ animation:couMonte 0.17s cubic-bezier(0.34,0.9,0.4,1) 0.07s; }
 body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
 
 .bulle{
@@ -5538,11 +5543,20 @@ body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
 /* 260 ms, comme le changement de page : les deux mouvements se terminent
    ensemble. La montée décélère, sans dépassement — c'est la chute qui porte
    l'effet, pas l'arrivée. */
+/* L'OPACITÉ MONTE PRESQUE D'UN COUP.
+
+   À 100 ms de fondu, le bouton n'était qu'à moitié visible quand le cou
+   apparaissait : on voyait donc la goutte AVANT le rectangle, alors que c'est
+   l'inverse qu'on veut. À 60 ms il est solide dès le départ et c'est lui qui
+   mène — le cou le suit.
+
+   Ce réglage ne vaut que pour la montée : la chute garde son fondu retardé,
+   déclaré sur l'état de repos. */
 body.plus-vu .bulle,
 body.plus-vu .plus-flot{
   transform:translate(-50%, var(--plus-monte)) scale(1);
   transition:transform 0.26s cubic-bezier(0.34,0.9,0.4,1),
-             opacity 0.1s linear,
+             opacity 0.04s linear,
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }

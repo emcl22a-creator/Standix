@@ -1085,10 +1085,18 @@
          Les minutes se lisent maintenant directement dans chaque section :
          c'est là qu'on se demande comment elles sont comptées, pas dans un
          encadré séparé qui redisait le total. -->
-    <div class="an-aide-seule">
-      <button type="button" class="an-aide" data-aide-temps="" aria-label="Comment le temps est compté">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>
-      </button>
+    <!-- Le titre de la page et son compte. Le bouton d'explication partage la
+         ligne du compte : c'est ce compte qu'il explique, et lui donner une
+         ligne à lui seul gaspillerait de la hauteur pour un rond de 26 px. -->
+    <div class="page-tete">
+      <h1>Analyse</h1>
+      <div class="tete-bas">
+        <p id="an-compte">—</p>
+        <button type="button" class="an-aide" data-aide-temps=""
+                aria-label="Comment le temps est compté">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>
+        </button>
+      </div>
     </div>
 
     <!-- L'équipe passe en dernier. Les deux premières sections disent où part le
@@ -1404,7 +1412,7 @@
 
   <div class="screen" id="p-settings">
     <div class="detail-header">
-            <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+            <h1 class="pagehead" style="margin:0; font-size:20px;">Réglages</h1>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -1799,7 +1807,7 @@
   <div class="screen" id="e-settings">
     <div class="pagehead-row">
       
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Réglages</h1>
     </div>
 
     <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">

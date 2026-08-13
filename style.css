@@ -336,6 +336,23 @@
   .screen.nait .an-lig{
     animation:none !important;
   }
+  /* ═══ LE CHANGEMENT D'ONGLET ═══
+     Un fondu, rien d'autre. 180 ms : assez pour que l'œil enregistre que la
+     page a changé, trop court pour qu'on attende. Aucun déplacement — un
+     onglet ne vient de nulle part, il remplace. */
+  .screen.fondu{ animation:ecranFondu 0.18s ease-out; }
+  @keyframes ecranFondu{ from{ opacity:0 } to{ opacity:1 } }
+
+  /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux
+     animations superposées feraient exactement ce qu'on cherche à éviter. */
+  .screen.fondu .sop-card,
+  .screen.fondu .emp-row,
+  .screen.fondu .cat-cell,
+  .screen.fondu .proc-rich-card,
+  .screen.fondu .reg-groupe,
+  .screen.fondu .an-bloc,
+  .screen.fondu .hero{ animation:none !important; }
+
   @keyframes ecranNait{
     0%{ opacity:0; transform:scale(0.32); border-radius:34px; }
     38%{ opacity:1; }
@@ -344,6 +361,7 @@
 
   /* Le mouvement se coupe si le système demande moins d'animation. */
   @media (prefers-reduced-motion: reduce){
+    .screen.fondu{ animation:none; }
     .screen.active.nait{ animation:none; }
   }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
@@ -5070,11 +5088,17 @@
    ═══════════════════════════════════════════════════════════════════════ */
 .topbar-card{
   /* Ni fond ni bordure propres : tout vient des pseudo-éléments, comme dans
-     `.glassDiv`. Une bordure en plus du creux ferait un double contour. */
+     `.glassDiv`. Une bordure en plus du creux ferait un double contour.
+
+     Le filet clair est le MÊME que celui de la barre du bas, à la même valeur :
+     les deux pièces doivent avoir la même arête, sinon l'une paraît posée sur
+     l'écran et l'autre creusée dedans. */
   background:none;
   border:none;
   isolation:isolate;
-  box-shadow:0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18);
+  box-shadow:
+    0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18),
+    inset 0 0 0 0.5px var(--filet, rgba(255,255,255,0.13));
 }
 /* La teinte et le creux : c'est ce qui donne l'épaisseur au verre. Sans le
    `inset` négatif, on obtient une vitre plate. */
@@ -5246,60 +5270,27 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    LA CARTE DE L'ACCUEIL
 
-   Même matière et même bord que celle des Procédures, composition inverse : le
-   dessin d'abord, sur toute la largeur, le texte ensuite. C'est ce qui empêche
-   les deux pages de se confondre — elles ont la même peau, pas la même forme.
+   Même matière et même bord que celle des Procédures, composition inverse :
+   le dessin d'abord, le texte ensuite. Les deux cartes ont la même peau, pas
+   la même forme — c'est ce qui empêche les deux pages de se confondre.
    ═══════════════════════════════════════════════════════════════════════════ */
-.hero-ia{ padding:0 0 20px; }
+.hero-ia{ padding:16px 0 20px; }
 .hero-ia .hero-txt{ padding:0 20px; }
-/* 21 px : à 22, « l'IA » basculait seul sur la ligne suivante. Un titre qui
-   se coupe sur son dernier mot se lit deux fois. */
 .hero-ia h2{ font-size:20px; letter-spacing:-0.045em; }
 
-.hero-scene{
-  position:relative; z-index:2; display:block;
-  padding:14px 20px 4px;
-}
-.hero-scene svg{ width:100%; height:auto; display:block; }
+/* 74 % de la largeur, centrée. À 100 % la carte montait à 430 px et mangeait
+   la moitié de l'écran ; ici elle en fait 383 et le reste de la page tient
+   encore. L'image respire au lieu de remplir.
 
-/* L'anneau se pose en bas à droite de la feuille, là où l'on signe. C'est ce
-   qu'il dit : ce document a été écrit par l'IA. Il tourne en permanence, comme
-   partout ailleurs dans l'app. */
-.hero-anneau{
-  position:absolute; right:19%; bottom:9%;
-  display:grid; place-items:center;
-  /* Aucun fond. Le centre de l'anneau est réellement évidé : la feuille doit
-     transparaître au travers, sinon il ressemble à un bouton posé dessus. Une
-     plaque sombre derrière lui, et c'est un trou noir. */
-  filter:drop-shadow(0 6px 16px rgba(0,0,0,0.5));
-}
-/* 78 px écrasait la feuille. À 56 il la signe sans la couvrir. */
-.hero-anneau .ia-fig{ width:56px; height:56px; --trait:6.5px; }
-
-/* IMMOBILE ICI, ET SEULEMENT ICI.
-
-   Ailleurs l'anneau tourne parce qu'il dit « ça travaille en ce moment ».
-   Sur cette carte il ne travaille pas : il signe. Un mouvement perpétuel sur
-   un écran d'accueil attire l'œil en permanence vers un objet qui n'a rien à
-   annoncer, et fatigue.
-
-   La rotation figée place la partie ambrée en bas à droite, du côté du coin
-   replié — sinon elle s'arrêterait n'importe où selon l'instant du chargement. */
-.hero-anneau .ia-fig .lum{
-  animation:none;
-  transform:rotate(-145deg);
-}
-/* Le halo reste, décalé de 25° derrière la partie ambrée. C'est ce décalage
-   qui fait la traîne : l'œil lit un objet qui vient de tourner et s'est
-   arrêté, au lieu d'un cercle simplement posé là. Le mouvement est suggéré,
-   pas joué — on garde l'impression sans l'agitation. */
-.hero-anneau .ia-fig .halo{
-  animation:none;
-  transform:rotate(-172deg);
-  opacity:0.62;
+   `width` et `height` sont déclarés dans le balisage : sans eux, la page se
+   décale au moment où l'image arrive, et le titre saute sous les yeux. */
+.hero-img{
+  display:block; width:74%; height:auto;
+  margin:0 auto 10px;
+  pointer-events:none; user-select:none;
 }
 
 @media (max-width: 360px){
-  .hero-ia h2{ font-size:20px; }
-  .hero-scene{ padding:12px 16px 2px; }
+  .hero-ia h2{ font-size:18.5px; }
+  .hero-img{ width:66%; }
 }

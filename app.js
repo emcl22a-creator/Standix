@@ -5114,6 +5114,19 @@ function renderCategoryGrid() {
   const oldRects = captureCardPositions(catGridEl)
   catGridEl.innerHTML = ''
 
+  /* Le compte de la page. On l'écrit ici plutôt qu'ailleurs : c'est la fonction
+     qui connaît déjà les deux nombres, et les tenir à jour depuis deux endroits
+     est le meilleur moyen qu'ils finissent par diverger. */
+  const compte = document.getElementById('proc-compte')
+  if (compte) {
+    const nbP = (allGestionProcedures || []).length
+    const nbC = new Set((allGestionProcedures || [])
+      .map(p => (p.categorie || '').trim()).filter(Boolean)).size
+    compte.textContent = nbP
+      ? `${nbP} procédure${nbP > 1 ? 's' : ''} \u00b7 ${nbC} catégorie${nbC > 1 ? 's' : ''}`
+      : 'Aucune procédure pour le moment'
+  }
+
   // Départage systématique par ordre alphabétique : sans ça, deux catégories
   // dont les procédures ont été créées à la même seconde restaient dans
   // l'ordre où la base les avait renvoyées, et changer de tri ne bougeait

@@ -4770,11 +4770,15 @@ async function peindreDernieresProcedures() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES DERNIÈRES ACTIVITÉS DE L'ENTREPRISE
+   LES MOUVEMENTS DE L'ÉQUIPE
 
-   Quatre sources, toutes déjà en mémoire sauf une : les arrivées, les
-   promotions, les lectures, et les accès refusés faute de place. On les mêle,
-   on trie par date, on garde les cinq plus récentes.
+   Qui entre, qui change de rang, qui n'a pas pu entrer. RIEN D'AUTRE.
+
+   Les lectures et les créations de procédure ont été retirées : elles se
+   comptent par dizaines chaque semaine et noyaient les mouvements, qui eux sont
+   rares. Et elles ont déjà leur place — la page Analyse pour les lectures, le
+   bloc juste au-dessus pour les créations. Un bloc qui répète ce que deux
+   autres disent mieux ne sert qu'à remplir.
 
    CE QUI MANQUE, ET POURQUOI : les départs et les retraits. Quand on retire
    quelqu'un, la ligne de `membres` est effacée — il ne reste ni son nom, ni la
@@ -4815,30 +4819,30 @@ async function collecterActivites() {
     })
   })
 
-  /* Les lectures. Une par personne et par procédure : dix lignes « Karim a lu »
-     d'affilée noieraient tout le reste. */
-  const vues = new Set()
-  ;(cachedValidations || []).forEach(v => {
-    const cle = v.membre_id + '|' + v.procedure_id
-    if (vues.has(cle)) return
-    vues.add(cle)
-    const proc = (allGestionProcedures || []).find(p => p.id === v.procedure_id)
-    if (!proc) return
-    faits.push({
-      quand: Date.parse(v.validated_at), genre: 'lecture',
-      texte: `<b>${escapeHtml(nomDe(v.membre_id))}</b> a lu ${escapeHtml(proc.titre || 'une procédure')}`,
-      detail: v.duree_lecture ? dureeLisible(v.duree_lecture) : '',
-    })
-  })
+  /* ═══ LES DÉPARTS ET LES RETRAITS ═══
 
-  ;(allGestionProcedures || []).forEach(p => {
-    if (!p.created_at) return
-    faits.push({
-      quand: Date.parse(p.created_at), genre: 'creation',
-      texte: `<b>${escapeHtml(p.titre || 'Une procédure')}</b> a été créée`,
-      detail: p.categorie ? escapeHtml(p.categorie) : '',
+     Ils ne peuvent pas se déduire de `membres` : la ligne est effacée. C'est le
+     journal `mouvements` qui les garde, écrit au moment du geste. La table peut
+     ne pas exister encore — on se tait alors plutôt que d'échouer. */
+  {
+    const { data } = await supabase
+      .from('mouvements')
+      .select('genre, nom, poste, par_nom, created_at')
+      .eq('entreprise_id', currentMembre?.entreprise_id)
+      .order('created_at', { ascending: false })
+      .limit(40)
+    ;(data || []).forEach(m => {
+      const qui = `<b>${escapeHtml(m.nom || 'Quelqu\u2019un')}</b>`
+      faits.push({
+        quand: Date.parse(m.created_at), genre: m.genre === 'depart' ? 'depart' : 'retrait',
+        texte: m.genre === 'depart'
+          ? `${qui} a quitté l\u2019équipe`
+          : `${qui} a été retiré\u00b7e de l\u2019équipe`,
+        detail: [m.poste, m.par_nom ? 'par ' + escapeHtml(m.par_nom) : null]
+          .filter(Boolean).map(escapeHtml).join(' \u00b7 '),
+      })
     })
-  })
+  }
 
   /* Seule source qui demande une requête — la table peut ne pas exister
      encore, on se tait alors plutôt que d'échouer. */
@@ -4867,6 +4871,8 @@ const ACT_DESSINS = {
   lecture:   '<path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><path d="M8.8 16.6l2 2 4-4.4"/>',
   creation:  '<path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><line x1="11.8" y1="12" x2="11.8" y2="17"/><line x1="9.3" y1="14.5" x2="14.3" y2="14.5"/>',
   refus:     '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="16.5" y1="7.5" x2="21.5" y2="12.5"/><line x1="21.5" y1="7.5" x2="16.5" y2="12.5"/>',
+  depart:    '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><path d="M17.5 9.5 21 13l-3.5 3.5"/><line x1="21" y1="13" x2="15" y2="13"/>',
+  retrait:   '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="15.5" y1="11" x2="22" y2="11"/>',
 }
 
 /* La MÊME ligne que sur la page Analyse : `an-lig`, avec son nom, son
@@ -4896,14 +4902,7 @@ async function peindreActivites() {
 
   const faits = await collecterActivites()
 
-  /* LES LECTURES NE DOIVENT PAS TOUT MANGER. Une équipe en produit des dizaines
-     par semaine, là où une arrivée est rare. Triées par date seule, elles
-     occupaient les trois lignes — et c'est l'événement le moins urgent, celui
-     qu'on retrouve en détail sur la page Analyse. On en garde une. */
-  const parDate = (a, b) => b.quand - a.quand
-  const lectures = faits.filter(f => f.genre === 'lecture').slice(0, 1)
-  const autres = faits.filter(f => f.genre !== 'lecture')
-  const recents = [...autres, ...lectures].sort(parDate).slice(0, 3)
+  const recents = faits.slice(0, 3)
 
   /* Même règle que le bloc au-dessus : il reste, avec une phrase à la place
      des lignes. */
@@ -4917,10 +4916,10 @@ async function peindreActivites() {
             <circle cx="12" cy="12" r="8.8"/><path d="M12 6.8V12l3.6 2.2"/>
           </svg>
         </span>
-        <b>Dernières activités</b>
+        <b>Mouvements de l\u2019équipe</b>
       </div>
-      ${!recents.length ? `<div class="an-vide">Les arrivées, les lectures et les
-        créations s\u2019afficheront ici.</div>` : ''}
+      ${!recents.length ? `<div class="an-vide">Les arrivées, les départs et les changements
+        de rang s\u2019afficheront ici.</div>` : ''}
       ${recents.map(ligneActivite).join('')}
       ${faits.length > recents.length
         ? `<button type="button" class="an-plus" id="act-plus">Voir plus</button>` : ''}
@@ -4965,7 +4964,7 @@ window.ouvrirActivites = async function () {
      petites capitales, puis les lignes. Sans l'anneau — il répartirait un total
      entre des parts, et une activité ne se répartit pas. */
   zone.innerHTML = `
-    <div class="fm-titre">Ce qui s\u2019est passé</div>
+    <div class="fm-titre">Les mouvements</div>
     ${morceaux.join('')}
     <div class="fm-periode-mot">${faits.length} activité${faits.length > 1 ? 's' : ''}
       sur ${Math.round(ACTIVITES_JOURS / 7)} semaines</div>`
@@ -13379,6 +13378,23 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
     danger: true,
   })
   if (!ok) return
+
+  /* ═══ ON ÉCRIT AVANT D'EFFACER ═══
+
+     La ligne de `membres` va disparaître : après, il ne reste ni le nom, ni la
+     date, ni qui a retiré. Une information qu'on n'écrit pas ne se retrouve
+     pas. On la consigne donc d'abord — si le journal n'existe pas encore en
+     base, on n'empêche pas le retrait pour autant. */
+  await supabase.from('mouvements').insert({
+    entreprise_id: currentMembre.entreprise_id,
+    genre: 'retrait',
+    nom: btn.dataset.nom || cible?.nom || null,
+    poste: cible?.poste || null,
+    par_nom: currentMembre.nom || null,
+  }).then(({ error: e }) => {
+    if (e) console.warn('[mouvements] non consigné :', e.message)
+  })
+
   const { error } = await supabase.from('membres').delete().eq('id', btn.dataset.membre)
   /* `alert()` ouvre la boîte du navigateur : elle porte le nom du site, ne suit
      pas le thème sombre, et casse net l'impression d'application. Le toast dit

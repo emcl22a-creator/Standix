@@ -322,12 +322,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Deux points : on ne devine pas qu'un panneau se cache à droite tant
-           que rien ne le dit. -->
-      <div class="haut-points" id="haut-points" aria-hidden="true">
-        <span class="on"></span><span></span>
-      </div>
     </div>
   </div>
 
@@ -359,12 +353,6 @@
         <p>Filmez le geste une seule fois. L’IA le découpe en étapes et les rédige.</p>
       </div>
     </div>
-
-    <!-- ═══ L'ANALYSE EN COURS ═══
-         Vide et masqué tant qu'aucune analyse ne tourne. Un cadre qui
-         annoncerait « aucune analyse en cours » occuperait la place sans rien
-         apprendre : mieux vaut qu'il n'existe pas. -->
-    <div id="accueil-encours"></div>
 
     <!-- Les trois dernières procédures créées. -->
     <div id="accueil-recentes"></div>
@@ -1428,10 +1416,7 @@
 
   <div class="screen" id="p-settings">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-list')" aria-label="Retour">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
+            <h1 class="pagehead" style="margin:0; font-size:20px;">Paramètres</h1>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -2159,11 +2144,19 @@
      d'où la séparation entre ce qui coule et ce qui se lit. -->
 <div class="liquide" aria-hidden="true"><span class="socle"></span><span class="bulle"></span></div>
 
+<!-- LE CADRE QUI COUPE.
+
+     Le bouton est au plan 11, donc AU-DESSUS de la barre : en montant, il se
+     dessinait par-dessus elle. Ce cadre s'arrête à l'arête haute de la barre et
+     masque tout ce qui dépasse en dessous — le bouton n'existe donc à l'écran
+     qu'à partir du moment où il émerge. -->
+<div class="plus-cadre" aria-hidden="false">
 <button type="button" class="plus-flot" id="plus-flot"
         aria-label="Créer une procédure" onclick="startNewProcedure()">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
        stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
+</div>
 
 <div class="glassDiv" id="bar">
   <div class="glassDiv" id="lens"><div id="lensGray"></div></div>

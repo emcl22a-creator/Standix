@@ -7263,6 +7263,9 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       .select().single()
     if (procError) throw new Error(procError.message)
     aiProcedureId = newProc.id
+    /* On trace la création : c'est le seul moyen de savoir si l'identifiant
+       transmis au serveur est bien celui d'une ligne réellement écrite. */
+    console.log('[procédure créée]', aiProcedureId, '· réponse complète :', newProc)
 
     signalerEtapeIA('L\u2019IA \u00e9coute et regarde\u2026')
     // 3. Démarrage de l'analyse Azure
@@ -7402,7 +7405,8 @@ async function pollAiStatus() {
       const zone = document.getElementById('ai-error')
       zone.style.color = 'var(--red)'
       zone.textContent = `Le serveur d'analyse a répondu ${checkRes.status}` +
-        (dit ? ' : ' + String(dit).slice(0, 300) : ' sans détail.')
+        (dit ? ' : ' + String(dit).slice(0, 200) : ' sans détail.') +
+        ` — procédure interrogée : ${aiProcedureId || '(AUCUNE)'}`
       afficherDetailEchec(aiProcedureId, dit || `HTTP ${checkRes.status}`)
       return
     }

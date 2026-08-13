@@ -843,11 +843,19 @@ function afficherBarre(montrer) {
    elle flotterait par-dessus l'écran de choix et celui de connexion. */
 afficherBarre(false)
 
+/* Vrai le temps qu'un onglet ouvre sa page. C'est ce qui distingue un
+   changement d'onglet d'une ouverture depuis une carte — les deux passent par
+   la même fonction d'affichage, mais ne méritent pas la même animation. */
+let navDepuisOnglet = false
+
 window.onNavigate = function (index) {
-  if (index === 0) showGestionScreen('p-home')
-  else if (index === 1) showGestionScreen('p-list')
-  else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
-  else if (index === 3) openSettings()
+  navDepuisOnglet = true
+  try {
+    if (index === 0) showGestionScreen('p-home')
+    else if (index === 1) showGestionScreen('p-list')
+    else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
+    else if (index === 3) openSettings()
+  } finally { navDepuisOnglet = false }
 }
 
 function afficherCoquille(espace) {
@@ -4196,6 +4204,7 @@ function ouvrirDepuisCarte(ecran) {
 /* Remet tous les écrans à zéro avant d'en ouvrir un autre. */
 function oublierNaissances() {
   document.querySelectorAll('.screen.nait').forEach(s => s.classList.remove('nait'))
+  document.querySelectorAll('.screen.fondu').forEach(s => s.classList.remove('fondu'))
 }
 
 /* Les deux gestes dans le BON ORDRE : la naissance d'abord, l'activation
@@ -4209,6 +4218,16 @@ function activerAvecNaissance(ecran) {
   if (!ecran) return
   oublierNaissances()
   ouvrirDepuisCarte(ecran)
+  /* DEUX GESTES, DEUX ANIMATIONS.
+
+     Ouvrir une procédure depuis sa carte, c'est entrer dedans : l'écran naît du
+     point touché et grandit. Passer d'un onglet à l'autre, c'est remplacer une
+     page par une autre — rien n'entre nulle part. Le même zoom aux deux
+     endroits donnait à un simple changement d'onglet le poids d'une ouverture.
+
+     Ici, un fondu de 180 ms, sans déplacement. C'est ce que fait iOS entre deux
+     onglets, et c'est fait pour ne pas se remarquer. */
+  if (navDepuisOnglet && !ecran.classList.contains('nait')) ecran.classList.add('fondu')
   ecran.classList.add('active')
 }
 
@@ -6616,6 +6635,43 @@ function startAiProgressSimulation() {
 
 /* Appelée à chaque sondage : l'étape vient de ce que répond le serveur, le
    pourcentage aussi. Rien n'est deviné ici. */
+/* ═══ L'ÉCRAN D'ATTENTE, AU BOUT DE CINQ SECONDES ═══
+
+   Les jalons s'écrivaient sous le bouton, en petit, parce qu'on les croyait
+   affaire de deux secondes. Une vidéo de téléphone dément : la compression
+   seule en prend souvent dix, l'envoi autant.
+
+   Passé cinq secondes, on bascule sur le vrai écran d'attente — celui du
+   grand anneau — et les jalons continuent de s'y écrire. La personne voit
+   qu'on travaille au lieu de fixer un bouton qui tourne.
+
+   `aiEcranAttente` évite de basculer deux fois : la bascule d'origine, plus
+   loin, appelle la même fonction. */
+let aiEcranAttente = false
+
+function basculerVersAttente() {
+  if (aiEcranAttente) return
+  const dépôt = document.getElementById('ai-upload-card')
+  const attente = document.getElementById('ai-progress-card')
+  if (!dépôt || !attente) return
+  aiEcranAttente = true
+  dépôt.style.display = 'none'
+  attente.style.display = 'block'
+  const zone = document.getElementById('ai-error')
+  if (zone) zone.textContent = ''
+  startAiProgressSimulation()
+}
+
+/* Un jalon va là où la personne regarde : sous le bouton tant qu'elle y est,
+   sur l'écran d'attente une fois basculée. */
+function jalonUI(m) {
+  if (aiEcranAttente) { signalerEtapeIA(m); return }
+  const zone = document.getElementById('ai-error')
+  if (!zone) return
+  zone.style.color = 'var(--label-3)'
+  zone.textContent = m
+}
+
 function signalerEtapeIA(etape, progres) {
   aiEtapeCourante = etape
   aiProgresAzure = (typeof progres === 'number' && progres >= 0 && progres <= 100) ? progres : null
@@ -6706,7 +6762,8 @@ function resetAiScreen() {
   document.getElementById('ai-error').textContent = ''
   const detail = document.getElementById('ai-detail')
   if (detail) detail.style.display = 'none'
-  document.getElementById('ai-upload-card').style.display = 'block'
+  aiEcranAttente = false
+      document.getElementById('ai-upload-card').style.display = 'block'
   document.getElementById('ai-progress-card').style.display = 'none'
   document.getElementById('ai-done-card').style.display = 'none'
   aiVideoFile = null
@@ -6911,6 +6968,19 @@ async function comprimerVideo(fichier, surAvancee) {
   lecteur.muted = false
   lecteur.playsInline = true
 
+  /* DÉCLARÉ ICI, ET ARRÊTÉ DANS LE `finally`.
+
+     La boucle qui dessine les images appelle le compteur d'avancement à chaque
+     rafraîchissement. Tant qu'elle tourne, elle réécrit « 1/3 · … % » par-dessus
+     tout ce qu'on affiche.
+
+     Elle ne s'arrêtait qu'au bout du chemin normal. La moindre erreur en cours
+     de route la laissait tourner À VIE : elle recouvrait ensuite chaque message,
+     y compris l'erreur elle-même — d'où ce « 99 % » figé, en rouge parce que
+     l'erreur avait teinté la zone. On ne voyait pas un blocage, on voyait un
+     message masqué. */
+  let arret = false
+
   try {
     await new Promise((ok, non) => {
       lecteur.onloadedmetadata = ok
@@ -6982,7 +7052,6 @@ async function comprimerVideo(fichier, surAvancee) {
        façon — la sortie n'est pas raccordée aux haut-parleurs. */
     await lecteur.play()
 
-    let arret = false
     const dessiner = () => {
       if (arret) return
       ctx.drawImage(lecteur, 0, 0, L, H)
@@ -7033,9 +7102,13 @@ async function comprimerVideo(fichier, surAvancee) {
                     { type })
   } catch (e) {
     /* La compression échoue ? On envoie l'original. Elle est un confort, pas une
-       condition : refuser la vidéo serait pire que l'envoyer lourde. */
+       condition : refuser la vidéo serait pire que l'envoyer lourde.
+       On garde tout de même la raison : c'est elle qui manquait. */
+    console.warn('[compression] abandonnée :', e?.message || e)
     return fichier
   } finally {
+    arret = true
+    try { lecteur.pause() } catch (e) {}
     URL.revokeObjectURL(lecteur.src)
   }
 }
@@ -7127,13 +7200,17 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     /* Les trois premières étapes durent quelques secondes : elles s'affichent
        sous le bouton, dont l'anneau tourne. On ne change pas d'écran pour si
        peu — la page disparaîtrait et reviendrait aussitôt. */
-    errorEl.textContent = '1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o'
-    aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-      errorEl.textContent = pct >= 100
-        ? '1/3 \u00b7 Finalisation de la vid\u00e9o\u2026'
-        : `1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
-    })
-    errorEl.textContent = ''
+    jalonUI('1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o')
+    /* Cinq secondes : au-delà, on ne fait plus patienter sous un bouton. */
+    const bascule = setTimeout(basculerVersAttente, 5000)
+    try {
+      aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
+        jalonUI(pct >= 100
+          ? '1/3 \u00b7 Finalisation de la vid\u00e9o\u2026'
+          : `1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
+      })
+    } finally { clearTimeout(bascule) }
+    if (!aiEcranAttente) errorEl.textContent = ''
     /* ON RESTE EN GRIS.
 
        Cette ligne remettait le rouge tout de suite après la compression. Or les
@@ -7150,6 +7227,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     }
   }
 
+  /* Même règle pendant l'envoi : cinq secondes sous le bouton, pas plus.
+     Déclaré HORS du `try` pour que le rattrapage puisse l'annuler — sinon une
+     erreur survenue avant la cinquième seconde verrait quand même l'écran
+     d'attente s'ouvrir par-dessus son propre message. */
+  const bascule2 = setTimeout(basculerVersAttente, 5000)
+
   try {
     errorEl.style.color = 'var(--label-3)'
     /* ═══ LE 2/3 SE DÉCOUPE ═══
@@ -7164,8 +7247,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const t0 = Date.now()
     const chrono = () => `${((Date.now() - t0) / 1000).toFixed(1)} s`
     const etape = (m) => {
-      errorEl.style.color = 'var(--label-3)'
-      errorEl.textContent = `2/3 · ${m}`
+      jalonUI(`2/3 · ${m}`)
       console.log(`[envoi ${chrono()}] ${m}`)
     }
     etape('vérification du poids…')
@@ -7274,12 +7356,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        La vidéo est arrivée ; ce qui suit dure des minutes. C'est le moment de
        quitter la page de dépôt pour l'écran d'attente — pas avant, sinon on
        change d'écran pour trois secondes. */
-    document.getElementById('ai-upload-card').style.display = 'none'
-    document.getElementById('ai-progress-card').style.display = 'block'
-    /* Le jalon a fait son travail : l'écran d'attente prend le relais. Laissé
-       en place, il reparaîtrait sous le bouton au prochain dépôt. */
-    errorEl.textContent = ''
-    startAiProgressSimulation()
+    clearTimeout(bascule2)
+    basculerVersAttente()
     signalerEtapeIA('Cr\u00e9ation de la proc\u00e9dure\u2026')
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
     const { data: newProc, error: procError } = await supabase
@@ -7322,6 +7400,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        pas retarder l'affichage de la progression. */
     loadGestionProcedures().catch(() => {})
   } catch (e) {
+    clearTimeout(bascule2)
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
     /* Le rouge n'apparaît qu'ici : c'est le seul endroit où il y a vraiment
        quelque chose qui a échoué. */
@@ -7332,7 +7411,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        d'erreur derrière, sans moyen de recommencer. */
     stopAiProgressSimulation()
     document.getElementById('ai-progress-card').style.display = 'none'
-    document.getElementById('ai-upload-card').style.display = 'block'
+    aiEcranAttente = false
+      document.getElementById('ai-upload-card').style.display = 'block'
 
 
     /* La vidéo muette n'est pas une erreur de l'app : c'est une vidéo qui ne
@@ -7426,6 +7506,7 @@ async function pollAiStatus() {
       }
       stopAiProgressSimulation(0)
       document.getElementById('ai-progress-card').style.display = 'none'
+      aiEcranAttente = false
       document.getElementById('ai-upload-card').style.display = 'block'
       const zone = document.getElementById('ai-error')
       zone.style.color = 'var(--red)'
@@ -7482,7 +7563,8 @@ document.getElementById('ai-view-btn').onclick = () => openAnalyse(aiProcedureId
     // status === 'error'
     stopAiProgressSimulation(0)
     document.getElementById('ai-progress-card').style.display = 'none'
-    document.getElementById('ai-upload-card').style.display = 'block'
+    aiEcranAttente = false
+      document.getElementById('ai-upload-card').style.display = 'block'
     document.getElementById('ai-error').style.color = 'var(--red)'
     document.getElementById('ai-error').textContent = data.message || "Une erreur est survenue pendant l'analyse."
     afficherDetailEchec(aiProcedureId, data.message)
@@ -7495,6 +7577,7 @@ document.getElementById('ai-view-btn').onclick = () => openAnalyse(aiProcedureId
     if (aiEchecsSuite >= 6) {
       stopAiProgressSimulation(0)
       document.getElementById('ai-progress-card').style.display = 'none'
+      aiEcranAttente = false
       document.getElementById('ai-upload-card').style.display = 'block'
       const zone = document.getElementById('ai-error')
       zone.style.color = 'var(--red)'

@@ -844,7 +844,8 @@ function afficherBarre(montrer) {
 afficherBarre(false)
 
 window.onNavigate = function (index) {
-  if (index === 0 || index === 1) showGestionScreen('p-list')
+  if (index === 0) showGestionScreen('p-home')
+  else if (index === 1) showGestionScreen('p-list')
   else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
   else if (index === 3) openSettings()
 }
@@ -1622,7 +1623,7 @@ async function enterApp(membre) {
        d'une session précédente réapparaissait : se déconnecter depuis une fiche
        de procédure puis recréer un compte ramenait sur cette fiche, parce que
        rien ne remettait la navigation à zéro. */
-    showGestionScreen('p-list')
+    showGestionScreen('p-home')
     await loadGestionProcedures()
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
@@ -1723,11 +1724,17 @@ async function ouvrirCibleQR() {
      sobre — mais personne n'entre sans avoir vu le nom. */
   const proc = allEquipeProcedures.find(p => p.id === id)
   let titre = proc?.titre, categorie = proc?.categorie
-  if (!titre) {
-    const { data } = await supabase.from('procedures')
-      .select('titre, categorie').eq('id', id).maybeSingle()
-    titre = data?.titre; categorie = data?.categorie
-  }
+
+  /* On LANCE la requête sans l'attendre. Tout l'intérêt est là : la fenêtre
+     s'ouvre pendant que la base répond, au lieu de laisser l'écran noir après
+     le scan. Le nom se posera dessus quand il arrivera.
+
+     Le `await` avait été remis ici par une réécriture, et la variable qui
+     portait la promesse a disparu avec — mais le code plus bas l'attendait
+     toujours. L'arrivée par QR code s'arrêtait net dès que le titre n'était
+     pas déjà en mémoire. */
+  const promesseTitre = titre ? null : supabase.from('procedures')
+    .select('titre, categorie').eq('id', id).maybeSingle()
 
   const nouveau = estNouvelUtilisateur()
   if (nouveau) marquerBienvenueVue()
@@ -2155,13 +2162,16 @@ function renderGainTemps(validations, procedures) {
   const s = document.getElementById('an-gain-s')
 
   if (!secondes) {
-    t.textContent = 'Chaque lecture est une explication en moins'
+    t.innerHTML = '<em>Chaque lecture est une explication en moins</em>'
     s.innerHTML = 'D\u00e8s que votre \u00e9quipe ouvrira vos proc\u00e9dures, ' +
       "vous verrez ici <b>le temps que vous n'avez plus \u00e0 passer \u00e0 expliquer</b>."
     return
   }
 
-  t.textContent = `${dureeLisible(secondes)} de formation ce mois-ci`
+  /* Le chiffre porté à part : c'est LUI qu'on vient chercher sur cette page,
+     et une phrase entière le noie. */
+  t.innerHTML = `<b>${escapeHtml(dureeLisible(secondes))}</b>` +
+    `<em>de formation ce mois-ci</em>`
   /* « Sans que vous ayez eu à l'expliquer » sonnait comme un reproche déguisé —
      comme si expliquer à son équipe était une corvée dont on se débarrasse. On
      dit plutôt ce qui est vrai et vérifiable : ces lectures ont eu lieu, elles
@@ -2578,7 +2588,15 @@ window.ouvrirFicheMembre = function(membreId) {
 /* Les couleurs des parts. Six teintes distinctes, reprises dans l'ordre au-delà.
    Elles ne signifient rien en soi — elles servent à relier une part à sa ligne,
    rien de plus. */
-const FM_TEINTES = ['#5EA0FF', '#30D158', '#FF9F0A', '#BF5AF2', '#FF9F5A', '#64D2FF']
+/* Une ÉCHELLE, pas une palette. Ces teintes ne signifient rien : elles servent
+   à relier une part de l'anneau à sa ligne, et rien d'autre. Or l'ancienne
+   suite mêlait de l'ambre, du vert et du bleu — et le vert dit « terminé »
+   partout ailleurs dans l'app. Une catégorie tombait en vert par le seul hasard
+   de son rang, et paraissait aller mieux que sa voisine.
+
+   Six ambres du plus clair au plus sombre : on les distingue par la clarté, ce
+   qui reste lisible même pour un œil qui confond les teintes. */
+const FM_TEINTES = ['#FFC46B', '#FF9A1F', '#E07A12', '#B85E0C', '#8A4508', '#FFDCA8']
 
 /* Les deux périodes vivent en parallèle : chacune a son classement, son total
    et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau
@@ -3169,64 +3187,221 @@ function peindreIntroEquipe(employes, validations) {
   }
 }
 
+let anEqVues = { month: { classe: [], total: 0, deplie: false },
+                 all:   { classe: [], total: 0, deplie: false } }
+let anEqPeriode = 'month'
+
 function peindreAnEquipe() {
-  const el = document.getElementById('an-equipe-liste')
-  if (!el || !currentGaData) return
-
-  /* On relève où chaque ligne se trouve AVANT de reconstruire la liste. Après
-     coup, `playCardShuffle` compare les deux positions et fait glisser chacune
-     de l'ancienne à la nouvelle. C'est la même mécanique que le tri de
-     « Gérer l'équipe » — deux listes qui se réordonnent doivent le faire pareil,
-     sinon on croit avoir changé d'écran. */
-  const positions = captureCardPositions(el)
-  const { employes, procedures, validations } = currentGaData
+  if (!currentGaData) return
+  const { employes, validations } = currentGaData
   peindreIntroEquipe(employes, validations)
-  /* Cette page a son propre filtre — mois ou total — comme les deux autres
-     pages complètes de l'analyse. */
-  const dansPeriode = anValidationsPeriode()
 
-  const stats = employes.map(m => {
-    const siennes = dansPeriode.filter(v => v.membre_id === m.id)
-    return {
-      m,
-      nb: new Set(siennes.map(v => v.procedure_id)).size,
-      temps: siennes.reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
-      /* Le temps affiché suit désormais le filtre de la page : un filtre qui
-         ne change rien à l'écran est pire que pas de filtre du tout. */
-      total: validations.filter(v => v.membre_id === m.id)
-        .reduce((s, v) => s + Number(v.duree_lecture || 0), 0),
-    }
-  })
+  const debutMois = new Date()
+  debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
+  const duMois = (validations || []).filter(v => new Date(v.validated_at) >= debutMois)
 
-  const trie = [...stats].sort((a, b) => {
-    /* Du plus actif au moins actif. À nombre de lectures égal, le temps
-       départage : deux personnes qui ont ouvert trois procédures n'y ont pas
-       passé le même temps. */
-    return (b.nb - a.nb) || (b.temps - a.temps)
-  })
+  for (const [cle, lot] of [['month', duMois], ['all', validations || []]]) {
+    const vue = anEqVues[cle]
+    vue.classe = (employes || []).map(m => {
+      const siennes = lot.filter(v => v.membre_id === m.id)
+      return {
+        membre: m, nom: m.nom || 'Sans nom',
+        total: siennes.reduce((t, v) => t + Number(v.duree_lecture || 0), 0),
+        lues: new Set(siennes.map(v => v.procedure_id)).size,
+      }
+    }).sort((a, b) => b.total - a.total)
 
-  const total = procedures.length
-  document.getElementById('p-an-equipe-compte').textContent =
-    `${employes.length} personne${employes.length > 1 ? 's' : ''}`
+    vue.total = vue.classe.reduce((t, x) => t + x.total, 0)
+    let n = 0
+    vue.classe.forEach(x => { if (x.total) x.couleur = FM_TEINTES[n++ % FM_TEINTES.length] })
 
-  el.innerHTML = trie.length ? trie.map(s => `
-    <div class="emp-row" data-membre="${escapeHtml(s.m.id)}" data-key="${escapeHtml(s.m.id)}">
-      <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
-        <!-- Le temps de la période ferait doublon avec le total, à droite. -->
-        <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) + ' \u00b7 ' : ''}${s.nb} sur ${total} lue${s.nb > 1 ? 's' : ''}</span>
-      </div>
-      ${tempsTotalHtml(s.temps, false, anLibelle())}
-      <span class="fl">\u203a</span>
-    </div>`).join('')
-    : '<div class="an-vide">Aucun membre dans l\'\u00e9quipe.</div>'
-
-  el.querySelectorAll('[data-membre]').forEach(l => {
-    l.addEventListener('click', () => ouvrirFicheMembre(l.dataset.membre))
-  })
-
-  playCardShuffle(el, positions)
-  garantirVisibilite(el)
+    vue.deplie = false
+    dessinerAnneauEq(cle)
+    peindreClassementEq(cle)
+  }
+  majBarreEq()
 }
+
+function dessinerAnneauEq(cle) {
+  const zone = document.getElementById('an-anneau-eq-' + cle)
+  if (!zone) return
+
+  const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const vue = anEqVues[cle]
+  const vus = regrouperParts(vue.classe.filter(x => x.total), x => x.total)
+  const somme = vus.reduce((t, x) => t + x.total, 0)
+
+  if (!vus.length || !somme) {
+    zone.innerHTML = ''
+    zone.closest('.fm-segm')?.style.setProperty('display', 'none')
+    return
+  }
+  zone.closest('.fm-segm')?.style.removeProperty('display')
+
+  const ecart = Math.max(1.5, Math.min(5, (circ / 8) / Math.max(1, vus.length)))
+  const fracs = fractionsLisibles(vus, x => x.total, circ, ecart + ep * 1.7)
+
+  let pos = 0
+  const arcs = vus.map((x, i) => {
+    const brut = circ * fracs[i]
+    const rond = brut > ecart + ep * 1.6
+    const len = rond ? brut - ecart - ep : Math.max(1, brut - ecart)
+    const depart = circ * pos + ecart / 2 + (rond ? ep / 2 : 0)
+    pos += fracs[i]
+    return `<circle class="arc${rond ? '' : ' droit'}" data-arc="${i}" cx="${T/2}" cy="${T/2}" r="${r}"
+      fill="none" stroke="${x.couleur}" stroke-width="${ep}"
+      stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
+  }).join('')
+
+  const idMasque = 'an-eq-masque-' + cle + '-' + Date.now()
+  zone.innerHTML = `
+    <svg width="${T}" height="${T}">
+      <defs><mask id="${idMasque}">
+        <circle class="fm-aiguille" cx="${T/2}" cy="${T/2}" r="${r}" fill="none"
+                stroke="#fff" stroke-width="${ep + 3}"
+                stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+      </mask></defs>
+      <g mask="url(#${idMasque})">${arcs}</g>
+    </svg>
+    <div class="dedans"><span class="v"></span><span class="u"></span><span class="n"></span></div>`
+
+  centreAnneauEq(cle, null)
+  const aiguille = zone.querySelector('.fm-aiguille')
+  if (aiguille) {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
+    })
+  }
+}
+
+function centreAnneauEq(cle, choix) {
+  const zone = document.getElementById('an-anneau-eq-' + cle)
+  if (!zone) return
+  const v = zone.querySelector('.v'), u = zone.querySelector('.u'), n = zone.querySelector('.n')
+  if (!v) return
+  const vue = anEqVues[cle]
+  if (!choix) {
+    const actifs = vue.classe.filter(x => x.total).length
+    v.textContent = String(Math.round(vue.total / 60))
+    u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
+    n.textContent = `${actifs} sur ${vue.classe.length} personne${vue.classe.length > 1 ? 's' : ''}`
+    return
+  }
+  v.textContent = String(Math.round(choix.total / 60))
+  u.textContent = 'minutes'
+  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || 'Autres') : choix.nom)
+}
+
+function peindreClassementEq(cle, animerDes) {
+  const el = document.getElementById('an-top-eq-' + cle)
+  if (!el) return
+  const vue = anEqVues[cle]
+
+  if (!vue.classe.length) {
+    el.innerHTML = vide({
+      dessin: NEANT_EQUIPE,
+      titre: 'Personne pour l\u2019instant',
+      phrase: "Invitez votre \u00e9quipe avec le code de l'entreprise.",
+      action: "Voir le code d'invitation", geste: 'inviter',
+    })
+    return
+  }
+
+  const partsAnneau = regrouperParts(vue.classe.filter(x => x.total > 0), x => x.total)
+  const grises = new Set()
+  if (partsAnneau.find(x => x.estAutres)) {
+    const montrees = new Set(partsAnneau.filter(x => !x.estAutres))
+    vue.classe.forEach(x => { if (!montrees.has(x)) grises.add(x) })
+  }
+  const visibles = (vue.deplie ? vue.classe : partsAnneau).map(x =>
+    grises.has(x) ? { ...x, couleur: ANNEAU_GRIS } : x)
+
+  el.innerHTML = visibles.map((x, rang) => {
+    const neuve = animerDes != null && rang >= animerDes
+    return `
+      <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
+              ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
+              data-part="${rang}" ${x.estAutres ? '' : `data-membre="${escapeHtml(x.membre.id)}"`}>
+        <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
+        <span class="co">
+          <span class="nm">${escapeHtml(x.estAutres ? (x.nom || 'Autres') : x.nom)}</span>
+          <span class="st">${x.estAutres ? 'Les moins actifs'
+            : (x.membre.poste ? escapeHtml(x.membre.poste) + ' \u00b7 ' : '') +
+              x.lues + ' proc\u00e9dure' + (x.lues > 1 ? 's' : '') + ' lue' + (x.lues > 1 ? 's' : '')}</span>
+        </span>
+        <span class="vl"${x.total ? '' : ' style="color:var(--label-3)"'}>${
+          x.total ? dureeLisible(x.total) : 'jamais'}</span>
+      </button>`
+  }).join('')
+
+  if (vue.classe.length > 3) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'fm-plus'
+    b.textContent = vue.deplie ? 'Voir moins' : 'Voir plus'
+    b.addEventListener('click', () => {
+      vue.deplie = !vue.deplie
+      peindreClassementEq(cle, vue.deplie ? 3 : null)
+    })
+    el.appendChild(b)
+  }
+
+  /* Toucher éclaire la part ; un appui long ouvre la fiche. Le geste court sert
+     à comparer, le long à aller voir — comme sur les deux autres pages. */
+  el.querySelectorAll('[data-part]').forEach(b => {
+    let minuteur = null, ouverte = false
+    b.addEventListener('pointerdown', () => {
+      ouverte = false
+      if (!b.dataset.membre) return
+      minuteur = setTimeout(() => { ouverte = true; ouvrirFicheMembre(b.dataset.membre) }, 550)
+    })
+    const annuler = () => { if (minuteur) { clearTimeout(minuteur); minuteur = null } }
+    b.addEventListener('pointerup', annuler)
+    b.addEventListener('pointerleave', annuler)
+    b.addEventListener('pointercancel', annuler)
+
+    b.addEventListener('click', () => {
+      if (ouverte) return
+      const i = Number(b.dataset.part)
+      const actif = b.classList.contains('choisi')
+      el.querySelectorAll('[data-part]').forEach(x => x.classList.remove('choisi'))
+      const arcs = document.querySelectorAll('#an-anneau-eq-' + cle + ' [data-arc]')
+      if (actif) {
+        arcs.forEach(a => a.classList.remove('pale'))
+        centreAnneauEq(cle, null)
+        return
+      }
+      b.classList.add('choisi')
+      arcs.forEach((a, k) => a.classList.toggle('pale', k !== i))
+      centreAnneauEq(cle, vue.classe[i])
+    })
+  })
+}
+
+function majBarreEq() {
+  document.querySelectorAll('#an-barre-eq [data-va]').forEach(b => {
+    b.classList.toggle('on', b.dataset.va === anEqPeriode)
+  })
+  const mot = document.getElementById('an-mot-eq')
+  if (mot) mot.textContent = anEqPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+}
+
+;(() => {
+  const piste = document.getElementById('an-piste-eq')
+  if (!piste) return
+  piste.addEventListener('scroll', () => {
+    const page = piste.scrollLeft > piste.clientWidth / 2 ? 'all' : 'month'
+    if (page === anEqPeriode) return
+    anEqPeriode = page
+    majBarreEq()
+    if (navigator.vibrate) navigator.vibrate(6)
+  }, { passive: true })
+  document.querySelectorAll('#an-barre-eq [data-va]').forEach(b => {
+    b.addEventListener('click', () => {
+      piste.scrollTo({ left: b.dataset.va === 'all' ? piste.clientWidth : 0, behavior: 'smooth' })
+    })
+  })
+})()
 
 window.ouvrirAnCategories = function() {
   showGestionScreen('p-an-categories')
@@ -3967,8 +4142,8 @@ const ONGLET_PAR_ECRAN = {
      `p-list` est rattachée à Accueil, pas à Procédures. Les deux onglets y
      mènent tant que l'écran d'accueil n'existe pas ; il fallait en choisir un,
      et c'est bien l'écran d'ouverture de l'app. */
-  'p-list': 0,
-  'p-category': 1, 'p-analyse': 1, 'p-edit-procedure': 1,
+  'p-home': 0,
+  'p-list': 1, 'p-category': 1, 'p-analyse': 1, 'p-edit-procedure': 1,
   'p-create': 1, 'p-create-manual': 1, 'p-create-video': 1,
   'p-create-doc': 1, 'p-create-ai': 1,
   'p-global-analyse': 2, 'p-membre': 2, 'p-membre-fiche': 2,
@@ -4289,20 +4464,20 @@ async function loadGestionProcedures() {
               <line x1="30" y1="95" x2="60" y2="95" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/>
               <line x1="66" y1="95" x2="84" y2="95" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
             </g>
+            <!-- Le seul point de couleur de ce dessin : il fait écho au bouton
+                 de la carte du haut, et relie les deux d'un coup d'œil. Tout le
+                 reste demeure au trait blanc — deux foyers de couleur sur un
+                 même écran, et le bouton perdrait sa force. -->
             <g class="signe">
-              <circle cx="112" cy="26" r="13" fill="#fff"/>
-              <line x1="112" y1="20" x2="112" y2="32" stroke="#0C0D0E" stroke-width="2.4" stroke-linecap="round"/>
-              <line x1="106" y1="26" x2="118" y2="26" stroke="#0C0D0E" stroke-width="2.4" stroke-linecap="round"/>
+              <circle cx="112" cy="26" r="13" fill="url(#logoOrIc)"/>
+              <line x1="112" y1="20" x2="112" y2="32" stroke="#2A1400" stroke-width="2.6" stroke-linecap="round"/>
+              <line x1="106" y1="26" x2="118" y2="26" stroke="#2A1400" stroke-width="2.6" stroke-linecap="round"/>
             </g>
           </svg>
         </div>
         <h3>Votre première procédure</h3>
         <p>Décrivez une tâche étape par étape, ou filmez-la une seule fois — l'IA la découpe pour vous.</p>
-        <div class="fleche">
-          Touchez le bouton
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          en bas de l'écran
-        </div>
+        <div class="fleche">Touchez « Créer une procédure », en haut de la page</div>
       </div>
     `
     /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
@@ -4551,20 +4726,31 @@ function renderCategoryGrid() {
     const cell = document.createElement('div')
     cell.className = 'cat-cell'
     cell.dataset.key = nom
+    /* Le dossier vit dans une pastille teintée, et la carte se termine par une
+       ligne d'appel : combien de procédures, et un chevron qui dit qu'on entre.
+       Sans elle, rien n'indiquait que la carte s'ouvrait. */
     cell.innerHTML = `
       <div class="cat-top">
-        <!-- L'anneau coloré a été retiré. Vert, orange ou rouge selon le taux de
-             lecture, il faisait d'une simple catégorie un bulletin de notes — et
-             le rouge y disait « problème » là où il n'y avait qu'une procédure
-             récente que personne n'avait eu le temps d'ouvrir. -->
-          <div class="cat-ring-wrap">
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></div>
-        </div>
-        <div class="cat-badge">${procsInCat.length}</div>
+        <span class="cat-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
+                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+            <line x1="3" y1="10.6" x2="21" y2="10.6" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
+          </svg>
+        </span>
       </div>
       <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-            <div class="cat-recent">
+      <div class="cat-recent">
         ${recentTitles.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
+      </div>
+      <div class="cat-pied">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+                stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span>${procsInCat.length} procédure${procsInCat.length > 1 ? 's' : ''}</span>
+        <span class="fl">›</span>
       </div>
     `
     /* Sur la carte d'une catégorie, un titre en panne mène directement à la
@@ -4841,23 +5027,36 @@ function renderCategoryProceduresListInterne() {
       enPanne ? proposerReprise(proc) :
       enAnalyse ? proposerAbandon(proc) :
       openAnalyse(proc.id)
+    /* La même grammaire que la catégorie : plaque à gauche, nom, filet, pied.
+       Le pied dit ici le suivi de lecture — la seule chose qu'un gérant vient
+       vérifier sur cette page. */
+    const detail = [
+      `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`,
+      toutesProcedures ? escapeHtml(proc.categorie || 'Sans catégorie') : '',
+    ].filter(Boolean).join(' \u00b7 ')
+
     div.innerHTML = `
-      <div class="cat-top">
-        <div class="cat-ring-wrap">
-          <svg viewBox="0 0 46 46">
-            <circle class="cat-ring-bg" cx="23" cy="23" r="20"/>
-            <circle class="cat-ring-fill" cx="23" cy="23" r="20" stroke="${ringColor}"
-              stroke-dasharray="${circumference}" stroke-dashoffset="${dashoffset}"/>
+      <div class="proc-tete">
+        <span class="cat-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+            <line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.5"
+                  stroke-width="1.6" stroke-linecap="round"/>
+            <line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="url(#logoOrIc)" stroke-opacity="0.5"
+                  stroke-width="1.6" stroke-linecap="round"/>
           </svg>
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-        </div>
-        <div class="cat-badge">${nbEtapes} étape${nbEtapes>1?'s':''}</div>
+        </span>
+        <span class="proc-co">
+          <span class="proc-nom"><span class="txt">${escapeHtml(proc.titre)}</span>${etatProcedureHtml(proc)}</span>
+          <span class="proc-meta">${detail}</span>
+        </span>
+        <span class="proc-fl">\u203a</span>
       </div>
-      <div class="cat-name"><span class="txt">${escapeHtml(proc.titre)}</span>${etatProcedureHtml(proc)}</div>
-      ${toutesProcedures ? `<div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans catégorie')}</div>` : ''}
-      <div class="cat-pct-row">
-        <span class="cat-pct" style="color:${ringColor};">${pct}%</span>
-        <span class="cat-pct-label">ont consulté</span>
+      <div class="proc-pied">
+        <span class="proc-jauge"><i style="width:${pct}%; background:${ringColor}"></i></span>
+        <span class="proc-taux" style="color:${ringColor};">${pct} %<em> ont lu</em></span>
       </div>
     `
     listEl.appendChild(div)
@@ -5513,7 +5712,27 @@ async function completerEtapesAvecIA() {
     if (!urlAnalyse) throw new Error("Aucune vid\u00e9o \u00e0 analyser.")
 
     jalon('4/5 \u00b7 Ouverture de l\u2019analyse\u2026')
+
+    /* L'analyse serveur n'écrit pas dans le vide : elle dépose ses étapes SUR
+       une procédure, et il lui en faut donc une avant de démarrer. Celle-ci ne
+       sert que de boîte aux lettres — le `finally` la supprime dès les textes
+       récupérés, que l'analyse ait abouti ou non.
+
+       Ces trois lignes avaient disparu lors d'une réécriture, alors que les
+       deux qui les suivaient sont restées : `errTemp` et `temp` étaient lus
+       sans avoir jamais été créés. Le bouton « Rédiger mes étapes » s'arrêtait
+       donc là, à tous les coups. */
+    const { data: temp, error: errTemp } = await supabase
+      .from('procedures')
+      .insert({
+        entreprise_id: currentMembre.entreprise_id,
+        titre: '\u2014 analyse en cours \u2014',
+        created_by: currentMembre.id,
+        statut: 'traitement',
+      })
+      .select().single()
     if (errTemp) throw new Error(errTemp.message)
+    if (!temp?.id) throw new Error("La proc\u00e9dure d'analyse n'a pas pu \u00eatre cr\u00e9\u00e9e.")
     tempId = temp.id
 
     /* 3. L'analyse, puis l'attente. */
@@ -8093,7 +8312,7 @@ const DELAI_APPUI_LONG = 340
 
 /* Palette des étapes. Elle tourne au-delà de huit étapes, ce qui suffit : deux
    étapes de même couleur seront alors très éloignées sur la frise. */
-const PALETTE_ETAPES = ['#30D158', '#0A84FF', '#FF9F0A', '#BF5AF2', '#FF375F', '#64D2FF', '#FFD60A', '#5E5CE6']
+const PALETTE_ETAPES = ['#30D158', '#F5A623', '#FF9F0A', '#E8A33D', '#FF375F', '#64D2FF', '#FFD60A', '#5E5CE6']
 const COULEUR_ETAPE = (i) => PALETTE_ETAPES[i % PALETTE_ETAPES.length]
 
 function activerGlissementEtapes(conteneur, donnerTableau, apres) {
@@ -8231,8 +8450,8 @@ function cocheFaiteDess(taille) {
      visuel : seule la couleur change, comme quand on coche une case. */
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <circle cx="15" cy="15" r="12.6" fill="#5EA0FF"/>
-    <path d="M10 15.2 13.4 18.6 20 11.8" stroke="#04203F" stroke-width="2.2"
+    <circle cx="15" cy="15" r="12.6" fill="#FFB340"/>
+    <path d="M10 15.2 13.4 18.6 20 11.8" stroke="#2E1B00" stroke-width="2.2"
           stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`
 }

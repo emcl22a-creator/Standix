@@ -4827,16 +4827,16 @@ async function peindreDernieresProcedures() {
      titre, et des lignes séparées par un filet — la même construction que les
      sections de la page Analyse. */
   zone.innerHTML = `
-    <div class="rec-bloc">
-      <div class="rec-tete">
-        <span class="rec-pic">
+    <div class="an-bloc">
+      <div class="an-tete">
+        <span class="an-ic">
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
                   stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
             <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
           </svg>
         </span>
-        <span class="rec-t">Dernières procédures créées</span>
+        <b>Dernières procédures créées</b>
       </div>
       ${recentes.map(p => {
         const nb = p.etapes?.[0]?.count ?? 0
@@ -4852,15 +4852,12 @@ async function peindreDernieresProcedures() {
         ].filter(Boolean).join(' \u00b7 ')
 
         return `
-          <button type="button" class="rec-l" data-proc="${escapeHtml(p.id)}">
-            <span class="rec-co">
-              <span class="rec-h">
-                <span class="rec-nom">${escapeHtml(p.titre || 'Sans titre')}</span>
-                <span class="rec-q">${ilYA(Date.parse(p.created_at || '') || Date.now())}</span>
-              </span>
-              <span class="rec-tr">${traits}</span>
+          <button type="button" class="an-lig" data-proc="${escapeHtml(p.id)}">
+            <span class="co">
+              <span class="nm">${escapeHtml(p.titre || 'Sans titre')}</span>
+              <span class="st">${traits}</span>
             </span>
-            <span class="rec-fl">\u203a</span>
+            <span class="vl">${ilYA(Date.parse(p.created_at || '') || Date.now())}</span>
           </button>`
       }).join('')}
     </div>`
@@ -4882,12 +4879,17 @@ async function peindreDernieresProcedures() {
    date, ni qui l'a retiré. Une information qu'on n'écrit pas ne se retrouve
    pas. Il faudra un journal pour les garder.
    ═══════════════════════════════════════════════════════════════════════════ */
-async function peindreActivites() {
-  const zone = document.getElementById('accueil-activites')
-  if (!zone) return
+/* Six semaines. Au-delà, une lecture ou une arrivée n'apprend plus rien, et la
+   liste deviendrait trop longue pour qu'on la parcoure. */
+const ACTIVITES_JOURS = 45
 
+/* La collecte, séparée de l'affichage : l'accueil en montre trois, la page
+   dédiée les montre toutes. Une seule source, deux vues — sinon les deux
+   finissent par ne plus dire la même chose. */
+async function collecterActivites() {
   const membres = cachedMembres || []
   const nomDe = (id) => membres.find(m => m.id === id)?.nom || 'Quelqu\u2019un'
+  const depuis = Date.now() - ACTIVITES_JOURS * 86400000
   const faits = []
 
   /* Les arrivées. On saute la fiche du fondateur : « X a rejoint » le jour de
@@ -4911,8 +4913,8 @@ async function peindreActivites() {
     })
   })
 
-  /* Les lectures. Une par personne et par procédure suffit : dix lignes
-     « Karim a lu » d'affilée noieraient tout le reste. */
+  /* Les lectures. Une par personne et par procédure : dix lignes « Karim a lu »
+     d'affilée noieraient tout le reste. */
   const vues = new Set()
   ;(cachedValidations || []).forEach(v => {
     const cle = v.membre_id + '|' + v.procedure_id
@@ -4927,15 +4929,24 @@ async function peindreActivites() {
     })
   })
 
-  /* Les accès refusés. Seule source qui demande une requête — la table peut ne
-     pas exister encore, on se tait alors plutôt que d'échouer. */
+  ;(allGestionProcedures || []).forEach(p => {
+    if (!p.created_at) return
+    faits.push({
+      quand: Date.parse(p.created_at), genre: 'creation',
+      texte: `<b>${escapeHtml(p.titre || 'Une procédure')}</b> a été créée`,
+      detail: p.categorie ? escapeHtml(p.categorie) : '',
+    })
+  })
+
+  /* Seule source qui demande une requête — la table peut ne pas exister
+     encore, on se tait alors plutôt que d'échouer. */
   if (currentMembre?.role === 'gestion') {
     const { data } = await supabase
       .from('demandes_acces')
       .select('nom, email, created_at')
       .eq('entreprise_id', currentMembre.entreprise_id)
       .order('created_at', { ascending: false })
-      .limit(5)
+      .limit(40)
     ;(data || []).forEach(d => {
       faits.push({
         quand: Date.parse(d.created_at), genre: 'refus',
@@ -4945,54 +4956,114 @@ async function peindreActivites() {
     })
   }
 
-  /* ═══ LES LECTURES NE DOIVENT PAS TOUT MANGER ═══
+  return faits.filter(f => f.quand && f.quand >= depuis).sort((a, b) => b.quand - a.quand)
+}
 
-     Une équipe de cinq personnes produit des dizaines de lectures par semaine,
-     là où une arrivée ou un refus d'accès est rare. Trié par date seule, le
-     bloc n'affichait que des lectures — et c'est justement l'événement le moins
-     urgent, celui qu'on retrouve en détail sur la page Analyse.
+const ACT_DESSINS = {
+  arrivee:   '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="19" y1="7" x2="19" y2="13"/><line x1="16" y1="10" x2="22" y2="10"/>',
+  promotion: '<path d="M12 3.2l2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.2 6.8 19.1 8 13.3l-4.4-4 5.9-.7z"/>',
+  lecture:   '<path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><path d="M8.8 16.6l2 2 4-4.4"/>',
+  creation:  '<path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><line x1="11.8" y1="12" x2="11.8" y2="17"/><line x1="9.3" y1="14.5" x2="14.3" y2="14.5"/>',
+  refus:     '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="16.5" y1="7.5" x2="21.5" y2="12.5"/><line x1="21.5" y1="7.5" x2="16.5" y2="12.5"/>',
+}
 
-     On en garde deux au plus. Le reste de la place revient à ce qui n'apparaît
-     nulle part ailleurs. */
+/* La MÊME ligne que sur la page Analyse : `an-lig`, avec son nom, son
+   sous-titre et sa valeur à droite. Trois blocs qui répondent à la même
+   question — que s'est-il passé — doivent se lire de la même façon.
+
+   La pastille d'icône reste : les événements sont de natures différentes, et
+   le dessin les distingue sans qu'on ait à lire. C'est le seul ajout. */
+function ligneActivite(f) {
+  return `
+    <div class="an-lig act-lig">
+      <span class="act-ic act-${f.genre}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">${ACT_DESSINS[f.genre]}</svg>
+      </span>
+      <span class="co">
+        <span class="nm">${f.texte}</span>
+        ${f.detail ? `<span class="st">${f.detail}</span>` : ''}
+      </span>
+      <span class="vl">${depuisQuandCourt(f.quand)}</span>
+    </div>`
+}
+
+async function peindreActivites() {
+  const zone = document.getElementById('accueil-activites')
+  if (!zone) return
+
+  const faits = await collecterActivites()
+
+  /* LES LECTURES NE DOIVENT PAS TOUT MANGER. Une équipe en produit des dizaines
+     par semaine, là où une arrivée est rare. Triées par date seule, elles
+     occupaient les trois lignes — et c'est l'événement le moins urgent, celui
+     qu'on retrouve en détail sur la page Analyse. On en garde une. */
   const parDate = (a, b) => b.quand - a.quand
-  const lectures = faits.filter(f => f.quand && f.genre === 'lecture').sort(parDate).slice(0, 2)
-  const autres = faits.filter(f => f.quand && f.genre !== 'lecture').sort(parDate)
-
-  const recents = [...autres, ...lectures].sort(parDate).slice(0, 5)
+  const lectures = faits.filter(f => f.genre === 'lecture').slice(0, 1)
+  const autres = faits.filter(f => f.genre !== 'lecture')
+  const recents = [...autres, ...lectures].sort(parDate).slice(0, 3)
 
   if (!recents.length) { zone.innerHTML = ''; return }
 
-  const DESSINS = {
-    arrivee:   '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="19" y1="7" x2="19" y2="13"/><line x1="16" y1="10" x2="22" y2="10"/>',
-    promotion: '<path d="M12 3.2l2.5 5.4 5.9.7-4.4 4 1.2 5.8L12 16.2 6.8 19.1 8 13.3l-4.4-4 5.9-.7z"/>',
-    lecture:   '<path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/><path d="M13.6 3v5h5"/><path d="M8.8 16.6l2 2 4-4.4"/>',
-    refus:     '<circle cx="9.5" cy="8" r="3.8"/><path d="M2.8 20a6.7 6.7 0 0 1 13.4 0"/><line x1="16.5" y1="7.5" x2="21.5" y2="12.5"/><line x1="21.5" y1="7.5" x2="16.5" y2="12.5"/>',
-  }
-
   zone.innerHTML = `
-    <div class="rec-bloc">
-      <div class="rec-tete">
-        <span class="rec-pic">
+    <div class="an-bloc">
+      <div class="an-tete">
+        <span class="an-ic">
           <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.7"
                stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="8.8"/><path d="M12 6.8V12l3.6 2.2"/>
           </svg>
         </span>
-        <span class="rec-t">Dernières activités</span>
+        <b>Dernières activités</b>
       </div>
-      ${recents.map(f => `
-        <div class="act-l">
-          <span class="act-ic act-${f.genre}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round">${DESSINS[f.genre]}</svg>
-          </span>
-          <span class="act-co">
-            <span class="act-tx">${f.texte}</span>
-            ${f.detail ? `<span class="act-de">${f.detail}</span>` : ''}
-          </span>
-          <span class="act-q">${depuisQuandCourt(f.quand)}</span>
-        </div>`).join('')}
+      ${recents.map(ligneActivite).join('')}
+      ${faits.length > recents.length
+        ? `<button type="button" class="an-plus" id="act-plus">Voir plus</button>` : ''}
     </div>`
+
+  document.getElementById('act-plus')?.addEventListener('click', ouvrirActivites)
+}
+
+/* La page entière : tout ce que la collecte a trouvé, groupé par jour. Sans ces
+   en-têtes, quarante lignes de « 12 mars » se ressemblent toutes. */
+window.ouvrirActivites = async function () {
+  showGestionScreen('p-activites')
+  const zone = document.getElementById('activites-tout')
+  if (!zone) return
+  zone.innerHTML = '<div class="act-vide">Chargement\u2026</div>'
+
+  const faits = await collecterActivites()
+  if (!faits.length) {
+    zone.innerHTML = `<div class="act-vide">Rien ne s\u2019est passé ces
+      ${Math.round(ACTIVITES_JOURS / 7)} dernières semaines.</div>`
+    return
+  }
+
+  const jour = (t) => new Date(t).toLocaleDateString('fr-FR',
+    { weekday: 'long', day: 'numeric', month: 'long' })
+  const aujourdhui = jour(Date.now())
+  const hier = jour(Date.now() - 86400000)
+
+  let dernier = null
+  const morceaux = []
+  faits.forEach(f => {
+    const j = jour(f.quand)
+    if (j !== dernier) {
+      dernier = j
+      const nom = j === aujourdhui ? "Aujourd'hui" : j === hier ? 'Hier' : j
+      morceaux.push(`<div class="act-jour">${escapeHtml(nom)}</div>`)
+    }
+    morceaux.push(ligneActivite(f))
+  })
+
+  /* Le même habit que la page Procédures de l'analyse : une tête de section en
+     petites capitales, puis les lignes. Sans l'anneau — il répartirait un total
+     entre des parts, et une activité ne se répartit pas. */
+  zone.innerHTML = `
+    <div class="fm-titre">Ce qui s\u2019est passé</div>
+    ${morceaux.join('')}
+    <div class="fm-periode-mot">${faits.length} activité${faits.length > 1 ? 's' : ''}
+      sur ${Math.round(ACTIVITES_JOURS / 7)} semaines</div>`
 }
 
 /* « 2 min », « 3 h », « hier », « 12 mars ». Court, parce que cette colonne est

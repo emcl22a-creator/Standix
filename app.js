@@ -7325,6 +7325,9 @@ document.getElementById('ai-copier')?.addEventListener('click', async () => {
   catch (e) { toast("La copie a \u00e9chou\u00e9 \u2014 s\u00e9lectionnez le texte \u00e0 la main.") }
 })
 
+/* Échecs consécutifs du serveur. Remis à zéro dès qu'une réponse arrive. */
+let aiEchecsSuite = 0
+
 async function pollAiStatus() {
   try {
     const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
@@ -7332,6 +7335,40 @@ async function pollAiStatus() {
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
       body: JSON.stringify({ procedure_id: aiProcedureId }),
     })
+
+    /* ═══ UNE PANNE DU SERVEUR N'EST PAS UNE COUPURE RÉSEAU ═══
+
+       Le code réessayait indéfiniment, toutes les cinq secondes, sans jamais
+       montrer la raison : l'anneau tournait pour l'éternité pendant que la
+       console se remplissait de 500 identiques.
+
+       Une coupure passagère se répare toute seule, on retente. Une fonction qui
+       plante répondra pareil au centième essai. On distingue donc les deux : on
+       accorde trois tentatives, puis on affiche ce que le serveur a répondu et
+       on s'arrête. */
+    if (!checkRes.ok) {
+      const brut = await checkRes.text().catch(() => '')
+      let dit = brut
+      try { dit = JSON.parse(brut).error || JSON.parse(brut).message || brut } catch (e) {}
+      aiEchecsSuite++
+      console.error('[ai-check]', checkRes.status, brut)
+
+      if (aiEchecsSuite < 3) {
+        aiPollTimer = setTimeout(pollAiStatus, 4000)
+        return
+      }
+      stopAiProgressSimulation(0)
+      document.getElementById('ai-progress-card').style.display = 'none'
+      document.getElementById('ai-upload-card').style.display = 'block'
+      const zone = document.getElementById('ai-error')
+      zone.style.color = 'var(--red)'
+      zone.textContent = `Le serveur d'analyse a répondu ${checkRes.status}` +
+        (dit ? ' : ' + String(dit).slice(0, 300) : ' sans détail.')
+      afficherDetailEchec(aiProcedureId, dit || `HTTP ${checkRes.status}`)
+      return
+    }
+    aiEchecsSuite = 0
+
     const data = await checkRes.json()
 
     if (data.status === 'processing') {
@@ -7382,8 +7419,20 @@ document.getElementById('ai-view-btn').onclick = () => openAnalyse(aiProcedureId
     document.getElementById('ai-error').textContent = data.message || "Une erreur est survenue pendant l'analyse."
     afficherDetailEchec(aiProcedureId, data.message)
   } catch (e) {
-    // Coupure réseau passagère : on retente sans rien casser
+    /* Ici, c'est vraiment le réseau : la requête n'est même pas partie, ou la
+       réponse n'était pas lisible. On retente — mais pas éternellement. */
     aiNbSondages++
+    aiEchecsSuite++
+    console.warn('[ai-check] injoignable :', e?.message || e)
+    if (aiEchecsSuite >= 6) {
+      stopAiProgressSimulation(0)
+      document.getElementById('ai-progress-card').style.display = 'none'
+      document.getElementById('ai-upload-card').style.display = 'block'
+      const zone = document.getElementById('ai-error')
+      zone.style.color = 'var(--red)'
+      zone.textContent = "Le serveur d'analyse est injoignable. R\u00e9essayez dans un instant."
+      return
+    }
     aiPollTimer = setTimeout(pollAiStatus, 5000)
   }
 }

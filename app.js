@@ -1644,6 +1644,7 @@ async function enterApp(membre) {
      bouton des réglages, au lieu d'arriver après la lecture en base — ce qui
      donnait une barre incomplète pendant une seconde. */
   peindreTiroir()
+  peindreBarreEtablissements()
 
   // Préchauffage des bibliothèques QR : utile, mais surtout pas pendant le
   // premier affichage. On attend que le navigateur soit inoccupé.
@@ -4309,6 +4310,7 @@ function activerAvecNaissance(ecran) {
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   majBoutonPlus(id)
+  animerBarreHaut()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
@@ -4332,6 +4334,7 @@ window.showGestionScreen = function(id, btn) {
   /* On redessine à chaque changement d'écran : c'est le seul moment dont on soit
      sûr qu'il arrive, quoi qu'il se passe ailleurs. */
   peindreTiroir()
+  peindreBarreEtablissements()
 }
 
 // Le document défile d'un seul bloc, tous écrans confondus : sans ça, en
@@ -4410,6 +4413,7 @@ window.showEquipeScreen = function(id, btn) {
   remonterEnHaut()
 
   peindreTiroir()
+  peindreBarreEtablissements()
 }
 
 // ═══════════ GESTION : liste ═══════════
@@ -4803,7 +4807,11 @@ async function peindreDernieresProcedures() {
     .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
     .slice(0, 3)
 
-  if (!recentes.length) { zone.innerHTML = ''; return }
+  /* LE BLOC RESTE, MÊME VIDE.
+
+     Il disparaissait quand il n'y avait rien : l'accueil changeait alors de
+     forme selon le contenu, et on ne savait pas qu'un jour quelque chose
+     apparaîtrait là. Un cadre avec une phrase apprend ce qu'on y trouvera. */
 
   /* La durée filmée n'est pas stockée : elle se déduit des bornes des étapes.
      Une seule requête pour les trois, et seulement deux colonnes — inutile de
@@ -4838,6 +4846,8 @@ async function peindreDernieresProcedures() {
         </span>
         <b>Dernières procédures créées</b>
       </div>
+      ${!recentes.length ? `<div class="an-vide">Vos procédures apparaîtront ici
+        au fur et à mesure que vous les créerez.</div>` : ''}
       ${recentes.map(p => {
         const nb = p.etapes?.[0]?.count ?? 0
         const sec = duree.get(p.id)
@@ -5003,7 +5013,8 @@ async function peindreActivites() {
   const autres = faits.filter(f => f.genre !== 'lecture')
   const recents = [...autres, ...lectures].sort(parDate).slice(0, 3)
 
-  if (!recents.length) { zone.innerHTML = ''; return }
+  /* Même règle que le bloc au-dessus : il reste, avec une phrase à la place
+     des lignes. */
 
   zone.innerHTML = `
     <div class="an-bloc">
@@ -5016,6 +5027,8 @@ async function peindreActivites() {
         </span>
         <b>Dernières activités</b>
       </div>
+      ${!recents.length ? `<div class="an-vide">Les arrivées, les lectures et les
+        créations s\u2019afficheront ici.</div>` : ''}
       ${recents.map(ligneActivite).join('')}
       ${faits.length > recents.length
         ? `<button type="button" class="an-plus" id="act-plus">Voir plus</button>` : ''}
@@ -12317,8 +12330,17 @@ function elementListeTiroir() {
 }
 
 async function chargerEtablissements() {
-  const tiroir = elementTiroir()
-  if (!tiroir || !currentMembre) return
+  /* ON NE DÉPEND PLUS DU TIROIR.
+
+     Cette fonction sortait aussitôt si le tiroir était absent du balisage. Il a
+     été retiré des deux barres du haut : elle ne chargeait donc plus rien, et
+     `mesEtablissements` restait vide — la piste n'avait jamais qu'une carte, et
+     la bascule d'un établissement à l'autre était devenue impossible sans que
+     rien ne le signale.
+
+     Charger des données ne doit pas dépendre de la présence d'un élément qui
+     les affiche. Ce sont les fonctions de dessin qui vérifient leur cible. */
+  if (!currentMembre) return
 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return
@@ -12375,6 +12397,7 @@ async function chargerEtablissements() {
   }
 
   peindreTiroir()
+  peindreBarreEtablissements()
   peindreListeEtab()
 }
 
@@ -12508,6 +12531,65 @@ document.addEventListener('click', (e) => {
 })
 
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiroir() })
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT
+
+   Un cercle par établissement, dans une pilule de la matière de la barre du
+   bas. Le plafond étant de trois, ils tiennent tous côte à côte : on touche
+   celui qu'on veut au lieu de faire glisser pour atteindre un voisin déjà
+   visible.
+
+   Le « + » reste gris. Ajouter un établissement n'est pas le geste courant ;
+   s'il portait l'ambre, il pèserait autant que l'entreprise elle-même.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* L'APPROCHE, À CHAQUE CHANGEMENT DE PAGE.
+
+   280 ms, depuis 90 % — la même profondeur que le fondu des pages, et sans
+   déplacement : la pilule ne vient de nulle part, elle est déjà là.
+
+   On retire la classe avant de la remettre, avec une lecture forcée entre les
+   deux : sans elle le navigateur ne voit aucun changement et l'animation ne
+   rejoue pas. */
+function animerBarreHaut() {
+  const p = document.getElementById('topbar-pilule')
+  if (!p) return
+  p.classList.remove('approche')
+  void p.offsetWidth
+  p.classList.add('approche')
+}
+
+function peindreBarreEtablissements() {
+  const zone = document.getElementById('etab-ronds')
+  const plus = document.getElementById('etab-plus')
+  if (!zone) return
+
+  const liste = mesEtablissements || []
+  if (plus) {
+    plus.style.display = (liste.length < ETABLISSEMENTS_MAX && multiSitesAutorise())
+      ? '' : 'none'
+  }
+  if (!liste.length) return
+
+  const courant = currentMembre?.entreprise_id
+  zone.innerHTML = liste.map(e => {
+    const init = (e.nom || '?').trim().split(/\s+/).slice(0, 2)
+      .map(m => m[0]).join('').toUpperCase()
+    const dedans = e.logo_url
+      ? `<img src="${escapeHtml(cheminFichier(e.logo_url))}" alt="">`
+      : `<span class="rond-init">${escapeHtml(init)}</span>`
+    return `
+      <button type="button" class="rond-etab${e.id === courant ? ' actif' : ''}"
+              data-etab="${escapeHtml(e.id)}" title="${escapeHtml(e.nom || '')}"
+              aria-label="${escapeHtml(e.nom || 'Établissement')}">${dedans}</button>`
+  }).join('')
+
+  zone.querySelectorAll('[data-etab]').forEach(b => {
+    b.addEventListener('click', () => basculerVersEtablissement(b.dataset.etab))
+  })
+}
+
+document.getElementById('etab-plus')?.addEventListener('click', () => ouvrirFenetreEtab(null))
 
 /* Changer d'établissement, c'est changer de fiche membre : on relance l'app avec
    celle qui a été choisie, ce qui recharge procédures, équipe et droits. */

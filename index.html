@@ -328,17 +328,14 @@
       <div class="hero-txt">
         <h2>Créer des procédures avec l’IA</h2>
         <p>Filmez le geste une seule fois. L’IA le découpe en étapes et les rédige.</p>
-        <!-- « Créer avec l'IA » plutôt que « Créer une procédure avec l'IA » :
-             le titre juste au-dessus dit déjà la phrase entière, et un bouton
-             qui répète son titre mot pour mot se lit deux fois pour rien.
-             La caméra, elle, reste : elle annonce le geste — on va filmer. -->
-        <button type="button" class="hero-cta" onclick="ouvrirMontageVideo()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linejoin="round"><rect x="2.6" y="6" width="13" height="12" rx="2.6"/><path d="M15.6 11l5.8-3.4v8.8L15.6 13z"/></svg>
-          Créer avec l’IA
-        </button>
       </div>
     </div>
+
+    <!-- ═══ L'ANALYSE EN COURS ═══
+         Vide et masqué tant qu'aucune analyse ne tourne. Un cadre qui
+         annoncerait « aucune analyse en cours » occuperait la place sans rien
+         apprendre : mieux vaut qu'il n'existe pas. -->
+    <div id="accueil-encours"></div>
   </div>
 
   <div class="screen" id="p-list">
@@ -1099,22 +1096,16 @@
 
     <!-- Le temps gagné : la seule chose de cette page qui réponde à
          « pourquoi je paie cet abonnement ». -->
-    <div class="an-gain" id="an-gain">
-      <!-- L'explication du comptage vit désormais ici, et ici seulement. Trois
-           boutons identiques sur trois sections voisines donnaient à croire
-           qu'ils disaient trois choses différentes. -->
-      <span class="an-gain-lueur"></span>
-      <div class="gain-ligne">
-        <span class="an-gain-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.7"
-               stroke-linecap="round"><circle cx="12" cy="12" r="8.8"/><path d="M12 6.6V12l3.8 2.2"/></svg>
-        </span>
-        <button type="button" class="an-aide gain-aide" data-aide-temps="" aria-label="Comment le temps est compté">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>
-        </button>
-      </div>
-      <div class="t" id="an-gain-t">—</div>
-      <div class="s" id="an-gain-s">—</div>
+    <!-- LA CARTE DU TEMPS A ÉTÉ RETIRÉE.
+
+         Il ne reste que l'explication du comptage, seule et alignée à gauche.
+         Les minutes se lisent maintenant directement dans chaque section :
+         c'est là qu'on se demande comment elles sont comptées, pas dans un
+         encadré séparé qui redisait le total. -->
+    <div class="an-aide-seule">
+      <button type="button" class="an-aide" data-aide-temps="" aria-label="Comment le temps est compté">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"></circle></svg>
+      </button>
     </div>
 
     <!-- L'équipe passe en dernier. Les deux premières sections disent où part le

@@ -377,10 +377,19 @@
      La courbe part vite et finit lentement : l'essentiel du chemin est fait
      dans le premier tiers, de sorte que la page paraît réactive tout en
      s'installant en douceur. */
-  .screen.fondu{ animation:ecranFondu 0.26s cubic-bezier(0.32,0.72,0,1); }
+  /* ═══ APPARAÎTRE, PUIS GRANDIR ═══
+
+     Les deux ne vont pas à la même vitesse, et c'est tout l'effet : la page est
+     déjà entièrement visible au tiers du chemin, mais elle continue de grandir.
+     On ne la voit donc jamais pâle — on la voit arriver.
+
+     240 ms. L'échelle part de 0,93 : à 0,985, l'ancien réglage, le mouvement
+     était trop faible pour se lire, et il ne restait qu'un fondu. */
+  .screen.fondu{ animation:ecranFondu 0.24s cubic-bezier(0.22,0.85,0.25,1); }
   @keyframes ecranFondu{
-    from{ opacity:0; transform:scale(0.985) }
-    to{ opacity:1; transform:none }
+    0%  { opacity:0; transform:scale(0.93) }
+    34% { opacity:1; transform:scale(0.978) }
+    100%{ opacity:1; transform:none }
   }
 
   /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux
@@ -5382,110 +5391,86 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    LE BOUTON DE CRÉATION, EN GOUTTE
 
-   Il n'existe que sur la page Procédures. Il en sort et y retourne en passant
-   DERRIÈRE la barre : la matière qui le porte est au plan 9, la barre au 10,
-   le bouton net au 11. Cet ordre suffit, il n'y a rien à masquer.
+   BLOC ENTIER, RÉÉCRIT D'UN SEUL TENANT. Il avait été retouché sept fois par
+   petits bouts, et chaque retouche déplaçait un réglage sans voir les autres :
+   un cou qui démarrait à 22 px de haut — donc qui APPARAISSAIT d'un coup —
+   pendant que le bouton était encore caché derrière la barre.
 
-   Sa largeur n'est pas écrite ici : le script la mesure sur un onglet de la
-   barre, qui fait exactement la largeur de la capsule. Le jour où le nombre
-   d'onglets change, les deux suivront ensemble — une valeur en dur aurait
-   divergé sans que personne ne s'en aperçoive.
+   Tout est ici, dans l'ordre où ça se lit. Ne pas modifier une valeur sans
+   relire les trois autres qui en dépendent.
+
+   Trois plans : la MATIÈRE sous la barre, la BARRE, le BOUTON net au-dessus.
+   C'est cet empilement qui fait la traversée — aucun masque.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root{
   --plus-bas:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
   --plus-larg:86px;
   --plus-cx:50%;
   --plus-h:46px;
-  /* LA POSITION DE REPOS : entièrement sous l'arête, donc hors du cadre.
-     `100%` vaut la hauteur du bouton — il est exactement caché, quelle que
-     soit cette hauteur. */
+  /* Repos : entièrement sous l'arête, donc hors du cadre. `100%` vaut la
+     hauteur du bouton — il est exactement caché quelle qu'elle soit. */
   --plus-repos:100%;
-  /* Six pixels au-dessus de l'arête une fois posé. */
   --plus-monte:-6px;
+  /* UNE SEULE COURBE, UNE SEULE DURÉE, pour l'aller comme pour le retour.
+     C'est ce qui garantit qu'ils se répondent. */
+  --plus-duree:0.36s;
+  --plus-courbe:cubic-bezier(0.34, 1.62, 0.5, 1);
 }
 
+/* La matière. Sous la barre — c'est ce qui la fait passer au travers. */
 .liquide{
   position:fixed; left:0; right:0; bottom:0; height:220px; z-index:9;
   pointer-events:none; filter:url(#fusion);
-  /* Rien à afficher tant qu'on n'est pas sur la page : sans ça, la matière
-     resterait en mémoire du navigateur pour un objet invisible. */
   visibility:hidden;
 }
-body.plus-vu .liquide{ visibility:visible; }
+body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
 
-/* Le socle vit ENTIÈREMENT derrière la barre — son sommet effleure l'arête
+/* Le socle vit entièrement derrière la barre : son sommet effleure l'arête
    haute sans jamais la dépasser. On ne le voit jamais ; on ne voit que ce
-   qu'il produit, le cou.
-
-   Hauteur nulle au repos : s'il gardait sa masse, la goutte lui resterait
-   attachée une fois posée et le cou ne se romprait pas. */
+   qu'il produit, le cou. */
 .socle{
   position:absolute; left:var(--plus-cx); transform:translateX(-50%);
   bottom:calc(var(--plus-bas) + 34px);
   width:calc(var(--plus-larg) * 0.5); height:0;
   border-radius:20px; background:#F58A15;
-  transition:left 0.34s cubic-bezier(0.32,0.72,0,1);
 }
-/* L'étirement puis la rupture, en une seule courbe : la masse monte à la
-   rencontre de la goutte, s'amincit, puis disparaît. */
-/* ═══ LE COU SUIT, IL NE PRÉCÈDE PAS ═══
 
-   La matière montait en même temps que le bouton, et le dépassait : on voyait
-   une goutte s'élever, PUIS le rectangle la rattraper. L'ordre était inversé.
+/* LE COU PART DE ZÉRO ET Y REVIENT.
 
-   Le cou démarre maintenant avec 50 ms de retard et ne monte qu'à 52 px, en
-   deçà du bouton : c'est lui qui est tiré, pas lui qui tire. */
-/* Le cou doit avoir FINI avant le bouton, pas après. Il montait à 52 px et
-   traînait cent millisecondes au-delà de l'arrivée : la goutte restait pendue
-   sous un bouton déjà posé, et c'est elle qu'on regardait en dernier.
+   C'était le défaut : la première image le posait déjà à 22 px, et il naissait
+   d'un coup sous un bouton encore caché. Il monte maintenant depuis rien,
+   s'étire jusqu'à 58, s'affine jusqu'au fil de six pixels, puis rompt.
 
-   Il culmine maintenant à 42 et s'éteint à 230 ms, quand le bouton se pose. */
-/* LE COU CASSE AVANT L'ARRIVÉE.
-
-   220 ms contre 360 pour le bouton : le fil rompt à mi-course et le bouton
-   finit son ressort seul. C'est ce que fait une vraie goutte — elle se détache
-   avant d'avoir fini sa course.
-
-   Le défaut d'avant était l'inverse, et involontaire : un cou de 200 ms sous un
-   bouton de 400, qui s'éteignait pendant que l'autre flottait encore. Ici c'est
-   voulu, et le fil s'affine jusqu'à six pixels pour qu'on VOIE la rupture. */
-@keyframes couMonte{
-  0%  { height:22px; width:calc(var(--plus-larg) * 0.5); }
-  45% { height:58px; width:20px; }
-  80% { height:30px; width:6px; }
+   240 ms contre 360 pour le bouton : le fil casse à mi-course et le bouton
+   finit son ressort seul. C'est ce que fait une vraie goutte. */
+@keyframes couGoutte{
+  0%  { height:0;    width:calc(var(--plus-larg) * 0.5); }
+  22% { height:44px; width:26px; }
+  52% { height:58px; width:18px; }
+  82% { height:28px; width:6px;  }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
+/* 60 ms de retard : le bouton doit avoir franchi l'arête avant que la matière
+   ne se montre. Sans ce décalage, on voit la goutte avant le rectangle. */
+body.plus-vu .socle,
+body.plus-part .socle{
+  animation:couGoutte 0.24s cubic-bezier(0.5, 0, 0.3, 1) 0.06s;
+}
 
-body.plus-vu .socle{ animation:couMonte 0.22s cubic-bezier(0.5,0,0.3,1) 0.04s; }
-/* Le même cou qu'à l'aller, joué à l'envers : la matière se reforme, s'étire,
-   puis s'éteint. `reverse` évite d'écrire une seconde suite d'images-clés qui
-   aurait fini par diverger de la première. */
-/* À la sortie, le MÊME cou joué à l'endroit : il se reforme, s'étire, casse.
-   À l'envers, il grandissait au moment où il aurait dû rompre. */
-body.plus-part .socle{ animation:couMonte 0.22s cubic-bezier(0.5,0,0.3,1); }
-
+/* La bulle double le bouton dans la matière. Même repère — l'arête de la barre
+   — sinon les deux se désolidarisent. */
 .bulle{
-  /* MÊME REPÈRE QUE LE BOUTON : l'arête haute de la barre, et non le bas de
-     l'écran. Sans ça les deux se désolidarisent — la matière monterait de
-     soixante pixels quand le bouton n'en monte que six. */
   position:absolute; left:var(--plus-cx);
   bottom:calc(var(--plus-bas) + var(--bar-h));
   width:var(--plus-larg); height:var(--plus-h);
   border-radius:calc(var(--plus-h) / 2); background:#F58A15;
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
-  /* Cet état est aussi celui du RETOUR. La courbe est désormais la MÊME qu'à
-     l'aller : le bouton redescend avec le même ressort, dépassant légèrement
-     sous la barre avant de se caler. Aller et retour se répondent. */
-  transition:transform 0.36s cubic-bezier(0.34,1.62,0.5,1),
-             left 0.26s cubic-bezier(0.32,0.72,0,1);
+  transition:transform var(--plus-duree) var(--plus-courbe);
 }
 
-/* LE CADRE. Il s'arrête à l'arête haute de la barre et masque ce qui dépasse
-   en dessous : le bouton n'existe à l'écran qu'à partir du moment où il émerge.
-   Sans lui, il se dessinait par-dessus la barre pendant toute sa montée.
-
-   `pointer-events:none` sur le cadre, `auto` sur le bouton : le cadre couvre
-   tout l'écran, il ne doit rien intercepter. */
+/* Le cadre s'arrête à l'arête haute et masque ce qui dépasse en dessous : le
+   bouton n'existe à l'écran qu'à partir du moment où il émerge. Il couvre tout
+   l'écran, donc il ne doit rien intercepter. */
 .plus-cadre{
   position:fixed; left:0; right:0; top:0;
   bottom:calc(var(--plus-bas) + var(--bar-h));
@@ -5497,54 +5482,31 @@ body.plus-part .socle{ animation:couMonte 0.22s cubic-bezier(0.5,0,0.3,1); }
   width:var(--plus-larg); height:var(--plus-h); border:none;
   border-radius:calc(var(--plus-h) / 2);
   display:grid; place-items:center;
-  /* MOINS FLUO. Le dégradé montait jusqu'à #FFAD33 et le halo portait à 32 % :
-     sur un fond noir, l'ensemble rayonnait comme une enseigne. On garde
-     l'orange de la marque, on éteint le haut du dégradé et on divise le halo
-     par deux — il détache le bouton du fond, il ne l'éclaire plus. */
-  background:linear-gradient(135deg,#E85D00 0%,#F58A15 62%,#FF9F26 100%);
+  background:linear-gradient(135deg, #E85D00 0%, #F58A15 62%, #FF9F26 100%);
   color:#2A1400;
   box-shadow:0 6px 16px rgba(0,0,0,0.34), 0 2px 10px rgba(255,122,24,0.16);
-  /* 0,62 et non 0,5 : le trajet est deux fois plus court qu'avant, une échelle
-     trop basse ferait un saut de taille au lieu d'une éclosion. */
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
   opacity:0; pointer-events:none;
-  transition:transform 0.36s cubic-bezier(0.34,1.62,0.5,1),
-             opacity 0.1s linear 0.20s,
-             left 0.26s cubic-bezier(0.32,0.72,0,1);
+  /* L'opacité monte presque d'un coup à l'aller — le rectangle doit être solide
+     avant que le cou n'apparaisse — et s'éteint en retard au retour, quand il
+     est déjà rentré sous l'arête. */
+  transition:transform var(--plus-duree) var(--plus-courbe),
+             opacity 0.04s linear 0.20s;
 }
 .plus-flot svg{ width:21px; height:21px; display:block; }
 
-/* 260 ms, comme le changement de page : les deux mouvements se terminent
-   ensemble. La montée décélère, sans dépassement — c'est la chute qui porte
-   l'effet, pas l'arrivée. */
-/* L'OPACITÉ MONTE PRESQUE D'UN COUP.
-
-   À 100 ms de fondu, le bouton n'était qu'à moitié visible quand le cou
-   apparaissait : on voyait donc la goutte AVANT le rectangle, alors que c'est
-   l'inverse qu'on veut. À 60 ms il est solide dès le départ et c'est lui qui
-   mène — le cou le suit.
-
-   Ce réglage ne vaut que pour la montée : la chute garde son fondu retardé,
-   déclaré sur l'état de repos. */
-/* LE RESSORT. La courbe dépasse 1 avant de revenir : le bouton monte six pixels
-   trop haut, puis se pose. 400 ms — plus long que le changement de page, mais
-   c'est le prix du rebond, et il n'a lieu qu'une fois par visite sur la page.
-
-   L'opacité reste à 40 ms : le rectangle doit être solide avant que le cou
-   n'apparaisse, sinon on voit la goutte en premier. */
 body.plus-vu .bulle,
+body.plus-vu .plus-flot{ transform:translate(-50%, var(--plus-monte)) scale(1); }
 body.plus-vu .plus-flot{
-  transform:translate(-50%, var(--plus-monte)) scale(1);
-  transition:transform 0.36s cubic-bezier(0.34,1.62,0.5,1),
-             opacity 0.04s linear,
-             left 0.26s cubic-bezier(0.32,0.72,0,1);
+  opacity:1; pointer-events:auto;
+  transition:transform var(--plus-duree) var(--plus-courbe),
+             opacity 0.04s linear;
 }
-body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
-
 .plus-flot:active{ transform:translate(-50%, var(--plus-monte)) scale(0.94); }
 
 @media (prefers-reduced-motion: reduce){
-  .bulle, .plus-flot, .socle{ transition:none; animation:none; }
+  .bulle, .plus-flot{ transition:none; }
+  .socle{ animation:none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -5601,7 +5563,10 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
 .proc-rich-card,
 .reg-groupe,
 .reg-identite,
-.an-intro,
+.an-intro{
+  border-color:transparent !important;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA BARRE DU HAUT

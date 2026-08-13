@@ -12591,6 +12591,19 @@ function peindreBarreEtablissements() {
 
 document.getElementById('etab-plus')?.addEventListener('click', () => ouvrirFenetreEtab(null))
 
+/* Les deux points suivent le panneau visible. On lit la position du défilement
+   plutôt que de tenir un compteur : c'est la piste qui fait autorité, et elle
+   reste juste même si le doigt s'arrête entre deux. */
+;(() => {
+  const piste = document.getElementById('haut-piste')
+  const points = document.getElementById('haut-points')
+  if (!piste || !points) return
+  piste.addEventListener('scroll', () => {
+    const i = piste.scrollLeft > piste.clientWidth / 2 ? 1 : 0
+    ;[...points.children].forEach((p, k) => p.classList.toggle('on', k === i))
+  }, { passive: true })
+})()
+
 /* Changer d'établissement, c'est changer de fiche membre : on relance l'app avec
    celle qui a été choisie, ce qui recharge procédures, équipe et droits. */
 async function basculerVersEtablissement(entrepriseId) {

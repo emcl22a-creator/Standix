@@ -5448,6 +5448,14 @@
   --plus-duree:0.26s;
   --plus-courbe:cubic-bezier(0.5, -0.2, 0.9, 0.6);
   --plus-courbe-entree:cubic-bezier(0.1, 0.4, 0.5, 1.2);
+  /* L'ENTRÉE : 230 ms. Ramenée de 340 à la demande.
+
+     Attention en la relisant : le temps qu'on PERÇOIT n'est pas celui-ci. Entre
+     le doigt et le premier mouvement, l'app change de page, redessine la liste
+     et repose la barre — de soixante à cent cinquante millisecondes selon la
+     charge. Du clic au bouton posé, on est donc autour de 310, pas de 230.
+     Diviser cette valeur par deux ne diviserait pas l'attente par deux. */
+  --plus-duree-entree:0.23s;
 }
 
 /* LA MATIÈRE EST COUPÉE À L'ARÊTE, COMME LE BOUTON.
@@ -5515,7 +5523,11 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
 /* La suite étant symétrique, les deux sens partagent la même — et `couEntree`,
    qui existait pour éviter l'éclaboussure à l'entrée, n'a plus de raison
    d'être. Une clé de moins à tenir en accord avec sa jumelle. */
-body.plus-vu .socle,
+/* La matière suit le bouton : même durée que lui, dans chaque sens. Les laisser
+   diverger, c'est ce qui donnait l'impression de deux animations distinctes. */
+body.plus-vu .socle{
+  animation:couGoutte 0.23s cubic-bezier(0.4, 0, 0.3, 1);
+}
 body.plus-part .socle{
   animation:couGoutte 0.26s cubic-bezier(0.4, 0, 0.3, 1);
 }
@@ -5559,10 +5571,10 @@ body.plus-part .socle{
 
 body.plus-vu .bulle,
 body.plus-vu .plus-flot{ transform:translate(-50%, var(--plus-monte)) scale(1); }
-body.plus-vu .bulle{ transition:transform var(--plus-duree) var(--plus-courbe-entree); }
+body.plus-vu .bulle{ transition:transform var(--plus-duree-entree) var(--plus-courbe-entree); }
 body.plus-vu .plus-flot{
   opacity:1; pointer-events:auto;
-  transition:transform var(--plus-duree) var(--plus-courbe-entree),
+  transition:transform var(--plus-duree-entree) var(--plus-courbe-entree),
              opacity 0.04s linear;
 }
 .plus-flot:active{ transform:translate(-50%, var(--plus-monte)) scale(0.94); }

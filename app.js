@@ -4807,41 +4807,50 @@ async function peindreDernieresProcedures() {
     duree.set(e.procedure_id, Math.max(duree.get(e.procedure_id) || 0, Number(f)))
   })
 
-  zone.innerHTML = `
-    <div class="rec-titre">Dernières procédures</div>
-    ${recentes.map(p => {
-      const nb = p.etapes?.[0]?.count ?? 0
-      const sec = duree.get(p.id)
-      /* On n'affiche une durée que si la vidéo existe ET que des bornes ont été
-         posées. Un « 0:00 » sur une procédure écrite à la main serait faux. */
-      const traits = [
-        nb ? `${nb} étape${nb > 1 ? 's' : ''}` : null,
-        (p.video_url && sec) ? `${formatTime(sec)} de vidéo` : (p.video_url ? 'vidéo' : 'sans vidéo'),
-        p.categorie ? escapeHtml(p.categorie) : null,
-      ].filter(Boolean).join(' \u00b7 ')
+  /* UN SEUL BLOC, ET DES LIGNES DEDANS.
 
-      return `
-        <button type="button" class="rec" data-proc="${escapeHtml(p.id)}">
-          <span class="rec-ic">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-                    stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-              <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-              <line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="url(#logoOrIc)"
-                    stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/>
-              <line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="url(#logoOrIc)"
-                    stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/>
-            </svg>
-          </span>
-          <span class="rec-co">
-            <span class="rec-h">
-              <span class="rec-nom">${escapeHtml(p.titre || 'Sans titre')}</span>
-              <span class="rec-q">${ilYA(Date.parse(p.created_at || '') || Date.now())}</span>
+     Trois cartes séparées faisaient trois objets à l'écran, alors qu'il s'agit
+     d'une seule information : ce qui vient d'être créé. Un cadre unique, un
+     titre, et des lignes séparées par un filet — la même construction que les
+     sections de la page Analyse. */
+  zone.innerHTML = `
+    <div class="rec-bloc">
+      <div class="rec-tete">
+        <span class="rec-pic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+            <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        <span class="rec-t">Dernières procédures créées</span>
+      </div>
+      ${recentes.map(p => {
+        const nb = p.etapes?.[0]?.count ?? 0
+        const sec = duree.get(p.id)
+        /* On n'affiche une durée que si la vidéo existe ET que des bornes ont
+           été posées. Un « 0:00 » sur une procédure écrite à la main serait
+           faux. */
+        const traits = [
+          nb ? `${nb} étape${nb > 1 ? 's' : ''}` : null,
+          (p.video_url && sec) ? `${formatTime(sec)} de vidéo`
+            : (p.video_url ? 'vidéo' : 'sans vidéo'),
+          p.categorie ? escapeHtml(p.categorie) : null,
+        ].filter(Boolean).join(' \u00b7 ')
+
+        return `
+          <button type="button" class="rec-l" data-proc="${escapeHtml(p.id)}">
+            <span class="rec-co">
+              <span class="rec-h">
+                <span class="rec-nom">${escapeHtml(p.titre || 'Sans titre')}</span>
+                <span class="rec-q">${ilYA(Date.parse(p.created_at || '') || Date.now())}</span>
+              </span>
+              <span class="rec-tr">${traits}</span>
             </span>
-            <span class="rec-tr">${traits}</span>
-          </span>
-        </button>`
-    }).join('')}`
+            <span class="rec-fl">\u203a</span>
+          </button>`
+      }).join('')}
+    </div>`
 
   zone.querySelectorAll('[data-proc]').forEach(b => {
     b.addEventListener('click', () => openAnalyse(b.dataset.proc))
@@ -10189,9 +10198,22 @@ const currentAnalysePeriod = 'all'
    l'écran, on vérifie qu'on est toujours la dernière. */
 let ouvertureCourante = 0
 
+/* D'OÙ L'ON VENAIT.
+
+   La suppression renvoyait toujours à `p-list`, puis cherchait la carte de la
+   procédure pour la replier. Or cette carte vit sur `p-category` — on la
+   cherchait donc là où elle n'est pas, et l'animation ne jouait jamais quand on
+   supprimait depuis une catégorie. La procédure disparaissait d'un coup, entre
+   deux images, et on doutait d'avoir supprimé la bonne.
+
+   On retient l'écran d'où l'on ouvre : c'est là qu'on retournera. */
+let retourApresAnalyse = 'p-list'
+
 async function openAnalyse(procId) {
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
+  const depuis = document.querySelector('#gestion-app .screen.active')?.id
+  if (depuis && depuis !== 'p-analyse') retourApresAnalyse = depuis
   showGestionScreen('p-analyse')
 
   /* La coche verte ne sert qu'à annoncer « ton analyse est prête ». Une fois la
@@ -10267,10 +10289,11 @@ async function openAnalyse(procId) {
       })
       return
     }
-    /* On revient d'abord à la liste, puis on replie la carte : la personne voit
-       la procédure qu'elle vient de supprimer s'en aller. La ligne est déjà
-       effacée en base, l'animation ne fait que raconter ce qui s'est passé. */
-    showGestionScreen('p-list')
+    /* On revient à l'écran d'où l'on venait — la catégorie, ou la liste — puis
+       on replie la carte : la personne voit la procédure qu'elle vient de
+       supprimer s'en aller. La ligne est déjà effacée en base, l'animation ne
+       fait que raconter ce qui s'est passé. */
+    showGestionScreen(retourApresAnalyse)
     const carte = carteDeProcedure(procId)
     if (carte) await replierCarte(carte)
 

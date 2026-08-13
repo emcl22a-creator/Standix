@@ -4345,10 +4345,18 @@
     position:relative; overflow:hidden;
     margin-bottom:16px; padding:22px 20px 22px;
     border-radius:24px;
-    /* Le noir de l'app, celui des autres cartes. Le fond chaud d'avant tirait
-       la carte vers l'orange ; la couleur doit rester sur les bords et le
-       bouton, pas baigner le texte. */
-    background:var(--hero-gradient);
+    /* ═══ UN NOIR PLUS PROFOND QUE LES AUTRES CARTES ═══
+
+       `--hero-gradient` part de #2C2C34, un gris déjà clair. Sur les cartes de
+       contenu c'est juste : elles doivent se détacher du fond. Ici non — cette
+       carte porte un bord allumé et un dessin lumineux, et un intérieur gris
+       les affadissait tous les deux.
+
+       On descend à #17171B / #060608 : le contraste avec le liseré ambre et le
+       dessin double, sans que rien d'autre change. Le dégradé garde le même
+       angle et la même progression — c'est la même lumière, sur une matière
+       plus sombre. */
+    background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
     border:none;
     /* Une lueur ambre très basse sous la carte : c'est elle qui la détache du
        fond, comme sur la référence. */
@@ -5236,9 +5244,13 @@
    aux deux angles, même fond. Les trois pages complètes se ressemblent, et
    celle-ci ne devait pas rester la seule à porter une simple carte grise.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Le même noir profond que la carte d'ouverture : ces deux-là portent le bord
+   allumé, elles doivent avoir le même fond. Sans quoi l'une paraîtrait creusée
+   et l'autre posée. */
 .an-intro-cadre{
   position:relative; overflow:hidden;
   border:none; border-radius:22px; padding:16px 18px 17px;
+  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
   box-shadow:0 14px 34px rgba(0,0,0,0.42), 0 0 30px -14px rgba(255,122,24,0.26);
 }
 .an-intro-cadre .t, .an-intro-cadre .s{ position:relative; z-index:2; }
@@ -5510,28 +5522,41 @@ body.plus-vu .liquide{ visibility:visible; }
 }
 /* L'étirement puis la rupture, en une seule courbe : la masse monte à la
    rencontre de la goutte, s'amincit, puis disparaît. */
-/* PLUS MARQUÉE. Le cou montait à 54 px et s'amincissait à 14 : trop court et
-   trop épais pour qu'on voie l'étirement. Il monte maintenant à 76 et descend
-   à 8 — la matière s'allonge vraiment, s'affine jusqu'au fil, puis casse.
+/* ═══ LE COU SUIT, IL NE PRÉCÈDE PAS ═══
 
-   Le palier à 84 % maintient un instant le fil le plus mince : c'est là que
-   l'œil comprend qu'il y a rupture, et non simple disparition. */
-@keyframes couGoutte{
-  0%  { height:34px; width:calc(var(--plus-larg) * 0.55); }
-  30% { height:62px; width:30px; }
-  55% { height:76px; width:18px; }
-  84% { height:40px; width:8px; }
-  100%{ height:0;    width:calc(var(--plus-larg) * 0.55); }
+   La matière montait en même temps que le bouton, et le dépassait : on voyait
+   une goutte s'élever, PUIS le rectangle la rattraper. L'ordre était inversé.
+
+   Le cou démarre maintenant avec 50 ms de retard et ne monte qu'à 52 px, en
+   deçà du bouton : c'est lui qui est tiré, pas lui qui tire. */
+@keyframes couMonte{
+  0%  { height:22px; width:calc(var(--plus-larg) * 0.5); }
+  45% { height:52px; width:26px; }
+  78% { height:30px; width:11px; }
+  100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
-body.plus-vu .socle{ animation:couGoutte 0.44s cubic-bezier(0.45,0,0.15,1); }
+
+/* LA CHUTE. Une goutte ne remonte pas son film : elle résiste en se détachant,
+   puis elle est happée. Le cou se reforme VERS LE BAS et la masse s'élargit à
+   l'impact — l'éclaboussure. */
+@keyframes couChute{
+  0%  { height:0;    width:12px; }
+  40% { height:44px; width:20px; }
+  72% { height:16px; width:calc(var(--plus-larg) * 0.85); }
+  100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
+}
+body.plus-vu .socle{ animation:couMonte 0.26s cubic-bezier(0.34,0.9,0.4,1) 0.05s; }
+body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
 
 .bulle{
   position:absolute; left:var(--plus-cx); bottom:var(--plus-bas);
   width:var(--plus-larg); height:var(--plus-h);
   border-radius:calc(var(--plus-h) / 2); background:#F58A15;
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
-  transition:transform 0.44s cubic-bezier(0.45,0,0.15,1),
-             left 0.34s cubic-bezier(0.32,0.72,0,1);
+  /* Cet état est aussi celui du RETOUR : la courbe déclarée ici est donc celle
+     de la chute. Elle amorce vers le haut — le nombre négatif — puis tombe. */
+  transition:transform 0.26s cubic-bezier(0.5,-0.2,0.9,0.6),
+             left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 
 .plus-flot{
@@ -5550,18 +5575,75 @@ body.plus-vu .socle{ animation:couGoutte 0.44s cubic-bezier(0.45,0,0.15,1); }
      trop basse ferait un saut de taille au lieu d'une éclosion. */
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
   opacity:0; pointer-events:none;
-  transition:transform 0.44s cubic-bezier(0.45,0,0.15,1),
-             opacity 0.12s linear,
-             left 0.34s cubic-bezier(0.32,0.72,0,1);
+  transition:transform 0.26s cubic-bezier(0.5,-0.2,0.9,0.6),
+             opacity 0.1s linear 0.14s,
+             left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 .plus-flot svg{ width:21px; height:21px; display:block; }
 
+/* 260 ms, comme le changement de page : les deux mouvements se terminent
+   ensemble. La montée décélère, sans dépassement — c'est la chute qui porte
+   l'effet, pas l'arrivée. */
 body.plus-vu .bulle,
-body.plus-vu .plus-flot{ transform:translate(-50%, var(--plus-monte)) scale(1); }
+body.plus-vu .plus-flot{
+  transform:translate(-50%, var(--plus-monte)) scale(1);
+  transition:transform 0.26s cubic-bezier(0.34,0.9,0.4,1),
+             opacity 0.1s linear,
+             left 0.26s cubic-bezier(0.32,0.72,0,1);
+}
 body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
 
 .plus-flot:active{ transform:translate(-50%, var(--plus-monte)) scale(0.94); }
 
 @media (prefers-reduced-motion: reduce){
   .bulle, .plus-flot, .socle{ transition:none; animation:none; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DERNIÈRES ACTIVITÉS
+
+   Même cadre que « Dernières procédures créées », mais chaque ligne porte une
+   pastille : ici les événements sont de natures différentes — une arrivée n'est
+   pas une lecture — et le dessin les distingue sans qu'on ait à lire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.act-l{
+  display:flex; align-items:center; gap:11px;
+  padding:11px 0; border-top:0.5px solid var(--separator);
+}
+/* `:first-of-type` compte les BALISES, et l'en-tête est un `div` comme les
+   lignes : la première ligne n'était donc jamais « la première de son type »,
+   et la règle ne s'appliquait à rien. On désigne celle qui SUIT l'en-tête —
+   sans dépendre de ce qu'elle est. */
+.rec-tete + .act-l{ border-top:none; padding-top:6px; }
+
+.act-ic{
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:30px; height:30px; border-radius:10px;
+  background:rgba(255,255,255,0.05);
+  border:0.5px solid rgba(255,255,255,0.08);
+  color:var(--label-2);
+}
+.act-ic svg{ width:16px; height:16px; display:block; }
+
+/* Une seule couleur, pour un seul cas : quelqu'un attend d'entrer et ça coûte
+   de l'argent. Les autres événements sont des faits, pas des alertes — les
+   teinter tous reviendrait à n'en signaler aucun. */
+.act-refus{
+  background:rgba(255,154,31,0.12);
+  border-color:rgba(255,173,51,0.30);
+  color:#FFAD33;
+}
+
+.act-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
+.act-tx{
+  font-size:13.5px; color:var(--label-2); line-height:1.35;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.act-tx b{ color:var(--label-1); font-weight:700; }
+.act-de{ font-size:11px; color:var(--label-3); font-weight:600; margin-top:2px; }
+.act-q{
+  font-size:11px; color:var(--label-3); font-weight:600; flex-shrink:0;
+  align-self:flex-start; margin-top:2px;
+  font-variant-numeric:tabular-nums;
 }

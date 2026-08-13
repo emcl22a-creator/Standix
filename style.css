@@ -4951,13 +4951,13 @@
 
   /* Variante de la barre du haut. Déclarée APRÈS `.boot-logo` : à specificité
      égale c'est la dernière règle qui l'emporte, et sa taille doit gagner.
-     Montée et flou réduits, proportionnels à ses 23px. */
-  .boot-logo--topbar{ width:23px; height:27px; margin:0; }
-  .boot-logo--topbar.play{ animation: logoDouxPetit 0.85s cubic-bezier(0.16,1,0.3,1) both; }
-  @keyframes logoDouxPetit{
-    0%   { opacity:0; transform:scale(0.7) translateY(5px); filter:blur(2.5px); }
-    100% { opacity:1; transform:scale(1) translateY(0); filter:blur(0); }
-  }
+
+     AUCUNE ANIMATION ICI. Le logo de l'écran de démarrage a la sienne — il est
+     seul à l'écran, il annonce l'app. Celui de la barre du haut est un repère
+     permanent : le faire grandir et se dé-flouter à chaque ouverture attirait
+     l'œil sur un élément qui n'a rien à dire, pendant que le reste chargeait. */
+  .boot-logo--topbar{ width:23px; height:27px; margin:0; opacity:1; }
+  .boot-logo--topbar.play{ animation:none; }
 
   @media (prefers-reduced-motion: reduce){
     .boot-logo{ opacity:1; }
@@ -5177,47 +5177,25 @@
    objets — alors que ce sont deux éléments de la même interface. On aligne
    la carte sur la barre.
    ═══════════════════════════════════════════════════════════════════════ */
-.topbar-card{
-  /* Ni fond ni bordure propres : tout vient des pseudo-éléments, comme dans
-     `.glassDiv`. Une bordure en plus du creux ferait un double contour.
+/* ═══ UNE SEULE COUCHE ═══
 
-     Le filet clair est le MÊME que celui de la barre du bas, à la même valeur :
-     les deux pièces doivent avoir la même arête, sinon l'une paraît posée sur
-     l'écran et l'autre creusée dedans. */
-  background:none;
+   La carte empilait trois plans : l'élément, une teinte en `::before`, et le
+   verre en `::after` au plan −1. Trois surfaces à la même place, dont une
+   DERRIÈRE le parent — et selon le navigateur, l'arête se détachait du reste,
+   comme un contour posé en arrière-plan.
+
+   Tout est maintenant sur l'élément lui-même : le fond, le flou, le creux et
+   l'arête. Une seule surface, rien qui puisse se décaler. */
+.topbar-card{
+  background-color:rgba(var(--tint-color, 255,255,255), var(--tint-opacity, .06));
+  -webkit-backdrop-filter:var(--verre-bar);
+  backdrop-filter:var(--verre-bar);
   border:none;
-  isolation:isolate;
   box-shadow:
     0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18),
+    inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px) var(--shadow-color, #000),
     inset 0 0 0 0.5px var(--filet);
 }
-/* La teinte et le creux : c'est ce qui donne l'épaisseur au verre. Sans le
-   `inset` négatif, on obtient une vitre plate. */
-.topbar-card::before{
-  content:'';position:absolute;inset:0;z-index:1;
-  border-radius:inherit;pointer-events:none;
-  box-shadow:inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px)
-             var(--shadow-color, #000);
-  background-color:rgba(var(--tint-color, 255,255,255), var(--tint-opacity, .06));
-}
-/* La réfraction : le même filtre SVG que la barre. C'est lui qui déforme ce
-   qui passe dessous, au lieu de simplement le flouter. */
-/* Elle pointait vers `#bar-filter`, le filtre SVG de la réfraction. Ce filtre
-   n'est plus fabriqué depuis que la barre est passée au verre dépoli — WebKit
-   n'acceptant pas `url()` dans un `backdrop-filter`. La carte n'avait donc plus
-   aucun verre, seulement sa teinte : c'est pour ça que sa matière ne
-   ressemblait plus à celle de la barre.
-
-   Elle lit maintenant la MÊME variable que la barre. Une seule valeur pour les
-   deux, elles ne peuvent plus diverger. */
-.topbar-card::after{
-  content:'';position:absolute;inset:0;z-index:-1;
-  border-radius:inherit;
-  backdrop-filter:var(--verre-bar);
-  -webkit-backdrop-filter:var(--verre-bar);
-}
-/* Le contenu passe au-dessus de la teinte. */
-.topbar-card > *{position:relative;z-index:2}
 
 
 /* ═══════════════════════════════════════════════════════════════════════

@@ -7409,7 +7409,10 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
       // La bande son pour un geste filmé ; la vidéo entière pour un écran.
       body: JSON.stringify({
-        procedure_id: newProc.id,
+        /* `newProc` n'existe plus : la procédure est créée bien plus haut,
+           avant même la compression, et son identifiant vit dans
+           `aiProcedureId`. Cette ligne était restée en arrière. */
+        procedure_id: aiProcedureId,
         video_url: urlPourAnalyse,
         avec_image: true,
       }),

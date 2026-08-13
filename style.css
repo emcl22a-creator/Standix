@@ -340,8 +340,21 @@
      Un fondu, rien d'autre. 180 ms : assez pour que l'œil enregistre que la
      page a changé, trop court pour qu'on attende. Aucun déplacement — un
      onglet ne vient de nulle part, il remplace. */
-  .screen.fondu{ animation:ecranFondu 0.12s ease-out; }
-  @keyframes ecranFondu{ from{ opacity:0 } to{ opacity:1 } }
+  /* Le fondu net de 120 ms était trop sec : la page apparaissait d'un coup,
+     sans qu'on la voie arriver. On garde le principe — aucun déplacement, un
+     onglet ne vient de nulle part — mais on lui donne du temps et une entrée.
+
+     260 ms, et l'écran arrive d'un demi-pas en arrière, à 98,5 %. Ce n'est pas
+     un mouvement : c'est une profondeur. L'œil la lit sans pouvoir la nommer.
+
+     La courbe part vite et finit lentement : l'essentiel du chemin est fait
+     dans le premier tiers, de sorte que la page paraît réactive tout en
+     s'installant en douceur. */
+  .screen.fondu{ animation:ecranFondu 0.26s cubic-bezier(0.32,0.72,0,1); }
+  @keyframes ecranFondu{
+    from{ opacity:0; transform:scale(0.985) }
+    to{ opacity:1; transform:none }
+  }
 
   /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux
      animations superposées feraient exactement ce qu'on cherche à éviter. */
@@ -4379,6 +4392,11 @@
   /* Texte sombre sur l'orange : à cette luminosité, du blanc perdrait le
      contraste que le noir garde sans effort. */
   .hero-actions{ display:flex; align-items:center; gap:10px; }
+
+  /* Les deux gestes de la page Procédures, sans carte autour. Même hauteur et
+     même matière que dans la carte d'accueil — ce sont les mêmes boutons, ils
+     n'ont pas à changer d'aspect selon la page. */
+  .p-gestes{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
 
   .hero-cta{
     display:inline-flex; align-items:center; justify-content:center; gap:9px;

@@ -1124,20 +1124,51 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 
     membre = fiche
   } else {
-    // Espace équipe : on rejoint une entreprise existante, il n'y a rien à créer.
-    const { data: fiche, error: membreError } = await supabase
-      .from('membres')
-      .insert({
-        user_id: data.user.id,
-        nom: `${prenom} ${nom}`,
-        role: selectedSpace,
-        entreprise_id: targetEntrepriseId
-      })
-      .select().single()
+    /* ═══ REJOINDRE UNE ENTREPRISE PASSE PAR LA BASE ═══
 
-    if (membreError) {
+       L'app écrivait directement dans `membres` : personne n'était jamais
+       refusé, et une entreprise à cinq places pouvait en accueillir vingt.
+
+       Le compte des places se fait maintenant côté base, dans la même
+       transaction que l'écriture. Deux raisons :
+
+       — un contrôle en JavaScript se contourne en dix secondes avec les outils
+         de développement ;
+       — deux inscriptions au même instant sur la dernière place passeraient
+         toutes les deux si le compte et l'écriture étaient séparés.
+
+       Et quand c'est complet, la demande est gardée : le gérant la verra sur
+       son accueil. Sans ça, un refus ne laisse aucune trace et personne ne sait
+       que quelqu'un a essayé d'entrer. */
+    const { data: fiche, error: membreError } = await supabase
+      .rpc('rejoindre_entreprise', {
+        p_code: codeAcces,
+        p_nom: `${prenom} ${nom}`,
+        p_email: email,
+      })
+
+    if (membreError || !fiche) {
+      const m = String(membreError?.message || '')
       errorEl.style.color = 'var(--red)'
-      errorEl.textContent = "Compte créé mais erreur de profil : " + membreError.message
+
+      if (m.includes('PLACES_COMPLETES')) {
+        /* La base lève « PLACES_COMPLETES:Le Bistrot:5 » — le nom peut contenir
+           des deux-points, donc on découpe par la FIN : le dernier morceau est
+           le nombre de places, tout ce qui précède est le nom. */
+        const bouts = m.split('PLACES_COMPLETES:')[1].split(':')
+        const places = bouts.pop().trim()
+        const nomEnt = bouts.join(':').trim()
+        errorEl.textContent =
+          `${nomEnt || 'Cette entreprise'} a atteint les ${places} places de son abonnement. ` +
+          `Votre demande a été transmise — demandez à votre gérant d'ajouter une place.`
+      } else if (m.includes('CODE_INCONNU')) {
+        errorEl.textContent = "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire."
+      } else if (m.includes('28000')) {
+        errorEl.textContent = "Votre compte est créé. Connectez-vous pour rejoindre l'entreprise."
+      } else {
+        errorEl.textContent = "Impossible de rejoindre l'entreprise : " + (m || 'réessayez.')
+      }
+      console.error('[rejoindre]', membreError)
       setButtonLoading(signupBtn, false)
       return
     }

@@ -4393,10 +4393,6 @@
      contraste que le noir garde sans effort. */
   .hero-actions{ display:flex; align-items:center; gap:10px; }
 
-  /* Les deux gestes de la page Procédures, sans carte autour. Même hauteur et
-     même matière que dans la carte d'accueil — ce sont les mêmes boutons, ils
-     n'ont pas à changer d'aspect selon la page. */
-  .p-gestes{ display:flex; align-items:center; gap:10px; margin-bottom:18px; }
 
   .hero-cta{
     display:inline-flex; align-items:center; justify-content:center; gap:9px;
@@ -5388,3 +5384,156 @@
   70%{ box-shadow:0 0 0 6px rgba(255,173,51,0) }
 }
 @media (prefers-reduced-motion: reduce){ .enc-pas .encours .rond{ animation:none } }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TROIS DERNIÈRES PROCÉDURES, SUR L'ACCUEIL
+
+   Des lignes, pas des cartes. La grille des catégories, un onglet plus loin,
+   emploie déjà de vraies cartes ; répéter la même forme ici ferait croire à un
+   second catalogue. Ici, on ne fait que rappeler ce qui vient d'être fait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.rec-titre{
+  font-size:12px; font-weight:750; letter-spacing:0.07em; text-transform:uppercase;
+  color:var(--label-3); margin:22px 0 10px 2px;
+}
+
+.rec{
+  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+  padding:12px 14px; margin-bottom:9px;
+  border-radius:18px; background:var(--bg-card);
+  border:0.5px solid var(--border);
+  transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1);
+}
+.rec:active{ transform:scale(0.985); }
+
+.rec-ic{
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:34px; height:34px; border-radius:11px;
+  background:linear-gradient(165deg,
+    rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
+  border:0.5px solid rgba(255,173,51,0.20);
+}
+.rec-ic svg{ width:18px; height:18px; display:block; }
+
+.rec-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
+
+/* La date partage la ligne du NOM, pas celle des caractéristiques. Placée à
+   droite de ces dernières, « il y a 1 semaine » leur volait la moitié de la
+   largeur et « Comptabilité » finissait en « Com… ». Un nom se laisse couper
+   sans dommage — on le reconnaît à ses premiers mots. */
+.rec-h{ display:flex; align-items:baseline; gap:10px; min-width:0; }
+.rec-nom{
+  flex:1; min-width:0;
+  font-size:14.5px; font-weight:700; letter-spacing:-0.025em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+/* Les caractéristiques sur une seule ligne, coupées si besoin : trois faits
+   séparés par des points médians se lisent d'un coup d'œil, une liste à la
+   ligne demanderait de s'arrêter. */
+.rec-tr{
+  display:block; font-size:11.5px; color:var(--label-3); font-weight:600; margin-top:3px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.rec-q{ font-size:11px; color:var(--label-3); font-weight:600; flex-shrink:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BOUTON DE CRÉATION, EN GOUTTE
+
+   Il n'existe que sur la page Procédures. Il en sort et y retourne en passant
+   DERRIÈRE la barre : la matière qui le porte est au plan 9, la barre au 10,
+   le bouton net au 11. Cet ordre suffit, il n'y a rien à masquer.
+
+   Sa largeur n'est pas écrite ici : le script la mesure sur un onglet de la
+   barre, qui fait exactement la largeur de la capsule. Le jour où le nombre
+   d'onglets change, les deux suivront ensemble — une valeur en dur aurait
+   divergé sans que personne ne s'en aperçoive.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --plus-bas:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  --plus-larg:86px;
+  --plus-cx:50%;
+  --plus-h:46px;
+  --plus-monte:-70px;
+  /* LA POSITION DE REPOS.
+
+     Le bouton était calé au BAS de la barre : son sommet se trouvait 18 px
+     sous l'arête haute, et il devait traverser toute la hauteur avant de
+     paraître. On le remonte pour que son sommet EFFLEURE cette arête — il en
+     sort donc exactement de là, et y rentre de même.
+
+     Calculé, non écrit : hauteur du bouton moins hauteur de la barre. Si l'une
+     des deux change, le calage suit. Une valeur en dur aurait laissé le bouton
+     dépasser ou s'enfoncer sans qu'on comprenne pourquoi. */
+  --plus-repos:calc(var(--plus-h) - var(--bar-h));
+}
+
+.liquide{
+  position:fixed; left:0; right:0; bottom:0; height:220px; z-index:9;
+  pointer-events:none; filter:url(#fusion);
+  /* Rien à afficher tant qu'on n'est pas sur la page : sans ça, la matière
+     resterait en mémoire du navigateur pour un objet invisible. */
+  visibility:hidden;
+}
+body.plus-vu .liquide{ visibility:visible; }
+
+/* Le socle vit ENTIÈREMENT derrière la barre — son sommet effleure l'arête
+   haute sans jamais la dépasser. On ne le voit jamais ; on ne voit que ce
+   qu'il produit, le cou.
+
+   Hauteur nulle au repos : s'il gardait sa masse, la goutte lui resterait
+   attachée une fois posée et le cou ne se romprait pas. */
+.socle{
+  position:absolute; left:var(--plus-cx); transform:translateX(-50%);
+  bottom:calc(var(--plus-bas) + 34px);
+  width:calc(var(--plus-larg) * 0.5); height:0;
+  border-radius:20px; background:#FF9A1F;
+  transition:left 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+/* L'étirement puis la rupture, en une seule courbe : la masse monte à la
+   rencontre de la goutte, s'amincit, puis disparaît. */
+@keyframes couGoutte{
+  0%  { height:30px; width:calc(var(--plus-larg) * 0.5); }
+  38% { height:54px; width:26px; }
+  70% { height:26px; width:14px; }
+  100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
+}
+body.plus-vu .socle{ animation:couGoutte 0.34s cubic-bezier(0.5,0,0.2,1); }
+
+.bulle{
+  position:absolute; left:var(--plus-cx); bottom:var(--plus-bas);
+  width:var(--plus-larg); height:var(--plus-h);
+  border-radius:calc(var(--plus-h) / 2); background:#FF9A1F;
+  transform:translate(-50%, var(--plus-repos)) scale(0.62);
+  transition:transform 0.34s cubic-bezier(0.5,0,0.2,1),
+             left 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+
+.plus-flot{
+  position:fixed; left:var(--plus-cx); bottom:var(--plus-bas); z-index:11;
+  width:var(--plus-larg); height:var(--plus-h); border:none;
+  border-radius:calc(var(--plus-h) / 2);
+  display:grid; place-items:center;
+  background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+  color:#2A1400;
+  box-shadow:0 8px 22px rgba(255,122,24,0.32);
+  /* 0,62 et non 0,5 : le trajet est deux fois plus court qu'avant, une échelle
+     trop basse ferait un saut de taille au lieu d'une éclosion. */
+  transform:translate(-50%, var(--plus-repos)) scale(0.62);
+  opacity:0; pointer-events:none;
+  transition:transform 0.34s cubic-bezier(0.5,0,0.2,1),
+             opacity 0.12s linear,
+             left 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+.plus-flot svg{ width:21px; height:21px; display:block; }
+
+body.plus-vu .bulle,
+body.plus-vu .plus-flot{ transform:translate(-50%, var(--plus-monte)) scale(1); }
+body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
+
+.plus-flot:active{ transform:translate(-50%, var(--plus-monte)) scale(0.94); }
+
+@media (prefers-reduced-motion: reduce){
+  .bulle, .plus-flot, .socle{ transition:none; animation:none; }
+}

@@ -4600,7 +4600,81 @@ async function loadGestionProcedures() {
 /* ═══ Carte d'accueil ═══
    Salutation qui suit l'heure, et un mot qui dépend du suivi réel de l'équipe.
    Tout se calcule sur les données déjà en mémoire, aucune requête de plus. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANALYSE EN COURS, SUR L'ACCUEIL
+
+   Une analyse dure plusieurs minutes. Rien n'obligeait à rester sur son écran
+   d'attente — mais en le quittant, on perdait toute trace du travail. La
+   procédure porte pourtant son statut en base depuis la première seconde :
+   il suffisait de le lire.
+
+   Trois étapes, l'une après l'autre. Ce n'est pas une barre qui monte : Azure
+   ne dit pas où il en est, il dit « en cours » puis « terminé ». Une barre
+   chiffrée mentirait sur le temps restant ; trois jalons, non.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Le chronomètre de chaque bloc, pour que le temps écoulé avance à l'écran. */
+let minuteurEnCours = null
+
+function peindreAnalyseEnCours() {
+  const zone = document.getElementById('accueil-encours')
+  if (!zone) return
+
+  const encours = (allGestionProcedures || []).filter(
+    p => p.statut === 'traitement' || p.statut === 'redaction')
+
+  if (!encours.length) {
+    zone.innerHTML = ''
+    if (minuteurEnCours) { clearInterval(minuteurEnCours); minuteurEnCours = null }
+    return
+  }
+
+  zone.innerHTML = encours.map(p => {
+    /* Deuxième jalon pendant l'écoute, troisième pendant la rédaction. Le
+       premier est acquis : sans vidéo envoyée, il n'y aurait pas d'analyse. */
+    const rang = p.statut === 'redaction' ? 2 : 1
+    const jalons = ['Vidéo envoyée', 'L\u2019IA écoute et regarde', 'Rédaction des étapes']
+    return `
+      <button type="button" class="enc" data-proc="${escapeHtml(p.id)}">
+        <span class="enc-tete">
+          <span class="ia-fig m"><span class="lum"></span></span>
+          <span class="enc-co">
+            <span class="enc-nom">${escapeHtml(p.titre || 'Sans titre')}</span>
+            <span class="enc-st">Analyse en cours</span>
+          </span>
+          <span class="enc-chr" data-depuis="${p.created_at || ''}">—</span>
+        </span>
+        <span class="enc-pas">
+          ${jalons.map((t, i) => `
+            <span class="${i < rang ? 'fait' : i === rang ? 'encours' : ''}">
+              <i class="rond"></i>${t}</span>`).join('')}
+        </span>
+      </button>`
+  }).join('')
+
+  zone.querySelectorAll('[data-proc]').forEach(b => {
+    /* `openAnalyse` : la page de suivi d'une procédure, celle qui affiche les
+       étapes au fur et à mesure qu'elles arrivent. */
+    b.addEventListener('click', () => openAnalyse(b.dataset.proc))
+  })
+
+  majChronosEnCours()
+  if (!minuteurEnCours) minuteurEnCours = setInterval(majChronosEnCours, 1000)
+}
+
+/* Le temps écoulé se recalcule depuis la date de création : il reste juste
+   après un rechargement, là où un compteur en mémoire repartirait de zéro. */
+function majChronosEnCours() {
+  document.querySelectorAll('#accueil-encours .enc-chr').forEach(el => {
+    const t0 = Date.parse(el.dataset.depuis || '')
+    if (!t0) { el.textContent = '—'; return }
+    const s = Math.max(0, Math.round((Date.now() - t0) / 1000))
+    el.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+  })
+}
+
 function renderAccueil() {
+  peindreAnalyseEnCours()
   const salut = document.getElementById('accueil-salut')
   const mot = document.getElementById('accueil-mot')
   if (!salut || !mot) return
@@ -6944,6 +7018,17 @@ const VIDEO_IMAGES_S = 30
    mouvement rapide, c'est une main qui fait quelque chose devant un plan fixe. */
 const VIDEO_DEBIT = 2_500_000
 
+/* ═══ LE PLAFOND ═══
+
+   90 Mo, soit environ cinq minutes au débit de compression ci-dessus — ce que
+   l'écran promet.
+
+   ATTENTION : cette valeur ne fait qu'annoncer la limite à la personne. C'est
+   SUPABASE qui décide. Si le compartiment `procedo-videos` est réglé plus bas,
+   un fichier de 80 Mo passera ce contrôle et se fera refuser par un 400 juste
+   après. Les deux nombres doivent concorder. */
+const LIMITE_STOCKAGE = 90 * 1024 * 1024
+
 /* Le navigateur sait-il enregistrer ? Safari sur iPhone ne l'a appris que
    récemment. Sans ce test, on planterait au lieu d'envoyer l'original. */
 function peutComprimer() {
@@ -7312,6 +7397,22 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const base = `${currentMembre.entreprise_id}/${Date.now()}`
 
     // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
+    /* ═══ LE PLAFOND DU STOCKAGE ═══
+
+       Supabase refuse un fichier au-delà d'une taille fixée par compartiment —
+       50 Mo par défaut. Le refus arrive sous forme d'un 400 sec, sans que rien
+       ne prévienne : on envoyait soixante mégaoctets pour se les faire jeter.
+
+       On regarde donc avant de partir. Et on le dit dans les termes de la
+       personne : ce n'est pas « votre fichier fait 63 millions d'octets »,
+       c'est « votre vidéo est trop longue ». */
+    if (aiVideoFile.size > LIMITE_STOCKAGE) {
+      throw new Error(
+        `Cette vidéo pèse ${poidsLisible(aiVideoFile.size)} une fois allégée, ` +
+        `au-delà des ${poidsLisible(LIMITE_STOCKAGE)} acceptés. ` +
+        `Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.`)
+    }
+
     const path = `${base}_${aiVideoFile.name}`
     /* ═══ UN ENVOI QUI NE RÉPOND JAMAIS ═══
 
@@ -7340,7 +7441,17 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       supabase.storage.from('procedo-videos')
         .upload(path, aiVideoFile, { cacheControl: CACHE_LONG }),
       90, "L'envoi de la vidéo")
-    if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
+    if (uploadError) {
+      /* Le message brut de Supabase est en anglais et parle d'objets et de
+         seaux. On traduit le seul cas fréquent, on laisse le reste tel quel. */
+      const m = String(uploadError.message || '')
+      console.error('[envoi] refus du stockage :', uploadError)
+      if (/exceed|too large|maximum/i.test(m)) {
+        throw new Error(`Le stockage a refusé un fichier de ${poidsLisible(aiVideoFile.size)}. ` +
+          `Filmez une séquence plus courte.`)
+      }
+      throw new Error("Le stockage a refusé la vidéo : " + m)
+    }
     etape(`vidéo envoyée en ${chrono()}`)
     /* On garde le CHEMIN, pas une URL publique. Le bucket est privé depuis le
      passage aux liens signés : `getPublicUrl` rendait une adresse qui ne

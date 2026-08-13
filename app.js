@@ -2505,6 +2505,23 @@ window.loadGlobalAnalyse = function() {
   currentGaData = { procedures, membres, employes, validations }
   currentGaPeriod = 'week'
 
+  /* Le compte de la page. On compte les LECTEURS et les procédures LUES, pas
+     les membres ni les procédures existantes : cette page ne parle que de ce
+     qui a été lu, et annoncer « 8 procédures » quand une seule a été ouverte
+     serait une promesse que le contenu dément aussitôt.
+
+     Volontairement, pas de total de minutes ici : c'est la carte qui a été
+     retirée de cette page, et la remettre sous une autre forme reviendrait à
+     défaire ce choix. */
+  const cpt = document.getElementById('an-compte')
+  if (cpt) {
+    const lecteurs = new Set((validations || []).map(v => v.membre_id)).size
+    const lues = new Set((validations || []).map(v => v.procedure_id)).size
+    cpt.textContent = lues
+      ? `${lecteurs} personne${lecteurs > 1 ? 's' : ''} \u00b7 ${lues} procédure${lues > 1 ? 's' : ''} lue${lues > 1 ? 's' : ''}`
+      : 'Aucune lecture pour le moment'
+  }
+
   renderGaStats()
 
   /* ... PUIS on relit la base. Sans ça, la page montrait indéfiniment l'état du

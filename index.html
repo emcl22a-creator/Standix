@@ -284,22 +284,31 @@
 <div class="app" id="gestion-app" style="display:none;">
   <div class="topbar">
     <div class="topbar-row">
-      <div class="topbar-card">
-        <div class="topbar-left">
-          <div class="logo-pill">
-            <div class="boot-logo boot-logo--topbar" id="topbar-logo-gestion">
+      <!-- ═══ LA BARRE DU HAUT ═══
+
+           Une pilule de la matière de la barre du bas — même verre, même filet.
+           Dedans, un cercle par établissement, plus le « + ».
+
+           Pas de piste qui glisse : le plafond est de TROIS établissements, et
+           trois cercles tiennent côte à côte. Faire glisser pour atteindre un
+           voisin qu'on voit déjà serait un geste pour rien. -->
+      <div class="topbar-pilule" id="topbar-pilule">
+        <div class="etab-ronds" id="etab-ronds">
+          <button type="button" class="rond-etab actif" aria-label="Procédo">
+            <span class="rond-logo">
               <svg viewBox="0 0 85 100" fill="none">
                 <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="url(#logoOr)"></path>
               </svg>
-            </div>
-          </div>
-          <div class="topbar-title">
-            <span class="name">Procédo</span>
-            <span class="role">Espace Gestion</span>
-          </div>
+            </span>
+          </button>
         </div>
+        <button type="button" class="rond-etab rond-plus" id="etab-plus"
+                aria-label="Ajouter un établissement">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+               stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
       </div>
-      </div>
+    </div>
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
@@ -339,6 +348,9 @@
 
     <!-- Les trois dernières procédures créées. -->
     <div id="accueil-recentes"></div>
+
+    <!-- Ce qui vient de se passer dans l'entreprise. -->
+    <div id="accueil-activites"></div>
   </div>
 
   <div class="screen" id="p-list">
@@ -1171,6 +1183,19 @@
       <button type="button" data-va="all" aria-label="Depuis le début"><span></span></button>
     </div>
     <div class="fm-periode-mot" id="an-mot-eq">Ce mois-ci</div>
+  </div>
+
+  <!-- ═══ TOUTES LES ACTIVITÉS ═══
+       Six semaines. Au-delà, une lecture ou une arrivée n'apprend plus rien —
+       et la liste deviendrait trop longue pour qu'on la parcoure. -->
+  <div class="screen" id="p-activites">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-home')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Activités</h1>
+    </div>
+    <div id="activites-tout"></div>
   </div>
 
   <div class="screen" id="p-an-categories">

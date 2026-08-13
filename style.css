@@ -141,7 +141,7 @@
     content:''; position:absolute; top:1px; right:1px;
     width:11px; height:11px; border-radius:50%;
     background:var(--red); border:2px solid #16171B;
-    animation:pastilleArrive 0.4s cubic-bezier(0.34,1.5,0.5,1) both;
+    animation:pastilleArrive 0.4s cubic-bezier(0.34,1.62,0.5,1) both;
   }
   @keyframes pastilleArrive{ from{ transform:scale(0); } to{ transform:none; } }
 
@@ -288,10 +288,10 @@
        92 px laissaient donc VINGT pixels de vide sous elle, alors que le reste
        de l'app respire par des marges de 14 à 20.
 
-       La barre du haut mesure désormais 92 px — 16 de marge, 56 de pilule,
-       12 pour les deux points ajoutés dessous. À 87, la page passait CINQ
-       pixels au-dessus d'elle. On repart de sa hauteur réelle plus quinze. */
-    padding:107px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
+       La barre du haut mesure 72 px — 16 de marge et 56 de pilule. Les deux
+       points ont disparu avec le débord : c'est le bord du panneau voisin qui
+       annonce désormais qu'il y en a un. Plus quinze de jeu. */
+    padding:87px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
@@ -5380,61 +5380,6 @@
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   L'ANALYSE EN COURS, SUR L'ACCUEIL
-   ═══════════════════════════════════════════════════════════════════════════ */
-.enc{
-  display:block; width:100%; text-align:left;
-  margin-top:12px; padding:15px;
-  border-radius:20px; background:var(--bg-card);
-  border:0.5px solid rgba(255,173,51,0.22);
-  box-shadow:0 10px 26px rgba(0,0,0,0.34);
-  transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1);
-}
-.enc:active{ transform:scale(0.985); }
-
-.enc-tete{ display:flex; align-items:center; gap:11px; margin-bottom:13px; }
-.enc-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
-.enc-nom{
-  display:block; font-size:15px; font-weight:700; letter-spacing:-0.03em;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.enc-st{ display:block; font-size:11.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
-.enc-chr{
-  font-size:11.5px; color:var(--label-3); font-weight:650; flex-shrink:0;
-  font-variant-numeric:tabular-nums;
-}
-
-/* Les trois jalons. Le filet du haut les sépare de l'en-tête sans encadrer. */
-.enc-pas{
-  display:flex; flex-direction:column; gap:9px;
-  padding-top:12px; border-top:0.5px solid var(--separator);
-}
-.enc-pas span{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--label-3); }
-.enc-pas .rond{
-  width:15px; height:15px; border-radius:50%; flex-shrink:0;
-  border:1.5px solid rgba(255,255,255,0.16);
-}
-
-/* Fait : plein, sans coche. À cette taille une coche devient une tache — le
-   remplissage suffit à dire que c'est passé. */
-.enc-pas .fait{ color:var(--label-2); }
-.enc-pas .fait .rond{
-  border-color:#FF9A1F; background:#FF9A1F;
-  box-shadow:inset 0 0 0 2px var(--bg-card);
-}
-
-/* En cours : le seul point coloré, et le seul qui bouge. La pulsation dit que
-   le travail se fait ICI, pas ailleurs dans la liste. */
-.enc-pas .encours{ color:#FFC46B; font-weight:650; }
-.enc-pas .encours .rond{ border-color:#FFAD33; animation:encoursPulse 1.4s ease-in-out infinite; }
-@keyframes encoursPulse{
-  0%,100%{ box-shadow:0 0 0 0 rgba(255,173,51,0.45) }
-  70%{ box-shadow:0 0 0 6px rgba(255,173,51,0) }
-}
-@media (prefers-reduced-motion: reduce){ .enc-pas .encours .rond{ animation:none } }
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
    LE BOUTON DE CRÉATION, EN GOUTTE
 
    Il n'existe que sur la page Procédures. Il en sort et y retourne en passant
@@ -5451,18 +5396,12 @@
   --plus-larg:86px;
   --plus-cx:50%;
   --plus-h:46px;
-  --plus-monte:-70px;
-  /* LA POSITION DE REPOS.
-
-     Le bouton était calé au BAS de la barre : son sommet se trouvait 18 px
-     sous l'arête haute, et il devait traverser toute la hauteur avant de
-     paraître. On le remonte pour que son sommet EFFLEURE cette arête — il en
-     sort donc exactement de là, et y rentre de même.
-
-     Calculé, non écrit : hauteur du bouton moins hauteur de la barre. Si l'une
-     des deux change, le calage suit. Une valeur en dur aurait laissé le bouton
-     dépasser ou s'enfoncer sans qu'on comprenne pourquoi. */
-  --plus-repos:calc(var(--plus-h) - var(--bar-h));
+  /* LA POSITION DE REPOS : entièrement sous l'arête, donc hors du cadre.
+     `100%` vaut la hauteur du bouton — il est exactement caché, quelle que
+     soit cette hauteur. */
+  --plus-repos:100%;
+  /* Six pixels au-dessus de l'arête une fois posé. */
+  --plus-monte:-6px;
 }
 
 .liquide{
@@ -5501,33 +5440,60 @@ body.plus-vu .liquide{ visibility:visible; }
    sous un bouton déjà posé, et c'est elle qu'on regardait en dernier.
 
    Il culmine maintenant à 42 et s'éteint à 230 ms, quand le bouton se pose. */
+/* LE COU CASSE AVANT L'ARRIVÉE.
+
+   220 ms contre 360 pour le bouton : le fil rompt à mi-course et le bouton
+   finit son ressort seul. C'est ce que fait une vraie goutte — elle se détache
+   avant d'avoir fini sa course.
+
+   Le défaut d'avant était l'inverse, et involontaire : un cou de 200 ms sous un
+   bouton de 400, qui s'éteignait pendant que l'autre flottait encore. Ici c'est
+   voulu, et le fil s'affine jusqu'à six pixels pour qu'on VOIE la rupture. */
 @keyframes couMonte{
-  0%  { height:16px; width:calc(var(--plus-larg) * 0.5); }
-  40% { height:42px; width:24px; }
-  74% { height:22px; width:10px; }
+  0%  { height:22px; width:calc(var(--plus-larg) * 0.5); }
+  45% { height:58px; width:20px; }
+  80% { height:30px; width:6px; }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
 
-body.plus-vu .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) 0.06s; }
+body.plus-vu .socle{ animation:couMonte 0.22s cubic-bezier(0.5,0,0.3,1) 0.04s; }
 /* Le même cou qu'à l'aller, joué à l'envers : la matière se reforme, s'étire,
    puis s'éteint. `reverse` évite d'écrire une seconde suite d'images-clés qui
    aurait fini par diverger de la première. */
-body.plus-part .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) reverse; }
+/* À la sortie, le MÊME cou joué à l'endroit : il se reforme, s'étire, casse.
+   À l'envers, il grandissait au moment où il aurait dû rompre. */
+body.plus-part .socle{ animation:couMonte 0.22s cubic-bezier(0.5,0,0.3,1); }
 
 .bulle{
-  position:absolute; left:var(--plus-cx); bottom:var(--plus-bas);
+  /* MÊME REPÈRE QUE LE BOUTON : l'arête haute de la barre, et non le bas de
+     l'écran. Sans ça les deux se désolidarisent — la matière monterait de
+     soixante pixels quand le bouton n'en monte que six. */
+  position:absolute; left:var(--plus-cx);
+  bottom:calc(var(--plus-bas) + var(--bar-h));
   width:var(--plus-larg); height:var(--plus-h);
   border-radius:calc(var(--plus-h) / 2); background:#F58A15;
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
   /* Cet état est aussi celui du RETOUR. La courbe est désormais la MÊME qu'à
      l'aller : le bouton redescend avec le même ressort, dépassant légèrement
      sous la barre avant de se caler. Aller et retour se répondent. */
-  transition:transform 0.40s cubic-bezier(0.34,1.62,0.5,1),
+  transition:transform 0.36s cubic-bezier(0.34,1.62,0.5,1),
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 
+/* LE CADRE. Il s'arrête à l'arête haute de la barre et masque ce qui dépasse
+   en dessous : le bouton n'existe à l'écran qu'à partir du moment où il émerge.
+   Sans lui, il se dessinait par-dessus la barre pendant toute sa montée.
+
+   `pointer-events:none` sur le cadre, `auto` sur le bouton : le cadre couvre
+   tout l'écran, il ne doit rien intercepter. */
+.plus-cadre{
+  position:fixed; left:0; right:0; top:0;
+  bottom:calc(var(--plus-bas) + var(--bar-h));
+  overflow:hidden; z-index:11; pointer-events:none;
+}
+
 .plus-flot{
-  position:fixed; left:var(--plus-cx); bottom:var(--plus-bas); z-index:11;
+  position:absolute; left:var(--plus-cx); bottom:0;
   width:var(--plus-larg); height:var(--plus-h); border:none;
   border-radius:calc(var(--plus-h) / 2);
   display:grid; place-items:center;
@@ -5542,8 +5508,8 @@ body.plus-part .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) rev
      trop basse ferait un saut de taille au lieu d'une éclosion. */
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
   opacity:0; pointer-events:none;
-  transition:transform 0.40s cubic-bezier(0.34,1.62,0.5,1),
-             opacity 0.1s linear 0.22s,
+  transition:transform 0.36s cubic-bezier(0.34,1.62,0.5,1),
+             opacity 0.1s linear 0.20s,
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 .plus-flot svg{ width:21px; height:21px; display:block; }
@@ -5569,7 +5535,7 @@ body.plus-part .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) rev
 body.plus-vu .bulle,
 body.plus-vu .plus-flot{
   transform:translate(-50%, var(--plus-monte)) scale(1);
-  transition:transform 0.40s cubic-bezier(0.34,1.62,0.5,1),
+  transition:transform 0.36s cubic-bezier(0.34,1.62,0.5,1),
              opacity 0.04s linear,
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
@@ -5636,9 +5602,6 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
 .reg-groupe,
 .reg-identite,
 .an-intro,
-.enc{
-  border-color:transparent !important;
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA BARRE DU HAUT
@@ -5657,24 +5620,21 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
   scrollbar-width:none; -ms-overflow-style:none;
 }
 .haut-piste::-webkit-scrollbar{ display:none; }
+/* LE VOISIN DÉPASSE.
+
+   84 % au lieu de 100, et la piste rend les 8 % restants en retrait de chaque
+   côté : le panneau suivant montre son bord. C'est la seule marque qui ne soit
+   pas un SYMBOLE de ce qu'on peut faire, mais la chose elle-même — on voit
+   qu'il y a quelque chose, on n'a pas à l'interpréter.
+
+   Elle ne coûte rien en hauteur : les deux points sont retirés, la barre
+   retrouve ses 72 px. */
 .haut-pan{
-  flex:0 0 100%;
+  flex:0 0 84%;
   display:flex; justify-content:center;
   scroll-snap-align:center; scroll-snap-stop:always;
 }
-
-/* Les deux points. Sans eux, rien ne dit qu'un second panneau existe — on ne
-   glisse pas au hasard sur une barre qui n'a jamais bougé. */
-.haut-points{
-  display:flex; justify-content:center; gap:5px;
-  margin-top:7px; height:5px;
-}
-.haut-points span{
-  width:5px; height:5px; border-radius:50%;
-  background:rgba(255,255,255,0.16);
-  transition:background 0.22s, width 0.22s;
-}
-.haut-points span.on{ width:14px; border-radius:3px; background:rgba(255,173,51,0.75); }
+.haut-piste{ padding-inline:8%; }
 
 .topbar-pilule{
   position:relative; isolation:isolate;
@@ -5731,11 +5691,18 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
    280 ms depuis 90 %, sans déplacement : la pilule ne vient de nulle part,
    elle est déjà là. Même profondeur que le fondu des pages, et les deux se
    terminent ensemble. */
-.topbar-pilule.approche{ animation:pilApproche 0.28s cubic-bezier(0.32,0.72,0,1); }
-@keyframes pilApproche{
-  from{ opacity:0; transform:scale(0.90); }
-  to{ opacity:1; transform:none; }
+/* ═══ UN FONDU LÉGER, JAMAIS UNE ABSENCE ═══
+
+   L'approche repartait de zéro à chaque page : la barre disparaissait puis
+   revenait, et ce clignotement se remarque sur un objet permanent.
+
+   Elle descend maintenant à 25 %, pas à 0, et sans changer de taille. On voit
+   qu'il s'est passé quelque chose ; on ne la voit jamais absente. */
+.haut-piste.approche{ animation:pilFondu 0.20s ease-out; }
+@keyframes pilFondu{
+  from{ opacity:0.25; }
+  to{ opacity:1; }
 }
 @media (prefers-reduced-motion: reduce){
-  .topbar-pilule.approche{ animation:none; }
+  .haut-piste.approche{ animation:none; }
 }

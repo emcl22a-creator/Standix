@@ -6942,10 +6942,29 @@ async function comprimerVideo(fichier, surAvancee) {
        audio rendrait l'analyse inutile. */
     try {
       const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
+      /* Le contexte naît parfois suspendu : sans ce réveil, il ne produirait
+         aucun échantillon et l'enregistrement serait muet. */
+      if (ctxAudio.state === 'suspended') await ctxAudio.resume()
       const source = ctxAudio.createMediaElementSource(lecteur)
       const dest = ctxAudio.createMediaStreamDestination()
       source.connect(dest)
-      source.connect(ctxAudio.destination)
+
+      /* ON NE BRANCHE PAS LES HAUT-PARLEURS.
+
+         Le son partait vers deux endroits : l'enregistrement ET la sortie
+         audio. Comme on ne veut pas faire écouter la vidéo à la personne, la
+         ligne `lecteur.muted = true` la coupait quinze lignes plus bas.
+
+         Sauf que couper l'élément coupe TOUTE la chaîne : à partir de
+         `createMediaElementSource`, l'audio ne passe plus que par le graphe, et
+         un élément muet n'y envoie que du silence. On enregistrait donc une
+         piste audio parfaitement vide.
+
+         D'où le message « cette vidéo n'a pas de son » sur des vidéos qui en
+         avaient : l'app rendait muette la vidéo qu'elle s'apprêtait à juger.
+
+         En ne raccordant pas la sortie, rien n'est audible — sans avoir à
+         couper quoi que ce soit. */
       dest.stream.getAudioTracks().forEach(t => flux.addTrack(t))
     } catch (e) {
       /* Sans son, la compression n'a plus d'intérêt : on renvoie l'original. */
@@ -6958,7 +6977,9 @@ async function comprimerVideo(fichier, surAvancee) {
 
     const fini = new Promise((ok) => { enr.onstop = ok })
     enr.start(1000)
-    lecteur.muted = true          // on ne fait pas écouter la vidéo à la personne
+    /* Surtout pas de `muted` ici : l'élément alimente le graphe audio, le
+       couper reviendrait à enregistrer du silence. Rien n'est audible de toute
+       façon — la sortie n'est pas raccordée aux haut-parleurs. */
     await lecteur.play()
 
     let arret = false

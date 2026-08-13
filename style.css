@@ -1086,9 +1086,18 @@
      26 px de marge, et l'emporterait même avec `!important` des deux côtés — une
      règle à identifiant bat toujours une règle à classes. C'est ce qui creusait
      un grand vide en haut de chaque carte. */
-  #p-global-analyse .an-bloc .an-tete{
+  /* La tête de section porte une grande marge et un filet quand elle sépare
+     deux sections d'une page. Dans une CARTE, c'est la carte qui sépare : elle
+     n'a plus besoin ni de l'un ni de l'autre.
+
+     L'accueil est ajouté ici. Sans lui, ses deux blocs héritaient de la règle
+     générale — 32 px de marge et un trait au-dessus du titre, à l'intérieur
+     d'une carte qui les contenait déjà. */
+  #p-global-analyse .an-bloc .an-tete,
+  #p-home .an-bloc .an-tete{
     margin:0 0 6px !important; padding-top:0 !important; border-top:none !important;
   }
+  #p-home .an-bloc .an-plus{ margin-top:4px; margin-bottom:6px; }
   /* Les lignes perdent déjà leur carte par la règle `#p-global-analyse .cat-rank`
      plus bas : inutile de la réécrire ici. On ajuste seulement leur retrait, pour
      que leur texte s'aligne sur le titre de la carte. */
@@ -5413,61 +5422,6 @@
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES TROIS DERNIÈRES PROCÉDURES CRÉÉES
-
-   UN seul cadre, des lignes dedans. Trois cartes séparées faisaient trois
-   objets à l'écran alors qu'il s'agit d'une seule information — la même
-   construction que les sections de la page Analyse, qu'on retrouve donc sans
-   avoir à l'apprendre.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.rec-bloc{
-  margin-top:20px; padding:15px 15px 4px;
-  border-radius:20px; background:var(--bg-card);
-  border:0.5px solid var(--border);
-}
-
-.rec-tete{ display:flex; align-items:center; gap:11px; margin-bottom:4px; }
-.rec-pic{
-  display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  width:34px; height:34px; border-radius:11px;
-  background:linear-gradient(165deg,
-    rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
-  border:0.5px solid rgba(255,173,51,0.20);
-}
-.rec-pic svg{ width:18px; height:18px; display:block; }
-.rec-t{ font-size:16px; font-weight:750; letter-spacing:-0.03em; }
-
-/* Les lignes. Le filet du HAUT et non du bas : la dernière ligne n'en porte
-   donc aucun, et le bloc se ferme proprement sans règle d'exception. */
-.rec-l{
-  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
-  padding:12px 0; background:none; border:none;
-  border-top:0.5px solid var(--separator);
-}
-/* Le filet sépare les lignes ENTRE elles. La première n'a rien à séparer du
-   titre : un trait sous un en-tête le transforme en bandeau. */
-.rec-l:first-of-type{ border-top:none; padding-top:6px; }
-.rec-l:active{ opacity:0.6; }
-
-.rec-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
-
-/* La date partage la ligne du NOM. Placée à droite des caractéristiques, « il
-   y a 1 semaine » leur volait la moitié de la largeur et « Comptabilité »
-   finissait en « Com… ». Un nom se laisse couper sans dommage. */
-.rec-h{ display:flex; align-items:baseline; gap:10px; min-width:0; }
-.rec-nom{
-  flex:1; min-width:0;
-  font-size:14.5px; font-weight:700; letter-spacing:-0.025em;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.rec-q{ font-size:11px; color:var(--label-3); font-weight:600; flex-shrink:0; }
-.rec-tr{
-  display:block; font-size:11.5px; color:var(--label-3); font-weight:600; margin-top:3px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.rec-fl{ color:var(--label-3); font-size:17px; line-height:1; flex-shrink:0; }
-
-/* ═══════════════════════════════════════════════════════════════════════════
    LE BOUTON DE CRÉATION, EN GOUTTE
 
    Il n'existe que sur la page Procédures. Il en sort et y retourne en passant
@@ -5599,51 +5553,61 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
   .bulle, .plus-flot, .socle{ transition:none; animation:none; }
 }
 
-
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES DERNIÈRES ACTIVITÉS
+   LES ACTIVITÉS
 
-   Même cadre que « Dernières procédures créées », mais chaque ligne porte une
-   pastille : ici les événements sont de natures différentes — une arrivée n'est
-   pas une lecture — et le dessin les distingue sans qu'on ait à lire.
+   Rien de neuf : les lignes empruntent `an-lig`, les blocs `an-bloc`, la page
+   la mise en page de « Procédures » vue depuis l'analyse. Seule la pastille
+   d'icône est propre aux activités — les événements sont de natures
+   différentes, et le dessin les distingue sans qu'on ait à lire.
    ═══════════════════════════════════════════════════════════════════════════ */
-.act-l{
-  display:flex; align-items:center; gap:11px;
-  padding:11px 0; border-top:0.5px solid var(--separator);
-}
-/* `:first-of-type` compte les BALISES, et l'en-tête est un `div` comme les
-   lignes : la première ligne n'était donc jamais « la première de son type »,
-   et la règle ne s'appliquait à rien. On désigne celle qui SUIT l'en-tête —
-   sans dépendre de ce qu'elle est. */
-.rec-tete + .act-l{ border-top:none; padding-top:6px; }
-
-.act-ic{
+.act-lig .act-ic{
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   width:30px; height:30px; border-radius:10px;
   background:rgba(255,255,255,0.05);
-  border:0.5px solid rgba(255,255,255,0.08);
   color:var(--label-2);
 }
-.act-ic svg{ width:16px; height:16px; display:block; }
+.act-lig .act-ic svg{ width:16px; height:16px; display:block; }
+/* Le nom porte du gras à l'intérieur : « **Karim** a lu … ». */
+.act-lig .nm{ font-weight:400; color:var(--label-2); }
+.act-lig .nm b{ font-weight:700; color:var(--label-1); }
 
 /* Une seule couleur, pour un seul cas : quelqu'un attend d'entrer et ça coûte
    de l'argent. Les autres événements sont des faits, pas des alertes — les
    teinter tous reviendrait à n'en signaler aucun. */
 .act-refus{
-  background:rgba(255,154,31,0.12);
-  border-color:rgba(255,173,51,0.30);
-  color:#FFAD33;
+  background:rgba(255,154,31,0.12) !important;
+  color:#FFAD33 !important;
 }
 
-.act-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
-.act-tx{
-  font-size:13.5px; color:var(--label-2); line-height:1.35;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+#p-activites{ padding-left:32px; padding-right:32px; }
+#p-activites .back-btn{ margin-left:-5px; }
+
+/* Le groupement par jour. Sans ces en-têtes, quarante lignes se ressemblent
+   toutes et l'œil n'a plus de prise. */
+.act-jour{
+  font-size:11.5px; font-weight:750; letter-spacing:0.05em; text-transform:uppercase;
+  color:var(--label-3); margin:22px 0 2px;
 }
-.act-tx b{ color:var(--label-1); font-weight:700; }
-.act-de{ font-size:11px; color:var(--label-3); font-weight:600; margin-top:2px; }
-.act-q{
-  font-size:11px; color:var(--label-3); font-weight:600; flex-shrink:0;
-  align-self:flex-start; margin-top:2px;
-  font-variant-numeric:tabular-nums;
+#activites-tout > .act-jour:first-of-type{ margin-top:14px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN SEUL TRAIT DE CONTOUR DANS TOUTE L'APP
+
+   La barre du bas et la carte du logo portent le filet clair : ce sont les deux
+   pièces de verre, posées PAR-DESSUS la page, et l'arête dit qu'elles flottent.
+
+   Les cartes, elles, sont dans le flux. Leur donner un contour les découpe
+   comme des vignettes ; c'est le fond plus clair et l'ombre qui doivent les
+   détacher. Un trait partout ne détache plus rien.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.an-bloc,
+.card,
+.cat-cell,
+.proc-rich-card,
+.reg-groupe,
+.reg-identite,
+.an-intro,
+.enc{
+  border-color:transparent !important;
 }

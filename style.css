@@ -5394,14 +5394,6 @@
 }
 
 
-/* Le bouton d'explication, seul, contre le bord gauche. Le rond fait 26 px pour
-   un dessin de 19 : les 3,5 px de vide autour ne se voient pas, on les
-   retranche pour que le dessin s'aligne vraiment sur la marge du texte. */
-.an-aide-seule{
-  display:flex; justify-content:flex-start;
-  margin:0 0 14px calc(-3.5px);
-}
-.an-aide-seule .an-aide{ position:static; margin:0; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -5447,7 +5439,18 @@
      et le bouton part sur-le-champ. Même mouvement, sens opposé. */
   --plus-duree:0.26s;
   --plus-courbe:cubic-bezier(0.5, -0.2, 0.9, 0.6);
-  --plus-courbe-entree:cubic-bezier(0.1, 0.4, 0.5, 1.2);
+  /* CALME, PAS SEC.
+
+     La courbe précédente — (0,1 · 0,4 · 0,5 · 1,2) — était l'inverse exacte de
+     la sortie. Mathématiquement juste, mais l'inverse d'une amorce est un
+     DÉPART SEC : le bouton s'élançait à pleine vitesse dès la première image,
+     puis claquait sur un dépassement. D'où l'impression de brusquerie.
+
+     Celle-ci part de rien et finit sur rien — lente aux deux bouts, ample au
+     milieu, sans dépassement. C'est la même sensation posée que la sortie,
+     obtenue autrement : là c'est l'amorce qui calme, ici c'est le démarrage
+     progressif. */
+  --plus-courbe-entree:cubic-bezier(0.45, 0.02, 0.2, 1);
   /* L'ENTRÉE EST PLUS LONGUE QUE LA SORTIE : 340 ms contre 260.
 
      Ce n'est pas une inattention. On regarde une chose qui arrive, on ne
@@ -5764,5 +5767,12 @@ body.plus-vu .plus-flot{
   font-size:26px; font-weight:800; letter-spacing:-0.045em; line-height:1.1;
 }
 .page-tete p{
-  margin-top:5px; font-size:13px; color:var(--label-3); font-weight:600;
+  font-size:13px; color:var(--label-3); font-weight:600;
 }
+/* Le compte et son bouton d'explication sur la même ligne. Le rond de 26 px
+   porte 3,5 px de vide autour de son dessin : on les retranche pour que le
+   trait s'aligne sur la hauteur du texte, pas sur sa boîte. */
+.page-tete .tete-bas{
+  display:flex; align-items:center; gap:7px; margin-top:5px;
+}
+.page-tete .tete-bas .an-aide{ position:static; margin:0 0 0 -1px; }

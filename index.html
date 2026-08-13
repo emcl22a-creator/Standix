@@ -284,29 +284,49 @@
 <div class="app" id="gestion-app" style="display:none;">
   <div class="topbar">
     <div class="topbar-row">
-      <!-- ═══ LA BARRE DU HAUT ═══
+      <!-- ═══ DEUX PANNEAUX QU'ON FAIT GLISSER ═══
 
-           Une pilule de la matière de la barre du bas — même verre, même filet.
-           Dedans, un cercle par établissement, plus le « + ».
+           À gauche la carte d'origine — logo, Procédo, Espace Gestion. À droite
+           les établissements : un cercle par entreprise, plus le « + ».
 
-           Pas de piste qui glisse : le plafond est de TROIS établissements, et
-           trois cercles tiennent côte à côte. Faire glisser pour atteindre un
-           voisin qu'on voit déjà serait un geste pour rien. -->
-      <div class="topbar-pilule" id="topbar-pilule">
-        <div class="etab-ronds" id="etab-ronds">
-          <button type="button" class="rond-etab actif" aria-label="Procédo">
-            <span class="rond-logo">
-              <svg viewBox="0 0 85 100" fill="none">
-                <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="url(#logoOr)"></path>
-              </svg>
-            </span>
-          </button>
+           On garde les deux. La première dit OÙ l'on est dans l'app, la seconde
+           DANS QUELLE entreprise : deux questions différentes, deux réponses.
+           Les fondre en une seule aurait fait perdre l'une des deux. -->
+      <div class="haut-piste" id="haut-piste">
+        <div class="haut-pan">
+          <div class="topbar-card">
+            <div class="topbar-left">
+              <div class="logo-pill">
+                <div class="boot-logo boot-logo--topbar" id="topbar-logo-gestion">
+                  <svg viewBox="0 0 85 100" fill="none">
+                    <path class="boot-fill" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="url(#logoOr)"></path>
+                  </svg>
+                </div>
+              </div>
+              <div class="topbar-title">
+                <span class="name">Procédo</span>
+                <span class="role">Espace Gestion</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <button type="button" class="rond-etab rond-plus" id="etab-plus"
-                aria-label="Ajouter un établissement">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
-               stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        </button>
+
+        <div class="haut-pan">
+          <div class="topbar-pilule" id="topbar-pilule">
+            <div class="etab-ronds" id="etab-ronds"></div>
+            <button type="button" class="rond-etab rond-plus" id="etab-plus"
+                    aria-label="Ajouter un établissement">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                   stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deux points : on ne devine pas qu'un panneau se cache à droite tant
+           que rien ne le dit. -->
+      <div class="haut-points" id="haut-points" aria-hidden="true">
+        <span class="on"></span><span></span>
       </div>
     </div>
   </div>
@@ -2395,11 +2415,18 @@ const LENS = {
 
   // ---- Atterrissage : trois rebonds decroissants ----
   // fort, moyen, faible. Oscillation amortie sur les DEUX axes.
-  LAND_A1: 0.14,     // 1er rebond : moyen
-  LAND_A2: 0.10,     // 2e rebond : entre moyen et faible
-  LAND_A3: 0.06,     // 3e rebond : faible
-  LAND_A4: 0.03,     // 4e rebond : faible
-  LAND_PERIOD: 80,  // duree d'un rebond, en ms.
+  /* ═══ AMPLITUDES ET DUREE VONT ENSEMBLE ═══
+     La duree d'un rebond est passee de 150 a 80 ms sans que ces amplitudes
+     changent : meme distance en deux fois moins de temps, donc deux fois plus
+     vite. L'oeil ne lisait plus un rebond mais une vibration — d'ou
+     l'impression que la barre bugue.
+     On les baisse de vingt pour cent, et la duree remonte a 110 : la VITESSE
+     redevient celle d'origine, pour un cycle nettement plus court. */
+  LAND_A1: 0.11,     // 1er rebond : moyen
+  LAND_A2: 0.08,     // 2e rebond : entre moyen et faible
+  LAND_A3: 0.05,     // 3e rebond : faible
+  LAND_A4: 0.025,    // 4e rebond : faible
+  LAND_PERIOD: 110, // duree d'un rebond, en ms.
                      // Ramene de 150 a 120 : les quatre rebonds sont tous
                      // joues, simplement plus serres. Le TRAJET n'est pas
                      // touche — seule la queue d'oscillation se raccourcit.
@@ -2407,7 +2434,7 @@ const LENS = {
                      // Doit rester SUPERIEUR a cette convergence : plus court,
                      // la capsule serait declaree arrivee alors qu'elle bouge
                      // encore, et le rebond s'enchainerait en plein vol.
-  LAND_MS: 320,      // exactement 4 x LAND_PERIOD : fin a zero.
+  LAND_MS: 440,      // exactement 4 x LAND_PERIOD : fin a zero.
                      // Ce multiple doit etre EXACT : la quatrieme amplitude
                      // s'eteint pile a la fin. Un autre rapport couperait le
                      // dernier rebond en plein mouvement.

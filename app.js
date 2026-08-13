@@ -7564,6 +7564,9 @@ async function pollAiStatus() {
     aiEchecsSuite = 0
 
     const data = await checkRes.json()
+    /* La réponse ENTIÈRE, à chaque sondage. C'est le seul moyen de savoir si le
+       serveur suit vraiment Azure ou s'il répond « en cours » par défaut. */
+    console.log(`[ai-check ${Math.round((Date.now() - aiDebutAnalyse) / 1000)} s]`, data)
 
     if (data.status === 'processing') {
       /* Le serveur nous dit où il en est : dès qu'il répond « en traitement »,
@@ -7573,6 +7576,35 @@ async function pollAiStatus() {
       // On interroge souvent au début, puis on espace : la première minute
       // était la plus pénalisante, on pouvait attendre 6 s pour rien après la
       // fin réelle de l'analyse.
+      /* ═══ UNE ANALYSE NE DURE PAS INDÉFINIMENT ═══
+
+         Rien n'arrêtait le sondage : tant que le serveur disait « en cours »,
+         l'anneau tournait, une heure s'il le fallait. L'app ne pouvait donc
+         jamais dire ce qu'on veut savoir — que ça dure anormalement.
+
+         Azure indexe une vidéo courte en une à trois minutes. Au-delà de DOUZE,
+         quelque chose est resté en travers, et continuer d'attendre n'apprend
+         plus rien. */
+      const ecoule = (Date.now() - aiDebutAnalyse) / 1000
+      if (ecoule > 12 * 60) {
+        stopAiProgressSimulation(0)
+        document.getElementById('ai-progress-card').style.display = 'none'
+        aiEcranAttente = false
+        document.getElementById('ai-upload-card').style.display = 'block'
+        const zone = document.getElementById('ai-error')
+        zone.style.color = 'var(--red)'
+        zone.textContent = "L'analyse dure depuis " + Math.round(ecoule / 60) +
+          " minutes sans aboutir. Elle est probablement bloquée chez Azure."
+        afficherDetailEchec(aiProcedureId,
+          `Aucune réponse d'Azure après ${Math.round(ecoule)} s · ${aiNbSondages} sondages`)
+        if (aiProcedureId) {
+          supabase.from('procedures')
+            .update({ statut: 'echec', erreur_ia: `Analyse bloquée après ${Math.round(ecoule / 60)} min` })
+            .eq('id', aiProcedureId).then(() => loadGestionProcedures().catch(() => {}))
+        }
+        return
+      }
+
       aiNbSondages++
       const delai = aiNbSondages < 12 ? 3000 : aiNbSondages < 30 ? 5000 : 8000
       aiPollTimer = setTimeout(pollAiStatus, delai)

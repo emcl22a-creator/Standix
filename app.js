@@ -7152,7 +7152,23 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
   try {
     errorEl.style.color = 'var(--label-3)'
-    errorEl.textContent = '2/3 \u00b7 Envoi de la vid\u00e9o'
+    /* ═══ LE 2/3 SE DÉCOUPE ═══
+
+       Sous ce seul libellé se cachaient quatre opérations : le contrôle du
+       poids, l'écoute de la bande son, l'envoi dans le stockage et la
+       signature de l'adresse. Bloqué, on ne savait pas laquelle — et deux
+       minutes trente pour vingt secondes de vidéo ne ressemblent à aucune.
+
+       Chacune annonce son nom et le temps écoulé. La dernière ligne affichée
+       est le point de blocage. */
+    const t0 = Date.now()
+    const chrono = () => `${((Date.now() - t0) / 1000).toFixed(1)} s`
+    const etape = (m) => {
+      errorEl.style.color = 'var(--label-3)'
+      errorEl.textContent = `2/3 · ${m}`
+      console.log(`[envoi ${chrono()}] ${m}`)
+    }
+    etape('vérification du poids…')
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
@@ -7168,7 +7184,9 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     /* On extrait la bande son AVANT d'envoyer quoi que ce soit. Si elle est
        muette, on refuse tout de suite : transférer 40 Mo puis attendre cinq
        minutes pour annoncer l'échec serait la pire façon de l'apprendre. */
+    etape(`écoute de la bande son… (${poidsLisible(aiVideoFile.size)})`)
     const son = await extraireBandeSon(aiVideoFile)
+    etape(son ? `son mesuré : crête ${son.crete.toFixed(3)}` : 'son illisible, on continue')
 
     if (son && son.crete < SON_SEUIL) {
       throw new Error('SANS_SON')
@@ -7178,8 +7196,10 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
     // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
     const path = `${base}_${aiVideoFile.name}`
+    etape(`envoi de ${poidsLisible(aiVideoFile.size)} vers le stockage…`)
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, aiVideoFile, { cacheControl: CACHE_LONG })
     if (uploadError) throw new Error("Erreur d'upload vidéo : " + uploadError.message)
+    etape(`vidéo envoyée en ${chrono()}`)
     /* On garde le CHEMIN, pas une URL publique. Le bucket est privé depuis le
      passage aux liens signés : `getPublicUrl` rendait une adresse qui ne
      s'ouvre plus. La fiche signera ce chemin au moment de lire la vidéo.
@@ -7216,6 +7236,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        chemin nu ne s'ouvre pas, et l'analyse échouerait sans qu'on sache
        pourquoi. */
     if (urlPourAnalyse === videoUrl) {
+      etape('préparation du lien d’analyse…')
       const { data: sigVid } = await supabase.storage.from('procedo-videos')
         .createSignedUrl(videoUrl, 6 * 3600)
       if (!sigVid?.signedUrl) throw new Error("Impossible de pr\u00e9parer la vid\u00e9o pour l'analyse.")

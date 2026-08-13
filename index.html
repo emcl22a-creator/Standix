@@ -342,41 +342,32 @@
   </div>
 
   <div class="screen" id="p-list">
-    <!-- ═══ LA CARTE D'OUVERTURE ═══
-         Elle remplace la salutation. Deux raisons : elle dit ce que la page
-         permet de faire au lieu de dire bonjour, et elle porte le seul chemin
-         vers la création d'une procédure — la nouvelle barre n'a plus de « + ».
+    <!-- ═══ DEUX GESTES, PAS UNE CARTE ═══
 
-         Les teintes sont celles du logo, et d'aucun signal : c'est du décor. -->
-    <div class="hero">
-      <span class="hero-lueur"></span>
+         Il y avait ici la même carte d'ouverture que sur l'Accueil : titre,
+         phrase, bord allumé. Deux cartes de même forme sur deux onglets
+         voisins, et les pages se confondaient — sans compter qu'elle repoussait
+         la liste hors de l'écran.
 
-      <div class="hero-txt">
-        <h2>Gérer vos procédures</h2>
-        <p>Créez, organisez et retrouvez facilement vos procédures.</p>
-        <!-- Deux gestes, deux poids. Créer est le principal : il prend toute la
-             largeur. Scanner est occasionnel : un carré à côté suffit, et son
-             dessin se comprend sans libellé. -->
-        <div class="hero-actions">
-          <button type="button" class="hero-cta" onclick="startNewProcedure()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
-                 stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Créer une procédure
-          </button>
-          <button type="button" class="hero-qr" aria-label="Scanner un QR code"
-                  onclick="showGestionScreen('p-scan'); startScanner('gestion')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="7" rx="1.8"/>
-              <rect x="14" y="3" width="7" height="7" rx="1.8"/>
-              <rect x="3" y="14" width="7" height="7" rx="1.8"/>
-              <path d="M14 14h3.2v3.2H14zM17.8 17.8H21V21h-3.2zM14 19.4h2.2V21H14zM19.4 14H21v2.2h-1.6z"
-                    fill="currentColor" stroke="none"/>
-            </svg>
-          </button>
-        </div>
-      </div>
-
+         Sur cette page, le contenu c'est la liste. Il ne reste donc que ce
+         qu'on ne peut pas y mettre : créer, et scanner. -->
+    <div class="p-gestes">
+      <button type="button" class="hero-cta" onclick="startNewProcedure()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+             stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Créer une procédure
+      </button>
+      <button type="button" class="hero-qr" aria-label="Scanner un QR code"
+              onclick="showGestionScreen('p-scan'); startScanner('gestion')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1.8"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.8"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.8"/>
+          <path d="M14 14h3.2v3.2H14zM17.8 17.8H21V21h-3.2zM14 19.4h2.2V21H14zM19.4 14H21v2.2h-1.6z"
+                fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
     </div>
 
     <div class="list-tools">
@@ -2383,9 +2374,15 @@ const LENS = {
   LAND_A2: 0.10,     // 2e rebond : entre moyen et faible
   LAND_A3: 0.06,     // 3e rebond : faible
   LAND_A4: 0.03,     // 4e rebond : faible
-  LAND_PERIOD: 150,  // duree d'un rebond, en ms
+  LAND_PERIOD: 120,  // duree d'un rebond, en ms.
+                     // Ramene de 150 a 120 : les quatre rebonds sont tous
+                     // joues, simplement plus serres. Le TRAJET n'est pas
+                     // touche — seule la queue d'oscillation se raccourcit.
   TRAVEL_MS: 560,    // > temps de convergence du ressort (450 ms)
-  LAND_MS: 600,      // exactement 4 x LAND_PERIOD : fin a zero
+  LAND_MS: 480,      // exactement 4 x LAND_PERIOD : fin a zero.
+                     // Ce multiple doit etre EXACT : la quatrieme amplitude
+                     // s'eteint pile a la fin. Un autre rapport couperait le
+                     // dernier rebond en plein mouvement.
   GLASS_HOLD: 0,     // le gris monte des la premiere frame du rebond
   GLASS_FADE: 0.62,  // conserve pour compatibilite, non utilise
   GLASS_LEAD: 0.3,   // part FINALE du trajet consacree au fondu.

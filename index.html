@@ -63,6 +63,65 @@
        lumière, pas à la mesure. */
     --filet:rgba(255,255,255,0.22);
   }
+  /* ═══ L'ÉCRAN DE DÉMARRAGE ═══
+
+     Trois temps : le logo se pose, il attend, puis le noir s'ouvre en sa forme
+     et découvre l'app. Le style vit ici et non dans `style.css` — une feuille
+     externe peut arriver après la première image, et l'écran s'afficherait
+     alors sans mise en forme.
+
+     Rien ici n'est un minuteur déguisé en chargement : l'ouverture ne part que
+     lorsque l'app est réellement prête, l'attente n'en est que le plancher. */
+  #splash{
+    position:fixed; inset:0; z-index:9999;
+    background:transparent; pointer-events:none;
+  }
+  body.splash-fini #splash{ display:none; }
+
+  .sp-voile{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+
+  /* LE TROU. Il part à la taille du logo et s'ouvre jusqu'à ce que sa forme
+     déborde de l'écran par tous les côtés. 90 : au-delà, on ne gagne rien ;
+     en deçà, un bord du « P » traversait encore l'écran à la fin. */
+  .sp-forme{
+    transform:scale(0.85);
+    transform-origin:0 0;
+    transform-box:view-box;
+  }
+  body.splash-ouvre .sp-forme{
+    transform:scale(90);
+    /* Lente au départ, emballée à la fin : c'est ce qui donne l'impression
+       qu'on passe AU TRAVERS plutôt que devant. */
+    transition:transform 0.9s cubic-bezier(0.7, 0, 0.84, 0);
+  }
+
+  /* LE LOGO PLEIN. Il arrive en dézoom — plus grand que sa place, puis il s'y
+     pose. C'est l'inverse d'une apparition qui grandit, et c'est ce qui le fait
+     paraître venir vers nous. */
+  .sp-marque{
+    position:absolute; top:50%; left:50%;
+    width:65px; height:76px;
+    transform:translate(-50%,-50%) scale(1.5);
+    opacity:0;
+    animation:spPose 0.72s cubic-bezier(0.16,1,0.3,1) 0.08s both;
+  }
+  @keyframes spPose{
+    from{ opacity:0; transform:translate(-50%,-50%) scale(1.5); }
+    to{ opacity:1; transform:translate(-50%,-50%) scale(1); }
+  }
+  /* Il s'efface au tout début de l'ouverture : la couleur cède la place à ce
+     qu'il y a derrière, dans la même silhouette. */
+  body.splash-ouvre .sp-marque{
+    animation:none; opacity:0;
+    transform:translate(-50%,-50%) scale(1);
+    transition:opacity 0.16s linear;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .sp-marque{ animation:none; opacity:1; transform:translate(-50%,-50%); }
+    body.splash-ouvre .sp-forme{ transition:none; transform:scale(90); }
+  }
+
   .glassDiv{
     position:absolute;
     border-radius:var(--glass-radius);
@@ -201,6 +260,50 @@
 </style>
 </head>
 <body class="booting">
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     L'ÉCRAN DE DÉMARRAGE
+
+     Il est écrit ICI, en tête du document, et non fabriqué par un script :
+     c'est ce qui lui permet d'être peint à la première image, avant même que
+     `app.js` ne soit lu. Un écran de chargement qui attend le chargement du
+     script pour apparaître arrive après ce qu'il devait couvrir.
+
+     Sa disparition ne dépend d'aucun minuteur. Elle suit `body.booting`, que
+     l'app retire quand elle est réellement prête — c'est déjà son signal, on
+     n'en invente pas un second.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div id="splash" aria-hidden="true">
+  <!-- LE VOILE PERCÉ.
+
+       Un rectangle noir qui couvre tout, avec un TROU en forme de logo. Au
+       repos le trou fait la taille du logo ; en grandissant, il découvre l'app.
+       Ce n'est pas le logo qui s'agrandit, c'est le noir qui s'ouvre.
+
+       `slice` fait couvrir la boîte de 1000 unités quel que soit l'écran, et
+       son centre reste le centre de l'écran : le trou s'ouvre donc toujours
+       depuis le milieu. -->
+  <svg class="sp-voile" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <mask id="sp-trou" maskUnits="userSpaceOnUse" x="-3000" y="-3000" width="7000" height="7000">
+        <rect x="-3000" y="-3000" width="7000" height="7000" fill="#fff"/>
+        <g transform="translate(500 500)">
+          <g class="sp-forme"><path transform="translate(-42.5 -50)" d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="#000"/></g>
+        </g>
+      </mask>
+    </defs>
+    <rect x="-3000" y="-3000" width="7000" height="7000" fill="#050505" mask="url(#sp-trou)"/>
+  </svg>
+
+  <!-- Le logo plein, par-dessus le trou et exactement dessus. Il s'efface au
+       moment où le trou s'ouvre : la couleur cède la place à ce qu'il y a
+       derrière, dans la même silhouette. -->
+  <svg class="sp-marque" viewBox="0 0 85 100" fill="none">
+    <path d="M 65.78 3.86 L 60.26 1.43 L 53.42 0.00 L 1.77 0.00 L 0.00 1.32 L 0.00 6.62 L 2.10 13.69 L 6.18 19.87 L 11.15 23.95 L 20.31 26.82 L 52.10 27.04 L 56.51 29.80 L 58.50 34.77 L 57.17 40.51 L 53.20 43.71 L 23.18 44.70 L 15.56 47.90 L 9.38 53.42 L 5.63 59.93 L 3.86 67.44 L 3.75 96.91 L 4.97 99.34 L 8.28 100.00 L 15.12 99.34 L 19.76 97.13 L 23.62 93.60 L 27.59 85.10 L 28.04 70.97 L 54.19 70.97 L 60.71 69.76 L 70.86 64.46 L 78.81 55.74 L 82.34 48.57 L 84.11 41.50 L 84.44 34.22 L 83.22 26.27 L 80.57 19.21 L 77.37 14.02 L 71.96 8.17 Z" fill="url(#logoOr)"></path>
+  </svg>
+</div>
+  </div>
+</div>
 
 
 

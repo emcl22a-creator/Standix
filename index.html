@@ -2040,9 +2040,12 @@
          soudent, et quand elles s'éloignent le cou s'amincit jusqu'à rompre.
          Rien n'est dessiné — c'est le seuil qui fabrique la goutte. -->
     <filter id="fusion">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="flou"></feGaussianBlur>
+      <!-- 11 au lieu de 8, et un seuil plus doux : les formes se soudent de
+           plus loin et le cou reste visible plus longtemps avant de rompre.
+           C'est le flou qui décide de la portée de la fusion. -->
+      <feGaussianBlur in="SourceGraphic" stdDeviation="11" result="flou"></feGaussianBlur>
       <feColorMatrix in="flou" mode="matrix"
-        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 22 -10" result="dur"></feColorMatrix>
+        values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 26 -13" result="dur"></feColorMatrix>
       <feComposite in="SourceGraphic" in2="dur" operator="atop"></feComposite>
     </filter>
     <linearGradient id="logoOr" x1="0" y1="0" x2="85" y2="100" gradientUnits="userSpaceOnUse">

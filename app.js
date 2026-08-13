@@ -7191,6 +7191,41 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
      La bascule se fait plus bas, au moment où l'analyse démarre vraiment. */
 
+  /* ═══ LA PROCÉDURE EXISTE AVANT MÊME QU'ON TOUCHE À LA VIDÉO ═══
+
+     Elle était créée après l'envoi, tout à la fin. « Vous pouvez quitter cette
+     page » était donc un mensonge pendant les deux premières étapes : en
+     partant à ce moment-là, on ne retrouvait rien — la ligne n'existait pas
+     encore, et le travail en cours n'avait aucune trace.
+
+     Elle est maintenant écrite tout de suite, en « traitement ». Elle apparaît
+     dans la liste dès la première seconde, avec l'anneau de l'IA à côté de son
+     nom, et on peut quitter la page sans rien perdre.
+
+     L'adresse de la vidéo viendra la compléter plus loin. */
+  try {
+    const { data: nouvelle, error: errNouvelle } = await supabase
+      .from('procedures')
+      .insert({
+        entreprise_id: currentMembre.entreprise_id,
+        titre, categorie,
+        created_by: currentMembre.id,
+        statut: 'traitement',
+      })
+      .select().single()
+    if (errNouvelle) throw new Error(errNouvelle.message)
+    aiProcedureId = nouvelle.id
+    console.log('[procédure créée]', aiProcedureId)
+    /* La liste se recharge sans qu'on l'attende : la procédure doit apparaître
+       maintenant, pas quand le rechargement daignera finir. */
+    loadGestionProcedures().catch(() => {})
+  } catch (e) {
+    launchBtn.classList.remove('travaille'); launchBtn.disabled = false
+    errorEl.style.color = 'var(--red)'
+    errorEl.textContent = "Impossible de créer la procédure : " + (e?.message || e)
+    return
+  }
+
   /* On comprime MAINTENANT, pas à l'import : l'aperçu doit rester immédiat.
      La personne voit sa vidéo tout de suite, et le travail se fait au moment
      où elle accepte d'attendre. */
@@ -7358,17 +7393,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        change d'écran pour trois secondes. */
     clearTimeout(bascule2)
     basculerVersAttente()
-    signalerEtapeIA('Cr\u00e9ation de la proc\u00e9dure\u2026')
-    // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
-    const { data: newProc, error: procError } = await supabase
+    signalerEtapeIA('Vid\u00e9o rattach\u00e9e\u2026')
+    /* La procédure existe déjà — elle a été créée avant la compression. On ne
+       fait que lui rattacher sa vidéo. */
+    const { error: procError } = await supabase
       .from('procedures')
-      .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, video_url: videoUrl, created_by: currentMembre.id, statut: 'traitement' })
-      .select().single()
+      .update({ video_url: videoUrl })
+      .eq('id', aiProcedureId)
     if (procError) throw new Error(procError.message)
-    aiProcedureId = newProc.id
-    /* On trace la création : c'est le seul moyen de savoir si l'identifiant
-       transmis au serveur est bien celui d'une ligne réellement écrite. */
-    console.log('[procédure créée]', aiProcedureId, '· réponse complète :', newProc)
 
     signalerEtapeIA('L\u2019IA \u00e9coute et regarde\u2026')
     // 3. Démarrage de l'analyse Azure
@@ -7393,14 +7425,24 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     /* La bascule a eu lieu au clic — il ne reste qu'à sonder. */
     pollAiStatus()
 
-    /* La procédure existe en base, mais rien en mémoire ne le savait : en allant
-       tout de suite dans les catégories, elle n'apparaissait pas. La grille est
-       construite à partir de `allCategoriesData`, qui n'est reconstruit que par
-       le chargement complet — on le relance donc, sans attendre sa fin pour ne
-       pas retarder l'affichage de la progression. */
+    /* La liste a déjà été rechargée à la création, tout au début. On la
+       recharge une seconde fois ici : la vidéo vient d'être rattachée, et
+       c'est elle qui donne sa vignette à la carte. */
     loadGestionProcedures().catch(() => {})
   } catch (e) {
     clearTimeout(bascule2)
+
+    /* La procédure existe déjà en base : on ne peut plus faire comme si rien
+       n'avait commencé. On la marque en échec plutôt que de l'effacer — elle
+       reste dans la liste avec son signal rouge, et un appui la relance. Une
+       ligne qui disparaît toute seule laisse croire à une erreur de l'app. */
+    if (aiProcedureId) {
+      supabase.from('procedures')
+        .update({ statut: 'echec', erreur_ia: String(e?.message || e).slice(0, 400) })
+        .eq('id', aiProcedureId)
+        .then(() => loadGestionProcedures().catch(() => {}))
+    }
+
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
     /* Le rouge n'apparaît qu'ici : c'est le seul endroit où il y a vraiment
        quelque chose qui a échoué. */

@@ -5303,7 +5303,8 @@
 .hero-ia{ padding:12px 0 16px; }
 .hero-ia .hero-txt{ padding:0 20px; }
 .hero-ia h2{ font-size:19px; letter-spacing:-0.045em; margin-bottom:6px; }
-.hero-ia p{ font-size:13px; margin-bottom:14px; }
+/* Plus de bouton dessous : la phrase n'a plus rien à espacer. */
+.hero-ia p{ font-size:13px; margin-bottom:0; }
 .hero-ia .hero-cta{ height:44px; font-size:14px; }
 
 /* 74 % de la largeur, centrée. À 100 % la carte montait à 430 px et mangeait
@@ -5322,3 +5323,68 @@
   .hero-ia h2{ font-size:18.5px; }
   .hero-img{ width:66%; }
 }
+
+
+/* Le bouton d'explication, seul, contre le bord gauche. Le rond fait 26 px pour
+   un dessin de 19 : les 3,5 px de vide autour ne se voient pas, on les
+   retranche pour que le dessin s'aligne vraiment sur la marge du texte. */
+.an-aide-seule{
+  display:flex; justify-content:flex-start;
+  margin:0 0 14px calc(-3.5px);
+}
+.an-aide-seule .an-aide{ position:static; margin:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANALYSE EN COURS, SUR L'ACCUEIL
+   ═══════════════════════════════════════════════════════════════════════════ */
+.enc{
+  display:block; width:100%; text-align:left;
+  margin-top:12px; padding:15px;
+  border-radius:20px; background:var(--bg-card);
+  border:0.5px solid rgba(255,173,51,0.22);
+  box-shadow:0 10px 26px rgba(0,0,0,0.34);
+  transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1);
+}
+.enc:active{ transform:scale(0.985); }
+
+.enc-tete{ display:flex; align-items:center; gap:11px; margin-bottom:13px; }
+.enc-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
+.enc-nom{
+  display:block; font-size:15px; font-weight:700; letter-spacing:-0.03em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.enc-st{ display:block; font-size:11.5px; color:var(--label-3); font-weight:600; margin-top:3px; }
+.enc-chr{
+  font-size:11.5px; color:var(--label-3); font-weight:650; flex-shrink:0;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Les trois jalons. Le filet du haut les sépare de l'en-tête sans encadrer. */
+.enc-pas{
+  display:flex; flex-direction:column; gap:9px;
+  padding-top:12px; border-top:0.5px solid var(--separator);
+}
+.enc-pas span{ display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--label-3); }
+.enc-pas .rond{
+  width:15px; height:15px; border-radius:50%; flex-shrink:0;
+  border:1.5px solid rgba(255,255,255,0.16);
+}
+
+/* Fait : plein, sans coche. À cette taille une coche devient une tache — le
+   remplissage suffit à dire que c'est passé. */
+.enc-pas .fait{ color:var(--label-2); }
+.enc-pas .fait .rond{
+  border-color:#FF9A1F; background:#FF9A1F;
+  box-shadow:inset 0 0 0 2px var(--bg-card);
+}
+
+/* En cours : le seul point coloré, et le seul qui bouge. La pulsation dit que
+   le travail se fait ICI, pas ailleurs dans la liste. */
+.enc-pas .encours{ color:#FFC46B; font-weight:650; }
+.enc-pas .encours .rond{ border-color:#FFAD33; animation:encoursPulse 1.4s ease-in-out infinite; }
+@keyframes encoursPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(255,173,51,0.45) }
+  70%{ box-shadow:0 0 0 6px rgba(255,173,51,0) }
+}
+@media (prefers-reduced-motion: reduce){ .enc-pas .encours .rond{ animation:none } }

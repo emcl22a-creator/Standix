@@ -1597,6 +1597,10 @@ document.addEventListener('click', async (e) => {
 })
 
 async function enterApp(membre) {
+  /* L'espace Équipe n'a pas d'écran de chargement : il ouvre une seule liste,
+     l'attente ne vaut pas qu'on l'habille. On le retire tout de suite. */
+  if (membre?.role !== 'gestion') document.body.classList.remove('booting')
+
   currentMembre = membre
   try {
     localStorage.setItem('procedo_espace', membre.role)
@@ -1860,6 +1864,53 @@ async function proposerEntrepriseDuQR(code) {
 // Le décor (halos, animations de cartes) ne se remet en marche qu'une fois
 // l'app réellement affichée et posée. Avant ça, tout le processeur sert à
 // l'afficher — c'est ce qui rendait le lancement saccadé sur iPhone.
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN DE DÉMARRAGE
+
+   Le logo se pose, il attend, puis le noir s'ouvre en sa forme et découvre
+   l'app. Trois temps, dont un seul est une attente.
+
+   CE QUI DÉCLENCHE L'OUVERTURE, c'est l'app elle-même : elle retire
+   `body.booting` quand elle est prête, et on l'écoute. Le plancher de 900 ms
+   n'ajoute rien quand le chargement est plus long — il ne sert qu'à empêcher
+   le logo de disparaître avant d'avoir été vu. C'est un minimum, jamais un
+   délai imposé.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const SPLASH_MINIMUM = 900
+const splashDebut = performance.now()
+let splashParti = false
+
+function splashOuvrir() {
+  if (splashParti) return
+  splashParti = true
+  document.body.classList.add('splash-ouvre')
+  /* On retire l'écran du document une fois l'ouverture finie : un voile
+     transparent qui reste couvre l'app pour toujours du point de vue du
+     navigateur, même s'il ne se voit plus. */
+  setTimeout(() => document.body.classList.add('splash-fini'), 1000)
+}
+
+function splashQuandPret() {
+  const reste = SPLASH_MINIMUM - (performance.now() - splashDebut)
+  if (reste > 0) setTimeout(splashOuvrir, reste)
+  else splashOuvrir()
+}
+
+/* `body.booting` est retiré à trois endroits selon le chemin emprunté —
+   session valide, écran de choix, ou erreur. Plutôt que de brancher les trois,
+   on observe la classe : un seul point d'écoute, et rien à retoucher le jour
+   où un quatrième chemin apparaît. */
+;(() => {
+  if (!document.body.classList.contains('booting')) { splashQuandPret(); return }
+  const oeil = new MutationObserver(() => {
+    if (!document.body.classList.contains('booting')) {
+      oeil.disconnect()
+      splashQuandPret()
+    }
+  })
+  oeil.observe(document.body, { attributes: true, attributeFilter: ['class'] })
+})()
+
 let demarrageTermine = false
 function finDuDemarrage() {
   if (demarrageTermine) return

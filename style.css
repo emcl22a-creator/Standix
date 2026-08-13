@@ -340,7 +340,7 @@
      Un fondu, rien d'autre. 180 ms : assez pour que l'œil enregistre que la
      page a changé, trop court pour qu'on attende. Aucun déplacement — un
      onglet ne vient de nulle part, il remplace. */
-  .screen.fondu{ animation:ecranFondu 0.18s ease-out; }
+  .screen.fondu{ animation:ecranFondu 0.12s ease-out; }
   @keyframes ecranFondu{ from{ opacity:0 } to{ opacity:1 } }
 
   /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux

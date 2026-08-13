@@ -4245,6 +4245,37 @@ function oublierNaissances() {
 
    Les écrans de l'espace équipe s'activent à la main, sans passer par
    `showEquipeScreen` : ils appellent cette fonction directement. */
+/* ═══ LE BOUTON DE CRÉATION SUIT L'ÉCRAN ═══
+
+   Il n'appartient qu'à la liste des procédures. Ailleurs, il se retire derrière
+   la barre — sans quoi il proposerait de créer une procédure depuis les
+   réglages ou l'analyse, où le geste n'a pas de sens.
+
+   Sa largeur se MESURE sur un onglet, qui fait exactement celle de la capsule.
+   Mesurer plutôt que recopier : le jour où l'on passe à trois onglets, le
+   bouton suivra tout seul. */
+function majBoutonPlus(idEcran) {
+  const montre = idEcran === 'p-list'
+  document.body.classList.toggle('plus-vu', montre)
+  if (!montre) return
+
+  const barre = document.getElementById('bar')
+  const onglet = document.querySelector('#lNorm .tab')
+  if (!barre || !onglet) return
+
+  const rb = barre.getBoundingClientRect()
+  const ro = onglet.getBoundingClientRect()
+  if (!ro.width) return
+
+  const r = document.documentElement.style
+  r.setProperty('--plus-larg', Math.round(ro.width) + 'px')
+  r.setProperty('--plus-cx', Math.round(rb.left + rb.width / 2) + 'px')
+}
+
+addEventListener('resize', () => {
+  if (document.body.classList.contains('plus-vu')) majBoutonPlus('p-list')
+})
+
 function activerAvecNaissance(ecran) {
   if (!ecran) return
   oublierNaissances()
@@ -4264,6 +4295,7 @@ function activerAvecNaissance(ecran) {
 
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
+  majBoutonPlus(id)
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
@@ -4342,6 +4374,8 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
+  /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
+  document.body.classList.remove('plus-vu')
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
@@ -4666,7 +4700,7 @@ function peindreAnalyseEnCours() {
     const rang = p.statut === 'redaction' ? 2 : 1
     const jalons = ['Vidéo envoyée', 'L\u2019IA écoute et regarde', 'Rédaction des étapes']
     return `
-      <button type="button" class="enc" data-proc="${escapeHtml(p.id)}">
+      <div class="enc" data-id="${escapeHtml(p.id)}">
         <span class="enc-tete">
           <span class="ia-fig m"><span class="lum"></span></span>
           <span class="enc-co">
@@ -4680,17 +4714,52 @@ function peindreAnalyseEnCours() {
             <span class="${i < rang ? 'fait' : i === rang ? 'encours' : ''}">
               <i class="rond"></i>${t}</span>`).join('')}
         </span>
-      </button>`
+      </div>`
   }).join('')
 
-  zone.querySelectorAll('[data-proc]').forEach(b => {
-    /* `openAnalyse` : la page de suivi d'une procédure, celle qui affiche les
-       étapes au fur et à mesure qu'elles arrivent. */
-    b.addEventListener('click', () => openAnalyse(b.dataset.proc))
-  })
+  /* PAS DE CLIC. Pendant l'analyse, la procédure n'a encore ni étapes ni
+     contenu : l'ouvrir mènerait à une page vide, et on croirait que quelque
+     chose s'est perdu. Le bloc informe, il ne mène nulle part. */
 
   majChronosEnCours()
-  if (!minuteurEnCours) minuteurEnCours = setInterval(majChronosEnCours, 1000)
+  if (!minuteurEnCours) minuteurEnCours = setInterval(battement, 1000)
+}
+
+/* ═══ LE BLOC DOIT SE TAIRE QUAND C'EST FINI ═══
+
+   Il lisait le statut UNE FOIS, au chargement de la page. L'analyse se
+   terminait, la base passait la procédure en « prêt », et le bloc continuait
+   d'annoncer « l'IA écoute et regarde » — indéfiniment, jusqu'au prochain
+   rechargement. Pire qu'une absence d'information : une information fausse.
+
+   On relit donc le statut en base toutes les huit secondes. Pas plus souvent :
+   une analyse dure des minutes, et interroger la base chaque seconde pour un
+   statut qui change une fois serait du gaspillage. Le chronomètre, lui, avance
+   à chaque seconde — il n'a besoin de personne pour ça. */
+let battements = 0
+
+async function battement() {
+  majChronosEnCours()
+  if (++battements % 8) return
+
+  const ids = [...document.querySelectorAll('#accueil-encours .enc[data-id]')]
+    .map(e => e.dataset.id)
+  if (!ids.length) return
+
+  const { data } = await supabase
+    .from('procedures').select('id, statut').in('id', ids)
+  if (!data) return
+
+  const fini = data.some(p => p.statut !== 'traitement' && p.statut !== 'redaction')
+  const change = data.some(p => {
+    const local = (allGestionProcedures || []).find(x => x.id === p.id)
+    return local && local.statut !== p.statut
+  })
+  if (!fini && !change) return
+
+  /* Une seule chose a bougé, mais on recharge tout : la procédure vient de
+     gagner ses étapes, et elles doivent apparaître partout à la fois. */
+  await loadGestionProcedures()
 }
 
 /* Le temps écoulé se recalcule depuis la date de création : il reste juste
@@ -4704,8 +4773,84 @@ function majChronosEnCours() {
   })
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TROIS DERNIÈRES PROCÉDURES CRÉÉES
+
+   Trois cartes, avec ce qu'on veut savoir d'une vidéo : combien d'étapes elle a
+   produites, quelle durée de film elles couvrent, et quand elle a été faite.
+
+   Celles en cours d'analyse sont écartées : elles occupent déjà le bloc du
+   dessus, et les montrer deux fois ferait croire à deux procédures.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function peindreDernieresProcedures() {
+  const zone = document.getElementById('accueil-recentes')
+  if (!zone) return
+
+  const recentes = (allGestionProcedures || [])
+    .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
+    .slice(0, 3)
+
+  if (!recentes.length) { zone.innerHTML = ''; return }
+
+  /* La durée filmée n'est pas stockée : elle se déduit des bornes des étapes.
+     Une seule requête pour les trois, et seulement deux colonnes — inutile de
+     rapatrier les textes pour compter des secondes. */
+  const duree = new Map()
+  const { data: bornes } = await supabase
+    .from('etapes')
+    .select('procedure_id, timestamp_video, fin_video')
+    .in('procedure_id', recentes.map(p => p.id))
+
+  ;(bornes || []).forEach(e => {
+    const f = e.fin_video ?? e.timestamp_video
+    if (f == null) return
+    duree.set(e.procedure_id, Math.max(duree.get(e.procedure_id) || 0, Number(f)))
+  })
+
+  zone.innerHTML = `
+    <div class="rec-titre">Dernières procédures</div>
+    ${recentes.map(p => {
+      const nb = p.etapes?.[0]?.count ?? 0
+      const sec = duree.get(p.id)
+      /* On n'affiche une durée que si la vidéo existe ET que des bornes ont été
+         posées. Un « 0:00 » sur une procédure écrite à la main serait faux. */
+      const traits = [
+        nb ? `${nb} étape${nb > 1 ? 's' : ''}` : null,
+        (p.video_url && sec) ? `${formatTime(sec)} de vidéo` : (p.video_url ? 'vidéo' : 'sans vidéo'),
+        p.categorie ? escapeHtml(p.categorie) : null,
+      ].filter(Boolean).join(' \u00b7 ')
+
+      return `
+        <button type="button" class="rec" data-proc="${escapeHtml(p.id)}">
+          <span class="rec-ic">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+                    stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+              <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+              <line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="url(#logoOrIc)"
+                    stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/>
+              <line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="url(#logoOrIc)"
+                    stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="rec-co">
+            <span class="rec-h">
+              <span class="rec-nom">${escapeHtml(p.titre || 'Sans titre')}</span>
+              <span class="rec-q">${ilYA(Date.parse(p.created_at || '') || Date.now())}</span>
+            </span>
+            <span class="rec-tr">${traits}</span>
+          </span>
+        </button>`
+    }).join('')}`
+
+  zone.querySelectorAll('[data-proc]').forEach(b => {
+    b.addEventListener('click', () => openAnalyse(b.dataset.proc))
+  })
+}
+
 function renderAccueil() {
   peindreAnalyseEnCours()
+  peindreDernieresProcedures()
   const salut = document.getElementById('accueil-salut')
   const mot = document.getElementById('accueil-mot')
   if (!salut || !mot) return
@@ -10645,8 +10790,11 @@ function etatProcedureHtml(proc) {
 /* Abandon d'une analyse : la personne ne veut plus de cette procédure. On
    supprime tout — la ligne, ses étapes, et la vidéo déposée. Azure continuera
    son calcul dans le vide, mais plus rien ne l'attend de notre côté. */
-async function abandonnerAnalyse(proc) {
-  const ok = await confirmDialog({
+/* `dejaConfirme` : l'appelant a déjà posé la question. Sans ce garde-fou, on
+   enchaînait deux fenêtres identiques — celle de l'appelant, puis celle-ci — et
+   la seconde donnait l'impression que la première n'avait pas été entendue. */
+async function abandonnerAnalyse(proc, dejaConfirme) {
+  const ok = dejaConfirme || await confirmDialog({
     titre: 'Abandonner cette procédure ?',
     message: `« ${proc.titre || 'Cette procédure'} » sera supprimée, avec sa vidéo et l'analyse en cours. C'est définitif.`,
     confirmer: 'Supprimer',
@@ -10718,11 +10866,21 @@ async function proposerReprise(proc) {
   const raison = proc.erreur_ia ? proc.erreur_ia + ' ' : ''
 
   if (!proc.video_url) {
-    await confirmDialog({
+    /* « Compris » et « Fermer » disaient la même chose : rien. On restait avec
+       une procédure inutilisable et aucun moyen de s'en débarrasser depuis ici.
+       Le second bouton supprime désormais — c'est la seule chose à faire d'une
+       analyse sans vidéo. */
+    const supprimer = await confirmDialog({
       titre: 'Aucune vidéo',
-      message: raison + "Cette procédure n'a pas de vidéo associée : l'analyse ne peut pas être relancée. Modifiez-la à la main ou supprimez-la.",
-      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+      message: raison + "Cette procédure n'a pas de vidéo associée : l'analyse ne peut pas être relancée.",
+      confirmer: 'Supprimer',
+      annuler: 'Garder',
+      danger: true,
     })
+    if (supprimer) {
+      await abandonnerAnalyse(proc, true)
+      loadGestionProcedures()
+    }
     return
   }
 

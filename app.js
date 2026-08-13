@@ -7134,13 +7134,24 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         : `1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`
     })
     errorEl.textContent = ''
-    errorEl.style.color = 'var(--red)'
+    /* ON RESTE EN GRIS.
+
+       Cette ligne remettait le rouge tout de suite après la compression. Or les
+       étapes 2/3 et 3/3 s'écrivent dans la MÊME zone que les erreurs : elles
+       s'affichaient donc en rouge, comme des pannes, alors qu'elles annoncent
+       simplement où en est le travail.
+
+       C'est ce « 2/3 · Envoi de la vidéo » écarlate qui passait pour un bug
+       depuis le début. Le rouge est désormais posé au seul endroit où il a un
+       sens : quand quelque chose échoue vraiment. */
+    errorEl.style.color = 'var(--label-3)'
     if (aiVideoFile.size < avant) {
       console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192', poidsLisible(aiVideoFile.size))
     }
   }
 
   try {
+    errorEl.style.color = 'var(--label-3)'
     errorEl.textContent = '2/3 \u00b7 Envoi de la vid\u00e9o'
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
@@ -7211,6 +7222,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       urlPourAnalyse = sigVid.signedUrl
     }
 
+    errorEl.style.color = 'var(--label-3)'
     errorEl.textContent = '3/3 \u00b7 Vid\u00e9o re\u00e7ue'
 /* ═══ ON BASCULE MAINTENANT ═══
        La vidéo est arrivée ; ce qui suit dure des minutes. C'est le moment de
@@ -7218,6 +7230,9 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        change d'écran pour trois secondes. */
     document.getElementById('ai-upload-card').style.display = 'none'
     document.getElementById('ai-progress-card').style.display = 'block'
+    /* Le jalon a fait son travail : l'écran d'attente prend le relais. Laissé
+       en place, il reparaîtrait sous le bouton au prochain dépôt. */
+    errorEl.textContent = ''
     startAiProgressSimulation()
     signalerEtapeIA('Cr\u00e9ation de la proc\u00e9dure\u2026')
     // 2. Création de la procédure (vide pour l'instant, l'IA va remplir les étapes)
@@ -7259,6 +7274,9 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     loadGestionProcedures().catch(() => {})
   } catch (e) {
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
+    /* Le rouge n'apparaît qu'ici : c'est le seul endroit où il y a vraiment
+       quelque chose qui a échoué. */
+    errorEl.style.color = 'var(--red)'
 
     /* ON REVIENT À LA PAGE DE DÉPÔT. Sans ça, l'échec laissait l'écran
        d'attente ouvert sur un anneau figé : la personne voyait le message

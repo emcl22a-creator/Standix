@@ -336,6 +336,20 @@
   .screen.nait .an-lig{
     animation:none !important;
   }
+  /* SAUF UNE CARTE QUI S'EN VA.
+
+     Les règles ci-dessus coupent toute animation de contenu pendant qu'un écran
+     naît ou se fond — c'est ce qui évite deux mouvements superposés. Mais la
+     classe `nait` reste posée jusqu'au changement d'écran suivant, et elle
+     tuait donc aussi le repli d'une carte supprimée : la procédure disparaissait
+     d'un coup, sans qu'on la voie partir.
+
+     Le repli est le seul mouvement qu'on déclenche APRÈS coup, en réponse à un
+     geste. Il doit passer. */
+  .screen.nait .carte-part,
+  .screen.fondu .carte-part{
+    animation:carteSeReplie 0.44s cubic-bezier(0.4,0,0.2,1) forwards !important;
+  }
   /* ═══ LE CHANGEMENT D'ONGLET ═══
      Un fondu, rien d'autre. 180 ms : assez pour que l'œil enregistre que la
      page a changé, trop court pour qu'on attende. Aucun déplacement — un
@@ -5387,56 +5401,59 @@
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES TROIS DERNIÈRES PROCÉDURES, SUR L'ACCUEIL
+   LES TROIS DERNIÈRES PROCÉDURES CRÉÉES
 
-   Des lignes, pas des cartes. La grille des catégories, un onglet plus loin,
-   emploie déjà de vraies cartes ; répéter la même forme ici ferait croire à un
-   second catalogue. Ici, on ne fait que rappeler ce qui vient d'être fait.
+   UN seul cadre, des lignes dedans. Trois cartes séparées faisaient trois
+   objets à l'écran alors qu'il s'agit d'une seule information — la même
+   construction que les sections de la page Analyse, qu'on retrouve donc sans
+   avoir à l'apprendre.
    ═══════════════════════════════════════════════════════════════════════════ */
-.rec-titre{
-  font-size:12px; font-weight:750; letter-spacing:0.07em; text-transform:uppercase;
-  color:var(--label-3); margin:22px 0 10px 2px;
-}
-
-.rec{
-  display:flex; align-items:center; gap:12px; width:100%; text-align:left;
-  padding:12px 14px; margin-bottom:9px;
-  border-radius:18px; background:var(--bg-card);
+.rec-bloc{
+  margin-top:20px; padding:15px 15px 4px;
+  border-radius:20px; background:var(--bg-card);
   border:0.5px solid var(--border);
-  transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1);
 }
-.rec:active{ transform:scale(0.985); }
 
-.rec-ic{
+.rec-tete{ display:flex; align-items:center; gap:11px; margin-bottom:4px; }
+.rec-pic{
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   width:34px; height:34px; border-radius:11px;
   background:linear-gradient(165deg,
     rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
   border:0.5px solid rgba(255,173,51,0.20);
 }
-.rec-ic svg{ width:18px; height:18px; display:block; }
+.rec-pic svg{ width:18px; height:18px; display:block; }
+.rec-t{ font-size:16px; font-weight:750; letter-spacing:-0.03em; }
+
+/* Les lignes. Le filet du HAUT et non du bas : la dernière ligne n'en porte
+   donc aucun, et le bloc se ferme proprement sans règle d'exception. */
+.rec-l{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:12px 0; background:none; border:none;
+  border-top:0.5px solid var(--separator);
+}
+/* Le filet sépare les lignes ENTRE elles. La première n'a rien à séparer du
+   titre : un trait sous un en-tête le transforme en bandeau. */
+.rec-l:first-of-type{ border-top:none; padding-top:6px; }
+.rec-l:active{ opacity:0.6; }
 
 .rec-co{ display:flex; flex-direction:column; flex:1; min-width:0; }
 
-/* La date partage la ligne du NOM, pas celle des caractéristiques. Placée à
-   droite de ces dernières, « il y a 1 semaine » leur volait la moitié de la
-   largeur et « Comptabilité » finissait en « Com… ». Un nom se laisse couper
-   sans dommage — on le reconnaît à ses premiers mots. */
+/* La date partage la ligne du NOM. Placée à droite des caractéristiques, « il
+   y a 1 semaine » leur volait la moitié de la largeur et « Comptabilité »
+   finissait en « Com… ». Un nom se laisse couper sans dommage. */
 .rec-h{ display:flex; align-items:baseline; gap:10px; min-width:0; }
 .rec-nom{
   flex:1; min-width:0;
   font-size:14.5px; font-weight:700; letter-spacing:-0.025em;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-/* Les caractéristiques sur une seule ligne, coupées si besoin : trois faits
-   séparés par des points médians se lisent d'un coup d'œil, une liste à la
-   ligne demanderait de s'arrêter. */
+.rec-q{ font-size:11px; color:var(--label-3); font-weight:600; flex-shrink:0; }
 .rec-tr{
   display:block; font-size:11.5px; color:var(--label-3); font-weight:600; margin-top:3px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.rec-q{ font-size:11px; color:var(--label-3); font-weight:600; flex-shrink:0; }
-
+.rec-fl{ color:var(--label-3); font-size:17px; line-height:1; flex-shrink:0; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE BOUTON DE CRÉATION, EN GOUTTE
@@ -5488,25 +5505,32 @@ body.plus-vu .liquide{ visibility:visible; }
   position:absolute; left:var(--plus-cx); transform:translateX(-50%);
   bottom:calc(var(--plus-bas) + 34px);
   width:calc(var(--plus-larg) * 0.5); height:0;
-  border-radius:20px; background:#FF9A1F;
+  border-radius:20px; background:#F58A15;
   transition:left 0.34s cubic-bezier(0.32,0.72,0,1);
 }
 /* L'étirement puis la rupture, en une seule courbe : la masse monte à la
    rencontre de la goutte, s'amincit, puis disparaît. */
+/* PLUS MARQUÉE. Le cou montait à 54 px et s'amincissait à 14 : trop court et
+   trop épais pour qu'on voie l'étirement. Il monte maintenant à 76 et descend
+   à 8 — la matière s'allonge vraiment, s'affine jusqu'au fil, puis casse.
+
+   Le palier à 84 % maintient un instant le fil le plus mince : c'est là que
+   l'œil comprend qu'il y a rupture, et non simple disparition. */
 @keyframes couGoutte{
-  0%  { height:30px; width:calc(var(--plus-larg) * 0.5); }
-  38% { height:54px; width:26px; }
-  70% { height:26px; width:14px; }
-  100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
+  0%  { height:34px; width:calc(var(--plus-larg) * 0.55); }
+  30% { height:62px; width:30px; }
+  55% { height:76px; width:18px; }
+  84% { height:40px; width:8px; }
+  100%{ height:0;    width:calc(var(--plus-larg) * 0.55); }
 }
-body.plus-vu .socle{ animation:couGoutte 0.34s cubic-bezier(0.5,0,0.2,1); }
+body.plus-vu .socle{ animation:couGoutte 0.44s cubic-bezier(0.45,0,0.15,1); }
 
 .bulle{
   position:absolute; left:var(--plus-cx); bottom:var(--plus-bas);
   width:var(--plus-larg); height:var(--plus-h);
-  border-radius:calc(var(--plus-h) / 2); background:#FF9A1F;
+  border-radius:calc(var(--plus-h) / 2); background:#F58A15;
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
-  transition:transform 0.34s cubic-bezier(0.5,0,0.2,1),
+  transition:transform 0.44s cubic-bezier(0.45,0,0.15,1),
              left 0.34s cubic-bezier(0.32,0.72,0,1);
 }
 
@@ -5515,14 +5539,18 @@ body.plus-vu .socle{ animation:couGoutte 0.34s cubic-bezier(0.5,0,0.2,1); }
   width:var(--plus-larg); height:var(--plus-h); border:none;
   border-radius:calc(var(--plus-h) / 2);
   display:grid; place-items:center;
-  background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+  /* MOINS FLUO. Le dégradé montait jusqu'à #FFAD33 et le halo portait à 32 % :
+     sur un fond noir, l'ensemble rayonnait comme une enseigne. On garde
+     l'orange de la marque, on éteint le haut du dégradé et on divise le halo
+     par deux — il détache le bouton du fond, il ne l'éclaire plus. */
+  background:linear-gradient(135deg,#E85D00 0%,#F58A15 62%,#FF9F26 100%);
   color:#2A1400;
-  box-shadow:0 8px 22px rgba(255,122,24,0.32);
+  box-shadow:0 6px 16px rgba(0,0,0,0.34), 0 2px 10px rgba(255,122,24,0.16);
   /* 0,62 et non 0,5 : le trajet est deux fois plus court qu'avant, une échelle
      trop basse ferait un saut de taille au lieu d'une éclosion. */
   transform:translate(-50%, var(--plus-repos)) scale(0.62);
   opacity:0; pointer-events:none;
-  transition:transform 0.34s cubic-bezier(0.5,0,0.2,1),
+  transition:transform 0.44s cubic-bezier(0.45,0,0.15,1),
              opacity 0.12s linear,
              left 0.34s cubic-bezier(0.32,0.72,0,1);
 }

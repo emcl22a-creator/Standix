@@ -4683,114 +4683,6 @@ async function loadGestionProcedures() {
    Salutation qui suit l'heure, et un mot qui dépend du suivi réel de l'équipe.
    Tout se calcule sur les données déjà en mémoire, aucune requête de plus. */
 /* ═══════════════════════════════════════════════════════════════════════════
-   L'ANALYSE EN COURS, SUR L'ACCUEIL
-
-   Une analyse dure plusieurs minutes. Rien n'obligeait à rester sur son écran
-   d'attente — mais en le quittant, on perdait toute trace du travail. La
-   procédure porte pourtant son statut en base depuis la première seconde :
-   il suffisait de le lire.
-
-   Trois étapes, l'une après l'autre. Ce n'est pas une barre qui monte : Azure
-   ne dit pas où il en est, il dit « en cours » puis « terminé ». Une barre
-   chiffrée mentirait sur le temps restant ; trois jalons, non.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* Le chronomètre de chaque bloc, pour que le temps écoulé avance à l'écran. */
-let minuteurEnCours = null
-
-function peindreAnalyseEnCours() {
-  const zone = document.getElementById('accueil-encours')
-  if (!zone) return
-
-  const encours = (allGestionProcedures || []).filter(
-    p => p.statut === 'traitement' || p.statut === 'redaction')
-
-  if (!encours.length) {
-    zone.innerHTML = ''
-    if (minuteurEnCours) { clearInterval(minuteurEnCours); minuteurEnCours = null }
-    return
-  }
-
-  zone.innerHTML = encours.map(p => {
-    /* Deuxième jalon pendant l'écoute, troisième pendant la rédaction. Le
-       premier est acquis : sans vidéo envoyée, il n'y aurait pas d'analyse. */
-    const rang = p.statut === 'redaction' ? 2 : 1
-    const jalons = ['Vidéo envoyée', 'L\u2019IA écoute et regarde', 'Rédaction des étapes']
-    return `
-      <div class="enc" data-id="${escapeHtml(p.id)}">
-        <span class="enc-tete">
-          <span class="ia-fig m"><span class="lum"></span></span>
-          <span class="enc-co">
-            <span class="enc-nom">${escapeHtml(p.titre || 'Sans titre')}</span>
-            <span class="enc-st">Analyse en cours</span>
-          </span>
-          <span class="enc-chr" data-depuis="${p.created_at || ''}">—</span>
-        </span>
-        <span class="enc-pas">
-          ${jalons.map((t, i) => `
-            <span class="${i < rang ? 'fait' : i === rang ? 'encours' : ''}">
-              <i class="rond"></i>${t}</span>`).join('')}
-        </span>
-      </div>`
-  }).join('')
-
-  /* PAS DE CLIC. Pendant l'analyse, la procédure n'a encore ni étapes ni
-     contenu : l'ouvrir mènerait à une page vide, et on croirait que quelque
-     chose s'est perdu. Le bloc informe, il ne mène nulle part. */
-
-  majChronosEnCours()
-  if (!minuteurEnCours) minuteurEnCours = setInterval(battement, 1000)
-}
-
-/* ═══ LE BLOC DOIT SE TAIRE QUAND C'EST FINI ═══
-
-   Il lisait le statut UNE FOIS, au chargement de la page. L'analyse se
-   terminait, la base passait la procédure en « prêt », et le bloc continuait
-   d'annoncer « l'IA écoute et regarde » — indéfiniment, jusqu'au prochain
-   rechargement. Pire qu'une absence d'information : une information fausse.
-
-   On relit donc le statut en base toutes les huit secondes. Pas plus souvent :
-   une analyse dure des minutes, et interroger la base chaque seconde pour un
-   statut qui change une fois serait du gaspillage. Le chronomètre, lui, avance
-   à chaque seconde — il n'a besoin de personne pour ça. */
-let battements = 0
-
-async function battement() {
-  majChronosEnCours()
-  if (++battements % 8) return
-
-  const ids = [...document.querySelectorAll('#accueil-encours .enc[data-id]')]
-    .map(e => e.dataset.id)
-  if (!ids.length) return
-
-  const { data } = await supabase
-    .from('procedures').select('id, statut').in('id', ids)
-  if (!data) return
-
-  const fini = data.some(p => p.statut !== 'traitement' && p.statut !== 'redaction')
-  const change = data.some(p => {
-    const local = (allGestionProcedures || []).find(x => x.id === p.id)
-    return local && local.statut !== p.statut
-  })
-  if (!fini && !change) return
-
-  /* Une seule chose a bougé, mais on recharge tout : la procédure vient de
-     gagner ses étapes, et elles doivent apparaître partout à la fois. */
-  await loadGestionProcedures()
-}
-
-/* Le temps écoulé se recalcule depuis la date de création : il reste juste
-   après un rechargement, là où un compteur en mémoire repartirait de zéro. */
-function majChronosEnCours() {
-  document.querySelectorAll('#accueil-encours .enc-chr').forEach(el => {
-    const t0 = Date.parse(el.dataset.depuis || '')
-    if (!t0) { el.textContent = '—'; return }
-    const s = Math.max(0, Math.round((Date.now() - t0) / 1000))
-    el.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
-  })
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    LES TROIS DERNIÈRES PROCÉDURES CRÉÉES
 
    Trois cartes, avec ce qu'on veut savoir d'une vidéo : combien d'étapes elle a
@@ -5095,7 +4987,6 @@ function depuisQuandCourt(t) {
 }
 
 function renderAccueil() {
-  peindreAnalyseEnCours()
   peindreActivites()
   peindreDernieresProcedures()
   const salut = document.getElementById('accueil-salut')
@@ -12552,7 +12443,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiro
    deux : sans elle le navigateur ne voit aucun changement et l'animation ne
    rejoue pas. */
 function animerBarreHaut() {
-  const p = document.getElementById('topbar-pilule')
+  /* La PISTE entière, pas la seule pilule : la carte du logo doit marquer le
+     changement elle aussi, et c'est elle qu'on voit en premier. */
+  const p = document.getElementById('haut-piste')
   if (!p) return
   p.classList.remove('approche')
   void p.offsetWidth

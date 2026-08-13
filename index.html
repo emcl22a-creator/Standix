@@ -50,6 +50,13 @@
        dans le script. Rien d'autre n'aura bougé. */
     --verre-bar:blur(14px) saturate(180%);
     --verre-lens:saturate(150%) brightness(1.08);
+
+    /* ═══ LE FILET DE L'ARÊTE ═══
+       Déclaré ICI, et lu par les deux pièces de verre : la barre du bas et la
+       carte du logo. Une seule valeur pour les deux — sans ça, chacune portait
+       son propre littéral et rien n'empêchait qu'elles finissent par diverger,
+       comme c'est arrivé au verre lui-même. */
+    --filet:rgba(255,255,255,0.30);
   }
   .glassDiv{
     position:absolute;
@@ -63,7 +70,7 @@
        et décalerait tout ce qu'elle contient d'un demi-pixel. */
     box-shadow:
       0px 4px var(--outer-shadow-blur) rgba(0,0,0,0.18),
-      inset 0 0 0 0.5px var(--filet, rgba(255,255,255,0.13));
+      inset 0 0 0 0.5px var(--filet);
   }
   .glassDiv::before{
     content:'';position:absolute;inset:0;z-index:1;

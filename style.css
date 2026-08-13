@@ -278,7 +278,18 @@
      dernier bloc — le bandeau de lecture, par exemple — passait dessous. */
   .screen{
     display:none;
-    padding:92px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
+    /* ═══ 74 AU LIEU DE 92 ═══
+
+       La barre du haut occupe 16 px de marge plus 56 de pilule, soit 72. Les
+       92 px laissaient donc VINGT pixels de vide sous elle, alors que le reste
+       de l'app respire par des marges de 14 à 20.
+
+       On descend à 82 : dix pixels de jeu. À 74 la carte venait toucher la
+       pilule — deux objets qui flottent ont besoin de se voir séparés, sinon
+       ils paraissent collés l'un à l'autre.
+
+       La barre du haut ne bouge pas : c'est le contenu qui remonte. */
+    padding:82px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
@@ -5504,7 +5515,7 @@ body.plus-vu .liquide{ visibility:visible; }
   72% { height:16px; width:calc(var(--plus-larg) * 0.85); }
   100%{ height:0;    width:calc(var(--plus-larg) * 0.5); }
 }
-body.plus-vu .socle{ animation:couMonte 0.17s cubic-bezier(0.34,0.9,0.4,1) 0.07s; }
+body.plus-vu .socle{ animation:couMonte 0.20s cubic-bezier(0.34,0.9,0.4,1) 0.06s; }
 body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
 
 .bulle{
@@ -5552,10 +5563,16 @@ body.plus-part .socle{ animation:couChute 0.26s cubic-bezier(0.4,0,0.3,1); }
 
    Ce réglage ne vaut que pour la montée : la chute garde son fondu retardé,
    déclaré sur l'état de repos. */
+/* LE RESSORT. La courbe dépasse 1 avant de revenir : le bouton monte six pixels
+   trop haut, puis se pose. 400 ms — plus long que le changement de page, mais
+   c'est le prix du rebond, et il n'a lieu qu'une fois par visite sur la page.
+
+   L'opacité reste à 40 ms : le rectangle doit être solide avant que le cou
+   n'apparaisse, sinon on voit la goutte en premier. */
 body.plus-vu .bulle,
 body.plus-vu .plus-flot{
   transform:translate(-50%, var(--plus-monte)) scale(1);
-  transition:transform 0.26s cubic-bezier(0.34,0.9,0.4,1),
+  transition:transform 0.40s cubic-bezier(0.34,1.62,0.5,1),
              opacity 0.04s linear,
              left 0.26s cubic-bezier(0.32,0.72,0,1);
 }
@@ -5624,4 +5641,75 @@ body.plus-vu .plus-flot{ opacity:1; pointer-events:auto; }
 .an-intro,
 .enc{
   border-color:transparent !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT
+
+   La matière de la barre du bas : même verre, même filet, mêmes variables. Les
+   deux pièces flottent au-dessus de la page et doivent se ressembler — c'est
+   ce qui dit qu'elles ne font pas partie du contenu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.topbar-pilule{
+  position:relative; isolation:isolate;
+  display:flex; align-items:center; gap:8px;
+  padding:7px; border-radius:100px;
+  box-shadow:0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,0.18),
+             inset 0 0 0 0.5px var(--filet);
+}
+.topbar-pilule::before{
+  content:''; position:absolute; inset:0; z-index:1; border-radius:inherit;
+  background-color:rgba(var(--tint-color), var(--tint-opacity));
+  box-shadow:inset 0 0 var(--shadow-blur) var(--shadow-spread) var(--shadow-color);
+  pointer-events:none;
+}
+.topbar-pilule::after{
+  content:''; position:absolute; inset:0; z-index:-1; border-radius:inherit;
+  -webkit-backdrop-filter:var(--verre-bar); backdrop-filter:var(--verre-bar);
+}
+.etab-ronds{ display:flex; align-items:center; gap:8px; }
+
+.rond-etab{
+  position:relative; z-index:2; flex-shrink:0;
+  width:42px; height:42px; border-radius:50%; border:none;
+  display:grid; place-items:center; overflow:hidden;
+  background:rgba(255,255,255,0.05);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.10);
+  transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1), box-shadow 0.2s;
+}
+.rond-etab:active{ transform:scale(0.93); }
+.rond-etab img{ width:100%; height:100%; object-fit:cover; display:block; }
+.rond-logo{ display:grid; place-items:center; width:24px; height:24px; }
+.rond-logo svg{ width:100%; height:100%; display:block; }
+.rond-init{
+  font-size:14px; font-weight:750; letter-spacing:0.02em; color:var(--label-3);
+}
+
+/* L'établissement ouvert porte la marque ; les autres restent en retrait. Une
+   pastille par entreprise, toutes identiques, ne dirait pas où l'on est. */
+.rond-etab.actif{
+  background:linear-gradient(165deg, rgba(255,173,51,0.14), rgba(255,173,51,0.03));
+  box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.30);
+}
+.rond-etab.actif .rond-init{
+  background:linear-gradient(135deg,#FF6A00,#FF9A1F 60%,#FFAD33);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+
+/* Le « + » reste neutre : ajouter n'est pas le geste courant. */
+.rond-plus{ color:var(--label-2); }
+.rond-plus svg{ width:18px; height:18px; display:block; }
+
+/* ═══ L'APPROCHE, À CHAQUE CHANGEMENT DE PAGE ═══
+   280 ms depuis 90 %, sans déplacement : la pilule ne vient de nulle part,
+   elle est déjà là. Même profondeur que le fondu des pages, et les deux se
+   terminent ensemble. */
+.topbar-pilule.approche{ animation:pilApproche 0.28s cubic-bezier(0.32,0.72,0,1); }
+@keyframes pilApproche{
+  from{ opacity:0; transform:scale(0.90); }
+  to{ opacity:1; transform:none; }
+}
+@media (prefers-reduced-motion: reduce){
+  .topbar-pilule.approche{ animation:none; }
 }

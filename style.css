@@ -5614,9 +5614,18 @@ body.plus-vu .plus-flot{
   color:var(--label-2);
 }
 .act-lig .act-ic svg{ width:16px; height:16px; display:block; }
-/* Le nom porte du gras à l'intérieur : « **Karim** a lu … ». */
-.act-lig .nm{ font-weight:400; color:var(--label-2); }
-.act-lig .nm b{ font-weight:700; color:var(--label-1); }
+/* LE MÊME BLANC QUE LES LIGNES DU BLOC AU-DESSUS.
+
+   La phrase était en gris avec le seul nom en blanc — l'idée étant de faire
+   ressortir la personne. Mais les lignes des « Dernières procédures créées »,
+   juste au-dessus, sont blanches d'un bout à l'autre : deux blocs voisins de
+   même construction, l'un lisible et l'autre en retrait, et le second passait
+   pour secondaire alors qu'il ne l'est pas.
+
+   Tout est blanc. Le nom garde son gras — à luminosité égale, la graisse
+   suffit à le détacher. */
+.act-lig .nm{ font-weight:400; color:var(--label-1); }
+.act-lig .nm b{ font-weight:700; }
 
 /* Une seule couleur, pour un seul cas : quelqu'un attend d'entrer et ça coûte
    de l'argent. Les autres événements sont des faits, pas des alertes — les

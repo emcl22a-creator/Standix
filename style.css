@@ -4568,13 +4568,8 @@
      La connexion à Supabase demande une à deux secondes au premier appel, et
      aucune ligne de code ne peut l'accélérer. Autant montrer l'app tout de
      suite, en creux, plutôt qu'un écran vide. */
-  .squelette{ position:relative; overflow:hidden; }
-  .squelette::after{
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(100deg, transparent 20%, rgba(255,255,255,0.07) 50%, transparent 80%);
-    animation: squeletteBalai 1.4s ease-in-out infinite;
-  }
-  @keyframes squeletteBalai{ from{ transform:translateX(-100%); } to{ transform:translateX(100%); } }
+  /* Les faux blocs de chargement ont été retirés : leur style part avec eux.
+     Un jeu de règles qui ne s'applique plus à rien fait douter du reste. */
   .sq-bloc{ background:rgba(255,255,255,0.08); border-radius:8px; }
 
   .cat-cell, .proc-rich-card{
@@ -5891,3 +5886,37 @@ body.plus-vu .plus-flot{
 }
 .fait-rappel.ouvert .fl{ transform:rotate(90deg); }
 .fait-rappel:active{ opacity:0.7; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COCHE S'ÉCRIT, L'ÉTAPE SE RANGE (variante A)
+
+   Le chiffre et la coche vivent SUPERPOSÉS dans le même bouton. C'est ce qui
+   permet de les échanger : un remplacement de contenu ne peut pas s'animer.
+
+   Les sélecteurs partent de `#detail-steps`. Sans cet identifiant, les règles
+   du fil — qui en portent un — l'emportaient, et le chiffre restait visible
+   sous la coche : on voyait les deux à la fois, en olive.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#detail-steps .et-coche{ display:grid; place-items:center; }
+#detail-steps .et-coche .num,
+#detail-steps .et-coche .ok{
+  grid-area:1 / 1; display:grid; place-items:center;
+  transition:opacity 0.2s, transform 0.34s cubic-bezier(0.34,1.5,0.6,1);
+}
+#detail-steps .et-coche .ok{ opacity:0; transform:scale(0.82); }
+
+/* Le trait de la coche se DESSINE : sa longueur sert de pointillé, qu'on fait
+   défiler jusqu'à zéro. 320 ms — le temps de voir l'action, pas seulement son
+   résultat. Le rond, lui, arrive avec l'opacité : c'est le geste d'écriture
+   qu'on montre, pas l'apparition du jeton. */
+#detail-steps .et-coche .ok svg path{
+  stroke-dasharray:16; stroke-dashoffset:16;
+  transition:stroke-dashoffset 0.32s cubic-bezier(0.5,0,0.2,1) 0.06s;
+}
+#detail-steps .detail-step.faite .et-coche .num{ opacity:0; transform:scale(0.6); }
+#detail-steps .detail-step.faite .et-coche .ok{ opacity:1; transform:scale(1); }
+#detail-steps .detail-step.faite .et-coche .ok svg path{ stroke-dashoffset:0; }
+
+/* L'étape monte vers le rappel en s'effaçant : c'est là qu'elle se range. */
+#detail-steps .detail-step.et-part{ transform:translateY(-26px) scale(0.94); }

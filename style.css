@@ -5787,6 +5787,11 @@ body.plus-vu .plus-flot{
 .page-tete h1{
   font-size:26px; font-weight:700; letter-spacing:-0.04em; line-height:1.1;
 }
+/* Le salut de l'espace Équipe est plus court que les autres titres — un
+   prénom, pas un nom de section — mais il porte un emoji, qui compte double en
+   hauteur. 21 px au lieu de 26 : la ligne reprend le poids d'un titre sans
+   occuper le tiers de l'écran. */
+#e-list .page-tete h1{ font-size:21px; letter-spacing:-0.03em; }
 /* L'ÉCART SOUS LE TITRE, POSÉ AU MÊME ENDROIT POUR LES DEUX PAGES.
 
    Sur Analyse, le compte est enveloppé dans `.tete-bas` — qui porte la marge.

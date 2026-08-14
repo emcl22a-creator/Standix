@@ -402,6 +402,13 @@
      240 ms. L'échelle part de 0,93 : à 0,985, l'ancien réglage, le mouvement
      était trop faible pour se lire, et il ne restait qu'un fondu. */
   .screen.fondu{ animation:ecranFondu 0.24s cubic-bezier(0.22,0.85,0.25,1); }
+  /* L'ESPACE ÉQUIPE VA PLUS VITE : 150 ms au lieu de 240.
+
+     Ses pages sont courtes — une liste, un scanner, des réglages — et on y
+     revient sans arrêt pendant le service. Une transition qu'on traverse vingt
+     fois par heure doit s'effacer ; celle du gérant, qui lit et compare, peut
+     prendre son temps. */
+  #equipe-app .screen.fondu{ animation-duration:0.15s; }
   @keyframes ecranFondu{
     0%  { opacity:0; transform:scale(0.93) }
     34% { opacity:1; transform:scale(0.978) }
@@ -5195,22 +5202,13 @@
     0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18),
     inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px) var(--shadow-color, #000);
 }
-/* Le même liseré que la barre du bas — même dégradé, même angle, même minimum.
-   Les deux pièces reçoivent la lumière de la même source : si leurs arêtes
-   s'allumaient différemment, on ne croirait plus au verre. */
+/* Le même liseré que la barre du bas : une seule valeur sur tout le tour. Les
+   deux pièces sont de la même matière — leurs bords doivent se ressembler. */
 .topbar-card::after{
   content:''; position:absolute; inset:0; z-index:3;
   border-radius:inherit; pointer-events:none;
   padding:0.5px;
-  background:conic-gradient(from 200deg,
-    rgba(255,255,255,0.07) 0deg,
-    var(--filet) 44deg,
-    var(--filet) 104deg,
-    rgba(255,255,255,0.10) 168deg,
-    rgba(255,255,255,0.07) 214deg,
-    rgba(255,255,255,0.14) 256deg,
-    rgba(255,255,255,0.08) 310deg,
-    rgba(255,255,255,0.07) 360deg);
+  background:var(--filet);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
@@ -5816,3 +5814,58 @@ body.plus-vu .plus-flot{
 .page-tete .tete-bas .an-aide{
   position:static; margin:-5px 0 -5px -1px;
 }
+
+
+/* La pastille « pas encore lu » sur un titre de la carte de catégorie, côté
+   équipe. Un point, pas un mot : la ligne est déjà serrée, et le seul fait
+   qu'il y ait quelque chose suffit à dire qu'il reste à faire. */
+.cat-neuf{
+  width:6px; height:6px; border-radius:50%; flex-shrink:0;
+  background:linear-gradient(135deg,#FF6A00,#FFAD33);
+  margin-left:auto;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COCHER UNE ÉTAPE : LE REPLI ET LE RAPPEL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Le repli en deux temps : l'étape s'éteint sur place, PUIS se rétracte. Les
+   deux à la fois donneraient un escamotage ; l'un après l'autre laisse le
+   temps de voir ce qui part. */
+.detail-step{
+  overflow:hidden;
+  transition:opacity 0.22s ease,
+             max-height 0.30s cubic-bezier(0.32,0.72,0,1),
+             margin-bottom 0.30s cubic-bezier(0.32,0.72,0,1),
+             padding 0.30s cubic-bezier(0.32,0.72,0,1),
+             border-color 0.3s ease, background 0.3s ease;
+}
+.detail-step.et-part{ opacity:0; }
+.detail-step.et-repli{
+  max-height:0 !important; margin-bottom:0;
+  padding-top:0; padding-bottom:0;
+}
+
+/* Le rappel. Il s'ouvre vers le bas quand la première étape est cochée, et se
+   referme quand on décoche tout. */
+.fait-rappel{
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+  padding:11px 14px; margin-bottom:10px; border:none;
+  border-radius:14px; background:rgba(255,255,255,0.045);
+  color:var(--label-2); font-family:inherit; font-size:12.5px; font-weight:600;
+}
+.fait-rappel .p{
+  width:22px; height:22px; border-radius:50%; flex-shrink:0;
+  display:grid; place-items:center;
+  background:rgba(255,173,51,0.14);
+}
+.fait-rappel .p svg{ width:15px; height:15px; display:block; }
+.fait-rappel b{ color:var(--label-1); font-weight:700; }
+/* La flèche pivote : c'est elle qui dit si la pile est ouverte. */
+.fait-rappel .fl{
+  margin-left:auto; color:var(--label-3); font-size:17px; line-height:1;
+  transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);
+}
+.fait-rappel.ouvert .fl{ transform:rotate(90deg); }
+.fait-rappel:active{ opacity:0.7; }

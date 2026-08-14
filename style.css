@@ -5428,7 +5428,18 @@
      milieu, sans dépassement. C'est la même sensation posée que la sortie,
      obtenue autrement : là c'est l'amorce qui calme, ici c'est le démarrage
      progressif. */
-  --plus-courbe-entree:cubic-bezier(0.45, 0.02, 0.2, 1);
+  --plus-courbe-entree:cubic-bezier(0.5, 0.02, 0.25, 1);
+
+  /* ═══ CE QUI RENDAIT L'ENTRÉE BRUSQUE N'ÉTAIT PAS LA COURBE ═══
+
+     Le bouton partait à 62 % de sa taille : soixante pour cent de croissance en
+     un tiers de seconde. Quelle que soit la courbe, une telle variation d'aire
+     se lit comme un surgissement — l'œil est bien plus sensible au changement
+     de TAILLE qu'au déplacement.
+
+     Il part maintenant de 88 %. Le mouvement reste, la brusquerie s'en va.
+     C'est aussi pour cette raison que la durée monte à 420 ms : le geste est
+     désormais assez discret pour qu'on puisse le prendre son temps. */
   /* L'ENTRÉE EST PLUS LONGUE QUE LA SORTIE : 340 ms contre 260.
 
      Ce n'est pas une inattention. On regarde une chose qui arrive, on ne
@@ -5440,7 +5451,7 @@
      de soixante à cent cinquante millisecondes selon la charge. Du clic au
      bouton posé, on est donc autour de 420, pas de 340. Raccourcir cette
      valeur ne raccourcit que sa part. */
-  --plus-duree-entree:0.34s;
+  --plus-duree-entree:0.42s;
 }
 
 /* LA MATIÈRE EST COUPÉE À L'ARÊTE, COMME LE BOUTON.
@@ -5511,7 +5522,7 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
 /* La matière suit le bouton : même durée que lui, dans chaque sens. Les laisser
    diverger, c'est ce qui donnait l'impression de deux animations distinctes. */
 body.plus-vu .socle{
-  animation:couGoutte 0.34s cubic-bezier(0.4, 0, 0.3, 1);
+  animation:couGoutte 0.42s cubic-bezier(0.4, 0, 0.3, 1);
 }
 body.plus-part .socle{
   animation:couGoutte 0.26s cubic-bezier(0.4, 0, 0.3, 1);
@@ -5523,7 +5534,7 @@ body.plus-part .socle{
   position:absolute; left:var(--plus-cx); bottom:0;
   width:var(--plus-larg); height:var(--plus-h);
   border-radius:calc(var(--plus-h) / 2); background:#F58A15;
-  transform:translate(-50%, var(--plus-repos)) scale(0.62);
+  transform:translate(-50%, var(--plus-repos)) scale(0.88);
   transition:transform var(--plus-duree) var(--plus-courbe);
 }
 
@@ -5544,7 +5555,7 @@ body.plus-part .socle{
   background:linear-gradient(135deg, #E85D00 0%, #F58A15 62%, #FF9F26 100%);
   color:#2A1400;
   box-shadow:0 6px 16px rgba(0,0,0,0.34), 0 2px 10px rgba(255,122,24,0.16);
-  transform:translate(-50%, var(--plus-repos)) scale(0.62);
+  transform:translate(-50%, var(--plus-repos)) scale(0.88);
   opacity:0; pointer-events:none;
   /* L'opacité monte presque d'un coup à l'aller — le rectangle doit être solide
      avant que le cou n'apparaisse — et s'éteint en retard au retour, quand il

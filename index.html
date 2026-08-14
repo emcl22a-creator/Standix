@@ -82,31 +82,23 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     LE FILET : CONTINU, MAIS PAS UNIFORME
+     LE FILET, PARTOUT ET À LA MÊME INTENSITÉ
 
-     Il descendait à `transparent` : le trait s'interrompait franchement, et une
-     arête qui s'arrête net puis reprend se lit comme un défaut, pas comme une
-     lumière. Sur une vraie pièce, l'arête ne disparaît jamais — elle s'assombrit.
+     Il a d'abord été interrompu, puis dégradé — vif d'un côté, sourd de
+     l'autre. Les deux versions donnaient une arête qui change en tournant, et
+     à un demi-pixel d'épaisseur cette variation se lit comme une irrégularité
+     plutôt que comme une lumière.
 
-     Le minimum est relevé à 0,07 au lieu de zéro. Le trait fait tout le tour,
-     extrémités arrondies comprises, mais il reste deux fois plus vif en haut à
-     gauche qu'ailleurs. C'est la lumière d'une source haute, et c'est elle qui
-     donne l'épaisseur sans découper l'objet.
+     Une seule valeur sur tout le tour. C'est plus net, et c'est plus juste :
+     ce filet ne dessine pas un reflet, il dessine le BORD de la pièce — et un
+     bord ne change pas selon l'endroit où on le regarde.
 
      `mask-composite:exclude` évide le centre — il ne reste que le liseré. */
   .glassDiv::after{
     content:''; position:absolute; inset:0; z-index:3;
     border-radius:inherit; pointer-events:none;
     padding:0.5px;
-    background:conic-gradient(from 200deg,
-      rgba(255,255,255,0.07) 0deg,
-      var(--filet) 44deg,
-      var(--filet) 104deg,
-      rgba(255,255,255,0.10) 168deg,
-      rgba(255,255,255,0.07) 214deg,
-      rgba(255,255,255,0.14) 256deg,
-      rgba(255,255,255,0.08) 310deg,
-      rgba(255,255,255,0.07) 360deg);
+    background:var(--filet);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -1830,6 +1822,10 @@
         <span class="tiroir-liste" id="tiroir-langue-liste"></span>
       </div>
     </div>
+    <!-- Le rappel des étapes faites, au-dessus de la liste. Vide tant que rien
+         n'est coché : un cadre qui annoncerait « 0 étape faite » occuperait la
+         place sans rien apprendre. -->
+    <div id="etapes-rappel"></div>
     <div id="detail-steps"></div>
     <div class="confirm-bar">
       <div class="lecture-etat" id="lecture-etat">

@@ -1665,7 +1665,20 @@ async function enterApp(membre) {
        de procédure puis recréer un compte ramenait sur cette fiche, parce que
        rien ne remettait la navigation à zéro. */
     showGestionScreen('p-home')
-    await loadGestionProcedures()
+
+    /* ═══ LE DESSIN D'ABORD, LES DONNÉES ENSUITE ═══
+
+       `loadGestionProcedures()` était ATTENDU ici, avant d'afficher quoi que ce
+       soit : la barre du haut, la barre du bas, les cadres, tout restait caché
+       jusqu'à ce que la dernière requête ait répondu. Sur une connexion lente,
+       c'était plusieurs secondes de noir — l'app paraissait ne pas démarrer.
+
+       On montre maintenant la charpente tout de suite. Les blocs s'affichent
+       vides — ils savent le faire, chacun porte sa phrase d'attente — puis se
+       remplissent quand les données arrivent.
+
+       Le chargement n'est pas plus rapide. Il est simplement VISIBLE, ce qui
+       n'est pas la même chose mais règle le même problème. */
     document.getElementById('login-screen').style.display = 'none'
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('gestion-app')
@@ -1679,6 +1692,10 @@ async function enterApp(membre) {
     afficherBarre(true)
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
+
+    /* Les données, une fois la charpente à l'écran. On n'attend plus AVANT
+       d'afficher — on remplit APRÈS. */
+    await loadGestionProcedures()
     desarmerSurveillance()
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la

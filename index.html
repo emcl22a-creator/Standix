@@ -2843,6 +2843,17 @@ function layout() {
   LENS.REST_W = (BAR_W - 2 * PAD) / N;
   LENS.BASE_W = LENS.REST_W;
 
+  /* ═══ LE TRAJET S'ADAPTE AU NOMBRE D'ONGLETS ═══
+
+     La duree etait fixe : 420 ms, quel que soit le nombre. A trois onglets ils
+     font 115 px au lieu de 86 — la capsule couvre donc plus de chemin dans le
+     meme temps, et le geste parait s'etirer alors qu'il va plus vite.
+
+     On la met a l'echelle du nombre d'onglets : 420 pour quatre, 315 pour
+     trois. Le geste garde la meme VIVACITE d'un espace a l'autre, ce qui est
+     ce qu'on percoit — pas la duree brute. */
+  LENS.TRAVEL_MS = Math.round(420 * N / 4);
+
   // Les centres : la premiere capsule commence a PAD, la derniere finit a PAD
   // du bord oppose. Marge laterale = marge verticale.
   const half = LENS.REST_W / 2;
@@ -2985,6 +2996,18 @@ const lens = new ActiveLens(CENTERS[0] - BAR_W / 2);
 window.majBarreEspace = function (espace) {
   const jeu = espace === 'equipe' ? LABELS_EQUIPE : LABELS_GESTION;
   if (jeu === LABELS) return;
+
+  /* ═══ JAMAIS SUR UNE BARRE MASQUÉE ═══
+
+     `layout()` lit la largeur de la barre. Masquée, elle vaut ZÉRO : les
+     onglets se retrouvent tous à gauche, largeur nulle, et leurs libellés
+     s'impriment les uns sur les autres. C'est ce qu'on voyait au rechargement.
+
+     On mémorise donc l'espace demandé et on refait la barre quand elle
+     apparaît. */
+  const barre = document.getElementById('bar');
+  if (!barre || barre.offsetWidth < 40) { window.__espaceEnAttente = espace; return; }
+  window.__espaceEnAttente = null;
   LABELS = jeu;
   active = 0;
   layout();

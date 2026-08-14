@@ -399,16 +399,20 @@
      déjà entièrement visible au tiers du chemin, mais elle continue de grandir.
      On ne la voit donc jamais pâle — on la voit arriver.
 
-     240 ms. L'échelle part de 0,93 : à 0,985, l'ancien réglage, le mouvement
-     était trop faible pour se lire, et il ne restait qu'un fondu. */
-  .screen.fondu{ animation:ecranFondu 0.24s cubic-bezier(0.22,0.85,0.25,1); }
-  /* L'espace Équipe avait 150 ms au lieu de 240. Trop court : à cette vitesse
-     la page ne paraît plus arriver, elle paraît sauter — on croit à un défaut
-     d'affichage plutôt qu'à une transition. Les deux espaces reprennent la
-     même durée. */
+     LE DOSAGE COMPTE PLUS QUE LE PRINCIPE. L'échelle partait de 0,93 : à chaque
+     onglet le grossissement se remarquait, et on finissait par regarder
+     l'animation au lieu de la page. À 0,965 il est présent, et jamais commenté.
+
+     340 ms — plus long, mais le mouvement étant plus petit, l'ensemble paraît
+     plus calme, pas plus lent.
+
+     Les deux espaces partagent cette durée. L'Équipe a eu 150 ms un moment :
+     trop court, la page ne paraissait plus arriver mais sauter — on y lit un
+     défaut d'affichage plutôt qu'une transition. */
+  .screen.fondu{ animation:ecranFondu 0.34s cubic-bezier(0.32,0.72,0,1); }
   @keyframes ecranFondu{
-    0%  { opacity:0; transform:scale(0.93) }
-    34% { opacity:1; transform:scale(0.978) }
+    0%  { opacity:0; transform:scale(0.965) }
+    26% { opacity:1; transform:scale(0.972) }
     100%{ opacity:1; transform:none }
   }
 

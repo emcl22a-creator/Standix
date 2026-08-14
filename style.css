@@ -5193,8 +5193,27 @@
   border:none;
   box-shadow:
     0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18),
-    inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px) var(--shadow-color, #000),
-    inset 0 0 0 0.5px var(--filet);
+    inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px) var(--shadow-color, #000);
+}
+/* Le même liseré partiel que la barre du bas — même dégradé, même angle. Les
+   deux pièces reçoivent la lumière de la même source : si leurs arêtes
+   s'allumaient à des endroits différents, on ne croirait plus au verre. */
+.topbar-card::after{
+  content:''; position:absolute; inset:0; z-index:3;
+  border-radius:inherit; pointer-events:none;
+  padding:0.5px;
+  background:conic-gradient(from 200deg,
+    transparent 0deg,
+    var(--filet) 40deg,
+    var(--filet) 104deg,
+    transparent 158deg,
+    transparent 212deg,
+    rgba(255,255,255,0.09) 252deg,
+    transparent 304deg,
+    transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
 }
 
 
@@ -5751,17 +5770,40 @@ body.plus-vu .plus-flot{
    qui portent un titre le portent de la même façon, sinon chacune paraît venir
    d'une app différente.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* LA MÊME ÉCRITURE QUE « PROCÉDO / ESPACE GESTION ».
+
+   La carte du haut pose le modèle : un nom en 700, une seconde ligne plus
+   légère en 500, dans le gris de second plan. Les titres de page reprennent
+   exactement ces graisses et ces couleurs — seule la taille change, parce
+   qu'un titre de page n'est pas une étiquette de barre.
+
+   Le titre était en 800 et son compte en 600 : plus lourds tous les deux que
+   le modèle, et la parenté ne se lisait pas. */
 .page-tete{ margin:0 0 18px; }
 .page-tete h1{
-  font-size:26px; font-weight:800; letter-spacing:-0.045em; line-height:1.1;
+  font-size:26px; font-weight:700; letter-spacing:-0.04em; line-height:1.1;
 }
+/* L'ÉCART SOUS LE TITRE, POSÉ AU MÊME ENDROIT POUR LES DEUX PAGES.
+
+   Sur Analyse, le compte est enveloppé dans `.tete-bas` — qui porte la marge.
+   Sur Procédures, le compte est un `p` nu : il n'en avait aucune, et le chiffre
+   collait au titre. Les deux valeurs vivaient à deux endroits différents, donc
+   elles divergeaient.
+
+   La marge est maintenant portée par CE QUI SUIT le titre, quel qu'il soit. */
+.page-tete h1 + *{ margin-top:8px; }
 .page-tete p{
-  font-size:13px; color:var(--label-3); font-weight:600;
+  font-size:13px; color:var(--label-2); font-weight:500;
 }
 /* Le compte et son bouton d'explication sur la même ligne. Le rond de 26 px
    porte 3,5 px de vide autour de son dessin : on les retranche pour que le
    trait s'aligne sur la hauteur du texte, pas sur sa boîte. */
 .page-tete .tete-bas{
-  display:flex; align-items:center; gap:7px; margin-top:5px;
+  display:flex; align-items:center; gap:7px;
 }
-.page-tete .tete-bas .an-aide{ position:static; margin:0 0 0 -1px; }
+/* Le rond fait 26 px, le texte 17 : sans cela il étire la ligne et pousse le
+   compte quatre pixels plus bas que sur les autres pages. Les marges négatives
+   le retirent du calcul de hauteur — il reste visible, il ne compte plus. */
+.page-tete .tete-bas .an-aide{
+  position:static; margin:-5px 0 -5px -1px;
+}

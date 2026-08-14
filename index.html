@@ -78,8 +78,38 @@
       /* Le creux du verre, repris du pseudo-élément supprimé. Sans lui la
          pièce est une vitre plate : c'est cette ombre interne qui lui donne
          son épaisseur. */
-      inset 0 0 var(--shadow-blur) var(--shadow-spread) var(--shadow-color),
-      inset 0 0 0 0.5px var(--filet);
+      inset 0 0 var(--shadow-blur) var(--shadow-spread) var(--shadow-color);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE FILET NE FAIT PLUS TOUT LE TOUR
+
+     Une arête continue, c'est une bordure — et une bordure DÉCOUPE l'objet.
+     Sur une vraie pièce de verre, la lumière ne frôle que certains bords :
+     ceux qu'elle rencontre. Ailleurs l'arête s'éteint.
+
+     On remplace donc l'ombre interne, qui éclairait tout uniformément, par un
+     dégradé conique posé sur le seul contour : vif en haut à gauche, éteint à
+     droite, faiblement rallumé en bas. C'est la lumière d'une source haute, et
+     c'est elle qui donne l'épaisseur.
+
+     `mask-composite:exclude` évide le centre — il ne reste que le liseré. */
+  .glassDiv::after{
+    content:''; position:absolute; inset:0; z-index:3;
+    border-radius:inherit; pointer-events:none;
+    padding:0.5px;
+    background:conic-gradient(from 200deg,
+      transparent 0deg,
+      var(--filet) 40deg,
+      var(--filet) 104deg,
+      transparent 158deg,
+      transparent 212deg,
+      rgba(255,255,255,0.09) 252deg,
+      transparent 304deg,
+      transparent 360deg);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
   }
   /* ═══ UNE SEULE COUCHE, COMME LA CARTE DU HAUT ═══
 
@@ -201,20 +231,6 @@
 </style>
 </head>
 <body class="booting">
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     L'ÉCRAN DE DÉMARRAGE
-
-     Il est écrit ICI, en tête du document, et non fabriqué par un script :
-     c'est ce qui lui permet d'être peint à la première image, avant même que
-     `app.js` ne soit lu. Un écran de chargement qui attend le chargement du
-     script pour apparaître arrive après ce qu'il devait couvrir.
-
-  </div>
-</div>
-
-
-
 
 <div class="color-halos">
   <div class="chalo chalo-4"></div>
@@ -1434,7 +1450,7 @@
 
   <div class="screen" id="p-settings">
     <div class="detail-header">
-            <h1 class="pagehead" style="margin:0; font-size:20px;">Réglages</h1>
+            <h1 class="pagehead" style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.04em;">Réglages</h1>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -1829,7 +1845,7 @@
   <div class="screen" id="e-settings">
     <div class="pagehead-row">
       
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Réglages</h1>
+      <h1 class="pagehead" style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.04em;">Réglages</h1>
     </div>
 
     <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">

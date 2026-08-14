@@ -402,13 +402,10 @@
      240 ms. L'échelle part de 0,93 : à 0,985, l'ancien réglage, le mouvement
      était trop faible pour se lire, et il ne restait qu'un fondu. */
   .screen.fondu{ animation:ecranFondu 0.24s cubic-bezier(0.22,0.85,0.25,1); }
-  /* L'ESPACE ÉQUIPE VA PLUS VITE : 150 ms au lieu de 240.
-
-     Ses pages sont courtes — une liste, un scanner, des réglages — et on y
-     revient sans arrêt pendant le service. Une transition qu'on traverse vingt
-     fois par heure doit s'effacer ; celle du gérant, qui lit et compare, peut
-     prendre son temps. */
-  #equipe-app .screen.fondu{ animation-duration:0.15s; }
+  /* L'espace Équipe avait 150 ms au lieu de 240. Trop court : à cette vitesse
+     la page ne paraît plus arriver, elle paraît sauter — on croit à un défaut
+     d'affichage plutôt qu'à une transition. Les deux espaces reprennent la
+     même durée. */
   @keyframes ecranFondu{
     0%  { opacity:0; transform:scale(0.93) }
     34% { opacity:1; transform:scale(0.978) }
@@ -5832,19 +5829,24 @@ body.plus-vu .plus-flot{
 
 /* Le repli en deux temps : l'étape s'éteint sur place, PUIS se rétracte. Les
    deux à la fois donneraient un escamotage ; l'un après l'autre laisse le
-   temps de voir ce qui part. */
+   temps de voir ce qui part.
+
+   PAS D'`overflow:hidden` ICI. La case numérotée est à −45 px de la carte et la
+   barre de lecture à −55 : toutes deux vivent DEHORS. Découper la carte les
+   faisait disparaître — les chiffres cliquables comme le repère de position.
+   Le découpage n'est posé que pendant le repli, quand l'étape s'en va de toute
+   façon. */
 .detail-step{
-  overflow:hidden;
   transition:opacity 0.22s ease,
              max-height 0.30s cubic-bezier(0.32,0.72,0,1),
              margin-bottom 0.30s cubic-bezier(0.32,0.72,0,1),
              padding 0.30s cubic-bezier(0.32,0.72,0,1),
              border-color 0.3s ease, background 0.3s ease;
 }
-.detail-step.et-part{ opacity:0; }
+.detail-step.et-part{ opacity:0; overflow:hidden; }
 .detail-step.et-repli{
   max-height:0 !important; margin-bottom:0;
-  padding-top:0; padding-bottom:0;
+  padding-top:0; padding-bottom:0; overflow:hidden;
 }
 
 /* Le rappel. Il s'ouvre vers le bas quand la première étape est cochée, et se

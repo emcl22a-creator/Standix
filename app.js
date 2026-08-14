@@ -11309,10 +11309,6 @@ function renderEquipeCategories() {
   Object.keys(parCat).sort((a, b) => {
     if (equipeCatSort === 'new') return dateCat(b) - dateCat(a)
     if (equipeCatSort === 'old') return dateCat(a) - dateCat(b)
-    if (equipeCatSort === 'reste') {
-      const d = resteCat(b) - resteCat(a)
-      if (d) return d
-    }
     return a.localeCompare(b, 'fr')
   }).forEach(nom => {
     const procs = parCat[nom]
@@ -11400,10 +11396,9 @@ function renderEquipeCatListe() {
   const triees = [...vues].sort((a, b) => {
     if (equipeProcSort === 'new') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
     if (equipeProcSort === 'old') return new Date(a.created_at || 0) - new Date(b.created_at || 0)
-    if (equipeProcSort === 'reste') {
-      const d = (equipeLues.has(a.id) ? 1 : 0) - (equipeLues.has(b.id) ? 1 : 0)
-      if (d) return d
-    }
+    /* Le tri « À lire d'abord » a été retiré du menu : les deux branches qui le
+       servaient sont parties avec lui. Un tri qu'aucun bouton ne déclenche est
+       un piège pour qui relira ce code. */
     return (a.titre || '').localeCompare(b.titre || '', 'fr')
   })
 

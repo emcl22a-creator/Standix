@@ -4632,7 +4632,17 @@
      voisines de contenus inégaux verraient leur ligne d'appel à des hauteurs
      différentes — et c'est justement la ligne qu'on balaye du regard.
      ═══════════════════════════════════════════════════════════════════════ */
-  #cat-grid .cat-cell{
+  /* LES DEUX GRILLES, PAS UNE SEULE.
+
+     Cette règle ne visait que `#cat-grid`, la grille de la gestion. La grille
+     de l'équipe — `#e-cat-grid` — porte pourtant les mêmes cartes : elle
+     n'héritait ni de la colonne, ni du retrait, ni du rayon. Les cartes
+     paraissaient « presque pareilles », ce qui est pire que différentes.
+
+     Un sélecteur par identifiant est un piège de ce genre : il marche jusqu'au
+     jour où le même objet apparaît ailleurs. */
+  #cat-grid .cat-cell,
+  #e-cat-grid .cat-cell{
     display:flex; flex-direction:column;
     padding:14px 14px 0; border-radius:20px;
   }
@@ -4662,8 +4672,9 @@
   .cat-pied span:not(.fl){ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .cat-pied .fl{ margin-left:auto; color:var(--label-3); font-size:16px; line-height:1; }
 
-  /* Les titres récents respirent avant le pied. */
-  #cat-grid .cat-recent{ padding-bottom:11px; }
+  /* Les titres récents respirent avant le pied. Les deux grilles, là encore. */
+  #cat-grid .cat-recent,
+  #e-cat-grid .cat-recent{ padding-bottom:11px; }
 
   /* ═══════════════════════════════════════════════════════════════════════
      LA CARTE D'UNE PROCÉDURE

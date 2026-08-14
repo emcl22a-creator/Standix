@@ -851,6 +851,15 @@ let navDepuisOnglet = false
 window.onNavigate = function (index) {
   navDepuisOnglet = true
   try {
+    /* DEUX AIGUILLAGES, UN PAR ESPACE. Il n'y en avait qu'un, celui de la
+       gestion : depuis l'espace Équipe, les onglets activaient des écrans
+       invisibles et l'app paraissait ne pas répondre. */
+    if (currentMembre?.role === 'equipe') {
+      if (index === 0) showEquipeScreen('e-list')
+      else if (index === 1) { showEquipeScreen('e-scan'); startScanner('equipe') }
+      else if (index === 2) openEquipeSettings()
+      return
+    }
     if (index === 0) showGestionScreen('p-home')
     else if (index === 1) showGestionScreen('p-list')
     else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
@@ -862,6 +871,10 @@ function afficherCoquille(espace) {
   const appEl = document.getElementById(espace === 'equipe' ? 'equipe-app' : 'gestion-app')
   if (!appEl || appEl.style.display === 'block') return
   appEl.style.display = 'block'
+  /* AVANT d'afficher la barre : elle change de nombre d'onglets, donc de
+     géométrie. La montrer d'abord, la refaire ensuite, ferait voir l'ancienne
+     le temps d'une image. */
+  window.majBarreEspace?.(espace)
   afficherBarre(true)
 
   if (espace === 'equipe') {
@@ -2051,7 +2064,10 @@ function ouvrirContact() {
    des réglages. Ils avaient chacun leur texte, plus court et différent : deux
    portes vers le même endroit doivent dire la même chose, sinon on croit
    arriver ailleurs. */
-;['contact-gestion', 'contact-equipe', 'accueil-avatar', 'e-avatar'].forEach(id => {
+/* `e-avatar` a disparu avec la carte « Bonjour » de l'espace Équipe : la
+   boucle le cherchait sans le trouver. Retiré plutôt que laissé — un nom qui
+   ne désigne plus rien fait douter du reste de la liste. */
+;['contact-gestion', 'contact-equipe', 'accueil-avatar'].forEach(id => {
   const el = document.getElementById(id)
   el?.addEventListener('click', ouvrirContact)
   el?.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ouvrirContact() } })
@@ -4344,6 +4360,7 @@ function activerAvecNaissance(ecran) {
 
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
+  window.majBarreEspace?.('gestion')
   majBoutonPlus(id)
   animerBarreHaut()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
@@ -4425,6 +4442,7 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
+  window.majBarreEspace?.('equipe')
   /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
   document.body.classList.remove('plus-vu')
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
@@ -11237,24 +11255,28 @@ function renderEquipeAccueil() {
   const h = new Date().getHours()
   const bonjour = h < 6 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir'
   const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
+  /* Le salut est devenu le TITRE de la page. Sans l'emoji : un titre de 26 px
+     porte déjà la chaleur, et une main qui fait signe à cette taille prend
+     autant de place que le prénom. */
   const salut = document.getElementById('e-salut')
-  if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
+  if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''}`
 
   const total = allEquipeProcedures.length
   const lues = allEquipeProcedures.filter(p => equipeLues.has(p.id)).length
   const reste = total - lues
   const pct = total ? Math.round((lues / total) * 100) : 0
 
-  const mot = document.getElementById('e-mot')
+  /* La seconde ligne du titre. `e-mot` a disparu avec la carte : on écrit
+     désormais dans `e-compte`, la ligne de compte de la page — c'est le même
+     rôle, à la même place que sur les pages de la gestion. */
+  const mot = document.getElementById('e-compte')
   if (mot) {
     mot.innerHTML = !total
-      ? "Aucune procédure pour l'instant. Votre responsable vous prévient dès qu'il en publie une."
+      ? "Aucune procédure pour l'instant."
       : reste === 0
         ? "Vous avez tout lu. Rien ne vous attend."
         : `Il vous reste <b>${reste} procédure${reste > 1 ? 's' : ''}</b> à lire.`
   }
-
-  const couleur = pct >= 70 ? 'var(--green)' : pct >= 30 ? 'var(--orange)' : 'var(--red)'
 }
 
 /* Grille des catégories, exactement celle de l'espace gestion : anneau de
@@ -11263,6 +11285,9 @@ function renderEquipeCategories() {
   const grille = document.getElementById('e-cat-grid')
   if (!grille) return
   grille.innerHTML = ''
+
+  /* Le compte de la page est écrit par `renderEquipeAccueil`, pas ici : deux
+     fonctions qui remplissent la même ligne finissent par se contredire. */
 
   if (!allEquipeProcedures.length) {
     grille.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">

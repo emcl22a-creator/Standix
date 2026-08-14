@@ -2686,20 +2686,23 @@ window.ouvrirFicheMembre = function(membreId) {
 
    Six ambres du plus clair au plus sombre : on les distingue par la clarté, ce
    qui reste lisible même pour un œil qui confond les teintes. */
-/* ═══ SIX AMBRES, ALTERNÉES CLAIR-FONCÉ ═══
+/* ═══ AMBRE ET CUIVRE ═══
 
-   Elles étaient rangées du plus clair au plus foncé. Sur un anneau, deux
-   segments voisins se touchent : rangées ainsi, ils ne pouvaient que se
-   ressembler — l'écart entre deux degrés successifs d'un même dégradé est le
-   plus petit écart possible.
+   La progression va toujours du clair au foncé — c'est ce qui rend l'anneau
+   lisible d'un coup d'œil. Ce qui change, c'est l'AMPLEUR : elle part d'un
+   crème presque blanc et descend jusqu'au brun cuivré, alors que l'ancienne
+   restait dans un même ambre du début à la fin.
 
-   Ce sont les MÊMES six teintes, dans un autre ordre : clair, foncé, clair,
-   très foncé, très clair, moyen. Chaque voisin tranche avec le précédent, et
-   la famille reste la même.
+   Mesuré : l'écart perceptuel entre deux teintes voisines ne descend plus sous
+   22, contre 14 avant — c'est là que la deuxième et la troisième se
+   confondaient.
 
-   Le gris d'« Autres » vit ailleurs, dans `ANNEAU_GRIS` : il n'est pas
-   concerné. */
-const FM_TEINTES = ['#FFC46B', '#B85E0C', '#FF9A1F', '#8A4508', '#FFDCA8', '#E07A12']
+   Le cuivre plutôt que le rouge : le rouge dit « problème » ailleurs dans
+   l'app — analyse échouée, accès refusé. Sur un anneau qui ne fait que
+   répartir du temps de lecture, il enverrait un signal qui n'existe pas.
+
+   Le gris d'« Autres » vit à part, dans `ANNEAU_GRIS`. */
+const FM_TEINTES = ['#FFDFA0', '#FFAE2E', '#E8760F', '#B34A16', '#7A3A22', '#4A2A1E']
 
 /* Les deux périodes vivent en parallèle : chacune a son classement, son total
    et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau

@@ -11255,11 +11255,10 @@ function renderEquipeAccueil() {
   const h = new Date().getHours()
   const bonjour = h < 6 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir'
   const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
-  /* Le salut est devenu le TITRE de la page. Sans l'emoji : un titre de 26 px
-     porte déjà la chaleur, et une main qui fait signe à cette taille prend
-     autant de place que le prénom. */
+  /* Le salut est le TITRE de la page. La main reste : c'est elle qui distingue
+     un bonjour d'une simple étiquette. */
   const salut = document.getElementById('e-salut')
-  if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''}`
+  if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
 
   const total = allEquipeProcedures.length
   const lues = allEquipeProcedures.filter(p => equipeLues.has(p.id)).length

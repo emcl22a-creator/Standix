@@ -82,16 +82,16 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     LE FILET NE FAIT PLUS TOUT LE TOUR
+     LE FILET : CONTINU, MAIS PAS UNIFORME
 
-     Une arête continue, c'est une bordure — et une bordure DÉCOUPE l'objet.
-     Sur une vraie pièce de verre, la lumière ne frôle que certains bords :
-     ceux qu'elle rencontre. Ailleurs l'arête s'éteint.
+     Il descendait à `transparent` : le trait s'interrompait franchement, et une
+     arête qui s'arrête net puis reprend se lit comme un défaut, pas comme une
+     lumière. Sur une vraie pièce, l'arête ne disparaît jamais — elle s'assombrit.
 
-     On remplace donc l'ombre interne, qui éclairait tout uniformément, par un
-     dégradé conique posé sur le seul contour : vif en haut à gauche, éteint à
-     droite, faiblement rallumé en bas. C'est la lumière d'une source haute, et
-     c'est elle qui donne l'épaisseur.
+     Le minimum est relevé à 0,07 au lieu de zéro. Le trait fait tout le tour,
+     extrémités arrondies comprises, mais il reste deux fois plus vif en haut à
+     gauche qu'ailleurs. C'est la lumière d'une source haute, et c'est elle qui
+     donne l'épaisseur sans découper l'objet.
 
      `mask-composite:exclude` évide le centre — il ne reste que le liseré. */
   .glassDiv::after{
@@ -99,14 +99,14 @@
     border-radius:inherit; pointer-events:none;
     padding:0.5px;
     background:conic-gradient(from 200deg,
-      transparent 0deg,
-      var(--filet) 40deg,
+      rgba(255,255,255,0.07) 0deg,
+      var(--filet) 44deg,
       var(--filet) 104deg,
-      transparent 158deg,
-      transparent 212deg,
-      rgba(255,255,255,0.09) 252deg,
-      transparent 304deg,
-      transparent 360deg);
+      rgba(255,255,255,0.10) 168deg,
+      rgba(255,255,255,0.07) 214deg,
+      rgba(255,255,255,0.14) 256deg,
+      rgba(255,255,255,0.08) 310deg,
+      rgba(255,255,255,0.07) 360deg);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;

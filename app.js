@@ -11324,24 +11324,44 @@ function renderEquipeCategories() {
     const cell = document.createElement('div')
     cell.className = 'cat-cell'
     cell.onclick = () => openEquipeCategorie(nom)
+    /* ═══ LA MÊME CARTE QUE CÔTÉ GESTION ═══
+
+       Les deux avaient divergé : plaque ambre et pied à chevron d'un côté,
+       icône blanche et pastille de comptage de l'autre. Or c'est le même objet
+       — une catégorie — et l'employé qui devient gérant ne doit pas avoir à
+       réapprendre à quoi elle ressemble.
+
+       Seul le PIED diffère, et pour une raison : le gérant compte ce qu'il
+       possède, l'employé ce qu'il lui reste. */
+    const reste = procs.filter(p => !equipeLues.has(p.id)).length
     cell.innerHTML = `
       <div class="cat-top">
-        <!-- Même carte que l'espace gestion : pas d'anneau coloré. Vert, orange ou
-             rouge selon le taux de lecture, il faisait d'une catégorie un bulletin
-             de notes — et le rouge disait « problème » là où il n'y avait qu'une
-             procédure récente. -->
-          <div class="cat-ring-wrap">
-            <span class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="3" y1="10.6" x2="21" y2="10.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.5"/></svg></span>
-        </div>
-        <div class="cat-badge">${procs.length}</div>
+        <span class="cat-ic">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
+                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+            <line x1="3" y1="10.6" x2="21" y2="10.6" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
+          </svg>
+        </span>
       </div>
       <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-            <div class="cat-recent">${[...procs]
-        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
-        .slice(0, 3).map(p =>
-        /* Le titre dans un `.txt` comme côté gestion : sans lui, la règle de
-                 coupure ne s'applique pas et un nom long passe à la ligne. */
-              `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span></div>`).join('')}</div>`
+      <div class="cat-recent">
+        ${[...procs]
+          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+          .slice(0, 3)
+          .map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${
+            equipeLues.has(p.id) ? '' : '<span class="cat-neuf"></span>'}</div>`).join('')}
+      </div>
+      <div class="cat-pied">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+                stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+        </svg>
+        <span>${reste ? `${reste} \u00e0 lire` : 'Tout est lu'}</span>
+        <span class="fl">\u203a</span>
+      </div>
+    `
     grille.appendChild(cell)
   })
 }
@@ -11459,17 +11479,108 @@ let etapesFaites = new Set()
 let etapesTotal = 0
 let colonneCochesAbsente = false
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   COCHER UNE ÉTAPE : TROIS TEMPS, ET RIEN QUI SAUTE
+
+   Le chiffre devient une coche, le texte pâlit — on marque une pause de 420 ms
+   pour qu'on VOIE ce qui vient d'être fait — puis l'étape se replie et celles
+   du dessous GLISSENT à sa place.
+
+   Le glissement est le point délicat. Replier une étape déplace toutes les
+   suivantes d'un coup : elles réapparaissent ailleurs sans qu'on ait vu le
+   trajet, et l'œil croit que la liste a été remplacée. On mesure donc leur
+   position AVANT, on laisse le navigateur poser la nouvelle, puis on les remet
+   optiquement à l'ancienne et on relâche : elles rejoignent leur place en
+   glissant. C'est le seul moyen d'animer un déplacement qu'on n'a pas calculé
+   soi-même.
+   ═══════════════════════════════════════════════════════════════════════════ */
 function basculerEtape(etapeId) {
-  if (etapesFaites.has(etapeId)) etapesFaites.delete(etapeId)
-  else {
-    etapesFaites.add(etapeId)
-    if (navigator.vibrate) navigator.vibrate(8)
+  const dejaFaite = etapesFaites.has(etapeId)
+
+  if (dejaFaite) {
+    etapesFaites.delete(etapeId)
+    peindreCoches()
+    enregistrerCoches()
+    return
   }
-  peindreCoches()
+
+  etapesFaites.add(etapeId)
+  if (navigator.vibrate) navigator.vibrate(8)
   enregistrerCoches()
+
+  const el = document.querySelector(`#detail-steps .et-coche[data-etape="${etapeId}"]`)?.closest('.detail-step')
+  if (!el || document.body.classList.contains('etapes-toutes')) { peindreCoches(); return }
+
+  /* 1. La coche et le gris, tout de suite. */
+  peindreCoches()
+
+  /* 2. Après la pause, on replie — en figeant d'abord la hauteur, sans quoi
+        `max-height:0` n'a rien depuis quoi partir et le repli est instantané. */
+  setTimeout(() => {
+    if (!el.isConnected) return
+    const suivantes = [...document.querySelectorAll('#detail-steps .detail-step')]
+      .filter(x => x !== el && x.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING)
+    const avant = suivantes.map(x => x.getBoundingClientRect().top)
+
+    el.style.maxHeight = el.offsetHeight + 'px'
+    void el.offsetHeight
+    el.classList.add('et-part')
+
+    setTimeout(() => {
+      if (!el.isConnected) return
+      el.classList.add('et-repli')
+
+      /* 3. Le glissement des suivantes, mesuré puis rejoué. */
+      requestAnimationFrame(() => {
+        suivantes.forEach((x, k) => {
+          const delta = avant[k] - x.getBoundingClientRect().top
+          if (!delta) return
+          x.style.transition = 'none'
+          x.style.transform = `translateY(${delta}px)`
+          requestAnimationFrame(() => {
+            x.style.transition = 'transform 0.34s cubic-bezier(0.32,0.72,0,1)'
+            x.style.transform = ''
+          })
+        })
+      })
+
+      setTimeout(peindreCoches, 360)
+    }, 220)
+  }, 420)
+}
+
+/* Le rappel en tête de liste : « 3 étapes faites — revoir ». Il n'existe pas
+   tant que rien n'est fait. Le toucher rouvre les étapes cochées à leur place
+   d'origine — l'employé ne revient pas « d'une étape », il veut revoir ce qu'il
+   a fait, parfois la première alors qu'il en est à la quatrième. */
+function peindreRappelFaites() {
+  const zone = document.getElementById('etapes-rappel')
+  if (!zone) return
+  const n = etapesFaites.size
+  const ouvert = document.body.classList.contains('etapes-toutes')
+
+  if (!n) { zone.innerHTML = ''; document.body.classList.remove('etapes-toutes'); return }
+
+  zone.innerHTML = `
+    <button type="button" class="fait-rappel${ouvert ? ' ouvert' : ''}" id="rappel-btn">
+      <span class="p">${cocheFaiteDess()}</span>
+      <span><b>${n} \u00e9tape${n > 1 ? 's' : ''} faite${n > 1 ? 's' : ''}</b> \u2014 ${
+        ouvert ? 'masquer' : 'revoir'}</span>
+      <span class="fl">\u203a</span>
+    </button>`
+
+  document.getElementById('rappel-btn').addEventListener('click', () => {
+    document.body.classList.toggle('etapes-toutes')
+    /* `peindreCoches` repeint aussi le rappel : l'appeler seul suffit, et
+       l'appeler tous les deux ferait boucler. */
+    peindreCoches()
+  })
 }
 
 function peindreCoches() {
+  /* Le rappel se repeint avec les coches : c'est le même état, il ne doit pas
+     pouvoir être en retard d'un cran sur la liste. */
+  peindreRappelFaites()
   document.querySelectorAll('#detail-steps .detail-step').forEach((div, i) => {
     const b = div.querySelector('.et-coche')
     if (!b) return
@@ -11477,6 +11588,14 @@ function peindreCoches() {
     b.classList.toggle('f', faite)
     b.innerHTML = faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)
     div.classList.toggle('faite', faite)
+
+    /* Une étape faite est repliée, sauf si le rappel est ouvert. On remet à
+       zéro ce que l'animation avait posé : sans ça, une étape décochée
+       resterait figée à hauteur nulle. */
+    const cache = faite && !document.body.classList.contains('etapes-toutes')
+    div.classList.toggle('et-part', cache)
+    div.classList.toggle('et-repli', cache)
+    if (!cache) { div.style.maxHeight = ''; div.style.transform = ''; div.style.transition = '' }
   })
   majBandeauCoches()
 }

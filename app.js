@@ -826,6 +826,14 @@ const cibleQR = (function () {
 function afficherBarre(montrer) {
   const b = document.getElementById('bar')
   if (b) b.style.display = montrer ? '' : 'none'
+  /* La barre vient d'apparaître : si un changement d'espace avait été demandé
+     pendant qu'elle était masquée, il n'a rien pu faire — sa largeur valait
+     zéro. On le rejoue maintenant, la mesure est possible. */
+  if (montrer && window.__espaceEnAttente) {
+    const e = window.__espaceEnAttente
+    window.__espaceEnAttente = null
+    window.majBarreEspace?.(e)
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -871,41 +879,21 @@ function afficherCoquille(espace) {
   const appEl = document.getElementById(espace === 'equipe' ? 'equipe-app' : 'gestion-app')
   if (!appEl || appEl.style.display === 'block') return
   appEl.style.display = 'block'
-  /* AVANT d'afficher la barre : elle change de nombre d'onglets, donc de
-     géométrie. La montrer d'abord, la refaire ensuite, ferait voir l'ancienne
-     le temps d'une image. */
-  window.majBarreEspace?.(espace)
+  /* APRÈS l'affichage : la barre doit être mesurable pour que sa géométrie se
+     recalcule. Appelée avant, elle travaillait sur une largeur nulle. */
   afficherBarre(true)
+  window.majBarreEspace?.(espace)
 
-  if (espace === 'equipe') {
-    const liste = document.getElementById('e-cat-grid')
-    if (liste && !liste.children.length) {
-      liste.innerHTML = Array.from({ length: 5 }).map(() => `
-        <div class="sop-card squelette">
-          <div style="flex:1;">
-            <div class="sq-bloc" style="height:15px; width:62%;"></div>
-            <div class="sq-bloc" style="height:11px; width:38%; margin-top:7px;"></div>
-          </div>
-          <div class="sq-bloc" style="width:24px; height:24px; border-radius:50%;"></div>
-        </div>`).join('')
-    }
-    return
-  }
+  /* ═══ PLUS DE FAUX BLOCS ═══
 
-  const grille = document.getElementById('cat-grid')
-  if (grille && !grille.children.length) {
-    grille.innerHTML = Array.from({ length: 4 }).map(() => `
-      <div class="cat-cell squelette">
-        <div class="cat-top">
-          <div class="sq-bloc" style="width:46px; height:46px; border-radius:50%;"></div>
-          <div class="sq-bloc" style="width:26px; height:18px; border-radius:100px;"></div>
-        </div>
-        <div class="sq-bloc" style="height:15px; width:70%; margin-top:12px;"></div>
-        <div class="sq-bloc" style="height:12px; width:45%; margin-top:9px;"></div>
-        <div class="sq-bloc" style="height:11px; width:85%; margin-top:14px;"></div>
-        <div class="sq-bloc" style="height:11px; width:65%; margin-top:6px;"></div>
-      </div>`).join('')
-  }
+     On posait ici cinq cartes grises en attendant les vraies. Le résultat était
+     l'inverse de l'intention : au rechargement, on voyait des rectangles vides
+     s'installer, puis disparaître, puis les vraies cartes arriver — trois états
+     au lieu d'un, et l'app paraissait ramer.
+
+     La grille reste simplement VIDE le temps du chargement. Le titre, la barre
+     et les filtres sont déjà là : la page est déjà elle-même, il n'y manque
+     que son contenu, et ça se voit moins qu'un contenu faux. */
 }
 
 /* Relance proprement l'animation du logo de l'écran de choix. On retire la
@@ -1705,6 +1693,17 @@ async function enterApp(membre) {
     afficherBarre(true)
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
+
+    /* ═══ LES BLOCS AUSSI FONT PARTIE DE LA CHARPENTE ═══
+
+       Ils n'étaient peints qu'APRÈS le chargement : pendant les deux secondes
+       d'attente, l'accueil n'affichait que sa carte d'ouverture, seule au
+       milieu du vide. On voyait une page à moitié construite.
+
+       On les peint tout de suite, sur des données encore vides — ils savent le
+       faire, chacun porte sa phrase d'attente. La page est alors complète dès
+       la première image, et le chargement ne fait que la remplir. */
+    renderAccueil()
 
     /* Les données, une fois la charpente à l'écran. On n'attend plus AVANT
        d'afficher — on remplit APRÈS. */
@@ -2687,7 +2686,20 @@ window.ouvrirFicheMembre = function(membreId) {
 
    Six ambres du plus clair au plus sombre : on les distingue par la clarté, ce
    qui reste lisible même pour un œil qui confond les teintes. */
-const FM_TEINTES = ['#FFC46B', '#FF9A1F', '#E07A12', '#B85E0C', '#8A4508', '#FFDCA8']
+/* ═══ SIX AMBRES, ALTERNÉES CLAIR-FONCÉ ═══
+
+   Elles étaient rangées du plus clair au plus foncé. Sur un anneau, deux
+   segments voisins se touchent : rangées ainsi, ils ne pouvaient que se
+   ressembler — l'écart entre deux degrés successifs d'un même dégradé est le
+   plus petit écart possible.
+
+   Ce sont les MÊMES six teintes, dans un autre ordre : clair, foncé, clair,
+   très foncé, très clair, moyen. Chaque voisin tranche avec le précédent, et
+   la famille reste la même.
+
+   Le gris d'« Autres » vit ailleurs, dans `ANNEAU_GRIS` : il n'est pas
+   concerné. */
+const FM_TEINTES = ['#FFC46B', '#B85E0C', '#FF9A1F', '#8A4508', '#FFDCA8', '#E07A12']
 
 /* Les deux périodes vivent en parallèle : chacune a son classement, son total
    et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau
@@ -11327,9 +11339,11 @@ function renderEquipeCategories() {
        — une catégorie — et l'employé qui devient gérant ne doit pas avoir à
        réapprendre à quoi elle ressemble.
 
-       Seul le PIED diffère, et pour une raison : le gérant compte ce qu'il
-       possède, l'employé ce qu'il lui reste. */
-    const reste = procs.filter(p => !equipeLues.has(p.id)).length
+       Le pied dit la MÊME chose des deux côtés : le nombre de procédures de la
+       catégorie. « Tout est lu » y figurait un temps — mais un pied qui change
+       de nature selon l'état ne se compare plus d'une carte à l'autre, et le
+       nombre, lui, se lit toujours. Ce qui reste à faire est déjà dit par les
+       pastilles sur les titres, juste au-dessus. */
     cell.innerHTML = `
       <div class="cat-top">
         <span class="cat-ic">
@@ -11354,7 +11368,7 @@ function renderEquipeCategories() {
                 stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
           <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
         </svg>
-        <span>${reste ? `${reste} \u00e0 lire` : 'Tout est lu'}</span>
+        <span>${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
         <span class="fl">\u203a</span>
       </div>
     `
@@ -11523,7 +11537,19 @@ function basculerEtape(etapeId) {
 
     setTimeout(() => {
       if (!el.isConnected) return
+
+      /* ═══ LE RAPPEL ARRIVE EN MÊME TEMPS QUE L'ÉTAPE PART ═══
+
+         Il était posé APRÈS, dans le repeint final. À la première coche cela
+         donnait deux mouvements contraires : les étapes montaient pour combler
+         le vide, puis le rappel apparaissait et les repoussait vers le bas.
+
+         Les deux changements se font maintenant dans la MÊME passe de calcul.
+         Les suivantes ne bougent donc que d'une seule chose : la différence
+         entre la hauteur de l'étape partie et celle du rappel qui la remplace.
+         Un mouvement, court, au lieu de deux longs qui s'annulent. */
       el.classList.add('et-repli')
+      peindreRappelFaites()
 
       /* 3. Le glissement des suivantes, mesuré puis rejoué. */
       requestAnimationFrame(() => {
@@ -11556,6 +11582,9 @@ function peindreRappelFaites() {
 
   if (!n) { zone.innerHTML = ''; document.body.classList.remove('etapes-toutes'); return }
 
+  /* Pas d'animation d'ouverture sur le rappel : sa hauteur est déjà prise en
+     compte dans le glissement des étapes. L'animer en plus le ferait bouger
+     deux fois — une fois par lui-même, une fois par le calcul. */
   zone.innerHTML = `
     <button type="button" class="fait-rappel${ouvert ? ' ouvert' : ''}" id="rappel-btn">
       <span class="p">${cocheFaiteDess()}</span>
@@ -11581,7 +11610,14 @@ function peindreCoches() {
     if (!b) return
     const faite = etapesFaites.has(b.dataset.etape)
     b.classList.toggle('f', faite)
-    b.innerHTML = faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)
+    /* On ne REMPLACE plus le contenu : le chiffre et la coche sont tous deux
+       dans le bouton, superposés, et c'est la classe `faite` de l'étape qui
+       décide lequel se voit. Un remplacement ne peut pas s'animer — c'était la
+       raison pour laquelle le chiffre sautait à la coche. */
+    const num = b.querySelector('.num')
+    if (!num) b.innerHTML = `<span class="num">${numeroEtapeDess(i + 1)}</span>`
+      + `<span class="ok">${cocheFaiteDess()}</span>`
+    else num.innerHTML = numeroEtapeDess(i + 1)
     div.classList.toggle('faite', faite)
 
     /* Une étape faite est repliée, sauf si le rappel est ouvert. On remet à
@@ -11755,7 +11791,7 @@ async function openEquipeDetail(procId) {
     if (faite) div.classList.add('faite')
     div.innerHTML = `
       <button type="button" class="et-coche${faite ? ' f' : ''}" data-etape="${escapeHtml(etape.id)}"
-              aria-label="\u00c9tape ${i + 1}">${faite ? cocheFaiteDess() : numeroEtapeDess(i + 1)}</button>
+              aria-label="\u00c9tape ${i + 1}"><span class="num">${numeroEtapeDess(i + 1)}</span><span class="ok">${cocheFaiteDess()}</span></button>
       <div class="et-co">
         <p>${escapeHtml(etape.texte)}</p>
         <!-- La durée est À L'INTÉRIEUR du bloc de texte, après le paragraphe.

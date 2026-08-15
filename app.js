@@ -11528,13 +11528,22 @@ function ficheEquipe(proc) {
   div.className = 'card proc-rich-card'
   div.dataset.key = proc.id
   div.onclick = () => openEquipeDetail(proc.id)
+  /* L'ICÔNE PORTE LE MÊME DÉGRADÉ QUE CÔTÉ GESTION.
+
+     Le tracé était déjà identique, seule la couleur différait : blanc à 78 %
+     ici, le dégradé ambre là-bas. Une procédure est le même objet dans les
+     deux espaces — l'employé qui devient gérant ne doit pas avoir à
+     réapprendre à quoi elle ressemble.
+
+     Le commentaire est ICI et non dans le gabarit : à l'intérieur, un accent
+     grave refermerait la chaîne. C'est ce qui vient de casser le fichier. */
   div.innerHTML = `
     <div class="cat-top">
       <!-- L'anneau coloré est retiré : la coche verte dit déjà que c'est lu, et
              l'anneau gris autour d'une procédure non lue ressemblait à une jauge
              à zéro plutôt qu'à « pas encore ouverte ». -->
         <div class="cat-ring-wrap">
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="rgba(255,255,255,0.78)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="rgba(255,255,255,0.34)" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/></svg></div>
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>

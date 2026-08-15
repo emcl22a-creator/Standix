@@ -72,7 +72,7 @@ let allEquipeProcedures = []
 let equipeEtapesByProc = {}
 let equipeLues = new Set()      // identifiants des procédures que j'ai lues
 let mesLectures = []            // mes validations, avec date et durée
-/* Les deux tris de l'espace équipe. Ils vivent à côté de la catégorie courante :
+/* Les deux tris de l'espace équipe. Ils vivent à côté de la dossier courante :
    ce sont les trois choses qui décrivent ce que l'employé regarde. */
 let equipeCatSort = 'az'
 let equipeProcSort = 'az'
@@ -139,8 +139,8 @@ const DICO = {
     "Aucune vidéo importée": "No video imported",
     "Autorisez la caméra pour scanner": "Allow the camera to scan",
     "Bonjour 👋": "Hello 👋",
-    "Catégorie": "Category",
-    "Catégories les plus consultées": "Most viewed categories",
+    "Dossier": "Category",
+    "Dossiers les plus consultées": "Most viewed categories",
     "Ce mois-ci": "This month",
     "Cette semaine": "This week",
     "Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.": "Each step you cut is automatically linked to the point in the video you were at.",
@@ -151,7 +151,7 @@ const DICO = {
     "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Paste your procedure, memo or instructions here…",
     "Collez un texte, ou déposez un PDF ou un Word": "Paste a text, or drop a PDF or Word file",
     "Comment créer cette procédure ?": "How do you want to create it?",
-    "Complétez le titre et la catégorie ci-dessus pour continuer.": "Fill in the title and category above to continue.",
+    "Complétez le titre et la dossier ci-dessus pour continuer.": "Fill in the title and category above to continue.",
     "Compte": "Account",
     "Consulté": "Viewed",
     "Copier ce détail": "Copy this detail",
@@ -347,8 +347,8 @@ const DICO = {
     "Aucune vidéo importée": "Ningún vídeo importado",
     "Autorisez la caméra pour scanner": "Autoriza la cámara para escanear",
     "Bonjour 👋": "Hola 👋",
-    "Catégorie": "Categoría",
-    "Catégories les plus consultées": "Categorías más consultadas",
+    "Dossier": "Categoría",
+    "Dossiers les plus consultées": "Categorías más consultadas",
     "Ce mois-ci": "Este mes",
     "Cette semaine": "Esta semana",
     "Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.": "Cada paso cortado se vincula automáticamente al momento del vídeo en el que estabas.",
@@ -359,7 +359,7 @@ const DICO = {
     "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Pega aquí tu procedimiento, tu nota interna, tu manual…",
     "Collez un texte, ou déposez un PDF ou un Word": "Pega un texto, o suelta un PDF o un Word",
     "Comment créer cette procédure ?": "¿Cómo crear este procedimiento?",
-    "Complétez le titre et la catégorie ci-dessus pour continuer.": "Completa el título y la categoría de arriba para continuar.",
+    "Complétez le titre et la dossier ci-dessus pour continuer.": "Completa el título y la categoría de arriba para continuar.",
     "Compte": "Cuenta",
     "Consulté": "Consultado",
     "Copier ce détail": "Copiar este detalle",
@@ -549,8 +549,8 @@ const DICO = {
     "Aucune vidéo importée": "Nenhum vídeo importado",
     "Autorisez la caméra pour scanner": "Autorize a câmara para ler",
     "Bonjour 👋": "Olá 👋",
-    "Catégorie": "Categoria",
-    "Catégories les plus consultées": "Categorias mais consultadas",
+    "Dossier": "Categoria",
+    "Dossiers les plus consultées": "Categorias mais consultadas",
     "Ce mois-ci": "Este mês",
     "Cette semaine": "Esta semana",
     "Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.": "Cada etapa cortada liga-se automaticamente ao momento do vídeo em que estava.",
@@ -561,7 +561,7 @@ const DICO = {
     "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Cole aqui o seu procedimento, a sua nota de serviço, o seu manual…",
     "Collez un texte, ou déposez un PDF ou un Word": "Cole um texto, ou largue um PDF ou Word",
     "Comment créer cette procédure ?": "Como criar este procedimento?",
-    "Complétez le titre et la catégorie ci-dessus pour continuer.": "Preencha o título e a categoria acima para continuar.",
+    "Complétez le titre et la dossier ci-dessus pour continuer.": "Preencha o título e a categoria acima para continuar.",
     "Compte": "Conta",
     "Consulté": "Consultado",
     "Copier ce détail": "Copiar este detalhe",
@@ -752,7 +752,7 @@ function t(phrase) {
 
 /* Parcourt les textes de l'espace équipe et remplace ceux que le dictionnaire
    connaît. On ne touche qu'aux correspondances EXACTES : un titre de procédure
-   ou un nom de catégorie ne figure pas dans le dictionnaire, il ne risque donc
+   ou un nom de dossier ne figure pas dans le dictionnaire, il ne risque donc
    jamais d'être modifié. */
 function appliquerLangue() {
   /* Les deux espaces sont traduits, et entièrement : 127 libellés côté gestion,
@@ -2156,7 +2156,7 @@ window.setGaPeriod = function(period) {
 
    Le taux d'abord, en grand : c'est la réponse à la question qu'on se pose en
    ouvrant la page. Puis ce qu'il manque, en une phrase. Puis l'équipe, les
-   catégories, et ce qu'il reste à traiter.
+   dossiers, et ce qu'il reste à traiter.
 
    Les anneaux ont disparu : trois cercles côte à côte demandaient d'être
    interprétés, là où un seul chiffre répond.
@@ -2219,7 +2219,7 @@ function renderGaStats() {
    OÙ L'ÉQUIPE PASSE SON TEMPS
 
    Le classement des procédures par temps de lecture cumulé. C'est le troisième
-   axe de la page : qui lit, dans quelle catégorie, et sur quoi.
+   axe de la page : qui lit, dans quelle dossier, et sur quoi.
 
    Ce que ça révèle, et qui ne se voit nulle part ailleurs : une procédure qui
    prend beaucoup plus de temps que les autres est souvent mal écrite, pas plus
@@ -2391,18 +2391,18 @@ function dessinerAnneau(id, pct, couleur, texte, unite) {
     <div class="dedans">${escapeHtml(texte)}${unite ? `<span class="unite">${escapeHtml(unite)}</span>` : ''}</div>`
 }
 
-/* Classement des catégories par taux de consultation.
-   Le taux d'une catégorie = consultations réellement enregistrées, divisé par
+/* Classement des dossiers par taux de consultation.
+   Le taux d'une dossier = consultations réellement enregistrées, divisé par
    le nombre de consultations possibles, soit ses procédures x ses employés.
-   On raisonne en pourcentage et non en volume brut, sinon une catégorie de
-   dix procédures écraserait systématiquement une catégorie de deux. */
+   On raisonne en pourcentage et non en volume brut, sinon une dossier de
+   dix procédures écraserait systématiquement une dossier de deux. */
 /* `cible` et `tout` permettent de réutiliser ce rendu sur la page entière :
    mêmes lignes, même grammaire, un seul endroit qui les dessine. */
-/* Les catégories où l'équipe passe le plus de temps.
+/* Les dossiers où l'équipe passe le plus de temps.
 
    Avant, on classait par taux de consultation. Mais un taux élevé sur une
-   catégorie d'une seule procédure ne dit rien ; le temps, lui, se compare
-   d'une catégorie à l'autre quelle que soit leur taille. */
+   dossier d'une seule procédure ne dit rien ; le temps, lui, se compare
+   d'une dossier à l'autre quelle que soit leur taille. */
 /* « Voir les 1 autres » ne se dit pas. Une seule formule, employée partout. */
 function libelleVoirAutres(n) {
   return n === 1 ? "Voir l'autre" : `Voir les ${n} autres`
@@ -2468,7 +2468,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     return
   }
 
-  /* À quelle catégorie appartient chaque procédure. */
+  /* À quelle dossier appartient chaque procédure. */
   const catDe = {}
   procedures.forEach(p => { catDe[p.id] = p.categorie || 'Sans cat\u00e9gorie' })
 
@@ -2712,7 +2712,7 @@ window.ouvrirFicheMembre = function(membreId) {
 /* Une ÉCHELLE, pas une palette. Ces teintes ne signifient rien : elles servent
    à relier une part de l'anneau à sa ligne, et rien d'autre. Or l'ancienne
    suite mêlait de l'ambre, du vert et du bleu — et le vert dit « terminé »
-   partout ailleurs dans l'app. Une catégorie tombait en vert par le seul hasard
+   partout ailleurs dans l'app. Une dossier tombait en vert par le seul hasard
    de son rang, et paraissait aller mieux que sa voisine.
 
    Six ambres du plus clair au plus sombre : on les distingue par la clarté, ce
@@ -2901,7 +2901,7 @@ function regrouperParts(vus, valeur) {
   if (!total) return gardees
 
   /* « Autres » en gris, jamais en couleur : une teinte de plus laisserait croire
-     à une catégorie réelle. Le gris dit « ceci n'est pas une part, c'est ce qui
+     à une dossier réelle. Le gris dit « ceci n'est pas une part, c'est ce qui
      reste ». */
   const modele = reste[0]
   const autres = { ...modele, couleur: ANNEAU_GRIS, estAutres: true, _reste: reste.length }
@@ -2926,7 +2926,7 @@ function dessinerAnneauMembre(cle) {
     fmVues[cle].classe.filter(x => x.secondes >= 1), x => x.secondes)
   const somme = vus.reduce((s, x) => s + x.secondes, 0)
 
-  /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
+  /* L'écart s'adapte au NOMBRE de parts. À vingt dossiers, cinq pixels chacune
      mangeraient un tiers du cercle et les couleurs se bousculeraient. L'ensemble
      ne dépasse jamais le huitième du tour ; chaque écart reste au-dessus de
      1,5 px — en dessous, deux couleurs paraissent se toucher. */
@@ -3205,7 +3205,7 @@ function renderMembresListe() {
 
   /* Le mois en cours, comme les deux autres sections. Elles montraient trois
      fenêtres différentes de la même semaine : Équipe le total depuis toujours,
-     Catégories et Procédures le mois. Trois chiffres qui ne se comparent pas,
+     Dossiers et Procédures le mois. Trois chiffres qui ne se comparent pas,
      empilés sur le même écran. */
   const debutMois = new Date()
   debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
@@ -3562,7 +3562,7 @@ function periodeCourante() {
 
 
 
-/* La page des catégories, bâtie exactement comme celle des procédures : deux
+/* La page des dossiers, bâtie exactement comme celle des procédures : deux
    panneaux qu'on fait glisser, un anneau par période, le classement en dessous.
    Deux pages qui répondent à la même question doivent se lire pareil. */
 
@@ -3622,7 +3622,7 @@ function dessinerAnneauCat(cle) {
   }
   zone.closest('.fm-segm')?.style.removeProperty('display')
 
-  /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
+  /* L'écart s'adapte au NOMBRE de parts. À vingt dossiers, cinq pixels chacune
      mangeraient un tiers du cercle et les couleurs se bousculeraient. L'ensemble
      ne dépasse jamais le huitième du tour ; chaque écart reste au-dessus de
      1,5 px — en dessous, deux couleurs paraissent se toucher. */
@@ -3782,7 +3782,7 @@ function peindreClassementCat(cle, animerDes) {
     el.appendChild(b)
   }
 
-  /* Toucher éclaire la part ; un appui long ouvre la catégorie. Le geste court
+  /* Toucher éclaire la part ; un appui long ouvre la dossier. Le geste court
      sert à comparer, le long à aller voir — comme sur la page des procédures. */
   el.querySelectorAll('[data-part]').forEach(b => {
     let minuteur = null, ouverte = false
@@ -3927,7 +3927,7 @@ function dessinerAnneauProc(cle) {
   }
   zone.closest('.fm-segm')?.style.removeProperty('display')
 
-  /* L'écart s'adapte au NOMBRE de parts. À vingt catégories, cinq pixels chacune
+  /* L'écart s'adapte au NOMBRE de parts. À vingt dossiers, cinq pixels chacune
      mangeraient un tiers du cercle et les couleurs se bousculeraient. L'ensemble
      ne dépasse jamais le huitième du tour ; chaque écart reste au-dessus de
      1,5 px — en dessous, deux couleurs paraissent se toucher. */
@@ -4436,7 +4436,7 @@ window.showGestionScreen = function(id, btn) {
 }
 
 // Le document défile d'un seul bloc, tous écrans confondus : sans ça, en
-// ouvrant une catégorie depuis le bas de la grille, on atterrissait sur un
+// ouvrant une dossier depuis le bas de la grille, on atterrissait sur un
 // écran plus court en gardant la position de défilement — donc sur du vide.
 function remonterEnHaut() {
   window.scrollTo({ top: 0, behavior: 'auto' })
@@ -4643,11 +4643,11 @@ async function loadGestionProcedures() {
 
   if (procedures.length === 0) {
     renderAccueil()
-      ecrireSous(`0 catégorie · 0 procédure · accès complet`)
+      ecrireSous(`0 dossier · 0 procédure · accès complet`)
     /* Le compte de la page reste sinon sur son tiret : ce chemin court-circuite
        `renderCategoryGrid`, qui est le seul endroit qui l'écrit. */
     const cpt0 = document.getElementById('proc-compte')
-    if (cpt0) cpt0.textContent = '0 catégorie · 0 procédure'
+    if (cpt0) cpt0.textContent = '0 dossier · 0 procédure'
     // On mesure APRÈS avoir écrit : la grille doit exister pour être située.
     requestAnimationFrame(() => ajusterHauteurDebut())
     catGridEl.innerHTML = `
@@ -4730,18 +4730,18 @@ async function loadGestionProcedures() {
 
   const categoriesMap = {}
   procedures.forEach(p => {
-    const nom = p.categorie || 'Sans catégorie'
+    const nom = p.categorie || 'Sans dossier'
     if (!categoriesMap[nom]) categoriesMap[nom] = '📁'
   })
 
   const nbCategories = Object.keys(categoriesMap).length
-  ecrireSous(`${nbCategories} catégorie${nbCategories > 1 ? 's' : ''} · ${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`)
+  ecrireSous(`${nbCategories} dossier${nbCategories > 1 ? 's' : ''} · ${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`)
 
   allCategoriesData = []
   for (const [nom, icone] of Object.entries(categoriesMap)) {
-    const procsInCat = procedures.filter(p => (p.categorie || 'Sans catégorie') === nom) // déjà trié du plus récent au plus ancien
+    const procsInCat = procedures.filter(p => (p.categorie || 'Sans dossier') === nom) // déjà trié du plus récent au plus ancien
 
-    // Taux moyen de consultation de la catégorie (moyenne des taux de chaque procédure)
+    // Taux moyen de consultation de la dossier (moyenne des taux de chaque procédure)
     let avgPct = 0
     if (nbEmployesTotal > 0) {
       let totalRatio = 0
@@ -5146,7 +5146,7 @@ function captureCardPositions(containerEl) {
 
 // Fait "glisser/mélanger" chaque carte depuis son ancienne position vers sa nouvelle position
 /* Ce qui a déjà joué son animation d'arrivée, pour ne pas la rejouer. Vidé au
-   changement d'établissement : ce sont d'autres catégories. */
+   changement d'établissement : ce sont d'autres dossiers. */
 let dejaEntre = new Set()
 
 function playCardShuffle(containerEl, oldRects) {
@@ -5162,7 +5162,7 @@ function playCardShuffle(containerEl, oldRects) {
     const oldRect = oldRects.get(el.dataset.key)
     if (!oldRect) {
       /* « Pas de position précédente » ne veut pas dire « nouvelle » : la grille
-         est vidée à chaque changement de page, et une catégorie qui existe depuis
+         est vidée à chaque changement de page, et une dossier qui existe depuis
          des semaines se retrouvait donc sans passé à chaque retour. Elle rejouait
          son arrivée indéfiniment.
 
@@ -5246,11 +5246,11 @@ function renderCategoryGrid() {
     const nbC = new Set((allGestionProcedures || [])
       .map(p => (p.categorie || '').trim()).filter(Boolean)).size
     compte.textContent = nbP
-      ? `${nbP} procédure${nbP > 1 ? 's' : ''} \u00b7 ${nbC} catégorie${nbC > 1 ? 's' : ''}`
+      ? `${nbP} procédure${nbP > 1 ? 's' : ''} \u00b7 ${nbC} dossier${nbC > 1 ? 's' : ''}`
       : 'Aucune procédure pour le moment'
   }
 
-  // Départage systématique par ordre alphabétique : sans ça, deux catégories
+  // Départage systématique par ordre alphabétique : sans ça, deux dossiers
   // dont les procédures ont été créées à la même seconde restaient dans
   // l'ordre où la base les avait renvoyées, et changer de tri ne bougeait
   // rien à l'écran — le filtre semblait cassé alors qu'il tournait bien.
@@ -5295,8 +5295,8 @@ function renderCategoryGrid() {
         <span class="fl">›</span>
       </div>
     `
-    /* Sur la carte d'une catégorie, un titre en panne mène directement à la
-       reprise : sinon il faudrait ouvrir la catégorie pour s'en apercevoir. */
+    /* Sur la carte d'une dossier, un titre en panne mène directement à la
+       reprise : sinon il faudrait ouvrir la dossier pour s'en apercevoir. */
     cell.onclick = (e) => {
       const ligne = e.target.closest('.cat-recent-item')
       if (ligne) {
@@ -5394,7 +5394,7 @@ wireSortDropdown('dd-membres-sort', (valeur) => {
 })
 
 
-// Texte tapé dans la recherche de l'écran d'une catégorie
+// Texte tapé dans la recherche de l'écran d'une dossier
 let currentCategoryQuery = ''
 
 document.getElementById('category-search-input')?.addEventListener('input', (e) => {
@@ -5411,7 +5411,7 @@ let toutesProcedures = false   // vrai quand on affiche toutes les procédures
 function openCategoryProcedures(nom) {
   try { ouvrirCategorie(nom) }
   catch (e) {
-    console.error('Ouverture de la catégorie :', e)
+    console.error('Ouverture de la dossier :', e)
     showGestionScreen('p-category')
     const el = document.getElementById('category-procedures-list')
     if (el) el.innerHTML = `<div class="empty-state"><h3>Ouverture impossible</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
@@ -5421,12 +5421,12 @@ function openCategoryProcedures(nom) {
 /* ═══════════════════════════════════════════════════════════════════════════
    RENOMMER UNE CATÉGORIE
 
-   La catégorie n'est pas une table : c'est une colonne de texte sur chaque
+   La dossier n'est pas une table : c'est une colonne de texte sur chaque
    procédure. La renommer, c'est réécrire ce texte sur toutes celles qui la
    portent — d'un seul appel, filtré sur l'ancien nom.
 
-   Conséquence à connaître : deux catégories fusionnent si on donne à l'une le
-   nom de l'autre. C'est cohérent avec ce qu'est une catégorie ici, et c'est même
+   Conséquence à connaître : deux dossiers fusionnent si on donne à l'une le
+   nom de l'autre. C'est cohérent avec ce qu'est une dossier ici, et c'est même
    le seul moyen de les regrouper. On prévient donc au lieu d'interdire.
    ═══════════════════════════════════════════════════════════════════════════ */
 
@@ -5445,7 +5445,7 @@ document.getElementById('cat-renommer')?.addEventListener('click', async () => {
   })
   if (!nouveau || nouveau === ancien) return
 
-  // Une catégorie de ce nom existe déjà : on le dit, on ne l'empêche pas.
+  // Une dossier de ce nom existe déjà : on le dit, on ne l'empêche pas.
   const existe = allGestionProcedures.some(p =>
     (p.categorie || '').toLowerCase() === nouveau.toLowerCase())
   if (existe) {
@@ -5468,7 +5468,7 @@ document.getElementById('cat-renommer')?.addEventListener('click', async () => {
   if (!data || !data.length) { toast('La base a refus\u00e9 la modification.'); return }
 
   document.getElementById('category-titre').textContent = nouveau
-  /* On recharge : les regroupements par catégorie sont construits au chargement,
+  /* On recharge : les regroupements par dossier sont construits au chargement,
      et c'est le seul endroit qui les construit. */
   await loadGestionProcedures()
   ouvrirCategorie(nouveau)
@@ -5480,7 +5480,7 @@ function ouvrirCategorie(nom) {
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = toutesProcedures ? 'Toutes les procédures' : nom
   /* Rien à renommer quand on regarde tout : « Toutes les procédures » n'est pas
-     une catégorie, c'est une vue. */
+     une dossier, c'est une vue. */
   const btnRenommer = document.getElementById('cat-renommer')
   if (btnRenommer) btnRenommer.style.display = toutesProcedures ? 'none' : 'flex'
   document.getElementById('category-search-input').value = ''
@@ -5494,10 +5494,10 @@ function ouvrirCategorie(nom) {
 
   const procsInCategory = toutesProcedures
     ? allGestionProcedures
-    : allGestionProcedures.filter(p => (p.categorie || 'Sans catégorie') === nom)
-  const nbCat = new Set(allGestionProcedures.map(p => p.categorie || 'Sans catégorie')).size
+    : allGestionProcedures.filter(p => (p.categorie || 'Sans dossier') === nom)
+  const nbCat = new Set(allGestionProcedures.map(p => p.categorie || 'Sans dossier')).size
   document.getElementById('category-subhead').textContent = toutesProcedures
-    ? `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''} · ${nbCat} catégorie${nbCat > 1 ? 's' : ''}`
+    ? `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''} · ${nbCat} dossier${nbCat > 1 ? 's' : ''}`
     : `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
 
   // Tout est déjà en mémoire (préchargé au démarrage) : affichage instantané, zéro attente réseau.
@@ -5538,8 +5538,8 @@ function renderCategoryProceduresListInterne() {
   const filtered = currentCategoryQuery
     ? currentCategoryProcsData.filter(d => {
         const titre = (d.proc.titre || '').toLowerCase()
-        // En vue globale, on peut aussi chercher par nom de catégorie
-        const cat = toutesProcedures ? (d.proc.categorie || 'sans catégorie').toLowerCase() : ''
+        // En vue globale, on peut aussi chercher par nom de dossier
+        const cat = toutesProcedures ? (d.proc.categorie || 'sans dossier').toLowerCase() : ''
         return titre.includes(currentCategoryQuery) || (cat && cat.includes(currentCategoryQuery))
       })
     : currentCategoryProcsData
@@ -5569,12 +5569,12 @@ function renderCategoryProceduresListInterne() {
       enPanne ? proposerReprise(proc) :
       enAnalyse ? proposerAbandon(proc) :
       openAnalyse(proc.id)
-    /* La même grammaire que la catégorie : plaque à gauche, nom, filet, pied.
+    /* La même grammaire que la dossier : plaque à gauche, nom, filet, pied.
        Le pied dit ici le suivi de lecture — la seule chose qu'un gérant vient
        vérifier sur cette page. */
     const detail = [
       `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`,
-      toutesProcedures ? escapeHtml(proc.categorie || 'Sans catégorie') : '',
+      toutesProcedures ? escapeHtml(proc.categorie || 'Sans dossier') : '',
     ].filter(Boolean).join(' \u00b7 ')
 
     div.innerHTML = `
@@ -5813,7 +5813,7 @@ window.ouvrirAnProcedures = function() {
    liste — doivent se ressembler. Et un déroulant accueille une troisième
    période le jour où on en ajoutera une, là où les segments débordent.
 
-   Les trois pages partagent la même valeur : on revient de « Catégories » vers
+   Les trois pages partagent la même valeur : on revient de « Dossiers » vers
    « Équipe » sans que la fenêtre de temps change sous les pieds. */
 document.querySelectorAll('[data-an-trigger]').forEach(t => {
   t.addEventListener('click', (e) => {
@@ -6645,7 +6645,7 @@ function marquerLesNeufs(conteneur, liste, selecteur) {
 
 /* ═══ LA DISPARITION ═══
 
-   Une catégorie s'efface quand sa dernière procédure part. Sans animation, elle
+   Une dossier s'efface quand sa dernière procédure part. Sans animation, elle
    disparaît entre deux images : on doute d'avoir supprimé la bonne chose.
 
    On la fait partir DEVANT les yeux, puis on redessine. */
@@ -10390,7 +10390,7 @@ async function insertEtapes(rows) {
   return res
 }
 
-/* Le titre et la catégorie sont saisis sur l'écran des étapes ; l'écran précédent
+/* Le titre et la dossier sont saisis sur l'écran des étapes ; l'écran précédent
    les propose aussi, pour qui les remplit avant de choisir son mode. On prend
    celui qui est rempli, en donnant la priorité à la page où l'on se trouve. */
 function champManuel(quoi) {
@@ -10525,7 +10525,7 @@ let ouvertureCourante = 0
    La suppression renvoyait toujours à `p-list`, puis cherchait la carte de la
    procédure pour la replier. Or cette carte vit sur `p-category` — on la
    cherchait donc là où elle n'est pas, et l'animation ne jouait jamais quand on
-   supprimait depuis une catégorie. La procédure disparaissait d'un coup, entre
+   supprimait depuis une dossier. La procédure disparaissait d'un coup, entre
    deux images, et on doutait d'avoir supprimé la bonne.
 
    On retient l'écran d'où l'on ouvre : c'est là qu'on retournera. */
@@ -10611,7 +10611,7 @@ async function openAnalyse(procId) {
       })
       return
     }
-    /* On revient à l'écran d'où l'on venait — la catégorie, ou la liste — puis
+    /* On revient à l'écran d'où l'on venait — la dossier, ou la liste — puis
        on replie la carte : la personne voit la procédure qu'elle vient de
        supprimer s'en aller. La ligne est déjà effacée en base, l'animation ne
        fait que raconter ce qui s'est passé. */
@@ -10619,8 +10619,8 @@ async function openAnalyse(procId) {
     const carte = carteDeProcedure(procId)
     if (carte) await replierCarte(carte)
 
-    /* La catégorie se vide-t-elle ? Si cette procédure était la dernière, sa
-       catégorie va disparaître du prochain dessin. On la fait partir DEVANT les
+    /* La dossier se vide-t-elle ? Si cette procédure était la dernière, sa
+       dossier va disparaître du prochain dessin. On la fait partir DEVANT les
        yeux plutôt qu'entre deux images — sinon on doute d'avoir supprimé la
        bonne chose. */
     const cat = proc?.categorie
@@ -10639,7 +10639,7 @@ async function openAnalyse(procId) {
   }
 
   document.getElementById('analyse-titre').textContent = proc.titre
-  document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans catégorie'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
+  document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans dossier'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
 
   renderAnalyseStats()
 
@@ -11012,7 +11012,7 @@ function surveillerAnalyses() {
         /* ON RECHARGE DEPUIS LA BASE, on ne se contente pas de modifier l'objet
            en mémoire.
 
-           Les listes de catégories travaillent sur des copies filtrées : changer
+           Les listes de dossiers travaillent sur des copies filtrées : changer
            `p.statut` dans `allGestionProcedures` ne touchait pas la copie que la
            page affichait. L'état était juste en mémoire, faux à l'écran, et la
            roue tournait sur une analyse terminée depuis longtemps. */
@@ -11053,7 +11053,7 @@ function surveillerAnalyses() {
       }
         /* On repeint TOUT ce qui peut montrer l'état d'une procédure. Ne repeindre
          que la grille laissait la roue tourner sur les autres écrans : la fiche
-         ouverte, la recherche, la liste d'une catégorie. L'état avait changé en
+         ouverte, la recherche, la liste d'une dossier. L'état avait changé en
          mémoire, mais personne ne le redessinait là où on regardait. */
       /* Une analyse vient d'aboutir : on relit tout plutôt que de repeindre des
          copies périmées. C'est un aller-retour de plus, une fois par analyse —
@@ -11283,7 +11283,7 @@ async function renderBlocVisiteur() {
   }
 
   bloc.style.display = 'block'
-  // La grille des catégories n'a pas de sens avec une seule procédure.
+  // La grille des dossiers n'a pas de sens avec une seule procédure.
   if (grille) grille.style.display = 'none'
 
   const { count } = await supabase
@@ -11413,7 +11413,7 @@ function renderEquipeAccueil() {
   }
 }
 
-/* Grille des catégories, exactement celle de l'espace gestion : anneau de
+/* Grille des dossiers, exactement celle de l'espace gestion : anneau de
    progression, nom, nombre de procédures et aperçu des titres récents. */
 function renderEquipeCategories() {
   const grille = document.getElementById('e-cat-grid')
@@ -11431,13 +11431,13 @@ function renderEquipeCategories() {
 
   const parCat = {}
   allEquipeProcedures.forEach(p => {
-    const nom = p.categorie || 'Sans catégorie'
+    const nom = p.categorie || 'Sans dossier'
     if (!parCat[nom]) parCat[nom] = []
     parCat[nom].push(p)
   })
 
   /* Le même tri que côté gestion, plus une entrée propre à l'employé :
-     « À lire d'abord » remonte les catégories où il lui reste le plus à lire. */
+     « À lire d'abord » remonte les dossiers où il lui reste le plus à lire. */
   const dateCat = (n) => Math.max(...parCat[n].map(p => new Date(p.created_at || 0).getTime()))
   const resteCat = (n) => parCat[n].filter(p => !equipeLues.has(p.id)).length
 
@@ -11459,11 +11459,11 @@ function renderEquipeCategories() {
 
        Les deux avaient divergé : plaque ambre et pied à chevron d'un côté,
        icône blanche et pastille de comptage de l'autre. Or c'est le même objet
-       — une catégorie — et l'employé qui devient gérant ne doit pas avoir à
+       — une dossier — et l'employé qui devient gérant ne doit pas avoir à
        réapprendre à quoi elle ressemble.
 
        Le pied dit la MÊME chose des deux côtés : le nombre de procédures de la
-       catégorie. « Tout est lu » y figurait un temps — mais un pied qui change
+       dossier. « Tout est lu » y figurait un temps — mais un pied qui change
        de nature selon l'état ne se compare plus d'une carte à l'autre, et le
        nombre, lui, se lit toujours. Ce qui reste à faire est déjà dit par les
        pastilles sur les titres, juste au-dessus. */
@@ -11499,7 +11499,7 @@ function renderEquipeCategories() {
   })
 }
 
-/* Écran d'une catégorie : ses procédures, avec sa propre recherche. */
+/* Écran d'une dossier : ses procédures, avec sa propre recherche. */
 function openEquipeCategorie(nom) {
   equipeCatCourante = nom
   equipeCatQuery = ''
@@ -11515,7 +11515,7 @@ function openEquipeCategorie(nom) {
 function renderEquipeCatListe() {
   const listEl = document.getElementById('equipe-procedures-list')
   if (!listEl) return
-  const dansCat = allEquipeProcedures.filter(p => (p.categorie || 'Sans catégorie') === equipeCatCourante)
+  const dansCat = allEquipeProcedures.filter(p => (p.categorie || 'Sans dossier') === equipeCatCourante)
   const q = equipeCatQuery
   const vues = q ? dansCat.filter(p => p.titre.toLowerCase().includes(q)) : dansCat
 
@@ -11528,7 +11528,7 @@ function renderEquipeCatListe() {
     listEl.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à votre recherche.</p></div>`
     return
   }
-  /* Le même tri que les catégories, avec la même entrée propre à l'employé :
+  /* Le même tri que les dossiers, avec la même entrée propre à l'employé :
      « À lire d'abord » remonte ce qu'il n'a pas encore ouvert. */
   const triees = [...vues].sort((a, b) => {
     if (equipeProcSort === 'new') return new Date(b.created_at || 0) - new Date(a.created_at || 0)
@@ -11542,7 +11542,7 @@ function renderEquipeCatListe() {
   triees.forEach(proc => listEl.appendChild(ficheEquipe(proc)))
 }
 
-/* Une fiche de procédure, réutilisée par la catégorie et par la recherche.
+/* Une fiche de procédure, réutilisée par la dossier et par la recherche.
    Même carte que dans l'espace gestion : anneau, nombre d'étapes, titre. Ce que
    l'anneau mesure change de sens — côté gérant, la part de l'équipe qui a
    consulté ; côté employé, sa propre lecture : pleine et verte s'il l'a lue,
@@ -11585,10 +11585,10 @@ function ficheEquipe(proc) {
 
 
 /* Recherche de l'accueil : elle cherche dans toutes les procédures, toutes
-   catégories confondues, et remplace la grille par ses résultats le temps de
+   dossiers confondues, et remplace la grille par ses résultats le temps de
    la saisie. */
 
-// Recherche à l'intérieur d'une catégorie
+// Recherche à l'intérieur d'une dossier
 document.getElementById('e-cat-recherche')?.addEventListener('input', (e) => {
   equipeCatQuery = e.target.value.trim().toLowerCase()
   renderEquipeCatListe()
@@ -11897,7 +11897,7 @@ async function openEquipeDetail(procId) {
   }
 
   document.getElementById('detail-titre').textContent = proc.titre
-  document.getElementById('detail-subhead').textContent = proc.categorie || 'Sans catégorie'
+  document.getElementById('detail-subhead').textContent = proc.categorie || 'Sans dossier'
 
   const videoFrame = document.getElementById('detail-video-frame')
   const detailVideoEl = document.getElementById('detail-video')
@@ -14803,7 +14803,7 @@ window.openEditProcedure = async function(procId, mode) {
   document.getElementById('edit-titre-header').textContent = editMode === 'ai-review' ? 'Vérifier les étapes' : 'Modifier la procédure'
   document.getElementById('edit-subhead').textContent = editMode === 'ai-review'
     ? "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin"
-    : 'Modifiez le titre, la catégorie ou les étapes'
+    : 'Modifiez le titre, la dossier ou les étapes'
   document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
 
   const bande = document.getElementById('edit-bande-ia')
@@ -15447,7 +15447,7 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
 
   /* L'image de la procédure part avec le reste. Si la colonne n'existe pas
      encore, la mise à jour échoue entièrement : on retente alors sans elle,
-     plutôt que de perdre le titre et la catégorie pour une image. */
+     plutôt que de perdre le titre et la dossier pour une image. */
   const urlCouv = await envoyerCouverture(editProcedureId)
 
   let { error: updateError } = await supabase

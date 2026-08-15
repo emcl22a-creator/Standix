@@ -2600,184 +2600,26 @@
     -webkit-user-select:text; user-select:text;
   }
 
-  /* ═══════════════════════════════════════════════════════════════════
-     LA PAGE DES OFFRES
-     Le prix suit le nombre de membres, et il est ramené au membre : c'est le
-     seul chiffre qu'un restaurateur peut comparer à quelque chose qu'il connaît.
-     Les avantages ne sont pas une liste à puces de plus : les deux ou trois qui
-     comptent sont détaillés, le reste tient sur une ligne.
-     ═════════════════════════════════════════════════════════════════ */
-  .abo-scene{
-    position:relative; margin-top:14px; padding:28px 16px 22px; border-radius:28px;
-    background:linear-gradient(168deg,#17181D,#101114);
-    border:0.5px solid var(--border); overflow:hidden;
-  }
-  .abo-halo{
-    position:absolute; top:-96px; left:50%; transform:translateX(-50%);
-    width:320px; height:210px; pointer-events:none;
-    background:radial-gradient(ellipse, rgba(255,179,64,0.22), transparent 66%);
-  }
-  .abo-hi{ position:relative; text-align:center; margin-bottom:22px; padding-top:8px; }
-  /* La même écriture que les titres de page — « Paramètres », « Abonnement » :
-     700 de graisse et − 0,02 em d'espacement. Le 850 et le − 0,05 em précédents
-     venaient d'ailleurs, et cette page détonnait dans l'app. */
-  .abo-hi h2{
-    font-size:24px; font-weight:700; letter-spacing:-0.02em;
-    line-height:1.25; margin-bottom:9px;
-  }
-  .abo-hi p{ font-size:13.5px; color:var(--label-2); line-height:1.5; max-width:290px; margin:0 auto; }
-  .abo-hi b{ color:#fff; font-weight:650; }
-  /* La promesse tient en une phrase : autant la mettre là où l'on hésite, juste
-     avant d'aller comparer les autres offres. */
-  .abo-egal{
-    margin-top:18px; padding:12px 14px; border-radius:14px;
-    background:rgba(255,179,64,0.10); border:0.5px solid rgba(255,179,64,0.24);
-    font-size:12.5px; color:var(--label-2); line-height:1.5; text-align:center;
-  }
-  .abo-egal b{ color:#fff; font-weight:700; }
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE ZOOM DE BUREAU A ÉTÉ RETIRÉ
 
-  .abo-conf{
-    display:flex; align-items:center; justify-content:center; gap:14px; margin-top:18px;
-    font-size:10.5px; color:var(--label-3); font-weight:600;
-  }
-  #abo-liste{ display:none; margin-top:12px; }
-  #abo-liste.ouvert{ display:block; animation:contenuEntre 0.44s cubic-bezier(0.22,1,0.36,1) both; }
+     `body{ zoom }` agrandissait tout de 1,3 à 2 selon la largeur de l'écran.
+     L'intention était bonne — une colonne de téléphone perdue au milieu d'un
+     grand écran n'est pas lisible de loin. Le résultat ne l'était pas.
 
-  .offre-carte{
-    position:relative; padding:22px 18px 18px; border-radius:24px;
-    background:var(--bg-card); border:1px solid var(--border); margin-bottom:12px;
-  }
-  .offre-carte.vedette{ border-color:rgba(255,255,255,0.5); background:rgba(255,255,255,0.07); }
-  .offre-ruban{
-    position:absolute; top:-9px; left:16px; padding:3px 11px; border-radius:100px;
-    background:#fff; color:#000; font-size:9.5px; font-weight:800; letter-spacing:0.04em;
-  }
-  /* Pas de vert sur cette page : le bleu du halo suffit, et le vert dit
-     « terminé » ailleurs dans l'app — ici rien n'est terminé. */
-  .offre-carte.actuelle .offre-ruban{ background:#FFB340; color:#2E1B00; }
+     `zoom` MENT AUX MESURES. `getBoundingClientRect` rend des pixels zoomés,
+     `style.left` s'écrit en pixels CSS : tout code qui mesure puis positionne
+     se trompe d'un facteur deux. La barre du bas posait son dernier onglet à
+     2 092 px pour une barre qui s'arrête à 1 214, et le clic tombait à côté.
+     J'ai corrigé la barre — mais la même erreur guette partout ailleurs, à
+     chaque fois qu'on mesurera quelque chose.
 
-  /* L'en-tête : le nom, la taille, le prix. Pas de dessin — il était étiré et
-     n'apportait rien qu'un chiffre ne dise mieux. */
-  .offre-tete{ display:flex; align-items:flex-start; gap:12px; }
-  .offre-txt{ flex:1; min-width:0; }
-  .offre-nom{ display:block; font-size:19px; font-weight:700; letter-spacing:-0.02em; }
-  .offre-taille{ display:block; font-size:12.5px; color:var(--label-2); margin-top:3px; }
-  .offre-prix{ text-align:right; flex-shrink:0; }
-  .offre-prix .v{ font-size:26px; font-weight:700; letter-spacing:-0.02em; line-height:1; }
-  .offre-prix .u{ display:block; font-size:10.5px; color:var(--label-3); font-weight:600; margin-top:4px; }
-  .offre-parmembre{
-    font-size:12px; color:var(--label-3); line-height:1.5; margin-top:14px;
-    padding-top:14px; border-top:0.5px solid var(--border);
-  }
-  .offre-parmembre b{ color:#fff; font-weight:700; }
+     Sans zoom, l'app garde sa colonne de 460 px sur tous les écrans. Plus
+     petite sur un grand moniteur, mais JUSTE : ce qu'on mesure est ce qu'on
+     voit. Un bandeau invite à passer sur le téléphone, pour qui ouvre l'app
+     sur un ordinateur.
+     ═══════════════════════════════════════════════════════════════════════ */
 
-  /* Les avantages qui comptent : titre net, une phrase qui dit ce qu'on y gagne. */
-  /* Un intertitre discret : il dit que ce qui suit est ce qu'on GAGNE, et non
-     une liste de plus. */
-  .offre-etiq{
-    font-size:10.5px; font-weight:750; color:var(--label-3);
-    text-transform:uppercase; letter-spacing:0.06em;
-    margin-top:20px; padding-top:16px; border-top:0.5px solid var(--border);
-  }
-  .offre-phares{ display:flex; flex-direction:column; gap:16px; margin-top:14px; }
-  /* `align-items:center` : sans lui, le titre se calait en HAUT de la tuile.
-     Un texte d'une seule ligne à côté d'un carré de 34 px paraissait alors
-     flotter au-dessus du dessin plutôt qu'à sa hauteur. */
-  .offre-phare{ display:flex; gap:13px; align-items:center; }
-  /* L'avantage qui fait acheter se voit avant les autres : un cadre, un fond
-     bleuté, un titre plus grand. Le bleu de la page, pas le vert de l'app. */
-  .offre-phare.vedette{
-    padding:14px; border-radius:16px;
-    background:rgba(255,179,64,0.10);
-    border:0.5px solid rgba(255,179,64,0.26);
-  }
-  /* Sur la tuile de tête, la marque AI remplace le dessin : elle doit rester
-     lisible sur un fond bleuté, d'où le dégradé clair plutôt que le bleu foncé
-     des boutons blancs. */
-  .offre-phare .p .ia-mot{
-    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #FFC46B 100%);
-    -webkit-background-clip:text; background-clip:text;
-    -webkit-text-fill-color:transparent; color:transparent;
-    font-weight:850; letter-spacing:0.02em; line-height:1;
-  }
-
-  .offre-phare.vedette .p{
-    width:34px; height:34px; border-radius:11px;
-    background:rgba(255,179,64,0.18); border-color:rgba(255,179,64,0.34);
-  }
-  .offre-phare.vedette .p svg{ width:19px; height:19px; }
-  .offre-phare.vedette .t{ font-size:15.5px; letter-spacing:-0.03em; }
-  .offre-phare.vedette .s{ color:var(--label-2); }
-  .offre-phare .p{
-    flex-shrink:0; width:30px; height:30px; border-radius:9px;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
-  }
-  .offre-phare .p svg{ width:17px; height:17px; display:block; }
-  .offre-phare .t{ display:block; font-size:14px; font-weight:700; letter-spacing:-0.02em; }
-
-  .offre-aussi{
-    font-size:12.5px; color:var(--label-3); line-height:1.55;
-    margin-top:18px; padding-top:16px; border-top:0.5px solid var(--border);
-  }
-  .offre-aussi b{ color:var(--label-2); font-weight:600; }
-
-  .offre-cta{
-    width:100%; height:50px; margin-top:20px; border:none; border-radius:15px;
-    font-family:inherit; font-size:14.5px; font-weight:700;
-    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
-    color:#2A1400; box-shadow:0 6px 18px rgba(255,122,24,0.24);
-  }
-  .offre-carte:not(.vedette) .offre-cta{
-    background:rgba(255,255,255,0.08); color:#fff; border:0.5px solid var(--border);
-    height:42px; font-size:13px;
-  }
-  .offre-carte.actuelle .offre-cta{ background:none; color:#FFB340; }
-/* ═══ MENSUEL OU ANNUEL ═══
-     Deux boutons radio, entre les avantages et l'action. On voit les DEUX prix
-     en même temps : un interrupteur cache toujours la moitié de l'information,
-     et ce qu'on ne voit pas ne convainc pas. */
-/* L'offre en cours : le bouton dit ce qu'elle est, sans inviter à rien. */
-/* Le lien de gestion : discret sous l'offre, mais présent. On ne cache pas la
-     porte de sortie — la loi l'interdit, et un client qui la cherche sans la
-     trouver part quand même, en mauvais termes. */
-/* ═══════════════════════════════════════════════════════════════════════
-     LES TABLETTES
-     ═══════════════════════════════════════════════════════════════════════
-
-     L'application est une colonne de 460 px centrée — taillée pour un téléphone.
-     Sur un iPad, elle restait à 460 px au milieu de six cents pixels de vide :
-     lisible, mais ridicule, et il fallait approcher l'écran pour lire.
-
-     `zoom` agrandit TOUT dans les mêmes proportions — textes, tuiles, marges,
-     rayons, épaisseurs de trait. C'est ce qu'on veut : la même interface, plus
-     grande. Redessiner une mise en page à deux colonnes serait un autre travail,
-     et une autre application à maintenir.
-
-     Pourquoi pas `transform: scale` : il déplace les éléments sans changer la
-     place qu'ils occupent, ce qui casse le défilement et les positions fixes.
-     `zoom` recalcule la mise en page pour de bon.
-
-     Les téléphones ne sont pas touchés : rien ne s'applique sous 768 px. */
-
-  /* Les paliers visent une colonne occupant les deux tiers de la largeur : assez
-     grande pour se lire de loin, assez étroite pour que l'œil ne balaye pas. */
-  /* Chaque palier ajuste AUSSI le plafond de la barre du bas. Le zoom
-     multiplie tout : sans cette compensation, une barre de 520 px s'affichait
-     a 988 px reels sur un grand ecran — les onglets s'eloignaient les uns des
-     autres et l'ensemble perdait sa forme.
-
-     Le calcul vise une largeur reelle d'environ 600 px : 520 / 1,30 = 400,
-     520 / 1,90 = 274. On garde ainsi la meme piece, a la meme taille apparente,
-     quel que soit l'ecran. */
-  @media (min-width: 768px)  { body{ zoom: 1.30; --bar-max: 460px; --col-max: 400px; } }  /* iPad portrait */
-  @media (min-width: 900px)  { body{ zoom: 1.50; --bar-max: 400px; --col-max: 360px; } }
-  @media (min-width: 1100px) { body{ zoom: 1.70; --bar-max: 355px; --col-max: 330px; } }  /* iPad paysage */
-  @media (min-width: 1300px) { body{ zoom: 1.90; --bar-max: 320px; --col-max: 310px; } }  /* iPad Pro */
-
-  /* Au-delà, on cesse de grossir : une interface de téléphone étirée sur un
-     grand écran devient caricaturale. Le vide autour vaut mieux. */
-  @media (min-width: 1600px) { body{ zoom: 2.00; --bar-max: 305px; --col-max: 300px; } }
 
   .offre-gerer{
     width:100%; margin-top:10px; padding:11px 0;
@@ -6149,3 +5991,67 @@ body.chargement #bar{
    un vide au-dessus du titre. */
 .hero.hero-sans-image{ padding:20px; }
 .hero.hero-sans-image .hero-txt{ margin-top:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BANDEAU DE BUREAU
+
+   En haut, pleine largeur, au-dessus de tout. Il ne pousse pas l'app vers le
+   bas : elle est en position fixe, et la décaler demanderait de reprendre
+   toutes ses mesures. Il flotte donc par-dessus, à droite du contenu — là où
+   la colonne de 460 px laisse du vide de toute façon.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.pc-bandeau{
+  position:fixed; z-index:60;
+  top:22px; right:22px; width:300px;
+  display:flex; align-items:flex-start; gap:14px;
+  padding:16px 16px 16px 18px;
+  border-radius:20px;
+  background:rgba(18,18,21,0.86);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  backdrop-filter:blur(18px) saturate(160%);
+  box-shadow:0 12px 40px rgba(0,0,0,0.45),
+             inset 0 0 0 0.5px rgba(255,255,255,0.14);
+  animation:pcArrive 0.5s cubic-bezier(0.32,0.72,0,1) 0.5s both;
+}
+/* Il arrive une demi-seconde après l'app : posé en même temps, il se
+   disputerait l'attention avec la page qui se dévoile. */
+@keyframes pcArrive{
+  from{ opacity:0; transform:translateY(-10px) scale(0.97); }
+  to{ opacity:1; transform:none; }
+}
+.pc-bandeau[hidden]{ display:none; }
+
+.pc-qr{
+  width:96px; height:96px; flex-shrink:0;
+  display:grid; place-items:center;
+  border-radius:10px; background:rgba(255,255,255,0.05);
+  padding:6px;
+}
+.pc-qr canvas{ display:block; width:100%; height:100%; }
+
+.pc-txt{ flex:1; min-width:0; padding-top:2px; }
+.pc-txt b{
+  display:block; font-size:13.5px; font-weight:700; color:var(--label-1);
+  letter-spacing:-0.01em; margin-bottom:5px;
+}
+.pc-txt span{
+  display:block; font-size:11.5px; line-height:1.45; color:var(--label-3);
+}
+
+.pc-fermer{
+  position:absolute; top:8px; right:8px;
+  width:26px; height:26px; border-radius:50%; border:none;
+  display:grid; place-items:center;
+  background:none; color:var(--label-3);
+  transition:background 0.2s, color 0.2s;
+}
+.pc-fermer svg{ width:13px; height:13px; display:block; }
+.pc-fermer:hover{ background:rgba(255,255,255,0.07); color:var(--label-1); }
+
+/* Sous 900 px il n'a rien à dire : on EST sur le bon appareil. */
+@media (max-width: 899px){ .pc-bandeau{ display:none !important; } }
+
+@media (prefers-reduced-motion: reduce){
+  .pc-bandeau{ animation:none; }
+}

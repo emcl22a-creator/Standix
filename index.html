@@ -158,14 +158,16 @@
        qu'elle contient — s'arrêtaient à 420. La barre débordait de cinquante
        pixels de chaque côté.
 
-       420 px : la colonne de 460 moins ses 20 px de marge intérieure de chaque
-       côté. La barre commence et finit exactement où commencent et finissent
-       « Mouvements de l'équipe » et les autres blocs.
+       La colonne moins ses 20 px de marge intérieure de chaque côté : la barre
+       commence et finit exactement où commencent et finissent « Mouvements de
+       l'équipe » et les autres blocs.
+
+       `--col` vaut 460 sur téléphone et 560 au-delà de 768 : la barre suit
+       toute seule, 420 puis 520.
 
        Sur téléphone rien ne change : `100vw - 46` vaut 356 sur un écran de
-       402, et reste plus petit que 420. C'est la largeur de l'écran qui
-       décide, pas une règle de bureau. */
-    width:min(calc(100vw - 46px), 420px);
+       402, et reste plus petit. C'est la largeur de l'écran qui décide. */
+    width:min(calc(100vw - 46px), calc(var(--col, 460px) - 40px));
     height:var(--bar-h);
     margin-left:0;
     transform:translateX(-50%) scale(1) translateZ(0);

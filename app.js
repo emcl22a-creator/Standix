@@ -5094,7 +5094,15 @@ function renderAccueil() {
   if (!salut || !mot) return
 
   const h = new Date().getHours()
-  const bonjour = h < 6 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir'
+  /* PAS DE « BONNE NUIT ». On souhaitait la bonne nuit avant 6 h — or celui
+     qui ouvre l'app à cette heure-là ne va pas se coucher : il ouvre le
+     restaurant, ou il termine le service. Lui dire bonne nuit, c'est le
+     saluer comme s'il partait.
+
+     Deux salutations suffisent : « Bonsoir » couvre la nuit et la soirée,
+     « Bonjour » le reste. La bascule à 5 h plutôt qu'à 6 : à cinq heures on
+     est en début de journée pour une équipe de cuisine. */
+  const bonjour = (h >= 5 && h < 18) ? 'Bonjour' : 'Bonsoir'
   const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
   salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
 
@@ -11301,7 +11309,15 @@ async function loadEquipeProcedures() {
    question : combien j'en ai lu, combien il en reste. */
 function renderEquipeAccueil() {
   const h = new Date().getHours()
-  const bonjour = h < 6 ? 'Bonne nuit' : h < 18 ? 'Bonjour' : 'Bonsoir'
+  /* PAS DE « BONNE NUIT ». On souhaitait la bonne nuit avant 6 h — or celui
+     qui ouvre l'app à cette heure-là ne va pas se coucher : il ouvre le
+     restaurant, ou il termine le service. Lui dire bonne nuit, c'est le
+     saluer comme s'il partait.
+
+     Deux salutations suffisent : « Bonsoir » couvre la nuit et la soirée,
+     « Bonjour » le reste. La bascule à 5 h plutôt qu'à 6 : à cinq heures on
+     est en début de journée pour une équipe de cuisine. */
+  const bonjour = (h >= 5 && h < 18) ? 'Bonjour' : 'Bonsoir'
   const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
   /* Le salut est le TITRE de la page. La main reste : c'est elle qui distingue
      un bonjour d'une simple étiquette. */

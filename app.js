@@ -12565,8 +12565,10 @@ function initialesEtab(nom) {
 }
 
 function rondEtabHtml(e, estActif, attributs) {
+  /* `urlLogo` et non l'adresse brute : la base peut contenir un chemin seul,
+     auquel cas `src` chercherait à la racine du site. */
   const dedans = e.logo_url
-    ? `<img src="${escapeHtml(e.logo_url)}" alt="">`
+    ? `<img src="${escapeHtml(urlLogo(e.logo_url))}" alt="">`
     : (e.nom ? `<span class="ini">${escapeHtml(initialesEtab(e.nom))}</span>` : '')
   const classes = 'rond-ent' + (estActif ? ' actif' : '') + (e.logo_url ? ' a-logo' : '')
   return `<button type="button" class="${classes}" ${attributs}>${dedans}</button>`
@@ -12715,8 +12717,14 @@ function peindreListeEtab() {
        adresse doit être signée, ce que fait `signerMedias` après coup. J'avais
        posé le chemin brut dans `src` — le navigateur cherchait un fichier à la
        racine du site, ne trouvait rien, et le cercle restait vide. */
+    /* PAS DE `data-fichier` ICI. Ce mécanisme signe les adresses en cherchant
+       dans `procedo-videos` — le dépôt privé des vidéos. Le logo vit dans
+       `procedo-logos`, qui est PUBLIC : la signature n'y trouvait rien, et mon
+       repli affichait les initiales à la place de l'image.
+
+       Un dépôt public sert son adresse telle quelle. On la pose directement. */
     b.innerHTML = e.logo_url
-      ? `<img data-fichier="${escapeHtml(cheminFichier(e.logo_url))}" alt="">`
+      ? `<img src="${escapeHtml(urlLogo(e.logo_url))}" alt="">`
       : `<span>${escapeHtml(init)}</span>`
     /* Un appui bascule ; un appui LONG ouvre la fiche pour renommer ou changer
        le logo. Le geste court est celui qu'on fait vingt fois, le long celui
@@ -12736,10 +12744,6 @@ function peindreListeEtab() {
     })
     rang.insertBefore(b, plus)
   })
-
-  /* Les logos sont privés : on demande leurs adresses signées maintenant que
-     les images sont dans la page. */
-  signerMedias(rang)
 
   /* Le « + » disparaît au plafond : proposer une création qu'on refusera
      ensuite est pire que ne rien proposer. */
@@ -12893,8 +12897,11 @@ function peindreBarreEtablissements() {
   zone.innerHTML = liste.map(e => {
     const init = (e.nom || '?').trim().split(/\s+/).slice(0, 2)
       .map(m => m[0]).join('').toUpperCase()
+    /* `cheminFichier` rendait le chemin NU, pas une adresse : le navigateur
+       cherchait le fichier à la racine du site. Le dépôt des logos est public,
+       `urlLogo` en construit l'adresse complète. */
     const dedans = e.logo_url
-      ? `<img src="${escapeHtml(cheminFichier(e.logo_url))}" alt="">`
+      ? `<img src="${escapeHtml(urlLogo(e.logo_url))}" alt="">`
       : `<span class="rond-init">${escapeHtml(init)}</span>`
     return `
       <button type="button" class="rond-etab${e.id === courant ? ' actif' : ''}"
@@ -15400,6 +15407,19 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
 const SIGNATURE_DUREE = 3600            // une heure
 const signatures = new Map()            // chemin → { url, expire }
 
+/* ═══ L'ADRESSE D'UN LOGO ═══
+
+   `procedo-logos` est PUBLIC, contrairement à `procedo-videos` : son adresse
+   se construit et ne se signe pas. On accepte les deux formes stockées en
+   base — une adresse complète héritée, ou un simple chemin. */
+function urlLogo(valeur) {
+  if (!valeur) return ''
+  const v = String(valeur)
+  if (v.startsWith('http')) return v
+  const { data } = supabase.storage.from('procedo-logos').getPublicUrl(v)
+  return data?.publicUrl || ''
+}
+
 function cheminFichier(valeur) {
   if (!valeur) return null
   const v = String(valeur)
@@ -15444,17 +15464,7 @@ async function signerMedias(racine) {
     const url = await urlSignee(el.getAttribute('data-fichier'))
     if (url) el.src = url
     else {
-      /* Le fichier a disparu du dépôt. On retire le cadre qui l'entourait —
-         sauf pour un cercle d'établissement, où l'on rend la main aux
-         initiales : effacer l'image y laisserait un rond vide, alors que le
-         nom, lui, existe toujours. */
-      const rond = el.closest('.etab-rond')
-      if (rond) {
-        const nom = rond.getAttribute('aria-label') || '?'
-        const init = nom.trim().split(/\s+/).slice(0, 2).map(m => m[0]).join('').toUpperCase()
-        rond.innerHTML = `<span>${escapeHtml(init)}</span>`
-        return
-      }
+      /* Le fichier a disparu du dépôt : on retire le cadre qui l'entourait. */
       el.closest('.detail-step-img, .analyse-couv, .step-img-vignette')?.remove()
     }
   }))

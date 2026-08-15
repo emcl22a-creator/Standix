@@ -151,20 +151,17 @@
        mesurée plus haut : là où il n'y a pas de zone sûre, l'écart est le même
        en bas qu'à gauche et à droite. */
     bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
-    /* ═══ LA MÊME LARGEUR QUE LES BLOCS ═══
+    /* ═══ EXACTEMENT COMME SUR TÉLÉPHONE ═══
 
-       La barre se calait sur la FENÊTRE, les blocs sur la COLONNE. Sur
-       téléphone les deux coïncidaient à peu près ; sur un écran large la barre
-       faisait 520 px pour des blocs de 420, et débordait de cinquante pixels
-       de chaque côté. Deux pièces posées l'une sous l'autre, mal alignées.
+       `100vw` seul faisait 1 394 px sur un écran de bureau : la barre prenait
+       520 px pendant que la colonne en faisait 460, et elle débordait des
+       blocs. Le plafond descend à 414 — la colonne moins les 46 px d'air que
+       la barre garde toujours sur les côtés.
 
-       Elle suit maintenant la colonne : sa largeur moins les 20 px de marge
-       intérieure de chaque côté. Un bloc et la barre commencent et finissent
-       exactement au même endroit, quel que soit l'écran.
-
-       `100vw - 46px` reste comme plancher : sur un téléphone étroit, la colonne
-       occupe tout, et il faut bien garder un peu d'air sur les côtés. */
-    width:min(calc(100vw - 46px), calc(var(--col-max, 460px) - 40px));
+       Sur un téléphone rien ne change : `100vw - 46` vaut 356 sur un écran de
+       402, et reste plus petit que 414. La règle est la même partout, c'est la
+       largeur de l'écran qui décide. */
+    width:min(calc(100vw - 46px), 414px);
     height:var(--bar-h);
     margin-left:0;
     transform:translateX(-50%) scale(1) translateZ(0);

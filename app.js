@@ -46,48 +46,39 @@ async function ensureQRCode() {
   return QRCode
 }
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE BANDEAU DE BUREAU
+   LA CARTE DE BUREAU
 
-   Il n'apparaît que sur un grand écran, une seule fois, et se ferme pour de
-   bon. Le code QR est dessiné À LA DEMANDE — la bibliothèque ne se charge que
-   si le bandeau doit s'afficher, donc jamais sur un téléphone.
+   Dans l'angle, au-dessus de 900 px. Elle n'empêche rien : l'app reste celle
+   du téléphone, entière.
+
+   Le code mène à la PAGE DE CONNEXION — l'adresse du site sans rien d'autre.
+   Sur son téléphone, la personne n'est probablement pas connectée : l'envoyer
+   sur une page interne la ferait rebondir sans comprendre.
    ═══════════════════════════════════════════════════════════════════════════ */
-async function poserBandeauBureau() {
-  const el = document.getElementById('pc-bandeau')
-  if (!el) return
-
-  /* Fermé une fois, fermé pour toujours. Quelqu'un qui travaille sciemment sur
-     ordinateur n'a pas à refuser le même conseil chaque matin. */
-  let refuse = false
-  try { refuse = localStorage.getItem('procedo_pc_bandeau') === 'non' } catch (e) {}
-  if (refuse || window.innerWidth < 900) return
-
-  el.hidden = false
-  document.body.classList.add('a-bandeau-pc')
-
-  document.getElementById('pc-fermer')?.addEventListener('click', () => {
-    el.hidden = true
-    document.body.classList.remove('a-bandeau-pc')
-    try { localStorage.setItem('procedo_pc_bandeau', 'non') } catch (e) {}
-  })
+async function poserCarteBureau() {
+  const el = document.getElementById('pc-coin')
+  if (!el || window.innerWidth < 900) return
 
   try {
     const QR = await ensureQRCode()
     const toile = document.createElement('canvas')
-    /* L'adresse EN COURS, pas l'accueil : on reprend où l'on en était. */
-    await QR.toCanvas(toile, location.href, {
-      width: 96, margin: 0,
-      color: { dark: '#F5F5F7', light: '#00000000' },
+    /* La racine du site, pas `location.href` : c'est là que se trouve l'écran
+       de connexion. */
+    const adresse = location.origin + location.pathname.replace(/[^/]*$/, '')
+    await QR.toCanvas(toile, adresse, {
+      width: 132, margin: 0,
+      color: { dark: '#0C0D0E', light: '#F5F5F7' },
     })
     document.getElementById('pc-qr')?.replaceChildren(toile)
+    el.hidden = false
   } catch (e) {
-    /* Sans code, le bandeau n'a plus rien à offrir : on le retire plutôt que
-       de laisser un carré vide à côté d'un texte qui parle de scanner. */
-    console.warn('[bandeau] code QR indisponible :', e.message)
-    el.hidden = true
-    document.body.classList.remove('a-bandeau-pc')
+    /* Sans code, la carte demanderait de scanner quelque chose qui n'existe
+       pas. On ne l'affiche pas du tout. */
+    console.warn('[bureau] code QR indisponible :', e.message)
   }
 }
+
+poserCarteBureau()
 
 async function ensureJsQR() {
   if (!jsQRLib) {
@@ -898,10 +889,6 @@ setTimeout(() => {
 function afficherBarre(montrer) {
   const b = document.getElementById('bar')
   if (b) b.style.display = montrer ? '' : 'none'
-  /* Le bandeau de bureau attend que l'app soit ouverte : l'afficher sur l'écran
-     de connexion parlerait d'un espace où l'on n'est pas encore entré. */
-  if (montrer) poserBandeauBureau()
-
   /* La barre vient d'apparaître : si un changement d'espace avait été demandé
      pendant qu'elle était masquée, il n'a rien pu faire — sa largeur valait
      zéro. On le rejoue maintenant, la mesure est possible. */
@@ -12259,11 +12246,29 @@ const OFFRES = [
   /* Le prix mensuel est celui qu'on affiche ; l'annuel se règle en une fois et
      revient à vingt pour cent de moins.
 
-     Le prix par membre BAISSE à chaque palier — 9,80 €, 6,60 €, 5,97 €, 4,99 €.
+     Le prix par membre BAISSE à chaque palier — 13,80 €, 6,60 €, 5,97 €, 4,99 €.
      C'est ce qui donne envie de monter : le client y gagne toujours, et nos
      coûts ne suivent pas la même pente puisque le nombre d'analyses double
-     quand les membres triplent. */
-  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,   analyses: 30,  prix: 49,  an: 468,  stripe: true },
+     quand les membres triplent.
+
+     ═══ POURQUOI ESSENTIEL EST À 69 ET NON 49 ═══
+
+     Une analyse coûte 0,71 € — cinq minutes de vidéo au tarif d'Azure, le
+     plafond que l'app accepte. Trente analyses par mois font donc 21,45 € de
+     coût variable.
+
+     À 49 € payés à l'année, avec la remise de 20 %, la recette tombait à 39 €
+     par mois pendant que le coût restait le même : le pire cas était NÉGATIF
+     de 52 € sur l'année. La remise réduit ce qu'on encaisse, jamais ce qu'on
+     dépense.
+
+     À 69 €, ce même pire cas rapporte 137 €. L'écart avec Équipe se creuse —
+     13,80 € par membre contre 6,60 — et c'est tant mieux : il rend le passage
+     à l'offre supérieure évident.
+
+     Les trois autres paliers ne bougent pas. Ils étaient déjà largement
+     positifs, et 99 € est un prix qu'un patron décide seul. */
+  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,   analyses: 30,  prix: 69,  an: 660,  stripe: true },
   { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,  analyses: 60,  prix: 99,  an: 948,  stripe: true },
   { cle: 'pro',        nom: 'Pro',        max: 40,  analyses: 120, prix: 239, an: 2268, stripe: true },
   { cle: 'reseau',     nom: 'R\u00e9seau',     max: 100, analyses: 250, prix: 499, an: 4788, stripe: true },

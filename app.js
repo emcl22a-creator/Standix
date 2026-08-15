@@ -1959,8 +1959,6 @@ function peindreReglages() {
      dont l'offre le permet : ailleurs elle n'aurait rien à montrer. */
   const ne = (mesEtablissements || []).length
   const montrer = ne > 0 && multiSitesAutorise()
-  if (el('reg-ligne-etabs')) el('reg-ligne-etabs').style.display = montrer ? 'flex' : 'none'
-  if (el('reg-filet-etabs')) el('reg-filet-etabs').style.display = montrer ? 'block' : 'none'
   if (el('reg-nb-etabs')) {
     el('reg-nb-etabs').textContent = ne > 1 ? `${ne} \u00e9tablissements` : '1 \u00e9tablissement'
   }
@@ -12681,43 +12679,75 @@ async function chargerEtablissements() {
 
 /* La même liste dans les réglages, pour changer un logo plus tard. Chaque ligne
    ouvre la fenêtre déjà remplie : c'est le même écran que la création. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ÉTABLISSEMENTS, DANS LA CARTE DES RÉGLAGES
+
+   Une rangée de cercles et un « + » au bout. Plus de page séparée : la liste
+   tenait sur trois lignes, elle ne méritait pas un écran.
+
+   Le cercle de l'établissement COURANT porte l'ambre ; les autres restent en
+   retrait. Sans cela, rien ne dirait où l'on est — et toucher un cercle
+   bascule vers cet établissement.
+   ═══════════════════════════════════════════════════════════════════════════ */
 function peindreListeEtab() {
-  const el = document.getElementById('etab-liste')
-  if (!el) return
+  const rang = document.getElementById('etab-rang')
+  const plus = document.getElementById('etab-ajouter')
+  const note = document.getElementById('etab-note')
+  if (!rang || !plus) return
 
-  if (!multiSitesAutorise() || !mesEtablissements.length) {
-    el.innerHTML = ''
-    return
+  const liste = mesEtablissements || []
+  const courant = currentMembre?.entreprise_id
+
+  /* On efface les cercles, jamais le « + » : il est dans le balisage, et le
+     recréer à chaque peinture lui ferait perdre son écouteur. */
+  rang.querySelectorAll('[data-etab]').forEach(n => n.remove())
+
+  liste.forEach(e => {
+    const init = (e.nom || '?').trim().split(/\s+/).slice(0, 2)
+      .map(m => m[0]).join('').toUpperCase()
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'etab-rond' + (e.id === courant ? ' actif' : '')
+    b.dataset.etab = e.id
+    b.title = e.nom || ''
+    b.setAttribute('aria-label', e.nom || 'Établissement')
+    b.innerHTML = e.logo_url
+      ? `<img src="${escapeHtml(cheminFichier(e.logo_url))}" alt="">`
+      : `<span>${escapeHtml(init)}</span>`
+    /* Un appui bascule ; un appui LONG ouvre la fiche pour renommer ou changer
+       le logo. Le geste court est celui qu'on fait vingt fois, le long celui
+       qu'on fait une fois. */
+    let minuteur = null, longue = false
+    b.addEventListener('pointerdown', () => {
+      longue = false
+      minuteur = setTimeout(() => { longue = true; ouvrirFenetreEtab(e.id) }, 550)
+    })
+    const stop = () => { if (minuteur) { clearTimeout(minuteur); minuteur = null } }
+    b.addEventListener('pointerup', stop)
+    b.addEventListener('pointerleave', stop)
+    b.addEventListener('pointercancel', stop)
+    b.addEventListener('click', () => {
+      if (longue) return
+      if (e.id !== courant) basculerVersEtablissement(e.id)
+    })
+    rang.insertBefore(b, plus)
+  })
+
+  /* Le « + » disparaît au plafond : proposer une création qu'on refusera
+     ensuite est pire que ne rien proposer. */
+  const plein = liste.length >= ETABLISSEMENTS_MAX
+  plus.style.display = plein ? 'none' : ''
+  if (note) {
+    note.innerHTML = plein
+      ? `Vous g\u00e9rez ${ETABLISSEMENTS_MAX} \u00e9tablissements, le maximum par compte.`
+      : 'Cr\u00e9er un \u00e9tablissement est <b>gratuit</b>. Les membres des deux '
+        + '\u00e9tablissements s\u2019additionnent sur votre abonnement : une fois le '
+        + 'nombre atteint, plus personne ne peut rejoindre l\u2019un ou l\u2019autre.'
   }
-
-  el.innerHTML = mesEtablissements.map(e => {
-    const actif = e.id === currentMembre?.entreprise_id
-    const rond = rondEtabHtml(e, false, '')
-      .replace('<button type="button"', '<span').replace('</button>', '</span>')
-    return `
-    <button type="button" class="etab-ligne" data-etab-edit="${e.id}">
-      ${rond}
-      <span class="tx">
-        <span class="nm">${escapeHtml(e.nom)}${actif ? '<span class="ici">actif</span>' : ''}</span>
-        <span class="st">${e.logo_url
-          ? 'Logo d\u00e9pos\u00e9 \u00b7 <b>le remplacer</b>'
-          : `Initiales <b>${escapeHtml(initialesEtab(e.nom))}</b> \u00b7 <b>ajouter un logo</b>`}</span>
-      </span>
-      <span class="fl">\u203a</span>
-    </button>`
-  }).join('') + `
-    <button type="button" class="etab-ligne ajout" data-etab-plus>
-      <span class="rond-ent plus"><span class="ini">+</span></span>
-      <span class="tx"><span class="nm">Ajouter un \u00e9tablissement</span>
-      <span class="st">Son nom et son logo</span></span>
-    </button>`
 }
 
-document.getElementById('etab-liste')?.addEventListener('click', (e) => {
-  const l = e.target.closest('[data-etab-edit]')
-  if (l) { ouvrirFenetreEtab(l.dataset.etabEdit); return }
-  if (e.target.closest('[data-etab-plus]')) ouvrirFenetreEtab(null)
-})
+document.getElementById('etab-ajouter')?.addEventListener('click', () => ouvrirFenetreEtab(null))
+
 
 function peindreTiroir() {
   const tiroir = elementTiroir()

@@ -5920,3 +5920,75 @@ body.plus-vu .plus-flot{
 
 /* L'étape monte vers le rappel en s'effaçant : c'est là qu'elle se range. */
 #detail-steps .detail-step.et-part{ transform:translateY(-26px) scale(0.94); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RIEN, PUIS TOUT
+
+   Pendant le chargement l'écran ne montre que ses halos : ni barre du haut, ni
+   barre du bas, ni contenu. Puis tout paraît ENSEMBLE.
+
+   C'est un choix contre l'affichage progressif. Montrer la charpente d'abord,
+   puis la remplir, donnait trois états successifs — une page à moitié
+   construite, des cadres vides, enfin le contenu. Trois choses à regarder pour
+   une seule arrivée.
+
+   `opacity` et non `display` : les éléments gardent leur place, donc leurs
+   dimensions sont mesurables. La barre du bas en a besoin — son calcul de
+   géométrie lit sa largeur, et sur un élément masqué elle vaut zéro. C'est
+   exactement le défaut qui empilait les onglets à gauche.
+
+   Les deux espaces partagent cette règle : rien ne les distingue au démarrage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#gestion-app, #equipe-app, #bar{
+  transition:opacity 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+body.chargement #gestion-app,
+body.chargement #equipe-app,
+body.chargement #bar{
+  /* `!important` ET `animation:none`. Les deux espaces portent une animation
+     d'entrée propre (`app-shell-in`), et une animation l'emporte TOUJOURS sur
+     une déclaration ordinaire : le voile ne tenait que sur la barre, l'app
+     passait au travers et se montrait pendant le chargement.
+
+     On coupe donc l'animation pendant l'attente. C'est le voile qui fait
+     l'entrée, une seule fois, pour tout le monde en même temps. */
+  opacity:0 !important;
+  animation:none !important;
+  pointer-events:none;
+}
+@media (prefers-reduced-motion: reduce){
+  #gestion-app, #equipe-app, #bar{ transition:none; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'INVITE SOUS « ÉCRIVEZ-NOUS »
+
+   La carte entière est cliquable, mais rien ne le disait : pas de bouton, pas
+   de chevron, juste un titre et un paragraphe — donc rien qui ressemble à une
+   commande. On peut la lire dix fois sans penser à la toucher.
+
+   Une main qui appuie et trois mots règlent ça. L'ambre parce que c'est le
+   seul geste de la carte : ailleurs sur cette page, l'ambre marque déjà ce
+   qu'on peut faire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.contact-invite{
+  display:inline-flex; align-items:center; gap:7px;
+  margin-top:12px;
+  font-size:12.5px; font-weight:650; letter-spacing:-0.01em;
+  color:#FFAD33;
+}
+.contact-invite svg{ width:17px; height:17px; flex-shrink:0; display:block; }
+
+/* La main appuie, doucement et sans fin. Deux pixels : assez pour attirer
+   l'œil de biais, trop peu pour qu'on la regarde. */
+.contact-invite svg{ animation:mainAppuie 2.6s ease-in-out infinite; }
+@keyframes mainAppuie{
+  0%, 62%, 100% { transform:translateY(0); }
+  72%           { transform:translateY(2px); }
+  82%           { transform:translateY(0); }
+}
+@media (prefers-reduced-motion: reduce){
+  .contact-invite svg{ animation:none; }
+}

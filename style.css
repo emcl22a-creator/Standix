@@ -4893,11 +4893,21 @@
      écran, coupé sur un petit. La variable est posée au rendu, à partir de la
      position réelle de la grille et de la hauteur réelle de la barre.
      `dvh` plutôt que `vh` : sur téléphone, `vh` ignore la barre d'adresse. */
+  /* LE BLOC OCCUPE LA PLACE ENTRE LES FILTRES ET LA BARRE, et son contenu s'y
+     centre. Le rembourrage du bas tient compte du bouton + flottant : sans
+     lui, la dernière ligne passait DESSOUS et devenait illisible — c'est ce
+     qu'on voyait sur la page vide.
+
+     84 px : la hauteur du bouton plus sa marge, et de quoi respirer. */
   .debut{
     grid-column:1/-1; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center;
-    min-height:var(--debut-h, calc(100dvh - 300px)); padding:20px 20px 8px;
+    min-height:var(--debut-h, calc(100dvh - 300px));
+    padding:20px 20px 84px;
   }
+  /* La consigne finale, plus discrète que le paragraphe : c'est une indication
+     de geste, pas une explication. */
+  .debut .fleche b{ color:#FFAD33; font-weight:800; }
   .debut-dessin{ position:relative; width:132px; height:120px; margin-bottom:26px; }
   .debut-dessin .lueur{
     position:absolute; left:50%; top:52%; transform:translate(-50%,-50%);

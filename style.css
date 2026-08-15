@@ -89,7 +89,7 @@
 
   /* `100vh` dépasse l'écran réellement visible sur téléphone : il ignore la barre
      d'adresse. La page était donc TOUJOURS plus haute que l'écran, même avec deux
-     catégories, d'où ce grand vide sous la barre d'onglets. `100dvh` suit la
+     dossiers, d'où ce grand vide sous la barre d'onglets. `100dvh` suit la
      hauteur réellement disponible.
 
      Le dégagement du bas est porté par l'écran, pas par l'app : ici il
@@ -280,7 +280,7 @@
 
   /* Le bas réserve exactement la place de la barre d'onglets : sa hauteur, son
      décalage, et un peu d'air. Rien de plus — c'est constant, quel que soit le
-     nombre de catégories, puisque la barre ne change pas de taille. Le contenu,
+     nombre de dossiers, puisque la barre ne change pas de taille. Le contenu,
      lui, pousse naturellement. */
   /* La barre du bas mesure 54,5 px et flotte à 20 px du bord : il faut dégager
      au moins 75 px, plus une marge d'air. Le compte était trop juste, et le
@@ -915,7 +915,7 @@
   .doc-page.saisie{ opacity:0.55; transform:scale(0.98); }
   .doc-photo-plus{ margin-top:4px !important; }
 
-  /* La catégorie remonte sur la ligne du titre. Elle en dit le contexte, pas
+  /* La dossier remonte sur la ligne du titre. Elle en dit le contexte, pas
      autre chose : la mettre en dessous lui donnait le poids d'une phrase. */
   .detail-header:has(+ .titre-cat){ margin-bottom:0; }
   .titre-cat{
@@ -1119,7 +1119,7 @@
   .an-trois .l{ font-size:11px; color:var(--label-3); font-weight:600; margin-top:4px; }
 
   /* ═══ Chaque section dans sa carte ═══
-     Mêmes valeurs qu'une tuile de catégorie sur la page des procédures : même
+     Mêmes valeurs qu'une tuile de dossier sur la page des procédures : même
      fond, même liseret, même rayon de 16. Les deux pages emploient ainsi le
      même objet, et l'œil n'a qu'une grammaire à apprendre. */
   .an-bloc{
@@ -1154,7 +1154,7 @@
     display:flex; align-items:center; gap:10px;
     margin:32px 0 2px; padding-top:20px; border-top:0.5px solid var(--border);
   }
-  /* La même plaque que les cartes de catégorie : une seule matière pour tout
+  /* La même plaque que les cartes de dossier : une seule matière pour tout
      ce qui porte une icône dans l'app. */
   .an-ic{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
@@ -1533,7 +1533,7 @@
   .emp-roue .s b{ color:#fff; font-weight:650; }
   .emp-liste .an-lig .pt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
-  /* La même barre que la recherche d'une catégorie, avec son bouton à côté. */
+  /* La même barre que la recherche d'une dossier, avec son bouton à côté. */
   /* La liste des postes, dans la fenêtre d'arrivée. Des lignes pleine largeur :
      on choisit du doigt, dans une cuisine, souvent debout. */
   /* La fenêtre du choix de poste. */
@@ -1700,7 +1700,7 @@
   }
 
   /* Un pavé gris pleine largeur pesait autant que la liste qu'il prolonge.
-     C'est devenu une ligne d'appel, comme le pied des cartes de catégorie :
+     C'est devenu une ligne d'appel, comme le pied des cartes de dossier :
      un libellé, un chevron, un filet au-dessus. */
   .an-plus{
     display:flex; align-items:center; gap:7px; width:100%;
@@ -2884,7 +2884,7 @@
   /* La tuile reprend le verre de l'app plutôt que les aplats colorés d'iOS, et
      le glyphe est dessiné au trait comme les icônes de création : contour de
      devant à 78 %, second plan à 32 %. */
-  /* La même plaque que partout : catégories, sections d'analyse, réglages.
+  /* La même plaque que partout : dossiers, sections d'analyse, réglages.
      Une seule matière pour tout ce qui porte une icône. */
   .reg-ic{
     width:34px; height:34px; border-radius:11px; flex-shrink:0;
@@ -3665,7 +3665,7 @@
 
   .section-title{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--label-2); margin:20px 0 10px; }
   /* ═══ Pourquoi pas de `backdrop-filter` ici ═══
-     Ces classes couvrent les cartes de catégories, de procédures, les lignes
+     Ces classes couvrent les cartes de dossiers, de procédures, les lignes
      d'employés : sur un seul écran, ça fait dix à vingt éléments. Chacun
      obligeait Safari à photographier le fond, le flouter sur 20px et le
      resaturer — par-dessus trois halos déjà flous et en mouvement. C'est ce
@@ -3690,7 +3690,7 @@
     animation:cardIn 0.45s cubic-bezier(0.32,0.72,0,1) both;
   }
 
-  /* La sortie. Une catégorie qui s'efface parce que sa dernière procédure part
+  /* La sortie. Une dossier qui s'efface parce que sa dernière procédure part
      doit se voir partir — sinon on doute d'avoir supprimé la bonne chose. */
   /* Le départ ANNULE l'arrivée.
 
@@ -4115,7 +4115,7 @@
   }
   .cat-rank.premier .pos{ background:#fff; color:#000; }
   /* Les lignes du temps de lecture s'ouvrent : on le montre à l'appui, comme
-     partout ailleurs dans l'app. Les catégories, elles, ne bougent pas. */
+     partout ailleurs dans l'app. Les dossiers, elles, ne bougent pas. */
   .cat-rank.cliquable{ cursor:pointer; transition:transform 0.16s, background 0.2s; }
   .cat-rank.cliquable:active{ transform:scale(0.985); background:rgba(255,255,255,0.07); }
   .cat-rank .infos{ flex:1; min-width:0; }
@@ -4674,7 +4674,7 @@
   /* ═══════════════════════════════════════════════════════════════════════
      LA CARTE D'UNE PROCÉDURE
 
-     Même grammaire que la catégorie : la plaque à gauche, le nom, un filet, et
+     Même grammaire que la dossier : la plaque à gauche, le nom, un filet, et
      un pied. Ce qui change, c'est ce que dit le pied — ici le suivi de lecture,
      la seule chose qu'un gérant vient vérifier.
 
@@ -5336,7 +5336,7 @@
    maintenant les mêmes, ceux du reste de l'app.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Le rayon des cartes : 20, comme les catégories, les blocs d'analyse et les
+/* Le rayon des cartes : 20, comme les dossiers, les blocs d'analyse et les
    groupes de réglages. */
 #p-reg-compte .card, #p-reg-code .card, #p-reg-etabs .card{ border-radius:20px; }
 
@@ -5838,7 +5838,7 @@ body.plus-vu .plus-flot{
 }
 
 
-/* La pastille « pas encore lu » sur un titre de la carte de catégorie, côté
+/* La pastille « pas encore lu » sur un titre de la carte de dossier, côté
    équipe. Un point, pas un mot : la ligne est déjà serrée, et le seul fait
    qu'il y ait quelque chose suffit à dire qu'il reste à faire. */
 .cat-neuf{
@@ -6085,3 +6085,33 @@ body.chargement #bar{
   margin-top:13px; font-size:12px; line-height:1.5; color:var(--label-3);
 }
 .etab-note b{ color:var(--label-2); font-weight:700; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CHANGER D'ENTREPRISE
+
+   Le contenu s'écarte, puis le nouveau arrive en cascade — cette seconde
+   moitié existait déjà (`contenu-entre`), il manquait la première.
+
+   L'écran RECULE en s'effaçant : trois pour cent, pas davantage. C'est ce que
+   fait iOS quand une vue passe au second plan, et c'est ce mouvement — pas le
+   fondu — qui dit qu'on quitte quelque chose plutôt qu'on l'efface.
+
+   Les deux barres ne bougent pas. Elles ne changent pas d'entreprise : elles
+   encadrent celle qu'on regarde.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.screen.bascule-part{
+  opacity:0;
+  transform:scale(0.97);
+  transition:opacity 0.18s ease-out,
+             transform 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+  pointer-events:none;
+}
+/* Le retour se fait par `contenu-entre`, en cascade. On rend seulement sa
+   transition à l'écran pour qu'il revienne à sa taille sans à-coup. */
+.screen{ transition:opacity 0.18s ease-out, transform 0.18s cubic-bezier(0.32,0.72,0,1); }
+
+@media (prefers-reduced-motion: reduce){
+  .screen.bascule-part{ transition:none; }
+  .screen{ transition:none; }
+}

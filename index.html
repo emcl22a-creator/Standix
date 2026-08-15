@@ -151,17 +151,9 @@
        mesurée plus haut : là où il n'y a pas de zone sûre, l'écart est le même
        en bas qu'à gauche et à droite. */
     bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
-    /* ═══ EXACTEMENT COMME SUR TÉLÉPHONE ═══
-
-       `100vw` seul faisait 1 394 px sur un écran de bureau : la barre prenait
-       520 px pendant que la colonne en faisait 460, et elle débordait des
-       blocs. Le plafond descend à 414 — la colonne moins les 46 px d'air que
-       la barre garde toujours sur les côtés.
-
-       Sur un téléphone rien ne change : `100vw - 46` vaut 356 sur un écran de
-       402, et reste plus petit que 414. La règle est la même partout, c'est la
-       largeur de l'écran qui décide. */
-    width:min(calc(100vw - 46px), 414px);
+    /* 520 px de plafond, comme à l'origine. Sur un téléphone il ne sert
+       jamais : `100vw - 46` vaut 356 sur un écran de 402. */
+    width:min(calc(100vw - 46px), 520px);
     height:var(--bar-h);
     margin-left:0;
     transform:translateX(-50%) scale(1) translateZ(0);
@@ -233,31 +225,6 @@
 </style>
 </head>
 <body class="booting chargement">
-
-<!-- ═══ LE BANDEAU DE BUREAU ═══
-
-     Procédo est fait pour le téléphone : on filme un geste, on scanne un code
-     au mur, on coche une étape entre deux services. Sur un ordinateur, tout
-     cela est possible mais aucun ne va de soi.
-
-     Un bandeau, pas une page bloquante. Le gérant qui a un clavier voudra
-     s'en servir pour rédiger trente titres de procédures — le lui interdire
-     serait lui retirer le seul appareil confortable pour ce travail.
-
-     Il ne s'affiche qu'au-dessus de 900 px, et disparaît définitivement quand
-     on le ferme. Le code QR pointe vers l'adresse EN COURS : on reprend là
-     où l'on en était, pas à l'accueil. -->
-<div class="pc-bandeau" id="pc-bandeau" hidden>
-  <div class="pc-qr" id="pc-qr"></div>
-  <div class="pc-txt">
-    <b>Procédo est fait pour le téléphone</b>
-    <span>Scannez ce code pour continuer sur le vôtre — vous reprendrez sur cette page.</span>
-  </div>
-  <button type="button" class="pc-fermer" id="pc-fermer" aria-label="Fermer">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-         stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-  </button>
-</div>
 
 <div class="color-halos">
   <div class="chalo chalo-4"></div>

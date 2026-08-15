@@ -510,52 +510,48 @@
 
          C'est une hypothèse, pas une mesure — aucun usage réel ne l'appuie
          encore. À revoir dès qu'on saura ce que les gens choisissent. -->
+      <!-- L'ORDRE DIT CE QU'ON RECOMMANDE.
+
+           « L'IA découpe la vidéo » passe en tête : c'est la raison d'être de
+           Procédo, et c'est ce qu'on veut que le gérant essaie en premier. Les
+           « Étapes manuelles » ferment la marche — c'est le recours, pas la
+           promesse.
+
+           « Vous découpez, l'IA rédige » est retiré : entre laisser l'IA tout
+           faire et tout écrire soi-même, ce troisième chemin demandait de
+           comprendre une nuance avant même d'avoir essayé. Quatre choix sur un
+           premier écran, c'est un de trop. -->
+      <div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
+        <div class="mode-choice-row">
+          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="11" y="6" width="27" height="20" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="5" y="12" width="27" height="20" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2"></rect><circle cx="18.5" cy="22" r="5.6" stroke="url(#iaFini)" stroke-width="2"></circle><path d="m16.6 19.4 4.4 2.6-4.4 2.6z" fill="url(#iaFini)"></path></svg></div>
+          <div class="mode-choice-text">
+            <div class="mode-choice-title">L'IA découpe la vidéo</div>
+            <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes · 5 min maximum</div>
+          </div>
+          <div class="mode-choice-arrow">›</div>
+        </div>
+      </div>
+      <div class="card mode-choice-card disabled" onclick="goToCreateMode('doc')" id="mode-card-doc">
+        <div class="mode-choice-row">
+          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M17 4h10l7 7v15a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M10 10h10l7.5 7.5V33a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><path d="M20 10v7.5h7.5" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><line x1="15" y1="24" x2="23" y2="24" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line><line x1="15" y1="29" x2="20" y2="29" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line></svg></div>
+          <div class="mode-choice-text">
+            <div class="mode-choice-title">L'IA découpe un document</div>
+            <div class="mode-choice-desc">Collez un texte, ou déposez un PDF ou un Word</div>
+          </div>
+          <div class="mode-choice-arrow">›</div>
+        </div>
+      </div>
       <div class="card mode-choice-card disabled" onclick="goToCreateMode('manual')" id="mode-card-manual">
-      <div class="mode-choice-row">
-        <!-- Pas de marque IA ici : c'est le seul mode où personne n'intervient
-             à votre place. -->
-        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M14 5h11l7 7v14a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M8 11h11l7 7v14a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path><path d="M19 11v7h7" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path><line x1="13" y1="24" x2="21" y2="24" stroke="rgba(255,255,255,0.42)" stroke-width="1.9" stroke-linecap="round"></line><line x1="13" y1="29" x2="18" y2="29" stroke="rgba(255,255,255,0.16)" stroke-width="1.9" stroke-linecap="round"></line><path d="M33 21.5a2.3 2.3 0 0 1 3.3 3.3l-6.6 6.6-4.3 1 1-4.3z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path></svg></div>
-        <div class="mode-choice-text">
-          <div class="mode-choice-title">Étapes manuelles</div>
-          <div class="mode-choice-desc">Écrivez chaque étape vous-même</div>
+        <div class="mode-choice-row">
+          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M14 5h11l7 7v14a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M8 11h11l7 7v14a3 3 0 0 1-3 3H11a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path><path d="M19 11v7h7" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path><line x1="13" y1="24" x2="21" y2="24" stroke="rgba(255,255,255,0.42)" stroke-width="1.9" stroke-linecap="round"></line><line x1="13" y1="29" x2="18" y2="29" stroke="rgba(255,255,255,0.16)" stroke-width="1.9" stroke-linecap="round"></line><path d="M33 21.5a2.3 2.3 0 0 1 3.3 3.3l-6.6 6.6-4.3 1 1-4.3z" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="2" stroke-linejoin="round"></path></svg></div>
+          <div class="mode-choice-text">
+            <div class="mode-choice-title">Étapes manuelles</div>
+            <div class="mode-choice-desc">Écrivez chaque étape vous-même</div>
+          </div>
+          <div class="mode-choice-arrow">›</div>
         </div>
-        <div class="mode-choice-arrow">›</div>
-      </div>
-    </div><div class="card mode-choice-card disabled" onclick="goToCreateMode('video')" id="mode-card-video">
-      <div class="mode-choice-row">
-        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="10" y="5" width="28" height="18" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="4" y="11" width="28" height="18" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2"></rect><path d="m15 16 6 4-6 4z" fill="url(#iaFini)"></path><line x1="4" y1="34.5" x2="14" y2="34.5" stroke="url(#iaFini)" stroke-width="2" stroke-linecap="round"></line><line x1="18" y1="34.5" x2="26" y2="34.5" stroke="url(#iaFini)" stroke-width="2" stroke-linecap="round"></line><line x1="30" y1="34.5" x2="38" y2="34.5" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linecap="round"></line></svg></div>
-        <div class="mode-choice-text">
-          <div class="mode-choice-title">Vous découpez, l’IA rédige</div>
-          <div class="mode-choice-desc">Marquez où chaque étape s’arrête, l’IA écrit le texte</div>
-        </div>
-        <div class="mode-choice-arrow">›</div>
-      </div>
-    </div><div class="card mode-choice-card disabled" onclick="goToCreateMode('doc')" id="mode-card-doc">
-      <div class="mode-choice-row">
-        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M17 4h10l7 7v15a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M10 10h10l7.5 7.5V33a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><path d="M20 10v7.5h7.5" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><line x1="15" y1="24" x2="23" y2="24" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line><line x1="15" y1="29" x2="20" y2="29" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line></svg></div>
-        <div class="mode-choice-text">
-          <div class="mode-choice-title">L'IA découpe un document</div>
-          <div class="mode-choice-desc">Collez un texte, ou déposez un PDF ou un Word</div>
-        </div>
-        <div class="mode-choice-arrow">›</div>
-      </div>
-    </div><div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
-      <div class="mode-choice-row">
-        <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="11" y="6" width="27" height="20" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="5" y="12" width="27" height="20" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2"></rect><circle cx="18.5" cy="22" r="5.6" stroke="url(#iaFini)" stroke-width="2"></circle><path d="m16.6 19.4 4.4 2.6-4.4 2.6z" fill="url(#iaFini)"></path></svg></div>
-        <div class="mode-choice-text">
-          <div class="mode-choice-title">L'IA découpe la vidéo</div>
-          <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes · 5 min maximum</div>
-        </div>
-
-      
-
-      
-
-      
-        <div class="mode-choice-arrow">›</div>
       </div>
     </div>
-  </div>
 
   <div class="screen" id="p-create-manual">
     <div class="detail-header">

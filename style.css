@@ -5859,9 +5859,25 @@ body.plus-vu .plus-flot{
              border-color 0.3s ease, background 0.3s ease;
 }
 .detail-step.et-part{ opacity:0; overflow:hidden; }
-.detail-step.et-repli{
-  max-height:0 !important; margin-bottom:0;
-  padding-top:0; padding-bottom:0; overflow:hidden;
+/* LE REPLI DOIT ÊTRE AUSSI SPÉCIFIQUE QUE LA RÈGLE DU FIL.
+
+   Dans le fil, l'étape porte `padding:0 0 28px !important` — et ce sélecteur
+   commence par un IDENTIFIANT. Mon `.detail-step.et-repli !important` ne
+   pouvait pas l'emporter : à `!important` égal, c'est la spécificité qui
+   tranche, et un identifiant bat deux classes.
+
+   Résultat : vingt-huit pixels de rembourrage survivaient au repli et
+   laissaient une bande vide là où l'étape venait de se ranger. Très visible
+   sur les étapes à photo, dont on voyait le socle rester en place.
+
+   Les sélecteurs reprennent donc les mêmes identifiants. */
+.detail-step.et-repli,
+#detail-steps.etapes-fil .detail-step.et-repli,
+#analyse-steps-list.etapes-fil .detail-step.et-repli{
+  max-height:0 !important; overflow:hidden !important;
+  margin-top:0 !important; margin-bottom:0 !important;
+  padding-top:0 !important; padding-bottom:0 !important;
+  border-width:0 !important;
 }
 
 /* Le rappel. Il s'ouvre vers le bas quand la première étape est cochée, et se

@@ -12711,8 +12711,12 @@ function peindreListeEtab() {
     b.dataset.etab = e.id
     b.title = e.nom || ''
     b.setAttribute('aria-label', e.nom || 'Établissement')
+    /* `data-fichier` et NON `src`. Les fichiers du dépôt sont privés : leur
+       adresse doit être signée, ce que fait `signerMedias` après coup. J'avais
+       posé le chemin brut dans `src` — le navigateur cherchait un fichier à la
+       racine du site, ne trouvait rien, et le cercle restait vide. */
     b.innerHTML = e.logo_url
-      ? `<img src="${escapeHtml(cheminFichier(e.logo_url))}" alt="">`
+      ? `<img data-fichier="${escapeHtml(cheminFichier(e.logo_url))}" alt="">`
       : `<span>${escapeHtml(init)}</span>`
     /* Un appui bascule ; un appui LONG ouvre la fiche pour renommer ou changer
        le logo. Le geste court est celui qu'on fait vingt fois, le long celui
@@ -12732,6 +12736,10 @@ function peindreListeEtab() {
     })
     rang.insertBefore(b, plus)
   })
+
+  /* Les logos sont privés : on demande leurs adresses signées maintenant que
+     les images sont dans la page. */
+  signerMedias(rang)
 
   /* Le « + » disparaît au plafond : proposer une création qu'on refusera
      ensuite est pire que ne rien proposer. */
@@ -15431,7 +15439,20 @@ async function signerMedias(racine) {
     el.setAttribute('data-signe', '1')
     const url = await urlSignee(el.getAttribute('data-fichier'))
     if (url) el.src = url
-    else el.closest('.detail-step-img, .analyse-couv, .step-img-vignette')?.remove()
+    else {
+      /* Le fichier a disparu du dépôt. On retire le cadre qui l'entourait —
+         sauf pour un cercle d'établissement, où l'on rend la main aux
+         initiales : effacer l'image y laisserait un rond vide, alors que le
+         nom, lui, existe toujours. */
+      const rond = el.closest('.etab-rond')
+      if (rond) {
+        const nom = rond.getAttribute('aria-label') || '?'
+        const init = nom.trim().split(/\s+/).slice(0, 2).map(m => m[0]).join('').toUpperCase()
+        rond.innerHTML = `<span>${escapeHtml(init)}</span>`
+        return
+      }
+      el.closest('.detail-step-img, .analyse-couv, .step-img-vignette')?.remove()
+    }
   }))
 }
 

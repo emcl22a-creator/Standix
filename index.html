@@ -222,7 +222,7 @@
     transform-origin:center}
 </style>
 </head>
-<body class="booting">
+<body class="booting chargement">
 
 <div class="color-halos">
   <div class="chalo chalo-4"></div>
@@ -1435,8 +1435,12 @@
       <div id="abo-liste"></div>
     </div>
 
+    <!-- Les conditions, en bas, là où on les cherche. Le non-report est dit
+         explicitement : sans cette phrase, quelqu'un qui n'a rien créé pendant
+         six mois viendra réclamer six mois d'analyses d'un coup. -->
     <div class="note" style="text-align:center; margin-top:16px;">
-      Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.
+      Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.<br>
+      Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.
     </div>
   </div>
 
@@ -1529,6 +1533,16 @@
       <div class="accueil-texte">
         <div class="t">Écrivez-nous</div>
         <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
+        <div class="contact-invite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11.4V5.6a1.7 1.7 0 0 1 3.4 0v5.1"/>
+            <path d="M12.4 10.7V9.3a1.6 1.6 0 0 1 3.2 0v1.6"/>
+            <path d="M15.6 11V9.9a1.6 1.6 0 0 1 3.2 0v5.3a5.6 5.6 0 0 1-5.6 5.6h-1.4a5.4 5.4 0 0 1-4.3-2.1l-2.6-3.4a1.6 1.6 0 0 1 2.4-2.1L9 14.8"/>
+            <path d="M4.4 4.6 3 3.2M7.6 3.4V2M11.4 3.6l1-1.2" stroke-opacity="0.55"/>
+          </svg>
+          <span>Cliquez ici pour nous écrire</span>
+        </div>
       </div>
     </div>
 
@@ -1892,6 +1906,16 @@
       <div class="accueil-texte">
         <div class="t">Écrivez-nous</div>
         <div class="s">Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.</div>
+        <div class="contact-invite">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11.4V5.6a1.7 1.7 0 0 1 3.4 0v5.1"/>
+            <path d="M12.4 10.7V9.3a1.6 1.6 0 0 1 3.2 0v1.6"/>
+            <path d="M15.6 11V9.9a1.6 1.6 0 0 1 3.2 0v5.3a5.6 5.6 0 0 1-5.6 5.6h-1.4a5.4 5.4 0 0 1-4.3-2.1l-2.6-3.4a1.6 1.6 0 0 1 2.4-2.1L9 14.8"/>
+            <path d="M4.4 4.6 3 3.2M7.6 3.4V2M11.4 3.6l1-1.2" stroke-opacity="0.55"/>
+          </svg>
+          <span>Cliquez ici pour nous écrire</span>
+        </div>
       </div>
     </div>
 
@@ -2894,7 +2918,9 @@ const ICONS = [
    La version pleine reprend donc chaque grand carré avec son carré intérieur :
    la règle `evenodd`, déjà posée par la barre, en fait un trou. */
 const ICONE_QR = {
-  line:'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14.4 14.4h2.6v2.6h-2.6z M17.4 17.4H20V20h-2.6z M14.4 18.6h1.8V20h-1.8z M18.6 14.4H20v1.8h-1.4z',
+  /* `plein` : toujours dessine en remplissage, actif ou non. Voir `row()`. */
+  plein: true,
+  line:'M4 4h6v6H4z M6.2 6.2h1.6v1.6H6.2z M14 4h6v6h-6z M16.2 6.2h1.6v1.6h-1.6z M4 14h6v6H4z M6.2 16.2h1.6v1.6H6.2z M14.4 14.4h2.6v2.6h-2.6z M17.4 17.4H20V20h-2.6z M14.4 18.6h1.8V20h-1.8z M18.6 14.4H20v1.8h-1.4z',
   fill:'M4 4h6v6H4z M6.2 6.2h1.6v1.6H6.2z M14 4h6v6h-6z M16.2 6.2h1.6v1.6h-1.6z M4 14h6v6H4z M6.2 16.2h1.6v1.6H6.2z M14.4 14.4h2.6v2.6h-2.6z M17.4 17.4H20V20h-2.6z M14.4 18.6h1.8V20h-1.8z M18.6 14.4H20v1.8h-1.4z',
 };
 
@@ -2957,15 +2983,26 @@ const contentW = [];
 function row(el, filled) {
   const ICON_PX = Math.round(BAR_H * 0.355);
   const jeu = ICONES_DU_JEU();
-  el.innerHTML = CENTERS.map((c, i) => `
+  el.innerHTML = CENTERS.map((c, i) => {
+    /* UNE ICONE PEUT IMPOSER SON REMPLISSAGE.
+
+       La barre choisit d'ordinaire pour tout le monde : contour quand l'onglet
+       dort, plein quand il est choisi. Le QR ne s'y prete pas — un code se
+       reconnait a ses carres PLEINS, et sa version au trait n'en avait plus
+       l'air. `plein:true` le sort de la regle commune : il est dessine pareil
+       dans les deux etats, seule la couleur change. */
+    const ic = jeu[i];
+    const p = ic.plein || filled;
+    return `
     <div class="tab" data-i="${i}" style="left:${c - LENS.REST_W / 2}px;width:${LENS.REST_W}px">
       <svg width="${ICON_PX}" height="${ICON_PX}" viewBox="0 0 24 24"
-        fill="${filled ? 'currentColor' : 'none'}"
-        stroke="${filled ? 'none' : 'currentColor'}"
+        fill="${p ? 'currentColor' : 'none'}"
+        stroke="${p ? 'none' : 'currentColor'}"
         stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
-        <path d="${jeu[i][filled ? 'fill' : 'line']}"/></svg>
+        <path d="${ic[p ? 'fill' : 'line']}"/></svg>
       <span>${LABELS[i]}</span>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 row(lNorm, false);
 row(lLens, true);

@@ -45,6 +45,50 @@ async function ensureQRCode() {
   }
   return QRCode
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BANDEAU DE BUREAU
+
+   Il n'apparaît que sur un grand écran, une seule fois, et se ferme pour de
+   bon. Le code QR est dessiné À LA DEMANDE — la bibliothèque ne se charge que
+   si le bandeau doit s'afficher, donc jamais sur un téléphone.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function poserBandeauBureau() {
+  const el = document.getElementById('pc-bandeau')
+  if (!el) return
+
+  /* Fermé une fois, fermé pour toujours. Quelqu'un qui travaille sciemment sur
+     ordinateur n'a pas à refuser le même conseil chaque matin. */
+  let refuse = false
+  try { refuse = localStorage.getItem('procedo_pc_bandeau') === 'non' } catch (e) {}
+  if (refuse || window.innerWidth < 900) return
+
+  el.hidden = false
+  document.body.classList.add('a-bandeau-pc')
+
+  document.getElementById('pc-fermer')?.addEventListener('click', () => {
+    el.hidden = true
+    document.body.classList.remove('a-bandeau-pc')
+    try { localStorage.setItem('procedo_pc_bandeau', 'non') } catch (e) {}
+  })
+
+  try {
+    const QR = await ensureQRCode()
+    const toile = document.createElement('canvas')
+    /* L'adresse EN COURS, pas l'accueil : on reprend où l'on en était. */
+    await QR.toCanvas(toile, location.href, {
+      width: 96, margin: 0,
+      color: { dark: '#F5F5F7', light: '#00000000' },
+    })
+    document.getElementById('pc-qr')?.replaceChildren(toile)
+  } catch (e) {
+    /* Sans code, le bandeau n'a plus rien à offrir : on le retire plutôt que
+       de laisser un carré vide à côté d'un texte qui parle de scanner. */
+    console.warn('[bandeau] code QR indisponible :', e.message)
+    el.hidden = true
+    document.body.classList.remove('a-bandeau-pc')
+  }
+}
+
 async function ensureJsQR() {
   if (!jsQRLib) {
     await new Promise((resolve, reject) => {
@@ -854,6 +898,10 @@ setTimeout(() => {
 function afficherBarre(montrer) {
   const b = document.getElementById('bar')
   if (b) b.style.display = montrer ? '' : 'none'
+  /* Le bandeau de bureau attend que l'app soit ouverte : l'afficher sur l'écran
+     de connexion parlerait d'un espace où l'on n'est pas encore entré. */
+  if (montrer) poserBandeauBureau()
+
   /* La barre vient d'apparaître : si un changement d'espace avait été demandé
      pendant qu'elle était masquée, il n'a rien pu faire — sa largeur valait
      zéro. On le rejoue maintenant, la mesure est possible. */

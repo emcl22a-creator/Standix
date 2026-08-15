@@ -4644,6 +4644,10 @@ async function loadGestionProcedures() {
   if (procedures.length === 0) {
     renderAccueil()
       ecrireSous(`0 catégorie · 0 procédure · accès complet`)
+    /* Le compte de la page reste sinon sur son tiret : ce chemin court-circuite
+       `renderCategoryGrid`, qui est le seul endroit qui l'écrit. */
+    const cpt0 = document.getElementById('proc-compte')
+    if (cpt0) cpt0.textContent = '0 catégorie · 0 procédure'
     // On mesure APRÈS avoir écrit : la grille doit exister pour être située.
     requestAnimationFrame(() => ajusterHauteurDebut())
     catGridEl.innerHTML = `
@@ -4677,7 +4681,7 @@ async function loadGestionProcedures() {
         </div>
         <h3>Votre première procédure</h3>
         <p>Décrivez une tâche étape par étape, ou filmez-la une seule fois — l'IA la découpe pour vous.</p>
-        <div class="fleche">Touchez « Créer une procédure », en haut de la page</div>
+        <div class="fleche">Touchez le bouton <b>+</b>, en bas de l’écran</div>
       </div>
     `
     /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
@@ -4837,8 +4841,8 @@ async function peindreDernieresProcedures() {
         </span>
         <b>Dernières procédures créées</b>
       </div>
-      ${!recentes.length ? `<div class="an-vide">Vos procédures apparaîtront ici
-        au fur et à mesure que vous les créerez.</div>` : ''}
+      ${!recentes.length ? `<div class="an-vide">Les trois dernières procédures
+        créées apparaîtront ici.</div>` : ''}
       ${recentes.map(p => {
         const nb = p.etapes?.[0]?.count ?? 0
         const sec = duree.get(p.id)
@@ -5208,8 +5212,20 @@ function ajusterHauteurDebut() {
   const debut = document.querySelector('#cat-grid .debut, #e-cat-grid .debut')
   if (!debut) return
   const haut = Math.round(debut.getBoundingClientRect().top + window.scrollY)
-  const barre = document.getElementById('tabbar')?.offsetHeight
-    || document.getElementById('tabbar')?.offsetHeight || 88
+
+  /* LA BARRE S'APPELLE `bar`, PAS `tabbar`.
+
+     Cette mesure cherchait un élément qui n'existe pas — deux fois de suite, la
+     même erreur écrite en double — et retombait donc toujours sur 88 px. La
+     barre en fait 64, plus sa marge basse : le dessin était calé sur une
+     hauteur fausse et se retrouvait poussé vers le bas de l'écran.
+
+     On lit aussi le VRAI bas de la barre, marge comprise : c'est lui qui
+     limite la place disponible, pas la hauteur de la pièce. */
+  const bar = document.getElementById('bar')
+  const barre = bar
+    ? Math.round(window.innerHeight - bar.getBoundingClientRect().top)
+    : 88
   // 22 px de respiration sous le texte, pour qu'il ne touche pas la barre.
   debut.style.setProperty('--debut-h', `calc(100dvh - ${haut}px - ${barre + 22}px)`)
 }
@@ -6499,6 +6515,19 @@ function dessinerAlerteEssai(hote) {
   const zone = document.getElementById(hote)
   if (!zone) return
   if (!etatAbo || etatAbo.statut === 'actif') { zone.style.display = 'none'; return }
+
+  /* ═══ NI À QUELQU'UN QUI PAIE DÉJÀ AILLEURS ═══
+
+     `etatAbo` ne connaît que l'établissement AFFICHÉ. Un gérant abonné qui crée
+     un second établissement bascule dessus, et voyait « 13 jours d'essai » —
+     alors qu'il paie. Le message était juste pour l'établissement, faux pour la
+     personne.
+
+     On regarde donc tous ses établissements : s'il en paie un, il ne voit plus
+     ce bandeau nulle part. */
+  const paieAilleurs = (mesEtablissements || [])
+    .some(e => e.abonnement_statut === 'actif')
+  if (paieAilleurs) { zone.style.display = 'none'; return }
 
   const fini = etatAbo.statut === 'expire'
   const j = etatAbo.jours_restants
@@ -12631,7 +12660,9 @@ async function chargerEtablissements() {
   const gerant = currentMembre.role === 'gestion'
 
   let requete = supabase
-    .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url)')
+    /* `abonnement_statut` en plus : il sert à savoir si la PERSONNE paie déjà
+       quelque part, indépendamment de l'établissement affiché. */
+    .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url, abonnement_statut)')
     .eq('user_id', user.id)
   if (gerant) requete = requete.eq('role', 'gestion')
   let { data, error } = await requete
@@ -12691,10 +12722,17 @@ async function chargerEtablissements() {
    retrait. Sans cela, rien ne dirait où l'on est — et toucher un cercle
    bascule vers cet établissement.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Les DEUX espaces portent cette carte. On peint celle qui est présente —
+   les identifiants diffèrent d'un préfixe, le reste est identique. */
 function peindreListeEtab() {
-  const rang = document.getElementById('etab-rang')
-  const plus = document.getElementById('etab-ajouter')
-  const note = document.getElementById('etab-note')
+  peindreRangEtab('etab-rang', 'etab-ajouter', 'etab-note')
+  peindreRangEtab('e-etab-rang', 'e-etab-ajouter', 'e-etab-note')
+}
+
+function peindreRangEtab(idRang, idPlus, idNote) {
+  const rang = document.getElementById(idRang)
+  const plus = document.getElementById(idPlus)
+  const note = document.getElementById(idNote)
   if (!rang || !plus) return
 
   const liste = mesEtablissements || []
@@ -12751,14 +12789,16 @@ function peindreListeEtab() {
   plus.style.display = plein ? 'none' : ''
   if (note) {
     note.innerHTML = plein
-      ? `Vous g\u00e9rez ${ETABLISSEMENTS_MAX} \u00e9tablissements, le maximum par compte.`
-      : 'Cr\u00e9er un \u00e9tablissement est <b>gratuit</b>. Les membres des deux '
-        + '\u00e9tablissements s\u2019additionnent sur votre abonnement : une fois le '
-        + 'nombre atteint, plus personne ne peut rejoindre l\u2019un ou l\u2019autre.'
+      ? `Vous \u00eates dans ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
+      : 'Cr\u00e9ez une entreprise et vous en \u00eates le <b>g\u00e9rant</b>, avec '
+        + '<b>14 jours d\u2019essai gratuit</b>. Touchez un logo pour basculer '
+        + 'd\u2019une entreprise \u00e0 l\u2019autre.'
   }
 }
 
-document.getElementById('etab-ajouter')?.addEventListener('click', () => ouvrirFenetreEtab(null))
+;['etab-ajouter', 'e-etab-ajouter'].forEach(id => {
+  document.getElementById(id)?.addEventListener('click', () => ouvrirFenetreEtab(null))
+})
 
 
 function peindreTiroir() {

@@ -1471,6 +1471,33 @@
       <span class="fl">›</span>
     </button>
 
+    <!-- ═══ LES ÉTABLISSEMENTS, SUR PLACE ═══
+
+         Tout se fait DANS la carte : plus de page à part. Un cercle par
+         établissement, un « + » au bout de la ligne, et la création se règle
+         dans une fenêtre qui se referme aussitôt.
+
+         Le texte du dessous n'est pas un ornement : il dit que créer est
+         gratuit, et surtout que les membres s'additionnent d'un établissement
+         à l'autre. Sans cette phrase, un gérant croira ouvrir un second
+         abonnement — et découvrira le contraire le jour où plus personne ne
+         peut entrer. -->
+    <div class="reg-titre">Vos établissements</div>
+    <div class="etab-carte">
+      <div class="etab-rang" id="etab-rang">
+        <button type="button" class="etab-plus" id="etab-ajouter"
+                aria-label="Créer un établissement">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"/><line x1="5.5" y1="12" x2="18.5" y2="12"/></svg>
+        </button>
+      </div>
+      <p class="etab-note" id="etab-note">
+        Créer un établissement est <b>gratuit</b>. Les membres des deux
+        établissements s’additionnent sur votre abonnement : une fois le nombre
+        atteint, plus personne ne peut rejoindre l’un ou l’autre.
+      </p>
+    </div>
+
     <div class="reg-titre">Votre entreprise</div>
     <div class="reg-groupe">
       <button type="button" class="reg-ligne" onclick="openMembres()">
@@ -1490,10 +1517,6 @@
         <span class="reg-val mono" id="reg-code-val">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet" id="reg-filet-etabs" style="display:none;"></div>
-      <button type="button" class="reg-ligne" id="reg-ligne-etabs" style="display:none;" onclick="showGestionScreen('p-reg-etabs')">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></rect><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></rect><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="url(#logoOrIc)" stroke-width="1.7"></rect></svg></span><span class="reg-nm">Établissements</span>
-        <span class="reg-val" id="reg-nb-etabs">—</span><span class="fl">›</span>
-      </button>
     </div>
 
     <div class="reg-titre">Abonnement</div>
@@ -1638,21 +1661,6 @@
     <div id="postes-liste" style="margin-top:16px;"></div>
   </div>
 
-  <div class="screen" id="p-reg-etabs">
-    <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Établissements</h1>
-    </div>
-    <div style="margin-top:14px;" id="etab-liste"></div>
-    <div class="reg-note" id="etab-section-note">
-      Touchez un établissement pour changer son nom ou déposer son logo.
-      Sans logo, ce sont ses initiales qui s'affichent dans la barre du haut.
-    </div>
-  </div>
-
-  <!-- Sous-page : la langue -->
   <div class="screen" id="p-reg-langue">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">

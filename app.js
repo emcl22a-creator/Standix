@@ -4286,9 +4286,25 @@ const ONGLET_PAR_ECRAN = {
   'p-global-analyse': 2, 'p-membre': 2, 'p-membre-fiche': 2,
   'p-an-equipe': 2, 'p-an-categories': 2, 'p-an-temps': 2,
   'p-settings': 3, 'p-reg-poste': 3, 'p-reg-compte': 3, 'p-reg-code': 3,
-  'p-reg-postes': 3, 'p-reg-etabs': 3, 'p-reg-langue': 3, 'p-reg-appareils': 3,
+  'p-reg-postes': 3, 'p-reg-langue': 3, 'p-reg-appareils': 3,
   'p-abonnement': 3, 'p-membres': 3,
+
+  /* ═══ CES DEUX-LÀ MANQUAIENT ═══
+
+     Un écran absent de cette table ne change pas l'onglet : la capsule reste
+     sur la page d'où l'on vient. C'est ce qui donnait une barre qui indique
+     une page où l'on n'est pas.
+
+     `p-activites` s'ouvre par « Voir plus » depuis l'accueil — c'est la suite
+     de l'accueil, l'onglet y reste. `p-scan` est le lecteur de QR code, qui
+     appartient aux Réglages. */
+  'p-activites': 0,
+  'p-scan': 3,
 }
+
+/* `p-reg-etabs` a été retiré de cette table en même temps que l'écran : la
+   liste des établissements vit désormais dans la carte des Réglages. Une
+   entrée qui ne désigne plus rien fait douter de toutes les autres. */
 
 
 /* ═══ D'OÙ L'ÉCRAN DOIT NAÎTRE ═══
@@ -4407,6 +4423,8 @@ function activerAvecNaissance(ecran) {
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   window.majBarreEspace?.('gestion')
+  /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
+  window.placerOnglet?.(ONGLET_PAR_ECRAN[id])
   majBoutonPlus(id)
   animerBarreHaut()
   document.querySelectorAll('#gestion-app .screen').forEach(s => s.classList.remove('active'))
@@ -4482,13 +4500,18 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
   /* Équipe : Procédures 0, QR code 1, Réglages 2. */
   'e-list': 0, 'e-category': 0, 'e-detail': 0,
   'e-scan': 1,
-  'e-settings': 2, 'e-reg-compte': 2, 'e-reg-entreprises': 2,
+  'e-settings': 2, 'e-reg-compte': 2,
+  /* `reg-appareils` SANS préfixe : c'est bien son nom dans le balisage, seul
+     écran de l'espace Équipe à ne pas en porter. J'ai cru à une faute et je
+     l'ai « corrigé » en `e-reg-appareils` — ce qui l'aurait privé d'onglet.
+     Vérifié dans `index.html` avant de le remettre. */
   'e-reg-poste': 2, 'e-reg-langue': 2, 'reg-appareils': 2,
 }
 
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
   window.majBarreEspace?.('equipe')
+  window.placerOnglet?.(ONGLET_EQUIPE_PAR_ECRAN[id])
   /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
   document.body.classList.remove('plus-vu')
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
@@ -5213,21 +5236,26 @@ function ajusterHauteurDebut() {
   if (!debut) return
   const haut = Math.round(debut.getBoundingClientRect().top + window.scrollY)
 
-  /* LA BARRE S'APPELLE `bar`, PAS `tabbar`.
+  /* ═══ LA BARRE ÉTAIT COMPTÉE DEUX FOIS ═══
 
-     Cette mesure cherchait un élément qui n'existe pas — deux fois de suite, la
-     même erreur écrite en double — et retombait donc toujours sur 88 px. La
-     barre en fait 64, plus sa marge basse : le dessin était calé sur une
-     hauteur fausse et se retrouvait poussé vers le bas de l'écran.
+     L'écran porte DÉJÀ un rembourrage bas de 122 px, posé pour dégager la barre
+     et le bouton +. Je retranchais en plus la hauteur de la barre : la page
+     dépassait de 27 px, et elle défilait alors qu'il n'y avait rien à lire.
 
-     On lit aussi le VRAI bas de la barre, marge comprise : c'est lui qui
-     limite la place disponible, pas la hauteur de la pièce. */
-  const bar = document.getElementById('bar')
-  const barre = bar
-    ? Math.round(window.innerHeight - bar.getBoundingClientRect().top)
-    : 88
-  // 22 px de respiration sous le texte, pour qu'il ne touche pas la barre.
-  debut.style.setProperty('--debut-h', `calc(100dvh - ${haut}px - ${barre + 22}px)`)
+     La place disponible, c'est simplement : la fenêtre, moins ce qui est
+     au-dessus du bloc, moins le rembourrage que l'écran réserve déjà en bas.
+     Rien d'autre à soustraire. */
+  const ecran = debut.closest('.screen')
+  const bas = ecran ? parseFloat(getComputedStyle(ecran).paddingBottom) || 0 : 110
+
+  /* La grille porte en plus 14 px de marge basse — l'écart entre elle et ce qui
+     la suit. Ces pixels comptent aussi : sans les retrancher, la page dépassait
+     de 14 px, juste assez pour qu'elle défile sans rien avoir à montrer. */
+  const grille = debut.parentElement
+  const marge = grille ? parseFloat(getComputedStyle(grille).marginBottom) || 0 : 0
+
+  debut.style.setProperty('--debut-h',
+    `calc(100dvh - ${haut}px - ${Math.round(bas + marge)}px)`)
 }
 window.addEventListener('resize', ajusterHauteurDebut)
 window.addEventListener('orientationchange', () => setTimeout(ajusterHauteurDebut, 120))
@@ -12033,10 +12061,8 @@ function peindreReglagesEquipe() {
   if (el('es-initiales')) el('es-initiales').textContent = initialesEtab(nom)
   if (el('es-email-affiche')) el('es-email-affiche').textContent = el('es-email')?.value || '\u2014'
 
-  const n = (mesAdhesions || []).length
-  if (el('es-nb-ent')) {
-    el('es-nb-ent').textContent = n > 1 ? `${n} entreprises` : (n === 1 ? '1 entreprise' : '\u2014')
-  }
+  /* Le compteur `es-nb-ent` a disparu avec sa ligne : la carte « Vos
+     établissements » montre les entreprises elle-même, une par cercle. */
   const l = LANGUES.find(x => x.code === langueApp)
   if (el('es-langue-val')) el('es-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
 }

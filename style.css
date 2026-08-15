@@ -6040,7 +6040,16 @@ body.chargement #bar{
    cela, rien ne dirait dans quel établissement on travaille. */
 .etab-rond.actif{
   background:linear-gradient(165deg, rgba(255,173,51,0.14), rgba(255,173,51,0.03));
-  box-shadow:inset 0 0 0 1px rgba(255,173,51,0.42);
+}
+/* L'ANNEAU PAR-DESSUS L'IMAGE.
+
+   Il était posé en ombre interne : un logo en `object-fit:cover` la recouvrait
+   entièrement, et le cercle actif ne se distinguait plus des autres dès qu'il
+   portait une image. Un pseudo-élément passe au-dessus. */
+.etab-rond.actif::after{
+  content:''; position:absolute; inset:0; border-radius:50%;
+  box-shadow:inset 0 0 0 2px rgba(255,173,51,0.85);
+  pointer-events:none;
 }
 .etab-rond.actif span{
   background:linear-gradient(135deg,#FF6A00,#FF9A1F 60%,#FFAD33);

@@ -94,14 +94,14 @@
 
      Le dégagement du bas est porté par l'écran, pas par l'app : ici il
      s'ajoutait à celui de l'écran, et les deux se cumulaient. */
-  /* 460 px de colonne, comme un telephone. La valeur passe par une variable :
-     le zoom de bureau la multiplie, et il faut pouvoir la reprendre a chaque
-     palier pour que la colonne garde la meme largeur APPARENTE. */
+  /* 460 px, une seule valeur pour tous les écrans. Plus de variable ni de
+     palier : sur un ordinateur ou une tablette, l'app est exactement celle du
+     téléphone, centrée, avec du vide autour. */
   .app{
-    position:relative; z-index:1; width:100%; max-width:var(--col-max, 460px); margin:0 auto;
+    position:relative; z-index:1; width:100%; max-width:460px; margin:0 auto;
     min-height:100dvh;
   }
-  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col-max, 460px); z-index:15; padding:16px 18px 0; }
+  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:460px; z-index:15; padding:16px 18px 0; }
 
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{

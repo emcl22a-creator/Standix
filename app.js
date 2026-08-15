@@ -13162,30 +13162,34 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       )
     }
 
-    // 1. La ligne d'abord : on a besoin de son identifiant pour nommer le logo.
+    /* ═══ 1. L'ENTREPRISE ET SON GÉRANT, EN UNE SEULE OPÉRATION ═══
+
+       On appelait `insert(...).select('id')` : créer la ligne, puis la relire
+       pour son identifiant. L'insertion passait ; c'est la RELECTURE qui
+       échouait, parce que la règle de lecture exige d'être membre — et le
+       membre n'existe pas encore, il est créé juste après.
+
+       Supabase renvoyait une erreur mentionnant « row-level security », et
+       l'app en concluait qu'il manquait la règle « insert ». Elle se trompait
+       de coupable, et le message envoyait chercher au mauvais endroit.
+
+       La base fait maintenant les deux écritures ensemble. Elle règle du même
+       coup un risque qui existait avant : si la création du membre échouait,
+       il restait une entreprise que personne ne pouvait voir ni supprimer. */
     if (!entrepriseId) {
-      const code = String(Math.floor(10000 + Math.random() * 90000))
-      const { data, error } = await supabase.from('entreprises')
-        .insert({ nom, code_acces: code }).select('id').single()
+      const { data: res, error } = await supabase.rpc('creer_etablissement', { p_nom: nom })
       if (error) {
-        throw new Error(/row-level security|permission|policy/i.test(error.message)
-          ? "La base refuse la cr\u00e9ation. Ex\u00e9cutez migration-etablissements.sql : " +
-            "il manque la r\u00e8gle d'acc\u00e8s \u00ab insert \u00bb sur la table entreprises."
+        throw new Error(/function .* does not exist|not find the function/i.test(error.message)
+          ? "La base ne sait pas encore cr\u00e9er un \u00e9tablissement. "
+            + "Ex\u00e9cutez migration-creer-etablissement.sql."
           : error.message)
       }
-      if (!data?.id) throw new Error("L'entreprise n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e : la base n'a rien renvoy\u00e9.")
-      entrepriseId = data.id
-
-      // Le créateur en devient gérant, sinon il ne pourrait pas y entrer.
-      const { data: { user } } = await supabase.auth.getUser()
-      const { error: eM } = await supabase.from('membres')
-        .insert({ user_id: user.id, entreprise_id: entrepriseId, nom: currentMembre?.nom || '', role: 'gestion' })
-      if (eM) {
-        throw new Error(/row-level security|permission|policy/i.test(eM.message)
-          ? "L'entreprise est cr\u00e9\u00e9e mais vous n'y \u00eates pas rattach\u00e9 : il manque la r\u00e8gle " +
-            "d'acc\u00e8s \u00ab insert \u00bb sur la table membres. Ex\u00e9cutez migration-promotion.sql."
-          : eM.message)
+      if (!res?.ok) {
+        throw new Error(res?.raison === 'non connecte'
+          ? "Votre session a expir\u00e9. Reconnectez-vous."
+          : "L'entreprise n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e : " + (res?.raison || 'raison inconnue'))
       }
+      entrepriseId = res.id
     }
 
     // 2. Le logo, s'il a changé. Il a besoin de l'identifiant, d'où son rang.

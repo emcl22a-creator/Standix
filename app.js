@@ -12657,21 +12657,28 @@ async function chargerEtablissements() {
      C'est ce qui se passe tant que le SQL n'a pas été exécuté. On redemande donc
      sans elle : le tiroir marche alors avec les initiales, ce qui est déjà
      l'essentiel. */
-  const gerant = currentMembre.role === 'gestion'
+  /* ═══ TOUTES SES ENTREPRISES, QUEL QUE SOIT SON RÔLE ═══
 
+     Cette requête filtrait sur `role = 'gestion'` dès que le membre COURANT
+     était gérant. Conséquence : quelqu'un qui est employé chez A et gérant chez
+     B voyait les deux depuis A, puis A disparaissait dès qu'il basculait vers
+     B — et il ne pouvait plus revenir.
+
+     Le rôle qu'on a dans une entreprise ne dit rien des autres. On les liste
+     toutes ; c'est chaque fiche qui porte son propre rôle. */
   let requete = supabase
     /* `abonnement_statut` en plus : il sert à savoir si la PERSONNE paie déjà
        quelque part, indépendamment de l'établissement affiché. */
     .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url, abonnement_statut)')
     .eq('user_id', user.id)
-  if (gerant) requete = requete.eq('role', 'gestion')
   let { data, error } = await requete
 
   if (error || !data) {
     let repli = supabase
       .from('membres').select('id, role, entreprise_id, entreprises(id, nom)')
       .eq('user_id', user.id)
-    if (gerant) repli = repli.eq('role', 'gestion')
+    /* Le même filtre traînait ici. Il aurait provoqué une erreur — `gerant`
+       n'existe plus — le jour où cette requête de secours aurait servi. */
     repli = await repli
     data = repli.data || []
     if (repli.error) {
@@ -12685,6 +12692,12 @@ async function chargerEtablissements() {
       id: a.entreprises.id, nom: a.entreprises.nom,
       logo_url: a.entreprises.logo_url || null,   // absent = initiales
       membre_id: a.id,
+      /* Le RÔLE qu'on a dans CETTE entreprise-là. Le commentaire de la
+         déclaration l'annonçait depuis toujours, il n'était pas repris : la
+         requête le demande pourtant. Il sert à savoir si la personne gère déjà
+         quelque part, et à adapter ce qu'on lui explique. */
+      role: a.role,
+      abonnement_statut: a.entreprises.abonnement_statut || null,
     }))
 
   /* Filet : si la lecture groupée n'a rien donné — relation absente, règle
@@ -12788,11 +12801,31 @@ function peindreRangEtab(idRang, idPlus, idNote) {
   const plein = liste.length >= ETABLISSEMENTS_MAX
   plus.style.display = plein ? 'none' : ''
   if (note) {
+    /* ═══ DEUX PHRASES, SELON QUI LIT ═══
+
+       Un GÉRANT sait déjà ce qu'est un abonnement : ce qu'il ignore, c'est que
+       les membres de ses établissements se comptent ENSEMBLE. C'est la seule
+       chose qui puisse le surprendre, et elle coûte cher — le jour où plus
+       personne ne peut entrer.
+
+       Un EMPLOYÉ, lui, ignore qu'il peut devenir gérant. C'est ça qu'il faut
+       lui dire, pas une règle de facturation qui ne le concerne pas encore.
+
+       On regarde s'il est gérant QUELQUE PART, pas seulement ici : celui qui
+       gère une entreprise et travaille dans une autre relève du premier cas,
+       où qu'il se trouve au moment de lire. */
+    const dejaGerant = (mesEtablissements || []).some(e => e.role === 'gestion')
+      || currentMembre?.role === 'gestion'
+
     note.innerHTML = plein
       ? `Vous \u00eates dans ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
-      : 'Cr\u00e9ez une entreprise et vous en \u00eates le <b>g\u00e9rant</b>, avec '
-        + '<b>14 jours d\u2019essai gratuit</b>. Touchez un logo pour basculer '
-        + 'd\u2019une entreprise \u00e0 l\u2019autre.'
+      : dejaGerant
+        ? 'Cr\u00e9er un \u00e9tablissement est <b>gratuit</b>. Les membres des deux '
+          + '\u00e9tablissements s\u2019additionnent sur votre abonnement : une fois le '
+          + 'nombre atteint, plus personne ne peut rejoindre l\u2019un ou l\u2019autre.'
+        : 'Cr\u00e9ez une entreprise et vous en \u00eates le <b>g\u00e9rant</b>, avec '
+          + '<b>14 jours d\u2019essai gratuit</b>. Touchez un logo pour basculer '
+          + 'd\u2019une entreprise \u00e0 l\u2019autre.'
   }
 }
 
@@ -12986,10 +13019,30 @@ async function basculerVersEtablissement(entrepriseId) {
      d'entrée : la barre du haut et celle du bas repartaient de zéro, alors qu'on
      change seulement de contenu. Ce sont les procédures qui changent, pas le
      cadre — le cadre doit rester immobile. */
+  /* ═══ LA BASCULE, EN DEUX TEMPS ═══
+
+     Le contenu s'efface AVANT le chargement, revient APRÈS. Sans le premier
+     temps, on voyait l'ancienne entreprise jusqu'à la dernière milliseconde,
+     puis la nouvelle d'un coup — un remplacement, pas un passage.
+
+     Seul le CONTENU bouge. Les deux barres restent immobiles : elles ne
+     changent pas d'entreprise, elles encadrent celle qu'on regarde. */
+  const ecran = document.querySelector('#gestion-app .screen.active, #equipe-app .screen.active')
+  if (ecran) {
+    ecran.classList.add('bascule-part')
+    /* 180 ms : le temps que l'effacement se voie, pas plus. Au-delà on attend
+       devant un écran vide, et l'attente réelle du réseau s'y ajoute. */
+    await new Promise(r => setTimeout(r, 180))
+  }
+
   dejaEntre = new Set()
   basculeSansAnimation = true
   await enterApp(membre)
   basculeSansAnimation = false
+
+  /* On retire l'état de départ AVANT de rejouer l'entrée : les deux classes
+     ensemble s'annuleraient, et le contenu resterait pâle. */
+  document.querySelectorAll('.bascule-part').forEach(x => x.classList.remove('bascule-part'))
   rejouerContenu()
   toast(e.nom)
 }

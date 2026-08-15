@@ -6183,6 +6183,10 @@ async function completerEtapesAvecIA() {
   }
 
   let tempId = null
+  /* Vrai dès que la base a décompté une analyse. Sert à la lui rendre si la
+     suite échoue : le client ne doit pas payer une analyse qui n'a rien
+     produit. */
+  let analyseConsommee = false
   iaCompletionEnCours = true
   majBoutonIA()
 
@@ -6238,6 +6242,36 @@ async function completerEtapesAvecIA() {
       jalon('3/5 \u00b7 Vid\u00e9o retrouv\u00e9e\u2026')
     }
     if (!urlAnalyse) throw new Error("Aucune vid\u00e9o \u00e0 analyser.")
+
+    /* ═══ LE QUOTA, AVANT DE DÉPENSER ═══
+
+       On demande à la base, pas à nous-mêmes : c'est elle qui compte, et son
+       compteur ne se contourne pas depuis la console. Elle compte ET consomme
+       dans la même opération, si bien que deux analyses lancées à la même
+       seconde ne peuvent pas lire le même total.
+
+       Placé ICI, après le découpage et avant l'envoi : on ne réserve pas une
+       analyse pour un fichier qui n'existe pas, et on n'appelle pas Azure sans
+       avoir le droit. */
+    const { data: droit, error: errDroit } = await supabase.rpc('consommer_analyse')
+    if (errDroit) {
+      /* La fonction n'existe pas encore en base : on laisse passer plutôt que
+         de bloquer la création. Le jour où le SQL est posé, le contrôle
+         s'active de lui-même. */
+      console.warn('[quota] contrôle indisponible :', errDroit.message)
+    } else if (droit && droit.autorise === false) {
+      if (droit.raison === 'quota') {
+        throw new Error(
+          `Vous avez utilis\u00e9 vos ${droit.quota} analyses vid\u00e9o de ce mois-ci. `
+          + `Elles se renouvellent le 1er du mois prochain \u2014 ou passez \u00e0 l'offre `
+          + `sup\u00e9rieure pour en avoir davantage tout de suite.`)
+      }
+      if (droit.raison === 'role') {
+        throw new Error("Seule la gestion peut cr\u00e9er des proc\u00e9dures.")
+      }
+      throw new Error("Impossible de v\u00e9rifier votre abonnement.")
+    }
+    analyseConsommee = true
 
     jalon('4/5 \u00b7 Ouverture de l\u2019analyse\u2026')
 
@@ -6307,6 +6341,16 @@ async function completerEtapesAvecIA() {
     if (navigator.vibrate) navigator.vibrate(10)
 
   } catch (e) {
+    /* ═══ ON REND L'ANALYSE ═══
+       Azure indisponible, vidéo muette, réseau coupé : le décompte a eu lieu,
+       le client n'a rien reçu. On le lui rembourse.
+
+       Sauf quand c'est le quota lui-même qui a refusé — rien n'a été consommé
+       dans ce cas, et rendre reviendrait à en offrir une. */
+    if (analyseConsommee) {
+      await supabase.rpc('rendre_analyse', { p_procedure_id: tempId })
+        .then(({ error: er }) => { if (er) console.warn('[quota] non rendue :', er.message) })
+    }
     /* L'erreur se voit : en rouge, et précédée de sa cause. Elle s'affichait
        dans la même teinte grise que les messages ordinaires, au point de passer
        pour une simple explication. */

@@ -151,7 +151,17 @@
        mesurée plus haut : là où il n'y a pas de zone sûre, l'écart est le même
        en bas qu'à gauche et à droite. */
     bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
-    width:min(calc(100vw - 46px), 520px);
+    /* ═══ UNE LARGEUR QUI TIENT COMPTE DU ZOOM ═══
+
+       520 px de CSS, mais le corps de page porte un zoom jusqu'a 2 sur grand
+       ecran : la barre s'affichait a 988 px reels. Une barre d'un metre de
+       large sur un bureau n'a plus rien d'une barre — les onglets s'eloignent
+       les uns des autres et le pouce n'a plus de sens.
+
+       Le plafond descend donc a mesure que le zoom monte, pour que la largeur
+       REELLE reste autour de 600 px. Sur telephone, rien ne change : le zoom
+       n'existe pas sous 768 px. */
+    width:min(calc(100vw - 46px), var(--bar-max, 520px));
     height:var(--bar-h);
     margin-left:0;
     transform:translateX(-50%) scale(1) translateZ(0);
@@ -1588,9 +1598,22 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Votre poste</h1>
     </div>
-    <div class="an-intro">
-      <div class="t">Quel est votre rôle ici ?</div>
-      <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
+    <!-- LA MÊME CARTE QUE « CRÉER DES PROCÉDURES AVEC L'IA ».
+
+         C'était un `.an-intro` : un bloc de texte sans cadre, qui se confondait
+         avec le fond. Or c'est la seule chose à lire sur cette page, et elle
+         pose une question — elle mérite le même traitement que la carte
+         d'ouverture de l'accueil.
+
+         `hero-ia` apporte le fond profond et le liseré ambre ; `hero-lueur`
+         la lumière qui court derrière. Aucun style nouveau : on emploie ce qui
+         existe, pour que les deux cartes ne puissent pas diverger. -->
+    <div class="hero hero-ia hero-sans-image">
+      <span class="hero-lueur"></span>
+      <div class="hero-txt">
+        <h2>Quel est votre rôle ici ?</h2>
+        <p>Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</p>
+      </div>
     </div>
     <div id="mon-poste-liste" style="margin-top:14px;"></div>
     <div class="reg-note" id="mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
@@ -1892,10 +1915,10 @@
 
     <div class="reg-titre">Votre entreprise</div>
     <div class="reg-groupe">
-      <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-entreprises')">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></rect><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></rect><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="url(#logoOrIc)" stroke-width="1.7"></rect></svg></span><span class="reg-nm">Vos entreprises</span>
-        <span class="reg-val" id="es-nb-ent">—</span><span class="fl">›</span>
-      </button>
+      <!-- La ligne « Vos entreprises » a été retirée : la carte « Vos
+           établissements », plus haut sur cette page, montre les mêmes
+           entreprises et permet en plus d'en changer d'un geste. Deux chemins
+           vers la même chose, dont un moins bon. -->
         <button type="button" class="reg-ligne" onclick="ouvrirMonPoste()">
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="url(#logoOrIc)" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
           <span class="reg-nm">Votre poste</span>
@@ -1977,48 +2000,6 @@
   </div>
 
   <!-- Sous-page : les entreprises -->
-  <div class="screen" id="e-reg-entreprises">
-    <div class="detail-header">
-      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos entreprises</h1>
-    </div>
-
-    <div style="margin-top:14px;" id="es-entreprises"></div>
-
-    <div class="reg-groupe" style="margin-top:10px;">
-      <button type="button" class="reg-ligne" id="es-ajouter">
-        <span class="reg-ic">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"></path>
-            <path d="M12 11.4v5.2M9.4 14h5.2" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path>
-          </svg>
-        </span>
-        <span class="reg-nm">Créer une entreprise</span>
-        <span class="fl">›</span>
-      </button>
-    </div>
-    <div class="reg-note">Vous en serez responsable, et vous obtiendrez un code à partager à votre équipe. Pour rejoindre une entreprise existante, utilisez le code reçu à l'inscription.</div>
-
-    <!-- Conservés hors écran : la fenêtre de rattachement s'appuie dessus. -->
-    <input type="text" id="es-code" style="display:none;">
-    <button type="button" id="es-rejoindre" style="display:none;"></button>
-    <div class="error-msg" id="es-code-error" style="display:none;"></div>
-
-    <div class="reg-titre">Partir</div>
-    <div class="reg-groupe">
-      <button type="button" class="reg-ligne danger" id="es-quitter">
-        <span class="reg-nm">Quitter cette entreprise</span>
-      </button>
-    </div>
-    <div class="reg-note">Vous perdrez l'accès à ses procédures. Votre compte Procédo reste actif : vous pourrez en rejoindre une autre avec un nouveau code.</div>
-  </div>
-
-  <!-- Sous-page : les appareils -->
-  <!-- Le jumeau de `p-reg-poste`. Les deux espaces sont deux conteneurs
-       distincts : `showEquipeScreen` ne trouve pas un écran qui vit dans
-       l'autre, et la page s'ouvrait vide. -->
   <div class="screen" id="e-reg-poste">
     <div class="detail-header">
       <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
@@ -2026,9 +2007,22 @@
       </button>
       <h1 class="pagehead" style="margin:0; font-size:20px;">Votre poste</h1>
     </div>
-    <div class="an-intro">
-      <div class="t">Quel est votre rôle ici ?</div>
-      <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
+    <!-- LA MÊME CARTE QUE « CRÉER DES PROCÉDURES AVEC L'IA ».
+
+         C'était un `.an-intro` : un bloc de texte sans cadre, qui se confondait
+         avec le fond. Or c'est la seule chose à lire sur cette page, et elle
+         pose une question — elle mérite le même traitement que la carte
+         d'ouverture de l'accueil.
+
+         `hero-ia` apporte le fond profond et le liseré ambre ; `hero-lueur`
+         la lumière qui court derrière. Aucun style nouveau : on emploie ce qui
+         existe, pour que les deux cartes ne puissent pas diverger. -->
+    <div class="hero hero-ia hero-sans-image">
+      <span class="hero-lueur"></span>
+      <div class="hero-txt">
+        <h2>Quel est votre rôle ici ?</h2>
+        <p>Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</p>
+      </div>
     </div>
     <div id="e-mon-poste-liste" style="margin-top:14px;"></div>
     <div class="reg-note" id="e-mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
@@ -2876,11 +2870,29 @@ const PAD = 5.75;      // marge identique dans les quatre directions
 const PAD_TOP = PAD;
 const Y_SHIFT = (PAD - PAD_TOP) / 2;
 
+/* ═══ LE ZOOM DE BUREAU FAUSSE TOUTES LES MESURES ═══
+
+   Au-dessus de 768 px, le corps de page porte un `zoom` — jusqu'a 2 sur un
+   grand ecran. `getBoundingClientRect` rend alors des pixels ZOOMES, tandis que
+   les positions qu'on ecrit (`style.left`) sont en pixels CSS, donc non zoomes.
+
+   La barre mesurait 988 et posait ses onglets comme si elle en faisait autant,
+   alors qu'elle n'en fait que 520 en CSS. Le dernier onglet se retrouvait a
+   2 092 px pour une barre qui s'arrete a 1 214 : « Reglages » sortait de
+   l'ecran, et la capsule ne suivait plus rien.
+
+   On ramene donc chaque mesure en pixels CSS. */
+function facteurZoom() {
+  const z = parseFloat(getComputedStyle(document.body).zoom);
+  return (z && z > 0) ? z : 1;
+}
+
 function layout() {
   const bar = document.getElementById('bar');
   const rb = bar.getBoundingClientRect();
-  BAR_W = rb.width;
-  BAR_H = rb.height;
+  const z = facteurZoom();
+  BAR_W = rb.width / z;
+  BAR_H = rb.height / z;
 
   // La capsule remplit l'interieur de la barre, marge PAD partout.
   LENS.REST_H = BAR_H - PAD_TOP - PAD;
@@ -3083,10 +3095,34 @@ window.majBarreEspace = function (espace) {
   });
 };
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   PLACER LA CAPSULE DEPUIS L'EXTÉRIEUR
+
+   Elle ne bougeait QUE sur un clic dans la barre. Or on change de page par
+   bien d'autres chemins : une carte de l'accueil, un bouton retour, « Voir
+   plus », un lien dans les réglages. Dans tous ces cas la capsule restait où
+   elle était — et la barre indiquait une page où l'on n'était pas.
+
+   L'app tient une table écran → onglet ; elle n'était lue par personne. Cette
+   fonction est le pont qui manquait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+window.placerOnglet = function (i) {
+  if (typeof i !== 'number' || i < 0 || i >= LABELS.length) return;
+  if (i === active) return;
+  active = i;
+  lens.goTo(CENTERS[active] - BAR_W / 2);
+  swellStart = performance.now();
+};
+
 barEl.addEventListener('click', (e) => {
   const r = barEl.getBoundingClientRect();
+  /* Meme correction ici : `clientX` et `r.left` sont zoomes, `LENS.REST_W` ne
+     l'est pas. Sans la division, un clic a droite de la barre renvoyait un
+     onglet inexistant — et sur un grand ecran, on touchait « Analyse » en
+     visant « Reglages ». */
+  const z = facteurZoom();
   const i = Math.max(0, Math.min(LABELS.length - 1,
-    Math.floor((e.clientX - r.left - PAD) / LENS.REST_W)));
+    Math.floor(((e.clientX - r.left) / z - PAD) / LENS.REST_W)));
 
   const memeOnglet = i === active;
   active = i;

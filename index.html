@@ -151,17 +151,20 @@
        mesurée plus haut : là où il n'y a pas de zone sûre, l'écart est le même
        en bas qu'à gauche et à droite. */
     bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
-    /* ═══ UNE LARGEUR QUI TIENT COMPTE DU ZOOM ═══
+    /* ═══ LA MÊME LARGEUR QUE LES BLOCS ═══
 
-       520 px de CSS, mais le corps de page porte un zoom jusqu'a 2 sur grand
-       ecran : la barre s'affichait a 988 px reels. Une barre d'un metre de
-       large sur un bureau n'a plus rien d'une barre — les onglets s'eloignent
-       les uns des autres et le pouce n'a plus de sens.
+       La barre se calait sur la FENÊTRE, les blocs sur la COLONNE. Sur
+       téléphone les deux coïncidaient à peu près ; sur un écran large la barre
+       faisait 520 px pour des blocs de 420, et débordait de cinquante pixels
+       de chaque côté. Deux pièces posées l'une sous l'autre, mal alignées.
 
-       Le plafond descend donc a mesure que le zoom monte, pour que la largeur
-       REELLE reste autour de 600 px. Sur telephone, rien ne change : le zoom
-       n'existe pas sous 768 px. */
-    width:min(calc(100vw - 46px), var(--bar-max, 520px));
+       Elle suit maintenant la colonne : sa largeur moins les 20 px de marge
+       intérieure de chaque côté. Un bloc et la barre commencent et finissent
+       exactement au même endroit, quel que soit l'écran.
+
+       `100vw - 46px` reste comme plancher : sur un téléphone étroit, la colonne
+       occupe tout, et il faut bien garder un peu d'air sur les côtés. */
+    width:min(calc(100vw - 46px), calc(var(--col-max, 460px) - 40px));
     height:var(--bar-h);
     margin-left:0;
     transform:translateX(-50%) scale(1) translateZ(0);
@@ -233,6 +236,31 @@
 </style>
 </head>
 <body class="booting chargement">
+
+<!-- ═══ LE BANDEAU DE BUREAU ═══
+
+     Procédo est fait pour le téléphone : on filme un geste, on scanne un code
+     au mur, on coche une étape entre deux services. Sur un ordinateur, tout
+     cela est possible mais aucun ne va de soi.
+
+     Un bandeau, pas une page bloquante. Le gérant qui a un clavier voudra
+     s'en servir pour rédiger trente titres de procédures — le lui interdire
+     serait lui retirer le seul appareil confortable pour ce travail.
+
+     Il ne s'affiche qu'au-dessus de 900 px, et disparaît définitivement quand
+     on le ferme. Le code QR pointe vers l'adresse EN COURS : on reprend là
+     où l'on en était, pas à l'accueil. -->
+<div class="pc-bandeau" id="pc-bandeau" hidden>
+  <div class="pc-qr" id="pc-qr"></div>
+  <div class="pc-txt">
+    <b>Procédo est fait pour le téléphone</b>
+    <span>Scannez ce code pour continuer sur le vôtre — vous reprendrez sur cette page.</span>
+  </div>
+  <button type="button" class="pc-fermer" id="pc-fermer" aria-label="Fermer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+         stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+</div>
 
 <div class="color-halos">
   <div class="chalo chalo-4"></div>

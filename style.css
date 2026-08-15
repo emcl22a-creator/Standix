@@ -2610,6 +2610,161 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
+     LA PAGE ABONNEMENT
+
+     CE BLOC AVAIT DISPARU. En retirant les paliers de zoom, mon découpage a
+     emporté tout ce qui le précédait — le style des offres. La page continuait
+     de s'afficher, mais sans aucune mise en forme : du texte nu et des icônes
+     en pleine taille, faute de dimension imposée.
+
+     Il est réécrit d'après ce que le balisage attend. Si certains détails
+     diffèrent de l'original, dis-le-moi : je n'avais aucune copie pour le
+     restaurer à l'identique.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  .abo-scene{ position:relative; }
+  .abo-halo{
+    position:absolute; top:-40px; left:50%; transform:translateX(-50%);
+    width:280px; height:220px; pointer-events:none; z-index:0;
+    background:radial-gradient(ellipse at center,
+      rgba(255,154,31,0.16), rgba(255,154,31,0) 68%);
+    filter:blur(8px);
+  }
+  .abo-hi{ position:relative; z-index:1; text-align:center; margin-bottom:20px; }
+  .abo-hi h2{
+    font-size:24px; font-weight:750; letter-spacing:-0.045em; line-height:1.18;
+    margin-bottom:8px;
+  }
+  .abo-hi p{ font-size:13.5px; line-height:1.5; color:var(--label-3); }
+
+  /* ── UNE OFFRE ── */
+  .offre-carte{
+    position:relative; z-index:1;
+    background:var(--bg-card); border-radius:22px;
+    padding:20px 18px; margin-bottom:12px;
+    box-shadow:inset 0 0 0 0.5px var(--border);
+  }
+  /* Celle qu'on recommande porte le liseré ambre : c'est le seul signal, et il
+     suffit. */
+  .offre-carte.vedette{
+    background:linear-gradient(150deg,#22222A 0%,#17171C 45%,#0E0E12 100%);
+    box-shadow:inset 0 0 0 1px rgba(255,173,51,0.42),
+               0 14px 38px rgba(0,0,0,0.42);
+  }
+  .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
+
+  .offre-ruban{
+    position:absolute; top:-9px; left:18px;
+    padding:4px 11px; border-radius:100px;
+    background:linear-gradient(135deg,#E85D00,#FF9A1F);
+    font-size:10.5px; font-weight:750; letter-spacing:0.04em;
+    text-transform:uppercase; color:#2A1400;
+  }
+
+  .offre-tete{ display:flex; align-items:flex-start; gap:12px; }
+  .offre-txt{ flex:1; min-width:0; }
+  .offre-nom{
+    display:block; font-size:18px; font-weight:750; letter-spacing:-0.03em;
+  }
+  .offre-taille{
+    display:block; font-size:11.5px; line-height:1.4; color:var(--label-3);
+    margin-top:3px;
+  }
+  .offre-prix{ flex-shrink:0; text-align:right; white-space:nowrap; }
+  .offre-prix .v{ font-size:26px; font-weight:800; letter-spacing:-0.045em; }
+  .offre-prix .u{
+    display:block; font-size:10.5px; font-weight:650; color:var(--label-3);
+    margin-top:1px;
+  }
+
+  .offre-parmembre{
+    margin-top:12px; padding-top:12px;
+    border-top:0.5px solid var(--border);
+    font-size:12.5px; line-height:1.45; color:var(--label-2);
+  }
+  .offre-parmembre b{ color:var(--label-1); font-weight:700; }
+
+  .offre-etiq{
+    margin:16px 0 10px; font-size:11px; font-weight:750;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--label-3);
+  }
+
+  /* ── LES AVANTAGES ── */
+  .offre-phares{ display:flex; flex-direction:column; gap:9px; }
+  .offre-phare{ display:flex; align-items:center; gap:10px; }
+  /* LA TAILLE DU PICTO EST INDISPENSABLE. Sans elle, un SVG sans hauteur
+     déclarée s'affiche à sa taille naturelle — c'est ce qui donnait les
+     symboles géants au milieu de la page. */
+  .offre-phare .p{
+    width:22px; height:22px; flex-shrink:0;
+    display:grid; place-items:center; color:var(--label-2);
+  }
+  .offre-phare .p svg{ width:18px; height:18px; display:block; }
+  .offre-phare .t{ font-size:13.5px; font-weight:600; }
+  .offre-phare.vedette .p{ color:#FFAD33; }
+  .offre-phare.vedette .t{ color:var(--label-1); font-weight:700; }
+
+  .offre-aussi{
+    margin-top:14px; font-size:12px; line-height:1.5; color:var(--label-3);
+  }
+
+  /* ── LE RYTHME DE PAIEMENT ── */
+  .offre-rythme{ display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+  .rlg{
+    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
+    padding:12px 14px; border-radius:14px;
+    border:0.5px solid var(--border); background:rgba(255,255,255,0.03);
+    font-family:inherit; color:var(--label-2);
+    transition:border-color 0.2s, background 0.2s;
+  }
+  .rlg.on{
+    border-color:rgba(255,173,51,0.5); background:rgba(255,173,51,0.07);
+  }
+  .rlg .rd{
+    width:18px; height:18px; border-radius:50%; flex-shrink:0;
+    display:grid; place-items:center;
+    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.22);
+  }
+  .rlg.on .rd{ box-shadow:inset 0 0 0 1.5px #FFAD33; }
+  .rlg .rd i{
+    width:9px; height:9px; border-radius:50%; display:block;
+    background:transparent; transition:background 0.2s;
+  }
+  .rlg.on .rd i{ background:#FFAD33; }
+  .rlg .tx{ flex:1; min-width:0; }
+  .rlg .tx b{ display:block; font-size:13.5px; font-weight:700; color:var(--label-1); }
+  .rlg .tx span{ display:block; font-size:11px; color:var(--label-3); margin-top:1px; }
+
+  /* ── LE BOUTON ── */
+  .offre-cta{
+    width:100%; height:50px; margin-top:18px; border:none; border-radius:15px;
+    font-family:inherit; font-size:14.5px; font-weight:750;
+    background:linear-gradient(135deg,#E85D00,#F58A15 62%,#FF9F26);
+    color:#2A1400;
+  }
+  .offre-carte:not(.vedette) .offre-cta{
+    background:rgba(255,255,255,0.08); color:var(--label-1);
+  }
+  .offre-cta.encours{
+    background:none; color:#FFB340;
+    box-shadow:inset 0 0 0 1px rgba(255,179,64,0.35);
+  }
+  .offre-cta:active{ opacity:0.85; }
+
+  /* ── LE BAS DE PAGE ── */
+  .abo-conf{
+    display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
+    margin-top:14px; font-size:11.5px; font-weight:600; color:var(--label-3);
+  }
+  .abo-egal{
+    margin-top:14px; padding:13px 15px; border-radius:16px;
+    background:rgba(255,173,51,0.06);
+    box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.16);
+    font-size:12.5px; line-height:1.5; text-align:center; color:var(--label-2);
+  }
+  .abo-egal b{ color:var(--label-1); font-weight:750; }
+
+  /* ═══════════════════════════════════════════════════════════════════════
      LE ZOOM DE BUREAU A ÉTÉ RETIRÉ
 
      `body{ zoom }` agrandissait tout de 1,3 à 2 selon la largeur de l'écran.

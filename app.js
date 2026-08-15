@@ -9360,7 +9360,7 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
   manualSteps[i].image_url = null
   manualSteps[i].imageFichier = null
   manualSteps[i].imageARetirer = true
-  renderManualSteps()
+  repeindreSansSauter(renderManualSteps)
   if (navigator.vibrate) navigator.vibrate(6)
 })
 
@@ -11681,6 +11681,28 @@ function peindreCoches() {
     if (!cache) { div.style.maxHeight = ''; div.style.transform = ''; div.style.transition = '' }
   })
   majBandeauCoches()
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   REPEINDRE SANS PERDRE SA PLACE
+
+   Redessiner une liste d'étapes en détruit tout le contenu et le recrée. La
+   page devient brièvement plus courte, le navigateur n'a plus assez de matière
+   pour tenir le défilement où il était, et il remonte en haut. C'est ce qui se
+   passait quand on retirait la photo d'une étape : l'écran sautait au sommet
+   et il fallait redescendre chercher où l'on en était.
+
+   On relève la position AVANT, on repeint, et on la remet — dans la même image,
+   sans quoi le saut se verrait quand même.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function repeindreSansSauter(repeindre) {
+  /* C'est la FENÊTRE qui défile, pas l'écran : les écrans sont en
+     `overflow:visible` et s'étirent, c'est le document qui porte la barre.
+     Vérifié — j'avais d'abord sauvegardé aussi le `scrollTop` du conteneur, il
+     valait zéro en toutes circonstances. */
+  const y = window.scrollY
+  repeindre()
+  window.scrollTo({ top: y, behavior: 'instant' })
 }
 
 /* Le bandeau du bas dit où l'on en est, et félicite à la dernière case. */
@@ -15093,7 +15115,7 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
   editStepsData[i].image_url = null
   editStepsData[i].imageFichier = null
   editStepsData[i].imageARetirer = true
-  renderEditSteps()
+  repeindreSansSauter(renderEditSteps)
   if (navigator.vibrate) navigator.vibrate(6)
 })
 

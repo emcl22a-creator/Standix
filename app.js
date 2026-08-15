@@ -6197,9 +6197,9 @@ async function completerEtapesAvecIA() {
   }
 
   let tempId = null
-  /* Vrai dès que la base a décompté une analyse. Sert à la lui rendre si la
-     suite échoue : le client ne doit pas payer une analyse qui n'a rien
-     produit. */
+  /* Vrai une fois qu'`ai-start` a répondu — c'est lui qui décompte. Sert à
+     rendre l'analyse si la SUITE échoue : `ai-start` rembourse ses propres
+     échecs, mais pas ce qui casse après lui. */
   let analyseConsommee = false
   iaCompletionEnCours = true
   majBoutonIA()
@@ -6264,10 +6264,15 @@ async function completerEtapesAvecIA() {
        dans la même opération, si bien que deux analyses lancées à la même
        seconde ne peuvent pas lire le même total.
 
-       Placé ICI, après le découpage et avant l'envoi : on ne réserve pas une
-       analyse pour un fichier qui n'existe pas, et on n'appelle pas Azure sans
-       avoir le droit. */
-    const { data: droit, error: errDroit } = await supabase.rpc('consommer_analyse')
+       ON VÉRIFIE, ON NE CONSOMME PAS. Le décompte réel se fait dans `ai-start`,
+       juste avant l'appel à Azure — c'est le seul point de passage qu'on ne
+       peut pas contourner. Si l'app consommait aussi, chaque analyse en
+       compterait deux.
+
+       Ce contrôle-ci sert à PRÉVENIR : découper une vidéo, l'envoyer, puis
+       apprendre que le quota est épuisé serait une perte de temps et de
+       données. Placé après le découpage et avant l'envoi. */
+    const { data: droit, error: errDroit } = await supabase.rpc('verifier_analyse')
     if (errDroit) {
       /* La fonction n'existe pas encore en base : on laisse passer plutôt que
          de bloquer la création. Le jour où le SQL est posé, le contrôle
@@ -6285,7 +6290,6 @@ async function completerEtapesAvecIA() {
       }
       throw new Error("Impossible de v\u00e9rifier votre abonnement.")
     }
-    analyseConsommee = true
 
     jalon('4/5 \u00b7 Ouverture de l\u2019analyse\u2026')
 
@@ -6320,6 +6324,11 @@ async function completerEtapesAvecIA() {
     
     const dep = await rep.json()
     if (!rep.ok || dep.error) throw new Error(dep.error || "L\u2019analyse n\u2019a pas d\u00e9marr\u00e9.")
+
+    /* `ai-start` a répondu : l'analyse est décomptée. À partir d'ici, tout
+       échec doit la rendre — c'est ce que fait le bloc d'erreur plus bas.
+       Avant ce point, `ai-start` rembourse lui-même. */
+    analyseConsommee = true
 
     jalon('5/5 \u00b7 Analyse du son et de l\u2019image\u2026')
     const textes = await attendreEtapesIA(tempId)

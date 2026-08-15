@@ -823,6 +823,34 @@ const cibleQR = (function () {
    `display:''` et non `'flex'` : la barre porte sa propre géométrie — position
    absolue, largeur calculée, capsule placée au pixel. Lui imposer `flex`
    déplacerait ses onglets. On rend la main au style d'origine. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   TOUT PARAÎT ENSEMBLE
+
+   Appelée quand un espace a fini de charger. Un seul point de sortie pour les
+   deux — c'est ce qui garantit qu'ils se comportent pareil.
+
+   Le délai de secours n'est pas un ornement : sans lui, une requête qui
+   n'aboutit pas laisserait l'écran vide pour toujours. On a déjà fait cette
+   erreur avec l'écran de démarrage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let appRevelee = false
+function revelerApp() {
+  if (appRevelee) return
+  appRevelee = true
+  /* Une image d'attente : le rendu qui vient de se faire doit être PEINT avant
+     qu'on ne lève le voile, sinon on découvre une page encore en cours de
+     mise en page. */
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    document.body.classList.remove('chargement')
+  }))
+}
+setTimeout(() => {
+  if (!appRevelee) {
+    console.warn('Procédo · chargement trop long, on affiche quand même')
+    revelerApp()
+  }
+}, 6000)
+
 function afficherBarre(montrer) {
   const b = document.getElementById('bar')
   if (b) b.style.display = montrer ? '' : 'none'
@@ -1708,6 +1736,7 @@ async function enterApp(membre) {
     /* Les données, une fois la charpente à l'écran. On n'attend plus AVANT
        d'afficher — on remplit APRÈS. */
     await loadGestionProcedures()
+    revelerApp()
     desarmerSurveillance()
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
@@ -1744,6 +1773,7 @@ async function enterApp(membre) {
     chargerEtablissements()
     verifierPromotion(membre)          // tout de suite : c'est la première chose à dire
     window.jalon?.('APP AFFICHÉE')
+    revelerApp()
     desarmerSurveillance()
     window.mesurerFluidite?.()
     // Premier placement sans animation : la barre vient d'apparaître, la
@@ -1896,6 +1926,9 @@ function finDuDemarrage() {
   demarrageTermine = true
   const liberer = () => {
     document.body.classList.remove('booting')
+    /* L'écran de choix et la connexion ne passent par aucun espace : sans cet
+       appel, le voile resterait posé sur une page qui n'a rien à charger. */
+    revelerApp()
   }
   if ('requestIdleCallback' in window) requestIdleCallback(liberer, { timeout: 1200 })
   else setTimeout(liberer, 300)
@@ -12004,7 +12037,23 @@ const AVANTAGES = [
 const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste, m\u00e9dailles ' +
   'd\'assiduit\u00e9, relance des retardataires, vue consolid\u00e9e de vos sites.'
 
-/* Les paliers suivent le NOMBRE DE MEMBRES, et c'est tout ce qui les sépare. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PALIERS SUIVENT LE NOMBRE DE MEMBRES
+
+   LE QUOTA D'ANALYSES EST MENSUEL, ET IL SE RÉINITIALISE. Il était TOTAL — une
+   fois épuisé, plus jamais d'IA. Le client continuait de payer pour un produit
+   dont la fonction principale s'était arrêtée : au troisième mois, il ne voyait
+   plus ce qu'il payait.
+
+   Le coût de ce changement est faible parce que l'usage réel s'effondre après
+   le premier mois : un gérant documente tout son établissement en quelques
+   semaines, puis deux ou trois procédures par mois. Filmer, relire et corriger
+   prend un quart d'heure par fiche — c'est le temps humain qui limite, pas le
+   compteur.
+
+   Les analyses non utilisées NE SE REPORTENT PAS. À écrire sur la page, sinon
+   quelqu'un viendra réclamer six mois d'un coup.
+   ═══════════════════════════════════════════════════════════════════════════ */
 const OFFRES = [
   /* Le prix mensuel est celui qu'on affiche ; l'annuel se règle en une fois et
      revient à vingt pour cent de moins.
@@ -12066,7 +12115,7 @@ function carteOffre(o, opts = {}) {
       <span class="offre-txt">
         <span class="offre-nom">${o.nom}</span>
         <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `Jusqu'\u00e0 ${o.max} membres`}${
-          o.analyses ? ` \u00b7 ${o.analyses} analyses vid\u00e9o / mois` : ''}</span>
+          o.analyses ? ` \u00b7 ${o.analyses} analyses vid\u00e9o par mois` : ''}</span>
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>

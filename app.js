@@ -11765,7 +11765,16 @@ function basculerEtape(etapeId) {
 
       setTimeout(peindreCoches, 360)
     }, 220)
-  }, 420)
+  /* ═══ 620 MS, ET NON 420 ═══
+
+     Mesuré : la coche achève de se tracer à 339 ms. À 420, elle n'était
+     pleinement visible que 81 millisecondes — le temps de la voir apparaître,
+     pas celui de la voir. Or c'est elle qui dit « c'est fait » ; la ranger
+     aussitôt revient à effacer la réponse avant qu'on l'ait lue.
+
+     À 620, elle tient 280 ms achevée. C'est le réglage de la maquette, et il
+     se sent nettement à l'usage. */
+  }, 620)
 }
 
 /* Le rappel en tête de liste : « 3 étapes faites — revoir ». Il n'existe pas

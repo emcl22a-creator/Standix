@@ -423,9 +423,9 @@
      défaut d'affichage plutôt qu'une transition. */
   .screen.fondu{ animation:ecranFondu 0.34s cubic-bezier(0.32,0.72,0,1); }
   @keyframes ecranFondu{
-    0%  { opacity:0; transform:scale(0.965) }
-    26% { opacity:1; transform:scale(0.972) }
-    100%{ opacity:1; transform:none }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
   }
 
   /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux
@@ -451,14 +451,32 @@
   }
   .app-shell-in{ animation: appShellIn 0.65s cubic-bezier(0.22,1,0.36,1); }
   @keyframes appShellIn{
-    0%{ opacity:0; transform:scale(0.95); filter:blur(10px); }
-    100%{ opacity:1; transform:scale(1); filter:blur(0); }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     UNE SEULE ARRIVÉE, PARTOUT
+
+     Neuf animations différentes disaient la même chose : « une surface
+     apparaît ». L'une montait de 18 px en se dé-floutant, l'autre glissait de
+     côté, une troisième naissait à 32 % de sa taille. Rien ne les reliait, et
+     l'app changeait de caractère d'un écran à l'autre.
+
+     Elles partagent maintenant le même corps : opacité de 0 à 1, échelle de
+     0,975 à 1. L'échelle est volontairement FAIBLE — on sent le mouvement sans
+     le voir. À 94 %, il se remarque ; et une animation qu'on remarque à la
+     centième fois devient une attente.
+
+     Les noms restent, et les durées propres à chaque endroit aussi : c'est le
+     GESTE qui est commun, pas le rythme. Une fenêtre peut s'ouvrir plus vite
+     qu'une page sans cesser d'être la même animation.
+     ═══════════════════════════════════════════════════════════════════════ */
   @keyframes screenIn{
-    0%{ opacity:0; transform:translateY(18px) scale(0.97); filter:blur(6px); }
-    60%{ opacity:1; filter:blur(0); }
-    100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
   }
   .same-as-title-in{ animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1) both; }
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
@@ -802,7 +820,8 @@
     animation:attenteArrive 0.42s cubic-bezier(0.32,0.72,0,1) both;
   }
   @keyframes attenteArrive{
-    0%{ opacity:0; transform:scale(0.94) translateY(10px); }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
     100%{ opacity:1; transform:none; }
   }
 
@@ -2600,7 +2619,11 @@
     box-shadow:0 16px 40px rgba(0,0,0,0.5);
   }
   .bandeau-bloc.on{ display:block; animation:bandeauArrive 0.4s cubic-bezier(0.34,1.4,0.5,1) both; }
-  @keyframes bandeauArrive{ from{ opacity:0; transform:translateY(14px); } to{ opacity:1; transform:none; } }
+  @keyframes bandeauArrive{
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
+  }
   .bandeau-bloc .t{ font-size:14px; font-weight:700; letter-spacing:-0.02em; margin-bottom:5px; }
   .bandeau-bloc .s{
     font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -2638,18 +2661,30 @@
   .abo-hi p{ font-size:13.5px; line-height:1.5; color:var(--label-3); }
 
   /* ── UNE OFFRE ── */
+  /* ═══ PLUS SOMBRE QUE LES AUTRES CARTES ═══
+
+     Elle prenait le gris des cartes ordinaires. Or celles-ci portent une liste
+     ou un résumé, tandis que celle-ci EST la page : on ne vient ici que pour
+     elle. Un fond plus profond la détache du reste et fait ressortir l'ambre,
+     qui perdait de sa force sur un gris moyen.
+
+     Un dégradé plutôt qu'un aplat : il donne de la matière sur une carte aussi
+     haute, là où une couleur unique paraîtrait plate. */
   .offre-carte{
     position:relative; z-index:1;
-    background:var(--bg-card); border-radius:22px;
+    background:linear-gradient(160deg,#16161A 0%,#111114 52%,#0B0B0E 100%);
+    border-radius:22px;
     padding:20px 18px; margin-bottom:12px;
-    box-shadow:inset 0 0 0 0.5px var(--border);
+    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
+               0 8px 26px rgba(0,0,0,0.32);
   }
   /* Celle qu'on recommande porte le liseré ambre : c'est le seul signal, et il
-     suffit. */
+     suffit. Son fond descend un cran plus bas encore — c'est ce qui fait
+     ressortir le liseré. */
   .offre-carte.vedette{
-    background:linear-gradient(150deg,#22222A 0%,#17171C 45%,#0E0E12 100%);
+    background:linear-gradient(150deg,#191920 0%,#0F0F13 48%,#08080A 100%);
     box-shadow:inset 0 0 0 1px rgba(255,173,51,0.42),
-               0 14px 38px rgba(0,0,0,0.42);
+               0 16px 42px rgba(0,0,0,0.5);
   }
   .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
 
@@ -2750,6 +2785,24 @@
     box-shadow:inset 0 0 0 1px rgba(255,179,64,0.35);
   }
   .offre-cta:active{ opacity:0.85; }
+
+  /* ═══ LES AUTRES OFFRES SONT REPLIÉES ═══
+
+     Elles s'affichaient toutes, sous un bouton « Voir les autres offres » qui
+     n'avait donc plus rien à montrer. L'app posait pourtant déjà une classe
+     `ouvert` sur la liste — c'est le style qui manquait, emporté avec le bloc
+     que j'ai perdu tout à l'heure.
+
+     `grid-template-rows` plutôt que `max-height` : on n'a pas à deviner une
+     hauteur, et le dépliage reste juste quel que soit le nombre d'offres. */
+  #abo-liste{
+    display:grid; grid-template-rows:0fr;
+    transition:grid-template-rows 0.42s cubic-bezier(0.32,0.72,0,1),
+               opacity 0.3s ease, margin-top 0.42s cubic-bezier(0.32,0.72,0,1);
+    opacity:0; margin-top:0;
+  }
+  #abo-liste > *{ overflow:hidden; min-height:0; }
+  #abo-liste.ouvert{ grid-template-rows:1fr; opacity:1; margin-top:12px; }
 
   /* ── LE BAS DE PAGE ── */
   .abo-conf{
@@ -3191,8 +3244,15 @@
     width:100%; max-width:340px; padding:24px 20px 18px; border-radius:26px; text-align:center;
     background:var(--hero-gradient); border:0.5px solid var(--border);
     box-shadow:0 24px 60px rgba(0,0,0,0.6);
-    transform:scale(0.92) translateY(12px); opacity:0;
-    transition:transform 0.42s cubic-bezier(0.34,1.4,0.5,1), opacity 0.3s ease;
+    /* LE MÊME GESTE QUE LES PAGES. Elle montait de 12 px depuis 92 %, avec un
+       rebond — un mouvement bien plus marqué que celui des écrans, alors que
+       c'est la même chose qui se produit : une surface arrive.
+
+       Elle garde en revanche son fond assombri : c'est lui qui dit « ceci vous
+       interrompt, répondez ». Le voile des pages ne s'y ajoute pas, il ferait
+       double emploi. */
+    transform:scale(0.975); opacity:0;
+    transition:transform 0.38s cubic-bezier(0.32,0.72,0,1), opacity 0.3s ease;
   }
   .fond-etab.on .fen-etab{ transform:none; opacity:1; }
   .fen-etab h3{ font-size:19px; font-weight:800; letter-spacing:-0.035em; margin-bottom:4px; }
@@ -3736,8 +3796,9 @@
   }
 
 @keyframes cardIn{
-    0%{ opacity:0; transform:translateY(10px) scale(0.97); }
-    100%{ opacity:1; transform:translateY(0) scale(1); }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
   }
   @keyframes cardSlideIn{
     0%{ opacity:0; transform:translateX(24px) scale(0.96); }
@@ -4916,10 +4977,47 @@
      qu'on voyait sur la page vide.
 
      84 px : la hauteur du bouton plus sa marge, et de quoi respirer. */
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA HAUTEUR NE SE MESURE PLUS, ELLE SE DÉDUIT
+
+     Un script mesurait la position du bloc et en tirait sa hauteur. Il tournait
+     TROP TARD : pendant deux cents millisecondes, le bloc gardait sa valeur de
+     repli, trop grande — le dessin paraissait bas et la page défilait. Puis un
+     glissement déclenchait un nouveau calcul, et tout se remettait en place
+     d'un coup. C'est précisément ce qu'on voyait.
+
+     Le CSS sait faire ça sans rien mesurer. L'écran devient une colonne, la
+     grille prend la place qui reste, le bloc la remplit. Aucun délai possible :
+     c'est vrai dès la première image.
+
+     `:has()` limite tout ça au seul cas du bloc d'accueil — les pages qui ont
+     du contenu gardent leur disposition en grille, intacte.
+     ═══════════════════════════════════════════════════════════════════════ */
+  .screen.active:has(#cat-grid .debut),
+  .screen.active:has(#e-cat-grid .debut){
+    display:flex; flex-direction:column;
+    /* SANS CETTE HAUTEUR, RIEN NE S'ÉTIRE. Une colonne souple ne distribue que
+       la place qu'elle a — et un écran ne fait par défaut que la hauteur de son
+       contenu. La grille restait donc collée sous les filtres, et le dessin
+       remontait de 130 px.
+
+       `100dvh` avec un modèle de boîte à bordure : le rembourrage du bas, qui
+       réserve la barre et le bouton, est compris dedans. La page tient donc
+       exactement dans la fenêtre. */
+    min-height:100dvh;
+  }
+  #cat-grid:has(.debut),
+  #e-cat-grid:has(.debut){
+    flex:1 1 auto; display:flex; min-height:0;
+  }
+
   .debut{
     grid-column:1/-1; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center;
-    min-height:var(--debut-h, calc(100dvh - 300px));
+    /* `flex:1` quand la grille est en colonne souple ; la valeur de repli ne
+       sert plus que si `:has()` n'est pas reconnu. */
+    flex:1 1 auto; width:100%;
+    min-height:var(--debut-h, 0);
     /* ═══ UN REMBOURRAGE ÉGAL, PARCE QUE LA HAUTEUR EST DÉJÀ JUSTE ═══
 
        Il valait 84 px en bas, pour dégager le bouton + flottant. Mais la
@@ -5053,8 +5151,9 @@
   .auth-form{ display:none; }
   .auth-form.active{ display:block; animation: authFormIn 0.45s cubic-bezier(0.22,1,0.36,1); }
   @keyframes authFormIn{
-    0%{ opacity:0; transform:translateY(10px) scale(0.97); filter:blur(4px); }
-    100%{ opacity:1; transform:translateY(0) scale(1); filter:blur(0); }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
   }
   .login-card h1{ font-size:22px; margin-bottom:6px; }
   .login-card .subhead{margin-bottom:20px;}
@@ -6185,8 +6284,9 @@ body.chargement #bar{
 }
 .pc-coin[hidden]{ display:none; }
 @keyframes pcCoinArrive{
-  from{ opacity:0; transform:translateY(-8px) scale(0.97); }
-  to{ opacity:1; transform:none; }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
 }
 
 .pc-tete{
@@ -6217,3 +6317,39 @@ body.chargement #bar{
 /* Sous 900 px elle n'a rien à dire : on EST sur le bon appareil. */
 @media (max-width: 899px){ .pc-coin{ display:none !important; } }
 @media (prefers-reduced-motion: reduce){ .pc-coin{ animation:none; } }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VOILE D'ARRIVÉE
+
+   Un noir qui monte à moitié puis redescend, le temps qu'une surface arrive.
+   C'est la moitié la plus importante de l'animation : le grossissement seul
+   laisse deux surfaces à plat, le voile leur donne un dessus et un dessous.
+
+   Il passe SOUS les deux barres — elles ne changent pas d'écran, elles
+   encadrent celui qu'on regarde, et les voir clignoter à chaque page serait
+   pénible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.voile-arrivee{
+  position:fixed; inset:0;
+  /* z-index 9 : SOUS les deux barres. La barre du bas est à 10, celle du haut
+     à 15 — je l'avais posé à 14, ce qui assombrissait la barre du bas à chaque
+     page. Or elle ne change pas d'écran : elle encadre celui qu'on regarde, et
+     la voir clignoter cent fois par service serait pénible.
+
+     Au-dessus du contenu (z-index 1) et des halos : c'est bien lui qu'on
+     assombrit. */
+  z-index:9;
+  background:#000; opacity:0; pointer-events:none;
+}
+.voile-arrivee.joue{
+  animation:voileArrivee 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes voileArrivee{
+  0%   { opacity:0; }
+  38%  { opacity:0.42; }
+  100% { opacity:0; }
+}
+@media (prefers-reduced-motion: reduce){
+  .voile-arrivee.joue{ animation:none; }
+}

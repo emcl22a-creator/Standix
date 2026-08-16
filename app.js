@@ -12237,7 +12237,7 @@ const OFFRES = [
   /* Le prix mensuel est celui qu'on affiche ; l'annuel se règle en une fois et
      revient à vingt pour cent de moins.
 
-     Le prix par membre BAISSE à chaque palier — 13,80 €, 6,60 €, 5,97 €, 4,99 €.
+     Le prix par membre BAISSE à chaque palier — 13,80 €, 8,60 €, 5,97 €, 4,99 €.
      C'est ce qui donne envie de monter : le client y gagne toujours, et nos
      coûts ne suivent pas la même pente puisque le nombre d'analyses double
      quand les membres triplent.
@@ -12257,10 +12257,19 @@ const OFFRES = [
      13,80 € par membre contre 6,60 — et c'est tant mieux : il rend le passage
      à l'offre supérieure évident.
 
-     Les trois autres paliers ne bougent pas. Ils étaient déjà largement
-     positifs, et 99 € est un prix qu'un patron décide seul. */
+     ═══ ET ÉQUIPE À 129 ═══
+
+     Même raisonnement, un cran plus haut. À 99 € payés à l'année, le pire cas
+     ne laissait que 164 € sur douze mois — soit 14 % — parce que la remise de
+     vingt pour cent réduit la recette sans toucher aux 60 analyses mensuelles.
+     À 129, il remonte à 447 €.
+
+     La remise annuelle reste à 20,2 %, alignée sur les trois autres paliers :
+     la grille garde sa logique, seul le niveau change.
+
+     Pro et Réseau ne bougent pas — ils étaient déjà largement positifs. */
   { cle: 'essentiel',  nom: 'Essentiel',  max: 5,   analyses: 30,  prix: 69,  an: 660,  stripe: true },
-  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,  analyses: 60,  prix: 99,  an: 948,  stripe: true },
+  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,  analyses: 60,  prix: 129, an: 1236, stripe: true },
   { cle: 'pro',        nom: 'Pro',        max: 40,  analyses: 120, prix: 239, an: 2268, stripe: true },
   { cle: 'reseau',     nom: 'R\u00e9seau',     max: 100, analyses: 250, prix: 499, an: 4788, stripe: true },
   { cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,

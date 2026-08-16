@@ -1473,6 +1473,23 @@
     </div>
   </div>
 
+  <!-- ═══ VOS ANALYSES VIDÉO ═══
+
+       Un seul chiffre : ce qu'il RESTE. L'anneau maigrit à mesure du mois, ce
+       qui se lit d'un coup d'œil sans compter.
+
+       L'encadré du dessous est un argument, pas une note : le mode document
+       reste illimité, et il faut le dire là où l'on découvre une limite. -->
+  <div class="screen" id="p-quota">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead" style="margin:0; font-size:20px;">Vos analyses vidéo</h1>
+    </div>
+    <div class="quota-carte" id="quota-carte"></div>
+  </div>
+
   <div class="screen" id="p-settings">
     <div class="detail-header">
             <h1 class="pagehead" style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.04em;">Réglages</h1>
@@ -1533,6 +1550,13 @@
 
     <div class="reg-titre">Votre entreprise</div>
     <div class="reg-groupe">
+      <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
+           d'ouvrir la page. Elle sert quand on veut savoir quand ça repart. -->
+      <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Vos analyses vidéo</span>
+        <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
+      </button>
+      <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="openMembres()">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="url(#logoOrIc)" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>

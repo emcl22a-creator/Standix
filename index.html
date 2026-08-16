@@ -660,9 +660,13 @@
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px;" id="dv-titre-page">Vous découpez, l’IA rédige</h1>
+      <!-- Le titre annonçait « l'IA rédige » alors que le bouton qui le permettait
+           a été retiré. Une page qui promet ce qu'elle ne fait pas est pire qu'une
+           page muette : on cherche le bouton, on ne le trouve pas, on doute du
+           reste. Elle ne sert plus qu'à découper une vidéo déjà écrite. -->
+      <h1 class="pagehead" style="margin:0; font-size:20px;" id="dv-titre-page">Découper la vidéo</h1>
     </div>
-    <div class="subhead" id="dv-sous">Marquez les coupures, l’IA rédige ensuite</div>
+    <div class="subhead" id="dv-sous">Marquez le début et la fin de chaque étape</div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION, comme sur l'écran
          des étapes manuelles. À la création ils ont déjà été demandés sur l'écran
@@ -781,29 +785,10 @@
       <div class="error-msg" id="create-error-video"></div>
       <!-- Le retour est ici aussi, pas seulement en haut : arrivé en bas d'une
            longue liste d'étapes, remonter chercher la flèche est une corvée. -->
-      <!-- « Compléter les étapes avec l'IA », juste au-dessus de la publication :
-           c'est le dernier geste avant de publier, et l'endroit où l'on se
-           demande « est-ce que tout est écrit ? ».
-
-           Sans fond ni bordure : ce n'est pas une action à faire, c'en est une
-           qu'on PEUT faire. Un bouton plein l'aurait mise au même rang que
-           « Publier ». -->
-      <button type="button" class="dv-ia-bas" id="vid-ia-bas" style="display:none;">
-        <span class="ia-case"><span class="ia-mot">AI</span><span class="ia-fig m ia-roue"><span class="lum"></span></span><span class="ia-coche">
-          <svg viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
-            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline>
-          </svg>
-        </span></span>
-        <!-- La coche prend la place de l'anneau quand c'est fini. Elle porte le
-             même dégradé : c'est le même travail qui s'achève, pas un autre signe. -->
-        
-        <span id="vid-ia-bas-txt">L’IA rédige mes étapes</span>
-      </button>
-      <!-- La note vit SOUS le bouton. Elle était restée où l'ancien bouton se
-           trouvait, tout en haut : les messages d'erreur s'affichaient à un
-           endroit qu'on ne regardait pas, et l'action semblait sans effet. -->
-      <div class="vid-ia-note" id="vid-ia-note"></div>
+      <!-- Le bouton « L'IA rédige mes étapes » a été retiré. C'était un reste du
+           mode « Vous découpez, l'IA rédige », supprimé de la création : cette
+           page ne sert plus qu'à modifier une procédure vidéo existante, où le
+           texte est déjà écrit. Proposer de le refaire n'avait plus de sens. -->
       <!-- Un vrai écart avant « Publier » : neuf pixels collaient le bouton à la
            note de l'IA, et les deux se lisaient comme un seul bloc. Publier est un
            geste définitif — il doit se détacher de ce qui le précède. -->

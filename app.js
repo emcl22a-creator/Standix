@@ -11669,17 +11669,23 @@ document.getElementById('e-cat-recherche')?.addEventListener('input', (e) => {
    L'employé coche chaque étape en la réalisant. Deux effets, et le second
    compte plus que le premier.
 
-   Il retrouve où il en était après une interruption — en cuisine, on est
-   interrompu tout le temps, et relire trois étapes pour savoir laquelle on
-   venait de finir est exactement ce qui décourage d'ouvrir l'app.
-
-   Et le temps mesuré devient un temps d'EXÉCUTION, pas de lecture. « Fermeture
-   de caisse : 22 minutes en moyenne » apprend quelque chose de vrai sur
+   Le temps mesuré devient un temps d'EXÉCUTION, pas de lecture. « Fermeture de
+   caisse : 22 minutes en moyenne » apprend quelque chose de vrai sur
    l'établissement ; « 40 secondes de lecture » n'apprend rien.
 
-   Les cases vivent dans `validations.etapes_faites`, une colonne JSON. Si elle
-   n'existe pas encore en base, tout continue de fonctionner : les cases sont
-   simplement oubliées à la fermeture.
+   ═══ LES CASES NE SURVIVENT PAS À LA FERMETURE ═══
+
+   Elles étaient relues à l'ouverture, pour retrouver où l'on en était après une
+   interruption. Mais une procédure de travail se REFAIT : celui qui rouvre
+   « Fermeture de caisse » le lendemain la refait en entier, et retrouver la
+   liste à moitié barrée l'oblige à tout décocher avant de commencer.
+
+   La colonne `validations.etapes_faites` continue d'être écrite — elle ne coûte
+   rien et pourra servir un jour à savoir quelles étapes sont systématiquement
+   sautées. Mais PLUS PERSONNE NE LA RELIT pour préremplir les cases.
+
+   Ce qui reste enregistré, c'est la LECTURE elle-même et le temps passé : c'est
+   ce que la gestion consulte, et ça ne bouge pas.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 let etapesFaites = new Set()
@@ -11995,9 +12001,18 @@ async function openEquipeDetail(procId) {
 
   const stepsEl = document.getElementById('detail-steps')
   detacherSuiviLecture(detailVideoEl)
-  /* On reprend les cases déjà cochées lors d'une visite précédente. */
-  const dejaLu = (mesLectures || []).find(v => v.procedure_id === procId)
-  etapesFaites = new Set(Array.isArray(dejaLu?.etapes_faites) ? dejaLu.etapes_faites : [])
+  /* ═══ LES CASES REPARTENT VIDES À CHAQUE OUVERTURE ═══
+
+     On reprenait les cases cochées lors d'une visite précédente. C'était une
+     erreur de nature : une procédure de travail se REFAIT. Un cuisinier qui
+     rouvre « Fermeture de caisse » le lendemain soir la refait en entier — il
+     n'a que faire de ce qu'il avait coché hier, et retrouver la liste à moitié
+     barrée l'oblige à tout décocher avant de commencer.
+
+     Les cases suivent le geste en cours, pas l'historique. Ce qui est
+     historique, c'est la LECTURE — qui reste enregistrée, avec le temps passé :
+     c'est ce que la gestion consulte, et ça ne bouge pas. */
+  etapesFaites = new Set()
   etapesTotal = (etapes || []).length
 
   stepsEl.innerHTML = ''

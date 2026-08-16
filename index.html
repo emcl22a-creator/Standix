@@ -267,6 +267,11 @@
   <span class="pc-sous">Scannez ce code pour y accéder</span>
 </div>
 
+<!-- Le voile d'arrivée. Il assombrit brièvement l'écran pendant qu'une page
+     ou une fenêtre arrive : c'est lui qui donne la profondeur. Sans lui, les
+     deux surfaces se superposent à plat et rien ne dit laquelle est devant. -->
+<div class="voile-arrivee" id="voile-arrivee" aria-hidden="true"></div>
+
 <div class="color-halos">
   <div class="chalo chalo-4"></div>
   <div class="chalo chalo-1"></div>
@@ -2967,7 +2972,17 @@ const LABELS_EQUIPE  = ['Procedures', 'QR code', 'Reglages'];
 let LABELS = LABELS_GESTION;
 const ICONS = [
   {line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
-   fill:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H5.4a2.2 2.2 0 0 1-2.2-2.2z M9.3 21.8v-6.4h5.4v6.4z'},
+   /* UN SEUL CONTOUR, PAS DEUX TRACÉS.
+
+      La porte était un second rectangle, évidé par la règle `evenodd`. Son bord
+      inférieur tombait exactement sur celui de la maison — à 21,8 — et deux
+      arêtes superposées se rendent mal : selon la densité de l'écran, il
+      restait un liseré orange sous la porte, comme un seuil.
+
+      On longe maintenant la maison ET on rentre dans la porte au passage, d'un
+      seul trait. Le dessin est identique, mais plus aucune arête ne se
+      superpose : le défaut ne peut plus apparaître, sur aucun écran. */
+   fill:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2H14.7V15.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z'},
   {line:'M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.8 10.9h6.4M8.8 14.4h6.4M8.8 17.9h3.6',
    fill:'M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.9 10h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 13.5h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 17h3.4a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z'},
   {line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',

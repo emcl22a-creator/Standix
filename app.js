@@ -4455,8 +4455,23 @@ function activerAvecNaissance(ecran) {
   ecran.classList.add('active')
 }
 
+/* ═══ LE VOILE, À CHAQUE ARRIVÉE ═══
+
+   Une seule fonction, appelée partout : changement de page dans les deux
+   espaces, ouverture d'une fenêtre. On retire la classe puis on force le
+   navigateur à recalculer — sans ce temps mort, rejouer la même animation ne
+   produit rien du tout. */
+function jouerVoile() {
+  const v = document.getElementById('voile-arrivee')
+  if (!v) return
+  v.classList.remove('joue')
+  void v.offsetWidth
+  v.classList.add('joue')
+}
+
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
+  jouerVoile()
   window.majBarreEspace?.('gestion')
   /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
   window.placerOnglet?.(ONGLET_PAR_ECRAN[id])
@@ -4545,6 +4560,7 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 
 window.showEquipeScreen = function(id, btn) {
   arreterToutesLesVideos()
+  jouerVoile()
   window.majBarreEspace?.('equipe')
   window.placerOnglet?.(ONGLET_EQUIPE_PAR_ECRAN[id])
   /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
@@ -4706,8 +4722,9 @@ async function loadGestionProcedures() {
        `renderCategoryGrid`, qui est le seul endroit qui l'écrit. */
     const cpt0 = document.getElementById('proc-compte')
     if (cpt0) cpt0.textContent = '0 dossier · 0 procédure'
-    // On mesure APRÈS avoir écrit : la grille doit exister pour être située.
-    requestAnimationFrame(() => ajusterHauteurDebut())
+    /* Plus rien à mesurer : le CSS déduit la hauteur du bloc dès la première
+       image. L'appel qui était ici pointait vers une fonction supprimée — il
+       aurait cassé la page à chaque ouverture. */
     catGridEl.innerHTML = `
       <div class="debut">
         <div class="debut-dessin">
@@ -5266,64 +5283,11 @@ function playCardShuffle(containerEl, oldRects) {
 /* Cale l'état vide entre ce qui le précède et la barre d'onglets, quelle que
    soit la taille de l'écran. Sans ça, le dessin flottait trop haut sur grand
    écran et se retrouvait sous la barre sur petit. */
-function ajusterHauteurDebut() {
-  const debut = document.querySelector('#cat-grid .debut, #e-cat-grid .debut')
-  if (!debut) return
-  const haut = Math.round(debut.getBoundingClientRect().top + window.scrollY)
+/* `ajusterHauteurDebut` et sa surveillance ont été retirées : la hauteur du
+   bloc d'accueil est désormais déduite par le CSS (`:has()` + flex). Mesurer
+   puis poser une valeur ne pouvait pas être instantané — il y avait toujours
+   une image où la valeur de repli s'appliquait. */
 
-  /* ═══ LA BARRE ÉTAIT COMPTÉE DEUX FOIS ═══
-
-     L'écran porte DÉJÀ un rembourrage bas de 122 px, posé pour dégager la barre
-     et le bouton +. Je retranchais en plus la hauteur de la barre : la page
-     dépassait de 27 px, et elle défilait alors qu'il n'y avait rien à lire.
-
-     La place disponible, c'est simplement : la fenêtre, moins ce qui est
-     au-dessus du bloc, moins le rembourrage que l'écran réserve déjà en bas.
-     Rien d'autre à soustraire. */
-  const ecran = debut.closest('.screen')
-  const bas = ecran ? parseFloat(getComputedStyle(ecran).paddingBottom) || 0 : 110
-
-  /* La grille porte en plus 14 px de marge basse — l'écart entre elle et ce qui
-     la suit. Ces pixels comptent aussi : sans les retrancher, la page dépassait
-     de 14 px, juste assez pour qu'elle défile sans rien avoir à montrer. */
-  const grille = debut.parentElement
-  const marge = grille ? parseFloat(getComputedStyle(grille).marginBottom) || 0 : 0
-
-  debut.style.setProperty('--debut-h',
-    `calc(100dvh - ${haut}px - ${Math.round(bas + marge)}px)`)
-}
-/* ═══ LA MESURE SE DÉCLENCHE TOUTE SEULE ═══
-
-   Elle n'était appelée QU'À UN endroit : le chemin « aucune procédure du tout »,
-   au chargement. Dès qu'on arrivait sur la page autrement — par un onglet, un
-   retour, un dossier qu'on vient de vider — la hauteur n'était jamais posée. Le
-   bloc retombait sur sa valeur de repli, trop grande, et la page défilait sans
-   rien avoir à montrer.
-
-   Plutôt que de semer des appels dans chaque chemin — et d'en oublier un —, on
-   surveille les deux grilles : dès qu'un bloc d'accueil y apparaît, on mesure.
-   Un seul endroit à tenir, et aucun chemin ne peut lui échapper. */
-;(() => {
-  const oeil = new MutationObserver(() => {
-    if (document.querySelector('#cat-grid .debut, #e-cat-grid .debut')) {
-      /* Deux images d'attente : la première laisse le navigateur poser la
-         grille, la seconde garantit que sa position est définitive. */
-      requestAnimationFrame(() => requestAnimationFrame(ajusterHauteurDebut))
-    }
-  })
-  const brancher = () => {
-    ;['cat-grid', 'e-cat-grid'].forEach(id => {
-      const el = document.getElementById(id)
-      if (el) oeil.observe(el, { childList: true })
-    })
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', brancher)
-  } else brancher()
-})()
-
-window.addEventListener('resize', ajusterHauteurDebut)
-window.addEventListener('orientationchange', () => setTimeout(ajusterHauteurDebut, 120))
 
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
@@ -12241,7 +12205,7 @@ const AVANTAGES = [
     s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
   /* QUATRE, et non trois. On les nomme : « trois façons de créer » ne dit ni
      lesquelles ni pourquoi on en aurait besoin. */
-  { p: 'main', t: 'Quatre fa\u00e7ons de cr\u00e9er une proc\u00e9dure',
+  { p: 'main', t: 'Trois fa\u00e7ons de cr\u00e9er une proc\u00e9dure',
     s: "\u00c9crivez \u00e0 la main, filmez et d\u00e9coupez vous-m\u00eame, laissez l'IA d\u00e9couper, " +
        "ou partez d'un document existant." },
   { p: 'monde', t: 'Chacun lit dans sa langue',
@@ -12252,8 +12216,11 @@ const AVANTAGES = [
     s: "Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe." },
 ]
 
-const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste, m\u00e9dailles ' +
-  'd\'assiduit\u00e9, relance des retardataires, vue consolid\u00e9e de vos sites.'
+/* La liste s'arrête au QR code. Les médailles d'assiduité, la relance des
+   retardataires et la vue consolidée sont retirées : annoncer sur une page
+   d'abonnement des fonctions qu'on ne trouvera pas ensuite est la promesse la
+   plus coûteuse qu'un produit puisse faire. */
+const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste.'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES PALIERS SUIVENT LE NOMBRE DE MEMBRES
@@ -12351,7 +12318,7 @@ function carteOffre(o, opts = {}) {
       <span class="offre-txt">
         <span class="offre-nom">${o.nom}</span>
         <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `Jusqu'\u00e0 ${o.max} membres`}${
-          o.analyses ? ` \u00b7 ${o.analyses} analyses vid\u00e9o par mois` : ''}</span>
+          o.analyses ? ` \u00b7 ${o.analyses} analyses vid\u00e9o IA par mois` : ''}</span>
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
@@ -12441,7 +12408,11 @@ window.renderAbonnements = function() {
     detaille: true,
   })
 
-  document.getElementById('abo-liste').innerHTML = OFFRES
+  /* UN SEUL ENFANT DANS LA LISTE. Le repli se fait en passant la hauteur de
+     `0fr` à `1fr` — une bascule qui suppose une seule piste. Avec une carte par
+     enfant, chacune créait sa propre piste et rien ne se refermait. On enveloppe
+     donc les cartes. */
+  document.getElementById('abo-liste').innerHTML = '<div class="abo-repli">' + OFFRES
     .filter(o => o.cle !== mienne.cle)
     .map(o => carteOffre(o, {
       classe: o.cle === actuel ? ' actuelle' : '',
@@ -12451,7 +12422,7 @@ window.renderAbonnements = function() {
       /* Développées elles aussi : quelqu'un qui déplie les autres offres veut
          comparer, et comparer des titres seuls ne dit rien. */
       membres: n,
-    })).join('')
+    })).join('') + '</div>'
 
   const rappel = document.getElementById('abo-actuel')
   if (rappel) {

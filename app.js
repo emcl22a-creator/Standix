@@ -5292,6 +5292,36 @@ function ajusterHauteurDebut() {
   debut.style.setProperty('--debut-h',
     `calc(100dvh - ${haut}px - ${Math.round(bas + marge)}px)`)
 }
+/* ═══ LA MESURE SE DÉCLENCHE TOUTE SEULE ═══
+
+   Elle n'était appelée QU'À UN endroit : le chemin « aucune procédure du tout »,
+   au chargement. Dès qu'on arrivait sur la page autrement — par un onglet, un
+   retour, un dossier qu'on vient de vider — la hauteur n'était jamais posée. Le
+   bloc retombait sur sa valeur de repli, trop grande, et la page défilait sans
+   rien avoir à montrer.
+
+   Plutôt que de semer des appels dans chaque chemin — et d'en oublier un —, on
+   surveille les deux grilles : dès qu'un bloc d'accueil y apparaît, on mesure.
+   Un seul endroit à tenir, et aucun chemin ne peut lui échapper. */
+;(() => {
+  const oeil = new MutationObserver(() => {
+    if (document.querySelector('#cat-grid .debut, #e-cat-grid .debut')) {
+      /* Deux images d'attente : la première laisse le navigateur poser la
+         grille, la seconde garantit que sa position est définitive. */
+      requestAnimationFrame(() => requestAnimationFrame(ajusterHauteurDebut))
+    }
+  })
+  const brancher = () => {
+    ;['cat-grid', 'e-cat-grid'].forEach(id => {
+      const el = document.getElementById(id)
+      if (el) oeil.observe(el, { childList: true })
+    })
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', brancher)
+  } else brancher()
+})()
+
 window.addEventListener('resize', ajusterHauteurDebut)
 window.addEventListener('orientationchange', () => setTimeout(ajusterHauteurDebut, 120))
 

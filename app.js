@@ -6198,51 +6198,17 @@ function majBoutonIA() {
   /* Un seul bouton, juste au-dessus de « Publier ». Celui qui vivait sous les
      étapes a été retiré : deux boutons identiques à deux endroits laissaient
      croire à deux actions différentes. */
-  const bas = document.getElementById('vid-ia-bas')
-  if (bas) {
-    const nbTot = videoSteps.length
-    const videsTot = videoSteps.filter(s => !String(s.texte || '').trim()).length
-    bas.style.display = nbTot ? 'flex' : 'none'
-    /* Le bouton reste ACTIF tant qu'il y a des étapes. Être éteint sans rien
-       dire de plus qu'une phrase grise laissait croire à une panne — et quand
-       on vidait un texte, il ne se réveillait pas.
+  /* ═══ CETTE FONCTION N'A PLUS RIEN À PILOTER ═══
 
-       Son libellé ne change plus non plus : « Compléter les étapes avec l'IA »,
-       toujours. C'est la note du dessous qui dit où l'on en est. */
-    bas.disabled = iaCompletionEnCours || iaVientDeFinir
-    /* Pendant le travail : l'anneau seul. À la fin : la coche. Le texte
-       disparaît dans les deux cas — il n'y a plus rien à décider, et une phrase
-       sous un bouton éteint donne envie d'appuyer encore. */
-    bas.classList.toggle('travaille', iaCompletionEnCours)
-    bas.classList.toggle('fini', iaVientDeFinir && !iaCompletionEnCours)
-    const txt = document.getElementById('vid-ia-bas-txt')
-    /* « Compléter les étapes avec l'IA » ne disait pas qui fait quoi : on croyait
-       devoir compléter soi-même, avec son aide. Le titre de la page annonce
-       « Vous découpez, l'IA rédige » — le bouton reprend ces mots. */
-    /* Sans le mot « IA » : la marque AI est déjà dans le bouton, juste à
-       gauche. L'écrire deux fois dans le même bouton le dit moins fort, pas
-       plus. */
-    if (txt) txt.textContent = 'R\u00e9diger mes \u00e9tapes'
-  }
+     Le bouton « L'IA rédige mes étapes » a été retiré de la page. Restait la
+     note qui l'accompagnait — et elle allait chercher `vid-ia-note`, un
+     identifiant porté AUSSI par la note « Cinq minutes maximum » de la page de
+     création par l'IA. Elle l'aurait écrasée avec « 3 étapes sans texte ».
 
-  /* La note explicative reste : elle dit combien d'étapes attendent un texte,
-     et elle est utile juste au-dessus du bouton du bas. */
-  const note = document.getElementById('vid-ia-note')
-  if (!note) return
-  const nb = videoSteps.length
-  const vides = videoSteps.filter(s => !String(s.texte || '').trim()).length
-  if (!nb) { note.textContent = ''; return }
-  if (iaCompletionEnCours) {
-    note.textContent = 'Une \u00e0 deux minutes. Vous pouvez continuer \u00e0 d\u00e9couper.'
-  } else if (!vides) {
-    note.textContent = 'Toutes vos \u00e9tapes ont d\u00e9j\u00e0 un texte.'
-  } else {
-    note.textContent = `${vides} \u00e9tape${vides > 1 ? 's' : ''} sans texte. ` +
-      `L\u2019IA \u00e9crira \u00e0 partir de ce que vous avez dit pendant chacune.`
-  }
+     Deux éléments portaient le même identifiant ; en supprimer un a rendu le
+     défaut visible. On s'arrête ici. */
 }
 
-document.getElementById('vid-ia-bas')?.addEventListener('click', completerEtapesAvecIA)
 
 async function completerEtapesAvecIA() {
   if (iaCompletionEnCours) return
@@ -9114,11 +9080,15 @@ window.ouvrirMontageVideo = async function(procId) {
 
   /* En modification, l'écran ne parle plus de découpage : on vient corriger une
      procédure qui existe, pas en fabriquer une. */
+  /* Les libellés de CRÉATION ne parlent plus de l'IA : ce mode a été retiré de
+     l'écran de création, et le bouton qui rédigeait les textes n'existe plus.
+     Cette page ne sert qu'à découper — soit une procédure qu'on modifie, soit
+     une vidéo qu'on remonte. */
   el('dv-titre-page').textContent = dvEdition
-    ? 'Modifier la proc\u00e9dure' : 'Vous d\u00e9coupez, l\u2019IA r\u00e9dige'
+    ? 'Modifier la proc\u00e9dure' : 'D\u00e9couper la vid\u00e9o'
   el('dv-sous').textContent = dvEdition
     ? "Vos changements ne partent qu'\u00e0 l'enregistrement"
-    : 'Marquez les coupures, l\u2019IA r\u00e9dige ensuite'
+    : 'Marquez le d\u00e9but et la fin de chaque \u00e9tape'
   el('dv-entete').style.display = dvEdition ? 'block' : 'none'
 
   if (!dvEdition) return

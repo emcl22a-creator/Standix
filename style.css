@@ -4920,7 +4920,16 @@
     grid-column:1/-1; display:flex; flex-direction:column;
     align-items:center; justify-content:center; text-align:center;
     min-height:var(--debut-h, calc(100dvh - 300px));
-    padding:20px 20px 84px;
+    /* ═══ UN REMBOURRAGE ÉGAL, PARCE QUE LA HAUTEUR EST DÉJÀ JUSTE ═══
+
+       Il valait 84 px en bas, pour dégager le bouton + flottant. Mais la
+       hauteur du bloc, elle, s'arrête DÉJÀ au bouton : le calcul retranche le
+       rembourrage de l'écran, qui réserve exactement cette place. Les 84 px
+       faisaient donc double emploi, et poussaient le contenu 31 px trop haut.
+
+       Vingt pixels partout. Le contenu se centre alors dans la place réelle —
+       du haut de la grille au bouton — et ne le touche jamais. */
+    padding:20px;
   }
   /* La consigne finale, plus discrète que le paragraphe : c'est une indication
      de geste, pas une explication. */

@@ -4335,6 +4335,7 @@ const ONGLET_PAR_ECRAN = {
      appartient aux Réglages. */
   'p-activites': 0,
   'p-scan': 3,
+  'p-quota': 3,   // il vit dans les Réglages
 }
 
 /* `p-reg-etabs` a été retiré de cette table en même temps que l'écran : la
@@ -4472,6 +4473,10 @@ function jouerVoile() {
 window.showGestionScreen = function(id, btn) {
   arreterToutesLesVideos()
   jouerVoile()
+  /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
+     dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
+     Branché ICI plutôt qu'aux quatre endroits qui ouvrent cette page. */
+  if (id === 'p-settings') majLigneQuota()
   window.majBarreEspace?.('gestion')
   /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
   window.placerOnglet?.(ONGLET_PAR_ECRAN[id])
@@ -11834,6 +11839,107 @@ function repeindreSansSauter(repeindre) {
   const y = window.scrollY
   repeindre()
   window.scrollTo({ top: y, behavior: 'instant' })
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VOS ANALYSES VIDÉO
+
+   On interroge `verifier_analyse`, qui NE CONSOMME RIEN — c'est la fonction de
+   lecture, pas celle qui décompte. Ouvrir cette page ne coûte donc aucune
+   analyse, ce qui serait le comble.
+
+   Le mode DOCUMENT n'est pas compté : il passe par `ai-texte`, sans Azure, et
+   coûte vingt-cinq fois moins. Le dire ici transforme une limite en générosité
+   — et évite qu'un client se croie bloqué alors qu'il ne l'est pas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let quotaConnu = null
+
+/* Le premier jour du mois PROCHAIN, en toutes lettres. « le mois prochain »
+   oblige à calculer ; « le 1er septembre » se retient. */
+function dateRenouvellement() {
+  const d = new Date()
+  const p = new Date(d.getFullYear(), d.getMonth() + 1, 1)
+  return p.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+    .replace(/^1 /, '1er ')
+}
+
+async function lireQuota() {
+  try {
+    const { data, error } = await supabase.rpc('verifier_analyse')
+    if (error || !data) return null
+    quotaConnu = { quota: Number(data.quota) || 0, reste: Number(data.reste) || 0 }
+    return quotaConnu
+  } catch (e) {
+    console.warn('[quota] lecture impossible :', e?.message || e)
+    return null
+  }
+}
+
+/* La ligne des Réglages. Elle affiche le compte SANS ouvrir la page. */
+async function majLigneQuota() {
+  const el = document.getElementById('reg-quota')
+  if (!el) return
+  const q = await lireQuota()
+  el.textContent = q ? `${q.reste} sur ${q.quota}` : '\u2014'
+}
+
+window.ouvrirQuota = async function() {
+  showGestionScreen('p-quota')
+  const carte = document.getElementById('quota-carte')
+  if (!carte) return
+  carte.innerHTML = '<div class="quota-attente">Chargement\u2026</div>'
+
+  const q = await lireQuota()
+  if (!q) {
+    carte.innerHTML = '<div class="quota-attente">Le compte n\u2019a pas pu \u00eatre lu. '
+      + 'R\u00e9essayez dans un instant.</div>'
+    return
+  }
+
+  const { quota, reste } = q
+  const R = 92, C = 2 * Math.PI * R
+  /* L'ambre montre ce qui RESTE : l'anneau maigrit à mesure du mois. Montrer le
+     consommé se lirait à l'envers — un anneau presque plein voudrait dire
+     « il ne reste presque rien ». */
+  const part = quota > 0 ? (reste / quota) * C : 0
+  const s = reste > 1 ? 's' : ''
+
+  carte.innerHTML = `
+    <div class="quota-anneau">
+      <svg width="220" height="220" viewBox="0 0 220 220">
+        <circle class="piste" cx="110" cy="110" r="${R}" fill="none" stroke-width="17"/>
+        <circle class="part" cx="110" cy="110" r="${R}" fill="none" stroke="#FFAE2E"
+          stroke-width="17" stroke-dasharray="${part} ${C - part}" stroke-dashoffset="${C}"/>
+      </svg>
+      <div class="quota-dedans">
+        <div class="gros">${reste}</div>
+        <div class="unite">analyse${s} restante${s}</div>
+        <div class="sous">sur ${quota} ce mois-ci</div>
+      </div>
+    </div>
+    <div class="quota-illimite">
+      <span class="ic">\u221e</span>
+      <span>Cr\u00e9er depuis un <b>document</b> ou \u00e0 la main reste <b>illimit\u00e9</b>.
+        Seule l\u2019analyse vid\u00e9o est compt\u00e9e.</span>
+    </div>
+    ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
+        ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
+      </button>` : ''}
+    <div class="quota-pied">
+      Renouvellement le <b>${dateRenouvellement()}</b>.
+      Les analyses non utilis\u00e9es ne se reportent pas.
+    </div>`
+
+  /* L'anneau part de zéro et se remplit : deux images d'attente, sans quoi le
+     navigateur pose la valeur finale sans rien animer. */
+  const arc = carte.querySelector('.part')
+  if (arc) requestAnimationFrame(() => requestAnimationFrame(() => {
+    arc.setAttribute('stroke-dashoffset', '0')
+  }))
+}
+
+window.ouvrirAbonnementDepuisQuota = function() {
+  document.getElementById('ouvrir-abonnement')?.click()
 }
 
 /* Le bandeau du bas dit où l'on en est, et félicite à la dernière case. */

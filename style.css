@@ -6370,3 +6370,70 @@ body.chargement #bar{
 @media (prefers-reduced-motion: reduce){
   .voile-arrivee.joue{ animation:none; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VOS ANALYSES VIDÉO
+
+   Une carte, un anneau, un chiffre. L'ambre montre ce qui RESTE : l'anneau
+   maigrit à mesure du mois, ce qui se lit sans compter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.quota-carte{
+  background:linear-gradient(165deg,#141418 0%,#0F0F13 55%,#0B0B0E 100%);
+  border-radius:26px; padding:26px 18px 20px; text-align:center;
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
+             0 10px 34px rgba(0,0,0,0.34);
+}
+.quota-attente{ padding:40px 10px; font-size:13px; color:var(--label-3); }
+
+.quota-anneau{ position:relative; display:grid; place-items:center; margin-bottom:14px; }
+/* Le quart de tour : sans lui, l'anneau démarre à trois heures. */
+.quota-anneau svg{ display:block; transform:rotate(-90deg); }
+.quota-anneau .piste{ stroke:rgba(255,255,255,0.07); }
+.quota-anneau .part{
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1.1s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.quota-dedans{ position:absolute; text-align:center; width:150px; }
+.quota-dedans .gros{
+  font-size:52px; font-weight:750; letter-spacing:-0.05em; line-height:1;
+}
+.quota-dedans .unite{
+  font-size:12.5px; color:var(--label-2); font-weight:650;
+  margin-top:4px; line-height:1.3;
+}
+.quota-dedans .sous{
+  font-size:12px; color:var(--label-3); font-weight:600; margin-top:9px;
+}
+
+/* L'illimité est un ARGUMENT, pas une note. Il tient donc dans un encadré
+   ambre, au-dessus de la mention — pas mêlé à elle. */
+.quota-illimite{
+  display:flex; align-items:flex-start; gap:10px; text-align:left;
+  margin-top:18px; padding:13px 14px; border-radius:16px;
+  background:rgba(255,173,51,0.06);
+  box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.16);
+  font-size:12.5px; line-height:1.5; color:var(--label-2);
+}
+.quota-illimite b{ color:var(--label-1); font-weight:700; }
+.quota-illimite .ic{ flex-shrink:0; font-size:17px; color:#FFAD33; line-height:1.15; }
+
+/* Le bouton n'apparaît QUE sous cinq analyses. Ailleurs il serait de la
+   réclame ; ici c'est un service — la personne va se trouver bloquée. */
+.quota-cta{
+  width:100%; height:46px; margin-top:12px; border:none; border-radius:14px;
+  font-family:inherit; font-size:14px; font-weight:750;
+  background:linear-gradient(135deg,#E85D00,#F58A15 62%,#FF9F26); color:#2A1400;
+}
+.quota-cta:active{ opacity:0.85; }
+
+.quota-pied{
+  margin-top:16px; padding-top:15px;
+  border-top:0.5px solid rgba(255,255,255,0.07);
+  font-size:12.5px; line-height:1.5; color:var(--label-3);
+}
+.quota-pied b{ color:var(--label-2); font-weight:700; }
+
+@media (prefers-reduced-motion: reduce){
+  .quota-anneau .part{ transition:none; }
+}

@@ -134,9 +134,14 @@
   .topbar-card{
     position:relative;
     display:flex; align-items:center;
-    border-radius:100px; padding:10px 20px 10px 18px;
+    /* 13 px à gauche au lieu de 18 : le logo se rapproche du bord, ce qui
+       resserre l'ensemble et lui donne de l'assise. À droite on garde 20 —
+       le texte a besoin de plus d'air qu'une forme. */
+    border-radius:100px; padding:10px 20px 10px 13px;
   }
-  .topbar-left{ display:flex; align-items:center; gap:10px; }
+  /* 9 px : le cadre épouse maintenant le dessin, la marge peut donc reprendre
+     une valeur normale. À 6 px avec un cadre juste, le nom collerait au logo. */
+  .topbar-left{ display:flex; align-items:center; gap:9px; }
   .logo-pill{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
     /* Calage optique fin par rapport au bloc de texte à deux lignes. */
@@ -5191,11 +5196,20 @@
      oblige le navigateur à redessiner un tracé image par image, contrairement
      à l'animation de contour d'avant. Elle n'est lancée qu'une fois l'écran
      réellement peint, sinon son horloge tourne pendant que rien ne s'affiche. */
+  /* Le cadre était de 30 × 35 — la proportion du « P », plus haut que large.
+     Le nouveau ruban est CARRÉ : gardé dans l'ancien cadre, il aurait été
+     écrasé ou réduit. */
   .boot-logo{
-    position:relative; width:30px; height:35px; margin:0 auto 14px;
+    position:relative; width:30px; height:41px; margin:0 auto 14px;
     display:flex; align-items:center; justify-content:center; opacity:0;
   }
   .boot-logo svg{ width:100%; height:100%; position:relative; z-index:1; }
+  /* `object-fit: contain` : le dessin garde ses proportions quoi qu'il arrive.
+     Sans lui, une image carrée dans un cadre non carré se déforme. */
+  .boot-logo img.boot-fill{
+    width:100%; height:100%; object-fit:contain;
+    position:relative; z-index:1; display:block;
+  }
   .boot-fill{ opacity:1; }
   .boot-glow{
     position:absolute; width:170%; height:170%; border-radius:50%;
@@ -5223,7 +5237,10 @@
      seul à l'écran, il annonce l'app. Celui de la barre du haut est un repère
      permanent : le faire grandir et se dé-flouter à chaque ouverture attirait
      l'œil sur un élément qui n'a rien à dire, pendant que le reste chargeait. */
-  .boot-logo--topbar{ width:23px; height:27px; margin:0; opacity:1; }
+  /* Le cadre suit le RAPPORT du dessin — 0,74, soit 25 sur 34. Forcé en carré,
+     il ajoutait 149 px de vide de chaque côté dans l'image : c'est ce vide,
+     et non la marge, qui éloignait le logo du nom. */
+  .boot-logo--topbar{ width:28px; height:38px; margin:0; opacity:1; }
   .boot-logo--topbar.play{ animation:none; }
 
   @media (prefers-reduced-motion: reduce){

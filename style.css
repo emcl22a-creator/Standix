@@ -338,12 +338,17 @@
 
      82 rétablit la mesure, et rapproche du même coup le bouton d'information de
      la carte : c'est le premier élément de la page, il se cale sur elle. */
+  /* 87 px, comme toutes les autres. L'Analyse forçait 82 : cinq pixels plus
+     haut, ce qui se voit en passant d'un onglet à l'autre — le titre saute.
+     Rien ne justifiait l'exception. */
   #p-global-analyse{
-    padding-top:82px !important;
     padding-bottom:calc(110px + max(20px, env(safe-area-inset-bottom))) !important;
   }
   #p-membre .an-tete{ margin-top:30px !important; padding-top:22px !important; }
-  .screen.active{ display:block; animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1); }
+  /* 0,38 s, comme les deux autres arrivées. Trois durées coexistaient pour le
+     même geste — 0,55, 0,38 et 0,34 — et la différence se sentait en passant
+     d'une page à l'autre : certaines paraissaient plus lourdes. */
+  .screen.active{ display:block; animation: screenIn 0.38s cubic-bezier(0.32,0.72,0,1); }
 
   /* ═══ L'ÉCRAN QUI NAÎT DE LA CARTE TOUCHÉE ═══
 
@@ -356,7 +361,12 @@
      cette mesure, l'agrandissement partirait toujours du même endroit — juste
      pour la carte du milieu, faux pour toutes les autres. */
   .screen.active.nait{
-    animation:ecranNait 0.46s cubic-bezier(0.32,0.72,0,1);
+    /* 0,38 s comme partout ailleurs. 0,46 se sentait plus lent — et un écran
+       qui met plus longtemps à venir donne l'impression d'un chargement. */
+    animation:ecranNait 0.38s cubic-bezier(0.32,0.72,0,1);
+    /* Le point d'origine reste celui de la carte touchée : à cette amplitude il
+       ne se voit plus vraiment, mais il ne coûte rien et donne au mouvement une
+       direction plutôt qu'un simple gonflement. */
     transform-origin:var(--ox, 50%) var(--oy, 40%);
   }
 
@@ -421,7 +431,7 @@
      Les deux espaces partagent cette durée. L'Équipe a eu 150 ms un moment :
      trop court, la page ne paraissait plus arriver mais sauter — on y lit un
      défaut d'affichage plutôt qu'une transition. */
-  .screen.fondu{ animation:ecranFondu 0.34s cubic-bezier(0.32,0.72,0,1); }
+  .screen.fondu{ animation:ecranFondu 0.38s cubic-bezier(0.32,0.72,0,1); }
   @keyframes ecranFondu{
     0%  { opacity:0; transform:scale(0.975); }
     30% { opacity:1; }
@@ -438,10 +448,23 @@
   .screen.fondu .an-bloc,
   .screen.fondu .hero{ animation:none !important; }
 
+  /* ═══ LE MÊME GESTE QUE TOUTES LES AUTRES ARRIVÉES ═══
+
+     L'écran « naissait » de la carte touchée : il partait à 32 % de sa taille,
+     coins arrondis, et se dépliait. C'était joliment trouvé, mais c'était le
+     SEUL endroit de l'app à faire ça — ouvrir un dossier ne ressemblait à rien
+     d'autre.
+
+     Une animation particulière se remarque ; remarquée cent fois par jour, elle
+     devient une attente. Elle rejoint donc les huit autres : 0,975 à 1.
+
+     Le nom et l'origine du mouvement restent — la carte touchée sert toujours
+     de point de départ au navigateur — mais l'amplitude est celle de tout le
+     reste. */
   @keyframes ecranNait{
-    0%{ opacity:0; transform:scale(0.32); border-radius:34px; }
-    38%{ opacity:1; }
-    100%{ opacity:1; transform:scale(1); border-radius:0; }
+    0%  { opacity:0; transform:scale(0.975); }
+    30% { opacity:1; }
+    100%{ opacity:1; transform:none; }
   }
 
   /* Le mouvement se coupe si le système demande moins d'animation. */
@@ -478,9 +501,18 @@
     30% { opacity:1; }
     100%{ opacity:1; transform:none; }
   }
-  .same-as-title-in{ animation: screenIn 0.55s cubic-bezier(0.22,1,0.36,1) both; }
+  .same-as-title-in{ animation: screenIn 0.38s cubic-bezier(0.32,0.72,0,1) both; }
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
-  h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.02em; margin:6px 0 2px; }
+  /* La marge haute de 6 px descendait le titre sous celui des pages d'onglet.
+     `letter-spacing` aligné sur `.page-tete h1` : -0,04 et non -0,02. */
+  h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.04em; margin:0 0 2px; }
+  .detail-header h1.pagehead{ margin:0; }
+
+  /* `pagehead-row` porte le titre ET un bouton à droite — « Gérer l'équipe »
+     et son « + ». Il gardait une marge haute qui descendait le titre de 34 px
+     sous celui des autres pages. */
+  .pagehead-row{ margin-top:0 !important; }
+  .pagehead-row h1.pagehead{ margin:0; }
   .subhead{ font-size:14px; color:var(--label-2); margin-bottom:18px; line-height:1.35; }
 
   /* ═══ Entreprises de l'utilisateur ═══ */
@@ -1347,7 +1379,24 @@
   .fm-nom-ligne .poste:not(:empty)::before{ content:' · '; white-space:pre; }
 
   /* L'anneau segmenté. */
-  .fm-segm{ display:flex; justify-content:center; padding:20px 0 2px; }
+  /* ═══ L'ANNEAU DANS UNE CARTE ═══
+
+     C'était la dernière page où tout flottait sur le fond, depuis qu'on a
+     rassemblé l'abonnement et le quota. La carte lui donne la même tenue :
+     même fond, même rayon, même ombre. */
+  .fm-segm{
+    display:flex; justify-content:center;
+    padding:24px 16px 20px;
+    background:linear-gradient(165deg,#141418 0%,#0F0F13 55%,#0B0B0E 100%);
+    border-radius:26px;
+    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
+               0 10px 34px rgba(0,0,0,0.34);
+  }
+
+  /* LA LISTE RESTE À PLAT. Je l'avais mise dans un bloc — mais les pages
+     d'Analyse, qui portent exactement la même chose, la laissent à nu avec de
+     simples filets. Deux pages sœurs doivent se ressembler ; c'est la fiche
+     membre qui s'aligne, pas l'inverse. */
   .fm-segm .svg{ position:relative; width:214px; height:214px; }
   .fm-segm svg{ transform:rotate(-90deg); display:block; }
   /* Les bouts sont arrondis : chaque part se termine par un demi-cercle.
@@ -1378,8 +1427,11 @@
   }
   .fm-segm .dedans .v{ font-size:36px; font-weight:800; letter-spacing:-0.05em; line-height:1; }
   .fm-segm .dedans .u{ font-size:12px; color:var(--label-3); font-weight:650; margin-top:4px; }
+  /* 112 px, pas 132 : le trou de l'anneau en fait 120, et « 2 procédures sur
+     10 » passait dessous. On rétrécit et on raccourcit — voir `app.js`, où le
+     texte devient « 2 sur 10 lues ». */
   .fm-segm .dedans .n{
-    font-size:12px; font-weight:650; margin-top:8px; max-width:132px;
+    font-size:11px; font-weight:650; margin-top:8px; max-width:112px;
     text-align:center; line-height:1.3; color:var(--label-2);
   }
 
@@ -1433,7 +1485,9 @@
   .fm-plus:active{ opacity:0.6; }
 
   /* Les quatre repères d'activité, tous sur le même modèle. */
+  /* « Activité » reste à plat aussi, pour la même raison. */
   .fm-rep{ margin-top:6px; }
+  .fm-rep .l:last-child{ border-bottom:none; }
   .fm-rep .l{
     display:flex; align-items:center; gap:11px; padding:11px 2px;
     border-bottom:0.5px solid rgba(255,255,255,0.055);
@@ -1476,7 +1530,20 @@
   }
 
   /* La barre de position : deux traits, celui de la page active en blanc. */
+  /* ═══ LA BARRE DE POSITION ═══
+
+     Deux traits sous la piste. Celui de la page courante prend l'ambre et
+     s'allonge — c'est ce qui dit où l'on est, et qu'il y a autre chose à côté.
+
+     J'avais remplacé ça par deux boutons nommés. Le geste de glisser est plus
+     juste : la barre ACCOMPAGNE le mouvement du doigt au lieu de le remplacer
+     par un appui. */
   .fm-barre{ display:flex; gap:6px; justify-content:center; margin-top:20px; }
+  /* Le dessin de la barre est plus bas, dans sa définition d'origine : le TRAIT
+     est le `span`, et le bouton n'est que la zone qu'on touche — plus large que
+     le trait, ce qui la rend atteignable au doigt. J'avais écrit une seconde
+     définition ici, qui masquait le span et peignait le bouton ; les deux se
+     marchaient dessus et le trait inactif disparaissait. */
   .fm-barre button{
     border:none; background:none; padding:8px 3px; cursor:pointer;
   }
@@ -1485,7 +1552,7 @@
     background:rgba(255,255,255,0.16);
     transition:background 0.28s ease, width 0.28s cubic-bezier(0.22,1,0.36,1);
   }
-  .fm-barre button.on span{ background:#fff; width:44px; }
+  .fm-barre button.on span{ background:#FFAD33; width:44px; }
 
   .fm-periode-mot{
     text-align:center; font-size:12px; font-weight:650; color:var(--label-3);
@@ -2656,6 +2723,10 @@
      Le fond est un cran au-dessus du noir de la page — assez pour détacher,
      pas assez pour concurrencer la carte d'offre qui vit dedans. */
   .abo-scene{
+    /* Quatre pixels séparaient le titre « Abonnement » de la carte : les deux
+       se touchaient, et le titre paraissait collé dessus plutôt que posé
+       au-dessus. Dix-huit suffisent à les séparer sans les éloigner. */
+    margin-top:18px;
     position:relative;
     background:linear-gradient(165deg, #141418 0%, #0F0F13 55%, #0B0B0E 100%);
     border-radius:26px;
@@ -3647,13 +3718,28 @@
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
     background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
   }
+  /* ═══ DEUX COULEURS, DEUX RÔLES ═══
+
+     La gestion et l'équipe portaient deux ambres presque identiques — #F0A030
+     et #E8A33D. Indiscernables dans une liste : il fallait lire le rôle écrit
+     sous chaque nom pour savoir qui pouvait quoi.
+
+     L'ÉQUIPE garde l'ambre, la couleur de l'app. LA GESTION prend l'indigo :
+     assez éloigné pour se voir d'un coup d'œil, assez sobre pour ne pas
+     hurler. Le contraste ne repose pas sur la seule teinte — le fond de la
+     gestion est nettement plus sombre, ce qui reste lisible pour qui distingue
+     mal les couleurs. */
   .pm-av{
     width:38px; height:38px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-size:13px; font-weight:750; color:#fff;
+    font-size:13px; font-weight:750; color:#2A1400;
     background:linear-gradient(155deg, #FFCE8A, #F0A030);
   }
-  .pm-av.chef{ background:linear-gradient(155deg, #FFD9A6, #E8A33D); }
+  .pm-av.chef{
+    color:#EAEAF2;
+    background:linear-gradient(155deg, #5B62C4, #3A3F8F);
+    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.16);
+  }
   .pm-info{ flex:1; min-width:0; }
   .pm-nom{ font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
   .pm-soi{
@@ -4300,7 +4386,23 @@
   .plan-price span{ font-size:11px; font-weight:500; color:var(--label-2); }
   .plan-desc{ font-size:12px; color:var(--label-2); margin-top:4px; }
 
-  .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; padding-top:2px; }
+  /* ═══════════════════════════════════════════════════════════════════════
+     TOUTES LES PAGES COMMENCENT À LA MÊME HAUTEUR
+
+     Deux formes d'en-tête coexistent : `page-tete` sur les pages d'onglet, et
+     `detail-header` — bouton retour plus titre — sur les pages qu'on ouvre.
+
+     Elles ne se ressemblaient pas. Le titre des secondes était forcé à 20 px
+     dans le balisage, sur VINGT-CINQ pages, contre 26 pour les premières. Et
+     leur rembourrage haut de 2 px les descendait de six pixels de plus.
+
+     Résultat : « Procédures » commençait à 87 px en 26 px, « Abonnement » à
+     93 px en 20 px. Passer de l'une à l'autre faisait sauter le titre et
+     changer sa taille.
+
+     Le rembourrage passe à zéro, et le titre prend 26 px comme les autres. Le
+     bouton retour reste aligné dessus par `align-items:center`. */
+  .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; }
   .back-btn{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); border:0.5px solid var(--border); flex-shrink:0; }
   .back-btn svg{width:16px; height:16px;}
   /* ═══ Le fil des étapes, côté équipe ═══
@@ -6258,19 +6360,51 @@ body.chargement #bar{
    encadrent celle qu'on regarde.
    ═══════════════════════════════════════════════════════════════════════════ */
 .screen.bascule-part{
+  /* ═══ ON VA À CÔTÉ, PAS PLUS LOIN ═══
+
+     Le contenu reculait à 97 % — presque le geste d'arrivée d'une page, en
+     plus discret. Rien ne disait qu'on changeait d'ENTREPRISE plutôt que de
+     page.
+
+     Il sort maintenant par la GAUCHE. Aucun autre écran de l'app ne se déplace
+     horizontalement : le mouvement latéral est donc réservé à ça, et se
+     reconnaît sans qu'on ait à l'apprendre. Vingt-six pixels — assez pour se
+     voir, trop peu pour donner le mal de mer. */
   opacity:0;
-  transform:scale(0.97);
+  transform:translateX(-26px);
   transition:opacity 0.18s ease-out,
-             transform 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+             transform 0.2s cubic-bezier(0.32, 0.72, 0, 1);
   pointer-events:none;
 }
-/* Le retour se fait par `contenu-entre`, en cascade. On rend seulement sa
-   transition à l'écran pour qu'il revienne à sa taille sans à-coup. */
-.screen{ transition:opacity 0.18s ease-out, transform 0.18s cubic-bezier(0.32,0.72,0,1); }
+
+/* Et le nouveau contenu entre par la DROITE. Sans ce second temps, l'ancien
+   partait de côté et le nouveau apparaissait sur place — un demi-geste. */
+.bascule-en-cours .screen.active:not(.bascule-part){
+  animation:basculeEntre 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes basculeEntre{
+  from{ opacity:0; transform:translateX(26px); }
+  to{ opacity:1; transform:none; }
+}
+/* ═══ LA TRANSITION NE VAUT QUE POUR LA BASCULE D'ÉTABLISSEMENT ═══
+
+   Elle était posée sur `.screen` — donc sur TOUS les écrans, en permanence.
+   Résultat : à chaque changement de page, deux mouvements se superposaient sur
+   les mêmes propriétés — l'animation d'arrivée de 0,34 s, et cette transition
+   de 0,18 s. C'est ce qu'on sentait comme « une animation en plus ».
+
+   Elle n'existe que pour une chose : ramener l'écran à sa taille après un
+   changement d'établissement, quand `bascule-part` est retirée. On la limite
+   donc à ce moment-là, en la posant sur le PARENT — la classe est présente
+   pendant la bascule et absente le reste du temps. */
+.bascule-en-cours .screen{
+  transition:opacity 0.18s ease-out, transform 0.18s cubic-bezier(0.32,0.72,0,1);
+}
 
 @media (prefers-reduced-motion: reduce){
   .screen.bascule-part{ transition:none; }
-  .screen{ transition:none; }
+  .bascule-en-cours .screen{ transition:none; }
+  .bascule-en-cours .screen.active:not(.bascule-part){ animation:none; }
 }
 
 

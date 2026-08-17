@@ -4458,6 +4458,26 @@ function activerAvecNaissance(ecran) {
   ecran.classList.add('active')
 }
 
+/* ═══ LE LOGO, DÉFINI UNE FOIS ═══
+
+   L'image est intégrée dans `index.html` plutôt que déposée à côté : un
+   fichier absent du dépôt donnait un point d'interrogation à la place du
+   logo, et rien ne le signalait.
+
+   Elle n'y figure qu'UNE fois — les deux autres emplacements la recopient au
+   démarrage. Sans ça, les 24 Ko de l'image seraient écrits trois fois dans la
+   page. */
+;(() => {
+  const poser = () => {
+    const src = document.getElementById('logo-src')
+    if (!src) return
+    document.querySelectorAll('img[data-logo]').forEach(i => { i.src = src.src })
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', poser)
+  } else poser()
+})()
+
 /* ═══ LE VOILE, À CHAQUE ARRIVÉE ═══
 
    Une seule fonction, appelée partout : changement de page dans les deux

@@ -165,9 +165,18 @@
      plupart des produits. */
   .topbar-title .name, .logotype{
     font-family:'Poppins', 'Inter', system-ui, sans-serif;
-    /* 500. À 400 le mot était trop léger, à 600 trop épais — c'est la graisse
-       intermédiaire qui tient. Une géométrique paraît toujours plus grasse
-       qu'une Inter de même valeur, ses lettres étant plus pleines. */
+    /* ═══ LA GRAISSE 500, POUR DE VRAI ═══
+
+       Il y avait ici du 400 épaissi d'un quart de pixel par un contour tracé
+       dans la couleur de la lettre. Un demi-pas, faute d'avoir chargé le 500.
+
+       Le procédé a deux défauts : le contour est ajouté par le navigateur, pas
+       dessiné par le typographe — les jonctions du « a » et du « d » s'y
+       empâtent —, et `-webkit-text-stroke` n'existe pas partout, si bien que
+       le mot changeait d'épaisseur d'un navigateur à l'autre.
+
+       Le 500 est maintenant chargé et employé. Une vraie graisse, dessinée
+       pour l'être. */
     font-weight:500; letter-spacing:-0.01em;
   }
   .topbar-title .name{ font-size:15.5px; }

@@ -5200,7 +5200,7 @@
      Le nouveau ruban est CARRÉ : gardé dans l'ancien cadre, il aurait été
      écrasé ou réduit. */
   .boot-logo{
-    position:relative; width:30px; height:41px; margin:0 auto 14px;
+    position:relative; width:32px; height:41px; margin:0 auto 14px;
     display:flex; align-items:center; justify-content:center; opacity:0;
   }
   .boot-logo svg{ width:100%; height:100%; position:relative; z-index:1; }
@@ -5240,7 +5240,10 @@
   /* Le cadre suit le RAPPORT du dessin — 0,74, soit 25 sur 34. Forcé en carré,
      il ajoutait 149 px de vide de chaque côté dans l'image : c'est ce vide,
      et non la marge, qui éloignait le logo du nom. */
-  .boot-logo--topbar{ width:28px; height:38px; margin:0; opacity:1; }
+  /* 25 sur 32, au rapport 0,773 du dessin. À 38 px le logo dépassait la hauteur
+     des deux lignes de texte à côté — il paraissait posé sur la pilule plutôt
+     que dedans. */
+  .boot-logo--topbar{ width:25px; height:32px; margin:0; opacity:1; }
   .boot-logo--topbar.play{ animation:none; }
 
   @media (prefers-reduced-motion: reduce){

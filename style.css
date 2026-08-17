@@ -6494,7 +6494,9 @@ body.chargement #bar{
   display:flex; align-items:center; gap:9px;
   text-align:left; margin-bottom:14px;
 }
-.pc-logo{ width:17px; height:20px; flex-shrink:0; display:block; }
+/* Le cinquième logo — la carte de bureau. 15 sur 21, au rapport 0,706 du
+   dessin : la règle visait un SVG de proportions différentes. */
+.pc-logo{ width:15px; height:21px; flex-shrink:0; display:block; object-fit:contain; }
 .pc-tete b{
   font-size:12.5px; font-weight:700; line-height:1.3;
   letter-spacing:-0.01em; color:var(--label-1);

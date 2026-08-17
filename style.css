@@ -149,7 +149,27 @@
   }
   .logo-pill svg{ width:23px; height:27px; }
   .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
-  .topbar-title .name{ font-size:14.5px; font-weight:700; }
+  /* ═══ LE NOM PORTE SA PROPRE POLICE ═══
+
+     Poppins, en graisse 400. Outfit y était d'abord — mais elle est plus
+     étroite et plus dense : à 600, le mot paraissait épais. Poppins a le « a »
+     à un seul étage et la rondeur de la capture, avec un trait fin.
+
+     Elle ne sert QU'AU NOM. Le reste de l'app garde Inter, dessinée pour la
+     lecture en petit sur écran — c'est ce que fait un employé debout en
+     cuisine. Une police géométrique y fatigue : ses lettres se ressemblent
+     trop, et le I majuscule, le l minuscule et le 1 s'y confondent. Dans une
+     procédure, cette confusion coûte cher.
+
+     Une police de marque, une police de lecture : c'est ainsi que font la
+     plupart des produits. */
+  .topbar-title .name, .logotype{
+    font-family:'Poppins', 'Inter', system-ui, sans-serif;
+    /* 400 et non 600 : une géométrique a l'air plus grasse qu'une Inter de
+       même graisse, ses lettres étant plus pleines. */
+    font-weight:400; letter-spacing:-0.01em;
+  }
+  .topbar-title .name{ font-size:15.5px; }
   .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
   /* ═══ Le compte est partagé ═══ */
   /* Un point sur le bouton des réglages : c'est le seul endroit où l'on peut
@@ -4374,7 +4394,10 @@
     display:flex; align-items:center; justify-content:center; gap:5px;
     margin-top:12px; padding-top:11px; border-top:1px solid rgba(20,21,24,0.10);
   }
+  /* La plaque porte le logo en image, comme le reste — la règle visait encore
+     le SVG du « P ». 11 sur 15, au rapport 0,706 du dessin. */
   .qr-plaque-mark svg{ width:9px; height:11px; }
+  .qr-plaque-mark img{ width:11px; height:15px; object-fit:contain; display:block; }
   .qr-plaque-mark span{ color:rgba(20,21,24,0.4); font-size:10px; font-weight:700; letter-spacing:0.01em; }
   .qr-hint{ font-size:12px; color:var(--label-2); margin-bottom:12px; line-height:1.4; }
 

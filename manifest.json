@@ -1,0 +1,19 @@
+{
+  "name": "Standix",
+  "short_name": "Standix",
+  "description": "Vos procédures, filmées une fois.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0C0D0E",
+  "theme_color": "#0C0D0E",
+  "orientation": "portrait",
+  "lang": "fr",
+  "icons": [
+    { "src": "favicon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "favicon.png", "sizes": "96x96", "type": "image/png" },
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

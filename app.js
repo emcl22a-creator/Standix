@@ -245,7 +245,7 @@ const DICO = {
     "Publier la procédure": "Publish the procedure",
     "Quelques secondes. Vous relirez chaque étape ensuite.": "A few seconds. You will review each step afterwards.",
     "Rechercher une procédure...": "Search a procedure…",
-    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Procédo reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Removing someone immediately cuts their access to the company procedures. Their Procédo account stays active: they can join another company with a new code.",
+    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Standix reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Removing someone immediately cuts their access to the company procedures. Their Standix account stays active: they can join another company with a new code.",
     "Scanner un code": "Scan a code",
     "Scannez pour ouvrir la procédure": "Scan to open the procedure",
     "Se déconnecter": "Sign out",
@@ -258,7 +258,7 @@ const DICO = {
     "Trier : A → Z": "Sort: A → Z",
     "Trier : les plus actifs": "Sort: most active",
     "Télécharger la fiche": "Download the sheet",
-    "Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.": "A problem, an idea, a question about Procédo? We read everything and reply as soon as we can.",
+    "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "A problem, an idea, a question about Standix? We read everything and reply as soon as we can.",
     "Une consigne écrite, une fiche, un mode d'emploi": "A written instruction, a sheet, a manual",
     "Une question ?": "A question?",
     "Visez le QR code affiché sur un poste pour ouvrir sa procédure": "Point at the QR code displayed at a station to open its procedure",
@@ -353,8 +353,8 @@ const DICO = {
       'Enter the 5-digit code your manager gave you. It will be remembered: the company will appear in the list above.',
     'Une question ?': 'A question?',
     '\u00c9crivez-nous': 'Write to us',
-    'Un souci, une id\u00e9e, une question sur Proc\u00e9do ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
-      'A problem, an idea, a question about Proc\u00e9do? We read everything and reply as soon as we can.',
+    'Un souci, une id\u00e9e, une question sur Standix ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
+      'A problem, an idea, a question about Standix? We read everything and reply as soon as we can.',
     'Compte': 'Account',
     'Se d\u00e9connecter': 'Sign out',
   },
@@ -453,7 +453,7 @@ const DICO = {
     "Publier la procédure": "Publicar el procedimiento",
     "Quelques secondes. Vous relirez chaque étape ensuite.": "Unos segundos. Después revisarás cada paso.",
     "Rechercher une procédure...": "Buscar un procedimiento…",
-    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Procédo reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Quitar a una persona le corta inmediatamente el acceso a los procedimientos de la empresa. Su cuenta Procédo sigue activa: podrá unirse a otra empresa con un nuevo código.",
+    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Standix reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Quitar a una persona le corta inmediatamente el acceso a los procedimientos de la empresa. Su cuenta Standix sigue activa: podrá unirse a otra empresa con un nuevo código.",
     "Scanner un code": "Escanear un código",
     "Scannez pour ouvrir la procédure": "Escanea para abrir el procedimiento",
     "Se déconnecter": "Cerrar sesión",
@@ -466,7 +466,7 @@ const DICO = {
     "Trier : A → Z": "Ordenar: A → Z",
     "Trier : les plus actifs": "Ordenar: los más activos",
     "Télécharger la fiche": "Descargar la ficha",
-    "Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.": "¿Un problema, una idea, una duda sobre Procédo? Lo leemos todo y respondemos lo antes posible.",
+    "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "¿Un problema, una idea, una duda sobre Standix? Lo leemos todo y respondemos lo antes posible.",
     "Une consigne écrite, une fiche, un mode d'emploi": "Una instrucción escrita, una ficha, un manual",
     "Une question ?": "¿Una pregunta?",
     "Visez le QR code affiché sur un poste pour ouvrir sa procédure": "Apunta al código QR de un puesto para abrir su procedimiento",
@@ -555,8 +555,8 @@ const DICO = {
       'Introduce el c\u00f3digo de 5 cifras que te dio tu responsable. Se guardar\u00e1: la empresa aparecer\u00e1 en la lista de arriba.',
     'Une question ?': '\u00bfUna pregunta?',
     '\u00c9crivez-nous': 'Escr\u00edbenos',
-    'Un souci, une id\u00e9e, une question sur Proc\u00e9do ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
-      '\u00bfUn problema, una idea, una duda sobre Proc\u00e9do? Lo leemos todo y respondemos lo antes posible.',
+    'Un souci, une id\u00e9e, une question sur Standix ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
+      '\u00bfUn problema, una idea, una duda sobre Standix? Lo leemos todo y respondemos lo antes posible.',
     'Compte': 'Cuenta',
     'Se d\u00e9connecter': 'Cerrar sesi\u00f3n',
   },
@@ -655,7 +655,7 @@ const DICO = {
     "Publier la procédure": "Publicar o procedimento",
     "Quelques secondes. Vous relirez chaque étape ensuite.": "Alguns segundos. Depois vai rever cada etapa.",
     "Rechercher une procédure...": "Procurar um procedimento…",
-    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Procédo reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Remover uma pessoa corta-lhe imediatamente o acesso aos procedimentos da empresa. A conta Procédo mantém-se ativa: poderá aderir a outra empresa com um novo código.",
+    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Standix reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Remover uma pessoa corta-lhe imediatamente o acesso aos procedimentos da empresa. A conta Standix mantém-se ativa: poderá aderir a outra empresa com um novo código.",
     "Scanner un code": "Ler um código",
     "Scannez pour ouvrir la procédure": "Leia para abrir o procedimento",
     "Se déconnecter": "Terminar sessão",
@@ -668,7 +668,7 @@ const DICO = {
     "Trier : A → Z": "Ordenar: A → Z",
     "Trier : les plus actifs": "Ordenar: os mais ativos",
     "Télécharger la fiche": "Descarregar a ficha",
-    "Un souci, une idée, une question sur Procédo ? Nous lisons tout et nous répondons au plus vite.": "Um problema, uma ideia, uma dúvida sobre o Procédo? Lemos tudo e respondemos o mais depressa possível.",
+    "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "Um problema, uma ideia, uma dúvida sobre o Standix? Lemos tudo e respondemos o mais depressa possível.",
     "Une consigne écrite, une fiche, un mode d'emploi": "Uma instrução escrita, uma ficha, um manual",
     "Une question ?": "Uma pergunta?",
     "Visez le QR code affiché sur un poste pour ouvrir sa procédure": "Aponte ao código QR de um posto para abrir o seu procedimento",
@@ -757,8 +757,8 @@ const DICO = {
       'Introduza o c\u00f3digo de 5 algarismos que o seu respons\u00e1vel lhe deu. Ser\u00e1 guardado: a empresa aparecer\u00e1 na lista acima.',
     'Une question ?': 'Uma pergunta?',
     '\u00c9crivez-nous': 'Escreva-nos',
-    'Un souci, une id\u00e9e, une question sur Proc\u00e9do ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
-      'Um problema, uma ideia, uma d\u00favida sobre o Proc\u00e9do? Lemos tudo e respondemos o mais depressa poss\u00edvel.',
+    'Un souci, une id\u00e9e, une question sur Standix ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
+      'Um problema, uma ideia, uma d\u00favida sobre o Standix? Lemos tudo e respondemos o mais depressa poss\u00edvel.',
     'Compte': 'Conta',
     'Se d\u00e9connecter': 'Terminar sess\u00e3o',
   },
@@ -881,7 +881,7 @@ function revelerApp() {
 }
 setTimeout(() => {
   if (!appRevelee) {
-    console.warn('Procédo · chargement trop long, on affiche quand même')
+    console.warn('Standix · chargement trop long, on affiche quand même')
     revelerApp()
   }
 }, 6000)
@@ -1472,7 +1472,7 @@ async function signalerPresence(membre) {
   } catch (ex) {
     /* Fonction non déployée, réseau coupé : on laisse passer. Mieux vaut ne pas
        compter que de bloquer quelqu'un de légitime. */
-    console.warn('Proc\u00e9do \u00b7 pr\u00e9sence :', ex?.message || ex)
+    console.warn('Standix \u00b7 pr\u00e9sence :', ex?.message || ex)
     return true
   }
 }
@@ -1502,7 +1502,7 @@ async function fenetreTropDAppareils() {
     titre: 'Trop d\'appareils',
     message: `Ce compte est d\u00e9j\u00e0 utilis\u00e9 sur ${APPAREILS_MAX} appareils. ` +
       `Cet appareil-ci a \u00e9t\u00e9 d\u00e9connect\u00e9.\n\n` +
-      `Proc\u00e9do compte les lectures par personne : si votre \u00e9quipe partage un seul ` +
+      `Standix compte les lectures par personne : si votre \u00e9quipe partage un seul ` +
       `compte, votre responsable ne sait pas qui a lu quoi. Demandez-lui votre ` +
       `propre acc\u00e8s \u2014 c'est compris dans votre abonnement.`,
     confirmer: 'Compris', annuler: 'Fermer', danger: false,
@@ -2120,7 +2120,7 @@ window.signOut = async function() {
    prérempli avec l'espace et le nom : je sais tout de suite à qui je réponds. */
 function ouvrirContact() {
   const espace = currentMembre?.role === 'gestion' ? 'Gestion' : 'Équipe'
-  const sujet = encodeURIComponent('Procédo · ' + espace)
+  const sujet = encodeURIComponent('Standix · ' + espace)
   const corps = encodeURIComponent(
     '\n\n\u2014\n' + (currentMembre?.nom || '') + ' \u00b7 espace ' + espace)
   window.location.href = `mailto:Procedo.off@gmail.com?subject=${sujet}&body=${corps}`
@@ -2589,7 +2589,7 @@ async function rafraichirAnalyse() {
       renderGaStats()
     }
   } catch (e) {
-    console.warn('Proc\u00e9do \u00b7 analyse non rafra\u00eechie :', e?.message || e)
+    console.warn('Standix \u00b7 analyse non rafra\u00eechie :', e?.message || e)
   }
 }
 
@@ -3040,7 +3040,9 @@ function centreAnneauMembre(cle, choix) {
     const vus = vue.classe.filter(x => x.secondes).length
     v.textContent = String(Math.round(vue.total / 60))
     u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
-    n.textContent = `${vus} proc\u00e9dure${vus > 1 ? 's' : ''} sur ${vue.classe.length}`
+    /* « 2 sur 10 lues » et non « 2 procédures sur 10 » : le trou de l'anneau
+       fait 120 px, et la phrase longue passait dessous. */
+    n.textContent = `${vus} sur ${vue.classe.length} lues`
     return
   }
 
@@ -3071,8 +3073,8 @@ function majBarrePeriode() {
   document.querySelectorAll('#fm-barre [data-va]').forEach(b => {
     b.classList.toggle('on', b.dataset.va === fmPeriode)
   })
-  const mot = document.getElementById('fm-periode-mot')
-  if (mot) mot.textContent = fmPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+  /* Le mot sous les points a disparu avec eux : les boutons portent leur
+     libellé, le répéter en dessous n'apprenait plus rien. */
 }
 
 ;(() => {
@@ -3554,8 +3556,8 @@ function majBarreEq() {
   document.querySelectorAll('#an-barre-eq [data-va]').forEach(b => {
     b.classList.toggle('on', b.dataset.va === anEqPeriode)
   })
-  const mot = document.getElementById('an-mot-eq')
-  if (mot) mot.textContent = anEqPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+  /* Le mot sous les points est parti avec eux : les boutons de période
+     portent leur libellé. */
 }
 
 ;(() => {
@@ -3867,8 +3869,8 @@ function majBarreCat() {
   document.querySelectorAll('#an-barre-cat [data-va]').forEach(b => {
     b.classList.toggle('on', b.dataset.va === anCatPeriode)
   })
-  const mot = document.getElementById('an-mot-cat')
-  if (mot) mot.textContent = anCatPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+  /* Le mot sous les points est parti avec eux : les boutons de période
+     portent leur libellé. */
 }
 
 ;(() => {
@@ -4185,8 +4187,8 @@ function majBarreProc() {
   document.querySelectorAll('#an-barre-proc [data-va]').forEach(b => {
     b.classList.toggle('on', b.dataset.va === anProcPeriode)
   })
-  const mot = document.getElementById('an-mot-proc')
-  if (mot) mot.textContent = anProcPeriode === 'all' ? 'Depuis le d\u00e9but' : 'Ce mois-ci'
+  /* Le mot sous les points est parti avec eux : les boutons de période
+     portent leur libellé. */
 }
 
 ;(() => {
@@ -4645,7 +4647,7 @@ function rangerGrille(entrepriseId, categories, sous) {
     localStorage.setItem(cleCache(entrepriseId), JSON.stringify({ quand: Date.now(), sous, categories: leger }))
   } catch (e) {
     // Mémoire pleine ou navigation privée : on s'en passe, ce n'est qu'un confort.
-    console.warn('Proc\u00e9do \u00b7 grille non mise en cache :', e?.message || e)
+    console.warn('Standix \u00b7 grille non mise en cache :', e?.message || e)
   }
 }
 
@@ -5427,7 +5429,7 @@ document.addEventListener('click', (e) => {
       try {
         sortHandlers[prefix]?.(option.dataset.sort)
       } catch (err) {
-        console.error(`[Procédo] Erreur au tri "${prefix}" :`, err)
+        console.error(`[Standix] Erreur au tri "${prefix}" :`, err)
       }
     }
     e.stopPropagation()
@@ -5929,7 +5931,7 @@ async function chargerPostes() {
     .select('*').eq('entreprise_id', currentMembre.entreprise_id).order('ordre')
   /* La table peut ne pas exister encore : l'app continue sans les postes plutôt
      que de casser les réglages entiers. */
-  if (error) { console.warn('Proc\u00e9do \u00b7 postes indisponibles :', error.message); return [] }
+  if (error) { console.warn('Standix \u00b7 postes indisponibles :', error.message); return [] }
   postesEntreprise = data || []
   return postesEntreprise
 }
@@ -7515,7 +7517,7 @@ async function extraireBandeSon(fichier) {
 
     return { blob: new Blob([octets], { type: 'audio/wav' }), crete }
   } catch (e) {
-    console.warn('Proc\u00e9do \u00b7 bande son non extraite :', e?.message || e)
+    console.warn('Standix \u00b7 bande son non extraite :', e?.message || e)
     return null
   }
 }
@@ -9698,7 +9700,7 @@ async function envoyerCouverture(procedureId) {
          adresse gardée en base serait morte au bout d'une heure. */
       return chemin
   } catch (ex) {
-    console.warn('Proc\u00e9do \u00b7 image de couverture non envoy\u00e9e :', ex?.message || ex)
+    console.warn('Standix \u00b7 image de couverture non envoy\u00e9e :', ex?.message || ex)
     return couvertureUrl
   }
 }
@@ -10516,7 +10518,7 @@ async function publishProcedure(errorElId, btnId) {
   if (urlCouv) {
     const { error: eCouv } = await supabase.from('procedures')
       .update({ image_url: urlCouv }).eq('id', newProc.id)
-    if (eCouv) console.warn('Proc\u00e9do \u00b7 image non enregistr\u00e9e :', eCouv.message)
+    if (eCouv) console.warn('Standix \u00b7 image non enregistr\u00e9e :', eCouv.message)
   }
 
   const etapesToInsert = allSteps.map((s, i) => ({
@@ -10802,7 +10804,7 @@ async function openAnalyse(procId) {
   }
 }
 
-/* Tracé du logo Procédo en unités 85 x 100. Le logo n'est qu'une suite de
+/* Tracé du logo Standix en unités 85 x 100. Le logo n'est qu'une suite de
    segments droits : on le dessine point par point plutôt que via Path2D,
    dont le constructeur à partir d'une chaîne SVG n'est pas garanti partout. */
 const LOGO_POINTS = [65.78,3.86,60.26,1.43,53.42,0.00,1.77,0.00,0.00,1.32,0.00,6.62,2.10,13.69,6.18,19.87,11.15,23.95,20.31,26.82,52.10,27.04,56.51,29.80,58.50,34.77,57.17,40.51,53.20,43.71,23.18,44.70,15.56,47.90,9.38,53.42,5.63,59.93,3.86,67.44,3.75,96.91,4.97,99.34,8.28,100.00,15.12,99.34,19.76,97.13,23.62,93.60,27.59,85.10,28.04,70.97,54.19,70.97,60.71,69.76,70.86,64.46,78.81,55.74,82.34,48.57,84.11,41.50,84.44,34.22,83.22,26.27,80.57,19.21,77.37,14.02,71.96,8.17]
@@ -10823,7 +10825,7 @@ function dessinerLogo(ctx, x, y, hauteur, couleur) {
 }
 
 /* Dessine la fiche à imprimer : plaque blanche, QR, titre de la procédure,
-   consigne de scan et signature Procédo avec son logo. Rendue en haute définition pour
+   consigne de scan et signature Standix avec son logo. Rendue en haute définition pour
    rester nette une fois imprimée. */
 function composerFicheQR(qrCanvas, titre) {
   const L = 760, cote = 470
@@ -10884,10 +10886,10 @@ function composerFicheQR(qrCanvas, titre) {
 
   // Logo + nom, centrés ensemble. Le logo est le même tracé que partout
   // ailleurs dans l'app, dessiné directement dans le canvas — il manquait
-  // à l'export, seul le mot « Procédo » était écrit.
+  // à l'export, seul le mot « Standix » était écrit.
   g.fillStyle = 'rgba(20,21,24,0.4)'
   g.font = '700 22px Inter, -apple-system, system-ui, sans-serif'
-  const nom = 'Procédo'
+  const nom = 'Standix'
   const largeurNom = g.measureText(nom).width
   const hLogo = 22
   const lLogo = hLogo * 0.85          // le tracé fait 85 x 100 unités
@@ -11992,7 +11994,7 @@ async function enregistrerCoches() {
      l'erreur à chaque case cochée. Les cases restent utilisables à l'écran. */
   if (error && /etapes_faites/i.test(error.message || '')) {
     colonneCochesAbsente = true
-    console.warn('Proc\u00e9do \u00b7 colonne etapes_faites absente : les coches ne seront pas gard\u00e9es.')
+    console.warn('Standix \u00b7 colonne etapes_faites absente : les coches ne seront pas gard\u00e9es.')
   }
 }
 
@@ -12270,6 +12272,10 @@ const PICTOS = {
   suivi: `<svg viewBox="0 0 24 24" fill="none"><line x1="5.4" y1="19.4" x2="5.4" y2="12.6" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19.4" x2="12" y2="7.6" stroke="${AV_O}" stroke-width="2" stroke-linecap="round"/><line x1="18.6" y1="19.4" x2="18.6" y2="10.4" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/></svg>`,
   sites: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="${AV_O}" stroke-width="1.7"/></svg>`,
   main: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v9.2M8.4 7l3.6-3.6L15.6 7" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.6 14.4v3.4a2.6 2.6 0 0 0 2.6 2.6h9.6a2.6 2.6 0 0 0 2.6-2.6v-3.4" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+  /* LA FICHE DE PROCÉDURE. Le même tracé que les cartes de l'app — feuille au
+     coin corné, deux lignes de texte. « Trois façons de créer une procédure »
+     portait une flèche d'envoi, qui parlait d'import et non de procédure. */
+  fiche: `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="${AV_O}" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="${AV_O}" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
 }
 
 /* Les paliers suivent le NOMBRE DE MEMBRES. Chaque offre annonce deux ou trois
@@ -12305,7 +12311,7 @@ const AVANTAGES = [
     s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
   /* QUATRE, et non trois. On les nomme : « trois façons de créer » ne dit ni
      lesquelles ni pourquoi on en aurait besoin. */
-  { p: 'main', t: 'Trois fa\u00e7ons de cr\u00e9er une proc\u00e9dure',
+  { p: 'fiche', t: 'Trois fa\u00e7ons de cr\u00e9er une proc\u00e9dure',
     s: "\u00c9crivez \u00e0 la main, filmez et d\u00e9coupez vous-m\u00eame, laissez l'IA d\u00e9couper, " +
        "ou partez d'un document existant." },
   { p: 'monde', t: 'Chacun lit dans sa langue',
@@ -12671,11 +12677,11 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   const formule = rythmeChoisi
 
   /* L'acceptation au moment de payer. Ce que Stripe présente ensuite est SON
-     contrat, pas le nôtre : sans ce passage, les conditions de Procédo ne
+     contrat, pas le nôtre : sans ce passage, les conditions de Standix ne
      seraient jamais acceptées par quelqu'un qui paie. */
   const accepte = await confirmDialog({
     titre: 'Avant de continuer',
-    message: 'En souscrivant, vous acceptez les conditions d\u2019utilisation de Proc\u00e9do.\n\n' +
+    message: 'En souscrivant, vous acceptez les conditions d\u2019utilisation de Standix.\n\n' +
       'Elles pr\u00e9cisent notamment que les proc\u00e9dures r\u00e9dig\u00e9es par l\u2019IA doivent \u00eatre ' +
       'relues par vos soins avant d\u2019\u00eatre suivies.',
     confirmer: 'J\u2019accepte et je continue',
@@ -12880,7 +12886,7 @@ async function chargerEtablissements() {
     repli = await repli
     data = repli.data || []
     if (repli.error) {
-      console.warn('Proc\u00e9do \u00b7 \u00e9tablissements :', repli.error.message)
+      console.warn('Standix \u00b7 \u00e9tablissements :', repli.error.message)
     }
   }
 
@@ -12912,7 +12918,7 @@ async function chargerEtablissements() {
         membre_id: currentMembre.id,
       }]
     } else if (eEnt) {
-      console.warn('Proc\u00e9do \u00b7 entreprise courante :', eEnt.message)
+      console.warn('Standix \u00b7 entreprise courante :', eEnt.message)
     }
   }
 
@@ -13227,6 +13233,10 @@ async function basculerVersEtablissement(entrepriseId) {
      changent pas d'entreprise, elles encadrent celle qu'on regarde. */
   const ecran = document.querySelector('#gestion-app .screen.active, #equipe-app .screen.active')
   if (ecran) {
+    /* La transition de retour n'est active que pendant la bascule — voir
+       `.bascule-en-cours` dans le style. Posée en permanence, elle se
+       superposait à l'animation d'arrivée de chaque page. */
+    document.body.classList.add('bascule-en-cours')
     ecran.classList.add('bascule-part')
     /* 180 ms : le temps que l'effacement se voie, pas plus. Au-delà on attend
        devant un écran vide, et l'attente réelle du réseau s'y ajoute. */
@@ -13241,6 +13251,9 @@ async function basculerVersEtablissement(entrepriseId) {
   /* On retire l'état de départ AVANT de rejouer l'entrée : les deux classes
      ensemble s'annuleraient, et le contenu resterait pâle. */
   document.querySelectorAll('.bascule-part').forEach(x => x.classList.remove('bascule-part'))
+  /* On laisse la transition finir avant de la retirer, sinon l'écran reviendrait
+     à sa taille d'un coup. */
+  setTimeout(() => document.body.classList.remove('bascule-en-cours'), 260)
   rejouerContenu()
   toast(e.nom)
 }
@@ -13648,7 +13661,7 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
   const ok = await confirmDialog({
     titre: `Quitter ${nom} ?`,
     message: `Vous perdrez l'acc\u00e8s \u00e0 ses proc\u00e9dures et votre historique de lectures. ` +
-      `Votre compte Proc\u00e9do reste actif : vous pourrez rejoindre une autre entreprise avec un code.`,
+      `Votre compte Standix reste actif : vous pourrez rejoindre une autre entreprise avec un code.`,
     confirmer: 'Quitter',
     annuler: 'Rester',
     danger: true,
@@ -13824,7 +13837,7 @@ async function verifierPromotion(membre) {
      ouverture. */
   membre.promu_vu = true
   supabase.from('membres').update({ promu_vu: true }).eq('id', membre.id)
-    .then(({ error }) => { if (error) console.warn('Proc\u00e9do \u00b7 promu_vu :', error.message) })
+    .then(({ error }) => { if (error) console.warn('Standix \u00b7 promu_vu :', error.message) })
 }
 
 document.getElementById('promu-entrer')?.addEventListener('click', () => {
@@ -14100,7 +14113,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
   const ok = await confirmDialog({
     titre: 'Retirer cet utilisateur ?',
-    message: `${btn.dataset.nom || 'Cette personne'} perdra l'accès aux procédures de l'entreprise. Son compte Procédo n'est pas supprimé : elle pourra rejoindre une autre entreprise.`,
+    message: `${btn.dataset.nom || 'Cette personne'} perdra l'accès aux procédures de l'entreprise. Son compte Standix n'est pas supprimé : elle pourra rejoindre une autre entreprise.`,
     confirmer: 'Retirer',
     annuler: 'Annuler',
     danger: true,
@@ -14291,7 +14304,7 @@ async function ecrireTempsLecture() {
     lectureBase = total
     lectureSecondes = 0
   } catch (e) {
-    console.warn('Proc\u00e9do \u00b7 temps de lecture non \u00e9crit :', e?.message || e)
+    console.warn('Standix \u00b7 temps de lecture non \u00e9crit :', e?.message || e)
   }
 }
 
@@ -14936,7 +14949,7 @@ function handleScanResult(text) {
       </div>`
     setTimeout(() => confirmerOuvertureScan(procId, espace), 400)
   } else {
-    resultZone.innerHTML = `<div class="error-msg">Ce code ne correspond à aucune procédure Procédo.</div>`
+    resultZone.innerHTML = `<div class="error-msg">Ce code ne correspond à aucune procédure Standix.</div>`
   }
 }
 
@@ -14968,7 +14981,7 @@ document.addEventListener('click', async (e) => {
     await piste.applyConstraints({ advanced: [{ torch: allumee }] })
     b.classList.toggle('on', allumee)
   } catch (err) {
-    console.warn('Proc\u00e9do \u00b7 lampe indisponible :', err?.message || err)
+    console.warn('Standix \u00b7 lampe indisponible :', err?.message || err)
     b.style.display = 'none'
   }
 })
@@ -15651,7 +15664,7 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   let { error: updateError } = await supabase
     .from('procedures').update({ titre, categorie, image_url: urlCouv }).eq('id', editProcedureId)
   if (updateError && /image_url/i.test(updateError.message || '')) {
-    console.warn('Proc\u00e9do \u00b7 colonne image_url absente sur procedures.')
+    console.warn('Standix \u00b7 colonne image_url absente sur procedures.')
     const repli = await supabase.from('procedures')
       .update({ titre, categorie }).eq('id', editProcedureId)
     updateError = repli.error
@@ -15739,7 +15752,7 @@ async function urlSignee(valeur) {
     signatures.set(chemin, { url: data.signedUrl, expire: Date.now() + SIGNATURE_DUREE * 1000 })
     return data.signedUrl
   } catch (e) {
-    console.warn('Proc\u00e9do \u00b7 adresse non sign\u00e9e :', e?.message || e)
+    console.warn('Standix \u00b7 adresse non sign\u00e9e :', e?.message || e)
     return null
   }
 }

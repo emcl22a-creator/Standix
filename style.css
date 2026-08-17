@@ -6633,3 +6633,19 @@ body.chargement #bar{
 @media (prefers-reduced-motion: reduce){
   .quota-anneau .part{ transition:none; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN DE CHOIX : LE LOGO ET LE NOM SUR UNE LIGNE
+
+   Le logo était posé au-dessus du mot, comme un blason. Côte à côte, on lit
+   une signature — la même que dans la barre du haut de l'app, ce qui rend
+   l'arrivée dans l'app moins brutale.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.choix-marque{
+  display:flex; align-items:center; justify-content:center;
+  gap:11px; margin-bottom:6px;
+}
+/* La marge du bas appartenait au logo, qui n'est plus seul sur sa ligne. */
+.choix-marque .boot-logo{ margin:0; }
+.choix-marque .logotype{ margin:0; }

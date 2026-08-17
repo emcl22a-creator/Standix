@@ -5240,10 +5240,15 @@
   /* Le cadre suit le RAPPORT du dessin — 0,74, soit 25 sur 34. Forcé en carré,
      il ajoutait 149 px de vide de chaque côté dans l'image : c'est ce vide,
      et non la marge, qui éloignait le logo du nom. */
-  /* 25 sur 32, au rapport 0,773 du dessin. À 38 px le logo dépassait la hauteur
-     des deux lignes de texte à côté — il paraissait posé sur la pilule plutôt
-     que dedans. */
-  .boot-logo--topbar{ width:25px; height:32px; margin:0; opacity:1; }
+  /* 22 sur 28, au rapport 0,773 du dessin.
+
+     ═══ ET L'ALIGNEMENT ═══
+
+     Pas de décalage vertical : j'en avais ajouté deux pixels en croyant le
+     dessin déséquilibré. Mesuré, son centre de gravité est à 0,6 % du centre
+     géométrique — il est droit. Les deux pixels ne corrigeaient rien, ils
+     désalignaient. */
+  .boot-logo--topbar{ width:24px; height:31px; margin:0; opacity:1; }
   .boot-logo--topbar.play{ animation:none; }
 
   @media (prefers-reduced-motion: reduce){

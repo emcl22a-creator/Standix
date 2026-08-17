@@ -15,8 +15,16 @@
      L'icône d'écran d'accueil est OPAQUE, sur fond noir, avec 16 % de marge :
      iOS ne gère pas la transparence — elle deviendrait noire — et il arrondit
      les angles, ce qui rognerait un dessin collé au bord. -->
+<!-- Plusieurs tailles : le navigateur prend celle qui lui convient. La 32
+     est celle que Chrome demande en premier pour l'onglet. -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="96x96" href="favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<!-- CHROME PASSE PAR LE MANIFESTE. Sans lui, il ignore les balises ci-dessus
+     pour l'écran d'accueil et affiche un globe. Il sert aussi à installer
+     l'app : nom, couleur de fond, ouverture en plein écran. -->
+<link rel="manifest" href="manifest.json">
 <!-- Les trois serveurs contactés au démarrage. Ouvrir la connexion dès la
      lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur
      chacun — c'est du temps mort pur, avant même la première requête. -->

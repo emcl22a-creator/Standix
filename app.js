@@ -3520,22 +3520,22 @@ function peindreClassementEq(cle, animerDes) {
     el.appendChild(b)
   }
 
-  /* Toucher éclaire la part ; un appui long ouvre la fiche. Le geste court sert
-     à comparer, le long à aller voir — comme sur les deux autres pages. */
-  el.querySelectorAll('[data-part]').forEach(b => {
-    let minuteur = null, ouverte = false
-    b.addEventListener('pointerdown', () => {
-      ouverte = false
-      if (!b.dataset.membre) return
-      minuteur = setTimeout(() => { ouverte = true; ouvrirFicheMembre(b.dataset.membre) }, 550)
-    })
-    const annuler = () => { if (minuteur) { clearTimeout(minuteur); minuteur = null } }
-    b.addEventListener('pointerup', annuler)
-    b.addEventListener('pointerleave', annuler)
-    b.addEventListener('pointercancel', annuler)
+  /* ═══ UN SIMPLE TOUCHER OUVRE LA FICHE ═══
 
+     Il fallait un appui de 550 ms. Personne ne devine qu'il faut maintenir —
+     on touche, rien ne se passe, on recommence. Le profil était donc
+     inatteignable en pratique.
+
+     Le geste court ouvre maintenant la fiche : c'est ce qu'on attend d'une
+     ligne qui porte un nom. Le dépliage du classement reste sur le bouton
+     « Voir les autres », qui n'a pas de `data-membre`. */
+  el.querySelectorAll('[data-part]').forEach(b => {
     b.addEventListener('click', () => {
-      if (ouverte) return
+      /* UNE LIGNE QUI PORTE UN NOM OUVRE SA FICHE. Les autres — « Autres »,
+         les regroupements — n'ont pas de `data-membre` : elles gardent le
+         comportement d'origine, qui éclaire la part dans l'anneau. */
+      if (b.dataset.membre) { ouvrirFicheMembre(b.dataset.membre); return }
+
       const i = Number(b.dataset.part)
       const actif = b.classList.contains('choisi')
       el.querySelectorAll('[data-part]').forEach(x => x.classList.remove('choisi'))
@@ -13971,7 +13971,7 @@ function peindreEquipe() {
       : '\u00c9quipe'
 
     return `
-      <div class="pm-ligne" data-fiche="${escapeHtml(m.id)}" role="button" tabindex="0">
+      <div class="pm-ligne" data-fiche="${escapeHtml(m.id)}">
         <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
@@ -14022,13 +14022,20 @@ document.getElementById('pm-vider')?.addEventListener('click', () => {
 })
 
 /* ── La promotion ───────────────────────────────────────── */
-document.getElementById('pm-liste')?.addEventListener('click', (e) => {
-  /* Toute la ligne ouvre la fiche, sauf les boutons de rôle et de retrait : ce
-     sont des actions, pas une consultation. */
-  if (e.target.closest('button')) return
-  const ligne = e.target.closest('[data-fiche]')
-  if (ligne) ouvrirFicheMembre(ligne.dataset.fiche)
-})
+/* La ligne n'a plus `role="button"` ni `tabindex` : elle n'est plus cliquable,
+   et l'annoncer comme telle tromperait — un lecteur d'écran l'aurait présentée
+   comme un bouton qui ne fait rien. `data-fiche` reste : il ne coûte rien et
+   sert d'identifiant à la ligne. */
+
+/* ═══ « GÉRER L'ÉQUIPE » NE MÈNE PLUS À LA FICHE ═══
+
+   Toucher une ligne y ouvrait le profil. Mais cette page est une page
+   d'ADMINISTRATION : on y change un rôle, on y retire quelqu'un. Ses lignes
+   portent des boutons dangereux, et un appui à côté ouvrait une page —
+   déroutant quand on venait pour promouvoir quelqu'un.
+
+   La consultation se fait depuis l'Analyse → Équipe, dont c'est le rôle.
+   Ici, seuls les boutons agissent. */
 
 document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   const btn = e.target.closest('[data-promo]')

@@ -4666,7 +4666,7 @@ window.showGestionScreen = function(id, btn) {
   /* La page de détail de la Gestion se comporte comme celle de l'Équipe :
      l'en-tête et la vidéo s'y figent. La classe neutralise l'`overflow` du
      body, sans quoi `position:sticky` n'a aucun effet. */
-  document.body.classList.toggle('page-procedure', id === 'p-analyse')
+
   arreterToutesLesVideos()
   jouerVoile()
   /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
@@ -4777,7 +4777,6 @@ window.showEquipeScreen = function(id, btn) {
 
      La classe vit sur le BODY, qu'un sélecteur CSS ne peut pas atteindre
      depuis l'écran — d'où ce passage par le script. */
-  document.body.classList.toggle('page-procedure', id === 'e-detail')
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()

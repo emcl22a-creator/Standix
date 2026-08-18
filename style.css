@@ -6837,7 +6837,21 @@ body.chargement #bar{
 /* Le corps de la page ne défile plus tant qu'on est sur un détail. Sans cette
    règle, l'app garde sa hauteur habituelle et la fenêtre défile par-dessus la
    page figée — on voyait le bas d'une autre page apparaître. */
-body:has(#e-detail.active){ overflow:hidden; }
+/* `body` ET `html` : sur mobile, c'est souvent l'élément racine qui défile, pas
+   le corps. Bloquer l'un sans l'autre laisse la page bouger malgré tout.
+
+   `position:fixed` sur le corps est le seul verrou vraiment sûr sur iOS, où
+   Safari ignore `overflow:hidden` dans certains cas. La largeur explicite
+   l'empêche de se rétracter une fois sorti du flux. */
+html:has(#e-detail.active),
+body:has(#e-detail.active){
+  overflow:hidden;
+  height:100%;
+  overscroll-behavior:none;
+}
+body:has(#e-detail.active){
+  position:fixed; inset:0; width:100%;
+}
 #e-detail.active{ display:flex; }
 
 /* L'en-tête figé : tout ce qui n'est pas la liste. */
@@ -6847,32 +6861,44 @@ body:has(#e-detail.active){ overflow:hidden; }
    l'écran et il ne resterait rien pour les étapes. */
 #e-detail .video-frame video{ max-height:30dvh; }
 
-/* ═══ LA LISTE, SEULE ZONE QUI DÉFILE ═══ */
-#e-detail #detail-steps{
+/* ═══ LA ZONE QUI DÉFILE ═══
+
+   Elle contient la liste ET le bloc « Procédure terminée ». Les deux défilent
+   ensemble : le bloc de fin arrive APRÈS la dernière étape, comme une
+   conclusion — c'est ce qu'on attend au bout d'une lecture.
+
+   Posé en dehors, il aurait occupé le bas de l'écran en permanence, y compris
+   quand il reste six étapes à lire.
+
+   La zone descend jusqu'en bas de l'écran : `flex:1 1 auto` lui donne tout
+   l'espace restant sous la vidéo. */
+#e-detail .zone-etapes{
   flex:1 1 auto;
   min-height:0;                /* le piège du flex — voir plus haut */
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
   padding-top:10px;
-  padding-bottom:16px;
+  padding-bottom:18px;
 
   mask-image:linear-gradient(180deg,
     transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
   -webkit-mask-image:linear-gradient(180deg,
     transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
 }
+/* Le bloc de fin respire après la dernière étape. */
+#e-detail .zone-etapes .confirm-bar{ margin-top:22px; }
 
 /* ═══ LA BARRE DE DÉFILEMENT EST INVISIBLE ═══
 
    Trois écritures, parce qu'aucune ne suffit seule : `scrollbar-width` pour
    Firefox, `-webkit-scrollbar` pour Safari et Chrome, `-ms-overflow-style`
    pour les anciens Edge. La zone défile toujours — on ne cache que la barre. */
-#e-detail #detail-steps{
+#e-detail .zone-etapes{
   scrollbar-width:none;
   -ms-overflow-style:none;
 }
-#e-detail #detail-steps::-webkit-scrollbar{ width:0; height:0; display:none; }
+#e-detail .zone-etapes::-webkit-scrollbar{ width:0; height:0; display:none; }
 
 /* ═══ UNE ÉTAPE COCHÉE RESTE EN PLACE ═══
 

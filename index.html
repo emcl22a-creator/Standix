@@ -1196,7 +1196,15 @@
       <button class="back-btn" onclick="showGestionScreen('p-list')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead" style="margin:0; font-size:20px; flex:1; min-width:0; white-space:normal; word-break:break-word;" id="analyse-titre">—</h1>
+      <!-- 26 px comme les treize autres pages. Il était à 20 — sans doute pour
+           faire de la place aux deux boutons de droite, mais un titre plus
+           petit sur une seule page se remarque, et l'app paraît alors mal
+           réglée.
+
+           `flex:1` et `min-width:0` restent : ils permettent au titre de se
+           replier sur deux lignes plutôt que de pousser les boutons hors de
+           l'écran. -->
+      <h1 class="pagehead" style="margin:0; flex:1; min-width:0; white-space:normal; word-break:break-word;" id="analyse-titre">—</h1>
       <button class="back-btn" id="analyse-edit-btn" style="flex-shrink:0;" aria-label="Modifier">
         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
       </button>
@@ -1606,7 +1614,7 @@
 
   <div class="screen" id="p-settings">
     <div class="detail-header">
-            <h1 class="pagehead" style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.04em;">Réglages</h1>
+            <h1 class="pagehead" style="margin:0;">Réglages</h1>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -2004,7 +2012,7 @@
       <button class="back-btn" onclick="showEquipeScreen('e-list', document.querySelector('#tabbar .tab-round'))">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead" id="e-cat-titre" style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.04em;">Dossier</h1>
+      <h1 class="pagehead" id="e-cat-titre" style="margin:0;">Dossier</h1>
     </div>
     <div class="subhead" id="e-cat-sous">—</div>
 
@@ -2076,7 +2084,7 @@
   <div class="screen" id="e-settings">
     <div class="pagehead-row">
       
-      <h1 class="pagehead" style="margin:0; font-size:26px; font-weight:700; letter-spacing:-0.04em;">Réglages</h1>
+      <h1 class="pagehead" style="margin:0;">Réglages</h1>
     </div>
 
     <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">

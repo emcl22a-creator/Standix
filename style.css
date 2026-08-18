@@ -540,7 +540,12 @@
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
   /* La marge haute de 6 px descendait le titre sous celui des pages d'onglet.
      `letter-spacing` aligné sur `.page-tete h1` : -0,04 et non -0,02. */
-  h1.pagehead{ font-size:26px; font-weight:700; letter-spacing:-0.04em; margin:0 0 2px; }
+  /* 21 px pour TOUS les titres de page, sans exception.
+
+     L'approche passe de −0,04 à −0,03 em : le resserrement des lettres se voit
+     d'autant plus que le texte est petit. À −0,04 sur 21 px, « Codes
+     d'invitation » commençait à se tasser. */
+  h1.pagehead{ font-size:21px; font-weight:700; letter-spacing:-0.03em; margin:0 0 2px; }
   .detail-header h1.pagehead{ margin:0; }
 
   /* `pagehead-row` porte le titre ET un bouton à droite — « Gérer l'équipe »
@@ -6138,14 +6143,15 @@ body.plus-vu .plus-flot{
    Le titre était en 800 et son compte en 600 : plus lourds tous les deux que
    le modèle, et la parenté ne se lisait pas. */
 .page-tete{ margin:0 0 18px; }
+/* 21 px, comme `h1.pagehead`. Ces trois titres — « Procédures », « Analyse »
+   et le salut de l'Équipe — vivent dans `.page-tete` plutôt que de porter la
+   classe `pagehead`, et ils échappaient donc à la règle centrale.
+
+   L'exception de l'espace Équipe, qui était déjà à 21, n'a plus lieu d'être :
+   toutes les pages emploient maintenant la même valeur. */
 .page-tete h1{
-  font-size:26px; font-weight:700; letter-spacing:-0.04em; line-height:1.1;
+  font-size:21px; font-weight:700; letter-spacing:-0.03em; line-height:1.1;
 }
-/* Le salut de l'espace Équipe est plus court que les autres titres — un
-   prénom, pas un nom de section — mais il porte un emoji, qui compte double en
-   hauteur. 21 px au lieu de 26 : la ligne reprend le poids d'un titre sans
-   occuper le tiers de l'écran. */
-#e-list .page-tete h1{ font-size:21px; letter-spacing:-0.03em; }
 /* L'ÉCART SOUS LE TITRE, POSÉ AU MÊME ENDROIT POUR LES DEUX PAGES.
 
    Sur Analyse, le compte est enveloppé dans `.tete-bas` — qui porte la marge.

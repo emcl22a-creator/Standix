@@ -354,40 +354,35 @@
          ICI, sur l'écran que l'employé regarde avant d'entrer, revient à lui
          dire qu'il sera surveillé. On parle donc de ce que chaque espace
          PERMET DE FAIRE, pas de ce qu'il permet de voir. -->
-    <!-- L'icône est posée À GAUCHE, dans une pastille, et le texte s'aligne à
-         sa droite. Centré comme avant, le bouton n'avait pas de point de
-         départ : l'œil devait chercher où commencer à lire.
+    <!-- ═══ LA MAQUETTE D ═══
 
-         Le chevron à droite dit qu'on entre quelque part — un bouton qui mène
-         à une page ne fait pas la même promesse qu'un bouton qui valide. -->
+         L'icône n'est PAS dans une pastille à gauche : elle est en filigrane,
+         grande et pâle, débordant du bord droit. Le texte reste seul maître de
+         la ligne, et le bouton garde du caractère sans rien perdre en place.
+
+         Pas de chevron non plus : sur un bouton entièrement arrondi, il
+         viendrait buter contre la courbe. -->
     <button class="btn block choix-btn" onclick="chooseSpace('gestion')">
-      <span class="cb-ic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <span class="cb-fond" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+             stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 20V9.2L12 3l9 6.2V20"></path>
           <path d="M9.2 20v-6.4h5.6V20"></path>
         </svg>
       </span>
-      <span class="cb-txt">
-        <span class="cb-t">Espace Gestion</span>
-        <span class="cb-s">Créer et organiser les procédures</span>
-      </span>
-      <span class="cb-fl" aria-hidden="true">›</span>
+      <span class="cb-t">Espace Gestion</span>
+      <span class="cb-s">Créer les procédures</span>
     </button>
     <button class="btn ghost block choix-btn" onclick="chooseSpace('equipe')">
-      <span class="cb-ic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <span class="cb-fond" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
+             stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 19.2A2.3 2.3 0 0 1 6.3 17H20"></path>
           <path d="M6.3 2.5H20v19H6.3A2.3 2.3 0 0 1 4 19.2V4.8a2.3 2.3 0 0 1 2.3-2.3z"></path>
-          <path d="M8.4 7.4h7.2"></path><path d="M8.4 11h4.8"></path>
         </svg>
       </span>
-      <span class="cb-txt">
-        <span class="cb-t">Espace Équipe</span>
-        <span class="cb-s">Consulter les procédures de mon poste</span>
-      </span>
-      <span class="cb-fl" aria-hidden="true">›</span>
+      <span class="cb-t">Espace Équipe</span>
+      <span class="cb-s">Consulter mes procédures</span>
     </button>
   </div>
 </div>

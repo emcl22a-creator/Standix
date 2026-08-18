@@ -6824,11 +6824,18 @@ body.chargement #bar{
    au milieu de la dernière étape sur une liste courte, et elle paraîtrait
    effacée alors qu'il n'y a rien après.
    ═══════════════════════════════════════════════════════════════════════════ */
-#e-detail{
-  /* La hauteur exacte de ce qui reste entre les deux barres : 87 px pour celle
-     du haut, 122 pour celle du bas avec sa marge. La page ne peut donc pas
-     défiler — il n'y a rien à faire défiler. */
-  height:calc(100dvh - 87px - 122px);
+/* ═══ `.active` SUR CHAQUE RÈGLE ═══
+
+   J'avais écrit `#e-detail{ display:flex }` sans condition. Un écran inactif
+   est masqué par `display:none` — ma règle l'écrasait, et la page de détail
+   restait visible sous le QR code, sous les réglages, et en bas de la liste.
+
+   Toutes les règles ci-dessous ne valent donc que pour l'écran ACTIF. */
+#e-detail.active{
+  /* La hauteur descend jusqu'au BAS DE L'ÉCRAN, pas jusqu'à la barre : on
+     retire seulement les 87 px du haut. La liste passe ainsi derrière la
+     navigation, qui flotte au-dessus d'elle. */
+  height:calc(100dvh - 87px);
   display:flex; flex-direction:column;
   overflow:hidden;
   margin-top:87px;
@@ -6852,14 +6859,14 @@ body:has(#e-detail.active){
 body:has(#e-detail.active){
   position:fixed; inset:0; width:100%;
 }
-#e-detail.active{ display:flex; }
+
 
 /* L'en-tête figé : tout ce qui n'est pas la liste. */
-#e-detail > *{ flex:0 0 auto; }
+#e-detail.active > *{ flex:0 0 auto; }
 
 /* La vidéo est bornée : sans plafond, une vidéo verticale prendrait tout
    l'écran et il ne resterait rien pour les étapes. */
-#e-detail .video-frame video{ max-height:30dvh; }
+#e-detail.active .video-frame video{ max-height:30dvh; }
 
 /* ═══ LA ZONE QUI DÉFILE ═══
 
@@ -6872,14 +6879,20 @@ body:has(#e-detail.active){
 
    La zone descend jusqu'en bas de l'écran : `flex:1 1 auto` lui donne tout
    l'espace restant sous la vidéo. */
-#e-detail .zone-etapes{
+#e-detail.active .zone-etapes{
   flex:1 1 auto;
   min-height:0;                /* le piège du flex — voir plus haut */
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
-  padding-top:10px;
-  padding-bottom:18px;
+  /* 22 px en haut : la première étape ne naît plus DANS la ligne de fondu, elle
+     commence juste en dessous. À 10, elle apparaissait déjà à moitié effacée.
+
+     122 px en bas : la hauteur de la barre de navigation. La zone descend
+     jusqu'au bord de l'écran — c'est son CONTENU qui s'arrête au-dessus de la
+     barre, pour que la dernière étape reste lisible. */
+  padding-top:22px;
+  padding-bottom:122px;
 
   mask-image:linear-gradient(180deg,
     transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
@@ -6887,18 +6900,18 @@ body:has(#e-detail.active){
     transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
 }
 /* Le bloc de fin respire après la dernière étape. */
-#e-detail .zone-etapes .confirm-bar{ margin-top:22px; }
+#e-detail.active .zone-etapes .confirm-bar{ margin-top:22px; }
 
 /* ═══ LA BARRE DE DÉFILEMENT EST INVISIBLE ═══
 
    Trois écritures, parce qu'aucune ne suffit seule : `scrollbar-width` pour
    Firefox, `-webkit-scrollbar` pour Safari et Chrome, `-ms-overflow-style`
    pour les anciens Edge. La zone défile toujours — on ne cache que la barre. */
-#e-detail .zone-etapes{
+#e-detail.active .zone-etapes{
   scrollbar-width:none;
   -ms-overflow-style:none;
 }
-#e-detail .zone-etapes::-webkit-scrollbar{ width:0; height:0; display:none; }
+#e-detail.active .zone-etapes::-webkit-scrollbar{ width:0; height:0; display:none; }
 
 /* ═══ UNE ÉTAPE COCHÉE RESTE EN PLACE ═══
 
@@ -6908,3 +6921,37 @@ body:has(#e-detail.active){
   opacity:0.42;
   transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « POURQUOI LA LIMITE DE 90 MO ? »
+
+   Le lien dans le message d'avertissement, et le tableau de la fenêtre.
+
+   Le sélecteur part de `.fen-co` : cette classe centre tout son contenu, et sa
+   règle vit dans un bloc `@media` — ce qui la rend plus spécifique qu'un
+   sélecteur simple. Deux classes contre une, et le centrage cède. C'est juste
+   pour une question courte, faux pour un tableau à deux colonnes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.lien-info{
+  background:none; border:none; padding:0; cursor:pointer;
+  font:inherit; color:var(--or2, #FFAD33); text-decoration:underline;
+  text-underline-offset:2px;
+}
+.fen-co .fen-html,
+.fen-co .fen-html *{ text-align:left; }
+.fen-html{ margin-top:4px; }
+.pq-p{ font-size:13.5px; line-height:1.5; color:var(--label-2); margin-bottom:14px; }
+.pq-t{
+  font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase;
+  color:var(--label-3); margin-bottom:6px;
+}
+/* Chaque ligne : la source à gauche, la durée à droite. Le filet les sépare
+   sans les enfermer dans un tableau — deux colonnes suffisent. */
+.pq-l{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  font-size:13.5px; color:var(--label-2);
+  padding:9px 0; border-top:0.5px solid var(--border);
+}
+.pq-l:first-of-type{ border-top:none; }
+.pq-l b{ color:var(--label-1); font-weight:700; white-space:nowrap; }
+.pq-fin{ margin-top:16px; margin-bottom:0; }

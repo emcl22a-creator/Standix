@@ -5232,15 +5232,18 @@
   @keyframes debutDescend{ 0%,100%{ transform:translateY(0); opacity:0.6; } 50%{ transform:translateY(3px); opacity:1; } }
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
-  /* La carte est centrée, puis REMONTÉE de 6 % de la hauteur d'écran. Un bloc
-     exactement au milieu paraît toujours un peu bas : l'œil place le centre
-     optique au-dessus du centre géométrique. Six pour cent corrigent l'écart
-     sans qu'on puisse dire que la carte est décalée.
+  /* La carte est centrée, puis remontée de CINQ PIXELS.
 
-     En pourcentage de la hauteur, pas en pixels : le décalage suit la taille
-     de l'écran au lieu d'être énorme sur un petit et discret sur un grand. */
+     J'avais mis 6 % de la hauteur d'écran — une cinquantaine de pixels sur un
+     iPhone. C'était le décalage qu'on donne à un bloc pour corriger le centre
+     optique, mais ici il se voyait : la carte paraissait posée en haut plutôt
+     que centrée.
+
+     Cinq pixels en valeur fixe, et non en pourcentage : à cette échelle, un
+     pourcentage n'a plus de sens — cinq pixels doivent rester cinq pixels sur
+     tous les écrans. */
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
-  .login-wrap > .login-card{ transform:translateY(-6dvh); }
+  .login-wrap > .login-card{ transform:translateY(-5px); }
 
   /* ═══ Apparition du logo ═══
      Le logo arrive légèrement flou et plus petit, monte et se met au net.

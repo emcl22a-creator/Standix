@@ -30,6 +30,23 @@
      pour l'écran d'accueil et affiche un globe. Il sert aussi à installer
      l'app : nom, couleur de fond, ouverture en plein écran. -->
 <link rel="manifest" href="manifest.json">
+<!-- ═══ L'APERÇU QUAND ON PARTAGE LE LIEN ═══
+
+     Sans ces balises, un lien envoyé par message ou publié quelque part
+     n'affiche qu'une adresse nue. Avec elles, on voit le logo, le nom et une
+     phrase — ce qui change tout quand un gérant transfère le lien à son
+     associé.
+
+     L'image est celle sur FOND NOIR : les aperçus s'affichent sur des fonds
+     clairs comme sombres, et un logo transparent y disparaîtrait la moitié du
+     temps. 1200 × 630, le format que réclament les réseaux. -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Standix">
+<meta property="og:description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
+<meta property="og:image" content="partage.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="partage.png">
+<meta name="description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
 <!-- Les trois serveurs contactés au démarrage. Ouvrir la connexion dès la
      lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur
      chacun — c'est du temps mort pur, avant même la première requête. -->
@@ -541,7 +558,10 @@
       <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
       <button type="button" class="vider" id="pm-vider" aria-label="Effacer">×</button>
     </div>
-    <div class="note" style="margin-top:12px;">Touchez une personne pour voir son activité en détail : temps passé, procédures lues, ce qu'il lui reste. Les flèches changent son rôle, la croix la retire de l'entreprise.</div>
+    <!-- Le texte promettait « touchez une personne pour voir son activité » —
+         ce que la page ne fait plus. Il dit maintenant ce qu'elle fait, et où
+         trouver ce qu'elle ne fait pas. -->
+    <div class="note" style="margin-top:12px;">Les flèches changent le rôle d'une personne, la croix la retire de l'entreprise. Pour voir l'activité de quelqu'un — temps passé, procédures lues — allez dans <b>Analyse</b>.</div>
     <div id="pm-liste" style="margin-top:14px;"></div>
   </div>
 

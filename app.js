@@ -4663,6 +4663,10 @@ function jouerVoile() {
 }
 
 window.showGestionScreen = function(id, btn) {
+  /* La page de détail de la Gestion se comporte comme celle de l'Équipe :
+     l'en-tête et la vidéo s'y figent. La classe neutralise l'`overflow` du
+     body, sans quoi `position:sticky` n'a aucun effet. */
+  document.body.classList.toggle('page-procedure', id === 'p-analyse')
   arreterToutesLesVideos()
   jouerVoile()
   /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
@@ -4762,14 +4766,17 @@ window.showEquipeScreen = function(id, btn) {
   window.placerOnglet?.(ONGLET_EQUIPE_PAR_ECRAN[id])
   /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
   document.body.classList.remove('plus-vu')
-  /* ═══ LE TITRE SE FIGE SUR LA PAGE D'UNE PROCÉDURE ═══
+  /* ═══ LE STICKY A BESOIN QUE LE BODY LE LAISSE FAIRE ═══
 
-     `body` porte un `overflow`, ce qui empêche `position:sticky` de se caler
-     sur la fenêtre. On le neutralise le temps de cette page, et on le rétablit
-     en sortant : les autres écrans gardent leur comportement d'origine.
+     `body` porte un `overflow`, et un élément collant se cale sur le premier
+     ancêtre qui en a un — donc sur le body, qui ne défile pas lui-même. Le
+     titre n'avait alors aucune raison de se figer.
 
-     La classe est posée ICI plutôt que dans le style parce qu'elle vit sur le
-     BODY — un sélecteur CSS ne peut pas remonter jusqu'à lui depuis l'écran. */
+     On neutralise cet `overflow` le temps des pages de détail, et on le
+     rétablit en sortant : les autres écrans gardent leur comportement.
+
+     La classe vit sur le BODY, qu'un sélecteur CSS ne peut pas atteindre
+     depuis l'écran — d'où ce passage par le script. */
   document.body.classList.toggle('page-procedure', id === 'e-detail')
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))

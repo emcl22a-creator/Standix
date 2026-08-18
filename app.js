@@ -1100,18 +1100,35 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   if (!email || !password) { errorEl.textContent = 'E-mail et mot de passe obligatoires.'; return }
   if (password.length < 6) { errorEl.textContent = 'Le mot de passe doit faire au moins 6 caractères.'; return }
   if (selectedSpace === 'gestion' && !entrepriseNom) { errorEl.textContent = "Merci d'indiquer le nom de votre entreprise."; return }
-  if (selectedSpace === 'equipe' && !/^\d{5}$/.test(codeAcces)) { errorEl.textContent = 'Le code entreprise doit contenir exactement 5 chiffres.'; return }
+  /* Le code n'est plus forcément à cinq chiffres : ceux de gestion font six
+     signes, lettres comprises. On accepte de 4 à 12 et on laisse la base
+     trancher — elle seule sait ce qui existe. */
+  if (selectedSpace === 'equipe' && !/^[A-Za-z0-9]{4,12}$/.test(codeAcces)) {
+    errorEl.textContent = 'Le code doit contenir entre 4 et 12 caractères.'
+    return
+  }
 
-  // Pour l'équipe : vérifier que le code correspond bien à une entreprise AVANT de créer le compte
+  /* ═══ C'EST LE CODE QUI DONNE LE RÔLE ═══
+
+     Auparavant, la personne choisissait son espace et le code ne servait qu'à
+     retrouver l'entreprise. Un employé à qui on avait donné le code pouvait
+     donc choisir « Gestion » à l'inscription et obtenir tous les droits.
+
+     Maintenant, `verifier_code` renvoie l'entreprise ET le rôle. Le choix fait
+     à l'écran précédent ne décide plus de rien : il n'indique que le chemin
+     d'inscription. */
   let targetEntrepriseId = null
+  let roleAccorde = null
   if (selectedSpace === 'equipe') {
-    const entreprise = await entrepriseParCode(codeAcces)
-    const entrepriseError = null
-    if (entrepriseError || !entreprise) {
-      errorEl.textContent = "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire."
+    const { data: trouve, error: errCode } = await supabase
+      .rpc('verifier_code', { p_code: codeAcces })
+    const ligne = Array.isArray(trouve) ? trouve[0] : trouve
+    if (errCode || !ligne) {
+      errorEl.textContent = "Ce code n'existe pas, ou il a expiré. Vérifiez-le auprès de votre gestionnaire."
       return
     }
-    targetEntrepriseId = entreprise.id
+    targetEntrepriseId = ligne.entreprise_id
+    roleAccorde = ligne.role
   }
 
   const signupBtn = document.getElementById('signup-btn')
@@ -2051,6 +2068,10 @@ window.openSettings = async function() {
     if (nouveauCode && cachedEntreprise) cachedEntreprise.code_acces = nouveauCode
     document.getElementById('settings-code').textContent = nouveauCode || '—'
   }
+
+  /* Le second code se peint dans la foulée : les deux vivent sur la même page,
+     ils doivent arriver ensemble. */
+  await peindreCodeGestion()
 }
 
 document.getElementById('copy-code-btn')?.addEventListener('click', () => {
@@ -2061,6 +2082,122 @@ document.getElementById('copy-code-btn')?.addEventListener('click', () => {
     const original = btn.textContent
     btn.textContent = 'Copié !'
     setTimeout(() => { btn.textContent = original }, 1500)
+  }
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CODE DE GESTION
+
+   Il n'existe que lorsqu'une invitation est en cours. La page a donc deux
+   états : un encadré qui propose d'en créer un, et un encadré qui montre celui
+   qui court.
+
+   Tout se joue côté base, par des fonctions `security definer` : l'app ne
+   peut ni engendrer un code, ni décider qu'il est valide. Elle demande, la
+   base répond. C'est ce qui empêche quelqu'un de se fabriquer un accès en
+   modifiant ce qu'il envoie.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Combien de temps reste-t-il ? Formulé en jours, pas en heures : « expire
+   dans 3 jours » se retient, « dans 71 heures » ne dit rien. */
+function resteAvant(expire) {
+  const ms = new Date(expire).getTime() - Date.now()
+  if (ms <= 0) return { texte: 'Expiré', bientot: true, mort: true }
+  const jours = Math.floor(ms / 86400000)
+  const heures = Math.floor(ms / 3600000)
+  if (jours >= 2) return { texte: `Expire dans ${jours} jours`, bientot: false }
+  if (heures >= 2) return { texte: `Expire dans ${heures} heures`, bientot: true }
+  return { texte: 'Expire dans moins d\u2019une heure', bientot: true }
+}
+
+async function peindreCodeGestion() {
+  const vide = document.getElementById('cg-vide')
+  const actif = document.getElementById('cg-actif')
+  if (!vide || !actif) return
+
+  const e = cachedEntreprise
+  const code = e?.code_gestion
+  const exp = e?.code_gestion_expire
+  const brule = e?.code_gestion_usage_unique && e?.code_gestion_utilise_le
+
+  /* Un code utilisé ou périmé ne vaut pas mieux qu'un code absent : on montre
+     l'encadré de création plutôt qu'un code mort qui laisserait croire qu'il
+     fonctionne encore. */
+  const r = exp ? resteAvant(exp) : null
+  const valable = code && r && !r.mort && !brule
+
+  vide.style.display = valable ? 'none' : ''
+  actif.style.display = valable ? '' : 'none'
+  if (!valable) return
+
+  document.getElementById('cg-code').textContent = code
+  const el = document.getElementById('cg-reste')
+  el.textContent = r.texte
+  el.classList.toggle('bientot', r.bientot)
+}
+
+document.getElementById('cg-creer')?.addEventListener('click', async (ev) => {
+  const btn = ev.currentTarget
+  const avant = btn.textContent
+  btn.disabled = true
+  btn.textContent = '\u2026'
+  try {
+    const { data, error } = await supabase.rpc('creer_code_gestion', {
+      p_entreprise: currentMembre.entreprise_id,
+      p_jours: 7,
+      p_usage_unique: true,
+    })
+    if (error) throw error
+    const ligne = Array.isArray(data) ? data[0] : data
+    /* On met l'entreprise en cache à jour plutôt que de la relire : la
+       fonction nous a déjà donné les deux valeurs qui changent. */
+    if (cachedEntreprise) {
+      cachedEntreprise.code_gestion = ligne.code
+      cachedEntreprise.code_gestion_expire = ligne.expire
+      cachedEntreprise.code_gestion_usage_unique = true
+      cachedEntreprise.code_gestion_utilise_le = null
+    }
+    await peindreCodeGestion()
+  } catch (e) {
+    toast(e?.message || 'Le code n\u2019a pas pu \u00eatre cr\u00e9\u00e9.')
+  } finally {
+    btn.disabled = false
+    btn.textContent = avant
+  }
+})
+
+document.getElementById('cg-copier')?.addEventListener('click', (ev) => {
+  const code = document.getElementById('cg-code').textContent
+  if (!code || code === '\u2014') return
+  navigator.clipboard.writeText(code)
+  const btn = ev.currentTarget
+  const avant = btn.textContent
+  btn.textContent = 'Copi\u00e9 !'
+  setTimeout(() => { btn.textContent = avant }, 1500)
+})
+
+document.getElementById('cg-revoquer')?.addEventListener('click', async () => {
+  const ok = await confirmDialog({
+    titre: 'R\u00e9voquer ce code ?',
+    message: 'Il cessera imm\u00e9diatement de fonctionner. Les gestionnaires ' +
+             'd\u00e9j\u00e0 inscrits gardent leur acc\u00e8s.',
+    confirmer: 'R\u00e9voquer',
+    annuler: 'Annuler',
+    danger: true,
+  })
+  if (!ok) return
+  try {
+    const { error } = await supabase.rpc('revoquer_code_gestion', {
+      p_entreprise: currentMembre.entreprise_id,
+    })
+    if (error) throw error
+    if (cachedEntreprise) {
+      cachedEntreprise.code_gestion = null
+      cachedEntreprise.code_gestion_expire = null
+    }
+    await peindreCodeGestion()
+  } catch (e) {
+    toast(e?.message || 'La r\u00e9vocation a \u00e9chou\u00e9.')
   }
 })
 

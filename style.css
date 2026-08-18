@@ -5232,7 +5232,15 @@
   @keyframes debutDescend{ 0%,100%{ transform:translateY(0); opacity:0.6; } 50%{ transform:translateY(3px); opacity:1; } }
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
+  /* La carte est centrée, puis REMONTÉE de 6 % de la hauteur d'écran. Un bloc
+     exactement au milieu paraît toujours un peu bas : l'œil place le centre
+     optique au-dessus du centre géométrique. Six pour cent corrigent l'écart
+     sans qu'on puisse dire que la carte est décalée.
+
+     En pourcentage de la hauteur, pas en pixels : le décalage suit la taille
+     de l'écran au lieu d'être énorme sur un petit et discret sur un grand. */
   .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
+  .login-wrap > .login-card{ transform:translateY(-6dvh); }
 
   /* ═══ Apparition du logo ═══
      Le logo arrive légèrement flou et plus petit, monte et se met au net.
@@ -6690,3 +6698,78 @@ body.chargement #bar{
 #equipe-app .page-tete{
   margin-top:11px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN DE CHOIX : DEUX LIGNES PAR BOUTON
+
+   Le bouton porte maintenant son nom ET ce qu'on trouve derrière. Il lui faut
+   donc une hauteur libre plutôt que la hauteur fixe des boutons ordinaires.
+
+   La marge de 10 px était posée en style direct sur le premier bouton ; elle
+   passe ici, où elle se lit avec le reste.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* `.btn.block` impose `text-align:center` et gagne par spécificité — deux
+   classes contre une. On redouble donc la nôtre pour l'emporter, plutôt que de
+   modifier `.btn.block`, qui sert à quinze autres boutons dans l'app. */
+.choix-btn.choix-btn{
+  display:flex; align-items:center; gap:13px;
+  height:auto; padding:13px 15px; line-height:1.3; text-align:left;
+}
+.choix-btn + .choix-btn{ margin-top:10px; }
+.choix-btn .cb-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.choix-btn .cb-t{ font-size:15.5px; font-weight:700; letter-spacing:-0.015em; }
+/* Le sous-titre hérite de la couleur du bouton et s'efface à 62 % : sur le
+   bouton plein il devient brun sombre, sur le bouton sobre il devient gris.
+   Une couleur fixe aurait été illisible sur l'un des deux. */
+.choix-btn .cb-s{ font-size:12px; font-weight:500; opacity:0.62; }
+
+/* ═══ LA PASTILLE DE L'ICÔNE ═══
+
+   `currentColor` partout : la pastille et le tracé prennent la couleur du
+   bouton qui les porte. Sur le bouton plein, l'icône devient brun sombre sur
+   un voile sombre ; sur le bouton sobre, elle devient claire sur un voile
+   clair. Deux couleurs fixes auraient demandé deux règles, et l'une des deux
+   aurait fini par être fausse. */
+.choix-btn .cb-ic{
+  flex:0 0 auto; width:38px; height:38px; border-radius:12px;
+  display:grid; place-items:center;
+  background:currentColor; /* remplacé juste en dessous par un voile */
+  background:color-mix(in srgb, currentColor 13%, transparent);
+  box-shadow:inset 0 0 0 .5px color-mix(in srgb, currentColor 22%, transparent);
+}
+.choix-btn .cb-ic svg{ width:19px; height:19px; display:block; }
+
+/* Le chevron. Il glisse d'un pixel à l'appui — assez pour qu'on sente le
+   geste, trop peu pour qu'on le remarque. */
+.choix-btn .cb-fl{
+  margin-left:auto; flex:0 0 auto;
+  font-size:20px; line-height:1; opacity:0.42;
+  transition:transform 0.18s cubic-bezier(0.32,0.72,0,1), opacity 0.18s ease;
+}
+.choix-btn:active .cb-fl{ transform:translateX(2px); opacity:0.7; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX CODES D'INVITATION
+
+   Le style du code était écrit en attribut, directement sur la balise. Il
+   passe ici : deux codes le partagent maintenant, et une valeur recopiée à
+   deux endroits finit toujours par diverger.
+
+   0.22em d'approche et non 0.28 : six caractères prennent plus de place que
+   cinq, et le code débordait sur un écran de 320 px.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.code-gros{
+  font-size:34px; font-weight:850; letter-spacing:0.22em;
+  margin:10px 0 16px; word-break:break-all;
+}
+.sect-tt{
+  font-size:11.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--label-3); margin:26px 0 10px 2px;
+}
+.cg-txt{ font-size:14px; color:var(--label-2); line-height:1.5; margin-bottom:14px; }
+/* Le temps restant. Il vire à l'ambre le dernier jour — c'est le moment où le
+   gérant doit savoir que son invitation va tomber. */
+.cg-reste{ font-size:12.5px; color:var(--label-3); margin-bottom:14px; }
+.cg-reste.bientot{ color:var(--or2, #FFAD33); }

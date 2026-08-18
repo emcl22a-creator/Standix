@@ -12,7 +12,7 @@
     --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
   }
   html, body{
-    background:#0C0D0E; font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+    background:#0C0D0E;     font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
     color:var(--label); font-size:17px; line-height:1.32; letter-spacing:-0.02em;
     -webkit-font-smoothing:antialiased; min-height:100dvh; overflow-x:hidden; position:relative;
     -webkit-text-size-adjust:100%; text-size-adjust:100%;
@@ -3746,8 +3746,14 @@
 
   /* ═══ Utilisateurs de l'entreprise ═══ */
   /* La ligne s'ouvre : on le montre à l'appui, comme partout ailleurs. */
-  .pm-ligne[data-fiche]{ cursor:pointer; transition:transform 0.16s, background 0.2s; }
-  .pm-ligne[data-fiche]:active{ transform:scale(0.985); background:rgba(255,255,255,0.07); }
+  /* ═══ LA LIGNE N'EST PLUS CLIQUABLE, ET ELLE NE DOIT PLUS EN AVOIR L'AIR ═══
+
+     Le clic n'ouvre plus la fiche — cette page sert à administrer, pas à
+     consulter. Mais le style disait encore le contraire : curseur en main,
+     enfoncement à l'appui. On touchait, l'étape s'enfonçait, rien ne se
+     passait. Pire qu'une ligne inerte : une ligne qui promet.
+
+     Seuls les boutons de rôle et de retrait réagissent désormais. */
 
   .pm-ligne{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
@@ -6142,14 +6148,9 @@ body.plus-vu .plus-flot{
 }
 
 
-/* La pastille « pas encore lu » sur un titre de la carte de dossier, côté
-   équipe. Un point, pas un mot : la ligne est déjà serrée, et le seul fait
-   qu'il y ait quelque chose suffit à dire qu'il reste à faire. */
-.cat-neuf{
-  width:6px; height:6px; border-radius:50%; flex-shrink:0;
-  background:linear-gradient(135deg,#FF6A00,#FFAD33);
-  margin-left:auto;
-}
+/* La pastille « non lu » a été retirée : sur une carte qui ne montre que trois
+   procédures, presque toutes en portaient une — un signal qui s'allume partout
+   ne distingue plus rien. Le compte à lire est dit en haut de la page. */
 
 
 /* ═══════════════════════════════════════════════════════════════════════════

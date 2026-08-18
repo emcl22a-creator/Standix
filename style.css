@@ -6773,3 +6773,65 @@ body.chargement #bar{
    gérant doit savoir que son invitation va tomber. */
 .cg-reste{ font-size:12.5px; color:var(--label-3); margin-bottom:14px; }
 .cg-reste.bientot{ color:var(--or2, #FFAD33); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'UNE PROCÉDURE : LA VIDÉO RESTE, LES ÉTAPES PASSENT
+
+   ═══ POURQUOI LA VIDÉO NE DOIT PAS PARTIR ═══
+
+   Un employé lit l'étape 4 en regardant le geste. Si la vidéo a défilé hors de
+   l'écran, il remonte, regarde, redescend, et a perdu sa ligne. La vidéo est
+   le SUJET de la page ; les étapes sont ce qu'on parcourt.
+
+   `sticky` et non `fixed` : elle se libère toute seule quand on quitte la page,
+   sans qu'aucun script n'ait à la surveiller. Et elle reste dans le flux, donc
+   les étapes commencent naturellement en dessous.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#e-detail .video-frame{
+  position:sticky;
+  /* 6 px sous la barre du haut. Collée à zéro, elle paraîtrait glisser
+     dessous ; six pixels suffisent à dire qu'elle s'y arrête. */
+  top:calc(var(--topbar-h, 62px) + 6px);
+  z-index:6;
+  /* L'ombre naît quand la vidéo se colle, pas avant : posée en permanence,
+     elle assombrirait le haut de la page dès l'ouverture. */
+  box-shadow:0 14px 34px rgba(0,0,0,0.45);
+}
+
+/* ═══ LES ÉTAPES APPARAISSENT ET S'EFFACENT ═══
+
+   Un masque sur le conteneur : ce qui passe sous la vidéo s'estompe au lieu
+   de disparaître d'un coup, et ce qui arrive par le bas se révèle de même.
+
+   Le masque agit sur le CONTENEUR, pas sur chaque étape. Une transition posée
+   sur chaque ligne demanderait un observateur par ligne et se déclencherait
+   par à-coups ; le masque, lui, est calculé par le compositeur du navigateur
+   et suit le doigt sans un seul calcul en JavaScript.
+
+   Les 8 % du haut sont l'endroit exact où l'étape croise le bas de la vidéo :
+   c'est de là que part le fondu. */
+#e-detail #detail-steps{
+  mask-image:linear-gradient(180deg,
+    transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,
+    transparent 0%, #000 8%, #000 92%, transparent 100%);
+  /* Une marge en haut pour que la première étape ne naisse pas déjà effacée. */
+  padding-top:10px;
+}
+
+/* ═══ UNE ÉTAPE FAITE PÂLIT, ELLE NE PART PLUS ═══
+
+   Elle se repliait ; elle reste maintenant en place, en gris. On garde la
+   trace de son avancement sous les yeux au lieu de la voir s'effacer. */
+#detail-steps.etapes-fil .detail-step.faite{
+  opacity:0.42;
+  transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+#detail-steps.etapes-fil .detail-step.faite p{
+  /* Barré, en plus du gris : sur un écran vu de loin dans une cuisine, une
+     nuance de gris ne se distingue pas ; un trait, si. */
+  text-decoration:line-through;
+  text-decoration-color:var(--label-3);
+  text-decoration-thickness:1px;
+}

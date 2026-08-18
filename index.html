@@ -2050,6 +2050,11 @@
          n'est coché : un cadre qui annoncerait « 0 étape faite » occuperait la
          place sans rien apprendre. -->
     <div id="etapes-rappel"></div>
+    <!-- ═══ LA ZONE QUI DÉFILE ═══
+         Les étapes ET le bloc de fin y sont ensemble : le second arrive après
+         la dernière étape, comme une conclusion. Posé en dehors, il aurait
+         occupé le bas de l'écran en permanence. -->
+    <div class="zone-etapes">
     <div id="detail-steps"></div>
     <div class="confirm-bar">
       <div class="lecture-etat" id="lecture-etat">
@@ -2061,6 +2066,7 @@
       </div>
       <div class="error-msg" id="confirm-error"></div>
     </div>
+    </div><!-- /.zone-etapes -->
   </div>
 
   <!-- Mon activité : ce que l'employé a lu, et le temps qu'il y a passé -->

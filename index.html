@@ -43,9 +43,31 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Standix">
 <meta property="og:description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
-<meta property="og:image" content="partage.png">
+<!-- ═══ POURQUOI L'ADRESSE COMPLÈTE ET LES DIMENSIONS ═══
+
+     WhatsApp affichait une petite vignette carrée au lieu de la grande carte.
+     Deux causes, et il fallait corriger les deux :
+
+     • L'ADRESSE ÉTAIT RELATIVE. Les robots qui lisent la page pour fabriquer
+       l'aperçu n'ont pas de navigateur : ils ne savent pas résoudre
+       « partage.png » en une adresse complète. Beaucoup abandonnent.
+
+     • LES DIMENSIONS MANQUAIENT. WhatsApp choisit entre vignette et grande
+       carte AVANT de télécharger l'image, d'après `og:image:width`. Sans elle,
+       il suppose une petite image et affiche un carré. -->
+<meta property="og:image" content="https://emcl22a-creator.github.io/Standix/partage.png">
+<meta property="og:image:secure_url" content="https://emcl22a-creator.github.io/Standix/partage.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Standix">
+<meta property="og:url" content="https://emcl22a-creator.github.io/Standix/">
+<meta property="og:site_name" content="Standix">
+<meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="partage.png">
+<meta name="twitter:title" content="Standix">
+<meta name="twitter:description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
+<meta name="twitter:image" content="https://emcl22a-creator.github.io/Standix/partage.png">
 <meta name="description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
 <!-- Les trois serveurs contactés au démarrage. Ouvrir la connexion dès la
      lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur

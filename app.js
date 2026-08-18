@@ -2085,6 +2085,55 @@ document.getElementById('copy-code-btn')?.addEventListener('click', () => {
   }
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   POURQUOI CERTAINES VIDÉOS SONT TROP LOURDES
+
+   Les durées ci-dessous sont CALCULÉES, pas estimées : 90 Mo divisés par le
+   débit de chaque source. Elles disent à l'utilisateur ce qu'il peut filmer
+   avant même d'essayer.
+
+   L'enregistrement d'écran figure en tête parce que c'est le cas qui surprend :
+   on croit qu'un écran « pèse moins » qu'une scène filmée, alors que c'est
+   l'inverse. Le texte net et les aplats sont ce que les codecs gèrent le plus
+   mal — ils sont faits pour des images naturelles.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function expliquerLePoids() {
+  const LIM = 90 * 1024 * 1024
+  const duree = (mbps) => {
+    const sec = Math.floor(LIM * 8 / (mbps * 1e6))
+    const m = Math.floor(sec / 60), r = sec % 60
+    return m ? `${m} min ${String(r).padStart(2, '0')}` : `${r} s`
+  }
+  const lignes = [
+    ['Enregistrement d\u2019\u00e9cran', 13],
+    ['Cam\u00e9ra 1080p \u00e0 60 images/s', 14],
+    ['Cam\u00e9ra 1080p \u00e0 30 images/s', 8],
+    ['Cam\u00e9ra 720p \u00e0 30 images/s', 6],
+    ['Cam\u00e9ra 4K', 45],
+  ].map(([nom, d]) => `<div class="pq-l"><span>${nom}</span><b>${duree(d)}</b></div>`).join('')
+
+  confirmDialog({
+    titre: 'Pourquoi la limite de 90 Mo ?',
+    message: '',
+    confirmer: 'Compris',
+    annuler: '',
+    danger: false,
+    html: `
+      <p class="pq-p">Chaque vid\u00e9o est all\u00e9g\u00e9e avant l\u2019envoi. Mais toutes ne
+         se compressent pas pareil : un <b>enregistrement d\u2019\u00e9cran</b> r\u00e9siste,
+         parce que le texte net et les aplats sont ce que la compression g\u00e8re
+         le plus mal.</p>
+      <div class="pq-t">Ce qui tient dans 90 Mo</div>
+      ${lignes}
+      <p class="pq-p pq-fin">Pour filmer plus long, baissez la d\u00e9finition :
+         <b>R\u00e9glages \u2192 Appareil photo \u2192 720p \u00e0 30 i/s</b> sur iPhone.</p>`,
+  })
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target?.id === 'info-poids') { e.preventDefault(); expliquerLePoids() }
+})
+
 /* ═══ « ÉTAPE 1 — » EST DE TROP ═══
 
    L'IA préfixe souvent ses phrases par « Étape 1 : », « 1. » ou « Étape 3 — ».
@@ -7977,8 +8026,23 @@ function verifierDureeVideo() {
   if (aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX) {
     if (peutComprimer()) {
       err.style.color = 'var(--label-2)'
+      /* ═══ ON ANNONCE CE QUI VA SE PASSER, ET CE QUI PEUT RATER ═══
+
+         Le message disait « elle sera allégée » sans réserve. Or la compression
+         ne réduit pas tout dans les mêmes proportions : un enregistrement
+         d'écran, fait de texte net et d'aplats, résiste — mesuré, 160 Mo n'ont
+         donné que 140.
+
+         Au-delà d'un certain poids, on prévient donc que ça peut échouer, et
+         on met le bouton d'information à portée de doigt : c'est le moment où
+         la question se pose, pas après le refus. */
+      const risque = aiVideoFile.size > LIMITE_STOCKAGE * 1.6
       err.innerHTML = `Cette vidéo pèse <b>${poidsLisible(aiVideoFile.size)}</b>. ` +
-        `Elle sera allégée avant l'envoi — comptez une minute de plus au lancement.`
+        (risque
+          ? `Elle sera allégée, mais elle risque de rester trop lourde — ` +
+            `c'est le cas des enregistrements d'écran. ` +
+            `<button type="button" class="lien-info" id="info-poids">Pourquoi ?</button>`
+          : `Elle sera allégée avant l'envoi — comptez une minute de plus au lancement.`)
       btn.disabled = false
       return
     }
@@ -8141,7 +8205,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
   if (aiVideoFile.size > VIDEO_POIDS_MAX) {
     throw new Error(`Même allégée, cette vidéo pèse ${poidsLisible(aiVideoFile.size)}, ` +
       `au-delà des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo acceptés. ` +
-      `Filmez une séquence plus courte.`)
+      `Baissez la définition de votre caméra, ou filmez plus court.`)
   }
 
 
@@ -15609,7 +15673,11 @@ const ICONE_QUESTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
   <line x1="12" y1="16.8" x2="12" y2="16.8"/></svg>`
 
 function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler',
-                         danger = true, accompli = false, icone = null }) {
+                         danger = true, accompli = false, icone = null,
+                         html = '' }) {
+  /* `html` n'est PAS échappé, contrairement à `message`. Il n'est employé que
+     pour des contenus écrits dans CE fichier — jamais pour du texte venu de la
+     base ou saisi par quelqu'un. */
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
     backdrop.className = 'ios-alert-backdrop'
@@ -15637,6 +15705,7 @@ function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Ann
             : accompli ? ICONE_COCHE_RONDE : ICONE_QUESTION)}</span>
           <div class="fen-t">${escapeHtml(titre)}</div>
           ${message ? `<div class="fen-s">${escapeHtml(message)}</div>` : ''}
+          ${html ? `<div class="fen-html">${html}</div>` : ''}
         </div>
         <div class="fen-ac">
           <button type="button" class="fen-p ${danger ? 'rouge' : ''} ok">${escapeHtml(confirmer)}</button>

@@ -6792,69 +6792,102 @@ body.chargement #bar{
 .cg-reste.bientot{ color:var(--or2, #FFAD33); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA PAGE D'UNE PROCÉDURE
+   LE DÉTAIL D'UNE PROCÉDURE · L'EN-TÊTE ET LA VIDÉO SE FIGENT
 
-   Deux choses seulement. J'avais ajouté au fil des essais un masque de fondu,
-   une hauteur calculée, une vidéo collante et un texte barré — tout est retiré.
+   La même règle pour les DEUX espaces. Le détail se présente pareil des deux
+   côtés — c'est ce qui fait qu'un gérant qui montre l'app à son équipe n'a rien
+   à expliquer.
 
-   ─── 1 · CE QUI EST AU-DESSUS DE LA VIDÉO NE BOUGE PAS ───
+   ═══ CE QUI SE FIGE ═══
 
-   Le titre et le nom du dossier se figent quand on descend. La vidéo, elle,
-   défile normalement — c'est ce qui distingue ceci de mon essai précédent, où
-   je l'avais collée aussi.
+   Le titre, le nom du dossier, et la vidéo. Ces trois-là restent en haut ; les
+   étapes défilent dessous.
 
-   `sticky` et non `fixed` : l'en-tête se libère tout seul quand on quitte la
-   page, sans qu'aucun script n'ait à le surveiller, et il garde sa place dans
-   le flux — rien ne saute au moment où il se fige.
+   Un employé lit l'étape 4 en regardant le geste. Si la vidéo est partie hors
+   de l'écran, il remonte, regarde, redescend, et a perdu sa ligne.
 
-   Le fond est indispensable : sans lui, les étapes défileraient EN
-   TRANSPARENCE derrière le titre.
+   ═══ POURQUOI DES `top` DIFFÉRENTS ═══
 
-   ─── 2 · UNE ÉTAPE COCHÉE RESTE EN PLACE ───
+   Chaque élément se colle SOUS le précédent, sinon les trois se superposeraient
+   au même endroit. Les valeurs suivent leurs hauteurs réelles : la barre de
+   l'app occupe 87 px, le titre en fait 44, le nom du dossier 30.
 
-   Le chiffre devient une coche, l'étape passe en gris. Elle ne se replie plus,
-   la liste ne bouge pas : on garde son avancement sous les yeux.
+   ═══ LE FOND EST INDISPENSABLE ═══
+
+   Sans lui, les étapes défileraient EN TRANSPARENCE derrière le titre. Et les
+   marges négatives étendent ce fond d'un bord à l'autre : l'écran porte 20 px
+   de marge, sans quoi les étapes se verraient passer de chaque côté.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* ═══ POURQUOI LE STICKY NE PRENAIT PAS ═══
-
-   `body` porte `overflow:hidden auto`. Un élément collant se cale sur le
-   premier ancêtre qui a un `overflow` — donc sur le body, et non sur la
-   fenêtre. Comme le body ne défile pas lui-même — c'est `html` qui défile —,
-   le titre n'avait aucune raison de se figer et partait avec le contenu.
-
-   `overflow:clip visible` sur le body pendant qu'on est sur cette page :
-   `clip` coupe horizontalement comme `hidden` le faisait, mais NE CRÉE PAS de
-   zone de défilement. Le sticky retrouve alors la fenêtre comme référence.
-
-   La classe est posée par le script à l'ouverture de la page, et retirée en
-   sortant : les autres écrans gardent le comportement d'origine. */
+/* `body` porte `overflow:hidden auto`. Un élément collant se cale sur le
+   premier ancêtre qui a un `overflow` — donc sur le body, qui ne défile pas
+   lui-même : rien ne se figeait. `clip` coupe horizontalement comme `hidden`
+   le faisait, mais ne crée AUCUNE zone de défilement, et le sticky retrouve la
+   fenêtre comme référence. La classe est posée par le script, page par page. */
 body.page-procedure{ overflow-x:clip; overflow-y:visible; }
 
+#p-analyse .detail-header,
+#p-analyse .subhead.titre-cat,
+#p-analyse .video-frame,
 #e-detail .detail-header,
-#e-detail .subhead.titre-cat{
+#e-detail .subhead.titre-cat,
+#e-detail .video-frame{
   position:sticky;
-  z-index:7;
   background:var(--bg, #0C0D0E);
-  /* Le fond doit couvrir TOUTE la largeur, pas seulement celle du texte.
-     L'écran porte 20 px de marge à gauche et à droite : on les déborde par des
-     marges négatives, compensées par un rembourrage de même valeur pour que le
-     texte reste à sa place.
-
-     Sans ça, les étapes défilaient VISIBLEMENT de chaque côté du titre. */
   margin-left:-20px; margin-right:-20px;
   padding-left:20px; padding-right:20px;
 }
-/* Le `top` se compte depuis le haut de la FENÊTRE, pas depuis le contenu. La
-   barre de l'app occupe les 87 premiers pixels : à `top:0`, le titre se serait
-   figé DERRIÈRE elle, invisible. */
-#e-detail .detail-header{ top:87px; padding-top:6px; }
-/* Le nom du dossier se colle SOUS le titre : 87 plus les 44 px du bloc de
-   titre. Au même `top`, les deux se chevaucheraient. */
-/* `z-index:8`, un cran de plus que le titre : le nom du dossier est le
-   DERNIER élément figé, donc celui qui doit passer devant tout le reste. À
-   égalité, le bord de la vidéo se voyait au travers. */
-#e-detail .subhead.titre-cat{ top:131px; padding-bottom:12px; z-index:8; }
+#p-analyse .detail-header,
+#e-detail .detail-header{
+  top:87px; z-index:9; padding-top:6px;
+  box-shadow:0 0 0 20px var(--bg, #0C0D0E);
+}
+/* Le nom du dossier déborde lui aussi par une ombre : sa marge négative le
+   fait bien commencer au bord gauche, mais un résidu d'étape passait à droite,
+   là où le titre est plus court que l'écran. */
+#p-analyse .subhead.titre-cat,
+#e-detail .subhead.titre-cat{
+  top:131px; z-index:8; padding-bottom:10px;
+  box-shadow:0 0 0 20px var(--bg, #0C0D0E);
+}
+/* La vidéo se colle en dernier, donc sous les deux autres. `z-index:7` : à
+   égalité, son bord passerait devant le nom du dossier. */
+/* La vidéo se colle en dernier, donc sous les deux autres. `z-index:7` : à
+   égalité, son bord passerait devant le nom du dossier.
 
+   Le fond est posé par un pseudo-élément plutôt que par un rembourrage. La
+   vidéo a ses propres angles arrondis : un rembourrage les aurait décollés du
+   bord, et jouer sur la largeur donnait deux pixels de trop.
+
+   Le pseudo-élément, lui, s'étend derrière sans rien déplacer. `inset` le cale
+   sur les quatre côtés, les valeurs négatives le font déborder jusqu'aux bords
+   de l'écran. */
+/* Le fond est posé par une OMBRE PORTÉE plutôt que par un rembourrage ou un
+   pseudo-élément.
+
+   Les deux essais précédents ont échoué : un rembourrage décollait les angles
+   arrondis de la vidéo du bord de l'écran, et un pseudo-élément en `z-index:-1`
+   passait derrière son propre parent au lieu de masquer les étapes.
+
+   `box-shadow` avec un étalement de 20 px et aucun flou peint un rectangle
+   plein tout autour, sans rien déplacer et sans créer d'élément. C'est la
+   réponse la plus simple des trois. */
+#p-analyse .video-frame,
+#e-detail .video-frame{
+  top:161px; z-index:7;
+  padding-bottom:14px;
+  background:transparent;
+  box-shadow:0 0 0 20px var(--bg, #0C0D0E);
+}
+
+/* La vidéo est bornée en hauteur : sans plafond, une vidéo verticale
+   occuperait tout l'écran et il ne resterait rien pour les étapes. */
+#p-analyse .video-frame video,
+#e-detail .video-frame video{ max-height:30dvh; }
+
+/* ═══ UNE ÉTAPE COCHÉE RESTE EN PLACE ═══
+
+   Le chiffre devient une coche, l'étape passe en gris. Elle ne se replie plus :
+   on garde son avancement sous les yeux. */
 #detail-steps.etapes-fil .detail-step.faite{
   opacity:0.42;
   transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1);

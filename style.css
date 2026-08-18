@@ -6791,139 +6791,71 @@ body.chargement #bar{
 .cg-reste{ font-size:12.5px; color:var(--label-3); margin-bottom:14px; }
 .cg-reste.bientot{ color:var(--or2, #FFAD33); }
 
-
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA PAGE D'UNE PROCÉDURE : LA VIDÉO RESTE, LES ÉTAPES PASSENT
+   LA PAGE D'UNE PROCÉDURE
 
-   ═══ POURQUOI LA VIDÉO NE DOIT PAS PARTIR ═══
+   Deux choses seulement. J'avais ajouté au fil des essais un masque de fondu,
+   une hauteur calculée, une vidéo collante et un texte barré — tout est retiré.
 
-   Un employé lit l'étape 4 en regardant le geste. Si la vidéo a défilé hors de
-   l'écran, il remonte, regarde, redescend, et a perdu sa ligne. La vidéo est
-   le SUJET de la page ; les étapes sont ce qu'on parcourt.
+   ─── 1 · CE QUI EST AU-DESSUS DE LA VIDÉO NE BOUGE PAS ───
 
-   `sticky` et non `fixed` : elle se libère toute seule quand on quitte la page,
-   sans qu'aucun script n'ait à la surveiller. Et elle reste dans le flux, donc
-   les étapes commencent naturellement en dessous.
+   Le titre et le nom du dossier se figent quand on descend. La vidéo, elle,
+   défile normalement — c'est ce qui distingue ceci de mon essai précédent, où
+   je l'avais collée aussi.
+
+   `sticky` et non `fixed` : l'en-tête se libère tout seul quand on quitte la
+   page, sans qu'aucun script n'ait à le surveiller, et il garde sa place dans
+   le flux — rien ne saute au moment où il se fige.
+
+   Le fond est indispensable : sans lui, les étapes défileraient EN
+   TRANSPARENCE derrière le titre.
+
+   ─── 2 · UNE ÉTAPE COCHÉE RESTE EN PLACE ───
+
+   Le chiffre devient une coche, l'étape passe en gris. Elle ne se replie plus,
+   la liste ne bouge pas : on garde son avancement sous les yeux.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA PAGE D'UNE PROCÉDURE : L'EN-TÊTE EST FIGÉ, SEULES LES ÉTAPES DÉFILENT
+/* ═══ POURQUOI LE STICKY NE PRENAIT PAS ═══
 
-   J'avais d'abord posé la vidéo en `sticky`. Ça ne suffisait pas : le titre,
-   la catégorie et le sélecteur de langue continuaient de défiler, et la vidéo
-   ne se collait qu'après avoir bougé.
+   `body` porte `overflow:hidden auto`. Un élément collant se cale sur le
+   premier ancêtre qui a un `overflow` — donc sur le body, et non sur la
+   fenêtre. Comme le body ne défile pas lui-même — c'est `html` qui défile —,
+   le titre n'avait aucune raison de se figer et partait avec le contenu.
 
-   ═══ LE DISPOSITIF ═══
+   `overflow:clip visible` sur le body pendant qu'on est sur cette page :
+   `clip` coupe horizontalement comme `hidden` le faisait, mais NE CRÉE PAS de
+   zone de défilement. Le sticky retrouve alors la fenêtre comme référence.
 
-   L'écran devient une colonne de la hauteur exacte de la fenêtre, qui ne
-   défile pas. Dedans, deux parties :
+   La classe est posée par le script à l'ouverture de la page, et retirée en
+   sortant : les autres écrans gardent le comportement d'origine. */
+body.page-procedure{ overflow-x:clip; overflow-y:visible; }
 
-   • L'EN-TÊTE — titre, catégorie, vidéo, ligne des étapes. Hauteur libre,
-     `flex-shrink:0` pour qu'il ne se comprime jamais.
+#e-detail .detail-header,
+#e-detail .subhead.titre-cat{
+  position:sticky;
+  z-index:7;
+  background:var(--bg, #0C0D0E);
+  /* Le fond doit couvrir TOUTE la largeur, pas seulement celle du texte.
+     L'écran porte 20 px de marge à gauche et à droite : on les déborde par des
+     marges négatives, compensées par un rembourrage de même valeur pour que le
+     texte reste à sa place.
 
-   • LA LISTE — elle prend tout ce qui reste et défile SEULE.
-
-   `min-height:0` sur la liste : sans lui, un enfant en `flex` refuse de
-   devenir plus petit que son contenu, et c'est la page entière qui reprend le
-   défilement. C'est le piège classique de cette disposition.
-   ═══════════════════════════════════════════════════════════════════════════ */
-#e-detail{
-  /* La hauteur de la fenêtre, moins la barre du haut et celle du bas.
-     `dvh` et non `vh` : sur iPhone, la barre d'adresse de Safari se replie au
-     défilement, et `vh` ne le sait pas — la page dépasserait de 60 px. */
-  /* ═══ LA HAUTEUR ═══
-
-     Deux essais ratés avant celui-ci, et ils valent d'être notés.
-
-     `100dvh - 87px - 87px` comptait double : l'écran porte DÉJÀ son
-     rembourrage, on le retirait une seconde fois. Il s'arrêtait 174 px trop
-     tôt et on voyait le fond de la page dessous.
-
-     `height:100%` ne marchait pas non plus : le parent n'a pas de hauteur
-     déclarée, donc un pourcentage ne se calcule pas — l'écran reprenait la
-     taille de son contenu et dépassait de 365 px sous la barre.
-
-     `100dvh` seul ne suffisait pas non plus : la liste, en `overflow:auto`,
-     défilait SOUS le rembourrage du bas et passait derrière la barre.
-
-     La bonne réponse retire explicitement les deux barres, et l'écran
-     n'applique plus de rembourrage vertical — ce sont les 87 px du haut et
-     les 122 du bas qui sont remplacés par ce calcul. */
-  height:calc(100dvh - 87px - 122px);
-  /* Le rembourrage du HAUT reste : c'est lui qui pousse le titre sous la barre.
-     Sans lui, le titre se collait à 0 px et passait dessous. Seul celui du bas
-     disparaît — il est remplacé par les 122 px retirés de la hauteur. */
-  margin-top:87px;
-  padding-top:0;
-  padding-bottom:0;
-  display:flex; flex-direction:column;
-  overflow:hidden;
-  padding-bottom:0;
+     Sans ça, les étapes défilaient VISIBLEMENT de chaque côté du titre. */
+  margin-left:-20px; margin-right:-20px;
+  padding-left:20px; padding-right:20px;
 }
-#e-detail.active{ display:flex; }
+/* Le `top` se compte depuis le haut de la FENÊTRE, pas depuis le contenu. La
+   barre de l'app occupe les 87 premiers pixels : à `top:0`, le titre se serait
+   figé DERRIÈRE elle, invisible. */
+#e-detail .detail-header{ top:87px; padding-top:6px; }
+/* Le nom du dossier se colle SOUS le titre : 87 plus les 44 px du bloc de
+   titre. Au même `top`, les deux se chevaucheraient. */
+/* `z-index:8`, un cran de plus que le titre : le nom du dossier est le
+   DERNIER élément figé, donc celui qui doit passer devant tout le reste. À
+   égalité, le bord de la vidéo se voyait au travers. */
+#e-detail .subhead.titre-cat{ top:131px; padding-bottom:12px; z-index:8; }
 
-/* L'en-tête figé. Tout ce qui n'est pas la liste. */
-#e-detail > .detail-header,
-#e-detail > .subhead,
-#e-detail > .analyse-couv,
-#e-detail > .video-frame,
-#e-detail > .detail-etapes-tete,
-#e-detail > #etapes-rappel{
-  flex:0 0 auto;
-}
-
-/* La vidéo garde une taille bornée : sans plafond, une vidéo verticale
-   occuperait tout l'écran et il ne resterait rien pour les étapes. */
-#e-detail > .video-frame{
-  max-height:34dvh;
-}
-#e-detail > .video-frame video{
-  max-height:34dvh; width:100%; object-fit:contain;
-}
-
-/* ═══ LA LISTE, SEULE ZONE QUI DÉFILE ═══ */
-#e-detail #detail-steps{
-  flex:1 1 auto;
-  min-height:0;              /* le piège du flex — voir plus haut */
-  overflow-y:auto;
-  /* La liste s'arrête au-dessus de la barre du bas. Le rembourrage de l'écran
-     ne suffit pas : un enfant en `overflow:auto` défile SOUS lui, et les
-     dernières étapes passaient derrière la navigation.
-
-     J'ai d'abord tenté une marge négative compensée par un rembourrage — ça
-     ne marche pas, la marge négative annule la protection qu'on vient de
-     poser. Le simple rembourrage est la bonne réponse. */
-  padding-bottom:18px;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
-  padding-top:12px;
-
-  /* ═══ LE FONDU, EN PIXELS ET NON EN POURCENTAGE ═══
-
-     Il était réglé à 6 % en haut et 7 % en bas. Sur une liste courte, ces
-     pourcentages tombaient au milieu de la dernière étape : elle paraissait à
-     moitié effacée alors qu'il n'y avait plus rien après, et on croyait à une
-     page mal chargée.
-
-     En pixels, le fondu fait toujours 22 px, quelle que soit la longueur de la
-     liste. Il estompe le bord, jamais le contenu. */
-  mask-image:linear-gradient(180deg,
-    transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
-  -webkit-mask-image:linear-gradient(180deg,
-    transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
-}
-
-/* ═══ UNE ÉTAPE FAITE PÂLIT, ELLE NE PART PLUS ═══
-
-   Elle se repliait ; elle reste maintenant en place, en gris. On garde la
-   trace de son avancement sous les yeux au lieu de la voir s'effacer. */
 #detail-steps.etapes-fil .detail-step.faite{
   opacity:0.42;
   transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1);
-}
-#detail-steps.etapes-fil .detail-step.faite p{
-  /* Barré, en plus du gris : sur un écran vu de loin dans une cuisine, une
-     nuance de gris ne se distingue pas ; un trait, si. */
-  text-decoration:line-through;
-  text-decoration-color:var(--label-3);
-  text-decoration-thickness:1px;
 }

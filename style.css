@@ -6648,3 +6648,23 @@ body.chargement #bar{
 /* La marge du bas appartenait au logo, qui n'est plus seul sur sa ligne. */
 .choix-marque .boot-logo{ margin:0; }
 .choix-marque .logotype{ margin:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ESPACE ÉQUIPE RESPIRE UN PEU PLUS SOUS LA BARRE
+
+   Dix-neuf pixels séparaient la pilule du logo et le « Bonjour ». C'est la
+   valeur commune aux deux espaces — mais ici le titre est un salut, pas une
+   étiquette de section : il ouvre la page plutôt qu'il ne la range. Il lui
+   faut le recul qu'on donne à une phrase qu'on adresse à quelqu'un.
+
+   La règle ne vise QUE `#equipe-app` : l'espace Gestion garde ses 19 px, et
+   ses quinze pages restent alignées entre elles.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* Le `.page-tete` n'est pas enfant direct de l'écran : il vit dans
+   `#e-bloc-categories`. Le sélecteur descendant l'atteint quel que soit le
+   nombre de niveaux, et `:first-child` garantit qu'on ne vise que le premier
+   de la page — pas un en-tête de section plus bas. */
+#equipe-app .page-tete{
+  margin-top:11px;
+}

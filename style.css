@@ -6712,43 +6712,57 @@ body.chargement #bar{
 /* `.btn.block` impose `text-align:center` et gagne par spécificité — deux
    classes contre une. On redouble donc la nôtre pour l'emporter, plutôt que de
    modifier `.btn.block`, qui sert à quinze autres boutons dans l'app. */
-.choix-btn.choix-btn{
-  display:flex; align-items:center; gap:13px;
-  height:auto; padding:13px 15px; line-height:1.3; text-align:left;
+/* ═══ LES BOUTONS DE CHOIX · MAQUETTE D ═══
+
+   `999px` : le navigateur plafonne tout seul à la moitié de la hauteur, ce qui
+   donne un vrai demi-cercle de chaque côté quelle que soit la taille du texte.
+
+   `text-align:left !important` : `.btn.block` centre le texte, et ce sélecteur
+   est plus fort que le nôtre. C'est le seul endroit du fichier où j'emploie
+   `!important` — ailleurs on peut toujours faire autrement. */
+.choix-btn{
+  display:block; position:relative; overflow:hidden;
+  height:auto; padding:12px 22px; line-height:1.3;
+  text-align:left !important;
+  border-radius:999px;
 }
 .choix-btn + .choix-btn{ margin-top:10px; }
-.choix-btn .cb-txt{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-.choix-btn .cb-t{ font-size:15.5px; font-weight:700; letter-spacing:-0.015em; }
+.choix-btn .cb-t{
+  display:block; position:relative;
+  font-size:15.5px; font-weight:700; letter-spacing:-0.02em;
+}
 /* Le sous-titre hérite de la couleur du bouton et s'efface à 62 % : sur le
    bouton plein il devient brun sombre, sur le bouton sobre il devient gris.
    Une couleur fixe aurait été illisible sur l'un des deux. */
-.choix-btn .cb-s{ font-size:12px; font-weight:500; opacity:0.62; }
-
-/* ═══ LA PASTILLE DE L'ICÔNE ═══
-
-   `currentColor` partout : la pastille et le tracé prennent la couleur du
-   bouton qui les porte. Sur le bouton plein, l'icône devient brun sombre sur
-   un voile sombre ; sur le bouton sobre, elle devient claire sur un voile
-   clair. Deux couleurs fixes auraient demandé deux règles, et l'une des deux
-   aurait fini par être fausse. */
-.choix-btn .cb-ic{
-  flex:0 0 auto; width:38px; height:38px; border-radius:12px;
-  display:grid; place-items:center;
-  background:currentColor; /* remplacé juste en dessous par un voile */
-  background:color-mix(in srgb, currentColor 13%, transparent);
-  box-shadow:inset 0 0 0 .5px color-mix(in srgb, currentColor 22%, transparent);
+.choix-btn .cb-s{
+  display:block; position:relative;
+  font-size:12px; font-weight:500; opacity:0.62; margin-top:2px;
+  max-width:76%;
 }
-.choix-btn .cb-ic svg{ width:19px; height:19px; display:block; }
 
-/* Le chevron. Il glisse d'un pixel à l'appui — assez pour qu'on sente le
-   geste, trop peu pour qu'on le remarque. */
-.choix-btn .cb-fl{
-  margin-left:auto; flex:0 0 auto;
-  font-size:20px; line-height:1; opacity:0.42;
-  transition:transform 0.18s cubic-bezier(0.32,0.72,0,1), opacity 0.18s ease;
+/* ═══ L'ICÔNE EN FILIGRANE ═══
+
+   Grande, très pâle, débordant du bord droit. Elle donne du caractère sans
+   prendre de place au texte — c'est tout l'intérêt de cette disposition par
+   rapport à une pastille posée à gauche.
+
+   `currentColor` à 13 % : sur le bouton plein elle devient brun sombre, sur le
+   sobre elle devient claire. Une couleur fixe aurait disparu sur l'un des deux. */
+.choix-btn .cb-fond{
+  position:absolute; right:-6px; top:50%; transform:translateY(-50%);
+  opacity:0.13; pointer-events:none;
 }
-.choix-btn:active .cb-fl{ transform:translateX(2px); opacity:0.7; }
+.choix-btn .cb-fond svg{ width:62px; height:62px; display:block; }
 
+/* Sur un iPhone SE, la carte fait 250 px de large : le texte passe à la ligne
+   plutôt que d'être tronqué, et le filigrane rétrécit pour lui laisser la
+   place. Un bouton un peu plus haut vaut mieux qu'une phrase amputée. */
+@media (max-width: 360px){
+  .choix-btn{ padding:12px 18px; }
+  .choix-btn .cb-t{ font-size:15px; }
+  .choix-btn .cb-s{ font-size:11.5px; max-width:70%; }
+  .choix-btn .cb-fond svg{ width:52px; height:52px; }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES DEUX CODES D'INVITATION

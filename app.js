@@ -11777,13 +11777,25 @@ function basculerEtape(etapeId) {
   }, 620)
 }
 
-/* Le rappel en tête de liste : « 3 étapes faites — revoir ». Il n'existe pas
-   tant que rien n'est fait. Le toucher rouvre les étapes cochées à leur place
-   d'origine — l'employé ne revient pas « d'une étape », il veut revoir ce qu'il
-   a fait, parfois la première alors qu'il en est à la quatrième. */
+/* ═══ PLUS DE BANDEAU « 3 ÉTAPES FAITES — REVOIR » ═══
+
+   Il apparaissait dès la première coche et grandissait à chaque suivante. Sur
+   une procédure de huit étapes, on finissait avec un bandeau permanent en tête
+   de liste et deux étapes en dessous : l'écran parlait davantage de ce qui
+   était fini que de ce qui restait à faire.
+
+   Or c'est l'inverse qu'un employé debout en cuisine a besoin de voir. Ce qui
+   est fait a disparu, et c'est très bien : le geste suivant est en haut.
+
+   La fonction reste, vidée, plutôt que d'être supprimée : elle est appelée à
+   quatre endroits, et retirer chaque appel multiplierait les occasions de me
+   tromper. Elle efface la zone, ce qui suffit. */
 function peindreRappelFaites() {
   const zone = document.getElementById('etapes-rappel')
   if (!zone) return
+  zone.innerHTML = ''
+  document.body.classList.remove('etapes-toutes')
+  return
   const n = etapesFaites.size
   const ouvert = document.body.classList.contains('etapes-toutes')
 

@@ -12052,13 +12052,19 @@ function peindreCoches() {
     else num.innerHTML = numeroEtapeDess(i + 1)
     div.classList.toggle('faite', faite)
 
-    /* Une étape faite est repliée, sauf si le rappel est ouvert. On remet à
-       zéro ce que l'animation avait posé : sans ça, une étape décochée
-       resterait figée à hauteur nulle. */
-    const cache = faite && !document.body.classList.contains('etapes-toutes')
-    div.classList.toggle('et-part', cache)
-    div.classList.toggle('et-repli', cache)
-    if (!cache) { div.style.maxHeight = ''; div.style.transform = ''; div.style.transition = '' }
+    /* ═══ L'ÉTAPE NE SE REPLIE PLUS ═══
+
+       `et-part` et `et-repli` la faisaient disparaître : c'était le dispositif
+       d'avant. On les retire de force plutôt que de simplement ne plus les
+       poser — une étape cochée lors d'une visite précédente les porterait
+       encore, et resterait invisible.
+
+       Les styles posés en ligne par l'ancienne animation sont effacés pour la
+       même raison : sans ça, une étape figée à hauteur nulle le resterait. */
+    div.classList.remove('et-part', 'et-repli')
+    div.style.maxHeight = ''
+    div.style.transform = ''
+    div.style.transition = ''
   })
   majBandeauCoches()
 }

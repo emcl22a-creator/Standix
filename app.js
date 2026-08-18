@@ -14097,6 +14097,9 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
     confirmer: 'Repasser en \u00e9quipe',
     annuler: 'Annuler',
     danger: true,
+    /* La teinte rouge reste — le geste retire un accès, il mérite qu'on
+       s'arrête. Mais l'icône dit ce qui se passe vraiment. */
+    icone: ICONE_ROLE,
   })
   if (!ok) return
 
@@ -15413,6 +15416,21 @@ function demanderTexte({ titre, message, valeur = '', placeholder = '', confirme
 
 /* `accompli` : la fenêtre annonce une réussite plutôt qu'une question. Vert,
    coche ronde, et généralement un seul bouton. */
+/* ═══ CHANGER DE RÔLE N'EST PAS SUPPRIMER ═══
+
+   La fenêtre « Repasser en équipe » portait une poubelle : elle annonçait donc
+   une suppression alors qu'on ne fait que changer un rôle. La personne reste
+   dans l'entreprise, ses procédures restent en place — la phrase le dit, mais
+   l'icône disait le contraire, et c'est elle qu'on lit en premier.
+
+   Deux flèches qui se croisent : l'une monte, l'autre descend. Le geste est
+   réversible, et le dessin le montre. */
+const ICONE_ROLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M7.5 20.5V5"></path><path d="M3.6 8.9 7.5 5l3.9 3.9"></path>
+  <path d="M16.5 3.5V19"></path><path d="M20.4 15.1 16.5 19l-3.9-3.9"></path>
+</svg>`
+
 const ICONE_POUBELLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="3.5 6.2 20.5 6.2"/>
@@ -15430,7 +15448,7 @@ const ICONE_QUESTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
   <line x1="12" y1="16.8" x2="12" y2="16.8"/></svg>`
 
 function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler',
-                         danger = true, accompli = false }) {
+                         danger = true, accompli = false, icone = null }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
     backdrop.className = 'ios-alert-backdrop'
@@ -15454,8 +15472,8 @@ function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Ann
       <div class="fen-pro" role="alertdialog" aria-modal="true">
         <span class="fen-halo ${teinte}"></span>
         <div class="fen-co">
-          <span class="fen-ic ${teinte}">${danger ? ICONE_POUBELLE
-            : accompli ? ICONE_COCHE_RONDE : ICONE_QUESTION}</span>
+          <span class="fen-ic ${teinte}">${icone || (danger ? ICONE_POUBELLE
+            : accompli ? ICONE_COCHE_RONDE : ICONE_QUESTION)}</span>
           <div class="fen-t">${escapeHtml(titre)}</div>
           ${message ? `<div class="fen-s">${escapeHtml(message)}</div>` : ''}
         </div>

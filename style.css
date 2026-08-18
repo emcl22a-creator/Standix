@@ -1414,18 +1414,18 @@
   .fm-nom-ligne .poste:not(:empty)::before{ content:' · '; white-space:pre; }
 
   /* L'anneau segmenté. */
-  /* ═══ L'ANNEAU DANS UNE CARTE ═══
+  /* ═══ L'ANNEAU N'EST PAS DANS UNE CARTE ═══
 
-     C'était la dernière page où tout flottait sur le fond, depuis qu'on a
-     rassemblé l'abonnement et le quota. La carte lui donne la même tenue :
-     même fond, même rayon, même ombre. */
+     J'avais posé une carte autour, pour aligner ces pages sur l'abonnement et
+     le quota. Mais un anneau n'est pas une liste : il se suffit à lui-même, et
+     l'encadrer ajoute une bordure qui n'entoure rien — juste du vide autour
+     d'un cercle.
+
+     Le cadre reste utile quand il RASSEMBLE plusieurs éléments disparates ;
+     ici il n'en rassemblait qu'un. */
   .fm-segm{
     display:flex; justify-content:center;
-    padding:24px 16px 20px;
-    background:linear-gradient(165deg,#141418 0%,#0F0F13 55%,#0B0B0E 100%);
-    border-radius:26px;
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
-               0 10px 34px rgba(0,0,0,0.34);
+    padding:20px 0 16px;
   }
 
   /* LA LISTE RESTE À PLAT. Je l'avais mise dans un bloc — mais les pages
@@ -6574,12 +6574,10 @@ body.chargement #bar{
    Une carte, un anneau, un chiffre. L'ambre montre ce qui RESTE : l'anneau
    maigrit à mesure du mois, ce qui se lit sans compter.
    ═══════════════════════════════════════════════════════════════════════════ */
-.quota-carte{
-  background:linear-gradient(165deg,#141418 0%,#0F0F13 55%,#0B0B0E 100%);
-  border-radius:26px; padding:26px 18px 20px; text-align:center;
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
-             0 10px 34px rgba(0,0,0,0.34);
-}
+/* Pas de carte non plus ici — même raison que pour la fiche membre. L'anneau
+   porte tout le sens ; l'encadrer ne fait qu'ajouter une bordure autour du
+   vide. */
+.quota-carte{ padding:14px 2px 4px; text-align:center; }
 .quota-attente{ padding:40px 10px; font-size:13px; color:var(--label-3); }
 
 .quota-anneau{ position:relative; display:grid; place-items:center; margin-bottom:14px; }

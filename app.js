@@ -10824,25 +10824,9 @@ async function openAnalyse(procId) {
   }
 }
 
-/* Tracé du logo Standix en unités 85 x 100. Le logo n'est qu'une suite de
-   segments droits : on le dessine point par point plutôt que via Path2D,
-   dont le constructeur à partir d'une chaîne SVG n'est pas garanti partout. */
-const LOGO_POINTS = [65.78,3.86,60.26,1.43,53.42,0.00,1.77,0.00,0.00,1.32,0.00,6.62,2.10,13.69,6.18,19.87,11.15,23.95,20.31,26.82,52.10,27.04,56.51,29.80,58.50,34.77,57.17,40.51,53.20,43.71,23.18,44.70,15.56,47.90,9.38,53.42,5.63,59.93,3.86,67.44,3.75,96.91,4.97,99.34,8.28,100.00,15.12,99.34,19.76,97.13,23.62,93.60,27.59,85.10,28.04,70.97,54.19,70.97,60.71,69.76,70.86,64.46,78.81,55.74,82.34,48.57,84.11,41.50,84.44,34.22,83.22,26.27,80.57,19.21,77.37,14.02,71.96,8.17]
-
-function dessinerLogo(ctx, x, y, hauteur, couleur) {
-  const e = hauteur / 100          // le tracé fait 100 unités de haut
-  ctx.save()
-  ctx.fillStyle = couleur
-  ctx.beginPath()
-  for (let i = 0; i < LOGO_POINTS.length; i += 2) {
-    const px = x + LOGO_POINTS[i] * e
-    const py = y + LOGO_POINTS[i + 1] * e
-    if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py)
-  }
-  ctx.closePath()
-  ctx.fill()
-  ctx.restore()
-}
+/* Le tracé de l'ancien « P », dessiné point par point, a été retiré : plus
+   personne ne l'appelait depuis que la fiche imprimable emploie la vraie image
+   du logo. C'était le dernier endroit où l'ancienne marque survivait. */
 
 /* Dessine la fiche à imprimer : plaque blanche, QR, titre de la procédure,
    consigne de scan et signature Standix avec son logo. Rendue en haute définition pour
@@ -10904,21 +10888,31 @@ function composerFicheQR(qrCanvas, titre) {
   g.lineWidth = 2
   g.beginPath(); g.moveTo(marge, y); g.lineTo(L - marge, y); g.stroke()
 
-  // Logo + nom, centrés ensemble. Le logo est le même tracé que partout
-  // ailleurs dans l'app, dessiné directement dans le canvas — il manquait
-  // à l'export, seul le mot « Standix » était écrit.
-  g.fillStyle = 'rgba(20,21,24,0.4)'
-  g.font = '700 22px Inter, -apple-system, system-ui, sans-serif'
+  /* ═══ LE LOGO ET LE NOM, EN NOIR ═══
+
+     Deux corrections. Le logo était le TRACÉ de l'ancien « P », dessiné point
+     par point — il ne pouvait donc pas suivre le changement d'image. On emploie
+     maintenant la vraie image, celle qui est dans la page.
+
+     Et le tout passe en noir franc plutôt qu'en gris à 40 % : cette fiche est
+     faite pour être IMPRIMÉE et collée au mur. Un gris pâle sur du papier, vu
+     de deux mètres dans une cuisine, ne se lit pas. */
+  const NOIR = '#14151A'
+  g.fillStyle = NOIR
+  g.font = '500 24px Poppins, Inter, -apple-system, system-ui, sans-serif'
   const nom = 'Standix'
   const largeurNom = g.measureText(nom).width
-  const hLogo = 22
-  const lLogo = hLogo * 0.85          // le tracé fait 85 x 100 unités
-  const espace = 8
+  const hLogo = 26
+  const lLogo = hLogo * 0.706          // le rapport du nouveau dessin
+  const espace = 9
   const totalL = lLogo + espace + largeurNom
   const xDepart = (L - totalL) / 2
-  const yBase = y + 30
+  const yBase = y + 32
 
-  dessinerLogo(g, xDepart, yBase - hLogo + 2, hLogo, 'rgba(20,21,24,0.4)')
+  const img = document.getElementById('logo-src')
+  if (img && img.complete && img.naturalWidth) {
+    g.drawImage(img, xDepart, yBase - hLogo + 3, lLogo, hLogo)
+  }
 
   g.textAlign = 'left'
   g.fillText(nom, xDepart + lLogo + espace, yBase)
@@ -11545,8 +11539,11 @@ function renderEquipeCategories() {
         ${[...procs]
           .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
           .slice(0, 3)
-          .map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${
-            equipeLues.has(p.id) ? '' : '<span class="cat-neuf"></span>'}</div>`).join('')}
+          /* Plus de pastille « non lu » ici. Trois procédures sur quatre en
+             portaient une — sur une carte qui n'en montre que trois, un signal
+             qui s'allume presque partout ne distingue plus rien. Le compte à
+             lire est déjà dit en haut de la page, en toutes lettres. */
+          .map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span></div>`).join('')}
       </div>
       <div class="cat-pied">
         <svg viewBox="0 0 24 24" fill="none">
@@ -13971,7 +13968,7 @@ function peindreEquipe() {
       : '\u00c9quipe'
 
     return `
-      <div class="pm-ligne" data-fiche="${escapeHtml(m.id)}">
+      <div class="pm-ligne">
         <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
@@ -14022,10 +14019,11 @@ document.getElementById('pm-vider')?.addEventListener('click', () => {
 })
 
 /* ── La promotion ───────────────────────────────────────── */
-/* La ligne n'a plus `role="button"` ni `tabindex` : elle n'est plus cliquable,
-   et l'annoncer comme telle tromperait — un lecteur d'écran l'aurait présentée
-   comme un bouton qui ne fait rien. `data-fiche` reste : il ne coûte rien et
-   sert d'identifiant à la ligne. */
+/* La ligne n'a plus `role="button"`, ni `tabindex`, ni `data-fiche` : elle
+   n'est plus cliquable. J'avais gardé l'attribut en pensant qu'il ne coûtait
+   rien — mais le style s'en servait comme sélecteur pour poser un curseur en
+   main et un effet d'enfoncement. La ligne réagissait donc au doigt sans rien
+   faire, ce qui est pire qu'une ligne inerte. */
 
 /* ═══ « GÉRER L'ÉQUIPE » NE MÈNE PLUS À LA FICHE ═══
 

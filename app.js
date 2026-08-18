@@ -7475,10 +7475,21 @@ const DUREE_REFUSEE = 5 * 60
    Depuis, l'application réduit elle-même en 1080p à 30 images : cinq minutes
    pesent alors 94 Mo. À 45, on refusait donc des vidéos que l'on savait traiter.
 
-   150 laisse la marge nécessaire — une scène très détaillée se comprime moins
-   bien qu'un plan fixe — tout en écartant ce qui n'a manifestement pas été
-   comprimé : une 4K brute de cinq minutes en fait sept cents. */
-const VIDEO_POIDS_MAX = 150 * 1024 * 1024
+   ═══ 90 MO, ET NON 150 ═══
+
+   Le calcul est fermé : cinq minutes au débit de 2,5 Mb/s font exactement
+   89 Mo. C'est le plafond que produit NOTRE compression, pas une estimation.
+
+   150 laissait passer des fichiers que la compression aurait dû réduire — soit
+   qu'elle ait échoué, soit qu'elle ait été contournée. Ces fichiers-là partent
+   sur Azure et coûtent le double sans rien apporter : l'analyse ne lit pas
+   mieux une vidéo lourde.
+
+   90 refuse ce qui n'est manifestement pas passé par la compression, et laisse
+   passer tout ce qui l'a été. La marge d'un mégaoctet suffit : le calcul est
+   déterministe, il n'y a pas de scène « plus détaillée » qui gonflerait le
+   résultat — le débit est imposé à l'encodeur. */
+const VIDEO_POIDS_MAX = 90 * 1024 * 1024
 
 function poidsLisible(o) {
   return o >= 1024 * 1024 ? Math.round(o / 1024 / 1024) + ' Mo'

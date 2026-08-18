@@ -6788,36 +6788,77 @@ body.chargement #bar{
    sans qu'aucun script n'ait à la surveiller. Et elle reste dans le flux, donc
    les étapes commencent naturellement en dessous.
    ═══════════════════════════════════════════════════════════════════════════ */
-#e-detail .video-frame{
-  position:sticky;
-  /* 6 px sous la barre du haut. Collée à zéro, elle paraîtrait glisser
-     dessous ; six pixels suffisent à dire qu'elle s'y arrête. */
-  top:calc(var(--topbar-h, 62px) + 6px);
-  z-index:6;
-  /* L'ombre naît quand la vidéo se colle, pas avant : posée en permanence,
-     elle assombrirait le haut de la page dès l'ouverture. */
-  box-shadow:0 14px 34px rgba(0,0,0,0.45);
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'UNE PROCÉDURE : L'EN-TÊTE EST FIGÉ, SEULES LES ÉTAPES DÉFILENT
+
+   J'avais d'abord posé la vidéo en `sticky`. Ça ne suffisait pas : le titre,
+   la catégorie et le sélecteur de langue continuaient de défiler, et la vidéo
+   ne se collait qu'après avoir bougé.
+
+   ═══ LE DISPOSITIF ═══
+
+   L'écran devient une colonne de la hauteur exacte de la fenêtre, qui ne
+   défile pas. Dedans, deux parties :
+
+   • L'EN-TÊTE — titre, catégorie, vidéo, ligne des étapes. Hauteur libre,
+     `flex-shrink:0` pour qu'il ne se comprime jamais.
+
+   • LA LISTE — elle prend tout ce qui reste et défile SEULE.
+
+   `min-height:0` sur la liste : sans lui, un enfant en `flex` refuse de
+   devenir plus petit que son contenu, et c'est la page entière qui reprend le
+   défilement. C'est le piège classique de cette disposition.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#e-detail{
+  /* La hauteur de la fenêtre, moins la barre du haut et celle du bas.
+     `dvh` et non `vh` : sur iPhone, la barre d'adresse de Safari se replie au
+     défilement, et `vh` ne le sait pas — la page dépasserait de 60 px. */
+  /* Mesuré dans l'app : la barre du haut s'arrête à 68 px, celle du bas fait
+     87 px de haut. L'écran porte déjà 87 px de rembourrage en haut — c'est lui
+     qui pousse le contenu sous la barre —, donc on retire les deux barres ET
+     ce rembourrage de la hauteur disponible. */
+  height:calc(100dvh - 87px - 87px);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  padding-bottom:0;
+}
+#e-detail.active{ display:flex; }
+
+/* L'en-tête figé. Tout ce qui n'est pas la liste. */
+#e-detail > .detail-header,
+#e-detail > .subhead,
+#e-detail > .analyse-couv,
+#e-detail > .video-frame,
+#e-detail > .detail-etapes-tete,
+#e-detail > #etapes-rappel{
+  flex:0 0 auto;
 }
 
-/* ═══ LES ÉTAPES APPARAISSENT ET S'EFFACENT ═══
+/* La vidéo garde une taille bornée : sans plafond, une vidéo verticale
+   occuperait tout l'écran et il ne resterait rien pour les étapes. */
+#e-detail > .video-frame{
+  max-height:34dvh;
+}
+#e-detail > .video-frame video{
+  max-height:34dvh; width:100%; object-fit:contain;
+}
 
-   Un masque sur le conteneur : ce qui passe sous la vidéo s'estompe au lieu
-   de disparaître d'un coup, et ce qui arrive par le bas se révèle de même.
-
-   Le masque agit sur le CONTENEUR, pas sur chaque étape. Une transition posée
-   sur chaque ligne demanderait un observateur par ligne et se déclencherait
-   par à-coups ; le masque, lui, est calculé par le compositeur du navigateur
-   et suit le doigt sans un seul calcul en JavaScript.
-
-   Les 8 % du haut sont l'endroit exact où l'étape croise le bas de la vidéo :
-   c'est de là que part le fondu. */
+/* ═══ LA LISTE, SEULE ZONE QUI DÉFILE ═══ */
 #e-detail #detail-steps{
+  flex:1 1 auto;
+  min-height:0;              /* le piège du flex — voir plus haut */
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
+  padding:12px 0 26px;
+
+  /* Le fondu haut et bas. Ce qui sort de la zone s'estompe au lieu d'être
+     coupé net. Le masque est calculé par le compositeur du navigateur : il
+     suit le doigt sans un seul calcul en JavaScript. */
   mask-image:linear-gradient(180deg,
-    transparent 0%, #000 8%, #000 92%, transparent 100%);
+    transparent 0%, #000 6%, #000 93%, transparent 100%);
   -webkit-mask-image:linear-gradient(180deg,
-    transparent 0%, #000 8%, #000 92%, transparent 100%);
-  /* Une marge en haut pour que la première étape ne naisse pas déjà effacée. */
-  padding-top:10px;
+    transparent 0%, #000 6%, #000 93%, transparent 100%);
 }
 
 /* ═══ UNE ÉTAPE FAITE PÂLIT, ELLE NE PART PLUS ═══

@@ -17,6 +17,11 @@
      les angles, ce qui rognerait un dessin collé au bord. -->
 <!-- Plusieurs tailles : le navigateur prend celle qui lui convient. La 32
      est celle que Chrome demande en premier pour l'onglet. -->
+<!-- Le .ico EN PREMIER. Chrome le réclame de lui-même à la racine, même sans
+     déclaration — et s'il ne le trouve pas, il montre un globe sans toujours
+     retomber sur les PNG. C'est le format le plus ancien, et le seul que tous
+     les navigateurs acceptent sans discuter. -->
+<link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="icon" type="image/png" sizes="96x96" href="favicon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icone-192.png">

@@ -5704,9 +5704,17 @@
 
    `width` et `height` sont déclarés dans le balisage : sans eux, la page se
    décale au moment où l'image arrive, et le titre saute sous les yeux. */
+/* 56 %, la valeur d'origine. L'image ne remplit plus la carte : elle
+   l'illustre. Une illustration au trait supporte mal d'être trop grande — le
+   vide autour d'elle fait partie du dessin.
+
+   Les marges lui donnent de l'air. Elles sont ASYMÉTRIQUES — 6 px en haut,
+   18 en bas — parce que la carte porte déjà 12 px de rembourrage au-dessus :
+   sans cette compensation, l'espace du haut faisait 26 px contre 16 en bas, et
+   l'image paraissait poussée vers le titre. */
 .hero-img{
   display:block; width:56%; height:auto;
-  margin:0 auto 4px;
+  margin:6px auto 18px;
   pointer-events:none; user-select:none;
 }
 

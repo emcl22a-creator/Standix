@@ -6792,97 +6792,87 @@ body.chargement #bar{
 .cg-reste.bientot{ color:var(--or2, #FFAD33); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE DÉTAIL D'UNE PROCÉDURE · L'EN-TÊTE ET LA VIDÉO SE FIGENT
+   LE DÉTAIL D'UNE PROCÉDURE
 
-   La même règle pour les DEUX espaces. Le détail se présente pareil des deux
-   côtés — c'est ce qui fait qu'un gérant qui montre l'app à son équipe n'a rien
-   à expliquer.
+   ═══ POURQUOI SEULEMENT L'ESPACE ÉQUIPE ═══
 
-   ═══ CE QUI SE FIGE ═══
+   J'ai d'abord appliqué la même règle aux deux. Le résultat était mauvais côté
+   Gestion : cette page ne s'arrête pas aux étapes, elle porte AUSSI le QR code
+   et son encadré. Forcée sur un écran, la liste se réduisait à une seule ligne
+   écrasée entre la vidéo et le QR.
 
-   Le titre, le nom du dossier, et la vidéo. Ces trois-là restent en haut ; les
-   étapes défilent dessous.
+   Les deux pages n'ont pas le même contenu, elles ne peuvent pas avoir la même
+   disposition. Celle de l'Équipe ne montre que les étapes : elle peut tenir
+   sur un écran. Celle de la Gestion continue de défiler normalement.
 
-   Un employé lit l'étape 4 en regardant le geste. Si la vidéo est partie hors
-   de l'écran, il remonte, regarde, redescend, et a perdu sa ligne.
+   ═══ LA PAGE TIENT SUR UN ÉCRAN ═══
 
-   ═══ POURQUOI DES `top` DIFFÉRENTS ═══
+   Elle ne défile pas. À l'intérieur, deux parties : un en-tête figé — titre,
+   dossier, vidéo — et la liste des étapes, seule zone mobile.
 
-   Chaque élément se colle SOUS le précédent, sinon les trois se superposeraient
-   au même endroit. Les valeurs suivent leurs hauteurs réelles : la barre de
-   l'app occupe 87 px, le titre en fait 44, le nom du dossier 30.
+   `min-height:0` sur la liste : sans lui, un enfant en `flex` refuse de
+   devenir plus petit que son contenu, et c'est la page entière qui reprend le
+   défilement. C'est le piège classique de cette disposition.
 
-   ═══ LE FOND EST INDISPENSABLE ═══
+   ═══ LA LIGNE DE FONDU ═══
 
-   Sans lui, les étapes défileraient EN TRANSPARENCE derrière le titre. Et les
-   marges négatives étendent ce fond d'un bord à l'autre : l'écran porte 20 px
-   de marge, sans quoi les étapes se verraient passer de chaque côté.
+   Juste sous la vidéo, invisible. Les étapes s'y effacent en montant, et
+   réapparaissent en descendant.
+
+   14 px, réglage « court et franc » : l'étape disparaît vite, sans traîner
+   à moitié lisible. En PIXELS et non en pourcentage — un pourcentage tomberait
+   au milieu de la dernière étape sur une liste courte, et elle paraîtrait
+   effacée alors qu'il n'y a rien après.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* `body` porte `overflow:hidden auto`. Un élément collant se cale sur le
-   premier ancêtre qui a un `overflow` — donc sur le body, qui ne défile pas
-   lui-même : rien ne se figeait. `clip` coupe horizontalement comme `hidden`
-   le faisait, mais ne crée AUCUNE zone de défilement, et le sticky retrouve la
-   fenêtre comme référence. La classe est posée par le script, page par page. */
-body.page-procedure{ overflow-x:clip; overflow-y:visible; }
-
-#p-analyse .detail-header,
-#p-analyse .subhead.titre-cat,
-#p-analyse .video-frame,
-#e-detail .detail-header,
-#e-detail .subhead.titre-cat,
-#e-detail .video-frame{
-  position:sticky;
-  background:var(--bg, #0C0D0E);
-  margin-left:-20px; margin-right:-20px;
-  padding-left:20px; padding-right:20px;
+#e-detail{
+  /* La hauteur exacte de ce qui reste entre les deux barres : 87 px pour celle
+     du haut, 122 pour celle du bas avec sa marge. La page ne peut donc pas
+     défiler — il n'y a rien à faire défiler. */
+  height:calc(100dvh - 87px - 122px);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  margin-top:87px;
+  padding-top:0; padding-bottom:0;
 }
-#p-analyse .detail-header,
-#e-detail .detail-header{
-  top:87px; z-index:9; padding-top:6px;
-  box-shadow:0 0 0 20px var(--bg, #0C0D0E);
-}
-/* Le nom du dossier déborde lui aussi par une ombre : sa marge négative le
-   fait bien commencer au bord gauche, mais un résidu d'étape passait à droite,
-   là où le titre est plus court que l'écran. */
-#p-analyse .subhead.titre-cat,
-#e-detail .subhead.titre-cat{
-  top:131px; z-index:8; padding-bottom:10px;
-  box-shadow:0 0 0 20px var(--bg, #0C0D0E);
-}
-/* La vidéo se colle en dernier, donc sous les deux autres. `z-index:7` : à
-   égalité, son bord passerait devant le nom du dossier. */
-/* La vidéo se colle en dernier, donc sous les deux autres. `z-index:7` : à
-   égalité, son bord passerait devant le nom du dossier.
+/* Le corps de la page ne défile plus tant qu'on est sur un détail. Sans cette
+   règle, l'app garde sa hauteur habituelle et la fenêtre défile par-dessus la
+   page figée — on voyait le bas d'une autre page apparaître. */
+body:has(#e-detail.active){ overflow:hidden; }
+#e-detail.active{ display:flex; }
 
-   Le fond est posé par un pseudo-élément plutôt que par un rembourrage. La
-   vidéo a ses propres angles arrondis : un rembourrage les aurait décollés du
-   bord, et jouer sur la largeur donnait deux pixels de trop.
+/* L'en-tête figé : tout ce qui n'est pas la liste. */
+#e-detail > *{ flex:0 0 auto; }
 
-   Le pseudo-élément, lui, s'étend derrière sans rien déplacer. `inset` le cale
-   sur les quatre côtés, les valeurs négatives le font déborder jusqu'aux bords
-   de l'écran. */
-/* Le fond est posé par une OMBRE PORTÉE plutôt que par un rembourrage ou un
-   pseudo-élément.
-
-   Les deux essais précédents ont échoué : un rembourrage décollait les angles
-   arrondis de la vidéo du bord de l'écran, et un pseudo-élément en `z-index:-1`
-   passait derrière son propre parent au lieu de masquer les étapes.
-
-   `box-shadow` avec un étalement de 20 px et aucun flou peint un rectangle
-   plein tout autour, sans rien déplacer et sans créer d'élément. C'est la
-   réponse la plus simple des trois. */
-#p-analyse .video-frame,
-#e-detail .video-frame{
-  top:161px; z-index:7;
-  padding-bottom:14px;
-  background:transparent;
-  box-shadow:0 0 0 20px var(--bg, #0C0D0E);
-}
-
-/* La vidéo est bornée en hauteur : sans plafond, une vidéo verticale
-   occuperait tout l'écran et il ne resterait rien pour les étapes. */
-#p-analyse .video-frame video,
+/* La vidéo est bornée : sans plafond, une vidéo verticale prendrait tout
+   l'écran et il ne resterait rien pour les étapes. */
 #e-detail .video-frame video{ max-height:30dvh; }
+
+/* ═══ LA LISTE, SEULE ZONE QUI DÉFILE ═══ */
+#e-detail #detail-steps{
+  flex:1 1 auto;
+  min-height:0;                /* le piège du flex — voir plus haut */
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
+  padding-top:10px;
+  padding-bottom:16px;
+
+  mask-image:linear-gradient(180deg,
+    transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  -webkit-mask-image:linear-gradient(180deg,
+    transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+}
+
+/* ═══ LA BARRE DE DÉFILEMENT EST INVISIBLE ═══
+
+   Trois écritures, parce qu'aucune ne suffit seule : `scrollbar-width` pour
+   Firefox, `-webkit-scrollbar` pour Safari et Chrome, `-ms-overflow-style`
+   pour les anciens Edge. La zone défile toujours — on ne cache que la barre. */
+#e-detail #detail-steps{
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+#e-detail #detail-steps::-webkit-scrollbar{ width:0; height:0; display:none; }
 
 /* ═══ UNE ÉTAPE COCHÉE RESTE EN PLACE ═══
 

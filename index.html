@@ -246,7 +246,10 @@
     backface-visibility:hidden;
     -webkit-backface-visibility:hidden;
     --glass-radius:calc(var(--bar-h) / 2);
-    z-index:10;
+    /* 60 et non 10. Sur le détail d'une procédure, la liste des étapes descend
+       jusqu'au bord de l'écran et passait DERRIÈRE la barre. Elle doit passer
+       dessous : la navigation reste toujours au premier plan. */
+    z-index:60;
   }
   /* Gris translucide du repos. Il monte a mesure que le verre
      s'eteint : a l'arret la capsule est entierement grise, comme

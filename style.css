@@ -6830,11 +6830,31 @@ body.chargement #bar{
   /* La hauteur de la fenêtre, moins la barre du haut et celle du bas.
      `dvh` et non `vh` : sur iPhone, la barre d'adresse de Safari se replie au
      défilement, et `vh` ne le sait pas — la page dépasserait de 60 px. */
-  /* Mesuré dans l'app : la barre du haut s'arrête à 68 px, celle du bas fait
-     87 px de haut. L'écran porte déjà 87 px de rembourrage en haut — c'est lui
-     qui pousse le contenu sous la barre —, donc on retire les deux barres ET
-     ce rembourrage de la hauteur disponible. */
-  height:calc(100dvh - 87px - 87px);
+  /* ═══ LA HAUTEUR ═══
+
+     Deux essais ratés avant celui-ci, et ils valent d'être notés.
+
+     `100dvh - 87px - 87px` comptait double : l'écran porte DÉJÀ son
+     rembourrage, on le retirait une seconde fois. Il s'arrêtait 174 px trop
+     tôt et on voyait le fond de la page dessous.
+
+     `height:100%` ne marchait pas non plus : le parent n'a pas de hauteur
+     déclarée, donc un pourcentage ne se calcule pas — l'écran reprenait la
+     taille de son contenu et dépassait de 365 px sous la barre.
+
+     `100dvh` seul ne suffisait pas non plus : la liste, en `overflow:auto`,
+     défilait SOUS le rembourrage du bas et passait derrière la barre.
+
+     La bonne réponse retire explicitement les deux barres, et l'écran
+     n'applique plus de rembourrage vertical — ce sont les 87 px du haut et
+     les 122 du bas qui sont remplacés par ce calcul. */
+  height:calc(100dvh - 87px - 122px);
+  /* Le rembourrage du HAUT reste : c'est lui qui pousse le titre sous la barre.
+     Sans lui, le titre se collait à 0 px et passait dessous. Seul celui du bas
+     disparaît — il est remplacé par les 122 px retirés de la hauteur. */
+  margin-top:87px;
+  padding-top:0;
+  padding-bottom:0;
   display:flex; flex-direction:column;
   overflow:hidden;
   padding-bottom:0;
@@ -6865,17 +6885,31 @@ body.chargement #bar{
   flex:1 1 auto;
   min-height:0;              /* le piège du flex — voir plus haut */
   overflow-y:auto;
+  /* La liste s'arrête au-dessus de la barre du bas. Le rembourrage de l'écran
+     ne suffit pas : un enfant en `overflow:auto` défile SOUS lui, et les
+     dernières étapes passaient derrière la navigation.
+
+     J'ai d'abord tenté une marge négative compensée par un rembourrage — ça
+     ne marche pas, la marge négative annule la protection qu'on vient de
+     poser. Le simple rembourrage est la bonne réponse. */
+  padding-bottom:18px;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
-  padding:12px 0 26px;
+  padding-top:12px;
 
-  /* Le fondu haut et bas. Ce qui sort de la zone s'estompe au lieu d'être
-     coupé net. Le masque est calculé par le compositeur du navigateur : il
-     suit le doigt sans un seul calcul en JavaScript. */
+  /* ═══ LE FONDU, EN PIXELS ET NON EN POURCENTAGE ═══
+
+     Il était réglé à 6 % en haut et 7 % en bas. Sur une liste courte, ces
+     pourcentages tombaient au milieu de la dernière étape : elle paraissait à
+     moitié effacée alors qu'il n'y avait plus rien après, et on croyait à une
+     page mal chargée.
+
+     En pixels, le fondu fait toujours 22 px, quelle que soit la longueur de la
+     liste. Il estompe le bord, jamais le contenu. */
   mask-image:linear-gradient(180deg,
-    transparent 0%, #000 6%, #000 93%, transparent 100%);
+    transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
   -webkit-mask-image:linear-gradient(180deg,
-    transparent 0%, #000 6%, #000 93%, transparent 100%);
+    transparent 0, #000 22px, #000 calc(100% - 22px), transparent 100%);
 }
 
 /* ═══ UNE ÉTAPE FAITE PÂLIT, ELLE NE PART PLUS ═══

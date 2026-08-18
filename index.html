@@ -346,8 +346,49 @@
       <h1 class="logotype">Standix</h1>
     </div>
     <div class="subhead">Choisissez votre espace</div>
-    <button class="btn block" style="margin-bottom:10px;" onclick="chooseSpace('gestion')">Espace Gestion</button>
-    <button class="btn ghost block" onclick="chooseSpace('equipe')">Espace Équipe</button>
+    <!-- Une ligne sous chaque bouton dit à qui l'espace s'adresse. Sans elle,
+         deux boutons identiques ne donnaient aucun moyen de choisir.
+
+         CE QU'ELLE NE DIT PAS, VOLONTAIREMENT : que la gestion voit qui a lu
+         quoi. C'est vrai, c'est même l'intérêt du produit — mais l'annoncer
+         ICI, sur l'écran que l'employé regarde avant d'entrer, revient à lui
+         dire qu'il sera surveillé. On parle donc de ce que chaque espace
+         PERMET DE FAIRE, pas de ce qu'il permet de voir. -->
+    <!-- L'icône est posée À GAUCHE, dans une pastille, et le texte s'aligne à
+         sa droite. Centré comme avant, le bouton n'avait pas de point de
+         départ : l'œil devait chercher où commencer à lire.
+
+         Le chevron à droite dit qu'on entre quelque part — un bouton qui mène
+         à une page ne fait pas la même promesse qu'un bouton qui valide. -->
+    <button class="btn block choix-btn" onclick="chooseSpace('gestion')">
+      <span class="cb-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 20V9.2L12 3l9 6.2V20"></path>
+          <path d="M9.2 20v-6.4h5.6V20"></path>
+        </svg>
+      </span>
+      <span class="cb-txt">
+        <span class="cb-t">Espace Gestion</span>
+        <span class="cb-s">Créer et organiser les procédures</span>
+      </span>
+      <span class="cb-fl" aria-hidden="true">›</span>
+    </button>
+    <button class="btn ghost block choix-btn" onclick="chooseSpace('equipe')">
+      <span class="cb-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.85"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 19.2A2.3 2.3 0 0 1 6.3 17H20"></path>
+          <path d="M6.3 2.5H20v19H6.3A2.3 2.3 0 0 1 4 19.2V4.8a2.3 2.3 0 0 1 2.3-2.3z"></path>
+          <path d="M8.4 7.4h7.2"></path><path d="M8.4 11h4.8"></path>
+        </svg>
+      </span>
+      <span class="cb-txt">
+        <span class="cb-t">Espace Équipe</span>
+        <span class="cb-s">Consulter les procédures de mon poste</span>
+      </span>
+      <span class="cb-fl" aria-hidden="true">›</span>
+    </button>
   </div>
 </div>
 
@@ -1765,13 +1806,42 @@
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">Code d'invitation</h1>
+      <h1 class="pagehead">Codes d'invitation</h1>
     </div>
-    <div class="card" style="text-align:center; margin-top:14px;">
-      <div id="settings-code" style="font-size:38px; font-weight:850; letter-spacing:0.28em; margin:10px 0 16px;">—</div>
+
+    <!-- ═══ DEUX CODES, DEUX NATURES ═══
+
+         Le code ÉQUIPE est permanent : il ne donne accès qu'à la lecture, on
+         peut l'afficher au mur sans risque.
+
+         Le code GESTION donne accès à tout — créer, supprimer, voir qui a lu
+         quoi. Il n'existe donc que lorsqu'on invite quelqu'un, et il meurt
+         ensuite. Les deux ne peuvent pas se présenter de la même façon : l'un
+         est un fait, l'autre est une action. -->
+
+    <div class="sect-tt" style="margin-top:16px;">Pour l'équipe</div>
+    <div class="card" style="text-align:center;">
+      <div id="settings-code" class="code-gros">—</div>
       <button class="btn block" id="copy-code-btn">Copier le code</button>
     </div>
-    <div class="reg-note">Partagez ce code à votre équipe : il lui permet de créer son compte et d'accéder aux procédures. Il ne donne aucun droit de modification.</div>
+    <div class="reg-note">Ce code permet à vos employés de créer leur compte et de lire les procédures. Il ne donne aucun droit de modification, et ne change jamais.</div>
+
+    <div class="sect-tt">Pour un gestionnaire</div>
+
+    <!-- Quand aucune invitation n'est en cours. -->
+    <div class="card" id="cg-vide">
+      <p class="cg-txt">Un gestionnaire peut créer des procédures, gérer l'équipe et voir l'analyse. Engendrez un code seulement au moment d'inviter quelqu'un.</p>
+      <button class="btn block" id="cg-creer">Créer une invitation</button>
+    </div>
+
+    <!-- Quand une invitation est valide. -->
+    <div class="card" id="cg-actif" style="display:none; text-align:center;">
+      <div id="cg-code" class="code-gros">—</div>
+      <div id="cg-reste" class="cg-reste">—</div>
+      <button class="btn block" id="cg-copier" style="margin-bottom:8px;">Copier le code</button>
+      <button class="btn ghost block" id="cg-revoquer">Révoquer</button>
+    </div>
+    <div class="reg-note">Ce code expire au bout de sept jours, et cesse de fonctionner dès que quelqu'un l'a utilisé.</div>
   </div>
 
   <!-- Sous-page : les établissements -->

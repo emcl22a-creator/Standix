@@ -2085,6 +2085,39 @@ document.getElementById('copy-code-btn')?.addEventListener('click', () => {
   }
 })
 
+/* ═══ « ÉTAPE 1 — » EST DE TROP ═══
+
+   L'IA préfixe souvent ses phrases par « Étape 1 : », « 1. » ou « Étape 3 — ».
+   Le chiffre est DÉJÀ dans le cercle à gauche : l'écrire deux fois vole de la
+   place au geste, seule chose qui compte pour quelqu'un qui lit debout.
+
+   On nettoie à L'AFFICHAGE plutôt qu'à la création, pour deux raisons : les
+   procédures déjà créées en profitent immédiatement, et le texte d'origine
+   reste intact en base — si le nettoyage se révélait trop gourmand, rien n'est
+   perdu.
+
+   ═══ CE QUE LA RÈGLE ATTRAPE ═══
+
+     « Étape 1 : Ouvrir »      → « Ouvrir »
+     « Étape 3 — Fermer »      → « Fermer »
+     « 1. Rincer »             → « Rincer »
+     « 2) Essuyer »            → « Essuyer »
+
+   ET CE QU'ELLE LAISSE, volontairement :
+
+     « 2 minutes de cuisson »  → intact, le chiffre appartient à la phrase
+     « 1er étage »             → intact
+
+   La règle exige un séparateur — deux-points, tiret, point ou parenthèse —
+   SUIVI d'une espace. « 2 minutes » n'en a pas, donc rien n'est retiré. */
+function sansNumeroDEtape(texte) {
+  if (!texte) return ''
+  return String(texte)
+    .replace(/^\s*(?:\u00e9tape|etape)\s*\d+\s*[:.\u2014\u2013-]\s+/i, '')
+    .replace(/^\s*\d+\s*[.):]\s+/, '')
+    .trim()
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LE CODE DE GESTION
 
@@ -4729,6 +4762,15 @@ window.showEquipeScreen = function(id, btn) {
   window.placerOnglet?.(ONGLET_EQUIPE_PAR_ECRAN[id])
   /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
   document.body.classList.remove('plus-vu')
+  /* ═══ LE TITRE SE FIGE SUR LA PAGE D'UNE PROCÉDURE ═══
+
+     `body` porte un `overflow`, ce qui empêche `position:sticky` de se caler
+     sur la fenêtre. On le neutralise le temps de cette page, et on le rétablit
+     en sortant : les autres écrans gardent leur comportement d'origine.
+
+     La classe est posée ICI plutôt que dans le style parce qu'elle vit sur le
+     BODY — un sélecteur CSS ne peut pas remonter jusqu'à lui depuis l'écran. */
+  document.body.classList.toggle('page-procedure', id === 'e-detail')
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
@@ -12245,7 +12287,7 @@ async function openEquipeDetail(procId) {
       <button type="button" class="et-coche${faite ? ' f' : ''}" data-etape="${escapeHtml(etape.id)}"
               aria-label="\u00c9tape ${i + 1}"><span class="num">${numeroEtapeDess(i + 1)}</span><span class="ok">${cocheFaiteDess()}</span></button>
       <div class="et-co">
-        <p>${escapeHtml(etape.texte)}</p>
+        <p>${escapeHtml(sansNumeroDEtape(etape.texte))}</p>
         <!-- La durée est À L'INTÉRIEUR du bloc de texte, après le paragraphe.
              En voisine du texte, elle en rognait la largeur : la ligne étant
              horizontale, chaque phrase perdait la place de la pastille. -->

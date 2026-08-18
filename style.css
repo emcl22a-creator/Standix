@@ -4502,7 +4502,12 @@
      L'IMAGE S'EFFACE AUSSI. Seul le texte pâlissait, et une photo restée en
      pleine lumière au-dessus d'un texte éteint attirait l'œil vers l'étape
      qu'on venait justement de terminer. */
-  #detail-steps.etapes-fil .detail-step.faite p{ color:var(--label-2); }
+  /* Le texte pâlit en même temps que le chiffre devient coche. Il restait au
+     gris ordinaire des étapes — rien ne le distinguait d'une étape non faite,
+     alors que c'est le premier signal qu'on perçoit. La transition sur la
+     couleur le fait glisser plutôt que sauter. */
+  #detail-steps.etapes-fil .detail-step p{ transition:color 0.24s ease; }
+  #detail-steps.etapes-fil .detail-step.faite p{ color:var(--label-3); }
   #detail-steps.etapes-fil .detail-step .detail-step-img,
   #detail-steps.etapes-fil .detail-step .detail-step-video{
     transition:opacity 0.3s ease;
@@ -6175,7 +6180,16 @@ body.plus-vu .plus-flot{
    Le découpage n'est posé que pendant le repli, quand l'étape s'en va de toute
    façon. */
 .detail-step{
+  /* `transform` MANQUAIT dans cette liste. L'étape portait bien un
+     `translateY(-26px)` au départ — mais sans transition pour l'accompagner,
+     elle sautait de sa place à 26 px plus haut entre deux images. On ne voyait
+     donc qu'un fondu, jamais la montée.
+
+     0,26 s : un peu plus long que le fondu de 0,22, pour que le mouvement se
+     poursuive une fraction après que l'étape a disparu. C'est ce décalage qui
+     donne l'impression qu'elle s'échappe plutôt qu'elle s'éteint. */
   transition:opacity 0.22s ease,
+             transform 0.26s cubic-bezier(0.32,0.72,0,1),
              max-height 0.30s cubic-bezier(0.32,0.72,0,1),
              margin-bottom 0.30s cubic-bezier(0.32,0.72,0,1),
              padding 0.30s cubic-bezier(0.32,0.72,0,1),

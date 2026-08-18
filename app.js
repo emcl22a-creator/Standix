@@ -11863,66 +11863,19 @@ function basculerEtape(etapeId) {
   if (navigator.vibrate) navigator.vibrate(8)
   enregistrerCoches()
 
-  const el = document.querySelector(`#detail-steps .et-coche[data-etape="${etapeId}"]`)?.closest('.detail-step')
-  if (!el || document.body.classList.contains('etapes-toutes')) { peindreCoches(); return }
+  /* ═══ L'ÉTAPE NE PART PLUS ═══
 
-  /* 1. La coche et le gris, tout de suite. */
+     Elle se repliait après 620 ms, et les suivantes remontaient pour combler
+     le vide. Deux défauts : on perdait de vue ce qu'on venait de faire, et le
+     texte bougeait sous le doigt au moment précis où l'on regardait.
+
+     Maintenant elle RESTE. Le chiffre devient une coche, l'étape pâlit, et
+     c'est tout — la liste ne bouge pas. On garde la trace de son avancement
+     sous les yeux, et on peut revenir en arrière d'un simple regard.
+
+     `peindreCoches` suffit donc : c'est lui qui pose la classe `faite`, dont
+     le style fait le reste. */
   peindreCoches()
-
-  /* 2. Après la pause, on replie — en figeant d'abord la hauteur, sans quoi
-        `max-height:0` n'a rien depuis quoi partir et le repli est instantané. */
-  setTimeout(() => {
-    if (!el.isConnected) return
-    const suivantes = [...document.querySelectorAll('#detail-steps .detail-step')]
-      .filter(x => x !== el && x.compareDocumentPosition(el) & Node.DOCUMENT_POSITION_PRECEDING)
-    const avant = suivantes.map(x => x.getBoundingClientRect().top)
-
-    el.style.maxHeight = el.offsetHeight + 'px'
-    void el.offsetHeight
-    el.classList.add('et-part')
-
-    setTimeout(() => {
-      if (!el.isConnected) return
-
-      /* ═══ LE RAPPEL ARRIVE EN MÊME TEMPS QUE L'ÉTAPE PART ═══
-
-         Il était posé APRÈS, dans le repeint final. À la première coche cela
-         donnait deux mouvements contraires : les étapes montaient pour combler
-         le vide, puis le rappel apparaissait et les repoussait vers le bas.
-
-         Les deux changements se font maintenant dans la MÊME passe de calcul.
-         Les suivantes ne bougent donc que d'une seule chose : la différence
-         entre la hauteur de l'étape partie et celle du rappel qui la remplace.
-         Un mouvement, court, au lieu de deux longs qui s'annulent. */
-      el.classList.add('et-repli')
-      peindreRappelFaites()
-
-      /* 3. Le glissement des suivantes, mesuré puis rejoué. */
-      requestAnimationFrame(() => {
-        suivantes.forEach((x, k) => {
-          const delta = avant[k] - x.getBoundingClientRect().top
-          if (!delta) return
-          x.style.transition = 'none'
-          x.style.transform = `translateY(${delta}px)`
-          requestAnimationFrame(() => {
-            x.style.transition = 'transform 0.34s cubic-bezier(0.32,0.72,0,1)'
-            x.style.transform = ''
-          })
-        })
-      })
-
-      setTimeout(peindreCoches, 360)
-    }, 220)
-  /* ═══ 620 MS, ET NON 420 ═══
-
-     Mesuré : la coche achève de se tracer à 339 ms. À 420, elle n'était
-     pleinement visible que 81 millisecondes — le temps de la voir apparaître,
-     pas celui de la voir. Or c'est elle qui dit « c'est fait » ; la ranger
-     aussitôt revient à effacer la réponse avant qu'on l'ait lue.
-
-     À 620, elle tient 280 ms achevée. C'est le réglage de la maquette, et il
-     se sent nettement à l'usage. */
-  }, 620)
 }
 
 /* ═══ PLUS DE BANDEAU « 3 ÉTAPES FAITES — REVOIR » ═══

@@ -6695,10 +6695,25 @@ async function completerEtapesAvecIA() {
     let urlAnalyse = null
     const base = `${currentMembre.entreprise_id}/${Date.now()}_ia`
     if (currentVideoFile) {
-      const chemin = `${base}.webm`
+      /* ═══ L'EXTENSION SUIT LE FICHIER, ELLE NE LE PRÉCÈDE PAS ═══
+
+         `.webm` était écrit en dur. Tant que la compression ne tournait que
+         sur ordinateur, c'était juste par hasard : Chrome produit du WebM.
+         Safari, lui, ne sait produire que du MP4 — une fois la compression
+         réparée sur iPhone, on aurait déposé un MP4 sous un nom de WebM.
+
+         Azure devine souvent le format à la lecture, mais pas toujours, et un
+         échec d'indexation pour une extension menteuse est le genre de panne
+         qu'on cherche pendant deux heures. */
+      const t = currentVideoFile.type || ''
+      const ext = t.includes('mp4') ? 'mp4'
+                : t.includes('webm') ? 'webm'
+                : t.includes('quicktime') ? 'mov'
+                : (currentVideoFile.name?.split('.').pop() || 'mp4').toLowerCase()
+      const chemin = `${base}.${ext}`
       const { error: eUp } = await supabase.storage.from('procedo-videos')
         .upload(chemin, currentVideoFile, {
-          contentType: currentVideoFile.type || 'video/webm',
+          contentType: t || 'video/mp4',
           cacheControl: CACHE_LONG,
         })
       if (eUp) throw new Error(eUp.message)
@@ -8168,9 +8183,50 @@ function peutComprimer() {
           typeof HTMLCanvasElement.prototype.webkitCaptureStream === 'function')
 }
 
+/* ═══ LE FORMAT D'ENREGISTREMENT · LÀ OÙ IPHONE DÉCROCHAIT ═══
+
+   La liste ne comptait que trois entrées : `video/mp4;codecs=avc1`,
+   `video/webm;codecs=vp9`, `video/webm`.
+
+   SAFARI NE CONNAÎT PAS WEBM. Pas une variante, pas une version : le format
+   n'existe pas pour lui. Les deux dernières entrées ne lui servent donc à
+   rien, et tout repose sur la première — une chaîne que Safari refuse souvent,
+   parce qu'il attend soit `video/mp4` tout court, soit un profil complet du
+   genre `avc1.42E01E`.
+
+   Résultat : sur ordinateur, `video/webm;codecs=vp9` répondait oui et la
+   compression tournait. Sur iPhone, les trois répondaient non, la fonction
+   sortait par `format`, et le fichier partait intact — 271 Mo, refusés par
+   Supabase. Le même code, deux comportements, aucun message.
+
+   La liste couvre maintenant les trois écritures du MP4 avant de passer au
+   WebM. L'ordre compte : on demande d'abord le plus précis, car un navigateur
+   qui accepte `video/mp4` tout court accepte aussi le profil détaillé, alors
+   que l'inverse n'est pas vrai.
+
+   ET SI `isTypeSupported` N'EXISTE PAS ? Les Safari d'avant 2021 ont
+   MediaRecorder sans cette méthode. Le `?.` rendait alors `undefined` pour
+   tout, et on abandonnait alors que l'enregistrement aurait marché. On tente
+   `video/mp4` à l'aveugle : au pire le constructeur lèvera, et le `catch`
+   nommera la sortie. */
 function formatEnregistrable() {
-  for (const t of ['video/mp4;codecs=avc1', 'video/webm;codecs=vp9', 'video/webm']) {
-    if (MediaRecorder.isTypeSupported?.(t)) return t
+  const candidats = [
+    'video/mp4;codecs=avc1.42E01E',   // profil de base, le plus largement lu
+    'video/mp4;codecs=avc1',
+    'video/mp4',                       // ce que Safari accepte le plus souvent
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+  ]
+  if (typeof MediaRecorder.isTypeSupported !== 'function') {
+    console.warn('[compression] isTypeSupported absent — on tente video/mp4')
+    return 'video/mp4'
+  }
+  for (const t of candidats) {
+    if (MediaRecorder.isTypeSupported(t)) {
+      console.log('[compression] format retenu :', t)
+      return t
+    }
   }
   return ''
 }

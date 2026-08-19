@@ -7741,6 +7741,11 @@ await new Promise(r => setTimeout(r, 900))
 let aiVideoFile = null
 let aiVideoDuree = 0        // durée de la vidéo, pour estimer le temps d'analyse
 let aiDebutAnalyse = 0      // heure de démarrage de l'analyse
+/* L'attente totale attendue, en secondes, posée au démarrage. Elle sert à dire
+   ce qu'il RESTE plutôt que ce qui s'est écoulé. `null` quand on ne sait pas —
+   la durée de la vidéo n'est pas toujours lisible — et on retombe alors sur
+   l'ancien affichage du temps passé. */
+let aiEstimationTotale = null
 let aiNbSondages = 0
 let aiPollTimer = null
 let aiProcedureId = null
@@ -7795,6 +7800,9 @@ const AI_ETAPES = {
 var aiPalierDepuis = null
 function startAiProgressSimulation() {
   aiDebutAnalyse = Date.now()
+  /* L'allègement est DÉJÀ fait quand on arrive ici : il ne reste qu'Azure et
+     la rédaction. Le compter deux fois annoncerait le double du vrai reste. */
+  aiEstimationTotale = estimerAnalyse(aiVideoDuree, false)
   aiPalierDepuis = null
   aiNbSondages = 0
   aiEtapeCourante = 'envoi'
@@ -7885,6 +7893,20 @@ function majProgressionIA() {
   /* La phrase du dessous peut être vide : on ne laisse alors ni point orphelin
      ni espace en trop. */
   let phrase = `${t(info.titre)} \u00b7 ${temps}.`
+
+  /* ═══ LE TEMPS QUI RESTE, PAS SEULEMENT CELUI QUI PASSE ═══
+
+     « 4 min 12 » écoulées ne disent pas si l'on est au tiers ou à la fin. Le
+     reste se déduit de l'estimation faite avant le lancement : Azure suit la
+     durée de la vidéo, on sait donc à peu près où l'on en est.
+
+     ON NE L'AFFICHE PAS SI L'ESTIMATION EST DÉPASSÉE. Annoncer « encore 0 min »
+     pendant trois minutes serait pire que de ne rien dire — le message du
+     palier, plus bas, prend alors le relais et explique ce qui se passe. */
+  if (aiEstimationTotale) {
+    const reste = aiEstimationTotale - ecoule
+    if (reste > 20) phrase = `${t(info.titre)} \u00b7 encore ${attenteLisible(reste)}.`
+  }
   if (info.sous) phrase += ' ' + t(info.sous)
   /* Le palier de fin a son propre message. Sans lui, on voit un chiffre figé
      sans savoir si quelque chose avance encore — c'est exactement le moment
@@ -7974,11 +7996,63 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
    transcription dépasse ce que le modèle met en forme d'un seul tenant, et
    l'échec est quasi certain. Mieux vaut le dire avant l'envoi qu'après dix
    minutes d'attente. */
-const DUREE_CONSEILLEE = 5 * 60
+/* DEUX MINUTES, ET C'EST UN CONSEIL. Au-delà l'analyse marche parfaitement —
+   Emilien vient d'en passer une de 3 min 30. Mais l'allègement ET Azure suivent
+   tous deux la durée : moitié moins de vidéo fait moitié moins d'attente, et
+   coûte moitié moins cher en minutes Azure. Le refus, lui, reste à cinq. */
+const DUREE_CONSEILLEE = 2 * 60
 /* Cinq minutes. Au-delà, l'analyse marcherait encore, mais deux choses la
    déconseillent : le coût Azure suit la durée à la minute près, et surtout une
    procédure de dix minutes ne se suivrait pas — on la regarde une fois, jamais deux. */
 const DUREE_REFUSEE = 5 * 60
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMBIEN DE TEMPS ÇA VA PRENDRE
+
+   Une analyse de sept minutes derrière un compteur qui tourne se lit comme une
+   panne. La même attente, annoncée, se lit comme une attente. Rien n'est plus
+   rapide — mais on cesse de se demander si c'est cassé.
+
+   ─── LES TROIS COEFFICIENTS SONT MESURÉS, PAS ESTIMÉS ───
+
+   ① L'ALLÈGEMENT COÛTE LE TEMPS RÉEL. `comprimerVideo` LIT la vidéo pour la
+      capturer : trois minutes trente de vidéo demandent trois minutes trente.
+      Mesuré sur banc : 92,6 s pour 90 s, soit 1,03. On retient 1,05, un
+      téléphone étant plus lent qu'un ordinateur.
+
+   ② AZURE TOURNE À PEU PRÈS À 0,8 FOIS LA DURÉE avec le préréglage `Default`,
+      qui lit à la fois la parole, le texte à l'écran et les objets. Déduit du
+      cas réel d'Emilien : 7 min au total pour 3 min 30 de vidéo, dont 3 min 40
+      d'allègement et une minute d'envoi et de rédaction.
+
+   ③ L'ENVOI ET LA RÉDACTION comptent pour une minute forfaitaire. L'envoi
+      dépend du réseau, qu'on ne connaît pas ; une minute est une valeur haute
+      sur une vidéo allégée à une quarantaine de mégaoctets.
+
+   ON ARRONDIT VERS LE HAUT, toujours. Une attente plus courte qu'annoncée est
+   une bonne surprise ; l'inverse est un mensonge. */
+const COUT_ALLEGEMENT = 1.05
+const COUT_AZURE = 0.8
+const COUT_FIXE = 60
+
+function estimerAnalyse(dureeVideo, avecAllegement) {
+  if (!dureeVideo || !isFinite(dureeVideo)) return null
+  return Math.round(dureeVideo * ((avecAllegement ? COUT_ALLEGEMENT : 0) + COUT_AZURE) + COUT_FIXE)
+}
+
+/* `dureeLisible` existe déjà, ligne 2569, et arrondit à la minute. On ne la
+   redéfinit pas : deux fonctions du même nom, et c'est la dernière chargée qui
+   gagne, au hasard de l'ordre du fichier.
+
+   Une seule différence justifie une fonction à part : ici on arrondit VERS LE
+   HAUT. Une attente plus courte qu'annoncée est une bonne surprise ; l'inverse
+   est un mensonge. `dureeLisible` arrondit au plus proche, ce qui annoncerait
+   4 min pour une attente de 4 min 25. */
+function attenteLisible(sec) {
+  if (sec == null) return ''
+  if (sec < 60) return `${Math.max(10, Math.round(sec / 10) * 10)} s`
+  return `${Math.ceil(sec / 60)} min`
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE POIDS DE LA VIDÉO, ET SA BANDE SON
@@ -8581,7 +8655,42 @@ function verifierDureeVideo() {
     btn.disabled = true
     return
   }
-  err.textContent = ''
+  err.style.color = 'var(--label-2)'
+
+  /* ═══ ON ANNONCE LE TEMPS, ET ON DIT CE QU'IL COÛTE ═══
+
+     Rien n'était dit ici. La personne lançait une analyse sans savoir si elle
+     en avait pour trente secondes ou pour dix minutes, et sept minutes de
+     silence passent pour une panne.
+
+     AU-DELÀ DE DEUX MINUTES, ON CONSEILLE — ON NE REFUSE PAS. Le refus reste à
+     cinq minutes. Entre les deux, la vidéo marche très bien : Emilien vient
+     d'en passer une de 3 min 30.
+
+     ⚠ ON NE PROMET PAS DE GAGNER DU TEMPS EN DÉCOUPANT. J'ai failli l'écrire :
+     « deux vidéos de moitié prendraient 5 min chacune » — vrai, mais 10 min en
+     tout contre 8 pour une seule, parce que le coût fixe se paie deux fois. Le
+     découpage ne fait pas gagner de temps total, et le coût Azure ne bouge pas
+     non plus : il se compte à la minute de vidéo.
+
+     Ce qu'on gagne est ailleurs, et c'est le vrai argument : une procédure de
+     deux minutes se regarde debout entre deux tâches, une de quatre non. */
+  const doitAlleger = aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX && peutComprimer()
+  const estime = estimerAnalyse(aiVideoDuree, doitAlleger)
+
+  if (aiVideoDuree > DUREE_CONSEILLEE) {
+    err.innerHTML =
+      `Cette vid\u00e9o dure <b>${Math.floor(aiVideoDuree / 60)} min ` +
+      `${String(Math.round(aiVideoDuree % 60)).padStart(2, '0')}</b> \u2014 ` +
+      `comptez <b>${attenteLisible(estime)}</b> d\u2019analyse.<br>` +
+      `Une vid\u00e9o de deux minutes s\u2019analyse en ` +
+      `<b>${attenteLisible(estimerAnalyse(DUREE_CONSEILLEE, doitAlleger))}</b>, ` +
+      `et se suit mieux debout entre deux t\u00e2ches.`
+  } else if (estime) {
+    err.innerHTML = `Comptez <b>${attenteLisible(estime)}</b> d\u2019analyse.`
+  } else {
+    err.textContent = ''
+  }
   btn.disabled = false
 }
 
@@ -8665,7 +8774,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
         jalonUI(pct >= 100
           ? '1/3 \u00b7 Finalisation de la vid\u00e9o\u2026'
-          : `1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o\u2026 ${pct}%`)
+          /* LE POURCENTAGE SEUL NE DIT RIEN D'UTILE. « 34 % » sur une opération
+             dont on ignore la longueur ne renseigne pas ; « encore 2 min »
+             renseigne. L'allègement avance à la vitesse de lecture, donc le
+             reste se déduit exactement de la durée restante de la vidéo. */
+          : `1/3 \u00b7 All\u00e8gement \u00b7 ${pct}%`
+            + (aiVideoDuree
+                ? ` \u00b7 encore ${attenteLisible(aiVideoDuree * (100 - pct) / 100 * COUT_ALLEGEMENT)}`
+                : ''))
       })
     } finally { clearTimeout(bascule) }
     if (!aiEcranAttente) errorEl.textContent = ''

@@ -6863,7 +6863,24 @@ async function completerEtapesAvecIA() {
        Sauf quand c'est le quota lui-même qui a refusé — rien n'a été consommé
        dans ce cas, et rendre reviendrait à en offrir une. */
     if (analyseConsommee) {
-      await supabase.rpc('rendre_analyse', { p_procedure_id: tempId })
+      /* ═══ ON PRÉCISE L'ENTREPRISE ═══
+
+         L'appel ne passait que `p_procedure_id`. Deux conséquences.
+
+         ① IL TOMBAIT SUR L'ANCIENNE SIGNATURE. `rendre_analyse` existe en deux
+            versions dans la base — une à un argument, une à deux — et PostgREST
+            choisit d'après les arguments fournis. Un seul argument menait donc
+            à la version d'avant le correctif, celle qui cherche l'entreprise
+            avec un `limit 1` sans `order by`.
+
+         ② ELLE REMBOURSAIT AU HASARD. Pour un compte membre de deux
+            entreprises, Postgres rendait n'importe laquelle des fiches : le
+            crédit pouvait aller à la mauvaise. Le quota de l'une se remplissait
+            pendant que l'autre se vidait, sans que rien ne plante. */
+      await supabase.rpc('rendre_analyse', {
+        p_procedure_id: tempId,
+        p_entreprise_id: currentMembre?.entreprise_id ?? null,
+      })
         .then(({ error: er }) => { if (er) console.warn('[quota] non rendue :', er.message) })
     }
     /* L'erreur se voit : en rouge, et précédée de sa cause. Elle s'affichait

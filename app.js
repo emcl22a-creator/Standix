@@ -2130,35 +2130,52 @@ document.getElementById('copy-code-btn')?.addEventListener('click', () => {
    mal — ils sont faits pour des images naturelles.
    ═══════════════════════════════════════════════════════════════════════════ */
 function expliquerLePoids() {
-  const LIM = 150 * 1024 * 1024
-  const duree = (mbps) => {
-    const sec = Math.floor(LIM * 8 / (mbps * 1e6))
-    const m = Math.floor(sec / 60), r = sec % 60
-    return m ? `${m} min ${String(r).padStart(2, '0')}` : `${r} s`
-  }
-  const lignes = [
-    ['Enregistrement d\u2019\u00e9cran', 13],
-    ['Cam\u00e9ra 1080p \u00e0 60 images/s', 14],
-    ['Cam\u00e9ra 1080p \u00e0 30 images/s', 8],
-    ['Cam\u00e9ra 720p \u00e0 30 images/s', 6],
-    ['Cam\u00e9ra 4K', 45],
-  ].map(([nom, d]) => `<div class="pq-l"><span>${nom}</span><b>${duree(d)}</b></div>`).join('')
+  /* ═══ CE MODAL DISAIT LE CONTRAIRE DE LA VÉRITÉ ═══
 
+     Il affichait un tableau de cinq durées — « Caméra 4K : 27 s »,
+     « Enregistrement d'écran : 1 min 36 » — calculées à partir du débit de la
+     vidéo SOURCE. Autrement dit : le moment où l'allègement se déclenche.
+     Jamais la durée maximale.
+
+     Or l'allègement réencode tout en 1280×720. Mesuré sur l'iPhone d'Emilien,
+     sur un enregistrement d'écran — le contenu le plus difficile qui soit :
+
+         3 min 30 · 271 Mo  →  43,81 Mo  ·  1,75 Mb/s
+
+     Le tableau annonçait donc 27 secondes là où la réalité est de deux heures.
+     Il décourageait des gens qui n'ont aucun problème, et c'est le pire défaut
+     qu'un message d'aide puisse avoir.
+
+     ─── CE QUI LIMITE VRAIMENT ───
+
+     La DURÉE, pas le poids. Cinq minutes au débit mesuré font 63 Mo : les
+     150 Mo ne peuvent pas être atteints par une vidéo acceptée. On le dit
+     plutôt que de faire croire à une contrainte de taille qui n'existe pas.
+
+     ─── CE QU'ON GARDE DE L'ANCIEN ───
+
+     L'avertissement sur les enregistrements d'écran. Il est juste : ils
+     résistent à la compression, et c'est le seul cas où le poids peut encore
+     poser problème. Mais il devient une remarque, plus un tableau. */
   confirmDialog({
-    titre: 'Pourquoi la limite de 150 Mo ?',
+    titre: 'Combien de temps peut durer la vidéo ?',
     message: '',
     confirmer: 'Compris',
     annuler: '',
     danger: false,
     html: `
-      <p class="pq-p">Chaque vid\u00e9o est all\u00e9g\u00e9e avant l\u2019envoi. Mais toutes ne
-         se compressent pas pareil : un <b>enregistrement d\u2019\u00e9cran</b> r\u00e9siste,
-         parce que le texte net et les aplats sont ce que la compression g\u00e8re
-         le plus mal.</p>
-      <div class="pq-t">Ce qui tient dans 150 Mo</div>
-      ${lignes}
-      <p class="pq-p pq-fin">Pour filmer plus long, baissez la d\u00e9finition :
-         <b>R\u00e9glages \u2192 Appareil photo \u2192 720p \u00e0 30 i/s</b> sur iPhone.</p>`,
+      <p class="pq-p">Chaque vid\u00e9o est all\u00e9g\u00e9e avant l\u2019envoi, quelle que soit
+         sa d\u00e9finition. Une vid\u00e9o 4K et une vid\u00e9o 720p ressortent au m\u00eame
+         poids : c\u2019est la <b>dur\u00e9e</b> qui compte, pas la qualit\u00e9 de
+         l\u2019image.</p>
+      <div class="pq-t">Ce qui d\u00e9cide</div>
+      <div class="pq-l"><span>Dur\u00e9e accept\u00e9e</span><b>5 min</b></div>
+      <div class="pq-l"><span>Dur\u00e9e conseill\u00e9e</span><b>2 min</b></div>
+      <div class="pq-l"><span>Poids apr\u00e8s all\u00e8gement, 3 min 30</span><b>~44 Mo</b></div>
+      <p class="pq-p pq-fin">Un <b>enregistrement d\u2019\u00e9cran</b> s\u2019all\u00e8ge moins
+         bien qu\u2019une vid\u00e9o film\u00e9e : le texte net et les aplats sont ce que la
+         compression g\u00e8re le plus mal. C\u2019est le seul cas o\u00f9 le poids peut
+         encore g\u00eaner.</p>`,
   })
 }
 
@@ -8226,15 +8243,36 @@ const VIDEO_DEBIT = 1_400_000
    celle de l'écoute. */
 const AUDIO_DEBIT = 96_000
 
-/* ═══ LE PLAFOND ═══
+/* ═══ LE PLAFOND · POURQUOI 150 ET POURQUOI ON N'Y TOUCHE PAS ═══
 
-   90 Mo, soit environ cinq minutes au débit de compression ci-dessus — ce que
-   l'écran promet.
+   ─── LA MESURE, SUR LE MATÉRIEL RÉEL ───
 
-   ATTENTION : cette valeur ne fait qu'annoncer la limite à la personne. C'est
-   SUPABASE qui décide. Si le compartiment `procedo-videos` est réglé plus bas,
-   un fichier de 80 Mo passera ce contrôle et se fera refuser par un 400 juste
-   après. Les deux nombres doivent concorder. */
+   Un enregistrement d'écran de 3 min 30 est ressorti de l'iPhone d'Emilien à
+   43,81 Mo — soit 1,75 Mb/s tout compris. C'est le PIRE CAS : le texte net et
+   les aplats d'un écran sont ce qu'un codec gère le plus mal. Une vidéo filmée
+   à la caméra descend trois à dix fois plus bas.
+
+   ─── CE QUE ÇA CHANGE ───
+
+   Au débit mesuré, la limite de DURÉE plafonne déjà tout :
+
+       2 min → 25 Mo      5 min → 63 Mo      12 min → 150 Mo
+
+   `DUREE_REFUSEE` vaut cinq minutes. Une vidéo acceptée ne peut donc pas
+   dépasser 63 Mo, et les 150 Mo NE SERONT JAMAIS ATTEINTS. Une marge de 2,4.
+
+   ─── POURQUOI ON LES GARDE QUAND MÊME ───
+
+   Ce n'est plus une politique, c'est un garde-fou. Il attrape ce que la limite
+   de durée ne voit pas : une vidéo dont `duration` est illisible, un fichier
+   corrompu, un allègement qui n'a pas eu lieu — exactement le cas des 271 Mo.
+
+   Le baisser ne gagnerait rien et rapprocherait le refus de cas légitimes.
+   Le monter ne servirait à rien non plus, puisque le seuil n'est pas atteint.
+
+   ⚠ CE NOMBRE DOIT ÉGALER CELUI DE SUPABASE : Storage → bucket `procedo-videos`
+   → Edit bucket → File size limit. S'ils diffèrent, l'app accepte ce que le
+   serveur refuse, et le refus arrive au milieu de l'envoi. */
 const LIMITE_STOCKAGE = 150 * 1024 * 1024
 
 /* Le navigateur sait-il enregistrer ? Safari sur iPhone ne l'a appris que
@@ -8796,8 +8834,22 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        depuis le début. Le rouge est désormais posé au seul endroit où il a un
        sens : quand quelque chose échoue vraiment. */
     errorEl.style.color = 'var(--label-3)'
+    /* ═══ LE RÉSULTAT DE L'ALLÈGEMENT, VISIBLE ═══
+
+       Il n'allait que dans la console — invisible sur un iPhone sans un Mac
+       branché. Emilien a dû ouvrir Supabase pour savoir que sa vidéo pesait
+       43,81 Mo, et jusque-là il ne pouvait pas dire si la compression avait
+       fonctionné. C'est exactement la question qu'une ligne de texte répond.
+
+       On affiche aussi la PART retirée : « 271 Mo → 44 Mo » ne dit pas grand
+       chose seul, « −84 % » se lit d'un coup d'œil et se compare d'une vidéo à
+       l'autre. */
     if (aiVideoFile.size < avant) {
-      console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192', poidsLisible(aiVideoFile.size))
+      const part = Math.round((1 - aiVideoFile.size / avant) * 100)
+      errorEl.innerHTML = `Vid\u00e9o all\u00e9g\u00e9e : ${poidsLisible(avant)} \u2192 ` +
+        `<b>${poidsLisible(aiVideoFile.size)}</b> (\u2212${part}\u202f%)`
+      console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192',
+        poidsLisible(aiVideoFile.size), `(-${part} %)`)
     }
   }
 

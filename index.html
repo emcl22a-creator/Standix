@@ -521,7 +521,14 @@
       <div class="re-tete">
         <span class="re-salut" id="re-salut">Bonjour</span>
         <span class="re-main" aria-hidden="true">👋</span>
+        <!-- Le total passe à droite de la salutation. Il n'a plus besoin d'une
+             case à lui : c'est la somme des deux autres, pas une troisième
+             information. -->
+        <span class="re-total" id="re-total"></span>
       </div>
+      <!-- La barre de répartition et sa légende. Le nom `re-chiffres` est
+           conservé : il est employé par `peindreResumeEntreprise` et le
+           renommer n'apporterait rien. -->
       <div class="re-chiffres" id="re-chiffres"></div>
       <div class="re-postes" id="re-postes"></div>
     </div>

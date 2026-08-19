@@ -7097,6 +7097,27 @@ async function lireEtatAbonnement() {
     return null
   }
   etatAbo = data[0]
+
+  /* ═══ LE COMPTE D'ANALYSES, LU EN MÊME TEMPS ═══
+
+     Le bandeau annonçait « 13 jours d'essai restants » et rien d'autre. Or
+     c'est le QUOTA qui s'épuise en premier : quinze analyses en quatorze
+     jours, ça se fait en une après-midi. Un refus qui tombe sans prévenir, au
+     moment précis où quelqu'un évalue le produit, est le meilleur moyen de le
+     perdre.
+
+     `reste_analyses` ne consomme rien, elle lit. On l'appelle ici plutôt que
+     dans le dessin du bandeau : le dessin est synchrone et appelé à plusieurs
+     endroits, une requête à chaque fois serait du gaspillage.
+
+     Sans réponse — migration pas encore passée — on n'affiche simplement pas
+     la ligne. On n'enferme personne pour une fonction manquante. */
+  try {
+    const { data: q } = await supabase
+      .rpc('reste_analyses', { p_entreprise: currentMembre.entreprise_id })
+    etatAbo.analyses = q || null
+  } catch (e) { etatAbo.analyses = null }
+
   return etatAbo
 }
 
@@ -7153,6 +7174,19 @@ function dessinerAlerteEssai(hote) {
       </span>
     </div>
     ${fini ? '' : `<div class="jauge"><i style="width:${Math.round((14 - j) / 14 * 100)}%"></i></div>`}
+    ${(!fini && etatAbo.analyses)
+      /* Le nombre d'abord, le total ensuite : « 11 analyses » se lit avant
+         « sur 15 », et c'est le premier qui compte quand on décide de filmer
+         ou non. À zéro on ne dit pas « 0 restantes » mais ce qu'il faut faire. */
+      ? (etatAbo.analyses.reste > 0
+          ? `<div class="s" style="margin-top:6px">
+               <b>${etatAbo.analyses.reste} analyse${etatAbo.analyses.reste > 1 ? 's' : ''} vid\u00e9o</b>
+               restante${etatAbo.analyses.reste > 1 ? 's' : ''} sur ${etatAbo.analyses.quota},
+               pour toute la dur\u00e9e de l\u2019essai.</div>`
+          : `<div class="s" style="margin-top:6px">
+               <b>Les ${etatAbo.analyses.quota} analyses de l\u2019essai ont \u00e9t\u00e9 utilis\u00e9es.</b>
+               Choisissez une offre pour continuer \u2014 vos proc\u00e9dures sont conserv\u00e9es.</div>`)
+      : ''}
     <div class="s">${fini
       ? `Vous \u00eates <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> : votre formule est \u00e0
          <b>39 \u20ac par mois</b>, ou 29 \u20ac en r\u00e9glant l\u2019ann\u00e9e. Tout revient d\u00e8s le paiement.`

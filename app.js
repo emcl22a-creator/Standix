@@ -13270,7 +13270,7 @@ async function chargerEtablissements() {
   let requete = supabase
     /* `abonnement_statut` en plus : il sert à savoir si la PERSONNE paie déjà
        quelque part, indépendamment de l'établissement affiché. */
-    .from('membres').select('id, role, entreprise_id, entreprises(id, nom, logo_url, abonnement_statut)')
+    .from('membres').select('id, role, promu_par, entreprise_id, entreprises(id, nom, logo_url, abonnement_statut)')
     .eq('user_id', user.id)
   let { data, error } = await requete
 
@@ -13298,6 +13298,10 @@ async function chargerEtablissements() {
          requête le demande pourtant. Il sert à savoir si la personne gère déjà
          quelque part, et à adapter ce qu'on lui explique. */
       role: a.role,
+      /* `promu_par` distingue le FONDATEUR d'un gestionnaire invité : le second
+         porte le nom de celui qui l'a nommé, le premier non. C'est ce qui
+         décide du droit de supprimer l'établissement. */
+      promu_par: a.promu_par || null,
       abonnement_statut: a.entreprises.abonnement_statut || null,
     }))
 
@@ -13678,11 +13682,26 @@ window.ouvrirFenetreEtab = function(entrepriseId) {
     : "Son logo appara\u00eetra dans la barre, \u00e0 c\u00f4t\u00e9 du vôtre."
   document.getElementById('etab-nom').value = etabEdite?.nom || ''
   document.getElementById('etab-ok').textContent = etabEdite ? 'Enregistrer' : 'Ajouter'
-  /* On ne supprime qu'un établissement existant, et jamais le dernier : quelqu'un
-     sans entreprise se retrouverait devant une app vide. */
+  /* ═══ SEUL LE FONDATEUR SUPPRIME ═══
+
+     Trois conditions, et la troisième manquait : l'établissement doit exister,
+     ne pas être le dernier, et la personne doit en être LE FONDATEUR.
+
+     Sans ce contrôle, n'importe qui — y compris un employé en lecture seule —
+     pouvait effacer une entreprise entière avec ses procédures, ses vidéos et
+     son équipe. Rien ne permet de revenir en arrière.
+
+     `estFondateur` distingue celui qui a créé l'entreprise d'un gestionnaire
+     invité ensuite : le second porte un `promu_par`, le premier non. Un
+     associé nommé la semaine dernière ne doit pas pouvoir tout effacer. */
   const boutonSuppr = document.getElementById('etab-supprimer')
   if (boutonSuppr) {
-    boutonSuppr.style.display = (etabEdite && mesEtablissements.length > 1) ? 'block' : 'none'
+    const monRole = (mesEtablissements || []).find(x => x.id === etabEdite?.id)
+    const jeSuisFondateur = monRole
+      ? (monRole.role === 'gestion' && !monRole.promu_par)
+      : estFondateur(currentMembre)
+    boutonSuppr.style.display =
+      (etabEdite && mesEtablissements.length > 1 && jeSuisFondateur) ? 'block' : 'none'
   }
   document.getElementById('etab-erreur').textContent = ''
   majFenetreEtab()
@@ -13755,6 +13774,18 @@ document.getElementById('etab-fichier')?.addEventListener('change', (ev) => {
 document.getElementById('etab-supprimer')?.addEventListener('click', async () => {
   if (!etabEdite) return
   const nom = etabEdite.nom || 'cet \u00e9tablissement'
+
+  /* On revérifie AU CLIC, pas seulement à l'affichage. Masquer un bouton ne
+     protège de rien : il suffit de le réafficher depuis la console. Le contrôle
+     doit être là où l'action se déclenche. */
+  const _mien = (mesEtablissements || []).find(x => x.id === etabEdite.id)
+  const _fondateur = _mien
+    ? (_mien.role === 'gestion' && !_mien.promu_par)
+    : estFondateur(currentMembre)
+  if (!_fondateur) {
+    toast('Seul le fondateur peut supprimer un \u00e9tablissement.')
+    return
+  }
 
   const ok = await confirmDialog({
     titre: `Supprimer ${nom} ?`,
@@ -14053,8 +14084,45 @@ document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
    on lui donne le champ pour le réparer, là où il est.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══ ON NE LAISSE PAS UNE ENTREPRISE SANS GESTIONNAIRE ═══
+
+   Si le dernier gestionnaire part, l'entreprise devient ORPHELINE : les
+   employés gardent leur accès en lecture, mais plus personne ne peut créer une
+   procédure, gérer l'équipe, ni même supprimer l'entreprise. Elle reste là,
+   définitivement, avec ses vidéos et son stockage.
+
+   On compte donc avant de laisser partir. Le compte se fait en base et non sur
+   la liste chargée : celle-ci peut dater de plusieurs minutes, et quelqu'un a
+   pu être rétrogradé entre-temps. */
+async function jeSuisLeDernierGestionnaire() {
+  if (currentMembre?.role !== 'gestion') return false
+  const { count, error } = await supabase
+    .from('membres')
+    .select('id', { count: 'exact', head: true })
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .eq('role', 'gestion')
+  /* En cas d'erreur on RETIENT la personne plutôt que de la laisser partir :
+     mieux vaut un départ empêché à tort qu'une entreprise orpheline. */
+  if (error) return true
+  return (count ?? 0) <= 1
+}
+
 document.getElementById('es-quitter')?.addEventListener('click', async () => {
   const nom = cachedEntreprise?.nom || 'cette entreprise'
+
+  if (await jeSuisLeDernierGestionnaire()) {
+    await confirmDialog({
+      titre: 'Vous \u00eates le seul gestionnaire',
+      message: `Si vous partez, plus personne ne pourra cr\u00e9er de proc\u00e9dure ` +
+        `ni g\u00e9rer l'\u00e9quipe de ${nom}. Nommez d'abord quelqu'un d'autre ` +
+        `dans « G\u00e9rer l'\u00e9quipe », ou supprimez l'entreprise.`,
+      confirmer: 'Compris',
+      annuler: '',
+      danger: false,
+    })
+    return
+  }
+
   const ok = await confirmDialog({
     titre: `Quitter ${nom} ?`,
     message: `Vous perdrez l'acc\u00e8s \u00e0 ses proc\u00e9dures et votre historique de lectures. ` +

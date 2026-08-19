@@ -2231,21 +2231,37 @@ async function peindreResumeEntreprise() {
   const membres = cachedMembres || []
   const nbGestion = membres.filter(m => m.role === 'gestion').length
   const nbEquipe = membres.filter(m => m.role === 'equipe').length
-
-  /* « Gestion » plutôt que « gestionnaires » : sur un iPhone SE, la colonne
-     fait 73 px et le mot long se coupait en « gestionn / aires ». Un mot
-     tronqué au mauvais endroit se lit plus mal qu'un mot plus court.
-
-     Les trois libellés tiennent maintenant sur une ligne à toutes les
-     largeurs. */
+  const total = membres.length
   const s = (n) => (n > 1 ? 's' : '')
-  chiffres.innerHTML = [
-    [membres.length, `membre${s(membres.length)}`],
-    [nbGestion, 'gestion'],
-    [nbEquipe, `employé${s(nbEquipe)}`],
-  ].map(([n, lib]) =>
-    `<div class="re-c"><b>${n}</b><span>${escapeHtml(lib)}</span></div>`
-  ).join('')
+
+  /* Le total rejoint la ligne de la salutation. Il n'avait pas besoin d'une
+     case à lui : 11 = 3 + 8, et une case qui répète la somme de ses deux
+     voisines occupe la même place qu'elles pour ne rien ajouter. */
+  const totalEl = document.getElementById('re-total')
+  if (totalEl) {
+    totalEl.textContent = total ? `${total} membre${s(total)}` : ''
+  }
+
+  /* ═══ LA BARRE DE RÉPARTITION ═══
+
+     Trois cases de même taille donnaient le même poids visuel à un total et à
+     ses deux parts. Une barre montre la PROPORTION — ce que trois nombres
+     alignés obligeaient à calculer de tête.
+
+     ON N'ÉMET QUE LES SEGMENTS NON VIDES. Un segment à `flex:0` aurait une
+     largeur nulle, mais l'écart entre segments s'appliquerait quand même : il
+     resterait un moignon de 3 px collé au bord. */
+  const segments = []
+  if (nbGestion > 0) segments.push(`<i class="re-sg" style="flex:${nbGestion}"></i>`)
+  if (nbEquipe > 0) segments.push(`<i class="re-se" style="flex:${nbEquipe}"></i>`)
+
+  chiffres.innerHTML = total === 0 ? '' : (
+    `<div class="re-barre">${segments.join('')}</div>` +
+    `<div class="re-leg">` +
+      `<span><b class="g">${nbGestion}</b> gestion</span>` +
+      `<span><b class="e">${nbEquipe}</b> employé${s(nbEquipe)}</span>` +
+    `</div>`
+  )
 
   if (!postes) return
 
@@ -2261,17 +2277,42 @@ async function peindreResumeEntreprise() {
     return
   }
 
+  /* ═══ LE COMPTE DES POSTES · PERSONNE NE DISPARAÎT ═══
+
+     L'ancien compte avait deux trous silencieux.
+
+     ① LES SANS-POSTE N'ÉTAIENT NULLE PART. Sur onze membres dont un serveur et
+        trois cuisiniers, sept personnes n'apparaissaient dans aucune ligne. Le
+        relevé affichait 4 et laissait croire que c'était tout. C'est pourtant
+        l'information la plus actionnable de la carte : sept fiches à remplir.
+
+     ② UN POSTE SUPPRIMÉ EFFAÇAIT SES OCCUPANTS. `if (compte.has(p))` : quand
+        un poste disparaissait de la liste, les membres qui le portaient encore
+        n'étaient comptés ni dans leur ancien poste, ni ailleurs. Ils sortaient
+        du relevé sans laisser de trace.
+
+     Maintenant tout poste rencontré crée sa ligne, même s'il n'est plus dans la
+     liste — une ligne inattendue est une information, pas une erreur. */
   const compte = new Map()
   liste.forEach(p => compte.set(p.nom, 0))
+
+  let sansPoste = 0
   membres.forEach(m => {
     const p = (m.poste || '').trim()
-    if (p && compte.has(p)) compte.set(p, compte.get(p) + 1)
+    if (!p) { sansPoste += 1; return }
+    compte.set(p, (compte.get(p) || 0) + 1)
   })
+
+  /* La ligne « sans poste » est en dernier et grisée : c'est un reste, pas un
+     poste. Elle ne s'affiche que s'il y a quelqu'un dedans. */
+  const ligneSansPoste = sansPoste > 0
+    ? `<div class="re-p vide"><span>Sans poste</span><b>${sansPoste}</b></div>`
+    : ''
 
   postes.innerHTML = '<div class="re-t">Postes</div>' +
     [...compte.entries()].map(([nom, n]) =>
       `<div class="re-p"><span>${escapeHtml(nom)}</span><b>${n}</b></div>`
-    ).join('')
+    ).join('') + ligneSansPoste
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -5537,6 +5578,29 @@ function depuisQuandCourt(t) {
 }
 
 function renderAccueil() {
+  /* ═══ POURQUOI CET APPEL EST ICI ═══
+
+     Le résumé restait VIDE au premier chargement. Il fallait aller sur la page
+     Analyse puis revenir pour qu'il se remplisse.
+
+     La cause : `peindreResumeEntreprise` n'était appelée QU'À UN SEUL ENDROIT,
+     dans `rafraichirAnalyse` (ligne ~2913). Or les membres arrivent par DEUX
+     chemins — celui-là, et le chargement principal (ligne ~5081) qui remplit
+     `cachedMembres` sans rien repeindre. Au premier affichage, les données
+     étaient donc là et personne ne les dessinait.
+
+     Aller sur Analyse déclenchait `rafraichirAnalyse`, qui peignait la carte au
+     passage ; revenir sur l'accueil la montrait enfin remplie. Le symptôme
+     décrivait exactement le défaut.
+
+     `rafraichirAnalyse` a en plus un `return` anticipé quand l'entreprise n'a
+     aucune procédure : sur un compte neuf, le résumé ne se serait JAMAIS
+     rempli, quelle que soit la navigation.
+
+     Ici, il est peint chaque fois que l'accueil est dessiné. Sans `await` :
+     les postes viennent d'une requête à part et peuvent arriver une seconde
+     plus tard sans que le reste attende. */
+  peindreResumeEntreprise().catch(() => {})
   peindreActivites()
   peindreDernieresProcedures()
   const salut = document.getElementById('accueil-salut')

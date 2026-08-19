@@ -3342,17 +3342,22 @@
   }
   .fond-promu.on .fen-promu{ transform:none; opacity:1; }
   /* La carte reprend l'accueil, avec un fond un cran plus présent : c'est un
-     moment, pas une ligne de plus dans une liste. */
-  .promu-carte{ background:linear-gradient(160deg,#1E2026,#141519); }
-  /* Plus petit que sur la carte d'accueil : ici le visage accompagne une
-     annonce, il ne l'occupe pas. */
-  .promu-carte .accueil-av{
-    width:56px; height:56px;
-    animation:promuArrive 0.62s cubic-bezier(0.34,1.42,0.5,1) 0.1s both;
+     moment, pas une ligne de plus dans une liste.
+
+     `:not(.hero)` : la fenêtre « aucune entreprise » emploie la MÊME classe
+     avec l'ancienne forme et son image. Sans cette exception, ce fond
+     écraserait celui de `.hero` sur la carte de promotion. */
+  .promu-carte:not(.hero){ background:linear-gradient(160deg,#1E2026,#141519); }
+
+  /* La carte de promotion arrive avec un léger rebond : c'est une annonce, elle
+     mérite d'être remarquée. L'animation portait sur l'avatar, qui n'existe
+     plus — elle porte maintenant sur la carte entière. */
+  .fen-promu .hero.promu-carte{
+    animation:promuArrive 0.62s cubic-bezier(0.34,1.42,0.5,1) 0.05s both;
   }
 
   @keyframes promuArrive{
-    from{ opacity:0; transform:scale(0.62) translateY(8px); }
+    from{ opacity:0; transform:scale(0.94) translateY(10px); }
     to{ opacity:1; transform:none; }
   }
   .fen-promu .avert{
@@ -3360,7 +3365,7 @@
     margin-top:12px; text-align:center;
   }
   @media (prefers-reduced-motion: reduce){
-    .promu-carte .accueil-av{ animation:none; }
+    .fen-promu .hero.promu-carte{ animation:none; }
   }
 
   /* ═══ Fenêtre d'un établissement ═══ */

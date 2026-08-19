@@ -8252,6 +8252,28 @@ async function comprimerVideo(fichier, surAvancee) {
   lecteur.src = URL.createObjectURL(fichier)
   lecteur.muted = false
   lecteur.playsInline = true
+  lecteur.setAttribute('playsinline', '')
+
+  /* ═══ L'ÉLÉMENT DOIT ÊTRE DANS LA PAGE · LE DÉFAUT DES 10 SECONDES ═══
+
+     Il ne l'était pas. Sur ordinateur, cela ne change rien : Chrome décode et
+     rafraîchit une vidéo détachée comme les autres.
+
+     SUR IPHONE, SAFARI ÉTRANGLE CE QU'IL NE VOIT PAS. Le `requestAnimationFrame`
+     qui alimente le canevas tombe alors autour d'une passe par seconde. Sur
+     3 min 30, on capture environ 240 images au lieu de 5 000 — et Safari, qui
+     écrit ses MP4 à cadence fixe, en fait une vidéo de 10 SECONDES.
+
+     C'est le pire des résultats : rien ne plante, le fichier est valide, léger,
+     et il part chez Azure qui rédige trois étapes à partir de 5 % du geste.
+
+     Un pixel, presque transparent, posé en bas de la page suffit à ce que
+     Safari le considère visible. Ni `display:none` ni `opacity:0` ne
+     conviennent — ils le rendraient invisible à nouveau. */
+  lecteur.style.cssText =
+    'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0.01;' +
+    'pointer-events:none;z-index:-1;'
+  document.body.appendChild(lecteur)
 
   /* DÉCLARÉ ICI, ET ARRÊTÉ DANS LE `finally`.
 
@@ -8265,6 +8287,7 @@ async function comprimerVideo(fichier, surAvancee) {
      l'erreur avait teinté la zone. On ne voyait pas un blocage, on voyait un
      message masqué. */
   let arret = false
+  let minuterie = null
 
   try {
     await new Promise((ok, non) => {
@@ -8386,14 +8409,30 @@ async function comprimerVideo(fichier, surAvancee) {
        façon — la sortie n'est pas raccordée aux haut-parleurs. */
     await lecteur.play()
 
+    /* ═══ CE N'EST PLUS L'ÉCRAN QUI COMMANDE LA CADENCE ═══
+
+       `requestAnimationFrame` suit le rafraîchissement de l'écran, et un
+       navigateur l'étrangle dès qu'il juge le contenu peu visible. La cadence
+       de capture dépendait donc de ce que Safari décidait d'accorder à un
+       élément d'un pixel — ce qui a donné la vidéo de 10 secondes.
+
+       Une minuterie à 24 images par seconde ne dépend de rien de tout cela.
+       Elle peut prendre du retard sur un téléphone chargé, mais elle ne tombe
+       pas à une image par seconde.
+
+       ON COMPTE LES IMAGES. C'est la seule façon de savoir, à la fin, si la
+       capture a suivi — et de refuser un fichier tronqué au lieu de l'envoyer. */
+    let imagesDessinees = 0
+    const periode = Math.round(1000 / VIDEO_IMAGES_S)
+
     const dessiner = () => {
       if (arret) return
-      ctx.drawImage(lecteur, 0, 0, L, H)
+      try { ctx.drawImage(lecteur, 0, 0, L, H); imagesDessinees += 1 } catch (e) {}
       if (surAvancee && lecteur.duration) {
         surAvancee(Math.min(99, Math.round(lecteur.currentTime / lecteur.duration * 100)))
       }
-      requestAnimationFrame(dessiner)
     }
+    minuterie = setInterval(dessiner, periode)
     dessiner()
 
     /* LA LECTURE PEUT NE JAMAIS « FINIR ».
@@ -8417,7 +8456,33 @@ async function comprimerVideo(fichier, surAvancee) {
     })
 
     arret = true
+    clearInterval(minuterie)
     enr.stop()
+
+    /* ═══ LA CAPTURE A-T-ELLE SUIVI ? ═══
+
+       Sans ce contrôle, une capture étranglée passait inaperçue : le fichier
+       produit est valide, léger, et ne ressemble en rien à la vidéo d'origine.
+       Il partait chez Azure, qui rédigeait des étapes à partir de ce qu'il
+       avait — c'est-à-dire presque rien.
+
+       On attend `duree × 24` images. En dessous des deux tiers, on renonce et
+       on renvoie l'original : une vidéo trop lourde qu'on refuse proprement
+       vaut mieux qu'une vidéo légère qui ment sur son contenu.
+
+       Le seuil est à deux tiers et non à 95 % : un téléphone occupé perd
+       quelques images sans que cela change rien à l'analyse. Ce qu'on traque
+       ici est l'effondrement — 5 % au lieu de 100 —, pas la petite perte. */
+    const attendues = (lecteur.duration || 0) * VIDEO_IMAGES_S
+    const part = attendues ? imagesDessinees / attendues : 1
+    console.log('[compression] images captur\u00e9es :', imagesDessinees,
+      'sur', Math.round(attendues), `(${Math.round(part * 100)} %)`)
+
+    if (attendues > 0 && part < 0.66) {
+      return abandon('images-perdues',
+        `${imagesDessinees} images captur\u00e9es sur ${Math.round(attendues)} attendues ` +
+        `(${Math.round(part * 100)} %) — la vid\u00e9o produite serait tronqu\u00e9e`)
+    }
 
     /* 99 → 100. Le compteur était plafonné à 99 pour ne pas annoncer la fin
        avant l'heure, mais rien ne le passait à 100 : il restait bloqué là
@@ -8441,8 +8506,14 @@ async function comprimerVideo(fichier, surAvancee) {
        On garde tout de même la raison : c'est elle qui manquait. */
     return abandon('echec', e?.message || String(e))
   } finally {
+    /* TOUT EST DÉFAIT ICI, y compris sur le chemin d'erreur. Une minuterie
+       laissée en marche continuerait de dessiner dans le vide et de réécrire
+       le compteur d'avancement par-dessus les messages ; un élément vidéo
+       oublié dans la page garderait le décodeur occupé. */
     arret = true
+    try { clearInterval(minuterie) } catch (e) {}
     try { lecteur.pause() } catch (e) {}
+    try { lecteur.remove() } catch (e) {}
     URL.revokeObjectURL(lecteur.src)
   }
 }
@@ -8638,6 +8709,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       'deja-legere': 'elle \u00e9tait d\u00e9j\u00e0 au d\u00e9bit le plus bas',
       'echec': 'l\u2019all\u00e8gement s\u2019est interrompu',
       'plus-lourde': 'l\u2019all\u00e8gement l\u2019aurait alourdie',
+      'images-perdues': 'votre t\u00e9l\u00e9phone n\u2019a pas suivi la cadence — '
+        + 'fermez les autres applications et r\u00e9essayez',
     }
     const pourquoi = explications[raisonCompression]
     errorEl.style.color = 'var(--red)'

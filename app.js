@@ -6676,12 +6676,104 @@ async function completerEtapesAvecIA() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANALYSE SURVIT À LA FERMETURE DE L'APP
+
+   ═══ CE QUI SE PASSAIT ═══
+
+   Le travail se répartit en deux endroits. `ai-start` envoie la vidéo à Azure,
+   qui travaille jusqu'au bout quoi qu'il arrive. Puis une boucle interroge
+   `ai-check` toutes les trois secondes pour savoir si c'est prêt.
+
+   Cette boucle vit DANS L'ONGLET. Quitter Chrome la tue. L'analyse aboutissait,
+   les étapes étaient écrites en base — et personne n'allait les chercher.
+
+   ═══ DEUX RÉPARATIONS ═══
+
+   La première : on note dans le navigateur qu'une analyse est en cours. Au
+   retour sur l'app, on reprend la surveillance là où elle s'était arrêtée.
+
+   La seconde, plus bas dans le fichier : à l'ouverture d'une procédure, si des
+   étapes existent en base alors que l'app n'en a pas, on les affiche. Plus rien
+   ne se perd, quel que soit ce qui s'est passé entre-temps.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const CLE_ANALYSE = 'standix-analyse-en-cours'
+
+/* On garde l'identifiant ET l'heure de départ. Sans l'heure, une analyse
+   abandonnée il y a trois jours ferait tourner la surveillance au prochain
+   lancement. */
+function noterAnalyseEnCours(procId) {
+  try {
+    localStorage.setItem(CLE_ANALYSE, JSON.stringify({ id: procId, debut: Date.now() }))
+  } catch (e) {}
+}
+
+function oublierAnalyse() {
+  try { localStorage.removeItem(CLE_ANALYSE) } catch (e) {}
+}
+
+function analyseAbandonnee() {
+  try {
+    const brut = localStorage.getItem(CLE_ANALYSE)
+    if (!brut) return null
+    const o = JSON.parse(brut)
+    /* Au-delà de quinze minutes, ce n'est plus une analyse en cours : c'est un
+       reste. Azure ne met jamais autant, et la surveillance elle-même abandonne
+       au bout de huit. */
+    if (!o?.id || Date.now() - (o.debut || 0) > 15 * 60000) { oublierAnalyse(); return null }
+    return o
+  } catch (e) { return null }
+}
+
+/* ═══ ① LA REPRISE AU RETOUR ═══
+
+   `visibilitychange` se déclenche quand l'onglet revient au premier plan —
+   après un changement d'onglet, un déverrouillage, ou la réouverture de Chrome.
+
+   On ne relance PAS l'analyse : Azure a continué de son côté. On se contente
+   de reprendre la surveillance, et le plus souvent la réponse arrive du premier
+   coup parce que le travail est déjà fini.
+
+   `iaCompletionEnCours` évite le double emploi : si la boucle tourne encore —
+   cas d'un simple changement d'onglet —, on ne la double pas. */
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible') return
+  if (iaCompletionEnCours) return
+
+  const reste = analyseAbandonnee()
+  if (!reste) return
+
+  try {
+    const textes = await attendreEtapesIA(reste.id)
+    if (!textes?.length) return
+
+    /* On répartit comme le fait le chemin normal : chaque texte va dans la
+       première coupure encore vide. Réemployer la même logique évite qu'un
+       jour l'une des deux dérive par rapport à l'autre. */
+    let pris = 0
+    videoSteps.forEach(st => {
+      if (String(st.texte || '').trim()) return
+      if (pris >= textes.length) return
+      st.texte = textes[pris++]
+    })
+    renderVideoSteps()
+    toast(`L\u2019analyse est termin\u00e9e : ${textes.length} \u00e9tapes.`)
+  } catch (e) {
+    /* En silence : la personne n'a rien demandé en revenant sur l'app, un
+       message d'erreur surgi de nulle part serait déroutant. Elle retrouvera
+       ses étapes en rouvrant la procédure — voir ② plus bas. */
+    console.warn('[reprise] analyse non r\u00e9cup\u00e9r\u00e9e :', e?.message || e)
+  }
+})
+
 /* Interroge le serveur jusqu'à ce que les étapes soient prêtes, puis les lit.
    On espace les demandes : la première minute est celle où ça peut aboutir
    vite, ensuite ça ne sert à rien d'insister toutes les trois secondes. */
 async function attendreEtapesIA(procId) {
   const debut = Date.now()
   let tour = 0
+  noterAnalyseEnCours(procId)
 
   while (Date.now() - debut < 8 * 60000) {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
@@ -6692,11 +6784,13 @@ async function attendreEtapesIA(procId) {
     const data = await rep.json()
 
     if (data.status === 'ready') {
+      oublierAnalyse()
       const { data: etapes } = await supabase.from('etapes')
         .select('texte').eq('procedure_id', procId).order('ordre')
       return (etapes || []).map(e => String(e.texte || '').trim()).filter(Boolean)
     }
     if (data.status === 'error' || data.error) {
+      oublierAnalyse()
       throw new Error(data.error || "L\u2019analyse a \u00e9chou\u00e9.")
     }
 
@@ -6704,6 +6798,7 @@ async function attendreEtapesIA(procId) {
     const delai = tour < 12 ? 3000 : tour < 30 ? 5000 : 8000
     await new Promise(r => setTimeout(r, delai))
   }
+  oublierAnalyse()
   throw new Error("L\u2019analyse prend trop de temps. R\u00e9essayez, ou \u00e9crivez les \u00e9tapes vous-m\u00eame.")
 }
 

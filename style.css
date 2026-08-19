@@ -60,11 +60,32 @@
     50%    { transform:translateX(-50%) scale(1.15); opacity:1; }
   }
 
+  /* ═══ LE FOND, SUR MOBILE ═══
+
+     Sur un petit écran, les halos sont éclaircis et le flou resserré : à
+     120 px de flou sur 390 px de large, la tache déborde de tous les côtés et
+     ne se voit plus. 90 px lui rendent une forme.
+
+     ─── AOÛT 2026 · UN CRAN PLUS SOMBRE ───
+
+     L'éclaircissement était trop franc : environ +17 par canal sur les trois
+     halos, plus l'opacité poussée de 0,8 à 1. Le fond montait par endroits à
+     #3B3B41 — assez clair pour que les cartes, dont l'intérieur descend à
+     #060608, paraissent flotter sur un gris plutôt que sur du noir.
+
+     On reprend HUIT POINTS par canal, soit à peu près la moitié du chemin vers
+     les valeurs du bureau. Les halos restent visibles — le but n'était pas de
+     les éteindre — mais le noir redevient le fond, et l'ambre des liserés
+     ressort dessus.
+
+     POUR AJUSTER : ce sont les six valeurs ci-dessous, et elles seules. Plus
+     sombre encore, retire huit de plus à chaque paire ; les valeurs du bureau
+     sont trente lignes plus haut et forment le plancher. */
   @media (max-width: 600px){
     .chalo{ opacity:1; filter:blur(90px); }
-    .chalo-1{ background:radial-gradient(circle, #36363C 0%, #2A2A2F 45%, transparent 72%); }
-    .chalo-2{ background:radial-gradient(circle, #3B3B41 0%, #2F2F35 45%, transparent 72%); }
-    .chalo-4{ opacity:1; background:radial-gradient(circle, #38383E 0%, #2C2C32 48%, transparent 70%); }
+    .chalo-1{ background:radial-gradient(circle, #2E2E34 0%, #222227 45%, transparent 72%); }
+    .chalo-2{ background:radial-gradient(circle, #333339 0%, #27272D 45%, transparent 72%); }
+    .chalo-4{ opacity:1; background:radial-gradient(circle, #303036 0%, #24242A 48%, transparent 70%); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -7100,17 +7121,30 @@ body:has(#e-detail.active) #equipe-app{
   border-radius:5px; overflow:hidden;
 }
 .re-barre i{ display:block; min-width:3px; }
-/* Ambre pour la gestion, blanc éteint pour les employés. L'ambre est la couleur
-   de l'app : elle marque le petit nombre, celui qui décide. */
-.re-sg{ background:var(--orange); }
+/* ═══ LE MÊME AMBRE QUE L'ANCIENNE CARTE ═══
+
+   J'avais employé `--orange` (#FF9F0A), qui n'est pas l'ambre de l'app. Le
+   dégradé ci-dessous est recopié à l'identique de l'ancienne règle `.re-c b`,
+   celle qui colorait les trois grands chiffres — même angle, mêmes deux
+   arrêts. La carte change de forme, pas de couleur.
+
+   135° sur un segment large donne un dégagement franc de gauche à droite :
+   c'est le même geste que sur les chiffres, à l'horizontale. */
+.re-sg{ background:linear-gradient(135deg,#FFC46B,#FF6A00); }
 .re-se{ background:rgba(255,255,255,0.17); }
 
 .re-leg{ display:flex; gap:16px; font-size:12px; color:var(--label-2); }
 /* Sans `nowrap`, « 3 gestion » se casse entre le chiffre et le mot dès que la
    place manque, et la légende occupe quatre lignes au lieu d'une. */
 .re-leg span{ white-space:nowrap; }
-.re-leg b{ font-weight:600; font-variant-numeric:tabular-nums; }
-.re-leg b.g{ color:var(--orange); }
+.re-leg b{ font-weight:700; font-variant-numeric:tabular-nums; }
+/* Le chiffre de la gestion porte le dégradé découpé sur le texte — exactement
+   le traitement des anciens grands chiffres, à une autre échelle. */
+.re-leg b.g{
+  background:linear-gradient(135deg,#FFC46B,#FF6A00);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 .re-leg b.e{ color:var(--label); }
 
 /* Les postes. Une ligne chacun, le nom à gauche et le compte à droite —

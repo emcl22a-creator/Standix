@@ -98,6 +98,38 @@ const SUPABASE_URL = 'https://tlrtsoahwqhtvtkhssbm.supabase.co'
 const SUPABASE_ANON_KEY = 'sb_publishable_pzGIsj3EE2Sh_OBt21QbGg_4lKfitFw'
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'EN-TÊTE D'AUTORISATION DES FONCTIONS
+
+   ═══ LE DÉFAUT ═══
+
+   Six appels envoyaient `Bearer ${SUPABASE_ANON_KEY}` — la clé PUBLIQUE du
+   projet, celle qui identifie l'application, pas la personne.
+
+   Une fonction qui cherche ensuite « quel compte m'appelle ? » ne trouve rien :
+   pour elle, l'appel est anonyme. D'où le « Compte introuvable » de `ai-start`,
+   renvoyé en vingt-deux millisecondes — le temps de constater l'absence, sans
+   même interroger la base.
+
+   ═══ LA CORRECTION ═══
+
+   On envoie le JETON DE SESSION, celui que Supabase délivre à la connexion. Il
+   porte l'identifiant de la personne, et `auth.uid()` fonctionne enfin côté
+   serveur.
+
+   On retombe sur la clé publique si aucune session n'existe : certaines
+   fonctions n'ont pas besoin d'identité, et il vaut mieux un appel anonyme
+   qu'un appel sans en-tête du tout, que la passerelle refuserait d'emblée.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function enTeteFonction() {
+  let jeton = SUPABASE_ANON_KEY
+  try {
+    const { data } = await supabase.auth.getSession()
+    if (data?.session?.access_token) jeton = data.session.access_token
+  } catch (e) {}
+  return { 'Content-Type': 'application/json', Authorization: `Bearer ${jeton}` }
+}
+
 let currentMembre = null
 let manualSteps = []
 let videoSteps = []
@@ -1481,7 +1513,7 @@ async function signalerPresence(membre) {
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/presence`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       body: JSON.stringify({ membre_id: membre.id, entreprise_id: membre.entreprise_id }),
     })
     const data = await rep.json()
@@ -6602,7 +6634,7 @@ async function completerEtapesAvecIA() {
     /* 3. L'analyse, puis l'attente. */
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: tempId, video_url: urlAnalyse }),
     })
     
@@ -6778,7 +6810,7 @@ async function attendreEtapesIA(procId) {
   while (Date.now() - debut < 8 * 60000) {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: procId }),
     })
     const data = await rep.json()
@@ -7504,7 +7536,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-texte`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
         body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64() }),
     })
     const data = await rep.json()
@@ -7914,6 +7946,7 @@ const SON_SEUIL = 0.01
    Un an. Si une vidéo devait changer, elle changerait de nom : le chemin porte
    un horodatage, donc l'ancienne adresse ne sert plus à rien. */
 const CACHE_LONG = '31536000'   // un an, en secondes
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES RÉGLAGES DE COMPRESSION
@@ -8492,7 +8525,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     // 3. Démarrage de l'analyse Azure
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       // La bande son pour un geste filmé ; la vidéo entière pour un écran.
       body: JSON.stringify({
         /* `newProc` n'existe plus : la procédure est créée bien plus haut,
@@ -8610,7 +8643,7 @@ async function pollAiStatus() {
   try {
     const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: aiProcedureId }),
     })
 
@@ -11496,7 +11529,7 @@ function surveillerAnalyses() {
       try {
         const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+          headers: await enTeteFonction(),
           body: JSON.stringify({ procedure_id: row.id }),
         })
         const etat = await rep.json()
@@ -11715,7 +11748,7 @@ async function proposerReprise(proc) {
 
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: proc.id, video_url: proc.video_url }),
     })
     const data = await rep.json()
@@ -12988,7 +13021,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
     try {
       const rep = await fetch(`${SUPABASE_URL}/functions/v1/stripe-portail`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+        headers: await enTeteFonction(),
         body: JSON.stringify({
           entreprise_id: currentMembre.entreprise_id,
           retour: window.location.origin + window.location.pathname,
@@ -13094,7 +13127,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/stripe-checkout`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      headers: await enTeteFonction(),
       body: JSON.stringify({
         entreprise_id: currentMembre.entreprise_id,
         /* On envoie le NOM de l'offre, jamais son prix. Le serveur seul sait ce
@@ -15016,7 +15049,7 @@ async function traduireProcedure(choix) {
       const etapes = [...document.querySelectorAll('#detail-steps .detail-step p')].map(e => e.textContent)
       const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-traduire`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+        headers: await enTeteFonction(),
         body: JSON.stringify({
           langue: choix,
           titre: document.getElementById('detail-titre').textContent,

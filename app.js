@@ -2098,7 +2098,7 @@ document.getElementById('copy-code-btn')?.addEventListener('click', () => {
    mal — ils sont faits pour des images naturelles.
    ═══════════════════════════════════════════════════════════════════════════ */
 function expliquerLePoids() {
-  const LIM = 90 * 1024 * 1024
+  const LIM = 150 * 1024 * 1024
   const duree = (mbps) => {
     const sec = Math.floor(LIM * 8 / (mbps * 1e6))
     const m = Math.floor(sec / 60), r = sec % 60
@@ -2113,7 +2113,7 @@ function expliquerLePoids() {
   ].map(([nom, d]) => `<div class="pq-l"><span>${nom}</span><b>${duree(d)}</b></div>`).join('')
 
   confirmDialog({
-    titre: 'Pourquoi la limite de 90 Mo ?',
+    titre: 'Pourquoi la limite de 150 Mo ?',
     message: '',
     confirmer: 'Compris',
     annuler: '',
@@ -2123,7 +2123,7 @@ function expliquerLePoids() {
          se compressent pas pareil : un <b>enregistrement d\u2019\u00e9cran</b> r\u00e9siste,
          parce que le texte net et les aplats sont ce que la compression g\u00e8re
          le plus mal.</p>
-      <div class="pq-t">Ce qui tient dans 90 Mo</div>
+      <div class="pq-t">Ce qui tient dans 150 Mo</div>
       ${lignes}
       <p class="pq-p pq-fin">Pour filmer plus long, baissez la d\u00e9finition :
          <b>R\u00e9glages \u2192 Appareil photo \u2192 720p \u00e0 30 i/s</b> sur iPhone.</p>`,
@@ -7723,7 +7723,7 @@ const DUREE_REFUSEE = 5 * 60
    passer tout ce qui l'a été. La marge d'un mégaoctet suffit : le calcul est
    déterministe, il n'y a pas de scène « plus détaillée » qui gonflerait le
    résultat — le débit est imposé à l'encodeur. */
-const VIDEO_POIDS_MAX = 90 * 1024 * 1024
+const VIDEO_POIDS_MAX = 150 * 1024 * 1024
 
 function poidsLisible(o) {
   return o >= 1024 * 1024 ? Math.round(o / 1024 / 1024) + ' Mo'
@@ -7794,7 +7794,7 @@ const SON_SEUIL = 0.01
 /* ═══ LA COMPRESSION AVANT L'ENVOI ═══
 
    Un iPhone filme en 4K à 60 images par seconde. Cinq minutes pèsent alors
-   700 Mo, là où le même geste tient dans 90 Mo en 1080p à 30 images.
+   700 Mo, là où le même geste tient dans 150 Mo en 1080p à 30 images.
 
    Ce n'est pas qu'une question de facture. Chaque lecture par un employé
    retransfère le fichier : une vidéo huit fois plus lourde coûte huit fois plus
@@ -7838,7 +7838,7 @@ const VIDEO_DEBIT = 2_500_000
    SUPABASE qui décide. Si le compartiment `procedo-videos` est réglé plus bas,
    un fichier de 80 Mo passera ce contrôle et se fera refuser par un 400 juste
    après. Les deux nombres doivent concorder. */
-const LIMITE_STOCKAGE = 90 * 1024 * 1024
+const LIMITE_STOCKAGE = 150 * 1024 * 1024
 
 /* Le navigateur sait-il enregistrer ? Safari sur iPhone ne l'a appris que
    récemment. Sans ce test, on planterait au lieu d'envoyer l'original. */
@@ -8036,7 +8036,10 @@ function verifierDureeVideo() {
          Au-delà d'un certain poids, on prévient donc que ça peut échouer, et
          on met le bouton d'information à portée de doigt : c'est le moment où
          la question se pose, pas après le refus. */
-      const risque = aiVideoFile.size > LIMITE_STOCKAGE * 1.6
+      /* 1,25 fois la limite et non 1,6. Avec 150 Mo, 1,6 mettait le seuil à
+         240 Mo — on prévenait bien trop tard. À 188, on avertit dès que la
+         compression risque de ne pas suffire. */
+      const risque = aiVideoFile.size > LIMITE_STOCKAGE * 1.25
       err.innerHTML = `Cette vidéo pèse <b>${poidsLisible(aiVideoFile.size)}</b>. ` +
         (risque
           ? `Elle sera allégée, mais elle risque de rester trop lourde — ` +

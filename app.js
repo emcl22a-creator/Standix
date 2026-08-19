@@ -7820,14 +7820,39 @@ const SON_SEUIL = 0.01
    un horodatage, donc l'ancienne adresse ne sert plus à rien. */
 const CACHE_LONG = '31536000'   // un an, en secondes
 
-const VIDEO_LARGEUR_MAX = 1920
-const VIDEO_HAUTEUR_MAX = 1080
-const VIDEO_IMAGES_S = 30
-/* 2,5 Mb/s. À 4, cinq minutes pèsent encore 150 Mo — trop pour un fichier qu'un
-   employé retransfère à chaque consultation. À 2,5 on tombe à 90 Mo, et la
-   différence ne se voit pas sur un geste filmé : ce n'est ni un paysage ni un
-   mouvement rapide, c'est une main qui fait quelque chose devant un plan fixe. */
-const VIDEO_DEBIT = 2_500_000
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES RÉGLAGES DE COMPRESSION
+
+   ═══ 720p ET NON 1080p ═══
+
+   Ce qu'on filme est un GESTE : une main qui fait quelque chose devant un plan
+   fixe. Ni paysage, ni mouvement rapide, ni détail fin à examiner. Le 1080p n'y
+   apporte rien qu'on puisse voir sur un téléphone, et il double le poids.
+
+   L'employé regarde sur un écran de 390 px de large. Une source en 1280 lui
+   donne déjà trois fois sa définition.
+
+   ═══ 24 IMAGES PAR SECONDE ═══
+
+   C'est la cadence du cinéma, et elle suffit largement à suivre une main. 30
+   coûte 20 % de données de plus pour une fluidité que personne ne remarque sur
+   un geste lent.
+
+   ═══ 1,4 Mb/s ═══
+
+   Le point où le texte d'un écran filmé reste lisible. En dessous, à 1,0, les
+   mouvements vifs se brouillent. Au-dessus, on paie pour du détail invisible.
+
+   Cinq minutes tiennent maintenant dans 50 Mo, contre 89 auparavant. */
+const VIDEO_LARGEUR_MAX = 1280
+const VIDEO_HAUTEUR_MAX = 720
+const VIDEO_IMAGES_S = 24
+const VIDEO_DEBIT = 1_400_000
+
+/* Le son garde un débit correct : c'est LUI qu'Azure écoute pour rédiger les
+   étapes. Économiser dessus coûterait la qualité de l'analyse, pas seulement
+   celle de l'écoute. */
+const AUDIO_DEBIT = 96_000
 
 /* ═══ LE PLAFOND ═══
 
@@ -7884,13 +7909,29 @@ async function comprimerVideo(fichier, surAvancee) {
       setTimeout(() => non(new Error('trop long')), 15000)
     })
 
-    /* Déjà raisonnable : on n'y touche pas. Recomprimer une vidéo déjà
-       compressée ne fait que perdre de la qualité. */
+    /* ═══ LE RACCOURCI QUI LAISSAIT TOUT PASSER ═══
+
+       La vidéo était renvoyée telle quelle si elle tenait dans 1920×1080 ET
+       pesait moins de 100 Mo. Or c'est le cas de presque tout ce que filme un
+       iPhone : un enregistrement d'écran de 1 min 30 en 1080p à 60 images fait
+       140 Mo... mais mesure 1080 de haut, donc il passait le premier test.
+
+       Le vrai critère n'est pas la définition, c'est le DÉBIT. On le calcule :
+       poids divisé par durée. Si la vidéo est déjà plus légère que ce que
+       produirait notre compression, la recomprimer ne ferait que dégrader.
+
+       Une marge de 15 % évite de retraiter un fichier qui n'y gagnerait presque
+       rien — la compression coûte une minute d'attente à l'utilisateur. */
     const large = lecteur.videoWidth, haut = lecteur.videoHeight
     if (!large || !haut) return fichier
-    if (large <= VIDEO_LARGEUR_MAX && haut <= VIDEO_HAUTEUR_MAX &&
-        fichier.size < 100 * 1024 * 1024) {
-      return fichier
+
+    const duree = lecteur.duration
+    if (duree && isFinite(duree) && duree > 0) {
+      const debitActuel = fichier.size * 8 / duree
+      if (debitActuel < VIDEO_DEBIT * 1.15 &&
+          large <= VIDEO_LARGEUR_MAX && haut <= VIDEO_HAUTEUR_MAX) {
+        return fichier
+      }
     }
 
     /* On garde les proportions : une vidéo filmée verticalement le reste. */
@@ -7938,7 +7979,17 @@ async function comprimerVideo(fichier, surAvancee) {
     }
 
     const morceaux = []
-    const enr = new MediaRecorder(flux, { mimeType: type, videoBitsPerSecond: VIDEO_DEBIT })
+    /* Le débit AUDIO était laissé au navigateur, qui prend souvent 128 kb/s ou
+       plus. Sur cinq minutes, c'est 5 Mo pour une voix qui commente un geste —
+       96 kb/s suffisent amplement et en économisent deux.
+
+       On ne descend pas plus bas : c'est cette piste qu'Azure transcrit pour
+       rédiger les étapes. Une voix hachée donne des étapes fausses. */
+    const enr = new MediaRecorder(flux, {
+      mimeType: type,
+      videoBitsPerSecond: VIDEO_DEBIT,
+      audioBitsPerSecond: AUDIO_DEBIT,
+    })
     enr.ondataavailable = (e) => { if (e.data.size) morceaux.push(e.data) }
 
     const fini = new Promise((ok) => { enr.onstop = ok })

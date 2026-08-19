@@ -185,11 +185,11 @@ const DICO = {
     // ── espace gestion ──
     "Vous pouvez quitter cette page": "You can leave this page",
     "la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "the procedure will appear in your list as soon as it is ready.",
-    "Envoi de la vidéo": "Uploading the video",
-    "La vidéo part vers le service d'analyse.": "The video is being sent to the analysis service.",
-    "Analyse de la vidéo": "Analysing the video",
-    "Rédaction des étapes": "Writing the steps",
-    "L'IA relit la transcription et en tire les étapes.": "The AI reads the transcript and draws the steps from it.",
+    "Préparation": "Getting ready",
+    "Vous pouvez quitter cette page, l'analyse continue.": "You can leave this page — we'll keep going.",
+    "Lecture de votre vidéo": "Reading your video",
+    "Mise en forme": "Almost there",
+    "Presque prêt": "Almost ready",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "This is taking longer than usual, but the analysis is still running.",
     "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Paste your text below, or drop a file. The AI will draw steps from it that you can",
     ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Beyond that, the analysis gets long and the cutting less reliable — film one procedure per video instead.",
@@ -253,7 +253,7 @@ const DICO = {
     "L'IA découpe un document": "The AI cuts a document",
     "L'IA lit votre document…": "The AI is reading your document…",
     "L'IA travaille au mieux sur des vidéos de": "The AI works best on videos of",
-    "L'analyse tourne sur nos serveurs.": "The analysis runs on our servers.",
+    "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "Your procedure will appear in your list as soon as it's ready.",
     "Lancer l'analyse": "Start the analysis",
     "Les moins actifs": "Least active",
     "Les plus actifs": "Most active",
@@ -393,11 +393,11 @@ const DICO = {
 
   es: {
     // ── espace gestion ──
-    "Envoi de la vidéo": "Envío del vídeo",
-    "La vidéo part vers le service d'analyse.": "El vídeo se envía al servicio de análisis.",
-    "Analyse de la vidéo": "Análisis del vídeo",
-    "Rédaction des étapes": "Redacción de los pasos",
-    "L'IA relit la transcription et en tire les étapes.": "La IA relee la transcripción y extrae los pasos.",
+    "Préparation": "Preparando",
+    "Vous pouvez quitter cette page, l'analyse continue.": "Puede salir de esta página, seguimos trabajando.",
+    "Lecture de votre vidéo": "Leyendo su vídeo",
+    "Mise en forme": "Ya casi está",
+    "Presque prêt": "Casi listo",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Está tardando más de lo habitual, pero el análisis sigue en marcha.",
     "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Pega tu texto abajo, o suelta un archivo. La IA extraerá pasos que podrás",
     ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Más allá, el análisis se alarga y el corte es menos fiable — graba mejor un procedimiento por vídeo.",
@@ -461,7 +461,7 @@ const DICO = {
     "L'IA découpe un document": "La IA corta un documento",
     "L'IA lit votre document…": "La IA está leyendo tu documento…",
     "L'IA travaille au mieux sur des vidéos de": "La IA funciona mejor con vídeos de",
-    "L'analyse tourne sur nos serveurs.": "El análisis se ejecuta en nuestros servidores.",
+    "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "Su procedimiento aparecerá en la lista en cuanto esté listo.",
     "Lancer l'analyse": "Iniciar el análisis",
     "Les moins actifs": "Los menos activos",
     "Les plus actifs": "Los más activos",
@@ -595,11 +595,11 @@ const DICO = {
 
   pt: {
     // ── espace gestion ──
-    "Envoi de la vidéo": "Envio do vídeo",
-    "La vidéo part vers le service d'analyse.": "O vídeo está a ser enviado para o serviço de análise.",
-    "Analyse de la vidéo": "Análise do vídeo",
-    "Rédaction des étapes": "Redação das etapas",
-    "L'IA relit la transcription et en tire les étapes.": "A IA relê a transcrição e extrai as etapas.",
+    "Préparation": "A preparar",
+    "Vous pouvez quitter cette page, l'analyse continue.": "Pode sair desta página, continuamos a trabalhar.",
+    "Lecture de votre vidéo": "A ler o seu vídeo",
+    "Mise en forme": "Quase lá",
+    "Presque prêt": "Quase pronto",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Está a demorar mais do que o habitual, mas a análise continua a correr.",
     "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Cole o seu texto abaixo, ou largue um ficheiro. A IA extrairá etapas que poderá",
     ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Acima disso, a análise demora e o corte é menos fiável — filme antes um procedimento por vídeo.",
@@ -663,7 +663,7 @@ const DICO = {
     "L'IA découpe un document": "A IA corta um documento",
     "L'IA lit votre document…": "A IA está a ler o seu documento…",
     "L'IA travaille au mieux sur des vidéos de": "A IA funciona melhor com vídeos de",
-    "L'analyse tourne sur nos serveurs.": "A análise corre nos nossos servidores.",
+    "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "O seu procedimento aparecerá na lista assim que estiver pronto.",
     "Lancer l'analyse": "Iniciar a análise",
     "Les moins actifs": "Os menos ativos",
     "Les plus actifs": "Os mais ativos",
@@ -2200,6 +2200,81 @@ function sansNumeroDEtape(texte) {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   LE RÉSUMÉ DE L'ENTREPRISE, EN HAUT DE L'ACCUEIL
+
+   Ce qu'un gérant vient vérifier en ouvrant l'app : combien ils sont, qui fait
+   quoi. L'illustration qui occupait cette place ne lui apprenait rien.
+
+   ═══ POURQUOI « MEMBRES » ET PAS « EMPLOYÉS » ═══
+
+   Le compte total inclut le gérant lui-même. Écrire « 8 employés » quand on est
+   huit dont le patron serait faux — et personne ne compte son patron parmi ses
+   employés. « Membres » englobe tout le monde sans mentir.
+
+   ═══ LES POSTES SANS PERSONNE ═══
+
+   Ils sont affichés quand même, à zéro. Un poste vide est une information : soit
+   il faut recruter, soit il faut le supprimer. Le masquer, c'est l'oublier.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function peindreResumeEntreprise() {
+  const salut = document.getElementById('re-salut')
+  const chiffres = document.getElementById('re-chiffres')
+  const postes = document.getElementById('re-postes')
+  if (!salut || !chiffres) return
+
+  /* Le prénom seul. « Bonjour Emilien Meifj » sonne comme un courrier
+     administratif ; le prénom, comme quelqu'un qui vous connaît. */
+  const nom = (currentMembre?.nom || '').trim()
+  const prenom = nom ? nom.split(/\s+/)[0] : ''
+  salut.textContent = prenom ? `Bonjour ${prenom}` : 'Bonjour'
+
+  const membres = cachedMembres || []
+  const nbGestion = membres.filter(m => m.role === 'gestion').length
+  const nbEquipe = membres.filter(m => m.role === 'equipe').length
+
+  /* « Gestion » plutôt que « gestionnaires » : sur un iPhone SE, la colonne
+     fait 73 px et le mot long se coupait en « gestionn / aires ». Un mot
+     tronqué au mauvais endroit se lit plus mal qu'un mot plus court.
+
+     Les trois libellés tiennent maintenant sur une ligne à toutes les
+     largeurs. */
+  const s = (n) => (n > 1 ? 's' : '')
+  chiffres.innerHTML = [
+    [membres.length, `membre${s(membres.length)}`],
+    [nbGestion, 'gestion'],
+    [nbEquipe, `employé${s(nbEquipe)}`],
+  ].map(([n, lib]) =>
+    `<div class="re-c"><b>${n}</b><span>${escapeHtml(lib)}</span></div>`
+  ).join('')
+
+  if (!postes) return
+
+  /* Les postes arrivent par une requête à part : la table peut ne pas exister,
+     et `chargerPostes` rend alors un tableau vide plutôt que d'échouer. */
+  let liste = postesEntreprise
+  if (!liste || !liste.length) {
+    try { liste = await chargerPostes() } catch (e) { liste = [] }
+  }
+
+  if (!liste?.length) {
+    postes.innerHTML = ''
+    return
+  }
+
+  const compte = new Map()
+  liste.forEach(p => compte.set(p.nom, 0))
+  membres.forEach(m => {
+    const p = (m.poste || '').trim()
+    if (p && compte.has(p)) compte.set(p, compte.get(p) + 1)
+  })
+
+  postes.innerHTML = '<div class="re-t">Postes</div>' +
+    [...compte.entries()].map(([nom, n]) =>
+      `<div class="re-p"><span>${escapeHtml(nom)}</span><b>${n}</b></div>`
+    ).join('')
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LE CODE DE GESTION
 
    Il n'existe que lorsqu'une invitation est en cours. La page a donc deux
@@ -2831,6 +2906,11 @@ async function rafraichirAnalyse() {
 
     cachedMembres = membres
     cachedValidations = validations
+    /* Le résumé de l'accueil dépend des membres : c'est ici qu'ils arrivent,
+       c'est donc ici qu'on le repeint. Sans `await` — l'accueil n'attend pas
+       après ce chargement, et les postes peuvent arriver une seconde plus
+       tard sans que ça gêne. */
+    peindreResumeEntreprise().catch(() => {})
     const employes = membres.filter(m => m.role === 'equipe')
     currentGaData = { procedures: allGestionProcedures, membres, employes, validations }
 
@@ -7613,13 +7693,24 @@ const AI_RING_CIRCUMFERENCE = 213.6
 let aiEtapeCourante = 'envoi'      // envoi → transcription → redaction
 let aiProgresAzure = null          // le vrai pourcentage, quand Azure en donne un
 
+/* ═══ ON NE DÉCRIT PLUS LA MACHINE ═══
+
+   Les phrases racontaient le fonctionnement : « la vidéo part vers le service
+   d'analyse », « l'IA relit la transcription ». C'est vrai, et ça n'intéresse
+   personne. Quelqu'un qui attend veut savoir OÙ IL EN EST, pas comment on s'y
+   prend.
+
+   Les titres disent maintenant l'étape du point de vue de la personne, à la
+   deuxième personne quand c'est possible. Les sous-titres disparaissent : une
+   phrase qui n'apprend rien vaut moins qu'une ligne vide — elle occupe la place
+   et fait travailler l'œil pour rien.
+
+   Un seul reste, sur la première phase : c'est la plus longue, et savoir qu'on
+   peut partir change la façon d'attendre. */
 const AI_ETAPES = {
-  envoi:         { titre: 'Envoi de la vid\u00e9o', sous: "La vid\u00e9o part vers le service d'analyse." },
-  /* « Transcription de la parole » ne dit plus ce qui se passe : l'image est
-     analysée en même temps que le son. Et la phrase du dessous décrivait la
-     machine — elle occupait une ligne sans rien apprendre. */
-  transcription: { titre: 'Analyse de la vid\u00e9o', sous: '' },
-  redaction:     { titre: 'R\u00e9daction des \u00e9tapes', sous: "L'IA relit la transcription et en tire les \u00e9tapes." },
+  envoi:         { titre: 'Pr\u00e9paration', sous: 'Vous pouvez quitter cette page, l\u2019analyse continue.' },
+  transcription: { titre: 'Lecture de votre vid\u00e9o', sous: '' },
+  redaction:     { titre: 'Mise en forme', sous: '' },
 }
 
 var aiPalierDepuis = null
@@ -7690,7 +7781,7 @@ function majProgressionIA() {
      plutôt ce qu'on obtient, une bonne fois. Le détail de l'étape et le temps
      écoulé passent dans la phrase du dessous, où ils ne bousculent rien. */
   const titre = document.getElementById('ai-progress-title')
-  if (titre) titre.textContent = t('Votre proc\u00e9dure s\u2019\u00e9crit')
+  if (titre) titre.textContent = t('Presque pr\u00eat')
 
   /* L'anneau tourne toujours — c'est son mouvement qui dit que ça travaille,
      plus une jauge. On n'affiche le chiffre QUE si Azure en donne un vrai : un

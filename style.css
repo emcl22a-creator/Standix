@@ -7064,42 +7064,54 @@ body:has(#e-detail.active) #equipe-app{
 .resume-ent{ padding:18px 20px 16px; }
 
 .re-tete{ display:flex; align-items:center; gap:9px; margin-bottom:16px; }
-.re-salut{ font-size:20px; font-weight:700; letter-spacing:-0.03em; }
+/* `min-width:0` et les points de suspension : sans eux, un prénom long pousse
+   « 11 membres » à la ligne suivante et la tête de carte se dédouble. Le
+   prénom se tronque, le total ne bouge pas — c'est le bon arbitrage : on sait
+   toujours à qui on parle, même tronqué, et le chiffre doit rester lisible. */
+.re-salut{
+  font-size:20px; font-weight:700; letter-spacing:-0.03em;
+  min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
 /* L'emoji ne suit pas la graisse du texte : il garde sa taille propre et un
    léger décalage vers le haut, sinon il pend sous la ligne de base. */
 .re-main{ font-size:18px; line-height:1; transform:translateY(-1px); }
+/* Le total, poussé à droite. `margin-left:auto` plutôt qu'un
+   `justify-content:space-between` sur le parent : l'emoji doit rester COLLÉ au
+   prénom, et `space-between` l'aurait envoyé au milieu. */
+.re-total{
+  margin-left:auto; flex-shrink:0;
+  font-size:12.5px; color:var(--label-2);
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
 
-/* Les trois chiffres, en ligne.
+/* ═══ LA RÉPARTITION ═══
 
-   `minmax(0, 1fr)` et non `1fr` : par défaut, une colonne de grille refuse de
-   devenir plus étroite que son contenu. Sur un iPhone SE, « gestionnaires »
-   forçait donc sa colonne à 93 px pendant que ses voisines tombaient à 72 —
-   trois cases inégales là où il en faut trois identiques.
+   Trois cases de même taille pour un total et ses deux parts : le même poids
+   visuel donné à 11 qu'à 3 et 8, alors que 11 EST 3 + 8. La barre montre la
+   proportion, ce que trois nombres alignés obligeaient à calculer de tête.
 
-   `minmax(0, …)` lève ce plancher : le mot se replie sur deux lignes plutôt
-   que d'écarter les autres. */
-.re-chiffres{
-  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px;
+   Les largeurs viennent de `flex` posé en ligne par le JavaScript, avec les
+   effectifs bruts comme valeurs : trois et huit donnent d'eux-mêmes 27 % et
+   73 %. Aucun pourcentage n'est calculé nulle part — c'est le moteur de mise
+   en page qui divise, et il ne se trompe pas d'arrondi. */
+.re-chiffres{ margin-bottom:2px; }
+.re-barre{
+  display:flex; gap:3px; height:8px; margin-bottom:9px;
+  border-radius:5px; overflow:hidden;
 }
-.re-c{
-  background:rgba(255,255,255,0.045); border-radius:14px; padding:12px 10px;
-  box-shadow:inset 0 0 0 0.5px var(--border);
-  text-align:center;
-}
-.re-c b{
-  display:block; font-size:24px; font-weight:800; letter-spacing:-0.04em;
-  line-height:1.05;
-  background:linear-gradient(135deg,#FFC46B,#FF6A00);
-  -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-.re-c span{
-  display:block; font-size:11.5px; color:var(--label-2); margin-top:4px;
-  line-height:1.25;
-  /* Le mot se coupe s'il le faut : mieux vaut « gestion- / naires » sur deux
-     lignes qu'une colonne deux fois plus large que ses voisines. */
-  overflow-wrap:anywhere; hyphens:auto;
-}
+.re-barre i{ display:block; min-width:3px; }
+/* Ambre pour la gestion, blanc éteint pour les employés. L'ambre est la couleur
+   de l'app : elle marque le petit nombre, celui qui décide. */
+.re-sg{ background:var(--orange); }
+.re-se{ background:rgba(255,255,255,0.17); }
+
+.re-leg{ display:flex; gap:16px; font-size:12px; color:var(--label-2); }
+/* Sans `nowrap`, « 3 gestion » se casse entre le chiffre et le mot dès que la
+   place manque, et la légende occupe quatre lignes au lieu d'une. */
+.re-leg span{ white-space:nowrap; }
+.re-leg b{ font-weight:600; font-variant-numeric:tabular-nums; }
+.re-leg b.g{ color:var(--orange); }
+.re-leg b.e{ color:var(--label); }
 
 /* Les postes. Une ligne chacun, le nom à gauche et le compte à droite —
    la disposition d'un relevé, qui se lit en diagonale. */
@@ -7115,3 +7127,14 @@ body:has(#e-detail.active) #equipe-app{
 }
 .re-p:first-of-type{ border-top:none; }
 .re-p b{ color:var(--label-1); font-weight:700; font-variant-numeric:tabular-nums; }
+/* « Sans poste » n'est pas un poste, c'est un reste. Grisé pour qu'il se lise
+   comme un rappel et non comme une cinquième fonction de l'équipe — mais bien
+   présent : sept personnes sans poste, c'est sept fiches à remplir, et c'est la
+   seule ligne de cette carte sur laquelle on peut agir aujourd'hui.
+
+   PAS DE GRAISSE. `.re-p b` met le compte en 700 : sur une ligne grise, ça
+   donnait un reste plus appuyé que les vrais postes, exactement l'inverse de
+   l'intention. Et `nowrap` sur les deux mots, qui n'ont aucune raison de se
+   séparer. */
+.re-p.vide span,
+.re-p.vide b{ color:var(--label-3); font-weight:400; white-space:nowrap; }

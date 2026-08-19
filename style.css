@@ -6957,6 +6957,48 @@ body:has(#e-detail.active) #equipe-app{
 /* Le bloc de fin respire après la dernière étape. */
 #e-detail.active .zone-etapes .confirm-bar{ margin-top:22px; }
 
+/* ═══ L'ÉCART SOUS « ÉTAPES DE LA PROCÉDURE » ═══
+
+   Trente-six pixels séparaient le bas du texte du haut de la première étape.
+   Beaucoup trop : le titre et la première étape appartiennent au même bloc de
+   lecture, et cet écart les faisait paraître étrangers l'un à l'autre.
+
+   ─── D'OÙ VENAIENT CES 36 PIXELS ───
+
+   Quatre sources, et la plus grosse n'était pas une marge :
+
+     10 px  du VIDE DANS LA LIGNE DU TITRE. Le sélecteur de langue fait 38 px
+            de haut, le texte n'en occupe que 18. La ligne est un `flex` centré
+            verticalement : le globe commande la hauteur, et le texte flotte au
+            milieu avec 10 px de vide au-dessous. C'est la cause principale, et
+            elle est invisible quand on cherche des marges.
+      4 px  `margin-bottom` de la ligne du titre
+     18 px  `padding-top` de la zone qui défile
+      4 px  `margin-top` du fil des étapes
+
+   ─── CE QUI EST TOUCHÉ, ET CE QUI NE L'EST PAS ───
+
+   Les 18 px de la zone RESTENT. Ils sont commandés par le fondu de 14 px, qui
+   est une décision arrêtée. À 16 px, la marge entre le fondu et le premier
+   cercle tombe à 2 px et le cercle commence à s'estomper. On n'y touche pas.
+
+   Le globe GARDE ses 38 px. Réduire une cible tactile pour gagner de la place
+   est un mauvais échange : on lit cette page debout, entre deux tâches. On
+   annule seulement la hauteur qu'il IMPOSE À LA LIGNE, par une marge négative
+   verticale — le globe déborde de sa ligne, ce qui ne se voit pas puisqu'il
+   n'y a rien à côté.
+
+   Résultat : 36 px → 22 px. La zone de 18 px reste la plus grosse part, et
+   c'est normal : c'est elle qui porte le fondu.
+
+   Portée limitée à `#e-detail` : la fiche de gestion emploie les mêmes classes
+   et n'a pas été demandée. */
+#e-detail.active .detail-etapes-tete{ margin-bottom:0; }
+#e-detail.active .detail-etapes-tete .tiroir-langue{
+  margin-top:-6px; margin-bottom:-6px;   /* ligne : 38 px → 26 px */
+}
+#e-detail.active #detail-steps.etapes-fil{ margin-top:0; }
+
 /* ═══ LA BARRE DE DÉFILEMENT EST INVISIBLE ═══
 
    Trois écritures, parce qu'aucune ne suffit seule : `scrollbar-width` pour

@@ -4533,7 +4533,11 @@
   .confirm-bar{ margin-top:20px; margin-bottom:8px; display:none; }
 
   /* La ligne du titre des étapes accueille le sélecteur de langue à droite. */
-  .detail-etapes-tete{ margin-top:22px; margin-bottom:10px; }
+  /* 6 px sous le titre au lieu de 10. Avec les 16 px de la zone des étapes,
+     l'écart total tombe à 22 px — contre 28 avant. Le titre et la première
+     étape appartiennent au même bloc de lecture ; les séparer davantage les
+     faisait paraître étrangers l'un à l'autre. */
+  .detail-etapes-tete{ margin-top:22px; margin-bottom:4px; }
   .detail-etapes-tete .tiroir-langue{ margin-bottom:0; }
   .confirm-bar.visible{ display:block; }
   .confirm-bar.visible .lecture-etat{ animation:bandeauArrive 0.5s cubic-bezier(0.22,1,0.36,1) both; }
@@ -6904,10 +6908,12 @@ body:has(#e-detail.active){
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain; /* le défilement ne se propage pas à la page */
-  /* 18 px en haut. Mesuré : le fondu s'arrête 14 px sous le bord de la zone,
-     et le cercle de la première étape commençait 8 px plus bas encore. On en
-     reprend quatre — il en reste quatre, assez pour que le cercle ne morde
-     jamais sur le fondu, même si une police se charge un peu plus grande.
+  /* 18 px en haut, inchangé. J'avais tenté 16 pour resserrer davantage : la
+     marge entre le fondu et le premier cercle tombait à 2 px, et le cercle
+     commençait à s'estomper.
+
+     Le resserrement se prend donc UNIQUEMENT sur la marge du titre, qui n'a
+     pas cette contrainte. L'écart total passe quand même de 28 à 22 px.
 
      122 px en bas : la hauteur de la barre de navigation. La zone descend
      jusqu'au bord de l'écran — c'est son CONTENU qui s'arrête au-dessus de la

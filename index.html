@@ -1936,12 +1936,21 @@
 <!-- Changement de rôle : même forme que la carte d'accueil -->
 <div class="fond-promu" id="fond-promu">
   <div class="fen-promu" role="dialog" aria-modal="true">
-    <div class="accueil promu-carte">
-      <div class="accueil-texte">
-        <div class="t" id="promu-titre">—</div>
-        <div class="s" id="promu-texte">—</div>
+    <!-- ═══ LA MÊME FORME QUE LA CARTE D'ACCUEIL ═══
+
+         L'avatar est retiré. Il montrait une silhouette générique — une tête et
+         une main — qui ne représentait personne : ni le gérant, ni l'employé
+         promu. Un dessin qui ne désigne rien vole la place du message.
+
+         La carte reprend `.hero` avec sa lueur, comme « Créer des procédures
+         avec l'IA ». Les deux blocs annoncent quelque chose d'important ; ils
+         doivent se ressembler. -->
+    <div class="hero hero-ia promu-carte">
+      <span class="hero-lueur"></span>
+      <div class="hero-txt">
+        <h2 id="promu-titre">—</h2>
+        <p id="promu-texte">—</p>
       </div>
-      <div class="accueil-av"><span class="dispo"></span></div>
     </div>
     <button type="button" class="btn block" id="promu-entrer" style="margin-top:14px;">—</button>
     <div class="avert" id="promu-avert">—</div>

@@ -540,12 +540,15 @@
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
   /* La marge haute de 6 px descendait le titre sous celui des pages d'onglet.
      `letter-spacing` aligné sur `.page-tete h1` : -0,04 et non -0,02. */
-  /* 21 px pour TOUS les titres de page, sans exception.
+  /* 24 px pour TOUS les titres de page, sans exception.
 
-     L'approche passe de −0,04 à −0,03 em : le resserrement des lettres se voit
-     d'autant plus que le texte est petit. À −0,04 sur 21 px, « Codes
-     d'invitation » commençait à se tasser. */
-  h1.pagehead{ font-size:21px; font-weight:700; letter-spacing:-0.03em; margin:0 0 2px; }
+     21 était un peu juste : un titre doit se distinguer du texte courant, qui
+     fait 15 à 16 px. Trois points d'écart ne suffisaient pas à établir la
+     hiérarchie.
+
+     L'approche reste à −0,03 em. À −0,04, valeur d'origine, « Codes
+     d'invitation » se tassait. */
+  h1.pagehead{ font-size:24px; font-weight:700; letter-spacing:-0.03em; margin:0 0 2px; }
   .detail-header h1.pagehead{ margin:0; }
 
   /* `pagehead-row` porte le titre ET un bouton à droite — « Gérer l'équipe »
@@ -6160,14 +6163,11 @@ body.plus-vu .plus-flot{
    Le titre était en 800 et son compte en 600 : plus lourds tous les deux que
    le modèle, et la parenté ne se lisait pas. */
 .page-tete{ margin:0 0 18px; }
-/* 21 px, comme `h1.pagehead`. Ces trois titres — « Procédures », « Analyse »
+/* 24 px, comme `h1.pagehead`. Ces trois titres — « Procédures », « Analyse »
    et le salut de l'Équipe — vivent dans `.page-tete` plutôt que de porter la
-   classe `pagehead`, et ils échappaient donc à la règle centrale.
-
-   L'exception de l'espace Équipe, qui était déjà à 21, n'a plus lieu d'être :
-   toutes les pages emploient maintenant la même valeur. */
+   classe `pagehead`, et ils échappaient donc à la règle centrale. */
 .page-tete h1{
-  font-size:21px; font-weight:700; letter-spacing:-0.03em; line-height:1.1;
+  font-size:24px; font-weight:700; letter-spacing:-0.03em; line-height:1.1;
 }
 /* L'ÉCART SOUS LE TITRE, POSÉ AU MÊME ENDROIT POUR LES DEUX PAGES.
 

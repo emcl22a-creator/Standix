@@ -8150,9 +8150,22 @@ const LIMITE_STOCKAGE = 150 * 1024 * 1024
 
 /* Le navigateur sait-il enregistrer ? Safari sur iPhone ne l'a appris que
    récemment. Sans ce test, on planterait au lieu d'envoyer l'original. */
+/* ═══ POURQUOI LA COMPRESSION N'A PAS EU LIEU ═══
+
+   `comprimerVideo` avait SEPT sorties qui renvoyaient le fichier d'origine, et
+   UNE SEULE laissait une trace. Les six autres étaient muettes : l'app
+   annonçait « elle sera allégée », ne l'allégeait pas, et envoyait le fichier
+   entier. Mesuré chez Emilien : 271 Mo « après allègement », soit le poids
+   d'origine — et un refus de Supabase, qui plafonne à 150.
+
+   On ne devine plus. Chaque sortie inscrit sa raison ici, et l'appelant la lit
+   pour dire à la personne ce qui s'est réellement passé. */
+let raisonCompression = ''
+
 function peutComprimer() {
   return typeof MediaRecorder !== 'undefined' &&
-         typeof HTMLCanvasElement.prototype.captureStream === 'function'
+         (typeof HTMLCanvasElement.prototype.captureStream === 'function' ||
+          typeof HTMLCanvasElement.prototype.webkitCaptureStream === 'function')
 }
 
 function formatEnregistrable() {
@@ -8163,9 +8176,21 @@ function formatEnregistrable() {
 }
 
 async function comprimerVideo(fichier, surAvancee) {
-  if (!peutComprimer()) return fichier
+  /* Remis à zéro à chaque appel : une raison qui traîne d'une vidéo à l'autre
+     ferait accuser la mauvaise. */
+  raisonCompression = ''
+  const abandon = (code, detail) => {
+    raisonCompression = code
+    console.warn('[compression] non effectuée ·', code, detail || '')
+    return fichier
+  }
+
+  if (!peutComprimer()) return abandon('navigateur',
+    'MediaRecorder ou captureStream absent')
+
   const type = formatEnregistrable()
-  if (!type) return fichier
+  if (!type) return abandon('format',
+    'aucun format enregistrable — MediaRecorder.isTypeSupported refuse mp4, vp9 et webm')
 
   const lecteur = document.createElement('video')
   lecteur.src = URL.createObjectURL(fichier)
@@ -8206,14 +8231,16 @@ async function comprimerVideo(fichier, surAvancee) {
        Une marge de 15 % évite de retraiter un fichier qui n'y gagnerait presque
        rien — la compression coûte une minute d'attente à l'utilisateur. */
     const large = lecteur.videoWidth, haut = lecteur.videoHeight
-    if (!large || !haut) return fichier
+    if (!large || !haut) return abandon('dimensions',
+      'le navigateur ne rend pas videoWidth/videoHeight')
 
     const duree = lecteur.duration
     if (duree && isFinite(duree) && duree > 0) {
       const debitActuel = fichier.size * 8 / duree
       if (debitActuel < VIDEO_DEBIT * 1.15 &&
           large <= VIDEO_LARGEUR_MAX && haut <= VIDEO_HAUTEUR_MAX) {
-        return fichier
+        return abandon('deja-legere',
+          `${(debitActuel / 1e6).toFixed(2)} Mb/s en ${large}×${haut} — recomprimer dégraderait`)
       }
     }
 
@@ -8226,40 +8253,61 @@ async function comprimerVideo(fichier, surAvancee) {
     toile.width = L; toile.height = H
     const ctx = toile.getContext('2d')
 
-    const flux = toile.captureStream(VIDEO_IMAGES_S)
+    const flux = (toile.captureStream || toile.webkitCaptureStream).call(toile, VIDEO_IMAGES_S)
 
-    /* LE SON DOIT SUIVRE. C'est lui qu'Azure écoute : une vidéo comprimée sans
-       audio rendrait l'analyse inutile. */
+    /* ═══ LE SON · DEUX CHEMINS, LE PLUS SIMPLE D'ABORD ═══
+
+       LE SON DOIT SUIVRE : c'est lui qu'Azure écoute. Une vidéo comprimée sans
+       audio rendrait l'analyse inutile.
+
+       ─── POURQUOI CE N'EST PLUS L'AUDIOCONTEXT QUI MÈNE ───
+
+       L'ancienne version passait par `new AudioContext()` puis
+       `createMediaElementSource`. Sur Safari iOS, ce chemin est fragile pour
+       deux raisons cumulées : un contexte audio n'y démarre qu'à la suite d'un
+       geste de l'utilisateur, et le `resume()` posé plus haut ne suffit pas
+       toujours quand l'appel vient d'une chaîne asynchrone. Le `createMediaElementSource`
+       lève alors, le `catch` renvoyait le fichier d'origine SANS RIEN DIRE, et
+       l'app annonçait un allègement qui n'avait pas eu lieu.
+
+       ─── LE CHEMIN DIRECT ───
+
+       `HTMLMediaElement.captureStream()` rend les pistes de l'élément
+       lui-même — audio comprise — sans contexte audio, sans geste requis,
+       sans graphe à monter. C'est un appel, contre une quinzaine de lignes.
+
+       L'AudioContext reste en second recours pour les navigateurs qui ne
+       connaissent pas encore cette méthode. Et si les deux échouent, on ne se
+       tait plus : on le dit. */
+    let sonOk = false
     try {
-      const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
-      /* Le contexte naît parfois suspendu : sans ce réveil, il ne produirait
-         aucun échantillon et l'enregistrement serait muet. */
-      if (ctxAudio.state === 'suspended') await ctxAudio.resume()
-      const source = ctxAudio.createMediaElementSource(lecteur)
-      const dest = ctxAudio.createMediaStreamDestination()
-      source.connect(dest)
+      const capt = lecteur.captureStream || lecteur.mozCaptureStream || lecteur.webkitCaptureStream
+      if (capt) {
+        const pistes = capt.call(lecteur).getAudioTracks()
+        if (pistes.length) { pistes.forEach(t => flux.addTrack(t)); sonOk = true }
+      }
+    } catch (e) { /* on tente l'autre chemin */ }
 
-      /* ON NE BRANCHE PAS LES HAUT-PARLEURS.
-
-         Le son partait vers deux endroits : l'enregistrement ET la sortie
-         audio. Comme on ne veut pas faire écouter la vidéo à la personne, la
-         ligne `lecteur.muted = true` la coupait quinze lignes plus bas.
-
-         Sauf que couper l'élément coupe TOUTE la chaîne : à partir de
-         `createMediaElementSource`, l'audio ne passe plus que par le graphe, et
-         un élément muet n'y envoie que du silence. On enregistrait donc une
-         piste audio parfaitement vide.
-
-         D'où le message « cette vidéo n'a pas de son » sur des vidéos qui en
-         avaient : l'app rendait muette la vidéo qu'elle s'apprêtait à juger.
-
-         En ne raccordant pas la sortie, rien n'est audible — sans avoir à
-         couper quoi que ce soit. */
-      dest.stream.getAudioTracks().forEach(t => flux.addTrack(t))
-    } catch (e) {
-      /* Sans son, la compression n'a plus d'intérêt : on renvoie l'original. */
-      return fichier
+    if (!sonOk) {
+      try {
+        const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
+        if (ctxAudio.state === 'suspended') await ctxAudio.resume()
+        const source = ctxAudio.createMediaElementSource(lecteur)
+        const dest = ctxAudio.createMediaStreamDestination()
+        source.connect(dest)
+        /* ON NE BRANCHE PAS LES HAUT-PARLEURS : rien ne doit être audible, et
+           couper l'élément reviendrait à n'enregistrer que du silence, car à
+           partir de `createMediaElementSource` le son ne passe plus que par le
+           graphe. */
+        const pistes = dest.stream.getAudioTracks()
+        if (pistes.length) { pistes.forEach(t => flux.addTrack(t)); sonOk = true }
+      } catch (e) {
+        return abandon('audio', e?.message || String(e))
+      }
     }
+
+    if (!sonOk) return abandon('audio-vide',
+      'aucune piste sonore récupérable — la vidéo en a-t-elle une ?')
 
     const morceaux = []
     /* Le débit AUDIO était laissé au navigateur, qui prend souvent 128 kb/s ou
@@ -8325,7 +8373,8 @@ async function comprimerVideo(fichier, surAvancee) {
     const sortie = new Blob(morceaux, { type })
     /* Si la compression a grossi le fichier — ça arrive sur une vidéo déjà
        optimisée — on garde l'original. */
-    if (sortie.size >= fichier.size) return fichier
+    if (sortie.size >= fichier.size) return abandon('plus-lourde',
+      `${(sortie.size/1048576).toFixed(1)} Mo contre ${(fichier.size/1048576).toFixed(1)} Mo`)
 
     const ext = type.includes('mp4') ? 'mp4' : 'webm'
     return new File([sortie], (fichier.name || 'video').replace(/\.[^.]+$/, '') + '.' + ext,
@@ -8334,8 +8383,7 @@ async function comprimerVideo(fichier, surAvancee) {
     /* La compression échoue ? On envoie l'original. Elle est un confort, pas une
        condition : refuser la vidéo serait pire que l'envoyer lourde.
        On garde tout de même la raison : c'est elle qui manquait. */
-    console.warn('[compression] abandonnée :', e?.message || e)
-    return fichier
+    return abandon('echec', e?.message || String(e))
   } finally {
     arret = true
     try { lecteur.pause() } catch (e) {}
@@ -8508,6 +8556,44 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     if (aiVideoFile.size < avant) {
       console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192', poidsLisible(aiVideoFile.size))
     }
+  }
+
+  /* ═══ ON RECONTRÔLE LE POIDS APRÈS ALLÈGEMENT ═══
+
+     Il n'y avait AUCUN contrôle ici. La vidéo partait vers Supabase quelle que
+     soit sa taille, et c'est Supabase qui refusait — un 400 sec, au milieu de
+     l'envoi, sans rien dire de compréhensible. Vu chez Emilien : 271 Mo
+     « après allègement », donc pas allégés du tout, et l'analyse qui meurt à
+     « 2/3 · Envoi de la vidéo ».
+
+     Deux choses le rendaient invisible. La compression a SEPT sorties qui
+     renvoient le fichier intact, dont six étaient muettes — l'app annonçait un
+     allègement qui n'avait pas eu lieu. Et personne ne revérifiait ensuite.
+
+     Maintenant on arrête avant l'envoi, et on DIT POURQUOI : `raisonCompression`
+     porte le nom de la sortie empruntée. */
+  if (aiVideoFile && aiVideoFile.size > LIMITE_STOCKAGE) {
+    const explications = {
+      'navigateur': 'votre navigateur ne sait pas all\u00e9ger les vid\u00e9os',
+      'format': 'votre navigateur n\u2019accepte aucun format d\u2019enregistrement',
+      'audio': 'le son n\u2019a pas pu \u00eatre repris',
+      'audio-vide': 'aucune piste sonore n\u2019a \u00e9t\u00e9 trouv\u00e9e dans la vid\u00e9o',
+      'dimensions': 'la vid\u00e9o n\u2019a pas pu \u00eatre lue',
+      'deja-legere': 'elle \u00e9tait d\u00e9j\u00e0 au d\u00e9bit le plus bas',
+      'echec': 'l\u2019all\u00e8gement s\u2019est interrompu',
+      'plus-lourde': 'l\u2019all\u00e8gement l\u2019aurait alourdie',
+    }
+    const pourquoi = explications[raisonCompression]
+    errorEl.style.color = 'var(--red)'
+    errorEl.innerHTML =
+      `Cette vid\u00e9o p\u00e8se encore <b>${poidsLisible(aiVideoFile.size)}</b>, ` +
+      `au-del\u00e0 des ${Math.round(LIMITE_STOCKAGE / 1024 / 1024)} Mo accept\u00e9s` +
+      (pourquoi ? ` : ${pourquoi}.` : '.') +
+      `<br>Refilmez en <b>720p \u00e0 30 images par seconde</b>, ou plus court.`
+    launchBtn.disabled = false
+    console.warn('[envoi] refus\u00e9 ·', poidsLisible(aiVideoFile.size),
+      '· raison de la compression :', raisonCompression || 'aucune (elle a fonctionn\u00e9)')
+    return
   }
 
   /* Même règle pendant l'envoi : cinq secondes sous le bouton, pas plus.

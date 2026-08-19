@@ -6879,13 +6879,36 @@ body.chargement #bar{
    Safari ignore `overflow:hidden` dans certains cas. La largeur explicite
    l'empêche de se rétracter une fois sorti du flux. */
 html:has(#e-detail.active),
+/* ═══ LE VERROU QUI CASSAIT LES CLICS ═══
+
+   J'avais posé `position:fixed; inset:0` sur le corps, pour empêcher la page
+   de défiler derrière la liste. Ça marchait — et ça cassait tout le reste.
+
+   Un corps en `fixed` sort du flux : sa hauteur ne correspond plus à celle du
+   contenu, et le navigateur calcule mal où se trouvent les éléments. Les
+   boutons répondaient donc au deuxième ou au troisième doigt, jamais au
+   premier — le point touché ne tombait pas là où le navigateur croyait qu'il
+   était.
+
+   `overflow:hidden` seul suffit à bloquer le défilement. C'est ce qu'il aurait
+   fallu poser dès le départ ; le `fixed` était une précaution de trop, prise
+   pour un problème iOS que je n'avais pas constaté. */
 body:has(#e-detail.active){
   overflow:hidden;
-  height:100%;
   overscroll-behavior:none;
 }
-body:has(#e-detail.active){
-  position:fixed; inset:0; width:100%;
+/* ═══ LE CONTENEUR AUSSI ═══
+
+   `#equipe-app` descendait à 931 px pour une fenêtre de 844 : il additionnait
+   la hauteur de l'écran et le rembourrage de la barre du haut. Le document
+   gardait donc 87 px de défilement résiduel — invisible à l'œil, mais assez
+   pour que la page glisse sous le doigt et que le navigateur refuse les clics
+   sur une cible « qui bouge ».
+
+   On le borne à la fenêtre le temps de cette page. */
+body:has(#e-detail.active) #equipe-app{
+  height:100dvh;
+  overflow:hidden;
 }
 
 
@@ -6987,3 +7010,66 @@ body:has(#e-detail.active){
 .pq-l:first-of-type{ border-top:none; }
 .pq-l b{ color:var(--label-1); font-weight:700; white-space:nowrap; }
 .pq-fin{ margin-top:16px; margin-bottom:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE RÉSUMÉ DE L'ENTREPRISE
+
+   Il occupe la place de l'ancienne carte illustrée, et en garde la forme :
+   même fond, même liseré ambre, même lueur. Ce qui change, c'est le contenu —
+   des chiffres au lieu d'un dessin.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.resume-ent{ padding:18px 20px 16px; }
+
+.re-tete{ display:flex; align-items:center; gap:9px; margin-bottom:16px; }
+.re-salut{ font-size:20px; font-weight:700; letter-spacing:-0.03em; }
+/* L'emoji ne suit pas la graisse du texte : il garde sa taille propre et un
+   léger décalage vers le haut, sinon il pend sous la ligne de base. */
+.re-main{ font-size:18px; line-height:1; transform:translateY(-1px); }
+
+/* Les trois chiffres, en ligne.
+
+   `minmax(0, 1fr)` et non `1fr` : par défaut, une colonne de grille refuse de
+   devenir plus étroite que son contenu. Sur un iPhone SE, « gestionnaires »
+   forçait donc sa colonne à 93 px pendant que ses voisines tombaient à 72 —
+   trois cases inégales là où il en faut trois identiques.
+
+   `minmax(0, …)` lève ce plancher : le mot se replie sur deux lignes plutôt
+   que d'écarter les autres. */
+.re-chiffres{
+  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:10px;
+}
+.re-c{
+  background:rgba(255,255,255,0.045); border-radius:14px; padding:12px 10px;
+  box-shadow:inset 0 0 0 0.5px var(--border);
+  text-align:center;
+}
+.re-c b{
+  display:block; font-size:24px; font-weight:800; letter-spacing:-0.04em;
+  line-height:1.05;
+  background:linear-gradient(135deg,#FFC46B,#FF6A00);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.re-c span{
+  display:block; font-size:11.5px; color:var(--label-2); margin-top:4px;
+  line-height:1.25;
+  /* Le mot se coupe s'il le faut : mieux vaut « gestion- / naires » sur deux
+     lignes qu'une colonne deux fois plus large que ses voisines. */
+  overflow-wrap:anywhere; hyphens:auto;
+}
+
+/* Les postes. Une ligne chacun, le nom à gauche et le compte à droite —
+   la disposition d'un relevé, qui se lit en diagonale. */
+.re-postes{ margin-top:16px; }
+.re-t{
+  font-size:10.5px; font-weight:700; letter-spacing:0.09em; text-transform:uppercase;
+  color:var(--label-3); margin-bottom:6px;
+}
+.re-p{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  font-size:13.5px; color:var(--label-2);
+  padding:7px 0; border-top:0.5px solid var(--border);
+}
+.re-p:first-of-type{ border-top:none; }
+.re-p b{ color:var(--label-1); font-weight:700; font-variant-numeric:tabular-nums; }

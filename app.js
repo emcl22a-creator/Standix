@@ -8534,6 +8534,16 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         procedure_id: aiProcedureId,
         video_url: urlPourAnalyse,
         avec_image: true,
+        /* ═══ ON DIT DANS QUELLE ENTREPRISE ON TRAVAILLE ═══
+
+           `consommer_analyse` le devinait, en prenant la première fiche membre
+           venue. Pour quelqu'un qui appartient à deux entreprises, Postgres
+           rendait n'importe laquelle — la fonction voyait tantôt le rôle
+           « gestion », tantôt « equipe », et acceptait ou refusait au hasard.
+
+           L'app, elle, SAIT : c'est l'entreprise de l'espace ouvert. Le deviner
+           côté base était l'erreur de départ. */
+        entreprise_id: currentMembre?.entreprise_id || null,
       }),
     })
     const startData = await startRes.json()

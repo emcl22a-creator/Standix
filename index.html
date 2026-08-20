@@ -1295,6 +1295,40 @@ footer .marque{ margin-bottom:18px; }
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1099px){
   :root{ --halo:226,232,242; }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA CAPTURE SORT DE LA PAGE — TÉLÉPHONE ET TABLETTE
+
+     Même diagnostic que sur l'ordinateur : l'ombre portée était noire sur un
+     fond noir, donc invisible, et la capture — presque de la même valeur que
+     la page — s'y fondait.
+
+     Ici la place manque pour un vrai décalage en profondeur. On joue donc sur
+     les trois signaux qui ne coûtent aucun pixel :
+
+     ① une bascule de 2° vers le lecteur. À peine perceptible consciemment,
+        mais elle suffit à dire « objet » plutôt que « surface ».
+     ② une arête franche : le liseré passe de 16 à 32 % de blanc, et le reflet
+        du haut de 30 à 42.
+     ③ un halo clair qui épouse le cadre. C'est lui qui remplace l'ombre : sur
+        du sombre, on ne détache pas un objet en assombrissant derrière lui,
+        on le détache en éclairant autour. */
+  .ecran{ perspective:1200px; }
+  .capture{
+    transform:rotateX(-2deg);
+    transform-origin:50% 100%;
+    box-shadow:0 0 0 1px rgba(255,255,255,.32),
+               inset 0 1px 0 rgba(255,255,255,.42),
+               inset 0 0 0 1px rgba(255,255,255,.06),
+               0 0 70px 8px rgba(255,255,255,.07),
+               0 34px 90px rgba(0,0,0,.7);
+  }
+  /* Le halo derrière porte un cran plus loin : c'est la source qui rend
+     l'arête crédible. Sans elle, un liseré clair paraît dessiné. */
+  .souffle{
+    background:radial-gradient(ellipse 52% 60% at 50% 62%,
+      rgba(255,255,255,.52), rgba(var(--halo),.06) 48%, transparent 72%);
+  }
   /* ═══ PLUS DE LUEUR EN HAUT ═══
      Le foyer du haut était posé à hauteur de la barre du logo. Sur un
      téléphone, la barre est en verre translucide : la lueur passait donc au
@@ -1506,10 +1540,36 @@ footer .marque{ margin-bottom:18px; }
   .colonne-app .croix{ display:none }
   .ecran{ max-width:none; padding:0 }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     LES ÉCRANS SORTENT DE LA PAGE
+
+     ═══ POURQUOI ILS PARAISSAIENT EN ARRIÈRE-PLAN ═══
+
+     Leurs ombres étaient noires sur un fond noir : elles ne produisaient
+     rien. Sur du sombre, ce qui détache un objet n'est pas son ombre mais son
+     arête éclairée et la lumière qui passe derrière lui. Et comme les
+     captures sont presque de la même valeur que la page, elles s'y fondaient.
+
+     Quatre choses ensemble, du plus fort au plus fin :
+
+     ① la perspective. Le conteneur en reçoit une, et l'écran du fond tourne
+        de 10° — il s'éloigne réellement au lieu d'être seulement plus petit.
+     ② l'écran de devant DÉBORDE de la colonne, par-dessus la verticale de
+        droite. C'est le seul élément de la page qui franchit la grille, et
+        c'est ce qui donne l'impression qu'il en sort.
+     ③ les arêtes s'éclaircissent. Le liseré passe de 14 à 30 % de blanc sur
+        celui de devant, et il gagne un reflet sur son bord gauche — le côté
+        tourné vers le lecteur.
+     ④ la profondeur de champ. Celui du fond reçoit un flou d'un pixel et
+        s'assombrit : ce qui est net est ce qui est proche.
+     ═══════════════════════════════════════════════════════════════════════ */
+  .colonne-app{ perspective:1600px; perspective-origin:70% 45% }
+
   .capture{
     position:relative; max-width:none; margin:0;
     aspect-ratio:auto; height:600px; overflow:visible;
     border-radius:0; box-shadow:none;
+    transform-style:preserve-3d;
     -webkit-mask-image:none; mask-image:none;
   }
   /* Les vues cessent d'être empilées : chacune redevient un objet posé, avec
@@ -1518,9 +1578,9 @@ footer .marque{ margin-bottom:18px; }
      `on`, mais elle n'a plus d'effet ici. */
   .capture .vue{
     position:absolute; inset:auto;
-    opacity:1; transform:none; filter:none; transition:none;
+    opacity:1; filter:none; transition:none;
     pointer-events:auto;
-    border-radius:20px; overflow:hidden;
+    border-radius:22px; overflow:hidden;
     box-shadow:0 0 0 1px rgba(255,255,255,.14),
                inset 0 1px 0 rgba(255,255,255,.30),
                0 34px 80px rgba(0,0,0,.66);
@@ -1534,15 +1594,50 @@ footer .marque{ margin-bottom:18px; }
      dit qu'il y a d'autres écrans, et elle donne la profondeur. Un tiers
      visible suffit à ça. */
   .capture .vue:nth-of-type(1){
-    left:0; top:70px; width:282px; z-index:1;
-    box-shadow:0 0 0 1px rgba(255,255,255,.10),
-               inset 0 1px 0 rgba(255,255,255,.18),
-               0 24px 60px rgba(0,0,0,.6);
+    left:-6px; top:76px; width:286px; z-index:1;
+    transform:rotateY(15deg) scale(.95);
+    transform-origin:100% 50%;
+    /* Assombri et légèrement flou : la profondeur de champ dit « loin » bien
+       plus clairement qu'un simple changement de taille. */
+    filter:blur(1px) brightness(.78);
+    box-shadow:0 0 0 1px rgba(255,255,255,.09),
+               inset 0 1px 0 rgba(255,255,255,.14),
+               0 30px 70px rgba(0,0,0,.7);
   }
   /* Devant : la procédure ouverte, plus grande et plus haute. C'est elle qui
      porte la démonstration, donc elle prend le premier plan. */
   .capture .vue:nth-of-type(2){
-    right:0; top:0; width:334px; z-index:2;
+    /* -46px : il franchit la verticale de droite et déborde dans la marge.
+       C'est le seul élément de la page à sortir de la grille — c'est pour ça
+       que ça se lit comme une intention et non comme un défaut. */
+    /* ═══ LE DÉBORDEMENT SUIT LA MARGE DISPONIBLE ═══
+       À -58 px fixes, l'écran arrivait à huit pixels du bord de la fenêtre sur
+       un ordinateur de 1 100 px : le débordement ne se lisait plus comme une
+       sortie de grille mais comme un défaut de mise en page.
+
+       Il vaut maintenant au plus 58 px, et au plus la moitié de la marge
+       libre moins 16 px de garde. Sur un grand écran il déborde franchement,
+       sur un petit il rentre de lui-même. */
+    right:calc(-1 * min(58px, max(0px, (100vw - var(--large)) / 2 - 16px)));
+    top:-6px; width:366px; z-index:2;
+    /* Une rotation négative avec l'origine à gauche amène le bord DROIT vers
+       le lecteur. C'est donc lui qui porte le reflet — j'avais d'abord mis le
+       reflet à gauche, c'est-à-dire sur le bord qui s'éloigne. */
+    transform:rotateY(-9deg) translateZ(110px);
+    transform-origin:0% 50%;
+    box-shadow:0 0 0 1px rgba(255,255,255,.32),
+               inset -1px 0 0 rgba(255,255,255,.26),
+               inset 0 1px 0 rgba(255,255,255,.36),
+               0 60px 130px rgba(0,0,0,.85),
+               0 18px 40px rgba(0,0,0,.6);
+  }
+  /* La lumière qui passe DERRIÈRE l'écran de devant. C'est elle qui fait le
+     décollement : sans source derrière, un objet sombre sur fond sombre reste
+     collé au fond, quelle que soit son ombre. */
+  .capture .vue:nth-of-type(2)::after{
+    content:''; position:absolute; inset:0; z-index:-1;
+    border-radius:22px;
+    box-shadow:0 0 110px 40px rgba(var(--halo),.24);
   }
   .capture .vue img{ height:auto }
   /* Sur un écran de 1 440 px presque entièrement noir, la capture est le seul

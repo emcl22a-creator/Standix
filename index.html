@@ -680,7 +680,11 @@ h2 em{ font-style:normal; color:var(--t1); }
    paraît trouée dans la page.
    ═══════════════════════════════════════════════════════════════════════════ */
 .scene{
-  position:relative; margin-bottom:14px;
+  /* 22 px et non 14 : la photo et le bloc vidéo sont deux objets distincts —
+     un lieu et un fichier — et à 14 px ils se lisaient comme un seul bloc
+     empilé. L'écart doit être plus grand que celui qui sépare le bloc vidéo
+     de la descente (6 px), sinon la hiérarchie s'inverse. */
+  position:relative; margin-bottom:22px;
   border-radius:16px; overflow:hidden;
   box-shadow:0 0 0 1px rgba(255,255,255,.14),
              inset 0 1px 0 rgba(255,255,255,.28),
@@ -1520,9 +1524,24 @@ footer .marque{ margin-bottom:18px; }
     right:calc(var(--gouttiere) + 470px + 32px);
   }
 
+  /* ═══ LE PREMIER ÉCRAN OCCUPE TOUTE LA FENÊTRE ═══
+
+     `min-height` et non `height` : sur une fenêtre basse — un portable de
+     1 440 × 700 — le contenu dépasse les 700 px et doit pouvoir pousser. Avec
+     une hauteur fixe, la capture serait sortie du bloc et passée sous la
+     section suivante.
+
+     `dvh` et non `vh` : les deux sont identiques sur ordinateur, mais la page
+     emploie `dvh` partout ailleurs et deux unités pour la même chose finissent
+     toujours par diverger.
+
+     Le contenu reste centré verticalement. Sur un grand moniteur, cela laisse
+     du noir en haut et en bas — c'est ce qui fait qu'un premier écran plein
+     paraît posé plutôt qu'étiré. */
   .premier{
     display:grid; grid-template-columns:1fr 470px; gap:64px;
     align-items:center;
+    min-height:100dvh;
     max-width:var(--large); margin:0 auto;
     padding:calc(var(--barre) + 68px) var(--gouttiere) 92px;
   }

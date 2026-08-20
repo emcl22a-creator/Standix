@@ -6729,7 +6729,16 @@ body.chargement #bar{
 }
 /* La marge du bas appartenait au logo, qui n'est plus seul sur sa ligne. */
 .choix-marque .boot-logo{ margin:0; }
-.choix-marque .logotype{ margin:0; }
+/* ═══ LA TAILLE VENAIT DE LA CARTE, QUI N'EXISTE PLUS ═══
+
+   `Standix` est un `h1`, et sa taille lui venait de `.login-card h1{
+   font-size:22px }`. En retirant le cadre de l'écran de choix, on a retiré
+   cette règle avec lui : le mot serait repassé à la taille par défaut d'un
+   `h1`, soit 32 px, avec ses marges de bloc.
+
+   On la pose donc ici, où elle aurait dû être depuis le début : la taille de la
+   marque ne dépend pas de la boîte qui la contient. */
+.choix-marque .logotype{ font-size:22px; margin:0; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6764,56 +6773,236 @@ body.chargement #bar{
 /* `.btn.block` impose `text-align:center` et gagne par spécificité — deux
    classes contre une. On redouble donc la nôtre pour l'emporter, plutôt que de
    modifier `.btn.block`, qui sert à quinze autres boutons dans l'app. */
-/* ═══ LES BOUTONS DE CHOIX · MAQUETTE D ═══
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN DE CHOIX · DEUX CARTES, SANS CADRE AUTOUR
 
-   `999px` : le navigateur plafonne tout seul à la moitié de la hauteur, ce qui
-   donne un vrai demi-cercle de chaque côté quelle que soit la taille du texte.
+   Les deux boutons pleine largeur empilés sont devenus deux cartes verticales
+   posées côte à côte, DIRECTEMENT SUR LE FOND.
 
-   `text-align:left !important` : `.btn.block` centre le texte, et ce sélecteur
-   est plus fort que le nôtre. C'est le seul endroit du fichier où j'emploie
-   `!important` — ailleurs on peut toujours faire autrement. */
-.choix-btn{
-  display:block; position:relative; overflow:hidden;
-  height:auto; padding:12px 22px; line-height:1.3;
-  text-align:left !important;
-  border-radius:999px;
-}
-.choix-btn + .choix-btn{ margin-top:10px; }
-.choix-btn .cb-t{
-  display:block; position:relative;
-  font-size:15.5px; font-weight:700; letter-spacing:-0.02em;
-}
-/* Le sous-titre hérite de la couleur du bouton et s'efface à 62 % : sur le
-   bouton plein il devient brun sombre, sur le bouton sobre il devient gris.
-   Une couleur fixe aurait été illisible sur l'un des deux. */
-.choix-btn .cb-s{
-  display:block; position:relative;
-  font-size:12px; font-weight:500; opacity:0.62; margin-top:2px;
-  max-width:76%;
+   PLUS DE `login-card` AUTOUR. Deux cartes dans une carte, c'était une boîte
+   dans une boîte — et le cadre volait 48 px de largeur à un écran qui n'en a
+   pas de trop. Les cartes gagnent ces 48 px : 168 px par colonne sur un
+   iPhone, 133 px sur un iPhone SE, contre 150 et 114 avant.
+
+   LA MATIÈRE EST CELLE DE LA CARTE « BONJOUR ». Même fond dégradé, même liseré
+   allumé aux deux angles opposés, même lueur portée. C'est `.hero` qui la
+   définit, et on la reprend ici au lieu de la redessiner : le jour où tu
+   changeras l'une, l'autre suivra.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.choix-ecran{
+  width:100%; max-width:380px; text-align:center;
 }
 
-/* ═══ L'ICÔNE EN FILIGRANE ═══
-
-   Grande, très pâle, débordant du bord droit. Elle donne du caractère sans
-   prendre de place au texte — c'est tout l'intérêt de cette disposition par
-   rapport à une pastille posée à gauche.
-
-   `currentColor` à 13 % : sur le bouton plein elle devient brun sombre, sur le
-   sobre elle devient claire. Une couleur fixe aurait disparu sur l'un des deux. */
-.choix-btn .cb-fond{
-  position:absolute; right:-6px; top:50%; transform:translateY(-50%);
-  opacity:0.13; pointer-events:none;
+/* Le titre d'accueil. Le mot « Standix » porte la classe `logotype` dans le
+   balisage : il hérite de Poppins 500 comme la marque juste au-dessus. On ne
+   lui ajoute ici que la couleur — la police vient de l'autre règle, et c'est
+   volontaire pour qu'un changement de police de marque se propage. */
+.choix-bienvenue{
+  font-size:25px; font-weight:700; letter-spacing:-0.035em;
+  line-height:1.2; margin:14px 0 7px;
 }
-.choix-btn .cb-fond svg{ width:62px; height:62px; display:block; }
+.choix-bienvenue .logotype{
+  font-size:inherit;
+  background:linear-gradient(135deg,#FFC46B,#FF6A00);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
 
-/* Sur un iPhone SE, la carte fait 250 px de large : le texte passe à la ligne
-   plutôt que d'être tronqué, et le filigrane rétrécit pour lui laisser la
-   place. Un bouton un peu plus haut vaut mieux qu'une phrase amputée. */
-@media (max-width: 360px){
-  .choix-btn{ padding:12px 18px; }
-  .choix-btn .cb-t{ font-size:15px; }
-  .choix-btn .cb-s{ font-size:11.5px; max-width:70%; }
-  .choix-btn .cb-fond svg{ width:52px; height:52px; }
+.choix-duo{
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:11px;
+  align-items:stretch;
+  margin-top:14px;
+}
+
+/* ═══ LA CARTE ═══
+
+   `min-width:0` N'EST PAS DÉCORATIF. Sans lui, la carte déborde de sa colonne
+   et pousse tout l'écran vers la droite. `minmax(0, 1fr)` fixe la largeur de la
+   COLONNE, mais l'élément posé dedans garde `min-width:auto` : il refuse de
+   descendre sous sa largeur minimale intrinsèque et sort du cadre. Le défaut ne
+   se voit que sur un écran étroit — à 390 px tout semblait aller, à 320 px rien
+   ne tenait.
+
+   `overflow:visible` malgré le `.hero` d'origine qui coupe : la pastille
+   « Recommandé » est posée à cheval sur le bord haut et serait tranchée. */
+.choix-carte{
+  display:flex; flex-direction:column; align-items:flex-start;
+  position:relative; overflow:visible;
+  height:auto; text-align:left; min-width:0;
+  padding:34px 13px 15px;
+  border-radius:22px;
+  border:none;
+  /* Le fond de `.hero`, à l'identique. */
+  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+  color:var(--label);
+  transition:transform 0.18s ease;
+}
+.choix-carte .cc-t,
+.choix-carte .cc-s{ max-width:100%; overflow-wrap:break-word; }
+.choix-carte:active{ transform:scale(0.975); }
+
+/* Le contenu passe AU-DESSUS du calque de liseré, qui couvre toute la carte.
+
+   ⚠ `.cc-reco` EST EXCLUE, ET CE N'EST PAS UN DÉTAIL. Ce sélecteur pèse (0,2,0)
+   contre (0,1,0) pour `.cc-reco` : sans l'exclusion, il lui imposait
+   `position:relative` et la pastille retombait dans le flux. Elle prenait alors
+   une ligne entière en tête de carte — mesuré : 235 px de haut au lieu de 93 sur
+   un iPhone SE, et les deux cartes ne s'alignaient plus. Le défaut ne se voyait
+   qu'une fois les cartes empilées. */
+.choix-carte > *:not(.hero-lueur):not(.cc-reco){ position:relative; z-index:1; }
+
+/* ═══ LES DEUX COULEURS ═══
+
+   `.hero-lueur` et son `::after` portent déjà la mécanique : un calque en
+   position absolue, un contour évidé par masque, deux angles allumés. On ne
+   redéfinit ici que les COULEURS — la géométrie reste celle du hero.
+
+   Gestion en ambre, Équipe en blanc. Ce n'est pas qu'une différence de teinte :
+   l'ambre est la couleur des gestes de l'app, le blanc celle de la lecture. Les
+   deux espaces se distinguent donc par ce qu'ils font, pas par une hiérarchie. */
+.choix-carte--ambre{
+  box-shadow:0 16px 38px rgba(0,0,0,0.50), 0 0 34px -12px rgba(255,122,24,0.32);
+}
+.choix-carte--blanc{
+  box-shadow:0 16px 38px rgba(0,0,0,0.50), 0 0 34px -12px rgba(255,255,255,0.16);
+}
+.choix-carte--blanc .hero-lueur{
+  background:
+    radial-gradient(150px 110px at 100% 0%, rgba(255,255,255,0.10), transparent 72%),
+    radial-gradient(130px 100px at 0% 100%, rgba(255,255,255,0.06), transparent 72%);
+}
+.choix-carte--blanc .hero-lueur::after{
+  background:linear-gradient(45deg,
+    #FFFFFF 0%, rgba(255,255,255,0.50) 12%, rgba(255,255,255,0.06) 30%,
+    rgba(255,255,255,0.06) 70%, rgba(255,255,255,0.50) 88%, #FFFFFF 100%);
+}
+
+/* ═══ LA PASTILLE « RECOMMANDÉ » ═══
+
+   Posée à cheval sur le bord haut. `left:50%` + `translateX(-50%)` la centre
+   quelle que soit la longueur du mot — utile le jour où il sera traduit, car
+   « Recommended » et « Recomendado » ne font pas la même largeur. */
+.cc-reco{
+  position:absolute; top:-10px; left:50%; transform:translateX(-50%);
+  z-index:2;
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3.5px 9px; border-radius:999px;
+  background:#2A1B0C; border:0.5px solid rgba(255,150,40,0.45);
+  color:#FFAD33;
+  font-size:9px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase;
+  white-space:nowrap;
+}
+.cc-reco svg{ width:9px; height:9px; flex:0 0 9px; display:block; }
+
+/* ═══ LE ROND DE L'ICÔNE ═══
+
+   Un cercle vide, pas une pastille pleine : sur un fond aussi sombre, un
+   cercle plein attirerait plus l'œil que le titre qu'il surmonte, et l'ordre de
+   lecture s'inverserait. */
+.cc-rond{
+  display:flex; align-items:center; justify-content:center;
+  width:46px; height:46px; flex:0 0 46px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,0.16);
+  color:var(--label-2);
+  margin-bottom:13px;
+}
+.cc-rond svg{ width:21px; height:21px; display:block; }
+.choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
+.choix-carte--blanc .cc-rond{ border-color:rgba(255,255,255,0.34); color:var(--label); }
+
+/* L'enveloppe du texte. En deux colonnes elle ne fait rien — un bloc pleine
+   largeur, comme si elle n'existait pas. Empilée, elle devient la colonne
+   souple entre l'icône et la flèche. Sans elle, le titre et la description
+   seraient deux colonnes distinctes de la rangée. */
+.cc-txt{ display:block; width:100%; }
+
+.cc-t{
+  display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.025em;
+  line-height:1.25; margin-bottom:5px;
+}
+.cc-s{
+  display:block; font-size:11.5px; font-weight:500; line-height:1.4;
+  color:var(--label-2);
+}
+
+/* La flèche est poussée en bas par `margin-top:auto`. Les deux cartes font la
+   même hauteur — la grille l'impose — donc les deux flèches s'alignent, même
+   quand une description tient sur trois lignes et l'autre sur deux. */
+.cc-fleche{
+  display:flex; align-items:center; justify-content:center;
+  width:34px; height:34px; flex:0 0 34px;
+  margin-top:auto; align-self:center;
+  padding-top:0;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,0.16);
+  color:var(--label-2);
+}
+.cc-fleche svg{ width:16px; height:16px; display:block; }
+.choix-carte--ambre .cc-fleche{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
+.choix-carte--blanc .cc-fleche{ border-color:rgba(255,255,255,0.34); color:var(--label); }
+/* La flèche a besoin d'un peu d'air au-dessus quand la description est courte.
+   Écrit après `margin-top:auto` : le raccourci `margin` effacerait l'un des deux. */
+.cc-s + .cc-fleche{ margin-top:auto; }
+.choix-carte .cc-fleche{ margin-bottom:0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PETITS ÉCRANS · UNE CARTE PAR LIGNE
+
+   Deux colonnes au-dessus de 384 px, deux rangées en dessous.
+
+   ─── POURQUOI 384 ET PAS 360 ───
+
+   Il y a deux iPhone SE. Le premier fait 320 px de large, les suivants 375.
+   Une coupure à 360 aurait laissé le SE moderne — de loin le plus répandu — en
+   deux colonnes de 158 px, ce qui n'est pas ce qui est demandé. 384 attrape les
+   deux, et laisse tranquilles les iPhone courants à 390 et 393 px. La marge est
+   mince, six pixels, mais aucun téléphone ne tombe dedans.
+
+   ─── POURQUOI LA CARTE PASSE EN LIGNE ───
+
+   Empilée, une carte occupe toute la largeur : garder l'icône au-dessus du
+   titre et la flèche en dessous donnerait 200 px de haut par carte. Deux
+   cartes plus l'en-tête dépassent alors la hauteur utile d'un SE, et l'écran
+   de choix — celui qui doit se lire d'un coup — demanderait de faire défiler.
+
+   En ligne, la carte tombe à 76 px : icône à gauche, texte au milieu, flèche à
+   droite. Les deux tiennent, l'en-tête aussi, et rien ne défile.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 384px){
+  .choix-bienvenue{ font-size:22px; }
+
+  .choix-duo{ grid-template-columns:1fr; gap:10px; }
+
+  .choix-carte{
+    flex-direction:row; align-items:center;
+    padding:14px 14px 14px 13px;
+    text-align:left;
+  }
+
+  /* La pastille passe dans l'angle : sur une carte large et basse, la garder
+     centrée sur le bord haut la poserait au milieu de rien. */
+  .cc-reco{ left:auto; right:13px; transform:none; top:-9px; }
+
+  .cc-rond{
+    width:42px; height:42px; flex:0 0 42px;
+    margin-bottom:0; margin-right:12px;
+  }
+  .cc-rond svg{ width:19px; height:19px; }
+
+  /* `min-width:0` de nouveau : sans lui, la colonne du texte refuse de
+     descendre sous la longueur de sa plus longue ligne et pousse la flèche
+     hors de la carte. Même piège que sur la grille, un cran plus bas. */
+  .cc-txt{ flex:1 1 auto; min-width:0; width:auto; }
+  .cc-t{ font-size:14px; margin-bottom:3px; }
+  .cc-s{ font-size:11px; line-height:1.35; }
+
+  .cc-fleche{
+    width:32px; height:32px; flex:0 0 32px;
+    margin-top:0; margin-left:12px; align-self:center;
+  }
+  .cc-fleche svg{ width:15px; height:15px; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7172,3 +7361,61 @@ body:has(#e-detail.active) #equipe-app{
    séparer. */
 .re-p.vide span,
 .re-p.vide b{ color:var(--label-3); font-weight:400; white-space:nowrap; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   COLLER PLUSIEURS VIDÉOS
+
+   L'outil est SÉPARÉ des trois cartes de mode par un trait, et il ne porte pas
+   leur habit. C'est voulu : ce n'est pas une quatrième façon de créer une
+   procédure, c'est un préalable qu'on emploie avant d'en créer une. Lui donner
+   la même carte l'aurait rangé parmi des choix qui s'excluent, alors qu'il ne
+   s'oppose à aucun.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.outil-sep{
+  height:0.5px; background:var(--separator);
+  margin:26px 2px 16px;
+}
+/* Plus sobre que les cartes de mode : pas de fond, un simple contour. Il se
+   remarque moins, et c'est le but — on ne le cherche que quand on en a besoin. */
+.outil-card{
+  background:transparent;
+  box-shadow:inset 0 0 0 0.5px var(--border);
+}
+
+.coller-item{
+  display:flex; align-items:center; gap:8px;
+  padding:10px 12px; margin-bottom:8px;
+  background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+}
+.coller-rang{
+  flex:0 0 22px; width:22px; height:22px; border-radius:50%;
+  background:rgba(255,255,255,0.10); color:var(--label);
+  font-size:11.5px; font-weight:700; line-height:22px; text-align:center;
+}
+/* `min-width:0` : sans lui, un nom de fichier long refuse de se tronquer et
+   pousse les trois boutons hors de la carte. Le même piège que sur la grille
+   de l'écran de choix. */
+.coller-nom{ flex:1 1 auto; min-width:0; display:block; }
+.coller-nom .txt{
+  display:block; font-size:13px; font-weight:600;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.coller-meta{
+  display:block; font-size:11px; color:var(--label-2); margin-top:2px;
+  font-variant-numeric:tabular-nums;
+}
+.coller-fleche{
+  flex:0 0 30px; width:30px; height:30px; border-radius:9px;
+  background:rgba(255,255,255,0.07); border:none; color:var(--label);
+  font-size:14px; line-height:1;
+}
+.coller-fleche[disabled]{ opacity:0.28; }
+.coller-fleche.retirer{ color:var(--red); }
+
+.coller-tot{
+  display:flex; align-items:baseline; justify-content:space-between;
+  font-size:13px; color:var(--label-2);
+  padding:6px 0; border-top:0.5px solid var(--separator);
+}
+.coller-tot:first-child{ border-top:none; }
+.coller-tot b{ color:var(--label); font-weight:700; font-variant-numeric:tabular-nums; }

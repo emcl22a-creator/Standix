@@ -214,6 +214,10 @@
     100%{ transform:scale(1) }
   }
   .tab.rebond{ animation:ongletRebond 0.42s cubic-bezier(0.34,1.56,0.64,1); }
+  /* Les onglets héritent des deux mêmes déclarations : le toucher peut tomber
+     sur un libellé ou sur une icône plutôt que sur le fond de la barre, et
+     l'événement doit porter dans tous les cas. */
+  .tab{ cursor:pointer; touch-action:manipulation; }
   @media (prefers-reduced-motion: reduce){ .tab.rebond{ animation:none } }
 
   #bar{
@@ -221,6 +225,30 @@
        En absolu elle se posait au bas du DOCUMENT. */
     position:fixed;
     pointer-events:auto;
+
+    /* ═══ LE PREMIER TOUCHER QUI NE PORTAIT PAS ═══
+
+       Deux manques, indépendants, produisant le même symptôme. Aucun ne se voit
+       sur ordinateur : ce sont deux comportements propres à Safari sur iPhone.
+
+       ① `cursor:pointer`. SAFARI IOS NE DÉCLENCHE PAS `click` SUR UN ÉLÉMENT
+          NON INTERACTIF. La barre est une simple boîte, pas un bouton ni un lien :
+          sans cette déclaration, le navigateur ne la considère pas comme
+          touchable et l'événement n'arrive jamais. Elle n'a aucun effet visible
+          sur téléphone — il n'y a pas de curseur — mais elle change ce que
+          Safari accepte d'écouter. C'est une propriété de style détournée en
+          déclaration d'intention, et c'est ainsi depuis quinze ans.
+
+       ② `touch-action:manipulation`. Sans elle, Safari attend environ 300 ms
+          après chaque toucher pour voir s'il s'agit d'un double-tap de zoom.
+          Le premier appui semble alors ignoré, et le second — qui arrive après
+          le délai — paraît seul fonctionner. C'est exactement « répond mal au
+          premier toucher ».
+
+       Le zoom par pincement reste possible : `manipulation` ne désactive que
+       le double-tap, pas les autres gestes. */
+    cursor:pointer;
+    touch-action:manipulation;
     left:50%;
     /* LE VOL : la zone sûre de l'appareil, plus 12 pt — la barre laisse passer
        le trait d'accueil sous elle. Le plancher de 23 px est la marge latérale
@@ -1348,6 +1376,13 @@
 
     <div class="section-title">Étapes de la procédure</div>
     <div id="analyse-steps-list"></div>
+      <!-- ═══ LA PROCÉDURE EN PDF ═══
+           Un mur de plonge sans réseau, un classeur qu'un inspecteur demande,
+           quelqu'un qui préfère le papier : le PDF passe partout. Le bouton est
+           en second plan — c'est un recours, pas le mode de lecture normal. -->
+      <button class="btn ghost block" id="pdf-gestion" style="margin-top:18px;">
+        Télécharger en PDF
+      </button>
 
     <div class="section-title">Code d'accès rapide</div>
     <div class="card qr-card">
@@ -2211,6 +2246,13 @@
         </div>
       </div>
       <div class="error-msg" id="confirm-error"></div>
+      <!-- ═══ LA PROCÉDURE EN PDF ═══
+           Un mur de plonge sans réseau, un classeur qu'un inspecteur demande,
+           quelqu'un qui préfère le papier : le PDF passe partout. Le bouton est
+           en second plan — c'est un recours, pas le mode de lecture normal. -->
+      <button class="btn ghost block" id="pdf-equipe" style="margin-top:18px;">
+        Télécharger en PDF
+      </button>
     </div>
     </div><!-- /.zone-etapes -->
   </div>

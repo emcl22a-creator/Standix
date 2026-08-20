@@ -2394,7 +2394,8 @@ async function peindreResumeEntreprise() {
     <div class="re-tiroir${postesOuverts ? ' ouvert' : ''}" id="re-tiroir">
       <div class="re-tiroir-in">${dedans}</div>
     </div>
-    <button class="re-plus" onclick="basculerPostes()" aria-expanded="${postesOuverts}">
+    <button class="re-plus" onclick="basculerPostes()" aria-expanded="${postesOuverts}"
+            data-ouvrir="${escapeHtml(libelleTiroir)}">
       <span>${postesOuverts ? 'Réduire' : libelleTiroir}</span>
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
@@ -2411,7 +2412,31 @@ let postesOuverts = false
 
 window.basculerPostes = function () {
   postesOuverts = !postesOuverts
-  peindreResumeEntreprise().catch(() => {})
+
+  /* ═══ POURQUOI ON NE REPEINT PLUS ═══
+
+     La bascule appelait `peindreResumeEntreprise`, qui réécrit tout le contenu
+     de la carte. Le tiroir était donc DÉTRUIT ET RECRÉÉ à chaque clic — et un
+     élément qui naît déjà ouvert n'a rien à animer : une transition CSS a
+     besoin d'un état de départ, puis d'un changement sur LE MÊME élément.
+
+     La transition existait, elle était juste inatteignable. Le tiroir sautait
+     d'un état à l'autre.
+
+     On bascule donc la classe en place. Le contenu, lui, ne change pas : il est
+     déjà dessiné dans les deux cas, seulement replié.
+
+     LE REPEINT RESTE EN SECOURS. Si le tiroir n'est pas dans la page — carte
+     redessinée entre-temps, changement d'entreprise —, on retombe sur l'ancien
+     chemin plutôt que de ne rien faire. */
+  const t = document.getElementById('re-tiroir')
+  const b = document.querySelector('#re-postes .re-plus')
+  if (!t || !b) { peindreResumeEntreprise().catch(() => {}); return }
+
+  t.classList.toggle('ouvert', postesOuverts)
+  b.setAttribute('aria-expanded', String(postesOuverts))
+  const mot = b.querySelector('span')
+  if (mot) mot.textContent = postesOuverts ? 'Réduire' : (b.dataset.ouvrir || 'Voir plus')
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

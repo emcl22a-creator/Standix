@@ -7109,6 +7109,341 @@ function goToCreateMode(mode) {
 window.goToCreateMode = goToCreateMode
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   COLLER PLUSIEURS VIDÉOS EN UNE SEULE
+
+   Un geste filmé en cinq fois donne cinq fichiers, et l'analyse n'en accepte
+   qu'un. Cet outil les met bout à bout.
+
+   ─── COMMENT, ET POURQUOI PAS AUTREMENT ───
+
+   On rejoue les vidéos l'une après l'autre dans LE MÊME canevas, capté par LE
+   MÊME enregistreur. Celui-ci ne voit qu'un flux continu : il ignore qu'il y a
+   eu cinq fichiers.
+
+   L'autre voie était `ffmpeg.wasm` : vingt-cinq mégaoctets à télécharger avant
+   de commencer, lent sur téléphone, et rien ne garantit qu'il passe le réseau.
+   Écartée.
+
+   ─── CE QUE CETTE MÉTHODE DONNE EN PRIME ───
+
+   Le collage EST une compression. Le canevas fait 1280×720, l'enregistreur
+   tourne à 1,4 Mb/s : cinq vidéos 4K de 400 Mo au total ressortent à une
+   trentaine de mégaoctets. Il n'y a pas de seconde étape à prévoir.
+
+   C'est pourquoi LE POIDS D'ENTRÉE NE LIMITE RIEN. On l'affiche — c'est
+   demandé, et c'est rassurant — mais ce qui décide est la DURÉE CUMULÉE :
+   après recompression, le poids n'en dépend plus que d'elle.
+
+   ─── LE SON ───
+
+   Un seul point d'arrivée audio pour tout le collage, et chaque vidéo s'y
+   branche à son tour. L'enregistreur voit une piste sonore unique du début à
+   la fin — c'est indispensable : lui changer sa piste en cours de route
+   produirait un fichier illisible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let collageFichiers = []      // { fichier, duree, largeur, hauteur }
+let collageResultat = null    // le Blob produit
+let collageEnAttente = null   // passée à l'écran IA, consommée une fois
+
+function ouvrirCollage() {
+  collageFichiers = []
+  collageResultat = null
+  document.getElementById('coller-resultat').style.display = 'none'
+  document.getElementById('coller-input').value = ''
+  dessinerCollage()
+  showGestionScreen('p-coller')
+}
+window.ouvrirCollage = ouvrirCollage
+
+/* Lire durée et dimensions demande de charger les métadonnées, donc d'attendre.
+   On le fait UNE FOIS à l'ajout plutôt qu'à chaque affichage de la liste. */
+function lireMeta(fichier) {
+  return new Promise((ok) => {
+    const v = document.createElement('video')
+    v.preload = 'metadata'
+    v.onloadedmetadata = () => {
+      ok({ duree: v.duration || 0, largeur: v.videoWidth, hauteur: v.videoHeight })
+      URL.revokeObjectURL(v.src)
+    }
+    v.onerror = () => { ok({ duree: 0, largeur: 0, hauteur: 0 }); URL.revokeObjectURL(v.src) }
+    v.src = URL.createObjectURL(fichier)
+  })
+}
+
+function dessinerCollage() {
+  const liste = document.getElementById('coller-liste')
+  const total = document.getElementById('coller-total')
+  const avert = document.getElementById('coller-avert')
+  const lancer = document.getElementById('coller-lancer')
+  if (!liste) return
+
+  if (collageFichiers.length === 0) {
+    liste.innerHTML = ''
+    total.style.display = 'none'
+    avert.textContent = 'Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.'
+    lancer.disabled = true
+    return
+  }
+
+  /* Les flèches plutôt qu'un glisser-déposer : sur un téléphone, déplacer un
+     élément d'une liste qui défile est le geste le plus raté de toute
+     l'interface mobile. Deux boutons ne trompent personne. */
+  liste.innerHTML = collageFichiers.map((f, i) => `
+    <div class="coller-item">
+      <span class="coller-rang">${i + 1}</span>
+      <span class="coller-nom">
+        <span class="txt">${escapeHtml(f.fichier.name)}</span>
+        <span class="coller-meta">${dureeCourte(f.duree)} · ${poidsLisible(f.fichier.size)}</span>
+      </span>
+      <button class="coller-fleche" onclick="deplacerCollage(${i}, -1)" ${i === 0 ? 'disabled' : ''} aria-label="Monter">↑</button>
+      <button class="coller-fleche" onclick="deplacerCollage(${i}, 1)" ${i === collageFichiers.length - 1 ? 'disabled' : ''} aria-label="Descendre">↓</button>
+      <button class="coller-fleche retirer" onclick="retirerCollage(${i})" aria-label="Retirer">✕</button>
+    </div>`).join('')
+
+  const secondes = collageFichiers.reduce((s, f) => s + f.duree, 0)
+  const octets = collageFichiers.reduce((s, f) => s + f.fichier.size, 0)
+  /* Le poids ATTENDU en sortie, au débit réel mesuré sur iPhone : 1,75 Mb/s
+     dans le pire cas, un enregistrement d'écran. Une vidéo filmée sortira plus
+     légère — l'estimation est haute, jamais basse. */
+  const attendu = secondes * 1.75e6 / 8
+
+  total.style.display = ''
+  total.innerHTML = `
+    <div class="coller-tot"><span>Durée totale</span><b>${dureeCourte(secondes)}</b></div>
+    <div class="coller-tot"><span>Poids des vidéos choisies</span><b>${poidsLisible(octets)}</b></div>
+    <div class="coller-tot"><span>Poids après collage, environ</span><b>${poidsLisible(attendu)}</b></div>
+    <div class="coller-tot"><span>Temps de collage, environ</span><b>${attenteLisible(secondes * 1.05)}</b></div>`
+
+  /* ═══ C'EST LA DURÉE QUI REFUSE, PAS LE POIDS ═══
+
+     Cinq clips 4K pesant 400 Mo à eux tous, mais durant deux minutes,
+     ressortent à vingt-six mégaoctets. Les refuser sur leur poids d'entrée
+     écarterait un montage parfaitement valide. */
+  if (secondes > DUREE_REFUSEE) {
+    avert.innerHTML = `<span style="color:var(--red)">Le total dépasse ` +
+      `${Math.round(DUREE_REFUSEE / 60)} minutes. Retirez une vidéo, ou coupez-en une.</span>`
+    lancer.disabled = true
+  } else if (collageFichiers.length < 2) {
+    avert.textContent = 'Ajoutez au moins une seconde vidéo.'
+    lancer.disabled = true
+  } else {
+    avert.textContent = secondes > DUREE_CONSEILLEE
+      ? `Au-delà de deux minutes, une procédure se suit mal debout entre deux tâches.`
+      : ''
+    lancer.disabled = false
+  }
+}
+
+function dureeCourte(s) {
+  s = Math.round(s || 0)
+  return s < 60 ? `${s} s` : `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, '0')}`
+}
+
+window.deplacerCollage = function (i, sens) {
+  const j = i + sens
+  if (j < 0 || j >= collageFichiers.length) return
+  const t = collageFichiers[i]
+  collageFichiers[i] = collageFichiers[j]
+  collageFichiers[j] = t
+  dessinerCollage()
+}
+
+window.retirerCollage = function (i) {
+  collageFichiers.splice(i, 1)
+  dessinerCollage()
+}
+
+/* ═══ LE COLLAGE ═══ */
+async function collerLesVideos(surAvancee) {
+  if (!peutComprimer()) throw new Error('Votre navigateur ne sait pas assembler de vidéos.')
+  const type = formatEnregistrable()
+  if (!type) throw new Error('Votre navigateur n’accepte aucun format d’enregistrement.')
+
+  /* Le cadre vient de la PREMIÈRE vidéo, ramenée à 1280 de large. Les suivantes
+     s'y inscrivent en gardant leurs proportions, avec des bandes noires si
+     elles n'ont pas le même format. Sans cela, une prise en portrait au milieu
+     de quatre prises en paysage serait étirée. */
+  const p = collageFichiers[0]
+  let L = p.largeur || 1280, H = p.hauteur || 720
+  if (L > VIDEO_LARGEUR_MAX) { H = Math.round(H * VIDEO_LARGEUR_MAX / L); L = VIDEO_LARGEUR_MAX }
+  if (H > VIDEO_HAUTEUR_MAX) { L = Math.round(L * VIDEO_HAUTEUR_MAX / H); H = VIDEO_HAUTEUR_MAX }
+  L -= L % 2; H -= H % 2
+
+  const toile = document.createElement('canvas')
+  toile.width = L; toile.height = H
+  const ctx = toile.getContext('2d', { alpha: false })
+  ctx.fillStyle = '#000'; ctx.fillRect(0, 0, L, H)
+
+  const flux = (toile.captureStream || toile.webkitCaptureStream).call(toile, VIDEO_IMAGES_S)
+
+  /* UN SEUL POINT D'ARRIVÉE AUDIO POUR TOUT LE COLLAGE. Chaque vidéo s'y
+     branche à son tour ; la piste, elle, ne change jamais. Changer la piste
+     d'un enregistrement en cours produit un fichier que rien ne relit. */
+  const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
+  if (ctxAudio.state === 'suspended') await ctxAudio.resume()
+  const arrivee = ctxAudio.createMediaStreamDestination()
+  arrivee.stream.getAudioTracks().forEach((t) => flux.addTrack(t))
+
+  const morceaux = []
+  const enr = new MediaRecorder(flux, {
+    mimeType: type, videoBitsPerSecond: VIDEO_DEBIT, audioBitsPerSecond: AUDIO_DEBIT,
+  })
+  enr.ondataavailable = (e) => { if (e.data && e.data.size) morceaux.push(e.data) }
+  const fini = new Promise((ok) => { enr.onstop = ok })
+  enr.start(1000)
+
+  let courant = null
+  let images = 0
+  const minuterie = setInterval(() => {
+    if (!courant || courant.readyState < 2) return
+    /* On inscrit l'image dans le cadre sans la déformer. Le rapport le plus
+       contraignant gagne, le reste devient de la bande noire. */
+    const r = Math.min(L / courant.videoWidth, H / courant.videoHeight)
+    const w = courant.videoWidth * r, h = courant.videoHeight * r
+    if (w < L || h < H) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, L, H) }
+    ctx.drawImage(courant, (L - w) / 2, (H - h) / 2, w, h)
+    images += 1
+  }, Math.round(1000 / VIDEO_IMAGES_S))
+
+  const totalSec = collageFichiers.reduce((s, f) => s + f.duree, 0)
+  let faites = 0
+
+  try {
+    for (let i = 0; i < collageFichiers.length; i++) {
+      const f = collageFichiers[i]
+      const v = document.createElement('video')
+      v.src = URL.createObjectURL(f.fichier)
+      v.playsInline = true
+      v.setAttribute('playsinline', '')
+      /* Audible pour le graphe, muet pour l'oreille : à partir de
+         `createMediaElementSource`, le son ne sort plus que par le graphe, et
+         on ne le raccorde jamais aux haut-parleurs. */
+      v.muted = false
+      v.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;'
+      document.body.appendChild(v)
+
+      await new Promise((ok, ko) => { v.onloadedmetadata = ok; v.onerror = () => ko(new Error(`« ${f.fichier.name} » n’a pas pu être lue.`)) })
+
+      try {
+        ctxAudio.createMediaElementSource(v).connect(arrivee)
+      } catch (e) {
+        /* Une vidéo sans piste sonore, ou un navigateur qui refuse : on
+           continue sans son POUR CE CLIP plutôt que d'abandonner tout le
+           collage. Les autres garderont le leur. */
+        console.warn('[collage] son ignoré pour', f.fichier.name, e?.message || e)
+      }
+
+      courant = v
+      await v.play()
+      await new Promise((ok) => {
+        const finir = () => { clearInterval(garde); ok() }
+        v.onended = finir
+        const garde = setInterval(() => {
+          if (v.ended || (v.duration && v.currentTime >= v.duration - 0.15)) finir()
+          if (surAvancee) {
+            const avance = (faites + v.currentTime) / (totalSec || 1)
+            surAvancee(Math.min(99, Math.round(avance * 100)), i + 1, collageFichiers.length)
+          }
+        }, 300)
+      })
+
+      faites += f.duree
+      courant = null
+      try { v.pause() } catch (e) {}
+      v.remove()
+      URL.revokeObjectURL(v.src)
+    }
+  } finally {
+    clearInterval(minuterie)
+    try { enr.stop() } catch (e) {}
+  }
+
+  await fini
+  try { await ctxAudio.close() } catch (e) {}
+
+  const attendues = totalSec * VIDEO_IMAGES_S
+  const part = attendues ? images / attendues : 1
+  console.log('[collage] images :', images, 'sur', Math.round(attendues), `(${Math.round(part * 100)} %)`)
+  if (attendues > 0 && part < 0.66) {
+    throw new Error('Votre téléphone n’a pas suivi la cadence. Fermez les autres applications et réessayez.')
+  }
+
+  const ext = type.includes('mp4') ? 'mp4' : 'webm'
+  return new File(morceaux, `procedure-collee.${ext}`, { type: type.split(';')[0] })
+}
+
+/* ═══ LES BOUTONS ═══ */
+document.getElementById('coller-ajouter')?.addEventListener('click', () => {
+  document.getElementById('coller-input').click()
+})
+
+document.getElementById('coller-input')?.addEventListener('change', async (e) => {
+  const choisis = [...(e.target.files || [])]
+  if (!choisis.length) return
+  const btn = document.getElementById('coller-ajouter')
+  btn.disabled = true; btn.textContent = 'Lecture des vidéos…'
+  for (const fichier of choisis) {
+    const m = await lireMeta(fichier)
+    if (!m.duree) { console.warn('[collage] durée illisible :', fichier.name); continue }
+    collageFichiers.push({ fichier, ...m })
+  }
+  btn.disabled = false; btn.textContent = 'Choisir des vidéos'
+  /* On vide le champ : sans cela, choisir deux fois le même fichier ne
+     déclencherait pas d'événement, la valeur n'ayant pas changé. */
+  e.target.value = ''
+  dessinerCollage()
+})
+
+document.getElementById('coller-lancer')?.addEventListener('click', async () => {
+  const btn = document.getElementById('coller-lancer')
+  const avert = document.getElementById('coller-avert')
+  btn.disabled = true
+  document.getElementById('coller-resultat').style.display = 'none'
+  try {
+    collageResultat = await collerLesVideos((pct, n, sur) => {
+      btn.textContent = `Collage · ${pct}% · vidéo ${n} sur ${sur}`
+    })
+    const url = URL.createObjectURL(collageResultat)
+    const ap = document.getElementById('coller-apercu')
+    ap.src = url
+    document.getElementById('coller-resume').innerHTML =
+      `Une seule vidéo de <b>${poidsLisible(collageResultat.size)}</b>, ` +
+      `à partir de ${collageFichiers.length} prises. Regardez-la avant de la garder : ` +
+      `c’est le seul moyen de vérifier que l’ordre est le bon.`
+    document.getElementById('coller-resultat').style.display = ''
+    avert.textContent = ''
+  } catch (err) {
+    avert.innerHTML = `<span style="color:var(--red)">${escapeHtml(err?.message || String(err))}</span>`
+  } finally {
+    btn.textContent = 'Coller les vidéos'
+    btn.disabled = false
+  }
+})
+
+document.getElementById('coller-garder')?.addEventListener('click', () => {
+  if (!collageResultat) return
+  /* `download` sur une adresse d'objet : c'est ce qui déclenche la feuille de
+     partage sur iPhone, d'où l'on enregistre dans Photos ou Fichiers. */
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(collageResultat)
+  a.download = collageResultat.name
+  document.body.appendChild(a)
+  a.click()
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 4000)
+})
+
+document.getElementById('coller-utiliser')?.addEventListener('click', () => {
+  if (!collageResultat) return
+  /* On repart de l'écran de création avec la vidéo déjà en main : la personne
+     n'a plus qu'à nommer sa procédure. Elle n'a pas à la ressortir de ses
+     photos, où elle vient à peine d'être rangée. */
+  collageEnAttente = collageResultat
+  showGestionScreen('p-create')
+  toast('Vidéo prête — nommez la procédure, puis « L’IA découpe la vidéo »')
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
    GESTION : L'IA LIT UN DOCUMENT
 
    Le texte peut venir de trois endroits : collé à la main, extrait d'un PDF, ou
@@ -8083,6 +8418,21 @@ function resetAiScreen() {
   bLance.classList.remove('travaille', 'fini')
   bLance.disabled = true
   document.getElementById('ai-error').textContent = ''
+
+  /* ═══ LA VIDÉO COLLÉE SURVIT À LA REMISE À ZÉRO ═══
+
+     `goToCreateMode('ai')` appelle cette fonction AVANT d'ouvrir l'écran : une
+     vidéo posée depuis l'outil de collage y était effacée aussitôt, et la
+     personne devait aller la rechercher dans ses photos — là où elle venait
+     d'être enregistrée trente secondes plus tôt.
+
+     On la reprend donc après la remise à zéro, et on vide la variable : elle
+     ne sert qu'une fois, sinon elle reviendrait à chaque nouvelle procédure. */
+  if (collageEnAttente) {
+    const v = collageEnAttente
+    collageEnAttente = null
+    setTimeout(() => chargerVideoPourIA(v), 0)
+  }
   const detail = document.getElementById('ai-detail')
   if (detail) detail.style.display = 'none'
   aiEcranAttente = false
@@ -8098,6 +8448,16 @@ function resetAiScreen() {
 document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (!file) return
+  chargerVideoPourIA(file)
+})
+
+/* ═══ EXTRAIT DU GESTIONNAIRE, POUR QUE LE COLLAGE PUISSE L'EMPRUNTER ═══
+
+   Une vidéo collée doit arriver sur cet écran exactement comme une vidéo
+   choisie dans Photos : même lecteur, même durée relevée, même bouton activé,
+   même contrôle de durée. Recopier ces lignes ailleurs aurait créé deux chemins
+   qui divergeraient à la première correction. */
+function chargerVideoPourIA(file) {
   aiVideoFile = file
   const url = URL.createObjectURL(file)
   const player = document.getElementById('ai-video-player')
@@ -8114,7 +8474,7 @@ document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
        dixième de seconde, ce qui force le rendu d'une vraie image. */
     try { player.currentTime = 0.1 } catch (e) {}
   }, { once: true })
-})
+}
 
 /* Deux seuils. Au-delà de 5 minutes on prévient : l'analyse marche encore mais
    elle devient longue et le découpage moins sûr. Au-delà de 20, on refuse : la

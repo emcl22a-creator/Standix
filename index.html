@@ -358,7 +358,11 @@
 
 <!-- ═══ 1. CHOIX DE L'ESPACE ═══ -->
 <div class="login-wrap" id="choice-screen" style="display:none;">
-  <div class="login-card" style="text-align:center;">
+  <!-- PAS DE `login-card` ICI. L'écran de choix n'a plus de cadre : les deux
+       cartes sont posées à même le fond. Un cadre autour de deux cartes qui en
+       sont déjà, c'était une boîte dans une boîte — et il volait 48 px de
+       largeur aux cartes, ce qui compte quand il n'en reste que 114. -->
+  <div class="choix-ecran">
     <div class="choix-marque">
       <div class="boot-logo boot-logo--once">
         <div class="boot-glow"></div>
@@ -366,45 +370,80 @@
       </div>
       <h1 class="logotype">Standix</h1>
     </div>
-    <div class="subhead">Choisissez votre espace</div>
-    <!-- Une ligne sous chaque bouton dit à qui l'espace s'adresse. Sans elle,
-         deux boutons identiques ne donnaient aucun moyen de choisir.
+    <!-- `logotype` sur le mot : même police, même graisse et même approche que
+         le « Standix » posé à côté du logo, juste au-dessus. -->
+    <h2 class="choix-bienvenue">Bienvenue sur <span class="logotype">Standix</span></h2>
+    <div class="subhead">Choisissez votre espace pour continuer</div>
 
-         CE QU'ELLE NE DIT PAS, VOLONTAIREMENT : que la gestion voit qui a lu
-         quoi. C'est vrai, c'est même l'intérêt du produit — mais l'annoncer
-         ICI, sur l'écran que l'employé regarde avant d'entrer, revient à lui
-         dire qu'il sera surveillé. On parle donc de ce que chaque espace
-         PERMET DE FAIRE, pas de ce qu'il permet de voir. -->
-    <!-- ═══ LA MAQUETTE D ═══
+    <!-- ═══ DEUX CARTES CÔTE À CÔTE ═══
 
-         L'icône n'est PAS dans une pastille à gauche : elle est en filigrane,
-         grande et pâle, débordant du bord droit. Le texte reste seul maître de
-         la ligne, et le bouton garde du caractère sans rien perdre en place.
+         Les deux boutons pleine largeur empilés sont devenus deux cartes
+         verticales. Le choix se lit d'un coup d'œil au lieu de se lire de haut
+         en bas, et la carte recommandée se distingue par son liseré plutôt que
+         par sa position.
 
-         Pas de chevron non plus : sur un bouton entièrement arrondi, il
-         viendrait buter contre la courbe. -->
-    <button class="btn block choix-btn" onclick="chooseSpace('gestion')">
-      <span class="cb-fond" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M3 20V9.2L12 3l9 6.2V20"></path>
-          <path d="M9.2 20v-6.4h5.6V20"></path>
-        </svg>
-      </span>
-      <span class="cb-t">Espace Gestion</span>
-      <span class="cb-s">Créer les procédures</span>
-    </button>
-    <button class="btn ghost block choix-btn" onclick="chooseSpace('equipe')">
-      <span class="cb-fond" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M4 19.2A2.3 2.3 0 0 1 6.3 17H20"></path>
-          <path d="M6.3 2.5H20v19H6.3A2.3 2.3 0 0 1 4 19.2V4.8a2.3 2.3 0 0 1 2.3-2.3z"></path>
-        </svg>
-      </span>
-      <span class="cb-t">Espace Équipe</span>
-      <span class="cb-s">Consulter mes procédures</span>
-    </button>
+         CE QU'ON NE DIT TOUJOURS PAS, VOLONTAIREMENT : que la gestion voit qui
+         a lu quoi. C'est vrai, c'est même l'intérêt du produit — mais
+         l'annoncer ICI, sur l'écran que l'employé regarde avant d'entrer,
+         revient à lui dire qu'il sera surveillé. On parle de ce que chaque
+         espace PERMET DE FAIRE, pas de ce qu'il permet de voir.
+
+         Les cartes sont des `button` et non des `div` : le clavier les
+         atteint, le lecteur d'écran les annonce comme actionnables, et la
+         touche Entrée les déclenche. Un `div` avec un `onclick` ne fait rien
+         de tout cela. -->
+    <div class="choix-duo">
+
+      <button class="choix-carte choix-carte--ambre" onclick="chooseSpace('gestion')">
+        <span class="hero-lueur" aria-hidden="true"></span>
+        <span class="cc-reco">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9z"></path>
+          </svg>Recommandé
+        </span>
+        <span class="cc-rond" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 20V9.2L12 3l9 6.2V20"></path>
+            <path d="M9.2 20v-6.4h5.6V20"></path>
+          </svg>
+        </span>
+        <span class="cc-txt">
+          <span class="cc-t">Espace Gestion</span>
+          <span class="cc-s">Créer, organiser et gérer toutes vos procédures</span>
+        </span>
+        <span class="cc-fleche" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h13"></path><path d="M12.5 6.5L19 12l-6.5 5.5"></path>
+          </svg>
+        </span>
+      </button>
+
+      <button class="choix-carte choix-carte--blanc" onclick="chooseSpace('equipe')">
+        <span class="hero-lueur" aria-hidden="true"></span>
+        <span class="cc-rond" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16.5 20v-1.8a3.4 3.4 0 0 0-3.4-3.4H6.9a3.4 3.4 0 0 0-3.4 3.4V20"></path>
+            <circle cx="10" cy="7.4" r="3.4"></circle>
+            <path d="M20.5 20v-1.8a3.4 3.4 0 0 0-2.6-3.3"></path>
+            <path d="M15.4 4.2a3.4 3.4 0 0 1 0 6.5"></path>
+          </svg>
+        </span>
+        <span class="cc-txt">
+          <span class="cc-t">Espace Équipe</span>
+          <span class="cc-s">Consulter et suivre les procédures de l'équipe</span>
+        </span>
+        <span class="cc-fleche" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h13"></path><path d="M12.5 6.5L19 12l-6.5 5.5"></path>
+          </svg>
+        </span>
+      </button>
+
+    </div>
   </div>
 </div>
 
@@ -722,7 +761,76 @@
           <div class="mode-choice-arrow">›</div>
         </div>
       </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       COLLER PLUSIEURS VIDÉOS EN UNE SEULE
+
+       Séparé des trois cartes du dessus, et volontairement : ce n'est pas une
+       quatrième façon de créer une procédure, c'est un OUTIL. On l'emploie
+       avant de créer, quand le geste a été filmé en plusieurs fois — puis on
+       revient à « L'IA découpe la vidéo » avec un seul fichier.
+
+       Le trait au-dessus dit cette différence mieux qu'un titre.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="outil-sep"></div>
+  <div class="card outil-card" onclick="ouvrirCollage()" id="mode-card-coller">
+    <div class="mode-choice-row">
+      <div class="mode-choice-icon">
+        <svg viewBox="0 0 44 40" fill="none">
+          <rect x="4" y="9" width="15" height="11" rx="2.6" fill="rgba(255,255,255,0.05)"
+                stroke="rgba(255,255,255,0.42)" stroke-width="1.9"/>
+          <rect x="4" y="23" width="15" height="11" rx="2.6" fill="rgba(255,255,255,0.05)"
+                stroke="rgba(255,255,255,0.42)" stroke-width="1.9"/>
+          <path d="M22 21.5h6.5" stroke="rgba(255,255,255,0.42)" stroke-width="1.9" stroke-linecap="round"/>
+          <path d="M26.5 18.5 30 21.5l-3.5 3" stroke="rgba(255,255,255,0.42)"
+                stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="31" y="14" width="10" height="15" rx="2.6" fill="rgba(255,255,255,0.05)"
+                stroke="url(#iaFini)" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="mode-choice-text">
+        <div class="mode-choice-title">Coller plusieurs vidéos</div>
+        <div class="mode-choice-desc">Un geste filmé en plusieurs fois · une seule vidéo à la fin</div>
+      </div>
+      <div class="mode-choice-arrow">›</div>
     </div>
+  </div>
+    </div>
+
+  <!-- ═══ L'ÉCRAN DE COLLAGE ═══ -->
+  <div class="screen" id="p-coller">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead">Coller plusieurs vidéos</h1>
+    </div>
+    <div class="subhead">Elles se suivront dans l’ordre de la liste</div>
+
+    <input type="file" id="coller-input" accept="video/*" multiple style="display:none;">
+    <button class="btn ghost block" id="coller-ajouter">Choisir des vidéos</button>
+
+    <div id="coller-liste" style="margin-top:14px;"></div>
+
+    <!-- Le total. Vide tant qu'aucune vidéo n'est choisie : un compteur à zéro
+         n'apprend rien et occupe la place de ce qui compte. -->
+    <div class="card" id="coller-total" style="display:none;"></div>
+
+    <div id="coller-avert" class="note" style="margin-top:10px;"></div>
+
+    <button class="btn block" id="coller-lancer" style="margin-top:16px;" disabled>Coller les vidéos</button>
+
+    <!-- Le résultat. Une vidéo qu'on peut regarder AVANT de la garder : c'est
+         le seul moyen de vérifier que l'ordre était le bon. -->
+    <div id="coller-resultat" style="display:none; margin-top:20px;">
+      <div class="section-title">Résultat</div>
+      <div class="video-frame"><video id="coller-apercu" controls playsinline></video></div>
+      <div class="note" id="coller-resume" style="margin-top:8px;"></div>
+      <button class="btn block" id="coller-garder" style="margin-top:14px;">Enregistrer la vidéo</button>
+      <button class="btn ghost block" id="coller-utiliser" style="margin-top:10px;">Créer une procédure avec</button>
+    </div>
+  </div>
 
   <div class="screen" id="p-create-manual">
     <div class="detail-header">
@@ -1393,7 +1501,7 @@
       <button class="back-btn" onclick="showGestionScreen('p-home')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">Activités</h1>
+      <h1 class="pagehead">Mouvements de l’équipe</h1>
     </div>
     <div id="activites-tout"></div>
   </div>

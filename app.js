@@ -2380,14 +2380,24 @@ async function peindreResumeEntreprise() {
      autres » qui n'ouvre rien est pire qu'une absence de bouton. */
   const dedans = autres.map(ligne).join('') + ligneSansPoste
 
+  /* ═══ LES DIMENSIONS SONT DANS LE BALISAGE, PAS SEULEMENT DANS LE STYLE ═══
+
+     Un `<svg>` sans attributs `width`/`height` et sans règle CSS prend sa
+     taille par défaut : 300 × 150 pixels. Le chevron devenait alors un V géant
+     posé sous le bouton, et le tiroir paraissait cassé.
+
+     Ce n'était pas une faute de style — les règles existent — mais un décalage
+     de déploiement : `app.js` était en ligne, `style.css` pas encore. Le CSS
+     reste la référence pour la taille finale ; les attributs ne sont là que
+     pour qu'une page à moitié à jour reste regardable. */
   const tiroir = dedans ? `
     <div class="re-tiroir${postesOuverts ? ' ouvert' : ''}" id="re-tiroir">
       <div class="re-tiroir-in">${dedans}</div>
     </div>
     <button class="re-plus" onclick="basculerPostes()" aria-expanded="${postesOuverts}">
       <span>${postesOuverts ? 'Réduire' : libelleTiroir}</span>
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-           stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
     </button>` : ''
 
   postes.innerHTML = '<div class="re-t">Postes</div>' +
@@ -13616,50 +13626,85 @@ async function enregistrerCoches() {
 
 let jsPDFModule = null
 
-/* ═══ LE LOGO, EN NOIR, POUR LE PAPIER ═══
+/* ═══ LE LOGO, TEL QUEL ═══
 
-   Le PDF ne portait aucune marque — seulement le mot « Standix » en gris clair
-   au bas de la page, qu'on ne voit pas.
+   Le même ambre que dans l'app. Une procédure imprimée doit se reconnaître au
+   premier coup d'œil comme venant de Standix, et une marque qui change de
+   couleur selon le support n'est plus tout à fait la même marque.
 
-   POURQUOI NOIR ET NON AMBRE. Une procédure imprimée sort d'une imprimante de
-   bureau, souvent en noir et blanc. Un dégradé orange y devient une tache grise
-   baveuse. Le noir plein reste net sur toutes les imprimantes, et sur une page
-   blanche il se voit mieux que n'importe quelle couleur.
+   Le PDF ne portait auparavant aucune image — seulement le mot « Standix » en
+   gris clair au bas de la page, qu'on ne voyait pas.
+
+   ⚠ SUR UNE IMPRIMANTE NOIR ET BLANC, le dégradé ambre sortira en gris. C'est
+   le prix de la couleur, et il est modeste : la marque reste lisible, elle
+   perd seulement son éclat. Si un jour une impression te déçoit, c'est ici
+   qu'on repassera au noir plein — trois lignes.
 
    ON NE RECOPIE PAS LE FICHIER : le logo est déjà dans la page, en base64,
-   posé par l'écran d'accueil. On le peint sur une toile, on remplace chaque
-   pixel visible par du noir en gardant sa transparence, et on ressort une
-   image. Rien à télécharger, rien à maintenir en double — le jour où tu
-   changes de logo, celui du PDF suit. */
-let logoNoirCache = null
+   posé par l'écran d'accueil. On le repeint sur une toile pour en obtenir une
+   adresse que jsPDF accepte. Rien à télécharger, rien à maintenir en double —
+   le jour où tu changes de logo, celui du PDF suit. */
+/* ═══ POPPINS, LA POLICE DE LA MARQUE ═══
 
-function logoNoirPourPdf() {
-  if (logoNoirCache !== null) return logoNoirCache
+   jsPDF ne connaît que trois familles : Helvetica, Times, Courier. Aucune
+   n'est Poppins, et écrire « Standix » en Helvetica donnait un mot qui
+   ressemble à la marque sans en être une.
+
+   On apporte donc la police au document. 153 Ko de TTF, chargés UNE FOIS et
+   seulement à l'export : personne ne les paie tant qu'il ne demande pas de PDF.
+
+   ─── LE REPLI EST IMPORTANT ───
+
+   Un réseau coupé, un CDN qui bronche : sans repli, l'export entier échouerait
+   pour une question de police. On retombe alors sur Helvetica en gras — le mot
+   n'est plus tout à fait la marque, mais le document existe. */
+let poppinsPret = null
+
+async function chargerPoppins(doc) {
+  if (poppinsPret === false) return false
+  try {
+    if (!poppinsPret) {
+      const r = await fetch('https://cdn.jsdelivr.net/npm/@expo-google-fonts/poppins@0.2.3/500Medium/Poppins_500Medium.ttf')
+      if (!r.ok) throw new Error('HTTP ' + r.status)
+      const buf = new Uint8Array(await r.arrayBuffer())
+      /* En morceaux : `String.fromCharCode` sur 153 000 octets d'un coup
+         dépasse la taille d'appel autorisée et lève un RangeError. */
+      let bin = ''
+      for (let i = 0; i < buf.length; i += 8192) {
+        bin += String.fromCharCode.apply(null, buf.subarray(i, i + 8192))
+      }
+      poppinsPret = btoa(bin)
+    }
+    doc.addFileToVFS('Poppins-Medium.ttf', poppinsPret)
+    doc.addFont('Poppins-Medium.ttf', 'Poppins', 'normal')
+    return true
+  } catch (e) {
+    console.warn('[pdf] Poppins indisponible, repli sur Helvetica :', e?.message || e)
+    poppinsPret = false
+    return false
+  }
+}
+
+let logoCache = null
+
+function logoPourPdf() {
+  if (logoCache !== null) return logoCache
   try {
     const src = document.getElementById('logo-src')
-    if (!src || !src.naturalWidth) return (logoNoirCache = false)
+    if (!src || !src.naturalWidth) return (logoCache = false)
 
     const t = document.createElement('canvas')
     t.width = src.naturalWidth; t.height = src.naturalHeight
-    const c = t.getContext('2d')
-    c.drawImage(src, 0, 0)
-
-    const img = c.getImageData(0, 0, t.width, t.height)
-    const d = img.data
-    for (let i = 0; i < d.length; i += 4) {
-      /* On ne touche QUE la couleur, jamais l'opacité : garder le canal alpha
-         préserve les bords adoucis du dessin. Les remettre à plat donnerait un
-         contour en escalier, très visible à l'impression. */
-      if (d[i + 3] > 0) { d[i] = 0; d[i + 1] = 0; d[i + 2] = 0 }
-    }
-    c.putImageData(img, 0, 0)
-    return (logoNoirCache = { data: t.toDataURL('image/png'), l: t.width, h: t.height })
+    t.getContext('2d').drawImage(src, 0, 0)
+    /* PNG et non JPEG : le logo a un fond transparent, et le JPEG ne sait pas
+       le garder — il le remplirait de noir. */
+    return (logoCache = { data: t.toDataURL('image/png'), l: t.width, h: t.height })
   } catch (e) {
     /* Une toile « salie » par une image d'une autre origine refuse d'être lue.
        Le logo est en base64 dans la page, donc ce cas ne devrait pas se
        produire — mais un PDF sans logo vaut mieux qu'un export qui échoue. */
     console.warn('[pdf] logo indisponible :', e?.message || e)
-    return (logoNoirCache = false)
+    return (logoCache = false)
   }
 }
 
@@ -13698,15 +13743,33 @@ async function exporterProcedurePdf(proc, etapes) {
   /* La marque en haut à gauche : 11 mm de haut, soit deux fois la hauteur du
      titre. C'est la première chose qu'on voit sur la feuille, et sur un
      document qui circule — un classeur, un contrôle — c'est ce qui dit d'où il
-     vient. */
-  const logo = logoNoirPourPdf()
+     vient.
+
+     Le MOT reste noir à côté du dessin coloré : c'est du texte sur une page
+     blanche, et il doit se lire comme le reste. Dans l'app il est blanc pour
+     la même raison — s'accorder au fond, pas au logo. */
+  const logo = logoPourPdf()
+  const poppins = await chargerPoppins(doc)
   if (logo) {
-    const hL = 11, lL = hL * (logo.l / logo.h)
+    /* ═══ L'ÉQUILIBRE ENTRE LE SIGNE ET LE MOT ═══
+
+       Le logo faisait 11 mm pour un mot de 15 points : le dessin écrasait la
+       marque au lieu de l'accompagner. Dans l'app, les deux font à peu près la
+       même hauteur d'œil.
+
+       On descend le signe à 8,5 mm et on monte le mot à 19 points. Poppins
+       ayant une hauteur d'x généreuse, le mot occupe alors la même bande que le
+       dessin — c'est ce rapport-là qu'on lit, pas les tailles absolues. */
+    const hL = 8.5, lL = hL * (logo.l / logo.h)
     doc.addImage(logo.data, 'PNG', MARGE, y, lL, hL)
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(15)
+    if (poppins) doc.setFont('Poppins', 'normal')
+    else doc.setFont('helvetica', 'bold')
+    doc.setFontSize(19)
     doc.setTextColor(0, 0, 0)
-    doc.text('Standix', MARGE + lL + 3.5, y + 8)
+    /* `baseline: 'middle'` cale le mot sur le MILIEU du signe. Sans cela il
+       s'aligne sur sa ligne de pied, et les deux paraissent décalés d'un
+       millimètre — assez pour que ça se voie sans qu'on sache pourquoi. */
+    doc.text('Standix', MARGE + lL + 3.2, y + hL / 2, { baseline: 'middle' })
     y += hL + 9
   }
 

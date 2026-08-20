@@ -5809,7 +5809,7 @@ function renderCategoryGrid() {
       </div>
       <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
       <div class="cat-recent">
-        ${recentTitles.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
+        ${recentTitles.map(p => `<div class="cat-recent-item" data-proc="${p.id}"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
       </div>
       <div class="cat-pied">
         <svg viewBox="0 0 24 24" fill="none">
@@ -5824,11 +5824,38 @@ function renderCategoryGrid() {
     /* Sur la carte d'une dossier, un titre en panne mène directement à la
        reprise : sinon il faudrait ouvrir la dossier pour s'en apercevoir. */
     cell.onclick = (e) => {
+      /* ═══ CLIQUER SUR UN NOM OUVRE CE NOM ═══
+
+         La ligne d'une procédure listée dans la carte menait au DOSSIER, pas à
+         la procédure. On touchait « Arrosage automatique V2 » et on atterrissait
+         dans la liste du domaine — avec la procédure dedans, certes, mais il
+         fallait la toucher une seconde fois.
+
+         Deux conséquences. La navigation demandait deux gestes là où un suffit.
+         Et surtout, la coche « analyse terminée » ne s'éteignait jamais : elle
+         ne s'efface qu'à l'ouverture réelle de la procédure, et ce chemin-là
+         n'en ouvrait aucune. La coche revenait donc indéfiniment, ce qui se
+         lisait comme un défaut d'affichage alors que c'était un défaut de
+         navigation.
+
+         Le partage est net : la LIGNE ouvre sa procédure, le RESTE de la carte
+         ouvre le dossier. La ligne était déjà traitée à part pour les analyses
+         en échec — on ne fait qu'étendre au cas normal ce qui existait pour le
+         cas d'erreur. */
       const ligne = e.target.closest('.cat-recent-item')
       if (ligne) {
-        const titre = ligne.querySelector('.txt')?.textContent
-        const p = procsInCat.find(x => x.titre === titre)
-        if (p && (p.statut === 'echec' || analyseBloquee(p))) { proposerReprise(p); return }
+        /* PAR L'IDENTIFIANT, PAS PAR LE TITRE. La ligne était retrouvée en
+           comparant le texte affiché : deux procédures de même nom dans un
+           même dossier auraient ouvert la mauvaise. Tant qu'on n'ouvrait que
+           le dossier, la confusion restait sans conséquence. */
+        const p = procsInCat.find(x => x.id === ligne.dataset.proc)
+        if (p) {
+          if (p.statut === 'echec' || analyseBloquee(p)) { proposerReprise(p); return }
+          /* On retiendra le dossier : le bouton Retour de la fiche y ramène,
+             et non à la grille — c'est de là qu'on vient réellement. */
+          openAnalyse(p.id)
+          return
+        }
       }
       openCategoryProcedures(nom)
     }

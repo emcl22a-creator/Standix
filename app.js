@@ -2331,16 +2331,77 @@ async function peindreResumeEntreprise() {
     compte.set(p, (compte.get(p) || 0) + 1)
   })
 
-  /* La ligne « sans poste » est en dernier et grisée : c'est un reste, pas un
-     poste. Elle ne s'affiche que s'il y a quelqu'un dedans. */
+  /* ═══ « SANS POSTE » DESCEND DANS LE TIROIR ═══
+
+     Elle était la troisième ligne visible, entre les deux postes récents et le
+     bouton. Ce n'est pas sa place : ce n'est pas un poste, c'est ce qui reste
+     quand on les a tous comptés — donc une ligne de bas de relevé, pas une
+     ligne de tête.
+
+     Elle reste grisée, et toujours EN DERNIER dans le tiroir, après les autres
+     postes. Comme un total qu'on lit à la fin. */
   const ligneSansPoste = sansPoste > 0
     ? `<div class="re-p vide"><span>Sans poste</span><b>${sansPoste}</b></div>`
     : ''
 
+  /* ═══ DEUX POSTES VISIBLES, LE RESTE DANS UN TIROIR ═══
+
+     Une entreprise de nettoyage peut avoir douze postes. Douze lignes sous la
+     salutation, et la carte devient un tableau : on ne la lit plus, on la
+     traverse. Deux suffisent à dire de quoi il s'agit ; le tiroir garde les
+     autres à portée sans les imposer.
+
+     LES DEUX DERNIERS CRÉÉS, PAS LES DEUX PREMIERS. `ordre` vaut
+     `postesEntreprise.length` au moment de la création : il croît donc avec le
+     temps, et la fin de la liste est ce qui vient d'être ajouté. C'est aussi ce
+     qui intéresse — un poste qu'on vient de créer est un poste qu'on est en
+     train de remplir.
+
+     Aucune date n'est nécessaire : `ordre` la porte déjà. */
+  const lignes = [...compte.entries()]
+  const recents = lignes.slice(-2).reverse()
+  const autres = lignes.slice(0, -2).reverse()
+
+  const ligne = ([nom, n]) =>
+    `<div class="re-p"><span>${escapeHtml(nom)}</span><b>${n}</b></div>`
+
+  /* LE BOUTON COMPTE CE QU'IL OUVRE VRAIMENT. « Voir les 4 autres » alors que
+     le tiroir en contient cinq — les quatre postes plus la ligne « sans
+     poste » — est une petite trahison, mais on la remarque tout de suite.
+
+     Et s'il n'y a QUE « sans poste » à montrer, on le dit en toutes lettres :
+     « Voir 1 autre » n'apprend rien sur ce qu'on va trouver. */
+  const nDedans = autres.length + (sansPoste > 0 ? 1 : 0)
+  const libelleTiroir = autres.length === 0
+    ? 'Voir les personnes sans poste'
+    : `Voir ${nDedans} ligne${nDedans > 1 ? 's' : ''} de plus`
+
+  /* Le tiroir n'existe QUE s'il a quelque chose dedans. Un bouton « voir les
+     autres » qui n'ouvre rien est pire qu'une absence de bouton. */
+  const dedans = autres.map(ligne).join('') + ligneSansPoste
+
+  const tiroir = dedans ? `
+    <div class="re-tiroir${postesOuverts ? ' ouvert' : ''}" id="re-tiroir">
+      <div class="re-tiroir-in">${dedans}</div>
+    </div>
+    <button class="re-plus" onclick="basculerPostes()" aria-expanded="${postesOuverts}">
+      <span>${postesOuverts ? 'Réduire' : libelleTiroir}</span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>` : ''
+
   postes.innerHTML = '<div class="re-t">Postes</div>' +
-    [...compte.entries()].map(([nom, n]) =>
-      `<div class="re-p"><span>${escapeHtml(nom)}</span><b>${n}</b></div>`
-    ).join('') + ligneSansPoste
+    recents.map(ligne).join('') + tiroir
+}
+
+/* L'état du tiroir vit HORS de la fonction qui dessine : la carte est repeinte
+   à chaque retour sur l'accueil, et un tiroir qui se referme tout seul à chaque
+   passage donnerait l'impression de n'avoir jamais été ouvert. */
+let postesOuverts = false
+
+window.basculerPostes = function () {
+  postesOuverts = !postesOuverts
+  peindreResumeEntreprise().catch(() => {})
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -13521,6 +13582,253 @@ async function enregistrerCoches() {
   }
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PROCÉDURE EN PDF
+
+   Une procédure vit sur un téléphone. Mais il y a des murs de plonge sans
+   réseau, des classeurs qu'un inspecteur demande, des employés qui préfèrent
+   le papier. Le PDF est le format qui passe partout et ne demande rien.
+
+   ─── LE TEXTE EST DU TEXTE, PAS UNE IMAGE ───
+
+   Deux façons de fabriquer un PDF dans un navigateur. On peut photographier
+   l'écran et coller l'image dans une page — c'est ce que fait `html2canvas`,
+   et c'est ce que je n'ai PAS fait. Une capture d'écran ne se cherche pas, ne
+   se copie pas, s'imprime mal, et pèse dix fois plus lourd.
+
+   On écrit donc le texte directement dans le document. Il reste sélectionnable,
+   cherchable, et une procédure de dix étapes tient dans une trentaine de
+   kilooctets.
+
+   ─── LA VIDÉO N'Y EST PAS, ET NE PEUT PAS Y ÊTRE ───
+
+   Un PDF ne lit pas de vidéo. Les bornes de temps de chaque étape sont
+   conservées — « 0:12 – 0:34 » — pour qui voudrait retrouver le passage dans
+   l'app. C'est tout ce qu'on peut faire, et le dire vaut mieux que de laisser
+   quelqu'un chercher un bouton de lecture sur une feuille.
+
+   ─── LA BIBLIOTHÈQUE EST CHARGÉE À LA DEMANDE ───
+
+   Comme le lecteur de QR et le lecteur de PDF déjà présents : rien n'est
+   téléchargé tant que personne ne demande un export.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let jsPDFModule = null
+
+/* ═══ LE LOGO, EN NOIR, POUR LE PAPIER ═══
+
+   Le PDF ne portait aucune marque — seulement le mot « Standix » en gris clair
+   au bas de la page, qu'on ne voit pas.
+
+   POURQUOI NOIR ET NON AMBRE. Une procédure imprimée sort d'une imprimante de
+   bureau, souvent en noir et blanc. Un dégradé orange y devient une tache grise
+   baveuse. Le noir plein reste net sur toutes les imprimantes, et sur une page
+   blanche il se voit mieux que n'importe quelle couleur.
+
+   ON NE RECOPIE PAS LE FICHIER : le logo est déjà dans la page, en base64,
+   posé par l'écran d'accueil. On le peint sur une toile, on remplace chaque
+   pixel visible par du noir en gardant sa transparence, et on ressort une
+   image. Rien à télécharger, rien à maintenir en double — le jour où tu
+   changes de logo, celui du PDF suit. */
+let logoNoirCache = null
+
+function logoNoirPourPdf() {
+  if (logoNoirCache !== null) return logoNoirCache
+  try {
+    const src = document.getElementById('logo-src')
+    if (!src || !src.naturalWidth) return (logoNoirCache = false)
+
+    const t = document.createElement('canvas')
+    t.width = src.naturalWidth; t.height = src.naturalHeight
+    const c = t.getContext('2d')
+    c.drawImage(src, 0, 0)
+
+    const img = c.getImageData(0, 0, t.width, t.height)
+    const d = img.data
+    for (let i = 0; i < d.length; i += 4) {
+      /* On ne touche QUE la couleur, jamais l'opacité : garder le canal alpha
+         préserve les bords adoucis du dessin. Les remettre à plat donnerait un
+         contour en escalier, très visible à l'impression. */
+      if (d[i + 3] > 0) { d[i] = 0; d[i + 1] = 0; d[i + 2] = 0 }
+    }
+    c.putImageData(img, 0, 0)
+    return (logoNoirCache = { data: t.toDataURL('image/png'), l: t.width, h: t.height })
+  } catch (e) {
+    /* Une toile « salie » par une image d'une autre origine refuse d'être lue.
+       Le logo est en base64 dans la page, donc ce cas ne devrait pas se
+       produire — mais un PDF sans logo vaut mieux qu'un export qui échoue. */
+    console.warn('[pdf] logo indisponible :', e?.message || e)
+    return (logoNoirCache = false)
+  }
+}
+
+async function chargerJsPDF() {
+  if (jsPDFModule) return jsPDFModule
+  const m = await import('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/+esm')
+  jsPDFModule = m.jsPDF || m.default?.jsPDF || m.default
+  return jsPDFModule
+}
+
+/* « 0:34 », « 1:07 ». Les bornes des étapes, dans le format de la pastille. */
+function bornePdf(s) {
+  if (s == null || !isFinite(s)) return ''
+  const t = Math.round(s)
+  return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`
+}
+
+async function exporterProcedurePdf(proc, etapes) {
+  if (!proc) return
+  const jsPDF = await chargerJsPDF()
+
+  /* A4 en millimètres : c'est l'unité des imprimeurs, et elle évite de
+     convertir des points à chaque ligne. */
+  const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+  const L = 210, MARGE = 18, LARGEUR = L - MARGE * 2
+  let y = MARGE
+
+  /* On saute une page quand il ne reste plus de quoi écrire trois lignes.
+     Vérifié AVANT chaque bloc plutôt qu'après : une étape coupée entre son
+     numéro et son texte est illisible. */
+  const place = (h) => {
+    if (y + h > 297 - MARGE) { doc.addPage(); y = MARGE }
+  }
+
+  // ─── L'EN-TÊTE ───────────────────────────────────────────────────────────
+  /* La marque en haut à gauche : 11 mm de haut, soit deux fois la hauteur du
+     titre. C'est la première chose qu'on voit sur la feuille, et sur un
+     document qui circule — un classeur, un contrôle — c'est ce qui dit d'où il
+     vient. */
+  const logo = logoNoirPourPdf()
+  if (logo) {
+    const hL = 11, lL = hL * (logo.l / logo.h)
+    doc.addImage(logo.data, 'PNG', MARGE, y, lL, hL)
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(15)
+    doc.setTextColor(0, 0, 0)
+    doc.text('Standix', MARGE + lL + 3.5, y + 8)
+    y += hL + 9
+  }
+
+  doc.setFont('helvetica', 'bold')
+  doc.setFontSize(20)
+  doc.setTextColor(20, 20, 22)
+  const titre = doc.splitTextToSize(proc.titre || 'Procédure', LARGEUR)
+  doc.text(titre, MARGE, y + 6)
+  y += 6 + titre.length * 8
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(10)
+  doc.setTextColor(120, 120, 126)
+  const sous = [proc.categorie || 'Sans dossier',
+                new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })]
+  doc.text(sous.join('  ·  '), MARGE, y)
+  y += 5
+
+  /* Un trait ambre : la seule couleur de la page, et la même que dans l'app. */
+  doc.setDrawColor(255, 122, 24)
+  doc.setLineWidth(0.8)
+  doc.line(MARGE, y, MARGE + 26, y)
+  y += 10
+
+  // ─── LES ÉTAPES ──────────────────────────────────────────────────────────
+  const liste = (etapes || []).slice().sort((a, b) => (a.ordre ?? 0) - (b.ordre ?? 0))
+
+  if (!liste.length) {
+    doc.setFontSize(11)
+    doc.setTextColor(120, 120, 126)
+    doc.text('Cette procédure n\u2019a pas encore d\u2019étapes.', MARGE, y)
+  }
+
+  /* ═══ LE ROND DIT DÉJÀ LE NUMÉRO ═══
+
+     Si le texte commence par « Étape 4 : », « 4. » ou « 4) », on l'a écrit deux
+     fois sur la même ligne — une fois dans le rond, une fois à côté.
+
+     Tes étapes actuelles n'ont pas ce préfixe : l'IA écrit « Entrer la
+     transaction VA05 ». Mais elle pourrait le prendre un jour, et une
+     procédure importée d'un document en portera souvent un. Le retirer ici
+     coûte une expression et évite d'y revenir.
+
+     ON NE RETIRE QUE LE PRÉFIXE, jamais un numéro qui appartient à la phrase :
+     « 200 g de farine » ou « transaction VA05 » ne commencent pas par un
+     numéro d'ordre suivi d'un séparateur. */
+  const sansPrefixe = (t) => (t || '')
+    .replace(/^\s*(étape|etape|step)\s*n?[°o]?\s*\d+\s*[:.)\-–—]*\s*/i, '')
+    .replace(/^\s*\d{1,2}\s*[.)\-–—]\s+/, '')
+    .trim()
+
+  liste.forEach((e, i) => {
+    doc.setFontSize(11)
+    const texte = doc.splitTextToSize(sansPrefixe(e.texte), LARGEUR - 12)
+    const att = e.attention ? doc.splitTextToSize(e.attention, LARGEUR - 16) : null
+    place(texte.length * 5.6 + (att ? att.length * 5 + 6 : 0) + 12)
+
+    /* Le numéro dans son rond, comme dans l'app. Le même repère d'un support à
+       l'autre : on retrouve l'étape 4 au même endroit sur les deux. */
+    doc.setFillColor(242, 242, 244)
+    doc.circle(MARGE + 3.4, y + 1.4, 3.4, 'F')
+    doc.setFont('helvetica', 'bold')
+    doc.setFontSize(8.5)
+    doc.setTextColor(60, 60, 66)
+    doc.text(String(i + 1), MARGE + 3.4, y + 2.6, { align: 'center' })
+
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(11)
+    doc.setTextColor(20, 20, 22)
+    doc.text(texte, MARGE + 12, y + 3)
+    y += texte.length * 5.6 + 2
+
+    /* La borne de temps, discrète : elle ne sert qu'à retrouver le passage
+       dans l'app, et n'a aucun sens pour qui lit sur papier. */
+    const d = bornePdf(e.timestamp_video), f = bornePdf(e.fin_video)
+    if (d) {
+      doc.setFontSize(8.5)
+      doc.setTextColor(160, 160, 166)
+      doc.text(f ? `${d} – ${f}` : d, MARGE + 12, y + 2)
+      y += 4
+    }
+
+    if (att) {
+      /* Le point de vigilance garde son ambre et son filet, comme dans l'app.
+         C'est la seule chose de la page qu'on doit voir sans lire. */
+      doc.setDrawColor(255, 122, 24)
+      doc.setLineWidth(0.6)
+      doc.line(MARGE + 12, y + 1, MARGE + 12, y + 1 + att.length * 5)
+      doc.setFontSize(9.5)
+      doc.setTextColor(150, 80, 10)
+      doc.text(att, MARGE + 15, y + 4.4)
+      y += att.length * 5 + 4
+    }
+
+    y += 6
+  })
+
+  // ─── LE PIED DE PAGE ─────────────────────────────────────────────────────
+  const pages = doc.internal.getNumberOfPages()
+  for (let p = 1; p <= pages; p++) {
+    doc.setPage(p)
+    doc.setFont('helvetica', 'normal')
+    doc.setFontSize(8)
+    doc.setTextColor(170, 170, 176)
+    /* Plus de « Standix » ici : la marque est en haut, en noir et lisible.
+       La répéter en gris clair en bas ne servait qu'à combler la ligne. */
+    doc.text(`${p} / ${pages}`, L - MARGE, 297 - 10, { align: 'right' })
+  }
+
+  /* Un nom de fichier tiré du titre : « Fermeture de caisse.pdf » se retrouve
+     dans un dossier, « procedure.pdf » non. On retire ce qu'un système de
+     fichiers refuse. */
+  const nom = (proc.titre || 'procedure')
+    .replace(/[\\/:*?"<>|]/g, '-').replace(/\s+/g, ' ').trim().slice(0, 60)
+  doc.save(`${nom}.pdf`)
+}
+window.exporterProcedurePdf = exporterProcedurePdf
+
+/* La procédure ouverte côté Équipe, pour l'export. La Gestion a déjà
+   `currentAnalyseData` ; l'Équipe n'avait rien d'équivalent. */
+let equipeProcCourante = null
+
 async function openEquipeDetail(procId) {
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
@@ -13580,6 +13888,7 @@ async function openEquipeDetail(procId) {
 
   document.getElementById('detail-titre').textContent = proc.titre
   document.getElementById('detail-subhead').textContent = proc.categorie || 'Sans dossier'
+  equipeProcCourante = { proc, etapes: etapes || [] }
 
   const videoFrame = document.getElementById('detail-video-frame')
   const detailVideoEl = document.getElementById('detail-video')
@@ -17465,3 +17774,31 @@ try {
   afficherEcranChoix()
   document.body.classList.remove('booting')
 }
+
+
+/* ═══ LES DEUX BOUTONS D'EXPORT ═══
+
+   Un par espace, car les deux gardent la procédure ouverte dans une variable
+   différente : la Gestion dans `currentAnalyseData`, l'Équipe dans
+   `equipeProcCourante`. Le PDF, lui, est le même — c'est la même procédure,
+   et rien ne justifierait que le papier diffère selon qui l'imprime. */
+async function exporterDepuis(source, bouton) {
+  if (!source?.proc) { toast('Ouvrez d\u2019abord une procédure'); return }
+  const avant = bouton.textContent
+  bouton.disabled = true
+  bouton.textContent = 'Préparation du PDF…'
+  try {
+    await exporterProcedurePdf(source.proc, source.etapes)
+  } catch (e) {
+    console.warn('[pdf]', e?.message || e)
+    toast('Le PDF n\u2019a pas pu être créé')
+  } finally {
+    bouton.textContent = avant
+    bouton.disabled = false
+  }
+}
+
+document.getElementById('pdf-gestion')?.addEventListener('click', (e) =>
+  exporterDepuis(currentAnalyseData, e.currentTarget))
+document.getElementById('pdf-equipe')?.addEventListener('click', (e) =>
+  exporterDepuis(equipeProcCourante, e.currentTarget))

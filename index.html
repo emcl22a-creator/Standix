@@ -15,23 +15,53 @@
 
      Elle doit donc porter la phrase, pas le nom de domaine.
 
-     ⚠ partage.png est attendu à la racine : 1200 × 630, la capture de l'app
-       sur fond noir avec le titre. Sans lui, le lien s'affiche nu.
+     ⚠ L'ADRESSE EST COMPLÈTE, ET C'EST NÉCESSAIRE. Les robots qui fabriquent
+       les aperçus n'ont pas de navigateur : ils ne savent pas résoudre
+       « partage.png » en une adresse, et beaucoup abandonnent.
+
+     ⚠ LES DIMENSIONS AUSSI. WhatsApp choisit entre vignette et grande carte
+       AVANT de télécharger l'image, d'après `og:image:width`. Sans elle, il
+       suppose une petite image et affiche un carré.
+
+     ⚠ LE FICHIER A CHANGÉ DE NOM. `partage.png` est parti dans `app/` avec le
+       reste de l'application ; celui du site est `site-partage.png`.
      ═══════════════════════════════════════════════════════════════════════════ -->
 <meta name="description" content="Filmez le geste ou votre écran. L'IA découpe la vidéo et rédige les étapes. Votre équipe les lit sur son téléphone, ou scanne un QR code sur place.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Filmez une fois. Votre équipe saura faire.">
 <meta property="og:description" content="L'IA découpe la vidéo et rédige les étapes. Un QR code sur place, et la procédure s'ouvre.">
-<meta property="og:image" content="partage.png">
+<meta property="og:image" content="https://standix.app/site-partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://standix.app/">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- Les liens vers l'app sont RELATIFS : « app/ » fonctionne aujourd'hui sur
-     emcl22a-creator.github.io/Standix/ et demain sur standix.app/, sans rien
-     changer le jour de la bascule du domaine. -->
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+     standix.app/ comme hier sur emcl22a-creator.github.io/Standix/, sans rien
+     changer. Seule l'image de partage exige une adresse complète, faute de
+     navigateur chez ceux qui la lisent. -->
+
+<!-- ═══ LES ICÔNES · POURQUOI LE PRÉFIXE `site-` ═══
+
+     Le site et l'application partagent le même dépôt. Leurs icônes portaient
+     les mêmes noms, ce qui rendait tout dépôt de fichiers ambigu : une fois
+     sorties de leur dossier, rien ne les distinguait. Celles du site sont donc
+     préfixées, celles de l'app sont dans `app/`.
+
+     ⚠ CES LIGNES POINTAIENT ENCORE VERS LES ANCIENS NOMS, partis dans `app/`.
+       Le navigateur les demandait, ne les trouvait pas, et affichait le globe
+       gris à la place du logo.
+
+     `favicon.ico` est le SEUL nom qu'un navigateur demande de lui-même, sans
+     qu'on le déclare. En le renommant on perd ce filet — les lignes ci-dessous
+     couvrent les navigateurs modernes, mais si tu veux la ceinture et les
+     bretelles, dépose une copie sous le nom `favicon.ico` à la racine. -->
+<link rel="icon" href="site-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="site-favicon-32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="site-favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="site-icone-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="site-apple-touch-icon.png">
 <meta name="theme-color" content="#08090A">
 <meta name="color-scheme" content="dark">
 <meta name="format-detection" content="telephone=no, address=no, email=no">

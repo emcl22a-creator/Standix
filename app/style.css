@@ -6790,8 +6790,22 @@ body.chargement #bar{
    changeras l'une, l'autre suivra.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══ L'ÉCRAN DE CHOIX PREND LA PLACE ═══
+
+   Il était borné à 380 px dans une enveloppe qui prend elle-même 24 px de
+   chaque côté : sur un iPhone de 390, les deux cartes se partageaient 342 px
+   et flottaient au milieu d'un écran vide.
+
+   Ce n'est pas une page de contenu — c'est un aiguillage, la première chose
+   qu'on voit, et il n'y a que deux choses à y faire. Elles doivent occuper
+   l'écran, pas s'y blottir.
+
+   `#choice-screen` porte la classe `.login-wrap`, partagée avec l'écran de
+   connexion : on ne desserre QUE celui-ci. La connexion garde ses 24 px, elle
+   contient des champs de saisie qui ont besoin de cette marge. */
+#choice-screen{ padding:18px 14px; }
 .choix-ecran{
-  width:100%; max-width:380px; text-align:center;
+  width:100%; max-width:460px; text-align:center;
 }
 
 /* Le titre d'accueil. Le mot « Standix » porte la classe `logotype` dans le
@@ -6800,7 +6814,7 @@ body.chargement #bar{
    volontaire pour qu'un changement de police de marque se propage. */
 .choix-bienvenue{
   font-size:25px; font-weight:700; letter-spacing:-0.035em;
-  line-height:1.2; margin:14px 0 7px;
+  line-height:1.2; margin:16px 0 8px;
 }
 .choix-bienvenue .logotype{
   font-size:inherit;
@@ -6810,9 +6824,22 @@ body.chargement #bar{
 }
 
 .choix-duo{
-  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:11px;
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:14px;
   align-items:stretch;
-  margin-top:14px;
+  /* ═══ L'ÉCART QUI SÉPARE LA QUESTION DE LA RÉPONSE ═══
+
+     14 px, c'était l'écart entre deux lignes d'un même paragraphe. « Choisissez
+     votre espace pour continuer » se lisait donc comme une légende des cartes,
+     collée à elles, alors que c'est la question à laquelle elles répondent.
+
+     Une question et ses réponses ne sont pas au même niveau : il faut un blanc
+     qui marque le passage de l'une aux autres. C'est le seul endroit de cet
+     écran où l'espacement porte du sens plutôt que du confort.
+
+     `clamp` parce que la valeur ne peut pas être fixe : 30 px sur un iPhone SE
+     rognent la hauteur des cartes, alors que sur un grand téléphone il en
+     faudrait davantage pour que le blanc se voie. */
+  margin-top:clamp(20px, 4.2vh, 34px);
 }
 
 /* ═══ LA CARTE ═══
@@ -6830,7 +6857,26 @@ body.chargement #bar{
   display:flex; flex-direction:column; align-items:flex-start;
   position:relative; overflow:visible;
   height:auto; text-align:left; min-width:0;
-  padding:34px 13px 15px;
+  /* ═══ PLUS DE RÉSERVE EN HAUT ═══
+
+     Les 34 px du haut n'étaient pas de l'air : ils réservaient la place de la
+     pastille « Recommandé », qui n'existe plus. Les garder aurait laissé un
+     vide inexpliqué au-dessus de l'icône.
+
+     Le rembourrage est maintenant régulier — un peu plus en bas, pour que la
+     flèche ne touche pas le bord. Une carte aux marges égales se lit comme une
+     carte ; une carte plus creuse en haut se lit comme une carte mal remplie. */
+  /* La carte grandit avec l'écran ; le rembourrage suit. Une carte plus large
+     avec les mêmes marges paraît creuse au centre et serrée sur les bords. */
+  padding:22px 18px 24px;
+  /* ═══ LA HAUTEUR SUIT LA FENÊTRE ═══
+
+     Sans plancher, la carte se règle sur son contenu : deux lignes de
+     description donnent une carte basse, perdue dans un écran de 800 px.
+
+     `min()` borne les deux extrêmes — 40 % de la hauteur utile sur un grand
+     téléphone, jamais plus de 300 px sur une tablette où ce serait démesuré. */
+  min-height:min(38vh, 290px);
   border-radius:22px;
   border:none;
   /* Le fond de `.hero`, à l'identique. */
@@ -6906,9 +6952,9 @@ body.chargement #bar{
   border-radius:50%;
   border:1px solid rgba(255,255,255,0.16);
   color:var(--label-2);
-  margin-bottom:13px;
+  margin-bottom:18px;
 }
-.cc-rond svg{ width:21px; height:21px; display:block; }
+.cc-rond svg{ width:23px; height:23px; display:block; }
 .choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
 .choix-carte--blanc .cc-rond{ border-color:rgba(255,255,255,0.34); color:var(--label); }
 
@@ -6920,7 +6966,7 @@ body.chargement #bar{
 
 .cc-t{
   display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.025em;
-  line-height:1.25; margin-bottom:5px;
+  line-height:1.25; margin-bottom:7px;
 }
 .cc-s{
   display:block; font-size:11.5px; font-weight:500; line-height:1.4;
@@ -6932,19 +6978,30 @@ body.chargement #bar{
    quand une description tient sur trois lignes et l'autre sur deux. */
 .cc-fleche{
   display:flex; align-items:center; justify-content:center;
-  width:34px; height:34px; flex:0 0 34px;
-  margin-top:auto; align-self:center;
+  width:38px; height:38px; flex:0 0 38px;
+  /* ═══ LA FLÈCHE REJOINT LA COLONNE ═══
+
+     Elle était centrée alors que l'icône, le titre et la description sont à
+     gauche. Un seul élément désaligné dans une carte qui en compte quatre
+     suffit à la faire paraître bancale, sans qu'on sache dire pourquoi.
+
+     Pourquoi la gauche plutôt que tout centrer : la description fait deux à
+     trois lignes, et un paragraphe centré se lit moins bien qu'un paragraphe
+     aligné — l'œil doit rechercher le début de chaque ligne. On aligne donc la
+     flèche sur le texte, pas l'inverse. */
+  margin-top:auto; align-self:flex-start;
   padding-top:0;
   border-radius:50%;
   border:1px solid rgba(255,255,255,0.16);
   color:var(--label-2);
 }
-.cc-fleche svg{ width:16px; height:16px; display:block; }
+.cc-fleche svg{ width:17px; height:17px; display:block; }
 .choix-carte--ambre .cc-fleche{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
 .choix-carte--blanc .cc-fleche{ border-color:rgba(255,255,255,0.34); color:var(--label); }
-/* La flèche a besoin d'un peu d'air au-dessus quand la description est courte.
-   Écrit après `margin-top:auto` : le raccourci `margin` effacerait l'un des deux. */
-.cc-s + .cc-fleche{ margin-top:auto; }
+/* Un plancher d'air au-dessus de la flèche. `margin-top:auto` la pousse en bas,
+   mais si la description remplit la carte, les deux se touchent. */
+.cc-fleche{ margin-top:auto; }
+.cc-s + .cc-fleche{ margin-top:18px; }
 .choix-carte .cc-fleche{ margin-bottom:0; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6973,11 +7030,21 @@ body.chargement #bar{
 @media (max-width: 384px){
   .choix-bienvenue{ font-size:22px; }
 
-  .choix-duo{ grid-template-columns:1fr; gap:10px; }
+  /* Empilées, les cartes sont plus basses et l'écran plus court : on garde la
+     séparation mais on la resserre, sinon elle mange la place des cartes. */
+  .choix-duo{ grid-template-columns:1fr; gap:10px; margin-top:clamp(16px, 3vh, 24px); }
 
   .choix-carte{
     flex-direction:row; align-items:center;
-    padding:14px 14px 14px 13px;
+    /* Empilées, les cartes sont larges et basses : le rembourrage suit une
+       autre logique qu'en colonnes, et la flèche se recentre verticalement
+       puisqu'elle est à droite du texte et non en dessous. */
+    /* ⚠ ON ANNULE LE PLANCHER DE HAUTEUR. Il vaut 38 % de la fenêtre pour les
+       cartes en colonnes, où il les empêche de paraître écrasées. Empilées,
+       elles sont larges et basses : le même plancher en faisait deux pavés de
+       300 px qui débordaient de l'écran. */
+    min-height:0;
+    padding:16px 16px 16px 15px;
     text-align:left;
   }
 
@@ -7000,7 +7067,7 @@ body.chargement #bar{
 
   .cc-fleche{
     width:32px; height:32px; flex:0 0 32px;
-    margin-top:0; margin-left:12px; align-self:center;
+    margin-top:0; margin-left:14px; align-self:center;
   }
   .cc-fleche svg{ width:15px; height:15px; }
 }
@@ -7348,7 +7415,31 @@ body:has(#e-detail.active) #equipe-app{
   font-size:13.5px; color:var(--label-2);
   padding:7px 0; border-top:0.5px solid var(--border);
 }
-.re-p:first-of-type{ border-top:none; }
+/* ═══ LE TRAIT MANQUANT SOUS LA DERNIÈRE LIGNE VISIBLE ═══
+
+   `:first-of-type` se calcule PAR PARENT. Le tiroir en est un : sa première
+   ligne était donc, elle aussi, « la première de son type », et perdait son
+   trait — exactement celui qui devait la séparer de la dernière ligne restée
+   visible au-dessus. Ouvrir le tiroir laissait un blanc à la jonction.
+
+   Le sélecteur d'enfant direct règle la question : seule la première ligne de
+   la LISTE perd son trait, jamais celle du tiroir. */
+.re-postes > .re-p:first-of-type{ border-top:none; }
+/* ═══ ET ON LE REMET FRANCHEMENT DANS LE TIROIR ═══
+
+   La règle du dessus suffit en théorie : `>` ne vise que les enfants directs,
+   donc la première ligne du tiroir — qui est une petite-fille — garde son
+   trait. En théorie.
+
+   En pratique, ce trait a manqué deux fois. Une règle qui repose sur l'ABSENCE
+   d'une correspondance est fragile : il suffit qu'un sélecteur voisin change,
+   ou qu'une feuille arrive dans un autre ordre, pour qu'elle se remette à
+   mordre. Et le défaut est discret — un trait manquant à la jonction, qu'on ne
+   voit qu'en ouvrant le tiroir.
+
+   On l'affirme donc au lieu de compter dessus. Deux déclarations pour le même
+   résultat, mais la seconde ne peut pas être défaite par accident. */
+.re-tiroir-in > .re-p:first-of-type{ border-top:0.5px solid var(--border); }
 .re-p b{ color:var(--label-1); font-weight:700; font-variant-numeric:tabular-nums; }
 /* « Sans poste » n'est pas un poste, c'est un reste. Grisé pour qu'il se lise
    comme un rappel et non comme une cinquième fonction de l'équipe — mais bien
@@ -7457,3 +7548,35 @@ body:has(#e-detail.active) #equipe-app{
    a à refermer. C'est le seul indice que le bouton n'est pas un lien. */
 .re-plus[aria-expanded="true"] svg{ transform:rotate(180deg); }
 .re-plus:active{ opacity:0.6; }
+
+
+/* ═══ LA ZONE DE TEXTE DU DOCUMENT ═══
+
+   Sa hauteur est pilotée par `ajusterHauteurTexte`, mais le CSS pose le
+   plancher et le confort de lecture.
+
+   `min-height` PLUTÔT QUE `rows` : l'attribut fixe une hauteur en lignes que
+   le JavaScript doit ensuite écraser, ce qui produit un saut visible au
+   premier affichage. Un plancher en pixels ne saute pas.
+
+   `resize:vertical` reste : quelqu'un qui veut voir plus que le plafond peut
+   tirer le coin. On ajuste automatiquement, on n'interdit pas. */
+#doc-texte{
+  /* ═══ `border-box`, SANS QUOI LE PLAFOND EST FAUX ═══
+
+     Les champs de l'app n'ont pas de `box-sizing` déclaré : ils sont donc en
+     `content-box`, où la hauteur posée s'AJOUTE au rembourrage et à la bordure.
+     Le JavaScript calculait un plafond de 440 px et obtenait une boîte de 466 —
+     vingt-cinq de trop, soit exactement les 2 × 12 px de rembourrage et le
+     filet.
+
+     Vingt-cinq pixels ne se voient pas sur un champ. Sur un plafond censé
+     laisser le bouton visible, ils le repoussent d'autant. */
+  box-sizing:border-box;
+  min-height:150px;
+  line-height:1.55;
+  resize:vertical;
+  /* Sans transition : la hauteur change à chaque frappe, et l'animer ferait
+     traîner le champ derrière le curseur. */
+  transition:none;
+}

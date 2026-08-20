@@ -26,6 +26,13 @@
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 
+<!-- ═══ LES LIENS VERS L'APP SONT RELATIFS ═══
+
+     « app/ » et non l'adresse complète : un lien relatif fonctionne AUJOURD'HUI
+     sur emcl22a-creator.github.io/Standix/ et DEMAIN sur standix.app/, sans
+     rien changer le jour de la bascule. Une adresse écrite en entier aurait dû
+     être corrigée à sept endroits, un jour où tu auras déjà le DNS à
+     surveiller. -->
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -351,7 +358,7 @@ header.pose{
      capture sous la pliure. J'en ai donc repris six pixels sur l'écart qui
      sépare l'accroche de la galerie : à cet endroit, le blanc ne se remarque
      pas, alors que dans l'accroche il se voit à chaque ligne. */
-  padding:calc(var(--barre) + 50px) var(--gouttiere) 0;
+  padding:calc(var(--barre) + 38px) var(--gouttiere) 0;
   max-width:var(--large); margin:0 auto;
 }
 /* ═══ L'EMPHASE SANS COULEUR ═══
@@ -378,15 +385,15 @@ h1{
   /* 1,09 et non 1,05 : sur quatre lignes serrées à -0,045 em, l'interligne est
      ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
      changent l'impression d'ensemble plus que n'importe quelle marge. */
-  line-height:1.13; letter-spacing:-.045em; font-weight:500;
-  margin-bottom:26px; max-width:16ch;
+  line-height:1.09; letter-spacing:-.045em; font-weight:500;
+  margin-bottom:20px; max-width:16ch;
   color:var(--t2);
 }
 h1 em{ font-style:normal; color:var(--t1); }
 
 .sous{
-  font-size:15.5px; line-height:1.62; color:var(--t2);
-  max-width:31ch; margin-bottom:36px;
+  font-size:15.5px; line-height:1.6; color:var(--t2);
+  max-width:31ch; margin-bottom:30px;
 }
 
 .actions{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
@@ -452,7 +459,7 @@ h1 em{ font-style:normal; color:var(--t1); }
      « Sans carte bancaire », à la même gouttière, le nom de l'écran se lisait
      comme une seconde ligne du même paragraphe. Le blanc doit séparer
      l'accroche de la galerie, pas la galerie de son image. */
-  margin-top:34px;
+  margin-top:30px;
   padding:20px var(--bord-image) 12px;
   display:flex; align-items:baseline; justify-content:space-between;
 }
@@ -1247,48 +1254,6 @@ footer .marque{ margin-bottom:18px; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   TÉLÉPHONE ET TABLETTE — SANS BLEU
-
-   Toutes les lumières de la page passent par `--halo` : le voile du haut, les
-   deux foyers du bas, le halo derrière la capture. Il suffit donc de changer
-   cette seule valeur pour retirer le bleu partout en dessous de 1 100 px.
-
-   La valeur n'est pas un blanc pur mais un blanc très légèrement froid. Un
-   blanc pur, diffusé à faible opacité sur du noir, ne se lit pas comme de la
-   lumière mais comme une salissure grise sur la dalle — c'est physique, pas
-   une question de goût. Si tu veux le blanc strict malgré tout, la valeur à
-   mettre est 255,255,255.
-
-   Les intensités descendent d'un cran au passage : le bleu portait une partie
-   du contraste, et à la même opacité en neutre le voile devenait laiteux.
-   ═══════════════════════════════════════════════════════════════════════════ */
-@media (max-width: 1099px){
-  :root{ --halo:226,232,242; }
-  .lueur{
-    background:
-      radial-gradient(ellipse 110% 40% at 22% -2%,
-        rgba(var(--halo),.085), rgba(var(--halo),.025) 46%, transparent 70%),
-      radial-gradient(ellipse 92% 26% at 52% 62%,
-        rgba(255,255,255,.035), transparent 68%);
-  }
-  .tarifs::after, .fin::after{
-    background:radial-gradient(ellipse 50% 50% at 50% 50%,
-      rgba(var(--halo),.075), rgba(255,255,255,.025) 44%, transparent 72%);
-  }
-  .ecran::before{
-    background:
-      radial-gradient(ellipse 44% 56% at 50% 38%,
-        rgba(255,255,255,.24), transparent 72%),
-      radial-gradient(ellipse 82% 88% at 50% 40%,
-        rgba(var(--halo),.07), transparent 74%);
-  }
-  .souffle{
-    background:radial-gradient(ellipse 52% 60% at 50% 62%,
-      rgba(255,255,255,.40), rgba(var(--halo),.05) 48%, transparent 72%);
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    TABLETTE ET ORDINATEUR
 
    Tout ce qui précède est la version téléphone, et elle reste la référence :
@@ -1683,9 +1648,9 @@ footer .marque{ margin-bottom:18px; }
     <span>Standix</span>
   </div>
   <div class="h-droite">
-    <a class="h-lien" href="https://emcl22a-creator.github.io/Standix">Se connecter</a>
+    <a class="h-lien" href="app/">Se connecter</a>
     <!-- Masquée sur téléphone, elle ne réapparaît qu'à partir de 1 100 px. -->
-    <a class="h-pil-pc" href="https://emcl22a-creator.github.io/Standix" style="display:none">Essayer gratuitement</a>
+    <a class="h-pil-pc" href="app/" style="display:none">Essayer gratuitement</a>
   </div>
 </header>
 
@@ -1712,7 +1677,7 @@ footer .marque{ margin-bottom:18px; }
     code sur place, et la procédure s'ouvre.
   </p>
   <div class="actions flou r3">
-    <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+    <a class="btn" href="app/">
       Essayer gratuitement
       <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
     </a>
@@ -2110,7 +2075,7 @@ footer .marque{ margin-bottom:18px; }
       <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
     </ul>
     <p class="annuel">ou <b>55 € par mois</b> en payant à l'année</p>
-    <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+    <a class="btn" href="app/">
       Essayer gratuitement
       <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
     </a>
@@ -2187,7 +2152,7 @@ footer .marque{ margin-bottom:18px; }
     Celle que vous expliquez le plus souvent.
   </p>
   <div class="actions app" style="--d:.09s">
-    <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+    <a class="btn" href="app/">
       Essayer gratuitement
       <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
     </a>
@@ -2207,7 +2172,7 @@ footer .marque{ margin-bottom:18px; }
     <a href="mentions.html">Mentions légales</a>
     <a href="cgu.html">Conditions d'utilisation</a>
     <a href="confidentialite.html">Confidentialité</a>
-    <a href="https://emcl22a-creator.github.io/Standix">Se connecter</a>
+    <a href="app/">Se connecter</a>
   </nav>
   <p class="f-bas">
     <!-- La phrase de pied de page décrit, elle ne vend pas. « Le savoir-faire
@@ -2229,7 +2194,7 @@ footer .marque{ margin-bottom:18px; }
     <b>69 € par mois</b>
     <span>Sans engagement</span>
   </span>
-  <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+  <a class="btn" href="app/">
     Essayer
     <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
   </a>

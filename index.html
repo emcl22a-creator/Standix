@@ -837,7 +837,7 @@
     <div class="subhead">Elles se suivront dans l’ordre de la liste</div>
 
     <input type="file" id="coller-input" accept="video/*" multiple style="display:none;">
-    <button class="btn ghost block" id="coller-ajouter">Choisir des vidéos</button>
+    <button class="btn ghost block" id="coller-ajouter">Ajouter des vidéos</button>
 
     <div id="coller-liste" style="margin-top:14px;"></div>
 
@@ -916,7 +916,7 @@
 
   <div class="screen" id="p-create-video">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-create')">
+      <button class="back-btn" id="dv-retour" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <!-- Le titre annonçait « l'IA rédige » alors que le bouton qui le permettait
@@ -1083,7 +1083,7 @@
           </span>
         </div>
 
-      <div class="doc-bloc" id="doc-bloc-texte" style="display: none;"><label class="f">Votre texte</label><textarea id="doc-texte" rows="7" placeholder="Collez ici votre procédure, votre note de service, votre mode d'emploi…"></textarea></div>
+      <div class="doc-bloc" id="doc-bloc-texte" style="display: none;"><label class="f">Votre texte</label><textarea id="doc-texte" placeholder="Collez ici votre procédure, votre note de service, votre mode d'emploi…"></textarea></div>
       
 
 

@@ -26,13 +26,9 @@
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 
-<!-- ═══ LES LIENS VERS L'APP SONT RELATIFS ═══
-
-     « app/ » et non l'adresse complète : un lien relatif fonctionne AUJOURD'HUI
-     sur emcl22a-creator.github.io/Standix/ et DEMAIN sur standix.app/, sans
-     rien changer le jour de la bascule. Une adresse écrite en entier aurait dû
-     être corrigée à sept endroits, un jour où tu auras déjà le DNS à
-     surveiller. -->
+<!-- Les liens vers l'app sont RELATIFS : « app/ » fonctionne aujourd'hui sur
+     emcl22a-creator.github.io/Standix/ et demain sur standix.app/, sans rien
+     changer le jour de la bascule du domaine. -->
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -293,10 +289,16 @@ header.pose{
 /* Le ruban passe de 20 à 26 px, et l'écart de 9 à 5. À 20 px le volume du
    rendu 3D était perdu ; à 26 il commence à exister. Et un logo posé trop loin
    de son nom se lit comme deux objets — collés, ils font une signature. */
-.marque{ display:flex; align-items:center; gap:5px; }
-.marque img{ width:26px; height:auto; display:block; margin-left:-3px; }
+.marque{ display:flex; align-items:center; gap:6px; }
+/* Le ruban et le mot grandissent ENSEMBLE : c'est le couple qui fait la
+   signature, et un logo agrandi seul écrase le mot qu'il accompagne.
+   Le rattrapage optique suit la proportion, -3 → -4 : le PNG porte 7 % de
+   marge interne, donc plus le ruban grandit, plus elle l'éloigne du filet. */
+.marque img{ width:32px; height:auto; display:block; margin-left:-4px; }
+/* Le serrage descend d'un cran avec la taille : plus un mot est grand, plus
+   l'espace entre ses lettres paraît large à corps égal. */
 .marque span{ font-family:'Poppins',sans-serif; font-weight:500;
-  font-size:17px; letter-spacing:-.02em; }
+  font-size:21px; letter-spacing:-.024em; }
 /* ═══ LA BARRE N'A PLUS D'APPEL À L'ACTION ═══
 
    La pilule « Essayer » a été retirée. Elle était le premier objet que l'œil
@@ -358,7 +360,7 @@ header.pose{
      capture sous la pliure. J'en ai donc repris six pixels sur l'écart qui
      sépare l'accroche de la galerie : à cet endroit, le blanc ne se remarque
      pas, alors que dans l'accroche il se voit à chaque ligne. */
-  padding:calc(var(--barre) + 38px) var(--gouttiere) 0;
+  padding:calc(var(--barre) + 62px) var(--gouttiere) 0;
   max-width:var(--large); margin:0 auto;
 }
 /* ═══ L'EMPHASE SANS COULEUR ═══
@@ -385,15 +387,15 @@ h1{
   /* 1,09 et non 1,05 : sur quatre lignes serrées à -0,045 em, l'interligne est
      ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
      changent l'impression d'ensemble plus que n'importe quelle marge. */
-  line-height:1.09; letter-spacing:-.045em; font-weight:500;
-  margin-bottom:20px; max-width:16ch;
+  line-height:1.18; letter-spacing:-.045em; font-weight:500;
+  margin-bottom:32px; max-width:16ch;
   color:var(--t2);
 }
 h1 em{ font-style:normal; color:var(--t1); }
 
 .sous{
-  font-size:15.5px; line-height:1.6; color:var(--t2);
-  max-width:31ch; margin-bottom:30px;
+  font-size:15.5px; line-height:1.62; color:var(--t2);
+  max-width:31ch; margin-bottom:42px;
 }
 
 .actions{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
@@ -459,7 +461,7 @@ h1 em{ font-style:normal; color:var(--t1); }
      « Sans carte bancaire », à la même gouttière, le nom de l'écran se lisait
      comme une seconde ligne du même paragraphe. Le blanc doit séparer
      l'accroche de la galerie, pas la galerie de son image. */
-  margin-top:30px;
+  margin-top:42px;
   padding:20px var(--bord-image) 12px;
   display:flex; align-items:baseline; justify-content:space-between;
 }
@@ -1254,6 +1256,48 @@ footer .marque{ margin-bottom:18px; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   TÉLÉPHONE ET TABLETTE — SANS BLEU
+
+   Toutes les lumières de la page passent par `--halo` : le voile du haut, les
+   deux foyers du bas, le halo derrière la capture. Il suffit donc de changer
+   cette seule valeur pour retirer le bleu partout en dessous de 1 100 px.
+
+   La valeur n'est pas un blanc pur mais un blanc très légèrement froid. Un
+   blanc pur, diffusé à faible opacité sur du noir, ne se lit pas comme de la
+   lumière mais comme une salissure grise sur la dalle — c'est physique, pas
+   une question de goût. Si tu veux le blanc strict malgré tout, la valeur à
+   mettre est 255,255,255.
+
+   Les intensités descendent d'un cran au passage : le bleu portait une partie
+   du contraste, et à la même opacité en neutre le voile devenait laiteux.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1099px){
+  :root{ --halo:226,232,242; }
+  .lueur{
+    background:
+      radial-gradient(ellipse 110% 40% at 22% -2%,
+        rgba(var(--halo),.085), rgba(var(--halo),.025) 46%, transparent 70%),
+      radial-gradient(ellipse 92% 26% at 52% 62%,
+        rgba(255,255,255,.035), transparent 68%);
+  }
+  .tarifs::after, .fin::after{
+    background:radial-gradient(ellipse 50% 50% at 50% 50%,
+      rgba(var(--halo),.075), rgba(255,255,255,.025) 44%, transparent 72%);
+  }
+  .ecran::before{
+    background:
+      radial-gradient(ellipse 44% 56% at 50% 38%,
+        rgba(255,255,255,.24), transparent 72%),
+      radial-gradient(ellipse 82% 88% at 50% 40%,
+        rgba(var(--halo),.07), transparent 74%);
+  }
+  .souffle{
+    background:radial-gradient(ellipse 52% 60% at 50% 62%,
+      rgba(255,255,255,.40), rgba(var(--halo),.05) 48%, transparent 72%);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    TABLETTE ET ORDINATEUR
 
    Tout ce qui précède est la version téléphone, et elle reste la référence :
@@ -1275,7 +1319,7 @@ footer .marque{ margin-bottom:18px; }
 @media (min-width: 768px){
   :root{ --large:700px; --gouttiere:40px; --retrait:0px; }
 
-  h1{ font-size:46px; max-width:15ch }
+  h1{ font-size:46px; max-width:15ch; line-height:1.14 }
   .sous{ font-size:17px; max-width:38ch }
   h2{ font-size:38px }
   .chapo{ font-size:16px }
@@ -1305,6 +1349,9 @@ footer .marque{ margin-bottom:18px; }
 
   .capture{ max-width:400px; margin:0 auto }
   .souffle{ left:8%; right:8% }
+  .hero{ padding-top:calc(var(--barre) + 88px) }
+  .sous{ margin-bottom:50px }
+  .onglets{ margin-top:56px }
   section.bloc{ padding:80px var(--gouttiere) 96px }
 }
 

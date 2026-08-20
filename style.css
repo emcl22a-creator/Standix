@@ -7419,3 +7419,41 @@ body:has(#e-detail.active) #equipe-app{
 }
 .coller-tot:first-child{ border-top:none; }
 .coller-tot b{ color:var(--label); font-weight:700; font-variant-numeric:tabular-nums; }
+
+/* ═══ LE TIROIR DES POSTES ═══
+
+   ANIMER VERS UNE HAUTEUR AUTOMATIQUE N'EST PAS POSSIBLE en CSS : `height:auto`
+   n'est pas une valeur qu'on peut interpoler. Les deux contournements habituels
+   sont mauvais — un `max-height` généreux fait démarrer l'animation en retard
+   et sa durée dépend du nombre de lignes ; mesurer la hauteur en JavaScript
+   oblige à recalculer à chaque changement de contenu.
+
+   `grid-template-rows` de `0fr` à `1fr` s'anime, LUI, et donne exactement la
+   hauteur du contenu. L'enfant a besoin de `min-height:0` et d'`overflow:hidden`
+   pour accepter d'être écrasé — sans ces deux lignes, il garde sa hauteur
+   naturelle et le tiroir ne se ferme pas. */
+.re-tiroir{
+  display:grid; grid-template-rows:0fr;
+  transition:grid-template-rows 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+.re-tiroir.ouvert{ grid-template-rows:1fr; }
+.re-tiroir-in{ min-height:0; overflow:hidden; }
+
+/* Le bouton se lit comme une ligne de plus, pas comme une action : il prolonge
+   la liste au lieu de s'y opposer. D'où la même hauteur, le même alignement,
+   et la couleur secondaire. */
+.re-plus{
+  display:flex; align-items:center; gap:5px;
+  width:100%; padding:8px 0 2px; margin:0;
+  background:none; border:none;
+  color:var(--label-2); font-size:12.5px; font-weight:600;
+  letter-spacing:-0.01em; text-align:left;
+}
+.re-plus svg{
+  width:14px; height:14px; flex:0 0 14px;
+  transition:transform 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+/* Le chevron pointe vers le bas quand il y a à ouvrir, vers le haut quand il y
+   a à refermer. C'est le seul indice que le bouton n'est pas un lien. */
+.re-plus[aria-expanded="true"] svg{ transform:rotate(180deg); }
+.re-plus:active{ opacity:0.6; }

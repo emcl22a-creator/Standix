@@ -1,0 +1,2352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Standix — filmez le geste, l'IA écrit la procédure</title>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     L'APERÇU DU LIEN
+
+     Ce n'est pas une formalité de référencement. Le travail que tu as donné à
+     ce site, c'est qu'un patron rencontré la veille en reparle à son associé.
+     Concrètement, il lui envoie le lien par SMS ou par WhatsApp — et la
+     première chose que l'associé voit n'est pas la page, c'est cette vignette.
+
+     Elle doit donc porter la phrase, pas le nom de domaine.
+
+     ⚠ partage.png est attendu à la racine : 1200 × 630, la capture de l'app
+       sur fond noir avec le titre. Sans lui, le lien s'affiche nu.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<meta name="description" content="Filmez le geste ou votre écran. L'IA découpe la vidéo et rédige les étapes. Votre équipe les lit sur son téléphone, ou scanne un QR code sur place.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Filmez une fois. Votre équipe saura faire.">
+<meta property="og:description" content="L'IA découpe la vidéo et rédige les étapes. Un QR code sur place, et la procédure s'ouvre.">
+<meta property="og:image" content="partage.png">
+<meta property="og:locale" content="fr_FR">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<meta name="theme-color" content="#08090A">
+<meta name="color-scheme" content="dark">
+<meta name="format-detection" content="telephone=no, address=no, email=no">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500&display=swap">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAQUETTE 12 — LA PAGE MOBILE, TEXTES RÉÉCRITS
+
+   Le rideau, la sculpture et la découpe en tranches sont abandonnés. À leur
+   place : la capture de l'app, seule, en pleine largeur, coupée par le bas.
+
+   Pas de main, pas de téléphone dessiné, pas d'ombre de châssis. Le lecteur
+   tient déjà un téléphone — en redessiner un ne ferait que rétrécir le
+   contenu de 38 %.
+
+   ⚠ L'image n'est pas encore là. Le cadre ci-dessous est un EMPLACEMENT :
+     bonnes dimensions, bon liseré, bonne coupe. Il suffira de remplacer le
+     bloc .attente par <img src="capture-procedure.png"> sans rien toucher au
+     CSS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --fond:#08090A;
+  --t1:#F7F8F8;
+  --t2:#8E939B;
+  --t3:#61656C;
+  /* ═══ LE BLANC EST LA COULEUR D'ACTION ═══
+
+     Le bleu ne pilote plus rien. Il n'est plus une couleur de marque, il est
+     seulement de la lumière : un halo très faible derrière le titre et
+     derrière la capture, et rien d'autre.
+
+     Pourquoi le halo n'est pas blanc pur : sur du noir, un halo blanc se lit
+     comme une salissure sur l'écran. Une pointe de bleu le fait lire comme de
+     la lumière. C'est de la physique de rendu, pas une entorse à la règle —
+     aucun élément de la page n'emploie cette couleur.
+
+     ⚠ L'AMBRE DU LOGO N'APPARAÎT NULLE PART, sauf à l'intérieur de la
+       capture, qui garde ses couleurs propres. C'est elle, et elle seule, qui
+       fait le pont entre le site et l'app. */
+  --halo:61,123,255;
+
+  /* ═══ LA GOUTTIÈRE ═══
+
+     Une seule valeur pour toute la page. C'est la condition de la grille :
+     l'accroche était à 22 px et la capture à 18, ce qui suffisait à faire
+     mentir les filets.
+
+     26 px et pas 22 : à 22, les verticales frôlent le bord de l'écran et se
+     lisent comme un défaut d'affichage plutôt que comme une intention. Chez
+     Stripe ça passe à 22 parce qu'ils ont 1400 px de large et de vraies
+     marges. */
+  /* ═══ POURQUOI ON ÉLARGIT LA GOUTTIÈRE PLUTÔT QUE RÉTRÉCIR L'IMAGE ═══
+
+     Rentrer la capture à l'intérieur des filets aurait été le geste évident —
+     et il aurait fait mentir la grille : les verticales n'auraient plus marqué
+     aucun bord. En élargissant la gouttière, l'image rétrécit ET reste calée
+     dessus.
+
+     `clamp` parce qu'une valeur fixe ne peut pas servir les deux extrêmes :
+     34 px sur un iPhone SE, c'est 68 px sur 320, soit un cinquième de la
+     largeur mangé par du vide. */
+  /* ═══ LA LARGEUR DU CONTENU ═══
+     Six blocs portaient « 520px » en dur. Une seule variable, et les
+     déclinaisons tablette et ordinateur tiennent en une ligne chacune. */
+  --large:520px;
+
+  --gouttiere:clamp(22px, 8vw, 34px);
+
+  /* ═══ LE RETRAIT DE L'IMAGE ═══
+
+     La capture ne touche plus les verticales : elle est rentrée à
+     l'intérieur de la colonne.
+
+     Ça change le rôle de la grille, et il faut le dire : les verticales ne
+     marquent plus le bord de l'image, elles marquent la colonne de TEXTE.
+     C'est le fonctionnement de Stripe — la grille tient le texte, l'image
+     flotte dedans. L'horizontale, elle, continue de marquer exactement l'arête
+     haute de l'image, donc les filets ne mentent toujours pas.
+
+     Le bandeau nom + points suit l'image et non la colonne : il légende la
+     capture, il lui appartient. */
+  /* La hauteur de la barre est une variable : le filet horizontal du haut est
+     posé dessus, et à la coder deux fois on finit toujours par en oublier une.
+
+     Repassée à 64 px. Elle avait été montée à 72 sur une mauvaise lecture de
+     ma part — c'était l'accroche qu'il fallait aérer, pas la barre. Les huit
+     pixels rendus reviennent à la capture, qui en avait plus besoin. */
+  --barre:64px;
+  --retrait:clamp(10px, 4vw, 20px);
+  --bord-image:calc(var(--gouttiere) + var(--retrait));
+  --filet:rgba(255,255,255,.075);
+  --bord:rgba(255,255,255,.09);
+  --ec:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+/* `overflow-x` sur html ET sur body : les filets horizontaux dépassent
+   volontairement de 40 px de chaque côté, et body seul ne suffit pas à
+   empêcher le document de devenir scrollable latéralement. */
+html{ -webkit-text-size-adjust:100%; overflow-x:hidden; }
+body{
+  background:var(--fond); color:var(--t1);
+  font:400 16px/1.5 'Inter',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  overflow-x:hidden; min-height:100dvh;
+  /* Repère pour la grille, qui court maintenant sur toute la hauteur du
+     document et non plus sur les 1400 premiers pixels. */
+  position:relative;
+}
+
+/* La lueur suit le texte, qui n'est plus centré : elle part du coin haut
+   gauche. Elle ne se voit pas vraiment — elle empêche le noir d'être plat et
+   donne une profondeur au fond. Aucun élément n'emploie cette couleur. */
+.lueur{
+  position:absolute; top:0; left:0; right:0; height:100dvh;
+  z-index:0; pointer-events:none;
+  /* ═══ DEUX FOYERS, PAS UN ═══
+
+     Une seule grande tache produit un gris sale ; deux foyers d'intensités
+     différentes créent une direction, et l'œil lit une source de lumière au
+     lieu d'un fond éclairci.
+
+     Le premier, bleuté, est derrière le titre. Le second, blanc et plus
+     faible, tombe à peu près là où se trouve la capture — sur téléphone comme
+     sur ordinateur, puisqu'il est placé en pourcentage. */
+  background:
+    radial-gradient(ellipse 110% 40% at 22% -2%,
+      rgba(var(--halo),.17), rgba(var(--halo),.05) 46%, transparent 70%),
+    radial-gradient(ellipse 92% 26% at 52% 62%,
+      rgba(255,255,255,.045), transparent 68%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX FOYERS DU BAS DE PAGE
+
+   Derrière le prix et derrière la clôture, et nulle part ailleurs : ce sont
+   les deux endroits où l'on décide. Une page éclairée partout n'a plus de
+   hiérarchie — le noir des autres sections est ce qui donne leur valeur à
+   ces deux-là.
+
+   `z-index:-1` les place derrière le contenu de la section sans les sortir de
+   son empilement : ils ne passent donc jamais devant les filets de la grille.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.tarifs::after, .fin::after{
+  content:''; position:absolute; z-index:-1; pointer-events:none;
+  left:50%; top:6%; transform:translateX(-50%);
+  width:min(760px, 150%); height:440px;
+  background:radial-gradient(ellipse 50% 50% at 50% 50%,
+    rgba(var(--halo),.14), rgba(255,255,255,.035) 44%, transparent 72%);
+  filter:blur(40px);
+}
+.fin::after{ height:360px; top:12% }
+.grain{
+  position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.022;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA GRILLE
+
+   Deux verticales qui tiennent la colonne, des horizontales qui traversent
+   bord à bord en passant DEVANT elles.
+
+   C'est ce croisement qui distingue une grille d'un cadre : un cadre enferme,
+   une grille situe. Si les quatre traits se rejoignaient aux angles, on
+   lirait une boîte posée sur la page — exactement ce qu'on cherche à éviter.
+
+   La grille est en `absolute` et non `fixed` : fixée, elle resterait immobile
+   pendant que la page défile, et les filets glisseraient sur le contenu au
+   lieu de l'accompagner.
+
+   Opacité 7,5 % : au-dessus, on lit un tableau ; en dessous, les filets
+   disparaissent sur les écrans peu contrastés. C'est une plage étroite.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.grille{
+  position:absolute; top:0; left:0; right:0; bottom:0;
+  z-index:1; pointer-events:none;
+  max-width:var(--large); margin:0 auto;
+}
+/* Les verticales partent du pixel zéro et passent DERRIÈRE la barre. Elles
+   s'arrêtaient auparavant 46 px plus bas, ce qui les faisait commencer nulle
+   part : une grille qui démarre au milieu du vide se lit comme deux traits
+   oubliés. En les faisant naître hors champ, elles préexistent à la page. */
+.grille .v{
+  position:absolute; top:0; bottom:0; width:1px;
+  /* Le fondu est calculé depuis le BAS et non en pourcentage : en
+     pourcentage, il se déplaçait à chaque section ajoutée. Les 180 derniers
+     pixels s'éteignent, quelle que soit la longueur de la page. */
+  background:linear-gradient(180deg,
+    var(--filet) calc(100% - 180px), transparent);
+}
+/* La verticale médiane n'apparaît qu'à partir de 1 100 px : sur téléphone,
+   elle couperait le texte en deux. */
+.grille .v.m{ display:none }
+.grille .v.g{ left:var(--gouttiere) }
+.grille .v.d{ right:var(--gouttiere) }
+/* Les horizontales sortent de la colonne : elles vont d'un bord de l'écran à
+   l'autre. C'est elles qui donnent la largeur, les verticales donnent la
+   colonne. */
+.grille .h{
+  position:absolute; left:-40px; right:-40px; height:1px;
+  background:var(--filet);
+}
+/* ═══ LES CROIX ═══
+   Aux intersections, un petit + de 7 px. C'est le détail qui fait lire la
+   grille comme un instrument de mesure plutôt que comme une bordure. Deux
+   traits suffisent ; les dessiner en `background` évite quatre balises. */
+.grille .x{
+  position:absolute; width:9px; height:9px;
+  transform:translate(-4px,-4px);
+  background:
+    linear-gradient(var(--t3),var(--t3)) center/9px 1px no-repeat,
+    linear-gradient(var(--t3),var(--t3)) center/1px 9px no-repeat;
+  opacity:.55;
+}
+
+/* ═══ LA BARRE ═══ */
+header{
+  position:fixed; top:0; left:0; right:0; z-index:40;
+  /* ═══ LA BARRE SE CALE SUR LA GRILLE ═══
+
+     Elle était à 20 px de marge quand tout le reste de la page est à 31,2 : le
+     logo dépassait de 14 px à gauche du filet, la pilule de 11 px à droite.
+     C'était le seul élément à flotter au-dessus d'une grille qu'il ne
+     respectait pas — et c'est ce décalage, pas la hauteur, qui donnait
+     l'impression d'un bloc étriqué.
+
+     La hauteur passe quand même de 58 à 64 : le ruban a grossi de six pixels,
+     il lui faut son air. */
+  height:var(--barre); padding:0 var(--gouttiere);
+  display:flex; align-items:center; justify-content:space-between;
+  background:rgba(8,9,10,0); border-bottom:.5px solid transparent;
+  transition:background .3s ease, backdrop-filter .3s ease, border-color .3s ease;
+}
+/* ═══ LE VERRE DE LA BARRE ═══
+
+   Le fond passe de 74 % à 42 % d'opacité : à 74, la barre était un bandeau
+   noir et le flou ne servait à rien — il n'y avait rien à voir au travers.
+
+   `saturate(180%)` est ce qui fait la différence entre un flou et du verre.
+   Un flou seul délave les couleurs qui passent dessous ; la saturation les
+   ravive, exactement comme une vitre épaisse. C'est le réglage d'Apple, et
+   c'est celui qu'on oublie toujours.
+
+   Le flou monte à 26 px pour compenser la transparence : moins le fond est
+   opaque, plus il faut brouiller, sinon le texte qui défile derrière reste
+   lisible et la barre devient sale. */
+header.pose{
+  background:rgba(8,9,10,.42);
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  border-bottom-color:rgba(255,255,255,.07);
+}
+/* Le ruban passe de 20 à 26 px, et l'écart de 9 à 5. À 20 px le volume du
+   rendu 3D était perdu ; à 26 il commence à exister. Et un logo posé trop loin
+   de son nom se lit comme deux objets — collés, ils font une signature. */
+.marque{ display:flex; align-items:center; gap:5px; }
+.marque img{ width:26px; height:auto; display:block; margin-left:-3px; }
+.marque span{ font-family:'Poppins',sans-serif; font-weight:500;
+  font-size:17px; letter-spacing:-.02em; }
+/* ═══ LA BARRE N'A PLUS D'APPEL À L'ACTION ═══
+
+   La pilule « Essayer » a été retirée. Elle était le premier objet que l'œil
+   attrapait en arrivant — avant le titre — et elle répétait un bouton présent
+   trois fois plus bas.
+
+   « Se connecter » reste : ce n'est pas un appel à l'action mais de la
+   navigation, et c'est ce que cherche un client déjà inscrit qui revient.
+   Confondre les deux est l'erreur la plus courante des barres de site.
+
+   Sa fonction — pouvoir agir n'importe où dans la page — est reprise par la
+   barre basse, plus bas dans cette feuille. */
+/* ═══ L'AIR À L'INTÉRIEUR DE LA BARRE ═══
+
+   L'écart entre le lien et la pilule passe de 13 à 20 px, et la pilule
+   s'épaissit de 33,5 à 38 px.
+
+   La barre a gagné 6 px de hauteur, mais son contenu était resté au même
+   serrage : les éléments se retrouvaient tassés au milieu d'un bandeau plus
+   grand, ce qui donne l'inverse de l'effet cherché. Quand une boîte s'agrandit,
+   ce qu'elle contient doit respirer dans la même proportion, sinon elle paraît
+   plus vide et non plus généreuse. */
+.h-droite{ display:flex; align-items:center; gap:20px; }
+.h-lien{ font-size:13.5px; font-weight:500; color:var(--t2); text-decoration:none;
+  letter-spacing:-.005em; }
+.h-pil{
+  padding:10px 18px; border-radius:100px; text-decoration:none;
+  background:var(--t1); color:var(--fond); font-size:13px; font-weight:500;
+  transition:background .2s ease, transform .15s var(--ec);
+}
+.h-pil:active{ background:#D6D9DC; transform:scale(.97); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ACCROCHE
+
+   Trois suppressions par rapport au premier écran d'origine : la pastille
+   d'annonce, le dégradé bleu sur la fin du titre, et le second bouton. Ce
+   sont elles, plus que le décor, qui font la différence — l'accroche empilait
+   six éléments, elle en a maintenant quatre.
+
+   Le titre passe à gauche. Centré, l'œil doit rechercher le début de chaque
+   ligne ; à gauche il y a une colonne, et la lecture est plus rapide.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* Les deux enveloppes du premier écran n'existent pas sur téléphone :
+   `display:contents` les efface de la mise en page, leurs enfants se
+   comportent exactement comme avant. Elles ne redeviennent des boîtes qu'à
+   partir de 1 100 px. */
+.premier, .colonne-app, .pq-texte, .pq-listes, .pv-texte, .pv-demo{ display:contents }
+
+.hero{
+  position:relative; z-index:2;
+  /* ═══ L'AIR DANS L'ACCROCHE ═══
+
+     Chaque valeur de ce bloc a été desserrée d'un cran : le retrait sous la
+     barre, l'interligne du titre, l'écart sous le titre, l'écart sous le
+     sous-titre, et le blanc entre le bouton et sa mention.
+
+     Le coût se paie en bas — tout ce qui gagne de la place ici enfonce la
+     capture sous la pliure. J'en ai donc repris six pixels sur l'écart qui
+     sépare l'accroche de la galerie : à cet endroit, le blanc ne se remarque
+     pas, alors que dans l'accroche il se voit à chaque ligne. */
+  padding:calc(var(--barre) + 38px) var(--gouttiere) 0;
+  max-width:var(--large); margin:0 auto;
+}
+/* ═══ L'EMPHASE SANS COULEUR ═══
+
+   Le titre entier est en GRIS, et le mot qui compte est en blanc plein. C'est
+   l'inverse de l'habitude — d'ordinaire on écrit le titre en blanc et on
+   colore un mot.
+
+   La raison est comptable : si le blanc est ce qui se clique, un mot bleu au
+   milieu d'un titre est une promesse non tenue. L'œil y va, rien ne s'y passe.
+   Ici l'emphase ne coûte aucune couleur : elle est faite de retrait, pas
+   d'ajout. »Écrit« est le verbe qu'on n'attend pas d'une caméra — c'est lui
+   qu'on met en avant, pas »filmez«. */
+/* ═══ LA LARGEUR DU TITRE ═══
+
+   Le `max-width: 13ch` datait de l'ancien titre, plus court. Avec le nouveau,
+   il forçait la casse à 238 px alors que la colonne en fait 328 : cinq lignes,
+   et la capture disparaissait sous la ligne de flottaison.
+
+   16ch et deux points de moins en corps : quatre lignes, et le rideau
+   respire. Une accroche qui mange l'écran n'a plus rien à annoncer. */
+h1{
+  font-size:clamp(31px,8.7vw,41px);
+  /* 1,09 et non 1,05 : sur quatre lignes serrées à -0,045 em, l'interligne est
+     ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
+     changent l'impression d'ensemble plus que n'importe quelle marge. */
+  line-height:1.09; letter-spacing:-.045em; font-weight:500;
+  margin-bottom:20px; max-width:16ch;
+  color:var(--t2);
+}
+h1 em{ font-style:normal; color:var(--t1); }
+
+.sous{
+  font-size:15.5px; line-height:1.6; color:var(--t2);
+  max-width:31ch; margin-bottom:30px;
+}
+
+.actions{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:7px;
+  height:44px; padding:0 20px; border-radius:100px; text-decoration:none;
+  font-size:14.5px; font-weight:500; letter-spacing:-.01em; white-space:nowrap;
+  background:var(--t1); color:var(--fond);
+  /* L'ombre portée est blanche et large : c'est elle qui empêche le bouton de
+     ressembler à une étiquette découpée. Un blanc posé sur du noir sans halo
+     paraît collé sur la page. */
+  box-shadow:0 6px 26px rgba(255,255,255,.13);
+  transition:transform .15s var(--ec), background .2s ease;
+}
+.btn:active{ transform:scale(.975); background:#D6D9DC; }
+.btn svg{ width:14px; height:14px; stroke:currentColor; fill:none;
+  stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+/* La mention n'est plus une ligne à part : elle tient à côté du bouton. Une
+   ligne de moins, et elle est lue au moment où elle sert — avant de cliquer. */
+.aside{ font-size:12.5px; color:var(--t3); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ÉCRAN
+
+   ═══ CE QUI TIENT LIEU DE DÉCOR ═══
+
+   Il n'y en a pas. Le fond reste noir. Ce qui détache la capture, c'est trois
+   choses seulement, et c'est assez :
+
+     • un halo large et très diffus, à peine bleuté, qui la décolle du noir
+       sans qu'on voie d'où il vient ;
+     • un liseré clair d'un pixel, qui donne l'arête ;
+     • une ombre profonde vers le bas.
+
+   Un décor derrière l'écran aurait fait deux images concurrentes. Ici il n'y
+   en a qu'une, et c'est le produit.
+
+   ═══ POURQUOI ELLE EST COUPÉE ═══
+
+   Elle ne tient pas dans l'écran, et c'est voulu : une image entière dit
+   « voilà, c'est tout » ; une image coupée dit qu'il y a une suite. Le bas se
+   dissout en fondu plutôt que de s'arrêter sur un trait — un trait net se lit
+   comme une erreur d'affichage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BANDEAU DE LA GALERIE
+
+   Le nom de l'écran à gauche, les points à droite, chacun collé à sa
+   verticale. C'est le seul endroit de la page où les deux filets servent
+   vraiment à quelque chose : ils tiennent les deux extrémités d'une même
+   ligne.
+
+   Il est placé HORS du bloc .ecran : dedans, il aurait décalé vers le bas le
+   filet horizontal et les croix, qui sont calés sur le haut de l'image.
+
+   Le nom compte autant que l'image. Une capture sans légende ne s'enseigne
+   pas — on regarde, on ne comprend pas, on passe.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.onglets{
+  position:relative; z-index:3;
+  max-width:var(--large); margin:0 auto;
+  /* La respiration est ICI et non sous le bandeau : posé juste après
+     « Sans carte bancaire », à la même gouttière, le nom de l'écran se lisait
+     comme une seconde ligne du même paragraphe. Le blanc doit séparer
+     l'accroche de la galerie, pas la galerie de son image. */
+  margin-top:30px;
+  padding:20px var(--bord-image) 12px;
+  display:flex; align-items:baseline; justify-content:space-between;
+}
+.nom{
+  font-size:12.5px; font-weight:500; color:var(--t2);
+  letter-spacing:-.01em;
+  transition:opacity .3s ease;
+}
+.points{ display:flex; gap:6px; }
+.points i{
+  display:block; width:5px; height:5px; border-radius:50%;
+  background:rgba(255,255,255,.20);
+  transition:background .4s ease, width .4s var(--ec);
+}
+/* Le point actif s'allonge au lieu de seulement s'éclaircir : sur 5 px, un
+   changement de teinte seul ne se voit pas au bout d'un bras. */
+.points i.on{ width:16px; border-radius:3px; background:var(--t1); }
+
+/* ═══ L'HORIZONTALE ═══
+
+   Elle était posée sur l'arête haute de l'image — donc ENTRE le libellé et la
+   capture qu'il légende. Elle séparait deux choses qui vont ensemble.
+
+   Remontée au-dessus du libellé, elle devient la frontière entre l'accroche et
+   le bloc produit. Le nom, les points et l'image sont désormais du même côté
+   du trait.
+
+   Elle sort de la colonne et va d'un bord de l'écran à l'autre : les
+   horizontales traversent, les verticales tiennent. */
+.onglets::before{
+  content:''; position:absolute; z-index:3;
+  left:-40px; right:-40px; top:0; height:1px;
+  background:var(--filet);
+  pointer-events:none;
+}
+.croix{
+  position:absolute; z-index:4; top:0; width:9px; height:9px;
+  background:
+    linear-gradient(var(--t3),var(--t3)) center/9px 1px no-repeat,
+    linear-gradient(var(--t3),var(--t3)) center/1px 9px no-repeat;
+  opacity:.55; pointer-events:none;
+}
+.croix.g{ left:var(--gouttiere); transform:translate(-4px,-4px) }
+.croix.d{ right:var(--gouttiere); transform:translate(4px,-4px) }
+
+.ecran{
+  position:relative; z-index:2;
+  margin:0 auto;
+  padding:0 var(--bord-image);
+  max-width:var(--large);
+}
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LUMIÈRE DERRIÈRE LA CAPTURE
+
+   ═══ POURQUOI ELLE NE SE VOYAIT PAS ═══
+
+   Elle faisait 260 px de haut et débordait de 6 % sur les côtés — c'est-à-dire
+   qu'environ 85 % de sa surface était cachée sous un rectangle opaque. On n'en
+   voyait que les miettes qui dépassaient. Augmenter son intensité n'aurait
+   rien donné : le problème n'était pas la puissance, c'était l'occultation.
+
+   La règle : une lumière derrière un objet opaque ne se voit QUE dans ce qui
+   dépasse. Il faut donc qu'elle soit beaucoup plus large que lui, et qu'elle
+   monte franchement au-dessus de son arête.
+
+   ═══ TROIS COUCHES ═══
+
+   ① le halo d'ambiance — très large, très flou, il décolle tout le bloc du
+      noir et déborde largement de chaque côté ;
+   ② le souffle — une bande resserrée et vive, posée sur l'arête haute, qui
+      fait lire « cet écran émet de la lumière » ;
+   ③ le liseré spéculaire — un pixel clair sur le bord supérieur de l'image.
+      C'est lui qui donne l'arête. Sans lui, les deux premiers ne font qu'une
+      brume et l'objet n'a pas de tranche.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ecran::before{
+  content:''; position:absolute; z-index:0;
+  left:-38%; right:-38%; top:-96px; height:440px;
+  background:
+    radial-gradient(ellipse 44% 56% at 50% 38%,
+      rgba(255,255,255,.30), transparent 72%),
+    /* Le bleu ne sert qu'à empêcher le blanc de virer au gris sale. À .28 il
+       reprenait la main sur la page et la teintait entièrement — .12 est le
+       maximum avant qu'on le nomme. */
+    radial-gradient(ellipse 82% 88% at 50% 40%,
+      rgba(var(--halo),.12), transparent 74%);
+  filter:blur(44px);
+  pointer-events:none;
+}
+/* ② Le souffle. Beaucoup plus resserré que le halo, et centré sur l'arête :
+   c'est ce contraste d'échelle entre les deux qui fait qu'on lit une source
+   et non un brouillard. */
+.souffle{
+  position:absolute; z-index:0;
+  left:-14%; right:-14%; top:-54px; height:150px;
+  background:radial-gradient(ellipse 52% 60% at 50% 62%,
+    rgba(255,255,255,.46), rgba(var(--halo),.08) 48%, transparent 72%);
+  filter:blur(22px);
+  pointer-events:none;
+}
+.capture{
+  position:relative; z-index:1;
+  /* Les angles ne sont arrondis qu'en haut : le bas n'existe pas, il sort de
+     l'écran. Arrondir les quatre coins aurait refermé l'image. */
+  border-radius:20px 20px 0 0;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,.16),
+             /* ③ le liseré spéculaire : un seul pixel, sur le bord du haut
+                uniquement. C'est le détail qui donne la tranche — sans lui,
+                le halo n'est qu'une brume et l'objet n'a pas d'arête. */
+             inset 0 1px 0 rgba(255,255,255,.40),
+             inset 0 0 0 1px rgba(255,255,255,.05),
+             0 34px 90px rgba(0,0,0,.66);
+  /* Le fondu du bas. Il commence à 74 % : au-dessus, la capture est pleinement
+     lisible ; en dessous, elle s'efface, liseré compris. */
+  -webkit-mask-image:linear-gradient(180deg,#000 74%,rgba(0,0,0,.42) 91%,transparent);
+          mask-image:linear-gradient(180deg,#000 74%,rgba(0,0,0,.42) 91%,transparent);
+}
+.capture img{ display:block; width:100%; height:auto; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA GALERIE
+
+   Les écrans sont empilés au même endroit ; un seul est visible. On passe de
+   l'un à l'autre par un glissement horizontal.
+
+   ═══ LE FONDU ═══
+
+   Pas un fondu simple. Trois choses ensemble, exactement les mêmes que
+   l'entrée de la page : l'opacité, une échelle de 1,03 à 1, et un flou de
+   5 px qui se dissipe.
+
+   C'est ce qui fait qu'on lit « un autre écran se met au point » plutôt que
+   « deux images se superposent ». Le même vocabulaire d'un bout à l'autre du
+   site — c'est là que se gagne l'impression de soin, pas dans un effet neuf à
+   chaque section.
+
+   `will-change` : sans lui, le premier passage saccade sur un téléphone
+   d'entrée de gamme, le temps que le navigateur promeuve la couche. */
+.capture{ aspect-ratio:720 / 1226; }
+.vue{
+  position:absolute; inset:0;
+  opacity:0; transform:scale(1.03); filter:blur(5px);
+  transition:opacity .75s var(--ec), transform .75s var(--ec), filter .75s var(--ec);
+  pointer-events:none;
+  will-change:opacity, transform, filter;
+}
+.vue.on{ opacity:1; transform:none; filter:blur(0); pointer-events:auto; }
+.vue img{ width:100%; height:100%; object-fit:cover; object-position:top; }
+
+/* Le bloc d'emplacement gris a été supprimé : les deux vues de la galerie
+   sont maintenant de vraies captures, il n'y a plus rien à faire patienter. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PREUVE — DEUXIÈME SECTION
+
+   ═══ POURQUOI CETTE SECTION-LÀ ET PAS UNE AUTRE ═══
+
+   Le premier écran a déjà dit les trois temps : la galerie les montre, écran
+   par écran, avec leurs légendes. Remettre en dessous une section
+   « je filme / l'IA découpe / je sais qui a lu » aurait été la troisième fois
+   qu'on dit la même chose.
+
+   Ce que le visiteur se demande à cet instant précis est autre chose. Il a lu
+   « l'IA écrit la procédure », et il ne le croit pas : il pense que ça va
+   sortir du charabia qu'il devra réécrire. Tant que ce doute tient, le prix et
+   les métiers ne servent à rien.
+
+   Cette section ne vend rien. Elle montre un résultat brut.
+   ═══════════════════════════════════════════════════════════════════════════ */
+section.bloc{
+  position:relative; z-index:2;
+  max-width:var(--large); margin:0 auto;
+  padding:64px var(--gouttiere) 78px;
+}
+/* Chaque section porte son filet et ses croix : c'est ce qui fait que la
+   grille se lit comme un système et non comme un ornement du haut de page. */
+section.bloc::before{
+  content:''; position:absolute; z-index:3;
+  left:-40px; right:-40px; top:0; height:1px;
+  background:var(--filet);
+}
+.surtitre{
+  font-size:12.5px; font-weight:500; color:var(--t3);
+  letter-spacing:.02em; margin-bottom:14px;
+}
+h2{
+  font-size:clamp(27px,7.4vw,33px);
+  line-height:1.1; letter-spacing:-.04em; font-weight:500;
+  color:var(--t2); margin-bottom:16px; max-width:15ch;
+}
+h2 em{ font-style:normal; color:var(--t1); }
+.chapo{
+  font-size:14.5px; line-height:1.6; color:var(--t2);
+  max-width:36ch; margin-bottom:30px;
+}
+
+/* ═══ LA SOURCE ═══
+   La ligne qui dit d'où vient tout le reste. Sans elle, la liste d'étapes
+   n'est qu'une liste ; avec elle, c'est le produit d'une vidéo. */
+.source{
+  display:flex; align-items:center; gap:12px;
+  padding:13px 15px; border-radius:13px;
+  background:rgba(255,255,255,.035);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.10),
+             inset 0 0 0 .5px rgba(255,255,255,.10);
+  margin-bottom:6px;
+}
+.source .play{
+  flex:none; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(255,255,255,.10);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.16);
+}
+.source .play svg{ width:11px; height:11px; fill:var(--t1); margin-left:2px; }
+.source .txt{ min-width:0 }
+.source b{
+  display:block; font-size:14px; font-weight:500; color:var(--t1);
+  letter-spacing:-.015em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.source span{ font-size:12px; color:var(--t3); line-height:1.4; }
+.source .duree{
+  margin-left:auto; flex:none;
+  font-size:12px; font-variant-numeric:tabular-nums; color:var(--t2);
+  padding:4px 9px; border-radius:7px;
+  background:rgba(255,255,255,.06);
+}
+
+/* ═══ LA DESCENTE ═══
+   Un court trait vertical entre la vidéo et les étapes. Il ne décore pas : il
+   dit que ce qui suit SORT de ce qui précède. Sans lui, on lit deux blocs
+   voisins au lieu d'une transformation. */
+.descente{
+  width:1px; height:34px; margin:0 0 0 10px;
+  background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.07));
+}
+
+/* ═══ LES ÉTAPES ═══
+
+   Un fil vertical relie les horodatages. C'est lui qui fait lire une bande de
+   temps découpée plutôt qu'une liste à puces — et l'horodatage est ce qui rend
+   la démonstration crédible : il prouve que l'étape vient d'un endroit précis
+   de la vidéo, pas d'un texte tapé à la main.
+
+   `tabular-nums` : sans ça, les chiffres n'ont pas la même largeur et la
+   colonne des minutes ondule d'une ligne à l'autre. */
+.etapes{ list-style:none; position:relative; counter-reset:etape; }
+/* Le fil court derrière les pastilles ; leur fond opaque le masque à chaque
+   étape. C'est ce qui évite d'avoir à découper le trait entre les numéros. */
+.etapes::before{
+  content:''; position:absolute; left:10px; top:10px; bottom:16px; width:1px;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.14), rgba(255,255,255,.14) 82%, transparent);
+}
+.etapes li{ position:relative; counter-increment:etape; padding:0 0 26px 36px; }
+.etapes li:last-child{ padding-bottom:0 }
+/* ═══ L'HORODATAGE PASSE AU-DESSUS DU TITRE ═══
+
+   Il était dans une colonne à gauche, sur le même axe que le fil : à 390 px,
+   « 0:03 » venait toucher le point, et la colonne de 62 px ne laissait que
+   266 px au texte, ce qui faisait passer presque tous les titres sur deux
+   lignes.
+
+   Au-dessus, il ne coûte rien en largeur et se lit mieux : on voit d'abord
+   d'où vient l'étape, puis ce qu'elle dit. */
+.tc{
+  display:block; margin-bottom:3px;
+  font-size:11px; font-variant-numeric:tabular-nums; color:var(--t3);
+  letter-spacing:.03em;
+}
+/* ═══ LE NUMÉRO DANS LA PASTILLE ═══
+   Le point vide ne disait que « il y a une étape ici ». Le numéro dit
+   laquelle — et sur une procédure qu'on suit en travaillant, retrouver son
+   rang après avoir levé les yeux est exactement ce qu'on cherche.
+
+   `counter` plutôt qu'un chiffre écrit dans le HTML : la numérotation suit
+   l'ordre réel, et rien ne se décale si une étape est ajoutée ou retirée. */
+.etapes li::before{
+  content:counter(etape);
+  position:absolute; left:0; top:0;
+  width:21px; height:21px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:11px; font-weight:500; font-variant-numeric:tabular-nums;
+  color:var(--t2); letter-spacing:0;
+  background:var(--fond);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.26);
+}
+.etapes h3{
+  font-size:15.5px; font-weight:500; color:var(--t1);
+  letter-spacing:-.015em; line-height:1.3; margin-bottom:5px;
+}
+.etapes p{ font-size:13.5px; line-height:1.55; color:var(--t2); max-width:36ch; }
+/* ═══ L'AVERTISSEMENT ═══
+   Dans l'app il est ambre ; ici il reste monochrome, comme tout le reste du
+   site. C'est le filet à gauche qui le distingue, pas la couleur — et un
+   liseré suffit, parce qu'il n'y en a qu'un sur toute la page. */
+.etapes .garde{
+  margin-top:9px; padding-left:11px;
+  border-left:2px solid rgba(255,255,255,.30);
+  color:var(--t1); font-size:13px;
+}
+
+/* ═══ L'OBJECTION ═══
+
+   La question que tout le monde se pose et que presque aucun site ne pose à
+   voix haute. Y répondre fait plus pour la confiance qu'un argument de plus :
+   celui qui lit la réponse se dit « il sait de quoi il parle », celui qui ne
+   la trouve pas se dit qu'on la lui cache. */
+.objection{
+  margin-top:34px; padding:20px;
+  border-radius:15px;
+  background:rgba(255,255,255,.03);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.09),
+             inset 0 0 0 .5px rgba(255,255,255,.09);
+}
+.objection b{
+  display:block; font-size:14.5px; font-weight:500; color:var(--t1);
+  letter-spacing:-.015em; margin-bottom:8px;
+}
+.objection p{ font-size:13.5px; line-height:1.6; color:var(--t2); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CE QUE ÇA CHANGE — TROISIÈME SECTION
+
+   La section précédente a répondu à « est-ce que ça marche ». Celle-ci répond
+   à « à quoi ça me sert », et pas autrement : par UN cas, en entier.
+
+   ═══ POURQUOI UN CAS ET NON TROIS ARGUMENTS ═══
+
+   Trois arguments abstraits — gain de temps, homogénéité, traçabilité — se
+   lisent en quatre secondes et s'oublient en deux. Un cas se retient et se
+   raconte : c'est exactement ce que le site doit permettre, qu'un patron le
+   répète à son associé le lendemain.
+
+   Le cas est celui du nettoyage et non de la restauration. C'est la cible de
+   départ, et c'est surtout le seul métier où le patron ne PEUT PAS montrer le
+   geste : son employé est seul chez le client. Ailleurs, Standix fait gagner
+   du temps ; là, il rend possible ce qui ne l'était pas.
+
+   ═══ LES DEUX VOLETS ═══
+
+   Le premier est terne — gris sur gris, aucune bordure. Le second est le seul
+   bloc clair de toute la page hors boutons. La différence de traitement fait
+   le travail avant qu'on ait lu un mot.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.volets{ display:flex; flex-direction:column; gap:9px; }
+.volet{
+  padding:19px; border-radius:15px;
+  background:rgba(255,255,255,.026);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),
+             inset 0 0 0 .5px rgba(255,255,255,.07);
+}
+.volet.apres{
+  background:linear-gradient(158deg, rgba(255,255,255,.085), rgba(255,255,255,.02));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),
+             inset 0 0 0 .5px rgba(255,255,255,.20),
+             0 22px 50px rgba(0,0,0,.42);
+}
+.volet .etiq{
+  font-size:11px; font-weight:500; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--t3); margin-bottom:9px;
+}
+.volet.apres .etiq{ color:var(--t1); }
+.volet p{ font-size:14px; line-height:1.6; color:var(--t2); }
+.volet.apres p{ color:var(--t1); }
+
+/* ═══ LES TROIS SUITES ═══
+   En lignes et non en cartes : la section précédente en avait déjà, et deux
+   séries de cartes d'affilée se lisent comme une seule section répétée. */
+.suites{ list-style:none; margin-top:26px; }
+.suites li{
+  position:relative; padding:11px 0 11px 22px;
+  font-size:14px; line-height:1.5; color:var(--t2);
+  border-top:.5px solid var(--bord);
+}
+.suites li:last-child{ border-bottom:.5px solid var(--bord); }
+.suites li b{ color:var(--t1); font-weight:500; }
+.suites li::before{
+  content:''; position:absolute; left:3px; top:19px;
+  width:5px; height:5px; border-radius:50%; background:var(--t2);
+}
+
+/* ═══ POUR QUI ═══
+   Un bandeau court, sans titre : deux secondes pour que le lecteur se
+   reconnaisse. Placé APRÈS le cas — plus haut, une liste de métiers n'aurait
+   fait qu'exclure des gens qui n'avaient pas encore compris le produit. */
+.pourqui{ padding-top:44px; padding-bottom:58px; }
+.pourqui p{
+  font-size:14px; line-height:1.6; color:var(--t2);
+  max-width:34ch; margin-bottom:16px;
+}
+/* L'intitulé de groupe. Volontairement discret : il sert à séparer, pas à
+   annoncer. Un vrai titre à cet endroit ferait croire à deux sections. */
+.groupe{
+  margin:22px 0 10px;
+  font-size:11.5px; font-weight:500; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--t3);
+}
+.groupe:first-of-type{ margin-top:20px }
+.metiers{ display:flex; flex-wrap:wrap; gap:7px; }
+.metiers span{
+  padding:7px 12px; border-radius:100px;
+  font-size:12.5px; font-weight:500; color:var(--t2);
+  background:rgba(255,255,255,.035);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.09);
+}
+/* ═══ LA HIÉRARCHIE SANS DÉPENSER LE BLANC ═══
+
+   Les deux métiers visés d'abord étaient en blanc plein. C'était une faute :
+   sur ce site le blanc plein veut dire « ceci se clique », et ces pastilles ne
+   se cliquent pas. L'œil y allait, rien ne s'y passait — la même erreur que le
+   mot coloré au milieu d'un titre.
+
+   La hiérarchie passe donc par le texte et le contour, pas par le fond. */
+.metiers span.cible{
+  color:var(--t1);
+  background:rgba(255,255,255,.06);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.26);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE PRIX — QUATRIÈME SECTION
+
+   ═══ CE QU'ON VEND ICI N'EST PAS UN TARIF ═══
+
+   À ce stade le visiteur ne se demande plus si ça marche ni à quoi ça sert. Il
+   se demande ce qu'il RISQUE. Et à 69 €, le risque n'est pas l'argent : c'est
+   de payer trois mois un outil que son équipe n'ouvrira jamais.
+
+   D'où le titre : « sans engagement » avant le montant. Une section intitulée
+   « Nos tarifs » répondrait à une question que personne ne se pose.
+
+   ═══ UNE CARTE, PAS QUATRE ═══
+
+   Quatre offres en quatre cartes sur 390 px sont illisibles. Mais n'afficher
+   qu'un prix sur quatre laisse sans réponse la question qui vient toujours en
+   deuxième — « et si on est douze ? ». Une carte détaillée plus une ligne pour
+   les trois autres : la question est fermée en trois lignes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.tarif{
+  position:relative;
+  padding:26px 22px; border-radius:19px;
+  background:linear-gradient(160deg, rgba(255,255,255,.075), rgba(255,255,255,.018));
+  /* ═══ L'ARÊTE ═══
+     Un pixel clair sur le bord du haut, et lui seul — la lumière vient du
+     haut. C'est le détail le moins visible et le plus rentable de la page :
+     une surface sombre sans arête éclairée se lit comme un trou, la même avec
+     un liseré se lit comme un objet posé sous une lampe. */
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),
+             inset 0 0 0 .5px rgba(255,255,255,.20),
+             0 26px 62px rgba(0,0,0,.52);
+}
+.tarif .nom{
+  font-size:12.5px; font-weight:500; color:var(--t2);
+  letter-spacing:.03em; margin-bottom:14px;
+}
+.tarif .somme{ display:flex; align-items:baseline; gap:7px; margin-bottom:4px; }
+.tarif .somme b{
+  font-size:46px; font-weight:500; letter-spacing:-.05em; line-height:1;
+  color:var(--t1);
+}
+.tarif .somme i{ font-style:normal; font-size:14px; color:var(--t2); }
+/* ═══ LA DIVISION ═══
+   69 € pour cinq personnes, c'est 13,80 € par personne. Ce n'est pas une
+   astuce de présentation, c'est une division — et un chiffre divisé pèse
+   toujours moins lourd qu'un chiffre entier. */
+.tarif .division{
+  font-size:12.5px; color:var(--t3); margin-bottom:22px;
+}
+.tarif ul{ list-style:none; margin-bottom:22px; }
+.tarif li{
+  position:relative; padding-left:24px; margin-bottom:11px;
+  font-size:14px; color:var(--t2);
+}
+.tarif li:last-child{ margin-bottom:0 }
+.tarif li b{ color:var(--t1); font-weight:500 }
+.tarif li svg{
+  position:absolute; left:0; top:3px; width:14px; height:14px;
+  stroke:var(--t1); fill:none; stroke-width:2.2;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+/* Le tarif annuel n'a pas sa propre carte : deux colonnes mensuel/annuel sur
+   390 px doublent la lecture pour une remise que personne ne prend au premier
+   achat. Une ligne sous les avantages suffit — elle se voit sans occuper la
+   place d'un choix. */
+.tarif .annuel{
+  margin:-8px 0 20px; font-size:12.5px; color:var(--t3);
+}
+.tarif .annuel b{ color:var(--t2); font-weight:500 }
+
+/* Le bouton prend toute la largeur de la carte, contrairement à celui de
+   l'accroche. Là on invitait, ici on conclut. */
+.tarif .btn{ display:flex; width:100%; height:48px; font-size:15px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TIROIR DES AUTRES FORMULES
+
+   ═══ POURQUOI LE BOUTON N'EST PAS BLANC ═══
+
+   Le blanc, sur ce site, veut dire « ceci vous fait avancer ». Un bouton blanc
+   ici entrerait en concurrence directe avec « Essayer gratuitement » posé
+   juste au-dessus, et on aurait deux actions de même poids à dix pixels l'une
+   de l'autre — c'est-à-dire aucune. Celui-ci est un simple contour : il ouvre
+   un tiroir, il ne fait pas passer à l'acte.
+
+   ═══ POURQUOI LA HAUTEUR EST CALCULÉE EN JAVASCRIPT ═══
+
+   `height: auto` ne s'anime pas. Les deux contournements habituels ont chacun
+   leur défaut : `max-height` avec une valeur généreuse rend l'animation
+   irrégulière — la fermeture paraît instantanée puis lente, parce que la
+   transition parcourt d'abord le vide ; et `grid-template-rows: 0fr → 1fr`
+   n'est pas fiable sur les Safari anciens qu'on trouve encore sur les
+   téléphones d'un patron de PME.
+
+   On mesure donc la hauteur réelle et on la repasse en `auto` une fois
+   l'ouverture finie, pour que le contenu puisse encore se reflow.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.plus{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  width:100%; margin-top:16px;
+  height:42px; padding:0 18px;
+  border:0; border-radius:100px; cursor:pointer;
+  background:rgba(255,255,255,.04);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.13);
+  font:500 13.5px/1 'Inter',sans-serif; letter-spacing:-.01em;
+  color:var(--t2);
+  transition:background .2s ease, color .2s ease, transform .15s var(--ec);
+}
+.plus:active{ transform:scale(.985); background:rgba(255,255,255,.08) }
+.plus[aria-expanded="true"]{ color:var(--t1) }
+.plus svg{
+  width:12px; height:12px; stroke:currentColor; fill:none;
+  stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+  transition:transform .45s var(--ec);
+}
+.plus[aria-expanded="true"] svg{ transform:rotate(180deg) }
+
+.tiroir{
+  height:0; overflow:hidden;
+  transition:height .48s var(--ec);
+}
+.formules{ list-style:none; padding-top:14px; }
+.formules li{
+  display:flex; align-items:baseline; gap:14px;
+  padding:14px 4px;
+  border-top:.5px solid var(--bord);
+}
+.formules li:last-child{ border-bottom:.5px solid var(--bord) }
+.formules .f-nom{
+  font-size:14.5px; font-weight:500; color:var(--t1); letter-spacing:-.015em;
+}
+.formules .f-quota{
+  display:block; margin-top:3px;
+  /* 12 px et non 12,5 : « Jusqu'à 100 membres · 250 analyses IA » dépassait de
+     quelques pixels et renvoyait « IA » seul à la ligne. Les espaces insécables
+     du HTML garantissent en plus que le groupe « 250 analyses IA » ne se coupe
+     jamais, quelle que soit la largeur. */
+  font-size:12px; font-weight:400; color:var(--t3);
+}
+.formules .f-prix{
+  margin-left:auto; flex:none;
+  font-size:14.5px; font-weight:500; color:var(--t1);
+  font-variant-numeric:tabular-nums;
+}
+.formules .f-prix span{ font-size:12px; color:var(--t3); font-weight:400 }
+/* Les mentions de bas de tarif, dans le tiroir et non sur la carte : elles ne
+   servent qu'à celui qui compare vraiment, et lui a déjà ouvert le tiroir. */
+.finement{
+  margin-top:16px; font-size:11.5px; line-height:1.6; color:var(--t3);
+}
+
+/* ═══ LES TROIS LEVÉES DE RISQUE ═══
+   Elles ne sont pas dans la carte : dans la carte, on les lit comme des
+   caractéristiques du produit. En dessous, détachées, on les lit comme ce
+   qu'elles sont — la réponse à « qu'est-ce que je risque ». */
+.risques{
+  display:flex; flex-wrap:wrap; gap:7px 18px;
+  margin-top:26px;
+}
+.risques span{
+  position:relative; padding-left:17px;
+  font-size:12.5px; color:var(--t2);
+}
+.risques span::before{
+  content:''; position:absolute; left:0; top:7px;
+  width:5px; height:5px; border-radius:50%;
+  background:rgba(255,255,255,.34);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA RELANCE
+
+   Celui qui a défilé jusqu'ici a tout lu. Il ne doit pas avoir à remonter
+   chercher un bouton — c'est le geste où l'on perd les gens qui étaient
+   pourtant décidés.
+
+   Courte, et centrée alors que tout le reste de la page est à gauche. Le
+   changement d'axe est le signal de fin : on ne lit plus, on décide.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.fin{ text-align:center; padding-bottom:58px; }
+.fin h2{ margin:0 auto 22px; max-width:14ch; }
+/* La ligne d'amorce, entre le titre et le bouton. Elle transforme une
+   injonction en conseil : le lecteur n'a plus à choisir PAR OÙ commencer, ce
+   qui est la dernière chose qui fait reposer un téléphone. */
+.amorce{
+  font-size:14.5px; line-height:1.5; color:var(--t2);
+  max-width:28ch; margin:0 auto 24px;
+}
+.fin h2{ margin-bottom:14px }
+.fin .actions{ justify-content:center; }
+.fin .aside{ display:block; margin-top:15px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE QR CODE — LA SECTION QUI RÉPOND À L'OBJECTION MUETTE
+
+   Le doute qu'aucun patron ne formule mais que tous ont : « mon équipe
+   n'ouvrira jamais une application ». C'est ce qui tue la plupart des outils
+   de procédures, et la page n'y répondait nulle part.
+
+   Le QR code y répond en supprimant la question : il n'y a rien à ouvrir. La
+   procédure est collée là où le geste se fait.
+
+   ═══ POURQUOI LA VIGNETTE EST BLANCHE ═══
+
+   Partout ailleurs, le blanc plein signifie « ceci se clique », et j'ai
+   corrigé deux fois des éléments qui l'employaient à tort. Ici l'exception est
+   assumée : un QR code doit être sombre sur clair, les lecteurs échouent sur
+   les codes inversés. Et la forme le sauve — un carré surmonté d'une légende
+   ne se confond avec aucun bouton de cette page, qui sont tous des pilules.
+
+   C'est le seul objet PHYSIQUE du site. Il doit ressembler à un autocollant
+   posé sur une machine, pas à un élément d'interface.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* Les deux objets sont alignés par le BAS : posés sur une même surface, comme
+   sur un plan de travail. Alignés par le haut, ils auraient flotté. */
+.objets{
+  display:flex; align-items:flex-end; justify-content:center;
+  gap:16px;
+}
+.feuille{
+  width:min(190px, 44vw);
+  border-radius:6px; overflow:hidden;
+  background:#F7F8F8;
+  box-shadow:0 22px 46px rgba(0,0,0,.58),
+             0 0 0 1px rgba(255,255,255,.14);
+}
+.feuille img{ display:block; width:100%; height:auto; }
+.legende-objets{
+  margin-top:20px; text-align:center;
+  font-size:12.5px; color:var(--t3);
+}
+
+.sticker{
+  width:min(148px, 36vw); margin:0;
+  padding:14px 14px 12px;
+  border-radius:14px;
+  background:#F7F8F8;
+  box-shadow:0 20px 44px rgba(0,0,0,.55),
+             0 0 0 1px rgba(255,255,255,.14);
+}
+.sticker img{ display:block; width:100%; height:auto; border-radius:4px; }
+.sticker .etiq{
+  margin-top:9px; text-align:center;
+  font-size:10.5px; font-weight:500; color:#3A3D42;
+  letter-spacing:-.01em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+/* Les endroits où on le colle. En liste courte plutôt qu'en phrase : c'est un
+   inventaire, et un inventaire se scanne des yeux. */
+.endroits{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:7px;
+  margin-top:26px;
+}
+/* La phrase précédente disait « une manipulation se capture à l'écran, l'IA
+   les découpe de la même façon, et l'équipe les lit au même endroit ». Trois
+   abstractions : « manipulation » ne désigne rien, « de la même façon » ne dit
+   pas quoi, et « au même endroit » ne dit pas où. Deux situations nommées et
+   un seul résultat se comprennent sans relire.
+
+   La note de vérité. Elle est en --t3, en dessous, et volontairement discrète
+   — mais elle est là. Une garantie qu'on énonce à voix basse est plus crédible
+   qu'un argument qu'on met en gras. */
+.note{
+  margin:26px auto 0; max-width:36ch;
+  font-size:12.5px; line-height:1.6; color:var(--t3);
+}
+.endroits span{
+  padding:6px 12px; border-radius:100px;
+  font-size:12.5px; color:var(--t2);
+  background:rgba(255,255,255,.035);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.09);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE BASSE
+
+   ═══ POURQUOI EN BAS ET NON EN HAUT ═══
+
+   La page fait 5 600 px. Entre le bouton de l'accroche, vers 660, et celui du
+   prix, vers 4 400, il y avait 3 700 px sans aucun moyen d'agir — les trois
+   quarts de la page. Quelqu'un convaincu au milieu n'avait rien à toucher.
+
+   En bas plutôt qu'en haut parce que c'est là qu'est le pouce, et parce
+   qu'une barre haute chargée écrase le titre à l'arrivée.
+
+   ═══ LES DEUX CONDITIONS D'APPARITION ═══
+
+   Elle ne monte que si l'accroche est passée ET qu'aucun autre bouton n'est à
+   l'écran. Deux appels à l'action visibles en même temps ne font pas deux
+   chances de convertir : ils font hésiter, et l'hésitation ne clique pas.
+
+   `translateY(120%)` et non `100%` : l'ombre portée dépasse du bloc et
+   resterait visible en bas de l'écran à 100 %.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.barre-bas{
+  position:fixed; z-index:38; left:0; right:0; bottom:0;
+  display:flex; align-items:center; gap:14px;
+  padding:12px var(--gouttiere) calc(12px + env(safe-area-inset-bottom));
+  background:rgba(8,9,10,.62);
+  backdrop-filter:blur(26px) saturate(180%);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+  border-top:.5px solid rgba(255,255,255,.09);
+  transform:translateY(120%);
+  transition:transform .5s var(--ec);
+  pointer-events:none;
+}
+.barre-bas.la{ transform:none; pointer-events:auto; }
+.barre-bas .quoi{ min-width:0; }
+.barre-bas .quoi b{
+  display:block; font-size:14px; font-weight:500; color:var(--t1);
+  letter-spacing:-.015em;
+}
+.barre-bas .quoi span{ font-size:12px; color:var(--t3); }
+.barre-bas .btn{ margin-left:auto; flex:none; height:42px; font-size:14px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE PIED DE PAGE
+   ═══════════════════════════════════════════════════════════════════════════ */
+footer{
+  position:relative; z-index:2;
+  max-width:var(--large); margin:0 auto;
+  padding:30px var(--gouttiere) calc(40px + env(safe-area-inset-bottom));
+}
+footer::before{
+  content:''; position:absolute; z-index:3;
+  left:-40px; right:-40px; top:0; height:1px;
+  background:var(--filet);
+}
+footer .marque{ margin-bottom:18px; }
+.f-liens{ display:flex; flex-wrap:wrap; gap:9px 20px; margin-bottom:20px; }
+.f-liens a{
+  font-size:13px; color:var(--t2); text-decoration:none;
+  transition:color .2s ease;
+}
+.f-liens a:active{ color:var(--t1) }
+.f-bas{ font-size:12px; color:var(--t3); line-height:1.75; }
+
+/* ═══ L'APPARITION AU DÉFILEMENT ═══
+   Même vocabulaire que partout ailleurs : opacité, montée, flou qui se
+   dissipe. Une cascade par section, sauf les étapes — elles se comptent, donc
+   elles se déclenchent une par une. */
+.app{
+  opacity:0; transform:translateY(16px); filter:blur(6px);
+  transition:opacity 1s var(--ec), transform 1s var(--ec), filter 1s var(--ec);
+  transition-delay:var(--d,0s);
+}
+.app.vu{ opacity:1; transform:none; filter:blur(0); }
+
+/* ═══ L'ENTRÉE EN FLOU ═══
+   Trois choses simultanées : le flou qui se dissipe, l'élément qui monte, et
+   l'opacité. Le flou est ce qui distingue l'effet d'une animation ordinaire :
+   l'œil lit « quelque chose se met au point » plutôt que « quelque chose
+   glisse ». */
+.flou{
+  opacity:0; transform:translateY(14px); filter:blur(6px);
+  animation:netteté 1.1s var(--ec) forwards;
+}
+@keyframes netteté{ to{ opacity:1; transform:none; filter:blur(0); } }
+.r1{animation-delay:.10s} .r2{animation-delay:.19s}
+.r3{animation-delay:.28s} .r4{animation-delay:.42s}
+
+/* Sur un petit écran, l'accroche se resserre pour rendre à la capture les
+   pixels dont elle a besoin : en dessous de 150 px visibles, on ne comprend
+   plus ce qu'on regarde. */
+@media (max-height: 740px){
+  .hero{ padding-top:84px; }
+  h1{ font-size:clamp(29px,8.4vw,36px); margin-bottom:11px; }
+  .sous{ font-size:14.5px; line-height:1.5; margin-bottom:18px; }
+  .ecran{ margin-top:26px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLETTE ET ORDINATEUR
+
+   Tout ce qui précède est la version téléphone, et elle reste la référence :
+   les deux paliers ci-dessous ne font qu'élargir, jamais réécrire.
+
+   ═══ LE PARTI PRIS ═══
+
+   Une seule largeur de conteneur par palier, pas deux. La grille, les croix et
+   les filets horizontaux sont tous calés sur `--large` : si les sections
+   avaient leur propre largeur, plus étroite que la grille, les croix ne
+   tomberaient plus sur les verticales et le repère deviendrait faux.
+
+   La longueur de ligne est donc bornée élément par élément, à l'intérieur d'un
+   conteneur large. C'est plus verbeux, mais c'est la seule façon de garder la
+   grille honnête.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ TABLETTE — à partir de 768 px ═══ */
+@media (min-width: 768px){
+  :root{ --large:700px; --gouttiere:40px; --retrait:0px; }
+
+  h1{ font-size:46px; max-width:15ch }
+  .sous{ font-size:17px; max-width:38ch }
+  h2{ font-size:38px }
+  .chapo{ font-size:16px }
+
+  /* Les deux volets passent côte à côte : l'avant et l'après se comparent d'un
+     regard au lieu de se lire l'un après l'autre. C'est le seul endroit de la
+     page où la largeur change le sens, et non seulement la mise en page. */
+  .volets{ flex-direction:row }
+  .volets .volet{ flex:1 }
+
+  /* ═══ LA BARRE SE CALE SUR LE CONTENEUR ═══
+
+     Elle est en `position:fixed`, donc large comme l'écran : avec une simple
+     gouttière, le logo se retrouvait à 40 px du bord pendant que le titre
+     commençait à 107 px. Le seul élément de la page à ne pas être sur la
+     grille — le défaut déjà corrigé sur téléphone, réapparu ici parce que la
+     grille a changé de largeur.
+
+     `max()` garde la gouttière comme plancher sur les écrans plus étroits que
+     le conteneur. */
+  header{
+    padding-inline:max(var(--gouttiere),
+                       calc((100% - var(--large)) / 2 + var(--gouttiere)));
+  }
+  /* Le filet sous la barre traverse l'écran entier, comme les autres. */
+  .grille .h{ left:calc(-50vw + 50%); right:calc(-50vw + 50%) }
+
+  .capture{ max-width:400px; margin:0 auto }
+  .souffle{ left:8%; right:8% }
+  section.bloc{ padding:80px var(--gouttiere) 96px }
+}
+
+/* ═══ ORDINATEUR — à partir de 1100 px ═══ */
+@media (min-width: 1100px){
+  :root{ --large:1080px; --gouttiere:56px; }
+
+  /* ═══ LE PREMIER ÉCRAN EN DEUX COLONNES ═══
+
+     `.premier` et `.colonne-app` sont en `display:contents` sur téléphone :
+     ils n'existent pas, la mise en page est exactement celle d'avant. Ici ils
+     redeviennent des boîtes, et le texte se met à gauche de la capture.
+
+     C'est le seul endroit où l'ordinateur apporte autre chose qu'un
+     agrandissement : sur téléphone, la capture est SOUS le texte et coupée par
+     la pliure ; ici elle est À CÔTÉ, et on voit les deux d'un coup. */
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA LUMIÈRE SUR GRAND ÉCRAN
+
+     Le halo de l'accroche était calibré pour 390 px : étalé sur 1 440, il ne
+     produisait plus qu'un gris sale en haut à gauche. Et sous le premier
+     écran, il n'y avait plus rien du tout — cinq mille pixels de noir plat.
+
+     Trois apports, du plus large au plus fin.
+
+     ① Le halo de l'accroche, resserré et dédoublé : un foyer bleu derrière le
+        titre, un foyer blanc plus faible derrière la capture. Deux sources
+        valent mieux qu'une grande tache — elles créent une direction.
+
+     ② Deux foyers sous la page, derrière le prix et derrière la clôture.
+        Ce sont les deux endroits où l'on décide ; le reste peut rester noir.
+
+     ③ Une arête lumineuse d'un pixel sur le haut des cartes. C'est le détail
+        le moins visible et le plus rentable : une surface sombre sans arête
+        éclairée se lit comme un trou, la même avec un liseré se lit comme un
+        objet posé sous une lampe.
+     ═══════════════════════════════════════════════════════════════════════ */
+  .lueur{
+    height:1180px;
+    background:
+      radial-gradient(ellipse 46% 46% at 27% 4%,
+        rgba(var(--halo),.20), rgba(var(--halo),.05) 48%, transparent 68%),
+      radial-gradient(ellipse 42% 38% at 74% 30%,
+        rgba(255,255,255,.05), transparent 66%);
+  }
+
+  /* Les foyers du bas et les arêtes des cartes sont désormais dans la feuille
+     de base : rien dans ces réglages ne dépend de la largeur, c'est de la
+     lumière et non de la mise en page. Seule leur taille grandit ici. */
+  .tarifs::after{ width:820px; height:560px }
+  .fin::after{ width:680px; height:420px; top:14% }
+
+  /* ═══ LA COLONNE DU MILIEU ═══
+
+     Deux verticales aux bords d'un conteneur, c'est un cadre ; il faut une
+     troisième ligne pour que ce soit une grille. Et surtout : la coupe de
+     l'accroche était à 1,05fr/1fr, donc elle ne tombait sur RIEN. Une grille
+     qui ne mesure pas ce qu'elle contient ne sert à rien.
+
+     Les deux colonnes passent à parts égales et la médiane tombe au centre de
+     leur gouttière. À partir de là, tout ce qui est à droite commence sur une
+     ligne, et l'œil le sent même sans la voir. */
+  /* ═══ LA MÉDIANE SUIT LA MISE EN PAGE ═══
+
+     Elle était posée à 50 %, et j'avais forcé les colonnes à parts égales pour
+     qu'elles tombent dessus. C'était l'erreur : le titre fait 57 signes et se
+     retrouvait dans 452 px, soit moins de quinze signes par ligne — six lignes
+     au total, dont deux mots seuls.
+
+     La capture prend maintenant une largeur FIXE de 400 px et le texte prend
+     ce qui reste. La verticale est calculée depuis la droite pour tomber au
+     centre de leur gouttière, quelle que soit la largeur du conteneur. */
+  .grille .v.m{
+    display:block; left:auto;
+    right:calc(var(--gouttiere) + 470px + 32px);
+  }
+
+  .premier{
+    display:grid; grid-template-columns:1fr 470px; gap:64px;
+    align-items:center;
+    max-width:var(--large); margin:0 auto;
+    padding:calc(var(--barre) + 68px) var(--gouttiere) 92px;
+  }
+  .hero{ padding:0; max-width:none }
+  .colonne-app{ display:block }
+
+  /* 68 px, et l'interligne resserré à 0,98 : à cette taille, un titre respire
+     par lui-même et un interligne large le fait flotter. C'est l'inverse du
+     réglage du téléphone, où il fallait desserrer. */
+  /* Plus de `max-width` : c'est la colonne qui borne la ligne, et elle est
+     maintenant assez large. 60 px au lieu de 68 — la lisibilité d'un titre de
+     quatre lignes bat l'effet d'un titre de six. */
+  h1{ font-size:55px; line-height:1.01; max-width:none; margin-bottom:24px }
+  .sous{ font-size:17.5px; max-width:38ch; margin-bottom:34px }
+  .btn{ height:50px; padding:0 24px; font-size:15.5px }
+  .aside{ font-size:13.5px }
+
+  /* Le bandeau de la galerie suit sa colonne. Son filet horizontal et ses
+     croix sont masqués : ils marquaient la frontière entre l'accroche et la
+     galerie, or les deux sont maintenant côte à côte — il n'y a plus de
+     frontière à marquer. */
+  .onglets{
+    max-width:none; margin-top:0;
+    padding:0 0 14px;
+  }
+  /* ═══════════════════════════════════════════════════════════════════════
+     LES DEUX ÉCRANS EN MÊME TEMPS
+
+     Le carrousel existe parce qu'un téléphone n'a la place que d'un écran.
+     Sur un ordinateur, il cache la moitié du produit derrière deux pastilles
+     de cinq pixels que personne ne clique — et il laisse à l'arrivée une
+     image plate où rien ne se passe.
+
+     Les deux vues sont donc affichées ensemble, décalées en profondeur : la
+     liste des dossiers en retrait, la procédure ouverte devant. On lit d'un
+     coup « c'est une application, elle a plusieurs écrans, et voilà ce qu'il
+     y a dedans ».
+
+     Le bandeau nom + pastilles disparaît : il ne légende plus rien puisqu'il
+     n'y a plus rien à faire défiler.
+     ═══════════════════════════════════════════════════════════════════════ */
+  .onglets{ display:none }
+  .colonne-app .croix{ display:none }
+  .ecran{ max-width:none; padding:0 }
+
+  .capture{
+    position:relative; max-width:none; margin:0;
+    aspect-ratio:auto; height:600px; overflow:visible;
+    border-radius:0; box-shadow:none;
+    -webkit-mask-image:none; mask-image:none;
+  }
+  /* Les vues cessent d'être empilées : chacune redevient un objet posé, avec
+     son cadre, son ombre et son propre fondu de bas. Les transitions du
+     carrousel sont neutralisées — le script continue de basculer la classe
+     `on`, mais elle n'a plus d'effet ici. */
+  .capture .vue{
+    position:absolute; inset:auto;
+    opacity:1; transform:none; filter:none; transition:none;
+    pointer-events:auto;
+    border-radius:20px; overflow:hidden;
+    box-shadow:0 0 0 1px rgba(255,255,255,.14),
+               inset 0 1px 0 rgba(255,255,255,.30),
+               0 34px 80px rgba(0,0,0,.66);
+    /* Le fondu commence à 88 % et non 78 : à 78 il tombait en plein milieu de
+       la barre de navigation de l'app, qu'on lisait à moitié effacée. Plus bas,
+       il n'efface que le vide sous elle. */
+    -webkit-mask-image:linear-gradient(180deg,#000 88%,rgba(0,0,0,.45) 96%,transparent);
+            mask-image:linear-gradient(180deg,#000 88%,rgba(0,0,0,.45) 96%,transparent);
+  }
+  /* Derrière : la liste des dossiers. Elle n'est pas là pour être lue — elle
+     dit qu'il y a d'autres écrans, et elle donne la profondeur. Un tiers
+     visible suffit à ça. */
+  .capture .vue:nth-of-type(1){
+    left:0; top:70px; width:282px; z-index:1;
+    box-shadow:0 0 0 1px rgba(255,255,255,.10),
+               inset 0 1px 0 rgba(255,255,255,.18),
+               0 24px 60px rgba(0,0,0,.6);
+  }
+  /* Devant : la procédure ouverte, plus grande et plus haute. C'est elle qui
+     porte la démonstration, donc elle prend le premier plan. */
+  .capture .vue:nth-of-type(2){
+    right:0; top:0; width:334px; z-index:2;
+  }
+  .capture .vue img{ height:auto }
+  /* Sur un écran de 1 440 px presque entièrement noir, la capture est le seul
+     objet lumineux : le halo doit porter plus loin qu'au téléphone, sinon
+     l'image paraît posée sur le vide au lieu d'en émerger. */
+  .ecran::before{ left:-24%; right:-24%; top:-70px; height:520px; filter:blur(56px) }
+  .souffle{ left:-6%; right:-6%; top:-30px; height:200px }
+
+  /* ═══ LES FILETS TRAVERSENT L'ÉCRAN ENTIER ═══
+     Les 40 px de débordement suffisaient sur téléphone, où la section occupe
+     presque toute la largeur. Sur un écran de 1 440 px, il resterait 140 px de
+     noir de chaque côté du trait. */
+  section.bloc::before, footer::before{
+    left:calc(-50vw + 50%); right:calc(-50vw + 50%);
+  }
+
+  section.bloc{ padding:104px var(--gouttiere) 120px }
+  h2{ font-size:44px; max-width:17ch; margin-bottom:20px }
+  .surtitre{ font-size:13px }
+  .chapo{ font-size:16.5px; max-width:44ch }
+
+  /* ═══ LES BORNES DE LONGUEUR DE LIGNE ═══
+     Sans elles, une ligne de texte ferait 968 px dans le conteneur — environ
+     150 signes, soit le double de ce qui se lit sans effort. */
+  /* ═══ « LA PREUVE » EN DEUX COLONNES ═══
+
+     Première version faite en assignant une rangée de grille à chaque bloc.
+     Erreur : la rangée 2 prenait la hauteur du titre, donc le petit trait de
+     descente s'étirait dans le vide et l'objection tombait cent pixels sous
+     le chapô, sans rien entre les deux.
+
+     Deux enveloppes, comme pour « Pour qui ». Sur téléphone elles sont en
+     `display:contents` et l'ordre de lecture ne change pas d'un pixel. */
+  .preuve{
+    display:grid; grid-template-columns:0.85fr 1fr;
+    /* `auto 1fr` et non deux rangées automatiques : la colonne de droite
+       s'étend sur les deux rangées, et sans cette contrainte le navigateur
+       lui donnait une part de la rangée 1 — l'objection se retrouvait
+       repoussée deux cents pixels sous le chapô, dans le vide. La rangée 1
+       est maintenant exactement haute comme le bloc de texte. */
+    grid-template-rows:auto 1fr;
+    column-gap:80px; align-items:start;
+  }
+  .pv-texte{ display:block; grid-column:1; grid-row:1 }
+  .pv-demo { display:block; grid-column:2; grid-row:1 / -1 }
+  .preuve > .objection{
+    grid-column:1; grid-row:2; margin-top:30px; max-width:none;
+  }
+  .pv-texte h2{ max-width:14ch }
+  .pv-texte .chapo{ max-width:none }
+  .source, .descente, .etapes{ max-width:none }
+  .etapes p{ max-width:52ch }
+  .suites{ max-width:720px }
+  .suites li{ font-size:15px }
+  /* ═══ « POUR QUI » EN DEUX COLONNES ═══
+
+     Première tentative faite avec les pseudo-classes de position : elles
+     comptent les BALISES, pas les classes. Les intitulés de groupe étant des
+     <p> comme le surtitre, tous se sont retrouvés dans la même case, empilés
+     les uns sur les autres.
+
+     Deux enveloppes explicites, comme pour le premier écran. Sur téléphone
+     elles sont en `display:contents` : elles n'existent pas, et l'ordre de
+     lecture reste exactement celui d'avant — texte, listes, puis la note. */
+  .pourqui{
+    display:grid; grid-template-columns:1fr 1fr; column-gap:64px;
+    align-items:start;
+  }
+  .pq-texte{ display:block; grid-column:1; grid-row:1 }
+  .pq-listes{ display:block; grid-column:2; grid-row:1 }
+  .pourqui > .note{ grid-column:1; grid-row:2; margin-top:24px; max-width:44ch }
+  .pq-texte p{ font-size:16.5px; max-width:none }
+  .pq-listes .groupe:first-child{ margin-top:0 }
+  .metiers{ max-width:none }
+
+  .volets{ gap:20px }
+  .volet{ padding:28px }
+  .volet p{ font-size:15px }
+
+  /* Le prix se centre : c'est un objet, pas un paragraphe. Une carte alignée à
+     gauche dans un cadre de 1 080 px paraît posée de travers. */
+  .tarifs > *{ margin-left:auto; margin-right:auto }
+  .tarifs h2, .tarifs .chapo, .tarifs .surtitre{ text-align:center; max-width:20ch }
+  .tarifs .chapo{ max-width:46ch }
+  /* Le bouton du tiroir est enveloppé dans un <div> d'animation, donc il
+     n'est pas un enfant direct de la section : la règle de centrage
+     ci-dessus ne l'atteignait pas et il restait collé à gauche pendant que
+     la carte, elle, était centrée. */
+  .tarif, .plus, .tiroir, .autres, .finement{ max-width:460px }
+  .tarifs .plus, .tarifs .tiroir{ margin-inline:auto }
+  .risques{ max-width:460px; justify-content:center }
+
+  .surplace .sticker{ width:168px }
+  .surplace .feuille{ width:216px }
+  .surplace .objets{ gap:22px }
+  .note{ max-width:46ch }
+
+  .fin h2{ font-size:46px; max-width:18ch }
+  .amorce{ font-size:16px; max-width:34ch }
+
+  /* ═══ LE PIED DE PAGE À L'HORIZONTALE ═══ */
+  footer{
+    padding:36px var(--gouttiere) 48px;
+    display:flex; align-items:center; gap:32px; flex-wrap:wrap;
+  }
+  footer .marque{ margin-bottom:0 }
+  .f-liens{ margin-bottom:0 }
+  .f-bas{ margin-left:auto; text-align:right }
+
+  /* ═══ LA BARRE BASSE DISPARAÎT, LA PILULE REVIENT ═══
+
+     Sur téléphone, la barre basse existait parce que le pouce est en bas et
+     que 5 000 px séparaient deux boutons. Sur un ordinateur, la barre du haut
+     reste visible en permanence et le curseur y va sans effort : une barre
+     collée en bas d'un écran de 900 px ne ferait qu'occuper de la place.
+
+     La pilule « Essayer » revient donc dans la barre. Ce qui la rendait
+     nuisible sur téléphone — elle attrapait l'œil avant le titre — ne joue
+     plus ici : à 1 400 px de large, elle est loin du titre, pas devant lui. */
+  .barre-bas{ display:none }
+  .h-pil-pc{
+    display:inline-flex !important; align-items:center; gap:7px;
+    padding:10px 18px; border-radius:100px; text-decoration:none;
+    background:var(--t1); color:var(--fond);
+    font-size:13.5px; font-weight:500; letter-spacing:-.01em;
+    transition:background .2s ease, transform .15s var(--ec);
+  }
+  .h-pil-pc:hover{ background:#fff; transform:translateY(-1px) }
+  .h-droite{ gap:24px }
+
+  /* ═══ LE SURVOL ═══
+     Il n'existait pas : un téléphone n'a pas de curseur. Sans lui, une page
+     d'ordinateur paraît morte au clic près. */
+  .btn:hover{ background:#fff }
+  .h-lien:hover{ color:var(--t1) }
+  .plus:hover{ background:rgba(255,255,255,.07); color:var(--t1) }
+  .f-liens a:hover{ color:var(--t1) }
+  .points i{ cursor:pointer }
+  .metiers span, .endroits span{ transition:background .2s ease }
+}
+
+/* ═══ TRÈS GRAND ÉCRAN ═══
+   Au-delà, on n'élargit plus : une ligne de texte a une longueur lisible qui
+   ne dépend pas de la taille du moniteur. Seul le blanc autour augmente. */
+@media (min-width: 1500px){
+  :root{ --large:1140px }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .flou{ animation:none; opacity:1; transform:none; filter:none; }
+  .app{ transition:none; opacity:1; transform:none; filter:none; }
+  .vue{ transition:none }
+  .tiroir, .plus svg{ transition:none }
+  .barre-bas{ transition:none }
+}
+</style>
+</head>
+<body>
+
+<div class="lueur"></div>
+
+<!-- ═══ LA GRILLE ═══
+     Une seule horizontale est posée ici, sous la barre. Celle du haut de la
+     capture est portée par le bloc .ecran lui-même : codée en pixels, elle
+     se serait décalée dès que le titre change de nombre de lignes. -->
+<div class="grille" aria-hidden="true">
+  <i class="v g"></i>
+  <i class="v m"></i>
+  <i class="v d"></i>
+  <i class="h" style="top:var(--barre)"></i>
+  <i class="x" style="left:var(--gouttiere);top:var(--barre)"></i>
+  <i class="x" style="right:var(--gouttiere);top:var(--barre);transform:translate(4px,-4px)"></i>
+</div>
+<div class="grain"></div>
+
+<header id="barre">
+  <div class="marque">
+    <img src="logo-standix.png" alt="">
+    <span>Standix</span>
+  </div>
+  <div class="h-droite">
+    <a class="h-lien" href="https://emcl22a-creator.github.io/Standix">Se connecter</a>
+    <!-- Masquée sur téléphone, elle ne réapparaît qu'à partir de 1 100 px. -->
+    <a class="h-pil-pc" href="https://emcl22a-creator.github.io/Standix" style="display:none">Essayer gratuitement</a>
+  </div>
+</header>
+
+<div class="premier">
+<section class="hero">
+  <!-- ═══ POURQUOI CE TITRE-LÀ ═══
+
+       Le précédent — « Vous ne pouvez pas être partout. Votre savoir-faire,
+       si. » — était une phrase de positionnement, pas une phrase de produit.
+       Elle aurait pu vendre un logiciel de planning, une caméra de
+       surveillance ou un service de conciergerie. Sur un téléphone, le titre
+       est souvent la seule chose lue : il doit contenir le VERBE du produit.
+
+       « Filmez » est ce verbe. « Une fois » est la promesse. « Saura faire »
+       est le résultat. « Même sans vous » garde le fil de l'absence, mais
+       APRÈS la mécanique et non avant.
+
+       « Saura faire » fait aussi écho à savoir-faire, qui est le mot central
+       de la marque. C'est une résonance gratuite, il aurait été dommage de
+       s'en priver. -->
+  <h1 class="flou r1">Filmez une fois.<br><em>Votre équipe saura faire, même sans vous.</em></h1>
+  <p class="sous flou r2">
+    Le geste ou l'écran : l'IA découpe la vidéo et rédige les étapes. Un QR
+    code sur place, et la procédure s'ouvre.
+  </p>
+  <div class="actions flou r3">
+    <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+      Essayer gratuitement
+      <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+    </a>
+    <span class="aside">Sans carte bancaire</span>
+  </div>
+</section>
+
+<div class="colonne-app">
+<div class="onglets flou r4">
+  <p class="nom" id="nom">Toutes vos procédures</p>
+  <div class="points" id="points" aria-hidden="true">
+    <i class="on"></i><i></i>
+  </div>
+  <i class="croix g"></i><i class="croix d"></i>
+</div>
+
+<div class="ecran flou r4">
+  <i class="souffle" aria-hidden="true"></i>
+
+  <!-- ═══ LA GALERIE ═══
+       Trois écrans. Le premier est ta capture réelle ; les deux autres sont
+       des emplacements. L'ordre est à revoir quand tu me les enverras : la
+       procédure ouverte devrait passer en premier, c'est le seul écran où le
+       produit se prouve. -->
+  <!-- ═══ DEUX ÉCRANS RÉELS ═══
+
+       Les emplacements gris ont disparu : les deux vues sont des captures de
+       l'app. L'écran Analyse a été retiré plutôt que laissé en attente — une
+       galerie de deux vraies images vaut mieux qu'une de trois dont une est un
+       rectangle vide. -->
+  <div class="capture" id="galerie">
+
+    <div class="vue on" data-nom="Toutes vos procédures">
+      <img src="app-procedures.png" alt="L'accueil de l'espace Équipe de Standix"
+           width="720" height="1281">
+    </div>
+
+    <div class="vue" data-nom="Le geste, étape par étape">
+      <img src="app-procedure.png"
+           alt="Une procédure Standix ouverte, avec sa vidéo et ses étapes"
+           width="720" height="1269">
+    </div>
+
+  </div>
+</div>
+
+</div>
+</div><!-- /.premier -->
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LA PREUVE
+
+     ⚠ TOUT LE TEXTE CI-DESSOUS EST PROVISOIRE. Il faut le remplacer par une
+       procédure réelle de ton app, recopiée SANS RETOUCHE — fautes comprises.
+       Une version relue et embellie ne prouverait rien, et c'est exactement ce
+       que fait la concurrence.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="bloc preuve">
+  <i class="croix g"></i><i class="croix d"></i>
+  <div class="pv-texte">
+  <p class="surtitre app">La preuve</p>
+  <h2 class="app" style="--d:.05s">
+    Trois minutes de vidéo. <em>Six étapes écrites.</em>
+  </h2>
+  <p class="chapo app" style="--d:.09s">
+    Une procédure réelle, telle qu'elle sort de l'app. Rien n'a été réécrit.
+  </p>
+
+  </div>
+
+  <div class="pv-demo">
+  <div class="source app" style="--d:.13s">
+    <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span>
+    <span class="txt">
+      <!-- Le titre était tronqué à « Machine à café — Détartra… » : la ligne
+           est en `nowrap` avec ellipse, et 24 signes ne tiennent pas à côté du
+           bouton et de la durée. Le dossier passe donc en sous-titre, là où il
+           a la place — c'est aussi la hiérarchie de l'app. -->
+      <b>Machine à café</b>
+      <span>Détartrage · filmée au téléphone, en une prise</span>
+    </span>
+    <span class="duree">3:13</span>
+  </div>
+
+  <div class="descente app" style="--d:.17s"></div>
+
+  <!-- ═══ CE TEXTE EST CELUI DE L'APP, MOT POUR MOT ═══
+
+       Les étapes n'ont ni titre ni résumé : l'app produit un paragraphe par
+       étape, et c'est ce qui est affiché. Leur donner un titre aurait été les
+       réécrire, ce qui détruit la seule chose que cette section démontre.
+
+       Les horodatages sont des PLAGES et non des instants. C'est plus
+       crédible : un instant peut se taper à la main, une plage prouve que
+       l'étape correspond à un segment découpé de la vidéo. -->
+  <ol class="etapes">
+    <li class="app" style="--d:.20s">
+      <span class="tc">0:00 – 0:58</span>
+      <p>Allumer la machine, éjecter la capsule, vider le bac à capsules et les
+         bacs récolte-gouttes, puis placer un récipient d'environ 1 litre sous
+         la sortie café</p>
+      <!-- L'avertissement est produit par l'IA, pas ajouté à la main. C'est le
+           détail le plus convaincant de toute la page : une liste d'étapes se
+           devine, une mise en garde suppose qu'on a compris le geste. -->
+      <p class="garde">Ne pas oublier d'éjecter la capsule avant de commencer</p>
+    </li>
+    <li class="app" style="--d:.24s">
+      <span class="tc">0:58 – 1:24</span>
+      <p>Remplir le réservoir avec environ 500 ml d'eau et de détartrant
+         Nespresso, attendre que les 2 boutons arrêtent de clignoter, puis
+         appuyer simultanément sur les 2 boutons pendant 3 secondes pour
+         activer le mode détartrage</p>
+    </li>
+    <li class="app" style="--d:.28s">
+      <span class="tc">1:24 – 2:01</span>
+      <p>Appuyer sur le bouton grande tasse et laisser couler toute la
+         solution, remplir à nouveau le réservoir avec le même mélange, puis
+         appuyer sur le bouton grande tasse et laisser couler toute la solution
+         détartrante</p>
+    </li>
+    <li class="app" style="--d:.32s">
+      <span class="tc">2:01 – 2:23</span>
+      <p>Vider et rincer le réservoir d'eau, puis le remplir avec de l'eau
+         claire</p>
+    </li>
+    <li class="app" style="--d:.36s">
+      <span class="tc">2:23 – 2:49</span>
+      <p>Appuyer sur le bouton grande tasse pour vider le réservoir de son
+         contenu, puis vider et rincer les bacs récolte-gouttes</p>
+    </li>
+    <li class="app" style="--d:.40s">
+      <span class="tc">2:49 – 3:13</span>
+      <p>Appuyer simultanément sur les 2 boutons pendant 3 secondes pour
+         quitter le mode détartrage</p>
+    </li>
+  </ol>
+
+  </div>
+
+  <div class="objection app" style="--d:.20s">
+    <b>Et si l'IA se trompe&nbsp;?</b>
+    <p>
+      Vous relisez avant de publier. Corriger un mot prend cinq secondes.
+      Écrire la procédure de zéro en prend vingt minutes.
+    </p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     CE QUE ÇA CHANGE
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="bloc">
+  <i class="croix g"></i><i class="croix d"></i>
+  <p class="surtitre app">Quand vous n'êtes pas là</p>
+  <!-- ═══ DEUX FAUTES CORRIGÉES ═══
+
+       « Elle est seule chez le client » ouvrait la section sur un pronom sans
+       antécédent : le lecteur arrive ici sans savoir de qui on parle. Un
+       pronom en tête de section n'a rien à quoi se raccrocher.
+
+       Et « vous êtes ailleurs » parlait du patron, alors que le problème n'est
+       pas où il se trouve — c'est qu'il n'y a personne pour montrer le geste.
+       La seconde phrase nomme maintenant le manque, pas l'absent.
+
+       ═══ LE REMÈDE EST AU MÊME ENDROIT QUE L'ERREUR ═══
+
+       Le volet « Avec Standix » plaçait d'abord le QR code dans le placard à
+       produits — c'est-à-dire au dépôt, alors que la scène se passe chez le
+       client. Le remède arrivait après coup et dans un autre lieu, ce qui ne
+       répond à rien.
+
+       Le QR est maintenant sur le bidon. L'objet qui cause le problème est
+       celui qui l'empêche, et l'interception a lieu à la seconde exacte du
+       geste. C'est aussi ce qui rend la démonstration du QR code crédible :
+       on le colle sur ce qu'on prend en main, pas sur un mur. -->
+  <h2 class="app" style="--d:.05s">
+    Un nouveau, seul chez un client. <em>Personne pour lui montrer.</em>
+  </h2>
+
+  <div class="volets">
+    <div class="volet app" style="--d:.10s">
+      <p class="etiq">Aujourd'hui</p>
+      <p>
+        Premier chantier. Il attaque la salle de bain et prend le détartrant
+        pour la paroi de douche. La paroi est en pierre naturelle. Il s'en
+        aperçoit quand la surface devient mate — et vous, quand le client
+        appelle.
+      </p>
+    </div>
+    <div class="volet apres app" style="--d:.16s">
+      <p class="etiq">Avec Standix</p>
+      <p>
+        Il prend le même bidon. Un QR code est collé dessus. Il scanne :
+        « Jamais sur pierre naturelle — savon noir dilué », et la vidéo du
+        geste. Trente secondes. La paroi est intacte, et votre téléphone n'a
+        pas sonné.
+      </p>
+    </div>
+  </div>
+
+  <ul class="suites">
+    <li class="app" style="--d:.20s">
+      <b>Le même geste partout.</b> Plus la version de celui qui a formé.
+    </li>
+    <li class="app" style="--d:.24s">
+      <b>Une formation qui ne se refait pas.</b> Une fois, pas à chaque arrivée.
+    </li>
+    <li class="app" style="--d:.28s">
+      <b>Une trace.</b> Qui a lu quoi, et quand. Utile le jour où ça se discute.
+    </li>
+  </ul>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     SUR PLACE
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="bloc surplace" style="text-align:center">
+  <i class="croix g"></i><i class="croix d"></i>
+  <!-- ═══ DEUX CORRECTIONS ═══
+
+       « Sur la machine » ne parle pas à la cible de départ : dans le nettoyage
+       et les services à domicile, il n'y a pas de machine. « Là où le geste se
+       fait » couvre le bidon, le chariot, la porte du local et le four du
+       boulanger, sans en exclure aucun.
+
+       « Pas de compte à créer » était FAUX : chaque membre a un compte, créé
+       avec le code de l'entreprise. Une promesse fausse sur la page d'accueil
+       se retourne à la première conversation avec un prospect.
+
+       Et ce n'est pas une perte : le compte signifie que les procédures ne
+       sont pas publiques. Un patron qui confie son savoir-faire à un outil
+       veut précisément l'entendre. Ce qui était présenté comme une absence de
+       friction devient une garantie. -->
+  <p class="surtitre app">Sur place</p>
+  <h2 class="app" style="--d:.05s;margin-inline:auto">
+    Là où le geste se fait. <em>À l'écran ou sur papier.</em>
+  </h2>
+  <p class="chapo app" style="--d:.09s;margin-inline:auto;margin-bottom:34px">
+    On scanne le code, la bonne procédure s'ouvre — pas de liste à parcourir,
+    pas de nom à retenir. Et quand il faut du papier, chaque procédure
+    s'exporte en PDF.
+  </p>
+
+  <!-- ═══ DEUX OBJETS, PAS UN ═══
+
+       L'autocollant seul racontait l'accès. La feuille à côté raconte l'autre
+       moitié : le contrôle, l'affichage au mur, le classeur du responsable
+       qualité. Ce sont les deux seules surfaces claires de la page, et c'est
+       voulu — ce sont aussi les deux seuls objets PHYSIQUES du produit.
+
+       La feuille est plus grande que l'autocollant, dans le rapport où on les
+       trouve dans la réalité. Deux objets de même taille se seraient lus comme
+       deux boutons. -->
+  <div class="objets app" style="--d:.13s">
+    <div class="sticker">
+      <img src="qr-standix.png" alt="QR code d'une procédure Standix"
+           width="600" height="600">
+      <p class="etiq">Machine à café</p>
+    </div>
+    <div class="feuille">
+      <img src="pdf-standix.png" alt="La même procédure exportée en PDF"
+           width="1068" height="1134">
+    </div>
+  </div>
+  <p class="legende-objets app" style="--d:.16s">
+    Le code à afficher au poste · la fiche à imprimer
+  </p>
+
+  <div class="endroits app" style="--d:.18s">
+    <span>Sur le bidon</span>
+    <span>Sur le chariot</span>
+    <span>Au dos de la porte</span>
+    <span>Dans le camion</span>
+  </div>
+
+  <p class="note app" style="--d:.22s">
+    Chaque membre a son compte, créé une fois à son arrivée avec le code de
+    l'entreprise. Vos procédures ne sont jamais publiques.
+  </p>
+</section>
+
+<!-- ═══ POUR QUI ═══ -->
+<section class="bloc pourqui">
+  <i class="croix g"></i><i class="croix d"></i>
+  <!-- « Cinq à trente personnes, et du mouvement » a été retiré : c'était une
+       phrase sans verbe, donc une énumération qui n'annonçait rien. Un
+       fragment de ce genre se lit deux fois avant d'être compris, et sur un
+       téléphone il n'est pas relu.
+
+       ⚠ L'information « 5 à 30 personnes » disparaît avec elle. Elle
+         n'apparaît plus nulle part sur la page. -->
+  <!-- ═══ POURQUOI LA LISTE ARRIVAIT SANS PRÉVENIR ═══
+
+       C'était la seule section de la page sans surtitre ni titre : le lecteur
+       tombait sur dix-neuf pastilles sans savoir ce qu'elles énumèrent — des
+       clients ? des secteurs couverts ? des exemples ?
+
+       Deux corrections. Le surtitre, que toutes les autres sections ont, situe
+       la section avant qu'on la lise. Et la phrase se termine maintenant par
+       deux-points : une liste annoncée par deux-points n'a plus besoin d'être
+       expliquée, elle est attendue. -->
+  <div class="pq-texte">
+  <p class="surtitre app">Pour qui</p>
+  <p class="app" style="--d:.04s">
+    Quand quelqu'un s'en va, son savoir-faire s'en va avec lui. Standix le
+    retient, dans tous les métiers où l'on apprend en regardant faire —
+    à la main comme à l'écran :
+  </p>
+  <!-- ═══ DEUX GROUPES PLUTÔT QU'UNE LISTE ═══
+
+       Ajouter les métiers de bureau à la suite aurait porté la liste à
+       vingt-six pastilles — un mur qu'on ne lit plus, on le survole.
+
+       Séparées et intitulées, les deux listes redeviennent courtes, ET elles
+       font un travail que la liste unique ne faisait pas : elles montrent d'un
+       coup d'œil que Standix couvre deux usages. Le lecteur de bureau ne se
+       serait pas reconnu dans une liste ouverte par « Nettoyage ». -->
+  </div>
+
+  <div class="pq-listes">
+  <p class="groupe app" style="--d:.08s">Sur le terrain</p>
+  <div class="metiers app" style="--d:.10s">
+    <span class="cible">Nettoyage</span>
+    <span class="cible">Aide à domicile</span>
+    <span>Restauration</span>
+    <span>Boulangerie</span>
+    <span>Boucherie</span>
+    <span>Hôtellerie</span>
+    <span>Coiffure</span>
+    <span>Garage</span>
+    <span>Carrosserie</span>
+    <span>Paysagisme</span>
+    <span>Location de matériel</span>
+  </div>
+
+  <p class="groupe app" style="--d:.14s">Devant un écran</p>
+  <div class="metiers app" style="--d:.16s">
+    <span>Cabinet comptable</span>
+    <span>Agence immobilière</span>
+    <span>Assurance</span>
+    <span>Étude notariale</span>
+    <span>Secrétariat médical</span>
+    <span>Logistique</span>
+  </div>
+
+  </div>
+
+  <p class="note app" style="--d:.20s;margin-left:0;text-align:left">
+    Sur le terrain, on filme le geste. Au bureau, on enregistre l'écran. Dans
+    les deux cas, l'IA en fait une procédure que l'équipe ouvre sur son
+    téléphone.
+  </p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LE PRIX
+
+     ⚠ À COMPLÉTER : les quotas d'Équipe, Pro et Réseau — nombre de membres et
+       d'analyses vidéo. Et la durée de l'essai gratuit, qui n'est écrite nulle
+       part sur la page alors que le bouton la promet depuis le premier écran.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="bloc tarifs">
+  <i class="croix g"></i><i class="croix d"></i>
+  <!-- ═══ CE QUE LE TITRE MET EN AVANT ═══
+
+       « Sans engagement » était un argument de tout le monde. « Tout est
+       compris » est le tien : toutes les offres donnent accès aux mêmes
+       fonctionnalités, seule la taille de l'équipe change le prix.
+
+       C'est rare et c'est vérifiable. La plupart des logiciels réservent le
+       suivi, l'export ou le multi-établissement à l'offre haute, et le patron
+       de dix personnes le sait — il s'attend à découvrir que ce qui l'intéresse
+       est deux paliers plus haut. Lui dire l'inverse d'entrée lève une méfiance
+       qu'il n'aura même pas eu à formuler. -->
+  <p class="surtitre app">Le prix</p>
+  <h2 class="app" style="--d:.05s">
+    69 € par mois. <em>Tout est compris.</em>
+  </h2>
+  <p class="chapo app" style="--d:.09s">
+    Toutes les offres donnent accès aux mêmes fonctionnalités, sans exception.
+    Seule la taille de l'équipe change le prix.
+  </p>
+
+  <div class="tarif app" style="--d:.13s">
+    <p class="nom">Essentiel</p>
+    <p class="somme"><b>69 €</b><i>par mois, hors taxes</i></p>
+    <p class="division">Soit 13,80 € par personne et par mois.</p>
+    <ul>
+      <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Jusqu'à <b>5 membres</b></li>
+      <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>30 analyses vidéo IA</b> par mois</li>
+      <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Procédures illimitées</li>
+      <!-- La langue est placée AVANT « toutes les fonctionnalités » : cette
+           dernière ligne conclut la liste, rien ne doit venir après elle. -->
+      <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
+      <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
+    </ul>
+    <p class="annuel">ou <b>55 € par mois</b> en payant à l'année</p>
+    <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+      Essayer gratuitement
+      <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+
+  <div class="app" style="--d:.17s">
+    <button class="plus" id="btn-formules" aria-expanded="false"
+            aria-controls="tiroir-formules">
+      <span id="btn-formules-txt">Voir les autres formules</span>
+      <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+
+    <div class="tiroir" id="tiroir-formules" role="region"
+         aria-labelledby="btn-formules">
+      <ul class="formules">
+        <li>
+          <span class="f-nom">Équipe
+            <span class="f-quota">Jusqu'à 15 membres · 60&nbsp;analyses&nbsp;IA/mois</span>
+          </span>
+          <span class="f-prix">129 €<span> /mois</span></span>
+        </li>
+        <li>
+          <span class="f-nom">Pro
+            <span class="f-quota">Jusqu'à 40 membres · 120&nbsp;analyses&nbsp;IA/mois</span>
+          </span>
+          <span class="f-prix">239 €<span> /mois</span></span>
+        </li>
+        <li>
+          <span class="f-nom">Réseau
+            <span class="f-quota">Jusqu'à 100 membres · 250&nbsp;analyses&nbsp;IA/mois</span>
+          </span>
+          <span class="f-prix">499 €<span> /mois</span></span>
+        </li>
+        <li>
+          <span class="f-nom">Entreprise
+            <span class="f-quota">Au-delà de 100 personnes</span>
+          </span>
+          <span class="f-prix">Sur devis</span>
+        </li>
+      </ul>
+      <p class="finement">
+        Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais
+        avant. Les analyses vidéo se renouvellent chaque mois et ne se
+        reportent pas.
+      </p>
+    </div>
+  </div>
+
+  <div class="risques app" style="--d:.21s">
+    <span>14 jours d'essai</span>
+    <span>Sans carte bancaire</span>
+    <span>Résiliable en un clic</span>
+  </div>
+</section>
+
+<!-- ═══ LA RELANCE ═══ -->
+<section class="bloc fin">
+  <i class="croix g"></i><i class="croix d"></i>
+  <!-- ═══ CE QUE LA CLÔTURE DOIT FAIRE ═══
+
+       La précédente — « Filmez un geste ce soir. Le prochain qui arrive saura
+       le faire. » — avait deux défauts. Elle répétait l'accroche mot pour mot
+       (« saura faire »), donc elle ne faisait rien avancer. Et « ce soir »
+       imposait un moment que le lecteur n'a pas choisi.
+
+       Surtout, elle réargumentait alors qu'à ce stade le lecteur est déjà
+       convaincu. Ce qui le retient n'est plus le doute, c'est l'AMPLEUR : il
+       imagine qu'il faudrait filmer tout son métier avant que ça serve.
+
+       La clôture ne vend donc plus rien. Elle réduit la première marche à une
+       seule procédure, et la ligne suivante lui dit même laquelle choisir. -->
+  <h2 class="app">Commencez par <em>une seule procédure.</em></h2>
+  <p class="amorce app" style="--d:.04s">
+    Celle que vous expliquez le plus souvent.
+  </p>
+  <div class="actions app" style="--d:.09s">
+    <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+      Essayer gratuitement
+      <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+  <span class="aside app" style="--d:.13s">Sans carte bancaire · Résiliable en un clic</span>
+</section>
+
+<footer>
+  <div class="marque">
+    <img src="logo-standix.png" alt="">
+    <span>Standix</span>
+  </div>
+  <!-- ⚠ Ces trois pages n'existent pas : les liens renvoient une 404 tant que
+       tu ne m'auras pas donné les textes. Il manque aussi une adresse de
+       contact — un site sans moyen d'écrire inquiète plus qu'il ne rassure. -->
+  <nav class="f-liens">
+    <a href="mentions.html">Mentions légales</a>
+    <a href="cgu.html">Conditions d'utilisation</a>
+    <a href="confidentialite.html">Confidentialité</a>
+    <a href="https://emcl22a-creator.github.io/Standix">Se connecter</a>
+  </nav>
+  <p class="f-bas">
+    <!-- La phrase de pied de page décrit, elle ne vend pas. « Le savoir-faire
+         de la maison, disponible sans vous » avait deux défauts : « sans vous »
+         se lit aussi « on n'a plus besoin de vous », et « la maison » est du
+         vocabulaire de restauration qui ne dit rien à un cabinet comptable.
+
+         Cette formule-là avait été écartée comme TITRE parce qu'elle décrivait
+         la mécanique au lieu de vendre. C'est exactement ce qu'on veut d'un
+         pied de page. -->
+    Filmez le geste. L'IA écrit la procédure.<br>
+    © 2026 Standix
+  </p>
+</footer>
+
+<!-- ═══ LA BARRE BASSE ═══ -->
+<div class="barre-bas" id="barre-bas">
+  <span class="quoi">
+    <b>69 € par mois</b>
+    <span>Sans engagement</span>
+  </span>
+  <a class="btn" href="https://emcl22a-creator.github.io/Standix">
+    Essayer
+    <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+  </a>
+</div>
+
+<script>
+;(() => {
+  /* ═══ LA BARRE BASSE ═══
+
+     Calculée au défilement plutôt qu'avec un IntersectionObserver : il faut
+     surveiller trois éléments à la fois et croiser leurs états, ce qu'un
+     observateur rend plus tortueux qu'un simple calcul de rectangles.
+
+     Elle est calée sur le même `requestAnimationFrame` que la barre du haut,
+     donc il n'y a qu'un seul écouteur de défilement sur toute la page. */
+  const bb = document.getElementById('barre-bas')
+  const boutons = [...document.querySelectorAll('.hero .btn, .tarif .btn, .fin .btn')]
+  const majBas = () => {
+    const [accroche, ...suivants] = boutons
+    /* Condition 1 : l'accroche est sortie par le haut. */
+    const passe = accroche.getBoundingClientRect().bottom < 0
+    /* Condition 2 : aucun autre bouton n'est à l'écran. */
+    const libre = suivants.every(e => {
+      const r = e.getBoundingClientRect()
+      return r.top > innerHeight || r.bottom < 0
+    })
+    bb.classList.toggle('la', passe && libre)
+  }
+
+  const barre = document.getElementById('barre')
+  let attend = false
+  const maj = () => {
+    attend = false
+    barre.classList.toggle('pose', scrollY > 10)
+    majBas()
+  }
+  addEventListener('scroll', () => { if (attend) return; attend = true
+    requestAnimationFrame(maj) }, { passive:true })
+  maj()
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA GALERIE
+
+     ═══ POURQUOI SEULEMENT L'HORIZONTAL ═══
+
+     Le glissement vertical appartient à la page. Le détourner pour changer
+     une image est le geste le plus détesté du web mobile : le doigt fait ce
+     qu'il fait toujours, et rien ne bouge. Et il faudrait épingler le cadre à
+     l'écran — mesuré et écarté : à 390 px, le cadre et le titre se croisent.
+
+     L'horizontal, lui, est libre : rien d'autre ne l'emploie ici.
+
+     ═══ LE SEUIL ═══
+
+     48 px, et seulement si le mouvement est plus horizontal que vertical. En
+     dessous, un pouce qui fait défiler la page en diagonale déclencherait la
+     galerie par accident — c'est la faute classique de ce genre de code.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const gal = document.getElementById('galerie')
+  const vues = [...gal.querySelectorAll('.vue')]
+  const pts  = [...document.getElementById('points').children]
+  const nom  = document.getElementById('nom')
+  let i = 0, touche = false, auto = null
+
+  const aller = (n) => {
+    n = (n + vues.length) % vues.length
+    if (n === i) return
+    vues[i].classList.remove('on'); pts[i].classList.remove('on')
+    i = n
+    vues[i].classList.add('on'); pts[i].classList.add('on')
+    /* Le nom s'efface avant de changer : voir un mot se remplacer d'un coup
+       pendant que l'image se fond, c'est deux vitesses différentes à l'écran. */
+    nom.style.opacity = 0
+    setTimeout(() => { nom.textContent = vues[i].dataset.nom; nom.style.opacity = 1 }, 220)
+  }
+
+  let x0 = 0, y0 = 0, suit = false
+  gal.addEventListener('touchstart', e => {
+    x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; suit = true
+  }, { passive:true })
+  gal.addEventListener('touchend', e => {
+    if (!suit) return
+    suit = false
+    const dx = e.changedTouches[0].clientX - x0
+    const dy = e.changedTouches[0].clientY - y0
+    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return
+    touche = true; clearTimeout(auto)
+    aller(i + (dx < 0 ? 1 : -1))
+  }, { passive:true })
+
+  /* Sur ordinateur, les points sont cliquables — sans ça, la galerie serait
+     invisible pour qui n'a pas d'écran tactile. */
+  pts.forEach((p, n) => {
+    p.style.cursor = 'pointer'
+    p.addEventListener('click', () => { touche = true; clearTimeout(auto); aller(n) })
+  })
+
+  /* UN SEUL passage automatique, 3,2 s après l'arrivée. Il ne sert pas à
+     montrer le deuxième écran : il sert à révéler que la galerie EXISTE.
+     Sans lui, personne ne devine qu'on peut glisser. Il s'annule dès que le
+     visiteur touche quoi que ce soit — un carrousel qui tourne tout seul pendant
+     qu'on le lit est pire que pas de carrousel du tout. */
+  auto = setTimeout(() => { if (!touche) aller(1) }, 3200)
+
+  /* ═══ LE TIROIR ═══
+
+     Le libellé change à l'ouverture. Un bouton qui garde « Voir les autres
+     formules » alors qu'elles sont déjà à l'écran laisse le visiteur chercher
+     comment refermer. */
+  const bt = document.getElementById('btn-formules')
+  const ti = document.getElementById('tiroir-formules')
+  const tx = document.getElementById('btn-formules-txt')
+  bt.addEventListener('click', () => {
+    const ouvert = bt.getAttribute('aria-expanded') === 'true'
+    if (ouvert) {
+      /* On repasse de `auto` à une valeur chiffrée avant de fermer : une
+         transition depuis `auto` ne se joue pas, la fermeture serait sèche. */
+      ti.style.height = ti.scrollHeight + 'px'
+      requestAnimationFrame(() => { ti.style.height = '0px' })
+      bt.setAttribute('aria-expanded', 'false')
+      tx.textContent = 'Voir les autres formules'
+    } else {
+      ti.style.height = ti.scrollHeight + 'px'
+      bt.setAttribute('aria-expanded', 'true')
+      tx.textContent = 'Masquer les formules'
+    }
+  })
+  /* Une fois ouvert, la hauteur redevient `auto` : sinon une rotation d'écran
+     ou un changement de taille de police tronquerait le contenu. */
+  ti.addEventListener('transitionend', e => {
+    if (e.propertyName !== 'height') return
+    if (bt.getAttribute('aria-expanded') === 'true') ti.style.height = 'auto'
+  })
+
+  /* ═══ L'APPARITION AU DÉFILEMENT ═══
+
+     `rootMargin: -12%` en bas : l'élément doit être franchement entré dans
+     l'écran avant de se révéler. Sans cette marge, il s'anime alors qu'il
+     touche à peine le bord et on ne voit que la fin du mouvement.
+
+     `unobserve` après coup : chaque élément ne s'anime qu'une fois. Un bloc
+     qui rejoue son apparition à chaque remontée devient vite agaçant. */
+  const cibles = document.querySelectorAll('.app')
+  if (!('IntersectionObserver' in window)) {
+    cibles.forEach(e => e.classList.add('vu'))
+  } else {
+    /* Le `boundingClientRect.top < 0` n'est pas un détail : sans lui, un
+       visiteur qui arrive au milieu de la page — lien avec ancre, rechargement
+       à mi-hauteur, retour arrière du navigateur — trouve tout ce qui est
+       au-dessus de lui resté invisible pour toujours, puisque ces éléments ne
+       croiseront plus jamais l'écran. */
+    const ob = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting && e.boundingClientRect.top > 0) return
+      e.target.classList.add('vu')
+      ob.unobserve(e.target)
+    }), { rootMargin:'0px 0px -12% 0px', threshold:.01 })
+    cibles.forEach(e => ob.observe(e))
+  }
+})()
+</script>
+</body>
+</html>

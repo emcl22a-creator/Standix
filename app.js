@@ -7233,10 +7233,42 @@ function lireMeta(fichier) {
   return new Promise((ok) => {
     const v = document.createElement('video')
     v.preload = 'metadata'
-    v.onloadedmetadata = () => {
-      ok({ duree: v.duration || 0, largeur: v.videoWidth, hauteur: v.videoHeight })
+
+    const fini = (duree) => {
+      ok({ duree: isFinite(duree) && duree > 0 ? duree : 0,
+           largeur: v.videoWidth, hauteur: v.videoHeight })
       URL.revokeObjectURL(v.src)
     }
+
+    v.onloadedmetadata = () => {
+      /* ═══ CERTAINS FICHIERS NE PORTENT PAS LEUR DURÉE ═══
+
+         `MediaRecorder` écrit des WebM sans durée dans l'en-tête : le lecteur
+         rend `Infinity`. Or c'est exactement ce que produit notre propre
+         collage — recoller un collage tombait donc dessus, et les totaux
+         affichaient « Infinity s ».
+
+         LE CONTOURNEMENT EST CONNU ET LAID : on demande à se placer très loin
+         dans la vidéo. Le lecteur va au bout, découvre la vraie fin, et la
+         renseigne. On revient ensuite au début.
+
+         Un garde-fou de deux secondes : si le lecteur ne répond pas, on rend
+         zéro plutôt que d'attendre indéfiniment. La vidéo sera écartée avec un
+         message, ce qui vaut mieux qu'une liste qui ne se remplit jamais. */
+      if (isFinite(v.duration) && v.duration > 0) { fini(v.duration); return }
+
+      const secours = setTimeout(() => { v.ontimeupdate = null; fini(0) }, 2000)
+      v.ontimeupdate = () => {
+        if (!isFinite(v.duration)) return
+        clearTimeout(secours)
+        v.ontimeupdate = null
+        const d = v.duration
+        try { v.currentTime = 0 } catch (e) {}
+        fini(d)
+      }
+      try { v.currentTime = 1e101 } catch (e) { clearTimeout(secours); fini(0) }
+    }
+
     v.onerror = () => { ok({ duree: 0, largeur: 0, hauteur: 0 }); URL.revokeObjectURL(v.src) }
     v.src = URL.createObjectURL(fichier)
   })
@@ -7348,6 +7380,73 @@ async function collerLesVideos(surAvancee) {
 
   const flux = (toile.captureStream || toile.webkitCaptureStream).call(toile, VIDEO_IMAGES_S)
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE DÉVERROUILLAGE · TOUT CE QUI SUIT DOIT RESTER AVANT LE PREMIER `await`
+     ═══════════════════════════════════════════════════════════════════════
+
+     ─── LE DÉFAUT ───
+
+     Les lecteurs étaient créés au fur et à mesure, dans la boucle. Le premier
+     démarrait dans la foulée du clic et passait ; les suivants arrivaient après
+     plusieurs attentes — chargement, lecture de la prise précédente — et iOS
+     les refusait :
+
+         NotAllowedError · the user denied permission
+
+     ─── POURQUOI ON NE PEUT PAS SIMPLEMENT LES COUPER ───
+
+     Un élément muet a le droit de démarrer sans geste. Mais MESURÉ :
+     `createMediaElementSource` sur un élément muet ne rend QUE DU SILENCE —
+     énergie 0,0000 contre 1,0379 pour le même élément audible. Couper les
+     lecteurs livrerait donc une vidéo sans son, et Azure n'aurait plus rien à
+     transcrire. Le remède serait pire.
+
+     (C'est l'inverse de `captureStream`, où `muted` n'agit que sur la sortie.
+     Deux mécanismes, deux comportements opposés — j'ai mesuré les deux.)
+
+     ─── CE QU'ON FAIT À LA PLACE ───
+
+     On crée TOUS les lecteurs maintenant, dans le geste, et on les démarre
+     puis les arrête aussitôt. iOS accorde alors sa permission à chacun, une
+     fois pour toutes : la boucle pourra les relancer plus tard sans être
+     refusée.
+
+     C'est pour cela qu'aucun `await` ne doit s'intercaler au-dessus. */
+  const lecteurs = collageFichiers.map((f) => {
+    const v = document.createElement('video')
+    v.src = URL.createObjectURL(f.fichier)
+    v.playsInline = true
+    v.setAttribute('playsinline', '')
+    v.preload = 'auto'
+    /* Audible pour le graphe. Rien ne sort des haut-parleurs : à partir de
+       `createMediaElementSource`, le son ne passe plus que par le graphe, et on
+       ne le raccorde jamais à la sortie. */
+    v.muted = false
+    v.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;'
+    document.body.appendChild(v)
+    /* ═══ LA PAUSE NE DOIT PAS RATTRAPER LA LECTURE ═══
+
+       `v.play().then(() => v.pause())` semblait suffire. Il ne suffit pas : la
+       promesse se résout QUAND ELLE VEUT — parfois plusieurs secondes plus
+       tard, le temps que le fichier se charge. Si la boucle a déjà relancé
+       cette prise entre-temps, la pause différée l'arrête net. La vidéo ne se
+       termine jamais, et le collage reste suspendu indéfiniment.
+
+       Vu sur banc : deux clips de quatre secondes, toujours en cours au bout de
+       trois minutes. Le défaut aurait été le même sur un téléphone, en pire —
+       les fichiers y sont plus lourds, donc les promesses plus lentes.
+
+       Le drapeau règle la course : dès que la boucle prend la main sur un
+       lecteur, la pause de déverrouillage renonce.
+
+       Sans `catch`, un refus remonterait en promesse non traitée. On l'ignore
+       volontairement : ce qui compte est que l'APPEL parte du geste, pas qu'il
+       aboutisse. */
+    v.dataset.enUsage = ''
+    v.play().then(() => { if (!v.dataset.enUsage) v.pause() }, () => {})
+    return v
+  })
+
   /* UN SEUL POINT D'ARRIVÉE AUDIO POUR TOUT LE COLLAGE. Chaque vidéo s'y
      branche à son tour ; la piste, elle, ne change jamais. Changer la piste
      d'un enregistrement en cours produit un fichier que rien ne relit. */
@@ -7383,18 +7482,13 @@ async function collerLesVideos(surAvancee) {
   try {
     for (let i = 0; i < collageFichiers.length; i++) {
       const f = collageFichiers[i]
-      const v = document.createElement('video')
-      v.src = URL.createObjectURL(f.fichier)
-      v.playsInline = true
-      v.setAttribute('playsinline', '')
-      /* Audible pour le graphe, muet pour l'oreille : à partir de
-         `createMediaElementSource`, le son ne sort plus que par le graphe, et
-         on ne le raccorde jamais aux haut-parleurs. */
-      v.muted = false
-      v.style.cssText = 'position:fixed;left:0;bottom:0;width:1px;height:1px;opacity:0.01;pointer-events:none;z-index:-1;'
-      document.body.appendChild(v)
+      const v = lecteurs[i]
 
-      await new Promise((ok, ko) => { v.onloadedmetadata = ok; v.onerror = () => ko(new Error(`« ${f.fichier.name} » n’a pas pu être lue.`)) })
+      await new Promise((ok, ko) => {
+        if (v.readyState >= 1) { ok(); return }
+        v.onloadedmetadata = ok
+        v.onerror = () => ko(new Error(`« ${f.fichier.name} » n’a pas pu être lue.`))
+      })
 
       try {
         ctxAudio.createMediaElementSource(v).connect(arrivee)
@@ -7405,8 +7499,23 @@ async function collerLesVideos(surAvancee) {
         console.warn('[collage] son ignoré pour', f.fichier.name, e?.message || e)
       }
 
+      /* Le déverrouillage a pu faire avancer la lecture de quelques images.
+         On revient au début, sinon la prise commencerait tronquée. */
+      try { v.currentTime = 0 } catch (e) {}
+
       courant = v
-      await v.play()
+      v.dataset.enUsage = '1'   // la pause de déverrouillage renonce à partir d'ici
+      try {
+        await v.play()
+      } catch (e) {
+        /* Le refus d'iOS porte un nom : `NotAllowedError`. Le dire en clair
+           vaut mieux que de recopier le message du navigateur, que personne
+           ne peut interpréter. */
+        throw new Error(e?.name === 'NotAllowedError'
+          ? 'Le navigateur a refusé de lire « ' + f.fichier.name + ' ». '
+            + 'Relancez le collage sans quitter cette page entre-temps.'
+          : (e?.message || String(e)))
+      }
       await new Promise((ok) => {
         const finir = () => { clearInterval(garde); ok() }
         v.onended = finir
@@ -7422,12 +7531,17 @@ async function collerLesVideos(surAvancee) {
       faites += f.duree
       courant = null
       try { v.pause() } catch (e) {}
-      v.remove()
-      URL.revokeObjectURL(v.src)
     }
   } finally {
     clearInterval(minuterie)
     try { enr.stop() } catch (e) {}
+    /* Tous les lecteurs sont défaits ici, y compris sur le chemin d'erreur :
+       ils sont créés d'avance, donc la boucle ne peut plus s'en charger. */
+    lecteurs.forEach((v) => {
+      try { v.pause() } catch (e) {}
+      try { URL.revokeObjectURL(v.src) } catch (e) {}
+      try { v.remove() } catch (e) {}
+    })
   }
 
   await fini
@@ -7452,11 +7566,18 @@ document.getElementById('coller-ajouter')?.addEventListener('click', () => {
 document.getElementById('coller-input')?.addEventListener('change', async (e) => {
   const choisis = [...(e.target.files || [])]
   if (!choisis.length) return
+  /* Les fichiers écartés sont NOMMÉS. Une vidéo qui disparaît de la liste sans
+     un mot laisse croire à un bug de l'app. */
+  const ignorees = []
   const btn = document.getElementById('coller-ajouter')
   btn.disabled = true; btn.textContent = 'Lecture des vidéos…'
   for (const fichier of choisis) {
     const m = await lireMeta(fichier)
-    if (!m.duree) { console.warn('[collage] durée illisible :', fichier.name); continue }
+    if (!m.duree) {
+      console.warn('[collage] durée illisible :', fichier.name)
+      ignorees.push(fichier.name)
+      continue
+    }
     collageFichiers.push({ fichier, ...m })
   }
   btn.disabled = false; btn.textContent = 'Choisir des vidéos'
@@ -7464,6 +7585,11 @@ document.getElementById('coller-input')?.addEventListener('change', async (e) =>
      déclencherait pas d'événement, la valeur n'ayant pas changé. */
   e.target.value = ''
   dessinerCollage()
+  if (ignorees.length) {
+    document.getElementById('coller-avert').innerHTML =
+      `<span style="color:var(--red)">Non ajoutée${ignorees.length > 1 ? 's' : ''} : ` +
+      `${ignorees.map(escapeHtml).join(', ')} — durée illisible.</span>`
+  }
 })
 
 document.getElementById('coller-lancer')?.addEventListener('click', async () => {

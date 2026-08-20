@@ -5517,7 +5517,7 @@ async function collecterActivites() {
   /* Les arrivées. On saute la fiche du fondateur : « X a rejoint » le jour de
      la création de l'entreprise n'apprend rien à celui qui l'a créée. */
   membres.forEach(m => {
-    if (m.role === 'gestion' && !m.promu_par) return
+    if (estFondateur(m)) return
     if (!m.created_at) return
     faits.push({
       quand: Date.parse(m.created_at), genre: 'arrivee',
@@ -6427,6 +6427,25 @@ document.getElementById('man-annuler')?.addEventListener('click', async () => {
 
 document.getElementById('man-retour')?.addEventListener('click', () => {
   showGestionScreen(manEdition ? 'p-analyse' : 'p-create')
+})
+
+/* ═══ LE MÊME RETOUR POUR LE MONTAGE VIDÉO ═══
+
+   Son bouton renvoyait TOUJOURS vers « Nouvelle procédure », par un `onclick`
+   écrit en dur dans le balisage. C'est juste quand on vient d'y créer une
+   procédure ; c'est faux quand on vient d'en modifier une — on repartait
+   alors sur l'écran de création au lieu de revenir à la fiche.
+
+   L'écran manuel, lui, faisait déjà la distinction. Le montage vidéo ne l'avait
+   jamais reçue, et le défaut ne se voit que sur les procédures AVEC vidéo :
+   celles sans vidéo passent par l'écran manuel, qui était correct. C'est
+   pourquoi il pouvait sembler intermittent.
+
+   `dvEdition` porte l'identifiant de la procédure en cours de modification, ou
+   `null` en création — exactement comme `manEdition`. Les deux écrans se
+   comportent maintenant pareil. */
+document.getElementById('dv-retour')?.addEventListener('click', () => {
+  showGestionScreen(dvEdition ? 'p-analyse' : 'p-create')
 })
 
 
@@ -7605,7 +7624,9 @@ document.getElementById('coller-input')?.addEventListener('change', async (e) =>
     }
     collageFichiers.push({ fichier, ...m })
   }
-  btn.disabled = false; btn.textContent = 'Choisir des vidéos'
+  /* Le MÊME libellé que dans le balisage. Deux textes différents pour un
+     seul bouton, et il change de nom après le premier ajout. */
+  btn.disabled = false; btn.textContent = 'Ajouter des vidéos'
   /* On vide le champ : sans cela, choisir deux fois le même fichier ne
      déclencherait pas d'événement, la valeur n'ayant pas changé. */
   e.target.value = ''
@@ -8072,7 +8093,12 @@ function ouvrirVoieDoc(voie) {
      s'affiche pour qu'on y touche encore serait un geste de trop. */
   if (voie === 'photo') document.getElementById('doc-photo-input')?.click()
   if (voie === 'fichier') document.getElementById('doc-fichier')?.click()
-  if (voie === 'coller') document.getElementById('doc-texte')?.focus()
+  if (voie === 'coller') {
+    document.getElementById('doc-texte')?.focus()
+    /* Le champ est masqué au chargement, donc `scrollHeight` y vaut zéro : on
+       ne peut l'ajuster qu'une fois affiché. */
+    ajusterHauteurTexte()
+  }
   if (navigator.vibrate) navigator.vibrate(6)
 }
 
@@ -8085,6 +8111,7 @@ function resetDocScreen() {
   docTexteExtrait = ''
   docNomFichier = ''
   const t = document.getElementById('doc-texte'); if (t) t.value = ''
+  ajusterHauteurTexte()
   const f = document.getElementById('doc-fichier'); if (f) f.value = ''
   const e = document.getElementById('doc-fichier-etat'); if (e) e.style.display = 'none'
   const err = document.getElementById('doc-erreur'); if (err) err.textContent = ''
@@ -8152,6 +8179,7 @@ function ajouterPages(fichiers) {
      personne ne sait ce que l'IA a vraiment lu. */
   if (docPages.length) {
     document.getElementById('doc-texte').value = ''
+    ajusterHauteurTexte()
     docTexteExtrait = ''
     const e = document.getElementById('doc-fichier-etat'); if (e) e.style.display = 'none'
   }
@@ -8224,7 +8252,54 @@ function majBoutonDoc() {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA ZONE DE TEXTE SUIT SON CONTENU
+
+   Elle avait `rows="7"` et rien d'autre : sept lignes, quoi qu'on y mette. Une
+   note de service en fait trente — on collait, on ne voyait plus qu'un
+   septième de ce qu'on venait de coller, et il fallait faire défiler dans un
+   champ minuscule pour se relire.
+
+   ─── POURQUOI EN JAVASCRIPT ET PAS EN CSS ───
+
+   Le CSS sait le faire depuis peu, avec `field-sizing: content`. Chrome le
+   connaît, Safari pas encore de façon sûre — et c'est Safari qui compte ici.
+   On mesure donc à la main.
+
+   ─── LA MÉCANIQUE, ET SON PIÈGE ───
+
+   On remet la hauteur à zéro AVANT de lire `scrollHeight`. Sans cette remise,
+   `scrollHeight` ne descend jamais : il rend la hauteur actuelle tant que le
+   contenu y tient, et le champ grandirait sans jamais rétrécir quand on
+   efface.
+
+   ─── UN PLAFOND, PARCE QU'UN CHAMP SANS FIN EST PIRE ───
+
+   À trente lignes, le bouton « Créer » sortirait de l'écran et personne ne le
+   trouverait. Au-delà de 55 % de la hauteur de la fenêtre, le champ garde sa
+   taille et défile — on voit toujours où l'on écrit ET ce qu'on doit toucher
+   ensuite. */
+const TEXTE_MAX_PART = 0.55
+
+function ajusterHauteurTexte() {
+  const t = document.getElementById('doc-texte')
+  if (!t) return
+  const plafond = Math.round(window.innerHeight * TEXTE_MAX_PART)
+  t.style.height = 'auto'
+  const voulu = t.scrollHeight
+  t.style.height = Math.min(voulu, plafond) + 'px'
+  t.style.overflowY = voulu > plafond ? 'auto' : 'hidden'
+}
+window.ajusterHauteurTexte = ajusterHauteurTexte
+
+/* La fenêtre change de hauteur quand le clavier s'ouvre : le plafond bouge
+   avec elle, sinon le champ recouvrirait le clavier sur un petit écran. */
+window.addEventListener('resize', () => {
+  if (document.getElementById('doc-bloc-texte')?.style.display !== 'none') ajusterHauteurTexte()
+})
+
 document.getElementById('doc-texte')?.addEventListener('input', () => {
+  ajusterHauteurTexte()
   // Un texte collé remplace le fichier : on ne mélange pas les deux sources.
   if (document.getElementById('doc-texte').value.trim()) {
     docTexteExtrait = ''
@@ -8313,6 +8388,7 @@ document.getElementById('doc-fichier')?.addEventListener('change', async (e) => 
     docTexteExtrait = texte
     docNomFichier = fichier.name
     document.getElementById('doc-texte').value = ''
+    ajusterHauteurTexte()
     const mots = texte.split(/\s+/).length
     etat.innerHTML = `<span class="ic">\u2705</span><span class="tx">
       <span class="n">${escapeHtml(fichier.name)}</span>
@@ -13666,8 +13742,25 @@ window.ouvrirQuota = async function() {
     </div>
     <div class="quota-illimite">
       <span class="ic">\u221e</span>
-      <span>Cr\u00e9er depuis un <b>document</b> ou \u00e0 la main reste <b>illimit\u00e9</b>.
-        Seule l\u2019analyse vid\u00e9o est compt\u00e9e.</span>
+      <!-- ═══ LA PHRASE LA PLUS COURTE POSSIBLE ═══
+
+           Deux versions écartées avant celle-ci.
+
+           La première parlait en interne : « Créer depuis un document ou à la
+           main reste illimité. Seule l'analyse vidéo est comptée. » Personne ne
+           reconnaît de bouton derrière « depuis un document ».
+
+           La seconde nommait les modes exactement — « L'IA découpe un
+           document », « Étapes manuelles » — et faisait quatre lignes sur un
+           iPhone SE. Exact, mais trop long pour une note sous un compteur : on
+           ne lit pas quatre lignes pour comprendre un chiffre.
+
+           Celle-ci tient en une phrase et répond à la seule question qu'on se
+           pose devant un compteur : qu'est-ce qui le fait descendre ? Ce qui
+           reste gratuit se déduit — et de toute façon rien d'autre n'est
+           compté nulle part. -->
+      <span>Seules les vid\u00e9os analys\u00e9es par l\u2019IA sont compt\u00e9es.
+        <b>Tout le reste est gratuit.</b></span>
     </div>
     ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
         ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
@@ -15347,7 +15440,9 @@ window.ouvrirFenetreEtab = function(entrepriseId) {
   if (boutonSuppr) {
     const monRole = (mesEtablissements || []).find(x => x.id === etabEdite?.id)
     const jeSuisFondateur = monRole
-      ? (monRole.role === 'gestion' && !monRole.promu_par)
+      /* Par la fonction, pas par une copie de sa règle : elle vient de
+         changer, et les copies, elles, ne changent pas. */
+      ? estFondateur(monRole)
       : estFondateur(currentMembre)
     boutonSuppr.style.display =
       (etabEdite && mesEtablissements.length > 1 && jeSuisFondateur) ? 'block' : 'none'
@@ -15429,7 +15524,7 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
      doit être là où l'action se déclenche. */
   const _mien = (mesEtablissements || []).find(x => x.id === etabEdite.id)
   const _fondateur = _mien
-    ? (_mien.role === 'gestion' && !_mien.promu_par)
+    ? estFondateur(_mien)
     : estFondateur(currentMembre)
   if (!_fondateur) {
     toast('Seul le fondateur peut supprimer un \u00e9tablissement.')
@@ -15980,8 +16075,21 @@ let triEquipe = 'az'
 /* Le fondateur : le gestionnaire qui n'a été promu par personne. Tant que la
    colonne n'existe pas, tous les gestionnaires en sont — l'app reste utilisable
    avant l'exécution du SQL, simplement sans la distinction. */
+/* ═══ QUI EST LE FONDATEUR ═══
+
+   On le reconnaissait à l'absence de `promu_par`. Un seul champ, et il suffit
+   qu'une écriture le manque pour qu'un gestionnaire promu passe pour le
+   créateur de l'entreprise — c'est arrivé.
+
+   `promu_le` est le second garde-fou : il est posé à CHAQUE changement de rang,
+   promotion comme rétrogradation. Quelqu'un qui le porte a forcément vu son
+   rôle changer un jour, donc n'est pas celui qui a créé l'entreprise.
+
+   Deux champs valent mieux qu'un, mais ce n'en est pas moins un contournement :
+   la vraie réponse serait une colonne qui dit « celui-ci a créé l'entreprise ».
+   Tant qu'elle n'existe pas, on déduit. */
 function estFondateur(m) {
-  return m?.role === 'gestion' && !m?.promu_par
+  return m?.role === 'gestion' && !m?.promu_par && !m?.promu_le
 }
 
 function initialesMembre(nom) {
@@ -16160,13 +16268,34 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   let { data, error } = await supabase.from('membres')
     .update(maj).eq('id', btn.dataset.promo).select('id')
 
-  /* Repli : si les colonnes de promotion n'existent pas encore, on change au
-     moins le rôle. La personne aura ses droits ; il lui manquera seulement la
-     fête d'accueil, et l'app ne saura pas qu'elle a été promue. */
+  /* ═══ LE REPLI FABRIQUAIT DE FAUX FONDATEURS ═══
+
+     Il ne posait que `role`. Or `estFondateur` reconnaît le fondateur à
+     l'ABSENCE de `promu_par` : un gestionnaire promu par ce chemin devenait
+     donc indiscernable de celui qui a créé l'entreprise. Vu en base — deux
+     « fondateurs » sur la même entreprise, dont un promu le 19 août.
+
+     Ce n'était pas visible parce que le repli ne sert qu'en cas d'échec de la
+     première écriture : il se déclenche rarement, et sans un mot.
+
+     Maintenant on descend PAR PALIERS. On retente d'abord sans `promu_par`,
+     qui est le seul champ pouvant tomber sur une contrainte de clé étrangère ;
+     on garde ainsi `promu_le`, qui suffit à dire que la personne a été promue.
+     Le rôle seul reste le dernier recours, et il se signale. */
   if (error) {
-    const repli = await supabase.from('membres')
-      .update({ role: 'gestion' }).eq('id', btn.dataset.promo).select('id')
-    data = repli.data; error = repli.error
+    console.warn('[promotion] écriture complète refusée :', error.message)
+    const p2 = await supabase.from('membres')
+      .update({ role: 'gestion', promu_le: maj.promu_le, promu_vu: false })
+      .eq('id', btn.dataset.promo).select('id')
+    data = p2.data; error = p2.error
+
+    if (error) {
+      console.warn('[promotion] repli partiel refusé aussi :', error.message)
+      const p3 = await supabase.from('membres')
+        .update({ role: 'gestion' }).eq('id', btn.dataset.promo).select('id')
+      data = p3.data; error = p3.error
+      if (!error) toast('Promotion faite, mais la date n\u2019a pas pu être enregistrée')
+    }
   }
 
   if (error) { toast('\u00c9chec : ' + error.message); return }

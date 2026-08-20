@@ -55,19 +55,33 @@
      • LES DIMENSIONS MANQUAIENT. WhatsApp choisit entre vignette et grande
        carte AVANT de télécharger l'image, d'après `og:image:width`. Sans elle,
        il suppose une petite image et affiche un carré. -->
-<meta property="og:image" content="https://emcl22a-creator.github.io/Standix/partage.png">
-<meta property="og:image:secure_url" content="https://emcl22a-creator.github.io/Standix/partage.png">
+<!-- ═══ L'ADRESSE POINTAIT VERS LA RACINE ═══
+
+     Elle disait `emcl22a-creator.github.io/Standix/partage.png`. Cette racine
+     appartient désormais au SITE : l'app y cherchait un fichier qui n'y est
+     plus, et le lien partagé s'affichait sans vignette.
+
+     Quatre balises portaient la même adresse — `og:image`, sa version sécurisée,
+     `twitter:image`, et `og:url` pour la page. Les quatre sont corrigées : en
+     oublier une donne un aperçu juste sur un réseau et faux sur un autre, ce
+     qui est le plus long à diagnostiquer.
+
+     ⚠ ELLE RESTE ÉCRITE EN DUR, et c'est obligatoire : les robots qui lisent
+       cette page n'ont pas de navigateur et ne résolvent aucun chemin relatif.
+       Si tu changes encore de domaine, ce sont ces quatre lignes à reprendre. -->
+<meta property="og:image" content="https://standix.app/app/partage.png">
+<meta property="og:image:secure_url" content="https://standix.app/app/partage.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Standix">
-<meta property="og:url" content="https://emcl22a-creator.github.io/Standix/">
+<meta property="og:url" content="https://standix.app/app/">
 <meta property="og:site_name" content="Standix">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Standix">
 <meta name="twitter:description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
-<meta name="twitter:image" content="https://emcl22a-creator.github.io/Standix/partage.png">
+<meta name="twitter:image" content="https://standix.app/app/partage.png">
 <meta name="description" content="Vos procédures, filmées une fois. L'IA les rédige, votre équipe les lit.">
 <!-- Les trois serveurs contactés au démarrage. Ouvrir la connexion dès la
      lecture de l'en-tête fait gagner la poignée de main réseau (DNS, TLS) sur

@@ -15,53 +15,23 @@
 
      Elle doit donc porter la phrase, pas le nom de domaine.
 
-     ⚠ L'ADRESSE EST COMPLÈTE, ET C'EST NÉCESSAIRE. Les robots qui fabriquent
-       les aperçus n'ont pas de navigateur : ils ne savent pas résoudre
-       « partage.png » en une adresse, et beaucoup abandonnent.
-
-     ⚠ LES DIMENSIONS AUSSI. WhatsApp choisit entre vignette et grande carte
-       AVANT de télécharger l'image, d'après `og:image:width`. Sans elle, il
-       suppose une petite image et affiche un carré.
-
-     ⚠ LE FICHIER A CHANGÉ DE NOM. `partage.png` est parti dans `app/` avec le
-       reste de l'application ; celui du site est `site-partage.png`.
+     ⚠ partage.png est attendu à la racine : 1200 × 630, la capture de l'app
+       sur fond noir avec le titre. Sans lui, le lien s'affiche nu.
      ═══════════════════════════════════════════════════════════════════════════ -->
 <meta name="description" content="Filmez le geste ou votre écran. L'IA découpe la vidéo et rédige les étapes. Votre équipe les lit sur son téléphone, ou scanne un QR code sur place.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Filmez une fois. Votre équipe saura faire.">
 <meta property="og:description" content="L'IA découpe la vidéo et rédige les étapes. Un QR code sur place, et la procédure s'ouvre.">
-<meta property="og:image" content="https://standix.app/site-partage.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:url" content="https://standix.app/">
+<meta property="og:image" content="partage.png">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- Les liens vers l'app sont RELATIFS : « app/ » fonctionne aujourd'hui sur
-     standix.app/ comme hier sur emcl22a-creator.github.io/Standix/, sans rien
-     changer. Seule l'image de partage exige une adresse complète, faute de
-     navigateur chez ceux qui la lisent. -->
-
-<!-- ═══ LES ICÔNES · POURQUOI LE PRÉFIXE `site-` ═══
-
-     Le site et l'application partagent le même dépôt. Leurs icônes portaient
-     les mêmes noms, ce qui rendait tout dépôt de fichiers ambigu : une fois
-     sorties de leur dossier, rien ne les distinguait. Celles du site sont donc
-     préfixées, celles de l'app sont dans `app/`.
-
-     ⚠ CES LIGNES POINTAIENT ENCORE VERS LES ANCIENS NOMS, partis dans `app/`.
-       Le navigateur les demandait, ne les trouvait pas, et affichait le globe
-       gris à la place du logo.
-
-     `favicon.ico` est le SEUL nom qu'un navigateur demande de lui-même, sans
-     qu'on le déclare. En le renommant on perd ce filet — les lignes ci-dessous
-     couvrent les navigateurs modernes, mais si tu veux la ceinture et les
-     bretelles, dépose une copie sous le nom `favicon.ico` à la racine. -->
-<link rel="icon" href="site-favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="site-favicon-32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="site-favicon-96.png">
-<link rel="icon" type="image/png" sizes="192x192" href="site-icone-192.png">
-<link rel="apple-touch-icon" sizes="180x180" href="site-apple-touch-icon.png">
+     emcl22a-creator.github.io/Standix/ et demain sur standix.app/, sans rien
+     changer le jour de la bascule du domaine. -->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
 <meta name="theme-color" content="#08090A">
 <meta name="color-scheme" content="dark">
 <meta name="format-detection" content="telephone=no, address=no, email=no">
@@ -695,6 +665,34 @@ h2 em{ font-style:normal; color:var(--t1); }
 .chapo{
   font-size:14.5px; line-height:1.6; color:var(--t2);
   max-width:36ch; margin-bottom:30px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA SCÈNE
+
+   C'est la seule photographie de tout le site : le reste est capture d'app,
+   QR code et texte. Elle a donc un travail que rien d'autre ne fait — dire
+   que Standix part du monde physique.
+
+   Le fondu du bas la relie au bloc de la vidéo posé juste dessous, au lieu de
+   la laisser s'arrêter sur un trait. Et l'arête claire du haut la traite comme
+   les autres objets de la page : sur du noir, sans liseré, une image sombre
+   paraît trouée dans la page.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.scene{
+  position:relative; margin-bottom:14px;
+  border-radius:16px; overflow:hidden;
+  box-shadow:0 0 0 1px rgba(255,255,255,.14),
+             inset 0 1px 0 rgba(255,255,255,.28),
+             0 26px 60px rgba(0,0,0,.55);
+}
+.scene img{ display:block; width:100%; height:auto; }
+/* Un voile sombre très léger sur le bas : la photo est claire, le bloc vidéo
+   qui la suit est sombre, et sans transition la jointure se voit. */
+.scene::after{
+  content:''; position:absolute; left:0; right:0; bottom:0; height:34%;
+  background:linear-gradient(180deg,transparent,rgba(8,9,10,.55));
+  pointer-events:none;
 }
 
 /* ═══ LA SOURCE ═══
@@ -1950,6 +1948,20 @@ footer .marque{ margin-bottom:18px; }
   </div>
 
   <div class="pv-demo">
+  <!-- ═══ LA PHOTO N'EST PAS UNE VIGNETTE DE VIDÉO ═══
+
+       On y voit quelqu'un qui consulte son téléphone à côté d'une machine —
+       pas un plan du détartrage. Lui poser un bouton de lecture dessus aurait
+       dit « cette vidéo montre un homme qui regarde son téléphone ».
+
+       Elle sert donc de scène : voilà où la procédure est lue, et voilà le
+       geste qu'elle décrit. Le bloc de la vidéo garde son bouton juste en
+       dessous, avec sa durée. Les deux disent deux choses différentes. -->
+  <figure class="scene app" style="--d:.11s">
+    <img src="cafe.jpg" width="1000" height="945"
+         alt="Un employé consulte la procédure sur son téléphone avant de détartrer la machine à café du local">
+  </figure>
+
   <div class="source app" style="--d:.13s">
     <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span>
     <span class="txt">
@@ -1957,8 +1969,16 @@ footer .marque{ margin-bottom:18px; }
            est en `nowrap` avec ellipse, et 24 signes ne tiennent pas à côté du
            bouton et de la durée. Le dossier passe donc en sous-titre, là où il
            a la place — c'est aussi la hiérarchie de l'app. -->
+      <!-- « filmée au téléphone, en une prise » a été retiré : la vidéo ne
+           vient pas d'un tournage maison, et cette phrase se trouvait sous le
+           titre « La preuve », à trois lignes de « rien n'a été réécrit ».
+           C'était la seule affirmation vérifiablement fausse du site.
+
+           Ce qui reste est vrai et suffit : une vidéo de 3:13, six étapes
+           produites par l'IA. C'est le découpage qu'on démontre, pas la
+           provenance du fichier. -->
       <b>Machine à café</b>
-      <span>Détartrage · filmée au téléphone, en une prise</span>
+      <span>Détartrage · une vidéo, six étapes</span>
     </span>
     <span class="duree">3:13</span>
   </div>

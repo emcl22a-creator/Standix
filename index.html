@@ -360,7 +360,15 @@ header.pose{
      capture sous la pliure. J'en ai donc repris six pixels sur l'écart qui
      sépare l'accroche de la galerie : à cet endroit, le blanc ne se remarque
      pas, alors que dans l'accroche il se voit à chaque ligne. */
-  padding:calc(var(--barre) + 62px) var(--gouttiere) 0;
+  /* ═══ L'ESPACE SUIT LA HAUTEUR DE LA FENÊTRE ═══
+
+     Ni valeur fixe ni rupture : `clamp` interpole entre les deux bornes selon
+     la place disponible. Sur un grand téléphone l'accroche respire ; sur un
+     petit elle se resserre d'elle-même, sans qu'un seuil fasse tout basculer
+     d'un coup — c'est exactement ce qui n'allait pas dans le bloc supprimé.
+
+     Les mêmes quatre valeurs pilotent tout le rythme de l'accroche. */
+  padding:calc(var(--barre) + clamp(30px, 7.4vh, 74px)) var(--gouttiere) 0;
   max-width:var(--large); margin:0 auto;
 }
 /* ═══ L'EMPHASE SANS COULEUR ═══
@@ -388,14 +396,14 @@ h1{
      ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
      changent l'impression d'ensemble plus que n'importe quelle marge. */
   line-height:1.18; letter-spacing:-.045em; font-weight:500;
-  margin-bottom:32px; max-width:16ch;
+  margin-bottom:clamp(18px, 3.8vh, 34px); max-width:16ch;
   color:var(--t2);
 }
 h1 em{ font-style:normal; color:var(--t1); }
 
 .sous{
   font-size:15.5px; line-height:1.62; color:var(--t2);
-  max-width:31ch; margin-bottom:42px;
+  max-width:31ch; margin-bottom:clamp(22px, 5.2vh, 44px);
 }
 
 .actions{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
@@ -461,7 +469,7 @@ h1 em{ font-style:normal; color:var(--t1); }
      « Sans carte bancaire », à la même gouttière, le nom de l'écran se lisait
      comme une seconde ligne du même paragraphe. Le blanc doit séparer
      l'accroche de la galerie, pas la galerie de son image. */
-  margin-top:42px;
+  margin-top:clamp(22px, 5vh, 44px);
   padding:20px var(--bord-image) 12px;
   display:flex; align-items:baseline; justify-content:space-between;
 }
@@ -1181,10 +1189,18 @@ h2 em{ font-style:normal; color:var(--t1); }
   position:fixed; z-index:38; left:0; right:0; bottom:0;
   display:flex; align-items:center; gap:14px;
   padding:12px var(--gouttiere) calc(12px + env(safe-area-inset-bottom));
-  background:rgba(8,9,10,.62);
+  /* ═══ MÊME VERRE QUE LA BARRE DU HAUT ═══
+     Elle était à 62 % d'opacité contre 42 pour celle du haut : plus dense,
+     donc pas la même matière — deux barres du même site qui ne réagissent pas
+     pareil à ce qui passe derrière, ça se remarque même sans savoir pourquoi.
+
+     Les trois valeurs sont maintenant identiques : fond, flou et saturation.
+     C'est la saturation qui fait la différence entre un flou et du verre — un
+     flou seul délave les couleurs qui passent dessous, elle les ravive. */
+  background:rgba(8,9,10,.42);
   backdrop-filter:blur(26px) saturate(180%);
   -webkit-backdrop-filter:blur(26px) saturate(180%);
-  border-top:.5px solid rgba(255,255,255,.09);
+  border-top:.5px solid rgba(255,255,255,.07);
   transform:translateY(120%);
   transition:transform .5s var(--ec);
   pointer-events:none;
@@ -1247,12 +1263,18 @@ footer .marque{ margin-bottom:18px; }
 /* Sur un petit écran, l'accroche se resserre pour rendre à la capture les
    pixels dont elle a besoin : en dessous de 150 px visibles, on ne comprend
    plus ce qu'on regarde. */
-@media (max-height: 740px){
-  .hero{ padding-top:84px; }
-  h1{ font-size:clamp(29px,8.4vw,36px); margin-bottom:11px; }
-  .sous{ font-size:14.5px; line-height:1.5; margin-bottom:18px; }
-  .ecran{ margin-top:26px; }
-}
+/* Le bloc `@media (max-height: 740px)` qui se trouvait ici a été supprimé.
+   Il datait de la deuxième maquette, n'avait jamais été rejoué, et écrasait
+   tous les espacements de l'accroche par des valeurs de l'époque — 84 px sous
+   la barre au lieu de 126, 11 px sous le titre au lieu de 32.
+
+   Surtout, il se déclenchait presque toujours : un téléphone de 844 px de haut
+   n'offre que 650 à 700 px de fenêtre une fois la barre du navigateur déduite.
+   La condition était donc vraie sur la quasi-totalité des téléphones, et les
+   réglages de la règle de base ne servaient à personne.
+
+   Les espacements suivent maintenant la hauteur de la fenêtre en continu :
+   voir les `clamp` dans .hero, h1, .sous et .onglets. */
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1273,12 +1295,19 @@ footer .marque{ margin-bottom:18px; }
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1099px){
   :root{ --halo:226,232,242; }
+  /* ═══ PLUS DE LUEUR EN HAUT ═══
+     Le foyer du haut était posé à hauteur de la barre du logo. Sur un
+     téléphone, la barre est en verre translucide : la lueur passait donc au
+     travers et l'éclairait par en dessous, ce qui la faisait paraître sale
+     plutôt qu'éclairée.
+
+     Il ne reste que le foyer bas, à hauteur de la capture — celui qui décolle
+     l'image du noir. Le haut de l'écran redevient un noir franc, et c'est le
+     titre blanc qui y fait la lumière. */
   .lueur{
     background:
-      radial-gradient(ellipse 110% 40% at 22% -2%,
-        rgba(var(--halo),.085), rgba(var(--halo),.025) 46%, transparent 70%),
       radial-gradient(ellipse 92% 26% at 52% 62%,
-        rgba(255,255,255,.035), transparent 68%);
+        rgba(255,255,255,.04), transparent 68%);
   }
   .tarifs::after, .fin::after{
     background:radial-gradient(ellipse 50% 50% at 50% 50%,

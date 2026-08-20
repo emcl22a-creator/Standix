@@ -200,6 +200,7 @@ const DICO = {
     "Actuel": "Current",
     "Analyse": "Analytics",
     "Analyse en cours...": "Analysing…",
+    "Analyse en cours": "Analysis in progress",
     "Ancien → nouveau": "Oldest → newest",
     "Annuler": "Cancel",
     "Arrivés récemment": "Recently joined",
@@ -408,6 +409,7 @@ const DICO = {
     "Actuel": "Actual",
     "Analyse": "Análisis",
     "Analyse en cours...": "Analizando…",
+    "Analyse en cours": "Análisis en curso",
     "Ancien → nouveau": "Antiguo → nuevo",
     "Annuler": "Cancelar",
     "Arrivés récemment": "Incorporados recientemente",
@@ -610,6 +612,7 @@ const DICO = {
     "Actuel": "Atual",
     "Analyse": "Análise",
     "Analyse en cours...": "A analisar…",
+    "Analyse en cours": "Análise em curso",
     "Ancien → nouveau": "Antigo → novo",
     "Annuler": "Cancelar",
     "Arrivés récemment": "Entraram recentemente",
@@ -2272,11 +2275,19 @@ async function peindreResumeEntreprise() {
   if (nbGestion > 0) segments.push(`<i class="re-sg" style="flex:${nbGestion}"></i>`)
   if (nbEquipe > 0) segments.push(`<i class="re-se" style="flex:${nbEquipe}"></i>`)
 
+  /* « Équipe » plutôt qu'« employés » : c'est le nom de l'espace dans l'app —
+     Gestion d'un côté, Équipe de l'autre — et la carte doit employer les mêmes
+     mots que la navigation. « Employés » désignait la même chose avec un autre
+     vocabulaire, et obligeait à faire le rapprochement.
+
+     Le mot ne s'accorde plus : « 8 équipe » serait faux, mais « équipe » est un
+     collectif — on écrit « 8 en équipe » comme on dit « 3 en gestion ». Les deux
+     libellés se lisent alors sur le même modèle. */
   chiffres.innerHTML = total === 0 ? '' : (
     `<div class="re-barre">${segments.join('')}</div>` +
     `<div class="re-leg">` +
-      `<span><b class="g">${nbGestion}</b> gestion</span>` +
-      `<span><b class="e">${nbEquipe}</b> employé${s(nbEquipe)}</span>` +
+      `<span><b class="g">${nbGestion}</b> en gestion</span>` +
+      `<span><b class="e">${nbEquipe}</b> en équipe</span>` +
     `</div>`
   )
 
@@ -5569,11 +5580,15 @@ window.ouvrirActivites = async function () {
     morceaux.push(ligneActivite(f))
   })
 
-  /* Le même habit que la page Procédures de l'analyse : une tête de section en
-     petites capitales, puis les lignes. Sans l'anneau — il répartirait un total
-     entre des parts, et une activité ne se répartit pas. */
+  /* ═══ PLUS DE TÊTE DE SECTION ═══
+
+     Il y avait ici « Les mouvements », en petites capitales, juste sous le
+     titre de la page. Depuis que celui-ci s'appelle « Mouvements de l'équipe »,
+     les deux disaient la même chose à trois centimètres d'écart.
+
+     Une tête de section sert à distinguer plusieurs blocs sur une même page.
+     Ici il n'y en a qu'un : elle ne séparait rien, elle répétait. */
   zone.innerHTML = `
-    <div class="fm-titre">Les mouvements</div>
     ${morceaux.join('')}
     <div class="fm-periode-mot">${faits.length} activité${faits.length > 1 ? 's' : ''}
       sur ${Math.round(ACTIVITES_JOURS / 7)} semaines</div>`
@@ -7860,7 +7875,17 @@ let aiProgresAzure = null          // le vrai pourcentage, quand Azure en donne 
    Un seul reste, sur la première phase : c'est la plus longue, et savoir qu'on
    peut partir change la façon d'attendre. */
 const AI_ETAPES = {
-  envoi:         { titre: 'Pr\u00e9paration', sous: 'Vous pouvez quitter cette page, l\u2019analyse continue.' },
+  /* ═══ PLUS DE SOUS-TITRE ICI ═══
+
+     « Vous pouvez quitter cette page, l'analyse continue » s'affichait DEUX
+     FOIS : une fois par ce champ, une fois par la ligne qui l'ajoute
+     systématiquement en gras à la fin de la phrase. Sur l'écran, cela donnait
+     « … l'analyse continue. Vous pouvez quitter cette page — la procédure
+     apparaîtra… ». La même information, à trois mots près, dans la même phrase.
+
+     On garde celle du bas : elle est en gras, elle enchaîne sur ce qui se
+     passera ensuite, et elle vaut pour toutes les phases. */
+  envoi:         { titre: 'Pr\u00e9paration', sous: '' },
   transcription: { titre: 'Lecture de votre vid\u00e9o', sous: '' },
   redaction:     { titre: 'Mise en forme', sous: '' },
 }
@@ -7936,7 +7961,17 @@ function majProgressionIA() {
      plutôt ce qu'on obtient, une bonne fois. Le détail de l'étape et le temps
      écoulé passent dans la phrase du dessous, où ils ne bousculent rien. */
   const titre = document.getElementById('ai-progress-title')
-  if (titre) titre.textContent = t('Presque pr\u00eat')
+  /* ═══ « PRESQUE PRÊT » N'ÉTAIT PAS À LA HAUTEUR ═══
+
+     Le mot promet une fin imminente pendant sept minutes, et il ment donc
+     pendant six. Passé la deuxième minute, il fait douter de l'app plutôt
+     que patienter.
+
+     « Analyse en cours » dit ce qui se passe, sans promettre de date — la date
+     est juste en dessous, avec le temps restant, et c'est elle qui rassure.
+     Le ton est celui du reste de l'app : on nomme le travail, on ne commente
+     pas la machine. */
+  if (titre) titre.textContent = t('Analyse en cours')
 
   /* L'anneau tourne toujours — c'est son mouvement qui dit que ça travaille,
      plus une jauge. On n'affiche le chiffre QUE si Azure en donne un vrai : un
@@ -8413,7 +8448,24 @@ async function comprimerVideo(fichier, surAvancee) {
 
   const lecteur = document.createElement('video')
   lecteur.src = URL.createObjectURL(fichier)
-  lecteur.muted = false
+  /* ═══ MUET À L'OREILLE, PAS À L'ENREGISTREMENT ═══
+
+     On entendait la vidéo pendant tout l'allègement — quatre minutes de son
+     dans le vide, sur un téléphone qu'on tient à la main.
+
+     C'était `muted = false`, hérité de l'époque où le son passait par un
+     AudioContext. Dans ce montage-là, couper l'élément coupait TOUTE la chaîne
+     et on enregistrait du silence : le commentaire aurait disparu, et Azure
+     n'aurait plus rien eu à transcrire. D'où le faux.
+
+     Depuis que le son vient de `captureStream()` sur l'élément lui-même, ce
+     n'est plus vrai. MESURÉ : un élément muet capture un signal d'énergie 1,12
+     contre 1,08 pour le même élément audible — identique. `muted` agit sur la
+     sortie haut-parleurs, pas sur la piste capturée.
+
+     ⚠ LE SECOND CHEMIN, L'AUDIOCONTEXT, EXIGE L'INVERSE. Il remet donc
+     `muted = false` chez lui — voir le commentaire à cet endroit. */
+  lecteur.muted = true
   lecteur.playsInline = true
   lecteur.setAttribute('playsinline', '')
 
@@ -8532,6 +8584,22 @@ async function comprimerVideo(fichier, surAvancee) {
 
     if (!sonOk) {
       try {
+        /* ═══ ICI, ON REND LE SON À L'ÉLÉMENT ═══
+
+           Ce chemin-ci ne supporte PAS `muted`. `createMediaElementSource`
+           détourne tout l'audio de l'élément vers le graphe : un élément muet
+           n'y envoie que du silence, et on enregistrerait une piste vide — le
+           commentaire disparaîtrait, Azure n'aurait rien à transcrire.
+
+           Le rendre audible ne le rend pas AUDIBLE pour autant : à partir de
+           `createMediaElementSource`, le son ne passe plus que par le graphe,
+           et on ne raccorde jamais la sortie aux haut-parleurs. Rien ne sort.
+
+           C'est exactement l'inverse du chemin `captureStream`, où `muted`
+           n'agit que sur la sortie. Deux mécanismes, deux réglages opposés — et
+           c'est pour cela qu'ils sont écrits séparément plutôt qu'une fois pour
+           les deux. */
+        lecteur.muted = false
         const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
         if (ctxAudio.state === 'suspended') await ctxAudio.resume()
         const source = ctxAudio.createMediaElementSource(lecteur)
@@ -11648,7 +11716,26 @@ async function openAnalyse(procId) {
   const enAttente = allGestionProcedures.find(p => p.id === procId && p.statut === 'pret')
   if (enAttente) {
     enAttente.statut = null
-    supabase.from('procedures').update({ statut: null }).eq('id', procId).then(() => {}, () => {})
+    /* ═══ ON RETIENT, MÊME SI LA BASE REFUSE ═══
+
+       `allGestionProcedures` est réécrit toutes les quinze secondes par
+       `surveillerAnalyses`. Effacer le statut dans cet objet ne survit donc pas
+       au prochain rechargement : si l'écriture en base échoue, la coche revient
+       toute seule. Cette liste-ci, elle, tient jusqu'à la fermeture. */
+    proceduresVues.add(procId)
+
+    /* L'ÉCHEC NE SE TAIT PLUS. C'était `.then(() => {}, () => {})` : deux
+       fonctions vides qui avalaient tout. Une règle d'accès trop stricte, une
+       colonne `statut` déclarée `not null` — n'importe laquelle de ces causes
+       faisait échouer l'écriture en silence, et personne ne pouvait le savoir.
+
+       Si tu vois ce message dans la console, envoie-le-moi : il nomme la
+       cause, et elle se corrige en base plutôt qu'ici. */
+    supabase.from('procedures').update({ statut: null }).eq('id', procId)
+      .then(({ error }) => {
+        if (error) console.warn('[coche] statut non effac\u00e9 en base :', error.message)
+      }, (e) => console.warn('[coche] \u00e9criture impossible :', e?.message || e))
+
     renderCategoryGrid()
     if (document.getElementById('p-category')?.classList.contains('active')) renderCategoryProceduresList()
   }
@@ -12199,6 +12286,26 @@ function analyseBloquee(proc) {
    · « pret »                → analyse finie, pas encore ouverte, coche verte
    · « echec »               → point d'exclamation rouge
    Ouvrir la procédure fait passer le statut à null : la coche disparaît. */
+/* ═══ LES PROCÉDURES DÉJÀ OUVERTES ═══
+
+   La coche disparaissait à l'ouverture, puis REVENAIT. Deux mécanismes se
+   contredisaient.
+
+   `openAnalyse` efface le statut à deux endroits : dans `allGestionProcedures`,
+   pour l'affichage immédiat, et en base, pour que ce soit vrai sur les autres
+   appareils. Mais l'écriture en base était posée en `.then(() => {}, () => {})`
+   — un échec n'y laissait aucune trace.
+
+   Or `surveillerAnalyses` recharge la liste depuis la base toutes les quinze
+   secondes. Si l'écriture a échoué, elle rapporte `statut = 'pret'` et la coche
+   revient. D'où le symptôme : elle disparaît, on navigue, elle est de retour.
+
+   Cette liste tient la mémoire de ce qui a été ouvert PENDANT LA SESSION. Elle
+   ne remplace pas l'écriture en base — qui reste la bonne source, et qui dit
+   maintenant quand elle échoue — mais elle garantit qu'un rechargement ne
+   ressuscite pas une coche déjà vue. */
+const proceduresVues = new Set()
+
 function etatProcedureHtml(proc) {
   const alerte = (couleur, titre) => `<div class="etat-proc souci" title="${titre}">
       <svg viewBox="0 0 24 24" fill="none" stroke="${couleur}" stroke-width="2.6" stroke-linecap="round">
@@ -12215,7 +12322,7 @@ function etatProcedureHtml(proc) {
       <span class="ia-fig s"><span class="lum"></span></span>
     </div>`
   }
-  if (proc?.statut === 'pret') {
+  if (proc?.statut === 'pret' && !proceduresVues.has(proc.id)) {
     /* La même famille que l'anneau de l'IA : un cercle fin dans la même
        palette, la coche à l'intérieur. C'est le même travail qui s'achève —
        le passage de l'un à l'autre doit se lire comme une suite, pas comme

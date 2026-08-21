@@ -5170,7 +5170,11 @@ function rangerGrille(entrepriseId, categories, sous) {
       nom: c.nom, icone: c.icone, avgPct: c.avgPct,
       latestDate: c.latestDate, earliestDate: c.earliestDate,
       procsInCat: (c.procsInCat || []).map(p => ({
-        id: p.id, titre: p.titre, categorie: p.categorie, statut: p.statut,
+        id: p.id, titre: p.titre, categorie: p.categorie,
+        /* Rapportée dès maintenant : sans elle, les écrans qui la liront à
+           l'étape 3 recevraient `undefined` et afficheraient tout comme
+           « sans sous-dossier », sans qu'aucune erreur ne le signale. */
+        sous_categorie: p.sous_categorie || null, statut: p.statut,
         created_at: p.created_at, video_url: p.video_url, image_url: p.image_url,
         etapes: p.etapes,
       })),
@@ -6360,6 +6364,7 @@ window.ouvrirEtapesManuelles = async function(procId) {
     /* En création, on reprend ce qui a été saisi sur l'écran précédent. */
     el('man-titre').value = document.getElementById('new-titre')?.value || ''
     el('man-categorie').value = document.getElementById('new-categorie')?.value || ''
+    el('man-sous-categorie').value = document.getElementById('new-sous-categorie')?.value || ''
     if (!manualSteps.length) manualSteps = [{ texte: '' }]
     reinitialiserCouverture(null)
     manDepart = etatManuel()
@@ -6379,6 +6384,7 @@ window.ouvrirEtapesManuelles = async function(procId) {
 
   el('man-titre').value = proc.titre || ''
   el('man-categorie').value = proc.categorie || ''
+  el('man-sous-categorie').value = proc.sous_categorie || ''
   reinitialiserCouverture(proc.image_url || null)
   manualSteps = (etapes || []).map(e => ({
     id: e.id, texte: e.texte || '', image_url: e.image_url || null,
@@ -6394,6 +6400,7 @@ function etatManuel() {
   return JSON.stringify({
     titre: document.getElementById('man-titre')?.value || '',
     categorie: document.getElementById('man-categorie')?.value || '',
+    sous_categorie: lireSousDossier('man-sous-categorie'),
     etapes: manualSteps.map(s => ({ id: s.id || null, texte: s.texte, image_url: s.image_url || null })),
   })
 }
@@ -6417,6 +6424,7 @@ document.getElementById('man-annuler')?.addEventListener('click', async () => {
   } else {
     document.getElementById('man-titre').value = ''
     document.getElementById('man-categorie').value = ''
+    document.getElementById('man-sous-categorie').value = ''
     manualSteps = [{ texte: '' }]
     reinitialiserCouverture(null)
     renderManualSteps()
@@ -6528,6 +6536,25 @@ document.querySelectorAll('[data-an-periode]').forEach(b => {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 let postesEntreprise = []
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE SOUS-DOSSIER · LECTURE ET ÉCRITURE
+
+   Quatre écrans portent ce champ : création, étapes manuelles, montage vidéo,
+   et l'ancien éditeur. Quatre fois la même règle — couper les espaces, et
+   rendre `null` plutôt qu'une chaîne vide.
+
+   Écrite une fois. Recopiée quatre fois, elle aurait divergé à la première
+   correction, et le défaut n'apparaîtrait que sur l'écran oublié.
+
+   POURQUOI `null` ET NON `''`. La base refuse la chaîne vide — c'est la
+   contrainte posée à l'étape 1. Mais surtout : deux valeurs pour dire « pas de
+   sous-dossier » obligeraient chaque lecture à traiter les deux cas, et l'une
+   des deux finirait par être oubliée quelque part. */
+function lireSousDossier(id) {
+  const v = (document.getElementById(id)?.value || '').trim()
+  return v || null
+}
 
 async function chargerPostes() {
   if (!currentMembre?.entreprise_id) return []
@@ -9611,6 +9638,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       .insert({
         entreprise_id: currentMembre.entreprise_id,
         titre, categorie,
+        sous_categorie: lireSousDossier('new-sous-categorie'),
         created_by: currentMembre.id,
         statut: 'traitement',
       })
@@ -10950,6 +10978,7 @@ window.ouvrirMontageVideo = async function(procId) {
 
 
   el('dv-categorie').value = proc.categorie || ''
+  el('dv-sous-categorie').value = proc.sous_categorie || ''
   el('dv-titre').value = proc.titre || ''
 
   currentVideoFile = null
@@ -12295,6 +12324,18 @@ async function publishProcedure(errorElId, btnId) {
   errorEl.textContent = ''
   const titre = champManuel('titre').value.trim()
   const categorie = champManuel('categorie').value.trim()
+  /* ═══ PAR `champManuel`, PAS PAR UN IDENTIFIANT EN DUR ═══
+
+     Trois écrans appellent cette fonction — création, étapes manuelles,
+     montage vidéo — et chacun a ses propres champs. `champManuel` prend celui
+     de l'écran affiché ; écrire `new-sous-categorie` en dur aurait enregistré
+     le sous-dossier de la page de création alors qu'on publie depuis le
+     montage. C'est le défaut que son propre commentaire décrit pour le titre.
+
+     Le `?.` est nécessaire : `champManuel` peut ne rien rendre si aucun des
+     trois champs n'est rempli, ce qui est le cas normal pour un champ
+     facultatif. */
+  const sousCategorie = (champManuel('sous-categorie')?.value || '').trim() || null
   const categorieIcone = '📁'
   const allSteps = [...manualSteps, ...videoSteps]
 
@@ -12323,10 +12364,12 @@ async function publishProcedure(errorElId, btnId) {
   const enCours = manEdition || dvEdition
   const { data: newProc, error: procError } = enCours
     ? await supabase.from('procedures')
-        .update({ titre, categorie, categorie_icone: categorieIcone })
+        .update({ titre, categorie, sous_categorie: sousCategorie, categorie_icone: categorieIcone })
         .eq('id', enCours).select().single()
     : await supabase.from('procedures')
-        .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie, categorie_icone: categorieIcone, video_url: videoUrl, created_by: currentMembre.id })
+        .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie,
+                  sous_categorie: sousCategorie, categorie_icone: categorieIcone,
+                  video_url: videoUrl, created_by: currentMembre.id })
         .select().single()
 
   /* Les anciennes étapes sont remplacées : c'est plus sûr que de rapprocher
@@ -17324,6 +17367,7 @@ window.openEditProcedure = async function(procId, mode) {
 
   document.getElementById('edit-titre').value = proc.titre || ''
   document.getElementById('edit-categorie').value = proc.categorie || ''
+  document.getElementById('edit-sous-categorie').value = proc.sous_categorie || ''
 
   const videoFrame = document.getElementById('edit-video-frame')
   const videoEl = document.getElementById('edit-video-player')
@@ -17950,6 +17994,7 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   errorEl.textContent = ''
   const titre = document.getElementById('edit-titre').value.trim()
   const categorie = document.getElementById('edit-categorie').value.trim()
+  const sousCategorie = lireSousDossier('edit-sous-categorie')
 
   if (!titre) { errorEl.textContent = 'Le titre est obligatoire.'; return }
   if (editStepsData.length === 0) { errorEl.textContent = 'Ajoutez au moins une étape.'; return }
@@ -17964,11 +18009,14 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   const urlCouv = await envoyerCouverture(editProcedureId)
 
   let { error: updateError } = await supabase
-    .from('procedures').update({ titre, categorie, image_url: urlCouv }).eq('id', editProcedureId)
+    .from('procedures')
+    .update({ titre, categorie, sous_categorie: sousCategorie, image_url: urlCouv })
+    .eq('id', editProcedureId)
   if (updateError && /image_url/i.test(updateError.message || '')) {
     console.warn('Standix \u00b7 colonne image_url absente sur procedures.')
     const repli = await supabase.from('procedures')
-      .update({ titre, categorie }).eq('id', editProcedureId)
+      /* Le repli garde le sous-dossier : seule l'image posait problème. */
+      .update({ titre, categorie, sous_categorie: sousCategorie }).eq('id', editProcedureId)
     updateError = repli.error
   }
   if (updateError) { setButtonLoading(saveBtn, false); errorEl.textContent = updateError.message; return }

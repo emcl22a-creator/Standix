@@ -1085,10 +1085,28 @@ window.chooseSpace = function(space) {
    L'onglet « Créer un compte » reste accessible depuis l'écran de connexion —
    mais il y afficherait un formulaire sans champ entreprise ni champ code. On
    le masque donc : quelqu'un arrivé par ce chemin s'inscrit par les cartes. */
+/* ═══ BRANCHÉ ICI, PAS PAR `onclick` DANS LE BALISAGE ═══
+
+   Avec `onclick="allerConnexion()"`, si `app.js` n'est pas déployé — ou tombe
+   sur une erreur avant cette ligne — le bouton existe, se dessine, se touche…
+   et ne fait rien. Aucune trace, aucun message : on croit à un défaut de
+   conception alors que c'est un fichier manquant.
+
+   Un écouteur posé ici échoue autrement : le bouton n'est jamais branché, mais
+   la console dit pourquoi. Et la vérification ci-dessous nomme le problème au
+   lieu de le laisser deviner. */
+document.getElementById('choix-deja')?.addEventListener('click', () => allerConnexion())
+
 window.allerConnexion = function() {
+  const cible = document.getElementById('login-screen')
+  const source = document.getElementById('choice-screen')
+  if (!cible || !source) {
+    console.error('[connexion] écran introuvable — index.html et app.js ne sont pas de la même version')
+    return
+  }
   selectedSpace = null
-  document.getElementById('choice-screen').style.display = 'none'
-  document.getElementById('login-screen').style.display = 'flex'
+  source.style.display = 'none'
+  cible.style.display = 'flex'
   document.getElementById('auth-title').textContent = 'Se connecter'
   document.getElementById('signup-gestion-field').style.display = 'none'
   document.getElementById('signup-equipe-field').style.display = 'none'
@@ -6097,6 +6115,22 @@ let currentCategorySort = 'az'
 wireSortDropdown('dd-category-sort', (sort) => { currentCategorySort = sort; renderCategoryProceduresList() })
 
 let currentCategoryProcsData = []
+
+/* ═══ OÙ L'ON SE TROUVE DANS L'ARBRE ═══
+
+   `null` : on est dans le dossier, on voit ses sous-dossiers et ses procédures
+   non rangées. Une chaîne : on est DANS ce sous-dossier, on ne voit que son
+   contenu.
+
+   On réemploie l'écran `p-category` plutôt que d'en créer un second. Les deux
+   vues montrent la même chose — un titre, une recherche, un tri, une liste — et
+   deux écrans jumeaux auraient signifié deux boutons retour, deux recherches,
+   deux tris à maintenir en parallèle. C'est exactement ce qui a produit le
+   retour de modification qui menait au mauvais endroit. */
+let sousDossierCourant = null
+/* Le nom du DOSSIER, gardé à part : quand on entre dans un sous-dossier,
+   le titre affiche ce dernier et ne peut plus servir de source. */
+let dossierCourantNom = ''
 let toutesProcedures = false   // vrai quand on affiche toutes les procédures
 
 function openCategoryProcedures(nom) {
@@ -6183,6 +6217,11 @@ function ouvrirCategorie(nom) {
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
+  /* Entrer dans un dossier ferme le sous-dossier où l'on était : sinon, ouvrir
+     « Salle » après « Cuisine › Friteuse » afficherait une liste vide, et rien
+     ne dirait pourquoi. */
+  sousDossierCourant = null
+  dossierCourantNom = nom
   const procsInCategory = toutesProcedures
     ? allGestionProcedures
     : allGestionProcedures.filter(p => (p.categorie || 'Sans dossier') === nom)
@@ -6226,8 +6265,16 @@ function renderCategoryProceduresListInterne() {
   const oldRects = captureCardPositions(listEl)
   listEl.innerHTML = ''
 
+  /* ═══ DANS UN SOUS-DOSSIER, ON NE VOIT QUE LUI ═══
+
+     Le filtre s'applique AVANT la recherche : chercher « caisse » depuis
+     l'intérieur de « Friteuse » ne doit pas ramener toute la cuisine. */
+  const dansLaVue = sousDossierCourant
+    ? currentCategoryProcsData.filter(d => (d.proc.sous_categorie || '').trim() === sousDossierCourant)
+    : currentCategoryProcsData
+
   const filtered = currentCategoryQuery
-    ? currentCategoryProcsData.filter(d => {
+    ? dansLaVue.filter(d => {
         const titre = (d.proc.titre || '').toLowerCase()
         // En vue globale, on peut aussi chercher par nom de dossier
         const cat = toutesProcedures ? (d.proc.categorie || 'sans dossier').toLowerCase() : ''
@@ -6239,7 +6286,7 @@ function renderCategoryProceduresListInterne() {
             || (cat && cat.includes(currentCategoryQuery))
             || (sous && sous.includes(currentCategoryQuery))
       })
-    : currentCategoryProcsData
+    : dansLaVue
 
   const parTitre = (a, b) => (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
   const sorted = [...filtered].sort((a, b) => {
@@ -6249,46 +6296,56 @@ function renderCategoryProceduresListInterne() {
   })
 
   /* ═══════════════════════════════════════════════════════════════════════
-     LES SOUS-DOSSIERS · DES INTERTITRES, PAS UN NIVEAU DE PLUS
+     D'ABORD LES SOUS-DOSSIERS, ENSUITE LES PROCÉDURES
      ═══════════════════════════════════════════════════════════════════════
 
-     Les procédures sans sous-dossier restent EN TÊTE, sans titre au-dessus
-     d'elles. Celles qui en ont un sont groupées dessous, chacune sous son
-     intertitre.
+     Les intertitres sont remplacés par de vraies cartes, deux par deux, en
+     haut de la page. On les voit d'un coup d'œil avant de descendre dans la
+     liste — c'est ce qu'on attend d'un dossier ouvert.
 
-     ─── POURQUOI CET ORDRE ───
+     TROIS CAS OÙ ILS NE S'AFFICHENT PAS :
 
-     Une entreprise qui n'utilise pas les sous-dossiers ne doit voir AUCUNE
-     différence : pas d'intertitre « Sans sous-dossier », pas de section vide,
-     rien. La fonction est optionnelle, son affichage doit l'être aussi.
+     ① Quand on est DÉJÀ dans un sous-dossier. Il n'y a pas de troisième
+        niveau, et en montrer un serait promettre ce qui n'existe pas.
+     ② Pendant une recherche. On cherche des procédures, pas des rangements ;
+        des cartes en tête repousseraient les résultats hors de l'écran.
+     ③ En vue globale, où les dossiers ne sont plus la structure d'affichage.
 
-     Et pour celle qui s'en sert, le non-classé en tête est le bon choix : ce
-     sont les procédures qu'on vient de créer et qu'on n'a pas encore rangées.
-     Les enterrer en bas les ferait oublier.
+     Dans ces trois cas la liste est plate — exactement ce qu'elle était avant
+     ce chantier. */
+  const montrerSousDossiers = !sousDossierCourant && !currentCategoryQuery && !toutesProcedures
 
-     ─── LE TRI EST CONSERVÉ ───
+  if (montrerSousDossiers) {
+    const groupes = new Map()
+    for (const d of sorted) {
+      const sd = (d.proc.sous_categorie || '').trim()
+      if (!sd) continue
+      if (!groupes.has(sd)) groupes.set(sd, [])
+      groupes.get(sd).push(d.proc)
+    }
+    if (groupes.size) {
+      /* Par ordre alphabétique, quel que soit le tri des procédures : on
+         cherche un rangement par son nom, pas par sa date. */
+      const noms = [...groupes.keys()].sort((a, b) =>
+        a.localeCompare(b, 'fr', { sensitivity: 'base' }))
+      const grille = document.createElement('div')
+      grille.className = 'sd-grille'
+      noms.forEach(n => grille.appendChild(carteSousDossier(n, groupes.get(n))))
+      listEl.appendChild(grille)
+    }
+  }
 
-     `sorted` porte déjà le choix de la personne — par nom, par date. On ne
-     retrie pas : on REGROUPE en gardant l'ordre existant à l'intérieur de
-     chaque groupe. Retrier ici ferait que le bouton « Trier » ne servirait
-     plus à rien dès qu'un sous-dossier existe.
-
-     ─── LES INTERTITRES SONT MASQUÉS PENDANT UNE RECHERCHE ───
-
-     Quand on cherche « friteuse », on veut la liste des résultats, pas une
-     arborescence à moitié vide. Les groupes n'apparaissent qu'en navigation
-     normale. */
-  const avecGroupes = grouperParSousDossier(sorted, d => d.proc, currentCategoryQuery)
+  /* Dans un sous-dossier : ses procédures. Dans un dossier : seulement celles
+     qui ne sont rangées nulle part — les autres sont déjà accessibles par leur
+     carte, et les répéter doublerait la liste. */
+  const avecGroupes = montrerSousDossiers
+    ? sorted.filter(d => !(d.proc.sous_categorie || '').trim())
+    : sorted
 
   for (const entree of avecGroupes) {
     /* Un intertitre n'est pas une carte : il se dessine et on passe à la
        suivante. Le mettre dans la même boucle garde l'ordre sans avoir à
        reconstruire la liste en deux passes. */
-    if (entree.intertitre) {
-      listEl.appendChild(elementIntertitre(entree.intertitre, entree.compte, true))
-      continue
-    }
-
     const { proc, nbEtapes, pct } = entree
     const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
@@ -6689,6 +6746,114 @@ function grouperParSousDossier(sujets, dont, requete) {
 }
 
 /* Le dessin de l'intertitre, partagé lui aussi. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'UN SOUS-DOSSIER
+
+   Même moule que la carte de dossier : `cat-cell`, pastille, nom, aperçu des
+   procédures, pied avec le compte et le chevron. Elle hérite donc de tout son
+   style, de son animation de réagencement et de son comportement au toucher,
+   sans une ligne de CSS en plus.
+
+   SEULE L'ICÔNE CHANGE : un dossier posé DANS un autre, décalé, avec le coin
+   du parent visible derrière. C'est la seule différence, et elle suffit — les
+   deux objets sont de même nature, il ne faut pas laisser croire le contraire.
+
+   Le pied ne porte pas le chevron des dossiers mais le même : on entre pareil.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function carteSousDossier(nom, procs) {
+  const cell = document.createElement('div')
+  cell.className = 'cat-cell cat-cell--sous'
+  cell.dataset.key = 'sd:' + nom
+  const recents = procs.slice(0, 3)
+  cell.innerHTML = `
+    <div class="cat-top">
+      <span class="cat-ic">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"
+                stroke="url(#logoOrIc)" stroke-width="1.6" stroke-opacity="0.45"
+                stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
+                stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+          <line x1="6" y1="13.4" x2="22" y2="13.4"
+                stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
+        </svg>
+      </span>
+    </div>
+    <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
+    <div class="cat-recent">
+      ${recents.map(p => `<div class="cat-recent-item" data-proc="${p.id}"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
+    </div>
+    <div class="cat-pied">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+              stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <span>${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
+      <span class="fl">›</span>
+    </div>`
+
+  cell.onclick = (e) => {
+    /* Comme sur la carte de dossier : toucher un NOM ouvre cette procédure,
+       toucher le reste ouvre le sous-dossier. */
+    const ligne = e.target.closest('.cat-recent-item')
+    if (ligne) {
+      const p = procs.find(x => x.id === ligne.dataset.proc)
+      if (p) {
+        if (p.statut === 'echec' || analyseBloquee(p)) { proposerReprise(p); return }
+        openAnalyse(p.id); return
+      }
+    }
+    ouvrirSousDossier(nom)
+  }
+  return cell
+}
+
+/* ═══ LE RETOUR REMONTE D'UN NIVEAU ═══
+
+   Depuis un sous-dossier, on revient au dossier — pas à la liste. C'est le
+   comportement de tout explorateur de fichiers, et c'est ce qu'attend quelqu'un
+   qui vient d'entrer quelque part.
+
+   Rouvrir le dossier plutôt que de simplement vider `sousDossierCourant` :
+   `ouvrirCategorie` remet aussi le titre, le sous-titre, la recherche et le
+   compte. Les remettre à la main ici, c'est en oublier un. */
+document.getElementById('cat-retour')?.addEventListener('click', () => {
+  if (sousDossierCourant) { openCategoryProcedures(dossierCourantNom); return }
+  showGestionScreen('p-list')
+})
+
+function ouvrirSousDossier(nom) {
+  sousDossierCourant = nom
+  currentCategoryQuery = ''
+  const champ = document.getElementById('category-search-input')
+  if (champ) champ.value = ''
+  majTitreCategorie()
+  renderCategoryProceduresList()
+}
+
+/* Le titre porte le chemin, et le bouton « renommer le dossier » disparaît
+   quand on est dans un sous-dossier : il renommerait le parent, ce que
+   personne n'attend à cet endroit. */
+function majTitreCategorie() {
+  const t = document.getElementById('category-titre')
+  const sub = document.getElementById('category-subhead')
+  const r = document.getElementById('cat-renommer')
+
+  if (sousDossierCourant) {
+    if (t) t.textContent = sousDossierCourant
+    /* Le sous-titre porte le chemin : sans lui, on ne sait plus dans quel
+       dossier on se trouve — deux entreprises peuvent avoir un « Friteuse ». */
+    if (sub) sub.textContent = `${dossierCourantNom} \u203a ${sousDossierCourant}`
+    /* Le crayon renommerait le DOSSIER, ce que personne n'attend ici. Le
+       sous-dossier se renomme depuis sa carte, dans le dossier parent. */
+    if (r) r.style.display = 'none'
+  } else {
+    if (t) t.textContent = dossierCourantNom
+    if (r) r.style.display = ''
+  }
+}
+
 function elementIntertitre(nom, compte, renommable) {
   const t = document.createElement('div')
   t.className = 'sous-dossier-titre' + (renommable ? ' renommable' : '')

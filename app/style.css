@@ -7748,3 +7748,28 @@ body:has(#e-detail.active) #equipe-app{
   flex:0 0 auto; font-weight:700; font-variant-numeric:tabular-nums;
   color:var(--label-3); letter-spacing:0;
 }
+
+
+/* ═══ LE CRAYON DE L'INTERTITRE ═══
+
+   Il n'apparaît qu'au survol sur ordinateur, mais reste TOUJOURS visible au
+   toucher : sur un téléphone il n'y a pas de survol, et un bouton qui ne se
+   montre jamais n'existe pas. `hover: hover` distingue les deux.
+
+   Sa zone de toucher fait 30 px alors que l'icône en fait 13 : c'est le
+   rembourrage qui la crée. Un bouton de 13 px se rate une fois sur deux avec
+   un pouce, et il est collé au bord de l'écran. */
+.sous-dossier-titre.renommable{ padding-right:0; }
+.sd-renommer{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+  width:30px; height:30px; margin:-8px -6px -8px 2px;
+  background:none; border:none; color:var(--label-3);
+  border-radius:9px;
+}
+.sd-renommer svg{ width:13px; height:13px; }
+.sd-renommer:active{ background:rgba(255,255,255,0.08); color:var(--label-2); }
+@media (hover: hover){
+  .sd-renommer{ opacity:0; transition:opacity 0.16s ease; }
+  .sous-dossier-titre:hover .sd-renommer{ opacity:1; }
+}

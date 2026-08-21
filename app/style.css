@@ -3407,6 +3407,29 @@
      écraserait celui de `.hero` sur la carte de promotion. */
   .promu-carte:not(.hero){ background:linear-gradient(160deg,#1E2026,#141519); }
 
+  /* ═══ UNE ANNONCE A BESOIN D'AIR ═══
+
+     `.hero-ia` donne 12 px en haut, 16 en bas, 20 sur les côtés. Ce réglage
+     vient de la carte d'accueil, qui contient une liste : ses lignes portent
+     leur propre espacement et la carte n'a pas à en ajouter.
+
+     Ici il n'y a que deux phrases. Le même rembourrage les colle aux bords, et
+     l'écran le plus important du parcours — celui qui annonce un changement de
+     rôle — paraît étriqué.
+
+     On passe à 24 px en haut et sur les côtés, 26 en bas. Le bas est un peu
+     plus large : sous un bloc de texte, l'œil perçoit le vide comme plus étroit
+     qu'il n'est, et une marge égale semblerait insuffisante.
+
+     Visé sur `.promu-carte` seulement : `.hero-ia` sert à trois cartes, dont
+     celle de l'accueil, qui ne doit pas bouger. */
+  .hero.promu-carte{ padding:24px 0 26px; }
+  .hero.promu-carte .hero-txt{ padding:0 24px; }
+  /* Le titre respire davantage de sa phrase : 6 px les rendaient solidaires,
+     comme deux lignes d'un même paragraphe. */
+  .hero.promu-carte h2{ margin-bottom:10px; }
+  .hero.promu-carte p{ line-height:1.55; }
+
   /* La carte de promotion arrive avec un léger rebond : c'est une annonce, elle
      mérite d'être remarquée. L'animation portait sur l'avatar, qui n'existe
      plus — elle porte maintenant sur la carte entière. */

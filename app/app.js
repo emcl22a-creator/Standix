@@ -1069,7 +1069,11 @@ function afficherEcranChoix() {
 window.chooseSpace = function(space) {
   selectedSpace = space
   document.getElementById('choice-screen').style.display = 'none'
-  document.getElementById('login-screen').style.display = 'flex'
+  const ecranC = document.getElementById('login-screen')
+  ecranC.style.display = 'flex'
+  /* On rend les champs utilisables : ils étaient `inert` pour empêcher Safari
+     de proposer le remplissage depuis l'écran de choix. */
+  ecranC.removeAttribute('inert')
   /* Le titre reprend le mot de la carte touchée : on doit reconnaître d'où
      l'on vient, sinon l'écran suivant paraît sans rapport. */
   /* Le titre reprend le mot de la carte touchée, mais SANS le verbe : « S'inscrire
@@ -1252,6 +1256,7 @@ window.allerConnexion = function() {
   selectedSpace = null
   source.style.display = 'none'
   cible.style.display = 'flex'
+  cible.removeAttribute('inert')
   document.getElementById('auth-title').textContent = 'Se connecter'
   document.getElementById('signup-gestion-field').style.display = 'none'
   document.getElementById('signup-equipe-field').style.display = 'none'
@@ -1264,6 +1269,17 @@ window.allerConnexion = function() {
 }
 
 window.backToChoice = function() {
+  /* ═══ ON REND L'INERTIE, ET ON RETIRE LE FOCUS ═══
+
+     Sans l'inertie, revenir au choix laisse le formulaire accessible au
+     remplissage automatique, et le clavier revient avec.
+
+     Mais l'inertie NE SUFFIT PAS : mesuré dans Chromium, un champ qui avait le
+     focus le GARDE quand on rend son parent inerte. Le clavier resterait donc
+     ouvert par-dessus l'écran de choix, ce qui est exactement le défaut qu'on
+     corrige. On le retire à la main. */
+  if (document.activeElement && document.activeElement.blur) document.activeElement.blur()
+  document.getElementById('login-screen')?.setAttribute('inert', '')
   document.querySelector('.auth-toggle')?.removeAttribute('data-cache')
   document.getElementById('login-screen').style.display = 'none'
   afficherEcranChoix()
@@ -1942,7 +1958,11 @@ async function enterApp(membre) {
     document.getElementById('equipe-app').style.display = 'none'
     afficherBarre(false)
     afficherBarre(false)
-    document.getElementById('login-screen').style.display = 'flex'
+    const ecranRejet = document.getElementById('login-screen')
+    ecranRejet.style.display = 'flex'
+    /* Troisième chemin qui montre cet écran : lui aussi doit lever l'inertie,
+       sinon la personne verrait un formulaire qu'elle ne peut pas remplir. */
+    ecranRejet.removeAttribute('inert')
     /* ═══ LES ONGLETS REVIENNENT ICI ═══
 
        Ce chemin renvoie à la connexion quelqu'un qui pouvait venir de
@@ -2831,7 +2851,11 @@ function ouvrirContact() {
   const sujet = encodeURIComponent('Standix · ' + espace)
   const corps = encodeURIComponent(
     '\n\n\u2014\n' + (currentMembre?.nom || '') + ' \u00b7 espace ' + espace)
-  window.location.href = `mailto:Procedo.off@gmail.com?subject=${sujet}&body=${corps}`
+  /* L'adresse de contact est écrite ici et à un second endroit — le formulaire
+     de résiliation. Deux occurrences, aucune constante : c'est peu, mais si un
+     troisième point d'écriture apparaît, il faudra une variable plutôt qu'une
+     recherche-remplacement de plus. */
+  window.location.href = `mailto:Standix.app@gmail.com?subject=${sujet}&body=${corps}`
 }
 /* Les avatars de l'accueil ouvrent la MÊME fenêtre que la carte « Écrivez-nous »
    des réglages. Ils avaient chacun leur texte, plus court et différent : deux
@@ -15650,7 +15674,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
       confirmer: 'Nous \u00e9crire',
       annuler: 'Fermer',
     })
-    if (ok) window.location.href = 'mailto:Procedo.off@gmail.com?subject=' +
+    if (ok) window.location.href = 'mailto:Standix.app@gmail.com?subject=' +
       encodeURIComponent('Offre ' + o.nom)
     return
   }

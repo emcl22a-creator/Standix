@@ -1057,8 +1057,11 @@ window.chooseSpace = function(space) {
   document.getElementById('login-screen').style.display = 'flex'
   /* Le titre reprend le mot de la carte touchée : on doit reconnaître d'où
      l'on vient, sinon l'écran suivant paraît sans rapport. */
+  /* Le titre reprend le mot de la carte touchée, mais SANS le verbe : « S'inscrire
+     et créer son entreprise » en tête d'un formulaire d'inscription répéterait ce
+     que la page fait déjà voir. La carte annonce le geste, l'écran le déroule. */
   document.getElementById('auth-title').textContent =
-    space === 'gestion' ? 'Cr\u00e9er une entreprise' : 'Rejoindre une entreprise'
+    space === 'gestion' ? 'Votre entreprise' : 'Rejoindre une entreprise'
   document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
   document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
   /* ═══ INSCRIPTION SEULE, ET LES ONGLETS DISPARAISSENT ═══

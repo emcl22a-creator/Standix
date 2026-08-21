@@ -569,14 +569,51 @@
 
      L'approche reste à −0,03 em. À −0,04, valeur d'origine, « Codes
      d'invitation » se tassait. */
-  h1.pagehead{ font-size:24px; font-weight:700; letter-spacing:-0.03em; margin:0 0 2px; }
-  .detail-header h1.pagehead{ margin:0; }
+  /* ═══ UN TITRE LONG REVIENT À LA LIGNE ═══
+
+     Plusieurs mots se répartissaient déjà d'eux-mêmes. Un mot SANS ESPACE, non :
+     « Réapprovisionnementhebdomadairecuisine » restait sur une seule ligne et
+     se faisait couper au bord, sans que rien ne le signale.
+
+     Ce n'est pas un cas d'école — un titre de procédure est saisi librement, et
+     rien n'oblige à y mettre des espaces.
+
+     `overflow-wrap:anywhere` autorise la coupure À L'INTÉRIEUR d'un mot, mais
+     SEULEMENT quand il n'y a pas d'autre solution. C'est ce qui le distingue de
+     `word-break:break-all`, qui coupe partout dès que ça l'arrange et
+     déchiquette des phrases parfaitement normales. */
+  h1.pagehead{
+    font-size:24px; font-weight:700; letter-spacing:-0.03em; margin:0 0 2px;
+    overflow-wrap:anywhere;
+  }
+  /* Même raison : un titre long doit se réduire, pas pousser le bouton dehors.
+     La page d'analyse le déclarait déjà en style direct — signe que le besoin
+     s'était fait sentir sans qu'on remonte à la règle. */
+  .detail-header h1.pagehead{ margin:0; min-width:0; flex:1; }
 
   /* `pagehead-row` porte le titre ET un bouton à droite — « Gérer l'équipe »
      et son « + ». Il gardait une marge haute qui descendait le titre de 34 px
      sous celui des autres pages. */
-  .pagehead-row{ margin-top:0 !important; }
-  .pagehead-row h1.pagehead{ margin:0; }
+  /* ═══ LE TITRE SUR LA MÊME LIGNE QUE LE RETOUR ═══
+
+     `.pagehead-row` n'avait AUCUNE règle de disposition — seulement une marge.
+     Le bouton et le titre restaient donc deux blocs, empilés l'un sous l'autre,
+     alors que les vingt-sept autres pages emploient `.detail-header` qui, lui,
+     est en `flex`. D'où l'incohérence : selon la page, le titre était à côté du
+     bouton ou en dessous.
+
+     On lui donne la même disposition. Pas en fusionnant les deux classes : elles
+     diffèrent par la marge du haut, et les confondre déplacerait vingt-sept
+     en-têtes pour en réparer deux.
+
+     `min-width:0` sur le titre est indispensable : sans lui, un nom de membre
+     long refuse de se réduire et pousse le bouton hors de l'écran. C'est le
+     même piège que sur les cartes de l'écran de choix. */
+  .pagehead-row{
+    margin-top:0 !important;
+    display:flex; align-items:flex-start; gap:10px; margin-bottom:4px;
+  }
+  .pagehead-row h1.pagehead{ margin:0; min-width:0; flex:1; }
   .subhead{ font-size:14px; color:var(--label-2); margin-bottom:18px; line-height:1.35; }
 
   /* ═══ Entreprises de l'utilisateur ═══ */
@@ -4480,7 +4517,26 @@
 
      Le rembourrage passe à zéro, et le titre prend 26 px comme les autres. Le
      bouton retour reste aligné dessus par `align-items:center`. */
-  .detail-header{ display:flex; align-items:center; gap:10px; margin-bottom:4px; }
+    /* ═══ LE BOUTON SE CALE SUR LA PREMIÈRE LIGNE, PAS SUR LE BLOC ═══
+
+     `align-items:center` centrait le bouton sur la HAUTEUR TOTALE du titre. Sur
+     une ligne, invisible. Sur trois, la flèche descendait au milieu du
+     paragraphe — elle paraissait flotter, sans rapport avec le début du texte.
+
+     Un bouton retour appartient au haut de la page. Il doit rester à hauteur du
+     premier mot, quelle que soit la longueur du titre.
+
+     `flex-start` seul ne suffirait pas : le bouton fait 34 px et une ligne de
+     titre environ 29, donc leurs bords hauts alignés laissent les centres
+     décalés de deux à trois pixels. La marge négative les remet d'aplomb —
+     assez peu pour ne rien déranger sur un titre court, assez pour que la
+     flèche tombe pile en face du premier mot sur un titre long. */
+  .detail-header{ display:flex; align-items:flex-start; gap:10px; margin-bottom:4px; }
+/* Le décalage qui remet le bouton en face de la première ligne. Voir
+   l'explication au-dessus de `.detail-header`. */
+.detail-header > .back-btn,
+.pagehead-row > .back-btn{ margin-top:-2.5px; }
+
   .back-btn{ width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); border:0.5px solid var(--border); flex-shrink:0; }
   .back-btn svg{width:16px; height:16px;}
   /* ═══ Le fil des étapes, côté équipe ═══
@@ -5306,7 +5362,19 @@
   .boot-fill{ opacity:1; }
   .boot-glow{
     position:absolute; width:170%; height:170%; border-radius:50%;
-    background:radial-gradient(circle, rgba(255,255,255,0.30) 0%, transparent 68%);
+    /* ═══ LA LUEUR EST AMBRE, PAS BLANCHE ═══
+
+       Un halo blanc derrière un logo ambre lave la couleur : au moment le plus
+       intense de l'animation, le signe paraît décoloré, comme surexposé.
+
+       Deux teintes plutôt qu'une : `#FFAD33` au centre, `#FF6A00` en périphérie.
+       C'est le dégradé de la marque, et une lueur qui vire au chaud vers les
+       bords imite la façon dont une vraie lumière colorée se diffuse.
+
+       L'opacité monte à 0,38 contre 0,30 : une couleur saturée se voit moins
+       qu'un blanc à intensité égale, sur un fond sombre. */
+    background:radial-gradient(circle,
+      rgba(255,173,51,0.38) 0%, rgba(255,106,0,0.22) 42%, transparent 68%);
     filter:blur(8px); opacity:0;
   }
 
@@ -5376,11 +5444,40 @@
     background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
     border-radius:100px; z-index:0;
     box-shadow:0 4px 14px rgba(255,122,24,0.26);
-    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    /* ═══ LE MÊME MOUVEMENT QUE LA CAPSULE DE LA BARRE DU BAS ═══
+
+       C'était `cubic-bezier(0.34, 1.56, 0.64, 1)` — une courbe qui DÉPASSE sa
+       cible puis revient. La capsule de la barre, elle, ne dépasse jamais : son
+       ressort est réglé raideur 340, amortissement 37, et le commentaire du
+       code le dit en toutes lettres — « sur-amorti : aucun dépassement ».
+
+       Deux animations de même nature qui se comportent différemment dans une
+       même app, c'est ce qui donne l'impression que les écrans ont été faits
+       par deux personnes.
+
+       ─── COMMENT LA COURBE A ÉTÉ OBTENUE ───
+
+       Ce n'est pas une approximation à l'œil. J'ai intégré le ressort de la
+       barre avec ses constantes réelles, échantillonné 26 points, et transcrit
+       le résultat en `linear()`. Le taux d'amortissement vaut 1,003 — juste
+       au-dessus du seuil critique — et la stabilisation prend 514 ms, d'où les
+       0,52 s. C'est le mouvement de la barre, à la milliseconde près.
+
+       ─── LE REPLI ───
+
+       `linear()` demande Safari 17.4. En dessous, la déclaration entière est
+       ignorée et la précédente s'applique : une courbe d'apaisement sobre, sans
+       rebond. Moins fidèle, mais du même caractère — c'est ce qui compte. */
+    transition: transform 0.42s cubic-bezier(0.22, 0.61, 0.19, 1);
+    transition: transform 0.52s linear(0.0000 0.0%, 0.0597 4.0%, 0.1811 8.0%, 0.3225 12.0%, 0.4572 16.1%, 0.5723 20.0%, 0.6705 24.0%, 0.7478 28.0%, 0.8102 32.0%, 0.8583 36.1%, 0.8942 40.0%, 0.9220 44.0%, 0.9428 48.1%, 0.9579 52.0%, 0.9693 56.1%, 0.9777 60.1%, 0.9837 64.0%, 0.9882 68.1%, 0.9915 72.1%, 0.9938 76.1%, 0.9956 80.1%, 0.9968 84.0%, 0.9977 88.1%, 0.9984 92.1%, 0.9988 96.1%, 1.0000 100.0%);
   }
   .auth-toggle-btn{
     position:relative; z-index:1; flex:1; text-align:center; font-size:13px; font-weight:600; padding:9px 0;
-    border-radius:100px; color:var(--label-2); transition: color 0.3s ease;
+    border-radius:100px; color:var(--label-2);
+    /* La couleur suivait en 0,3 s pendant que la pastille mettait 0,52 : le
+       texte devenait sombre avant que l'orange ne l'ait rejoint, et on voyait
+       du noir sur du gris pendant deux dixièmes. On l'aligne sur la pastille. */
+    transition: color 0.34s cubic-bezier(0.4, 0, 0.2, 1);
   }
   /* Texte sombre sur l'orange, comme sur les boutons : à cette clarté, du
      blanc perdrait le contraste que le noir garde sans effort. */
@@ -6725,7 +6822,18 @@ body.chargement #bar{
    ═══════════════════════════════════════════════════════════════════════════ */
 .choix-marque{
   display:flex; align-items:center; justify-content:center;
-  gap:11px; margin-bottom:6px;
+  gap:11px;
+  /* ═══ L'EN-TÊTE RESPIRE ═══
+
+     Six pixels sous la marque, quatorze sous le titre : les trois lignes
+     formaient un bloc compact, comme un en-tête de facture. Or ce sont trois
+     choses distinctes — qui parle, ce qu'on dit, ce qu'on demande — et chacune
+     mérite d'être lue séparément.
+
+     L'écart suit la hauteur de l'écran. Sur un iPhone SE il reste modeste ;
+     sur un grand téléphone, où la place ne manque pas, il s'ouvre. Une valeur
+     fixe aurait servi l'un au détriment de l'autre. */
+  margin-bottom:clamp(10px, 2.2vh, 20px);
 }
 /* La marge du bas appartenait au logo, qui n'est plus seul sur sa ligne. */
 .choix-marque .boot-logo{ margin:0; }
@@ -6814,7 +6922,7 @@ body.chargement #bar{
    volontaire pour qu'un changement de police de marque se propage. */
 .choix-bienvenue{
   font-size:25px; font-weight:700; letter-spacing:-0.035em;
-  line-height:1.2; margin:16px 0 8px;
+  line-height:1.2; margin:clamp(14px, 3vh, 26px) 0 clamp(8px, 1.4vh, 13px);
 }
 .choix-bienvenue .logotype{
   font-size:inherit;

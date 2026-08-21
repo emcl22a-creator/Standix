@@ -1195,20 +1195,19 @@ h2 em{ font-style:normal; color:var(--t1); }
 }
 
 .sticker{
-  width:min(148px, 36vw); margin:0;
-  padding:14px 14px 12px;
-  border-radius:14px;
-  background:#F7F8F8;
-  box-shadow:0 20px 44px rgba(0,0,0,.55),
-             0 0 0 1px rgba(255,255,255,.14);
+  /* ═══ L'ENVELOPPE EST VIDÉE ═══
+
+     L'image est maintenant l'autocollant COMPLET : la carte blanche, ses coins
+     arrondis, son ombre, le titre, le sous-titre, le filet et le logo. Le
+     cadre que le CSS dessinait autour faisait donc une carte blanche dans une
+     carte blanche, avec « Machine à café » écrit deux fois.
+
+     Il ne reste que la largeur. Pas de fond — les coins du PNG sont
+     transparents, un fond blanc aurait débordé en angles droits sur le noir de
+     la page. Pas d'ombre non plus : elle est dans l'image. */
+  width:min(152px, 37vw); margin:0;
 }
-.sticker img{ display:block; width:100%; height:auto; border-radius:4px; }
-.sticker .etiq{
-  margin-top:9px; text-align:center;
-  font-size:10.5px; font-weight:500; color:#3A3D42;
-  letter-spacing:-.01em;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
+.sticker img{ display:block; width:100%; height:auto; }
 /* Les endroits où on le colle. En liste courte plutôt qu'en phrase : c'est un
    inventaire, et un inventaire se scanne des yeux. */
 .endroits{
@@ -2212,9 +2211,8 @@ footer .marque{ margin-bottom:18px; }
        deux boutons. -->
   <div class="objets app" style="--d:.13s">
     <div class="sticker">
-      <img src="qr-standix.png" alt="QR code d'une procédure Standix"
-           width="600" height="600">
-      <p class="etiq">Machine à café</p>
+      <img src="qr-standix.png" width="900" height="927"
+           alt="L'autocollant d'une procédure Standix : le QR code, le titre « Machine à café » et l'invitation à scanner">
     </div>
     <div class="feuille">
       <img src="pdf-standix.png" alt="La même procédure exportée en PDF"

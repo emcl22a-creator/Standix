@@ -2360,7 +2360,9 @@
   <!-- Procédures d'une dossier, côté équipe -->
   <div class="screen" id="e-category">
     <div class="detail-header">
-      <button class="back-btn" onclick="showEquipeScreen('e-list', document.querySelector('#tabbar .tab-round'))">
+      <!-- Le retour remonte d'UN niveau : d'un sous-dossier vers son dossier,
+           d'un dossier vers la liste. -->
+      <button class="back-btn" id="e-cat-retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead" id="e-cat-titre" style="margin:0;">Dossier</h1>

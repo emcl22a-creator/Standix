@@ -6009,38 +6009,28 @@ function renderCategoryGrid() {
     /* Sur la carte d'une dossier, un titre en panne mène directement à la
        reprise : sinon il faudrait ouvrir la dossier pour s'en apercevoir. */
     cell.onclick = (e) => {
-      /* ═══ CLIQUER SUR UN NOM OUVRE CE NOM ═══
+      /* ═══ TOUTE LA CARTE OUVRE LE DOSSIER ═══
 
-         La ligne d'une procédure listée dans la carte menait au DOSSIER, pas à
-         la procédure. On touchait « Arrosage automatique V2 » et on atterrissait
-         dans la liste du domaine — avec la procédure dedans, certes, mais il
-         fallait la toucher une seconde fois.
+         J'avais fait l'inverse ce matin : toucher un nom ouvrait la procédure.
+         C'était une erreur de raisonnement. Le défaut que je cherchais était
+         la coche de fin d'analyse qui ne s'éteignait jamais — elle ne s'efface
+         qu'à l'ouverture réelle d'une procédure, et ce chemin n'en ouvrait
+         aucune. J'ai traité le symptôme en changeant la navigation, au lieu de
+         traiter la cause.
 
-         Deux conséquences. La navigation demandait deux gestes là où un suffit.
-         Et surtout, la coche « analyse terminée » ne s'éteignait jamais : elle
-         ne s'efface qu'à l'ouverture réelle de la procédure, et ce chemin-là
-         n'en ouvrait aucune. La coche revenait donc indéfiniment, ce qui se
-         lisait comme un défaut d'affichage alors que c'était un défaut de
-         navigation.
+         La carte est un DOSSIER. Les trois titres qu'elle montre sont un
+         aperçu de son contenu, pas un menu : ils disent ce qu'il y a dedans,
+         ils ne prétendent pas y mener directement. Rendre une partie de la
+         carte cliquable autrement que le reste crée deux comportements sur un
+         même objet, et on ne sait plus où l'on va sans viser.
 
-         Le partage est net : la LIGNE ouvre sa procédure, le RESTE de la carte
-         ouvre le dossier. La ligne était déjà traitée à part pour les analyses
-         en échec — on ne fait qu'étendre au cas normal ce qui existait pour le
-         cas d'erreur. */
+         Le cas de l'échec reste à part : une analyse en panne se reprend là où
+         on la voit, sinon il faut deviner qu'il faut d'abord ouvrir le dossier.
+         C'est une réparation, pas une navigation. */
       const ligne = e.target.closest('.cat-recent-item')
       if (ligne) {
-        /* PAR L'IDENTIFIANT, PAS PAR LE TITRE. La ligne était retrouvée en
-           comparant le texte affiché : deux procédures de même nom dans un
-           même dossier auraient ouvert la mauvaise. Tant qu'on n'ouvrait que
-           le dossier, la confusion restait sans conséquence. */
         const p = procsInCat.find(x => x.id === ligne.dataset.proc)
-        if (p) {
-          if (p.statut === 'echec' || analyseBloquee(p)) { proposerReprise(p); return }
-          /* On retiendra le dossier : le bouton Retour de la fiche y ramène,
-             et non à la grille — c'est de là qu'on vient réellement. */
-          openAnalyse(p.id)
-          return
-        }
+        if (p && (p.statut === 'echec' || analyseBloquee(p))) { proposerReprise(p); return }
       }
       openCategoryProcedures(nom)
     }
@@ -6823,15 +6813,15 @@ function carteSousDossier(nom, procs) {
     </div>`
 
   cell.onclick = (e) => {
-    /* Comme sur la carte de dossier : toucher un NOM ouvre cette procédure,
-       toucher le reste ouvre le sous-dossier. */
+    /* Comme la carte de dossier : TOUTE la carte ouvre le sous-dossier. Les
+       titres affichés sont un aperçu du contenu, pas un menu.
+
+       Seule exception, la même que sur le dossier : une analyse en panne se
+       reprend là où on la voit. C'est une réparation, pas une navigation. */
     const ligne = e.target.closest('.cat-recent-item')
     if (ligne) {
       const p = procs.find(x => x.id === ligne.dataset.proc)
-      if (p) {
-        if (p.statut === 'echec' || analyseBloquee(p)) { proposerReprise(p); return }
-        openAnalyse(p.id); return
-      }
+      if (p && (p.statut === 'echec' || analyseBloquee(p))) { proposerReprise(p); return }
     }
     ouvrirSousDossier(nom)
   }

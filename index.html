@@ -1661,7 +1661,22 @@ footer .marque{ margin-bottom:18px; }
      ④ la profondeur de champ. Celui du fond reçoit un flou d'un pixel et
         s'assombrit : ce qui est net est ce qui est proche.
      ═══════════════════════════════════════════════════════════════════════ */
-  .colonne-app{ perspective:1600px; perspective-origin:70% 45% }
+  /* ═══ POURQUOI LA GRILLE PASSAIT DEVANT ═══
+
+     `perspective` crée un CONTEXTE D'EMPILEMENT. Le `z-index:2` de la capture
+     se retrouvait donc enfermé à l'intérieur de cette colonne, et ne comptait
+     plus face à la grille : au niveau du dessus, la colonne valait `auto`,
+     c'est-à-dire zéro, contre 1 pour les filets. Le trait de droite passait
+     par-dessus l'écran qui le franchit — exactement l'inverse de l'effet
+     recherché, puisque c'est ce débordement qui devait donner l'impression
+     que l'écran sort de la page.
+
+     Il faut donc positionner la colonne elle-même. `z-index:3` et non 2 : les
+     sections sont à 2, et l'écran de devant doit passer au-dessus de tout. */
+  .colonne-app{
+    position:relative; z-index:3;
+    perspective:1600px; perspective-origin:70% 45%;
+  }
 
   .capture{
     position:relative; max-width:none; margin:0;

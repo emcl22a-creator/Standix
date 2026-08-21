@@ -6240,37 +6240,14 @@ function renderCategoryProceduresListInterne() {
      Quand on cherche « friteuse », on veut la liste des résultats, pas une
      arborescence à moitié vide. Les groupes n'apparaissent qu'en navigation
      normale. */
-  const groupes = new Map()          // sous-dossier → procédures, ordre conservé
-  const sansSous = []
-  for (const d of sorted) {
-    const sd = (d.proc.sous_categorie || '').trim()
-    if (!sd) { sansSous.push(d); continue }
-    if (!groupes.has(sd)) groupes.set(sd, [])
-    groupes.get(sd).push(d)
-  }
-  /* Les intertitres dans l'ordre alphabétique, quel que soit le tri des cartes :
-     on cherche un dossier par son nom, pas par sa date. */
-  const nomsGroupes = [...groupes.keys()].sort((a, b) =>
-    a.localeCompare(b, 'fr', { sensitivity: 'base' }))
-
-  const avecGroupes = currentCategoryQuery ? sorted
-    : [...sansSous, ...nomsGroupes.flatMap(n => [{ intertitre: n }, ...groupes.get(n)])]
+  const avecGroupes = grouperParSousDossier(sorted, d => d.proc, currentCategoryQuery)
 
   for (const entree of avecGroupes) {
     /* Un intertitre n'est pas une carte : il se dessine et on passe à la
        suivante. Le mettre dans la même boucle garde l'ordre sans avoir à
        reconstruire la liste en deux passes. */
     if (entree.intertitre) {
-      const t = document.createElement('div')
-      t.className = 'sous-dossier-titre'
-      t.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M3 7.5a2 2 0 0 1 2-2h3.4l1.8 2.2H19a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
-        </svg>
-        <span>${escapeHtml(entree.intertitre)}</span>
-        <b>${groupes.get(entree.intertitre).length}</b>`
-      listEl.appendChild(t)
+      listEl.appendChild(elementIntertitre(entree.intertitre, entree.compte))
       continue
     }
 
@@ -6635,6 +6612,56 @@ let postesEntreprise = []
 function lireSousDossier(id) {
   const v = (document.getElementById(id)?.value || '').trim()
   return v || null
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GROUPER PAR SOUS-DOSSIER · UNE SEULE FOIS POUR LES DEUX ESPACES
+
+   La Gestion et l'Équipe affichent la même chose et l'affichaient chacune de
+   son côté. Deux listes, deux boucles, deux occasions de diverger — et le
+   défaut n'apparaîtrait que dans l'espace où l'on ne regarde pas.
+
+   `sujets` est une liste d'objets quelconques ; `dont` dit où trouver la
+   procédure dans chacun. La Gestion passe `{ proc, nbEtapes, pct }`, l'Équipe
+   passe la procédure elle-même : la fonction s'accommode des deux sans que
+   l'une ait à ressembler à l'autre.
+
+   Elle rend une liste plate, entrecoupée de repères `{ intertitre, compte }`.
+   L'appelant n'a qu'à les reconnaître dans sa boucle — il garde donc entière
+   la main sur le dessin de ses cartes. */
+function grouperParSousDossier(sujets, dont, requete) {
+  if (requete) return sujets          // en recherche, une liste plate
+
+  const groupes = new Map()
+  const sansSous = []
+  for (const x of sujets) {
+    const sd = (dont(x)?.sous_categorie || '').trim()
+    if (!sd) { sansSous.push(x); continue }
+    if (!groupes.has(sd)) groupes.set(sd, [])
+    groupes.get(sd).push(x)
+  }
+  /* Les intertitres par ordre alphabétique, quel que soit le tri des cartes :
+     on cherche un rangement par son nom, pas par sa date. L'ordre À
+     L'INTÉRIEUR de chaque groupe, lui, reste celui que la personne a choisi. */
+  const noms = [...groupes.keys()].sort((a, b) =>
+    a.localeCompare(b, 'fr', { sensitivity: 'base' }))
+
+  return [...sansSous, ...noms.flatMap(n =>
+    [{ intertitre: n, compte: groupes.get(n).length }, ...groupes.get(n)])]
+}
+
+/* Le dessin de l'intertitre, partagé lui aussi. */
+function elementIntertitre(nom, compte) {
+  const t = document.createElement('div')
+  t.className = 'sous-dossier-titre'
+  t.innerHTML = `
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 7.5a2 2 0 0 1 2-2h3.4l1.8 2.2H19a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+    </svg>
+    <span>${escapeHtml(nom)}</span>
+    <b>${compte}</b>`
+  return t
 }
 
 async function chargerPostes() {
@@ -12667,7 +12694,17 @@ async function openAnalyse(procId) {
   }
 
   document.getElementById('analyse-titre').textContent = proc.titre
-  document.getElementById('analyse-subhead').textContent = `${proc.categorie || 'Sans dossier'} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
+  /* ═══ LE CHEMIN COMPLET SOUS LE TITRE ═══
+
+     « Cuisine › Friteuse › créée le 12 mars ». Le chevron sépare les niveaux
+     comme dans un explorateur de fichiers ; le point médian sépare le
+     rangement de la date, qui n'en fait pas partie.
+
+     Sans sous-dossier, la ligne est celle d'avant, au caractère près. */
+  const cheminProc = [proc.categorie || 'Sans dossier', proc.sous_categorie]
+    .filter(Boolean).join(' \u203a ')
+  document.getElementById('analyse-subhead').textContent =
+    `${cheminProc} · créée le ${new Date(proc.created_at).toLocaleDateString('fr-FR')}`
 
   renderAnalyseStats()
 
@@ -13584,7 +13621,16 @@ function renderEquipeCatListe() {
     return (a.titre || '').localeCompare(b.titre || '', 'fr')
   })
 
-  triees.forEach(proc => listEl.appendChild(ficheEquipe(proc)))
+  /* ═══ LE MÊME REGROUPEMENT CÔTÉ ÉQUIPE ═══
+
+     L'employé range moins que le gérant, mais il LIT dans la même arborescence.
+     Voir « Friteuse » dans un espace et pas dans l'autre serait le meilleur
+     moyen de lui faire croire à deux applications différentes. */
+  grouperParSousDossier(triees, p => p, q).forEach(x => {
+    listEl.appendChild(x.intertitre
+      ? elementIntertitre(x.intertitre, x.compte)
+      : ficheEquipe(x))
+  })
 }
 
 /* Une fiche de procédure, réutilisée par la dossier et par la recherche.
@@ -14346,7 +14392,8 @@ async function openEquipeDetail(procId) {
   }
 
   document.getElementById('detail-titre').textContent = proc.titre
-  document.getElementById('detail-subhead').textContent = proc.categorie || 'Sans dossier'
+  document.getElementById('detail-subhead').textContent =
+    [proc.categorie || 'Sans dossier', proc.sous_categorie].filter(Boolean).join(' \u203a ')
   equipeProcCourante = { proc, etapes: etapes || [] }
 
   const videoFrame = document.getElementById('detail-video-frame')

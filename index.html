@@ -1107,6 +1107,19 @@ h2 em{ font-style:normal; color:var(--t1); }
   font-variant-numeric:tabular-nums;
 }
 .formules .f-prix span{ font-size:12px; color:var(--t3); font-weight:400 }
+/* ═══ LA COUPURE DES QUOTAS ═══
+
+   « Jusqu'à 15 membres · 60 analyses IA/mois » tenait sur une ligne alors que
+   Pro et Réseau, avec des nombres plus longs, passaient à deux. Trois lignes
+   de la même liste ne se ressemblaient plus.
+
+   Le retour est donc forcé au même endroit pour les trois — après le point
+   médian, là où la coupure naturelle tombait déjà. Et uniquement sur
+   téléphone : à partir de la tablette, les trois tiennent d'une seule ligne et
+   une coupure imposée y créerait le déséquilibre inverse. */
+.cassure{ display:none }
+@media (max-width: 767px){ .cassure{ display:inline } }
+
 /* Les mentions de bas de tarif, dans le tiroir et non sur la carte : elles ne
    servent qu'à celui qui compare vraiment, et lui a déjà ouvert le tiroir. */
 .finement{
@@ -2374,19 +2387,19 @@ footer .marque{ margin-bottom:18px; }
       <ul class="formules">
         <li>
           <span class="f-nom">Équipe
-            <span class="f-quota">Jusqu'à 15 membres · 60&nbsp;analyses&nbsp;IA/mois</span>
+            <span class="f-quota">Jusqu'à 15 membres&nbsp;·<br class="cassure"> 60&nbsp;analyses&nbsp;IA/mois</span>
           </span>
           <span class="f-prix">129 €<span> /mois</span></span>
         </li>
         <li>
           <span class="f-nom">Pro
-            <span class="f-quota">Jusqu'à 40 membres · 120&nbsp;analyses&nbsp;IA/mois</span>
+            <span class="f-quota">Jusqu'à 40 membres&nbsp;·<br class="cassure"> 120&nbsp;analyses&nbsp;IA/mois</span>
           </span>
           <span class="f-prix">239 €<span> /mois</span></span>
         </li>
         <li>
           <span class="f-nom">Réseau
-            <span class="f-quota">Jusqu'à 100 membres · 250&nbsp;analyses&nbsp;IA/mois</span>
+            <span class="f-quota">Jusqu'à 100 membres&nbsp;·<br class="cassure"> 250&nbsp;analyses&nbsp;IA/mois</span>
           </span>
           <span class="f-prix">499 €<span> /mois</span></span>
         </li>

@@ -7773,3 +7773,36 @@ body:has(#e-detail.active) #equipe-app{
   .sd-renommer{ opacity:0; transition:opacity 0.16s ease; }
   .sous-dossier-titre:hover .sd-renommer{ opacity:1; }
 }
+
+
+/* ═══ « J'AI DÉJÀ UN COMPTE » ═══
+
+   Un lien, pas un bouton : ni fond, ni contour, ni flèche. Il doit se trouver
+   sans se chercher, et surtout ne pas peser autant que les deux cartes — qui
+   sont, elles, le vrai choix de la page.
+
+   La zone de toucher fait quand même 44 px de haut grâce au rembourrage : sur
+   un téléphone, un lien de la hauteur de son texte se rate une fois sur deux.
+   Le trait est sur le mot en gras seul, pas sur toute la phrase : c'est lui
+   l'action, « j'ai déjà un compte » n'est qu'un préambule. */
+.choix-deja{
+  display:block; width:100%;
+  margin:22px 0 0;
+  padding:11px 0;
+  background:none; border:none;
+  color:var(--label-2);
+  font-size:13.5px; letter-spacing:-0.01em;
+  text-align:center;
+}
+.choix-deja b{
+  color:var(--label);
+  font-weight:600;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  text-decoration-color:rgba(255,255,255,0.30);
+}
+.choix-deja:active{ opacity:0.55; }
+
+/* Les onglets Connexion / Créer un compte n'ont plus lieu d'être quand on
+   arrive par le lien : il n'y a qu'un seul geste possible. */
+.auth-toggle[data-cache]{ display:none; }

@@ -415,7 +415,7 @@
     <!-- `logotype` sur le mot : même police, même graisse et même approche que
          le « Standix » posé à côté du logo, juste au-dessus. -->
     <h2 class="choix-bienvenue">Bienvenue sur <span class="logotype">Standix</span></h2>
-    <div class="subhead">Choisissez votre espace pour continuer</div>
+    <div class="subhead">Créez la vôtre, ou rejoignez celle de votre équipe</div>
 
     <!-- ═══ DEUX CARTES CÔTE À CÔTE ═══
 
@@ -436,6 +436,19 @@
          de tout cela. -->
     <div class="choix-duo">
 
+      <!-- ═══ CRÉER, PAS « ESPACE GESTION » ═══
+
+           L'ancien libellé demandait à quelqu'un qui n'a jamais vu l'app de
+           choisir entre deux espaces dont il ignore la différence. Et depuis
+           les deux codes d'invitation, ce choix ne décide plus du rôle : c'est
+           le code qui le décide.
+
+           Les trois intentions réelles sont : je monte une entreprise, j'en
+           rejoins une, j'ai déjà un compte. Ce sont elles qu'on nomme.
+
+           `chooseSpace` ne change pas de comportement — 'gestion' affiche le
+           champ « Nom de l'entreprise » et appelle `creer_entreprise_et_fondateur`.
+           Ce n'était pas mal câblé, c'était mal nommé. -->
       <button class="choix-carte choix-carte--ambre" onclick="chooseSpace('gestion')">
         <span class="hero-lueur" aria-hidden="true"></span>
         <span class="cc-rond" aria-hidden="true">
@@ -446,8 +459,8 @@
           </svg>
         </span>
         <span class="cc-txt">
-          <span class="cc-t">Espace Gestion</span>
-          <span class="cc-s">Créer, organiser et gérer toutes vos procédures</span>
+          <span class="cc-t">Créer une entreprise</span>
+          <span class="cc-s">Vous en serez responsable, et recevrez vos codes d’invitation</span>
         </span>
         <span class="cc-fleche" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -462,15 +475,17 @@
         <span class="cc-rond" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
                stroke-linecap="round" stroke-linejoin="round">
-            <path d="M16.5 20v-1.8a3.4 3.4 0 0 0-3.4-3.4H6.9a3.4 3.4 0 0 0-3.4 3.4V20"></path>
-            <circle cx="10" cy="7.4" r="3.4"></circle>
-            <path d="M20.5 20v-1.8a3.4 3.4 0 0 0-2.6-3.3"></path>
-            <path d="M15.4 4.2a3.4 3.4 0 0 1 0 6.5"></path>
+            <!-- Une porte et une flèche qui entre : « rejoindre » est un geste,
+                 pas un groupe de personnes. L'ancienne icône disait « équipe »,
+                 ce qui n'est plus le sujet de cette carte. -->
+            <path d="M13.5 3.5H18a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2h-4.5"></path>
+            <path d="M9.5 16.5 4 12l5.5-4.5"></path>
+            <path d="M4 12h10"></path>
           </svg>
         </span>
         <span class="cc-txt">
-          <span class="cc-t">Espace Équipe</span>
-          <span class="cc-s">Consulter et suivre les procédures de l'équipe</span>
+          <span class="cc-t">Rejoindre une entreprise</span>
+          <span class="cc-s">Avec le code à 5 chiffres reçu de votre responsable</span>
         </span>
         <span class="cc-fleche" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -481,6 +496,21 @@
       </button>
 
     </div>
+
+    <!-- ═══ « J'AI DÉJÀ UN COMPTE » · UN LIEN, PAS UNE TROISIÈME CARTE ═══
+
+         C'est le geste le PLUS fréquent — une personne se connecte des
+         centaines de fois pour une seule inscription. Mais c'est aussi le seul
+         qui n'a besoin d'aucune explication : qui a déjà un compte sait ce
+         qu'il vient faire.
+
+         Les deux cartes s'adressent à qui découvre l'app et hésite. Une
+         troisième carte de même poids ferait trois choix à peser là où il n'y
+         en a que deux à comprendre. Le lien se trouve sans se chercher, et ne
+         retient personne. -->
+    <button type="button" class="choix-deja" onclick="allerConnexion()">
+      J’ai déjà un compte — <b>Se connecter</b>
+    </button>
   </div>
 </div>
 

@@ -1055,13 +1055,51 @@ window.chooseSpace = function(space) {
   selectedSpace = space
   document.getElementById('choice-screen').style.display = 'none'
   document.getElementById('login-screen').style.display = 'flex'
-  document.getElementById('auth-title').textContent = space === 'gestion' ? 'Espace Gestion' : 'Espace Équipe'
+  /* Le titre reprend le mot de la carte touchée : on doit reconnaître d'où
+     l'on vient, sinon l'écran suivant paraît sans rapport. */
+  document.getElementById('auth-title').textContent =
+    space === 'gestion' ? 'Cr\u00e9er une entreprise' : 'Rejoindre une entreprise'
   document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
   document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
-  switchAuthTab('login')
+  /* ═══ ON OUVRE SUR « CRÉER UN COMPTE », PLUS SUR « CONNEXION » ═══
+
+     Quelqu'un qui vient de toucher « Créer une entreprise » veut s'inscrire.
+     L'ouvrir sur l'onglet Connexion lui demandait un geste de plus pour
+     atteindre ce qu'il avait déjà demandé.
+
+     Ceux qui ont un compte passent désormais par le lien du bas, qui ouvre
+     bien sur la connexion. Chaque chemin arrive là où il va. */
+  switchAuthTab('signup')
   document.getElementById('login-error').textContent = ''
 }
+/* ═══ ALLER DIRECTEMENT À LA CONNEXION ═══
+
+   Sans passer par le choix créer/rejoindre, qui ne concerne que les nouveaux.
+
+   `selectedSpace` reste à `null` : il ne sert QU'À l'inscription, pour savoir
+   quel champ afficher et s'il faut créer une entreprise. À la connexion, le
+   rôle vient de la fiche `membres`, jamais de ce qui a été choisi sur cet
+   écran. Lui donner une valeur ici laisserait croire le contraire à qui lira
+   ce code plus tard.
+
+   L'onglet « Créer un compte » reste accessible depuis l'écran de connexion —
+   mais il y afficherait un formulaire sans champ entreprise ni champ code. On
+   le masque donc : quelqu'un arrivé par ce chemin s'inscrit par les cartes. */
+window.allerConnexion = function() {
+  selectedSpace = null
+  document.getElementById('choice-screen').style.display = 'none'
+  document.getElementById('login-screen').style.display = 'flex'
+  document.getElementById('auth-title').textContent = 'Se connecter'
+  document.getElementById('signup-gestion-field').style.display = 'none'
+  document.getElementById('signup-equipe-field').style.display = 'none'
+  switchAuthTab('login')
+  document.getElementById('login-error').textContent = ''
+  /* Les onglets disparaissent : il n'y a plus de second onglet utile. */
+  document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
+}
+
 window.backToChoice = function() {
+  document.querySelector('.auth-toggle')?.removeAttribute('data-cache')
   document.getElementById('login-screen').style.display = 'none'
   afficherEcranChoix()
 }

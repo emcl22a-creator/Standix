@@ -11681,6 +11681,17 @@ window.ouvrirMontageVideo = async function(procId) {
     const b = bornes.get(e.id)
     return {
       id: e.id, texte: e.texte || '',
+      /* ═══ LE POINT DE VIGILANCE ÉTAIT PERDU ICI ═══
+
+         Cette recopie ne gardait que cinq champs, et `attention` n'en faisait
+         pas partie. Le montage vidéo ne le lisait donc pas — et comme il
+         réécrit toutes les étapes à l'enregistrement, il l'effaçait en base.
+
+         Le défaut ne se voyait qu'après coup : on modifiait un titre, on
+         enregistrait, et un avertissement rédigé par l'IA disparaissait sans
+         que rien ne le signale. C'est le pire des trois cas — ni erreur, ni
+         message, et une information de sécurité en moins. */
+      attention: e.attention || null,
       timestamp_video: b ? b.start : (e.timestamp_video || 0),
       fin_video: b ? b.end : (e.fin_video || 0),
       image_url: e.image_url || null,
@@ -12834,6 +12845,19 @@ function renderVideoSteps(listEl) {
     div.innerHTML = `
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
       <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
+      <!-- ═══ LE POINT DE VIGILANCE, VISIBLE ET MODIFIABLE ═══
+
+           Il n'apparaissait nulle part sur cet écran. On modifiait une
+           procédure vidéo, on enregistrait, et l'avertissement rédigé par l'IA
+           disparaissait — sans erreur, sans message.
+
+           Le champ n'est affiché QUE s'il y a quelque chose dedans : ajouter
+           une seconde zone de saisie vide à chacune des vingt étapes doublerait
+           la hauteur de l'écran pour un cas qui concerne deux ou trois d'entre
+           elles. Ce qui existe se voit et se corrige ; ce qui n'existe pas ne
+           s'invente pas ici. -->
+      ${step.attention ? `<textarea class="et-attention-saisie" rows="1"
+          placeholder="Point de vigilance\u2026">${escapeHtml(step.attention)}</textarea>` : ''}
       <div class="step-bas">
         <!-- La vignette du premier plan a été retirée. Posée à côté du texte, elle
              lui laissait moins d'un tiers de la largeur : « Entrer la transaction »
@@ -12846,6 +12870,18 @@ function renderVideoSteps(listEl) {
         </button>
       </div>`
 
+
+    /* La saisie du point de vigilance, quand elle existe. Vidée, elle rend le
+       champ à `null` : c'est le seul moyen de retirer un avertissement, et il
+       est plus naturel qu'un bouton de suppression. */
+    const av = div.querySelector('.et-attention-saisie')
+    if (av) {
+      av.addEventListener('input', (e) => {
+        step.attention = e.target.value.trim() || null
+        autoResizeTextarea(e.target)
+      })
+      requestAnimationFrame(() => autoResizeTextarea(av))
+    }
 
     const ta = div.querySelector('textarea')
     ta.addEventListener('input', (e) => {
@@ -13087,6 +13123,9 @@ async function publishProcedure(errorElId, btnId) {
 
   const etapesToInsert = allSteps.map((s, i) => ({
     procedure_id: newProc.id, ordre: i + 1, texte: s.texte,
+    /* Réécrit avec le reste : sans cette ligne, chaque enregistrement d'une
+       procédure vidéo effaçait les points de vigilance. */
+    attention: s.attention ?? null,
     timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
     image_url: s.image_url ?? null,
   }))
@@ -18860,6 +18899,11 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   await supabase.from('etapes').delete().eq('procedure_id', editProcedureId)
   const etapesToInsert = editStepsData.map((s, i) => ({
     procedure_id: editProcedureId, ordre: i + 1, texte: s.texte,
+    /* Même oubli que sur l'autre chemin d'écriture. Cet écran est aujourd'hui
+       inatteignable — `openEditProcedure` n'est appelée nulle part — mais le
+       corriger coûte une ligne, et laisser un effacement silencieux dans du
+       code qu'on rebranchera peut-être serait un piège posé pour plus tard. */
+    attention: s.attention ?? null,
     timestamp_video: s.timestamp_video ?? null, fin_video: s.fin_video ?? null,
   }))
   const { error: insertError } = await insertEtapes(etapesToInsert)

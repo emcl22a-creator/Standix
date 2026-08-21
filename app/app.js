@@ -3922,9 +3922,19 @@ function peindreIntroEquipe(employes, validations) {
      Ce qu'il veut savoir, c'est où il en est de sa couverture : combien de gens
      sont à jour, et qui manque à l'appel. On nomme donc la personne quand il
      n'en reste qu'une — un nom est actionnable, un compte ne l'est pas. */
+  /* ═══ « SE SONT FORMÉS » COMPTE MAINTENANT TOUT LE MONDE ═══
+
+     La page montre désormais l'établissement entier, gestion comprise. Le
+     dénominateur suit forcément : dire « 3 sur 5 » en n'ayant listé que
+     l'équipe alors que huit noms s'affichent serait un chiffre qui contredit
+     ce qu'on voit juste en dessous.
+
+     Le mot « équipe » disparaît du titre au profit de « membres » : le
+     fondateur ne se compte pas dans son équipe, mais il est bien un membre de
+     son entreprise. */
   t.textContent = actifs > 1
-    ? `${actifs} sur ${employes.length} se sont form\u00e9s ce mois-ci`
-    : `1 sur ${employes.length} s'est form\u00e9 ce mois-ci`
+    ? `${actifs} membres sur ${employes.length} se sont form\u00e9s ce mois-ci`
+    : `1 membre sur ${employes.length} s'est form\u00e9 ce mois-ci`
 
   /* Le compte de ceux qui n'ont rien ouvert a été retiré : le titre le dit déjà
      — « 3 sur 5 », les deux autres se déduisent. Répéter le manque juste en
@@ -3951,8 +3961,31 @@ let anEqPeriode = 'month'
 
 function peindreAnEquipe() {
   if (!currentGaData) return
-  const { employes, validations } = currentGaData
-  peindreIntroEquipe(employes, validations)
+  const { membres, validations } = currentGaData
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     TOUS LES MEMBRES, PAS SEULEMENT L'ÉQUIPE
+     ═══════════════════════════════════════════════════════════════════════
+
+     Cette page montrait `employes`, c'est-à-dire les seuls comptes de rôle
+     `equipe`. Le fondateur et les gestionnaires en étaient absents — alors
+     qu'ils lisent des procédures comme les autres, et qu'un responsable veut
+     voir son établissement entier.
+
+     ─── ON NE TOUCHE PAS À `cachedEmployes` ───
+
+     Cette variable sert à sept endroits : le compte de places, les quotas,
+     le résumé d'accueil. Y ajouter les gestionnaires changerait des chiffres
+     de facturation pour un besoin d'affichage. On construit donc la liste
+     ICI, depuis `membres`, et rien d'autre ne bouge.
+
+     ─── L'ORDRE : PAR GROUPE, PUIS PAR TEMPS ───
+
+     Trier tout le monde au temps mélangerait les deux rôles, et « séparé »
+     n'aurait plus de sens. On trie donc d'abord par groupe — l'équipe en
+     premier, c'est elle qu'on vient regarder — puis au temps à l'intérieur. */
+  const tous = (membres || []).filter(m => m.role === 'equipe' || m.role === 'gestion')
+  peindreIntroEquipe(tous, validations)
 
   const debutMois = new Date()
   debutMois.setDate(1); debutMois.setHours(0, 0, 0, 0)
@@ -3960,14 +3993,15 @@ function peindreAnEquipe() {
 
   for (const [cle, lot] of [['month', duMois], ['all', validations || []]]) {
     const vue = anEqVues[cle]
-    vue.classe = (employes || []).map(m => {
+    vue.classe = tous.map(m => {
       const siennes = lot.filter(v => v.membre_id === m.id)
       return {
         membre: m, nom: m.nom || 'Sans nom',
+        gestion: m.role === 'gestion',
         total: siennes.reduce((t, v) => t + Number(v.duree_lecture || 0), 0),
         lues: new Set(siennes.map(v => v.procedure_id)).size,
       }
-    }).sort((a, b) => b.total - a.total)
+    }).sort((a, b) => (a.gestion - b.gestion) || (b.total - a.total))
 
     vue.total = vue.classe.reduce((t, x) => t + x.total, 0)
     let n = 0
@@ -4074,9 +4108,23 @@ function peindreClassementEq(cle, animerDes) {
   const visibles = (vue.deplie ? vue.classe : partsAnneau).map(x =>
     grises.has(x) ? { ...x, couleur: ANNEAU_GRIS } : x)
 
+  /* ═══ LE TRAIT ENTRE LES DEUX GROUPES ═══
+
+     Il n'apparaît QUE dans la liste dépliée. Repliée, l'anneau ne montre que
+     les parts les plus grosses — un intertitre y séparerait un extrait, ce qui
+     ne veut rien dire.
+
+     `avantGroupe` repère le passage de l'équipe à la gestion : la liste étant
+     triée par groupe, il n'y a qu'une frontière, et elle se trouve en comparant
+     chaque ligne à la précédente. Si un seul des deux groupes est présent,
+     aucune frontière n'est trouvée et rien ne s'affiche — ce qui est juste :
+     il n'y a rien à séparer. */
+  const avantGroupe = (x, i) => vue.deplie && i > 0 && x.gestion && !visibles[i - 1].gestion
+
   el.innerHTML = visibles.map((x, rang) => {
     const neuve = animerDes != null && rang >= animerDes
-    return `
+    return (avantGroupe(x, rang)
+      ? `<div class="fm-groupe"><span>Espace Gestion</span></div>` : '') + `
       <button type="button" class="fm-lg${neuve ? ' neuve' : ''}"
               ${neuve ? `style="animation-delay:${(rang - animerDes) * 0.05}s"` : ''}
               data-part="${rang}" ${x.estAutres ? '' : `data-membre="${escapeHtml(x.membre.id)}"`}>

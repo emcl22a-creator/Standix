@@ -592,6 +592,13 @@
         <label class="f">Mot de passe</label>
         <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px;">
         <button class="btn block" id="login-btn">Se connecter</button>
+        <!-- ═══ SOUS LE BOUTON, PAS AU-DESSUS ═══
+
+             On ne clique dessus qu'après avoir échoué à se connecter, ou en
+             sachant déjà qu'on a oublié. Le placer au-dessus du bouton le
+             mettrait sur le chemin de qui se souvient de son mot de passe —
+             c'est-à-dire de presque tout le monde. -->
+        <button type="button" class="lien-doux" id="mdp-oublie">Mot de passe oublié ?</button>
       </div>
 
       <!-- Inscription -->
@@ -2143,6 +2150,9 @@
       <label class="f">E-mail</label>
       <input type="text" id="settings-email" disabled="" style="opacity:0.6;">
       <button class="btn block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
+      <!-- Ici le mot de passe n'est pas « oublié » — on est connecté. Le
+           libellé dit donc le geste, pas le problème. -->
+      <button type="button" class="lien-doux" id="mdp-changer-g">Changer mon mot de passe</button>
       <div class="error-msg" id="settings-error"></div>
     </div>
     <div class="reg-note">Votre nom apparaît dans l'équipe et sur les procédures que vous publiez. L'adresse ne peut pas être modifiée ici.</div>
@@ -2556,6 +2566,7 @@
       <label class="f">E-mail</label>
       <input type="text" id="es-email" disabled="" style="opacity:0.6;">
       <button class="btn block" style="margin-top:14px;" id="es-save">Enregistrer</button>
+      <button type="button" class="lien-doux" id="mdp-changer-e">Changer mon mot de passe</button>
       <div class="error-msg" id="es-error"></div>
     </div>
     <div class="reg-note">Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.</div>

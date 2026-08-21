@@ -5017,7 +5017,18 @@
      suite : le premier sélecteur devenait invalide et la grille de Gestion
      perdait la règle, silencieusement. */
   #cat-grid .cat-recent,
-  #e-cat-grid .cat-recent{ padding-bottom:8px; }
+  #e-cat-grid .cat-recent,
+  /* ⚠ LA GRILLE DES SOUS-DOSSIERS N'ÉTAIT PAS VISÉE. Elle ne vit ni dans
+     `#cat-grid` ni dans `#e-cat-grid` mais dans la liste des procédures, sous
+     `.sd-grille`. Elle gardait donc le rembourrage par défaut, et son titre
+     d'aperçu restait collé au trait du bas alors que les cartes de dossier,
+     elles, avaient été corrigées.
+
+     C'est le défaut classique d'un sélecteur qui énumère des emplacements : il
+     oublie celui qu'on ajoute après. La classe `.cat-recent` aurait suffi —
+     mais la restreindre reste utile, ces cartes vivant aussi dans des listes
+     où le rembourrage d'origine convient. */
+  .sd-grille .cat-recent{ padding-bottom:8px; }
 
   /* ═══════════════════════════════════════════════════════════════════════
      LA CARTE D'UNE PROCÉDURE
@@ -5099,7 +5110,11 @@
      On passe à 13 px en haut. Avec les 2 px de la ligne, l'écart devient 15
      contre 23 — pas égal, et c'est voulu : le trait du bas appartient au pied,
      qui est un autre bloc. Ce qui gênait était le SERRAGE, pas l'asymétrie. */
-  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:13px; margin-top:12px; }
+  /* Mesuré au rendu, à l'échelle 3 : 51 px au-dessus du texte contre 39 en
+     dessous, soit 17 et 13 en pixels réels. Les 13 px de rembourrage haut
+     descendent à 9 pour égaliser — le reste de l'écart vient du `margin-top`
+     et du pied, qui appartiennent aux blocs voisins. */
+  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:9px; margin-top:12px; }
   /* Le titre d'une procédure récente et, le cas échéant, son état d'analyse :
      l'indicateur se cale juste au bout du texte, pas au bout de la carte. */
   .cat-recent-item{
@@ -7904,8 +7919,22 @@ body:has(#e-detail.active) #equipe-app{
    hauteur de sa police se rate une fois sur deux. */
 .lien-doux{
   display:block; width:100%;
-  margin:10px 0 0;
-  padding:12px 0;
+  /* ═══ LA ZONE DE TOUCHER DÉBORDAIT SOUS LA CARTE ═══
+
+     Mesuré : 12 px de rembourrage sous le texte, plus les 16 px de la carte —
+     28 px de vide en bas, contre 10 au-dessus. Le lien paraissait décroché,
+     posé trop bas dans un cadre trop grand.
+
+     On descend le rembourrage bas à 2 px. Le total sous le texte devient 18,
+     ce qui reste plus que les 12 du dessus — c'est voulu : le rembourrage de
+     la carte appartient à la carte, on ne le supprime pas pour un enfant.
+
+     ⚠ LA ZONE DE TOUCHER NE DOIT PAS RÉTRÉCIR. En retirant 10 px en bas, on
+     les remet en haut : 12 devient 22, et la hauteur totale reste de 44 px.
+     Sur un téléphone, un lien plus court se rate une fois sur deux — et il n'y
+     a rien de cliquable juste au-dessus, donc cette zone n'empiète sur rien. */
+  margin:2px 0 0;
+  padding:22px 0 2px;
   background:none; border:none;
   color:var(--label-2);
   font-size:13px; letter-spacing:-0.01em;

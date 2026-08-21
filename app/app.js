@@ -1035,6 +1035,21 @@ async function preparerArriveeQR() {
 }
 
 function afficherEcranChoix() {
+  /* ═══ LE RETOUR DU COURRIEL PASSE AVANT TOUT ═══
+
+     Le lien de réinitialisation ouvre une session : sans ce contrôle placé
+     ici, la personne serait envoyée dans son espace par le chemin normal, et
+     on ne lui demanderait jamais son nouveau mot de passe. Le lien n'aurait
+     servi à rien, sans qu'aucune erreur ne le signale.
+
+     `verifierRetourMotDePasse` rend `false` immédiatement quand l'adresse ne
+     porte pas `type=recovery`, donc ce contrôle ne coûte rien au démarrage
+     ordinaire. */
+  if (/type=recovery/.test((window.location.hash || '') + (window.location.search || ''))) {
+    verifierRetourMotDePasse().then(() => {})
+    return
+  }
+
   /* Verrou : si un espace est déjà à l'écran, ou si une fiche membre est en
      mémoire, on ne montre rien par-dessus. C'est ce qui manquait — un appel
      tardif recouvrait l'app déjà ouverte. */
@@ -1112,6 +1127,120 @@ window.chooseSpace = function(space) {
    la console dit pourquoi. Et la vérification ci-dessous nomme le problème au
    lieu de le laisser deviner. */
 document.getElementById('choix-deja')?.addEventListener('click', () => allerConnexion())
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOT DE PASSE OUBLIÉ
+
+   Supabase envoie un lien de réinitialisation par courriel. Le lien ramène sur
+   l'app avec une session temporaire, et c'est là qu'on saisit le nouveau mot
+   de passe — pas avant. On ne peut donc pas le changer depuis cet écran : on
+   demande l'envoi, et tout se passe ensuite dans la boîte aux lettres.
+
+   ─── ON NE DIT JAMAIS SI L'ADRESSE EXISTE ───
+
+   Le message de succès est le MÊME que l'adresse soit connue ou non. Répondre
+   « ce compte n'existe pas » permettrait à n'importe qui de vérifier si une
+   personne est cliente en tapant son adresse. C'est aussi ce que fait Supabase
+   de son côté : il ne rend pas d'erreur pour une adresse inconnue.
+
+   ─── L'ADRESSE DE RETOUR ───
+
+   `location.origin + location.pathname` : le lien du courriel ramène sur
+   l'app, pas sur le site. Écrite en dur, elle serait fausse le jour d'un
+   changement de domaine — et c'est déjà arrivé aujourd'hui avec l'image de
+   partage.
+
+   ⚠ À FAIRE UNE FOIS DANS SUPABASE : Authentication → URL Configuration →
+     Redirect URLs, ajouter `https://standix.app/app/**`. Sans cette
+     autorisation, le lien du courriel renvoie vers l'adresse par défaut du
+     projet et la réinitialisation échoue sans message clair. */
+async function demanderReinitialisation(email, zoneErreur, bouton) {
+  const err = document.getElementById(zoneErreur)
+  const propre = (email || '').trim()
+  if (!propre || !propre.includes('@')) {
+    if (err) { err.style.color = 'var(--red)'; err.textContent = 'Entrez d\u2019abord votre adresse e-mail.' }
+    return
+  }
+  const avant = bouton ? bouton.textContent : ''
+  if (bouton) { bouton.disabled = true; bouton.textContent = 'Envoi\u2026' }
+  try {
+    const retour = window.location.origin + window.location.pathname
+    const { error } = await supabase.auth.resetPasswordForEmail(propre, { redirectTo: retour })
+    /* On ne montre l'erreur QUE si elle est technique — réseau coupé, service
+       indisponible. Une adresse inconnue ne doit pas se distinguer. */
+    if (error && !/user|not found|invalid/i.test(error.message || '')) {
+      console.warn('[mot de passe]', error.message)
+    }
+    if (err) {
+      err.style.color = 'var(--label-2)'
+      err.innerHTML = `Si un compte existe pour <b>${escapeHtml(propre)}</b>, un lien vient d\u2019y \u00eatre envoy\u00e9. ` +
+        `Pensez \u00e0 regarder dans les ind\u00e9sirables.`
+    }
+  } catch (e) {
+    if (err) { err.style.color = 'var(--red)'; err.textContent = 'Envoi impossible : ' + (e?.message || e) }
+  } finally {
+    if (bouton) { bouton.disabled = false; bouton.textContent = avant }
+  }
+}
+window.demanderReinitialisation = demanderReinitialisation
+
+/* ═══ LES TROIS BOUTONS ═══
+
+   Trois écrans, une seule fonction. Depuis la connexion, l'adresse vient du
+   champ saisi ; depuis les pages de compte, elle vient du champ en lecture
+   seule — la personne est connectée, on connaît son adresse et lui redemander
+   serait un obstacle sans raison. */
+document.getElementById('mdp-oublie')?.addEventListener('click', (e) =>
+  demanderReinitialisation(document.getElementById('login-email')?.value, 'login-error', e.currentTarget))
+
+document.getElementById('mdp-changer-g')?.addEventListener('click', (e) =>
+  demanderReinitialisation(document.getElementById('settings-email')?.value, 'settings-error', e.currentTarget))
+
+document.getElementById('mdp-changer-e')?.addEventListener('click', (e) => {
+  /* L'espace Équipe n'a pas de zone d'erreur sur cette carte : on en crée une
+     à la volée plutôt que d'ajouter un élément vide au balisage pour les
+     rares fois où il sert. */
+  let z = document.getElementById('es-mdp-msg')
+  if (!z) {
+    z = document.createElement('div')
+    z.className = 'error-msg'
+    z.id = 'es-mdp-msg'
+    e.currentTarget.after(z)
+  }
+  demanderReinitialisation(document.getElementById('es-email')?.value, 'es-mdp-msg', e.currentTarget)
+})
+
+/* ═══ LE RETOUR DU COURRIEL ═══
+
+   Supabase ouvre l'app avec `type=recovery` dans l'adresse et une session déjà
+   ouverte. On saisit alors le nouveau mot de passe.
+
+   Ce contrôle doit tourner AU DÉMARRAGE, avant que l'app décide où envoyer la
+   personne : sans lui, elle atterrirait dans son espace sans jamais qu'on lui
+   demande son nouveau mot de passe, et le lien n'aurait servi à rien. */
+async function verifierRetourMotDePasse() {
+  const brut = (window.location.hash || '') + (window.location.search || '')
+  if (!/type=recovery/.test(brut)) return false
+
+  const nouveau = await demanderTexte({
+    titre: 'Nouveau mot de passe',
+    message: 'Choisissez un mot de passe d\u2019au moins 6 caract\u00e8res.',
+    placeholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
+    confirmer: 'Enregistrer',
+  })
+  if (!nouveau) { toast('Mot de passe inchang\u00e9'); return false }
+  if (nouveau.length < 6) { toast('Six caract\u00e8res minimum'); return await verifierRetourMotDePasse() }
+
+  const { error } = await supabase.auth.updateUser({ password: nouveau })
+  if (error) { toast('\u00c9chec : ' + error.message); return false }
+
+  /* On nettoie l'adresse : laisser `type=recovery` ferait redemander le mot de
+     passe à chaque rafraîchissement de la page. */
+  try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
+  toast('Mot de passe modifi\u00e9')
+  return true
+}
+window.verifierRetourMotDePasse = verifierRetourMotDePasse
 
 window.allerConnexion = function() {
   const cible = document.getElementById('login-screen')

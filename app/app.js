@@ -6193,7 +6193,13 @@ function renderCategoryProceduresListInterne() {
         const titre = (d.proc.titre || '').toLowerCase()
         // En vue globale, on peut aussi chercher par nom de dossier
         const cat = toutesProcedures ? (d.proc.categorie || 'sans dossier').toLowerCase() : ''
-        return titre.includes(currentCategoryQuery) || (cat && cat.includes(currentCategoryQuery))
+        /* Le sous-dossier est cherchable partout, pas seulement en vue globale :
+           dans un dossier, taper « friteuse » doit ramener son contenu — c'est
+           même le premier réflexe une fois qu'on s'est mis à ranger. */
+        const sous = (d.proc.sous_categorie || '').toLowerCase()
+        return titre.includes(currentCategoryQuery)
+            || (cat && cat.includes(currentCategoryQuery))
+            || (sous && sous.includes(currentCategoryQuery))
       })
     : currentCategoryProcsData
 
@@ -6204,7 +6210,71 @@ function renderCategoryProceduresListInterne() {
     return parTitre(a, b)
   })
 
-  for (const { proc, nbEtapes, pct } of sorted) {
+  /* ═══════════════════════════════════════════════════════════════════════
+     LES SOUS-DOSSIERS · DES INTERTITRES, PAS UN NIVEAU DE PLUS
+     ═══════════════════════════════════════════════════════════════════════
+
+     Les procédures sans sous-dossier restent EN TÊTE, sans titre au-dessus
+     d'elles. Celles qui en ont un sont groupées dessous, chacune sous son
+     intertitre.
+
+     ─── POURQUOI CET ORDRE ───
+
+     Une entreprise qui n'utilise pas les sous-dossiers ne doit voir AUCUNE
+     différence : pas d'intertitre « Sans sous-dossier », pas de section vide,
+     rien. La fonction est optionnelle, son affichage doit l'être aussi.
+
+     Et pour celle qui s'en sert, le non-classé en tête est le bon choix : ce
+     sont les procédures qu'on vient de créer et qu'on n'a pas encore rangées.
+     Les enterrer en bas les ferait oublier.
+
+     ─── LE TRI EST CONSERVÉ ───
+
+     `sorted` porte déjà le choix de la personne — par nom, par date. On ne
+     retrie pas : on REGROUPE en gardant l'ordre existant à l'intérieur de
+     chaque groupe. Retrier ici ferait que le bouton « Trier » ne servirait
+     plus à rien dès qu'un sous-dossier existe.
+
+     ─── LES INTERTITRES SONT MASQUÉS PENDANT UNE RECHERCHE ───
+
+     Quand on cherche « friteuse », on veut la liste des résultats, pas une
+     arborescence à moitié vide. Les groupes n'apparaissent qu'en navigation
+     normale. */
+  const groupes = new Map()          // sous-dossier → procédures, ordre conservé
+  const sansSous = []
+  for (const d of sorted) {
+    const sd = (d.proc.sous_categorie || '').trim()
+    if (!sd) { sansSous.push(d); continue }
+    if (!groupes.has(sd)) groupes.set(sd, [])
+    groupes.get(sd).push(d)
+  }
+  /* Les intertitres dans l'ordre alphabétique, quel que soit le tri des cartes :
+     on cherche un dossier par son nom, pas par sa date. */
+  const nomsGroupes = [...groupes.keys()].sort((a, b) =>
+    a.localeCompare(b, 'fr', { sensitivity: 'base' }))
+
+  const avecGroupes = currentCategoryQuery ? sorted
+    : [...sansSous, ...nomsGroupes.flatMap(n => [{ intertitre: n }, ...groupes.get(n)])]
+
+  for (const entree of avecGroupes) {
+    /* Un intertitre n'est pas une carte : il se dessine et on passe à la
+       suivante. Le mettre dans la même boucle garde l'ordre sans avoir à
+       reconstruire la liste en deux passes. */
+    if (entree.intertitre) {
+      const t = document.createElement('div')
+      t.className = 'sous-dossier-titre'
+      t.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 7.5a2 2 0 0 1 2-2h3.4l1.8 2.2H19a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+        </svg>
+        <span>${escapeHtml(entree.intertitre)}</span>
+        <b>${groupes.get(entree.intertitre).length}</b>`
+      listEl.appendChild(t)
+      continue
+    }
+
+    const { proc, nbEtapes, pct } = entree
     const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
     const circumference = 2 * Math.PI * 20
     const dashoffset = circumference * (1 - pct / 100)
@@ -6225,9 +6295,20 @@ function renderCategoryProceduresListInterne() {
     /* La même grammaire que la dossier : plaque à gauche, nom, filet, pied.
        Le pied dit ici le suivi de lecture — la seule chose qu'un gérant vient
        vérifier sur cette page. */
+    /* ═══ LE SOUS-DOSSIER DANS LE PIED DE CARTE ═══
+
+       Il n'y figure QUE pendant une recherche ou en vue globale — c'est-à-dire
+       quand les intertitres ne sont pas là pour le dire.
+
+       Sous son intertitre, le répéter sur chaque carte serait du bruit : on
+       vient de lire « Friteuse » deux centimètres plus haut. Mais dans une
+       liste de résultats, une procédure sans son rangement laisse la personne
+       se demander d'où elle sort. */
+    const montrerSous = (currentCategoryQuery || toutesProcedures) && proc.sous_categorie
     const detail = [
       `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`,
       toutesProcedures ? escapeHtml(proc.categorie || 'Sans dossier') : '',
+      montrerSous ? escapeHtml(proc.sous_categorie) : '',
     ].filter(Boolean).join(' \u00b7 ')
 
     div.innerHTML = `

@@ -1061,15 +1061,28 @@ window.chooseSpace = function(space) {
     space === 'gestion' ? 'Cr\u00e9er une entreprise' : 'Rejoindre une entreprise'
   document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
   document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
-  /* ═══ ON OUVRE SUR « CRÉER UN COMPTE », PLUS SUR « CONNEXION » ═══
+  /* ═══ INSCRIPTION SEULE, ET LES ONGLETS DISPARAISSENT ═══
 
      Quelqu'un qui vient de toucher « Créer une entreprise » veut s'inscrire.
-     L'ouvrir sur l'onglet Connexion lui demandait un geste de plus pour
-     atteindre ce qu'il avait déjà demandé.
+     J'ouvrais déjà sur le bon onglet, mais je laissais les deux visibles — la
+     connexion restait donc atteignable depuis un écran qui ne lui sert pas.
 
-     Ceux qui ont un compte passent désormais par le lien du bas, qui ouvre
-     bien sur la connexion. Chaque chemin arrive là où il va. */
+     Or les deux chemins ne sont pas symétriques. Se connecter depuis « Créer
+     une entreprise » n'a aucun sens : on ne crée rien, le champ « Nom de
+     l'entreprise » resterait rempli sans être lu, et l'entreprise ne serait
+     jamais créée. La personne se retrouverait dans son ancien espace en
+     croyant en avoir monté un nouveau.
+
+     Trois écrans, trois gestes, un seul possible dans chacun. C'est le même
+     traitement que « J'ai déjà un compte », dans l'autre sens. */
   switchAuthTab('signup')
+  document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
+  const sous = document.getElementById('auth-sous')
+  if (sous) {
+    sous.textContent = space === 'gestion'
+      ? 'Cr\u00e9ez votre compte, puis votre entreprise'
+      : 'Cr\u00e9ez votre compte avec le code re\u00e7u'
+  }
   document.getElementById('login-error').textContent = ''
 }
 /* ═══ ALLER DIRECTEMENT À LA CONNEXION ═══
@@ -1111,6 +1124,8 @@ window.allerConnexion = function() {
   document.getElementById('signup-gestion-field').style.display = 'none'
   document.getElementById('signup-equipe-field').style.display = 'none'
   switchAuthTab('login')
+  const sous = document.getElementById('auth-sous')
+  if (sous) sous.textContent = 'Entrez l\u2019adresse et le mot de passe de votre compte'
   document.getElementById('login-error').textContent = ''
   /* Les onglets disparaissent : il n'y a plus de second onglet utile. */
   document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
@@ -1796,6 +1811,20 @@ async function enterApp(membre) {
     afficherBarre(false)
     afficherBarre(false)
     document.getElementById('login-screen').style.display = 'flex'
+    /* ═══ LES ONGLETS REVIENNENT ICI ═══
+
+       Ce chemin renvoie à la connexion quelqu'un qui pouvait venir de
+       n'importe où — y compris de « Créer une entreprise », qui les avait
+       masqués. Sans ce retrait, il arriverait sur un écran de connexion sans
+       moyen de basculer, et se retrouverait coincé.
+
+       Le mécanisme n'a de sens que si CHAQUE chemin remet l'état qu'il
+       suppose. Un attribut posé par un écran et jamais retiré par un autre est
+       une porte fermée qu'on ne retrouve plus. */
+    document.querySelector('.auth-toggle')?.removeAttribute('data-cache')
+    switchAuthTab('login')
+    const sousR = document.getElementById('auth-sous')
+    if (sousR) sousR.textContent = 'Connectez-vous ou cr\u00e9ez votre compte'
     window.__procedoLoaded = true
     await fenetreTropDAppareils()
     return

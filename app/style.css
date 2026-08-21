@@ -7062,6 +7062,12 @@ body.chargement #bar{
   color:var(--label-2);
   margin-bottom:18px;
 }
+/* Le rond du « plus » masque le trait du bâtiment sous lui. Il doit donc être
+   rempli de la couleur du FOND DE LA CARTE, pas du fond de la page : les deux
+   diffèrent, et un rond noir sur une carte gris foncé se verrait comme une
+   tache. La variable est posée ici plutôt qu'en dur dans le balisage — le jour
+   où la carte change de teinte, l'icône suit. */
+.choix-carte{ --fond-choix:#131317; }
 .cc-rond svg{ width:23px; height:23px; display:block; }
 .choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
 .choix-carte--blanc .cc-rond{ border-color:rgba(255,255,255,0.34); color:var(--label); }
@@ -7781,10 +7787,14 @@ body:has(#e-detail.active) #equipe-app{
    sans se chercher, et surtout ne pas peser autant que les deux cartes — qui
    sont, elles, le vrai choix de la page.
 
+   J'avais essayé un contour et un fond léger pour qu'on le reconnaisse comme
+   touchable. Vu dans l'app, il devenait un troisième bouton et brouillait la
+   hiérarchie. Le soulignement suffit.
+
    La zone de toucher fait quand même 44 px de haut grâce au rembourrage : sur
    un téléphone, un lien de la hauteur de son texte se rate une fois sur deux.
-   Le trait est sur le mot en gras seul, pas sur toute la phrase : c'est lui
-   l'action, « j'ai déjà un compte » n'est qu'un préambule. */
+   Le trait est sur le mot en gras seul : c'est lui l'action, « j'ai déjà un
+   compte » n'est qu'un préambule. */
 .choix-deja{
   display:block; width:100%;
   margin:22px 0 0;
@@ -7804,5 +7814,31 @@ body:has(#e-detail.active) #equipe-app{
 .choix-deja:active{ opacity:0.55; }
 
 /* Les onglets Connexion / Créer un compte n'ont plus lieu d'être quand on
-   arrive par le lien : il n'y a qu'un seul geste possible. */
+   arrive par ce lien : il n'y a qu'un seul geste possible. */
 .auth-toggle[data-cache]{ display:none; }
+
+
+/* ═══ LA GRILLE DES SOUS-DOSSIERS ═══
+
+   Deux par deux, comme la grille des dossiers — c'est la même chose, un cran
+   plus bas, et rien ne justifierait une autre disposition.
+
+   `.cat-cell` porte déjà tout le style de la carte : on ne redéfinit que le
+   contenant. La seule règle propre au sous-dossier est la teinte de sa
+   pastille, très légèrement plus sourde, pour qu'on distingue les deux niveaux
+   sans avoir à lire l'icône. */
+.sd-grille{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:11px;
+  margin-bottom:18px;
+}
+.cat-cell--sous .cat-ic{
+  background:rgba(255,159,10,0.085);
+  border-color:rgba(255,159,10,0.22);
+}
+/* Sous 384 px, les cartes de dossier passent déjà en colonne unique : les
+   sous-dossiers suivent, sinon deux colonnes de 140 px tronqueraient les noms. */
+@media (max-width: 384px){
+  .sd-grille{ grid-template-columns:1fr; }
+}

@@ -7866,3 +7866,32 @@ body:has(#e-detail.active) #equipe-app{
   content:''; flex:1 1 auto; height:0.5px;
   background:var(--separator);
 }
+
+
+/* ═══ LES LIENS DISCRETS SOUS UN BOUTON ═══
+
+   « Mot de passe oublié ? », « Changer mon mot de passe » : des recours, pas
+   des actions principales. Ils ne doivent pas concurrencer le bouton plein
+   juste au-dessus, sinon on hésite entre deux gestes alors qu'un seul est le
+   chemin normal.
+
+   Même traitement que « J'ai déjà un compte » sur l'écran d'accueil : pas de
+   fond, pas de contour, un soulignement discret. La cohérence compte ici —
+   deux recours de même nature dans la même app doivent se ressembler.
+
+   44 px de haut malgré un texte de 13 : sur un téléphone, un lien de la
+   hauteur de sa police se rate une fois sur deux. */
+.lien-doux{
+  display:block; width:100%;
+  margin:10px 0 0;
+  padding:12px 0;
+  background:none; border:none;
+  color:var(--label-2);
+  font-size:13px; letter-spacing:-0.01em;
+  text-align:center;
+  text-decoration:underline;
+  text-underline-offset:3px;
+  text-decoration-color:rgba(255,255,255,0.22);
+}
+.lien-doux:active{ opacity:0.55; }
+.lien-doux[disabled]{ opacity:0.45; text-decoration:none; }

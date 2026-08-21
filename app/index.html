@@ -563,7 +563,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
     </button>
     <h1 id="auth-title">Espace Gestion</h1>
-    <div class="subhead">Connectez-vous ou créez votre compte</div>
+    <!-- Le sous-titre change selon le chemin : « Connectez-vous ou créez votre
+         compte » était vrai quand les deux onglets étaient offerts. Chaque
+         écran n'ayant plus qu'un seul geste possible, il doit dire lequel. -->
+    <div class="subhead" id="auth-sous">Connectez-vous ou créez votre compte</div>
 
     <div class="auth-toggle">
       <div class="auth-toggle-indicator" id="auth-indicator"></div>

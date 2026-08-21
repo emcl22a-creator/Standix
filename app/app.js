@@ -13964,6 +13964,9 @@ function renderEquipeCategories() {
 /* Écran d'une dossier : ses procédures, avec sa propre recherche. */
 function openEquipeCategorie(nom) {
   equipeCatCourante = nom
+  /* Sinon, ouvrir « Salle » après « Cuisine › Friteuse » afficherait une liste
+     vide, et rien ne dirait pourquoi. */
+  equipeSousDossier = null
   equipeCatQuery = ''
   const champ = document.getElementById('e-cat-recherche')
   if (champ) champ.value = ''
@@ -13974,10 +13977,78 @@ function openEquipeCategorie(nom) {
   renderEquipeCatListe()
 }
 
+/* ═══ OÙ L'EMPLOYÉ SE TROUVE DANS L'ARBRE ═══
+
+   Même mécanique que côté Gestion : `null` dans le dossier, une chaîne dans un
+   sous-dossier. On réemploie l'écran `e-category` plutôt que d'en créer un
+   second, pour la même raison — deux écrans jumeaux, ce sont deux boutons
+   retour et deux recherches à maintenir en parallèle. */
+let equipeSousDossier = null
+
+/* La carte d'un sous-dossier, côté Équipe. Même moule que la carte de dossier
+   de cet espace, seule l'icône change — un dossier posé dans un autre. */
+function carteSousDossierEquipe(nom, procs) {
+  const cell = document.createElement('div')
+  cell.className = 'cat-cell cat-cell--sous'
+  cell.onclick = () => ouvrirSousDossierEquipe(nom)
+  const apercu = procs.slice(0, 3)
+  const lues = procs.filter(p => equipeLues.has(p.id)).length
+  cell.innerHTML = `
+    <div class="cat-top">
+      <span class="cat-ic">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6" stroke="url(#logoOrIc)"
+                stroke-width="1.6" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"/>
+          <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
+                stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
+          <line x1="6" y1="13.4" x2="22" y2="13.4" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
+        </svg>
+      </span>
+    </div>
+    <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
+    <div class="cat-recent">
+      ${apercu.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span></div>`).join('')}
+    </div>
+    <div class="cat-pied">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
+              stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+      </svg>
+      <span>${procs.length} procédure${procs.length > 1 ? 's' : ''}${lues ? ` · ${lues} lue${lues > 1 ? 's' : ''}` : ''}</span>
+      <span class="fl">\u203a</span>
+    </div>`
+  return cell
+}
+
+/* Le retour remonte d'un niveau, comme côté Gestion. Rouvrir le dossier plutôt
+   que de vider la variable : `openEquipeCategorie` remet aussi le titre, le
+   sous-titre et la recherche. Les remettre à la main, c'est en oublier un. */
+document.getElementById('e-cat-retour')?.addEventListener('click', () => {
+  if (equipeSousDossier) { openEquipeCategorie(equipeCatCourante); return }
+  showEquipeScreen('e-list', document.querySelector('#tabbar .tab-round'))
+})
+
+function ouvrirSousDossierEquipe(nom) {
+  equipeSousDossier = nom
+  equipeCatQuery = ''
+  const champ = document.getElementById('e-cat-recherche')
+  if (champ) champ.value = ''
+  document.getElementById('e-cat-titre').textContent = nom
+  remonterEnHaut()
+  renderEquipeCatListe()
+}
+
 function renderEquipeCatListe() {
   const listEl = document.getElementById('equipe-procedures-list')
   if (!listEl) return
-  const dansCat = allEquipeProcedures.filter(p => (p.categorie || 'Sans dossier') === equipeCatCourante)
+  const duDossier = allEquipeProcedures.filter(p => (p.categorie || 'Sans dossier') === equipeCatCourante)
+  /* Dans un sous-dossier, on ne voit que lui — y compris pour la recherche :
+     chercher depuis l'intérieur de « Friteuse » ne doit pas ramener toute la
+     cuisine. */
+  const dansCat = equipeSousDossier
+    ? duDossier.filter(p => (p.sous_categorie || '').trim() === equipeSousDossier)
+    : duDossier
   const q = equipeCatQuery
   const vues = q ? dansCat.filter(p => p.titre.toLowerCase().includes(q)) : dansCat
 
@@ -14006,11 +14077,37 @@ function renderEquipeCatListe() {
      L'employé range moins que le gérant, mais il LIT dans la même arborescence.
      Voir « Friteuse » dans un espace et pas dans l'autre serait le meilleur
      moyen de lui faire croire à deux applications différentes. */
-  grouperParSousDossier(triees, p => p, q).forEach(x => {
-    listEl.appendChild(x.intertitre
-      ? elementIntertitre(x.intertitre, x.compte, false)
-      : ficheEquipe(x))
-  })
+  /* ═══ LES SOUS-DOSSIERS EN CARTES, COMME CÔTÉ GESTION ═══
+
+     Ils s'affichent même s'il n'y en a qu'un : le chemin doit être le même
+     quel que soit le nombre. Un sous-dossier qui disparaît quand il est seul
+     obligerait l'employé à apprendre deux parcours pour un seul rangement.
+
+     Trois cas où ils ne s'affichent pas : on est déjà dans un sous-dossier,
+     une recherche est en cours, ou il n'y en a aucun. */
+  const montrerSD = !equipeSousDossier && !q
+  if (montrerSD) {
+    const groupes = new Map()
+    for (const p of triees) {
+      const sd = (p.sous_categorie || '').trim()
+      if (!sd) continue
+      if (!groupes.has(sd)) groupes.set(sd, [])
+      groupes.get(sd).push(p)
+    }
+    if (groupes.size) {
+      const noms = [...groupes.keys()].sort((a, b) =>
+        a.localeCompare(b, 'fr', { sensitivity: 'base' }))
+      const grille = document.createElement('div')
+      grille.className = 'sd-grille'
+      noms.forEach(n => grille.appendChild(carteSousDossierEquipe(n, groupes.get(n))))
+      listEl.appendChild(grille)
+    }
+  }
+
+  /* Les procédures rangées ne sont pas répétées : elles sont déjà accessibles
+     par leur carte, et les afficher deux fois doublerait la liste. */
+  const aLister = montrerSD ? triees.filter(p => !(p.sous_categorie || '').trim()) : triees
+  aLister.forEach(p => listEl.appendChild(ficheEquipe(p)))
 }
 
 /* Une fiche de procédure, réutilisée par la dossier et par la recherche.

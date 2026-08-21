@@ -567,7 +567,21 @@
 </div>
 
 <!-- ═══ 2. CONNEXION / INSCRIPTION ═══ -->
-<div class="login-wrap" id="login-screen" style="display:none;">
+<!-- ═══ `inert` PENDANT QUE L'ÉCRAN EST MASQUÉ ═══
+
+     `display:none` retire du rendu, pas de l'ARBRE. Safari continue de lire le
+     balisage, y trouve un champ e-mail suivi d'un mot de passe, et propose le
+     remplissage dès l'ouverture — clavier compris — alors qu'on regarde
+     l'écran de choix.
+
+     `inert` dit au navigateur que tout ce bloc est hors service : ni focus, ni
+     remplissage, ni lecture d'écran. L'attribut est retiré à l'ouverture de
+     l'écran, remis quand on le quitte.
+
+     Il est posé DANS le balisage plutôt qu'au démarrage par le code : au
+     premier affichage, le JavaScript n'a pas encore tourné, et c'est justement
+     ce moment-là que Safari choisit pour proposer. -->
+<div class="login-wrap" id="login-screen" style="display:none;" inert>
   <div class="login-card">
     <button class="back-btn" style="margin-bottom:14px;" onclick="backToChoice()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -588,9 +602,26 @@
       <!-- Connexion -->
       <div id="login-form" class="auth-form active">
         <label class="f">E-mail</label>
-        <input type="email" id="login-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <!-- ═══ NOMMER LES CHAMPS POUR QUE SAFARI SE TAISE ═══
+
+             Aucun champ ne portait `autocomplete`. Safari devine alors seul
+             qu'il a affaire à un formulaire de connexion — deux champs, dont
+             un mot de passe — et propose le remplissage dès le chargement,
+             clavier compris. Même quand le formulaire est MASQUÉ : il lit le
+             balisage, pas ce qui est à l'écran.
+
+             En le nommant, on lui dit ce que sont ces champs et il cesse de
+             chercher. Le remplissage reste possible, mais à la demande.
+
+             `username` plutôt que `email` : c'est le nom que les gestionnaires
+             de mots de passe attendent pour l'apparier au mot de passe qui
+             suit. Avec `email`, certains traitent les deux séparément et
+             n'enregistrent jamais le couple. -->
+        <input type="email" id="login-email" placeholder="vous@entreprise.com"
+               autocomplete="username" style="margin-bottom:12px;">
         <label class="f">Mot de passe</label>
-        <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px;">
+        <input type="password" id="login-password" placeholder="••••••••"
+               autocomplete="current-password" style="margin-bottom:16px;">
         <button class="btn block" id="login-btn">Se connecter</button>
         <!-- ═══ SOUS LE BOUTON, PAS AU-DESSUS ═══
 
@@ -614,9 +645,14 @@
           </div>
         </div>
         <label class="f">E-mail</label>
-        <input type="email" id="signup-email" placeholder="vous@entreprise.com" style="margin-bottom:12px;">
+        <input type="email" id="signup-email" placeholder="vous@entreprise.com"
+               autocomplete="username" style="margin-bottom:12px;">
         <label class="f">Mot de passe</label>
-        <input type="password" id="signup-password" placeholder="••••••••" style="margin-bottom:16px;">
+        <!-- `new-password` et non `current-password` : c'est ce qui déclenche la
+             proposition d'un mot de passe fort, et ce qui empêche le
+             gestionnaire de préremplir l'ancien sur un formulaire de création. -->
+        <input type="password" id="signup-password" placeholder="••••••••"
+               autocomplete="new-password" style="margin-bottom:16px;">
 
         <div id="signup-gestion-field">
           <label class="f">Nom de l'entreprise</label>

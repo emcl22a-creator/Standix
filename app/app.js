@@ -6773,8 +6773,36 @@ function expliquerComptage() {
   })
 }
 
+/* ═══ CE QUE REPRÉSENTE LE NOMBRE AU BOUT DE CHAQUE LIGNE ═══
+
+   L'autre aide dit QUAND le compteur tourne. Celle-ci dit CE QU'ON ADDITIONNE,
+   et sur quelle période — la question que se pose quelqu'un qui voit « 4 h 12 »
+   sans savoir si c'est aujourd'hui, ce mois-ci ou depuis le début.
+
+   Le texte reprend le libellé affiché à l'écran plutôt qu'un terme générique :
+   la personne lit « ce mois-ci » dans les sections, elle doit retrouver les
+   mêmes mots ici. `anLibelle()` rend celui de la période en cours. */
+function expliquerDurees() {
+  const p = anLibelle()   // « ce mois-ci » ou « depuis le début »
+  confirmDialog({
+    titre: 'Ces dur\u00e9es, c\u2019est quoi ?',
+    message:
+      `La dur\u00e9e au bout de chaque ligne est le temps TOTAL pass\u00e9 \u00e0 lire, ` +
+      `additionn\u00e9 sur toute l\u2019\u00e9quipe, ${p}.\n\n` +
+      "\u2022 Sur un dossier : le temps pass\u00e9 sur toutes ses proc\u00e9dures.\n" +
+      "\u2022 Sur une proc\u00e9dure : le temps pass\u00e9 dessus par tout le monde.\n" +
+      "\u2022 Sur une personne : le temps qu\u2019elle a pass\u00e9 sur les proc\u00e9dures.\n\n" +
+      "Ce n\u2019est pas la dur\u00e9e de la vid\u00e9o, ni le nombre de fois qu\u2019elle a \u00e9t\u00e9 ouverte. " +
+      "C\u2019est du temps de lecture r\u00e9el, cumul\u00e9.",
+    confirmer: 'Compris',
+    annuler: null,
+    danger: false,
+  })
+}
+
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-aide-temps]')) expliquerComptage()
+  if (e.target.closest('[data-aide-duree]')) expliquerDurees()
 })
 
 /* ═══════════════════════════════════════════════════════════════════════════

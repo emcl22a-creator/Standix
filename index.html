@@ -714,8 +714,13 @@ h2 em{ font-style:normal; color:var(--t1); }
   /* 22 px et non 14 : la photo et le bloc vidéo sont deux objets distincts —
      un lieu et un fichier — et à 14 px ils se lisaient comme un seul bloc
      empilé. L'écart doit être plus grand que celui qui sépare le bloc vidéo
-     de la descente (6 px), sinon la hiérarchie s'inverse. */
-  position:relative; margin-bottom:22px;
+     de la descente (6 px), sinon la hiérarchie s'inverse.
+
+     22 → 32 : la photo est passée du carré au paysage, donc plus large et
+     moins haute. À largeur égale, un bloc plat a besoin de plus d'air sous lui
+     qu'un bloc haut pour paraître détaché — l'œil compare l'écart à la hauteur
+     de l'objet, pas à sa largeur. */
+  position:relative; margin-bottom:32px;
   border-radius:16px; overflow:hidden;
   box-shadow:0 0 0 1px rgba(255,255,255,.14),
              inset 0 1px 0 rgba(255,255,255,.28),
@@ -725,7 +730,10 @@ h2 em{ font-style:normal; color:var(--t1); }
 /* Un voile sombre très léger sur le bas : la photo est claire, le bloc vidéo
    qui la suit est sombre, et sans transition la jointure se voit. */
 .scene::after{
-  content:''; position:absolute; left:0; right:0; bottom:0; height:34%;
+  /* 34 % → 26 % : le voile était réglé pour une image presque carrée. Sur une
+     photo en paysage, la même proportion assombrissait le plan de travail et
+     les deux bidons — c'est-à-dire les objets qui rendent la scène crédible. */
+  content:''; position:absolute; left:0; right:0; bottom:0; height:26%;
   background:linear-gradient(180deg,transparent,rgba(8,9,10,.55));
   pointer-events:none;
 }
@@ -2008,7 +2016,7 @@ footer .marque{ margin-bottom:18px; }
        geste qu'elle décrit. Le bloc de la vidéo garde son bouton juste en
        dessous, avec sa durée. Les deux disent deux choses différentes. -->
   <figure class="scene app" style="--d:.11s">
-    <img src="cafe.jpg" width="1000" height="945"
+    <img src="cafe.jpg" width="1393" height="929"
          alt="Un employé consulte la procédure sur son téléphone avant de détartrer la machine à café du local">
   </figure>
 

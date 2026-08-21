@@ -1700,12 +1700,12 @@
     <div class="fm-piste" id="an-piste-eq">
       <section class="fm-pan" data-periode="month">
         <div class="fm-segm"><div class="svg" id="an-anneau-eq-month"></div></div>
-        <div class="fm-titre">Qui passe le temps</div>
+        <div class="fm-titre">Temps de lecture par personne</div>
         <div id="an-top-eq-month"></div>
       </section>
       <section class="fm-pan" data-periode="all">
         <div class="fm-segm"><div class="svg" id="an-anneau-eq-all"></div></div>
-        <div class="fm-titre">Qui passe le temps</div>
+        <div class="fm-titre">Temps de lecture par personne</div>
         <div id="an-top-eq-all"></div>
       </section>
     </div>
@@ -2214,7 +2214,19 @@
       <h1 class="pagehead">Les postes</h1>
     </div>
 
-    <div class="an-intro">
+    <!-- ═══ LA MATIÈRE DE LA CARTE « BONJOUR EMILIEN » ═══
+
+         C'était un `.an-intro` nu : deux lignes de texte posées sur le fond de
+         la page, sans cadre. À côté d'un accueil qui porte une carte allumée,
+         cette page paraissait moins finie que les autres — alors qu'elle dit la
+         même chose de la même façon.
+
+         `.hero` apporte le dégradé profond et la lueur ambre ; `.hero-lueur`
+         est le calque qui dessine le liseré évidé aux deux angles opposés. Les
+         deux classes viennent de la carte d'accueil telles quelles : aucune
+         règle nouvelle, donc aucune divergence possible entre les deux. -->
+    <div class="hero an-intro">
+      <span class="hero-lueur" aria-hidden="true"></span>
       <div class="t">Qui fait quoi dans l'entreprise</div>
       <div class="s">Définissez les postes de votre établissement. Chaque membre choisira le sien.</div>
     </div>

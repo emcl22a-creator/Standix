@@ -4036,9 +4036,22 @@ function peindreIntroEquipe(employes, validations) {
   const s = document.getElementById('an-eq-sous')
   if (!t || !s) return
 
-  const total = validations.reduce((x, v) => x + Number(v.duree_lecture || 0), 0)
-  const actifs = new Set(validations.filter(v => Number(v.duree_lecture)).map(v => v.membre_id)).size
-  const jamais = employes.length - actifs
+  /* ═══ LE DÉNOMINATEUR NE COMPTE QUE L'ÉQUIPE ═══
+
+     La liste montre tout le monde, mais la MESURE ne porte que sur ceux qui
+     ont à lire. Compter les gestionnaires ferait « 2 sur 5 » là où l'équipe
+     est de quatre, et le manquant serait quelqu'un à qui l'on ne demande rien.
+
+     `employes` est ici la liste complète — c'est `peindreAnEquipe` qui la
+     passe. On refiltre donc sur le rôle, plutôt que de changer ce qu'elle
+     envoie : la liste, elle, doit bien rester complète. */
+  const aLire = (employes || []).filter(m => m.role !== 'gestion')
+  const idsALire = new Set(aLire.map(m => m.id))
+  const validALire = (validations || []).filter(v => idsALire.has(v.membre_id))
+
+  const total = validALire.reduce((x, v) => x + Number(v.duree_lecture || 0), 0)
+  const actifs = new Set(validALire.filter(v => Number(v.duree_lecture)).map(v => v.membre_id)).size
+  const jamais = aLire.length - actifs
 
   if (!total) {
     t.textContent = 'Votre \u00e9quipe n\u2019a pas encore commenc\u00e9'
@@ -4062,8 +4075,8 @@ function peindreIntroEquipe(employes, validations) {
      fondateur ne se compte pas dans son équipe, mais il est bien un membre de
      son entreprise. */
   t.textContent = actifs > 1
-    ? `${actifs} membres sur ${employes.length} se sont form\u00e9s ce mois-ci`
-    : `1 membre sur ${employes.length} s'est form\u00e9 ce mois-ci`
+    ? `${actifs} sur ${aLire.length} se sont form\u00e9s ce mois-ci`
+    : `1 sur ${aLire.length} s'est form\u00e9 ce mois-ci`
 
   /* Le compte de ceux qui n'ont rien ouvert a été retiré : le titre le dit déjà
      — « 3 sur 5 », les deux autres se déduisent. Répéter le manque juste en
@@ -4132,9 +4145,18 @@ function peindreAnEquipe() {
       }
     }).sort((a, b) => (a.gestion - b.gestion) || (b.total - a.total))
 
-    vue.total = vue.classe.reduce((t, x) => t + x.total, 0)
+    /* ═══ LE TOTAL ET L'ANNEAU NE COMPTENT QUE L'ÉQUIPE ═══
+
+       La ligne d'un gestionnaire n'affiche plus son temps ; l'inclure dans le
+       total le ferait pourtant apparaître dans le chiffre du haut et dans une
+       part de l'anneau. On lirait « 30 min » sans pouvoir retrouver d'où
+       viennent les trois dernières.
+
+       Une couleur ne lui est pas attribuée non plus : elle ne servirait qu'à
+       une part qui n'existe pas. */
+    vue.total = vue.classe.reduce((t, x) => t + (x.gestion ? 0 : x.total), 0)
     let n = 0
-    vue.classe.forEach(x => { if (x.total) x.couleur = FM_TEINTES[n++ % FM_TEINTES.length] })
+    vue.classe.forEach(x => { if (x.total && !x.gestion) x.couleur = FM_TEINTES[n++ % FM_TEINTES.length] })
 
     vue.deplie = false
     dessinerAnneauEq(cle)
@@ -4228,7 +4250,7 @@ function peindreClassementEq(cle, animerDes) {
     return
   }
 
-  const partsAnneau = regrouperParts(vue.classe.filter(x => x.total > 0), x => x.total)
+  const partsAnneau = regrouperParts(vue.classe.filter(x => x.total > 0 && !x.gestion), x => x.total)
   const grises = new Set()
   if (partsAnneau.find(x => x.estAutres)) {
     const montrees = new Set(partsAnneau.filter(x => !x.estAutres))
@@ -4260,12 +4282,23 @@ function peindreClassementEq(cle, animerDes) {
         <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
         <span class="co">
           <span class="nm">${escapeHtml(x.estAutres ? (x.nom || 'Autres') : x.nom)}</span>
+          <!-- ═══ LA GESTION N'EST PAS MESURÉE ═══
+
+               « 0 procédure lue » et « jamais » à côté d'un gestionnaire
+               ressemblent à un reproche, alors qu'il n'y a rien à reprocher :
+               il ÉCRIT les procédures, il n'a pas à les lire. Le suivi de
+               lecture existe pour savoir si l'équipe est formée — pas pour
+               noter celui qui forme.
+
+               Sa ligne garde son nom et son rang. Elle est là parce qu'on a
+               demandé à voir tous les membres, pas pour être comparée. -->
           <span class="st">${x.estAutres ? 'Les moins actifs'
+            : x.gestion ? (x.membre.poste ? escapeHtml(x.membre.poste) : 'Gestion')
             : (x.membre.poste ? escapeHtml(x.membre.poste) + ' \u00b7 ' : '') +
               x.lues + ' proc\u00e9dure' + (x.lues > 1 ? 's' : '') + ' lue' + (x.lues > 1 ? 's' : '')}</span>
         </span>
-        <span class="vl"${x.total ? '' : ' style="color:var(--label-3)"'}>${
-          x.total ? dureeLisible(x.total) : 'jamais'}</span>
+        ${x.gestion ? '' : `<span class="vl"${x.total ? '' : ' style="color:var(--label-3)"'}>${
+          x.total ? dureeLisible(x.total) : 'jamais'}</span>`}
       </button>`
   }).join('')
 
@@ -8021,17 +8054,22 @@ function dessinerCollage() {
     </div>`).join('')
 
   const secondes = collageFichiers.reduce((s, f) => s + f.duree, 0)
-  const octets = collageFichiers.reduce((s, f) => s + f.fichier.size, 0)
-  /* Le poids ATTENDU en sortie, au débit réel mesuré sur iPhone : 1,75 Mb/s
-     dans le pire cas, un enregistrement d'écran. Une vidéo filmée sortira plus
-     légère — l'estimation est haute, jamais basse. */
-  const attendu = secondes * 1.75e6 / 8
+  /* ═══ LES DEUX LIGNES DE POIDS ONT ÉTÉ RETIRÉES ═══
+
+     Elles disaient « Poids des vidéos choisies » et « Poids après collage,
+     environ ». Deux chiffres pour une question que personne ne se pose : ce
+     qui compte est la durée, et le poids en découle.
+
+     Elles avaient un sens quand le poids était la limite. Depuis qu'on a
+     mesuré le vrai débit — 1,75 Mb/s au pire — c'est la DURÉE qui plafonne :
+     cinq minutes font 63 Mo, très loin des 150 acceptés. Afficher un poids
+     laissait croire à une contrainte qui n'existe plus.
+
+     Le calcul du poids attendu part avec elles : plus rien ne le lit. */
 
   total.style.display = ''
   total.innerHTML = `
     <div class="coller-tot"><span>Durée totale</span><b>${dureeCourte(secondes)}</b></div>
-    <div class="coller-tot"><span>Poids des vidéos choisies</span><b>${poidsLisible(octets)}</b></div>
-    <div class="coller-tot"><span>Poids après collage, environ</span><b>${poidsLisible(attendu)}</b></div>
     <div class="coller-tot"><span>Temps de collage, environ</span><b>${attenteLisible(secondes * 1.05)}</b></div>`
 
   /* ═══ C'EST LA DURÉE QUI REFUSE, PAS LE POIDS ═══
@@ -16170,7 +16208,41 @@ async function basculerVersEtablissement(entrepriseId) {
   if (!membre) return
 
   currentMembre = membre
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     ON VIDE TOUS LES CACHES, PAS SEULEMENT L'ENTREPRISE
+     ═══════════════════════════════════════════════════════════════════════
+
+     Seul `cachedEntreprise` l'était. Les autres gardaient le contenu de
+     l'établissement qu'on venait de quitter jusqu'à la fin du rechargement —
+     et l'app peint AVANT que les requêtes reviennent, c'est même le but de la
+     copie locale.
+
+     Résultat visible sur la page Mouvements : elle lit `cachedMembres`, et
+     affichait donc les arrivées et les promotions de l'AUTRE entreprise. Le
+     journal `mouvements`, lui, était bien filtré — c'est ce qui rendait le
+     défaut déroutant : une partie de la page était juste, l'autre non.
+
+     Vider coûte un affichage vide de quelques centaines de millisecondes.
+     Ne pas vider coûte des informations d'une entreprise montrées dans une
+     autre, ce qui n'est pas un défaut d'affichage mais une fuite.
+
+     LA LISTE EST VOLONTAIREMENT LARGE. Chacun de ces caches est propre à une
+     entreprise ; en oublier un, c'est laisser exactement le même défaut sur
+     une autre page, et il ne se verra que le jour où quelqu'un aura deux
+     établissements. */
   cachedEntreprise = null
+  cachedMembres = []
+  cachedEmployes = []
+  cachedValidations = []
+  allGestionProcedures = []
+  allCategoriesData = []
+  allEquipeProcedures = []
+  currentGaData = null
+  /* Les deux vues de l'arbre repartent à la racine : rester dans « Cuisine ›
+     Friteuse » d'une entreprise qu'on vient de quitter n'a aucun sens. */
+  sousDossierCourant = null
+  equipeSousDossier = null
 
   /* On ne masque plus l'app avant de recharger. Le faire rejouait l'animation
      d'entrée : la barre du haut et celle du bas repartaient de zéro, alors qu'on

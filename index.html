@@ -15,23 +15,45 @@
 
      Elle doit donc porter la phrase, pas le nom de domaine.
 
-     ⚠ partage.png est attendu à la racine : 1200 × 630, la capture de l'app
-       sur fond noir avec le titre. Sans lui, le lien s'affiche nu.
+     ⚠ site-partage.png est attendu à la racine : 1200 × 630, la capture de
+       l'app sur fond noir avec le titre. Sans lui, le lien s'affiche nu.
      ═══════════════════════════════════════════════════════════════════════════ -->
 <meta name="description" content="Filmez le geste ou votre écran. L'IA découpe la vidéo et rédige les étapes. Votre équipe les lit sur son téléphone, ou scanne un QR code sur place.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Filmez une fois. Votre équipe saura faire.">
 <meta property="og:description" content="L'IA découpe la vidéo et rédige les étapes. Un QR code sur place, et la procédure s'ouvre.">
-<meta property="og:image" content="partage.png">
+<!-- L'ADRESSE EST COMPLÈTE, ET C'EST OBLIGATOIRE. Les robots qui fabriquent
+     les aperçus n'ont pas de navigateur : ils ne résolvent pas un chemin
+     relatif, et beaucoup abandonnent. Les DIMENSIONS aussi comptent — WhatsApp
+     choisit entre vignette et grande carte AVANT de télécharger l'image. -->
+<meta property="og:image" content="https://standix.app/site-partage.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://standix.app/">
 <meta property="og:locale" content="fr_FR">
 <meta name="twitter:card" content="summary_large_image">
 
 <!-- Les liens vers l'app sont RELATIFS : « app/ » fonctionne aujourd'hui sur
      emcl22a-creator.github.io/Standix/ et demain sur standix.app/, sans rien
      changer le jour de la bascule du domaine. -->
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<!-- ═══ LES ICÔNES DU SITE PORTENT LE PRÉFIXE `site-` ═══
+
+     Ces lignes pointaient vers les icônes sans préfixe, parties dans `app/`
+     avec le reste
+     de l'application : le navigateur les demandait, recevait une page
+     introuvable, et affichait le globe gris à la place du logo.
+
+     Le préfixe existe parce que le site et l'app partagent le même dépôt. Sans
+     lui, un dépôt de fichiers était ambigu — une fois sorties de leur dossier,
+     rien ne distinguait les deux jeux.
+
+     ⚠ `site-favicon.ico` n'est pas encore déposé. Les quatre lignes PNG
+       suffisent à tous les navigateurs modernes en attendant. -->
+<link rel="icon" href="site-favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="site-favicon-32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="site-favicon-96.png">
+<link rel="icon" type="image/png" sizes="192x192" href="site-icone-192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="site-apple-touch-icon.png">
 <meta name="theme-color" content="#08090A">
 <meta name="color-scheme" content="dark">
 <meta name="format-detection" content="telephone=no, address=no, email=no">
@@ -52,7 +74,9 @@
    ⚠ L'image n'est pas encore là. Le cadre ci-dessous est un EMPLACEMENT :
      bonnes dimensions, bon liseré, bonne coupe. Il suffira de remplacer le
      bloc d'attente par une vraie capture. C'est fait : les deux vues de la
-     galerie sont maintenant app-procedures.png et app-procedure.png.
+     galerie sont app-procedures.webp et app-procedure.webp, à leur définition
+     native de 1 206 px — trois fois plus légères que les PNG de 720 px
+     qu'elles remplacent, et une fois et demie plus définies.
    ═══════════════════════════════════════════════════════════════════════════ */
 :root{
   --fond:#08090A;
@@ -476,7 +500,14 @@ h1 em{ font-style:normal; color:var(--t1); }
 .nom{
   font-size:12.5px; font-weight:500; color:var(--t2);
   letter-spacing:-.01em;
-  transition:opacity .3s ease;
+  /* ═══ 300 ms → 150 ms ═══
+     Le texte était remplacé au bout de 220 ms alors que le fondu en durait
+     300 : au moment de la bascule, l'ancien mot était encore visible à 20 %,
+     et l'œil lisait une superposition.
+
+     La durée du fondu doit être PLUS COURTE que le délai du remplacement,
+     jamais l'inverse. 150 contre 170 : le mot est à zéro quand il change. */
+  transition:opacity .15s ease;
 }
 .points{ display:flex; gap:6px; }
 .points i{
@@ -1929,14 +1960,14 @@ footer .marque{ margin-bottom:18px; }
   <div class="capture" id="galerie">
 
     <div class="vue on" data-nom="Toutes vos procédures">
-      <img src="app-procedures.png" alt="L'accueil de l'espace Équipe de Standix"
-           width="720" height="1281">
+      <img src="app-procedures.webp" alt="L'accueil de l'espace Équipe de Standix"
+           width="1206" height="2147">
     </div>
 
     <div class="vue" data-nom="Le geste, étape par étape">
-      <img src="app-procedure.png"
+      <img src="app-procedure.webp"
            alt="Une procédure Standix ouverte, avec sa vidéo et ses étapes"
-           width="720" height="1269">
+           width="1206" height="2126">
     </div>
 
   </div>
@@ -2497,7 +2528,7 @@ footer .marque{ margin-bottom:18px; }
   const vues = [...gal.querySelectorAll('.vue')]
   const pts  = [...document.getElementById('points').children]
   const nom  = document.getElementById('nom')
-  let i = 0, touche = false, auto = null
+  let i = 0, touche = false, auto = null, chgNom = null
 
   const aller = (n) => {
     n = (n + vues.length) % vues.length
@@ -2506,9 +2537,18 @@ footer .marque{ margin-bottom:18px; }
     i = n
     vues[i].classList.add('on'); pts[i].classList.add('on')
     /* Le nom s'efface avant de changer : voir un mot se remplacer d'un coup
-       pendant que l'image se fond, c'est deux vitesses différentes à l'écran. */
+       pendant que l'image se fond, c'est deux vitesses différentes à l'écran.
+
+       170 ms contre 150 ms de fondu : le mot est complètement effacé quand il
+       est remplacé. Et le minuteur est annulé à chaque appel — sans ça, deux
+       glissements rapprochés laissent deux remplacements en attente, et le
+       second réaffiche un texte déjà périmé. */
+    clearTimeout(chgNom)
     nom.style.opacity = 0
-    setTimeout(() => { nom.textContent = vues[i].dataset.nom; nom.style.opacity = 1 }, 220)
+    chgNom = setTimeout(() => {
+      nom.textContent = vues[i].dataset.nom
+      nom.style.opacity = 1
+    }, 170)
   }
 
   let x0 = 0, y0 = 0, suit = false

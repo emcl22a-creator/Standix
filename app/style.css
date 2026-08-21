@@ -7988,3 +7988,30 @@ body:has(#e-detail.active) #equipe-app{
 }
 .hero.an-intro .t,
 .hero.an-intro .s{ position:relative; z-index:2; }
+
+
+/* ═══ LE POINT DE VIGILANCE DANS LE MONTAGE VIDÉO ═══
+
+   Il se distingue du texte de l'étape sans crier : filet ambre à gauche, texte
+   plus petit et plus sourd. C'est le même vocabulaire que sur la fiche et dans
+   le PDF — un avertissement porte partout le même signe, sinon on ne le
+   reconnaît pas d'un support à l'autre.
+
+   Pas de fond coloré : à côté d'une zone de saisie, une seconde zone teintée
+   ferait deux blocs qui se disputent l'attention. Le filet suffit. */
+.et-attention-saisie{
+  display:block; width:100%;
+  margin-top:8px; padding:2px 0 2px 11px;
+  background:none; border:none;
+  border-left:2px solid rgba(255,122,24,0.55);
+  border-radius:0;
+  color:rgba(255,176,102,0.92);
+  font-size:12.5px; line-height:1.45;
+  resize:none; overflow:hidden;
+}
+.et-attention-saisie:focus{
+  outline:none;
+  border-left-color:#FF9F0A;
+  background:rgba(255,122,24,0.05);
+}
+.et-attention-saisie::placeholder{ color:rgba(255,176,102,0.40); }

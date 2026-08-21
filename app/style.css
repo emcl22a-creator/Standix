@@ -7688,3 +7688,20 @@ body:has(#e-detail.active) #equipe-app{
      traîner le champ derrière le curseur. */
   transition:none;
 }
+
+
+/* ═══ « (OPTIONNEL) » DANS LE LIBELLÉ ═══
+
+   Plus léger et plus petit que le nom du champ : il le précise, il ne le
+   concurrence pas. Sans cette différence, « Sous-dossier (optionnel) » se lit
+   comme un titre de champ à rallonge plutôt que comme une nuance.
+
+   Pas d'italique : à 11 px sur un fond sombre, l'italique se brouille. La
+   graisse et la couleur suffisent à hiérarchiser. */
+.f-opt{
+  font-size:11px;
+  font-weight:400;
+  color:var(--label-3);
+  letter-spacing:0;
+  margin-left:2px;
+}

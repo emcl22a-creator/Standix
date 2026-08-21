@@ -5008,8 +5008,16 @@
   .cat-pied .fl{ margin-left:auto; color:var(--label-3); font-size:16px; line-height:1; }
 
   /* Les titres récents respirent avant le pied. Les deux grilles, là encore. */
+  /* En dessous, on descend de 11 à 8 : le pied apporte déjà ses 10 px de
+     rembourrage, et les deux additionnés éloignaient le dernier titre de son
+     trait bien plus que le premier ne l'était du sien.
+
+     ⚠ Le commentaire est AU-DESSUS du sélecteur, pas au milieu. Glissé entre
+     `#cat-grid .cat-recent,` et la ligne suivante, il coupait la virgule de sa
+     suite : le premier sélecteur devenait invalide et la grille de Gestion
+     perdait la règle, silencieusement. */
   #cat-grid .cat-recent,
-  #e-cat-grid .cat-recent{ padding-bottom:11px; }
+  #e-cat-grid .cat-recent{ padding-bottom:8px; }
 
   /* ═══════════════════════════════════════════════════════════════════════
      LA CARTE D'UNE PROCÉDURE
@@ -5078,7 +5086,20 @@
   .cat-pct-label{ font-size:10.5px; color:var(--label-3); }
   .cat-date{ font-size:10.5px; font-weight:600; color:var(--label-3); margin-top:4px; font-variant-numeric:tabular-nums; }
   .carte-categorie{ font-size:11px; font-weight:600; color:var(--label-3); margin-top:3px; }
-  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:9px; margin-top:10px; }
+  /* ═══ L'AIR AUTOUR DES TITRES D'APERÇU ═══
+
+     Mesuré : au-dessus du premier titre, 9 px de rembourrage plus 2 px de la
+     ligne — 11 en tout. En dessous du dernier, 2 + 11 + 10 = 23, à cause du
+     rembourrage du bloc et de celui du pied.
+
+     Le texte était donc deux fois plus près du trait du haut que de celui du
+     bas. Sur une carte à un seul titre, comme « SAP », les deux traits
+     l'enserrent et le déséquilibre saute aux yeux.
+
+     On passe à 13 px en haut. Avec les 2 px de la ligne, l'écart devient 15
+     contre 23 — pas égal, et c'est voulu : le trait du bas appartient au pied,
+     qui est un autre bloc. Ce qui gênait était le SERRAGE, pas l'asymétrie. */
+  .cat-recent{ border-top:0.5px solid var(--separator); padding-top:13px; margin-top:12px; }
   /* Le titre d'une procédure récente et, le cas échéant, son état d'analyse :
      l'indicateur se cale juste au bout du texte, pas au bout de la carte. */
   .cat-recent-item{
@@ -7895,3 +7916,23 @@ body:has(#e-detail.active) #equipe-app{
 }
 .lien-doux:active{ opacity:0.55; }
 .lien-doux[disabled]{ opacity:0.45; text-decoration:none; }
+
+
+/* ═══ « QUI FAIT QUOI » DANS LA MATIÈRE DE L'ACCUEIL ═══
+
+   `.hero` donne le fond et la lueur, `.an-intro` donne la typographie de ses
+   deux lignes. Il ne reste qu'à remonter le texte au-dessus du calque de
+   lueur — sans `z-index`, le liseré passe par-dessus et ternit les mots.
+
+   La marge du bas vient de `.hero` (16 px) ; on ne la redéclare pas, sinon la
+   carte d'accueil et celle-ci se décaleraient à la première retouche. */
+/* ⚠ `.an-intro` porte `border-color:transparent !important` — un vestige du
+   temps où elle avait un contour à effacer. Le `!important` gagne contre tout,
+   y compris contre le liseré de la carte. On l'annule ici, faute de pouvoir le
+   retirer là-bas sans vérifier les trois autres pages qui l'emploient. */
+.hero.an-intro{
+  margin-bottom:18px;
+  border-color:rgba(255,180,84,0.42) !important;
+}
+.hero.an-intro .t,
+.hero.an-intro .s{ position:relative; z-index:2; }

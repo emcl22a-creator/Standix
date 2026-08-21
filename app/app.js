@@ -6247,7 +6247,7 @@ function renderCategoryProceduresListInterne() {
        suivante. Le mettre dans la même boucle garde l'ordre sans avoir à
        reconstruire la liste en deux passes. */
     if (entree.intertitre) {
-      listEl.appendChild(elementIntertitre(entree.intertitre, entree.compte))
+      listEl.appendChild(elementIntertitre(entree.intertitre, entree.compte, true))
       continue
     }
 
@@ -6651,17 +6651,124 @@ function grouperParSousDossier(sujets, dont, requete) {
 }
 
 /* Le dessin de l'intertitre, partagé lui aussi. */
-function elementIntertitre(nom, compte) {
+function elementIntertitre(nom, compte, renommable) {
   const t = document.createElement('div')
-  t.className = 'sous-dossier-titre'
+  t.className = 'sous-dossier-titre' + (renommable ? ' renommable' : '')
+  /* ═══ LE CRAYON N'APPARAÎT QUE CÔTÉ GESTION ═══
+
+     Un employé ne range pas : lui montrer un bouton qu'il n'a pas le droit
+     d'utiliser — ou pire, qu'il peut utiliser — n'a aucun sens. Le paramètre
+     est explicite plutôt que déduit d'une variable globale : la fonction sert
+     les deux espaces, elle ne doit pas avoir à deviner lequel l'appelle. */
   t.innerHTML = `
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
       <path d="M3 7.5a2 2 0 0 1 2-2h3.4l1.8 2.2H19a2 2 0 0 1 2 2v7.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
     </svg>
     <span>${escapeHtml(nom)}</span>
-    <b>${compte}</b>`
+    <b>${compte}</b>` + (renommable ? `
+    <button type="button" class="sd-renommer" data-sd="${escapeHtml(nom)}"
+            aria-label="Renommer le sous-dossier ${escapeHtml(nom)}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M14.5 4.8l4.7 4.7M4 20h4.2L20 8.2a2 2 0 0 0 0-2.8l-1.4-1.4a2 2 0 0 0-2.8 0L4 15.8Z"/>
+      </svg>
+    </button>` : '')
   return t
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENOMMER UN SOUS-DOSSIER
+
+   Même mécanique que pour un dossier : on réécrit la colonne sur toutes les
+   procédures concernées. Il n'y a pas de table à mettre à jour, puisqu'un
+   sous-dossier n'existe que par les procédures qui le portent.
+
+   ─── LA PORTÉE EST LIMITÉE AU DOSSIER COURANT ───
+
+   `eq('categorie', ...)` en plus du sous-dossier. Sans cette condition, un
+   « Friteuse » rangé sous Cuisine et un autre sous Maintenance seraient
+   renommés ensemble — deux rangements distincts qui portent le même nom, ce
+   qui est parfaitement légitime.
+
+   ─── LE VIDER LE SUPPRIME ───
+
+   Effacer le nom rend `null`, donc « pas de sous-dossier » : les procédures
+   remontent en tête de liste. C'est le seul moyen de défaire un rangement, et
+   il est plus naturel qu'un bouton « supprimer » qui ferait craindre pour les
+   procédures elles-mêmes. On le dit dans la fenêtre. */
+async function renommerSousDossier(ancien) {
+  const dossier = (document.getElementById('category-titre')?.textContent || '').trim()
+  if (!dossier) return
+
+  /* ═══ POURQUOI UN CHOIX AVANT LA SAISIE ═══
+
+     `demanderTexte` rend `null` DANS DEUX CAS : quand on annule, et quand on
+     valide un champ vide. Impossible de les distinguer — et ici les deux
+     conséquences sont opposées : ne rien faire, ou sortir les procédures du
+     sous-dossier.
+
+     Plutôt que de deviner, on sépare les deux gestes. « Retirer » est une
+     action explicite ; « Renommer » ouvre la saisie, où un champ vide ne peut
+     plus qu'être une annulation. */
+  const quoi = await confirmDialog({
+    titre: `\u00ab ${ancien} \u00bb`,
+    message: 'Renommer ce sous-dossier, ou en sortir les proc\u00e9dures ? ' +
+      'Les sortir ne supprime rien : elles remontent en haut du dossier.',
+    confirmer: 'Renommer',
+    annuler: 'Retirer le sous-dossier',
+    danger: false,
+  })
+
+  let propre
+  if (quoi) {
+    const saisi = await demanderTexte({
+      titre: 'Renommer le sous-dossier',
+      message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb dans \u00ab ${dossier} \u00bb suivront.`,
+      valeur: ancien,
+      placeholder: 'Ex : Friteuse',
+      confirmer: 'Renommer',
+    })
+    if (!saisi || saisi === ancien) return          // annulé, ou rien changé
+    propre = saisi
+  } else {
+    /* `confirmDialog` rend `false` sur le bouton de gauche ET sur la croix.
+       Une confirmation ferme la porte au retrait involontaire. */
+    const sur = await confirmDialog({
+      titre: 'Retirer le sous-dossier ?',
+      message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb remonteront en haut de ` +
+        `\u00ab ${dossier} \u00bb. Aucune proc\u00e9dure n'est supprim\u00e9e.`,
+      confirmer: 'Retirer', annuler: 'Annuler', danger: false,
+    })
+    if (!sur) return
+    propre = null
+  }
+
+  /* ═══ LA PORTÉE EST LIMITÉE AU DOSSIER COURANT ═══
+
+     `eq('categorie', dossier)` en plus du sous-dossier. Sans cette condition,
+     un « Friteuse » rangé sous Cuisine et un autre sous Maintenance seraient
+     renommés ensemble — deux rangements distincts qui portent le même nom, ce
+     qui est parfaitement légitime. */
+  const { data, error } = await supabase.from('procedures')
+    .update({ sous_categorie: propre })
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .eq('categorie', dossier)
+    .eq('sous_categorie', ancien)
+    .select('id')
+
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  if (!data || !data.length) { toast('La base a refus\u00e9 la modification.'); return }
+
+  /* On met à jour la copie en mémoire plutôt que de tout recharger : la liste
+     se redessine aussitôt, sans attendre le réseau. */
+  for (const l of [allGestionProcedures, currentCategoryProcsData.map(d => d.proc)]) {
+    l.forEach(p => {
+      if (p.categorie === dossier && p.sous_categorie === ancien) p.sous_categorie = propre
+    })
+  }
+  renderCategoryProceduresList()
+  toast(propre ? `Renomm\u00e9 en \u00ab ${propre} \u00bb` : 'Sous-dossier retir\u00e9')
 }
 
 async function chargerPostes() {
@@ -13628,7 +13735,7 @@ function renderEquipeCatListe() {
      moyen de lui faire croire à deux applications différentes. */
   grouperParSousDossier(triees, p => p, q).forEach(x => {
     listEl.appendChild(x.intertitre
-      ? elementIntertitre(x.intertitre, x.compte)
+      ? elementIntertitre(x.intertitre, x.compte, false)
       : ficheEquipe(x))
   })
 }
@@ -14225,7 +14332,12 @@ async function exporterProcedurePdf(proc, etapes) {
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
   doc.setTextColor(120, 120, 126)
-  const sous = [proc.categorie || 'Sans dossier',
+  /* Le chemin complet, comme sous le titre dans l'app : « Cuisine › Friteuse ».
+     Une procédure imprimée circule hors de l'app — sur un mur, dans un
+     classeur — et cette ligne est la seule qui dise d'où elle vient. */
+  const chemin = [proc.categorie || 'Sans dossier', proc.sous_categorie]
+    .filter(Boolean).join(' \u203a ')
+  const sous = [chemin,
                 new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })]
   doc.text(sous.join('  ·  '), MARGE, y)
   y += 5

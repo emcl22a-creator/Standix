@@ -676,6 +676,7 @@ section.bloc{
   max-width:var(--large); margin:0 auto;
   padding:64px var(--gouttiere) 78px;
 }
+.preuve{ counter-reset:etape }
 /* Chaque section porte son filet et ses croix : c'est ce qui fait que la
    grille se lit comme un système et non comme un ornement du haut de page. */
 section.bloc::before{
@@ -788,13 +789,58 @@ h2 em{ font-style:normal; color:var(--t1); }
 
    `tabular-nums` : sans ça, les chiffres n'ont pas la même largeur et la
    colonne des minutes ondule d'une ligne à l'autre. */
-.etapes{ list-style:none; position:relative; counter-reset:etape; }
+/* Le compteur est remis à zéro sur la SECTION et non sur la liste : les
+   étapes sont maintenant réparties en deux listes — trois visibles, trois dans
+   le tiroir — et un compteur porté par chaque liste aurait fait repartir la
+   numérotation à 1 dans la seconde. */
+.etapes{ list-style:none; position:relative; }
 /* Le fil court derrière les pastilles ; leur fond opaque le masque à chaque
    étape. C'est ce qui évite d'avoir à découper le trait entre les numéros. */
 .etapes::before{
   content:''; position:absolute; left:10px; top:10px; bottom:16px; width:1px;
   background:linear-gradient(180deg,
     rgba(255,255,255,.14), rgba(255,255,255,.14) 82%, transparent);
+}
+/* Le fil de la première liste s'arrête net : le bouton le suit immédiatement,
+   il n'a rien à quoi se fondre. Seul celui de la seconde s'estompe, parce
+   qu'il termine la démonstration. */
+.etapes.debut::before{ background:rgba(255,255,255,.14); bottom:0 }
+.etapes.suite{ padding-top:26px }
+.etapes.suite li:last-child{ padding-bottom:0 }
+/* Le bouton des étapes reprend celui des tarifs, à l'identique. Une seule
+   façon de replier quelque chose sur toute la page. */
+/* ═══ LE BOUTON DES ÉTAPES S'EFFACE APRÈS USAGE ═══
+
+   Contrairement à celui des tarifs, il ne sert qu'une fois : personne ne
+   replie des étapes qu'il vient de demander à voir. Les formules, elles, se
+   comparent puis se referment — leur bouton reste.
+
+   L'effacement combine trois transitions : l'opacité, la hauteur et la marge.
+   L'opacité seule aurait laissé un trou de 64 px au bas de la section. */
+.plus.etapes-btn{
+  margin-top:22px; margin-bottom:0;
+  overflow:hidden;
+  transition:opacity .28s ease, height .38s var(--ec),
+             margin-top .38s var(--ec), background .2s ease,
+             color .2s ease, transform .15s var(--ec);
+}
+.plus.etapes-btn.parti{
+  opacity:0; height:0; margin-top:0;
+  pointer-events:none; border:0;
+}
+/* La première étape révélée reçoit le focus quand le bouton s'efface. Sans
+   `tabindex`, un <li> ne peut pas le recevoir ; sans le focus, un lecteur
+   d'écran retomberait au début du document. Le contour reste discret : c'est
+   un point d'arrivée, pas un contrôle. */
+/* `:focus-visible` et non `:focus` : un clic à la souris focalise aussi le
+   bouton, donc l'étape recevait le contour même quand personne n'était au
+   clavier. Le navigateur ne fait correspondre `:focus-visible` que si la
+   dernière interaction était clavier — c'est exactement la distinction
+   voulue. */
+.etapes.suite li:focus{ outline:none }
+.etapes.suite li:focus-visible{
+  outline:1px solid rgba(255,255,255,.28); outline-offset:8px;
+  border-radius:8px;
 }
 .etapes li{ position:relative; counter-increment:etape; padding:0 0 26px 36px; }
 .etapes li:last-child{ padding-bottom:0 }
@@ -2079,7 +2125,7 @@ footer .marque{ margin-bottom:18px; }
        Les horodatages sont des PLAGES et non des instants. C'est plus
        crédible : un instant peut se taper à la main, une plage prouve que
        l'étape correspond à un segment découpé de la vidéo. -->
-  <ol class="etapes">
+  <ol class="etapes debut">
     <li class="app" style="--d:.20s">
       <span class="tc">0:00 – 0:58</span>
       <p>Allumer la machine, éjecter la capsule, vider le bac à capsules et les
@@ -2104,22 +2150,46 @@ footer .marque{ margin-bottom:18px; }
          appuyer sur le bouton grande tasse et laisser couler toute la solution
          détartrante</p>
     </li>
-    <li class="app" style="--d:.32s">
+  </ol>
+
+  <!-- Les trois dernières n'ont PAS la classe `app` : à hauteur nulle dans un
+       tiroir fermé, elles ne croiseraient jamais l'écran, l'observateur ne les
+       révélerait jamais, et elles resteraient invisibles une fois le tiroir
+       ouvert. C'est l'ouverture qui fait l'animation. -->
+  <div class="tiroir" id="tiroir-etapes" role="region" aria-labelledby="btn-etapes">
+  <ol class="etapes suite">
+    <li id="etape-4" tabindex="-1">
       <span class="tc">2:01 – 2:23</span>
       <p>Vider et rincer le réservoir d'eau, puis le remplir avec de l'eau
          claire</p>
     </li>
-    <li class="app" style="--d:.36s">
+    <li>
       <span class="tc">2:23 – 2:49</span>
       <p>Appuyer sur le bouton grande tasse pour vider le réservoir de son
          contenu, puis vider et rincer les bacs récolte-gouttes</p>
     </li>
-    <li class="app" style="--d:.40s">
+    <li>
       <span class="tc">2:49 – 3:13</span>
       <p>Appuyer simultanément sur les 2 boutons pendant 3 secondes pour
          quitter le mode détartrage</p>
     </li>
   </ol>
+  </div>
+
+  <!-- ═══ LE BOUTON EST APRÈS LE TIROIR ═══
+
+       Il était avant : une fois ouvert, « Masquer les trois dernières »
+       s'affichait AU-DESSUS des trois étapes qu'il proposait de masquer, et
+       l'ordre de lecture devenait faux.
+
+       Placé après, il reste au bas de la liste dans les deux états — fermé il
+       en montre trois de plus, ouvert il les replie. C'est aussi la convention
+       de tous les « voir plus » : la commande suit ce qu'elle commande. -->
+  <button class="plus etapes-btn" id="btn-etapes" aria-expanded="false"
+          aria-controls="tiroir-etapes">
+    <span id="btn-etapes-txt">Voir les trois dernières étapes</span>
+    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
 
   </div>
 
@@ -2617,35 +2687,58 @@ footer .marque{ margin-bottom:18px; }
      qu'on le lit est pire que pas de carrousel du tout. */
   auto = setTimeout(() => { if (!touche) aller(1) }, 3200)
 
-  /* ═══ LE TIROIR ═══
+  /* ═══ LES TIROIRS ═══
+
+     Il y en a deux : les formules tarifaires et les trois dernières étapes.
+     Le code était écrit pour le premier ; le dupliquer aurait dupliqué aussi
+     ses défauts futurs. Une fonction, appelée deux fois.
 
      Le libellé change à l'ouverture. Un bouton qui garde « Voir les autres
      formules » alors qu'elles sont déjà à l'écran laisse le visiteur chercher
      comment refermer. */
-  const bt = document.getElementById('btn-formules')
-  const ti = document.getElementById('tiroir-formules')
-  const tx = document.getElementById('btn-formules-txt')
-  bt.addEventListener('click', () => {
-    const ouvert = bt.getAttribute('aria-expanded') === 'true'
-    if (ouvert) {
-      /* On repasse de `auto` à une valeur chiffrée avant de fermer : une
-         transition depuis `auto` ne se joue pas, la fermeture serait sèche. */
-      ti.style.height = ti.scrollHeight + 'px'
-      requestAnimationFrame(() => { ti.style.height = '0px' })
-      bt.setAttribute('aria-expanded', 'false')
-      tx.textContent = 'Voir les autres formules'
-    } else {
-      ti.style.height = ti.scrollHeight + 'px'
-      bt.setAttribute('aria-expanded', 'true')
-      tx.textContent = 'Masquer les formules'
-    }
-  })
-  /* Une fois ouvert, la hauteur redevient `auto` : sinon une rotation d'écran
-     ou un changement de taille de police tronquerait le contenu. */
-  ti.addEventListener('transitionend', e => {
-    if (e.propertyName !== 'height') return
-    if (bt.getAttribute('aria-expanded') === 'true') ti.style.height = 'auto'
-  })
+  const tiroir = (idBouton, idTiroir, ferme, ouvertTxt, disparait) => {
+    const bt = document.getElementById(idBouton)
+    const ti = document.getElementById(idTiroir)
+    const tx = document.getElementById(idBouton + '-txt')
+    if (!bt || !ti || !tx) return
+    bt.addEventListener('click', () => {
+      const ouvert = bt.getAttribute('aria-expanded') === 'true'
+      if (ouvert) {
+        /* On repasse de `auto` à une valeur chiffrée avant de fermer : une
+           transition depuis `auto` ne se joue pas, la fermeture serait sèche. */
+        ti.style.height = ti.scrollHeight + 'px'
+        requestAnimationFrame(() => { ti.style.height = '0px' })
+        bt.setAttribute('aria-expanded', 'false')
+        tx.textContent = ferme
+      } else {
+        ti.style.height = ti.scrollHeight + 'px'
+        bt.setAttribute('aria-expanded', 'true')
+        tx.textContent = ouvertTxt
+        /* Le bouton à usage unique s'efface. Le focus part sur la première
+           étape révélée : sans ça, il retomberait sur le corps du document et
+           la lecture au clavier repartirait du début de la page. */
+        if (disparait) {
+          bt.classList.add('parti')
+          const cible = ti.querySelector('[tabindex]')
+          if (cible && document.activeElement === bt) cible.focus()
+          bt.addEventListener('transitionend', () => { bt.hidden = true },
+                              { once: true })
+        }
+      }
+    })
+    /* Une fois ouvert, la hauteur redevient `auto` : sinon une rotation
+       d'écran ou un changement de taille de police tronquerait le contenu. */
+    ti.addEventListener('transitionend', e => {
+      if (e.propertyName !== 'height') return
+      if (bt.getAttribute('aria-expanded') === 'true') ti.style.height = 'auto'
+    })
+  }
+
+  tiroir('btn-formules', 'tiroir-formules',
+         'Voir les autres formules', 'Masquer les formules')
+  tiroir('btn-etapes', 'tiroir-etapes',
+         'Voir les trois dernières étapes', '', true)
+
 
   /* ═══ L'APPARITION AU DÉFILEMENT ═══
 

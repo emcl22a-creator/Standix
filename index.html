@@ -1375,6 +1375,17 @@ footer .marque{ margin-bottom:18px; }
   transition-delay:var(--d,0s);
 }
 .app.vu{ opacity:1; transform:none; filter:blur(0); }
+/* ═══ POSER L'ÉTAT DE DÉPART SANS L'ANIMER ═══
+
+   `.app` porte la transition. En l'ajoutant par script, l'opacité ne saute
+   donc pas à zéro : elle commence un fondu d'une seconde VERS zéro. L'élément
+   partait s'effacer pendant qu'on lui demandait d'apparaître, et les deux
+   mouvements s'annulaient — rien ne bougeait à l'écran.
+
+   Cette classe neutralise la transition le temps d'une image, pour que l'état
+   de départ soit pris instantanément. On la retire ensuite, et l'apparition
+   se joue normalement. */
+.fige{ transition:none !important; }
 
 /* ═══ L'ENTRÉE EN FLOU ═══
    Trois choses simultanées : le flou qui se dissipe, l'élément qui monte, et
@@ -2152,10 +2163,10 @@ footer .marque{ margin-bottom:18px; }
     </li>
   </ol>
 
-  <!-- Les trois dernières n'ont PAS la classe `app` : à hauteur nulle dans un
-       tiroir fermé, elles ne croiseraient jamais l'écran, l'observateur ne les
-       révélerait jamais, et elles resteraient invisibles une fois le tiroir
-       ouvert. C'est l'ouverture qui fait l'animation. -->
+  <!-- Les trois dernières ne portent pas la classe d'apparition dans le HTML :
+       c'est le script qui la pose au moment de l'ouverture, avec son décalage.
+       Posée ici, l'observateur de défilement les aurait révélées pendant que
+       le tiroir était encore fermé. -->
   <div class="tiroir" id="tiroir-etapes" role="region" aria-labelledby="btn-etapes">
   <ol class="etapes suite">
     <li id="etape-4" tabindex="-1">
@@ -2696,7 +2707,7 @@ footer .marque{ margin-bottom:18px; }
      Le libellé change à l'ouverture. Un bouton qui garde « Voir les autres
      formules » alors qu'elles sont déjà à l'écran laisse le visiteur chercher
      comment refermer. */
-  const tiroir = (idBouton, idTiroir, ferme, ouvertTxt, disparait) => {
+  const tiroir = (idBouton, idTiroir, ferme, ouvertTxt, disparait, anime) => {
     const bt = document.getElementById(idBouton)
     const ti = document.getElementById(idTiroir)
     const tx = document.getElementById(idBouton + '-txt')
@@ -2711,6 +2722,36 @@ footer .marque{ margin-bottom:18px; }
         bt.setAttribute('aria-expanded', 'false')
         tx.textContent = ferme
       } else {
+        /* ═══ LES ÉTAPES RÉVÉLÉES ENTRENT EN FLOU ═══
+
+           Même apparition que les trois premières : opacité, montée de 16 px,
+           flou de 6 px qui se dissipe, avec un décalage d'une étape à l'autre.
+
+           Elles ne portent PAS la classe au repos, et c'est voulu.
+           L'observateur de défilement révèle aussi ce qui est déjà passé
+           au-dessus de l'écran — il les aurait marquées « vues » pendant que
+           le tiroir était encore fermé, et l'ouverture n'aurait plus rien
+           animé.
+
+           Les deux `requestAnimationFrame` ne sont pas une précaution : poser
+           l'état de départ et l'état d'arrivée dans la même image ne déclenche
+           aucune transition, le navigateur ne voit qu'une seule valeur. */
+        if (anime) {
+          const pas = [...ti.querySelectorAll('li')]
+          pas.forEach((e, i) => {
+            e.style.setProperty('--d', (i * 0.07) + 's')
+            e.classList.add('app', 'fige')
+          })
+          /* Lecture forcée de la mise en page : elle oblige le navigateur à
+             appliquer l'état de départ tout de suite, transition gelée. Sans
+             elle, il regrouperait tous les changements de cette image et la
+             classe de gel n'aurait servi à rien. */
+          void ti.offsetWidth
+          pas.forEach(e => e.classList.remove('fige'))
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            pas.forEach(e => e.classList.add('vu'))
+          }))
+        }
         ti.style.height = ti.scrollHeight + 'px'
         bt.setAttribute('aria-expanded', 'true')
         tx.textContent = ouvertTxt
@@ -2737,7 +2778,7 @@ footer .marque{ margin-bottom:18px; }
   tiroir('btn-formules', 'tiroir-formules',
          'Voir les autres formules', 'Masquer les formules')
   tiroir('btn-etapes', 'tiroir-etapes',
-         'Voir les trois dernières étapes', '', true)
+         'Voir les trois dernières étapes', '', true, true)
 
 
   /* ═══ L'APPARITION AU DÉFILEMENT ═══

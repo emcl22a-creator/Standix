@@ -705,45 +705,8 @@ h2 em{ font-style:normal; color:var(--t1); }
   max-width:36ch; margin-bottom:30px;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA SCÈNE
-
-   C'est la seule photographie de tout le site : le reste est capture d'app,
-   QR code et texte. Elle a donc un travail que rien d'autre ne fait — dire
-   que Standix part du monde physique.
-
-   Le fondu du bas la relie au bloc de la vidéo posé juste dessous, au lieu de
-   la laisser s'arrêter sur un trait. Et l'arête claire du haut la traite comme
-   les autres objets de la page : sur du noir, sans liseré, une image sombre
-   paraît trouée dans la page.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.scene{
-  /* 22 px et non 14 : la photo et le bloc vidéo sont deux objets distincts —
-     un lieu et un fichier — et à 14 px ils se lisaient comme un seul bloc
-     empilé. L'écart doit être plus grand que celui qui sépare le bloc vidéo
-     de la descente (6 px), sinon la hiérarchie s'inverse.
-
-     22 → 32 : la photo est passée du carré au paysage, donc plus large et
-     moins haute. À largeur égale, un bloc plat a besoin de plus d'air sous lui
-     qu'un bloc haut pour paraître détaché — l'œil compare l'écart à la hauteur
-     de l'objet, pas à sa largeur. */
-  position:relative; margin-bottom:32px;
-  border-radius:16px; overflow:hidden;
-  box-shadow:0 0 0 1px rgba(255,255,255,.14),
-             inset 0 1px 0 rgba(255,255,255,.28),
-             0 26px 60px rgba(0,0,0,.55);
-}
-.scene img{ display:block; width:100%; height:auto; }
-/* Un voile sombre très léger sur le bas : la photo est claire, le bloc vidéo
-   qui la suit est sombre, et sans transition la jointure se voit. */
-.scene::after{
-  /* 34 % → 26 % : le voile était réglé pour une image presque carrée. Sur une
-     photo en paysage, la même proportion assombrissait le plan de travail et
-     les deux bidons — c'est-à-dire les objets qui rendent la scène crédible. */
-  content:''; position:absolute; left:0; right:0; bottom:0; height:26%;
-  background:linear-gradient(180deg,transparent,rgba(8,9,10,.55));
-  pointer-events:none;
-}
+/* Les styles de la photo de scène se trouvaient ici. Photo supprimée, styles
+   supprimés avec elle. */
 
 /* ═══ LA SOURCE ═══
    La ligne qui dit d'où vient tout le reste. Sans elle, la liste d'étapes
@@ -807,11 +770,22 @@ h2 em{ font-style:normal; color:var(--t1); }
   background:linear-gradient(180deg,
     rgba(255,255,255,.14), rgba(255,255,255,.14) 82%, transparent);
 }
-/* Le fil de la première liste s'arrête net : le bouton le suit immédiatement,
-   il n'a rien à quoi se fondre. Seul celui de la seconde s'estompe, parce
-   qu'il termine la démonstration. */
+/* ═══ UN SEUL TRAIT POUR DEUX LISTES ═══
+
+   Les six étapes sont réparties en deux listes — deux visibles, quatre dans le
+   tiroir — et chacune trace son propre fil. L'espace de 26 px qui les sépare
+   n'appartenait à aucune des deux : le trait s'y interrompait.
+
+   La solution n'est pas de rallonger un trait au jugé, mais de faire porter
+   cet espace par la PREMIÈRE liste, sous forme de marge basse sur sa dernière
+   étape. Son fil, qui descend jusqu'en bas de la liste, le traverse alors
+   naturellement. La seconde reprend à zéro, sans retrait.
+
+   L'écart entre les étapes reste identique : il a seulement changé de côté. */
 .etapes.debut::before{ background:rgba(255,255,255,.14); bottom:0 }
-.etapes.suite{ padding-top:26px }
+.etapes.debut li:last-child{ padding-bottom:26px }
+.etapes.suite{ padding-top:0 }
+.etapes.suite::before{ top:0 }
 .etapes.suite li:last-child{ padding-bottom:0 }
 /* Le bouton des étapes reprend celui des tarifs, à l'identique. Une seule
    façon de replier quelque chose sur toute la page. */
@@ -2033,20 +2007,6 @@ footer .marque{ margin-bottom:18px; }
   </div>
 
   <div class="pv-demo">
-  <!-- ═══ LA PHOTO N'EST PAS UNE VIGNETTE DE VIDÉO ═══
-
-       On y voit quelqu'un qui consulte son téléphone à côté d'une machine —
-       pas un plan du détartrage. Lui poser un bouton de lecture dessus aurait
-       dit « cette vidéo montre un homme qui regarde son téléphone ».
-
-       Elle sert donc de scène : voilà où la procédure est lue, et voilà le
-       geste qu'elle décrit. Le bloc de la vidéo garde son bouton juste en
-       dessous, avec sa durée. Les deux disent deux choses différentes. -->
-  <figure class="scene app" style="--d:.11s">
-    <img src="cafe.jpg" width="1393" height="929"
-         alt="Un employé consulte la procédure sur son téléphone avant de détartrer la machine à café du local">
-  </figure>
-
   <div class="source app" style="--d:.13s">
     <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span>
     <span class="txt">

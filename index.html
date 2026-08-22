@@ -838,7 +838,7 @@ h2 em{ font-style:normal; color:var(--t1); }
    dernière interaction était clavier — c'est exactement la distinction
    voulue. */
 .etapes.suite li:focus{ outline:none }
-.etapes.suite li:focus-visible{
+#etape-3:focus-visible, .etapes.suite li:focus-visible{
   outline:1px solid rgba(255,255,255,.28); outline-offset:8px;
   border-radius:8px;
 }
@@ -909,66 +909,10 @@ h2 em{ font-style:normal; color:var(--t1); }
 }
 .objection p{ font-size:13.5px; line-height:1.6; color:var(--t2); }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   CE QUE ÇA CHANGE — TROISIÈME SECTION
-
-   La section précédente a répondu à « est-ce que ça marche ». Celle-ci répond
-   à « à quoi ça me sert », et pas autrement : par UN cas, en entier.
-
-   ═══ POURQUOI UN CAS ET NON TROIS ARGUMENTS ═══
-
-   Trois arguments abstraits — gain de temps, homogénéité, traçabilité — se
-   lisent en quatre secondes et s'oublient en deux. Un cas se retient et se
-   raconte : c'est exactement ce que le site doit permettre, qu'un patron le
-   répète à son associé le lendemain.
-
-   Le cas est celui du nettoyage et non de la restauration. C'est la cible de
-   départ, et c'est surtout le seul métier où le patron ne PEUT PAS montrer le
-   geste : son employé est seul chez le client. Ailleurs, Standix fait gagner
-   du temps ; là, il rend possible ce qui ne l'était pas.
-
-   ═══ LES DEUX VOLETS ═══
-
-   Le premier est terne — gris sur gris, aucune bordure. Le second est le seul
-   bloc clair de toute la page hors boutons. La différence de traitement fait
-   le travail avant qu'on ait lu un mot.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.volets{ display:flex; flex-direction:column; gap:9px; }
-.volet{
-  padding:19px; border-radius:15px;
-  background:rgba(255,255,255,.026);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),
-             inset 0 0 0 .5px rgba(255,255,255,.07);
-}
-.volet.apres{
-  background:linear-gradient(158deg, rgba(255,255,255,.085), rgba(255,255,255,.02));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.24),
-             inset 0 0 0 .5px rgba(255,255,255,.20),
-             0 22px 50px rgba(0,0,0,.42);
-}
-.volet .etiq{
-  font-size:11px; font-weight:500; letter-spacing:.07em;
-  text-transform:uppercase; color:var(--t3); margin-bottom:9px;
-}
-.volet.apres .etiq{ color:var(--t1); }
-.volet p{ font-size:14px; line-height:1.6; color:var(--t2); }
-.volet.apres p{ color:var(--t1); }
-
-/* ═══ LES TROIS SUITES ═══
-   En lignes et non en cartes : la section précédente en avait déjà, et deux
-   séries de cartes d'affilée se lisent comme une seule section répétée. */
-.suites{ list-style:none; margin-top:26px; }
-.suites li{
-  position:relative; padding:11px 0 11px 22px;
-  font-size:14px; line-height:1.5; color:var(--t2);
-  border-top:.5px solid var(--bord);
-}
-.suites li:last-child{ border-bottom:.5px solid var(--bord); }
-.suites li b{ color:var(--t1); font-weight:500; }
-.suites li::before{
-  content:''; position:absolute; left:3px; top:19px;
-  width:5px; height:5px; border-radius:50%; background:var(--t2);
-}
+/* Le bloc de « Ce que ça change » se trouvait ici : les deux volets et les
+   trois suites. Section supprimée, styles supprimés avec elle — du CSS qui ne
+   correspond à rien devient, au bout de quelques mois, du CSS qu'on n'ose
+   plus toucher. */
 
 /* ═══ POUR QUI ═══
    Un bandeau court, sans titre : deux secondes pour que le lecteur se
@@ -1129,42 +1073,22 @@ h2 em{ font-style:normal; color:var(--t1); }
   height:0; overflow:hidden;
   transition:height .48s var(--ec);
 }
-.formules{ list-style:none; padding-top:14px; }
-.formules li{
-  display:flex; align-items:baseline; gap:14px;
-  padding:14px 4px;
-  border-top:.5px solid var(--bord);
+/* La liste compacte des formules se trouvait ici. Remplacée par des cartes,
+   ses styles n'ont plus d'objet. */
+.autres-cartes{
+  display:flex; flex-direction:column; gap:16px;
+  padding-top:16px;
 }
-.formules li:last-child{ border-bottom:.5px solid var(--bord) }
-.formules .f-nom{
-  font-size:14.5px; font-weight:500; color:var(--t1); letter-spacing:-.015em;
-}
-.formules .f-quota{
-  display:block; margin-top:3px;
-  /* 12 px et non 12,5 : « Jusqu'à 100 membres · 250 analyses IA » dépassait de
-     quelques pixels et renvoyait « IA » seul à la ligne. Les espaces insécables
-     du HTML garantissent en plus que le groupe « 250 analyses IA » ne se coupe
-     jamais, quelle que soit la largeur. */
-  font-size:12px; font-weight:400; color:var(--t3);
-}
-.formules .f-prix{
-  margin-left:auto; flex:none;
-  font-size:14.5px; font-weight:500; color:var(--t1);
-  font-variant-numeric:tabular-nums;
-}
-.formules .f-prix span{ font-size:12px; color:var(--t3); font-weight:400 }
-/* ═══ LA COUPURE DES QUOTAS ═══
+/* Le prix « Sur devis » n'est pas un nombre : il ne prend pas le corps de 46
+   px des montants, qui le ferait déborder de la carte. */
+.tarif .somme b.devis{ font-size:30px; letter-spacing:-.03em }
+/* La carte Entreprise n'a pas de ligne « soit tant par personne » : sans elle,
+   la liste remonte contre le prix et cette carte ne s'aligne plus sur les
+   trois autres.
 
-   « Jusqu'à 15 membres · 60 analyses IA/mois » tenait sur une ligne alors que
-   Pro et Réseau, avec des nombres plus longs, passaient à deux. Trois lignes
-   de la même liste ne se ressemblaient plus.
-
-   Le retour est donc forcé au même endroit pour les trois — après le point
-   médian, là où la coupure naturelle tombait déjà. Et uniquement sur
-   téléphone : à partir de la tablette, les trois tiennent d'une seule ligne et
-   une coupure imposée y créerait le déséquilibre inverse. */
-.cassure{ display:none }
-@media (max-width: 767px){ .cassure{ display:inline } }
+   45 px et non 22 : il fallait compenser la marge de la ligne ET la hauteur
+   de la ligne elle-même. Mesuré sur les cartes voisines, pas estimé. */
+.tarif .somme:has(.devis){ margin-bottom:45px }
 
 /* Les mentions de bas de tarif, dans le tiroir et non sur la carte : elles ne
    servent qu'à celui qui compare vraiment, et lui a déjà ouvert le tiroir. */
@@ -1527,12 +1451,6 @@ footer .marque{ margin-bottom:18px; }
   h2{ font-size:38px }
   .chapo{ font-size:16px }
 
-  /* Les deux volets passent côte à côte : l'avant et l'après se comparent d'un
-     regard au lieu de se lire l'un après l'autre. C'est le seul endroit de la
-     page où la largeur change le sens, et non seulement la mise en page. */
-  .volets{ flex-direction:row }
-  .volets .volet{ flex:1 }
-
   /* ═══ LA BARRE SE CALE SUR LE CONTENEUR ═══
 
      Elle est en `position:fixed`, donc large comme l'écran : avec une simple
@@ -1860,8 +1778,6 @@ footer .marque{ margin-bottom:18px; }
   .pv-texte .chapo{ max-width:none }
   .source, .descente, .etapes{ max-width:none }
   .etapes p{ max-width:52ch }
-  .suites{ max-width:720px }
-  .suites li{ font-size:15px }
   /* ═══ « POUR QUI » EN DEUX COLONNES ═══
 
      Première tentative faite avec les pseudo-classes de position : elles
@@ -1883,10 +1799,6 @@ footer .marque{ margin-bottom:18px; }
   .pq-listes .groupe:first-child{ margin-top:0 }
   .metiers{ max-width:none }
 
-  .volets{ gap:20px }
-  .volet{ padding:28px }
-  .volet p{ font-size:15px }
-
   /* Le prix se centre : c'est un objet, pas un paragraphe. Une carte alignée à
      gauche dans un cadre de 1 080 px paraît posée de travers. */
   .tarifs > *{ margin-left:auto; margin-right:auto }
@@ -1896,8 +1808,17 @@ footer .marque{ margin-bottom:18px; }
      n'est pas un enfant direct de la section : la règle de centrage
      ci-dessus ne l'atteignait pas et il restait collé à gauche pendant que
      la carte, elle, était centrée. */
-  .tarif, .plus, .tiroir, .autres, .finement{ max-width:460px }
+  .tarif, .plus, .autres, .finement{ max-width:460px }
+  /* Le tiroir s'élargit pour porter deux cartes de front : empilées, les
+     quatre auraient fait défiler seize cents pixels sur un écran qui a la
+     place de les montrer deux par deux. */
+  .tarifs .tiroir{ max-width:960px }
   .tarifs .plus, .tarifs .tiroir{ margin-inline:auto }
+  .autres-cartes{
+    display:grid; grid-template-columns:1fr 1fr; gap:20px;
+    align-items:start;
+  }
+  .autres-cartes .tarif{ max-width:none }
   .risques{ max-width:460px; justify-content:center }
 
   .surplace .sticker{ width:168px }
@@ -2154,13 +2075,6 @@ footer .marque{ margin-bottom:18px; }
          appuyer simultanément sur les 2 boutons pendant 3 secondes pour
          activer le mode détartrage</p>
     </li>
-    <li class="app" style="--d:.28s">
-      <span class="tc">1:24 – 2:01</span>
-      <p>Appuyer sur le bouton grande tasse et laisser couler toute la
-         solution, remplir à nouveau le réservoir avec le même mélange, puis
-         appuyer sur le bouton grande tasse et laisser couler toute la solution
-         détartrante</p>
-    </li>
   </ol>
 
   <!-- Les trois dernières ne portent pas la classe d'apparition dans le HTML :
@@ -2169,7 +2083,20 @@ footer .marque{ margin-bottom:18px; }
        le tiroir était encore fermé. -->
   <div class="tiroir" id="tiroir-etapes" role="region" aria-labelledby="btn-etapes">
   <ol class="etapes suite">
-    <li id="etape-4" tabindex="-1">
+    <!-- L'étape 3 rejoint le tiroir : seules les deux premières restent
+         visibles. Elle perd sa classe d'apparition et son décalage — c'est le
+         script qui les pose à l'ouverture, comme pour les trois autres.
+
+         C'est elle qui porte maintenant le `tabindex` : le focus doit atterrir
+         sur la PREMIÈRE étape révélée, pas sur la deuxième. -->
+    <li id="etape-3" tabindex="-1">
+      <span class="tc">1:24 – 2:01</span>
+      <p>Appuyer sur le bouton grande tasse et laisser couler toute la
+         solution, remplir à nouveau le réservoir avec le même mélange, puis
+         appuyer sur le bouton grande tasse et laisser couler toute la solution
+         détartrante</p>
+    </li>
+    <li>
       <span class="tc">2:01 – 2:23</span>
       <p>Vider et rincer le réservoir d'eau, puis le remplir avec de l'eau
          claire</p>
@@ -2198,7 +2125,7 @@ footer .marque{ margin-bottom:18px; }
        de tous les « voir plus » : la commande suit ce qu'elle commande. -->
   <button class="plus etapes-btn" id="btn-etapes" aria-expanded="false"
           aria-controls="tiroir-etapes">
-    <span id="btn-etapes-txt">Voir les trois dernières étapes</span>
+    <span id="btn-etapes-txt">Voir les quatre dernières étapes</span>
     <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
   </button>
 
@@ -2211,71 +2138,6 @@ footer .marque{ margin-bottom:18px; }
       Écrire la procédure de zéro en prend vingt minutes.
     </p>
   </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     CE QUE ÇA CHANGE
-     ═══════════════════════════════════════════════════════════════════════ -->
-<section class="bloc">
-  <i class="croix g"></i><i class="croix d"></i>
-  <p class="surtitre app">Quand vous n'êtes pas là</p>
-  <!-- ═══ DEUX FAUTES CORRIGÉES ═══
-
-       « Elle est seule chez le client » ouvrait la section sur un pronom sans
-       antécédent : le lecteur arrive ici sans savoir de qui on parle. Un
-       pronom en tête de section n'a rien à quoi se raccrocher.
-
-       Et « vous êtes ailleurs » parlait du patron, alors que le problème n'est
-       pas où il se trouve — c'est qu'il n'y a personne pour montrer le geste.
-       La seconde phrase nomme maintenant le manque, pas l'absent.
-
-       ═══ LE REMÈDE EST AU MÊME ENDROIT QUE L'ERREUR ═══
-
-       Le volet « Avec Standix » plaçait d'abord le QR code dans le placard à
-       produits — c'est-à-dire au dépôt, alors que la scène se passe chez le
-       client. Le remède arrivait après coup et dans un autre lieu, ce qui ne
-       répond à rien.
-
-       Le QR est maintenant sur le bidon. L'objet qui cause le problème est
-       celui qui l'empêche, et l'interception a lieu à la seconde exacte du
-       geste. C'est aussi ce qui rend la démonstration du QR code crédible :
-       on le colle sur ce qu'on prend en main, pas sur un mur. -->
-  <h2 class="app" style="--d:.05s">
-    Un nouveau, seul chez un client. <em>Personne pour lui montrer.</em>
-  </h2>
-
-  <div class="volets">
-    <div class="volet app" style="--d:.10s">
-      <p class="etiq">Aujourd'hui</p>
-      <p>
-        Premier chantier. Il attaque la salle de bain et prend le détartrant
-        pour la paroi de douche. La paroi est en pierre naturelle. Il s'en
-        aperçoit quand la surface devient mate — et vous, quand le client
-        appelle.
-      </p>
-    </div>
-    <div class="volet apres app" style="--d:.16s">
-      <p class="etiq">Avec Standix</p>
-      <p>
-        Il prend le même bidon. Un QR code est collé dessus. Il scanne :
-        « Jamais sur pierre naturelle — savon noir dilué », et la vidéo du
-        geste. Trente secondes. La paroi est intacte, et votre téléphone n'a
-        pas sonné.
-      </p>
-    </div>
-  </div>
-
-  <ul class="suites">
-    <li class="app" style="--d:.20s">
-      <b>Le même geste partout.</b> Plus la version de celui qui a formé.
-    </li>
-    <li class="app" style="--d:.24s">
-      <b>Une formation qui ne se refait pas.</b> Une fois, pas à chaque arrivée.
-    </li>
-    <li class="app" style="--d:.28s">
-      <b>Une trace.</b> Qui a lu quoi, et quand. Utile le jour où ça se discute.
-    </li>
-  </ul>
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -2480,32 +2342,88 @@ footer .marque{ margin-bottom:18px; }
 
     <div class="tiroir" id="tiroir-formules" role="region"
          aria-labelledby="btn-formules">
-      <ul class="formules">
-        <li>
-          <span class="f-nom">Équipe
-            <span class="f-quota">Jusqu'à 15 membres&nbsp;·<br class="cassure"> 60&nbsp;analyses&nbsp;IA/mois</span>
-          </span>
-          <span class="f-prix">129 €<span> /mois</span></span>
-        </li>
-        <li>
-          <span class="f-nom">Pro
-            <span class="f-quota">Jusqu'à 40 membres&nbsp;·<br class="cassure"> 120&nbsp;analyses&nbsp;IA/mois</span>
-          </span>
-          <span class="f-prix">239 €<span> /mois</span></span>
-        </li>
-        <li>
-          <span class="f-nom">Réseau
-            <span class="f-quota">Jusqu'à 100 membres&nbsp;·<br class="cassure"> 250&nbsp;analyses&nbsp;IA/mois</span>
-          </span>
-          <span class="f-prix">499 €<span> /mois</span></span>
-        </li>
-        <li>
-          <span class="f-nom">Entreprise
-            <span class="f-quota">Au-delà de 100 personnes</span>
-          </span>
-          <span class="f-prix">Sur devis</span>
-        </li>
-      </ul>
+      <!-- ═══ QUATRE CARTES, PAS UNE LISTE ═══
+
+           Les autres formules étaient une liste compacte : un nom, un prix,
+           une ligne de quotas. On ne pouvait pas les comparer à Essentiel,
+           puisqu'elles n'étaient pas décrites de la même façon — la carte
+           annonçait cinq avantages, la ligne n'en montrait aucun.
+
+           Elles ont donc la même anatomie : nom, prix, prix par personne,
+           les cinq mêmes lignes, le même bouton. C'est aussi ce que la section
+           promet — « toutes les offres donnent accès aux mêmes fonctionnalités,
+           sans exception ».
+
+           ⚠ LE TARIF ANNUEL N'Y FIGURE PAS. Essentiel affiche « ou 55 € par
+             mois en payant à l'année ». Je ne connais pas l'équivalent pour
+             les autres, et un prix inventé sur une page tarifaire est la pire
+             erreur possible. Donne-les-moi et je les ajoute. -->
+      <div class="autres-cartes">
+      <div class="tarif">
+        <p class="nom">Équipe</p>
+        <p class="somme"><b>129 €</b><i>par mois, hors taxes</i></p>
+        <p class="division">Soit 8,60 € par personne et par mois.</p>
+        <ul>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Jusqu'à <b>15 membres</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>60 analyses vidéo IA</b> par mois</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Procédures illimitées</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
+        </ul>
+        <a class="btn" href="app/">
+          Essayer gratuitement
+          <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="tarif">
+        <p class="nom">Pro</p>
+        <p class="somme"><b>239 €</b><i>par mois, hors taxes</i></p>
+        <p class="division">Soit 5,98 € par personne et par mois.</p>
+        <ul>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Jusqu'à <b>40 membres</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>120 analyses vidéo IA</b> par mois</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Procédures illimitées</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
+        </ul>
+        <a class="btn" href="app/">
+          Essayer gratuitement
+          <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="tarif">
+        <p class="nom">Réseau</p>
+        <p class="somme"><b>499 €</b><i>par mois, hors taxes</i></p>
+        <p class="division">Soit 4,99 € par personne et par mois.</p>
+        <ul>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Jusqu'à <b>100 membres</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>250 analyses vidéo IA</b> par mois</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Procédures illimitées</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
+        </ul>
+        <a class="btn" href="app/">
+          Essayer gratuitement
+          <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="tarif">
+        <p class="nom">Entreprise</p>
+        <p class="somme"><b class="devis">Sur devis</b></p>
+        
+        <ul>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Au-delà de 100</b> personnes</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Quotas d'analyses adaptés</li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
+        <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
+        </ul>
+        <a class="btn" href="mailto:Standix.app@gmail.com">
+          Nous écrire
+          <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      </div>
+
       <p class="finement">
         Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais
         avant. Les analyses vidéo se renouvellent chaque mois et ne se
@@ -2778,7 +2696,7 @@ footer .marque{ margin-bottom:18px; }
   tiroir('btn-formules', 'tiroir-formules',
          'Voir les autres formules', 'Masquer les formules')
   tiroir('btn-etapes', 'tiroir-etapes',
-         'Voir les trois dernières étapes', '', true, true)
+         'Voir les quatre dernières étapes', '', true, true)
 
 
   /* ═══ L'APPARITION AU DÉFILEMENT ═══

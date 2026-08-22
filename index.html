@@ -898,11 +898,10 @@ h2 em{ font-style:normal; color:var(--t1); }
    Un bandeau court, sans titre : deux secondes pour que le lecteur se
    reconnaisse. Placé APRÈS le cas — plus haut, une liste de métiers n'aurait
    fait qu'exclure des gens qui n'avaient pas encore compris le produit. */
-.pourqui{ padding-top:44px; padding-bottom:58px; }
-.pourqui p{
-  font-size:14px; line-height:1.6; color:var(--t2);
-  max-width:34ch; margin-bottom:16px;
-}
+/* La section était un bandeau compact sans titre, d'où son retrait réduit.
+   Devenue une section à part entière, elle reprend le rythme des autres. */
+.pourqui{ padding-bottom:58px; }
+.pourqui .chapo{ max-width:34ch; }
 /* L'intitulé de groupe. Volontairement discret : il sert à séparer, pas à
    annoncer. Un vrai titre à cet endroit ferait croire à deux sections. */
 .groupe{
@@ -2122,6 +2121,91 @@ footer .marque{ margin-bottom:18px; }
   </div>
 </section>
 
+<!-- ═══ POUR QUI ═══ -->
+<section class="bloc pourqui">
+  <i class="croix g"></i><i class="croix d"></i>
+  <!-- « Cinq à trente personnes, et du mouvement » a été retiré : c'était une
+       phrase sans verbe, donc une énumération qui n'annonçait rien. Un
+       fragment de ce genre se lit deux fois avant d'être compris, et sur un
+       téléphone il n'est pas relu.
+
+       ⚠ L'information « 5 à 30 personnes » disparaît avec elle. Elle
+         n'apparaît plus nulle part sur la page. -->
+  <!-- ═══ POURQUOI LA LISTE ARRIVAIT SANS PRÉVENIR ═══
+
+       C'était la seule section de la page sans surtitre ni titre : le lecteur
+       tombait sur dix-neuf pastilles sans savoir ce qu'elles énumèrent — des
+       clients ? des secteurs couverts ? des exemples ?
+
+       Deux corrections. Le surtitre, que toutes les autres sections ont, situe
+       la section avant qu'on la lise. Et la phrase se termine maintenant par
+       deux-points : une liste annoncée par deux-points n'a plus besoin d'être
+       expliquée, elle est attendue. -->
+  <div class="pq-texte">
+  <!-- ═══ CETTE PHRASE ÉTAIT LE MEILLEUR ARGUMENT DU SITE ═══
+
+       Elle était en corps de texte gris, dans la seule section sans titre, à
+       l'avant-dernier rang. Personne ne la lisait comme un argument : elle
+       ressemblait à une introduction pour une liste de métiers.
+
+       Elle devient le titre, et la section devient le « pourquoi » de la page.
+       Il manquait depuis le retrait de « Quand vous n'êtes pas là » : tout le
+       reste explique le mécanisme et le prix, rien ne disait ce qu'on perd
+       sans lui. -->
+  <p class="surtitre app">Ce que vous perdez</p>
+  <h2 class="app" style="--d:.04s">
+    Quand un employé s'en va, <em>son savoir-faire s'en va avec lui.</em>
+  </h2>
+  <p class="chapo app" style="--d:.08s">
+    Standix le retient, dans tous les métiers où l'on apprend en regardant
+    faire — à la main comme à l'écran :
+  </p>
+  <!-- ═══ DEUX GROUPES PLUTÔT QU'UNE LISTE ═══
+
+       Ajouter les métiers de bureau à la suite aurait porté la liste à
+       vingt-six pastilles — un mur qu'on ne lit plus, on le survole.
+
+       Séparées et intitulées, les deux listes redeviennent courtes, ET elles
+       font un travail que la liste unique ne faisait pas : elles montrent d'un
+       coup d'œil que Standix couvre deux usages. Le lecteur de bureau ne se
+       serait pas reconnu dans une liste ouverte par « Nettoyage ». -->
+  </div>
+
+  <div class="pq-listes">
+  <p class="groupe app" style="--d:.08s">Sur le terrain</p>
+  <div class="metiers app" style="--d:.10s">
+    <span class="cible">Nettoyage</span>
+    <span class="cible">Aide à domicile</span>
+    <span>Restauration</span>
+    <span>Boulangerie</span>
+    <span>Boucherie</span>
+    <span>Hôtellerie</span>
+    <span>Coiffure</span>
+    <span>Garage</span>
+    <span>Carrosserie</span>
+    <span>Paysagisme</span>
+    <span>Location de matériel</span>
+  </div>
+
+  <p class="groupe app" style="--d:.14s">Devant un écran</p>
+  <div class="metiers app" style="--d:.16s">
+    <span>Cabinet comptable</span>
+    <span>Agence immobilière</span>
+    <span>Assurance</span>
+    <span>Étude notariale</span>
+    <span>Secrétariat médical</span>
+    <span>Logistique</span>
+  </div>
+
+  </div>
+
+  <p class="note app" style="--d:.20s;margin-left:0;text-align:left">
+    Sur le terrain, on filme le geste. Au bureau, on enregistre l'écran. Dans
+    les deux cas, l'IA en fait une procédure que l'équipe ouvre sur son
+    téléphone.
+  </p>
+</section>
+
 <!-- ═══════════════════════════════════════════════════════════════════════
      SUR PLACE
      ═══════════════════════════════════════════════════════════════════════ -->
@@ -2203,79 +2287,6 @@ footer .marque{ margin-bottom:18px; }
   <p class="note app" style="--d:.22s">
     Chaque membre a son compte, créé une fois à son arrivée avec le code de
     l'entreprise. Vos procédures ne sont jamais publiques.
-  </p>
-</section>
-
-<!-- ═══ POUR QUI ═══ -->
-<section class="bloc pourqui">
-  <i class="croix g"></i><i class="croix d"></i>
-  <!-- « Cinq à trente personnes, et du mouvement » a été retiré : c'était une
-       phrase sans verbe, donc une énumération qui n'annonçait rien. Un
-       fragment de ce genre se lit deux fois avant d'être compris, et sur un
-       téléphone il n'est pas relu.
-
-       ⚠ L'information « 5 à 30 personnes » disparaît avec elle. Elle
-         n'apparaît plus nulle part sur la page. -->
-  <!-- ═══ POURQUOI LA LISTE ARRIVAIT SANS PRÉVENIR ═══
-
-       C'était la seule section de la page sans surtitre ni titre : le lecteur
-       tombait sur dix-neuf pastilles sans savoir ce qu'elles énumèrent — des
-       clients ? des secteurs couverts ? des exemples ?
-
-       Deux corrections. Le surtitre, que toutes les autres sections ont, situe
-       la section avant qu'on la lise. Et la phrase se termine maintenant par
-       deux-points : une liste annoncée par deux-points n'a plus besoin d'être
-       expliquée, elle est attendue. -->
-  <div class="pq-texte">
-  <p class="surtitre app">Pour qui</p>
-  <p class="app" style="--d:.04s">
-    Quand quelqu'un s'en va, son savoir-faire s'en va avec lui. Standix le
-    retient, dans tous les métiers où l'on apprend en regardant faire —
-    à la main comme à l'écran :
-  </p>
-  <!-- ═══ DEUX GROUPES PLUTÔT QU'UNE LISTE ═══
-
-       Ajouter les métiers de bureau à la suite aurait porté la liste à
-       vingt-six pastilles — un mur qu'on ne lit plus, on le survole.
-
-       Séparées et intitulées, les deux listes redeviennent courtes, ET elles
-       font un travail que la liste unique ne faisait pas : elles montrent d'un
-       coup d'œil que Standix couvre deux usages. Le lecteur de bureau ne se
-       serait pas reconnu dans une liste ouverte par « Nettoyage ». -->
-  </div>
-
-  <div class="pq-listes">
-  <p class="groupe app" style="--d:.08s">Sur le terrain</p>
-  <div class="metiers app" style="--d:.10s">
-    <span class="cible">Nettoyage</span>
-    <span class="cible">Aide à domicile</span>
-    <span>Restauration</span>
-    <span>Boulangerie</span>
-    <span>Boucherie</span>
-    <span>Hôtellerie</span>
-    <span>Coiffure</span>
-    <span>Garage</span>
-    <span>Carrosserie</span>
-    <span>Paysagisme</span>
-    <span>Location de matériel</span>
-  </div>
-
-  <p class="groupe app" style="--d:.14s">Devant un écran</p>
-  <div class="metiers app" style="--d:.16s">
-    <span>Cabinet comptable</span>
-    <span>Agence immobilière</span>
-    <span>Assurance</span>
-    <span>Étude notariale</span>
-    <span>Secrétariat médical</span>
-    <span>Logistique</span>
-  </div>
-
-  </div>
-
-  <p class="note app" style="--d:.20s;margin-left:0;text-align:left">
-    Sur le terrain, on filme le geste. Au bureau, on enregistre l'écran. Dans
-    les deux cas, l'IA en fait une procédure que l'équipe ouvre sur son
-    téléphone.
   </p>
 </section>
 

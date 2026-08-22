@@ -288,28 +288,34 @@ header{
      il lui faut son air. */
   height:var(--barre); padding:0 var(--gouttiere);
   display:flex; align-items:center; justify-content:space-between;
-  background:rgba(8,9,10,0); border-bottom:.5px solid transparent;
-  transition:background .3s ease, backdrop-filter .3s ease, border-color .3s ease;
-}
-/* ═══ LE VERRE DE LA BARRE ═══
+  /* ═══ LE VERRE EST LÀ DÈS L'ARRIVÉE ═══
 
-   Le fond passe de 74 % à 42 % d'opacité : à 74, la barre était un bandeau
-   noir et le flou ne servait à rien — il n'y avait rien à voir au travers.
+     La barre était transparente au chargement et ne prenait sa matière qu'au
+     premier défilement. Deux barres différentes pour la même page : celle
+     qu'on voit en arrivant n'était pas celle qu'on garde ensuite.
 
-   `saturate(180%)` est ce qui fait la différence entre un flou et du verre.
-   Un flou seul délave les couleurs qui passent dessous ; la saturation les
-   ravive, exactement comme une vitre épaisse. C'est le réglage d'Apple, et
-   c'est celui qu'on oublie toujours.
-
-   Le flou monte à 26 px pour compenser la transparence : moins le fond est
-   opaque, plus il faut brouiller, sinon le texte qui défile derrière reste
-   lisible et la barre devient sale. */
-header.pose{
+     Le filet du bas est supprimé plutôt que rendu permanent : la grille trace
+     déjà une horizontale à exactement `--barre`, c'est-à-dire au pixel près
+     sous la barre. Les deux se seraient superposées en un trait deux fois
+     plus dense que tous les autres de la page. */
   background:rgba(8,9,10,.42);
   backdrop-filter:blur(26px) saturate(180%);
   -webkit-backdrop-filter:blur(26px) saturate(180%);
-  border-bottom-color:rgba(255,255,255,.07);
 }
+/* ═══ LE VERRE ═══
+
+   42 % d'opacité et non 74 : à 74, la barre serait un bandeau noir et le flou
+   ne servirait à rien — il n'y aurait rien à voir au travers.
+
+   `saturate(180%)` fait la différence entre un flou et du verre. Un flou seul
+   délave les couleurs qui passent dessous ; la saturation les ravive, comme
+   une vitre épaisse. C'est le réglage qu'on oublie toujours.
+
+   Le flou est à 26 px pour compenser la transparence : moins le fond est
+   opaque, plus il faut brouiller, sinon le texte qui défile derrière reste
+   lisible et la barre paraît sale.
+
+   La barre basse emploie exactement les trois mêmes valeurs. */
 /* Le ruban passe de 20 à 26 px, et l'écart de 9 à 5. À 20 px le volume du
    rendu 3D était perdu ; à 26 il commence à exister. Et un logo posé trop loin
    de son nom se lit comme deux objets — collés, ils font une signature. */
@@ -1172,9 +1178,25 @@ h2 em{ font-style:normal; color:var(--t1); }
              0 0 0 1px rgba(255,255,255,.14);
 }
 .feuille img{ display:block; width:100%; height:auto; }
-.legende-objets{
-  margin-top:20px; text-align:center;
-  font-size:12.5px; color:var(--t3);
+/* Les deux explications, une par objet. Alignées à GAUCHE alors que toute la
+   section est centrée : ce sont deux paragraphes de trois lignes, et un
+   paragraphe centré se relit à chaque ligne pour retrouver son début.
+   Le bloc, lui, reste centré dans la section. */
+.explique{
+  margin:26px auto 0; max-width:44ch; text-align:left;
+}
+.explique p{
+  font-size:13.5px; line-height:1.6; color:var(--t2);
+  padding-left:16px; position:relative;
+}
+.explique p + p{ margin-top:16px }
+.explique b{ color:var(--t1); font-weight:500 }
+/* Un point devant chaque objet : sans lui, les deux paragraphes se lisent
+   comme un seul texte coupé en deux. */
+.explique p::before{
+  content:''; position:absolute; left:0; top:9px;
+  width:5px; height:5px; border-radius:50%;
+  background:rgba(255,255,255,.34);
 }
 
 .sticker{
@@ -2161,13 +2183,20 @@ footer .marque{ margin-bottom:18px; }
        veut précisément l'entendre. Ce qui était présenté comme une absence de
        friction devient une garantie. -->
   <p class="surtitre app">Sur place</p>
+  <!-- ═══ CHAQUE OBJET A SON EXPLICATION ═══
+
+       L'ancien texte — « Là où le geste se fait. À l'écran ou sur papier. » —
+       posait bien deux objets, mais n'expliquait ni l'un ni l'autre : d'où
+       vient le code, ce qui se passe quand on le scanne, à quoi sert la
+       feuille. Le lecteur voyait deux images et devait deviner.
+
+       Le titre annonce maintenant les deux objets, et chacun reçoit sa propre
+       phrase sous les images : ce que c'est, d'où ça vient, ce qu'on en fait. -->
   <h2 class="app" style="--d:.05s;margin-inline:auto">
-    Là où le geste se fait. <em>À l'écran ou sur papier.</em>
+    Chaque procédure a son QR code. <em>Et sa version papier.</em>
   </h2>
   <p class="chapo app" style="--d:.09s;margin-inline:auto;margin-bottom:34px">
-    On scanne le code, la bonne procédure s'ouvre — pas de liste à parcourir,
-    pas de nom à retenir. Et quand il faut du papier, chaque procédure
-    s'exporte en PDF.
+    Deux façons d'ouvrir la bonne procédure sans chercher dans une liste.
   </p>
 
   <!-- ═══ DEUX OBJETS, PAS UN ═══
@@ -2194,9 +2223,15 @@ footer .marque{ margin-bottom:18px; }
            width="1068" height="1134">
     </div>
   </div>
-  <p class="legende-objets app" style="--d:.16s">
-    Le code à afficher au poste · la fiche à imprimer
-  </p>
+  <div class="explique app" style="--d:.16s">
+    <p><b>Le QR code.</b> L'app en génère un pour chaque procédure. Vous
+       l'imprimez et le collez sur la machine, le bidon ou la porte du local.
+       L'employé le scanne avec son téléphone : la vidéo et les étapes
+       s'ouvrent aussitôt.</p>
+    <p><b>Le PDF.</b> La même procédure, exportée en un clic. À afficher au mur
+       du local, à ranger dans un classeur, ou à transmettre le jour où
+       quelqu'un demande comment vous formez vos équipes.</p>
+  </div>
 
   <div class="endroits app" style="--d:.18s">
     <span>Sur le bidon</span>
@@ -2532,11 +2567,12 @@ footer .marque{ margin-bottom:18px; }
     bb.classList.toggle('la', passe && libre)
   }
 
-  const barre = document.getElementById('barre')
+  /* La barre du haut n'a plus rien à changer au défilement : son verre est
+     permanent. Il ne reste que la barre basse à surveiller, et un seul
+     écouteur pour toute la page. */
   let attend = false
   const maj = () => {
     attend = false
-    barre.classList.toggle('pose', scrollY > 10)
     majBas()
   }
   addEventListener('scroll', () => { if (attend) return; attend = true

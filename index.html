@@ -376,7 +376,7 @@ header{
    `display:contents` les efface de la mise en page, leurs enfants se
    comportent exactement comme avant. Elles ne redeviennent des boîtes qu'à
    partir de 1 100 px. */
-.premier, .colonne-app, .pq-texte, .pq-listes, .pv-texte, .pv-demo{ display:contents }
+.premier, .colonne-app, .pv-texte, .pv-demo{ display:contents }
 
 .hero{
   position:relative; z-index:2;
@@ -890,76 +890,6 @@ h2 em{ font-style:normal; color:var(--t1); }
 .objection p{ font-size:13.5px; line-height:1.6; color:var(--t2); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   CE QUE ÇA CHANGE — TROIS LIGNES
-
-   Ces trois avantages existaient dans la section supprimée. Ce n'étaient pas
-   eux le problème, c'était son exemple : ils reviennent seuls.
-
-   En lignes réglées et non en cartes : la page en compte déjà beaucoup, et
-   trois cartes de plus alourdiraient là où l'on cherche à alléger. Une liste
-   réglée se parcourt d'un regard — c'est exactement la respiration qui
-   manquait entre « La preuve » et « Sur place », les deux blocs les plus
-   denses de la page.
-
-   Pas de titre : un surtitre suffit. Une liste titrée par un surtitre se lit
-   comme une liste ; c'est un PARAGRAPHE sans titre qui se lit comme du texte
-   égaré, et c'était le défaut de l'ancienne section « Pour qui ».
-   ═══════════════════════════════════════════════════════════════════════════ */
-.suites{ list-style:none; }
-.suites li{
-  position:relative; padding:13px 0 13px 22px;
-  font-size:14.5px; line-height:1.5; color:var(--t2);
-  border-top:.5px solid var(--bord);
-}
-.suites li:last-child{ border-bottom:.5px solid var(--bord); }
-.suites li b{ color:var(--t1); font-weight:500; }
-.suites li::before{
-  content:''; position:absolute; left:3px; top:22px;
-  width:5px; height:5px; border-radius:50%; background:var(--t2);
-}
-
-/* ═══ POUR QUI ═══
-   Un bandeau court, sans titre : deux secondes pour que le lecteur se
-   reconnaisse. Placé APRÈS le cas — plus haut, une liste de métiers n'aurait
-   fait qu'exclure des gens qui n'avaient pas encore compris le produit. */
-/* La section était un bandeau compact sans titre, d'où son retrait réduit.
-   Devenue une section à part entière, elle reprend le rythme des autres. */
-.pourqui{ padding-bottom:58px; }
-/* Retrait réduit : cette section est une respiration entre deux blocs denses,
-   pas un chapitre. Au rythme des autres, elle pèserait autant qu'elles. */
-.atouts{ padding-top:52px; padding-bottom:60px; }
-.atouts .surtitre{ margin-bottom:20px; }
-.pourqui .chapo{ max-width:34ch; }
-/* L'intitulé de groupe. Volontairement discret : il sert à séparer, pas à
-   annoncer. Un vrai titre à cet endroit ferait croire à deux sections. */
-.groupe{
-  margin:22px 0 10px;
-  font-size:11.5px; font-weight:500; letter-spacing:.07em;
-  text-transform:uppercase; color:var(--t3);
-}
-.groupe:first-of-type{ margin-top:20px }
-.metiers{ display:flex; flex-wrap:wrap; gap:7px; }
-.metiers span{
-  padding:7px 12px; border-radius:100px;
-  font-size:12.5px; font-weight:500; color:var(--t2);
-  background:rgba(255,255,255,.035);
-  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.09);
-}
-/* ═══ LA HIÉRARCHIE SANS DÉPENSER LE BLANC ═══
-
-   Les deux métiers visés d'abord étaient en blanc plein. C'était une faute :
-   sur ce site le blanc plein veut dire « ceci se clique », et ces pastilles ne
-   se cliquent pas. L'œil y allait, rien ne s'y passait — la même erreur que le
-   mot coloré au milieu d'un titre.
-
-   La hiérarchie passe donc par le texte et le contour, pas par le fond. */
-.metiers span.cible{
-  color:var(--t1);
-  background:rgba(255,255,255,.06);
-  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.26);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
    LE PRIX — QUATRIÈME SECTION
 
    ═══ CE QU'ON VEND ICI N'EST PAS UN TARIF ═══
@@ -1165,79 +1095,59 @@ h2 em{ font-style:normal; color:var(--t1); }
    C'est le seul objet PHYSIQUE du site. Il doit ressembler à un autocollant
    posé sur une machine, pas à un élément d'interface.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* Les deux objets sont alignés par le BAS : posés sur une même surface, comme
-   sur un plan de travail. Alignés par le haut, ils auraient flotté. */
-.objets{
-  display:flex; align-items:flex-end; justify-content:center;
-  gap:16px;
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX OBJETS
+
+   Chacun avec son texte dessous, et non les deux images d'un côté puis les
+   deux textes de l'autre : appariés, ils se lisent sans effort de rattachement.
+
+   Côte à côte dès 560 px. En dessous, ils s'empilent — deux colonnes de 150 px
+   ne laissent pas la place d'une phrase lisible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.paire{ display:grid; gap:34px; }
+@media (min-width: 560px){
+  .paire{ grid-template-columns:1fr 1fr; gap:28px; align-items:stretch }
 }
+/* ═══ LES DEUX LÉGENDES S'ALIGNENT ═══
+
+   L'autocollant est plus court que la feuille : posés en haut de leur colonne,
+   leurs légendes tombaient à 27 px l'une de l'autre.
+
+   Chaque objet devient une grille de deux rangées, et les deux colonnes
+   s'étirent à la même hauteur. La rangée de l'image absorbe la différence,
+   les images se posent sur son bas — comme sur une étagère — et les légendes
+   se retrouvent sur la même ligne. Aucune hauteur n'est codée en dur : ça
+   tient quelles que soient les proportions des deux fichiers. */
+.objet{
+  display:grid; grid-template-rows:1fr auto; gap:16px;
+  justify-items:start;
+}
+.objet .sticker, .objet .feuille{ align-self:end }
+.objet figcaption{
+  font-size:13.5px; line-height:1.6; color:var(--t2);
+}
+.objet figcaption b{ color:var(--t1); font-weight:500 }
+
+/* Les deux surfaces claires de la page. Le carré du code est blanc par
+   nécessité — un QR inversé fait échouer une partie des lecteurs — et la
+   feuille l'est parce que c'est du papier. */
+.sticker{
+  width:min(168px, 46%);
+}
+.sticker img{ display:block; width:100%; height:auto }
 .feuille{
-  width:min(190px, 44vw);
-  border-radius:6px; overflow:hidden;
-  background:#F7F8F8;
+  width:min(190px, 52%);
+  border-radius:6px; overflow:hidden; background:#F7F8F8;
   box-shadow:0 22px 46px rgba(0,0,0,.58),
              0 0 0 1px rgba(255,255,255,.14);
 }
-.feuille img{ display:block; width:100%; height:auto; }
-/* Les deux explications, une par objet. Alignées à GAUCHE alors que toute la
-   section est centrée : ce sont deux paragraphes de trois lignes, et un
-   paragraphe centré se relit à chaque ligne pour retrouver son début.
-   Le bloc, lui, reste centré dans la section. */
-.explique{
-  margin:26px auto 0; max-width:44ch; text-align:left;
-}
-.explique p{
-  font-size:13.5px; line-height:1.6; color:var(--t2);
-  padding-left:16px; position:relative;
-}
-.explique p + p{ margin-top:16px }
-.explique b{ color:var(--t1); font-weight:500 }
-/* Un point devant chaque objet : sans lui, les deux paragraphes se lisent
-   comme un seul texte coupé en deux. */
-.explique p::before{
-  content:''; position:absolute; left:0; top:9px;
-  width:5px; height:5px; border-radius:50%;
-  background:rgba(255,255,255,.34);
-}
+.feuille img{ display:block; width:100%; height:auto }
 
-.sticker{
-  /* ═══ L'ENVELOPPE EST VIDÉE ═══
-
-     L'image est maintenant l'autocollant COMPLET : la carte blanche, ses coins
-     arrondis, son ombre, le titre, le sous-titre, le filet et le logo. Le
-     cadre que le CSS dessinait autour faisait donc une carte blanche dans une
-     carte blanche, avec « Machine à café » écrit deux fois.
-
-     Il ne reste que la largeur. Pas de fond — les coins du PNG sont
-     transparents, un fond blanc aurait débordé en angles droits sur le noir de
-     la page. Pas d'ombre non plus : elle est dans l'image. */
-  width:min(152px, 37vw); margin:0;
-}
-.sticker img{ display:block; width:100%; height:auto; }
-/* Les endroits où on le colle. En liste courte plutôt qu'en phrase : c'est un
-   inventaire, et un inventaire se scanne des yeux. */
-.endroits{
-  display:flex; flex-wrap:wrap; justify-content:center; gap:7px;
-  margin-top:26px;
-}
-/* La phrase précédente disait « une manipulation se capture à l'écran, l'IA
-   les découpe de la même façon, et l'équipe les lit au même endroit ». Trois
-   abstractions : « manipulation » ne désigne rien, « de la même façon » ne dit
-   pas quoi, et « au même endroit » ne dit pas où. Deux situations nommées et
-   un seul résultat se comprennent sans relire.
-
-   La note de vérité. Elle est en --t3, en dessous, et volontairement discrète
-   — mais elle est là. Une garantie qu'on énonce à voix basse est plus crédible
-   qu'un argument qu'on met en gras. */
+/* La note de vérité, en retrait et discrète : une garantie énoncée à voix
+   basse est plus crédible qu'un argument mis en gras. */
 .note{
-  margin:26px auto 0; max-width:36ch;
+  margin:30px 0 0; max-width:44ch;
   font-size:12.5px; line-height:1.6; color:var(--t3);
-}
-.endroits span{
-  padding:6px 12px; border-radius:100px;
-  font-size:12.5px; color:var(--t2);
-  background:rgba(255,255,255,.035);
-  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.09);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1812,27 +1722,6 @@ footer .marque{ margin-bottom:18px; }
   .pv-texte .chapo{ max-width:none }
   .source, .descente, .etapes{ max-width:none }
   .etapes p{ max-width:52ch }
-  /* ═══ « POUR QUI » EN DEUX COLONNES ═══
-
-     Première tentative faite avec les pseudo-classes de position : elles
-     comptent les BALISES, pas les classes. Les intitulés de groupe étant des
-     <p> comme le surtitre, tous se sont retrouvés dans la même case, empilés
-     les uns sur les autres.
-
-     Deux enveloppes explicites, comme pour le premier écran. Sur téléphone
-     elles sont en `display:contents` : elles n'existent pas, et l'ordre de
-     lecture reste exactement celui d'avant — texte, listes, puis la note. */
-  .pourqui{
-    display:grid; grid-template-columns:1fr 1fr; column-gap:64px;
-    align-items:start;
-  }
-  .pq-texte{ display:block; grid-column:1; grid-row:1 }
-  .pq-listes{ display:block; grid-column:2; grid-row:1 }
-  .pourqui > .note{ grid-column:1; grid-row:2; margin-top:24px; max-width:44ch }
-  .pq-texte p{ font-size:16.5px; max-width:none }
-  .pq-listes .groupe:first-child{ margin-top:0 }
-  .metiers{ max-width:none }
-
   /* Le prix se centre : c'est un objet, pas un paragraphe. Une carte alignée à
      gauche dans un cadre de 1 080 px paraît posée de travers. */
   .tarifs > *{ margin-left:auto; margin-right:auto }
@@ -1855,10 +1744,6 @@ footer .marque{ margin-bottom:18px; }
   .autres-cartes .tarif{ max-width:none }
   .risques{ max-width:460px; justify-content:center }
 
-  .surplace .sticker{ width:168px }
-  .surplace .feuille{ width:216px }
-  .surplace .objets{ gap:22px }
-  .note{ max-width:46ch }
 
   .fin h2{ font-size:46px; max-width:18ch }
   .amorce{ font-size:16px; max-width:34ch }
@@ -1904,7 +1789,6 @@ footer .marque{ margin-bottom:18px; }
   .plus:hover{ background:rgba(255,255,255,.07); color:var(--t1) }
   .f-liens a:hover{ color:var(--t1) }
   .points i{ cursor:pointer }
-  .metiers span, .endroits span{ transition:background .2s ease }
 }
 
 /* ═══ TRÈS GRAND ÉCRAN ═══
@@ -2163,185 +2047,47 @@ footer .marque{ margin-bottom:18px; }
   </div>
 </section>
 
-<!-- ═══ CE QUE ÇA CHANGE ═══ -->
-<section class="bloc atouts">
-  <i class="croix g"></i><i class="croix d"></i>
-  <p class="surtitre app">Ce que ça change</p>
-  <ul class="suites">
-    <li class="app" style="--d:.05s">
-      <b>Le même geste partout.</b> Plus la version de celui qui a formé.
-    </li>
-    <li class="app" style="--d:.09s">
-      <b>Une formation qui ne se refait pas.</b> Une fois, pas à chaque arrivée.
-    </li>
-    <li class="app" style="--d:.13s">
-      <b>Une trace.</b> Qui a lu quoi, et quand. Utile le jour où ça se discute.
-    </li>
-  </ul>
-</section>
-
 <!-- ═══════════════════════════════════════════════════════════════════════
      SUR PLACE
      ═══════════════════════════════════════════════════════════════════════ -->
-<section class="bloc surplace" style="text-align:center">
+<section class="bloc surplace">
   <i class="croix g"></i><i class="croix d"></i>
-  <!-- ═══ DEUX CORRECTIONS ═══
+  <!-- ═══ CHAQUE TEXTE SOUS SON OBJET ═══
 
-       « Sur la machine » ne parle pas à la cible de départ : dans le nettoyage
-       et les services à domicile, il n'y a pas de machine. « Là où le geste se
-       fait » couvre le bidon, le chariot, la porte du local et le four du
-       boulanger, sans en exclure aucun.
+       La version précédente posait les deux images ensemble, puis les deux
+       explications ensemble. Le lecteur voyait un autocollant et une feuille,
+       lisait deux paragraphes, et devait rattacher chacun au bon objet.
 
-       « Pas de compte à créer » était FAUX : chaque membre a un compte, créé
-       avec le code de l'entreprise. Une promesse fausse sur la page d'accueil
-       se retourne à la première conversation avec un prospect.
-
-       Et ce n'est pas une perte : le compte signifie que les procédures ne
-       sont pas publiques. Un patron qui confie son savoir-faire à un outil
-       veut précisément l'entendre. Ce qui était présenté comme une absence de
-       friction devient une garantie. -->
+       Appariés, ils se lisent sans effort. Et la section n'a plus besoin ni de
+       chapô — le titre suffit — ni des quatre pastilles d'emplacements, dont
+       le texte du code dit déjà l'essentiel. De 90 mots à 52. -->
   <p class="surtitre app">Sur place</p>
-  <!-- ═══ CHAQUE OBJET A SON EXPLICATION ═══
-
-       L'ancien texte — « Là où le geste se fait. À l'écran ou sur papier. » —
-       posait bien deux objets, mais n'expliquait ni l'un ni l'autre : d'où
-       vient le code, ce qui se passe quand on le scanne, à quoi sert la
-       feuille. Le lecteur voyait deux images et devait deviner.
-
-       Le titre annonce maintenant les deux objets, et chacun reçoit sa propre
-       phrase sous les images : ce que c'est, d'où ça vient, ce qu'on en fait. -->
-  <h2 class="app" style="--d:.05s;margin-inline:auto">
+  <h2 class="app" style="--d:.05s">
     Chaque procédure a son QR code. <em>Et sa version papier.</em>
   </h2>
-  <p class="chapo app" style="--d:.09s;margin-inline:auto;margin-bottom:34px">
-    Deux façons d'ouvrir la bonne procédure sans chercher dans une liste.
-  </p>
 
-  <!-- ═══ DEUX OBJETS, PAS UN ═══
+  <div class="paire">
+    <figure class="objet app" style="--d:.11s">
+      <div class="sticker">
+        <img src="site-qr.png" width="900" height="927"
+             alt="L'autocollant d'une procédure Standix : le QR code et son titre">
+      </div>
+      <figcaption><b>Le QR code.</b> Collé sur la machine ou le bidon, il ouvre
+        la vidéo et les étapes en un scan.</figcaption>
+    </figure>
 
-       L'autocollant seul racontait l'accès. La feuille à côté raconte l'autre
-       moitié : le contrôle, l'affichage au mur, le classeur du responsable
-       qualité. Ce sont les deux seules surfaces claires de la page, et c'est
-       voulu — ce sont aussi les deux seuls objets PHYSIQUES du produit.
-
-       La feuille est plus grande que l'autocollant, dans le rapport où on les
-       trouve dans la réalité. Deux objets de même taille se seraient lus comme
-       deux boutons. -->
-  <div class="objets app" style="--d:.13s">
-    <div class="sticker">
-      <!-- Nom volontairement NEUF, et non « qr-standix.png » remis à jour : GitHub
-           Pages et le cache du navigateur conservent longtemps un fichier au
-           même nom, et l'ancienne image continuait de s'afficher. Un nom neuf
-           force le rechargement, sans avoir à vider quoi que ce soit. -->
-      <img src="site-qr.png" width="900" height="927"
-           alt="L'autocollant d'une procédure Standix : le QR code, le titre « Machine à café » et l'invitation à scanner">
-    </div>
-    <div class="feuille">
-      <img src="pdf-standix.png" alt="La même procédure exportée en PDF"
-           width="1068" height="1134">
-    </div>
-  </div>
-  <div class="explique app" style="--d:.16s">
-    <p><b>Le QR code.</b> L'app en génère un par procédure. Collé sur la
-       machine ou le bidon, il ouvre la vidéo et les étapes en un scan.</p>
-    <p><b>Le PDF.</b> La même procédure imprimable, à afficher au mur ou à
-       joindre à un dossier.</p>
+    <figure class="objet app" style="--d:.16s">
+      <div class="feuille">
+        <img src="pdf-standix.png" alt="La même procédure exportée en PDF"
+             width="1068" height="1134">
+      </div>
+      <figcaption><b>Le PDF.</b> La même procédure imprimable, à afficher au mur
+        ou à joindre à un dossier.</figcaption>
+    </figure>
   </div>
 
-  <div class="endroits app" style="--d:.18s">
-    <span>Sur le bidon</span>
-    <span>Sur le chariot</span>
-    <span>Au dos de la porte</span>
-    <span>Dans le camion</span>
-  </div>
-
-  <p class="note app" style="--d:.22s">
+  <p class="note app" style="--d:.20s">
     Chaque membre a son compte. Vos procédures ne sont jamais publiques.
-  </p>
-</section>
-
-<!-- ═══ POUR QUI ═══ -->
-<section class="bloc pourqui">
-  <i class="croix g"></i><i class="croix d"></i>
-  <!-- « Cinq à trente personnes, et du mouvement » a été retiré : c'était une
-       phrase sans verbe, donc une énumération qui n'annonçait rien. Un
-       fragment de ce genre se lit deux fois avant d'être compris, et sur un
-       téléphone il n'est pas relu.
-
-       ⚠ L'information « 5 à 30 personnes » disparaît avec elle. Elle
-         n'apparaît plus nulle part sur la page. -->
-  <!-- ═══ POURQUOI LA LISTE ARRIVAIT SANS PRÉVENIR ═══
-
-       C'était la seule section de la page sans surtitre ni titre : le lecteur
-       tombait sur dix-neuf pastilles sans savoir ce qu'elles énumèrent — des
-       clients ? des secteurs couverts ? des exemples ?
-
-       Deux corrections. Le surtitre, que toutes les autres sections ont, situe
-       la section avant qu'on la lise. Et la phrase se termine maintenant par
-       deux-points : une liste annoncée par deux-points n'a plus besoin d'être
-       expliquée, elle est attendue. -->
-  <div class="pq-texte">
-  <!-- ═══ CETTE PHRASE ÉTAIT LE MEILLEUR ARGUMENT DU SITE ═══
-
-       Elle était en corps de texte gris, dans la seule section sans titre, à
-       l'avant-dernier rang. Personne ne la lisait comme un argument : elle
-       ressemblait à une introduction pour une liste de métiers.
-
-       Elle devient le titre, et la section devient le « pourquoi » de la page.
-       Il manquait depuis le retrait de « Quand vous n'êtes pas là » : tout le
-       reste explique le mécanisme et le prix, rien ne disait ce qu'on perd
-       sans lui. -->
-  <!-- L'argumentation du manque a été retirée : ce site s'adresse à quelqu'un
-       qui arrive par bouche-à-oreille, donc convaincu du problème par un
-       confrère. Le titre nomme maintenant l'audience au lieu de la persuader,
-       et il introduit les listes. Soixante mots de moins. -->
-  <p class="surtitre app">Pour qui</p>
-  <h2 class="app" style="--d:.04s">
-    Les métiers où l'on apprend <em>en regardant faire.</em>
-  </h2>
-  <!-- ═══ DEUX GROUPES PLUTÔT QU'UNE LISTE ═══
-
-       Ajouter les métiers de bureau à la suite aurait porté la liste à
-       vingt-six pastilles — un mur qu'on ne lit plus, on le survole.
-
-       Séparées et intitulées, les deux listes redeviennent courtes, ET elles
-       font un travail que la liste unique ne faisait pas : elles montrent d'un
-       coup d'œil que Standix couvre deux usages. Le lecteur de bureau ne se
-       serait pas reconnu dans une liste ouverte par « Nettoyage ». -->
-  </div>
-
-  <div class="pq-listes">
-  <p class="groupe app" style="--d:.08s">Sur le terrain</p>
-  <div class="metiers app" style="--d:.10s">
-    <span class="cible">Nettoyage</span>
-    <span class="cible">Aide à domicile</span>
-    <span>Restauration</span>
-    <span>Boulangerie</span>
-    <span>Boucherie</span>
-    <span>Hôtellerie</span>
-    <span>Coiffure</span>
-    <span>Garage</span>
-    <span>Carrosserie</span>
-    <span>Paysagisme</span>
-    <span>Location de matériel</span>
-  </div>
-
-  <p class="groupe app" style="--d:.14s">Devant un écran</p>
-  <div class="metiers app" style="--d:.16s">
-    <span>Cabinet comptable</span>
-    <span>Agence immobilière</span>
-    <span>Assurance</span>
-    <span>Étude notariale</span>
-    <span>Secrétariat médical</span>
-    <span>Logistique</span>
-  </div>
-
-  </div>
-
-  <p class="note app" style="--d:.20s;margin-left:0;text-align:left">
-    Sur le terrain, on filme le geste. Au bureau, on enregistre l'écran. Dans
-    les deux cas, l'IA en fait une procédure que l'équipe ouvre sur son
-    téléphone.
   </p>
 </section>
 

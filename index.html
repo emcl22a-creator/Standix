@@ -747,12 +747,17 @@ h2 em{ font-style:normal; color:var(--t1); }
    deux-points paraît décentré à cette échelle.
    ═══════════════════════════════════════════════════════════════════════════ */
 h2.chiffres{
-  display:flex; flex-direction:column; gap:14px;
+  display:flex; flex-direction:column; gap:11px;
   max-width:none; margin-bottom:26px;
 }
 .chiffres .n{ display:flex; align-items:baseline; gap:14px; }
 .chiffres b{
-  font-size:clamp(46px,13vw,64px); font-weight:500; line-height:.9;
+  /* 64 → 46 px, et le plancher de 46 à 34. Le chiffre doit dominer son
+     libellé, pas le titre de la page : à 64 il pesait plus lourd que « Chaque
+     procédure a son QR code » deux sections plus bas, et la hiérarchie
+     s'inversait. Il reste trois fois le corps du libellé, ce qui suffit
+     largement à en faire le point haut de la section. */
+  font-size:clamp(34px,9vw,46px); font-weight:500; line-height:.95;
   letter-spacing:-.05em; color:var(--t1);
   font-variant-numeric:tabular-nums;
 }
@@ -1816,10 +1821,10 @@ footer .marque{ margin-bottom:18px; }
     grid-column:1; grid-row:2; margin-top:30px; max-width:none;
   }
   .pv-texte h2{ max-width:14ch }
-  .chiffres b{ font-size:88px }
+  .chiffres b{ font-size:62px }
   .chiffres i{ font-size:16px }
   .chiffres .n{ gap:20px }
-  h2.chiffres{ gap:18px; margin-bottom:30px }
+  h2.chiffres{ gap:14px; margin-bottom:30px }
   .pv-texte .chapo{ max-width:none }
   .source, .descente, .etapes{ max-width:none }
   .etapes p{ max-width:52ch }

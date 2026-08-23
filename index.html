@@ -657,8 +657,22 @@ h1 em{ font-style:normal; color:var(--t1); }
 .vue.on{ opacity:1; transform:none; filter:blur(0); pointer-events:auto; }
 .vue img{ width:100%; height:100%; object-fit:cover; object-position:top; }
 
-/* Le bloc d'emplacement gris a été supprimé : les deux vues de la galerie
-   sont maintenant de vraies captures, il n'y a plus rien à faire patienter. */
+/* ═══ L'EMPLACEMENT ═══
+   Provisoire, le temps que la capture de l'écran Analyse arrive. Il est
+   volontairement inerte et terne : rien ne doit laisser croire qu'on regarde
+   le produit. */
+.attente{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:12px; padding:0 30px; text-align:center;
+  background:rgba(255,255,255,.022);
+}
+.attente svg{
+  width:34px; height:34px; stroke:var(--t3); fill:none;
+  stroke-width:1.4; stroke-linecap:round; stroke-linejoin:round; opacity:.6;
+}
+.attente b{ font-size:13.5px; font-weight:500; color:var(--t2) }
+.attente span{ font-size:12px; line-height:1.5; color:var(--t3); max-width:26ch }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PREUVE — DEUXIÈME SECTION
@@ -1672,6 +1686,10 @@ footer .marque{ margin-bottom:18px; }
     box-shadow:0 0 110px 40px rgba(var(--halo),.24);
   }
   .capture .vue img{ height:auto }
+  /* La composition en profondeur de l'ordinateur n'a que deux places. La
+     troisième vue y est masquée tant qu'elle est un emplacement — un rectangle
+     vide en premier plan serait pire que pas de troisième écran du tout. */
+  .capture .vue:nth-of-type(3){ display:none }
   /* Sur un écran de 1 440 px presque entièrement noir, la capture est le seul
      objet lumineux : le halo doit porter plus loin qu'au téléphone, sinon
      l'image paraît posée sur le vide au lieu d'en émerger. */
@@ -1872,7 +1890,7 @@ footer .marque{ margin-bottom:18px; }
 <div class="onglets flou r4">
   <p class="nom" id="nom">Toutes vos procédures</p>
   <div class="points" id="points" aria-hidden="true">
-    <i class="on"></i><i></i>
+    <i class="on"></i><i></i><i></i>
   </div>
   <i class="croix g"></i><i class="croix d"></i>
 </div>
@@ -1902,6 +1920,19 @@ footer .marque{ margin-bottom:18px; }
       <img src="app-procedure.webp"
            alt="Une procédure Standix ouverte, avec sa vidéo et ses étapes"
            width="1206" height="2126">
+    </div>
+
+    <!-- ⚠ EMPLACEMENT — NE PAS METTRE EN LIGNE EN L'ÉTAT.
+         En attente de la capture de l'écran Analyse. Remplacer tout le bloc
+         .attente par <img src="app-analyse.webp" width="1206" height="…">,
+         et retirer la règle qui masque cette vue sur ordinateur. -->
+    <div class="vue" data-nom="Qui a lu, et quand">
+      <div class="attente">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/>
+          <circle cx="8.5" cy="8.5" r="1.4"/><path d="M21 15l-5-5L5 21"/></svg>
+        <b>Capture à venir</b>
+        <span>L'écran Analyse : le suivi des lectures par membre.</span>
+      </div>
     </div>
 
   </div>

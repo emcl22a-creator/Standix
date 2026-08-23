@@ -691,7 +691,9 @@ h1 em{ font-style:normal; color:var(--t1); }
 
    Cette section ne vend rien. Elle montre un résultat brut.
    ═══════════════════════════════════════════════════════════════════════════ */
+body{ counter-reset:sec }
 section.bloc{
+  counter-increment:sec;
   position:relative; z-index:2;
   max-width:var(--large); margin:0 auto;
   padding:64px var(--gouttiere) 78px;
@@ -704,9 +706,28 @@ section.bloc::before{
   left:-40px; right:-40px; top:0; height:1px;
   background:var(--filet);
 }
+/* ═══ ① LES SECTIONS SONT NUMÉROTÉES ═══
+
+   Le remède littéral à « les sections ne se suivent pas » : rien ne disait
+   qu'elles formaient une suite. Un 01, 02, 03 le dit sans un mot.
+
+   `inline-flex` et non `flex` : le surtitre reste un élément en ligne, donc le
+   `text-align:center` de la section tarifaire continue de le centrer. En
+   `flex`, il occuperait toute la largeur et l'alignement serait perdu.
+
+   La clôture n'a pas de surtitre : le compteur s'incrémente mais rien ne
+   s'affiche. C'est voulu — on ne numérote pas la sortie. */
 .surtitre{
+  display:inline-flex; align-items:baseline; gap:11px;
   font-size:12.5px; font-weight:500; color:var(--t3);
   letter-spacing:.02em; margin-bottom:14px;
+}
+.surtitre::before{
+  content:counter(sec, decimal-leading-zero);
+  font-variant-numeric:tabular-nums; letter-spacing:.04em;
+  color:var(--t2);
+  padding-right:11px;
+  border-right:1px solid rgba(255,255,255,.14);
 }
 h2{
   font-size:clamp(27px,7.4vw,33px);
@@ -714,6 +735,36 @@ h2{
   color:var(--t2); margin-bottom:16px; max-width:15ch;
 }
 h2 em{ font-style:normal; color:var(--t1); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES CHIFFRES DE « LA PREUVE »
+
+   Empilés et non côte à côte : dans la colonne de gauche de l'ordinateur, deux
+   nombres de cette taille l'un à côté de l'autre déborderaient. Empilés, ils
+   se lisent aussi comme une progression — la vidéo d'abord, le résultat après.
+
+   `tabular-nums` sur « 3:13 » : sans lui, le 1 est plus étroit que le 3 et le
+   deux-points paraît décentré à cette échelle.
+   ═══════════════════════════════════════════════════════════════════════════ */
+h2.chiffres{
+  display:flex; flex-direction:column; gap:14px;
+  max-width:none; margin-bottom:26px;
+}
+.chiffres .n{ display:flex; align-items:baseline; gap:14px; }
+.chiffres b{
+  font-size:clamp(46px,13vw,64px); font-weight:500; line-height:.9;
+  letter-spacing:-.05em; color:var(--t1);
+  font-variant-numeric:tabular-nums;
+}
+/* `nowrap` : « étapes écrites par l'IA » se coupait sur deux lignes et les
+   deux libellés n'avaient plus la même hauteur, ce qui décalait les deux
+   nombres. Le corps descend d'un point sur les petits écrans — à 320 px, la
+   ligne complète mesure 161 px pour 165 disponibles. */
+.chiffres i{
+  font-style:normal; font-size:clamp(13px,3.6vw,14.5px); line-height:1.35;
+  letter-spacing:-.01em; color:var(--t2);
+  white-space:nowrap;
+}
 .chapo{
   font-size:14.5px; line-height:1.6; color:var(--t2);
   max-width:36ch; margin-bottom:30px;
@@ -1267,7 +1318,35 @@ footer .marque{ margin-bottom:18px; }
    Cette classe neutralise la transition le temps d'une image, pour que l'état
    de départ soit pris instantanément. On la retire ensuite, et l'apparition
    se joue normalement. */
-.fige{ transition:none !important; }
+/* `.fige *` en plus de `.fige` : pour les titres, la transition est portée par
+   les MOTS, pas par le titre lui-même. Geler le parent seul n'aurait rien
+   gelé du tout. */
+.fige, .fige *{ transition:none !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TITRES ENTRENT LIGNE PAR LIGNE
+
+   L'apparition d'ensemble montait de 16 px avec 6 px de flou : sur un titre de
+   44 px, c'est imperceptible. Ici chaque LIGNE monte à son tour, de 22 px, avec
+   80 ms d'écart. La page se construit au lieu de se dérouler.
+
+   ═══ POURQUOI DES MOTS ET NON DES LIGNES ═══
+
+   Découper en lignes obligerait à ré-emboîter le contenu dans un conteneur par
+   ligne — ce qui casserait le `<em>` blanc qui traverse les titres, et le
+   nombre de lignes change à chaque largeur d'écran.
+
+   Chaque MOT est donc enveloppé, puis reçoit le rang de la ligne où il est
+   tombé. Les mots d'une même ligne partent ensemble : à l'œil, c'est une ligne
+   qui monte, et la structure du titre est intacte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.mots .mot{
+  display:inline-block;
+  opacity:0; transform:translateY(22px); filter:blur(7px);
+  transition:opacity .85s var(--ec), transform .85s var(--ec), filter .85s var(--ec);
+  transition-delay:calc(var(--l,0) * .08s);
+}
+.mots.vu .mot{ opacity:1; transform:none; filter:blur(0); }
 
 /* ═══ L'ENTRÉE EN FLOU ═══
    Trois choses simultanées : le flou qui se dissipe, l'élément qui monte, et
@@ -1737,6 +1816,10 @@ footer .marque{ margin-bottom:18px; }
     grid-column:1; grid-row:2; margin-top:30px; max-width:none;
   }
   .pv-texte h2{ max-width:14ch }
+  .chiffres b{ font-size:88px }
+  .chiffres i{ font-size:16px }
+  .chiffres .n{ gap:20px }
+  h2.chiffres{ gap:18px; margin-bottom:30px }
   .pv-texte .chapo{ max-width:none }
   .source, .descente, .etapes{ max-width:none }
   .etapes p{ max-width:52ch }
@@ -1819,6 +1902,7 @@ footer .marque{ margin-bottom:18px; }
 @media (prefers-reduced-motion: reduce){
   .flou{ animation:none; opacity:1; transform:none; filter:none; }
   .app{ transition:none; opacity:1; transform:none; filter:none; }
+  .mots .mot{ transition:none; opacity:1; transform:none; filter:none; }
   .vue{ transition:none }
   .tiroir, .plus svg{ transition:none }
   .barre-bas{ transition:none }
@@ -1953,8 +2037,18 @@ footer .marque{ margin-bottom:18px; }
   <i class="croix g"></i><i class="croix d"></i>
   <div class="pv-texte">
   <p class="surtitre app">La preuve</p>
-  <h2 class="app" style="--d:.05s">
-    Trois minutes de vidéo. <em>Six étapes écrites.</em>
+  <!-- ═══ LE CHIFFRE PORTE L'ARGUMENT ═══
+
+       « Trois minutes de vidéo. Six étapes écrites. » était l'argument central
+       du site, écrit au même corps que tous les autres titres. La section
+       n'avait aucun point haut : on la lisait comme les quatre autres.
+
+       Les deux nombres passent en très grand, le texte en petit à côté. C'est
+       le même titre, la même phrase — seule l'échelle change, et elle fait le
+       travail que les mots faisaient mal. -->
+  <h2 class="chiffres">
+    <span class="n"><b>3:13</b><i>de vidéo filmée</i></span>
+    <span class="n"><b>6</b><i>étapes écrites par l'IA</i></span>
   </h2>
   <p class="chapo app" style="--d:.09s">
     Une procédure réelle, telle qu'elle sort de l'app. Rien n'a été réécrit.
@@ -2568,9 +2662,58 @@ footer .marque{ margin-bottom:18px; }
 
      `unobserve` après coup : chaque élément ne s'anime qu'une fois. Un bloc
      qui rejoue son apparition à chaque remontée devient vite agaçant. */
+  /* ═══ DÉCOUPAGE DES TITRES EN MOTS ═══
+
+     Fait en JavaScript et non dans le HTML : à la main, il aurait fallu écrire
+     chaque mot dans une balise, et le moindre changement de texte aurait
+     demandé de tout refaire.
+
+     `--l` porte le rang de la LIGNE, déduit de la position verticale réelle de
+     chaque mot après rendu. C'est la seule façon fiable de connaître les
+     lignes : elles dépendent de la largeur de l'écran, de la police chargée et
+     de la langue. */
+  const enMots = (el) => {
+    const marche = (n) => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment()
+        n.textContent.split(/(\s+)/).forEach(part => {
+          if (!part.trim()) { frag.appendChild(document.createTextNode(part)); return }
+          const sp = document.createElement('span')
+          sp.className = 'mot'; sp.textContent = part
+          frag.appendChild(sp)
+        })
+        n.replaceWith(frag)
+      } else if (n.nodeType === 1 && !n.classList.contains('mot')) {
+        [...n.childNodes].forEach(marche)
+      }
+    }
+    [...el.childNodes].forEach(marche)
+    let haut = null, ligne = -1
+    el.querySelectorAll('.mot').forEach(m => {
+      const t = Math.round(m.offsetTop)
+      if (haut === null || t > haut + 4) { ligne++; haut = t }
+      m.style.setProperty('--l', ligne)
+    })
+    /* Poser l'état de départ SANS l'animer. Sans ce gel, `.mots` déclenche une
+       transition d'une seconde de l'opacité 1 vers 0 : les mots partent
+       s'effacer pendant qu'on leur demande d'apparaître, et les deux
+       mouvements s'annulent. La lecture forcée de la mise en page oblige le
+       navigateur à appliquer l'état tout de suite. */
+    el.classList.add('mots', 'fige')
+    void el.offsetWidth
+    el.classList.remove('fige')
+  }
+
+  /* Les titres perdent l'apparition d'ensemble au profit de la leur. Sans ce
+     retrait, les deux se superposeraient et la seconde n'aurait aucun effet —
+     l'élément entier étant déjà à l'opacité nulle. */
+  const titres = [...document.querySelectorAll('h1, section.bloc h2')]
+  titres.forEach(t => { t.classList.remove('app', 'flou'); enMots(t) })
+
   const cibles = document.querySelectorAll('.app')
   if (!('IntersectionObserver' in window)) {
     cibles.forEach(e => e.classList.add('vu'))
+    titres.forEach(e => e.classList.add('vu'))
   } else {
     /* Le `boundingClientRect.top < 0` n'est pas un détail : sans lui, un
        visiteur qui arrive au milieu de la page — lien avec ancre, rechargement
@@ -2583,6 +2726,13 @@ footer .marque{ margin-bottom:18px; }
       ob.unobserve(e.target)
     }), { rootMargin:'0px 0px -12% 0px', threshold:.01 })
     cibles.forEach(e => ob.observe(e))
+    titres.forEach(e => ob.observe(e))
+  }
+  /* Le titre de l'accroche est à l'écran dès l'arrivée : il n'attend pas le
+     défilement, il part après le même délai que le reste du premier écran. */
+  {
+    const h1 = document.querySelector('h1')
+    if (h1) setTimeout(() => h1.classList.add('vu'), 120)
   }
 })()
 </script>

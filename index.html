@@ -889,10 +889,34 @@ h2 em{ font-style:normal; color:var(--t1); }
 }
 .objection p{ font-size:13.5px; line-height:1.6; color:var(--t2); }
 
-/* Le bloc de « Ce que ça change » se trouvait ici : les deux volets et les
-   trois suites. Section supprimée, styles supprimés avec elle — du CSS qui ne
-   correspond à rien devient, au bout de quelques mois, du CSS qu'on n'ose
-   plus toucher. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   CE QUE ÇA CHANGE — TROIS LIGNES
+
+   Ces trois avantages existaient dans la section supprimée. Ce n'étaient pas
+   eux le problème, c'était son exemple : ils reviennent seuls.
+
+   En lignes réglées et non en cartes : la page en compte déjà beaucoup, et
+   trois cartes de plus alourdiraient là où l'on cherche à alléger. Une liste
+   réglée se parcourt d'un regard — c'est exactement la respiration qui
+   manquait entre « La preuve » et « Sur place », les deux blocs les plus
+   denses de la page.
+
+   Pas de titre : un surtitre suffit. Une liste titrée par un surtitre se lit
+   comme une liste ; c'est un PARAGRAPHE sans titre qui se lit comme du texte
+   égaré, et c'était le défaut de l'ancienne section « Pour qui ».
+   ═══════════════════════════════════════════════════════════════════════════ */
+.suites{ list-style:none; }
+.suites li{
+  position:relative; padding:13px 0 13px 22px;
+  font-size:14.5px; line-height:1.5; color:var(--t2);
+  border-top:.5px solid var(--bord);
+}
+.suites li:last-child{ border-bottom:.5px solid var(--bord); }
+.suites li b{ color:var(--t1); font-weight:500; }
+.suites li::before{
+  content:''; position:absolute; left:3px; top:22px;
+  width:5px; height:5px; border-radius:50%; background:var(--t2);
+}
 
 /* ═══ POUR QUI ═══
    Un bandeau court, sans titre : deux secondes pour que le lecteur se
@@ -901,6 +925,10 @@ h2 em{ font-style:normal; color:var(--t1); }
 /* La section était un bandeau compact sans titre, d'où son retrait réduit.
    Devenue une section à part entière, elle reprend le rythme des autres. */
 .pourqui{ padding-bottom:58px; }
+/* Retrait réduit : cette section est une respiration entre deux blocs denses,
+   pas un chapitre. Au rythme des autres, elle pèserait autant qu'elles. */
+.atouts{ padding-top:52px; padding-bottom:60px; }
+.atouts .surtitre{ margin-bottom:20px; }
 .pourqui .chapo{ max-width:34ch; }
 /* L'intitulé de groupe. Volontairement discret : il sert à séparer, pas à
    annoncer. Un vrai titre à cet endroit ferait croire à deux sections. */
@@ -1276,6 +1304,17 @@ footer::before{
   background:var(--filet);
 }
 footer .marque{ margin-bottom:18px; }
+/* L'adresse est plus grande et plus claire que les liens légaux qui la
+   suivent : elle sert à agir, eux à se conformer. Les mettre au même niveau
+   reviendrait à cacher la seule ligne utile du pied de page. */
+.f-contact{
+  font-size:14px; color:var(--t2); margin-bottom:18px;
+}
+.f-contact a{
+  color:var(--t1); text-decoration:none; font-weight:500;
+  border-bottom:1px solid rgba(255,255,255,.28);
+  padding-bottom:1px;
+}
 .f-liens{ display:flex; flex-wrap:wrap; gap:9px 20px; margin-bottom:20px; }
 .f-liens a{
   font-size:13px; color:var(--t2); text-decoration:none;
@@ -1830,6 +1869,9 @@ footer .marque{ margin-bottom:18px; }
     display:flex; align-items:center; gap:32px; flex-wrap:wrap;
   }
   footer .marque{ margin-bottom:0 }
+  /* Sur ordinateur le pied de page est en ligne : l'adresse se place après la
+     marque, avant les liens légaux. */
+  .f-contact{ margin-bottom:0 }
   .f-liens{ margin-bottom:0 }
   .f-bas{ margin-left:auto; text-align:right }
 
@@ -2121,89 +2163,21 @@ footer .marque{ margin-bottom:18px; }
   </div>
 </section>
 
-<!-- ═══ POUR QUI ═══ -->
-<section class="bloc pourqui">
+<!-- ═══ CE QUE ÇA CHANGE ═══ -->
+<section class="bloc atouts">
   <i class="croix g"></i><i class="croix d"></i>
-  <!-- « Cinq à trente personnes, et du mouvement » a été retiré : c'était une
-       phrase sans verbe, donc une énumération qui n'annonçait rien. Un
-       fragment de ce genre se lit deux fois avant d'être compris, et sur un
-       téléphone il n'est pas relu.
-
-       ⚠ L'information « 5 à 30 personnes » disparaît avec elle. Elle
-         n'apparaît plus nulle part sur la page. -->
-  <!-- ═══ POURQUOI LA LISTE ARRIVAIT SANS PRÉVENIR ═══
-
-       C'était la seule section de la page sans surtitre ni titre : le lecteur
-       tombait sur dix-neuf pastilles sans savoir ce qu'elles énumèrent — des
-       clients ? des secteurs couverts ? des exemples ?
-
-       Deux corrections. Le surtitre, que toutes les autres sections ont, situe
-       la section avant qu'on la lise. Et la phrase se termine maintenant par
-       deux-points : une liste annoncée par deux-points n'a plus besoin d'être
-       expliquée, elle est attendue. -->
-  <div class="pq-texte">
-  <!-- ═══ CETTE PHRASE ÉTAIT LE MEILLEUR ARGUMENT DU SITE ═══
-
-       Elle était en corps de texte gris, dans la seule section sans titre, à
-       l'avant-dernier rang. Personne ne la lisait comme un argument : elle
-       ressemblait à une introduction pour une liste de métiers.
-
-       Elle devient le titre, et la section devient le « pourquoi » de la page.
-       Il manquait depuis le retrait de « Quand vous n'êtes pas là » : tout le
-       reste explique le mécanisme et le prix, rien ne disait ce qu'on perd
-       sans lui. -->
-  <p class="surtitre app">Ce que vous perdez</p>
-  <h2 class="app" style="--d:.04s">
-    Quand un employé s'en va, <em>son savoir-faire s'en va avec lui.</em>
-  </h2>
-  <p class="chapo app" style="--d:.08s">
-    Standix le retient, dans tous les métiers où l'on apprend en regardant
-    faire — à la main comme à l'écran :
-  </p>
-  <!-- ═══ DEUX GROUPES PLUTÔT QU'UNE LISTE ═══
-
-       Ajouter les métiers de bureau à la suite aurait porté la liste à
-       vingt-six pastilles — un mur qu'on ne lit plus, on le survole.
-
-       Séparées et intitulées, les deux listes redeviennent courtes, ET elles
-       font un travail que la liste unique ne faisait pas : elles montrent d'un
-       coup d'œil que Standix couvre deux usages. Le lecteur de bureau ne se
-       serait pas reconnu dans une liste ouverte par « Nettoyage ». -->
-  </div>
-
-  <div class="pq-listes">
-  <p class="groupe app" style="--d:.08s">Sur le terrain</p>
-  <div class="metiers app" style="--d:.10s">
-    <span class="cible">Nettoyage</span>
-    <span class="cible">Aide à domicile</span>
-    <span>Restauration</span>
-    <span>Boulangerie</span>
-    <span>Boucherie</span>
-    <span>Hôtellerie</span>
-    <span>Coiffure</span>
-    <span>Garage</span>
-    <span>Carrosserie</span>
-    <span>Paysagisme</span>
-    <span>Location de matériel</span>
-  </div>
-
-  <p class="groupe app" style="--d:.14s">Devant un écran</p>
-  <div class="metiers app" style="--d:.16s">
-    <span>Cabinet comptable</span>
-    <span>Agence immobilière</span>
-    <span>Assurance</span>
-    <span>Étude notariale</span>
-    <span>Secrétariat médical</span>
-    <span>Logistique</span>
-  </div>
-
-  </div>
-
-  <p class="note app" style="--d:.20s;margin-left:0;text-align:left">
-    Sur le terrain, on filme le geste. Au bureau, on enregistre l'écran. Dans
-    les deux cas, l'IA en fait une procédure que l'équipe ouvre sur son
-    téléphone.
-  </p>
+  <p class="surtitre app">Ce que ça change</p>
+  <ul class="suites">
+    <li class="app" style="--d:.05s">
+      <b>Le même geste partout.</b> Plus la version de celui qui a formé.
+    </li>
+    <li class="app" style="--d:.09s">
+      <b>Une formation qui ne se refait pas.</b> Une fois, pas à chaque arrivée.
+    </li>
+    <li class="app" style="--d:.13s">
+      <b>Une trace.</b> Qui a lu quoi, et quand. Utile le jour où ça se discute.
+    </li>
+  </ul>
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -2268,13 +2242,10 @@ footer .marque{ margin-bottom:18px; }
     </div>
   </div>
   <div class="explique app" style="--d:.16s">
-    <p><b>Le QR code.</b> L'app en génère un pour chaque procédure. Vous
-       l'imprimez et le collez sur la machine, le bidon ou la porte du local.
-       L'employé le scanne avec son téléphone : la vidéo et les étapes
-       s'ouvrent aussitôt.</p>
-    <p><b>Le PDF.</b> La même procédure, exportée en un clic. À afficher au mur
-       du local, à ranger dans un classeur, ou à transmettre le jour où
-       quelqu'un demande comment vous formez vos équipes.</p>
+    <p><b>Le QR code.</b> L'app en génère un par procédure. Collé sur la
+       machine ou le bidon, il ouvre la vidéo et les étapes en un scan.</p>
+    <p><b>Le PDF.</b> La même procédure imprimable, à afficher au mur ou à
+       joindre à un dossier.</p>
   </div>
 
   <div class="endroits app" style="--d:.18s">
@@ -2285,8 +2256,92 @@ footer .marque{ margin-bottom:18px; }
   </div>
 
   <p class="note app" style="--d:.22s">
-    Chaque membre a son compte, créé une fois à son arrivée avec le code de
-    l'entreprise. Vos procédures ne sont jamais publiques.
+    Chaque membre a son compte. Vos procédures ne sont jamais publiques.
+  </p>
+</section>
+
+<!-- ═══ POUR QUI ═══ -->
+<section class="bloc pourqui">
+  <i class="croix g"></i><i class="croix d"></i>
+  <!-- « Cinq à trente personnes, et du mouvement » a été retiré : c'était une
+       phrase sans verbe, donc une énumération qui n'annonçait rien. Un
+       fragment de ce genre se lit deux fois avant d'être compris, et sur un
+       téléphone il n'est pas relu.
+
+       ⚠ L'information « 5 à 30 personnes » disparaît avec elle. Elle
+         n'apparaît plus nulle part sur la page. -->
+  <!-- ═══ POURQUOI LA LISTE ARRIVAIT SANS PRÉVENIR ═══
+
+       C'était la seule section de la page sans surtitre ni titre : le lecteur
+       tombait sur dix-neuf pastilles sans savoir ce qu'elles énumèrent — des
+       clients ? des secteurs couverts ? des exemples ?
+
+       Deux corrections. Le surtitre, que toutes les autres sections ont, situe
+       la section avant qu'on la lise. Et la phrase se termine maintenant par
+       deux-points : une liste annoncée par deux-points n'a plus besoin d'être
+       expliquée, elle est attendue. -->
+  <div class="pq-texte">
+  <!-- ═══ CETTE PHRASE ÉTAIT LE MEILLEUR ARGUMENT DU SITE ═══
+
+       Elle était en corps de texte gris, dans la seule section sans titre, à
+       l'avant-dernier rang. Personne ne la lisait comme un argument : elle
+       ressemblait à une introduction pour une liste de métiers.
+
+       Elle devient le titre, et la section devient le « pourquoi » de la page.
+       Il manquait depuis le retrait de « Quand vous n'êtes pas là » : tout le
+       reste explique le mécanisme et le prix, rien ne disait ce qu'on perd
+       sans lui. -->
+  <!-- L'argumentation du manque a été retirée : ce site s'adresse à quelqu'un
+       qui arrive par bouche-à-oreille, donc convaincu du problème par un
+       confrère. Le titre nomme maintenant l'audience au lieu de la persuader,
+       et il introduit les listes. Soixante mots de moins. -->
+  <p class="surtitre app">Pour qui</p>
+  <h2 class="app" style="--d:.04s">
+    Les métiers où l'on apprend <em>en regardant faire.</em>
+  </h2>
+  <!-- ═══ DEUX GROUPES PLUTÔT QU'UNE LISTE ═══
+
+       Ajouter les métiers de bureau à la suite aurait porté la liste à
+       vingt-six pastilles — un mur qu'on ne lit plus, on le survole.
+
+       Séparées et intitulées, les deux listes redeviennent courtes, ET elles
+       font un travail que la liste unique ne faisait pas : elles montrent d'un
+       coup d'œil que Standix couvre deux usages. Le lecteur de bureau ne se
+       serait pas reconnu dans une liste ouverte par « Nettoyage ». -->
+  </div>
+
+  <div class="pq-listes">
+  <p class="groupe app" style="--d:.08s">Sur le terrain</p>
+  <div class="metiers app" style="--d:.10s">
+    <span class="cible">Nettoyage</span>
+    <span class="cible">Aide à domicile</span>
+    <span>Restauration</span>
+    <span>Boulangerie</span>
+    <span>Boucherie</span>
+    <span>Hôtellerie</span>
+    <span>Coiffure</span>
+    <span>Garage</span>
+    <span>Carrosserie</span>
+    <span>Paysagisme</span>
+    <span>Location de matériel</span>
+  </div>
+
+  <p class="groupe app" style="--d:.14s">Devant un écran</p>
+  <div class="metiers app" style="--d:.16s">
+    <span>Cabinet comptable</span>
+    <span>Agence immobilière</span>
+    <span>Assurance</span>
+    <span>Étude notariale</span>
+    <span>Secrétariat médical</span>
+    <span>Logistique</span>
+  </div>
+
+  </div>
+
+  <p class="note app" style="--d:.20s;margin-left:0;text-align:left">
+    Sur le terrain, on filme le geste. Au bureau, on enregistre l'écran. Dans
+    les deux cas, l'IA en fait une procédure que l'équipe ouvre sur son
+    téléphone.
   </p>
 </section>
 
@@ -2342,7 +2397,7 @@ footer .marque{ margin-bottom:18px; }
   <div class="app" style="--d:.17s">
     <button class="plus" id="btn-formules" aria-expanded="false"
             aria-controls="tiroir-formules">
-      <span id="btn-formules-txt">Voir les autres formules</span>
+      <span id="btn-formules-txt">Voir les formules jusqu'à 100 personnes</span>
       <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
     </button>
 
@@ -2360,10 +2415,13 @@ footer .marque{ margin-bottom:18px; }
            promet — « toutes les offres donnent accès aux mêmes fonctionnalités,
            sans exception ».
 
-           ⚠ LE TARIF ANNUEL N'Y FIGURE PAS. Essentiel affiche « ou 55 € par
-             mois en payant à l'année ». Je ne connais pas l'équivalent pour
-             les autres, et un prix inventé sur une page tarifaire est la pire
-             erreur possible. Donne-les-moi et je les ajoute. -->
+           ⚠ LES TARIFS ANNUELS SONT DÉDUITS, PAS FOURNIS. Essentiel passe de
+             69 à 55 €, soit 20 % de remise. Le même taux appliqué aux trois
+             autres donne 103, 191 et 399 €.
+
+             CE SONT DES PRIX : vérifie-les avant publication. S'ils ne
+             correspondent pas à ce que facture Stripe, un client le verra au
+             moment de payer — et c'est le pire endroit pour une surprise. -->
       <div class="autres-cartes">
       <div class="tarif">
         <p class="nom">Équipe</p>
@@ -2376,6 +2434,7 @@ footer .marque{ margin-bottom:18px; }
         <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
         <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
         </ul>
+        <p class="annuel">ou <b>103 € par mois</b> en payant à l'année</p>
         <a class="btn" href="app/">
           Essayer gratuitement
           <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
@@ -2392,6 +2451,7 @@ footer .marque{ margin-bottom:18px; }
         <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
         <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
         </ul>
+        <p class="annuel">ou <b>191 € par mois</b> en payant à l'année</p>
         <a class="btn" href="app/">
           Essayer gratuitement
           <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
@@ -2408,6 +2468,7 @@ footer .marque{ margin-bottom:18px; }
         <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>En <b>français, anglais et allemand</b></li>
         <li><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg><b>Toutes</b> les fonctionnalités</li>
         </ul>
+        <p class="annuel">ou <b>399 € par mois</b> en payant à l'année</p>
         <a class="btn" href="app/">
           Essayer gratuitement
           <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
@@ -2482,6 +2543,19 @@ footer .marque{ margin-bottom:18px; }
   <!-- ⚠ Ces trois pages n'existent pas : les liens renvoient une 404 tant que
        tu ne m'auras pas donné les textes. Il manque aussi une adresse de
        contact — un site sans moyen d'écrire inquiète plus qu'il ne rassure. -->
+  <!-- ═══ L'ADRESSE, AU-DESSUS DES LIENS LÉGAUX ═══
+
+       Elle n'est PAS dans la rangée des mentions et des conditions. Un lecteur
+       qui cherche à écrire ne parcourt pas une liste de liens juridiques : il
+       cherche une adresse, et s'il ne la voit pas, il referme.
+
+       C'est d'autant plus vrai pour l'usage prévu de ce site — quelqu'un
+       arrive parce qu'un confrère lui en a parlé, donc il vient chercher une
+       personne, pas un formulaire d'inscription. -->
+  <p class="f-contact">
+    Une question ?
+    <a href="mailto:Standix.app@gmail.com">Standix.app@gmail.com</a>
+  </p>
   <nav class="f-liens">
     <a href="mentions.html">Mentions légales</a>
     <a href="cgu.html">Conditions d'utilisation</a>
@@ -2700,8 +2774,11 @@ footer .marque{ margin-bottom:18px; }
     })
   }
 
+  /* « Voir les autres formules » n'apprenait rien : un patron de douze
+     personnes ne savait pas que sa réponse était derrière ce bouton. Le
+     libellé la donne maintenant avant même le clic. */
   tiroir('btn-formules', 'tiroir-formules',
-         'Voir les autres formules', 'Masquer les formules')
+         "Voir les formules jusqu'à 100 personnes", 'Masquer les formules')
   tiroir('btn-etapes', 'tiroir-etapes',
          'Voir les quatre dernières étapes', '', true, true)
 

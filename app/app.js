@@ -6515,8 +6515,8 @@ function vignetteProcedure(p) {
    `horloge`   un cadran et ses aiguilles. Le temps, sans métaphore.
    `equipe`    deux silhouettes, la seconde en retrait. Reprise de la carte
                « Espace Équipe » : on la reconnaît d'un écran à l'autre.
-   `film`      une bande perforée. Elle dit « vidéo » là où une caméra dirait
-               « filmer », et c'est bien du stock qu'il s'agit, pas du geste.
+   La quatrième tuile ne figure pas ici : elle porte l'anneau de l'IA, repris
+   de `.ia-fig` et figé. Voir `iconeAccueil`.
    ═══════════════════════════════════════════════════════════════════════════ */
 const AC_ICONES = {
   document: `<path d="M13.4 3.2H7.6a2 2 0 0 0-2 2v13.6a2 2 0 0 0 2 2h6.2"/>
@@ -6531,12 +6531,23 @@ const AC_ICONES = {
              <circle cx="9.5" cy="7.8" r="3.2"/>
              <path d="M20.6 20.2v-1.7a3.2 3.2 0 0 0-2.4-3.1"/>
              <path d="M15.1 4.9a3.2 3.2 0 0 1 0 6.1"/>`,
-  film:     `<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.4"/>
-             <path d="M7.3 5.4v13.2M16.7 5.4v13.2"/>
-             <path d="M3.2 12h17.6"/>`,
+
 }
 
 function iconeAccueil(cle) {
+  /* ═══ L'ANNEAU IA, FIGÉ ═══
+
+     La tuile des analyses ne porte pas un dessin au trait mais l'anneau de
+     l'IA — celui qui tourne pendant une analyse, partout ailleurs dans l'app.
+     C'est le signe que l'app emploie déjà pour dire « intelligence
+     artificielle » ; en inventer un autre ici aurait fait deux vocabulaires.
+
+     `ac-ia-fige` reprend `.ia-fig` sans ses deux animations. Un anneau qui
+     tourne sur l'accueil promettrait un travail en cours alors que rien ne se
+     passe — l'animation a un sens pendant une analyse, aucun sur un compteur. */
+  if (cle === 'ia') {
+    return `<span class="ac-ic"><span class="ia-fig ac-ia-fige"><span class="lum"></span></span></span>`
+  }
   return `<span class="ac-ic">
     <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.7"
          stroke-linejoin="round">${AC_ICONES[cle] || ''}</svg>
@@ -6568,7 +6579,7 @@ function tuileQuota(utilisees, quota) {
     /* Pas de plafond connu : on ne dessine pas d'anneau vide, on dit ce qu'on
        sait. Un anneau à zéro laisserait croire qu'il ne reste rien. */
     el.innerHTML = `
-      ${iconeAccueil('film')}
+      ${iconeAccueil('ia')}
       <div class="ac-t">Analyses vidéo IA</div>
       <div class="ac-v">${utilisees == null ? '—' : utilisees}</div>
       <div class="ac-n">ce mois-ci</div>`
@@ -6580,7 +6591,7 @@ function tuileQuota(utilisees, quota) {
   const rempli = circ * (pct / 100)
 
   el.innerHTML = `
-    ${iconeAccueil('film')}
+    ${iconeAccueil('ia')}
     <div class="ac-t">Analyses vidéo IA</div>
     <div class="ac-anneau">
       <svg width="${T}" height="${T}">

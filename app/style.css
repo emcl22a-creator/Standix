@@ -8093,12 +8093,23 @@ body:has(#e-detail.active) #equipe-app{
    L'ACCUEIL · SALUT, FILTRE, QUATRE TUILES
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══ LES VALEURS DE L'APP, PAS LES MIENNES ═══
+
+   J'avais inventé une échelle : 26 px en 800, un sous-titre à 13,5. L'app en a
+   déjà une, employée sur toutes les autres pages :
+
+     titre de page    24 px · 700 · -0.03em   (`h1.pagehead`)
+     sous-titre       14 px · `--label-2`     (`.subhead`)
+     titre de section 12 px · 650 · capitales (`.fm-titre`)
+
+   Deux échelles typographiques dans une même app, c'est deux apps. On reprend
+   celle qui existe — au dixième près. */
 .ac-tete{ padding:2px 2px 16px; }
 .ac-salut{
-  font-size:26px; font-weight:800; letter-spacing:-0.042em; line-height:1.15;
-  margin:0 0 5px;
+  font-size:24px; font-weight:700; letter-spacing:-0.03em; line-height:1.2;
+  margin:0 0 2px;
 }
-.ac-sous{ font-size:13.5px; color:var(--label-2); margin:0; letter-spacing:-0.01em; }
+.ac-sous{ font-size:14px; color:var(--label-2); margin:0; line-height:1.35; }
 
 /* Le filtre est aligné à droite : à gauche il aurait concurrencé la phrase
    d'introduction, qui est ce qu'on lit en premier. */
@@ -8136,8 +8147,9 @@ body:has(#e-detail.active) #equipe-app{
   display:flex; flex-direction:column;
   min-height:158px;
 }
+/* 13 px / 600, comme `.section-title` — le titre d'un groupe dans cette app. */
 .ac-t{
-  font-size:11.5px; font-weight:600; color:var(--label-2);
+  font-size:13px; font-weight:600; color:var(--label-2);
   letter-spacing:-0.01em; line-height:1.3;
   /* Deux lignes réservées : « Procédures créées » tient sur une, « Temps de
      formation » aussi, mais les valeurs se décaleraient d'une tuile à l'autre
@@ -8208,9 +8220,11 @@ body:has(#e-detail.active) #equipe-app{
    L'ACCUEIL · LES TROIS DERNIÈRES PROCÉDURES
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* Repris de `.fm-titre`, le titre de section des pages d'analyse : mêmes
+   12 px, même graisse, même espacement de capitales. */
 .ac-sect{
-  font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase;
-  color:var(--label-3); margin:26px 2px 10px;
+  font-size:12px; font-weight:650; letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--label-3); margin:24px 2px 8px;
 }
 
 /* La ligne réemploie `an-bloc` comme les tuiles : même fond, même liseré, même
@@ -8258,8 +8272,9 @@ body:has(#e-detail.active) #equipe-app{
 .ac-rec-doc svg{ width:22px; height:22px; }
 
 .ac-rec-txt{ flex:1; min-width:0; }
+/* Le titre d'une carte de procédure fait 14,5 px en 600 partout ailleurs. */
 .ac-rec-t{
-  display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em;
+  display:block; font-size:14.5px; font-weight:600; letter-spacing:-0.025em;
   line-height:1.25;
   /* Deux lignes au plus : un titre long ne doit pas repousser le chevron hors
      de l'écran ni faire grandir la ligne indéfiniment. */
@@ -8267,7 +8282,7 @@ body:has(#e-detail.active) #equipe-app{
   overflow:hidden;
 }
 .ac-rec-s{
-  display:block; font-size:11.5px; color:var(--label-2); margin-top:3px;
+  display:block; font-size:12px; color:var(--label-2); margin-top:3px;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .ac-rec-fl{ flex:0 0 auto; font-size:17px; color:var(--label-3); }

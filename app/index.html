@@ -720,7 +720,20 @@
          À la place, ce qu'il vient vérifier : où en est son équipe. Le contenu
          est peint par `peindreResumeEntreprise` — il dépend des membres, qui
          arrivent après le chargement. -->
-    <div class="hero hero-ia resume-ent" id="accueil-resume">
+    <!-- ═══ MASQUÉE JUSQU'À CE QU'ELLE AIT QUELQUE CHOSE À DIRE ═══
+
+         Cette carte est dans le balisage, pas créée par le code : elle est donc
+         à l'écran dès la première image, vide, avec « Bonjour » tout seul. Puis
+         le prénom arrive, puis la barre, puis les postes — trois à-coups.
+
+         `pas-prete` la retire du flux. `peindreResumeEntreprise` l'enlève quand
+         tout est en place, et la carte apparaît d'un bloc, avec la même
+         animation que les autres.
+
+         L'attribut est dans le balisage plutôt que posé au démarrage : au
+         premier affichage, le JavaScript n'a pas encore tourné, et c'est
+         justement l'instant qu'on veut couvrir. -->
+    <div class="hero hero-ia resume-ent pas-prete" id="accueil-resume">
       <span class="hero-lueur"></span>
       <div class="re-tete">
         <span class="re-salut" id="re-salut">Bonjour</span>

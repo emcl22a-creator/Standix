@@ -8637,6 +8637,18 @@ function lireMeta(fichier) {
   })
 }
 
+/* ═══ SIX LECTEURS AU PLUS ═══
+
+   Le plafond au-delà duquel Safari sur iPhone cesse d'accorder des lecteurs
+   vidéo, silencieusement. Mesuré à sept, lors d'un collage resté bloqué à zéro
+   pour cent.
+
+   Déclarée ICI et non près de `DUREE_REFUSEE` : cette dernière vit 1 500 lignes
+   plus bas, après la fonction qui l'emploie. Ça marche pour elle — le module
+   pose ses `const` avant tout appel — mais placer une constante loin de son
+   seul usage oblige à la chercher. */
+const COLLAGE_MAX_FICHIERS = 6
+
 function dessinerCollage() {
   const liste = document.getElementById('coller-liste')
   const total = document.getElementById('coller-total')
@@ -8691,7 +8703,24 @@ function dessinerCollage() {
      Cinq clips 4K pesant 400 Mo à eux tous, mais durant deux minutes,
      ressortent à vingt-six mégaoctets. Les refuser sur leur poids d'entrée
      écarterait un montage parfaitement valide. */
-  if (secondes > DUREE_REFUSEE) {
+  /* ═══ LE NOMBRE COMPTE AUSSI, PAS SEULEMENT LA DURÉE ═══
+
+     Le collage crée TOUS les lecteurs d'un coup — il le faut, c'est ainsi
+     qu'iOS accorde sa permission dans un seul geste. Mais sept vidéos ouvertes
+     ensemble, ce sont sept décodeurs actifs et sept fichiers en mémoire.
+
+     Sur un iPhone, au-delà de six, Safari commence à refuser des lecteurs sans
+     rien dire : ils ne se chargent pas, leurs métadonnées n'arrivent jamais, et
+     le collage s'arrête à zéro pour cent. C'est exactement ce que tu as vu.
+
+     La limite est basse et je l'assume : mieux vaut deux collages de cinq que
+     l'un de sept qui échoue après trois minutes d'attente. */
+  if (collageFichiers.length > COLLAGE_MAX_FICHIERS) {
+    avert.innerHTML = `<span style="color:var(--red)">Pas plus de ` +
+      `${COLLAGE_MAX_FICHIERS} vidéos à la fois. Collez-en ` +
+      `${COLLAGE_MAX_FICHIERS} d’abord, puis ajoutez le reste au résultat.</span>`
+    lancer.disabled = true
+  } else if (secondes > DUREE_REFUSEE) {
     avert.innerHTML = `<span style="color:var(--red)">Le total dépasse ` +
       `${Math.round(DUREE_REFUSEE / 60)} minutes. Retirez une vidéo, ou coupez-en une.</span>`
     lancer.disabled = true
@@ -8811,7 +8840,27 @@ async function collerLesVideos(surAvancee) {
        volontairement : ce qui compte est que l'APPEL parte du geste, pas qu'il
        aboutisse. */
     v.dataset.enUsage = ''
-    v.play().then(() => { if (!v.dataset.enUsage) v.pause() }, () => {})
+    /* ═══ LE DÉVERROUILLAGE DOIT ÊTRE SILENCIEUX ═══
+
+       On joue chaque vidéo une fraction de seconde pour qu'iOS accorde sa
+       permission. Mais à cet instant, le graphe audio N'EST PAS ENCORE
+       branché — `createMediaElementSource` n'est appelé que bien plus tard,
+       après le chargement des métadonnées.
+
+       Le son sortait donc des haut-parleurs : sept vidéos qui démarrent
+       ensemble, au moment où l'on touche « Coller ». C'est ce vacarme que tu
+       entendais.
+
+       On coupe le volume pendant le déverrouillage et on le rend juste après.
+       `volume` et non `muted` : un élément muet reste muet pour
+       `createMediaElementSource`, qui ne rendrait alors que du silence — c'est
+       la mesure notée plus haut. `volume = 0` ne touche que la sortie des
+       haut-parleurs, pas ce que le graphe capte. */
+    v.volume = 0
+    v.play().then(() => {
+      if (!v.dataset.enUsage) v.pause()
+      v.volume = 1
+    }, () => { v.volume = 1 })
     return v
   })
 
@@ -8819,7 +8868,28 @@ async function collerLesVideos(surAvancee) {
      branche à son tour ; la piste, elle, ne change jamais. Changer la piste
      d'un enregistrement en cours produit un fichier que rien ne relit. */
   const ctxAudio = new (window.AudioContext || window.webkitAudioContext)()
-  if (ctxAudio.state === 'suspended') await ctxAudio.resume()
+  /* ═══ `resume()` PEUT NE JAMAIS ABOUTIR ═══
+
+     Sur iOS, un contexte audio ne se réveille que dans un geste utilisateur
+     encore valide. Ici il ne l'est plus : les sept `play()` du déverrouillage
+     viennent de le consommer, et chacun a pu déclencher une attente réseau.
+
+     `await` sur une promesse qui ne se résout jamais bloque tout — la boucle
+     n'atteint pas sa première vidéo, et la progression reste à 0 %. C'est ce
+     que tu as vu avec sept prises : à deux ou trois, le geste tenait encore.
+
+     On attend donc trois secondes au plus. Passé ce délai, on continue sans
+     réveiller le contexte : le collage se fait, et si le son manque, il vaut
+     mieux une vidéo muette qu'un écran figé. */
+  if (ctxAudio.state === 'suspended') {
+    await Promise.race([
+      ctxAudio.resume().catch(() => {}),
+      new Promise((ok) => setTimeout(ok, 3000)),
+    ])
+    if (ctxAudio.state === 'suspended') {
+      console.warn('[collage] contexte audio non réveillé — le collage continue sans son')
+    }
+  }
   const arrivee = ctxAudio.createMediaStreamDestination()
   arrivee.stream.getAudioTracks().forEach((t) => flux.addTrack(t))
 
@@ -8852,10 +8922,27 @@ async function collerLesVideos(surAvancee) {
       const f = collageFichiers[i]
       const v = lecteurs[i]
 
+      /* ═══ ET CETTE ATTENTE AUSSI DOIT AVOIR UNE FIN ═══
+
+         `onloadedmetadata` ne se déclenche pas toujours : un fichier corrompu,
+         un format que Safari refuse à moitié, une mémoire saturée par sept
+         vidéos ouvertes ensemble. Sans limite, la promesse reste en suspens et
+         le collage s'arrête là où il en est.
+
+         Quinze secondes : c'est long, et c'est voulu. Une vidéo de trois
+         minutes filmée en 4K met plusieurs secondes à livrer ses métadonnées
+         sur un iPhone occupé. Abandonner trop tôt ferait échouer un collage
+         qui allait aboutir. */
       await new Promise((ok, ko) => {
         if (v.readyState >= 1) { ok(); return }
-        v.onloadedmetadata = ok
-        v.onerror = () => ko(new Error(`« ${f.fichier.name} » n’a pas pu être lue.`))
+        const minuteur = setTimeout(
+          () => ko(new Error(`« ${f.fichier.name} » n’a pas répondu. Retirez-la et réessayez.`)),
+          15000)
+        v.onloadedmetadata = () => { clearTimeout(minuteur); ok() }
+        v.onerror = () => {
+          clearTimeout(minuteur)
+          ko(new Error(`« ${f.fichier.name} » n’a pas pu être lue.`))
+        }
       })
 
       try {

@@ -6379,21 +6379,22 @@ body.plus-vu .plus-flot{
    trait s'aligne sur la hauteur du texte, pas sur sa boîte. */
 .page-tete .tete-bas{
   display:flex; align-items:center; gap:7px;
-  /* ═══ LES DEUX AIDES PASSENT À DROITE ═══
-
-     Le compte « N personnes · N procédures lues » occupait la gauche, et les
-     deux ronds le suivaient — ils se lisaient comme la ponctuation de cette
-     phrase.
-
-     Sans elle, ils se retrouvaient collés sous le titre, à gauche, où ils
-     ressemblaient à deux pastilles orphelines. Repoussés à droite, ils
-     redeviennent ce qu'ils sont : deux recours discrets, à l'opposé du titre.
-
-     `margin-top` négatif : la ligne n'a plus de texte pour lui donner sa
-     hauteur, elle se collait au titre. */
-  justify-content:flex-end;
-  margin-top:-2px;
 }
+
+/* ═══ L'EN-TÊTE DE L'ANALYSE TIENT SUR UNE LIGNE ═══
+
+   Le titre et les deux aides côte à côte, les ronds poussés à droite par
+   `margin-left:auto`. Le second rang n'existe plus : il ne portait que deux
+   pastilles de 26 px depuis que le compte est parti, et cette ligne à moitié
+   vide séparait le titre du premier anneau.
+
+   La classe est propre à cet écran. `page-tete` sert aussi à « Procédures » et
+   au salut de l'Équipe, qui empilent leur sous-titre sous leur titre — les
+   passer en ligne casserait les deux. */
+.tete-analyse{
+  display:flex; align-items:center; gap:10px;
+}
+.tete-analyse .tete-bas{ margin-left:auto; }
 /* Le rond fait 26 px, le texte 17 : sans cela il étire la ligne et pousse le
    compte quatre pixels plus bas que sur les autres pages. Les marges négatives
    le retirent du calcul de hauteur — il reste visible, il ne compte plus. */

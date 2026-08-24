@@ -6330,6 +6330,84 @@ function peindreTuilesAccueil() {
   }))
 
   grille.appendChild(tuileQuota(utilisees, quota))
+
+  peindreRecentesAccueil()
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TROIS DERNIÈRES PROCÉDURES
+
+   ─── LA VIGNETTE, TROIS CAS ───
+
+   ① Une image de présentation : on la montre. C'est celle que le gérant a
+      choisie, elle vaut mieux que tout ce qu'on pourrait déduire.
+   ② Pas d'image mais une vidéo : on affiche la vidéo elle-même, arrêtée sur sa
+      première image. `preload="metadata"` suffit — le navigateur télécharge
+      l'en-tête, pas le fichier, donc trois vignettes ne coûtent pas trois
+      vidéos.
+   ③ Ni l'un ni l'autre : une icône de document, dans une plaque ambre. Pas de
+      rectangle gris vide, qui ressemble à une image qui n'a pas chargé.
+
+   ─── PAS DE REQUÊTE ───
+
+   `peindreDernieresProcedures`, l'ancienne version, allait chercher les bornes
+   des étapes pour afficher la durée filmée. Pour trois vignettes sur l'accueil,
+   une requête réseau à chaque affichage est un prix qu'on ne veut pas payer :
+   on montre ce qui est déjà en mémoire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function peindreRecentesAccueil() {
+  const zone = document.getElementById('ac-recentes')
+  if (!zone) return
+  zone.innerHTML = ''
+
+  const recentes = (allGestionProcedures || [])
+    .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
+    .slice(0, 3)
+  if (!recentes.length) return
+
+  const titre = document.createElement('div')
+  titre.className = 'ac-sect'
+  titre.textContent = 'Dernières procédures'
+  zone.appendChild(titre)
+
+  recentes.forEach(p => {
+    const el = document.createElement('button')
+    el.type = 'button'
+    el.className = 'an-bloc ac-rec'
+    el.addEventListener('click', () => openAnalyse(p.id))
+
+    const chemin = [p.categorie || 'Sans dossier', p.sous_categorie].filter(Boolean).join(' \u203a ')
+    const n = Array.isArray(p.etapes) ? p.etapes.length : (p.etapes || 0)
+
+    el.innerHTML = `
+      <span class="ac-rec-vue">${vignetteProcedure(p)}</span>
+      <span class="ac-rec-txt">
+        <span class="ac-rec-t">${escapeHtml(p.titre || 'Sans titre')}</span>
+        <span class="ac-rec-s">${escapeHtml(chemin)}${n ? ` \u00b7 ${n} \u00e9tape${n > 1 ? 's' : ''}` : ''}</span>
+      </span>
+      <span class="ac-rec-fl">\u203a</span>`
+    zone.appendChild(el)
+  })
+}
+
+function vignetteProcedure(p) {
+  if (p.image_url) {
+    return `<img src="${escapeHtml(p.image_url)}" alt="" loading="lazy">`
+  }
+  if (p.video_url) {
+    /* `muted` et `playsinline` : sans eux, iOS refuse d'afficher la première
+       image et laisse un rectangle noir. */
+    return `<video src="${escapeHtml(p.video_url)}#t=0.1" preload="metadata"
+                   muted playsinline></video>
+            <span class="ac-rec-play">\u25B6</span>`
+  }
+  return `<span class="ac-rec-doc">
+      <svg viewBox="0 0 24 24" fill="none" stroke="url(#acDegrade)" stroke-width="1.8"
+           stroke-linejoin="round">
+        <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"/>
+        <path d="M13.6 3v5h5"/>
+      </svg>
+    </span>`
 }
 
 /* Une tuile ordinaire : titre en petit, valeur en grand, note en dessous. */

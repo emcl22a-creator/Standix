@@ -8144,10 +8144,21 @@ body:has(#e-detail.active) #equipe-app{
      si l'une passait à deux lignes. On fige la hauteur. */
   min-height:30px;
 }
+/* ═══ LA VALEUR NE FLOTTE PLUS EN BAS ═══
+
+   `margin-top:auto` la poussait au ras de la note, tout en bas de la tuile. Sur
+   la tuile à anneau c'est juste — l'anneau occupe la place. Sur les trois
+   autres, cela creusait un vide de cinquante pixels entre le titre et le
+   chiffre, et les cartes paraissaient à moitié remplies.
+
+   La valeur suit maintenant son titre, et c'est la NOTE qui descend. Le trio
+   titre-valeur se lit d'un bloc, la note reste ancrée en bas comme sur la
+   quatrième — les quatre pieds restent alignés. */
 .ac-v{
   font-size:29px; font-weight:800; letter-spacing:-0.045em; line-height:1;
-  margin-top:auto; font-variant-numeric:tabular-nums;
+  margin-top:6px; font-variant-numeric:tabular-nums;
 }
+.ac-tuile > .ac-n{ margin-top:auto; padding-top:8px; }
 .ac-n{
   font-size:11px; color:var(--label-3); margin-top:6px; letter-spacing:-0.005em;
 }
@@ -8168,6 +8179,9 @@ body:has(#e-detail.active) #equipe-app{
 .ac-anneau{
   position:relative; width:76px; height:76px; margin:auto auto 0;
 }
+/* Sur la tuile à anneau, la note n'a pas besoin d'être poussée : l'anneau
+   occupe déjà tout l'espace disponible au-dessus d'elle. */
+.ac-tuile--anneau > .ac-n{ margin-top:0; padding-top:6px; }
 /* Le quart de tour fait partir l'arc à midi : on lit un cercle comme une
    horloge, jamais depuis la droite. */
 .ac-anneau svg{ transform:rotate(-90deg); display:block; }

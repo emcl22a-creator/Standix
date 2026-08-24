@@ -3006,7 +3006,16 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     if (avecTemps.length) {
       const vus = regrouperParts(avecTemps, x => x.total)
       let t = 0
-      vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+      /* ═══ « AUTRES » GARDE SON GRIS ═══
+
+         `regrouperParts` a déjà posé `ANNEAU_GRIS` sur la part de
+         regroupement — c'est ce qui la distingue d'un vrai dossier sur les
+         pages de détail. Recolorer TOUTES les parts l'écrasait, et « 1 autre »
+         recevait une teinte ambre comme s'il nommait quelque chose.
+
+         On ne colore donc que les parts nommées, et le compteur ne s'incrémente
+         que pour elles : sinon la dernière couleur ambre serait sautée. */
+      vus.forEach(v => { if (!v.estAutres) v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
       el.appendChild(anneauResume(vus, x => x.total,
         x => x.estAutres ? x.nom : (x.proc?.titre || 'Sans titre'),
         dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
@@ -3337,7 +3346,16 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     if (avecTemps.length) {
       const vus = regrouperParts(avecTemps, c => c.total)
       let t = 0
-      vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+      /* ═══ « AUTRES » GARDE SON GRIS ═══
+
+         `regrouperParts` a déjà posé `ANNEAU_GRIS` sur la part de
+         regroupement — c'est ce qui la distingue d'un vrai dossier sur les
+         pages de détail. Recolorer TOUTES les parts l'écrasait, et « 1 autre »
+         recevait une teinte ambre comme s'il nommait quelque chose.
+
+         On ne colore donc que les parts nommées, et le compteur ne s'incrémente
+         que pour elles : sinon la dernière couleur ambre serait sautée. */
+      vus.forEach(v => { if (!v.estAutres) v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
       el.appendChild(anneauResume(vus, c => c.total, c => c.nom,
         dureeLisible(avecTemps.reduce((x, c) => x + c.total, 0)),
         /* « lues » ne disait ni de quoi ni sur quelle période. Le centre porte
@@ -4098,7 +4116,16 @@ function renderMembresListe() {
     if (avecTemps.length) {
       const vus = regrouperParts(avecTemps, x => x.total)
       let t = 0
-      vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+      /* ═══ « AUTRES » GARDE SON GRIS ═══
+
+         `regrouperParts` a déjà posé `ANNEAU_GRIS` sur la part de
+         regroupement — c'est ce qui la distingue d'un vrai dossier sur les
+         pages de détail. Recolorer TOUTES les parts l'écrasait, et « 1 autre »
+         recevait une teinte ambre comme s'il nommait quelque chose.
+
+         On ne colore donc que les parts nommées, et le compteur ne s'incrémente
+         que pour elles : sinon la dernière couleur ambre serait sautée. */
+      vus.forEach(v => { if (!v.estAutres) v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
       el.appendChild(anneauResume(vus, x => x.total,
         x => x.estAutres ? x.nom : (x.m?.nom || 'Sans nom'),
         dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),

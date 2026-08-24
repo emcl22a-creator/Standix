@@ -2994,7 +2994,34 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     return
   }
 
-  const visibles = tout ? classement : classement.slice(0, 3)
+  /* ═══ LE MÊME ANNEAU QUE POUR LES DOSSIERS ═══
+
+     Les trois blocs de cette page répartissent la même chose — du temps de
+     lecture — selon trois axes : par dossier, par procédure, par personne. Un
+     seul dessin pour les trois : on apprend à le lire une fois.
+
+     Pas d'anneau sur la page complète : elle porte déjà le sien. */
+  if (!tout) {
+    const avecTemps = classement.filter(x => x.total)
+    if (avecTemps.length) {
+      const vus = regrouperParts(avecTemps, x => x.total)
+      let t = 0
+      vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+      el.appendChild(anneauResume(vus, x => x.total,
+        x => x.estAutres ? x.nom : (x.proc?.titre || 'Sans titre'),
+        dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
+        'de lecture ce mois-ci', true))
+    }
+  }
+
+  /* ═══ SUR LE RÉSUMÉ, L'ANNEAU SUFFIT ═══
+
+     Les lignes détaillées répétaient ce que la légende venait de nommer, avec
+     les mêmes couleurs trois centimètres plus haut. Elles gardent leur place
+     sur la page complète, où l'on vient chercher les chiffres.
+
+     `tout` distingue les deux : faux sur le résumé, vrai derrière « Voir plus ». */
+  const visibles = tout ? classement : []
 
   /* La même forme que la section Équipe : une ligne nue, le nom au-dessus de
      son sous-titre, la valeur à droite. Pas de cadre, pas de flèche — deux
@@ -3136,7 +3163,16 @@ document.addEventListener('click', (e) => {
    donc tout ce qu'elle rend, sans troncature supplémentaire : une légende plus
    longue que l'anneau signifierait que le regroupement a mal fait son travail,
    et c'est là qu'il faudrait corriger, pas ici. */
-function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite) {
+/* ═══ LA LÉGENDE PORTE LE RÉSUMÉ À ELLE SEULE ═══
+
+   Elle nomme chaque part avec sa couleur : c'est tout ce qu'il faut pour lire
+   l'anneau. Les lignes détaillées qui la suivaient — « Cuisine · 4 procédures ·
+   2 personnes · 27 min » — répétaient les mêmes noms en plus long, juste sous
+   les mêmes couleurs.
+
+   Le détail a sa page, derrière « Voir plus ». Le résumé se contente de
+   montrer la répartition ; on descend d'un cran quand on veut les chiffres. */
+function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite, legende) {
   const T = 168, ep = 14, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const somme = parts.reduce((t, x) => t + valeur(x), 0)
   const bloc = document.createElement('div')
@@ -3176,9 +3212,9 @@ function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite) {
         <span class="u">${escapeHtml(centreUnite || '')}</span>
       </div>
     </div>
-    <div class="an-resume-leg">
+    ${legende ? `<div class="an-resume-leg">
       ${parts.map(x => `<span><i style="background:${x.couleur}"></i>${escapeHtml(nomDe(x))}</span>`).join('')}
-    </div>`
+    </div>` : ''}`
 
   /* L'anneau se remplit au lieu d'apparaître. Le masque part vide et se
      découvre : c'est la même mécanique que sur les pages de détail, donc le
@@ -3232,7 +3268,14 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
     return
   }
 
-  const visibles = tout ? classement : classement.slice(0, 3)
+  /* ═══ SUR LE RÉSUMÉ, L'ANNEAU SUFFIT ═══
+
+     Les lignes détaillées répétaient ce que la légende venait de nommer, avec
+     les mêmes couleurs trois centimètres plus haut. Elles gardent leur place
+     sur la page complète, où l'on vient chercher les chiffres.
+
+     `tout` distingue les deux : faux sur le résumé, vrai derrière « Voir plus ». */
+  const visibles = tout ? classement : []
 
   /* ═══════════════════════════════════════════════════════════════════════
      L'ANNEAU AVANT LES LIGNES
@@ -3262,7 +3305,10 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
       let t = 0
       vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
       el.appendChild(anneauResume(vus, c => c.total, c => c.nom,
-        dureeLisible(avecTemps.reduce((x, c) => x + c.total, 0)), 'lues'))
+        dureeLisible(avecTemps.reduce((x, c) => x + c.total, 0)),
+        /* « lues » ne disait ni de quoi ni sur quelle période. Le centre porte
+           une durée : il doit dire que c'est du temps de lecture, et quand. */
+        'de lecture ce mois-ci', true))
     }
   }
 
@@ -4009,7 +4055,25 @@ function renderMembresListe() {
 
   /* Trois lignes suffisent à répondre « qui suit ». Le reste se déplie : la page
      reste courte pour tout le monde, et complète pour qui veut vérifier. */
-  const visibles = membresDeplies ? trie : trie.slice(0, 3)
+  /* Le troisième axe : par personne. Même anneau, même grammaire.
+
+     Il ne s'affiche que replié — déplié, la page devient une liste complète et
+     l'anneau n'y résume plus rien. */
+  if (!membresDeplies) {
+    const avecTemps = trie.filter(x => x.total)
+    if (avecTemps.length) {
+      const vus = regrouperParts(avecTemps, x => x.total)
+      let t = 0
+      vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+      el.appendChild(anneauResume(vus, x => x.total,
+        x => x.estAutres ? x.nom : (x.m?.nom || 'Sans nom'),
+        dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
+        'de lecture ce mois-ci', true))
+    }
+  }
+
+  /* Même règle : replié, l'anneau et sa légende ; déplié, la liste entière. */
+  const visibles = membresDeplies ? trie : []
 
   visibles.forEach((s, i) => {
     const div = document.createElement('div')

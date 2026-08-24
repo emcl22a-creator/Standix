@@ -2852,6 +2852,150 @@ function debutPeriode(periode) {
   return null
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COURBE D'ÉVOLUTION
+
+   Douze mois de temps de lecture, une ligne, deux chiffres dessous.
+
+   ─── POURQUOI UN SVG ÉCRIT À LA MAIN ───
+
+   Pas de bibliothèque. Une courbe de douze points, c'est une chaîne de
+   caractères ; charger cent kilooctets pour la tracer serait payer le
+   chargement de chaque page pour un seul bloc.
+
+   ─── L'ÉCHELLE PART DE ZÉRO ───
+
+   Un graphique qui commence à sa valeur minimale exagère tout : trois minutes
+   d'écart deviennent une falaise. La base est donc zéro, et le sommet est le
+   plus haut mois — la pente qu'on voit est la vraie.
+
+   ─── LES MOIS VIDES SONT DES ZÉROS, PAS DES TROUS ───
+
+   Un mois sans lecture vaut zéro et la ligne y descend. L'omettre relierait
+   deux mois éloignés par une droite, en donnant à croire à une continuité qui
+   n'a pas eu lieu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ DEUX PAGES SONT DEVENUES ORPHELINES.
+
+   `p-an-categories` et `p-an-temps` — le détail par dossier et par procédure —
+   n'étaient atteignables que par les blocs qu'on vient de retirer. Elles
+   existent encore, avec leur anneau et leur classement, mais plus aucun bouton
+   n'y mène.
+
+   Je les laisse en place plutôt que de les supprimer : elles fonctionnent, et
+   si tu veux un jour rouvrir ce détail, il suffira d'un bouton. Les effacer
+   maintenant demanderait de retirer aussi leurs fonctions de rendu, leurs
+   anneaux et leur balisage — quelques centaines de lignes qu'il faudrait
+   réécrire en cas de retour en arrière.
+
+   Elles ne coûtent rien tant qu'on ne les ouvre pas : leur code ne s'exécute
+   qu'à l'affichage. */
+const COURBE_MOIS = 12
+
+function moisDeLecture(validations) {
+  const maintenant = new Date()
+  const cases = []
+  for (let i = COURBE_MOIS - 1; i >= 0; i--) {
+    const d = new Date(maintenant.getFullYear(), maintenant.getMonth() - i, 1)
+    cases.push({ debut: d, fin: new Date(d.getFullYear(), d.getMonth() + 1, 1), total: 0 })
+  }
+  for (const v of validations || []) {
+    const s = Number(v.duree_lecture || 0)
+    if (!s) continue
+    const t = new Date(v.validated_at)
+    const c = cases.find(x => t >= x.debut && t < x.fin)
+    if (c) c.total += s
+  }
+  return cases
+}
+
+function renderCourbe(validations) {
+  const el = document.getElementById('ga-courbe')
+  if (!el) return
+  el.innerHTML = ''
+
+  const cases = moisDeLecture(validations)
+  const sommet = Math.max(...cases.map(c => c.total))
+
+  if (!sommet) {
+    el.innerHTML = vide({
+      dessin: NEANT_PROCEDURE,
+      titre: 'Rien de lu pour le moment',
+      phrase: 'Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue mois après mois.',
+    })
+    return
+  }
+
+  const L = 320, H = 108, marge = 6
+  const pas = (L - marge * 2) / (COURBE_MOIS - 1)
+  const y = (v) => H - marge - (v / sommet) * (H - marge * 2)
+  const pts = cases.map((c, i) => [marge + i * pas, y(c.total)])
+
+  /* Une courbe adoucie plutôt qu'une ligne brisée : les points de contrôle
+     sont placés à mi-chemin horizontal, ce qui arrondit sans jamais dépasser
+     les valeurs réelles — une courbe qui bombe au-dessus d'un sommet ferait
+     lire un chiffre qui n'existe pas. */
+  let d = `M ${pts[0][0]} ${pts[0][1]}`
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]
+    const mx = (x0 + x1) / 2
+    d += ` C ${mx} ${y0}, ${mx} ${y1}, ${x1} ${y1}`
+  }
+  const aire = `${d} L ${pts[pts.length - 1][0]} ${H - marge} L ${pts[0][0]} ${H - marge} Z`
+
+  const dernier = cases[cases.length - 1].total
+  const avant = cases[cases.length - 2]?.total ?? 0
+  let ecart = null
+  if (avant > 0) ecart = Math.round(((dernier - avant) / avant) * 100)
+
+  const nomMois = (dt) => dt.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')
+
+  el.innerHTML = `
+    <div class="cb-zone">
+      <svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" class="cb-svg">
+        <defs>
+          <linearGradient id="cbAire" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FF9F0A" stop-opacity="0.22"/>
+            <stop offset="1" stop-color="#FF9F0A" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="${aire}" fill="url(#cbAire)"/>
+        <path class="cb-ligne" d="${d}" fill="none" stroke="url(#logoOrIc)"
+              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4"
+                fill="#FF9F0A"/>
+      </svg>
+      <div class="cb-mois">
+        <span>${escapeHtml(nomMois(cases[0].debut))}</span>
+        <span>${escapeHtml(nomMois(cases[Math.floor(COURBE_MOIS / 2)].debut))}</span>
+        <span>${escapeHtml(nomMois(cases[cases.length - 1].debut))}</span>
+      </div>
+    </div>
+    <div class="cb-pied">
+      <span class="cb-v">${escapeHtml(dureeLisible(dernier) || '0 min')}</span>
+      <span class="cb-q">ce mois-ci</span>
+      ${ecart === null ? ''
+        : `<span class="cb-e ${ecart >= 0 ? 'hausse' : 'baisse'}">${ecart >= 0 ? '+' : ''}${ecart} %</span>`}
+    </div>`
+
+  /* La ligne se dessine de gauche à droite au premier affichage. Une seule
+     animation sur la page, et elle accompagne une lecture qui va dans ce
+     sens — pas trois anneaux qui s'ouvrent en même temps. */
+  const ligne = el.querySelector('.cb-ligne')
+  if (ligne && !courbeDejaJouee) {
+    courbeDejaJouee = true
+    const len = ligne.getTotalLength()
+    ligne.style.strokeDasharray = len
+    ligne.style.strokeDashoffset = len
+    requestAnimationFrame(() => {
+      ligne.style.transition = 'stroke-dashoffset 1.1s cubic-bezier(0.22,1,0.36,1)'
+      ligne.style.strokeDashoffset = '0'
+    })
+  }
+}
+
+let courbeDejaJouee = false
+
 function renderGaStats() {
   if (!currentGaData) return
   const { procedures, employes, validations } = currentGaData
@@ -2869,10 +3013,11 @@ function renderGaStats() {
   const el = (i) => document.getElementById(i)
 
   const nbEmployes = (currentGaData?.employes || []).length
-  renderTopCategories(procedures, dansPeriode, nbEmployes, libelle)
+  /* La courbe prend TOUTES les validations, pas celles du mois : elle montre
+     douze mois, elle a besoin des douze. */
+  renderCourbe(validations)
   renderMembresListe()
   renderGainTemps(validations, procedures)
-  renderTempsLecture(procedures, dansPeriode, libelle)
 }
 
 /* Ce qu'il reste à faire. Chaque ligne est elle-même l'action : on la touche, on

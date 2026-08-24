@@ -681,6 +681,20 @@ h1 em{ font-style:normal; color:var(--t1); }
    Cette section ne vend rien. Elle montre un résultat brut.
    ═══════════════════════════════════════════════════════════════════════════ */
 body{ counter-reset:sec }
+/* ═══ « LA PREUVE » EST MASQUÉE, PAS SUPPRIMÉE ═══
+
+   Elle reste dans le fichier, avec ses six étapes et son objection. Pour la
+   remettre, il suffit de retirer cette seule ligne.
+
+   `display:none` et non `visibility:hidden` : un élément sans boîte n'incrémente
+   pas les compteurs CSS, donc la numérotation des sections reste 01, 02 sans
+   qu'on ait à y toucher. Avec `visibility`, elle aurait sauté un numéro. */
+/* `body .preuve` et non `.preuve` seul : le bloc ordinateur déclare
+   `.preuve{ display:grid }`, et une règle sous média n'a pas plus de poids —
+   c'est l'ordre qui l'emportait. Un sélecteur plus spécifique gagne partout,
+   ce qui garde UN SEUL endroit à modifier pour la réafficher. */
+body .preuve{ display:none }
+
 section.bloc{
   counter-increment:sec;
   position:relative; z-index:2;
@@ -1155,52 +1169,48 @@ h2.chiffres{
    posé sur une machine, pas à un élément d'interface.
    ═══════════════════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES DEUX OBJETS
+   COMMENT ÇA MARCHE
 
-   Chacun avec son texte dessous, et non les deux images d'un côté puis les
-   deux textes de l'autre : appariés, ils se lisent sans effort de rattachement.
-
-   Côte à côte dès 560 px. En dessous, ils s'empilent — deux colonnes de 150 px
-   ne laissent pas la place d'une phrase lisible.
+   Les cartes disent COMMENT ON FABRIQUE, les lignes COMMENT ON ACCÈDE. Deux
+   formes différentes pour deux questions différentes : en six cartes de même
+   poids, le lecteur n'aurait plus vu qu'il y en a deux.
    ═══════════════════════════════════════════════════════════════════════════ */
-.paire{ display:grid; gap:34px; }
-@media (min-width: 560px){
-  .paire{ grid-template-columns:1fr 1fr; gap:28px; align-items:stretch }
+.cartes{ display:grid; gap:14px }
+.carte{
+  padding:24px 22px; border-radius:16px;
+  background:rgba(255,255,255,.028);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),
+             inset 0 0 0 .5px rgba(255,255,255,.08);
 }
-/* ═══ LES DEUX LÉGENDES S'ALIGNENT ═══
-
-   L'autocollant est plus court que la feuille : posés en haut de leur colonne,
-   leurs légendes tombaient à 27 px l'une de l'autre.
-
-   Chaque objet devient une grille de deux rangées, et les deux colonnes
-   s'étirent à la même hauteur. La rangée de l'image absorbe la différence,
-   les images se posent sur son bas — comme sur une étagère — et les légendes
-   se retrouvent sur la même ligne. Aucune hauteur n'est codée en dur : ça
-   tient quelles que soient les proportions des deux fichiers. */
-.objet{
-  display:grid; grid-template-rows:1fr auto; gap:16px;
-  justify-items:start;
+.carte .pic{
+  width:26px; height:26px; color:var(--t2); margin-bottom:16px;
+  stroke:currentColor; fill:none; stroke-width:1.5;
+  stroke-linecap:round; stroke-linejoin:round;
 }
-.objet .sticker, .objet .feuille{ align-self:end }
-.objet figcaption{
+.carte b{ display:block; font-size:16px; font-weight:500; color:var(--t1);
+  letter-spacing:-.02em; margin-bottom:8px }
+.carte p{ font-size:13.5px; line-height:1.6; color:var(--t2) }
+/* La ligne de formats est en --t3 : elle sert à celui qui cherche si SON
+   format est accepté, pas à celui qui découvre. */
+.carte .tag{ display:block; margin-top:12px; font-size:11.5px; color:var(--t3) }
+
+.sous-titre{
+  margin:38px 0 18px;
+  font-size:16px; font-weight:500; color:var(--t1); letter-spacing:-.02em;
+}
+.acces{ list-style:none }
+.acces li{
+  display:flex; align-items:flex-start; gap:14px;
+  padding:15px 0; border-top:.5px solid var(--bord);
   font-size:13.5px; line-height:1.6; color:var(--t2);
 }
-.objet figcaption b{ color:var(--t1); font-weight:500 }
-
-/* Les deux surfaces claires de la page. Le carré du code est blanc par
-   nécessité — un QR inversé fait échouer une partie des lecteurs — et la
-   feuille l'est parce que c'est du papier. */
-.sticker{
-  width:min(168px, 46%);
+.acces li:last-child{ border-bottom:.5px solid var(--bord) }
+.acces b{ color:var(--t1); font-weight:500 }
+.acces svg{
+  flex:none; width:19px; height:19px; margin-top:2px; color:var(--t3);
+  stroke:currentColor; fill:none; stroke-width:1.5;
+  stroke-linecap:round; stroke-linejoin:round;
 }
-.sticker img{ display:block; width:100%; height:auto }
-.feuille{
-  width:min(190px, 52%);
-  border-radius:6px; overflow:hidden; background:#F7F8F8;
-  box-shadow:0 22px 46px rgba(0,0,0,.58),
-             0 0 0 1px rgba(255,255,255,.14);
-}
-.feuille img{ display:block; width:100%; height:auto }
 
 /* La note de vérité, en retrait et discrète : une garantie énoncée à voix
    basse est plus crédible qu'un argument mis en gras. */
@@ -1774,6 +1784,11 @@ footer .marque{ margin-bottom:18px; }
     left:calc(-50vw + 50%); right:calc(-50vw + 50%);
   }
 
+  .cartes{ grid-template-columns:repeat(3,1fr); gap:18px }
+  .carte p{ font-size:14px }
+  .acces li{ font-size:14px }
+  .sous-titre{ font-size:17px; margin-top:44px }
+
   section.bloc{ padding:104px var(--gouttiere) 120px }
   h2{ font-size:44px; max-width:17ch; margin-bottom:20px }
   .surtitre{ font-size:13px }
@@ -1987,10 +2002,16 @@ footer .marque{ margin-bottom:18px; }
          rédige les étapes », ce que le titre dit désormais. Répéter en petit
          ce qu'on vient de lire en grand fait perdre le lecteur. Il ne garde que
          ce que le titre ne dit pas : le QR code. -->
-  <h1 class="flou r1">Filmez ce que vous faites.<br><em>L'IA en écrit la procédure.</em></h1>
-  <p class="sous flou r2">
-    Un QR code collé sur place, et la bonne procédure s'ouvre.
-  </p>
+  <h1 class="flou r1">L'IA transforme vos vidéos en procédures,<br><em>consultables à tout moment.</em></h1>
+  <!-- ═══ PAS DE SOUS-TITRE ═══
+
+       Le titre porte déjà la mécanique ET l'accès. La section 01, juste en
+       dessous, détaille les trois façons de créer et les trois de consulter :
+       un sous-titre les annonçait à trois centimètres de distance.
+
+       Pour en remettre un, une seule ligne suffit ici — la classe `sous` et son
+       style sont conservés :
+       <p class="sous flou r2">Trois minutes de vidéo suffisent.</p> -->
   <div class="actions flou r3">
     <a class="btn" href="app/">
       Essayer gratuitement
@@ -2052,192 +2073,71 @@ footer .marque{ margin-bottom:18px; }
 </div><!-- /.premier -->
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-     LA PREUVE
+     COMMENT ÇA MARCHE
 
-     ⚠ TOUT LE TEXTE CI-DESSOUS EST PROVISOIRE. Il faut le remplacer par une
-       procédure réelle de ton app, recopiée SANS RETOUCHE — fautes comprises.
-       Une version relue et embellie ne prouverait rien, et c'est exactement ce
-       que fait la concurrence.
+     Remplace « Sur place ». Deux temps dans une seule section : les trois
+     façons de créer une procédure, puis les trois façons de la consulter.
+
+     Les créer sont en cartes, les consulter en lignes. Six cartes auraient
+     donné deux rangées de même poids, et le lecteur n'aurait plus vu qu'il y a
+     deux questions différentes — comment on la fabrique, et comment on y
+     accède.
      ═══════════════════════════════════════════════════════════════════════ -->
-<section class="bloc preuve">
+<section class="bloc comment">
   <i class="croix g"></i><i class="croix d"></i>
-  <div class="pv-texte">
-  <p class="surtitre app">La preuve</p>
-  <!-- ═══ LE CHIFFRE PORTE L'ARGUMENT ═══
-
-       « Trois minutes de vidéo. Six étapes écrites. » était l'argument central
-       du site, écrit au même corps que tous les autres titres. La section
-       n'avait aucun point haut : on la lisait comme les quatre autres.
-
-       Les deux nombres passent en très grand, le texte en petit à côté. C'est
-       le même titre, la même phrase — seule l'échelle change, et elle fait le
-       travail que les mots faisaient mal. -->
-  <h2 class="chiffres">
-    <span class="n"><b>3:13</b><i>de vidéo filmée</i></span>
-    <span class="n"><b>6</b><i>étapes écrites par l'IA</i></span>
-  </h2>
-  <p class="chapo app" style="--d:.09s">
-    Une procédure réelle, telle qu'elle sort de l'app. Rien n'a été réécrit.
-  </p>
-
-  </div>
-
-  <div class="pv-demo">
-  <div class="source app" style="--d:.13s">
-    <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span>
-    <span class="txt">
-      <!-- Le titre était tronqué à « Machine à café — Détartra… » : la ligne
-           est en `nowrap` avec ellipse, et 24 signes ne tiennent pas à côté du
-           bouton et de la durée. Le dossier passe donc en sous-titre, là où il
-           a la place — c'est aussi la hiérarchie de l'app. -->
-      <!-- « filmée au téléphone, en une prise » a été retiré : la vidéo ne
-           vient pas d'un tournage maison, et cette phrase se trouvait sous le
-           titre « La preuve », à trois lignes de « rien n'a été réécrit ».
-           C'était la seule affirmation vérifiablement fausse du site.
-
-           Ce qui reste est vrai et suffit : une vidéo de 3:13, six étapes
-           produites par l'IA. C'est le découpage qu'on démontre, pas la
-           provenance du fichier. -->
-      <b>Machine à café</b>
-      <span>Détartrage · une vidéo, six étapes</span>
-    </span>
-    <span class="duree">3:13</span>
-  </div>
-
-  <div class="descente app" style="--d:.17s"></div>
-
-  <!-- ═══ CE TEXTE EST CELUI DE L'APP, MOT POUR MOT ═══
-
-       Les étapes n'ont ni titre ni résumé : l'app produit un paragraphe par
-       étape, et c'est ce qui est affiché. Leur donner un titre aurait été les
-       réécrire, ce qui détruit la seule chose que cette section démontre.
-
-       Les horodatages sont des PLAGES et non des instants. C'est plus
-       crédible : un instant peut se taper à la main, une plage prouve que
-       l'étape correspond à un segment découpé de la vidéo. -->
-  <ol class="etapes debut">
-    <li class="app" style="--d:.20s">
-      <span class="tc">0:00 – 0:58</span>
-      <p>Allumer la machine, éjecter la capsule, vider le bac à capsules et les
-         bacs récolte-gouttes, puis placer un récipient d'environ 1 litre sous
-         la sortie café</p>
-      <!-- L'avertissement est produit par l'IA, pas ajouté à la main. C'est le
-           détail le plus convaincant de toute la page : une liste d'étapes se
-           devine, une mise en garde suppose qu'on a compris le geste. -->
-      <p class="garde">Ne pas oublier d'éjecter la capsule avant de commencer</p>
-    </li>
-    <li class="app" style="--d:.24s">
-      <span class="tc">0:58 – 1:24</span>
-      <p>Remplir le réservoir avec environ 500 ml d'eau et de détartrant
-         Nespresso, attendre que les 2 boutons arrêtent de clignoter, puis
-         appuyer simultanément sur les 2 boutons pendant 3 secondes pour
-         activer le mode détartrage</p>
-    </li>
-  </ol>
-
-  <!-- Les trois dernières ne portent pas la classe d'apparition dans le HTML :
-       c'est le script qui la pose au moment de l'ouverture, avec son décalage.
-       Posée ici, l'observateur de défilement les aurait révélées pendant que
-       le tiroir était encore fermé. -->
-  <div class="tiroir" id="tiroir-etapes" role="region" aria-labelledby="btn-etapes">
-  <ol class="etapes suite">
-    <!-- L'étape 3 rejoint le tiroir : seules les deux premières restent
-         visibles. Elle perd sa classe d'apparition et son décalage — c'est le
-         script qui les pose à l'ouverture, comme pour les trois autres.
-
-         C'est elle qui porte maintenant le `tabindex` : le focus doit atterrir
-         sur la PREMIÈRE étape révélée, pas sur la deuxième. -->
-    <li id="etape-3" tabindex="-1">
-      <span class="tc">1:24 – 2:01</span>
-      <p>Appuyer sur le bouton grande tasse et laisser couler toute la
-         solution, remplir à nouveau le réservoir avec le même mélange, puis
-         appuyer sur le bouton grande tasse et laisser couler toute la solution
-         détartrante</p>
-    </li>
-    <li>
-      <span class="tc">2:01 – 2:23</span>
-      <p>Vider et rincer le réservoir d'eau, puis le remplir avec de l'eau
-         claire</p>
-    </li>
-    <li>
-      <span class="tc">2:23 – 2:49</span>
-      <p>Appuyer sur le bouton grande tasse pour vider le réservoir de son
-         contenu, puis vider et rincer les bacs récolte-gouttes</p>
-    </li>
-    <li>
-      <span class="tc">2:49 – 3:13</span>
-      <p>Appuyer simultanément sur les 2 boutons pendant 3 secondes pour
-         quitter le mode détartrage</p>
-    </li>
-  </ol>
-  </div>
-
-  <!-- ═══ LE BOUTON EST APRÈS LE TIROIR ═══
-
-       Il était avant : une fois ouvert, « Masquer les trois dernières »
-       s'affichait AU-DESSUS des trois étapes qu'il proposait de masquer, et
-       l'ordre de lecture devenait faux.
-
-       Placé après, il reste au bas de la liste dans les deux états — fermé il
-       en montre trois de plus, ouvert il les replie. C'est aussi la convention
-       de tous les « voir plus » : la commande suit ce qu'elle commande. -->
-  <button class="plus etapes-btn" id="btn-etapes" aria-expanded="false"
-          aria-controls="tiroir-etapes">
-    <span id="btn-etapes-txt">Voir les quatre dernières étapes</span>
-    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-  </button>
-
-  </div>
-
-  <div class="objection app" style="--d:.20s">
-    <b>Et si l'IA se trompe&nbsp;?</b>
-    <p>
-      Vous relisez avant de publier. Corriger un mot prend cinq secondes.
-      Écrire la procédure de zéro en prend vingt minutes.
-    </p>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════════════════════════════════════════════
-     SUR PLACE
-     ═══════════════════════════════════════════════════════════════════════ -->
-<section class="bloc surplace">
-  <i class="croix g"></i><i class="croix d"></i>
-  <!-- ═══ CHAQUE TEXTE SOUS SON OBJET ═══
-
-       La version précédente posait les deux images ensemble, puis les deux
-       explications ensemble. Le lecteur voyait un autocollant et une feuille,
-       lisait deux paragraphes, et devait rattacher chacun au bon objet.
-
-       Appariés, ils se lisent sans effort. Et la section n'a plus besoin ni de
-       chapô — le titre suffit — ni des quatre pastilles d'emplacements, dont
-       le texte du code dit déjà l'essentiel. De 90 mots à 52. -->
-  <p class="surtitre app">Sur place</p>
+  <p class="surtitre app">Comment ça marche</p>
   <h2 class="app" style="--d:.05s">
-    Chaque procédure a son QR code. <em>Et sa version papier.</em>
+    Trois façons de créer une procédure. <em>Le résultat est le même.</em>
   </h2>
 
-  <div class="paire">
-    <figure class="objet app" style="--d:.11s">
-      <div class="sticker">
-        <img src="site-qr.png" width="900" height="927"
-             alt="L'autocollant d'une procédure Standix : le QR code et son titre">
-      </div>
-      <figcaption><b>Le QR code.</b> Collé sur la machine ou le bidon, il ouvre
-        la vidéo et les étapes en un scan.</figcaption>
-    </figure>
-
-    <figure class="objet app" style="--d:.16s">
-      <div class="feuille">
-        <img src="pdf-standix.png" alt="La même procédure exportée en PDF"
-             width="1068" height="1134">
-      </div>
-      <figcaption><b>Le PDF.</b> La même procédure imprimable, à afficher au mur
-        ou à joindre à un dossier.</figcaption>
-    </figure>
+  <div class="cartes">
+    <div class="carte app" style="--d:.10s">
+      <svg class="pic" viewBox="0 0 24 24"><rect x="2" y="5" width="14" height="14" rx="3"/><path d="M16 10l6-3v10l-6-3z"/></svg>
+      <b>À partir d'une vidéo</b>
+      <p>Vous filmez le geste, ou votre écran. L'IA découpe la vidéo en étapes,
+         rédige chacune d'elles et l'horodate.</p>
+      <!-- La durée est annoncée comme une CARACTÉRISTIQUE, pas comme une
+           supériorité : je n'ai pas les limites des autres outils. Elle a sa
+           place ici parce qu'un patron veut savoir si sa vidéo passera — c'est
+           la première question pratique qu'il se pose. -->
+      <span class="tag">Le geste ou l'écran · jusqu'à 5 minutes</span>
+    </div>
+    <div class="carte app" style="--d:.15s">
+      <svg class="pic" viewBox="0 0 24 24"><path d="M14 3v5h5"/><path d="M19 8v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2h7z"/><path d="M9 13h6M9 17h4"/></svg>
+      <b>À partir d'un document</b>
+      <p>Déposez ce que vous avez déjà. L'IA le découpe et en fait une procédure
+         structurée.</p>
+      <span class="tag">PDF · Word · image · texte</span>
+    </div>
+    <div class="carte app" style="--d:.20s">
+      <svg class="pic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+      <b>À la main</b>
+      <p>Écrivez les étapes une par une et ajoutez une photo à chacune. Sans IA,
+         quand vous savez déjà quoi dire.</p>
+      <span class="tag">Une image par étape</span>
+    </div>
   </div>
 
-  <p class="note app" style="--d:.20s">
+  <p class="sous-titre app" style="--d:.24s">Et trois façons de la consulter.</p>
+  <ul class="acces">
+    <li class="app" style="--d:.27s">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3M20 20h1M17 21h0"/></svg>
+      <span><b>En scannant un QR code.</b> L'app en génère un par procédure.
+        Collé sur la machine ou le bidon, il l'ouvre en un scan.</span>
+    </li>
+    <li class="app" style="--d:.30s">
+      <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/></svg>
+      <span><b>Depuis l'app.</b> Chaque membre y retrouve toutes les procédures
+        de l'entreprise, classées par dossier.</span>
+    </li>
+    <li class="app" style="--d:.33s">
+      <svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7" rx="1"/><path d="M6 18H4a2 2 0 01-2-2v-3a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2"/></svg>
+      <span><b>Sur papier.</b> Chaque procédure s'exporte en PDF, à afficher au
+        mur ou à joindre à un dossier.</span>
+    </li>
+  </ul>
+
+  <p class="note app" style="--d:.36s">
     Chaque membre a son compte. Vos procédures ne sont jamais publiques.
   </p>
 </section>
@@ -2404,6 +2304,153 @@ footer .marque{ margin-bottom:18px; }
 </section>
 
 <!-- ═══ LA RELANCE ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LA PREUVE
+
+     ⚠ TOUT LE TEXTE CI-DESSOUS EST PROVISOIRE. Il faut le remplacer par une
+       procédure réelle de ton app, recopiée SANS RETOUCHE — fautes comprises.
+       Une version relue et embellie ne prouverait rien, et c'est exactement ce
+       que fait la concurrence.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="bloc preuve">
+  <i class="croix g"></i><i class="croix d"></i>
+  <div class="pv-texte">
+  <p class="surtitre app">La preuve</p>
+  <!-- ═══ LE CHIFFRE PORTE L'ARGUMENT ═══
+
+       « Trois minutes de vidéo. Six étapes écrites. » était l'argument central
+       du site, écrit au même corps que tous les autres titres. La section
+       n'avait aucun point haut : on la lisait comme les quatre autres.
+
+       Les deux nombres passent en très grand, le texte en petit à côté. C'est
+       le même titre, la même phrase — seule l'échelle change, et elle fait le
+       travail que les mots faisaient mal. -->
+  <h2 class="chiffres">
+    <span class="n"><b>3:13</b><i>de vidéo filmée</i></span>
+    <span class="n"><b>6</b><i>étapes écrites par l'IA</i></span>
+  </h2>
+  <p class="chapo app" style="--d:.09s">
+    Une procédure réelle, telle qu'elle sort de l'app. Rien n'a été réécrit.
+  </p>
+
+  </div>
+
+  <div class="pv-demo">
+  <div class="source app" style="--d:.13s">
+    <span class="play"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></span>
+    <span class="txt">
+      <!-- Le titre était tronqué à « Machine à café — Détartra… » : la ligne
+           est en `nowrap` avec ellipse, et 24 signes ne tiennent pas à côté du
+           bouton et de la durée. Le dossier passe donc en sous-titre, là où il
+           a la place — c'est aussi la hiérarchie de l'app. -->
+      <!-- « filmée au téléphone, en une prise » a été retiré : la vidéo ne
+           vient pas d'un tournage maison, et cette phrase se trouvait sous le
+           titre « La preuve », à trois lignes de « rien n'a été réécrit ».
+           C'était la seule affirmation vérifiablement fausse du site.
+
+           Ce qui reste est vrai et suffit : une vidéo de 3:13, six étapes
+           produites par l'IA. C'est le découpage qu'on démontre, pas la
+           provenance du fichier. -->
+      <b>Machine à café</b>
+      <span>Détartrage · une vidéo, six étapes</span>
+    </span>
+    <span class="duree">3:13</span>
+  </div>
+
+  <div class="descente app" style="--d:.17s"></div>
+
+  <!-- ═══ CE TEXTE EST CELUI DE L'APP, MOT POUR MOT ═══
+
+       Les étapes n'ont ni titre ni résumé : l'app produit un paragraphe par
+       étape, et c'est ce qui est affiché. Leur donner un titre aurait été les
+       réécrire, ce qui détruit la seule chose que cette section démontre.
+
+       Les horodatages sont des PLAGES et non des instants. C'est plus
+       crédible : un instant peut se taper à la main, une plage prouve que
+       l'étape correspond à un segment découpé de la vidéo. -->
+  <ol class="etapes debut">
+    <li class="app" style="--d:.20s">
+      <span class="tc">0:00 – 0:58</span>
+      <p>Allumer la machine, éjecter la capsule, vider le bac à capsules et les
+         bacs récolte-gouttes, puis placer un récipient d'environ 1 litre sous
+         la sortie café</p>
+      <!-- L'avertissement est produit par l'IA, pas ajouté à la main. C'est le
+           détail le plus convaincant de toute la page : une liste d'étapes se
+           devine, une mise en garde suppose qu'on a compris le geste. -->
+      <p class="garde">Ne pas oublier d'éjecter la capsule avant de commencer</p>
+    </li>
+    <li class="app" style="--d:.24s">
+      <span class="tc">0:58 – 1:24</span>
+      <p>Remplir le réservoir avec environ 500 ml d'eau et de détartrant
+         Nespresso, attendre que les 2 boutons arrêtent de clignoter, puis
+         appuyer simultanément sur les 2 boutons pendant 3 secondes pour
+         activer le mode détartrage</p>
+    </li>
+  </ol>
+
+  <!-- Les trois dernières ne portent pas la classe d'apparition dans le HTML :
+       c'est le script qui la pose au moment de l'ouverture, avec son décalage.
+       Posée ici, l'observateur de défilement les aurait révélées pendant que
+       le tiroir était encore fermé. -->
+  <div class="tiroir" id="tiroir-etapes" role="region" aria-labelledby="btn-etapes">
+  <ol class="etapes suite">
+    <!-- L'étape 3 rejoint le tiroir : seules les deux premières restent
+         visibles. Elle perd sa classe d'apparition et son décalage — c'est le
+         script qui les pose à l'ouverture, comme pour les trois autres.
+
+         C'est elle qui porte maintenant le `tabindex` : le focus doit atterrir
+         sur la PREMIÈRE étape révélée, pas sur la deuxième. -->
+    <li id="etape-3" tabindex="-1">
+      <span class="tc">1:24 – 2:01</span>
+      <p>Appuyer sur le bouton grande tasse et laisser couler toute la
+         solution, remplir à nouveau le réservoir avec le même mélange, puis
+         appuyer sur le bouton grande tasse et laisser couler toute la solution
+         détartrante</p>
+    </li>
+    <li>
+      <span class="tc">2:01 – 2:23</span>
+      <p>Vider et rincer le réservoir d'eau, puis le remplir avec de l'eau
+         claire</p>
+    </li>
+    <li>
+      <span class="tc">2:23 – 2:49</span>
+      <p>Appuyer sur le bouton grande tasse pour vider le réservoir de son
+         contenu, puis vider et rincer les bacs récolte-gouttes</p>
+    </li>
+    <li>
+      <span class="tc">2:49 – 3:13</span>
+      <p>Appuyer simultanément sur les 2 boutons pendant 3 secondes pour
+         quitter le mode détartrage</p>
+    </li>
+  </ol>
+  </div>
+
+  <!-- ═══ LE BOUTON EST APRÈS LE TIROIR ═══
+
+       Il était avant : une fois ouvert, « Masquer les trois dernières »
+       s'affichait AU-DESSUS des trois étapes qu'il proposait de masquer, et
+       l'ordre de lecture devenait faux.
+
+       Placé après, il reste au bas de la liste dans les deux états — fermé il
+       en montre trois de plus, ouvert il les replie. C'est aussi la convention
+       de tous les « voir plus » : la commande suit ce qu'elle commande. -->
+  <button class="plus etapes-btn" id="btn-etapes" aria-expanded="false"
+          aria-controls="tiroir-etapes">
+    <span id="btn-etapes-txt">Voir les quatre dernières étapes</span>
+    <svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+  </button>
+
+  </div>
+
+  <div class="objection app" style="--d:.20s">
+    <b>Et si l'IA se trompe&nbsp;?</b>
+    <p>
+      Vous relisez avant de publier. Corriger un mot prend cinq secondes.
+      Écrire la procédure de zéro en prend vingt minutes.
+    </p>
+  </div>
+</section>
+
 <section class="bloc fin">
   <i class="croix g"></i><i class="croix d"></i>
   <!-- ═══ CE QUE LA CLÔTURE DOIT FAIRE ═══

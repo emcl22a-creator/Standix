@@ -4200,7 +4200,17 @@ function renderMembresListe() {
     const b = document.createElement('button')
     b.type = 'button'
     b.className = 'an-plus'
-    b.textContent = trie.length > 3 ? libelleVoirAutres(trie.length - 3) : 'Voir le détail'
+    /* ═══ « VOIR PLUS », COMME LES DEUX AUTRES BLOCS ═══
+
+       Le libellé alternait entre « Voir les N autres » et « Voir le détail »
+       selon le nombre de membres. Les deux étaient faux depuis que le résumé
+       n'affiche plus de lignes : il n'y a pas « N autres » à voir, il y a TOUT
+       à voir — l'anneau ne montre que la répartition.
+
+       Et les blocs Dossiers et Procédures disent déjà « Voir plus ». Trois
+       boutons côte à côte qui mènent au même genre de page doivent porter le
+       même mot. */
+    b.textContent = 'Voir plus'
     b.addEventListener('click', () => ouvrirAnEquipe())
     el.appendChild(b)
   }

@@ -6385,7 +6385,19 @@ function peindreRecentesAccueil() {
   const recentes = (allGestionProcedures || [])
     .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
     .slice(0, 3)
-  if (!recentes.length) return
+
+  /* Sans procédure, on saute le titre et les lignes — mais PAS le bouton :
+     une entreprise neuve a déjà des activités, ne serait-ce que sa création
+     et l'arrivée de son fondateur. */
+  if (!recentes.length) {
+    const seul = document.createElement('button')
+    seul.type = 'button'
+    seul.className = 'an-plus ac-act'
+    seul.textContent = 'Voir les dernières activités de l\u2019entreprise'
+    seul.addEventListener('click', () => ouvrirActivites())
+    zone.appendChild(seul)
+    return
+  }
 
   const titre = document.createElement('div')
   titre.className = 'ac-sect'
@@ -6423,6 +6435,24 @@ function peindreRecentesAccueil() {
     zone.appendChild(el)
     preparerVignetteVideo(el)
   })
+
+  /* ═══ LE LIEN VERS LES ACTIVITÉS ═══
+
+     `p-activites` existe déjà : arrivées, départs, promotions, procédures
+     créées. Elle n'était atteignable que depuis le bloc « Mouvements de
+     l'équipe », qui a quitté l'accueil lors de la refonte — la page était donc
+     devenue orpheline.
+
+     Le bouton est en bas, après les procédures : c'est le dernier recours de
+     la page, pas ce qu'on vient y chercher. Et il porte la même classe
+     `an-plus` que les trois « Voir plus » de l'Analyse, puisqu'il fait la même
+     chose : ouvrir une page entière. */
+  const act = document.createElement('button')
+  act.type = 'button'
+  act.className = 'an-plus ac-act'
+  act.textContent = 'Voir les dernières activités de l\u2019entreprise'
+  act.addEventListener('click', () => ouvrirActivites())
+  zone.appendChild(act)
 }
 
 /* ═══ FORCER LA PREMIÈRE IMAGE, ET SE REPLIER SI ELLE NE VIENT PAS ═══
@@ -6453,21 +6483,23 @@ function preparerVignetteVideo(carte) {
 
   v.addEventListener('error', replier, { once: true })
 
-  /* ═══ LE GARDE-FOU ═══
+  /* ═══ LE GARDE-FOU, CORRIGÉ ═══
 
-     Le placement dépend de choses qu'on ne maîtrise pas : le serveur doit
-     accepter les requêtes partielles, le format doit être indexé, le réseau
-     doit répondre. Si l'un manque, `error` ne se déclenche pas forcément — la
-     vidéo reste simplement noire, indéfiniment.
+     Il testait `readyState < 2`. C'était faux : `preload="metadata"` s'ARRÊTE
+     à 1 — durée et dimensions connues, aucune image décodée — et c'est
+     exactement ce qu'on lui demande. Le test était donc vrai pour TOUTE vidéo
+     saine, et les vignettes basculaient sur l'icône générique quelques
+     secondes après s'être affichées.
 
-     Trois secondes après, si aucune image n'a été décodée — `readyState` en
-     dessous de 2 —, on remplace par l'icône. Un cadre noir passe pour un défaut
-     de l'app ; une icône passe pour une procédure sans image, ce qui est vrai.
+     Le bon critère est plus bas : les métadonnées sont-elles arrivées ? Si
+     `readyState` vaut encore 0 au bout de six secondes, la vidéo n'a rien
+     donné — adresse expirée, fichier absent, réseau coupé. En dessous, on
+     laisse le navigateur faire son travail.
 
-     Trois secondes et non une : sur un réseau mobile lent, une vidéo met
-     parfois deux secondes à rendre sa première image, et se replier trop tôt
-     priverait de la vignette quelqu'un qui l'aurait eue. */
-  setTimeout(() => { if (v.readyState < 2) replier() }, 3000)
+     Six secondes et non trois : sur un réseau mobile, l'en-tête d'une vidéo de
+     quarante mégaoctets met parfois quatre secondes à arriver. Se replier plus
+     tôt priverait de la vignette quelqu'un qui l'aurait eue. */
+  setTimeout(() => { if (v.readyState === 0) replier() }, 6000)
 }
 
 function vignetteProcedure(p) {

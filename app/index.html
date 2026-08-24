@@ -1720,18 +1720,21 @@
     <!-- Le titre de la page et son compte. Le bouton d'explication partage la
          ligne du compte : c'est ce compte qu'il explique, et lui donner une
          ligne à lui seul gaspillerait de la hauteur pour un rond de 26 px. -->
-    <div class="page-tete">
+    <div class="page-tete tete-analyse">
       <h1>Analyse</h1>
-      <!-- ═══ « 3 PERSONNES · 7 PROCÉDURES LUES » A ÉTÉ RETIRÉ ═══
+      <!-- ═══ LES DEUX AIDES SUR LA LIGNE DU TITRE ═══
 
-           Ce compte disait, en petit sous le titre, ce que les trois anneaux
-           disent juste en dessous — et il le disait autrement : lui comptait
-           depuis toujours, les anneaux comptent le mois. Deux chiffres qui ne
-           parlent pas de la même période, à trois centimètres l'un de l'autre.
+           `tete-bas` était un second rang, sous le titre. Il portait le compte
+           « N personnes · N procédures lues » ; les deux ronds le suivaient et
+           se lisaient comme sa ponctuation.
 
-           Les boutons d'aide restent : ils répondent à « quand le compteur
-           tourne » et « à quoi correspondent les durées », deux questions que
-           les anneaux posent sans y répondre. -->
+           Le compte retiré, ce rang ne contenait plus que deux pastilles de
+           26 px — une ligne entière pour deux boutons, et un vide entre le
+           titre et le premier anneau.
+
+           Ils remontent donc à côté du titre. `tete-analyse` passe le conteneur
+           en ligne ; la classe est propre à cet écran, car `page-tete` sert
+           aussi à « Procédures » et au salut de l'Équipe, qui empilent. -->
       <div class="tete-bas">
         <button type="button" class="an-aide" data-aide-temps=""
                 aria-label="Comment le temps est compté">

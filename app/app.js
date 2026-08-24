@@ -2548,155 +2548,25 @@ async function peindreResumeEntreprise() {
      sans postes, la fonction s'arrête avant, et la carte resterait masquée
      pour toujours. Un masquage qu'on oublie de lever est pire que pas de
      masquage du tout. */
-  if (!postes) { devoiler(); return }
+  /* ═══ LES POSTES ONT QUITTÉ CETTE CARTE ═══
 
-  /* Les postes arrivent par une requête à part : la table peut ne pas exister,
-     et `chargerPostes` rend alors un tableau vide plutôt que d'échouer. */
-  let liste = postesEntreprise
-  if (!liste || !liste.length) {
-    try { liste = await chargerPostes() } catch (e) { liste = [] }
-  }
+     Elle en portait sept informations : le prénom, le total, la barre, deux
+     chiffres de légende, la liste des postes et son tiroir. Une carte
+     d'accueil doit accueillir, pas rendre compte.
 
-  if (!liste?.length) {
-    postes.innerHTML = ''
-    devoiler()
-    return
-  }
+     Les postes se consultent une fois par mois, pas chaque matin — et ils ont
+     déjà leur page, dans Réglages, où on les crée et les renomme. Les afficher
+     ici les dédoublait sans les rendre plus utiles.
 
-  /* ═══ LE COMPTE DES POSTES · PERSONNE NE DISPARAÎT ═══
-
-     L'ancien compte avait deux trous silencieux.
-
-     ① LES SANS-POSTE N'ÉTAIENT NULLE PART. Sur onze membres dont un serveur et
-        trois cuisiniers, sept personnes n'apparaissaient dans aucune ligne. Le
-        relevé affichait 4 et laissait croire que c'était tout. C'est pourtant
-        l'information la plus actionnable de la carte : sept fiches à remplir.
-
-     ② UN POSTE SUPPRIMÉ EFFAÇAIT SES OCCUPANTS. `if (compte.has(p))` : quand
-        un poste disparaissait de la liste, les membres qui le portaient encore
-        n'étaient comptés ni dans leur ancien poste, ni ailleurs. Ils sortaient
-        du relevé sans laisser de trace.
-
-     Maintenant tout poste rencontré crée sa ligne, même s'il n'est plus dans la
-     liste — une ligne inattendue est une information, pas une erreur. */
-  const compte = new Map()
-  liste.forEach(p => compte.set(p.nom, 0))
-
-  let sansPoste = 0
-  membres.forEach(m => {
-    const p = (m.poste || '').trim()
-    if (!p) { sansPoste += 1; return }
-    compte.set(p, (compte.get(p) || 0) + 1)
-  })
-
-  /* ═══ « SANS POSTE » DESCEND DANS LE TIROIR ═══
-
-     Elle était la troisième ligne visible, entre les deux postes récents et le
-     bouton. Ce n'est pas sa place : ce n'est pas un poste, c'est ce qui reste
-     quand on les a tous comptés — donc une ligne de bas de relevé, pas une
-     ligne de tête.
-
-     Elle reste grisée, et toujours EN DERNIER dans le tiroir, après les autres
-     postes. Comme un total qu'on lit à la fin. */
-  const ligneSansPoste = sansPoste > 0
-    ? `<div class="re-p vide"><span>Sans poste</span><b>${sansPoste}</b></div>`
-    : ''
-
-  /* ═══ DEUX POSTES VISIBLES, LE RESTE DANS UN TIROIR ═══
-
-     Une entreprise de nettoyage peut avoir douze postes. Douze lignes sous la
-     salutation, et la carte devient un tableau : on ne la lit plus, on la
-     traverse. Deux suffisent à dire de quoi il s'agit ; le tiroir garde les
-     autres à portée sans les imposer.
-
-     LES DEUX DERNIERS CRÉÉS, PAS LES DEUX PREMIERS. `ordre` vaut
-     `postesEntreprise.length` au moment de la création : il croît donc avec le
-     temps, et la fin de la liste est ce qui vient d'être ajouté. C'est aussi ce
-     qui intéresse — un poste qu'on vient de créer est un poste qu'on est en
-     train de remplir.
-
-     Aucune date n'est nécessaire : `ordre` la porte déjà. */
-  const lignes = [...compte.entries()]
-  const recents = lignes.slice(-2).reverse()
-  const autres = lignes.slice(0, -2).reverse()
-
-  const ligne = ([nom, n]) =>
-    `<div class="re-p"><span>${escapeHtml(nom)}</span><b>${n}</b></div>`
-
-  /* LE BOUTON COMPTE CE QU'IL OUVRE VRAIMENT. « Voir les 4 autres » alors que
-     le tiroir en contient cinq — les quatre postes plus la ligne « sans
-     poste » — est une petite trahison, mais on la remarque tout de suite.
-
-     Et s'il n'y a QUE « sans poste » à montrer, on le dit en toutes lettres :
-     « Voir 1 autre » n'apprend rien sur ce qu'on va trouver. */
-  const nDedans = autres.length + (sansPoste > 0 ? 1 : 0)
-  const libelleTiroir = autres.length === 0
-    ? 'Voir les personnes sans poste'
-    : `Voir ${nDedans} ligne${nDedans > 1 ? 's' : ''} de plus`
-
-  /* Le tiroir n'existe QUE s'il a quelque chose dedans. Un bouton « voir les
-     autres » qui n'ouvre rien est pire qu'une absence de bouton. */
-  const dedans = autres.map(ligne).join('') + ligneSansPoste
-
-  /* ═══ LES DIMENSIONS SONT DANS LE BALISAGE, PAS SEULEMENT DANS LE STYLE ═══
-
-     Un `<svg>` sans attributs `width`/`height` et sans règle CSS prend sa
-     taille par défaut : 300 × 150 pixels. Le chevron devenait alors un V géant
-     posé sous le bouton, et le tiroir paraissait cassé.
-
-     Ce n'était pas une faute de style — les règles existent — mais un décalage
-     de déploiement : `app.js` était en ligne, `style.css` pas encore. Le CSS
-     reste la référence pour la taille finale ; les attributs ne sont là que
-     pour qu'une page à moitié à jour reste regardable. */
-  const tiroir = dedans ? `
-    <div class="re-tiroir${postesOuverts ? ' ouvert' : ''}" id="re-tiroir">
-      <div class="re-tiroir-in">${dedans}</div>
-    </div>
-    <button class="re-plus" onclick="basculerPostes()" aria-expanded="${postesOuverts}"
-            data-ouvrir="${escapeHtml(libelleTiroir)}">
-      <span>${postesOuverts ? 'Réduire' : libelleTiroir}</span>
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </button>` : ''
-
-  postes.innerHTML = '<div class="re-t">Postes</div>' +
-    recents.map(ligne).join('') + tiroir
+     Reste le prénom, le total et la répartition gestion/équipe : trois
+     informations qui disent l'état de l'entreprise en un regard. */
   devoiler()
 }
 
-/* L'état du tiroir vit HORS de la fonction qui dessine : la carte est repeinte
-   à chaque retour sur l'accueil, et un tiroir qui se referme tout seul à chaque
-   passage donnerait l'impression de n'avoir jamais été ouvert. */
-let postesOuverts = false
-
-window.basculerPostes = function () {
-  postesOuverts = !postesOuverts
-
-  /* ═══ POURQUOI ON NE REPEINT PLUS ═══
-
-     La bascule appelait `peindreResumeEntreprise`, qui réécrit tout le contenu
-     de la carte. Le tiroir était donc DÉTRUIT ET RECRÉÉ à chaque clic — et un
-     élément qui naît déjà ouvert n'a rien à animer : une transition CSS a
-     besoin d'un état de départ, puis d'un changement sur LE MÊME élément.
-
-     La transition existait, elle était juste inatteignable. Le tiroir sautait
-     d'un état à l'autre.
-
-     On bascule donc la classe en place. Le contenu, lui, ne change pas : il est
-     déjà dessiné dans les deux cas, seulement replié.
-
-     LE REPEINT RESTE EN SECOURS. Si le tiroir n'est pas dans la page — carte
-     redessinée entre-temps, changement d'entreprise —, on retombe sur l'ancien
-     chemin plutôt que de ne rien faire. */
-  const t = document.getElementById('re-tiroir')
-  const b = document.querySelector('#re-postes .re-plus')
-  if (!t || !b) { peindreResumeEntreprise().catch(() => {}); return }
-
-  t.classList.toggle('ouvert', postesOuverts)
-  b.setAttribute('aria-expanded', String(postesOuverts))
-  const mot = b.querySelector('span')
-  if (mot) mot.textContent = postesOuverts ? 'Réduire' : (b.dataset.ouvrir || 'Voir plus')
-}
+/* `basculerPostes` et `postesOuverts` ont été retirés avec le tiroir : ils ne
+   pilotaient plus rien. Une fonction exposée sur `window` que plus personne
+   n'appelle est pire que du code mort — elle laisse croire qu'un mécanisme
+   existe encore. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE CODE DE GESTION
@@ -6190,7 +6060,15 @@ function renderAccueil() {
      plus tard sans que le reste attende. */
   peindreResumeEntreprise().catch(() => {})
   peindreActivites()
-  peindreDernieresProcedures()
+  /* ═══ APPEL RETIRÉ AVEC LE BLOC ═══
+
+     `peindreDernieresProcedures` n'est plus appelée nulle part. Je la laisse
+     en place plutôt que de la supprimer : elle sait dessiner une liste de
+     procédures récentes, et si tu veux ce bloc ailleurs un jour, il est écrit.
+
+     J'avais d'abord écrit ici qu'elle servait à l'onglet Procédures. C'est
+     faux — j'ai vérifié après coup : il a sa propre grille. Une note inexacte
+     dans le code est pire qu'aucune note. */
   const salut = document.getElementById('accueil-salut')
   const mot = document.getElementById('accueil-mot')
   if (!salut || !mot) return

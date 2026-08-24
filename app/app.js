@@ -3460,14 +3460,9 @@ window.loadGlobalAnalyse = function() {
      Volontairement, pas de total de minutes ici : c'est la carte qui a été
      retirée de cette page, et la remettre sous une autre forme reviendrait à
      défaire ce choix. */
-  const cpt = document.getElementById('an-compte')
-  if (cpt) {
-    const lecteurs = new Set((validations || []).map(v => v.membre_id)).size
-    const lues = new Set((validations || []).map(v => v.procedure_id)).size
-    cpt.textContent = lues
-      ? `${lecteurs} personne${lecteurs > 1 ? 's' : ''} \u00b7 ${lues} procédure${lues > 1 ? 's' : ''} lue${lues > 1 ? 's' : ''}`
-      : 'Aucune lecture pour le moment'
-  }
+  /* Le compte « N personnes · N procédures lues » a quitté l'en-tête, et son
+     calcul avec lui : plus rien ne le lisait. Deux ensembles construits à chaque
+     rendu pour un texte qui n'existe plus, c'est du travail pour personne. */
 
   renderGaStats()
 

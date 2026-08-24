@@ -2897,23 +2897,21 @@ let courbePeriode = 'annee'      // 'mois' · 'annee' · 'tout'
 
 /* ═══ LE DÉBUT DE L'HISTOIRE, PAS LE DÉBUT DU CALENDRIER ═══
 
-   Une entreprise seule ne lit pas ses propres procédures : tant qu'il n'y a
-   qu'une personne, la courbe est plate à zéro et ne raconte rien.
+   La courbe démarre au jour où l'entreprise a été créée. Avant, il n'y avait
+   rien — ni équipe, ni procédure — et afficher ces mois vides donnerait à
+   croire à un échec là où il n'y avait personne.
 
-   On part donc du mois où le DEUXIÈME membre est arrivé — le moment où il
-   devient possible de former quelqu'un. Avant, il n'y avait pas d'équipe, et
-   afficher ces mois vides donnerait à croire à un échec là où il n'y avait
-   simplement personne.
+   J'avais d'abord pris l'arrivée du DEUXIÈME membre, en me disant qu'une
+   entreprise seule ne lit pas ses propres procédures. C'était un raisonnement
+   de ma part, pas une demande : le gérant veut voir son histoire depuis le
+   début, y compris les semaines où il était seul à préparer.
 
-   Sans deuxième membre, on rend `null` et l'appelant se rabat sur douze mois. */
-function debutEquipe(membres) {
-  const dates = (membres || [])
-    .map(m => m.created_at ? new Date(m.created_at) : null)
-    .filter(Boolean)
-    .sort((a, b) => a - b)
-  if (dates.length < 2) return null
-  const d = dates[1]
-  return new Date(d.getFullYear(), d.getMonth(), 1)
+   Sans date connue, on se rabat sur douze mois. */
+function debutEntreprise() {
+  const d = cachedEntreprise?.created_at
+  if (!d) return null
+  const t = new Date(d)
+  return isNaN(t) ? null : new Date(t.getFullYear(), t.getMonth(), 1)
 }
 
 /* Les cases de la courbe, selon la période. Chacune porte son libellé d'axe. */
@@ -2927,26 +2925,40 @@ function casesCourbe(validations, membres) {
     const fin = now.getDate()
     for (let j = 1; j <= fin; j++) {
       const deb = new Date(now.getFullYear(), now.getMonth(), j)
+      /* ═══ LE JOUR SEUL NE DIT RIEN ═══
+
+         Les repères affichaient « 1 · 13 · 25 ». Trois nombres nus, sans mois :
+         on ne sait pas de quelle période il s'agit, et « 1 » pourrait aussi bien
+         être une valeur qu'une date.
+
+         Le mois est ajouté à chacun — « 1 août · 13 août · 25 août ». Trois
+         mots de plus, et la ligne devient lisible sans effort. */
       cases.push({ deb, fin: new Date(now.getFullYear(), now.getMonth(), j + 1), total: 0,
-                   nom: String(j) })
+                   nom: `${j} ${deb.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')}` })
     }
   } else if (courbePeriode === 'annee') {
     /* Les douze mois de l'année en cours, de janvier à aujourd'hui. */
     for (let m = 0; m <= now.getMonth(); m++) {
       const deb = new Date(now.getFullYear(), m, 1)
+      /* Une seule année affichée : le mois suffit, l'année serait répétée
+         douze fois pour rien. */
       cases.push({ deb, fin: new Date(now.getFullYear(), m + 1, 1), total: 0,
                    nom: deb.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '') })
     }
   } else {
     /* Depuis l'arrivée du deuxième membre, mois par mois. Plafonné à vingt-quatre
        points : au-delà, deux ans sur 320 px donnent une ligne illisible. */
-    let deb = debutEquipe(membres) || new Date(now.getFullYear(), now.getMonth() - COURBE_MOIS + 1, 1)
+    let deb = debutEntreprise() || new Date(now.getFullYear(), now.getMonth() - COURBE_MOIS + 1, 1)
     const limite = new Date(now.getFullYear(), now.getMonth() - 23, 1)
     if (deb < limite) deb = limite
     const c = new Date(deb)
     while (c <= now) {
+      /* « Au total » peut traverser deux années : le mois seul ferait revenir
+         « janv » deux fois sans qu'on sache lequel est lequel. L'année s'ajoute
+         en deux chiffres, pour ne pas allonger la ligne. */
       cases.push({ deb: new Date(c), fin: new Date(c.getFullYear(), c.getMonth() + 1, 1), total: 0,
-                   nom: c.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '') })
+                   nom: c.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
+                         .replace('.', '') })
       c.setMonth(c.getMonth() + 1)
     }
   }
@@ -2984,23 +2996,19 @@ function renderCourbe(validations, membres) {
   const cases = casesCourbe(validations, membres)
   const brut = Math.max(...cases.map(c => c.total), 0)
 
-  const filtre = `
-    <div class="dd-filter cb-filtre" id="dd-courbe">
-      <button type="button" class="dd-trigger" id="dd-courbe-trigger">
-        <span id="dd-courbe-label">${courbePeriode === 'mois' ? 'Ce mois-ci'
-          : courbePeriode === 'annee' ? 'Cette année' : 'Au total'}</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="dd-menu" id="dd-courbe-menu">
-        <button type="button" class="dd-opt${courbePeriode === 'mois' ? ' actif' : ''}" data-courbe="mois">Ce mois-ci</button>
-        <button type="button" class="dd-opt${courbePeriode === 'annee' ? ' actif' : ''}" data-courbe="annee">Cette année</button>
-        <button type="button" class="dd-opt${courbePeriode === 'tout' ? ' actif' : ''}" data-courbe="tout">Au total</button>
-      </div>
-    </div>`
+  /* Le filtre vit désormais dans le balisage, sur la ligne du titre. On se
+     contente d'y refléter le choix courant. */
+  const lbl = document.getElementById('dd-courbe-label')
+  if (lbl) {
+    lbl.textContent = courbePeriode === 'mois' ? 'Ce mois-ci'
+      : courbePeriode === 'annee' ? 'Cette année' : 'Au total'
+  }
+  document.querySelectorAll('#dd-courbe-menu .dd-opt').forEach(o => {
+    o.classList.toggle('actif', o.dataset.courbe === courbePeriode)
+  })
 
   if (!brut || cases.length < 2) {
-    el.innerHTML = filtre + vide({
+    el.innerHTML = vide({
       dessin: NEANT_PROCEDURE,
       titre: 'Rien de lu sur cette période',
       phrase: 'Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.',
@@ -3024,7 +3032,7 @@ function renderCourbe(validations, membres) {
 
   const milieu = cases[Math.floor(cases.length / 2)]
 
-  el.innerHTML = filtre + `
+  el.innerHTML = `
     <div class="cb-cadre">
       <div class="cb-axe">
         <span>${escapeHtml(dureeLisible(sommet))}</span>

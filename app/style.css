@@ -8221,9 +8221,20 @@ body:has(#e-detail.active) #equipe-app{
    On rend donc l'écart fixe. La note suit sa valeur, et le vide résiduel
    remonte sous le titre — là où il se lit comme de l'air, pas comme un trou. */
 .ac-tuile > .ac-n{ margin-top:6px; }
-/* C'est la VALEUR qui descend : elle se pose juste au-dessus de la note, et le
-   trio titre-valeur-note reste soudé au bas de la tuile. */
-.ac-tuile > .ac-v{ margin-top:auto; }
+/* ═══ LE TRIO RESTE SOUDÉ EN HAUT ═══
+
+   `margin-top:auto` sur la valeur la poussait vers le bas, et tout l'écart
+   excédentaire se logeait entre le titre et elle. Mesuré : 4 px dans les
+   tuiles de la première rangée, 47 dans « Équipe formée » — étirée à 202 px
+   par sa voisine à anneau.
+
+   C'est ce trou que tu voyais, et il grandit à mesure que la tuile voisine
+   grandit : le vide n'est donc pas entre les rangées, il est DANS la tuile la
+   moins haute de la rangée la plus haute.
+
+   Sans `auto`, icône, titre, valeur et note se suivent en haut, et le vide
+   passe sous la note — là où il ne se distingue plus du rembourrage. */
+.ac-tuile > .ac-v{ margin-top:6px; }
 .ac-n{
   font-size:11px; color:var(--label-3); margin-top:6px; letter-spacing:-0.005em;
 }
@@ -8245,8 +8256,16 @@ body:has(#e-detail.active) #equipe-app{
 /* 76 px, pas 92 : mesuré au rendu, un anneau de 92 débordait de la tuile —
    la hauteur disponible est celle des trois autres, et le titre en mange
    déjà 30. Le pourcentage suit, à 18 px au lieu de 21. */
+/* ═══ L'ANNEAU NE PLONGE PLUS VERS LE BAS ═══
+
+   `margin:auto auto 0` le poussait au ras de sa note, ce qui étirait la tuile
+   et laissait sa voisine avec un vide sous la sienne.
+
+   Posé juste sous le titre, il rend 26 px à la rangée. La tuile reste la plus
+   haute des quatre — un anneau de 76 px ne peut pas faire moins — mais l'écart
+   se réduit, et « se sont formés ce mois-ci » ne flotte plus. */
 .ac-anneau{
-  position:relative; width:76px; height:76px; margin:auto auto 0;
+  position:relative; width:76px; height:76px; margin:8px auto 0;
 }
 /* Sur la tuile à anneau, la note n'a pas besoin d'être poussée : l'anneau
    occupe déjà tout l'espace disponible au-dessus d'elle. */

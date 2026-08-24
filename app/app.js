@@ -2970,6 +2970,18 @@ function renderGainTemps(validations, procedures) {
 function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
   const el = cible || document.getElementById('ga-late-list')
   if (!el) return
+  /* ═══ ON VIDE ICI, PAS PLUS BAS ═══
+
+     Le vidage se trouvait juste avant la boucle des lignes — donc APRÈS l'ajout
+     de l'anneau, qu'il effaçait aussitôt. Le bloc restait vide : l'anneau était
+     bien construit, bien ajouté, et supprimé dans la foulée.
+
+     Rien ne le signalait, puisque aucune erreur n'est levée. Et le défaut ne
+     touchait que ce bloc-ci : les deux autres vident en tête, comme il se doit.
+
+     La règle : on vide au début d'une fonction de rendu, jamais au milieu. Ce
+     qui est ajouté ensuite doit pouvoir l'être dans n'importe quel ordre. */
+  el.innerHTML = ''
 
   const parProc = {}
   dansPeriode.forEach(v => {
@@ -2986,7 +2998,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     .sort((a, b) => b.total - a.total)
 
   if (!classement.length) {
-    el.innerHTML = vide({
+    el.innerHTML = vide({          // le conteneur est déjà vide, on peut écraser
       dessin: NEANT_PROCEDURE,
       titre: 'Rien de lu ce mois-ci',
       phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe.",
@@ -3035,7 +3047,6 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
   /* La même forme que la section Équipe : une ligne nue, le nom au-dessus de
      son sous-titre, la valeur à droite. Pas de cadre, pas de flèche — deux
      sections voisines qui présentent la même chose doivent se ressembler. */
-  el.innerHTML = ''
   visibles.forEach((x, i) => {
     const n = x.lecteurs.size
     const div = document.createElement('div')

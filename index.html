@@ -1686,62 +1686,62 @@ footer .marque{ margin-bottom:18px; }
 
   .capture{
     position:relative; max-width:none; margin:0;
-    aspect-ratio:auto; height:600px; overflow:visible;
+    aspect-ratio:auto; height:626px; overflow:visible;
     border-radius:0; box-shadow:none;
     transform-style:preserve-3d;
     -webkit-mask-image:none; mask-image:none;
   }
-  /* Les vues cessent d'être empilées : chacune redevient un objet posé, avec
-     son cadre, son ombre et son propre fondu de bas. Les transitions du
-     carrousel sont neutralisées — le script continue de basculer la classe
-     `on`, mais elle n'a plus d'effet ici. */
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     TROIS ÉCRANS EN ÉVENTAIL
+
+     La composition n'en portait que deux : un au fond, un devant. Le troisième
+     y était masqué faute de place. En les décalant en diagonale — même largeur,
+     même pas horizontal et vertical — les trois tiennent dans la colonne, et
+     chacun laisse voir une centaine de pixels de celui qui le précède.
+
+     L'ORDRE À L'ÉCRAN N'EST PAS CELUI DU HTML. Au fond l'accueil, au milieu
+     l'analyse, devant la procédure ouverte : c'est elle qui porte la
+     démonstration, donc elle prend le premier plan. Le carrousel du téléphone,
+     lui, garde l'ordre de lecture.
+
+     La netteté et la clarté augmentent vers l'avant : c'est le signal de
+     profondeur le plus fort, bien avant la taille ou l'ombre.
+     ═══════════════════════════════════════════════════════════════════════ */
   .capture .vue{
     position:absolute; inset:auto;
     opacity:1; filter:none; transition:none;
     pointer-events:auto;
     border-radius:22px; overflow:hidden;
-    box-shadow:0 0 0 1px rgba(255,255,255,.14),
-               inset 0 1px 0 rgba(255,255,255,.30),
-               0 34px 80px rgba(0,0,0,.66);
-    /* Le fondu commence à 88 % et non 78 : à 78 il tombait en plein milieu de
-       la barre de navigation de l'app, qu'on lisait à moitié effacée. Plus bas,
-       il n'efface que le vide sous elle. */
     -webkit-mask-image:linear-gradient(180deg,#000 88%,rgba(0,0,0,.45) 96%,transparent);
             mask-image:linear-gradient(180deg,#000 88%,rgba(0,0,0,.45) 96%,transparent);
   }
-  /* Derrière : la liste des dossiers. Elle n'est pas là pour être lue — elle
-     dit qu'il y a d'autres écrans, et elle donne la profondeur. Un tiers
-     visible suffit à ça. */
-  .capture .vue:nth-of-type(1){
-    left:-6px; top:76px; width:286px; z-index:1;
-    transform:rotateY(15deg) scale(.95);
-    transform-origin:100% 50%;
-    /* Assombri et légèrement flou : la profondeur de champ dit « loin » bien
-       plus clairement qu'un simple changement de taille. */
-    filter:blur(1px) brightness(.78);
-    box-shadow:0 0 0 1px rgba(255,255,255,.09),
-               inset 0 1px 0 rgba(255,255,255,.14),
-               0 30px 70px rgba(0,0,0,.7);
-  }
-  /* Devant : la procédure ouverte, plus grande et plus haute. C'est elle qui
-     porte la démonstration, donc elle prend le premier plan. */
-  .capture .vue:nth-of-type(2){
-    /* -46px : il franchit la verticale de droite et déborde dans la marge.
-       C'est le seul élément de la page à sortir de la grille — c'est pour ça
-       que ça se lit comme une intention et non comme un défaut. */
-    /* ═══ LE DÉBORDEMENT SUIT LA MARGE DISPONIBLE ═══
-       À -58 px fixes, l'écran arrivait à huit pixels du bord de la fenêtre sur
-       un ordinateur de 1 100 px : le débordement ne se lisait plus comme une
-       sortie de grille mais comme un défaut de mise en page.
 
-       Il vaut maintenant au plus 58 px, et au plus la moitié de la marge
-       libre moins 16 px de garde. Sur un grand écran il déborde franchement,
-       sur un petit il rentre de lui-même. */
+  /* Au fond : l'accueil. */
+  .capture .vue:nth-of-type(1){
+    left:0; top:0; width:268px; z-index:1;
+    transform:rotateY(16deg) scale(.97);
+    transform-origin:100% 50%;
+    filter:blur(1.3px) brightness(.6);
+    box-shadow:0 0 0 1px rgba(255,255,255,.07),
+               0 24px 56px rgba(0,0,0,.7);
+  }
+  /* Au milieu : l'analyse, dont les anneaux ambre sont la seule couleur de la
+     page — placée au fond elle aurait été éteinte par l'assombrissement. */
+  .capture .vue:nth-of-type(3){
+    left:98px; top:52px; width:288px; z-index:2;
+    transform:rotateY(8deg);
+    transform-origin:100% 50%;
+    filter:blur(.5px) brightness(.82);
+    box-shadow:0 0 0 1px rgba(255,255,255,.13),
+               inset 0 1px 0 rgba(255,255,255,.18),
+               0 34px 70px rgba(0,0,0,.75);
+  }
+  /* Devant : la procédure ouverte. Elle franchit la verticale de droite et
+     déborde dans la marge — le seul élément de la page à sortir de la grille. */
+  .capture .vue:nth-of-type(2){
     right:calc(-1 * min(58px, max(0px, (100vw - var(--large)) / 2 - 16px)));
-    top:-6px; width:366px; z-index:2;
-    /* Une rotation négative avec l'origine à gauche amène le bord DROIT vers
-       le lecteur. C'est donc lui qui porte le reflet — j'avais d'abord mis le
-       reflet à gauche, c'est-à-dire sur le bord qui s'éloigne. */
+    top:104px; width:312px; z-index:3;
     transform:rotateY(-9deg) translateZ(110px);
     transform-origin:0% 50%;
     box-shadow:0 0 0 1px rgba(255,255,255,.32),
@@ -1750,9 +1750,6 @@ footer .marque{ margin-bottom:18px; }
                0 60px 130px rgba(0,0,0,.85),
                0 18px 40px rgba(0,0,0,.6);
   }
-  /* La lumière qui passe DERRIÈRE l'écran de devant. C'est elle qui fait le
-     décollement : sans source derrière, un objet sombre sur fond sombre reste
-     collé au fond, quelle que soit son ombre. */
   .capture .vue:nth-of-type(2)::after{
     content:''; position:absolute; inset:0; z-index:-1;
     border-radius:22px;
@@ -1762,7 +1759,7 @@ footer .marque{ margin-bottom:18px; }
   /* La composition en profondeur de l'ordinateur n'a que deux places. La
      troisième vue y est masquée tant qu'elle est un emplacement — un rectangle
      vide en premier plan serait pire que pas de troisième écran du tout. */
-  .capture .vue:nth-of-type(3){ display:none }
+
   /* Sur un écran de 1 440 px presque entièrement noir, la capture est le seul
      objet lumineux : le halo doit porter plus loin qu'au téléphone, sinon
      l'image paraît posée sur le vide au lieu d'en émerger. */

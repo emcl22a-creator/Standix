@@ -6260,12 +6260,12 @@ function renderAccueil() {
   }
 }
 
-/* Le premier jour du mois courant, et celui du mois précédent. Servent aux
-   deux fenêtres de comparaison. */
-function bornesMois() {
+/* Le premier jour du mois courant. Le mois précédent servait à la comparaison
+   d'usage de l'IA, qui a été remplacée par le taux de lecture — plus rien ne
+   le lit, donc plus rien ne le calcule. */
+function debutDuMois() {
   const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0)
-  const p = new Date(d); p.setMonth(p.getMonth() - 1)
-  return { debutMois: d, debutPrec: p }
+  return d
 }
 
 function peindreTuilesAccueil() {
@@ -6274,7 +6274,7 @@ function peindreTuilesAccueil() {
   grille.innerHTML = ''
 
   const tout = accueilPeriode === 'tout'
-  const { debutMois, debutPrec } = bornesMois()
+  const debutMois = debutDuMois()
   const procs = allGestionProcedures || []
   const vals = cachedValidations || []
 
@@ -6291,25 +6291,29 @@ function peindreTuilesAccueil() {
     : vals.filter(v => new Date(v.validated_at) >= debutMois)
   const secondes = dansFenetre.reduce((t, v) => t + Number(v.duree_lecture || 0), 0)
 
-  /* ─── ③ UTILISATION IA, COMPARÉE AU MOIS PRÉCÉDENT ────────────────────────
-     Une procédure analysée porte une `video_url` : c'est ce qui la distingue
-     d'une procédure écrite à la main.
+  /* ─── ③ LE TAUX DE LECTURE ────────────────────────────────────────────────
 
-     ⚠ LA COMPARAISON N'A DE SENS QUE SUR LE MOIS. « Au total » n'a pas de mois
-       précédent auquel se comparer ; la tuile affiche alors le nombre brut,
-       sans pourcentage. Inventer une comparaison sur une période qui n'en
-       admet pas serait un chiffre faux. */
-  const iaMois = procs.filter(p => p.video_url && new Date(p.created_at) >= debutMois).length
-  const iaPrec = procs.filter(p => {
-    if (!p.video_url) return false
-    const d = new Date(p.created_at)
-    return d >= debutPrec && d < debutMois
-  }).length
-  const iaTotal = procs.filter(p => p.video_url).length
+     « 6 sur 8 se sont formés. » C'est la seule tuile qui parle du RÉSULTAT :
+     les trois autres comptent ce qui a été créé, celle-ci dit si ça sert.
 
-  let ecart = null
-  if (!tout && iaPrec > 0) ecart = Math.round(((iaMois - iaPrec) / iaPrec) * 100)
-  else if (!tout && iaPrec === 0 && iaMois > 0) ecart = 'neuf'
+     Elle remplace une comparaison d'usage de l'IA qui doublait la quatrième
+     tuile — deux tuiles sur quatre comptaient les analyses — et dont le
+     pourcentage était instable : passer de 3 à 2 affichait « −33 % », ce qui
+     dit surtout que les nombres sont petits.
+
+     ─── LA GESTION N'EST PAS COMPTÉE ───
+
+     Même règle que sur la page Analyse : un gestionnaire écrit les procédures,
+     il n'a pas à les lire. L'inclure ferait « 6 sur 10 » là où l'équipe est de
+     huit, et le manquant serait quelqu'un à qui l'on ne demande rien.
+
+     Deux pages qui donneraient deux dénominateurs différents pour la même
+     question seraient pires que pas de chiffre. */
+  const aLire = (cachedMembres || []).filter(m => m.role === 'equipe')
+  const idsALire = new Set(aLire.map(m => m.id))
+  const lecteurs = new Set(
+    dansFenetre.filter(v => idsALire.has(v.membre_id) && Number(v.duree_lecture))
+               .map(v => v.membre_id)).size
 
   /* ─── ④ QUOTA D'ANALYSES ───────────────────────────────────────────────────
      `etatAbo.analyses` vient de `reste_analyses`, qui ne consomme rien. Si la
@@ -6333,13 +6337,18 @@ function peindreTuilesAccueil() {
   }))
 
   grille.appendChild(tuileAccueil({
-    titre: 'Utilisation IA', icone: 'etincelle',
-    valeur: String(tout ? iaTotal : iaMois),
-    note: tout ? 'analyses au total'
-      : ecart === 'neuf' ? 'premières analyses'
-      : ecart === null ? 'analyses ce mois-ci'
-      : `${ecart >= 0 ? '+' : ''}${ecart} % vs mois dernier`,
-    tendance: typeof ecart === 'number' ? ecart : null,
+    titre: 'Équipe formée', icone: 'equipe',
+    /* « 6 / 8 » plutôt que « 75 % » : sur une équipe de huit, le pourcentage
+       est moins parlant que les deux nombres, et il masque la taille de
+       l'équipe — 75 % de quatre personnes, ce n'est pas la même chose. */
+    valeur: aLire.length ? `${lecteurs} / ${aLire.length}` : '—',
+    note: !aLire.length ? 'aucun membre en équipe'
+      : lecteurs === aLire.length ? 'toute l\u2019équipe'
+      : tout ? 'ont lu au moins une procédure'
+      : 'se sont formés ce mois-ci',
+    /* Vert quand tout le monde a lu, sinon rien : une couleur d'alerte sur
+       « 6 sur 8 » ferait d'un chiffre correct un reproche. */
+    tendance: aLire.length && lecteurs === aLire.length ? 1 : null,
   }))
 
   grille.appendChild(tuileQuota(utilisees, quota))
@@ -6436,8 +6445,8 @@ function vignetteProcedure(p) {
    `document`  un feuillet avec son coin plié, et un plus : on en crée.
                C'est déjà l'icône du pied des cartes de dossier.
    `horloge`   un cadran et ses aiguilles. Le temps, sans métaphore.
-   `etincelle` la marque à quatre branches de l'IA, doublée d'une petite —
-               c'est le signe employé partout pour l'analyse automatique.
+   `equipe`    deux silhouettes, la seconde en retrait. Reprise de la carte
+               « Espace Équipe » : on la reconnaît d'un écran à l'autre.
    `film`      une bande perforée. Elle dit « vidéo » là où une caméra dirait
                « filmer », et c'est bien du stock qu'il s'agit, pas du geste.
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -6447,8 +6456,13 @@ const AC_ICONES = {
              <path d="M18.4 21v-6.2M15.3 17.9h6.2" stroke-linecap="round"/>`,
   horloge:  `<circle cx="12" cy="12" r="8.6"/>
              <path d="M12 6.9V12l3.5 2.1" stroke-linecap="round"/>`,
-  etincelle:`<path d="M10.2 3.4l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/>
-             <path d="M17.6 13.8l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/>`,
+  /* Deux silhouettes, la seconde en retrait. Le même dessin que la carte
+     « Espace Équipe » de l'écran d'accueil — un employé qui reconnaît cette
+     icône ailleurs dans l'app sait de quoi la tuile parle. */
+  equipe:   `<path d="M15.6 20.2v-1.7a3.2 3.2 0 0 0-3.2-3.2H6.6a3.2 3.2 0 0 0-3.2 3.2v1.7"/>
+             <circle cx="9.5" cy="7.8" r="3.2"/>
+             <path d="M20.6 20.2v-1.7a3.2 3.2 0 0 0-2.4-3.1"/>
+             <path d="M15.1 4.9a3.2 3.2 0 0 1 0 6.1"/>`,
   film:     `<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.4"/>
              <path d="M7.3 5.4v13.2M16.7 5.4v13.2"/>
              <path d="M3.2 12h17.6"/>`,

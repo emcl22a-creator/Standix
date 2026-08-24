@@ -8136,8 +8136,21 @@ body:has(#e-detail.active) #equipe-app{
    `align-items:stretch` sur la grille les met déjà à égalité DEUX À DEUX, ce
    qui suffit : deux tuiles côte à côte sont alignées, et la seconde rangée n'a
    pas à copier la hauteur de la première. */
+/* ═══ LA MARGE HÉRITÉE, ANNULÉE ═══
+
+   `.an-bloc` porte `margin-bottom:14px` : sur la page Analyse ses blocs sont
+   EMPILÉS, et c'est cette marge qui les sépare.
+
+   Dans une grille, c'est le `gap` qui sépare — et les deux s'additionnaient.
+   Mesuré : 11 px entre les colonnes, 25 entre les rangées. Le double, et rien
+   dans mes propres règles ne l'expliquait : j'ai cherché deux fois à
+   l'intérieur des tuiles avant de mesurer les boîtes elles-mêmes.
+
+   C'est le risque d'hériter d'une classe : on prend son fond et son liseré,
+   mais aussi ses marges, réglées pour un autre contexte. */
 .ac-tuile{
   padding:15px 14px 16px;
+  margin-bottom:0;
   display:flex; flex-direction:column;
 }
 /* 13 px / 600, comme `.section-title` — le titre d'un groupe dans cette app. */
@@ -8358,3 +8371,9 @@ body:has(#e-detail.active) #equipe-app{
   -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - var(--trait)), #000 0);
   mask:radial-gradient(farthest-side, transparent calc(100% - var(--trait)), #000 0);
 }
+
+
+/* Le lien vers les activités, en pied d'accueil. `an-plus` lui donne son fond
+   et son rayon ; on n'ajoute que l'air au-dessus, la dernière ligne de
+   procédure portant déjà sa propre marge. */
+.ac-act{ margin-top:5px; }

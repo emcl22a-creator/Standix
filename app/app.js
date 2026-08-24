@@ -4333,7 +4333,22 @@ function dessinerAnneauEq(cle) {
 
   const T = 214, ep = 17, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const vue = anEqVues[cle]
-  const vus = regrouperParts(vue.classe.filter(x => x.total), x => x.total)
+  /* ═══ LA GESTION N'ENTRE PAS DANS L'ANNEAU ═══
+
+     Quand j'ai retiré les gestionnaires de la mesure, j'ai exclu leur temps du
+     TOTAL et de l'attribution des couleurs — mais pas de ce filtre. Un
+     gestionnaire qui avait lu quelque chose entrait donc dans l'anneau SANS
+     couleur : son arc se dessinait en gris, et on le prenait pour la part
+     « Autres ».
+
+     Le gris était juste au mauvais endroit. Trois exclusions étaient
+     nécessaires, j'en avais fait deux — et la troisième ne se voit que sur une
+     entreprise où un gestionnaire lit, ce qui n'arrive pas tous les jours.
+
+     ⚠ Seul CET anneau est concerné. `dessinerAnneauCat` et `dessinerAnneauProc`
+       partagent la même ligne, mais ils classent des dossiers et des
+       procédures : `gestion` n'y existe pas. */
+  const vus = regrouperParts(vue.classe.filter(x => x.total && !x.gestion), x => x.total)
   const somme = vus.reduce((t, x) => t + x.total, 0)
 
   if (!vus.length || !somme) {
@@ -4386,10 +4401,14 @@ function centreAnneauEq(cle, choix) {
   if (!v) return
   const vue = anEqVues[cle]
   if (!choix) {
-    const actifs = vue.classe.filter(x => x.total).length
+    /* Le compte suit la même règle que l'anneau : sans les gestionnaires.
+       Il disait « 3 sur 5 » pendant que le bandeau du dessus disait « 2 sur 3 »
+       — deux chiffres contradictoires à trois centimètres d'écart. */
+    const mesures = vue.classe.filter(x => !x.gestion)
+    const actifs = mesures.filter(x => x.total).length
     v.textContent = String(Math.round(vue.total / 60))
     u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
-    n.textContent = `${actifs} sur ${vue.classe.length} personne${vue.classe.length > 1 ? 's' : ''}`
+    n.textContent = `${actifs} sur ${mesures.length} personne${mesures.length > 1 ? 's' : ''}`
     return
   }
   v.textContent = String(Math.round(choix.total / 60))

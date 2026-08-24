@@ -6237,6 +6237,15 @@ function depuisQuandCourt(t) {
 let accueilPeriode = 'mois'      // 'mois' ou 'tout'
 
 function renderAccueil() {
+  /* ═══ UN ÉCHEC ICI NE DOIT PLUS ÊTRE SILENCIEUX ═══
+
+     La page est restée entièrement vide et rien ne le signalait : une erreur
+     dans le calcul des tuiles interrompt la fonction, et l'accueil n'affiche
+     alors ni salut, ni phrase, ni tuiles — comme si l'écran n'existait pas.
+
+     Le salut est donc posé AVANT tout calcul, et les tuiles sont enveloppées :
+     si elles échouent, la console dit pourquoi et le haut de page reste
+     lisible. Un écran à moitié rempli se diagnostique ; un écran vide, non. */
   const prenom = document.getElementById('ac-prenom')
   if (prenom) {
     /* Le prénom seul. « Bonjour Emilien Meifj » sonne comme un courrier
@@ -6244,7 +6253,11 @@ function renderAccueil() {
     const nom = (currentMembre?.nom || '').trim()
     prenom.textContent = nom ? nom.split(/\s+/)[0] : ''
   }
-  peindreTuilesAccueil()
+  try {
+    peindreTuilesAccueil()
+  } catch (e) {
+    console.error('[accueil] les tuiles n\u2019ont pas pu \u00eatre dessin\u00e9es :', e)
+  }
 }
 
 /* Le premier jour du mois courant, et celui du mois précédent. Servent aux

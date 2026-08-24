@@ -8125,29 +8125,41 @@ body:has(#e-detail.active) #equipe-app{
   display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:11px; align-items:stretch;
 }
-/* ═══ 158 px, ADDITIONNÉS ET NON ESTIMÉS ═══
+/* ═══ PLUS DE HAUTEUR IMPOSÉE ═══
 
-   La tuile la plus haute est celle de l'anneau :
+   `min-height:158px` alignait les quatre tuiles sur la plus haute, celle de
+   l'anneau. Les trois autres se retrouvaient avec cinquante pixels de vide au
+   milieu — c'est ce vide qu'on prenait pour un écart entre les rangées, alors
+   que l'écart lui-même vaut 11 px dans les deux sens depuis le début.
 
-     15 de rembourrage haut
-     30 de titre (deux lignes réservées)
-     76 d'anneau
-      6 d'écart
-     14 de note
-     16 de rembourrage bas
-     ───
-    157
-
-   J'avais écrit 148 de mémoire — la tuile aurait débordé de neuf pixels, et
-   l'anneau serait sorti par le bas comme sur mon premier rendu. Les trois
-   autres tuiles s'alignent sur celle-ci plutôt que de laisser une rangée
-   bancale. */
+   Sans hauteur imposée, chaque rangée prend la hauteur de sa plus haute tuile.
+   `align-items:stretch` sur la grille les met déjà à égalité DEUX À DEUX, ce
+   qui suffit : deux tuiles côte à côte sont alignées, et la seconde rangée n'a
+   pas à copier la hauteur de la première. */
 .ac-tuile{
   padding:15px 14px 16px;
   display:flex; flex-direction:column;
-  min-height:158px;
 }
 /* 13 px / 600, comme `.section-title` — le titre d'un groupe dans cette app. */
+/* ═══ LA PLAQUE D'ICÔNE ═══
+
+   Reprise de `.cat-ic`, celle des dossiers et des procédures : même dégradé
+   ambre très pâle, même liseré à 20 %, même rayon. Réduite de 40 à 34 px, et
+   son dessin de 21 à 18 — une tuile de demi-largeur ne peut pas s'offrir la
+   même plaque qu'une carte pleine.
+
+   Le dégradé et le liseré sont recopiés plutôt qu'hérités : `.cat-ic` vit dans
+   une requête média, et l'attacher ici l'aurait fait disparaître hors de cette
+   fenêtre. Recopier trois lignes coûte moins qu'une dépendance invisible. */
+.ac-ic{
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  width:34px; height:34px; border-radius:11px; margin-bottom:10px;
+  background:linear-gradient(165deg,
+    rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
+  border:0.5px solid rgba(255,173,51,0.20);
+}
+.ac-ic svg{ width:18px; height:18px; display:block; }
+
 .ac-t{
   font-size:13px; font-weight:600; color:var(--label-2);
   letter-spacing:-0.01em; line-height:1.3;
@@ -8170,7 +8182,9 @@ body:has(#e-detail.active) #equipe-app{
   font-size:29px; font-weight:800; letter-spacing:-0.045em; line-height:1;
   margin-top:6px; font-variant-numeric:tabular-nums;
 }
-.ac-tuile > .ac-n{ margin-top:auto; padding-top:8px; }
+/* La note suit la valeur, sans être poussée : il n'y a plus de hauteur
+   excédentaire à combler. */
+.ac-tuile > .ac-n{ margin-top:6px; }
 .ac-n{
   font-size:11px; color:var(--label-3); margin-top:6px; letter-spacing:-0.005em;
 }
@@ -8184,7 +8198,11 @@ body:has(#e-detail.active) #equipe-app{
    L'anneau prend la place de la valeur. Il est centré, le pourcentage à
    l'intérieur, et le rapport passe en note comme sur les autres. */
 .ac-tuile--anneau{ align-items:center; text-align:center; }
-.ac-tuile--anneau .ac-t{ align-self:flex-start; text-align:left; }
+/* La tuile à anneau centre son contenu ; la plaque et le titre restent
+   pourtant à gauche, comme sur les trois autres. Sans cela, l'icône serait
+   centrée dans une tuile et à gauche dans les trois voisines. */
+.ac-tuile--anneau .ac-t,
+.ac-tuile--anneau .ac-ic{ align-self:flex-start; text-align:left; }
 /* 76 px, pas 92 : mesuré au rendu, un anneau de 92 débordait de la tuile —
    la hauteur disponible est celle des trois autres, et le titre en mange
    déjà 30. Le pourcentage suit, à 18 px au lieu de 21. */

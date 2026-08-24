@@ -3616,7 +3616,21 @@ window.ouvrirFicheMembre = function(membreId) {
    répartir du temps de lecture, il enverrait un signal qui n'existe pas.
 
    Le gris d'« Autres » vit à part, dans `ANNEAU_GRIS`. */
-const FM_TEINTES = ['#FFDFA0', '#FFAE2E', '#E8760F', '#B34A16', '#7A3A22', '#4A2A1E']
+/* ═══ TROIS TEINTES, ET LE GRIS ═══
+
+   Il y en avait six. Les deux dernières — #7A3A22 et #4A2A1E — sont si sombres
+   qu'elles se confondaient avec le fond de la carte : un arc marron foncé sur
+   un fond presque noir ne se lit pas, il se devine.
+
+   Trois couleurs plus le gris font quatre parts. C'est peu, et c'est le but :
+   au-delà, on retourne à la légende à chaque arc pour savoir lequel est
+   lequel. Ce qui déborde va dans le gris, où il est nommé « N autres » — et
+   c'est plus honnête que de lui donner une couleur qu'on ne saura pas relire.
+
+   ⚠ CE TABLEAU COMMANDE LE PLAFOND. `regrouperParts` lit sa longueur pour
+     savoir combien de parts nommer ; en ajouter une quatrième suffit à élargir
+     l'anneau, sans toucher à rien d'autre. */
+const FM_TEINTES = ['#FFDFA0', '#FFAE2E', '#E8760F']
 
 /* Les deux périodes vivent en parallèle : chacune a son classement, son total
    et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau
@@ -3699,15 +3713,16 @@ async function peindreFicheMembre() {
    complet reste dans la liste en dessous, où il est à sa place.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* CINQ PARTS AU PLUS, le gris compris.
+/* ═══ PAS DE CONSTANTE DE PLAFOND ═══
 
-   Sept étaient encore trop : à sept couleurs, on ne distingue plus laquelle est
-   laquelle sans revenir à la légende à chaque fois. Quatre couleurs et un gris
-   se lisent d'un regard — c'est à peu près la limite de ce qu'on retient.
+   Il y en avait une, `ANNEAU_PARTS_MAX`. Elle disait « cinq parts au plus, gris
+   compris » — un nombre à tenir en accord avec la longueur de `FM_TEINTES`, et
+   les deux avaient fini par diverger : cinq places pour six couleurs, puis
+   quatre places pour trois couleurs.
 
-   Le gris ne paraît QUE s'il rassemble quelque chose : avec trois procédures,
-   il n'y a rien à regrouper et l'anneau n'en montre que trois. */
-const ANNEAU_PARTS_MAX = 5
+   Le plafond est maintenant lu directement dans `FM_TEINTES` là où il sert, une
+   seule fois. Un tableau de trois couleurs autorise trois parts nommées ; en
+   ajouter une quatrième élargit l'anneau sans qu'aucun autre nombre ne bouge. */
 const ANNEAU_GRIS = 'rgba(235,235,245,0.28)'
 
 /* ═══ AUCUNE PART TROP PETITE POUR SES ARRONDIS ═══
@@ -3768,17 +3783,25 @@ function regrouperParts(vus, valeur) {
   const grosses = vus.filter(x => valeur(x) / somme >= seuil)
   const petites = vus.filter(x => valeur(x) / somme < seuil)
 
+  /* ═══ LE PLAFOND PORTE SUR LES PARTS NOMMÉES ═══
+
+     Il était comparé au nombre TOTAL de parts, gris compris. Avec quatre
+     procédures et rien à regrouper, la fonction rendait donc quatre parts
+     nommées — pour trois couleurs disponibles. La quatrième reprenait la
+     première teinte, et deux arcs différents portaient le même ambre.
+
+     Le vrai plafond est celui des couleurs : au-delà, il faut regrouper, qu'il
+     y ait des petites parts ou non. */
+  const NOMMEES_MAX = FM_TEINTES.length
+
   /* Rien à regrouper : on rend la liste telle quelle. */
-  if (!petites.length && grosses.length <= ANNEAU_PARTS_MAX) return vus
+  if (!petites.length && grosses.length <= NOMMEES_MAX) return vus
 
   const tri = [...grosses].sort((a, b) => valeur(b) - valeur(a))
   /* Une place est réservée à « autres » dès qu'il y aura quelque chose à y
-     mettre — des petites écartées, ou des grosses en trop. Sinon le plafond de
-     sept devenait huit avec le gris. */
-  const deborde = petites.length > 0 || tri.length > ANNEAU_PARTS_MAX
-  const place = deborde ? ANNEAU_PARTS_MAX - 1 : ANNEAU_PARTS_MAX
-  const gardees = tri.slice(0, place)
-  const reste = [...tri.slice(place), ...petites]
+     mettre — des petites écartées, ou des grosses en trop. */
+  const gardees = tri.slice(0, NOMMEES_MAX)
+  const reste = [...tri.slice(NOMMEES_MAX), ...petites]
   if (!reste.length) return gardees
   const total = reste.reduce((t, x) => t + valeur(x), 0)
   if (!total) return gardees

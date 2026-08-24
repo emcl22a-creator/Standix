@@ -8188,3 +8188,73 @@ body:has(#e-detail.active) #equipe-app{
   .ac-t{ min-height:0; }
   .ac-v{ margin-top:10px; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL · LES TROIS DERNIÈRES PROCÉDURES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ac-sect{
+  font-size:11px; font-weight:700; letter-spacing:0.07em; text-transform:uppercase;
+  color:var(--label-3); margin:26px 2px 10px;
+}
+
+/* La ligne réemploie `an-bloc` comme les tuiles : même fond, même liseré, même
+   rayon. Elle est seulement plus basse et disposée en ligne. */
+.ac-rec{
+  display:flex; align-items:center; gap:12px;
+  width:100%; text-align:left;
+  padding:10px 12px 10px 10px;
+  margin-bottom:9px;
+  font-family:inherit; color:inherit;
+}
+
+/* ═══ LA VIGNETTE ═══
+
+   Un carré de 52 px à coins arrondis. `object-fit:cover` recadre sans
+   déformer — une photo prise de travers reste lisible, elle est juste rognée.
+
+   `overflow:hidden` sur le conteneur plutôt qu'un rayon sur l'image : Safari
+   ignore parfois `border-radius` sur une balise `video`, et le coin ressort
+   carré au milieu d'une carte arrondie. */
+.ac-rec-vue{
+  position:relative; flex:0 0 52px;
+  width:52px; height:52px; border-radius:13px;
+  overflow:hidden; background:rgba(255,255,255,0.05);
+  display:flex; align-items:center; justify-content:center;
+}
+.ac-rec-vue img,
+.ac-rec-vue video{
+  width:100%; height:100%; object-fit:cover; display:block;
+}
+/* La pastille de lecture dit que c'est une vidéo et non une photo. Elle est
+   petite et en bas à droite : au centre, elle masquerait le sujet. */
+.ac-rec-play{
+  position:absolute; right:4px; bottom:4px;
+  width:16px; height:16px; border-radius:50%;
+  background:rgba(0,0,0,0.62);
+  display:flex; align-items:center; justify-content:center;
+  font-size:7px; color:#fff; padding-left:1px;
+}
+.ac-rec-doc{
+  display:flex; align-items:center; justify-content:center;
+  width:100%; height:100%;
+  background:rgba(255,159,10,0.10);
+}
+.ac-rec-doc svg{ width:22px; height:22px; }
+
+.ac-rec-txt{ flex:1; min-width:0; }
+.ac-rec-t{
+  display:block; font-size:14.5px; font-weight:650; letter-spacing:-0.02em;
+  line-height:1.25;
+  /* Deux lignes au plus : un titre long ne doit pas repousser le chevron hors
+     de l'écran ni faire grandir la ligne indéfiniment. */
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden;
+}
+.ac-rec-s{
+  display:block; font-size:11.5px; color:var(--label-2); margin-top:3px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ac-rec-fl{ flex:0 0 auto; font-size:17px; color:var(--label-3); }
+.ac-rec:active{ background:rgba(255,255,255,0.04); }

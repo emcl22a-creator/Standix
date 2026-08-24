@@ -752,58 +752,36 @@
        le dessin d'abord : deux pages qu'on distingue au premier coup d'œil.
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="screen active" id="p-home">
-    <!-- ═══ LE RÉSUMÉ DE L'ENTREPRISE ═══
 
-         L'illustration et sa phrase ont disparu. Elles décoraient : un gérant
-         qui ouvre son app connaît déjà son produit, et ce dessin lui reprenait
-         le premier écran chaque matin.
+    <!-- ═══ L'ACCUEIL, REFAIT ═══
 
-         À la place, ce qu'il vient vérifier : où en est son équipe. Le contenu
-         est peint par `peindreResumeEntreprise` — il dépend des membres, qui
-         arrivent après le chargement. -->
-    <!-- ═══ MASQUÉE JUSQU'À CE QU'ELLE AIT QUELQUE CHOSE À DIRE ═══
+         Un salut, une phrase, un filtre, quatre tuiles. Les tuiles portent la
+         même matière que les blocs de la page Analyse — `an-bloc` — pour qu'on
+         ne découvre pas un troisième vocabulaire de carte dans la même app.
 
-         Cette carte est dans le balisage, pas créée par le code : elle est donc
-         à l'écran dès la première image, vide, avec « Bonjour » tout seul. Puis
-         le prénom arrive, puis la barre, puis les postes — trois à-coups.
-
-         `pas-prete` la retire du flux. `peindreResumeEntreprise` l'enlève quand
-         tout est en place, et la carte apparaît d'un bloc, avec la même
-         animation que les autres.
-
-         L'attribut est dans le balisage plutôt que posé au démarrage : au
-         premier affichage, le JavaScript n'a pas encore tourné, et c'est
-         justement l'instant qu'on veut couvrir. -->
-    <div class="hero hero-ia resume-ent pas-prete" id="accueil-resume">
-      <span class="hero-lueur"></span>
-      <div class="re-tete">
-        <span class="re-salut" id="re-salut">Bonjour</span>
-        <span class="re-main" aria-hidden="true">👋</span>
-        <!-- Le total passe à droite de la salutation. Il n'a plus besoin d'une
-             case à lui : c'est la somme des deux autres, pas une troisième
-             information. -->
-        <span class="re-total" id="re-total"></span>
-      </div>
-      <!-- La barre de répartition et sa légende. Le nom `re-chiffres` est
-           conservé : il est employé par `peindreResumeEntreprise` et le
-           renommer n'apporterait rien. -->
-      <div class="re-chiffres" id="re-chiffres"></div>
-      <div class="re-postes" id="re-postes"></div>
+         La quatrième porte un anneau : c'est la seule dont la valeur est un
+         rapport (N sur N), et un anneau dit un rapport mieux qu'un texte. Les
+         trois autres portent un nombre, parce qu'un nombre seul n'a rien à
+         comparer. -->
+    <div class="ac-tete">
+      <h1 class="ac-salut">Bonjour <span id="ac-prenom">—</span> 👋</h1>
+      <p class="ac-sous">Voici un aperçu de votre espace de travail</p>
     </div>
 
-    <!-- Les trois dernières procédures créées. -->
-    <!-- ═══ « DERNIÈRES PROCÉDURES » A QUITTÉ L'ACCUEIL ═══
+    <div class="dd-filter ac-filtre" id="dd-home-periode">
+      <button type="button" class="dd-trigger" id="dd-home-periode-trigger">
+        <span id="dd-home-periode-label">Ce mois-ci</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dd-menu" id="dd-home-periode-menu">
+        <button type="button" class="dd-opt actif" data-periode="mois">Ce mois-ci</button>
+        <button type="button" class="dd-opt" data-periode="tout">Au total</button>
+      </div>
+    </div>
 
-         Ce bloc répétait ce que l'onglet Procédures montre déjà, en moins
-         complet : trois cartes contre la grille entière, sans recherche ni
-         tri. Deux chemins vers la même chose, dont un tronqué.
+    <div class="ac-grille" id="ac-grille"></div>
 
-         L'accueil garde ce qu'il est seul à dire — l'état de l'entreprise et
-         ce qui vient de s'y passer. Pour les procédures, l'onglet est à un
-         doigt, en bas de l'écran. -->
-
-    <!-- Ce qui vient de se passer dans l'entreprise. -->
-    <div id="accueil-activites"></div>
   </div>
 
   <div class="screen" id="p-list">
@@ -2872,6 +2850,12 @@
       <stop stop-color="#FF6A00"></stop>
       <stop offset="0.6" stop-color="#FF9A1F"></stop>
       <stop offset="1" stop-color="#FFAD33"></stop>
+    </linearGradient>
+    <!-- Le dégradé de l'anneau du quota, sur l'accueil. Même ambre que le
+         logo, mais déclaré à part : celui du logo est incliné pour suivre le
+         signe, celui-ci est vertical pour suivre un cercle. -->
+    <linearGradient id="acDegrade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFC46B"/><stop offset="1" stop-color="#FF6A00"/>
     </linearGradient>
     <linearGradient id="iaFini" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FFFFFF"></stop><stop offset="0.55" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#FFC46B"></stop>

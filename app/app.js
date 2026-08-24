@@ -6509,17 +6509,28 @@ function peindreTuilesAccueil() {
   }))
 
   grille.appendChild(tuileAccueil({
-    titre: 'Équipe formée', icone: 'equipe',
-    /* « 6 / 8 » plutôt que « 75 % » : sur une équipe de huit, le pourcentage
-       est moins parlant que les deux nombres, et il masque la taille de
-       l'équipe — 75 % de quatre personnes, ce n'est pas la même chose. */
-    valeur: aLire.length ? `${lecteurs} / ${aLire.length}` : '—',
+    /* ═══ « MEMBRES ACTIFS », ET UN NOMBRE SIMPLE ═══
+
+       Deux changements, pour la même raison : la tuile jugeait au lieu de
+       renseigner.
+
+       ① « Équipe formée » sonne comme une case à cocher — soit elle l'est, soit
+          elle ne l'est pas, et on est en faute. « Membres actifs » constate.
+
+       ② « 2 / 3 » est une note d'école. Le nombre seul dit la même chose sans
+          le rapport implicite à une perfection. La fraction n'est pas perdue :
+          elle passe en note, où elle informe au lieu de noter.
+
+       Le chiffre est identique, seule sa mise en scène change. Un gérant qui
+       ouvre son app le matin n'a pas à se sentir évalué par elle. */
+    titre: 'Membres actifs', icone: 'equipe',
+    valeur: aLire.length ? String(lecteurs) : '—',
     note: !aLire.length ? 'aucun membre en équipe'
-      : lecteurs === aLire.length ? 'toute l\u2019équipe'
-      : tout ? 'ont lu au moins une procédure'
-      : 'se sont formés ce mois-ci',
-    /* Vert quand tout le monde a lu, sinon rien : une couleur d'alerte sur
-       « 6 sur 8 » ferait d'un chiffre correct un reproche. */
+      : lecteurs === aLire.length ? `tous · ${aLire.length} sur ${aLire.length}`
+      : tout ? `sur ${aLire.length} · ont déjà lu`
+      : `sur ${aLire.length} · ont lu ce mois-ci`,
+    /* Vert quand tout le monde a lu, sinon rien : une couleur d'alerte ferait
+       d'un chiffre correct un reproche. */
     tendance: aLire.length && lecteurs === aLire.length ? 1 : null,
   }))
 

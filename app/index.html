@@ -1777,6 +1777,25 @@
           </svg>
         </span>
         <b>Évolution</b>
+        <!-- ═══ LE FILTRE SUR LA LIGNE DU TITRE ═══
+
+             Il était dessiné par le code, dans `ga-courbe`, donc forcément SOUS
+             l'en-tête — une ligne à lui seul pour un réglage de trois options.
+
+             Posé ici, il occupe la place libre à droite du titre. `an-tete` est
+             déjà en `flex` ; `margin-left:auto` suffit à le pousser au bout. -->
+        <div class="dd-filter cb-filtre" id="dd-courbe">
+          <button type="button" class="dd-trigger" id="dd-courbe-trigger">
+            <span id="dd-courbe-label">Cette année</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="dd-menu" id="dd-courbe-menu">
+            <button type="button" class="dd-opt" data-courbe="mois">Ce mois-ci</button>
+            <button type="button" class="dd-opt actif" data-courbe="annee">Cette année</button>
+            <button type="button" class="dd-opt" data-courbe="tout">Au total</button>
+          </div>
+        </div>
       </div>
       <div id="ga-courbe"></div>
     </div>

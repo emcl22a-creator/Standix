@@ -8422,14 +8422,21 @@ body:has(#e-detail.active) #equipe-app{
    LA COURBE D'ÉVOLUTION
    ═══════════════════════════════════════════════════════════════════════════ */
 
-.cb-filtre{ display:flex; justify-content:flex-end; margin:-2px 0 10px; }
+/* Le filtre est sur la ligne du titre : `an-tete` est en `flex`, il suffit de
+   le pousser au bout. `margin-left:auto` plutôt que `justify-content` sur le
+   parent — celui-ci sert à tous les blocs d'analyse, et les autres n'ont rien
+   à droite de leur titre. */
+.cb-filtre{ margin-left:auto; }
+/* Un cran plus discret que les autres filtres : il partage sa ligne avec un
+   titre en gras, et à taille égale les deux se disputeraient l'attention. */
+.cb-filtre .dd-trigger{ font-size:11.5px; padding:5px 9px; }
 
 /* ═══ L'AXE ET LA COURBE, CÔTE À CÔTE ═══
 
    L'axe est hors du SVG, dans une colonne à lui. Le SVG est étiré en largeur
    par `preserveAspectRatio="none"` : un texte placé dedans serait étiré avec
    lui, et les chiffres deviendraient bancals sur un écran large. */
-.cb-cadre{ display:flex; gap:9px; padding-top:4px; }
+.cb-cadre{ display:flex; gap:9px; padding-top:10px; }
 .cb-axe{
   display:flex; flex-direction:column; justify-content:space-between;
   height:108px; flex:0 0 auto;

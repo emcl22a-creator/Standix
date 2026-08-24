@@ -2922,8 +2922,13 @@ function casesCourbe(validations, membres) {
   if (courbePeriode === 'mois') {
     /* Jour par jour sur le mois courant. Un mois de trente points est lisible ;
        c'est la seule échelle où le détail quotidien a un sens. */
+    /* Sur le mois courant, la création n'est un repère que si l'entreprise est
+       née CE mois-ci. Sinon on part du 1er, comme d'habitude. */
+    const neCeMois = cachedEntreprise?.created_at ? new Date(cachedEntreprise.created_at) : null
+    const premierJour = (neCeMois && neCeMois.getFullYear() === now.getFullYear()
+      && neCeMois.getMonth() === now.getMonth()) ? neCeMois.getDate() : 1
     const fin = now.getDate()
-    for (let j = 1; j <= fin; j++) {
+    for (let j = premierJour; j <= fin; j++) {
       const deb = new Date(now.getFullYear(), now.getMonth(), j)
       /* ═══ LE JOUR SEUL NE DIT RIEN ═══
 
@@ -2938,7 +2943,17 @@ function casesCourbe(validations, membres) {
     }
   } else if (courbePeriode === 'annee') {
     /* Les douze mois de l'année en cours, de janvier à aujourd'hui. */
-    for (let m = 0; m <= now.getMonth(); m++) {
+    /* ═══ PAS AVANT LA CRÉATION DE L'ENTREPRISE ═══
+
+       « Cette année » partait de janvier, même pour une entreprise créée en
+       mai : cinq mois plats à zéro avant que l'histoire commence.
+
+       Le départ est donc le plus tardif des deux — janvier, ou le mois de
+       création. Une entreprise née en 2025 garde bien janvier ; une née en mai
+       2026 démarre en mai. */
+    const ne = debutEntreprise()
+    const premier = (ne && ne.getFullYear() === now.getFullYear()) ? ne.getMonth() : 0
+    for (let m = premier; m <= now.getMonth(); m++) {
       const deb = new Date(now.getFullYear(), m, 1)
       /* Une seule année affichée : le mois suffit, l'année serait répétée
          douze fois pour rien. */

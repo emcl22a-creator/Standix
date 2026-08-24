@@ -8422,42 +8422,31 @@ body:has(#e-detail.active) #equipe-app{
    LA COURBE D'ÉVOLUTION
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Les 4 px latéraux laissent respirer le trait et son point de fin, que le SVG
-   pousse jusqu'au bord de sa boîte. */
-.cb-zone{ padding:6px 4px 0; }
-/* `preserveAspectRatio="none"` étire le tracé à la largeur du bloc. La hauteur
-   reste fixe : une courbe qui grandirait avec l'écran écraserait ce qui suit.
+.cb-filtre{ display:flex; justify-content:flex-end; margin:-2px 0 10px; }
 
-   ⚠ PAS D'`overflow:visible`. Avec lui, le point de fin et l'épaisseur du trait
-     dépassaient du bloc — le SVG s'étire jusqu'au bord, et un trait de 2,2 px
-     déborde donc de la moitié de son épaisseur. Le rembourrage latéral de la
-     zone rend cette marge : 4 px de chaque côté suffisent au trait et au
-     point. */
+/* ═══ L'AXE ET LA COURBE, CÔTE À CÔTE ═══
+
+   L'axe est hors du SVG, dans une colonne à lui. Le SVG est étiré en largeur
+   par `preserveAspectRatio="none"` : un texte placé dedans serait étiré avec
+   lui, et les chiffres deviendraient bancals sur un écran large. */
+.cb-cadre{ display:flex; gap:9px; padding-top:4px; }
+.cb-axe{
+  display:flex; flex-direction:column; justify-content:space-between;
+  height:108px; flex:0 0 auto;
+  font-size:9.5px; color:var(--label-3);
+  font-variant-numeric:tabular-nums; text-align:right;
+  /* Les libellés s'alignent sur les traits de grille, qui sont à 6 px du haut
+     et du bas — d'où le décalage vertical d'une demi-hauteur de ligne. */
+  padding:1px 0 0;
+}
+.cb-zone{ flex:1; min-width:0; padding-right:4px; }
 .cb-svg{ display:block; width:100%; height:108px; }
+/* Trois traits horizontaux, très pâles : ils aident l'œil à relier la courbe à
+   sa graduation sans jamais concurrencer le tracé. */
+.cb-grille{ stroke:rgba(255,255,255,0.06); stroke-width:1; }
 
-/* Trois repères seulement — le premier mois, le milieu, le dernier. Douze
-   étiquettes sur 320 px se chevaucheraient, et personne ne lit une abscisse
-   mois par mois : on veut savoir d'où à où, pas chaque graduation. */
 .cb-mois{
   display:flex; justify-content:space-between;
   margin-top:7px; padding:0 2px;
   font-size:10.5px; color:var(--label-3); text-transform:capitalize;
 }
-
-.cb-pied{
-  display:flex; align-items:baseline; gap:7px;
-  margin-top:14px; padding-top:12px;
-  border-top:0.5px solid var(--separator);
-}
-.cb-v{
-  font-size:23px; font-weight:800; letter-spacing:-0.04em;
-  font-variant-numeric:tabular-nums;
-}
-.cb-q{ font-size:12.5px; color:var(--label-2); flex:1; }
-/* L'écart est à droite, détaché du chiffre : c'est une comparaison, pas une
-   unité. Collé à la valeur, on lirait « 4 h 12 +18 % » comme un seul nombre. */
-.cb-e{
-  font-size:12.5px; font-weight:700; font-variant-numeric:tabular-nums;
-}
-.cb-e.hausse{ color:#30D158; }
-.cb-e.baisse{ color:#FF9F0A; }

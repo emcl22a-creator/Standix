@@ -977,6 +977,9 @@ function afficherCoquille(espace) {
   const appEl = document.getElementById(espace === 'equipe' ? 'equipe-app' : 'gestion-app')
   if (!appEl || appEl.style.display === 'block') return
   appEl.style.display = 'block'
+  /* L'espace redevient utilisable : il était `inert` pour empêcher Safari d'y
+     lire des champs et d'ouvrir le clavier au chargement de l'app. */
+  appEl.removeAttribute('inert')
   /* APRÈS l'affichage : la barre doit être mesurable pour que sa géométrie se
      recalcule. Appelée avant, elle travaillait sur une largeur nulle. */
   afficherBarre(true)
@@ -2036,6 +2039,7 @@ async function enterApp(membre) {
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('gestion-app')
     appEl.style.display = 'block'
+    appEl.removeAttribute('inert')
     if (basculeSansAnimation) {
       // On retire la classe sans la remettre : aucune animation ne peut rejouer.
       appEl.classList.remove('app-shell-in')
@@ -5445,6 +5449,29 @@ addEventListener('resize', () => {
 
 function activerAvecNaissance(ecran) {
   if (!ecran) return
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LES ÉCRANS INACTIFS SONT INERTES
+     ═══════════════════════════════════════════════════════════════════════
+
+     L'app compte une trentaine de champs de saisie répartis dans ses écrans.
+     Tous existent dès le chargement — seul `display:none` les cache.
+
+     Or masquer retire du rendu, PAS de l'arbre. Safari lit le balisage entier,
+     y trouve des champs, et propose un remplissage dès l'ouverture : clavier
+     compris, sur un écran qui n'en contient aucun.
+
+     J'avais posé `inert` sur le seul écran de connexion. C'était insuffisant :
+     ce sont les trente autres qui parlaient.
+
+     `inert` retire un bloc du focus, du remplissage et de la lecture d'écran.
+     On le pose sur tous les écrans et on le lève sur celui qu'on montre — un
+     seul endroit, puisque toutes les bascules passent ici. */
+  document.querySelectorAll('.screen').forEach(s => {
+    if (s === ecran) s.removeAttribute('inert')
+    else s.setAttribute('inert', '')
+  })
+
   oublierNaissances()
   ouvrirDepuisCarte(ecran)
   /* DEUX GESTES, DEUX ANIMATIONS.
@@ -6393,7 +6420,7 @@ function peindreRecentesAccueil() {
     const seul = document.createElement('button')
     seul.type = 'button'
     seul.className = 'an-plus ac-act'
-    seul.textContent = 'Voir les dernières activités de l\u2019entreprise'
+    seul.textContent = 'Voir les derniers mouvements de l\u2019entreprise'
     seul.addEventListener('click', () => ouvrirActivites())
     zone.appendChild(seul)
     return
@@ -6450,7 +6477,7 @@ function peindreRecentesAccueil() {
   const act = document.createElement('button')
   act.type = 'button'
   act.className = 'an-plus ac-act'
-  act.textContent = 'Voir les dernières activités de l\u2019entreprise'
+  act.textContent = 'Voir les derniers mouvements de l\u2019entreprise'
   act.addEventListener('click', () => ouvrirActivites())
   zone.appendChild(act)
 }

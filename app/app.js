@@ -6389,7 +6389,7 @@ function peindreRecentesAccueil() {
 
   const titre = document.createElement('div')
   titre.className = 'ac-sect'
-  titre.textContent = 'Dernières procédures'
+  titre.textContent = 'Dernières procédures créées'
   zone.appendChild(titre)
 
   recentes.forEach(p => {
@@ -6399,7 +6399,19 @@ function peindreRecentesAccueil() {
     el.addEventListener('click', () => openAnalyse(p.id))
 
     const chemin = [p.categorie || 'Sans dossier', p.sous_categorie].filter(Boolean).join(' \u203a ')
-    const n = Array.isArray(p.etapes) ? p.etapes.length : (p.etapes || 0)
+    /* ═══ `etapes` N'EST PAS LA LISTE DES ÉTAPES ═══
+
+       Supabase rend un COMPTE agrégé : `etapes: [{ count: 9 }]`. Un tableau
+       d'un seul objet, quel que soit le nombre réel.
+
+       `p.etapes.length` valait donc toujours 1, et toutes les procédures
+       affichaient « 1 étape ». Le défaut était invisible à la relecture — la
+       ligne a l'air juste — et ne se voyait qu'à l'écran, sur une procédure
+       qu'on savait en avoir neuf.
+
+       `proc.etapes?.[0]?.count` est la lecture employée partout ailleurs dans
+       l'app ; je l'aurais trouvée en cherchant `nbEtapes` avant d'écrire. */
+    const n = p.etapes?.[0]?.count ?? 0
 
     el.innerHTML = `
       <span class="ac-rec-vue">${vignetteProcedure(p)}</span>
@@ -6409,7 +6421,53 @@ function peindreRecentesAccueil() {
       </span>
       <span class="ac-rec-fl">\u203a</span>`
     zone.appendChild(el)
+    preparerVignetteVideo(el)
   })
+}
+
+/* ═══ FORCER LA PREMIÈRE IMAGE, ET SE REPLIER SI ELLE NE VIENT PAS ═══
+
+   Deux gestes, pour deux défaillances différentes.
+
+   ① `currentTime = 0.1` après `loadedmetadata` : c'est la seule façon d'obtenir
+      une image sur iOS. On vise un dixième de seconde plutôt que zéro — la
+      toute première image d'une vidéo est souvent noire, le temps que
+      l'exposition se règle.
+
+   ② Si la vidéo refuse de se charger — adresse expirée, fichier supprimé,
+      réseau coupé —, on remplace la vignette par l'icône générique. Un cadre
+      noir ressemble à un défaut de l'app ; une icône ressemble à une
+      procédure sans image, ce qui est vrai. */
+function preparerVignetteVideo(carte) {
+  const v = carte.querySelector('video[data-video]')
+  if (!v) return
+
+  const replier = () => {
+    const vue = carte.querySelector('.ac-rec-vue')
+    if (vue && vue.querySelector('video')) vue.innerHTML = vignetteProcedure({})
+  }
+
+  v.addEventListener('loadedmetadata', () => {
+    try { v.currentTime = 0.1 } catch (e) { replier() }
+  }, { once: true })
+
+  v.addEventListener('error', replier, { once: true })
+
+  /* ═══ LE GARDE-FOU ═══
+
+     Le placement dépend de choses qu'on ne maîtrise pas : le serveur doit
+     accepter les requêtes partielles, le format doit être indexé, le réseau
+     doit répondre. Si l'un manque, `error` ne se déclenche pas forcément — la
+     vidéo reste simplement noire, indéfiniment.
+
+     Trois secondes après, si aucune image n'a été décodée — `readyState` en
+     dessous de 2 —, on remplace par l'icône. Un cadre noir passe pour un défaut
+     de l'app ; une icône passe pour une procédure sans image, ce qui est vrai.
+
+     Trois secondes et non une : sur un réseau mobile lent, une vidéo met
+     parfois deux secondes à rendre sa première image, et se replier trop tôt
+     priverait de la vignette quelqu'un qui l'aurait eue. */
+  setTimeout(() => { if (v.readyState < 2) replier() }, 3000)
 }
 
 function vignetteProcedure(p) {
@@ -6417,9 +6475,19 @@ function vignetteProcedure(p) {
     return `<img src="${escapeHtml(p.image_url)}" alt="" loading="lazy">`
   }
   if (p.video_url) {
-    /* `muted` et `playsinline` : sans eux, iOS refuse d'afficher la première
-       image et laisse un rectangle noir. */
-    return `<video src="${escapeHtml(p.video_url)}#t=0.1" preload="metadata"
+    /* ═══ POURQUOI `#t=0.1` NE SUFFIT PAS SUR IPHONE ═══
+
+       Sur ordinateur, le fragment de temps dans l'adresse suffit : le
+       navigateur télécharge l'en-tête et affiche l'image à cette seconde.
+
+       Safari sur iOS l'ignore. Il charge les métadonnées — durée, dimensions —
+       et laisse le cadre VIDE, jusqu'à ce qu'on lui demande explicitement une
+       position. C'est pourquoi les vignettes ne s'affichaient pas chez toi
+       alors que le dessin était correct.
+
+       Le placement est donc forcé par le code, après `loadedmetadata`. Le
+       `data-video` sert à retrouver l'élément une fois posé dans la page. */
+    return `<video data-video src="${escapeHtml(p.video_url)}#t=0.1" preload="metadata"
                    muted playsinline></video>
             <span class="ac-rec-play">\u25B6</span>`
   }
@@ -6501,7 +6569,7 @@ function tuileQuota(utilisees, quota) {
        sait. Un anneau à zéro laisserait croire qu'il ne reste rien. */
     el.innerHTML = `
       ${iconeAccueil('film')}
-      <div class="ac-t">Analyses vidéo</div>
+      <div class="ac-t">Analyses vidéo IA</div>
       <div class="ac-v">${utilisees == null ? '—' : utilisees}</div>
       <div class="ac-n">ce mois-ci</div>`
     return el
@@ -6513,7 +6581,7 @@ function tuileQuota(utilisees, quota) {
 
   el.innerHTML = `
     ${iconeAccueil('film')}
-    <div class="ac-t">Analyses vidéo</div>
+    <div class="ac-t">Analyses vidéo IA</div>
     <div class="ac-anneau">
       <svg width="${T}" height="${T}">
         <circle cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"

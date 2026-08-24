@@ -2892,49 +2892,128 @@ function debutPeriode(periode) {
    qu'à l'affichage. */
 const COURBE_MOIS = 12
 
-function moisDeLecture(validations) {
-  const maintenant = new Date()
+/* La période affichée. Trois échelles, un seul réglage. */
+let courbePeriode = 'annee'      // 'mois' · 'annee' · 'tout'
+
+/* ═══ LE DÉBUT DE L'HISTOIRE, PAS LE DÉBUT DU CALENDRIER ═══
+
+   Une entreprise seule ne lit pas ses propres procédures : tant qu'il n'y a
+   qu'une personne, la courbe est plate à zéro et ne raconte rien.
+
+   On part donc du mois où le DEUXIÈME membre est arrivé — le moment où il
+   devient possible de former quelqu'un. Avant, il n'y avait pas d'équipe, et
+   afficher ces mois vides donnerait à croire à un échec là où il n'y avait
+   simplement personne.
+
+   Sans deuxième membre, on rend `null` et l'appelant se rabat sur douze mois. */
+function debutEquipe(membres) {
+  const dates = (membres || [])
+    .map(m => m.created_at ? new Date(m.created_at) : null)
+    .filter(Boolean)
+    .sort((a, b) => a - b)
+  if (dates.length < 2) return null
+  const d = dates[1]
+  return new Date(d.getFullYear(), d.getMonth(), 1)
+}
+
+/* Les cases de la courbe, selon la période. Chacune porte son libellé d'axe. */
+function casesCourbe(validations, membres) {
+  const now = new Date()
   const cases = []
-  for (let i = COURBE_MOIS - 1; i >= 0; i--) {
-    const d = new Date(maintenant.getFullYear(), maintenant.getMonth() - i, 1)
-    cases.push({ debut: d, fin: new Date(d.getFullYear(), d.getMonth() + 1, 1), total: 0 })
+
+  if (courbePeriode === 'mois') {
+    /* Jour par jour sur le mois courant. Un mois de trente points est lisible ;
+       c'est la seule échelle où le détail quotidien a un sens. */
+    const fin = now.getDate()
+    for (let j = 1; j <= fin; j++) {
+      const deb = new Date(now.getFullYear(), now.getMonth(), j)
+      cases.push({ deb, fin: new Date(now.getFullYear(), now.getMonth(), j + 1), total: 0,
+                   nom: String(j) })
+    }
+  } else if (courbePeriode === 'annee') {
+    /* Les douze mois de l'année en cours, de janvier à aujourd'hui. */
+    for (let m = 0; m <= now.getMonth(); m++) {
+      const deb = new Date(now.getFullYear(), m, 1)
+      cases.push({ deb, fin: new Date(now.getFullYear(), m + 1, 1), total: 0,
+                   nom: deb.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '') })
+    }
+  } else {
+    /* Depuis l'arrivée du deuxième membre, mois par mois. Plafonné à vingt-quatre
+       points : au-delà, deux ans sur 320 px donnent une ligne illisible. */
+    let deb = debutEquipe(membres) || new Date(now.getFullYear(), now.getMonth() - COURBE_MOIS + 1, 1)
+    const limite = new Date(now.getFullYear(), now.getMonth() - 23, 1)
+    if (deb < limite) deb = limite
+    const c = new Date(deb)
+    while (c <= now) {
+      cases.push({ deb: new Date(c), fin: new Date(c.getFullYear(), c.getMonth() + 1, 1), total: 0,
+                   nom: c.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '') })
+      c.setMonth(c.getMonth() + 1)
+    }
   }
+
   for (const v of validations || []) {
     const s = Number(v.duree_lecture || 0)
     if (!s) continue
     const t = new Date(v.validated_at)
-    const c = cases.find(x => t >= x.debut && t < x.fin)
+    const c = cases.find(x => t >= x.deb && t < x.fin)
     if (c) c.total += s
   }
   return cases
 }
 
-function renderCourbe(validations) {
+/* ═══ LES GRADUATIONS DE L'AXE ═══
+
+   Trois seulement — zéro, la moitié, le sommet. Quatre ou cinq encombreraient
+   une courbe de 108 px de haut, et personne ne lit une valeur intermédiaire sur
+   un graphique de cette taille : on veut l'ordre de grandeur.
+
+   L'arrondi porte sur une valeur ronde au-dessus du sommet — 47 min devient
+   1 h, 12 min devient 15. Un axe qui s'arrête à 47 se lit moins vite qu'un axe
+   qui s'arrête à un nombre qu'on a en tête. */
+function sommetRond(secondes) {
+  if (secondes <= 0) return 60
+  const paliers = [60, 300, 600, 900, 1800, 3600, 7200, 14400, 28800, 57600, 86400]
+  return paliers.find(p => p >= secondes) || Math.ceil(secondes / 3600) * 3600
+}
+
+function renderCourbe(validations, membres) {
   const el = document.getElementById('ga-courbe')
   if (!el) return
   el.innerHTML = ''
 
-  const cases = moisDeLecture(validations)
-  const sommet = Math.max(...cases.map(c => c.total))
+  const cases = casesCourbe(validations, membres)
+  const brut = Math.max(...cases.map(c => c.total), 0)
 
-  if (!sommet) {
-    el.innerHTML = vide({
+  const filtre = `
+    <div class="dd-filter cb-filtre" id="dd-courbe">
+      <button type="button" class="dd-trigger" id="dd-courbe-trigger">
+        <span id="dd-courbe-label">${courbePeriode === 'mois' ? 'Ce mois-ci'
+          : courbePeriode === 'annee' ? 'Cette année' : 'Au total'}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="dd-menu" id="dd-courbe-menu">
+        <button type="button" class="dd-opt${courbePeriode === 'mois' ? ' actif' : ''}" data-courbe="mois">Ce mois-ci</button>
+        <button type="button" class="dd-opt${courbePeriode === 'annee' ? ' actif' : ''}" data-courbe="annee">Cette année</button>
+        <button type="button" class="dd-opt${courbePeriode === 'tout' ? ' actif' : ''}" data-courbe="tout">Au total</button>
+      </div>
+    </div>`
+
+  if (!brut || cases.length < 2) {
+    el.innerHTML = filtre + vide({
       dessin: NEANT_PROCEDURE,
-      titre: 'Rien de lu pour le moment',
-      phrase: 'Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue mois après mois.',
+      titre: 'Rien de lu sur cette période',
+      phrase: 'Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.',
     })
     return
   }
 
+  const sommet = sommetRond(brut)
   const L = 320, H = 108, marge = 6
-  const pas = (L - marge * 2) / (COURBE_MOIS - 1)
+  const pas = (L - marge * 2) / (cases.length - 1)
   const y = (v) => H - marge - (v / sommet) * (H - marge * 2)
   const pts = cases.map((c, i) => [marge + i * pas, y(c.total)])
 
-  /* Une courbe adoucie plutôt qu'une ligne brisée : les points de contrôle
-     sont placés à mi-chemin horizontal, ce qui arrondit sans jamais dépasser
-     les valeurs réelles — une courbe qui bombe au-dessus d'un sommet ferait
-     lire un chiffre qui n'existe pas. */
   let d = `M ${pts[0][0]} ${pts[0][1]}`
   for (let i = 1; i < pts.length; i++) {
     const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]
@@ -2943,44 +3022,39 @@ function renderCourbe(validations) {
   }
   const aire = `${d} L ${pts[pts.length - 1][0]} ${H - marge} L ${pts[0][0]} ${H - marge} Z`
 
-  const dernier = cases[cases.length - 1].total
-  const avant = cases[cases.length - 2]?.total ?? 0
-  let ecart = null
-  if (avant > 0) ecart = Math.round(((dernier - avant) / avant) * 100)
+  const milieu = cases[Math.floor(cases.length / 2)]
 
-  const nomMois = (dt) => dt.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')
-
-  el.innerHTML = `
-    <div class="cb-zone">
-      <svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" class="cb-svg">
-        <defs>
-          <linearGradient id="cbAire" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#FF9F0A" stop-opacity="0.22"/>
-            <stop offset="1" stop-color="#FF9F0A" stop-opacity="0"/>
-          </linearGradient>
-        </defs>
-        <path d="${aire}" fill="url(#cbAire)"/>
-        <path class="cb-ligne" d="${d}" fill="none" stroke="url(#logoOrIc)"
-              stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4"
-                fill="#FF9F0A"/>
-      </svg>
-      <div class="cb-mois">
-        <span>${escapeHtml(nomMois(cases[0].debut))}</span>
-        <span>${escapeHtml(nomMois(cases[Math.floor(COURBE_MOIS / 2)].debut))}</span>
-        <span>${escapeHtml(nomMois(cases[cases.length - 1].debut))}</span>
+  el.innerHTML = filtre + `
+    <div class="cb-cadre">
+      <div class="cb-axe">
+        <span>${escapeHtml(dureeLisible(sommet))}</span>
+        <span>${escapeHtml(dureeLisible(sommet / 2))}</span>
+        <span>0</span>
       </div>
-    </div>
-    <div class="cb-pied">
-      <span class="cb-v">${escapeHtml(dureeLisible(dernier) || '0 min')}</span>
-      <span class="cb-q">ce mois-ci</span>
-      ${ecart === null ? ''
-        : `<span class="cb-e ${ecart >= 0 ? 'hausse' : 'baisse'}">${ecart >= 0 ? '+' : ''}${ecart} %</span>`}
+      <div class="cb-zone">
+        <svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" class="cb-svg">
+          <defs>
+            <linearGradient id="cbAire" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#FF9F0A" stop-opacity="0.22"/>
+              <stop offset="1" stop-color="#FF9F0A" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="${marge}" x2="${L}" y2="${marge}" class="cb-grille"/>
+          <line x1="0" y1="${H / 2}" x2="${L}" y2="${H / 2}" class="cb-grille"/>
+          <line x1="0" y1="${H - marge}" x2="${L}" y2="${H - marge}" class="cb-grille"/>
+          <path d="${aire}" fill="url(#cbAire)"/>
+          <path class="cb-ligne" d="${d}" fill="none" stroke="url(#logoOrIc)"
+                stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4" fill="#FF9F0A"/>
+        </svg>
+        <div class="cb-mois">
+          <span>${escapeHtml(cases[0].nom)}</span>
+          <span>${escapeHtml(milieu.nom)}</span>
+          <span>${escapeHtml(cases[cases.length - 1].nom)}</span>
+        </div>
+      </div>
     </div>`
 
-  /* La ligne se dessine de gauche à droite au premier affichage. Une seule
-     animation sur la page, et elle accompagne une lecture qui va dans ce
-     sens — pas trois anneaux qui s'ouvrent en même temps. */
   const ligne = el.querySelector('.cb-ligne')
   if (ligne && !courbeDejaJouee) {
     courbeDejaJouee = true
@@ -3015,7 +3089,7 @@ function renderGaStats() {
   const nbEmployes = (currentGaData?.employes || []).length
   /* La courbe prend TOUTES les validations, pas celles du mois : elle montre
      douze mois, elle a besoin des douze. */
-  renderCourbe(validations)
+  renderCourbe(validations, cachedMembres)
   renderMembresListe()
   renderGainTemps(validations, procedures)
 }
@@ -7053,6 +7127,21 @@ document.addEventListener('click', (e) => {
      Il partage l'ouverture et la fermeture avec les menus de tri — c'est le
      même geste, il doit répondre pareil. Seul le choix diffère : `data-periode`
      au lieu de `data-sort`, et il redessine les tuiles plutôt que la liste. */
+  /* Le filtre de la courbe. Même mécanique que les autres menus : l'ouverture
+     est commune, seul le choix diffère. */
+  const cb = e.target.closest('.dd-menu button[data-courbe]')
+  if (cb) {
+    courbePeriode = cb.dataset.courbe
+    /* L'animation rejoue à chaque changement de période : la courbe est
+       entièrement redessinée, et la voir se tracer confirme que le réglage a
+       bien été pris. */
+    courbeDejaJouee = false
+    closeAllDropdowns()
+    renderCourbe(currentGaData?.validations || cachedValidations, cachedMembres)
+    e.stopPropagation()
+    return
+  }
+
   const periode = e.target.closest('.dd-menu button[data-periode]')
   if (periode) {
     accueilPeriode = periode.dataset.periode

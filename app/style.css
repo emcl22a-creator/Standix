@@ -8237,20 +8237,27 @@ body:has(#e-detail.active) #equipe-app{
    On rend donc l'écart fixe. La note suit sa valeur, et le vide résiduel
    remonte sous le titre — là où il se lit comme de l'air, pas comme un trou. */
 .ac-tuile > .ac-n{ margin-top:6px; }
-/* ═══ LE TRIO RESTE SOUDÉ EN HAUT ═══
+/* ═══ LE TRIO RESTE SOUDÉ, ET DESCEND EN BLOC ═══
 
-   `margin-top:auto` sur la valeur la poussait vers le bas, et tout l'écart
-   excédentaire se logeait entre le titre et elle. Mesuré : 4 px dans les
-   tuiles de la première rangée, 47 dans « Équipe formée » — étirée à 202 px
-   par sa voisine à anneau.
+   Trois positions essayées, dans cet ordre :
 
-   C'est ce trou que tu voyais, et il grandit à mesure que la tuile voisine
-   grandit : le vide n'est donc pas entre les rangées, il est DANS la tuile la
-   moins haute de la rangée la plus haute.
+     ① `margin-top:auto` sur la VALEUR — elle descendait seule, et tout
+        l'excédent se logeait entre le titre et elle : 47 px de trou dans
+        « Membres actifs », étirée par sa voisine à anneau.
+     ② `margin-top:6px` partout — le trio remontait en haut, soudé, et le vide
+        passait sous la note. Correct, mais le contenu flottait au plafond
+        d'une tuile haute.
+     ③ Le TITRE en `auto` — icône en haut, puis titre, valeur et note collés
+        au bas. Mais le titre décollait de son icône, et les deux ne se
+        lisaient plus ensemble.
+     ④ Celle-ci : icône et titre restent soudés en haut, la VALEUR porte le
+        `auto` et entraîne la note avec elle.
 
-   Sans `auto`, icône, titre, valeur et note se suivent en haut, et le vide
-   passe sous la note — là où il ne se distingue plus du rembourrage. */
-.ac-tuile > .ac-v{ margin-top:6px; }
+   Le vide se loge donc entre le titre et la valeur. C'est le seul endroit où
+   il ne casse aucune paire : l'icône appartient à son titre, la valeur à sa
+   note, mais rien ne lie le titre à la valeur — l'un nomme, l'autre chiffre. */
+.ac-tuile > .ac-t{ margin-top:8px; }
+.ac-tuile > .ac-v{ margin-top:auto; }
 .ac-n{
   font-size:11px; color:var(--label-3); margin-top:6px; letter-spacing:-0.005em;
 }

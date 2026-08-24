@@ -6321,19 +6321,19 @@ function peindreTuilesAccueil() {
   const utilisees = quota ? quota - reste : null
 
   grille.appendChild(tuileAccueil({
-    titre: 'Procédures créées',
+    titre: 'Procédures créées', icone: 'document',
     valeur: String(creees),
     note: tout ? 'depuis le début' : 'ce mois-ci',
   }))
 
   grille.appendChild(tuileAccueil({
-    titre: 'Temps de formation',
+    titre: 'Temps de formation', icone: 'horloge',
     valeur: dureeLisible(secondes) || '0 min',
     note: 'tous les membres',
   }))
 
   grille.appendChild(tuileAccueil({
-    titre: 'Utilisation IA',
+    titre: 'Utilisation IA', icone: 'etincelle',
     valeur: String(tout ? iaTotal : iaMois),
     note: tout ? 'analyses au total'
       : ecart === 'neuf' ? 'premières analyses'
@@ -6423,8 +6423,46 @@ function vignetteProcedure(p) {
     </span>`
 }
 
-/* Une tuile ordinaire : titre en petit, valeur en grand, note en dessous. */
-function tuileAccueil({ titre, valeur, note, tendance }) {
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES QUATRE DESSINS
+
+   Même facture que les icônes de dossier et de procédure : `viewBox 0 0 24 24`,
+   trait de 1,7, pas de remplissage, et le dégradé `logoOrIc` comme couleur de
+   trait. Ce sont ces trois réglages, plus que le motif, qui font qu'une icône
+   appartient à la même famille.
+
+   ─── CE QUE CHACUNE DIT ───
+
+   `document`  un feuillet avec son coin plié, et un plus : on en crée.
+               C'est déjà l'icône du pied des cartes de dossier.
+   `horloge`   un cadran et ses aiguilles. Le temps, sans métaphore.
+   `etincelle` la marque à quatre branches de l'IA, doublée d'une petite —
+               c'est le signe employé partout pour l'analyse automatique.
+   `film`      une bande perforée. Elle dit « vidéo » là où une caméra dirait
+               « filmer », et c'est bien du stock qu'il s'agit, pas du geste.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const AC_ICONES = {
+  document: `<path d="M13.4 3.2H7.6a2 2 0 0 0-2 2v13.6a2 2 0 0 0 2 2h6.2"/>
+             <path d="M13.4 3.2v5h5"/>
+             <path d="M18.4 21v-6.2M15.3 17.9h6.2" stroke-linecap="round"/>`,
+  horloge:  `<circle cx="12" cy="12" r="8.6"/>
+             <path d="M12 6.9V12l3.5 2.1" stroke-linecap="round"/>`,
+  etincelle:`<path d="M10.2 3.4l1.5 4 4 1.5-4 1.5-1.5 4-1.5-4-4-1.5 4-1.5z"/>
+             <path d="M17.6 13.8l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z"/>`,
+  film:     `<rect x="3.2" y="5.4" width="17.6" height="13.2" rx="2.4"/>
+             <path d="M7.3 5.4v13.2M16.7 5.4v13.2"/>
+             <path d="M3.2 12h17.6"/>`,
+}
+
+function iconeAccueil(cle) {
+  return `<span class="ac-ic">
+    <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.7"
+         stroke-linejoin="round">${AC_ICONES[cle] || ''}</svg>
+  </span>`
+}
+
+/* Une tuile ordinaire : icône, titre, valeur, note. */
+function tuileAccueil({ titre, valeur, note, tendance, icone }) {
   const el = document.createElement('div')
   el.className = 'an-bloc ac-tuile'
   /* La couleur de la tendance porte un sens, pas une décoration : au-dessus de
@@ -6432,6 +6470,7 @@ function tuileAccueil({ titre, valeur, note, tendance }) {
      gris quand il n'y a rien à comparer. */
   const cls = tendance == null ? '' : tendance >= 0 ? ' hausse' : ' baisse'
   el.innerHTML = `
+    ${iconeAccueil(icone)}
     <div class="ac-t">${escapeHtml(titre)}</div>
     <div class="ac-v">${escapeHtml(valeur)}</div>
     <div class="ac-n${cls}">${escapeHtml(note)}</div>`
@@ -6447,6 +6486,7 @@ function tuileQuota(utilisees, quota) {
     /* Pas de plafond connu : on ne dessine pas d'anneau vide, on dit ce qu'on
        sait. Un anneau à zéro laisserait croire qu'il ne reste rien. */
     el.innerHTML = `
+      ${iconeAccueil('film')}
       <div class="ac-t">Analyses vidéo</div>
       <div class="ac-v">${utilisees == null ? '—' : utilisees}</div>
       <div class="ac-n">ce mois-ci</div>`
@@ -6458,6 +6498,7 @@ function tuileQuota(utilisees, quota) {
   const rempli = circ * (pct / 100)
 
   el.innerHTML = `
+    ${iconeAccueil('film')}
     <div class="ac-t">Analyses vidéo</div>
     <div class="ac-anneau">
       <svg width="${T}" height="${T}">

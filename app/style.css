@@ -8182,9 +8182,35 @@ body:has(#e-detail.active) #equipe-app{
   font-size:29px; font-weight:800; letter-spacing:-0.045em; line-height:1;
   margin-top:6px; font-variant-numeric:tabular-nums;
 }
-/* La note suit la valeur, sans être poussée : il n'y a plus de hauteur
-   excédentaire à combler. */
+/* ═══ LA NOTE COLLE AU BAS DE SA TUILE ═══
+
+   `align-items:stretch` met les deux tuiles d'une rangée à la même hauteur —
+   celle de la plus grande. Mais leur CONTENU restait en haut : « Procédures
+   créées · 6 · ce mois-ci » se terminait à mi-hauteur, et le reste de la tuile
+   était vide.
+
+   `margin-top:auto` pousse la note tout en bas. Les deux tuiles d'une rangée
+   ont alors leur note à la même ligne, et le vide passe entre la valeur et la
+   note — là où il ne se voit pas — au lieu de rester sous le texte.
+
+   J'avais retiré ce `auto` deux tours plus tôt, quand la hauteur était imposée
+   à 158 px : il creusait alors un trou au milieu. Sans hauteur imposée, il fait
+   exactement l'inverse. */
+/* ═══ MESURÉ : LA NOTE COLLAIT DÉJÀ ═══
+
+   Relevé dans le navigateur, les quatre notes sont à 17 px du bas de leur
+   tuile — c'est le rembourrage, elles ne peuvent pas descendre plus.
+
+   Le vide se trouve AILLEURS : entre la valeur et la note. `margin-top:auto`
+   sur la note poussait tout l'écart à cet endroit, et sur une tuile plus haute
+   que son contenu, cela creuse un trou au milieu.
+
+   On rend donc l'écart fixe. La note suit sa valeur, et le vide résiduel
+   remonte sous le titre — là où il se lit comme de l'air, pas comme un trou. */
 .ac-tuile > .ac-n{ margin-top:6px; }
+/* C'est la VALEUR qui descend : elle se pose juste au-dessus de la note, et le
+   trio titre-valeur-note reste soudé au bas de la tuile. */
+.ac-tuile > .ac-v{ margin-top:auto; }
 .ac-n{
   font-size:11px; color:var(--label-3); margin-top:6px; letter-spacing:-0.005em;
 }
@@ -8305,3 +8331,30 @@ body:has(#e-detail.active) #equipe-app{
 }
 .ac-rec-fl{ flex:0 0 auto; font-size:17px; color:var(--label-3); }
 .ac-rec:active{ background:rgba(255,255,255,0.04); }
+
+
+/* ═══ L'ANNEAU IA DE L'ACCUEIL, FIGÉ ═══
+
+   Il reprend `.ia-fig` — même dégradé conique, même masque qui évide le centre.
+   Deux différences seulement.
+
+   ① LES ANIMATIONS SONT COUPÉES. `.lum` tourne en 3,6 s partout ailleurs ;
+      ici l'anneau désigne un compteur, pas un travail en cours. Un mouvement
+      promettrait quelque chose qui n'arrive pas.
+
+   ② PAS DE HALO. Le second calque de `.ia-fig` est une lueur animée qui déborde
+      de l'anneau ; sur une plaque de 34 px, elle en mangerait le liseré. On ne
+      garde que la forme.
+
+   La rotation de départ est fixée à -90° : l'accent ambre du dégradé conique se
+   retrouve en haut plutôt qu'à droite, ce qui aligne les quatre icônes sur le
+   même axe de lecture. */
+.ac-ic .ia-fig.ac-ia-fige{
+  width:19px; height:19px; --trait:3.2px;
+  transform:rotate(-90deg);
+}
+.ac-ic .ia-fig.ac-ia-fige .lum{
+  animation:none;
+  -webkit-mask:radial-gradient(farthest-side, transparent calc(100% - var(--trait)), #000 0);
+  mask:radial-gradient(farthest-side, transparent calc(100% - var(--trait)), #000 0);
+}

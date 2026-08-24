@@ -3031,7 +3031,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
       el.appendChild(anneauResume(vus, x => x.total,
         x => x.estAutres ? x.nom : (x.proc?.titre || 'Sans titre'),
         dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
-        'de lecture ce mois-ci', true, 'procedures'))
+        'de lecture ce mois-ci', true))
     }
   }
 
@@ -3183,27 +3183,20 @@ document.addEventListener('click', (e) => {
    donc tout ce qu'elle rend, sans troncature supplémentaire : une légende plus
    longue que l'anneau signifierait que le regroupement a mal fait son travail,
    et c'est là qu'il faudrait corriger, pas ici. */
-/* ═══ L'ANIMATION NE JOUE QU'UNE FOIS ═══
+/* ═══ LES ANNEAUX DU RÉSUMÉ NE S'ANIMENT PAS ═══
 
-   Un anneau qui se remplit est agréable la première fois. Au dixième
-   aller-retour entre Analyse et Procédures dans la même session, il devient
-   une attente : on connaît déjà le chiffre, on attend qu'il finisse d'arriver.
+   Ils se remplissaient au premier affichage de la page. Trois anneaux qui
+   s'ouvrent en même temps, c'est trois attentes simultanées pour trois chiffres
+   qu'on vient juste consulter — et la page paraît lente alors qu'elle est
+   instantanée.
 
-   Cet ensemble retient quels anneaux ont DÉJÀ joué. Passé le premier
-   affichage, ils apparaissent complets — instantanément.
+   L'animation garde tout son sens UN CRAN PLUS BAS : quand on touche « Voir
+   plus », on a demandé à regarder de près, et l'anneau qui se dessine
+   accompagne l'arrivée sur la page. Elle y est déjà, dans `dessinerAnneauEq` et
+   ses deux jumelles — je n'y touche pas.
 
-   ─── POURQUOI UNE CLÉ PAR ANNEAU ET NON UN SEUL DRAPEAU ───
-
-   Les trois blocs ne s'affichent pas forcément ensemble : celui de l'Équipe se
-   redessine seul quand on change son tri. Un drapeau unique aurait donc éteint
-   l'animation des deux autres avant qu'ils l'aient jouée.
-
-   ─── ET POURQUOI PAS UNE PERSISTANCE ───
-
-   L'ensemble se vide au rechargement de la page. C'est voulu : rouvrir l'app
-   le lendemain matin est un moment où l'animation a de nouveau du sens. Ce
-   qu'on supprime, c'est la répétition dans une même session. */
-const anneauxDejaJoues = new Set()
+   Le résumé, lui, apparaît complet. `anneauxDejaJoues` disparaît avec : il
+   servait à ne jouer qu'une fois ce qui ne joue plus jamais. */
 
 /* ═══ LA LÉGENDE PORTE LE RÉSUMÉ À ELLE SEULE ═══
 
@@ -3214,7 +3207,7 @@ const anneauxDejaJoues = new Set()
 
    Le détail a sa page, derrière « Voir plus ». Le résumé se contente de
    montrer la répartition ; on descend d'un cran quand on veut les chiffres. */
-function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite, legende, cle) {
+function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite, legende) {
   const T = 168, ep = 14, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const somme = parts.reduce((t, x) => t + valeur(x), 0)
   const bloc = document.createElement('div')
@@ -3258,22 +3251,17 @@ function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite, legende, c
       ${parts.map(x => `<span><i style="background:${x.couleur}"></i>${escapeHtml(nomDe(x))}</span>`).join('')}
     </div>` : ''}`
 
-  /* L'anneau se remplit au lieu d'apparaître. Le masque part vide et se
-     découvre : c'est la même mécanique que sur les pages de détail, donc le
-     même geste d'un écran à l'autre.
+  /* Le masque est posé à découvert d'emblée, sans transition ni
+     `requestAnimationFrame` : l'anneau est complet dès la première image, sans
+     jamais passer par un état vide.
 
-     Déjà joué dans cette session : on pose le masque à découvert d'emblée,
-     sans transition. Pas de `requestAnimationFrame`, donc pas d'image où
-     l'anneau serait vide — il est complet dès le premier rendu. */
+     Le masque reste dans le dessin plutôt que d'être supprimé — il ne coûte
+     rien, et c'est lui qui rend l'animation possible si on la veut un jour
+     ici. */
   const aiguille = bloc.querySelector('.an-resume-aiguille')
   if (aiguille) {
-    if (cle && anneauxDejaJoues.has(cle)) {
-      aiguille.style.transition = 'none'
-      aiguille.style.strokeDashoffset = '0'
-    } else {
-      if (cle) anneauxDejaJoues.add(cle)
-      requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
-    }
+    aiguille.style.transition = 'none'
+    aiguille.style.strokeDashoffset = '0'
   }
   return bloc
 }
@@ -3371,7 +3359,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
         dureeLisible(avecTemps.reduce((x, c) => x + c.total, 0)),
         /* « lues » ne disait ni de quoi ni sur quelle période. Le centre porte
            une durée : il doit dire que c'est du temps de lecture, et quand. */
-        'de lecture ce mois-ci', true, 'dossiers'))
+        'de lecture ce mois-ci', true))
     }
   }
 
@@ -4158,7 +4146,7 @@ function renderMembresListe() {
       el.appendChild(anneauResume(vus, x => x.total,
         x => x.estAutres ? x.nom : (x.m?.nom || 'Sans nom'),
         dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
-        'de lecture ce mois-ci', true, 'equipe'))
+        'de lecture ce mois-ci', true))
     }
   }
 

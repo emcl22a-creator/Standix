@@ -421,7 +421,10 @@ header{
    16ch et deux points de moins en corps : quatre lignes, et le rideau
    respire. Une accroche qui mange l'écran n'a plus rien à annoncer. */
 h1{
-  font-size:clamp(31px,8.7vw,41px);
+  /* Descendu à 34 px quand le titre faisait quinze mots, puis remonté à 39 :
+     un titre court peut redevenir grand. C'est le même arbitrage dans l'autre
+     sens — le corps suit la longueur, pas l'inverse. */
+  font-size:clamp(29px,8.2vw,39px);
   /* 1,09 et non 1,05 : sur quatre lignes serrées à -0,045 em, l'interligne est
      ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
      changent l'impression d'ensemble plus que n'importe quelle marge. */
@@ -1488,7 +1491,7 @@ footer .marque{ margin-bottom:18px; }
 @media (min-width: 768px){
   :root{ --large:700px; --gouttiere:40px; --retrait:0px; }
 
-  h1{ font-size:46px; max-width:15ch; line-height:1.14 }
+  h1{ font-size:44px; max-width:18ch; line-height:1.12 }
   .sous{ font-size:17px; max-width:38ch }
   h2{ font-size:38px }
   .chapo{ font-size:16px }
@@ -1622,7 +1625,7 @@ footer .marque{ margin-bottom:18px; }
   /* Plus de `max-width` : c'est la colonne qui borne la ligne, et elle est
      maintenant assez large. 60 px au lieu de 68 — la lisibilité d'un titre de
      quatre lignes bat l'effet d'un titre de six. */
-  h1{ font-size:55px; line-height:1.01; max-width:none; margin-bottom:24px }
+  h1{ font-size:54px; line-height:1.03; max-width:none; margin-bottom:26px }
   .sous{ font-size:17.5px; max-width:38ch; margin-bottom:34px }
   .btn{ height:50px; padding:0 24px; font-size:15.5px }
   .aside{ font-size:13.5px }
@@ -1961,10 +1964,30 @@ footer .marque{ margin-bottom:18px; }
        « Saura faire » fait aussi écho à savoir-faire, qui est le mot central
        de la marque. C'est une résonance gratuite, il aurait été dommage de
        s'en priver. -->
-  <h1 class="flou r1">Filmez une fois.<br><em>Votre équipe saura faire, même sans vous.</em></h1>
+  <!-- ═══ LE TITRE DIT LE MÉCANISME ═══
+
+       « Filmez une fois. Votre équipe saura faire, même sans vous. » promettait
+       un résultat sans jamais dire par quel moyen — le sous-titre devait
+       rattraper. Ici les trois temps sont dans le titre, dans l'ordre où ils se
+       produisent : ce que fait le patron, ce que fait l'IA, ce qu'en fait
+       l'équipe.
+
+       « Ce que vous faites » et non « un geste » : l'app filme aussi bien un
+       geste qu'un écran d'ordinateur, et « geste » excluait la moitié des
+       usages.
+
+       La troisième partie — « et votre équipe la lit sur son téléphone » — a
+       été retirée : elle portait le titre à quinze mots et six lignes, et la
+       section 02 la raconte déjà en entier. Un titre annonce, il ne résume pas
+       la page.
+
+       ⚠ LE SOUS-TITRE A ÉTÉ RACCOURCI. Il disait « l'IA découpe la vidéo et
+         rédige les étapes », ce que le titre dit désormais. Répéter en petit
+         ce qu'on vient de lire en grand fait perdre le lecteur. Il ne garde que
+         ce que le titre ne dit pas : le QR code. -->
+  <h1 class="flou r1">Filmez ce que vous faites.<br><em>L'IA en écrit la procédure.</em></h1>
   <p class="sous flou r2">
-    Le geste ou l'écran : l'IA découpe la vidéo et rédige les étapes. Un QR
-    code sur place, et la procédure s'ouvre.
+    Un QR code collé sur place, et la bonne procédure s'ouvre.
   </p>
   <div class="actions flou r3">
     <a class="btn" href="app/">

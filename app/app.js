@@ -6215,80 +6215,176 @@ function depuisQuandCourt(t) {
   return new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL · QUATRE TUILES
+
+   Un salut, une phrase, un filtre, quatre chiffres. Rien d'autre.
+
+   ─── LA MÊME MATIÈRE QUE LA PAGE ANALYSE ───
+
+   Les tuiles portent `an-bloc`, la classe des trois blocs de l'Analyse. Une
+   troisième grammaire de carte dans la même app aurait été une chose de plus à
+   apprendre, pour rien.
+
+   ─── UN SEUL ANNEAU ───
+
+   Seule la quatrième tuile en porte un : sa valeur est un RAPPORT — tant
+   d'analyses sur tant d'autorisées — et un anneau dit un rapport mieux qu'un
+   texte. Les trois autres portent un nombre nu, parce qu'un nombre seul n'a
+   rien à comparer et qu'un anneau à 100 % ne veut rien dire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let accueilPeriode = 'mois'      // 'mois' ou 'tout'
+
 function renderAccueil() {
-  /* ═══ POURQUOI CET APPEL EST ICI ═══
-
-     Le résumé restait VIDE au premier chargement. Il fallait aller sur la page
-     Analyse puis revenir pour qu'il se remplisse.
-
-     La cause : `peindreResumeEntreprise` n'était appelée QU'À UN SEUL ENDROIT,
-     dans `rafraichirAnalyse` (ligne ~2913). Or les membres arrivent par DEUX
-     chemins — celui-là, et le chargement principal (ligne ~5081) qui remplit
-     `cachedMembres` sans rien repeindre. Au premier affichage, les données
-     étaient donc là et personne ne les dessinait.
-
-     Aller sur Analyse déclenchait `rafraichirAnalyse`, qui peignait la carte au
-     passage ; revenir sur l'accueil la montrait enfin remplie. Le symptôme
-     décrivait exactement le défaut.
-
-     `rafraichirAnalyse` a en plus un `return` anticipé quand l'entreprise n'a
-     aucune procédure : sur un compte neuf, le résumé ne se serait JAMAIS
-     rempli, quelle que soit la navigation.
-
-     Ici, il est peint chaque fois que l'accueil est dessiné. Sans `await` :
-     les postes viennent d'une requête à part et peuvent arriver une seconde
-     plus tard sans que le reste attende. */
-  peindreResumeEntreprise().catch(() => {})
-  peindreActivites()
-  /* ═══ APPEL RETIRÉ AVEC LE BLOC ═══
-
-     `peindreDernieresProcedures` n'est plus appelée nulle part. Je la laisse
-     en place plutôt que de la supprimer : elle sait dessiner une liste de
-     procédures récentes, et si tu veux ce bloc ailleurs un jour, il est écrit.
-
-     J'avais d'abord écrit ici qu'elle servait à l'onglet Procédures. C'est
-     faux — j'ai vérifié après coup : il a sa propre grille. Une note inexacte
-     dans le code est pire qu'aucune note. */
-  const salut = document.getElementById('accueil-salut')
-  const mot = document.getElementById('accueil-mot')
-  if (!salut || !mot) return
-
-  const h = new Date().getHours()
-  /* PAS DE « BONNE NUIT ». On souhaitait la bonne nuit avant 6 h — or celui
-     qui ouvre l'app à cette heure-là ne va pas se coucher : il ouvre le
-     restaurant, ou il termine le service. Lui dire bonne nuit, c'est le
-     saluer comme s'il partait.
-
-     Deux salutations suffisent : « Bonsoir » couvre la nuit et la soirée,
-     « Bonjour » le reste. La bascule à 5 h plutôt qu'à 6 : à cinq heures on
-     est en début de journée pour une équipe de cuisine. */
-  const bonjour = (h >= 5 && h < 18) ? 'Bonjour' : 'Bonsoir'
-  const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
-  salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
-
-  const nbProcs = allGestionProcedures.length
-  const nbEmp = cachedEmployes.length
-
-  if (!nbProcs) {
-    mot.innerHTML = "Vous n'avez pas encore de procédure. Commencez quand vous voulez, ça prend quelques minutes."
-    return
+  const prenom = document.getElementById('ac-prenom')
+  if (prenom) {
+    /* Le prénom seul. « Bonjour Emilien Meifj » sonne comme un courrier
+       administratif ; on salue quelqu'un par son prénom. */
+    const nom = (currentMembre?.nom || '').trim()
+    prenom.textContent = nom ? nom.split(/\s+/)[0] : ''
   }
-  if (!nbEmp) {
-    mot.innerHTML = "Votre équipe est vide. Partagez votre code d'invitation dans les Paramètres pour suivre les lectures."
-    return
+  peindreTuilesAccueil()
+}
+
+/* Le premier jour du mois courant, et celui du mois précédent. Servent aux
+   deux fenêtres de comparaison. */
+function bornesMois() {
+  const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0)
+  const p = new Date(d); p.setMonth(p.getMonth() - 1)
+  return { debutMois: d, debutPrec: p }
+}
+
+function peindreTuilesAccueil() {
+  const grille = document.getElementById('ac-grille')
+  if (!grille) return
+  grille.innerHTML = ''
+
+  const tout = accueilPeriode === 'tout'
+  const { debutMois, debutPrec } = bornesMois()
+  const procs = allGestionProcedures || []
+  const vals = cachedValidations || []
+
+  /* ─── ① PROCÉDURES CRÉÉES ─────────────────────────────────────────────── */
+  const creees = tout ? procs.length
+    : procs.filter(p => new Date(p.created_at) >= debutMois).length
+
+  /* ─── ② TEMPS DE FORMATION ────────────────────────────────────────────────
+     La somme de ce que TOUS les membres ont passé sur les procédures. C'est le
+     même calcul que la page Analyse, sur la même fenêtre — deux pages qui
+     donnent deux chiffres différents pour la même chose seraient pires que
+     pas de chiffre du tout. */
+  const dansFenetre = tout ? vals
+    : vals.filter(v => new Date(v.validated_at) >= debutMois)
+  const secondes = dansFenetre.reduce((t, v) => t + Number(v.duree_lecture || 0), 0)
+
+  /* ─── ③ UTILISATION IA, COMPARÉE AU MOIS PRÉCÉDENT ────────────────────────
+     Une procédure analysée porte une `video_url` : c'est ce qui la distingue
+     d'une procédure écrite à la main.
+
+     ⚠ LA COMPARAISON N'A DE SENS QUE SUR LE MOIS. « Au total » n'a pas de mois
+       précédent auquel se comparer ; la tuile affiche alors le nombre brut,
+       sans pourcentage. Inventer une comparaison sur une période qui n'en
+       admet pas serait un chiffre faux. */
+  const iaMois = procs.filter(p => p.video_url && new Date(p.created_at) >= debutMois).length
+  const iaPrec = procs.filter(p => {
+    if (!p.video_url) return false
+    const d = new Date(p.created_at)
+    return d >= debutPrec && d < debutMois
+  }).length
+  const iaTotal = procs.filter(p => p.video_url).length
+
+  let ecart = null
+  if (!tout && iaPrec > 0) ecart = Math.round(((iaMois - iaPrec) / iaPrec) * 100)
+  else if (!tout && iaPrec === 0 && iaMois > 0) ecart = 'neuf'
+
+  /* ─── ④ QUOTA D'ANALYSES ───────────────────────────────────────────────────
+     `etatAbo.analyses` vient de `reste_analyses`, qui ne consomme rien. Si la
+     migration n'est pas passée, il vaut `null` : la tuile dit alors ce qu'elle
+     sait — le nombre d'analyses — sans inventer de plafond. */
+  const q = etatAbo?.analyses || null
+  const quota = q ? Number(q.quota || 0) : 0
+  const reste = q ? Number(q.reste || 0) : 0
+  const utilisees = quota ? quota - reste : null
+
+  grille.appendChild(tuileAccueil({
+    titre: 'Procédures créées',
+    valeur: String(creees),
+    note: tout ? 'depuis le début' : 'ce mois-ci',
+  }))
+
+  grille.appendChild(tuileAccueil({
+    titre: 'Temps de formation',
+    valeur: dureeLisible(secondes) || '0 min',
+    note: 'tous les membres',
+  }))
+
+  grille.appendChild(tuileAccueil({
+    titre: 'Utilisation IA',
+    valeur: String(tout ? iaTotal : iaMois),
+    note: tout ? 'analyses au total'
+      : ecart === 'neuf' ? 'premières analyses'
+      : ecart === null ? 'analyses ce mois-ci'
+      : `${ecart >= 0 ? '+' : ''}${ecart} % vs mois dernier`,
+    tendance: typeof ecart === 'number' ? ecart : null,
+  }))
+
+  grille.appendChild(tuileQuota(utilisees, quota))
+}
+
+/* Une tuile ordinaire : titre en petit, valeur en grand, note en dessous. */
+function tuileAccueil({ titre, valeur, note, tendance }) {
+  const el = document.createElement('div')
+  el.className = 'an-bloc ac-tuile'
+  /* La couleur de la tendance porte un sens, pas une décoration : au-dessus de
+     zéro on a plus analysé que le mois d'avant, en dessous on a ralenti. Le
+     gris quand il n'y a rien à comparer. */
+  const cls = tendance == null ? '' : tendance >= 0 ? ' hausse' : ' baisse'
+  el.innerHTML = `
+    <div class="ac-t">${escapeHtml(titre)}</div>
+    <div class="ac-v">${escapeHtml(valeur)}</div>
+    <div class="ac-n${cls}">${escapeHtml(note)}</div>`
+  return el
+}
+
+/* La tuile du quota : un anneau, le pourcentage au centre, le rapport dessous. */
+function tuileQuota(utilisees, quota) {
+  const el = document.createElement('div')
+  el.className = 'an-bloc ac-tuile ac-tuile--anneau'
+
+  if (!quota) {
+    /* Pas de plafond connu : on ne dessine pas d'anneau vide, on dit ce qu'on
+       sait. Un anneau à zéro laisserait croire qu'il ne reste rien. */
+    el.innerHTML = `
+      <div class="ac-t">Analyses vidéo</div>
+      <div class="ac-v">${utilisees == null ? '—' : utilisees}</div>
+      <div class="ac-n">ce mois-ci</div>`
+    return el
   }
 
-  const possible = nbProcs * nbEmp
-  const taux = possible ? Math.round((cachedValidations.length / possible) * 100) : 0
-  const phrase =
-    /* « VOS procédures » ne vaut que pour le fondateur. Un gestionnaire promu
-       n'en est pas propriétaire : lui dire « vos » sonne faux, et laisse croire
-       qu'il porte une responsabilité qui n'est pas la sienne. */
-    taux >= 80 ? `L'équipe suit très bien. <b>${taux} %</b> des procédures ont été lues.` :
-    taux >= 50 ? `Ça avance. <b>${taux} %</b> des procédures ont été lues par l'équipe.` :
-    taux >= 20 ? `<b>${taux} %</b> des procédures ont été lues. Un rappel à l'équipe ne ferait pas de mal.` :
-                 `Seulement <b>${taux} %</b> des procédures ont été lues. Affichez les QR codes sur les postes.`
-  mot.innerHTML = phrase
+  const pct = Math.max(0, Math.min(100, Math.round((utilisees / quota) * 100)))
+  const T = 76, ep = 8, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const rempli = circ * (pct / 100)
+
+  el.innerHTML = `
+    <div class="ac-t">Analyses vidéo</div>
+    <div class="ac-anneau">
+      <svg width="${T}" height="${T}">
+        <circle cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
+                stroke="rgba(255,255,255,0.09)" stroke-width="${ep}"/>
+        <circle class="arc" cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
+                stroke="url(#acDegrade)" stroke-width="${ep}" stroke-linecap="round"
+                stroke-dasharray="${rempli} ${circ}" stroke-dashoffset="${circ}"/>
+      </svg>
+      <span class="ac-pct">${pct}<em>%</em></span>
+    </div>
+    <div class="ac-n">${utilisees} / ${quota} utilisées</div>`
+
+  /* L'anneau se remplit à l'arrivée. C'est le seul de l'accueil, donc la seule
+     attente — pas trois animations concurrentes comme sur l'Analyse. */
+  const arc = el.querySelector('.arc')
+  if (arc) requestAnimationFrame(() => { arc.style.strokeDashoffset = '0' })
+  return el
 }
 
 /* Un appui sur l'avatar ouvre le support, avec la même fenêtre que partout. */
@@ -6508,6 +6604,24 @@ document.addEventListener('click', (e) => {
     const wasOpen = menu.classList.contains('open')
     closeAllDropdowns()
     if (!wasOpen) { menu.classList.add('open'); trigger.classList.add('open') }
+    e.stopPropagation()
+    return
+  }
+
+  /* ═══ LE FILTRE DE PÉRIODE DE L'ACCUEIL ═══
+
+     Il partage l'ouverture et la fermeture avec les menus de tri — c'est le
+     même geste, il doit répondre pareil. Seul le choix diffère : `data-periode`
+     au lieu de `data-sort`, et il redessine les tuiles plutôt que la liste. */
+  const periode = e.target.closest('.dd-menu button[data-periode]')
+  if (periode) {
+    accueilPeriode = periode.dataset.periode
+    const menu = periode.closest('.dd-menu')
+    menu?.querySelectorAll('.dd-opt').forEach(o => o.classList.toggle('actif', o === periode))
+    const lbl = document.getElementById('dd-home-periode-label')
+    if (lbl) lbl.textContent = periode.textContent.trim()
+    closeAllDropdowns()
+    peindreTuilesAccueil()
     e.stopPropagation()
     return
   }

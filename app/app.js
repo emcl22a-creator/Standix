@@ -2479,6 +2479,16 @@ async function peindreResumeEntreprise() {
   const postes = document.getElementById('re-postes')
   if (!salut || !chiffres) return
 
+  /* La carte est dévoilée à la SORTIE de cette fonction, jamais ici : tout ce
+     qui suit peut attendre le réseau, et la révéler maintenant reviendrait à
+     montrer un cadre vide — exactement ce qu'on corrige. */
+  const carte = document.getElementById('accueil-resume')
+  const devoiler = () => {
+    if (!carte || !carte.classList.contains('pas-prete')) return
+    carte.classList.remove('pas-prete')
+    carte.classList.add('neuf')
+  }
+
   /* Le prénom seul. « Bonjour Emilien Meifj » sonne comme un courrier
      administratif ; le prénom, comme quelqu'un qui vous connaît. */
   const nom = (currentMembre?.nom || '').trim()
@@ -2528,7 +2538,17 @@ async function peindreResumeEntreprise() {
     `</div>`
   )
 
-  if (!postes) return
+  /* ═══ TROIS SORTIES, TROIS RÉVÉLATIONS ═══
+
+     La carte est complète dès ici : le salut, le total et la barre sont
+     posés. Ce qui suit — les postes — vient d'une requête séparée qui peut
+     ne rien rendre.
+
+     Dévoiler à CHAQUE sortie plutôt qu'à la fin seulement : sur une entreprise
+     sans postes, la fonction s'arrête avant, et la carte resterait masquée
+     pour toujours. Un masquage qu'on oublie de lever est pire que pas de
+     masquage du tout. */
+  if (!postes) { devoiler(); return }
 
   /* Les postes arrivent par une requête à part : la table peut ne pas exister,
      et `chargerPostes` rend alors un tableau vide plutôt que d'échouer. */
@@ -2539,6 +2559,7 @@ async function peindreResumeEntreprise() {
 
   if (!liste?.length) {
     postes.innerHTML = ''
+    devoiler()
     return
   }
 
@@ -2640,6 +2661,7 @@ async function peindreResumeEntreprise() {
 
   postes.innerHTML = '<div class="re-t">Postes</div>' +
     recents.map(ligne).join('') + tiroir
+  devoiler()
 }
 
 /* L'état du tiroir vit HORS de la fonction qui dessine : la carte est repeinte
@@ -3220,6 +3242,82 @@ document.addEventListener('click', (e) => {
   if (b.dataset.neant === 'creer') startNewProcedure()
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN ANNEAU DE RÉSUMÉ, RÉUTILISABLE
+
+   Écrit une fois pour les trois blocs de la page Analyse. Il prend une liste
+   déjà regroupée et colorée, deux accesseurs — la valeur, le nom — et ce qu'il
+   faut afficher au centre.
+
+   ─── POURQUOI PAS `dessinerAnneauEq` ───
+
+   Celle-là lit `anEqVues`, écrit dans un identifiant construit, et rebranche
+   la légende cliquable de la page de détail. Elle est faite pour un écran
+   précis. La détourner aurait demandé de lui passer un faux état, et le
+   premier changement sur la page de détail aurait cassé celui-ci.
+
+   On partage donc ce qui est PUR — `regrouperParts`, `fractionsLisibles`,
+   `FM_TEINTES` — et on garde deux dessins séparés. La duplication est ici
+   moins coûteuse que le couplage.
+
+   ─── LA LÉGENDE EST COURTE PAR CONSTRUCTION ───
+
+   `regrouperParts` a déjà fondu les petites parts dans « Autres ». On affiche
+   donc tout ce qu'elle rend, sans troncature supplémentaire : une légende plus
+   longue que l'anneau signifierait que le regroupement a mal fait son travail,
+   et c'est là qu'il faudrait corriger, pas ici. */
+function anneauResume(parts, valeur, nomDe, centreTexte, centreUnite) {
+  const T = 168, ep = 14, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const somme = parts.reduce((t, x) => t + valeur(x), 0)
+  const bloc = document.createElement('div')
+  bloc.className = 'an-resume'
+  if (!parts.length || !somme) return bloc
+
+  const ecart = Math.max(1.5, Math.min(5, (circ / 8) / Math.max(1, parts.length)))
+  const fracs = fractionsLisibles(parts, valeur, circ, ecart + ep * 1.7)
+
+  let pos = 0
+  const arcs = parts.map((x, i) => {
+    const brut = circ * fracs[i]
+    /* Une part large reçoit des bouts arrondis ; une part fine n'en a pas la
+       place — arrondie, elle deviendrait un point au lieu d'un arc. */
+    const rond = brut > ecart + ep * 1.6
+    const len = rond ? brut - ecart - ep : Math.max(1, brut - ecart)
+    const depart = circ * pos + ecart / 2 + (rond ? ep / 2 : 0)
+    pos += fracs[i]
+    return `<circle class="arc${rond ? '' : ' droit'}" cx="${T / 2}" cy="${T / 2}" r="${r}"
+      fill="none" stroke="${x.couleur}" stroke-width="${ep}"
+      stroke-dasharray="${len} ${circ}" stroke-dashoffset="${-depart}"/>`
+  }).join('')
+
+  const masque = 'an-res-' + Math.random().toString(36).slice(2, 9)
+  bloc.innerHTML = `
+    <div class="an-resume-anneau">
+      <svg width="${T}" height="${T}">
+        <defs><mask id="${masque}">
+          <circle class="an-resume-aiguille" cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
+                  stroke="#fff" stroke-width="${ep + 3}"
+                  stroke-dasharray="${circ}" stroke-dashoffset="${circ}"/>
+        </mask></defs>
+        <g mask="url(#${masque})">${arcs}</g>
+      </svg>
+      <div class="an-resume-centre">
+        <span class="v">${escapeHtml(centreTexte)}</span>
+        <span class="u">${escapeHtml(centreUnite || '')}</span>
+      </div>
+    </div>
+    <div class="an-resume-leg">
+      ${parts.map(x => `<span><i style="background:${x.couleur}"></i>${escapeHtml(nomDe(x))}</span>`).join('')}
+    </div>`
+
+  /* L'anneau se remplit au lieu d'apparaître. Le masque part vide et se
+     découvre : c'est la même mécanique que sur les pages de détail, donc le
+     même geste d'un écran à l'autre. */
+  const aiguille = bloc.querySelector('.an-resume-aiguille')
+  if (aiguille) requestAnimationFrame(() => { aiguille.style.strokeDashoffset = '0' })
+  return bloc
+}
+
 function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodLabel, cible, tout) {
   const el = cible || document.getElementById('ga-top-categories')
   if (!el) return
@@ -3266,7 +3364,40 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
 
   const visibles = tout ? classement : classement.slice(0, 3)
 
-  el.innerHTML = visibles.map(c => {
+  /* ═══════════════════════════════════════════════════════════════════════
+     L'ANNEAU AVANT LES LIGNES
+     ═══════════════════════════════════════════════════════════════════════
+
+     La page ne montrait que des listes : il fallait lire pour comprendre où
+     part le temps. Un anneau se saisit en trois secondes — on voit qu'un
+     dossier domine sans lire un mot, et les lignes en dessous répondent
+     ensuite au « lequel exactement ».
+
+     ─── ON RÉEMPLOIE, ON NE RÉÉCRIT PAS ───
+
+     `regrouperParts`, `fractionsLisibles` et `FM_TEINTES` viennent des pages de
+     détail, où cet anneau existe déjà. Le redessiner ici avec ses propres
+     calculs aurait donné deux anneaux qui divergent à la première correction —
+     et l'un des deux aurait fini par mentir.
+
+     ─── PAS D'ANNEAU SUR LA PAGE COMPLÈTE ───
+
+     `tout` vaut vrai sur la page de détail, qui porte DÉJÀ le sien. Deux
+     anneaux l'un au-dessus de l'autre, montrant la même chose, n'apprendraient
+     rien de plus. */
+  if (!tout) {
+    const avecTemps = classement.filter(c => c.total)
+    if (avecTemps.length) {
+      const vus = regrouperParts(avecTemps, c => c.total)
+      let t = 0
+      vus.forEach(v => { v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
+      el.appendChild(anneauResume(vus, c => c.total, c => c.nom,
+        dureeLisible(avecTemps.reduce((x, c) => x + c.total, 0)), 'lues'))
+    }
+  }
+
+  const lignes = document.createElement('div')
+  lignes.innerHTML = visibles.map(c => {
     const n = c.lecteurs.size
     return `
       <button type="button" class="an-lig" data-cat="${escapeHtml(c.nom)}">
@@ -3278,6 +3409,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
         ${tempsTotalHtml(c.total, false, periodLabel)}
       </button>`
   }).join('')
+  while (lignes.firstChild) el.appendChild(lignes.firstChild)
 
   /* Le bouton s'affiche même avec trois entrées ou moins : la page complète ne
      se contente plus d'allonger la liste, elle porte l'anneau et le classement
@@ -3679,7 +3811,9 @@ function regrouperParts(vus, valeur) {
   const autres = { ...modele, couleur: ANNEAU_GRIS, estAutres: true, _reste: reste.length }
   if ('total' in modele) autres.total = total
   if ('secondes' in modele) autres.secondes = total
-  autres.nom = `${reste.length} autres`
+  /* Accordé : « 1 autres » se voit tout de suite et fait bâclé. Le cas se
+     produit dès qu'une seule part tombe sous le seuil, ce qui est fréquent. */
+  autres.nom = reste.length > 1 ? `${reste.length} autres` : '1 autre'
   autres.titre = autres.nom
   return [...gardees, autres]
 }

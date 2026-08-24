@@ -6174,11 +6174,27 @@ body.plus-vu .plus-flot{
    d'icône est propre aux activités — les événements sont de natures
    différentes, et le dessin les distingue sans qu'on ait à lire.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ LA MÊME PLAQUE QUE LES TUILES DE L'ACCUEIL ═══
+
+   Elle était blanche translucide, avec un trait gris — le vocabulaire des
+   éléments neutres de l'app. Or ces icônes désignent des ÉVÉNEMENTS de
+   l'entreprise, comme celles des tuiles désignent ses chiffres : elles
+   appartiennent à la même famille et doivent en porter la couleur.
+
+   Dégradé ambre, liseré à 20 %, repris de `.cat-ic` et `.ac-ic` au réglage
+   près. Le trait suit `currentColor` : il devient ambre sans qu'on y touche.
+
+   ⚠ LES TROIS GENRES PERDENT LEUR NUANCE. `act-arrivee`, `act-depart` et
+     `act-promo` pouvaient teinter la plaque différemment ; ce n'était pas le
+     cas ici, mais si tu veux les distinguer un jour, c'est `color` qu'il
+     faudra changer, pas le fond. */
 .act-lig .act-ic{
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   width:30px; height:30px; border-radius:10px;
-  background:rgba(255,255,255,0.05);
-  color:var(--label-2);
+  background:linear-gradient(165deg,
+    rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
+  border:0.5px solid rgba(255,173,51,0.20);
+  color:#FFAD33;
 }
 .act-lig .act-ic svg{ width:16px; height:16px; display:block; }
 /* LE MÊME BLANC QUE LES LIGNES DU BLOC AU-DESSUS.
@@ -8392,7 +8408,11 @@ body:has(#e-detail.active) #equipe-app{
 }
 
 
-/* Le lien vers les activités, en pied d'accueil. `an-plus` lui donne son fond
-   et son rayon ; on n'ajoute que l'air au-dessus, la dernière ligne de
-   procédure portant déjà sa propre marge. */
-.ac-act{ margin-top:5px; }
+/* Le lien vers les mouvements, en pied d'accueil. `an-plus` lui donne son fond
+   et son rayon.
+
+   18 px au-dessus, et non 5 : la dernière ligne de procédure porte déjà 9 px
+   de marge, ce qui faisait 14 en tout — assez pour séparer deux lignes d'une
+   même liste, pas assez pour séparer une LISTE d'un bouton qui mène ailleurs.
+   Les deux se lisaient comme un même bloc. */
+.ac-act{ margin-top:18px; }

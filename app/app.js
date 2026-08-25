@@ -5799,7 +5799,14 @@ function activerAvecNaissance(ecran) {
   const poser = () => {
     const src = document.getElementById('logo-src')
     if (!src) return
-    document.querySelectorAll('img[data-logo]').forEach(i => { i.src = src.src })
+    document.querySelectorAll('img[data-logo]').forEach(i => {
+      i.src = src.src
+      /* Les logos teintes par masque ont besoin de la source dans leur CSS,
+         pas seulement dans leur attribut. Une variable la leur passe. */
+      if (i.classList.contains('logo-forme')) {
+        i.style.setProperty('--logo-src', `url("${src.src}")`)
+      }
+    })
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', poser)
@@ -16465,7 +16472,11 @@ function carteOffre(o, opts = {}) {
          le fichier est blanc, et le recolorer en CSS evite de maintenir une
          seconde version du logo dans le depot. -->
     <span class="offre-logo" aria-hidden="true">
-      <img src="../logo-standix.png" alt="" loading="lazy">
+      <!-- LE MEME LOGO QUE PARTOUT AILLEURS. L app n utilise aucun fichier :
+           le logo est embarque en base64 dans index.html, et data-logo en copie
+           la source dans chaque balise qui le porte. Mon chemin vers un PNG du
+           depot pointait vers un fichier que l app ne charge jamais. -->
+      <img class="logo-forme" data-logo alt="">
     </span>
 
     <div class="offre-nom">${o.nom}</div>
@@ -16581,7 +16592,19 @@ window.renderAbonnements = function() {
   const estActuelle = mienne.cle === actuel
   document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
     classe: ' vedette' + (estActuelle ? ' actuelle' : ''),
-    ruban: estActuelle ? 'En cours' : 'Recommandée',
+    /* ═══ PLUS DE « RECOMMANDÉE » ═══
+
+       Le ruban suggérait un choix de goût — comme si certains clients
+       préféraient cette offre. Or on ne choisit pas son abonnement par
+       préférence : on le choisit sur le nombre de membres, et l'offre affichée
+       en tête est DÉJÀ celle qui correspond à la taille de l'équipe.
+
+       Dire « recommandée » sur un plan imposé par le compte des personnes, c'est
+       présenter une contrainte comme une suggestion. Le sous-titre l'explique
+       déjà : « L'offre Essentiel est faite pour une équipe de cette taille. »
+
+       « En cours » reste : ce n'est pas un avis, c'est un fait. */
+    ruban: estActuelle ? 'En cours' : '',
     enCours: estActuelle,
     gerer: estActuelle,
     /* « Choisir <offre> » : le geste, sans le mot argent. « Essayer

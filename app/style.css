@@ -6176,6 +6176,19 @@ body.plus-vu .plus-flot{
 }
 #activites-tout > .act-jour:first-of-type{ margin-top:14px; }
 
+/* ═══ LE MÊME AIR SOUS LE TITRE DES PROCÉDURES RÉCENTES ═══
+
+   `detail-header` ne laisse que 4 px : c'est juste pour une page dont le
+   contenu commence par un intertitre, qui porte sa propre marge. Ici la
+   première carte arrive nue, et elle se collait au titre.
+
+   14 px, comme sur la page des mouvements — les deux s'ouvrent depuis le même
+   pied d'accueil et doivent se ressembler.
+
+   Le sélecteur vise le PREMIER enfant seulement : les cartes suivantes ont
+   déjà leurs 9 px de marge, et les espacer davantage détacherait la liste. */
+#recentes-tout > *:first-child{ margin-top:14px; }
+
 /* ═══════════════════════════════════════════════════════════════════════════
    UN SEUL TRAIT DE CONTOUR DANS TOUTE L'APP
 

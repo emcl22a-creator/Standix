@@ -4919,6 +4919,17 @@
 
 
   .dd-filter{ position:relative; margin-bottom:14px; }
+  /* ═══ SAUF DANS UN EN-TÊTE CENTRÉ ═══
+
+     La marge de 14 px sert quand le filtre surmonte une liste. Dans `.an-tete`,
+     qui centre ses enfants, elle fait partie de la boîte : le navigateur centre
+     24 px de bouton PLUS 14 px de marge, et le bouton remonte de sept pixels.
+
+     Mesuré : centre du titre à 104, centre du filtre à 97.
+
+     La règle est ici, dans la même requête média que celle qu'elle corrige —
+     posée en fin de fichier, elle était moins spécifique et sans effet. */
+  .an-tete .dd-filter{ margin-bottom:0; }
   .dd-trigger{
     display:flex; align-items:center; justify-content:space-between; width:100%;
     font-family:inherit; font-size:13.5px; font-weight:600; color:var(--label);
@@ -8558,7 +8569,26 @@ body:has(#e-detail.active) #equipe-app{
    le pousser au bout. `margin-left:auto` plutôt que `justify-content` sur le
    parent — celui-ci sert à tous les blocs d'analyse, et les autres n'ont rien
    à droite de leur titre. */
-.cb-filtre{ margin-left:auto; }
+/* ═══ LA MARGE HÉRITÉE DÉCENTRE LE FILTRE ═══
+
+   `.dd-filter` porte `margin-bottom:14px` — utile quand il est seul au-dessus
+   d'une liste. Dans un conteneur centré, cette marge fait partie de la boîte :
+   le navigateur centre les 24 px du bouton PLUS les 14 px de marge, et le
+   bouton remonte de sept pixels.
+
+   Mesuré : centre du titre à 104, centre du filtre à 97.
+
+   C'est le même piège que sur les tuiles de l'accueil, où `.an-bloc` ajoutait
+   sa marge au `gap` de la grille. Une marge héritée ne se voit pas dans la
+   règle qu'on lit. */
+.cb-filtre{ margin-left:auto; margin-bottom:0; }
+
+/* La ligne d'explication, sous l'en-tête. Même gris et même taille que les
+   sous-titres de l'app — c'est un complément de titre, pas une donnée. */
+.cb-sous{
+  font-size:12.5px; color:var(--label-2); line-height:1.4;
+  margin:2px 0 -4px; letter-spacing:-0.005em;
+}
 /* Un cran plus discret que les autres filtres : il partage sa ligne avec un
    titre en gras, et à taille égale les deux se disputeraient l'attention. */
 .cb-filtre .dd-trigger{ font-size:11.5px; padding:5px 9px; }

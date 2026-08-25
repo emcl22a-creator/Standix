@@ -6470,7 +6470,16 @@ function depuisQuandCourt(t) {
    rien à comparer et qu'un anneau à 100 % ne veut rien dire.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-let accueilPeriode = 'mois'      // 'mois' ou 'tout'
+/* ═══ PLUS DE FILTRE : TOUT EST AU TOTAL ═══
+
+   Le sélecteur « Ce mois-ci / Au total » a été retiré. Le titre demandé —
+   « Total de procédures créées » — dit le total, et un filtre qui pourrait le
+   ramener au mois contredirait son propre libellé.
+
+   La constante reste plutôt que d'être effacée : `peindreTuilesAccueil` la lit
+   à trois endroits, et la retirer demanderait de réécrire chaque calcul. Elle
+   ne change simplement plus de valeur. */
+const accueilPeriode = 'tout'
 
 function renderAccueil() {
   /* ═══ UN ÉCHEC ICI NE DOIT PLUS ÊTRE SILENCIEUX ═══
@@ -6563,9 +6572,11 @@ function peindreTuilesAccueil() {
   const utilisees = quota ? quota - reste : null
 
   grille.appendChild(tuileAccueil({
-    titre: 'Procédures créées', icone: 'document',
+    titre: 'Total de procédures créées', icone: 'document',
     valeur: String(creees),
-    note: tout ? 'depuis le début' : 'ce mois-ci',
+    /* « Depuis le début » disparaît : le titre dit déjà « total ». La note
+       renseigne plutôt sur ce qui est compté. */
+    note: 'toutes vos procédures',
   }))
 
   /* ═══ L'ANNEAU EN DEUXIÈME POSITION ═══
@@ -6599,10 +6610,12 @@ function peindreTuilesAccueil() {
        ouvre son app le matin n'a pas à se sentir évalué par elle. */
     titre: 'Membres actifs', icone: 'equipe',
     valeur: aLire.length ? String(lecteurs) : '—',
+    /* La branche « ont lu ce mois-ci » a été retirée : sans filtre, la période
+       est toujours « depuis le début ». Une branche que rien ne peut atteindre
+       est un piège pour qui relira ce code. */
     note: !aLire.length ? 'aucun membre en équipe'
       : lecteurs === aLire.length ? `tous · ${aLire.length} sur ${aLire.length}`
-      : tout ? `sur ${aLire.length} · ont déjà lu`
-      : `sur ${aLire.length} · ont lu ce mois-ci`,
+      : `sur ${aLire.length} · ont déjà lu`,
     /* Vert quand tout le monde a lu, sinon rien : une couleur d'alerte ferait
        d'un chiffre correct un reproche. */
     tendance: aLire.length && lecteurs === aLire.length ? 1 : null,
@@ -7166,18 +7179,8 @@ document.addEventListener('click', (e) => {
     return
   }
 
-  const periode = e.target.closest('.dd-menu button[data-periode]')
-  if (periode) {
-    accueilPeriode = periode.dataset.periode
-    const menu = periode.closest('.dd-menu')
-    menu?.querySelectorAll('.dd-opt').forEach(o => o.classList.toggle('actif', o === periode))
-    const lbl = document.getElementById('dd-home-periode-label')
-    if (lbl) lbl.textContent = periode.textContent.trim()
-    closeAllDropdowns()
-    peindreTuilesAccueil()
-    e.stopPropagation()
-    return
-  }
+  /* L'écouteur du filtre d'accueil a été retiré avec le filtre lui-même.
+     `accueilPeriode` est désormais une constante. */
 
   const option = e.target.closest('.dd-menu button[data-sort]')
   if (option) {

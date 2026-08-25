@@ -2860,7 +2860,7 @@
   }
   .abo-hi{ position:relative; z-index:1; text-align:center; margin-bottom:20px; }
   .abo-hi h2{
-    font-size:24px; font-weight:750; letter-spacing:-0.045em; line-height:1.18;
+    font-size:24px; font-weight:700; letter-spacing:-0.045em; line-height:1.18;
     margin-bottom:8px;
   }
   .abo-hi p{ font-size:13.5px; line-height:1.5; color:var(--label-3); }
@@ -2900,23 +2900,22 @@
      ⚠ LE PARENT DOIT ÊTRE `position:relative` et le contenu `z-index:2` :
        sinon le pseudo-élément passe par-dessus le texte. Les deux sont déjà
        en place plus bas. */
+  /* ═══ LE MEME CADRE QUE « ÉCRIVEZ-NOUS » ═══
+
+     Cette carte-là n'a AUCUN liseré : `border:none`, et deux ombres portées
+     seulement — une sombre qui la décolle, une ambre qui la fait diffuser.
+     C'est la lueur qui dessine le bord, pas un trait.
+
+     Mon liseré en dégradé était plus voyant mais moins juste : il faisait de la
+     carte un objet cerclé au milieu d'une app où rien d'autre ne l'est. */
   .offre-carte.vedette{
-    position:relative;
-    background:linear-gradient(150deg,#191920 0%,#0F0F13 48%,#08080A 100%);
-    box-shadow:0 16px 42px rgba(0,0,0,0.5);
+    position:relative; overflow:hidden;
+    border:none; border-radius:22px;
+    background:linear-gradient(150deg,#17171B 0%,#101014 40%,#0A0A0D 75%,#060608 100%);
+    box-shadow:0 14px 34px rgba(0,0,0,0.42), 0 0 30px -14px rgba(255,122,24,0.26);
   }
-  .offre-carte.vedette::before{
-    content:''; position:absolute; inset:0; border-radius:inherit;
-    padding:1px; pointer-events:none; z-index:1;
-    background:linear-gradient(145deg,
-      rgba(255,186,80,0.78) 0%,
-      rgba(255,159,10,0.34) 38%,
-      rgba(255,159,10,0.10) 68%,
-      rgba(255,159,10,0.05) 100%);
-    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite:xor; mask-composite:exclude;
-  }
+  /* Le liseré en dégradé a été retiré : « Écrivez-nous » n'en a pas, et c'est
+     le modèle. Deux techniques de bord dans la même app en font une de trop. */
   .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
 
   /* ═══ LE RUBAN RENTRE DANS LA CARTE ═══
@@ -2929,20 +2928,32 @@
      nom qu'il qualifie. Le fond passe d'un dégradé plein à un ambre translucide :
      à l'intérieur d'une carte sombre, un aplat orange vif pesait plus que le
      prix qu'il surmonte. */
+  /* ═══ TROIS GRAISSES RAMENÉES DANS LA FAMILLE ═══
+
+     L'app n'emploie que 600 et 700. Le bloc de l'abonnement avait accumulé
+     650, 750 et 800 — des valeurs intermédiaires qui n'existent nulle part
+     ailleurs et qui donnent à cette page une main différente.
+
+     Le ruban passe de 800 à 700, le nom et le bouton de 750 à 700, l'unité du
+     prix de 650 à 600. Aucune n'était voulue : elles se sont ajoutées au fil
+     des retouches. */
   .offre-ruban{
     display:inline-block; margin-bottom:13px;
     padding:4px 11px; border-radius:100px;
     background:rgba(255,159,10,0.16);
-    font-size:9.5px; font-weight:800; letter-spacing:0.09em;
+    font-size:9.5px; font-weight:700; letter-spacing:0.09em;
     text-transform:uppercase; color:#FFAD33;
   }
   .offre-nom{
-    display:block; font-size:18px; font-weight:750; letter-spacing:-0.03em;
+    display:block; font-size:18px; font-weight:700; letter-spacing:-0.03em;
   }
   .offre-prix{ flex-shrink:0; text-align:right; white-space:nowrap; }
-  .offre-prix .v{ font-size:26px; font-weight:800; letter-spacing:-0.045em; }
+  /* Ancienne règle, conservée pour les cartes NON vedettes de la liste
+     dépliée : 26 px suffit quand la carte n'est pas mise en avant. La graisse
+     suit la famille — 700, comme « Bonjour Emilien ». */
+  .offre-prix .v{ font-size:26px; font-weight:700; letter-spacing:-0.03em; }
   .offre-prix .u{
-    display:block; font-size:10.5px; font-weight:650; color:var(--label-3);
+    display:block; font-size:10.5px; font-weight:600; color:var(--label-3);
     margin-top:1px;
   }
 
@@ -2970,7 +2981,7 @@
   /* ── LE BOUTON ── */
   .offre-cta{
     width:100%; height:50px; margin-top:18px; border:none; border-radius:15px;
-    font-family:inherit; font-size:14.5px; font-weight:750;
+    font-family:inherit; font-size:14.5px; font-weight:700;
     background:linear-gradient(135deg,#E85D00,#F58A15 62%,#FF9F26);
     color:#2A1400;
   }
@@ -3002,7 +3013,7 @@
   #abo-liste.ouvert{ grid-template-rows:1fr; opacity:1; margin-top:12px; }
 
   /* ── LE BAS DE PAGE ── */
-  .abo-egal b{ color:var(--label-1); font-weight:750; }
+  .abo-egal b{ color:var(--label-1); font-weight:700; }
 
   /* ═══════════════════════════════════════════════════════════════════════
      LE ZOOM DE BUREAU A ÉTÉ RETIRÉ
@@ -8555,8 +8566,16 @@ body:has(#e-detail.active) #equipe-app{
    prix passe à 38 : plus grand qu'eux, parce que c'est un prix, mais dans la
    même famille. Un chiffre qui ne ressemble à aucun autre dans l'app se lit
    comme importé d'ailleurs. */
+/* ═══ LA GRAISSE DE « BONJOUR EMILIEN » ═══
+
+   `.ac-salut` fait 700 avec une approche de -0,03. Le prix était en 800 à
+   -0,045 : plus lourd et plus serré, donc d'une autre main.
+
+   Il reste plus GRAND — 38 px contre 24 — parce que c'est un prix. Mais la
+   graisse et l'approche sont celles du reste de l'app : c'est ce qui fait
+   qu'un texte appartient à la même famille, pas sa taille. */
 .offre-prix .v{
-  font-size:38px; font-weight:800; letter-spacing:-0.045em; line-height:1;
+  font-size:38px; font-weight:700; letter-spacing:-0.03em; line-height:1;
   font-variant-numeric:tabular-nums;
 }
 .offre-prix .u{ font-size:13.5px; color:var(--label-2); letter-spacing:-0.01em; }
@@ -8578,7 +8597,7 @@ body:has(#e-detail.active) #equipe-app{
   font-style:normal; font-size:12px; line-height:1.5;
   color:rgba(255,159,10,0.72); flex:0 0 auto;
 }
-.offre-li b{ color:var(--label-1); font-weight:700; }
+.offre-li b{ color:var(--label-1); font-weight:700; letter-spacing:-0.02em; }
 
 /* ═══ L'ANNUEL, UNE LIGNE ═══
 
@@ -8637,7 +8656,7 @@ body:has(#e-detail.active) #equipe-app{
   display:flex; align-items:center; gap:6px;
   padding:8px 16px; border:none; border-radius:100px;
   background:none; color:var(--label-2);
-  font-family:inherit; font-size:12.5px; font-weight:650; letter-spacing:-0.01em;
+  font-family:inherit; font-size:12.5px; font-weight:600; letter-spacing:-0.01em;
 }
 /* ═══ L'ONGLET ACTIF, SELON TON IMAGE ═══
 
@@ -8660,6 +8679,9 @@ body:has(#e-detail.active) #equipe-app{
 
    Fond plein et texte sombre : à 9,5 px, un texte ambre sur fond translucide
    se lit mal. L'inversion le rend net. */
+/* ⚠ 800 ASSUMÉ ICI. À 9,5 px sur un fond ambre plein, 700 devient flou : la
+   graisse compense la petite taille, elle n'est pas une fantaisie. C'est la
+   seule exception dans tout le bloc. */
 .abo-ryt .eco{
   padding:2.5px 7px; border-radius:100px;
   font-size:9.5px; font-weight:800; letter-spacing:0.02em;
@@ -8758,46 +8780,19 @@ body:has(#e-detail.active) #equipe-app{
      contexte de rendu qui empêche le masque de l'enfant de s'appliquer — le
      logo ressortait gris. L'ombre est portée par l'enfant, où elle fonctionne. */
 }
-/* ═══ LA TEINTE PAR MASQUE, PAS PAR FILTRE ═══
+/* ═══ NI FILTRE, NI MASQUE : DEUX FICHIERS ═══
 
-   `sepia` + `hue-rotate` donnait un vert olive : la chaîne de filtres part du
-   blanc, qui n'a pas de teinte, et le résultat dépend d'un enchaînement fragile
-   que j'ai mal réglé deux fois.
+   J'ai perdu quatre essais à recolorer le logo blanc — `sepia` + `hue-rotate`
+   donnait un vert olive, le masque CSS un gris, et deux variantes du masque
+   n'ont rien changé.
 
-   `mask-image` est exact : le PNG ne sert plus que de POCHOIR, et la couleur
-   vient d'un dégradé qu'on choisit. Le logo prend l'ambre exact de la marque,
-   sans calcul intermédiaire.
-
-   Le `img` devient un bloc vide masqué par lui-même — on ne voit que le
-   dégradé, découpé à la forme du logo. */
+   La solution était plus simple : un second fichier, déjà orange, embarqué à
+   côté du blanc dans index.html. Le blanc sert à l'en-tête et au démarrage sur
+   fond sombre, l'orange à la carte d'abonnement. Aucun calcul de couleur. */
+/* Le fichier porte déjà sa couleur : plus de masque, plus de dégradé de fond.
+   L'image se dessine simplement. */
 .offre-logo .logo-forme{
-  width:100%; height:100%; display:block;
-  /* ═══ UNE DIV, PAS UNE IMAGE ═══
-
-     Le masque et le dégradé étaient corrects — vérifié dans le navigateur. Mais
-     la balise `img` DESSINAIT aussi son fichier, par-dessus son propre fond :
-     on voyait le logo blanc d'origine, gris sur fond sombre.
-
-     Un élément vide n'a rien à dessiner. Le masque lit le fichier, le fond
-     donne la couleur, et rien ne vient par-dessus. C'est le détail qui
-     manquait à mes quatre essais précédents. */
-  display:block;
-  /* ═══ PLUS ORANGE ═══
-
-     `#FFC46B` → `#FF6A00` partait d'un beige clair : au bout d'un dégradé, sur
-     30 % d'opacité, le logo tirait vers le gris chaud plutôt que vers l'orange.
-
-     On resserre sur la partie orange de la palette — `#FF9A2E` → `#E85D00` —
-     et on remonte l'opacité à 40 %. Le blanc du fichier n'intervient plus : le
-     masque ne garde que sa forme, la couleur vient entièrement d'ici. */
-  background:linear-gradient(150deg,#FF9A2E,#E85D00);
-  /* La source vient de `--logo-src`, posée par le code au démarrage : c'est le
-     même base64 que l'en-tête, pas un fichier séparé du dépôt. */
-  -webkit-mask-image:var(--logo-src);
-  mask-image:var(--logo-src);
-  -webkit-mask-size:contain; mask-size:contain;
-  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
-  -webkit-mask-position:center; mask-position:center;
+  width:100%; height:100%; display:block; object-fit:contain;
   filter:drop-shadow(0 6px 22px rgba(255,122,24,0.18));
 }
 /* Le texte passe AU-DESSUS du logo, jamais dessous : un prix illisible parce
@@ -8833,8 +8828,10 @@ body:has(#e-detail.active) #equipe-app{
 }
 /* Le montant en dégradé ambre-orange, comme les grands chiffres de l'app. Un
    ambre plat à cette taille se confond avec le gris du reste de la phrase. */
+/* 700 comme le reste, au lieu de 750 — une graisse intermédiaire qui
+   n'existait nulle part ailleurs. */
 .offre-annuel-note b{
-  font-weight:750;
+  font-weight:700;
   background:linear-gradient(135deg,#FFC46B,#FF7A18);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }

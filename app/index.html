@@ -701,7 +701,19 @@
         </div>
         <div id="signup-equipe-field" style="display:none;">
           <label class="f">Code de l'entreprise (5 chiffres)</label>
-          <!-- ═══ `autocomplete="off"` SUR LES CHAMPS DE CODE ═══
+          <!-- ═══ `off`, ET NON `one-time-code` ═══
+
+               J'avais mis `one-time-code` en pensant que nommer le champ ferait
+               taire Safari. C'était l'inverse exact : `one-time-code` est le nom
+               qui lui DEMANDE de proposer un code reçu par SMS. Je lui avais
+               donc explicitement demandé d'ouvrir son clavier numérique au
+               chargement de l'app.
+
+               `off` est le bon attribut. Il n'est pas toujours respecté sur les
+               champs de mot de passe, mais il l'est sur un champ texte ordinaire
+               comme celui-ci.
+
+               ═══ L'ANCIENNE NOTE, QUI ÉTAIT FAUSSE ═══
 
                `inert` empêche le focus, mais PAS le gestionnaire de mots de
                passe : Safari lit le balisage, voit un champ de cinq chiffres
@@ -715,7 +727,7 @@
                il cesse de proposer. C'est contre-intuitif — on nomme pour
                faire taire — mais c'est ainsi que la spécification fonctionne. -->
           <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric"
-                 autocomplete="one-time-code" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
+                 autocomplete="off" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
         </div>
 
         <button class="btn block" id="signup-btn">Créer mon compte</button>
@@ -921,11 +933,23 @@
       <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
       <button type="button" class="vider" id="pm-vider" aria-label="Effacer">×</button>
     </div>
-    <!-- Le texte promettait « touchez une personne pour voir son activité » —
-         ce que la page ne fait plus. Il dit maintenant ce qu'elle fait, et où
-         trouver ce qu'elle ne fait pas. -->
-    <div class="note" style="margin-top:12px;">Les flèches changent le rôle d'une personne, la croix la retire de l'entreprise. Pour voir l'activité de quelqu'un — temps passé, procédures lues — allez dans <b>Analyse</b>.</div>
-    <div id="pm-liste" style="margin-top:14px;"></div>
+    <!-- ═══ LA NOTE PASSE APRÈS LA LISTE ═══
+
+         Elle occupait trois lignes AVANT les personnes : cinq blocs empilés —
+         titre, compte, tri, recherche, note — se lisaient avant d'atteindre ce
+         qu'on vient voir.
+
+         Un mode d'emploi se consulte quand on est bloqué, pas avant d'avoir
+         essayé. Descendu en pied, il reste trouvable et cesse de barrer la
+         route. Et il est raccourci : « les flèches changent le rôle » se
+         devine en touchant une flèche. -->
+    <!-- La note de pied a été retirée. Elle renvoyait vers Analyse pour voir
+         l'activité de quelqu'un — mais cette page sert à gérer les rôles, pas à
+         consulter, et personne ne vient y chercher une redirection.
+
+         Un écran qui explique où aller ailleurs avoue qu'il ne sait pas quoi
+         faire de la place. La liste suffit. -->
+    <div id="pm-liste" style="margin-top:16px;"></div>
   </div>
 
   <div class="screen" inert id="p-create">
@@ -2447,7 +2471,7 @@
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
-    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" autocomplete="one-time-code" placeholder="00000" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
+    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="00000" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
     <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
     <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
     <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
@@ -2518,7 +2542,7 @@
         </div>
       </div>
       <div class="visiteur-code">
-        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" autocomplete="one-time-code" placeholder="00000">
+        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="00000">
         <button class="btn" id="e-visiteur-valider">Débloquer</button>
       </div>
       <div class="error-msg" id="e-visiteur-erreur"></div>

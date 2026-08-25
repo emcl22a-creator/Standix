@@ -3108,8 +3108,8 @@ function renderCourbe(validations, membres) {
         <svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" class="cb-svg">
           <defs>
             <linearGradient id="cbAire" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#FF9F0A" stop-opacity="0.22"/>
-              <stop offset="1" stop-color="#FF9F0A" stop-opacity="0"/>
+              <stop offset="0" stop-color="#FA8A08" stop-opacity="0.22"/>
+              <stop offset="1" stop-color="#FA8A08" stop-opacity="0"/>
             </linearGradient>
           </defs>
           <line x1="0" y1="${marge}" x2="${L}" y2="${marge}" class="cb-grille"/>
@@ -3118,7 +3118,7 @@ function renderCourbe(validations, membres) {
           <path d="${aire}" fill="url(#cbAire)"/>
           <path class="cb-ligne" d="${d}" fill="none" stroke="url(#logoOrIc)"
                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4" fill="#FF9F0A"/>
+          <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4" fill="#FA8A08"/>
         </svg>
         <div class="cb-mois">
           <span>${escapeHtml(cases[0].nom)}</span>
@@ -3909,7 +3909,7 @@ window.ouvrirFicheMembre = function(membreId) {
    ⚠ CE TABLEAU COMMANDE LE PLAFOND. `regrouperParts` lit sa longueur pour
      savoir combien de parts nommer ; en ajouter une quatrième suffit à élargir
      l'anneau, sans toucher à rien d'autre. */
-const FM_TEINTES = ['#FFDFA0', '#FFAE2E', '#E8760F']
+const FM_TEINTES = ['#FEC64A', '#FDA81E', '#EB5201']
 
 /* Les deux périodes vivent en parallèle : chacune a son classement, son total
    et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau
@@ -7455,7 +7455,7 @@ function renderCategoryProceduresListInterne() {
        suivante. Le mettre dans la même boucle garde l'ordre sans avoir à
        reconstruire la liste en deux passes. */
     const { proc, nbEtapes, pct } = entree
-    const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FF9F0A' : '#FF453A'
+    const ringColor = pct >= 70 ? '#30D158' : pct >= 30 ? '#FA8A08' : '#FF453A'
     const circumference = 2 * Math.PI * 20
     const dashoffset = circumference * (1 - pct / 100)
 
@@ -12809,7 +12809,7 @@ const DELAI_APPUI_LONG = 340
 
 /* Palette des étapes. Elle tourne au-delà de huit étapes, ce qui suffit : deux
    étapes de même couleur seront alors très éloignées sur la frise. */
-const PALETTE_ETAPES = ['#30D158', '#F5A623', '#FF9F0A', '#E8A33D', '#FF375F', '#64D2FF', '#FFD60A', '#5E5CE6']
+const PALETTE_ETAPES = ['#30D158', '#FDA81E', '#FA8A08', '#FEB731', '#FF375F', '#64D2FF', '#FFD60A', '#5E5CE6']
 const COULEUR_ETAPE = (i) => PALETTE_ETAPES[i % PALETTE_ETAPES.length]
 
 function activerGlissementEtapes(conteneur, donnerTableau, apres) {
@@ -12947,7 +12947,7 @@ function cocheFaiteDess(taille) {
      visuel : seule la couleur change, comme quand on coche une case. */
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <circle cx="15" cy="15" r="12.6" fill="#FFB340"/>
+    <circle cx="15" cy="15" r="12.6" fill="#FEB731"/>
     <path d="M10 15.2 13.4 18.6 20 11.8" stroke="#2E1B00" stroke-width="2.2"
           stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`
@@ -14774,7 +14774,7 @@ function etatProcedureHtml(proc) {
       </svg></div>`
 
   if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a échoué — touchez pour relancer")
-  if (analyseBloquee(proc)) return alerte('#FF9F0A', "L'analyse semble bloquée — touchez pour relancer")
+  if (analyseBloquee(proc)) return alerte('#FA8A08', "L'analyse semble bloquée — touchez pour relancer")
 
   if (proc?.statut === 'traitement' || proc?.statut === 'redaction') {
     /* La marque de l'IA, pas une roue de chargement quelconque : c'est bien
@@ -15613,7 +15613,7 @@ window.ouvrirQuota = async function() {
     <div class="quota-anneau">
       <svg width="220" height="220" viewBox="0 0 220 220">
         <circle class="piste" cx="110" cy="110" r="${R}" fill="none" stroke-width="17"/>
-        <circle class="part" cx="110" cy="110" r="${R}" fill="none" stroke="#FFAE2E"
+        <circle class="part" cx="110" cy="110" r="${R}" fill="none" stroke="#FDA81E"
           stroke-width="17" stroke-dasharray="${part} ${C - part}" stroke-dashoffset="${C}"/>
       </svg>
       <div class="quota-dedans">
@@ -16506,7 +16506,7 @@ function carteOffre(o, opts = {}) {
       ${inclus.map(t => `<div class="offre-li">
         <i><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11"
              fill="rgba(255,159,10,0.14)" stroke="rgba(255,173,51,0.42)" stroke-width="1"/>
-           <path d="M7.6 12.3l3 3 5.8-6.4" stroke="#FFAD33" stroke-width="2"
+           <path d="M7.6 12.3l3 3 5.8-6.4" stroke="#FDA81E" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round"/></svg></i>
         <span>${t}</span></div>`).join('')}
     </div>
@@ -16516,10 +16516,10 @@ function carteOffre(o, opts = {}) {
          disparait quand l annuel est deja choisi. -->
     ${!surDevis && rythmeChoisi === 'mensuel' ? `
     <div class="offre-annuel-note">
-      <span class="et"><svg viewBox="0 0 24 24" fill="none" stroke="#FFAD33"
+      <span class="et"><svg viewBox="0 0 24 24" fill="none" stroke="#FDA81E"
         stroke-width="1.7" stroke-linejoin="round"><path d="M3.4 12.6V4.8a1.4 1.4 0 0 1 1.4-1.4h7.8
         L21 11.8a1.4 1.4 0 0 1 0 2L14 20.8a1.4 1.4 0 0 1-2 0Z"/>
-        <circle cx="8" cy="8" r="1.5" fill="#FFAD33" stroke="none"/></svg></span>
+        <circle cx="8" cy="8" r="1.5" fill="#FDA81E" stroke="none"/></svg></span>
       ou <b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année
     </div>` : ''}
     ${surDevis ? `<div class="offre-annuel-fixe">${o.devis || 'Les mêmes fonctionnalités, sans exception.'}</div>` : ''}

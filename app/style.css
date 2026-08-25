@@ -15,8 +15,8 @@
      la hiérarchie tout en assombrissant l'ensemble. */ --bg-card: rgba(255,255,255,0.06);
     --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
     --hero-gradient: linear-gradient(150deg, #2C2C34 0%, #1E1E24 40%, #141418 75%, #0C0C10 100%);
-    --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
-    --blue:#F5A623; --purple:#E8A33D;   /* utilisées par les anneaux de l'analyse */
+    --green:#30D158; --red:#FF453A; --orange:#FA8A08;
+    --blue:#FDA81E; --purple:#FEB731;   /* utilisées par les anneaux de l'analyse */
     --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
   }
   html, body{
@@ -295,7 +295,7 @@
      même rang, et l'œil ne sait plus lequel est LE geste. */
   .alerte-essai .principal{
     flex:1; height:38px; border:none; border-radius:12px;
-    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
     color:#2A1400; font-family:inherit; font-size:13px; font-weight:750;
     box-shadow:0 5px 15px rgba(255,122,24,0.22);
   }
@@ -699,7 +699,7 @@
      métal poli. La couleur n'affleure que sur un quart du tour : elle donne le
      mouvement sans que l'anneau devienne bleu. */
   .ia-fig{
-    --blanc:#FFFFFF; --bleu:#FDC042;
+    --blanc:#FFFFFF; --bleu:#FEC64A;
     position:relative; display:grid; place-items:center; flex-shrink:0;
   }
   .ia-fig .lum{
@@ -1197,10 +1197,10 @@
     background:rgba(255,179,64,0.09) !important;
   }
   .detail-step.en-lecture .n{
-    background:rgba(255,179,64,0.22); color:#FCC85C;
+    background:rgba(255,179,64,0.22); color:#FEC64A;
   }
   .detail-step.en-lecture .badge.ok{
-    background:rgba(255,179,64,0.20); color:#FCC85C;
+    background:rgba(255,179,64,0.20); color:#FEC64A;
   }
 
   /* L'image en tête de la fiche, et sur la carte. */
@@ -1240,7 +1240,7 @@
   .app-ligne .st{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
   .app-ligne .ici{
     display:inline-block; margin-left:7px; padding:2px 7px; border-radius:100px;
-    background:rgba(255,179,64,0.20); color:#FCC85C;
+    background:rgba(255,179,64,0.20); color:#FEC64A;
     font-size:9.5px; font-weight:750; text-transform:uppercase; letter-spacing:0.04em;
     vertical-align:1px;
   }
@@ -1271,7 +1271,7 @@
   .an-ev{
     display:inline-flex; align-items:center; gap:4px; margin-top:12px;
     padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:700;
-    background:rgba(255,179,64,0.14); color:#FFB340;
+    background:rgba(255,179,64,0.14); color:#FEB731;
   }
   .an-ev.baisse{ background:rgba(255,159,10,0.14); color:var(--orange); }
   .an-dit{ font-size:14.5px; line-height:1.5; color:var(--label-2); margin-top:22px; }
@@ -1406,8 +1406,8 @@
   .an-gain-lueur::after{
     content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
     background:linear-gradient(45deg,
-      #FBB43A 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
-      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FBB43A 100%);
+      #FEB731 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
+      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FEB731 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -1661,7 +1661,7 @@
     background:rgba(255,255,255,0.16);
     transition:background 0.28s ease, width 0.28s cubic-bezier(0.22,1,0.36,1);
   }
-  .fm-barre button.on span{ background:#FFAD33; width:44px; }
+  .fm-barre button.on span{ background:#FDA81E; width:44px; }
 
   .fm-periode-mot{
     text-align:center; font-size:12px; font-weight:650; color:var(--label-3);
@@ -1799,7 +1799,7 @@
   /* Même matière que le bouton principal : c'est le geste de la page. */
   .poste-ajouter{
     flex-shrink:0; height:38px; padding:0 18px; border:none; border-radius:100px;
-    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
     color:#2A1400; font-family:inherit; font-size:14px; font-weight:700;
     box-shadow:0 5px 15px rgba(255,122,24,0.24);
   }
@@ -1938,7 +1938,7 @@
   .an-tete b{ flex:1; font-size:16px; font-weight:700; letter-spacing:-0.025em; }
   .an-lien{
     border:none; background:none; padding:0; font-family:inherit;
-    font-size:13px; color:#FFB340; font-weight:600;
+    font-size:13px; color:#FEB731; font-weight:600;
   }
 
   /* Une ligne : médaille ou pastille, nom, détail, valeur. */
@@ -2087,7 +2087,7 @@
   .ia-mot{
     font-size:15px; font-weight:850; letter-spacing:0.02em;
     line-height:1; flex-shrink:0; user-select:none;
-    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #FDC042 100%);
+    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #FEC64A 100%);
     -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent;
   }
@@ -2104,7 +2104,7 @@
     margin-top:9px; padding:9px 11px; border-radius:11px;
     background:rgba(255,159,10,0.10);
     border:0.5px solid rgba(255,159,10,0.26);
-    color:#FFB340;
+    color:#FEB731;
   }
   .et-attention svg{ width:15px; height:15px; flex-shrink:0; margin-top:1px; }
   .et-attention span{ font-size:13px; font-weight:600; line-height:1.4; }
@@ -2432,7 +2432,7 @@
     justify-content:center; gap:10px; background:#fff; color:#000;
     transition:background 0.18s, color 0.18s;
   }
-  .dv-geste button.coupe{ background:#FFB340; color:#2E1B00; }
+  .dv-geste button.coupe{ background:#FEB731; color:#2E1B00; }
   .dv-geste svg{ width:21px; height:21px; }
   .dv-aide{
     font-size:11.5px; color:var(--label-3); text-align:center;
@@ -2579,7 +2579,7 @@
   .langue-choix .dr{ font-size:17px; line-height:1; flex-shrink:0; }
   .langue-choix .nm{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .langue-choix.actif{ border-color:#fff; background:rgba(255,255,255,0.12); }
-  .langue-choix .coche{ color:#FFAD33; font-weight:800; flex-shrink:0; }
+  .langue-choix .coche{ color:#FDA81E; font-weight:800; flex-shrink:0; }
 
   /* Le bouton de langue sur une fiche de procédure */
   .langue-proc{
@@ -2950,8 +2950,8 @@
     content:''; position:absolute; inset:0; border-radius:inherit;
     padding:1px; pointer-events:none; z-index:1;
     background:linear-gradient(45deg,
-      #FBB43A 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
-      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FBB43A 100%);
+      #FEB731 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
+      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FEB731 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -2998,14 +2998,14 @@
   .offre-cta{
     width:100%; height:50px; margin-top:18px; border:none; border-radius:15px;
     font-family:inherit; font-size:14.5px; font-weight:700;
-    background:linear-gradient(135deg,#E85D00,#F58A15 62%,#F79318);
+    background:linear-gradient(135deg,#EB5201,#FA8A08 62%,#FD9F12);
     color:#2A1400;
   }
   .offre-carte:not(.vedette) .offre-cta{
     background:rgba(255,255,255,0.08); color:var(--label-1);
   }
   .offre-cta.encours{
-    background:none; color:#FFB340;
+    background:none; color:#FEB731;
     box-shadow:inset 0 0 0 1px rgba(255,179,64,0.35);
   }
   .offre-cta:active{ opacity:0.85; }
@@ -3070,7 +3070,7 @@
   }
 
   .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:11px; }
-  .offre-annuel b{ color:#FFB340; font-weight:700; }
+  .offre-annuel b{ color:#FEB731; font-weight:700; }
 
   /* ═══════════════════════════════════════════════════════════════════
      LES RÉGLAGES
@@ -3099,7 +3099,7 @@
   .reg-identite .av{
     width:52px; height:52px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-size:18px; font-weight:750; letter-spacing:0.03em; color:#FFAD33;
+    font-size:18px; font-weight:750; letter-spacing:0.03em; color:#FDA81E;
     background:linear-gradient(165deg,
       rgba(255,173,51,0.13) 0%, rgba(255,173,51,0.05) 52%, rgba(255,173,51,0.015) 100%);
     border:0.5px solid rgba(255,173,51,0.22);
@@ -3228,7 +3228,7 @@
      sans son cadre, sans son halo et sans ses rassurances. */
   /* Le bleu du halo, et lui seul. Le vert dit « terminé » ailleurs dans l'app :
      l'employer ici pour un prix brouillerait les deux. */
-  .offre-annuel b{ color:#FFB340; font-weight:700; }
+  .offre-annuel b{ color:#FEB731; font-weight:700; }
 
   @keyframes contenuEntre{
     from{ opacity:0; transform:translateY(12px); }
@@ -3862,8 +3862,8 @@
   }
   /* ═══ DEUX COULEURS, DEUX RÔLES ═══
 
-     La gestion et l'équipe portaient deux ambres presque identiques — #F0A030
-     et #E8A33D. Indiscernables dans une liste : il fallait lire le rôle écrit
+     La gestion et l'équipe portaient deux ambres presque identiques — #FDA81E
+     et #FEB731. Indiscernables dans une liste : il fallait lire le rôle écrit
      sous chaque nom pour savoir qui pouvait quoi.
 
      L'ÉQUIPE garde l'ambre, la couleur de l'app. LA GESTION prend l'indigo :
@@ -3892,7 +3892,7 @@
      l'app — l'ambre pour ce qui compte, le gris pour le reste. */
   .pm-av.chef{
     color:#2A1400;
-    background:linear-gradient(155deg, #FFCE8A, #F0A030);
+    background:linear-gradient(155deg, #FEC64A, #FDA81E);
     box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.16);
   }
   .pm-info{ flex:1; min-width:0; }
@@ -4087,7 +4087,7 @@
      passait sur deux lignes pour lui faire place. En dessous, elle ne coûte
      rien à la lecture et se touche aussi bien. */
   .badge.extrait{
-    background:rgba(255,179,64,0.16); color:#FFB340;
+    background:rgba(255,179,64,0.16); color:#FEB731;
     display:inline-flex; align-items:center; margin-top:7px;
   }
   .et-co .badge.extrait{ display:inline-flex; }
@@ -4112,7 +4112,7 @@
      Texte sombre et non blanc : à cette clarté d'orange, du blanc perdrait le
      contraste que le noir garde sans effort. */
   .btn{ font-size:14px; font-weight:700; letter-spacing:-0.02em;
-    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
     color:#2A1400; padding:11px 20px; border-radius:100px; border:none;
     box-shadow:0 6px 18px rgba(255,122,24,0.26), 0 2px 6px rgba(0,0,0,0.28);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s; }
@@ -4228,7 +4228,7 @@
   .clip-handle .grip{ width:16px; height:100%; background:#fff; border-radius:6px;
     display:flex; align-items:center; justify-content:center; box-shadow:0 2px 10px rgba(0,0,0,0.7); }
   .clip-handle .grip::after{ content:''; width:2px; height:20px; background:rgba(0,0,0,0.35); border-radius:2px; }
-  .clip-handle.dragging .grip{ background:#F5A623; }
+  .clip-handle.dragging .grip{ background:#FDA81E; }
   .clip-info{ display:flex; justify-content:space-between; align-items:center; gap:10px;
     margin-top:10px; font-size:11.5px; color:var(--label-2); font-variant-numeric:tabular-nums; }
   .clip-info b{ color:#fff; font-weight:700; }
@@ -4838,8 +4838,8 @@
     content:''; position:absolute; inset:0; border-radius:inherit;
     padding:1.1px;
     background:linear-gradient(45deg,
-      #FBB43A 0%, rgba(255,173,51,0.55) 12%, rgba(255,173,51,0.06) 30%,
-      rgba(255,173,51,0.06) 70%, rgba(255,173,51,0.55) 88%, #FBB43A 100%);
+      #FEB731 0%, rgba(255,173,51,0.55) 12%, rgba(255,173,51,0.06) 30%,
+      rgba(255,173,51,0.06) 70%, rgba(255,173,51,0.55) 88%, #FEB731 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -4869,7 +4869,7 @@
     display:inline-flex; align-items:center; justify-content:center; gap:9px;
     flex:1; min-width:0;
     height:48px; padding:0 18px; border:none; border-radius:15px;
-    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
     color:#2A1400; font-family:inherit; font-size:14.5px; font-weight:750;
     letter-spacing:-0.02em;
     white-space:nowrap;
@@ -4886,7 +4886,7 @@
     width:48px; height:48px; border-radius:15px; padding:0;
     background:rgba(255,255,255,0.055);
     border:0.5px solid rgba(255,173,51,0.30);
-    color:#FFAD33;
+    color:#FDA81E;
     transition:transform 0.16s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
   .hero-qr svg{ width:21px; height:21px; }
@@ -5383,7 +5383,7 @@
   }
   /* La consigne finale, plus discrète que le paragraphe : c'est une indication
      de geste, pas une explication. */
-  .debut .fleche b{ color:#FFAD33; font-weight:800; }
+  .debut .fleche b{ color:#FDA81E; font-weight:800; }
   .debut-dessin{ position:relative; width:132px; height:120px; margin-bottom:26px; }
   .debut-dessin .lueur{
     position:absolute; left:50%; top:52%; transform:translate(-50%,-50%);
@@ -5457,7 +5457,7 @@
        Un halo blanc derrière un logo ambre lave la couleur : au moment le plus
        intense de l'animation, le signe paraît décoloré, comme surexposé.
 
-       Deux teintes plutôt qu'une : `#FFAD33` au centre, `#E85A00` en périphérie.
+       Deux teintes plutôt qu'une : `#FDA81E` au centre, `#EB5201` en périphérie.
        C'est le dégradé de la marque, et une lueur qui vire au chaud vers les
        bords imite la façon dont une vraie lumière colorée se diffuse.
 
@@ -5531,7 +5531,7 @@
      comme un oubli. */
   .auth-toggle-indicator{
     position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px);
-    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
     border-radius:100px; z-index:0;
     box-shadow:0 4px 14px rgba(255,122,24,0.26);
     /* ═══ LE MÊME MOUVEMENT QUE LA CAPSULE DE LA BARRE DU BAS ═══
@@ -5924,7 +5924,7 @@
 /* Le code d'invitation : les chiffres portent la matière de la marque. C'est
    la seule chose à lire sur cette page, et on la recopie à la main. */
 #settings-code{
-  background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 55%,#FFAD33 100%);
+  background:linear-gradient(135deg,#EB5201 0%,#FA8A08 55%,#FDA81E 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
@@ -6084,7 +6084,7 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
   position:absolute; left:var(--plus-cx); transform:translateX(-50%);
   bottom:0;
   width:calc(var(--plus-larg) * 0.5); height:0;
-  border-radius:20px 20px 0 0; background:#F58A15;
+  border-radius:20px 20px 0 0; background:#FA8A08;
 }
 
 /* LE COU DE LA VERSION VALIDÉE, RENDU TEL QUEL.
@@ -6139,7 +6139,7 @@ body.plus-part .socle{
 .bulle{
   position:absolute; left:var(--plus-cx); bottom:0;
   width:var(--plus-larg); height:var(--plus-h);
-  border-radius:calc(var(--plus-h) / 2); background:#F58A15;
+  border-radius:calc(var(--plus-h) / 2); background:#FA8A08;
   transform:translate(-50%, var(--plus-repos)) scale(0.88);
   transition:transform var(--plus-duree) var(--plus-courbe);
 }
@@ -6158,7 +6158,7 @@ body.plus-part .socle{
   width:var(--plus-larg); height:var(--plus-h); border:none;
   border-radius:calc(var(--plus-h) / 2);
   display:grid; place-items:center;
-  background:linear-gradient(135deg, #E85D00 0%, #F58A15 62%, #F79318 100%);
+  background:linear-gradient(135deg, #EB5201 0%, #FA8A08 62%, #FD9F12 100%);
   color:#2A1400;
   box-shadow:0 6px 16px rgba(0,0,0,0.34), 0 2px 10px rgba(255,122,24,0.16);
   transform:translate(-50%, var(--plus-repos)) scale(0.88);
@@ -6214,7 +6214,7 @@ body.plus-vu .plus-flot{
   background:linear-gradient(165deg,
     rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
   border:0.5px solid rgba(255,173,51,0.20);
-  color:#FFAD33;
+  color:#FDA81E;
 }
 .act-lig .act-ic svg{ width:16px; height:16px; display:block; }
 /* LE MÊME BLANC QUE LES LIGNES DU BLOC AU-DESSUS.
@@ -6235,7 +6235,7 @@ body.plus-vu .plus-flot{
    teinter tous reviendrait à n'en signaler aucun. */
 .act-refus{
   background:rgba(255,154,31,0.12) !important;
-  color:#FFAD33 !important;
+  color:#FDA81E !important;
 }
 
 #p-activites{ padding-left:32px; padding-right:32px; }
@@ -6358,7 +6358,7 @@ body.plus-vu .plus-flot{
   box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.30);
 }
 .rond-etab.actif .rond-init{
-  background:linear-gradient(135deg,#E85A00,#FF9A1F 60%,#FFAD33);
+  background:linear-gradient(135deg,#EB5201,#FA8A08 60%,#FDA81E);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
@@ -6636,7 +6636,7 @@ body.chargement #bar{
   display:inline-flex; align-items:center; gap:7px;
   margin-top:12px;
   font-size:12.5px; font-weight:650; letter-spacing:-0.01em;
-  color:#FFAD33;
+  color:#FDA81E;
 }
 .contact-invite svg{ width:17px; height:17px; flex-shrink:0; display:block; }
 
@@ -6695,7 +6695,7 @@ body.chargement #bar{
   pointer-events:none;
 }
 .etab-rond.actif span{
-  background:linear-gradient(135deg,#E85A00,#FF9A1F 60%,#FFAD33);
+  background:linear-gradient(135deg,#EB5201,#FA8A08 60%,#FDA81E);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
@@ -6712,7 +6712,7 @@ body.chargement #bar{
 }
 .etab-plus svg{ width:19px; height:19px; display:block; }
 .etab-plus:active{ transform:scale(0.93); }
-.etab-plus:hover{ border-color:rgba(255,173,51,0.45); color:#FFAD33; }
+.etab-plus:hover{ border-color:rgba(255,173,51,0.45); color:#FDA81E; }
 
 .etab-note{
   margin-top:13px; font-size:12px; line-height:1.5; color:var(--label-3);
@@ -6924,14 +6924,14 @@ body.chargement #bar{
   font-size:12.5px; line-height:1.5; color:var(--label-2);
 }
 .quota-illimite b{ color:var(--label-1); font-weight:700; }
-.quota-illimite .ic{ flex-shrink:0; font-size:17px; color:#FFAD33; line-height:1.15; }
+.quota-illimite .ic{ flex-shrink:0; font-size:17px; color:#FDA81E; line-height:1.15; }
 
 /* Le bouton n'apparaît QUE sous cinq analyses. Ailleurs il serait de la
    réclame ; ici c'est un service — la personne va se trouver bloquée. */
 .quota-cta{
   width:100%; height:46px; margin-top:12px; border:none; border-radius:14px;
   font-family:inherit; font-size:14px; font-weight:750;
-  background:linear-gradient(135deg,#E85D00,#F58A15 62%,#F79318); color:#2A1400;
+  background:linear-gradient(135deg,#EB5201,#FA8A08 62%,#FD9F12); color:#2A1400;
 }
 .quota-cta:active{ opacity:0.85; }
 
@@ -7060,7 +7060,7 @@ body.chargement #bar{
 }
 .choix-bienvenue .logotype{
   font-size:inherit;
-  background:linear-gradient(135deg,#FDC042,#E85A00);
+  background:linear-gradient(135deg,#FEC64A,#EB5201);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -7177,7 +7177,7 @@ body.chargement #bar{
   display:inline-flex; align-items:center; gap:4px;
   padding:3.5px 9px; border-radius:999px;
   background:#2A1B0C; border:0.5px solid rgba(255,150,40,0.45);
-  color:#FFAD33;
+  color:#FDA81E;
   font-size:9px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase;
   white-space:nowrap;
 }
@@ -7203,7 +7203,7 @@ body.chargement #bar{
    où la carte change de teinte, l'icône suit. */
 .choix-carte{ --fond-choix:#131317; }
 .cc-rond svg{ width:23px; height:23px; display:block; }
-.choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
+.choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#FDA81E; }
 .choix-carte--blanc .cc-rond{ border-color:rgba(255,255,255,0.34); color:var(--label); }
 
 /* L'enveloppe du texte. En deux colonnes elle ne fait rien — un bloc pleine
@@ -7244,7 +7244,7 @@ body.chargement #bar{
   color:var(--label-2);
 }
 .cc-fleche svg{ width:17px; height:17px; display:block; }
-.choix-carte--ambre .cc-fleche{ border-color:rgba(255,150,40,0.50); color:#FFAD33; }
+.choix-carte--ambre .cc-fleche{ border-color:rgba(255,150,40,0.50); color:#FDA81E; }
 .choix-carte--blanc .cc-fleche{ border-color:rgba(255,255,255,0.34); color:var(--label); }
 /* Un plancher d'air au-dessus de la flèche. `margin-top:auto` la pousse en bas,
    mais si la description remplit la carte, les deux se touchent. */
@@ -7342,7 +7342,7 @@ body.chargement #bar{
 /* Le temps restant. Il vire à l'ambre le dernier jour — c'est le moment où le
    gérant doit savoir que son invitation va tomber. */
 .cg-reste{ font-size:12.5px; color:var(--label-3); margin-bottom:14px; }
-.cg-reste.bientot{ color:var(--or2, #FFAD33); }
+.cg-reste.bientot{ color:var(--or2, #FDA81E); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE DÉTAIL D'UNE PROCÉDURE
@@ -7556,7 +7556,7 @@ body:has(#e-detail.active) #equipe-app{
    ═══════════════════════════════════════════════════════════════════════════ */
 .lien-info{
   background:none; border:none; padding:0; cursor:pointer;
-  font:inherit; color:var(--or2, #FFAD33); text-decoration:underline;
+  font:inherit; color:var(--or2, #FDA81E); text-decoration:underline;
   text-underline-offset:2px;
 }
 .fen-co .fen-html,
@@ -7627,14 +7627,14 @@ body:has(#e-detail.active) #equipe-app{
 .re-barre i{ display:block; min-width:3px; }
 /* ═══ LE MÊME AMBRE QUE L'ANCIENNE CARTE ═══
 
-   J'avais employé `--orange` (#FF9F0A), qui n'est pas l'ambre de l'app. Le
+   J'avais employé `--orange` (#FA8A08), qui n'est pas l'ambre de l'app. Le
    dégradé ci-dessous est recopié à l'identique de l'ancienne règle `.re-c b`,
    celle qui colorait les trois grands chiffres — même angle, mêmes deux
    arrêts. La carte change de forme, pas de couleur.
 
    135° sur un segment large donne un dégagement franc de gauche à droite :
    c'est le même geste que sur les chiffres, à l'horizontale. */
-.re-sg{ background:linear-gradient(135deg,#FDC042,#E85A00); }
+.re-sg{ background:linear-gradient(135deg,#FEC64A,#EB5201); }
 .re-se{ background:rgba(255,255,255,0.17); }
 
 .re-leg{ display:flex; gap:16px; font-size:12px; color:var(--label-2); }
@@ -7645,7 +7645,7 @@ body:has(#e-detail.active) #equipe-app{
 /* Le chiffre de la gestion porte le dégradé découpé sur le texte — exactement
    le traitement des anciens grands chiffres, à une autre échelle. */
 .re-leg b.g{
-  background:linear-gradient(135deg,#FDC042,#E85A00);
+  background:linear-gradient(135deg,#FEC64A,#EB5201);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -8086,7 +8086,7 @@ body:has(#e-detail.active) #equipe-app{
 }
 .et-attention-saisie:focus{
   outline:none;
-  border-left-color:#FF9F0A;
+  border-left-color:#FA8A08;
   background:rgba(255,122,24,0.05);
 }
 .et-attention-saisie::placeholder{ color:rgba(255,176,102,0.40); }
@@ -8305,7 +8305,7 @@ body:has(#e-detail.active) #equipe-app{
 /* La tendance colore la note, pas la valeur : le nombre est un fait, la
    comparaison est un jugement. */
 .ac-n.hausse{ color:#30D158; }
-.ac-n.baisse{ color:#FF9F0A; }
+.ac-n.baisse{ color:#FA8A08; }
 
 /* ═══ LA TUILE À ANNEAU ═══
 
@@ -8644,7 +8644,7 @@ body:has(#e-detail.active) #equipe-app{
   color:var(--label-3); letter-spacing:-0.005em;
 }
 .offre-annuel b{ color:var(--label-2); font-weight:700; }
-.offre-annuel.on b{ color:#FFAD33; }
+.offre-annuel.on b{ color:#FDA81E; }
 .offre-annuel:active{ opacity:0.6; }
 
 
@@ -8692,7 +8692,7 @@ body:has(#e-detail.active) #equipe-app{
 .abo-ryt.on{
   background:rgba(10,10,12,0.85);
   box-shadow:inset 0 0 0 1px rgba(255,173,51,0.85);
-  color:#FFAD33;
+  color:#FDA81E;
 }
 /* ═══ « −20 % » EN AMBRE, PAS EN VERT ═══
 
@@ -8708,7 +8708,7 @@ body:has(#e-detail.active) #equipe-app{
 .abo-ryt .eco{
   padding:2.5px 7px; border-radius:100px;
   font-size:9.5px; font-weight:800; letter-spacing:0.02em;
-  background:linear-gradient(135deg,#FFAD33,#F08000); color:#2A1400;
+  background:linear-gradient(135deg,#FDA81E,#F56F02); color:#2A1400;
 }
 
 /* ═══ « VOIR LES AUTRES FORMULES » ═══
@@ -8855,7 +8855,7 @@ body:has(#e-detail.active) #equipe-app{
    n'existait nulle part ailleurs. */
 .offre-annuel-note b{
   font-weight:700;
-  background:linear-gradient(135deg,#FDC042,#FF7A18);
+  background:linear-gradient(135deg,#FEC64A,#F56F02);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .offre-annuel-note .et{ display:flex; flex:0 0 17px; width:17px; height:17px; }

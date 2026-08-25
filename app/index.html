@@ -828,17 +828,12 @@
       <p class="ac-sous">Voici un aperçu de votre espace de travail</p>
     </div>
 
-    <div class="dd-filter ac-filtre" id="dd-home-periode">
-      <button type="button" class="dd-trigger" id="dd-home-periode-trigger">
-        <span id="dd-home-periode-label">Ce mois-ci</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <div class="dd-menu" id="dd-home-periode-menu">
-        <button type="button" class="dd-opt actif" data-periode="mois">Ce mois-ci</button>
-        <button type="button" class="dd-opt" data-periode="tout">Au total</button>
-      </div>
-    </div>
+    <!-- Le sélecteur « Ce mois-ci / Au total » a été retiré. La tuile
+         « Total de procédures créées » dit le total : un filtre qui pourrait la
+         ramener au mois contredirait son propre libellé.
+
+         Les deux autres tuiles suivent — membres actifs et analyses vidéo sont
+         désormais comptés sur toute la durée de vie de l'entreprise. -->
 
     <div class="ac-grille" id="ac-grille"></div>
 
@@ -1892,6 +1887,17 @@
           </div>
         </div>
       </div>
+      <!-- Le titre « Évolution » ne dit pas de quoi. Cette ligne le précise,
+           sous l'en-tête plutôt que dans le titre : celui-ci reste court, et le
+           filtre garde sa place à côté de lui.
+
+           Elle ne répète pas le mot « Évolution » — deux fois le même mot à
+           deux lignes d'écart se lit comme un bégaiement.
+
+           Et elle tient sur UNE ligne : « mois après mois » débordait, laissant
+           le mot « mois » seul en dessous. Le pas de temps est déjà lisible sur
+           l'axe de la courbe. -->
+      <div class="cb-sous">Le temps de lecture de votre équipe</div>
       <div id="ga-courbe"></div>
     </div>
 

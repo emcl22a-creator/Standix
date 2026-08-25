@@ -2884,15 +2884,8 @@
     font-size:10.5px; font-weight:750; letter-spacing:0.04em;
     text-transform:uppercase; color:#2A1400;
   }
-
-  .offre-tete{ display:flex; align-items:flex-start; gap:12px; }
-  .offre-txt{ flex:1; min-width:0; }
   .offre-nom{
     display:block; font-size:18px; font-weight:750; letter-spacing:-0.03em;
-  }
-  .offre-taille{
-    display:block; font-size:11.5px; line-height:1.4; color:var(--label-3);
-    margin-top:3px;
   }
   .offre-prix{ flex-shrink:0; text-align:right; white-space:nowrap; }
   .offre-prix .v{ font-size:26px; font-weight:800; letter-spacing:-0.045em; }
@@ -2919,23 +2912,10 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;
   }
 
-  .offre-etiq{
-    margin:16px 0 10px; font-size:11px; font-weight:750;
-    letter-spacing:0.06em; text-transform:uppercase; color:var(--label-3);
-  }
-
   /* ── LES AVANTAGES ── */
-  .offre-phares{ display:flex; flex-direction:column; gap:9px; }
-  .offre-phare{ display:flex; align-items:center; gap:10px; }
   /* LA TAILLE DU PICTO EST INDISPENSABLE. Sans elle, un SVG sans hauteur
      déclarée s'affiche à sa taille naturelle — c'est ce qui donnait les
      symboles géants au milieu de la page. */
-  .offre-phare .p{
-    width:22px; height:22px; flex-shrink:0;
-    display:grid; place-items:center; color:var(--label-2);
-  }
-  .offre-phare .p svg{ width:18px; height:18px; display:block; }
-  .offre-phare .t{ display:block; font-size:13.5px; font-weight:600; }
 
   /* ═══ LA VEDETTE SE DÉTACHE VRAIMENT ═══
 
@@ -2946,57 +2926,11 @@
      Les trois lignes qui suivent restent nues et alignées : c'est le contraste
      qui fait la hiérarchie, pas la couleur. Si les quatre étaient encadrées,
      on serait revenu au point de départ. */
-  .offre-phare.vedette{
-    align-items:flex-start;
-    padding:13px 13px 14px; margin-bottom:4px;
-    border-radius:15px;
-    background:rgba(255,159,10,0.07);
-    border:0.5px solid rgba(255,173,51,0.22);
-  }
-  .offre-phare.vedette .p{
-    width:30px; height:30px; border-radius:10px; margin-top:1px;
-    background:rgba(255,173,51,0.13); color:#FFAD33;
-  }
-  .offre-phare.vedette .p svg{ width:17px; height:17px; }
-  .offre-phare.vedette .t{ font-size:14.5px; font-weight:750; letter-spacing:-0.02em; }
-  .offre-phare .d{
-    display:block; font-size:12.5px; line-height:1.45;
-    color:var(--label-2); margin-top:4px;
-  }
 
   /* Une seule ligne désormais, donc plus besoin d'un paragraphe : on la
      rapproche et on l'aligne sur les titres. */
-  .offre-aussi{
-    margin-top:12px; padding-left:32px;
-    font-size:12px; line-height:1.5; color:var(--label-3);
-  }
 
   /* ── LE RYTHME DE PAIEMENT ── */
-  .offre-rythme{ display:flex; flex-direction:column; gap:8px; margin-top:16px; }
-  .rlg{
-    display:flex; align-items:center; gap:11px; width:100%; text-align:left;
-    padding:12px 14px; border-radius:14px;
-    border:0.5px solid var(--border); background:rgba(255,255,255,0.03);
-    font-family:inherit; color:var(--label-2);
-    transition:border-color 0.2s, background 0.2s;
-  }
-  .rlg.on{
-    border-color:rgba(255,173,51,0.5); background:rgba(255,173,51,0.07);
-  }
-  .rlg .rd{
-    width:18px; height:18px; border-radius:50%; flex-shrink:0;
-    display:grid; place-items:center;
-    box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.22);
-  }
-  .rlg.on .rd{ box-shadow:inset 0 0 0 1.5px #FFAD33; }
-  .rlg .rd i{
-    width:9px; height:9px; border-radius:50%; display:block;
-    background:transparent; transition:background 0.2s;
-  }
-  .rlg.on .rd i{ background:#FFAD33; }
-  .rlg .tx{ flex:1; min-width:0; }
-  .rlg .tx b{ display:block; font-size:13.5px; font-weight:700; color:var(--label-1); }
-  .rlg .tx span{ display:block; font-size:11px; color:var(--label-3); margin-top:1px; }
 
   /* ── LE BOUTON ── */
   .offre-cta{
@@ -3082,32 +3016,6 @@
     border:0.5px solid var(--border);
     font-weight:650;
   }
-
-  .offre-rythme{
-    display:flex; gap:8px; margin-top:16px;
-    padding-top:16px; border-top:0.5px solid var(--border);
-  }
-  .offre-rythme .rlg{
-    flex:1; display:flex; align-items:center; gap:9px;
-    padding:11px 12px; border-radius:14px; text-align:left;
-    background:rgba(255,255,255,0.04); border:1px solid transparent;
-    color:#fff; font-family:inherit;
-  }
-  .offre-rythme .rlg.on{
-    border-color:rgba(255,255,255,0.45); background:rgba(255,255,255,0.09);
-  }
-  .offre-rythme .rlg:active{ transform:scale(0.98); }
-  .offre-rythme .rd{
-    width:18px; height:18px; border-radius:50%; flex-shrink:0;
-    border:1.5px solid var(--label-3);
-    display:flex; align-items:center; justify-content:center;
-  }
-  .offre-rythme .rlg.on .rd{ border-color:#fff; background:#fff; }
-  .offre-rythme .rd i{ width:7px; height:7px; border-radius:50%; background:#000; display:none; }
-  .offre-rythme .rlg.on .rd i{ display:block; }
-  .offre-rythme .tx b{ display:block; font-size:13px; font-weight:700; }
-  .offre-rythme .tx span{ display:block; font-size:10.5px; color:var(--label-3); margin-top:1px; }
-  .offre-rythme .rlg.on .tx span{ color:var(--label-2); }
 
   .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:11px; }
   .offre-annuel b{ color:#FFB340; font-weight:700; }
@@ -8309,7 +8217,22 @@ body:has(#e-detail.active) #equipe-app{
 
    L'anneau prend la place de la valeur. Il est centré, le pourcentage à
    l'intérieur, et le rapport passe en note comme sur les autres. */
-.ac-tuile--anneau{ align-items:center; text-align:center; }
+/* ═══ DEUX CARRÉS À GAUCHE, UN RECTANGLE À DROITE ═══
+
+   L'anneau occupe la COLONNE de droite sur les deux rangées ; les deux autres
+   tuiles s'empilent à gauche.
+
+   `grid-row: 1 / 3` le fait courir sur deux rangées, `grid-column: 2` le fixe
+   à droite. Les deux autres se placent d'elles-mêmes dans les cases libres,
+   sans qu'on ait à leur dire où aller.
+
+   ⚠ L'ORDRE DU CODE NE COMPTE PLUS. `tuileQuota` est appelée en deuxième, mais
+     la grille la met à droite quoi qu'il arrive. Changer l'ordre des appels ne
+     déplacera rien — c'est ici qu'il faut regarder. */
+.ac-tuile--anneau{
+  grid-column:2; grid-row:1 / 3;
+  align-items:center; justify-content:center; text-align:center;
+}
 /* La tuile à anneau centre son contenu ; la plaque et le titre restent
    pourtant à gauche, comme sur les trois autres. Sans cela, l'icône serait
    centrée dans une tuile et à gauche dans les trois voisines. */
@@ -8326,8 +8249,20 @@ body:has(#e-detail.active) #equipe-app{
    Posé juste sous le titre, il rend 26 px à la rangée. La tuile reste la plus
    haute des quatre — un anneau de 76 px ne peut pas faire moins — mais l'écart
    se réduit, et « se sont formés ce mois-ci » ne flotte plus. */
+/* ═══ 132 PX, MESURÉ ET NON ESTIMÉ ═══
+
+   Relevé dans le navigateur : la tuile fait 174 px de large et 337 de haut,
+   dont 203 libres entre le titre et la note. À 88 px, l'anneau laissait 43 px
+   de marge de chaque côté — il flottait au milieu d'une tuile faite pour lui.
+
+   La largeur est la vraie contrainte : 174 moins 2 × 14 de rembourrage donne
+   146 px utilisables. On s'arrête à 132, ce qui laisse 7 px de chaque côté —
+   assez pour que l'anneau ne touche pas les bords, pas assez pour qu'il ait
+   l'air perdu.
+
+   La hauteur suit sans forcer : 132 sur 203 disponibles. */
 .ac-anneau{
-  position:relative; width:76px; height:76px; margin:8px auto 0;
+  position:relative; width:132px; height:132px; margin:auto;
 }
 /* Sur la tuile à anneau, la note n'a pas besoin d'être poussée : l'anneau
    occupe déjà tout l'espace disponible au-dessus d'elle. */
@@ -8336,18 +8271,23 @@ body:has(#e-detail.active) #equipe-app{
    horloge, jamais depuis la droite. */
 .ac-anneau svg{ transform:rotate(-90deg); display:block; }
 .ac-anneau .arc{ transition:stroke-dashoffset 0.85s cubic-bezier(0.22,1,0.36,1); }
+/* Le pourcentage suit l'anneau : 32 px dans un cercle de 132, c'est la même
+   proportion qu'avant — un chiffre qui resterait à 23 paraîtrait perdu. */
 .ac-pct{
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
-  font-size:18px; font-weight:800; letter-spacing:-0.04em;
+  font-size:32px; font-weight:800; letter-spacing:-0.04em;
   font-variant-numeric:tabular-nums;
 }
-.ac-pct em{ font-size:12px; font-weight:700; font-style:normal; color:var(--label-3); margin-left:1px; }
+.ac-pct em{ font-size:16px; font-weight:700; font-style:normal; color:var(--label-3); margin-left:2px; }
 
 /* Sous 384 px, deux colonnes de 150 px tronqueraient « Temps de formation ».
    Une seule colonne, et les tuiles s'aplatissent. */
 @media (max-width: 384px){
   .ac-grille{ grid-template-columns:1fr; }
+  /* En colonne unique, le placement en grille n'a plus de sens : l'anneau
+     reprend sa place dans le flux, à sa position d'appel. */
+  .ac-tuile--anneau{ grid-column:auto; grid-row:auto; }
   .ac-tuile{ min-height:0; }
   .ac-t{ min-height:0; }
   .ac-v{ margin-top:10px; }
@@ -8518,3 +8458,68 @@ body:has(#e-detail.active) #equipe-app{
   margin-top:7px; padding:0 2px;
   font-size:10.5px; color:var(--label-3); text-transform:capitalize;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'OFFRE, REFONDUE
+
+   Nom discret, prix énorme, lignes à coche, une ligne d'annuel, un bouton.
+   Cinq éléments, un seul niveau de lecture.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.offre-nom{
+  font-size:13px; font-weight:600; color:var(--label-2);
+  letter-spacing:-0.01em; margin-bottom:9px;
+}
+
+/* ═══ LE PRIX EST L'OBJET DE LA CARTE ═══
+
+   46 px, seul sur sa ligne. L'unité s'aligne sur la BASE du chiffre, pas sur
+   son sommet : `align-items:baseline` — sans quoi « par mois » flotte à mi-
+   hauteur d'un nombre de quarante-six pixels. */
+.offre-prix{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; }
+.offre-prix .v{
+  font-size:46px; font-weight:800; letter-spacing:-0.05em; line-height:1;
+  font-variant-numeric:tabular-nums;
+}
+.offre-prix .u{ font-size:13.5px; color:var(--label-2); letter-spacing:-0.01em; }
+
+.offre-parmembre{
+  margin-top:8px; font-size:12.5px; color:var(--label-3); letter-spacing:-0.005em;
+}
+.offre-parmembre b{ color:var(--label-2); font-weight:700; }
+
+/* ═══ LES INCLUS ═══
+
+   Une seule forme pour tout : une coche, un texte. Le gras porte le CHIFFRE et
+   non la phrase — l'œil accroche ce qui change d'une offre à l'autre.
+
+   La coche est ambre à 55 % : assez pour se voir, pas assez pour concurrencer
+   le prix. En blanc elle pesait autant que le texte. */
+.offre-inclus{ margin-top:20px; display:flex; flex-direction:column; gap:1px; }
+.offre-li{
+  display:flex; align-items:flex-start; gap:11px;
+  padding:7px 0; font-size:13.5px; color:var(--label-2);
+  line-height:1.4; letter-spacing:-0.01em;
+}
+.offre-li i{
+  font-style:normal; font-size:12px; line-height:1.5;
+  color:rgba(255,159,10,0.72); flex:0 0 auto;
+}
+.offre-li b{ color:var(--label-1); font-weight:700; }
+
+/* ═══ L'ANNUEL, UNE LIGNE ═══
+
+   Cliquable, mais sans l'apparence d'un bouton : c'est une alternative, pas
+   une action principale. Deux radios pour un choix qu'on fait une fois
+   prenaient un quart de la carte. */
+.offre-annuel,
+.offre-annuel-fixe{
+  display:block; width:100%; margin-top:16px; padding:0;
+  background:none; border:none; text-align:left;
+  font-family:inherit; font-size:12.5px; line-height:1.5;
+  color:var(--label-3); letter-spacing:-0.005em;
+}
+.offre-annuel b{ color:var(--label-2); font-weight:700; }
+.offre-annuel.on b{ color:#FFAD33; }
+.offre-annuel:active{ opacity:0.6; }

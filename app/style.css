@@ -3294,9 +3294,17 @@
   .etab-ligne.ajout{ border-style:dashed; background:none; }
 
   /* ═══ Recherche dans l'équipe ═══ */
+  /* ═══ LE TRI ET LA RECHERCHE SE RAPPROCHENT ═══
+
+     14 px les séparaient, comme deux blocs sans rapport. Ils forment pourtant
+     une seule barre d'outils : on trie OU on cherche, jamais les deux à la
+     fois. 8 px les lient sans les coller.
+
+     La hauteur descend de 44 à 40 : un champ de recherche n'est pas une action
+     principale, et quatre pixels rendus au-dessus de la liste se voient. */
   .pm-recherche{
-    position:relative; display:flex; align-items:center; gap:9px; margin-top:14px;
-    padding:0 12px; height:44px; border-radius:14px;
+    position:relative; display:flex; align-items:center; gap:9px; margin-top:8px;
+    padding:0 12px; height:40px; border-radius:13px;
     background:var(--bg-card); border:0.5px solid var(--border);
     color:var(--label-3);
   }
@@ -3811,15 +3819,28 @@
      hurler. Le contraste ne repose pas sur la seule teinte — le fond de la
      gestion est nettement plus sombre, ce qui reste lisible pour qui distingue
      mal les couleurs. */
+  /* L'équipe en gris, la gestion en ambre. Le rond devient un carré arrondi,
+     comme toutes les plaques de l'app — un cercle ici était le seul de son
+     espèce. */
   .pm-av{
-    width:38px; height:38px; border-radius:50%; flex-shrink:0;
+    width:38px; height:38px; border-radius:12px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-size:13px; font-weight:750; color:#2A1400;
-    background:linear-gradient(155deg, #FFCE8A, #F0A030);
+    font-size:13px; font-weight:700; letter-spacing:0.01em;
+    color:var(--label-2);
+    background:rgba(255,255,255,0.07);
   }
+  /* ═══ PLUS DE BLEU-VIOLET ═══
+
+     `#5B62C4` n'existe nulle part ailleurs dans l'app. Une couleur inventée
+     pour un seul usage se remarque plus qu'elle n'informe : on se demande ce
+     qu'elle veut dire avant de comprendre qu'elle dit « gestion ».
+
+     La gestion garde donc l'ambre, en plein ; l'équipe passe en gris sourd.
+     Le contraste entre les deux suffit, et il emploie le vocabulaire de
+     l'app — l'ambre pour ce qui compte, le gris pour le reste. */
   .pm-av.chef{
-    color:#EAEAF2;
-    background:linear-gradient(155deg, #5B62C4, #3A3F8F);
+    color:#2A1400;
+    background:linear-gradient(155deg, #FFCE8A, #F0A030);
     box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.16);
   }
   .pm-info{ flex:1; min-width:0; }
@@ -8536,3 +8557,6 @@ body:has(#e-detail.active) #equipe-app{
 .offre-annuel b{ color:var(--label-2); font-weight:700; }
 .offre-annuel.on b{ color:#FFAD33; }
 .offre-annuel:active{ opacity:0.6; }
+
+
+/* `.pm-aide` a été retirée avec la note de pied qu'elle habillait. */

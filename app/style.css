@@ -2901,12 +2901,23 @@
     margin-top:1px;
   }
 
+  /* ═══ LE PRIX PAR PERSONNE MONTE D'UN CRAN ═══
+
+     Il était sous un filet, en gris, comme une note de bas de page. C'est
+     pourtant le meilleur argument de la carte : 129 € est une dépense, 8,60 €
+     par personne est une évidence.
+
+     Plus de filet — il coupait l'en-tête en deux et éloignait ce chiffre du
+     prix qu'il explique. Collé dessous, il se lit dans le même mouvement. */
   .offre-parmembre{
-    margin-top:12px; padding-top:12px;
-    border-top:0.5px solid var(--border);
-    font-size:12.5px; line-height:1.45; color:var(--label-2);
+    margin-top:7px;
+    font-size:13px; line-height:1.4; color:var(--label-2);
   }
-  .offre-parmembre b{ color:var(--label-1); font-weight:700; }
+  .offre-parmembre b{
+    font-size:15px; font-weight:800; letter-spacing:-0.02em;
+    background:linear-gradient(135deg,#FFC46B,#FF6A00);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
 
   .offre-etiq{
     margin:16px 0 10px; font-size:11px; font-weight:750;
@@ -2924,12 +2935,40 @@
     display:grid; place-items:center; color:var(--label-2);
   }
   .offre-phare .p svg{ width:18px; height:18px; display:block; }
-  .offre-phare .t{ font-size:13.5px; font-weight:600; }
-  .offre-phare.vedette .p{ color:#FFAD33; }
-  .offre-phare.vedette .t{ color:var(--label-1); font-weight:700; }
+  .offre-phare .t{ display:block; font-size:13.5px; font-weight:600; }
 
+  /* ═══ LA VEDETTE SE DÉTACHE VRAIMENT ═══
+
+     Elle n'était qu'un peu plus grasse que les autres — pas assez pour qu'on
+     s'y arrête. Elle a maintenant son propre cadre, sa plaque ambre et sa
+     phrase.
+
+     Les trois lignes qui suivent restent nues et alignées : c'est le contraste
+     qui fait la hiérarchie, pas la couleur. Si les quatre étaient encadrées,
+     on serait revenu au point de départ. */
+  .offre-phare.vedette{
+    align-items:flex-start;
+    padding:13px 13px 14px; margin-bottom:4px;
+    border-radius:15px;
+    background:rgba(255,159,10,0.07);
+    border:0.5px solid rgba(255,173,51,0.22);
+  }
+  .offre-phare.vedette .p{
+    width:30px; height:30px; border-radius:10px; margin-top:1px;
+    background:rgba(255,173,51,0.13); color:#FFAD33;
+  }
+  .offre-phare.vedette .p svg{ width:17px; height:17px; }
+  .offre-phare.vedette .t{ font-size:14.5px; font-weight:750; letter-spacing:-0.02em; }
+  .offre-phare .d{
+    display:block; font-size:12.5px; line-height:1.45;
+    color:var(--label-2); margin-top:4px;
+  }
+
+  /* Une seule ligne désormais, donc plus besoin d'un paragraphe : on la
+     rapproche et on l'aligne sur les titres. */
   .offre-aussi{
-    margin-top:14px; font-size:12px; line-height:1.5; color:var(--label-3);
+    margin-top:12px; padding-left:32px;
+    font-size:12px; line-height:1.5; color:var(--label-3);
   }
 
   /* ── LE RYTHME DE PAIEMENT ── */
@@ -8422,7 +8461,22 @@ body:has(#e-detail.active) #equipe-app{
    de marge, ce qui faisait 14 en tout — assez pour séparer deux lignes d'une
    même liste, pas assez pour séparer une LISTE d'un bouton qui mène ailleurs.
    Les deux se lisaient comme un même bloc. */
+/* ═══ LES DEUX BOUTONS DE PIED ═══
+
+   18 px au-dessus du premier : il suit les quatre tuiles, et deux blocs de
+   nature différente ont besoin de plus d'air que deux lignes d'une même liste.
+
+   9 px entre les deux, comme entre deux lignes : ils sont de même nature et se
+   lisent ensemble, comme un choix à deux branches. */
 .ac-act{ margin-top:18px; }
+.ac-act + .ac-act{ margin-top:9px; }
+
+/* La date, sous le chemin, dans la page des procédures récentes. Plus pâle que
+   le sous-titre : c'est un repère, pas une information qu'on vient chercher. */
+.ac-rec-d{
+  display:block; font-size:11px; color:var(--label-3); margin-top:3px;
+  text-transform:capitalize;
+}
 
 
 /* ═══════════════════════════════════════════════════════════════════════════

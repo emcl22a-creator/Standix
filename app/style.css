@@ -2823,24 +2823,40 @@
      La carte les tient ensemble : on lit UNE proposition, pas cinq morceaux.
      Le fond est un cran au-dessus du noir de la page — assez pour détacher,
      pas assez pour concurrencer la carte d'offre qui vit dedans. */
+  /* ═══ UN SEUL CADRE, PAS DEUX ═══
+
+     La scène portait un fond, un rayon de 26 px et un liseré ; la carte de
+     l'offre en porte un second à l'intérieur, avec son propre rayon et son
+     propre liseré. Deux cadres emboîtés, et le ruban « EN COURS » à cheval sur
+     le bord intérieur.
+
+     La scène devient transparente : elle ne sert plus qu'à grouper l'accroche
+     et la carte, et à porter la lueur. La carte de l'offre est désormais le
+     seul objet encadré de la page. */
   .abo-scene{
-    /* Quatre pixels séparaient le titre « Abonnement » de la carte : les deux
-       se touchaient, et le titre paraissait collé dessus plutôt que posé
-       au-dessus. Dix-huit suffisent à les séparer sans les éloigner. */
     margin-top:18px;
     position:relative;
-    background:linear-gradient(165deg, #141418 0%, #0F0F13 55%, #0B0B0E 100%);
-    border-radius:26px;
-    padding:22px 16px 18px;
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
-               0 10px 34px rgba(0,0,0,0.34);
+    padding:0;
   }
+  /* ═══ LE HALO AMBRE EST RETIRÉ ═══
+
+     Une lueur orange derrière le titre, sur une page de prix : elle déteint
+     sur la carte, qui n'est plus ni noire ni ambrée, et donne à l'ensemble un
+     aspect sali plutôt que chaleureux.
+
+     Elle ne disparaît pas tout à fait : elle devient une lueur BLANCHE très
+     faible, qui détache l'accroche du fond sans la colorer. La couleur reste
+     là où elle informe — le ruban, le prix, les coches — et nulle part comme
+     décor.
+
+     `0.05` et non `0.16` : à cette opacité on ne la voit pas, on voit
+     seulement que le titre ne flotte pas dans le vide. */
   .abo-halo{
-    position:absolute; top:-40px; left:50%; transform:translateX(-50%);
-    width:280px; height:220px; pointer-events:none; z-index:0;
+    position:absolute; top:-30px; left:50%; transform:translateX(-50%);
+    width:300px; height:200px; pointer-events:none; z-index:0;
     background:radial-gradient(ellipse at center,
-      rgba(255,154,31,0.16), rgba(255,154,31,0) 68%);
-    filter:blur(8px);
+      rgba(255,255,255,0.05), rgba(255,255,255,0) 70%);
+    filter:blur(10px);
   }
   .abo-hi{ position:relative; z-index:1; text-align:center; margin-bottom:20px; }
   .abo-hi h2{
@@ -2877,12 +2893,22 @@
   }
   .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
 
+  /* ═══ LE RUBAN RENTRE DANS LA CARTE ═══
+
+     `position:absolute; top:-9px` le posait à cheval sur le bord — une pastille
+     coupée en deux par un liseré, qui salissait le coin le plus visible de la
+     page.
+
+     Il est maintenant DANS le flux, en tête de carte, aligné à gauche comme le
+     nom qu'il qualifie. Le fond passe d'un dégradé plein à un ambre translucide :
+     à l'intérieur d'une carte sombre, un aplat orange vif pesait plus que le
+     prix qu'il surmonte. */
   .offre-ruban{
-    position:absolute; top:-9px; left:18px;
+    display:inline-block; margin-bottom:13px;
     padding:4px 11px; border-radius:100px;
-    background:linear-gradient(135deg,#E85D00,#FF9A1F);
-    font-size:10.5px; font-weight:750; letter-spacing:0.04em;
-    text-transform:uppercase; color:#2A1400;
+    background:rgba(255,159,10,0.16);
+    font-size:9.5px; font-weight:800; letter-spacing:0.09em;
+    text-transform:uppercase; color:#FFAD33;
   }
   .offre-nom{
     display:block; font-size:18px; font-weight:750; letter-spacing:-0.03em;
@@ -8512,8 +8538,18 @@ body:has(#e-detail.active) #equipe-app{
    son sommet : `align-items:baseline` — sans quoi « par mois » flotte à mi-
    hauteur d'un nombre de quarante-six pixels. */
 .offre-prix{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; }
+/* ═══ LA MÊME ÉCRITURE QUE PARTOUT AILLEURS ═══
+
+   46 px et -0,05 d'approche : le prix était plus gros et plus resserré que
+   tous les autres chiffres de l'app, ce qui lui donnait une autre allure.
+
+   Les grands nombres de Standix — les tuiles d'accueil, le centre des anneaux,
+   le pied de la courbe — sont tous à 29 px, poids 800, approche -0,045. Le
+   prix passe à 38 : plus grand qu'eux, parce que c'est un prix, mais dans la
+   même famille. Un chiffre qui ne ressemble à aucun autre dans l'app se lit
+   comme importé d'ailleurs. */
 .offre-prix .v{
-  font-size:46px; font-weight:800; letter-spacing:-0.05em; line-height:1;
+  font-size:38px; font-weight:800; letter-spacing:-0.045em; line-height:1;
   font-variant-numeric:tabular-nums;
 }
 .offre-prix .u{ font-size:13.5px; color:var(--label-2); letter-spacing:-0.01em; }

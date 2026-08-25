@@ -5584,6 +5584,10 @@ const ONGLET_PAR_ECRAN = {
      de l'accueil, l'onglet y reste. `p-scan` est le lecteur de QR code, qui
      appartient aux Réglages. */
   'p-activites': 0,
+  /* Comme `p-activites` : ouverte depuis l'accueil, elle en est la suite, et
+     l'onglet Accueil doit rester allumé. Sans cette ligne, la capsule
+     resterait sur la page d'où l'on vient. */
+  'p-recentes': 0,
   'p-scan': 3,
   'p-quota': 3,   // il vit dans les Réglages
 }
@@ -6186,83 +6190,10 @@ async function loadGestionProcedures() {
    Celles en cours d'analyse sont écartées : elles occupent déjà le bloc du
    dessus, et les montrer deux fois ferait croire à deux procédures.
    ═══════════════════════════════════════════════════════════════════════════ */
-async function peindreDernieresProcedures() {
-  const zone = document.getElementById('accueil-recentes')
-  if (!zone) return
-
-  const recentes = (allGestionProcedures || [])
-    .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
-    .slice(0, 3)
-
-  /* LE BLOC RESTE, MÊME VIDE.
-
-     Il disparaissait quand il n'y avait rien : l'accueil changeait alors de
-     forme selon le contenu, et on ne savait pas qu'un jour quelque chose
-     apparaîtrait là. Un cadre avec une phrase apprend ce qu'on y trouvera. */
-
-  /* La durée filmée n'est pas stockée : elle se déduit des bornes des étapes.
-     Une seule requête pour les trois, et seulement deux colonnes — inutile de
-     rapatrier les textes pour compter des secondes. */
-  const duree = new Map()
-  const { data: bornes } = await supabase
-    .from('etapes')
-    .select('procedure_id, timestamp_video, fin_video')
-    .in('procedure_id', recentes.map(p => p.id))
-
-  ;(bornes || []).forEach(e => {
-    const f = e.fin_video ?? e.timestamp_video
-    if (f == null) return
-    duree.set(e.procedure_id, Math.max(duree.get(e.procedure_id) || 0, Number(f)))
-  })
-
-  /* UN SEUL BLOC, ET DES LIGNES DEDANS.
-
-     Trois cartes séparées faisaient trois objets à l'écran, alors qu'il s'agit
-     d'une seule information : ce qui vient d'être créé. Un cadre unique, un
-     titre, et des lignes séparées par un filet — la même construction que les
-     sections de la page Analyse. */
-  zone.innerHTML = `
-    <div class="an-bloc">
-      <div class="an-tete">
-        <span class="an-ic">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-            <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-          </svg>
-        </span>
-        <b>Dernières procédures créées</b>
-      </div>
-      ${!recentes.length ? `<div class="an-vide">Les trois dernières procédures
-        créées apparaîtront ici.</div>` : ''}
-      ${recentes.map(p => {
-        const nb = p.etapes?.[0]?.count ?? 0
-        const sec = duree.get(p.id)
-        /* On n'affiche une durée que si la vidéo existe ET que des bornes ont
-           été posées. Un « 0:00 » sur une procédure écrite à la main serait
-           faux. */
-        const traits = [
-          nb ? `${nb} étape${nb > 1 ? 's' : ''}` : null,
-          (p.video_url && sec) ? `${formatTime(sec)} de vidéo`
-            : (p.video_url ? 'vidéo' : 'sans vidéo'),
-          p.categorie ? escapeHtml(p.categorie) : null,
-        ].filter(Boolean).join(' \u00b7 ')
-
-        return `
-          <button type="button" class="an-lig" data-proc="${escapeHtml(p.id)}">
-            <span class="co">
-              <span class="nm">${escapeHtml(p.titre || 'Sans titre')}</span>
-              <span class="st">${traits}</span>
-            </span>
-            <span class="vl">${ilYA(Date.parse(p.created_at || '') || Date.now())}</span>
-          </button>`
-      }).join('')}
-    </div>`
-
-  zone.querySelectorAll('[data-proc]').forEach(b => {
-    b.addEventListener('click', () => openAnalyse(b.dataset.proc))
-  })
-}
+/* `peindreDernieresProcedures` a été retirée : elle dessinait les trois
+   dernières procédures sur l'accueil, remplacées par un bouton menant à
+   `p-recentes`. Elle n'avait plus d'appelant depuis la refonte de l'accueil,
+   et son remplacement rend son retour improbable. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES MOUVEMENTS DE L'ÉQUIPE
@@ -6662,124 +6593,90 @@ function peindreRecentesAccueil() {
   if (!zone) return
   zone.innerHTML = ''
 
-  const recentes = (allGestionProcedures || [])
-    .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
-    .slice(0, 3)
+  /* ═══ DEUX BOUTONS, PLUS DE LISTE ═══
 
-  /* Sans procédure, on saute le titre et les lignes — mais PAS le bouton :
-     une entreprise neuve a déjà des activités, ne serait-ce que sa création
-     et l'arrivée de son fondateur. */
-  if (!recentes.length) {
-    const seul = document.createElement('button')
-    seul.type = 'button'
-    seul.className = 'an-plus ac-act'
-    seul.textContent = 'Voir les derniers mouvements de l\u2019entreprise'
-    seul.addEventListener('click', () => ouvrirActivites())
-    zone.appendChild(seul)
+     L'accueil affichait trois cartes de procédures avec leurs vignettes. Elles
+     doublaient l'onglet Procédures — qui montre tout, avec recherche et tri —
+     pour soixante pixels de hauteur chacune.
+
+     Deux boutons de même forme les remplacent, menant à deux pages de même
+     nature. L'accueil se termine sur un choix clair au lieu d'un extrait. */
+  const bouton = (texte, action) => {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'an-plus ac-act'
+    b.textContent = texte
+    b.addEventListener('click', action)
+    zone.appendChild(b)
+  }
+
+  bouton('Voir les dernières procédures créées', () => ouvrirRecentes())
+  bouton('Voir les derniers mouvements de l\u2019entreprise', () => ouvrirActivites())
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE DES PROCÉDURES RÉCENTES
+
+   Quinze jours, pas davantage.
+
+   ─── « SUPPRIMÉ » VEUT DIRE « RETIRÉ DE CETTE LISTE » ───
+
+   Les procédures plus anciennes disparaissent d'ICI, et de nulle part
+   ailleurs : elles restent dans l'onglet Procédures, avec leurs étapes et
+   leurs vidéos. Cette page est une fenêtre sur les deux dernières semaines,
+   pas un dépôt d'où l'on efface.
+
+   Il n'y a donc AUCUNE suppression en base. Si tu voulais réellement effacer
+   des procédures passé un délai, ce serait un tout autre chantier — et je te
+   le déconseillerais : une procédure écrite ne périme pas, elle sert
+   justement d'année en année.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const RECENTES_JOURS = 14
+
+window.ouvrirRecentes = function () {
+  showGestionScreen('p-recentes')
+  const zone = document.getElementById('recentes-tout')
+  if (!zone) return
+  zone.innerHTML = ''
+
+  const depuis = Date.now() - RECENTES_JOURS * 86400000
+  const liste = (allGestionProcedures || [])
+    .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
+    .filter(p => p.created_at && new Date(p.created_at).getTime() >= depuis)
+
+  if (!liste.length) {
+    zone.innerHTML = vide({
+      dessin: NEANT_PROCEDURE,
+      titre: 'Aucune procédure ces deux dernières semaines',
+      phrase: 'Les procédures créées apparaissent ici pendant quinze jours. Les plus anciennes restent accessibles dans l\u2019onglet Procédures.',
+    })
     return
   }
 
-  const titre = document.createElement('div')
-  titre.className = 'ac-sect'
-  titre.textContent = 'Dernières procédures créées'
-  zone.appendChild(titre)
-
-  recentes.forEach(p => {
+  liste.forEach(p => {
     const el = document.createElement('button')
     el.type = 'button'
     el.className = 'an-bloc ac-rec'
     el.addEventListener('click', () => openAnalyse(p.id))
 
     const chemin = [p.categorie || 'Sans dossier', p.sous_categorie].filter(Boolean).join(' \u203a ')
-    /* ═══ `etapes` N'EST PAS LA LISTE DES ÉTAPES ═══
-
-       Supabase rend un COMPTE agrégé : `etapes: [{ count: 9 }]`. Un tableau
-       d'un seul objet, quel que soit le nombre réel.
-
-       `p.etapes.length` valait donc toujours 1, et toutes les procédures
-       affichaient « 1 étape ». Le défaut était invisible à la relecture — la
-       ligne a l'air juste — et ne se voyait qu'à l'écran, sur une procédure
-       qu'on savait en avoir neuf.
-
-       `proc.etapes?.[0]?.count` est la lecture employée partout ailleurs dans
-       l'app ; je l'aurais trouvée en cherchant `nbEtapes` avant d'écrire. */
     const n = p.etapes?.[0]?.count ?? 0
+    /* La date en clair plutôt qu'un « il y a N jours » : sur quinze jours, on
+       retient mieux « mardi 12 » qu'un compte à rebours. */
+    const quand = new Date(p.created_at).toLocaleDateString('fr-FR',
+      { weekday: 'long', day: 'numeric', month: 'long' })
 
     el.innerHTML = `
       <span class="ac-rec-vue">${vignetteProcedure(p)}</span>
       <span class="ac-rec-txt">
         <span class="ac-rec-t">${escapeHtml(p.titre || 'Sans titre')}</span>
         <span class="ac-rec-s">${escapeHtml(chemin)}${n ? ` \u00b7 ${n} \u00e9tape${n > 1 ? 's' : ''}` : ''}</span>
+        <span class="ac-rec-d">${escapeHtml(quand)}</span>
       </span>
       <span class="ac-rec-fl">\u203a</span>`
     zone.appendChild(el)
     preparerVignetteVideo(el)
   })
-
-  /* ═══ LE LIEN VERS LES ACTIVITÉS ═══
-
-     `p-activites` existe déjà : arrivées, départs, promotions, procédures
-     créées. Elle n'était atteignable que depuis le bloc « Mouvements de
-     l'équipe », qui a quitté l'accueil lors de la refonte — la page était donc
-     devenue orpheline.
-
-     Le bouton est en bas, après les procédures : c'est le dernier recours de
-     la page, pas ce qu'on vient y chercher. Et il porte la même classe
-     `an-plus` que les trois « Voir plus » de l'Analyse, puisqu'il fait la même
-     chose : ouvrir une page entière. */
-  const act = document.createElement('button')
-  act.type = 'button'
-  act.className = 'an-plus ac-act'
-  act.textContent = 'Voir les derniers mouvements de l\u2019entreprise'
-  act.addEventListener('click', () => ouvrirActivites())
-  zone.appendChild(act)
-}
-
-/* ═══ FORCER LA PREMIÈRE IMAGE, ET SE REPLIER SI ELLE NE VIENT PAS ═══
-
-   Deux gestes, pour deux défaillances différentes.
-
-   ① `currentTime = 0.1` après `loadedmetadata` : c'est la seule façon d'obtenir
-      une image sur iOS. On vise un dixième de seconde plutôt que zéro — la
-      toute première image d'une vidéo est souvent noire, le temps que
-      l'exposition se règle.
-
-   ② Si la vidéo refuse de se charger — adresse expirée, fichier supprimé,
-      réseau coupé —, on remplace la vignette par l'icône générique. Un cadre
-      noir ressemble à un défaut de l'app ; une icône ressemble à une
-      procédure sans image, ce qui est vrai. */
-function preparerVignetteVideo(carte) {
-  const v = carte.querySelector('video[data-video]')
-  if (!v) return
-
-  const replier = () => {
-    const vue = carte.querySelector('.ac-rec-vue')
-    if (vue && vue.querySelector('video')) vue.innerHTML = vignetteProcedure({})
-  }
-
-  v.addEventListener('loadedmetadata', () => {
-    try { v.currentTime = 0.1 } catch (e) { replier() }
-  }, { once: true })
-
-  v.addEventListener('error', replier, { once: true })
-
-  /* ═══ LE GARDE-FOU, CORRIGÉ ═══
-
-     Il testait `readyState < 2`. C'était faux : `preload="metadata"` s'ARRÊTE
-     à 1 — durée et dimensions connues, aucune image décodée — et c'est
-     exactement ce qu'on lui demande. Le test était donc vrai pour TOUTE vidéo
-     saine, et les vignettes basculaient sur l'icône générique quelques
-     secondes après s'être affichées.
-
-     Le bon critère est plus bas : les métadonnées sont-elles arrivées ? Si
-     `readyState` vaut encore 0 au bout de six secondes, la vidéo n'a rien
-     donné — adresse expirée, fichier absent, réseau coupé. En dessous, on
-     laisse le navigateur faire son travail.
-
-     Six secondes et non trois : sur un réseau mobile, l'en-tête d'une vidéo de
-     quarante mégaoctets met parfois quatre secondes à arriver. Se replier plus
-     tôt priverait de la vignette quelqu'un qui l'aurait eue. */
-  setTimeout(() => { if (v.readyState === 0) replier() }, 6000)
 }
 
 function vignetteProcedure(p) {
@@ -16291,37 +16188,38 @@ const PICTOS = {
    quand on n'en regarde qu'une. */
 let rythmeChoisi = 'annuel'
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   CE QU'ON ACHÈTE · QUATRE LIGNES
+
+   Il y en avait six, toutes de même poids. Une liste où tout est important est
+   une liste où rien ne l'est : on la parcourt et on n'en retient aucune ligne.
+
+   ─── DEUX ONT ÉTÉ RETIRÉES ───
+
+   « Trois façons de créer une procédure » décrit un MENU, pas un bénéfice. On
+   n'achète pas un choix de méthodes, on achète le résultat — et le résultat est
+   déjà dit par la première ligne.
+
+   « Plusieurs établissements » ne concerne presque personne : une PME de cinq à
+   trente personnes en a un seul. L'annoncer en quatrième position, c'est donner
+   à la ligne la moins utile la place d'une des plus utiles.
+
+   ─── LA VEDETTE GARDE SA PHRASE, LES AUTRES NON ───
+
+   Trois titres nus se lisent d'un regard. Trois titres suivis chacun d'une
+   phrase deviennent un paragraphe qu'on saute — c'était le cas.
+   ═══════════════════════════════════════════════════════════════════════════ */
 const AVANTAGES = [
-  /* L'argument de tête porte la marque AI plutôt qu'un dessin : c'est le nom de
-     ce qu'on vend, et il se lit même de loin. */
-  /* « L'IA écoute et regarde » décrivait la machine ; ce titre-ci dit ce qu'on
-     y gagne. Deux minutes est un chiffre vérifiable, pas une promesse creuse —
-     c'est à peu près ce que dure une démonstration de geste. */
-  /* Sobre : l'IA est un outil de création, pas un numéro de magie. Annoncer
-     « deux minutes » promettait un temps qu'on ne maîtrise pas. */
   { p: 'marqueAI', vedette: true, t: 'L\'IA \u00e9crit vos proc\u00e9dures',
-    s: "Elle entend ce que vous expliquez et lit ce qui est visible \u2014 objets, gestes, " +
-       "texte \u00e0 l'\u00e9cran. Elle en tire des \u00e9tapes num\u00e9rot\u00e9es que vous relisez." },
-  { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es',
-    s: "\u00c9crivez-en dix ou deux cents, le prix ne bouge pas." },
-  /* QUATRE, et non trois. On les nomme : « trois façons de créer » ne dit ni
-     lesquelles ni pourquoi on en aurait besoin. */
-  { p: 'fiche', t: 'Trois fa\u00e7ons de cr\u00e9er une proc\u00e9dure',
-    s: "\u00c9crivez \u00e0 la main, filmez et d\u00e9coupez vous-m\u00eame, laissez l'IA d\u00e9couper, " +
-       "ou partez d'un document existant." },
-  { p: 'monde', t: 'Chacun lit dans sa langue',
-    s: "Vos proc\u00e9dures se traduisent \u00e0 la demande, sans que vous les r\u00e9\u00e9criviez." },
-  { p: 'suivi', t: 'Vous savez qui a lu quoi',
-    s: "Par personne, par cat\u00e9gorie, avec le temps pass\u00e9 sur chaque proc\u00e9dure." },
-  { p: 'sites', t: 'Plusieurs \u00e9tablissements',
-    s: "Un compte, plusieurs enseignes, chacune avec son logo et son \u00e9quipe." },
+    s: 'Filmez le geste. Les \u00e9tapes sont r\u00e9dig\u00e9es et horodat\u00e9es.' },
+  { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es' },
+  { p: 'monde', t: 'Chacun lit dans sa langue' },
+  { p: 'suivi', t: 'Vous savez qui a lu quoi' },
 ]
 
-/* La liste s'arrête au QR code. Les médailles d'assiduité, la relance des
-   retardataires et la vue consolidée sont retirées : annoncer sur une page
-   d'abonnement des fonctions qu'on ne trouvera pas ensuite est la promesse la
-   plus coûteuse qu'un produit puisse faire. */
-const AUSSI = '\u00c9tapes \u00e9crites et photos, QR code \u00e0 afficher au poste.'
+/* « Étapes écrites et photos » redit la première ligne ; il ne reste que le QR
+   code, qui est une chose concrète qu'aucune autre ligne ne dit. */
+const AUSSI = 'QR code \u00e0 afficher au poste.'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES PALIERS SUIVENT LE NOMBRE DE MEMBRES
@@ -16427,20 +16325,22 @@ function carteOffre(o, opts = {}) {
     <div class="offre-tete">
       <span class="offre-txt">
         <span class="offre-nom">${o.nom}</span>
-        <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `Jusqu'\u00e0 ${o.max} membres`}${
-          o.analyses ? ` \u00b7 ${o.analyses} analyses vid\u00e9o IA par mois` : ''}</span>
+        <!-- « Jusqu'à 15 membres · 60 analyses vidéo IA par mois » passait sur
+             trois lignes et repoussait le prix. Le point médian les met sur une
+             seule, et « /mois » suffit là où « par mois » débordait. -->
+        <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `${o.max} membres`}${
+          o.analyses ? ` \u00b7 ${o.analyses} analyses IA/mois` : ''}</span>
       </span>
       <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
     </div>
-    ${pm ? `<div class="offre-parmembre">Pour vos ${n} membres, cela fait <b>${pm} \u20ac personne / mois</b>.</div>` : ''}
-    ${opts.detaille ? `<div class="offre-etiq">Tout est compris</div>
+    ${pm ? `<div class="offre-parmembre">soit <b>${pm} \u20ac</b> par personne, pour vos ${n} membres</div>` : ''}
+    ${opts.detaille ? `
     <div class="offre-phares">
       ${AVANTAGES.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
         <span class="p">${PICTOS[f.p]}</span>
-        <!-- Les explications ont été retirées. Six titres se lisent d'un regard ;
-             six titres suivis chacun d'une phrase deviennent un paragraphe qu'on
-             saute. Le titre dit déjà ce qu'on achète. -->
-        <span><span class="t">${f.t}</span></span>
+        <!-- Seule la vedette porte une phrase : c'est l'argument qui décide, les
+             trois autres se lisent au titre. -->
+        <span><span class="t">${f.t}</span>${f.s ? `<span class="d">${f.s}</span>` : ''}</span>
       </div>`).join('')}
     </div>
     <div class="offre-aussi">${AUSSI}</div>`

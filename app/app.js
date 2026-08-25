@@ -3859,7 +3859,19 @@ window.ouvrirFicheMembre = function(membreId) {
    ⚠ CE TABLEAU COMMANDE LE PLAFOND. `regrouperParts` lit sa longueur pour
      savoir combien de parts nommer ; en ajouter une quatrième suffit à élargir
      l'anneau, sans toucher à rien d'autre. */
-const FM_TEINTES = ['#FEC64A', '#FDA81E', '#EB5201']
+/* ═══ LES TEINTES D'ORIGINE, REMISES ═══
+
+   Je les avais changées en `#FEC64A · #FDA81E · #EB5201` lors de l'alignement
+   général sur le logo. C'était une erreur : ces trois-là servent aux ICÔNES et
+   aux TRAITS, où elles sont justes.
+
+   Sur un anneau, l'écart de teinte entre `#FEC64A` et `#FDA81E` ne fait que
+   quatre degrés — deux arcs voisins devenaient indiscernables, et le premier
+   tirait au jaune.
+
+   Les valeurs d'origine — 36°, 34°, 26° — sont plus espacées en luminosité
+   qu'en teinte, ce qui se lit mieux sur un arc fin. Elles ne bougent plus. */
+const FM_TEINTES = ['#FFDFA0', '#FFAE2E', '#E8760F']
 
 /* Les deux périodes vivent en parallèle : chacune a son classement, son total
    et son état déplié. On les peint toutes les deux d'un coup — sinon le panneau
@@ -16436,6 +16448,23 @@ function carteOffre(o, opts = {}) {
   const n = opts.membres || 0
   const pm = opts.detaille ? prixParMembre(o, n) : null
   const surDevis = o.prix === null
+  /* Le prix mensuel équivalent quand on paie à l'année : vingt pour cent de
+     moins. C'est lui qu'on montre en grand si l'annuel est choisi. */
+  /* ═══ LE PRIX MENSUEL DÉCOULE DU TARIF ANNUEL RÉEL ═══
+
+     `o.an` porte le vrai montant facturé — 660, 1236, 2268, 4788. Ce sont les
+     tarifs de Stripe, pas une remise calculée.
+
+     On divise donc par douze plutôt que d'appliquer −20 % au prix mensuel : les
+     deux donnent le même résultat aujourd'hui, mais si tu changes un tarif
+     annuel sans toucher au mensuel, seule cette formule reste juste.
+
+     Sans `o.an` — une offre nouvelle, mal renseignée — on retombe sur la
+     remise de vingt pour cent. */
+  const prixAffiche = surDevis ? null
+    : (rythmeChoisi === 'annuel'
+        ? Math.round((o.an || o.prix * 0.8 * 12) / 12)
+        : o.prix)
 
   /* Les inclus, dans l'ordre de ce qu'on compare : d'abord ce qui change d'une
      offre à l'autre, ensuite ce qui est commun à toutes. */
@@ -16475,9 +16504,13 @@ function carteOffre(o, opts = {}) {
 
     <div class="offre-nom">${o.nom}</div>
 
+    <!-- LE PRIX SUIT LE RYTHME CHOISI. Il affichait toujours le tarif MENSUEL :
+         basculer sur Annuel ne changeait rien au grand chiffre, on lisait 69
+         alors qu on allait payer 55 par mois. Le montant est arrondi a l euro. -->
     <div class="offre-prix">
       ${surDevis ? `<span class="v">Sur devis</span>`
-        : `<span class="v">${o.prix} €</span><span class="u">par mois, hors taxes</span>`}
+        : `<span class="v">${prixAffiche} €</span>
+           <span class="u">par mois, hors taxes${rythmeChoisi === 'annuel' ? '<br>factur\u00e9 \u00e0 l\u2019ann\u00e9e' : ''}</span>`}
     </div>
     <!-- ═══ « SOIT X € PAR PERSONNE » A ÉTÉ RETIRÉ ═══
 
@@ -16512,7 +16545,10 @@ function carteOffre(o, opts = {}) {
         stroke-width="1.7" stroke-linejoin="round"><path d="M3.4 12.6V4.8a1.4 1.4 0 0 1 1.4-1.4h7.8
         L21 11.8a1.4 1.4 0 0 1 0 2L14 20.8a1.4 1.4 0 0 1-2 0Z"/>
         <circle cx="8" cy="8" r="1.5" fill="#FDA81E" stroke="none"/></svg></span>
-      ou <b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année
+      <!-- Le même calcul que le prix de tête : on divise le tarif annuel réel,
+           sinon cette ligne annoncerait un montant que la bascule ne donnerait
+           pas. -->
+      ou <b>${Math.round((o.an || o.prix * 0.8 * 12) / 12)} € par mois</b> en payant à l’année
     </div>` : ''}
     ${surDevis ? `<div class="offre-annuel-fixe">${o.devis || 'Les mêmes fonctionnalités, sans exception.'}</div>` : ''}
 
@@ -16537,6 +16573,8 @@ function carteOffre(o, opts = {}) {
          laisse d\u00e9couvrir le montant sur la page de paiement \u2014 c'est l\u00e0 qu'on
          renonce. */
       : rythmeChoisi === 'annuel'
+        /* Le total facturé, tel qu'il est déclaré dans l'offre. Le grand prix
+           en découle par division : les deux ne peuvent plus diverger. */
         ? `Activer \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an`
         : `Activer \u00b7 ${o.prix} \u20ac par mois`
     }</button>` : ''}

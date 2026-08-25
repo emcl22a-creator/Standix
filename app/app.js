@@ -6542,7 +6542,9 @@ function peindreTuilesAccueil() {
      L'anneau, lui, dit tout autre chose : ce qu'il reste du forfait. Une seule
      tuile sur trois parle d'abonnement, elle mérite le deuxième regard plutôt
      que le dernier. */
-  grille.appendChild(tuileQuota(utilisees, quota))
+  const tQuota = tuileQuota(utilisees, quota)
+  grille.appendChild(tQuota)
+  lancerAnneauQuota(tQuota)
 
   grille.appendChild(tuileAccueil({
     /* ═══ « MEMBRES ACTIFS », ET UN NOMBRE SIMPLE ═══
@@ -6769,6 +6771,26 @@ function iconeAccueil(cle) {
   </span>`
 }
 
+/* ═══ LE REMPLISSAGE DE L'ANNEAU, UNE FOIS POSÉ ═══
+
+   Deux images d'attente au lieu d'une : la première laisse le navigateur
+   calculer la position de l'élément, la seconde déclenche la transition. Un
+   seul `requestAnimationFrame` suffit sur ordinateur ; sur un téléphone qui
+   compose plus lentement, la mesure et le changement tombaient dans la même
+   image et la transition était ignorée.
+
+   `getBoundingClientRect()` force le calcul plutôt que de l'espérer : lire une
+   position oblige le navigateur à résoudre la mise en page en attente. C'est
+   la façon habituelle de garantir un état de départ. */
+function lancerAnneauQuota(tuile) {
+  const arc = tuile?.querySelector('.arc')
+  if (!arc) return
+  arc.getBoundingClientRect()
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => { arc.style.strokeDashoffset = '0' })
+  })
+}
+
 /* Une tuile ordinaire : icône, titre, valeur, note. */
 function tuileAccueil({ titre, valeur, note, tendance, icone }) {
   const el = document.createElement('div')
@@ -6822,10 +6844,17 @@ function tuileQuota(utilisees, quota) {
     </div>
     <div class="ac-n">${utilisees} / ${quota} utilisées</div>`
 
-  /* L'anneau se remplit à l'arrivée. C'est le seul de l'accueil, donc la seule
-     attente — pas trois animations concurrentes comme sur l'Analyse. */
-  const arc = el.querySelector('.arc')
-  if (arc) requestAnimationFrame(() => { arc.style.strokeDashoffset = '0' })
+  /* ═══ L'ANIMATION NE PART PAS D'ICI ═══
+
+     `requestAnimationFrame` était appelé AVANT que la tuile soit ajoutée à la
+     page. L'élément n'existant pas encore dans le document, le navigateur n'a
+     aucun état de départ à interpoler : sur ordinateur il rattrape, sur
+     téléphone — plus lent à composer — l'anneau saute d'un coup à sa valeur,
+     ou reste figé à zéro.
+
+     C'est `lancerAnneauQuota`, appelée après `appendChild`, qui s'en charge
+     maintenant. La règle générale : on n'anime jamais un élément qui n'est pas
+     encore dans la page. */
   return el
 }
 
@@ -10346,7 +10375,19 @@ function chargerVideoPourIA(file) {
   player.src = url
   player.style.display = 'block'
   document.getElementById('ai-video-placeholder').style.display = 'none'
-  document.getElementById('ai-launch-btn').disabled = false
+  /* ═══ LE BOUTON RESTE FERMÉ TANT QU'ON NE SAIT PAS ═══
+
+     Il était activé ICI, avant que la durée soit connue — `loadedmetadata`
+     n'arrive que quelques centaines de millisecondes plus tard, parfois
+     davantage sur un gros fichier.
+
+     Quelqu'un de rapide touchait donc « Lancer » pendant cet intervalle, et
+     l'analyse partait sans qu'aucun contrôle n'ait eu lieu. C'est ce qui s'est
+     passé avec ta vidéo de 5 min 01.
+
+     Le bouton s'ouvre maintenant dans `verifierDureeVideo`, une fois la durée
+     lue — et seulement si elle passe. */
+  document.getElementById('ai-launch-btn').disabled = true
   aiVideoDuree = 0
   player.addEventListener('loadedmetadata', () => {
     if (isFinite(player.duration)) aiVideoDuree = player.duration
@@ -11071,12 +11112,21 @@ function verifierDureeVideo() {
     return
   }
 
-  if (!aiVideoDuree) { err.textContent = ''; btn.disabled = false; return }
+  /* Durée encore inconnue : on n'ouvre pas. Le bouton s'ouvrira au prochain
+     passage, déclenché par `loadedmetadata`. */
+  if (!aiVideoDuree) { err.textContent = ''; return }
 
   const min = Math.round(aiVideoDuree / 60)
   if (aiVideoDuree > DUREE_REFUSEE) {
+    /* ═══ LES SECONDES, PAS L'ARRONDI ═══
+
+       `Math.round` affichait « Cette vidéo dure 5 minutes. L'analyse accepte
+       jusqu'à 5 minutes » — un refus qui se contredit lui-même. Une vidéo de
+       5 min 01 doit s'annoncer comme telle, sinon le message paraît faux. */
+    const m = Math.floor(aiVideoDuree / 60)
+    const sc = String(Math.round(aiVideoDuree % 60)).padStart(2, '0')
     err.style.color = 'var(--red)'
-    err.textContent = `Cette vidéo dure ${min} minutes. L'analyse accepte jusqu'à 5 minutes : ` +
+    err.textContent = `Cette vidéo dure ${m} min ${sc}. L'analyse accepte jusqu'à 5 minutes : ` +
       `filmez une procédure par vidéo, ou découpez celle-ci en deux.`
     btn.disabled = true
     return
@@ -11128,6 +11178,23 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
   if (!titre) { errorEl.textContent = 'Le titre est obligatoire (en haut de la page précédente).'; return }
   if (!aiVideoFile) { errorEl.textContent = 'Importez une vidéo.'; return }
+
+  /* ═══ ON REVÉRIFIE ICI, MÊME SI LE BOUTON EST CENSÉ ÊTRE FERMÉ ═══
+
+     Un bouton désactivé est une politesse, pas une sécurité : il se rouvre au
+     moindre `disabled = false` posé ailleurs, et rien ne le signale.
+
+     Le contrôle au lancement est le seul qui ne peut pas être contourné. Il
+     coûte deux lignes et évite une analyse de dix minutes qui finira en
+     échec — et des minutes Azure facturées pour rien. */
+  if (aiVideoDuree > DUREE_REFUSEE) {
+    const min = Math.floor(aiVideoDuree / 60)
+    const sec = String(Math.round(aiVideoDuree % 60)).padStart(2, '0')
+    errorEl.style.color = 'var(--red)'
+    errorEl.textContent = `Cette vidéo dure ${min} min ${sec}. L'analyse accepte ` +
+      `jusqu'à 5 minutes : découpez-la en deux, ou filmez une procédure par vidéo.`
+    return
+  }
 
   const launchBtn = document.getElementById('ai-launch-btn')
   /* PAS de `setButtonLoading` ici : il remplaçait tout le contenu du bouton par

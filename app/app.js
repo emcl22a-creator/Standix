@@ -5795,6 +5795,23 @@ function activerAvecNaissance(ecran) {
    Elle n'y figure qu'UNE fois — les deux autres emplacements la recopient au
    démarrage. Sans ça, les 24 Ko de l'image seraient écrits trois fois dans la
    page. */
+/* ═══ LA CARTE D'ABONNEMENT N'EXISTE PAS AU DÉMARRAGE ═══
+
+   `poser()` ne tourne qu'une fois, au chargement du document. La carte
+   d'abonnement, elle, est construite bien plus tard — quand on ouvre la page.
+   Sa balise `data-logo-or` n'existait pas encore : elle restait donc vide, et
+   le logo n'apparaissait jamais.
+
+   `poserLogosOr` est extraite pour être rappelée après chaque construction de
+   carte. Elle est idempotente : reposer une source déjà posée ne coûte rien. */
+window.poserLogosOr = function () {
+  const srcOr = document.getElementById('logo-or')
+  if (!srcOr) return
+  document.querySelectorAll('img[data-logo-or]').forEach(i => {
+    if (i.src !== srcOr.src) i.src = srcOr.src
+  })
+}
+
 ;(() => {
   const poser = () => {
     const src = document.getElementById('logo-src')
@@ -5803,10 +5820,7 @@ function activerAvecNaissance(ecran) {
     /* Le logo ORANGE, pour la carte d'abonnement. Deux sources distinctes
        plutôt qu'une teinte calculée : j'ai perdu quatre essais à recolorer le
        blanc par filtre puis par masque, alors que le fichier orange existait. */
-    const srcOr = document.getElementById('logo-or')
-    if (srcOr) {
-      document.querySelectorAll('img[data-logo-or]').forEach(i => { i.src = srcOr.src })
-    }
+    poserLogosOr()
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', poser)
@@ -9514,7 +9528,7 @@ document.addEventListener('click', (e) => {
     /* DESSINER AVANT D'OUVRIR : l'écran existe mais son contenu est fabriqué à
        la demande. Sans cet appel, on arrivait sur une page vide. */
     renderAbonnements()
-    showGestionScreen('p-abonnement')
+    showGestionScreen('p-abonnement'); marquerAboNeuf()
     return
   }
   if (e.target.closest('[data-abo-plus-tard]')) {
@@ -9751,7 +9765,14 @@ document.addEventListener('click', async (e) => {
       `• ${d.nom || d.email || 'Quelqu\u2019un'}`).join('\n') || 'Personne pour l\u2019instant.',
     confirmer: 'Fermer',
     annuler: 'Voir les offres',
-  }) || showGestionScreen('p-abonnement')
+  /* ⚠ LE POINT-VIRGULE SÉPARAIT DEUX INSTRUCTIONS. Écrit
+       `|| showGestionScreen(...); marquerAboNeuf()`, le second appel
+       s'exécutait TOUJOURS — même quand la personne fermait la boîte sans
+       vouloir voir les offres. La classe était alors posée sur une page qu'on
+       n'ouvre pas, et la cascade ratait sa vraie ouverture.
+
+       Les deux appels tiennent maintenant dans la même branche. */
+  }) || (showGestionScreen('p-abonnement'), marquerAboNeuf())
 })
 
 function ouvrirVoieDoc(voie) {
@@ -16304,7 +16325,15 @@ const LG_O = 'rgba(255,255,255,0.32)'
    quand il y aura quatre paliers, chacun portera le sien. Un interrupteur
    unique devrait piloter toutes les offres à la fois, ce qui ne veut rien dire
    quand on n'en regarde qu'une. */
-let rythmeChoisi = 'annuel'
+/* ═══ LE MENSUEL EN PREMIER ═══
+
+   Le défaut était `annuel`. On ouvrait donc la page sur un prix engagé pour
+   douze mois, sans l'avoir demandé — et le montant affiché n'était pas celui
+   qu'on paierait en cliquant sans rien changer.
+
+   Le mensuel est l'offre par défaut : sans engagement, réversible. L'annuel se
+   choisit, il ne s'impose pas. */
+let rythmeChoisi = 'mensuel'
 
 /* `AVANTAGES`, `PICTOS` et `AUSSI` ont été retirés avec l'ancienne carte : la
    nouvelle liste ses inclus directement, en lignes à coche, sans pictogramme.
@@ -16627,6 +16656,20 @@ window.renderAbonnements = function() {
       ? (o.prix === null ? `Offre ${o.nom}` : `Offre ${o.nom} \u00b7 ${o.prix} \u20ac par mois`)
       : `${mienne.nom} conseill\u00e9e`
   }
+
+  /* Les cartes viennent d'être construites : on y pose le logo orange. Sans
+     cet appel, leurs balises restent vides — la pose initiale a eu lieu au
+     chargement du document, quand elles n'existaient pas. */
+  poserLogosOr()
+}
+
+/* La cascade d'entrée ne joue qu'à l'ouverture : la classe est posée ici, et
+   retirée une seconde plus tard — le temps que les cinq blocs soient arrivés. */
+function marquerAboNeuf() {
+  const p = document.getElementById('p-abonnement')
+  if (!p) return
+  p.classList.add('abo-neuf')
+  setTimeout(() => p.classList.remove('abo-neuf'), 1000)
 }
 
 document.getElementById('ouvrir-abonnement')?.addEventListener('click', () => {

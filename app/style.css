@@ -627,7 +627,7 @@
   /* ═══ Entreprises de l'utilisateur ═══ */
   .ent-ligne{
     display:flex; align-items:center; gap:12px; padding:14px 15px; margin-bottom:8px;
-    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    background:var(--bg-card); border-radius:14px;
     transition:background 0.2s;
   }
   .ent-ligne:not(.actuelle){ cursor:pointer; }
@@ -1224,7 +1224,7 @@
   /* ═══ Les appareils ═══ */
   .app-ligne{
     display:flex; align-items:center; gap:12px; padding:12px;
-    border-radius:15px; background:var(--bg-card); border:0.5px solid var(--border);
+    border-radius:15px; background:var(--bg-card);
     margin-bottom:8px;
   }
   .app-ligne.moi{ border-color:rgba(255,179,64,0.45); background:rgba(255,179,64,0.08); }
@@ -1295,7 +1295,7 @@
      fond, même liseret, même rayon de 16. Les deux pages emploient ainsi le
      même objet, et l'œil n'a qu'une grammaire à apprendre. */
   .an-bloc{
-    background:var(--bg-card); border:0.5px solid var(--border);
+    background:var(--bg-card);
     border-radius:20px; padding:15px 15px 11px; margin-bottom:14px;
   }
   /* Dans une carte, la tête de section n'a plus besoin de filet ni de grande
@@ -3098,7 +3098,7 @@
   .reg-identite{
     display:flex; align-items:center; gap:14px; width:100%; margin-top:14px;
     padding:15px 15px; border-radius:22px;
-    background:var(--bg-card); border:0.5px solid var(--border);
+    background:var(--bg-card);
     font-family:inherit; text-align:left; color:#fff;
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
@@ -3135,7 +3135,7 @@
   /* Le groupe : une carte qui tient plusieurs lignes. */
   .reg-groupe{
     border-radius:20px; overflow:hidden;
-    background:var(--bg-card); border:0.5px solid var(--border);
+    background:var(--bg-card);
   }
   .reg-ligne{
     display:flex; align-items:center; gap:12px; width:100%;
@@ -3194,7 +3194,7 @@
   /* La liste des établissements adopte la même carte groupée. */
   .etab-ligne{
     display:flex; align-items:center; gap:12px; width:100%; padding:11px 13px;
-    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
+    border-radius:16px; background:var(--bg-card);
     margin-bottom:8px; font-family:inherit; text-align:left; color:#fff;
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
@@ -3320,12 +3320,12 @@
      initiales utilisées » décrivait une situation sans dire qu'on pouvait la
      changer ; « ajouter un logo » le dit, et se voit parce que c'est en bleu. */
   .etab-ligne{
+    display:flex; a  .etab-ligne{
     display:flex; align-items:center; gap:12px; width:100%; padding:11px 13px;
-    border-radius:16px; background:var(--bg-card); border:0.5px solid var(--border);
+    border-radius:16px; background:var(--bg-card);
     margin-bottom:8px; font-family:inherit; text-align:left; color:#fff;
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  .etab-ligne:active{ transform:scale(0.985); }
+  }cale(0.985); }
   /* Hors du tiroir, le rond n'a pas de verre derrière lui : il le porte
      lui-même, aux valeurs exactes du bouton des réglages. */
   .etab-ligne .rond-ent{
@@ -3868,7 +3868,7 @@
 
   .pm-ligne{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
-    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    background:var(--bg-card); border-radius:14px;
   }
   /* ═══ DEUX COULEURS, DEUX RÔLES ═══
 
@@ -3970,8 +3970,7 @@
   .ga-trio{ display:flex; gap:9px; }
   .ga-tuile{
     flex:1; display:flex; flex-direction:column; align-items:center;
-    padding:15px 6px 13px; background:var(--bg-card);
-    border:0.5px solid var(--border); border-radius:18px;
+    padding:15px 6px 13px; background:var(--bg-card); border-radius:18px;
   }
   .ga-anneau{ position:relative; width:58px; height:58px; }
   .ga-anneau svg{ transform:rotate(-90deg); display:block; }
@@ -4000,7 +3999,7 @@
 
   @media (prefers-reduced-motion: reduce){ .ga-anneau .valeur{ animation:none; } }
 
-  .hero-card{ position:relative; background:var(--hero-gradient); border:0.5px solid rgba(255,255,255,0.15);
+  .hero-card{ position:relative; background:var(--hero-gradient);
     border-radius:20px; padding:20px 18px; margin-bottom:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
   .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.55); font-weight:500; margin-bottom:10px; }
   .hero-card .num{ font-size:44px; font-weight:700; color:#fff; letter-spacing:-1.2px; }
@@ -4463,7 +4462,7 @@
 
   .cat-rank{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
-    background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px;
+    background:var(--bg-card); border-radius:14px;
   }
   .cat-rank .pos{
     width:22px; height:22px; border-radius:50%; flex-shrink:0;
@@ -4483,7 +4482,7 @@
   .cat-rank .taux{ font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; flex-shrink:0; }
 
   .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
-  .stat-mini{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+  .stat-mini{ background:var(--bg-card); border-radius:14px; padding:12px 8px; text-align:center; }
   .stat-mini .num{ font-size:20px; font-weight:700; }
   .stat-mini .lbl{ font-size:10.5px; color:var(--label-2); margin-top:2px; }
 
@@ -4553,8 +4552,7 @@
   .qr-hint{ font-size:12px; color:var(--label-2); margin-bottom:12px; line-height:1.4; }
 
   .plan-card{
-    background:var(--bg-card);
-    border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px;
+    background:var(--bg-card); border-radius:16px; padding:14px 16px; margin-bottom:8px;
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
   }
   .plan-card.active{ border-color:rgba(255,255,255,0.5); }

@@ -4536,7 +4536,9 @@ function peindreIntroEquipe(employes, validations) {
 
   const total = validALire.reduce((x, v) => x + Number(v.duree_lecture || 0), 0)
   const actifs = new Set(validALire.filter(v => Number(v.duree_lecture)).map(v => v.membre_id)).size
-  const jamais = aLire.length - actifs
+  /* `jamais` a été retiré : il servait aux trois variantes du sous-titre,
+     remplacées par une phrase unique. Le compte de ceux qui n'ont rien lu se
+     déduit du titre — « 3 sur 5 ». */
 
   if (!total) {
     t.textContent = 'Votre \u00e9quipe n\u2019a pas encore commenc\u00e9'
@@ -4566,20 +4568,21 @@ function peindreIntroEquipe(employes, validations) {
   /* Le compte de ceux qui n'ont rien ouvert a été retiré : le titre le dit déjà
      — « 3 sur 5 », les deux autres se déduisent. Répéter le manque juste en
      dessous en faisait un reproche là où le chiffre suffisait. */
-  if (jamais === 0) {
-    const moyenne = Math.round(total / Math.max(1, actifs))
-    s.innerHTML = `Toute votre \u00e9quipe est \u00e0 jour, <b>${dureeLisible(moyenne)} par personne</b> en moyenne. ` +
-      `Votre \u00e9tablissement peut le prouver.`
-  } else if (jamais === 1) {
-    const seul = employes.find(e => !validations.some(v =>
-      v.membre_id === e.id && Number(v.duree_lecture)))
-    s.innerHTML = seul?.nom
-      ? `Il ne manque que <b>${escapeHtml(seul.nom)}</b>. Touchez son nom pour le d\u00e9tail de son activit\u00e9.`
-      : `Il ne manque qu'<b>une personne</b>. Touchez son nom pour le d\u00e9tail de son activit\u00e9.`
-  } else {
-    s.innerHTML = `Touchez un nom pour le <b>d\u00e9tail de son activit\u00e9</b> : ` +
-      `ce qui l'occupe et ce qu'il n'a pas ouvert.`
-  }
+  /* ═══ UNE SEULE PHRASE, QUEL QUE SOIT LE NOMBRE ═══
+
+     Il y en avait trois : « toute votre équipe est à jour », « il ne manque que
+     Untel », « touchez un nom ». Trois formulations pour une seule information
+     — comment se servir de la liste.
+
+     Nommer le retardataire posait deux problèmes. Le premier est de ton : « il
+     ne manque que Emilien Meifj » désigne quelqu'un du doigt sous le titre,
+     alors que la liste le montre déjà, à sa place, sans commentaire. Le second
+     est pratique : la phrase changeait de sens d'un mois à l'autre, et on
+     relisait à chaque fois un texte qu'on croyait connaître.
+
+     Le sous-titre dit maintenant à quoi sert la liste, et rien d'autre. Le
+     chiffre du titre — « 3 sur 5 » — porte déjà l'information sur le manque. */
+  s.innerHTML = `Touchez le nom d'un membre pour voir le <b>d\u00e9tail de son activit\u00e9</b>.`
 }
 
 let anEqVues = { month: { classe: [], total: 0, deplie: false },
@@ -16419,6 +16422,17 @@ function prixParMembre(o, n) {
    ⑤ L'ANNUEL DEVIENT UNE LIGNE DE TEXTE. Deux gros boutons radio pour un choix
       qu'on fait une fois occupaient un quart de la carte.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Le rythme affiché diffère-t-il de celui qu'on paie ? C'est la seule
+   condition qui réveille le bouton d'une offre déjà souscrite.
+
+   `rythmeActuel` vient de l'abonnement en base ; sans lui, on suppose le
+   mensuel — c'est le cas de tous les abonnements existants, et supposer
+   l'annuel proposerait à tort de « passer au mensuel ». */
+function changementRythme(opts) {
+  const paye = opts.rythmeActuel || 'mensuel'
+  return rythmeChoisi !== paye
+}
+
 function carteOffre(o, opts = {}) {
   const n = opts.membres || 0
   const pm = opts.detaille ? prixParMembre(o, n) : null
@@ -16439,6 +16453,20 @@ function carteOffre(o, opts = {}) {
 
   return `<div class="offre-carte${opts.classe || ''}">
     ${opts.ruban ? `<span class="offre-ruban">${opts.ruban}</span>` : ''}
+    <!-- ═══ LE LOGO EN FILIGRANE ═══
+
+         C est le fichier du depot, pas un trace refait a la main. J ai essaye
+         deux fois de le redessiner en SVG : la premiere donnait un S
+         calligraphique qui n a rien a voir, la seconde des gelules trop
+         epaisses et mal inclinees. Le logo a une geometrie precise, et
+         l approcher a l oeil ne suffit pas.
+
+         L image est donc chargee telle quelle. Le filtre la teinte en ambre :
+         le fichier est blanc, et le recolorer en CSS evite de maintenir une
+         seconde version du logo dans le depot. -->
+    <span class="offre-logo" aria-hidden="true">
+      <img src="../logo-standix.png" alt="" loading="lazy">
+    </span>
 
     <div class="offre-nom">${o.nom}</div>
 
@@ -16446,28 +16474,59 @@ function carteOffre(o, opts = {}) {
       ${surDevis ? `<span class="v">Sur devis</span>`
         : `<span class="v">${o.prix} €</span><span class="u">par mois, hors taxes</span>`}
     </div>
-    ${pm && !surDevis ? `<div class="offre-parmembre">Soit <b>${pm} €</b> par personne et par mois.</div>` : ''}
+    <!-- ═══ « SOIT X € PAR PERSONNE » A ÉTÉ RETIRÉ ═══
+
+         Il divisait le prix de l'offre par le nombre RÉEL de membres. Sur une
+         entreprise de 5 personnes abonnée à Réseau, cela donnait 99,80 € par
+         tête — le chiffre qui donne envie de résilier.
+
+         Et il poussait dans le mauvais sens : la même entreprise voyait
+         « 13,80 € » sous Essentiel et « 99,80 € » sous Réseau. L'argument
+         censé donner envie de MONTER poussait à descendre.
+
+         Il n'a de sens que si l'offre correspond à la taille de l'équipe —
+         c'est-à-dire dans le cas où on n'a pas besoin de le dire. -->
 
     <div class="offre-inclus">
-      ${inclus.map(t => `<div class="offre-li"><i>✓</i><span>${t}</span></div>`).join('')}
+      <!-- Coche ronde et pleine : un caractere de coche nu se lisait comme du
+           texte, la pastille en fait un signe. -->
+      ${inclus.map(t => `<div class="offre-li">
+        <i><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11"
+             fill="rgba(255,159,10,0.14)" stroke="rgba(255,173,51,0.42)" stroke-width="1"/>
+           <path d="M7.6 12.3l3 3 5.8-6.4" stroke="#FFAD33" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"/></svg></i>
+        <span>${t}</span></div>`).join('')}
     </div>
 
-    ${opts.cta && !surDevis && !opts.enCours ? `
-    <!-- L'annuel en une ligne, cliquable. Deux boutons radio pour un choix
-         qu'on fait une seule fois prenaient un quart de la carte. -->
-    <button type="button" class="offre-annuel${rythmeChoisi === 'annuel' ? ' on' : ''}"
-            data-rythme="${rythmeChoisi === 'annuel' ? 'mensuel' : 'annuel'}">
-      ${rythmeChoisi === 'annuel'
-        ? `<b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année · revenir au mensuel`
-        : `ou <b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année`}
-    </button>` : ''}
+    <!-- Rappel de l offre annuelle, avec son etiquette. Les onglets du haut
+         commandent, cette ligne rappelle ce qu on gagne a basculer. Elle
+         disparait quand l annuel est deja choisi. -->
+    ${!surDevis && rythmeChoisi === 'mensuel' ? `
+    <div class="offre-annuel-note">
+      <span class="et"><svg viewBox="0 0 24 24" fill="none" stroke="#FFAD33"
+        stroke-width="1.7" stroke-linejoin="round"><path d="M3.4 12.6V4.8a1.4 1.4 0 0 1 1.4-1.4h7.8
+        L21 11.8a1.4 1.4 0 0 1 0 2L14 20.8a1.4 1.4 0 0 1-2 0Z"/>
+        <circle cx="8" cy="8" r="1.5" fill="#FFAD33" stroke="none"/></svg></span>
+      ou <b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année
+    </div>` : ''}
     ${surDevis ? `<div class="offre-annuel-fixe">${o.devis || 'Les mêmes fonctionnalités, sans exception.'}</div>` : ''}
 
     ${opts.cta ? `<button type="button" class="offre-cta${opts.enCours ? ' encours' : ''}"
-      ${opts.enCours ? 'disabled' : ''} data-offre="${o.cle}">${
-      /* L'offre déjà payée ne propose pas de la repayer : le bouton dit ce
-         qu'elle est, et ne fait rien. */
-      opts.enCours ? opts.cta
+      ${opts.enCours && !changementRythme(opts) ? 'disabled' : ''} data-offre="${o.cle}">${
+      /* ═══ SAUF POUR CHANGER DE RYTHME ═══
+
+         L'offre en cours désactivait son bouton : rien à repayer, en effet.
+         Mais depuis que le choix mensuel / annuel s'affiche aussi sur elle,
+         quelqu'un peut vouloir passer à l'année SANS changer de formule.
+
+         Le bouton se réveille alors, et annonce le nouveau montant. C'est le
+         seul changement qu'un client satisfait veut faire — et vingt pour cent
+         de trésorerie d'avance. */
+      opts.enCours && changementRythme(opts)
+        ? (rythmeChoisi === 'annuel'
+            ? `Passer \u00e0 l'ann\u00e9e \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac`
+            : `Passer au mensuel \u00b7 ${o.prix} \u20ac par mois`)
+      : opts.enCours ? opts.cta
       : o.prix === null ? opts.cta
       /* Le bouton annonce EXACTEMENT ce qui sera pr\u00e9lev\u00e9. \u00ab Activer \u00bb tout court
          laisse d\u00e9couvrir le montant sur la page de paiement \u2014 c'est l\u00e0 qu'on
@@ -16475,7 +16534,9 @@ function carteOffre(o, opts = {}) {
       : rythmeChoisi === 'annuel'
         ? `Activer \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an`
         : `Activer \u00b7 ${o.prix} \u20ac par mois`
-    }</button>` : ''}
+    }${opts.enCours ? '' : `<svg class="cta-fl" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M5 12h13M13 6l6 6-6 6"/></svg>`}</button>` : ''}
     ${opts.gerer ? `
     <!-- Résilier doit être aussi simple que souscrire : le lien est ICI, sous
          l'offre, pas caché dans un recoin des paramètres. -->
@@ -16498,19 +16559,24 @@ window.renderAbonnements = function() {
   const payee = actuel ? OFFRES.find(o => o.cle === actuel) : null
   const mienne = payee || offrePourTaille(n)
 
-  const titre = document.getElementById('abo-titre')
+  /* ═══ UNE SEULE PHRASE, PAS UN TITRE PLUS UN SOUS-TITRE ═══
+
+     « Vous êtes 5 membres chez M Entreprise » occupait deux lignes en gros, et
+     répétait ce que la page Gérer l'équipe dit déjà. Le titre « Abonnement » de
+     l'en-tête suffit à nommer l'écran.
+
+     Reste une phrase qui oriente : ce qu'on paie, ou ce qui conviendrait. */
   const sous = document.getElementById('abo-sous')
-  const nomEnt = cachedEntreprise?.nom || 'votre \u00e9tablissement'
-  if (titre) {
-    titre.innerHTML = n > 1
-      ? `Vous \u00eates <b>${n} membres</b><br>chez ${escapeHtml(nomEnt)}`
-      : `Vous d\u00e9marrez seul<br>chez ${escapeHtml(nomEnt)}`
-  }
   if (sous) {
     sous.innerHTML = payee
       ? `Vous \u00eates abonn\u00e9 \u00e0 l'offre <b>${mienne.nom}</b>.`
-      : `L'offre <b>${mienne.nom}</b> est faite pour une \u00e9quipe de cette taille.`
+      : `Choisissez le plan qui correspond<br>\u00e0 la fa\u00e7on dont votre \u00e9quipe travaille.`
   }
+
+  /* Les deux onglets de rythme reflètent le choix courant. */
+  document.querySelectorAll('#abo-rythme .abo-ryt').forEach(b => {
+    b.classList.toggle('on', b.dataset.rythme === rythmeChoisi)
+  })
 
   const estActuelle = mienne.cle === actuel
   document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
@@ -16518,8 +16584,12 @@ window.renderAbonnements = function() {
     ruban: estActuelle ? 'En cours' : 'Recommandée',
     enCours: estActuelle,
     gerer: estActuelle,
+    /* « Choisir <offre> » : le geste, sans le mot argent. « Essayer
+       gratuitement » aurait été plus doux mais l'essai n'est pas systématique,
+       et « Payer » ferait fuir quelqu'un à qui l'on promet 14 jours d'essai
+       trois lignes plus bas. */
     cta: estActuelle ? 'Votre abonnement actuel'
-      : (mienne.prix === null ? 'Nous \u00e9crire' : 'Commencer avec ' + mienne.nom),
+      : (mienne.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + mienne.nom),
     annuel: !estActuelle,
     membres: n,
     detaille: true,

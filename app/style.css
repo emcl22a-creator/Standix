@@ -2087,7 +2087,17 @@
   .ia-mot{
     font-size:15px; font-weight:850; letter-spacing:0.02em;
     line-height:1; flex-shrink:0; user-select:none;
-    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #FEC64A 100%);
+    /* ═══ BLANC, PUIS AMBRE, PUIS ORANGE ═══
+
+       Le dégradé restait BLANC PUR sur 46 % de sa course : sur deux lettres de
+       15 px, l'ambre n'apparaissait que dans le dernier tiers du « I », et on
+       lisait un sigle blanc.
+
+       Le blanc tient maintenant jusqu'à 20 %, l'ambre prend le milieu, l'orange
+       ferme. Les trois couleurs se voient sur deux lettres — c'est court, il
+       faut que la transition le soit aussi. */
+    background:linear-gradient(118deg,
+      #FFFFFF 0%, #FFFFFF 20%, #FEC64A 58%, #EB5201 100%);
     -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent;
   }
@@ -8199,17 +8209,56 @@ body:has(#e-detail.active) #equipe-app{
    mais aussi ses marges, réglées pour un autre contexte. */
 /* Les tuiles gardent la matière de `.an-bloc` : fond uni, liseré fin.
 
-   J'avais essayé un dégradé, un filet de lumière et une ombre portée — la
-   variante A. Trop de matière : trois tuiles en relief sur un écran qui en
-   compte déjà quatre autres, et la page devenait lourde.
-
-   Le fond plat est le bon choix ici. La carte d'accueil peut se permettre du
-   volume parce qu'elle est seule ; une grille n'en a pas le droit. */
+   J'ai essayé de reproduire un rendu 3D fourni en image — source lumineuse,
+   reflets. Quatre passes de mesure, sans y parvenir : ce genre d'image se fait
+   dans un outil 3D, pas en CSS. Seul le CONTOUR change désormais. */
 .ac-tuile{
+  position:relative;
   padding:15px 14px 16px;
   margin-bottom:0;
   display:flex; flex-direction:column;
+  /* Le liseré vient du pseudo-élément ci-dessous. Sans cette ligne, la bordure
+     héritée de `.an-bloc` doublerait le contour. */
+  border:none;
 }
+
+/* ═══ LE CONTOUR EN LUMIÈRE RASANTE ═══
+
+   Vif dans le coin supérieur gauche, éteint au milieu des côtés, ravivé en bas
+   à droite. C'est la technique d'« Écrivez-nous » et de la carte d'abonnement :
+   les tuiles rejoignent la famille des cartes importantes de l'app.
+
+   Un dégradé posé en fond, découpé en anneau par deux masques superposés —
+   l'un couvre tout, l'autre évide l'intérieur, et `xor` ne laisse que le
+   pourtour. Un `border` ne sait pas faire de dégradé.
+
+   La MATIÈRE ne bouge pas : même fond, même rayon, même absence d'ombre. */
+.ac-tuile::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:1px; pointer-events:none; z-index:1;
+  /* ═══ GRIS CLAIR, PAS AMBRE ═══
+
+     L'ambre appartient aux cartes qui vendent — l'abonnement, « Écrivez-nous ».
+     Sur trois tuiles de tableau de bord, il tirait l'œil vers le contenant
+     alors que ce sont les chiffres qui comptent.
+
+     Le blanc translucide garde le relief sans la couleur : la lumière rasante
+     subsiste — vive en haut à gauche, éteinte au milieu, ravivée en bas à
+     droite — mais elle ne dit plus « regardez-moi ».
+
+     Les valeurs sont plus hautes qu'un liseré ambre équivalent : le blanc
+     ressort moins sur fond sombre à opacité égale. */
+  background:linear-gradient(135deg,
+    rgba(255,255,255,0.34) 0%,
+    rgba(255,255,255,0.10) 30%,
+    rgba(255,255,255,0.04) 60%,
+    rgba(255,255,255,0.18) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+/* Le contenu passe au-dessus du liseré. */
+.ac-tuile > *{ position:relative; z-index:2; }
 /* 13 px / 600, comme `.section-title` — le titre d'un groupe dans cette app. */
 /* ═══ LA PLAQUE D'ICÔNE ═══
 
@@ -8495,15 +8544,6 @@ body:has(#e-detail.active) #equipe-app{
    de marge, ce qui faisait 14 en tout — assez pour séparer deux lignes d'une
    même liste, pas assez pour séparer une LISTE d'un bouton qui mène ailleurs.
    Les deux se lisaient comme un même bloc. */
-/* ═══ LES DEUX BOUTONS DE PIED ═══
-
-   18 px au-dessus du premier : il suit les quatre tuiles, et deux blocs de
-   nature différente ont besoin de plus d'air que deux lignes d'une même liste.
-
-   9 px entre les deux, comme entre deux lignes : ils sont de même nature et se
-   lisent ensemble, comme un choix à deux branches. */
-.ac-act{ margin-top:18px; }
-.ac-act + .ac-act{ margin-top:9px; }
 
 /* La date, sous le chemin, dans la page des procédures récentes. Plus pâle que
    le sous-titre : c'est un repère, pas une information qu'on vient chercher. */
@@ -8968,3 +9008,115 @@ body:has(#e-detail.active) #equipe-app{
     animation:none;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES AUTRES OFFRES · CASCADE À L'OUVERTURE
+
+   Le conteneur se dépliait déjà — `grid-template-rows` de 0fr à 1fr — mais les
+   cartes apparaissaient d'un bloc à l'intérieur. Un rideau qui se lève sur un
+   décor figé.
+
+   Chaque carte monte et se révèle, décalée de 70 ms sur la précédente : c'est
+   le même geste que la page d'abonnement à son ouverture, et que les tuiles de
+   l'accueil. Une seule grammaire d'apparition dans toute l'app.
+
+   Le délai part de 0,10 s : le dépliage du conteneur dure 0,42 s, et lancer
+   les cartes trop tôt les ferait apparaître avant d'avoir la place.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes aboCarte{
+  from{ opacity:0; transform:translateY(14px) scale(0.985) }
+  to  { opacity:1; transform:none }
+}
+#abo-liste.ouvert .offre-carte{
+  animation:aboCarte 0.50s cubic-bezier(0.22,1,0.36,1) both;
+}
+#abo-liste.ouvert .offre-carte:nth-child(1){ animation-delay:0.10s }
+#abo-liste.ouvert .offre-carte:nth-child(2){ animation-delay:0.17s }
+#abo-liste.ouvert .offre-carte:nth-child(3){ animation-delay:0.24s }
+#abo-liste.ouvert .offre-carte:nth-child(4){ animation-delay:0.31s }
+
+/* Le bouton ne disparaît plus d'un coup : il s'efface en montant, ce qui
+   raccorde son départ à l'arrivée des cartes. Sans cela, un trou apparaît une
+   fraction de seconde là où il était. */
+.abo-autres{
+  transition:transform 0.14s ease, background 0.2s ease,
+             opacity 0.26s ease, margin 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+.abo-autres.part{
+  opacity:0; transform:translateY(-6px);
+  margin-top:0; margin-bottom:-52px; pointer-events:none;
+}
+
+/* ⚠ RESPECT DU RÉGLAGE SYSTÈME, comme ailleurs sur cette page. */
+@media (prefers-reduced-motion: reduce){
+  #abo-liste.ouvert .offre-carte{ animation:none }
+  .abo-autres.part{ display:none }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX TUILES DE LIEN
+
+   Même matière que les trois du haut — fond, contour, plaque d'icône viennent
+   de `.ac-tuile`. Trois différences seulement :
+
+   ① ELLES SONT EN LIGNE. Icône à gauche, texte au centre, chevron à droite.
+      Les tuiles de chiffre empilent ; celles-ci se lisent d'un trait.
+   ② PAS DE HAUTEUR MINIMALE. Un lien n'a pas de chiffre à porter, il n'a pas
+      besoin de la place d'une tuile de statistique.
+   ③ UN CHEVRON. C'est lui qui dit « ça mène ailleurs » — sans lui, on lirait
+      une cinquième statistique.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ac-lien{
+  /* ⚠ PAS DE `grid-column`. Ces tuiles vivent dans `#ac-recentes`, APRÈS la
+     grille — elles ne sont pas des cellules. Une propriété de grille sur un
+     élément hors grille est ignorée, et j'ai perdu un rendu à la chercher. */
+  display:flex; width:100%;
+  flex-direction:row; align-items:center; gap:13px;
+  padding:13px 14px;
+  text-align:left; font-family:inherit; color:inherit;
+  margin-top:0;
+}
+/* La première des deux prend l'air qui séparait la grille de chiffres du pied
+   de page. 18 px : assez pour dire que c'est autre chose, pas assez pour
+   couper la page en deux. */
+.ac-lien:first-of-type{ margin-top:18px; }
+.ac-lien + .ac-lien{ margin-top:11px; }
+
+/* La plaque perd sa marge basse : en ligne, c'est l'écart latéral qui compte. */
+.ac-lien .ac-ic{ margin-bottom:0; }
+
+.ac-lien-txt{ flex:1; min-width:0; }
+.ac-lien-t{
+  display:block; font-size:14.5px; font-weight:600; letter-spacing:-0.025em;
+  line-height:1.25;
+}
+.ac-lien-s{
+  display:block; font-size:11.5px; color:var(--label-2); margin-top:3px;
+  line-height:1.35;
+  /* Une seule ligne : un sous-titre qui déborde ferait grandir la tuile et
+     casserait l'alignement des deux. */
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ac-lien-fl{ flex:0 0 auto; font-size:17px; color:var(--label-3); }
+.ac-lien:active{ transform:scale(0.99); }
+.ac-lien{ transition:transform 0.14s ease; }
+
+
+/* ═══ LA BARRE DE TRI DE « GÉRER L'ÉQUIPE » ═══
+
+   Le menu à gauche, le bouton d'aide à droite. Même disposition que l'en-tête
+   d'Analyse : un réglage et un recours, séparés par tout l'espace disponible.
+
+   La marge du haut vient de l'ancienne barre de pastilles, qui la portait en
+   ligne dans le balisage — on la remet ici, où elle se maintient. */
+.pm-barre{
+  display:flex; align-items:center; gap:10px;
+  margin-top:14px;
+}
+.pm-barre .dd-filter{ flex:0 0 auto; }
+/* Poussé au bout : entre les deux, rien à mettre. */
+.pm-aide-btn{ margin-left:auto; }

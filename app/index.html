@@ -678,11 +678,11 @@
         <div style="display:flex; gap:8px; margin-bottom:12px;">
           <div style="flex:1;">
             <label class="f">Prénom</label>
-            <input type="text" id="signup-prenom" placeholder="Marie">
+            <input type="text" id="signup-prenom" placeholder="Marie" autocomplete="given-name">
           </div>
           <div style="flex:1;">
             <label class="f">Nom</label>
-            <input type="text" id="signup-nom" placeholder="Tissot">
+            <input type="text" id="signup-nom" placeholder="Tissot" autocomplete="family-name">
           </div>
         </div>
         <label class="f">E-mail</label>
@@ -697,11 +697,25 @@
 
         <div id="signup-gestion-field">
           <label class="f">Nom de l'entreprise</label>
-          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;">
+          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;" autocomplete="organization">
         </div>
         <div id="signup-equipe-field" style="display:none;">
           <label class="f">Code de l'entreprise (5 chiffres)</label>
-          <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
+          <!-- ═══ `autocomplete="off"` SUR LES CHAMPS DE CODE ═══
+
+               `inert` empêche le focus, mais PAS le gestionnaire de mots de
+               passe : Safari lit le balisage, voit un champ de cinq chiffres
+               nommé « code », le prend pour un code de vérification à usage
+               unique, et propose son remplissage — clavier numérique compris,
+               au chargement de l'app.
+
+               `off` ne suffit pas seul sur iOS, qui l'ignore souvent.
+               `one-time-code` en revanche est le nom que Safari CHERCHE : le
+               lui donner explicitement lui dit que le champ est déjà géré, et
+               il cesse de proposer. C'est contre-intuitif — on nomme pour
+               faire taire — mais c'est ainsi que la spécification fonctionne. -->
+          <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric"
+                 autocomplete="one-time-code" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
         </div>
 
         <button class="btn block" id="signup-btn">Créer mon compte</button>
@@ -842,7 +856,7 @@
     <div class="subhead" id="category-subhead">—</div>
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="category-search-input" placeholder="Rechercher une procédure...">
+      <input type="text" id="category-search-input" placeholder="Rechercher une procédure..." autocomplete="off">
     </div>
     <div class="dd-filter" id="dd-category-sort">
       <button type="button" class="dd-trigger" id="dd-category-sort-trigger">
@@ -946,7 +960,7 @@
              l'expliquer. L'exemple parle à qui découvre l'app sans savoir
              encore ce qu'il va y mettre. -->
         <label class="f">Dossier</label>
-        <input type="text" id="new-categorie" placeholder="Ex : Entretien">
+        <input type="text" id="new-categorie" placeholder="Ex : Entretien" autocomplete="off">
         <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
              Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -962,11 +976,11 @@
              la relation plutôt que de la décrire. -->
         <div style="margin-top:12px;">
           <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-          <input type="text" id="new-sous-categorie" placeholder="Ex : Machine à café">
+          <input type="text" id="new-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
           <label class="f">Titre</label>
-          <input type="text" id="new-titre" placeholder="Ex : Détartrer la machine à café">
+          <input type="text" id="new-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
         </div>
       </div>
 
@@ -1107,7 +1121,7 @@
     <div id="man-entete" style="display:none;">
       <div class="card">
         <label class="f">Dossier</label>
-        <input type="text" id="man-categorie" placeholder="Ex : Entretien">
+        <input type="text" id="man-categorie" placeholder="Ex : Entretien" autocomplete="off">
         <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
              Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -1123,11 +1137,11 @@
              la relation plutôt que de la décrire. -->
         <div style="margin-top:12px;">
           <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-          <input type="text" id="man-sous-categorie" placeholder="Ex : Machine à café">
+          <input type="text" id="man-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
           <label class="f">Titre</label>
-          <input type="text" id="man-titre" placeholder="Ex : Détartrer la machine à café">
+          <input type="text" id="man-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1183,7 +1197,7 @@
     <div id="dv-entete" style="display:none;">
       <div class="card">
         <label class="f">Dossier</label>
-        <input type="text" id="dv-categorie" placeholder="Ex : Entretien">
+        <input type="text" id="dv-categorie" placeholder="Ex : Entretien" autocomplete="off">
         <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
              Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -1199,11 +1213,11 @@
              la relation plutôt que de la décrire. -->
         <div style="margin-top:12px;">
           <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-          <input type="text" id="dv-sous-categorie" placeholder="Ex : Machine à café">
+          <input type="text" id="dv-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
           <label class="f">Titre</label>
-          <input type="text" id="dv-titre" placeholder="Ex : Détartrer la machine à café">
+          <input type="text" id="dv-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1492,7 +1506,7 @@
          remplir autre chose. -->
     <div class="card">
       <label class="f">Dossier</label>
-      <input type="text" id="edit-categorie" placeholder="Ex : Entretien">
+      <input type="text" id="edit-categorie" placeholder="Ex : Entretien" autocomplete="off">
       <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
            Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -1508,11 +1522,11 @@
            la relation plutôt que de la décrire. -->
       <div style="margin-top:12px;">
         <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-        <input type="text" id="edit-sous-categorie" placeholder="Ex : Machine à café">
+        <input type="text" id="edit-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
       </div>
       <div style="margin-top:12px;">
         <label class="f">Titre</label>
-        <input type="text" id="edit-titre" placeholder="Ex : Détartrer la machine à café">
+        <input type="text" id="edit-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
       </div>
     </div>
 
@@ -1870,6 +1884,25 @@
       <h1 class="pagehead">Mouvements de l’équipe</h1>
     </div>
     <div id="activites-tout"></div>
+  </div>
+
+  <!-- ═══ LES PROCÉDURES RÉCENTES, SUR LEUR PROPRE PAGE ═══
+
+       Elles étaient listées sur l'accueil, avec leurs vignettes. Trois cartes
+       de soixante pixels pour une information qu'on consulte rarement — et
+       l'onglet Procédures montre déjà tout, avec sa recherche et son tri.
+
+       Le même traitement que les mouvements : un bouton en pied d'accueil, une
+       page dédiée. L'accueil se termine ainsi sur deux boutons de même nature,
+       qui mènent à deux pages de même forme. -->
+  <div class="screen" inert id="p-recentes">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-home')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead">Procédures récentes</h1>
+    </div>
+    <div id="recentes-tout"></div>
   </div>
 
   <div class="screen" inert id="p-an-categories">
@@ -2289,9 +2322,9 @@
     </div>
     <div class="card" style="margin-top:14px;">
       <label class="f">Nom complet</label>
-      <input type="text" id="settings-nom" style="margin-bottom:12px;">
+      <input type="text" id="settings-nom" style="margin-bottom:12px;" autocomplete="name">
       <label class="f">E-mail</label>
-      <input type="text" id="settings-email" disabled="" style="opacity:0.6;">
+      <input type="text" id="settings-email" disabled="" style="opacity:0.6;" autocomplete="off">
       <button class="btn block" style="margin-top:14px;" id="settings-save-btn">Enregistrer</button>
       <!-- Ici le mot de passe n'est pas « oublié » — on est connecté. Le
            libellé dit donc le geste, pas le problème. -->
@@ -2380,7 +2413,7 @@
     <div class="poste-saisie">
       <div class="search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        <input type="text" id="poste-nouveau" placeholder="Ex : Serveur">
+        <input type="text" id="poste-nouveau" placeholder="Ex : Serveur" autocomplete="off">
       </div>
       <button type="button" class="poste-ajouter" id="poste-ajouter">Ajouter</button>
     </div>
@@ -2414,7 +2447,7 @@
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
-    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" placeholder="00000" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
+    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" autocomplete="one-time-code" placeholder="00000" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
     <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
     <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
     <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
@@ -2485,7 +2518,7 @@
         </div>
       </div>
       <div class="visiteur-code">
-        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" placeholder="00000">
+        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" autocomplete="one-time-code" placeholder="00000">
         <button class="btn" id="e-visiteur-valider">Débloquer</button>
       </div>
       <div class="error-msg" id="e-visiteur-erreur"></div>
@@ -2536,7 +2569,7 @@
 
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="e-cat-recherche" placeholder="Rechercher une procédure...">
+      <input type="text" id="e-cat-recherche" placeholder="Rechercher une procédure..." autocomplete="off">
     </div>
 
       <div class="dd-filter" id="dd-e-proc-sort" style="margin-bottom:12px;">
@@ -2717,9 +2750,9 @@
     </div>
     <div class="card" style="margin-top:14px;">
       <label class="f">Nom complet</label>
-      <input type="text" id="es-nom" style="margin-bottom:12px;">
+      <input type="text" id="es-nom" style="margin-bottom:12px;" autocomplete="name">
       <label class="f">E-mail</label>
-      <input type="text" id="es-email" disabled="" style="opacity:0.6;">
+      <input type="text" id="es-email" disabled="" style="opacity:0.6;" autocomplete="off">
       <button class="btn block" style="margin-top:14px;" id="es-save">Enregistrer</button>
       <button type="button" class="lien-doux" id="mdp-changer-e">Changer mon mot de passe</button>
       <div class="error-msg" id="es-error"></div>
@@ -2831,7 +2864,7 @@
     <div class="etab-legende" id="etab-legende">Facultatif · les initiales serviront sinon</div>
 
     <label class="f" style="text-align:left; display:block;">Nom de l'établissement</label>
-    <input type="text" id="etab-nom" placeholder="Ex : Le Comptoir">
+    <input type="text" id="etab-nom" placeholder="Ex : Le Comptoir" autocomplete="off">
 
     <div class="error-msg" id="etab-erreur"></div>
     <button type="button" class="btn block" id="etab-ok" style="margin-top:14px;" disabled="">Ajouter</button>

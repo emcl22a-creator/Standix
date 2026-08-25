@@ -2920,24 +2920,7 @@
     margin-top:1px;
   }
 
-  /* ═══ LE PRIX PAR PERSONNE MONTE D'UN CRAN ═══
-
-     Il était sous un filet, en gris, comme une note de bas de page. C'est
-     pourtant le meilleur argument de la carte : 129 € est une dépense, 8,60 €
-     par personne est une évidence.
-
-     Plus de filet — il coupait l'en-tête en deux et éloignait ce chiffre du
-     prix qu'il explique. Collé dessous, il se lit dans le même mouvement. */
-  .offre-parmembre{
-    margin-top:7px;
-    font-size:13px; line-height:1.4; color:var(--label-2);
-  }
-  .offre-parmembre b{
-    font-size:15px; font-weight:800; letter-spacing:-0.02em;
-    background:linear-gradient(135deg,#FFC46B,#FF6A00);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-  }
-
+  
   /* ── LES AVANTAGES ── */
   /* LA TAILLE DU PICTO EST INDISPENSABLE. Sans elle, un SVG sans hauteur
      déclarée s'affiche à sa taille naturelle — c'est ce qui donnait les
@@ -2993,16 +2976,6 @@
   #abo-liste.ouvert{ grid-template-rows:1fr; opacity:1; margin-top:12px; }
 
   /* ── LE BAS DE PAGE ── */
-  .abo-conf{
-    display:flex; justify-content:center; gap:14px; flex-wrap:wrap;
-    margin-top:14px; font-size:11.5px; font-weight:600; color:var(--label-3);
-  }
-  .abo-egal{
-    margin-top:14px; padding:13px 15px; border-radius:16px;
-    background:rgba(255,173,51,0.06);
-    box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.16);
-    font-size:12.5px; line-height:1.5; text-align:center; color:var(--label-2);
-  }
   .abo-egal b{ color:var(--label-1); font-weight:750; }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -8562,11 +8535,6 @@ body:has(#e-detail.active) #equipe-app{
 }
 .offre-prix .u{ font-size:13.5px; color:var(--label-2); letter-spacing:-0.01em; }
 
-.offre-parmembre{
-  margin-top:8px; font-size:12.5px; color:var(--label-3); letter-spacing:-0.005em;
-}
-.offre-parmembre b{ color:var(--label-2); font-weight:700; }
-
 /* ═══ LES INCLUS ═══
 
    Une seule forme pour tout : une coche, un texte. Le gras porte le CHIFFRE et
@@ -8591,6 +8559,15 @@ body:has(#e-detail.active) #equipe-app{
    Cliquable, mais sans l'apparence d'un bouton : c'est une alternative, pas
    une action principale. Deux radios pour un choix qu'on fait une fois
    prenaient un quart de la carte. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHOIX DU RYTHME · DEUX BOUTONS
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* Le choix actif se marque par un liseré ambre et un fond légèrement teinté —
+   pas par une pastille radio. Sur deux options seulement, le contraste suffit
+   et se lit plus vite qu'un rond à cocher. */
+/* L'économie en pastille, en haut à droite : c'est elle qui décide, elle doit
+   se voir avant le prix qu'elle accompagne. */
+
 .offre-annuel,
 .offre-annuel-fixe{
   display:block; width:100%; margin-top:16px; padding:0;
@@ -8604,3 +8581,200 @@ body:has(#e-detail.active) #equipe-app{
 
 
 /* `.pm-aide` a été retirée avec la note de pied qu'elle habillait. */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ABONNEMENT · EN-TÊTE, RYTHME, GARANTIES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.abo-hi{ text-align:center; margin-bottom:16px; }
+.abo-hi p{ font-size:13.5px; line-height:1.5; color:var(--label-2); margin:0; }
+.abo-hi p b{ color:var(--label-1); font-weight:700; }
+
+/* ═══ LES DEUX ONGLETS DE RYTHME ═══
+
+   Une piste unique contenant deux boutons, plutôt que deux boutons séparés :
+   c'est ce qui fait comprendre qu'ils s'excluent. Deux cartes côte à côte se
+   liraient comme deux options cumulables.
+
+   Centrée et étroite : elle commande la page, elle n'est pas la page. */
+.abo-rythme{
+  display:inline-flex; gap:3px; padding:3px; margin:0 auto 16px;
+  border-radius:100px;
+  background:rgba(255,255,255,0.05);
+  border:0.5px solid rgba(255,255,255,0.07);
+}
+.abo-rythme{ display:flex; width:max-content; }
+.abo-ryt{
+  display:flex; align-items:center; gap:6px;
+  padding:8px 16px; border:none; border-radius:100px;
+  background:none; color:var(--label-2);
+  font-family:inherit; font-size:12.5px; font-weight:650; letter-spacing:-0.01em;
+}
+/* L'onglet actif porte un liseré ambre et un fond teinté — pas un fond plein :
+   un aplat orange dans une piste de 34 px pèserait plus que le prix. */
+.abo-ryt.on{
+  background:rgba(255,159,10,0.10);
+  box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.42);
+  color:var(--label-1);
+}
+.abo-ryt .eco{
+  padding:2px 6px; border-radius:100px;
+  font-size:9.5px; font-weight:800; letter-spacing:0.03em;
+  background:rgba(48,209,88,0.15); color:#30D158;
+}
+
+/* ═══ « VOIR LES AUTRES FORMULES » ═══
+
+   Un bouton nu, pas un bouton plein : il ne concurrence pas celui de l'offre.
+   Le chevron dit qu'il déplie plutôt qu'il navigue. */
+.abo-autres{
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  width:100%; margin-top:14px; padding:14px;
+  border:0.5px solid var(--border); border-radius:15px;
+  background:rgba(255,255,255,0.03);
+  font-family:inherit; font-size:13.5px; font-weight:600; color:var(--label-2);
+}
+.abo-autres svg{ width:15px; height:15px; }
+
+/* ═══ LES TROIS GARANTIES, EN PIED ═══
+
+   En colonnes égales, chacune avec son icône. Elles répondent aux trois
+   objections qui restent une fois le prix accepté : et si je me trompe, et si
+   je dois donner ma carte, et si je veux partir.
+
+   Le filet au-dessus les sépare de l'offre : ce ne sont pas des arguments de
+   vente, ce sont des assurances. */
+.abo-conf{
+  display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;
+  margin-top:26px; padding-top:20px;
+  border-top:0.5px solid var(--separator);
+}
+.abo-conf .cf{ text-align:center; }
+.abo-conf .ic{
+  display:flex; align-items:center; justify-content:center;
+  width:26px; height:26px; margin:0 auto 8px;
+}
+.abo-conf .ic svg{ width:22px; height:22px; display:block; }
+/* ═══ LES TITRES TIENNENT SUR UNE LIGNE ═══
+
+   « Sans carte bancaire » et « Résiliable en un clic » passaient sur deux
+   lignes dans une colonne de 110 px, et les trois blocs se désalignaient.
+
+   Les titres sont raccourcis — « Sans carte », « Résiliable » — et le détail
+   descend dans la ligne du dessous, qui a la place. 11 px au lieu de 11,5
+   pour la marge de sécurité sur un écran de 320. */
+.abo-conf b{
+  display:block; font-size:11px; font-weight:700; letter-spacing:-0.015em;
+  line-height:1.3; white-space:nowrap;
+}
+.abo-conf span:not(.ic){
+  display:block; font-size:10.5px; color:var(--label-3); margin-top:3px;
+  line-height:1.35;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'OFFRE · LOGO, COCHES, LIGNE ANNUELLE, FLÈCHE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ LE LOGO, À DROITE, DÉBORDANT ═══
+
+   Il sort du cadre par la droite — `overflow:hidden` sur la carte le recoupe,
+   ce qui donne l'impression qu'il passe derrière. Sans ce débordement il
+   ressemble à une image collée ; avec, il fait partie de la matière.
+
+   `position:absolute` le sort du flux : le texte de la carte ne se décale pas
+   pour lui, il passe simplement dessous. */
+.offre-carte{ position:relative; overflow:hidden; }
+/* ═══ EN FILIGRANE, PAS EN PREMIER PLAN ═══
+
+   Mon premier essai le posait à 92 % d'opacité, sur 132 px : il traversait le
+   prix et la moitié des inclus. Un ornement qui rend le contenu illisible est
+   un défaut, pas un caractère.
+
+   28 % d'opacité, 108 px, et remonté vers le haut de la carte où il n'y a que
+   le nom de l'offre. On le devine, on ne le lit pas — c'est ce qu'on demande à
+   un filigrane. */
+/* ═══ LE LOGO, TEINTÉ EN AMBRE PAR FILTRE ═══
+
+   Le fichier `logo-standix.png` est blanc. Plutôt que d'ajouter une seconde
+   version ambre au dépôt — qu'il faudrait refaire à chaque retouche du logo —
+   on le recolore ici.
+
+   `sepia` puis `hue-rotate` : le blanc devient d'abord un beige, que la
+   rotation de teinte amène sur l'ambre. `saturate` pousse la couleur, et
+   `brightness` compense l'assombrissement que la saturation entraîne.
+
+   ⚠ L'ORDRE DES FILTRES COMPTE. Une rotation avant la sépia ne ferait rien :
+     le blanc n'a pas de teinte à tourner. */
+.offre-logo{
+  position:absolute; top:14px; right:-26px;
+  width:150px; height:150px; pointer-events:none;
+  opacity:0.30;
+  /* ⚠ PAS DE `filter` SUR LE PARENT. Un `drop-shadow` ici crée un nouveau
+     contexte de rendu qui empêche le masque de l'enfant de s'appliquer — le
+     logo ressortait gris. L'ombre est portée par l'enfant, où elle fonctionne. */
+}
+/* ═══ LA TEINTE PAR MASQUE, PAS PAR FILTRE ═══
+
+   `sepia` + `hue-rotate` donnait un vert olive : la chaîne de filtres part du
+   blanc, qui n'a pas de teinte, et le résultat dépend d'un enchaînement fragile
+   que j'ai mal réglé deux fois.
+
+   `mask-image` est exact : le PNG ne sert plus que de POCHOIR, et la couleur
+   vient d'un dégradé qu'on choisit. Le logo prend l'ambre exact de la marque,
+   sans calcul intermédiaire.
+
+   Le `img` devient un bloc vide masqué par lui-même — on ne voit que le
+   dégradé, découpé à la forme du logo. */
+.offre-logo img{
+  width:100%; height:100%; display:block;
+  background:linear-gradient(150deg,#FFC46B,#FF6A00);
+  -webkit-mask-image:url("../logo-standix.png");
+  mask-image:url("../logo-standix.png");
+  -webkit-mask-size:contain; mask-size:contain;
+  -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
+  -webkit-mask-position:center; mask-position:center;
+  filter:drop-shadow(0 6px 22px rgba(255,122,24,0.18));
+}
+.offre-logo svg{ width:100%; height:100%; display:block; }
+/* Le texte passe AU-DESSUS du logo, jamais dessous : un prix illisible parce
+   qu'un ornement le traverse serait le pire des échanges. */
+.offre-nom, .offre-prix, .offre-inclus,
+.offre-ruban, .offre-annuel-note, .offre-cta{ position:relative; z-index:2; }
+
+/* ═══ LES COCHES RONDES ═══
+
+   Une pastille ambre translucide avec sa coche pleine. Le caractère « ✓ » nu
+   se lisait comme du texte au milieu d'une phrase. */
+.offre-li i{ width:19px; height:19px; flex:0 0 19px; margin-top:1px; }
+.offre-li i svg{ width:100%; height:100%; display:block; }
+
+/* ═══ LA LIGNE ANNUELLE ═══
+
+   Une étiquette et une phrase, sur fond légèrement teinté. Elle annonce une
+   économie sans crier : à côté d'un bouton plein ambre, un second aplat de la
+   même couleur les affaiblirait tous les deux. */
+.offre-annuel-note{
+  display:flex; align-items:center; gap:9px;
+  margin-top:18px; padding:11px 13px; border-radius:13px;
+  background:rgba(255,159,10,0.07);
+  font-size:12.5px; color:var(--label-2); line-height:1.4;
+}
+.offre-annuel-note b{ color:#FFAD33; font-weight:750; }
+.offre-annuel-note .et{ display:flex; flex:0 0 17px; width:17px; height:17px; }
+.offre-annuel-note .et svg{ width:100%; height:100%; display:block; }
+
+/* La flèche du bouton : elle dit qu'on part quelque part. Sans elle, le bouton
+   annonce un état ; avec elle, il annonce un geste. */
+.offre-cta{ display:flex; align-items:center; justify-content:center; gap:9px; }
+.cta-fl{ width:17px; height:17px; flex:0 0 17px; }
+
+/* L'accroche s'aligne à gauche, sous le titre de page — centrée, elle flottait
+   sans point d'appui. */
+.abo-hi{ text-align:left; }
+
+/* « Voir les autres formules » ne prend plus toute la ligne : réduit et centré,
+   il cesse de concurrencer le bouton de l'offre. */
+.abo-autres{ width:auto; margin-left:auto; margin-right:auto; padding:13px 22px; }

@@ -947,10 +947,32 @@
       <h1 class="pagehead">Gérer l'équipe</h1>
     </div>
     <div class="subhead" id="pm-subhead">—</div>
-    <div class="filter-chips" id="pm-tri" style="margin-top:14px;">
-      <button type="button" data-tri="az" class="active">A → Z</button>
-      <button type="button" data-tri="neuf">Nouveau</button>
-      <button type="button" data-tri="vieux">Ancien</button>
+    <!-- ═══ LE MÊME FILTRE QUE SUR LES PROCÉDURES ═══
+
+         C'étaient trois pastilles côte à côte, une mécanique qu'on ne voyait
+         nulle part ailleurs. La page Procédures emploie un menu déroulant :
+         un seul geste à apprendre pour toute l'app.
+
+         Le bouton d'aide occupe la place laissée libre à droite. Il répond à
+         la question qu'on se pose en découvrant les deux icônes d'action —
+         une flèche et une poubelle, sans libellé. -->
+    <div class="pm-barre">
+      <div class="dd-filter" id="dd-pm-tri">
+        <button type="button" class="dd-trigger" id="dd-pm-tri-trigger">
+          <span id="dd-pm-tri-label">Trier : A → Z</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+        <div class="dd-menu" id="dd-pm-tri-menu">
+          <button type="button" class="selected" data-tri="az" data-label="Trier : A → Z">A → Z</button>
+          <button type="button" data-tri="neuf" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+          <button type="button" data-tri="vieux" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+        </div>
+      </div>
+      <button type="button" class="an-aide pm-aide-btn" data-aide-actions=""
+              aria-label="À quoi servent les boutons de chaque ligne">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
+      </button>
     </div>
     <div class="pm-recherche">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.2" y1="16.2" x2="20.6" y2="20.6"></line></svg>
@@ -1043,7 +1065,7 @@
          encore. À revoir dès qu'on saura ce que les gens choisissent. -->
       <!-- L'ORDRE DIT CE QU'ON RECOMMANDE.
 
-           « L'IA découpe la vidéo » passe en tête : c'est la raison d'être de
+           « L'IA transforme la vidéo » passe en tête : c'est la raison d'être de
            Standix, et c'est ce qu'on veut que le gérant essaie en premier. Les
            « Étapes manuelles » ferment la marche — c'est le recours, pas la
            promesse.
@@ -1054,19 +1076,25 @@
            premier écran, c'est un de trop. -->
       <div class="card mode-choice-card disabled" onclick="goToCreateMode('ai')" id="mode-card-ai">
         <div class="mode-choice-row">
-          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="11" y="6" width="27" height="20" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="5" y="12" width="27" height="20" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2"></rect><circle cx="18.5" cy="22" r="5.6" stroke="url(#iaFini)" stroke-width="2"></circle><path d="m16.6 19.4 4.4 2.6-4.4 2.6z" fill="url(#iaFini)"></path></svg></div>
+          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><rect x="11" y="6" width="27" height="20" rx="3.4" stroke="rgba(255,255,255,0.16)" stroke-width="2"></rect><rect x="5" y="12" width="27" height="20" rx="3.4" fill="rgba(255,255,255,0.05)" stroke="url(#iaDessin)" stroke-width="2"></rect><circle cx="18.5" cy="22" r="5.6" stroke="url(#iaDessin)" stroke-width="2"></circle><path d="m16.6 19.4 4.4 2.6-4.4 2.6z" fill="url(#iaDessin)"></path></svg></div>
           <div class="mode-choice-text">
-            <div class="mode-choice-title">L'IA découpe la vidéo</div>
-            <div class="mode-choice-desc">Filmez une fois, l'IA repère les étapes · 5 min maximum</div>
+            <!-- « L'IA découpe la vidéo » décrivait le MÉCANISME. Ce qu'on
+                 achète, c'est le résultat : une procédure. Le nouveau titre le
+                 dit, et la description se réduit à la seule contrainte. -->
+            <div class="mode-choice-title">L'IA transforme la vidéo en une procédure</div>
+            <div class="mode-choice-desc">Vidéo de 5 min maximum</div>
           </div>
           <div class="mode-choice-arrow">›</div>
         </div>
       </div>
       <div class="card mode-choice-card disabled" onclick="goToCreateMode('doc')" id="mode-card-doc">
         <div class="mode-choice-row">
-          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M17 4h10l7 7v15a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M10 10h10l7.5 7.5V33a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><path d="M20 10v7.5h7.5" stroke="url(#iaFini)" stroke-width="2" stroke-linejoin="round"></path><line x1="15" y1="24" x2="23" y2="24" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line><line x1="15" y1="29" x2="20" y2="29" stroke="url(#iaFini)" stroke-width="1.9" stroke-linecap="round"></line></svg></div>
+          <div class="mode-choice-icon"><svg viewBox="0 0 44 40" fill="none"><path d="M17 4h10l7 7v15a3 3 0 0 1-3 3h-1" stroke="rgba(255,255,255,0.16)" stroke-width="2" stroke-linejoin="round"></path><path d="M10 10h10l7.5 7.5V33a3 3 0 0 1-3 3H13a3 3 0 0 1-3-3Z" fill="rgba(255,255,255,0.05)" stroke="url(#iaDessin)" stroke-width="2" stroke-linejoin="round"></path><path d="M20 10v7.5h7.5" stroke="url(#iaDessin)" stroke-width="2" stroke-linejoin="round"></path><line x1="15" y1="24" x2="23" y2="24" stroke="url(#iaDessin)" stroke-width="1.9" stroke-linecap="round"></line><line x1="15" y1="29" x2="20" y2="29" stroke="url(#iaDessin)" stroke-width="1.9" stroke-linecap="round"></line></svg></div>
           <div class="mode-choice-text">
-            <div class="mode-choice-title">L'IA découpe un document</div>
+            <!-- « Découpe un document » disait le geste ; « rédige la procédure »
+                 dit le résultat, comme la carte du dessus. Les deux modes IA
+                 annoncent maintenant ce qu'on obtient, pas ce qui se passe. -->
+            <div class="mode-choice-title">L'IA rédige la procédure à partir d'un document</div>
             <div class="mode-choice-desc">Collez un texte, ou déposez un PDF ou un Word</div>
           </div>
           <div class="mode-choice-arrow">›</div>
@@ -1089,7 +1117,7 @@
        Séparé des trois cartes du dessus, et volontairement : ce n'est pas une
        quatrième façon de créer une procédure, c'est un OUTIL. On l'emploie
        avant de créer, quand le geste a été filmé en plusieurs fois — puis on
-       revient à « L'IA découpe la vidéo » avec un seul fichier.
+       revient à « L'IA transforme la vidéo » avec un seul fichier.
 
        Le trait au-dessus dit cette différence mieux qu'un titre.
        ═══════════════════════════════════════════════════════════════════════ -->
@@ -1106,12 +1134,14 @@
           <path d="M26.5 18.5 30 21.5l-3.5 3" stroke="rgba(255,255,255,0.42)"
                 stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
           <rect x="31" y="14" width="10" height="15" rx="2.6" fill="rgba(255,255,255,0.05)"
-                stroke="url(#iaFini)" stroke-width="2"/>
+                stroke="url(#iaDessin)" stroke-width="2"/>
         </svg>
       </div>
       <div class="mode-choice-text">
         <div class="mode-choice-title">Coller plusieurs vidéos</div>
-        <div class="mode-choice-desc">Un geste filmé en plusieurs fois · une seule vidéo à la fin</div>
+        <!-- « Un geste filmé en plusieurs fois » décrivait la situation ;
+             la nouvelle phrase décrit ce que l'outil FAIT. -->
+        <div class="mode-choice-desc">Plusieurs vidéos deviennent une seule</div>
       </div>
       <div class="mode-choice-arrow">›</div>
     </div>
@@ -1387,7 +1417,7 @@
       <button class="back-btn" onclick="showGestionScreen('p-create')">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">L’IA découpe un document</h1>
+      <h1 class="pagehead">L’IA rédige la procédure</h1>
     </div>
     <div class="subhead">L’IA en tirera des étapes, que vous relirez.</div>
 
@@ -1475,9 +1505,9 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <!-- Le titre reprend MOT POUR MOT le bouton qui mène ici. « Partez d'une
-           vidéo » ne disait pas la même chose que « L'IA découpe la vidéo » : on
+           vidéo » ne disait pas la même chose que le titre de la carte : on
            doutait d'être au bon endroit. -->
-      <h1 class="pagehead">L’IA découpe la vidéo</h1>
+      <h1 class="pagehead">L’IA transforme la vidéo</h1>
     </div>
     <div class="subhead">L’IA en tirera des étapes, que vous relirez.</div>
 
@@ -1533,7 +1563,7 @@
         <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFini)" stroke-width="1.6"></circle><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFini)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"></path></g></svg></div>
+      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFiniGrand)" stroke-width="1.6"></circle><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFiniGrand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"></path></g></svg></div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
       <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
       <button class="btn block" id="ai-view-btn">Voir la procédure</button>
@@ -1804,10 +1834,13 @@
 
              Le « ? » répond à celle-là. Deux icônes distinctes plutôt que deux
              ronds identiques : on doit pouvoir choisir sans les ouvrir. -->
-        <button type="button" class="an-aide" data-aide-duree=""
-                aria-label="À quoi correspondent les durées affichées">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
-        </button>
+        <!-- Le bouton « Ces durées, c'est quoi ? » a été retiré. Son texte
+             expliquait le temps affiché « sur un dossier » et « sur une
+             procédure » — les deux blocs supprimés de cette page lors de la
+             refonte. Il décrivait un écran qui n'existe plus.
+
+             Le bouton voisin reste : il explique QUAND le compteur tourne, ce
+             qui vaut toujours. -->
       </div>
     </div>
 
@@ -1831,10 +1864,10 @@
       <div class="an-tete">
         <span class="an-ic">
           <svg viewBox="0 0 26 24" fill="none">
-            <path d="M3 20.5h20" stroke="url(#logoOrIc)" stroke-opacity="0.4"
+            <path d="M3 20.5h20" stroke="url(#orLibre)" stroke-opacity="0.4"
                   stroke-width="1.5" stroke-linecap="round"></path>
             <path d="M3.5 16.2l5-5.4 4.2 3.4 5-6.2 4.8 4"
-                  stroke="url(#logoOrIc)" stroke-width="1.8"
+                  stroke="url(#orLibre)" stroke-width="1.8"
                   stroke-linecap="round" stroke-linejoin="round"></path>
           </svg>
         </span>
@@ -1864,7 +1897,7 @@
 
     <div class="an-bloc">
       <div class="an-tete">
-        <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="url(#logoOrIc)" stroke-opacity="0.42" stroke-width="1.5"></circle><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="url(#logoOrIc)" stroke-opacity="0.42" stroke-width="1.5" stroke-linecap="round"></path><circle cx="9.5" cy="7" r="4.2" stroke="url(#logoOrIc)" stroke-width="1.7"></circle><path d="M3 19.5a6.5 6.5 0 0 1 13 0" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path></svg></span>
+        <span class="an-ic"><svg viewBox="0 0 26 24" fill="none"><circle cx="18" cy="8" r="3.4" stroke="url(#orLibre)" stroke-opacity="0.42" stroke-width="1.5"></circle><path d="M12.6 19a5.4 5.4 0 0 1 10.8 0" stroke="url(#orLibre)" stroke-opacity="0.42" stroke-width="1.5" stroke-linecap="round"></path><circle cx="9.5" cy="7" r="4.2" stroke="url(#orLibre)" stroke-width="1.7"></circle><path d="M3 19.5a6.5 6.5 0 0 1 13 0" stroke="url(#orLibre)" stroke-width="1.7" stroke-linecap="round"></path></svg></span>
         <b>Équipe</b>
               </div>
       <div id="ga-top-membres"></div>
@@ -3021,8 +3054,60 @@
     <linearGradient id="acDegrade" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#FEC64A"/><stop offset="1" stop-color="#EB5201"/>
     </linearGradient>
+
+    <!-- ═══ LE DÉGRADÉ DE LA COURBE ═══
+
+         `logoOrIc` est déclaré en `userSpaceOnUse` sur 24 × 24 pixels : c'est
+         la taille d'une icône. Appliqué à une courbe de 320 px de large, tout
+         ce qui dépasse 24 px reçoit la couleur de fin — la ligne paraissait
+         d'un orange uniforme, sans rapport avec le logo.
+
+         Celui-ci est en coordonnées RELATIVES : il s'étire sur toute la largeur
+         du tracé, quel qu'il soit. La courbe part du clair à gauche et va vers
+         le sombre à droite, comme le logo de haut en bas. -->
+    <!-- Un dégradé RELATIF, pour tout ce qui dépasse 24 px : une pastille dans
+         un grand dessin, un cercle, une forme libre. `logoOrIc` reste réservé
+         aux icônes de 24 px pour lesquelles il a été calibré. -->
+    <linearGradient id="orLibre" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FEC64A"/><stop offset="1" stop-color="#EB5201"/>
+    </linearGradient>
+
+    <linearGradient id="cbTrait" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FEC64A"/>
+      <stop offset="0.55" stop-color="#FDA81E"/>
+      <stop offset="1" stop-color="#EB5201"/>
+    </linearGradient>
     <linearGradient id="iaFini" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
       <stop stop-color="#FFFFFF"></stop><stop offset="0.55" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#FEC64A"></stop>
+    </linearGradient>
+
+    <!-- ═══ LES DESSINS DES TROIS FAÇONS DE CRÉER ═══
+
+         Ils employaient `iaFini`, qui a deux défauts pour eux :
+
+         ① IL EST SURTOUT BLANC — 55 % de sa course avant que l'ambre commence.
+            Sur une coche de 24 px c'est voulu : le blanc dit « terminé »,
+            l'ambre signe. Sur un dessin de 44 px, on ne voit qu'un trait blanc.
+
+         ② IL EST CALIBRÉ SUR 24 PIXELS. Les dessins font 44 × 40 : au-delà de
+            24, tout reçoit la couleur de fin.
+
+         Celui-ci est RELATIF et parcourt toute la palette du logo. Il ne
+         remplace pas `iaFini`, qui reste juste pour les coches. -->
+    <!-- La coche de fin d'analyse fait 52 × 48 : `iaFini`, calibré sur 24, y
+         donnait un trait uniforme. Celui-ci garde le blanc — qui dit « c'est
+         terminé » — mais en coordonnées relatives, et il finit sur l'ambre du
+         logo plutôt que d'y arriver hors cadre. -->
+    <linearGradient id="iaFiniGrand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"></stop>
+      <stop offset="0.5" stop-color="#FFFFFF"></stop>
+      <stop offset="1" stop-color="#FEC64A"></stop>
+    </linearGradient>
+
+    <linearGradient id="iaDessin" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FEC64A"></stop>
+      <stop offset="0.55" stop-color="#FDA81E"></stop>
+      <stop offset="1" stop-color="#EB5201"></stop>
     </linearGradient>
   </defs>
 </svg>

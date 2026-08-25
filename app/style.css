@@ -627,7 +627,7 @@
   /* ═══ Entreprises de l'utilisateur ═══ */
   .ent-ligne{
     display:flex; align-items:center; gap:12px; padding:14px 15px; margin-bottom:8px;
-    background:var(--bg-card); border-radius:14px; border:0.5px solid var(--border);
+    background:var(--bg-card); border-radius:14px;
     transition:background 0.2s;
   }
   .ent-ligne:not(.actuelle){ cursor:pointer; }
@@ -1224,7 +1224,7 @@
   /* ═══ Les appareils ═══ */
   .app-ligne{
     display:flex; align-items:center; gap:12px; padding:12px;
-    border-radius:15px; border:0.5px solid var(--border); background:var(--bg-card);
+    border-radius:15px; background:var(--bg-card);
     margin-bottom:8px;
   }
   .app-ligne.moi{ border-color:rgba(255,179,64,0.45); background:rgba(255,179,64,0.08); }
@@ -1296,7 +1296,7 @@
      même objet, et l'œil n'a qu'une grammaire à apprendre. */
   .an-bloc{
     background:var(--bg-card);
-    border-radius:20px; border:0.5px solid var(--border); padding:15px 15px 11px; margin-bottom:14px;
+    border-radius:20px; padding:15px 15px 11px; margin-bottom:14px;
   }
   /* Dans une carte, la tête de section n'a plus besoin de filet ni de grande
      marge : c'est la carte qui sépare désormais. */
@@ -3097,7 +3097,7 @@
   /* La fiche du haut : qui vous êtes. */
   .reg-identite{
     display:flex; align-items:center; gap:14px; width:100%; margin-top:14px;
-    padding:15px 15px; border-radius:22px; border:0.5px solid var(--border);
+    padding:15px 15px; border-radius:22px;
     background:var(--bg-card);
     font-family:inherit; text-align:left; color:#fff;
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
@@ -3134,7 +3134,7 @@
 
   /* Le groupe : une carte qui tient plusieurs lignes. */
   .reg-groupe{
-    border-radius:20px; border:0.5px solid var(--border); overflow:hidden;
+    border-radius:20px; overflow:hidden;
     background:var(--bg-card);
   }
   .reg-ligne{
@@ -3194,7 +3194,7 @@
   /* La liste des établissements adopte la même carte groupée. */
   .etab-ligne{
     display:flex; align-items:center; gap:12px; width:100%; padding:11px 13px;
-    border-radius:16px; border:0.5px solid var(--border); background:var(--bg-card);
+    border-radius:16px; background:var(--bg-card);
     margin-bottom:8px; font-family:inherit; text-align:left; color:#fff;
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
@@ -3868,7 +3868,7 @@
 
   .pm-ligne{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
-    background:var(--bg-card); border-radius:14px; border:0.5px solid var(--border);
+    background:var(--bg-card); border-radius:14px;
   }
   /* ═══ DEUX COULEURS, DEUX RÔLES ═══
 
@@ -3970,7 +3970,7 @@
   .ga-trio{ display:flex; gap:9px; }
   .ga-tuile{
     flex:1; display:flex; flex-direction:column; align-items:center;
-    padding:15px 6px 13px; background:var(--bg-card); border-radius:18px; border:0.5px solid var(--border);
+    padding:15px 6px 13px; background:var(--bg-card); border-radius:18px;
   }
   .ga-anneau{ position:relative; width:58px; height:58px; }
   .ga-anneau svg{ transform:rotate(-90deg); display:block; }
@@ -4000,7 +4000,7 @@
   @media (prefers-reduced-motion: reduce){ .ga-anneau .valeur{ animation:none; } }
 
   .hero-card{ position:relative; background:var(--hero-gradient);
-    border-radius:20px; border:0.5px solid var(--border); padding:20px 18px; margin-bottom:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
+    border-radius:20px; padding:20px 18px; margin-bottom:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
   .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.55); font-weight:500; margin-bottom:10px; }
   .hero-card .num{ font-size:44px; font-weight:700; color:#fff; letter-spacing:-1.2px; }
   .hero-card .sub{ font-size:13px; color:rgba(255,255,255,0.55); margin-top:4px; font-weight:500; }
@@ -4462,7 +4462,7 @@
 
   .cat-rank{
     display:flex; align-items:center; gap:12px; padding:12px 14px; margin-bottom:8px;
-    background:var(--bg-card); border-radius:14px; border:0.5px solid var(--border);
+    background:var(--bg-card); border-radius:14px;
   }
   .cat-rank .pos{
     width:22px; height:22px; border-radius:50%; flex-shrink:0;
@@ -4482,7 +4482,7 @@
   .cat-rank .taux{ font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; flex-shrink:0; }
 
   .stats-row{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:6px; }
-  .stat-mini{ background:var(--bg-card); border-radius:14px; border:0.5px solid var(--border); padding:12px 8px; text-align:center; }
+  .stat-mini{ background:var(--bg-card); border-radius:14px; padding:12px 8px; text-align:center; }
   .stat-mini .num{ font-size:20px; font-weight:700; }
   .stat-mini .lbl{ font-size:10.5px; color:var(--label-2); margin-top:2px; }
 
@@ -4552,7 +4552,7 @@
   .qr-hint{ font-size:12px; color:var(--label-2); margin-bottom:12px; line-height:1.4; }
 
   .plan-card{
-    background:var(--bg-card); border-radius:16px; border:0.5px solid var(--border); padding:14px 16px; margin-bottom:8px;
+    background:var(--bg-card); border-radius:16px; padding:14px 16px; margin-bottom:8px;
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
   }
   .plan-card.active{ border-color:rgba(255,255,255,0.5); }
@@ -8242,13 +8242,7 @@ body:has(#e-detail.active) #equipe-app{
    pourtour. Un `border` ne sait pas faire de dégradé.
 
    La MATIÈRE ne bouge pas : même fond, même rayon, même absence d'ombre. */
-.ac-tuile::before{
-  content:''; position:absolute; inset:0; border-radius:inherit;
-  pointer-events:none; z-index:0;
-  background:
-    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.028), transparent 72%),
-    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.016), transparent 72%);
-}
+/* Les lueurs des tuiles sont passées en `::after`, avec les douze cartes. */
 /* Le contenu passe au-dessus du liseré. */
 .ac-tuile > *{ position:relative; z-index:2; }
 /* 13 px / 600, comme `.section-title` — le titre d'un groupe dans cette app. */
@@ -9185,9 +9179,39 @@ body:has(#e-detail.active) #equipe-app{
 
         À 2,8 %, 1,6 % et 10 %, le modelé se devine sans se voir. C'est ce qu'on
         demande à un modelé : qu'il donne du volume, pas qu'il fasse un motif. */
+/* ═══ LE LISERÉ D'« ÉCRIVEZ-NOUS », EN BLANC ET PLUS FIN ═══
+
+   Son dégradé est à 45° avec les COINS VIFS et les côtés presque éteints —
+   100 % aux extrémités, 5 % au milieu. C'est ce contraste qui donne la lumière
+   rasante, qu'un trait uniforme ne reproduit pas.
+
+   Deux différences avec l'original :
+     · il est BLANC, pas ambre — la couleur reste au produit ;
+     · il fait 0,5 px au lieu de 1 — « plus fin », comme demandé.
+
+   Le liseré est découpé par deux masques : l'un couvre tout, l'autre évide
+   l'intérieur, et `xor` ne garde que le pourtour. Un `border` ne sait pas
+   porter de dégradé. */
 .an-bloc::before, .reg-groupe::before, .reg-identite::before, .ga-tuile::before,
 .stat-mini::before, .cat-rank::before, .pm-ligne::before, .app-ligne::before,
-.ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before{
+.ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before,
+.ac-tuile::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:0.5px; pointer-events:none; z-index:0;
+  background:linear-gradient(45deg,
+    rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.15) 12%,
+    rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.03) 70%,
+    rgba(255,255,255,0.15) 88%, rgba(255,255,255,0.34) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+
+/* Les lueurs de coin passent en `::after` : `::before` porte le liseré. */
+.an-bloc::after, .reg-groupe::after, .reg-identite::after, .ga-tuile::after,
+.stat-mini::after, .cat-rank::after, .pm-ligne::after, .app-ligne::after,
+.ent-ligne::after, .etab-ligne::after, .plan-card::after, .hero-card::after,
+.ac-tuile::after{
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none; z-index:0;
   background:

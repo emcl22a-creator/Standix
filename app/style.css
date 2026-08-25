@@ -2908,42 +2908,50 @@
 
      Mon liseré en dégradé était plus voyant mais moins juste : il faisait de la
      carte un objet cerclé au milieu d'une app où rien d'autre ne l'est. */
+  /* ═══ LE CADRE D'« ÉCRIVEZ-NOUS », AVEC UN CONTOUR AMBRE ═══
+
+     Cette carte-là porte un `border:0.5px` en blanc translucide — je l'avais
+     manqué en ne regardant que `.contact-carte`, alors qu'il vient de
+     `.accueil`, la classe posée à côté.
+
+     Même finesse ici, mais en ambre : 0,5 px à 30 % d'opacité. C'est assez
+     pour dessiner le bord sans faire de la carte un objet cerclé — le trait
+     se devine, il ne s'affiche pas.
+
+     La lueur portée reste : c'est elle qui donne le volume, le trait ne fait
+     que préciser le contour. */
+  /* ═══ LE CONTOUR EXACT D'« ÉCRIVEZ-NOUS » ═══
+
+     Ce n'est pas un `border` uniforme : c'est `.an-gain-lueur::after`, un
+     liseré en dégradé à 45° dont les COINS sont vifs et les côtés presque
+     éteints — 100 % d'ambre aux extrémités, 5 % au milieu.
+
+     C'est ce contraste qui donne l'impression d'une lumière rasante frappant
+     deux angles opposés. Un trait uniforme, même ambre, ne le reproduit pas :
+     j'ai essayé, il fait un cadre là où il faut un reflet.
+
+     Le liseré est découpé par deux masques superposés : l'un couvre tout,
+     l'autre évide l'intérieur, et `xor` ne laisse que le pourtour. */
   .offre-carte.vedette{
     position:relative; overflow:hidden;
     border:none; border-radius:22px;
     background:linear-gradient(150deg,#17171B 0%,#101014 40%,#0A0A0D 75%,#060608 100%);
     box-shadow:0 14px 34px rgba(0,0,0,0.42), 0 0 30px -14px rgba(255,122,24,0.26);
   }
+  .offre-carte.vedette::before{
+    content:''; position:absolute; inset:0; border-radius:inherit;
+    padding:1px; pointer-events:none; z-index:1;
+    background:linear-gradient(45deg,
+      #FFB454 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
+      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FFB454 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
+  }
   /* Le liseré en dégradé a été retiré : « Écrivez-nous » n'en a pas, et c'est
      le modèle. Deux techniques de bord dans la même app en font une de trop. */
   .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
-
-  /* ═══ LE RUBAN RENTRE DANS LA CARTE ═══
-
-     `position:absolute; top:-9px` le posait à cheval sur le bord — une pastille
-     coupée en deux par un liseré, qui salissait le coin le plus visible de la
-     page.
-
-     Il est maintenant DANS le flux, en tête de carte, aligné à gauche comme le
-     nom qu'il qualifie. Le fond passe d'un dégradé plein à un ambre translucide :
-     à l'intérieur d'une carte sombre, un aplat orange vif pesait plus que le
-     prix qu'il surmonte. */
-  /* ═══ TROIS GRAISSES RAMENÉES DANS LA FAMILLE ═══
-
-     L'app n'emploie que 600 et 700. Le bloc de l'abonnement avait accumulé
-     650, 750 et 800 — des valeurs intermédiaires qui n'existent nulle part
-     ailleurs et qui donnent à cette page une main différente.
-
-     Le ruban passe de 800 à 700, le nom et le bouton de 750 à 700, l'unité du
-     prix de 650 à 600. Aucune n'était voulue : elles se sont ajoutées au fil
-     des retouches. */
-  .offre-ruban{
-    display:inline-block; margin-bottom:13px;
-    padding:4px 11px; border-radius:100px;
-    background:rgba(255,159,10,0.16);
-    font-size:9.5px; font-weight:700; letter-spacing:0.09em;
-    text-transform:uppercase; color:#FFAD33;
-  }
+  /* `.offre-ruban` a ete retiree avec le ruban lui-meme. */
   .offre-nom{
     display:block; font-size:18px; font-weight:700; letter-spacing:-0.03em;
   }
@@ -8545,9 +8553,16 @@ body:has(#e-detail.active) #equipe-app{
    Cinq éléments, un seul niveau de lecture.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══ LE NOM DE L'OFFRE, EN BLANC ET PLUS GRAND ═══
+
+   Il faisait 13 px en gris — plus discret que les lignes d'inclus qu'il
+   surmonte. C'est le nom de ce qu'on achète : il doit se lire avant elles.
+
+   20 px en blanc, graisse 700 comme le prix. Il forme désormais un bloc avec
+   lui : nom, puis montant, dans la même main. */
 .offre-nom{
-  font-size:13px; font-weight:600; color:var(--label-2);
-  letter-spacing:-0.01em; margin-bottom:9px;
+  display:block; font-size:20px; font-weight:700; color:var(--label-1);
+  letter-spacing:-0.03em; margin-bottom:6px;
 }
 
 /* ═══ LE PRIX EST L'OBJET DE LA CARTE ═══
@@ -8798,7 +8813,7 @@ body:has(#e-detail.active) #equipe-app{
 /* Le texte passe AU-DESSUS du logo, jamais dessous : un prix illisible parce
    qu'un ornement le traverse serait le pire des échanges. */
 .offre-nom, .offre-prix, .offre-inclus,
-.offre-ruban, .offre-annuel-note, .offre-cta{ position:relative; z-index:2; }
+.offre-annuel-note, .offre-cta{ position:relative; z-index:2; }
 
 /* ═══ LES COCHES RONDES ═══
 
@@ -8841,7 +8856,6 @@ body:has(#e-detail.active) #equipe-app{
 /* La flèche du bouton : elle dit qu'on part quelque part. Sans elle, le bouton
    annonce un état ; avec elle, il annonce un geste. */
 .offre-cta{ display:flex; align-items:center; justify-content:center; gap:9px; }
-.cta-fl{ width:17px; height:17px; flex:0 0 17px; }
 
 /* L'accroche s'aligne à gauche, sous le titre de page — centrée, elle flottait
    sans point d'appui. */

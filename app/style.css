@@ -8225,10 +8225,8 @@ body:has(#e-detail.active) #equipe-app{
   padding:15px 14px 16px;
   margin-bottom:0;
   display:flex; flex-direction:column;
-  border:none; border-radius:20px;
-  /* La même matière que les douze cartes : fond en dégradé, lueurs de coin,
-     double ombre portée. Aucun liseré — c'est le modelé qui fait le bord. */
-  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+  border:none;
+  /* Le fond vient toujours de `.an-bloc`. Seules les deux ombres s'ajoutent. */
   box-shadow:0 14px 34px rgba(0,0,0,0.42),
              0 0 30px -14px rgba(255,255,255,0.20);
 }
@@ -9167,10 +9165,13 @@ body:has(#e-detail.active) #equipe-app{
 .pm-ligne, .app-ligne, .ent-ligne, .etab-ligne, .plan-card, .hero-card{
   position:relative; overflow:hidden;
   border:none;
-  /* ① Le fond en dégradé : la lumière vient du haut-gauche. */
-  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
-  /* ③ Deux ombres portées. La seconde est blanche à très faible opacité :
-        c'est elle qui remplace la lueur ambre d'« Écrivez-nous ». */
+  /* ⚠ LE FOND N'EST PAS TOUCHÉ. J'avais remplacé l'aplat par le dégradé
+     d'« Écrivez-nous » : ce n'était pas demandé, et cela changeait l'intérieur
+     de toutes les cartes.
+
+     Chacune garde le sien — `--bg-card` pour les unes, leur propre teinte pour
+     les autres. Seul le MODELÉ s'ajoute : les lueurs de coin ci-dessous, et
+     les deux ombres portées ici. */
   box-shadow:0 14px 34px rgba(0,0,0,0.42),
              0 0 30px -14px rgba(255,255,255,0.20);
 }

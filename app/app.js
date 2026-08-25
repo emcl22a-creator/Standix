@@ -6489,7 +6489,9 @@ function peindreTuilesAccueil() {
      pas de chiffre du tout. */
   const dansFenetre = tout ? vals
     : vals.filter(v => new Date(v.validated_at) >= debutMois)
-  const secondes = dansFenetre.reduce((t, v) => t + Number(v.duree_lecture || 0), 0)
+  /* Le total en secondes servait à la tuile « Temps de formation », retirée :
+     elle disait la même chose que « Membres actifs » sous une autre forme.
+     `dansFenetre` reste utilisé plus bas pour compter les lecteurs. */
 
   /* ─── ③ LE TAUX DE LECTURE ────────────────────────────────────────────────
 
@@ -6530,11 +6532,17 @@ function peindreTuilesAccueil() {
     note: tout ? 'depuis le début' : 'ce mois-ci',
   }))
 
-  grille.appendChild(tuileAccueil({
-    titre: 'Temps de formation', icone: 'horloge',
-    valeur: dureeLisible(secondes) || '0 min',
-    note: 'tous les membres',
-  }))
+  /* ═══ L'ANNEAU EN DEUXIÈME POSITION ═══
+
+     Il était en quatrième, derrière « Temps de formation ». Ce temps disait la
+     même chose que « Membres actifs » sous une autre forme — l'un compte des
+     minutes, l'autre des personnes, mais les deux répondent à « est-ce que
+     l'équipe se forme ».
+
+     L'anneau, lui, dit tout autre chose : ce qu'il reste du forfait. Une seule
+     tuile sur trois parle d'abonnement, elle mérite le deuxième regard plutôt
+     que le dernier. */
+  grille.appendChild(tuileQuota(utilisees, quota))
 
   grille.appendChild(tuileAccueil({
     /* ═══ « MEMBRES ACTIFS », ET UN NOMBRE SIMPLE ═══
@@ -6561,8 +6569,6 @@ function peindreTuilesAccueil() {
        d'un chiffre correct un reproche. */
     tendance: aLire.length && lecteurs === aLire.length ? 1 : null,
   }))
-
-  grille.appendChild(tuileQuota(utilisees, quota))
 
   peindreRecentesAccueil()
 }
@@ -6796,7 +6802,9 @@ function tuileQuota(utilisees, quota) {
   }
 
   const pct = Math.max(0, Math.min(100, Math.round((utilisees / quota) * 100)))
-  const T = 76, ep = 8, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  /* 132 px, avec un trait de 12 : l'épaisseur suit le diamètre, sinon un grand
+     cercle tracé fin paraît fragile. */
+  const T = 132, ep = 12, r = (T - ep) / 2, circ = 2 * Math.PI * r
   const rempli = circ * (pct / 100)
 
   el.innerHTML = `
@@ -16152,23 +16160,6 @@ async function chargerMesEntreprises() {
 const AV_O = 'rgba(255,255,255,0.78)'
 const LG_O = 'rgba(255,255,255,0.32)'
 
-/* Un pictogramme par avantage phare, dans la langue des icônes de création. */
-const PICTOS = {
-  /* Pas un dessin : les deux lettres, avec le dégradé de l'anneau. C'est la
-     même marque que sur les boutons — l'œil la reconnaît d'un écran à l'autre.
-     Un œil stylisé aurait dit « regarder » ; « AI » dit ce que c'est. */
-  marqueAI: `<span class="ia-mot" style="font-size:14px;">AI</span>`,
-  video: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="5.4" width="18.8" height="13.2" rx="3" stroke="${AV_O}" stroke-width="1.7"/><path d="M10 9.6 15.4 12 10 14.4Z" fill="${AV_O}"/></svg>`,
-  monde: `<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="${AV_O}" stroke-width="1.7"/><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="${LG_O}" stroke-width="1.6"/><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-  infini: `<svg viewBox="0 0 24 24" fill="none"><path d="M6.6 8.6a3.4 3.4 0 1 0 0 6.8c2.5 0 3.3-2.4 5.4-3.4s2.9-3.4 5.4-3.4a3.4 3.4 0 1 1 0 6.8c-2.5 0-3.3-2.4-5.4-3.4S9.1 8.6 6.6 8.6Z" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  suivi: `<svg viewBox="0 0 24 24" fill="none"><line x1="5.4" y1="19.4" x2="5.4" y2="12.6" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="19.4" x2="12" y2="7.6" stroke="${AV_O}" stroke-width="2" stroke-linecap="round"/><line x1="18.6" y1="19.4" x2="18.6" y2="10.4" stroke="${LG_O}" stroke-width="2" stroke-linecap="round"/></svg>`,
-  sites: `<svg viewBox="0 0 24 24" fill="none"><rect x="2.6" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="15" y="10.4" width="6.4" height="10.2" rx="2" stroke="${LG_O}" stroke-width="1.6"/><rect x="8.4" y="4.2" width="7.2" height="16.4" rx="2.2" stroke="${AV_O}" stroke-width="1.7"/></svg>`,
-  main: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4v9.2M8.4 7l3.6-3.6L15.6 7" stroke="${AV_O}" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4.6 14.4v3.4a2.6 2.6 0 0 0 2.6 2.6h9.6a2.6 2.6 0 0 0 2.6-2.6v-3.4" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-  /* LA FICHE DE PROCÉDURE. Le même tracé que les cartes de l'app — feuille au
-     coin corné, deux lignes de texte. « Trois façons de créer une procédure »
-     portait une flèche d'envoi, qui parlait d'import et non de procédure. */
-  fiche: `<svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="${AV_O}" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="${AV_O}" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="${LG_O}" stroke-width="1.6" stroke-linecap="round"/></svg>`,
-}
 
 /* Les paliers suivent le NOMBRE DE MEMBRES. Chaque offre annonce deux ou trois
    avantages PHARES, détaillés — ce qu'on y gagne, en une phrase — puis le reste
@@ -16188,38 +16179,12 @@ const PICTOS = {
    quand on n'en regarde qu'une. */
 let rythmeChoisi = 'annuel'
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   CE QU'ON ACHÈTE · QUATRE LIGNES
+/* `AVANTAGES`, `PICTOS` et `AUSSI` ont été retirés avec l'ancienne carte : la
+   nouvelle liste ses inclus directement, en lignes à coche, sans pictogramme.
+   Trois tableaux de données pour un affichage qui n'existe plus, c'était du
+   poids mort au milieu du fichier. */
 
-   Il y en avait six, toutes de même poids. Une liste où tout est important est
-   une liste où rien ne l'est : on la parcourt et on n'en retient aucune ligne.
 
-   ─── DEUX ONT ÉTÉ RETIRÉES ───
-
-   « Trois façons de créer une procédure » décrit un MENU, pas un bénéfice. On
-   n'achète pas un choix de méthodes, on achète le résultat — et le résultat est
-   déjà dit par la première ligne.
-
-   « Plusieurs établissements » ne concerne presque personne : une PME de cinq à
-   trente personnes en a un seul. L'annoncer en quatrième position, c'est donner
-   à la ligne la moins utile la place d'une des plus utiles.
-
-   ─── LA VEDETTE GARDE SA PHRASE, LES AUTRES NON ───
-
-   Trois titres nus se lisent d'un regard. Trois titres suivis chacun d'une
-   phrase deviennent un paragraphe qu'on saute — c'était le cas.
-   ═══════════════════════════════════════════════════════════════════════════ */
-const AVANTAGES = [
-  { p: 'marqueAI', vedette: true, t: 'L\'IA \u00e9crit vos proc\u00e9dures',
-    s: 'Filmez le geste. Les \u00e9tapes sont r\u00e9dig\u00e9es et horodat\u00e9es.' },
-  { p: 'infini', t: 'Proc\u00e9dures illimit\u00e9es' },
-  { p: 'monde', t: 'Chacun lit dans sa langue' },
-  { p: 'suivi', t: 'Vous savez qui a lu quoi' },
-]
-
-/* « Étapes écrites et photos » redit la première ligne ; il ne reste que le QR
-   code, qui est une chose concrète qu'aucune autre ligne ne dit. */
-const AUSSI = 'QR code \u00e0 afficher au poste.'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LES PALIERS SUIVENT LE NOMBRE DE MEMBRES
@@ -16314,48 +16279,73 @@ function prixParMembre(o, n) {
   return (o.prix / n).toFixed(2).replace('.', ',')
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'UNE OFFRE
+
+   Refondue sur le modèle que tu m'as montré. Cinq changements de fond :
+
+   ① LE NOM PASSE AVANT, EN PETIT. « Équipe » n'est pas un argument, c'est une
+      étiquette. Il annonce, il ne vend pas.
+
+   ② LE PRIX EST ÉNORME. 46 px, seul sur sa ligne, avec son unité en petit à
+      côté. C'est le premier chiffre qu'on cherche ; le cacher en haut à droite
+      obligeait à le chasser du regard.
+
+   ③ TOUT DEVIENT UNE LIGNE À COCHE. Membres, analyses, langues, procédures :
+      la même forme pour tout ce qui est inclus. Les pictogrammes et les cadres
+      créaient trois niveaux de lecture là où il n'en faut qu'un.
+
+   ④ LE GRAS PORTE LE CHIFFRE, PAS LA PHRASE. « Jusqu'à **5 membres** » plutôt
+      que « **Jusqu'à 5 membres** » : l'œil accroche ce qui varie d'une offre à
+      l'autre, et saute le reste.
+
+   ⑤ L'ANNUEL DEVIENT UNE LIGNE DE TEXTE. Deux gros boutons radio pour un choix
+      qu'on fait une fois occupaient un quart de la carte.
+   ═══════════════════════════════════════════════════════════════════════════ */
 function carteOffre(o, opts = {}) {
   const n = opts.membres || 0
-  const p = o.prix === null ? 'Sur devis' : o.prix + '\u20ac'
-  const u = o.prix === null ? '' : 'par mois'
   const pm = opts.detaille ? prixParMembre(o, n) : null
+  const surDevis = o.prix === null
+
+  /* Les inclus, dans l'ordre de ce qu'on compare : d'abord ce qui change d'une
+     offre à l'autre, ensuite ce qui est commun à toutes. */
+  const inclus = [
+    o.max === Infinity ? 'Membres <b>illimités</b>' : `Jusqu'à <b>${o.max} membres</b>`,
+    o.analyses ? `<b>${o.analyses} analyses vidéo IA</b> par mois` : null,
+    'Procédures <b>illimitées</b>',
+    /* « Chacun lit dans sa langue » promettait toutes les langues. Nommer les
+       trois est plus honnête, et plus vendeur dans le tri-frontière bâlois où
+       les trois cohabitent dans la même équipe. */
+    'En <b>français, anglais et allemand</b>',
+    '<b>Toutes</b> les fonctionnalités',
+  ].filter(Boolean)
 
   return `<div class="offre-carte${opts.classe || ''}">
     ${opts.ruban ? `<span class="offre-ruban">${opts.ruban}</span>` : ''}
-    <div class="offre-tete">
-      <span class="offre-txt">
-        <span class="offre-nom">${o.nom}</span>
-        <!-- « Jusqu'à 15 membres · 60 analyses vidéo IA par mois » passait sur
-             trois lignes et repoussait le prix. Le point médian les met sur une
-             seule, et « /mois » suffit là où « par mois » débordait. -->
-        <span class="offre-taille">${o.max === Infinity ? 'Membres illimit\u00e9s' : `${o.max} membres`}${
-          o.analyses ? ` \u00b7 ${o.analyses} analyses IA/mois` : ''}</span>
-      </span>
-      <span class="offre-prix"><span class="v">${p}</span><span class="u">${u}</span></span>
+
+    <div class="offre-nom">${o.nom}</div>
+
+    <div class="offre-prix">
+      ${surDevis ? `<span class="v">Sur devis</span>`
+        : `<span class="v">${o.prix} €</span><span class="u">par mois, hors taxes</span>`}
     </div>
-    ${pm ? `<div class="offre-parmembre">soit <b>${pm} \u20ac</b> par personne, pour vos ${n} membres</div>` : ''}
-    ${opts.detaille ? `
-    <div class="offre-phares">
-      ${AVANTAGES.map(f => `<div class="offre-phare${f.vedette ? ' vedette' : ''}">
-        <span class="p">${PICTOS[f.p]}</span>
-        <!-- Seule la vedette porte une phrase : c'est l'argument qui décide, les
-             trois autres se lisent au titre. -->
-        <span><span class="t">${f.t}</span>${f.s ? `<span class="d">${f.s}</span>` : ''}</span>
-      </div>`).join('')}
+    ${pm && !surDevis ? `<div class="offre-parmembre">Soit <b>${pm} €</b> par personne et par mois.</div>` : ''}
+
+    <div class="offre-inclus">
+      ${inclus.map(t => `<div class="offre-li"><i>✓</i><span>${t}</span></div>`).join('')}
     </div>
-    <div class="offre-aussi">${AUSSI}</div>`
-    : `<div class="offre-aussi">${o.devis || 'Les m\u00eames fonctionnalit\u00e9s, sans exception.'}</div>`}
-    ${opts.cta && o.prix !== null && !opts.enCours ? `
-    <div class="offre-rythme">
-      <button type="button" class="rlg${rythmeChoisi === 'mensuel' ? ' on' : ''}" data-rythme="mensuel">
-        <span class="rd"><i></i></span>
-        <span class="tx"><b>${o.prix} \u20ac / mois</b><span>Sans engagement</span></span>
-      </button>
-      <button type="button" class="rlg${rythmeChoisi === 'annuel' ? ' on' : ''}" data-rythme="annuel">
-        <span class="rd"><i></i></span>
-        <span class="tx"><b>${Math.round(o.prix * 0.8)} \u20ac / mois</b><span>${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an</span></span>
-      </button>
-    </div>` : ''}
+
+    ${opts.cta && !surDevis && !opts.enCours ? `
+    <!-- L'annuel en une ligne, cliquable. Deux boutons radio pour un choix
+         qu'on fait une seule fois prenaient un quart de la carte. -->
+    <button type="button" class="offre-annuel${rythmeChoisi === 'annuel' ? ' on' : ''}"
+            data-rythme="${rythmeChoisi === 'annuel' ? 'mensuel' : 'annuel'}">
+      ${rythmeChoisi === 'annuel'
+        ? `<b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année · revenir au mensuel`
+        : `ou <b>${Math.round(o.prix * 0.8)} € par mois</b> en payant à l’année`}
+    </button>` : ''}
+    ${surDevis ? `<div class="offre-annuel-fixe">${o.devis || 'Les mêmes fonctionnalités, sans exception.'}</div>` : ''}
+
     ${opts.cta ? `<button type="button" class="offre-cta${opts.enCours ? ' encours' : ''}"
       ${opts.enCours ? 'disabled' : ''} data-offre="${o.cle}">${
       /* L'offre déjà payée ne propose pas de la repayer : le bouton dit ce

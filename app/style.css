@@ -4,7 +4,15 @@
      Les règles de la frise vidéo (classes) restent prioritaires sur ce `*`. */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
   :root{
-    --bg:#0C0D0E; --bg-card: rgba(255,255,255,0.06);
+    --bg:#050506;
+  /* ═══ PLUS PROCHE DU NOIR PUR ═══
+
+     #0C0D0E laissait un gris perceptible sur les écrans OLED : les cartes,
+     déjà sombres, ne s'en détachaient plus.
+
+     #050506 n'est pas le noir absolu — #000 supprimerait toute profondeur et
+     ferait paraître les cartes posées sur du vide. Un demi-ton suffit à garder
+     la hiérarchie tout en assombrissant l'ensemble. */ --bg-card: rgba(255,255,255,0.06);
     --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
     --hero-gradient: linear-gradient(150deg, #2C2C34 0%, #1E1E24 40%, #141418 75%, #0C0C10 100%);
     --green:#30D158; --red:#FF453A; --orange:#FF9F0A;
@@ -12,7 +20,7 @@
     --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
   }
   html, body{
-    background:#0C0D0E;     font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
+    background:var(--bg);     font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
     color:var(--label); font-size:17px; line-height:1.32; letter-spacing:-0.02em;
     -webkit-font-smoothing:antialiased; min-height:100dvh; overflow-x:hidden; position:relative;
     -webkit-text-size-adjust:100%; text-size-adjust:100%;
@@ -287,7 +295,7 @@
      même rang, et l'œil ne sait plus lequel est LE geste. */
   .alerte-essai .principal{
     flex:1; height:38px; border:none; border-radius:12px;
-    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
     color:#2A1400; font-family:inherit; font-size:13px; font-weight:750;
     box-shadow:0 5px 15px rgba(255,122,24,0.22);
   }
@@ -691,7 +699,7 @@
      métal poli. La couleur n'affleure que sur un quart du tour : elle donne le
      mouvement sans que l'anneau devienne bleu. */
   .ia-fig{
-    --blanc:#FFFFFF; --bleu:#FFC46B;
+    --blanc:#FFFFFF; --bleu:#FDC042;
     position:relative; display:grid; place-items:center; flex-shrink:0;
   }
   .ia-fig .lum{
@@ -1189,10 +1197,10 @@
     background:rgba(255,179,64,0.09) !important;
   }
   .detail-step.en-lecture .n{
-    background:rgba(255,179,64,0.22); color:#FFD199;
+    background:rgba(255,179,64,0.22); color:#FCC85C;
   }
   .detail-step.en-lecture .badge.ok{
-    background:rgba(255,179,64,0.20); color:#FFD199;
+    background:rgba(255,179,64,0.20); color:#FCC85C;
   }
 
   /* L'image en tête de la fiche, et sur la carte. */
@@ -1232,7 +1240,7 @@
   .app-ligne .st{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
   .app-ligne .ici{
     display:inline-block; margin-left:7px; padding:2px 7px; border-radius:100px;
-    background:rgba(255,179,64,0.20); color:#FFD199;
+    background:rgba(255,179,64,0.20); color:#FCC85C;
     font-size:9.5px; font-weight:750; text-transform:uppercase; letter-spacing:0.04em;
     vertical-align:1px;
   }
@@ -1398,8 +1406,8 @@
   .an-gain-lueur::after{
     content:''; position:absolute; inset:0; border-radius:inherit; padding:1px;
     background:linear-gradient(45deg,
-      #FFB454 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
-      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FFB454 100%);
+      #FBB43A 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
+      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FBB43A 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -1791,7 +1799,7 @@
   /* Même matière que le bouton principal : c'est le geste de la page. */
   .poste-ajouter{
     flex-shrink:0; height:38px; padding:0 18px; border:none; border-radius:100px;
-    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
     color:#2A1400; font-family:inherit; font-size:14px; font-weight:700;
     box-shadow:0 5px 15px rgba(255,122,24,0.24);
   }
@@ -2079,7 +2087,7 @@
   .ia-mot{
     font-size:15px; font-weight:850; letter-spacing:0.02em;
     line-height:1; flex-shrink:0; user-select:none;
-    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #FFC46B 100%);
+    background:linear-gradient(118deg, #FFFFFF 0%, #FFFFFF 46%, #FDC042 100%);
     -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent;
   }
@@ -2942,8 +2950,8 @@
     content:''; position:absolute; inset:0; border-radius:inherit;
     padding:1px; pointer-events:none; z-index:1;
     background:linear-gradient(45deg,
-      #FFB454 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
-      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FFB454 100%);
+      #FBB43A 0%, rgba(255,173,51,0.45) 12%, rgba(255,173,51,0.05) 30%,
+      rgba(255,173,51,0.05) 70%, rgba(255,173,51,0.45) 88%, #FBB43A 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -2990,7 +2998,7 @@
   .offre-cta{
     width:100%; height:50px; margin-top:18px; border:none; border-radius:15px;
     font-family:inherit; font-size:14.5px; font-weight:700;
-    background:linear-gradient(135deg,#E85D00,#F58A15 62%,#FF9F26);
+    background:linear-gradient(135deg,#E85D00,#F58A15 62%,#F79318);
     color:#2A1400;
   }
   .offre-carte:not(.vedette) .offre-cta{
@@ -4104,7 +4112,7 @@
      Texte sombre et non blanc : à cette clarté d'orange, du blanc perdrait le
      contraste que le noir garde sans effort. */
   .btn{ font-size:14px; font-weight:700; letter-spacing:-0.02em;
-    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
     color:#2A1400; padding:11px 20px; border-radius:100px; border:none;
     box-shadow:0 6px 18px rgba(255,122,24,0.26), 0 2px 6px rgba(0,0,0,0.28);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s; }
@@ -4830,8 +4838,8 @@
     content:''; position:absolute; inset:0; border-radius:inherit;
     padding:1.1px;
     background:linear-gradient(45deg,
-      #FFB454 0%, rgba(255,173,51,0.55) 12%, rgba(255,173,51,0.06) 30%,
-      rgba(255,173,51,0.06) 70%, rgba(255,173,51,0.55) 88%, #FFB454 100%);
+      #FBB43A 0%, rgba(255,173,51,0.55) 12%, rgba(255,173,51,0.06) 30%,
+      rgba(255,173,51,0.06) 70%, rgba(255,173,51,0.55) 88%, #FBB43A 100%);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -4861,7 +4869,7 @@
     display:inline-flex; align-items:center; justify-content:center; gap:9px;
     flex:1; min-width:0;
     height:48px; padding:0 18px; border:none; border-radius:15px;
-    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
     color:#2A1400; font-family:inherit; font-size:14.5px; font-weight:750;
     letter-spacing:-0.02em;
     white-space:nowrap;
@@ -5449,7 +5457,7 @@
        Un halo blanc derrière un logo ambre lave la couleur : au moment le plus
        intense de l'animation, le signe paraît décoloré, comme surexposé.
 
-       Deux teintes plutôt qu'une : `#FFAD33` au centre, `#FF6A00` en périphérie.
+       Deux teintes plutôt qu'une : `#FFAD33` au centre, `#E85A00` en périphérie.
        C'est le dégradé de la marque, et une lueur qui vire au chaud vers les
        bords imite la façon dont une vraie lumière colorée se diffuse.
 
@@ -5523,7 +5531,7 @@
      comme un oubli. */
   .auth-toggle-indicator{
     position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px);
-    background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 60%,#FFAD33 100%);
+    background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 60%,#FFAD33 100%);
     border-radius:100px; z-index:0;
     box-shadow:0 4px 14px rgba(255,122,24,0.26);
     /* ═══ LE MÊME MOUVEMENT QUE LA CAPSULE DE LA BARRE DU BAS ═══
@@ -5916,7 +5924,7 @@
 /* Le code d'invitation : les chiffres portent la matière de la marque. C'est
    la seule chose à lire sur cette page, et on la recopie à la main. */
 #settings-code{
-  background:linear-gradient(135deg,#FF6A00 0%,#FF9A1F 55%,#FFAD33 100%);
+  background:linear-gradient(135deg,#E85A00 0%,#FF9A1F 55%,#FFAD33 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
@@ -6150,7 +6158,7 @@ body.plus-part .socle{
   width:var(--plus-larg); height:var(--plus-h); border:none;
   border-radius:calc(var(--plus-h) / 2);
   display:grid; place-items:center;
-  background:linear-gradient(135deg, #E85D00 0%, #F58A15 62%, #FF9F26 100%);
+  background:linear-gradient(135deg, #E85D00 0%, #F58A15 62%, #F79318 100%);
   color:#2A1400;
   box-shadow:0 6px 16px rgba(0,0,0,0.34), 0 2px 10px rgba(255,122,24,0.16);
   transform:translate(-50%, var(--plus-repos)) scale(0.88);
@@ -6350,7 +6358,7 @@ body.plus-vu .plus-flot{
   box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.30);
 }
 .rond-etab.actif .rond-init{
-  background:linear-gradient(135deg,#FF6A00,#FF9A1F 60%,#FFAD33);
+  background:linear-gradient(135deg,#E85A00,#FF9A1F 60%,#FFAD33);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
@@ -6687,7 +6695,7 @@ body.chargement #bar{
   pointer-events:none;
 }
 .etab-rond.actif span{
-  background:linear-gradient(135deg,#FF6A00,#FF9A1F 60%,#FFAD33);
+  background:linear-gradient(135deg,#E85A00,#FF9A1F 60%,#FFAD33);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
@@ -6923,7 +6931,7 @@ body.chargement #bar{
 .quota-cta{
   width:100%; height:46px; margin-top:12px; border:none; border-radius:14px;
   font-family:inherit; font-size:14px; font-weight:750;
-  background:linear-gradient(135deg,#E85D00,#F58A15 62%,#FF9F26); color:#2A1400;
+  background:linear-gradient(135deg,#E85D00,#F58A15 62%,#F79318); color:#2A1400;
 }
 .quota-cta:active{ opacity:0.85; }
 
@@ -7052,7 +7060,7 @@ body.chargement #bar{
 }
 .choix-bienvenue .logotype{
   font-size:inherit;
-  background:linear-gradient(135deg,#FFC46B,#FF6A00);
+  background:linear-gradient(135deg,#FDC042,#E85A00);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -7626,7 +7634,7 @@ body:has(#e-detail.active) #equipe-app{
 
    135° sur un segment large donne un dégagement franc de gauche à droite :
    c'est le même geste que sur les chiffres, à l'horizontale. */
-.re-sg{ background:linear-gradient(135deg,#FFC46B,#FF6A00); }
+.re-sg{ background:linear-gradient(135deg,#FDC042,#E85A00); }
 .re-se{ background:rgba(255,255,255,0.17); }
 
 .re-leg{ display:flex; gap:16px; font-size:12px; color:var(--label-2); }
@@ -7637,7 +7645,7 @@ body:has(#e-detail.active) #equipe-app{
 /* Le chiffre de la gestion porte le dégradé découpé sur le texte — exactement
    le traitement des anciens grands chiffres, à une autre échelle. */
 .re-leg b.g{
-  background:linear-gradient(135deg,#FFC46B,#FF6A00);
+  background:linear-gradient(135deg,#FDC042,#E85A00);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent;
 }
@@ -8847,7 +8855,7 @@ body:has(#e-detail.active) #equipe-app{
    n'existait nulle part ailleurs. */
 .offre-annuel-note b{
   font-weight:700;
-  background:linear-gradient(135deg,#FFC46B,#FF7A18);
+  background:linear-gradient(135deg,#FDC042,#FF7A18);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .offre-annuel-note .et{ display:flex; flex:0 0 17px; width:17px; height:17px; }

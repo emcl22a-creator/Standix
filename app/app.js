@@ -239,7 +239,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Drag to fine-tune to a tenth of a second",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Film the task while explaining out loud, the AI writes the steps",
     "Filmez puis découpez chaque étape": "Film, then cut each step",
-    "Filmez une fois, l'IA repère les étapes · 5 min maximum": "Film once, the AI finds the steps · 5 min maximum",
+    "Vidéo de 5 min maximum": "Video, 5 min maximum",
     "Fin": "End",
     "Fin ici": "End here",
     "Glissez sur la frise pour naviguer dans la vidéo": "Drag the timeline to move through the video",
@@ -250,8 +250,8 @@ const DICO = {
     "Jours actifs": "Active days",
     "Jusqu'à 10 membres · fonctionnalités essentielles": "Up to 10 members · essential features",
     "Jusqu'à 25 membres · IA incluse · vérification vidéo": "Up to 25 members · AI included · video check",
-    "L'IA découpe la vidéo": "The AI cuts the video",
-    "L'IA découpe un document": "The AI cuts a document",
+    "L'IA transforme la vidéo en une procédure": "The AI turns the video into a procedure",
+    "L'IA rédige la procédure à partir d'un document": "The AI writes the procedure from a document",
     "L'IA lit votre document…": "The AI is reading your document…",
     "L'IA travaille au mieux sur des vidéos de": "The AI works best on videos of",
     "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "Your procedure will appear in your list as soon as it's ready.",
@@ -448,7 +448,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Arrastra para ajustar a la décima de segundo",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Graba la tarea explicando en voz alta, la IA genera los pasos",
     "Filmez puis découpez chaque étape": "Graba y luego corta cada paso",
-    "Filmez une fois, l'IA repère les étapes · 5 min maximum": "Graba una vez, la IA detecta los pasos · 5 min máximo",
+    "Vidéo de 5 min maximum": "Vídeo de 5 min máximo",
     "Fin": "Fin",
     "Fin ici": "Fin aquí",
     "Glissez sur la frise pour naviguer dans la vidéo": "Desliza por la línea de tiempo para navegar por el vídeo",
@@ -459,8 +459,8 @@ const DICO = {
     "Jours actifs": "Días activos",
     "Jusqu'à 10 membres · fonctionnalités essentielles": "Hasta 10 miembros · funciones esenciales",
     "Jusqu'à 25 membres · IA incluse · vérification vidéo": "Hasta 25 miembros · IA incluida · verificación por vídeo",
-    "L'IA découpe la vidéo": "La IA corta el vídeo",
-    "L'IA découpe un document": "La IA corta un documento",
+    "L'IA transforme la vidéo en une procédure": "La IA convierte el vídeo en un procedimiento",
+    "L'IA rédige la procédure à partir d'un document": "La IA redacta el procedimiento a partir de un documento",
     "L'IA lit votre document…": "La IA está leyendo tu documento…",
     "L'IA travaille au mieux sur des vidéos de": "La IA funciona mejor con vídeos de",
     "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "Su procedimiento aparecerá en la lista en cuanto esté listo.",
@@ -651,7 +651,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Arraste para ajustar ao décimo de segundo",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Filme a tarefa explicando em voz alta, a IA gera as etapas",
     "Filmez puis découpez chaque étape": "Filme e depois corte cada etapa",
-    "Filmez une fois, l'IA repère les étapes · 5 min maximum": "Filme uma vez, a IA deteta as etapas · 5 min no máximo",
+    "Vidéo de 5 min maximum": "Vídeo de 5 min no máximo",
     "Fin": "Fim",
     "Fin ici": "Fim aqui",
     "Glissez sur la frise pour naviguer dans la vidéo": "Deslize na linha de tempo para navegar no vídeo",
@@ -662,8 +662,8 @@ const DICO = {
     "Jours actifs": "Dias ativos",
     "Jusqu'à 10 membres · fonctionnalités essentielles": "Até 10 membros · funcionalidades essenciais",
     "Jusqu'à 25 membres · IA incluse · vérification vidéo": "Até 25 membros · IA incluída · verificação por vídeo",
-    "L'IA découpe la vidéo": "A IA corta o vídeo",
-    "L'IA découpe un document": "A IA corta um documento",
+    "L'IA transforme la vidéo en une procédure": "A IA transforma o vídeo num procedimento",
+    "L'IA rédige la procédure à partir d'un document": "A IA escreve o procedimento a partir de um documento",
     "L'IA lit votre document…": "A IA está a ler o seu documento…",
     "L'IA travaille au mieux sur des vidéos de": "A IA funciona melhor com vídeos de",
     "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "O seu procedimento aparecerá na lista assim que estiver pronto.",
@@ -2411,70 +2411,10 @@ document.getElementById('copy-code-btn')?.addEventListener('click', () => {
   }
 })
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   POURQUOI CERTAINES VIDÉOS SONT TROP LOURDES
+/* `expliquerLePoids` a été retirée avec l'avertissement qui l'appelait. */
 
-   Les durées ci-dessous sont CALCULÉES, pas estimées : 90 Mo divisés par le
-   débit de chaque source. Elles disent à l'utilisateur ce qu'il peut filmer
-   avant même d'essayer.
-
-   L'enregistrement d'écran figure en tête parce que c'est le cas qui surprend :
-   on croit qu'un écran « pèse moins » qu'une scène filmée, alors que c'est
-   l'inverse. Le texte net et les aplats sont ce que les codecs gèrent le plus
-   mal — ils sont faits pour des images naturelles.
-   ═══════════════════════════════════════════════════════════════════════════ */
-function expliquerLePoids() {
-  /* ═══ CE MODAL DISAIT LE CONTRAIRE DE LA VÉRITÉ ═══
-
-     Il affichait un tableau de cinq durées — « Caméra 4K : 27 s »,
-     « Enregistrement d'écran : 1 min 36 » — calculées à partir du débit de la
-     vidéo SOURCE. Autrement dit : le moment où l'allègement se déclenche.
-     Jamais la durée maximale.
-
-     Or l'allègement réencode tout en 1280×720. Mesuré sur l'iPhone d'Emilien,
-     sur un enregistrement d'écran — le contenu le plus difficile qui soit :
-
-         3 min 30 · 271 Mo  →  43,81 Mo  ·  1,75 Mb/s
-
-     Le tableau annonçait donc 27 secondes là où la réalité est de deux heures.
-     Il décourageait des gens qui n'ont aucun problème, et c'est le pire défaut
-     qu'un message d'aide puisse avoir.
-
-     ─── CE QUI LIMITE VRAIMENT ───
-
-     La DURÉE, pas le poids. Cinq minutes au débit mesuré font 63 Mo : les
-     150 Mo ne peuvent pas être atteints par une vidéo acceptée. On le dit
-     plutôt que de faire croire à une contrainte de taille qui n'existe pas.
-
-     ─── CE QU'ON GARDE DE L'ANCIEN ───
-
-     L'avertissement sur les enregistrements d'écran. Il est juste : ils
-     résistent à la compression, et c'est le seul cas où le poids peut encore
-     poser problème. Mais il devient une remarque, plus un tableau. */
-  confirmDialog({
-    titre: 'Combien de temps peut durer la vidéo ?',
-    message: '',
-    confirmer: 'Compris',
-    annuler: '',
-    danger: false,
-    html: `
-      <p class="pq-p">Chaque vid\u00e9o est all\u00e9g\u00e9e avant l\u2019envoi, quelle que soit
-         sa d\u00e9finition. Une vid\u00e9o 4K et une vid\u00e9o 720p ressortent au m\u00eame
-         poids : c\u2019est la <b>dur\u00e9e</b> qui compte, pas la qualit\u00e9 de
-         l\u2019image.</p>
-      <div class="pq-t">Ce qui d\u00e9cide</div>
-      <div class="pq-l"><span>Dur\u00e9e accept\u00e9e</span><b>5 min</b></div>
-      <div class="pq-l"><span>Dur\u00e9e conseill\u00e9e</span><b>2 min</b></div>
-      <div class="pq-l"><span>Poids apr\u00e8s all\u00e8gement, 3 min 30</span><b>~44 Mo</b></div>
-      <p class="pq-p pq-fin">Un <b>enregistrement d\u2019\u00e9cran</b> s\u2019all\u00e8ge moins
-         bien qu\u2019une vid\u00e9o film\u00e9e : le texte net et les aplats sont ce que la
-         compression g\u00e8re le plus mal. C\u2019est le seul cas o\u00f9 le poids peut
-         encore g\u00eaner.</p>`,
-  })
-}
 
 document.addEventListener('click', (e) => {
-  if (e.target?.id === 'info-poids') { e.preventDefault(); expliquerLePoids() }
 })
 
 /* ═══ « ÉTAPE 1 — » EST DE TROP ═══
@@ -2851,13 +2791,20 @@ function placerPastille(conteneur, immediat) {
   }
 }
 
-/* Les bascules vivent dans des écrans masqués au chargement : rien n'est
-   mesurable tant qu'ils ne sont pas visibles. On repose donc la pastille à
-   chaque affichage d'écran, et au redimensionnement. */
-function reposerPastilles(immediat) {
-  placerPastille(document.getElementById('pm-tri'), immediat)
-}
-window.addEventListener('resize', () => reposerPastilles(true))
+/* ═══ `reposerPastilles` NE FAIT PLUS RIEN ═══
+
+   Elle repositionnait la bille de fond d'une seule barre : `pm-tri`, le tri de
+   « Gérer l'équipe », remplacé par un menu déroulant. L'élément n'existe plus,
+   l'appel ne faisait qu'échouer silencieusement.
+
+   La fonction est CONSERVÉE, vide : elle est appelée à chaque affichage
+   d'écran et au redimensionnement, à deux endroits éloignés. La retirer
+   demanderait de toucher à ces appels, pour un gain nul.
+
+   `placerPastille` reste employée par la barre d'onglets, via
+   `placerPastilleSansAnimation`. */
+function reposerPastilles() {}
+window.addEventListener('resize', () => reposerPastilles())
 
 window.setGaPeriod = function(period) {
   currentGaPeriod = period
@@ -3108,17 +3055,20 @@ function renderCourbe(validations, membres) {
         <svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" class="cb-svg">
           <defs>
             <linearGradient id="cbAire" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#FA8A08" stop-opacity="0.22"/>
-              <stop offset="1" stop-color="#FA8A08" stop-opacity="0"/>
+              <!-- L'aire sous la courbe part de l'ambre médian, pas de l'orange
+                   sombre : sous un tracé qui va du clair au sombre, un fond
+                   sombre écraserait la moitié gauche. -->
+              <stop offset="0" stop-color="#FDA81E" stop-opacity="0.24"/>
+              <stop offset="1" stop-color="#FDA81E" stop-opacity="0"/>
             </linearGradient>
           </defs>
           <line x1="0" y1="${marge}" x2="${L}" y2="${marge}" class="cb-grille"/>
           <line x1="0" y1="${H / 2}" x2="${L}" y2="${H / 2}" class="cb-grille"/>
           <line x1="0" y1="${H - marge}" x2="${L}" y2="${H - marge}" class="cb-grille"/>
           <path d="${aire}" fill="url(#cbAire)"/>
-          <path class="cb-ligne" d="${d}" fill="none" stroke="url(#logoOrIc)"
+          <path class="cb-ligne" d="${d}" fill="none" stroke="url(#cbTrait)"
                 stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4" fill="#FA8A08"/>
+          <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.4" fill="#FEC64A"/>
         </svg>
         <div class="cb-mois">
           <span>${escapeHtml(cases[0].nom)}</span>
@@ -6143,7 +6093,7 @@ async function loadGestionProcedures() {
                  reste demeure au trait blanc — deux foyers de couleur sur un
                  même écran, et le bouton perdrait sa force. -->
             <g class="signe">
-              <circle cx="112" cy="26" r="13" fill="url(#logoOrIc)"/>
+              <circle cx="112" cy="26" r="13" fill="url(#orLibre)"/>
               <line x1="112" y1="20" x2="112" y2="32" stroke="#2A1400" stroke-width="2.6" stroke-linecap="round"/>
               <line x1="106" y1="26" x2="118" y2="26" stroke="#2A1400" stroke-width="2.6" stroke-linecap="round"/>
             </g>
@@ -6683,17 +6633,34 @@ function peindreRecentesAccueil() {
 
      Deux boutons de même forme les remplacent, menant à deux pages de même
      nature. L'accueil se termine sur un choix clair au lieu d'un extrait. */
-  const bouton = (texte, action) => {
-    const b = document.createElement('button')
-    b.type = 'button'
-    b.className = 'an-plus ac-act'
-    b.textContent = texte
-    b.addEventListener('click', action)
-    zone.appendChild(b)
+  /* ═══ DEUX TUILES, PAS DEUX BOUTONS ═══
+
+     C'étaient deux barres pleine largeur, d'une matière qu'on ne voyait nulle
+     part ailleurs sur cette page. Elles deviennent des tuiles : même fond, même
+     contour en lumière rasante, même plaque d'icône que « Procédures créées ».
+
+     L'accueil ne compte plus qu'une seule sorte d'objet. Ce qui les distingue
+     des trois du haut, c'est le chevron : elles mènent ailleurs, les autres
+     montrent un chiffre. */
+  const tuile = (icone, titre, sous, action) => {
+    const el = document.createElement('button')
+    el.type = 'button'
+    el.className = 'an-bloc ac-tuile ac-lien'
+    el.addEventListener('click', action)
+    el.innerHTML = `
+      ${iconeAccueil(icone)}
+      <span class="ac-lien-txt">
+        <span class="ac-lien-t">${escapeHtml(titre)}</span>
+        <span class="ac-lien-s">${escapeHtml(sous)}</span>
+      </span>
+      <span class="ac-lien-fl">\u203a</span>`
+    zone.appendChild(el)
   }
 
-  bouton('Voir les dernières procédures créées', () => ouvrirRecentes())
-  bouton('Voir les derniers mouvements de l\u2019entreprise', () => ouvrirActivites())
+  tuile('pile', 'Derni\u00e8res proc\u00e9dures',
+        'Celles cr\u00e9\u00e9es ces quinze derniers jours', () => ouvrirRecentes())
+  tuile('mouvement', 'Derniers mouvements',
+        'Arriv\u00e9es, d\u00e9parts et changements de r\u00f4le', () => ouvrirActivites())
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6818,6 +6785,20 @@ const AC_ICONES = {
   /* Deux silhouettes, la seconde en retrait. Le même dessin que la carte
      « Espace Équipe » de l'écran d'accueil — un employé qui reconnaît cette
      icône ailleurs dans l'app sait de quoi la tuile parle. */
+  /* ═══ DEUX DESSINS POUR LES TUILES DE LIEN ═══
+
+     Elles ne peuvent pas reprendre `document` et `equipe` : ce sont déjà les
+     icônes des tuiles du haut, et deux plaques identiques sur le même écran
+     feraient croire à une répétition.
+
+     `pile`      trois feuillets empilés, décalés — une LISTE de procédures,
+                 pas une procédure.
+     `mouvement` deux flèches opposées — ce qui entre et ce qui sort. */
+  pile:     `<rect x="7.4" y="3.2" width="12.4" height="15.6" rx="2"/>
+             <path d="M15.6 21.4H6a2 2 0 0 1-2-2V7.6" stroke-opacity="0.5"/>`,
+  mouvement:`<path d="M7.4 4.6v13.2M4.2 15l3.2 3.2 3.2-3.2" stroke-linecap="round"/>
+             <path d="M16.6 19.4V6.2M13.4 9l3.2-3.2L19.8 9" stroke-linecap="round"
+                   stroke-opacity="0.55"/>`,
   equipe:   `<path d="M15.6 20.2v-1.7a3.2 3.2 0 0 0-3.2-3.2H6.6a3.2 3.2 0 0 0-3.2 3.2v1.7"/>
              <circle cx="9.5" cy="7.8" r="3.2"/>
              <path d="M20.6 20.2v-1.7a3.2 3.2 0 0 0-2.4-3.1"/>
@@ -8340,36 +8321,12 @@ function expliquerComptage() {
   })
 }
 
-/* ═══ CE QUE REPRÉSENTE LE NOMBRE AU BOUT DE CHAQUE LIGNE ═══
+/* `expliquerDurees` a été retirée avec son bouton : elle décrivait le temps
+   affiché sur les blocs Dossiers et Procédures, disparus de la page. */
 
-   L'autre aide dit QUAND le compteur tourne. Celle-ci dit CE QU'ON ADDITIONNE,
-   et sur quelle période — la question que se pose quelqu'un qui voit « 4 h 12 »
-   sans savoir si c'est aujourd'hui, ce mois-ci ou depuis le début.
-
-   Le texte reprend le libellé affiché à l'écran plutôt qu'un terme générique :
-   la personne lit « ce mois-ci » dans les sections, elle doit retrouver les
-   mêmes mots ici. `anLibelle()` rend celui de la période en cours. */
-function expliquerDurees() {
-  const p = anLibelle()   // « ce mois-ci » ou « depuis le début »
-  confirmDialog({
-    titre: 'Ces dur\u00e9es, c\u2019est quoi ?',
-    message:
-      `La dur\u00e9e au bout de chaque ligne est le temps TOTAL pass\u00e9 \u00e0 lire, ` +
-      `additionn\u00e9 sur toute l\u2019\u00e9quipe, ${p}.\n\n` +
-      "\u2022 Sur un dossier : le temps pass\u00e9 sur toutes ses proc\u00e9dures.\n" +
-      "\u2022 Sur une proc\u00e9dure : le temps pass\u00e9 dessus par tout le monde.\n" +
-      "\u2022 Sur une personne : le temps qu\u2019elle a pass\u00e9 sur les proc\u00e9dures.\n\n" +
-      "Ce n\u2019est pas la dur\u00e9e de la vid\u00e9o, ni le nombre de fois qu\u2019elle a \u00e9t\u00e9 ouverte. " +
-      "C\u2019est du temps de lecture r\u00e9el, cumul\u00e9.",
-    confirmer: 'Compris',
-    annuler: null,
-    danger: false,
-  })
-}
 
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-aide-temps]')) expliquerComptage()
-  if (e.target.closest('[data-aide-duree]')) expliquerDurees()
 })
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -9370,7 +9327,7 @@ document.getElementById('coller-utiliser')?.addEventListener('click', () => {
      photos, où elle vient à peine d'être rangée. */
   collageEnAttente = collageResultat
   showGestionScreen('p-create')
-  toast('Vidéo prête — nommez la procédure, puis « L’IA découpe la vidéo »')
+  toast('Vidéo prête — nommez la procédure, puis lancez l’analyse')
 })
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -10165,7 +10122,7 @@ await new Promise(r => setTimeout(r, 900))
   }
 })
 
-// ═══════════ GESTION : L'IA découpe la vidéo ═══════════
+// ═══════════ GESTION : L'IA transforme la vidéo en procédure ═══════════
 /* Le type d'enregistrement, choisi avant l'analyse.
 
    `false` — on filme un geste : seule la parole porte le sens. On envoie la
@@ -11170,13 +11127,18 @@ function verifierDureeVideo() {
       /* 1,25 fois la limite et non 1,6. Avec 150 Mo, 1,6 mettait le seuil à
          240 Mo — on prévenait bien trop tard. À 188, on avertit dès que la
          compression risque de ne pas suffire. */
-      const risque = aiVideoFile.size > LIMITE_STOCKAGE * 1.25
-      err.innerHTML = `Cette vidéo pèse <b>${poidsLisible(aiVideoFile.size)}</b>. ` +
-        (risque
-          ? `Elle sera allégée, mais elle risque de rester trop lourde — ` +
-            `c'est le cas des enregistrements d'écran. ` +
-            `<button type="button" class="lien-info" id="info-poids">Pourquoi ?</button>`
-          : `Elle sera allégée avant l'envoi — comptez une minute de plus au lancement.`)
+      /* ═══ L'AVERTISSEMENT DE POIDS A ÉTÉ RETIRÉ ═══
+
+         Il annonçait « cette vidéo pèse 540 Mo, elle sera allégée mais risque
+         de rester trop lourde », avec un lien « Pourquoi ? ».
+
+         Trois lignes d'inquiétude avant même d'avoir essayé, sur un traitement
+         qui réussit la plupart du temps. Si la compression échoue, l'analyse le
+         dira — et ce sera un vrai problème, pas une hypothèse.
+
+         Le bouton reste ouvert : c'était déjà le cas, l'avertissement
+         n'empêchait rien. */
+      err.textContent = ''
       btn.disabled = false
       return
     }
@@ -11207,8 +11169,7 @@ function verifierDureeVideo() {
     const m = Math.floor(aiVideoDuree / 60)
     const sc = String(Math.round(aiVideoDuree % 60)).padStart(2, '0')
     err.style.color = 'var(--red)'
-    err.textContent = `Cette vidéo dure ${m} min ${sc}. L'analyse accepte jusqu'à 5 minutes : ` +
-      `filmez une procédure par vidéo, ou découpez celle-ci en deux.`
+    err.textContent = `Cette vidéo dure ${m} min ${sc}. L'analyse accepte jusqu'à 5 minutes.`
     btn.disabled = true
     return
   }
@@ -11272,8 +11233,10 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const min = Math.floor(aiVideoDuree / 60)
     const sec = String(Math.round(aiVideoDuree % 60)).padStart(2, '0')
     errorEl.style.color = 'var(--red)'
-    errorEl.textContent = `Cette vidéo dure ${min} min ${sec}. L'analyse accepte ` +
-      `jusqu'à 5 minutes : découpez-la en deux, ou filmez une procédure par vidéo.`
+    /* Le conseil « découpez-la en deux » a été retiré : quelqu'un qui vient de
+       filmer sait quoi faire de sa vidéo, et un refus n'a pas à donner de leçon.
+       Le message dit ce qui bloque, rien de plus. */
+    errorEl.textContent = `Cette vidéo dure ${min} min ${sec}. L'analyse accepte jusqu'à 5 minutes.`
     return
   }
 
@@ -16675,14 +16638,36 @@ function marquerAboNeuf() {
 document.getElementById('ouvrir-abonnement')?.addEventListener('click', () => {
   document.getElementById('abo-liste')?.classList.remove('ouvert')
   const b = document.getElementById('abo-autres')
-  if (b) { b.style.display = 'block'; b.textContent = 'Voir les autres offres' }
+  if (b) {
+    /* ═══ DEUX DÉFAUTS CORRIGÉS ICI ═══
+
+       ① `part` n'était pas retirée : le bouton revenait avec son opacité à
+          zéro et sa marge négative — invisible, mais occupant sa place.
+
+       ② `textContent` écrasait le chevron SVG posé dans le balisage. Au second
+          passage sur la page, le bouton perdait sa flèche. On ne touche plus
+          au contenu : le libellé est dans `index.html` et n'a pas à changer. */
+    b.classList.remove('part')
+    b.style.display = 'flex'
+  }
   renderAbonnements()
   showGestionScreen('p-abonnement')
 })
 
 document.getElementById('abo-autres')?.addEventListener('click', (e) => {
   document.getElementById('abo-liste')?.classList.add('ouvert')
-  e.currentTarget.style.display = 'none'
+  /* ═══ LE BOUTON S'EFFACE, IL NE DISPARAÎT PAS ═══
+
+     `display:none` le retirait instantanément : un trou apparaissait là où il
+     était, et les cartes montaient dans un espace qui venait de se vider d'un
+     coup.
+
+     La classe `part` le fait remonter en s'effaçant, et sa marge négative
+     referme progressivement la place qu'il occupait. `display:none` est posé
+     après coup — sinon il reste focusable au clavier une fois invisible. */
+  const b = e.currentTarget
+  b.classList.add('part')
+  setTimeout(() => { b.style.display = 'none' }, 340)
 })
 
 document.getElementById('p-abonnement')?.addEventListener('click', async (e) => {
@@ -18225,13 +18210,48 @@ document.getElementById('pm-chercher')?.addEventListener('input', (e) => {
   document.querySelector('.pm-recherche')?.classList.toggle('remplie', !!filtreEquipe)
   peindreEquipe()
 })
-document.getElementById('pm-tri')?.addEventListener('click', (e) => {
+/* ═══ LE TRI PASSE EN MENU DÉROULANT ═══
+
+   L'ancien écouteur gérait trois pastilles : il déplaçait une bille de fond
+   avec `placerPastille` et basculait la classe `active`. Le menu déroulant a
+   sa propre mécanique — ouverture commune, option marquée `selected`, libellé
+   du bouton mis à jour.
+
+   `placerPastille` n'est plus appelée ici : elle servait à animer un fond qui
+   n'existe plus. */
+document.getElementById('dd-pm-tri-menu')?.addEventListener('click', (e) => {
   const b = e.target.closest('[data-tri]')
   if (!b) return
   triEquipe = b.dataset.tri
-  document.querySelectorAll('#pm-tri button').forEach(x => x.classList.toggle('active', x === b))
-  placerPastille(document.getElementById('pm-tri'))
+  document.querySelectorAll('#dd-pm-tri-menu button')
+    .forEach(x => x.classList.toggle('selected', x === b))
+  const lbl = document.getElementById('dd-pm-tri-label')
+  if (lbl) lbl.textContent = b.dataset.label || b.textContent.trim()
+  closeAllDropdowns()
   peindreEquipe()
+})
+
+/* ═══ À QUOI SERVENT LES DEUX BOUTONS DE CHAQUE LIGNE ═══
+
+   Une flèche et une poubelle, sans libellé. La flèche surtout : elle monte ou
+   descend selon le rôle, et rien ne dit qu'elle fait passer quelqu'un en
+   gestion. */
+document.getElementById('p-membres')?.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-aide-actions]')) return
+  confirmDialog({
+    titre: 'Les boutons de chaque ligne',
+    message:
+      "\u2022 La FL\u00c8CHE change le r\u00f4le d\u2019une personne.\n" +
+      "  Vers le haut : elle passe en gestion et pourra cr\u00e9er des proc\u00e9dures, " +
+      "voir l\u2019analyse et inviter du monde.\n" +
+      "  Vers le bas : elle repasse en \u00e9quipe et ne fait plus que lire.\n\n" +
+      "\u2022 La CROIX retire la personne de l\u2019entreprise. Son compte reste, " +
+      "mais elle perd l\u2019acc\u00e8s \u00e0 vos proc\u00e9dures. Ses lectures pass\u00e9es " +
+      "restent dans l\u2019analyse.\n\n" +
+      "Vous ne pouvez ni vous r\u00e9trograder, ni vous retirer vous-m\u00eame : " +
+      "une entreprise sans gestionnaire serait inaccessible.",
+    confirmer: 'Compris', annuler: '', danger: false,
+  })
 })
 
 document.getElementById('pm-vider')?.addEventListener('click', () => {

@@ -8817,13 +8817,27 @@ body:has(#e-detail.active) #equipe-app{
    Une étiquette et une phrase, sur fond légèrement teinté. Elle annonce une
    économie sans crier : à côté d'un bouton plein ambre, un second aplat de la
    même couleur les affaiblirait tous les deux. */
+/* ═══ SANS FOND, LE TEXTE PORTE LA COULEUR ═══
+
+   Un aplat ambre sous cette ligne faisait un troisième bloc teinté dans la
+   carte — après le ruban et le bouton. Trois surfaces de la même couleur
+   s'affaiblissent mutuellement : on ne sait plus laquelle regarder.
+
+   Le fond disparaît, et c'est le TEXTE qui prend l'ambre. Le rembourrage
+   latéral part avec le fond : sans lui, la ligne s'aligne enfin sur les
+   coches du dessus. */
 .offre-annuel-note{
   display:flex; align-items:center; gap:9px;
-  margin-top:18px; padding:11px 13px; border-radius:13px;
-  background:rgba(255,159,10,0.07);
+  margin-top:18px; padding:2px 0;
   font-size:12.5px; color:var(--label-2); line-height:1.4;
 }
-.offre-annuel-note b{ color:#FFAD33; font-weight:750; }
+/* Le montant en dégradé ambre-orange, comme les grands chiffres de l'app. Un
+   ambre plat à cette taille se confond avec le gris du reste de la phrase. */
+.offre-annuel-note b{
+  font-weight:750;
+  background:linear-gradient(135deg,#FFC46B,#FF7A18);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
 .offre-annuel-note .et{ display:flex; flex:0 0 17px; width:17px; height:17px; }
 .offre-annuel-note .et svg{ width:100%; height:100%; display:block; }
 

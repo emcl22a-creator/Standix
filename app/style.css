@@ -1367,7 +1367,7 @@
   #p-global-analyse .emp-row,
   #p-global-analyse .cat-rank{
     background:none !important; border:none !important; border-radius:0 !important;
-    border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
+    border-bottom:0.5px solid rgba(255,255,255,0.028) !important;
     padding:10px 2px !important; margin:0 !important;
    animation:none !important; }
   #p-global-analyse .emp-row:last-of-type,
@@ -1458,7 +1458,7 @@
   #p-an-temps .emp-row,
   #p-an-equipe .emp-row{
     background:none !important; border:none !important; border-radius:0 !important;
-    border-bottom:0.5px solid rgba(255,255,255,0.055) !important;
+    border-bottom:0.5px solid rgba(255,255,255,0.028) !important;
     padding:12px 2px !important; margin:0 !important;
   }
   #p-an-categories .cat-rank:last-of-type,
@@ -1548,7 +1548,7 @@
   /* Les lignes du classement. */
   .fm-lg{
     display:flex; align-items:center; gap:11px; padding:11px 2px; width:100%;
-    background:none; border:none; border-bottom:0.5px solid rgba(255,255,255,0.055);
+    background:none; border:none; border-bottom:0.5px solid rgba(255,255,255,0.028);
     font-family:inherit; text-align:left; color:inherit;
   }
   /* `:last-of-type` compte les BALISES, pas les classes : dans une liste suivie
@@ -1588,7 +1588,7 @@
 
   .fm-plus{
     width:100%; height:42px; margin-top:12px; border-radius:100px;
-    background:rgba(255,255,255,0.055); border:0.5px solid var(--border);
+    background:rgba(255,255,255,0.028); border:0.5px solid var(--border);
     color:var(--label-2); font-family:inherit; font-size:13.5px; font-weight:650;
   }
   .fm-plus:active{ opacity:0.6; }
@@ -1599,7 +1599,7 @@
   .fm-rep .l:last-child{ border-bottom:none; }
   .fm-rep .l{
     display:flex; align-items:center; gap:11px; padding:11px 2px;
-    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    border-bottom:0.5px solid rgba(255,255,255,0.028);
   }
   .fm-rep .l:last-child{ border-bottom:none; }
   .fm-rep .ic{
@@ -1696,7 +1696,7 @@
      à du texte et non à des contrôles. */
   button.fm-lig{
     width:100%; background:none; border:none; padding:12px 2px;
-    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    border-bottom:0.5px solid rgba(255,255,255,0.028);
     font-family:inherit; text-align:left; color:inherit;
   }
   button.fm-lig:active{ opacity:0.6; }
@@ -1704,7 +1704,7 @@
 
   .fm-lig{
     display:flex; align-items:center; gap:12px; padding:12px 2px;
-    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    border-bottom:0.5px solid rgba(255,255,255,0.028);
   }
   .fm-lig:last-child{ border-bottom:none; }
   .fm-lig .co{ flex:1; min-width:0; }
@@ -1887,7 +1887,7 @@
   .an-lig{
     display:flex; align-items:center; gap:12px; width:100%;
     padding:12px 2px; background:none; border:none;
-    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    border-bottom:0.5px solid rgba(255,255,255,0.028);
     font-family:inherit; text-align:left; color:inherit;
   }
   .an-lig:last-of-type{ border-bottom:none; }
@@ -4513,7 +4513,7 @@
      ombre portée donne des rendus incohérents. Fond plein, rendu fiable. */
   .qr-card{
     padding:18px; text-align:center;
-    background:rgba(255,255,255,0.055);
+    background:rgba(255,255,255,0.028);
     -webkit-backdrop-filter:none; backdrop-filter:none;
   }
   .qr-plaque{
@@ -4892,7 +4892,7 @@
   .hero-qr{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
     width:48px; height:48px; border-radius:15px; padding:0;
-    background:rgba(255,255,255,0.055);
+    background:rgba(255,255,255,0.028);
     border:0.5px solid rgba(255,173,51,0.30);
     color:#FDA81E;
     transition:transform 0.16s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
@@ -5279,7 +5279,7 @@
   .scan-echec .pas li{
     position:relative; counter-increment:pas;
     padding:11px 0 11px 38px; font-size:13.5px; line-height:1.45;
-    border-bottom:0.5px solid rgba(255,255,255,0.055);
+    border-bottom:0.5px solid rgba(255,255,255,0.028);
   }
   .scan-echec .pas li:last-child{ border-bottom:none; }
   .scan-echec .pas li::before{
@@ -5292,7 +5292,7 @@
   .scan-echec .pas b{ font-weight:700; color:#fff; }
   .scan-echec .repli{
     font-size:12px; color:var(--label-3); line-height:1.45; margin-top:14px;
-    padding-top:13px; border-top:0.5px solid rgba(255,255,255,0.055);
+    padding-top:13px; border-top:0.5px solid rgba(255,255,255,0.028);
   }
   .scan-echec .btn{ margin-top:18px; }
 
@@ -8228,7 +8228,7 @@ body:has(#e-detail.active) #equipe-app{
      remplacer. */
   /* Le fond vient toujours de `.an-bloc`. Seules les deux ombres s'ajoutent. */
   box-shadow:0 14px 34px rgba(0,0,0,0.42),
-             0 0 30px -14px rgba(255,255,255,0.20);
+             0 0 30px -14px rgba(255,255,255,0.10);
 }
 
 /* ═══ LE CONTOUR EN LUMIÈRE RASANTE ═══
@@ -8246,8 +8246,8 @@ body:has(#e-detail.active) #equipe-app{
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none; z-index:0;
   background:
-    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.055), transparent 72%),
-    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.032), transparent 72%);
+    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.028), transparent 72%),
+    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.016), transparent 72%);
 }
 /* Le contenu passe au-dessus du liseré. */
 .ac-tuile > *{ position:relative; z-index:2; }
@@ -9172,20 +9172,27 @@ body:has(#e-detail.active) #equipe-app{
      les autres. Seul le MODELÉ s'ajoute : les lueurs de coin ci-dessous, et
      les deux ombres portées ici. */
   box-shadow:0 14px 34px rgba(0,0,0,0.42),
-             0 0 30px -14px rgba(255,255,255,0.20);
+             0 0 30px -14px rgba(255,255,255,0.10);
 }
 
 /* ② Les deux lueurs de coin, en blanc au lieu d'ambre. Elles sont posées en
-      pseudo-élément plutôt que dans le fond : superposées au dégradé, elles
-      l'éclairent sans le remplacer. */
+      pseudo-élément plutôt que dans le fond : superposées à lui, elles
+      l'éclairent sans le remplacer.
+
+      ⚠ VALEURS DIVISÉES PAR DEUX. Elles étaient à 5,5 % et 3,2 %, l'ombre
+        portée à 20 % : le coin haut-droite montait à [29 26 25] sur un fond de
+        carte à [20 20 24] — soit neuf tons d'écart, visible comme une tache.
+
+        À 2,8 %, 1,6 % et 10 %, le modelé se devine sans se voir. C'est ce qu'on
+        demande à un modelé : qu'il donne du volume, pas qu'il fasse un motif. */
 .an-bloc::before, .reg-groupe::before, .reg-identite::before, .ga-tuile::before,
 .stat-mini::before, .cat-rank::before, .pm-ligne::before, .app-ligne::before,
 .ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none; z-index:0;
   background:
-    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.055), transparent 72%),
-    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.032), transparent 72%);
+    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.028), transparent 72%),
+    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.016), transparent 72%);
 }
 /* Le contenu passe au-dessus des lueurs. */
 .an-bloc > *, .reg-groupe > *, .reg-identite > *, .ga-tuile > *, .stat-mini > *,

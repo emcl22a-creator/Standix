@@ -1083,7 +1083,7 @@ window.chooseSpace = function(space) {
      et créer son entreprise » en tête d'un formulaire d'inscription répéterait ce
      que la page fait déjà voir. La carte annonce le geste, l'écran le déroule. */
   document.getElementById('auth-title').textContent =
-    space === 'gestion' ? 'Votre entreprise' : 'Rejoindre une entreprise'
+    space === 'gestion' ? 'Votre entreprise' : 'Acc\u00e9der aux proc\u00e9dures'
   document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
   document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
   /* ═══ INSCRIPTION SEULE, ET LES ONGLETS DISPARAISSENT ═══
@@ -1104,9 +1104,12 @@ window.chooseSpace = function(space) {
   document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
   const sous = document.getElementById('auth-sous')
   if (sous) {
+    /* Ces phrases suivent les cartes du choix : elles disent le rôle, pas la
+       suite d'opérations. Un écran qui reprend d'autres mots que le bouton
+       qu'on vient de toucher fait douter d'avoir cliqué au bon endroit. */
     sous.textContent = space === 'gestion'
-      ? 'Cr\u00e9ez votre compte, puis votre entreprise'
-      : 'Cr\u00e9ez votre compte avec le code re\u00e7u'
+      ? 'Vous cr\u00e9ez l\u2019entreprise et invitez votre \u00e9quipe'
+      : 'Entrez le code \u00e0 5 chiffres de votre responsable'
   }
   document.getElementById('login-error').textContent = ''
 }
@@ -1845,12 +1848,59 @@ async function peindreAppareils() {
 
      L'empreinte ne convient pas pour ça : c'est justement elle qui change avec
      le réseau. C'est la cause du problème, pas sa solution. */
+  /* ═══ LE NAVIGATEUR NE FAIT PAS UN APPAREIL ═══
+
+     Le nom rendu par la base porte souvent le navigateur : « iPhone · Safari »
+     et « iPhone · Chrome ». Deux lignes pour un seul téléphone, et le compteur
+     annonçait deux appareils là où il n'y en a qu'un.
+
+     `socleAppareil` retire cette partie. Elle coupe au premier séparateur —
+     tiret, point médian, parenthèse — et écarte les noms de navigateurs connus
+     s'ils apparaissent ailleurs dans la chaîne.
+
+     ⚠ ON NE TOUCHE PAS À LA BASE. Chaque ligne reste enregistrée : c'est elle
+       qui porte la date de dernière visite, et deux navigateurs sur le même
+       téléphone peuvent avoir des activités différentes. On regroupe seulement
+       à L'AFFICHAGE, et `lignes` garde tous les identifiants — la révocation
+       les supprime donc tous ensemble, ce qui est le comportement attendu. */
+  const NAVIGATEURS = ['safari', 'chrome', 'firefox', 'edge', 'opera', 'samsung internet',
+                       'brave', 'duckduckgo', 'webview', 'crios', 'fxios']
+  /* Le socle en conservant la casse : c'est lui qu'on affiche. */
+  const socleAffiche = (nom) => {
+    let t = String(nom || 'Appareil').trim()
+    t = t.split(/\s*[·\-—|(]\s*/)[0].trim()
+    const mots = t.split(/\s+/).filter(m => !NAVIGATEURS.includes(m.toLowerCase()))
+    return mots.join(' ').trim() || t || 'Appareil'
+  }
+  /* Le même, en minuscules : c'est lui qui sert de clé de regroupement. */
+  const socleAppareil = (nom) => {
+    let t = String(nom || 'Appareil').trim()
+    /* Tout ce qui suit un séparateur est un détail, pas l'appareil. */
+    t = t.split(/\s*[·\-—|(]\s*/)[0].trim()
+    /* Le navigateur peut aussi être accolé sans séparateur. On le retire mot à
+       mot plutôt qu'en bloc : « iPhone Safari » et « Safari iPhone » doivent
+       donner le même socle. */
+    const mots = t.split(/\s+/).filter(m => !NAVIGATEURS.includes(m.toLowerCase()))
+    const propre = mots.join(' ').trim()
+    return (propre || t || 'Appareil').toLowerCase()
+  }
+
   const parAppareil = new Map()
   for (const a of brut) {
-    const cle = String(a.nom || 'Appareil').trim().toLowerCase()
+    const cle = socleAppareil(a.nom)
     const connu = parAppareil.get(cle)
     if (!connu) {
-      parAppareil.set(cle, { ...a, lignes: [a.id], reseaux: a.reseau ? [a.reseau] : [] })
+      /* ═══ LE NOM AFFICHÉ, SANS LE NAVIGATEUR ═══
+
+         On ne peut pas afficher la clé : elle est en minuscules pour que le
+         regroupement ignore la casse, et « iPhone » deviendrait « Iphone ».
+
+         On recalcule donc le socle sur le nom D'ORIGINE, en gardant sa casse.
+         `socleAffiche` fait le même travail que `socleAppareil` sans passer en
+         minuscules — les deux partagent la même liste de navigateurs, donc ils
+         ne peuvent pas diverger. */
+      parAppareil.set(cle, { ...a, nom: socleAffiche(a.nom), lignes: [a.id],
+                             reseaux: a.reseau ? [a.reseau] : [] })
       continue
     }
     /* On garde la visite la plus récente : c'est elle qui dit si l'appareil est

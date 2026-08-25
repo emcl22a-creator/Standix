@@ -19,7 +19,7 @@ try {
   console.error('Échec du chargement de Supabase :', e)
   window.__procedoLoaded = true
   document.body.insertAdjacentHTML('beforeend', `
-    <div style="position:fixed; inset:0; z-index:9999; background:#0C0D0E; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div style="position:fixed; inset:0; z-index:9999; background:#050506; display:flex; align-items:center; justify-content:center; padding:24px;">
       <div style="text-align:center; max-width:320px;">
         <p style="color:#fff; font-size:15px; font-weight:300; margin-bottom:8px;">Connexion impossible</p>
         <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">Vérifiez votre connexion internet, puis réessayez.</p>

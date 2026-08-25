@@ -762,7 +762,7 @@
      virgule bleue qui tourne. Le blanc y devient un bleu très pâle et le bleu
      se fonce — c'est le même dessin, transposé pour rester lisible. */
   .btn:not(.ghost) .ia-fig, .ia-fig.clair{
-    --blanc:#FFE6C2; --bleu:#C77A0A;
+    --blanc:#FEC64A; --bleu:#EB5201;
   }
 
   .ia-fig.g .pct{
@@ -2093,7 +2093,7 @@
   }
   /* Sur un bouton blanc, des lettres blanches n'existent pas. */
   .btn:not(.ghost):not(.dv-ia-bas) .ia-mot{
-    background:linear-gradient(118deg, #C77A0A 0%, #C77A0A 46%, #7A4A00 100%);
+    background:linear-gradient(118deg, #EB5201 0%, #EB5201 46%, #8C3100 100%);
     -webkit-background-clip:text; background-clip:text;
   }
   /* Éteint, le bouton pâlit — la marque garde sa couleur, comme l'anneau. */
@@ -8872,3 +8872,99 @@ body:has(#e-detail.active) #equipe-app{
 /* « Voir les autres formules » ne prend plus toute la ligne : réduit et centré,
    il cesse de concurrencer le bouton de l'offre. */
 .abo-autres{ width:auto; margin-left:auto; margin-right:auto; padding:13px 22px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ABONNEMENT · ANIMATIONS
+
+   Trois gestes, pas davantage. Une page qui bouge de partout paraît instable ;
+   une page qui ne bouge pas du tout paraît morte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── ① L'ENTRÉE EN CASCADE ───────────────────────────────────────────────
+   Chaque bloc monte de douze pixels en apparaissant, décalé de 60 ms sur le
+   précédent. C'est le geste d'iOS : les éléments ne surgissent pas ensemble,
+   ils arrivent dans l'ordre où on les lit.
+
+   `cubic-bezier(0.22,1,0.36,1)` — un départ vif qui s'amortit. Une courbe
+   linéaire donnerait un mouvement mécanique. */
+@keyframes aboEntree{
+  from{ opacity:0; transform:translateY(12px) }
+  to  { opacity:1; transform:none }
+}
+/* ═══ LA CASCADE NE JOUE QU'À L'OUVERTURE ═══
+
+   `renderAbonnements()` reconstruit toute la page à chaque bascule de rythme.
+   Sans garde, les cinq blocs rejoueraient leur entrée à chaque clic sur
+   « Annuel » — une page qui se remonte sous les doigts.
+
+   La classe `abo-neuf` est posée à l'ouverture et retirée une seconde après.
+   Passé ce délai, les bascules ne déclenchent plus que l'animation du prix,
+   qui elle a du sens : c'est le chiffre qui change. */
+#p-abonnement.abo-neuf .abo-hi,
+#p-abonnement.abo-neuf .abo-rythme,
+#p-abonnement.abo-neuf #abo-vedette,
+#p-abonnement.abo-neuf .abo-autres,
+#p-abonnement.abo-neuf .abo-conf{
+  animation:aboEntree 0.52s cubic-bezier(0.22,1,0.36,1) both;
+}
+#p-abonnement.abo-neuf .abo-rythme{ animation-delay:0.06s }
+#p-abonnement.abo-neuf #abo-vedette{ animation-delay:0.12s }
+#p-abonnement.abo-neuf .abo-autres{ animation-delay:0.18s }
+#p-abonnement.abo-neuf .abo-conf{ animation-delay:0.24s }
+
+/* Les cinq lignes d'inclus arrivent l'une après l'autre, plus serrées :
+   40 ms suffisent pour une liste, sinon l'attente devient perceptible. */
+@keyframes aboLigne{
+  from{ opacity:0; transform:translateX(-6px) }
+  to  { opacity:1; transform:none }
+}
+#p-abonnement.abo-neuf .offre-li{
+  animation:aboLigne 0.42s cubic-bezier(0.22,1,0.36,1) both;
+}
+#p-abonnement.abo-neuf .offre-li:nth-child(1){ animation-delay:0.20s }
+#p-abonnement.abo-neuf .offre-li:nth-child(2){ animation-delay:0.24s }
+#p-abonnement.abo-neuf .offre-li:nth-child(3){ animation-delay:0.28s }
+#p-abonnement.abo-neuf .offre-li:nth-child(4){ animation-delay:0.32s }
+#p-abonnement.abo-neuf .offre-li:nth-child(5){ animation-delay:0.36s }
+
+/* ─── ② LA BASCULE DE RYTHME ──────────────────────────────────────────────
+   L'onglet actif ne saute pas d'un côté à l'autre : son fond et son contour
+   se transposent. Sans transition, le changement se voit comme un
+   clignotement. */
+.abo-ryt{
+  transition:background 0.28s ease, box-shadow 0.28s ease, color 0.28s ease;
+}
+/* Le prix change de valeur à la bascule : un fondu court accompagne le
+   remplacement, sinon le nouveau chiffre apparaît brutalement à la place de
+   l'ancien. */
+@keyframes aboPrix{
+  from{ opacity:0.35; transform:scale(0.97) }
+  to  { opacity:1; transform:none }
+}
+#p-abonnement .offre-prix{
+  animation:aboPrix 0.34s cubic-bezier(0.22,1,0.36,1);
+}
+
+/* ─── ③ LE TOUCHER ────────────────────────────────────────────────────────
+   Un léger enfoncement au contact, comme sur iOS. `scale` plutôt qu'une
+   variation de couleur : le retour est physique, pas visuel. */
+.offre-cta{ transition:transform 0.14s ease, filter 0.14s ease; }
+.offre-cta:active{ transform:scale(0.975); filter:brightness(0.94); }
+.abo-autres{ transition:transform 0.14s ease, background 0.2s ease; }
+.abo-autres:active{ transform:scale(0.985); }
+
+/* ⚠ RESPECT DU RÉGLAGE SYSTÈME. Quelqu'un qui a demandé moins de mouvement
+     dans iOS ne doit pas subir la cascade : tout devient instantané, rien ne
+     disparaît. C'est une exigence d'accessibilité, pas une option. */
+@media (prefers-reduced-motion: reduce){
+  #p-abonnement .abo-hi,
+  #p-abonnement .abo-rythme,
+  #p-abonnement #abo-vedette,
+  #p-abonnement .abo-autres,
+  #p-abonnement .abo-conf,
+  #p-abonnement .offre-li,
+  #p-abonnement .offre-prix{
+    animation:none;
+  }
+}

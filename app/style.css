@@ -8221,13 +8221,16 @@ body:has(#e-detail.active) #equipe-app{
    reflets. Quatre passes de mesure, sans y parvenir : ce genre d'image se fait
    dans un outil 3D, pas en CSS. Seul le CONTOUR change désormais. */
 .ac-tuile{
-  position:relative;
+  position:relative; overflow:hidden;
   padding:15px 14px 16px;
   margin-bottom:0;
   display:flex; flex-direction:column;
-  /* Le liseré vient du pseudo-élément ci-dessous. Sans cette ligne, la bordure
-     héritée de `.an-bloc` doublerait le contour. */
-  border:none;
+  border:none; border-radius:20px;
+  /* La même matière que les douze cartes : fond en dégradé, lueurs de coin,
+     double ombre portée. Aucun liseré — c'est le modelé qui fait le bord. */
+  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+  box-shadow:0 14px 34px rgba(0,0,0,0.42),
+             0 0 30px -14px rgba(255,255,255,0.20);
 }
 
 /* ═══ LE CONTOUR EN LUMIÈRE RASANTE ═══
@@ -8243,24 +8246,10 @@ body:has(#e-detail.active) #equipe-app{
    La MATIÈRE ne bouge pas : même fond, même rayon, même absence d'ombre. */
 .ac-tuile::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
-  padding:1px; pointer-events:none; z-index:1;
-  /* ═══ PLUS DISCRET ═══
-
-     Les valeurs allaient de 34 % à 4 %. Sur cinq tuiles côte à côte, cinq
-     contours à 34 % font cinq cadres, et l'œil compte les cadres au lieu de
-     lire les chiffres.
-
-     Divisées par deux environ : 18 % au point le plus vif, 3 % au plus éteint.
-     Le relief subsiste — on voit toujours d'où vient la lumière — mais le
-     contour cesse de se signaler. */
-  background:linear-gradient(135deg,
-    rgba(255,255,255,0.18) 0%,
-    rgba(255,255,255,0.06) 30%,
-    rgba(255,255,255,0.03) 60%,
-    rgba(255,255,255,0.10) 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none; z-index:0;
+  background:
+    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.055), transparent 72%),
+    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.032), transparent 72%);
 }
 /* Le contenu passe au-dessus du liseré. */
 .ac-tuile > *{ position:relative; z-index:2; }
@@ -9150,54 +9139,55 @@ body:has(#e-detail.active) #equipe-app{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   UN SEUL CONTOUR POUR LES CARTES DE CONTENU
+   LA MATIÈRE D'« ÉCRIVEZ-NOUS », EN BLANC-GRIS, SANS LISERÉ
 
-   Le même liseré en lumière rasante que les tuiles de l'accueil : vif dans le
-   coin supérieur gauche, éteint au milieu des côtés, ravivé en bas à droite.
+   Cette carte-là tient sur trois choses :
 
-   ─── LES DOUZE CLASSES ───
+     ① un FOND EN DÉGRADÉ, de #17171B à #060608 sur 150° — le haut-gauche est
+        plus clair que le bas-droite ;
+     ② DEUX LUEURS DE COIN, en haut-droite et en bas-gauche ;
+     ③ une OMBRE PORTÉE double : une sombre qui décolle, une teintée qui
+        diffuse.
 
-   Les blocs d'analyse, les groupes de réglages, les lignes de membres,
-   d'appareils, d'entreprises et d'établissements, les tuiles de statistiques.
-   Ce sont les cartes qui PORTENT du contenu.
+   Ses lueurs sont ambres. Ici elles passent en blanc-gris : la couleur reste
+   au produit — icônes, chiffres — et le volume vient de la lumière seule.
 
-   Ne sont PAS incluses, et c'est délibéré :
-     · les champs et menus — un contour de carte les ferait passer pour des
-       blocs cliquables ;
-     · les alertes — leur contour porte une couleur qui signale quelque chose ;
-     · les plaques d'icônes — ce sont des pastilles de 34 px.
+   ─── ET AUCUN LISERÉ ───
 
-   ─── COMMENT ───
+   C'est le point : sans trait, il ne reste que le modelé. Le bord n'est pas
+   dessiné, il se devine à l'endroit où le fond de la carte rejoint celui de la
+   page. C'est ce qui donne l'impression d'un objet bombé plutôt que d'un
+   rectangle découpé.
 
-   `border:none` sur la carte, et le liseré devient un pseudo-élément. Un
-   `border` ne sait pas porter de dégradé : il faut un fond découpé en anneau
-   par deux masques dont le `xor` ne garde que le pourtour.
-
-   `border-radius:inherit` épouse le rayon de chaque carte — 14, 16, 18, 20 ou
-   22 px selon les cas. Une valeur fixe aurait décalé le liseré sur la moitié
-   d'entre elles.
-
-   ⚠ `position:relative` est indispensable sur la carte, sinon le pseudo-élément
-     se positionne par rapport à un ancêtre lointain.
+   Les douze classes : blocs d'analyse, groupes de réglages, lignes de membres,
+   d'appareils, d'entreprises, d'établissements, tuiles de statistiques.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 .an-bloc, .reg-groupe, .reg-identite, .ga-tuile, .stat-mini, .cat-rank,
 .pm-ligne, .app-ligne, .ent-ligne, .etab-ligne, .plan-card, .hero-card{
-  position:relative;
+  position:relative; overflow:hidden;
   border:none;
+  /* ① Le fond en dégradé : la lumière vient du haut-gauche. */
+  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+  /* ③ Deux ombres portées. La seconde est blanche à très faible opacité :
+        c'est elle qui remplace la lueur ambre d'« Écrivez-nous ». */
+  box-shadow:0 14px 34px rgba(0,0,0,0.42),
+             0 0 30px -14px rgba(255,255,255,0.20);
 }
 
+/* ② Les deux lueurs de coin, en blanc au lieu d'ambre. Elles sont posées en
+      pseudo-élément plutôt que dans le fond : superposées au dégradé, elles
+      l'éclairent sans le remplacer. */
 .an-bloc::before, .reg-groupe::before, .reg-identite::before, .ga-tuile::before,
 .stat-mini::before, .cat-rank::before, .pm-ligne::before, .app-ligne::before,
 .ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
-  padding:1px; pointer-events:none; z-index:1;
-  background:linear-gradient(135deg,
-    rgba(255,255,255,0.18) 0%,
-    rgba(255,255,255,0.06) 30%,
-    rgba(255,255,255,0.03) 60%,
-    rgba(255,255,255,0.10) 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none; z-index:0;
+  background:
+    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.055), transparent 72%),
+    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.032), transparent 72%);
 }
+/* Le contenu passe au-dessus des lueurs. */
+.an-bloc > *, .reg-groupe > *, .reg-identite > *, .ga-tuile > *, .stat-mini > *,
+.cat-rank > *, .pm-ligne > *, .app-ligne > *, .ent-ligne > *, .etab-ligne > *,
+.plan-card > *, .hero-card > *{ position:relative; z-index:1; }

@@ -8180,10 +8180,7 @@ body:has(#e-detail.active) #equipe-app{
   margin:0 0 2px;
 }
 .ac-sous{ font-size:14px; color:var(--label-2); margin:0; line-height:1.35; }
-
-/* Le filtre est aligné à droite : à gauche il aurait concurrencé la phrase
-   d'introduction, qui est ce qu'on lit en premier. */
-.ac-filtre{ display:flex; justify-content:flex-end; margin-bottom:12px; }
+/* `.ac-filtre` a été retirée avec le sélecteur de période de l'accueil. */
 
 /* ═══ DEUX PAR DEUX ═══
 
@@ -8287,13 +8284,16 @@ body:has(#e-detail.active) #equipe-app{
 }
 .ac-ic svg{ width:18px; height:18px; display:block; }
 
+/* 38 px et non 30 : « Total de procédures créées » passe sur DEUX lignes, et
+   les tuiles voisines doivent réserver la même place — sinon leurs valeurs se
+   décalent d'une ligne les unes par rapport aux autres. */
 .ac-t{
   font-size:13px; font-weight:600; color:var(--label-2);
   letter-spacing:-0.01em; line-height:1.3;
   /* Deux lignes réservées : « Procédures créées » tient sur une, « Temps de
      formation » aussi, mais les valeurs se décaleraient d'une tuile à l'autre
      si l'une passait à deux lignes. On fige la hauteur. */
-  min-height:30px;
+  min-height:38px;
 }
 /* ═══ LA VALEUR NE FLOTTE PLUS EN BAS ═══
 
@@ -9147,3 +9147,57 @@ body:has(#e-detail.active) #equipe-app{
 .pm-barre .dd-filter{ flex:0 0 auto; }
 /* Poussé au bout : entre les deux, rien à mettre. */
 .pm-aide-btn{ margin-left:auto; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN SEUL CONTOUR POUR LES CARTES DE CONTENU
+
+   Le même liseré en lumière rasante que les tuiles de l'accueil : vif dans le
+   coin supérieur gauche, éteint au milieu des côtés, ravivé en bas à droite.
+
+   ─── LES DOUZE CLASSES ───
+
+   Les blocs d'analyse, les groupes de réglages, les lignes de membres,
+   d'appareils, d'entreprises et d'établissements, les tuiles de statistiques.
+   Ce sont les cartes qui PORTENT du contenu.
+
+   Ne sont PAS incluses, et c'est délibéré :
+     · les champs et menus — un contour de carte les ferait passer pour des
+       blocs cliquables ;
+     · les alertes — leur contour porte une couleur qui signale quelque chose ;
+     · les plaques d'icônes — ce sont des pastilles de 34 px.
+
+   ─── COMMENT ───
+
+   `border:none` sur la carte, et le liseré devient un pseudo-élément. Un
+   `border` ne sait pas porter de dégradé : il faut un fond découpé en anneau
+   par deux masques dont le `xor` ne garde que le pourtour.
+
+   `border-radius:inherit` épouse le rayon de chaque carte — 14, 16, 18, 20 ou
+   22 px selon les cas. Une valeur fixe aurait décalé le liseré sur la moitié
+   d'entre elles.
+
+   ⚠ `position:relative` est indispensable sur la carte, sinon le pseudo-élément
+     se positionne par rapport à un ancêtre lointain.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.an-bloc, .reg-groupe, .reg-identite, .ga-tuile, .stat-mini, .cat-rank,
+.pm-ligne, .app-ligne, .ent-ligne, .etab-ligne, .plan-card, .hero-card{
+  position:relative;
+  border:none;
+}
+
+.an-bloc::before, .reg-groupe::before, .reg-identite::before, .ga-tuile::before,
+.stat-mini::before, .cat-rank::before, .pm-ligne::before, .app-ligne::before,
+.ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:1px; pointer-events:none; z-index:1;
+  background:linear-gradient(135deg,
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.06) 30%,
+    rgba(255,255,255,0.03) 60%,
+    rgba(255,255,255,0.10) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}

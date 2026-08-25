@@ -8236,23 +8236,20 @@ body:has(#e-detail.active) #equipe-app{
 .ac-tuile::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
   padding:1px; pointer-events:none; z-index:1;
-  /* ═══ GRIS CLAIR, PAS AMBRE ═══
+  /* ═══ PLUS DISCRET ═══
 
-     L'ambre appartient aux cartes qui vendent — l'abonnement, « Écrivez-nous ».
-     Sur trois tuiles de tableau de bord, il tirait l'œil vers le contenant
-     alors que ce sont les chiffres qui comptent.
+     Les valeurs allaient de 34 % à 4 %. Sur cinq tuiles côte à côte, cinq
+     contours à 34 % font cinq cadres, et l'œil compte les cadres au lieu de
+     lire les chiffres.
 
-     Le blanc translucide garde le relief sans la couleur : la lumière rasante
-     subsiste — vive en haut à gauche, éteinte au milieu, ravivée en bas à
-     droite — mais elle ne dit plus « regardez-moi ».
-
-     Les valeurs sont plus hautes qu'un liseré ambre équivalent : le blanc
-     ressort moins sur fond sombre à opacité égale. */
+     Divisées par deux environ : 18 % au point le plus vif, 3 % au plus éteint.
+     Le relief subsiste — on voit toujours d'où vient la lumière — mais le
+     contour cesse de se signaler. */
   background:linear-gradient(135deg,
-    rgba(255,255,255,0.34) 0%,
-    rgba(255,255,255,0.10) 30%,
-    rgba(255,255,255,0.04) 60%,
-    rgba(255,255,255,0.18) 100%);
+    rgba(255,255,255,0.18) 0%,
+    rgba(255,255,255,0.06) 30%,
+    rgba(255,255,255,0.03) 60%,
+    rgba(255,255,255,0.10) 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;

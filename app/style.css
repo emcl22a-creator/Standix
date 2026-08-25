@@ -2886,10 +2886,36 @@
   /* Celle qu'on recommande porte le liseré ambre : c'est le seul signal, et il
      suffit. Son fond descend un cran plus bas encore — c'est ce qui fait
      ressortir le liseré. */
+  /* ═══ UN LISERÉ QUI S'ÉTEINT ═══
+
+     Il était uniforme : la même opacité tout autour. Sur ton image il est vif
+     en haut à gauche et s'efface en bas à droite — c'est ce qui donne
+     l'impression d'une lumière qui frappe la carte de biais.
+
+     Un `box-shadow` ne sait pas faire de dégradé. La technique : un dégradé
+     posé en fond, découpé en anneau par deux masques superposés — l'un couvre
+     tout, l'autre évide l'intérieur, et `xor` ne laisse que la différence.
+     Il ne reste que le contour.
+
+     ⚠ LE PARENT DOIT ÊTRE `position:relative` et le contenu `z-index:2` :
+       sinon le pseudo-élément passe par-dessus le texte. Les deux sont déjà
+       en place plus bas. */
   .offre-carte.vedette{
+    position:relative;
     background:linear-gradient(150deg,#191920 0%,#0F0F13 48%,#08080A 100%);
-    box-shadow:inset 0 0 0 1px rgba(255,173,51,0.42),
-               0 16px 42px rgba(0,0,0,0.5);
+    box-shadow:0 16px 42px rgba(0,0,0,0.5);
+  }
+  .offre-carte.vedette::before{
+    content:''; position:absolute; inset:0; border-radius:inherit;
+    padding:1px; pointer-events:none; z-index:1;
+    background:linear-gradient(145deg,
+      rgba(255,186,80,0.78) 0%,
+      rgba(255,159,10,0.34) 38%,
+      rgba(255,159,10,0.10) 68%,
+      rgba(255,159,10,0.05) 100%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude;
   }
   .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
 
@@ -8598,30 +8624,46 @@ body:has(#e-detail.active) #equipe-app{
    liraient comme deux options cumulables.
 
    Centrée et étroite : elle commande la page, elle n'est pas la page. */
+/* La piste : un fond sombre uni et un contour très discret. Sur ton image elle
+   est à peine plus claire que la page — c'est le contour de l'onglet actif qui
+   porte le contraste, pas la piste. */
 .abo-rythme{
-  display:inline-flex; gap:3px; padding:3px; margin:0 auto 16px;
+  display:flex; width:max-content; gap:4px; padding:4px; margin:0 auto 18px;
   border-radius:100px;
-  background:rgba(255,255,255,0.05);
-  border:0.5px solid rgba(255,255,255,0.07);
+  background:rgba(255,255,255,0.035);
+  border:0.5px solid rgba(255,255,255,0.06);
 }
-.abo-rythme{ display:flex; width:max-content; }
 .abo-ryt{
   display:flex; align-items:center; gap:6px;
   padding:8px 16px; border:none; border-radius:100px;
   background:none; color:var(--label-2);
   font-family:inherit; font-size:12.5px; font-weight:650; letter-spacing:-0.01em;
 }
-/* L'onglet actif porte un liseré ambre et un fond teinté — pas un fond plein :
-   un aplat orange dans une piste de 34 px pèserait plus que le prix. */
+/* ═══ L'ONGLET ACTIF, SELON TON IMAGE ═══
+
+   Un CONTOUR ambre net et un texte ambre — pas un fond teinté avec du texte
+   blanc. La différence est nette à l'œil : le contour désigne, le fond
+   remplit. Ton image montre un anneau, pas une pastille pleine.
+
+   Le fond reste presque noir, un cran plus sombre que la piste : c'est ce
+   creux qui donne l'impression d'un onglet enfoncé. */
 .abo-ryt.on{
-  background:rgba(255,159,10,0.10);
-  box-shadow:inset 0 0 0 0.5px rgba(255,173,51,0.42);
-  color:var(--label-1);
+  background:rgba(10,10,12,0.85);
+  box-shadow:inset 0 0 0 1px rgba(255,173,51,0.85);
+  color:#FFAD33;
 }
+/* ═══ « −20 % » EN AMBRE, PAS EN VERT ═══
+
+   Le vert disait « économie » dans un vocabulaire qui n'est pas celui de
+   l'app. Ton image montre une pastille ambre — la seule couleur d'accent de
+   Standix, et elle suffit à dire que c'est un avantage.
+
+   Fond plein et texte sombre : à 9,5 px, un texte ambre sur fond translucide
+   se lit mal. L'inversion le rend net. */
 .abo-ryt .eco{
-  padding:2px 6px; border-radius:100px;
-  font-size:9.5px; font-weight:800; letter-spacing:0.03em;
-  background:rgba(48,209,88,0.15); color:#30D158;
+  padding:2.5px 7px; border-radius:100px;
+  font-size:9.5px; font-weight:800; letter-spacing:0.02em;
+  background:linear-gradient(135deg,#FFAD33,#F08000); color:#2A1400;
 }
 
 /* ═══ « VOIR LES AUTRES FORMULES » ═══
@@ -8711,7 +8753,7 @@ body:has(#e-detail.active) #equipe-app{
 .offre-logo{
   position:absolute; top:14px; right:-26px;
   width:150px; height:150px; pointer-events:none;
-  opacity:0.30;
+  opacity:0.40;
   /* ⚠ PAS DE `filter` SUR LE PARENT. Un `drop-shadow` ici crée un nouveau
      contexte de rendu qui empêche le masque de l'enfant de s'appliquer — le
      logo ressortait gris. L'ombre est portée par l'enfant, où elle fonctionne. */
@@ -8728,17 +8770,36 @@ body:has(#e-detail.active) #equipe-app{
 
    Le `img` devient un bloc vide masqué par lui-même — on ne voit que le
    dégradé, découpé à la forme du logo. */
-.offre-logo img{
+.offre-logo .logo-forme{
   width:100%; height:100%; display:block;
-  background:linear-gradient(150deg,#FFC46B,#FF6A00);
-  -webkit-mask-image:url("../logo-standix.png");
-  mask-image:url("../logo-standix.png");
+  /* ═══ UNE DIV, PAS UNE IMAGE ═══
+
+     Le masque et le dégradé étaient corrects — vérifié dans le navigateur. Mais
+     la balise `img` DESSINAIT aussi son fichier, par-dessus son propre fond :
+     on voyait le logo blanc d'origine, gris sur fond sombre.
+
+     Un élément vide n'a rien à dessiner. Le masque lit le fichier, le fond
+     donne la couleur, et rien ne vient par-dessus. C'est le détail qui
+     manquait à mes quatre essais précédents. */
+  display:block;
+  /* ═══ PLUS ORANGE ═══
+
+     `#FFC46B` → `#FF6A00` partait d'un beige clair : au bout d'un dégradé, sur
+     30 % d'opacité, le logo tirait vers le gris chaud plutôt que vers l'orange.
+
+     On resserre sur la partie orange de la palette — `#FF9A2E` → `#E85D00` —
+     et on remonte l'opacité à 40 %. Le blanc du fichier n'intervient plus : le
+     masque ne garde que sa forme, la couleur vient entièrement d'ici. */
+  background:linear-gradient(150deg,#FF9A2E,#E85D00);
+  /* La source vient de `--logo-src`, posée par le code au démarrage : c'est le
+     même base64 que l'en-tête, pas un fichier séparé du dépôt. */
+  -webkit-mask-image:var(--logo-src);
+  mask-image:var(--logo-src);
   -webkit-mask-size:contain; mask-size:contain;
   -webkit-mask-repeat:no-repeat; mask-repeat:no-repeat;
   -webkit-mask-position:center; mask-position:center;
   filter:drop-shadow(0 6px 22px rgba(255,122,24,0.18));
 }
-.offre-logo svg{ width:100%; height:100%; display:block; }
 /* Le texte passe AU-DESSUS du logo, jamais dessous : un prix illisible parce
    qu'un ornement le traverse serait le pire des échanges. */
 .offre-nom, .offre-prix, .offre-inclus,

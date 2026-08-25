@@ -1705,74 +1705,61 @@ footer .marque{ margin-bottom:18px; }
 
   .capture{
     position:relative; max-width:none; margin:0;
-    aspect-ratio:auto; height:626px; overflow:visible;
+    aspect-ratio:auto; height:742px; overflow:visible;
     border-radius:0; box-shadow:none;
     transform-style:preserve-3d;
     -webkit-mask-image:none; mask-image:none;
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     TROIS ÉCRANS EN ÉVENTAIL
+     UN SEUL ÉCRAN, EN GRAND
 
-     La composition n'en portait que deux : un au fond, un devant. Le troisième
-     y était masqué faute de place. En les décalant en diagonale — même largeur,
-     même pas horizontal et vertical — les trois tiennent dans la colonne, et
-     chacun laisse voir une centaine de pixels de celui qui le précède.
+     L'éventail à trois est abandonné. Mesuré, il ne montrait que 35 % et 32 %
+     des deux écrans du fond : un seul lisible, et deux bandes de 90 px qu'on
+     ne pouvait pas lire mais qui encombraient. La colonne fait 470 px ; trois
+     écrans lisibles en demanderaient 900. Aucune disposition n'y pouvait rien.
 
-     L'ORDRE À L'ÉCRAN N'EST PAS CELUI DU HTML. Au fond l'accueil, au milieu
-     l'analyse, devant la procédure ouverte : c'est elle qui porte la
-     démonstration, donc elle prend le premier plan. Le carrousel du téléphone,
-     lui, garde l'ordre de lecture.
+     Reste la procédure ouverte, seule, à 420 px : c'est elle qui porte la
+     démonstration. Les deux autres captures ne disparaissent pas du site — le
+     carrousel du téléphone les montre toutes les trois.
 
-     La netteté et la clarté augmentent vers l'avant : c'est le signal de
-     profondeur le plus fort, bien avant la taille ou l'ombre.
+     Un objet net vaut mieux que trois moitiés d'objets.
      ═══════════════════════════════════════════════════════════════════════ */
   .capture .vue{
     position:absolute; inset:auto;
     opacity:1; filter:none; transition:none;
     pointer-events:auto;
-    border-radius:22px; overflow:hidden;
-    -webkit-mask-image:linear-gradient(180deg,#000 88%,rgba(0,0,0,.45) 96%,transparent);
-            mask-image:linear-gradient(180deg,#000 88%,rgba(0,0,0,.45) 96%,transparent);
+    border-radius:26px; overflow:hidden;
+    -webkit-mask-image:linear-gradient(180deg,#000 90%,rgba(0,0,0,.45) 97%,transparent);
+            mask-image:linear-gradient(180deg,#000 90%,rgba(0,0,0,.45) 97%,transparent);
   }
+  /* Les deux autres vues ne sont pas supprimées, seulement masquées : le
+     carrousel du téléphone continue de les afficher, et elles reviendront si
+     l'écran épinglé est construit un jour. */
+  .capture .vue:nth-of-type(1),
+  .capture .vue:nth-of-type(3){ display:none }
 
-  /* Au fond : l'accueil. */
-  .capture .vue:nth-of-type(1){
-    left:0; top:0; width:268px; z-index:1;
-    transform:rotateY(16deg) scale(.97);
-    transform-origin:100% 50%;
-    filter:blur(1.3px) brightness(.6);
-    box-shadow:0 0 0 1px rgba(255,255,255,.07),
-               0 24px 56px rgba(0,0,0,.7);
-  }
-  /* Au milieu : l'analyse, dont les anneaux ambre sont la seule couleur de la
-     page — placée au fond elle aurait été éteinte par l'assombrissement. */
-  .capture .vue:nth-of-type(3){
-    left:98px; top:52px; width:288px; z-index:2;
-    transform:rotateY(8deg);
-    transform-origin:100% 50%;
-    filter:blur(.5px) brightness(.82);
-    box-shadow:0 0 0 1px rgba(255,255,255,.13),
-               inset 0 1px 0 rgba(255,255,255,.18),
-               0 34px 70px rgba(0,0,0,.75);
-  }
-  /* Devant : la procédure ouverte. Elle franchit la verticale de droite et
-     déborde dans la marge — le seul élément de la page à sortir de la grille. */
   .capture .vue:nth-of-type(2){
-    right:calc(-1 * min(58px, max(0px, (100vw - var(--large)) / 2 - 16px)));
-    top:104px; width:312px; z-index:3;
-    transform:rotateY(-9deg) translateZ(110px);
+    /* Il franchit la verticale de droite et déborde dans la marge, au plus la
+       moitié de l'espace libre moins 16 px de garde. C'est le seul élément de
+       la page à sortir de la grille — d'où l'impression qu'il en sort. */
+    right:calc(-1 * min(46px, max(0px, (100vw - var(--large)) / 2 - 16px)));
+    top:0; width:420px; z-index:3;
+    /* 5° au lieu de 9 : à cette taille, une rotation marquée déforme le texte
+       de l'app sur le bord éloigné. Assez pour le volume, pas assez pour gêner
+       la lecture. */
+    transform:rotateY(-5deg) translateZ(80px);
     transform-origin:0% 50%;
-    box-shadow:0 0 0 1px rgba(255,255,255,.32),
-               inset -1px 0 0 rgba(255,255,255,.26),
-               inset 0 1px 0 rgba(255,255,255,.36),
-               0 60px 130px rgba(0,0,0,.85),
-               0 18px 40px rgba(0,0,0,.6);
+    box-shadow:0 0 0 1px rgba(255,255,255,.30),
+               inset -1px 0 0 rgba(255,255,255,.24),
+               inset 0 1px 0 rgba(255,255,255,.34),
+               0 70px 150px rgba(0,0,0,.85),
+               0 22px 50px rgba(0,0,0,.6);
   }
   .capture .vue:nth-of-type(2)::after{
     content:''; position:absolute; inset:0; z-index:-1;
-    border-radius:22px;
-    box-shadow:0 0 110px 40px rgba(var(--halo),.24);
+    border-radius:26px;
+    box-shadow:0 0 130px 48px rgba(var(--halo),.26);
   }
   .capture .vue img{ height:auto }
   /* La composition en profondeur de l'ordinateur n'a que deux places. La
@@ -1956,17 +1943,9 @@ footer .marque{ margin-bottom:18px; }
   /* Les trois écrans avancent d'un cran au survol. Le déplacement suit l'axe
      de leur rotation — chacun revient vers le lecteur au lieu de monter, ce qui
      serait incohérent avec la perspective. */
-  .capture .vue{ transition:transform .5s var(--ec), filter .5s ease }
-  .capture .vue:nth-of-type(1):hover{
-    transform:rotateY(16deg) scale(.97) translateZ(40px);
-    filter:blur(.4px) brightness(.78);
-  }
-  .capture .vue:nth-of-type(3):hover{
-    transform:rotateY(8deg) translateZ(50px);
-    filter:blur(0) brightness(.96);
-  }
+  .capture .vue{ transition:transform .5s var(--ec) }
   .capture .vue:nth-of-type(2):hover{
-    transform:rotateY(-9deg) translateZ(150px);
+    transform:rotateY(-5deg) translateZ(130px);
   }
 
   .tarif{ transition:transform .35s var(--ec), box-shadow .35s ease }
@@ -2064,16 +2043,15 @@ footer .marque{ margin-bottom:18px; }
          rédige les étapes », ce que le titre dit désormais. Répéter en petit
          ce qu'on vient de lire en grand fait perdre le lecteur. Il ne garde que
          ce que le titre ne dit pas : le QR code. -->
-  <h1 class="flou r1">L'IA transforme vos vidéos en procédures,<br><em>consultables à tout moment.</em></h1>
-  <!-- ═══ PAS DE SOUS-TITRE ═══
-
-       Le titre porte déjà la mécanique ET l'accès. La section 01, juste en
-       dessous, détaille les trois façons de créer et les trois de consulter :
-       un sous-titre les annonçait à trois centimètres de distance.
-
-       Pour en remettre un, une seule ligne suffit ici — la classe `sous` et son
-       style sont conservés :
-       <p class="sous flou r2">Trois minutes de vidéo suffisent.</p> -->
+  <!-- Le mot mis en blanc est « procédures » : c'est le résultat, et le seul
+       terme du titre qui désigne ce que le patron obtient. « L'IA transforme
+       vos vidéos » reste en gris — c'est le moyen. -->
+  <h1 class="flou r1">L'IA transforme vos vidéos<br><em>en procédures.</em></h1>
+  <!-- Le sous-titre dit ce que le titre ne dit pas : QUI les lit. Le titre
+       s'arrête au résultat, celui-ci le met entre les mains de l'équipe. -->
+  <p class="sous flou r2">
+    Toute l'équipe les consulte d'un scan, ou dans l'app.
+  </p>
   <div class="actions flou r3">
     <a class="btn" href="app/">
       Essayer gratuitement

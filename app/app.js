@@ -5799,14 +5799,14 @@ function activerAvecNaissance(ecran) {
   const poser = () => {
     const src = document.getElementById('logo-src')
     if (!src) return
-    document.querySelectorAll('img[data-logo]').forEach(i => {
-      i.src = src.src
-      /* Les logos teintes par masque ont besoin de la source dans leur CSS,
-         pas seulement dans leur attribut. Une variable la leur passe. */
-      if (i.classList.contains('logo-forme')) {
-        i.style.setProperty('--logo-src', `url("${src.src}")`)
-      }
-    })
+    document.querySelectorAll('img[data-logo]').forEach(i => { i.src = src.src })
+    /* Le logo ORANGE, pour la carte d'abonnement. Deux sources distinctes
+       plutôt qu'une teinte calculée : j'ai perdu quatre essais à recolorer le
+       blanc par filtre puis par masque, alors que le fichier orange existait. */
+    const srcOr = document.getElementById('logo-or')
+    if (srcOr) {
+      document.querySelectorAll('img[data-logo-or]').forEach(i => { i.src = srcOr.src })
+    }
   }
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', poser)
@@ -16459,7 +16459,9 @@ function carteOffre(o, opts = {}) {
   ].filter(Boolean)
 
   return `<div class="offre-carte${opts.classe || ''}">
-    ${opts.ruban ? `<span class="offre-ruban">${opts.ruban}</span>` : ''}
+    <!-- Le ruban a ete retire. « Populaire » n avait pas de sens — on choisit
+         son offre sur le nombre de membres, pas par gout — et « En cours »
+         doublait le bouton, qui dit deja « Votre abonnement actuel ». -->
     <!-- ═══ LE LOGO EN FILIGRANE ═══
 
          C est le fichier du depot, pas un trace refait a la main. J ai essaye
@@ -16472,11 +16474,11 @@ function carteOffre(o, opts = {}) {
          le fichier est blanc, et le recolorer en CSS evite de maintenir une
          seconde version du logo dans le depot. -->
     <span class="offre-logo" aria-hidden="true">
-      <!-- LE MEME LOGO QUE PARTOUT AILLEURS. L app n utilise aucun fichier :
-           le logo est embarque en base64 dans index.html, et data-logo en copie
-           la source dans chaque balise qui le porte. Mon chemin vers un PNG du
-           depot pointait vers un fichier que l app ne charge jamais. -->
-      <img class="logo-forme" data-logo alt="">
+      <!-- LE LOGO ORANGE, celui fourni par Emilien. Il est embarque en base64
+           dans index.html sous l id logo-or, a cote du blanc que l en-tete
+           emploie. Plus de masque CSS ni de teinte calculee : le fichier porte
+           deja la bonne couleur. -->
+      <img class="logo-forme" data-logo-or alt="">
     </span>
 
     <div class="offre-nom">${o.nom}</div>
@@ -16545,9 +16547,7 @@ function carteOffre(o, opts = {}) {
       : rythmeChoisi === 'annuel'
         ? `Activer \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an`
         : `Activer \u00b7 ${o.prix} \u20ac par mois`
-    }${opts.enCours ? '' : `<svg class="cta-fl" viewBox="0 0 24 24" fill="none"
-        stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h13M13 6l6 6-6 6"/></svg>`}</button>` : ''}
+    }</button>` : ''}
     ${opts.gerer ? `
     <!-- Résilier doit être aussi simple que souscrire : le lien est ICI, sous
          l'offre, pas caché dans un recoin des paramètres. -->
@@ -16592,19 +16592,6 @@ window.renderAbonnements = function() {
   const estActuelle = mienne.cle === actuel
   document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
     classe: ' vedette' + (estActuelle ? ' actuelle' : ''),
-    /* ═══ PLUS DE « RECOMMANDÉE » ═══
-
-       Le ruban suggérait un choix de goût — comme si certains clients
-       préféraient cette offre. Or on ne choisit pas son abonnement par
-       préférence : on le choisit sur le nombre de membres, et l'offre affichée
-       en tête est DÉJÀ celle qui correspond à la taille de l'équipe.
-
-       Dire « recommandée » sur un plan imposé par le compte des personnes, c'est
-       présenter une contrainte comme une suggestion. Le sous-titre l'explique
-       déjà : « L'offre Essentiel est faite pour une équipe de cette taille. »
-
-       « En cours » reste : ce n'est pas un avis, c'est un fait. */
-    ruban: estActuelle ? 'En cours' : '',
     enCours: estActuelle,
     gerer: estActuelle,
     /* « Choisir <offre> » : le geste, sans le mot argent. « Essayer
@@ -16626,7 +16613,6 @@ window.renderAbonnements = function() {
     .filter(o => o.cle !== mienne.cle)
     .map(o => carteOffre(o, {
       classe: o.cle === actuel ? ' actuelle' : '',
-      ruban: o.cle === actuel ? 'En cours' : '',
       cta: o.cle === actuel ? 'Votre abonnement actuel'
         : (o.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + o.nom),
       /* Développées elles aussi : quelqu'un qui déplie les autres offres veut

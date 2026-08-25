@@ -972,6 +972,58 @@ h2.chiffres{
 .objection p{ font-size:13.5px; line-height:1.6; color:var(--t2); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   LE VOLET GLISSABLE
+
+   Même mécanique que la galerie du premier écran : deux vues superposées, une
+   seule visible, fondu de l'une à l'autre, et le glissement au doigt.
+
+   DEUX ONGLETS ÉCRITS, PAS DES PASTILLES. Sur la galerie, les pastilles
+   suffisent parce que l'image dit d'elle-même ce qu'elle montre. Ici les deux
+   vues sont du texte : sans libellé, personne ne saurait qu'il existe une
+   seconde liste — ni laquelle il regarde.
+
+   La hauteur du cadre suit celle de la liste affichée, sinon la plus courte
+   laisserait un trou de deux cents pixels.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.bascule{ display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap }
+.bascule-bt{
+  padding:10px 18px; border-radius:100px; border:0; cursor:pointer;
+  font:500 13.5px/1 'Inter',sans-serif; letter-spacing:-.01em;
+  background:linear-gradient(rgba(255,255,255,.04),rgba(255,255,255,.04)), var(--fond);
+  color:var(--t2);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.11);
+  transition:background .25s ease, color .25s ease, box-shadow .25s ease;
+}
+.bascule-bt.actif{ background:var(--t1); color:var(--fond); box-shadow:none }
+
+.dossier{ position:relative; transition:height .45s var(--ec) }
+.face{
+  position:absolute; inset:0 auto auto 0; width:100%;
+  opacity:0; transform:translateY(10px); filter:blur(5px);
+  transition:opacity .5s var(--ec), transform .5s var(--ec), filter .5s var(--ec);
+  pointer-events:none;
+}
+.face.on{ opacity:1; transform:none; filter:blur(0); pointer-events:auto }
+
+.face ul{ list-style:none }
+/* Une seule colonne : les deux listes font trois et cinq lignes. Réparties en
+   deux colonnes, trois lignes laissaient une moitié vide et le regard cherchait
+   la suite. */
+@media(min-width:820px){ .face ul{ max-width:58ch } }
+.face li{
+  position:relative; padding:11px 0 11px 24px;
+  font-size:14.5px; line-height:1.55; color:var(--t2);
+  break-inside:avoid;
+}
+.face li::before{ content:'—'; position:absolute; left:0; top:11px; color:var(--t3) }
+.face li b{ color:var(--t1); font-weight:500 }
+@media(min-width:820px){ .face li{ font-size:15px } }
+
+.bascule-pas{ display:flex; gap:7px; margin-top:24px }
+.bascule-pas i{ width:6px; height:6px; border-radius:100px; background:rgba(255,255,255,.2);
+  transition:width .35s var(--ec), background .35s ease }
+.bascule-pas i.on{ width:22px; background:var(--t1) }
+/* ═══════════════════════════════════════════════════════════════════════════
    LE PRIX — QUATRIÈME SECTION
 
    ═══ CE QU'ON VEND ICI N'EST PAS UN TARIF ═══
@@ -1785,6 +1837,14 @@ footer .marque{ margin-bottom:18px; }
   .acces li{ font-size:14px }
   .sous-titre{ font-size:17px; margin-top:44px }
 
+  .duel li{
+    flex-direction:row; align-items:center; gap:28px;
+    padding:26px 0;
+  }
+  .duel .av{ flex:1; font-size:16px }
+  .duel .ap{ flex:1.15; font-size:24px }
+  .duel .fl{ transform:none; margin:0 }
+
   section.bloc{ padding:104px var(--gouttiere) 120px }
   h2{ font-size:44px; max-width:17ch; margin-bottom:20px }
   .surtitre{ font-size:13px }
@@ -2180,6 +2240,54 @@ footer .marque{ margin-bottom:18px; }
   <p class="note app" style="--d:.36s">
     Chaque membre a son compte. Vos procédures ne sont jamais publiques.
   </p>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LA DIFFÉRENCE
+
+     ⚠ LES CLASSES SONT PRÉFIXÉES `bascule-` ET NOMMÉES `face` / `dossier`.
+       Les noms évidents — `.vue`, `.onglets` — appartiennent déjà à la galerie
+       du premier écran, et leurs règles écrasaient ces listes à zéro pixel de
+       haut. Sur une page d'un seul fichier, deux composants ne peuvent pas
+       partager un nom.
+
+     ⚠ LES LISTES SONT COURTES : trois lignes pour le gérant, cinq pour
+       l'employé. À compléter dès que la liste réelle des fonctionnalités
+       sera connue.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<section class="bloc difference">
+  <i class="croix g"></i><i class="croix d"></i>
+  <p class="surtitre app">La différence</p>
+  <!-- « Ce que ça change, des deux côtés » supposait qu'on sache déjà quels
+       côtés. Le nouveau titre nomme les deux personnes concernées : le patron
+       se reconnaît, et il comprend que son équipe y gagne aussi. -->
+  <h2 class="app" style="--d:.05s">Ce que ça vous apporte, <em>à vous et à votre équipe.</em></h2>
+
+  <div class="bascule app" id="bascule" style="--d:.09s">
+    <button class="bascule-bt actif">Pour le gérant</button>
+    <button class="bascule-bt">Pour l'employé</button>
+  </div>
+
+  <div class="dossier app" id="dossier" style="--d:.13s">
+    <div class="face on">
+      <ul>
+        <li><b>Former une seule fois.</b> Vous filmez le geste, il sert à toutes les arrivées suivantes.</li>
+        <li><b>Ne plus être interrompu</b> pour la même question, pour la quinzième fois.</li>
+        <li><b>Le savoir-faire reste</b> quand quelqu'un s'en va.</li>
+      </ul>
+    </div>
+    <div class="face">
+      <ul>
+        <li><b>Trouver la bonne procédure</b> en scannant un QR code.</li>
+        <li><b>Trouver la réponse seul</b>, sans avoir à demander à quelqu'un.</li>
+        <li><b>Dans sa langue</b> — français, anglais ou allemand.</li>
+        <li><b>Démarrer seul</b> le premier jour.</li>
+        <li><b>Refaire un geste rare</b> sans hésiter, même des mois après.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="bascule-pas app" id="bascule-pas" style="--d:.17s"><i class="on"></i><i></i></div>
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════════════════
@@ -2855,6 +2963,44 @@ footer .marque{ margin-bottom:18px; }
     const h1 = document.querySelector('h1')
     if (h1) setTimeout(() => h1.classList.add('vu'), 120)
   }
+})()
+</script>
+<script>
+
+(() => {
+  const faces = [...document.querySelectorAll('.face')]
+  const bts  = [...document.querySelectorAll('.bascule-bt')]
+  const pas  = [...document.querySelectorAll('#bascule-pas i')]
+  const dossier = document.getElementById('dossier')
+  let i = 0
+
+  /* La hauteur est fixée à celle de la vue active. Sans ça, un conteneur en
+     position absolue s'effondre à zéro et le contenu qui suit remonte. */
+  const cale = () => { dossier.style.height = faces[i].offsetHeight + 'px' }
+
+  const aller = (n) => {
+    i = (n + faces.length) % faces.length
+    faces.forEach((v, k) => v.classList.toggle('on', k === i))
+    bts.forEach((b, k) => b.classList.toggle('actif', k === i))
+    pas.forEach((p, k) => p.classList.toggle('on', k === i))
+    cale()
+  }
+  bts.forEach((b, k) => b.addEventListener('click', () => aller(k)))
+
+  /* Le glissement au doigt, comme la galerie du premier écran. 40 px de seuil :
+     en dessous, un défilement vertical un peu oblique déclencherait un
+     changement de vue non voulu. */
+  let x0 = null
+  dossier.addEventListener('touchstart', e => { x0 = e.touches[0].clientX }, {passive:true})
+  dossier.addEventListener('touchend', e => {
+    if (x0 === null) return
+    const d = e.changedTouches[0].clientX - x0
+    if (Math.abs(d) > 40) aller(i + (d < 0 ? 1 : -1))
+    x0 = null
+  }, {passive:true})
+
+  addEventListener('resize', cale)
+  requestAnimationFrame(cale)
 })()
 </script>
 </body>

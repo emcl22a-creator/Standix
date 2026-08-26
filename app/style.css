@@ -5472,7 +5472,29 @@
      Cinq pixels en valeur fixe, et non en pourcentage : à cette échelle, un
      pourcentage n'a plus de sens — cinq pixels doivent rester cinq pixels sur
      tous les écrans. */
-  .login-wrap{ position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px; overflow:hidden; touch-action:none; }
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA FEUILLE MODALE
+
+     L'écran d'inscription monte du bas et s'arrête avant le haut, laissant
+     voir la page d'accueil derrière. C'est la `sheet` d'iOS : Apple l'emploie
+     pour tout ce qui s'ouvre par-dessus sans quitter la page.
+
+     ⚠ CE QUI N'EST PAS DU STYLE APPLE, et que je n'ai donc pas fait :
+       · le logo en pastille à cheval sur le bord — convention du web des
+         années 2010, jamais dans les apps d'Apple ;
+       · une photo décorative figée derrière — sur iOS, le fond d'une feuille
+         est l'écran d'où l'on vient.
+
+     Le voile qui assombrit ce qu'il y a derrière : sans lui, on ne sait plus
+     quelle couche est active. */
+  .login-wrap{
+    position:fixed; inset:0; z-index:60;
+    display:flex; align-items:flex-end; justify-content:center;
+    padding:0;
+    background:rgba(0,0,0,0.42);
+    -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+    animation:feuilleVoile 0.32s ease both;
+  }
   .login-wrap > .login-card{ transform:translateY(-5px); }
 
   /* ═══ Apparition du logo ═══
@@ -5564,8 +5586,78 @@
   }
   .btn.ghost .btn-spinner{ border-color:rgba(255,255,255,0.25); border-top-color:#fff; }
   .btn[data-loading="true"]{ pointer-events:none; opacity:0.85; }
-  .login-card{ width:100%; max-width:360px; max-height:92vh; overflow-y:auto; background:var(--bg-card); border:0.5px solid var(--border); border-radius:20px; padding:28px 24px;
-    -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%); touch-action:pan-y; }
+  .login-card{
+    width:100%; max-width:none;
+    /* Elle s'arrête à 92 % : les huit pour cent restants laissent voir la page
+       d'accueil, et c'est ce qui dit qu'on peut revenir en arrière. */
+    max-height:92vh; overflow-y:auto;
+    background:#0E0E13;
+    border:none;
+    /* Arrondie en haut seulement — elle sort du bas de l'écran. */
+    border-radius:22px 22px 0 0;
+    /* 40 px en tête : la pastille chevauche le bord et mord sur 31 px. Sans
+       cette réserve, elle recouvrirait le titre. */
+    padding:66px 22px calc(env(safe-area-inset-bottom, 0px) + 26px);
+    box-shadow:0 -12px 40px rgba(0,0,0,0.6);
+    animation:feuilleMonte 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+
+  /* ═══ LA PASTILLE DU LOGO, À CHEVAL SUR LE BORD ═══
+
+     Deux impasses avant celle-ci :
+
+     ① SUR `.login-card` en pseudo-élément — impossible, elle porte
+        `overflow-y:auto` pour défiler, ce qui rogne tout ce qui dépasse.
+
+     ② SUR `.login-wrap` avec `bottom:calc(92vh - 31px)` — la feuille s'adapte
+        à son contenu, elle ne fait pas toujours 92 % de la hauteur. La
+        pastille partait hors de l'écran.
+
+     La solution : un conteneur dans le FLUX de la carte, remonté par une marge
+     négative. Il ne dépend d'aucune hauteur, et le `padding:66px` de la carte
+     lui réserve la place. */
+  .feuille-tete{
+    display:flex; justify-content:center;
+    margin:-53px 0 16px;
+    pointer-events:none;
+  }
+  .feuille-logo{
+    width:62px; height:62px; border-radius:50%;
+    display:grid; place-items:center;
+    background:#0A0A0E;
+    box-shadow:0 6px 20px rgba(0,0,0,0.7),
+               inset 0 0 0 0.5px rgba(255,255,255,0.10);
+  }
+  .feuille-logo img{ width:24px; height:32px; object-fit:contain; display:block; }
+
+  /* La poignée : deux pixels de haut, centrée. C'est le signe qu'iOS met sur
+     toutes ses feuilles — on comprend qu'elle se referme en glissant. */
+  .login-card::before{
+    content:''; display:block;
+    width:36px; height:4px; margin:0 auto 16px;
+    border-radius:100px; background:rgba(255,255,255,0.22);
+  }
+
+  @keyframes feuilleMonte{
+    from{ transform:translateY(100%) }
+    to  { transform:none }
+  }
+  @keyframes feuilleVoile{
+    from{ opacity:0 }
+    to  { opacity:1 }
+  }
+  /* La descente, pour le retour. Une animation qui ne joue que dans un sens se
+     remarque plus qu'une absence d'animation. */
+  @keyframes feuilleDescend{
+    from{ transform:none }
+    to  { transform:translateY(100%) }
+  }
+
+  /* ⚠ RESPECT DU RÉGLAGE SYSTÈME. La feuille apparaît sans monter pour qui a
+     demandé moins de mouvement. */
+  @media (prefers-reduced-motion: reduce){
+    .login-card, .login-wrap{ animation:none; }
+  }
 
   .auth-toggle{
     position:relative; display:flex; gap:0; background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
@@ -7100,9 +7192,9 @@ body.chargement #bar{
    connexion : on ne desserre QUE celui-ci. La connexion garde ses 24 px, elle
    contient des champs de saisie qui ont besoin de cette marge. */
 #choice-screen{ padding:18px 14px; }
-.choix-ecran{
-  width:100%; max-width:460px; text-align:center;
-}
+/* `.choix-ecran` est redéfinie plus bas, pour la page d'accueil plein écran.
+   L'ancienne règle limitait sa largeur à 460 px — utile pour une carte
+   centrée, nuisible pour une image de fond. */
 
 /* Le titre d'accueil. Le mot « Standix » porte la classe `logotype` dans le
    balisage : il hérite de Poppins 500 comme la marque juste au-dessus. On ne
@@ -9232,3 +9324,136 @@ body:has(#e-detail.active) #equipe-app{
 .card > *, .sop-card > *, .emp-row > *, .cat-cell > *,
 .proc-rich-card > *, .etab-carte > *,
 .offre-carte > *{ position:relative; z-index:1; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'ACCUEIL · IMAGE PLEIN ÉCRAN
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.choix-ecran{
+  position:fixed; inset:0; z-index:40;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  background:#000; overflow:hidden;
+}
+
+/* ─── ① LES PHOTOS ────────────────────────────────────────────────────────
+   Elles occupent tout l'écran, pas seulement le haut : le dégradé du dessous
+   fait la séparation. Une image coupée net à mi-hauteur ferait bandeau. */
+/* ═══ LA PHOTO OCCUPE LE HAUT, PAS TOUT L'ÉCRAN ═══
+
+   En `inset:0` avec `cover`, l'image 3:4 se recadrait sur un écran deux fois
+   plus haut que large : on ne voyait qu'une bande centrale, sans les visages
+   ni la scène.
+
+   Elle occupe maintenant les 62 % hauts, où son rapport 3:4 tient presque tel
+   quel. Le reste de l'écran est noir, et c'est là que va le texte. */
+.ac-photos{ position:absolute; top:0; left:0; right:0; height:62%; }
+.ac-photo{
+  position:absolute; inset:0;
+  /* `center 30%` : le cadrage résiduel coupe surtout le bas de l'image — le
+     plafond et les visages comptent plus que le plancher. */
+  background-size:cover; background-position:center 30%;
+  opacity:0; transition:opacity 1.4s ease;
+}
+.ac-photo.on{ opacity:1; }
+
+/* Le fondu vers le noir. Il part de 42 % de la hauteur — au-dessus, la photo
+   est intacte ; en dessous, elle s'éteint pour porter le texte.
+
+   Trois arrêts plutôt que deux : un dégradé linéaire simple laisse une bande
+   grise au milieu, visible sur un fond noir. */
+.ac-fondu{
+  /* Il déborde de 1 px vers le bas pour qu'aucune ligne claire ne subsiste
+     entre la photo et le noir. */
+  position:absolute; left:0; right:0; bottom:-1px; height:52%;
+  pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(0,0,0,0) 0%,
+    rgba(0,0,0,0.55) 42%,
+    rgba(0,0,0,0.92) 74%,
+    #000 100%);
+}
+
+/* ─── LE LOGO, EN HAUT À GAUCHE ─────────────────────────────────────────── */
+/* Le logo seul : plus de mot à côté, donc plus de `gap` ni d'alignement à
+   gérer. Il est un peu plus grand qu'avec le texte — 24 × 32 au lieu de
+   19 × 26 — parce qu'un signe isolé doit se lire sans son appui. */
+.ac-marque{
+  position:absolute; top:calc(env(safe-area-inset-top, 0px) + 22px); left:22px;
+  z-index:2;
+}
+.ac-marque img{ width:24px; height:32px; object-fit:contain; display:block; }
+/* `.ac-marque span` a été retirée avec le mot « Standix ». */
+
+/* ─── ② LE TEXTE ET ③ LES ACTIONS ────────────────────────────────────────── */
+.ac-bas{
+  position:relative; z-index:2;
+  padding:0 24px calc(env(safe-area-inset-bottom, 0px) + 28px);
+  text-align:center; width:100%;
+}
+
+/* Capitales, graisse légère, interlettrage serré : c'est la typographie du
+   modèle. Le poids 300 est essentiel — en gras, des capitales de cette taille
+   deviennent un panneau routier. */
+/* ═══ LA POLICE DE L'APP, PAS CELLE DU SITE ═══
+
+   Deux erreurs successives ici. D'abord des capitales en graisse 300, d'après
+   l'image de mode — le style d'une marque de vêtements. Puis Poppins, relevée
+   sur standix.app.
+
+   Or l'app emploie INTER partout : « Bonjour Emilien » en est la référence, et
+   il n'a aucune `font-family` — il hérite du corps. Poppins n'y sert qu'au
+   logotype, le mot « Standix ».
+
+   Le titre hérite donc, comme tout le reste. Seules la graisse et l'approche
+   sont reprises du site : 500 et -0,045, sa casse normale.
+
+   `clamp` reprend la formule du site : le titre grandit avec l'écran, entre 29
+   et 39 px. Sur un téléphone étroit il ne déborde jamais, sur un grand il ne
+   paraît pas timide. */
+.ac-titre{
+  margin:0 0 12px;
+  font-size:clamp(27px, 7.6vw, 36px);
+  font-weight:500; line-height:1.14;
+  letter-spacing:-0.045em; color:#fff;
+}
+.ac-phrase{
+  margin:0 0 30px;
+  font-size:14.5px; line-height:1.55; font-weight:400;
+  letter-spacing:-0.01em;
+  color:rgba(255,255,255,0.68);
+}
+
+.ac-actions{ display:flex; flex-direction:column; gap:10px; }
+
+.ac-btn{
+  width:100%; height:52px; border:none; border-radius:100px; font-size:14.5px; font-weight:650; letter-spacing:-0.01em;
+  transition:transform 0.14s ease, filter 0.14s ease;
+}
+.ac-btn:active{ transform:scale(0.98); }
+
+/* Le bouton principal porte l'ambre du logo — c'est la seconde couleur du
+   modèle, où elle était blanche. */
+.ac-btn--plein{
+  background:linear-gradient(135deg,#E8760F 0%,#FFAE2E 62%,#FFDFA0 100%);
+  color:#2A1400;
+}
+/* Le second est creux : deux boutons pleins se disputeraient le regard. */
+.ac-btn--creux{
+  background:rgba(255,255,255,0.10);
+  color:#fff;
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.22);
+}
+.ac-btn--creux:active{ background:rgba(255,255,255,0.16); }
+
+.ac-connexion{
+  margin-top:6px; padding:12px 0; background:none; border:none; font-size:13px; color:rgba(255,255,255,0.55);
+}
+.ac-connexion b{ color:#fff; font-weight:650; }
+
+/* Plus de règle pour petit écran sur le titre : `clamp` fait le travail — le
+   titre grandit avec la largeur, entre 29 et 39 px. Seuls les boutons se
+   resserrent. */
+@media (max-width: 360px){
+  .ac-btn{ height:48px; font-size:13.5px; }
+}

@@ -9417,9 +9417,11 @@ body:has(#e-detail.active) #equipe-app{
 
 /* ─── ② LE TEXTE ET ③ LES ACTIONS ────────────────────────────────────────── */
 .ac-bas{
-  position:relative; z-index:2;
-  padding:0 24px calc(env(safe-area-inset-bottom, 0px) + 28px);
-  text-align:center; width:100%;
+  position:relative; z-index:2; width:100%;
+  padding:0 24px calc(env(safe-area-inset-bottom, 0px) + 26px);
+  /* À GAUCHE, pas centré. Un texte centré convient à une annonce ; à gauche,
+     il se lit comme une phrase — et l'œil retrouve la marge à chaque ligne. */
+  text-align:left;
 }
 
 /* Capitales, graisse légère, interlettrage serré : c'est la typographie du
@@ -9441,25 +9443,74 @@ body:has(#e-detail.active) #equipe-app{
    `clamp` reprend la formule du site : le titre grandit avec l'écran, entre 29
    et 39 px. Sur un téléphone étroit il ne déborde jamais, sur un grand il ne
    paraît pas timide. */
+/* ═══ MÊME APPROCHE QUE LA PHRASE ═══
+
+   Les deux héritent d'Inter, mais le titre était à -0,045 d'approche contre
+   -0,005 pour la phrase : neuf fois plus serré. C'est ce resserrement qui le
+   faisait paraître d'une autre police — les lettres s'y touchent presque.
+
+   -0,02 est la valeur des titres de l'app. Il reste plus compact que la phrase,
+   ce qui est normal à cette taille, mais la parenté se voit.
+
+   La taille descend aussi d'un cran : 32 px au lieu de 36, 25 au minimum. */
 .ac-titre{
   margin:0 0 12px;
-  font-size:clamp(27px, 7.6vw, 36px);
-  font-weight:500; line-height:1.14;
-  letter-spacing:-0.045em; color:#fff;
+  font-size:clamp(25px, 7vw, 32px);
+  font-weight:600; line-height:1.2;
+  letter-spacing:-0.02em; color:#fff;
+}
+/* La dernière ligne en ambre : elle porte le mot qui compte. C'est la seule
+   couleur du bloc de texte, donc elle se voit sans crier. */
+/* ═══ LE DÉGRADÉ RELEVÉ SUR TON IMAGE ═══
+
+   Mesuré le long du mot, du premier au dernier caractère :
+
+     2 %   #F69403
+     25 %  #F29702
+     50 %  #F28301
+     98 %  #DF6602
+
+   C'est un ORANGE DENSE, pas l'ambre clair que j'avais mis — `#FFDFA0` au
+   départ, presque jaune. La différence se voit immédiatement sur fond noir. */
+.ac-titre em{
+  font-style:normal;
+  background:linear-gradient(96deg,
+    #F69403 0%, #F29702 26%, #F28301 52%, #DF6602 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 .ac-phrase{
-  margin:0 0 30px;
-  font-size:14.5px; line-height:1.55; font-weight:400;
-  letter-spacing:-0.01em;
-  color:rgba(255,255,255,0.68);
+  margin:0 0 26px;
+  font-size:13.5px; line-height:1.55; font-weight:400;
+  letter-spacing:-0.005em;
+  color:rgba(255,255,255,0.58);
 }
 
 .ac-actions{ display:flex; flex-direction:column; gap:10px; }
 
+/* ═══ TROIS ZONES DANS CHAQUE BOUTON ═══
+
+   Une icône à gauche, le libellé au centre, un chevron à droite. On lit qui
+   l'on est, puis on voit que ça mène quelque part.
+
+   `text-align:left` sur le libellé : centré entre deux icônes, il paraîtrait
+   décalé dès que les deux textes n'ont pas la même longueur. */
 .ac-btn{
-  width:100%; height:52px; border:none; border-radius:100px; font-size:14.5px; font-weight:650; letter-spacing:-0.01em;
+  width:100%; min-height:54px;
+  display:flex; align-items:center; gap:12px;
+  padding:0 16px;
+  border:none; border-radius:100px;
+  font-family:inherit; font-size:13.5px; font-weight:600; letter-spacing:-0.015em;
+  text-align:left;
   transition:transform 0.14s ease, filter 0.14s ease;
 }
+.ac-btn:active{ transform:scale(0.98); }
+.ac-btn-ic{
+  display:grid; place-items:center; flex:0 0 30px;
+  width:30px; height:30px; border-radius:50%;
+}
+.ac-btn-ic svg{ width:17px; height:17px; display:block; }
+.ac-btn-tx{ flex:1; min-width:0; line-height:1.3; }
+.ac-btn-fl{ flex:0 0 auto; font-size:19px; opacity:0.42; }
 .ac-btn:active{ transform:scale(0.98); }
 
 /* Le bouton principal porte l'ambre du logo — c'est la seconde couleur du
@@ -9476,18 +9527,42 @@ body:has(#e-detail.active) #equipe-app{
   background:#fff;
   color:#0A0A0E;
 }
-/* Le second est creux : deux boutons pleins se disputeraient le regard. */
-.ac-btn--creux{
-  background:rgba(255,255,255,0.10);
-  color:#fff;
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.22);
+/* L'icône du gérant porte l'ambre : c'est le seul point de couleur des deux
+   boutons, et il désigne le rôle principal. */
+/* Les DEUX icônes portent le même orange — mesuré sur la couronne de ton
+   image : [247 170 81]. Le second bouton l'a aussi : deux chemins de même
+   nature méritent le même signe. */
+.ac-btn--plein .ac-btn-ic{
+  background:rgba(246,148,3,0.14); color:#F7AA51;
 }
+/* Le second est creux : deux boutons pleins se disputeraient le regard. */
+/* Le second bouton a la MÊME FORME que le premier, en sombre. Sur l'image ils
+   sont jumeaux : c'est ce qui dit que ce sont deux chemins d'égale dignité,
+   l'un n'étant pas un repli de l'autre. */
+.ac-btn--creux{
+  background:rgba(255,255,255,0.09);
+  color:#fff;
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.13);
+}
+.ac-btn--creux .ac-btn-ic{
+  background:rgba(246,148,3,0.14); color:#F7AA51;
+}
+.ac-btn--creux:active{ background:rgba(255,255,255,0.14); }
 .ac-btn--creux:active{ background:rgba(255,255,255,0.16); }
 
 .ac-connexion{
-  margin-top:6px; padding:12px 0; background:none; border:none; font-size:13px; color:rgba(255,255,255,0.55);
+  width:100%; margin-top:10px; padding:12px 0;
+  background:none; border:none;
+  font-family:inherit; font-size:12.5px; color:rgba(255,255,255,0.45);
+  text-align:center;
 }
-.ac-connexion b{ color:#fff; font-weight:650; }
+/* « Se connecter » en ambre : c'est un troisième chemin, moins fréquent que les
+   deux boutons, mais il ne doit pas se perdre dans le gris. */
+/* « Se connecter » du même orange que les icônes : trois éléments d'accent,
+   une seule teinte. */
+.ac-connexion b{
+  color:#F7AA51; font-weight:600;
+}
 
 /* Plus de règle pour petit écran sur le titre : `clamp` fait le travail — le
    titre grandit avec la largeur, entre 29 et 39 px. Seuls les boutons se

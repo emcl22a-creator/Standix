@@ -162,6 +162,25 @@
   --ec:cubic-bezier(.16,1,.3,1);
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ATTEND D'ÊTRE PRÊTE
+
+   Sans ça, le texte s'affiche dans la police de secours puis saute quand Inter
+   arrive, et l'image apparaît en dernier en poussant la mise en page. Ces
+   secousses donnent l'impression que le site fonctionne mal, alors qu'il ne
+   fait que charger.
+
+   Le corps reste invisible jusqu'à ce que tout soit là, polices comprises,
+   puis se révèle d'un seul fondu. Le fond noir est peint dès la première
+   image : on ne voit jamais de blanc.
+
+   ⚠ LE DÉLAI DE SÉCURITÉ EST OBLIGATOIRE. Si une police ne se charge pas ou
+     qu'une requête reste bloquée, la page ne doit pas rester noire — les 1,2 s
+     la révèlent quoi qu'il arrive. Une page vide est bien pire qu'une page qui
+     saute. */
+body.attend{ opacity:0 }
+body{ opacity:1; transition:opacity .45s ease }
 /* `overflow-x` sur html ET sur body : les filets horizontaux dépassent
    volontairement de 40 px de chaque côté, et body seul ne suffit pas à
    empêcher le document de devenir scrollable latéralement. */
@@ -192,8 +211,14 @@ body{
      faible, tombe à peu près là où se trouve la capture — sur téléphone comme
      sur ordinateur, puisqu'il est placé en pourcentage. */
   background:
+    /* Ce foyer était bleu à 17 %. Il teintait tout le coin haut-gauche du
+       premier écran, et le bleu n'existe nulle part ailleurs sur le site — ni
+       dans le logo, ni dans l'app, dont l'accent est ambre.
+
+       Il passe au blanc froid, la même teinte que sous 1100 px : la lumière
+       reste, la couleur part. */
     radial-gradient(ellipse 110% 40% at 22% -2%,
-      rgba(var(--halo),.17), rgba(var(--halo),.05) 46%, transparent 70%),
+      rgba(226,232,242,.14), rgba(226,232,242,.04) 46%, transparent 70%),
     radial-gradient(ellipse 92% 26% at 52% 62%,
       rgba(255,255,255,.045), transparent 68%);
 }
@@ -1480,11 +1505,17 @@ footer .marque{ margin-bottom:18px; }
         éclairée se lit comme un trou, la même avec un liseré se lit comme un
         objet posé sous une lampe.
      ═══════════════════════════════════════════════════════════════════════ */
+  /* Le foyer haut était bleu à 20 %. C'est lui qui teintait tout le coin
+     haut-gauche du premier écran — et le bleu n'existe nulle part ailleurs sur
+     le site : ni dans le logo, ni dans l'app, dont l'accent est ambre.
+
+     Il passe au blanc froid, la même teinte que sous 1100 px. La lumière
+     reste, la couleur part. */
   .lueur{
     height:1180px;
     background:
       radial-gradient(ellipse 46% 46% at 27% 4%,
-        rgba(var(--halo),.20), rgba(var(--halo),.05) 48%, transparent 68%),
+        rgba(226,232,242,.16), rgba(226,232,242,.04) 48%, transparent 68%),
       radial-gradient(ellipse 42% 38% at 74% 30%,
         rgba(255,255,255,.05), transparent 66%);
   }
@@ -1860,7 +1891,7 @@ footer .marque{ margin-bottom:18px; }
 }
 </style>
 </head>
-<body>
+<body class="attend">
 
 <div class="lueur"></div>
 
@@ -2469,6 +2500,20 @@ footer .marque{ margin-bottom:18px; }
 </div>
 
 <script>
+/* Révélation du corps, au plus tôt des trois signaux : chargement complet,
+   polices prêtes, délai de sécurité. Placé en tête pour s'exécuter même si une
+   erreur survenait plus bas dans le script. */
+;(() => {
+  let fait = false
+  const montrer = () => { if (fait) return; fait = true
+    document.body.classList.remove('attend') }
+  if (document.readyState === 'complete') requestAnimationFrame(montrer)
+  else addEventListener('load', () => requestAnimationFrame(montrer))
+  if (document.fonts && document.fonts.ready)
+    document.fonts.ready.then(() => { if (document.readyState === 'complete') montrer() })
+  setTimeout(montrer, 1200)
+})()
+
 ;(() => {
   /* ═══ LA BARRE BASSE ═══
 

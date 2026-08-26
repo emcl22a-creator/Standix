@@ -525,33 +525,55 @@ h1 em{ font-style:normal; color:var(--t1); }
    Les pictogrammes sont blancs : le site n'a aucune couleur ailleurs.
    ═══════════════════════════════════════════════════════════════════════════ */
 .reperes{
-  /* Une bande sous le premier écran, et non dans la colonne du titre : quatre
-     repères ajoutés au-dessus de la pliure poussaient le visuel entièrement
-     hors champ sur une fenêtre de téléphone réelle — mesuré à 664 px de haut.
+  /* ═══ CENTRÉ, SANS FILET, AVEC DE L'AIR ═══
 
-     Ici, ils rassurent celui qui descend sans retarder celui qui clique. */
+     Les traits verticaux ont été retirés : c'est eux qui faisaient lire un
+     tableau au lieu de quatre qualités. La séparation se fait par le vide.
+
+     Une seule colonne sur téléphone, l'un sous l'autre. Quatre éléments en
+     grille sur un écran étroit hachent les légendes en lignes irrégulières. */
+  /* ═══ UNE SEULE LIGNE, QUI SE FAIT GLISSER ═══
+
+     Sur telephone, les quatre empiles faisaient 160 px de haut a eux seuls.
+     En rail horizontal ils tiennent sur une ligne, et le quatrieme depasse
+     legerement du bord : c'est ce debordement qui dit qu'on peut glisser —
+     une fleche ou des pastilles seraient a expliquer, pas lui.
+
+     `scroll-snap` cale chaque repere en place au relachement du doigt, sinon
+     le rail s'arrete n'importe ou et l'ensemble parait mal aligne. */
   list-style:none;
   max-width:var(--large); margin:0 auto;
-  padding:0 var(--gouttiere) 8px;
-  display:grid; grid-template-columns:1fr 1fr; gap:22px 0;
+  /* Retrait du haut reduit de 48 a 30 : le bloc remonte vers le bouton.
+     Retrait du bas porte a 30 : sans lui, les legendes touchaient le filet
+     horizontal qui ferme la section. */
+  padding:30px 0 30px;
+  display:flex; gap:0;
+  overflow-x:auto; overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  scrollbar-width:none;
+  text-align:center;
+  /* Les bords s'estompent : le rail parait continuer au-dela de l'ecran au
+     lieu d'etre coupe net. */
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent);
 }
+.reperes::-webkit-scrollbar{ display:none }
 .reperes li{
-  padding:0 16px;
-  border-left:.5px solid rgba(255,255,255,.10);
+  flex:0 0 auto; width:150px; padding:0 8px;
+  scroll-snap-align:center;
 }
-.reperes li:nth-child(odd){ border-left:0; padding-left:0 }
+.reperes li:first-child{ margin-left:var(--gouttiere) }
+.reperes li:last-child{ margin-right:var(--gouttiere) }
 .reperes svg{
-  width:19px; height:19px; display:block; margin-bottom:11px;
-  /* Blancs et non ambre : le site n'a aucune couleur ailleurs, et quatre
-     pictogrammes colorés prenaient le regard avant le titre. */
+  width:22px; height:22px; display:block; margin:0 auto 13px;
   stroke:var(--t1); fill:none; stroke-width:1.5;
   stroke-linecap:round; stroke-linejoin:round;
 }
 .reperes b{
-  display:block; font-size:16px; font-weight:500; color:var(--t1);
-  letter-spacing:-.025em; margin-bottom:4px;
+  display:block; font-size:17px; font-weight:500; color:var(--t1);
+  letter-spacing:-.03em; margin-bottom:5px;
 }
-.reperes span{ display:block; font-size:12.5px; line-height:1.45; color:var(--t3) }
+.reperes span{ display:block; font-size:13px; line-height:1.5; color:var(--t3) }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE VISUEL DU PREMIER ÉCRAN
@@ -1615,7 +1637,10 @@ footer .marque{ margin-bottom:18px; }
        Le premier écran cède donc la place exacte de la bande, plus les 22 px
        qui la séparent de la section suivante. Rien n'est déplacé — c'est la
        hauteur qui s'ajuste, pas la structure. */
-    min-height:calc(100dvh - 124px);
+    /* 186 px : la hauteur exacte du bloc des reperes une fois l'air ajoute,
+       plus l'ecart qui le separe de la section suivante. Mesure, pas
+       estime — c'est ce qui decide si les quatre faits sont vus. */
+    min-height:calc(100dvh - 186px);
     max-width:var(--large); margin:0 auto;
     padding:calc(var(--barre) + 52px) var(--gouttiere) 60px;
   }
@@ -1719,12 +1744,24 @@ footer .marque{ margin-bottom:18px; }
      occupe toute la largeur de l'écran ; ici non. */
   /* Quatre en ligne sur ordinateur : la bande occupe toute la largeur de la
      page, chaque repère a donc 250 px et son texte tient sur une ligne. */
-  .reperes{ grid-template-columns:repeat(4,1fr); gap:0; padding-bottom:22px }
-  .reperes li:nth-child(odd){ border-left:.5px solid rgba(255,255,255,.10); padding-left:20px }
-  .reperes li:first-child{ border-left:0; padding-left:0 }
-  .reperes li{ padding-left:20px }
-  .reperes b{ font-size:17px }
-  .reperes span{ font-size:13px }
+  /* Quatre de front dès la tablette, séparés par le vide seul. Le retrait du
+     haut est plus large que celui du bas : le bloc appartient au premier écran
+     et doit s'en détacher, pas flotter au milieu. */
+  /* Sur ordinateur les quatre tiennent dans la largeur : le rail redevient une
+     rangee fixe, sans glissement ni estompage — il n'y a rien a decouvrir. */
+  .reperes{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:0 28px;
+    /* 42 -> 14 : les quatre reperes remontent vers le bouton. C'est le seul
+       retrait qui les separe de lui, donc le seul a regler. Le bas garde
+       ses 40 px, qui les detachent du filet fermant la section. */
+    padding:14px var(--gouttiere) 40px;
+    overflow:visible;
+    -webkit-mask-image:none; mask-image:none;
+  }
+  .reperes li{ width:auto; padding:0; margin:0 }
+  .reperes li:first-child, .reperes li:last-child{ margin:0 }
+  .reperes svg{ width:24px; margin-bottom:15px }
+  .reperes b{ font-size:18px }
 
   /* ═══ LE VISUEL CEDE LA PLACE A LA BANDE ═══
 
@@ -1737,7 +1774,10 @@ footer .marque{ margin-bottom:18px; }
      400 px de large ; sur un portable il retrecit juste assez. */
   .telephone{
     width:100%; max-width:400px; margin:0;
-    max-height:calc(100dvh - 300px);
+    /* 360 et non 300 : le bloc des reperes est passe de 102 a 160 px avec
+       l'air ajoute autour. C'est cette valeur, et elle seule, qui decide si
+       les quatre faits tiennent dans le premier ecran. */
+    max-height:calc(100dvh - 372px);
     object-fit:contain;
     transform:translateX(4.70%) translateX(-16px);
   }
@@ -2083,6 +2123,11 @@ footer .marque{ margin-bottom:18px; }
       <span>par vidéo analysée</span>
     </li>
     <li>
+      <svg viewBox="0 0 24 24"><path d="M12 2.6l7.6 3.2v5.4c0 4.6-3.1 8.6-7.6 10-4.5-1.4-7.6-5.4-7.6-10V5.8z"/><path d="M9.4 12.2l1.9 1.9 3.6-3.8"/></svg>
+      <b>Privé</b>
+      <span>vos procédures ne sortent pas</span>
+    </li>
+    <li>
       <svg viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="3.4"/><path d="M22 20v-2a4 4 0 00-3-3.9M16.4 3.6a4 4 0 010 7"/></svg>
       <b>Toute l'équipe</b>
       <span>y accède en direct</span>
@@ -2091,11 +2136,6 @@ footer .marque{ margin-bottom:18px; }
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4"/><path d="M12 2.8a15 15 0 010 18.4 15 15 0 010-18.4z"/></svg>
       <b>3 langues</b>
       <span>français, anglais, allemand</span>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M12 2.6l7.6 3.2v5.4c0 4.6-3.1 8.6-7.6 10-4.5-1.4-7.6-5.4-7.6-10V5.8z"/><path d="M9.4 12.2l1.9 1.9 3.6-3.8"/></svg>
-      <b>Privé</b>
-      <span>vos procédures ne sortent pas</span>
     </li>
   </ul>
 

@@ -1071,7 +1071,11 @@ function afficherEcranChoix() {
 // ═══ ÉCRAN 1 : CHOIX DE L'ESPACE ═══
 window.chooseSpace = function(space) {
   selectedSpace = space
-  document.getElementById('choice-screen').style.display = 'none'
+  /* ═══ L'ÉCRAN DE CHOIX RESTE VISIBLE ═══
+
+     Il était masqué d'un coup. Sur une feuille modale, ce qui est derrière doit
+     rester là : c'est ce qui fait comprendre qu'on peut revenir, et c'est la
+     règle d'iOS pour toute vue présentée par-dessus. */
   const ecranC = document.getElementById('login-screen')
   ecranC.style.display = 'flex'
   /* On rend les champs utilisables : ils étaient `inert` pour empêcher Safari
@@ -1137,6 +1141,49 @@ window.chooseSpace = function(space) {
    la console dit pourquoi. Et la vérification ci-dessous nomme le problème au
    lieu de le laisser deviner. */
 document.getElementById('choix-deja')?.addEventListener('click', () => allerConnexion())
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'ACCUEIL · BOUTONS ET DÉFILEMENT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les deux boutons d'inscription. Ils appellent `chooseSpace`, comme les
+   anciennes cartes — seule la présentation a changé. */
+document.querySelectorAll('.ac-btn[data-space]').forEach(b => {
+  b.addEventListener('click', () => chooseSpace(b.dataset.space))
+})
+document.getElementById('ac-connexion')?.addEventListener('click', () => allerConnexion())
+
+/* ═══ LE DÉFILEMENT DES PHOTOS ═══
+
+   Cinq secondes par image : assez pour la regarder, pas assez pour attendre.
+
+   ⚠ LE MINUTEUR S'ARRÊTE QUAND LA PAGE EST CACHÉE. Sans cela, il continue de
+     tourner pendant qu'on remplit le formulaire d'inscription — et sur un
+     téléphone en arrière-plan, il consomme pour rien.
+
+   Il s'arrête aussi si la personne a demandé moins de mouvement dans ses
+   réglages système : une image qui change toute seule en est. */
+;(() => {
+  const zone = document.getElementById('ac-photos')
+  if (!zone) return
+  const photos = [...zone.querySelectorAll('.ac-photo')]
+  if (photos.length < 2) return
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
+
+  let n = 0, minuteur = null
+  const suivante = () => {
+    photos[n].classList.remove('on')
+    n = (n + 1) % photos.length
+    photos[n].classList.add('on')
+  }
+  const lancer = () => { if (!minuteur) minuteur = setInterval(suivante, 5000) }
+  const arreter = () => { clearInterval(minuteur); minuteur = null }
+
+  document.addEventListener('visibilitychange', () => {
+    document.hidden ? arreter() : lancer()
+  })
+  lancer()
+})()
 
 /* ═══════════════════════════════════════════════════════════════════════════
    MOT DE PASSE OUBLIÉ
@@ -1260,7 +1307,8 @@ window.allerConnexion = function() {
     return
   }
   selectedSpace = null
-  source.style.display = 'none'
+  /* L'écran de choix reste visible derrière la feuille, comme pour
+     `chooseSpace`. Le masquer briserait l'illusion d'une couche posée dessus. */
   cible.style.display = 'flex'
   cible.removeAttribute('inert')
   document.getElementById('auth-title').textContent = 'Se connecter'
@@ -1274,21 +1322,26 @@ window.allerConnexion = function() {
   document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
 }
 
+/* ═══ LA FEUILLE REDESCEND AVANT DE DISPARAÎTRE ═══
+
+   Elle était masquée d'un `display:none` — elle disparaissait d'un coup, alors
+   qu'elle était montée en glissant. Une animation qui ne joue que dans un sens
+   se remarque plus qu'une absence d'animation.
+
+   `feuilleDescend` la fait redescendre, puis on masque au bout de 320 ms — la
+   durée exacte de l'animation. */
 window.backToChoice = function() {
-  /* ═══ ON REND L'INERTIE, ET ON RETIRE LE FOCUS ═══
-
-     Sans l'inertie, revenir au choix laisse le formulaire accessible au
-     remplissage automatique, et le clavier revient avec.
-
-     Mais l'inertie NE SUFFIT PAS : mesuré dans Chromium, un champ qui avait le
-     focus le GARDE quand on rend son parent inerte. Le clavier resterait donc
-     ouvert par-dessus l'écran de choix, ce qui est exactement le défaut qu'on
-     corrige. On le retire à la main. */
-  if (document.activeElement && document.activeElement.blur) document.activeElement.blur()
-  document.getElementById('login-screen')?.setAttribute('inert', '')
-  document.querySelector('.auth-toggle')?.removeAttribute('data-cache')
-  document.getElementById('login-screen').style.display = 'none'
-  afficherEcranChoix()
+  const w = document.getElementById('login-screen')
+  const carte = w?.querySelector('.login-card')
+  if (!w || !carte) return
+  carte.style.animation = 'feuilleDescend 0.32s cubic-bezier(0.32,0.72,0,1) both'
+  w.style.animation = 'feuilleVoile 0.32s ease reverse both'
+  setTimeout(() => {
+    w.style.display = 'none'
+    w.setAttribute('inert', '')
+    carte.style.animation = ''
+    w.style.animation = ''
+  }, 320)
 }
 
 // ═══ ONGLETS Connexion / Créer un compte ═══
@@ -5778,7 +5831,10 @@ window.poserLogosOr = function () {
   const poser = () => {
     const src = document.getElementById('logo-src')
     if (!src) return
-    document.querySelectorAll('img[data-logo]').forEach(i => { i.src = src.src })
+      document.querySelectorAll('img[data-logo]').forEach(i => { i.src = src.src })
+    /* La pastille de la feuille modale lit le logo depuis une variable CSS :
+       c'est un pseudo-élément, il ne peut pas porter de balise `img`. */
+    document.documentElement.style.setProperty('--logo-src', `url("${src.src}")`)
     /* Le logo ORANGE, pour la carte d'abonnement. Deux sources distinctes
        plutôt qu'une teinte calculée : j'ai perdu quatre essais à recolorer le
        blanc par filtre puis par masque, alors que le fichier orange existait. */
@@ -16486,24 +16542,9 @@ function carteOffre(o, opts = {}) {
     <!-- Le ruban a ete retire. « Populaire » n avait pas de sens — on choisit
          son offre sur le nombre de membres, pas par gout — et « En cours »
          doublait le bouton, qui dit deja « Votre abonnement actuel ». -->
-    <!-- ═══ LE LOGO EN FILIGRANE ═══
-
-         C est le fichier du depot, pas un trace refait a la main. J ai essaye
-         deux fois de le redessiner en SVG : la premiere donnait un S
-         calligraphique qui n a rien a voir, la seconde des gelules trop
-         epaisses et mal inclinees. Le logo a une geometrie precise, et
-         l approcher a l oeil ne suffit pas.
-
-         L image est donc chargee telle quelle. Le filtre la teinte en ambre :
-         le fichier est blanc, et le recolorer en CSS evite de maintenir une
-         seconde version du logo dans le depot. -->
-    <span class="offre-logo" aria-hidden="true">
-      <!-- LE LOGO ORANGE, celui fourni par Emilien. Il est embarque en base64
-           dans index.html sous l id logo-or, a cote du blanc que l en-tete
-           emploie. Plus de masque CSS ni de teinte calculee : le fichier porte
-           deja la bonne couleur. -->
-      <img class="logo-forme" data-logo-or alt="">
-    </span>
+    <!-- Le logo en filigrane a ete retire : pose derriere le prix, il faisait
+         decoratif plutot que soigne. La carte se tient par sa matiere et sa
+         typographie. -->
 
     <div class="offre-nom">${o.nom}</div>
 

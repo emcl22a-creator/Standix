@@ -709,13 +709,35 @@
        pas : ils sont lus à quatre endroits, et un renommage partiel casserait
        l'anneau sur un écran que je n'aurais pas vu. */
   .ia-fig{
-    --blanc:#FFDFA0; --bleu:#E8760F;
+    /* ═══ BLANC, PUIS LES COULEURS DE L'ICÔNE DE PROCÉDURE ═══
+
+       L'anneau employait `#FFDFA0` et `#E8760F` — proches, mais pas identiques
+       aux icônes, qui vont de `#EB5201` à `#FDA81E` via `#FA8A08`.
+
+       Les trois teintes sont maintenant celles de `logoOrIc`, plus le blanc que
+       tu demandes. Un même signe ne peut pas avoir deux palettes.
+
+       ⚠ LES NOMS SONT TROMPEURS. `--blanc` et `--bleu` datent d'une version où
+         l'anneau l'était vraiment. Je ne les renomme pas : ils sont lus à
+         plusieurs endroits, et un renommage partiel casserait l'anneau sur un
+         écran que je n'aurais pas vu. `--milieu` est nouveau. */
+    --blanc:#FFFFFF; --milieu:#FDA81E; --bleu:#EB5201;
     position:relative; display:grid; place-items:center; flex-shrink:0;
   }
   .ia-fig .lum{
     position:absolute; inset:0; border-radius:50%;
+    /* Trois arrêts au lieu de deux : le blanc occupe la moitié du tour, puis
+       l'ambre, puis l'orange sombre — l'ordre de `logoOrIc`, parcouru dans le
+       sens de rotation.
+
+       Le blanc revient à 360° pour que la boucle soit invisible : sans ce
+       retour, un saut de couleur apparaît à chaque tour. */
     background:conic-gradient(from 0deg,
-      var(--blanc) 0deg, var(--blanc) 190deg, var(--bleu) 280deg, var(--blanc) 360deg);
+      var(--blanc) 0deg,
+      var(--blanc) 170deg,
+      var(--milieu) 250deg,
+      var(--bleu) 300deg,
+      var(--blanc) 360deg);
     animation:iaTourne 3.6s linear infinite;
   }
   /* Le centre est VIDE, pas peint. Un disque de la couleur du fond marchait
@@ -730,7 +752,7 @@
        l'œil plus que la forme elle-même. */
     position:absolute; inset:-1.5px; border-radius:50%;
     filter:blur(2.5px); opacity:0.55;
-    background:conic-gradient(from 180deg, transparent 0 50%, var(--bleu) 72%, var(--blanc) 90%, transparent 100%);
+    background:conic-gradient(from 180deg, transparent 0 50%, var(--bleu) 68%, var(--milieu) 82%, var(--blanc) 92%, transparent 100%);
     animation:iaGalet 6.4s ease-in-out infinite reverse, iaTourne 5.2s linear infinite;
   }
 
@@ -772,20 +794,10 @@
      virgule bleue qui tourne. Le blanc y devient un bleu très pâle et le bleu
      se fonce — c'est le même dessin, transposé pour rester lisible. */
   .btn:not(.ghost) .ia-fig, .ia-fig.clair{
-    /* ═══ SUR LE BOUTON, L'ANNEAU EST SOMBRE ═══
-
-       Le bouton est un dégradé ambre — de #EB5201 à #FDA81E, luminosité 0,46 à
-       0,55. Un anneau ambre par-dessus se situait à 0,48 et 0,59 : les mêmes
-       valeurs. Il ne se détachait que par le blanc résiduel du dégradé, d'où
-       l'impression de blanc que tu voyais.
-
-       Ici l'anneau descend sous son fond : #8C3100 et #5A1F00, soit 0,27 et
-       0,17. C'est la même famille de teintes — l'orange brûlé du bas du logo —
-       mais assez sombre pour se lire sur un aplat clair.
-
-       C'est le principe inverse du fond sombre, où l'anneau est plus clair que
-       la page. Dans les deux cas, il tranche. */
-    --blanc:#8C3100; --bleu:#5A1F00;
+    /* Sur un bouton ambre, le blanc de l'anneau se confondrait avec les reflets
+       du dégradé. Les trois teintes descendent sous le fond : c'est le même
+       orange, en plus sombre. */
+    --blanc:#FCD9A8; --milieu:#B44000; --bleu:#7A2800;
   }
 
   .ia-fig.g .pct{
@@ -9569,4 +9581,71 @@ body:has(#e-detail.active) #equipe-app{
    resserrent. */
 @media (max-width: 360px){
   .ac-btn{ height:48px; font-size:13.5px; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BANDEAU DE PUBLICATION
+
+   Deux états dans un seul objet : brouillon en ambre, publiée en vert sourd.
+   Il change de couleur au lieu d'apparaître et disparaître — on sait toujours
+   où en est la procédure, sans avoir à chercher.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pub-bandeau{
+  display:flex; align-items:center; gap:12px;
+  margin:14px 0 4px; padding:13px 14px;
+  border-radius:16px;
+  background:rgba(246,148,3,0.08);
+  box-shadow:inset 0 0 0 0.5px rgba(246,148,3,0.22);
+}
+.pub-ic{
+  display:grid; place-items:center; flex:0 0 26px;
+  width:26px; height:26px; color:#F7AA51;
+}
+.pub-ic svg{ width:22px; height:22px; display:block; }
+.pub-txt{ flex:1; min-width:0; }
+.pub-t{
+  display:block; font-size:13.5px; font-weight:650; letter-spacing:-0.02em;
+  color:var(--label-1); line-height:1.3;
+}
+.pub-s{
+  display:block; font-size:11.5px; color:var(--label-2);
+  margin-top:2px; line-height:1.4;
+}
+.pub-btn{
+  flex:0 0 auto; height:34px; padding:0 15px;
+  border:none; border-radius:100px;
+  font-family:inherit; font-size:12.5px; font-weight:650;
+  background:linear-gradient(135deg,#E8760F,#F7AA51);
+  color:#2A1400;
+  transition:transform 0.14s ease, opacity 0.14s ease;
+}
+.pub-btn:active{ transform:scale(0.96); }
+.pub-btn:disabled{ opacity:0.5; }
+
+/* ─── L'ÉTAT PUBLIÉ ───────────────────────────────────────────────────────
+   Vert sourd, pas vif : c'est une confirmation, pas une alerte. Et le bouton
+   « Retirer » devient neutre — il ne doit pas inviter au clic. */
+.pub-bandeau--ok{
+  background:rgba(48,209,88,0.07);
+  box-shadow:inset 0 0 0 0.5px rgba(48,209,88,0.20);
+}
+.pub-bandeau--ok .pub-ic{ color:#30D158; }
+.pub-btn--retirer{
+  background:rgba(255,255,255,0.08);
+  color:var(--label-2);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.12);
+}
+
+/* ─── LA PASTILLE « BROUILLON », DANS LA LISTE ────────────────────────────
+   Sur la page Procédures, le gérant doit repérer d'un coup d'œil ce qui n'est
+   pas encore en ligne. Une pastille ambre suffit — sans elle, il faudrait
+   ouvrir chaque procédure pour le savoir. */
+.proc-brouillon{
+  display:inline-flex; align-items:center; gap:5px;
+  padding:2.5px 8px; border-radius:100px;
+  font-size:10px; font-weight:700; letter-spacing:0.02em;
+  background:rgba(246,148,3,0.14); color:#F7AA51;
+  margin-left:8px; vertical-align:middle;
 }

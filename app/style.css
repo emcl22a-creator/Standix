@@ -5597,38 +5597,68 @@
     border-radius:22px 22px 0 0;
     /* 40 px en tête : la pastille chevauche le bord et mord sur 31 px. Sans
        cette réserve, elle recouvrirait le titre. */
-    padding:66px 22px calc(env(safe-area-inset-bottom, 0px) + 26px);
+    padding:26px 22px calc(env(safe-area-inset-bottom, 0px) + 26px);
     box-shadow:0 -12px 40px rgba(0,0,0,0.6);
     animation:feuilleMonte 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
   }
 
-  /* ═══ LA PASTILLE DU LOGO, À CHEVAL SUR LE BORD ═══
+  /* ═══ LE BOUTON RETOUR, SUR L'IMAGE ═══
 
-     Deux impasses avant celle-ci :
-
-     ① SUR `.login-card` en pseudo-élément — impossible, elle porte
-        `overflow-y:auto` pour défiler, ce qui rogne tout ce qui dépasse.
-
-     ② SUR `.login-wrap` avec `bottom:calc(92vh - 31px)` — la feuille s'adapte
-        à son contenu, elle ne fait pas toujours 92 % de la hauteur. La
-        pastille partait hors de l'écran.
-
-     La solution : un conteneur dans le FLUX de la carte, remonté par une marge
-     négative. Il ne dépend d'aucune hauteur, et le `padding:66px` de la carte
-     lui réserve la place. */
-  .feuille-tete{
-    display:flex; justify-content:center;
-    margin:-53px 0 16px;
-    pointer-events:none;
-  }
-  .feuille-logo{
-    width:62px; height:62px; border-radius:50%;
+     Il est posé sur `.login-wrap`, pas dans la carte : il appartient à ce qu'il
+     y a derrière la feuille. Sa plaque sombre le détache de la photo, quelle
+     que soit la zone sur laquelle il tombe. */
+  .feuille-retour{
+    position:absolute; z-index:3;
+    top:calc(env(safe-area-inset-top, 0px) + 18px); left:18px;
+    width:38px; height:38px; border-radius:50%;
     display:grid; place-items:center;
-    background:#0A0A0E;
-    box-shadow:0 6px 20px rgba(0,0,0,0.7),
-               inset 0 0 0 0.5px rgba(255,255,255,0.10);
+    background:rgba(0,0,0,0.42);
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.16);
+    color:#fff;
+    transition:transform 0.14s ease;
   }
-  .feuille-logo img{ width:24px; height:32px; object-fit:contain; display:block; }
+  .feuille-retour svg{ width:19px; height:19px; }
+  .feuille-retour:active{ transform:scale(0.92); }
+
+  /* ═══ LE LOGO ENTIER, EN TÊTE DE FEUILLE ═══
+
+     Signe et mot, sur une ligne, centrés. Le mot porte `logotype` — il hérite
+     donc de Poppins, comme partout ailleurs dans l'app. */
+  .feuille-marque{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    margin:0 0 20px;
+  }
+  .feuille-marque img{ width:21px; height:28px; object-fit:contain; display:block; }
+  .feuille-marque .logotype{
+    font-size:19px; font-weight:500; letter-spacing:-0.02em; color:#fff;
+  }
+
+  /* ═══ LE TITRE ET LES DEUX LIGNES SOUS LUI ═══
+
+     La première ligne accueille — « Bienvenue. » — en blanc et à 15 px. La
+     seconde explique, en gris et plus petit.
+
+     Deux graisses, deux tailles, deux couleurs : c'est ce qui distingue un
+     accueil d'une consigne. Une seule ligne uniforme se lirait comme une
+     notice. */
+  #auth-sous{
+    text-align:center;
+    font-size:15px; font-weight:600; color:var(--label-1);
+    letter-spacing:-0.02em; line-height:1.35;
+    margin-bottom:22px;
+  }
+  .auth-sous-2{
+    display:block; margin-top:5px;
+    font-size:13px; font-weight:400; color:var(--label-2);
+    letter-spacing:-0.005em; line-height:1.5;
+  }
+  /* Le titre de la feuille, centré comme le reste de l'en-tête. */
+  #auth-title{
+    text-align:center;
+    font-size:23px; font-weight:700; letter-spacing:-0.035em;
+    margin:0 0 8px;
+  }
 
   /* La poignée : deux pixels de haut, centrée. C'est le signe qu'iOS met sur
      toutes ses feuilles — on comprend qu'elle se referme en glissant. */
@@ -9347,7 +9377,7 @@ body:has(#e-detail.active) #equipe-app{
 
    Elle occupe maintenant les 62 % hauts, où son rapport 3:4 tient presque tel
    quel. Le reste de l'écran est noir, et c'est là que va le texte. */
-.ac-photos{ position:absolute; top:0; left:0; right:0; height:62%; }
+.ac-photos{ position:absolute; top:0; left:0; right:0; height:54%; }
 .ac-photo{
   position:absolute; inset:0;
   /* `center 30%` : le cadrage résiduel coupe surtout le bas de l'image — le
@@ -9434,9 +9464,17 @@ body:has(#e-detail.active) #equipe-app{
 
 /* Le bouton principal porte l'ambre du logo — c'est la seconde couleur du
    modèle, où elle était blanche. */
+/* ═══ BLANC, ET LE LOGO GARDE L'AMBRE ═══
+
+   Le bouton était en dégradé ambre. Sur une photo déjà chaude, un grand aplat
+   orange fait publicitaire — et il attirait l'œil avant le titre.
+
+   En blanc, l'ordre de lecture redevient : titre, puis action. Et l'ambre du
+   logo devient la seule tache de couleur de la page, donc plus forte qu'en
+   surface. */
 .ac-btn--plein{
-  background:linear-gradient(135deg,#E8760F 0%,#FFAE2E 62%,#FFDFA0 100%);
-  color:#2A1400;
+  background:#fff;
+  color:#0A0A0E;
 }
 /* Le second est creux : deux boutons pleins se disputeraient le regard. */
 .ac-btn--creux{

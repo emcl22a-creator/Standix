@@ -1111,9 +1111,19 @@ window.chooseSpace = function(space) {
     /* Ces phrases suivent les cartes du choix : elles disent le rôle, pas la
        suite d'opérations. Un écran qui reprend d'autres mots que le bouton
        qu'on vient de toucher fait douter d'avoir cliqué au bon endroit. */
-    sous.textContent = space === 'gestion'
-      ? 'Vous cr\u00e9ez l\u2019entreprise et invitez votre \u00e9quipe'
-      : 'Entrez le code \u00e0 5 chiffres de votre responsable'
+    /* ═══ UNE PHRASE QUI ACCUEILLE, PAS UNE CONSIGNE ═══
+
+       Elles disaient l'opération : « Vous créez l'entreprise », « Entrez le
+       code ». C'est ce que le formulaire montre déjà.
+
+       Une première phrase dit maintenant OÙ l'on arrive, la seconde ce qu'on va
+       y faire. C'est le geste d'Apple sur ses écrans de bienvenue : on est reçu
+       avant d'être mis au travail. */
+    sous.innerHTML = space === 'gestion'
+      ? 'Bienvenue.<br><span class="auth-sous-2">Cr\u00e9ez votre espace, invitez votre \u00e9quipe, ' +
+        'et laissez l\u2019IA \u00e9crire vos proc\u00e9dures.</span>'
+      : 'Bienvenue.<br><span class="auth-sous-2">Votre responsable vous a donn\u00e9 un code \u00e0 ' +
+        'cinq chiffres : il ouvre les proc\u00e9dures de votre entreprise.</span>'
   }
   document.getElementById('login-error').textContent = ''
 }
@@ -1316,7 +1326,10 @@ window.allerConnexion = function() {
   document.getElementById('signup-equipe-field').style.display = 'none'
   switchAuthTab('login')
   const sous = document.getElementById('auth-sous')
-  if (sous) sous.textContent = 'Entrez l\u2019adresse et le mot de passe de votre compte'
+  /* Pour qui revient, pas de « bienvenue » — il connaît la maison. Une phrase
+     qui reprend le fil là où il l'a laissé. */
+  if (sous) sous.innerHTML = 'Content de vous revoir.<br>' +
+    '<span class="auth-sous-2">Vos proc\u00e9dures vous attendent.</span>'
   document.getElementById('login-error').textContent = ''
   /* Les onglets disparaissent : il n'y a plus de second onglet utile. */
   document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')

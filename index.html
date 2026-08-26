@@ -516,6 +516,44 @@ h1 em{ font-style:normal; color:var(--t1); }
    comme une erreur d'affichage.
    ═══════════════════════════════════════════════════════════════════════════ */
 /* ═══════════════════════════════════════════════════════════════════════════
+   LES QUATRE REPÈRES
+
+   Deux colonnes sur téléphone, quatre en ligne dès la tablette. Séparés par un
+   filet vertical plutôt que par des cartes : quatre cartes de plus alourdiraient
+   un premier écran qui porte déjà le titre, le bouton et le téléphone.
+
+   Les pictogrammes sont blancs : le site n'a aucune couleur ailleurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.reperes{
+  /* Une bande sous le premier écran, et non dans la colonne du titre : quatre
+     repères ajoutés au-dessus de la pliure poussaient le visuel entièrement
+     hors champ sur une fenêtre de téléphone réelle — mesuré à 664 px de haut.
+
+     Ici, ils rassurent celui qui descend sans retarder celui qui clique. */
+  list-style:none;
+  max-width:var(--large); margin:0 auto;
+  padding:0 var(--gouttiere) 8px;
+  display:grid; grid-template-columns:1fr 1fr; gap:22px 0;
+}
+.reperes li{
+  padding:0 16px;
+  border-left:.5px solid rgba(255,255,255,.10);
+}
+.reperes li:nth-child(odd){ border-left:0; padding-left:0 }
+.reperes svg{
+  width:19px; height:19px; display:block; margin-bottom:11px;
+  /* Blancs et non ambre : le site n'a aucune couleur ailleurs, et quatre
+     pictogrammes colorés prenaient le regard avant le titre. */
+  stroke:var(--t1); fill:none; stroke-width:1.5;
+  stroke-linecap:round; stroke-linejoin:round;
+}
+.reperes b{
+  display:block; font-size:16px; font-weight:500; color:var(--t1);
+  letter-spacing:-.025em; margin-bottom:4px;
+}
+.reperes span{ display:block; font-size:12.5px; line-height:1.45; color:var(--t3) }
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LE VISUEL DU PREMIER ÉCRAN
 
    Une image, rien autour. Le châssis, l'ombre et le fond appartiennent au
@@ -1568,9 +1606,18 @@ footer .marque{ margin-bottom:18px; }
   .premier{
     display:grid; grid-template-columns:1fr 470px; gap:64px;
     align-items:center;
-    min-height:100dvh;
+    /* ═══ LA BANDE DES REPÈRES TIENT DANS LE PREMIER ÉCRAN ═══
+
+       Elle mesure 102 px. En laissant le premier écran occuper 100dvh, elle
+       tombait juste sous la pliure : le visiteur voyait un premier écran qui
+       ne prouvait rien, et les quatre faits n'arrivaient qu'après un geste.
+
+       Le premier écran cède donc la place exacte de la bande, plus les 22 px
+       qui la séparent de la section suivante. Rien n'est déplacé — c'est la
+       hauteur qui s'ajuste, pas la structure. */
+    min-height:calc(100dvh - 124px);
     max-width:var(--large); margin:0 auto;
-    padding:calc(var(--barre) + 68px) var(--gouttiere) 92px;
+    padding:calc(var(--barre) + 52px) var(--gouttiere) 60px;
   }
   .hero{ padding:0; max-width:none }
   .colonne-app{ display:block }
@@ -1666,8 +1713,32 @@ footer .marque{ margin-bottom:18px; }
      Les 16 px vers la gauche corrigent l'axe : la médiane de la grille est
      tracée 32 px au-delà de la colonne, donc le milieu des deux filets ne
      coïncide pas avec le centre de la colonne. */
+  /* Deux par deux, même sur ordinateur : la colonne du titre ne fait que
+     434 px, et quatre en ligne donnent 108 px chacun — le texte s'y hache en
+     mots isolés. Le tableau de bord de l'app peut se le permettre parce qu'il
+     occupe toute la largeur de l'écran ; ici non. */
+  /* Quatre en ligne sur ordinateur : la bande occupe toute la largeur de la
+     page, chaque repère a donc 250 px et son texte tient sur une ligne. */
+  .reperes{ grid-template-columns:repeat(4,1fr); gap:0; padding-bottom:22px }
+  .reperes li:nth-child(odd){ border-left:.5px solid rgba(255,255,255,.10); padding-left:20px }
+  .reperes li:first-child{ border-left:0; padding-left:0 }
+  .reperes li{ padding-left:20px }
+  .reperes b{ font-size:17px }
+  .reperes span{ font-size:13px }
+
+  /* ═══ LE VISUEL CEDE LA PLACE A LA BANDE ═══
+
+     C'est la hauteur du telephone qui commandait celle du premier ecran,
+     pas la regle de hauteur minimale : a 400 px de large il en fait 756 de
+     haut, et la bande tombait sous la pliure quoi qu'on fasse.
+
+     Sa hauteur est donc plafonnee a ce que laisse l'ecran une fois retires
+     la barre, les marges et la bande. Sur un grand ecran il garde ses
+     400 px de large ; sur un portable il retrecit juste assez. */
   .telephone{
     width:100%; max-width:400px; margin:0;
+    max-height:calc(100dvh - 300px);
+    object-fit:contain;
     transform:translateX(4.70%) translateX(-16px);
   }
   /* La composition en profondeur de l'ordinateur n'a que deux places. La
@@ -1975,6 +2046,7 @@ footer .marque{ margin-bottom:18px; }
     </a>
     <span class="aside">Sans carte bancaire</span>
   </div>
+
 </section>
 
 <div class="colonne-app">
@@ -1990,6 +2062,43 @@ footer .marque{ margin-bottom:18px; }
 
 </div>
 </div><!-- /.premier -->
+
+  <!-- ═══ LES QUATRE REPÈRES ═══
+
+       Quatre faits vérifiables, pas quatre promesses. Chacun répond à une
+       question qu'un patron se pose avant même de cliquer : combien de temps
+       puis-je filmer, qui y aura accès, dans quelle langue, et où vont mes
+       données.
+
+       Ils sont sous le bouton et non au-dessus : ils ne doivent pas retarder
+       l'action, seulement rassurer celui qui hésite encore. -->
+<!-- `flou r4` et non `app` : la bande appartient au premier ecran, elle doit
+     donc entrer avec lui. Avec `app`, l'observateur de defilement l'ignorait
+     — il ne revele rien dans les 12 % du bas de l'ecran — et elle restait
+     invisible tant qu'on ne descendait pas. -->
+<ul class="reperes flou r4">
+    <li>
+      <svg viewBox="0 0 24 24"><path d="M2 6.5A2.5 2.5 0 014.5 4h8A2.5 2.5 0 0115 6.5v11a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 17.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg>
+      <b>5 min</b>
+      <span>par vidéo analysée</span>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="3.4"/><path d="M22 20v-2a4 4 0 00-3-3.9M16.4 3.6a4 4 0 010 7"/></svg>
+      <b>Toute l'équipe</b>
+      <span>y accède en direct</span>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4"/><path d="M12 2.8a15 15 0 010 18.4 15 15 0 010-18.4z"/></svg>
+      <b>3 langues</b>
+      <span>français, anglais, allemand</span>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24"><path d="M12 2.6l7.6 3.2v5.4c0 4.6-3.1 8.6-7.6 10-4.5-1.4-7.6-5.4-7.6-10V5.8z"/><path d="M9.4 12.2l1.9 1.9 3.6-3.8"/></svg>
+      <b>Privé</b>
+      <span>vos procédures ne sortent pas</span>
+    </li>
+  </ul>
+
 
 <!-- ═══════════════════════════════════════════════════════════════════════
      COMMENT ÇA MARCHE

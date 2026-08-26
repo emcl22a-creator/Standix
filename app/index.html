@@ -443,21 +443,49 @@
     <div class="ac-marque"><img data-logo alt="Standix"></div>
 
     <div class="ac-bas">
-      <!-- Le titre du site, mot pour mot : c'est celui qui a été travaillé pour
-           standix.app, et l'app doit dire la même chose que la page qui y mène. -->
-      <!-- La coupure est posée à la main, pas laissée au navigateur : « L'IA
-           transforme vos vidéos en procédures » se répartit mieux en trois
-           lignes courtes qu'en deux longues, sur 390 px. -->
-      <h1 class="ac-titre">L’IA transforme<br>vos vidéos<br>en procédures.</h1>
-      <p class="ac-phrase">Toute l’équipe les consulte d’un scan, ou dans l’app.</p>
+      <!-- ═══ ALIGNÉ À GAUCHE, PAS CENTRÉ ═══
+
+           Un texte centré convient à une annonce ; à gauche, il se lit comme
+           une phrase. La troisième ligne passe en ambre : elle porte le mot qui
+           compte — « procédures », ce qu'on obtient. -->
+      <h1 class="ac-titre">L’IA transforme<br>vos vidéos<br><em>en procédures.</em></h1>
+      <p class="ac-phrase">Toute l’équipe les consulte d’un scan,<br>ou dans l’app.</p>
 
       <div class="ac-actions">
+        <!-- Chaque bouton porte une icône à gauche et un chevron à droite : on
+             lit qui l'on est, puis on voit que ça mène quelque part. -->
         <button type="button" class="ac-btn ac-btn--plein" data-space="gestion">
-          S’inscrire en tant que gérant
+          <span class="ac-btn-ic">
+            <!-- La couronne redessinée : trois pointes franches et une base
+                 droite, au lieu d'un zigzag qui se lisait mal à 17 px. Les
+                 trois perles marquent les sommets. -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                 stroke-linejoin="round" stroke-linecap="round">
+              <path d="M4 9.2l3.4 3.4L12 6.4l4.6 6.2L20 9.2v8.2H4Z"/>
+              <path d="M4 20.4h16"/>
+              <circle cx="4" cy="8.4" r="1.15" fill="currentColor" stroke="none"/>
+              <circle cx="12" cy="5.4" r="1.15" fill="currentColor" stroke="none"/>
+              <circle cx="20" cy="8.4" r="1.15" fill="currentColor" stroke="none"/>
+            </svg>
+          </span>
+          <span class="ac-btn-tx">S’inscrire comme gérant</span>
+          <span class="ac-btn-fl">›</span>
         </button>
+
         <button type="button" class="ac-btn ac-btn--creux" data-space="equipe">
-          S’inscrire pour accéder aux procédures
+          <span class="ac-btn-ic">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linejoin="round"><path d="M15.6 20.2v-1.7a3.2 3.2 0 0 0-3.2-3.2H6.6a3.2 3.2 0 0 0-3.2 3.2v1.7"/>
+            <circle cx="9.5" cy="7.8" r="3.2"/><path d="M20.6 20.2v-1.7a3.2 3.2 0 0 0-2.4-3.1"/>
+            <path d="M15.1 4.9a3.2 3.2 0 0 1 0 6.1"/></svg>
+          </span>
+          <!-- Raccourci : « pour accéder aux procédures » passait sur deux lignes et
+               cassait la symétrie des deux boutons. « rejoindre mon équipe » dit la
+               même chose en tenant sur une ligne. -->
+          <span class="ac-btn-tx">S’inscrire comme employé</span>
+          <span class="ac-btn-fl">›</span>
         </button>
+
         <button type="button" class="ac-connexion" id="ac-connexion">
           Vous avez déjà un compte ? <b>Se connecter</b>
         </button>

@@ -482,14 +482,29 @@
      premier affichage, le JavaScript n'a pas encore tourné, et c'est justement
      ce moment-là que Safari choisit pour proposer. -->
 <div class="login-wrap" id="login-screen" style="display:none;" inert>
+  <!-- ═══ LE RETOUR EST HORS DE LA FEUILLE ═══
+
+       Il était dedans, au-dessus du titre. Sur une feuille modale, le retour
+       appartient à ce qu'il y a DERRIÈRE : le poser dans la feuille laisse
+       croire qu'il annule le formulaire, pas qu'il referme la vue.
+
+       En haut à gauche de l'écran, sur la photo, il dit clairement : on
+       revient à la page d'où l'on vient. -->
+  <button class="feuille-retour" onclick="backToChoice()" aria-label="Retour">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+         stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+  </button>
   <div class="login-card">
-    <!-- La pastille, à cheval sur le bord de la feuille. Elle est DANS le flux :
-         une marge négative la fait remonter, ce qui évite de dépendre de la
-         hauteur de la feuille — celle-ci varie avec son contenu. -->
-    <div class="feuille-tete"><span class="feuille-logo"><img data-logo alt=""></span></div>
-    <button class="back-btn" style="margin-bottom:14px;" onclick="backToChoice()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-    </button>
+    <!-- ═══ LE LOGO ENTIER, SIGNE ET MOT ═══
+
+         La pastille est retirée. À sa place, le logo complet — l'image et le
+         nom — centré en tête de feuille.
+
+         C'est ce que fait Apple sur ses écrans de connexion : la marque se
+         présente d'un bloc, sans médaillon qui chevauche un bord. -->
+    <div class="feuille-marque">
+      <img data-logo alt=""><span class="logotype">Standix</span>
+    </div>
     <h1 id="auth-title">Espace Gestion</h1>
     <!-- Le sous-titre change selon le chemin : « Connectez-vous ou créez votre
          compte » était vrai quand les deux onglets étaient offerts. Chaque

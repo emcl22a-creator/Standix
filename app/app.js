@@ -310,7 +310,7 @@ const DICO = {
     "ou": "or",
     "relire et corriger": "review and correct",
     "trou": "gap",
-    "À imprimer et afficher sur le poste de travail": "Print and display at the workstation",
+    "Accéder directement à la procédure en scannant le QR code": "Scan the QR code to open the procedure straight away",
     "À lire": "To read",
     "Écrivez chaque étape dans l'ordre": "Write each step in order",
     "Écrivez chaque étape vous-même": "Write each step yourself",
@@ -519,7 +519,7 @@ const DICO = {
     "ou": "o",
     "relire et corriger": "revisar y corregir",
     "trou": "hueco",
-    "À imprimer et afficher sur le poste de travail": "Para imprimir y colocar en el puesto de trabajo",
+    "Accéder directement à la procédure en scannant le QR code": "Escanea el código QR para abrir el procedimiento al instante",
     "À lire": "Por leer",
     "Écrivez chaque étape dans l'ordre": "Escribe cada paso en orden",
     "Écrivez chaque étape vous-même": "Escribe cada paso tú mismo",
@@ -722,7 +722,7 @@ const DICO = {
     "ou": "ou",
     "relire et corriger": "rever e corrigir",
     "trou": "lacuna",
-    "À imprimer et afficher sur le poste de travail": "Para imprimir e afixar no posto de trabalho",
+    "Accéder directement à la procédure en scannant le QR code": "Digitalize o código QR para abrir o procedimento de imediato",
     "À lire": "Por ler",
     "Écrivez chaque étape dans l'ordre": "Escreva cada etapa por ordem",
     "Écrivez chaque étape vous-même": "Escreva cada etapa você mesmo",
@@ -10350,7 +10350,9 @@ function majProgressionIA() {
   const min = Math.floor(ecoule / 60), sec = Math.floor(ecoule % 60)
   const temps = min > 0 ? `${min} min ${String(sec).padStart(2, '0')}` : `${sec} s`
 
-  const info = AI_ETAPES[aiEtapeCourante] || AI_ETAPES.envoi
+  /* `info` a été retiré : la phrase n'affiche plus le nom de l'étape, donc
+     `AI_ETAPES` n'est plus lu ici. La table reste dans le fichier — elle
+     documente les paliers, et `aiEtapeCourante` sert encore ailleurs. */
   /* Le titre ne change plus à chaque étape. « Transcription de la parole · 14 s »
      décrivait la machine et changeait toutes les vingt secondes ; on annonce
      plutôt ce qu'on obtient, une bonne fois. Le détail de l'étape et le temps
@@ -10388,9 +10390,11 @@ function majProgressionIA() {
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
 
-  /* La phrase du dessous peut être vide : on ne laisse alors ni point orphelin
-     ni espace en trop. */
-  let phrase = `${t(info.titre)} \u00b7 ${temps}.`
+  /* Le repli, quand l'estimation manque — une vidéo dont on n'a pas pu lire la
+     durée. On dit alors le temps ÉCOULÉ, faute de pouvoir dire le restant.
+     Toujours sans nom d'étape : le titre changeait toutes les quarante
+     secondes et brouillait la lecture. */
+  let phrase = `${temps} d\u2019analyse.`
 
   /* ═══ LE TEMPS QUI RESTE, PAS SEULEMENT CELUI QUI PASSE ═══
 
@@ -10401,11 +10405,20 @@ function majProgressionIA() {
      ON NE L'AFFICHE PAS SI L'ESTIMATION EST DÉPASSÉE. Annoncer « encore 0 min »
      pendant trois minutes serait pire que de ne rien dire — le message du
      palier, plus bas, prend alors le relais et explique ce qui se passe. */
+  /* ═══ LE TEMPS TOTAL, PAS L'ÉTAPE EN COURS ═══
+
+     Le message disait « Extraction des images · encore 3 min ». Deux
+     informations pour une seule attente : le nom de l'étape change toutes les
+     quarante secondes, et il donne l'impression que le compte à rebours
+     recommence à chaque fois.
+
+     Il ne reste que le temps jusqu'à la procédure finie. C'est la seule chose
+     qu'on veut savoir quand on attend, et c'est ce qui permet de partir faire
+     autre chose. */
   if (aiEstimationTotale) {
     const reste = aiEstimationTotale - ecoule
-    if (reste > 20) phrase = `${t(info.titre)} \u00b7 encore ${attenteLisible(reste)}.`
+    if (reste > 20) phrase = `Encore ${attenteLisible(reste)} avant votre proc\u00e9dure.`
   }
-  if (info.sous) phrase += ' ' + t(info.sous)
   /* Le palier de fin a son propre message. Sans lui, on voit un chiffre figé
      sans savoir si quelque chose avance encore — c'est exactement le moment
      où l'on ferme l'onglet. */
@@ -14841,6 +14854,20 @@ function etatProcedureHtml(proc) {
         <circle cx="12" cy="12" r="9.5"/><line x1="12" y1="7.5" x2="12" y2="13"/><line x1="12" y1="16.5" x2="12" y2="16.6"/>
       </svg></div>`
 
+  /* ═══ LE BROUILLON, AVANT TOUT LE RESTE ═══
+
+     Une procédure non publiée le signale, quel que soit son statut d'analyse.
+     Sans cette pastille, il faudrait ouvrir chaque procédure pour savoir ce
+     qui est en ligne et ce qui ne l'est pas.
+
+     ⚠ SEULE LA GESTION LA VOIT. L'équipe ne reçoit jamais de brouillon — la
+       politique RLS l'en empêche — donc le test ne s'y déclenche jamais. Il
+       est écrit quand même : une règle qui dépend d'un filtre distant n'est
+       pas une règle. */
+  if (proc && !proc.publiee_le && proc.statut !== 'traitement' && proc.statut !== 'redaction') {
+    return `<span class="proc-brouillon" title="Pas encore visible par votre équipe">Brouillon</span>`
+  }
+
   if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a échoué — touchez pour relancer")
   if (analyseBloquee(proc)) return alerte('#FA8A08', "L'analyse semble bloquée — touchez pour relancer")
 
@@ -15069,8 +15096,22 @@ async function loadEquipeProcedures() {
      demande donc que celle-là : les autres ne sont jamais chargées, il n'y a
      rien à masquer ni à contourner côté navigateur. */
   const requete = estVisiteur()
-    ? supabase.from('procedures').select('*').eq('id', currentMembre.procedure_visitee)
-    : supabase.from('procedures').select('*').eq('entreprise_id', currentMembre.entreprise_id).order('titre')
+    /* ═══ L'ÉQUIPE NE VOIT QUE CE QUI EST PUBLIÉ ═══
+
+       `.not('publiee_le', 'is', null)` écarte les brouillons. Le gérant les
+       voit dans son espace, l'équipe non.
+
+       ⚠ CE FILTRE NE PROTÈGE RIEN À LUI SEUL. Quelqu'un qui appelle l'API
+         directement peut demander toutes les procédures. C'est la politique
+         RLS de `migration-publication.sql` qui fait respecter la règle — celle
+         d'ici ne fait qu'éviter un aller-retour inutile. */
+    ? supabase.from('procedures').select('*')
+        .eq('id', currentMembre.procedure_visitee)
+        .not('publiee_le', 'is', null)
+    : supabase.from('procedures').select('*')
+        .eq('entreprise_id', currentMembre.entreprise_id)
+        .not('publiee_le', 'is', null)
+        .order('titre')
 
   const { data: procedures, error } = await requete
   if (error) { console.error(error); return }
@@ -19393,6 +19434,96 @@ let editVideoUrl = null
 let conventionClips = 'fin'   // sens de lecture des horodatages : 'debut' | 'fin'
 let clipsDeduits = false      // vrai si les bornes ont été déduites, pas lues en base
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BANDEAU DE PUBLICATION
+
+   Une procédure naît en brouillon. Ce bandeau dit où elle en est et porte le
+   bouton qui la met en ligne.
+
+   ⚠ IL N'APPARAÎT QUE POUR LA GESTION. Un membre en équipe ne voit jamais un
+     brouillon — la politique RLS l'en empêche — donc il n'a pas à voir ce
+     bandeau non plus. */
+function peindrePublication(proc) {
+  const b = document.getElementById('pub-bandeau')
+  if (!b) return
+  if (!proc || currentMembre?.role !== 'gestion') { b.hidden = true; return }
+
+  const publiee = !!proc.publiee_le
+  b.hidden = false
+  b.classList.toggle('pub-bandeau--ok', publiee)
+
+  const ic = document.getElementById('pub-ic')
+  const ti = document.getElementById('pub-titre')
+  const so = document.getElementById('pub-sous')
+  const bt = document.getElementById('pub-btn')
+
+  if (publiee) {
+    ic.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M8.4 12.2l2.6 2.6 4.6-5.2"/></svg>`
+    ti.textContent = 'En ligne pour votre équipe'
+    /* La date, pas seulement le fait : « publiée » sans quand laisse penser
+       que c'est peut-être ancien, ou peut-être à l'instant. */
+    so.textContent = 'Depuis le ' + dateEnClair(proc.publiee_le)
+    bt.textContent = 'Retirer'
+    bt.className = 'pub-btn pub-btn--retirer'
+  } else {
+    ic.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/><path d="M12 7.6v5"/>
+      <circle cx="12" cy="16.4" r="0.9" fill="currentColor" stroke="none"/></svg>`
+    ti.textContent = 'Brouillon — vous seul la voyez'
+    so.textContent = 'Relisez-la, puis publiez-la quand elle est prête.'
+    bt.textContent = 'Publier'
+    bt.className = 'pub-btn'
+  }
+}
+
+/* La date en toutes lettres : « 12 août » plutôt qu'une date technique. */
+function dateEnClair(iso) {
+  try {
+    return new Date(iso).toLocaleDateString('fr-FR',
+      { day: 'numeric', month: 'long', year: 'numeric' })
+  } catch { return '—' }
+}
+
+/* ═══ PUBLIER, OU RETIRER ═══
+
+   Une seule fonction pour les deux sens : on pose une date, ou on l'efface.
+
+   Le retrait demande confirmation, pas la publication. Publier est réversible
+   en un clic ; retirer coupe l'accès à des gens qui l'avaient — c'est le geste
+   qui mérite qu'on s'arrête. */
+document.getElementById('pub-btn')?.addEventListener('click', async () => {
+  if (!editProcedureId) return
+  const bt = document.getElementById('pub-btn')
+  const retrait = bt.classList.contains('pub-btn--retirer')
+
+  if (retrait) {
+    const ok = await confirmDialog({
+      titre: 'Retirer de l\u2019espace \u00e9quipe ?',
+      message: 'Vos membres ne la verront plus. Vous pourrez la republier \u00e0 tout moment ; ' +
+               'les lectures d\u00e9j\u00e0 enregistr\u00e9es restent dans l\u2019analyse.',
+      confirmer: 'Retirer', annuler: 'Annuler', danger: true,
+    })
+    if (!ok) return
+  }
+
+  bt.disabled = true
+  const { data, error } = await supabase.from('procedures')
+    .update({ publiee_le: retrait ? null : new Date().toISOString() })
+    .eq('id', editProcedureId)
+    .select('*')
+    .single()
+  bt.disabled = false
+
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  peindrePublication(data)
+  toast(retrait ? 'Retir\u00e9e de l\u2019espace \u00e9quipe'
+                : 'Publi\u00e9e \u2014 votre \u00e9quipe peut la lire')
+  if (navigator.vibrate) navigator.vibrate(8)
+})
+
 window.openEditProcedure = async function(procId, mode) {
   pileEdition = []
   editProcedureId = procId
@@ -19403,7 +19534,13 @@ window.openEditProcedure = async function(procId, mode) {
   document.getElementById('edit-subhead').textContent = editMode === 'ai-review'
     ? "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin"
     : 'Modifiez le titre, la dossier ou les étapes'
-  document.getElementById('edit-save-btn').textContent = editMode === 'ai-review' ? 'Publier la procédure' : 'Enregistrer les modifications'
+  /* ⚠ LE BOUTON D'ENREGISTREMENT NE PUBLIE PLUS. Il disait « Publier la
+     procédure » à la fin d'une analyse IA — un mot devenu faux, puisque la
+     publication est maintenant un geste distinct, plus bas dans la page.
+
+     Il dit ce qu'il fait : il enregistre. */
+  document.getElementById('edit-save-btn').textContent = editMode === 'ai-review'
+    ? 'Enregistrer les étapes' : 'Enregistrer les modifications'
 
   const bande = document.getElementById('edit-bande-ia')
   if (bande) {
@@ -19427,6 +19564,10 @@ window.openEditProcedure = async function(procId, mode) {
     etapes = e || []
   }
   if (!proc) { document.getElementById('edit-error').textContent = 'Procédure introuvable.'; return }
+
+  /* Le bandeau se peint dès que la procédure est chargée : il lit
+     `proc.publiee_le`, qui vient d'arriver. */
+  peindrePublication(proc)
 
   document.getElementById('edit-titre').value = proc.titre || ''
   document.getElementById('edit-categorie').value = proc.categorie || ''

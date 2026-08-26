@@ -4020,9 +4020,11 @@
      rien à l'œil : on garde donc le fond translucide, sans le filtre.
      Le verre dépoli reste sur les rares éléments fixes : barre du haut,
      pastille des réglages, barre d'onglets, carte de connexion, alertes. */
+  /* La bordure est retirée : ces quatre-là reçoivent le liseré à coins vifs,
+     comme les autres cartes. Deux traits superposés feraient double bord. */
   .card, .sop-card, .emp-row, .cat-cell{
     background:var(--bg-card);
-    border:0.5px solid var(--border); border-radius:16px;
+    border-radius:16px;
   }
   .sop-card{ padding:14px 16px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer;
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1); }
@@ -9155,6 +9157,7 @@ body:has(#e-detail.active) #equipe-app{
    d'appareils, d'entreprises, d'établissements, tuiles de statistiques.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+.card, .sop-card, .emp-row, .cat-cell, .proc-rich-card, .etab-carte,
 .an-bloc, .reg-groupe, .reg-identite, .ga-tuile, .stat-mini, .cat-rank,
 .pm-ligne, .app-ligne, .ent-ligne, .etab-ligne, .plan-card, .hero-card{
   position:relative; overflow:hidden;
@@ -9195,7 +9198,8 @@ body:has(#e-detail.active) #equipe-app{
 .an-bloc::before, .reg-groupe::before, .reg-identite::before, .ga-tuile::before,
 .stat-mini::before, .cat-rank::before, .pm-ligne::before, .app-ligne::before,
 .ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before,
-.ac-tuile::before{
+.ac-tuile::before,
+.card::before, .sop-card::before, .emp-row::before, .cat-cell::before, .proc-rich-card::before, .etab-carte::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
   padding:0.5px; pointer-events:none; z-index:0;
   background:linear-gradient(45deg,
@@ -9211,7 +9215,8 @@ body:has(#e-detail.active) #equipe-app{
 .an-bloc::after, .reg-groupe::after, .reg-identite::after, .ga-tuile::after,
 .stat-mini::after, .cat-rank::after, .pm-ligne::after, .app-ligne::after,
 .ent-ligne::after, .etab-ligne::after, .plan-card::after, .hero-card::after,
-.ac-tuile::after{
+.ac-tuile::after,
+.card::after, .sop-card::after, .emp-row::after, .cat-cell::after, .proc-rich-card::after, .etab-carte::after{
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none; z-index:0;
   background:
@@ -9221,4 +9226,6 @@ body:has(#e-detail.active) #equipe-app{
 /* Le contenu passe au-dessus des lueurs. */
 .an-bloc > *, .reg-groupe > *, .reg-identite > *, .ga-tuile > *, .stat-mini > *,
 .cat-rank > *, .pm-ligne > *, .app-ligne > *, .ent-ligne > *, .etab-ligne > *,
-.plan-card > *, .hero-card > *{ position:relative; z-index:1; }
+.plan-card > *, .hero-card > *, .ac-tuile > *,
+.card > *, .sop-card > *, .emp-row > *, .cat-cell > *,
+.proc-rich-card > *, .etab-carte > *{ position:relative; z-index:1; }

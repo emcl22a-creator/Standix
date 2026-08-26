@@ -695,11 +695,21 @@
      Teintes ardoise : un bleu si sombre qu'il passe pour du gris. Assez proche
      du noir et blanc de l'app pour ne pas jurer, assez distinct pour qu'on
      apprenne que cette lueur veut dire « l'IA travaille ». */
-  /* Trois quarts de blanc, un éclat bleu qui passe — comme un reflet sur du
-     métal poli. La couleur n'affleure que sur un quart du tour : elle donne le
-     mouvement sans que l'anneau devienne bleu. */
+  /* ═══ L'ANNEAU EST AMBRE, PLUS BLANC ═══
+
+     Il était blanc sur trois quarts de tour, avec un éclat ambre au passage.
+     Le blanc dominait donc, et l'anneau ne ressemblait pas au logo.
+
+     Les deux teintes sont maintenant celles du logo : `#FFDFA0` pour le clair,
+     `#E8760F` pour le sombre. Le mouvement reste lisible — un quart de tour
+     plus foncé qui tourne — mais l'ensemble appartient à la marque.
+
+     ⚠ LES NOMS DE VARIABLES SONT TROMPEURS. `--blanc` et `--bleu` datent d'une
+       version où l'anneau était effectivement blanc et bleu. Je ne les renomme
+       pas : ils sont lus à quatre endroits, et un renommage partiel casserait
+       l'anneau sur un écran que je n'aurais pas vu. */
   .ia-fig{
-    --blanc:#FFFFFF; --bleu:#FEC64A;
+    --blanc:#FFDFA0; --bleu:#E8760F;
     position:relative; display:grid; place-items:center; flex-shrink:0;
   }
   .ia-fig .lum{
@@ -762,7 +772,20 @@
      virgule bleue qui tourne. Le blanc y devient un bleu très pâle et le bleu
      se fonce — c'est le même dessin, transposé pour rester lisible. */
   .btn:not(.ghost) .ia-fig, .ia-fig.clair{
-    --blanc:#FEC64A; --bleu:#EB5201;
+    /* ═══ SUR LE BOUTON, L'ANNEAU EST SOMBRE ═══
+
+       Le bouton est un dégradé ambre — de #EB5201 à #FDA81E, luminosité 0,46 à
+       0,55. Un anneau ambre par-dessus se situait à 0,48 et 0,59 : les mêmes
+       valeurs. Il ne se détachait que par le blanc résiduel du dégradé, d'où
+       l'impression de blanc que tu voyais.
+
+       Ici l'anneau descend sous son fond : #8C3100 et #5A1F00, soit 0,27 et
+       0,17. C'est la même famille de teintes — l'orange brûlé du bas du logo —
+       mais assez sombre pour se lire sur un aplat clair.
+
+       C'est le principe inverse du fond sombre, où l'anneau est plus clair que
+       la page. Dans les deux cas, il tranche. */
+    --blanc:#8C3100; --bleu:#5A1F00;
   }
 
   .ia-fig.g .pct{
@@ -2898,8 +2921,10 @@
     background:linear-gradient(160deg,#16161A 0%,#111114 52%,#0B0B0E 100%);
     border-radius:22px;
     padding:20px 18px; margin-bottom:12px;
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07),
-               0 8px 26px rgba(0,0,0,0.32);
+    /* Le liseré uniforme est remplacé par celui à coins vifs, comme les
+       dix-neuf autres cartes. Ne restent ici que les ombres portées. */
+    box-shadow:0 8px 26px rgba(0,0,0,0.32),
+               0 0 30px -14px rgba(255,255,255,0.10);
   }
   /* Celle qu'on recommande porte le liseré ambre : c'est le seul signal, et il
      suffit. Son fond descend un cran plus bas encore — c'est ce qui fait
@@ -6281,7 +6306,15 @@ body.plus-vu .plus-flot{
 
    Le sélecteur vise le PREMIER enfant seulement : les cartes suivantes ont
    déjà leurs 9 px de marge, et les espacer davantage détacherait la liste. */
-#recentes-tout > *:first-child{ margin-top:14px; }
+/* ═══ 26 PX SOUS LE TITRE ═══
+
+   14 px suffisaient quand la page était nue. Depuis que les cartes portent un
+   liseré et un modelé, la première remonte visuellement vers le titre : un
+   objet en relief paraît plus proche qu'un rectangle plat.
+
+   26 px la remettent à distance. C'est plus que sur la page des mouvements,
+   dont les lignes n'ont pas de relief. */
+#recentes-tout > *:first-child{ margin-top:26px; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    UN SEUL TRAIT DE CONTOUR DANS TOUTE L'APP
@@ -8833,41 +8866,10 @@ body:has(#e-detail.active) #equipe-app{
    28 % d'opacité, 108 px, et remonté vers le haut de la carte où il n'y a que
    le nom de l'offre. On le devine, on ne le lit pas — c'est ce qu'on demande à
    un filigrane. */
-/* ═══ LE LOGO, TEINTÉ EN AMBRE PAR FILTRE ═══
-
-   Le fichier `logo-standix.png` est blanc. Plutôt que d'ajouter une seconde
-   version ambre au dépôt — qu'il faudrait refaire à chaque retouche du logo —
-   on le recolore ici.
-
-   `sepia` puis `hue-rotate` : le blanc devient d'abord un beige, que la
-   rotation de teinte amène sur l'ambre. `saturate` pousse la couleur, et
-   `brightness` compense l'assombrissement que la saturation entraîne.
-
-   ⚠ L'ORDRE DES FILTRES COMPTE. Une rotation avant la sépia ne ferait rien :
-     le blanc n'a pas de teinte à tourner. */
-.offre-logo{
-  position:absolute; top:14px; right:-26px;
-  width:150px; height:150px; pointer-events:none;
-  opacity:0.40;
-  /* ⚠ PAS DE `filter` SUR LE PARENT. Un `drop-shadow` ici crée un nouveau
-     contexte de rendu qui empêche le masque de l'enfant de s'appliquer — le
-     logo ressortait gris. L'ombre est portée par l'enfant, où elle fonctionne. */
-}
-/* ═══ NI FILTRE, NI MASQUE : DEUX FICHIERS ═══
-
-   J'ai perdu quatre essais à recolorer le logo blanc — `sepia` + `hue-rotate`
-   donnait un vert olive, le masque CSS un gris, et deux variantes du masque
-   n'ont rien changé.
-
-   La solution était plus simple : un second fichier, déjà orange, embarqué à
-   côté du blanc dans index.html. Le blanc sert à l'en-tête et au démarrage sur
-   fond sombre, l'orange à la carte d'abonnement. Aucun calcul de couleur. */
-/* Le fichier porte déjà sa couleur : plus de masque, plus de dégradé de fond.
-   L'image se dessine simplement. */
-.offre-logo .logo-forme{
-  width:100%; height:100%; display:block; object-fit:contain;
-  filter:drop-shadow(0 6px 22px rgba(255,122,24,0.18));
-}
+/* `.offre-logo` et `.logo-forme` ont été retirées avec le filigrane de la
+   carte d'abonnement. Le mécanisme `data-logo-or` reste dans le code : il ne
+   dessert plus rien pour l'instant, mais il coûte trois lignes et servira si
+   le logo orange doit reparaître ailleurs. */
 /* Le texte passe AU-DESSUS du logo, jamais dessous : un prix illisible parce
    qu'un ornement le traverse serait le pire des échanges. */
 .offre-nom, .offre-prix, .offre-inclus,
@@ -9199,7 +9201,7 @@ body:has(#e-detail.active) #equipe-app{
 .stat-mini::before, .cat-rank::before, .pm-ligne::before, .app-ligne::before,
 .ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before,
 .ac-tuile::before,
-.card::before, .sop-card::before, .emp-row::before, .cat-cell::before, .proc-rich-card::before, .etab-carte::before{
+.card::before, .sop-card::before, .emp-row::before, .cat-cell::before, .proc-rich-card::before, .etab-carte::before, .offre-carte::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
   padding:0.5px; pointer-events:none; z-index:0;
   background:linear-gradient(45deg,
@@ -9216,7 +9218,7 @@ body:has(#e-detail.active) #equipe-app{
 .stat-mini::after, .cat-rank::after, .pm-ligne::after, .app-ligne::after,
 .ent-ligne::after, .etab-ligne::after, .plan-card::after, .hero-card::after,
 .ac-tuile::after,
-.card::after, .sop-card::after, .emp-row::after, .cat-cell::after, .proc-rich-card::after, .etab-carte::after{
+.card::after, .sop-card::after, .emp-row::after, .cat-cell::after, .proc-rich-card::after, .etab-carte::after, .offre-carte::after{
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none; z-index:0;
   background:
@@ -9228,4 +9230,5 @@ body:has(#e-detail.active) #equipe-app{
 .cat-rank > *, .pm-ligne > *, .app-ligne > *, .ent-ligne > *, .etab-ligne > *,
 .plan-card > *, .hero-card > *, .ac-tuile > *,
 .card > *, .sop-card > *, .emp-row > *, .cat-cell > *,
-.proc-rich-card > *, .etab-carte > *{ position:relative; z-index:1; }
+.proc-rich-card > *, .etab-carte > *,
+.offre-carte > *{ position:relative; z-index:1; }

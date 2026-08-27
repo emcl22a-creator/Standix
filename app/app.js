@@ -18330,8 +18330,10 @@ function peindreEquipe() {
 
   const gerants = membresEquipe.filter(m => m.role === 'gestion').length
   if (sous) {
-    sous.textContent = `${membresEquipe.length} utilisateur${membresEquipe.length > 1 ? 's' : ''} \u00b7 ` +
-      `${gerants} en gestion \u00b7 ${membresEquipe.length - gerants} en \u00e9quipe`
+    /* Le détail — combien en gestion, combien en équipe — est passé dans les
+       trois sections, où il se compte tout seul. Le sous-titre ne garde que le
+       total, la seule chose qu'aucune section ne dit. */
+    sous.textContent = `${membresEquipe.length} personne${membresEquipe.length > 1 ? 's' : ''}`
   }
 
   /* La recherche ignore les accents et la casse : on cherche « lea » et on trouve
@@ -18359,7 +18361,20 @@ function peindreEquipe() {
 
   const jePeuxChangerLeRang = estFondateur(currentMembre)
 
-  liste.innerHTML = tries.map(m => {
+  /* ═══════════════════════════════════════════════════════════════════════
+     TROIS GROUPES, PAS UNE LISTE
+
+     Une liste unique mélangeait tout le monde : il fallait lire le rôle sous
+     chaque nom pour savoir qui pouvait quoi.
+
+     Trois sections désormais — le fondateur seul, la gestion, l'équipe. On
+     voit d'un regard qui a les clés.
+
+     ⚠ L'ORDRE N'EST PAS UNE HIÉRARCHIE. Le fondateur vient en premier parce
+       qu'il est unique et qu'on le cherche en premier, pas parce qu'il vaut
+       mieux. Les intitulés disent des ACCÈS, pas des rangs.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const ligne = (m) => {
     const soi = m.id === currentMembre.id
     const promouvable = jePeuxChangerLeRang && !soi && m.role !== 'gestion'
     /* On ne rétrograde pas un fondateur : ce serait se retirer soi-même la
@@ -18367,44 +18382,86 @@ function peindreEquipe() {
     const retrogradable = jePeuxChangerLeRang && !soi && m.role === 'gestion' && !estFondateur(m)
 
     /* Qui peut retirer qui.
-       Le fondateur retire n'importe qui, des deux espaces. Un gestionnaire promu
-       ne retire que des membres d'équipe : il ne doit pas pouvoir écarter ses
-       pairs, encore moins celui qui l'a nommé. Un pouvoir reçu ne sert pas à
-       défaire celui qui l'a donné. */
+       Le fondateur retire n'importe qui. Un gestionnaire promu ne retire que
+       des membres d'équipe : il ne doit pas pouvoir écarter ses pairs, encore
+       moins celui qui l'a nommé. */
     const supprimable = !soi && (jePeuxChangerLeRang || m.role !== 'gestion')
     const date = m.created_at
       ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
       : '\u2014'
-    const rang = m.role === 'gestion'
-      ? (estFondateur(m) ? 'Gestion \u00b7 fondateur' : 'Gestion')
-      : '\u00c9quipe'
 
     return `
       <div class="pm-ligne">
         <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
-          <div class="pm-role">${rang} \u00b7 depuis le ${date}</div>
+          <div class="pm-role">Depuis le ${date}</div>
         </div>
         ${promouvable ? `<button type="button" class="pm-rang" data-promo="${m.id}"
-          data-nom="${escapeHtml(m.nom || '')}" aria-label="Passer en gestion" title="Passer en gestion">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 19.4V5.6" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M6.6 11 12 5.6 17.4 11" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          data-nom="${escapeHtml(m.nom || '')}" aria-label="Donner l\u2019acc\u00e8s \u00e0 la gestion"
+          title="Donner l\u2019acc\u00e8s \u00e0 la gestion">
+          <!-- ═══ UNE SILHOUETTE AVEC UN PLUS ═══
+
+               Ni flèche montante — qui dirait « monter en grade » et placerait
+               l'un au-dessus de l'autre — ni clé, qui dit « ouvrir » sans dire
+               à qui.
+
+               On ajoute quelqu'un à un groupe. C'est le sujet de cette page :
+               des personnes, pas des serrures. -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9.4" cy="8" r="3.6"/>
+            <path d="M3.4 20.2a6 6 0 0 1 12 0"/>
+            <path d="M18.6 8.4v5.2M16 11h5.2"/>
           </svg>
         </button>` : ''}
         ${retrogradable ? `<button type="button" class="pm-rang" data-retro="${m.id}"
-          data-nom="${escapeHtml(m.nom || '')}" aria-label="Repasser en \u00e9quipe" title="Repasser en \u00e9quipe">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M12 4.6v13.8" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round"/>
-            <path d="M17.4 13 12 18.4 6.6 13" stroke="rgba(255,255,255,0.78)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer l\u2019acc\u00e8s \u00e0 la gestion"
+          title="Retirer l\u2019acc\u00e8s \u00e0 la gestion">
+          <!-- La même silhouette, avec un moins : on retire de ce groupe. Le
+               geste inverse du précédent, dans le même vocabulaire. -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="9.4" cy="8" r="3.6"/>
+            <path d="M3.4 20.2a6 6 0 0 1 12 0"/>
+            <path d="M16 11h5.2"/>
           </svg>
         </button>` : ''}
-        ${!supprimable ? '' : `<button type="button" class="pm-suppr" data-membre="${m.id}" data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        ${!supprimable ? '' : `<button type="button" class="pm-suppr" data-membre="${m.id}"
+          data-nom="${escapeHtml(m.nom || '')}" aria-label="Retirer de l\u2019entreprise">
+          <!-- Une SORTIE, pas une poubelle. On ne jette pas quelqu'un : on lui
+               retire un accès. La porte avec la flèche dit exactement ça, et
+               c'est le signe employé partout pour « se déconnecter ». -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.4 20.4H6.6a2 2 0 0 1-2-2V5.6a2 2 0 0 1 2-2h7.8"/>
+            <path d="M17.6 15.6L21 12l-3.4-3.6M21 12H9.6"/>
+          </svg>
         </button>`}
       </div>`
-  }).join('')
+  }
+
+  const parGroupe = (l) => l.map(ligne).join('')
+  const fondateurs = tries.filter(m => m.role === 'gestion' && estFondateur(m))
+  const gestion    = tries.filter(m => m.role === 'gestion' && !estFondateur(m))
+  const equipe     = tries.filter(m => m.role !== 'gestion')
+
+  /* Une section vide ne s'affiche pas : un intitulé « Gestion » suivi de rien
+     laisse croire à un chargement en cours. */
+  const section = (titre, aide, l) => !l.length ? '' : `
+    <div class="pm-groupe">
+      <div class="pm-gtete">
+        <span class="pm-gt">${titre}</span>
+        <span class="pm-gn">${l.length}</span>
+      </div>
+      <div class="pm-gaide">${aide}</div>
+      ${parGroupe(l)}
+    </div>`
+
+  liste.innerHTML =
+    section('Fondateur', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
+    section('Espace gestion', 'Cr\u00e9ent les proc\u00e9dures, voient l\u2019analyse, invitent du monde.', gestion) +
+    section('Espace \u00e9quipe', 'Consultent les proc\u00e9dures publi\u00e9es.', equipe)
 }
 
 /* ── La recherche ────────────────────────────────────────── */

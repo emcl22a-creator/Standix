@@ -626,7 +626,10 @@ h1 em{ font-style:normal; color:var(--t1); }
 .telephone{
   position:relative; z-index:1;
   display:block; width:min(300px, 82%); height:auto; margin:26px auto 0;
-  transform:translateX(4.70%);
+  /* Plus de decalage par `transform` : l'animation d'entree ecrit elle aussi
+     `transform`, et l'ecrasait a la derniere image — d'ou le telephone qui
+     changeait de place une fois arrive. Sa valeur, 2,8 px, tombait en plus
+     entre deux pixels : l'image etait rendue floue en permanence. */
   -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 88%);
           mask-image:linear-gradient(180deg,#000 70%,transparent 88%);
 }
@@ -1398,9 +1401,16 @@ footer .marque{ margin-bottom:18px; }
    lent pour paraitre lourd. Un telephone de 400 px qui arrive a la vitesse
    d'une ligne de texte parait leger, presque nerveux.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ `filter:none` et `transform:none` sont INDISPENSABLES. `.tel-cadre` porte
+   la classe `flou`, qui applique `blur(6px)` et une montee de 14 px, et
+   compte sur son animation pour les retirer. Ici l'animation est annulee au
+   profit de celle du telephone : sans ces deux lignes, le PARENT restait
+   floute en permanence — mesure a 8,6 fois moins net que l'image source. */
 .tel-cadre.flou{
   animation:none;
   opacity:0;
+  filter:none;
+  transform:none;
 }
 /* Sans flou : sur une capture d'ecran remplie de texte fin, le flou d'entree
    se lisait comme une image mal chargee plutot que comme un mouvement. Le
@@ -1868,7 +1878,6 @@ footer .marque{ margin-bottom:18px; }
        portable il rapetisse juste assez pour que tout tienne. */
     max-height:calc(100dvh - 240px);
     object-fit:contain;
-    transform:translateX(4.70%) translateX(-16px);
   }
   /* La composition en profondeur de l'ordinateur n'a que deux places. La
      troisième vue y est masquée tant qu'elle est un emplacement — un rectangle

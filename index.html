@@ -594,17 +594,17 @@ h1 em{ font-style:normal; color:var(--t1); }
    lumière de derrière. L'enveloppe est nécessaire — une balise `img` ne peut
    pas porter de pseudo-élément.
 
-   ═══ LE CENTRAGE ═══
-   Le châssis occupe 5 → 910 d'une image de 1010 : son axe tombe à 45,3 %,
-   l'ombre portée occupant la marge droite. L'image n'est PAS recadrée — rogner
-   cette marge couperait l'ombre net. Les 4,70 % sont rendus en pourcentage,
-   donc la compensation suit la taille affichée.
+   ═══ LE CENTRAGE DU CHASSIS
 
-   ═══ LA COUPE ═══
-   Le fondu attaque à 70 % et a tout effacé à 88 : le bas de l'appareil
-   disparaît dans le noir. Transition courte — un dégradé étalé donne une image
-   délavée, pas une coupe.
-   ═══════════════════════════════════════════════════════════════════════════ */
+   Le chassis occupait 5 -> 910 d'une image de 1010 : son axe tombait a
+   45,3 %, l'ombre portee occupant la marge droite. Centrer l'image
+   centrait donc l'ensemble « telephone + ombre ».
+
+   La correction est faite DANS LE FICHIER : 95 px de vide transparent
+   ajoutes a gauche. Rien n'est rogne, l'ombre est intacte, et le CSS n'a
+   plus a compenser — ce qu'il faisait par `transform`, que l'animation
+   d'entree ecrasait a la derniere image.
+   */
 .tel-cadre{ position:relative; display:flex; justify-content:center }
 .tel-cadre::before{
   content:''; position:absolute; z-index:0;
@@ -1862,7 +1862,11 @@ footer .marque{ margin-bottom:18px; }
      la barre, les marges et la bande. Sur un grand ecran il garde ses
      400 px de large ; sur un portable il retrecit juste assez. */
   .telephone{
-    width:100%; max-width:400px; margin:0;
+    /* Les 16 px de decalage sont poses en MARGE, pas en `transform` :
+       l'animation d'entree ecrit `transform` et l'ecrasait a la derniere
+       image. Une marge en pixels entiers evite aussi le rendu entre deux
+       pixels qui rendait l'image floue. */
+    width:100%; max-width:400px; margin:0 32px 0 0;
     /* 360 et non 300 : le bloc des reperes est passe de 102 a 160 px avec
        l'air ajoute autour. C'est cette valeur, et elle seule, qui decide si
        les quatre faits tiennent dans le premier ecran. */
@@ -2197,7 +2201,7 @@ footer .marque{ margin-bottom:18px; }
 <div class="tel-cadre flou r4">
 <img class="telephone" src="vue-telephone.webp"
      alt="Une procédure Standix ouverte dans un navigateur mobile"
-     width="1010" height="1908">
+     width="1105" height="1908">
 </div>
 
 </div>

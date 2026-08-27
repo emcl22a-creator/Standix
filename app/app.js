@@ -8855,10 +8855,22 @@ async function attendreEtapesIA(procId) {
   while (Date.now() - debut < 8 * 60000) {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
-      /* Le sondage tourne en boucle : un appel qui ne rend jamais la main
-         fige tout le suivi, et l'anneau tourne sans fin. 25 secondes — une
-         réponse normale arrive en moins d'une. */
-      signal: AbortSignal.timeout(25000),
+      /* ⚠ 25 SECONDES ÉTAIT TROP COURT, ET C'EST MOI QUI L'AVAIS POSÉ.
+
+         Un sondage ordinaire répond en moins d'une seconde. Mais UN sondage
+         sur toute l'analyse fait bien plus : c'est celui qui trouve Azure
+         terminé, et qui enchaîne alors le classement puis la rédaction des
+         étapes par Claude — trente à quatre-vingt-dix secondes sur une longue
+         transcription.
+
+         Ma limite le coupait en plein travail. Pire : quand le client se
+         déconnecte, Supabase peut interrompre la fonction — la procédure
+         restait alors bloquée en « redaction », et le sondage suivant lisait
+         un état qui ne bougeait plus.
+
+         120 secondes. Les autres sondages n'attendent pas pour autant : ils
+         répondent en une seconde et n'atteignent jamais ce plafond. */
+      signal: AbortSignal.timeout(120000),
       headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: procId }),
     })
@@ -10288,6 +10300,9 @@ let aiDebutAnalyse = 0      // heure de démarrage de l'analyse
    la durée de la vidéo n'est pas toujours lisible — et on retombe alors sur
    l'ancien affichage du temps passé. */
 let aiEstimationTotale = null
+/* Azure met la vidéo en file quand aucune machine n'est libre : elle attend
+   sans avancer. `majProgressionIA` lit ce drapeau pour le dire. */
+let aiEnFile = false
 let aiNbSondages = 0
 let aiPollTimer = null
 let aiProcedureId = null
@@ -10358,6 +10373,7 @@ function startAiProgressSimulation() {
   aiPalierDepuis = null
   aiNbSondages = 0
   aiEtapeCourante = 'envoi'
+  aiEnFile = false
   aiProgresAzure = null
   if (aiProgressTimer) clearInterval(aiProgressTimer)
   aiProgressTimer = setInterval(majProgressionIA, 1000)
@@ -10453,6 +10469,19 @@ function majProgressionIA() {
 
   const sous = document.getElementById('ai-progress-sub')
   if (!sous) return
+
+  /* ═══ EN FILE : PAS DE COMPTE À REBOURS ═══
+
+     Tant qu'Azure n'a pas commencé, aucune estimation n'a de sens — le temps
+     restant dépend d'une file dont on ne connaît pas la longueur.
+
+     Annoncer « encore 3 min » puis rester dix minutes est pire que de ne rien
+     annoncer : on croit à une panne. */
+  if (aiEnFile) {
+    sous.textContent = 'En attente d\u2019une machine chez notre prestataire d\u2019analyse. ' +
+      'Vous pouvez quitter cette page, le travail continue.'
+    return
+  }
 
   /* Le repli, quand l'estimation manque — une vidéo dont on n'a pas pu lire la
      durée. On dit alors le temps ÉCOULÉ, faute de pouvoir dire le restant.
@@ -11877,10 +11906,22 @@ async function pollAiStatus() {
   try {
     const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
-      /* Le sondage tourne en boucle : un appel qui ne rend jamais la main
-         fige tout le suivi, et l'anneau tourne sans fin. 25 secondes — une
-         réponse normale arrive en moins d'une. */
-      signal: AbortSignal.timeout(25000),
+      /* ⚠ 25 SECONDES ÉTAIT TROP COURT, ET C'EST MOI QUI L'AVAIS POSÉ.
+
+         Un sondage ordinaire répond en moins d'une seconde. Mais UN sondage
+         sur toute l'analyse fait bien plus : c'est celui qui trouve Azure
+         terminé, et qui enchaîne alors le classement puis la rédaction des
+         étapes par Claude — trente à quatre-vingt-dix secondes sur une longue
+         transcription.
+
+         Ma limite le coupait en plein travail. Pire : quand le client se
+         déconnecte, Supabase peut interrompre la fonction — la procédure
+         restait alors bloquée en « redaction », et le sondage suivant lisait
+         un état qui ne bougeait plus.
+
+         120 secondes. Les autres sondages n'attendent pas pour autant : ils
+         répondent en une seconde et n'atteignent jamais ce plafond. */
+      signal: AbortSignal.timeout(120000),
       headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: aiProcedureId }),
     })
@@ -11926,10 +11967,22 @@ async function pollAiStatus() {
     console.log(`[ai-check ${Math.round((Date.now() - aiDebutAnalyse) / 1000)} s]`, data)
 
     if (data.status === 'processing') {
-      /* Le serveur nous dit où il en est : dès qu'il répond « en traitement »,
-         c'est que la vidéo est arrivée et qu'Azure l'écoute. Le pourcentage vient
-         d'Azure quand il en fournit un ; sinon l'anneau tourne. */
-      signalerEtapeIA('transcription', data.progress)
+      /* ═══ EN FILE D'ATTENTE, OU EN TRAITEMENT ═══
+
+         Azure met la vidéo en file quand aucune machine n'est libre. Elle y
+         reste sans avancer d'un pour cent — et l'app affichait pourtant
+         « Lecture de votre vidéo », comme si quelque chose se passait.
+
+         Une attente qu'on croit être un travail paraît deux fois plus longue :
+         on cherche ce qui ne va pas au lieu de patienter.
+
+         `en_file` vient d'`ai-check` après le correctif `patch-ai-check.ts`.
+         Sans lui, `undefined` est faux et le comportement reste l'ancien. */
+      /* ⚠ ON POSE UN DRAPEAU, ON N'ÉCRIT PAS. `majProgressionIA` repeint ce
+         texte à chaque seconde : un message posé ici directement serait effacé
+         au tour suivant. */
+      aiEnFile = !!data.en_file
+      if (!aiEnFile) signalerEtapeIA('transcription', data.progress)
       // On interroge souvent au début, puis on espace : la première minute
       // était la plus pénalisante, on pouvait attendre 6 s pour rien après la
       // fin réelle de l'analyse.
@@ -13475,15 +13528,24 @@ function dvMajGeste() {
   const dureeTot = v && isFinite(v.duration) ? v.duration : 0
   const toutDecoupe = dureeTot > 0 && videoSteps.length > 0 && (dureeTot - dvDebutEnCours) < 0.5
 
+  /* ═══ PLUS DE « RECOMMENCER LE DÉCOUPAGE » ═══
+
+     Quand toute la vidéo était découpée, le bouton devenait « Recommencer » et
+     effaçait toutes les étapes d'un coup.
+
+     C'est un geste destructeur logé là où l'on venait de terminer un travail —
+     et le seul moyen de le défaire était de tout refaire. Il est retiré.
+
+     Le bouton se désactive à la place : il n'y a plus rien à couper. */
   if (toutDecoupe) {
-    b.classList.remove('coupe')
-    b.classList.add('refaire')
-    ic.innerHTML = '<path d="M12 4V1L8 5l4 4V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/>'
-    lib.textContent = 'Recommencer le d\u00e9coupage'
-    aide.textContent = "Toute la vid\u00e9o est d\u00e9coup\u00e9e. Corrigez les textes ci-dessous, " +
-      "ou reprenez le d\u00e9coupage depuis le d\u00e9but."
+    b.classList.remove('coupe', 'refaire')
+    b.disabled = true
+    ic.innerHTML = '<path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>'
+    lib.textContent = 'D\u00e9coupage termin\u00e9'
+    aide.textContent = 'Toute la vid\u00e9o est d\u00e9coup\u00e9e. Corrigez les textes ci-dessous.'
     return
   }
+  b.disabled = false
   b.classList.remove('refaire')
 
   if (rienCommence) {
@@ -13903,24 +13965,9 @@ document.getElementById('dv-bouton')?.addEventListener('click', async () => {
 
   /* Tout est découpé : le bouton recommence. On demande confirmation — c'est
      tout le travail qui disparaît, textes déjà écrits compris. */
-  if (document.getElementById('dv-bouton').classList.contains('refaire')) {
-    const ok = await confirmDialog({
-      titre: 'Recommencer le d\u00e9coupage ?',
-      message: `Vos ${videoSteps.length} \u00e9tapes seront effac\u00e9es, textes compris.`,
-      confirmer: 'Recommencer',
-      annuler: 'Garder',
-      danger: true,
-    })
-    if (!ok) return
-    videoSteps = []
-    dvDebutEnCours = 0
-    dvSelection = null
-    v.currentTime = 0
-    v.pause()
-    dvMajGeste(); renderVideoSteps(); dvMajFrise()
-    if (navigator.vibrate) navigator.vibrate(10)
-    return
-  }
+  /* La confirmation « Recommencer le découpage ? » a été retirée avec le bouton
+     qui l'appelait. */
+    
 
   /* Rien n'est encore commencé : ce premier appui lance la vidéo. */
   if (v.paused && !videoSteps.length && v.currentTime < 0.3) {

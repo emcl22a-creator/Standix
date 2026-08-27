@@ -17049,7 +17049,9 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
     annuler: 'Lire les conditions',
     danger: false,
   })
-  if (!accepte) { window.open('cgu.html', '_blank', 'noopener'); return }
+  /* Chemin ABSOLU, comme les trois liens du balisage : `cgu.html` cherchait le
+     fichier dans `app/`, où il n'est pas. */
+  if (!accepte) { window.open('/cgu.html', '_blank', 'noopener'); return }
 
   b.disabled = true
   const libelle = b.textContent
@@ -19273,60 +19275,132 @@ function remettreConsigne(el) {
   if (el) el.textContent = CONSIGNE
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   OÙ RÉTABLIR L'ACCÈS À LA CAMÉRA
+
+   Un navigateur qui a refusé la caméra ne la redemande jamais tout seul. Il
+   faut aller la rétablir dans ses réglages — et le chemin diffère selon
+   l'appareil ET le navigateur.
+
+   ⚠ SUR iOS, LE MOTEUR EST LE MÊME MAIS PAS L'INTERFACE. Chrome et Firefox
+     pour iPhone emploient bien WebKit, mais ils ont leur propre barre
+     d'adresse : le menu `ᴀA` de Safari n'y existe pas. L'ancienne version
+     donnait donc une consigne impossible à suivre pour eux.
+
+   ⚠ ET LE `ᴀA` EST EN BAS DEPUIS iOS 15, pas en haut. On ne dit plus où il
+     se trouve : « dans la barre d'adresse » vaut pour les deux dispositions,
+     et personne ne cherche longtemps un bouton sur une barre.
+   ═══════════════════════════════════════════════════════════════════════════ */
 function cheminReglagesCamera() {
   const ua = navigator.userAgent
   const iOS = /iPad|iPhone|iPod/.test(ua) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
   const android = /Android/.test(ua)
 
-  /* Sur iOS, TOUS les navigateurs utilisent le moteur de Safari : le chemin est
-     le même quel que soit celui qu'on a installé. */
+  /* L'ordre des tests compte : Chrome sur iOS contient « CriOS » ET « Safari »
+     dans son identifiant. Chercher Safari en premier le classerait mal. */
+  const criOS = /CriOS/.test(ua)
+  const fxiOS = /FxiOS/.test(ua)
+  const edgiOS = /EdgiOS/.test(ua)
+
   if (iOS) {
+    /* Chrome, Firefox et Edge sur iPhone : pas de menu `ᴀA`. Leur autorisation
+       se règle dans les réglages du système, sous le nom de l'app. */
+    if (criOS || fxiOS || edgiOS) {
+      const nom = criOS ? 'Chrome' : fxiOS ? 'Firefox' : 'Edge'
+      return {
+        appareil: `${nom} sur iPhone`,
+        etapes: [
+          `Ouvrez <b>R\u00e9glages</b> \u2192 <b>${nom}</b>`,
+          'Activez <b>Cam\u00e9ra</b>',
+          `Revenez dans ${nom} et touchez <b>R\u00e9essayer</b>`,
+        ],
+        repli: `Si l\u2019app n\u2019appara\u00eet pas dans R\u00e9glages : R\u00e9glages \u2192 ` +
+               `Confidentialit\u00e9 et s\u00e9curit\u00e9 \u2192 Cam\u00e9ra \u2192 ${nom}.`,
+      }
+    }
+
+    /* Safari. Le `ᴀA` est en bas depuis iOS 15, en haut avant : on ne dit pas
+       où, seulement dans quelle barre. */
     return {
-      appareil: 'iPhone',
+      appareil: 'Safari sur iPhone',
       etapes: [
-        'Touchez le <b>\u1d00A</b> \u00e0 gauche de la barre d\u2019adresse, en haut',
+        'Touchez le <b>\u1d00A</b> dans la barre d\u2019adresse',
         'Choisissez <b>R\u00e9glages du site web</b>',
         'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
-        'Revenez ici et touchez <b>R\u00e9essayer</b>',
+        'Touchez <b>R\u00e9essayer</b>',
       ],
-      repli: 'Si le menu n\u2019appara\u00eet pas : R\u00e9glages \u2192 Safari \u2192 Cam\u00e9ra \u2192 Demander ou Autoriser.',
+      repli: 'Si le menu n\u2019appara\u00eet pas : R\u00e9glages \u2192 Safari \u2192 Cam\u00e9ra \u2192 Autoriser.',
     }
   }
 
   if (android) {
-    const chrome = /Chrome|CriOS/.test(ua) && !/EdgA|OPR|SamsungBrowser/.test(ua)
     const samsung = /SamsungBrowser/.test(ua)
+    const firefox = /Firefox|FxiOS/.test(ua)
+    const edge = /EdgA/.test(ua)
+
     if (samsung) {
       return {
         appareil: 'Samsung Internet',
         etapes: [
-          'Touchez le <b>cadenas</b> \u00e0 gauche de l\u2019adresse',
-          'Choisissez <b>Autorisations</b>',
-          'Activez <b>Cam\u00e9ra</b>',
-          'Revenez ici et touchez <b>R\u00e9essayer</b>',
+          'Touchez le <b>cadenas</b> dans la barre d\u2019adresse',
+          'Ouvrez <b>Autorisations</b>',
+          'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
+          'Touchez <b>R\u00e9essayer</b>',
         ],
-        repli: 'Ou : Param\u00e8tres du t\u00e9l\u00e9phone \u2192 Applications \u2192 Samsung Internet \u2192 Autorisations \u2192 Appareil photo.',
+        repli: 'Ou : menu \u2261 \u2192 Param\u00e8tres \u2192 Sites et t\u00e9l\u00e9chargements \u2192 ' +
+               'Autorisations des sites \u2192 Cam\u00e9ra.',
       }
     }
+
+    if (firefox) {
+      return {
+        appareil: 'Firefox sur Android',
+        etapes: [
+          'Touchez le <b>cadenas</b> \u00e0 gauche de l\u2019adresse',
+          'Ouvrez <b>Autorisations du site</b>',
+          'Mettez <b>Cam\u00e9ra</b> sur <b>Autoris\u00e9</b>',
+          'Touchez <b>R\u00e9essayer</b>',
+        ],
+        repli: '',
+      }
+    }
+
+    /* Chrome et Edge partagent la même interface sur Android. */
     return {
-      appareil: chrome ? 'Chrome' : 'votre navigateur',
+      appareil: edge ? 'Edge sur Android' : 'Chrome sur Android',
       etapes: [
         'Touchez le <b>cadenas</b> \u00e0 gauche de l\u2019adresse',
-        'Choisissez <b>Autorisations</b> ou <b>Param\u00e8tres du site</b>',
+        'Ouvrez <b>Autorisations</b> ou <b>Param\u00e8tres du site</b>',
         'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
-        'Revenez ici et touchez <b>R\u00e9essayer</b>',
+        'Touchez <b>R\u00e9essayer</b>',
       ],
-      repli: 'Ou : Param\u00e8tres du t\u00e9l\u00e9phone \u2192 Applications \u2192 Chrome \u2192 Autorisations \u2192 Appareil photo.',
+      repli: 'Si la cam\u00e9ra n\u2019appara\u00eet pas : R\u00e9glages du t\u00e9l\u00e9phone \u2192 Applications ' +
+             '\u2192 le navigateur \u2192 Autorisations \u2192 Appareil photo.',
+    }
+  }
+
+  /* Ordinateur. Le cadenas est universel — Chrome, Firefox, Edge et Safari le
+     portent tous, au même endroit. */
+  const safariMac = /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)
+  if (safariMac) {
+    return {
+      appareil: 'Safari sur Mac',
+      etapes: [
+        'Menu <b>Safari</b> \u2192 <b>R\u00e9glages pour ce site web</b>',
+        'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
+        'Rechargez la page, puis touchez <b>R\u00e9essayer</b>',
+      ],
+      repli: '',
     }
   }
 
   return {
-    appareil: 'ordinateur',
+    appareil: 'votre navigateur',
     etapes: [
-      'Touchez l\u2019ic\u00f4ne \u00e0 gauche de la barre d\u2019adresse',
+      'Cliquez sur le <b>cadenas</b> \u00e0 gauche de l\u2019adresse',
       'Mettez <b>Cam\u00e9ra</b> sur <b>Autoriser</b>',
-      'Rechargez la page',
+      'Rechargez la page, puis cliquez sur <b>R\u00e9essayer</b>',
     ],
     repli: '',
   }
@@ -19358,7 +19432,10 @@ function echecScanner(hintEl, zone, titre, detail, refus) {
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 7.6A2.5 2.5 0 0 1 5 5.1h2.4l1.5-2h6.2l1.5 2H19a2.5 2.5 0 0 1 2.5 2.5v9.3A2.5 2.5 0 0 1 19 19.4H5a2.5 2.5 0 0 1-2.5-2.5z"/><line x1="3" y1="3" x2="21" y2="21"/></svg>
       </span>
       <div class="t">La cam\u00e9ra est bloqu\u00e9e</div>
-      <div class="s">Votre navigateur a refus\u00e9 l\u2019acc\u00e8s. Il ne le redemandera pas tout seul \u2014 voici comment le r\u00e9tablir sur ${escapeHtml(c.appareil)}.</div>
+      <!-- Le nom du navigateur DANS la phrase : « voici comment le rétablir sur
+           Chrome sur iPhone » confirme qu'on parle bien de celui qu'on a sous
+           les yeux. Sans ce nom, on doute que les étapes s'appliquent. -->
+      <div class="s">Votre navigateur a refus\u00e9 l\u2019acc\u00e8s et ne le redemandera pas tout seul.<br>Voici comment le r\u00e9tablir sur <b>${escapeHtml(c.appareil)}</b>.</div>
       <ol class="pas">
         ${c.etapes.map(e => `<li>${e}</li>`).join('')}
       </ol>
@@ -19653,8 +19730,16 @@ function peindrePublication(proc) {
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9"/><path d="M12 7.6v5"/>
       <circle cx="12" cy="16.4" r="0.9" fill="currentColor" stroke="none"/></svg>`
-    ti.textContent = 'Brouillon — vous seul la voyez'
-    so.textContent = 'Relisez-la, puis publiez-la quand elle est prête.'
+    /* ═══ CE QUE VOIT QUI ═══
+
+       « Vous seul la voyez » était faux : tous les membres de la gestion la
+       voient, pas seulement celui qui l'a créée.
+
+       Ta phrase, allégée : « seuls ceux qui ont accès à l'espace gestion
+       peuvent y accéder » répétait « accès » deux fois en six mots. */
+    ti.textContent = 'Brouillon'
+    so.textContent = 'Visible par l’espace gestion uniquement. ' +
+                     'Publiez-la pour que votre équipe puisse la lire.'
     bt.textContent = 'Publier'
     bt.className = 'pub-btn'
   }

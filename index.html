@@ -1827,7 +1827,11 @@ footer .marque{ margin-bottom:18px; }
     /* Plus de plafond : le telephone retrouve ses 400 px de large et ses
        756 de haut. C'est lui le sujet du premier ecran ; le comprimer pour
        loger les reperes revenait a sacrifier le principal au secondaire. */
-    max-height:none;
+    /* Le telephone suit la hauteur de l'ecran au lieu d'etre fixe a 756 px.
+       `100dvh - 240px` laisse la place a la barre, aux retraits et aux
+       reperes : sur un grand ecran il garde ses 400 px de large, sur un
+       portable il rapetisse juste assez pour que tout tienne. */
+    max-height:calc(100dvh - 240px);
     object-fit:contain;
     transform:translateX(4.70%) translateX(-16px);
   }

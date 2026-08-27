@@ -617,7 +617,7 @@
           <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;" autocomplete="organization">
         </div>
         <div id="signup-equipe-field" style="display:none;">
-          <label class="f">Code de l'entreprise (5 chiffres)</label>
+          <label class="f">Code de l'entreprise (6 caractères)</label>
           <!-- ═══ `off`, ET NON `one-time-code` ═══
 
                J'avais mis `one-time-code` en pensant que nommer le champ ferait
@@ -643,7 +643,20 @@
                lui donner explicitement lui dit que le champ est déjà géré, et
                il cesse de proposer. C'est contre-intuitif — on nomme pour
                faire taire — mais c'est ainsi que la spécification fonctionne. -->
-          <input type="text" id="signup-code-acces" placeholder="12345" maxlength="5" inputmode="numeric"
+          <!-- ═══ SIX CARACTÈRES, LETTRES ET CHIFFRES ═══
+
+               `maxlength="5"` refusait le sixième — le champ était réglé pour
+               l'ancien code à cinq chiffres.
+
+               ⚠ ET `inputmode="numeric"` OUVRAIT UN CLAVIER SANS LETTRES. Le
+                 nouveau code en contient : impossible de le saisir sur
+                 téléphone. C'est le défaut le plus grave des deux, et le moins
+                 visible en relisant le code.
+
+               `autocapitalize` met en majuscules : le code s'affiche ainsi,
+               et la fonction serveur ignore la casse de toute façon. -->
+            <input type="text" id="signup-code-acces" placeholder="A1B2C3" maxlength="6"
+                   autocapitalize="characters" spellcheck="false"
                  autocomplete="off" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
         </div>
 
@@ -1467,24 +1480,9 @@
     </div>
     <div class="subhead" id="edit-subhead">Vérifiez et ajustez avant de continuer</div>
 
-    <!-- ═══════════════════════════════════════════════════════════════════
-         LE BANDEAU DE PUBLICATION
-
-         Une procédure naît en BROUILLON : le gérant seul la voit. Ce bandeau
-         dit où elle en est, et porte le bouton qui la met en ligne.
-
-         Il change d'état plutôt que d'apparaître et disparaître : brouillon
-         en ambre, publiée en vert sourd. On sait toujours où on en est, sans
-         avoir à chercher.
-         ═══════════════════════════════════════════════════════════════════ -->
-    <div class="pub-bandeau" id="pub-bandeau" hidden>
-      <span class="pub-ic" id="pub-ic"></span>
-      <span class="pub-txt">
-        <span class="pub-t" id="pub-titre">—</span>
-        <span class="pub-s" id="pub-sous">—</span>
-      </span>
-      <button type="button" class="pub-btn" id="pub-btn">Publier</button>
-    </div>
+    <!-- Le bandeau de publication vit dans `p-analyse` : c'est elle que l'app
+         ouvre quand on touche une procédure. `openEditProcedure`, qui ouvre cet
+         écran-ci, n'est appelée nulle part. -->
 
     <!-- Dossier avant Titre, et les mêmes champs qu'à la création. Deux écrans
          qui demandent la même chose doivent la demander pareil : sinon on croit
@@ -1651,6 +1649,25 @@
       </button>
     </div>
     <div class="subhead titre-cat" id="analyse-subhead">—</div>
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LE BANDEAU DE PUBLICATION
+
+         ⚠ IL ÉTAIT SUR `p-edit-procedure` — un écran que RIEN N'OUVRE.
+           `openEditProcedure` n'est appelée nulle part : c'est `openAnalyse`,
+           ici, qui sert de page de détail depuis la refonte.
+
+           Le bandeau ne s'affichait donc jamais, et toutes les procédures
+           restaient en brouillon sans moyen de les publier.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="pub-bandeau" id="pub-bandeau" hidden>
+      <span class="pub-ic" id="pub-ic"></span>
+      <span class="pub-txt">
+        <span class="pub-t" id="pub-titre">—</span>
+        <span class="pub-s" id="pub-sous">—</span>
+      </span>
+      <button type="button" class="pub-btn" id="pub-btn">Publier</button>
+    </div>
+
 
     
     <div class="analyse-couv" id="analyse-couverture" style="display:none;"></div>
@@ -2509,12 +2526,12 @@
     <div class="accueil promu-carte">
       <div class="accueil-texte">
         <div class="t" id="orph-titre">Aucune entreprise</div>
-        <div class="s" id="orph-texte">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 5 chiffres
+        <div class="s" id="orph-texte">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères
           que votre responsable vous a communiqué.</div>
       </div>
       <div class="accueil-av"><span class="dispo"></span></div>
     </div>
-    <input type="text" id="orph-code" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="00000" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
+    <input type="text" id="orph-code" maxlength="6" autocomplete="off" placeholder="A1B2C3" autocapitalize="characters" spellcheck="false" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
     <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
     <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
     <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
@@ -2585,7 +2602,7 @@
         </div>
       </div>
       <div class="visiteur-code">
-        <input type="text" id="e-visiteur-champ" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="00000">
+        <input type="text" id="e-visiteur-champ" maxlength="6" autocomplete="off" placeholder="A1B2C3" autocapitalize="characters" spellcheck="false">
         <button class="btn" id="e-visiteur-valider">Débloquer</button>
       </div>
       <div class="error-msg" id="e-visiteur-erreur"></div>

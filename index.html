@@ -605,7 +605,21 @@ h1 em{ font-style:normal; color:var(--t1); }
    plus a compenser — ce qu'il faisait par `transform`, que l'animation
    d'entree ecrasait a la derniere image.
    */
-.tel-cadre{ position:relative; display:flex; justify-content:center }
+/* ═══ CENTRAGE MESURE AU CHARGEMENT ═══
+
+   Le decalage n'est plus une valeur ecrite a la main : un script lit la largeur
+   REELLE du fichier charge, calcule ou tombe le chassis, et pose l'ecart dans
+   `--axe`.
+
+   C'est la seule methode qui reste juste quelle que soit l'image deposee. Les
+   versions precedentes supposaient un fichier de 1105 px avec son centrage
+   integre ; avec l'ancien de 1010 px, le telephone partait 4,1 % trop a gauche
+   — mesure sur une capture reelle. */
+.tel-cadre{
+  --axe:0px;
+  position:relative; display:flex; justify-content:center;
+  transform:translateX(var(--axe));
+}
 .tel-cadre::before{
   content:''; position:absolute; z-index:0;
   left:-38%; right:-38%; top:-40px; height:440px;
@@ -628,7 +642,7 @@ h1 em{ font-style:normal; color:var(--t1); }
   /* 300 -> 336 px, et 82 -> 88 % de la largeur disponible. Le telephone est
      le seul element du premier ecran qui montre le produit ; sur un petit
      ecran il avait moins de place que le titre. */
-  display:block; width:min(318px, 86%); height:auto; margin:26px auto 0;
+  display:block; width:min(296px, 82%); height:auto; margin:26px auto 0;
   /* Plus de decalage par `transform` : l'animation d'entree ecrit elle aussi
      `transform`, et l'ecrasait a la derniere image — d'ou le telephone qui
      changeait de place une fois arrive. Sa valeur, 2,8 px, tombait en plus
@@ -1413,7 +1427,7 @@ footer .marque{ margin-bottom:18px; }
   animation:none;
   opacity:0;
   filter:none;
-  transform:none;
+  transform:translateX(var(--axe));
 }
 /* Sans flou : sur une capture d'ecran remplie de texte fin, le flou d'entree
    se lisait comme une image mal chargee plutot que comme un mouvement. Le
@@ -2757,6 +2771,35 @@ footer .marque{ margin-bottom:18px; }
 </div>
 
 <script>
+/* ═══ L'AXE DU TELEPHONE, MESURE SUR LE FICHIER CHARGE ═══
+
+   Le chassis n'est pas au centre de tous les fichiers : celui de 1010 px le
+   place a 45,05 %, celui de 1105 px a 49,77 %. Plutot que de coder une valeur
+   qui ne vaut que pour un fichier, on lit la largeur reelle de l'image une fois
+   chargee et on en deduit l'ecart a compenser.
+
+   Le chassis occupe toujours les memes 902 px du dessin d'origine, cale a
+   gauche apres detourage : sa position depend donc uniquement de ce que le
+   fichier porte a droite. */
+;(() => {
+  const img = document.querySelector('.telephone')
+  const cadre = document.querySelector('.tel-cadre')
+  if (!img || !cadre) return
+  const poser = () => {
+    const W = img.naturalWidth
+    if (!W) return
+    /* Le chassis est cale sur le bord DROIT du fichier : dans les deux versions
+       de l'image, son centre tombe a 555 px de la droite. C'est ce que le
+       detourage garantit — la marge, ombre ou vide ajoute, est toujours a
+       gauche. Verifie sur les deux fichiers : 1010-555=455 et 1105-555=550. */
+    const centreChassis = W - 555
+    const ecart = (centreChassis / W - 0.5) * img.getBoundingClientRect().width
+    cadre.style.setProperty('--axe', Math.round(-ecart) + 'px')
+  }
+  if (img.complete) poser(); else img.addEventListener('load', poser)
+  addEventListener('resize', poser)
+})()
+
 /* Révélation du corps, au plus tôt des trois signaux : chargement complet,
    polices prêtes, délai de sécurité. Placé en tête pour s'exécuter même si une
    erreur survenait plus bas dans le script. */

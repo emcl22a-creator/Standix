@@ -6615,6 +6615,40 @@ function peindreTuilesAccueil() {
   const tout = accueilPeriode === 'tout'
   const debutMois = debutDuMois()
   const procs = allGestionProcedures || []
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     L'ACCUEIL SANS AUCUNE PROCÉDURE
+
+     Trois tuiles à zéro et deux liens vers des listes vides : la page ne
+     disait rien, et surtout pas quoi faire.
+
+     ⚠ ON TESTE `procs.length`, PAS LE COMPTE DU MOIS. Une entreprise qui a
+       douze procédures mais aucune ce mois-ci n'est pas vide — elle a juste
+       un mois calme. L'état vide ne concerne que le vrai départ.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const vide = document.getElementById('ac-vide')
+  if (!procs.length) {
+    if (vide) {
+      vide.hidden = false
+      const nom = cachedEntreprise?.nom
+      /* Le nom de l'entreprise, quand on l'a. « Votre entreprise » est un
+         repli — jamais un texte à trous. */
+      vide.querySelector('.acv-t').textContent = nom
+        ? nom + ' n\u2019a pas encore de proc\u00e9dure'
+        : 'Aucune proc\u00e9dure pour l\u2019instant'
+
+      /* Plus de seconde phrase. Ce qu'il faut savoir tient dans le titre ; le
+         reste était du remplissage. */
+    }
+    grille.hidden = true
+    const rec = document.getElementById('ac-recentes')
+    if (rec) rec.hidden = true
+    return
+  }
+  if (vide) vide.hidden = true
+  grille.hidden = false
+  const rec = document.getElementById('ac-recentes')
+  if (rec) rec.hidden = false
   const vals = cachedValidations || []
 
   /* ─── ① PROCÉDURES CRÉÉES ─────────────────────────────────────────────── */

@@ -9626,7 +9626,9 @@ body:has(#e-detail.active) #equipe-app{
 
 .pub-bandeau{
   display:flex; align-items:center; gap:12px;
-  margin:14px 0 4px; padding:13px 14px;
+  /* 18 px sous le bandeau : il touchait presque la vidéo, et deux blocs qui se
+     touchent se lisent comme un seul. */
+  margin:14px 0 18px; padding:13px 14px;
   border-radius:16px;
   background:rgba(246,148,3,0.08);
   box-shadow:inset 0 0 0 0.5px rgba(246,148,3,0.22);

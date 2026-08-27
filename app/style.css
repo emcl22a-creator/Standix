@@ -9784,3 +9784,26 @@ body:has(#e-detail.active) #equipe-app{
   font-size:11.5px; line-height:1.45; color:var(--label-3);
   margin-bottom:11px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL SANS PROCÉDURE
+
+   Pas de carte, pas d'ombre, pas d'animation. Du blanc autour d'une icône et
+   d'une phrase — c'est ce qui distingue un état vide assumé d'un message
+   d'erreur.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ac-vide{
+  padding:64px 24px;
+  text-align:center;
+}
+.acv-ic{
+  width:44px; height:44px; display:block; margin:0 auto 16px;
+  color:var(--label-3);
+}
+.acv-t{
+  font-size:15px; font-weight:500; letter-spacing:-0.015em;
+  line-height:1.45; color:var(--label-2);
+  max-width:260px; margin:0 auto;
+}

@@ -382,8 +382,8 @@ const DICO = {
     'Rejoindre': 'Join',
     'Rejoindre une autre entreprise': 'Join another company',
     'D\u00e9bloquer': 'Unlock',
-    "Entrez le code \u00e0 5 chiffres que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
-      'Enter the 5-digit code your manager gave you. It will be remembered: the company will appear in the list above.',
+    "Entrez le code \u00e0 6 caract\u00e8res que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
+      'Enter the 6-character code your manager gave you. It will be remembered: the company will appear in the list above.',
     'Une question ?': 'A question?',
     '\u00c9crivez-nous': 'Write to us',
     'Un souci, une id\u00e9e, une question sur Standix ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
@@ -585,7 +585,7 @@ const DICO = {
     'Rejoindre': 'Unirse',
     'Rejoindre une autre entreprise': 'Unirse a otra empresa',
     'D\u00e9bloquer': 'Desbloquear',
-    "Entrez le code \u00e0 5 chiffres que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
+    "Entrez le code \u00e0 6 caract\u00e8res que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
       'Introduce el c\u00f3digo de 5 cifras que te dio tu responsable. Se guardar\u00e1: la empresa aparecer\u00e1 en la lista de arriba.',
     'Une question ?': '\u00bfUna pregunta?',
     '\u00c9crivez-nous': 'Escr\u00edbenos',
@@ -788,7 +788,7 @@ const DICO = {
     'Rejoindre': 'Aderir',
     'Rejoindre une autre entreprise': 'Aderir a outra empresa',
     'D\u00e9bloquer': 'Desbloquear',
-    "Entrez le code \u00e0 5 chiffres que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
+    "Entrez le code \u00e0 6 caract\u00e8res que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
       'Introduza o c\u00f3digo de 5 algarismos que o seu respons\u00e1vel lhe deu. Ser\u00e1 guardado: a empresa aparecer\u00e1 na lista acima.',
     'Une question ?': 'Uma pergunta?',
     '\u00c9crivez-nous': 'Escreva-nos',
@@ -1123,7 +1123,7 @@ window.chooseSpace = function(space) {
       ? 'Bienvenue.<br><span class="auth-sous-2">Cr\u00e9ez votre espace, invitez votre \u00e9quipe, ' +
         'et laissez l\u2019IA \u00e9crire vos proc\u00e9dures.</span>'
       : 'Bienvenue.<br><span class="auth-sous-2">Votre responsable vous a donn\u00e9 un code \u00e0 ' +
-        'cinq chiffres : il ouvre les proc\u00e9dures de votre entreprise.</span>'
+        'six caract\u00e8res : il ouvre les proc\u00e9dures de votre entreprise.</span>'
   }
   document.getElementById('login-error').textContent = ''
 }
@@ -14337,6 +14337,16 @@ async function openAnalyse(procId) {
   // si jamais elles manquent (cas rare), on retombe sur une requête fraîche.
   let proc = allGestionProcedures.find(p => p.id === procId)
   if (proc?.image_url) reinitialiserCouverture(proc.image_url)
+  /* ═══ LE BANDEAU DE PUBLICATION SE PEINT ICI ═══
+
+     Il était branché sur `openEditProcedure` — une fonction que RIEN N'APPELLE.
+     C'est `openAnalyse` qui sert de page de détail : le bandeau ne s'affichait
+     donc jamais, et toutes les procédures restaient en brouillon sans moyen de
+     les publier.
+
+     On peint dès qu'on a la procédure en cache, puis de nouveau plus bas si
+     elle vient de la base — sinon l'écran reste vide le temps de la requête. */
+  peindrePublication(proc)
   let etapes = cachedEtapesByProc[procId]
   let employes = cachedEmployes
   let validations = cachedValidations.filter(v => v.procedure_id === procId)
@@ -14346,6 +14356,8 @@ async function openAnalyse(procId) {
     document.getElementById('analyse-subhead').textContent = 'Chargement...'
     const res = await supabase.from('procedures').select('*').eq('id', procId).single()
     proc = res.data
+    /* La procédure vient d'arriver : on repeint avec sa vraie valeur. */
+    peindrePublication(proc)
   }
   /* Le cache pouvait contenir un tableau VIDE — préchargé à un moment où la
      procédure n'avait pas encore d'étapes : analyse terminée depuis, étapes
@@ -15135,7 +15147,10 @@ document.getElementById('e-visiteur-valider')?.addEventListener('click', async (
   const code = document.getElementById('e-visiteur-champ').value.trim()
   err.style.color = 'var(--red)'
   err.textContent = ''
-  if (!/^\d{5}$/.test(code)) { err.textContent = 'Le code comporte 5 chiffres.'; return }
+  /* ⚠ LE MOTIF REFUSAIT LES LETTRES. Le nouveau code en contient : la
+     vérification rejetait tout code valide. La casse est acceptée ici pour ne
+     pas refuser quelqu'un qui saisit en minuscules — le serveur la normalise. */
+  if (!/^[A-Za-z0-9]{6}$/.test(code)) { err.textContent = 'Le code comporte 6 caractères.'; return }
 
   setButtonLoading(btn, true)
   const ent = await entrepriseParCode(code)
@@ -17991,7 +18006,7 @@ document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
   const code = document.getElementById('es-code').value.trim()
   err.style.color = 'var(--red)'
   err.textContent = ''
-  if (!/^\d{5}$/.test(code)) { err.textContent = 'Le code comporte 5 chiffres.'; return }
+  if (!/^[A-Za-z0-9]{6}$/.test(code)) { err.textContent = 'Le code comporte 6 caractères.'; return }
 
   setButtonLoading(btn, true)
   const ent = await entrepriseParCode(code)
@@ -18134,14 +18149,14 @@ function montrerOrphelin(enPlus) {
   if (enPlus) {
     el('orph-titre').textContent = 'Rejoindre une entreprise'
     el('orph-texte').textContent =
-      "Entrez le code \u00e0 5 chiffres que son responsable vous a communiqu\u00e9. " +
+      "Entrez le code \u00e0 6 caract\u00e8res que son responsable vous a communiqu\u00e9. " +
       "Elle s'ajoutera \u00e0 celles que vous avez d\u00e9j\u00e0."
     el('orph-sortir').style.display = 'none'
     el('orph-annuler').style.display = 'block'
   } else {
     el('orph-titre').textContent = 'Aucune entreprise'
     el('orph-texte').textContent =
-      "Votre compte n'est rattach\u00e9 \u00e0 aucune entreprise. Entrez le code \u00e0 5 chiffres " +
+      "Votre compte n'est rattach\u00e9 \u00e0 aucune entreprise. Entrez le code \u00e0 6 caract\u00e8res " +
       "que votre responsable vous a communiqu\u00e9."
     el('orph-sortir').style.display = 'block'
     el('orph-annuler').style.display = 'none'
@@ -18166,7 +18181,7 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
   const code = (document.getElementById('orph-code').value || '').trim()
   err.textContent = ''
 
-  if (code.length !== 5) { err.textContent = 'Le code compte 5 chiffres.'; return }
+  if (!/^[A-Za-z0-9]{6}$/.test(code)) { err.textContent = 'Le code compte 6 caractères.'; return }
   btn.disabled = true
   btn.textContent = 'V\u00e9rification\u2026'
 
@@ -19571,6 +19586,14 @@ function peindrePublication(proc) {
   const b = document.getElementById('pub-bandeau')
   if (!b) return
   if (!proc || currentMembre?.role !== 'gestion') { b.hidden = true; return }
+
+  /* ⚠ LE BOUTON PUBLIE `editProcedureId`. Cette variable n'était posée que par
+     `openEditProcedure`, qui n'est appelée nulle part : le bouton n'aurait rien
+     eu à publier.
+
+     On la pose ici, au moment où l'on peint. Le bandeau et le bouton parlent
+     ainsi toujours de la même procédure. */
+  editProcedureId = proc.id
 
   const publiee = !!proc.publiee_le
   b.hidden = false

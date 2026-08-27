@@ -547,7 +547,14 @@ h1 em{ font-style:normal; color:var(--t1); }
      Retrait du bas porte a 30 : sans lui, les legendes touchaient le filet
      horizontal qui ferme la section. */
   padding:30px 0 30px;
-  display:flex; gap:0;
+  /* MASQUE SOUS 1100 PX. Les trois informations existent deja ailleurs :
+     « 5 min » dans la section 01, « 3 langues » dans la carte tarifaire,
+     « prive » dans la note qui la suit. Sur un ecran etroit elles coutaient
+     161 px au premier ecran pour repeter ce qui vient plus bas.
+
+     Les regles du rail restent en place : il suffit de remettre `flex` a la
+     ligne ci-dessous pour le reactiver. */
+  display:none; gap:0;
   overflow-x:auto; overscroll-behavior-x:contain;
   scroll-snap-type:x proximity;
   scrollbar-width:none;
@@ -1640,9 +1647,13 @@ footer .marque{ margin-bottom:18px; }
     /* 186 px : la hauteur exacte du bloc des reperes une fois l'air ajoute,
        plus l'ecart qui le separe de la section suivante. Mesure, pas
        estime — c'est ce qui decide si les quatre faits sont vus. */
-    min-height:calc(100dvh - 186px);
+    min-height:100dvh;
     max-width:var(--large); margin:0 auto;
-    padding:calc(var(--barre) + 52px) var(--gouttiere) 60px;
+    /* Retraits resserres : 52 -> 20 en haut, 60 -> 0 en bas. Le telephone
+       fait 756 px a lui seul ; avec 176 px de retrait, l'ensemble depassait
+       une fenetre de 900 px. Ce sont les seuls pixels qu'on pouvait rendre
+       sans toucher au visuel. */
+    padding:calc(var(--barre) + 20px) var(--gouttiere) 0;
   }
   .hero{ padding:0; max-width:none }
   .colonne-app{ display:block }
@@ -1754,7 +1765,31 @@ footer .marque{ margin-bottom:18px; }
     /* 42 -> 14 : les quatre reperes remontent vers le bouton. C'est le seul
        retrait qui les separe de lui, donc le seul a regler. Le bas garde
        ses 40 px, qui les detachent du filet fermant la section. */
-    padding:14px var(--gouttiere) 40px;
+    /* Le retrait du haut etait deja au minimum : ce qui tenait les reperes
+       en bas, c'etait la hauteur du premier ecran. Elle est reduite de
+       114 px ci-dessous, et cet espace leur est rendu par le bas — la somme
+       des deux remplit toujours l'ecran. */
+    /* Le retrait du bas suit la hauteur de l'ecran : fixe a 154 px, il
+       debordait sur un portable et ecrasait le telephone a 214 px. Entre
+       40 et 154 selon la place, les reperes restent hauts sans rien
+       comprimer. */
+    /* Marge negative : les reperes remontent DANS la zone ou le telephone
+       s'efface. Le fondu du bas de l'image les laisse passer sans les
+       masquer — c'est ce chevauchement qui soude les deux au lieu de les
+       empiler. */
+    /* -140 : la hauteur exacte du bloc des reperes. Ils remontent donc
+       entierement dans la zone ou le telephone s'efface, et l'ensemble tient
+       dans une fenetre de 900 px — la plus courante sur portable. */
+    /* -122 au lieu de -140 : les reperes redescendent de 18 px. Ils
+       chevauchent encore la zone d'effacement du telephone, mais moins
+       profondement.
+
+       ⚠ C'EST LA LIMITE. Chaque pixel de descente supplementaire les fait
+         passer sous la pliure d'une fenetre de 900 px : le telephone fait
+         756 px a lui seul, et il ne reste que quelques pixels de jeu. Pour
+         descendre davantage, il faudrait rapetisser le visuel. */
+    margin-top:-100px;
+    padding:0 var(--gouttiere) 48px;
     overflow:visible;
     -webkit-mask-image:none; mask-image:none;
   }
@@ -1777,7 +1812,13 @@ footer .marque{ margin-bottom:18px; }
     /* 360 et non 300 : le bloc des reperes est passe de 102 a 160 px avec
        l'air ajoute autour. C'est cette valeur, et elle seule, qui decide si
        les quatre faits tiennent dans le premier ecran. */
-    max-height:calc(100dvh - 372px);
+    /* 476 = les 300 px cedes par le premier ecran, plus ses 176 px de
+       retrait haut et bas. Au-dela, le telephone repousse la section et la
+       bande des reperes deborde sous la pliure. */
+    /* Plus de plafond : le telephone retrouve ses 400 px de large et ses
+       756 de haut. C'est lui le sujet du premier ecran ; le comprimer pour
+       loger les reperes revenait a sacrifier le principal au secondaire. */
+    max-height:none;
     object-fit:contain;
     transform:translateX(4.70%) translateX(-16px);
   }

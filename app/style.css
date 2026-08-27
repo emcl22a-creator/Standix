@@ -3425,13 +3425,28 @@
      Pas de vert ni de rouge — monter et descendre ne sont ni un succès ni un
      danger, ce sont deux mouvements symétriques. */
   .pm-rang{
-    width:34px; height:34px; border-radius:10px; flex-shrink:0; border:none; padding:0;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.08);
-    border:0.5px solid rgba(255,255,255,0.14);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
-    transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    width:34px; height:34px; border-radius:11px; flex-shrink:0;
+    display:grid; place-items:center;
+    background:rgba(253,168,30,0.11);
+    color:#FDA81E;
+    box-shadow:inset 0 0 0 0.5px rgba(253,168,30,0.20);
+    transition:transform 0.14s ease;
   }
+  /* ═══ DONNER EST AMBRE, REPRENDRE EST NEUTRE ═══
+
+     Les deux boutons partageaient le fond ambre. Or l'un accorde un accès et
+     l'autre le retire : leur donner la même couleur les rendait
+     interchangeables au premier regard.
+
+     L'ambre marque ce qui ajoute. Le retrait reste sourd, comme le bouton de
+     sortie à côté de lui. */
+  .pm-rang[data-retro]{
+    background:rgba(255,255,255,0.06);
+    color:var(--label-2);
+    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09);
+  }
+  .pm-rang svg{ width:17px; height:17px; display:block; }
+  .pm-rang:active{ transform:scale(0.94); }
   .pm-rang:active{ transform:scale(0.9); }
   .pm-rang svg{ width:18px; height:18px; display:block; }
 
@@ -3949,11 +3964,28 @@
     letter-spacing:0.05em; margin-left:5px;
   }
   .pm-role{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
+  /* ═══ RETIRER N'EST PAS DÉTRUIRE ═══
+
+     Le bouton était rouge, avec une poubelle. Deux signaux de destruction pour
+     un geste qui retire un accès — la personne garde son compte, ses lectures
+     restent dans l'analyse.
+
+     Il devient neutre, comme les autres actions de la ligne. Le rouge est
+     réservé à la confirmation, où il a un sens : c'est là qu'on décide. */
   .pm-suppr{
-    width:34px; height:34px; border-radius:50%; flex-shrink:0; border:none;
-    background:rgba(255,69,58,0.14); color:var(--red);
-    display:flex; align-items:center; justify-content:center;
-    transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1), background 0.2s;
+    width:34px; height:34px; border-radius:11px; flex-shrink:0;
+    display:grid; place-items:center;
+    background:rgba(255,255,255,0.06);
+    color:var(--label-2);
+    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09);
+    transition:transform 0.14s ease, background 0.2s ease, color 0.2s ease;
+  }
+  .pm-suppr svg{ width:17px; height:17px; display:block; }
+  /* Au contact seulement, la couleur du danger apparaît : on sait ce qu'on
+     s'apprête à faire, sans que la liste entière crie. */
+  .pm-suppr:active{
+    transform:scale(0.94);
+    background:rgba(255,69,58,0.14); color:#FF453A;
   }
   .pm-suppr:active{ transform:scale(0.88); background:rgba(255,69,58,0.24); }
   .pm-suppr svg{ width:16px; height:16px; }
@@ -9718,4 +9750,37 @@ body:has(#e-detail.active) #equipe-app{
 .ci-aide{
   font-size:11.5px; line-height:1.5; color:var(--label-3);
   margin-top:14px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TROIS GROUPES DE « GÉRER L'ÉQUIPE »
+
+   Fondateur, espace gestion, espace équipe. Chaque section porte son intitulé,
+   son compte, et une ligne qui dit ce que cet accès permet.
+
+   ⚠ AUCUNE SECTION N'EST MISE EN AVANT. Même taille, même gris, même poids :
+     ce sont des accès différents, pas des rangs. Un intitulé plus gros ou plus
+     coloré que les autres installerait une hiérarchie.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pm-groupe{ margin-top:26px; }
+.pm-groupe:first-child{ margin-top:18px; }
+
+.pm-gtete{
+  display:flex; align-items:baseline; gap:8px;
+  margin-bottom:3px;
+}
+.pm-gt{
+  font-size:12px; font-weight:700; letter-spacing:0.06em;
+  text-transform:uppercase; color:var(--label-2);
+}
+/* Le compte, en plus petit et plus sourd : il informe, il ne titre pas. */
+.pm-gn{
+  font-size:11.5px; font-weight:600; color:var(--label-3);
+  font-variant-numeric:tabular-nums;
+}
+.pm-gaide{
+  font-size:11.5px; line-height:1.45; color:var(--label-3);
+  margin-bottom:11px;
 }

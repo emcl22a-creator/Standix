@@ -1383,6 +1383,38 @@ footer .marque{ margin-bottom:18px; }
   animation:netteté 1.1s var(--ec) forwards;
 }
 @keyframes netteté{ to{ opacity:1; transform:none; filter:blur(0); } }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ENTREE DU TELEPHONE
+
+   Le reste de la page entre par un fondu et 14 px de montee. Le telephone,
+   lui, arrive AUSSI en grandissant : de 94 a 100 % de sa taille.
+
+   Six pour cent, c'est tres peu — et c'est le point. Un agrandissement qu'on
+   remarque donne un objet qui saute a l'ecran ; celui-la donne un objet qui
+   s'approche. C'est le meme mouvement que sur les pages produit d'Apple.
+
+   1,5 s au lieu de 1,1 : plus l'objet est grand, plus son mouvement doit etre
+   lent pour paraitre lourd. Un telephone de 400 px qui arrive a la vitesse
+   d'une ligne de texte parait leger, presque nerveux.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.tel-cadre.flou{
+  animation:none;
+  opacity:0;
+}
+.tel-cadre.flou .telephone{
+  opacity:0; transform:scale(.94) translateY(22px); filter:blur(10px);
+  animation:approche 1.5s var(--ec) .34s forwards;
+}
+.tel-cadre.flou{ opacity:1 }
+@keyframes approche{
+  to{ opacity:1; transform:scale(1) translateY(0); filter:blur(0); }
+}
+/* Le halo suit, un peu en retard : la lumiere se pose apres l'objet. */
+.tel-cadre.flou::before, .tel-cadre.flou::after{
+  opacity:0; animation:lueurEntre 1.3s var(--ec) .62s forwards;
+}
+@keyframes lueurEntre{ to{ opacity:1 } }
 .r1{animation-delay:.10s} .r2{animation-delay:.19s}
 .r3{animation-delay:.28s} .r4{animation-delay:.42s}
 
@@ -2048,6 +2080,8 @@ footer .marque{ margin-bottom:18px; }
 
 @media (prefers-reduced-motion: reduce){
   .flou{ animation:none; opacity:1; transform:none; filter:none; }
+  .tel-cadre.flou .telephone{ animation:none; opacity:1; transform:none; filter:none }
+  .tel-cadre.flou::before, .tel-cadre.flou::after{ animation:none; opacity:1 }
   .app{ transition:none; opacity:1; transform:none; filter:none; }
   .mots .mot{ transition:none; opacity:1; transform:none; filter:none; }
   .vue{ transition:none }

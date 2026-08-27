@@ -2394,10 +2394,18 @@ function peindreReglages() {
     el('reg-nb-membres').textContent = n ? `${n} membre${n > 1 ? 's' : ''}` : '\u2014'
   }
 
-  // Le code se lit aussi depuis la liste, sans entrer dans sa page.
-  const code = cachedEntreprise?.code_acces || ''
-  if (el('reg-code-val')) el('reg-code-val').textContent = code || '\u2014'
-  if (el('settings-code')) el('settings-code').textContent = code || '\u2014'
+  /* ═══ L'APERÇU DIT S'IL Y A UN CODE, PAS LEQUEL ═══
+
+     Il affichait le code permanent dans la liste des réglages. Un code
+     temporaire n'a pas sa place là : il change, il expire, et le lire hors de
+     sa page ne dit pas combien de temps il vaut encore.
+
+     La ligne dit maintenant l'état — un code court, ou aucun. */
+  const codeVivant = cachedEntreprise?.code_invite &&
+    new Date(cachedEntreprise.code_invite_expire) > Date.now()
+  if (el('reg-code-val')) {
+    el('reg-code-val').textContent = codeVivant ? 'Un code est actif' : 'Aucun code'
+  }
 
   /* La ligne des établissements n'apparaît qu'à ceux qui en ont plusieurs, ou
      dont l'offre le permet : ailleurs elle n'aurait rien à montrer. */
@@ -2446,24 +2454,14 @@ window.openSettings = async function() {
     cachedEntreprise = data
   }
 
-  if (entreprise && entreprise.code_acces) {
-    document.getElementById('settings-code').textContent = entreprise.code_acces
-  } else {
-    // Cette entreprise n'a pas encore de code (créée avant l'ajout de cette fonctionnalité) : on en génère un
-    let nouveauCode = null
-    for (let tentative = 0; tentative < 5 && !nouveauCode; tentative++) {
-      const code = String(Math.floor(10000 + Math.random() * 90000))
-      const { error: updateError } = await supabase
-        .from('entreprises').update({ code_acces: code }).eq('id', currentMembre.entreprise_id)
-      if (!updateError) nouveauCode = code
-    }
-    if (nouveauCode && cachedEntreprise) cachedEntreprise.code_acces = nouveauCode
-    document.getElementById('settings-code').textContent = nouveauCode || '—'
-  }
+  /* ═══ PLUS DE CODE PERMANENT À GÉNÉRER ═══
 
-  /* Le second code se peint dans la foulée : les deux vivent sur la même page,
-     ils doivent arriver ensemble. */
-  await peindreCodeGestion()
+     Ce bloc créait un code à cinq chiffres pour toute entreprise qui n'en
+     avait pas — une survivance de l'époque où le code était permanent.
+
+     Il n'y a plus rien à créer d'office : un code n'existe que si le gérant en
+     demande un, et il meurt à son échéance. */
+  peindreCodeInvite()
 }
 
 document.getElementById('copy-code-btn')?.addEventListener('click', () => {
@@ -2653,95 +2651,122 @@ function resteAvant(expire) {
   return { texte: 'Expire dans moins d\u2019une heure', bientot: true }
 }
 
-async function peindreCodeGestion() {
-  const vide = document.getElementById('cg-vide')
-  const actif = document.getElementById('cg-actif')
-  if (!vide || !actif) return
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CODE D'INVITATION
 
-  const e = cachedEntreprise
-  const code = e?.code_gestion
-  const exp = e?.code_gestion_expire
-  const brule = e?.code_gestion_usage_unique && e?.code_gestion_utilise_le
+   Un seul code, six caractères, créé à la demande pour une durée choisie.
 
-  /* Un code utilisé ou périmé ne vaut pas mieux qu'un code absent : on montre
-     l'encadré de création plutôt qu'un code mort qui laisserait croire qu'il
-     fonctionne encore. */
-  const r = exp ? resteAvant(exp) : null
-  const valable = code && r && !r.mort && !brule
+   ⚠ IL EST TIRÉ CÔTÉ SERVEUR. `creer_code_invite` vérifie que l'appelant est
+     bien en gestion de cette entreprise. Un code tiré dans le navigateur peut
+     être choisi par celui qui le tire.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-  vide.style.display = valable ? 'none' : ''
-  actif.style.display = valable ? '' : 'none'
-  if (!valable) return
+let ciMinuteur = null
 
-  document.getElementById('cg-code').textContent = code
-  const el = document.getElementById('cg-reste')
-  el.textContent = r.texte
-  el.classList.toggle('bientot', r.bientot)
+/* Le temps restant, en clair. Pas de secondes au-delà d'une minute : personne
+   ne règle sa conduite sur « 4 min 37 », et un compteur qui bouge chaque
+   seconde attire l'œil pour rien. */
+function ciResteLisible(ms) {
+  const s = Math.max(0, Math.round(ms / 1000))
+  if (s < 60) return s + ' s'
+  const m = Math.round(s / 60)
+  if (m < 60) return m + ' min'
+  const h = Math.floor(m / 60)
+  if (h < 24) return h + ' h' + (m % 60 ? ' ' + (m % 60) + ' min' : '')
+  return Math.round(h / 24) + ' jours'
 }
 
-document.getElementById('cg-creer')?.addEventListener('click', async (ev) => {
-  const btn = ev.currentTarget
-  const avant = btn.textContent
-  btn.disabled = true
-  btn.textContent = '\u2026'
-  try {
-    const { data, error } = await supabase.rpc('creer_code_gestion', {
-      p_entreprise: currentMembre.entreprise_id,
-      p_jours: 7,
-      p_usage_unique: true,
-    })
-    if (error) throw error
-    const ligne = Array.isArray(data) ? data[0] : data
-    /* On met l'entreprise en cache à jour plutôt que de la relire : la
-       fonction nous a déjà donné les deux valeurs qui changent. */
-    if (cachedEntreprise) {
-      cachedEntreprise.code_gestion = ligne.code
-      cachedEntreprise.code_gestion_expire = ligne.expire
-      cachedEntreprise.code_gestion_usage_unique = true
-      cachedEntreprise.code_gestion_utilise_le = null
+function peindreCodeInvite() {
+  const vide = document.getElementById('ci-vide')
+  const plein = document.getElementById('ci-plein')
+  if (!vide || !plein) return
+
+  clearInterval(ciMinuteur); ciMinuteur = null
+
+  const code = cachedEntreprise?.code_invite
+  const exp = cachedEntreprise?.code_invite_expire
+  const reste = exp ? new Date(exp) - Date.now() : 0
+
+  /* Un code expiré est traité comme absent. Le serveur le nettoie aussi, mais
+     l'app ne doit pas attendre un aller-retour pour le savoir. */
+  if (!code || reste <= 0) {
+    vide.hidden = false; plein.hidden = true
+    if (cachedEntreprise) { cachedEntreprise.code_invite = null; cachedEntreprise.code_invite_expire = null }
+    return
+  }
+
+  vide.hidden = true; plein.hidden = false
+  /* Les caractères espacés : un code de six signes se recopie mieux quand
+     l'œil peut les compter. */
+  document.getElementById('ci-code').textContent = code.split('').join('\u2009')
+
+  const majReste = () => {
+    const r = new Date(exp) - Date.now()
+    if (r <= 0) { peindreCodeInvite(); return }
+    document.getElementById('ci-reste').textContent = 'Expire dans ' + ciResteLisible(r)
+  }
+  majReste()
+  /* Toutes les dix secondes : assez pour que le compteur reste juste, assez peu
+     pour ne pas réveiller le téléphone. */
+  ciMinuteur = setInterval(majReste, 10000)
+}
+
+/* Les trois durées. Le choix rappelle qu'un code a une fin — un bouton unique
+   laisserait croire à un code permanent. */
+document.querySelectorAll('.ci-d').forEach(b => {
+  b.addEventListener('click', async () => {
+    if (!currentMembre?.entreprise_id) return
+    document.querySelectorAll('.ci-d').forEach(x => { x.disabled = true })
+    try {
+      const { data, error } = await supabase.rpc('creer_code_invite', {
+        p_entreprise: currentMembre.entreprise_id,
+        p_minutes: Number(b.dataset.min) || 120,
+      })
+      if (error) throw error
+      const ligne = Array.isArray(data) ? data[0] : data
+      if (cachedEntreprise) {
+        cachedEntreprise.code_invite = ligne.code
+        cachedEntreprise.code_invite_expire = ligne.expire
+      }
+      peindreCodeInvite()
+      if (navigator.vibrate) navigator.vibrate(8)
+    } catch (e) {
+      toast('\u00c9chec : ' + (e?.message || e))
+    } finally {
+      document.querySelectorAll('.ci-d').forEach(x => { x.disabled = false })
     }
-    await peindreCodeGestion()
-  } catch (e) {
-    toast(e?.message || 'Le code n\u2019a pas pu \u00eatre cr\u00e9\u00e9.')
-  } finally {
-    btn.disabled = false
-    btn.textContent = avant
+  })
+})
+
+document.getElementById('ci-copier')?.addEventListener('click', async () => {
+  const code = cachedEntreprise?.code_invite
+  if (!code) return
+  try {
+    await navigator.clipboard.writeText(code)
+    toast('Code copi\u00e9')
+  } catch {
+    /* `clipboard` échoue sur les navigateurs anciens et hors HTTPS. On montre
+       le code plutôt que de laisser croire à une copie qui n'a pas eu lieu. */
+    toast('Copie impossible \u2014 le code est : ' + code)
   }
 })
 
-document.getElementById('cg-copier')?.addEventListener('click', (ev) => {
-  const code = document.getElementById('cg-code').textContent
-  if (!code || code === '\u2014') return
-  navigator.clipboard.writeText(code)
-  const btn = ev.currentTarget
-  const avant = btn.textContent
-  btn.textContent = 'Copi\u00e9 !'
-  setTimeout(() => { btn.textContent = avant }, 1500)
-})
-
-document.getElementById('cg-revoquer')?.addEventListener('click', async () => {
+document.getElementById('ci-revoquer')?.addEventListener('click', async () => {
+  if (!currentMembre?.entreprise_id) return
   const ok = await confirmDialog({
     titre: 'R\u00e9voquer ce code ?',
-    message: 'Il cessera imm\u00e9diatement de fonctionner. Les gestionnaires ' +
-             'd\u00e9j\u00e0 inscrits gardent leur acc\u00e8s.',
-    confirmer: 'R\u00e9voquer',
-    annuler: 'Annuler',
-    danger: true,
+    message: 'Il cessera imm\u00e9diatement de fonctionner. Les personnes d\u00e9j\u00e0 ' +
+             'inscrites gardent leur acc\u00e8s.',
+    confirmer: 'R\u00e9voquer', annuler: 'Annuler', danger: true,
   })
   if (!ok) return
-  try {
-    const { error } = await supabase.rpc('revoquer_code_gestion', {
-      p_entreprise: currentMembre.entreprise_id,
-    })
-    if (error) throw error
-    if (cachedEntreprise) {
-      cachedEntreprise.code_gestion = null
-      cachedEntreprise.code_gestion_expire = null
-    }
-    await peindreCodeGestion()
-  } catch (e) {
-    toast(e?.message || 'La r\u00e9vocation a \u00e9chou\u00e9.')
-  }
+  const { error } = await supabase.rpc('revoquer_code_invite', {
+    p_entreprise: currentMembre.entreprise_id,
+  })
+  if (error) { toast('\u00c9chec : ' + error.message); return }
+  if (cachedEntreprise) { cachedEntreprise.code_invite = null; cachedEntreprise.code_invite_expire = null }
+  peindreCodeInvite()
+  toast('Code r\u00e9voqu\u00e9')
 })
 
 document.getElementById('settings-save-btn')?.addEventListener('click', async () => {
@@ -8796,6 +8821,10 @@ async function attendreEtapesIA(procId) {
   while (Date.now() - debut < 8 * 60000) {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
+      /* Le sondage tourne en boucle : un appel qui ne rend jamais la main
+         fige tout le suivi, et l'anneau tourne sans fin. 25 secondes — une
+         réponse normale arrive en moins d'une. */
+      signal: AbortSignal.timeout(25000),
       headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: procId }),
     })
@@ -10173,6 +10202,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
   try {
     const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-texte`, {
       method: 'POST',
+      signal: AbortSignal.timeout(60000),
       headers: await enTeteFonction(),
         body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64() }),
     })
@@ -11658,8 +11688,22 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
     signalerEtapeIA('L\u2019IA \u00e9coute et regarde\u2026')
     // 3. Démarrage de l'analyse Azure
+    /* ═══ UN DÉLAI MAXIMAL SUR LE DÉMARRAGE ═══
+
+       Ce `fetch` n'en avait aucun. Si le serveur ne répond pas — Azure
+       injoignable, fonction en panne, réseau coupé au mauvais moment — l'attente
+       est INFINIE : l'écran reste sur « Préparation » indéfiniment, sans que le
+       plafond de douze minutes du sondage ne s'applique, puisque le sondage n'a
+       jamais commencé.
+
+       C'est ce qui s'est produit : seize minutes sur une vidéo de 4 min 30.
+
+       Quarante secondes suffisent largement — `ai-start` ne fait que déclarer le
+       travail à Azure, il ne l'attend pas. Au-delà, quelque chose ne va pas et
+       il vaut mieux le dire. */
     const startRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-start`, {
       method: 'POST',
+      signal: AbortSignal.timeout(40000),
       headers: await enTeteFonction(),
       // La bande son pour un geste filmé ; la vidéo entière pour un écran.
       body: JSON.stringify({
@@ -11698,6 +11742,17 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     loadGestionProcedures().catch(() => {})
   } catch (e) {
     clearTimeout(bascule2)
+
+    /* ═══ UN MESSAGE LISIBLE POUR UNE INTERRUPTION ═══
+
+       `AbortSignal.timeout` lève une erreur dont le message est « signal timed
+       out » — du jargon de navigateur, incompréhensible pour qui lit la liste
+       des procédures trois jours plus tard.
+
+       On le remplace par ce qui s'est réellement passé. */
+    if (e?.name === 'TimeoutError' || /timed out/i.test(String(e?.message || ''))) {
+      e = new Error("Le serveur d'analyse n'a pas répondu. Réessayez dans un instant.")
+    }
 
     /* La procédure existe déjà en base : on ne peut plus faire comme si rien
        n'avait commencé. On la marque en échec plutôt que de l'effacer — elle
@@ -11788,6 +11843,10 @@ async function pollAiStatus() {
   try {
     const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
+      /* Le sondage tourne en boucle : un appel qui ne rend jamais la main
+         fige tout le suivi, et l'anneau tourne sans fin. 25 secondes — une
+         réponse normale arrive en moins d'une. */
+      signal: AbortSignal.timeout(25000),
       headers: await enTeteFonction(),
       body: JSON.stringify({ procedure_id: aiProcedureId }),
     })
@@ -14448,11 +14507,19 @@ async function openAnalyse(procId) {
   const qrContainer = document.getElementById('qr-container')
   qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">Génération...</div>'
   document.getElementById('qr-plaque-title').textContent = proc.titre
-  /* Le QR porte le code de l'entreprise en plus de la procédure : une personne
-     qui scanne sans compte peut ainsi s'inscrire sans avoir à le demander.
-     Sans ce code, il faudrait lire la table des procédures sans être connecté,
-     ce que les règles d'accès de la base interdisent — à raison. */
-  const codeEnt = cachedEntreprise?.code_acces || ''
+  /* ═══ LE QR NE PORTE PLUS DE CODE ═══
+
+     Il embarquait le code permanent de l'entreprise, pour qu'une personne qui
+     scanne sans compte puisse s'inscrire dans la foulée.
+
+     ⚠ AVEC UN CODE TEMPORAIRE, C'EST IMPOSSIBLE. Un QR imprimé et collé au mur
+       porterait un code mort au bout de deux heures — et il faudrait réimprimer
+       toutes les affiches à chaque nouveau code.
+
+     Le QR mène donc à la procédure seule. Une personne sans compte arrive sur
+     l'écran d'inscription et saisit le code que son responsable lui donne — ce
+     qui est aussi plus sûr : un code au mur est un code public. */
+  const codeEnt = ''
   const scanUrl = `${window.location.origin}${window.location.pathname}?proc=${procId}` +
     (codeEnt ? `&e=${codeEnt}` : '')
   /* Le dessin du QR passe par deux attentes. Si l'on ouvre une procédure puis

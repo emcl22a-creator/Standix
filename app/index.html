@@ -2399,39 +2399,50 @@
       <h1 class="pagehead">Codes d'invitation</h1>
     </div>
 
-    <!-- ═══ DEUX CODES, DEUX NATURES ═══
+    <!-- ═══════════════════════════════════════════════════════════════════
+         UN SEUL CODE, TEMPORAIRE
 
-         Le code ÉQUIPE est permanent : il ne donne accès qu'à la lecture, on
-         peut l'afficher au mur sans risque.
+         Les deux codes permanents — un pour l'équipe, un pour la gestion —
+         ont été remplacés par un code unique à six caractères, créé à la
+         demande et valable une durée choisie.
 
-         Le code GESTION donne accès à tout — créer, supprimer, voir qui a lu
-         quoi. Il n'existe donc que lorsqu'on invite quelqu'un, et il meurt
-         ensuite. Les deux ne peuvent pas se présenter de la même façon : l'un
-         est un fait, l'autre est une action. -->
+         Tout le monde entre en ÉQUIPE. Le gérant promeut ensuite depuis
+         « Gérer l'équipe ». Un code qui donnerait la gestion à qui le
+         possède serait la clé de toute l'entreprise.
 
-    <div class="sect-tt" style="margin-top:16px;">Pour l'équipe</div>
-    <div class="card" style="text-align:center;">
-      <div id="settings-code" class="code-gros">—</div>
-      <button class="btn block" id="copy-code-btn">Copier le code</button>
+         Le code n'est PAS à usage unique : cinquante personnes doivent
+         pouvoir l'employer. C'est un code de séance, pas une invitation.
+         ═══════════════════════════════════════════════════════════════════ -->
+
+    <div class="sect-tt" style="margin-top:16px;">Inviter votre équipe</div>
+
+    <!-- ─── L'ÉTAT SANS CODE ─── -->
+    <div class="card ci-vide" id="ci-vide">
+      <div class="ci-txt">Générez un code, affichez-le, et votre équipe
+        s'inscrit en le saisissant.</div>
+      <div class="ci-duree">
+        <button type="button" class="ci-d" data-min="15">15 minutes</button>
+        <button type="button" class="ci-d" data-min="120">2 heures</button>
+        <button type="button" class="ci-d" data-min="10080">7 jours</button>
+      </div>
+      <div class="ci-aide">Choisissez selon la situation : quinze minutes si tout
+        le monde est là, sept jours pour un recrutement en cours.</div>
     </div>
-    <div class="reg-note">Ce code permet à vos employés de créer leur compte et de lire les procédures. Il ne donne aucun droit de modification, et ne change jamais.</div>
 
-    <div class="sect-tt">Pour un gestionnaire</div>
-
-    <!-- Quand aucune invitation n'est en cours. -->
-    <div class="card" id="cg-vide">
-      <p class="cg-txt">Un gestionnaire peut créer des procédures, gérer l'équipe et voir l'analyse. Engendrez un code seulement au moment d'inviter quelqu'un.</p>
-      <button class="btn block" id="cg-creer">Créer une invitation</button>
+    <!-- ─── L'ÉTAT AVEC CODE ─── -->
+    <div class="card ci-plein" id="ci-plein" hidden>
+      <div class="ci-code" id="ci-code">——————</div>
+      <div class="ci-reste" id="ci-reste">—</div>
+      <div class="ci-actions">
+        <button type="button" class="ci-btn" id="ci-copier">Copier</button>
+        <button type="button" class="ci-btn ci-btn--sourd" id="ci-revoquer">Révoquer</button>
+      </div>
+      <div class="ci-aide">Vos membres le saisissent à l'inscription. Ils
+        rejoignent en tant qu'équipe — vous pourrez en promouvoir depuis
+        « Gérer l'équipe ».</div>
     </div>
-
-    <!-- Quand une invitation est valide. -->
-    <div class="card" id="cg-actif" style="display:none; text-align:center;">
-      <div id="cg-code" class="code-gros">—</div>
-      <div id="cg-reste" class="cg-reste">—</div>
-      <button class="btn block" id="cg-copier" style="margin-bottom:8px;">Copier le code</button>
-      <button class="btn ghost block" id="cg-revoquer">Révoquer</button>
-    </div>
-    <div class="reg-note">Ce code expire au bout de sept jours, et cesse de fonctionner dès que quelqu'un l'a utilisé.</div>
+    <!-- Les boutons de l'ancien code de gestion ont été retirés avec lui :
+         le nouveau code porte les siens, dans sa propre carte. -->
   </div>
 
   <!-- Sous-page : les établissements -->

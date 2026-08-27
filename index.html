@@ -1647,13 +1647,22 @@ footer .marque{ margin-bottom:18px; }
     /* 186 px : la hauteur exacte du bloc des reperes une fois l'air ajoute,
        plus l'ecart qui le separe de la section suivante. Mesure, pas
        estime — c'est ce qui decide si les quatre faits sont vus. */
-    min-height:100dvh;
+    /* ═══ LE GROUPE ENTIER EST CENTRE ═══
+
+       Les reperes debordent de 37 px sous le premier ecran une fois leur
+       chevauchement de 100 px deduit de leurs 137 px de hauteur. Le premier
+       ecran leur reserve donc exactement ces 37 px.
+
+       `align-content:center` centre alors le titre et le telephone dans ce
+       qui reste, et le bas des reperes tombe pile sur la pliure : c'est
+       l'ENSEMBLE qui est centre, pas chaque partie separement. */
+    min-height:calc(100dvh - 37px);
     max-width:var(--large); margin:0 auto;
     /* Retraits resserres : 52 -> 20 en haut, 60 -> 0 en bas. Le telephone
        fait 756 px a lui seul ; avec 176 px de retrait, l'ensemble depassait
        une fenetre de 900 px. Ce sont les seuls pixels qu'on pouvait rendre
        sans toucher au visuel. */
-    padding:calc(var(--barre) + 20px) var(--gouttiere) 0;
+    padding:calc(var(--barre) + 20px) var(--gouttiere) 20px;
   }
   .hero{ padding:0; max-width:none }
   .colonne-app{ display:block }

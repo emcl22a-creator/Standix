@@ -1862,11 +1862,12 @@ footer .marque{ margin-bottom:18px; }
      la barre, les marges et la bande. Sur un grand ecran il garde ses
      400 px de large ; sur un portable il retrecit juste assez. */
   .telephone{
-    /* Les 16 px de decalage sont poses en MARGE, pas en `transform` :
-       l'animation d'entree ecrit `transform` et l'ecrasait a la derniere
-       image. Une marge en pixels entiers evite aussi le rendu entre deux
-       pixels qui rendait l'image floue. */
-    width:100%; max-width:400px; margin:0 32px 0 0;
+    /* Aucun decalage : le chassis se centre sur la COLONNE. J'avais essaye
+       de l'aligner sur l'axe entre les deux filets verticaux, qui tombe
+       16 px plus a gauche — la mediane de la grille etant tracee 32 px au
+       dela du bord de colonne. A l'oeil, c'est la colonne qui sert de
+       reference, pas les traits. */
+    width:100%; max-width:400px; margin:0;
     /* 360 et non 300 : le bloc des reperes est passe de 102 a 160 px avec
        l'air ajoute autour. C'est cette valeur, et elle seule, qui decide si
        les quatre faits tiennent dans le premier ecran. */

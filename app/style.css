@@ -8428,11 +8428,7 @@ body:has(#e-detail.active) #equipe-app{
      nous ». On ne le neutralise plus : il complète le modelé au lieu de le
      remplacer. */
   /* Le fond vient toujours de `.an-bloc`. Seules les deux ombres s'ajoutent. */
-  /* ⚠ CETTE RÈGLE REDÉCLARE `box-shadow` EN ENTIER. Le second liseré des
-     cartes est donc recopié ici : sans lui, les tuiles seraient les seules
-     à ne pas l'avoir. Toute modification là-bas se reporte ici. */
-  box-shadow:0 0 0 0.5px rgba(255,255,255,0.10),
-             0 14px 34px rgba(0,0,0,0.42),
+  box-shadow:0 14px 34px rgba(0,0,0,0.42),
              0 0 30px -14px rgba(255,255,255,0.10);
 }
 
@@ -9340,24 +9336,7 @@ body:has(#e-detail.active) #equipe-app{
      Chacune garde le sien — `--bg-card` pour les unes, leur propre teinte pour
      les autres. Seul le MODELÉ s'ajoute : les lueurs de coin ci-dessous, et
      les deux ombres portées ici. */
-  /* ═══ LE SECOND LISERÉ ═══
-
-     Un deuxième trait de 0,5 px, blanc comme le premier, posé juste à
-     l'EXTÉRIEUR du bord. Celui de `::before` est un dégradé rasant — vif aux
-     coins, presque éteint au milieu des côtés. Celui-ci est uniforme : il
-     ferme le contour là où l'autre s'efface, et le bord se lit d'un trait
-     continu sur tout le tour.
-
-     Il est en ombre portée sans flou (`0 0 0 0.5px`) plutôt qu'en `outline` :
-     l'`outline` ne suit le rayon des coins qu'à partir de Safari 16.4, et un
-     rectangle à angles droits autour d'une carte arrondie, sur un téléphone
-     de terrain resté en iOS 15, serait pire que pas de trait du tout.
-
-     ⚠ IL VIENT EN PREMIER DANS LA LISTE. Les ombres se peignent de la
-       dernière à la première : écrit en fin de liste, il passerait sous
-       l'ombre sombre et le blanc y perdrait. */
-  box-shadow:0 0 0 0.5px rgba(255,255,255,0.10),
-             0 14px 34px rgba(0,0,0,0.42),
+  box-shadow:0 14px 34px rgba(0,0,0,0.42),
              0 0 30px -14px rgba(255,255,255,0.10);
 }
 
@@ -9647,9 +9626,17 @@ body:has(#e-detail.active) #equipe-app{
 
 .pub-bandeau{
   display:flex; align-items:center; gap:12px;
-  /* 18 px sous le bandeau : il touchait presque la vidéo, et deux blocs qui se
-     touchent se lisent comme un seul. */
-  margin:14px 0 18px; padding:13px 14px;
+  /* Le MÊME écart au-dessus qu'en dessous : le bandeau est posé entre deux
+     blocs, il doit être à égale distance des deux. À 14 px en haut et 32 en
+     bas, il paraissait accroché au sous-titre.
+
+     ⚠ 32 px en haut, 18 en bas, et pourtant l'écart est le même des deux
+       côtés — parce que les marges fusionnent. En haut, le sous-titre porte
+       déjà 18 px : le navigateur garde la plus grande des deux, soit 32. En
+       bas, c'est `#analyse-video-frame` qui porte les 32 px, et ces 18-là
+       passent dessous. Changer l'un des trois nombres sans les deux autres
+       ne donne pas ce qu'on croit. */
+  margin:32px 0 18px; padding:13px 14px;
   border-radius:16px;
   background:rgba(246,148,3,0.08);
   box-shadow:inset 0 0 0 0.5px rgba(246,148,3,0.22);

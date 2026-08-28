@@ -952,6 +952,91 @@ h2.chiffres{
 .objection p{ font-size:13.5px; line-height:1.6; color:var(--t2); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   LA PHOTO ET SES PASTILLES
+
+   Les pastilles sont en verre : fond translucide plus flou d'arriere-plan. Sur
+   une photo, c'est la seule matiere qui reste lisible quel que soit ce qu'il y
+   a dessous — un aplat opaque ferait autocollant, un texte nu deviendrait
+   illisible des que la photo est claire.
+
+   Elles sont posees en pourcentage, jamais en pixels : la photo se redimensionne
+   avec la page, elles doivent suivre le meme mouvement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.scene{
+  position:relative; margin:0 0 40px;
+  border-radius:20px; overflow:hidden;
+  box-shadow:0 26px 60px rgba(0,0,0,.5),
+             inset 0 0 0 .5px rgba(255,255,255,.12);
+}
+.scene img{ display:block; width:100%; height:auto }
+/* Le voile sombre a ete retire : la photo est rendue telle quelle. Les
+   pastilles gardent leur lisibilite par leur propre fond en verre, plus opaque
+   en consequence. */
+.pastille{
+  position:absolute; z-index:2;
+  padding:11px 18px; border-radius:100px;
+  background:rgba(16,18,22,.62);
+  -webkit-backdrop-filter:blur(14px) saturate(160%);
+          backdrop-filter:blur(14px) saturate(160%);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
+             inset 0 0 0 .5px rgba(255,255,255,.16),
+             0 10px 26px rgba(0,0,0,.4);
+}
+.pastille b{ display:block; font-size:15px; font-weight:500; color:var(--t1);
+  letter-spacing:-.02em; line-height:1.15 }
+.pastille span{ display:block; font-size:11.5px; color:rgba(255,255,255,.62);
+  line-height:1.3; margin-top:2px }
+.p1{ left:4%;  top:9% }
+.p2{ right:5%; top:36% }
+.p3{ left:8%;  bottom:9% }
+
+/* ═══ LES FILINS QUI DESIGNENT ═══
+
+   Un trait fin part de chaque pastille vers ce dont elle parle : le telephone
+   pour les deux premieres, l'homme pour la troisieme. Sans eux, les pastilles
+   flottent sans rien designer — c'etait le manque.
+
+   Trait plein cote pastille, estompe a l'autre bout : il montre une direction
+   sans encercler l'objet, ce qui ferait schema technique. Le petit disque au
+   bout remplace une pointe de fleche, trop appuyee sur une photo. */
+.pastille::after{
+  content:''; position:absolute;
+  height:1px; width:var(--fil, 58px);
+  top:50%; pointer-events:none;
+  background:linear-gradient(var(--sens, 90deg),
+    rgba(255,255,255,.55), rgba(255,255,255,.10));
+}
+.pastille::before{
+  content:''; position:absolute;
+  width:5px; height:5px; border-radius:50%;
+  top:calc(50% - 2px); pointer-events:none;
+  background:rgba(255,255,255,.55);
+  box-shadow:0 0 0 3px rgba(255,255,255,.10);
+}
+.p1::after{ left:100%; --fil:64px }
+.p1::before{ left:calc(100% + 64px) }
+.p2::after{ right:100%; --sens:270deg; --fil:70px }
+.p2::before{ right:calc(100% + 70px) }
+.p3::after{ left:100%; --fil:52px }
+.p3::before{ left:calc(100% + 52px) }
+
+@media (min-width: 820px){
+  .p1::after{ --fil:96px }  .p1::before{ left:calc(100% + 96px) }
+  .p2::after{ --fil:104px } .p2::before{ right:calc(100% + 104px) }
+  .p3::after{ --fil:84px }  .p3::before{ left:calc(100% + 84px) }
+}
+
+@media (min-width: 820px){
+  .scene{ margin-bottom:54px }
+  .pastille{ padding:13px 24px; border-radius:100px }
+  .pastille b{ font-size:18px }
+  .pastille span{ font-size:12.5px }
+  .p1{ left:6%; top:12% }
+  .p2{ right:7%; top:38% }
+  .p3{ left:10%; bottom:11% }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LE VOLET GLISSABLE
 
    Même mécanique que la galerie du premier écran : deux vues superposées, une
@@ -2241,18 +2326,22 @@ footer .marque{ margin-bottom:18px; }
 <ul class="reperes flou r4">
     <li>
       <svg viewBox="0 0 24 24"><path d="M2 6.5A2.5 2.5 0 014.5 4h8A2.5 2.5 0 0115 6.5v11a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 17.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg>
-      <b>5 min</b>
-      <span>par vidéo analysée</span>
+      <b>Jusqu'à 5 min</b>
+      <span>par vidéo analysée par l'IA</span>
     </li>
     <li>
       <svg viewBox="0 0 24 24"><path d="M12 2.6l7.6 3.2v5.4c0 4.6-3.1 8.6-7.6 10-4.5-1.4-7.6-5.4-7.6-10V5.8z"/><path d="M9.4 12.2l1.9 1.9 3.6-3.8"/></svg>
       <b>Privé</b>
-      <span>vos procédures ne sortent pas</span>
+      <span>vos procédures restent chez vous</span>
     </li>
     <li>
       <svg viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="3.4"/><path d="M22 20v-2a4 4 0 00-3-3.9M16.4 3.6a4 4 0 010 7"/></svg>
-      <b>Toute l'équipe</b>
-      <span>y accède en direct</span>
+      <!-- Corrige : « y accede en direct » etait faux. L'equipe ne voit rien
+           tant que le gerant n'a pas publie — la publication est explicite,
+           c'est une decision de conception assumee. Le repere dit donc le
+           geste ET son effet. -->
+      <b>Vous publiez</b>
+      <span>l'équipe y accède aussitôt</span>
     </li>
     <li>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4"/><path d="M12 2.8a15 15 0 010 18.4 15 15 0 010-18.4z"/></svg>
@@ -2347,6 +2436,36 @@ footer .marque{ margin-bottom:18px; }
      ═══════════════════════════════════════════════════════════════════════ -->
 <section class="bloc difference">
   <i class="croix g"></i><i class="croix d"></i>
+  <!-- ═══ LA PHOTO ═══
+
+       C'est la seule image de la page qui montre un lieu de travail. Un
+       entrepot, des racks, des bacs : le decor de l'acheteur, pas celui d'une
+       page de logiciel.
+
+       Elle est ICI et non dans le premier ecran : la-haut, la capture est la
+       preuve — on y lit une vraie procedure. Une photo affirme, elle ne
+       demontre pas. Elle ouvre donc la section qui n'avait aucune image.
+
+       ⚠ IMAGE GENEREE. A remplacer par une vraie photo prise chez un client des
+         que possible : sur une page qui dit « rien n'a ete reecrit », une scene
+         qui n'a jamais eu lieu est une contradiction qu'on tolere, pas qu'on
+         choisit. -->
+  <figure class="scene app">
+    <img src="atelier.webp" width="1086" height="1448" loading="lazy"
+         alt="Un responsable consulte une procédure Standix sur son téléphone, dans son atelier">
+    <!-- Trois pastilles, pas plus. Au-dela, ca devient un tableau de bord pose
+         sur une photo, et le montage se voit. Chacune porte un chiffre verifiable. -->
+    <figcaption class="pastille p1">
+      <b>3:13</b><span>de vidéo</span>
+    </figcaption>
+    <figcaption class="pastille p2">
+      <b>6 étapes</b><span>écrites par l'IA</span>
+    </figcaption>
+    <figcaption class="pastille p3">
+      <b>3 langues</b><span>pour toute l'équipe</span>
+    </figcaption>
+  </figure>
+
   <p class="surtitre app">La différence</p>
   <!-- « Ce que ça change, des deux côtés » supposait qu'on sache déjà quels
        côtés. Le nouveau titre nomme les deux personnes concernées : le patron

@@ -19755,6 +19755,12 @@ let clipsDeduits = false      // vrai si les bornes ont été déduites, pas lue
    ⚠ IL N'APPARAÎT QUE POUR LA GESTION. Un membre en équipe ne voit jamais un
      brouillon — la politique RLS l'en empêche — donc il n'a pas à voir ce
      bandeau non plus. */
+/* L'état affiché la dernière fois, pour savoir s'il y a BASCULEMENT ou simple
+   affichage. Sans cette mémoire, on ne peut pas faire la différence entre
+   « la procédure vient d'être publiée » et « on ouvre une procédure publiée ». */
+let dernierEtatPub = { id: null, publiee: null }
+let minuteurPubAnim = null
+
 function peindrePublication(proc) {
   const b = document.getElementById('pub-bandeau')
   if (!b) return
@@ -19769,6 +19775,37 @@ function peindrePublication(proc) {
   editProcedureId = proc.id
 
   const publiee = !!proc.publiee_le
+
+  /* ═══ L'ANIMATION DU BASCULEMENT ═══
+
+     Elle ne doit jouer QUE sur un vrai changement, vu à l'écran. Trois
+     conditions, et chacune corrige un cas où elle se déclenchait à tort :
+
+       · même procédure — sinon ouvrir une procédure publiée après une en
+         brouillon aurait animé un basculement qui n'a pas eu lieu ;
+       · bandeau déjà visible — à l'ouverture d'une fiche, il n'y a rien à
+         faire basculer, il y a un état à afficher ;
+       · état réellement différent — `peindrePublication` est appelée deux
+         fois à chaque ouverture, une fois depuis le cache et une fois avec
+         la réponse de la base.
+
+     La classe est posée AVANT le basculement : c'est elle qui autorise la
+     transition de couleur du fond. Posée après, la couleur serait déjà à sa
+     valeur d'arrivée et il n'y aurait rien à animer. */
+  const bascule = dernierEtatPub.id === proc.id &&
+                  dernierEtatPub.publiee !== null &&
+                  dernierEtatPub.publiee !== publiee &&
+                  !b.hidden
+  dernierEtatPub = { id: proc.id, publiee }
+
+  if (bascule && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    b.classList.remove('pub-anim')
+    void b.offsetWidth        // force la reprise à zéro si l'on rebascule vite
+    b.classList.add('pub-anim')
+    clearTimeout(minuteurPubAnim)
+    minuteurPubAnim = setTimeout(() => b.classList.remove('pub-anim'), 700)
+  }
+
   b.hidden = false
   b.classList.toggle('pub-bandeau--ok', publiee)
 

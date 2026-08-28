@@ -617,6 +617,7 @@ h1 em{ font-style:normal; color:var(--t1); }
    — mesure sur une capture reelle. */
 .tel-cadre{
   --axe:0px;
+  z-index:3;
   position:relative; display:flex; justify-content:center;
   transform:translateX(var(--axe));
 }
@@ -647,11 +648,71 @@ h1 em{ font-style:normal; color:var(--t1); }
 /* `margin:0 auto` : le bloc se centre dans sa colonne. Sans lui il se calait
    a gauche des que sa largeur etait bridee. */
 .duo{
-  position:relative; width:100%; max-width:400px; margin:0 auto;
+  /* ═══ L'IMAGE TIENT DANS LA GRILLE ═══
+
+     Sur telephone elle occupait toute la largeur de l'ecran, debordant des deux
+     filets verticaux qui encadrent le contenu. Elle est desormais bornee a la
+     colonne, comme le titre et le bouton.
+
+     `z-index:3` : au-dessus de la grille, qui est a 1. Sans ca, les filets
+     passaient par transparence sur les bords de la photo. */
+  /* `calc(100% - 2 * gouttiere)` : la largeur exacte entre les deux filets.
+     `width:100%` seul suivait le parent, qui lui n'a pas de retrait sur
+     telephone — l'image touchait donc les deux bords de l'ecran. */
+  position:relative;
+  /* 78 % de la largeur disponible : l'image respire, et les pastilles qui la
+     debordent restent dans l'ecran. Le debordement est VOULU — c'est ce qui
+     donne l'impression qu'elles flottent devant plutot que d'etre collees
+     dessus. */
+  /* 62 % sous 1100 px au lieu de 78 : les pastilles font pres de 210 px et
+     doivent deborder des deux cotes sans sortir de l'ecran. Retrecir l'image
+     est la seule variable qui leur rend de la place — deplacer les pastilles ne
+     ferait que choisir quel cote se coupe. */
+  width:min(470px, calc((100% - 2 * var(--gouttiere)) * 0.88));
+  /* De l'air au-dessus et en dessous : la photo et ses reperes ont besoin de
+     vide autour pour que le halo et les LED se lisent comme une mise en
+     scene, pas comme un fond. */
+  /* L'image se centre sur la grille, pas les pastilles : ce sont elles qui
+     debordent, elle qui sert de reference. `margin:auto` sur un bloc de
+     largeur bornee suffit — le conteneur n'a aucun retrait a compenser. */
+  margin:56px auto; z-index:3;
+  /* Carree sous 1100 px : verticale, elle y prenait deux fois la hauteur du
+     titre. `object-fit:cover` rogne le haut et le bas plutot que de
+     deformer, donc le sujet reste cadre. */
+  aspect-ratio:1;
+  /* `overflow:visible` : sans lui, le cadre rognerait les pastilles qui
+     debordent. Le fondu du bas passe donc sur la vue, pas sur le bloc. */
+  overflow:visible;
+}
+/* Les points lumineux du fond ont ete retires. */
+
+/* ═══ LE HALO DERRIERE L'IMAGE ═══
+   Une lueur froide et large, qui decolle la photo du fond et fait exister les
+   pastilles au-dessus d'elle. Elle deborde tres au-dela du cadre — c'est ce
+   debordement qui la fait lire comme une lumiere et non comme une bordure. */
+.duo::before{
+  content:''; position:absolute; z-index:-1;
+  inset:-16% -22%;
+  /* Teintes relevees dans la photo : le bleu des racks vaut 43-66-107, plus
+     sourd et plus vert que le bleu que j'avais pose. Le halo le reprend, pour
+     que la lumiere paraisse emaner de l'image et non lui etre appliquee. */
+  background:radial-gradient(ellipse 58% 52% at 50% 50%,
+    rgba(88,132,180,.20), rgba(60,95,140,.08) 52%, transparent 74%);
+  filter:blur(38px); pointer-events:none;
+  /* `overflow:visible` : sans lui, le cadre rognerait ce qui depasse. Le fondu
+     du bas passe donc sur l'image seule, pas sur le bloc. */
+  overflow:visible;
   aspect-ratio:1086/1448;
-  border-radius:22px; overflow:hidden;
-  -webkit-mask-image:linear-gradient(180deg,#000 78%,transparent 96%);
-          mask-image:linear-gradient(180deg,#000 78%,transparent 96%);
+}
+/* L'arrondi et le fondu descendent sur la vue : le conteneur doit laisser
+   passer les pastilles qui le debordent. */
+/* Le contour lumineux : un liseré clair en haut, qui s'eteint vers le bas —
+   la lumiere vient d'en haut, comme partout ailleurs sur la page. */
+/* ⚠ PAS D'`overflow:hidden` ICI. Les pastilles sont des enfants de la vue :
+   le rognage les coupait au bord de l'image, alors que tout le reglage vise
+   justement a les faire deborder. L'arrondi passe donc sur l'image seule. */
+.vue-scene{
+  /* Le fondu du bas a ete retire : l'image se termine nette sur son arrondi. */
 }
 .vue-scene{
   position:absolute; inset:0; margin:0;
@@ -659,7 +720,22 @@ h1 em{ font-style:normal; color:var(--t1); }
   pointer-events:none;
 }
 .vue-scene.on{ opacity:1; pointer-events:auto }
-.scene-img{ display:block; width:100%; height:100%; object-fit:cover }
+.scene-img{ display:block; width:100%; height:100%; object-fit:cover;
+  border-radius:22px; }
+
+/* ⚠ LE CONTOUR EST UNE BORDURE, PAS UNE OMBRE INTERNE.
+   `inset box-shadow` se dessine sur la boite et non sur son arrondi : les
+   quatre angles restaient sans lisere. Une bordure posee sur un calque au
+   meme rayon suit la courbe sur tout son parcours.
+
+   La lueur exterieure reprend le bleu releve dans la photo. */
+.vue-scene::after{
+  content:''; position:absolute; inset:0; z-index:2;
+  border-radius:22px; pointer-events:none;
+  border:.5px solid rgba(150,190,240,.32);
+  box-shadow:0 0 32px -4px rgba(88,132,180,.40),
+             inset 0 1px 0 rgba(255,255,255,.24);
+}
 
 .telephone{
   position:relative; z-index:1;
@@ -1018,37 +1094,55 @@ h2.chiffres{
    ═══════════════════════════════════════════════════════════════════════════ */
 .filins line{
   stroke-dasharray:1200; stroke-dashoffset:1200;
-  animation:trace 1.1s var(--ec) forwards;
+  animation:trace 1.5s var(--ec) forwards;
 }
-.filins line:nth-of-type(1){ animation-delay:.55s }
-.filins line:nth-of-type(2){ animation-delay:.77s }
-.filins line:nth-of-type(3){ animation-delay:.99s }
+.filins line:nth-of-type(1){ animation-delay:.5s }
+.filins line:nth-of-type(2){ animation-delay:.78s }
+.filins line:nth-of-type(3){ animation-delay:1.06s }
 @keyframes trace{ to{ stroke-dashoffset:0 } }
 
 .cible{ opacity:0; animation:cible .5s ease 1.5s forwards }
 @keyframes cible{ to{ opacity:1 } }
 
-/* Le centrage est integre aux images-cles. Une pastille est positionnee par son
-   coin ; sans `translate(-50%,-50%)`, elle se decale vers la droite et vers le
-   bas de la moitie de sa taille. Comme l'animation ecrit `transform`, le
-   centrage doit y figurer a chaque etape, sinon il saute a la derniere image. */
+/* ═══ L'ENTREE, A LA MANIERE D'APPLE ═══
+
+   L'agrandissement de 96 a 100 % est retire : il faisait « pop », un mouvement
+   d'interface plutot que de mise en scene. A la place, la pastille monte de
+   18 px et sort d'un flou de 10 px, sur 1,3 seconde.
+
+   C'est exactement la grammaire du reste de la page — le titre, le bouton et
+   l'image entrent deja ainsi. Une seule difference : c'est plus lent, parce
+   qu'un element qui se pose sur une photo doit paraitre plus lourd qu'une ligne
+   de texte.
+
+   Le centrage figure dans chaque image-cle : l'animation ecrit `transform`, donc
+   l'omettre a une seule etape decalerait la pastille d'une demi-largeur. */
 .pastille{
   opacity:0;
-  transform:translate(-50%,-50%) translateY(10px) scale(.96);
-  animation:repere .8s var(--ec) forwards;
+  transform:translate(-50%,-50%) translateY(18px);
+  filter:blur(10px);
+  animation:repere 1.3s var(--ec) forwards;
 }
-@keyframes repere{ to{ opacity:1; transform:translate(-50%,-50%) } }
+@keyframes repere{ to{ opacity:1; transform:translate(-50%,-50%); filter:blur(0) } }
 
 /* En mouvement reduit, tout est la d'emblee. */
 @media (prefers-reduced-motion: reduce){
   .filins line{ animation:none; stroke-dashoffset:0 }
-  .pastille{ animation:none; opacity:1; transform:translate(-50%,-50%) }
+  .pastille{ animation:none; opacity:1; transform:translate(-50%,-50%); filter:none }
   .cible{ animation:none; opacity:1 }
 }
 
 .pastille{
   position:absolute; z-index:2;
-  padding:7px 14px; border-radius:100px;
+  /* Rectangle a coins arrondis et non pilule : le pictogramme demande un
+     bloc, pas une bande. 18 px de rayon — assez pour rester doux, assez peu
+     pour que la forme se lise. */
+  display:flex; align-items:center; gap:12px;
+  padding:12px 15px; border-radius:18px;
+  /* `max-content` sans largeur imposee : chaque pastille prend la place de
+     son texte. « Prive » tient sur deux lignes courtes et n'a plus a
+     reserver le vide a droite qu'imposait une largeur commune. */
+  width:max-content; max-width:210px;
   /* ═══ MEME MATIERE QUE LA BARRE ═══
      Valeurs reprises telles quelles de l'en-tete : 42 % d'opacite, flou de
      26 px, saturation a 180 %. C'est `saturate` qui fait la difference entre
@@ -1065,14 +1159,59 @@ h2.chiffres{
   letter-spacing:-.02em; line-height:1.15 }
 /* `nowrap` : « ecrites par l'IA » passait sur deux lignes et deformait la
    pastille, qui n'avait plus la meme hauteur que les deux autres. */
-.pastille span{ display:block; white-space:nowrap; font-size:10.5px; color:rgba(255,255,255,.62);
+/* Le pictogramme dans son propre carre : c'est lui qui donne du poids a la
+   pastille et permet de la lire d'un coup d'oeil. */
+.pastille .ico{
+  flex:none; width:42px; height:42px; border-radius:12px;
+  display:grid; place-items:center;
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.13);
+}
+.pastille .ico svg{ width:23px; height:23px; stroke:var(--t1); fill:none;
+  stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
+.pastille .txt{ display:block; padding-top:1px }
+/* Le texte revient a la ligne : c'est ce qui donne a la pastille sa forme de
+   bloc plutot que de bande, et evite les legendes interminables. */
+.pastille span span, .pastille .txt span{ display:block; white-space:normal; font-size:11px; color:rgba(255,255,255,.62);
   line-height:1.3; margin-top:2px }
 /* Les pastilles sont centrees sur l'extremite de leur trait — memes
    coordonnees, exprimees en pourcentage de l'image. Deplacer un point du SVG
    sans deplacer sa pastille les desolidariserait. */
-.p1{ left:23.0%; top:22.8%; animation-delay:.75s }
-.p2{ left:63.0%; top:38.7%; animation-delay:.97s }
-.p3{ left:27.0%; top:75.3%; animation-delay:1.19s }
+/* ═══ EPARPILLEES, ET QUI DEBORDENT ═══
+
+   Elles ne pointent plus rien : elles occupent l'image, deux a gauche et une a
+   droite, a des hauteurs differentes. Chacune deborde franchement du cadre —
+   c'est ce qui les fait exister DEVANT la photo plutot que dessus. */
+.p1{ left:8.0%;  top:19.0%; animation-delay:.55s }
+.p2{ left:90.0%; top:47.0%; animation-delay:.75s }
+.p3{ left:10.0%; top:74.0%; animation-delay:.95s }
+
+@media (max-width: 1099px){
+  /* ═══ SOUS 1100 PX ═══
+
+     Les pastilles retrecissent — 170 px au lieu de 210 — et le texte passe en
+     10,5 px. C'est la seule facon de les laisser deborder des DEUX cotes sans
+     qu'elles se coupent contre le bord de l'ecran, ni qu'elles recouvrent
+     l'image entiere. */
+  .pastille{ max-width:170px; padding:10px 12px; gap:10px }
+  .pastille .ico{ width:36px; height:36px; border-radius:10px }
+  .pastille .ico svg{ width:20px; height:20px }
+  .pastille b{ font-size:12.5px }
+  .pastille .txt span{ font-size:10.5px }
+  .p1{ left:14.0%; top:16.0% }
+  .p2{ left:84.0%; top:48.0% }
+  .p3{ left:16.0%; top:80.0% }
+}
+
+/* Sous 380 px, les pastilles rentrent : l'ecran n'a plus la place d'absorber
+   un debordement de 60 px de chaque cote. */
+@media (max-width: 379px){
+  .pastille{ max-width:150px }
+  .p1{ left:28.0% }
+  .p2{ left:74.0% }
+  .p3{ left:30.0% }
+}
+}
 
 /* Le SVG couvre exactement l'image : `preserveAspectRatio:none` avec un viewBox
    aux dimensions du fichier, donc chaque coordonnee tombe ou on l'attend quelle
@@ -2028,6 +2167,11 @@ footer .marque{ margin-bottom:18px; }
      Sa hauteur est donc plafonnee a ce que laisse l'ecran une fois retires
      la barre, les marges et la bande. Sur un grand ecran il garde ses
      400 px de large ; sur un portable il retrecit juste assez. */
+  /* La colonne d'ordinateur porte deja le retrait de la grille : le calcul
+     du mobile y retirerait une seconde fois la gouttiere. */
+  /* Sur ordinateur, l'image garde son format vertical d'origine. */
+  .duo{ width:100%; max-width:470px; aspect-ratio:1086/1448 }
+
   .telephone{
     /* Aucun decalage : le chassis se centre sur la COLONNE. J'avais essaye
        de l'aligner sur l'axe entre les deux filets verticaux, qui tombe
@@ -2378,36 +2522,19 @@ footer .marque{ margin-bottom:18px; }
   <figure class="vue-scene on">
     <img class="scene-img" src="scene-1.webp" width="1086" height="1448"
          alt="Un responsable consulte une procédure Standix dans son atelier">
-    <svg class="filins" viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="fil1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
-          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
-        </linearGradient>
-        <linearGradient id="fil2" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
-          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
-        </linearGradient>
-        <linearGradient id="fil3" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
-          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
-        </linearGradient>
-      </defs>
-      <line x1="250" y1="330" x2="340" y2="700" stroke="url(#fil1)" stroke-width="2.5"/>
-      <line x1="684" y1="560" x2="340" y2="700" stroke="url(#fil2)" stroke-width="2.5"/>
-      <line x1="293" y1="1090" x2="340" y2="700" stroke="url(#fil3)" stroke-width="2.5"/>
-      <circle class="cible" cx="340" cy="700" r="7" fill="#fff" fill-opacity=".9"/>
-      <!-- L'onde qui pulsait a ete retiree : son centre restait a l'ancienne
-           position, ce qui faisait deux points au lieu d'un. -->
-    </svg>
-    <figcaption class="pastille p1"><b>Jusqu'à 5 min</b><span>de vidéo, analysée par l'IA</span></figcaption>
-    <figcaption class="pastille p2"><b>Un QR code</b><span>scannez, la procédure s'ouvre</span></figcaption>
-    <figcaption class="pastille p3"><b>Privé</b><span>vos procédures restent privées</span></figcaption>
+    <!-- Les traits ont ete retires : les pastilles sont eparpillees sur toute
+         l'image, elles ne designent plus un point unique. -->
+    <figcaption class="pastille p1">
+      <i class="ico"><svg viewBox="0 0 24 24"><path d="M2 7.5A2.5 2.5 0 014.5 5h8A2.5 2.5 0 0115 7.5v9a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 16.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg></i>
+      <span class="txt"><b>Jusqu'à 5 min</b><span>de vidéo, analysée par l'IA</span></span></figcaption>
+    <figcaption class="pastille p2">
+      <i class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 20h1.5M20 14h1"/></svg></i>
+      <span class="txt"><b>Un QR code</b><span>scannez, la procédure s'ouvre</span></span></figcaption>
+    <figcaption class="pastille p3">
+      <i class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.4"/><path d="M8 10V7a4 4 0 018 0v3"/><path d="M12 14.5v2.5"/></svg></i>
+      <span class="txt"><b>Privé</b><span>vos procédures<br>restent privées</span></span></figcaption>
   </figure>
-  <figure class="vue-scene">
-    <img class="scene-img" src="scene-2.webp" width="1086" height="1448"
-         alt="Une procédure Standix ouverte sur un téléphone, dans l'allée d'un entrepôt">
-  </figure>
+  <!-- La seconde scene a ete retiree : une seule image, avec ses reperes. -->
 </div>
 </div>
 
@@ -2427,32 +2554,8 @@ footer .marque{ margin-bottom:18px; }
      donc entrer avec lui. Avec `app`, l'observateur de defilement l'ignorait
      — il ne revele rien dans les 12 % du bas de l'ecran — et elle restait
      invisible tant qu'on ne descendait pas. -->
-<ul class="reperes flou r4">
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M2 6.5A2.5 2.5 0 014.5 4h8A2.5 2.5 0 0115 6.5v11a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 17.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg>
-      <b>Jusqu'à 5 min</b>
-      <span>par vidéo analysée par l'IA</span>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M12 2.6l7.6 3.2v5.4c0 4.6-3.1 8.6-7.6 10-4.5-1.4-7.6-5.4-7.6-10V5.8z"/><path d="M9.4 12.2l1.9 1.9 3.6-3.8"/></svg>
-      <b>Privé</b>
-      <span>vos procédures restent chez vous</span>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="3.4"/><path d="M22 20v-2a4 4 0 00-3-3.9M16.4 3.6a4 4 0 010 7"/></svg>
-      <!-- Corrige : « y accede en direct » etait faux. L'equipe ne voit rien
-           tant que le gerant n'a pas publie — la publication est explicite,
-           c'est une decision de conception assumee. Le repere dit donc le
-           geste ET son effet. -->
-      <b>Vous publiez</b>
-      <span>l'équipe y accède aussitôt</span>
-    </li>
-    <li>
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.2"/><path d="M2.8 12h18.4"/><path d="M12 2.8a15 15 0 010 18.4 15 15 0 010-18.4z"/></svg>
-      <b>3 langues</b>
-      <span>français, anglais, allemand</span>
-    </li>
-  </ul>
+<!-- La bande des quatre reperes a ete retiree : « Jusqu'a 5 min » et
+     « Prive » figurent deja sur les pastilles de l'image, juste au-dessus. -->
 
 
 <!-- ═══════════════════════════════════════════════════════════════════════

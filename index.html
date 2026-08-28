@@ -106,7 +106,12 @@
      ⚠ L'AMBRE DU LOGO N'APPARAÎT NULLE PART, sauf à l'intérieur de la
        capture, qui garde ses couleurs propres. C'est elle, et elle seule, qui
        fait le pont entre le site et l'app. */
-  --halo:61,123,255;
+  /* ═══ PLUS AUCUN BLEU ═══
+     `--halo` valait 61-123-255, un bleu franc. Il alimentait encore les
+     lueurs des sections tarifs et cloture, ainsi que deux surcharges
+     d'ordinateur : c'est de la que venait la teinte visible sur le fond.
+     Il passe au blanc froid, la meme valeur que sous 1100 px. */
+  --halo:226,232,242;
 
   /* ═══ LA GOUTTIÈRE ═══
 
@@ -219,10 +224,18 @@ body{
 
        Il passe au blanc froid, la même teinte que sous 1100 px : la lumière
        reste, la couleur part. */
-    radial-gradient(ellipse 110% 40% at 22% -2%,
-      rgba(226,232,242,.14), rgba(226,232,242,.04) 46%, transparent 70%),
+    /* 60 % de large au lieu de 110 : l'ellipse s'etendait jusque sous la photo
+       et l'entourait d'une zone plus claire. Resserree sur le coin haut-gauche,
+       elle eclaire le titre, ce pour quoi elle existe. */
+    radial-gradient(ellipse 60% 34% at 16% -4%,
+      rgba(226,232,242,.13), rgba(226,232,242,.03) 48%, transparent 72%),
+    /* Le second foyer a ete retire : place a 52 % / 62 %, il tombait exactement
+       derriere la photo et creait autour d'elle une zone plus claire que le
+       reste — le « second arriere-plan » visible. Il datait de l'epoque ou la
+       capture detouree avait besoin d'etre decollee du fond ; la photo, elle,
+       porte sa propre lumiere. */
     radial-gradient(ellipse 92% 26% at 52% 62%,
-      rgba(255,255,255,.045), transparent 68%);
+      rgba(255,255,255,0), transparent 68%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -701,35 +714,12 @@ h1 em{ font-style:normal; color:var(--t1); }
    davantage qu'on ne doit les voir. Au-dela, le fond bascule du cote « site
    crypto » que la specification ecarte.
    ═══════════════════════════════════════════════════════════════════════════ */
-.duo::after{
-  content:''; position:absolute; z-index:-2;
-  inset:-58% -66%;
-  pointer-events:none;
-  filter:blur(104px);
-  background:
-    /* la nappe centrale, froide et tres large */
-    /* ═══ UNE SEULE LUMIERE, SANS TEINTE ═══
+/* La nappe de lumiere derriere l'image a ete retiree. Elle formait un second
+   fond visible autour du bloc, distinct du noir de la page — exactement ce
+   qu'il fallait eviter. Il ne reste que la vignette. */
 
-       Les quatre nappes colorees — froide a gauche, ambre a droite, bleue au
-       sol — ont ete retirees. Superposees, elles se lisaient comme des taches
-       de couleur sur le noir au lieu d'une ambiance.
-
-       Il reste un blanc a peine teinte : la zone autour de l'image est
-       simplement un peu moins noire que le reste. */
-    radial-gradient(ellipse 46% 40% at 50% 46%,
-      rgba(226,232,240,.045) 0%, rgba(226,232,240,.018) 46%, transparent 78%);
-}
-
-/* La vignette : les quatre bords legerement plus sombres que le centre. Elle
-   fusionne avec le fond au lieu de s'y ajouter — c'est ce qui donne la
-   profondeur sans qu'on identifie un effet. */
-.duo::before{
-  content:''; position:absolute; z-index:-1;
-  inset:-58% -66%;
-  pointer-events:none;
-  background:radial-gradient(ellipse at center,
-    transparent 45%, rgba(0,0,0,.18) 70%, rgba(0,0,0,.42) 100%);
-}
+/* La vignette du bloc a ete retiree avec la lueur : sans zone claire a
+   assombrir sur les bords, elle ne faisait qu'ajouter une couche. */
 /* L'arrondi et le fondu descendent sur la vue : le conteneur doit laisser
    passer les pastilles qui le debordent. */
 /* Le contour lumineux : un liseré clair en haut, qui s'eteint vers le bas —
@@ -762,9 +752,11 @@ h1 em{ font-style:normal; color:var(--t1); }
      suffisent a faire emerger la photo du noir. Un contour colore la posait
      dans un cadre, ce que la reference n'a pas. */
   border:0;
+  /* La lueur de 35 px a ete retiree : c'est elle qui eclaircissait le noir juste
+     autour de la photo et se lisait comme un second fond. Il reste l'ombre
+     portee, qui la fait emerger sans rien allumer derriere. */
   box-shadow:0 30px 70px rgba(0,0,0,.45),
-             0 0 0 1px rgba(255,255,255,.06),
-             0 0 35px rgba(90,110,130,.025);
+             0 0 0 1px rgba(255,255,255,.06);
 }
 
 .telephone{
@@ -1191,7 +1183,10 @@ h2.chiffres{
   border:1px solid rgba(255,255,255,.10);
   box-shadow:0 15px 35px rgba(0,0,0,.28),
              inset 0 1px 0 rgba(255,255,255,.045);
-  transform:translateZ(0);
+  /* ⚠ PAS DE `transform` ICI. J'y avais mis `translateZ(0)` : declare apres la
+     regle d'animation, il ecrasait son point de depart — la pastille
+     n'apparaissait plus qu'en fondu, sans la montee ni le flou qui se dissipe.
+     C'est ce qui avait change l'entree sans que je l'aie voulu. */
 }
 .pastille b{ display:block; font-size:13px; font-weight:500; color:var(--t1);
   letter-spacing:-.02em; line-height:1.15 }

@@ -731,7 +731,10 @@
          comparer. -->
     <div class="ac-tete">
       <h1 class="ac-salut">Bonjour <span id="ac-prenom">—</span> 👋</h1>
-      <p class="ac-sous">Voici un aperçu de votre espace de travail</p>
+      <!-- La phrase dit ce que la PAGE montre, pas ce qu'est l'app. « Voici un
+           aperçu de votre espace de travail » aurait pu coiffer n'importe quel
+           écran ; celle-ci annonce l'anneau, puis les listes. -->
+      <p class="ac-sous">Ce qui est en ligne, et ce que votre équipe en fait</p>
     </div>
 
     <!-- Le sélecteur « Ce mois-ci / Au total » a été retiré. La tuile
@@ -757,12 +760,24 @@
       <div class="acv-t">Aucune procédure pour l’instant</div>
     </div>
 
-    <div class="ac-grille" id="ac-grille"></div>
+    <!-- ═══ L'ACCUEIL, REFAIT UNE SECONDE FOIS ═══
 
-    <!-- Les trois dernières procédures. Le bloc entier est dessiné par le code,
-         y compris son titre : sur une entreprise sans procédure, il n'y a rien
-         à annoncer, et un titre seul au-dessus du vide est pire que rien. -->
-    <div id="ac-recentes"></div>
+         Les trois tuiles — membres actifs, procédures créées, analyses IA —
+         ont disparu. Elles comptaient trois choses sans lien entre elles, et
+         aucune ne répondait à la question qu'un gérant se pose en ouvrant son
+         app : est-ce que mon équipe a bien tout ce qu'il lui faut ?
+
+         Quatre blocs à la place, du plus important au moins pressant :
+
+           ① UN ANNEAU. La part des procédures réellement en ligne. Le même
+              dessin que celui de la page Analyse — on l'apprend une fois.
+           ② DEUX CHIFFRES du mois : les consultations, et les analyses IA
+              consommées sur le forfait.
+           ③ DEUX LISTES : ce qui vient d'être écrit, et qui est arrivé ou
+              parti. -->
+    <div id="ac-anneau"></div>
+    <div class="ac-duo" id="ac-duo"></div>
+    <div id="ac-listes"></div>
 
   </div>
 
@@ -2167,6 +2182,16 @@
       </div>
 
       <div id="abo-vedette"></div>
+
+      <!-- ═══ GÉRER OU RÉSILIER, HORS DE LA CARTE ═══
+
+           Le lien vivait DANS la carte, sous le bouton d'action. Deux gestes
+           opposés au même endroit : l'un souscrit, l'autre s'en va.
+
+           Il devient une ligne de réglage, du même moule que celles des
+           Réglages — plaque, libellé, chevron. C'est ce qu'il est : un accès
+           au portail Stripe, pas une option de l'offre. -->
+      <div id="abo-gerer"></div>
       <!-- Centré et de largeur réduite : sur ton image il ne prend pas toute
            la ligne, ce qui l'empêche de concurrencer le bouton de l'offre. -->
       <button type="button" class="abo-autres" id="abo-autres">Voir les autres formules

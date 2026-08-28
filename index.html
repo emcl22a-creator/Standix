@@ -1000,9 +1000,9 @@ h2.chiffres{
 /* Les pastilles sont centrees sur l'extremite de leur trait — memes
    coordonnees, exprimees en pourcentage de l'image. Deplacer un point du SVG
    sans deplacer sa pastille les desolidariserait. */
-.p1{ left:14.7%; top:26.2%; transform:translate(-50%,-50%) }
-.p2{ left:69.0%; top:38.0%; transform:translate(-50%,-50%) }
-.p3{ left:21.2%; top:76.0%; transform:translate(-50%,-50%) }
+.p1{ left:28.0%; top:12.0%; transform:translate(-50%,-50%) }
+.p2{ left:70.0%; top:76.0%; transform:translate(-50%,-50%) }
+.p3{ left:30.0%; top:80.0%; transform:translate(-50%,-50%) }
 
 /* Le SVG couvre exactement l'image : `preserveAspectRatio:none` avec un viewBox
    aux dimensions du fichier, donc chaque coordonnee tombe ou on l'attend quelle
@@ -1013,7 +1013,7 @@ h2.chiffres{
 }
 /* L'onde s'ecarte du point et s'efface. Un mouvement lent et unique : c'est ce
    qui attire l'oeil sans donner l'impression que quelque chose charge. */
-.onde{ transform-origin:390px 666px; animation:onde 2.8s ease-out infinite }
+.onde{ transform-origin:542px 434px; animation:onde 2.8s ease-out infinite }
 @keyframes onde{
   0%   { transform:scale(1);   stroke-opacity:.5 }
   70%  { transform:scale(4.2); stroke-opacity:0 }
@@ -2452,6 +2452,16 @@ footer .marque{ margin-bottom:18px; }
          qui n'a jamais eu lieu est une contradiction qu'on tolere, pas qu'on
          choisit. -->
   <figure class="scene app">
+    <!-- ═══ NI PASTILLES NI TRAITS ═══
+
+         Ils sont retires : la capture est desormais VISIBLE dans le telephone
+         de la photo. On y lit la procedure, l'avertissement, la barre du
+         navigateur. Trois etiquettes posees par-dessus repetaient ce que
+         l'ecran montre deja, et masquaient une partie de l'image.
+
+         L'ancien SVG et les trois figcaption ont ete supprimes avec leur
+         balisage ; leurs styles restent dans la feuille, inutilises mais prets
+         si on veut les remettre. -->
     <img src="atelier.webp" width="1086" height="1448" loading="lazy"
          alt="Un responsable consulte une procédure Standix sur son téléphone, dans son atelier">
     <!-- ═══ TOUT CONVERGE SUR LE TELEPHONE ═══
@@ -2464,32 +2474,9 @@ footer .marque{ margin-bottom:18px; }
          d'angles differents, ce qu'une bordure ne sait pas faire. Le viewBox
          reprend les dimensions de l'image, donc les coordonnees sont celles de
          la photo elle-meme. -->
-    <svg class="filins" viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="fil1" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
-          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
-        </linearGradient>
-        <linearGradient id="fil2" x1="1" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
-          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
-        </linearGradient>
-        <linearGradient id="fil3" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
-          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
-        </linearGradient>
-      </defs>
-      <line x1="160" y1="380" x2="390" y2="666" stroke="url(#fil1)" stroke-width="2.5"/>
-      <line x1="750" y1="550" x2="390" y2="666" stroke="url(#fil2)" stroke-width="2.5"/>
-      <line x1="230" y1="1100" x2="390" y2="666" stroke="url(#fil3)" stroke-width="2.5"/>
-      <circle class="cible" cx="390" cy="666" r="7" fill="#fff" fill-opacity=".9"/>
-      <circle class="onde" cx="390" cy="666" r="7" fill="none"
-              stroke="#fff" stroke-opacity=".5" stroke-width="1.6"/>
-    </svg>
-
-    <figcaption class="pastille p1"><b>3:13</b><span>de vidéo</span></figcaption>
-    <figcaption class="pastille p2"><b>6 étapes</b><span>écrites par l'IA</span></figcaption>
-    <figcaption class="pastille p3"><b>3 langues</b><span>pour toute l'équipe</span></figcaption>
+    <!-- Les trois anciennes pastilles — 3:13, 6 etapes, 3 langues — repetaient
+         mot pour mot la section 01 : elles decoraient la photo sans rien
+         apprendre. Celles-ci nomment trois fonctions distinctes. -->
   </figure>
 
   <p class="surtitre app">La différence</p>

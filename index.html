@@ -668,7 +668,7 @@ h1 em{ font-style:normal; color:var(--t1); }
      doivent deborder des deux cotes sans sortir de l'ecran. Retrecir l'image
      est la seule variable qui leur rend de la place — deplacer les pastilles ne
      ferait que choisir quel cote se coupe. */
-  width:min(470px, calc((100% - 2 * var(--gouttiere)) * 0.88));
+  width:min(430px, calc((100% - 2 * var(--gouttiere)) * 0.88));
   /* De l'air au-dessus et en dessous : la photo et ses reperes ont besoin de
      vide autour pour que le halo et les LED se lisent comme une mise en
      scene, pas comme un fond. */
@@ -684,25 +684,48 @@ h1 em{ font-style:normal; color:var(--t1); }
      debordent. Le fondu du bas passe donc sur la vue, pas sur le bloc. */
   overflow:visible;
 }
-/* Les points lumineux du fond ont ete retires. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES COUCHES DE LUMIERE
 
-/* ═══ LE HALO DERRIERE L'IMAGE ═══
-   Une lueur froide et large, qui decolle la photo du fond et fait exister les
-   pastilles au-dessus d'elle. Elle deborde tres au-dela du cadre — c'est ce
-   debordement qui la fait lire comme une lumiere et non comme une bordure. */
+   Trois couches superposees plutot qu'un seul degrade, chacune sous le seuil de
+   perception immediate :
+
+   ::after   la nappe large, froide au centre, qui eclaire le noir autour du
+             produit sans jamais ressembler a une lumiere bleue ;
+             plus une lumiere froide a gauche et une ambre a droite.
+   ::before  la vignette et la lumiere basse.
+
+   Les opacites sont volontairement sous 0,12 : on doit ressentir ces couleurs
+   davantage qu'on ne doit les voir. Au-dela, le fond bascule du cote « site
+   crypto » que la specification ecarte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.duo::after{
+  content:''; position:absolute; z-index:-2;
+  inset:-58% -66%;
+  pointer-events:none;
+  filter:blur(84px);
+  background:
+    /* la nappe centrale, froide et tres large */
+    radial-gradient(ellipse 46% 40% at 50% 46%,
+      rgba(80,110,145,.12) 0%, rgba(55,75,100,.07) 42%,
+      rgba(20,30,40,.025) 66%, transparent 82%),
+    /* la lumiere froide, cote gauche */
+    radial-gradient(ellipse 30% 46% at 4% 42%, rgba(90,130,170,.10), transparent 72%),
+    /* l'ambre, cote droit — a peine perceptible, c'est voulu */
+    radial-gradient(ellipse 30% 46% at 96% 54%, rgba(255,170,80,.055), transparent 72%),
+    /* la lumiere au sol, qui se propage horizontalement sous le produit */
+    radial-gradient(ellipse 62% 22% at 50% 100%, rgba(80,110,140,.08), transparent 68%);
+}
+
+/* La vignette : les quatre bords legerement plus sombres que le centre. Elle
+   fusionne avec le fond au lieu de s'y ajouter — c'est ce qui donne la
+   profondeur sans qu'on identifie un effet. */
 .duo::before{
   content:''; position:absolute; z-index:-1;
-  inset:-16% -22%;
-  /* Teintes relevees dans la photo : le bleu des racks vaut 43-66-107, plus
-     sourd et plus vert que le bleu que j'avais pose. Le halo le reprend, pour
-     que la lumiere paraisse emaner de l'image et non lui etre appliquee. */
-  background:radial-gradient(ellipse 58% 52% at 50% 50%,
-    rgba(88,132,180,.20), rgba(60,95,140,.08) 52%, transparent 74%);
-  filter:blur(38px); pointer-events:none;
-  /* `overflow:visible` : sans lui, le cadre rognerait ce qui depasse. Le fondu
-     du bas passe donc sur l'image seule, pas sur le bloc. */
-  overflow:visible;
-  aspect-ratio:1086/1448;
+  inset:-58% -66%;
+  pointer-events:none;
+  background:radial-gradient(ellipse at center,
+    transparent 35%, rgba(0,0,0,.20) 70%, rgba(0,0,0,.50) 100%);
 }
 /* L'arrondi et le fondu descendent sur la vue : le conteneur doit laisser
    passer les pastilles qui le debordent. */
@@ -730,7 +753,7 @@ h1 em{ font-style:normal; color:var(--t1); }
 
    La lueur exterieure reprend le bleu releve dans la photo. */
 .vue-scene::after{
-  content:''; position:absolute; inset:0; z-index:2;
+  content:''; position:absolute; inset:0; z-index:1;
   border-radius:22px; pointer-events:none;
   border:.5px solid rgba(150,190,240,.32);
   box-shadow:0 0 32px -4px rgba(88,132,180,.40),
@@ -1137,6 +1160,9 @@ h2.chiffres{
   /* Rectangle a coins arrondis et non pilule : le pictogramme demande un
      bloc, pas une bande. 18 px de rayon — assez pour rester doux, assez peu
      pour que la forme se lise. */
+  /* z-index:4 : au-dessus du lisere de l'image, a 1. Les pastilles etaient au
+     meme plan que lui et passaient dessous. */
+  z-index:4;
   display:flex; align-items:center; gap:12px;
   padding:12px 15px; border-radius:18px;
   /* `max-content` sans largeur imposee : chaque pastille prend la place de
@@ -1148,9 +1174,13 @@ h2.chiffres{
      26 px, saturation a 180 %. C'est `saturate` qui fait la difference entre
      un flou et du verre — un flou seul delave ce qui passe dessous, la
      saturation le ravive. */
-  background:rgba(8,9,10,.42);
-  -webkit-backdrop-filter:blur(26px) saturate(180%);
-          backdrop-filter:blur(26px) saturate(180%);
+  /* Le verre est gris-noir transparent, jamais blanc : un degrade de blanc a
+     10 % puis 3,5 % sur un fond sombre, et non un voile clair. */
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.035)),
+    rgba(8,9,10,.46);
+  -webkit-backdrop-filter:blur(20px) saturate(120%);
+          backdrop-filter:blur(20px) saturate(120%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
              inset 0 0 0 .5px rgba(255,255,255,.16),
              0 10px 26px rgba(0,0,0,.4);
@@ -2170,7 +2200,10 @@ footer .marque{ margin-bottom:18px; }
   /* La colonne d'ordinateur porte deja le retrait de la grille : le calcul
      du mobile y retirerait une seconde fois la gouttiere. */
   /* Sur ordinateur, l'image garde son format vertical d'origine. */
-  .duo{ width:100%; max-width:470px; aspect-ratio:1086/1448 }
+  /* `margin-right:32px` cale l'image sur l'axe entre la mediane et la verticale
+     de droite : la mediane etant tracee 32 px au-dela du bord de colonne, les
+     deux centres different de sa moitie, seize pixels. */
+  .duo{ width:100%; max-width:430px; aspect-ratio:1086/1448; margin-right:32px }
 
   .telephone{
     /* Aucun decalage : le chassis se centre sur la COLONNE. J'avais essaye

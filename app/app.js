@@ -6623,19 +6623,16 @@ function debutDuMois() {
 }
 
 function peindreTuilesAccueil() {
-  const grille = document.getElementById('ac-grille')
-  if (!grille) return
-  grille.innerHTML = ''
+  const zAnneau = document.getElementById('ac-anneau')
+  const zDuo    = document.getElementById('ac-duo')
+  const zListes = document.getElementById('ac-listes')
+  if (!zAnneau || !zDuo || !zListes) return
+  zAnneau.innerHTML = ''; zDuo.innerHTML = ''; zListes.innerHTML = ''
 
-  const tout = accueilPeriode === 'tout'
-  const debutMois = debutDuMois()
   const procs = allGestionProcedures || []
 
   /* ═══════════════════════════════════════════════════════════════════════
      L'ACCUEIL SANS AUCUNE PROCÉDURE
-
-     Trois tuiles à zéro et deux liens vers des listes vides : la page ne
-     disait rien, et surtout pas quoi faire.
 
      ⚠ ON TESTE `procs.length`, PAS LE COMPTE DU MOIS. Une entreprise qui a
        douze procédures mais aucune ce mois-ci n'est pas vide — elle a juste
@@ -6646,190 +6643,328 @@ function peindreTuilesAccueil() {
     if (vide) {
       vide.hidden = false
       const nom = cachedEntreprise?.nom
-      /* Le nom de l'entreprise, quand on l'a. « Votre entreprise » est un
-         repli — jamais un texte à trous. */
       vide.querySelector('.acv-t').textContent = nom
         ? nom + ' n\u2019a pas encore de proc\u00e9dure'
         : 'Aucune proc\u00e9dure pour l\u2019instant'
-
-      /* Plus de seconde phrase. Ce qu'il faut savoir tient dans le titre ; le
-         reste était du remplissage. */
     }
-    grille.hidden = true
-    const rec = document.getElementById('ac-recentes')
-    if (rec) rec.hidden = true
     return
   }
   if (vide) vide.hidden = true
-  grille.hidden = false
-  const rec = document.getElementById('ac-recentes')
-  if (rec) rec.hidden = false
+
+  /* ═══ ① CE QUI EST EN LIGNE ═══════════════════════════════════════════════
+
+     Le seul chiffre qui dise si l'app SERT. Une procédure en brouillon n'existe
+     que pour la gestion : l'équipe ne la voit pas, ne la lit pas, ne s'en sert
+     pas. Un gérant peut en avoir écrit vingt et n'en avoir publié aucune.
+
+     ⚠ LES ANALYSES EN COURS SONT ÉCARTÉES. Une procédure que l'IA est en train
+       d'écrire n'est pas un brouillon oublié : elle n'existe pas encore. La
+       compter au dénominateur ferait baisser le taux à chaque nouvelle vidéo,
+       c'est-à-dire punirait le fait de travailler. */
+  const abouties = procs.filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
+  const enLigne = abouties.filter(p => p.publiee_le).length
+  zAnneau.appendChild(anneauPublication(enLigne, abouties.length))
+
+  /* ═══ ② LES DEUX CHIFFRES DU MOIS ════════════════════════════════════════ */
+  const debutMois = debutDuMois()
+  const debutMoisPrec = new Date(debutMois); debutMoisPrec.setMonth(debutMoisPrec.getMonth() - 1)
+
+  /* ─── LES CONSULTATIONS ───────────────────────────────────────────────────
+
+     ⚠ CE N'EST PAS UN COMPTEUR DE SCANS. Rien n'enregistre le geste de scanner
+       un QR code : ce qu'on compte ici, ce sont les lignes de `validations`,
+       c'est-à-dire les procédures OUVERTES par un membre, quel que soit le
+       chemin — QR code, liste, lien.
+
+       C'est le chiffre le plus proche qu'on ait, et il dit la même chose :
+       est-ce que l'équipe consulte. Pour compter les scans séparément, il
+       faudrait un journal écrit au moment du scan. */
   const vals = cachedValidations || []
+  const quand = v => Date.parse(v.validated_at)
+  const ceMois = vals.filter(v => quand(v) >= debutMois.getTime()).length
+  const moisPrec = vals.filter(v => {
+    const t = quand(v)
+    return t >= debutMoisPrec.getTime() && t < debutMois.getTime()
+  }).length
 
-  /* ─── ① PROCÉDURES CRÉÉES ─────────────────────────────────────────────── */
-  const creees = tout ? procs.length
-    : procs.filter(p => new Date(p.created_at) >= debutMois).length
+  zDuo.appendChild(chiffreAccueil({
+    icone: 'lecture',
+    titre: 'Consultations ce mois-ci',
+    valeur: String(ceMois),
+    /* ═══ PAS DE POURCENTAGE SUR DE PETITS NOMBRES ═══
 
-  /* ─── ② TEMPS DE FORMATION ────────────────────────────────────────────────
-     La somme de ce que TOUS les membres ont passé sur les procédures. C'est le
-     même calcul que la page Analyse, sur la même fenêtre — deux pages qui
-     donnent deux chiffres différents pour la même chose seraient pires que
-     pas de chiffre du tout. */
-  const dansFenetre = tout ? vals
-    : vals.filter(v => new Date(v.validated_at) >= debutMois)
-  /* Le total en secondes servait à la tuile « Temps de formation », retirée :
-     elle disait la même chose que « Membres actifs » sous une autre forme.
-     `dansFenetre` reste utilisé plus bas pour compter les lecteurs. */
+       Passer de 3 à 2 donne « −33 % », ce qui dit surtout que les nombres sont
+       petits. En dessous de dix, on annonce l'écart en clair.
 
-  /* ─── ③ LE TAUX DE LECTURE ────────────────────────────────────────────────
+       Et le mois en cours n'est pas fini : le comparer au mois précédent
+       complet est toujours défavorable. La note le dit plutôt que de laisser
+       croire à une chute. */
+    note: compareAuMoisPrecedent(ceMois, moisPrec),
+    tendance: moisPrec ? (ceMois > moisPrec ? 1 : ceMois < moisPrec ? -1 : 0) : null,
+  }))
 
-     « 6 sur 8 se sont formés. » C'est la seule tuile qui parle du RÉSULTAT :
-     les trois autres comptent ce qui a été créé, celle-ci dit si ça sert.
+  /* ─── LES ANALYSES VIDÉO IA ───────────────────────────────────────────────
 
-     Elle remplace une comparaison d'usage de l'IA qui doublait la quatrième
-     tuile — deux tuiles sur quatre comptaient les analyses — et dont le
-     pourcentage était instable : passer de 3 à 2 affichait « −33 % », ce qui
-     dit surtout que les nombres sont petits.
-
-     ─── LA GESTION N'EST PAS COMPTÉE ───
-
-     Même règle que sur la page Analyse : un gestionnaire écrit les procédures,
-     il n'a pas à les lire. L'inclure ferait « 6 sur 10 » là où l'équipe est de
-     huit, et le manquant serait quelqu'un à qui l'on ne demande rien.
-
-     Deux pages qui donneraient deux dénominateurs différents pour la même
-     question seraient pires que pas de chiffre. */
-  const aLire = (cachedMembres || []).filter(m => m.role === 'equipe')
-  const idsALire = new Set(aLire.map(m => m.id))
-  const lecteurs = new Set(
-    dansFenetre.filter(v => idsALire.has(v.membre_id) && Number(v.duree_lecture))
-               .map(v => v.membre_id)).size
-
-  /* ─── ④ QUOTA D'ANALYSES ───────────────────────────────────────────────────
      `etatAbo.analyses` vient de `reste_analyses`, qui ne consomme rien. Si la
-     migration n'est pas passée, il vaut `null` : la tuile dit alors ce qu'elle
-     sait — le nombre d'analyses — sans inventer de plafond. */
+     migration n'est pas passée, il vaut `null` : on dit alors ce qu'on sait,
+     sans inventer de plafond. */
   const q = etatAbo?.analyses || null
   const quota = q ? Number(q.quota || 0) : 0
   const reste = q ? Number(q.reste || 0) : 0
-  const utilisees = quota ? quota - reste : null
+  const utilisees = quota ? Math.max(0, quota - reste) : null
 
-  grille.appendChild(tuileAccueil({
-    titre: 'Total de procédures créées', icone: 'document',
-    valeur: String(creees),
-    /* « Depuis le début » disparaît : le titre dit déjà « total ». La note
-       renseigne plutôt sur ce qui est compté. */
-    note: 'toutes vos procédures',
+  zDuo.appendChild(chiffreAccueil({
+    icone: 'ia',
+    titre: 'Analyses vid\u00e9o IA ce mois-ci',
+    valeur: quota ? `${utilisees} / ${quota}` : (utilisees != null ? String(utilisees) : '\u2014'),
+    /* Le forfait n'est pas le même d'une offre à l'autre : sans cette phrase,
+       un gérant qui voit « 12 / 30 » ne sait pas d'où sort le 30. */
+    note: quota ? 'selon votre abonnement' : 'forfait non renseign\u00e9',
   }))
 
-  /* ═══ L'ANNEAU EN DEUXIÈME POSITION ═══
-
-     Il était en quatrième, derrière « Temps de formation ». Ce temps disait la
-     même chose que « Membres actifs » sous une autre forme — l'un compte des
-     minutes, l'autre des personnes, mais les deux répondent à « est-ce que
-     l'équipe se forme ».
-
-     L'anneau, lui, dit tout autre chose : ce qu'il reste du forfait. Une seule
-     tuile sur trois parle d'abonnement, elle mérite le deuxième regard plutôt
-     que le dernier. */
-  const tQuota = tuileQuota(utilisees, quota)
-  grille.appendChild(tQuota)
-  lancerAnneauQuota(tQuota)
-
-  grille.appendChild(tuileAccueil({
-    /* ═══ « MEMBRES ACTIFS », ET UN NOMBRE SIMPLE ═══
-
-       Deux changements, pour la même raison : la tuile jugeait au lieu de
-       renseigner.
-
-       ① « Équipe formée » sonne comme une case à cocher — soit elle l'est, soit
-          elle ne l'est pas, et on est en faute. « Membres actifs » constate.
-
-       ② « 2 / 3 » est une note d'école. Le nombre seul dit la même chose sans
-          le rapport implicite à une perfection. La fraction n'est pas perdue :
-          elle passe en note, où elle informe au lieu de noter.
-
-       Le chiffre est identique, seule sa mise en scène change. Un gérant qui
-       ouvre son app le matin n'a pas à se sentir évalué par elle. */
-    titre: 'Membres actifs', icone: 'equipe',
-    valeur: aLire.length ? String(lecteurs) : '—',
-    /* La branche « ont lu ce mois-ci » a été retirée : sans filtre, la période
-       est toujours « depuis le début ». Une branche que rien ne peut atteindre
-       est un piège pour qui relira ce code. */
-    note: !aLire.length ? 'aucun membre en équipe'
-      : lecteurs === aLire.length ? `tous · ${aLire.length} sur ${aLire.length}`
-      : `sur ${aLire.length} · ont déjà lu`,
-    /* Vert quand tout le monde a lu, sinon rien : une couleur d'alerte ferait
-       d'un chiffre correct un reproche. */
-    tendance: aLire.length && lecteurs === aLire.length ? 1 : null,
-  }))
-
-  peindreRecentesAccueil()
+  /* ═══ ③ LES DEUX LISTES ══════════════════════════════════════════════════ */
+  peindreListesAccueil()
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES TROIS DERNIÈRES PROCÉDURES
+   LA COMPARAISON AU MOIS PRÉCÉDENT
 
-   ─── LA VIGNETTE, TROIS CAS ───
-
-   ① Une image de présentation : on la montre. C'est celle que le gérant a
-      choisie, elle vaut mieux que tout ce qu'on pourrait déduire.
-   ② Pas d'image mais une vidéo : on affiche la vidéo elle-même, arrêtée sur sa
-      première image. `preload="metadata"` suffit — le navigateur télécharge
-      l'en-tête, pas le fichier, donc trois vignettes ne coûtent pas trois
-      vidéos.
-   ③ Ni l'un ni l'autre : une icône de document, dans une plaque ambre. Pas de
-      rectangle gris vide, qui ressemble à une image qui n'a pas chargé.
-
-   ─── PAS DE REQUÊTE ───
-
-   `peindreDernieresProcedures`, l'ancienne version, allait chercher les bornes
-   des étapes pour afficher la durée filmée. Pour trois vignettes sur l'accueil,
-   une requête réseau à chaque affichage est un prix qu'on ne veut pas payer :
-   on montre ce qui est déjà en mémoire.
+   Trois cas, trois phrases. Le pourcentage n'apparaît que lorsqu'il veut dire
+   quelque chose — c'est-à-dire au-dessus de dix consultations le mois passé.
    ═══════════════════════════════════════════════════════════════════════════ */
-function peindreRecentesAccueil() {
-  const zone = document.getElementById('ac-recentes')
-  if (!zone) return
-  zone.innerHTML = ''
+function compareAuMoisPrecedent(actuel, precedent) {
+  if (!precedent) return actuel ? 'premier mois avec des lectures' : 'rien de lu ce mois-ci'
+  const ecart = actuel - precedent
+  if (!ecart) return `comme le mois dernier \u00b7 ${precedent}`
+  const signe = ecart > 0 ? '+' : '\u2212'
+  const abs = Math.abs(ecart)
+  if (precedent < 10) return `${signe}${abs} par rapport au mois dernier`
+  return `${signe}${Math.round((abs / precedent) * 100)} % \u00b7 ${precedent} le mois dernier`
+}
 
-  /* ═══ DEUX BOUTONS, PLUS DE LISTE ═══
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANNEAU DES PROCÉDURES EN LIGNE
 
-     L'accueil affichait trois cartes de procédures avec leurs vignettes. Elles
-     doublaient l'onglet Procédures — qui montre tout, avec recherche et tri —
-     pour soixante pixels de hauteur chacune.
+   Le MÊME dessin que `anneauResume`, celui des blocs de la page Analyse :
+   168 px de côté, un trait de 14, la valeur au centre et l'unité dessous. On
+   apprend à lire un anneau une seule fois dans cette app.
 
-     Deux boutons de même forme les remplacent, menant à deux pages de même
-     nature. L'accueil se termine sur un choix clair au lieu d'un extrait. */
-  /* ═══ DEUX TUILES, PAS DEUX BOUTONS ═══
+   Deux différences, et une seule est visible :
 
-     C'étaient deux barres pleine largeur, d'une matière qu'on ne voyait nulle
-     part ailleurs sur cette page. Elles deviennent des tuiles : même fond, même
-     contour en lumière rasante, même plaque d'icône que « Procédures créées ».
+     · IL N'A QUE DEUX PARTS — publié, pas publié — là où celui de l'Analyse en
+       a autant que de dossiers. Une piste sombre pour le reste, un arc pour la
+       part faite : c'est une progression, pas une répartition.
 
-     L'accueil ne compte plus qu'une seule sorte d'objet. Ce qui les distingue
-     des trois du haut, c'est le chevron : elles mènent ailleurs, les autres
-     montrent un chiffre. */
-  const tuile = (icone, titre, sous, action) => {
-    const el = document.createElement('button')
-    el.type = 'button'
-    el.className = 'an-bloc ac-tuile ac-lien'
-    el.addEventListener('click', action)
-    el.innerHTML = `
+     · SA COULEUR EST CELLE DES DESSINS. `orLibre`, le dégradé relatif de
+       #FEC64A à #EB5201, celui que portent toutes les icônes de l'app.
+
+   ⚠ PAS `logoOrIc`. Ce dégradé-là est déclaré en `userSpaceOnUse` sur 24 × 24 :
+     au-delà, tout reçoit la couleur de fin. Sur un anneau de 168 px, l'arc
+     serait uniformément #EB5201 et le dégradé perdu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function anneauPublication(enLigne, total) {
+  const T = 168, ep = 14, r = (T - ep) / 2, circ = 2 * Math.PI * r
+  const pct = total ? Math.round((enLigne / total) * 100) : 0
+
+  const bloc = document.createElement('div')
+  /* ⚠ PAS DE CARTE AUTOUR. L'anneau n'est pas un bloc de plus : c'est le sujet
+     de la page. Posé sur le fond, il se détache de tout ce qui suit, et les
+     deux tuiles du dessous redeviennent ce qu'elles sont — des compléments. */
+  bloc.className = 'ac-pub-bloc'
+
+  /* La part dessinée s'arrête juste avant le tour complet quand tout est
+     publié : un arc de 360° dont les bouts sont arrondis se recouvre
+     lui-même et fait une bosse à midi. */
+  const part = Math.min(circ * (pct / 100), circ - 0.1)
+
+  /* ═══ LA PISTE GRISE N'APPARAÎT QU'À ZÉRO ═══
+
+     Un anneau de progression porte d'ordinaire un cercle sombre sous son arc,
+     pour montrer le chemin restant. Ici il ajoutait un second cercle complet
+     derrière le premier : deux traits concentriques de même épaisseur, dont
+     l'un ne dit rien.
+
+     L'anneau de la page Analyse n'en a pas non plus — il ne dessine que ses
+     parts. Celui-ci fait pareil.
+
+     Reste le cas de zéro : sans arc ET sans piste, il n'y aurait plus rien à
+     l'écran, et le chiffre flotterait au milieu du vide. La piste ne sert donc
+     qu'à ça — dire qu'un anneau existe quand il est vide. */
+  const piste = pct === 0
+    ? `<circle cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
+               stroke="rgba(255,255,255,0.07)" stroke-width="${ep}"/>`
+    : ''
+
+  /* ⚠ À ZÉRO, AUCUN ARC N'EST DESSINÉ. Un `stroke-dasharray` de longueur nulle
+     avec des bouts arrondis ne donne pas rien : il donne un POINT ambre à midi,
+     du diamètre du trait. Mesuré à l'écran — on croit à une poussière sur la
+     dalle. La piste grise suffit à dire que l'anneau est vide. */
+  const arcSvg = pct === 0 ? '' : `
+          <circle class="arc" cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
+                  stroke="url(#orLibre)" stroke-width="${ep}" stroke-linecap="round"
+                  stroke-dasharray="${part} ${circ}" stroke-dashoffset="${circ}"/>`
+
+  bloc.innerHTML = `
+    <div class="an-resume ac-pub">
+      <div class="an-resume-anneau">
+        <svg width="${T}" height="${T}">
+          ${piste}${arcSvg}
+        </svg>
+        <div class="an-resume-centre">
+          <span class="v">${pct} %</span>
+          <span class="u">${enLigne} sur ${total} en ligne</span>
+        </div>
+      </div>
+      <div class="ac-pub-txt">${
+        pct === 100 ? 'Toutes vos proc\u00e9dures sont accessibles \u00e0 votre \u00e9quipe.'
+        : pct === 0 ? 'Aucune proc\u00e9dure n\u2019est encore visible par votre \u00e9quipe.'
+        : `${total - enLigne} proc\u00e9dure${total - enLigne > 1 ? 's' : ''} rest${total - enLigne > 1 ? 'ent' : 'e'} en brouillon.`
+      }</div>
+    </div>`
+
+  /* Le remplissage part de zéro et se dessine. Deux images d'attente : la
+     première laisse le navigateur poser l'élément, la seconde déclenche la
+     transition. Un seul `requestAnimationFrame` suffit sur ordinateur ; sur un
+     téléphone qui compose plus lentement, la mesure et le changement tombaient
+     dans la même image et la transition était ignorée. */
+  const arc = bloc.querySelector('.arc')
+  /* ⚠ IL PEUT NE PAS Y EN AVOIR. À zéro pour cent l'arc n'est pas dessiné du
+     tout ; sans ce garde, l'accueil plantait sur `null.getBoundingClientRect`
+     — et comme `peindreTuilesAccueil` est enveloppée dans un `try`, la page
+     serait restée à moitié vide sans rien dire. */
+  if (arc) {
+    requestAnimationFrame(() => {
+      arc.getBoundingClientRect()
+      requestAnimationFrame(() => { arc.style.strokeDashoffset = '0' })
+    })
+  }
+  return bloc
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN CHIFFRE DU MOIS
+
+   La matière des blocs d'Analyse — `an-bloc` — comme les anciennes tuiles. Ce
+   qui change : la plaque d'icône passe en tête de ligne avec le titre, et le
+   chiffre prend toute la largeur en dessous. Sur une demi-largeur d'écran, un
+   titre et un nombre côte à côte se marchaient dessus.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function chiffreAccueil({ icone, titre, valeur, note, tendance }) {
+  const el = document.createElement('div')
+  el.className = 'an-bloc ac-tuile ac-chiffre'
+  el.innerHTML = `
+    <div class="ac-ch-tete">
       ${iconeAccueil(icone)}
-      <span class="ac-lien-txt">
-        <span class="ac-lien-t">${escapeHtml(titre)}</span>
-        <span class="ac-lien-s">${escapeHtml(sous)}</span>
-      </span>
-      <span class="ac-lien-fl">\u203a</span>`
+      <span class="ac-ch-t">${escapeHtml(titre)}</span>
+    </div>
+    <div class="ac-ch-v">${escapeHtml(valeur)}</div>
+    ${note ? `<div class="ac-ch-n${
+      tendance === 1 ? ' haut' : tendance === -1 ? ' bas' : ''
+    }">${escapeHtml(note)}</div>` : ''}`
+  return el
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX LISTES DU BAS
+
+   L'accueil montrait deux BOUTONS vers deux pages. Un bouton demande d'y aller
+   pour savoir s'il s'y passe quelque chose ; trois lignes le disent tout de
+   suite, et le lien reste pour le détail.
+
+   Les mouvements demandent une requête — `collecterActivites` interroge
+   `mouvements` et `demandes_acces`. La liste des procédures, elle, est déjà en
+   mémoire : elle s'affiche sans attendre, et les mouvements arrivent après.
+   Une page qui attend sa partie la plus lente pour tout montrer paraît lente
+   en entier.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function peindreListesAccueil() {
+  const zone = document.getElementById('ac-listes')
+  if (!zone) return
+
+  const bloc = (id, titre, sous, action) => {
+    const el = document.createElement('div')
+    el.className = 'an-bloc ac-liste'
+    el.innerHTML = `
+      <button type="button" class="ac-liste-tete">
+        <span class="ac-liste-t">${escapeHtml(titre)}</span>
+        <span class="ac-liste-fl">${escapeHtml(sous)} \u203a</span>
+      </button>
+      <div class="ac-liste-co" id="${id}"></div>`
+    el.querySelector('.ac-liste-tete').addEventListener('click', action)
     zone.appendChild(el)
+    return el.querySelector('.ac-liste-co')
   }
 
-  tuile('pile', 'Derni\u00e8res proc\u00e9dures',
-        'Celles cr\u00e9\u00e9es ces quinze derniers jours', () => ouvrirRecentes())
-  tuile('mouvement', 'Derniers mouvements',
-        'Arriv\u00e9es, d\u00e9parts et changements de r\u00f4le', () => ouvrirActivites())
+  /* ─── LES DERNIÈRES PROCÉDURES ─────────────────────────────────────────── */
+  const co1 = bloc('ac-l-procs', 'Derni\u00e8res proc\u00e9dures', 'Tout voir',
+                   () => ouvrirRecentes())
+  const recentes = (allGestionProcedures || [])
+    .filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
+    .slice(0, 3)
+
+  co1.innerHTML = recentes.length ? recentes.map(p => `
+    <button type="button" class="ac-l-lig" data-proc="${p.id}">
+      <span class="co">
+        <span class="nm">${escapeHtml(p.titre || 'Sans titre')}</span>
+        <span class="st">${escapeHtml(p.categorie || 'Sans dossier')}</span>
+      </span>
+      ${p.publiee_le ? '' : '<span class="proc-brouillon">Brouillon</span>'}
+      <span class="vl">${depuisQuandCourt(Date.parse(p.created_at))}</span>
+    </button>`).join('')
+    : '<div class="ac-l-rien">Aucune proc\u00e9dure pour l\u2019instant.</div>'
+
+  co1.querySelectorAll('[data-proc]').forEach(b => {
+    b.addEventListener('click', () => openAnalyse(b.dataset.proc))
+  })
+
+  /* ─── LES DERNIERS MOUVEMENTS ──────────────────────────────────────────── */
+  const co2 = bloc('ac-l-mvts', 'Derniers mouvements', 'Tout voir',
+                   () => ouvrirActivites())
+  co2.innerHTML = '<div class="ac-l-rien">Chargement\u2026</div>'
+
+  /* ⚠ ON REVÉRIFIE QUE LA ZONE EST TOUJOURS LÀ. Entre le départ de la requête
+     et sa réponse, l'accueil a pu être repeint — changement d'établissement,
+     déconnexion. Écrire dans un élément détaché ne lève aucune erreur : le
+     texte part simplement dans le vide, et on cherche longtemps pourquoi la
+     liste reste sur « Chargement ». */
+  collecterActivites().then(faits => {
+    if (!document.body.contains(co2)) return
+    const trois = (faits || []).slice(0, 3)
+    co2.innerHTML = trois.length ? trois.map(f => `
+      <div class="ac-l-lig">
+        <span class="act-ic act-${f.genre}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">${ACT_DESSINS[f.genre]}</svg>
+        </span>
+        <span class="co">
+          <span class="nm">${f.texte}</span>
+          ${f.detail ? `<span class="st">${f.detail}</span>` : ''}
+        </span>
+        <span class="vl">${depuisQuandCourt(f.quand)}</span>
+      </div>`).join('')
+      : '<div class="ac-l-rien">Aucun mouvement ces derni\u00e8res semaines.</div>'
+  }).catch(e => {
+    if (!document.body.contains(co2)) return
+    /* On dit que ça a échoué plutôt que de laisser « Chargement » indéfiniment.
+       Une attente sans fin ressemble à une app cassée ; un message est une
+       information. */
+    co2.innerHTML = '<div class="ac-l-rien">Mouvements indisponibles.</div>'
+    console.warn('[accueil] mouvements :', e?.message || e)
+  })
 }
+
+/* ⚠ QUATRE FONCTIONS ONT ÉTÉ RETIRÉES ICI.
+
+   `peindreRecentesAccueil`, `lancerAnneauQuota`, `tuileAccueil` et
+   `tuileQuota` dessinaient les trois tuiles de l'ancien accueil et les deux
+   boutons qui le fermaient. Plus rien ne les appelle depuis la refonte.
+
+   Elles sont supprimées plutôt que laissées en place : ce fichier a déjà payé
+   le prix des fonctions mortes — `openEditProcedure` et `ouvrirAnTemps` ont
+   coûté des heures à qui croyait modifier un écran vivant.
+
+   `iconeAccueil` et `AC_ICONES`, elles, RESTENT : `chiffreAccueil` s'en sert.
+   `vignetteProcedure` aussi, pour la page des procédures récentes. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PAGE DES PROCÉDURES RÉCENTES
@@ -6972,6 +7107,13 @@ const AC_ICONES = {
              <path d="M20.6 20.2v-1.7a3.2 3.2 0 0 0-2.4-3.1"/>
              <path d="M15.1 4.9a3.2 3.2 0 0 1 0 6.1"/>`,
 
+  /* Une procédure OUVERTE : le feuillet, et la coche de celui qui l'a lue.
+     C'est le même dessin que `ACT_DESSINS.lecture`, dans le journal des
+     mouvements — la même chose comptée doit porter le même signe. */
+  lecture:  `<path d="M13.4 3.2H7.6a2 2 0 0 0-2 2v13.6a2 2 0 0 0 2 2h8.8a2 2 0 0 0 2-2V8.2Z"/>
+             <path d="M13.4 3.2v5h5"/>
+             <path d="M8.9 15.6l2 2 4.2-4.6" stroke-linecap="round"/>`,
+
 }
 
 function iconeAccueil(cle) {
@@ -6994,92 +7136,6 @@ function iconeAccueil(cle) {
   </span>`
 }
 
-/* ═══ LE REMPLISSAGE DE L'ANNEAU, UNE FOIS POSÉ ═══
-
-   Deux images d'attente au lieu d'une : la première laisse le navigateur
-   calculer la position de l'élément, la seconde déclenche la transition. Un
-   seul `requestAnimationFrame` suffit sur ordinateur ; sur un téléphone qui
-   compose plus lentement, la mesure et le changement tombaient dans la même
-   image et la transition était ignorée.
-
-   `getBoundingClientRect()` force le calcul plutôt que de l'espérer : lire une
-   position oblige le navigateur à résoudre la mise en page en attente. C'est
-   la façon habituelle de garantir un état de départ. */
-function lancerAnneauQuota(tuile) {
-  const arc = tuile?.querySelector('.arc')
-  if (!arc) return
-  arc.getBoundingClientRect()
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => { arc.style.strokeDashoffset = '0' })
-  })
-}
-
-/* Une tuile ordinaire : icône, titre, valeur, note. */
-function tuileAccueil({ titre, valeur, note, tendance, icone }) {
-  const el = document.createElement('div')
-  el.className = 'an-bloc ac-tuile'
-  /* La couleur de la tendance porte un sens, pas une décoration : au-dessus de
-     zéro on a plus analysé que le mois d'avant, en dessous on a ralenti. Le
-     gris quand il n'y a rien à comparer. */
-  const cls = tendance == null ? '' : tendance >= 0 ? ' hausse' : ' baisse'
-  el.innerHTML = `
-    ${iconeAccueil(icone)}
-    <div class="ac-t">${escapeHtml(titre)}</div>
-    <div class="ac-v">${escapeHtml(valeur)}</div>
-    <div class="ac-n${cls}">${escapeHtml(note)}</div>`
-  return el
-}
-
-/* La tuile du quota : un anneau, le pourcentage au centre, le rapport dessous. */
-function tuileQuota(utilisees, quota) {
-  const el = document.createElement('div')
-  el.className = 'an-bloc ac-tuile ac-tuile--anneau'
-
-  if (!quota) {
-    /* Pas de plafond connu : on ne dessine pas d'anneau vide, on dit ce qu'on
-       sait. Un anneau à zéro laisserait croire qu'il ne reste rien. */
-    el.innerHTML = `
-      ${iconeAccueil('ia')}
-      <div class="ac-t">Analyses vidéo IA</div>
-      <div class="ac-v">${utilisees == null ? '—' : utilisees}</div>
-      <div class="ac-n">ce mois-ci</div>`
-    return el
-  }
-
-  const pct = Math.max(0, Math.min(100, Math.round((utilisees / quota) * 100)))
-  /* 132 px, avec un trait de 12 : l'épaisseur suit le diamètre, sinon un grand
-     cercle tracé fin paraît fragile. */
-  const T = 132, ep = 12, r = (T - ep) / 2, circ = 2 * Math.PI * r
-  const rempli = circ * (pct / 100)
-
-  el.innerHTML = `
-    ${iconeAccueil('ia')}
-    <div class="ac-t">Analyses vidéo IA</div>
-    <div class="ac-anneau">
-      <svg width="${T}" height="${T}">
-        <circle cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
-                stroke="rgba(255,255,255,0.09)" stroke-width="${ep}"/>
-        <circle class="arc" cx="${T / 2}" cy="${T / 2}" r="${r}" fill="none"
-                stroke="url(#acDegrade)" stroke-width="${ep}" stroke-linecap="round"
-                stroke-dasharray="${rempli} ${circ}" stroke-dashoffset="${circ}"/>
-      </svg>
-      <span class="ac-pct">${pct}<em>%</em></span>
-    </div>
-    <div class="ac-n">${utilisees} / ${quota} utilisées</div>`
-
-  /* ═══ L'ANIMATION NE PART PAS D'ICI ═══
-
-     `requestAnimationFrame` était appelé AVANT que la tuile soit ajoutée à la
-     page. L'élément n'existant pas encore dans le document, le navigateur n'a
-     aucun état de départ à interpoler : sur ordinateur il rattrape, sur
-     téléphone — plus lent à composer — l'anneau saute d'un coup à sa valeur,
-     ou reste figé à zéro.
-
-     C'est `lancerAnneauQuota`, appelée après `appendChild`, qui s'en charge
-     maintenant. La règle générale : on n'anime jamais un élément qui n'est pas
-     encore dans la page. */
-  return el
-}
 
 /* Un appui sur l'avatar ouvre le support, avec la même fenêtre que partout. */
 
@@ -16674,6 +16730,65 @@ function nombreDeMembres() {
   return Math.max(1, (cachedMembres || []).length)
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE PICTOGRAMME DE L'OFFRE
+
+   Une plaque ronde en tête de carte, à gauche du nom. Elle ne décore pas :
+   elle dit d'un coup d'œil de quelle TAILLE d'équipe on parle — une personne,
+   un binôme, un groupe, un réseau de sites.
+
+   ⚠ Les dessins sont écrits POUR UNE BOÎTE DE 24, mais `logoOrIc` est déclaré
+     en `userSpaceOnUse` sur 24 × 24 : au-delà, tout reçoit la couleur de fin.
+     La plaque affiche le dessin à 22 px, donc on reste dans les clous. Un jour
+     où elle grandirait, il faudra passer à `orLibre`.
+
+   Il vit à côté du tableau des offres plutôt que dedans : `OFFRES` porte des
+   prix et des limites, des choses qui se discutent. Un tracé SVG n'a rien à
+   y faire. */
+function iconeOffre(cle) {
+  const t = 'stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"'
+  const dessins = {
+    // Une personne : l'offre d'un artisan et de ses quelques mains.
+    essentiel: `<circle cx="12" cy="8.2" r="3.4" ${t}/>
+                <path d="M5.6 19.4a6.4 6.4 0 0 1 12.8 0" ${t}/>`,
+    // Deux personnes côte à côte.
+    equipe: `<circle cx="9.2" cy="8.6" r="3.1" ${t}/>
+             <path d="M3.6 19.2a5.6 5.6 0 0 1 11.2 0" ${t}/>
+             <path d="M16.2 6.2a3 3 0 0 1 0 5.6M17 14.2a5.4 5.4 0 0 1 3.4 5" ${t}/>`,
+    // Un groupe : trois têtes, celle du milieu en avant.
+    pro: `<circle cx="12" cy="7.4" r="3" ${t}/>
+          <path d="M6.8 18.6a5.2 5.2 0 0 1 10.4 0" ${t}/>
+          <path d="M5.6 9.4a2.5 2.5 0 1 0 0-.1M2.6 17.4a4.4 4.4 0 0 1 2.6-3.5" ${t}/>
+          <path d="M21.4 17.4a4.4 4.4 0 0 0-2.6-3.5" ${t}/>
+          <circle cx="18.6" cy="9.3" r="2.5" ${t}/>`,
+    /* ═══ LE RÉSEAU, REDESSINÉ ═══
+
+       Le premier essai avait trois anneaux évidés de rayon 2,6 et des traits
+       qui leur rentraient dedans : à 22 px, les traits touchaient les cercles
+       et l'ensemble faisait une tache. Deux corrections.
+
+       Les nœuds sont PLEINS. Un anneau de 2,6 px de rayon avec un trait de
+       1,7 ne laisse qu'un point de vide au centre — autant le remplir : le
+       disque se lit, l'anneau bavait.
+
+       Les liaisons S'ARRÊTENT AVANT les nœuds. Elles courent de 8,3 à 15,7
+       en ordonnée, soit un vide de deux pixels de part et d'autre. C'est ce
+       blanc qui fait qu'on voit trois objets reliés plutôt qu'un Y massif.
+
+       Le nœud du haut est un demi-pixel plus gros : c'est le parent, et la
+       hiérarchie se lit sans qu'on ait à l'expliquer. */
+    reseau: `<path d="M12 8.6v3.1M12 11.7 7.4 15.2M12 11.7l4.6 3.5" ${t}/>
+             <circle cx="12" cy="6.2" r="2.5" fill="url(#logoOrIc)" stroke="none"/>
+             <circle cx="6.1" cy="17.3" r="2.2" fill="url(#logoOrIc)" stroke="none"/>
+             <circle cx="17.9" cy="17.3" r="2.2" fill="url(#logoOrIc)" stroke="none"/>`,
+    // Un bâtiment : au-delà du réseau, c'est une organisation.
+    entreprise: `<path d="M4.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6.4a1.6 1.6 0 0 1 1.6 1.6v14.2" ${t}/>
+                 <path d="M14 10.4h4a1.6 1.6 0 0 1 1.6 1.6v8.4M2.6 20.4h18.8" ${t}/>
+                 <path d="M7.6 8.6h3M7.6 12.2h3M7.6 15.8h3" ${t}/>`,
+  }
+  return `<svg viewBox="0 0 24 24" fill="none">${dessins[cle] || dessins.equipe}</svg>`
+}
+
 function offrePourTaille(n) {
   return OFFRES.find(o => n <= o.max) || OFFRES[OFFRES.length - 1]
 }
@@ -16778,7 +16893,14 @@ function carteOffre(o, opts = {}) {
          decoratif plutot que soigne. La carte se tient par sa matiere et sa
          typographie. -->
 
-    <div class="offre-nom">${o.nom}</div>
+    <!-- ═══ LA LIGNE DE TÊTE ═══
+         Plaque ronde et nom sur la même ligne. Le nom seul flottait en haut
+         d'une carte de six cents pixels ; la plaque lui donne un point
+         d'appui et dit la taille d'équipe avant qu'on lise le chiffre. -->
+    <div class="offre-tete">
+      <span class="offre-plaque">${iconeOffre(o.cle)}</span>
+      <div class="offre-nom">${o.nom}</div>
+    </div>
 
     <!-- LE PRIX SUIT LE RYTHME CHOISI. Il affichait toujours le tarif MENSUEL :
          basculer sur Annuel ne changeait rien au grand chiffre, on lisait 69
@@ -16786,8 +16908,13 @@ function carteOffre(o, opts = {}) {
     <div class="offre-prix">
       ${surDevis ? `<span class="v">Sur devis</span>`
         : `<span class="v">${prixAffiche} €</span>
-           <span class="u">par mois, hors taxes${rythmeChoisi === 'annuel' ? '<br>factur\u00e9 \u00e0 l\u2019ann\u00e9e' : ''}</span>`}
+           <span class="u">/ mois, hors taxes${rythmeChoisi === 'annuel' ? '<br>factur\u00e9 \u00e0 l\u2019ann\u00e9e' : ''}</span>`}
     </div>
+
+    <!-- Un filet, pas une marge : il sépare ce qu'on paie de ce qu'on reçoit.
+         Sur une carte aussi haute, un simple blanc laissait les deux blocs
+         se confondre. -->
+    <div class="offre-filet"></div>
     <!-- ═══ « SOIT X € PAR PERSONNE » A ÉTÉ RETIRÉ ═══
 
          Il divisait le prix de l'offre par le nombre RÉEL de membres. Sur une
@@ -16806,7 +16933,7 @@ function carteOffre(o, opts = {}) {
            texte, la pastille en fait un signe. -->
       ${inclus.map(t => `<div class="offre-li">
         <i><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11"
-             fill="rgba(255,159,10,0.14)" stroke="rgba(255,173,51,0.42)" stroke-width="1"/>
+             fill="rgba(4,4,6,0.78)" stroke="rgba(255,173,51,0.46)" stroke-width="1"/>
            <path d="M7.6 12.3l3 3 5.8-6.4" stroke="#FDA81E" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round"/></svg></i>
         <span>${t}</span></div>`).join('')}
@@ -16853,11 +16980,16 @@ function carteOffre(o, opts = {}) {
            en découle par division : les deux ne peuvent plus diverger. */
         ? `Activer \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac par an`
         : `Activer \u00b7 ${o.prix} \u20ac par mois`
-    }</button>` : ''}
-    ${opts.gerer ? `
-    <!-- Résilier doit être aussi simple que souscrire : le lien est ICI, sous
-         l'offre, pas caché dans un recoin des paramètres. -->
-    <button type="button" class="offre-gerer" data-abo-gerer>G\u00e9rer ou r\u00e9silier mon abonnement</button>` : ''}
+    }<span class="fl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12h14"/>
+        <polyline points="13.2 6.4 19 12 13.2 17.6"/></svg></span></button>` : ''}
+    <!-- ⚠ « GÉRER OU RÉSILIER » N'EST PLUS ICI. C'est devenu une ligne de
+         réglage sous la carte, peinte dans abo-gerer par renderAbonnements.
+         Sous le bouton d'action, les deux gestes opposés se touchaient.
+
+         ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE. Il est à l'intérieur
+           d'un gabarit de chaîne : le premier accent grave le refermerait,
+           et le reste de la carte deviendrait du code. -->
   </div>`
 }
 
@@ -16910,6 +17042,31 @@ window.renderAbonnements = function() {
     membres: n,
     detaille: true,
   })
+
+  /* ═══ GÉRER OU RÉSILIER, SOUS LA CARTE ═══
+
+     Une ligne de réglage du même moule que celles des Réglages — `reg-groupe`,
+     `reg-ligne`, plaque, libellé, chevron. Aucune classe nouvelle : cette
+     ligne fait le même geste que ses cousines, elle doit s'y ressembler.
+
+     Elle n'apparaît que si l'on paie vraiment. Sans abonnement, « résilier »
+     n'a rien à résilier, et le portail Stripe répondrait en erreur. */
+  const gerer = document.getElementById('abo-gerer')
+  if (gerer) {
+    gerer.innerHTML = estActuelle ? `
+      <div class="reg-groupe">
+        <button type="button" class="reg-ligne" data-abo-gerer>
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 7.4h9M17.4 7.4h2.6M4 16.6h2.6M11 16.6h9"
+                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="15.2" cy="7.4" r="2.4" stroke="url(#logoOrIc)" stroke-width="1.7"/>
+            <circle cx="8.8" cy="16.6" r="2.4" stroke="url(#logoOrIc)" stroke-width="1.7"/>
+          </svg></span>
+          <span class="reg-nm">G\u00e9rer ou r\u00e9silier mon abonnement</span>
+          <span class="fl">\u203a</span>
+        </button>
+      </div>` : ''
+  }
 
   /* UN SEUL ENFANT DANS LA LISTE. Le repli se fait en passant la hauteur de
      `0fr` à `1fr` — une bascule qui suppose une seule piste. Avec une carte par
@@ -19818,7 +19975,11 @@ function peindrePublication(proc) {
     ic.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9"/><path d="M8.4 12.2l2.6 2.6 4.6-5.2"/></svg>`
-    ti.textContent = 'En ligne pour votre équipe'
+    /* ⚠ « EN LIGNE », PAS « EN LIGNE POUR VOTRE ÉQUIPE ». Le titre long se
+       cassait en deux lignes entre la pastille et le bouton, et la carte
+       montait d'un cran. Pour qui : le bouton « Retirer » juste à côté et la
+       page entière le disent déjà. */
+    ti.textContent = 'En ligne'
     /* La date, pas seulement le fait : « publiée » sans quand laisse penser
        que c'est peut-être ancien, ou peut-être à l'instant. */
     so.textContent = 'Depuis le ' + dateEnClair(proc.publiee_le)
@@ -19837,8 +19998,16 @@ function peindrePublication(proc) {
        Ta phrase, allégée : « seuls ceux qui ont accès à l'espace gestion
        peuvent y accéder » répétait « accès » deux fois en six mots. */
     ti.textContent = 'Brouillon'
-    so.textContent = 'Visible par l’espace gestion uniquement. ' +
-                     'Publiez-la pour que votre équipe puisse la lire.'
+    /* ═══ UNE LIGNE, PAS TROIS ═══
+
+       « Visible par l'espace gestion uniquement. Publiez-la pour que votre
+       équipe puisse la lire. » disait deux fois la même chose et faisait
+       monter la carte à trois lignes de texte.
+
+       Ce qui compte tient en six mots : l'équipe ne la voit pas. Le bouton
+       juste à côté dit déjà quoi faire — le répéter en toutes lettres, c'est
+       expliquer un bouton qui n'en a pas besoin. */
+    so.textContent = 'Votre équipe ne la voit pas'
     bt.textContent = 'Publier'
     bt.className = 'pub-btn'
   }

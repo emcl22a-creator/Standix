@@ -962,11 +962,15 @@ h2.chiffres{
    Elles sont posees en pourcentage, jamais en pixels : la photo se redimensionne
    avec la page, elles doivent suivre le meme mouvement.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* Meme largeur et meme fondu bas que le visuel du premier ecran : les deux
+   images sont les deux faces du meme objet, elles ne peuvent pas avoir des
+   tailles ni des traitements differents. */
 .scene{
-  position:relative; margin:0 0 40px;
+  position:relative; margin:0 auto 40px;
+  width:min(308px, 86%);
   border-radius:20px; overflow:hidden;
-  box-shadow:0 26px 60px rgba(0,0,0,.5),
-             inset 0 0 0 .5px rgba(255,255,255,.12);
+  -webkit-mask-image:linear-gradient(180deg,#000 70%,transparent 88%);
+          mask-image:linear-gradient(180deg,#000 70%,transparent 88%);
 }
 .scene img{ display:block; width:100%; height:auto }
 /* Le voile sombre a ete retire : la photo est rendue telle quelle. Les
@@ -974,51 +978,47 @@ h2.chiffres{
    en consequence. */
 .pastille{
   position:absolute; z-index:2;
-  padding:11px 18px; border-radius:100px;
-  background:rgba(16,18,22,.62);
-  -webkit-backdrop-filter:blur(14px) saturate(160%);
-          backdrop-filter:blur(14px) saturate(160%);
+  padding:7px 14px; border-radius:100px;
+  /* ═══ MEME MATIERE QUE LA BARRE ═══
+     Valeurs reprises telles quelles de l'en-tete : 42 % d'opacite, flou de
+     26 px, saturation a 180 %. C'est `saturate` qui fait la difference entre
+     un flou et du verre — un flou seul delave ce qui passe dessous, la
+     saturation le ravive. */
+  background:rgba(8,9,10,.42);
+  -webkit-backdrop-filter:blur(26px) saturate(180%);
+          backdrop-filter:blur(26px) saturate(180%);
   box-shadow:inset 0 1px 0 rgba(255,255,255,.22),
              inset 0 0 0 .5px rgba(255,255,255,.16),
              0 10px 26px rgba(0,0,0,.4);
 }
-.pastille b{ display:block; font-size:15px; font-weight:500; color:var(--t1);
+.pastille b{ display:block; font-size:13px; font-weight:500; color:var(--t1);
   letter-spacing:-.02em; line-height:1.15 }
-.pastille span{ display:block; font-size:11.5px; color:rgba(255,255,255,.62);
+/* `nowrap` : « ecrites par l'IA » passait sur deux lignes et deformait la
+   pastille, qui n'avait plus la meme hauteur que les deux autres. */
+.pastille span{ display:block; white-space:nowrap; font-size:10.5px; color:rgba(255,255,255,.62);
   line-height:1.3; margin-top:2px }
-.p1{ left:4%;  top:9% }
-.p2{ right:5%; top:36% }
-.p3{ left:8%;  bottom:9% }
+/* Les pastilles sont centrees sur l'extremite de leur trait — memes
+   coordonnees, exprimees en pourcentage de l'image. Deplacer un point du SVG
+   sans deplacer sa pastille les desolidariserait. */
+.p1{ left:14.7%; top:26.2%; transform:translate(-50%,-50%) }
+.p2{ left:69.0%; top:38.0%; transform:translate(-50%,-50%) }
+.p3{ left:21.2%; top:76.0%; transform:translate(-50%,-50%) }
 
-/* ═══ LES FILINS QUI DESIGNENT ═══
-
-   Un trait fin part de chaque pastille vers ce dont elle parle : le telephone
-   pour les deux premieres, l'homme pour la troisieme. Sans eux, les pastilles
-   flottent sans rien designer — c'etait le manque.
-
-   Trait plein cote pastille, estompe a l'autre bout : il montre une direction
-   sans encercler l'objet, ce qui ferait schema technique. Le petit disque au
-   bout remplace une pointe de fleche, trop appuyee sur une photo. */
-.pastille::after{
-  content:''; position:absolute;
-  height:1px; width:var(--fil, 58px);
-  top:50%; pointer-events:none;
-  background:linear-gradient(var(--sens, 90deg),
-    rgba(255,255,255,.55), rgba(255,255,255,.10));
+/* Le SVG couvre exactement l'image : `preserveAspectRatio:none` avec un viewBox
+   aux dimensions du fichier, donc chaque coordonnee tombe ou on l'attend quelle
+   que soit la taille d'affichage. */
+.filins{
+  position:absolute; inset:0; width:100%; height:100%;
+  z-index:1; pointer-events:none;
 }
-.pastille::before{
-  content:''; position:absolute;
-  width:5px; height:5px; border-radius:50%;
-  top:calc(50% - 2px); pointer-events:none;
-  background:rgba(255,255,255,.55);
-  box-shadow:0 0 0 3px rgba(255,255,255,.10);
+/* L'onde s'ecarte du point et s'efface. Un mouvement lent et unique : c'est ce
+   qui attire l'oeil sans donner l'impression que quelque chose charge. */
+.onde{ transform-origin:390px 666px; animation:onde 2.8s ease-out infinite }
+@keyframes onde{
+  0%   { transform:scale(1);   stroke-opacity:.5 }
+  70%  { transform:scale(4.2); stroke-opacity:0 }
+  100% { transform:scale(4.2); stroke-opacity:0 }
 }
-.p1::after{ left:100%; --fil:64px }
-.p1::before{ left:calc(100% + 64px) }
-.p2::after{ right:100%; --sens:270deg; --fil:70px }
-.p2::before{ right:calc(100% + 70px) }
-.p3::after{ left:100%; --fil:52px }
-.p3::before{ left:calc(100% + 52px) }
 
 @media (min-width: 820px){
   .p1::after{ --fil:96px }  .p1::before{ left:calc(100% + 96px) }
@@ -1027,13 +1027,14 @@ h2.chiffres{
 }
 
 @media (min-width: 820px){
-  .scene{ margin-bottom:54px }
-  .pastille{ padding:13px 24px; border-radius:100px }
-  .pastille b{ font-size:18px }
-  .pastille span{ font-size:12.5px }
-  .p1{ left:6%; top:12% }
-  .p2{ right:7%; top:38% }
-  .p3{ left:10%; bottom:11% }
+  .scene{ width:100%; max-width:400px; margin-bottom:54px }
+  .pastille{ padding:9px 18px; border-radius:100px }
+  .pastille b{ font-size:15px }
+  .pastille span{ font-size:11.5px }
+  /* Aucune position ici : elles sont fixees une seule fois, en pourcentage, sur
+     les extremites des traits. Redeclarer `bottom` alors que `top` est deja
+     pose etirait la pastille sur toute la hauteur entre les deux — c'est ce qui
+     produisait la tache sous « 3 langues », haute de 248 px au lieu de 65. */
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2453,17 +2454,42 @@ footer .marque{ margin-bottom:18px; }
   <figure class="scene app">
     <img src="atelier.webp" width="1086" height="1448" loading="lazy"
          alt="Un responsable consulte une procédure Standix sur son téléphone, dans son atelier">
-    <!-- Trois pastilles, pas plus. Au-dela, ca devient un tableau de bord pose
-         sur une photo, et le montage se voit. Chacune porte un chiffre verifiable. -->
-    <figcaption class="pastille p1">
-      <b>3:13</b><span>de vidéo</span>
-    </figcaption>
-    <figcaption class="pastille p2">
-      <b>6 étapes</b><span>écrites par l'IA</span>
-    </figcaption>
-    <figcaption class="pastille p3">
-      <b>3 langues</b><span>pour toute l'équipe</span>
-    </figcaption>
+    <!-- ═══ TOUT CONVERGE SUR LE TELEPHONE ═══
+
+         Le telephone est a 41,9 % / 45,0 % de l'image — detecte, pas estime.
+         Les trois traits partent des pastilles et s'arretent tous sur ce point,
+         ou un halo pulse doucement.
+
+         Les traits sont traces en SVG et non en CSS : il faut des diagonales
+         d'angles differents, ce qu'une bordure ne sait pas faire. Le viewBox
+         reprend les dimensions de l'image, donc les coordonnees sont celles de
+         la photo elle-meme. -->
+    <svg class="filins" viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="fil1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
+        </linearGradient>
+        <linearGradient id="fil2" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
+        </linearGradient>
+        <linearGradient id="fil3" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
+        </linearGradient>
+      </defs>
+      <line x1="160" y1="380" x2="390" y2="666" stroke="url(#fil1)" stroke-width="2.5"/>
+      <line x1="750" y1="550" x2="390" y2="666" stroke="url(#fil2)" stroke-width="2.5"/>
+      <line x1="230" y1="1100" x2="390" y2="666" stroke="url(#fil3)" stroke-width="2.5"/>
+      <circle class="cible" cx="390" cy="666" r="7" fill="#fff" fill-opacity=".9"/>
+      <circle class="onde" cx="390" cy="666" r="7" fill="none"
+              stroke="#fff" stroke-opacity=".5" stroke-width="1.6"/>
+    </svg>
+
+    <figcaption class="pastille p1"><b>3:13</b><span>de vidéo</span></figcaption>
+    <figcaption class="pastille p2"><b>6 étapes</b><span>écrites par l'IA</span></figcaption>
+    <figcaption class="pastille p3"><b>3 langues</b><span>pour toute l'équipe</span></figcaption>
   </figure>
 
   <p class="surtitre app">La différence</p>

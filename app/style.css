@@ -8428,7 +8428,11 @@ body:has(#e-detail.active) #equipe-app{
      nous ». On ne le neutralise plus : il complète le modelé au lieu de le
      remplacer. */
   /* Le fond vient toujours de `.an-bloc`. Seules les deux ombres s'ajoutent. */
-  box-shadow:0 14px 34px rgba(0,0,0,0.42),
+  /* ⚠ CETTE RÈGLE REDÉCLARE `box-shadow` EN ENTIER. Le second liseré des
+     cartes est donc recopié ici : sans lui, les tuiles seraient les seules
+     à ne pas l'avoir. Toute modification là-bas se reporte ici. */
+  box-shadow:0 0 0 0.5px rgba(255,255,255,0.10),
+             0 14px 34px rgba(0,0,0,0.42),
              0 0 30px -14px rgba(255,255,255,0.10);
 }
 
@@ -9336,7 +9340,24 @@ body:has(#e-detail.active) #equipe-app{
      Chacune garde le sien — `--bg-card` pour les unes, leur propre teinte pour
      les autres. Seul le MODELÉ s'ajoute : les lueurs de coin ci-dessous, et
      les deux ombres portées ici. */
-  box-shadow:0 14px 34px rgba(0,0,0,0.42),
+  /* ═══ LE SECOND LISERÉ ═══
+
+     Un deuxième trait de 0,5 px, blanc comme le premier, posé juste à
+     l'EXTÉRIEUR du bord. Celui de `::before` est un dégradé rasant — vif aux
+     coins, presque éteint au milieu des côtés. Celui-ci est uniforme : il
+     ferme le contour là où l'autre s'efface, et le bord se lit d'un trait
+     continu sur tout le tour.
+
+     Il est en ombre portée sans flou (`0 0 0 0.5px`) plutôt qu'en `outline` :
+     l'`outline` ne suit le rayon des coins qu'à partir de Safari 16.4, et un
+     rectangle à angles droits autour d'une carte arrondie, sur un téléphone
+     de terrain resté en iOS 15, serait pire que pas de trait du tout.
+
+     ⚠ IL VIENT EN PREMIER DANS LA LISTE. Les ombres se peignent de la
+       dernière à la première : écrit en fin de liste, il passerait sous
+       l'ombre sombre et le blanc y perdrait. */
+  box-shadow:0 0 0 0.5px rgba(255,255,255,0.10),
+             0 14px 34px rgba(0,0,0,0.42),
              0 0 30px -14px rgba(255,255,255,0.10);
 }
 
@@ -9657,6 +9678,25 @@ body:has(#e-detail.active) #equipe-app{
 }
 .pub-btn:active{ transform:scale(0.96); }
 .pub-btn:disabled{ opacity:0.5; }
+
+/* ─── L'AIR SOUS LE BANDEAU, QUAND IL Y A UNE VIDÉO ───────────────────────
+   Les 18 px du bandeau suffisent devant un titre de section, pas devant un
+   bloc noir de 16/9 : la vidéo est lourde à l'œil, elle remonte sur le
+   bandeau et les deux se lisent comme un seul objet.
+
+   La marge est portée par la vidéo, pas par le bandeau : `#analyse-video-frame`
+   est en `display:none` pour une procédure écrite à la main ou tirée d'un
+   document, donc l'écart n'existe QUE pour les procédures vidéo — sans avoir
+   à le décider en JavaScript.
+
+   ⚠ LES MARGES FUSIONNENT. Les 18 px du bandeau et cette valeur ne s'ajoutent
+     pas : le navigateur garde la plus grande des deux. Un `margin-top:14px`
+     ne changeait donc RIEN — mesuré, l'écart restait à 18 px. La valeur écrite
+     ici est l'écart final, pas un supplément.
+
+   ⚠ Le style direct du balisage ne pose que `margin-bottom` : `margin-top`
+     n'entre en conflit avec rien, la règle s'applique sans `!important`. */
+#analyse-video-frame{ margin-top:32px; }
 
 /* ─── L'ÉTAT PUBLIÉ ───────────────────────────────────────────────────────
    Vert sourd, pas vif : c'est une confirmation, pas une alerte. Et le bouton

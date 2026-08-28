@@ -637,6 +637,30 @@ h1 em{ font-style:normal; color:var(--t1); }
     rgba(255,255,255,.46), rgba(var(--halo),.08) 48%, transparent 72%);
   filter:blur(22px); pointer-events:none;
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX SCENES
+
+   Superposees, une seule visible. Le conteneur porte le rapport de l'image —
+   1086/1448 — donc sa hauteur est connue avant meme que les fichiers arrivent :
+   rien ne saute au chargement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* `margin:0 auto` : le bloc se centre dans sa colonne. Sans lui il se calait
+   a gauche des que sa largeur etait bridee. */
+.duo{
+  position:relative; width:100%; max-width:400px; margin:0 auto;
+  aspect-ratio:1086/1448;
+  border-radius:22px; overflow:hidden;
+  -webkit-mask-image:linear-gradient(180deg,#000 78%,transparent 96%);
+          mask-image:linear-gradient(180deg,#000 78%,transparent 96%);
+}
+.vue-scene{
+  position:absolute; inset:0; margin:0;
+  opacity:0; transition:opacity 1.1s var(--ec);
+  pointer-events:none;
+}
+.vue-scene.on{ opacity:1; pointer-events:auto }
+.scene-img{ display:block; width:100%; height:100%; object-fit:cover }
+
 .telephone{
   position:relative; z-index:1;
   /* 300 -> 336 px, et 82 -> 88 % de la largeur disponible. Le telephone est
@@ -976,6 +1000,52 @@ h2.chiffres{
 /* Le voile sombre a ete retire : la photo est rendue telle quelle. Les
    pastilles gardent leur lisibilite par leur propre fond en verre, plus opaque
    en consequence. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ENTREE DES REPERES
+
+   Les trois arrivent l'un apres l'autre, 220 ms d'ecart, apres l'image. Chacun
+   monte de 10 px en grandissant de 96 a 100 % — le meme mouvement d'approche
+   que le premier ecran, en plus court parce que l'objet est petit.
+
+   Les traits se dessinent AVANT eux : `stroke-dasharray` egale a la longueur du
+   trait, `stroke-dashoffset` qui revient a zero. Le trait part de la pastille et
+   court vers le telephone, donc le regard suit le meme chemin que le sens de
+   lecture.
+
+   Les longueurs sont calculees a la main depuis les coordonnees du SVG — un
+   `getTotalLength()` en JavaScript ferait la meme chose, mais imposerait
+   d'attendre le script pour afficher quoi que ce soit.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.filins line{
+  stroke-dasharray:1200; stroke-dashoffset:1200;
+  animation:trace 1.1s var(--ec) forwards;
+}
+.filins line:nth-of-type(1){ animation-delay:.55s }
+.filins line:nth-of-type(2){ animation-delay:.77s }
+.filins line:nth-of-type(3){ animation-delay:.99s }
+@keyframes trace{ to{ stroke-dashoffset:0 } }
+
+.cible{ opacity:0; animation:cible .5s ease 1.5s forwards }
+@keyframes cible{ to{ opacity:1 } }
+
+/* Le centrage est integre aux images-cles. Une pastille est positionnee par son
+   coin ; sans `translate(-50%,-50%)`, elle se decale vers la droite et vers le
+   bas de la moitie de sa taille. Comme l'animation ecrit `transform`, le
+   centrage doit y figurer a chaque etape, sinon il saute a la derniere image. */
+.pastille{
+  opacity:0;
+  transform:translate(-50%,-50%) translateY(10px) scale(.96);
+  animation:repere .8s var(--ec) forwards;
+}
+@keyframes repere{ to{ opacity:1; transform:translate(-50%,-50%) } }
+
+/* En mouvement reduit, tout est la d'emblee. */
+@media (prefers-reduced-motion: reduce){
+  .filins line{ animation:none; stroke-dashoffset:0 }
+  .pastille{ animation:none; opacity:1; transform:translate(-50%,-50%) }
+  .cible{ animation:none; opacity:1 }
+}
+
 .pastille{
   position:absolute; z-index:2;
   padding:7px 14px; border-radius:100px;
@@ -1000,9 +1070,9 @@ h2.chiffres{
 /* Les pastilles sont centrees sur l'extremite de leur trait — memes
    coordonnees, exprimees en pourcentage de l'image. Deplacer un point du SVG
    sans deplacer sa pastille les desolidariserait. */
-.p1{ left:28.0%; top:12.0%; transform:translate(-50%,-50%) }
-.p2{ left:70.0%; top:76.0%; transform:translate(-50%,-50%) }
-.p3{ left:30.0%; top:80.0%; transform:translate(-50%,-50%) }
+.p1{ left:23.0%; top:22.8%; animation-delay:.75s }
+.p2{ left:63.0%; top:38.7%; animation-delay:.97s }
+.p3{ left:27.0%; top:75.3%; animation-delay:1.19s }
 
 /* Le SVG couvre exactement l'image : `preserveAspectRatio:none` avec un viewBox
    aux dimensions du fichier, donc chaque coordonnee tombe ou on l'attend quelle
@@ -1011,13 +1081,7 @@ h2.chiffres{
   position:absolute; inset:0; width:100%; height:100%;
   z-index:1; pointer-events:none;
 }
-/* L'onde s'ecarte du point et s'efface. Un mouvement lent et unique : c'est ce
-   qui attire l'oeil sans donner l'impression que quelque chose charge. */
-.onde{ transform-origin:542px 434px; animation:onde 2.8s ease-out infinite }
-@keyframes onde{
-  0%   { transform:scale(1);   stroke-opacity:.5 }
-  70%  { transform:scale(4.2); stroke-opacity:0 }
-  100% { transform:scale(4.2); stroke-opacity:0 }
+/* L'animation de l'onde a ete retiree avec le cercle. */
 }
 
 @media (min-width: 820px){
@@ -2302,10 +2366,49 @@ footer .marque{ margin-bottom:18px; }
      La galerie à trois vues — pastilles, libellé, défilement — est retirée.
      L'image porte le châssis ET la barre du navigateur affichant standix.app :
      elle prouve que le produit tourne. Fond transparent, rien à ajouter. -->
+<!-- ═══ DEUX SCENES QUI SE RELAIENT ═══
+
+     La capture detouree a laisse la place a deux photos d'atelier. Elles ont
+     exactement le meme format — 1086 x 1448 — donc rien ne saute au changement.
+
+     Les reperes ne sont poses que sur la PREMIERE : sur la seconde, l'ecran du
+     telephone est lisible et trois etiquettes le masqueraient. -->
 <div class="tel-cadre flou r4">
-<img class="telephone" src="vue-telephone.webp"
-     alt="Une procédure Standix ouverte dans un navigateur mobile"
-     width="1105" height="1908">
+<div class="duo" id="duo">
+  <figure class="vue-scene on">
+    <img class="scene-img" src="scene-1.webp" width="1086" height="1448"
+         alt="Un responsable consulte une procédure Standix dans son atelier">
+    <svg class="filins" viewBox="0 0 1086 1448" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="fil1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
+        </linearGradient>
+        <linearGradient id="fil2" x1="1" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
+        </linearGradient>
+        <linearGradient id="fil3" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0" stop-color="#fff" stop-opacity=".05"/>
+          <stop offset="1" stop-color="#fff" stop-opacity=".62"/>
+        </linearGradient>
+      </defs>
+      <line x1="250" y1="330" x2="340" y2="700" stroke="url(#fil1)" stroke-width="2.5"/>
+      <line x1="684" y1="560" x2="340" y2="700" stroke="url(#fil2)" stroke-width="2.5"/>
+      <line x1="293" y1="1090" x2="340" y2="700" stroke="url(#fil3)" stroke-width="2.5"/>
+      <circle class="cible" cx="340" cy="700" r="7" fill="#fff" fill-opacity=".9"/>
+      <!-- L'onde qui pulsait a ete retiree : son centre restait a l'ancienne
+           position, ce qui faisait deux points au lieu d'un. -->
+    </svg>
+    <figcaption class="pastille p1"><b>Jusqu'à 5 min</b><span>de vidéo, analysée par l'IA</span></figcaption>
+    <figcaption class="pastille p2"><b>Un QR code</b><span>scannez, la procédure s'ouvre</span></figcaption>
+    <figcaption class="pastille p3"><b>Privé</b><span>vos procédures restent privées</span></figcaption>
+  </figure>
+  <figure class="vue-scene">
+    <img class="scene-img" src="scene-2.webp" width="1086" height="1448"
+         alt="Une procédure Standix ouverte sur un téléphone, dans l'allée d'un entrepôt">
+  </figure>
+</div>
 </div>
 
 </div>
@@ -2451,33 +2554,7 @@ footer .marque{ margin-bottom:18px; }
          que possible : sur une page qui dit « rien n'a ete reecrit », une scene
          qui n'a jamais eu lieu est une contradiction qu'on tolere, pas qu'on
          choisit. -->
-  <figure class="scene app">
-    <!-- ═══ NI PASTILLES NI TRAITS ═══
-
-         Ils sont retires : la capture est desormais VISIBLE dans le telephone
-         de la photo. On y lit la procedure, l'avertissement, la barre du
-         navigateur. Trois etiquettes posees par-dessus repetaient ce que
-         l'ecran montre deja, et masquaient une partie de l'image.
-
-         L'ancien SVG et les trois figcaption ont ete supprimes avec leur
-         balisage ; leurs styles restent dans la feuille, inutilises mais prets
-         si on veut les remettre. -->
-    <img src="atelier.webp" width="1086" height="1448" loading="lazy"
-         alt="Un responsable consulte une procédure Standix sur son téléphone, dans son atelier">
-    <!-- ═══ TOUT CONVERGE SUR LE TELEPHONE ═══
-
-         Le telephone est a 41,9 % / 45,0 % de l'image — detecte, pas estime.
-         Les trois traits partent des pastilles et s'arretent tous sur ce point,
-         ou un halo pulse doucement.
-
-         Les traits sont traces en SVG et non en CSS : il faut des diagonales
-         d'angles differents, ce qu'une bordure ne sait pas faire. Le viewBox
-         reprend les dimensions de l'image, donc les coordonnees sont celles de
-         la photo elle-meme. -->
-    <!-- Les trois anciennes pastilles — 3:13, 6 etapes, 3 langues — repetaient
-         mot pour mot la section 01 : elles decoraient la photo sans rien
-         apprendre. Celles-ci nomment trois fonctions distinctes. -->
-  </figure>
+  <!-- La photo est remontee dans le premier ecran, avec sa jumelle. -->
 
   <p class="surtitre app">La différence</p>
   <!-- « Ce que ça change, des deux côtés » supposait qu'on sache déjà quels
@@ -2903,6 +2980,31 @@ footer .marque{ margin-bottom:18px; }
 </div>
 
 <script>
+/* ═══ LES DEUX SCENES SE RELAIENT ═══
+
+   Six secondes par vue : assez pour lire la premiere sans la seconde qui
+   deboule, assez peu pour qu'un visiteur qui hesite voie les deux.
+
+   Le defilement S'ARRETE des qu'on touche ou survole le bloc — sinon l'image
+   change pendant qu'on la regarde, ce qui est plus agacant qu'utile. */
+;(() => {
+  const duo = document.getElementById('duo')
+  if (!duo) return
+  const vues = [...duo.querySelectorAll('.vue-scene')]
+  if (vues.length < 2) return
+  let i = 0, t = null
+  const aller = () => {
+    i = (i + 1) % vues.length
+    vues.forEach((v, k) => v.classList.toggle('on', k === i))
+  }
+  const lancer = () => { arreter(); t = setInterval(aller, 6000) }
+  const arreter = () => { if (t) clearInterval(t); t = null }
+  duo.addEventListener('pointerenter', arreter)
+  duo.addEventListener('pointerleave', lancer)
+  duo.addEventListener('touchstart', arreter, { passive:true })
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) lancer()
+})()
+
 /* ═══ L'AXE DU TELEPHONE, MESURE SUR LE FICHIER CHARGE ═══
 
    Le chassis n'est pas au centre de tous les fichiers : celui de 1010 px le

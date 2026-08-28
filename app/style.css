@@ -9627,16 +9627,19 @@ body:has(#e-detail.active) #equipe-app{
 .pub-bandeau{
   display:flex; align-items:center; gap:12px;
   /* Le MÊME écart au-dessus qu'en dessous : le bandeau est posé entre deux
-     blocs, il doit être à égale distance des deux. À 14 px en haut et 32 en
-     bas, il paraissait accroché au sous-titre.
+     blocs, il doit être à égale distance des deux.
 
-     ⚠ 32 px en haut, 18 en bas, et pourtant l'écart est le même des deux
+     14 px en haut l'accrochaient au sous-titre ; 32 des deux côtés le
+     laissaient flotter au milieu de rien. 24 px : il respire sans se détacher
+     de ce qu'il annonce.
+
+     ⚠ 24 px en haut, 18 en bas, et pourtant l'écart est le même des deux
        côtés — parce que les marges fusionnent. En haut, le sous-titre porte
-       déjà 18 px : le navigateur garde la plus grande des deux, soit 32. En
-       bas, c'est `#analyse-video-frame` qui porte les 32 px, et ces 18-là
+       déjà 18 px : le navigateur garde la plus grande des deux, soit 24. En
+       bas, c'est `#analyse-video-frame` qui porte les 24 px, et ces 18-là
        passent dessous. Changer l'un des trois nombres sans les deux autres
        ne donne pas ce qu'on croit. */
-  margin:32px 0 18px; padding:13px 14px;
+  margin:24px 0 18px; padding:13px 14px;
   border-radius:16px;
   background:rgba(246,148,3,0.08);
   box-shadow:inset 0 0 0 0.5px rgba(246,148,3,0.22);
@@ -9683,7 +9686,7 @@ body:has(#e-detail.active) #equipe-app{
 
    ⚠ Le style direct du balisage ne pose que `margin-bottom` : `margin-top`
      n'entre en conflit avec rien, la règle s'applique sans `!important`. */
-#analyse-video-frame{ margin-top:32px; }
+#analyse-video-frame{ margin-top:24px; }
 
 /* ─── L'ÉTAT PUBLIÉ ───────────────────────────────────────────────────────
    Vert sourd, pas vif : c'est une confirmation, pas une alerte. Et le bouton
@@ -9693,6 +9696,77 @@ body:has(#e-detail.active) #equipe-app{
   box-shadow:inset 0 0 0 0.5px rgba(48,209,88,0.20);
 }
 .pub-bandeau--ok .pub-ic{ color:#30D158; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BASCULEMENT — DU BROUILLON À LA MISE EN LIGNE
+
+   Publier, c'est un petit événement : la procédure passe d'un tiroir à un mur
+   d'atelier. Le bandeau changeait de couleur, de dessin et de mot d'un seul
+   coup d'horloge — on ne voyait pas le geste, on voyait un autre écran.
+
+   Quatre choses bougent, décalées de quelques centièmes pour qu'on lise une
+   suite plutôt qu'un sursaut : la couleur du fond, la coche qui se trace, le
+   texte qui monte, le bouton qui se substitue.
+
+   La courbe est celle d'iOS — `cubic-bezier(0.32, 0.72, 0, 1)` : un départ
+   franc, une arrivée qui se pose. C'est ce qui distingue un mouvement d'une
+   simple interpolation.
+
+   ⚠ TOUT EST SOUS `.pub-anim`, posée par le JavaScript au seul moment du
+     basculement. Sans cette garde, ouvrir une procédure déjà publiée aurait
+     montré l'ambre virer au vert à chaque fois — le bandeau naît sans la
+     classe `--ok`, qui lui est ajoutée dans la foulée.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.pub-bandeau.pub-anim{
+  transition:background-color 0.5s cubic-bezier(0.32,0.72,0,1),
+             box-shadow      0.5s cubic-bezier(0.32,0.72,0,1);
+}
+.pub-bandeau.pub-anim .pub-ic{
+  transition:color 0.5s cubic-bezier(0.32,0.72,0,1);
+  animation:pub-ic-pose 0.55s cubic-bezier(0.32,0.72,0,1) both;
+}
+/* Le trait se dessine au lieu d'apparaître. `24` couvre largement la coche
+   comme la barre du point d'exclamation : une valeur trop courte laisserait
+   un bout de trait visible au départ. Le `circle` n'est pas touché — il
+   encadre les deux états et n'a aucune raison de se redessiner. */
+.pub-bandeau.pub-anim .pub-ic svg path{
+  stroke-dasharray:24; stroke-dashoffset:24;
+  animation:pub-trait 0.45s cubic-bezier(0.32,0.72,0,1) 0.08s forwards;
+}
+.pub-bandeau.pub-anim .pub-t,
+.pub-bandeau.pub-anim .pub-s{
+  animation:pub-mot 0.42s cubic-bezier(0.32,0.72,0,1) both;
+}
+/* La ligne du dessous part un peu après celle du dessus : c'est ce léger
+   retard qui donne l'impression que le bloc se repose, et non qu'il clignote. */
+.pub-bandeau.pub-anim .pub-s{ animation-delay:0.05s; }
+.pub-bandeau.pub-anim .pub-btn{
+  animation:pub-mot 0.42s cubic-bezier(0.32,0.72,0,1) 0.09s both;
+}
+
+@keyframes pub-ic-pose{
+  0%  { transform:scale(0.55); opacity:0; }
+  62% { transform:scale(1.06); opacity:1; }
+  100%{ transform:scale(1);    opacity:1; }
+}
+@keyframes pub-trait{ to{ stroke-dashoffset:0; } }
+@keyframes pub-mot{
+  from{ opacity:0; transform:translateY(5px); }
+  to  { opacity:1; transform:translateY(0); }
+}
+
+/* Qui a demandé moins de mouvement n'en reçoit aucun. Le JavaScript vérifie
+   déjà `prefers-reduced-motion` avant de poser la classe ; cette règle est
+   la seconde ceinture, au cas où elle serait posée autrement. */
+@media (prefers-reduced-motion: reduce){
+  .pub-bandeau.pub-anim,
+  .pub-bandeau.pub-anim .pub-ic,
+  .pub-bandeau.pub-anim .pub-ic svg path,
+  .pub-bandeau.pub-anim .pub-t,
+  .pub-bandeau.pub-anim .pub-s,
+  .pub-bandeau.pub-anim .pub-btn{ animation:none; transition:none; }
+}
 .pub-btn--retirer{
   background:rgba(255,255,255,0.08);
   color:var(--label-2);

@@ -6071,7 +6071,11 @@ let currentCatSort = 'az'
    silence.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-function cleCache(entrepriseId) { return 'procedo_grille_' + entrepriseId }
+/* `v2` : les copies rangées par les versions précédentes ne portent pas
+   `publiee_le`. Les relire ferait afficher « Brouillon » sur toutes les
+   procédures au premier démarrage après la mise à jour. Changer la clé les
+   met de côté ; le navigateur nettoiera les anciennes de lui-même. */
+function cleCache(entrepriseId) { return 'procedo_grille_v2_' + entrepriseId }
 
 function rangerGrille(entrepriseId, categories, sous) {
   try {
@@ -6084,6 +6088,12 @@ function rangerGrille(entrepriseId, categories, sous) {
            l'étape 3 recevraient `undefined` et afficheraient tout comme
            « sans sous-dossier », sans qu'aucune erreur ne le signale. */
         sous_categorie: p.sous_categorie || null, statut: p.statut,
+        /* ⚠ SANS ELLE, TOUT PARAÎT EN BROUILLON. La copie sert à dessiner la
+           grille avant que le réseau réponde ; `etatProcedureHtml` lit
+           `publiee_le`, et une colonne absente vaut `undefined` — donc
+           « pas publiée ». La pastille s'affichait sur des procédures en
+           ligne depuis des semaines, et disparaissait ensuite. */
+        publiee_le: p.publiee_le || null,
         created_at: p.created_at, video_url: p.video_url, image_url: p.image_url,
         etapes: p.etapes,
       })),
@@ -6111,6 +6121,11 @@ function memeGrille(a, b) {
   if (!a || !b || a.length !== b.length) return false
   const cle = (c) => c.nom + ':' + c.avgPct + ':' +
     (c.procsInCat || []).map(p => [p.id, p.titre, p.statut, p.image_url,
+      /* La publication fait partie de ce qui se VOIT — c'est la pastille
+         « Brouillon ». Absente de cette clé, une procédure qu'on venait de
+         publier laissait la grille jugée identique, donc non redessinée, et
+         la pastille restait. */
+      p.publiee_le || '',
       p.etapes?.[0]?.count ?? ''].join('|')).join('~')
   return a.map(cle).join('\u00a7') === b.map(cle).join('\u00a7')
 }
@@ -19832,6 +19847,36 @@ document.getElementById('pub-btn')?.addEventListener('click', async () => {
 
   if (error) { toast('\u00c9chec : ' + error.message); return }
   peindrePublication(data)
+
+  /* ═══ RÉPERCUTER LE CHANGEMENT PARTOUT ═══
+
+     La base était à jour, l'écran de détail aussi — et rien d'autre. Les
+     listes se dessinent depuis `allGestionProcedures`, `allCategoriesData` et
+     `currentCategoryProcsData`, qui gardaient tous l'ancienne valeur. On
+     revenait à la liste et la pastille « Brouillon » y était encore, ou
+     l'inverse pour un retrait.
+
+     On corrige les trois mémoires, la copie locale, puis on redessine. */
+  const enMemoire = allGestionProcedures.find(p => p.id === editProcedureId)
+  if (enMemoire) enMemoire.publiee_le = data.publiee_le
+  for (const d of (currentCategoryProcsData || [])) {
+    if (d.proc?.id === editProcedureId) d.proc.publiee_le = data.publiee_le
+  }
+  for (const c of (allCategoriesData || [])) {
+    for (const p of (c.procsInCat || [])) {
+      if (p.id === editProcedureId) p.publiee_le = data.publiee_le
+    }
+  }
+  /* La copie locale aussi : sans elle, la pastille redevenait fausse au
+     prochain démarrage, le temps que la requête réponde. */
+  if (currentMembre?.entreprise_id && allCategoriesData?.length) {
+    rangerGrille(currentMembre.entreprise_id, allCategoriesData,
+                 document.getElementById('p-list-subhead')?.textContent || '')
+  }
+  renderCategoryGrid()
+  if (document.getElementById('p-category')?.classList.contains('active')) {
+    renderCategoryProceduresList()
+  }
   toast(retrait ? 'Retir\u00e9e de l\u2019espace \u00e9quipe'
                 : 'Publi\u00e9e \u2014 votre \u00e9quipe peut la lire')
   if (navigator.vibrate) navigator.vibrate(8)

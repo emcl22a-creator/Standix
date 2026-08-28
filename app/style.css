@@ -2930,7 +2930,11 @@
      haute, là où une couleur unique paraîtrait plate. */
   .offre-carte{
     position:relative; z-index:1;
-    background:linear-gradient(160deg,#16161A 0%,#111114 52%,#0B0B0E 100%);
+    /* Le même noir profond qu'« Écrivez-nous » et que la vedette. Les cartes
+       repliées se distinguent par leur taille et leur bouton, pas par leur
+       peau — mais elles gardent le liseré BLANC des dix-neuf cartes : le bord
+       allumé est réservé à celle qu'on met en avant. */
+    background:linear-gradient(150deg,#17171B 0%,#101014 40%,#0A0A0D 75%,#060608 100%);
     border-radius:22px;
     padding:20px 18px; margin-bottom:12px;
     /* Le liseré uniforme est remplacé par celui à coins vifs, comme les
@@ -2987,12 +2991,35 @@
 
      Le liseré est découpé par deux masques superposés : l'un couvre tout,
      l'autre évide l'intérieur, et `xor` ne laisse que le pourtour. */
+  /* ═══ LE CADRE EXACT D'« ÉCRIVEZ-NOUS » ═══
+
+     Relevé dans `.an-intro-cadre`, la classe qui l'habille réellement — pas
+     dans `.accueil`, où je m'étais arrêté la fois d'avant. Elle surcharge tout :
+     le fond clair de `--hero-gradient` n'apparaît jamais sur cette carte.
+
+     Quatre choses, et elles vont ensemble :
+
+       ① UN NOIR PROFOND, de #17171B à #060608 sur 150°. C'est ce fond sombre
+          qui permet au bord allumé de se voir ; sur un gris moyen il s'éteint.
+       ② UNE OMBRE DOUBLE : une sombre qui décolle la carte, une AMBRE qui
+          diffuse autour d'elle.
+       ③ DEUX LUEURS DE COIN, ambres elles aussi — haut-droite et bas-gauche.
+       ④ UN LISERÉ AMBRE À 45°, vif aux angles et presque éteint au milieu des
+          côtés. Une lumière rasante, pas un cadre.
+
+     ⚠ J'avais retiré ③ et ④ au tour précédent en croyant faire ressembler la
+       carte à « Écrivez-nous ». C'était l'inverse : ce sont eux qui font
+       « Écrivez-nous ». */
   .offre-carte.vedette{
     position:relative; overflow:hidden;
     border:none; border-radius:22px;
     background:linear-gradient(150deg,#17171B 0%,#101014 40%,#0A0A0D 75%,#060608 100%);
     box-shadow:0 14px 34px rgba(0,0,0,0.42), 0 0 30px -14px rgba(255,122,24,0.26);
   }
+  /* ④ Le liseré. Un `border` ne sait pas porter de dégradé : on pose le dégradé
+     en fond et deux masques superposés l'évident en anneau — `xor` ne garde
+     que le pourtour. Valeurs recopiées de `.an-gain-lueur::after`, au chiffre
+     près. */
   .offre-carte.vedette::before{
     content:''; position:absolute; inset:0; border-radius:inherit;
     padding:1px; pointer-events:none; z-index:1;
@@ -3002,6 +3029,30 @@
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
+  }
+  /* ③ Les deux lueurs de coin. Elles remplacent ici les lueurs BLANCHES que
+     `.offre-carte::after` reçoit avec les dix-neuf cartes : sur cette carte-ci
+     elles sont ambres, comme sur son modèle. Un seul pseudo-élément pour les
+     deux, donc l'un exclut l'autre.
+
+     ⚠ EN POURCENTAGES, PAS EN PIXELS. « Écrivez-nous » les déclare en
+       130 × 90 px sur une carte de 358 × 92 : la lueur couvre alors presque
+       toute sa hauteur, et la carte entière paraît baignée.
+
+       Recopiées telles quelles sur une carte cinq fois plus haute, ces mêmes
+       130 × 90 px n'éclairaient plus qu'un cinquième du coin — mesuré, l'ambre
+       y était même légèrement plus faible que sur le modèle. D'où ton
+       impression, qui était juste.
+
+       En pourcentages, la lueur grandit avec la carte et l'angle s'allume de
+       la même façon quelle que soit sa taille. L'opacité monte un peu pour
+       compenser l'étalement sur une plus grande surface. */
+  .offre-carte.vedette::after{
+    content:''; position:absolute; inset:0; border-radius:inherit;
+    pointer-events:none; z-index:0;
+    background:
+      radial-gradient(62% 34% at 100% 0%, rgba(255,122,24,0.11), transparent 72%),
+      radial-gradient(56% 30% at 0% 100%, rgba(255,154,31,0.075), transparent 72%);
   }
   /* Le liseré en dégradé a été retiré : « Écrivez-nous » n'en a pas, et c'est
      le modèle. Deux techniques de bord dans la même app en font une de trop. */
@@ -6420,7 +6471,11 @@ body.plus-vu .plus-flot{
      `act-promo` pouvaient teinter la plaque différemment ; ce n'était pas le
      cas ici, mais si tu veux les distinguer un jour, c'est `color` qu'il
      faudra changer, pas le fond. */
-.act-lig .act-ic{
+/* ⚠ LE SÉLECTEUR PORTE MAINTENANT DEUX CLASSES. Les lignes de l'accueil —
+   `.ac-l-lig` — emploient les mêmes pastilles ; sans elles ici, le dessin
+   s'affichait nu, sans son cadre, et l'on cherchait longtemps pourquoi la
+   même icône rend différemment sur deux pages. */
+.act-lig .act-ic, .ac-l-lig .act-ic{
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   width:30px; height:30px; border-radius:10px;
   background:linear-gradient(165deg,
@@ -6428,7 +6483,7 @@ body.plus-vu .plus-flot{
   border:0.5px solid rgba(255,173,51,0.20);
   color:#FDA81E;
 }
-.act-lig .act-ic svg{ width:16px; height:16px; display:block; }
+.act-lig .act-ic svg, .ac-l-lig .act-ic svg{ width:16px; height:16px; display:block; }
 /* LE MÊME BLANC QUE LES LIGNES DU BLOC AU-DESSUS.
 
    La phrase était en gris avec le seul nom en blanc — l'idée étant de faire
@@ -8381,12 +8436,132 @@ body:has(#e-detail.active) #equipe-app{
 .ac-sous{ font-size:14px; color:var(--label-2); margin:0; line-height:1.35; }
 /* `.ac-filtre` a été retirée avec le sélecteur de période de l'accueil. */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ACCUEIL REFAIT · ANNEAU, DEUX CHIFFRES, DEUX LISTES
+
+   Tout hérite d'`an-bloc` — même fond, même liseré, même rayon que les blocs
+   de la page Analyse. On ne redéfinit ici que la disposition.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── ① L'ANNEAU ─────────────────────────────────────────────────────────────
+
+   Aucune matière : ni fond, ni liseré, ni ombre. Il ne porte plus `an-bloc`.
+
+   L'anneau EST la page — le poser dans une carte en faisait le premier de
+   quatre blocs empilés, tous de même peau, et l'œil ne savait plus par où
+   commencer. Sur le fond nu, il se détache de tout ce qui suit.
+
+   Le rembourrage du bas reste : c'est lui qui sépare l'anneau des deux tuiles,
+   maintenant qu'aucun bord ne le fait. */
+.ac-pub-bloc{ padding:10px 4px 22px; }
+/* ⚠ LA CLASSE S'APPELLE `ac-pub`, PAS `ac-anneau`.
+
+   `.ac-anneau` EXISTE DÉJÀ, plus bas dans ce fichier : c'était l'anneau de
+   l'ancienne tuile de quota, en 132 × 132 px avec une HAUTEUR FIXE. Réutiliser
+   le nom écrasait la hauteur du nouvel anneau — il faisait 168 px de haut dans
+   un conteneur de 132, et la phrase du dessous, poussée dehors, disparaissait
+   sous l'`overflow:hidden` de la carte.
+
+   Rien ne l'annonçait : aucune erreur, un texte présent dans le DOM et
+   invisible à l'écran. C'est le genre de collision qu'on ne trouve qu'en
+   mesurant. */
+.ac-pub{ padding-bottom:0; }
+/* Le remplissage se dessine au lieu d'apparaître. La courbe est celle des
+   anneaux de l'Analyse — même geste pour le même objet. */
+.ac-pub .arc{ transition:stroke-dashoffset 1.05s cubic-bezier(0.22,1,0.36,1); }
+/* Le centre : le pourcentage en grand, la fraction dessous. La fraction est
+   plus longue que celle de l'Analyse — « 12 sur 17 en ligne » — donc elle a
+   besoin de sa largeur, sans quoi elle se coupe au milieu du cercle. */
+.ac-pub .an-resume-centre .u{ max-width:118px; text-align:center; line-height:1.3; }
+.ac-pub-txt{
+  margin-top:14px; padding:0 6px; text-align:center;
+  font-size:12.5px; line-height:1.45; color:var(--label-2);
+  letter-spacing:-0.01em;
+}
+
+/* ─── ② LES DEUX CHIFFRES ────────────────────────────────────────────────── */
+.ac-duo{
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:11px; align-items:stretch; margin-bottom:11px;
+}
+/* ═══ LE TITRE EN TÊTE, LE CHIFFRE DESSOUS ═══
+
+   Sur une demi-largeur d'écran, un titre et un nombre côte à côte se
+   marchaient dessus : « Analyses vidéo IA ce mois-ci » fait trois lignes, et
+   le chiffre se retrouvait coincé contre le bord.
+
+   La plaque et le titre partagent donc la première ligne, le chiffre prend
+   toute la largeur en dessous. */
+.ac-chiffre{ display:flex; flex-direction:column; padding:14px 13px 13px; }
+.ac-ch-tete{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
+.ac-ch-t{
+  font-size:11.5px; font-weight:650; line-height:1.3;
+  color:var(--label-2); letter-spacing:-0.01em;
+}
+.ac-ch-v{
+  font-size:26px; font-weight:700; letter-spacing:-0.035em; line-height:1;
+  font-variant-numeric:tabular-nums; color:var(--label-1);
+  /* Poussé en bas : deux tuiles dont les titres tiennent sur un nombre de
+     lignes différent auraient sinon leurs chiffres à deux hauteurs. */
+  margin-top:auto;
+}
+.ac-ch-n{
+  font-size:11px; color:var(--label-3); margin-top:5px; line-height:1.35;
+  letter-spacing:-0.005em;
+}
+/* La couleur de la tendance porte un sens, pas une décoration : elle ne
+   s'allume que lorsque la comparaison est réellement à la hausse ou à la
+   baisse. Un mois stable reste gris. */
+.ac-ch-n.haut{ color:#30D158; }
+.ac-ch-n.bas{ color:var(--label-3); }
+
+/* ─── ③ LES DEUX LISTES ──────────────────────────────────────────────────── */
+.ac-liste{ padding:0; margin-bottom:11px; overflow:hidden; }
+.ac-liste-tete{
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  width:100%; padding:14px 15px 10px;
+  background:none; border:none; font-family:inherit; text-align:left;
+}
+.ac-liste-t{
+  font-size:14px; font-weight:700; color:var(--label-1); letter-spacing:-0.025em;
+}
+.ac-liste-fl{ font-size:11.5px; color:var(--label-3); white-space:nowrap; }
+.ac-liste-co{ padding:0 15px 8px; }
+.ac-l-lig{
+  display:flex; align-items:center; gap:10px; width:100%;
+  padding:9px 0; background:none; border:none; font-family:inherit;
+  text-align:left; color:inherit;
+  /* Un filet entre les lignes plutôt qu'un écart : trois lignes espacées dans
+     une carte ressemblent à trois cartes. */
+  border-top:0.5px solid rgba(255,255,255,0.07);
+}
+.ac-liste-co .ac-l-lig:first-child{ border-top:none; }
+.ac-l-lig:active{ opacity:0.6; }
+.ac-l-lig .co{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.ac-l-lig .nm{
+  font-size:13px; font-weight:600; color:var(--label-1); letter-spacing:-0.015em;
+  /* Une seule ligne : un titre de procédure long ne doit pas faire grandir la
+     carte de trois lignes. */
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.ac-l-lig .nm b{ font-weight:700; }
+.ac-l-lig .st{
+  font-size:11px; color:var(--label-3);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.ac-l-lig .vl{ font-size:11px; color:var(--label-3); flex-shrink:0; }
+.ac-l-lig .proc-brouillon{ margin-left:0; flex-shrink:0; }
+.ac-l-rien{
+  padding:12px 0 14px; font-size:12.5px; color:var(--label-3);
+  border-top:0.5px solid rgba(255,255,255,0.07);
+}
+
 /* ═══ DEUX PAR DEUX ═══
 
-   Les tuiles héritent de `an-bloc` — même fond, même liseré, même rayon que
-   les blocs de la page Analyse. On ne redéfinit que ce qui change : la
-   disposition en grille et le rembourrage, plus serré parce qu'une tuile de
-   demi-largeur ne peut pas s'offrir les 16 px d'un bloc pleine largeur. */
+   ⚠ `.ac-grille` N'EST PLUS EMPLOYÉE. Le balisage qui la portait a disparu
+     avec les trois tuiles de l'ancien accueil. La règle reste parce que rien
+     ne prouve qu'aucune autre page ne s'en sert — la retirer demanderait de
+     relire les quatre mille lignes du balisage, et elle ne coûte rien. */
 .ac-grille{
   display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:11px; align-items:stretch;
@@ -8594,6 +8769,12 @@ body:has(#e-detail.active) #equipe-app{
    l'air perdu.
 
    La hauteur suit sans forcer : 132 sur 203 disponibles. */
+/* ⚠ CETTE RÈGLE N'A PLUS D'ÉLÉMENT. `tuileQuota`, qui posait `.ac-anneau` et
+   `.ac-tuile--anneau`, a été retirée avec les trois tuiles de l'ancien
+   accueil. On la garde deux temps : elle documente pourquoi le nouvel anneau
+   s'appelle `ac-pub` et non `ac-anneau`, et la supprimer maintenant obligerait
+   à relire les quatre mille lignes du balisage pour s'assurer que rien d'autre
+   ne la porte. */
 .ac-anneau{
   position:relative; width:132px; height:132px; margin:auto;
 }
@@ -8603,7 +8784,7 @@ body:has(#e-detail.active) #equipe-app{
 /* Le quart de tour fait partir l'arc à midi : on lit un cercle comme une
    horloge, jamais depuis la droite. */
 .ac-anneau svg{ transform:rotate(-90deg); display:block; }
-.ac-anneau .arc{ transition:stroke-dashoffset 0.85s cubic-bezier(0.22,1,0.36,1); }
+.ac-pub .arc{ transition:stroke-dashoffset 0.85s cubic-bezier(0.22,1,0.36,1); }
 /* Le pourcentage suit l'anneau : 32 px dans un cercle de 132, c'est la même
    proportion qu'avant — un chiffre qui resterait à 23 paraîtrait perdu. */
 .ac-pct{
@@ -8817,10 +8998,34 @@ body:has(#e-detail.active) #equipe-app{
 
    20 px en blanc, graisse 700 comme le prix. Il forme désormais un bloc avec
    lui : nom, puis montant, dans la même main. */
+/* ═══ LA LIGNE DE TÊTE : PLAQUE ET NOM ═══
+
+   Le nom seul flottait en haut d'une carte de six cents pixels. La plaque lui
+   donne un point d'appui, et dit la taille d'équipe avant qu'on lise le prix.
+
+   Le cercle est presque noir avec un liseré ambre très faible : c'est le
+   dessin qui porte la couleur, pas son support. Une pastille ambre pleine
+   aurait concurrencé le bouton, seul objet plein de la carte. */
+.offre-tete{ display:flex; align-items:center; gap:13px; margin-bottom:18px; }
+.offre-plaque{
+  display:grid; place-items:center; flex:0 0 42px; width:42px; height:42px;
+  border-radius:100px;
+  background:rgba(255,255,255,0.04);
+  box-shadow:inset 0 0 0 1px rgba(255,173,51,0.22);
+}
+.offre-plaque svg{ width:21px; height:21px; display:block; }
+
 .offre-nom{
   display:block; font-size:20px; font-weight:700; color:var(--label-1);
-  letter-spacing:-0.03em; margin-bottom:6px;
+  letter-spacing:-0.03em; margin-bottom:0;
 }
+
+/* ═══ LE PRIX EST L'OBJET DE LA CARTE ═══
+
+   L'unité s'aligne sur la BASE du chiffre, pas sur son sommet :
+   `align-items:baseline` — sans quoi « / mois » flotte à mi-hauteur d'un
+   nombre de trente-huit pixels. */
+.offre-prix{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; }
 
 /* ═══ LE PRIX EST L'OBJET DE LA CARTE ═══
 
@@ -8846,11 +9051,61 @@ body:has(#e-detail.active) #equipe-app{
    Il reste plus GRAND — 38 px contre 24 — parce que c'est un prix. Mais la
    graisse et l'approche sont celles du reste de l'app : c'est ce qui fait
    qu'un texte appartient à la même famille, pas sa taille. */
+/* ═══ LE PRIX PREND LA COULEUR DU LOGO ═══
+
+   Crème à gauche, ambre à droite : `#FFDFA0` → `#E8760F`, les deux extrêmes
+   du dégradé de la marque, mesurés au pixel. En blanc, le prix pesait autant
+   que le nom qui le surmonte ; en ambre plein il aurait crié.
+
+   Le dégradé est posé en fond puis découpé par le texte — `background-clip`.
+   C'est la seule façon d'appliquer un dégradé à des glyphes ; `color` ne sait
+   porter qu'une couleur unie.
+
+   ⚠ `-webkit-` INDISPENSABLE. Safari, donc tout iPhone, ne connaît que la
+     forme préfixée pour `background-clip:text`. Sans elle, le fond couvre
+     tout le bloc et le texte disparaît — un rectangle ambre à la place du
+     prix. */
 .offre-prix .v{
   font-size:38px; font-weight:700; letter-spacing:-0.03em; line-height:1;
   font-variant-numeric:tabular-nums;
+  background:linear-gradient(100deg,#FFDFA0 0%,#FFC46A 42%,#E8760F 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  /* Le fond doit épouser le texte, pas la ligne : sans cela le dégradé
+     s'étale sur toute la largeur disponible et le « € » reste crème. */
+  display:inline-block;
 }
-.offre-prix .u{ font-size:13.5px; color:var(--label-2); letter-spacing:-0.01em; }
+/* L'unité accompagne le prix, elle ne le double pas : graisse normale et gris
+   moyen. En demi-gras elle pesait autant que le chiffre. */
+.offre-prix .u{
+  font-size:13.5px; font-weight:500; color:var(--label-2);
+  letter-spacing:-0.01em;
+}
+
+/* ═══ « GÉRER OU RÉSILIER » TIENT SUR UNE LIGNE ═══
+
+   Sept mots, une plaque et un chevron sur une largeur de téléphone : à 15 px
+   le libellé se coupait en deux. Un demi-point de moins et une approche
+   resserrée suffisent, et personne ne verra que cette ligne-là est plus
+   petite — elle est seule sur sa page. */
+#abo-gerer .reg-nm{ font-size:14px; letter-spacing:-0.025em; }
+/* La ligne se détache de la carte qu'elle accompagne : elle en est la suite,
+   pas un morceau. */
+#abo-gerer{ margin-top:14px; }
+
+/* ═══ LE FILET SOUS LE PRIX ═══
+
+   Il sépare ce qu'on paie de ce qu'on reçoit. Sur une carte aussi haute, un
+   simple blanc laissait les deux blocs se confondre.
+
+   Il s'éteint aux extrémités plutôt que de buter sur les bords : un trait
+   franc d'un bord à l'autre aurait coupé la carte en deux. */
+.offre-filet{
+  height:1px; margin:20px 0 4px;
+  background:linear-gradient(90deg,
+    rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.13) 22%,
+    rgba(255,255,255,0.13) 78%, rgba(255,255,255,0.02) 100%);
+}
 
 /* ═══ LES INCLUS ═══
 
@@ -9038,6 +9293,7 @@ body:has(#e-detail.active) #equipe-app{
    le logo orange doit reparaître ailleurs. */
 /* Le texte passe AU-DESSUS du logo, jamais dessous : un prix illisible parce
    qu'un ornement le traverse serait le pire des échanges. */
+.offre-tete, .offre-filet,
 .offre-nom, .offre-prix, .offre-inclus,
 .offre-annuel-note, .offre-cta{ position:relative; z-index:2; }
 
@@ -9079,9 +9335,65 @@ body:has(#e-detail.active) #equipe-app{
 .offre-annuel-note .et{ display:flex; flex:0 0 17px; width:17px; height:17px; }
 .offre-annuel-note .et svg{ width:100%; height:100%; display:block; }
 
-/* La flèche du bouton : elle dit qu'on part quelque part. Sans elle, le bouton
-   annonce un état ; avec elle, il annonce un geste. */
-.offre-cta{ display:flex; align-items:center; justify-content:center; gap:9px; }
+/* ═══ LE BOUTON, SEUL OBJET PLEIN DE LA CARTE ═══
+
+   Texte centré, flèche calée à droite. `justify-content:center` avec un `gap`
+   aurait collé la flèche au dernier mot : le libellé changeant d'une offre à
+   l'autre, elle se serait promenée. Elle est donc posée en absolu, à distance
+   fixe du bord.
+
+   Le halo est une ombre portée ambre sans décalage : c'est ce qui donne au
+   bouton l'air d'être allumé plutôt que peint. */
+/* ═══ LES BOUTONS SONT DES PASTILLES ═══
+
+   `100px` plutôt qu'un rayon en pixels : la valeur dépasse la demi-hauteur,
+   le navigateur la ramène à la demi-hauteur, et le bouton reste parfaitement
+   arrondi quelle que soit sa taille. Un `15px` fixe donnait des angles encore
+   carrés sur un bouton de cinquante pixels de haut.
+
+   C'est aussi la forme du bouton de publication, des onglets de rythme et de
+   la pastille « −20 % » : la page n'a plus qu'une seule façon de dessiner un
+   bouton. */
+.offre-cta{
+  position:relative; border-radius:100px;
+  display:flex; align-items:center; justify-content:center; gap:9px;
+  box-shadow:0 8px 22px -6px rgba(235,82,1,0.55),
+             0 0 26px -8px rgba(253,168,30,0.45);
+}
+.abo-autres{ border-radius:100px; }
+.offre-cta .fl{
+  position:absolute; right:20px; top:50%; transform:translateY(-50%);
+  display:flex; width:19px; height:19px; opacity:0.72;
+}
+.offre-cta .fl svg{ width:100%; height:100%; display:block; }
+
+/* ═══ L'OFFRE EN COURS GARDE LE BOUTON PLEIN, MAIS ÉTEINT ═══
+
+   Il était en contour ambre sur fond transparent — logique, puisqu'il n'y a
+   rien à payer. Mais il laissait la carte sans aucun aplat, et c'est cet aplat
+   qui la termine : sans lui, la liste des inclus s'arrête dans le vide.
+
+   Il reste plein, donc, mais SANS HALO et d'un ton plus bas. Deux raisons :
+
+     · le halo était le vrai coupable. Une auréole ambre autour d'un bouton
+       déjà plein éclaire la moitié basse de la carte ;
+     · ce bouton n'appelle aucun geste. L'éclat est réservé à « Choisir » et
+       « Activer », qui eux attendent qu'on les touche.
+
+   Le dégradé descend à 85 % de sa clarté — assez pour se calmer, pas assez
+   pour virer au brun. À 70 %, essayé et mesuré, il devenait terne.
+
+   Il reste inerte au toucher, ce que `disabled` dit déjà au navigateur et aux
+   lecteurs d'écran. L'apparence annonce l'état de l'abonnement, pas une
+   action disponible. */
+.offre-cta.encours{
+  background:linear-gradient(135deg,#C84601,#D57507 62%,#D7870F);
+  color:#2A1400;
+  box-shadow:none;
+}
+/* Les cartes repliées, elles, gardent un bouton neutre et sans halo : cinq
+   halos empilés dans une liste feraient un sapin. */
+.offre-carte:not(.vedette) .offre-cta{ box-shadow:none; }
 
 /* L'accroche s'aligne à gauche, sous le titre de page — centrée, elle flottait
    sans point d'appui. */
@@ -9639,29 +9951,50 @@ body:has(#e-detail.active) #equipe-app{
        bas, c'est `#analyse-video-frame` qui porte les 24 px, et ces 18-là
        passent dessous. Changer l'un des trois nombres sans les deux autres
        ne donne pas ce qu'on croit. */
-  margin:24px 0 18px; padding:13px 14px;
-  border-radius:16px;
-  background:rgba(246,148,3,0.08);
-  box-shadow:inset 0 0 0 0.5px rgba(246,148,3,0.22);
+  margin:24px 0 18px; padding:12px 12px 12px 13px;
+  /* ═══ UNE CARTE NEUTRE, LA COULEUR DANS LA SEULE PASTILLE ═══
+
+     C'était un aplat ambre pleine largeur avec son liseré ambre : sur une page
+     déjà sombre, la bande criait l'état au lieu de le dire, et elle pesait
+     plus lourd que le titre de la procédure juste au-dessus.
+
+     Elle prend maintenant la matière des cartes de l'app — `--bg-card`, sans
+     bord teinté. La couleur ne subsiste que dans la pastille ronde, sur
+     trente-quatre pixels : assez pour se repérer d'un coup d'œil, trop peu
+     pour dominer la page. C'est la façon dont iOS annonce un état.
+
+     Le rayon passe de 16 à 18 px, celui des autres cartes. */
+  border-radius:18px;
+  background:var(--bg-card);
+  box-shadow:none;
+  gap:13px;
 }
+/* La pastille : un disque teinté, l'icône dedans. Ambre en brouillon, vert en
+   ligne — c'est le seul endroit de la carte qui change de couleur. */
 .pub-ic{
-  display:grid; place-items:center; flex:0 0 26px;
-  width:26px; height:26px; color:#F7AA51;
+  display:grid; place-items:center; flex:0 0 34px;
+  width:34px; height:34px; border-radius:100px;
+  background:rgba(246,148,3,0.13); color:#F7AA51;
 }
-.pub-ic svg{ width:22px; height:22px; display:block; }
+.pub-ic svg{ width:19px; height:19px; display:block; }
 .pub-txt{ flex:1; min-width:0; }
 .pub-t{
-  display:block; font-size:13.5px; font-weight:650; letter-spacing:-0.02em;
+  display:block; font-size:14.5px; font-weight:600; letter-spacing:-0.024em;
   color:var(--label-1); line-height:1.3;
 }
 .pub-s{
-  display:block; font-size:11.5px; color:var(--label-2);
-  margin-top:2px; line-height:1.4;
+  display:block; font-size:12px; color:var(--label-2);
+  margin-top:1px; line-height:1.35;
 }
+/* ═══ LE BOUTON, PLUS PETIT ═══
+
+   34 px de haut sur une carte de 58 : il en occupait la moitié. À 30 px avec
+   une graisse de 600, il redevient ce qu'il est — une action à portée de
+   pouce, pas le sujet de la carte. */
 .pub-btn{
-  flex:0 0 auto; height:34px; padding:0 15px;
+  flex:0 0 auto; height:30px; padding:0 14px;
   border:none; border-radius:100px;
-  font-family:inherit; font-size:12.5px; font-weight:650;
+  font-family:inherit; font-size:12.5px; font-weight:600;
   background:linear-gradient(135deg,#E8760F,#F7AA51);
   color:#2A1400;
   transition:transform 0.14s ease, opacity 0.14s ease;
@@ -9691,11 +10024,12 @@ body:has(#e-detail.active) #equipe-app{
 /* ─── L'ÉTAT PUBLIÉ ───────────────────────────────────────────────────────
    Vert sourd, pas vif : c'est une confirmation, pas une alerte. Et le bouton
    « Retirer » devient neutre — il ne doit pas inviter au clic. */
-.pub-bandeau--ok{
-  background:rgba(48,209,88,0.07);
-  box-shadow:inset 0 0 0 0.5px rgba(48,209,88,0.20);
+/* ⚠ LE FOND NE CHANGE PLUS. La carte reste la même dans les deux états ; seule
+   la pastille passe de l'ambre au vert. Deux fonds différents pour un même
+   objet le faisaient changer de nature au lieu de changer d'état. */
+.pub-bandeau--ok .pub-ic{
+  background:rgba(48,209,88,0.12); color:#30D158;
 }
-.pub-bandeau--ok .pub-ic{ color:#30D158; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE BASCULEMENT — DU BROUILLON À LA MISE EN LIGNE
@@ -9767,10 +10101,12 @@ body:has(#e-detail.active) #equipe-app{
   .pub-bandeau.pub-anim .pub-s,
   .pub-bandeau.pub-anim .pub-btn{ animation:none; transition:none; }
 }
+/* « Retirer » n'invite pas au clic : gris translucide, texte blanc. C'est le
+   bouton neutre d'iOS — présent, jamais tentant. */
 .pub-btn--retirer{
-  background:rgba(255,255,255,0.08);
-  color:var(--label-2);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.12);
+  background:rgba(255,255,255,0.10);
+  color:var(--label-1);
+  box-shadow:none;
 }
 
 /* ─── LA PASTILLE « BROUILLON », DANS LA LISTE ────────────────────────────

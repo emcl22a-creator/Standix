@@ -227,8 +227,10 @@ body{
     /* 60 % de large au lieu de 110 : l'ellipse s'etendait jusque sous la photo
        et l'entourait d'une zone plus claire. Resserree sur le coin haut-gauche,
        elle eclaire le titre, ce pour quoi elle existe. */
+    /* 0,13 -> 0,055 : ce blanc eclairait le titre mais concurrencait les halos
+       colores, qui doivent porter la couleur du premier ecran. */
     radial-gradient(ellipse 60% 34% at 16% -4%,
-      rgba(226,232,242,.13), rgba(226,232,242,.03) 48%, transparent 72%),
+      rgba(226,232,242,.055), rgba(226,232,242,.015) 48%, transparent 72%),
     /* Le second foyer a ete retire : place a 52 % / 62 %, il tombait exactement
        derriere la photo et creait autour d'elle une zone plus claire que le
        reste — le « second arriere-plan » visible. Il datait de l'epoque ou la
@@ -427,8 +429,144 @@ header{
    partir de 1 100 px. */
 .premier, .colonne-app, .pv-texte, .pv-demo{ display:contents }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA MAIN QUI TIENT LE TELEPHONE
+
+   Le fondu du bas est un masque en degrade : l'image est pleinement opaque
+   jusqu'a 62 %, puis s'efface. Une ombre portee ne ferait pas ca — elle
+   assombrirait par-dessus au lieu de rendre l'image transparente, et le bord
+   resterait visible.
+
+   `mask-image` est prefixe pour Safari, qui ne reconnait pas encore la version
+   standard sur les images.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.main{
+  /* ═══ LA SECTION S'ADAPTE A L'ECRAN ═══
+
+     `flex:1` : la figure prend toute la hauteur restante une fois le titre, le
+     sous-titre et le bouton places. `min-height:0` l'autorise a retrecir en
+     dessous de sa taille naturelle — sans lui, un conteneur flexible refuse de
+     passer sous la hauteur de son contenu et deborde.
+
+     La largeur suit la HAUTEUR disponible : `calc(var(--h) * 1388/1398)` garde
+     le rapport de l'image. Sur un ecran bas, le telephone retrecit au lieu de
+     depasser ; sur un ecran haut, il grandit jusqu'a 620 px.
+
+     ⚠ Le fichier porte 288 px de vide transparent a DROITE : le chassis y est
+       centre, la main occupant la gauche. Ne pas rogner. */
+  flex:1 1 auto; min-height:0;
+  margin:44px auto 0;
+  /* La largeur suit aussi la hauteur disponible : `min-height:0` autorise le
+     conteneur a retrecir, mais l'IMAGE gardait sa largeur et debordait. */
+  width:min(620px, 92%, calc((100dvh - var(--barre) - 300px) * 1388 / 1398));
+  display:flex; align-items:flex-start; justify-content:center;
+  pointer-events:none;
+}
+.main img{ max-height:100%; width:auto; margin:0 auto }
+
+/* ═══ ECRANS BAS ═══
+
+   Sous 760 px de haut — un portable en paysage, un vieil ecran 1280x720 — le
+   titre et le bouton consomment deja toute la place et l'image debordait de
+   82 px. Tout se resserre : retraits, interlignes, marge de l'image. */
+@media (min-width: 780px) and (max-height: 760px){
+  .hero{ padding-top:24px }
+  .hero h1{ font-size:clamp(28px, 3.4vw, 44px); line-height:1.1 }
+  .hero .sous{ margin-top:10px; margin-bottom:14px }
+  .main{ margin-top:16px }
+}
+.main img{
+  display:block; width:100%; height:auto;
+  -webkit-mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.55) 82%,transparent 97%);
+          mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.55) 82%,transparent 97%);
+}
+
+/* ═══ LES PASTILLES DU TITRE ═══
+
+   `display:inline-flex` et `vertical-align` cales sur la ligne de base : une
+   pastille posee dans un titre doit s'aligner sur les lettres, pas flotter
+   au-dessus. La taille est en `em`, donc elle suit celle du titre a chaque
+   palier — c'est ce qui evite de la recalibrer sur chaque largeur. */
+/* `.nobr` empeche la cesure entre un pictogramme et son verbe : « enregistrez »
+   se retrouvait seul en bout de ligne, separe de son ecran. */
+/* Chaque pictogramme est soude au mot qui le suit : sans cela, il se
+   retrouvait seul en fin de ligne, separe de son verbe. */
+.nobr{ white-space:nowrap }
+.pic{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:.92em; height:.92em; border-radius:.26em;
+  margin-right:.16em;
+  /* ⚠ `-.05em` ET NON `-.13em`. Le pictogramme tombait 10 px trop bas : son
+     centre ne coincidait pas avec celui des lettres. `vertical-align` se
+     mesure depuis la LIGNE DE BASE, qui n'est pas le milieu du texte — il faut
+     donc compenser la difference entre hauteur de casse et hauteur de boite. */
+  vertical-align:-.05em;
+  flex:none; position:relative;
+  /* ═══ LE RELIEF ═══
+     Trois couches : une ombre portee coloree qui teinte le noir sous la
+     pastille, un lisere clair en haut qui simule l'arete eclairee, et une
+     lueur interne au sommet. C'est ce qui donne l'impression d'un objet pose
+     sur la page plutot que d'un carre plat. */
+  box-shadow:
+    0 .12em .32em -.06em rgba(0,0,0,.55),
+    inset 0 .04em 0 rgba(255,255,255,.42),
+    inset 0 0 0 .012em rgba(255,255,255,.18);
+}
+/* Le reflet en diagonale : un blanc tres dilue sur le quart superieur gauche,
+   qui s'eteint avant le milieu. Au-dela, la pastille parait mouillee. */
+.pic::after{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  pointer-events:none;
+  background:linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,.05) 42%, transparent 62%);
+}
+.pic svg{ width:.58em; height:.58em; stroke:#fff; fill:none;
+  stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+  position:relative; z-index:1;
+  /* Le dessin porte sa propre ombre : sans elle, il flotte sur le degrade. */
+  filter:drop-shadow(0 .02em .03em rgba(0,0,0,.3)) }
+.pic-c svg{ fill:#fff; stroke:none }
+/* ═══ LES DEGRADES ═══
+
+   Apple ne fait pas varier la luminosite d'une seule couleur : il fait TOURNER
+   la teinte. Un orange qui s'assombrit vers le rouge, un bleu vers l'indigo.
+   C'est ce glissement qui donne la profondeur — un degrade clair-vers-fonce sur
+   la meme teinte reste plat.
+
+   Chaque pastille parcourt donc environ 25 degres de teinte, du plus chaud en
+   haut a gauche vers le plus profond en bas a droite.
+
+   ⚠ Ces couleurs ne sont plus exactement celles du logo. C'est assume : sur un
+     carre de 50 px avec un dessin blanc au centre, le #E8760F pur manque de
+     contraste en bas. */
+.pic-a{ background:linear-gradient(145deg,#FFB74A 0%,#F0800E 48%,#C64B06 100%) }
+.pic-b{ background:linear-gradient(145deg,#6FA6E8 0%,#3A64B4 48%,#243F7E 100%) }
+.pic-c{ background:linear-gradient(145deg,#FFD98A 0%,#FFA524 48%,#E06B0A 100%) }
+.pic-a{ box-shadow:
+    0 .12em .34em -.05em rgba(232,118,15,.45),
+    inset 0 .04em 0 rgba(255,255,255,.5),
+    inset 0 0 0 .012em rgba(255,255,255,.2) }
+.pic-b{ box-shadow:
+    0 .12em .34em -.05em rgba(47,75,119,.5),
+    inset 0 .04em 0 rgba(255,255,255,.42),
+    inset 0 0 0 .012em rgba(255,255,255,.18) }
+.pic-c{ box-shadow:
+    0 .12em .34em -.05em rgba(255,174,46,.42),
+    inset 0 .04em 0 rgba(255,255,255,.6),
+    inset 0 0 0 .012em rgba(255,255,255,.24) }
+
+/* Le premier ecran est centre a TOUTES les largeurs : le centrage n'etait
+   declare que dans le bloc d'ordinateur, si bien que sur telephone le titre
+   restait aligne a gauche. */
 .hero{
   position:relative; z-index:2;
+  text-align:center;
+  /* Le premier ecran occupe EXACTEMENT la hauteur visible, barre deduite.
+     `height` et non `min-height` : ce dernier laisse grandir au-dela, et le
+     bloc atteignait 1293 px sur un ecran de 900 — le bouton passait sous la
+     pliure. Avec `height`, l'image se comprime pour tenir. */
+  height:calc(100dvh - var(--barre));
+  display:flex; flex-direction:column;
+  overflow:hidden;
   /* ═══ L'AIR DANS L'ACCROCHE ═══
 
      Chaque valeur de ce bloc a été desserrée d'un cran : le retrait sous la
@@ -450,6 +588,12 @@ header{
   padding:calc(var(--barre) + clamp(30px, 7.4vh, 74px)) var(--gouttiere) 0;
   max-width:var(--large); margin:0 auto;
 }
+.hero .actions{ justify-content:center }
+/* `margin:auto` sur le titre AUSSI : il porte une largeur maximale propre
+   (511 px dans un bloc de 700 sur tablette) et restait donc cale a gauche,
+   alors que le sous-titre et le bouton etaient centres. */
+.hero h1, .hero .sous{ margin-left:auto; margin-right:auto }
+
 /* ═══ L'EMPHASE SANS COULEUR ═══
 
    Le titre entier est en GRIS, et le mot qui compte est en blanc plein. C'est
@@ -505,7 +649,7 @@ h1 em{ font-style:normal; color:var(--t1); }
   stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
 /* La mention n'est plus une ligne à part : elle tient à côté du bouton. Une
    ligne de moins, et elle est lue au moment où elle sert — avant de cliquer. */
-.aside{ font-size:12.5px; color:var(--t3); }
+.aside{ font-size:13.5px; color:var(--t3); }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    L'ÉCRAN
@@ -636,23 +780,44 @@ h1 em{ font-style:normal; color:var(--t1); }
   position:relative; display:flex; justify-content:center;
   transform:translateX(var(--axe));
 }
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES HALOS
+
+   Deux nappes larges derriere l'image, aux couleurs relevees dans la photo :
+   l'ambre des cartons a droite, le bleu-gris des racks a gauche. Elles
+   debordent largement du cadre et se croisent derriere lui.
+
+   ⚠ ELLES REMPLACENT DEUX HALOS BLANCS a 30 et 46 % qui occupaient la meme
+     place. C'etaient eux qui rendaient invisibles les halos colores poses
+     ailleurs : un blanc a 46 % sature la zone, aucune couleur a 40 % ne passe
+     par-dessus.
+
+   Le blanc ne disparait pas tout a fait — il reste a 10 % au centre, pour que
+   la photo se detache du noir. Mais il ne domine plus.
+   ═══════════════════════════════════════════════════════════════════════════ */
 .tel-cadre::before{
+  /* ═══ LE HALO, AU DEGRADE DU LOGO ═══
+
+     Trois foyers superposes, aux couleurs exactes du logotype Standix :
+     #FFDFA0 (255-223-160) au centre, #FFAE2E (255-174-46) autour, #E8760F
+     (232-118-15) sur les bords. On tournait autour depuis des heures avec des
+     blancs froids alors que la palette de la marque etait la.
+
+     Il reste sous 0,30 d'opacite : au-dela, la page devient orange au lieu
+     d'etre noire avec une lumiere chaude. */
   content:''; position:absolute; z-index:0;
-  left:-38%; right:-38%; top:-40px; height:440px;
+  /* Les foyers sont EN DEHORS du cadre — a -8 % et 108 % — parce que la photo
+     est opaque : un halo centre derriere elle est integralement masque. Ce sont
+     donc deux nappes laterales, dont seule la moitie exterieure se voit. */
+  left:-30%; right:-30%; top:-12%; height:124%;
   background:
-    radial-gradient(ellipse 44% 56% at 50% 38%,
-      rgba(255,255,255,.30), transparent 72%),
-    radial-gradient(ellipse 82% 88% at 50% 40%,
-      rgba(var(--halo),.12), transparent 74%);
-  filter:blur(44px); pointer-events:none;
+    radial-gradient(ellipse 26% 44% at -4% 44%, rgba(255,223,160,.30), transparent 68%),
+    radial-gradient(ellipse 30% 50% at 104% 48%, rgba(255,174,46,.34), transparent 68%),
+    radial-gradient(ellipse 44% 20% at 50% -6%, rgba(255,196,102,.24), transparent 68%),
+    radial-gradient(ellipse 40% 18% at 50% 106%, rgba(232,118,15,.22), transparent 68%);
+  filter:blur(58px); pointer-events:none;
 }
-.tel-cadre::after{
-  content:''; position:absolute; z-index:0;
-  left:-14%; right:-14%; top:-16px; height:150px;
-  background:radial-gradient(ellipse 52% 60% at 50% 62%,
-    rgba(255,255,255,.46), rgba(var(--halo),.08) 48%, transparent 72%);
-  filter:blur(22px); pointer-events:none;
-}
+/* Le second foyer blanc, en haut, a ete retire : un seul halo suffit. */
 /* ═══════════════════════════════════════════════════════════════════════════
    LES DEUX SCENES
 
@@ -683,7 +848,11 @@ h1 em{ font-style:normal; color:var(--t1); }
      doivent deborder des deux cotes sans sortir de l'ecran. Retrecir l'image
      est la seule variable qui leur rend de la place — deplacer les pastilles ne
      ferait que choisir quel cote se coupe. */
-  width:min(430px, calc((100% - 2 * var(--gouttiere)) * 0.88));
+  /* 0,82 sous 1100 px : les pastilles gardent les positions d'ordinateur — 8 %
+     et 90 % — et debordent donc autant. L'image leur cede la place. */
+  /* 0,72 : le texte agrandi elargit les pastilles, qui debordent toujours de
+     8 et 90 %. L'image leur cede la place. */
+  width:min(430px, calc((100% - 2 * var(--gouttiere)) * 0.72));
   /* De l'air au-dessus et en dessous : la photo et ses reperes ont besoin de
      vide autour pour que le halo et les LED se lisent comme une mise en
      scene, pas comme un fond. */
@@ -699,6 +868,18 @@ h1 em{ font-style:normal; color:var(--t1); }
      debordent. Le fondu du bas passe donc sur la vue, pas sur le bloc. */
   overflow:visible;
 }
+
+/* ═══ LES HALOS ═══
+
+   Six taches sur le pourtour, qui debordent a peine du cadre. Chacune reprend
+   la couleur relevee SUR LE BORD qu'elle longe : ocre en haut (125-93-75),
+   bleu-gris a droite (76-86-101), brun en bas (102-88-73), beige a gauche
+   (118-103-92).
+
+   Sous 0,18 d'opacite et 11 % de debord : au-dela, on ne voit plus une lumiere
+   qui emane de la photo mais des taches posees autour. */
+/* Les six halos colores ont ete retires. Il ne reste que la lueur blanche de
+   `.tel-cadre::before`, derriere l'image. */
 /* ═══════════════════════════════════════════════════════════════════════════
    LES COUCHES DE LUMIERE
 
@@ -745,19 +926,37 @@ h1 em{ font-style:normal; color:var(--t1); }
    meme rayon suit la courbe sur tout son parcours.
 
    La lueur exterieure reprend le bleu releve dans la photo. */
+/* ═══ LE CONTOUR EN VERRE ═══
+
+   Un lisere d'un pixel dont la couleur TOURNE avec le cadre : ocre en haut,
+   bleu-gris a droite, brun en bas — les teintes relevees sur chaque bord de la
+   photo. C'est ce qui fait que le verre semble refleter l'image plutot que
+   d'etre peint dessus.
+
+   `border-image` ne suit pas les angles arrondis. On passe donc par un degrade
+   en fond, masque pour ne garder que le contour. */
 .vue-scene::after{
   content:''; position:absolute; inset:0; z-index:1;
-  border-radius:22px; pointer-events:none;
-  /* Plus de lisere bleu : un trait blanc a 6 % et une ombre portee profonde
-     suffisent a faire emerger la photo du noir. Un contour colore la posait
-     dans un cadre, ce que la reference n'a pas. */
-  border:0;
-  /* La lueur de 35 px a ete retiree : c'est elle qui eclaircissait le noir juste
-     autour de la photo et se lisait comme un second fond. Il reste l'ombre
-     portee, qui la fait emerger sans rien allumer derriere. */
-  box-shadow:0 30px 70px rgba(0,0,0,.45),
-             0 0 0 1px rgba(255,255,255,.06);
+  border-radius:22px; pointer-events:none; padding:1.6px;
+  /* Le lisere n'est pas d'intensite constante : il s'allume franchement a trois
+     endroits — angle haut gauche, flanc droit, bas — et s'eteint entre eux.
+     C'est cette alternance qui fait lire un reflet et non un cadre peint. Un
+     trait uniforme, meme colore, reste grossier. */
+  /* Le lisere s'allume franchement en haut et sur le flanc droit — la ou la
+     lumiere de l'atelier frappe le cadre — et s'eteint presque ailleurs. Les
+     pics montent a 0,95 : au-dessous, on voit un trait colore, pas un reflet. */
+  background:linear-gradient(158deg,
+    rgba(255,236,210,.95) 0%,  rgba(240,206,168,.55) 10%,
+    rgba(226,206,186,.14) 26%, rgba(168,206,255,.95) 44%,
+    rgba(130,168,224,.42) 56%, rgba(150,132,112,.10) 74%,
+    rgba(228,186,142,.80) 90%, rgba(206,168,132,.34) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
 }
+/* L'ombre portee est ramenee de 70 a 34 px et de 0,45 a 0,26 : elle noircissait
+   exactement la zone ou les halos devaient se voir, et les annulait. */
+.vue-scene{ box-shadow:0 18px 34px rgba(0,0,0,.26) }
 
 .telephone{
   position:relative; z-index:1;
@@ -833,7 +1032,7 @@ section.bloc::before{
    s'affiche. C'est voulu — on ne numérote pas la sortie. */
 .surtitre{
   display:inline-flex; align-items:baseline; gap:11px;
-  font-size:12.5px; font-weight:500; color:var(--t3);
+  font-size:13.5px; font-weight:500; color:var(--t3);
   letter-spacing:.02em; margin-bottom:14px;
 }
 .surtitre::before{
@@ -1162,12 +1361,71 @@ h2.chiffres{
   /* z-index:4 : au-dessus du lisere de l'image, a 1. Les pastilles etaient au
      meme plan que lui et passaient dessous. */
   z-index:4;
-  display:flex; align-items:center; gap:12px;
-  padding:12px 15px; border-radius:18px;
+  /* `inline-flex` : la boite epouse son contenu au lieu d'occuper la largeur
+     disponible. Combine a `max-width` seul, elle se resserre sur la ligne la
+     plus longue une fois le texte replie. */
+  display:inline-flex; align-items:center; gap:13px;
+  /* ═══ MARGES VISUELLES, PAS MARGES DE BOITE ═══
+
+     A gauche, ce que l'oeil voit n'est pas le carre du pictogramme mais le
+     DESSIN qu'il contient — et ce carre porte 10 px de vide interne. Avec un
+     retrait egal des deux cotes, on mesurait donc 29 px du bord au dessin
+     contre 19 px du texte au bord.
+
+     Le retrait de gauche descend a 9 px pour compenser ces 10 px : les deux
+     ecarts visuels tombent alors a 19. Les valeurs different dans le code
+     precisement pour que le resultat paraisse symetrique. */
+  /* `border-radius:100px` : l'arrondi vaut plus que la moitie de la hauteur,
+     donc les cotes deviennent des demi-cercles complets — c'est le maximum
+     possible sur une boite de cette forme. */
+  /* ═══ 29 PX DE CHAQUE COTE, JUSQU'AU CONTENU VISIBLE ═══
+
+     A gauche, 19 px de retrait plus les 10 px de vide interne du carre du
+     pictogramme font 29 px avant le dessin. C'est cet ecart qui sert de
+     reference : le retrait de droite vaut donc 29 px, pour que le texte
+     s'arrete a la meme distance du bord.
+
+     Les deux valeurs different dans le code parce que ce qu'on egalise n'est
+     pas la boite mais ce que l'oeil voit. */
+  /* Retraits ramenes de 24/14 a 16/9 : c'etaient eux, et non la taille du
+     contenu, qui laissaient 23 % de vide. Le pictogramme comble la
+     difference a gauche, comme avant. */
+  padding:11px 16px 11px 12px; border-radius:100px;
   /* `max-content` sans largeur imposee : chaque pastille prend la place de
      son texte. « Prive » tient sur deux lignes courtes et n'a plus a
      reserver le vide a droite qu'imposait une largeur commune. */
-  width:max-content; max-width:210px;
+  /* 230 px : « ou un enregistrement d'écran » fait 27 signes et passait sur
+     quatre lignes a 210, ce qui rendait les trois pastilles de hauteurs
+     tres inegales. */
+  /* Le retour a la ligne est laisse au navigateur : les `<br>` que j'y avais
+     poses forcaient une coupure EN PLUS du repli naturel, d'ou des pastilles
+     a quatre lignes. */
+  /* ⚠ PAS DE `width:max-content`.
+
+     Il prend la largeur du texte NON REPLIE, puis `max-width` le replie : la
+     boite gardait 268 px alors que les lignes n'en occupaient que 176 — 92 px
+     de vide a droite. `max-width` seul, sur une boite en ligne, laisse le
+     navigateur se resserrer sur le contenu reel.
+
+     `fit-content(268px)` aurait fait la meme chose mais n'est pas reconnu sur
+     `width` : la largeur partait a 342 px. */
+  /* `min-width` autant que `max-width` : sans plancher, « Un QR code » se
+     repliait a 136 px et son texte partait sur six lignes, alors que la place
+     etait disponible. Les trois pastilles se resserrent donc entre 244 et
+     268 px — assez etroit pour eviter le vide, assez large pour deux lignes. */
+  /* ═══ LA BOITE EPOUSE EXACTEMENT LE TEXTE ═══
+
+     Les coupures sont posees a la main dans le HTML, et la largeur vaut
+     `max-content` : la boite mesure alors precisement la ligne la plus
+     longue, sans un pixel de vide a droite.
+
+     C'est la seule facon d'y arriver en CSS. Laisser le navigateur replier
+     produit toujours un reste : il coupe pour tenir dans la largeur permise,
+     puis la boite garde cette largeur meme si la ligne obtenue est plus
+     courte.
+
+     ⚠ Si un libelle change, il faut deplacer son `<br>`. */
+  width:max-content;
   /* ═══ MEME MATIERE QUE LA BARRE ═══
      Valeurs reprises telles quelles de l'en-tete : 42 % d'opacite, flou de
      26 px, saturation a 180 %. C'est `saturate` qui fait la difference entre
@@ -1177,7 +1435,9 @@ h2.chiffres{
      10 % puis 3,5 % sur un fond sombre, et non un voile clair. */
   background:
     linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
-    rgba(8,9,10,.30);
+    /* 0,30 -> 0,52 : sur la reference les pastilles sont nettement plus
+       denses que le fond, ce qui detache le texte de la photo. */
+    rgba(8,9,10,.52);
   -webkit-backdrop-filter:blur(16px) saturate(115%);
           backdrop-filter:blur(16px) saturate(115%);
   border:1px solid rgba(255,255,255,.10);
@@ -1188,7 +1448,7 @@ h2.chiffres{
      n'apparaissait plus qu'en fondu, sans la montee ni le flou qui se dissipe.
      C'est ce qui avait change l'entree sans que je l'aie voulu. */
 }
-.pastille b{ display:block; font-size:13px; font-weight:500; color:var(--t1);
+.pastille b{ display:block; font-size:16.5px; font-weight:500; color:var(--t1);
   letter-spacing:-.02em; line-height:1.15 }
 /* `nowrap` : « ecrites par l'IA » passait sur deux lignes et deformait la
    pastille, qui n'avait plus la meme hauteur que les deux autres. */
@@ -1205,17 +1465,19 @@ h2.chiffres{
 /* Le pictogramme dans son propre carre : c'est lui qui donne du poids a la
    pastille et permet de la lire d'un coup d'oeil. */
 .pastille .ico{
-  flex:none; width:42px; height:42px; border-radius:12px;
+  /* 42 -> 50 px, et le dessin de 23 a 28 : le contenu n'occupait que 77 % de
+     la pastille, le reste etant du vide. */
+  flex:none; width:50px; height:50px; border-radius:14px;
   display:grid; place-items:center;
   background:rgba(255,255,255,.07);
   box-shadow:inset 0 0 0 .5px rgba(255,255,255,.13);
 }
-.pastille .ico svg{ width:23px; height:23px; stroke:var(--t1); fill:none;
+.pastille .ico svg{ width:28px; height:28px; stroke:var(--t1); fill:none;
   stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round }
 .pastille .txt{ display:block; padding-top:1px }
 /* Le texte revient a la ligne : c'est ce qui donne a la pastille sa forme de
    bloc plutot que de bande, et evite les legendes interminables. */
-.pastille span span, .pastille .txt span{ display:block; white-space:normal; font-size:11px; color:rgba(255,255,255,.62);
+.pastille span span, .pastille .txt span{ display:block; white-space:normal; font-size:13.5px; color:rgba(255,255,255,.62);
   line-height:1.3; margin-top:2px }
 /* Les pastilles sont centrees sur l'extremite de leur trait — memes
    coordonnees, exprimees en pourcentage de l'image. Deplacer un point du SVG
@@ -1236,20 +1498,58 @@ h2.chiffres{
      10,5 px. C'est la seule facon de les laisser deborder des DEUX cotes sans
      qu'elles se coupent contre le bord de l'ecran, ni qu'elles recouvrent
      l'image entiere. */
-  .pastille{ max-width:170px; padding:10px 12px; gap:10px }
+  /* 230 px : sous 1100, la premiere legende passait a quatre lignes. La
+     pastille reste plus etroite qu'en grand format, mais assez large pour
+     que le texte tienne sur deux. */
+  /* Les positions sont celles de l'ordinateur, en pourcentage : a 288 px de
+     large, un debord de 8 % a gauche et 90 % a droite sort de l'ecran. Les
+     pastilles retrecissent donc — texte, pictogramme et retraits — pour tenir
+     a la meme place relative. */
+  /* Les positions restent celles de l'ordinateur — 8 %, 90 %, 10 % — et tiennent
+     desormais, parce que les legendes sont passees sur une seule ligne : la
+     pastille fait 150 px au lieu de 250, et deborde sans sortir de l'ecran. */
+  /* ⚠ CE BLOC S'APPLIQUE DES 1099 PX, donc AUSSI aux tablettes.
+
+     Les valeurs qui suivent sont taillees pour un telephone : sur une tablette,
+     ou l'image fait 430 px, elles donnaient des pastilles minuscules. Une taille
+     intermediaire est donc redeclaree plus bas, entre 780 et 1099 px. */
+  .pastille{ padding:7px 10px 7px 8px; gap:8px }
+  .pastille .txt span{ font-size:10.5px }
+  .pastille .ico{ width:30px; height:30px; border-radius:9px }
+  .pastille .ico svg{ width:17px; height:17px }
+  .pastille b{ font-size:13px }
+  .pastille .txt span{ font-size:11px }
   .pastille .ico{ width:36px; height:36px; border-radius:10px }
   .pastille .ico svg{ width:20px; height:20px }
-  .pastille b{ font-size:12.5px }
-  .pastille .txt span{ font-size:10.5px }
-  .p1{ left:14.0%; top:16.0% }
-  .p2{ left:84.0%; top:48.0% }
-  .p3{ left:16.0%; top:80.0% }
+  .pastille b{ font-size:13px }
+  .pastille .txt span{ font-size:11px }
+  /* Elargies a 230 px, elles debordaient de l'ecran sur telephone. Elles se
+     recentrent : elles depassent toujours l'image, mais restent lisibles. */
+/* Aucune position propre au telephone : les trois pastilles gardent celles de
+   l'ordinateur, exprimees en pourcentage, donc elles suivent l'image quelle
+   que soit sa taille. */
+
 }
 
 /* Sous 380 px, les pastilles rentrent : l'ecran n'a plus la place d'absorber
    un debordement de 60 px de chaque cote. */
+/* ═══ TABLETTE : ENTRE LES DEUX ═══
+
+   L'image y fait 430 px comme sur ordinateur, mais le bloc telephone leur
+   imposait des pastilles de 145 px. Elles reprennent ici une taille proche de
+   celle du grand format. */
+@media (min-width: 780px) and (max-width: 1099px){
+  .pastille{ padding:10px 13px 10px 10px; gap:11px }
+  .pastille .ico{ width:38px; height:38px; border-radius:11px }
+  .pastille .ico svg{ width:21px; height:21px }
+  .pastille b{ font-size:16.5px }
+  .pastille .txt span{ font-size:12.5px }
+}
+
 @media (max-width: 379px){
-  .pastille{ max-width:150px }
+  /* Sous 380 px, la coupure manuelle ne suffit plus : on laisse le navigateur
+     replier, quitte a retrouver un peu de vide. */
+  .pastille{ width:auto; max-width:150px }
   .p1{ left:28.0% }
   .p2{ left:74.0% }
   .p3{ left:30.0% }
@@ -1274,9 +1574,15 @@ h2.chiffres{
 
 @media (min-width: 820px){
   .scene{ width:100%; max-width:400px; margin-bottom:54px }
-  .pastille{ padding:9px 18px; border-radius:100px }
-  .pastille b{ font-size:15px }
-  .pastille span{ font-size:11.5px }
+  /* Cette regle datait des pastilles en pilule, sans pictogramme. Elle
+     ecrasait le retrait asymetrique pose plus haut et remettait un arrondi
+     de 100 px. */
+  /* ⚠ CETTE REGLE EST LA PLUS SPECIFIQUE : elle ecrase le retrait declare plus
+     haut. C'est ici qu'il faut agir pour l'ordinateur, pas dans `.pastille`. */
+  /* 13 px a gauche : le dessin touchait presque le bord arrondi. */
+  .pastille{ padding:12px 18px 12px 13px }
+  .pastille b{ font-size:16.5px }
+  .pastille span{ font-size:13px }
   /* Aucune position ici : elles sont fixees une seule fois, en pourcentage, sur
      les extremites des traits. Redeclarer `bottom` alors que `top` est deja
      pose etirait la pastille sur toute la hauteur entre les deux — c'est ce qui
@@ -1329,7 +1635,7 @@ h2.chiffres{
 }
 .face li::before{ content:'—'; position:absolute; left:0; top:11px; color:var(--t3) }
 .face li b{ color:var(--t1); font-weight:500 }
-@media(min-width:820px){ .face li{ font-size:15px } }
+@media(min-width:820px){ .face li{ font-size:16.5px } }
 
 .bascule-pas{ display:flex; gap:7px; margin-top:24px }
 .bascule-pas i{ width:6px; height:6px; border-radius:100px; background:rgba(255,255,255,.2);
@@ -1368,7 +1674,7 @@ h2.chiffres{
              0 26px 62px rgba(0,0,0,.52);
 }
 .tarif .nom{
-  font-size:12.5px; font-weight:500; color:var(--t2);
+  font-size:13.5px; font-weight:500; color:var(--t2);
   letter-spacing:.03em; margin-bottom:14px;
 }
 .tarif .somme{ display:flex; align-items:baseline; gap:7px; margin-bottom:4px; }
@@ -1382,7 +1688,7 @@ h2.chiffres{
    astuce de présentation, c'est une division — et un chiffre divisé pèse
    toujours moins lourd qu'un chiffre entier. */
 .tarif .division{
-  font-size:12.5px; color:var(--t3); margin-bottom:22px;
+  font-size:13.5px; color:var(--t3); margin-bottom:22px;
 }
 .tarif ul{ list-style:none; margin-bottom:22px; }
 .tarif li{
@@ -1401,13 +1707,13 @@ h2.chiffres{
    achat. Une ligne sous les avantages suffit — elle se voit sans occuper la
    place d'un choix. */
 .tarif .annuel{
-  margin:-8px 0 20px; font-size:12.5px; color:var(--t3);
+  margin:-8px 0 20px; font-size:13.5px; color:var(--t3);
 }
 .tarif .annuel b{ color:var(--t2); font-weight:500 }
 
 /* Le bouton prend toute la largeur de la carte, contrairement à celui de
    l'accroche. Là on invitait, ici on conclut. */
-.tarif .btn{ display:flex; width:100%; height:48px; font-size:15px; }
+.tarif .btn{ display:flex; width:100%; height:48px; font-size:16.5px; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LE TIROIR DES AUTRES FORMULES
@@ -1489,7 +1795,7 @@ h2.chiffres{
 }
 .risques span{
   position:relative; padding-left:17px;
-  font-size:12.5px; color:var(--t2);
+  font-size:13.5px; color:var(--t2);
 }
 .risques span::before{
   content:''; position:absolute; left:0; top:7px;
@@ -1589,7 +1895,7 @@ h2.chiffres{
    basse est plus crédible qu'un argument mis en gras. */
 .note{
   margin:30px 0 0; max-width:44ch;
-  font-size:12.5px; line-height:1.6; color:var(--t3);
+  font-size:13.5px; line-height:1.6; color:var(--t3);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2027,8 +2333,21 @@ footer .marque{ margin-bottom:18px; }
      du noir en haut et en bas — c'est ce qui fait qu'un premier écran plein
      paraît posé plutôt qu'étiré. */
   .premier{
-    display:grid; grid-template-columns:1fr 470px; gap:64px;
-    align-items:center;
+    /* ═══ UNE SEULE COLONNE, CENTREE ═══
+
+       Le premier ecran passe de deux colonnes a une seule : le visuel en haut,
+       puis le titre, le sous-titre et le bouton, tous centres.
+
+       ⚠ CE CHOIX A UN COUT : sur un ecran de 900 px de haut, le bouton descend
+         vers la pliure. La disposition en deux colonnes le gardait visible
+         d'emblee. On l'accepte ici parce que le titre court le rattrape — cinq
+         mots se lisent avant meme d'avoir defile. */
+    display:flex; flex-direction:column; align-items:center;
+    text-align:center; gap:0;
+    /* La zone d'accueil du visuel : 380 px de haut, reserves au-dessus du
+       titre. La capture detouree viendra s'y poser, eclairee par le halo qui
+       est deja en place. */
+    padding-top:380px;
     /* ═══ LA BANDE DES REPÈRES TIENT DANS LE PREMIER ÉCRAN ═══
 
        Elle mesure 102 px. En laissant le premier écran occuper 100dvh, elle
@@ -2058,8 +2377,19 @@ footer .marque{ margin-bottom:18px; }
        sans toucher au visuel. */
     padding:calc(var(--barre) + 20px) var(--gouttiere) 20px;
   }
-  .hero{ padding:0; max-width:none }
-  .colonne-app{ display:block }
+  /* Le texte est borne a 760 px : centre et pleine largeur, un titre devient
+     illisible — l'oeil perd la ligne suivante. */
+  /* 340 px de retrait en haut : la place ou viendra se poser la capture du
+     telephone detouree, eclairee par le halo deja en place. */
+  /* 60 px et non 340 : ces 340 px reservaient la place d'un visuel place
+     AU-DESSUS du titre. L'image etant desormais dessous, ils ne faisaient
+     que pousser tout le bloc vers le bas. */
+  .hero{ padding:60px 0 0; max-width:760px; margin:0 auto; text-align:center }
+  .hero .actions{ justify-content:center }
+  /* La colonne est desormais dans la section 02 : elle s'y centre. */
+  /* 96 px sous le visuel : a 54, le bas de l'image arrivait sur le surtitre
+     « 02 · La difference ». */
+  .colonne-app{ display:block; margin:0 auto 96px }
 
   /* 68 px, et l'interligne resserré à 0,98 : à cette taille, un titre respire
      par lui-même et un interligne large le fait flotter. C'est l'inverse du
@@ -2070,7 +2400,7 @@ footer .marque{ margin-bottom:18px; }
   h1{ font-size:54px; line-height:1.03; max-width:none; margin-bottom:26px }
   .sous{ font-size:17.5px; max-width:38ch; margin-bottom:34px }
   .btn{ height:50px; padding:0 24px; font-size:15.5px }
-  .aside{ font-size:13.5px }
+  .aside{ font-size:16.5px }
 
   /* Le bandeau de la galerie suit sa colonne. Son filet horizontal et ses
      croix sont masqués : ils marquaient la frontière entre l'accroche et la
@@ -2216,7 +2546,11 @@ footer .marque{ margin-bottom:18px; }
   /* `margin-right:32px` cale l'image sur l'axe entre la mediane et la verticale
      de droite : la mediane etant tracee 32 px au-dela du bord de colonne, les
      deux centres different de sa moitie, seize pixels. */
-  .duo{ width:100%; max-width:430px; aspect-ratio:1086/1448; margin-right:32px }
+  /* Sur ordinateur, la colonne a deja son retrait : pleine largeur. */
+  /* `margin:0 auto` : le bloc n'est plus dans une colonne de droite, il se
+     centre dans la section. Le decalage de 32 px compensait l'axe de la
+     grille a deux colonnes — il n'a plus d'objet. */
+  .duo{ width:100%; max-width:430px; aspect-ratio:1086/1448; margin:0 auto }
 
   .telephone{
     /* Aucun decalage : le chassis se centre sur la COLONNE. J'avais essaye
@@ -2259,7 +2593,10 @@ footer .marque{ margin-bottom:18px; }
     left:calc(-50vw + 50%); right:calc(-50vw + 50%);
   }
 
-  .cartes{ grid-template-columns:repeat(3,1fr); gap:18px }
+  /* Deux colonnes et non trois : avec quatre cartes, trois par ligne en
+     laissaient une seule sur la seconde rangee. Deux par deux, la grille est
+     pleine et chaque carte gagne en largeur. */
+  .cartes{ grid-template-columns:repeat(2,1fr); gap:18px }
   .carte p{ font-size:14px }
   .acces li{ font-size:14px }
   .sous-titre{ font-size:17px; margin-top:44px }
@@ -2535,54 +2872,60 @@ footer .marque{ margin-bottom:18px; }
   <!-- Le mot mis en blanc est « procédures » : c'est le résultat, et le seul
        terme du titre qui désigne ce que le patron obtient. « L'IA transforme
        vos vidéos » reste en gris — c'est le moyen. -->
-  <h1 class="flou r1">L'IA transforme vos vidéos<br><em>en procédures.</em></h1>
+  <!-- ⚠ TITRE RACCOURCI : « L'IA transforme vos videos en procedures » mettait
+       l'IA en sujet et prenait trois lignes. Ici c'est le patron qui agit —
+       « Filmez » — et le resultat tient en cinq mots. Sur un ecran centre, le
+       titre porte tout : il doit se lire d'un coup. -->
+  <!-- ═══ LE TITRE PORTE SES PICTOGRAMMES ═══
+
+       Trois carres colores glissES DANS la phrase, chacun juste avant le mot
+       qu'il illustre : une camera avant « Filmez », un ecran avant
+       « enregistrez », une etincelle avant « l'IA ».
+
+       Ils ne decorent pas, ils accelerent la lecture : l'oeil accroche le
+       pictogramme, puis lit le verbe. Sur un titre de trois actions, c'est ce
+       qui evite qu'on ne lise que la premiere.
+
+       Les couleurs sont celles du logo — #FFAE2E et #E8760F — sauf le dernier,
+       plus clair, qui marque le resultat. -->
+  <h1 class="flou r1">
+    <span class="nobr"><span class="pic pic-a"><svg viewBox="0 0 24 24"><path d="M2 7.5A2.5 2.5 0 014.5 5h8A2.5 2.5 0 0115 7.5v9a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 16.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg></span>Filmez,</span>
+    <span class="nobr"><span class="pic pic-b"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2.2"/><path d="M8 21h8M12 17v4"/></svg></span>enregistrez</span> un écran,
+    <em><span class="nobr"><span class="pic pic-c"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg></span>l'IA</span> crée la procédure.</em>
+  </h1>
   <!-- Le sous-titre dit ce que le titre ne dit pas : QUI les lit. Le titre
        s'arrête au résultat, celui-ci le met entre les mains de l'équipe. -->
   <p class="sous flou r2">
-    Toute l'équipe les consulte d'un scan, ou dans l'app.
+    Votre équipe la consulte d'un scan, au poste de travail.
   </p>
   <div class="actions flou r3">
     <a class="btn" href="app/">
       Essayer gratuitement
       <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
     </a>
-    <span class="aside">Sans carte bancaire</span>
+    <!-- « Sans carte bancaire » a ete retire du premier ecran. La mention reste
+         a cote du prix et dans la cloture, la ou elle repond a une objection ;
+         ici elle en soulevait une avant qu'on l'ait. -->
   </div>
+
+  <!-- ═══ LA MAIN QUI TIENT LE TELEPHONE ═══
+
+       Elle vient APRES le bouton, et non avant : le visiteur lit la promesse,
+       trouve son bouton, puis voit la preuve. Une image posee au-dessus aurait
+       repousse l'appel a l'action sous la pliure.
+
+       Le fondu du bas la fait disparaitre dans le noir de la page au lieu de
+       s'y arreter net — c'est ce qui donne l'impression qu'elle se prolonge
+       plutot qu'elle ne s'interrompt. -->
+  <figure class="main flou r4">
+    <img src="main-telephone.webp" width="1388" height="1398" loading="eager"
+         alt="Une procédure Standix ouverte sur un téléphone tenu en main">
+  </figure>
 
 </section>
 
-<div class="colonne-app">
-<!-- ═══ UN SEUL VISUEL ═══
-     La galerie à trois vues — pastilles, libellé, défilement — est retirée.
-     L'image porte le châssis ET la barre du navigateur affichant standix.app :
-     elle prouve que le produit tourne. Fond transparent, rien à ajouter. -->
-<!-- ═══ DEUX SCENES QUI SE RELAIENT ═══
-
-     La capture detouree a laisse la place a deux photos d'atelier. Elles ont
-     exactement le meme format — 1086 x 1448 — donc rien ne saute au changement.
-
-     Les reperes ne sont poses que sur la PREMIERE : sur la seconde, l'ecran du
-     telephone est lisible et trois etiquettes le masqueraient. -->
-<div class="tel-cadre flou r4">
-<div class="duo" id="duo">
-  <figure class="vue-scene on">
-    <img class="scene-img" src="scene-1.webp" width="1086" height="1448"
-         alt="Un responsable consulte une procédure Standix dans son atelier">
-    <!-- Les traits ont ete retires : les pastilles sont eparpillees sur toute
-         l'image, elles ne designent plus un point unique. -->
-    <figcaption class="pastille p1">
-      <i class="ico"><svg viewBox="0 0 24 24"><path d="M2 7.5A2.5 2.5 0 014.5 5h8A2.5 2.5 0 0115 7.5v9a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 16.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg></i>
-      <span class="txt"><b>Jusqu'à 5 min</b><span>de vidéo, analysée par l'IA</span></span></figcaption>
-    <figcaption class="pastille p2">
-      <i class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 20h1.5M20 14h1"/></svg></i>
-      <span class="txt"><b>Un QR code</b><span>scannez, la procédure s'ouvre</span></span></figcaption>
-    <figcaption class="pastille p3">
-      <i class="ico"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2.4"/><path d="M8 10V7a4 4 0 018 0v3"/><path d="M12 14.5v2.5"/></svg></i>
-      <span class="txt"><b>Privé</b><span>vos procédures<br>restent privées</span></span></figcaption>
-  </figure>
-  <!-- La seconde scene a ete retiree : une seule image, avec ses reperes. -->
-</div>
-</div>
+<!-- Le bloc visuel a ete DEPLACE en section 02. Le premier ecran garde sa
+     place libre au centre, pour la capture du telephone detouree. -->
 
 </div>
 </div><!-- /.premier -->
@@ -2619,33 +2962,43 @@ footer .marque{ margin-bottom:18px; }
   <i class="croix g"></i><i class="croix d"></i>
   <p class="surtitre app">Comment ça marche</p>
   <h2 class="app" style="--d:.05s">
-    Trois façons de créer une procédure. <em>Le résultat est le même.</em>
+    Quatre façons de créer une procédure. <em>Le résultat est le même.</em>
   </h2>
 
   <div class="cartes">
     <div class="carte app" style="--d:.10s">
       <svg class="pic" viewBox="0 0 24 24"><rect x="2" y="5" width="14" height="14" rx="3"/><path d="M16 10l6-3v10l-6-3z"/></svg>
       <b>À partir d'une vidéo</b>
-      <p>Vous filmez le geste, ou votre écran. L'IA découpe la vidéo en étapes,
-         rédige chacune d'elles et l'horodate.</p>
+      <p>Vous filmez le geste. L'IA découpe la vidéo en étapes, rédige chacune
+         d'elles et l'horodate.</p>
       <!-- La durée est annoncée comme une CARACTÉRISTIQUE, pas comme une
            supériorité : je n'ai pas les limites des autres outils. Elle a sa
            place ici parce qu'un patron veut savoir si sa vidéo passera — c'est
            la première question pratique qu'il se pose. -->
-      <span class="tag">Le geste ou l'écran · jusqu'à 5 minutes</span>
+      <span class="tag">Le geste filmé · jusqu'à 5 minutes</span>
     </div>
+    <!-- L'enregistrement d'ecran est une carte a part et non une mention dans
+         la premiere : c'est un geste different — on ne filme pas un ecran comme
+         on filme un atelier — et il parle a un metier different, celui ou la
+         procedure se passe sur un logiciel. -->
     <div class="carte app" style="--d:.15s">
+      <svg class="pic" viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2.2"/><path d="M8 21h8M12 17v4"/><circle cx="12" cy="10.5" r="2.6"/></svg>
+      <b>À partir d'un enregistrement d'écran</b>
+      <p>Vous enregistrez votre écran pendant que vous faites la manipulation.
+         L'IA en tire les étapes.</p>
+      <span class="tag">Logiciel · caisse · outil de gestion</span>
+    </div>
+    <div class="carte app" style="--d:.20s">
       <svg class="pic" viewBox="0 0 24 24"><path d="M14 3v5h5"/><path d="M19 8v11a2 2 0 01-2 2H7a2 2 0 01-2-2V5a2 2 0 012-2h7z"/><path d="M9 13h6M9 17h4"/></svg>
       <b>À partir d'un document</b>
       <p>Déposez ce que vous avez déjà. L'IA le découpe et en fait une procédure
          structurée.</p>
       <span class="tag">PDF · Word · image · texte</span>
     </div>
-    <div class="carte app" style="--d:.20s">
+    <div class="carte app" style="--d:.25s">
       <svg class="pic" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
-      <b>À la main</b>
-      <p>Écrivez les étapes une par une et ajoutez une photo à chacune. Sans IA,
-         quand vous savez déjà quoi dire.</p>
+      <b>Manuellement</b>
+      <p>Écrivez les étapes une par une et ajoutez une photo à chacune.</p>
       <span class="tag">Une image par étape</span>
     </div>
   </div>
@@ -2654,18 +3007,15 @@ footer .marque{ margin-bottom:18px; }
   <ul class="acces">
     <li class="app" style="--d:.27s">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 14h3v3M20 20h1M17 21h0"/></svg>
-      <span><b>En scannant un QR code.</b> L'app en génère un par procédure.
-        Collé sur la machine ou le bidon, il l'ouvre en un scan.</span>
+      <span><b>En scannant un QR code</b></span>
     </li>
     <li class="app" style="--d:.30s">
       <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/></svg>
-      <span><b>Depuis l'app.</b> Chaque membre y retrouve toutes les procédures
-        de l'entreprise, classées par dossier.</span>
+      <span><b>Depuis l'app</b></span>
     </li>
     <li class="app" style="--d:.33s">
       <svg viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><rect x="6" y="14" width="12" height="7" rx="1"/><path d="M6 18H4a2 2 0 01-2-2v-3a2 2 0 012-2h16a2 2 0 012 2v3a2 2 0 01-2 2h-2"/></svg>
-      <span><b>Sur papier.</b> Chaque procédure s'exporte en PDF, à afficher au
-        mur ou à joindre à un dossier.</span>
+      <span><b>Sur papier</b></span>
     </li>
   </ul>
 
@@ -2703,7 +3053,47 @@ footer .marque{ margin-bottom:18px; }
          que possible : sur une page qui dit « rien n'a ete reecrit », une scene
          qui n'a jamais eu lieu est une contradiction qu'on tolere, pas qu'on
          choisit. -->
-  <!-- La photo est remontee dans le premier ecran, avec sa jumelle. -->
+  <!-- ═══ LE VISUEL, DESCENDU DU PREMIER ECRAN ═══
+
+       La photo d'atelier, son halo, son contour et ses trois pastilles ouvrent
+       desormais la section 02. C'est leur place : elles racontent ce que
+       l'outil apporte, ce qui est le sujet de cette section.
+
+       Le premier ecran, lui, attend la capture du telephone — la preuve, et
+       non l'illustration. -->
+<div class="colonne-app">
+<!-- ═══ UN SEUL VISUEL ═══
+     La galerie à trois vues — pastilles, libellé, défilement — est retirée.
+     L'image porte le châssis ET la barre du navigateur affichant standix.app :
+     elle prouve que le produit tourne. Fond transparent, rien à ajouter. -->
+<!-- ═══ DEUX SCENES QUI SE RELAIENT ═══
+
+     La capture detouree a laisse la place a deux photos d'atelier. Elles ont
+     exactement le meme format — 1086 x 1448 — donc rien ne saute au changement.
+
+     Les reperes ne sont poses que sur la PREMIERE : sur la seconde, l'ecran du
+     telephone est lisible et trois etiquettes le masqueraient. -->
+<div class="tel-cadre flou r4">
+<div class="duo" id="duo">
+  <figure class="vue-scene on">
+    <img class="scene-img" src="scene-1.webp" width="1086" height="1448"
+         alt="Un responsable consulte une procédure Standix dans son atelier">
+    <!-- Les traits ont ete retires : les pastilles sont eparpillees sur toute
+         l'image, elles ne designent plus un point unique. -->
+    <figcaption class="pastille p1">
+      <i class="ico"><svg viewBox="0 0 24 24"><path d="M2 7.5A2.5 2.5 0 014.5 5h8A2.5 2.5 0 0115 7.5v9a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 16.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg></i>
+      <span class="txt"><b>Une vidéo</b><span>l'IA écrit la procédure</span></span></figcaption>
+    <figcaption class="pastille p2">
+      <i class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.4"/><rect x="14" y="3" width="7" height="7" rx="1.4"/><rect x="3" y="14" width="7" height="7" rx="1.4"/><path d="M14 14h3v3h-3zM18 18h3v3h-3zM14 20h1.5M20 14h1"/></svg></i>
+      <span class="txt"><b>Un QR code</b><span>l'équipe scanne, elle lit</span></span></figcaption>
+    <figcaption class="pastille p3">
+      <i class="ico"><svg viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.6"/><path d="M10.5 5.4h3"/><path d="M9.4 11h5.2M9.4 14.4h3.4"/></svg></i>
+      <span class="txt"><b>L'app</b><span>toutes les procédures</span></span></figcaption>
+  </figure>
+  <!-- La seconde scene a ete retiree : une seule image, avec ses reperes. -->
+</div>
+</div>
+
 
   <p class="surtitre app">La différence</p>
   <!-- « Ce que ça change, des deux côtés » supposait qu'on sache déjà quels
@@ -2718,16 +3108,26 @@ footer .marque{ margin-bottom:18px; }
 
   <div class="dossier app" id="dossier" style="--d:.13s">
     <div class="face on">
+      <!-- Les points sont ranges par ce qu'ils declenchent chez le gerant : le
+           temps gagne d'abord, la perte evitee ensuite, le pilotage en dernier.
+           C'est l'ordre dans lequel il se pose les questions. -->
       <ul>
         <li><b>Former une seule fois.</b> Vous filmez le geste, il sert à toutes les arrivées suivantes.</li>
         <li><b>Ne plus être interrompu</b> pour la même question, pour la quinzième fois.</li>
         <li><b>Le savoir-faire reste</b> quand quelqu'un s'en va.</li>
+        <li><b>Tout au même endroit.</b> Les procédures ne sont plus dans la tête des anciens ni dans un classeur.</li>
+        <li><b>Une sauvegarde de votre métier</b> — ce que vous savez faire ne dépend plus d'une personne.</li>
+        <li><b>Un format unique</b> pour toutes vos procédures, quel que soit celui qui les crée.</li>
+        <li><b>Créer et modifier sans effort</b>, sans repartir d'une page blanche.</li>
+        <li><b>Voir où en est l'équipe</b> depuis l'espace gestion.</li>
       </ul>
     </div>
     <div class="face">
       <ul>
         <li><b>Trouver la bonne procédure</b> en scannant un QR code.</li>
+        <li><b>Lire en quelques secondes</b>, au poste, sans ouvrir un classeur.</li>
         <li><b>Trouver la réponse seul</b>, sans avoir à demander à quelqu'un.</li>
+        <li><b>Toujours la même présentation</b>, d'une procédure à l'autre.</li>
         <li><b>Dans sa langue</b> — français, anglais ou allemand.</li>
         <li><b>Démarrer seul</b> le premier jour.</li>
         <li><b>Refaire un geste rare</b> sans hésiter, même des mois après.</li>

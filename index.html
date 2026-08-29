@@ -88,7 +88,10 @@
      `--surface` empile la même teinte sur une base opaque à la couleur du
      fond : l'aspect ne change pas d'un pixel, mais plus rien ne transparaît.
      Les mêmes valeurs, appliquées autrement. */
-  --fond:#08090A;
+  /* Noir pur. La grille, le grain et les lueurs restent, mais posent leurs
+     valeurs sur du #000 — c'est ce qui donne la profondeur maximale a un
+     ecran OLED, ou le noir pur n'emet aucune lumiere. */
+  --fond:#000000;
   --t1:#F7F8F8;
   --t2:#8E939B;
   --t3:#61656C;
@@ -420,7 +423,9 @@ header{
   /* 330 px et non 420 : l'appareil ecrasait le titre et le bouton. A cette
      taille l'ecran reste lisible et les deux reperes ont la place de
      deborder de chaque cote. */
-  width:min(330px, 74%);
+  /* 82 % sous 1100 px : l'appareil y etait plus petit que sur ordinateur alors
+     que c'est la qu'on regarde un telephone. */
+  width:min(330px, 82%);
   display:flex; align-items:flex-start; justify-content:center;
   pointer-events:none;
 }
@@ -532,8 +537,13 @@ header{
   /* Sur telephone seulement : l'image y fait moins de 250 px et ne peut pas
      contenir une pastille de 200. Tablette est traitee plus bas, avec les
      valeurs d'ordinateur. */
-  .sur-h{ right:-18% }
-  .sur-b{ left:-20% }
+  /* Sur telephone, « Rapide » sort franchement a droite et « Facile » rentre
+     un peu : l'image y est trop etroite pour les contenir, autant assumer le
+     debordement et le rendre symetrique. */
+  /* L'image ayant grandi de 74 a 82 %, les reperes debordaient de l'ecran :
+     ils rentrent de la meme proportion. */
+  .sur-h{ right:-16% }
+  .sur-b{ left:-6% }
 }
 
 /* ═══ LE HALO BLANC DERRIERE LE TELEPHONE ═══
@@ -605,8 +615,26 @@ header{
      qu'il y a autour, d'ou la demarcation. En reprenant la variable et en
      laissant les calques de la page passer dessous, la jonction disparait. */
   background:linear-gradient(180deg,
-    rgba(8,9,10,0) 0%, rgba(8,9,10,.5) 44%,
-    rgba(8,9,10,.85) 74%, var(--fond) 96%);
+    rgba(0,0,0,0) 0%, rgba(0,0,0,.5) 44%,
+    rgba(0,0,0,.85) 74%, var(--fond) 96%);
+}
+
+/* ═══ LA LIGNE DE REASSURANCE ═══
+
+   Elle doit se lire APRES le titre, pas avec lui : corps reduit, gris moyen, et
+   les points medians a 30 % d'opacite pour qu'ils separent sans peser.
+
+   `flex-wrap` : sur telephone, les trois faits passent sur deux lignes plutot
+   que de se compresser. */
+.rassure{
+  display:flex; flex-wrap:wrap; justify-content:center; align-items:center;
+  gap:0 12px; margin:0 auto;
+  font-size:14.5px; color:var(--t2); letter-spacing:-.005em;
+}
+.rassure i{ font-style:normal; opacity:.3 }
+
+@media (max-width: 779px){
+  .rassure{ font-size:13px; gap:0 9px }
 }
 
 /* ═══ LES PASTILLES DU TITRE ═══
@@ -810,7 +838,7 @@ h1{
   /* 520 et non 500 : un cran seulement, assez pour que le titre pese sans
      basculer dans le gras. */
   font-weight:520;
-  font-size:clamp(29px,8.2vw,39px);
+  font-size:clamp(33px,9.4vw,46px);
   /* 1,09 et non 1,05 : sur quatre lignes serrées à -0,045 em, l'interligne est
      ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
      changent l'impression d'ensemble plus que n'importe quelle marge. */
@@ -2597,7 +2625,7 @@ body:not(.attend) .tel-cadre.flou::after{ animation-play-state:running }
      que pousser tout le bloc vers le bas. */
   /* 130 px et non 60 : le titre etait cale trop haut sous la barre. Il
      descend vers le centre optique de la page, ou l'oeil se pose d'abord. */
-  .hero{ padding:130px 0 0; max-width:800px; margin:0 auto; text-align:center }
+  .hero{ padding:130px 0 0; max-width:900px; margin:0 auto; text-align:center }
   .hero .actions{ justify-content:center }
   /* La colonne est desormais dans la section 02 : elle s'y centre. */
   /* 96 px sous le visuel : a 54, le bas de l'image arrivait sur le surtitre
@@ -2614,7 +2642,16 @@ body:not(.attend) .tel-cadre.flou::after{ animation-play-state:running }
    loin. Les deux se lisent d'un seul mouvement. */
 /* 1,10 et non 1,03 : a 58 px, les lignes se touchaient presque — les jambages
    d'une ligne arrivaient sur les accents de la suivante. */
-h1{ font-size:64px; line-height:1.10; max-width:none; margin-bottom:16px }
+/* `max-width:none` laissait le titre se replier sur trois lignes. Borne a
+   19 caracteres par ligne, il en fait deux. */
+/* ⚠ LA LARGEUR SE COMPTE EN SIGNES, PAS EN LIGNES. Le titre fait 44 signes ;
+   pour qu'il tienne sur DEUX lignes il faut donc environ 24 signes par ligne,
+   soit `24ch`. A 19, il en faisait trois. */
+/* ⚠ DEUX LIGNES DEMANDENT DE LA LARGEUR, DONC UN CORPS PLUS PETIT.
+   A 64 px, le titre ne tenait pas en deux lignes dans les 800 px du bloc :
+   il en faisait trois. A 56 px avec `max-width:26ch`, il en fait deux.
+   C'est l'arbitrage — un titre plus grand est un titre plus long. */
+h1{ font-size:56px; line-height:1.12; max-width:26ch; margin-bottom:16px }
   .sous{ font-size:17.5px; max-width:38ch; margin-bottom:34px }
   .btn{ height:50px; padding:0 24px; font-size:15.5px }
   .aside{ font-size:16.5px }
@@ -3110,7 +3147,17 @@ h1{ font-size:64px; line-height:1.10; max-width:none; margin-bottom:16px }
     <span class="nobr"><span class="pic pic-b"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2.2"/><path d="M8 21h8M12 17v4"/></svg></span>enregistrez</span> un écran,
     <em><span class="nobr"><span class="pic pic-c"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg></span>l'IA</span> crée la procédure.</em>
   </h1>
-  <!-- Le sous-titre a ete retire : le titre porte deja les trois temps. -->
+  <!-- ═══ LA LIGNE DE REASSURANCE ═══
+
+       Trois faits qui repondent aux trois questions qu'un patron se pose avant
+       de cliquer : combien, est-ce que je m'engage, est-ce que je peux essayer.
+       Ils existaient deja, mais en section 03 — trop loin pour servir.
+
+       Ils sont separes par des points medians et non par des barres : le point
+       median relie, la barre oppose. -->
+  <p class="rassure flou r2">
+    <span>À partir de 69 € par mois</span><i>·</i><span>14 jours d'essai</span>
+  </p>
   <!-- Le bouton a ete retire du premier ecran : il reste dans la barre, en
        haut a droite, ou il suit le defilement sur toute la page. -->
 

@@ -444,8 +444,10 @@ header{
      telephone parait se prolonger sous la pliure au lieu de s'arreter net. */
   /* La coupe remonte a 62 % : la barre du navigateur, claire, restait visible
      tout en bas et formait une bande grise sur le noir. */
-  -webkit-mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.42) 80%,transparent 93%);
-          mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.42) 80%,transparent 93%);
+  /* 48 % et non 62 : la barre de navigation du telephone, en bas de la
+     capture, restait visible. Elle est desormais entierement dans le fondu. */
+  -webkit-mask-image:linear-gradient(180deg,#000 48%,rgba(0,0,0,.38) 68%,transparent 84%);
+          mask-image:linear-gradient(180deg,#000 48%,rgba(0,0,0,.38) 68%,transparent 84%);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -460,7 +462,9 @@ header{
    ═══════════════════════════════════════════════════════════════════════════ */
 .sur{
   position:absolute; z-index:3;
-  display:inline-flex; align-items:center; gap:11px;
+  /* `gap:13px` : la valeur de `.pastille`. Elle etait a 11, et l'ecart entre le
+     pictogramme et le texte differait de 2 px entre les deux familles. */
+  display:inline-flex; align-items:center; gap:13px;
   /* Valeurs reprises telles quelles de `.pastille`, les trois reperes de la
      section 02 : meme retrait asymetrique, meme verre, meme bordure, meme
      ombre. Les deux familles ne doivent pas se distinguer. */
@@ -505,23 +509,29 @@ header{
    de ce centrage. Sur deux lignes de longueurs differentes, un texte centre
    dans une pastille se lit moins bien qu'aligne. */
 .sur{ text-align:left }
-.sur > span{ font-size:12.5px; color:rgba(255,255,255,.6); line-height:1.35 }
+/* 13,5 px : la taille de la legende dans `.pastille`. Elle valait 12,5 ici. */
+.sur > span{ font-size:13.5px; color:rgba(255,255,255,.6); line-height:1.35 }
 .sur b{ font-size:16.5px }
 .sur > span b{ margin-bottom:1px }
-/* -46 % et -48 % : ils masquaient le haut de l'ecran et la video. A ce
-   debordement, seul leur bord touche encore l'appareil. */
-.sur-h{ right:-46%; top:17%; transform:translate(0,-50%) }
+/* ⚠ `right:0` ET NON UNE VALEUR NEGATIVE.
+   Ils debordaient de 185 px a droite et 158 a gauche, largement hors de
+   l'image. Cales a 0, leur bord exterieur coincide avec celui de la photo :
+   ils sont entierement dedans et l'effleurent. */
+.sur-h{ right:0; top:17%; transform:translate(0,-50%) }
 /* Le second repere est cale sur le HAUT de l'image et non sur son bas :
    l'image deborde sous la pliure, donc `bottom` le placait hors de l'ecran. */
-.sur-b{ left:-48%; top:44%; transform:translate(0,-50%) }
+.sur-b{ left:0; top:44%; transform:translate(0,-50%) }
 
 @media (max-width: 1099px){
   /* ⚠ CE BLOC NE REDECLARE NI RETRAIT NI PICTOGRAMME. Il le faisait, et
      ecrasait les valeurs communes posees plus bas — les deux familles
      divergeaient sur tablette et telephone. Il ne garde que ce qui lui est
      propre : la position des deux reperes. */
-  .sur-h{ right:-22% }
-  .sur-b{ left:-24% }
+  /* Sur telephone seulement : l'image y fait moins de 250 px et ne peut pas
+     contenir une pastille de 200. Tablette est traitee plus bas, avec les
+     valeurs d'ordinateur. */
+  .sur-h{ right:-18% }
+  .sur-b{ left:-20% }
 }
 
 /* ═══ LE HALO BLANC DERRIERE LE TELEPHONE ═══
@@ -610,7 +620,9 @@ header{
 .nobr{ white-space:nowrap }
 .pic{
   display:inline-flex; align-items:center; justify-content:center;
-  width:.92em; height:.92em; border-radius:.26em;
+  /* .98 et non .92 : les pastilles suivent le corps du titre, mais un cran
+     au-dessus pour qu'elles pesent autant que les majuscules. */
+  width:.90em; height:.90em; border-radius:.25em;
   margin-right:.16em;
   /* ⚠ VALEUR MESUREE, PAS DEDUITE. `vertical-align` se compte depuis la ligne
      de base, qui n'est ni le milieu ni le sommet du texte. Le seul moyen fiable
@@ -638,14 +650,18 @@ header{
   pointer-events:none;
   background:linear-gradient(145deg, rgba(255,255,255,.34), rgba(255,255,255,.05) 42%, transparent 62%);
 }
-.pic svg{ width:.58em; height:.58em; stroke:#fff; fill:none;
+.pic svg{ width:.57em; height:.57em; stroke:#fff; fill:none;
   stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
   position:relative; z-index:1;
   /* Le dessin porte sa propre ombre : sans elle, il flotte sur le degrade. */
   filter:drop-shadow(0 .02em .03em rgba(0,0,0,.3)) }
 .pic-c svg{ fill:#fff; stroke:none }
-/* L'eclair de « Rapide » est plein : un trace fin se perdrait a cette taille. */
-.sur-h .pic svg{ fill:#fff; stroke:#fff; stroke-width:1.4; stroke-linejoin:round }
+/* ⚠ LES DESSINS SONT TRACES, PAS REMPLIS.
+   C'etait la derniere difference visible : ceux des reperes etaient pleins,
+   avec un trait de 1,4 px, quand ceux de la section 02 sont traces a 1,6 px
+   sans remplissage. A l'oeil, un dessin plein parait plus lourd. */
+.sur .pic svg{ fill:none; stroke:var(--t1); stroke-width:1.6;
+  stroke-linecap:round; stroke-linejoin:round }
 /* ═══ LES DEGRADES ═══
 
    Apple ne fait pas varier la luminosite d'une seule couleur : il fait TOURNER
@@ -798,7 +814,7 @@ h1{
      changent l'impression d'ensemble plus que n'importe quelle marge. */
   /* ⚠ PAS DE `font-weight` ICI. Il valait 500 et ecrasait le 520 declare
      quelques lignes plus haut — la graisse ne changeait pas. */
-  line-height:1.18; letter-spacing:-.045em;
+  line-height:1.24; letter-spacing:-.045em;
   margin-bottom:clamp(14px, 2.4vh, 20px); max-width:16ch;
   color:var(--t2);
 }
@@ -1700,6 +1716,10 @@ h2.chiffres{
   /* Le selecteur porte les DEUX familles : les reperes du premier ecran et les
      pastilles de la section 02 doivent rester identiques a chaque palier. */
   .pastille, .sur{ padding:10px 13px 10px 10px; gap:11px }
+  /* Sur tablette l'image fait 330 px comme sur ordinateur : les reperes y
+     tiennent donc aussi entierement. */
+  .sur-h{ right:0 }
+  .sur-b{ left:0 }
   .pastille .ico, .sur .pic{ width:38px; height:38px; border-radius:11px }
   .pastille .ico svg, .sur .pic svg{ width:21px; height:21px }
   .pastille b, .sur b{ font-size:16.5px }
@@ -2559,7 +2579,9 @@ footer .marque{ margin-bottom:18px; }
      quatre lignes bat l'effet d'un titre de six. */
   /* 16 px et non 26 : le sous-titre prolonge le titre, il ne le commente pas de
    loin. Les deux se lisent d'un seul mouvement. */
-h1{ font-size:54px; line-height:1.03; max-width:none; margin-bottom:16px }
+/* 1,10 et non 1,03 : a 58 px, les lignes se touchaient presque — les jambages
+   d'une ligne arrivaient sur les accents de la suivante. */
+h1{ font-size:58px; line-height:1.10; max-width:none; margin-bottom:16px }
   .sous{ font-size:17.5px; max-width:38ch; margin-bottom:34px }
   .btn{ height:50px; padding:0 24px; font-size:15.5px }
   .aside{ font-size:16.5px }
@@ -3069,7 +3091,7 @@ h1{ font-size:54px; line-height:1.03; max-width:none; margin-bottom:16px }
        s'y arreter net — c'est ce qui donne l'impression qu'elle se prolonge
        plutot qu'elle ne s'interrompt. -->
   <figure class="main flou r4">
-    <img src="main-telephone.webp" width="1100" height="2225" loading="eager"
+    <img src="main-telephone2.webp" width="1100" height="2225" loading="eager"
          alt="Une procédure Standix ouverte sur un téléphone tenu en main">
     <!-- Deux reperes poses sur l'appareil, dans la matiere des pastilles du
          titre : meme verre, meme lueur, meme arrondi. Ils repondent aux deux

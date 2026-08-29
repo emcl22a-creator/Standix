@@ -205,60 +205,9 @@ body{
 /* La lueur suit le texte, qui n'est plus centré : elle part du coin haut
    gauche. Elle ne se voit pas vraiment — elle empêche le noir d'être plat et
    donne une profondeur au fond. Aucun élément n'emploie cette couleur. */
-.lueur{
-  position:absolute; top:0; left:0; right:0; height:100dvh;
-  z-index:0; pointer-events:none;
-  /* ═══ DEUX FOYERS, PAS UN ═══
-
-     Une seule grande tache produit un gris sale ; deux foyers d'intensités
-     différentes créent une direction, et l'œil lit une source de lumière au
-     lieu d'un fond éclairci.
-
-     Le premier, bleuté, est derrière le titre. Le second, blanc et plus
-     faible, tombe à peu près là où se trouve la capture — sur téléphone comme
-     sur ordinateur, puisqu'il est placé en pourcentage. */
-  background:
-    /* Ce foyer était bleu à 17 %. Il teintait tout le coin haut-gauche du
-       premier écran, et le bleu n'existe nulle part ailleurs sur le site — ni
-       dans le logo, ni dans l'app, dont l'accent est ambre.
-
-       Il passe au blanc froid, la même teinte que sous 1100 px : la lumière
-       reste, la couleur part. */
-    /* 60 % de large au lieu de 110 : l'ellipse s'etendait jusque sous la photo
-       et l'entourait d'une zone plus claire. Resserree sur le coin haut-gauche,
-       elle eclaire le titre, ce pour quoi elle existe. */
-    /* 0,13 -> 0,055 : ce blanc eclairait le titre mais concurrencait les halos
-       colores, qui doivent porter la couleur du premier ecran. */
-    radial-gradient(ellipse 60% 34% at 16% -4%,
-      rgba(226,232,242,.055), rgba(226,232,242,.015) 48%, transparent 72%),
-    /* Le second foyer a ete retire : place a 52 % / 62 %, il tombait exactement
-       derriere la photo et creait autour d'elle une zone plus claire que le
-       reste — le « second arriere-plan » visible. Il datait de l'epoque ou la
-       capture detouree avait besoin d'etre decollee du fond ; la photo, elle,
-       porte sa propre lumiere. */
-    radial-gradient(ellipse 92% 26% at 52% 62%,
-      rgba(255,255,255,0), transparent 68%);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   LES DEUX FOYERS DU BAS DE PAGE
-
-   Derrière le prix et derrière la clôture, et nulle part ailleurs : ce sont
-   les deux endroits où l'on décide. Une page éclairée partout n'a plus de
-   hiérarchie — le noir des autres sections est ce qui donne leur valeur à
-   ces deux-là.
-
-   `z-index:-1` les place derrière le contenu de la section sans les sortir de
-   son empilement : ils ne passent donc jamais devant les filets de la grille.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.tarifs::after, .fin::after{
-  content:''; position:absolute; z-index:-1; pointer-events:none;
-  left:50%; top:6%; transform:translateX(-50%);
-  width:min(760px, 150%); height:440px;
-  background:radial-gradient(ellipse 50% 50% at 50% 50%,
-    rgba(var(--halo),.14), rgba(255,255,255,.035) 44%, transparent 72%);
-  filter:blur(40px);
-}
+/* La lueur de la page a ete retiree : il ne reste que le halo blanc pose
+   derriere le telephone, dans `.main::before`. */
+.lueur{ display:none }
 .fin::after{ height:360px; top:12% }
 .grain{
   position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.022;
@@ -455,10 +404,23 @@ header{
      ⚠ Le fichier porte 288 px de vide transparent a DROITE : le chassis y est
        centre, la main occupant la gauche. Ne pas rogner. */
   flex:1 1 auto; min-height:0;
+  position:relative;
   margin:44px auto 0;
   /* La largeur suit aussi la hauteur disponible : `min-height:0` autorise le
      conteneur a retrecir, mais l'IMAGE gardait sa largeur et debordait. */
-  width:min(620px, 92%, calc((100dvh - var(--barre) - 300px) * 1388 / 1398));
+  /* ⚠ LA LARGEUR NE SUIT PLUS LA HAUTEUR DISPONIBLE.
+
+     L'image fait 1100x2225 : deux fois plus haute que large. La lier a la
+     hauteur restante la reduisait a 265 px sur un ecran de 900 — un telephone
+     minuscule dont on ne lisait plus l'ecran.
+
+     Elle prend donc une largeur fixe et DEBORDE sous la pliure. C'est voulu :
+     la coupe en verre du bas transforme ce debordement en effet, et l'appareil
+     parait se prolonger au lieu de manquer de place. */
+  /* 330 px et non 420 : l'appareil ecrasait le titre et le bouton. A cette
+     taille l'ecran reste lisible et les deux reperes ont la place de
+     deborder de chaque cote. */
+  width:min(330px, 74%);
   display:flex; align-items:flex-start; justify-content:center;
   pointer-events:none;
 }
@@ -477,8 +439,162 @@ header{
 }
 .main img{
   display:block; width:100%; height:auto;
-  -webkit-mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.55) 82%,transparent 97%);
-          mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.55) 82%,transparent 97%);
+  position:relative; z-index:1;
+  /* La coupe du bas : l'image est pleine jusqu'a 74 %, puis s'efface. Le
+     telephone parait se prolonger sous la pliure au lieu de s'arreter net. */
+  /* La coupe remonte a 62 % : la barre du navigateur, claire, restait visible
+     tout en bas et formait une bande grise sur le noir. */
+  -webkit-mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.42) 80%,transparent 93%);
+          mask-image:linear-gradient(180deg,#000 62%,rgba(0,0,0,.42) 80%,transparent 93%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX REPERES POSES SUR L'APPAREIL
+
+   Ils reprennent la matiere des pastilles du titre — le verre est declare une
+   seule fois plus bas, dans `.pic`, et le bloc porte le meme fond translucide.
+
+   Positions en pourcentage : ils suivent l'image quelle que soit sa taille.
+   `sur-h` en haut a droite, `sur-b` en bas a gauche — les deux coins que le
+   telephone laisse libres.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.sur{
+  position:absolute; z-index:3;
+  display:inline-flex; align-items:center; gap:11px;
+  /* Valeurs reprises telles quelles de `.pastille`, les trois reperes de la
+     section 02 : meme retrait asymetrique, meme verre, meme bordure, meme
+     ombre. Les deux familles ne doivent pas se distinguer. */
+  padding:12px 18px 12px 13px; border-radius:100px;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.075), rgba(255,255,255,.025)),
+    rgba(8,9,10,.52);
+  -webkit-backdrop-filter:blur(16px) saturate(115%);
+          backdrop-filter:blur(16px) saturate(115%);
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 15px 35px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.045);
+  /* Plus de `nowrap` : les coupures sont posees a la main dans le HTML, ce qui
+     donne deux lignes de longueur voisine plutot qu'une bande. */
+}
+/* `border-radius:50%` : les deux reperes portent un CERCLE, pas un carre
+   arrondi. Le reste — degrade, lueur, arete eclairee — est celui de
+   `.pic-a`, la pastille « Filmez » du titre. */
+.sur .pic{ width:50px; height:50px; margin:0; vertical-align:0 }
+/* `.rond` n'a plus d'effet : le pictogramme est un carre arrondi, comme en
+   section 02. */
+/* ⚠ LE PICTOGRAMME EST CELUI DE LA SECTION 02, PAS CELUI DU TITRE.
+
+   Les deux reperes portaient un cercle orange plein, repris des pastilles du
+   titre. Les trois de la section 02 portent un carre arrondi en blanc a 7 %,
+   avec un lisere clair — beaucoup plus sobre.
+
+   Le bloc etait deja identique : verre, bordure, ombre, retraits. Seul le
+   pictogramme differait, et c'est lui qu'on voyait. */
+/* ⚠ PAS DE `border-radius` ICI. Il valait 14 px et ecrasait les valeurs des
+   paliers — 11 px sur tablette, 10 sur telephone —, si bien que le pictogramme
+   des reperes gardait un arrondi different de celui de la section 02. */
+.sur .pic.pic-a{
+  background:rgba(255,255,255,.07);
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.13);
+}
+.sur .pic{ border-radius:14px }
+.sur .pic svg{ width:28px; height:28px }
+.sur b{ display:block; font-size:13.5px; font-weight:500; color:var(--t1);
+  letter-spacing:-.01em; line-height:1.2 }
+.sur span span, .sur > span{ display:block }
+/* `text-align:left` : le premier ecran est centre, et les reperes heritaient
+   de ce centrage. Sur deux lignes de longueurs differentes, un texte centre
+   dans une pastille se lit moins bien qu'aligne. */
+.sur{ text-align:left }
+.sur > span{ font-size:12.5px; color:rgba(255,255,255,.6); line-height:1.35 }
+.sur b{ font-size:16.5px }
+.sur > span b{ margin-bottom:1px }
+/* -46 % et -48 % : ils masquaient le haut de l'ecran et la video. A ce
+   debordement, seul leur bord touche encore l'appareil. */
+.sur-h{ right:-46%; top:17%; transform:translate(0,-50%) }
+/* Le second repere est cale sur le HAUT de l'image et non sur son bas :
+   l'image deborde sous la pliure, donc `bottom` le placait hors de l'ecran. */
+.sur-b{ left:-48%; top:44%; transform:translate(0,-50%) }
+
+@media (max-width: 1099px){
+  /* ⚠ CE BLOC NE REDECLARE NI RETRAIT NI PICTOGRAMME. Il le faisait, et
+     ecrasait les valeurs communes posees plus bas — les deux familles
+     divergeaient sur tablette et telephone. Il ne garde que ce qui lui est
+     propre : la position des deux reperes. */
+  .sur-h{ right:-22% }
+  .sur-b{ left:-24% }
+}
+
+/* ═══ LE HALO BLANC DERRIERE LE TELEPHONE ═══
+
+   Deux foyers : un large et tres dilue qui decolle l'appareil du noir, et un
+   plus resserre derriere le haut de l'ecran, la ou le regard se pose d'abord.
+
+   `z-index:0` contre 1 pour l'image : la lueur passe derriere sans que le
+   telephone ait besoin de fond opaque. */
+.main::before{
+  content:''; position:absolute; z-index:0;
+  left:-40%; right:-40%; top:-4%; height:88%;
+  /* ═══ UNE LED, PAS UNE LUEUR ═══
+     Trois foyers concentriques : un coeur presque blanc, un halo moyen, une
+     nappe large. C'est cet empilement qui fait lire une SOURCE lumineuse
+     plutot qu'un fond eclairci — un seul degre, meme fort, reste plat. */
+  /* ═══ DEUX HALOS COLORES, PLUS LA LED BLANCHE ═══
+
+     A gauche, l'ocre de « Filmez » — #E1933B, le ton central de ce
+     pictogramme. A droite, l'orange-rouge de « l'IA » — #DB5C28.
+
+     Ils sont decales de 22 % de part et d'autre et restent sous 0,22
+     d'opacite : la couleur doit se sentir aux bords sans que le fond vire.
+     La LED blanche reste au centre, derriere l'appareil. */
+  background:
+    radial-gradient(ellipse 22% 26% at 50% 30%, rgba(255,255,255,.42), transparent 66%),
+    radial-gradient(ellipse 40% 46% at 50% 34%, rgba(255,255,255,.22), transparent 70%),
+    /* 0,40 -> 0,16 : la couleur doit se deviner, pas colorer le fond. */
+    radial-gradient(ellipse 30% 38% at 12% 42%, rgba(225,147,59,.16), transparent 74%),
+    radial-gradient(ellipse 30% 38% at 88% 42%, rgba(219,92,40,.16), transparent 74%),
+    radial-gradient(ellipse 62% 66% at 50% 42%, rgba(255,255,255,.07), transparent 76%);
+  filter:blur(48px); pointer-events:none;
+}
+
+/* ═══ LE VERRE QUI COUPE LE BAS ═══
+
+   Une bande floue posee sur le bas de l'image : elle ne masque pas, elle
+   DEFORME ce qui passe dessous. C'est ce qui donne l'impression que le
+   telephone entre dans une matiere plutot qu'il ne disparait.
+
+   Le flou augmente vers le bas — `backdrop-filter` ne sait pas varier, donc
+   deux bandes superposees d'intensites differentes. */
+.main::after{
+  content:''; position:absolute; z-index:2;
+  /* ⚠ LA BANDE FLOUTEE DOIT DISPARAITRE, PAS S'ARRETER.
+
+     Elle formait un rectangle clair visible sous le telephone : `backdrop-filter`
+     eclaircit toujours legerement ce qu'il floute, et le masque la coupait net
+     a ses bords gauche et droit.
+
+     Elle est donc plus courte, moins floue, et son masque s'eteint AUSSI sur
+     les cotes — le flou s'estompe dans toutes les directions. */
+  left:-2%; right:-2%; bottom:0; height:30%;
+  pointer-events:none;
+  -webkit-backdrop-filter:blur(6px);
+          backdrop-filter:blur(6px);
+  -webkit-mask-image:
+    linear-gradient(180deg,transparent 0%,#000 58%,#000 100%),
+    linear-gradient(90deg,transparent 0%,#000 12%,#000 88%,transparent 100%);
+          mask-image:
+    linear-gradient(180deg,transparent 0%,#000 58%,#000 100%),
+    linear-gradient(90deg,transparent 0%,#000 12%,#000 88%,transparent 100%);
+  -webkit-mask-composite:source-in; mask-composite:intersect;
+  /* Le noir monte de 0,72 a 1 : le telephone se fond entierement dans le fond
+     de la page au lieu de s'y estomper a moitie. */
+  /* ⚠ `var(--fond)` ET NON UNE VALEUR ECRITE A LA MAIN. J'avais code #08090A
+     en dur : c'est bien la couleur du fond, mais la page porte aussi une grille
+     et un grain par-dessus. Le degre finissait donc sur un noir PLUS PUR que ce
+     qu'il y a autour, d'ou la demarcation. En reprenant la variable et en
+     laissant les calques de la page passer dessous, la jonction disparait. */
+  background:linear-gradient(180deg,
+    rgba(8,9,10,0) 0%, rgba(8,9,10,.5) 44%,
+    rgba(8,9,10,.85) 74%, var(--fond) 96%);
 }
 
 /* ═══ LES PASTILLES DU TITRE ═══
@@ -496,11 +612,14 @@ header{
   display:inline-flex; align-items:center; justify-content:center;
   width:.92em; height:.92em; border-radius:.26em;
   margin-right:.16em;
-  /* ⚠ `-.05em` ET NON `-.13em`. Le pictogramme tombait 10 px trop bas : son
-     centre ne coincidait pas avec celui des lettres. `vertical-align` se
-     mesure depuis la LIGNE DE BASE, qui n'est pas le milieu du texte — il faut
-     donc compenser la difference entre hauteur de casse et hauteur de boite. */
-  vertical-align:-.05em;
+  /* ⚠ VALEUR MESUREE, PAS DEDUITE. `vertical-align` se compte depuis la ligne
+     de base, qui n'est ni le milieu ni le sommet du texte. Le seul moyen fiable
+     est de rendre la page et de comparer les pixels : a `-.05em`, le sommet du
+     carre tombait 2,8 px sous celui du F de « Filmez ».
+
+     `-.01em` aligne les deux sommets. Ne pas « corriger » cette valeur au
+     jugement — elle depend de la police et de la hauteur de casse d'Inter. */
+  vertical-align:.02em;
   flex:none; position:relative;
   /* ═══ LE RELIEF ═══
      Trois couches : une ombre portee coloree qui teinte le noir sous la
@@ -525,6 +644,8 @@ header{
   /* Le dessin porte sa propre ombre : sans elle, il flotte sur le degrade. */
   filter:drop-shadow(0 .02em .03em rgba(0,0,0,.3)) }
 .pic-c svg{ fill:#fff; stroke:none }
+/* L'eclair de « Rapide » est plein : un trace fin se perdrait a cette taille. */
+.sur-h .pic svg{ fill:#fff; stroke:#fff; stroke-width:1.4; stroke-linejoin:round }
 /* ═══ LES DEGRADES ═══
 
    Apple ne fait pas varier la luminosite d'une seule couleur : il fait TOURNER
@@ -538,21 +659,70 @@ header{
    ⚠ Ces couleurs ne sont plus exactement celles du logo. C'est assume : sur un
      carre de 50 px avec un dessin blanc au centre, le #E8760F pur manque de
      contraste en bas. */
-.pic-a{ background:linear-gradient(145deg,#FFB74A 0%,#F0800E 48%,#C64B06 100%) }
-.pic-b{ background:linear-gradient(145deg,#6FA6E8 0%,#3A64B4 48%,#243F7E 100%) }
-.pic-c{ background:linear-gradient(145deg,#FFD98A 0%,#FFA524 48%,#E06B0A 100%) }
+/* ═══ LA PASTILLE « FILMEZ », RELEVEE SUR LA REFERENCE ═══
+
+   Couleurs mesurees dans l'image fournie, du sommet a la base :
+     #F7D888 en haut, #E1933B au centre, #D4611D en bas.
+
+   ⚠ LE DEGRADE EST VERTICAL, PAS DIAGONAL. Sur la reference, les coins haut
+     gauche et haut droit ont la meme valeur — la lumiere vient du dessus, pas
+     d'un angle. Les deux autres pastilles restent en 145 degres ; celle-ci
+     s'en detache volontairement. */
+.pic-a{ background:linear-gradient(180deg,#F9DE94 0%,#F0B65F 22%,#E1933B 52%,#D4611D 100%) }
+/* La lueur ambre autour du carre : sur la reference elle deborde franchement,
+   c'est ce qui donne l'impression que la pastille eclaire le noir. */
 .pic-a{ box-shadow:
-    0 .12em .34em -.05em rgba(232,118,15,.45),
-    inset 0 .04em 0 rgba(255,255,255,.5),
-    inset 0 0 0 .012em rgba(255,255,255,.2) }
+    0 .09em .34em -.05em rgba(232,140,40,.46),
+    0 0 .52em rgba(224,120,20,.24),
+    inset 0 .05em 0 rgba(255,255,255,.68),
+    inset 0 -.03em .06em rgba(150,60,0,.3),
+    inset 0 0 0 .014em rgba(255,255,255,.28) }
+/* ═══ LA PASTILLE « ECRAN », RELEVEE SUR LA REFERENCE ═══
+
+   Couleurs mesurees dans l'image fournie :
+     #CECFD5 en haut a gauche, #8F93A0 au centre, #5F6279 en bas a droite.
+
+   ⚠ ELLE N'EST PAS BLEUE. Le bleu que j'avais mis venait de moi ; la reference
+     est un gris-argent tres legerement froid, qui vire au gris-violet dans les
+     ombres. C'est ce qui la distingue de l'orange sans crier une couleur.
+
+   Le degrade est DIAGONAL ici, contrairement a celui de « Filmez » : les coins
+   haut gauche et haut droit different de 40 valeurs. */
+.pic-b{ background:linear-gradient(145deg,#D6D7DC 0%,#A7ABB7 30%,#8F93A0 55%,#5F6279 100%) }
+/* Une lueur froide et discrete : sur la reference elle deborde beaucoup moins
+   que celle de l'orange — un gris n'eclaire pas, il reflete. */
 .pic-b{ box-shadow:
-    0 .12em .34em -.05em rgba(47,75,119,.5),
-    inset 0 .04em 0 rgba(255,255,255,.42),
-    inset 0 0 0 .012em rgba(255,255,255,.18) }
+    0 .09em .3em -.05em rgba(150,158,180,.28),
+    0 0 .42em rgba(140,150,175,.12),
+    inset 0 .05em 0 rgba(255,255,255,.72),
+    inset 0 -.03em .06em rgba(50,55,75,.34),
+    inset 0 0 0 .014em rgba(255,255,255,.3) }
+/* ═══ LA PASTILLE « IA », RELEVEE SUR LA REFERENCE ═══
+
+   Couleurs mesurees dans l'image fournie, en evitant l'etoile blanche du
+   centre : #F3AA54 en haut, #E57937 au milieu, #A83B1A a la base.
+
+   ⚠ CE N'EST PAS LE MEME ORANGE QUE « FILMEZ ». Celui-ci vire nettement plus
+     au rouge — #A83B1A contre #D4611D — et il est plus sature. Les deux
+     pastilles orange se distinguent donc, ce qui evite qu'on les confonde du
+     coin de l'oeil.
+
+   Degrade diagonal : les coins haut gauche et haut droit different. */
+/* L'orange penche davantage vers le rouge : #F09A4A devient #EE8438, #E57937
+   devient #DB5C28, et la base descend de #A83B1A a #96280F. La pastille se
+   distingue nettement plus de celle de « Filmez », qui reste dans les ocres. */
+.pic-c{ background:linear-gradient(148deg,#F5AE58 0%,#EE8438 26%,#DB5C28 54%,#96280F 100%) }
+/* La lueur la plus chaude des trois : sur la reference elle deborde autant que
+   celle de « Filmez », mais tire vers le rouge. */
 .pic-c{ box-shadow:
-    0 .12em .34em -.05em rgba(255,174,46,.42),
-    inset 0 .04em 0 rgba(255,255,255,.6),
-    inset 0 0 0 .012em rgba(255,255,255,.24) }
+    0 .09em .34em -.05em rgba(222,88,38,.48),
+    0 0 .52em rgba(196,58,20,.28),
+    inset 0 .05em 0 rgba(255,255,255,.66),
+    inset 0 -.03em .06em rgba(120,40,10,.34),
+    inset 0 0 0 .014em rgba(255,255,255,.26) }
+/* L'ancienne ombre de `.pic-a` a ete remplacee plus haut. */
+/* L'ancienne ombre bleue de `.pic-b` a ete remplacee plus haut. */
+/* L'ancienne ombre de `.pic-c` a ete remplacee plus haut. */
 
 /* Le premier ecran est centre a TOUTES les largeurs : le centrage n'etait
    declare que dans le bloc d'ordinateur, si bien que sur telephone le titre
@@ -564,9 +734,11 @@ header{
      `height` et non `min-height` : ce dernier laisse grandir au-dela, et le
      bloc atteignait 1293 px sur un ecran de 900 — le bouton passait sous la
      pliure. Avec `height`, l'image se comprime pour tenir. */
-  height:calc(100dvh - var(--barre));
+  /* `min-height` et non `height` : l'image deborde volontairement, le premier
+     ecran peut donc depasser la hauteur visible. Le bouton, lui, reste
+     au-dessus de la pliure — verifie sur neuf formats. */
+  min-height:calc(100dvh - var(--barre));
   display:flex; flex-direction:column;
-  overflow:hidden;
   /* ═══ L'AIR DANS L'ACCROCHE ═══
 
      Chaque valeur de ce bloc a été desserrée d'un cran : le retrait sous la
@@ -617,12 +789,17 @@ h1{
   /* Descendu à 34 px quand le titre faisait quinze mots, puis remonté à 39 :
      un titre court peut redevenir grand. C'est le même arbitrage dans l'autre
      sens — le corps suit la longueur, pas l'inverse. */
+  /* 520 et non 500 : un cran seulement, assez pour que le titre pese sans
+     basculer dans le gras. */
+  font-weight:520;
   font-size:clamp(29px,8.2vw,39px);
   /* 1,09 et non 1,05 : sur quatre lignes serrées à -0,045 em, l'interligne est
      ce qui se voit le plus. Quatre centièmes coûtent six pixels en tout et
      changent l'impression d'ensemble plus que n'importe quelle marge. */
-  line-height:1.18; letter-spacing:-.045em; font-weight:500;
-  margin-bottom:clamp(18px, 3.8vh, 34px); max-width:16ch;
+  /* ⚠ PAS DE `font-weight` ICI. Il valait 500 et ecrasait le 520 declare
+     quelques lignes plus haut — la graisse ne changeait pas. */
+  line-height:1.18; letter-spacing:-.045em;
+  margin-bottom:clamp(14px, 2.4vh, 20px); max-width:16ch;
   color:var(--t2);
 }
 h1 em{ font-style:normal; color:var(--t1); }
@@ -795,28 +972,8 @@ h1 em{ font-style:normal; color:var(--t1); }
    Le blanc ne disparait pas tout a fait — il reste a 10 % au centre, pour que
    la photo se detache du noir. Mais il ne domine plus.
    ═══════════════════════════════════════════════════════════════════════════ */
-.tel-cadre::before{
-  /* ═══ LE HALO, AU DEGRADE DU LOGO ═══
-
-     Trois foyers superposes, aux couleurs exactes du logotype Standix :
-     #FFDFA0 (255-223-160) au centre, #FFAE2E (255-174-46) autour, #E8760F
-     (232-118-15) sur les bords. On tournait autour depuis des heures avec des
-     blancs froids alors que la palette de la marque etait la.
-
-     Il reste sous 0,30 d'opacite : au-dela, la page devient orange au lieu
-     d'etre noire avec une lumiere chaude. */
-  content:''; position:absolute; z-index:0;
-  /* Les foyers sont EN DEHORS du cadre — a -8 % et 108 % — parce que la photo
-     est opaque : un halo centre derriere elle est integralement masque. Ce sont
-     donc deux nappes laterales, dont seule la moitie exterieure se voit. */
-  left:-30%; right:-30%; top:-12%; height:124%;
-  background:
-    radial-gradient(ellipse 26% 44% at -4% 44%, rgba(255,223,160,.30), transparent 68%),
-    radial-gradient(ellipse 30% 50% at 104% 48%, rgba(255,174,46,.34), transparent 68%),
-    radial-gradient(ellipse 44% 20% at 50% -6%, rgba(255,196,102,.24), transparent 68%),
-    radial-gradient(ellipse 40% 18% at 50% 106%, rgba(232,118,15,.22), transparent 68%);
-  filter:blur(58px); pointer-events:none;
-}
+/* Le halo de l'ancienne image detouree a ete retire. */
+.tel-cadre::before{ display:none }
 /* Le second foyer blanc, en haut, a ete retire : un seul halo suffit. */
 /* ═══════════════════════════════════════════════════════════════════════════
    LES DEUX SCENES
@@ -1513,16 +1670,17 @@ h2.chiffres{
      Les valeurs qui suivent sont taillees pour un telephone : sur une tablette,
      ou l'image fait 430 px, elles donnaient des pastilles minuscules. Une taille
      intermediaire est donc redeclaree plus bas, entre 780 et 1099 px. */
-  .pastille{ padding:7px 10px 7px 8px; gap:8px }
-  .pastille .txt span{ font-size:10.5px }
-  .pastille .ico{ width:30px; height:30px; border-radius:9px }
-  .pastille .ico svg{ width:17px; height:17px }
-  .pastille b{ font-size:13px }
-  .pastille .txt span{ font-size:11px }
-  .pastille .ico{ width:36px; height:36px; border-radius:10px }
-  .pastille .ico svg{ width:20px; height:20px }
-  .pastille b{ font-size:13px }
-  .pastille .txt span{ font-size:11px }
+  /* Les selecteurs portent les DEUX familles. Les declarations en double qui
+     trainaient ici — le pictogramme etait fixe a 30 px puis a 36 — ont ete
+     fusionnees : seule la seconde s'appliquait.
+
+     Les retraits lateraux montent de 10/8 a 15/12 : sur telephone, le
+     pictogramme et le texte touchaient presque le bord arrondi. */
+  .pastille, .sur{ padding:8px 15px 8px 12px; gap:9px }
+  .pastille .ico, .sur .pic{ width:36px; height:36px; border-radius:10px }
+  .pastille .ico svg, .sur .pic svg{ width:20px; height:20px }
+  .pastille b, .sur b{ font-size:13px }
+  .pastille .txt span, .sur > span{ font-size:11px }
   /* Elargies a 230 px, elles debordaient de l'ecran sur telephone. Elles se
      recentrent : elles depassent toujours l'image, mais restent lisibles. */
 /* Aucune position propre au telephone : les trois pastilles gardent celles de
@@ -1539,11 +1697,13 @@ h2.chiffres{
    imposait des pastilles de 145 px. Elles reprennent ici une taille proche de
    celle du grand format. */
 @media (min-width: 780px) and (max-width: 1099px){
-  .pastille{ padding:10px 13px 10px 10px; gap:11px }
-  .pastille .ico{ width:38px; height:38px; border-radius:11px }
-  .pastille .ico svg{ width:21px; height:21px }
-  .pastille b{ font-size:16.5px }
-  .pastille .txt span{ font-size:12.5px }
+  /* Le selecteur porte les DEUX familles : les reperes du premier ecran et les
+     pastilles de la section 02 doivent rester identiques a chaque palier. */
+  .pastille, .sur{ padding:10px 13px 10px 10px; gap:11px }
+  .pastille .ico, .sur .pic{ width:38px; height:38px; border-radius:11px }
+  .pastille .ico svg, .sur .pic svg{ width:21px; height:21px }
+  .pastille b, .sur b{ font-size:16.5px }
+  .pastille .txt span, .sur > span{ font-size:12.5px }
 }
 
 @media (max-width: 379px){
@@ -1580,7 +1740,7 @@ h2.chiffres{
   /* ⚠ CETTE REGLE EST LA PLUS SPECIFIQUE : elle ecrase le retrait declare plus
      haut. C'est ici qu'il faut agir pour l'ordinateur, pas dans `.pastille`. */
   /* 13 px a gauche : le dessin touchait presque le bord arrondi. */
-  .pastille{ padding:12px 18px 12px 13px }
+  .pastille, .sur{ padding:12px 18px 12px 13px }
   .pastille b{ font-size:16.5px }
   .pastille span{ font-size:13px }
   /* Aucune position ici : elles sont fixees une seule fois, en pourcentage, sur
@@ -2397,7 +2557,9 @@ footer .marque{ margin-bottom:18px; }
   /* Plus de `max-width` : c'est la colonne qui borne la ligne, et elle est
      maintenant assez large. 60 px au lieu de 68 — la lisibilité d'un titre de
      quatre lignes bat l'effet d'un titre de six. */
-  h1{ font-size:54px; line-height:1.03; max-width:none; margin-bottom:26px }
+  /* 16 px et non 26 : le sous-titre prolonge le titre, il ne le commente pas de
+   loin. Les deux se lisent d'un seul mouvement. */
+h1{ font-size:54px; line-height:1.03; max-width:none; margin-bottom:16px }
   .sous{ font-size:17.5px; max-width:38ch; margin-bottom:34px }
   .btn{ height:50px; padding:0 24px; font-size:15.5px }
   .aside{ font-size:16.5px }
@@ -2893,20 +3055,9 @@ footer .marque{ margin-bottom:18px; }
     <span class="nobr"><span class="pic pic-b"><svg viewBox="0 0 24 24"><rect x="2.5" y="4" width="19" height="13" rx="2.2"/><path d="M8 21h8M12 17v4"/></svg></span>enregistrez</span> un écran,
     <em><span class="nobr"><span class="pic pic-c"><svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg></span>l'IA</span> crée la procédure.</em>
   </h1>
-  <!-- Le sous-titre dit ce que le titre ne dit pas : QUI les lit. Le titre
-       s'arrête au résultat, celui-ci le met entre les mains de l'équipe. -->
-  <p class="sous flou r2">
-    Votre équipe la consulte d'un scan, au poste de travail.
-  </p>
-  <div class="actions flou r3">
-    <a class="btn" href="app/">
-      Essayer gratuitement
-      <svg viewBox="0 0 24 24"><path d="M5 12h13"/><path d="M12 5l7 7-7 7"/></svg>
-    </a>
-    <!-- « Sans carte bancaire » a ete retire du premier ecran. La mention reste
-         a cote du prix et dans la cloture, la ou elle repond a une objection ;
-         ici elle en soulevait une avant qu'on l'ait. -->
-  </div>
+  <!-- Le sous-titre a ete retire : le titre porte deja les trois temps. -->
+  <!-- Le bouton a ete retire du premier ecran : il reste dans la barre, en
+       haut a droite, ou il suit le defilement sur toute la page. -->
 
   <!-- ═══ LA MAIN QUI TIENT LE TELEPHONE ═══
 
@@ -2918,8 +3069,20 @@ footer .marque{ margin-bottom:18px; }
        s'y arreter net — c'est ce qui donne l'impression qu'elle se prolonge
        plutot qu'elle ne s'interrompt. -->
   <figure class="main flou r4">
-    <img src="main-telephone.webp" width="1388" height="1398" loading="eager"
+    <img src="main-telephone.webp" width="1100" height="2225" loading="eager"
          alt="Une procédure Standix ouverte sur un téléphone tenu en main">
+    <!-- Deux reperes poses sur l'appareil, dans la matiere des pastilles du
+         titre : meme verre, meme lueur, meme arrondi. Ils repondent aux deux
+         objections qu'un patron a devant un logiciel — « ca va me prendre du
+         temps » et « ce sera trop complique ». -->
+    <figcaption class="sur sur-h">
+      <i class="pic pic-a rond"><svg viewBox="0 0 24 24"><path d="M13 2.5L4.5 13.5h6l-1 8L19 10.5h-6z"/></svg></i>
+      <span><b>Rapide</b>la procédure s'ouvre<br>en un scan, ou dans l'app</span>
+    </figcaption>
+    <figcaption class="sur sur-b">
+      <i class="pic pic-a rond"><svg viewBox="0 0 24 24"><path d="M2 7.5A2.5 2.5 0 014.5 5h8A2.5 2.5 0 0115 7.5v9a2.5 2.5 0 01-2.5 2.5h-8A2.5 2.5 0 012 16.5z"/><path d="M15 10.5l5.2-2.6a.8.8 0 011.3.7v6.8a.8.8 0 01-1.3.7L15 13.5z"/></svg></i>
+      <span><b>Facile</b>vous filmez, l'IA<br>rédige tout</span>
+    </figcaption>
   </figure>
 
 </section>

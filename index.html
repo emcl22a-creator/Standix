@@ -488,6 +488,7 @@ header{
    arrondi. Le reste — degrade, lueur, arete eclairee — est celui de
    `.pic-a`, la pastille « Filmez » du titre. */
 .sur .pic{ width:50px; height:50px; margin:0; vertical-align:0 }
+.sur .pic::after{ display:none }
 /* `.rond` n'a plus d'effet : le pictogramme est un carre arrondi, comme en
    section 02. */
 /* ⚠ LE PICTOGRAMME EST CELUI DE LA SECTION 02, PAS CELUI DU TITRE.
@@ -543,7 +544,7 @@ header{
   /* L'image ayant grandi de 74 a 82 %, les reperes debordaient de l'ecran :
      ils rentrent de la meme proportion. */
   .sur-h{ right:-16% }
-  .sur-b{ left:-6% }
+  .sur-b{ left:-22% }
 }
 
 /* ═══ LE HALO BLANC DERRIERE LE TELEPHONE ═══
@@ -569,12 +570,12 @@ header{
      d'opacite : la couleur doit se sentir aux bords sans que le fond vire.
      La LED blanche reste au centre, derriere l'appareil. */
   background:
-    radial-gradient(ellipse 22% 26% at 50% 30%, rgba(255,255,255,.52), transparent 66%),
-    radial-gradient(ellipse 40% 46% at 50% 34%, rgba(255,255,255,.28), transparent 70%),
+    radial-gradient(ellipse 26% 30% at 50% 32%, rgba(255,255,255,.72), transparent 68%),
+    radial-gradient(ellipse 46% 52% at 50% 36%, rgba(255,255,255,.40), transparent 72%),
     /* 0,40 -> 0,16 : la couleur doit se deviner, pas colorer le fond. */
     radial-gradient(ellipse 30% 38% at 12% 42%, rgba(225,147,59,.16), transparent 74%),
     radial-gradient(ellipse 30% 38% at 88% 42%, rgba(219,92,40,.16), transparent 74%),
-    radial-gradient(ellipse 62% 66% at 50% 42%, rgba(255,255,255,.07), transparent 76%);
+    radial-gradient(ellipse 68% 72% at 50% 44%, rgba(255,255,255,.13), transparent 78%);
   filter:blur(48px); pointer-events:none;
 }
 
@@ -675,6 +676,10 @@ header{
 }
 /* Le reflet en diagonale : un blanc tres dilue sur le quart superieur gauche,
    qui s'eteint avant le milieu. Au-dela, la pastille parait mouillee. */
+/* ⚠ CE REFLET NE VAUT QUE POUR LES PASTILLES DU TITRE.
+   Sur les deux reperes du telephone, il posait un voile blanc en diagonale
+   que les trois pastilles de la section 02 n'ont pas — c'etait la derniere
+   difference visible entre les deux familles. */
 .pic::after{
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none;

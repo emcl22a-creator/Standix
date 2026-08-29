@@ -8429,132 +8429,262 @@ body:has(#e-detail.active) #equipe-app{
    Deux échelles typographiques dans une même app, c'est deux apps. On reprend
    celle qui existe — au dixième près. */
 .ac-tete{ padding:2px 2px 16px; }
+/* ⚠ PLUS LÉGER QU'AVANT : 20 px en graisse 400, contre 24 en 700. Le salut
+   n'est plus le titre de la page — l'anneau l'est. À 24 px et gras, il tirait
+   l'œil vers le haut de l'écran, loin du chiffre qui compte. */
 .ac-salut{
-  font-size:24px; font-weight:700; letter-spacing:-0.03em; line-height:1.2;
-  margin:0 0 2px;
+  font-size:20px; font-weight:400; letter-spacing:-0.02em; line-height:1.25;
+  color:var(--label-2); margin:0;
 }
+.ac-salut span{ color:var(--label-1); font-weight:500; }
+/* `.ac-sous` n'a plus d'élément : le sous-titre a été retiré du balisage. */
 .ac-sous{ font-size:14px; color:var(--label-2); margin:0; line-height:1.35; }
 /* `.ac-filtre` a été retirée avec le sélecteur de période de l'accueil. */
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   L'ACCUEIL REFAIT · ANNEAU, DEUX CHIFFRES, DEUX LISTES
+   L'ACCUEIL · UN GRAND ANNEAU, DEUX TUILES, DEUX CARTES
 
-   Tout hérite d'`an-bloc` — même fond, même liseré, même rayon que les blocs
-   de la page Analyse. On ne redéfinit ici que la disposition.
+   La page n'a plus qu'un seul sujet : la part des procédures accessibles à
+   l'équipe. Tout le reste vient après, et se lit dans cet ordre.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ─── ① L'ANNEAU ─────────────────────────────────────────────────────────────
 
-   Aucune matière : ni fond, ni liseré, ni ombre. Il ne porte plus `an-bloc`.
+   Aucune matière : ni fond, ni liseré, ni ombre. Posé sur le noir de la page.
+   Dans une carte, il devenait le premier de quatre blocs de même peau, et
+   l'œil ne savait plus par où commencer. */
+.ac-pub-bloc{ padding:26px 0 18px; }
+.ac-pub{ display:flex; flex-direction:column; align-items:center; }
+.ac-pub-rond{ position:relative; }
+/* ⚠ `overflow:visible` INDISPENSABLE. Un SVG rogne son contenu à sa boîte par
+   défaut ; le halo de l'arc, qui déborde de vingt pixels, était coupé net et
+   dessinait un CARRÉ plus clair autour de l'anneau. Visible au premier rendu,
+   invisible dans le code. */
+.ac-pub-rond svg{ transform:rotate(-90deg); display:block; overflow:visible; }
 
-   L'anneau EST la page — le poser dans une carte en faisait le premier de
-   quatre blocs empilés, tous de même peau, et l'œil ne savait plus par où
-   commencer. Sur le fond nu, il se détache de tout ce qui suit.
+/* ═══ LA LUEUR DE L'ARC ═══
 
-   Le rembourrage du bas reste : c'est lui qui sépare l'anneau des deux tuiles,
-   maintenant qu'aucun bord ne le fait. */
-.ac-pub-bloc{ padding:10px 4px 22px; }
-/* ⚠ LA CLASSE S'APPELLE `ac-pub`, PAS `ac-anneau`.
+   Deux `drop-shadow` empilés : le premier serré pour poser un bord net, le
+   second large pour la lueur qui déborde sur le fond.
 
-   `.ac-anneau` EXISTE DÉJÀ, plus bas dans ce fichier : c'était l'anneau de
-   l'ancienne tuile de quota, en 132 × 132 px avec une HAUTEUR FIXE. Réutiliser
-   le nom écrasait la hauteur du nouvel anneau — il faisait 168 px de haut dans
-   un conteneur de 132, et la phrase du dessous, poussée dehors, disparaissait
-   sous l'`overflow:hidden` de la carte.
-
-   Rien ne l'annonçait : aucune erreur, un texte présent dans le DOM et
-   invisible à l'écran. C'est le genre de collision qu'on ne trouve qu'en
-   mesurant. */
-.ac-pub{ padding-bottom:0; }
-/* Le remplissage se dessine au lieu d'apparaître. La courbe est celle des
-   anneaux de l'Analyse — même geste pour le même objet. */
-.ac-pub .arc{ transition:stroke-dashoffset 1.05s cubic-bezier(0.22,1,0.36,1); }
-/* Le centre : le pourcentage en grand, la fraction dessous. La fraction est
-   plus longue que celle de l'Analyse — « 12 sur 17 en ligne » — donc elle a
-   besoin de sa largeur, sans quoi elle se coupe au milieu du cercle. */
-.ac-pub .an-resume-centre .u{ max-width:118px; text-align:center; line-height:1.3; }
-.ac-pub-txt{
-  margin-top:14px; padding:0 6px; text-align:center;
-  font-size:12.5px; line-height:1.45; color:var(--label-2);
-  letter-spacing:-0.01em;
+   ⚠ PAS `box-shadow`. Sur un élément SVG, `box-shadow` dessine l'ombre de la
+     BOÎTE — un rectangle flou derrière le cercle. `drop-shadow` suit la forme
+     réellement peinte, donc l'arc et lui seul. */
+.ac-pub .arc{
+  /* ⚠ MOITIÉ MOINS FORT QU'AU PREMIER JET — 0,55 et 0,40 d'opacité éclairaient
+     le fond de la page sur cent pixels autour de l'anneau, et le blanc du
+     pourcentage au centre s'en trouvait terni par contraste. La lueur doit se
+     deviner au bord du trait, pas éclairer la pièce. */
+  filter:drop-shadow(0 0 4px rgba(253,168,30,0.28))
+         drop-shadow(0 0 14px rgba(235,82,1,0.18));
+  transition:stroke-dashoffset 1.15s cubic-bezier(0.22,1,0.36,1);
 }
 
-/* ─── ② LES DEUX CHIFFRES ────────────────────────────────────────────────── */
+/* Le centre. `inset:0` plutôt qu'une translation : le bloc occupe tout le
+   disque et se centre par ses propres règles — un `translate(-50%,-50%)` sur
+   un contenu de hauteur variable décale le texte dès qu'une ligne s'ajoute. */
+.ac-pub-centre{
+  position:absolute; inset:0;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; padding:0 34px; pointer-events:none;
+}
+.ac-pub-v{
+  font-size:52px; font-weight:300; letter-spacing:-0.045em; line-height:1;
+  color:var(--label-1); font-variant-numeric:tabular-nums;
+  display:flex; align-items:baseline; gap:3px;
+}
+/* Le pour-cent est plus petit et plus léger : c'est une unité, pas une valeur.
+   À la même taille que le nombre, il volait la moitié du regard. */
+.ac-pub-v .pc{ font-size:24px; font-weight:300; letter-spacing:-0.02em; }
+.ac-pub-l{
+  margin-top:9px; font-size:13px; line-height:1.35;
+  color:var(--label-2); letter-spacing:-0.015em;
+}
+.ac-pub-leg{
+  margin-top:13px; display:flex; align-items:center; gap:6px;
+  font-size:12px; color:var(--label-2); letter-spacing:-0.01em;
+}
+.ac-pub-leg i{
+  width:7px; height:7px; border-radius:100px; flex:0 0 7px;
+  background:#FDA81E;
+}
+
+/* La pastille sous l'anneau. Un fond, pas une simple ligne de texte : elle
+   redit une donnée déjà chiffrée juste au-dessus, et sans contour elle se
+   confondait avec la légende de l'anneau. */
+.ac-pub-pill{
+  margin-top:20px; display:inline-flex; align-items:center; gap:9px;
+  padding:9px 16px 9px 13px; border-radius:100px;
+  background:rgba(255,255,255,0.045);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.08);
+  font-size:13px; color:var(--label-1); letter-spacing:-0.015em;
+}
+.ac-pub-pill i{
+  width:8px; height:8px; border-radius:100px; flex:0 0 8px;
+  background:#FDA81E;
+}
+.ac-pub-pill.ok i{ background:#30D158; }
+
+/* ─── ② LES DEUX TUILES ──────────────────────────────────────────────────── */
 .ac-duo{
   display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:11px; align-items:stretch; margin-bottom:11px;
 }
-/* ═══ LE TITRE EN TÊTE, LE CHIFFRE DESSOUS ═══
-
-   Sur une demi-largeur d'écran, un titre et un nombre côte à côte se
-   marchaient dessus : « Analyses vidéo IA ce mois-ci » fait trois lignes, et
-   le chiffre se retrouvait coincé contre le bord.
-
-   La plaque et le titre partagent donc la première ligne, le chiffre prend
-   toute la largeur en dessous. */
-.ac-chiffre{ display:flex; flex-direction:column; padding:14px 13px 13px; }
-.ac-ch-tete{ display:flex; align-items:center; gap:9px; margin-bottom:12px; }
-.ac-ch-t{
-  font-size:11.5px; font-weight:650; line-height:1.3;
-  color:var(--label-2); letter-spacing:-0.01em;
+.ac-tuile{
+  display:flex; flex-direction:column;
+  padding:14px 14px 15px; border-radius:20px;
+  background:var(--bg-card);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.06);
 }
-.ac-ch-v{
-  font-size:26px; font-weight:700; letter-spacing:-0.035em; line-height:1;
-  font-variant-numeric:tabular-nums; color:var(--label-1);
+.ac-t-tete{ display:flex; align-items:center; gap:9px; margin-bottom:14px; }
+/* La plaque est CARRÉE À COINS ARRONDIS, pas ronde : les disques sont pris
+   par les avatars et par les pastilles d'état. Une forme, un sens. */
+.ac-t-ic{
+  display:grid; place-items:center; flex:0 0 34px; width:34px; height:34px;
+  border-radius:11px;
+  background:rgba(255,255,255,0.05);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07);
+}
+.ac-t-ic svg{ width:18px; height:18px; display:block; }
+.ac-t-t{
+  font-size:12.5px; font-weight:500; color:var(--label-2);
+  letter-spacing:-0.015em; line-height:1.25;
+}
+.ac-t-corps{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:8px;
   /* Poussé en bas : deux tuiles dont les titres tiennent sur un nombre de
      lignes différent auraient sinon leurs chiffres à deux hauteurs. */
   margin-top:auto;
 }
-.ac-ch-n{
-  font-size:11px; color:var(--label-3); margin-top:5px; line-height:1.35;
-  letter-spacing:-0.005em;
+.ac-t-v{
+  font-size:29px; font-weight:400; letter-spacing:-0.04em; line-height:1;
+  color:var(--label-1); font-variant-numeric:tabular-nums;
 }
-/* La couleur de la tendance porte un sens, pas une décoration : elle ne
-   s'allume que lorsque la comparaison est réellement à la hausse ou à la
-   baisse. Un mois stable reste gris. */
-.ac-ch-n.haut{ color:#30D158; }
-.ac-ch-n.bas{ color:var(--label-3); }
+/* Plus petite que le chiffre, et calée sur sa ligne de base : la courbe
+   accompagne le nombre, elle ne le concurrence pas. */
+.ac-t-graph{ position:relative; width:46px; height:26px; flex:0 0 46px; margin-bottom:2px; }
+.ac-courbe{ width:100%; height:100%; display:block; overflow:visible; }
+/* Le point terminal. En position absolue par-dessus le tracé plutôt qu'en
+   `<circle>` dans le SVG : le `viewBox` est étiré en largeur par
+   `preserveAspectRatio="none"`, et un cercle y deviendrait une ellipse. */
+.ac-courbe-pt{
+  position:absolute; width:6px; height:6px; border-radius:100px;
+  background:#FDA81E; transform:translate(-50%,-50%);
+  box-shadow:0 0 8px rgba(253,168,30,0.8);
+}
+/* ⚠ `nowrap` ET 11 px. À 11,5 px avec retour à la ligne, « ↑ 28 % vs le mois
+   dernier » se cassait en deux et la tuile grandissait d'un cran — les deux
+   tuiles n'avaient plus la même hauteur. */
+.ac-t-n{
+  display:flex; align-items:center; gap:4px; white-space:nowrap;
+  margin-top:8px; font-size:11px; color:var(--label-3); letter-spacing:-0.015em;
+}
+.ac-t-n b{ font-weight:600; }
+/* La couleur porte un sens, pas une décoration : elle ne s'allume que sur une
+   vraie hausse. Une baisse reste grise — l'app ne réprimande pas. */
+.ac-t-n.haut .fl, .ac-t-n.haut b{ color:#FDA81E; }
+.ac-t-n .fl{ font-size:12px; line-height:1; }
 
-/* ─── ③ LES DEUX LISTES ──────────────────────────────────────────────────── */
-.ac-liste{ padding:0; margin-bottom:11px; overflow:hidden; }
-.ac-liste-tete{
-  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
-  width:100%; padding:14px 15px 10px;
+/* La jauge en cinq segments. Une barre continue à 4 % ne montre qu'un trait ;
+   cinq segments donnent une échelle, et l'on voit qu'on est au premier
+   cinquième. */
+.ac-jauge{ display:flex; gap:5px; margin-top:12px; }
+.ac-seg{
+  flex:1; height:4px; border-radius:100px; overflow:hidden;
+  background:rgba(255,255,255,0.09);
+}
+.ac-seg i{
+  display:block; height:100%; border-radius:100px;
+  background:linear-gradient(90deg,#EB5201,#FDA81E);
+}
+
+/* ─── ③ LES DEUX CARTES DU BAS ───────────────────────────────────────────── */
+.ac-carte{
+  padding:14px 14px 15px; border-radius:20px; margin-bottom:11px;
+  background:var(--bg-card);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.06);
+}
+.ac-carte-t{
+  font-size:13.5px; font-weight:600; color:var(--label-1);
+  letter-spacing:-0.02em; margin-bottom:12px;
+}
+.ac-carte-lig{
+  display:flex; align-items:center; gap:12px; width:100%;
   background:none; border:none; font-family:inherit; text-align:left;
+  color:inherit; padding:0;
 }
-.ac-liste-t{
-  font-size:14px; font-weight:700; color:var(--label-1); letter-spacing:-0.025em;
+.ac-carte-lig:active{ opacity:0.6; }
+.ac-carte-co{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:flex-start; }
+.ac-carte-co .nm{
+  font-size:14px; font-weight:500; color:var(--label-1); letter-spacing:-0.02em;
+  line-height:1.3;
+  /* Une seule ligne : un titre long ne doit pas faire grandir la carte. */
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.ac-liste-fl{ font-size:11.5px; color:var(--label-3); white-space:nowrap; }
-.ac-liste-co{ padding:0 15px 8px; }
-.ac-l-lig{
-  display:flex; align-items:center; gap:10px; width:100%;
-  padding:9px 0; background:none; border:none; font-family:inherit;
-  text-align:left; color:inherit;
-  /* Un filet entre les lignes plutôt qu'un écart : trois lignes espacées dans
-     une carte ressemblent à trois cartes. */
-  border-top:0.5px solid rgba(255,255,255,0.07);
+.ac-carte-co .nm b{ font-weight:650; }
+.ac-carte-co .st{
+  font-size:12px; color:var(--label-3); margin-top:2px;
+  max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-.ac-liste-co .ac-l-lig:first-child{ border-top:none; }
-.ac-l-lig:active{ opacity:0.6; }
-.ac-l-lig .co{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
-.ac-l-lig .nm{
-  font-size:13px; font-weight:600; color:var(--label-1); letter-spacing:-0.015em;
-  /* Une seule ligne : un titre de procédure long ne doit pas faire grandir la
-     carte de trois lignes. */
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+.ac-etiq{
+  margin-top:8px; padding:4px 9px; border-radius:7px;
+  background:rgba(255,255,255,0.06);
+  font-size:11px; color:var(--label-2); letter-spacing:-0.01em;
 }
-.ac-l-lig .nm b{ font-weight:700; }
-.ac-l-lig .st{
-  font-size:11px; color:var(--label-3);
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+.ac-carte-fl{ font-size:19px; color:var(--label-3); flex-shrink:0; line-height:1; }
+.ac-carte-quand{
+  display:flex; align-items:center; gap:7px; flex-shrink:0;
+  font-size:11.5px; color:var(--label-3);
 }
-.ac-l-lig .vl{ font-size:11px; color:var(--label-3); flex-shrink:0; }
-.ac-l-lig .proc-brouillon{ margin-left:0; flex-shrink:0; }
-.ac-l-rien{
-  padding:12px 0 14px; font-size:12.5px; color:var(--label-3);
-  border-top:0.5px solid rgba(255,255,255,0.07);
+.ac-carte-quand i{
+  width:7px; height:7px; border-radius:100px; background:#FDA81E; flex:0 0 7px;
 }
+
+/* La vignette. `background-size:cover` sur un rapport 4/3 : l'image de
+   couverture d'une procédure n'a pas de format imposé, et un `object-fit` sur
+   une balise `img` aurait demandé une balise de plus pour rien. */
+.ac-vign{
+  position:relative; flex:0 0 92px; width:92px; height:69px;
+  border-radius:12px; overflow:hidden;
+  background:#141418 center/cover no-repeat;
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.08);
+}
+.ac-vign.nue{
+  background:linear-gradient(150deg,#1E1E24,#0F0F12);
+}
+.ac-play{
+  position:absolute; inset:0; margin:auto;
+  width:30px; height:30px; border-radius:100px;
+  display:grid; place-items:center;
+  background:rgba(10,10,12,0.55); color:#fff;
+  /* Le voile derrière la flèche : sur une vignette claire, une flèche blanche
+     seule disparaît. */
+  backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.22);
+}
+.ac-play svg{ width:14px; height:14px; display:block; margin-left:2px; }
+
+/* L'avatar à initiales. Rond, à la différence des plaques d'icône : c'est une
+   personne, pas une catégorie. */
+.ac-av{
+  position:relative; flex:0 0 44px; width:44px; height:44px;
+  border-radius:100px; display:grid; place-items:center;
+  background:rgba(255,255,255,0.06);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09);
+  font-size:14px; font-weight:600; color:var(--label-2); letter-spacing:0.01em;
+}
+/* La pastille de genre, en haut à droite de l'avatar. Elle reprend la couleur
+   déjà employée par le journal des mouvements — la même chose au même signe. */
+.ac-av-pt{
+  position:absolute; top:1px; right:1px;
+  width:10px; height:10px; border-radius:100px;
+  background:#FDA81E;
+  box-shadow:0 0 0 2.5px var(--bg-card);
+}
+.ac-av-pt.act-depart, .ac-av-pt.act-retrait{ background:var(--label-3); }
+.ac-av-pt.act-refus{ background:#FF453A; }
+
+.ac-l-rien{ font-size:12.5px; color:var(--label-3); padding:2px 0 4px; }
 
 /* ═══ DEUX PAR DEUX ═══
 
@@ -10246,3 +10376,55 @@ body:has(#e-detail.active) #equipe-app{
   line-height:1.45; color:var(--label-2);
   max-width:260px; margin:0 auto;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « COMBIEN DE TEMPS ÇA PREND ? » · SOUS L'ANNEAU D'ANALYSE
+
+   Replié par défaut. Le bouton est en gris, sans fond ni bord : il ne doit
+   pas concurrencer « Abandonner et supprimer », ni donner l'impression qu'il
+   y a quelque chose à faire. C'est un renseignement, pas une action.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ai-combien{
+  display:block; margin:14px auto 0; padding:6px 4px;
+  background:none; border:none; font-family:inherit;
+  font-size:12.5px; color:var(--label-3); letter-spacing:-0.01em;
+  text-decoration:underline; text-underline-offset:3px;
+  text-decoration-color:rgba(235,235,245,0.22);
+}
+.ai-combien:active{ opacity:0.6; }
+
+.ai-combien-co{
+  margin-top:12px; padding:14px 15px;
+  border-radius:14px; background:rgba(255,255,255,0.035);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07);
+  /* Le texte revient à gauche : la carte entière est centrée, et un tableau
+     centré ne s'aligne sur rien. */
+  text-align:left;
+}
+.ai-combien-co p{
+  margin:0; font-size:12.5px; line-height:1.5; color:var(--label-2);
+}
+.ai-combien-co p b{ color:var(--label-1); font-weight:650; }
+
+.ai-combien-t{
+  width:100%; margin:12px 0; border-collapse:collapse;
+  font-size:12.5px; font-variant-numeric:tabular-nums;
+}
+.ai-combien-t th{
+  text-align:left; padding:0 0 6px; font-weight:650;
+  font-size:11px; text-transform:uppercase; letter-spacing:0.05em;
+  color:var(--label-3);
+  border-bottom:0.5px solid rgba(255,255,255,0.09);
+}
+.ai-combien-t td{
+  padding:7px 0; color:var(--label-1);
+  border-bottom:0.5px solid rgba(255,255,255,0.06);
+}
+/* La colonne des durées d'analyse, à droite et en ambre : c'est le chiffre
+   qu'on est venu chercher. */
+.ai-combien-t th:last-child,
+.ai-combien-t td:last-child{ text-align:right; }
+.ai-combien-t td:last-child{ color:#F7AA51; font-weight:600; }
+.ai-combien-t tr:last-child td{ border-bottom:none; }
+
+.ai-combien-n{ color:var(--label-3) !important; font-size:11.5px !important; }

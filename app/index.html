@@ -729,12 +729,12 @@
          rapport (N sur N), et un anneau dit un rapport mieux qu'un texte. Les
          trois autres portent un nombre, parce qu'un nombre seul n'a rien à
          comparer. -->
+    <!-- ⚠ LE SOUS-TITRE A ÉTÉ RETIRÉ. L'anneau occupe désormais le haut de
+         l'écran et dit lui-même ce qu'on regarde — « de vos procédures sont
+         accessibles » est écrit en son centre. Une phrase d'introduction
+         au-dessus aurait annoncé ce que la ligne suivante répète. -->
     <div class="ac-tete">
       <h1 class="ac-salut">Bonjour <span id="ac-prenom">—</span> 👋</h1>
-      <!-- La phrase dit ce que la PAGE montre, pas ce qu'est l'app. « Voici un
-           aperçu de votre espace de travail » aurait pu coiffer n'importe quel
-           écran ; celle-ci annonce l'anneau, puis les listes. -->
-      <p class="ac-sous">Ce qui est en ligne, et ce que votre équipe en fait</p>
     </div>
 
     <!-- Le sélecteur « Ce mois-ci / Au total » a été retiré. La tuile
@@ -1492,7 +1492,36 @@
         </div>
         <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Presque prêt</div>
         <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:#fff;">Vous pouvez quitter cette page.</b> Votre procédure apparaîtra dans la liste dès qu'elle sera prête.</div>
-        <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button></div>
+        <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button>
+
+        <!-- ═══ COMBIEN DE TEMPS ? ═══
+
+             Une attente de dix minutes sans repère ressemble à une panne. Ce
+             bouton déplie un ordre de grandeur, mesuré sur les analyses déjà
+             faites.
+
+             Il est DISCRET et REPLIÉ par défaut : quelqu'un qui attend sans
+             s'inquiéter n'a pas à lire un tableau. Il ne s'ouvre que pour
+             celui qui se demande si c'est normal. -->
+        <button type="button" class="ai-combien" id="ai-combien-btn"
+                aria-expanded="false" aria-controls="ai-combien-co">
+          Combien de temps ça prend ?
+        </button>
+        <div class="ai-combien-co" id="ai-combien-co" hidden>
+          <p>Comptez environ <b>trois minutes d’analyse par minute de vidéo</b>,
+             plus quelques minutes d’attente au départ.</p>
+          <table class="ai-combien-t">
+            <thead><tr><th>Votre vidéo</th><th>Analyse</th></tr></thead>
+            <tbody>
+              <tr><td>1 min</td><td>4 à 6 min</td></tr>
+              <tr><td>3 min</td><td>7 à 10 min</td></tr>
+              <tr><td>5 min</td><td>12 à 16 min</td></tr>
+            </tbody>
+          </table>
+          <p class="ai-combien-n">Ces durées varient : la vidéo attend parfois
+             qu’une machine se libère chez notre prestataire d’analyse. Vous
+             pouvez fermer l’application, le travail continue.</p>
+        </div></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
       <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFiniGrand)" stroke-width="1.6"></circle><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFiniGrand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"></path></g></svg></div>
@@ -3065,6 +3094,16 @@
     <!-- Un dégradé RELATIF, pour tout ce qui dépasse 24 px : une pastille dans
          un grand dessin, un cercle, une forme libre. `logoOrIc` reste réservé
          aux icônes de 24 px pour lesquelles il a été calibré. -->
+    <!-- La piste du grand anneau de l'accueil. Presque noire, avec un léger
+         éclaircissement en haut à gauche : à vingt-six pixels d'épaisseur, un
+         gris uni paraît plat comme du carton. Le dégradé lui donne le relief
+         d'un anneau creusé dans la page. -->
+    <linearGradient id="acPiste" x1="0" y1="0" x2="0.7" y2="1">
+      <stop offset="0" stop-color="#26262C"/>
+      <stop offset="0.45" stop-color="#161619"/>
+      <stop offset="1" stop-color="#0D0D10"/>
+    </linearGradient>
+
     <linearGradient id="orLibre" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FEC64A"/><stop offset="1" stop-color="#EB5201"/>
     </linearGradient>

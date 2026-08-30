@@ -10757,3 +10757,40 @@ body:has(#e-detail.active) #equipe-app{
     inset 0 -1.5px 2px -1.5px rgba(255,255,255,0.7),
     0 1px 2px rgba(20,20,30,0.06);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'AMBRE QUI SE DÉTACHE
+
+   Les teintes ne changent pas — ce sont celles de la marque. On agit sur la
+   FAÇON dont elles se posent sur un fond clair.
+
+   Deux effets, et ils font deux choses différentes :
+
+     · `saturate(1.28)` densifie la couleur. Sur du blanc, un orange perd de sa
+       chair : le blanc l'entoure de tous côtés et l'œil compense en le voyant
+       plus pâle qu'il n'est. La saturation rend ce qui a été perdu, sans
+       déplacer la teinte d'un degré.
+
+     · `drop-shadow` très courte et de la même famille. Ce n'est pas une lueur :
+       c'est une ombre de deux pixels, ambre foncé, à peine décalée. Elle donne
+       au dessin une assise — il cesse d'être posé À PLAT sur le blanc, et un
+       trait qui a du relief se détache d'un aplat qui n'en a pas.
+
+   ⚠ PAS DE LUEUR AMBRE. Un `drop-shadow` sans décalage et large ferait une
+     auréole autour de chaque icône : sur du sombre c'est de la lumière, sur du
+     clair c'est une tache de café.
+
+   ⚠ LE SÉLECTEUR CIBLE LES DÉGRADÉS, PAS LES CLASSES. Ces dessins sont
+     répartis dans des dizaines de classes différentes, et il s'en ajoute à
+     chaque écran. On les attrape par ce qu'ils ont en commun : leur attribut
+     `fill` ou `stroke` pointe vers l'un des trois dégradés ambres. Une icône
+     ajoutée demain héritera de l'effet sans qu'on y pense.
+   ═══════════════════════════════════════════════════════════════════════════ */
+svg [fill^="url(#logoOrIc"],  svg [stroke^="url(#logoOrIc"],
+svg [fill^="url(#orLibre"],   svg [stroke^="url(#orLibre"],
+svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
+  filter:saturate(1.28) drop-shadow(0 1px 1.5px rgba(196,71,0,0.30));
+}
+
+/* Le logo est hors du lot : il porte `logoOr`, et sa couleur est un acquis de
+   marque — on ne la densifie pas, on ne lui donne pas d'ombre. */

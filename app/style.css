@@ -6102,7 +6102,10 @@
      gris — sans elle le rond blanc n'aurait plus de limite sur une barre
      blanche. L'icône reste NOIRE : elle l'était déjà, et le noir sur un rond
      blanc se lit aussi bien dans les deux thèmes. */
-  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(20,20,30,0.12), 0 2px 6px rgba(20,20,30,0.08); border:0.5px solid rgba(28,28,38,0.10); }
+  /* ⚠ FOND NOIR, SIGNE BLANC. Il etait blanc a signe noir : sur une barre
+     blanche, il ne se distinguait que par sa bordure. Inverse, il devient le
+     seul aplat plein de l'ecran — et il rejoint la goutte qui en sort. */
+  .tab-round--primary{ background:#111116; color:#fff; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(17,17,22,0.28), 0 2px 6px rgba(20,20,30,0.10); border:none; }
   .tab-round--primary svg{ width:23px; height:23px; }
 
 
@@ -6504,7 +6507,10 @@ body.plus-vu .liquide, body.plus-part .liquide{ visibility:visible; }
   position:absolute; left:var(--plus-cx); transform:translateX(-50%);
   bottom:0;
   width:calc(var(--plus-larg) * 0.5); height:0;
-  border-radius:20px 20px 0 0; background:#FA8A08;
+  /* ⚠ NOIR, COMME LA GOUTTE ET LE ROND. Ces trois pieces forment un seul
+     objet en mouvement : si l'une garde l'ambre, on voit la couture au
+     moment ou elles se rejoignent. */
+  border-radius:20px 20px 0 0; background:#111116;
 }
 
 /* LE COU DE LA VERSION VALIDÉE, RENDU TEL QUEL.
@@ -6559,7 +6565,7 @@ body.plus-part .socle{
 .bulle{
   position:absolute; left:var(--plus-cx); bottom:0;
   width:var(--plus-larg); height:var(--plus-h);
-  border-radius:calc(var(--plus-h) / 2); background:#FA8A08;
+  border-radius:calc(var(--plus-h) / 2); background:#111116;
   transform:translate(-50%, var(--plus-repos)) scale(0.88);
   transition:transform var(--plus-duree) var(--plus-courbe);
 }
@@ -6840,8 +6846,11 @@ body.plus-vu .plus-flot{
 /* 24 px, comme `h1.pagehead`. Ces trois titres — « Procédures », « Analyse »
    et le salut de l'Équipe — vivent dans `.page-tete` plutôt que de porter la
    classe `pagehead`, et ils échappaient donc à la règle centrale. */
+/* ⚠ 28 PX, ET L'APPROCHE SUIT. Un titre plus grand a besoin de lettres plus
+   serrees : a -0,03 em, « Procedures » a 28 px paraissait etale. -0,038 le
+   ramene a la densite qu'il avait a 24. */
 .page-tete h1{
-  font-size:24px; font-weight:700; letter-spacing:-0.03em; line-height:1.1;
+  font-size:28px; font-weight:700; letter-spacing:-0.038em; line-height:1.08;
 }
 /* L'ÉCART SOUS LE TITRE, POSÉ AU MÊME ENDROIT POUR LES DEUX PAGES.
 
@@ -10827,40 +10836,105 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ne ressemblait pas au code. */
 #cat-grid .cat-cell--ligne{
   display:flex; flex-direction:row; align-items:flex-start; gap:13px;
-  padding:14px; border-radius:16px;
+  /* 20 px : la carte s'accorde aux capsules du dessus sans devenir une pilule
+     elle-meme. Au-dela, un bloc de cette hauteur commence a flotter. */
+  padding:14px; border-radius:20px;
 }
 /* La plaque teintée. Le reflet du haut lui donne l'épaisseur d'une pastille
    plutôt que l'aspect d'un carré de couleur. */
+/* ⚠ LA PLAQUE GRANDIT AVEC SON DESSIN. L'icone passe de 23 a 28 px : a 46,
+   la plaque ne lui laissait plus que neuf pixels de marge et le dossier
+   touchait presque le bord. 52 lui en rend douze. */
+/* ═══ UN SEUL FOND POUR LES HUIT COULEURS ═══
+
+   La plaque etait teintee de la famille du dossier : huit pastels differents,
+   qui diluaient la couleur au lieu de la porter. Sur six dossiers, la page
+   devenait un assortiment.
+
+   Le fond est maintenant DERIVE du trait de l'icone, en transparence — voir
+   `fondPlaque` dans app.js. Une seule teinte par dossier, declinee du dessin
+   au fond, au lieu de deux couleurs choisies separement.
+
+   ⚠ LE FOND EST POSE EN STYLE DIRECT, PAS ICI. Il change a chaque dossier :
+     le declarer en CSS demanderait huit regles, et il faudrait penser a en
+     ajouter une a chaque couleur nouvelle.
+
+   ⚠ LE REFLET DU HAUT RESTE, et l'ancien contour a disparu. Sur un fond
+     transparent, un liseré sombre en faisait le tour et cerclait la pastille ;
+     le reflet seul suffit a la poser sur la carte. */
 .cl-pl{
-  flex:0 0 46px; width:46px; height:46px; border-radius:13px;
+  flex:0 0 52px; width:52px; height:52px; border-radius:15px;
   display:grid; place-items:center;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.75);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
-.cl-pl svg{ width:23px; height:23px; display:block; }
+.cl-pl svg{ width:28px; height:28px; display:block; }
 .cl-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
 .cl-nm{
   font-size:16.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
-  color:var(--label);
+  color:var(--label); min-width:0;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-/* L'aperçu tient sur UNE ligne, coupée par des points de suite. Sur deux
-   lignes, la hauteur des cartes varie selon le nombre de procédures et la liste
-   perdait son rythme. */
+/* ⚠ `.cl-st` N'EST PLUS EMPLOYEE DANS LA LISTE DES DOSSIERS. Elle portait
+   l'apercu des trois titres, retire de la carte. La regle reste : d'autres
+   ecrans emploient la meme classe pour un sous-titre sur une ligne. */
 .cl-st{
   font-size:13.5px; color:var(--label-3); margin-top:3px; letter-spacing:-0.02em;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
 }
-.cl-bas{ display:flex; align-items:center; gap:8px; margin-top:9px; }
+/* ⚠ `space-between` : le badge d'état à gauche, le compte à droite. Ils sont
+   sur la MÊME ligne pour que la carte garde trois niveaux de lecture — le nom,
+   ce qu'il contient, son état — et pas quatre. */
+.cl-bas{
+  display:flex; align-items:center; justify-content:space-between;
+  gap:8px; margin-top:9px;
+}
+/* La tête porte le nom et les trois points, alignés sur leur première ligne :
+   un bouton centré verticalement sur un titre qui passe sur deux lignes
+   descendrait au milieu, loin de son coin. */
+.cl-tete{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:10px;
+}
+/* Les trois points. `flex-shrink:0` et une zone de touche de 28 px : le dessin
+   fait 18 px, mais un bouton de 18 px se rate au pouce. */
+.cl-plus{
+  flex-shrink:0; width:28px; height:22px; margin:-2px -6px 0 0;
+  display:grid; place-items:center; border:none; background:none; padding:0;
+  color:var(--label-3); border-radius:8px;
+}
+.cl-plus svg{ width:18px; height:18px; display:block; }
+.cl-plus:active{ background:rgba(60,60,67,0.10); }
+/* Le compte passe à droite du badge, plus discret que lui : c'est une
+   précision, pas un état. */
+.cl-n{
+  font-size:12.5px; color:var(--label-3); letter-spacing:-0.02em;
+  font-variant-numeric:tabular-nums; white-space:nowrap;
+}
+/* ═══ LE BADGE D'ETAT ═══
+
+   Une pilule blanche a contour fin, la meme forme pour les deux etats. Seul
+   le POINT change de couleur : vert quand des procedures sont en ligne, gris
+   quand il ne reste que des brouillons.
+
+   ⚠ MEME FORME, MEME TAILLE, MEME COULEUR DE TEXTE POUR LES DEUX. Un brouillon
+     en pastille ambre et un « en ligne » en texte nu, c'etaient deux objets
+     differents pour une meme information — l'oeil devait relire au lieu de
+     comparer. La couleur du point suffit a distinguer, et c'est la seule chose
+     qui doit varier.
+
+   ⚠ `nowrap` : un badge qui se casse en deux lignes fait grandir la carte, et
+     les hauteurs de la liste cessent d'etre regulieres. */
 .cl-badge{
-  display:inline-flex; align-items:center; gap:6px;
-  font-size:12.5px; color:var(--label-2); letter-spacing:-0.02em;
+  display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
+  padding:4px 11px 4px 9px; border-radius:100px;
+  background:#FFFFFF;
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.14), 0 1px 1.5px rgba(20,20,30,0.04);
+  font-size:12.5px; font-weight:500; color:var(--label-2); letter-spacing:-0.02em;
 }
 .cl-badge i{ width:7px; height:7px; border-radius:100px; flex-shrink:0; }
-.cl-dr{
-  display:flex; align-items:center; gap:7px; flex-shrink:0; align-self:center;
-  font-size:15px; color:var(--label-3);
-}
-.cl-n{ font-variant-numeric:tabular-nums; }
-.cl-dr .fl{ font-size:18px; }
+/* ⚠ `.cl-dr` N'EST PLUS EMPLOYÉE. Elle portait le compte et le chevron dans une
+   colonne à droite ; le compte est passé sous le nom, et le chevron a disparu —
+   la carte entière est cliquable, un chevron n'ajoutait rien. Gardée vide pour
+   ne pas casser un balisage qui la citerait encore ailleurs. */
 .cl-rien{
   padding:26px 4px; text-align:center;
   font-size:14px; color:var(--label-3); letter-spacing:-0.02em;
@@ -10869,7 +10943,10 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ─── LA RECHERCHE ───────────────────────────────────────────────────────── */
 .proc-rech{
   display:flex; align-items:center; gap:10px; margin:0 0 16px;
-  height:42px; padding:0 14px; border-radius:12px;
+  /* Arrondi complet : la barre de recherche devient une capsule, comme le
+     segment juste dessous. Deux formes differentes pour deux controles voisins
+     donnaient une pile de rectangles a coins tous differents. */
+  height:42px; padding:0 16px; border-radius:100px;
   background:rgba(118,118,128,0.12);
 }
 .proc-rech svg{ width:17px; height:17px; color:var(--label-3); flex-shrink:0; }
@@ -10881,3 +10958,30 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ LA CROIX NATIVE DE SAFARI EST MASQUÉE. Sur `type="search"`, WebKit ajoute
    son propre bouton d'effacement, gris et carré, qui jure avec le reste. */
 .proc-rech input::-webkit-search-cancel-button{ -webkit-appearance:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CONTRÔLE SEGMENTÉ DE LA PAGE PROCÉDURES
+
+   Une piste grise, une pastille blanche sur le segment choisi. C'est le
+   vocabulaire d'iOS, et il dit exactement ce qu'il fait : trois vues d'une
+   même liste, une seule à la fois.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.proc-segm{
+  display:flex; margin:0 0 16px; padding:3px; border-radius:100px;
+  background:rgba(118,118,128,0.12);
+}
+.p-seg{
+  /* ⚠ LA PASTILLE SUIT LA PISTE. A 8 px dans une piste a 100, elle laissait
+     voir quatre coins gris dans les angles. */
+  flex:1; padding:8px 0; border-radius:100px; border:none; background:none;
+  font-family:inherit; font-size:13.5px; font-weight:500;
+  color:var(--label-2); letter-spacing:-0.02em;
+  /* La transition ne porte que sur la couleur : animer le fond ferait clignoter
+     la pastille au changement de segment. */
+  transition:color 0.18s ease;
+}
+.p-seg.on{
+  background:#FFFFFF; color:var(--label); font-weight:600;
+  box-shadow:0 1px 3px rgba(20,20,30,0.10), 0 0 0 0.5px rgba(20,20,30,0.04);
+}

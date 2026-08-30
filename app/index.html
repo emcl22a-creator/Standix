@@ -115,11 +115,14 @@
 
        Blanc à 78 % : assez opaque pour qu'un texte noir se lise dessus, assez
        transparent pour qu'on devine le contenu qui défile dessous. */
-    /* La teinte de la capsule au repos, reprise au chiffre pres : `#lensGray`
-       pose `rgba(150,150,155,0.18)`. La barre porte maintenant la meme, pour
-       que les deux pieces soient de la meme matiere jusqu'a la couleur. */
-    --tint-color:150,150,155;
-    --tint-opacity:0.18;
+    /* ⚠ BLANC, PAS GRIS. La teinte grise venait du theme sombre : sur du noir,
+       un gris a 18 % eclaircit. Sur une page claire il assombrit, et la barre
+       paraissait sale a cote des cartes blanches qu'elle recouvre.
+
+       0,60 : assez pour que la barre se detache du fond et porte un texte
+       sombre, assez peu pour qu'on devine ce qui defile dessous. */
+    --tint-color:255,255,255;
+    --tint-opacity:0.60;
 
     /* ⚠ LE CREUX EST NEUTRALISÉ. Une ombre interne noire de 17 px dessinait la
        barre EN CREUX sur du noir : la lumière tombe dedans, c'est ce qui lui
@@ -395,13 +398,20 @@
     .glassDiv::after{ padding:0.5px; }
   }
 
-  /* Gris translucide du repos. Il monte a mesure que le verre
-     s'eteint : a l'arret la capsule est entierement grise, comme
-     dans le v7. */
+  /* Gris translucide du repos. Il monte a mesure que le verre s'eteint : a
+     l'arret la capsule est entierement grise.
+
+     ⚠ UN GRIS CLAIR, PAS UN GRIS MOYEN. `rgba(150,150,155,0.18)` venait du
+       theme sombre, ou il fallait ECLAIRCIR un fond noir. Sur une barre
+       blanche il fait l'inverse : il assombrit, et la capsule devenait une
+       tache grise au lieu d'un reperage discret.
+
+       190 a 32 % donne #EAEAEE sur du blanc — assez clair pour rester dans la
+       famille de la barre, assez dense pour designer l'onglet en cours. */
   #lensGray{
     position:absolute;inset:0;z-index:2;
     border-radius:inherit;pointer-events:none;
-    background:rgba(150,150,155,0.18);
+    background:rgba(190,190,200,0.32);
   }
   /* Illumination de la barre. Une COUCHE, pas un filter : un filter
      sur #bar creerait un contexte d'empilement et couperait le
@@ -429,14 +439,14 @@
        navigateur repartit ce qui reste, et la capsule descend d'un pixel —
        la moitie, exactement.
 
-       ⚠ POUR AJUSTER, C'EST CE SEUL NOMBRE, ET IL VAUT LE DOUBLE DE LA
-         DESCENTE VOULUE. 4px pour deux pixels, 6px pour trois. Ne pas
-         reintroduire de `margin-top` calcule : c'est ce qui avait rendu le
-         centrage faux et impossible a corriger proprement.
+       ⚠ POUR AJUSTER, C'EST CE SEUL NOMBRE, ET IL VAUT LE DOUBLE DU DECALAGE
+         VOULU. `4px` descend de deux pixels, `0` centre exactement, `-2px`
+         remonte d'un. Ne pas reintroduire de `margin-top` calcule : c'est ce
+         qui avait rendu le centrage faux et impossible a corriger proprement.
 
        Le pochoir qui decoupe la capsule suit tout seul — il lit `offsetTop`,
        donc la position reelle, quelle qu'en soit la cause. */
-    top:2px;bottom:0;margin-top:auto;margin-bottom:auto;left:0;
+    top:3.3px;bottom:0;margin-top:auto;margin-bottom:auto;left:0;
     /* La capsule passe SOUS les onglets : le texte et les icones
        restent lisibles au-dessus du verre. */
     z-index:5;pointer-events:none;

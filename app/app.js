@@ -7283,6 +7283,56 @@ function playCardShuffle(containerEl, oldRects) {
    une image où la valeur de repli s'appliquait. */
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA COULEUR D'UN DOSSIER
+
+   Elle sert à RECONNAÎTRE, pas à décorer. À douze dossiers, un gérant ne lit
+   plus les noms : il repère une forme et une teinte.
+
+   ⚠ ELLE EST TIRÉE DU NOM, PAS D'UN COMPTEUR. Avec un index de boucle,
+     ajouter un dossier en tête décalerait toutes les couleurs et le repère
+     serait perdu du jour au lendemain. Le nom, lui, ne bouge pas — et cela ne
+     demande aucune colonne en base.
+
+   ⚠ LE MÉLANGE DES BITS N'EST PAS DU LUXE. Avec le hachage classique
+     `s * 31 + code`, mesuré sur dix dossiers réels : CINQ tombaient sur la
+     même couleur et trois teintes n'étaient jamais tirées. La raison est
+     arithmétique — 31 vaut 7 modulo 8, et la palette a huit entrées ; avec un
+     modulo qui est une puissance de deux, seuls les bits BAS comptent, or ce
+     sont ceux que `× 31` fait le moins bouger.
+
+     FNV-1a puis une avalanche ramènent les bits hauts vers les bas avant le
+     modulo. Sur seize dossiers : six teintes sur huit employées, aucune plus
+     de quatre fois.
+
+   ⚠ L'ORDRE DE `PALETTE_DOSSIERS` EST CELUI DES DÉGRADÉS `pal0` À `pal7`
+     déclarés dans index.html. Insérer une couleur au milieu changerait la
+     teinte de tous les dossiers d'un coup. Ajouter, c'est à la fin — et il
+     faut alors le dégradé correspondant dans le balisage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const PALETTE_DOSSIERS = [
+  { i:0, trait:['#7C5CE0','#5B3FC4'], fond:['#EFEAFD','#E4DCFB'] },
+  { i:1, trait:['#3B8AF0','#1B5FCE'], fond:['#E8F1FE','#DBE9FD'] },
+  { i:2, trait:['#2CA85B','#178943'], fond:['#E5F7EC','#D7F1E1'] },
+  { i:3, trait:['#F0930B','#D2610A'], fond:['#FEF2E0','#FDE9CD'] },
+  { i:4, trait:['#EC5C86','#CE3665'], fond:['#FDEBF0','#FBDFE7'] },
+  { i:5, trait:['#1EA0BD','#0E7C97'], fond:['#E3F5F9','#D2EDF4'] },
+  { i:6, trait:['#5C63D8','#3B42B8'], fond:['#EBECFC','#DFE1FA'] },
+  { i:7, trait:['#DE6A45','#B94824'], fond:['#FCEDE8','#FAE0D7'] },
+]
+
+function couleurDossier(nom) {
+  let s = 0x811c9dc5
+  for (let i = 0; i < nom.length; i++) {
+    s = (s ^ nom.charCodeAt(i)) >>> 0
+    s = Math.imul(s, 0x01000193) >>> 0
+  }
+  s = (s ^ (s >>> 16)) >>> 0
+  s = Math.imul(s, 0x7feb352d) >>> 0
+  s = (s ^ (s >>> 15)) >>> 0
+  return PALETTE_DOSSIERS[s % PALETTE_DOSSIERS.length]
+}
+
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
   const oldRects = captureCardPositions(catGridEl)
@@ -7312,39 +7362,69 @@ function renderCategoryGrid() {
     return parNom(a, b)
   })
 
+  /* ═══ LE FILTRE DE RECHERCHE ═══
+
+     On cherche dans le NOM du dossier ET dans les titres qu'il contient : taper
+     « friteuse » doit trouver le dossier Cuisine, meme si le mot n'est nulle
+     part dans son nom. On cherche une chose, pas son rangement.
+
+     ⚠ SANS ACCENTS NI CASSE. `normalize('NFD')` separe les lettres de leurs
+       accents, et l'expression les retire : « securite » trouve « Sécurité ».
+       Sans cela, il faudrait taper l'accent au clavier du telephone pour
+       trouver la moitie des dossiers francais. */
+  const sansAccent = (s) => (s || '').normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  const q = sansAccent(rechercheDossiers)
+  const visibles = q
+    ? sorted.filter(c =>
+        sansAccent(c.nom).includes(q) ||
+        (c.procsInCat || []).some(p => sansAccent(p.titre).includes(q)))
+    : sorted
+
+  if (q && !visibles.length) {
+    catGridEl.innerHTML =
+      '<div class="cl-rien">Aucun dossier ne correspond à « ' +
+      escapeHtml(rechercheDossiers) + ' ».</div>'
+    return
+  }
+
   const triParDate = currentCatSort === 'new' || currentCatSort === 'old'
-  sorted.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
+  visibles.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
     const recentTitles = procsInCat.slice(0, 3)
 
     const cell = document.createElement('div')
-    cell.className = 'cat-cell'
+    /* ⚠ LA CLASSE `cat-cell` EST GARDEE. Elle est citee dans le gestionnaire de
+       clic global, dans l'animation de reordonnancement et dans le bloc de
+       matiere partage par les dix-neuf cartes. La renommer aurait casse ces
+       trois endroits sans qu'aucun ne le signale. `--ligne` ne fait que
+       changer sa mise en page. */
+    cell.className = 'cat-cell cat-cell--ligne'
     cell.dataset.key = nom
-    /* Le dossier vit dans une pastille teintée, et la carte se termine par une
-       ligne d'appel : combien de procédures, et un chevron qui dit qu'on entre.
-       Sans elle, rien n'indiquait que la carte s'ouvrait. */
+
+    /* La couleur du dossier, tiree de son nom. Voir `couleurDossier`. */
+    const teinte = couleurDossier(nom)
+    const brouillons = procsInCat.filter(p => !p.publiee_le).length
+
     cell.innerHTML = `
-      <div class="cat-top">
-        <span class="cat-ic">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
-                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-            <line x1="3" y1="10.6" x2="21" y2="10.6" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
-          </svg>
-        </span>
-      </div>
-      <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-      <div class="cat-recent">
-        ${recentTitles.map(p => `<div class="cat-recent-item" data-proc="${p.id}"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
-      </div>
-      <div class="cat-pied">
+      <span class="cl-pl" style="background:linear-gradient(150deg,${teinte.fond[0]},${teinte.fond[1]})">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-                stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
+                stroke="url(#pal${teinte.i})" stroke-width="1.9" stroke-linejoin="round"/>
         </svg>
-        <span>${procsInCat.length} procédure${procsInCat.length > 1 ? 's' : ''}</span>
+      </span>
+      <span class="cl-co">
+        <span class="cl-nm">${escapeHtml(nom)}</span>
+        <span class="cl-st">${recentTitles.map(p => escapeHtml(p.titre)).join(' · ') || 'Aucune procédure'}</span>
+        <span class="cl-bas">
+          ${brouillons
+            ? `<span class="proc-brouillon">${brouillons} brouillon${brouillons > 1 ? 's' : ''}</span>`
+            : `<span class="cl-badge"><i style="background:${teinte.trait[0]}"></i>Tout en ligne</span>`}
+        </span>
+      </span>
+      <span class="cl-dr">
+        <span class="cl-n">${procsInCat.length}</span>
         <span class="fl">›</span>
-      </div>
+      </span>
     `
     /* Sur la carte d'une dossier, un titre en panne mène directement à la
        reprise : sinon il faudrait ouvrir la dossier pour s'en apercevoir. */
@@ -7466,7 +7546,23 @@ document.addEventListener('click', (e) => {
   closeAllDropdowns()
 })
 
-wireSortDropdown('dd-cat-sort', (sort) => { currentCatSort = sort; renderCategoryGrid() })
+/* ⚠ `dd-cat-sort` N'EXISTE PLUS DANS LE BALISAGE. Son menu de tri a ete retire
+   pour laisser la place a la recherche. `wireSortDropdown` cherchait un
+   element absent — sans erreur, mais sans effet non plus.
+
+   La recherche prend sa place. Elle filtre les dossiers PAR NOM et par les
+   titres qu'ils contiennent : taper « friteuse » trouve le dossier Cuisine
+   meme si le mot n'est pas dans son nom. C'est ce qu'on attend d'une
+   recherche — trouver la chose, pas son rangement. */
+/* ⚠ DECLAREE AVANT L'ECOUTEUR. `let` a une zone morte : y ecrire depuis un
+   gestionnaire pose plus haut lancerait une erreur au premier caractere
+   tape. */
+let rechercheDossiers = ''
+const champRech = document.getElementById('proc-rech-champ')
+champRech?.addEventListener('input', () => {
+  rechercheDossiers = champRech.value.trim().toLowerCase()
+  renderCategoryGrid()
+})
 
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */

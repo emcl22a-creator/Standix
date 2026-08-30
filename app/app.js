@@ -2849,6 +2849,62 @@ function ouvrirContact() {
 
 document.getElementById('logout-btn')?.addEventListener('click', () => signOut())
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VOLET DE LA BARRE DU HAUT
+
+   Il dit dans quel espace on est, pour quelle entreprise, et permet de sortir.
+   Un par espace — gestion et equipe ont chacun leur barre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function remplirVoletTopbar() {
+  const espace = currentMembre?.role === 'gestion' ? 'gestion' : 'equipe'
+  const ent = document.getElementById('tb-ent-' + espace)
+  const role = document.getElementById('tb-role-' + espace)
+  /* ⚠ TROIS SOURCES POUR LE NOM, DANS CET ORDRE. `cachedEntreprise` est la
+     plus fraiche mais n'existe qu'apres un chargement complet ;
+     `entreprise_nom` vient de la ligne du membre et arrive plus tot. Sans le
+     repli, le volet afficherait un tiret pendant les premieres secondes. */
+  if (ent) {
+    ent.textContent = cachedEntreprise?.nom || currentMembre?.entreprise_nom || 'Votre entreprise'
+  }
+  if (role) {
+    role.textContent = espace === 'gestion' ? 'Espace Gestion' : 'Espace Équipe'
+  }
+}
+
+/* ⚠ UN SEUL ECOUTEUR SUR LE DOCUMENT, pour les deux espaces. Poser un
+   gestionnaire par bouton obligerait a en ajouter un a chaque nouvelle barre ;
+   et c'est le meme ecouteur qui referme le volet quand on touche ailleurs —
+   sans quoi il resterait ouvert pendant qu'on se sert de la page. */
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('.tb-menu')
+  const dedans = e.target.closest('.tb-volet')
+
+  if (e.target.closest('[data-deconnexion]')) { signOut(); return }
+
+  document.querySelectorAll('.tb-volet').forEach(v => {
+    const sien = bouton && v.id === bouton.id.replace('tb-menu-', 'tb-volet-')
+    const ouvrir = (sien && !v.classList.contains('ouvert')) || dedans === v
+    if (ouvrir) {
+      remplirVoletTopbar()
+      /* On retire `hidden` AVANT d'ajouter la classe, et on attend une image :
+         un element en `display:none` ne peut pas partir en transition, il
+         apparaitrait d'un coup. */
+      v.hidden = false
+      requestAnimationFrame(() => v.classList.add('ouvert'))
+    } else {
+      v.classList.remove('ouvert')
+      /* On remet `hidden` seulement quand l'animation de sortie est finie,
+         sinon elle serait coupee net. */
+      setTimeout(() => { if (!v.classList.contains('ouvert')) v.hidden = true }, 300)
+    }
+  })
+
+  document.querySelectorAll('.tb-menu').forEach(m => {
+    const v = document.getElementById(m.id.replace('tb-menu-', 'tb-volet-'))
+    m.setAttribute('aria-expanded', v && v.classList.contains('ouvert') ? 'true' : 'false')
+  })
+})
+
 // ═══ ANALYSE GÉNÉRALE ═══
 let currentGaData = null
 let currentGaPeriod = 'week'
@@ -7814,6 +7870,10 @@ function renderCategoryGrid() {
   }
   let visibles = q ? sorted.filter(correspond) : sorted
 
+  /* Le compte de la ligne de contexte. Il dit ce que la liste montre APRES
+     filtrage — sinon il annoncerait six dossiers pendant qu'on en voit deux. */
+  const nb = document.getElementById('proc-nb-dossiers')
+
   /* ⚠ LE FILTRE PORTE SUR LE CONTENU, PAS SUR LE DOSSIER. Un dossier n'a pas
      d'etat : ce sont ses procedures qui en ont un. « En ligne » garde donc
      les dossiers qui contiennent au moins une procedure publiee, et un meme
@@ -7837,6 +7897,12 @@ function renderCategoryGrid() {
        dossiers si elle porte plusieurs classements ; sans le `Set`, elle
        sortirait deux fois dans les resultats.
      ═══════════════════════════════════════════════════════════════════════ */
+  if (nb) {
+    nb.textContent = visibles.length
+      ? `${visibles.length} dossier${visibles.length > 1 ? 's' : ''}`
+      : 'Aucun dossier'
+  }
+
   if (q) {
     const vus = new Set()
     const trouvees = []
@@ -7860,6 +7926,12 @@ function renderCategoryGrid() {
       return
     }
 
+    /* ⚠ EN RECHERCHE, LA LIGNE COMPTE DES PROCEDURES, PAS DES DOSSIERS. La
+       liste montre des procedures : annoncer un nombre de dossiers au-dessus
+       serait un compte qui ne correspond a rien de visible. */
+    if (nb) {
+      nb.textContent = `${trouvees.length} procédure${trouvees.length > 1 ? 's' : ''}`
+    }
     trouvees.forEach(({ proc, dossier }, rang) => {
       catGridEl.appendChild(ligneProcedureTrouvee(proc, dossier, rang))
     })

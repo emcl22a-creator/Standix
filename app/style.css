@@ -10794,3 +10794,90 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
 /* Le logo est hors du lot : il porte `logoOr`, et sa couleur est un acquis de
    marque — on ne la densifie pas, on ne lui donne pas d'ombre. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE PROCÉDURES · LISTE DE DOSSIERS COLORÉS
+
+   La grille à deux colonnes devient une liste. Trois raisons, dans cet ordre :
+
+     · UNE COLONNE SE PARCOURT, DEUX SE BALAIENT. Les noms sont alignés, l'œil
+       descend au lieu de zigzaguer.
+     · LA COULEUR A BESOIN DE PLACE. Une plaque de 46 px dans une carte de
+       demi-largeur écrase le reste ; sur une ligne pleine largeur, elle est le
+       point d'entrée naturel.
+     · L'APERÇU TIENT SUR UNE LIGNE. Trois titres séparés par des points
+       médians disent le contenu sans faire grandir la carte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ `.cat-grid` PASSE EN COLONNE. Elle était déclarée en grille deux colonnes
+   plus haut dans ce fichier ; cette règle-ci vient après, donc elle gagne.
+   Ne pas retirer celle du haut — d'autres écrans l'emploient encore. */
+#cat-grid.cat-grid{ display:flex; flex-direction:column; gap:10px; }
+
+/* ⚠ LE SÉLECTEUR PORTE L'IDENTIFIANT, ET IL LE FAUT.
+
+   `#cat-grid .cat-cell` est déclarée plus haut dans ce fichier avec
+   `display:flex; flex-direction:column; padding:14px 14px 0`. Un identifiant
+   bat n'importe quel nombre de classes : ma règle `.cat-cell--ligne` seule
+   était lue, puis écrasée en silence.
+
+   Le résultat à l'écran : la plaque au-dessus du texte au lieu d'être à
+   gauche, le compte rejeté en bas, et l'aperçu qui débordait faute de largeur
+   contrainte. Rien dans la console, aucune erreur — juste une mise en page qui
+   ne ressemblait pas au code. */
+#cat-grid .cat-cell--ligne{
+  display:flex; flex-direction:row; align-items:flex-start; gap:13px;
+  padding:14px; border-radius:16px;
+}
+/* La plaque teintée. Le reflet du haut lui donne l'épaisseur d'une pastille
+   plutôt que l'aspect d'un carré de couleur. */
+.cl-pl{
+  flex:0 0 46px; width:46px; height:46px; border-radius:13px;
+  display:grid; place-items:center;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.75);
+}
+.cl-pl svg{ width:23px; height:23px; display:block; }
+.cl-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
+.cl-nm{
+  font-size:16.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
+  color:var(--label);
+}
+/* L'aperçu tient sur UNE ligne, coupée par des points de suite. Sur deux
+   lignes, la hauteur des cartes varie selon le nombre de procédures et la liste
+   perdait son rythme. */
+.cl-st{
+  font-size:13.5px; color:var(--label-3); margin-top:3px; letter-spacing:-0.02em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
+}
+.cl-bas{ display:flex; align-items:center; gap:8px; margin-top:9px; }
+.cl-badge{
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:12.5px; color:var(--label-2); letter-spacing:-0.02em;
+}
+.cl-badge i{ width:7px; height:7px; border-radius:100px; flex-shrink:0; }
+.cl-dr{
+  display:flex; align-items:center; gap:7px; flex-shrink:0; align-self:center;
+  font-size:15px; color:var(--label-3);
+}
+.cl-n{ font-variant-numeric:tabular-nums; }
+.cl-dr .fl{ font-size:18px; }
+.cl-rien{
+  padding:26px 4px; text-align:center;
+  font-size:14px; color:var(--label-3); letter-spacing:-0.02em;
+}
+
+/* ─── LA RECHERCHE ───────────────────────────────────────────────────────── */
+.proc-rech{
+  display:flex; align-items:center; gap:10px; margin:0 0 16px;
+  height:42px; padding:0 14px; border-radius:12px;
+  background:rgba(118,118,128,0.12);
+}
+.proc-rech svg{ width:17px; height:17px; color:var(--label-3); flex-shrink:0; }
+.proc-rech input{
+  flex:1; min-width:0; border:none; background:none; outline:none;
+  font-family:inherit; font-size:15px; color:var(--label); letter-spacing:-0.02em;
+}
+.proc-rech input::placeholder{ color:var(--label-3); }
+/* ⚠ LA CROIX NATIVE DE SAFARI EST MASQUÉE. Sur `type="search"`, WebKit ajoute
+   son propre bouton d'effacement, gris et carré, qui jure avec le reste. */
+.proc-rech input::-webkit-search-cancel-button{ -webkit-appearance:none; }

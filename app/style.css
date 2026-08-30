@@ -30,7 +30,17 @@
        une feuille de papier.
      ═══════════════════════════════════════════════════════════════════════ */
   :root{
-    --bg:#F2F2F5;
+    /* ═══ #F2F2F7 — LE GRIS DE FOND D'IOS ═══
+
+       C'est `systemGroupedBackground` en mode clair, la couleur sur laquelle
+       Apple pose ses listes et ses cartes depuis iOS 13, reprise telle quelle
+       dans les versions actuelles.
+
+       Deux tons de bleu de plus que le #F2F2F5 d'avant. C'est peu, mais c'est
+       ce qui empeche le gris de paraitre sale a cote du blanc pur des cartes :
+       un gris parfaitement neutre tire vers le beige quand on le pose contre
+       du blanc. */
+    --bg:#F2F2F7;
     /* ⚠ BLANC OPAQUE, PLUS DU VERRE. Le verre à 72 % supposait des halos
        derrière lui pour avoir quelque chose à réfracter. Sans eux,
        `backdrop-filter` floute du gris uni et rend du gris uni : on payait le
@@ -10633,22 +10643,75 @@ body:has(#e-detail.active) #equipe-app{
 .cat-cell, .proc-rich-card{
   background:linear-gradient(157deg,
     #FFFFFF 0%, #FEFEFF 42%, #FAFAFC 78%, #F7F7FA 100%);
+  /* ⚠ LE REFLET ET L'ARÊTE SONT PARTIS D'ICI. Ils sont maintenant dans la
+     tranche en dégradé, plus bas — les garder aurait fait deux bords l'un sur
+     l'autre. Ne restent que les deux ombres portées : le contact, qui pose la
+     carte, et la diffusion, qui la décolle. */
   box-shadow:
-    /* ② le reflet du haut */
-    inset 0 1px 0 rgba(255,255,255,0.95),
-    /* ③ l'arête, dense en bas, pâle en haut */
-    inset 0 -0.5px 0 rgba(28,28,38,0.10),
-    inset 0 0 0 0.5px rgba(28,28,38,0.055),
-    /* ④ contact, puis diffusion */
     0 1px 2px rgba(20,20,30,0.05),
     0 10px 24px -12px rgba(20,20,30,0.16);
 }
 
-/* ⚠ LE PSEUDO-ÉLÉMENT DE BORD EST ÉTEINT SUR CES TROIS CLASSES. Elles font
-   partie des dix-neuf cartes, qui posent toutes un `::before` en contour. Il
-   se superposerait à l'arête ci-dessus et en doublerait le trait — deux bords
-   à un demi-pixel l'un de l'autre se lisent comme un seul bord flou. */
-.cat-cell::before, .proc-rich-card::before{ display:none; }
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CONTOUR EN TRANCHE — CE QUI DONNE L'ÉPAISSEUR
+
+   Une ombre interne ne fait qu'assombrir un bord. Ce qui donne le VOLUME,
+   c'est un contour dont la valeur TOURNE avec la lumière : blanc en haut où
+   la lumière frappe, gris en bas où la carte se pose, et entre les deux un
+   passage progressif sur les côtés.
+
+   C'est la tranche d'un objet épais, pas le trait d'un cadre — et c'est la
+   différence entre une carte posée sur la page et une carte dessinée dessus.
+
+   ⚠ POURQUOI UN PSEUDO-ÉLÉMENT ET DEUX MASQUES. Un `border` ne sait pas
+     porter de dégradé : il prend une couleur, une seule. On peint donc le
+     dégradé sur toute la surface, puis on l'évide — un masque couvre tout, un
+     second couvre l'intérieur, et `xor` ne garde que ce qui les sépare : le
+     pourtour, épais d'un pixel.
+
+   ⚠ 1 PX ET NON 0,5. Le liseré des autres cartes fait un demi-pixel parce
+     qu'il ne doit que se deviner. Celui-ci doit se LIRE comme une épaisseur :
+     sous un pixel plein, le dégradé du haut vers le bas n'a pas la place de
+     s'exprimer et l'effet retombe à plat.
+
+   Il remplace le `::before` que les dix-neuf cartes partagent — il ne s'y
+   ajoute pas. Deux bords à un demi-pixel l'un de l'autre se liraient comme un
+   seul bord flou.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cat-cell::before, .proc-rich-card::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:1px; pointer-events:none; z-index:2;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,1)      0%,
+    rgba(255,255,255,0.55)   16%,
+    rgba(28,28,38,0.055)     52%,
+    rgba(28,28,38,0.13)      88%,
+    rgba(28,28,38,0.16)     100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+
+/* Le sous-dossier a la même tranche, d'un cran plus sourde : il est contenu
+   dans un dossier, il ne doit pas paraître aussi épais que lui. */
+.cat-cell--sous::before{
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.92)   0%,
+    rgba(255,255,255,0.45)   16%,
+    rgba(28,28,38,0.045)     52%,
+    rgba(28,28,38,0.10)      88%,
+    rgba(28,28,38,0.125)    100%);
+}
+
+/* À l'appui, la tranche s'éteint : le haut perd son reflet et le bas sa
+   densité. La carte cesse d'avoir une épaisseur — c'est exactement ce qu'on
+   ressent quand on appuie sur quelque chose. */
+.cat-cell:active::before, .proc-rich-card:active::before{
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.45)   0%,
+    rgba(28,28,38,0.05)      55%,
+    rgba(28,28,38,0.08)     100%);
+}
 
 /* Le sous-dossier est la même matière, d'un demi-ton plus sourd : il est
    CONTENU dans un dossier, il ne doit pas se présenter avec la même autorité
@@ -10657,9 +10720,6 @@ body:has(#e-detail.active) #equipe-app{
   background:linear-gradient(157deg,
     #FDFDFE 0%, #FBFBFD 42%, #F7F7F9 78%, #F4F4F7 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.90),
-    inset 0 -0.5px 0 rgba(28,28,38,0.09),
-    inset 0 0 0 0.5px rgba(28,28,38,0.05),
     0 1px 2px rgba(20,20,30,0.04),
     0 8px 20px -12px rgba(20,20,30,0.14);
 }
@@ -10667,8 +10727,5 @@ body:has(#e-detail.active) #equipe-app{
 /* À l'appui, la carte s'enfonce : le reflet du haut s'éteint, l'ombre portée
    se resserre. C'est le geste inverse de celui qui la fait exister. */
 .cat-cell:active, .proc-rich-card:active{
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.55),
-    inset 0 0 0 0.5px rgba(28,28,38,0.07),
-    0 1px 2px rgba(20,20,30,0.06);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06);
 }

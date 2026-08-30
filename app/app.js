@@ -7723,6 +7723,49 @@ function animerApparition(el, rang = 0) {
   _observateurApparition.observe(el)
 }
 
+/* La ligne d'un resultat de recherche : la meme que dans un dossier — icone
+   fixe, couleur du rang — avec en plus le nom du dossier, pour qu'on sache
+   d'ou sort la procedure. */
+function ligneProcedureTrouvee(proc, dossier, rang) {
+  const el = document.createElement('div')
+  el.className = 'cat-cell cat-cell--ligne'
+  el.dataset.key = proc.id
+  animerApparition(el, rang)
+  const teinte = couleurDossier(rang)
+  const enPanne = proc.statut === 'echec' || analyseBloquee(proc)
+  const enAnalyse = proc.statut === 'traitement' || proc.statut === 'redaction'
+
+  el.innerHTML = `
+    <span class="cl-pl" style="background:${fondPlaque(teinte)}">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
+                 M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2"
+              stroke="url(#pal${teinte.i})" stroke-width="1.9"
+              stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="cl-co">
+      <span class="cl-tete">
+        <span class="cl-nm">${escapeHtml(proc.titre)}</span>
+        <span class="proc-fl">\u203a</span>
+      </span>
+      <span class="cl-bas">
+        ${proc.publiee_le
+          ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
+          : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Brouillon</span>`}
+        <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
+      </span>
+    </span>`
+
+  /* Meme regle que partout : une analyse en panne se reprend la ou on la voit,
+     une analyse en cours ouvre sa fenetre d'abandon. */
+  el.onclick = () =>
+    enPanne ? proposerReprise(proc) :
+    enAnalyse ? proposerAbandon(proc) :
+    openAnalyse(proc.id)
+  return el
+}
+
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
   const oldRects = captureCardPositions(catGridEl)
@@ -7779,6 +7822,48 @@ function renderCategoryGrid() {
     visibles = visibles.filter(c => (c.procsInCat || []).some(p => p.publiee_le))
   } else if (filtreEtatDossiers === 'brouillon') {
     visibles = visibles.filter(c => (c.procsInCat || []).some(p => !p.publiee_le))
+  }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     UNE RECHERCHE REND DES PROCEDURES, PAS DES DOSSIERS
+
+     On tape « friteuse » pour trouver LA PROCEDURE, pas le rangement qui la
+     contient. Rendre le dossier obligeait a l'ouvrir puis a chercher la ligne
+     a l'interieur — deux gestes de plus pour un resultat qu'on avait deja.
+
+     Hors recherche, la page garde ses dossiers : c'est la vue d'ensemble.
+
+     ⚠ LES DOUBLONS SONT ECARTES. Une meme procedure peut apparaitre dans deux
+       dossiers si elle porte plusieurs classements ; sans le `Set`, elle
+       sortirait deux fois dans les resultats.
+     ═══════════════════════════════════════════════════════════════════════ */
+  if (q) {
+    const vus = new Set()
+    const trouvees = []
+    for (const cat of visibles) {
+      for (const p of (cat.procsInCat || [])) {
+        if (vus.has(p.id)) continue
+        const titre = sansAccent(p.titre)
+        /* Le dossier a deja ete retenu parce qu'il correspond ; on ne garde
+           ici que les procedures qui correspondent ELLES-MEMES, sinon toutes
+           celles d'un dossier trouve par son nom sortiraient avec. */
+        if (!termes.some(t => titre.includes(t))) continue
+        vus.add(p.id)
+        trouvees.push({ proc: p, dossier: cat.nom })
+      }
+    }
+
+    if (!trouvees.length) {
+      catGridEl.innerHTML =
+        '<div class="cl-rien">Aucune procédure ne correspond à « ' +
+        escapeHtml(rechercheDossiers) + ' ».</div>'
+      return
+    }
+
+    trouvees.forEach(({ proc, dossier }, rang) => {
+      catGridEl.appendChild(ligneProcedureTrouvee(proc, dossier, rang))
+    })
+    return
   }
 
   if (!visibles.length && (q || filtreEtatDossiers !== 'tout')) {

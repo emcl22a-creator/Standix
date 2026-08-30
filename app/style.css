@@ -5134,27 +5134,13 @@
     .hero-cta{ transition:none; }
   }
 
-  /* ⚠ `space-between` ET LE FILTRE NE S'ÉTIRE PLUS. Avec `flex:1`, la pastille
-     de tri occupait toute la largeur restante : son libellé se collait au mot
-     « Dossiers » et son chevron partait seul à l'autre bout de l'écran. On
-     lisait « Dossiers Trier : A → Z » comme une seule phrase, avec une flèche
-     égarée au bord. */
-  .list-tools{
-    display:flex; align-items:center; justify-content:space-between;
-    gap:10px; margin-bottom:14px;
-  }
-  .list-tools .dd-filter{ margin-bottom:0; flex:0 0 auto; }
-  /* Le tri se donne la forme d'un bouton : fond blanc, coins ronds. Sans lui,
-     c'était du texte gras noir posé sur le fond, impossible à distinguer d'un
-     titre. */
-  .list-tools .dd-trigger{
-    padding:7px 13px; border-radius:100px;
-    background:var(--bg-card);
-    box-shadow:0 1px 2px rgba(20,20,30,0.04),
-               inset 0 0 0 0.5px rgba(28,28,38,0.06);
-    font-size:12.5px; font-weight:500; color:var(--label-2);
-  }
-  .list-tools .dd-trigger svg{ width:12px; height:12px; margin-left:7px; color:var(--label-3); }
+  /* ⚠ NE PAS « CORRIGER » CETTE LIGNE. Le libellé du tri se colle au mot
+     « Dossiers » et son chevron part seul au bord droit : c'est voulu, et
+     c'est ce qu'Em a validé sur capture. J'avais transformé le déclencheur en
+     pastille blanche calée à droite — plus net à mon œil, mais ce n'était pas
+     demandé, et le résultat a été refusé. */
+  .list-tools{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .list-tools .dd-filter{ margin-bottom:0; flex:1; min-width:0; }
 
 
   .dd-filter{ position:relative; margin-bottom:14px; }
@@ -6168,12 +6154,28 @@
 
    On garde la géométrie, on retourne la matière : blanc à 72 %, reflet en
    haut, ombre portée dessous. Elle flotte au lieu d'être enfoncée. */
+/* ═══ EXACTEMENT LA MATIÈRE DE LA BARRE DU BAS ═══
+
+   Elle était en blanc opaque : une pastille de papier au-dessus d'une barre en
+   verre. Deux matières dans un même écran pour deux pièces qui font le même
+   travail — l'œil le sent avant de savoir pourquoi.
+
+   Tout vient maintenant des mêmes variables que `.glassDiv` : la teinte, le
+   flou, l'ombre. Une seule valeur à changer pour les deux pièces, et elles ne
+   peuvent plus diverger.
+
+   ⚠ CES VARIABLES SONT DÉCLARÉES DANS `index.html`, pas ici. Le `:root` du
+     bloc de style embarqué porte `--tint-color`, `--tint-opacity`,
+     `--verre-bar`, `--filet` et les quatre valeurs d'ombre. Les chercher dans
+     ce fichier ne donne rien. */
 .topbar-card{
-  background-color:#FFFFFF;
+  background-color:rgba(var(--tint-color), var(--tint-opacity));
+  -webkit-backdrop-filter:var(--verre-bar);
+  backdrop-filter:var(--verre-bar);
   border:none;
-  box-shadow:var(--verre-bord),
-             0 1px 1px rgba(60,40,20,0.05),
-             0 8px 22px -10px rgba(60,40,20,0.22);
+  box-shadow:
+    0px 4px var(--outer-shadow-blur) rgba(20,20,30,0.12),
+    inset 0 0 var(--shadow-blur) var(--shadow-spread) var(--shadow-color);
 }
 /* Le même liseré que la barre du bas : une seule valeur sur tout le tour. Les
    deux pièces sont de la même matière — leurs bords doivent se ressembler. */
@@ -6184,12 +6186,14 @@
      le haut plus épais que le bas — l'œil lit une variation de clarté comme
      une variation d'épaisseur. Voir le même réglage sur `.glassDiv` dans
      index.html : les deux pièces doivent se ressembler exactement. */
-  /* ⚠ LE LISERÉ EST SUPPRIMÉ, PAS ADOUCI. Un trait sombre de 1 px tout autour
-     d'une pilule blanche, c'est un CONTOUR DESSINÉ — la chose que le verre
-     d'Apple n'a jamais. Le reflet du haut, posé par `--verre-bord` sur
-     l'élément, suffit à donner son arête à la forme. */
+  /* Le même filet que la barre du bas, et par la même variable : c'est lui qui
+     dessine l'arête de la pièce de verre. Il était supprimé quand la carte
+     était en blanc opaque — une pastille pleine n'a pas d'arête à montrer. */
   padding:1px;
-  background:transparent;
+  background:var(--filet);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
 }
 
 /* À haute densité, un demi-pixel s'affiche vraiment : le trait s'affine sans

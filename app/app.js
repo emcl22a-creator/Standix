@@ -7302,6 +7302,231 @@ function playCardShuffle(containerEl, oldRects) {
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
+   LE CATALOGUE D'ICÔNES
+
+   Chaque dossier reçoit un dessin choisi d'après son nom : « Sécurité des
+   données » prend un bouclier, « Cuisine » une toque, « Livraison » un camion.
+
+   ─── POURQUOI PAS L'IA ───
+
+   Appeler un modèle pour chaque dossier coûterait un aller-retour réseau à
+   chaque affichage de la page, donnerait un résultat différent d'une fois sur
+   l'autre pour le même nom, et ne marcherait pas hors ligne. Or le problème
+   est étroit : on choisit parmi vingt dessins d'après quelques mots. Une table
+   de correspondance le fait instantanément, gratuitement, et surtout de façon
+   PRÉVISIBLE — le même nom donne toujours la même icône, sur tous les
+   téléphones.
+
+   Là où l'IA serait utile, c'est pour PROPOSER un mot-clé absent au moment où
+   l'on crée un dossier. Pas pour redécider à chaque rendu.
+
+   ─── COMMENT LIRE LA TABLE ───
+
+   L'ordre compte : on garde la PREMIÈRE entrée dont un mot-clé apparaît dans
+   le nom. Les termes les plus spécifiques sont donc placés avant les plus
+   généraux — « machine à café » avant « machine », sinon le second capturerait
+   le premier.
+
+   ⚠ LES MOTS-CLÉS SONT ÉCRITS SANS ACCENT ET EN MINUSCULES. Le nom du dossier
+     est normalisé avant la comparaison : « Sécurité » devient « securite ».
+     Un mot-clé accentué dans cette table ne serait jamais trouvé.
+
+   ⚠ LES TRACÉS SONT EN TRAIT, PAS EN APLAT. Ils sont peints par
+     `stroke="url(#palN)"` avec le dégradé du dossier ; un tracé prévu pour
+     être rempli ressortirait en pâté noir.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CATALOGUE_ICONES = [
+  /* — Sécurité, conformité — */
+  { cles: ['securite', 'protection', 'conformite', 'rgpd', 'confidentialite', 'donnees personnelles'],
+    d: 'M12 3.2 4.8 6.1v5.4c0 4.4 3 8.2 7.2 9.3 4.2-1.1 7.2-4.9 7.2-9.3V6.1Z M9.4 12.1l1.9 1.9 3.4-3.7' },
+
+  /* — Incendie, évacuation — */
+  { cles: ['incendie', 'evacuation', 'feu', 'extincteur', 'urgence'],
+    d: 'M12 3s4.4 3.7 4.4 8.2a4.4 4.4 0 0 1-8.8 0C7.6 9.5 9 8 9 8s.6 1.6 1.7 1.6C11.8 9.6 12 7 12 3Z M8.2 14.4A5.6 5.6 0 0 0 12 21a5.6 5.6 0 0 0 3.8-6.6' },
+
+  /* — Premiers secours — */
+  { cles: ['secours', 'premiers soins', 'trousse', 'medical', 'sante', 'infirmerie'],
+    d: 'M3.4 8.6a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M9 6.6V5a1.4 1.4 0 0 1 1.4-1.4h3.2A1.4 1.4 0 0 1 15 5v1.6 M12 10.4v6 M9 13.4h6' },
+
+  /* — Cuisine — */
+  { cles: ['cuisine', 'chef', 'plat', 'recette', 'restauration', 'friteuse', 'four'],
+    d: 'M7 20h10 M7.6 16.6h8.8 M12 3.4a3.4 3.4 0 0 0-3.3 2.7 3 3 0 0 0-.5 5.9v4.6h7.6v-4.6a3 3 0 0 0-.5-5.9A3.4 3.4 0 0 0 12 3.4Z' },
+
+  /* — Salle, service — */
+  { cles: ['salle', 'service', 'table', 'dressage', 'couvert', 'restaurant'],
+    d: 'M6.4 3.4v7.2a2.2 2.2 0 0 0 4.4 0V3.4 M8.6 10.8V20.6 M16.4 3.4c-1.5 0-2.4 1.6-2.4 4s.9 3.6 2.4 3.6V20.6' },
+
+  /* — Café, bar — */
+  { cles: ['cafe', 'bar', 'boisson', 'machine a cafe', 'percolateur', 'detartrage'],
+    d: 'M4.4 7.4h11.2v6a4.4 4.4 0 0 1-4.4 4.4H8.8a4.4 4.4 0 0 1-4.4-4.4Z M15.6 9.4h1.8a2.4 2.4 0 0 1 0 4.8h-1.8 M4.4 21h12' },
+
+  /* — Hygiène, nettoyage — */
+  { cles: ['nettoyage', 'menage', 'hygiene', 'proprete', 'desinfection', 'plonge', 'lavage'],
+    d: 'M10.6 3.4h3.6v4.2h-3.6Z M8.4 7.6h8v3.2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2Z M12.4 12.8v3.4 M9.6 20.6h5.6a1.4 1.4 0 0 0 1.4-1.4 3 3 0 0 0-3-3h-2.4a3 3 0 0 0-3 3 1.4 1.4 0 0 0 1.4 1.4Z' },
+
+  /* — Chaîne du froid — */
+  { cles: ['froid', 'temperature', 'frigo', 'chambre froide', 'congelation'],
+    d: 'M12 3v18 M5.5 6.8 18.5 17.2 M18.5 6.8 5.5 17.2 M12 6.6 9.6 4.8 M12 6.6l2.4-1.8 M12 17.4l-2.4 1.8 M12 17.4l2.4 1.8' },
+
+  /* — Informatique — */
+  { cles: ['informatique', 'systeme', 'reseau', 'logiciel', 'ordinateur', 'sap', 'erp', 'outil numerique'],
+    d: 'M3.4 5.6a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M8.4 20.4h7.2 M12 15.8v4.6' },
+
+  /* — Finance — */
+  { cles: ['finance', 'comptabilite', 'facture', 'paie', 'budget', 'caisse', 'encaissement', 'tresorerie'],
+    d: 'M3.4 7.4a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v9.2a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M3.4 10.2h17.2 M7 14.6h3.4' },
+
+  /* — Achats — */
+  { cles: ['achat', 'approvisionnement', 'commande', 'fournisseur', 'vente'],
+    d: 'M3.4 4.4h2.4l2.2 10.4a1.8 1.8 0 0 0 1.8 1.4h7.4a1.8 1.8 0 0 0 1.8-1.4l1.4-6.6H6.6 M9.6 20a1 1 0 1 0 0-.1 M17 20a1 1 0 1 0 0-.1' },
+
+  /* — Livraison — */
+  { cles: ['livraison', 'transport', 'expedition', 'logistique', 'reception marchandise'],
+    d: 'M2.6 6.6a1.6 1.6 0 0 1 1.6-1.6h8.6v10.4H2.6Z M12.8 9h3.6l3 3.4v3H12.8Z M6.4 18.4a1.6 1.6 0 1 0 0-.1 M16.6 18.4a1.6 1.6 0 1 0 0-.1' },
+
+  /* — Stock — */
+  { cles: ['stock', 'inventaire', 'reserve', 'magasin', 'entrepot'],
+    d: 'M3.4 7.6 12 3.4l8.6 4.2v8.8L12 20.6l-8.6-4.2Z M3.4 7.6 12 11.8l8.6-4.2 M12 11.8v8.8' },
+
+  /* — Ressources humaines — */
+  { cles: ['ressources humaines', 'rh', 'equipe', 'personnel', 'recrutement', 'collaborateur', 'onboarding'],
+    d: 'M8.6 11.4a3.4 3.4 0 1 0 0-.1 M2.8 20a5.8 5.8 0 0 1 11.6 0 M16.6 4.6a3.4 3.4 0 0 1 0 6.6 M17.2 14.6a5.8 5.8 0 0 1 4 5.4' },
+
+  /* — Formation — */
+  { cles: ['formation', 'apprentissage', 'tutoriel', 'accueil nouveau', 'integration'],
+    d: 'M12 4 2.6 8.4 12 12.8l9.4-4.4Z M6.6 10.6v5.2c0 1.8 2.4 3.2 5.4 3.2s5.4-1.4 5.4-3.2v-5.2 M21.4 8.4v5.4' },
+
+  /* — Maintenance — */
+  { cles: ['maintenance', 'technique', 'reparation', 'entretien', 'atelier', 'depannage'],
+    d: 'M15.4 3.6a5 5 0 0 0-4.6 6.8L3.6 17.6a2 2 0 0 0 2.8 2.8l7.2-7.2a5 5 0 0 0 6.8-4.6l-3.2 3.2-3-.8-.8-3Z' },
+
+  /* — Électricité — */
+  { cles: ['electricite', 'electrique', 'energie', 'tableau electrique'],
+    d: 'M13.4 2.6 4.6 13.4h6.2l-1.2 8 8.8-10.8h-6.2Z' },
+
+  /* — Plomberie — */
+  { cles: ['plomberie', 'eau', 'fuite', 'canalisation', 'sanitaire'],
+    d: 'M12 3.4s6 6.4 6 10.4a6 6 0 0 1-12 0c0-4 6-10.4 6-10.4Z M9.4 14.2a2.6 2.6 0 0 0 2.6 2.6' },
+
+  /* — Chantier — */
+  { cles: ['chantier', 'travaux', 'btp', 'construction', 'securite chantier'],
+    d: 'M3.6 15.6a8.4 8.4 0 0 1 16.8 0 M10.4 15.4V5.6a1.6 1.6 0 0 1 3.2 0v9.8 M2.6 18.6h18.8' },
+
+  /* — Communication — */
+  { cles: ['communication', 'marketing', 'annonce', 'affichage', 'reseaux sociaux'],
+    d: 'M3.4 9.6h3.8l7.2-4.6v14l-7.2-4.6H3.4Z M18.4 9a4 4 0 0 1 0 6' },
+
+  /* — Planning — */
+  { cles: ['planning', 'horaire', 'conges', 'absence', 'roulement', 'agenda'],
+    d: 'M4.4 6.6a2 2 0 0 1 2-2h11.2a2 2 0 0 1 2 2v11.8a2 2 0 0 1-2 2H6.4a2 2 0 0 1-2-2Z M4.4 10.2h15.2 M8.6 3.4v3.2 M15.4 3.4v3.2' },
+
+  /* — Qualité, contrôle — */
+  { cles: ['qualite', 'controle', 'audit', 'verification', 'norme', 'haccp'],
+    d: 'M8.6 3.6h6.8a2 2 0 0 1 2 2v13.6a1.2 1.2 0 0 1-1.8 1L12 18.2l-3.6 2a1.2 1.2 0 0 1-1.8-1V5.6a2 2 0 0 1 2-2Z M9.6 9.6l1.8 1.8 3.2-3.4' },
+
+  /* — Administratif — */
+  { cles: ['administratif', 'document', 'contrat', 'dossier administratif', 'papier', 'juridique'],
+    d: 'M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2' },
+
+  /* — Accueil, réception — */
+  { cles: ['accueil', 'reception', 'standard', 'visiteur', 'client'],
+    d: 'M3.4 18.6h17.2 M4.6 18.6v-4.2a7.4 7.4 0 0 1 14.8 0v4.2 M12 7V4.4 M12 4.4a1.2 1.2 0 1 0 0-.1' },
+
+  /* — Téléphone — */
+  { cles: ['telephone', 'appel', 'standard telephonique', 'hotline'],
+    d: 'M8.2 3.6 10 7.4l-2 1.6a11.4 11.4 0 0 0 5.6 5.6l1.6-2 3.8 1.8v3.2a1.6 1.6 0 0 1-1.8 1.6C10.6 18.6 5.4 13.4 4.6 5.4a1.6 1.6 0 0 1 1.6-1.8Z' },
+
+  /* — Clés, ouverture, fermeture — */
+  { cles: ['ouverture', 'fermeture', 'cle', 'verrouillage', 'acces', 'serrure'],
+    d: 'M15.4 3.6a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z M11.6 12 4 19.6v2.2h3v-2.2h2.2v-2.2h2.2' },
+
+  /* — Alarme — */
+  { cles: ['alarme', 'intrusion', 'surveillance', 'gardiennage'],
+    d: 'M18 9a6 6 0 0 0-12 0c0 6-2.4 7.6-2.4 7.6h16.8S18 15 18 9Z M13.8 20.2a2 2 0 0 1-3.6 0' },
+
+  /* — Vidéo, caméra — */
+  { cles: ['camera', 'video', 'enregistrement', 'videosurveillance'],
+    d: 'M3.4 7.6a2 2 0 0 1 2-2h7.6a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M15 10.6l5.6-3.2v9.2L15 13.4Z' },
+
+  /* — Déchets, tri — */
+  { cles: ['dechet', 'poubelle', 'tri', 'recyclage', 'ordure'],
+    d: 'M4.4 6.6h15.2 M9.4 6.6V4.8a1.4 1.4 0 0 1 1.4-1.4h2.4a1.4 1.4 0 0 1 1.4 1.4v1.8 M6.4 6.6l.9 12.2a2 2 0 0 0 2 1.8h5.4a2 2 0 0 0 2-1.8l.9-12.2 M10.2 10.4v6 M13.8 10.4v6' },
+
+  /* — Allergènes — */
+  { cles: ['allergene', 'allergie', 'intolerance', 'gluten'],
+    d: 'M12 3.4a8.6 8.6 0 1 0 0 17.2 8.6 8.6 0 0 0 0-17.2Z M12 8v5 M12 16.4a.9.9 0 1 0 0-.1' },
+
+  /* — Balance, mesure — */
+  { cles: ['balance', 'pesee', 'mesure', 'dosage', 'quantite'],
+    d: 'M12 3.4v17.2 M6.6 20.6h10.8 M4 9.4h16 M4 9.4 1.6 15a3.4 3.4 0 0 0 4.8 0Z M20 9.4 17.6 15a3.4 3.4 0 0 0 4.8 0Z' },
+
+  /* — Emballage, étiquetage — */
+  { cles: ['emballage', 'etiquette', 'etiquetage', 'conditionnement', 'colis'],
+    d: 'M20.6 12.6 12.8 20.4a1.8 1.8 0 0 1-2.6 0L3.4 13.6V4.4h9.2l8 8a1.8 1.8 0 0 1 0 .2Z M7.4 8.4a1 1 0 1 0 0-.1' },
+
+  /* — Linge, blanchisserie — */
+  { cles: ['linge', 'blanchisserie', 'lessive', 'uniforme', 'tenue'],
+    d: 'M4.6 5.4a2 2 0 0 1 2-2h10.8a2 2 0 0 1 2 2v13.2a2 2 0 0 1-2 2H6.6a2 2 0 0 1-2-2Z M12 9a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z M8 6.4h1.6' },
+
+  /* — Véhicule — */
+  { cles: ['vehicule', 'voiture', 'flotte', 'camionnette', 'chauffeur'],
+    d: 'M3.4 14.4 5 9.2a2 2 0 0 1 1.9-1.4h10.2a2 2 0 0 1 1.9 1.4l1.6 5.2v4.2h-3v-2H6.4v2h-3Z M6.6 16.4a.9.9 0 1 0 0-.1 M17.4 16.4a.9.9 0 1 0 0-.1' },
+
+  /* — Extérieur, terrasse — */
+  { cles: ['terrasse', 'exterieur', 'jardin', 'espace vert', 'plein air'],
+    d: 'M12 12.6v8 M4.4 12.6h15.2L12 3.6Z M8.4 20.6h7.2' },
+
+  /* — Vestiaire — */
+  { cles: ['vestiaire', 'casier', 'effets personnels'],
+    d: 'M4.6 4.4h14.8v15.2H4.6Z M12 4.4v15.2 M8.4 11.4h.1 M15.6 11.4h.1' },
+
+  /* — Réunion — */
+  { cles: ['reunion', 'briefing', 'point equipe', 'debriefing'],
+    d: 'M3.4 6.4a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H9l-4.6 3.6v-3.6a2 2 0 0 1-1-1.8Z M8.6 10.4h.1 M12 10.4h.1 M15.4 10.4h.1' },
+
+  /* — Message, courriel — */
+  { cles: ['courriel', 'email', 'mail', 'messagerie', 'boite mail'],
+    d: 'M3.4 7a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M3.8 7.6l8.2 5.6 8.2-5.6' },
+
+  /* — Impression — */
+  { cles: ['impression', 'imprimante', 'edition', 'photocopie'],
+    d: 'M7 8.6V3.6h10v5 M7 17.4H5.4a2 2 0 0 1-2-2v-4.8a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v4.8a2 2 0 0 1-2 2H17 M7 14.4h10v6H7Z' },
+
+  /* — Badge, identification — */
+  { cles: ['badge', 'identification', 'pointage', 'presence', 'horodatage'],
+    d: 'M4.4 6.6a2 2 0 0 1 2-2h11.2a2 2 0 0 1 2 2v10.8a2 2 0 0 1-2 2H6.4a2 2 0 0 1-2-2Z M12 9.6a1.8 1.8 0 1 0 0 3.6 1.8 1.8 0 0 0 0-3.6Z M8.4 16.4a3.8 3.8 0 0 1 7.2 0' },
+
+  /* — Signature, validation — */
+  { cles: ['signature', 'validation', 'approbation', 'visa', 'attestation'],
+    d: 'M3.4 18.6c3-1 4.4-3.4 5-6.2.8-3.6 2-6.6 3.6-6.6 1.4 0 1.6 2 .6 4.2-1 2.2-2.6 4.6-2.6 6.4 0 1.2.8 1.6 1.6 1.2 1.2-.6 2-2 3-2 .8 0 1 .8 1.8.8.8 0 1.4-.6 2.2-1.6 M18.6 20.6h2' },
+
+  /* — Ouverture de service — */
+  { cles: ['mise en place', 'ouverture service', 'preparation', 'prep'],
+    d: 'M12 3.4a8.6 8.6 0 1 0 0 17.2 8.6 8.6 0 0 0 0-17.2Z M12 7.6V12l3 1.8' },
+
+  /* — Stockage sec, cave — */
+  { cles: ['cave', 'reserve seche', 'vin', 'boisson stock'],
+    d: 'M8.4 3.4h7.2v5.2a3.6 3.6 0 0 1-3.6 3.6 3.6 3.6 0 0 1-3.6-3.6Z M12 12.2v5.4 M8.8 20.6h6.4' },
+]
+
+/* Le repli : le dossier lui-même, quand aucun mot-clé ne correspond. */
+const ICONE_DOSSIER_DEFAUT =
+  'M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z'
+
+/* ⚠ ON NORMALISE AVANT DE COMPARER. `normalize('NFD')` sépare les lettres de
+   leurs accents et l'expression les retire : « Sécurité » devient
+   « securite ». Sans cela, la moitié des noms français ne trouveraient jamais
+   leur mot-clé — et l'on chercherait pourquoi certains dossiers gardent
+   l'icône par défaut sans raison apparente. */
+function traceIconeDossier(nom) {
+  const n = (nom || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  for (const e of CATALOGUE_ICONES) {
+    if (e.cles.some(c => n.includes(c))) return e.d
+  }
+  return ICONE_DOSSIER_DEFAUT
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
    LA COULEUR D'UN DOSSIER
 
    Cinq teintes qui se suivent TOUJOURS dans le même ordre : violet, bleu,
@@ -7361,6 +7586,94 @@ function couleurDossier(rang) {
   return PALETTE_DOSSIERS[rang % PALETTE_DOSSIERS.length]
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES FAMILLES DE MOTS
+
+   Taper « laver » doit trouver « Nettoyer la friteuse ». Chaque ligne est un
+   groupe de termes qui veulent dire la même chose dans le métier ; chercher
+   l'un d'eux revient à chercher tous les autres.
+
+   ─── POURQUOI PAS UN APPEL À L'IA ───
+
+   La recherche se déclenche à CHAQUE CARACTÈRE TAPÉ. Un aller-retour réseau
+   par frappe rendrait le champ inutilisable — plusieurs centaines de
+   millisecondes avant que la liste ne bouge, là où l'on attend l'instantané.
+   Et sans réseau, dans une réserve ou une chambre froide, il n'y aurait plus
+   de recherche du tout.
+
+   Une table couvre le cas courant sans rien de tout cela. Là où l'IA aiderait
+   vraiment, c'est pour ENRICHIR cette table à partir des recherches qui n'ont
+   rien donné — une fois, hors ligne de mire de l'utilisateur.
+
+   ⚠ TOUT EST ÉCRIT SANS ACCENT ET EN MINUSCULES. Les mots tapés sont
+     normalisés avant comparaison ; un terme accenté ici ne serait jamais
+     trouvé.
+
+   ⚠ UN MOT PEUT APPARAÎTRE DANS PLUSIEURS GROUPES. « Four » est de la cuisine
+     et de la maintenance : les deux groupes s'ajoutent, on ne choisit pas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const FAMILLES_MOTS = [
+  ['nettoyer', 'nettoyage', 'laver', 'lavage', 'recurer', 'menage', 'proprete', 'desinfecter', 'desinfection', 'astiquer'],
+  ['friteuse', 'huile', 'friture', 'bain de friture'],
+  ['four', 'cuisson', 'cuire', 'rotir'],
+  ['cafe', 'percolateur', 'machine a cafe', 'expresso', 'detartrage', 'detartrer'],
+  ['securite', 'surete', 'protection', 'securiser', 'danger', 'risque'],
+  ['incendie', 'feu', 'evacuation', 'extincteur', 'alarme'],
+  ['secours', 'premiers soins', 'blessure', 'accident', 'urgence', 'trousse'],
+  ['livraison', 'reception', 'marchandise', 'colis', 'commande', 'fournisseur'],
+  ['stock', 'inventaire', 'reserve', 'approvisionnement', 'rupture'],
+  ['froid', 'frigo', 'refrigerateur', 'chambre froide', 'congelateur', 'temperature'],
+  ['ouverture', 'ouvrir', 'demarrage', 'mise en place', 'prise de poste'],
+  ['fermeture', 'fermer', 'cloture', 'fin de service'],
+  ['client', 'accueil', 'accueillir', 'service', 'salle'],
+  ['caisse', 'encaissement', 'encaisser', 'paiement', 'payer', 'monnaie'],
+  ['equipe', 'personnel', 'salarie', 'collaborateur', 'employe', 'recrutement', 'embauche'],
+  ['formation', 'former', 'apprendre', 'apprentissage', 'tutoriel', 'integration', 'onboarding'],
+  ['conge', 'absence', 'vacances', 'repos', 'planning', 'horaire'],
+  ['hygiene', 'sanitaire', 'haccp', 'contamination', 'allergene'],
+  ['dechet', 'poubelle', 'tri', 'recyclage', 'ordure'],
+  ['maintenance', 'panne', 'reparer', 'reparation', 'entretien', 'depannage', 'technique'],
+  ['informatique', 'ordinateur', 'logiciel', 'reseau', 'systeme', 'bug'],
+  ['facture', 'facturation', 'comptabilite', 'compta', 'devis', 'paie'],
+  ['document', 'papier', 'contrat', 'fiche', 'formulaire', 'administratif'],
+  ['controle', 'verification', 'verifier', 'audit', 'qualite', 'conformite'],
+]
+
+/* ⚠ L'INDEX EST CONSTRUIT UNE FOIS, PAS À CHAQUE FRAPPE. Parcourir les vingt-
+   quatre groupes à chaque caractère tapé ferait vingt-quatre fois le travail
+   d'une seule table de correspondance. */
+const INDEX_SYNONYMES = (() => {
+  const m = new Map()
+  for (const groupe of FAMILLES_MOTS) {
+    for (const mot of groupe) {
+      if (!m.has(mot)) m.set(mot, new Set())
+      groupe.forEach(x => m.get(mot).add(x))
+    }
+  }
+  return m
+})()
+
+/* Les termes à chercher réellement : ce qui a été tapé, plus tous ses
+   synonymes connus.
+
+   ⚠ LE PLURIEL EST RETIRÉ AVANT LA RECHERCHE DANS LA TABLE. Quelqu'un tape
+     « déchets » ; la table connaît « dechet ». Sans cette coupe, un simple
+     « s » suffirait à faire échouer l'élargissement, et l'on croirait la
+     fonction inutile. */
+function termesRecherche(q) {
+  const mots = q.split(/\s+/).filter(Boolean)
+  const out = new Set(mots)
+  for (const mot of mots) {
+    const base = mot.length > 3 && mot.endsWith('s') ? mot.slice(0, -1) : mot
+    const fam = INDEX_SYNONYMES.get(base) || INDEX_SYNONYMES.get(mot)
+    if (fam) fam.forEach(x => out.add(x))
+  }
+  /* La phrase entière reste candidate : « chambre froide » est un mot-clé à
+     elle seule, et la découper en deux la ferait manquer. */
+  out.add(q)
+  return [...out]
+}
+
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
   const oldRects = captureCardPositions(catGridEl)
@@ -7398,11 +7711,16 @@ function renderCategoryGrid() {
   const sansAccent = (s) => (s || '').normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '').toLowerCase()
   const q = sansAccent(rechercheDossiers)
-  let visibles = q
-    ? sorted.filter(c =>
-        sansAccent(c.nom).includes(q) ||
-        (c.procsInCat || []).some(p => sansAccent(p.titre).includes(q)))
-    : sorted
+  const termes = q ? termesRecherche(q) : []
+  /* Un dossier sort si l'un des termes — tape ou synonyme — apparait dans son
+     nom OU dans le titre d'une de ses procedures. On cherche une chose, pas
+     son rangement. */
+  const correspond = (c) => {
+    const nom = sansAccent(c.nom)
+    const titres = (c.procsInCat || []).map(p => sansAccent(p.titre))
+    return termes.some(t => nom.includes(t) || titres.some(x => x.includes(t)))
+  }
+  let visibles = q ? sorted.filter(correspond) : sorted
 
   /* ⚠ LE FILTRE PORTE SUR LE CONTENU, PAS SUR LE DOSSIER. Un dossier n'a pas
      d'etat : ce sont ses procedures qui en ont un. « En ligne » garde donc
@@ -7452,8 +7770,8 @@ function renderCategoryGrid() {
     cell.innerHTML = `
       <span class="cl-pl" style="background:${fondPlaque(teinte)}">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
-                stroke="url(#pal${teinte.i})" stroke-width="1.9" stroke-linejoin="round"/>
+          <path d="${traceIconeDossier(nom)}" stroke="url(#pal${teinte.i})"
+                stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
         </svg>
       </span>
       <span class="cl-co">
@@ -7964,29 +8282,39 @@ function renderCategoryProceduresListInterne() {
       montrerSous ? escapeHtml(proc.sous_categorie) : '',
     ].filter(Boolean).join(' \u00b7 ')
 
+    /* ⚠ MEME GRAMMAIRE QUE LA LISTE DES DOSSIERS, MAIS ICONE FIXE.
+
+       Sur la page precedente, chaque dossier a son dessin et sa couleur : c'est
+       ce qui permet de le reconnaitre parmi vingt. Ici, tout ce qu'on voit
+       appartient DEJA au meme dossier — varier les icones ne distinguerait
+       rien, ce serait du bruit colore.
+
+       Une procedure prend donc toujours le meme document, et la meme teinte.
+       C'est le TITRE qui distingue, et la jauge de lecture qui informe. */
+    /* ⚠ LA JAUGE DE LECTURE A ETE RETIREE de la carte. `pct` et `ringColor`
+       restent calcules plus haut : d'autres ecrans les emploient, et surtout
+       la page d'une procedure les affiche en grand — la retirer partout
+       demanderait de relire tout le fichier pour un gain nul. */
+    div.className += ' cat-cell--ligne'
     div.innerHTML = `
-      <div class="proc-tete">
-        <span class="cat-ic">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-            <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-            <line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.5"
-                  stroke-width="1.6" stroke-linecap="round"/>
-            <line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="url(#logoOrIc)" stroke-opacity="0.5"
-                  stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
+      <span class="cl-pl cl-pl--proc">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
+                   M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2"
+                stroke="url(#palProc)" stroke-width="1.9"
+                stroke-linejoin="round" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span class="cl-co">
+        <span class="cl-tete">
+          <span class="cl-nm">${escapeHtml(proc.titre)}</span>
+          <span class="proc-fl">\u203a</span>
         </span>
-        <span class="proc-co">
-          <span class="proc-nom"><span class="txt">${escapeHtml(proc.titre)}</span>${etatProcedureHtml(proc)}</span>
-          <span class="proc-meta">${detail}</span>
+        <span class="cl-bas">
+          ${etatProcedureHtml(proc) || `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`}
+          <span class="cl-n">${detail}</span>
         </span>
-        <span class="proc-fl">\u203a</span>
-      </div>
-      <div class="proc-pied">
-        <span class="proc-jauge"><i style="width:${pct}%; background:${ringColor}"></i></span>
-        <span class="proc-taux" style="color:${ringColor};">${pct} %<em> ont lu</em></span>
-      </div>
+      </span>
     `
     listEl.appendChild(div)
   }
@@ -8343,36 +8671,37 @@ function grouperParSousDossier(sujets, dont, requete) {
    ═══════════════════════════════════════════════════════════════════════════ */
 function carteSousDossier(nom, procs) {
   const cell = document.createElement('div')
-  cell.className = 'cat-cell cat-cell--sous'
+  cell.className = 'cat-cell cat-cell--sous cat-cell--ligne'
   cell.dataset.key = 'sd:' + nom
   const recents = procs.slice(0, 3)
+  const brouillons = procs.filter(p => !p.publiee_le).length
+
+  /* ⚠ ICONE FIXE, COMME POUR LES PROCEDURES. Tout ce qui est sur cette page
+     appartient deja au meme dossier : varier les dessins ne distinguerait
+     rien. Le sous-dossier garde donc toujours ce chemise-dans-chemise, et les
+     procedures leur document. */
   cell.innerHTML = `
-    <div class="cat-top">
-      <span class="cat-ic">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"
-                stroke="url(#logoOrIc)" stroke-width="1.6" stroke-opacity="0.45"
-                stroke-linejoin="round" stroke-linecap="round"/>
-          <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
-                stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-          <line x1="6" y1="13.4" x2="22" y2="13.4"
-                stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
-        </svg>
-      </span>
-    </div>
-    <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-    <div class="cat-recent">
-      ${recents.map(p => `<div class="cat-recent-item" data-proc="${p.id}"><span class="txt">${escapeHtml(p.titre)}</span>${etatProcedureHtml(p)}</div>`).join('')}
-    </div>
-    <div class="cat-pied">
+    <span class="cl-pl cl-pl--sous">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-              stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"
+              stroke="url(#palSous)" stroke-width="1.6" stroke-opacity="0.45"
+              stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
+              stroke="url(#palSous)" stroke-width="1.9" stroke-linejoin="round"/>
       </svg>
-      <span>${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
-      <span class="fl">›</span>
-    </div>`
+    </span>
+    <span class="cl-co">
+      <span class="cl-tete">
+        <span class="cl-nm">${escapeHtml(nom)}</span>
+        <span class="proc-fl">\u203a</span>
+      </span>
+      <span class="cl-bas">
+        ${brouillons
+          ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${brouillons} brouillon${brouillons > 1 ? 's' : ''}</span>`
+          : `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`}
+        <span class="cl-n">${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
+      </span>
+    </span>`
 
   cell.onclick = (e) => {
     /* Comme la carte de dossier : TOUTE la carte ouvre le sous-dossier. Les

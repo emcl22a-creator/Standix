@@ -5226,11 +5226,18 @@
      Un jeu de règles qui ne s'applique plus à rien fait douter du reste. */
   .sq-bloc{ background:rgba(28,28,38,0.068); border-radius:8px; }
 
+  /* ⚠ PLUS DE `transform` A L'APPUI. La carte retrecissait a 97 % puis
+     revenait avec une courbe rebondissante — au relachement, ce retour se lit
+     comme un GROSSISSEMENT, et sur une liste qu'on parcourt au pouce, chaque
+     effleurement faisait sauter une carte.
+
+     Le retour visuel de l'appui est desormais porte par le biseau, qui
+     s'inverse : la carte s'enfonce au lieu de bouger. C'est plus juste — on
+     appuie sur quelque chose, on ne le deplace pas. */
   .cat-cell, .proc-rich-card{
-    padding:15px 15px 14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+    padding:15px 15px 14px; text-align:left;
     position:relative; overflow:hidden;
   }
-  .cat-cell:active, .proc-rich-card:active{ transform:scale(0.97); }
   .proc-rich-card{ margin-bottom:12px; }
   /* L'icône et le compteur s'alignent en HAUT, pas au centre : le compteur
      est une étiquette, il se pose au coin, il ne flotte pas à mi-hauteur d'une

@@ -7674,6 +7674,55 @@ function termesRecherche(q) {
   return [...out]
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'APPARITION AU DÉFILEMENT
+
+   Une carte qui entre dans l'écran monte de quelques pixels en se révélant.
+   C'est le geste d'iOS : la carte ne surgit pas, elle arrive.
+
+   ⚠ UN SEUL OBSERVATEUR POUR TOUTE L'APP, PAS UN PAR CARTE. Créer un
+     `IntersectionObserver` par élément, c'est autant de rappels à chaque
+     défilement ; un seul observateur partagé n'en fait qu'un.
+
+   ⚠ ON CESSE D'OBSERVER DÈS QUE LA CARTE EST APPARUE. Sans ce
+     `unobserve`, l'observateur continuerait de suivre des dizaines
+     d'éléments déjà révélés pendant toute la vie de la page, et l'animation
+     rejouerait à chaque aller-retour.
+
+   ⚠ `rootMargin` NÉGATIF EN BAS. Sans lui, la carte se révèle au moment
+     précis où son bord touche celui de l'écran — donc trop tard, on la voit
+     déjà. À -40px, elle a fini son mouvement quand on arrive dessus.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const _observateurApparition = ('IntersectionObserver' in window)
+  ? new IntersectionObserver((entrees, obs) => {
+      for (const e of entrees) {
+        if (!e.isIntersecting) continue
+        e.target.classList.add('vu')
+        obs.unobserve(e.target)
+      }
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.01 })
+  : null
+
+/* Le décalage en cascade : chaque carte part un peu après la précédente, mais
+   on plafonne à six.
+
+   ⚠ SANS CE PLAFOND, la vingtième carte d'une longue liste attendrait plus
+     d'une seconde avant de bouger — l'utilisateur aurait déjà défilé au-delà
+     et verrait des cases vides se remplir derrière lui. */
+function animerApparition(el, rang = 0) {
+  /* ⚠ ON RESPECTE LE REGLAGE DU SYSTEME. Quelqu'un qui a demande moins
+     d'animations ne doit pas voir la liste bouger — et surtout pas rester
+     avec des cartes invisibles si l'observateur ne se declenchait pas. */
+  if (!_observateurApparition ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    el.classList.add('vu')
+    return
+  }
+  el.classList.add('cl-apparait')
+  el.style.setProperty('--retard', `${Math.min(rang, 6) * 45}ms`)
+  _observateurApparition.observe(el)
+}
+
 function renderCategoryGrid() {
   const catGridEl = document.getElementById('cat-grid')
   const oldRects = captureCardPositions(catGridEl)
@@ -7760,6 +7809,7 @@ function renderCategoryGrid() {
        changer sa mise en page. */
     cell.className = 'cat-cell cat-cell--ligne'
     cell.dataset.key = nom
+    animerApparition(cell, rang)
 
     /* La couleur du dossier, tiree de son nom. Voir `couleurDossier`. */
     const teinte = couleurDossier(rang)
@@ -8229,7 +8279,7 @@ function renderCategoryProceduresListInterne() {
         a.localeCompare(b, 'fr', { sensitivity: 'base' }))
       const grille = document.createElement('div')
       grille.className = 'sd-grille'
-      noms.forEach(n => grille.appendChild(carteSousDossier(n, groupes.get(n))))
+      noms.forEach((n, r) => grille.appendChild(carteSousDossier(n, groupes.get(n), r)))
       listEl.appendChild(grille)
     }
   }
@@ -8241,6 +8291,11 @@ function renderCategoryProceduresListInterne() {
     ? sorted.filter(d => !(d.proc.sous_categorie || '').trim())
     : sorted
 
+  /* ⚠ UN COMPTEUR EXPLICITE. La boucle est un `for...of` : il n'y a pas
+     d'index a recuperer, et `animerApparition` en a besoin pour decaler les
+     cartes. Sans lui, `i` n'existerait pas — `node --check` ne le voit pas,
+     mais la premiere carte lancerait une ReferenceError a l'affichage. */
+  let rangProc = 0
   for (const entree of avecGroupes) {
     /* Un intertitre n'est pas une carte : il se dessine et on passe à la
        suivante. Le mettre dans la même boucle garde l'ordre sans avoir à
@@ -8296,6 +8351,7 @@ function renderCategoryProceduresListInterne() {
        la page d'une procedure les affiche en grand — la retirer partout
        demanderait de relire tout le fichier pour un gain nul. */
     div.className += ' cat-cell--ligne'
+    animerApparition(div, rangProc++)
     div.innerHTML = `
       <span class="cl-pl cl-pl--proc">
         <svg viewBox="0 0 24 24" fill="none">
@@ -8669,25 +8725,31 @@ function grouperParSousDossier(sujets, dont, requete) {
 
    Le pied ne porte pas le chevron des dossiers mais le même : on entre pareil.
    ═══════════════════════════════════════════════════════════════════════════ */
-function carteSousDossier(nom, procs) {
+function carteSousDossier(nom, procs, rang = 0) {
   const cell = document.createElement('div')
   cell.className = 'cat-cell cat-cell--sous cat-cell--ligne'
   cell.dataset.key = 'sd:' + nom
+  animerApparition(cell, rang)
   const recents = procs.slice(0, 3)
   const brouillons = procs.filter(p => !p.publiee_le).length
+  /* ⚠ LA COULEUR SUIT LE RANG, COMME SUR LA LISTE DES DOSSIERS. Seule
+     l'ICONE est fixe ici — c'est elle qui dit « ceci est un sous-dossier ».
+     La teinte, elle, sert a distinguer les sous-dossiers entre eux, et huit
+     chemises violettes d'affilee n'en distinguaient aucune. */
+  const teinte = couleurDossier(rang)
 
   /* ⚠ ICONE FIXE, COMME POUR LES PROCEDURES. Tout ce qui est sur cette page
      appartient deja au meme dossier : varier les dessins ne distinguerait
      rien. Le sous-dossier garde donc toujours ce chemise-dans-chemise, et les
      procedures leur document. */
   cell.innerHTML = `
-    <span class="cl-pl cl-pl--sous">
+    <span class="cl-pl" style="background:${fondPlaque(teinte)}">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"
-              stroke="url(#palSous)" stroke-width="1.6" stroke-opacity="0.45"
+              stroke="url(#pal${teinte.i})" stroke-width="1.6" stroke-opacity="0.45"
               stroke-linejoin="round" stroke-linecap="round"/>
         <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
-              stroke="url(#palSous)" stroke-width="1.9" stroke-linejoin="round"/>
+              stroke="url(#pal${teinte.i})" stroke-width="1.9" stroke-linejoin="round"/>
       </svg>
     </span>
     <span class="cl-co">

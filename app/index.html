@@ -468,14 +468,17 @@
   /* ⚠ LES ONGLETS AU REPOS. #CBCDCF est un gris CLAIR — il se lisait sur le
      verre noir, il disparaît sur le verre blanc : mesuré, 1,5 de contraste.
 
-     La valeur a descendu en trois temps : #CBCDCF (1,5 de contraste, illisible
-     sur du blanc), puis #6C6C78 (5,0), puis #5A5A66 (6,6), et enfin celle-ci.
+     La valeur a descendu en quatre temps : #CBCDCF (1,5 de contraste, illisible
+     sur du blanc), #6C6C78 (5,0), #5A5A66 (6,6), #4A4A56 (8,4), et celle-ci.
 
-     #4A4A56 donne 8,4. Un onglet au repos n'est pas un texte désactivé, c'est
-     une DESTINATION — il doit se lire sans effort. Ce qui le distingue de
-     l'onglet en cours n'est pas sa pâleur, c'est sa couleur : gris contre
-     ambre. */
-  .layer--normal{color:#4A4A56}
+     #3A3A46 donne 10,8. Un onglet au repos n'est pas un texte désactivé, c'est
+     une DESTINATION — il doit se lire sans effort.
+
+     ⚠ ON NE PEUT PLUS DESCENDRE BEAUCOUP. L'onglet ACTIF est noir : plus les
+       autres s'en approchent, moins on distingue celui où l'on est. C'est la
+       capsule grise qui porte desormais l'essentiel de cette distinction, pas
+       l'ecart de couleur. */
+  .layer--normal{color:#3A3A46}
   /* L'ONGLET SOUS LA CAPSULE PORTE LA COULEUR DU LOGO.
 
      Deux techniques, parce qu'un dessin et un texte ne se peignent pas de la
@@ -486,12 +489,30 @@
   /* Blanc en sombre, donc noir en clair. Cette couleur ne sert que de repli :
      l'icône est peinte par `fill:url(#logoOrIc)` et le libellé par un dégradé
      découpé, tous deux inchangés. */
-  .layer--lens{color:#0F0F14}
-  .layer--lens svg{fill:url(#logoOrIc)}
+  /* ═══ L'ONGLET ACTIF PASSE AU NOIR ═══
+
+     Il portait l'ambre : le dessin en `fill:url(#logoOrIc)`, le libelle en
+     degrade decoupe sur les lettres. Deux techniques, parce qu'un trace et un
+     texte ne se peignent pas de la meme facon.
+
+     Les deux tombent. Avec des dossiers de huit couleurs a l'ecran, un onglet
+     orange devenait une neuvieme teinte au lieu de se detacher. Le noir
+     n'appartient a aucune famille — c'est ce qui le fait ressortir de toutes.
+
+     ⚠ IL FAUT ANNULER LES TROIS PROPRIETES DU DEGRADE DE TEXTE, pas seulement
+       en poser une nouvelle. `-webkit-text-fill-color:transparent` l'emporte
+       sur `color` : sans le remettre a `currentColor`, le libelle resterait
+       invisible et l'on chercherait longtemps pourquoi.
+
+     La graisse monte a 600 : c'est elle qui distingue maintenant l'onglet
+     actif, avec la capsule. Deux noirs de meme graisse ne se differencient
+     que par leur fond. */
+  .layer--lens{color:#0B0B0F}
+  .layer--lens svg{fill:#0B0B0F}
   .layer--lens span{
-    background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
-    -webkit-background-clip:text;background-clip:text;
-    -webkit-text-fill-color:transparent;color:transparent;
+    background:none;
+    -webkit-text-fill-color:currentColor;
+    color:#0B0B0F; font-weight:600;
   }
   .tab{position:absolute;top:0;height:100%;
     display:flex;flex-direction:column;align-items:center;justify-content:center;

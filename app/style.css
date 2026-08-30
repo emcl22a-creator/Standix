@@ -39,8 +39,12 @@
        Deux tons de bleu de plus que le #F2F2F5 d'avant. C'est peu, mais c'est
        ce qui empeche le gris de paraitre sale a cote du blanc pur des cartes :
        un gris parfaitement neutre tire vers le beige quand on le pose contre
-       du blanc. */
-    --bg:#F2F2F7;
+       du blanc.
+
+       ⚠ #F5F5F9 ET NON #F2F2F7. Trois tons plus clair : l'ecart avec le blanc
+         des cartes passe de 13 a 10, assez pour qu'elles se detachent encore,
+         assez peu pour que la page ne paraisse plus grise. */
+    --bg:#F5F5F9;
     /* ⚠ BLANC OPAQUE, PLUS DU VERRE. Le verre à 72 % supposait des halos
        derrière lui pour avoir quelque chose à réfracter. Sans eux,
        `backdrop-filter` floute du gris uni et rend du gris uni : on payait le
@@ -249,7 +253,12 @@
     position:relative; z-index:1; width:100%; max-width:var(--col); margin:0 auto;
     min-height:100dvh;
   }
-  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col); z-index:15; padding:16px 18px 0; }
+  /* ⚠ 24 PX, COMME `.screen`. La barre porte SA PROPRE marge laterale — elle
+     est en `position:fixed`, donc hors du flux de l'ecran et sans rapport avec
+     son remplissage. Les deux valeurs doivent etre changees ENSEMBLE : a 18
+     contre 24, le logo se decalait de six pixels par rapport aux cartes juste
+     en dessous, et rien ne le signalait. */
+  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col); z-index:15; padding:16px 24px 0; }
 
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{
@@ -302,10 +311,9 @@
 
      Une police de marque, une police de lecture : c'est ainsi que font la
      plupart des produits. */
-  /* ⚠ `.topbar-title` A DISPARU DU BALISAGE — le nom et le role ne sont plus
-     empiles. Les selecteurs qui la citaient sont reecrits sans elle ; les
-     laisser aurait rendu ces regles muettes, et le nom serait revenu a Inter
-     sans que rien ne le signale. */
+  /* ⚠ `.topbar-card .name` NE TROUVE PLUS RIEN — la barre porte desormais
+     `.tb-nom`, style plus bas dans ce fichier. Le selecteur reste ici pour
+     `.logotype`, qui est employe ailleurs (ecran de choix, boot). */
   .topbar-card .name, .logotype{
     font-family:'Poppins', 'Inter', system-ui, sans-serif;
     /* ═══ LA GRAISSE 500, POUR DE VRAI ═══
@@ -322,7 +330,7 @@
        pour l'être. */
     font-weight:500; letter-spacing:-0.01em;
   }
-  .topbar-card .name{ font-size:17px; }
+
 
   /* ═══ Le compte est partagé ═══ */
   /* Un point sur le bouton des réglages : c'est le seul endroit où l'on peut
@@ -486,7 +494,10 @@
        La barre du haut mesure 72 px — 16 de marge et 56 de pilule. Les deux
        points ont disparu avec le débord : c'est le bord du panneau voisin qui
        annonce désormais qu'il y en a un. Plus quinze de jeu. */
-    padding:87px 20px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
+    /* ⚠ 24 PX DE CHAQUE COTE, contre 20. C'est la seule ligne qui gouverne la
+       marge laterale de TOUS les ecrans : la barre du haut, les titres, les
+       cartes et la recherche s'y alignent sans avoir leur propre valeur. */
+    padding:87px 24px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
@@ -10685,13 +10696,13 @@ body:has(#e-detail.active) #equipe-app{
      ⚠ LE `spread` NÉGATIF EST LA CLÉ. Sans lui, l'ombre interne fait le tour
        complet et cercle la carte d'un halo. À -2px, elle ne déborde que du
        côté de son décalage — en haut pour le reflet, en bas pour l'ombre. */
+  /* Le biseau suit la tranche : moitie moins marque. Les deux vont ensemble —
+     garder un chanfrein appuye sous un bord adouci ferait un bourrelet. */
   box-shadow:
-    inset 0 2px 2.5px -2px rgba(255,255,255,1),
-    inset 0 -2px 2.5px -2px rgba(28,28,38,0.13),
-    /* Les deux ombres portées, un peu plus franches : une carte qu'on croit
-       épaisse doit projeter en conséquence. */
-    0 1px 2px rgba(20,20,30,0.07),
-    0 12px 28px -12px rgba(20,20,30,0.20);
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.07),
+    0 1px 2px rgba(20,20,30,0.05),
+    0 12px 26px -14px rgba(20,20,30,0.16);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -10722,20 +10733,19 @@ body:has(#e-detail.active) #equipe-app{
    ═══════════════════════════════════════════════════════════════════════════ */
 .cat-cell::before, .proc-rich-card::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
-  /* ⚠ 1,5 PX. À 1 px, la tranche existait sans se lire : sur un écran à trois
-     pixels par point, trois rangées ne suffisent pas à faire tenir un dégradé
-     du blanc au gris. À 1,5, il y en a quatre ou cinq — assez pour qu'on voie
-     le passage, donc l'épaisseur. */
-  padding:1.5px; pointer-events:none; z-index:2;
-  /* Le dégradé est plus contrasté aux deux bouts : blanc pur en haut, et le
-     bas passe de 16 à 26 %. C'est l'ÉCART entre les deux extrémités qui fait
-     le volume, pas la valeur moyenne. */
+  /* ⚠ 1 PX, ET LE BAS DESCEND DE 26 A 14 %. A 1,5 px avec un bas a 26, la
+     tranche ne suggerait plus l'epaisseur : elle la DESSINAIT, et chaque carte
+     paraissait cerclee d'un trait sombre.
+
+     Un relief se devine, il ne se lit pas. Le degrade garde son sens — blanc
+     en haut, sombre en bas — mais deux fois plus discret. */
+  padding:1px; pointer-events:none; z-index:2;
   background:linear-gradient(180deg,
-    rgba(255,255,255,1)      0%,
-    rgba(255,255,255,0.62)   14%,
-    rgba(28,28,38,0.04)      46%,
-    rgba(28,28,38,0.17)      82%,
-    rgba(28,28,38,0.26)     100%);
+    rgba(255,255,255,0.95)   0%,
+    rgba(255,255,255,0.50)   16%,
+    rgba(28,28,38,0.025)     50%,
+    rgba(28,28,38,0.09)      84%,
+    rgba(28,28,38,0.14)     100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
@@ -10745,11 +10755,11 @@ body:has(#e-detail.active) #equipe-app{
    dans un dossier, il ne doit pas paraître aussi épais que lui. */
 .cat-cell--sous::before{
   background:linear-gradient(180deg,
-    rgba(255,255,255,0.92)   0%,
-    rgba(255,255,255,0.50)   14%,
-    rgba(28,28,38,0.035)     46%,
-    rgba(28,28,38,0.13)      82%,
-    rgba(28,28,38,0.20)     100%);
+    rgba(255,255,255,0.88)   0%,
+    rgba(255,255,255,0.42)   16%,
+    rgba(28,28,38,0.02)      50%,
+    rgba(28,28,38,0.07)      84%,
+    rgba(28,28,38,0.11)     100%);
 }
 
 /* À l'appui, la tranche s'éteint : le haut perd son reflet et le bas sa
@@ -10973,7 +10983,8 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 
 /* ─── LA RECHERCHE ───────────────────────────────────────────────────────── */
-/* La rangee : la recherche prend la place restante, le bouton garde la sienne. */
+/* ⚠ LA RANGEE N'A PLUS QU'UN ENFANT. Le bouton de tri est descendu sous le
+   segment ; la regle reste, elle porte la marge basse du champ. */
 .proc-rech-rang{ display:flex; align-items:center; gap:10px; margin:0 0 16px; }
 
 /* ⚠ `min-width:0` SUR LA RECHERCHE. Sans lui, un champ de saisie refuse de
@@ -11160,9 +11171,12 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      que fait iOS sur ses barres transparentes.
    ═══════════════════════════════════════════════════════════════════════════ */
 .topbar-card{
-  display:flex; align-items:center; justify-content:space-between;
+  /* ⚠ TROIS COLONNES, PAS `space-between`. Les deux cotes font exactement
+     `1fr` : le logo tombe au milieu de l'ECRAN, pas au milieu de ce qui reste
+     entre deux boutons de largeurs differentes. */
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
   width:100%; flex:1 1 auto;
-  padding:0 0 12px; border-radius:0;
+  padding:0 0 10px; border-radius:0;
   background:none;
   -webkit-backdrop-filter:none; backdrop-filter:none;
   box-shadow:inset 0 -0.5px 0 rgba(60,60,67,0.12);
@@ -11171,17 +11185,10 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    de verre ; sur une ligne nue, il ferait un cadre autour de rien. */
 .topbar-card::after{ display:none; }
 
-.topbar-card .topbar-left{ display:flex; align-items:center; gap:9px; }
-
-/* La pastille du rôle. Même matière que les badges des cartes : une seule
-   grammaire pour tout ce qui est une étiquette dans l'app. */
-.topbar-card .role{
-  flex-shrink:0; white-space:nowrap;
-  padding:5px 12px; border-radius:100px;
-  background:rgba(118,118,128,0.12);
-  font-size:12.5px; font-weight:500; color:var(--label-2);
-  letter-spacing:-0.02em;
-}
+/* ⚠ `.topbar-left` ET `.role` NE SONT PLUS DANS LA BARRE. Le nom et la
+   pastille ont ete remplaces par le menu, le logo et le bouton de creation.
+   Leurs regles sont retirees : laissees en place, elles ne feraient rien mais
+   laisseraient croire que ces elements existent encore. */
 
 /* ⚠ `flex-direction:row` EST INDISPENSABLE ICI. La rangee est declaree en
    COLONNE huit cents lignes plus haut — un reste de l'epoque ou elle empilait
@@ -11195,3 +11202,127 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   display:flex; flex-direction:row; align-items:center;
   justify-content:flex-start; width:100%;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LIGNE DE CONTEXTE, SOUS LE SEGMENT
+
+   Le compte de ce qu'on regarde à gauche, le tri à droite. Elle décrit la
+   liste ; elle vient donc après le contrôle qui la change.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.proc-rang{
+  display:flex; align-items:center; justify-content:space-between;
+  margin:0 0 12px; min-height:34px;
+}
+.proc-rang-txt{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:13.5px; font-weight:500; color:var(--label-2); letter-spacing:-0.02em;
+}
+/* ⚠ L'ICONE EST EN `currentColor`, pas en dégradé. Elle accompagne un texte
+   gris et doit s'accorder à lui : un dossier coloré ici entrerait en
+   concurrence avec ceux de la liste, qui eux portent une information. */
+.proc-rang-txt svg{ width:16px; height:16px; display:block; flex-shrink:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT · MENU, LOGO, CRÉATION
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── LES DEUX TRAITS ───────────────────────────────────────────────────────
+   Deux, pas trois : à deux l'icône est plus calme et se lit aussi bien. Le
+   trait du bas est plus court — c'est ce qui la fait reconnaître comme un menu
+   plutôt que comme un signe égal. */
+.tb-menu{
+  justify-self:start;
+  width:40px; height:40px; border:none; background:none; padding:0;
+  display:grid; place-items:center; border-radius:100px; color:var(--label);
+}
+.tb-menu i{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+.tb-menu span{ display:block; height:2px; border-radius:2px; background:currentColor; }
+.tb-menu span:first-child{ width:19px; }
+.tb-menu span:last-child{ width:13px; transition:width 0.26s cubic-bezier(0.32,0.72,0,1); }
+/* Quand le volet est ouvert, le trait court rejoint le long : les deux traits
+   deviennent égaux, et l'icône cesse de dire « ouvre-moi ». */
+.tb-menu[aria-expanded="true"] span:last-child{ width:19px; }
+.tb-menu:active{ background:rgba(118,118,128,0.12); }
+
+.tb-logo{ justify-self:center; display:flex; align-items:center; gap:9px; }
+.tb-logo .boot-logo{ width:24px; height:28px; flex-shrink:0; }
+
+/* ⚠ LE NOM PORTE POPPINS, COMME PARTOUT AILLEURS DANS L'APP. Il vient de
+   remplacer `.topbar-card .name`, dont le selecteur ne trouve plus rien : sans
+   cette regle, « Standix » serait revenu a Inter et personne n'aurait su
+   pourquoi le mot avait change d'allure.
+
+   22 px : plus gros que les 20 de la version precedente, et c'est le maximum
+   raisonnable. Au-dela, le centre pousse les deux boutons vers les bords et la
+   barre perd son equilibre — la grille les laisse faire sans se plaindre. */
+.tb-nom{
+  font-family:'Poppins','Inter',system-ui,sans-serif;
+  font-weight:500; font-size:22px; letter-spacing:-0.02em;
+  color:var(--label); line-height:1; white-space:nowrap;
+}
+
+/* ─── LE BOUTON DE CRÉATION ────────────────────────────────────────────────
+   Le seul aplat plein de la barre. Il mène directement à la caméra : c'est le
+   geste central du produit, il ne doit pas passer par un menu. */
+.tb-plus{
+  justify-self:end;
+  width:40px; height:40px; border:none; padding:0; border-radius:100px;
+  display:grid; place-items:center;
+  background:#111116; color:#FFFFFF;
+  box-shadow:0 4px 12px -3px rgba(17,17,22,0.38);
+  transition:transform 0.2s cubic-bezier(0.34,1.5,0.6,1);
+}
+.tb-plus svg{ width:21px; height:21px; display:block; }
+.tb-plus:active{ transform:scale(0.9); }
+
+/* ⚠ LA CALE DE L'ESPACE ÉQUIPE. Elle occupe la largeur du bouton absent :
+   sans elle, la colonne de droite serait vide et le logo, centré sur la
+   grille, se retrouverait décalé par rapport à celui de la gestion. */
+.tb-cale{ justify-self:end; width:40px; height:40px; display:block; }
+
+/* ─── LE VOLET ─────────────────────────────────────────────────────────────
+   Il emprunte `.glassDiv` à la barre du bas : même flou, même teinte, même
+   filet. Deux surfaces flottantes dans une même app doivent être faites de la
+   même matière, sinon l'une des deux paraît étrangère.
+
+   ⚠ IL S'ANCRE SOUS SON BOUTON, à gauche. Un volet centré obligerait l'œil à
+     quitter l'endroit où le doigt vient d'appuyer. */
+.tb-volet{
+  position:absolute; top:58px; left:24px; z-index:45;
+  min-width:230px; padding:6px; border-radius:20px;
+  opacity:0; transform:translateY(-8px) scale(0.96);
+  transform-origin:top left; pointer-events:none;
+  transition:opacity 0.2s cubic-bezier(0.32,0.72,0,1),
+             transform 0.28s cubic-bezier(0.32,0.72,0,1);
+}
+.tb-volet.ouvert{ opacity:1; transform:none; pointer-events:auto; }
+/* ⚠ `hidden` EST RETIRÉ PAR LE SCRIPT AVANT L'ANIMATION. Un élément `hidden`
+   est en `display:none` : la transition ne partirait pas, il apparaîtrait
+   d'un coup. */
+.tb-volet[hidden]{ display:none; }
+
+.tb-v-tete{ padding:11px 12px 12px; }
+.tb-v-ent{
+  display:block; font-size:16px; font-weight:600; letter-spacing:-0.03em;
+  color:var(--label); line-height:1.25;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.tb-v-role{
+  display:inline-flex; align-items:center; margin-top:7px;
+  padding:4px 11px; border-radius:100px;
+  background:rgba(118,118,128,0.14);
+  font-size:12.5px; font-weight:500; color:var(--label-2); letter-spacing:-0.02em;
+}
+.tb-v-filet{ height:0.5px; background:rgba(60,60,67,0.12); margin:0 8px; }
+
+.tb-v-opt{
+  display:flex; align-items:center; gap:11px; width:100%;
+  margin-top:5px; padding:11px 12px; border:none; background:none;
+  border-radius:13px; font-family:inherit; font-size:15px;
+  letter-spacing:-0.02em; color:var(--label); text-align:left;
+}
+.tb-v-opt svg{ width:19px; height:19px; flex-shrink:0; }
+.tb-v-opt:active{ background:rgba(60,60,67,0.07); }
+.tb-v-opt--sortie{ color:#C8342B; }

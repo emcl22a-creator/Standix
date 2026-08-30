@@ -463,11 +463,14 @@
   /* ⚠ LES ONGLETS AU REPOS. #CBCDCF est un gris CLAIR — il se lisait sur le
      verre noir, il disparaît sur le verre blanc : mesuré, 1,5 de contraste.
 
-     #5A5A66 plutôt que le #6C6C78 d'abord essayé : 6,7 de contraste au lieu
-     de 5,0. Un onglet au repos n'est pas un texte désactivé, c'est une
-     destination — il doit se lire sans effort, seule sa COULEUR le distingue
-     de l'onglet en cours. */
-  .layer--normal{color:#5A5A66}
+     La valeur a descendu en trois temps : #CBCDCF (1,5 de contraste, illisible
+     sur du blanc), puis #6C6C78 (5,0), puis #5A5A66 (6,6), et enfin celle-ci.
+
+     #4A4A56 donne 8,4. Un onglet au repos n'est pas un texte désactivé, c'est
+     une DESTINATION — il doit se lire sans effort. Ce qui le distingue de
+     l'onglet en cours n'est pas sa pâleur, c'est sa couleur : gris contre
+     ambre. */
+  .layer--normal{color:#4A4A56}
   /* L'ONGLET SOUS LA CAPSULE PORTE LA COULEUR DU LOGO.
 
      Deux techniques, parce qu'un dessin et un texte ne se peignent pas de la

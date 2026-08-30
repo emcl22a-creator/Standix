@@ -431,22 +431,17 @@
      reste. */
   #lens{
     --glass-radius:23px;
-    /* ═══ UN PIXEL PLUS BAS, SANS RIEN CALCULER ═══
+    /* ═══ LE CENTRAGE DE SECOURS ═══
 
-       Les marges automatiques centrent l'element dans la zone `top`..`bottom`.
-       Pour le descendre, on ne touche donc ni a sa position ni a ses marges :
-       on DECALE LA ZONE. `top:2px` la fait commencer deux pixels plus bas, le
-       navigateur repartit ce qui reste, et la capsule descend d'un pixel —
-       la moitie, exactement.
+       Le script pose la position verticale a chaque image, mesuree sur
+       l'onglet actif. Ces valeurs-ci ne servent donc PAS en temps normal.
 
-       ⚠ POUR AJUSTER, C'EST CE SEUL NOMBRE, ET IL VAUT LE DOUBLE DU DECALAGE
-         VOULU. `4px` descend de deux pixels, `0` centre exactement, `-2px`
-         remonte d'un. Ne pas reintroduire de `margin-top` calcule : c'est ce
-         qui avait rendu le centrage faux et impossible a corriger proprement.
-
-       Le pochoir qui decoupe la capsule suit tout seul — il lit `offsetTop`,
-       donc la position reelle, quelle qu'en soit la cause. */
-    top:3.3px;bottom:0;margin-top:auto;margin-bottom:auto;left:0;
+       Elles servent quand la mesure est impossible : barre encore masquee,
+       onglets pas encore poses. Le script efface alors ce qu'il avait ecrit et
+       ces trois lignes reprennent la main — marges automatiques, centrage
+       exact, aucun calcul. C'est le comportement le plus sur, et c'est ce
+       qu'un repli doit etre. */
+    top:0;bottom:0;margin-top:auto;margin-bottom:auto;left:0;
     /* La capsule passe SOUS les onglets : le texte et les icones
        restent lisibles au-dessus du verre. */
     z-index:5;pointer-events:none;
@@ -4343,6 +4338,52 @@ function frame(now) {
   lensEl.style.width = g.width + 'px';
   lensEl.style.height = g.height + 'px';
   lensEl.style.left = (cx - g.width / 2) + 'px';
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA CAPSULE SE CALE SUR L'ONGLET, PLUS SUR LA BARRE
+
+     Tout le probleme venait de la : on la centrait dans `#bar`, alors que ce
+     qu'elle doit entourer, c'est un ONGLET. Deux references pour deux objets
+     qui doivent coincider — et chaque fois que l'une bougeait (filet, ombre
+     interne, boite de padding contre boite de bordure), il fallait
+     recompenser a la main.
+
+     On mesure donc directement l'onglet et on pose la capsule sur SON centre.
+     C'est vrai par construction : quoi qu'il arrive au bord de la barre, la
+     capsule reste alignee sur ce qu'elle designe.
+
+     ⚠ ON MESURE `lNorm`, LE CALQUE DU BAS. Les deux calques portent les memes
+       onglets aux memes places, mais `lLens` est masque par le pochoir — sa
+       mesure serait juste, jamais fausse, seulement moins evidente a relire.
+
+     ⚠ LE REPLI N'EST PAS UNE FORMULE, C'EST LE STYLE. J'avais d'abord ecrit
+       `BAR_H / 2` quand la mesure echouait. Or au demarrage la barre est en
+       `display:none` — `afficherBarre(false)` — donc BAR_H vaut ZERO : `top`
+       valait `0 - hauteur/2`, et la capsule se posait a moitie AU-DESSUS de
+       la barre.
+
+       On ne devine donc plus. Si l'on ne sait pas ou est l'onglet, on efface
+       ce qu'on avait ecrit et le style reprend la main : `top:0; bottom:0`
+       avec des marges automatiques centrent sans aucun calcul. Un repli doit
+       etre le comportement le plus sur, pas un calcul de secours. */
+  const ongletActif = lNorm.querySelectorAll('.tab')[active];
+  const ro = ongletActif ? ongletActif.getBoundingClientRect() : null;
+
+  if (ro && ro.height > 0 && BAR_H > 0) {
+    const rbar = document.getElementById('bar').getBoundingClientRect();
+    const centreY = ((ro.top + ro.bottom) / 2 - rbar.top) / facteurZoom();
+    lensEl.style.top = (centreY - g.height / 2) + 'px';
+    lensEl.style.bottom = 'auto';
+    lensEl.style.marginTop = '0';
+    lensEl.style.marginBottom = '0';
+  } else {
+    /* Chaine vide et non `auto` : on EFFACE la valeur en ligne pour que la
+       regle du style reprenne la main. Ecrire `auto` ici la figerait. */
+    lensEl.style.top = '';
+    lensEl.style.bottom = '';
+    lensEl.style.marginTop = '';
+    lensEl.style.marginBottom = '';
+  }
   /* ⚠ PLUS DE `marginTop` ICI. Les marges automatiques du style le posent au
      centre ; y ecrire une valeur les annulerait et ramenerait le decalage. */
   lensEl.style.setProperty('--glass-radius', g.radius + 'px');

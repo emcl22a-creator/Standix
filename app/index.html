@@ -115,11 +115,11 @@
 
        Blanc à 78 % : assez opaque pour qu'un texte noir se lise dessus, assez
        transparent pour qu'on devine le contenu qui défile dessous. */
-    --tint-color:255,255,255;
-    /* 0,55 et non 0,78 : le `brightness` du verre éclaircit déjà le fond. À
-       0,78 il n'avait plus rien à éclaircir — on payait un filtre pour un
-       résultat que la teinte masquait. */
-    --tint-opacity:0.55;
+    /* La teinte de la capsule au repos, reprise au chiffre pres : `#lensGray`
+       pose `rgba(150,150,155,0.18)`. La barre porte maintenant la meme, pour
+       que les deux pieces soient de la meme matiere jusqu'a la couleur. */
+    --tint-color:150,150,155;
+    --tint-opacity:0.18;
 
     /* ⚠ LE CREUX EST NEUTRALISÉ. Une ombre interne noire de 17 px dessinait la
        barre EN CREUX sur du noir : la lumière tombe dedans, c'est ce qui lui
@@ -162,11 +162,24 @@
        libellés se perdraient dedans ; la capsule, elle, peut s'en passer parce
        qu'elle ne couvre jamais que la barre.
 
-       C'est le `brightness(1.06)` qui fait le blanchiment : il agit sur ce
-       qu'on voit à travers, alors qu'une teinte plus opaque l'aurait masqué.
-       La teinte descend donc de 0,78 à 0,55 pour lui laisser la place. */
-    --verre-bar:blur(14px) saturate(160%) brightness(1.06);
+       ⚠ LA BARRE EMPLOIE DESORMAIS LE VERRE DE LA CAPSULE, A L'IDENTIQUE.
+         Une seule variable pour les deux : elles ne peuvent plus diverger.
+
+         Le flou a donc disparu, et c'est ce qui change tout. `--verre-lens` ne
+         depolit pas, il SATURE et ECLAIRCIT ce qui passe dessous — c'est une
+         lentille, pas un depoli.
+
+       ⚠ CE QU'ON PERD : LA LISIBILITE PAR-DESSUS LE CONTENU. Le flou de 14 px
+         brouillait le texte des cartes qui defilent sous la barre. Sans lui,
+         ce texte reste NET derriere les libelles des onglets, et les deux se
+         superposent quand une carte passe dessous.
+
+         C'est la contrepartie assumee du choix de matiere. Si la barre devient
+         illisible en defilant, la correction est de remettre un flou COURT
+         ici — `blur(6px)` suffit a casser les lettres sans effacer la
+         lentille — et non de rechanger la teinte. */
     --verre-lens:saturate(150%) brightness(1.08);
+    --verre-bar:var(--verre-lens);
 
     /* ═══ LE FILET DE L'ARÊTE ═══
        Déclaré ICI, et lu par les deux pièces de verre : la barre du bas et la
@@ -365,9 +378,37 @@
   /* Illumination de la barre. Une COUCHE, pas un filter : un filter
      sur #bar creerait un contexte d'empilement et couperait le
      backdrop-filter de son ::after, donc le verre disparaitrait. */
+  /* ═══ LE CENTRAGE EST RENDU AU NAVIGATEUR ═══
+
+     `top:50%` avec un `margin-top` negatif calcule en JavaScript ne marchait
+     pas : le pourcentage se mesure sur la boite de PADDING de la barre, tandis
+     que la hauteur employee pour le calcul venait de `getBoundingClientRect`,
+     qui mesure la boite de BORDURE. Deux references differentes, donc un ecart
+     — que je compensais par une constante trouvee a la main, et qui se
+     retrouvait fausse au premier changement d'epaisseur du filet.
+
+     `top:0; bottom:0` avec des marges automatiques centre exactement, sans
+     aucun calcul : le navigateur repartit lui-meme la place restante de part
+     et d'autre. Une seule reference, celle qu'il utilise deja pour tout le
+     reste. */
   #lens{
     --glass-radius:23px;
-    top:50%;left:0;
+    /* ═══ UN PIXEL PLUS BAS, SANS RIEN CALCULER ═══
+
+       Les marges automatiques centrent l'element dans la zone `top`..`bottom`.
+       Pour le descendre, on ne touche donc ni a sa position ni a ses marges :
+       on DECALE LA ZONE. `top:2px` la fait commencer deux pixels plus bas, le
+       navigateur repartit ce qui reste, et la capsule descend d'un pixel —
+       la moitie, exactement.
+
+       ⚠ POUR AJUSTER, C'EST CE SEUL NOMBRE, ET IL VAUT LE DOUBLE DE LA
+         DESCENTE VOULUE. 4px pour deux pixels, 6px pour trois. Ne pas
+         reintroduire de `margin-top` calcule : c'est ce qui avait rendu le
+         centrage faux et impossible a corriger proprement.
+
+       Le pochoir qui decoupe la capsule suit tout seul — il lit `offsetTop`,
+       donc la position reelle, quelle qu'en soit la cause. */
+    top:2px;bottom:0;margin-top:auto;margin-bottom:auto;left:0;
     /* La capsule passe SOUS les onglets : le texte et les icones
        restent lisibles au-dessus du verre. */
     z-index:5;pointer-events:none;
@@ -3917,44 +3958,20 @@ let CENTERS = [];
    de la barre, et les deux traits se liraient comme un seul bord epais. */
 const PAD = 4.5;       // LA marge, identique sur les quatre cotes
 
-/* ═══ LA HAUTEUR ET LE DECALAGE SONT DEUX CHOSES ═══
-
-   Ils passaient par la meme constante, et c'etait un piege : `REST_H` vaut
-   `BAR_H - PAD_TOP - PAD`. En augmentant PAD_TOP de 3 px pour descendre la
-   capsule, je lui avais RETIRE 3 px de hauteur sans le vouloir — elle est
-   passee de 52,5 a 49,5 px.
-
-   PAD_TOP reprend donc la valeur de PAD. La capsule retrouve sa hauteur
-   maximale de 52,5 px, et sa marge haute redevient egale a sa marge gauche :
-   5,75 px des quatre cotes, ce qui est la demande.
-
-   Le decalage vertical vit maintenant dans sa propre constante, et ne touche
-   plus a la taille. */
+/* PAD_TOP ne sert plus qu'a la HAUTEUR de la capsule — `REST_H = BAR_H -
+   PAD_TOP - PAD`. Il valait autrefois PAD + 3 pour descendre la capsule : la
+   descendre ainsi lui retirait 3 px de hauteur au passage, ce qui n'etait pas
+   voulu. Le centrage ne passe plus par lui. */
 const PAD_TOP = PAD;
 
-/* ═══ 1,7 PX VERS LE BAS — MESURE, PAS ESTIME ═══
+/* ⚠ `Y_SHIFT` A ETE SUPPRIME. Il portait une compensation de 1,7 px trouvee a
+   la main pour rattraper un centrage faux. Le centrage etant maintenant fait
+   par le navigateur — marges automatiques — et le pochoir mesure sur la
+   capsule elle-meme, il n'y a plus rien a compenser.
 
-   Le calcul place la capsule au milieu : `top:50%` sur la barre et
-   `marginTop = -h/2`. A l'ecran, elle ne l'est pas.
-
-   Mesure sur capture, avec une echelle etablie plutot que supposee : la
-   capsule mesure 49 px pour une hauteur calculee de 55, ce qui donne un
-   facteur de 0,891 — verifie sur la barre, qui devrait alors mesurer 57 px et
-   en mesure 58. L'echelle tient.
-
-   A cette echelle : 3,37 px de marge au-dessus, 6,73 en dessous. La capsule
-   est 1,68 px trop haute.
-
-   D'ou vient l'ecart : `top:50%` se calcule sur la BOITE DE CONTENU de la
-   barre, tandis que `BAR_H` vient de `getBoundingClientRect`, qui mesure la
-   boite de BORDURE. Quand les deux different — et le filet de la barre les
-   fait differer — la moitie de l'une ne tombe pas au milieu de l'autre.
-
-   ⚠ Y_SHIFT EST LU A DEUX ENDROITS : la position de la capsule (ligne ~4220)
-     et le pochoir qui la decoupe dans le calque des icones (~4264). Les deux
-     passent par cette constante — c'est ce qui garde la forme et son masque
-     alignes. Ne jamais corriger l'un des deux a la main. */
-const Y_SHIFT = -1.7;
+   Si un decalage reapparaissait, ne pas reintroduire de constante : chercher
+   ce qui, dans la barre, rend sa boite de padding differente de sa boite de
+   bordure. */
 
 /* ═══ LE ZOOM DE BUREAU FAUSSE TOUTES LES MESURES ═══
 
@@ -4288,7 +4305,8 @@ function frame(now) {
   lensEl.style.width = g.width + 'px';
   lensEl.style.height = g.height + 'px';
   lensEl.style.left = (cx - g.width / 2) + 'px';
-  lensEl.style.marginTop = (-g.height / 2 - Y_SHIFT) + 'px';
+  /* ⚠ PLUS DE `marginTop` ICI. Les marges automatiques du style le posent au
+     centre ; y ecrire une valeur les annulerait et ramenerait le decalage. */
   lensEl.style.setProperty('--glass-radius', g.radius + 'px');
 
   // ---- Matiere : verre en mouvement, gris au repos ----
@@ -4332,7 +4350,17 @@ function frame(now) {
      ═══════════════════════════════════════════════════════════════════════ */
   const E = 4;
   const rx = cx - g.width / 2 - E;
-  const ry = BAR_H / 2 - g.height / 2 - E - Y_SHIFT;
+  /* ═══ ON MESURE, ON NE RECALCULE PAS ═══
+
+     `ry` refaisait le meme calcul que la position de la capsule, avec les
+     memes references bancales — et surtout, les deux pouvaient diverger : il
+     suffisait de corriger l'un sans l'autre pour que le pochoir cesse de
+     tomber sur la forme.
+
+     `offsetTop` rend la position REELLE de la capsule dans la barre, quelle
+     que soit la facon dont elle y est arrivee. Le masque suit la forme par
+     construction, plus par accord entre deux formules. */
+  const ry = lensEl.offsetTop - E;
   const rw = g.width + E * 2, rh = g.height + E * 2;
   const rr = Math.min(g.radius + E, rw / 2, rh / 2);
 

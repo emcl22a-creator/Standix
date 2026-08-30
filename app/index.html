@@ -518,7 +518,10 @@
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     gap:calc(var(--bar-h) * 0.081);cursor:pointer}
   .tab svg{display:block;transform-origin:center}
-  .tab span{font-size:calc(var(--bar-h) * 0.153);font-weight:500;line-height:1;white-space:nowrap;
+  /* 0,167 au lieu de 0,153 : le libelle passe de 9,8 a 10,7 px, et sa graisse
+     de 500 a 550. Un texte de dix pixels a besoin d'un peu de corps pour ne
+     pas paraitre gris a cote d'une icone au trait epaissi. */
+  .tab span{font-size:calc(var(--bar-h) * 0.167);font-weight:550;line-height:1;white-space:nowrap;
     transform-origin:center}
 </style>
 </head>
@@ -4049,13 +4052,40 @@ let CENTERS = [];
 
    Ne pas descendre sous 4 : le filet de la capsule finirait par toucher celui
    de la barre, et les deux traits se liraient comme un seul bord epais. */
-const PAD = 4.5;       // LA marge, identique sur les quatre cotes
+const PAD = 3;         // LA marge, identique sur les quatre cotes
 
-/* PAD_TOP ne sert plus qu'a la HAUTEUR de la capsule — `REST_H = BAR_H -
-   PAD_TOP - PAD`. Il valait autrefois PAD + 3 pour descendre la capsule : la
-   descendre ainsi lui retirait 3 px de hauteur au passage, ce qui n'etait pas
-   voulu. Le centrage ne passe plus par lui. */
-const PAD_TOP = PAD;
+/* ⚠ 3 ET NON 4,5, ET C'EST LIE A CE QUI PRECEDE.
+
+   PAD gouverne A LA FOIS la largeur des onglets — `REST_W = (BAR_W - 2 x PAD)
+   / N` — et la hauteur de la capsule — `REST_H = BAR_H - PAD_TOP - PAD`. En
+   grossissant l'icone et le libelle, le contenu touchait le bord de la
+   capsule : il fallait donc lui rendre de la place, en haut, en bas et sur
+   les cotes a la fois.
+
+   Retrecir la marge de 1,5 px donne 3 px de plus a la capsule dans chaque
+   direction. Les onglets s'elargissent d'autant, donc le contenu se resserre
+   vers leur centre — c'est le meme geste, vu de l'autre cote.
+
+   Ne pas descendre sous 2,5 : le filet de la capsule finirait par toucher
+   celui de la barre, et les deux traits se liraient comme un seul bord. */
+
+/* ═══ PAD_TOP RECUPERE LA HAUTEUR QUE PAD VIENT DE DONNER ═══
+
+   PAD gouverne DEUX choses a la fois : la largeur des onglets, ou il est
+   retire une fois pour quatre, et la hauteur de la capsule, ou il est retire
+   deux fois. Le baisser de 4,5 a 3 elargissait donc de 0,75 px et grandissait
+   de 3 px — l'inverse de ce qu'on veut.
+
+   PAD_TOP ne sert qu'a la hauteur : `REST_H = BAR_H - PAD_TOP - PAD`. A 6, la
+   capsule retrouve ses 55 px exactement, pendant que la largeur garde son
+   gain.
+
+   ⚠ LES QUATRE MARGES NE SONT DONC PLUS EGALES : 3 px sur les cotes, 4,5 en
+     haut et en bas. C'est le prix d'elargir sans grandir — les deux dimensions
+     passaient par la meme constante, il fallait les separer. Le centrage
+     vertical, lui, ne bouge pas : il est mesure sur l'onglet, pas calcule a
+     partir de ces marges. */
+const PAD_TOP = 6;
 
 /* ⚠ `Y_SHIFT` A ETE SUPPRIME. Il portait une compensation de 1,7 px trouvee a
    la main pour rattraper un centrage faux. Le centrage etant maintenant fait
@@ -4222,7 +4252,10 @@ let active = 0;
 const contentW = [];
 
 function row(el, filled) {
-  const ICON_PX = Math.round(BAR_H * 0.355);
+  /* 0,385 et non 0,355 : l'icone passe de 23 a 25 px. Deux pixels, mais sur un
+     dessin de vingt-trois c'est un dixieme de plus — assez pour qu'il pese
+     autant que son libelle. */
+  const ICON_PX = Math.round(BAR_H * 0.385);
   const jeu = ICONES_DU_JEU();
   el.innerHTML = CENTERS.map((c, i) => {
     /* UNE ICONE PEUT IMPOSER SON REMPLISSAGE.
@@ -4239,7 +4272,7 @@ function row(el, filled) {
       <svg width="${ICON_PX}" height="${ICON_PX}" viewBox="0 0 24 24"
         fill="${p ? 'currentColor' : 'none'}"
         stroke="${p ? 'none' : 'currentColor'}"
-        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill-rule="evenodd">
         <path d="${ic[p ? 'fill' : 'line']}"/></svg>
       <span>${LABELS[i]}</span>
     </div>`;

@@ -287,7 +287,7 @@
     transform: translateY(0.1px);
   }
   .logo-pill svg{ width:23px; height:27px; }
-  .topbar-title{ display:flex; flex-direction:column; line-height:1.2; }
+
   /* ═══ LE NOM PORTE SA PROPRE POLICE ═══
 
      Poppins, en graisse 400. Outfit y était d'abord — mais elle est plus
@@ -302,7 +302,11 @@
 
      Une police de marque, une police de lecture : c'est ainsi que font la
      plupart des produits. */
-  .topbar-title .name, .logotype{
+  /* ⚠ `.topbar-title` A DISPARU DU BALISAGE — le nom et le role ne sont plus
+     empiles. Les selecteurs qui la citaient sont reecrits sans elle ; les
+     laisser aurait rendu ces regles muettes, et le nom serait revenu a Inter
+     sans que rien ne le signale. */
+  .topbar-card .name, .logotype{
     font-family:'Poppins', 'Inter', system-ui, sans-serif;
     /* ═══ LA GRAISSE 500, POUR DE VRAI ═══
 
@@ -318,8 +322,8 @@
        pour l'être. */
     font-weight:500; letter-spacing:-0.01em;
   }
-  .topbar-title .name{ font-size:15.5px; }
-  .topbar-title .role{ font-size:11.5px; color:var(--label-2); font-weight:500; }
+  .topbar-card .name{ font-size:17px; }
+
   /* ═══ Le compte est partagé ═══ */
   /* Un point sur le bouton des réglages : c'est le seul endroit où l'on peut
      agir, donc le seul endroit où la pastille a un sens. */
@@ -11130,3 +11134,48 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 @media (prefers-reduced-motion: reduce){
   .cl-apparait{ opacity:1; transform:none; transition:none; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT · LA LIGNE NUE
+
+   Plus de carte, plus de verre : le logo et le nom posés sur la page, le rôle
+   en pastille à l'autre bout, et un filet sous le tout. Le contenu commence
+   tout de suite.
+
+   ⚠ LE RÔLE N'EST PAS UN BOUTON. C'est une étiquette : elle dit où l'on est,
+     elle n'ouvre rien. Les espaces se changent depuis les réglages — mettre un
+     menu ici donnerait deux chemins vers la même bascule, dont un que personne
+     ne cherche en haut d'écran.
+
+   ⚠ LE FILET REMPLACE LA MATIÈRE. Sans fond, il faut bien quelque chose pour
+     séparer la barre du contenu qui suit ; un demi-pixel suffit, et c'est ce
+     que fait iOS sur ses barres transparentes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.topbar-card{
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%; flex:1 1 auto;
+  padding:0 0 12px; border-radius:0;
+  background:none;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  box-shadow:inset 0 -0.5px 0 rgba(60,60,67,0.12);
+}
+/* ⚠ LE PSEUDO-ÉLÉMENT DE FILET EST ÉTEINT. Il dessinait l'arête de la pilule
+   de verre ; sur une ligne nue, il ferait un cadre autour de rien. */
+.topbar-card::after{ display:none; }
+
+.topbar-card .topbar-left{ display:flex; align-items:center; gap:9px; }
+
+/* La pastille du rôle. Même matière que les badges des cartes : une seule
+   grammaire pour tout ce qui est une étiquette dans l'app. */
+.topbar-card .role{
+  flex-shrink:0; white-space:nowrap;
+  padding:5px 12px; border-radius:100px;
+  background:rgba(118,118,128,0.12);
+  font-size:12.5px; font-weight:500; color:var(--label-2);
+  letter-spacing:-0.02em;
+}
+
+/* La rangée s'étire : sans cela, `.topbar-card` garderait la largeur de son
+   contenu et la pastille collerait au nom. */
+.topbar-row{ display:flex; align-items:center; width:100%; }

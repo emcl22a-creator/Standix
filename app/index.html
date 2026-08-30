@@ -462,8 +462,12 @@
      charge, elle est d'un seul tenant. */
   /* ⚠ LES ONGLETS AU REPOS. #CBCDCF est un gris CLAIR — il se lisait sur le
      verre noir, il disparaît sur le verre blanc : mesuré, 1,5 de contraste.
-     Un gris moyen à 4,9 le remplace. */
-  .layer--normal{color:#6C6C78}
+
+     #5A5A66 plutôt que le #6C6C78 d'abord essayé : 6,7 de contraste au lieu
+     de 5,0. Un onglet au repos n'est pas un texte désactivé, c'est une
+     destination — il doit se lire sans effort, seule sa COULEUR le distingue
+     de l'onglet en cours. */
+  .layer--normal{color:#5A5A66}
   /* L'ONGLET SOUS LA CAPSULE PORTE LA COULEUR DU LOGO.
 
      Deux techniques, parce qu'un dessin et un texte ne se peignent pas de la
@@ -3192,6 +3196,11 @@
       <stop offset="0.6" stop-color="#FA8A08"></stop>
       <stop offset="1" stop-color="#FDA81E"></stop>
     </linearGradient>
+    <!-- ⚠ TEINTES D'ORIGINE, A NE PAS MODIFIER. Je les avais foncees pour
+         qu'elles ressortent sur le fond clair ; ce n'etait pas la demande, et
+         c'etait la mauvaise reponse. Ce qui fait ressortir ces dessins, c'est
+         l'effet pose en CSS — voir « L'AMBRE QUI SE DETACHE » dans style.css.
+         Les couleurs, elles, sont celles de la marque. -->
     <linearGradient id="logoOrIc" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
       <stop stop-color="#EB5201"></stop>
       <stop offset="0.6" stop-color="#FA8A08"></stop>

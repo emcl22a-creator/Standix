@@ -6072,6 +6072,10 @@
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
+    /* ⚠ 0,22 — L'INVERSION EXACTE DE L'ORIGINE, qui était un blanc à 22 %.
+       J'avais descendu à 0,07 en trouvant la pastille trop marquée : ce
+       n'était pas demandé, et c'est justement son contraste qui lui permet de
+       désigner la page où l'on se trouve. */
     background:rgba(28,28,38,0.221); pointer-events:none; opacity:0;
     transition: transform 0.45s cubic-bezier(0.34,1.4,0.5,1), opacity 0.25s ease;
   }
@@ -6083,12 +6087,26 @@
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), color 0.25s; }
   .tab-round:active{ transform:scale(0.88); }
   .tab-round svg{ width:23px; height:23px; }
-  .tab-round--secondary{ background:none; border:none; color:rgba(235,235,245,0.6); }
-  .tab-round--secondary.active{ color:#fff; }
+  /* ⚠ CETTE COULEUR AVAIT ÉCHAPPÉ À LA CONVERSION. Elle est écrite en
+     `rgba(235,235,245,…)` — le gris clair d'iOS — et non en `rgba(255,255,255)`
+     comme le reste du fichier : le remplacement automatique ne l'a pas vue.
+     Résultat, les icônes inactives restaient d'un gris presque blanc, donc
+     invisibles sur la barre claire. */
+  .tab-round--secondary{ background:none; border:none; color:rgba(28,28,38,0.44); }
+  /* Blanc en sombre, donc noir en clair : la couleur de premier plan, dans
+     les deux cas. L'ambre que j'avais mis était un choix, pas une conversion. */
+  .tab-round--secondary.active{ color:#0F0F14; }
   .tab-round .ico-plein{ display:none; }
   .tab-round.active .ico-ligne{ display:none; }
   .tab-round.active .ico-plein{ display:block; }
-  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(28,28,38,0.220), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(28,28,38,0.220); }
+  /* ⚠ MÊME DESSIN QU'EN SOMBRE : rond blanc, bordure d'un demi-pixel, deux
+     ombres, 44 px. Rien de la forme ne bouge.
+
+     UNE seule couleur change : la bordure, qui passe du blanc translucide au
+     gris — sans elle le rond blanc n'aurait plus de limite sur une barre
+     blanche. L'icône reste NOIRE : elle l'était déjà, et le noir sur un rond
+     blanc se lit aussi bien dans les deux thèmes. */
+  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(20,20,30,0.12), 0 2px 6px rgba(20,20,30,0.08); border:0.5px solid rgba(28,28,38,0.10); }
   .tab-round--primary svg{ width:23px; height:23px; }
 
 

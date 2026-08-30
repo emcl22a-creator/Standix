@@ -116,7 +116,10 @@
        Blanc à 78 % : assez opaque pour qu'un texte noir se lise dessus, assez
        transparent pour qu'on devine le contenu qui défile dessous. */
     --tint-color:255,255,255;
-    --tint-opacity:0.78;
+    /* 0,55 et non 0,78 : le `brightness` du verre éclaircit déjà le fond. À
+       0,78 il n'avait plus rien à éclaircir — on payait un filtre pour un
+       résultat que la teinte masquait. */
+    --tint-opacity:0.55;
 
     /* ⚠ LE CREUX EST NEUTRALISÉ. Une ombre interne noire de 17 px dessinait la
        barre EN CREUX sur du noir : la lumière tombe dedans, c'est ce qui lui
@@ -148,7 +151,21 @@
        Le jour où WebKit implémentera `url()`, il suffira de remettre
        `url(#bar-filter)` et `url(#lens-filter)` ici, et `VERRE_SVG` à true
        dans le script. Rien d'autre n'aura bougé. */
-    --verre-bar:blur(14px) saturate(180%);
+    /* ═══ LA BARRE PREND LA MATIÈRE DE LA CAPSULE ═══
+
+       La capsule en mouvement emploie `--verre-lens` : elle ne floute pas, elle
+       SATURE et ÉCLAIRCIT ce qui passe dessous. C'est ce `brightness` qui lui
+       donne son air de lentille plutôt que de dépoli.
+
+       La barre reprend les deux — saturation et éclaircissement — et garde son
+       flou. Sans lui, le texte des cartes resterait lisible au travers et les
+       libellés se perdraient dedans ; la capsule, elle, peut s'en passer parce
+       qu'elle ne couvre jamais que la barre.
+
+       C'est le `brightness(1.06)` qui fait le blanchiment : il agit sur ce
+       qu'on voit à travers, alors qu'une teinte plus opaque l'aurait masqué.
+       La teinte descend donc de 0,78 à 0,55 pour lui laisser la place. */
+    --verre-bar:blur(14px) saturate(160%) brightness(1.06);
     --verre-lens:saturate(150%) brightness(1.08);
 
     /* ═══ LE FILET DE L'ARÊTE ═══

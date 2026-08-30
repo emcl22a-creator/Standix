@@ -972,7 +972,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
           <circle cx="11" cy="11" r="7.5"></circle><path d="M16.5 16.5 21 21"></path>
         </svg>
-        <input type="search" id="proc-rech-champ" placeholder="Rechercher un dossier"
+        <input type="search" id="proc-rech-champ" placeholder="Rechercher une procédure"
                autocomplete="off" autocorrect="off" spellcheck="false">
       </div>
       <!-- ⚠ LE BOUTON EST CARRE, PAS ROND. A cote d'une capsule, un rond de
@@ -3337,6 +3337,15 @@
     <linearGradient id="pal2" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#7C2D12"/><stop offset="1" stop-color="#FBBF5C"/></linearGradient>
     <linearGradient id="pal3" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#14532D"/><stop offset="1" stop-color="#5FDDA0"/></linearGradient>
     <linearGradient id="pal4" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#3A4453"/><stop offset="1" stop-color="#A5B0C0"/></linearGradient>
+
+    <!-- ═══ LES DEUX TEINTES FIXES DE LA PAGE D'UN DOSSIER ═══
+
+         A l'interieur d'un dossier, tout appartient deja a la meme chose :
+         faire varier les couleurs ne distinguerait rien. Un sous-dossier est
+         donc toujours violet, une procedure toujours grise — c'est ce qui
+         separe les deux natures, et le titre fait le reste. -->
+    <linearGradient id="palSous" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#4C1D95"/><stop offset="1" stop-color="#A78BFA"/></linearGradient>
+    <linearGradient id="palProc" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#3A4453"/><stop offset="1" stop-color="#A5B0C0"/></linearGradient>
 
     <linearGradient id="orLibre" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FEC64A"/><stop offset="1" stop-color="#EB5201"/>

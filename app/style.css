@@ -11090,3 +11090,43 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 #category-procedures-list .cat-cell--ligne,
 #category-procedures-list .proc-rich-card{ width:100%; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'APPARITION AU DÉFILEMENT
+
+   Une carte qui entre dans l'écran monte de quatorze pixels en se révélant, et
+   grandit d'un demi-pour-cent. Ce n'est pas une entrée en scène : c'est le
+   mouvement qu'on ne remarque pas, celui qui donne l'impression que le contenu
+   arrive plutôt qu'il n'apparaît.
+
+   ⚠ LA COURBE EST CELLE D'IOS. `cubic-bezier(0.32, 0.72, 0, 1)` démarre vif et
+     freine longuement — un `ease-out` classique s'arrête trop sec et donne un
+     mouvement mécanique.
+
+   ⚠ LE RETARD VIENT DU SCRIPT, pas d'une règle par rang. `--retard` est posé
+     sur chaque carte au moment où elle est créée ; écrire vingt règles
+     `:nth-child` ici obligerait à en ajouter une à chaque carte de plus.
+
+   ⚠ `will-change` EST ABSENT VOLONTAIREMENT. Il forcerait une couche graphique
+     pour chaque carte de la liste, y compris celles qu'on ne verra jamais —
+     sur un téléphone d'atelier, c'est de la mémoire vidéo prise pour rien. Le
+     navigateur promeut tout seul ce qui bouge.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cl-apparait{
+  opacity:0;
+  transform:translateY(14px) scale(0.995);
+  transition:opacity 0.42s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
+             transform 0.52s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
+}
+.cl-apparait.vu{
+  opacity:1;
+  transform:none;
+}
+
+/* ⚠ FILET DE SECURITE. Si l'observateur ne se declenchait pas — onglet en
+   arriere-plan au moment du rendu, navigateur ancien —, les cartes
+   resteraient invisibles pour toujours. Ici, tout mouvement coupe et tout
+   s'affiche : une liste sans animation vaut mieux qu'une liste vide. */
+@media (prefers-reduced-motion: reduce){
+  .cl-apparait{ opacity:1; transform:none; transition:none; }
+}

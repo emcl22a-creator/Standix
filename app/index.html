@@ -107,11 +107,32 @@
     /* Teinte NOIRE : elle assombrit le fond vu a travers la barre,
        ce qui detache les libelles blancs. En contrepartie le verre
        perd du relief, compense par un lisere clair plus marque. */
-    --tint-color:0,0,0;
-    --tint-opacity:0.12;
+    /* ═══ LA TEINTE PASSE AU BLANC ═══
+
+       Elle était NOIRE à 12 % : elle assombrissait le fond vu au travers, ce
+       qui détachait les libellés blancs. Sur une app claire, elle grisait la
+       barre et les libellés sombres s'y perdaient.
+
+       Blanc à 78 % : assez opaque pour qu'un texte noir se lise dessus, assez
+       transparent pour qu'on devine le contenu qui défile dessous. */
+    --tint-color:255,255,255;
+    --tint-opacity:0.78;
+
+    /* ⚠ LE CREUX EST NEUTRALISÉ. Une ombre interne noire de 17 px dessinait la
+       barre EN CREUX sur du noir : la lumière tombe dedans, c'est ce qui lui
+       donnait son épaisseur. Sur du blanc, la même ombre trace un anneau gris
+       à l'intérieur du bord — la barre paraît sale et cerclée.
+
+       Ces variables sont aussi lues par la carte du logo et par le tiroir de
+       l'entreprise : c'est pourquoi on change la couleur et non la géométrie. */
+    /* ⚠ SEULE LA COULEUR DU CREUX CHANGE, PAS SA GÉOMÉTRIE. Le flou reste à
+       17 px et le retrait à −8 px, exactement comme en sombre. C'est la
+       COULEUR qui passe du noir au transparent : une ombre interne noire
+       dessine un creux sur du noir, mais un anneau gris sale à l'intérieur
+       d'un bord blanc. */
     --shadow-blur:17px;
     --shadow-spread:-8px;
-    --shadow-color:#000000;
+    --shadow-color:transparent;
     --outer-shadow-blur:17px;
 
     /* ═══ LA MATIÈRE DU VERRE ═══
@@ -140,7 +161,10 @@
        s'affiche. On l'affine donc en OPACITÉ — un trait plus pâle se lit comme
        un trait plus fin, parce que l'œil juge la finesse à la quantité de
        lumière, pas à la mesure. */
-    --filet:rgba(255,255,255,0.22);
+    /* Le filet s'inverse aussi : un trait plus clair que son fond était de la
+       lumière sur du noir ; sur du blanc, il faut un trait plus SOMBRE que le
+       fond pour dessiner la même arête. */
+    --filet:rgba(28,28,38,0.08);
   }
   .glassDiv{
     position:absolute;
@@ -153,7 +177,9 @@
        En ombre interne plutôt qu'en bordure : une bordure épaissirait la boîte
        et décalerait tout ce qu'elle contient d'un demi-pixel. */
     box-shadow:
-      0px 4px var(--outer-shadow-blur) rgba(0,0,0,0.18),
+      /* Même position, même flou qu'en sombre — 0 et 4 px. Seule la couleur
+         change : 18 % de noir faisait une flaque grise sur du blanc. */
+      0px 4px var(--outer-shadow-blur) rgba(20,20,30,0.12),
       /* Le creux du verre, repris du pseudo-élément supprimé. Sans lui la
          pièce est une vitre plate : c'est cette ombre interne qui lui donne
          son épaisseur. */
@@ -188,7 +214,7 @@
        les afficher — un iPhone en a deux ou trois par point —, 1 px ailleurs,
        où un demi-pixel tomberait entre deux rangées et laisserait des trous. */
     padding:1px;
-    background:rgba(255,255,255,0.16);
+    background:rgba(28,28,38,0.075);
     -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
     -webkit-mask-composite:xor; mask-composite:exclude;
@@ -343,7 +369,10 @@
   .layer{position:absolute;inset:0;z-index:20;pointer-events:none;}
   /* Plus de zone sensible ici : le découpage y ferait des trous. La barre s'en
      charge, elle est d'un seul tenant. */
-  .layer--normal{color:#CBCDCF}
+  /* ⚠ LES ONGLETS AU REPOS. #CBCDCF est un gris CLAIR — il se lisait sur le
+     verre noir, il disparaît sur le verre blanc : mesuré, 1,5 de contraste.
+     Un gris moyen à 4,9 le remplace. */
+  .layer--normal{color:#6C6C78}
   /* L'ONGLET SOUS LA CAPSULE PORTE LA COULEUR DU LOGO.
 
      Deux techniques, parce qu'un dessin et un texte ne se peignent pas de la
@@ -351,7 +380,10 @@
      pour le libellé. Les deux emploient les mêmes teintes que le logo — celles
      du dégradé `logoOr`, repris ici en CSS puisqu'un `url()` ne s'applique pas
      à du texte. */
-  .layer--lens{color:#FFFFFF}
+  /* Blanc en sombre, donc noir en clair. Cette couleur ne sert que de repli :
+     l'icône est peinte par `fill:url(#logoOrIc)` et le libellé par un dégradé
+     découpé, tous deux inchangés. */
+  .layer--lens{color:#0F0F14}
   .layer--lens svg{fill:url(#logoOrIc)}
   .layer--lens span{
     background:linear-gradient(135deg,#EB5201 0%,#FA8A08 60%,#FDA81E 100%);
@@ -3426,6 +3458,9 @@ function buildFilter(id, w, h, radius, blurOverride, scaleMul) {
 const LENS = {
   BASE_W: 62,        // largeur de reference
   REST_W: 74,        // largeur au repos : 62 + 6 px de chaque cote
+  /* ⚠ CETTE VALEUR NE SERT QUE D'AMORCE. `mesurerBarre` la REMPLACE au
+     chargement par `BAR_H - PAD_TOP - PAD`. La modifier ici n'a aucun effet a
+     l'ecran : la hauteur de la capsule se regle par PAD, plus bas. */
   REST_H: 46,
   // Ressort de position : la lentille a une vraie inertie.
   STIFFNESS: 340,   // plus vif : la fin de course ne traine plus.
@@ -3845,13 +3880,56 @@ let CENTERS = [];
 // La capsule occupe donc tout l'espace interieur disponible :
 //   hauteur = BAR_H - 2 x PAD
 //   largeur = (BAR_W - 2 x PAD) / 4   (les 4 onglets sont jointifs)
-const PAD = 5.75;      // marge identique dans les quatre directions
-// Marge HAUTE reduite d'un huitieme : la capsule gagne cet espace
-// vers le haut, son centre remonte donc legerement.
-// Marge IDENTIQUE dans les quatre directions : le haut, le bas et les
-// deux cotes ont exactement le meme espace jusqu'au bord de la barre.
+/* ═══ UNE SEULE CONSTANTE POUR LES QUATRE MARGES ═══
+
+   PAD gouverne tout a la fois :
+     · la marge GAUCHE et DROITE — `CENTERS[0] - REST_W/2` vaut exactement PAD ;
+     · la marge HAUTE et BASSE   — `REST_H = BAR_H - PAD_TOP - PAD`, PAD_TOP
+       valant PAD.
+
+   C'est pourquoi on ne peut pas agrandir la capsule en touchant sa hauteur :
+   il faut RETRECIR LA MARGE. En passant de 5,75 a 4,5, la capsule gagne 2,5 px
+   de hauteur et les quatre espaces restent egaux entre eux.
+
+   ⚠ LA LARGEUR DES ONGLETS SUIT AUSSI. `REST_W = (BAR_W - 2 x PAD) / N` : ils
+     gagnent chacun un demi-pixel. C'est voulu — la capsule doit rester
+     jointive d'un onglet a l'autre, sans quoi elle laisserait un trou en
+     glissant.
+
+   Ne pas descendre sous 4 : le filet de la capsule finirait par toucher celui
+   de la barre, et les deux traits se liraient comme un seul bord epais. */
+const PAD = 4.5;       // LA marge, identique sur les quatre cotes
+
+/* ═══ LA HAUTEUR ET LE DECALAGE SONT DEUX CHOSES ═══
+
+   Ils passaient par la meme constante, et c'etait un piege : `REST_H` vaut
+   `BAR_H - PAD_TOP - PAD`. En augmentant PAD_TOP de 3 px pour descendre la
+   capsule, je lui avais RETIRE 3 px de hauteur sans le vouloir — elle est
+   passee de 52,5 a 49,5 px.
+
+   PAD_TOP reprend donc la valeur de PAD. La capsule retrouve sa hauteur
+   maximale de 52,5 px, et sa marge haute redevient egale a sa marge gauche :
+   5,75 px des quatre cotes, ce qui est la demande.
+
+   Le decalage vertical vit maintenant dans sa propre constante, et ne touche
+   plus a la taille. */
 const PAD_TOP = PAD;
-const Y_SHIFT = (PAD - PAD_TOP) / 2;
+
+/* ═══ 1,5 PX VERS LE BAS, ET POURQUOI ═══
+
+   Mesure sur l'ecran : la capsule affichait 4 px de marge au-dessus contre 7
+   en dessous, alors que le calcul en prevoit 5,75 des deux cotes.
+
+   L'ecart ne vient pas du calcul mais du BORD DE LA BARRE : son filet et son
+   ombre interne ne se posent pas symetriquement, si bien que la moitie de
+   BAR_H ne tombe pas au milieu de ce qu'on VOIT. Aucune mesure du navigateur
+   ne le signale — seul un rendu le montre.
+
+   ⚠ Y_SHIFT EST LU A DEUX ENDROITS : la position de la capsule (ligne ~4220)
+     et le pochoir qui la decoupe dans le calque des icones (~4264). Les deux
+     passent par cette constante — c'est ce qui garde la forme et son masque
+     alignes. Ne jamais corriger l'un des deux a la main. */
+const Y_SHIFT = -1.5;
 
 /* ═══ LE ZOOM DE BUREAU FAUSSE TOUTES LES MESURES ═══
 

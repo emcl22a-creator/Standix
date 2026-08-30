@@ -11183,6 +11183,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   letter-spacing:-0.02em;
 }
 
-/* La rangée s'étire : sans cela, `.topbar-card` garderait la largeur de son
-   contenu et la pastille collerait au nom. */
-.topbar-row{ display:flex; align-items:center; width:100%; }
+/* ⚠ `flex-direction:row` EST INDISPENSABLE ICI. La rangee est declaree en
+   COLONNE huit cents lignes plus haut — un reste de l'epoque ou elle empilait
+   la carte du logo et une piste d'etablissements. Sans cette ligne, le logo et
+   la pastille se retrouvent l'un au-dessus de l'autre : la barre parait
+   cassee, et rien dans le balisage ne l'explique.
+
+   La rangee s'etire aussi : sans `width:100%`, `.topbar-card` garderait la
+   largeur de son contenu et la pastille collerait au nom. */
+.topbar-row{
+  display:flex; flex-direction:row; align-items:center;
+  justify-content:flex-start; width:100%;
+}

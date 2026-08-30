@@ -162,24 +162,22 @@
        libellés se perdraient dedans ; la capsule, elle, peut s'en passer parce
        qu'elle ne couvre jamais que la barre.
 
-       ⚠ LA BARRE EMPLOIE DESORMAIS LE VERRE DE LA CAPSULE, A L'IDENTIQUE.
-         Une seule variable pour les deux : elles ne peuvent plus diverger.
+       ⚠ LA CAPSULE EMPILE DEUX VERRES, PAS UN.
 
-         Le flou a donc disparu, et c'est ce qui change tout. `--verre-lens` ne
-         depolit pas, il SATURE et ECLAIRCIT ce qui passe dessous — c'est une
-         lentille, pas un depoli.
+         C'est ce que j'avais manque. `#lens` est un `.glassDiv` : il porte
+         donc `--verre-bar` sur l'element LUI-MEME, et `--verre-lens` sur son
+         `::after`. Deux couches superposees — le depoli d'abord, la lentille
+         par-dessus.
 
-       ⚠ CE QU'ON PERD : LA LISIBILITE PAR-DESSUS LE CONTENU. Le flou de 14 px
-         brouillait le texte des cartes qui defilent sous la barre. Sans lui,
-         ce texte reste NET derriere les libelles des onglets, et les deux se
-         superposent quand une carte passe dessous.
+         En posant `--verre-bar: var(--verre-lens)`, j'avais fait deux choses a
+         la fois, toutes deux fausses : la barre perdait son flou, et la
+         CAPSULE recevait la lentille DEUX FOIS. Sa saturation doublait sans
+         que personne ne l'ait demande.
 
-         C'est la contrepartie assumee du choix de matiere. Si la barre devient
-         illisible en defilant, la correction est de remettre un flou COURT
-         ici — `blur(6px)` suffit a casser les lettres sans effacer la
-         lentille — et non de rechanger la teinte. */
+         Chaque variable reprend donc son role. La barre recoit la seconde
+         couche autrement — voir `#bar::after`, plus bas. */
+    --verre-bar:blur(14px) saturate(180%);
     --verre-lens:saturate(150%) brightness(1.08);
-    --verre-bar:var(--verre-lens);
 
     /* ═══ LE FILET DE L'ARÊTE ═══
        Déclaré ICI, et lu par les deux pièces de verre : la barre du bas et la
@@ -265,10 +263,40 @@
     -webkit-backdrop-filter:var(--verre-bar);
   }
   #lens{--lens-filter:var(--verre-lens)}
+  /* ⚠ SEULE LA CAPSULE PORTE CE SECOND VERRE. J'avais etendu le selecteur a
+     `#bar::after`, ce qui donnait a la barre un bord refringent : une bordure
+     en relief, alors que la profondeur ne doit exister que sur les cartes de
+     dossier et de procedure. La barre est une piece de verre PLATE. */
   #lens::after{
     backdrop-filter:var(--lens-filter);
     -webkit-backdrop-filter:var(--lens-filter);
   }
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE ZOOM DU FOND SUR LES BORDS — POURQUOI IL N'EST PAS LA
+
+     Un vrai bord de lentille GROSSIT ce qui passe derriere lui. C'est ce que
+     fait le liquid-glass d'Apple, et ce que ce depot obtenait avec un filtre
+     SVG `feDisplacementMap` appele en `backdrop-filter:url(#bar-filter)`.
+
+     WebKit — donc TOUT navigateur sur iPhone, Chrome compris — n'accepte dans
+     un `backdrop-filter` que les fonctions courtes : blur, saturate,
+     brightness, contrast. Un `url()` y est ignore EN SILENCE.
+
+     ⚠ ET `transform:scale` NE LE REMPLACE PAS. Je l'ai teste avant de
+       l'ecrire : un element avec `backdrop-filter` et `scale(1.6)` rend un
+       fond dont les motifs mesurent exactement la meme chose qu'a cote —
+       20 px dans les deux cas, mesure sur un fond raye. La transformation
+       deplace l'element, elle ne grossit pas ce qu'il capture.
+
+     Il n'y a donc pas de zoom possible aujourd'hui sur iPhone sans dupliquer
+     le contenu de la page dans un calque agrandi et masque — beaucoup de code
+     et un second rendu de toute la page a chaque image de defilement.
+
+     Le jour ou WebKit acceptera `url()`, tout est deja pret : remettre
+     `url(#bar-filter)` dans `--verre-bar` et `VERRE_SVG` a true dans le
+     script. Rien d'autre n'aura bouge.
+     ═══════════════════════════════════════════════════════════════════════ */
 
   /* ---- La barre ---- */
   /* ---- Barre adaptative, mesuree sur Amazon Prime ----

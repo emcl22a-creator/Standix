@@ -6062,6 +6062,10 @@ let allCategoriesData = []
      `node --check` ne voit rien : la syntaxe est correcte, c'est l'ORDRE
      D'EXECUTION qui ne l'est pas. Seul un chargement reel le montre. */
 let rechercheDossiers = ''
+
+/* Le segment choisi : 'tout', 'ligne' ou 'brouillon'. Meme raison que
+   ci-dessus pour la position de cette declaration. */
+let filtreEtatDossiers = 'tout'
 let currentCatSort = 'az'
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7321,21 +7325,57 @@ function playCardShuffle(containerEl, oldRects) {
      modulo. Sur seize dossiers : six teintes sur huit employées, aucune plus
      de quatre fois.
 
-   ⚠ L'ORDRE DE `PALETTE_DOSSIERS` EST CELUI DES DÉGRADÉS `pal0` À `pal7`
+   ⚠ L'ORDRE DE `PALETTE_DOSSIERS` EST CELUI DES DÉGRADÉS `pal0` À `pal4`
      déclarés dans index.html. Insérer une couleur au milieu changerait la
      teinte de tous les dossiers d'un coup. Ajouter, c'est à la fin — et il
-     faut alors le dégradé correspondant dans le balisage.
+     faut alors le dégradé correspondant dans le balisage, sans quoi l'icône
+     n'aurait aucune couleur et rien ne le signalerait.
+
+   ⚠ CINQ FAMILLES, PAS HUIT. Violet, bleu, vert, ambre et gris.
+
+     Huit teintes sur une palette de repérage, c'était trop : trois d'entre
+     elles étaient des bleus, deux partaient du même sombre, et deux dossiers
+     voisins pouvaient recevoir des couleurs qu'on ne distinguait pas. Cinq
+     familles bien séparées se reconnaissent mieux que huit qui se ressemblent.
+
+     Le gris est là pour une raison : c'est la seule teinte NEUTRE de la
+     série. Sur une page où tout est coloré, il donne un point de repos — et
+     il évite qu'une couleur vive doive être attribuée à un dossier qui n'a
+     rien de particulier à signaler.
+
+   ⚠ `fond` A DISPARU DE LA TABLE. Le fond de la plaque est calculé depuis
+     `trait` par `fondPlaque` : une seule source, et les deux ne peuvent plus
+     diverger. Les huit pastels d'avant n'étaient plus lus.
    ═══════════════════════════════════════════════════════════════════════════ */
 const PALETTE_DOSSIERS = [
-  { i:0, trait:['#7C5CE0','#5B3FC4'], fond:['#EFEAFD','#E4DCFB'] },
-  { i:1, trait:['#3B8AF0','#1B5FCE'], fond:['#E8F1FE','#DBE9FD'] },
-  { i:2, trait:['#2CA85B','#178943'], fond:['#E5F7EC','#D7F1E1'] },
-  { i:3, trait:['#F0930B','#D2610A'], fond:['#FEF2E0','#FDE9CD'] },
-  { i:4, trait:['#EC5C86','#CE3665'], fond:['#FDEBF0','#FBDFE7'] },
-  { i:5, trait:['#1EA0BD','#0E7C97'], fond:['#E3F5F9','#D2EDF4'] },
-  { i:6, trait:['#5C63D8','#3B42B8'], fond:['#EBECFC','#DFE1FA'] },
-  { i:7, trait:['#DE6A45','#B94824'], fond:['#FCEDE8','#FAE0D7'] },
+  { i:0, trait:['#4C1D95','#A78BFA'] },   /* violet */
+  { i:1, trait:['#0C4A9E','#6BB6FF'] },   /* bleu   */
+  { i:2, trait:['#14532D','#5FDDA0'] },   /* vert   */
+  { i:3, trait:['#7C2D12','#FBBF5C'] },   /* ambre  */
+  { i:4, trait:['#3A4453','#A5B0C0'] },   /* gris   */
 ]
+
+/* ═══ LE FOND DE LA PLAQUE, TIRE DE SON TRAIT ═══
+
+   Plutot que huit pastels choisis a la main, on derive le fond de la couleur
+   du dessin : la meme teinte, en transparence. Une seule valeur a regler, et
+   les deux ne peuvent plus diverger.
+
+   ⚠ C'EST DU `rgba`, PAS UN PASTEL EQUIVALENT. La transparence laisse passer
+     la carte qui est dessous — donc le degrade blanc-vers-gris de la carte
+     traverse la plaque, et celle-ci s'y fond au lieu d'y etre posee. Un aplat
+     opaque de meme couleur perdrait cet accord.
+
+   Le degrade suit celui de l'icone : le clair en haut a gauche, le sombre en
+   bas a droite. Les opacites different — 0,22 pour le clair, 0,14 pour le
+   sombre — parce qu'une teinte foncee couvre davantage a opacite egale. */
+function fondPlaque(t) {
+  const rgba = (hex, a) => {
+    const n = parseInt(hex.slice(1), 16)
+    return `rgba(${n >> 16 & 255},${n >> 8 & 255},${n & 255},${a})`
+  }
+  return `linear-gradient(150deg,${rgba(t.trait[1], 0.22)},${rgba(t.trait[0], 0.14)})`
+}
 
 function couleurDossier(nom) {
   let s = 0x811c9dc5
@@ -7391,21 +7431,40 @@ function renderCategoryGrid() {
   const sansAccent = (s) => (s || '').normalize('NFD')
     .replace(/[\u0300-\u036f]/g, '').toLowerCase()
   const q = sansAccent(rechercheDossiers)
-  const visibles = q
+  let visibles = q
     ? sorted.filter(c =>
         sansAccent(c.nom).includes(q) ||
         (c.procsInCat || []).some(p => sansAccent(p.titre).includes(q)))
     : sorted
 
-  if (q && !visibles.length) {
-    catGridEl.innerHTML =
-      '<div class="cl-rien">Aucun dossier ne correspond à « ' +
-      escapeHtml(rechercheDossiers) + ' ».</div>'
+  /* ⚠ LE FILTRE PORTE SUR LE CONTENU, PAS SUR LE DOSSIER. Un dossier n'a pas
+     d'etat : ce sont ses procedures qui en ont un. « En ligne » garde donc
+     les dossiers qui contiennent au moins une procedure publiee, et un meme
+     dossier peut apparaitre dans les deux listes. */
+  if (filtreEtatDossiers === 'ligne') {
+    visibles = visibles.filter(c => (c.procsInCat || []).some(p => p.publiee_le))
+  } else if (filtreEtatDossiers === 'brouillon') {
+    visibles = visibles.filter(c => (c.procsInCat || []).some(p => !p.publiee_le))
+  }
+
+  if (!visibles.length && (q || filtreEtatDossiers !== 'tout')) {
+    /* Le message dit LEQUEL des deux filtres a tout retire : sans cela, on
+       cherche pourquoi la liste est vide alors qu'un segment est actif deux
+       lignes plus haut. */
+    catGridEl.innerHTML = '<div class="cl-rien">' + (q
+      ? 'Aucun dossier ne correspond à « ' + escapeHtml(rechercheDossiers) + ' ».'
+      : filtreEtatDossiers === 'ligne'
+        ? 'Aucune procédure n’est en ligne pour le moment.'
+        : 'Aucun brouillon en attente.') + '</div>'
     return
   }
 
   const triParDate = currentCatSort === 'new' || currentCatSort === 'old'
   visibles.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
+    /* ⚠ `recentTitles` N'EST PLUS AFFICHE DANS LA LISTE. L'apercu des trois
+       titres a ete retire de la carte : on ouvre le dossier pour voir ce qu'il
+       contient. La variable reste car la vue en grille de l'espace equipe la
+       lit encore — la retirer casserait cet autre ecran sans le signaler. */
     const recentTitles = procsInCat.slice(0, 3)
 
     const cell = document.createElement('div')
@@ -7421,30 +7480,59 @@ function renderCategoryGrid() {
     const teinte = couleurDossier(nom)
     const brouillons = procsInCat.filter(p => !p.publiee_le).length
 
+    const enLigne = procsInCat.length - brouillons
+
     cell.innerHTML = `
-      <span class="cl-pl" style="background:linear-gradient(150deg,${teinte.fond[0]},${teinte.fond[1]})">
+      <span class="cl-pl" style="background:${fondPlaque(teinte)}">
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
                 stroke="url(#pal${teinte.i})" stroke-width="1.9" stroke-linejoin="round"/>
         </svg>
       </span>
       <span class="cl-co">
-        <span class="cl-nm">${escapeHtml(nom)}</span>
-        <span class="cl-st">${recentTitles.map(p => escapeHtml(p.titre)).join(' · ') || 'Aucune procédure'}</span>
-        <span class="cl-bas">
-          ${brouillons
-            ? `<span class="proc-brouillon">${brouillons} brouillon${brouillons > 1 ? 's' : ''}</span>`
-            : `<span class="cl-badge"><i style="background:${teinte.trait[0]}"></i>Tout en ligne</span>`}
+        <span class="cl-tete">
+          <span class="cl-nm">${escapeHtml(nom)}</span>
+          <button type="button" class="cl-plus" data-menu="${escapeHtml(nom)}"
+                  aria-label="Options du dossier ${escapeHtml(nom)}">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/>
+            </svg>
+          </button>
         </span>
-      </span>
-      <span class="cl-dr">
-        <span class="cl-n">${procsInCat.length}</span>
-        <span class="fl">›</span>
+        <span class="cl-bas">
+          ${/* ⚠ UN SEUL BADGE, ET LA MEME FORME POUR LES DEUX ETATS. J'en
+                affichais trois avec le compte : a 390 px de large, « 3 en
+                ligne » et « 1 brouillon » se cassaient chacun en deux lignes
+                et la carte grandissait.
+
+                On montre donc l'etat qui APPELLE UNE ACTION : s'il reste des
+                brouillons, c'est eux qu'on signale ; sinon tout est en ligne.
+
+                La pilule est identique dans les deux cas — seul le POINT
+                change de couleur. Vert quand c'est publie, gris quand il reste
+                du travail. */
+            brouillons
+              ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${
+                  brouillons} brouillon${brouillons > 1 ? 's' : ''}</span>`
+              : enLigne
+                ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
+                : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Aucune en ligne</span>`}
+          <span class="cl-n">${procsInCat.length} procédure${procsInCat.length > 1 ? 's' : ''}</span>
+        </span>
       </span>
     `
     /* Sur la carte d'une dossier, un titre en panne mène directement à la
        reprise : sinon il faudrait ouvrir la dossier pour s'en apercevoir. */
     cell.onclick = (e) => {
+      /* ⚠ LE BOUTON D'OPTIONS NE DOIT PAS OUVRIR LE DOSSIER. Il est DANS la
+         carte, et la carte entiere est cliquable : sans cette sortie, toucher
+         les trois points renommerait ET naviguerait en meme temps. */
+      const opts = e.target.closest('.cl-plus')
+      if (opts) {
+        e.stopPropagation()
+        renommerDossierDepuisListe(opts.dataset.menu)
+        return
+      }
       /* ═══ TOUTE LA CARTE OUVRE LE DOSSIER ═══
 
          J'avais fait l'inverse ce matin : toucher un nom ouvrait la procédure.
@@ -7578,6 +7666,19 @@ champRech?.addEventListener('input', () => {
   renderCategoryGrid()
 })
 
+/* ⚠ UN SEUL ECOUTEUR SUR LE CONTENEUR, pas trois sur les boutons. Le segment
+   est fixe dans le balisage, mais poser un ecouteur par bouton oblige a les
+   reposer si l'on en ajoute un — et l'on oublie. Ici, un bouton de plus dans
+   le HTML fonctionne sans toucher au script. */
+document.getElementById('proc-segm')?.addEventListener('click', (e) => {
+  const b = e.target.closest('.p-seg')
+  if (!b || b.classList.contains('on')) return
+  b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
+  b.classList.add('on')
+  filtreEtatDossiers = b.dataset.etat
+  renderCategoryGrid()
+})
+
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */
 wireSortDropdown('dd-e-cat-sort', (sort) => { equipeCatSort = sort; renderEquipeCategories() })
@@ -7647,11 +7748,18 @@ function openCategoryProcedures(nom) {
    le seul moyen de les regrouper. On prévient donc au lieu d'interdire.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-document.getElementById('cat-renommer')?.addEventListener('click', async () => {
-  /* Le nom courant se lit dans le titre : c'est la seule source de vérité, la
-     page ne le garde nulle part ailleurs. */
-  const ancien = (document.getElementById('category-titre')?.textContent || '').trim()
-  if (!ancien || toutesProcedures) return
+/* ═══════════════════════════════════════════════════════════════════════════
+   RENOMMER UN DOSSIER, DEPUIS DEUX ENDROITS
+
+   Le bouton de l'en-tete du dossier ouvert, et les trois points de la liste.
+   Une seule fonction pour les deux : le nom arrive en parametre au lieu d'etre
+   lu dans le titre de la page.
+
+   ⚠ ELLE NE REMONTE PLUS DANS LE DOSSIER QUAND ON VIENT DE LA LISTE. Appeler
+     `ouvrirCategorie` a la fin renverrait l'utilisateur dans un ecran qu'il
+     n'avait pas ouvert. On ne navigue que si l'on y etait deja. */
+async function renommerDossier(ancien, { depuisListe = false } = {}) {
+  if (!ancien || (!depuisListe && toutesProcedures)) return
 
   const nouveau = await demanderTexte({
     titre: 'Renommer la cat\u00e9gorie',
@@ -7684,13 +7792,27 @@ document.getElementById('cat-renommer')?.addEventListener('click', async () => {
   if (error) { toast('\u00c9chec : ' + error.message); return }
   if (!data || !data.length) { toast('La base a refus\u00e9 la modification.'); return }
 
-  document.getElementById('category-titre').textContent = nouveau
   /* On recharge : les regroupements par dossier sont construits au chargement,
      et c'est le seul endroit qui les construit. */
   await loadGestionProcedures()
-  ouvrirCategorie(nouveau)
+  if (depuisListe) {
+    renderCategoryGrid()
+  } else {
+    document.getElementById('category-titre').textContent = nouveau
+    ouvrirCategorie(nouveau)
+  }
   toast(`${data.length} proc\u00e9dure${data.length > 1 ? 's' : ''} reclass\u00e9e${data.length > 1 ? 's' : ''}.`)
+}
+
+/* Les deux points d'entree. */
+document.getElementById('cat-renommer')?.addEventListener('click', () => {
+  /* Le nom courant se lit dans le titre : c'est la seule source de verite, la
+     page ne le garde nulle part ailleurs. */
+  renommerDossier((document.getElementById('category-titre')?.textContent || '').trim())
 })
+function renommerDossierDepuisListe(nom) {
+  renommerDossier(nom, { depuisListe: true })
+}
 
 function ouvrirCategorie(nom) {
   toutesProcedures = (nom == null)

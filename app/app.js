@@ -6046,6 +6046,22 @@ let cachedEtapesByProc = {}
 let preloadEtapes = null   // promesse du chargement différé des étapes
 
 let allCategoriesData = []
+
+/* ═══ LE TEXTE CHERCHE DANS LA PAGE PROCEDURES ═══
+
+   ⚠ ELLE DOIT ETRE DECLAREE ICI, ET PAS PRES DE SON ECOUTEUR.
+
+     Je l'avais posee a cote du champ de recherche, huit cents lignes plus bas.
+     Or `renderCategoryGrid` la lit, et cette fonction est appelee des le
+     premier rendu depuis la copie locale — donc AVANT cette ligne-la.
+
+     Une variable `let` n'est pas seulement « pas encore definie » avant sa
+     declaration : elle est dans une ZONE MORTE, et y toucher leve une
+     ReferenceError. La page des procedures ne s'affichait plus du tout.
+
+     `node --check` ne voit rien : la syntaxe est correcte, c'est l'ORDRE
+     D'EXECUTION qui ne l'est pas. Seul un chargement reel le montre. */
+let rechercheDossiers = ''
 let currentCatSort = 'az'
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7554,10 +7570,8 @@ document.addEventListener('click', (e) => {
    titres qu'ils contiennent : taper « friteuse » trouve le dossier Cuisine
    meme si le mot n'est pas dans son nom. C'est ce qu'on attend d'une
    recherche — trouver la chose, pas son rangement. */
-/* ⚠ DECLAREE AVANT L'ECOUTEUR. `let` a une zone morte : y ecrire depuis un
-   gestionnaire pose plus haut lancerait une erreur au premier caractere
-   tape. */
-let rechercheDossiers = ''
+/* La variable est declaree bien plus haut, avec les autres etats de la grille.
+   Voir l'avertissement qui l'accompagne : la placer ici cassait la page. */
 const champRech = document.getElementById('proc-rech-champ')
 champRech?.addEventListener('input', () => {
   rechercheDossiers = champRech.value.trim().toLowerCase()

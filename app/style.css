@@ -6584,9 +6584,14 @@ body.plus-part .socle{
   width:var(--plus-larg); height:var(--plus-h); border:none;
   border-radius:calc(var(--plus-h) / 2);
   display:grid; place-items:center;
-  background:linear-gradient(135deg, #EB5201 0%, #FA8A08 62%, #FD9F12 100%);
-  color:#2A1400;
-  box-shadow:0 6px 16px rgba(0,0,0,0.34), 0 2px 10px rgba(255,122,24,0.16);
+  /* ⚠ C'EST CETTE REGLE-CI QUI PEINT LE BOUTON VISIBLE. J'avais noirci
+     `.socle`, `.bulle` et le rond de la barre en croyant avoir tout fait :
+     `.plus-flot` est la piece qu'on VOIT au repos, et elle etait restee
+     ambre. Les quatre doivent aller ensemble, sinon la couleur change au
+     milieu de l'animation. */
+  background:#111116;
+  color:#FFFFFF;
+  box-shadow:0 6px 16px rgba(17,17,22,0.30), 0 2px 10px rgba(17,17,22,0.14);
   transform:translate(-50%, var(--plus-repos)) scale(0.88);
   opacity:0; pointer-events:none;
   /* L'opacité monte presque d'un coup à l'aller — le rectangle doit être solide
@@ -6849,8 +6854,11 @@ body.plus-vu .plus-flot{
 /* ⚠ 28 PX, ET L'APPROCHE SUIT. Un titre plus grand a besoin de lettres plus
    serrees : a -0,03 em, « Procedures » a 28 px paraissait etale. -0,038 le
    ramene a la densite qu'il avait a 24. */
+/* ⚠ 32 PX, ET L'APPROCHE SUIT ENCORE. Chaque fois qu'un titre grandit, ses
+   lettres doivent se resserrer : a taille egale d'espacement, un grand corps
+   parait etale. -0,045 em a 32, contre -0,038 a 28. */
 .page-tete h1{
-  font-size:28px; font-weight:700; letter-spacing:-0.038em; line-height:1.08;
+  font-size:32px; font-weight:700; letter-spacing:-0.045em; line-height:1.06;
 }
 /* L'ÉCART SOUS LE TITRE, POSÉ AU MÊME ENDROIT POUR LES DEUX PAGES.
 
@@ -10821,7 +10829,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ `.cat-grid` PASSE EN COLONNE. Elle était déclarée en grille deux colonnes
    plus haut dans ce fichier ; cette règle-ci vient après, donc elle gagne.
    Ne pas retirer celle du haut — d'autres écrans l'emploient encore. */
-#cat-grid.cat-grid{ display:flex; flex-direction:column; gap:10px; }
+#cat-grid.cat-grid{ display:flex; flex-direction:column; gap:12px; }
 
 /* ⚠ LE SÉLECTEUR PORTE L'IDENTIFIANT, ET IL LE FAUT.
 
@@ -10834,11 +10842,13 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    gauche, le compte rejeté en bas, et l'aperçu qui débordait faute de largeur
    contrainte. Rien dans la console, aucune erreur — juste une mise en page qui
    ne ressemblait pas au code. */
+/* ⚠ TOUT GRANDIT ENSEMBLE. Augmenter le seul remplissage aurait donne une
+   carte plus haute au contenu inchange — donc du vide, pas de l'espace. Le
+   remplissage passe de 14 a 18, l'ecart entre plaque et texte de 13 a 15, et
+   le rayon de 20 a 24 pour rester proportionne. */
 #cat-grid .cat-cell--ligne{
-  display:flex; flex-direction:row; align-items:flex-start; gap:13px;
-  /* 20 px : la carte s'accorde aux capsules du dessus sans devenir une pilule
-     elle-meme. Au-dela, un bloc de cette hauteur commence a flotter. */
-  padding:14px; border-radius:20px;
+  display:flex; flex-direction:row; align-items:flex-start; gap:15px;
+  padding:18px 18px 17px; border-radius:24px;
 }
 /* La plaque teintée. Le reflet du haut lui donne l'épaisseur d'une pastille
    plutôt que l'aspect d'un carré de couleur. */
@@ -10863,14 +10873,14 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      transparent, un liseré sombre en faisait le tour et cerclait la pastille ;
      le reflet seul suffit a la poser sur la carte. */
 .cl-pl{
-  flex:0 0 52px; width:52px; height:52px; border-radius:15px;
+  flex:0 0 56px; width:56px; height:56px; border-radius:17px;
   display:grid; place-items:center;
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
-.cl-pl svg{ width:28px; height:28px; display:block; }
+.cl-pl svg{ width:30px; height:30px; display:block; }
 .cl-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
 .cl-nm{
-  font-size:16.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
+  font-size:17.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
   color:var(--label); min-width:0;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
@@ -10941,8 +10951,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 
 /* ─── LA RECHERCHE ───────────────────────────────────────────────────────── */
+/* La rangee : la recherche prend la place restante, le bouton garde la sienne. */
+.proc-rech-rang{ display:flex; align-items:center; gap:10px; margin:0 0 16px; }
+
+/* ⚠ `min-width:0` SUR LA RECHERCHE. Sans lui, un champ de saisie refuse de
+   descendre sous sa largeur naturelle et pousse le bouton hors de l'ecran —
+   c'est le defaut classique d'un `input` dans une boite flexible. */
 .proc-rech{
-  display:flex; align-items:center; gap:10px; margin:0 0 16px;
+  flex:1; min-width:0;
+  display:flex; align-items:center; gap:10px;
   /* Arrondi complet : la barre de recherche devient une capsule, comme le
      segment juste dessous. Deux formes differentes pour deux controles voisins
      donnaient une pile de rectangles a coins tous differents. */
@@ -10984,4 +11001,30 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 .p-seg.on{
   background:#FFFFFF; color:var(--label); font-weight:600;
   box-shadow:0 1px 3px rgba(20,20,30,0.10), 0 0 0 0.5px rgba(20,20,30,0.04);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BOUTON DE FILTRES
+
+   Même hauteur que la recherche, même fond : les deux se lisent comme un seul
+   bloc de commandes. Seule la forme change — un carré arrondi plutôt qu'une
+   capsule, pour qu'on voie deux contrôles et non un champ avec une décoration.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ SANS FOND. Il se lisait comme un second champ a cote de la recherche ;
+   sans sa plaque grise, il redevient ce qu'il est — une commande, posee dans
+   la marge. La zone de touche garde ses 42 px : c'est le DESSIN qui perd son
+   fond, pas le bouton sa surface sensible. */
+.proc-filtre{
+  flex:0 0 42px; width:42px; height:42px; border-radius:14px;
+  display:grid; place-items:center; border:none; padding:0;
+  background:none;
+  color:var(--label-2);
+}
+.proc-filtre svg{ width:22px; height:22px; display:block; }
+.proc-filtre:active{ background:rgba(118,118,128,0.14); }
+/* Quand un filtre est actif, le bouton se remplit : c'est le seul moyen de
+   savoir qu'une liste est restreinte sans ouvrir la feuille. */
+.proc-filtre.actif{
+  background:#111116; color:#FFFFFF;
 }

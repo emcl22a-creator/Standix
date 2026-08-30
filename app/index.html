@@ -859,11 +859,13 @@
               <img class="boot-fill" alt="" width="113" height="160" data-logo>
             </div>
           </div>
-          <div class="topbar-title">
-            <span class="name">Standix</span>
-            <span class="role">Espace Gestion</span>
-          </div>
+          <span class="name">Standix</span>
         </div>
+        <!-- ⚠ LE ROLE SORT DE `.topbar-title`, qui disparait. Il etait empile
+             sous le nom ; il est maintenant une pastille a l'autre bout de la
+             ligne. Reste dans le meme bloc pour que le JS qui ecrit son texte
+             continue de le trouver par sa classe. -->
+        <span class="role">Espace Gestion</span>
       </div>
     </div>
   </div>
@@ -2851,11 +2853,9 @@
             <img class="boot-fill" alt="" width="113" height="160" data-logo>
           </div>
         </div>
-        <div class="topbar-title">
-          <span class="name">Standix</span>
-          <span class="role">Espace Équipe</span>
-        </div>
+        <span class="name">Standix</span>
       </div>
+      <span class="role">Espace Équipe</span>
       </div>
       <!-- L'engrenage a été retiré : les Réglages ont leur onglet dans la
            barre du bas. Deux chemins vers la même page, dont un qui chevauchait

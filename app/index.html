@@ -3915,21 +3915,29 @@ const PAD = 4.5;       // LA marge, identique sur les quatre cotes
    plus a la taille. */
 const PAD_TOP = PAD;
 
-/* ═══ 1,5 PX VERS LE BAS, ET POURQUOI ═══
+/* ═══ 1,7 PX VERS LE BAS — MESURE, PAS ESTIME ═══
 
-   Mesure sur l'ecran : la capsule affichait 4 px de marge au-dessus contre 7
-   en dessous, alors que le calcul en prevoit 5,75 des deux cotes.
+   Le calcul place la capsule au milieu : `top:50%` sur la barre et
+   `marginTop = -h/2`. A l'ecran, elle ne l'est pas.
 
-   L'ecart ne vient pas du calcul mais du BORD DE LA BARRE : son filet et son
-   ombre interne ne se posent pas symetriquement, si bien que la moitie de
-   BAR_H ne tombe pas au milieu de ce qu'on VOIT. Aucune mesure du navigateur
-   ne le signale — seul un rendu le montre.
+   Mesure sur capture, avec une echelle etablie plutot que supposee : la
+   capsule mesure 49 px pour une hauteur calculee de 55, ce qui donne un
+   facteur de 0,891 — verifie sur la barre, qui devrait alors mesurer 57 px et
+   en mesure 58. L'echelle tient.
+
+   A cette echelle : 3,37 px de marge au-dessus, 6,73 en dessous. La capsule
+   est 1,68 px trop haute.
+
+   D'ou vient l'ecart : `top:50%` se calcule sur la BOITE DE CONTENU de la
+   barre, tandis que `BAR_H` vient de `getBoundingClientRect`, qui mesure la
+   boite de BORDURE. Quand les deux different — et le filet de la barre les
+   fait differer — la moitie de l'une ne tombe pas au milieu de l'autre.
 
    ⚠ Y_SHIFT EST LU A DEUX ENDROITS : la position de la capsule (ligne ~4220)
      et le pochoir qui la decoupe dans le calque des icones (~4264). Les deux
      passent par cette constante — c'est ce qui garde la forme et son masque
      alignes. Ne jamais corriger l'un des deux a la main. */
-const Y_SHIFT = -1.5;
+const Y_SHIFT = -1.7;
 
 /* ═══ LE ZOOM DE BUREAU FAUSSE TOUTES LES MESURES ═══
 

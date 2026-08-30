@@ -6204,10 +6204,8 @@ async function loadGestionProcedures() {
   if (procedures.length === 0) {
     renderAccueil()
       ecrireSous(`0 dossier · 0 procédure · accès complet`)
-    /* Le compte de la page reste sinon sur son tiret : ce chemin court-circuite
-       `renderCategoryGrid`, qui est le seul endroit qui l'écrit. */
-    const cpt0 = document.getElementById('proc-compte')
-    if (cpt0) cpt0.textContent = '0 dossier · 0 procédure'
+    /* Meme raison qu'au-dessus : le sous-titre est fixe, ce chemin n'a plus
+       rien a y ecrire. */
     /* Plus rien à mesurer : le CSS déduit la hauteur du bloc dès la première
        image. L'appel qui était ici pointait vers une fonction supprimée — il
        aurait cassé la page à chaque ouverture. */
@@ -7306,52 +7304,34 @@ function playCardShuffle(containerEl, oldRects) {
 /* ═══════════════════════════════════════════════════════════════════════════
    LA COULEUR D'UN DOSSIER
 
-   Elle sert à RECONNAÎTRE, pas à décorer. À douze dossiers, un gérant ne lit
-   plus les noms : il repère une forme et une teinte.
+   Cinq teintes qui se suivent TOUJOURS dans le même ordre : violet, bleu,
+   ambre, vert, gris, puis on recommence. Le premier dossier de la liste est
+   violet, le sixième aussi.
 
-   ⚠ ELLE EST TIRÉE DU NOM, PAS D'UN COMPTEUR. Avec un index de boucle,
-     ajouter un dossier en tête décalerait toutes les couleurs et le repère
-     serait perdu du jour au lendemain. Le nom, lui, ne bouge pas — et cela ne
-     demande aucune colonne en base.
+   ⚠ ELLE DÉPEND DU RANG, PLUS DU NOM. C'est un choix, et il a une
+     conséquence à connaître : ajouter un dossier qui se classe en tête décale
+     toutes les couleurs d'un cran. « Cuisine » n'a donc pas SA couleur — elle
+     a celle de sa place.
 
-   ⚠ LE MÉLANGE DES BITS N'EST PAS DU LUXE. Avec le hachage classique
-     `s * 31 + code`, mesuré sur dix dossiers réels : CINQ tombaient sur la
-     même couleur et trois teintes n'étaient jamais tirées. La raison est
-     arithmétique — 31 vaut 7 modulo 8, et la palette a huit entrées ; avec un
-     modulo qui est une puissance de deux, seuls les bits BAS comptent, or ce
-     sont ceux que `× 31` fait le moins bouger.
-
-     FNV-1a puis une avalanche ramènent les bits hauts vers les bas avant le
-     modulo. Sur seize dossiers : six teintes sur huit employées, aucune plus
-     de quatre fois.
+     Une version précédente tirait la teinte du nom par hachage, ce qui la
+     rendait stable pour toujours mais donnait un ordre imprévisible. Les deux
+     ne peuvent pas coexister : ou la couleur suit la liste, ou elle suit le
+     dossier.
 
    ⚠ L'ORDRE DE `PALETTE_DOSSIERS` EST CELUI DES DÉGRADÉS `pal0` À `pal4`
-     déclarés dans index.html. Insérer une couleur au milieu changerait la
-     teinte de tous les dossiers d'un coup. Ajouter, c'est à la fin — et il
-     faut alors le dégradé correspondant dans le balisage, sans quoi l'icône
-     n'aurait aucune couleur et rien ne le signalerait.
+     déclarés dans index.html, et c'est aussi l'ordre d'apparition à l'écran.
+     Les deux listes vivent dans des fichiers séparés : si elles divergent, une
+     icône prend simplement la mauvaise couleur, sans erreur.
 
-   ⚠ CINQ FAMILLES, PAS HUIT. Violet, bleu, vert, ambre et gris.
-
-     Huit teintes sur une palette de repérage, c'était trop : trois d'entre
-     elles étaient des bleus, deux partaient du même sombre, et deux dossiers
-     voisins pouvaient recevoir des couleurs qu'on ne distinguait pas. Cinq
-     familles bien séparées se reconnaissent mieux que huit qui se ressemblent.
-
-     Le gris est là pour une raison : c'est la seule teinte NEUTRE de la
-     série. Sur une page où tout est coloré, il donne un point de repos — et
-     il évite qu'une couleur vive doive être attribuée à un dossier qui n'a
-     rien de particulier à signaler.
-
-   ⚠ `fond` A DISPARU DE LA TABLE. Le fond de la plaque est calculé depuis
+   ⚠ `fond` N'EST PAS DANS LA TABLE. Le fond de la plaque est calculé depuis
      `trait` par `fondPlaque` : une seule source, et les deux ne peuvent plus
-     diverger. Les huit pastels d'avant n'étaient plus lus.
+     diverger.
    ═══════════════════════════════════════════════════════════════════════════ */
 const PALETTE_DOSSIERS = [
   { i:0, trait:['#4C1D95','#A78BFA'] },   /* violet */
   { i:1, trait:['#0C4A9E','#6BB6FF'] },   /* bleu   */
-  { i:2, trait:['#14532D','#5FDDA0'] },   /* vert   */
-  { i:3, trait:['#7C2D12','#FBBF5C'] },   /* ambre  */
+  { i:2, trait:['#7C2D12','#FBBF5C'] },   /* ambre  */
+  { i:3, trait:['#14532D','#5FDDA0'] },   /* vert   */
   { i:4, trait:['#3A4453','#A5B0C0'] },   /* gris   */
 ]
 
@@ -7377,16 +7357,8 @@ function fondPlaque(t) {
   return `linear-gradient(150deg,${rgba(t.trait[1], 0.22)},${rgba(t.trait[0], 0.14)})`
 }
 
-function couleurDossier(nom) {
-  let s = 0x811c9dc5
-  for (let i = 0; i < nom.length; i++) {
-    s = (s ^ nom.charCodeAt(i)) >>> 0
-    s = Math.imul(s, 0x01000193) >>> 0
-  }
-  s = (s ^ (s >>> 16)) >>> 0
-  s = Math.imul(s, 0x7feb352d) >>> 0
-  s = (s ^ (s >>> 15)) >>> 0
-  return PALETTE_DOSSIERS[s % PALETTE_DOSSIERS.length]
+function couleurDossier(rang) {
+  return PALETTE_DOSSIERS[rang % PALETTE_DOSSIERS.length]
 }
 
 function renderCategoryGrid() {
@@ -7394,18 +7366,13 @@ function renderCategoryGrid() {
   const oldRects = captureCardPositions(catGridEl)
   catGridEl.innerHTML = ''
 
-  /* Le compte de la page. On l'écrit ici plutôt qu'ailleurs : c'est la fonction
-     qui connaît déjà les deux nombres, et les tenir à jour depuis deux endroits
-     est le meilleur moyen qu'ils finissent par diverger. */
-  const compte = document.getElementById('proc-compte')
-  if (compte) {
-    const nbP = (allGestionProcedures || []).length
-    const nbC = new Set((allGestionProcedures || [])
-      .map(p => (p.categorie || '').trim()).filter(Boolean)).size
-    compte.textContent = nbP
-      ? `${nbP} procédure${nbP > 1 ? 's' : ''} \u00b7 ${nbC} dossier${nbC > 1 ? 's' : ''}`
-      : 'Aucune procédure pour le moment'
-  }
+  /* ⚠ LE SOUS-TITRE N'EST PLUS ECRIT ICI. Il est fixe dans index.html — « Gerez
+     et suivez toutes les procedures de votre organisation. » — et le compte
+     vit desormais sur chaque carte.
+
+     La ligne qui l'ecrivait a ete retiree, pas commentee : laissee en place,
+     elle aurait remplace le texte des la premiere image, et l'on aurait
+     cherche longtemps pourquoi le HTML « ne prenait pas ». */
 
   // Départage systématique par ordre alphabétique : sans ça, deux dossiers
   // dont les procédures ont été créées à la même seconde restaient dans
@@ -7460,7 +7427,7 @@ function renderCategoryGrid() {
   }
 
   const triParDate = currentCatSort === 'new' || currentCatSort === 'old'
-  visibles.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }) => {
+  visibles.forEach(({ nom, icone, procsInCat, avgPct, latestDate, earliestDate }, rang) => {
     /* ⚠ `recentTitles` N'EST PLUS AFFICHE DANS LA LISTE. L'apercu des trois
        titres a ete retire de la carte : on ouvre le dossier pour voir ce qu'il
        contient. La variable reste car la vue en grille de l'espace equipe la
@@ -7477,7 +7444,7 @@ function renderCategoryGrid() {
     cell.dataset.key = nom
 
     /* La couleur du dossier, tiree de son nom. Voir `couleurDossier`. */
-    const teinte = couleurDossier(nom)
+    const teinte = couleurDossier(rang)
     const brouillons = procsInCat.filter(p => !p.publiee_le).length
 
     const enLigne = procsInCat.length - brouillons

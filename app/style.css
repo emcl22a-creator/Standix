@@ -10595,3 +10595,76 @@ body:has(#e-detail.active) #equipe-app{
 .ai-combien-t tr:last-child td{ border-bottom:none; }
 
 .ai-combien-n{ color:var(--label-3) !important; font-size:11.5px !important; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VERRE DES DOSSIERS, SOUS-DOSSIERS ET PROCÉDURES
+
+   Trois classes seulement — `.cat-cell`, `.cat-cell--sous`, `.proc-rich-card`.
+   Les autres cartes de l'app gardent leur traitement plat : ces trois-là sont
+   les objets qu'on TOUCHE, et le relief dit qu'ils sont saisissables.
+
+   Quatre couches, et chacune fait une chose :
+
+     ① UN FOND QUI N'EST PAS PLAT. Blanc pur en haut à gauche, blanc à peine
+        grisé en bas à droite. L'écart fait deux tons — invisible si on le
+        cherche, mais c'est lui qui empêche la carte de ressembler à du papier
+        découpé.
+
+     ② UN REFLET EN HAUT. Une ligne blanche d'un pixel, à l'intérieur du bord
+        supérieur. La lumière vient d'en haut : c'est l'arête qui la reçoit.
+
+     ③ UNE ARÊTE QUI TOURNE. Le contour n'a pas la même valeur partout — plus
+        pâle en haut où le reflet le mange, plus dense en bas où la carte se
+        pose. C'est cette variation qui donne l'épaisseur ; un contour uniforme
+        donne un cadre.
+
+     ④ DEUX OMBRES PORTÉES. Une de contact, serrée, qui pose la carte. Une de
+        diffusion, large et basse, qui la décolle. Une seule des deux et la
+        carte flotte ou colle.
+
+   ⚠ ELLES VONT ENSEMBLE. Retirer le dégradé du fond et garder le reflet donne
+     une carte avec un trait blanc en haut et rien d'autre — on voit le trait,
+     pas le volume.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cat-cell, .proc-rich-card{
+  background:linear-gradient(157deg,
+    #FFFFFF 0%, #FEFEFF 42%, #FAFAFC 78%, #F7F7FA 100%);
+  box-shadow:
+    /* ② le reflet du haut */
+    inset 0 1px 0 rgba(255,255,255,0.95),
+    /* ③ l'arête, dense en bas, pâle en haut */
+    inset 0 -0.5px 0 rgba(28,28,38,0.10),
+    inset 0 0 0 0.5px rgba(28,28,38,0.055),
+    /* ④ contact, puis diffusion */
+    0 1px 2px rgba(20,20,30,0.05),
+    0 10px 24px -12px rgba(20,20,30,0.16);
+}
+
+/* ⚠ LE PSEUDO-ÉLÉMENT DE BORD EST ÉTEINT SUR CES TROIS CLASSES. Elles font
+   partie des dix-neuf cartes, qui posent toutes un `::before` en contour. Il
+   se superposerait à l'arête ci-dessus et en doublerait le trait — deux bords
+   à un demi-pixel l'un de l'autre se lisent comme un seul bord flou. */
+.cat-cell::before, .proc-rich-card::before{ display:none; }
+
+/* Le sous-dossier est la même matière, d'un demi-ton plus sourd : il est
+   CONTENU dans un dossier, il ne doit pas se présenter avec la même autorité
+   que celui qui le porte. */
+.cat-cell--sous{
+  background:linear-gradient(157deg,
+    #FDFDFE 0%, #FBFBFD 42%, #F7F7F9 78%, #F4F4F7 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.90),
+    inset 0 -0.5px 0 rgba(28,28,38,0.09),
+    inset 0 0 0 0.5px rgba(28,28,38,0.05),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 20px -12px rgba(20,20,30,0.14);
+}
+
+/* À l'appui, la carte s'enfonce : le reflet du haut s'éteint, l'ombre portée
+   se resserre. C'est le geste inverse de celui qui la fait exister. */
+.cat-cell:active, .proc-rich-card:active{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    inset 0 0 0 0.5px rgba(28,28,38,0.07),
+    0 1px 2px rgba(20,20,30,0.06);
+}

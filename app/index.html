@@ -119,10 +119,15 @@
        un gris a 18 % eclaircit. Sur une page claire il assombrit, et la barre
        paraissait sale a cote des cartes blanches qu'elle recouvre.
 
-       0,60 : assez pour que la barre se detache du fond et porte un texte
-       sombre, assez peu pour qu'on devine ce qui defile dessous. */
+       0,48 : assez pour que la barre se detache du fond et porte un texte
+       sombre, assez peu pour qu'on devine ce qui defile dessous.
+
+       ⚠ C'EST LA SEULE VALEUR QUI REGLE LE BLANCHIMENT. Le flou et la
+         saturation ne changent pas la clarte, ils changent la nettete et la
+         vivacite. Pour eclaircir ou assombrir la barre, c'est ici et nulle
+         part ailleurs. */
     --tint-color:255,255,255;
-    --tint-opacity:0.60;
+    --tint-opacity:0.48;
 
     /* ⚠ LE CREUX EST NEUTRALISÉ. Une ombre interne noire de 17 px dessinait la
        barre EN CREUX sur du noir : la lumière tombe dedans, c'est ce qui lui

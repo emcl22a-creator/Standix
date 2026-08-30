@@ -3,21 +3,65 @@
      `text-size-adjust` empêche iOS de grossir le texte tout seul en paysage.
      Les règles de la frise vidéo (classes) restent prioritaires sur ce `*`. */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE THÈME CLAIR
+
+     L'app était bâtie sur du noir : ses cartes sont des BLANCS TRANSLUCIDES
+     posés sur un fond sombre, ses bords des liserés plus clairs que leur
+     fond. Sur du blanc, un blanc translucide ne se voit pas, et un liseré
+     clair disparaît. Tout devait donc s'inverser en même temps.
+
+     ⚠ LES AMBRES NE BOUGENT PAS. #FDA81E, #FEB731, #FA8A08, #EB5201 et les
+       dégradés `logoOrIc`, `orLibre`, `cbTrait` sont exactement ceux du
+       thème sombre. C'est la demande, et c'est cohérent : ce sont les
+       couleurs du logo.
+
+       Une conséquence à connaître : sur fond blanc, #FDA81E n'a que 1,95 de
+       contraste, très en dessous du seuil de 4,5. Il reste donc réservé aux
+       DESSINS — icônes, arcs, jauges — où le contraste s'apprécie à l'œil.
+       Pour du TEXTE ambre, `--ambre-txt` descend à #C24700, qui atteint 5,01
+       tout en restant du même orange.
+
+     ⚠ `--bg-card` EST DU VERRE, pas un blanc plein. À 72 % sur un fond à
+       halos ambres, la carte laisse passer la teinte de ce qu'il y a
+       derrière : c'est ce qui fait qu'une carte en haut de page n'a pas
+       exactement le même ton qu'une carte en bas, et c'est cette différence
+       qu'on lit comme de la profondeur. En blanc opaque, l'écran redevient
+       une feuille de papier.
+     ═══════════════════════════════════════════════════════════════════════ */
   :root{
-    --bg:#050506;
-  /* ═══ PLUS PROCHE DU NOIR PUR ═══
-
-     #0C0D0E laissait un gris perceptible sur les écrans OLED : les cartes,
-     déjà sombres, ne s'en détachaient plus.
-
-     #050506 n'est pas le noir absolu — #000 supprimerait toute profondeur et
-     ferait paraître les cartes posées sur du vide. Un demi-ton suffit à garder
-     la hiérarchie tout en assombrissant l'ensemble. */ --bg-card: rgba(255,255,255,0.06);
-    --label:#FFFFFF; --label-2: rgba(235,235,245,0.60); --label-3: rgba(235,235,245,0.30);
-    --hero-gradient: linear-gradient(150deg, #2C2C34 0%, #1E1E24 40%, #141418 75%, #0C0C10 100%);
-    --green:#30D158; --red:#FF453A; --orange:#FA8A08;
+    --bg:#F2F2F5;
+    /* ⚠ BLANC OPAQUE, PLUS DU VERRE. Le verre à 72 % supposait des halos
+       derrière lui pour avoir quelque chose à réfracter. Sans eux,
+       `backdrop-filter` floute du gris uni et rend du gris uni : on payait le
+       recalcul du fond à chaque image de défilement pour un résultat
+       strictement invisible. Blanc plein, et le flou disparaît partout. */
+    --bg-card: #FFFFFF;
+    --label:#0F0F14; --label-2: rgba(28,28,38,0.62); --label-3: rgba(28,28,38,0.42);
+    --hero-gradient: linear-gradient(150deg, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.74) 45%, rgba(255,255,255,0.62) 100%);
+    --green:#1F9E42; --red:#E0342A; --orange:#FA8A08;
     --blue:#FDA81E; --purple:#FEB731;   /* utilisées par les anneaux de l'analyse */
-    --separator: rgba(84,84,88,0.40); --border: rgba(255,255,255,0.15);
+    --separator: rgba(28,28,38,0.12); --border: rgba(28,28,38,0.10);
+
+    /* ─── LES OUTILS DU VERRE ─────────────────────────────────────────────
+       Le flou avec `saturate(180%)` AVANT lui : sans la saturation, le flou
+       lave les couleurs et le verre devient gris. C'est ce réglage qui donne
+       au matériau d'Apple sa vivacité.
+
+       Le liseré est EN HAUT seulement. La lumière vient d'en haut : un
+       contour sur les quatre côtés ferait un cadre, pas un reflet. */
+    /* Le flou ne sert plus à rien sans halos derrière : il est neutralisé
+       plutôt que supprimé, pour que les quelques règles qui l'appellent
+       encore ne cassent pas. */
+    --verre-flou: none;
+    /* Un contour d'un demi-pixel, gris et NEUTRE. Sur fond gris clair, une
+       carte blanche a besoin d'une arête : l'ombre seule la laisse flotter
+       sans limite nette. */
+    --verre-bord: inset 0 0 0 0.5px rgba(28,28,38,0.06);
+    /* L'ombre passe du brun au gris neutre : plus de fond chaud à accompagner. */
+    --verre-ombre: 0 1px 2px rgba(20,20,30,0.04),
+                   0 8px 22px -10px rgba(20,20,30,0.14);
+    --ambre-txt:#C24700;
   }
   html, body{
     background:var(--bg);     font-family:'Inter', -apple-system, BlinkMacSystemFont, "Helvetica Neue", system-ui, sans-serif;
@@ -34,25 +78,72 @@
      un conteneur, trois éléments, trois animations. Aucune promotion GPU
      forcée, aucune enveloppe intermédiaire, aucun état figé au démarrage.
      ═══════════════════════════════════════════════════════════════════════ */
-  .color-halos{
-    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
-  }
+  /* ═══ L'OPACITÉ DES HALOS SE RÈGLE ICI, ET NULLE PART AILLEURS ═══
+
+     ⚠ `opacity` SUR `.chalo` NE SERT À RIEN. Les trois animations respirent
+       en faisant varier l'opacité entre 0,65 et 0,95 — une animation en cours
+       l'emporte sur la règle. J'ai baissé la valeur deux fois de suite, mesuré
+       deux fois le même écart de 48 tons, et cherché la source ailleurs avant
+       de lire les keyframes.
+
+     Sur le conteneur, en revanche, l'opacité se MULTIPLIE avec celle des
+     enfants : 0,12 × 0,80 ≈ 0,10, et les animations continuent de respirer
+     par-dessus.
+
+     Mesuré dans les coins, en écart entre rouge et bleu : 48 tons avant —
+     un dégradé orange franc, la page devenait une affiche. Une dizaine
+     maintenant : la chaleur se sent sans qu'on voie la couleur. */
+  /* ═══ LES HALOS SONT ÉTEINTS ═══
+
+     Trois taches floutées qui respiraient derrière toute l'app. Sur fond
+     sombre elles éclairaient la page ; en clair, teintées d'ambre, elles la
+     faisaient virer à l'affiche publicitaire.
+
+     ⚠ ON LES MASQUE, ON NE LES SUPPRIME PAS. Le balisage de `index.html`
+       porte toujours les trois `div`, et trois autres blocs de ce fichier
+       règlent leur taille, leur animation et leur comportement en mouvement
+       réduit. Une seule ligne ici les neutralise tous sans avoir à défaire
+       cent cinquante lignes qu'il faudrait réécrire pour revenir en arrière.
+
+     Conséquence à connaître : le fond n'a plus aucune matière. C'est ce qui
+     rend le blanc opaque des cartes obligatoire — le verre n'aurait plus rien
+     à laisser passer. */
+  .color-halos{ display:none; }
+
+  /* ⚠ `opacity:0.20` ET NON 0.8. En sombre, un halo gris à 80 % éclaire à
+     peine un fond noir. En clair, les mêmes 80 % sur de l'ambre saturé
+     donnaient un aplat orange : la page devenait une affiche.
+
+     Mesuré dans les coins, en écart entre rouge et bleu : 48 tons à 0,16 —
+     un dégradé orange franc, la page devenait une affiche. 9 tons à 0,09 : la
+     chaleur se sent sans qu'on voie la couleur. */
   .chalo{
-    position:absolute; border-radius:50%; filter:blur(120px); opacity:0.8;
+    position:absolute; border-radius:50%; filter:blur(120px); opacity:0.20;
   }
+  /* ═══ LES HALOS DEVIENNENT AMBRES ═══
+
+     En sombre, ce sont trois gris légèrement plus clairs que le fond : ils
+     éclairent la page. En clair, un gris plus clair que du blanc n'existe
+     pas — ils deviennent donc de l'ambre très dilué.
+
+     ⚠ ILS NE SONT PAS DÉCORATIFS. Les cartes sont du verre à 72 % : sans
+       rien derrière, `backdrop-filter` floute du blanc et rend du blanc, et
+       l'on paie le coût d'un flou pour un résultat invisible. Ce sont ces
+       halos qui donnent au verre quelque chose à réfracter. Les retirer
+       aplatirait toute l'app d'un coup. */
   .chalo-1{
     top:4%; left:-14%; width:70vw; height:70vw; max-width:620px; max-height:620px;
-    background:radial-gradient(circle, #25252A 0%, #1D1D20 45%, transparent 72%);
+    background:radial-gradient(circle, rgba(255,146,26,0.85) 0%, rgba(255,146,26,0.38) 45%, transparent 72%);
     animation:chalo1 14s ease-in-out infinite;
   }
   .chalo-2{
     bottom:-8%; right:-16%; width:75vw; height:75vw; max-width:660px; max-height:660px;
-    background:radial-gradient(circle, #2A2A2F 0%, #222225 45%, transparent 72%);
+    background:radial-gradient(circle, rgba(255,104,12,0.62) 0%, rgba(255,104,12,0.26) 45%, transparent 72%);
     animation:chalo2 18s ease-in-out infinite;
   }
   .chalo-4{
     top:-14%; left:50%; width:120vw; height:70vw; max-width:1000px; max-height:600px;
-    background:radial-gradient(circle, #28282C 0%, #1F1F23 48%, transparent 70%);
+    background:radial-gradient(circle, rgba(255,168,52,0.72) 0%, rgba(255,168,52,0.30) 48%, transparent 70%);
     opacity:0.9; animation:chalo3 16s ease-in-out infinite;
   }
   @keyframes chalo1{
@@ -78,8 +169,8 @@
 
      L'éclaircissement était trop franc : environ +17 par canal sur les trois
      halos, plus l'opacité poussée de 0,8 à 1. Le fond montait par endroits à
-     #3B3B41 — assez clair pour que les cartes, dont l'intérieur descend à
-     #060608, paraissent flotter sur un gris plutôt que sur du noir.
+     #FAF9F8 — assez clair pour que les cartes, dont l'intérieur descend à
+     #F1F0EF, paraissent flotter sur un gris plutôt que sur du noir.
 
      On reprend HUIT POINTS par canal, soit à peu près la moitié du chemin vers
      les valeurs du bureau. Les halos restent visibles — le but n'était pas de
@@ -89,11 +180,20 @@
      POUR AJUSTER : ce sont les six valeurs ci-dessous, et elles seules. Plus
      sombre encore, retire huit de plus à chaque paire ; les valeurs du bureau
      sont trente lignes plus haut et forment le plancher. */
+  /* ⚠ CE BLOC ÉCRASE CELUI D'AU-DESSUS SUR TÉLÉPHONE, ET C'EST LUI QUI COMPTE.
+
+     J'avais teinté les halos trente lignes plus haut, mesuré le fond, et
+     trouvé zéro chaleur — les valeurs étaient bien dans le fichier et
+     n'arrivaient jamais à l'écran. Toute la clientèle de Standix est sur
+     téléphone : ces trois lignes-ci sont les seules que l'on voit.
+
+     Elles portent aussi `opacity:1`, qui annule le 0,20 du bloc général.
+     L'opacité est donc réglée ici, et ici seulement. */
   @media (max-width: 600px){
-    .chalo{ opacity:1; filter:blur(90px); }
-    .chalo-1{ background:radial-gradient(circle, #2E2E34 0%, #222227 45%, transparent 72%); }
-    .chalo-2{ background:radial-gradient(circle, #333339 0%, #27272D 45%, transparent 72%); }
-    .chalo-4{ opacity:1; background:radial-gradient(circle, #303036 0%, #24242A 48%, transparent 70%); }
+    .chalo{ opacity:0.09; filter:blur(90px); }
+    .chalo-1{ background:radial-gradient(circle, rgba(255,146,26,0.85) 0%, rgba(255,146,26,0.38) 45%, transparent 72%); }
+    .chalo-2{ background:radial-gradient(circle, rgba(255,104,12,0.70) 0%, rgba(255,104,12,0.30) 45%, transparent 72%); }
+    .chalo-4{ opacity:0.09; background:radial-gradient(circle, rgba(255,168,52,0.78) 0%, rgba(255,168,52,0.32) 48%, transparent 70%); }
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -216,7 +316,7 @@
   .icon-pill.alerte::after{
     content:''; position:absolute; top:1px; right:1px;
     width:11px; height:11px; border-radius:50%;
-    background:var(--red); border:2px solid #16171B;
+    background:var(--red); border:2px solid #F4F3F2;
     animation:pastilleArrive 0.4s cubic-bezier(0.34,1.62,0.5,1) both;
   }
   @keyframes pastilleArrive{ from{ transform:scale(0); } to{ transform:none; } }
@@ -245,7 +345,7 @@
   .alerte-demandes .tx b{ display:block; font-size:14.5px; font-weight:700; letter-spacing:-0.02em; }
   .alerte-demandes .tx i{
     display:block; font-style:normal; font-size:12px;
-    color:#FF9A92; margin-top:2px; font-weight:600;
+    color:#C0271D; margin-top:2px; font-weight:600;
   }
   .alerte-demandes .s{ font-size:12.5px; color:var(--label-2); line-height:1.5; margin-top:11px; }
   .alerte-demandes .actions{ display:flex; gap:8px; margin-top:13px; }
@@ -255,7 +355,7 @@
   }
   .alerte-demandes .secondaire{
     height:38px; padding:0 15px; border-radius:12px;
-    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.068); border:0.5px solid var(--border);
     color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
   }
 
@@ -301,13 +401,13 @@
   }
   .alerte-essai .secondaire{
     height:38px; padding:0 15px; border-radius:12px;
-    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.068); border:0.5px solid var(--border);
     color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
   }
   /* La jauge des jours écoulés, comme celles des pages d'analyse. */
   .alerte-essai .jauge{
     height:5px; border-radius:3px; margin-top:11px;
-    background:rgba(255,255,255,0.09); overflow:hidden;
+    background:rgba(28,28,38,0.076); overflow:hidden;
   }
   .alerte-essai .jauge i{ display:block; height:100%; border-radius:3px; background:var(--blue); }
 
@@ -340,18 +440,18 @@
   }
   .alerte-partage .secondaire{
     height:38px; padding:0 15px; border-radius:12px;
-    background:rgba(255,255,255,0.08); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.068); border:0.5px solid var(--border);
     color:var(--label-2); font-family:inherit; font-size:13px; font-weight:650;
   }
 
   .icon-pill{
     width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    background:rgba(255,255,255,0.10); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18); color:var(--label);
-    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.12);
+    background:rgba(28,28,38,0.085); -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:0.5px solid rgba(28,28,38,0.207); color:var(--label);
+    box-shadow:0 8px 28px rgba(0,0,0,0.40), 0 2px 8px rgba(0,0,0,0.25), inset 0 1px 0 rgba(28,28,38,0.138);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
-  .icon-pill:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); }
+  .icon-pill:active{ transform:scale(0.88); background:rgba(28,28,38,0.170); }
   .icon-pill svg{ width:20px; height:20px; }
 
   /* Le bas réserve exactement la place de la barre d'onglets : sa hauteur, son
@@ -631,13 +731,13 @@
     transition:background 0.2s;
   }
   .ent-ligne:not(.actuelle){ cursor:pointer; }
-  .ent-ligne:not(.actuelle):active{ background:rgba(255,255,255,0.10); }
+  .ent-ligne:not(.actuelle):active{ background:rgba(28,28,38,0.085); }
   .ent-ligne.actuelle{ border-color:rgba(48,209,88,0.35); }
   .ent-info{ flex:1; min-width:0; }
   .ent-nom{ font-size:15px; font-weight:650; letter-spacing:-0.02em; }
   .ent-role{ font-size:11.5px; color:var(--label-3); margin-top:2px; }
   .ent-marque{
-    width:24px; height:24px; border-radius:50%; flex-shrink:0; color:#06210F;
+    width:24px; height:24px; border-radius:50%; flex-shrink:0; color:#1C1C26;
     background:var(--green); display:flex; align-items:center; justify-content:center;
   }
   .ent-marque svg{ width:13px; height:13px; }
@@ -665,7 +765,7 @@
     text-transform:uppercase; letter-spacing:0.06em; margin-bottom:8px;
   }
   .ia-ecoute .lg{ display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13px; }
-  .ia-ecoute .lg svg{ width:18px; height:18px; color:rgba(255,255,255,0.62); flex-shrink:0; }
+  .ia-ecoute .lg svg{ width:18px; height:18px; color:rgba(28,28,38,0.87); flex-shrink:0; }
   .ia-ecoute .lg span{ color:var(--label-2); line-height:1.4; }
   .ia-ecoute .lg b{ color:#fff; font-weight:650; }
 
@@ -811,7 +911,7 @@
   }
   .man-lbl .n{ font-weight:600; }
   .man-champ{
-    width:100%; background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+    width:100%; background:rgba(28,28,38,0.043); border:0.5px solid var(--border);
     border-radius:14px; padding:14px 14px; color:#fff; font-family:inherit;
     font-size:15px; font-weight:500; letter-spacing:-0.02em;
   }
@@ -830,7 +930,7 @@
   /* Le trait s'arrête avant le dernier maillon : il relie, il ne dépasse pas. */
   .man-fil::before{
     content:''; position:absolute; left:17px; top:8px; bottom:34px; width:1.5px;
-    background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
+    background:linear-gradient(rgba(28,28,38,0.136), rgba(28,28,38,0.034));
   }
   .man-fil .step-edit-item{
     position:relative; background:none; border:none; border-radius:0;
@@ -893,7 +993,7 @@
      la photo. */
   .man-fil .etape-montage .vig{
     width:78px; height:44px; border-radius:9px; overflow:hidden; flex-shrink:0;
-    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.043); border:0.5px solid var(--border);
   }
   .man-fil .etape-montage .vig canvas{ width:100%; height:100%; object-fit:cover; display:block; }
   .man-fil .etape-montage.sel .step-num-dess{ filter:drop-shadow(0 0 7px rgba(255,179,64,0.5)); }
@@ -1027,8 +1127,8 @@
 
   .ai-vide{
     display:block; width:100%; aspect-ratio:16/9; border-radius:16px;
-    background:rgba(255,255,255,0.02);
-    border:1.5px dashed rgba(255,255,255,0.16);
+    background:rgba(28,28,38,0.017);
+    border:1.5px dashed rgba(28,28,38,0.184);
   }
   /* De l'air entre la vidéo et ce que l'IA analyse. */
   #ai-upload-card .ia-ecoute{ margin-top:20px; }
@@ -1036,14 +1136,14 @@
   .doc-zone{
     display:flex; flex-direction:column; align-items:center; justify-content:center;
     text-align:center; padding:30px 22px; border-radius:18px;
-    border:1.5px dashed rgba(255,255,255,0.16); background:rgba(255,255,255,0.02);
+    border:1.5px dashed rgba(28,28,38,0.184); background:rgba(28,28,38,0.017);
     margin-bottom:14px;
   }
   .doc-zone .ic{
     width:62px; height:62px; border-radius:19px; margin-bottom:14px;
     display:grid; place-items:center;
-    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
-    color:rgba(255,255,255,0.72);
+    background:rgba(28,28,38,0.043); border:0.5px solid var(--border);
+    color:rgba(28,28,38,0.92);
   }
   .doc-zone .ic svg{ width:29px; height:29px; }
   .doc-zone .t{ font-size:17px; font-weight:700; letter-spacing:-0.03em; }
@@ -1070,9 +1170,9 @@
     background:none; color:var(--label-3);
     font-family:inherit; font-size:11px; font-weight:650;
   }
-  .doc-zone .doc-voie svg{ width:20px; height:20px; color:rgba(255,255,255,0.5); }
+  .doc-zone .doc-voie svg{ width:20px; height:20px; color:rgba(28,28,38,0.75); }
   .doc-zone .doc-voie.on{
-    background:rgba(255,255,255,0.09); border-color:var(--border); color:#fff;
+    background:rgba(28,28,38,0.076); border-color:var(--border); color:#fff;
   }
   .doc-zone .doc-voie.on svg{ color:#fff; }
   .doc-zone .doc-voie:active{ transform:scale(0.94); }
@@ -1081,11 +1181,11 @@
     display:flex; flex-direction:column; align-items:center; gap:6px;
     font-size:11px; color:var(--label-3); font-weight:650;
   }
-  .doc-zone .trois svg{ width:20px; height:20px; color:rgba(255,255,255,0.5); }
+  .doc-zone .trois svg{ width:20px; height:20px; color:rgba(28,28,38,0.75); }
 
   .doc-photos-vide{
-    border:1.5px dashed rgba(255,255,255,0.16); border-radius:18px;
-    padding:24px 18px; text-align:center; background:rgba(255,255,255,0.025);
+    border:1.5px dashed rgba(28,28,38,0.184); border-radius:18px;
+    padding:24px 18px; text-align:center; background:rgba(28,28,38,0.021);
   }
   .doc-photos-vide .d{ display:block; width:46px; height:42px; margin:0 auto 10px; }
   .doc-photos-vide .d svg{ width:46px; height:42px; }
@@ -1103,7 +1203,7 @@
   .doc-page .rg{
     width:26px; height:26px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
     font-size:12px; font-weight:750;
   }
   .doc-page .vg{
@@ -1155,8 +1255,8 @@
      ombre portée pour qu'on sente qu'elle a quitté la pile. */
   .step-edit-item.attrape{
     position:relative; z-index:20;
-    background:rgba(255,255,255,0.13);
-    border-color:rgba(255,255,255,0.4);
+    background:rgba(28,28,38,0.111);
+    border-color:rgba(28,28,38,0.220);
     box-shadow:0 14px 34px rgba(0,0,0,0.5);
     transform:scale(1.025);
     transition:box-shadow 0.2s, background 0.2s, border-color 0.2s;
@@ -1181,7 +1281,7 @@
     stroke:#fff; stroke-width:2.4; stroke-linecap:round; fill:none;
     stroke-dasharray:40 60; opacity:0.9;
   }
-  .etat-proc .fond-arc{ stroke:rgba(255,255,255,0.14); stroke-width:2.4; fill:none; }
+  .etat-proc .fond-arc{ stroke:rgba(28,28,38,0.34); stroke-width:2.4; fill:none; }
   /* La coche est posée sur un rond de verre teinté de vert : le même langage
      que les cartes de l'app, plutôt qu'une pastille pleine. */
   /* La coche reprend le blanc de la roue qui la précède. Le vert annonçait un
@@ -1232,10 +1332,10 @@
     background:rgba(255,179,64,0.09) !important;
   }
   .detail-step.en-lecture .n{
-    background:rgba(255,179,64,0.22); color:#FEC64A;
+    background:rgba(255,179,64,0.22); color:#B85E00;
   }
   .detail-step.en-lecture .badge.ok{
-    background:rgba(255,179,64,0.20); color:#FEC64A;
+    background:rgba(255,179,64,0.20); color:#B85E00;
   }
 
   /* L'image en tête de la fiche, et sur la carte. */
@@ -1267,7 +1367,7 @@
   .app-ligne .ic{
     width:36px; height:36px; border-radius:11px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.08); border:0.5px solid rgba(255,255,255,0.14);
+    background:rgba(28,28,38,0.068); border:0.5px solid rgba(28,28,38,0.161);
   }
   .app-ligne .ic svg{ width:19px; height:19px; }
   .app-ligne .tx{ flex:1; min-width:0; }
@@ -1275,12 +1375,12 @@
   .app-ligne .st{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
   .app-ligne .ici{
     display:inline-block; margin-left:7px; padding:2px 7px; border-radius:100px;
-    background:rgba(255,179,64,0.20); color:#FEC64A;
+    background:rgba(255,179,64,0.20); color:#B85E00;
     font-size:9.5px; font-weight:750; text-transform:uppercase; letter-spacing:0.04em;
     vertical-align:1px;
   }
   .app-ligne .oter{
-    border:none; background:rgba(255,255,255,0.08); color:var(--red);
+    border:none; background:rgba(28,28,38,0.068); color:var(--red);
     font-family:inherit; font-size:11.5px; font-weight:650;
     padding:7px 12px; border-radius:100px; flex-shrink:0;
   }
@@ -1306,7 +1406,7 @@
   .an-ev{
     display:inline-flex; align-items:center; gap:4px; margin-top:12px;
     padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:700;
-    background:rgba(255,179,64,0.14); color:#FEB731;
+    background:rgba(255,179,64,0.14); color:#B85E00;
   }
   .an-ev.baisse{ background:rgba(255,159,10,0.14); color:var(--orange); }
   .an-dit{ font-size:14.5px; line-height:1.5; color:var(--label-2); margin-top:22px; }
@@ -1402,7 +1502,7 @@
   #p-global-analyse .emp-row,
   #p-global-analyse .cat-rank{
     background:none !important; border:none !important; border-radius:0 !important;
-    border-bottom:0.5px solid rgba(255,255,255,0.028) !important;
+    border-bottom:0.5px solid rgba(28,28,38,0.032) !important;
     padding:10px 2px !important; margin:0 !important;
    animation:none !important; }
   #p-global-analyse .emp-row:last-of-type,
@@ -1493,7 +1593,7 @@
   #p-an-temps .emp-row,
   #p-an-equipe .emp-row{
     background:none !important; border:none !important; border-radius:0 !important;
-    border-bottom:0.5px solid rgba(255,255,255,0.028) !important;
+    border-bottom:0.5px solid rgba(28,28,38,0.032) !important;
     padding:12px 2px !important; margin:0 !important;
   }
   #p-an-categories .cat-rank:last-of-type,
@@ -1583,7 +1683,7 @@
   /* Les lignes du classement. */
   .fm-lg{
     display:flex; align-items:center; gap:11px; padding:11px 2px; width:100%;
-    background:none; border:none; border-bottom:0.5px solid rgba(255,255,255,0.028);
+    background:none; border:none; border-bottom:0.5px solid rgba(28,28,38,0.032);
     font-family:inherit; text-align:left; color:inherit;
   }
   /* `:last-of-type` compte les BALISES, pas les classes : dans une liste suivie
@@ -1623,7 +1723,7 @@
 
   .fm-plus{
     width:100%; height:42px; margin-top:12px; border-radius:100px;
-    background:rgba(255,255,255,0.028); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.024); border:0.5px solid var(--border);
     color:var(--label-2); font-family:inherit; font-size:13.5px; font-weight:650;
   }
   .fm-plus:active{ opacity:0.6; }
@@ -1634,15 +1734,15 @@
   .fm-rep .l:last-child{ border-bottom:none; }
   .fm-rep .l{
     display:flex; align-items:center; gap:11px; padding:11px 2px;
-    border-bottom:0.5px solid rgba(255,255,255,0.028);
+    border-bottom:0.5px solid rgba(28,28,38,0.032);
   }
   .fm-rep .l:last-child{ border-bottom:none; }
   .fm-rep .ic{
     width:28px; height:28px; border-radius:8px; flex-shrink:0; display:flex;
     align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
   }
-  .fm-rep .ic svg{ width:14px; height:14px; color:rgba(255,255,255,0.72); }
+  .fm-rep .ic svg{ width:14px; height:14px; color:rgba(28,28,38,0.92); }
   .fm-rep .nm{ flex:1; min-width:0; font-size:13.5px; color:var(--label-2); font-weight:600; }
   .fm-rep .vl{ font-size:13.5px; font-weight:650; flex-shrink:0; }
 
@@ -1693,7 +1793,7 @@
   }
   .fm-barre span{
     display:block; width:34px; height:3px; border-radius:2px;
-    background:rgba(255,255,255,0.16);
+    background:rgba(28,28,38,0.136);
     transition:background 0.28s ease, width 0.28s cubic-bezier(0.22,1,0.36,1);
   }
   .fm-barre button.on span{ background:#FDA81E; width:44px; }
@@ -1731,7 +1831,7 @@
      à du texte et non à des contrôles. */
   button.fm-lig{
     width:100%; background:none; border:none; padding:12px 2px;
-    border-bottom:0.5px solid rgba(255,255,255,0.028);
+    border-bottom:0.5px solid rgba(28,28,38,0.032);
     font-family:inherit; text-align:left; color:inherit;
   }
   button.fm-lig:active{ opacity:0.6; }
@@ -1739,7 +1839,7 @@
 
   .fm-lig{
     display:flex; align-items:center; gap:12px; padding:12px 2px;
-    border-bottom:0.5px solid rgba(255,255,255,0.028);
+    border-bottom:0.5px solid rgba(28,28,38,0.032);
   }
   .fm-lig:last-child{ border-bottom:none; }
   .fm-lig .co{ flex:1; min-width:0; }
@@ -1793,19 +1893,19 @@
 
   .poste-fen .poste-choix{
     max-height:min(40vh, 260px); overflow-y:auto;
-    border-top:0.5px solid rgba(255,255,255,0.09);
+    border-top:0.5px solid rgba(28,28,38,0.103);
   }
   .poste-fen .poste-choix button{
     display:flex; align-items:center; gap:12px; width:100%;
     padding:15px 22px; border:none; background:none;
-    border-bottom:0.5px solid rgba(255,255,255,0.06);
+    border-bottom:0.5px solid rgba(28,28,38,0.069);
     font-family:inherit; font-size:15.5px; font-weight:600; color:#fff; text-align:left;
   }
   .poste-fen .poste-choix button:last-child{ border-bottom:none; }
   .poste-fen .poste-choix .nm{ flex:1; min-width:0; }
   .poste-fen .poste-choix .r{
     width:21px; height:21px; border-radius:50%; flex-shrink:0;
-    border:1.7px solid rgba(255,255,255,0.24);
+    border:1.7px solid rgba(28,28,38,0.220);
   }
   .poste-fen .poste-choix button.on{ background:rgba(255,179,64,0.10); }
   .poste-fen .poste-choix button.on .r{
@@ -1823,7 +1923,7 @@
   }
   /* Éteint tant que rien n'est choisi : c'est ce qui rend la réponse
      obligatoire, sans jamais avoir à l'écrire. */
-  .poste-ok:disabled{ background:rgba(255,255,255,0.10); color:var(--label-3); }
+  .poste-ok:disabled{ background:rgba(28,28,38,0.085); color:var(--label-3); }
 
   .poste-saisie{ display:flex; align-items:center; gap:9px; margin-top:16px; }
   /* La barre de recherche porte une marge basse de 12 px, utile là où elle
@@ -1855,7 +1955,7 @@
   }
   .an-neant-btn{
     margin-top:14px; height:38px; padding:0 18px; border:none; border-radius:100px;
-    background:rgba(255,255,255,0.08); border:0.5px solid var(--border); color:#fff;
+    background:rgba(28,28,38,0.068); border:0.5px solid var(--border); color:#fff;
     font-family:inherit; font-size:13.5px; font-weight:650;
   }
   .an-neant-btn:active{ opacity:0.65; }
@@ -1922,7 +2022,7 @@
   .an-lig{
     display:flex; align-items:center; gap:12px; width:100%;
     padding:12px 2px; background:none; border:none;
-    border-bottom:0.5px solid rgba(255,255,255,0.028);
+    border-bottom:0.5px solid rgba(28,28,38,0.032);
     font-family:inherit; text-align:left; color:inherit;
   }
   .an-lig:last-of-type{ border-bottom:none; }
@@ -1973,7 +2073,7 @@
   .an-tete b{ flex:1; font-size:16px; font-weight:700; letter-spacing:-0.025em; }
   .an-lien{
     border:none; background:none; padding:0; font-family:inherit;
-    font-size:13px; color:#FEB731; font-weight:600;
+    font-size:13px; color:#B85E00; font-weight:600;
   }
 
   /* Une ligne : médaille ou pastille, nom, détail, valeur. */
@@ -1987,8 +2087,8 @@
   .fm-serie b{ color:#fff; font-weight:700; }
 
   .fm-courbe{ display:flex; gap:5px; align-items:flex-end; height:52px; margin-top:6px; }
-  .fm-courbe span{ flex:1; border-radius:3px; background:rgba(255,255,255,0.14); min-height:3px; }
-  .fm-courbe span.haut{ background:rgba(255,255,255,0.42); }
+  .fm-courbe span{ flex:1; border-radius:3px; background:rgba(28,28,38,0.119); min-height:3px; }
+  .fm-courbe span.haut{ background:rgba(28,28,38,0.357); }
   .fm-jours{ display:flex; gap:5px; margin-top:8px; }
   .fm-jours span{ flex:1; text-align:center; font-size:9.5px; color:var(--label-3); font-weight:650; }
 
@@ -2004,7 +2104,7 @@
   .couv input[type=file]{ position:absolute; inset:0; opacity:0; width:100%; height:100%; z-index:2; }
   .couv .vign{
     width:56px; height:42px; border-radius:9px; flex-shrink:0; overflow:hidden;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
     display:flex; align-items:center; justify-content:center;
   }
   .couv .vign svg{ width:21px; height:21px; }
@@ -2023,8 +2123,8 @@
   .couv-depot:not(.remplie){
     flex-direction:column; text-align:center; gap:11px;
     padding:26px 18px; border-radius:18px;
-    border:1.5px dashed rgba(255,255,255,0.16);
-    background:rgba(255,255,255,0.025);
+    border:1.5px dashed rgba(28,28,38,0.184);
+    background:rgba(28,28,38,0.021);
   }
   #p-create-manual .couv:not(.remplie) .vign,
   .couv-depot:not(.remplie) .vign{
@@ -2038,7 +2138,7 @@
   .couv-depot:not(.remplie) .tx .s{ margin-top:4px; line-height:1.45; }
 
   .couv .oter{
-    position:relative; z-index:3; border:none; background:rgba(255,255,255,0.10);
+    position:relative; z-index:3; border:none; background:rgba(28,28,38,0.085);
     color:var(--red); font-family:inherit; font-size:11.5px; font-weight:650;
     padding:6px 11px; border-radius:100px; flex-shrink:0;
   }
@@ -2070,7 +2170,7 @@
   /* Le cadre vide devient une invitation : pointillés plutôt que noir plein,
      et il se resserre — il occupait la moitié de l'écran pour ne rien dire. */
   .dv-cadre:has(.dv-vide){
-    background:rgba(255,255,255,0.02); border:1.5px dashed rgba(255,255,255,0.16);
+    background:rgba(28,28,38,0.017); border:1.5px dashed rgba(28,28,38,0.184);
     aspect-ratio:auto; min-height:220px;
   }
   .dv-vide{
@@ -2080,8 +2180,8 @@
   .dv-vide .ic{
     width:62px; height:62px; border-radius:19px; margin-bottom:14px;
     display:grid; place-items:center;
-    background:rgba(255,255,255,0.05); border:0.5px solid var(--border);
-    color:rgba(255,255,255,0.72);
+    background:rgba(28,28,38,0.043); border:0.5px solid var(--border);
+    color:rgba(28,28,38,0.92);
   }
   .dv-vide .ic svg{ width:29px; height:29px; }
   .dv-vide .t{ font-size:17px; font-weight:700; letter-spacing:-0.03em; }
@@ -2149,7 +2249,7 @@
     margin-top:9px; padding:9px 11px; border-radius:11px;
     background:rgba(255,159,10,0.10);
     border:0.5px solid rgba(255,159,10,0.26);
-    color:#FEB731;
+    color:#B85E00;
   }
   .et-attention svg{ width:15px; height:15px; flex-shrink:0; margin-top:1px; }
   .et-attention span{ font-size:13px; font-weight:600; line-height:1.4; }
@@ -2225,7 +2325,7 @@
      frise faisait donc 500 % de rien. */
   .dv-frise{
     position:relative; height:44px; border-radius:11px;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
     flex-shrink:0;
   }
   .dv-fond{ position:absolute; inset:0; border-radius:11px; overflow:hidden; }
@@ -2236,7 +2336,7 @@
      pincement au navigateur. */
   .dv-frise{ touch-action:pan-x; transition:box-shadow 0.15s ease; }
 
-  .dv-frise.tire{ box-shadow:0 0 0 1.5px rgba(255,255,255,0.28); }
+  .dv-frise.tire{ box-shadow:0 0 0 1.5px rgba(28,28,38,0.220); }
   .dv-seg{
     position:absolute; top:0; bottom:0; border-right:1.5px solid var(--bg);
     background:rgba(255,179,64,0.30); display:flex; align-items:center;
@@ -2245,7 +2345,7 @@
   .dv-seg.sel{ background:rgba(255,179,64,0.62); }
   .dv-tete{
     position:absolute; top:0; bottom:0; left:0; width:2px; background:#fff; z-index:4;
-    box-shadow:0 0 8px rgba(255,255,255,0.7); pointer-events:none;
+    box-shadow:0 0 8px rgba(28,28,38,0.220); pointer-events:none;
   }
   .dv-tps{
     display:flex; justify-content:space-between; padding:6px 2px 0;
@@ -2281,7 +2381,7 @@
   .dv-tete{
     position:absolute; top:4px; bottom:4px; left:50%; width:2.5px; margin-left:-1.25px;
     background:#fff; z-index:6; border-radius:2px;
-    box-shadow:0 0 10px rgba(255,255,255,0.8);
+    box-shadow:0 0 10px rgba(28,28,38,0.220);
     pointer-events:none;
   }
   /* Une petite pointe en haut, comme sur un curseur de montage. */
@@ -2296,7 +2396,7 @@
   .dv-zoom, .dv-annuler{
     display:flex; align-items:center; gap:7px; padding:9px 14px;
     border-radius:100px; border:0.5px solid var(--border);
-    background:rgba(255,255,255,0.06); color:var(--label-2);
+    background:rgba(28,28,38,0.051); color:var(--label-2);
     font-family:inherit; font-size:12.5px; font-weight:650;
   }
   .dv-zoom svg, .dv-annuler svg{ width:15px; height:15px; flex-shrink:0; }
@@ -2318,7 +2418,7 @@
     transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
   }
   .dv-poi:active::after, .dv-poi.tire::after{ transform:scale(1.22); }
-  .dv-poi.tire::before{ width:3px; box-shadow:0 0 12px rgba(255,255,255,0.8); }
+  .dv-poi.tire::before{ width:3px; box-shadow:0 0 12px rgba(28,28,38,0.220); }
 
   /* ═══ LA PRISE ═══
      Le carré visible fait 12 px, mais la zone touchable en fait 44 — la largeur
@@ -2326,7 +2426,7 @@
      le doigt, la poignée grossit franchement pour qu'on sache qu'on la tient. */
   .dv-poi.tire::after{
     transform:scale(1.5);
-    box-shadow:0 2px 10px rgba(0,0,0,0.55), 0 0 0 4px rgba(255,255,255,0.16);
+    box-shadow:0 2px 10px rgba(0,0,0,0.55), 0 0 0 4px rgba(28,28,38,0.184);
   }
   /* La piste figée ne défile plus : le défilement natif lutterait contre le
      doigt qui tire la poignée. */
@@ -2359,7 +2459,7 @@
     width:38px; height:38px; border-radius:50%; border:none; padding:0; flex-shrink:0;
     background:rgba(0,0,0,0.45); backdrop-filter:blur(18px);
     -webkit-backdrop-filter:blur(18px);
-    border:0.5px solid rgba(255,255,255,0.18); color:#fff;
+    border:0.5px solid rgba(28,28,38,0.207); color:#fff;
     display:flex; align-items:center; justify-content:center;
   }
   .dv-rond svg{ width:17px; height:17px; display:block; }
@@ -2461,7 +2561,7 @@
   }
   .dv-play{
     width:34px; height:34px; border-radius:50%; border:none; padding:0; flex-shrink:0;
-    background:rgba(255,255,255,0.10); border:0.5px solid var(--border); color:#fff;
+    background:rgba(28,28,38,0.085); border:0.5px solid var(--border); color:#fff;
     display:flex; align-items:center; justify-content:center;
   }
   .dv-play svg{ width:15px; height:15px; display:block; }
@@ -2507,7 +2607,7 @@
   }
   .etape-montage .sup{
     width:30px; height:30px; border-radius:50%; border:none; flex-shrink:0;
-    background:rgba(255,255,255,0.07); color:var(--label-3);
+    background:rgba(28,28,38,0.060); color:var(--label-3);
     display:flex; align-items:center; justify-content:center;
   }
   .etape-montage .sup svg{ width:15px; height:15px; }
@@ -2536,7 +2636,7 @@
      existe — elle n'a pas à la montrer en grand : c'est le texte qu'on relit. */
     .step-img-vignette{
     width:76px; height:76px; border-radius:11px; flex-shrink:0; overflow:hidden;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
     display:flex; align-items:center; justify-content:center; position:relative;
   }
   .step-img-vignette img{ width:100%; height:100%; object-fit:cover; display:block; }
@@ -2552,11 +2652,11 @@
   .step-img{ display:flex; align-items:center; gap:11px; margin-top:10px; }
   .step-img-vignette{
     width:56px; height:56px; border-radius:11px; flex-shrink:0; overflow:hidden;
-    background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
     display:flex; align-items:center; justify-content:center; position:relative;
     transition:transform 0.16s, border-color 0.2s;
   }
-  .step-img-vignette:active{ transform:scale(0.94); border-color:rgba(255,255,255,0.3); }
+  .step-img-vignette:active{ transform:scale(0.94); border-color:rgba(28,28,38,0.220); }
   .step-img-vignette img{ width:100%; height:100%; object-fit:cover; display:block; }
   .step-img-vignette svg{ width:19px; height:19px; color:var(--label-3); }
   /* Le petit « + » dit que la vignette se touche, là où un cadre vide ne dit rien. */
@@ -2584,7 +2684,7 @@
   .detail-step-img{
     width:88px; height:88px; margin:10px 0 2px;
     border-radius:14px; overflow:hidden;
-    border:0.5px solid var(--border); background:rgba(255,255,255,0.04);
+    border:0.5px solid var(--border); background:rgba(28,28,38,0.034);
     display:flex; align-items:center; justify-content:center;
   }
   .detail-step-img img{ width:100%; height:100%; object-fit:cover; display:block; }
@@ -2623,8 +2723,8 @@
   }
   .langue-choix .dr{ font-size:17px; line-height:1; flex-shrink:0; }
   .langue-choix .nm{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .langue-choix.actif{ border-color:#fff; background:rgba(255,255,255,0.12); }
-  .langue-choix .coche{ color:#FDA81E; font-weight:800; flex-shrink:0; }
+  .langue-choix.actif{ border-color:#fff; background:rgba(28,28,38,0.102); }
+  .langue-choix .coche{ color:#C24700; font-weight:800; flex-shrink:0; }
 
   /* Le bouton de langue sur une fiche de procédure */
   .langue-proc{
@@ -2651,9 +2751,9 @@
      n'est poussé, rien ne recouvre l'écran.
      ═══════════════════════════════════════════════════════════════════ */
   .verre-barre{
-    background:rgba(255,255,255,0.10); border:0.5px solid rgba(255,255,255,0.18);
+    background:rgba(28,28,38,0.085); border:0.5px solid rgba(28,28,38,0.207);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.14);
+    box-shadow:inset 0 1px 0 rgba(28,28,38,0.161);
   }
   /* ═════════════════════════════════════════════════════════════════
      LE TIROIR DES ÉTABLISSEMENTS
@@ -2908,7 +3008,7 @@
     position:absolute; top:-30px; left:50%; transform:translateX(-50%);
     width:300px; height:200px; pointer-events:none; z-index:0;
     background:radial-gradient(ellipse at center,
-      rgba(255,255,255,0.05), rgba(255,255,255,0) 70%);
+      rgba(28,28,38,0.043), rgba(28,28,38,0.000) 70%);
     filter:blur(10px);
   }
   .abo-hi{ position:relative; z-index:1; text-align:center; margin-bottom:20px; }
@@ -2934,13 +3034,13 @@
        repliées se distinguent par leur taille et leur bouton, pas par leur
        peau — mais elles gardent le liseré BLANC des dix-neuf cartes : le bord
        allumé est réservé à celle qu'on met en avant. */
-    background:linear-gradient(150deg,#17171B 0%,#101014 40%,#0A0A0D 75%,#060608 100%);
+    background:linear-gradient(150deg,#F4F3F2 0%,#F2F1F0 40%,#F1F0EF 75%,#F1F0EF 100%);
     border-radius:22px;
     padding:20px 18px; margin-bottom:12px;
     /* Le liseré uniforme est remplacé par celui à coins vifs, comme les
        dix-neuf autres cartes. Ne restent ici que les ombres portées. */
     box-shadow:0 8px 26px rgba(0,0,0,0.32),
-               0 0 30px -14px rgba(255,255,255,0.10);
+               0 0 30px -14px rgba(28,28,38,0.115);
   }
   /* Celle qu'on recommande porte le liseré ambre : c'est le seul signal, et il
      suffit. Son fond descend un cran plus bas encore — c'est ce qui fait
@@ -2999,7 +3099,7 @@
 
      Quatre choses, et elles vont ensemble :
 
-       ① UN NOIR PROFOND, de #17171B à #060608 sur 150°. C'est ce fond sombre
+       ① UN NOIR PROFOND, de #F4F3F2 à #F1F0EF sur 150°. C'est ce fond sombre
           qui permet au bord allumé de se voir ; sur un gris moyen il s'éteint.
        ② UNE OMBRE DOUBLE : une sombre qui décolle la carte, une AMBRE qui
           diffuse autour d'elle.
@@ -3013,7 +3113,7 @@
   .offre-carte.vedette{
     position:relative; overflow:hidden;
     border:none; border-radius:22px;
-    background:linear-gradient(150deg,#17171B 0%,#101014 40%,#0A0A0D 75%,#060608 100%);
+    background:linear-gradient(150deg,#F4F3F2 0%,#F2F1F0 40%,#F1F0EF 75%,#F1F0EF 100%);
     box-shadow:0 14px 34px rgba(0,0,0,0.42), 0 0 30px -14px rgba(255,122,24,0.26);
   }
   /* ④ Le liseré. Un `border` ne sait pas porter de dégradé : on pose le dégradé
@@ -3056,7 +3156,7 @@
   }
   /* Le liseré en dégradé a été retiré : « Écrivez-nous » n'en a pas, et c'est
      le modèle. Deux techniques de bord dans la même app en font une de trop. */
-  .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(255,255,255,0.16); }
+  .offre-carte.actuelle{ box-shadow:inset 0 0 0 1px rgba(28,28,38,0.184); }
   /* `.offre-ruban` a ete retiree avec le ruban lui-meme. */
   .offre-nom{
     display:block; font-size:18px; font-weight:700; letter-spacing:-0.03em;
@@ -3100,10 +3200,10 @@
     color:#2A1400;
   }
   .offre-carte:not(.vedette) .offre-cta{
-    background:rgba(255,255,255,0.08); color:var(--label-1);
+    background:rgba(28,28,38,0.068); color:var(--label-1);
   }
   .offre-cta.encours{
-    background:none; color:#FEB731;
+    background:none; color:#B85E00;
     box-shadow:inset 0 0 0 1px rgba(255,179,64,0.35);
   }
   .offre-cta:active{ opacity:0.85; }
@@ -3161,14 +3261,14 @@
   .offre-gerer:disabled{ color:var(--label-3); text-decoration:none; }
 
   .offre-cta.encours{
-    background:rgba(255,255,255,0.10);
+    background:rgba(28,28,38,0.085);
     color:var(--label-2);
     border:0.5px solid var(--border);
     font-weight:650;
   }
 
   .offre-annuel{ font-size:11.5px; color:var(--label-3); text-align:center; margin-top:11px; }
-  .offre-annuel b{ color:#FEB731; font-weight:700; }
+  .offre-annuel b{ color:#B85E00; font-weight:700; }
 
   /* ═══════════════════════════════════════════════════════════════════
      LES RÉGLAGES
@@ -3197,7 +3297,7 @@
   .reg-identite .av{
     width:52px; height:52px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-size:18px; font-weight:750; letter-spacing:0.03em; color:#FDA81E;
+    font-size:18px; font-weight:750; letter-spacing:0.03em; color:#C24700;
     background:linear-gradient(165deg,
       rgba(255,173,51,0.13) 0%, rgba(255,173,51,0.05) 52%, rgba(255,173,51,0.015) 100%);
     border:0.5px solid rgba(255,173,51,0.22);
@@ -3232,7 +3332,7 @@
     transition:background 0.18s;
   }
 
-  .reg-ligne:active{ background:rgba(255,255,255,0.06); }
+  .reg-ligne:active{ background:rgba(28,28,38,0.051); }
   /* Le filet s'arrête à l'aplomb du texte, pas de la tuile : c'est ce qui donne
      le rythme des réglages d'iOS. */
   .reg-filet{ height:0.5px; background:var(--border); margin-left:58px; }
@@ -3289,10 +3389,10 @@
   .etab-ligne:active{ transform:scale(0.985); }
   .etab-ligne .rond-ent{
     width:42px; height:42px;
-    background:rgba(255,255,255,0.10);
+    background:rgba(28,28,38,0.085);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+    border:0.5px solid rgba(28,28,38,0.207);
+    box-shadow:inset 0 1px 0 rgba(28,28,38,0.138);
   }
   .etab-ligne .rond-ent .ini{ font-size:13px; }
   .etab-ligne .rond-ent.plus{ background:#fff; border-color:transparent; }
@@ -3326,7 +3426,7 @@
      sans son cadre, sans son halo et sans ses rassurances. */
   /* Le bleu du halo, et lui seul. Le vert dit « terminé » ailleurs dans l'app :
      l'employer ici pour un prix brouillerait les deux. */
-  .offre-annuel b{ color:#FEB731; font-weight:700; }
+  .offre-annuel b{ color:#B85E00; font-weight:700; }
 
   @keyframes contenuEntre{
     from{ opacity:0; transform:translateY(12px); }
@@ -3420,10 +3520,10 @@
     width:42px; height:42px;
     /* Hors du tiroir il n'y a pas de pastille derrière : le rond porte donc
        lui-même le verre, sinon il ne se verrait pas. */
-    background:rgba(255,255,255,0.10);
+    background:rgba(28,28,38,0.115);
     -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
-    border:0.5px solid rgba(255,255,255,0.18);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+    border:0.5px solid rgba(28,28,38,0.207);
+    box-shadow:inset 0 1px 0 rgba(28,28,38,0.138);
   }
   .etab-ligne .rond-ent .ini{ font-size:13px; }
   .etab-ligne .rond-ent.plus{ background:#fff; border-color:transparent; }
@@ -3466,7 +3566,7 @@
   .pm-recherche input::placeholder{ color:var(--label-3); }
   .pm-recherche input::-webkit-search-cancel-button{ display:none; }
   .pm-recherche .vider{
-    display:none; border:none; background:rgba(255,255,255,0.12); color:#fff;
+    display:none; border:none; background:rgba(28,28,38,0.102); color:#fff;
     width:22px; height:22px; border-radius:50%; font-size:15px; line-height:0;
     flex-shrink:0; font-family:inherit;
   }
@@ -3479,7 +3579,7 @@
     width:34px; height:34px; border-radius:11px; flex-shrink:0;
     display:grid; place-items:center;
     background:rgba(253,168,30,0.11);
-    color:#FDA81E;
+    color:#C24700;
     box-shadow:inset 0 0 0 0.5px rgba(253,168,30,0.20);
     transition:transform 0.14s ease;
   }
@@ -3492,9 +3592,9 @@
      L'ambre marque ce qui ajoute. Le retrait reste sourd, comme le bouton de
      sortie à côté de lui. */
   .pm-rang[data-retro]{
-    background:rgba(255,255,255,0.06);
+    background:rgba(28,28,38,0.051);
     color:var(--label-2);
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09);
+    box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.103);
   }
   .pm-rang svg{ width:17px; height:17px; display:block; }
   .pm-rang:active{ transform:scale(0.94); }
@@ -3525,7 +3625,7 @@
      `:not(.hero)` : la fenêtre « aucune entreprise » emploie la MÊME classe
      avec l'ancienne forme et son image. Sans cette exception, ce fond
      écraserait celui de `.hero` sur la carte de promotion. */
-  .promu-carte:not(.hero){ background:linear-gradient(160deg,#1E2026,#141519); }
+  .promu-carte:not(.hero){ background:linear-gradient(160deg,#F5F4F3,#F3F2F1); }
 
   /* ═══ UNE ANNONCE A BESOIN D'AIR ═══
 
@@ -3599,20 +3699,20 @@
   .etab-depot{
     position:relative; width:96px; height:96px; margin:0 auto 8px; border-radius:50%;
     overflow:hidden; padding:0; display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(160deg,#24262C,#15161A);
-    border:1.5px dashed rgba(255,255,255,0.28); color:rgba(255,255,255,0.5);
+    background:linear-gradient(160deg,#F6F5F4,#F3F2F1);
+    border:1.5px dashed rgba(28,28,38,0.220); color:rgba(28,28,38,0.75);
     transition:border-color 0.2s, transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
   }
   .etab-depot:active{ transform:scale(0.96); }
-  .etab-depot.rempli{ border-style:solid; border-color:rgba(255,255,255,0.4); }
+  .etab-depot.rempli{ border-style:solid; border-color:rgba(28,28,38,0.220); }
   .etab-depot img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-  .etab-depot .mono{ font-size:28px; font-weight:750; letter-spacing:0.04em; color:rgba(255,255,255,0.5); }
+  .etab-depot .mono{ font-size:28px; font-weight:750; letter-spacing:0.04em; color:rgba(28,28,38,0.75); }
   .etab-depot .appareil{
     position:absolute; inset:0; display:flex; flex-direction:column;
     align-items:center; justify-content:center; gap:5px;
   }
   .etab-depot .appareil svg{ width:22px; height:22px; }
-  .etab-depot .appareil span{ font-size:9.5px; font-weight:650; color:rgba(255,255,255,0.4); }
+  .etab-depot .appareil span{ font-size:9.5px; font-weight:650; color:rgba(28,28,38,0.65); }
   .etab-depot.rempli .appareil{ display:none; }
   .etab-legende{ font-size:12px; font-weight:600; color:var(--label-2); margin-bottom:16px; }
   .etab-legende button{
@@ -3645,7 +3745,7 @@
     text-transform:uppercase; letter-spacing:0.06em;
   }
   .doc-ou::before, .doc-ou::after{
-    content:''; flex:1; height:0.5px; background:rgba(255,255,255,0.12);
+    content:''; flex:1; height:0.5px; background:rgba(28,28,38,0.102);
   }
   .doc-fichier-etat{
     display:flex; align-items:center; gap:11px; margin-top:10px;
@@ -3693,7 +3793,7 @@
   .bienvenue .intro{ font-size:12.5px; color:var(--label-2); line-height:1.45; }
   .bienvenue .proc{
     margin:16px 0 4px; padding:13px 15px; border-radius:15px;
-    background:rgba(255,255,255,0.07); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.060); border:0.5px solid var(--border);
   }
   .bienvenue .proc .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .bienvenue .proc .c{ font-size:11.5px; color:var(--label-3); margin-top:3px; }
@@ -3701,7 +3801,7 @@
   .bienvenue .code-ic{
     width:54px; height:54px; margin:0 auto 14px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
-    font-size:25px; font-weight:800; color:#06210F; background:var(--green);
+    font-size:25px; font-weight:800; color:#1C1C26; background:var(--green);
     box-shadow:0 0 0 6px rgba(48,209,88,0.14);
     animation:salutArrive 0.5s cubic-bezier(0.22,1,0.36,1) both;
   }
@@ -3739,12 +3839,12 @@
   .titre-avec-aide{ display:flex; align-items:center; gap:7px; margin:22px 0 10px; }
   .btn-aide{
     width:22px; height:22px; border-radius:50%; flex-shrink:0; border:none; padding:0;
-    background:rgba(255,255,255,0.09); color:var(--label-2);
+    background:rgba(28,28,38,0.076); color:var(--label-2);
     display:flex; align-items:center; justify-content:center;
     transition:background 0.2s, color 0.2s, transform 0.16s cubic-bezier(0.34,1.5,0.64,1);
   }
   .btn-aide svg{ width:13px; height:13px; }
-  .btn-aide:active{ transform:scale(0.88); background:rgba(255,255,255,0.2); color:#fff; }
+  .btn-aide:active{ transform:scale(0.88); background:rgba(28,28,38,0.170); color:#fff; }
 
   /* ═══ Explication des médailles ═══ */
   .med-liste{ display:flex; flex-direction:column; gap:2px; }
@@ -3784,7 +3884,7 @@
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .ma-ligne .quand{ display:block; font-size:11.5px; color:var(--label-3); margin-top:2px; }
   .ma-ligne .duree{ font-size:14px; font-weight:750; flex-shrink:0; }
-  .ma-ligne .jauge{ height:4px; border-radius:4px; background:rgba(255,255,255,0.09);
+  .ma-ligne .jauge{ height:4px; border-radius:4px; background:rgba(28,28,38,0.076);
     margin-top:6px; overflow:hidden; }
   .ma-ligne .jauge i{ display:block; height:100%; border-radius:4px; }
   .ma-vide{ font-size:12.5px; color:var(--label-2); line-height:1.5; padding:2px 0 6px; }
@@ -3801,7 +3901,7 @@
   .visiteur-cadenas{
     width:38px; height:38px; border-radius:12px; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    background:rgba(255,255,255,0.08); color:var(--label-2);
+    background:rgba(28,28,38,0.068); color:var(--label-2);
   }
   .visiteur-cadenas svg{ width:19px; height:19px; }
   .visiteur-txt{ flex:1; min-width:0; }
@@ -3841,10 +3941,10 @@
     background:var(--bg-card); border:1px solid var(--border);
     transition:border-color 0.2s, background 0.2s;
   }
-  .ed-borne.actif{ border-color:#fff; background:rgba(255,255,255,0.12); }
+  .ed-borne.actif{ border-color:#fff; background:rgba(28,28,38,0.102); }
   .ed-borne .k{ font-size:10px; font-weight:750; color:var(--label-3);
     text-transform:uppercase; letter-spacing:0.05em; flex-shrink:0; }
-  .ed-borne.actif .k{ color:rgba(255,255,255,0.75); }
+  .ed-borne.actif .k{ color:rgba(28,28,38,0.92); }
   .ed-borne .v{ font-size:15px; font-weight:800; letter-spacing:-0.03em; color:#fff; }
   .ed-fleche{ font-size:13px; color:var(--label-3); flex-shrink:0; }
 
@@ -3854,7 +3954,7 @@
     text-transform:uppercase; letter-spacing:0.05em; margin-bottom:7px; }
   .ed-loupe{
     position:relative; height:56px; border-radius:12px; overflow:hidden;
-    background:rgba(255,255,255,0.04); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.034); border:0.5px solid var(--border);
     touch-action:none; cursor:grab;
   }
   .ed-loupe .bande{ position:absolute; top:0; bottom:0; display:flex; }
@@ -3870,7 +3970,7 @@
   .ed-loupe .zone{ position:absolute; top:0; bottom:0; background:rgba(48,209,88,0.16);
     z-index:1; pointer-events:none; }
   .ed-loupe .grad{ position:absolute; bottom:2px; font-size:8.5px;
-    color:rgba(255,255,255,0.45); transform:translateX(-50%); z-index:2; pointer-events:none; }
+    color:rgba(28,28,38,0.70); transform:translateX(-50%); z-index:2; pointer-events:none; }
   .ed-aide{ font-size:11px; color:var(--label-3); text-align:center; margin-top:6px; }
 
   .ed-couv{ display:none; height:6px; border-radius:6px; overflow:hidden; margin-top:14px; gap:1px; }
@@ -3910,7 +4010,7 @@
   }
   .lecture-anneau{ position:relative; width:44px; height:44px; flex-shrink:0; }
   .lecture-anneau svg{ transform:rotate(-90deg); display:block; }
-  .lecture-anneau .piste{ stroke:rgba(255,255,255,0.10); }
+  .lecture-anneau .piste{ stroke:rgba(28,28,38,0.30); }
   /* Le trait glisse jusqu'à sa nouvelle position, dans les deux sens : cocher
      l'avance, décocher le fait reculer. La courbe part vite et finit doucement,
      comme les anneaux d'activité d'Apple. */
@@ -3951,7 +4051,7 @@
   .mf-chiffre{ font-size:23px; font-weight:850; letter-spacing:-0.045em; }
   .mf-ligne{
     display:flex; align-items:baseline; justify-content:space-between; gap:12px;
-    padding:9px 0; border-top:0.5px solid rgba(255,255,255,0.07);
+    padding:9px 0; border-top:0.5px solid rgba(28,28,38,0.081);
   }
   .mf-ligne:first-child{ border-top:none; }
   .mf-ligne .k{ font-size:12.5px; color:var(--label-2); }
@@ -3992,7 +4092,7 @@
     display:flex; align-items:center; justify-content:center;
     font-size:13px; font-weight:700; letter-spacing:0.01em;
     color:var(--label-2);
-    background:rgba(255,255,255,0.07);
+    background:rgba(28,28,38,0.060);
   }
   /* ═══ PLUS DE BLEU-VIOLET ═══
 
@@ -4006,7 +4106,7 @@
   .pm-av.chef{
     color:#2A1400;
     background:linear-gradient(155deg, #FEC64A, #FDA81E);
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.16);
+    box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.184);
   }
   .pm-info{ flex:1; min-width:0; }
   .pm-nom{ font-size:14.5px; font-weight:650; letter-spacing:-0.02em; }
@@ -4026,9 +4126,9 @@
   .pm-suppr{
     width:34px; height:34px; border-radius:11px; flex-shrink:0;
     display:grid; place-items:center;
-    background:rgba(255,255,255,0.06);
+    background:rgba(28,28,38,0.051);
     color:var(--label-2);
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09);
+    box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.103);
     transition:transform 0.14s ease, background 0.2s ease, color 0.2s ease;
   }
   .pm-suppr svg{ width:17px; height:17px; display:block; }
@@ -4044,7 +4144,7 @@
   /* ═══ Page Analyse ═══ */
   .ga-segments{
     position:relative; display:flex; gap:0; padding:3px; border-radius:100px;
-    background:rgba(255,255,255,0.07); margin:14px 0 16px;
+    background:rgba(28,28,38,0.060); margin:14px 0 16px;
   }
   .ga-segments::before{
     content:''; position:absolute; top:3px; bottom:3px; left:3px;
@@ -4071,10 +4171,10 @@
   .recherche-fine{
     display:flex; align-items:center; gap:9px; height:38px; padding:0 13px;
     margin:14px 0 4px; border-radius:100px;
-    background:rgba(255,255,255,0.05); border:0.5px solid transparent;
+    background:rgba(28,28,38,0.043); border:0.5px solid transparent;
     transition:background 0.25s, border-color 0.25s;
   }
-  .recherche-fine:focus-within{ background:rgba(255,255,255,0.09); border-color:var(--border); }
+  .recherche-fine:focus-within{ background:rgba(28,28,38,0.076); border-color:var(--border); }
   .recherche-fine svg{ width:15px; height:15px; color:var(--label-3); flex-shrink:0; }
   /* Le sélecteur d'attribut est indispensable : sans lui, la règle générale
      `input[type=text]` déclarée plus bas l'emporte à spécificité égale et le
@@ -4094,7 +4194,7 @@
   }
   .ga-anneau{ position:relative; width:58px; height:58px; }
   .ga-anneau svg{ transform:rotate(-90deg); display:block; }
-  .ga-anneau .piste{ stroke:rgba(255,255,255,0.10); }
+  .ga-anneau .piste{ stroke:rgba(28,28,38,0.30); }
   /* L'anneau se remplit à l'affichage, comme dans l'app Forme. */
   .ga-anneau .valeur{
     stroke-linecap:round;
@@ -4121,11 +4221,11 @@
 
   .hero-card{ position:relative; background:var(--hero-gradient);
     border-radius:20px; padding:20px 18px; margin-bottom:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); }
-  .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(255,255,255,0.55); font-weight:500; margin-bottom:10px; }
+  .hero-card .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:0.6px; color:rgba(28,28,38,0.80); font-weight:500; margin-bottom:10px; }
   .hero-card .num{ font-size:44px; font-weight:700; color:#fff; letter-spacing:-1.2px; }
-  .hero-card .sub{ font-size:13px; color:rgba(255,255,255,0.55); margin-top:4px; font-weight:500; }
-  .hero-card .bar{ height:10px; background:rgba(255,255,255,0.18); border-radius:100px; overflow:hidden; margin-top:14px; }
-  .hero-card .bar-fill{ height:100%; background:#fff; border-radius:100px; box-shadow:0 0 12px rgba(255,255,255,0.55); }
+  .hero-card .sub{ font-size:13px; color:rgba(28,28,38,0.80); margin-top:4px; font-weight:500; }
+  .hero-card .bar{ height:10px; background:rgba(28,28,38,0.153); border-radius:100px; overflow:hidden; margin-top:14px; }
+  .hero-card .bar-fill{ height:100%; background:#fff; border-radius:100px; box-shadow:0 0 12px rgba(28,28,38,0.220); }
 
   .section-title{ display:flex; align-items:center; justify-content:space-between; font-size:13px; font-weight:600; color:var(--label-2); margin:20px 0 10px; }
   /* ═══ Pourquoi pas de `backdrop-filter` ici ═══
@@ -4218,7 +4318,7 @@
      passait sur deux lignes pour lui faire place. En dessous, elle ne coûte
      rien à la lecture et se touche aussi bien. */
   .badge.extrait{
-    background:rgba(255,179,64,0.16); color:#FEB731;
+    background:rgba(255,179,64,0.16); color:#B85E00;
     display:inline-flex; align-items:center; margin-top:7px;
   }
   .et-co .badge.extrait{ display:inline-flex; }
@@ -4230,9 +4330,9 @@
   label.f{ display:block; font-size:12px; font-weight:600; color:var(--label-2); margin-bottom:8px; }
   textarea, input[type=text], input[type=email], input[type=password], input[type=file]{
     width:100%; font-size:16px; border:0.5px solid var(--border); border-radius:12px; padding:12px;
-    background:rgba(255,255,255,0.04); color:var(--label);
+    background:rgba(28,28,38,0.034); color:var(--label);
   }
-  textarea:focus, input:focus{ outline:none; border-color:rgba(255,255,255,0.4); background:rgba(255,255,255,0.07); }
+  textarea:focus, input:focus{ outline:none; border-color:rgba(28,28,38,0.220); background:rgba(28,28,38,0.060); }
   ::placeholder{color:var(--label-3);}
 
   /* ═══ LE BOUTON PRINCIPAL ═══
@@ -4249,12 +4349,12 @@
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s; }
   .btn:active{ transform:scale(0.94); box-shadow:0 3px 10px rgba(255,122,24,0.22); }
   .btn.small{ padding:9px 16px; font-size:12.5px; }
-  .btn.ghost{ background:rgba(255,255,255,0.10); color:var(--label); box-shadow:none; border:0.5px solid var(--border); }
+  .btn.ghost{ background:rgba(28,28,38,0.085); color:var(--label); box-shadow:none; border:0.5px solid var(--border); }
   .btn.block{width:100%; text-align:center;}
   .btn[disabled]{opacity:0.5;}
 
   .video-frame{ background:#000; border:0.5px solid var(--border); border-radius:16px; aspect-ratio:16/9;
-    display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.5); font-size:13px; overflow:hidden; position:relative; }
+    display:flex; align-items:center; justify-content:center; color:rgba(28,28,38,0.75); font-size:13px; overflow:hidden; position:relative; }
   .video-frame video{width:100%; height:100%; object-fit:contain;}
 
   .step-edit-item{ background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px; margin-bottom:10px; }
@@ -4265,8 +4365,8 @@
   .step-edit-item textarea{
     min-height:44px; padding:11px 12px !important;
     border-radius:12px !important;
-    background:rgba(255,255,255,0.06) !important;
-    border:0.5px solid rgba(255,255,255,0.14) !important;
+    background:rgba(28,28,38,0.051) !important;
+    border:0.5px solid rgba(28,28,38,0.161) !important;
     font-size:15px !important; line-height:1.45 !important;
     transition:border-color 0.2s, background 0.2s;
   }
@@ -4277,10 +4377,10 @@
   }
   .step-edit-item textarea::placeholder{ color:var(--label-3); }
   .step-edit-item .step-num{
-    width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff;
+    width:24px; height:24px; border-radius:50%; background:rgba(28,28,38,0.085); color:#fff;
     display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; margin-top:2px;
   }
-  .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(255,255,255,0.06); padding:3px 7px; border-radius:6px; flex-shrink:0; }
+  .step-edit-item .range{ font-size:10.5px; font-weight:600; color:var(--label-2); background:rgba(28,28,38,0.051); padding:3px 7px; border-radius:6px; flex-shrink:0; }
   .step-edit-item textarea{
     flex:1; background:none; border:none; font-size:16px; padding:0; resize:none; overflow:hidden;
     line-height:1.4; font-family:inherit; color:var(--label); min-height:22px;
@@ -4320,7 +4420,7 @@
   .capcut-markers{ position:absolute; inset:0; pointer-events:none; }
   .capcut-marker{
     position:absolute; top:0; bottom:0; width:2px; background:#fff;
-    box-shadow:0 0 4px rgba(255,255,255,0.8);
+    box-shadow:0 0 4px rgba(28,28,38,0.220);
   }
   .capcut-playhead{
     position:absolute; top:-4px; bottom:-4px; width:3px; background:var(--red); z-index:3;
@@ -4337,21 +4437,21 @@
   .capcut-timeline.clipmode{ touch-action:none; }
   /* La bande de l'étape choisie ressort par un liseré clair par-dessus sa
      couleur : on sait laquelle on règle sans perdre le repère de couleur. */
-  .clip-band.sel{ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,0.9); }
+  .clip-band.sel{ box-shadow:inset 0 0 0 1.5px rgba(28,28,38,0.220); }
     /* Chaque étape porte deux bords marqués : son entrée à gauche, sa sortie à
      droite, dans sa couleur. On voit donc les bornes de toutes les étapes en
      même temps, pas seulement celles de l'étape choisie. */
   .clip-band{
     -webkit-user-select:none; user-select:none; pointer-events:auto;
-    position:absolute; top:0; bottom:0; background:rgba(255,255,255,0.10);
-    border-left:3px solid rgba(255,255,255,0.5); border-right:3px solid rgba(255,255,255,0.5);
+    position:absolute; top:0; bottom:0; background:rgba(28,28,38,0.085);
+    border-left:3px solid rgba(28,28,38,0.220); border-right:3px solid rgba(28,28,38,0.220);
     border-radius:2px;
   }
   .clip-band span{ position:absolute; top:4px; left:4px; font-size:9px; font-weight:800; color:#fff;
     background:rgba(0,0,0,0.65); border-radius:4px; padding:1px 5px; }
   .clip-mask{ position:absolute; top:0; bottom:0; background:rgba(0,0,0,0.6); pointer-events:none; z-index:2; display:none; }
   .clip-sel{ position:absolute; top:0; bottom:0; z-index:3; display:none; pointer-events:none;
-    border-top:2px solid #fff; border-bottom:2px solid #fff; background:rgba(255,255,255,0.06); }
+    border-top:2px solid #fff; border-bottom:2px solid #fff; background:rgba(28,28,38,0.051); }
   .clip-mask.on, .clip-sel.on{ display:block; }
   .clip-handle{ position:absolute; top:-1px; bottom:-1px; width:26px; z-index:6; display:none;
     align-items:center; justify-content:center; touch-action:none; cursor:ew-resize; }
@@ -4373,8 +4473,8 @@
   .fen-pro{
     position:relative; width:100%; max-width:318px;
     border-radius:26px; overflow:hidden;
-    background:linear-gradient(168deg, #1D1E23, #141518);
-    border:0.5px solid rgba(255,255,255,0.14);
+    background:linear-gradient(168deg, #F5F4F3, #F3F2F1);
+    border:0.5px solid rgba(28,28,38,0.161);
     box-shadow:0 28px 66px rgba(0,0,0,0.66);
     transform:scale(0.94); opacity:0;
     transition:transform 0.28s cubic-bezier(0.34,1.4,0.64,1), opacity 0.22s ease;
@@ -4394,11 +4494,11 @@
   .fen-ic{
     width:54px; height:54px; border-radius:18px; margin:0 auto 15px;
     display:grid; place-items:center; color:#fff;
-    background:rgba(255,255,255,0.07); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.060); border:0.5px solid var(--border);
   }
   .fen-ic svg{ width:25px; height:25px; display:block; }
-  .fen-ic.rouge{ background:rgba(255,69,58,0.14); border-color:rgba(255,69,58,0.34); color:#FF6961; }
-  .fen-ic.vert { background:rgba(48,209,88,0.14); border-color:rgba(48,209,88,0.32); color:#5FDE84; }
+  .fen-ic.rouge{ background:rgba(255,69,58,0.14); border-color:rgba(255,69,58,0.34); color:#C0271D; }
+  .fen-ic.vert { background:rgba(48,209,88,0.14); border-color:rgba(48,209,88,0.32); color:#1F8A3B; }
 
   .fen-t{ font-size:18.5px; font-weight:800; letter-spacing:-0.038em; line-height:1.25; }
   .fen-s{
@@ -4417,17 +4517,17 @@
   .fen-p:active{ transform:scale(0.98); }
   .fen-a{
     width:100%; height:44px; border-radius:15px;
-    border:0.5px solid var(--border); background:rgba(255,255,255,0.05);
+    border:0.5px solid var(--border); background:rgba(28,28,38,0.043);
     color:var(--label-2); font-family:inherit; font-size:14px; font-weight:650;
   }
-  .fen-a:active{ background:rgba(255,255,255,0.09); }
+  .fen-a:active{ background:rgba(28,28,38,0.076); }
 
   /* Le champ de saisie prend la place du dessin : une tuile au-dessus d'un
      champ ferait deux points d'attention là où il n'y a qu'une chose à faire. */
   .fen-champ{
     width:100%; height:46px; margin-top:16px; padding:0 14px;
     border-radius:14px; border:0.5px solid var(--border);
-    background:rgba(255,255,255,0.06); color:#fff;
+    background:rgba(28,28,38,0.051); color:#fff;
     font-family:inherit; font-size:15px; text-align:center;
   }
   .fen-champ:focus{
@@ -4534,30 +4634,30 @@
   .ios-alert-choix button{
     height:48px; border:none; background:none; color:var(--blue);
     font-family:inherit; font-size:15.5px; font-weight:650;
-    border-top:0.5px solid rgba(255,255,255,0.14);
+    border-top:0.5px solid rgba(28,28,38,0.161);
   }
-  .ios-alert-choix button:active{ background:rgba(255,255,255,0.07); }
+  .ios-alert-choix button:active{ background:rgba(28,28,38,0.060); }
   .ios-alert-choix button.danger{ color:var(--red); }
   .ios-alert-choix button.annuler{ font-weight:650; }
 
   .ios-alert-champ{
     width:100%; margin-top:13px; height:42px; padding:0 13px;
-    border-radius:11px; border:0.5px solid rgba(255,255,255,0.18);
-    background:rgba(255,255,255,0.08); color:#fff;
+    border-radius:11px; border:0.5px solid rgba(28,28,38,0.207);
+    background:rgba(28,28,38,0.068); color:#fff;
     font-family:inherit; font-size:16px; text-align:center;
   }
-  .ios-alert-champ:focus{ outline:none; border-color:rgba(255,255,255,0.42); }
+  .ios-alert-champ:focus{ outline:none; border-color:rgba(28,28,38,0.220); }
   .ios-alert-backdrop.closing .ios-alert{ transform:scale(0.95); opacity:0; transition-duration:0.16s; }
   .ios-alert-body{ padding:22px 20px 19px; }
   .ios-alert-title{ font-size:16.5px; font-weight:750; letter-spacing:-0.03em; margin-bottom:6px; }
   .ios-alert-msg{ font-size:13px; line-height:1.5; color:var(--label-2); }
-  .ios-alert-actions{ display:flex; border-top:0.5px solid rgba(255,255,255,0.18); }
+  .ios-alert-actions{ display:flex; border-top:0.5px solid rgba(28,28,38,0.207); }
   .ios-alert-actions button{
     flex:1; padding:15px 8px; font-family:inherit; font-size:15.5px; font-weight:650; letter-spacing:-0.025em;
     color:var(--blue); background:none; transition:background 0.12s;
   }
-  .ios-alert-actions button:active{ background:rgba(255,255,255,0.10); }
-  .ios-alert-actions button + button{ border-left:0.5px solid rgba(255,255,255,0.18); }
+  .ios-alert-actions button:active{ background:rgba(28,28,38,0.085); }
+  .ios-alert-actions button + button{ border-left:0.5px solid rgba(28,28,38,0.207); }
   .ios-alert-actions button.danger{ color:var(--red); font-weight:700; }
 
   /* ═══ Commandes de clip, façon CapCut ═══ */
@@ -4569,14 +4669,14 @@
     font-size:10.5px; font-weight:600; color:var(--label); line-height:1.1; text-align:center;
     transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), background 0.15s;
   }
-  .clip-tool:active{ transform:scale(0.93); background:rgba(255,255,255,0.14); }
+  .clip-tool:active{ transform:scale(0.93); background:rgba(28,28,38,0.119); }
   .clip-tool svg{ width:19px; height:19px; }
   .clip-tool[disabled]{ opacity:0.35; }
   .clip-done-btn{ display:none; width:100%; margin-top:10px; }
   .clip-done-btn.on{ display:block; }
 
   .step-edit-item{ cursor:pointer; transition: border-color 0.18s, background 0.18s; }
-  .step-edit-item.selected{ border-color:rgba(255,255,255,0.55); background:rgba(255,255,255,0.07); }
+  .step-edit-item.selected{ border-color:rgba(28,28,38,0.220); background:rgba(28,28,38,0.060); }
   
   
   
@@ -4589,17 +4689,17 @@
   .cat-rank .pos{
     width:22px; height:22px; border-radius:50%; flex-shrink:0;
     display:flex; align-items:center; justify-content:center;
-    font-size:11px; font-weight:800; background:rgba(255,255,255,0.12); color:#fff;
+    font-size:11px; font-weight:800; background:rgba(28,28,38,0.102); color:#fff;
   }
   .cat-rank.premier .pos{ background:#fff; color:#000; }
   /* Les lignes du temps de lecture s'ouvrent : on le montre à l'appui, comme
      partout ailleurs dans l'app. Les dossiers, elles, ne bougent pas. */
   .cat-rank.cliquable{ cursor:pointer; transition:transform 0.16s, background 0.2s; }
-  .cat-rank.cliquable:active{ transform:scale(0.985); background:rgba(255,255,255,0.07); }
+  .cat-rank.cliquable:active{ transform:scale(0.985); background:rgba(28,28,38,0.060); }
   .cat-rank .infos{ flex:1; min-width:0; }
   .cat-rank .nom{ font-size:14px; font-weight:600; }
   .cat-rank .detail{ font-size:11px; color:var(--label-2); margin-top:2px; }
-  .cat-rank .jauge{ height:4px; border-radius:4px; background:rgba(255,255,255,0.10); margin-top:7px; overflow:hidden; }
+  .cat-rank .jauge{ height:4px; border-radius:4px; background:rgba(28,28,38,0.085); margin-top:7px; overflow:hidden; }
   .cat-rank .jauge i{ display:block; height:100%; border-radius:4px; transition:width 0.6s cubic-bezier(0.22,1,0.36,1); }
   .cat-rank .taux{ font-size:15px; font-weight:800; font-variant-numeric:tabular-nums; flex-shrink:0; }
 
@@ -4635,7 +4735,7 @@
      ombre portée donne des rendus incohérents. Fond plein, rendu fiable. */
   .qr-card{
     padding:18px; text-align:center;
-    background:rgba(255,255,255,0.028);
+    background:rgba(28,28,38,0.024);
     -webkit-backdrop-filter:none; backdrop-filter:none;
   }
   .qr-plaque{
@@ -4658,7 +4758,7 @@
   .qr-corner.bl{ bottom:-7px; left:-7px; border-right:0; border-top:0; border-bottom-left-radius:7px; }
   .qr-corner.br{ bottom:-7px; right:-7px; border-left:0; border-top:0; border-bottom-right-radius:7px; }
   .qr-plaque-title{
-    color:#0C0D0E; font-size:14.5px; font-weight:700; line-height:1.25;
+    color:#1C1C26; font-size:14.5px; font-weight:700; line-height:1.25;
     margin-top:16px; word-break:break-word;
   }
   .qr-plaque-sub{ color:rgba(20,21,24,0.45); font-size:11px; font-weight:500; margin-top:4px; }
@@ -4677,7 +4777,7 @@
     background:var(--bg-card); border-radius:16px; padding:14px 16px; margin-bottom:8px;
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
   }
-  .plan-card.active{ border-color:rgba(255,255,255,0.5); }
+  .plan-card.active{ border-color:rgba(28,28,38,0.220); }
   .plan-card:active{ transform:scale(0.98); }
   .plan-head{ display:flex; justify-content:space-between; align-items:center; }
   .plan-name{ font-size:15px; font-weight:700; display:flex; align-items:center; }
@@ -4731,7 +4831,7 @@
   #detail-steps.etapes-fil::before,
   #analyse-steps-list.etapes-fil::before{
     content:''; position:absolute; left:16px; top:9px; bottom:18px; width:1.5px;
-    background:linear-gradient(rgba(255,255,255,0.16), rgba(255,255,255,0.04));
+    background:linear-gradient(rgba(28,28,38,0.136), rgba(28,28,38,0.034));
   }
   /* L'employé lit debout, souvent d'assez loin, et son doigt doit trouver la
      bonne case du premier coup. On desserre légèrement : 28 px entre les étapes
@@ -4792,7 +4892,7 @@
   }
 
   .detail-step{ transition:border-color 0.3s ease, background 0.3s ease; background:var(--bg-card); border:0.5px solid var(--border); border-radius:16px; padding:14px 16px; margin-bottom:8px; display:flex; gap:12px; align-items:flex-start; }
-  .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(255,255,255,0.1); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
+  .detail-step .n{ width:24px; height:24px; border-radius:50%; background:rgba(28,28,38,0.085); color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0; }
   /* `pre-line` conserve les retours à la ligne saisis à la rédaction : le HTML
      les avale sinon, et une étape écrite en plusieurs lignes arrivait en un seul
      bloc. Les espaces multiples restent réduits. */
@@ -4835,7 +4935,7 @@
      lieu d'un mouvement. */
   .filter-chips{
     position:relative; display:flex; gap:0; padding:3px; border-radius:100px;
-    background:rgba(255,255,255,0.07); border:0.5px solid rgba(255,255,255,0.10);
+    background:rgba(28,28,38,0.060); border:0.5px solid rgba(28,28,38,0.115);
   }
   /* La pastille est un seul élément qui se déplace, pas trois fonds qui
      s'allument : c'est ce qui donne le glissement. */
@@ -4908,7 +5008,7 @@
   .accueil-av:active{ transform:scale(0.93); }
   .accueil-av .dispo{
     position:absolute; right:5px; bottom:9px; width:12px; height:12px; border-radius:50%;
-    background:var(--green); box-shadow:0 0 0 2.5px #1A1B1F;
+    background:var(--green); box-shadow:0 0 0 2.5px #F4F3F2;
   }
   /* ═══════════════════════════════════════════════════════════════════════
      LA CARTE D'OUVERTURE
@@ -4926,16 +5026,16 @@
     border-radius:24px;
     /* ═══ UN NOIR PLUS PROFOND QUE LES AUTRES CARTES ═══
 
-       `--hero-gradient` part de #2C2C34, un gris déjà clair. Sur les cartes de
+       `--hero-gradient` part de #F7F6F5, un gris déjà clair. Sur les cartes de
        contenu c'est juste : elles doivent se détacher du fond. Ici non — cette
        carte porte un bord allumé et un dessin lumineux, et un intérieur gris
        les affadissait tous les deux.
 
-       On descend à #17171B / #060608 : le contraste avec le liseré ambre et le
+       On descend à #F4F3F2 / #F1F0EF : le contraste avec le liseré ambre et le
        dessin double, sans que rien d'autre change. Le dégradé garde le même
        angle et la même progression — c'est la même lumière, sur une matière
        plus sombre. */
-    background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+    background:linear-gradient(150deg, #F4F3F2 0%, #F2F1F0 40%, #F1F0EF 75%, #F1F0EF 100%);
     border:none;
     /* Une lueur ambre très basse sous la carte : c'est elle qui la détache du
        fond, comme sur la référence. */
@@ -5014,9 +5114,9 @@
   .hero-qr{
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
     width:48px; height:48px; border-radius:15px; padding:0;
-    background:rgba(255,255,255,0.028);
+    background:rgba(28,28,38,0.024);
     border:0.5px solid rgba(255,173,51,0.30);
-    color:#FDA81E;
+    color:#C24700;
     transition:transform 0.16s cubic-bezier(0.34,1.56,0.64,1), background 0.2s;
   }
   .hero-qr svg{ width:21px; height:21px; }
@@ -5034,8 +5134,27 @@
     .hero-cta{ transition:none; }
   }
 
-  .list-tools{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-  .list-tools .dd-filter{ margin-bottom:0; flex:1; min-width:0; }
+  /* ⚠ `space-between` ET LE FILTRE NE S'ÉTIRE PLUS. Avec `flex:1`, la pastille
+     de tri occupait toute la largeur restante : son libellé se collait au mot
+     « Dossiers » et son chevron partait seul à l'autre bout de l'écran. On
+     lisait « Dossiers Trier : A → Z » comme une seule phrase, avec une flèche
+     égarée au bord. */
+  .list-tools{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin-bottom:14px;
+  }
+  .list-tools .dd-filter{ margin-bottom:0; flex:0 0 auto; }
+  /* Le tri se donne la forme d'un bouton : fond blanc, coins ronds. Sans lui,
+     c'était du texte gras noir posé sur le fond, impossible à distinguer d'un
+     titre. */
+  .list-tools .dd-trigger{
+    padding:7px 13px; border-radius:100px;
+    background:var(--bg-card);
+    box-shadow:0 1px 2px rgba(20,20,30,0.04),
+               inset 0 0 0 0.5px rgba(28,28,38,0.06);
+    font-size:12.5px; font-weight:500; color:var(--label-2);
+  }
+  .list-tools .dd-trigger svg{ width:12px; height:12px; margin-left:7px; color:var(--label-3); }
 
 
   .dd-filter{ position:relative; margin-bottom:14px; }
@@ -5059,7 +5178,7 @@
   .dd-trigger.open svg{ transform:rotate(180deg); }
   .dd-menu{
     display:none; position:absolute; top:100%; left:0; right:0; margin-top:8px;
-    background:#1C1D20; border:0.5px solid var(--border); border-radius:14px;
+    background:#F5F4F3; border:0.5px solid var(--border); border-radius:14px;
     overflow:hidden; z-index:30; box-shadow:0 10px 30px rgba(0,0,0,0.5);
   }
   .dd-menu.open{ display:block; animation: authFormIn 0.2s cubic-bezier(0.22,1,0.36,1); }
@@ -5069,7 +5188,7 @@
   }
   .dd-menu button:last-child{ border-bottom:none; }
   .dd-menu button.selected{ color:#fff; font-weight:700; }
-  .dd-menu button:active{ background:rgba(255,255,255,0.06); }
+  .dd-menu button:active{ background:rgba(28,28,38,0.051); }
 
   .search-bar{ display:flex; align-items:center; gap:8px; background:var(--bg-card); border:0.5px solid var(--border); border-radius:100px; padding:0 14px; height:38px; margin-bottom:12px; }
 
@@ -5105,7 +5224,7 @@
      suite, en creux, plutôt qu'un écran vide. */
   /* Les faux blocs de chargement ont été retirés : leur style part avec eux.
      Un jeu de règles qui ne s'applique plus à rien fait douter du reste. */
-  .sq-bloc{ background:rgba(255,255,255,0.08); border-radius:8px; }
+  .sq-bloc{ background:rgba(28,28,38,0.068); border-radius:8px; }
 
   .cat-cell, .proc-rich-card{
     padding:15px 15px 14px; text-align:left; transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
@@ -5125,7 +5244,7 @@
      le dessin qui donne la taille, et la carte se resserre d'autant. */
   .cat-ring-wrap{ position:relative; flex-shrink:0; display:flex; }
   .cat-ring-wrap svg{ width:46px; height:46px; transform:rotate(-90deg); }
-  .cat-ring-bg{ fill:none; stroke:rgba(255,255,255,0.08); stroke-width:3; }
+  .cat-ring-bg{ fill:none; stroke:rgba(28,28,38,0.28); stroke-width:3; }
   .cat-ring-fill{ fill:none; stroke-width:3; stroke-linecap:round; transition:stroke-dashoffset 0.6s cubic-bezier(0.32,0.72,0,1); }
   .cat-icon{ display:flex; align-items:center; justify-content:center; font-size:24px; }
 
@@ -5255,7 +5374,7 @@
   }
   .proc-jauge{
     flex:1; min-width:0; height:5px; border-radius:3px; overflow:hidden;
-    background:rgba(255,255,255,0.08);
+    background:rgba(28,28,38,0.068);
   }
   .proc-jauge i{ display:block; height:100%; border-radius:3px; }
   .proc-taux{
@@ -5266,7 +5385,7 @@
   .proc-taux em{ font-style:normal; color:var(--label-3); font-weight:600; }
 
   .cat-badge{
-    font-size:11px; font-weight:700; margin-top:3px; background:rgba(255,255,255,0.08); color:var(--label-2);
+    font-size:11px; font-weight:700; margin-top:3px; background:rgba(28,28,38,0.068); color:var(--label-2);
     padding:4px 9px; border-radius:100px; flex-shrink:0;
   }
   /* Le nom et son indicateur d'état partagent une ligne : le texte prend la
@@ -5317,7 +5436,7 @@
     font-size:10.5px; color:var(--label-2);
     padding:2px 0;
   }
-  .cat-cell.active{ border-color:#fff; background:rgba(255,255,255,0.14); }
+  .cat-cell.active{ border-color:#fff; background:rgba(28,28,38,0.119); }
   .search-bar svg{width:15px; height:15px; color:var(--label-2); flex-shrink:0;}
   .search-bar input{background:none; border:none; font-size:16px; width:100%;}
 
@@ -5343,7 +5462,7 @@
   .scan-cible{
     position:absolute; left:50%; top:40%; transform:translate(-50%, -50%);
     width:min(62vw, 200px); aspect-ratio:1/1; border-radius:26px;
-    background:rgba(255,255,255,0.08);
+    background:rgba(28,28,38,0.068);
     box-shadow:0 0 0 9999px rgba(0,0,0,0.45);
     pointer-events:none;
   }
@@ -5401,7 +5520,7 @@
   .scan-echec .pas li{
     position:relative; counter-increment:pas;
     padding:11px 0 11px 38px; font-size:13.5px; line-height:1.45;
-    border-bottom:0.5px solid rgba(255,255,255,0.028);
+    border-bottom:0.5px solid rgba(28,28,38,0.032);
   }
   .scan-echec .pas li:last-child{ border-bottom:none; }
   .scan-echec .pas li::before{
@@ -5409,12 +5528,12 @@
     width:24px; height:24px; border-radius:50%;
     display:flex; align-items:center; justify-content:center;
     font-size:12px; font-weight:750; color:var(--label-2);
-    background:rgba(255,255,255,0.07); border:0.5px solid var(--border);
+    background:rgba(28,28,38,0.060); border:0.5px solid var(--border);
   }
   .scan-echec .pas b{ font-weight:700; color:#fff; }
   .scan-echec .repli{
     font-size:12px; color:var(--label-3); line-height:1.45; margin-top:14px;
-    padding-top:13px; border-top:0.5px solid rgba(255,255,255,0.028);
+    padding-top:13px; border-top:0.5px solid rgba(28,28,38,0.032);
   }
   .scan-echec .btn{ margin-top:18px; }
 
@@ -5425,7 +5544,7 @@
   }
   .scan-cam{
     width:44px; height:44px; border-radius:50%; border:none; padding:0;
-    background:rgba(255,255,255,0.16); backdrop-filter:blur(20px);
+    background:rgba(28,28,38,0.136); backdrop-filter:blur(20px);
     -webkit-backdrop-filter:blur(20px);
     display:flex; align-items:center; justify-content:center; color:#fff;
   }
@@ -5440,7 +5559,7 @@
 
   .scan-lampe{
     width:44px; height:44px; border-radius:50%; border:none; padding:0;
-    background:rgba(255,255,255,0.16); backdrop-filter:blur(20px);
+    background:rgba(28,28,38,0.136); backdrop-filter:blur(20px);
     display:flex; align-items:center; justify-content:center; color:#fff;
   }
   /* Le dessin d'une torche est plus haut que large : centré sur sa boîte, il
@@ -5524,12 +5643,12 @@
   }
   /* La consigne finale, plus discrète que le paragraphe : c'est une indication
      de geste, pas une explication. */
-  .debut .fleche b{ color:#FDA81E; font-weight:800; }
+  .debut .fleche b{ color:#C24700; font-weight:800; }
   .debut-dessin{ position:relative; width:132px; height:120px; margin-bottom:26px; }
   .debut-dessin .lueur{
     position:absolute; left:50%; top:52%; transform:translate(-50%,-50%);
     width:150%; height:150%; border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle, rgba(255,255,255,0.13) 0%, transparent 66%);
+    background:radial-gradient(circle, rgba(28,28,38,0.111) 0%, transparent 66%);
     filter:blur(14px); animation:debutLueur 4.5s ease-in-out infinite;
   }
   .debut-dessin svg{ position:relative; width:100%; height:100%; overflow:visible; }
@@ -5679,14 +5798,14 @@
     border:2px solid rgba(0,0,0,0.25); border-top-color:#000;
     animation: spin 0.7s linear infinite; vertical-align:middle;
   }
-  .btn.ghost .btn-spinner{ border-color:rgba(255,255,255,0.25); border-top-color:#fff; }
+  .btn.ghost .btn-spinner{ border-color:rgba(28,28,38,0.220); border-top-color:#fff; }
   .btn[data-loading="true"]{ pointer-events:none; opacity:0.85; }
   .login-card{
     width:100%; max-width:none;
     /* Elle s'arrête à 92 % : les huit pour cent restants laissent voir la page
        d'accueil, et c'est ce qui dit qu'on peut revenir en arrière. */
     max-height:92vh; overflow-y:auto;
-    background:#0E0E13;
+    background:#F2F1F0;
     border:none;
     /* Arrondie en haut seulement — elle sort du bas de l'écran. */
     border-radius:22px 22px 0 0;
@@ -5709,7 +5828,7 @@
     display:grid; place-items:center;
     background:rgba(0,0,0,0.42);
     -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
-    box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.16);
+    box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.184);
     color:#fff;
     transition:transform 0.14s ease;
   }
@@ -5760,7 +5879,7 @@
   .login-card::before{
     content:''; display:block;
     width:36px; height:4px; margin:0 auto 16px;
-    border-radius:100px; background:rgba(255,255,255,0.22);
+    border-radius:100px; background:rgba(28,28,38,0.187);
   }
 
   @keyframes feuilleMonte{
@@ -5785,7 +5904,7 @@
   }
 
   .auth-toggle{
-    position:relative; display:flex; gap:0; background:rgba(255,255,255,0.06); border:0.5px solid var(--border);
+    position:relative; display:flex; gap:0; background:rgba(28,28,38,0.051); border:0.5px solid var(--border);
     border-radius:100px; padding:4px; margin-bottom:22px;
   }
   /* La pastille qui glisse sous l'onglet choisi. Elle était blanche — la
@@ -5896,10 +6015,10 @@
   .zoom-frise{ display:flex; align-items:center; gap:7px; margin-top:9px; }
   .zoom-btn{
     width:32px; height:32px; border-radius:10px; flex-shrink:0;
-    border:0.5px solid var(--border); background:rgba(255,255,255,0.08);
+    border:0.5px solid var(--border); background:rgba(28,28,38,0.068);
     color:#fff; font-size:16px; font-weight:700; font-family:inherit;
   }
-  .zoom-btn:active{ background:rgba(255,255,255,0.18); }
+  .zoom-btn:active{ background:rgba(28,28,38,0.153); }
   .zoom-btn:disabled{ opacity:0.3; }
   .zoom-val{ font-size:12px; font-weight:700; color:var(--label-2); min-width:26px; text-align:center; }
   /* « Étapes liées » : le montage par report, là encore une convention des vraies
@@ -5907,7 +6026,7 @@
      voisine : la vidéo reste couverte, aucun trou ne peut apparaître. */
   .zoom-lien{
     margin-left:auto; height:32px; padding:0 13px; border-radius:10px;
-    border:0.5px solid var(--border); background:rgba(255,255,255,0.08);
+    border:0.5px solid var(--border); background:rgba(28,28,38,0.068);
     color:var(--label-2); font-size:11.5px; font-weight:650; font-family:inherit;
   }
   .zoom-lien.active{ background:rgba(255,255,255,0.9); color:#000; border-color:transparent; }
@@ -5953,7 +6072,7 @@
 
   .tab-pill{
     position:absolute; top:0; left:0; width:44px; height:44px; border-radius:100px;
-    background:rgba(255,255,255,0.26); pointer-events:none; opacity:0;
+    background:rgba(28,28,38,0.221); pointer-events:none; opacity:0;
     transition: transform 0.45s cubic-bezier(0.34,1.4,0.5,1), opacity 0.25s ease;
   }
   /* Onglets sans texte : icône seule, en ligne quand l'onglet dort, pleine et
@@ -5969,7 +6088,7 @@
   .tab-round .ico-plein{ display:none; }
   .tab-round.active .ico-ligne{ display:none; }
   .tab-round.active .ico-plein{ display:block; }
-  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(255,255,255,0.2), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(255,255,255,0.4); }
+  .tab-round--primary{ background:#fff; color:#000; width:44px; height:44px; padding:0; box-shadow:0 4px 12px rgba(28,28,38,0.220), 0 2px 6px rgba(0,0,0,0.25); border:0.5px solid rgba(28,28,38,0.220); }
   .tab-round--primary svg{ width:23px; height:23px; }
 
 
@@ -6024,14 +6143,19 @@
 
    Tout est maintenant sur l'élément lui-même : le fond, le flou, le creux et
    l'arête. Une seule surface, rien qui puisse se décaler. */
+/* ⚠ EN CLAIR, LE CREUX DEVIENT UNE BOSSE. L'ombre interne noire de 17 px
+   dessinait la barre en CREUX sur du noir — la lumière tombe dedans. Sur du
+   blanc, la même ombre trace un anneau gris à l'intérieur du bord : la pilule
+   paraît sale et cerclée.
+
+   On garde la géométrie, on retourne la matière : blanc à 72 %, reflet en
+   haut, ombre portée dessous. Elle flotte au lieu d'être enfoncée. */
 .topbar-card{
-  background-color:rgba(var(--tint-color, 255,255,255), var(--tint-opacity, .06));
-  -webkit-backdrop-filter:var(--verre-bar);
-  backdrop-filter:var(--verre-bar);
+  background-color:#FFFFFF;
   border:none;
-  box-shadow:
-    0 4px var(--outer-shadow-blur, 17px) rgba(0,0,0,.18),
-    inset 0 0 var(--shadow-blur, 17px) var(--shadow-spread, -8px) var(--shadow-color, #000);
+  box-shadow:var(--verre-bord),
+             0 1px 1px rgba(60,40,20,0.05),
+             0 8px 22px -10px rgba(60,40,20,0.22);
 }
 /* Le même liseré que la barre du bas : une seule valeur sur tout le tour. Les
    deux pièces sont de la même matière — leurs bords doivent se ressembler. */
@@ -6042,11 +6166,12 @@
      le haut plus épais que le bas — l'œil lit une variation de clarté comme
      une variation d'épaisseur. Voir le même réglage sur `.glassDiv` dans
      index.html : les deux pièces doivent se ressembler exactement. */
+  /* ⚠ LE LISERÉ EST SUPPRIMÉ, PAS ADOUCI. Un trait sombre de 1 px tout autour
+     d'une pilule blanche, c'est un CONTOUR DESSINÉ — la chose que le verre
+     d'Apple n'a jamais. Le reflet du haut, posé par `--verre-bord` sur
+     l'élément, suffit à donner son arête à la forme. */
   padding:1px;
-  background:rgba(255,255,255,0.16);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
+  background:transparent;
 }
 
 /* À haute densité, un demi-pixel s'affiche vraiment : le trait s'affine sans
@@ -6136,7 +6261,7 @@
 .an-intro-cadre{
   position:relative; overflow:hidden;
   border:none; border-radius:22px; padding:16px 18px 17px;
-  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+  background:linear-gradient(150deg, #F4F3F2 0%, #F2F1F0 40%, #F1F0EF 75%, #F1F0EF 100%);
   box-shadow:0 14px 34px rgba(0,0,0,0.42), 0 0 30px -14px rgba(255,122,24,0.26);
 }
 .an-intro-cadre .t, .an-intro-cadre .s{ position:relative; z-index:2; }
@@ -6481,7 +6606,7 @@ body.plus-vu .plus-flot{
   background:linear-gradient(165deg,
     rgba(255,173,51,0.11) 0%, rgba(255,173,51,0.045) 52%, rgba(255,173,51,0.015) 100%);
   border:0.5px solid rgba(255,173,51,0.20);
-  color:#FDA81E;
+  color:#C24700;
 }
 .act-lig .act-ic svg, .ac-l-lig .act-ic svg{ width:16px; height:16px; display:block; }
 /* LE MÊME BLANC QUE LES LIGNES DU BLOC AU-DESSUS.
@@ -6502,7 +6627,7 @@ body.plus-vu .plus-flot{
    teinter tous reviendrait à n'en signaler aucun. */
 .act-refus{
   background:rgba(255,154,31,0.12) !important;
-  color:#FDA81E !important;
+  color:#C24700 !important;
 }
 
 #p-activites{ padding-left:32px; padding-right:32px; }
@@ -6614,8 +6739,8 @@ body.plus-vu .plus-flot{
   position:relative; z-index:2; flex-shrink:0;
   width:42px; height:42px; border-radius:50%; border:none;
   display:grid; place-items:center; overflow:hidden;
-  background:rgba(255,255,255,0.05);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.10);
+  background:rgba(28,28,38,0.043);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.115);
   transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1), box-shadow 0.2s;
 }
 .rond-etab:active{ transform:scale(0.93); }
@@ -6803,7 +6928,7 @@ body.plus-vu .plus-flot{
 .fait-rappel{
   display:flex; align-items:center; gap:10px; width:100%; text-align:left;
   padding:11px 14px; border:none;
-  border-radius:14px; background:rgba(255,255,255,0.045);
+  border-radius:14px; background:rgba(28,28,38,0.038);
   color:var(--label-2); font-family:inherit; font-size:12.5px; font-weight:600;
 }
 .fait-rappel .p{
@@ -6911,7 +7036,7 @@ body.chargement #bar{
   display:inline-flex; align-items:center; gap:7px;
   margin-top:12px;
   font-size:12.5px; font-weight:650; letter-spacing:-0.01em;
-  color:#FDA81E;
+  color:#C24700;
 }
 .contact-invite svg{ width:17px; height:17px; flex-shrink:0; display:block; }
 
@@ -6945,8 +7070,8 @@ body.chargement #bar{
   position:relative; flex-shrink:0;
   width:46px; height:46px; border-radius:50%; border:none; overflow:hidden;
   display:grid; place-items:center;
-  background:rgba(255,255,255,0.05);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.10);
+  background:rgba(28,28,38,0.043);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.115);
   font-family:inherit; font-size:15px; font-weight:750; letter-spacing:0.02em;
   color:var(--label-3);
   transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1), box-shadow 0.2s;
@@ -6980,14 +7105,14 @@ body.chargement #bar{
 .etab-plus{
   flex-shrink:0; width:46px; height:46px; border-radius:50%;
   display:grid; place-items:center;
-  background:none; border:1.5px dashed rgba(255,255,255,0.18);
+  background:none; border:1.5px dashed rgba(28,28,38,0.207);
   color:var(--label-2);
   transition:transform 0.16s cubic-bezier(0.34,1.5,0.64,1),
              border-color 0.2s, color 0.2s;
 }
 .etab-plus svg{ width:19px; height:19px; display:block; }
 .etab-plus:active{ transform:scale(0.93); }
-.etab-plus:hover{ border-color:rgba(255,173,51,0.45); color:#FDA81E; }
+.etab-plus:hover{ border-color:rgba(255,173,51,0.45); color:#C24700; }
 
 .etab-note{
   margin-top:13px; font-size:12px; line-height:1.5; color:var(--label-3);
@@ -7075,9 +7200,9 @@ body.chargement #bar{
   top:26px; right:26px; width:196px;
   padding:18px 18px 16px;
   border-radius:22px; text-align:center;
-  background:linear-gradient(150deg,#1E1E24 0%,#141418 50%,#0C0C10 100%);
+  background:linear-gradient(150deg,#F5F4F3 0%,#F3F2F1 50%,#F2F1F0 100%);
   box-shadow:0 16px 44px rgba(0,0,0,0.5),
-             inset 0 0 0 0.5px rgba(255,255,255,0.10);
+             inset 0 0 0 0.5px rgba(28,28,38,0.115);
   /* Elle arrive après l'app : posée en même temps, elle se disputerait
      l'attention avec la page qui se dévoile. */
   animation:pcCoinArrive 0.5s cubic-bezier(0.32,0.72,0,1) 0.6s both;
@@ -7172,7 +7297,7 @@ body.chargement #bar{
 .quota-anneau{ position:relative; display:grid; place-items:center; margin-bottom:14px; }
 /* Le quart de tour : sans lui, l'anneau démarre à trois heures. */
 .quota-anneau svg{ display:block; transform:rotate(-90deg); }
-.quota-anneau .piste{ stroke:rgba(255,255,255,0.07); }
+.quota-anneau .piste{ stroke:rgba(28,28,38,0.27); }
 .quota-anneau .part{
   stroke-linecap:round;
   transition:stroke-dashoffset 1.1s cubic-bezier(0.32, 0.72, 0, 1);
@@ -7199,7 +7324,7 @@ body.chargement #bar{
   font-size:12.5px; line-height:1.5; color:var(--label-2);
 }
 .quota-illimite b{ color:var(--label-1); font-weight:700; }
-.quota-illimite .ic{ flex-shrink:0; font-size:17px; color:#FDA81E; line-height:1.15; }
+.quota-illimite .ic{ flex-shrink:0; font-size:17px; color:#C24700; line-height:1.15; }
 
 /* Le bouton n'apparaît QUE sous cinq analyses. Ailleurs il serait de la
    réclame ; ici c'est un service — la personne va se trouver bloquée. */
@@ -7212,7 +7337,7 @@ body.chargement #bar{
 
 .quota-pied{
   margin-top:16px; padding-top:15px;
-  border-top:0.5px solid rgba(255,255,255,0.07);
+  border-top:0.5px solid rgba(28,28,38,0.081);
   font-size:12.5px; line-height:1.5; color:var(--label-3);
 }
 .quota-pied b{ color:var(--label-2); font-weight:700; }
@@ -7397,7 +7522,7 @@ body.chargement #bar{
   border-radius:22px;
   border:none;
   /* Le fond de `.hero`, à l'identique. */
-  background:linear-gradient(150deg, #17171B 0%, #101014 40%, #0A0A0D 75%, #060608 100%);
+  background:linear-gradient(150deg, #F4F3F2 0%, #F2F1F0 40%, #F1F0EF 75%, #F1F0EF 100%);
   color:var(--label);
   transition:transform 0.18s ease;
 }
@@ -7428,17 +7553,17 @@ body.chargement #bar{
   box-shadow:0 16px 38px rgba(0,0,0,0.50), 0 0 34px -12px rgba(255,122,24,0.32);
 }
 .choix-carte--blanc{
-  box-shadow:0 16px 38px rgba(0,0,0,0.50), 0 0 34px -12px rgba(255,255,255,0.16);
+  box-shadow:0 16px 38px rgba(0,0,0,0.50), 0 0 34px -12px rgba(28,28,38,0.184);
 }
 .choix-carte--blanc .hero-lueur{
   background:
-    radial-gradient(150px 110px at 100% 0%, rgba(255,255,255,0.10), transparent 72%),
-    radial-gradient(130px 100px at 0% 100%, rgba(255,255,255,0.06), transparent 72%);
+    radial-gradient(150px 110px at 100% 0%, rgba(28,28,38,0.085), transparent 72%),
+    radial-gradient(130px 100px at 0% 100%, rgba(28,28,38,0.051), transparent 72%);
 }
 .choix-carte--blanc .hero-lueur::after{
   background:linear-gradient(45deg,
-    #FFFFFF 0%, rgba(255,255,255,0.50) 12%, rgba(255,255,255,0.06) 30%,
-    rgba(255,255,255,0.06) 70%, rgba(255,255,255,0.50) 88%, #FFFFFF 100%);
+    #FFFFFF 0%, rgba(255,255,255,0.50) 12%, rgba(28,28,38,0.051) 30%,
+    rgba(28,28,38,0.051) 70%, rgba(255,255,255,0.50) 88%, #FFFFFF 100%);
 }
 
 /* ═══ LA PASTILLE « RECOMMANDÉ » ═══
@@ -7452,7 +7577,7 @@ body.chargement #bar{
   display:inline-flex; align-items:center; gap:4px;
   padding:3.5px 9px; border-radius:999px;
   background:#2A1B0C; border:0.5px solid rgba(255,150,40,0.45);
-  color:#FDA81E;
+  color:#C24700;
   font-size:9px; font-weight:800; letter-spacing:0.07em; text-transform:uppercase;
   white-space:nowrap;
 }
@@ -7467,7 +7592,7 @@ body.chargement #bar{
   display:flex; align-items:center; justify-content:center;
   width:46px; height:46px; flex:0 0 46px;
   border-radius:50%;
-  border:1px solid rgba(255,255,255,0.16);
+  border:1px solid rgba(28,28,38,0.184);
   color:var(--label-2);
   margin-bottom:18px;
 }
@@ -7476,10 +7601,10 @@ body.chargement #bar{
    diffèrent, et un rond noir sur une carte gris foncé se verrait comme une
    tache. La variable est posée ici plutôt qu'en dur dans le balisage — le jour
    où la carte change de teinte, l'icône suit. */
-.choix-carte{ --fond-choix:#131317; }
+.choix-carte{ --fond-choix:#F3F2F1; }
 .cc-rond svg{ width:23px; height:23px; display:block; }
-.choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#FDA81E; }
-.choix-carte--blanc .cc-rond{ border-color:rgba(255,255,255,0.34); color:var(--label); }
+.choix-carte--ambre .cc-rond{ border-color:rgba(255,150,40,0.50); color:#C24700; }
+.choix-carte--blanc .cc-rond{ border-color:rgba(28,28,38,0.220); color:var(--label); }
 
 /* L'enveloppe du texte. En deux colonnes elle ne fait rien — un bloc pleine
    largeur, comme si elle n'existait pas. Empilée, elle devient la colonne
@@ -7515,12 +7640,12 @@ body.chargement #bar{
   margin-top:auto; align-self:flex-start;
   padding-top:0;
   border-radius:50%;
-  border:1px solid rgba(255,255,255,0.16);
+  border:1px solid rgba(28,28,38,0.184);
   color:var(--label-2);
 }
 .cc-fleche svg{ width:17px; height:17px; display:block; }
-.choix-carte--ambre .cc-fleche{ border-color:rgba(255,150,40,0.50); color:#FDA81E; }
-.choix-carte--blanc .cc-fleche{ border-color:rgba(255,255,255,0.34); color:var(--label); }
+.choix-carte--ambre .cc-fleche{ border-color:rgba(255,150,40,0.50); color:#C24700; }
+.choix-carte--blanc .cc-fleche{ border-color:rgba(28,28,38,0.220); color:var(--label); }
 /* Un plancher d'air au-dessus de la flèche. `margin-top:auto` la pousse en bas,
    mais si la description remplit la carte, les deux se touchent. */
 .cc-fleche{ margin-top:auto; }
@@ -7910,7 +8035,7 @@ body:has(#e-detail.active) #equipe-app{
    135° sur un segment large donne un dégagement franc de gauche à droite :
    c'est le même geste que sur les chiffres, à l'horizontale. */
 .re-sg{ background:linear-gradient(135deg,#FEC64A,#EB5201); }
-.re-se{ background:rgba(255,255,255,0.17); }
+.re-se{ background:rgba(28,28,38,0.145); }
 
 .re-leg{ display:flex; gap:16px; font-size:12px; color:var(--label-2); }
 /* Sans `nowrap`, « 3 gestion » se casse entre le chiffre et le mot dès que la
@@ -8003,7 +8128,7 @@ body:has(#e-detail.active) #equipe-app{
 }
 .coller-rang{
   flex:0 0 22px; width:22px; height:22px; border-radius:50%;
-  background:rgba(255,255,255,0.10); color:var(--label);
+  background:rgba(28,28,38,0.085); color:var(--label);
   font-size:11.5px; font-weight:700; line-height:22px; text-align:center;
 }
 /* `min-width:0` : sans lui, un nom de fichier long refuse de se tronquer et
@@ -8020,7 +8145,7 @@ body:has(#e-detail.active) #equipe-app{
 }
 .coller-fleche{
   flex:0 0 30px; width:30px; height:30px; border-radius:9px;
-  background:rgba(255,255,255,0.07); border:none; color:var(--label);
+  background:rgba(28,28,38,0.060); border:none; color:var(--label);
   font-size:14px; line-height:1;
 }
 .coller-fleche[disabled]{ opacity:0.28; }
@@ -8183,7 +8308,7 @@ body:has(#e-detail.active) #equipe-app{
   border-radius:9px;
 }
 .sd-renommer svg{ width:13px; height:13px; }
-.sd-renommer:active{ background:rgba(255,255,255,0.08); color:var(--label-2); }
+.sd-renommer:active{ background:rgba(28,28,38,0.068); color:var(--label-2); }
 @media (hover: hover){
   .sd-renommer{ opacity:0; transition:opacity 0.16s ease; }
   .sous-dossier-titre:hover .sd-renommer{ opacity:1; }
@@ -8218,7 +8343,7 @@ body:has(#e-detail.active) #equipe-app{
   font-weight:600;
   text-decoration:underline;
   text-underline-offset:3px;
-  text-decoration-color:rgba(255,255,255,0.30);
+  text-decoration-color:rgba(28,28,38,0.220);
 }
 .choix-deja:active{ opacity:0.55; }
 
@@ -8314,7 +8439,7 @@ body:has(#e-detail.active) #equipe-app{
   text-align:center;
   text-decoration:underline;
   text-underline-offset:3px;
-  text-decoration-color:rgba(255,255,255,0.22);
+  text-decoration-color:rgba(28,28,38,0.220);
 }
 .lien-doux:active{ opacity:0.55; }
 .lien-doux[disabled]{ opacity:0.45; text-decoration:none; }
@@ -8361,7 +8486,7 @@ body:has(#e-detail.active) #equipe-app{
 }
 .et-attention-saisie:focus{
   outline:none;
-  border-left-color:#FA8A08;
+  border-left-color:#C24700;
   background:rgba(255,122,24,0.05);
 }
 .et-attention-saisie::placeholder{ color:rgba(255,176,102,0.40); }
@@ -8515,8 +8640,8 @@ body:has(#e-detail.active) #equipe-app{
 .ac-pub-pill{
   margin-top:20px; display:inline-flex; align-items:center; gap:9px;
   padding:9px 16px 9px 13px; border-radius:100px;
-  background:rgba(255,255,255,0.045);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.08);
+  background:rgba(28,28,38,0.038);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.092);
   font-size:13px; color:var(--label-1); letter-spacing:-0.015em;
 }
 .ac-pub-pill i{
@@ -8534,7 +8659,7 @@ body:has(#e-detail.active) #equipe-app{
   display:flex; flex-direction:column;
   padding:14px 14px 15px; border-radius:20px;
   background:var(--bg-card);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.06);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.069);
 }
 .ac-t-tete{ display:flex; align-items:center; gap:9px; margin-bottom:14px; }
 /* La plaque est CARRÉE À COINS ARRONDIS, pas ronde : les disques sont pris
@@ -8542,8 +8667,8 @@ body:has(#e-detail.active) #equipe-app{
 .ac-t-ic{
   display:grid; place-items:center; flex:0 0 34px; width:34px; height:34px;
   border-radius:11px;
-  background:rgba(255,255,255,0.05);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07);
+  background:rgba(28,28,38,0.043);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.081);
 }
 .ac-t-ic svg{ width:18px; height:18px; display:block; }
 .ac-t-t{
@@ -8582,7 +8707,7 @@ body:has(#e-detail.active) #equipe-app{
 .ac-t-n b{ font-weight:600; }
 /* La couleur porte un sens, pas une décoration : elle ne s'allume que sur une
    vraie hausse. Une baisse reste grise — l'app ne réprimande pas. */
-.ac-t-n.haut .fl, .ac-t-n.haut b{ color:#FDA81E; }
+.ac-t-n.haut .fl, .ac-t-n.haut b{ color:#C24700; }
 .ac-t-n .fl{ font-size:12px; line-height:1; }
 
 /* La jauge en cinq segments. Une barre continue à 4 % ne montre qu'un trait ;
@@ -8591,7 +8716,7 @@ body:has(#e-detail.active) #equipe-app{
 .ac-jauge{ display:flex; gap:5px; margin-top:12px; }
 .ac-seg{
   flex:1; height:4px; border-radius:100px; overflow:hidden;
-  background:rgba(255,255,255,0.09);
+  background:rgba(28,28,38,0.076);
 }
 .ac-seg i{
   display:block; height:100%; border-radius:100px;
@@ -8602,7 +8727,7 @@ body:has(#e-detail.active) #equipe-app{
 .ac-carte{
   padding:14px 14px 15px; border-radius:20px; margin-bottom:11px;
   background:var(--bg-card);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.06);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.069);
 }
 .ac-carte-t{
   font-size:13.5px; font-weight:600; color:var(--label-1);
@@ -8628,7 +8753,7 @@ body:has(#e-detail.active) #equipe-app{
 }
 .ac-etiq{
   margin-top:8px; padding:4px 9px; border-radius:7px;
-  background:rgba(255,255,255,0.06);
+  background:rgba(28,28,38,0.051);
   font-size:11px; color:var(--label-2); letter-spacing:-0.01em;
 }
 .ac-carte-fl{ font-size:19px; color:var(--label-3); flex-shrink:0; line-height:1; }
@@ -8646,11 +8771,11 @@ body:has(#e-detail.active) #equipe-app{
 .ac-vign{
   position:relative; flex:0 0 92px; width:92px; height:69px;
   border-radius:12px; overflow:hidden;
-  background:#141418 center/cover no-repeat;
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.08);
+  background:#F3F2F1 center/cover no-repeat;
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.092);
 }
 .ac-vign.nue{
-  background:linear-gradient(150deg,#1E1E24,#0F0F12);
+  background:linear-gradient(150deg,#F5F4F3,#F2F1F0);
 }
 .ac-play{
   position:absolute; inset:0; margin:auto;
@@ -8660,7 +8785,7 @@ body:has(#e-detail.active) #equipe-app{
   /* Le voile derrière la flèche : sur une vignette claire, une flèche blanche
      seule disparaît. */
   backdrop-filter:blur(3px); -webkit-backdrop-filter:blur(3px);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.22);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.220);
 }
 .ac-play svg{ width:14px; height:14px; display:block; margin-left:2px; }
 
@@ -8669,8 +8794,8 @@ body:has(#e-detail.active) #equipe-app{
 .ac-av{
   position:relative; flex:0 0 44px; width:44px; height:44px;
   border-radius:100px; display:grid; place-items:center;
-  background:rgba(255,255,255,0.06);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09);
+  background:rgba(28,28,38,0.051);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.103);
   font-size:14px; font-weight:600; color:var(--label-2); letter-spacing:0.01em;
 }
 /* La pastille de genre, en haut à droite de l'avatar. Elle reprend la couleur
@@ -8733,8 +8858,22 @@ body:has(#e-detail.active) #equipe-app{
      nous ». On ne le neutralise plus : il complète le modelé au lieu de le
      remplacer. */
   /* Le fond vient toujours de `.an-bloc`. Seules les deux ombres s'ajoutent. */
-  box-shadow:0 14px 34px rgba(0,0,0,0.42),
-             0 0 30px -14px rgba(255,255,255,0.10);
+  /* ═══ EN CLAIR, LA CARTE SE SOULÈVE AU LIEU DE S'ALLUMER ═══
+
+     L'ombre à 42 % venait du sombre, où elle creusait le fond noir. Sur du
+     blanc, une ombre aussi dense fait une flaque grise sous chaque carte.
+
+     Deux couches à la place : un contact d'un pixel qui pose la carte, et une
+     diffusion basse et large qui la décolle. Elles sont teintées de brun
+     (60,40,20) et non de noir pur — une ombre grise sur un fond chaud paraît
+     sale. */
+  box-shadow:0 1px 2px rgba(20,20,30,0.04),
+             0 8px 22px -10px rgba(20,20,30,0.13);
+  /* ⚠ PLUS DE `backdrop-filter` ICI. Il floutait le fond derrière chaque
+     carte — dix-neuf classes, donc presque toutes les surfaces de l'app. Sans
+     halos derrière, il ne produisait rien et coûtait un recalcul du fond à
+     chaque image de défilement. C'est le réglage le plus lourd du navigateur ;
+     le retirer se sent sur un téléphone d'atelier. */
 }
 
 /* ═══ LE CONTOUR EN LUMIÈRE RASANTE ═══
@@ -8848,8 +8987,8 @@ body:has(#e-detail.active) #equipe-app{
 }
 /* La tendance colore la note, pas la valeur : le nombre est un fait, la
    comparaison est un jugement. */
-.ac-n.hausse{ color:#30D158; }
-.ac-n.baisse{ color:#FA8A08; }
+.ac-n.hausse{ color:#1F8A3B; }
+.ac-n.baisse{ color:#C24700; }
 
 /* ═══ LA TUILE À ANNEAU ═══
 
@@ -8970,7 +9109,7 @@ body:has(#e-detail.active) #equipe-app{
 .ac-rec-vue{
   position:relative; flex:0 0 52px;
   width:52px; height:52px; border-radius:13px;
-  overflow:hidden; background:rgba(255,255,255,0.05);
+  overflow:hidden; background:rgba(28,28,38,0.043);
   display:flex; align-items:center; justify-content:center;
 }
 .ac-rec-vue img,
@@ -9008,7 +9147,7 @@ body:has(#e-detail.active) #equipe-app{
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .ac-rec-fl{ flex:0 0 auto; font-size:17px; color:var(--label-3); }
-.ac-rec:active{ background:rgba(255,255,255,0.04); }
+.ac-rec:active{ background:rgba(28,28,38,0.034); }
 
 
 /* ═══ L'ANNEAU IA DE L'ACCUEIL, FIGÉ ═══
@@ -9105,7 +9244,7 @@ body:has(#e-detail.active) #equipe-app{
 .cb-svg{ display:block; width:100%; height:108px; }
 /* Trois traits horizontaux, très pâles : ils aident l'œil à relier la courbe à
    sa graduation sans jamais concurrencer le tracé. */
-.cb-grille{ stroke:rgba(255,255,255,0.06); stroke-width:1; }
+.cb-grille{ stroke:rgba(28,28,38,0.26); stroke-width:1; }
 
 .cb-mois{
   display:flex; justify-content:space-between;
@@ -9140,7 +9279,7 @@ body:has(#e-detail.active) #equipe-app{
 .offre-plaque{
   display:grid; place-items:center; flex:0 0 42px; width:42px; height:42px;
   border-radius:100px;
-  background:rgba(255,255,255,0.04);
+  background:rgba(28,28,38,0.034);
   box-shadow:inset 0 0 0 1px rgba(255,173,51,0.22);
 }
 .offre-plaque svg{ width:21px; height:21px; display:block; }
@@ -9233,8 +9372,8 @@ body:has(#e-detail.active) #equipe-app{
 .offre-filet{
   height:1px; margin:20px 0 4px;
   background:linear-gradient(90deg,
-    rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.13) 22%,
-    rgba(255,255,255,0.13) 78%, rgba(255,255,255,0.02) 100%);
+    rgba(28,28,38,0.017) 0%, rgba(28,28,38,0.111) 22%,
+    rgba(28,28,38,0.111) 78%, rgba(28,28,38,0.017) 100%);
 }
 
 /* ═══ LES INCLUS ═══
@@ -9278,7 +9417,7 @@ body:has(#e-detail.active) #equipe-app{
   color:var(--label-3); letter-spacing:-0.005em;
 }
 .offre-annuel b{ color:var(--label-2); font-weight:700; }
-.offre-annuel.on b{ color:#FDA81E; }
+.offre-annuel.on b{ color:#C24700; }
 .offre-annuel:active{ opacity:0.6; }
 
 
@@ -9306,8 +9445,8 @@ body:has(#e-detail.active) #equipe-app{
 .abo-rythme{
   display:flex; width:max-content; gap:4px; padding:4px; margin:0 auto 18px;
   border-radius:100px;
-  background:rgba(255,255,255,0.035);
-  border:0.5px solid rgba(255,255,255,0.06);
+  background:rgba(28,28,38,0.030);
+  border:0.5px solid rgba(28,28,38,0.069);
 }
 .abo-ryt{
   display:flex; align-items:center; gap:6px;
@@ -9326,7 +9465,7 @@ body:has(#e-detail.active) #equipe-app{
 .abo-ryt.on{
   background:rgba(10,10,12,0.85);
   box-shadow:inset 0 0 0 1px rgba(255,173,51,0.85);
-  color:#FDA81E;
+  color:#C24700;
 }
 /* ═══ « −20 % » EN AMBRE, PAS EN VERT ═══
 
@@ -9353,7 +9492,7 @@ body:has(#e-detail.active) #equipe-app{
   display:flex; align-items:center; justify-content:center; gap:7px;
   width:100%; margin-top:14px; padding:14px;
   border:0.5px solid var(--border); border-radius:15px;
-  background:rgba(255,255,255,0.03);
+  background:rgba(28,28,38,0.025);
   font-family:inherit; font-size:13.5px; font-weight:600; color:var(--label-2);
 }
 .abo-autres svg{ width:15px; height:15px; }
@@ -9747,7 +9886,7 @@ body:has(#e-detail.active) #equipe-app{
 
    Cette carte-là tient sur trois choses :
 
-     ① un FOND EN DÉGRADÉ, de #17171B à #060608 sur 150° — le haut-gauche est
+     ① un FOND EN DÉGRADÉ, de #F4F3F2 à #F1F0EF sur 150° — le haut-gauche est
         plus clair que le bas-droite ;
      ② DEUX LUEURS DE COIN, en haut-droite et en bas-gauche ;
      ③ une OMBRE PORTÉE double : une sombre qui décolle, une teintée qui
@@ -9779,7 +9918,7 @@ body:has(#e-detail.active) #equipe-app{
      les autres. Seul le MODELÉ s'ajoute : les lueurs de coin ci-dessous, et
      les deux ombres portées ici. */
   box-shadow:0 14px 34px rgba(0,0,0,0.42),
-             0 0 30px -14px rgba(255,255,255,0.10);
+             0 0 30px -14px rgba(28,28,38,0.115);
 }
 
 /* ② Les deux lueurs de coin, en blanc au lieu d'ambre. Elles sont posées en
@@ -9810,15 +9949,18 @@ body:has(#e-detail.active) #equipe-app{
 .ent-ligne::before, .etab-ligne::before, .plan-card::before, .hero-card::before,
 .ac-tuile::before,
 .card::before, .sop-card::before, .emp-row::before, .cat-cell::before, .proc-rich-card::before, .etab-carte::before, .offre-carte::before{
+  /* ═══ LE LISERÉ RASANT DEVIENT UN REFLET ═══
+
+     Le dégradé à 45° aux coins vifs marchait sur noir : un trait plus clair
+     que son fond, c'est de la lumière. Retourné en sombre sur blanc, il
+     devenait un cadre dessiné — l'exact contraire de l'effet cherché.
+
+     Le verre d'Apple n'a pas de contour : il a un REFLET, blanc, en haut
+     seulement, parce que la lumière vient d'en haut. Plus de masque, plus de
+     dégradé à 45° : deux ombres internes suffisent. */
   content:''; position:absolute; inset:0; border-radius:inherit;
-  padding:0.5px; pointer-events:none; z-index:0;
-  background:linear-gradient(45deg,
-    rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.15) 12%,
-    rgba(255,255,255,0.03) 30%, rgba(255,255,255,0.03) 70%,
-    rgba(255,255,255,0.15) 88%, rgba(255,255,255,0.34) 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none; z-index:0;
+  box-shadow:var(--verre-bord);
 }
 
 /* Les lueurs de coin passent en `::after` : `::before` porte le liseré. */
@@ -9827,11 +9969,18 @@ body:has(#e-detail.active) #equipe-app{
 .ent-ligne::after, .etab-ligne::after, .plan-card::after, .hero-card::after,
 .ac-tuile::after,
 .card::after, .sop-card::after, .emp-row::after, .cat-cell::after, .proc-rich-card::after, .etab-carte::after, .offre-carte::after{
+  /* ═══ LES LUEURS DE COIN N'ONT PLUS LIEU D'ÊTRE ═══
+
+     Deux taches plus claires que la carte, pour lui donner du volume sur du
+     noir. Inversées, ce sont deux taches SOMBRES dans les coins — on dirait
+     une carte tachée. Sur clair, le volume vient de l'ombre portée et du
+     reflet du haut ; il n'y a rien à ajouter.
+
+     Le pseudo-élément est gardé vide plutôt que supprimé : plusieurs cartes
+     s'en servent ailleurs pour poser leur propre décor, et retirer la règle
+     obligerait à toutes les relire. */
   content:''; position:absolute; inset:0; border-radius:inherit;
   pointer-events:none; z-index:0;
-  background:
-    radial-gradient(130px 90px at 100% 0%, rgba(255,255,255,0.028), transparent 72%),
-    radial-gradient(110px 80px at 0% 100%, rgba(255,255,255,0.016), transparent 72%);
 }
 /* Le contenu passe au-dessus des lueurs. */
 .an-bloc > *, .reg-groupe > *, .reg-identite > *, .ga-tuile > *, .stat-mini > *,
@@ -9968,7 +10117,7 @@ body:has(#e-detail.active) #equipe-app{
   margin:0 0 22px;
   font-size:13.5px; line-height:1.55; font-weight:400;
   letter-spacing:-0.005em;
-  color:rgba(255,255,255,0.58);
+  color:rgba(28,28,38,0.83);
 }
 
 .ac-actions{ display:flex; flex-direction:column; gap:9px; }
@@ -10011,7 +10160,7 @@ body:has(#e-detail.active) #equipe-app{
    surface. */
 .ac-btn--plein{
   background:#fff;
-  color:#0A0A0E;
+  color:#1C1C26;
 }
 /* L'icône du gérant porte l'ambre : c'est le seul point de couleur des deux
    boutons, et il désigne le rôle principal. */
@@ -10019,27 +10168,27 @@ body:has(#e-detail.active) #equipe-app{
    image : [247 170 81]. Le second bouton l'a aussi : deux chemins de même
    nature méritent le même signe. */
 .ac-btn--plein .ac-btn-ic{
-  background:rgba(246,148,3,0.14); color:#F7AA51;
+  background:rgba(246,148,3,0.14); color:#C24700;
 }
 /* Le second est creux : deux boutons pleins se disputeraient le regard. */
 /* Le second bouton a la MÊME FORME que le premier, en sombre. Sur l'image ils
    sont jumeaux : c'est ce qui dit que ce sont deux chemins d'égale dignité,
    l'un n'étant pas un repli de l'autre. */
 .ac-btn--creux{
-  background:rgba(255,255,255,0.09);
+  background:rgba(28,28,38,0.076);
   color:#fff;
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.13);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.149);
 }
 .ac-btn--creux .ac-btn-ic{
-  background:rgba(246,148,3,0.14); color:#F7AA51;
+  background:rgba(246,148,3,0.14); color:#C24700;
 }
-.ac-btn--creux:active{ background:rgba(255,255,255,0.14); }
-.ac-btn--creux:active{ background:rgba(255,255,255,0.16); }
+.ac-btn--creux:active{ background:rgba(28,28,38,0.119); }
+.ac-btn--creux:active{ background:rgba(28,28,38,0.136); }
 
 .ac-connexion{
   width:100%; margin-top:6px; padding:10px 0;
   background:none; border:none;
-  font-family:inherit; font-size:12.5px; color:rgba(255,255,255,0.45);
+  font-family:inherit; font-size:12.5px; color:rgba(28,28,38,0.70);
   text-align:center;
 }
 /* « Se connecter » en ambre : c'est un troisième chemin, moins fréquent que les
@@ -10047,7 +10196,7 @@ body:has(#e-detail.active) #equipe-app{
 /* « Se connecter » du même orange que les icônes : trois éléments d'accent,
    une seule teinte. */
 .ac-connexion b{
-  color:#F7AA51; font-weight:600;
+  color:#C24700; font-weight:600;
 }
 
 /* Plus de règle pour petit écran sur le titre : `clamp` fait le travail — le
@@ -10104,7 +10253,7 @@ body:has(#e-detail.active) #equipe-app{
 .pub-ic{
   display:grid; place-items:center; flex:0 0 34px;
   width:34px; height:34px; border-radius:100px;
-  background:rgba(246,148,3,0.13); color:#F7AA51;
+  background:rgba(246,148,3,0.13); color:#C24700;
 }
 .pub-ic svg{ width:19px; height:19px; display:block; }
 .pub-txt{ flex:1; min-width:0; }
@@ -10158,7 +10307,7 @@ body:has(#e-detail.active) #equipe-app{
    la pastille passe de l'ambre au vert. Deux fonds différents pour un même
    objet le faisaient changer de nature au lieu de changer d'état. */
 .pub-bandeau--ok .pub-ic{
-  background:rgba(48,209,88,0.12); color:#30D158;
+  background:rgba(48,209,88,0.12); color:#1F8A3B;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -10234,7 +10383,7 @@ body:has(#e-detail.active) #equipe-app{
 /* « Retirer » n'invite pas au clic : gris translucide, texte blanc. C'est le
    bouton neutre d'iOS — présent, jamais tentant. */
 .pub-btn--retirer{
-  background:rgba(255,255,255,0.10);
+  background:rgba(28,28,38,0.085);
   color:var(--label-1);
   box-shadow:none;
 }
@@ -10247,7 +10396,7 @@ body:has(#e-detail.active) #equipe-app{
   display:inline-flex; align-items:center; gap:5px;
   padding:2.5px 8px; border-radius:100px;
   font-size:10px; font-weight:700; letter-spacing:0.02em;
-  background:rgba(246,148,3,0.14); color:#F7AA51;
+  background:rgba(246,148,3,0.14); color:#C24700;
   margin-left:8px; vertical-align:middle;
 }
 
@@ -10276,12 +10425,12 @@ body:has(#e-detail.active) #equipe-app{
 .ci-d{
   flex:1; height:42px; border:none; border-radius:13px;
   font-family:inherit; font-size:12.5px; font-weight:600;
-  background:rgba(255,255,255,0.07);
+  background:rgba(28,28,38,0.060);
   color:var(--label-1);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.10);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.115);
   transition:transform 0.14s ease, background 0.2s ease;
 }
-.ci-d:active{ transform:scale(0.97); background:rgba(255,255,255,0.12); }
+.ci-d:active{ transform:scale(0.97); background:rgba(28,28,38,0.102); }
 .ci-d:disabled{ opacity:0.45; }
 
 /* ─── LE CODE ─────────────────────────────────────────────────────────────
@@ -10311,9 +10460,9 @@ body:has(#e-detail.active) #equipe-app{
 /* Révoquer ne doit pas inviter au clic : neutre, à côté de « Copier » qui est
    le geste courant. */
 .ci-btn--sourd{
-  background:rgba(255,255,255,0.07);
+  background:rgba(28,28,38,0.060);
   color:var(--label-2);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.10);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.115);
 }
 
 .ci-aide{
@@ -10395,8 +10544,8 @@ body:has(#e-detail.active) #equipe-app{
 
 .ai-combien-co{
   margin-top:12px; padding:14px 15px;
-  border-radius:14px; background:rgba(255,255,255,0.035);
-  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.07);
+  border-radius:14px; background:rgba(28,28,38,0.030);
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.081);
   /* Le texte revient à gauche : la carte entière est centrée, et un tableau
      centré ne s'aligne sur rien. */
   text-align:left;
@@ -10414,17 +10563,17 @@ body:has(#e-detail.active) #equipe-app{
   text-align:left; padding:0 0 6px; font-weight:650;
   font-size:11px; text-transform:uppercase; letter-spacing:0.05em;
   color:var(--label-3);
-  border-bottom:0.5px solid rgba(255,255,255,0.09);
+  border-bottom:0.5px solid rgba(28,28,38,0.103);
 }
 .ai-combien-t td{
   padding:7px 0; color:var(--label-1);
-  border-bottom:0.5px solid rgba(255,255,255,0.06);
+  border-bottom:0.5px solid rgba(28,28,38,0.069);
 }
 /* La colonne des durées d'analyse, à droite et en ambre : c'est le chiffre
    qu'on est venu chercher. */
 .ai-combien-t th:last-child,
 .ai-combien-t td:last-child{ text-align:right; }
-.ai-combien-t td:last-child{ color:#F7AA51; font-weight:600; }
+.ai-combien-t td:last-child{ color:#C24700; font-weight:600; }
 .ai-combien-t tr:last-child td{ border-bottom:none; }
 
 .ai-combien-n{ color:var(--label-3) !important; font-size:11.5px !important; }

@@ -10846,7 +10846,18 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    carte plus haute au contenu inchange — donc du vide, pas de l'espace. Le
    remplissage passe de 14 a 18, l'ecart entre plaque et texte de 13 a 15, et
    le rayon de 20 a 24 pour rester proportionne. */
-#cat-grid .cat-cell--ligne{
+/* ⚠ LES DEUX CONTENEURS SONT NOMMES, ET IL LE FAUT.
+
+   `#cat-grid .cat-cell` et `#category-procedures-list .card` sont declarees
+   ailleurs avec un IDENTIFIANT, qui bat n'importe quel nombre de classes. Une
+   regle `.cat-cell--ligne` seule est lue puis ecrasee en silence : la plaque
+   repasse au-dessus du titre et le compte tombe en bas.
+
+   C'est la deuxieme fois que ce piege se referme ici. Toute nouvelle liste qui
+   emploiera `--ligne` devra ajouter son conteneur a ce selecteur. */
+#cat-grid .cat-cell--ligne,
+#category-procedures-list .cat-cell--ligne,
+#category-procedures-list .proc-rich-card{
   display:flex; flex-direction:row; align-items:flex-start; gap:15px;
   padding:18px 18px 17px; border-radius:24px;
 }
@@ -11028,3 +11039,54 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 .proc-filtre.actif{
   background:#111116; color:#FFFFFF;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'UN DOSSIER · SOUS-DOSSIERS ET PROCÉDURES
+
+   Même ligne que sur la liste des dossiers : plaque, titre, badge, compte.
+   Deux différences seulement, et elles se tiennent :
+
+     · L'ICÔNE NE VARIE PAS. Tout ce qui est ici appartient déjà au même
+       dossier ; faire varier les dessins ne distinguerait rien, ce serait du
+       bruit coloré. Un sous-dossier a toujours sa chemise, une procédure
+       toujours son document.
+
+     · LA COULEUR NON PLUS. Violet pour un sous-dossier, gris pour une
+       procédure. C'est ce qui sépare les deux NATURES d'objet dans une liste
+       qui les mélange — pas les objets entre eux.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.cl-pl--sous{
+  background:linear-gradient(150deg, rgba(167,139,250,0.22), rgba(76,29,149,0.14));
+}
+.cl-pl--proc{
+  background:linear-gradient(150deg, rgba(165,176,192,0.24), rgba(58,68,83,0.14));
+}
+
+/* La flèche du bout de ligne, à la place des trois points : ces cartes n'ont
+   pas de menu, elles ouvrent. */
+.cl-tete .proc-fl{
+  flex-shrink:0; font-size:19px; line-height:1;
+  color:var(--label-3); margin:-1px -2px 0 8px;
+}
+
+/* ⚠ LA JAUGE DE LECTURE N'EST PLUS SUR LA CARTE. Elle donnait a chaque ligne
+   une seconde information chiffree, sous une premiere — a huit procedures, la
+   liste devenait un tableau de bord. Le taux reste lisible sur la page de la
+   procedure, ou il a la place d'etre explique.
+
+   Les regles `.proc-pied`, `.proc-jauge` et `.proc-taux` restent declarees
+   ailleurs dans ce fichier : elles servent a l'espace equipe. */
+
+/* ⚠ LA GRILLE DE CETTE PAGE PASSE EN COLONNE, elle aussi. Elle était déclarée
+   en deux colonnes comme celle des dossiers ; sans cette règle, les nouvelles
+   lignes s'y afficheraient côte à côte et déborderaient. */
+#category-procedures-list{ display:flex; flex-direction:column; gap:12px; }
+/* ⚠ `.sd-grille` ENVELOPPE LES SOUS-DOSSIERS et vit dans la meme liste. Elle
+   etait declaree en grille deux colonnes ; sans cette regle, les sous-dossiers
+   resteraient cote a cote au-dessus de procedures pleine largeur. */
+#category-procedures-list .sd-grille{
+  display:flex; flex-direction:column; gap:12px; margin:0 0 12px;
+}
+#category-procedures-list .cat-cell--ligne,
+#category-procedures-list .proc-rich-card{ width:100%; }

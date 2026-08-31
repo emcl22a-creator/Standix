@@ -11758,10 +11758,24 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      cartes et sous la derniere. Ici chaque carte se brouille avec son ombre et
      rien d'autre.
    ═══════════════════════════════════════════════════════════════════════════ */
-#cat-grid.sort > *{
+/* ⚠ LA LIGNE DE COMPTE PART AVEC LES CARTES. Elle annonce ce que la liste
+   contient — « 4 dossiers », « 3 procedures » — et ce nombre change en meme
+   temps qu'elles. La laisser nette pendant que les cartes se remplacent
+   donnait un compte fige au-dessus d'une liste en mouvement, qui annoncait
+   pendant un instant l'ancienne valeur.
+
+   ⚠ LES CLASSES SONT SUR L'ECRAN, PAS SUR LA GRILLE. La ligne est AVANT la
+     grille dans le balisage : aucun selecteur ne permet de remonter jusqu'a
+     elle depuis `#cat-grid`. C'est donc `#p-list` qui les porte, et la regle
+     designe les deux morceaux.
+
+   Le segment, la recherche et le titre restent nets : eux ne changent pas. */
+#p-list.sort .proc-rang,
+#p-list.sort #cat-grid > *{
   animation:listeSort 0.16s cubic-bezier(0.32,0.72,0,1) forwards;
 }
-#cat-grid.entre > *{
+#p-list.entre .proc-rang,
+#p-list.entre #cat-grid > *{
   animation:listeEntre 0.30s cubic-bezier(0.32,0.72,0,1);
 }
 @keyframes listeSort{
@@ -11774,7 +11788,8 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }
-  #cat-grid.sort > *, #cat-grid.entre > *{ animation:none; }
+  #p-list.sort .proc-rang, #p-list.sort #cat-grid > *,
+  #p-list.entre .proc-rang, #p-list.entre #cat-grid > *{ animation:none; }
 }
 
 

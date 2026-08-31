@@ -4966,8 +4966,14 @@
   }
   #detail-steps.etapes-fil .detail-step p,
   #analyse-steps-list.etapes-fil .detail-step p{ line-height:1.55; }
-  #detail-steps.etapes-fil .detail-step.en-lecture::after,
-  #analyse-steps-list.etapes-fil .detail-step.en-lecture::after{
+  /* ⚠ CE TRAIT NE VAUT PLUS QUE POUR L'ECRAN DE L'EQUIPE. Il marquait l'etape
+     en cours dans le fil vertical, a 55 px sur la gauche. Cote gestion, les
+     etapes sont devenues des cartes et le fil a disparu : le trait flottait
+     donc seul a cote de la carte, sans rien relier.
+
+     La carte, elle, se signale par sa bordure et son fond bleus — c'est deja
+     ce qui dit ou l'on en est. */
+  #detail-steps.etapes-fil .detail-step.en-lecture::after{
     content:''; position:absolute; left:-55px; top:-5px; bottom:16px; width:2.5px;
     border-radius:2px; background:var(--blue);
   }
@@ -11656,41 +11662,42 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      La garder aurait pose un `transform:none` sur des elements qui n'en
      portent aucun — sans effet, mais laissant croire qu'un mouvement existe
      encore ici. */
-/* ⚠ L'ANIMATION PORTE SUR LES CARTES, PAS SUR LA GRILLE.
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHANGEMENT DE SEGMENT · DEUX MOUVEMENTS, PAS UN
 
-   Elle etait posee sur `#cat-grid`, donc sur un conteneur qui occupe toute la
-   largeur de l'ecran : le flou s'appliquait a la boite entiere, y compris aux
-   espaces vides entre les cartes et sous la derniere. On voyait la zone
-   trembler plutot que les elements changer.
+   ⚠ UNE SEULE ANIMATION NE POUVAIT PAS MARCHER, et c'est ce qui rendait
+     l'effet invisible. On posait `change` sur la grille, l'animation demarrait
+     sur les cartes presentes — puis, a mi-chemin, `renderCategoryGrid`
+     REMPLACAIT tout le contenu. Les cartes qui s'animaient disparaissaient, et
+     les nouvelles reprenaient l'animation depuis son debut : elles
+     apparaissaient nettes, floutaient, puis se re-nettoyaient. Un aller-retour
+     la ou l'on attend une arrivee.
 
-   Sur chaque enfant, chaque carte se brouille avec SON ombre et rien d'autre.
-   Le fond de la page ne bouge pas.
+   Deux classes, donc : les anciennes cartes SORTENT, les nouvelles ENTRENT.
+   Chacune ne joue que la moitie qui la concerne.
 
-   ⚠ `> *` PLUTOT QU'UNE CLASSE. Les enfants ne sont pas toujours des cartes :
-     ce peut etre le message « aucun dossier », ou le bloc de premiere
-     procedure. Tous doivent partir de la meme facon. */
-#cat-grid.change > *{
-  animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
+   ⚠ LES DEUX PORTENT SUR `> *`, LES ENFANTS. Sur la grille, le flou
+     s'appliquait a toute la boite — y compris aux espaces vides entre les
+     cartes et sous la derniere. Ici chaque carte se brouille avec son ombre et
+     rien d'autre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#cat-grid.sort > *{
+  animation:listeSort 0.16s cubic-bezier(0.32,0.72,0,1) forwards;
 }
-/* ⚠ LE FLOU EST ICI, ET NON DANS LE VOILE. Le voile floute tout l'ecran ;
-   changer de segment ne change que la LISTE. Flouter le titre, la recherche et
-   le bouton qu'on vient de toucher ferait douter d'avoir appuye au bon
-   endroit.
-
-   3 px : la meme valeur que le voile du changement de page. Les deux gestes se
-   ressemblent, mais l'un porte sur la page et l'autre sur son contenu.
-
-   ⚠ ICI LE FLOU S'ANIME SANS `@property`. La regle vaut pour un `filter`
-     ordinaire, que les navigateurs interpolent tres bien ; c'est le
-     `backdrop-filter` du voile qui demandait une variable typee. */
-@keyframes listeChange{
-  0%   { opacity:1;   filter:blur(0px); }
-  40%  { opacity:0.3; filter:blur(3px); }
-  100% { opacity:1;   filter:blur(0px); }
+#cat-grid.entre > *{
+  animation:listeEntre 0.30s cubic-bezier(0.32,0.72,0,1);
+}
+@keyframes listeSort{
+  from{ opacity:1; filter:blur(0px); }
+  to  { opacity:0; filter:blur(3px); }
+}
+@keyframes listeEntre{
+  from{ opacity:0; filter:blur(3px); }
+  to  { opacity:1; filter:blur(0px); }
 }
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }
-  #cat-grid.change > *{ animation:none; }
+  #cat-grid.sort > *, #cat-grid.entre > *{ animation:none; }
 }
 
 

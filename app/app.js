@@ -10473,6 +10473,45 @@ async function collerLesVideos(surAvancee) {
     }
   }
   const arrivee = ctxAudio.createMediaStreamDestination()
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE SON NE DOIT JAMAIS SORTIR DES HAUT-PARLEURS
+
+     ⚠ ON NE PEUT PAS SIMPLEMENT COUPER LE VOLUME. Mesure faite : un element
+       a `volume = 0` branche sur `createMediaElementSource` ne livre au graphe
+       QUE DU SILENCE — energie 0,0000 contre 0,4318 pour le meme element
+       audible. Couper le volume donnerait une video sans son, et Azure n'aurait
+       plus rien a transcrire. C'est aussi vrai pour `muted`.
+
+     ─── CE QUI SE PASSAIT ───
+
+     Le branchement au graphe se faisait PLUS BAS, apres le chargement des
+     metadonnees de chaque clip. Entre le deverrouillage et ce moment-la, les
+     lecteurs etaient audibles et relies a la sortie par defaut : on entendait
+     les videos pendant tout le debut du collage.
+
+     ─── CE QU'ON FAIT ───
+
+     On branche TOUS les lecteurs des maintenant. Un element passe par
+     `createMediaElementSource` ne sort plus par la sortie par defaut : son son
+     ne va que la ou on le raccorde — ici l'arrivee du graphe, jamais les
+     haut-parleurs. Le volume reste a 1, donc le graphe capte tout.
+
+     ⚠ UN ELEMENT NE PEUT ETRE BRANCHE QU'UNE FOIS. Un second appel sur le meme
+       lecteur leve une erreur ; on note donc ceux qui sont deja passes, et la
+       boucle plus bas ne les rebranche pas.
+     ═══════════════════════════════════════════════════════════════════════ */
+  for (const v of lecteurs) {
+    try {
+      ctxAudio.createMediaElementSource(v).connect(arrivee)
+      v.dataset.brancheAudio = '1'
+    } catch (e) {
+      /* Une video sans piste sonore, ou un refus du navigateur : on continue
+         sans son POUR CE CLIP plutot que d'abandonner tout le collage. */
+      console.warn('[collage] son ignore pour un clip :', e?.message || e)
+    }
+  }
+
   arrivee.stream.getAudioTracks().forEach((t) => flux.addTrack(t))
 
   const morceaux = []
@@ -10527,13 +10566,18 @@ async function collerLesVideos(surAvancee) {
         }
       })
 
-      try {
-        ctxAudio.createMediaElementSource(v).connect(arrivee)
-      } catch (e) {
-        /* Une vidéo sans piste sonore, ou un navigateur qui refuse : on
-           continue sans son POUR CE CLIP plutôt que d'abandonner tout le
-           collage. Les autres garderont le leur. */
-        console.warn('[collage] son ignoré pour', f.fichier.name, e?.message || e)
+      /* ⚠ LE BRANCHEMENT A DEJA EU LIEU, plus haut, au moment de la creation
+         des lecteurs — c'est ce qui empeche le son de sortir des
+         haut-parleurs. Un second appel sur le meme element leverait une
+         erreur. On ne rattrape ici que les clips qui n'ont pas pu etre
+         branches. */
+      if (!v.dataset.brancheAudio) {
+        try {
+          ctxAudio.createMediaElementSource(v).connect(arrivee)
+          v.dataset.brancheAudio = '1'
+        } catch (e) {
+          console.warn('[collage] son ignoré pour', f.fichier.name, e?.message || e)
+        }
       }
 
       /* Le déverrouillage a pu faire avancer la lecture de quelques images.

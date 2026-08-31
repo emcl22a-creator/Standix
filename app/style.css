@@ -2313,17 +2313,31 @@
   .ia-mot{
     font-size:15px; font-weight:850; letter-spacing:0.02em;
     line-height:1; flex-shrink:0; user-select:none;
-    /* ═══ BLANC, PUIS AMBRE, PUIS ORANGE ═══
+    /* ⚠ TROIS QUARTS DE PIXEL VERS LE BAS, ET C'EST UNE MESURE.
 
-       Le dégradé restait BLANC PUR sur 46 % de sa course : sur deux lettres de
-       15 px, l'ambre n'apparaissait que dans le dernier tiers du « I », et on
-       lisait un sigle blanc.
+       Le sigle est centre dans sa case ; le libelle du bouton, lui, se pose
+       sur sa ligne de base. Deux references differentes : releve au pixel sur
+       un rendu a quatre fois la densite, la base du « AI » tombait 3 px plus
+       haut que celle de « Generer les etapes » — 0,75 px a l'ecran.
 
-       Le blanc tient maintenant jusqu'à 20 %, l'ambre prend le milieu, l'orange
-       ferme. Les trois couleurs se voient sur deux lettres — c'est court, il
-       faut que la transition le soit aussi. */
+       C'est peu, mais sur deux mots cote a cote l'oeil le voit tout de suite :
+       le sigle paraissait flotter au-dessus de la ligne.
+
+     ⚠ `top` ET NON `transform`. Le sigle porte deja un `transform` dans ses
+       etats — il retrecit quand le bouton travaille. Un decalage pose la
+       serait efface a la premiere animation. */
+    position:relative; top:0.75px;
+    /* ═══ BLANC, PUIS BLEU TRES CLAIR ═══
+
+       ⚠ LE DEGRADE FINISSAIT A #7FB6F2, UN BLEU FRANC. Sur un bouton bleu, le
+         « I » — qui tombe dans le dernier tiers de la course — se confondait
+         avec le fond : on lisait « AI » avec une seconde lettre a moitie
+         effacee, et le sigle paraissait coupe.
+
+       Il va maintenant du blanc a un bleu tres pale. La nuance se voit encore
+       sur deux lettres, mais les deux restent lisibles. */
     background:linear-gradient(118deg,
-      #FFFFFF 0%, #FFFFFF 22%, #CFE3FB 60%, #7FB6F2 100%);
+      #FFFFFF 0%, #FFFFFF 34%, #EAF2FE 68%, #C8DEFA 100%);
     -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent;
   }
@@ -2337,7 +2351,7 @@
      ici plutot qu'a reecrire. */
   .btn:not(.ghost):not(.dv-ia-bas) .ia-mot{
     background:linear-gradient(118deg,
-      #FFFFFF 0%, #FFFFFF 22%, #CFE3FB 60%, #7FB6F2 100%);
+      #FFFFFF 0%, #FFFFFF 34%, #EAF2FE 68%, #C8DEFA 100%);
     -webkit-background-clip:text; background-clip:text;
   }
   /* Éteint, le bouton pâlit — la marque garde sa couleur, comme l'anneau. */
@@ -2600,8 +2614,18 @@
      champ pendant ce temps. Ce qui reste est centré. */
   /* Le bouton « Générer les étapes » suit la même métamorphose que celui du
      découpage : les lettres AI cèdent la place à l'anneau, dans la même case. */
+  /* ⚠ LA BOITE FAISAIT 24 PX DE LARGE, ET LE SIGLE EST PLUS LARGE QUE CA.
+     « AI » a 15 px en graisse 850 mesure environ 27 px : le « I » etait
+     coupe net par le bord de la case, ce qui donnait un sigle tronque et
+     desaligne — c'est ce qu'on voit sur le bouton.
+
+     La largeur suit maintenant le contenu. Le `min-width` garde la place de la
+     roue et de la coche, qui font 24 px et se superposent au sigle dans la
+     meme cellule de grille : sans lui, la case se retrecirait pendant le
+     travail et le bouton sauterait. */
   #ai-launch-btn .ia-case{
-    display:grid; place-items:center; width:24px; height:24px; flex-shrink:0;
+    display:grid; place-items:center;
+    width:auto; min-width:24px; height:24px; flex-shrink:0;
   }
   #ai-launch-btn .ia-mot,
   #ai-launch-btn .ia-roue,
@@ -2624,8 +2648,12 @@
     transition:opacity 0.24s ease, transform 0.34s cubic-bezier(0.34,1.4,0.64,1);
   }
   /* La case commune. */
+  /* Meme correction que sur `#ai-launch-btn` : la case suivait une largeur fixe
+     de 24 px et coupait le « I » du sigle. Les deux boutons portent le meme
+     objet, ils doivent le mesurer pareil. */
   .dv-ia-bas .ia-case{
-    display:grid; place-items:center; width:24px; height:24px; flex-shrink:0;
+    display:grid; place-items:center;
+    width:auto; min-width:24px; height:24px; flex-shrink:0;
   }
   .dv-ia-bas .ia-roue{ display:grid; opacity:0; transform:scale(0.5); }
   .dv-ia-bas.travaille .ia-mot{ opacity:0; transform:scale(0.5); }
@@ -10135,8 +10163,20 @@ body:has(#e-detail.active) #equipe-app{
      Chacune garde le sien — `--bg-card` pour les unes, leur propre teinte pour
      les autres. Seul le MODELÉ s'ajoute : les lueurs de coin ci-dessous, et
      les deux ombres portées ici. */
-  box-shadow:0 14px 34px rgba(0,0,0,0.42),
-             0 0 30px -14px rgba(28,28,38,0.115);
+  /* ⚠ 42 % DE NOIR SUR 34 PX — C'ETAIT LE REGLAGE DU THEME SOMBRE. Il fallait
+     cette force pour detacher une carte d'un fond noir. Sur du gris clair, la
+     meme ombre pose une flaque sous chaque bloc, et comme cette regle couvre
+     les dix-neuf classes de cartes, l'app entiere paraissait lourde.
+
+     Le nouveau dosage est celui des cartes de la liste des dossiers : un
+     contact d'un pixel qui pose l'objet, puis une diffusion large et faible qui
+     le decolle. De 42 % a 5 %.
+
+     ⚠ C'EST LA SOURCE, PAS UN CAS PARTICULIER. Corriger ici evite d'avoir a le
+       refaire ecran par ecran — c'est ce que j'avais commence a faire sur la
+       page de creation et sur la carte du QR, chaque fois en local. */
+  box-shadow:0 1px 2px rgba(20,20,30,0.05),
+             0 12px 26px -16px rgba(20,20,30,0.16);
 }
 
 /* ② Les deux lueurs de coin, en blanc au lieu d'ambre. Elles sont posées en

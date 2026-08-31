@@ -1066,7 +1066,8 @@
         </svg>
         <span id="proc-nb-dossiers">—</span>
       </span>
-      <button type="button" class="proc-filtre" id="proc-filtre" aria-label="Trier et filtrer">
+      <button type="button" class="proc-filtre" id="proc-filtre"
+              aria-label="Trier les dossiers" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
              stroke-width="1.9" stroke-linecap="round">
           <path d="M3 7.5h11M18.5 7.5H21M3 16.5h2.5M10 16.5h11"></path>
@@ -1074,6 +1075,19 @@
           <circle cx="7.7" cy="16.5" r="2.3"></circle>
         </svg>
       </button>
+
+      <!-- ⚠ MEME MATIERE QUE LE VOLET DU MENU : `.glassDiv` et `.tb-volet`.
+           Deux menus dans la meme app doivent etre faits de la meme chose,
+           sinon l'un des deux parait venir d'ailleurs. Seul l'ancrage change —
+           celui-ci sort par la DROITE, sous son bouton. -->
+      <div class="tb-volet tb-volet--tri glassDiv" id="proc-tri-volet" role="menu" hidden>
+        <button type="button" class="tb-v-opt tb-v-tri on" data-tri="az">
+          <span class="tb-v-coche">✓</span>Nom A → Z</button>
+        <button type="button" class="tb-v-opt tb-v-tri" data-tri="new">
+          <span class="tb-v-coche">✓</span>Plus récent d’abord</button>
+        <button type="button" class="tb-v-opt tb-v-tri" data-tri="old">
+          <span class="tb-v-coche">✓</span>Plus ancien d’abord</button>
+      </div>
     </div>
     <div id="cat-grid" class="cat-grid"></div>
   </div>

@@ -4611,6 +4611,9 @@ addEventListener('resize', () => {
   rt = setTimeout(rebuild, 120);
 });
 let lastKey = '';
+/* La derniere position verticale ECRITE sur la capsule. Voir l'avertissement
+   dans la boucle : c'est elle qui evite de reecrire `top` a chaque image. */
+let dernierY = NaN;
 let last = performance.now();
 
 function frame(now) {
@@ -4656,13 +4659,35 @@ function frame(now) {
   if (ro && ro.height > 0 && BAR_H > 0) {
     const rbar = document.getElementById('bar').getBoundingClientRect();
     const centreY = ((ro.top + ro.bottom) / 2 - rbar.top) / facteurZoom();
-    lensEl.style.top = (centreY - g.height / 2) + 'px';
-    lensEl.style.bottom = 'auto';
-    lensEl.style.marginTop = '0';
-    lensEl.style.marginBottom = '0';
+    const y = centreY - g.height / 2;
+
+    /* ⚠ ON N'ECRIT QUE SI LA VALEUR A VRAIMENT BOUGE — C'EST CE QUI CORRIGE LE
+         TREMBLEMENT AU REPOS.
+
+       `getBoundingClientRect` rend des flottants bruites : mesure sur soixante
+       images capsule immobile, `top` prenait CINQ valeurs entre 4,50009 et
+       4,50024. Un dix-millieme de pixel ne se voit pas — mais chaque ecriture
+       force le navigateur a recalculer la mise en page, donc a REFAIRE LE FLOU
+       du verre et l'anticrenelage du bord. C'est ce recalcul qu'on voit
+       vibrer, pas un deplacement.
+
+       Un vingtieme de pixel est le seuil : en dessous, aucun ecran ne peut
+       montrer la difference, meme a trois pixels par point. Au-dessus, la
+       capsule suit normalement — un changement d'onglet fait bien plus. */
+    if (!(Math.abs(y - dernierY) <= 0.05)) {
+      dernierY = y;
+      lensEl.style.top = y + 'px';
+      lensEl.style.bottom = 'auto';
+      lensEl.style.marginTop = '0';
+      lensEl.style.marginBottom = '0';
+    }
   } else {
     /* Chaine vide et non `auto` : on EFFACE la valeur en ligne pour que la
        regle du style reprenne la main. Ecrire `auto` ici la figerait. */
+    /* ⚠ LE REPERE EST REMIS A ZERO. Sans cela, le retour a une barre visible
+       comparerait la nouvelle position a une valeur perimee et n'ecrirait
+       rien : la capsule resterait ou le style l'a laissee. */
+    dernierY = NaN;
     lensEl.style.top = '';
     lensEl.style.bottom = '';
     lensEl.style.marginTop = '';

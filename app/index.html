@@ -4640,6 +4640,8 @@ function rebuild() {
   row(lNorm, false);
   row(lLens, true);
   buildFilter('bar-filter', Math.round(BAR_W), BAR_H, BAR_H / 2);
+  /* Les onglets viennent d'etre reconstruits : on remesure. */
+  requestAnimationFrame(mesurerCentreY);
   lens.snapTo(CENTERS[active] - BAR_W / 2);
   requestAnimationFrame(() => {
     lNorm.querySelectorAll('.tab').forEach((t, i) => {
@@ -4651,12 +4653,33 @@ rebuild();
 let rt = 0;
 addEventListener('resize', () => {
   clearTimeout(rt);
-  rt = setTimeout(rebuild, 120);
+  /* `rebuild` remesure deja par son `requestAnimationFrame` final ; l'appel
+     direct ci-dessous couvre le cas ou seule la HAUTEUR de la barre change,
+     sans reconstruction des onglets. */
+  rt = setTimeout(() => { rebuild(); mesurerCentreY(); }, 120);
 });
 let lastKey = '';
 /* La derniere position verticale ECRITE sur la capsule. Voir l'avertissement
    dans la boucle : c'est elle qui evite de reecrire `top` a chaque image. */
 let dernierY = NaN;
+
+/* Le centre vertical de l'onglet actif dans la barre, mesure UNE FOIS.
+   `null` tant qu'on n'a pas pu le mesurer — la boucle rend alors la main au
+   style, qui centre par marges automatiques. */
+let centreYCache = null;
+
+function mesurerCentreY() {
+  const t = lNorm && lNorm.querySelectorAll('.tab')[active];
+  const barre = document.getElementById('bar');
+  if (!t || !barre) { centreYCache = null; return; }
+  const ro = t.getBoundingClientRect();
+  const rb = barre.getBoundingClientRect();
+  /* Barre encore masquee : on ne retient rien plutot qu'un zero, qui poserait
+     la capsule a moitie au-dessus de la barre. */
+  if (!ro.height || !rb.height) { centreYCache = null; return; }
+  centreYCache = ((ro.top + ro.bottom) / 2 - rb.top) / facteurZoom();
+  dernierY = NaN;   // la prochaine image ecrira, meme si la valeur est proche
+}
 let last = performance.now();
 
 function frame(now) {
@@ -4696,13 +4719,22 @@ function frame(now) {
        ce qu'on avait ecrit et le style reprend la main : `top:0; bottom:0`
        avec des marges automatiques centrent sans aucun calcul. Un repli doit
        etre le comportement le plus sur, pas un calcul de secours. */
-  const ongletActif = lNorm.querySelectorAll('.tab')[active];
-  const ro = ongletActif ? ongletActif.getBoundingClientRect() : null;
+  /* ⚠ LA MESURE NE SE FAIT PLUS A CHAQUE IMAGE — C'EST CE QUI ALOURDISSAIT LE
+       MOUVEMENT.
 
-  if (ro && ro.height > 0 && BAR_H > 0) {
-    const rbar = document.getElementById('bar').getBoundingClientRect();
-    const centreY = ((ro.top + ro.bottom) / 2 - rbar.top) / facteurZoom();
-    const y = centreY - g.height / 2;
+     `getBoundingClientRect` force le navigateur a recalculer la mise en page
+     avant de repondre. Appele soixante fois par seconde sur DEUX elements
+     pendant que la capsule glisse, il interrompt le travail d'affichage juste
+     au moment ou il faut aller vite.
+
+     Or ce qu'on mesure — le centre vertical d'un onglet dans la barre — ne
+     bouge que si la barre change de taille. On le calcule donc une fois, au
+     montage et au redimensionnement, et la boucle se contente de lire un
+     nombre. */
+  const ro = centreYCache;
+
+  if (ro !== null && BAR_H > 0) {
+    const y = ro - g.height / 2;
 
     /* ⚠ ON N'ECRIT QUE SI LA VALEUR A VRAIMENT BOUGE — C'EST CE QUI CORRIGE LE
          TREMBLEMENT AU REPOS.

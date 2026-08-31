@@ -11197,24 +11197,29 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    lignes s'y afficheraient côte à côte et déborderaient. */
 /* ⚠ LA MARGE DES CARTES EST ANNULEE. `.proc-rich-card` porte encore
    `margin-bottom:12px`, heritee de l'epoque ou la liste n'etait pas une boite
-   flexible. Elle s'AJOUTAIT au `gap` : 10 demandes, 22 obtenus entre deux
-   procedures, et 26 apres le groupe des sous-dossiers. Un ecart qu'on regle a
-   deux endroits ne se regle nulle part.
+   flexible. Elle s'AJOUTAIT au `gap`, et l'ecart obtenu ne correspondait
+   jamais a celui demande. Un ecart qu'on regle a deux endroits ne se regle
+   nulle part.
 
-   ⚠ 10 PX ICI, CONTRE 16 SUR LA LISTE DES DOSSIERS. Dans un dossier, tout ce
-   qu'on voit appartient a la meme chose : un ecart large decoupait la page en
-   objets separes alors qu'il s'agit d'un contenu. Sur la page des dossiers,
-   au contraire, chaque carte est un lieu distinct et merite son air. */
-#category-procedures-list{ display:flex; flex-direction:column; gap:10px; }
+   ⚠ 16 PX, LA MEME VALEUR QUE LA LISTE DES DOSSIERS. Un sous-dossier et une
+   procedure sont des cartes comme les autres : rien ne justifie qu'elles
+   respirent differemment selon la page ou on les regarde. Une seule valeur
+   pour toutes les listes de l'app. */
+#category-procedures-list{ display:flex; flex-direction:column; gap:16px; }
 #category-procedures-list .proc-rich-card{ margin-bottom:0; }
 /* ⚠ `.sd-grille` ENVELOPPE LES SOUS-DOSSIERS et vit dans la meme liste. Elle
    etait declaree en grille deux colonnes ; sans cette regle, les sous-dossiers
    resteraient cote a cote au-dessus de procedures pleine largeur. */
+/* ⚠ LE GROUPE DES SOUS-DOSSIERS N'A PLUS DE MARGE PROPRE. Elle valait 16 px et
+   s'AJOUTAIT au `gap` du parent : l'ecart entre le dernier sous-dossier et la
+   premiere procedure atteignait 26 px la ou les autres en faisaient 10. C'est
+   ce trou-la qu'on voyait.
+
+   Le `gap` de la liste s'applique deja entre ce groupe et ce qui le suit :
+   la marge faisait double emploi. */
 #category-procedures-list .sd-grille{
-  display:flex; flex-direction:column; gap:10px;
-  /* La marge sous le groupe des sous-dossiers reste plus large que l'ecart
-     interne : c'est elle qui separe les deux natures d'objet. */
-  margin:0 0 16px;
+  display:flex; flex-direction:column; gap:16px;
+  margin:0;
 }
 #category-procedures-list .cat-cell--ligne,
 #category-procedures-list .proc-rich-card{ width:100%; }

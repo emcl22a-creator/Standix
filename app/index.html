@@ -1043,6 +1043,10 @@
            action, on filtre une liste : c'est le relief qui désigne. Un aplat
            de couleur en ferait un bouton. -->
     <div class="proc-segm" id="proc-segm" role="tablist">
+      <!-- ⚠ LA PASTILLE EST UN ELEMENT, PAS UN FOND. Un `background` ne peut
+           pas glisser d'un bouton a l'autre : il faut une piece unique qu'on
+           deplace. Elle est posee EN PREMIER pour rester sous les libelles. -->
+      <span class="p-seg-lens" id="proc-segm-lens" aria-hidden="true"></span>
       <button type="button" class="p-seg on" data-etat="tout" role="tab">Toutes</button>
       <button type="button" class="p-seg" data-etat="ligne" role="tab">En ligne</button>
       <button type="button" class="p-seg" data-etat="brouillon" role="tab">Brouillons</button>

@@ -249,8 +249,22 @@
   :root{ --col: 460px; }
   @media (min-width: 768px){ :root{ --col: 560px; } }
 
+  /* ⚠ LE `z-index:1` A ETE RETIRE, ET C'EST CE QUI PERMET AU VOILE DE FLOUTER
+     SANS TOUCHER LES BARRES.
+
+     Avec lui, `.app` ouvrait son propre CONTEXTE D'EMPILEMENT : le `z-index:15`
+     de la barre du haut ne valait plus que dans ce contexte, et vue de la
+     racine la barre restait a l'etage 1 — sous le voile, qui est a 9. Elle se
+     floutait avec le contenu, sans qu'aucun reglage de la barre n'y change
+     quoi que ce soit.
+
+     Il servait a passer au-dessus des halos de fond ; ceux-ci sont eteints
+     depuis le passage au theme clair. `position:relative` reste : des enfants
+     s'y ancrent.
+
+     ⚠ NE PAS LE REMETTRE sans deplacer le voile a l'interieur de `.app`. */
   .app{
-    position:relative; z-index:1; width:100%; max-width:var(--col); margin:0 auto;
+    position:relative; width:100%; max-width:var(--col); margin:0 auto;
     min-height:100dvh;
   }
   /* ⚠ 24 PX, COMME `.screen`. La barre porte SA PROPRE marge laterale — elle
@@ -4551,7 +4565,24 @@
     position:absolute; top:-72px; left:50%; transform:translateX(-50%);
     width:250px; height:145px; pointer-events:none; filter:blur(26px);
   }
-  .fen-halo.bleu { background:radial-gradient(ellipse, rgba(255,179,64,0.34), transparent 68%); }
+  /* ⚠ LA CLASSE S'APPELAIT DEJA `bleu` MAIS PEIGNAIT DE L'AMBRE — un reste de
+     l'epoque ou la fenetre portait la couleur de la marque. Le nom disait une
+     chose, la valeur une autre : c'est exactement le genre d'ecart qu'on ne
+     trouve qu'en regardant l'ecran.
+
+     Les deux teintes sont celles du degrade de l'onglet actif, `navBleu` :
+     #1F4CEE au coeur, #4899EC en s'eloignant. Le halo et la barre du bas
+     parlent donc la meme langue.
+
+     ⚠ DEUX ARRETS AVANT LA TRANSPARENCE. Un seul bleu qui s'eteint donne une
+       tache plate ; le passage du profond au clair fait que le halo semble
+       venir de derriere la fenetre. */
+  .fen-halo.bleu {
+    background:radial-gradient(ellipse,
+      rgba(31,76,238,0.34) 0%,
+      rgba(72,153,236,0.20) 42%,
+      transparent 72%);
+  }
   .fen-halo.rouge{ background:radial-gradient(ellipse, rgba(255,69,58,0.30), transparent 68%); }
   .fen-halo.vert { background:radial-gradient(ellipse, rgba(48,209,88,0.28), transparent 68%); }
 
@@ -7364,39 +7395,45 @@ body.chargement #bar{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE VOILE D'ARRIVÉE — LE FLOU EN A ÉTÉ RETIRÉ
+   LE VOILE D'ARRIVÉE
 
-   Il floutait son fond par `backdrop-filter`, et il floutait LA BARRE DU HAUT
-   avec, ce qu'on ne voulait pas.
+   Le fond se brouille brièvement, avec un souffle de blanc pour l'éclaircir au
+   lieu de l'éteindre — un noir qui monte se lirait comme une coupure de
+   courant sur une page claire.
 
-   ⚠ LA RAISON N'EST PAS UNE HISTOIRE DE Z-INDEX MAL RÉGLÉ, mais de CONTEXTE
-     D'EMPILEMENT. `#gestion-app` porte `position:relative` et `z-index:1` : il
-     ouvre donc son propre contexte, et le `z-index:15` de la barre du haut ne
-     vaut QUE DANS CE CONTEXTE. Vue de la racine, la barre reste à l'étage 1 —
-     sous le voile, qui est à 9. La barre du bas, elle, est enfant direct du
-     `body` à l'étage 60 : elle passait déjà au-dessus.
+   ⚠ IL NE TOUCHE NI LA BARRE DU HAUT NI CELLE DU BAS. Le voile est à l'étage
+     9 ; la barre du bas est à 60 et celle du haut à 15, et surtout `.app` ne
+     crée plus de contexte d'empilement qui emprisonnerait la seconde. Voir la
+     règle `.app` plus haut : y remettre un `z-index` referait le défaut.
 
-     Monter le voile ou descendre `#gestion-app` aurait déplacé le problème
-     ailleurs : tout ce qui vit dans ce conteneur aurait suivi.
-
-   La solution est de ne plus flouter par en dessous. Le flou du changement de
-   page est désormais porté par `ecranEntre`, posé sur `.screen` — qui ne
-   contient NI l'une NI l'autre des deux barres. Aucun z-index n'entre en jeu.
-
-   Le voile garde son souffle de blanc : c'est lui qui donne le dessus et le
-   dessous aux deux surfaces pendant qu'elles se remplacent.
+   ⚠ LE FLOU PASSE PAR UNE VARIABLE TYPÉE. Écrire `blur(0px)` puis `blur(2px)`
+     dans des images-clés ne produit rien : les navigateurs n'interpolent pas
+     une fonction de filtre déclarée là, ils sautent d'une valeur à l'autre —
+     et comme les deux bouts valent zéro, on ne voit jamais le flou. `@property`
+     enregistre la valeur comme une LONGUEUR, et l'interpolation devient
+     possible.
    ═══════════════════════════════════════════════════════════════════════════ */
+@property --voile-flou{
+  syntax:'<length>'; initial-value:0px; inherits:false;
+}
 .voile-arrivee{
   position:fixed; inset:0; z-index:9;
   background:transparent; pointer-events:none;
+  --voile-flou:0px;
+  -webkit-backdrop-filter:blur(var(--voile-flou));
+  backdrop-filter:blur(var(--voile-flou));
 }
 .voile-arrivee.joue{
   animation:voileArrivee 0.30s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 @keyframes voileArrivee{
-  0%   { background:rgba(255,255,255,0); }
-  30%  { background:rgba(255,255,255,0.10); }
-  100% { background:rgba(255,255,255,0); }
+  0%   { --voile-flou:0px; background:rgba(255,255,255,0); }
+  /* ⚠ 3 PX, ET C'EST LE RESULTAT D'UNE MESURE. A 2 px, le titre ne perdait que
+     22 % de sa nettete — le filtre etait actif mais on ne le VOYAIT pas, d'ou
+     l'impression qu'il avait disparu. A 3, la difference se lit sans que le
+     texte devienne trouble. */
+  30%  { --voile-flou:3px; background:rgba(255,255,255,0.12); }
+  100% { --voile-flou:0px; background:rgba(255,255,255,0); }
 }
 @media (prefers-reduced-motion: reduce){
   .voile-arrivee.joue{ animation:none; }

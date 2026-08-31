@@ -5693,33 +5693,37 @@
        du haut de la grille au bouton — et ne le touche jamais. */
     padding:20px;
   }
-  /* La consigne finale, plus discrète que le paragraphe : c'est une indication
-     de geste, pas une explication. */
+  /* ⚠ `.fleche` N'EST PLUS EMPLOYEE sur cette page. Elle portait « Touchez le
+     bouton +, en bas de l'ecran » — or ce bouton est masque, la creation se
+     fait par la barre du haut. La consigne tient maintenant dans le paragraphe
+     lui-meme, en une phrase. Les regles restent : d'autres etats vides les
+     citent encore. */
   .debut .fleche b{ color:#C24700; font-weight:800; }
-  .debut-dessin{ position:relative; width:132px; height:120px; margin-bottom:26px; }
-  .debut-dessin .lueur{
-    position:absolute; left:50%; top:52%; transform:translate(-50%,-50%);
-    width:150%; height:150%; border-radius:50%; pointer-events:none;
-    background:radial-gradient(circle, rgba(28,28,38,0.111) 0%, transparent 66%);
-    filter:blur(14px); animation:debutLueur 4.5s ease-in-out infinite;
-  }
+  /* ⚠ LE DESSIN N'A PLUS QU'UNE PIECE. Il en avait quatre — deux fiches de
+     fond, celle de devant, le signe — chacune avec sa propre animation
+     decalee. Quatre mouvements simultanes sur un ecran vide, c'etait la
+     partie la plus animee de l'app pour la page qui a le moins a dire.
+
+     Il flotte d'un seul bloc, doucement. Les regles `.fond-1`, `.fond-2` et
+     `.devant` sont retirees : elles ne visaient plus rien. */
+  .debut-dessin{ position:relative; width:120px; height:108px; margin-bottom:24px;
+    animation:debutFlotte 6s ease-in-out infinite; }
   .debut-dessin svg{ position:relative; width:100%; height:100%; overflow:visible; }
-  /* Les deux fiches du fond montent doucement, décalées l'une de l'autre. */
-  .debut-dessin .fond-2{ animation:debutFlotte 5.4s ease-in-out infinite; }
-  .debut-dessin .fond-1{ animation:debutFlotte 5.4s ease-in-out -1.8s infinite; }
-  .debut-dessin .devant{ animation:debutFlotte 5.4s ease-in-out -3.4s infinite; }
-  .debut-dessin .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
   /* Le même battement discret sur le signe des icônes de mode. */
   .mode-choice-icon .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
   @media (prefers-reduced-motion: reduce){ .mode-choice-icon .signe{ animation:none; } }
-  @keyframes debutFlotte{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-4px); } }
+  @keyframes debutFlotte{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
   @keyframes debutLueur{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
   @keyframes debutSigne{ 0%,100%{ opacity:0.75; } 50%{ opacity:1; } }
   @media (prefers-reduced-motion: reduce){
     .debut-dessin *{ animation:none !important; }
   }
-  .debut h3{ font-size:19px; font-weight:750; letter-spacing:-0.03em; margin-bottom:8px; }
-  .debut p{ font-size:13.5px; color:var(--label-2); max-width:260px; margin:0 auto; line-height:1.55; }
+  .debut h3{ font-size:21px; font-weight:700; letter-spacing:-0.035em; margin-bottom:10px; }
+  .debut p{ font-size:14.5px; color:var(--label-2); max-width:250px; margin:0 auto; line-height:1.55; }
+  /* ⚠ LE `+` DANS LA PHRASE EST NOIR, comme le bouton qu'il designe. Il etait
+     ambre : la phrase renvoyait a une couleur qui n'existe plus sur ce
+     bouton. */
+  .debut p b{ color:var(--label); font-weight:700; }
   .debut .fleche{
     margin-top:22px; max-width:250px; line-height:1.5; text-align:center;
     font-size:12px; font-weight:600; color:var(--label-3);
@@ -11564,3 +11568,16 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   .p-seg-lens{ transition:none; }
   #cat-grid.change{ animation:none; }
 }
+
+
+/* ═══ L'EN-TÊTE DE LA PAGE D'UN DOSSIER EST PLUS SERRÉ ═══
+
+   Sur la page Procédures, la recherche est séparée du reste par 16 px : elle
+   agit sur toute la liste alors que le segment et le compte décrivent ce qui
+   est affiché. Ici il n'y a pas de segment — la recherche et la ligne de
+   compte se suivent directement, et 16 px les faisaient paraître sans rapport.
+
+   ⚠ LA RÈGLE PORTE L'IDENTIFIANT DE L'ÉCRAN. `.proc-rech-rang` est partagée
+     avec la page Procédures : la modifier sans le préfixe changerait aussi
+     celle-là, qu'on vient justement de régler à 16. */
+#p-category .proc-rech-rang{ margin-bottom:2px; }

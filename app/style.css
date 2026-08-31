@@ -6203,15 +6203,14 @@
      bloc de style embarqué porte `--tint-color`, `--tint-opacity`,
      `--verre-bar`, `--filet` et les quatre valeurs d'ombre. Les chercher dans
      ce fichier ne donne rien. */
-.topbar-card{
-  background-color:rgba(var(--tint-color), var(--tint-opacity));
-  -webkit-backdrop-filter:var(--verre-bar);
-  backdrop-filter:var(--verre-bar);
-  border:none;
-  box-shadow:
-    0px 4px var(--outer-shadow-blur) rgba(20,20,30,0.12),
-    inset 0 0 var(--shadow-blur) var(--shadow-spread) var(--shadow-color);
-}
+/* ⚠ CE BLOC A ÉTÉ RETIRÉ. Il recopiait ici le fond, le flou et l'ombre de la
+   barre du bas. La barre porte maintenant la classe `.glassDiv` directement
+   dans le balisage : elle hérite de la source, au lieu d'en tenir une copie
+   qu'il faudrait penser à mettre à jour.
+
+   Le filet du `::after` juste en dessous reste — `.glassDiv` a le sien, mais
+   il vit dans le bloc de style d'index.html et ne s'applique qu'à `#bar`. */
+.topbar-card{ border:none; }
 /* Le même liseré que la barre du bas : une seule valeur sur tout le tour. Les
    deux pièces sont de la même matière — leurs bords doivent se ressembler. */
 .topbar-card::after{
@@ -11182,20 +11181,31 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      séparer la barre du contenu qui suit ; un demi-pixel suffit, et c'est ce
      que fait iOS sur ses barres transparentes.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ LA MÊME MATIÈRE QUE LA BARRE DU BAS ═══
+
+   La barre porte `.glassDiv` dans le balisage : elle hérite donc du fond
+   teinté, du flou, du filet et de l'ombre — les valeurs exactes de la barre
+   d'onglets, sans qu'aucune soit recopiée ici.
+
+   ⚠ HÉRITER PLUTÔT QUE RECOPIER. Deux jeux de valeurs pour une même matière
+     divergent à la première retouche : on change la teinte de la barre du bas
+     et celle du haut reste en arrière, sans que rien ne le signale.
+
+   ⚠ `position` EST RÉÉCRITE. `.glassDiv` la met en `absolute` — c'est ce dont
+     la capsule a besoin en bas. Ici la barre est dans le flux ; sans ce
+     `relative`, elle se décrocherait de sa rangée. */
 .topbar-card{
+  position:relative;
   /* ⚠ TROIS COLONNES, PAS `space-between`. Les deux cotes font exactement
      `1fr` : le logo tombe au milieu de l'ECRAN, pas au milieu de ce qui reste
      entre deux boutons de largeurs differentes. */
   display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
   width:100%; flex:1 1 auto;
-  padding:0 0 10px; border-radius:0;
-  background:none;
-  -webkit-backdrop-filter:none; backdrop-filter:none;
-  box-shadow:inset 0 -0.5px 0 rgba(60,60,67,0.12);
+  /* Le remplissage remplace le filet du bas : la barre est maintenant une
+     pièce posée sur la page, elle a besoin d'air à l'intérieur. */
+  padding:7px 10px 7px 8px;
+  border-radius:100px;
 }
-/* ⚠ LE PSEUDO-ÉLÉMENT DE FILET EST ÉTEINT. Il dessinait l'arête de la pilule
-   de verre ; sur une ligne nue, il ferait un cadre autour de rien. */
-.topbar-card::after{ display:none; }
 
 /* ⚠ `.topbar-left` ET `.role` NE SONT PLUS DANS LA BARRE. Le nom et la
    pastille ont ete remplaces par le menu, le logo et le bouton de creation.

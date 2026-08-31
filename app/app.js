@@ -8340,9 +8340,13 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
        remplace a mi-chemin : une animation unique se retrouvait coupee sur des
        elements supprimes, et rejouee du debut sur les nouveaux. Voir le
        commentaire de `listeSort` dans style.css. */
-    g.classList.remove('sort', 'entre')
-    void g.offsetWidth
-    g.classList.add('sort')
+    /* ⚠ LES CLASSES VONT SUR L'ECRAN, pas sur la grille : la ligne de compte
+       est AVANT elle dans le balisage, et aucun selecteur CSS ne remonte a un
+       frere precedent. `#p-list` est le seul ancetre commun. */
+    const ecran = document.getElementById('p-list') || g
+    ecran.classList.remove('sort', 'entre')
+    void ecran.offsetWidth
+    ecran.classList.add('sort')
     /* ⚠ PAS DE `jouerVoile` ICI, ET C'EST VOULU. Le voile floute TOUT l'ecran —
        le titre, la recherche, le segment lui-meme. Or changer de segment ne
        change que la LISTE : flouter le bouton qu'on vient de toucher fait
@@ -8361,12 +8365,12 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
     setTimeout(() => {
       renderCategoryGrid()
       sansApparition = false
-      g.classList.remove('sort')
-      void g.offsetWidth
-      g.classList.add('entre')
+      ecran.classList.remove('sort')
+      void ecran.offsetWidth
+      ecran.classList.add('entre')
       /* ⚠ ON RETIRE `entre` A LA FIN. Laissee en place, le defilement suivant
          rejouerait l'animation sur des cartes deja visibles. */
-      setTimeout(() => g.classList.remove('entre'), 320)
+      setTimeout(() => ecran.classList.remove('entre'), 320)
     }, 160)
   } else {
     renderCategoryGrid()

@@ -11226,12 +11226,26 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ LA GRILLE DE CETTE PAGE PASSE EN COLONNE, elle aussi. Elle était déclarée
    en deux colonnes comme celle des dossiers ; sans cette règle, les nouvelles
    lignes s'y afficheraient côte à côte et déborderaient. */
-#category-procedures-list{ display:flex; flex-direction:column; gap:16px; }
+/* ⚠ LA MARGE DES CARTES EST ANNULEE. `.proc-rich-card` porte encore
+   `margin-bottom:12px`, heritee de l'epoque ou la liste n'etait pas une boite
+   flexible. Elle s'AJOUTAIT au `gap` : 10 demandes, 22 obtenus entre deux
+   procedures, et 26 apres le groupe des sous-dossiers. Un ecart qu'on regle a
+   deux endroits ne se regle nulle part.
+
+   ⚠ 10 PX ICI, CONTRE 16 SUR LA LISTE DES DOSSIERS. Dans un dossier, tout ce
+   qu'on voit appartient a la meme chose : un ecart large decoupait la page en
+   objets separes alors qu'il s'agit d'un contenu. Sur la page des dossiers,
+   au contraire, chaque carte est un lieu distinct et merite son air. */
+#category-procedures-list{ display:flex; flex-direction:column; gap:10px; }
+#category-procedures-list .proc-rich-card{ margin-bottom:0; }
 /* ⚠ `.sd-grille` ENVELOPPE LES SOUS-DOSSIERS et vit dans la meme liste. Elle
    etait declaree en grille deux colonnes ; sans cette regle, les sous-dossiers
    resteraient cote a cote au-dessus de procedures pleine largeur. */
 #category-procedures-list .sd-grille{
-  display:flex; flex-direction:column; gap:16px; margin:0 0 16px;
+  display:flex; flex-direction:column; gap:10px;
+  /* La marge sous le groupe des sous-dossiers reste plus large que l'ecart
+     interne : c'est elle qui separe les deux natures d'objet. */
+  margin:0 0 16px;
 }
 #category-procedures-list .cat-cell--ligne,
 #category-procedures-list .proc-rich-card{ width:100%; }

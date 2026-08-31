@@ -11656,7 +11656,20 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      La garder aurait pose un `transform:none` sur des elements qui n'en
      portent aucun — sans effet, mais laissant croire qu'un mouvement existe
      encore ici. */
-#cat-grid.change{
+/* ⚠ L'ANIMATION PORTE SUR LES CARTES, PAS SUR LA GRILLE.
+
+   Elle etait posee sur `#cat-grid`, donc sur un conteneur qui occupe toute la
+   largeur de l'ecran : le flou s'appliquait a la boite entiere, y compris aux
+   espaces vides entre les cartes et sous la derniere. On voyait la zone
+   trembler plutot que les elements changer.
+
+   Sur chaque enfant, chaque carte se brouille avec SON ombre et rien d'autre.
+   Le fond de la page ne bouge pas.
+
+   ⚠ `> *` PLUTOT QU'UNE CLASSE. Les enfants ne sont pas toujours des cartes :
+     ce peut etre le message « aucun dossier », ou le bloc de premiere
+     procedure. Tous doivent partir de la meme facon. */
+#cat-grid.change > *{
   animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
 }
 /* ⚠ LE FLOU EST ICI, ET NON DANS LE VOILE. Le voile floute tout l'ecran ;
@@ -11677,7 +11690,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }
-  #cat-grid.change{ animation:none; }
+  #cat-grid.change > *{ animation:none; }
 }
 
 

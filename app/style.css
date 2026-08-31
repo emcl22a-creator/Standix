@@ -11758,46 +11758,24 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      cartes et sous la derniere. Ici chaque carte se brouille avec son ombre et
      rien d'autre.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* ⚠ LA LIGNE DE COMPTE PART AVEC LES CARTES. Elle annonce ce que la liste
-   contient — « 4 dossiers », « 3 procedures » — et ce nombre change en meme
-   temps qu'elles. La laisser nette pendant que les cartes se remplacent
-   donnait un compte fige au-dessus d'une liste en mouvement, qui annoncait
-   pendant un instant l'ancienne valeur.
+/* ═══ LE CHANGEMENT DE SEGMENT N'EST PLUS PORTE PAR LE CSS ═══
 
-   ⚠ LES CLASSES SONT SUR L'ECRAN, PAS SUR LA GRILLE. La ligne est AVANT la
-     grille dans le balisage : aucun selecteur ne permet de remonter jusqu'a
-     elle depuis `#cat-grid`. C'est donc `#p-list` qui les porte, et la regle
-     designe les deux morceaux.
+   Il l'etait par deux classes posees sur l'ecran, `sort` et `entre`, dont les
+   cartes heritaient. Trois choses devaient s'aligner pour que cela marche : la
+   classe ajoutee au bon moment, les cartes existantes a cet instant, et aucune
+   autre regle ne prenant le dessus. Il suffisait qu'une seule cede pour qu'on
+   ne voie rien.
 
-   Le segment, la recherche et le titre restent nets : eux ne changent pas. */
-#p-list.sort .proc-rang,
-#p-list.sort #cat-grid > *{
-  animation:listeSort 0.16s cubic-bezier(0.32,0.72,0,1) forwards;
-}
-/* ⚠ L'ENTREE EST PORTEE PAR LA CARTE ELLE-MEME, via `.cl-entre` posee au
-   moment de sa construction — voir `animerApparition` dans app.js. Elle
-   dependait auparavant d'une classe ajoutee sur l'ecran apres le rendu : si le
-   rendu prenait un peu plus de temps que prevu, l'animation partait sur des
-   elements qui n'existaient pas encore, et rien ne se voyait.
+   L'animation est desormais lancee en JavaScript, sur les elements reels —
+   voir `flouSortie` et `flouEntree` dans app.js. Les regles ci-dessous sont
+   retirees : elles ne visaient plus rien, mais laissaient croire que le
+   mouvement se reglait ici.
 
-   La ligne de compte, elle, n'est pas recreee : elle garde le selecteur par
-   l'ecran. */
-#p-list.entre .proc-rang,
-#cat-grid > .cl-entre{
-  animation:listeEntre 0.30s cubic-bezier(0.32,0.72,0,1);
-}
-@keyframes listeSort{
-  from{ opacity:1; filter:blur(0px); }
-  to  { opacity:0; filter:blur(3px); }
-}
-@keyframes listeEntre{
-  from{ opacity:0; filter:blur(3px); }
-  to  { opacity:1; filter:blur(0px); }
-}
+   ⚠ LE REGLAGE `prefers-reduced-motion` EST TRAITE DANS LE SCRIPT, avant meme
+     de lancer l'animation : `matchMedia` y remplace la requete media. */
+
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }
-  #p-list.sort .proc-rang, #p-list.sort #cat-grid > *,
-  #p-list.entre .proc-rang, #cat-grid > .cl-entre{ animation:none; }
 }
 
 
@@ -12280,8 +12258,12 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ⚠ ELLES SONT RÉÉCRITES ICI PLUTÔT QUE MODIFIÉES SUR PLACE : d'autres écrans
      citent encore ces classes, et changer leur déclaration d'origine les
      emporterait avec. */
+/* ⚠ 22 PX, PAS 28. J'avais aligne le salut sur le titre « Procedures » — mais
+   ce n'est pas le meme objet : « Procedures » NOMME la page, « Bonjour Adrien »
+   accueille. Un mot d'accueil dans le corps d'un titre de page ecrase tout ce
+   qui suit, y compris la banniere qui porte l'action. */
 #p-home .ac-salut{
-  font-size:28px; font-weight:700; letter-spacing:-0.04em; line-height:1.1;
+  font-size:22px; font-weight:700; letter-spacing:-0.035em; line-height:1.15;
   color:var(--label); margin:0;
 }
 #p-home .ac-salut span{ color:var(--label); font-weight:700; }
@@ -12298,3 +12280,36 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-home .ac-lig-q{ font-size:12px; font-weight:400; color:var(--label-3); }
 #p-home .ac-sect-t > span{ font-size:15px; font-weight:650; color:var(--label); }
 #p-home .ac-chif-s{ font-size:11.5px; font-weight:400; color:var(--label-3); }
+
+
+/* ═══ LES BLOCS DE L'ACCUEIL PRENNENT LA TRANCHE DES CARTES DE DOSSIER ═══
+
+   Ils avaient l'ombre et le biseau, mais pas le liseré : sur un fond clair,
+   c'est lui qui donne l'épaisseur — le reste ne fait que décoller la carte du
+   fond. Sans lui, les blocs paraissaient posés à plat à côté de ceux de la
+   page Procédures.
+
+   ⚠ MÊME TECHNIQUE, MÊMES VALEURS. Un dégradé du blanc au sombre, découpé en
+     anneau d'un pixel par un masque en `xor` — le remplissage est retiré, il
+     ne reste que le contour. Reprendre la recette plutôt que l'approcher : à
+     deux valeurs près, l'œil verrait deux matières différentes.
+
+   ⚠ LA BANNIÈRE EN EST EXCLUE. Elle est sombre : un liseré blanc en haut y
+     ferait une arête lumineuse sur du noir, ce qui est l'effet inverse. */
+.ac-chif, .ac-lig{ position:relative; }
+.ac-chif::before, .ac-lig::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:1px; pointer-events:none; z-index:2;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.95)   0%,
+    rgba(255,255,255,0.50)   16%,
+    rgba(28,28,38,0.025)     50%,
+    rgba(28,28,38,0.09)      84%,
+    rgba(28,28,38,0.14)     100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+/* ⚠ LE CONTENU REPASSE AU-DESSUS. Le liseré est à l'étage 2 ; sans cette
+   règle, il couvrirait le texte et les icônes des blocs. */
+.ac-chif > *, .ac-lig > *{ position:relative; z-index:3; }

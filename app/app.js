@@ -7832,7 +7832,21 @@ const _observateurApparition = ('IntersectionObserver' in window)
 let sansApparition = false
 
 function animerApparition(el, rang = 0) {
-  if (sansApparition) { el.classList.add('vu'); return }
+  /* ⚠ PENDANT UN CHANGEMENT DE SEGMENT, LA CARTE PORTE SON ANIMATION
+       ELLE-MEME.
+
+     Elle etait posee sur l'ecran, puis heritee par `#p-list.entre > *`. Cela
+     supposait que la classe soit ajoutee APRES la creation des cartes, dans le
+     bon ordre et dans le bon delai. Un rendu un peu plus long que prevu, et
+     l'animation partait sur des elements qui n'existaient pas encore : on ne
+     voyait rien du tout.
+
+     En la posant ici, sur chaque carte au moment ou elle est construite, le
+     declenchement ne depend plus d'aucun minutage. */
+  if (sansApparition) {
+    el.classList.add('vu', 'cl-entre')
+    return
+  }
   /* ⚠ ON RESPECTE LE REGLAGE DU SYSTEME. Quelqu'un qui a demande moins
      d'animations ne doit pas voir la liste bouger — et surtout pas rester
      avec des cartes invisibles si l'observateur ne se declenchait pas. */
@@ -8404,14 +8418,16 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
     /* 160 ms : la duree exacte de la sortie. Redessiner plus tot couperait les
        anciennes cartes en plein mouvement, plus tard laisserait un blanc. */
     setTimeout(() => {
+      /* ⚠ ON RETIRE `sort` AVANT DE REDESSINER. Elle porte `forwards` : laissee
+         en place, elle figerait les nouvelles cartes a l'opacite zero de sa
+         derniere image. */
+      ecran.classList.remove('sort')
       renderCategoryGrid()
       sansApparition = false
-      ecran.classList.remove('sort')
-      void ecran.offsetWidth
+      /* La ligne de compte, elle, n'est pas recreee : elle garde une classe le
+         temps de son entree. */
       ecran.classList.add('entre')
-      /* ⚠ ON RETIRE `entre` A LA FIN. Laissee en place, le defilement suivant
-         rejouerait l'animation sur des cartes deja visibles. */
-      setTimeout(() => ecran.classList.remove('entre'), 320)
+      setTimeout(() => ecran.classList.remove('entre'), 340)
     }, 160)
   } else {
     renderCategoryGrid()

@@ -579,7 +579,7 @@
      l'etait — et l'oeil force la mise au point sur quelque chose qui bouge.
      Court et leger, le flou donne la profondeur sans se faire remarquer. */
   @keyframes ecranEntre{
-    0%  { opacity:0; transform:translateY(12px); filter:blur(4px); }
+    0%  { opacity:0; transform:translateY(12px); filter:blur(2.5px); }
     35% { opacity:1; filter:blur(0px); }
     100%{ opacity:1; transform:none; filter:blur(0px); }
   }
@@ -7416,10 +7416,18 @@ body.chargement #bar{
 
      Le sommet est aussi ramene a 30 % de la duree : le flou monte vite et
      redescend longuement, au lieu de rester au maximum pendant qu'on attend. */
+/* ⚠ 2,5 PX. Descendu de 10 a 4 puis a 2,5 : a chaque essai le flou se
+     remarquait encore. A cette valeur il donne la profondeur sans qu'on
+     puisse dire ce qui s'est passe — c'est le but.
+
+   ⚠ IL NE TOUCHE NI LA BARRE DU HAUT NI CELLE DU BAS, et c'est une affaire de
+     superposition, pas de filtre. Le voile est a l'etage 9 ; la barre du bas
+     est a 10 et celle du haut a 15. Elles passent donc AU-DESSUS et restent
+     nettes. Les monter ou descendre casserait cette regle sans prevenir. */
 @keyframes voileArrivee{
-  0%   { --voile-flou:0px; background:rgba(255,255,255,0); }
-  30%  { --voile-flou:4px; background:rgba(255,255,255,0.16); }
-  100% { --voile-flou:0px; background:rgba(255,255,255,0); }
+  0%   { --voile-flou:0px;   background:rgba(255,255,255,0); }
+  30%  { --voile-flou:2.5px; background:rgba(255,255,255,0.10); }
+  100% { --voile-flou:0px;   background:rgba(255,255,255,0); }
 }
 @media (prefers-reduced-motion: reduce){
   .voile-arrivee.joue{ animation:none; }
@@ -11254,8 +11262,11 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    bouger pareil, sinon l'app parait faite de deux morceaux. */
 .cl-apparait{
   opacity:0;
-  transform:translateY(12px);
-  filter:blur(3px);
+  transform:translateY(10px);
+  /* ⚠ LE MEME FLOU QUE LE CHANGEMENT DE PAGE — 2,5 px. Les trois mouvements de
+     l'app sortent de la meme valeur : une carte qui arrive, un ecran qui
+     arrive et une page qui change doivent se ressembler. */
+  filter:blur(2.5px);
   transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
              transform 0.44s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
              filter 0.20s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
@@ -11556,13 +11567,23 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    Au changement de segment, elle s'efface d'un souffle avant que les nouvelles
    cartes n'arrivent. Sans cela, les anciennes disparaissent d'un coup et les
    nouvelles semblent avoir toujours été là. */
+/* ═══ LE CHANGEMENT DE SEGMENT : LE FLOU SEUL ═══
+
+   Passer de « Toutes » a « Brouillons » ne fait pas ARRIVER une liste, cela
+   REVELE une partie de celle qu'on regardait. Une remontee raconterait une
+   arrivee ; le flou seul dit qu'on refait le point sur le meme sujet.
+
+   ⚠ LA CLASSE COUPE AUSSI LA REMONTEE DES CARTES. Sans cette regle, la liste
+     se floute pendant que chaque carte remonte de dix pixels par-dessus : deux
+     recits contraires dans le meme geste. */
 #cat-grid.change{
   animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
 }
+#cat-grid.change .cl-apparait{ transform:none; }
 @keyframes listeChange{
-  0%   { opacity:1; }
-  40%  { opacity:0; transform:translateY(6px); }
-  100% { opacity:1; transform:none; }
+  0%   { opacity:1;   --voile-flou:0px; filter:blur(0px); }
+  40%  { opacity:0.3; filter:blur(2.5px); }
+  100% { opacity:1;   filter:blur(0px); }
 }
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }

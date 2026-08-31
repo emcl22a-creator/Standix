@@ -10406,12 +10406,14 @@ body:has(#e-detail.active) #equipe-app{
   box-shadow:none;
   gap:13px;
 }
-/* La pastille : un disque teinté, l'icône dedans. Ambre en brouillon, vert en
-   ligne — c'est le seul endroit de la carte qui change de couleur. */
+/* ⚠ LA PASTILLE PASSE AU GRIS, COMME LE POINT DES BADGES. L'ambre etait la
+   seule couleur pleine de la page : elle disait « attention » la ou il n'y a
+   qu'un etat a constater. Un brouillon n'est pas une alerte, c'est du travail
+   en cours — meme gris que sur les cartes de la liste. */
 .pub-ic{
   display:grid; place-items:center; flex:0 0 34px;
   width:34px; height:34px; border-radius:100px;
-  background:rgba(246,148,3,0.13); color:#C24700;
+  background:rgba(60,60,67,0.10); color:var(--label-2);
 }
 .pub-ic svg{ width:19px; height:19px; display:block; }
 .pub-txt{ flex:1; min-width:0; }
@@ -10428,12 +10430,16 @@ body:has(#e-detail.active) #equipe-app{
    34 px de haut sur une carte de 58 : il en occupait la moitié. À 30 px avec
    une graisse de 600, il redevient ce qu'il est — une action à portée de
    pouce, pas le sujet de la carte. */
+/* ⚠ NOIR, COMME LE « + » DE LA BARRE ET LE BOUTON DE CREATION. Toutes les
+   actions principales de l'app portent desormais la meme matiere : un degrade
+   ambre ici en faisait une exception, et l'exception attirait l'oeil plus que
+   l'action ne le meritait. */
 .pub-btn{
-  flex:0 0 auto; height:30px; padding:0 14px;
+  flex:0 0 auto; height:30px; padding:0 15px;
   border:none; border-radius:100px;
   font-family:inherit; font-size:12.5px; font-weight:600;
-  background:linear-gradient(135deg,#E8760F,#F7AA51);
-  color:#2A1400;
+  background:#111116;
+  color:#FFFFFF;
   transition:transform 0.14s ease, opacity 0.14s ease;
 }
 .pub-btn:active{ transform:scale(0.96); }
@@ -11581,8 +11587,25 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      graphique et ne coûte rien.
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-segm{ position:relative; }
+/* ⚠ SA PLACE DE DEPART EST DONNEE PAR LE CSS, PAS PAR LE SCRIPT.
+
+   Elle etait posee uniquement par mesure au premier rendu. Or a ce moment-la
+   l'ecran peut encore etre cache : la mesure rendait zero, rien n'etait ecrit,
+   et « Toutes » restait sans son cadre blanc jusqu'au premier clic. J'ai
+   d'abord ajoute des tentatives successives — ca ne suffit pas quand l'ecran
+   met plus longtemps que prevu a s'afficher.
+
+   Les trois segments sont en `flex:1` : ils font donc EXACTEMENT le tiers de
+   la piste, moins ses six pixels de remplissage. Cette largeur se calcule en
+   CSS, sans rien mesurer, et vaut des la premiere image — bien avant que le
+   script ne s'execute.
+
+   Le script prend ensuite le relais pour les deplacements : il ecrit `width`
+   et `transform` en style direct, qui l'emportent sur ces valeurs. */
 .p-seg-lens{
   position:absolute; top:3px; bottom:3px; left:3px;
+  width:calc((100% - 6px) / 3);
+  transform:translateX(0);
   border-radius:100px; background:#FFFFFF; pointer-events:none;
   box-shadow:0 1px 3px rgba(20,20,30,0.10), 0 0 0 0.5px rgba(20,20,30,0.04);
   transition:transform 0.42s cubic-bezier(0.32,0.72,0,1),
@@ -11639,3 +11662,38 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      avec la page Procédures : la modifier sans le préfixe changerait aussi
      celle-là, qu'on vient justement de régler à 16. */
 #p-category .proc-rech-rang{ margin-bottom:2px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'UNE PROCÉDURE · MÊME MATIÈRE QUE LES LISTES
+
+   Le bandeau, la carte du QR et les blocs d'étapes reprennent le rayon, la
+   tranche et l'ombre des cartes de dossier. Trois matières différentes sur une
+   même page donnaient l'impression de trois écrans collés.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-analyse .pub-bandeau,
+#p-analyse .qr-card{
+  border-radius:24px;
+  padding:18px;
+}
+
+/* ⚠ LE BOUTON DE LA FICHE PERD SON DÉGRADÉ AMBRE. Il était la pièce la plus
+   colorée de l'écran pour une action secondaire — on télécharge une fiche
+   après avoir publié, pas avant. En noir, il rejoint les autres actions ;
+   c'est le contenu qui reprend la vedette. */
+#p-analyse #qr-download-btn{
+  background:#111116;
+  color:#FFFFFF;
+  border:none;
+  /* ⚠ L'OMBRE PORTEE EST REECRITE, PAS SEULEMENT LE FOND. Le bouton en portait
+     une teintee d'ambre : le fond passait au noir et une lueur orange restait
+     dessous, ce qui se voyait davantage qu'avant la correction. */
+  box-shadow:0 6px 16px -6px rgba(17,17,22,0.40);
+}
+
+/* Les titres de section suivent la graisse des titres de page : ils étaient
+   plus discrets que le texte qu'ils annonçaient. */
+#p-analyse .section-title{
+  font-size:14px; font-weight:650; color:var(--label);
+  letter-spacing:-0.025em; margin:26px 0 10px;
+}

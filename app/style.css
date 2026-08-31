@@ -10949,7 +10949,24 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
 .cl-pl svg{ width:32px; height:32px; display:block; }
-.cl-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
+/* ═══ LA COLONNE DE TEXTE FAIT LA HAUTEUR DE LA PLAQUE ═══
+
+   Le nom se cale en haut, la ligne d'information en bas — et ce bas coincide
+   avec celui de la pastille. Les deux colonnes de la carte commencent et
+   finissent ensemble.
+
+   ⚠ `min-height` VAUT LA PLAQUE, ET LES DEUX VALEURS DOIVENT SUIVRE. La
+     pastille fait 72 px ; si on la retouche sans toucher ici, le bas de la
+     ligne se decale et l'alignement se perd sans que rien ne le signale.
+
+   ⚠ `space-between` PLUTOT QU'UNE MARGE. Une marge fixe entre le nom et la
+     ligne du bas donnerait un ecart juste pour un titre d'une ligne et faux
+     pour un titre de deux. Ici, c'est l'espace restant qui se place tout seul,
+     quelle que soit la longueur du nom. */
+.cl-co{
+  flex:1; min-width:0; display:flex; flex-direction:column;
+  min-height:72px; justify-content:space-between;
+}
 .cl-nm{
   font-size:17.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
   color:var(--label); min-width:0;
@@ -10966,13 +10983,13 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    sur la MÊME ligne pour que la carte garde trois niveaux de lecture — le nom,
    ce qu'il contient, son état — et pas quatre.
 
-   ⚠ 18 PX D'ÉCART, CONTRE 9. C'est ICI que la carte respire, pas dans son
-     remplissage extérieur : entre le nom et l'information du bas. Doubler le
-     padding aurait éloigné le contenu des bords sans rien changer entre les
-     deux lignes — la carte aurait grandi en restant aussi serrée. */
+   ⚠ PLUS DE `margin-top` ICI. L'ecart entre le nom et cette ligne est
+     desormais l'espace RESTANT dans la colonne — voir `justify-content` sur
+     `.cl-co`. Une marge fixe s'y ajouterait et repousserait la ligne sous le
+     bas de la plaque. */
 .cl-bas{
   display:flex; align-items:center; justify-content:space-between;
-  gap:8px; margin-top:18px;
+  gap:8px;
 }
 /* La tête porte le nom et les trois points, alignés sur leur première ligne :
    un bouton centré verticalement sur un titre qui passe sur deux lignes

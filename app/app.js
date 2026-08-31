@@ -8203,14 +8203,54 @@ document.addEventListener('click', (e) => {
     ?.setAttribute('aria-expanded', ouvrir ? 'true' : 'false')
 })
 
+/* ═══ LA PASTILLE SUIT LE SEGMENT CHOISI ═══
+
+   ⚠ ELLE SE MESURE, ELLE NE SE CALCULE PAS. On pourrait diviser la largeur par
+     trois — mais les trois libelles n'ont pas la meme longueur et le segment
+     s'etire selon l'ecran. Mesurer le bouton donne la bonne place quel que
+     soit le texte, et un quatrieme onglet fonctionnerait sans rien changer. */
+function poserPastilleSegment(b, animer = true) {
+  const lens = document.getElementById('proc-segm-lens')
+  if (!lens || !b) return
+  const p = b.parentElement.getBoundingClientRect()
+  const r = b.getBoundingClientRect()
+  if (!r.width) return
+  /* Au premier passage on pose sans animer : sinon la pastille traverserait
+     l'ecran depuis la gauche au chargement de la page. */
+  if (!animer) lens.style.transition = 'none'
+  lens.style.width = r.width + 'px'
+  lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+  if (!animer) { void lens.offsetWidth; lens.style.transition = '' }
+}
+
 document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   const b = e.target.closest('.p-seg')
   if (!b || b.classList.contains('on')) return
   b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
   b.classList.add('on')
+  poserPastilleSegment(b)
   filtreEtatDossiers = b.dataset.etat
-  renderCategoryGrid()
+
+  /* La liste s'efface d'un souffle, puis se reconstruit. On redessine A MI-
+     CHEMIN de l'effacement : les nouvelles cartes arrivent pendant que
+     l'opacite remonte, et l'on ne voit jamais de liste vide. */
+  const g = document.getElementById('cat-grid')
+  if (g) {
+    g.classList.remove('change')
+    void g.offsetWidth
+    g.classList.add('change')
+    setTimeout(() => renderCategoryGrid(), 105)
+  } else {
+    renderCategoryGrid()
+  }
 })
+
+/* La pastille se pose au chargement, et se replace si l'ecran change de
+   largeur — une rotation de telephone la laisserait sinon a cote. */
+addEventListener('load', () =>
+  poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false))
+addEventListener('resize', () =>
+  poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false))
 
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */
@@ -16039,7 +16079,12 @@ function etatProcedureHtml(proc) {
        est écrit quand même : une règle qui dépend d'un filtre distant n'est
        pas une règle. */
   if (proc && !proc.publiee_le && proc.statut !== 'traitement' && proc.statut !== 'redaction') {
-    return `<span class="proc-brouillon" title="Pas encore visible par votre équipe">Brouillon</span>`
+    /* ⚠ LA MEME PILULE QUE PARTOUT AILLEURS. Elle etait ambre et pleine, seule
+       de son espece : dans une liste ou tous les etats sont des pilules
+       blanches a point colore, elle criait sans rien dire de plus. Le point
+       gris suffit — gris parce qu'il reste du travail, vert quand c'est
+       publie. */
+    return `<span class="cl-badge" title="Pas encore visible par votre équipe"><i style="background:#9A9AA4"></i>Brouillon</span>`
   }
 
   if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a échoué — touchez pour relancer")

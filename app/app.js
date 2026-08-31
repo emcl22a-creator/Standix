@@ -6267,39 +6267,47 @@ async function loadGestionProcedures() {
        aurait cassé la page à chaque ouverture. */
     catGridEl.innerHTML = `
       <div class="debut">
+        <!-- ═══ LE DESSIN : LE GESTE DEVIENT DES ETAPES ═══
+
+             A gauche ce qu'on filme, a droite ce qui en sort. Ce n'est pas
+             l'objet du produit, c'est sa PROMESSE.
+
+             ⚠ LE DEGRADE VA DU GRIS PROFOND AU NOIR, pas du noir au noir. Un
+               aplat noir est une silhouette ; c'est la variation qui donne le
+               volume et fait qu'on lit un objet plutot qu'une decoupe.
+
+             ⚠ LES DEUX DEGRADES SONT DECLARES ICI, dans le gabarit, et non
+               dans les definitions communes d'index.html. Ce bloc n'apparait
+               que sur une page vide : deux entrees de plus dans le balisage
+               partage seraient chargees a chaque ecran pour ne servir qu'ici.
+
+             ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE. Il est DANS un
+               gabarit delimite par des accents graves : un seul y fermerait la
+               chaine en plein milieu. C'est un piege deja rencontre ici. -->
         <div class="debut-dessin">
-          <div class="lueur"></div>
-          <svg viewBox="0 0 132 120" fill="none">
-            <!-- deux fiches en retrait, puis celle de devant avec son bouton de lecture -->
-            <rect class="fond-2" x="30" y="8"  width="72" height="52" rx="11"
-                  stroke="rgba(255,255,255,0.16)" stroke-width="1.5"/>
-            <rect class="fond-1" x="22" y="20" width="88" height="62" rx="13"
-                  stroke="rgba(255,255,255,0.26)" stroke-width="1.5"/>
-            <g class="devant">
-              <rect x="14" y="34" width="104" height="72" rx="15"
-                    fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
-              <circle cx="66" cy="70" r="17" stroke="rgba(255,255,255,0.42)" stroke-width="1.6"/>
-              <path d="M61.5 62.5 L76 70 L61.5 77.5 Z" fill="rgba(255,255,255,0.75)"/>
-              <line x1="30" y1="95" x2="60" y2="95" stroke="rgba(255,255,255,0.22)" stroke-width="1.6" stroke-linecap="round"/>
-              <line x1="66" y1="95" x2="84" y2="95" stroke="rgba(255,255,255,0.14)" stroke-width="1.6" stroke-linecap="round"/>
-            </g>
-            <!-- Le seul point de couleur de ce dessin : il fait écho au bouton
-                 de la carte du haut, et relie les deux d'un coup d'œil. Tout le
-                 reste demeure au trait blanc — deux foyers de couleur sur un
-                 même écran, et le bouton perdrait sa force. -->
-            <g class="signe">
-              <circle cx="112" cy="26" r="13" fill="url(#orLibre)"/>
-              <line x1="112" y1="20" x2="112" y2="32" stroke="#2A1400" stroke-width="2.6" stroke-linecap="round"/>
-              <line x1="106" y1="26" x2="118" y2="26" stroke="#2A1400" stroke-width="2.6" stroke-linecap="round"/>
-            </g>
+          <svg viewBox="0 0 120 112" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="dbNoir" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#4A4A55"/><stop offset="1" stop-color="#0B0B0F"/>
+              </linearGradient>
+              <linearGradient id="dbNoirDoux" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#3A3A44"/><stop offset="1" stop-color="#111116"/>
+              </linearGradient>
+            </defs>
+            <rect x="6" y="30" width="46" height="52" rx="13" fill="url(#dbNoir)"/>
+            <path d="M25 47 L38 56 L25 65 Z" fill="#FFFFFF" opacity="0.92"/>
+            <path d="M60 56 h12" stroke="#111116" stroke-width="2.4" stroke-linecap="round" opacity="0.34"/>
+            <path d="M68 51.5 L73 56 L68 60.5" stroke="#111116" stroke-width="2.4"
+                  stroke-linecap="round" stroke-linejoin="round" opacity="0.34"/>
+            <rect x="80" y="34" width="34" height="8" rx="4" fill="url(#dbNoirDoux)"/>
+            <rect x="80" y="52" width="34" height="8" rx="4" fill="url(#dbNoirDoux)" opacity="0.66"/>
+            <rect x="80" y="70" width="22" height="8" rx="4" fill="url(#dbNoirDoux)" opacity="0.4"/>
           </svg>
         </div>
-        <h3>Votre première procédure</h3>
-        <p>Décrivez une tâche étape par étape, ou filmez-la une seule fois — l'IA la découpe pour vous.</p>
-        <div class="fleche">Touchez le bouton <b>+</b>, en bas de l’écran</div>
+        <h3>Créez votre première procédure</h3>
+        <p>Touchez le bouton <b>+</b>, en haut de la page.</p>
       </div>
-    `
-    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
+    `    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
        entreprise sans procédure laissait en mémoire les lectures de la
        précédente : la carte du haut annonçait « 4 min de formation » pendant
        que les trois sections en dessous disaient « aucun membre » et
@@ -8529,14 +8537,34 @@ function renderCategoryProceduresListInterne() {
        pendant qu'on en voit deux. */
   const nbEl = document.getElementById('cat-nb-elements')
   if (nbEl) {
+    /* ⚠ LES DEUX NOMBRES, PAS UN SEUL. La page d'un dossier montre des
+       sous-dossiers ET des procédures : n'annoncer que les premiers laissait
+       croire qu'il n'y avait rien d'autre, et le compte disparaissait
+       entièrement dès qu'un dossier n'avait pas de sous-dossier.
+
+       Dans un SOUS-dossier il n'y a que des procédures : le premier morceau
+       tombe alors de lui-même. */
     const sousDossiers = sousDossierCourant ? new Set() : new Set(
-      filtered.map(d => (d.proc.sous_categorie || '').trim()).filter(Boolean))
+      (filtered || []).map(d => (d && d.proc && d.proc.sous_categorie || '').trim()).filter(Boolean))
+    const nbP = (filtered || []).length
+    const morceaux = []
     if (sousDossiers.size) {
-      nbEl.textContent = `${sousDossiers.size} sous-dossier${sousDossiers.size > 1 ? 's' : ''}`
-    } else {
-      nbEl.textContent = filtered.length
-        ? `${filtered.length} procédure${filtered.length > 1 ? 's' : ''}`
-        : 'Aucune procédure'
+      morceaux.push(`${sousDossiers.size} sous-dossier${sousDossiers.size > 1 ? 's' : ''}`)
+    }
+    morceaux.push(nbP ? `${nbP} procédure${nbP > 1 ? 's' : ''}` : 'aucune procédure')
+    nbEl.textContent = morceaux.join(' \u00b7 ')
+
+    /* ⚠ L'ICONE SUIT CE QU'ON COMPTE. Dans un sous-dossier il n'y a que des
+       procedures : y laisser deux chemises annoncait un rangement qui n'existe
+       pas a ce niveau. Le trace est le meme document que sur les cartes — un
+       objet, un dessin, partout dans l'app. */
+    const ic = document.getElementById('cat-rang-ic')
+    if (ic) {
+      ic.innerHTML = sousDossiers.size
+        ? `<path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"></path>
+           <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"></path>`
+        : `<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"></path>
+           <path d="M13.6 3.4v5h5"></path><path d="M8.8 13h6.4"></path><path d="M8.8 16.4h4.2"></path>`
     }
   }
 

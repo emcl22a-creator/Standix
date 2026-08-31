@@ -8336,27 +8336,38 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
      l'opacite remonte, et l'on ne voit jamais de liste vide. */
   const g = document.getElementById('cat-grid')
   if (g) {
-    g.classList.remove('change')
+    /* ⚠ SORTIE PUIS ENTREE, ET NON UNE SEULE ANIMATION. Le contenu est
+       remplace a mi-chemin : une animation unique se retrouvait coupee sur des
+       elements supprimes, et rejouee du debut sur les nouveaux. Voir le
+       commentaire de `listeSort` dans style.css. */
+    g.classList.remove('sort', 'entre')
     void g.offsetWidth
-    g.classList.add('change')
+    g.classList.add('sort')
     /* ⚠ PAS DE `jouerVoile` ICI, ET C'EST VOULU. Le voile floute TOUT l'ecran —
        le titre, la recherche, le segment lui-meme. Or changer de segment ne
        change que la LISTE : flouter le bouton qu'on vient de toucher fait
        douter d'avoir appuye au bon endroit.
 
-       Le flou est donc porte par `listeChange`, pose sur la grille seule. Sa
-       valeur est la meme que celle du voile, pour que les deux gestes se
-       ressemblent sans se confondre. */
+       Le flou est donc porte par `listeSort` et `listeEntre`, poses sur les
+       CARTES seules. Leur valeur est la meme que celle du voile, pour que les
+       deux gestes se ressemblent sans se confondre. */
 
     /* On coupe l'apparition AVANT de redessiner, et on la rend apres : les
        cartes de ce rendu-ci arrivent posees, celles du prochain defilement
        retrouveront leur entree normale. */
     sansApparition = true
-    setTimeout(() => { renderCategoryGrid(); sansApparition = false }, 105)
-    /* ⚠ ON RETIRE LA CLASSE A LA FIN. Elle coupe la remontee le temps du
-       changement ; laissee en place, le defilement suivant revelerait les
-       cartes sans mouvement. 300 ms : l'animation dure 260. */
-    setTimeout(() => g.classList.remove('change'), 300)
+    /* 160 ms : la duree exacte de la sortie. Redessiner plus tot couperait les
+       anciennes cartes en plein mouvement, plus tard laisserait un blanc. */
+    setTimeout(() => {
+      renderCategoryGrid()
+      sansApparition = false
+      g.classList.remove('sort')
+      void g.offsetWidth
+      g.classList.add('entre')
+      /* ⚠ ON RETIRE `entre` A LA FIN. Laissee en place, le defilement suivant
+         rejouerait l'animation sur des cartes deja visibles. */
+      setTimeout(() => g.classList.remove('entre'), 320)
+    }, 160)
   } else {
     renderCategoryGrid()
   }

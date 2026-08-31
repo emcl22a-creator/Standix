@@ -8294,12 +8294,27 @@ document.addEventListener('click', (e) => {
      trois — mais les trois libelles n'ont pas la meme longueur et le segment
      s'etire selon l'ecran. Mesurer le bouton donne la bonne place quel que
      soit le texte, et un quatrieme onglet fonctionnerait sans rien changer. */
-function poserPastilleSegment(b, animer = true) {
+function poserPastilleSegment(b, animer = true, essai = 0) {
   const lens = document.getElementById('proc-segm-lens')
   if (!lens || !b) return
   const p = b.parentElement.getBoundingClientRect()
   const r = b.getBoundingClientRect()
-  if (!r.width) return
+
+  /* ⚠ ON REESSAIE SI L'ECRAN N'EST PAS ENCORE MESURABLE, ET C'EST CE QUI
+       MANQUAIT AU DEMARRAGE.
+
+     Au premier rendu, la page des procedures peut etre en train d'apparaitre :
+     `getBoundingClientRect` rend alors une largeur nulle et la fonction
+     sortait sans rien poser. La pastille restait invisible jusqu'au premier
+     clic — « Toutes » etait bien selectionne, mais rien ne le montrait.
+
+     Cinq tentatives a une image d'intervalle suffisent largement ; au-dela on
+     abandonne plutot que de boucler indefiniment sur un ecran qui ne
+     s'affichera pas. */
+  if (!r.width) {
+    if (essai < 5) requestAnimationFrame(() => poserPastilleSegment(b, false, essai + 1))
+    return
+  }
   /* Au premier passage on pose sans animer : sinon la pastille traverserait
      l'ecran depuis la gauche au chargement de la page. */
   if (!animer) lens.style.transition = 'none'
@@ -8324,6 +8339,12 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
     g.classList.remove('change')
     void g.offsetWidth
     g.classList.add('change')
+    /* ⚠ LE MEME VOILE QUE LE CHANGEMENT DE PAGE, et pas une animation a part.
+       Passer d'un segment a l'autre remplace tout ce qu'on regarde : c'est le
+       meme evenement qu'une navigation, il doit donc se voir pareil. Emprunter
+       `jouerVoile` garantit que les deux ne pourront jamais diverger. */
+    jouerVoile()
+
     /* On coupe l'apparition AVANT de redessiner, et on la rend apres : les
        cartes de ce rendu-ci arrivent posees, celles du prochain defilement
        retrouveront leur entree normale. */

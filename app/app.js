@@ -14352,12 +14352,18 @@ function numeroEtapeDess(n, taille) {
      La taille est écrite DANS le dessin, pas seulement en CSS : un SVG sans
      `width` ni `height` disparaît si la règle censée la lui donner ne
      s'applique pas. */
+  /* ⚠ LE DESSIN ETAIT FAIT POUR LE THEME SOMBRE : cercle blanc a 5 %, contour
+     blanc a 30 %, chiffre blanc. Sur fond clair, il ne restait qu'un halo gris
+     ou l'on devinait a peine le numero — c'est ce qu'on voit sur la capture.
+
+     Il devient un disque plein, sombre, chiffre en blanc : le meme objet que
+     la plaque d'une carte, en plus petit. Un numero d'etape doit se lire d'un
+     coup d'oeil quand on a les mains occupees. */
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <circle cx="15" cy="15" r="12.6" fill="rgba(255,255,255,0.05)"
-            stroke="rgba(255,255,255,0.30)" stroke-width="1.4"/>
-    <text x="15" y="19.4" text-anchor="middle" font-family="Inter,sans-serif" font-size="12"
-          font-weight="750" fill="rgba(255,255,255,0.86)">${n}</text>
+    <circle cx="15" cy="15" r="13" fill="#111116"/>
+    <text x="15" y="19.6" text-anchor="middle" font-family="Inter,sans-serif" font-size="12.5"
+          font-weight="700" fill="#FFFFFF">${n}</text>
   </svg>`
 }
 

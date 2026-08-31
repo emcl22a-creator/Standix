@@ -7350,35 +7350,59 @@ body.chargement #bar{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE VOILE D'ARRIVÉE
+   LE VOILE D'ARRIVÉE — UN FLOU, PLUS UN NOIR
 
-   Un noir qui monte à moitié puis redescend, le temps qu'une surface arrive.
-   C'est la moitié la plus importante de l'animation : le grossissement seul
-   laisse deux surfaces à plat, le voile leur donne un dessus et un dessous.
+   Il assombrissait l'écran à 42 % de noir pendant qu'une page arrivait. Le
+   geste marchait, mais il était brutal : sur un fond clair, un noir qui monte
+   se lit comme une coupure de courant, pas comme une transition.
+
+   À la place, ce qu'il y a dessous se BROUILLE brièvement, avec un souffle de
+   blanc pour l'éclaircir au lieu de l'éteindre. On garde le dessus et le
+   dessous que le voile donnait aux deux surfaces, sans le noir.
+
+   ⚠ LE FLOU PASSE PAR UNE VARIABLE TYPÉE, ET IL LE FAUT.
+
+     Écrire `backdrop-filter:blur(0px)` puis `blur(9px)` dans des images-clés
+     ne produit RIEN : mesuré au navigateur en pleine animation, le filtre
+     calculé restait à `blur(0px)`. Les navigateurs n'interpolent pas une
+     fonction de filtre déclarée en `@keyframes` — ils sautent d'une valeur à
+     l'autre, et comme les deux bouts valent zéro, on ne voit jamais le flou.
+
+     `@property` enregistre `--voile-flou` comme une LONGUEUR. Le navigateur
+     sait alors interpoler un nombre, et le filtre suit.
+
+   ⚠ ET `opacity` NE MARCHERAIT PAS NON PLUS. Faire varier l'opacité d'un
+     élément qui floute son fond ne réduit pas le flou : il reste entier
+     jusqu'à ce que l'élément disparaisse, et l'on voit un saut net.
 
    Il passe SOUS les deux barres — elles ne changent pas d'écran, elles
    encadrent celui qu'on regarde, et les voir clignoter à chaque page serait
    pénible.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* La variable enregistrée. Sans ce bloc, elle serait une simple chaîne de
+   caractères et le navigateur passerait de « 0px » à « 9px » d'un coup. */
+@property --voile-flou{
+  syntax:'<length>'; initial-value:0px; inherits:false;
+}
 .voile-arrivee{
   position:fixed; inset:0;
   /* z-index 9 : SOUS les deux barres. La barre du bas est à 10, celle du haut
      à 15 — je l'avais posé à 14, ce qui assombrissait la barre du bas à chaque
      page. Or elle ne change pas d'écran : elle encadre celui qu'on regarde, et
-     la voir clignoter cent fois par service serait pénible.
-
-     Au-dessus du contenu (z-index 1) et des halos : c'est bien lui qu'on
-     assombrit. */
+     la voir clignoter cent fois par service serait pénible. */
   z-index:9;
-  background:#000; opacity:0; pointer-events:none;
+  background:transparent; pointer-events:none;
+  --voile-flou:0px;
+  -webkit-backdrop-filter:blur(var(--voile-flou));
+  backdrop-filter:blur(var(--voile-flou));
 }
 .voile-arrivee.joue{
-  animation:voileArrivee 0.38s cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation:voileArrivee 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 @keyframes voileArrivee{
-  0%   { opacity:0; }
-  38%  { opacity:0.42; }
-  100% { opacity:0; }
+  0%   { --voile-flou:0px;  background:rgba(255,255,255,0); }
+  40%  { --voile-flou:10px; background:rgba(255,255,255,0.30); }
+  100% { --voile-flou:0px;  background:rgba(255,255,255,0); }
 }
 @media (prefers-reduced-motion: reduce){
   .voile-arrivee.joue{ animation:none; }

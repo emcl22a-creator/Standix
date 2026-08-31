@@ -947,25 +947,71 @@
          l'écran et dit lui-même ce qu'on regarde — « de vos procédures sont
          accessibles » est écrit en son centre. Une phrase d'introduction
          au-dessus aurait annoncé ce que la ligne suivante répète. -->
-    <div class="ac-tete">
-      <h1 class="ac-salut">Bonjour <span id="ac-prenom">—</span> 👋</h1>
+    <div class="page-tete">
+      <h1 class="ac-salut">Bonjour, <span id="ac-prenom">—</span> 👋</h1>
+      <p>Voici un aperçu de votre espace de travail.</p>
     </div>
 
-    <!-- Le sélecteur « Ce mois-ci / Au total » a été retiré. La tuile
-         « Total de procédures créées » dit le total : un filtre qui pourrait la
-         ramener au mois contredirait son propre libellé.
+    <!-- ═══ LA BANNIERE ═══
 
-         Les deux autres tuiles suivent — membres actifs et analyses vidéo sont
-         désormais comptés sur toute la durée de vie de l'entreprise. -->
+         Le seul aplat sombre de l'app. Il n'y en a qu'un, et il porte
+         l'unique action que la page propose : creer. Deux blocs noirs sur un
+         meme ecran s'annuleraient.
 
-    <!-- ═══ L'ACCUEIL SANS PROCÉDURE ═══
+         ⚠ LE DESSIN EST EN SVG, PAS EN IMAGE. Trois feuillets empiles, tires
+           du logo, qui s'eclairent d'un halo. Une image demanderait un fichier
+           de plus a charger, et ne s'adapterait pas au theme. -->
+    <div class="ac-banniere">
+      <div class="ac-ban-txt">
+        <span class="ac-ban-sur">Créez. Organisez. Partagez.</span>
+        <h2>Des procédures claires,<br><em>une équipe alignée.</em></h2>
+        <p>Transformez vos savoir-faire en gestes simples et répétables.</p>
+        <button type="button" class="ac-ban-btn" onclick="startNewProcedure()">
+          Créer une procédure
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+      <svg class="ac-ban-dess" viewBox="0 0 150 170" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="acFeuil" x1="0" y1="0" x2="150" y2="170" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#4899EC" stop-opacity="0.55"/>
+            <stop offset="1" stop-color="#1F4CEE" stop-opacity="0.16"/>
+          </linearGradient>
+          <radialGradient id="acHalo" cx="0.5" cy="0.5" r="0.5">
+            <stop stop-color="#4899EC" stop-opacity="0.34"/>
+            <stop offset="1" stop-color="#4899EC" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="78" cy="88" rx="74" ry="80" fill="url(#acHalo)"/>
+        <rect x="34" y="18" width="88" height="116" rx="16" transform="rotate(-9 78 76)"
+              stroke="url(#acFeuil)" stroke-width="1.6"/>
+        <rect x="30" y="26" width="88" height="116" rx="16" transform="rotate(-3 74 84)"
+              stroke="url(#acFeuil)" stroke-width="1.6"/>
+        <rect x="26" y="34" width="88" height="116" rx="16"
+              stroke="url(#acFeuil)" stroke-width="1.8" fill="rgba(255,255,255,0.03)"/>
+        <path d="M84 62 55 96h22l-11 40 30-42H74z" fill="url(#acFeuil)" opacity="0.9"/>
+      </svg>
+    </div>
 
-         Un dessin, une phrase. J'avais mis trois feuillets, un anneau IA
-         animé et deux textes selon le rôle — beaucoup de matière pour dire
-         qu'il n'y a rien.
+    <!-- ═══ LES TROIS CHIFFRES ═══
 
-         Ce qui reste : un contour de dossier vide, et le nom de l'entreprise
-         suivi du fait. La page ne s'excuse pas, elle constate. -->
+         Ce qu'un gerant regarde en ouvrant : ce qui est accessible a son
+         equipe, qui la compose, et ce qu'il lui reste de forfait.
+
+         ⚠ LE TROISIEME DEPEND DE L'ABONNEMENT et le dit. Un compteur sans son
+           plafond n'apprend rien : « 12 » ne se lit que si l'on sait qu'il y
+           en avait 20. -->
+    <div class="ac-chiffres" id="ac-chiffres"></div>
+
+    <!-- ⚠ L'ETAT VIDE EST REVENU. Mon remplacement du corps de l'accueil
+         l'avait emporte, alors que le script le cherche toujours : la page
+         d'une entreprise sans procedure n'aurait rien affiche entre les
+         chiffres et la barre du bas.
+
+         Il se place APRES les chiffres : zero procedure en ligne et zero
+         membre restent des faits justes, et les masquer donnerait un ecran
+         encore plus nu. -->
     <div class="ac-vide" id="ac-vide" hidden>
       <svg class="acv-ic" viewBox="0 0 48 48" fill="none" stroke="currentColor"
            stroke-width="1.6" stroke-linejoin="round">
@@ -974,23 +1020,8 @@
       <div class="acv-t">Aucune procédure pour l’instant</div>
     </div>
 
-    <!-- ═══ L'ACCUEIL, REFAIT UNE SECONDE FOIS ═══
-
-         Les trois tuiles — membres actifs, procédures créées, analyses IA —
-         ont disparu. Elles comptaient trois choses sans lien entre elles, et
-         aucune ne répondait à la question qu'un gérant se pose en ouvrant son
-         app : est-ce que mon équipe a bien tout ce qu'il lui faut ?
-
-         Quatre blocs à la place, du plus important au moins pressant :
-
-           ① UN ANNEAU. La part des procédures réellement en ligne. Le même
-              dessin que celui de la page Analyse — on l'apprend une fois.
-           ② DEUX CHIFFRES du mois : les consultations, et les analyses IA
-              consommées sur le forfait.
-           ③ DEUX LISTES : ce qui vient d'être écrit, et qui est arrivé ou
-              parti. -->
-    <div id="ac-anneau"></div>
-    <div class="ac-duo" id="ac-duo"></div>
+    <!-- Les deux dernieres sections : ce qui vient de se passer, et ce qui
+         vient d'etre ecrit. Chacune montre UNE ligne et renvoie a sa page. -->
     <div id="ac-listes"></div>
 
   </div>

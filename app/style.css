@@ -11840,9 +11840,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
   box-shadow:
     inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
-    inset 0 -2px 2.5px -2px rgba(28,28,38,0.07),
-    0 1px 2px rgba(20,20,30,0.05),
-    0 10px 22px -14px rgba(20,20,30,0.14);
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
 }
 /* ⚠ LES CARTES SONT ESPACEES PAR LEUR CONTENEUR, pas par une marge propre :
    l'ecart se regle alors a un seul endroit, comme sur les autres listes. */
@@ -11881,9 +11881,21 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-create .mode-choice-card.disabled .mode-choice-arrow{ opacity:0.42; }
 #p-create .mode-choice-card.disabled .mode-choice-title{ color:var(--label-2); }
 
-/* Le formulaire prend le même rayon que les cartes, et ses champs la capsule
-   de la recherche : une seule grammaire de saisie dans toute l'app. */
-#p-create .card{ border-radius:24px; padding:18px; }
+/* ⚠ L'OMBRE DU FORMULAIRE ETAIT A 42 % DE NOIR SUR 34 PX. Encore un calibrage
+   du theme sombre : il fallait cette force pour detacher une carte d'un fond
+   noir. Sur du gris clair, elle posait une flaque sous le bloc — c'est
+   l'excès d'ombre qu'on voyait sur toute la page.
+
+   Elle prend le meme dosage que les cartes de la liste : un contact d'un
+   pixel, puis une diffusion large et faible. Le rapport passe de 42 % a 5 %.
+
+   ⚠ ET CELLE DES CARTES DE MODE DESCEND AUSSI. A cote d'un formulaire allege,
+     leurs 14 % paraissaient lourds : les deux devaient bouger ensemble, sinon
+     on n'aurait fait que deplacer le desequilibre. */
+#p-create .card{
+  border-radius:24px; padding:18px;
+  box-shadow:0 1px 2px rgba(20,20,30,0.05), 0 10px 24px -16px rgba(20,20,30,0.14);
+}
 #p-create input[type=text]{
   border-radius:100px; padding:12px 16px;
   border:none; background:rgba(118,118,128,0.12);

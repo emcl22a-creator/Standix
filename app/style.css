@@ -258,7 +258,16 @@
      son remplissage. Les deux valeurs doivent etre changees ENSEMBLE : a 18
      contre 24, le logo se decalait de six pixels par rapport aux cartes juste
      en dessous, et rien ne le signalait. */
-  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col); z-index:15; padding:16px 24px 0; }
+  /* ⚠ LA MARGE DU HAUT DOIT PASSER SOUS L'ENCOCHE. 16 px suffisaient quand la
+     barre etait une ligne nue collee au bord ; maintenant qu'elle est une
+     pilule de verre, son arete haute se retrouvait sous la barre d'etat de
+     l'iPhone et paraissait coupee.
+
+     `env(safe-area-inset-top)` vaut 47 px sur un iPhone a encoche et 0 sur un
+     ecran d'ordinateur — le `max` garde 10 px dans ce second cas, sinon la
+     barre collerait au bord en navigateur. */
+  .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col); z-index:15;
+           padding:max(10px, env(safe-area-inset-top, 0px)) 24px 0; }
 
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{
@@ -494,10 +503,16 @@
        La barre du haut mesure 72 px — 16 de marge et 56 de pilule. Les deux
        points ont disparu avec le débord : c'est le bord du panneau voisin qui
        annonce désormais qu'il y en a un. Plus quinze de jeu. */
-    /* ⚠ 24 PX DE CHAQUE COTE, contre 20. C'est la seule ligne qui gouverne la
-       marge laterale de TOUS les ecrans : la barre du haut, les titres, les
-       cartes et la recherche s'y alignent sans avoir leur propre valeur. */
-    padding:87px 24px calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
+    /* ⚠ LE HAUT SUIT LA BARRE, QUI SUIT L'ENCOCHE. La barre occupe sa marge
+       haute plus 54 px de pilule ; le contenu doit commencer sous elle, sinon
+       il passerait derriere le verre des le premier titre.
+
+       ⚠ 24 PX DE CHAQUE COTE. C'est la seule ligne qui gouverne la marge
+         laterale de TOUS les ecrans : la barre du haut, les titres, les cartes
+         et la recherche s'y alignent sans avoir leur propre valeur. */
+    padding:calc(max(10px, env(safe-area-inset-top, 0px)) + 72px)
+            24px
+            calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 
   /* La page d'analyse respire davantage : c'est une page qu'on lit, pas une
@@ -10849,7 +10864,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ `.cat-grid` PASSE EN COLONNE. Elle était déclarée en grille deux colonnes
    plus haut dans ce fichier ; cette règle-ci vient après, donc elle gagne.
    Ne pas retirer celle du haut — d'autres écrans l'emploient encore. */
-#cat-grid.cat-grid{ display:flex; flex-direction:column; gap:12px; }
+#cat-grid.cat-grid{ display:flex; flex-direction:column; gap:16px; }
 
 /* ⚠ LE SÉLECTEUR PORTE L'IDENTIFIANT, ET IL LE FAUT.
 
@@ -11029,7 +11044,10 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    même liste, une seule à la fois.
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-segm{
-  display:flex; margin:0 0 16px; padding:3px; border-radius:100px;
+  /* 8 px sous le segment au lieu de 16 : la ligne qui suit DECRIT ce segment,
+     elle lui appartient. Un ecart plein la detachait et l'on croyait a deux
+     blocs sans rapport. */
+  display:flex; margin:0 0 8px; padding:3px; border-radius:100px;
   background:rgba(118,118,128,0.12);
 }
 .p-seg{
@@ -11114,12 +11132,12 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ LA GRILLE DE CETTE PAGE PASSE EN COLONNE, elle aussi. Elle était déclarée
    en deux colonnes comme celle des dossiers ; sans cette règle, les nouvelles
    lignes s'y afficheraient côte à côte et déborderaient. */
-#category-procedures-list{ display:flex; flex-direction:column; gap:12px; }
+#category-procedures-list{ display:flex; flex-direction:column; gap:16px; }
 /* ⚠ `.sd-grille` ENVELOPPE LES SOUS-DOSSIERS et vit dans la meme liste. Elle
    etait declaree en grille deux colonnes ; sans cette regle, les sous-dossiers
    resteraient cote a cote au-dessus de procedures pleine largeur. */
 #category-procedures-list .sd-grille{
-  display:flex; flex-direction:column; gap:12px; margin:0 0 12px;
+  display:flex; flex-direction:column; gap:16px; margin:0 0 16px;
 }
 #category-procedures-list .cat-cell--ligne,
 #category-procedures-list .proc-rich-card{ width:100%; }
@@ -11194,7 +11212,17 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ⚠ `position` EST RÉÉCRITE. `.glassDiv` la met en `absolute` — c'est ce dont
      la capsule a besoin en bas. Ici la barre est dans le flux ; sans ce
      `relative`, elle se décrocherait de sa rangée. */
-.topbar-card{
+/* ⚠ LE SELECTEUR PORTE LES DEUX CLASSES, ET IL LE FAUT.
+
+   `.glassDiv{ position:absolute }` est declaree dans le bloc `<style>` de
+   index.html, qui est charge APRES ce fichier. A specificite egale — une
+   classe contre une classe — c'est la derniere lue qui gagne : ma
+   `position:relative` etait ecrasee en silence.
+
+   La carte restait donc en `absolute`, sortait du flux, sa rangee tombait a
+   zero de hauteur et la barre remontait de 17 px au-dessus du bord de
+   l'ecran. Deux classes suffisent a reprendre la main. */
+.topbar-card.glassDiv{
   position:relative;
   /* ⚠ TROIS COLONNES, PAS `space-between`. Les deux cotes font exactement
      `1fr` : le logo tombe au milieu de l'ECRAN, pas au milieu de ce qui reste
@@ -11234,7 +11262,10 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-rang{
   display:flex; align-items:center; justify-content:space-between;
-  margin:0 0 12px; min-height:34px;
+  /* En revanche l'ecart SOUS cette ligne grandit : c'est la qu'il faut une
+     coupure, entre les commandes et la liste. */
+  margin:0 0 16px; min-height:34px;
+  position:relative;
 }
 .proc-rang-txt{
   display:inline-flex; align-items:center; gap:8px;
@@ -11365,4 +11396,31 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
      Pour le rendre : retirer ce bloc, rien d'autre.
    ═══════════════════════════════════════════════════════════════════════════ */
-.plus-cadre{ display:none !important; }
+/* ⚠ DEUX CONTENEURS, PAS UN. `.plus-cadre` porte le bouton lui-meme, mais le
+   socle et la bulle vivent dans `.liquide`, un frere. J'avais masque le
+   premier seulement : la goutte restait, et l'on voyait un rectangle arrondi
+   sortir de la barre sans bouton dessus. */
+.plus-cadre, .liquide{ display:none !important; }
+
+
+/* ═══ LE VOLET DE TRI ═══
+   Il reprend `.tb-volet`, donc la matière et l'animation du menu de la barre
+   du haut. Trois choses seulement lui sont propres : son ancrage à droite, sa
+   largeur, et la coche qui marque le tri en cours. */
+.tb-volet--tri{
+  top:38px; right:0; left:auto; min-width:206px;
+  transform-origin:top right;
+}
+.tb-v-tri{ padding-left:10px; }
+/* ⚠ LA COCHE OCCUPE SA PLACE MÊME QUAND ELLE EST INVISIBLE. En la retirant du
+   flux, les trois libellés se décaleraient d'un cran selon l'option choisie —
+   le menu paraîtrait sauter à chaque ouverture. */
+.tb-v-coche{
+  width:16px; flex-shrink:0; text-align:center;
+  font-size:13px; color:var(--label-2); visibility:hidden;
+}
+.tb-v-tri.on .tb-v-coche{ visibility:visible; }
+.tb-v-tri.on{ font-weight:600; }
+/* Le bouton se remplit quand le tri n'est plus celui par défaut : c'est le
+   seul moyen de savoir qu'une liste est ordonnée autrement sans ouvrir. */
+.proc-filtre[aria-expanded="true"]{ background:rgba(118,118,128,0.16); }

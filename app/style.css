@@ -11774,8 +11774,16 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-list.sort #cat-grid > *{
   animation:listeSort 0.16s cubic-bezier(0.32,0.72,0,1) forwards;
 }
+/* ⚠ L'ENTREE EST PORTEE PAR LA CARTE ELLE-MEME, via `.cl-entre` posee au
+   moment de sa construction — voir `animerApparition` dans app.js. Elle
+   dependait auparavant d'une classe ajoutee sur l'ecran apres le rendu : si le
+   rendu prenait un peu plus de temps que prevu, l'animation partait sur des
+   elements qui n'existaient pas encore, et rien ne se voyait.
+
+   La ligne de compte, elle, n'est pas recreee : elle garde le selecteur par
+   l'ecran. */
 #p-list.entre .proc-rang,
-#p-list.entre #cat-grid > *{
+#cat-grid > .cl-entre{
   animation:listeEntre 0.30s cubic-bezier(0.32,0.72,0,1);
 }
 @keyframes listeSort{
@@ -11789,7 +11797,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }
   #p-list.sort .proc-rang, #p-list.sort #cat-grid > *,
-  #p-list.entre .proc-rang, #p-list.entre #cat-grid > *{ animation:none; }
+  #p-list.entre .proc-rang, #cat-grid > .cl-entre{ animation:none; }
 }
 
 

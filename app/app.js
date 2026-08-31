@@ -8248,6 +8248,11 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
     void g.offsetWidth
     g.classList.add('change')
     setTimeout(() => renderCategoryGrid(), 105)
+    /* ⚠ ON RETIRE LA CLASSE A LA FIN. Elle coupe la remontee des cartes le
+       temps du changement de segment ; laissee en place, le defilement suivant
+       revelerait les cartes sans mouvement, et l'on croirait l'animation
+       cassee. 300 ms : l'animation dure 260. */
+    setTimeout(() => g.classList.remove('change'), 300)
   } else {
     renderCategoryGrid()
   }

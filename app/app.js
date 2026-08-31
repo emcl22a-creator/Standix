@@ -7668,6 +7668,17 @@ function couleurDossier(rang) {
    ⚠ UN MOT PEUT APPARAÎTRE DANS PLUSIEURS GROUPES. « Four » est de la cuisine
      et de la maintenance : les deux groupes s'ajoutent, on ne choisit pas.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ UNE SEULE FONCTION POUR TOUTE L'APP. Elle etait declaree DANS
+   `renderCategoryGrid`, donc invisible ailleurs — la page d'un dossier en
+   aurait eu sa propre copie, et les deux auraient fini par diverger.
+
+   `normalize('NFD')` separe les lettres de leurs accents, l'expression les
+   retire : « Sécurité » devient « securite ». Sans cela, il faudrait taper
+   l'accent au clavier du telephone pour trouver la moitie des noms. */
+function sansAccents(s) {
+  return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
 const FAMILLES_MOTS = [
   ['nettoyer', 'nettoyage', 'laver', 'lavage', 'recurer', 'menage', 'proprete', 'desinfecter', 'desinfection', 'astiquer'],
   ['friteuse', 'huile', 'friture', 'bain de friture'],
@@ -7856,16 +7867,14 @@ function renderCategoryGrid() {
        accents, et l'expression les retire : « securite » trouve « Sécurité ».
        Sans cela, il faudrait taper l'accent au clavier du telephone pour
        trouver la moitie des dossiers francais. */
-  const sansAccent = (s) => (s || '').normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '').toLowerCase()
-  const q = sansAccent(rechercheDossiers)
+  const q = sansAccents(rechercheDossiers)
   const termes = q ? termesRecherche(q) : []
   /* Un dossier sort si l'un des termes — tape ou synonyme — apparait dans son
      nom OU dans le titre d'une de ses procedures. On cherche une chose, pas
      son rangement. */
   const correspond = (c) => {
-    const nom = sansAccent(c.nom)
-    const titres = (c.procsInCat || []).map(p => sansAccent(p.titre))
+    const nom = sansAccents(c.nom)
+    const titres = (c.procsInCat || []).map(p => sansAccents(p.titre))
     return termes.some(t => nom.includes(t) || titres.some(x => x.includes(t)))
   }
   let visibles = q ? sorted.filter(correspond) : sorted
@@ -7909,7 +7918,7 @@ function renderCategoryGrid() {
     for (const cat of visibles) {
       for (const p of (cat.procsInCat || [])) {
         if (vus.has(p.id)) continue
-        const titre = sansAccent(p.titre)
+        const titre = sansAccents(p.titre)
         /* Le dossier a deja ete retenu parce qu'il correspond ; on ne garde
            ici que les procedures qui correspondent ELLES-MEMES, sinon toutes
            celles d'un dossier trouve par son nom sortiraient avec. */
@@ -8229,7 +8238,37 @@ document.getElementById('category-search-input')?.addEventListener('input', (e) 
 })
 
 let currentCategorySort = 'az'
-wireSortDropdown('dd-category-sort', (sort) => { currentCategorySort = sort; renderCategoryProceduresList() })
+/* ═══ LE TRI DE LA PAGE D'UN DOSSIER ═══
+
+   `dd-category-sort` n'existe plus dans le balisage : son menu a laisse la
+   place a la ligne de contexte. `currentCategorySort` et toute la logique de
+   tri restent — il n'y avait qu'a rebrancher un bouton dessus.
+
+   ⚠ MEME ECOUTEUR, MEMES CLASSES QUE LA PAGE PROCEDURES. Les deux volets sont
+     faits de la meme matiere et se comportent pareil ; seul l'identifiant
+     change. */
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('#cat-filtre')
+  const volet = document.getElementById('cat-tri-volet')
+  if (!volet) return
+  const choix = e.target.closest('#cat-tri-volet .tb-v-tri')
+
+  if (choix) {
+    volet.querySelectorAll('.tb-v-tri').forEach(b => b.classList.toggle('on', b === choix))
+    currentCategorySort = choix.dataset.tri
+    renderCategoryProceduresList()
+  }
+
+  const ouvrir = bouton && !volet.classList.contains('ouvert') && !choix
+  if (ouvrir) {
+    volet.hidden = false
+    requestAnimationFrame(() => volet.classList.add('ouvert'))
+  } else {
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+  }
+  document.getElementById('cat-filtre')?.setAttribute('aria-expanded', ouvrir ? 'true' : 'false')
+})
 
 let currentCategoryProcsData = []
 
@@ -8347,11 +8386,16 @@ function ouvrirCategorie(nom) {
   const btnRenommer = document.getElementById('cat-renommer')
   if (btnRenommer) btnRenommer.style.display = toutesProcedures ? 'none' : 'flex'
   document.getElementById('category-search-input').value = ''
+  /* Le libelle dit ce qu'on parcourt ICI : des sous-dossiers dans un dossier,
+     des procedures partout ailleurs. */
   document.getElementById('category-search-input').placeholder = toutesProcedures
-    ? 'Rechercher parmi toutes les procédures...'
-    : 'Rechercher une procédure...'
+    ? 'Rechercher une procédure'
+    : 'Rechercher un sous-dossier'
   currentCategoryQuery = ''
-  setSortUI('dd-category-sort', currentCategorySort)
+  /* ⚠ `setSortUI` VISAIT UN MENU DISPARU. On coche desormais la bonne ligne du
+     volet — sans erreur si l'ecran n'est pas encore construit. */
+  document.querySelectorAll('#cat-tri-volet .tb-v-tri').forEach(b =>
+    b.classList.toggle('on', b.dataset.tri === currentCategorySort))
   const listEl = document.getElementById('category-procedures-list')
   listEl.innerHTML = ''
 
@@ -8411,20 +8455,50 @@ function renderCategoryProceduresListInterne() {
     ? currentCategoryProcsData.filter(d => (d.proc.sous_categorie || '').trim() === sousDossierCourant)
     : currentCategoryProcsData
 
+  /* ═══ LA MEME RECHERCHE QUE SUR LA PAGE PROCEDURES ═══
+
+     Sans accents et par familles de mots : taper « laver » trouve « Nettoyer
+     la friteuse », « frigo » trouve la chambre froide.
+
+     ⚠ LES DEUX PAGES PARTAGENT `sansAccents` ET `termesRecherche`. Ecrire ici
+       une seconde version du meme filtre garantissait qu'un jour l'une des
+       deux comprendrait un mot que l'autre ignore. */
+  const termesCat = currentCategoryQuery ? termesRecherche(sansAccents(currentCategoryQuery)) : []
   const filtered = currentCategoryQuery
     ? dansLaVue.filter(d => {
-        const titre = (d.proc.titre || '').toLowerCase()
+        const titre = sansAccents(d.proc.titre || '')
         // En vue globale, on peut aussi chercher par nom de dossier
-        const cat = toutesProcedures ? (d.proc.categorie || 'sans dossier').toLowerCase() : ''
+        const cat = toutesProcedures ? sansAccents(d.proc.categorie || 'sans dossier') : ''
         /* Le sous-dossier est cherchable partout, pas seulement en vue globale :
            dans un dossier, taper « friteuse » doit ramener son contenu — c'est
            même le premier réflexe une fois qu'on s'est mis à ranger. */
-        const sous = (d.proc.sous_categorie || '').toLowerCase()
-        return titre.includes(currentCategoryQuery)
-            || (cat && cat.includes(currentCategoryQuery))
-            || (sous && sous.includes(currentCategoryQuery))
+        const sous = sansAccents(d.proc.sous_categorie || '')
+        return termesCat.some(t =>
+          titre.includes(t) || (cat && cat.includes(t)) || (sous && sous.includes(t)))
       })
     : dansLaVue
+
+  /* ═══ LE COMPTE DE LA LIGNE DE CONTEXTE ═══
+
+     Il dit ce que la page montre VRAIMENT, apres recherche. Dans un dossier,
+     on annonce les sous-dossiers quand il y en a — c'est ce qu'on parcourt ;
+     sinon les procedures. Dans un sous-dossier, il n'y a que des procedures.
+
+     ⚠ IL SE CALCULE ICI, PAS PLUS HAUT. `filtered` n'existe qu'apres le
+       filtre : annoncer le total avant reviendrait a promettre six elements
+       pendant qu'on en voit deux. */
+  const nbEl = document.getElementById('cat-nb-elements')
+  if (nbEl) {
+    const sousDossiers = sousDossierCourant ? new Set() : new Set(
+      filtered.map(d => (d.proc.sous_categorie || '').trim()).filter(Boolean))
+    if (sousDossiers.size) {
+      nbEl.textContent = `${sousDossiers.size} sous-dossier${sousDossiers.size > 1 ? 's' : ''}`
+    } else {
+      nbEl.textContent = filtered.length
+        ? `${filtered.length} procédure${filtered.length > 1 ? 's' : ''}`
+        : 'Aucune procédure'
+    }
+  }
 
   const parTitre = (a, b) => (a.proc.titre || '').localeCompare(b.proc.titre || '', 'fr', { sensitivity: 'base' })
   const sorted = [...filtered].sort((a, b) => {
@@ -8988,7 +9062,13 @@ function ouvrirSousDossier(nom) {
   sousDossierCourant = nom
   currentCategoryQuery = ''
   const champ = document.getElementById('category-search-input')
-  if (champ) champ.value = ''
+  if (champ) {
+    champ.value = ''
+    /* ⚠ LE LIBELLE CHANGE AVEC LA PAGE. Un sous-dossier ne contient que des
+       procedures : y proposer de chercher un sous-dossier ferait chercher
+       quelque chose qui ne peut pas s'y trouver. */
+    champ.placeholder = 'Rechercher une procédure'
+  }
   majTitreCategorie()
   renderCategoryProceduresList()
 }

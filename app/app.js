@@ -6712,7 +6712,109 @@ function debutDuMois() {
   return d
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES CONSEILS DE L'ACCUEIL
+
+   Une phrase sous le salut, differente a chaque ouverture. Elle remplace
+   « Voici un apercu de votre espace de travail », qui ne disait rien qu'on ne
+   voie deja : la page EST l'apercu.
+
+   ⚠ CE SONT DES GESTES, PAS DES ANNONCES. Chacun dit une chose que le gerant
+     peut faire aujourd'hui, avec ce qu'il a. Une liste d'avantages produit se
+     lit une fois puis s'ignore ; un conseil s'essaie.
+
+   ⚠ DEUX LIGNES, PAS UNE DE PLUS. Le premier morceau donne le geste, le second
+     ce qu'il apporte. Au-dela, on n'est plus sous un salut mais devant un mode
+     d'emploi.
+
+   Pour en ajouter un : une entree de plus, deux morceaux. Rien d'autre a
+   toucher.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CONSEILS_ACCUEIL = [
+  ['Collez un QR code là où le geste se fait :',
+   'on scanne, la procédure s’ouvre.'],
+
+  ['Filmez le geste plutôt que de l’écrire :',
+   'l’IA en tire les étapes, vous corrigez.'],
+
+  ['Rangez par lieu, pas par thème :',
+   'on cherche la caisse, pas l’encaissement.'],
+
+  ['Un brouillon n’est vu par personne :',
+   'publiez-le pour qu’il serve.'],
+
+  ['Ajoutez une photo à chaque étape :',
+   'un écran se reconnaît mieux qu’il ne se décrit.'],
+
+  ['Placez le QR code à hauteur des yeux :',
+   'on ne scanne pas ce qu’on doit chercher.'],
+
+  ['Regardez qui a lu quoi dans l’onglet Analyse :',
+   'une procédure jamais ouverte est à revoir.'],
+
+  ['Nommez vos étapes par un verbe :',
+   '« Vider le bac » se suit mieux que « Bac ».'],
+
+  ['Invitez un membre avant son arrivée :',
+   'il commence en sachant où tout se trouve.'],
+
+  ['Une vidéo de deux minutes suffit :',
+   'au-delà, on ne la regarde plus jusqu’au bout.'],
+
+  ['Découpez ce qui est trop long :',
+   'douze étapes se retiennent, trente se sautent.'],
+
+  ['Écrivez ce qu’il ne faut PAS faire :',
+   'une erreur non nommée se répète.'],
+
+  ['Mettez le QR code dans votre signature :',
+   'les procédures suivent vos échanges.'],
+
+  ['Relisez vos procédures après un départ :',
+   'ce qu’il savait sans l’écrire part avec lui.'],
+
+  ['Créez un sous-dossier dès la troisième :',
+   'au-delà, on ne parcourt plus, on cherche.'],
+
+  ['Datez ce qui change souvent :',
+   'un tarif ou un horaire sans date sème le doute.'],
+
+  ['Faites relire par celui qui exécute :',
+   'l’étape évidente pour vous ne l’est pas pour lui.'],
+
+  ['Plastifiez vos QR codes :',
+   'un papier scotché ne passe pas l’hiver.'],
+
+  ['Commencez par ce qu’on vous redemande :',
+   'c’est la procédure qui manque le plus.'],
+
+  ['Une procédure par onboarding, pas dix :',
+   'le premier jour, on retient une chose.'],
+]
+
+/* ⚠ LE CONSEIL SUIT LE JOUR, IL N'EST PAS TIRE AU HASARD. Deux ouvertures dans
+   la meme minute donneraient deux phrases differentes, et l'on croirait a un
+   defilement automatique qu'on n'a pas le temps de lire. Un jour, un conseil :
+   on a le temps de le retenir, et il revient assez rarement pour surprendre. */
+function conseilDuJour() {
+  const jour = Math.floor(Date.now() / 86400000)
+  /* ⚠ ON SAUTE LE PREMIER. Il porte le QR code, qui est deja ecrit au-dessus
+     en toutes lettres : le voir revenir en astuce le lendemain donnerait deux
+     fois la meme phrase sur le meme ecran. */
+  const reste = CONSEILS_ACCUEIL.slice(1)
+  return reste[jour % reste.length]
+}
+
 function peindreTuilesAccueil() {
+  /* ⚠ LA PREMIERE PHRASE EST FIXE, DANS LE BALISAGE. Seule l'astuce change :
+     ecrire les deux ici aurait fait disparaitre la promesse du produit chaque
+     fois que le script tarde a s'executer. */
+  const zAstuce = document.getElementById('ac-astuce-txt')
+  if (zAstuce) {
+    const [geste, gain] = conseilDuJour()
+    zAstuce.textContent = `${geste} ${gain}`
+  }
+
   const zChiffres = document.getElementById('ac-chiffres')
   const zListes   = document.getElementById('ac-listes')
   if (!zChiffres || !zListes) return
@@ -6773,16 +6875,26 @@ function peindreTuilesAccueil() {
      ⚠ `depuisQuandCourt` ATTEND DES MILLISECONDES, pas une date. Lui passer la
        chaine de Supabase directement rendait « NaN min » — le genre d'erreur
        qui ne casse rien et s'affiche quand meme. */
+  /* ⚠ LE TITRE EST DANS LA CARTE, PAS AU-DESSUS.
+
+     Il flottait sur le fond de la page, separe de ce qu'il annonce par un
+     ecart. A deux sections, cela faisait quatre blocs a lire au lieu de deux :
+     un titre, un cadre, un titre, un cadre.
+
+     Dans la carte, le titre et son contenu forment un seul objet — et le
+     bouton « Voir plus » se rattache visiblement a ce qu'il prolonge. */
   const section = (titre, action, surAction, corps) => `
     <div class="ac-sect">
-      <div class="ac-sect-t">
-        <span>${titre}</span>
-        <button type="button" class="ac-sect-plus" ${surAction}>${action}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-               stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-        </button>
+      <div class="ac-bloc">
+        <div class="ac-bloc-t">
+          <span>${titre}</span>
+          <button type="button" class="ac-sect-plus" ${surAction}>${action}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                 stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        ${corps}
       </div>
-      ${corps}
     </div>`
 
   /* Le dernier mouvement : la lecture la plus recente d'un membre. */
@@ -8391,27 +8503,54 @@ function poserPastilleSegment(b, animer = true, essai = 0) {
 const COURBE_SEGM = 'cubic-bezier(0.32, 0.72, 0, 1)'
 const MOINS_ANIM = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-/* Les elements qui bougent : les cartes, et la ligne de compte au-dessus —
-   elle annonce ce que la liste contient, et ce nombre change avec elle. */
+/* ⚠ ON ANIME LES DEUX CONTENEURS, PAS LEURS ENFANTS.
+
+   J'ai essaye trois fois de faire porter le mouvement par les cartes — par
+   une classe sur l'ecran, puis par une classe sur chaque carte, puis par
+   `animate()` sur chaque carte. Les trois echouaient pour la meme raison de
+   fond : LES CARTES SONT DETRUITES ET RECREEES au milieu du geste. Une
+   animation lancee sur un element supprime meurt avec lui, et celle lancee sur
+   les nouveaux depend du moment exact ou ils apparaissent.
+
+   La grille, elle, ne disparait jamais. Son contenu change dessous, mais
+   l'element reste le meme d'un bout a l'autre : une animation posee sur lui ne
+   peut pas etre perdue.
+
+   La ligne de compte suit — elle annonce ce que la liste contient, et ce
+   nombre change en meme temps. */
 function morceauxDeLaListe() {
-  const g = document.getElementById('cat-grid')
-  const rang = document.querySelector('#p-list .proc-rang')
-  return [...(rang ? [rang] : []), ...(g ? [...g.children] : [])]
+  return [
+    document.querySelector('#p-list .proc-rang'),
+    document.getElementById('cat-grid'),
+  ].filter(Boolean)
 }
 
 function flouSortie(el) {
   return el.animate(
-    [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(3px)' }],
-    { duration: 160, easing: COURBE_SEGM, fill: 'forwards' })
+    [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(4px)' }],
+    { duration: 190, easing: COURBE_SEGM, fill: 'forwards' })
 }
 
 function flouEntree(el, rang) {
+  /* ⚠ ON ANNULE D'ABORD LA SORTIE, ET C'EST INDISPENSABLE.
+
+     Elle porte `fill:forwards` — necessaire pour que la grille reste invisible
+     pendant qu'on remplace son contenu. Mais une animation terminee en
+     `forwards` continue d'imposer sa derniere image : mesure, l'element
+     revenait a `opacity:0` des la fin de l'entree, et la liste disparaissait
+     au lieu d'apparaitre.
+
+     `cancel()` la retire pour de bon. `getAnimations` les rend toutes : on ne
+     peut pas se contenter de garder une reference, l'element pouvant en porter
+     d'autres.
+
+   ⚠ PLUS DE DECALAGE EN CASCADE. Il n'avait de sens que sur des cartes une a
+     une ; sur deux conteneurs, il ferait arriver la liste apres son propre
+     compte, ce qui se remarque au lieu de se sentir. */
+  el.getAnimations().forEach(a => a.cancel())
   return el.animate(
-    [{ opacity: 0, filter: 'blur(3px)' }, { opacity: 1, filter: 'blur(0px)' }],
-    /* ⚠ UN LEGER DECALAGE, PLAFONNE A CINQ. Sans lui les cartes arrivent d'un
-       bloc ; au-dela de cinq crans, la derniere attendrait un quart de seconde
-       de plus que la premiere et la liste paraitrait ramer. */
-    { duration: 300, delay: Math.min(rang, 5) * 30, easing: COURBE_SEGM })
+    [{ opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)' }],
+    { duration: 340, easing: COURBE_SEGM })
 }
 
 document.getElementById('proc-segm')?.addEventListener('click', (e) => {
@@ -8431,13 +8570,17 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
      meme element se contrarieraient. */
   sansApparition = true
 
-  /* 160 ms : la duree exacte de la sortie. Redessiner plus tot couperait les
-     anciennes cartes en plein mouvement, plus tard laisserait un blanc. */
+  /* 190 ms : la duree exacte de la sortie. Redessiner plus tot couperait le
+     mouvement, plus tard laisserait un blanc.
+
+     ⚠ LE CONTENU EST REMPLACE PENDANT QUE LA GRILLE EST INVISIBLE — l'animation
+       de sortie a `fill:forwards`, elle la tient a l'opacite zero. On ne voit
+       donc jamais la liste se vider puis se remplir. */
   setTimeout(() => {
     renderCategoryGrid()
     sansApparition = false
     morceauxDeLaListe().forEach((el, i) => flouEntree(el, i))
-  }, 160)
+  }, 190)
 })
 
 /* ⚠ `load` NE SUFFIT PAS, ET C'EST POUR CELA QUE LA PASTILLE MANQUAIT AU

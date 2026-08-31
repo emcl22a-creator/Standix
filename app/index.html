@@ -949,7 +949,21 @@
          au-dessus aurait annoncé ce que la ligne suivante répète. -->
     <div class="page-tete">
       <h1 class="ac-salut">Bonjour, <span id="ac-prenom">—</span> 👋</h1>
-      <p>Voici un aperçu de votre espace de travail.</p>
+      <!-- ═══ DEUX PHRASES SOUS LE SALUT ═══
+
+           La premiere ne change jamais : c'est ce que Standix fait de
+           particulier, et un gerant qui ouvre l'app pour la dixieme fois doit
+           encore pouvoir se le rappeler.
+
+           La seconde change chaque jour — voir `CONSEILS_ACCUEIL` dans app.js.
+           Elle apprend a se servir du produit une technique a la fois.
+
+           ⚠ ELLES NE SE RESSEMBLENT PAS. La premiere est une promesse, la
+             seconde un conseil : la seconde est donc plus petite, precedee
+             d'une puce, et porte le mot « Astuce ». Deux phrases de meme poids
+             se seraient annulees. -->
+      <p id="ac-conseil">Collez un QR code là où le geste se fait :<br>on scanne, la procédure s’ouvre.</p>
+      <p id="ac-astuce"><b>Astuce</b><span id="ac-astuce-txt">—</span></p>
     </div>
 
     <!-- ═══ LA BANNIERE ═══
@@ -961,17 +975,7 @@
          ⚠ LE DESSIN EST EN SVG, PAS EN IMAGE. Trois feuillets empiles, tires
            du logo, qui s'eclairent d'un halo. Une image demanderait un fichier
            de plus a charger, et ne s'adapterait pas au theme. -->
-    <div class="ac-banniere">
-      <div class="ac-ban-txt">
-        <h2>Chaque poste a son <em>QR code</em>.</h2>
-        <p>L’équipe scanne, la procédure s’ouvre.</p>
-        <button type="button" class="ac-ban-btn" onclick="startNewProcedure()">
-          Créer une procédure
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
-        </button>
-      </div>
-    </div>
+
 
 
 

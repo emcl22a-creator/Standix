@@ -11650,17 +11650,21 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #cat-grid.change{
   animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
 }
-/* ⚠ PLUS DE FLOU ICI. Il vient du voile, exactement comme pour un changement
-   de page — voir `jouerVoile` dans app.js. Deux flous superposes se seraient
-   additionnes, et l'un des deux aurait derive le jour ou l'on retouche
-   l'autre.
+/* ⚠ LE FLOU EST ICI, ET NON DANS LE VOILE. Le voile floute tout l'ecran ;
+   changer de segment ne change que la LISTE. Flouter le titre, la recherche et
+   le bouton qu'on vient de toucher ferait douter d'avoir appuye au bon
+   endroit.
 
-   Il ne reste que la disparition du contenu, qui laisse le temps aux nouvelles
-   cartes d'arriver sans qu'on voie la liste se vider. */
+   3 px : la meme valeur que le voile du changement de page. Les deux gestes se
+   ressemblent, mais l'un porte sur la page et l'autre sur son contenu.
+
+   ⚠ ICI LE FLOU S'ANIME SANS `@property`. La regle vaut pour un `filter`
+     ordinaire, que les navigateurs interpolent tres bien ; c'est le
+     `backdrop-filter` du voile qui demandait une variable typee. */
 @keyframes listeChange{
-  0%   { opacity:1; }
-  40%  { opacity:0.3; }
-  100% { opacity:1; }
+  0%   { opacity:1;   filter:blur(0px); }
+  40%  { opacity:0.3; filter:blur(3px); }
+  100% { opacity:1;   filter:blur(0px); }
 }
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }

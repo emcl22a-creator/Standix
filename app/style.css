@@ -11610,10 +11610,17 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #cat-grid.change{
   animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
 }
+/* ⚠ PLUS DE FLOU ICI. Il vient du voile, exactement comme pour un changement
+   de page — voir `jouerVoile` dans app.js. Deux flous superposes se seraient
+   additionnes, et l'un des deux aurait derive le jour ou l'on retouche
+   l'autre.
+
+   Il ne reste que la disparition du contenu, qui laisse le temps aux nouvelles
+   cartes d'arriver sans qu'on voie la liste se vider. */
 @keyframes listeChange{
-  0%   { opacity:1; filter:blur(0px); }
-  40%  { opacity:0.3; filter:blur(2px); }
-  100% { opacity:1;   filter:blur(0px); }
+  0%   { opacity:1; }
+  40%  { opacity:0.3; }
+  100% { opacity:1; }
 }
 @media (prefers-reduced-motion: reduce){
   .p-seg-lens{ transition:none; }

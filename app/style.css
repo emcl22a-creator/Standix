@@ -10519,6 +10519,10 @@ body:has(#e-detail.active) #equipe-app{
    Sur la page Procédures, le gérant doit repérer d'un coup d'œil ce qui n'est
    pas encore en ligne. Une pastille ambre suffit — sans elle, il faudrait
    ouvrir chaque procédure pour le savoir. */
+/* ⚠ `.proc-brouillon` N'EST PLUS EMPLOYEE. Elle portait la pilule ambre des
+   brouillons ; `etatProcedureHtml` rend maintenant la meme pilule blanche que
+   les autres etats. La regle reste au cas ou un ecran non repris la citerait
+   encore — sans elle, il afficherait un texte nu. */
 .proc-brouillon{
   display:inline-flex; align-items:center; gap:5px;
   padding:2.5px 8px; border-radius:100px;
@@ -11501,3 +11505,49 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* Le bouton se remplit quand le tri n'est plus celui par défaut : c'est le
    seul moyen de savoir qu'une liste est ordonnée autrement sans ouvrir. */
 .proc-filtre[aria-expanded="true"]{ background:rgba(118,118,128,0.16); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PASTILLE DU SEGMENT GLISSE
+
+   Elle sautait d'un onglet à l'autre : le fond blanc disparaissait ici et
+   réapparaissait là. Maintenant une seule pastille se déplace, comme la
+   capsule de la barre du bas — le mouvement dit d'où l'on vient.
+
+   ⚠ C'EST UN ÉLÉMENT À PART, PAS LE FOND DU BOUTON. Un `background` ne peut
+     pas glisser d'un élément à un autre : il faut une pièce unique qu'on
+     déplace. Les boutons ne portent plus que leur texte.
+
+   ⚠ `transform` ET NON `left`. Déplacer par la position force un recalcul de
+     mise en page à chaque image ; une transformation reste sur la carte
+     graphique et ne coûte rien.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.proc-segm{ position:relative; }
+.p-seg-lens{
+  position:absolute; top:3px; bottom:3px; left:3px;
+  border-radius:100px; background:#FFFFFF; pointer-events:none;
+  box-shadow:0 1px 3px rgba(20,20,30,0.10), 0 0 0 0.5px rgba(20,20,30,0.04);
+  transition:transform 0.42s cubic-bezier(0.32,0.72,0,1),
+             width 0.42s cubic-bezier(0.32,0.72,0,1);
+}
+/* Le fond du bouton actif disparaît : c'est la pastille qui le remplace. Seuls
+   la couleur et la graisse du texte restent. */
+.p-seg{ position:relative; z-index:1; }
+.p-seg.on{ background:none; box-shadow:none; }
+
+/* ═══ LA LISTE SE RENOUVELLE ═══
+   Au changement de segment, elle s'efface d'un souffle avant que les nouvelles
+   cartes n'arrivent. Sans cela, les anciennes disparaissent d'un coup et les
+   nouvelles semblent avoir toujours été là. */
+#cat-grid.change{
+  animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
+}
+@keyframes listeChange{
+  0%   { opacity:1; }
+  40%  { opacity:0; transform:translateY(6px); }
+  100% { opacity:1; transform:none; }
+}
+@media (prefers-reduced-motion: reduce){
+  .p-seg-lens{ transition:none; }
+  #cat-grid.change{ animation:none; }
+}

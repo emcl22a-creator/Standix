@@ -574,15 +574,19 @@
      ⚠ 14 PX DE REMONTÉE, PAS PLUS. Au-delà, le mouvement devient une
        diapositive : on regarde l'écran arriver au lieu de lire ce qu'il porte.
      ═══════════════════════════════════════════════════════════════════════ */
+  /* ⚠ 4 PX DE FLOU, ETEINT A 35 %. A 7 px sur 55 % de la duree, le texte
+     restait trouble assez longtemps pour qu'on essaie de le lire pendant qu'il
+     l'etait — et l'oeil force la mise au point sur quelque chose qui bouge.
+     Court et leger, le flou donne la profondeur sans se faire remarquer. */
   @keyframes ecranEntre{
-    0%  { opacity:0; transform:translateY(14px); filter:blur(7px); }
-    55% { opacity:1; filter:blur(0px); }
+    0%  { opacity:0; transform:translateY(12px); filter:blur(4px); }
+    35% { opacity:1; filter:blur(0px); }
     100%{ opacity:1; transform:none; filter:blur(0px); }
   }
 
   /* 0,42 s : le flou a besoin d'un peu plus de temps qu'un simple fondu pour
      ne pas paraître saccadé. */
-  .screen.active{ display:block; animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1); }
+  .screen.active{ display:block; animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1); }
 
   /* ═══ L'ÉCRAN QUI NAÎT DE LA CARTE TOUCHÉE ═══
 
@@ -597,7 +601,7 @@
   .screen.active.nait{
     /* 0,38 s comme partout ailleurs. 0,46 se sentait plus lent — et un écran
        qui met plus longtemps à venir donne l'impression d'un chargement. */
-    animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1);
+    animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1);
     /* Le point d'origine reste celui de la carte touchée : à cette amplitude il
        ne se voit plus vraiment, mais il ne coûte rien et donne au mouvement une
        direction plutôt qu'un simple gonflement. */
@@ -665,7 +669,7 @@
      Les deux espaces partagent cette durée. L'Équipe a eu 150 ms un moment :
      trop court, la page ne paraissait plus arriver mais sauter — on y lit un
      défaut d'affichage plutôt qu'une transition. */
-  .screen.fondu{ animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1); }
+  .screen.fondu{ animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1); }
 
   /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux
      animations superposées feraient exactement ce qu'on cherche à éviter. */
@@ -720,7 +724,7 @@
      GESTE qui est commun, pas le rythme. Une fenêtre peut s'ouvrir plus vite
      qu'une page sans cesser d'être la même animation.
      ═══════════════════════════════════════════════════════════════════════ */
-  .same-as-title-in{ animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1) both; }
+  .same-as-title-in{ animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1) both; }
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
   /* La marge haute de 6 px descendait le titre sous celui des pages d'onglet.
      `letter-spacing` aligné sur `.page-tete h1` : -0,04 et non -0,02. */
@@ -7397,12 +7401,21 @@ body.chargement #bar{
   backdrop-filter:blur(var(--voile-flou));
 }
 .voile-arrivee.joue{
-  animation:voileArrivee 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  animation:voileArrivee 0.30s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
+/* ⚠ 4 PX ET NON 10, 30 % ET NON 100 % DE LA DUREE.
+
+     A 10 px, le flou ne se lisait plus comme une transition mais comme une
+     panne de mise au point : on voyait l'ecran devenir illisible, ce qui
+     attire l'attention sur l'effet au lieu de la porter sur la page qui
+     arrive. Un fondu reussi ne se remarque pas.
+
+     Le sommet est aussi ramene a 30 % de la duree : le flou monte vite et
+     redescend longuement, au lieu de rester au maximum pendant qu'on attend. */
 @keyframes voileArrivee{
-  0%   { --voile-flou:0px;  background:rgba(255,255,255,0); }
-  40%  { --voile-flou:10px; background:rgba(255,255,255,0.30); }
-  100% { --voile-flou:0px;  background:rgba(255,255,255,0); }
+  0%   { --voile-flou:0px; background:rgba(255,255,255,0); }
+  30%  { --voile-flou:4px; background:rgba(255,255,255,0.16); }
+  100% { --voile-flou:0px; background:rgba(255,255,255,0); }
 }
 @media (prefers-reduced-motion: reduce){
   .voile-arrivee.joue{ animation:none; }
@@ -11237,11 +11250,11 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    bouger pareil, sinon l'app parait faite de deux morceaux. */
 .cl-apparait{
   opacity:0;
-  transform:translateY(14px);
-  filter:blur(6px);
-  transition:opacity 0.42s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
-             transform 0.52s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
-             filter 0.34s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
+  transform:translateY(12px);
+  filter:blur(3px);
+  transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
+             transform 0.44s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
+             filter 0.20s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
 }
 .cl-apparait.vu{
   opacity:1;

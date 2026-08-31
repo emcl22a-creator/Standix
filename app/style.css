@@ -11779,3 +11779,105 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   font-size:15px; line-height:1.5; color:var(--label);
   letter-spacing:-0.015em; margin:0;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE « NOUVELLE PROCÉDURE » · MÊME MATIÈRE QUE LA LISTE
+
+   Les quatre modes deviennent des lignes comme les dossiers : une plaque
+   teintée à gauche, le titre, sa description, un chevron. Ils étaient posés sur
+   des cartes grises sans relief, avec des icônes dessinées en traits blancs —
+   invisibles depuis le passage au thème clair.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ MÊME PLAQUE QUE `.cl-pl`, EN PLUS PETIT. Les valeurs sont écrites ici
+   plutôt que partagées : la carte de mode est moins haute qu'une carte de
+   dossier, et une plaque de 72 px y tiendrait toute la place. */
+.mc-pl{
+  width:48px; height:48px; border-radius:14px;
+  display:grid; place-items:center; flex-shrink:0;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
+}
+.mc-pl svg{ width:24px; height:24px; display:block; }
+
+#p-new .mode-choice-card,
+#p-new .outil-card{
+  padding:16px; border-radius:20px; margin-bottom:12px;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.07),
+    0 1px 2px rgba(20,20,30,0.05),
+    0 10px 22px -14px rgba(20,20,30,0.14);
+}
+/* ⚠ L'ÉTAT DÉSACTIVÉ MONTE DE 0,4 À 0,55. À 40 %, le titre d'un mode devenait
+   illisible sur fond clair — on ne savait plus ce qu'on attendait de nous. */
+#p-new .mode-choice-card.disabled{ opacity:0.55; }
+#p-new .mode-choice-icon{ width:auto; height:auto; }
+#p-new .mode-choice-row{ gap:14px; }
+#p-new .mode-choice-text{ flex:1; min-width:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE « NOUVELLE PROCÉDURE » · MÊME MATIÈRE QUE LES LISTES
+
+   Les trois modes étaient des rectangles gris posés à plat. À côté d'un
+   formulaire en carte blanche, ça faisait deux matières sur un écran qui n'a
+   qu'une chose à faire dire : par quoi commencer.
+
+   Ils reprennent la carte de la liste des dossiers — tranche, biseau, ombre —
+   et l'icône entre dans une plaque, comme un dossier dans sa pastille.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-create .mode-choice-card{
+  padding:16px; border-radius:22px; margin-bottom:0;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.07),
+    0 1px 2px rgba(20,20,30,0.05),
+    0 10px 22px -14px rgba(20,20,30,0.14);
+}
+/* ⚠ LES CARTES SONT ESPACEES PAR LEUR CONTENEUR, pas par une marge propre :
+   l'ecart se regle alors a un seul endroit, comme sur les autres listes. */
+#p-create .mode-choice-card + .mode-choice-card{ margin-top:12px; }
+
+/* La plaque de l'icône : le même carré arrondi que sur les cartes de dossier,
+   d'un cran plus petit — ici l'icône accompagne un texte, elle ne le porte
+   pas. */
+#p-create .mode-choice-icon{
+  flex:0 0 52px; width:52px; height:52px; border-radius:15px;
+  background:linear-gradient(150deg,#F7F7FA,#EFEFF4);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.90);
+  display:grid; place-items:center;
+}
+#p-create .mode-choice-icon svg{ width:28px; height:28px; }
+
+/* ⚠ LE TITRE PASSAIT SUR DEUX LIGNES. À 14,5 px pour « L'IA transforme la
+   vidéo en une procédure », la carte doublait de hauteur et la description
+   s'en trouvait décrochée. 14 px avec l'approche resserrée le ramènent sur
+   une ligne dans la plupart des cas. */
+#p-create .mode-choice-title{
+  font-size:14px; font-weight:650; letter-spacing:-0.025em; line-height:1.3;
+  color:var(--label);
+}
+#p-create .mode-choice-desc{
+  font-size:12.5px; color:var(--label-3); margin-top:3px; line-height:1.4;
+}
+#p-create .mode-choice-arrow{ font-size:19px; color:var(--label-3); }
+
+/* ⚠ LA CARTE DÉSACTIVÉE N'EST PLUS À 40 % D'OPACITÉ. Tout s'effaçait, y
+   compris le titre : on ne pouvait plus lire ce qu'on attendait de nous. Seuls
+   l'icône et la description s'estompent ; le titre reste lisible. */
+#p-create .mode-choice-card.disabled{ opacity:1; }
+#p-create .mode-choice-card.disabled .mode-choice-icon,
+#p-create .mode-choice-card.disabled .mode-choice-desc,
+#p-create .mode-choice-card.disabled .mode-choice-arrow{ opacity:0.42; }
+#p-create .mode-choice-card.disabled .mode-choice-title{ color:var(--label-2); }
+
+/* Le formulaire prend le même rayon que les cartes, et ses champs la capsule
+   de la recherche : une seule grammaire de saisie dans toute l'app. */
+#p-create .card{ border-radius:24px; padding:18px; }
+#p-create input[type=text]{
+  border-radius:100px; padding:12px 16px;
+  border:none; background:rgba(118,118,128,0.12);
+}

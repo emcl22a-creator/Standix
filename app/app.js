@@ -8162,6 +8162,38 @@ champRech?.addEventListener('input', () => {
    est fixe dans le balisage, mais poser un ecouteur par bouton oblige a les
    reposer si l'on en ajoute un — et l'on oublie. Ici, un bouton de plus dans
    le HTML fonctionne sans toucher au script. */
+/* ═══ LE TRI DES DOSSIERS ═══
+
+   ⚠ `currentCatSort` EXISTE DEJA et `renderCategoryGrid` le lit : le menu de
+     tri avait ete retire du balisage, mais toute la logique de tri est restee.
+     Il n'y avait plus qu'a rebrancher un bouton dessus.
+
+   ⚠ UN SEUL ECOUTEUR SUR LE DOCUMENT, comme partout ailleurs — c'est lui qui
+     ferme le volet quand on touche a cote. */
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('#proc-filtre')
+  const choix = e.target.closest('.tb-v-tri')
+  const volet = document.getElementById('proc-tri-volet')
+  if (!volet) return
+
+  if (choix) {
+    volet.querySelectorAll('.tb-v-tri').forEach(b => b.classList.toggle('on', b === choix))
+    currentCatSort = choix.dataset.tri
+    renderCategoryGrid()
+  }
+
+  const ouvrir = bouton && !volet.classList.contains('ouvert') && !choix
+  if (ouvrir) {
+    volet.hidden = false
+    requestAnimationFrame(() => volet.classList.add('ouvert'))
+  } else {
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+  }
+  document.getElementById('proc-filtre')
+    ?.setAttribute('aria-expanded', ouvrir ? 'true' : 'false')
+})
+
 document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   const b = e.target.closest('.p-seg')
   if (!b || b.classList.contains('on')) return

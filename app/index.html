@@ -470,17 +470,20 @@
   /* ⚠ LES ONGLETS AU REPOS. #CBCDCF est un gris CLAIR — il se lisait sur le
      verre noir, il disparaît sur le verre blanc : mesuré, 1,5 de contraste.
 
-     La valeur a descendu en quatre temps : #CBCDCF (1,5 de contraste, illisible
-     sur du blanc), #6C6C78 (5,0), #5A5A66 (6,6), #4A4A56 (8,4), et celle-ci.
+     La valeur a descendu en cinq temps : #CBCDCF (1,5 de contraste, illisible
+     sur du blanc), #6C6C78 (5,0), #5A5A66 (6,6), #4A4A56 (8,4), #3A3A46 (10,8)
+     et celle-ci.
 
-     #3A3A46 donne 10,8. Un onglet au repos n'est pas un texte désactivé, c'est
+     #32323E donne 12,0. Un onglet au repos n'est pas un texte désactivé, c'est
      une DESTINATION — il doit se lire sans effort.
 
-     ⚠ ON NE PEUT PLUS DESCENDRE BEAUCOUP. L'onglet ACTIF est noir : plus les
-       autres s'en approchent, moins on distingue celui où l'on est. C'est la
-       capsule grise qui porte desormais l'essentiel de cette distinction, pas
-       l'ecart de couleur. */
-  .layer--normal{color:#3A3A46}
+     ⚠ C'EST LE DERNIER CRAN. En dessous on entre dans le noir du texte des
+       cartes, et un onglet au repos deviendrait aussi appuye que le titre
+       d'une page. Ce qui distingue l'onglet EN COURS n'est plus sa valeur mais
+       sa TEINTE — il est bleu — et la capsule grise qui le porte. Foncer
+       encore ne prendrait rien a cette distinction, mais chargerait la barre.
+       */
+  .layer--normal{color:#32323E}
   /* L'ONGLET SOUS LA CAPSULE PORTE LA COULEUR DU LOGO.
 
      Deux techniques, parce qu'un dessin et un texte ne se peignent pas de la
@@ -506,15 +509,31 @@
        sur `color` : sans le remettre a `currentColor`, le libelle resterait
        invisible et l'on chercherait longtemps pourquoi.
 
-     La graisse monte a 600 : c'est elle qui distingue maintenant l'onglet
-     actif, avec la capsule. Deux noirs de meme graisse ne se differencient
-     que par leur fond. */
-  .layer--lens{color:#0B0B0F}
-  .layer--lens svg{fill:#0B0B0F}
+     La graisse monte a 600 : elle appuie la distinction que la capsule et la
+     couleur portent deja.
+
+   ⚠ LE BLEU EST CELUI DE LA PALETTE DES DOSSIERS, au chiffre pres — `#0C4A9E`,
+     le sombre de la deuxieme famille. C'est ce qui fait que la barre appartient
+     au meme monde que les listes : une couleur inventee pour la seule barre
+     aurait ete une couleur de plus a tenir a jour.
+
+     Contraste mesure sur la capsule grise : 8,9. Bien au-dessus du seuil, et
+     l'ecart avec le gris des onglets au repos reste lisible — c'est la TEINTE
+     qui distingue maintenant, plus seulement la valeur. */
+  /* ⚠ DEUX TECHNIQUES POUR UNE MEME COULEUR. Un trace SVG se peint avec
+     `fill:url(#...)` ; un texte ne le peut pas — il faut un degrade CSS
+     decoupe sur les lettres par `background-clip:text`. Les deux valeurs
+     doivent rester identiques, sinon l'icone et son libelle divergent d'un
+     ton sans que rien ne le signale.
+
+     C'est le mecanisme qui portait l'ambre avant ; il revient avec le bleu. */
+  .layer--lens{color:#1F4CEE}
+  .layer--lens svg{fill:url(#navBleu)}
   .layer--lens span{
-    background:none;
-    -webkit-text-fill-color:currentColor;
-    color:#0B0B0F; font-weight:600;
+    background:linear-gradient(0deg,#1F4CEE 0%,#3A78EE 100%);
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    font-weight:600;
   }
   .tab{position:absolute;top:0;height:100%;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -3428,6 +3447,24 @@
          donc toujours violet, une procedure toujours grise — c'est ce qui
          separe les deux natures, et le titre fait le reste. -->
     <linearGradient id="palSous" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#4C1D95"/><stop offset="1" stop-color="#A78BFA"/></linearGradient>
+    <!-- ═══ LE BLEU DE L'ONGLET ACTIF ═══
+
+         Les deux bouts sont releves au pixel sur le bouton fourni : #1F4CEE au
+         plus profond, #4899EC au plus clair.
+
+         ⚠ L'AXE VA DU BAS VERS LE HAUT, ET C'EST UNE CONTRAINTE DE LISIBILITE.
+           Sur le bouton d'origine le degrade file en diagonale ; ici le bout
+           CLAIR ne donne que 2,4 de contraste sur la capsule grise — illisible
+           pour un libelle de dix pixels. En posant le clair EN HAUT, il tombe
+           sur l'icone, qui est un aplat de 25 px et le supporte ; le texte,
+           lui, recoit le bout profond a 5,1.
+
+         ⚠ `userSpaceOnUse` SUR 0..44, la hauteur d'un onglet. En unites
+           relatives, le degrade se recalculerait sur la boite de CHAQUE trace
+           et l'icone prendrait toute la plage a elle seule. -->
+    <linearGradient id="navBleu" x1="0" y1="44" x2="0" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1F4CEE"/><stop offset="1" stop-color="#4899EC"/>
+    </linearGradient>
     <linearGradient id="palProc" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#3A4453"/><stop offset="1" stop-color="#A5B0C0"/></linearGradient>
 
     <linearGradient id="orLibre" x1="0" y1="0" x2="1" y2="1">

@@ -8525,9 +8525,12 @@ function ouvrirCategorie(nom) {
   document.getElementById('category-search-input').value = ''
   /* Le libelle dit ce qu'on parcourt ICI : des sous-dossiers dans un dossier,
      des procedures partout ailleurs. */
-  document.getElementById('category-search-input').placeholder = toutesProcedures
-    ? 'Rechercher une procédure'
-    : 'Rechercher un sous-dossier'
+  /* ⚠ TOUJOURS « UNE PROCEDURE », MEME DANS UN DOSSIER. La recherche ne se
+     limite pas aux sous-dossiers : elle regarde le titre des procedures, le
+     nom du dossier ET celui du sous-dossier. Annoncer « un sous-dossier »
+     decrivait une partie de ce qu'elle fait, et laissait croire qu'une
+     procedure ne s'y trouverait pas. */
+  document.getElementById('category-search-input').placeholder = 'Rechercher une procédure'
   currentCategoryQuery = ''
   /* ⚠ `setSortUI` VISAIT UN MENU DISPARU. On coche desormais la bonne ligne du
      volet — sans erreur si l'ecran n'est pas encore construit. */

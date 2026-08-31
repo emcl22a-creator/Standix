@@ -846,7 +846,11 @@
   .ia-ecoute .lg{ display:flex; align-items:center; gap:10px; padding:5px 0; font-size:13px; }
   .ia-ecoute .lg svg{ width:18px; height:18px; color:rgba(28,28,38,0.87); flex-shrink:0; }
   .ia-ecoute .lg span{ color:var(--label-2); line-height:1.4; }
-  .ia-ecoute .lg b{ color:#fff; font-weight:650; }
+  /* ⚠ C'ETAIT `color:#fff` — invisible sur fond blanc. « Vos paroles » et « Ce
+     qui est visible » disparaissaient, et il ne restait que les deux tirets
+     suivis de leur explication, qui n'expliquait plus rien. Encore un reste du
+     theme sombre. */
+  .ia-ecoute .lg b{ color:var(--label); font-weight:650; }
 
   .ai-type{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
   .ai-type button{
@@ -2314,13 +2318,21 @@
        ferme. Les trois couleurs se voient sur deux lettres — c'est court, il
        faut que la transition le soit aussi. */
     background:linear-gradient(118deg,
-      #FFFFFF 0%, #FFFFFF 20%, #7FB6F2 58%, #EB5201 100%);
+      #FFFFFF 0%, #FFFFFF 22%, #CFE3FB 60%, #7FB6F2 100%);
     -webkit-background-clip:text; background-clip:text;
     -webkit-text-fill-color:transparent; color:transparent;
   }
-  /* Sur un bouton blanc, des lettres blanches n'existent pas. */
+  /* ⚠ CETTE SURCHARGE REPEIGNAIT LE SIGLE EN ORANGE SUR LES BOUTONS PLEINS.
+     Elle datait de l'epoque ou ces boutons etaient blancs — des lettres
+     blanches n'y auraient pas existe. Le bouton est maintenant bleu profond :
+     le sigle doit y rester blanc, comme dans la regle du dessus.
+
+     Elle est neutralisee plutot que supprimee : d'autres boutons pleins
+     pourraient revenir a un fond clair, et la regle serait alors a rerégler
+     ici plutot qu'a reecrire. */
   .btn:not(.ghost):not(.dv-ia-bas) .ia-mot{
-    background:linear-gradient(118deg, #EB5201 0%, #EB5201 46%, #8C3100 100%);
+    background:linear-gradient(118deg,
+      #FFFFFF 0%, #FFFFFF 22%, #CFE3FB 60%, #7FB6F2 100%);
     -webkit-background-clip:text; background-clip:text;
   }
   /* Éteint, le bouton pâlit — la marque garde sa couleur, comme l'anneau. */
@@ -4431,10 +4443,21 @@
 
      Texte sombre et non blanc : à cette clarté d'orange, du blanc perdrait le
      contraste que le noir garde sans effort. */
+  /* ⚠ LE DEGRADE ETAIT RESTE A MOITIE CONVERTI : orange au depart, bleu a
+     l'arrivee. Ma reprise generale avait traduit les deux derniers arrets mais
+     pas le premier, qui n'etait pas dans la liste des ambres cherches. Le
+     bouton passait donc de l'orange au bleu, ce qui se voit sur la capture.
+
+     Il porte maintenant `navBleu` d'un bout a l'autre — #1F4CEE vers #4899EC,
+     les deux teintes de l'onglet actif.
+
+     ⚠ ET LE TEXTE PASSE AU BLANC. Il etait en #2A1400, un brun sombre choisi
+       pour se lire sur de l'ambre clair ; sur du bleu profond il devenait
+       illisible. */
   .btn{ font-size:14px; font-weight:700; letter-spacing:-0.02em;
-    background:linear-gradient(135deg,#EB5201 0%,#3A78EE 60%,#4899EC 100%);
-    color:#2A1400; padding:11px 20px; border-radius:100px; border:none;
-    box-shadow:0 6px 18px rgba(31,76,238,0.26), 0 2px 6px rgba(0,0,0,0.28);
+    background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+    color:#FFFFFF; padding:11px 20px; border-radius:100px; border:none;
+    box-shadow:0 6px 18px rgba(31,76,238,0.24), 0 2px 6px rgba(20,20,30,0.12);
     transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s; }
   .btn:active{ transform:scale(0.94); box-shadow:0 3px 10px rgba(31,76,238,0.22); }
   .btn.small{ padding:9px 16px; font-size:12.5px; }

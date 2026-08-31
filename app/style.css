@@ -268,6 +268,10 @@
      barre collerait au bord en navigateur. */
   .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col); z-index:15;
            padding:max(10px, env(safe-area-inset-top, 0px)) 24px 0; }
+  /* ⚠ LA BARRE N'A PAS DE MARGE BASSE : elle est en `position:fixed`, donc
+     hors du flux — une marge sous elle ne pousserait rien. L'ecart avec le
+     titre se regle sur le REMPLISSAGE HAUT DE L'ECRAN, plus bas dans ce
+     fichier : `max(10px, safe-area) + 72px` devient `+ 92px`. */
 
   .brand .mark svg{ width:26px; height:29px; animation: logoBreath 4s ease-in-out infinite; }
   @keyframes logoBreath{
@@ -510,7 +514,7 @@
        ⚠ 24 PX DE CHAQUE COTE. C'est la seule ligne qui gouverne la marge
          laterale de TOUS les ecrans : la barre du haut, les titres, les cartes
          et la recherche s'y alignent sans avoir leur propre valeur. */
-    padding:calc(max(10px, env(safe-area-inset-top, 0px)) + 72px)
+    padding:calc(max(10px, env(safe-area-inset-top, 0px)) + 92px)
             24px
             calc(86px + max(20px, env(safe-area-inset-bottom)) + 16px);
   }
@@ -552,7 +556,33 @@
   /* 0,38 s, comme les deux autres arrivées. Trois durées coexistaient pour le
      même geste — 0,55, 0,38 et 0,34 — et la différence se sentait en passant
      d'une page à l'autre : certaines paraissaient plus lourdes. */
-  .screen.active{ display:block; animation: screenIn 0.38s cubic-bezier(0.32,0.72,0,1); }
+  /* ═══════════════════════════════════════════════════════════════════════
+     L'ENTRÉE D'UN ÉCRAN — UNE SEULE ANIMATION POUR TOUTE L'APP
+
+     Un fondu flou avec une légère remontée : l'écran arrive de dessous, net
+     à la fin, comme s'il se posait.
+
+     ⚠ ELLE ÉTAIT ÉCRITE TROIS FOIS. `screenIn`, `ecranNait` et `ecranFondu`
+       avaient exactement les mêmes images-clés — trois noms pour un seul
+       mouvement. Retoucher l'un laissait les deux autres en arrière, et rien
+       ne le signalait. Les trois pointent maintenant vers celle-ci.
+
+     ⚠ LE FLOU S'ÉTEINT AVANT LA FIN, à 55 %. Un `blur` qui court jusqu'au
+       bout laisse le texte trembler sur les derniers pourcents — l'œil le lit
+       comme un défaut de mise au point, pas comme une entrée.
+
+     ⚠ 14 PX DE REMONTÉE, PAS PLUS. Au-delà, le mouvement devient une
+       diapositive : on regarde l'écran arriver au lieu de lire ce qu'il porte.
+     ═══════════════════════════════════════════════════════════════════════ */
+  @keyframes ecranEntre{
+    0%  { opacity:0; transform:translateY(14px); filter:blur(7px); }
+    55% { opacity:1; filter:blur(0px); }
+    100%{ opacity:1; transform:none; filter:blur(0px); }
+  }
+
+  /* 0,42 s : le flou a besoin d'un peu plus de temps qu'un simple fondu pour
+     ne pas paraître saccadé. */
+  .screen.active{ display:block; animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1); }
 
   /* ═══ L'ÉCRAN QUI NAÎT DE LA CARTE TOUCHÉE ═══
 
@@ -567,7 +597,7 @@
   .screen.active.nait{
     /* 0,38 s comme partout ailleurs. 0,46 se sentait plus lent — et un écran
        qui met plus longtemps à venir donne l'impression d'un chargement. */
-    animation:ecranNait 0.38s cubic-bezier(0.32,0.72,0,1);
+    animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1);
     /* Le point d'origine reste celui de la carte touchée : à cette amplitude il
        ne se voit plus vraiment, mais il ne coûte rien et donne au mouvement une
        direction plutôt qu'un simple gonflement. */
@@ -635,12 +665,7 @@
      Les deux espaces partagent cette durée. L'Équipe a eu 150 ms un moment :
      trop court, la page ne paraissait plus arriver mais sauter — on y lit un
      défaut d'affichage plutôt qu'une transition. */
-  .screen.fondu{ animation:ecranFondu 0.38s cubic-bezier(0.32,0.72,0,1); }
-  @keyframes ecranFondu{
-    0%  { opacity:0; transform:scale(0.975); }
-    30% { opacity:1; }
-    100%{ opacity:1; transform:none; }
-  }
+  .screen.fondu{ animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1); }
 
   /* Pendant le fondu, le contenu ne rejoue pas sa propre entrée : deux
      animations superposées feraient exactement ce qu'on cherche à éviter. */
@@ -665,11 +690,6 @@
      Le nom et l'origine du mouvement restent — la carte touchée sert toujours
      de point de départ au navigateur — mais l'amplitude est celle de tout le
      reste. */
-  @keyframes ecranNait{
-    0%  { opacity:0; transform:scale(0.975); }
-    30% { opacity:1; }
-    100%{ opacity:1; transform:none; }
-  }
 
   /* Le mouvement se coupe si le système demande moins d'animation. */
   @media (prefers-reduced-motion: reduce){
@@ -700,12 +720,7 @@
      GESTE qui est commun, pas le rythme. Une fenêtre peut s'ouvrir plus vite
      qu'une page sans cesser d'être la même animation.
      ═══════════════════════════════════════════════════════════════════════ */
-  @keyframes screenIn{
-    0%  { opacity:0; transform:scale(0.975); }
-    30% { opacity:1; }
-    100%{ opacity:1; transform:none; }
-  }
-  .same-as-title-in{ animation: screenIn 0.38s cubic-bezier(0.32,0.72,0,1) both; }
+  .same-as-title-in{ animation:ecranEntre 0.42s cubic-bezier(0.32,0.72,0,1) both; }
   .greeting{ font-size:14px; font-weight:600; color:var(--label-2); margin-top:6px; }
   /* La marge haute de 6 px descendait le titre sous celui des pages d'onglet.
      `letter-spacing` aligné sur `.page-tete h1` : -0,04 et non -0,02. */
@@ -6883,7 +6898,10 @@ body.plus-vu .plus-flot{
 
    Le titre était en 800 et son compte en 600 : plus lourds tous les deux que
    le modèle, et la parenté ne se lisait pas. */
-.page-tete{ margin:0 0 18px; }
+/* ⚠ C'EST ICI QUE LA PAGE RESPIRE, pas entre les commandes. Le titre et son
+   sous-titre forment un bloc ; les quatre commandes en forment un autre, serre
+   a 8 px. La coupure est entre les deux, et elle vaut 24 px. */
+.page-tete{ margin:0 0 24px; }
 /* 24 px, comme `h1.pagehead`. Ces trois titres — « Procédures », « Analyse »
    et le salut de l'Équipe — vivent dans `.page-tete` plutôt que de porter la
    classe `pagehead`, et ils échappaient donc à la règle centrale. */
@@ -11010,8 +11028,13 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
 /* ─── LA RECHERCHE ───────────────────────────────────────────────────────── */
 /* ⚠ LA RANGEE N'A PLUS QU'UN ENFANT. Le bouton de tri est descendu sous le
-   segment ; la regle reste, elle porte la marge basse du champ. */
-.proc-rech-rang{ display:flex; align-items:center; gap:10px; margin:0 0 16px; }
+   segment ; la regle reste, elle porte la marge basse du champ.
+
+   ⚠ 8 PX, COMME LES DEUX AUTRES. Les quatre blocs de commandes — recherche,
+     segment, ligne de compte, liste — sont separes par le MEME ecart. Des
+     valeurs differentes entre eux creaient des groupes qui n'existent pas :
+     l'oeil lisait « recherche seule, puis le reste ». */
+.proc-rech-rang{ display:flex; align-items:center; gap:10px; margin:0 0 8px; }
 
 /* ⚠ `min-width:0` SUR LA RECHERCHE. Sans lui, un champ de saisie refuse de
    descendre sous sa largeur naturelle et pousse le bouton hors de l'ecran —
@@ -11044,9 +11067,6 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    même liste, une seule à la fois.
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-segm{
-  /* 8 px sous le segment au lieu de 16 : la ligne qui suit DECRIT ce segment,
-     elle lui appartient. Un ecart plein la detachait et l'on croyait a deux
-     blocs sans rapport. */
   display:flex; margin:0 0 8px; padding:3px; border-radius:100px;
   background:rgba(118,118,128,0.12);
 }
@@ -11163,15 +11183,21 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      sur un téléphone d'atelier, c'est de la mémoire vidéo prise pour rien. Le
      navigateur promeut tout seul ce qui bouge.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ LE MEME VOCABULAIRE QUE L'ENTREE D'ECRAN : meme remontee de 14 px, meme
+   flou, meme courbe. Une carte qui arrive et un ecran qui arrive doivent
+   bouger pareil, sinon l'app parait faite de deux morceaux. */
 .cl-apparait{
   opacity:0;
-  transform:translateY(14px) scale(0.995);
+  transform:translateY(14px);
+  filter:blur(6px);
   transition:opacity 0.42s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
-             transform 0.52s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
+             transform 0.52s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
+             filter 0.34s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
 }
 .cl-apparait.vu{
   opacity:1;
   transform:none;
+  filter:blur(0px);
 }
 
 /* ⚠ FILET DE SECURITE. Si l'observateur ne se declenchait pas — onglet en
@@ -11179,7 +11205,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    resteraient invisibles pour toujours. Ici, tout mouvement coupe et tout
    s'affiche : une liste sans animation vaut mieux qu'une liste vide. */
 @media (prefers-reduced-motion: reduce){
-  .cl-apparait{ opacity:1; transform:none; transition:none; }
+  .cl-apparait{ opacity:1; transform:none; filter:none; transition:none; }
 }
 
 
@@ -11262,9 +11288,10 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-rang{
   display:flex; align-items:center; justify-content:space-between;
-  /* En revanche l'ecart SOUS cette ligne grandit : c'est la qu'il faut une
-     coupure, entre les commandes et la liste. */
-  margin:0 0 16px; min-height:34px;
+  /* 8 px sous la ligne aussi : elle annonce la liste, elle n'en est pas
+     separee. Les trois blocs — segment, compte, liste — forment un seul
+     ensemble ; c'est au-DESSUS du segment que la page respire. */
+  margin:0 0 8px; min-height:32px;
   position:relative;
 }
 .proc-rang-txt{

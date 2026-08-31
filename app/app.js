@@ -7890,15 +7890,73 @@ function renderCategoryGrid() {
   /* Le compte de la ligne de contexte. Il dit ce que la liste montre APRES
      filtrage — sinon il annoncerait six dossiers pendant qu'on en voit deux. */
   const nb = document.getElementById('proc-nb-dossiers')
+  /* ⚠ L'ICONE SUIT CE QU'ON COMPTE, sur cette page comme sur celle d'un
+     dossier. Un dossier quand on liste des dossiers, un document quand on
+     liste des procedures : sans cela, « 3 procedures » s'affichait a cote
+     d'une chemise. */
+  const poserIconeRang = (procedures) => {
+    const ic = document.getElementById('proc-rang-ic')
+    if (!ic) return
+    ic.innerHTML = procedures
+      ? `<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"></path>
+         <path d="M13.6 3.4v5h5"></path><path d="M8.8 13h6.4"></path><path d="M8.8 16.4h4.2"></path>`
+      : `<path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path>`
+  }
 
-  /* ⚠ LE FILTRE PORTE SUR LE CONTENU, PAS SUR LE DOSSIER. Un dossier n'a pas
-     d'etat : ce sont ses procedures qui en ont un. « En ligne » garde donc
-     les dossiers qui contiennent au moins une procedure publiee, et un meme
-     dossier peut apparaitre dans les deux listes. */
-  if (filtreEtatDossiers === 'ligne') {
-    visibles = visibles.filter(c => (c.procsInCat || []).some(p => p.publiee_le))
-  } else if (filtreEtatDossiers === 'brouillon') {
-    visibles = visibles.filter(c => (c.procsInCat || []).some(p => !p.publiee_le))
+  /* ═══════════════════════════════════════════════════════════════════════
+     « EN LIGNE » ET « BROUILLONS » RENDENT DES PROCEDURES, PAS DES DOSSIERS
+
+     Ils filtraient les dossiers contenant au moins une procedure de cet etat.
+     Trois choses n'allaient pas :
+
+       · LE COMPTE MENTAIT. La carte annonce le total du dossier — « Cuisine,
+         5 procedures » — alors qu'un seul brouillon s'y trouve. On lisait cinq
+         et l'on en trouvait un.
+
+       · IL FALLAIT UN SECOND GESTE. L'etat appartient a la procedure ; montrer
+         son rangement obligeait a ouvrir pour atteindre ce qu'on cherchait.
+
+       · « BROUILLONS » EST UNE LISTE DE TACHES. Ce sont les procedures a
+         finir : on veut les voir, pas savoir ou elles dorment.
+
+     ⚠ LE CONTENU CHANGE DONC DE NATURE SELON LE SEGMENT — des dossiers sous
+       « Toutes », des procedures sous les deux autres. C'est assume, et la
+       ligne de compte le dit : « 4 dossiers » ou « 7 procedures ».
+     ═══════════════════════════════════════════════════════════════════════ */
+  if (filtreEtatDossiers !== 'tout') {
+    const vus = new Set()
+    const liste = []
+    for (const cat of visibles) {
+      for (const p of (cat.procsInCat || [])) {
+        if (vus.has(p.id)) continue
+        const enLigne = !!p.publiee_le
+        if (filtreEtatDossiers === 'ligne' ? !enLigne : enLigne) continue
+        /* La recherche, si elle est active, s'applique aussi ici : les deux
+           filtres se cumulent au lieu de s'annuler. */
+        if (q && !termes.some(t => sansAccents(p.titre).includes(t))) continue
+        vus.add(p.id)
+        liste.push({ proc: p, dossier: cat.nom })
+      }
+    }
+
+    if (nb) {
+      nb.textContent = liste.length
+        ? `${liste.length} procédure${liste.length > 1 ? 's' : ''}`
+        : 'Aucune procédure'
+    }
+    poserIconeRang(true)
+
+    if (!liste.length) {
+      catGridEl.innerHTML = '<div class="cl-rien">' + (filtreEtatDossiers === 'ligne'
+        ? 'Aucune procédure n’est en ligne pour le moment.'
+        : 'Aucun brouillon en attente.') + '</div>'
+      return
+    }
+
+    liste.forEach(({ proc, dossier }, rang) => {
+      catGridEl.appendChild(ligneProcedureTrouvee(proc, dossier, rang))
+    })
+    return
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -7919,6 +7977,7 @@ function renderCategoryGrid() {
       ? `${visibles.length} dossier${visibles.length > 1 ? 's' : ''}`
       : 'Aucun dossier'
   }
+  poserIconeRang(false)
 
   if (q) {
     const vus = new Set()
@@ -7949,6 +8008,7 @@ function renderCategoryGrid() {
     if (nb) {
       nb.textContent = `${trouvees.length} procédure${trouvees.length > 1 ? 's' : ''}`
     }
+    poserIconeRang(true)
     trouvees.forEach(({ proc, dossier }, rang) => {
       catGridEl.appendChild(ligneProcedureTrouvee(proc, dossier, rang))
     })

@@ -10438,11 +10438,27 @@ async function collerLesVideos(surAvancee) {
        `createMediaElementSource`, qui ne rendrait alors que du silence — c'est
        la mesure notée plus haut. `volume = 0` ne touche que la sortie des
        haut-parleurs, pas ce que le graphe capte. */
+    /* ═══ LE VOLUME RESTE A ZERO JUSQU'AU BRANCHEMENT ═══
+
+       ⚠ ON NE PEUT PAS SIMPLEMENT COUPER LE SON. Mesure faite : un element a
+         `volume = 0` branche sur `createMediaElementSource` ne livre au graphe
+         QUE DU SILENCE — energie 0,0000 contre 0,4318 pour le meme element
+         audible. Le rendre muet pour de bon donnerait une video sans son, et
+         l'IA n'aurait plus rien a transcrire. C'est aussi vrai de `muted`.
+
+       ⚠ ET ON NE PEUT PAS BRANCHER TOUT DE SUITE NON PLUS. Je l'avais essaye :
+         raccorder les lecteurs au graphe des leur creation coupe bien le son,
+         mais si le contexte audio n'a pas pu se reveiller — il attend un geste
+         utilisateur, et le delai est de trois secondes — les elements branches
+         dessus NE JOUENT PLUS DU TOUT. Le collage restait bloque a 0 %.
+
+       Le volume reste donc a zero, et il n'est rendu qu'au moment ou le clip
+       est branche, dans la boucle : a partir de la, son son ne va plus qu'au
+       graphe. Entre les deux, rien ne sort des haut-parleurs. */
     v.volume = 0
     v.play().then(() => {
       if (!v.dataset.enUsage) v.pause()
-      v.volume = 1
-    }, () => { v.volume = 1 })
+    }, () => {})
     return v
   })
 
@@ -10473,44 +10489,6 @@ async function collerLesVideos(surAvancee) {
     }
   }
   const arrivee = ctxAudio.createMediaStreamDestination()
-
-  /* ═══════════════════════════════════════════════════════════════════════
-     LE SON NE DOIT JAMAIS SORTIR DES HAUT-PARLEURS
-
-     ⚠ ON NE PEUT PAS SIMPLEMENT COUPER LE VOLUME. Mesure faite : un element
-       a `volume = 0` branche sur `createMediaElementSource` ne livre au graphe
-       QUE DU SILENCE — energie 0,0000 contre 0,4318 pour le meme element
-       audible. Couper le volume donnerait une video sans son, et Azure n'aurait
-       plus rien a transcrire. C'est aussi vrai pour `muted`.
-
-     ─── CE QUI SE PASSAIT ───
-
-     Le branchement au graphe se faisait PLUS BAS, apres le chargement des
-     metadonnees de chaque clip. Entre le deverrouillage et ce moment-la, les
-     lecteurs etaient audibles et relies a la sortie par defaut : on entendait
-     les videos pendant tout le debut du collage.
-
-     ─── CE QU'ON FAIT ───
-
-     On branche TOUS les lecteurs des maintenant. Un element passe par
-     `createMediaElementSource` ne sort plus par la sortie par defaut : son son
-     ne va que la ou on le raccorde — ici l'arrivee du graphe, jamais les
-     haut-parleurs. Le volume reste a 1, donc le graphe capte tout.
-
-     ⚠ UN ELEMENT NE PEUT ETRE BRANCHE QU'UNE FOIS. Un second appel sur le meme
-       lecteur leve une erreur ; on note donc ceux qui sont deja passes, et la
-       boucle plus bas ne les rebranche pas.
-     ═══════════════════════════════════════════════════════════════════════ */
-  for (const v of lecteurs) {
-    try {
-      ctxAudio.createMediaElementSource(v).connect(arrivee)
-      v.dataset.brancheAudio = '1'
-    } catch (e) {
-      /* Une video sans piste sonore, ou un refus du navigateur : on continue
-         sans son POUR CE CLIP plutot que d'abandonner tout le collage. */
-      console.warn('[collage] son ignore pour un clip :', e?.message || e)
-    }
-  }
 
   arrivee.stream.getAudioTracks().forEach((t) => flux.addTrack(t))
 
@@ -10566,18 +10544,37 @@ async function collerLesVideos(surAvancee) {
         }
       })
 
-      /* ⚠ LE BRANCHEMENT A DEJA EU LIEU, plus haut, au moment de la creation
-         des lecteurs — c'est ce qui empeche le son de sortir des
-         haut-parleurs. Un second appel sur le meme element leverait une
-         erreur. On ne rattrape ici que les clips qui n'ont pas pu etre
-         branches. */
-      if (!v.dataset.brancheAudio) {
-        try {
-          ctxAudio.createMediaElementSource(v).connect(arrivee)
-          v.dataset.brancheAudio = '1'
-        } catch (e) {
-          console.warn('[collage] son ignoré pour', f.fichier.name, e?.message || e)
-        }
+      /* ⚠ ON NE BRANCHE QUE SI LE CONTEXTE EST REVEILLE — c'est la cause du
+         blocage a « 1 sur 4, 0 % ».
+
+         Mesure faite : un element raccorde a un contexte SUSPENDU n'avance
+         plus. Sur 600 ms de lecture, il progressait de 0,06 s au lieu de 0,66.
+         La boucle attendait donc la fin d'une video qui ne jouait pas.
+
+         Le contexte se reveille dans un geste utilisateur ; ici le geste a
+         deja ete consomme par les `play()` du deverrouillage, et le reveil
+         peut echouer — c'est prevu plus haut, avec un delai de trois secondes.
+         Quand il echoue, on saute le branchement : le clip reste muet et
+         silencieux, mais le collage va au bout.
+
+         ⚠ SANS SON PLUTOT QUE SANS COLLAGE. Une video muette se rattrape ; un
+           ecran fige a 0 % ne se rattrape pas. */
+      if (ctxAudio.state !== 'running') {
+        console.warn('[collage] contexte audio endormi — ce clip sera muet')
+      } else try {
+        ctxAudio.createMediaElementSource(v).connect(arrivee)
+        /* ⚠ LE VOLUME N'EST RENDU QU'ICI, une fois le clip raccorde au graphe.
+           A partir de cet appel, l'element ne sort plus par la sortie par
+           defaut : son son ne va que la ou on le branche — l'arrivee du
+           graphe, jamais les haut-parleurs. Le mettre a 1 plus tot le rendrait
+           audible dans la piece. */
+        v.volume = 1
+      } catch (e) {
+        /* Une video sans piste sonore, ou un navigateur qui refuse : on
+           continue sans son POUR CE CLIP plutot que d'abandonner tout le
+           collage. Le volume reste a zero — l'element n'etant pas branche, le
+           remonter le ferait sortir des haut-parleurs. */
+        console.warn('[collage] son ignoré pour', f.fichier.name, e?.message || e)
       }
 
       /* Le déverrouillage a pu faire avancer la lecture de quelques images.

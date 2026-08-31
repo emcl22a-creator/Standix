@@ -11047,11 +11047,13 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ LA RANGEE N'A PLUS QU'UN ENFANT. Le bouton de tri est descendu sous le
    segment ; la regle reste, elle porte la marge basse du champ.
 
-   ⚠ 8 PX, COMME LES DEUX AUTRES. Les quatre blocs de commandes — recherche,
-     segment, ligne de compte, liste — sont separes par le MEME ecart. Des
-     valeurs differentes entre eux creaient des groupes qui n'existent pas :
-     l'oeil lisait « recherche seule, puis le reste ». */
-.proc-rech-rang{ display:flex; align-items:center; gap:10px; margin:0 0 8px; }
+   ⚠ 16 PX ICI, ET C'EST VOULU. La recherche est un bloc a part : elle agit sur
+     TOUTE la liste, alors que le segment et la ligne de compte decrivent ce
+     qui est affiche. L'ecart marque cette difference de nature.
+
+     Les deux blocs suivants, eux, sont serres a 2 px — ils forment un seul
+     ensemble avec la liste. */
+.proc-rech-rang{ display:flex; align-items:center; gap:10px; margin:0 0 16px; }
 
 /* ⚠ `min-width:0` SUR LA RECHERCHE. Sans lui, un champ de saisie refuse de
    descendre sous sa largeur naturelle et pousse le bouton hors de l'ecran —
@@ -11084,7 +11086,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    même liste, une seule à la fois.
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-segm{
-  display:flex; margin:0 0 8px; padding:3px; border-radius:100px;
+  /* 2 px : la ligne de compte qui suit DECRIT ce segment. Elle lui est
+     attachee, elle ne s'en detache pas. */
+  display:flex; margin:0 0 2px; padding:3px; border-radius:100px;
   background:rgba(118,118,128,0.12);
 }
 .p-seg{
@@ -11305,10 +11309,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ═══════════════════════════════════════════════════════════════════════════ */
 .proc-rang{
   display:flex; align-items:center; justify-content:space-between;
-  /* 8 px sous la ligne aussi : elle annonce la liste, elle n'en est pas
-     separee. Les trois blocs — segment, compte, liste — forment un seul
-     ensemble ; c'est au-DESSUS du segment que la page respire. */
-  margin:0 0 8px; min-height:32px;
+  /* 2 px sous la ligne aussi, et la meme valeur au-dessus : elle annonce la
+     liste, elle n'en est pas separee. Segment, compte et liste forment un seul
+     ensemble ; c'est au-DESSUS, sous la recherche, que la page respire.
+
+     ⚠ `min-height` PORTE UNE PART DE L'ESPACE. La ligne fait 30 px pour un
+       texte de 18 : les 12 px restants se repartissent en haut et en bas, et
+       s'ajoutent aux marges. Reduire les marges sans toucher a cette valeur ne
+       resserre donc qu'a moitie. */
+  margin:0 0 2px; min-height:30px;
   position:relative;
 }
 .proc-rang-txt{

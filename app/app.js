@@ -6713,79 +6713,120 @@ function debutDuMois() {
 }
 
 function peindreTuilesAccueil() {
-  const zAnneau = document.getElementById('ac-anneau')
-  const zDuo    = document.getElementById('ac-duo')
-  const zListes = document.getElementById('ac-listes')
-  if (!zAnneau || !zDuo || !zListes) return
-  zAnneau.innerHTML = ''; zDuo.innerHTML = ''; zListes.innerHTML = ''
+  const zChiffres = document.getElementById('ac-chiffres')
+  const zListes   = document.getElementById('ac-listes')
+  if (!zChiffres || !zListes) return
+  zChiffres.innerHTML = ''; zListes.innerHTML = ''
 
   const procs = allGestionProcedures || []
 
-  /* ⚠ ON TESTE `procs.length`, PAS LE COMPTE DU MOIS. Une entreprise qui a
-     douze procédures mais aucune ce mois-ci n'est pas vide — elle a juste un
-     mois calme. L'état vide ne concerne que le vrai départ. */
+  /* ⚠ ON TESTE `procs.length`, PAS UN COMPTE DU MOIS. Une entreprise qui a
+     douze procedures mais aucune ce mois-ci n'est pas vide — elle a juste un
+     mois calme. L'etat vide ne concerne que le vrai depart. */
   const vide = document.getElementById('ac-vide')
-  if (!procs.length) {
-    if (vide) {
-      vide.hidden = false
-      const nom = cachedEntreprise?.nom
-      vide.querySelector('.acv-t').textContent = nom
-        ? nom + ' n\u2019a pas encore de proc\u00e9dure'
-        : 'Aucune proc\u00e9dure pour l\u2019instant'
-    }
-    return
+  if (vide) vide.hidden = !!procs.length
+
+  const enLigne = procs.filter(p => p.publiee_le).length
+  const membres = (cachedMembres || []).length
+
+  /* ⚠ LE RESTE D'ANALYSES VIENT DU FORFAIT, et il faut ses DEUX nombres. Un
+     compteur sans son plafond n'apprend rien : « 12 » ne se lit que si l'on
+     sait qu'il y en avait vingt. Quand le forfait est inconnu — chargement en
+     cours, offre sans limite — on n'affiche pas de fraction inventee. */
+  const quota  = Number(cachedEntreprise?.analyses_quota) || null
+  const restant = Number.isFinite(Number(cachedEntreprise?.analyses_restantes))
+    ? Number(cachedEntreprise.analyses_restantes) : null
+
+  const IC = {
+    doc: '<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/><path d="M13.6 3.4v5h5"/>',
+    gens: '<circle cx="9.4" cy="8.6" r="3.4"/><path d="M3 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.6 5.4a3.4 3.4 0 0 1 0 6.4"/>',
+    etincelle: '<path d="M12 3.4l2.1 5.1 5.1 2.1-5.1 2.1L12 17.8l-2.1-5.1-5.1-2.1 5.1-2.1Z"/>',
   }
-  if (vide) vide.hidden = true
+  const tuile = (i, val, sous, teinte) => `
+    <div class="ac-chif">
+      <span class="ac-chif-ic" style="background:${teinte.fond};color:${teinte.trait}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round">${i}</svg>
+      </span>
+      <span class="ac-chif-v">${val}</span>
+      <span class="ac-chif-s">${sous}</span>
+    </div>`
 
-  /* ═══ ① CE QUI EST EN LIGNE ═══════════════════════════════════════════════
+  zChiffres.innerHTML =
+    tuile(IC.doc, enLigne, `procédure${enLigne > 1 ? 's' : ''} en ligne`,
+          { fond: 'rgba(31,76,238,0.10)',  trait: '#1F4CEE' }) +
+    tuile(IC.gens, membres, `membre${membres > 1 ? 's' : ''}`,
+          { fond: 'rgba(76,29,149,0.10)',  trait: '#4C1D95' }) +
+    tuile(IC.etincelle,
+          restant === null ? '—' : (quota ? `${restant}<em>/${quota}</em>` : restant),
+          'analyses IA restantes',
+          { fond: 'rgba(20,168,91,0.10)',  trait: '#178943' })
 
-     ⚠ LES ANALYSES EN COURS SONT ÉCARTÉES. Une procédure que l'IA est en train
-       d'écrire n'est pas un brouillon oublié : elle n'existe pas encore. La
-       compter au dénominateur ferait baisser le taux à chaque nouvelle vidéo,
-       c'est-à-dire punirait le fait de travailler. */
-  const abouties = procs.filter(p => p.statut !== 'traitement' && p.statut !== 'redaction')
-  const enLigne = abouties.filter(p => p.publiee_le).length
-  zAnneau.appendChild(anneauPublication(enLigne, abouties.length))
+  /* ═══ LES DEUX DERNIERES SECTIONS ═══
 
-  /* ═══ ② LES DEUX CHIFFRES DU MOIS ════════════════════════════════════════ */
-  const debutMois = debutDuMois()
-  const debutMoisPrec = new Date(debutMois); debutMoisPrec.setMonth(debutMoisPrec.getMonth() - 1)
+     Chacune montre UNE ligne — la plus recente — et renvoie a sa page. Une
+     liste de cinq ici ferait doublon avec la page qu'elle annonce.
 
-  /* ⚠ CE N'EST PAS UN COMPTEUR DE SCANS. Rien n'enregistre le geste de scanner
-     un QR code : ce qu'on compte, ce sont les lignes de `validations`, donc les
-     procédures OUVERTES par un membre, quel que soit le chemin. C'est le
-     chiffre le plus proche qu'on ait, et il dit la même chose. */
-  const vals = cachedValidations || []
-  const quand = v => Date.parse(v.validated_at)
-  const ceMois = vals.filter(v => quand(v) >= debutMois.getTime()).length
-  const moisPrec = vals.filter(v => {
-    const t = quand(v)
-    return t >= debutMoisPrec.getTime() && t < debutMois.getTime()
-  }).length
+     ⚠ UNE SECTION SANS CONTENU NE S'AFFICHE PAS. Un titre suivi d'un cadre
+       vide occupe autant de place qu'une vraie ligne et ne dit rien.
 
-  const ecart = moisPrec ? Math.round(((ceMois - moisPrec) / moisPrec) * 100) : null
+     ⚠ `depuisQuandCourt` ATTEND DES MILLISECONDES, pas une date. Lui passer la
+       chaine de Supabase directement rendait « NaN min » — le genre d'erreur
+       qui ne casse rien et s'affiche quand meme. */
+  const section = (titre, action, surAction, corps) => `
+    <div class="ac-sect">
+      <div class="ac-sect-t">
+        <span>${titre}</span>
+        <button type="button" class="ac-sect-plus" ${surAction}>${action}
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      ${corps}
+    </div>`
 
-  zDuo.appendChild(tuileScans({
-    valeur: ceMois,
-    ecart,
-    /* La courbe est cumulative : elle monte toujours, et sa PENTE dit le
-       rythme. Une courbe des lectures par jour sur trente pixels de haut
-       ressemblerait à un électrocardiogramme — du bruit, pas une tendance. */
-    courbe: courbeDuMois(vals, debutMois),
-  }))
+  /* Le dernier mouvement : la lecture la plus recente d'un membre. */
+  const lectures = [...(cachedValidations || [])]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  const derniere = lectures[0]
+  if (derniere) {
+    const p = procs.find(x => x.id === derniere.procedure_id)
+    const m = (cachedMembres || []).find(x => x.id === derniere.membre_id)
+    zListes.innerHTML += section('Dernier mouvement', 'Voir plus',
+      'onclick="showGestionScreen(\'p-equipe\')"', `
+      <div class="ac-lig">
+        <span class="ac-lig-ini">${escapeHtml(initialesDe(m?.nom || '?'))}</span>
+        <span class="ac-lig-co">
+          <span class="ac-lig-t">${escapeHtml(m?.nom || 'Un membre')} a consulté une procédure</span>
+          <span class="ac-lig-s">${escapeHtml(p?.titre || 'Procédure supprimée')}</span>
+        </span>
+        <span class="ac-lig-q">${depuisQuandCourt(new Date(derniere.created_at).getTime())}</span>
+      </div>`)
+  }
 
-  /* `etatAbo.analyses` vient de `reste_analyses`, qui ne consomme rien. Si la
-     migration n'est pas passée, il vaut `null` : on dit alors ce qu'on sait,
-     sans inventer de plafond. */
-  const q = etatAbo?.analyses || null
-  const quota = q ? Number(q.quota || 0) : 0
-  const reste = q ? Number(q.reste || 0) : 0
-  const utilisees = quota ? Math.max(0, quota - reste) : null
-
-  zDuo.appendChild(tuileAnalyses(utilisees, quota))
-
-  /* ═══ ③ LES DEUX CARTES DU BAS ═══════════════════════════════════════════ */
-  peindreListesAccueil()
+  /* La derniere procedure creee. */
+  const recentes = [...procs].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+  const neuve = recentes[0]
+  if (neuve) {
+    const teinte = couleurDossier(0)
+    zListes.innerHTML += section('Dernière procédure créée', 'Voir plus',
+      'onclick="showGestionScreen(\'p-list\')"', `
+      <div class="ac-lig" onclick="openAnalyse('${neuve.id}')">
+        <span class="ac-lig-pl" style="background:${fondPlaque(teinte)}">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
+                     M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2"
+                  stroke="url(#pal${teinte.i})" stroke-width="1.9"
+                  stroke-linejoin="round" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="ac-lig-co">
+          <span class="ac-lig-t">${escapeHtml(neuve.titre || 'Sans titre')}</span>
+          <span class="ac-lig-s">${escapeHtml(neuve.categorie || 'Sans dossier')}</span>
+        </span>
+        <span class="ac-lig-q">${depuisQuandCourt(new Date(neuve.created_at).getTime())}</span>
+      </div>`)
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

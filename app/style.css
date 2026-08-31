@@ -12110,7 +12110,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 .ac-banniere{
   position:relative; overflow:hidden;
   display:flex; align-items:center;
-  border-radius:26px; padding:24px 22px;
+  border-radius:26px; padding:26px 24px;
   background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
   box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
   margin-bottom:16px;
@@ -12120,21 +12120,33 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   display:block; font-size:10.5px; font-weight:700; letter-spacing:0.09em;
   text-transform:uppercase; color:rgba(255,255,255,0.52); margin-bottom:10px;
 }
+/* Sans dessin a cote, le titre a la place de respirer : 23 px au lieu de 21,
+   et la marge du haut disparait avec le sur-titre. */
 .ac-banniere h2{
-  font-size:21px; font-weight:700; letter-spacing:-0.035em; line-height:1.22;
-  color:#FFFFFF; margin:0 0 8px;
+  font-size:23px; font-weight:700; letter-spacing:-0.035em; line-height:1.25;
+  color:#FFFFFF; margin:0 0 9px;
 }
-/* La seconde ligne du titre prend le dégradé de la barre du bas — c'est le même
-   bleu partout, et il désigne ici ce que le produit promet. */
+/* ⚠ LE DEGRADE PART DU BOUT CLAIR DE `navBleu`, PAS DU PROFOND.
+
+   Les deux teintes sont bien celles de l'onglet actif — #4899EC et #1F4CEE —
+   mais leur ordre est inverse par rapport a la barre du bas, et c'est mesure :
+   sur le noir de la banniere, #1F4CEE ne donne que 2,98 de contraste, sous le
+   seuil de lisibilite. #4899EC en donne 6,31.
+
+   Le degrade s'arrete donc a mi-course vers le profond : les deux mots gardent
+   la nuance sans que le second devienne illisible. */
 .ac-banniere h2 em{
   font-style:normal;
-  background:linear-gradient(96deg,#4899EC 0%,#7FB6F2 100%);
+  background:linear-gradient(96deg,#4899EC 0%,#3A78EE 100%);
   -webkit-background-clip:text; background-clip:text;
   -webkit-text-fill-color:transparent; color:transparent;
 }
+/* ⚠ PLUS DE `max-width`. Il tenait le texte a l'ecart du dessin ; celui-ci
+   ayant disparu, la phrase peut occuper toute la largeur — et sur un ecran de
+   390 px, ces deux lignes tiennent alors sur une seule. */
 .ac-banniere p{
-  font-size:13px; line-height:1.5; color:rgba(255,255,255,0.62);
-  margin:0 0 16px; max-width:210px;
+  font-size:13.5px; line-height:1.5; color:rgba(255,255,255,0.62);
+  margin:0 0 18px;
 }
 .ac-ban-btn{
   display:inline-flex; align-items:center; gap:9px;
@@ -12144,13 +12156,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 .ac-ban-btn svg{ width:16px; height:16px; }
 .ac-ban-btn:active{ transform:scale(0.97); }
-/* ⚠ LE DESSIN DÉBORDE VOLONTAIREMENT À DROITE. Contenu dans la boîte, il
-   n'aurait plus que 90 px de large et les trois feuillets se confondraient.
-   `overflow:hidden` sur la bannière coupe ce qui dépasse. */
-.ac-ban-dess{
-  position:absolute; right:-26px; top:50%; transform:translateY(-50%);
-  width:172px; height:196px; pointer-events:none;
-}
+/* ⚠ `.ac-ban-dess` A ÉTÉ RETIRÉE AVEC LE DESSIN. La bannière n'a plus qu'une
+   colonne de texte ; `overflow:hidden` reste sur elle, il ne coûte rien et
+   protégera un éventuel décor futur. */
 
 /* ─── LES TROIS CHIFFRES ─────────────────────────────────────────────────── */
 /* ⚠ TROIS COLONNES ÉGALES, PAS UN DÉFILEMENT. À trois, tout tient sur la

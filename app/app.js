@@ -7832,21 +7832,13 @@ const _observateurApparition = ('IntersectionObserver' in window)
 let sansApparition = false
 
 function animerApparition(el, rang = 0) {
-  /* ⚠ PENDANT UN CHANGEMENT DE SEGMENT, LA CARTE PORTE SON ANIMATION
-       ELLE-MEME.
+  /* ⚠ PENDANT UN CHANGEMENT DE SEGMENT, la carte ne joue pas son apparition au
+     defilement : son entree est lancee en JavaScript juste apres le rendu —
+     voir `flouEntree`. Deux animations sur le meme element se contrarieraient.
 
-     Elle etait posee sur l'ecran, puis heritee par `#p-list.entre > *`. Cela
-     supposait que la classe soit ajoutee APRES la creation des cartes, dans le
-     bon ordre et dans le bon delai. Un rendu un peu plus long que prevu, et
-     l'animation partait sur des elements qui n'existaient pas encore : on ne
-     voyait rien du tout.
-
-     En la posant ici, sur chaque carte au moment ou elle est construite, le
-     declenchement ne depend plus d'aucun minutage. */
-  if (sansApparition) {
-    el.classList.add('vu', 'cl-entre')
-    return
-  }
+     On pose quand meme `vu` : sans elle, la carte resterait a l'opacite zero
+     de `.cl-apparait` si l'entree ne partait pas. */
+  if (sansApparition) { el.classList.add('vu'); return }
   /* ⚠ ON RESPECTE LE REGLAGE DU SYSTEME. Quelqu'un qui a demande moins
      d'animations ne doit pas voir la liste bouger — et surtout pas rester
      avec des cartes invisibles si l'observateur ne se declenchait pas. */
@@ -8378,6 +8370,50 @@ function poserPastilleSegment(b, animer = true, essai = 0) {
   if (!animer) { void lens.offsetWidth; lens.style.transition = '' }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHANGEMENT DE SEGMENT
+
+   ⚠ L'ANIMATION EST LANCEE EN JAVASCRIPT, PAS PAR UNE CLASSE CSS.
+
+     Elle passait par des classes posees sur l'ecran, puis heritees par les
+     cartes. Trois choses devaient s'aligner pour que cela marche : la classe
+     ajoutee au bon moment, les cartes existantes a cet instant, et aucune
+     autre regle ne prenant le dessus. Il suffisait qu'une seule cede pour
+     qu'on ne voie rien du tout — et c'est ce qui arrivait.
+
+     `element.animate()` s'applique a l'element qu'on lui donne, tout de suite,
+     sans passer par une feuille de style. On parcourt donc les enfants REELS
+     au moment ou ils existent. Plus rien a synchroniser.
+
+   ⚠ ON RESPECTE LE REGLAGE DU SYSTEME. Quelqu'un qui a demande moins
+     d'animations passe directement au resultat.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const COURBE_SEGM = 'cubic-bezier(0.32, 0.72, 0, 1)'
+const MOINS_ANIM = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/* Les elements qui bougent : les cartes, et la ligne de compte au-dessus —
+   elle annonce ce que la liste contient, et ce nombre change avec elle. */
+function morceauxDeLaListe() {
+  const g = document.getElementById('cat-grid')
+  const rang = document.querySelector('#p-list .proc-rang')
+  return [...(rang ? [rang] : []), ...(g ? [...g.children] : [])]
+}
+
+function flouSortie(el) {
+  return el.animate(
+    [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(3px)' }],
+    { duration: 160, easing: COURBE_SEGM, fill: 'forwards' })
+}
+
+function flouEntree(el, rang) {
+  return el.animate(
+    [{ opacity: 0, filter: 'blur(3px)' }, { opacity: 1, filter: 'blur(0px)' }],
+    /* ⚠ UN LEGER DECALAGE, PLAFONNE A CINQ. Sans lui les cartes arrivent d'un
+       bloc ; au-dela de cinq crans, la derniere attendrait un quart de seconde
+       de plus que la premiere et la liste paraitrait ramer. */
+    { duration: 300, delay: Math.min(rang, 5) * 30, easing: COURBE_SEGM })
+}
+
 document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   const b = e.target.closest('.p-seg')
   if (!b || b.classList.contains('on')) return
@@ -8386,52 +8422,22 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   poserPastilleSegment(b)
   filtreEtatDossiers = b.dataset.etat
 
-  /* La liste s'efface d'un souffle, puis se reconstruit. On redessine A MI-
-     CHEMIN de l'effacement : les nouvelles cartes arrivent pendant que
-     l'opacite remonte, et l'on ne voit jamais de liste vide. */
-  const g = document.getElementById('cat-grid')
-  if (g) {
-    /* ⚠ SORTIE PUIS ENTREE, ET NON UNE SEULE ANIMATION. Le contenu est
-       remplace a mi-chemin : une animation unique se retrouvait coupee sur des
-       elements supprimes, et rejouee du debut sur les nouveaux. Voir le
-       commentaire de `listeSort` dans style.css. */
-    /* ⚠ LES CLASSES VONT SUR L'ECRAN, pas sur la grille : la ligne de compte
-       est AVANT elle dans le balisage, et aucun selecteur CSS ne remonte a un
-       frere precedent. `#p-list` est le seul ancetre commun. */
-    const ecran = document.getElementById('p-list') || g
-    ecran.classList.remove('sort', 'entre')
-    void ecran.offsetWidth
-    ecran.classList.add('sort')
-    /* ⚠ PAS DE `jouerVoile` ICI, ET C'EST VOULU. Le voile floute TOUT l'ecran —
-       le titre, la recherche, le segment lui-meme. Or changer de segment ne
-       change que la LISTE : flouter le bouton qu'on vient de toucher fait
-       douter d'avoir appuye au bon endroit.
+  if (MOINS_ANIM()) { renderCategoryGrid(); return }
 
-       Le flou est donc porte par `listeSort` et `listeEntre`, poses sur les
-       CARTES seules. Leur valeur est la meme que celle du voile, pour que les
-       deux gestes se ressemblent sans se confondre. */
+  morceauxDeLaListe().forEach(flouSortie)
 
-    /* On coupe l'apparition AVANT de redessiner, et on la rend apres : les
-       cartes de ce rendu-ci arrivent posees, celles du prochain defilement
-       retrouveront leur entree normale. */
-    sansApparition = true
-    /* 160 ms : la duree exacte de la sortie. Redessiner plus tot couperait les
-       anciennes cartes en plein mouvement, plus tard laisserait un blanc. */
-    setTimeout(() => {
-      /* ⚠ ON RETIRE `sort` AVANT DE REDESSINER. Elle porte `forwards` : laissee
-         en place, elle figerait les nouvelles cartes a l'opacite zero de sa
-         derniere image. */
-      ecran.classList.remove('sort')
-      renderCategoryGrid()
-      sansApparition = false
-      /* La ligne de compte, elle, n'est pas recreee : elle garde une classe le
-         temps de son entree. */
-      ecran.classList.add('entre')
-      setTimeout(() => ecran.classList.remove('entre'), 340)
-    }, 160)
-  } else {
+  /* ⚠ ON COUPE L'APPARITION AU DEFILEMENT le temps du changement : les cartes
+     de ce rendu-ci portent deja leur propre entree, deux animations sur le
+     meme element se contrarieraient. */
+  sansApparition = true
+
+  /* 160 ms : la duree exacte de la sortie. Redessiner plus tot couperait les
+     anciennes cartes en plein mouvement, plus tard laisserait un blanc. */
+  setTimeout(() => {
     renderCategoryGrid()
-  }
+    sansApparition = false
+    morceauxDeLaListe().forEach((el, i) => flouEntree(el, i))
+  }, 160)
 })
 
 /* ⚠ `load` NE SUFFIT PAS, ET C'EST POUR CELA QUE LA PASTILLE MANQUAIT AU

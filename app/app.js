@@ -7784,7 +7784,14 @@ const _observateurApparition = ('IntersectionObserver' in window)
    ⚠ SANS CE PLAFOND, la vingtième carte d'une longue liste attendrait plus
      d'une seconde avant de bouger — l'utilisateur aurait déjà défilé au-delà
      et verrait des cases vides se remplir derrière lui. */
+/* ⚠ VRAI PENDANT UN CHANGEMENT DE SEGMENT. Les cartes ne doivent alors PAS
+   rejouer leur entree : la grille entiere se floute et se re-nettoie, et deux
+   animations superposees se contrariaient — les cartes remontaient pendant que
+   la liste revenait, ce qui donnait un mouvement casse. */
+let sansApparition = false
+
 function animerApparition(el, rang = 0) {
+  if (sansApparition) { el.classList.add('vu'); return }
   /* ⚠ ON RESPECTE LE REGLAGE DU SYSTEME. Quelqu'un qui a demande moins
      d'animations ne doit pas voir la liste bouger — et surtout pas rester
      avec des cartes invisibles si l'observateur ne se declenchait pas. */
@@ -7889,6 +7896,16 @@ function renderCategoryGrid() {
 
   /* Le compte de la ligne de contexte. Il dit ce que la liste montre APRES
      filtrage — sinon il annoncerait six dossiers pendant qu'on en voit deux. */
+  /* La pastille du segment se cale ici : c'est le seul moment ou l'on sait que
+     l'ecran est visible et donc mesurable.
+
+     ⚠ ELLE EST DEFINIE PLUS BAS DANS LE FICHIER, et cela marche parce que
+       c'est une declaration `function`, hissee au sommet de la portee. Si on
+       la reecrivait un jour en `const poserPastilleSegment = () => …`, cet
+       appel tomberait dans la zone morte et la page des procedures ne
+       s'afficherait plus. Le controle de syntaxe ne le verrait pas. */
+  poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false)
+
   const nb = document.getElementById('proc-nb-dossiers')
   /* ⚠ L'ICONE SUIT CE QU'ON COMPTE, sur cette page comme sur celle d'un
      dossier. Un dossier quand on liste des dossiers, un document quand on
@@ -8307,21 +8324,28 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
     g.classList.remove('change')
     void g.offsetWidth
     g.classList.add('change')
-    setTimeout(() => renderCategoryGrid(), 105)
-    /* ⚠ ON RETIRE LA CLASSE A LA FIN. Elle coupe la remontee des cartes le
-       temps du changement de segment ; laissee en place, le defilement suivant
-       revelerait les cartes sans mouvement, et l'on croirait l'animation
-       cassee. 300 ms : l'animation dure 260. */
+    /* On coupe l'apparition AVANT de redessiner, et on la rend apres : les
+       cartes de ce rendu-ci arrivent posees, celles du prochain defilement
+       retrouveront leur entree normale. */
+    sansApparition = true
+    setTimeout(() => { renderCategoryGrid(); sansApparition = false }, 105)
+    /* ⚠ ON RETIRE LA CLASSE A LA FIN. Elle coupe la remontee le temps du
+       changement ; laissee en place, le defilement suivant revelerait les
+       cartes sans mouvement. 300 ms : l'animation dure 260. */
     setTimeout(() => g.classList.remove('change'), 300)
   } else {
     renderCategoryGrid()
   }
 })
 
-/* La pastille se pose au chargement, et se replace si l'ecran change de
-   largeur — une rotation de telephone la laisserait sinon a cote. */
-addEventListener('load', () =>
-  poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false))
+/* ⚠ `load` NE SUFFIT PAS, ET C'EST POUR CELA QUE LA PASTILLE MANQUAIT AU
+     DEMARRAGE. Quand le document finit de charger, l'ecran des procedures est
+     encore cache : `getBoundingClientRect` rend des zeros, la fonction sort
+     sans rien poser, et la pastille restait invisible jusqu'au premier clic.
+
+   Elle se pose donc aussi a chaque rendu de la liste — voir l'appel en tete de
+   `renderCategoryGrid`, qui s'execute quand la page devient visible. Les deux
+   ecouteurs restent : ils couvrent la rotation du telephone. */
 addEventListener('resize', () =>
   poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false))
 

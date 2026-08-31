@@ -1021,11 +1021,16 @@
   }
   .man-fil .step-num-dess{ position:absolute; left:-44px; top:-4px; width:33px; height:33px; }
   .man-fil .step-num-dess svg{ width:33px; height:33px; display:block; }
+  /* ⚠ C'ETAIT `color:#fff` — LE TEXTE SAISI ETAIT INVISIBLE. Sur fond blanc,
+     on ecrivait une etape sans jamais la voir apparaitre. Encore un reste du
+     theme sombre, et le plus grave de tous : celui-la empechait purement et
+     simplement de se servir de la page. */
   .man-fil textarea{
     width:100%; background:none; border:none; padding:0; resize:none;
-    color:#fff; font-family:inherit; font-size:14.5px; line-height:1.55;
-    font-weight:500; letter-spacing:-0.02em;
+    color:var(--label); font-family:inherit; font-size:15px; line-height:1.5;
+    font-weight:400; letter-spacing:-0.015em;
   }
+  .man-fil textarea::placeholder{ color:var(--label-3); }
   .man-fil textarea:focus{ outline:none; }
   .man-fil textarea::placeholder{ color:var(--label-3); }
   .man-fil .step-bas{ display:flex; align-items:flex-end; gap:11px; margin-top:12px; }
@@ -11922,4 +11927,122 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-create input[type=text]{
   border-radius:100px; padding:12px 16px;
   border:none; background:rgba(118,118,128,0.12);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ÉTAPES MANUELLES · MÊME PRÉSENTATION QUE LA PAGE DE DÉTAIL
+
+   Elles étaient dans un fil vertical, le numéro accroché à gauche hors de la
+   boîte. La page de détail, elle, présente chaque étape comme une carte. Deux
+   formes pour la même chose, alors qu'on passe de l'une à l'autre en publiant.
+
+   ⚠ LE FIL ET LE DÉCALAGE SONT ANNULÉS. `.man-fil` pose `padding-left:44px` et
+     un trait en `::before` ; le numéro est en position absolue à −44 px. Dans
+     une carte, tout cela doit disparaître, sinon le numéro flotte dehors et le
+     trait court dans le vide.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-create-manual .man-fil{
+  padding-left:0; margin-top:18px;
+  display:flex; flex-direction:column; gap:10px;
+}
+#p-create-manual .man-fil::before{ display:none; }
+
+/* ⚠ UNE GRILLE, PAS UNE BOITE FLEXIBLE. L'etape a TROIS enfants directs : le
+   numero, le champ, et la rangee du bas qui porte la photo et la corbeille. En
+   `flex`, les trois se mettaient cote a cote et la rangee du bas se retrouvait
+   a droite du texte, ecrasee.
+
+   Deux colonnes : le numero occupe la premiere, le champ et la rangee du bas
+   se suivent dans la seconde. Aucun changement de balisage necessaire. */
+#p-create-manual .man-fil .step-edit-item{
+  display:grid; grid-template-columns:30px 1fr; gap:6px 13px;
+  align-items:start;
+  padding:15px 16px; border-radius:20px; margin:0;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+#p-create-manual .man-fil .step-num-dess{
+  position:static; left:auto; top:auto;
+  flex:0 0 30px; width:30px; height:30px; margin:1px 0 0;
+}
+#p-create-manual .man-fil .step-num-dess svg{ width:30px; height:30px; }
+/* ⚠ LE CHAMP PREND TOUTE LA LARGEUR RESTANTE. Sans `flex:1`, un `textarea`
+   garde sa largeur par défaut — vingt caractères — et laisse la carte à moitié
+   vide.
+
+   ⚠ ET IL PERD SON FOND. Une règle générale sur `textarea` lui donne un gris
+     et une bordure : dans une carte blanche, ça faisait une boîte dans une
+     boîte, avec deux contours à quatre pixels l'un de l'autre. Le champ est
+     maintenant à même la carte — c'est la carte qui est le champ.
+
+     Le `!important` est nécessaire : la règle générale porte sur l'élément
+     `textarea`, et la mienne aussi ; à spécificité voisine, l'ordre de
+     déclaration ne suffit pas toujours selon d'où elle est chargée. */
+#p-create-manual .man-fil textarea{
+  flex:1; min-width:0;
+  background:none !important; border:none !important;
+  padding:0 !important; border-radius:0 !important;
+}
+
+
+/* ─── LA PHOTO D'UNE ÉTAPE, DANS LA CARTE ─────────────────────────────────
+   La vignette et son libellé passent sous le texte, dans la deuxième colonne.
+   La corbeille se cale à l'autre bout de la même rangée.
+
+   ⚠ LA VIGNETTE EST LA COMMANDE. Sans photo elle ouvre directement le
+     sélecteur ; avec, elle propose de remplacer ou de retirer. Le libellé à
+     côté dit lequel des deux cas on est — c'est lui qui évite d'avoir à
+     deviner. */
+#p-create-manual .man-fil .step-num-dess{ grid-row:1; grid-column:1; }
+#p-create-manual .man-fil textarea{ grid-row:1; grid-column:2; }
+#p-create-manual .man-fil .step-bas{
+  grid-row:2; grid-column:2;
+  display:flex; align-items:center; gap:10px; margin-top:4px;
+}
+#p-create-manual .man-fil .step-img{
+  display:flex; align-items:center; gap:10px; flex:1; min-width:0;
+}
+/* ⚠ CARREE, COMME LA PHOTO QU'ELLE MONTRE. La vignette donne le cadrage exact
+   qu'aura l'image dans la fiche : ce qu'on voit ici est ce qui sera lu. */
+#p-create-manual .man-fil .step-img-vignette{
+  flex:0 0 42px; width:42px; height:42px; border-radius:12px; aspect-ratio:1/1;
+  display:grid; place-items:center; position:relative; overflow:hidden;
+  background:rgba(118,118,128,0.12); color:var(--label-3);
+  border:0.5px dashed rgba(28,28,38,0.18);
+}
+/* Une fois remplie, la vignette n'a plus besoin de son contour pointillé :
+   l'image dit d'elle-même qu'il y a quelque chose. */
+#p-create-manual .man-fil .step-img-vignette.pleine{ border-style:solid; border-color:rgba(28,28,38,0.10); }
+#p-create-manual .man-fil .step-img-vignette img{ width:100%; height:100%; object-fit:cover; }
+#p-create-manual .man-fil .step-img-vignette svg{ width:19px; height:19px; }
+/* ⚠ IL ETAIT MASQUE PAR `.man-fil .img-toucher{ display:none }`. Dans le fil,
+   la vignette seule suffisait — elle etait large et son role se devinait. Dans
+   une carte, elle ne fait que 42 px : sans libelle, rien ne dit qu'on peut
+   ajouter une photo, et le carre pointille passe pour une decoration.
+
+   `display:block` est necessaire ici : la regle du fil est declaree avec deux
+   classes, la mienne avec un identifiant, mais toutes deux dans le meme
+   fichier — mieux vaut l'ecrire que compter sur l'ordre. */
+#p-create-manual .man-fil .img-toucher{
+  display:block;
+  border:none; background:none; padding:0; text-align:left;
+  font-family:inherit; font-size:12.5px; font-weight:500;
+  color:var(--label-2); letter-spacing:-0.02em;
+}
+#p-create-manual .man-fil .step-bas .del{
+  flex-shrink:0; display:grid; place-items:center;
+  width:32px; height:32px; border-radius:100px; color:#C8342B;
+}
+#p-create-manual .man-fil .step-bas .del svg{ width:17px; height:17px; }
+#p-create-manual .man-fil .step-bas .del:active{ background:rgba(200,52,43,0.10); }
+/* La croix de retrait, posée dans le coin de la vignette pleine. */
+#p-create-manual .man-fil .img-oter{
+  position:absolute; top:2px; right:2px; width:18px; height:18px;
+  border:none; border-radius:100px; padding:0; line-height:1;
+  background:rgba(17,17,22,0.72); color:#fff; font-size:12px;
 }

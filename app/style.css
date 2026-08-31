@@ -10904,12 +10904,19 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ⚠ LE REFLET DU HAUT RESTE, et l'ancien contour a disparu. Sur un fond
      transparent, un liseré sombre en faisait le tour et cerclait la pastille ;
      le reflet seul suffit a la poser sur la carte. */
+/* ⚠ SEULE LA PLAQUE GRANDIT, PAS SON DESSIN. Elle passe de 64 a 72 px et son
+   rayon de 19 a 21 ; l'icone reste a 32.
+
+   C'est volontaire : un dessin de 32 dans une pastille de 72 a vingt pixels de
+   marge de chaque cote, ce qui lui donne de l'air. Le faire grandir avec elle
+   rendrait le trait plus epais a l'ecran et la pastille aussi serree qu'avant
+   — on aurait une plus grosse plaque, pas une plaque plus aeree. */
 .cl-pl{
-  flex:0 0 56px; width:56px; height:56px; border-radius:17px;
+  flex:0 0 72px; width:72px; height:72px; border-radius:21px;
   display:grid; place-items:center;
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
-.cl-pl svg{ width:30px; height:30px; display:block; }
+.cl-pl svg{ width:32px; height:32px; display:block; }
 .cl-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
 .cl-nm{
   font-size:17.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
@@ -10925,10 +10932,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 /* ⚠ `space-between` : le badge d'état à gauche, le compte à droite. Ils sont
    sur la MÊME ligne pour que la carte garde trois niveaux de lecture — le nom,
-   ce qu'il contient, son état — et pas quatre. */
+   ce qu'il contient, son état — et pas quatre.
+
+   ⚠ 18 PX D'ÉCART, CONTRE 9. C'est ICI que la carte respire, pas dans son
+     remplissage extérieur : entre le nom et l'information du bas. Doubler le
+     padding aurait éloigné le contenu des bords sans rien changer entre les
+     deux lignes — la carte aurait grandi en restant aussi serrée. */
 .cl-bas{
   display:flex; align-items:center; justify-content:space-between;
-  gap:8px; margin-top:9px;
+  gap:8px; margin-top:18px;
 }
 /* La tête porte le nom et les trois points, alignés sur leur première ligne :
    un bouton centré verticalement sur un titre qui passe sur deux lignes
@@ -11326,3 +11338,21 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 .tb-v-opt svg{ width:19px; height:19px; flex-shrink:0; }
 .tb-v-opt:active{ background:rgba(60,60,67,0.07); }
 .tb-v-opt--sortie{ color:#C8342B; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BOUTON FLOTTANT · MASQUÉ, PAS SUPPRIMÉ
+
+   La création se fait maintenant par le « + » de la barre du haut. Ce
+   bouton-ci — la goutte qui monte de la barre du bas — fait donc double
+   emploi.
+
+   ⚠ IL EST MASQUÉ, ET SON CODE RESTE INTACT. Tout son mécanisme est encore là :
+     le socle, la bulle, le cou qui s'étire, les classes `plus-vu` et
+     `plus-part` posées par le script. Le supprimer demanderait de démêler ces
+     quatre pièces et le JS qui les orchestre — pour un geste qu'on peut vouloir
+     rendre demain.
+
+     Pour le rendre : retirer ce bloc, rien d'autre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.plus-cadre{ display:none !important; }

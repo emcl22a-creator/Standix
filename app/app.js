@@ -14440,6 +14440,58 @@ function ajusterChampsVisibles() {
   })
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PHOTO D'UNE ÉTAPE EST TOUJOURS CARRÉE
+
+   Elle est recadrée au centre, en 1:1, AU MOMENT OÙ ON LA CHOISIT — pas à
+   l'affichage.
+
+   ⚠ RECADRER À LA SOURCE PLUTÔT QU'À L'ÉCRAN. Un `object-fit:cover` en CSS
+     donne le même rendu dans l'app, mais l'image stockée garde ses
+     proportions : la fiche PDF, l'espace équipe et tout ce qui la relit
+     ailleurs la reçoivent de travers. En recadrant avant l'envoi, le 1:1 est
+     vrai partout et pour toujours.
+
+   ⚠ ON RECADRE, ON NE DÉFORME PAS. Le carré est pris au centre de l'image, sur
+     son plus petit côté. Étirer une photo pour la rendre carrée donnerait des
+     visages écrasés et des plans de travail penchés.
+
+   ⚠ 1400 PX AU MAXIMUM. Une photo de téléphone fait souvent 4000 px de côté —
+     inutile pour une vignette lue sur un écran de six pouces, et lourd à
+     envoyer depuis une cuisine en 4G.
+
+   ⚠ SI QUOI QUE CE SOIT ÉCHOUE, ON GARDE LE FICHIER D'ORIGINE. Mieux vaut une
+     photo non carrée qu'une étape sans photo : le recadrage est un confort,
+     pas une condition.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function recadrerCarre(fichier) {
+  try {
+    const img = await new Promise((ok, non) => {
+      const i = new Image()
+      i.onload = () => ok(i)
+      i.onerror = non
+      i.src = URL.createObjectURL(fichier)
+    })
+    const cote = Math.min(img.naturalWidth, img.naturalHeight)
+    if (!cote) return fichier
+    const taille = Math.min(cote, 1400)
+    const c = document.createElement('canvas')
+    c.width = c.height = taille
+    c.getContext('2d').drawImage(
+      img,
+      (img.naturalWidth - cote) / 2, (img.naturalHeight - cote) / 2, cote, cote,
+      0, 0, taille, taille)
+    URL.revokeObjectURL(img.src)
+    const blob = await new Promise(ok => c.toBlob(ok, 'image/jpeg', 0.88))
+    if (!blob) return fichier
+    /* On garde un nom de fichier : l'envoi s'en sert pour l'extension. */
+    return new File([blob], (fichier.name || 'photo').replace(/\.\w+$/, '') + '.jpg',
+                    { type: 'image/jpeg' })
+  } catch {
+    return fichier
+  }
+}
+
 function renderManualSteps() {
 /* Retirer la photo d'une étape. Il n'y avait aucun moyen de le faire : une
    photo posée par erreur restait là pour toujours. */
@@ -14475,10 +14527,8 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
           ? `<img data-fichier="${escapeHtml(cheminFichier(step.image_url))}" alt="">`
           : (step.imageFichier ? `<img src="${URL.createObjectURL(step.imageFichier)}" alt="">` : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5-6 6-2-2-5 5"/></svg>`)}${step.image_url || step.imageFichier
           ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
-          : ''}${step.image_url || step.imageFichier
-          ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
           : ''}</div>
-        <button type="button" class="img-toucher"button type="button" class="img-toucher" aria-label="Photo de l'étape">
+        <button type="button" class="img-toucher" aria-label="Photo de l'étape">
           <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
         </button>
         <input type="file" accept="image/*" class="fichier">
@@ -14527,9 +14577,13 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
       const f = e.target.files[0]
       if (!f) return
       if (f.size > 6 * 1024 * 1024) { toast('Photo trop lourde : 6 Mo maximum.'); return }
-      manualSteps[i].imageFichier = f
-      manualSteps[i].image_url = null
-      renderManualSteps()
+      /* Le recadrage est asynchrone : on affiche l'etape des qu'il est fait,
+         pas avant, sinon la vignette montrerait brievement l'image d'origine. */
+      recadrerCarre(f).then(carre => {
+        manualSteps[i].imageFichier = carre
+        manualSteps[i].image_url = null
+        renderManualSteps()
+      })
     })
     div.querySelector('.del').addEventListener('click', () => {
       demanderSuppressionEtape(i + 1, manualSteps[i].texte, () => { manualSteps.splice(i, 1); renderManualSteps() })

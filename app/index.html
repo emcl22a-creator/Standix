@@ -1108,19 +1108,49 @@
       </button>
     </div>
     <div class="subhead" id="category-subhead">—</div>
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="category-search-input" placeholder="Rechercher une procédure..." autocomplete="off">
+    <!-- ═══ LA MEME GRAMMAIRE QUE LA PAGE PROCEDURES ═══
+
+         Recherche en capsule, puis une ligne qui dit ce qu'on regarde et
+         permet de le trier. Les deux pages se parcourent pareil.
+
+         ⚠ L'ANCIEN MENU `dd-category-sort` A ETE RETIRE. Il occupait la place
+           de cette ligne et duplicait le tri qu'elle porte maintenant. Son
+           branchement dans app.js suit. -->
+    <div class="proc-rech-rang">
+      <div class="proc-rech">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <circle cx="11" cy="11" r="7.5"></circle><path d="M16.5 16.5 21 21"></path>
+        </svg>
+        <input type="search" id="category-search-input" placeholder="Rechercher un sous-dossier"
+               autocomplete="off" autocorrect="off" spellcheck="false">
+      </div>
     </div>
-    <div class="dd-filter" id="dd-category-sort">
-      <button type="button" class="dd-trigger" id="dd-category-sort-trigger">
-        <span id="dd-category-sort-label">Trier : A → Z</span>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+
+    <div class="proc-rang">
+      <span class="proc-rang-txt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linejoin="round" aria-hidden="true">
+          <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"></path>
+          <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"></path>
+        </svg>
+        <span id="cat-nb-elements">—</span>
+      </span>
+      <button type="button" class="proc-filtre" id="cat-filtre"
+              aria-label="Trier" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.9" stroke-linecap="round">
+          <path d="M3 7.5h11M18.5 7.5H21M3 16.5h2.5M10 16.5h11"></path>
+          <circle cx="16" cy="7.5" r="2.3"></circle>
+          <circle cx="7.7" cy="16.5" r="2.3"></circle>
+        </svg>
       </button>
-      <div class="dd-menu" id="dd-category-sort-menu">
-        <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
-        <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
-        <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+      <div class="tb-volet tb-volet--tri glassDiv" id="cat-tri-volet" role="menu" hidden>
+        <button type="button" class="tb-v-opt tb-v-tri on" data-tri="az">
+          <span class="tb-v-coche">✓</span>Nom A → Z</button>
+        <button type="button" class="tb-v-opt tb-v-tri" data-tri="new">
+          <span class="tb-v-coche">✓</span>Plus récent d’abord</button>
+        <button type="button" class="tb-v-opt tb-v-tri" data-tri="old">
+          <span class="tb-v-coche">✓</span>Plus ancien d’abord</button>
       </div>
     </div>
     <div id="category-procedures-list"></div>

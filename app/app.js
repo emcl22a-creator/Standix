@@ -8339,11 +8339,14 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
     g.classList.remove('change')
     void g.offsetWidth
     g.classList.add('change')
-    /* ⚠ LE MEME VOILE QUE LE CHANGEMENT DE PAGE, et pas une animation a part.
-       Passer d'un segment a l'autre remplace tout ce qu'on regarde : c'est le
-       meme evenement qu'une navigation, il doit donc se voir pareil. Emprunter
-       `jouerVoile` garantit que les deux ne pourront jamais diverger. */
-    jouerVoile()
+    /* ⚠ PAS DE `jouerVoile` ICI, ET C'EST VOULU. Le voile floute TOUT l'ecran —
+       le titre, la recherche, le segment lui-meme. Or changer de segment ne
+       change que la LISTE : flouter le bouton qu'on vient de toucher fait
+       douter d'avoir appuye au bon endroit.
+
+       Le flou est donc porte par `listeChange`, pose sur la grille seule. Sa
+       valeur est la meme que celle du voile, pour que les deux gestes se
+       ressemblent sans se confondre. */
 
     /* On coupe l'apparition AVANT de redessiner, et on la rend apres : les
        cartes de ce rendu-ci arrivent posees, celles du prochain defilement

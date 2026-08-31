@@ -578,8 +578,14 @@
      restait trouble assez longtemps pour qu'on essaie de le lire pendant qu'il
      l'etait — et l'oeil force la mise au point sur quelque chose qui bouge.
      Court et leger, le flou donne la profondeur sans se faire remarquer. */
+  /* ⚠ C'EST CE FLOU-CI QUI PORTE LE CHANGEMENT DE PAGE, depuis que celui du
+     voile a été retiré. Il s'applique à `.screen`, donc au seul contenu : les
+     deux barres vivent en dehors et restent nettes, sans qu'aucun z-index
+     n'ait à être réglé.
+
+     2 px : un cran de moins que les 2,5 précédents. */
   @keyframes ecranEntre{
-    0%  { opacity:0; transform:translateY(12px); filter:blur(2.5px); }
+    0%  { opacity:0; transform:translateY(12px); filter:blur(2px); }
     35% { opacity:1; filter:blur(0px); }
     100%{ opacity:1; transform:none; filter:blur(0px); }
   }
@@ -7358,76 +7364,39 @@ body.chargement #bar{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE VOILE D'ARRIVÉE — UN FLOU, PLUS UN NOIR
+   LE VOILE D'ARRIVÉE — LE FLOU EN A ÉTÉ RETIRÉ
 
-   Il assombrissait l'écran à 42 % de noir pendant qu'une page arrivait. Le
-   geste marchait, mais il était brutal : sur un fond clair, un noir qui monte
-   se lit comme une coupure de courant, pas comme une transition.
+   Il floutait son fond par `backdrop-filter`, et il floutait LA BARRE DU HAUT
+   avec, ce qu'on ne voulait pas.
 
-   À la place, ce qu'il y a dessous se BROUILLE brièvement, avec un souffle de
-   blanc pour l'éclaircir au lieu de l'éteindre. On garde le dessus et le
-   dessous que le voile donnait aux deux surfaces, sans le noir.
+   ⚠ LA RAISON N'EST PAS UNE HISTOIRE DE Z-INDEX MAL RÉGLÉ, mais de CONTEXTE
+     D'EMPILEMENT. `#gestion-app` porte `position:relative` et `z-index:1` : il
+     ouvre donc son propre contexte, et le `z-index:15` de la barre du haut ne
+     vaut QUE DANS CE CONTEXTE. Vue de la racine, la barre reste à l'étage 1 —
+     sous le voile, qui est à 9. La barre du bas, elle, est enfant direct du
+     `body` à l'étage 60 : elle passait déjà au-dessus.
 
-   ⚠ LE FLOU PASSE PAR UNE VARIABLE TYPÉE, ET IL LE FAUT.
+     Monter le voile ou descendre `#gestion-app` aurait déplacé le problème
+     ailleurs : tout ce qui vit dans ce conteneur aurait suivi.
 
-     Écrire `backdrop-filter:blur(0px)` puis `blur(9px)` dans des images-clés
-     ne produit RIEN : mesuré au navigateur en pleine animation, le filtre
-     calculé restait à `blur(0px)`. Les navigateurs n'interpolent pas une
-     fonction de filtre déclarée en `@keyframes` — ils sautent d'une valeur à
-     l'autre, et comme les deux bouts valent zéro, on ne voit jamais le flou.
+   La solution est de ne plus flouter par en dessous. Le flou du changement de
+   page est désormais porté par `ecranEntre`, posé sur `.screen` — qui ne
+   contient NI l'une NI l'autre des deux barres. Aucun z-index n'entre en jeu.
 
-     `@property` enregistre `--voile-flou` comme une LONGUEUR. Le navigateur
-     sait alors interpoler un nombre, et le filtre suit.
-
-   ⚠ ET `opacity` NE MARCHERAIT PAS NON PLUS. Faire varier l'opacité d'un
-     élément qui floute son fond ne réduit pas le flou : il reste entier
-     jusqu'à ce que l'élément disparaisse, et l'on voit un saut net.
-
-   Il passe SOUS les deux barres — elles ne changent pas d'écran, elles
-   encadrent celui qu'on regarde, et les voir clignoter à chaque page serait
-   pénible.
+   Le voile garde son souffle de blanc : c'est lui qui donne le dessus et le
+   dessous aux deux surfaces pendant qu'elles se remplacent.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* La variable enregistrée. Sans ce bloc, elle serait une simple chaîne de
-   caractères et le navigateur passerait de « 0px » à « 9px » d'un coup. */
-@property --voile-flou{
-  syntax:'<length>'; initial-value:0px; inherits:false;
-}
 .voile-arrivee{
-  position:fixed; inset:0;
-  /* z-index 9 : SOUS les deux barres. La barre du bas est à 10, celle du haut
-     à 15 — je l'avais posé à 14, ce qui assombrissait la barre du bas à chaque
-     page. Or elle ne change pas d'écran : elle encadre celui qu'on regarde, et
-     la voir clignoter cent fois par service serait pénible. */
-  z-index:9;
+  position:fixed; inset:0; z-index:9;
   background:transparent; pointer-events:none;
-  --voile-flou:0px;
-  -webkit-backdrop-filter:blur(var(--voile-flou));
-  backdrop-filter:blur(var(--voile-flou));
 }
 .voile-arrivee.joue{
   animation:voileArrivee 0.30s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
-/* ⚠ 4 PX ET NON 10, 30 % ET NON 100 % DE LA DUREE.
-
-     A 10 px, le flou ne se lisait plus comme une transition mais comme une
-     panne de mise au point : on voyait l'ecran devenir illisible, ce qui
-     attire l'attention sur l'effet au lieu de la porter sur la page qui
-     arrive. Un fondu reussi ne se remarque pas.
-
-     Le sommet est aussi ramene a 30 % de la duree : le flou monte vite et
-     redescend longuement, au lieu de rester au maximum pendant qu'on attend. */
-/* ⚠ 2,5 PX. Descendu de 10 a 4 puis a 2,5 : a chaque essai le flou se
-     remarquait encore. A cette valeur il donne la profondeur sans qu'on
-     puisse dire ce qui s'est passe — c'est le but.
-
-   ⚠ IL NE TOUCHE NI LA BARRE DU HAUT NI CELLE DU BAS, et c'est une affaire de
-     superposition, pas de filtre. Le voile est a l'etage 9 ; la barre du bas
-     est a 10 et celle du haut a 15. Elles passent donc AU-DESSUS et restent
-     nettes. Les monter ou descendre casserait cette regle sans prevenir. */
 @keyframes voileArrivee{
-  0%   { --voile-flou:0px;   background:rgba(255,255,255,0); }
-  30%  { --voile-flou:2.5px; background:rgba(255,255,255,0.10); }
-  100% { --voile-flou:0px;   background:rgba(255,255,255,0); }
+  0%   { background:rgba(255,255,255,0); }
+  30%  { background:rgba(255,255,255,0.10); }
+  100% { background:rgba(255,255,255,0); }
 }
 @media (prefers-reduced-motion: reduce){
   .voile-arrivee.joue{ animation:none; }
@@ -11274,20 +11243,25 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ LE MEME VOCABULAIRE QUE L'ENTREE D'ECRAN : meme remontee de 14 px, meme
    flou, meme courbe. Une carte qui arrive et un ecran qui arrive doivent
    bouger pareil, sinon l'app parait faite de deux morceaux. */
+/* ⚠ PLUS DE REMONTEE ICI, ET C'EST UNE CORRECTION DE DEFAUT.
+
+   La carte montait de dix pixels en apparaissant. Le `transform` entrait en
+   conflit avec ceux que d'autres etats posent sur la meme carte — l'appui, le
+   reordonnancement, le changement de segment : deux regles ecrivant la meme
+   propriete, la derniere gagne et le mouvement se coupe net.
+
+   Il ne reste que l'opacite et le flou. Aucune des deux n'est portee ailleurs,
+   donc rien ne peut plus les contrarier — et le geste garde sa profondeur. */
 .cl-apparait{
   opacity:0;
-  transform:translateY(10px);
-  /* ⚠ LE MEME FLOU QUE LE CHANGEMENT DE PAGE — 2,5 px. Les trois mouvements de
-     l'app sortent de la meme valeur : une carte qui arrive, un ecran qui
-     arrive et une page qui change doivent se ressembler. */
-  filter:blur(2.5px);
+  /* Le meme flou que le changement de page : 2 px. Une carte qui arrive et une
+     page qui change doivent se ressembler. */
+  filter:blur(2px);
   transition:opacity 0.34s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
-             transform 0.44s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms),
              filter 0.20s cubic-bezier(0.32,0.72,0,1) var(--retard, 0ms);
 }
 .cl-apparait.vu{
   opacity:1;
-  transform:none;
   filter:blur(0px);
 }
 
@@ -11296,7 +11270,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    resteraient invisibles pour toujours. Ici, tout mouvement coupe et tout
    s'affiche : une liste sans animation vaut mieux qu'une liste vide. */
 @media (prefers-reduced-motion: reduce){
-  .cl-apparait{ opacity:1; transform:none; filter:none; transition:none; }
+  .cl-apparait{ opacity:1; filter:none; transition:none; }
 }
 
 
@@ -11587,16 +11561,16 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    REVELE une partie de celle qu'on regardait. Une remontee raconterait une
    arrivee ; le flou seul dit qu'on refait le point sur le meme sujet.
 
-   ⚠ LA CLASSE COUPE AUSSI LA REMONTEE DES CARTES. Sans cette regle, la liste
-     se floute pendant que chaque carte remonte de dix pixels par-dessus : deux
-     recits contraires dans le meme geste. */
+   ⚠ LA REGLE QUI COUPAIT LA REMONTEE A ETE RETIREE : les cartes n'en ont plus.
+     La garder aurait pose un `transform:none` sur des elements qui n'en
+     portent aucun — sans effet, mais laissant croire qu'un mouvement existe
+     encore ici. */
 #cat-grid.change{
   animation:listeChange 0.26s cubic-bezier(0.32,0.72,0,1);
 }
-#cat-grid.change .cl-apparait{ transform:none; }
 @keyframes listeChange{
-  0%   { opacity:1;   --voile-flou:0px; filter:blur(0px); }
-  40%  { opacity:0.3; filter:blur(2.5px); }
+  0%   { opacity:1; filter:blur(0px); }
+  40%  { opacity:0.3; filter:blur(2px); }
   100% { opacity:1;   filter:blur(0px); }
 }
 @media (prefers-reduced-motion: reduce){

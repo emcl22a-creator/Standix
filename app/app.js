@@ -4025,6 +4025,63 @@ function rejouerDeplacements(conteneur, avant, duree = 340) {
   }
 }
 
+/* ═══ REORGANISER UNE LISTE SANS LA FAIRE DISPARAITRE ═══
+
+   Le tri et le changement de segment floutaient la liste, la redessinaient
+   derriere ce voile, puis la revelaient. Le flou cachait le remplacement — mais
+   il cachait aussi le DEPLACEMENT, qui est justement ce qu'on veut voir : des
+   cartes qui glissent a leur nouvelle place.
+
+   ⚠ ON MESURE AVANT, ON MESURE APRES, ON REJOUE L'ECART. Le navigateur ne sait
+     pas animer un reordonnancement qu'il vient de calculer ; on lui remet
+     chaque carte a son ancienne place par une transformation, et on la laisse
+     revenir a zero.
+
+   ⚠ TROIS SORTS DIFFERENTS selon ce qui arrive a la carte :
+
+       · elle reste et bouge   -> elle glisse ;
+       · elle arrive           -> elle monte en apparaissant ;
+       · elle part             -> rien, le redessin l'a deja retiree.
+
+     Sans le deuxieme cas, une carte qui entre apparaitrait d'un coup au milieu
+     de voisines qui glissent — le contraste se voit plus que l'absence
+     d'animation. */
+function reorganiserListe(conteneur, redessiner, duree = 380) {
+  if (!conteneur) { redessiner(); return }
+
+  if (MOINS_ANIM()) { redessiner(); return }
+
+  const avant = mesurerPlaces(conteneur)
+  redessiner()
+
+  /* ⚠ DANS UN `requestAnimationFrame`. `redessiner` ecrit dans le DOM, mais le
+     navigateur n'a pas encore recalcule les positions quand il rend la main :
+     mesurer tout de suite donnerait les anciennes. */
+  requestAnimationFrame(() => {
+    for (const el of conteneur.children) {
+      const cle = el.dataset.key || el.dataset.cle
+      const vieux = cle && avant.get(cle)
+
+      if (!vieux) {
+        /* Une nouvelle carte : elle monte de huit pixels en apparaissant. */
+        el.animate(
+          [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+          { duration: 260, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' })
+        continue
+      }
+
+      const neuf = el.getBoundingClientRect()
+      const dx = vieux.left - neuf.left
+      const dy = vieux.top - neuf.top
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue
+
+      el.animate(
+        [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+        { duration: duree, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' })
+    }
+  })
+}
+
 /* La carte s'efface sur place. Elle n'est PLUS repliee : c'est le redessin qui
    la retire, et `rejouerDeplacements` fait remonter les autres. */
 function replierCarte(el) {
@@ -9720,17 +9777,11 @@ document.addEventListener('click', (e) => {
     setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
     document.getElementById('proc-filtre')?.setAttribute('aria-expanded', 'false')
 
-    if (MOINS_ANIM()) { renderCategoryGrid(); return }
-
-    morceauxDeLaListe().forEach(flouSortie)
-    /* Comme pour le segment : on coupe l'apparition au defilement, deux
-       animations sur la meme carte se contrarieraient. */
+    /* Le meme geste que le segment : les cartes glissent a leur nouvelle
+       place, sans voile. */
     sansApparition = true
-    setTimeout(() => {
-      renderCategoryGrid()
-      sansApparition = false
-      morceauxDeLaListe().forEach(flouEntree)
-    }, 130)
+    reorganiserListe(document.getElementById('cat-grid'), renderCategoryGrid)
+    sansApparition = false
     return
   }
 
@@ -9881,26 +9932,17 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   poserPastilleSegment(b)
   filtreEtatDossiers = b.dataset.etat
 
-  if (MOINS_ANIM()) { renderCategoryGrid(); return }
+  /* ⚠ PLUS DE FLOU : LES CARTES SE REPLACENT.
 
-  morceauxDeLaListe().forEach(flouSortie)
+     La liste se floutait, se redessinait derriere ce voile, puis reapparaissait.
+     Le flou cachait le remplacement — et avec lui le deplacement, qui est
+     justement ce qu'on veut voir.
 
-  /* ⚠ ON COUPE L'APPARITION AU DEFILEMENT le temps du changement : les cartes
-     de ce rendu-ci portent deja leur propre entree, deux animations sur le
-     meme element se contrarieraient. */
+     ⚠ ON COUPE L'APPARITION AU DEFILEMENT. Les cartes de ce rendu portent leur
+       propre entree ; deux animations sur le meme element se contrarieraient. */
   sansApparition = true
-
-  /* 130 ms : la duree exacte de la sortie. Redessiner plus tot couperait le
-     mouvement, plus tard laisserait un blanc.
-
-     ⚠ LE CONTENU EST REMPLACE PENDANT QUE LA GRILLE EST INVISIBLE — l'animation
-       de sortie a `fill:forwards`, elle la tient a l'opacite zero. On ne voit
-       donc jamais la liste se vider puis se remplir. */
-  setTimeout(() => {
-    renderCategoryGrid()
-    sansApparition = false
-    morceauxDeLaListe().forEach(flouEntree)
-  }, 130)
+  reorganiserListe(document.getElementById('cat-grid'), renderCategoryGrid)
+  sansApparition = false
 })
 
 /* ⚠ `load` NE SUFFIT PAS, ET C'EST POUR CELA QUE LA PASTILLE MANQUAIT AU
@@ -9965,20 +10007,10 @@ document.addEventListener('click', (e) => {
     setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
     document.getElementById('cat-filtre')?.setAttribute('aria-expanded', 'false')
 
-    if (MOINS_ANIM()) { renderCategoryProceduresList(); return }
-
-    const morceaux = [
-      document.querySelector('#p-category .proc-rang'),
-      document.getElementById('category-procedures-list'),
-    ].filter(Boolean)
-
-    morceaux.forEach(flouSortie)
     sansApparition = true
-    setTimeout(() => {
-      renderCategoryProceduresList()
-      sansApparition = false
-      morceaux.forEach(flouEntree)
-    }, 130)
+    reorganiserListe(document.getElementById('category-procedures-list'),
+                     renderCategoryProceduresList)
+    sansApparition = false
     return
   }
 

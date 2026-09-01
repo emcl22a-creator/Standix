@@ -16290,14 +16290,20 @@ function dvMajGeste() {
      et le seul moyen de le défaire était de tout refaire. Il est retiré.
 
      Le bouton se désactive à la place : il n'y a plus rien à couper. */
+  /* ⚠ LE BOUTON DISPARAIT AU LIEU DE S'AFFICHER DESACTIVE.
+
+     Il annonçait « Decoupage termine » en gris, inerte. Un bouton qu'on ne
+     peut pas toucher occupe la place d'une action et n'en propose aucune : on
+     le vise, il ne repond pas, on doute.
+
+     La phrase d'aide reste — c'est elle qui dit ou l'on en est et ce qu'il
+     reste a faire. */
   if (toutDecoupe) {
-    b.classList.remove('coupe', 'refaire')
-    b.disabled = true
-    ic.innerHTML = '<path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>'
-    lib.textContent = 'D\u00e9coupage termin\u00e9'
+    b.hidden = true
     aide.textContent = 'Toute la vid\u00e9o est d\u00e9coup\u00e9e. Corrigez les textes ci-dessous.'
     return
   }
+  b.hidden = false
   b.disabled = false
   b.classList.remove('refaire')
 

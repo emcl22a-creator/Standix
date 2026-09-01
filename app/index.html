@@ -2748,15 +2748,16 @@
   </div>
 
   <div class="screen" inert id="p-settings">
-    <div class="detail-header">
-            <h1 class="pagehead" style="margin:0;">Réglages</h1>
+    <div class="page-tete">
+      <h1>Réglages</h1>
+      <p>Votre compte, votre équipe<br>et le fonctionnement de l’app.</p>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
       <div class="tete">
         <span class="pic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#FA8A08" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3.6 21.4 20H2.6Z"></path><line x1="12" y1="9.6" x2="12" y2="14"></line><circle cx="12" cy="17" r="0.6" fill="#FA8A08"></circle>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.6 21.4 20H2.6Z"></path><line x1="12" y1="9.6" x2="12" y2="14"></line><circle cx="12" cy="17" r="0.6" fill="currentColor"></circle>
           </svg>
         </span>
         <span class="tx"><b>Un compte est partagé</b><i id="alerte-detail">—</i></span>
@@ -2806,48 +2807,48 @@
     </div>
 
     <div class="reg-titre">Votre entreprise</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="bleu">
       <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
            d'ouvrir la page. Elle sert quand on veut savoir quand ça repart. -->
       <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Vos analyses vidéo</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Vos analyses vidéo</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="openMembres()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="url(#logoOrIc)" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
         <!-- Le filet du groupe : le même que partout ailleurs. -->
         <div class="reg-filet"></div>
         <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
-          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="url(#logoOrIc)" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
           <span class="reg-nm">Les postes</span>
           <span class="reg-fl">›</span>
         </button>
       <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-code')">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="url(#logoOrIc)" stroke-width="1.7"></rect><rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></rect><rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></rect><path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="url(#logoOrIc)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Code d'invitation</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3.4" y="3.4" width="7" height="7" rx="1.8" stroke="currentColor" stroke-width="1.7"></rect><rect x="13.6" y="3.4" width="7" height="7" rx="1.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></rect><rect x="3.4" y="13.6" width="7" height="7" rx="1.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></rect><path d="M13.6 13.6h3.2v3.2M20.6 20.6h-3.2v-3.2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Code d'invitation</span>
         <span class="reg-val mono" id="reg-code-val">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet" id="reg-filet-etabs" style="display:none;"></div>
     </div>
 
     <div class="reg-titre">Abonnement</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="violet">
       <button type="button" class="reg-ligne" id="ouvrir-abonnement">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
         <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
       </button>
     </div>
 
     <div class="reg-titre">Préférences</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="vert">
       <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
         <span class="reg-ic">
           <svg viewBox="0 0 24 24" fill="none">
-            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="url(#logoOrIc)" stroke-width="1.7"></rect>
-            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></line>
+            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect>
+            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></line>
           </svg>
         </span>
         <span class="reg-nm">Vos appareils</span>
@@ -2855,7 +2856,7 @@
       </button>
       <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="showGestionScreen('p-reg-langue')">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="url(#logoOrIc)" stroke-width="1.7"></circle><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></ellipse><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line></svg></span><span class="reg-nm">Langue</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="currentColor" stroke-width="1.7"></circle><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></ellipse><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line></svg></span><span class="reg-nm">Langue</span>
         <span class="reg-val" id="reg-langue-val">Français</span><span class="fl">›</span>
       </button>
     </div>
@@ -2880,7 +2881,7 @@
     </div>
 
     <div class="reg-titre">Compte</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="ambre">
       <button type="button" class="reg-ligne danger" id="logout-btn">
         <span class="reg-nm">Se déconnecter</span>
       </button>

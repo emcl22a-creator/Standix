@@ -955,15 +955,14 @@
            particulier, et un gerant qui ouvre l'app pour la dixieme fois doit
            encore pouvoir se le rappeler.
 
-           La seconde change chaque jour — voir `CONSEILS_ACCUEIL` dans app.js.
-           Elle apprend a se servir du produit une technique a la fois.
+           La seconde dit ce qu'il RESTE A FAIRE. C'est la seule chose qu'on
+           attend d'un accueil : savoir si l'on a du travail en attente sans
+           avoir a aller le chercher.
 
-           ⚠ ELLES NE SE RESSEMBLENT PAS. La premiere est une promesse, la
-             seconde un conseil : la seconde est donc plus petite, precedee
-             d'une puce, et porte le mot « Astuce ». Deux phrases de meme poids
-             se seraient annulees. -->
+           ⚠ ELLE DISPARAIT QUAND IL N'Y A RIEN. Un « 0 procedure en brouillon »
+             occupe une ligne pour dire qu'il n'y a rien a dire. -->
       <p id="ac-conseil">Collez un QR code là où le geste se fait :<br>on scanne, la procédure s’ouvre.</p>
-      <p id="ac-astuce"><b>Astuce</b><span id="ac-astuce-txt">—</span></p>
+      <p id="ac-reste" hidden></p>
     </div>
 
     <!-- ═══ LA BANNIERE ═══
@@ -1066,7 +1065,8 @@
       <span class="p-seg-lens" id="proc-segm-lens" aria-hidden="true"></span>
       <button type="button" class="p-seg on" data-etat="tout" role="tab">Toutes</button>
       <button type="button" class="p-seg" data-etat="ligne" role="tab">En ligne</button>
-      <button type="button" class="p-seg" data-etat="brouillon" role="tab">Brouillons</button>
+      <button type="button" class="p-seg" data-etat="brouillon" role="tab">Brouillons<span
+        class="p-seg-pt" id="seg-brouillons-pt" hidden></span></button>
     </div>
 
     <!-- ═══ LA LIGNE DE CONTEXTE ═══
@@ -3582,7 +3582,7 @@
       <stop offset="1" stop-color="#EB5201"/>
     </linearGradient>
     <linearGradient id="iaFini" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF"></stop><stop offset="0.55" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#FEC64A"></stop>
+      <stop stop-color="#FFFFFF"></stop><stop offset="0.55" stop-color="#FFFFFF"></stop><stop offset="1" stop-color="#BBD6F8"></stop>
     </linearGradient>
 
     <!-- ═══ LES DESSINS DES TROIS FAÇONS DE CRÉER ═══
@@ -3607,12 +3607,9 @@
       <stop offset="0.5" stop-color="#FFFFFF"></stop>
       <stop offset="1" stop-color="#FEC64A"></stop>
     </linearGradient>
-
-    <linearGradient id="iaDessin" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#FEC64A"></stop>
-      <stop offset="0.55" stop-color="#FDA81E"></stop>
-      <stop offset="1" stop-color="#EB5201"></stop>
-    </linearGradient>
+    <!-- ⚠ `iaDessin` A ETE RETIRE : plus aucun trace ne le citait. Un degrade
+         orphelin se recopie a la prochaine reprise du fichier, et l'on finit
+         par croire qu'il sert. -->
   </defs>
 </svg>
 

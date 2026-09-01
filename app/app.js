@@ -6098,10 +6098,21 @@ window.showGestionScreen = function(id, btn) {
      ⚠ LA CLASSE EST NETTOYEE SUR TOUS LES ECRANS AVANT D'ETRE POSEE. Laissee
        en place, elle rejouerait le glissement la prochaine fois qu'on affiche
        cet ecran par un autre chemin. */
-  const versReglage = id.startsWith('p-reg-')
-  const depuisReglage = document.querySelector('.screen.active')?.id?.startsWith('p-reg-')
-  const glisse = versReglage ? 'vient-droite'
-               : (depuisReglage && id === 'p-settings') ? 'vient-gauche'
+  /* ⚠ LE CRITERE EST L'ECRAN D'OU L'ON PART, PAS LE NOM DE LA CIBLE.
+
+     Je testais `id.startsWith('p-reg-')`. Or seules trois des sept destinations
+     des Reglages portent ce prefixe : les quatre autres — les analyses vidéo,
+     l'équipe, les postes, les appareils — passent par des fonctions et
+     s'appellent `p-quota`, `p-equipe`, `p-postes`, `p-reg-appareils`. Elles
+     n'avaient donc aucune animation, alors que trois voisines en avaient une.
+
+     On regarde donc D'OU l'on vient : quitter les Reglages fait glisser la
+     nouvelle page depuis la droite, y revenir ramene celle du dessous depuis
+     la gauche. Le critere vaut pour toute page ouverte de la, y compris celles
+     qu'on ajoutera. */
+  const actuel = document.querySelector('.screen.active')?.id
+  const glisse = actuel === 'p-settings' && id !== 'p-settings' ? 'vient-droite'
+               : id === 'p-settings' && actuel && actuel !== 'p-settings' ? 'vient-gauche'
                : null
 
   document.querySelectorAll('.screen.vient-droite, .screen.vient-gauche')
@@ -13203,7 +13214,21 @@ function majProgressionIA() {
     phrase = t("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }
 
-  sous.innerHTML = `${phrase} <b style="color:#fff;">${t('Vous pouvez quitter cette page')}</b> \u2014 ` +
+  /* ⚠ IL Y AVAIT DEUX `color:#fff`, PAS UN.
+
+     J'ai corrige celui du balisage au tour precedent — mais cette ligne-ci
+     REECRIT le contenu a chaque battement du minuteur, une fois par seconde.
+     Le texte du balisage n'est qu'un etat de depart : il est remplace avant
+     meme qu'on ait le temps de le lire.
+
+     C'est pour cela que « Vous pouvez quitter cette page » restait invisible
+     malgre la correction : je n'avais touche qu'a la version qui ne s'affiche
+     jamais.
+
+   ⚠ CHERCHER LES DEUX. Quand un texte est ecrit a la fois dans le balisage et
+     par le script, corriger le balisage ne se voit pas — et l'on croit que le
+     changement n'a pas ete deploye. */
+  sous.innerHTML = `${phrase} <b style="color:var(--label);">${t('Vous pouvez quitter cette page')}</b> \u2014 ` +
     escapeHtml(t("la proc\u00e9dure appara\u00eetra dans votre liste d\u00e8s qu'elle sera pr\u00eate."))
 }
 
@@ -18655,45 +18680,60 @@ window.ouvrirQuota = async function() {
   }
 
   const { quota, reste } = q
-  const R = 92, C = 2 * Math.PI * R
-  /* L'ambre montre ce qui RESTE : l'anneau maigrit à mesure du mois. Montrer le
-     consommé se lirait à l'envers — un anneau presque plein voudrait dire
-     « il ne reste presque rien ». */
-  const part = quota > 0 ? (reste / quota) * C : 0
+  const utilisees = Math.max(0, quota - reste)
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     CINQ BARRES, PAS UN ANNEAU
+
+     ⚠ ELLES MONTRENT CE QUI EST CONSOMME, pas ce qui reste.
+
+       L'anneau montrait le restant : il maigrissait au fil du mois. C'est
+       l'inverse de ce qu'on lit ailleurs — une jauge se remplit quand on
+       avance. Devant un anneau presque vide, on croit que quelque chose ne
+       marche plus.
+
+     ⚠ CINQ BARRES POUR N'IMPORTE QUEL FORFAIT. Une par tranche de 20 % : a
+       zero analyse la premiere est deja pleine, comme sur la reference. Le
+       nombre de barres ne change pas avec le quota — sinon un forfait a 250
+       en afficherait deux cent cinquante.
+
+     ⚠ LA DERNIERE TRANCHE SE REMPLIT PARTIELLEMENT. Cinq barres tout ou rien
+       donneraient des sauts de vingt pour cent : on passerait de deux barres a
+       trois sans rien avoir fait de particulier.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const N = 5
+  /* ⚠ LA JAUGE NE DESCEND JAMAIS SOUS UN CRAN.
+
+     Mon premier calcul mettait la premiere barre pleine a zero — comme sur la
+     reference — puis la faisait RECULER a 20 % des la premiere analyse. Une
+     jauge qui recule quand on avance est pire que pas de jauge du tout.
+
+     Le plancher d'un cinquieme regle les deux cas d'un coup : a zero comme a
+     dix sur deux cent cinquante, la premiere barre est pleine ; au-dela, la
+     progression reprend la main. */
+  const brut = quota > 0 ? Math.min(1, utilisees / quota) : 0
+  const partFaite = Math.max(brut, 1 / N)
+
+  const barres = [...Array(N)].map((_, i) => {
+    /* Chaque barre couvre une tranche de 1/N. On calcule ce qui, dans cette
+       tranche, est deja consomme. */
+    const debut = i / N, fin = (i + 1) / N
+    const part = Math.max(0, Math.min(1, (partFaite - debut) / (fin - debut)))
+    return `<span class="qb"><i style="width:${(part * 100).toFixed(1)}%"></i></span>`
+  }).join('')
+
   const s = reste > 1 ? 's' : ''
 
   carte.innerHTML = `
-    <div class="quota-anneau">
-      <svg width="220" height="220" viewBox="0 0 220 220">
-        <circle class="piste" cx="110" cy="110" r="${R}" fill="none" stroke-width="17"/>
-        <circle class="part" cx="110" cy="110" r="${R}" fill="none" stroke="#FDA81E"
-          stroke-width="17" stroke-dasharray="${part} ${C - part}" stroke-dashoffset="${C}"/>
-      </svg>
-      <div class="quota-dedans">
-        <div class="gros">${reste}</div>
-        <div class="unite">analyse${s} restante${s}</div>
-        <div class="sous">sur ${quota} ce mois-ci</div>
-      </div>
+    <div class="quota-bloc">
+      <div class="quota-chiffre">${utilisees} <em>/ ${quota}</em></div>
+      <div class="quota-legende">selon votre abonnement</div>
+      <div class="quota-barres">${barres}</div>
+      <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ce mois-ci</div>
     </div>
+
     <div class="quota-illimite">
       <span class="ic">\u221e</span>
-      <!-- ═══ LA PHRASE LA PLUS COURTE POSSIBLE ═══
-
-           Deux versions écartées avant celle-ci.
-
-           La première parlait en interne : « Créer depuis un document ou à la
-           main reste illimité. Seule l'analyse vidéo est comptée. » Personne ne
-           reconnaît de bouton derrière « depuis un document ».
-
-           La seconde nommait les modes exactement — « L'IA découpe un
-           document », « Étapes manuelles » — et faisait quatre lignes sur un
-           iPhone SE. Exact, mais trop long pour une note sous un compteur : on
-           ne lit pas quatre lignes pour comprendre un chiffre.
-
-           Celle-ci tient en une phrase et répond à la seule question qu'on se
-           pose devant un compteur : qu'est-ce qui le fait descendre ? Ce qui
-           reste gratuit se déduit — et de toute façon rien d'autre n'est
-           compté nulle part. -->
       <span>Seules les vid\u00e9os analys\u00e9es par l\u2019IA sont compt\u00e9es.
         <b>Tout le reste est gratuit.</b></span>
     </div>
@@ -18705,11 +18745,12 @@ window.ouvrirQuota = async function() {
       Les analyses non utilis\u00e9es ne se reportent pas.
     </div>`
 
-  /* L'anneau part de zéro et se remplit : deux images d'attente, sans quoi le
-     navigateur pose la valeur finale sans rien animer. */
-  const arc = carte.querySelector('.part')
-  if (arc) requestAnimationFrame(() => requestAnimationFrame(() => {
-    arc.setAttribute('stroke-dashoffset', '0')
+  /* ⚠ LES BARRES PARTENT DE ZERO ET SE REMPLISSENT. Deux images d'attente,
+     sans quoi le navigateur pose la largeur finale sans rien animer. */
+  const pleines = [...carte.querySelectorAll('.qb i')].map(e => e.style.width)
+  carte.querySelectorAll('.qb i').forEach(e => { e.style.width = '0%' })
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    carte.querySelectorAll('.qb i').forEach((e, i) => { e.style.width = pleines[i] })
   }))
 }
 
@@ -21290,7 +21331,6 @@ window.openMembres = async function() {
   filtreEquipe = ''
   const champ = document.getElementById('pm-chercher')
   if (champ) champ.value = ''
-  document.querySelector('.pm-recherche')?.classList.remove('remplie')
 
   const { data, error } = await supabase
     .from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
@@ -21447,7 +21487,6 @@ function peindreEquipe() {
 /* ── La recherche ────────────────────────────────────────── */
 document.getElementById('pm-chercher')?.addEventListener('input', (e) => {
   filtreEquipe = e.target.value
-  document.querySelector('.pm-recherche')?.classList.toggle('remplie', !!filtreEquipe)
   peindreEquipe()
 })
 /* ═══ LE TRI PASSE EN MENU DÉROULANT ═══
@@ -21494,13 +21533,9 @@ document.getElementById('p-membres')?.addEventListener('click', (e) => {
   })
 })
 
-document.getElementById('pm-vider')?.addEventListener('click', () => {
-  filtreEquipe = ''
-  const champ = document.getElementById('pm-chercher')
-  if (champ) { champ.value = ''; champ.focus() }
-  document.querySelector('.pm-recherche')?.classList.remove('remplie')
-  peindreEquipe()
-})
+/* ⚠ `pm-vider` A ETE RETIRE avec la refonte de la barre. Le champ est de type
+   `search` : le navigateur y pose sa propre croix d'effacement, comme sur la
+   recherche des procedures. Deux croix superposees, c'etait une de trop. */
 
 /* ── La promotion ───────────────────────────────────────── */
 /* La ligne n'a plus `role="button"`, ni `tabindex`, ni `data-fiche` : elle

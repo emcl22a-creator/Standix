@@ -8733,29 +8733,41 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
         <span class="proc-fl">\u203a</span>
       </span>
       <span class="cl-bas">
-        ${/* ⚠ UNE PROCEDURE EN COURS D'ANALYSE MONTRE LA ROUE, PAS UN BADGE.
+        ${/* ═══ L'ETAT DE LA PROCEDURE ═══
 
-              Elle apparait dans « Brouillons » des sa creation — elle n'est
-              pas publiee — mais y afficher « Brouillon » laisserait croire
-              qu'elle attend une action alors que l'IA est en train de
-              l'ecrire. `etatProcedureHtml` rend l'anneau qui tourne, le meme
-              signe que partout ailleurs dans l'app.
+             ⚠ ON NE DEMANDE `etatProcedureHtml` QUE POUR CE QU'ELLE SAIT
+               MONTRER : la roue d'analyse et l'alerte de panne.
 
-              ⚠ LA ROUE DISPARAIT SEULE. Quand l'analyse se termine, la liste
-                se redessine et le badge la remplace ; la classe `cl-etat-neuf`
-                lui donne son arrivee. */
-          enAnalyse || enPanne
-            ? `<span class="cl-etat cl-etat-neuf">${etatProcedureHtml(proc)}</span>`
-            : proc.publiee_le
-              ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
-              : `<span class="cl-badge">${
-                  /* ⚠ LA PASTILLE EST DANS LE BADGE, pas dans la carte. Elle
-                     marque l'etat « brouillon pas encore vu » : posee sur le
-                     coin de la carte, elle pouvait se lire comme une marque de
-                     la procedure entiere. Sur le badge, elle qualifie ce que le
-                     badge annonce. */
-                  jamaisVue ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''
-                }<i style="background:#9A9AA4"></i>Brouillon</span>`}
+               Elle teste le brouillon EN PREMIER, avant l'analyse : pour une
+               procedure non publiee dont l'IA travaille encore, elle rend donc
+               son propre badge « Brouillon ». On l'enveloppait alors dans
+               `.cl-etat`, qui est aussi une pilule — d'ou DEUX contours
+               concentriques autour du meme mot. Et la pastille des non-vus,
+               posee uniquement dans l'autre branche, disparaissait.
+
+               On regarde donc ce qu'elle rend avant de decider.
+
+             ⚠ LA PASTILLE EST DANS LE BADGE, pas dans la carte. Elle marque
+               l'etat « brouillon pas encore vu » : posee sur le coin de la
+               carte, elle se lirait comme une marque de la procedure entiere. */
+          (() => {
+            const marque = jamaisVue
+              ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''
+
+            if (proc.publiee_le) {
+              return `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
+            }
+            /* Non publiee : la roue seulement si l'analyse tourne VRAIMENT,
+               c'est-a-dire si `etatProcedureHtml` rend autre chose qu'un
+               badge. */
+            if (enAnalyse || enPanne) {
+              const etat = etatProcedureHtml(proc)
+              if (etat && !etat.includes('cl-badge')) {
+                return `<span class="cl-etat">${etat}</span>`
+              }
+            }
+            return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>Brouillon</span>`
+          })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
     </span>`

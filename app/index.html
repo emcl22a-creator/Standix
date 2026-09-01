@@ -98,7 +98,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=611f1c0e">
+<link rel="stylesheet" href="style.css?v=3c679e81">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -357,8 +357,7 @@
        le double-tap, pas les autres gestes. */
     cursor:pointer;
     touch-action:manipulation;
-    left:50%;
-    /* LE VOL : la zone sûre de l'appareil, plus 12 pt — la barre laisse passer
+        /* LE VOL : la zone sûre de l'appareil, plus 12 pt — la barre laisse passer
        le trait d'accueil sous elle. Le plancher de 23 px est la marge latérale
        mesurée plus haut : là où il n'y a pas de zone sûre, l'écart est le même
        en bas qu'à gauche et à droite. */
@@ -379,10 +378,44 @@
 
        Sur téléphone rien ne change : `100vw - 46` vaut 356 sur un écran de
        402, et reste plus petit. C'est la largeur de l'écran qui décide. */
-    width:min(calc(100vw - 46px), calc(var(--col, 460px) - 40px));
+    /* ⚠ LA BARRE LAISSE LA PLACE AU CERCLE. Elle occupait toute la largeur
+       disponible ; le bouton « voir comme l'equipe » a besoin de sa hauteur
+       plus un ecart. On retire donc `--bar-h + 12` a sa largeur, et on la
+       decale d'autant vers la gauche pour que l'ensemble reste centre. */
+    width:min(calc(100vw - 46px - var(--bar-h) - 12px),
+              calc(var(--col, 460px) - 40px - var(--bar-h) - 12px));
     height:var(--bar-h);
-    margin-left:0;
-    transform:translateX(-50%) scale(1) translateZ(0);
+    margin-/* ⚠ CENTRAGE : moitie d'ecran, puis retrait de la moitie de sa largeur.
+       Cette ligne avait disparu — un de mes scripts l'avait remplacee en
+       croyant la corriger, et la barre partait du bord gauche.
+
+       ⚠ NE CITEZ PAS UNE PROPRIETE SUIVIE DE DEUX-POINTS DANS UN COMMENTAIRE
+         CSS. Ecrite ainsi, elle m'a fait chercher la vraie declaration
+         pendant trois essais : mon analyse la trouvait, le navigateur non. */
+    left:50%;
+    left:50%;
+    /* ⚠ ON GARDE LE CENTRAGE D'ORIGINE, ET LE CERCLE SE PLACE PAR RAPPORT A
+       LA BARRE — pas l'inverse.
+
+       J'ai essaye deux fois de deplacer la barre : une fois en ajoutant un
+       decalage a son `translateX(-50%)`, une fois en remplacant le centrage
+       par un `left` calcule. Les deux ont echoue, la seconde envoyant la barre
+       a 111 px HORS de l'ecran.
+
+       La raison est simple : `-50%` porte sur la largeur de la barre, qui
+       depend elle-meme de la place laissee au cercle. Chaque correction
+       deplacait la reference qu'elle utilisait.
+
+       L'ensemble reste donc centre comme avant. Seule la largeur change, et le
+       cercle se pose contre le bord droit de la barre — une seule mesure, une
+       seule direction. */
+    /* ⚠ LA BARRE RECULE DE LA MOITIE DE CE QUE PREND LE CERCLE.
+
+       Centree seule, elle laissait 61 px a gauche et le cercle debordait a
+       droite. C'est l'ENSEMBLE barre + ecart + cercle qui doit etre centre :
+       la barre se decale donc de la moitie de `--bar-h + 12`, soit 38 px, ce
+       qui ramene sa marge gauche a 23 — la meme qu'a droite. */
+    transform:translateX(calc(-50% - (var(--bar-h) + 12px) / 2)) scale(1) translateZ(0);
     /* origine en bas : la barre grandit vers le haut, son bord
        inferieur reste fige au pixel pres. */
     transform-origin:center bottom;
@@ -3794,7 +3827,7 @@
 
      ⚠ A REGENERER A CHAQUE MODIFICATION de `app.js` ou `style.css`. C'est ce
        que fait `version.py`, livre a cote. -->
-<script type="module" src="app.js?v=bfc4478a"></script>
+<script type="module" src="app.js?v=f4646090"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -3823,6 +3856,36 @@
        stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 </button>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LE BOUTON « VOIR COMME L'EQUIPE »
+
+     Un cercle a droite, detache de la barre, dans la meme piece de verre.
+
+     ⚠ IL EST HORS DE `#bar`, ET IL LE FAUT. La barre calcule la largeur de ses
+       onglets a partir de la sienne : un enfant de plus fausserait le calcul et
+       les libelles se chevaucheraient.
+
+     ⚠ CE N'EST PAS UN QUATRIEME ONGLET. Un onglet mene a une page de l'app ;
+       celui-ci ouvre une VUE — ce que voit l'equipe. La forme le dit : un
+       cercle seul, comme le « + » en haut a droite qui ouvre une action.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<!-- ⚠ LE BANDEAU DE L'APERCU. Il ne s'affiche que pendant l'apercu, par la
+     classe posee sur `body`. Il reste en haut, par-dessus tout, parce qu'on
+     peut naviguer plusieurs ecrans avant de vouloir revenir. -->
+<div id="apercu-bandeau">
+  <span>Vous voyez l’espace Équipe</span>
+  <button type="button" data-fermer-apercu>Revenir</button>
+</div>
+
+<button type="button" class="glassDiv" id="voir-equipe"
+        aria-label="Voir comme l’équipe">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+       stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
+    <circle cx="12" cy="12" r="3.1"/>
+  </svg>
+</button>
 
 <div class="glassDiv" id="bar">
   <div class="glassDiv" id="lens"><div id="lensGray"></div></div>
@@ -5124,8 +5187,23 @@ function frame(now) {
   if (Math.abs(barFollow) < 0.0006 && Math.abs(barVel) < 0.004) {
     barFollow = REST_EPS; barVel = 0;
   }
+  /* ⚠ LE DECALAGE EST REECRIT ICI, PAS SEULEMENT DANS LE CSS.
+
+     Cette ligne s'execute a chaque image pour l'animation de gonflement, et
+     ecrase le `transform` de la feuille de style — un style en ligne gagne
+     toujours. J'ai corrige la regle CSS trois fois sans effet avant de
+     comprendre d'ou venait l'ecrasement.
+
+     `--bar-h + 12` est la place prise par le cercle a droite ; la barre recule
+     de sa moitie pour que l'ensemble reste centre. */
+  /* ⚠ LE DECALAGE DISPARAIT AVEC LE CERCLE. Pendant l'apercu equipe, le bouton
+     est masque : la barre doit reprendre toute la place et se recentrer, sinon
+     elle reste collee a gauche avec un vide a droite. */
+  const placeCercle = document.body.classList.contains('en-apercu')
+    ? '0px' : 'calc((var(--bar-h) + 12px) / 2)';
   barEl.style.transform =
-    `translateX(-50%) scale(${(1 + BAR_SWELL * barFollow).toFixed(6)}) translateZ(0)`;
+    `translateX(calc(-50% - ${placeCercle})) ` +
+    `scale(${(1 + BAR_SWELL * barFollow).toFixed(6)}) translateZ(0)`;
 
   // Aucune illumination : la barre ne fait que grossir.
 

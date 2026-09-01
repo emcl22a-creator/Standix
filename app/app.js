@@ -5969,6 +5969,19 @@ window.showGestionScreen = function(id, btn) {
 
   arreterToutesLesVideos()
   jouerVoile()
+
+  /* ⚠ ON REMONTE EN HAUT A CHAQUE CHANGEMENT DE PAGE.
+
+     Le defilement appartient au `body`, pas a chaque ecran : passer d'une
+     longue liste a une page courte gardait la position de la premiere, et l'on
+     arrivait au milieu — parfois sous le contenu, sur un ecran apparemment
+     vide.
+
+     ⚠ `instant` ET NON `smooth`. La nouvelle page arrive deja avec son voile
+       et son fondu ; y ajouter un defilement anime ferait deux mouvements
+       simultanes, et l'on verrait l'ancienne page glisser sous la nouvelle. */
+  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  catch { window.scrollTo(0, 0) }
   /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
      dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
      Branché ICI plutôt qu'aux quatre endroits qui ouvrent cette page. */
@@ -6060,6 +6073,12 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 }
 
 window.showEquipeScreen = function(id, btn) {
+  /* ⚠ MEME REMISE A ZERO QUE DANS L'ESPACE GESTION. Les deux espaces ont leur
+     propre fonction de navigation ; ne corriger que la premiere laisserait le
+     defaut sur la moitie de l'app. */
+  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  catch { window.scrollTo(0, 0) }
+
   arreterToutesLesVideos()
   jouerVoile()
   window.majBarreEspace?.('equipe')
@@ -6821,7 +6840,10 @@ window.ouvrirHisto = function ouvrirHisto(quoi) {
      arrive au bout de la liste continue a faire glisser l'ecran derriere — et
      l'on se retrouve ailleurs sans avoir rien demande. */
   document.body.style.overflow = 'hidden'
-  ;(quoi === 'mouvements' ? remplirHistoMouvements : remplirHistoCreations)()
+  const remplir = { mouvements: remplirHistoMouvements,
+                    creations: remplirHistoCreations,
+                    equipe: remplirHistoEquipe }[quoi]
+  remplir?.()
 }
 
 function fermerHisto(f) {
@@ -6946,6 +6968,45 @@ function remplirHistoMouvements() {
         sous: mv.membre_poste ? escapeHtml(mv.membre_poste) : '',
       })), 'Aucun mouvement ce mois-ci.')
     })
+}
+
+/* ═══ L'EQUIPE, AU COMPLET ═══
+
+   Le bloc de l'accueil montre les deux premiers ; cette page les montre tous,
+   sur la periode choisie dans le segment.
+
+   ⚠ ELLE N'EST PAS GROUPEE PAR JOUR, contrairement aux deux autres. Un
+     classement n'a pas de chronologie : c'est un ordre, pas une suite. On
+     reutilise donc la ligne, pas `peindreHisto`. */
+function remplirHistoEquipe() {
+  const zone = document.getElementById('histo-equipe-liste')
+  const note = document.getElementById('histo-equipe-note')
+  if (!zone) return
+  if (note) note.textContent = `Temps passé à lire, sur ${anJours} jours.`
+
+  const parMembre = {}
+  for (const v of anValidations()) {
+    if (!v.membre_id) continue
+    parMembre[v.membre_id] = (parMembre[v.membre_id] || 0) + Number(v.duree_lecture || 0)
+  }
+  const rangs = Object.entries(parMembre)
+    .sort((a, b) => b[1] - a[1])
+    .map(([id, sec]) => ({ m: (cachedMembres || []).find(x => x.id === id), sec }))
+    .filter(x => x.m)
+
+  if (!rangs.length) {
+    zone.innerHTML = '<div class="histo-rien">Personne n’a encore lu de procédure.</div>'
+    return
+  }
+  zone.innerHTML = rangs.map(({ m, sec }, r) => `
+    <div class="histo-lig">
+      <span class="histo-pt" style="background:${pointDossier(r)}"></span>
+      <span class="histo-co">
+        <span class="histo-t">${escapeHtml(m.nom || 'Sans nom')}</span>
+        ${m.poste ? `<span class="histo-s">${escapeHtml(m.poste)}</span>` : ''}
+      </span>
+      <span class="histo-q">${anDureeLisible(sec)}</span>
+    </div>`).join('')
 }
 
 function remplirHistoCreations() {

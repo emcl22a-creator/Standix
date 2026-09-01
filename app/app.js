@@ -7298,6 +7298,13 @@ function anCourbe(points, teinte, id, unite) {
      s'y trompe. Si le sommet depasse l'heure, tout passe en heures. */
   const etiquette = (v) => {
     if (unite !== 'min') return String(Math.round(v))
+    /* ⚠ « 0 min » N'A PAS DE SENS SUR UNE GRADUATION. Le zero d'un axe ne
+       porte pas d'unite : elle est deja dite par les reperes au-dessus. On
+       ecrit donc « 0 » seul, comme sur l'echelle en heures juste en dessous.
+
+       Sans ce test, l'echelle des courtes durees affichait « 0 min / 10 min /
+       20 min » — trois fois la meme unite pour un axe qui n'en a qu'une. */
+    if (!v) return '0'
     if (max < 60) return `${Math.round(v)} min`
     const h = Math.floor(v / 60), m = Math.round(v % 60)
     if (!v) return '0'
@@ -7673,13 +7680,38 @@ function peindreTuilesAccueil() {
     return [dire(escapeHtml(nom)), depuisQuandCourt(new Date(mv.cree_le).getTime())]
   }
 
+  /* ⚠ ON REMPLACE LE BLOC, ON NE L'AJOUTE PLUS DEVANT.
+
+     Cette fonction est appelee DEUX FOIS : une premiere avec le repli — les
+     arrivees deduites des dates de creation — puis une seconde quand la table
+     `mouvements_membres` repond.
+
+     Elle ecrivait `section(...) + zListes.innerHTML`, ce qui empilait : le
+     bloc du repli restait, et le second se posait devant. Tant que la table
+     n'existait pas, la seconde peinture n'arrivait jamais et le defaut ne se
+     voyait pas. Il est apparu le jour ou la migration est passee.
+
+     Le bloc porte maintenant un identifiant. On remplace le sien s'il existe,
+     on l'insere en tete sinon. */
   const peindreMouvements = (mvs) => {
     if (!mvs.length) return
-    zListes.innerHTML = section('Dernier mouvement',
+    const html = section('Dernier mouvement',
       POINTS_MOUVEMENT[mvs[0].type] || '#9A9AA4', 'Voir plus',
       'onclick="ouvrirHisto(\'mouvements\')"',
       mvs.map(ligneMouvement))
-      + zListes.innerHTML
+
+    const dejaLa = zListes.querySelector('[data-bloc="mouvement"]')
+    if (dejaLa) {
+      /* ⚠ ON REMPLACE LE CONTENU, PAS L'ELEMENT. Remplacer l'element ferait
+         disparaitre puis reapparaitre le bloc — un clignotement a chaque
+         reponse du serveur. */
+      const tampon = document.createElement('div')
+      tampon.innerHTML = html
+      dejaLa.innerHTML = tampon.firstElementChild.innerHTML
+      return
+    }
+    zListes.insertAdjacentHTML('afterbegin', html)
+    zListes.firstElementChild?.setAttribute('data-bloc', 'mouvement')
   }
 
   /* ⚠ LE REPLI EST CALCULE TOUT DE SUITE, pas dans le `catch`. La requete est

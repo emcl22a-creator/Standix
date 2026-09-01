@@ -436,6 +436,46 @@
      aucun calcul : le navigateur repartit lui-meme la place restante de part
      et d'autre. Une seule reference, celle qu'il utilise deja pour tout le
      reste. */
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA CAPSULE EST MASQUEE
+
+     Elle imitait de trop pres le « verre liquide » d'Apple. Elle n'est pas
+     supprimee — le ressort, la deformation et la mesure continuent de tourner
+     et attendent qu'on la rende.
+
+     ⚠ POUR LA RETABLIR : retirer `display:none` ci-dessous, rien d'autre. Le
+       reste du dispositif est intact.
+
+     ⚠ L'ONGLET ACTIF EST DESORMAIS MARQUE PAR `.tab-on`. Sans cela, cacher la
+       capsule effacait toute indication : elle servait de MASQUE revelant une
+       seconde couche d'onglets bleus, et rien d'autre ne disait ou l'on etait.
+
+     ⚠ LA BOUCLE D'ANIMATION TOURNE ENCORE pour un element invisible. Elle ne
+       mesure plus rien depuis qu'on a sorti `getBoundingClientRect` de son
+       corps, donc le cout est negligeable — mais si la capsule devait rester
+       cachee pour de bon, c'est la qu'il faudrait couper.
+     ═══════════════════════════════════════════════════════════════════════ */
+  #lens{ display:none; }
+
+  /* ⚠ LA COUCHE BLEUE EST MASQUEE ELLE AUSSI, et il le fallait.
+
+     Masquer la capsule ne suffisait pas : `layer--lens` est une SECONDE
+     rangee d'onglets, entierement bleue, decoupee par un `clip-path` en forme
+     de capsule que le script deplace a chaque image. La capsule cachee, le
+     decoupage continuait — on voyait donc une zone bleue glisser d'un onglet a
+     l'autre, sans la pastille de verre autour.
+
+     C'etait exactement le trajet qu'on voulait supprimer.
+
+     ⚠ NI SUPPRIMEE NI VIDEE. Le script continue d'ecrire son `clip-path`, son
+       `filter` et sa deformation dessus a chaque image. Retirer l'element
+       ferait echouer ces ecritures ; `display:none` les laisse s'appliquer
+       dans le vide, sans rien afficher.
+
+     ⚠ POUR TOUT RETABLIR : retirer ces deux `display:none`, et le
+       `.tab-on` de la couche visible reprendra son role de repli. */
+  .layer--lens{ display:none; }
+
   #lens{
     --glass-radius:23px;
     /* ═══ LE CENTRAGE DE SECOURS ═══
@@ -527,6 +567,60 @@
      ton sans que rien ne le signale.
 
      C'est le mecanisme qui portait l'ambre avant ; il revient avec le bleu. */
+  /* ⚠ CETTE COUCHE N'EST PLUS REVELEE PAR RIEN, la capsule etant masquee. Ses
+     regles restent : elles reprendront leur role le jour ou on la rend.
+
+     En attendant, c'est `.tab-on` sur la couche visible qui porte la couleur.
+
+     ⚠ CETTE COUCHE S'APPELLE `layer--normal`, PAS `layer--base`. J'avais ecrit
+       le second : la regle ne visait rien, et l'onglet actif restait gris
+       comme les autres. Le nom se lit sur `#lNorm`, pas dans le vocabulaire
+       qu'on croit naturel. */
+  .layer--normal .tab-on span{
+    background:linear-gradient(0deg,#1F4CEE,#3A78EE);
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    font-weight:650;
+  }
+  /* ⚠ CERTAINES ICONES SONT DESSINEES AU TRAIT, D'AUTRES EN APLAT — et il faut
+       traiter les deux, sinon on obtient un melange.
+
+     `row()` ecrit `fill="currentColor" stroke="none"` pour une icone pleine, et
+     l'inverse pour une icone au trait. Ma regle ne posait que `fill` : sur une
+     icone au trait, elle REMPLISSAIT l'interieur en bleu tout en laissant le
+     contour gris. C'est le liseré fonce autour du bleu.
+
+     On cible donc chaque cas par son attribut, tel que le script l'a ecrit. */
+  .layer--normal .tab-on svg[fill="currentColor"]{ fill:url(#navBleu); }
+  .layer--normal .tab-on svg[stroke="currentColor"]{ stroke:url(#navBleu); }
+
+  /* ═══ L'ONGLET ACTIF GROSSIT LEGEREMENT ═══
+
+     ⚠ SEULE L'ICONE GRANDIT, PAS LE LIBELLE — et c'est une mesure qui l'a
+       decide, pas un gout.
+
+       Avec 1,5 px de plus sur le texte, « Procedures » passe de 65 a 74 px de
+       large. Sur un ecran de 390 px l'onglet en fait 85, donc ca tient ; mais
+       a 360 px il n'en fait plus que 77, et a 320 px seulement 67. Le libelle
+       deborde alors sur ses voisins — teste, il DEBORDE dans les deux cas.
+
+       L'icone, elle, mesure 25 px pour un onglet de 67 au minimum : elle peut
+       grandir sans jamais rien toucher.
+
+     ⚠ `transform` ET NON `width`. Une transformation ne redessine pas la mise
+       en page : l'icone grossit sur place, sans pousser le libelle d'un demi-
+       pixel vers le bas a chaque changement d'onglet.
+
+     La graisse du libelle passe de 550 a 650 : c'est ce qui donne du poids au
+     mot sans toucher a sa largeur. */
+  .layer--normal .tab svg{
+    transition:transform 0.26s cubic-bezier(0.34,1.4,0.64,1);
+  }
+  .layer--normal .tab-on svg{ transform:scale(1.14); }
+  @media (prefers-reduced-motion: reduce){
+    .layer--normal .tab svg{ transition:none; }
+  }
+
   .layer--lens{color:#1F4CEE}
   .layer--lens svg{fill:url(#navBleu)}
   .layer--lens span{
@@ -4628,10 +4722,27 @@ window.majBarreEspace = function (espace) {
    L'app tient une table écran → onglet ; elle n'était lue par personne. Cette
    fonction est le pont qui manquait.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ UNE CLASSE MARQUE L'ONGLET ACTIF, en plus de la capsule.
+
+   Jusqu'ici, RIEN dans le balisage ne disait quel onglet etait choisi : la
+   capsule glissait par-dessus une seconde couche d'onglets bleus et la
+   revelait a travers elle. Cacher la capsule effacait donc toute indication.
+
+   `marquerOngletActif` pose `.tab-on` sur les deux couches. C'est aussi ce
+   qu'attend un lecteur d'ecran, qui ne voit pas un masque. */
+function marquerOngletActif() {
+  document.querySelectorAll('#bar .tab').forEach((t, k) => {
+    const on = k % LABELS.length === active
+    t.classList.toggle('tab-on', on)
+    t.setAttribute('aria-current', on ? 'page' : 'false')
+  })
+}
+
 window.placerOnglet = function (i) {
   if (typeof i !== 'number' || i < 0 || i >= LABELS.length) return;
   if (i === active) return;
   active = i;
+  marquerOngletActif();
   lens.goTo(CENTERS[active] - BAR_W / 2);
   swellStart = performance.now();
 };
@@ -4648,6 +4759,7 @@ barEl.addEventListener('click', (e) => {
 
   const memeOnglet = i === active;
   active = i;
+  marquerOngletActif();
   lens.goTo(CENTERS[active] - BAR_W / 2);
   swellStart = performance.now();
 
@@ -4689,6 +4801,7 @@ function rebuild() {
   row(lNorm, false);
   row(lLens, true);
   buildFilter('bar-filter', Math.round(BAR_W), BAR_H, BAR_H / 2);
+  marquerOngletActif();
   /* Les onglets viennent d'etre reconstruits : on remesure. */
   requestAnimationFrame(mesurerCentreY);
   lens.snapTo(CENTERS[active] - BAR_W / 2);
@@ -4894,7 +5007,20 @@ function frame(now) {
      la barre sans que sa découpe soit coupée net. */
   const dehors = `M-40 -40H${(BAR_W + 40).toFixed(2)}V${(BAR_H + 40).toFixed(2)}H-40Z`;
 
-  lNorm.style.clipPath = `path(evenodd, '${dehors}${capsule}')`;
+  /* ⚠ LE CALQUE VISIBLE N'EST PLUS DECOUPE, la capsule etant masquee.
+
+     Ce `clip-path` retirait de la barre grise la forme exacte de la capsule,
+     pour laisser voir le calque bleu dessous. Sans capsule affichee, le trou
+     restait : l'onglet actif etait litteralement DECOUPE de la barre, et il
+     disparaissait en glissant d'un onglet a l'autre. C'est ce qu'on prenait
+     pour « la couleur du cercle qui suit ».
+
+     ⚠ LE CALCUL AU-DESSUS EST CONSERVE. Il ne coute presque rien et sera
+       necessaire tel quel le jour ou l'on rendra la capsule : il suffira de
+       remettre l'affectation ci-dessous a la place de `'none'`.
+
+     lNorm.style.clipPath = `path(evenodd, '${dehors}${capsule}')`;   ← d'origine */
+  lNorm.style.clipPath = 'none';
   lLens.style.clipPath = `path('${capsule}')`;
 
   // ---- Le contenu subit TOUS les effets du verre ----

@@ -6207,17 +6207,44 @@ window.showGestionScreen = function(id, btn) {
 
   arreterToutesLesVideos()
 
-  /* ⚠ LE GLISSEMENT LATERAL A ETE RETIRE.
+  /* ═══════════════════════════════════════════════════════════════════════
+     LES PAGES DES REGLAGES ARRIVENT PAR LA DROITE
 
-     Les pages ouvertes depuis les Reglages arrivaient en glissant depuis la
-     droite. Le geste ne se declenchait que sur ce chemin-la : selon la page
-     d'ou l'on venait, la meme destination arrivait tantot en glissant, tantot
-     en fondu. Deux comportements pour un seul bouton.
+     ⚠ LE CRITERE EST LA CIBLE, PAS L'ORIGINE — et c'est ce qui corrige le
+       defaut de ma premiere version.
 
-     Toute l'app partage maintenant le meme geste : le voile et l'entree
-     d'ecran. Les classes `vient-droite` et `pageGlisse` sont supprimees du
-     CSS. */
-  jouerVoile()
+       Je testais alors « est-ce qu'on vient des Reglages ». La meme page
+       arrivait donc en glissant ou en fondu selon le chemin emprunte, ce qui
+       se remarquait immediatement.
+
+       Une liste de destinations donne le comportement inverse : ces huit
+       pages glissent TOUJOURS, d'ou qu'on vienne. Un ecran, un geste.
+
+     ⚠ LE RETOUR NE GLISSE PAS. Revenir aux Reglages garde le voile et l'entree
+       communs a toute l'app. J'avais ajoute un glissement inverse de moi-meme ;
+       il n'avait pas ete demande, et le retour marchait tres bien sans.
+
+     ⚠ LES DEUX GESTES S'EXCLUENT. Le voile floute tout l'ecran ; ajoute a un
+       glissement, on verrait la page arriver ET se brouiller — deux recits
+       pour un seul mouvement. */
+  const PAGES_QUI_GLISSENT = new Set([
+    'p-quota', 'p-membres', 'p-postes', 'p-reg-code', 'p-abonnement',
+    'p-reg-appareils', 'p-reg-langue', 'p-reg-compte', 'p-reg-poste',
+    'p-reg-postes',
+  ])
+  const glisse = PAGES_QUI_GLISSENT.has(id)
+
+  /* ⚠ ON NETTOIE AVANT DE POSER. Laissee en place, la classe rejouerait le
+     glissement la prochaine fois qu'on affiche cet ecran par un autre chemin. */
+  document.querySelectorAll('.screen.vient-droite')
+    .forEach(s => s.classList.remove('vient-droite'))
+
+  if (glisse) {
+    const cible = document.getElementById(id)
+    if (cible) { void cible.offsetWidth; cible.classList.add('vient-droite') }
+  } else {
+    jouerVoile()
+  }
 
   /* ⚠ ON REMONTE EN HAUT A CHAQUE CHANGEMENT DE PAGE.
 

@@ -6882,8 +6882,23 @@ function remplirHistoMouvements() {
     vers_gestion: (n) => `${n} <em>est passé en Gestion</em>`,
     vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
   }
-  const PT = { arrivee: '#34C759', depart: '#C8342B',
-               vers_gestion: '#1F4CEE', vers_equipe: '#4C1D95' }
+  /* ⚠ LES POINTS VIENNENT DE `PALETTE_DOSSIERS`, pas d'une liste a part.
+
+     Ils portaient un vert systeme, un rouge d'alerte et deux bleus choisis a
+     la main : quatre couleurs qu'on ne voyait nulle part ailleurs dans l'app.
+     Les cinq teintes des dossiers suffisent, et elles sont deja celles qu'on
+     lit sur chaque carte.
+
+     ⚠ ON PREND LE TRAIT SOMBRE, l'indice 0 de chaque paire. Le clair est fait
+       pour un degrade sur fond teinte ; sur un point de huit pixels pose sur du
+       blanc, il disparaitrait.
+
+   ⚠ `PALETTE_DOSSIERS` EST DECLAREE PLUS BAS DANS LE FICHIER, et cela marche :
+       cette fonction n'est appelee qu'a l'ouverture de la feuille, longtemps
+       apres le chargement du module. Un `const` en zone morte ne pose probleme
+       que s'il est lu PENDANT l'evaluation du fichier. */
+  const PT = { arrivee: pointDossier(3), depart: pointDossier(2),
+               vers_gestion: pointDossier(1), vers_equipe: pointDossier(0) }
 
   /* Le repli, le temps de la requete — et definitivement si la table n'existe
      pas encore. Voir `mouvements-membres.sql`. */
@@ -6920,7 +6935,9 @@ function remplirHistoCreations() {
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .map(p => ({
       quand: p.created_at,
-      teinte: p.publiee_le ? '#34C759' : '#9A9AA4',
+      /* Vert des dossiers pour une procedure en ligne, gris pour un brouillon —
+         les deux dernieres teintes de `PALETTE_DOSSIERS`. */
+      teinte: pointDossier(p.publiee_le ? 3 : 4),
       html: `${escapeHtml(p.titre || 'Sans titre')}
              <em>dans ${escapeHtml(p.categorie || 'Sans dossier')}</em>`,
     }))
@@ -7074,10 +7091,17 @@ function peindreTuilesAccueil() {
     vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
   }
   /* Le point de l'etiquette prend la couleur du mouvement le plus recent :
-     c'est lui qu'on lit en premier. */
+     c'est lui qu'on lit en premier.
+
+     ⚠ LES MEMES TEINTES QUE LA PAGE D'HISTORIQUE, tirees de
+       `PALETTE_DOSSIERS`. Ce bloc et la feuille qu'il ouvre montrent le meme
+       evenement : le voir change de couleur en passant de l'un a l'autre
+       laisserait croire a deux choses differentes. */
   const POINTS_MOUVEMENT = {
-    arrivee: '#34C759', depart: '#C8342B',
-    vers_gestion: '#1F4CEE', vers_equipe: '#4C1D95',
+    arrivee: pointDossier(3),      /* vert   */
+    depart: pointDossier(2),       /* ambre  */
+    vers_gestion: pointDossier(1), /* bleu   */
+    vers_equipe: pointDossier(0),  /* violet */
   }
 
   /* ⚠ LE PRENOM SEUL. « Emma Dupont a rejoint l'equipe » se coupe en plein
@@ -7978,6 +8002,29 @@ const PALETTE_DOSSIERS = [
   { i:3, trait:['#14532D','#5FDDA0'] },   /* vert   */
   { i:4, trait:['#3A4453','#A5B0C0'] },   /* gris   */
 ]
+
+/* ═══ LA TEINTE D'UN POINT, TIREE DE LA MEME PALETTE ═══
+
+   ⚠ NI LE SOMBRE NI LE CLAIR, MAIS ENTRE LES DEUX.
+
+     Les deux bouts de chaque paire sont faits pour un DEGRADE sur fond teinte,
+     pas pour un aplat de huit pixels. Le sombre y paraissait presque noir —
+     mesure, il donne 9 a 11 de contraste sur du blanc, la ou 4,5 suffit ; le
+     clair, lui, disparaitrait.
+
+     38 % vers le clair : la couleur se lit enfin comme du violet ou du vert, et
+     le contraste reste entre 4,4 et 6,4 — au-dessus du seuil.
+
+   ⚠ LE MELANGE SE CALCULE, il n'est pas ecrit en dur. Ajouter une teinte a
+     `PALETTE_DOSSIERS` suffit : son point suivra, sans qu'on ait a poser une
+     sixieme valeur ailleurs. */
+function pointDossier(rang) {
+  const [sombre, clair] = PALETTE_DOSSIERS[rang % PALETTE_DOSSIERS.length].trait
+  const lire = (h) => [1, 3, 5].map(i => parseInt(h.substr(i, 2), 16))
+  const [a, b] = [lire(sombre), lire(clair)]
+  const m = a.map((v, i) => Math.round(v + (b[i] - v) * 0.38))
+  return '#' + m.map(v => v.toString(16).padStart(2, '0')).join('').toUpperCase()
+}
 
 /* ═══ LE FOND DE LA PLAQUE, TIRE DE SON TRAIT ═══
 

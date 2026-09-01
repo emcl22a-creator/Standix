@@ -7081,18 +7081,32 @@ function remplirHistoEquipe() {
   if (!zone) return
   if (note) note.textContent = `Temps passé à lire, sur ${anJours} jours.`
 
+  /* ⚠ ON PART DES MEMBRES, PAS DES LECTURES.
+
+     La liste se construisait a partir des validations : un membre qui n'avait
+     rien lu n'apparaissait nulle part. C'est exactement l'inverse de ce qu'on
+     vient chercher ici — savoir qui lit, c'est aussi savoir qui ne lit pas.
+
+     ⚠ L'ESPACE EQUIPE SEULEMENT. La note du graphique l'annonce deja : « seuls
+       les membres de l'espace Equipe sont comptes ». La gestion ne consulte pas
+       les procedures pour les appliquer, elle les ecrit. */
   const parMembre = {}
   for (const v of anValidations()) {
     if (!v.membre_id) continue
     parMembre[v.membre_id] = (parMembre[v.membre_id] || 0) + Number(v.duree_lecture || 0)
   }
-  const rangs = Object.entries(parMembre)
-    .sort((a, b) => b[1] - a[1])
-    .map(([id, sec]) => ({ m: (cachedMembres || []).find(x => x.id === id), sec }))
-    .filter(x => x.m)
+
+  const rangs = (cachedMembres || [])
+    .filter(m => m.role === 'equipe')
+    .map(m => ({ m, sec: parMembre[m.id] || 0 }))
+    /* ⚠ A EGALITE, ON CLASSE PAR NOM. Sans second critere, tous ceux a zero
+       s'ordonnent au hasard du chargement et changent de place a chaque
+       ouverture — on croit que la liste bouge alors que rien n'a change. */
+    .sort((a, b) => b.sec - a.sec ||
+      (a.m.nom || '').localeCompare(b.m.nom || '', 'fr'))
 
   if (!rangs.length) {
-    zone.innerHTML = '<div class="histo-rien">Personne n’a encore lu de procédure.</div>'
+    zone.innerHTML = '<div class="histo-rien">Personne dans l’espace Équipe pour le moment.</div>'
     return
   }
   zone.innerHTML = rangs.map(({ m, sec }, r) => `
@@ -7102,7 +7116,9 @@ function remplirHistoEquipe() {
         <span class="histo-t">${escapeHtml(m.nom || 'Sans nom')}</span>
         ${m.poste ? `<span class="histo-s">${escapeHtml(m.poste)}</span>` : ''}
       </span>
-      <span class="histo-q">${anDureeLisible(sec)}</span>
+      <!-- ⚠ « Aucune lecture » PLUTOT QUE « 0 min ». Un zero se lit comme une
+           mesure ; la phrase dit ce qui s'est passe, c'est-a-dire rien. -->
+      <span class="histo-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : 'Aucune lecture'}</span>
     </div>`).join('')
 }
 
@@ -7393,10 +7409,16 @@ function peindreAnalyseInterne() {
       if (!v.membre_id) continue
       parMembre[v.membre_id] = (parMembre[v.membre_id] || 0) + Number(v.duree_lecture || 0)
     }
-    const top = Object.entries(parMembre)
-      .sort((a, b) => b[1] - a[1]).slice(0, 2)
-      .map(([id, sec]) => ({ m: (cachedMembres || []).find(x => x.id === id), sec }))
-      .filter(x => x.m)
+    /* ⚠ ON PART DES MEMBRES, comme la page complete. Partir des lectures
+       ecartait ceux qui n'ont rien lu : sur une equipe de trois dont deux
+       n'ont pas encore ouvert l'app, le bloc n'affichait qu'une ligne et l'on
+       croyait a un defaut. */
+    const top = (cachedMembres || [])
+      .filter(m => m.role === 'equipe')
+      .map(m => ({ m, sec: parMembre[m.id] || 0 }))
+      .sort((a, b) => b.sec - a.sec ||
+        (a.m.nom || '').localeCompare(b.m.nom || '', 'fr'))
+      .slice(0, 2)
 
     zE.innerHTML = top.length
       ? top.map(({ m, sec }, r) => `
@@ -7410,9 +7432,9 @@ function peindreAnalyseInterne() {
             <span class="an-m-t">${escapeHtml(m.nom || 'Sans nom')}</span>
             ${m.poste ? `<span class="an-m-s">${escapeHtml(m.poste)}</span>` : ''}
           </span>
-          <span class="an-m-q">${anDureeLisible(sec)}</span>
+          <span class="an-m-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : 'Aucune lecture'}</span>
         </div>`).join('')
-      : '<div class="an-vide-l">Personne n’a encore lu de procédure.</div>'
+      : '<div class="an-vide-l">Personne dans l’espace Équipe pour le moment.</div>'
   }
 }
 

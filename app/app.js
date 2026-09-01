@@ -20001,9 +20001,21 @@ function carteOffre(o, opts = {}) {
       <!-- Coche ronde et pleine : un caractere de coche nu se lisait comme du
            texte, la pastille en fait un signe. -->
       ${inclus.map(t => `<div class="offre-li">
+        <!-- ⚠ LES COULEURS SONT ECRITES ICI, PAS DANS LE CSS. Le cercle etait
+             cercle en rgba(255,173,51,0.46) et la coche en #FDA81E — de
+             l'ambre en dur, qu'aucune regle de feuille de style ne pouvait
+             atteindre. J'ai cherche longtemps dans style.css avant de le voir.
+
+             La coche prend le degrade cocheOffre, blanc en haut, bleu en bas :
+             la pointe claire attrape l'oeil, la base rattache le signe a la
+             carte.
+
+             ⚠ AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il est DANS un gabarit
+               delimite par des accents graves, un seul y fermerait la chaine.
+               C'est ce qui vient d'arriver a l'essai precedent. -->
         <i><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11"
-             fill="rgba(4,4,6,0.78)" stroke="rgba(255,173,51,0.46)" stroke-width="1"/>
-           <path d="M7.6 12.3l3 3 5.8-6.4" stroke="#FDA81E" stroke-width="2"
+             fill="rgba(4,4,6,0.78)" stroke="rgba(127,182,242,0.42)" stroke-width="1"/>
+           <path d="M7.6 12.3l3 3 5.8-6.4" stroke="url(#cocheOffre)" stroke-width="2.2"
              stroke-linecap="round" stroke-linejoin="round"/></svg></i>
         <span>${t}</span></div>`).join('')}
     </div>

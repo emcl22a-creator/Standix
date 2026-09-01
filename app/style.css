@@ -5797,94 +5797,17 @@
      qu'on voyait sur la page vide.
 
      84 px : la hauteur du bouton plus sa marge, et de quoi respirer. */
-  /* ═══════════════════════════════════════════════════════════════════════
-     LA HAUTEUR NE SE MESURE PLUS, ELLE SE DÉDUIT
+  /* ⚠ LES REGLES DU BLOC `.debut` ONT ETE RETIREES.
 
-     Un script mesurait la position du bloc et en tirait sa hauteur. Il tournait
-     TROP TARD : pendant deux cents millisecondes, le bloc gardait sa valeur de
-     repli, trop grande — le dessin paraissait bas et la page défilait. Puis un
-     glissement déclenchait un nouveau calcul, et tout se remettait en place
-     d'un coup. C'est précisément ce qu'on voyait.
+   Il affichait un dessin, un titre et une invite quand aucune procedure
+   n'existait — avec toute une mise en page d'exception : l'ecran passait en
+   colonne souple, la grille s'etirait, le contenu se centrait verticalement.
 
-     Le CSS sait faire ça sans rien mesurer. L'écran devient une colonne, la
-     grille prend la place qui reste, le bloc la remplit. Aucun délai possible :
-     c'est vrai dès la première image.
+   L'etat vide est maintenant une simple phrase, la meme que pour « En ligne »
+   et « Brouillons ». Elle n'a besoin d'aucune de ces regles, et les laisser
+   ferait basculer la page en mode colonne au moindre element portant cette
+   classe. */
 
-     `:has()` limite tout ça au seul cas du bloc d'accueil — les pages qui ont
-     du contenu gardent leur disposition en grille, intacte.
-     ═══════════════════════════════════════════════════════════════════════ */
-  .screen.active:has(#cat-grid .debut),
-  .screen.active:has(#e-cat-grid .debut){
-    display:flex; flex-direction:column;
-    /* SANS CETTE HAUTEUR, RIEN NE S'ÉTIRE. Une colonne souple ne distribue que
-       la place qu'elle a — et un écran ne fait par défaut que la hauteur de son
-       contenu. La grille restait donc collée sous les filtres, et le dessin
-       remontait de 130 px.
-
-       `100dvh` avec un modèle de boîte à bordure : le rembourrage du bas, qui
-       réserve la barre et le bouton, est compris dedans. La page tient donc
-       exactement dans la fenêtre. */
-    min-height:100dvh;
-  }
-  #cat-grid:has(.debut),
-  #e-cat-grid:has(.debut){
-    flex:1 1 auto; display:flex; min-height:0;
-  }
-
-  .debut{
-    grid-column:1/-1; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; text-align:center;
-    /* `flex:1` quand la grille est en colonne souple ; la valeur de repli ne
-       sert plus que si `:has()` n'est pas reconnu. */
-    flex:1 1 auto; width:100%;
-    min-height:var(--debut-h, 0);
-    /* ═══ UN REMBOURRAGE ÉGAL, PARCE QUE LA HAUTEUR EST DÉJÀ JUSTE ═══
-
-       Il valait 84 px en bas, pour dégager le bouton + flottant. Mais la
-       hauteur du bloc, elle, s'arrête DÉJÀ au bouton : le calcul retranche le
-       rembourrage de l'écran, qui réserve exactement cette place. Les 84 px
-       faisaient donc double emploi, et poussaient le contenu 31 px trop haut.
-
-       Vingt pixels partout. Le contenu se centre alors dans la place réelle —
-       du haut de la grille au bouton — et ne le touche jamais. */
-    padding:20px;
-  }
-  /* ⚠ `.fleche` N'EST PLUS EMPLOYEE sur cette page. Elle portait « Touchez le
-     bouton +, en bas de l'ecran » — or ce bouton est masque, la creation se
-     fait par la barre du haut. La consigne tient maintenant dans le paragraphe
-     lui-meme, en une phrase. Les regles restent : d'autres etats vides les
-     citent encore. */
-  .debut .fleche b{ color:#1F4CEE; font-weight:800; }
-  /* ⚠ LE DESSIN N'A PLUS QU'UNE PIECE. Il en avait quatre — deux fiches de
-     fond, celle de devant, le signe — chacune avec sa propre animation
-     decalee. Quatre mouvements simultanes sur un ecran vide, c'etait la
-     partie la plus animee de l'app pour la page qui a le moins a dire.
-
-     Il flotte d'un seul bloc, doucement. Les regles `.fond-1`, `.fond-2` et
-     `.devant` sont retirees : elles ne visaient plus rien. */
-  .debut-dessin{ position:relative; width:120px; height:108px; margin-bottom:24px;
-    animation:debutFlotte 6s ease-in-out infinite; }
-  .debut-dessin svg{ position:relative; width:100%; height:100%; overflow:visible; }
-  /* Le même battement discret sur le signe des icônes de mode. */
-  .mode-choice-icon .signe{ animation:debutSigne 5.4s ease-in-out infinite; transform-origin:center; }
-  @media (prefers-reduced-motion: reduce){ .mode-choice-icon .signe{ animation:none; } }
-  @keyframes debutFlotte{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
-  @keyframes debutLueur{ 0%,100%{ opacity:0.55; } 50%{ opacity:1; } }
-  @keyframes debutSigne{ 0%,100%{ opacity:0.75; } 50%{ opacity:1; } }
-  @media (prefers-reduced-motion: reduce){
-    .debut-dessin *{ animation:none !important; }
-  }
-  .debut h3{ font-size:21px; font-weight:700; letter-spacing:-0.035em; margin-bottom:10px; }
-  .debut p{ font-size:14.5px; color:var(--label-2); max-width:250px; margin:0 auto; line-height:1.55; }
-  /* ⚠ LE `+` DANS LA PHRASE EST NOIR, comme le bouton qu'il designe. Il etait
-     ambre : la phrase renvoyait a une couleur qui n'existe plus sur ce
-     bouton. */
-  .debut p b{ color:var(--label); font-weight:700; }
-  .debut .fleche{
-    margin-top:22px; max-width:250px; line-height:1.5; text-align:center;
-    font-size:12px; font-weight:600; color:var(--label-3);
-  }
-  .debut .fleche svg{ width:13px; height:13px; animation:debutDescend 2.2s ease-in-out infinite; }
   @keyframes debutDescend{ 0%,100%{ transform:translateY(0); opacity:0.6; } 50%{ transform:translateY(3px); opacity:1; } }
   .error-msg{ font-size:13px; color:var(--red); margin-top:8px; }
 
@@ -12984,40 +12907,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LES SOUS-PAGES DES RÉGLAGES ARRIVENT PAR LA GAUCHE
+/* ⚠ `vient-droite` ET `pageGlisse` ONT ETE RETIRES.
 
-   Elles entrent en glissant depuis le bord droit, comme on tourne une page.
-   Les autres écrans montent en fondu ; ici le mouvement latéral dit qu'on
-   descend d'un niveau et qu'on remontera par le même chemin.
+   Les pages ouvertes depuis les Reglages arrivaient en glissant depuis la
+   droite. Le geste ne se declenchait que sur ce chemin : selon la page d'ou
+   l'on venait, la meme destination arrivait tantot en glissant, tantot en
+   fondu — deux comportements pour un seul bouton.
 
-   ⚠ LA CLASSE EST POSÉE PAR LE SCRIPT, sur le seul écran qui arrive. Une règle
-     visant tous les `#p-reg-*` s'appliquerait aussi au retour vers les
-     Réglages, et la page parente glisserait dans le mauvais sens.
-
-   ⚠ `translateX` ET NON `left`. Déplacer par la position force un recalcul de
-     mise en page à chaque image ; une transformation reste sur la carte
-     graphique.
-   ═══════════════════════════════════════════════════════════════════════════ */
-.screen.vient-droite{
-  animation:pageGlisse 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
-}
-@keyframes pageGlisse{
-  from{ transform:translateX(26%); opacity:0; }
-  to  { transform:none;            opacity:1; }
-}
-
-/* ⚠ `vient-gauche` ET `pageRevient` ONT ETE RETIRES. Ils faisaient revenir la
-   page des Reglages en glissant depuis la gauche — un geste que j'avais ajoute
-   de moi-meme, alors que le retour marchait tres bien avec le voile et le
-   fondu communs a toute l'app.
-
-   Seul l'aller glisse desormais. Les regles sont supprimees pour qu'on ne les
-   croie pas encore en service. */
-
-@media (prefers-reduced-motion: reduce){
-  .screen.vient-droite{ animation:none; }
-}
+   Toute l'app partage desormais le voile et l'entree d'ecran. Les regles sont
+   supprimees pour qu'on ne les croie pas encore en service. */
 
 
 /* ═══ « ÉCRIVEZ-NOUS » : UN NOIR SIMPLE ═══
@@ -13672,4 +13570,290 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 #p-abonnement .offre-cta{
   box-shadow:0 6px 18px -8px rgba(31,76,238,0.45);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES CARTES D'OFFRE EN NOIR
+
+   Elles passent au meme noir que la banniere d'accueil. C'est le seul aplat
+   sombre de l'app, et une offre a laquelle on souscrit merite d'etre traitee
+   comme un objet a part.
+
+   ⚠ TOUT CE QUI ETAIT MESURE POUR UN FOND CLAIR SE REPREND. Sur du noir, les
+     valeurs se lisent a l'envers : ce qui etait sombre disparait, ce qui etait
+     pale devient criard. Chaque teinte est donc redonnee, pas heritee.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#p-abonnement .offre-carte{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+}
+
+/* ⚠ LA VEDETTE SE DISTINGUE PAR UN LISERE BLEU CLAIR. Sur du noir, le bleu
+   profond `#1F4CEE` tombe a 2,98 de contraste — mesure au moment de la
+   banniere, meme fond ici. C'est `#4899EC` qui doit porter le contour. */
+#p-abonnement .offre-carte.vedette{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(72,153,236,0.55),
+    0 1px 2px rgba(20,20,30,0.06),
+    0 16px 34px -18px rgba(31,76,238,0.42);
+}
+#p-abonnement .offre-carte.vedette::before{
+  background:linear-gradient(135deg,#4899EC,#7FB6F2) !important;
+}
+/* Le voile de la vedette : a peine plus clair que le noir, pour la detacher
+   sans l'eclaircir. */
+#p-abonnement .offre-carte.vedette::after{
+  background:rgba(72,153,236,0.07) !important;
+}
+
+/* ─── LES TEXTES ────────────────────────────────────────────────────────── */
+#p-abonnement .offre-nom{ color:#FFFFFF; }
+
+/* ⚠ LE PRIX EN BLANC PLEIN, pas en degrade. C'est le chiffre qu'on vient
+   chercher : il doit etre le plus lisible de la carte, et rien ne se lit mieux
+   sur du noir qu'un blanc franc. */
+#p-abonnement .offre-prix{ color:#FFFFFF; }
+#p-abonnement .offre-prix em,
+#p-abonnement .offre-prix small,
+#p-abonnement .offre-prix span{ color:rgba(255,255,255,0.58); }
+
+#p-abonnement .offre-li{ color:rgba(255,255,255,0.72); }
+#p-abonnement .offre-annuel-note,
+#p-abonnement .offre-inclus{ color:rgba(255,255,255,0.52); }
+#p-abonnement .offre-filet{ background:rgba(255,255,255,0.12); }
+
+/* Les pastilles de la liste — les puces devant chaque ligne. */
+#p-abonnement .offre-li svg,
+#p-abonnement .offre-li .ic{ color:#7FB6F2; stroke:#7FB6F2; }
+
+/* ─── LE BOUTON ─────────────────────────────────────────────────────────── */
+/* ⚠ IL RESTE BLEU SUR NOIR, ET C'EST LISIBLE : `#1F4CEE` sur `#0B0B0F` donne
+   un contraste de fond a fond, pas de texte a fond — c'est le texte blanc du
+   bouton qui compte, et il est sur du bleu. */
+#p-abonnement .offre-cta{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  color:#FFFFFF;
+  box-shadow:0 6px 20px -8px rgba(72,153,236,0.55);
+}
+
+/* Le ruban de la vedette, pose sur le noir. */
+#p-abonnement .offre-ruban{
+  background:linear-gradient(135deg,#4899EC 0%,#7FB6F2 100%);
+  color:#0B0B0F;
+}
+
+/* La plaque du logo, sur fond sombre. */
+#p-abonnement .offre-plaque{
+  background:rgba(255,255,255,0.06);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.12);
+}
+#p-abonnement .offre-logo{ color:#FFFFFF; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES CARTES D'OFFRE EN NOIR
+
+   Le meme aplat sombre que la banniere d'accueil et « Ecrivez-nous ». Une
+   carte de prix se regarde une fois, au moment de choisir : elle a le droit de
+   peser plus lourd que le reste de la page.
+
+   ⚠ TOUT CE QUI S'Y POSE DOIT ETRE REPRIS, pas seulement le fond. Les textes,
+     les puces, le lisere de la vedette et les deux pseudo-elements portaient
+     des couleurs pensees pour un fond clair : laisses tels quels, la moitie du
+     contenu disparait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-abonnement .offre-carte{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+}
+
+/* ⚠ LA VEDETTE SE DISTINGUE PAR UN LISERE BLEU CLAIR. Sur du noir, le bleu
+   profond du degrade tombe a 2,98 de contraste — mesure au moment de la
+   banniere d'accueil. C'est le bout clair qui se voit. */
+#p-abonnement .offre-carte.vedette{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(72,153,236,0.55),
+    0 1px 2px rgba(20,20,30,0.08),
+    0 14px 30px -16px rgba(31,76,238,0.34);
+}
+#p-abonnement .offre-carte.vedette::before{
+  background:linear-gradient(135deg,#4899EC,#7FB6F2) !important;
+}
+/* Le voile de la vedette : un bleu tres discret sur le noir, pour la detacher
+   sans l'eclaircir. */
+#p-abonnement .offre-carte.vedette::after{
+  background:rgba(72,153,236,0.08) !important;
+}
+
+/* ─── LES TEXTES ────────────────────────────────────────────────────────── */
+#p-abonnement .offre-nom{ color:#FFFFFF; }
+/* ⚠ LE PRIX EN BLANC PLEIN. C'est le chiffre qu'on vient lire ; tout gris le
+   ferait passer apres le nom de l'offre. */
+#p-abonnement .offre-prix{ color:#FFFFFF; }
+#p-abonnement .offre-li{ color:rgba(255,255,255,0.72); }
+#p-abonnement .offre-annuel, #p-abonnement .offre-annuel-fixe,
+#p-abonnement .offre-annuel-note{ color:rgba(255,255,255,0.55); }
+#p-abonnement .offre-inclus{ color:rgba(255,255,255,0.62); }
+#p-abonnement .offre-filet{ background:rgba(255,255,255,0.12); }
+
+/* ⚠ LES PUCES DE LA LISTE AUSSI. Elles etaient dessinees en `currentColor`,
+   qui suivait le texte sombre : sur du noir, elles disparaissaient. */
+#p-abonnement .offre-li svg{ stroke:#4899EC; }
+#p-abonnement .offre-li::marker{ color:#4899EC; }
+
+/* La plaque du logo d'offre, transposee sur fond sombre. */
+#p-abonnement .offre-plaque{
+  background:rgba(255,255,255,0.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.10);
+}
+#p-abonnement .offre-logo{ color:#FFFFFF; }
+
+/* ─── LE BOUTON ─────────────────────────────────────────────────────────── */
+/* Il garde son degrade bleu : sur du noir, il ressort mieux qu'avant. */
+#p-abonnement .offre-cta{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  color:#FFFFFF;
+  box-shadow:0 6px 20px -8px rgba(72,153,236,0.55);
+}
+/* Le bouton de l'offre en cours — « Gerer » — reste sobre : on ne pousse pas
+   quelqu'un vers ce qu'il a deja. */
+#p-abonnement .offre-gerer{
+  background:rgba(255,255,255,0.10); color:#FFFFFF;
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.18);
+}
+
+/* Le ruban de la vedette, sur une carte deja sombre : un bleu plein suffit. */
+#p-abonnement .offre-ruban{
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF;
+}
+
+
+/* ⚠ LE RUBAN A BESOIN DE SA PROPRE LIGNE. Sur la carte vedette, il se posait
+   juste au-dessus du nom, sans marge : les deux se touchaient et le ruban se
+   lisait comme un surlignage du titre.
+
+   Une pilule, une ligne a elle, et de l'air en dessous. */
+#p-abonnement .offre-ruban{
+  display:inline-flex; align-items:center;
+  padding:3px 10px; border-radius:100px;
+  font-size:10.5px; font-weight:700; letter-spacing:0.03em;
+  text-transform:uppercase; line-height:1.5;
+  margin-bottom:10px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TROIS CARTES SUR FOND NOIR
+
+   ⚠ J'AVAIS COMPRIS L'INVERSE. Au tour precedent, j'ai noirci le TEXTE de ces
+     trois blocs, alors que c'est leur FOND qu'il fallait passer au noir. Le
+     texte redevient donc clair — sur un aplat sombre, c'est le seul choix.
+
+   Le meme noir que la banniere d'accueil, « Ecrivez-nous » et les cartes
+   d'abonnement : quatre endroits, un seul aplat.
+
+   ⚠ TOUT CE QUI S'Y POSE DOIT SUIVRE. Un fond change, et les textes
+   secondaires, les separateurs, les pastilles de duree deviennent invisibles
+   s'ils gardent des valeurs pensees pour du blanc. */
+
+/* ─── LE COMPTEUR D'ANALYSES ─────────────────────────────────────────────── */
+#p-quota .quota-bloc{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+}
+#p-quota .quota-bloc::before{ display:none; }   /* la tranche claire n'a plus lieu d'etre */
+#p-quota .quota-chiffre{ color:#FFFFFF; }
+#p-quota .quota-chiffre em{ color:rgba(255,255,255,0.50); }
+#p-quota .quota-legende{ color:rgba(255,255,255,0.55); }
+#p-quota .quota-reste{ color:rgba(255,255,255,0.78); }
+/* ⚠ LA PISTE DES BARRES S'ECLAIRCIT. Le gris translucide d'origine se
+   confondait avec le noir : on ne voyait plus que la barre bleue, sans savoir
+   sur quelle longueur elle progresse. */
+#p-quota .qb{ background:rgba(255,255,255,0.14); }
+
+/* ─── « QUI FAIT QUOI DANS L'ENTREPRISE » ────────────────────────────────── */
+#p-reg-postes .hero.an-intro{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+}
+#p-reg-postes .hero .t{ color:#FFFFFF; }
+#p-reg-postes .hero .s{ color:rgba(255,255,255,0.62); }
+
+/* ─── « GENEREZ UN CODE… » ───────────────────────────────────────────────── */
+#p-reg-code .card.ci-vide, #p-reg-code .card.ci-plein{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+}
+#p-reg-code .card::before{ display:none; }
+#p-reg-code .ci-txt{ color:rgba(255,255,255,0.78); }
+#p-reg-code .ci-txt b{ color:#FFFFFF; }
+#p-reg-code .ci-aide{ color:rgba(255,255,255,0.48); }
+/* Les trois durees : des pilules claires sur le noir, l'inverse d'avant. */
+#p-reg-code .ci-d{
+  background:rgba(255,255,255,0.10); color:#FFFFFF;
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.18);
+}
+#p-reg-code .ci-d.on{
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF; box-shadow:none;
+}
+#p-reg-code .ci-code{ color:#FFFFFF; }
+#p-reg-code .ci-reste{ color:rgba(255,255,255,0.55); }
+
+
+/* La mention de partage, sous le compteur. Plus petite que le reste : elle
+   explique, elle n'informe pas d'un chiffre. */
+#p-quota .quota-part{
+  margin-top:10px; padding-top:10px;
+  box-shadow:inset 0 0.5px 0 rgba(255,255,255,0.12);
+  font-size:12px; line-height:1.5; color:rgba(255,255,255,0.55);
+  letter-spacing:-0.01em;
+}
+
+
+/* ═══ LA JAUGE DE DUREE DU COLLAGE ═══
+
+   Elle montre la part des cinq minutes deja prise. Le meme dessin que les
+   barres du compteur d'analyses : une piste, un remplissage.
+
+   ⚠ LA COULEUR EST POSEE PAR LE SCRIPT, pas ici. Elle depend de la valeur —
+     bleu, puis ambre a partir de 80 %, puis rouge au refus — et une regle CSS
+     ne sait pas lire un pourcentage pour en deduire une teinte. */
+.coller-jauge{
+  height:6px; border-radius:100px; overflow:hidden;
+  background:rgba(118,118,128,0.16);
+  margin:2px 0 10px;
+}
+.coller-jauge i{
+  display:block; height:100%; border-radius:100px;
+  transition:width 0.4s cubic-bezier(0.32,0.72,0,1), background 0.3s ease;
+}
+@media (prefers-reduced-motion: reduce){
+  .coller-jauge i{ transition:none; }
+}
+
+/* Le total, avec sa fraction. Le « / 5 min » est une reference : plus discret
+   que le chiffre qu'on vient lire. */
+.coller-tot b em{
+  font-style:normal; font-weight:600; color:var(--label-3);
+}
+
+/* La marche a suivre, sous le refus. Elle n'est pas rouge : ce n'est pas une
+   erreur de plus, c'est la solution. */
+.coller-sortie{
+  display:inline-block; margin-top:5px;
+  font-size:12.5px; color:var(--label-2); line-height:1.5;
+}
+
+
+/* ⚠ « Aucune lecture » N'EST PAS UNE MESURE. Il portait la graisse et la
+   couleur d'un temps — « 1 h 10 » et « Aucune lecture » pesaient pareil, alors
+   que l'un est un chiffre et l'autre un constat. Plus leger et plus clair, il
+   se lit comme ce qu'il est : une absence. */
+#p-global-analyse .an-m-q.vide,
+#histo-equipe .histo-q.vide{
+  font-weight:400; color:var(--label-3);
 }

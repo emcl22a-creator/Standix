@@ -12382,13 +12382,37 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      de ce qu'elle occupe — et la pastille glissante, qui se mesure, suit
      toute seule.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ ELLE DEBORDE DU BOUTON, EN HAUT A DROITE.
+
+   Elle etait dans le flux, a cote du libelle : elle elargissait le bouton, et
+   la pastille glissante — qui se mesure — devenait plus large que les deux
+   autres segments. En absolu, le bouton garde sa largeur et les trois onglets
+   restent egaux.
+
+   ⚠ LE SEGMENT NE DOIT PAS COUPER CE QUI DEPASSE. `.proc-segm` n'a pas
+     d'`overflow:hidden` — s'il en gagnait un, la pastille serait rognee de
+     moitie et l'on chercherait longtemps pourquoi. */
+.p-seg{ position:relative; }
 .p-seg-pt{
-  display:inline-grid; place-items:center;
-  min-width:18px; height:18px; padding:0 5px; margin-left:6px;
+  /* ⚠ ELLE RENTRE DE DEUX PIXELS A DROITE. A `right:-1px`, elle chevauchait
+     l'arrondi du segment — le coin passait sous elle et la pastille paraissait
+     coupee. A `right:2px`, elle deborde encore du bouton mais reste dans la
+     piste. */
+  position:absolute; top:-3px; right:2px; z-index:4;
+  display:grid; place-items:center;
+  min-width:18px; height:18px; padding:0 5px;
   border-radius:100px;
-  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  /* Un liseré de la couleur du segment : sans lui, la pastille se colle au
+     bord du bouton blanc et les deux formes se confondent. */
+  box-shadow:0 0 0 2px #F5F5F9;
+  /* ⚠ LES TROIS ARRETS DU BOUTON, PAS DEUX. La pastille n'en avait que les
+     extremites — #1F4CEE et #4899EC — alors que le bouton passe par #3A78EE a
+     55 %. Sur dix-huit pixels l'ecart est faible, mais les deux dessins sont
+     cotes a cote sur la meme page : ils doivent etre du meme bleu, pas d'un
+     bleu voisin. */
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
   color:#FFFFFF; font-size:11px; font-weight:700; letter-spacing:-0.01em;
-  line-height:1; vertical-align:middle;
+  line-height:1;
   /* ⚠ `will-change` EST ABSENT VOLONTAIREMENT : la pastille n'apparaît que
      quelques fois par session, et une couche graphique permanente pour cela
      coûterait plus qu'elle ne rapporte. */
@@ -12459,11 +12483,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   padding:0; background:none; border:none; font-size:inherit; color:inherit;
 }
 .cl-etat .ia-fig{ flex-shrink:0; }
-.cl-bas .cl-badge{ animation:etatArrive 0.32s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes etatArrive{
-  from{ transform:scale(0.7); opacity:0; }
-  to  { transform:scale(1);   opacity:1; }
-}
-@media (prefers-reduced-motion: reduce){
-  .cl-bas .cl-badge{ animation:none; }
-}
+/* ⚠ CETTE ANIMATION A ETE RETIREE, et c'etait un vrai defaut.
+
+   Elle devait adoucir le remplacement de la roue par le badge quand une
+   analyse se termine. Mais elle etait posee sur TOUS les badges, et la liste
+   est reconstruite a chaque rendu : elle rejouait donc a chaque changement de
+   filtre. Apres le flou, chaque carte voyait son badge grossir de 70 a 100 % —
+   un sursaut qui arrivait juste au moment ou tout devait se poser.
+
+   Il n'y a pas de correction possible en CSS seul : une animation d'apparition
+   ne peut pas distinguer un element qui vient d'apparaitre d'un element
+   recree a l'identique. Le passage de la roue au badge se fait donc sans
+   transition, ce qui est preferable a un sursaut sur toute la liste. */

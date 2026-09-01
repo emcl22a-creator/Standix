@@ -12654,6 +12654,13 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   line-height:1.35;
 }
 .histo-t em{ font-style:normal; font-weight:450; color:var(--label-3); }
+/* Le poste, sous la phrase. Plus petit et plus clair : il situe la personne,
+   il ne dit pas ce qui s'est passe. */
+.histo-s{
+  display:block; margin-top:2px;
+  font-size:12px; color:var(--label-3); letter-spacing:-0.015em;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
 .histo-q{ flex-shrink:0; font-size:12px; color:var(--label-3); white-space:nowrap; }
 
 /* Le jour, au-dessus d'un groupe de lignes. */

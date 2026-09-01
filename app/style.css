@@ -655,10 +655,6 @@
 
      Le repli est le seul mouvement qu'on déclenche APRÈS coup, en réponse à un
      geste. Il doit passer. */
-  .screen.nait .carte-part,
-  .screen.fondu .carte-part{
-    animation:carteSeReplie 0.44s cubic-bezier(0.4,0,0.2,1) forwards !important;
-  }
   /* ═══ LE CHANGEMENT D'ONGLET ═══
      Un fondu, rien d'autre. 180 ms : assez pour que l'œil enregistre que la
      page a changé, trop court pour qu'on attende. Aucun déplacement — un
@@ -2832,18 +2828,16 @@
   /* ═══ Disparition d'une carte ═══
      La carte se replie sur elle-même et les suivantes remontent. Sans ça, la
      procédure disparaît d'un coup et on doute d'avoir supprimé la bonne. */
-  @keyframes carteSeReplie{
-    0%   { opacity:1; transform:scale(1);     max-height:var(--h); margin-bottom:var(--mb); }
-    45%  { opacity:0; transform:scale(0.88);  max-height:var(--h); margin-bottom:var(--mb); }
-    100% { opacity:0; transform:scale(0.88);  max-height:0; margin-bottom:0; padding-top:0; padding-bottom:0; border-width:0; }
-  }
-  .carte-part{
-    overflow:hidden; pointer-events:none;
-    animation:carteSeReplie 0.44s cubic-bezier(0.4,0,0.2,1) forwards;
-  }
-  @media (prefers-reduced-motion: reduce){
-    .carte-part{ animation-duration:0.01s; }
-  }
+  /* ⚠ `.carte-part` ET `carteSeReplie` NE SERVENT PLUS.
+
+     Le repli se faisait par `max-height`, ce qui marche dans une pile mais pas
+     dans une grille : `gap` n'est pas une marge, il ne se replie pas. Un vide
+     de seize pixels restait a la place de la carte partie, et les suivantes
+     sautaient au redessin.
+
+     La disparition et le deplacement sont desormais lances en JavaScript —
+     voir `replierCarte` et `rejouerDeplacements` dans app.js. Les regles sont
+     retirees pour qu'on ne les croie pas encore en service. */
 
   /* ═══ Carte de contact ═══
      Même habit que la carte d'accueil — fond sombre, texte à gauche, avatar à

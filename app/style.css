@@ -12811,3 +12811,188 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-global-analyse .an-note{ font-size:11.5px; font-weight:400; color:var(--label-3); }
 #p-global-analyse .an-axe span{ font-size:10.5px; font-weight:400; color:var(--label-3); }
 #p-global-analyse .ac-chif-s{ font-size:11.5px; font-weight:400; color:var(--label-3); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE RÉGLAGES
+
+   Elle reprend la matière des autres pages : cartes à tranche, plaques
+   colorées, titres de section à 14 px. Rien de neuf à apprendre en arrivant
+   ici.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── LES TITRES DE SECTION ───────────────────────────────────────────────
+   Alignés sur ceux de l'accueil : même corps, même graisse. Ils étaient en
+   petites majuscules grises, hérités d'une liste de réglages système. */
+#p-settings .reg-titre{
+  font-size:14px; font-weight:650; letter-spacing:-0.025em;
+  color:var(--label); text-transform:none;
+  margin:26px 0 10px;
+}
+#p-settings .reg-titre:first-of-type{ margin-top:22px; }
+
+/* ─── LES GROUPES DE LIGNES ───────────────────────────────────────────────
+   Une carte par groupe, comme les blocs de l'accueil. */
+#p-settings .reg-groupe,
+#p-settings .etab-carte,
+#p-settings .reg-identite{
+  position:relative;
+  border-radius:20px; overflow:hidden;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+/* ⚠ `overflow:hidden` EST NÉCESSAIRE ICI. Les lignes ont un fond au toucher :
+   sans lui, la première et la dernière débordent des coins arrondis et l'on
+   voit deux angles droits apparaître sous le doigt. */
+
+/* La tranche en relief, la même recette que les cartes de dossier. */
+#p-settings .reg-groupe::before,
+#p-settings .etab-carte::before,
+#p-settings .reg-identite::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:1px; pointer-events:none; z-index:2;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.50) 16%,
+    rgba(28,28,38,0.025) 50%, rgba(28,28,38,0.09) 84%, rgba(28,28,38,0.14) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+#p-settings .reg-groupe > *,
+#p-settings .etab-carte > *,
+#p-settings .reg-identite > *{ position:relative; z-index:3; }
+
+/* ─── UNE LIGNE ──────────────────────────────────────────────────────────── */
+#p-settings .reg-ligne{
+  display:flex; align-items:center; gap:13px;
+  padding:13px 16px; width:100%; border:none; background:none;
+  font-family:inherit; text-align:left;
+}
+#p-settings .reg-ligne:active{ background:rgba(118,118,128,0.10); }
+
+/* La plaque de l'icône : celle des dossiers, en plus petit. */
+/* ⚠ LES ICONES ETAIENT EN AMBRE FIXE, `#FA8A08` ecrit sept fois dans le
+   balisage. Elles sont passees a `currentColor` : la couleur vient desormais
+   de la plaque, et une seule regle la change pour toutes.
+
+   ⚠ CHAQUE GROUPE A SA TEINTE, tiree de `PALETTE_DOSSIERS` comme partout
+     ailleurs. Sept icones de la meme couleur ne distinguent rien ; reparties
+     par section, elles aident a retrouver une ligne de memoire. */
+#p-settings .reg-ic{
+  flex:0 0 34px; width:34px; height:34px; border-radius:11px;
+  display:grid; place-items:center;
+  background:rgba(118,118,128,0.10); color:var(--label-2);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
+}
+/* ⚠ `nth-of-type` NE COMPTE PAS LES `.reg-groupe`, il compte les `div` — et il
+   y en a d'autres entre eux : les titres de section, la carte des
+   etablissements. Mes cinq regles visaient donc les mauvais elements, et trois
+   groupes sur cinq gardaient le gris par defaut.
+
+   `nth-of-type` ne se filtre pas par classe : il faut un parent commun dont
+   les enfants soient tous des groupes, ou nommer chaque groupe. Le plus simple
+   ici est de compter parmi les freres de meme classe — ce que fait
+   `:nth-child` combine a `.reg-groupe` seulement si l'ordre est stable, ce
+   qu'il n'est pas non plus.
+
+   On nomme donc les groupes dans le balisage, par `data-teinte`. Une valeur
+   lisible, qui ne bougera pas si l'on insere une section demain. */
+#p-settings .reg-groupe[data-teinte="bleu"]   .reg-ic{ background:rgba(31,76,238,0.10);  color:#3073C3; }
+#p-settings .reg-groupe[data-teinte="violet"] .reg-ic{ background:rgba(76,29,149,0.10);  color:#6F47BB; }
+#p-settings .reg-groupe[data-teinte="vert"]   .reg-ic{ background:rgba(20,83,45,0.10);   color:#318759; }
+#p-settings .reg-groupe[data-teinte="ambre"]  .reg-ic{ background:rgba(124,45,18,0.10);  color:#AC642E; }
+#p-settings .reg-groupe[data-teinte="gris"]   .reg-ic{ background:rgba(58,68,83,0.10);   color:#636D7C; }
+#p-settings .reg-ic svg{ width:19px; height:19px; }
+#p-settings .reg-nm{
+  flex:1; min-width:0; font-size:15px; font-weight:500;
+  letter-spacing:-0.025em; color:var(--label);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#p-settings .reg-val{
+  flex-shrink:0; font-size:13.5px; color:var(--label-3);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:44%;
+}
+#p-settings .reg-fl{ flex-shrink:0; font-size:19px; color:var(--label-3); line-height:1; }
+
+/* ⚠ LE FILET NE VA PAS JUSQU'AU BORD. Il part après la plaque, comme dans les
+   listes d'iOS : un trait pleine largeur découpe la carte en tranches, un
+   trait décalé rattache chaque ligne à celle du dessus. */
+#p-settings .reg-filet{
+  height:0.5px; background:var(--separator);
+  margin-left:63px;
+}
+
+/* ─── L'IDENTITÉ, EN TÊTE ────────────────────────────────────────────────── */
+#p-settings .reg-identite{
+  display:flex; align-items:center; gap:14px;
+  padding:15px 16px; width:100%; border:none;
+  font-family:inherit; text-align:left; margin-bottom:4px;
+}
+#p-settings .reg-identite .av{
+  flex:0 0 46px; width:46px; height:46px; border-radius:15px;
+  display:grid; place-items:center;
+  background:rgba(31,76,238,0.10); color:#1F4CEE;
+  font-size:15px; font-weight:650; letter-spacing:-0.02em;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
+}
+#p-settings .reg-identite .tx{ flex:1; min-width:0; display:flex; flex-direction:column; }
+#p-settings .reg-identite .nm{
+  font-size:16px; font-weight:650; letter-spacing:-0.03em; color:var(--label);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#p-settings .reg-identite .st{
+  font-size:13px; color:var(--label-3); margin-top:2px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#p-settings .reg-identite .fl{ flex-shrink:0; font-size:20px; color:var(--label-3); }
+#p-settings .reg-identite:active{ transform:scale(0.995); }
+
+#p-settings .etab-note{
+  font-size:12px; color:var(--label-3); line-height:1.45;
+  margin:9px 2px 0; letter-spacing:-0.01em;
+}
+#p-settings .reg-version{
+  text-align:center; font-size:11.5px; color:var(--label-3);
+  margin:26px 0 0; letter-spacing:-0.01em;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES SOUS-PAGES DES RÉGLAGES ARRIVENT PAR LA GAUCHE
+
+   Elles entrent en glissant depuis le bord droit, comme on tourne une page.
+   Les autres écrans montent en fondu ; ici le mouvement latéral dit qu'on
+   descend d'un niveau et qu'on remontera par le même chemin.
+
+   ⚠ LA CLASSE EST POSÉE PAR LE SCRIPT, sur le seul écran qui arrive. Une règle
+     visant tous les `#p-reg-*` s'appliquerait aussi au retour vers les
+     Réglages, et la page parente glisserait dans le mauvais sens.
+
+   ⚠ `translateX` ET NON `left`. Déplacer par la position force un recalcul de
+     mise en page à chaque image ; une transformation reste sur la carte
+     graphique.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.screen.vient-droite{
+  animation:pageGlisse 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes pageGlisse{
+  from{ transform:translateX(26%); opacity:0; }
+  to  { transform:none;            opacity:1; }
+}
+
+/* Le retour : la page parente revient de la gauche, dans l'autre sens. */
+.screen.vient-gauche{
+  animation:pageRevient 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes pageRevient{
+  from{ transform:translateX(-18%); opacity:0; }
+  to  { transform:none;             opacity:1; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.vient-droite, .screen.vient-gauche{ animation:none; }
+}

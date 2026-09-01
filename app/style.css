@@ -13964,3 +13964,35 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   background:none; color:#7FB6F2;
   box-shadow:inset 0 0 0 1px rgba(127,182,242,0.45);
 }
+
+
+/* ═══ LES CARTES D'OFFRE : UN NOIR SIMPLE ═══
+
+   Le fond etait deja celui d'« Ecrivez-nous », mais la carte vedette portait
+   par-dessus tout un dispositif herite : un contour dessine par `::before`, un
+   voile bleu par `::after`, une ombre coloree, une lueur sous le bouton.
+
+   ⚠ CINQ EFFETS POUR DIRE « celle-ci ». Un seul suffit, et « Ecrivez-nous » le
+     montre : un aplat, une ombre discrete, rien d'autre.
+
+   La vedette garde un lisere fin — il faut bien la distinguer — mais perd le
+   voile, la lueur et l'ombre teintee. */
+#p-abonnement .offre-carte,
+#p-abonnement .offre-carte.vedette{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+}
+/* ⚠ `inset` PLUTOT QU'UN PSEUDO-ELEMENT. Le contour tenait dans un `::before`
+   avec masque et composition — beaucoup de machinerie pour un trait. Une ombre
+   interieure fait le meme trait, sans element. */
+#p-abonnement .offre-carte.vedette{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(72,153,236,0.45),
+    0 1px 2px rgba(20,20,30,0.06),
+    0 14px 30px -18px rgba(20,20,30,0.34);
+}
+#p-abonnement .offre-carte.vedette::before,
+#p-abonnement .offre-carte.vedette::after{ display:none !important; }
+
+/* Le bouton perd sa lueur : elle debordait de la carte et la faisait flotter. */
+#p-abonnement .offre-cta{ box-shadow:none; }

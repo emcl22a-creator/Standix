@@ -2421,7 +2421,10 @@ function peindreReglages() {
   const el = (i) => document.getElementById(i)
 
   if (el('reg-nom')) el('reg-nom').textContent = nom || 'Votre compte'
-  if (el('reg-initiales')) el('reg-initiales').textContent = initialesEtab(nom)
+  /* ⚠ `reg-initiales` N'EXISTE PLUS dans le balisage : le rond de deux lettres
+     a ete retire de la ligne d'identite. Le test `if (el(...))` protegeait
+     deja l'ecriture, elle ne levait donc aucune erreur — mais une ligne qui ne
+     fait plus rien laisse croire qu'un element l'attend quelque part. */
 
   const n = (cachedMembres || []).length
   if (el('reg-nb-membres')) {

@@ -3908,18 +3908,96 @@ window.loadGlobalAnalyse = function() {
 /* Fait disparaître une carte en la repliant, puis rend la main. Les hauteurs
    sont mesurées avant de commencer : une animation ne peut pas partir de
    « la hauteur actuelle » si on ne la lui donne pas. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   FAIRE PARTIR UNE CARTE, ET LAISSER LES AUTRES REMONTER
+
+   ⚠ POURQUOI L'ANCIENNE VERSION SAUTAIT.
+
+     Elle repliait la carte par `max-height`, ce qui marche dans une pile mais
+     pas dans une grille : `gap` n'est pas une marge, il ne se replie pas. Un
+     ecart de seize pixels restait donc a la place de la carte partie.
+
+     Pire, les cartes du dessous ne bougeaient pas pendant l'animation : elles
+     changeaient de place d'un coup au redessin suivant. On voyait la carte
+     disparaitre, un blanc, puis un saut.
+
+   ⚠ CE QU'ON FAIT A LA PLACE : ON MESURE AVANT ET APRES.
+
+     C'est la seule facon d'animer un deplacement que le navigateur calcule
+     lui-meme. On note la position de chaque carte, on laisse le redessin se
+     faire, on mesure a nouveau, puis on remet chaque carte a son ancienne
+     place par une transformation — et on la laisse revenir a zero. Le
+     navigateur anime alors un mouvement qu'il n'a jamais eu a decider.
+
+   ⚠ `transform` UNIQUEMENT. Animer `top` ou `margin` recalculerait la mise en
+     page a chaque image, pour une liste entiere. Une transformation ne touche
+     a rien.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Les positions de tous les enfants d'un conteneur, retenues par leur cle. */
+function mesurerPlaces(conteneur) {
+  const places = new Map()
+  if (!conteneur) return places
+  for (const el of conteneur.children) {
+    const cle = el.dataset.key || el.dataset.cle
+    if (cle) places.set(cle, el.getBoundingClientRect())
+  }
+  return places
+}
+
+/* ⚠ ON NE REJOUE QUE CE QUI A BOUGE D'AU MOINS UN PIXEL. Poser une
+   transformation sur une carte immobile creerait une couche graphique pour
+   rien, et sur une longue liste cela se sent. */
+function rejouerDeplacements(conteneur, avant, duree = 340) {
+  if (!conteneur || !avant.size) return
+  for (const el of conteneur.children) {
+    const cle = el.dataset.key || el.dataset.cle
+    const vieux = cle && avant.get(cle)
+    if (!vieux) continue
+    const neuf = el.getBoundingClientRect()
+    const dx = vieux.left - neuf.left
+    const dy = vieux.top - neuf.top
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) continue
+    el.animate(
+      [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }],
+      { duration: duree, easing: 'cubic-bezier(0.32, 0.72, 0, 1)' })
+  }
+}
+
+/* La carte s'efface sur place. Elle n'est PLUS repliee : c'est le redessin qui
+   la retire, et `rejouerDeplacements` fait remonter les autres. */
 function replierCarte(el) {
   return new Promise((resoudre) => {
     if (!el) { resoudre(); return }
-    const st = getComputedStyle(el)
-    el.style.setProperty('--h', el.offsetHeight + 'px')
-    el.style.setProperty('--mb', st.marginBottom)
-    el.classList.add('carte-part')
-    let fini = false
-    const finir = () => { if (fini) return; fini = true; resoudre() }
-    el.addEventListener('animationend', finir, { once: true })
-    setTimeout(finir, 300)   // filet, si l'animation ne démarre pas
+
+    /* ⚠ ON RETIENT LES PLACES AVANT DE COMMENCER. Apres le redessin, la carte
+       n'existe plus et ses voisines ont deja bouge : il serait trop tard. */
+    const grille = el.parentElement
+    el.dataset.placesAvant = '1'
+    replierCarte._avant = mesurerPlaces(grille)
+    replierCarte._grille = grille
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      resoudre(); return
+    }
+    const anim = el.animate(
+      [{ opacity: 1, transform: 'scale(1)' },
+       { opacity: 0, transform: 'scale(0.92)' }],
+      { duration: 200, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' })
+    anim.finished.then(resoudre, resoudre)
+    /* Filet : si l'animation ne demarre pas — element hors de l'ecran,
+       onglet en arriere-plan — on n'attend pas indefiniment. */
+    setTimeout(resoudre, 260)
   })
+}
+
+/* A appeler APRES le redessin qui suit une suppression. */
+function terminerRepli() {
+  const grille = replierCarte._grille
+  const avant = replierCarte._avant
+  replierCarte._grille = null
+  replierCarte._avant = null
+  if (grille && avant) rejouerDeplacements(grille, avant)
 }
 
 /* Retrouve la carte d'une procédure, où qu'elle soit affichée. */
@@ -17154,6 +17232,16 @@ async function openAnalyse(procId) {
 
     allGestionProcedures = allGestionProcedures.filter(x => x.id !== procId)
     loadGestionProcedures()
+
+    /* ⚠ APRES LE REDESSIN, PAS AVANT. `terminerRepli` compare les places
+       d'avant a celles d'apres : appelee plus tot, elle mesurerait deux fois
+       la meme chose et n'animerait rien.
+
+       ⚠ ET DANS UN `requestAnimationFrame`. `loadGestionProcedures` ecrit dans
+         le DOM ; le navigateur n'a pas encore recalcule la mise en page quand
+         elle rend la main. Mesurer tout de suite donnerait les anciennes
+         positions. */
+    requestAnimationFrame(terminerRepli)
   }
 
   document.getElementById('analyse-titre').textContent = proc.titre
@@ -17742,6 +17830,13 @@ async function abandonnerAnalyse(proc, dejaConfirme) {
     const carte = carteDeProcedure(proc.id)
     if (carte) await replierCarte(carte)
     allGestionProcedures = allGestionProcedures.filter(p => p.id !== proc.id)
+
+    /* ⚠ ON REDESSINE ICI. Cette voie-la ne rechargeait pas la liste : la carte
+       restait a l'ecran, effacee par l'animation mais toujours presente, et
+       elle reapparaissait au premier redessin venu. */
+    if (typeof loadGestionProcedures === 'function') loadGestionProcedures()
+    requestAnimationFrame(terminerRepli)
+
     toast('Procédure supprimée.')
     return true
   } catch (e) {

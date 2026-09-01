@@ -2770,8 +2770,14 @@
       </div>
     </div>
 
+    <!-- ⚠ LES INITIALES ONT ETE RETIREES. Un rond de deux lettres a cote du nom
+         ecrit en entier ne dit rien de plus, et il prenait soixante pixels de
+         large. Meme raison que dans le bloc Equipe de l'accueil.
+
+         ⚠ `reg-initiales` DISPARAIT DU BALISAGE. Le script l'ecrivait ; son
+           ecriture est retiree avec, sinon elle echouerait en silence a chaque
+           ouverture de la page. -->
     <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
-      <span class="av" id="reg-initiales">—</span>
       <span class="tx">
         <span class="nm" id="reg-nom">—</span>
         <span class="st" id="reg-email">—</span>

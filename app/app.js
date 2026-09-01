@@ -6712,107 +6712,101 @@ function debutDuMois() {
   return d
 }
 
+/* ⚠ `CONSEILS_ACCUEIL` ET `conseilDuJour` ONT ETE RETIRES. L'astuce du jour a
+   laisse la place a une ligne qui dit ce qu'il reste a terminer : un accueil
+   sert a savoir ou l'on en est, pas a apprendre a se servir du produit.
+
+   Les vingt conseils sont dans l'historique du fichier si l'on veut les
+   reprendre ailleurs — une page d'aide, par exemple. */
+
 /* ═══════════════════════════════════════════════════════════════════════════
-   LES CONSEILS DE L'ACCUEIL
+   LES BROUILLONS PAS ENCORE VUS
 
-   Une phrase sous le salut, differente a chaque ouverture. Elle remplace
-   « Voici un apercu de votre espace de travail », qui ne disait rien qu'on ne
-   voie deja : la page EST l'apercu.
+   Une pastille sur l'onglet « Brouillons », avec le nombre de procedures
+   creees que le gerant n'a pas encore ouvertes depuis ce telephone.
 
-   ⚠ CE SONT DES GESTES, PAS DES ANNONCES. Chacun dit une chose que le gerant
-     peut faire aujourd'hui, avec ce qu'il a. Une liste d'avantages produit se
-     lit une fois puis s'ignore ; un conseil s'essaie.
+   ⚠ « VU » EST LOCAL, PAS PARTAGE. On enregistre dans le navigateur, pas en
+     base : deux gerants n'ont pas la meme liste a lire, et marquer une
+     procedure comme vue pour l'un l'effacerait pour l'autre.
 
-   ⚠ DEUX LIGNES, PAS UNE DE PLUS. Le premier morceau donne le geste, le second
-     ce qu'il apporte. Au-dela, on n'est plus sous un salut mais devant un mode
-     d'emploi.
-
-   Pour en ajouter un : une entree de plus, deux morceaux. Rien d'autre a
-   toucher.
+   ⚠ ON STOCKE LES IDENTIFIANTS, PAS UN COMPTE. Un compteur se desynchronise
+     des qu'une procedure est supprimee ou qu'une autre arrive ; une liste
+     d'identifiants reste juste quoi qu'il se passe.
    ═══════════════════════════════════════════════════════════════════════════ */
-const CONSEILS_ACCUEIL = [
-  ['Collez un QR code là où le geste se fait :',
-   'on scanne, la procédure s’ouvre.'],
+const CLE_VUS = 'standix.brouillons.vus'
 
-  ['Filmez le geste plutôt que de l’écrire :',
-   'l’IA en tire les étapes, vous corrigez.'],
+function brouillonsVus() {
+  try { return new Set(JSON.parse(localStorage.getItem(CLE_VUS) || '[]')) }
+  catch { return new Set() }
+}
 
-  ['Rangez par lieu, pas par thème :',
-   'on cherche la caisse, pas l’encaissement.'],
+function marquerBrouillonVu(id) {
+  if (!id) return
+  const vus = brouillonsVus()
+  if (vus.has(id)) return
+  vus.add(id)
+  /* ⚠ ON NE GARDE QUE LES DEUX CENTS DERNIERS. Sans plafond, la liste grossit
+     indefiniment dans un stockage limite a quelques megaoctets — et une
+     procedure vue il y a un an n'a plus besoin d'etre suivie. */
+  try { localStorage.setItem(CLE_VUS, JSON.stringify([...vus].slice(-200))) } catch {}
+  majPastilleBrouillons()
+}
 
-  ['Un brouillon n’est vu par personne :',
-   'publiez-le pour qu’il serve.'],
+function majPastilleBrouillons() {
+  const pt = document.getElementById('seg-brouillons-pt')
+  if (!pt) return
+  const vus = brouillonsVus()
+  const enCours = (p) => p.statut === 'traitement' || p.statut === 'redaction'
+  const n = (allGestionProcedures || [])
+    .filter(p => !p.publiee_le && !enCours(p) && !vus.has(p.id)).length
 
-  ['Ajoutez une photo à chaque étape :',
-   'un écran se reconnaît mieux qu’il ne se décrit.'],
+  /* ⚠ ON NE TOUCHE A RIEN SI LE NOMBRE N'A PAS CHANGE. Reecrire le contenu
+     relancerait l'animation d'apparition a chaque rendu de la liste, et la
+     pastille sauterait sans raison. */
+  if (pt.dataset.n === String(n)) return
+  pt.dataset.n = String(n)
 
-  ['Placez le QR code à hauteur des yeux :',
-   'on ne scanne pas ce qu’on doit chercher.'],
-
-  ['Regardez qui a lu quoi dans l’onglet Analyse :',
-   'une procédure jamais ouverte est à revoir.'],
-
-  ['Nommez vos étapes par un verbe :',
-   '« Vider le bac » se suit mieux que « Bac ».'],
-
-  ['Invitez un membre avant son arrivée :',
-   'il commence en sachant où tout se trouve.'],
-
-  ['Une vidéo de deux minutes suffit :',
-   'au-delà, on ne la regarde plus jusqu’au bout.'],
-
-  ['Découpez ce qui est trop long :',
-   'douze étapes se retiennent, trente se sautent.'],
-
-  ['Écrivez ce qu’il ne faut PAS faire :',
-   'une erreur non nommée se répète.'],
-
-  ['Mettez le QR code dans votre signature :',
-   'les procédures suivent vos échanges.'],
-
-  ['Relisez vos procédures après un départ :',
-   'ce qu’il savait sans l’écrire part avec lui.'],
-
-  ['Créez un sous-dossier dès la troisième :',
-   'au-delà, on ne parcourt plus, on cherche.'],
-
-  ['Datez ce qui change souvent :',
-   'un tarif ou un horaire sans date sème le doute.'],
-
-  ['Faites relire par celui qui exécute :',
-   'l’étape évidente pour vous ne l’est pas pour lui.'],
-
-  ['Plastifiez vos QR codes :',
-   'un papier scotché ne passe pas l’hiver.'],
-
-  ['Commencez par ce qu’on vous redemande :',
-   'c’est la procédure qui manque le plus.'],
-
-  ['Une procédure par onboarding, pas dix :',
-   'le premier jour, on retient une chose.'],
-]
-
-/* ⚠ LE CONSEIL SUIT LE JOUR, IL N'EST PAS TIRE AU HASARD. Deux ouvertures dans
-   la meme minute donneraient deux phrases differentes, et l'on croirait a un
-   defilement automatique qu'on n'a pas le temps de lire. Un jour, un conseil :
-   on a le temps de le retenir, et il revient assez rarement pour surprendre. */
-function conseilDuJour() {
-  const jour = Math.floor(Date.now() / 86400000)
-  /* ⚠ ON SAUTE LE PREMIER. Il porte le QR code, qui est deja ecrit au-dessus
-     en toutes lettres : le voir revenir en astuce le lendemain donnerait deux
-     fois la meme phrase sur le meme ecran. */
-  const reste = CONSEILS_ACCUEIL.slice(1)
-  return reste[jour % reste.length]
+  if (!n) {
+    if (!pt.hidden) {
+      /* On attend la fin de la disparition pour masquer : sinon elle serait
+         coupee net. */
+      pt.classList.add('part')
+      setTimeout(() => {
+        if (pt.dataset.n === '0') { pt.hidden = true; pt.classList.remove('part') }
+      }, 220)
+    }
+    return
+  }
+  pt.textContent = n > 9 ? '9+' : String(n)
+  pt.classList.remove('part')
+  pt.hidden = false
+  /* Le temps mort relance l'arrivee : ajouter une classe deja presente ne
+     rejoue rien. */
+  pt.classList.remove('vient'); void pt.offsetWidth; pt.classList.add('vient')
 }
 
 function peindreTuilesAccueil() {
-  /* ⚠ LA PREMIERE PHRASE EST FIXE, DANS LE BALISAGE. Seule l'astuce change :
-     ecrire les deux ici aurait fait disparaitre la promesse du produit chaque
-     fois que le script tarde a s'executer. */
-  const zAstuce = document.getElementById('ac-astuce-txt')
-  if (zAstuce) {
-    const [geste, gain] = conseilDuJour()
-    zAstuce.textContent = `${geste} ${gain}`
+  /* ═══ CE QU'IL RESTE A TERMINER ═══
+
+     ⚠ ON COMPTE LES BROUILLONS, PAS LES PROCEDURES EN COURS D'ANALYSE. Une
+       procedure que l'IA est en train d'ecrire n'attend rien de personne ; un
+       brouillon, si. Melanger les deux donnerait un chiffre qui bouge tout
+       seul et sur lequel on ne peut rien.
+
+     ⚠ LA PHRASE DISPARAIT QUAND IL N'Y A RIEN. « 0 procedure en brouillon »
+       prend une ligne pour dire qu'il n'y a rien a dire — et sur un accueil,
+       chaque ligne compte. */
+  const zReste = document.getElementById('ac-reste')
+  if (zReste) {
+    const enCours = (p) => p.statut === 'traitement' || p.statut === 'redaction'
+    const brouillons = (allGestionProcedures || [])
+      .filter(p => !p.publiee_le && !enCours(p)).length
+    zReste.hidden = !brouillons
+    if (brouillons) {
+      zReste.textContent = brouillons > 1
+        ? `${brouillons} procédures sont en brouillon, en attente de publication.`
+        : `1 procédure est en brouillon, en attente de publication.`
+    }
   }
 
   const zChiffres = document.getElementById('ac-chiffres')
@@ -8034,19 +8028,37 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
         <span class="proc-fl">\u203a</span>
       </span>
       <span class="cl-bas">
-        ${proc.publiee_le
-          ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
-          : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Brouillon</span>`}
+        ${/* ⚠ UNE PROCEDURE EN COURS D'ANALYSE MONTRE LA ROUE, PAS UN BADGE.
+
+              Elle apparait dans « Brouillons » des sa creation — elle n'est
+              pas publiee — mais y afficher « Brouillon » laisserait croire
+              qu'elle attend une action alors que l'IA est en train de
+              l'ecrire. `etatProcedureHtml` rend l'anneau qui tourne, le meme
+              signe que partout ailleurs dans l'app.
+
+              ⚠ LA ROUE DISPARAIT SEULE. Quand l'analyse se termine, la liste
+                se redessine et le badge la remplace ; la classe `cl-etat-neuf`
+                lui donne son arrivee. */
+          enAnalyse || enPanne
+            ? `<span class="cl-etat cl-etat-neuf">${etatProcedureHtml(proc)}</span>`
+            : proc.publiee_le
+              ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
+              : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Brouillon</span>`}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
     </span>`
 
   /* Meme regle que partout : une analyse en panne se reprend la ou on la voit,
      une analyse en cours ouvre sa fenetre d'abandon. */
-  el.onclick = () =>
-    enPanne ? proposerReprise(proc) :
-    enAnalyse ? proposerAbandon(proc) :
+  el.onclick = () => {
+    /* ⚠ ON MARQUE AVANT D'OUVRIR, pas dans `openAnalyse`. Une procedure en
+       panne ou en cours d'analyse n'ouvre pas sa page — mais on l'a bien vue,
+       et la pastille doit en tenir compte. */
+    marquerBrouillonVu(proc.id)
+    if (enPanne) return proposerReprise(proc)
+    if (enAnalyse) return proposerAbandon(proc)
     openAnalyse(proc.id)
+  }
   return el
 }
 
@@ -8107,6 +8119,7 @@ function renderCategoryGrid() {
        appel tomberait dans la zone morte et la page des procedures ne
        s'afficherait plus. Le controle de syntaxe ne le verrait pas. */
   poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false)
+  majPastilleBrouillons()
 
   const nb = document.getElementById('proc-nb-dossiers')
   /* ⚠ L'ICONE SUIT CE QU'ON COMPTE, sur cette page comme sur celle d'un
@@ -8580,32 +8593,36 @@ function morceauxDeLaListe() {
    ⚠ `fill:forwards` RESTE INDISPENSABLE. C'est lui qui tient le flou pendant
      qu'on remplace le contenu ; sans lui, la liste redeviendrait nette juste
      avant de changer. */
+/* ═══ LA SORTIE ET L'ENTREE ═══
+
+   ⚠ NEUF PIXELS DE FLOU, C'ETAIT TROP. La liste devenait une bouillie, et un
+     flou qu'on remarque n'est plus une transition mais un effet. A cinq, on
+     perd la lisibilite — ce qui suffit a couvrir le remplacement — sans que la
+     forme des cartes se dissolve.
+
+   ⚠ ET C'ETAIT TROP LENT. 190 + 340 ms font plus d'une demi-seconde pour
+     changer de filtre : on appuie, et l'on attend. 130 + 220 laissent le geste
+     se voir tout en restant sous le seuil ou l'on commence a patienter.
+
+   ⚠ LA COURBE CHANGE AUSSI. `cubic-bezier(0.32, 0.72, 0, 1)` freine
+     longuement — juste pour un ecran qui arrive, trop mou pour un contenu qui
+     se remplace. La sortie part vite et s'arrete net, l'entree demarre franc
+     et se pose : c'est ce qui fait un mouvement net plutot que cotonneux. */
 function flouSortie(el) {
   return el.animate(
-    [{ filter: 'blur(0px)' }, { filter: 'blur(9px)' }],
-    { duration: 190, easing: COURBE_SEGM, fill: 'forwards' })
+    [{ filter: 'blur(0px)' }, { filter: 'blur(5px)' }],
+    { duration: 130, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' })
 }
 
-function flouEntree(el, rang) {
-  /* ⚠ ON ANNULE D'ABORD LA SORTIE, ET C'EST INDISPENSABLE.
-
-     Elle porte `fill:forwards` — necessaire pour que le flou tienne pendant
-     qu'on remplace le contenu. Mais une animation terminee en `forwards`
-     continue d'imposer sa derniere image : mesure, l'element retombait a neuf
-     pixels de flou des la fin de l'entree, et la liste redevenait illisible au
-     lieu de se poser.
-
-     `cancel()` la retire pour de bon. `getAnimations` les rend toutes : on ne
-     peut pas se contenter de garder une reference, l'element pouvant en porter
-     d'autres.
-
-   ⚠ PLUS DE DECALAGE EN CASCADE. Il n'avait de sens que sur des cartes une a
-     une ; sur deux conteneurs, il ferait arriver la liste apres son propre
-     compte, ce qui se remarque au lieu de se sentir. */
+function flouEntree(el) {
+  /* ⚠ ON ANNULE D'ABORD LA SORTIE. Elle porte `fill:forwards` — necessaire
+     pour tenir le flou pendant qu'on remplace le contenu — et une animation
+     terminee en `forwards` continue d'imposer sa derniere image. Sans ce
+     `cancel`, la liste retombe a cinq pixels de flou des la fin de l'entree. */
   el.getAnimations().forEach(a => a.cancel())
   return el.animate(
-    [{ filter: 'blur(9px)' }, { filter: 'blur(0px)' }],
-    { duration: 340, easing: COURBE_SEGM })
+    [{ filter: 'blur(5px)' }, { filter: 'blur(0px)' }],
+    { duration: 220, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' })
 }
 
 document.getElementById('proc-segm')?.addEventListener('click', (e) => {
@@ -8625,7 +8642,7 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
      meme element se contrarieraient. */
   sansApparition = true
 
-  /* 190 ms : la duree exacte de la sortie. Redessiner plus tot couperait le
+  /* 130 ms : la duree exacte de la sortie. Redessiner plus tot couperait le
      mouvement, plus tard laisserait un blanc.
 
      ⚠ LE CONTENU EST REMPLACE PENDANT QUE LA GRILLE EST INVISIBLE — l'animation
@@ -8634,8 +8651,8 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   setTimeout(() => {
     renderCategoryGrid()
     sansApparition = false
-    morceauxDeLaListe().forEach((el, i) => flouEntree(el, i))
-  }, 190)
+    morceauxDeLaListe().forEach(flouEntree)
+  }, 130)
 })
 
 /* ⚠ `load` NE SUFFIT PAS, ET C'EST POUR CELA QUE LA PASTILLE MANQUAIT AU

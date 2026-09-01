@@ -12566,9 +12566,23 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
 .histo-carte{
   position:relative; width:100%; max-width:var(--col); margin:0 auto;
-  /* ⚠ 88 % ET NON 100 %. On doit voir un morceau de l'écran du dessous : c'est
-     ce qui fait comprendre que la page est POSÉE dessus et se referme. */
-  max-height:88dvh; display:flex; flex-direction:column;
+  /* ⚠ LA FEUILLE S'ARRÊTE SOUS LA BARRE DU HAUT, et cette hauteur se CALCULE —
+     elle ne se choisit pas en pourcentage.
+
+     La barre occupe `safe-area + 64 px` : sa marge haute suit l'encoche du
+     téléphone, elle n'est donc pas la même partout. Un pourcentage fixe
+     recouvrirait le logo sur un appareil et laisserait un trou sur un autre.
+
+     12 px de dégagement sous la barre : assez pour qu'on la voie entière et
+     qu'elle ne paraisse pas collée à la feuille.
+
+     ⚠ `dvh` ET NON `vh`. Sur un téléphone, la barre d'adresse se replie au
+       défilement : `vh` garde la hauteur du départ et la feuille dépasserait
+       de l'écran, poussant la dernière ligne hors de vue. */
+  --histo-haut:calc(env(safe-area-inset-top, 0px) + 76px);
+  max-height:calc(100dvh - var(--histo-haut));
+  height:calc(100dvh - var(--histo-haut));
+  display:flex; flex-direction:column;
   background:var(--bg);
   border-radius:26px 26px 0 0;
   box-shadow:0 -10px 34px -12px rgba(20,20,30,0.28);

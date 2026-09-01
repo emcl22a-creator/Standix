@@ -3896,14 +3896,22 @@ const LENS = {
      l'ecran : la hauteur de la capsule se regle par PAD, plus bas. */
   REST_H: 46,
   // Ressort de position : la lentille a une vraie inertie.
-  STIFFNESS: 340,   // plus vif : la fin de course ne traine plus.
-                    // Monte de 200 a 340 : le ressort converge en 1/racine(k),
-                    // soit un tiers de temps en moins. Sans danger ici — le pas
-                    // est plafonne a 1/45 s, et k x pas au carre vaut 0,17,
-                    // tres loin du seuil de divergence.
-  DAMPING: 37,      // sur-amorti : aucun depassement de position.
-                    // Cale sur la raideur : 2 x racine(340) = 36,9. Toute autre
-                    // valeur ferait depasser la cible ou trainer la fin.
+  STIFFNESS: 440,   // Monte de 340 a 440 : le ressort converge en 1/racine(k),
+                    // soit 12 % de temps en moins sur la course complete.
+                    //
+                    // ⚠ LA LIMITE N'EST PAS LA SENSATION, C'EST LA STABILITE.
+                    //   Le pas est plafonne a 1/45 s ; l'integration diverge
+                    //   quand k x pas au carre approche 4. A 440, il vaut
+                    //   0,217 — on peut monter bien plus haut sans risque
+                    //   numerique, mais au-dela le mouvement devient sec et
+                    //   l'on ne voit plus la capsule se deplacer, seulement
+                    //   apparaitre a sa nouvelle place.
+  DAMPING: 42,      // sur-amorti : aucun depassement de position.
+                    //
+                    // ⚠ CETTE VALEUR SE RECALCULE AVEC LA RAIDEUR, elle ne se
+                    //   choisit pas : 2 x racine(440) = 41,95. Laissee a 37,
+                    //   le ressort serait sous-amorti et la capsule
+                    //   depasserait l'onglet avant d'y revenir.
   // Fenetre d'observation de la vitesse, comme accelerationWindowDuration
   // dans LiquidLensView (0.3 s).
   WINDOW_MS: 300,

@@ -883,28 +883,31 @@
      Il était blanc sur trois quarts de tour, avec un éclat ambre au passage.
      Le blanc dominait donc, et l'anneau ne ressemblait pas au logo.
 
-     Les deux teintes sont maintenant celles du logo : `#FFDFA0` pour le clair,
-     `#1F4CEE` pour le sombre. Le mouvement reste lisible — un quart de tour
-     plus foncé qui tourne — mais l'ensemble appartient à la marque.
+     Les trois teintes sont maintenant celles du bouton « Générer les étapes » :
+     `#1F4CEE`, `#4899EC`, et le noir de l'app. Le mouvement reste lisible — un
+     quart de tour plus dense qui tourne — et le signe de l'IA parle la même
+     langue partout où il apparaît.
 
      ⚠ LES NOMS DE VARIABLES SONT TROMPEURS. `--blanc` et `--bleu` datent d'une
        version où l'anneau était effectivement blanc et bleu. Je ne les renomme
        pas : ils sont lus à quatre endroits, et un renommage partiel casserait
        l'anneau sur un écran que je n'aurais pas vu. */
   .ia-fig{
-    /* ═══ BLANC, PUIS LES COULEURS DE L'ICÔNE DE PROCÉDURE ═══
+    /* ═══ NOIR, PUIS LE DÉGRADÉ DU BOUTON « GÉNÉRER LES ÉTAPES » ═══
 
-       L'anneau employait `#FFDFA0` et `#E8760F` — proches, mais pas identiques
-       aux icônes, qui vont de `#EB5201` à `#FDA81E` via `#FA8A08`.
+       Les trois teintes sont exactement celles du bouton : `#1F4CEE` au
+       départ, `#4899EC` à l'arrivée — les deux bouts de `navBleu` — et le noir
+       de l'app pour ancrer l'ensemble.
 
-       Les trois teintes sont maintenant celles de `logoOrIc`, plus le blanc que
-       tu demandes. Un même signe ne peut pas avoir deux palettes.
+       ⚠ LE NOIR EST EN PREMIER, PAS LE BLANC. Cet anneau tourne sur des fonds
+         CLAIRS : une portion blanche y devenait un trou, et l'on ne voyait
+         plus qu'un arc bleu incomplet tourner. Le noir se détache partout.
 
-       ⚠ LES NOMS SONT TROMPEURS. `--blanc` et `--bleu` datent d'une version où
-         l'anneau l'était vraiment. Je ne les renomme pas : ils sont lus à
-         plusieurs endroits, et un renommage partiel casserait l'anneau sur un
-         écran que je n'aurais pas vu. `--milieu` est nouveau. */
-    --blanc:#FFFFFF; --milieu:#FDA81E; --bleu:#EB5201;
+       ⚠ LES NOMS DE VARIABLES SONT TROMPEURS, et je ne les renomme pas.
+         `--blanc` ne contient plus de blanc, `--bleu` porte le bleu clair.
+         Elles sont lues à plusieurs endroits ; un renommage partiel casserait
+         l'anneau sur un écran que je n'aurais pas vu. */
+    --blanc:#111116; --milieu:#1F4CEE; --bleu:#4899EC;
     position:relative; display:grid; place-items:center; flex-shrink:0;
   }
   .ia-fig .lum{
@@ -11137,9 +11140,22 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      ligne du bas donnerait un ecart juste pour un titre d'une ligne et faux
      pour un titre de deux. Ici, c'est l'espace restant qui se place tout seul,
      quelle que soit la longueur du nom. */
+/* ⚠ `center` AVEC UN ECART FIXE, PLUS `space-between`.
+
+   La colonne s'etirait sur les 72 px de la plaque et repartissait l'espace
+   restant entre le nom et la ligne du bas : l'ecart valait ce qui restait,
+   soit vingt-deux pixels, et ne se reglait pas.
+
+   Il vaut maintenant 18, et se lit ici. Le bloc de texte est centre sur la
+   hauteur de la plaque, ce qui reste equilibre.
+
+   ⚠ CE QU'ON PERD : la ligne du bas ne coincide plus exactement avec le bas de
+     la pastille. Les deux ne peuvent pas tenir ensemble a hauteur de plaque
+     constante — soit l'ecart est libre et l'alignement exact, soit l'ecart est
+     choisi et l'alignement approche. */
 .cl-co{
   flex:1; min-width:0; display:flex; flex-direction:column;
-  min-height:72px; justify-content:space-between;
+  min-height:72px; justify-content:center; gap:18px;
 }
 .cl-nm{
   font-size:17.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;
@@ -12186,42 +12202,40 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 .ac-bloc-t > span{
   font-size:13px; font-weight:650; letter-spacing:-0.02em; color:var(--label-2);
 }
-/* ⚠ UN FILET SOUS LE TITRE, PAS UNE SECONDE CARTE. La ligne etait elle-meme
-   une carte : imbriquee dans le bloc, cela faisait deux contours a quatre
-   pixels l'un de l'autre. Un demi-pixel suffit a separer. */
-.ac-bloc-t{ padding-bottom:11px; box-shadow:inset 0 -0.5px 0 rgba(60,60,67,0.10); }
+/* ⚠ PLUS DE FILET SOUS LE TITRE. Il separait l'etiquette d'une ligne qui
+   ressemblait a une carte ; la phrase, elle, prolonge l'etiquette — un trait
+   entre les deux couperait ce qui doit se lire d'un trait. */
+.ac-bloc-t{ margin-bottom:13px; }
 
-.ac-lig{
-  display:flex; align-items:center; gap:13px;
-  padding:0; border-radius:0; background:none; box-shadow:none;
+/* L'etiquette et son point de couleur : vert pour une lecture, violet pour une
+   creation. C'est ce qui distingue les deux blocs sans qu'on lise leur titre. */
+.ac-eti{
+  display:inline-flex; align-items:center; gap:7px;
+  font-size:11.5px; font-weight:600; letter-spacing:-0.01em; color:var(--label-2);
 }
-/* Les initiales d'un membre, dans la même pastille que les icônes de dossier —
-   même taille, même rayon. Un visage et un dossier sont deux objets qu'on
-   parcourt de la même façon. */
-.ac-lig-ini{
-  flex:0 0 44px; width:44px; height:44px; border-radius:14px;
-  display:grid; place-items:center;
+.ac-eti i{ width:6px; height:6px; border-radius:100px; flex-shrink:0; }
+
+/* ═══ LA PHRASE ═══
+   Elle porte l'information. Le complement — le dossier, la procedure — est en
+   gris DANS le texte : on lit une phrase francaise, pas deux champs empiles. */
+.ac-ph{
+  font-size:17px; font-weight:650; letter-spacing:-0.03em; line-height:1.32;
+  color:var(--label);
+}
+.ac-ph em{ font-style:normal; font-weight:500; color:var(--label-3); }
+
+/* Le pied : les initiales et le moment. Ce qui situe, pas ce qui informe. */
+.ac-bas{ display:flex; align-items:center; gap:9px; margin-top:13px; }
+.ac-mini{
+  width:26px; height:26px; border-radius:9px; display:grid; place-items:center;
   background:rgba(31,76,238,0.10); color:#1F4CEE;
-  font-size:14px; font-weight:650; letter-spacing:-0.02em;
+  font-size:10px; font-weight:700; letter-spacing:-0.01em;
 }
-.ac-lig-pl{
-  flex:0 0 44px; width:44px; height:44px; border-radius:14px;
-  display:grid; place-items:center;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
-}
-.ac-lig-pl svg{ width:24px; height:24px; display:block; }
-.ac-lig-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
-.ac-lig-t{
-  font-size:14.5px; font-weight:600; letter-spacing:-0.025em; color:var(--label);
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.ac-lig-s{
-  font-size:12.5px; color:var(--label-3); margin-top:2px;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
-}
-.ac-lig-q{
-  flex-shrink:0; font-size:12px; color:var(--label-3); white-space:nowrap;
-}
+.ac-q{ font-size:12.5px; color:var(--label-3); }
+/* ⚠ `.ac-lig`, `.ac-lig-t`, `.ac-lig-s`, `.ac-lig-q`, `.ac-lig-ini` ET
+   `.ac-lig-pl` ONT ETE RETIREES. Elles habillaient la ligne a trois champs
+   que la phrase remplace. Gardees, elles laisseraient croire qu'un tel objet
+   existe encore sur cette page. */
 
 
 /* ═══ CE QUE L'ANCIEN ACCUEIL LAISSE DERRIÈRE LUI ═══
@@ -12250,17 +12264,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 #p-home .ac-salut span{ color:var(--label); font-weight:700; }
 
-#p-home .ac-bloc-t > span,
-#p-home .ac-lig-t,
-#p-home .ac-lig-s,
-#p-home .ac-lig-q,
+#p-home .ac-eti,
+#p-home .ac-ph,
+#p-home .ac-q,
 #p-home .ac-chif-s{
   text-transform:none; letter-spacing:-0.02em;
 }
-#p-home .ac-lig-t{ font-size:14.5px; font-weight:600; color:var(--label); }
-#p-home .ac-lig-s{ font-size:12.5px; font-weight:400; color:var(--label-3); }
-#p-home .ac-lig-q{ font-size:12px; font-weight:400; color:var(--label-3); }
-#p-home .ac-bloc-t > span{ font-size:13px; font-weight:650; color:var(--label-2); }
+#p-home .ac-ph{ font-size:17px; font-weight:650; color:var(--label); letter-spacing:-0.03em; }
+#p-home .ac-q{ font-size:12.5px; font-weight:400; color:var(--label-3); }
+#p-home .ac-eti{ font-size:11.5px; font-weight:600; color:var(--label-2); }
 #p-home .ac-chif-s{ font-size:11.5px; font-weight:400; color:var(--label-3); }
 
 

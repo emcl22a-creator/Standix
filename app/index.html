@@ -1038,6 +1038,22 @@
     </div>
   </div>
 
+  <div class="histo" id="histo-equipe" hidden aria-hidden="true">
+    <div class="histo-fond" data-fermer-histo></div>
+    <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Activité de l’équipe">
+      <span class="histo-poignee" data-fermer-histo></span>
+      <div class="histo-tete">
+        <h2>Équipe</h2>
+        <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <p class="histo-note" id="histo-equipe-note">Temps passé à lire des procédures.</p>
+      <div class="histo-liste" id="histo-equipe-liste"></div>
+    </div>
+  </div>
+
   <div class="histo" id="histo-creations" hidden aria-hidden="true">
     <div class="histo-fond" data-fermer-histo></div>
     <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Procédures créées">
@@ -2250,7 +2266,7 @@
       <div class="ac-bloc">
         <div class="ac-bloc-t">
           <span class="ac-eti"><i style="background:#318759"></i>Équipe</span>
-          <button type="button" class="ac-sect-plus" onclick="showGestionScreen('p-an-equipe')">Voir plus
+          <button type="button" class="ac-sect-plus" onclick="ouvrirHisto('equipe')">Voir plus
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                  stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
           </button>

@@ -874,6 +874,36 @@ const cibleQR = (function () {
   return proc ? { proc: proc, code: p.get('e') || '' } : null
 })()
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ON NOTE L'OUVERTURE PAR QR CODE
+
+   ⚠ ELLE S'ECRIT AVANT TOUTE CONNEXION. Un code se scanne par quelqu'un qui
+     n'a peut-etre pas de compte — c'est tout l'interet du dispositif. Attendre
+     une session ferait perdre exactement les scans qu'on cherche a compter.
+
+   ⚠ ET SANS BLOQUER L'AFFICHAGE. La procedure doit s'ouvrir tout de suite ; le
+     comptage part en arriere-plan et son echec ne se voit nulle part. Une
+     statistique ne fait pas attendre un lecteur devant sa machine.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function noterScanQR() {
+  if (!cibleQR?.proc) return
+  try {
+    /* Le code de l'entreprise est dans l'adresse ; sans lui on ne saurait pas
+       a qui rattacher le scan. */
+    const ent = cibleQR.code ? await entrepriseParCode(cibleQR.code) : null
+    if (!ent?.id) return
+    await supabase.from('scans_qr').insert({
+      entreprise_id: ent.id,
+      procedure_id: cibleQR.proc,
+      membre_id: currentMembre?.id || null,
+    })
+  } catch (e) {
+    /* Table absente — migration pas encore passee — ou reseau coupe : on
+       n'affiche rien. Le scan a eu lieu, il ne sera simplement pas compte. */
+    console.warn('[scan] non enregistre :', e?.message || e)
+  }
+}
+
 /* Affiche l'ossature de l'app sans attendre les données : barre du haut,
    titre, et six cartes en creux. L'utilisateur voit son app tout de suite,
    elle se remplit ensuite. On se souvient de l'espace choisi la dernière fois
@@ -1030,6 +1060,10 @@ async function preparerArriveeQR() {
     document.getElementById('signup-equipe-field').style.display = 'none'
   }
   // On nomme l'entreprise si on peut la retrouver par son code.
+  /* ⚠ EN ARRIERE-PLAN, SANS `await`. Le comptage ne doit pas retarder d'une
+     milliseconde l'ouverture de la procedure. */
+  noterScanQR()
+
   if (cibleQR.code) {
     const ent = await entrepriseParCode(cibleQR.code)
     const sous = document.getElementById('qr-bandeau-sous')
@@ -7035,18 +7069,40 @@ function remplirHistoCreations() {
 
 let anJours = 7
 
-/* ⚠ LES SCANS DE QR CODE NE SONT PAS ENCORE COMPTES EN BASE.
+/* ═══ LES SCANS DE QR CODE ═══
 
-   Rien n'enregistre l'ouverture d'une procedure par QR code : `validations`
-   note la LECTURE, pas la maniere d'y arriver. Le chiffre affiche donc un
-   tiret plutot qu'un zero — un zero se lit comme « personne ne scanne »,
-   alors qu'on ne sait simplement pas.
+   Ils viennent de la table `scans_qr` — voir `scans-qr.sql`. Le compte est
+   garde en memoire par periode : la page se redessine a chaque changement de
+   filtre, et redemander la meme chose au serveur a chaque fois serait du
+   gaspillage.
 
-   Pour l'activer : ajouter une colonne `via_qr boolean` a `validations`, la
-   remplir a l'ouverture quand `cibleQR` est renseigne, et remplacer le `null`
-   ci-dessous par le compte. */
-function anScansQR(depuis) {
-  return null
+   ⚠ `null` TANT QU'ON NE SAIT PAS, et zero seulement quand on sait qu'il n'y
+     en a eu aucun. La tuile affiche un tiret dans le premier cas : un zero se
+     lit comme « personne ne scanne », alors qu'on n'a peut-etre pas encore la
+     reponse — ou pas encore la table. */
+const anScansCache = {}
+
+function anScansQR() {
+  const n = anScansCache[anJours]
+  return n === undefined ? null : n
+}
+
+function chargerScansQR() {
+  if (!currentMembre?.entreprise_id) return
+  const jours = anJours
+  if (anScansCache[jours] !== undefined) return
+  const depuis = new Date(Date.now() - jours * 86400000).toISOString()
+  supabase.from('scans_qr')
+    .select('id', { count: 'exact', head: true })
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .gte('cree_le', depuis)
+    .then(({ count, error }) => {
+      if (error) return          // table absente : on garde le tiret
+      anScansCache[jours] = count || 0
+      /* On redessine, mais SEULEMENT si l'on est encore sur la meme periode :
+         l'utilisateur a pu changer de filtre pendant la requete. */
+      if (jours === anJours) peindreAnalyse()
+    })
 }
 
 function anDureeLisible(sec) {
@@ -7218,6 +7274,7 @@ function peindreAnalyseInterne() {
 
   const lectures = valides.length
   const secondes = valides.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  chargerScansQR()
   const scans = anScansQR()
 
   const IC = {

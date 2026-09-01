@@ -892,12 +892,50 @@ const cibleQR = (function () {
 async function noterScanQR() {
   if (!cibleQR?.proc) return
   try {
-    /* Le code de l'entreprise est dans l'adresse ; sans lui on ne saurait pas
-       a qui rattacher le scan. */
-    const ent = cibleQR.code ? await entrepriseParCode(cibleQR.code) : null
-    if (!ent?.id) return
+    /* ═══ TROUVER L'ENTREPRISE, PAR TROIS CHEMINS ═══
+
+       ⚠ LE QR NE CONTIENT PAS LE CODE D'ENTREPRISE. Je m'appuyais dessus, et
+         sortais sans rien ecrire quand il manquait — c'est-a-dire TOUJOURS.
+         L'adresse gravee dans le QR est `?proc=...`, rien d'autre : le code a
+         ete retire volontairement, un code affiche au mur etant un code
+         public.
+
+       ⚠ LA PROCEDURE D'ABORD, PAS LA SESSION.
+
+         J'avais mis la session en tete : c'est le cas le plus frequent, donc
+         le plus rapide. Mais quelqu'un de connecte sur l'entreprise B qui
+         scanne une affiche de l'entreprise A aurait fait compter le scan a B.
+         Un compteur faux est pire qu'un compteur vide.
+
+         La procedure porte son `entreprise_id` : c'est la SEULE source qui
+         dise a qui appartient l'affiche qu'on vient de scanner. Une requete de
+         plus, en arriere-plan, ne coute rien a personne.
+
+       Les deux autres ne servent que si celle-la echoue :
+
+         · le code dans l'adresse, s'il y est (anciennes affiches) ;
+         · la session, en dernier recours.
+
+       ⚠ LA PREMIERE EXIGE UNE LECTURE PUBLIQUE DE `procedures`. Si la
+         politique RLS l'interdit a un visiteur non connecte, la requete rend
+         vide et l'on passe aux suivantes. */
+    let entrepriseId = null
+
+    const { data: pr } = await supabase.from('procedures')
+      .select('entreprise_id').eq('id', cibleQR.proc).maybeSingle()
+    entrepriseId = pr?.entreprise_id || null
+
+    if (!entrepriseId && cibleQR.code) {
+      const ent = await entrepriseParCode(cibleQR.code)
+      entrepriseId = ent?.id || null
+    }
+
+    if (!entrepriseId) entrepriseId = currentMembre?.entreprise_id || null
+
+    if (!entrepriseId) return
+
     await supabase.from('scans_qr').insert({
-      entreprise_id: ent.id,
+      entreprise_id: entrepriseId,
       procedure_id: cibleQR.proc,
       membre_id: currentMembre?.id || null,
     })
@@ -1000,10 +1038,11 @@ window.onNavigate = function (index) {
       else if (index === 2) openEquipeSettings()
       return
     }
-    if (index === 0) showGestionScreen('p-home')
-    else if (index === 1) showGestionScreen('p-list')
-    else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
-    else if (index === 3) openSettings()
+    /* ⚠ TROIS ONGLETS COTE GESTION. Procedures en premier — c'est desormais
+       l'ecran d'ouverture de l'app. */
+    if (index === 0) showGestionScreen('p-list')
+    else if (index === 1) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
+    else if (index === 2) openSettings()
   } finally { navDepuisOnglet = false }
 }
 
@@ -1063,10 +1102,9 @@ async function preparerArriveeQR() {
     // saisir à quelqu'un qui n'a fait que scanner une affiche.
     document.getElementById('signup-equipe-field').style.display = 'none'
   }
+  /* ⚠ L'APPEL A `noterScanQR` A ETE DEPLACE dans `ouvrirCibleQR`. Ici, il ne
+     couvrait que les visiteurs non connectes — une minorite des scans. */
   // On nomme l'entreprise si on peut la retrouver par son code.
-  /* ⚠ EN ARRIERE-PLAN, SANS `await`. Le comptage ne doit pas retarder d'une
-     milliseconde l'ouverture de la procedure. */
-  noterScanQR()
 
   if (cibleQR.code) {
     const ent = await entrepriseParCode(cibleQR.code)
@@ -2174,7 +2212,9 @@ async function enterApp(membre) {
        d'une session précédente réapparaissait : se déconnecter depuis une fiche
        de procédure puis recréer un compte ramenait sur cette fiche, parce que
        rien ne remettait la navigation à zéro. */
-    showGestionScreen('p-home')
+    /* ⚠ ON ARRIVE SUR PROCEDURES, plus sur l'accueil. C'est ce que l'app fait :
+       montrer et ranger des procedures. */
+    showGestionScreen('p-list')
 
     /* ═══ LE DESSIN D'ABORD, LES DONNÉES ENSUITE ═══
 
@@ -2282,6 +2322,23 @@ let qrPropositionFaite = false
 
 async function ouvrirCibleQR() {
   if (!cibleQR) return
+
+  /* ⚠ LE SCAN SE NOTE ICI, ET NON DANS L'ECRAN D'INSCRIPTION.
+
+     Je l'avais pose dans `preparerArriveeQR`, la page qui accueille un
+     VISITEUR NON CONNECTE. Or la plupart des scans viennent de quelqu'un qui a
+     deja son compte ouvert : ce chemin-la n'y passe jamais, et le compteur
+     restait a zero.
+
+     `ouvrirCibleQR` est le seul endroit par ou TOUT le monde passe — connecte
+     ou non, gestion ou equipe, appareil photo du telephone ou scanner de
+     l'app.
+
+   ⚠ AVANT L'EFFACEMENT DE L'ADRESSE. Quelques lignes plus bas, le parametre
+     `?proc=` est retire de l'URL. `cibleQR` est fige au chargement et n'en
+     souffre pas, mais l'ordre reste le bon : on note d'abord, on nettoie
+     ensuite. */
+  noterScanQR()
 
   /* Cas fréquent en pratique : la personne est connectée, mais dans une autre
      entreprise que celle du QR. Sans rien faire, elle verrait « Procédure
@@ -5849,20 +5906,23 @@ document.getElementById('tb-analyse')?.addEventListener('click', function() {
 function poserOngletActif(id) {}
 
 const ONGLET_PAR_ECRAN = {
-  /* Gestion : Accueil 0, Procédures 1, Analyse 2, Réglages 3.
+  /* ⚠ TOUS LES INDICES ONT RECULE D'UN CRAN. L'onglet Accueil a ete retire :
+     Procedures passe de 1 a 0, Analyse de 2 a 1, Reglages de 3 a 2.
 
-     `p-list` est rattachée à Accueil, pas à Procédures. Les deux onglets y
-     mènent tant que l'écran d'accueil n'existe pas ; il fallait en choisir un,
-     et c'est bien l'écran d'ouverture de l'app. */
-  'p-home': 0,
-  'p-list': 1, 'p-category': 1, 'p-analyse': 1, 'p-edit-procedure': 1,
-  'p-create': 1, 'p-create-manual': 1, 'p-create-video': 1,
-  'p-create-doc': 1, 'p-create-ai': 1,
-  'p-global-analyse': 2, 'p-membre': 2, 'p-membre-fiche': 2,
-  'p-an-equipe': 2, 'p-an-categories': 2, 'p-an-temps': 2,
-  'p-settings': 3, 'p-reg-poste': 3, 'p-reg-compte': 3, 'p-reg-code': 3,
-  'p-reg-postes': 3, 'p-reg-langue': 3, 'p-reg-appareils': 3,
-  'p-abonnement': 3, 'p-membres': 3,
+     Une seule valeur oubliee ici allume le mauvais onglet — et rien ne le
+     signale, la barre se contentant d'eclairer une position qui existe. */
+  'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
+  'p-create': 0, 'p-create-manual': 0, 'p-create-video': 0,
+  'p-create-doc': 0, 'p-create-ai': 0,
+  'p-global-analyse': 1, 'p-membre': 1, 'p-membre-fiche': 1,
+  'p-an-equipe': 1, 'p-an-categories': 1, 'p-an-temps': 1,
+  'p-settings': 2, 'p-reg-poste': 2, 'p-reg-compte': 2, 'p-reg-code': 2,
+  'p-reg-postes': 2, 'p-reg-langue': 2, 'p-reg-appareils': 2,
+  'p-abonnement': 2, 'p-membres': 2, 'p-postes': 2,
+  /* ⚠ `p-quota` EST PLUS BAS, AVEC `p-scan`. Je l'avais ajoute ici aussi en
+     decalant les indices : deux entrees pour la meme cle, dont seule la
+     derniere compte. Sans consequence tant que les deux valent 2, mais le jour
+     ou l'une change, on cherchera longtemps. */
 
   /* ═══ CES DEUX-LÀ MANQUAIENT ═══
 
@@ -5870,16 +5930,18 @@ const ONGLET_PAR_ECRAN = {
      sur la page d'où l'on vient. C'est ce qui donnait une barre qui indique
      une page où l'on n'est pas.
 
-     `p-activites` s'ouvre par « Voir plus » depuis l'accueil — c'est la suite
-     de l'accueil, l'onglet y reste. `p-scan` est le lecteur de QR code, qui
-     appartient aux Réglages. */
+     ⚠ `p-activites` ET `p-recentes` S'OUVRAIENT DEPUIS L'ACCUEIL, qui n'existe
+       plus. Leurs boutons de retour menent desormais a Procedures : l'onglet
+       suit, sinon la capsule resterait sur la page d'ou l'on vient.
+
+     ⚠ LES DEUX DERNIERES LIGNES ETAIENT RESTEES A 3, l'ancien indice des
+       Reglages. Une valeur hors des trois onglets n'allume rien — et rien ne
+       le signale. */
   'p-activites': 0,
-  /* Comme `p-activites` : ouverte depuis l'accueil, elle en est la suite, et
-     l'onglet Accueil doit rester allumé. Sans cette ligne, la capsule
-     resterait sur la page d'où l'on vient. */
   'p-recentes': 0,
-  'p-scan': 3,
-  'p-quota': 3,   // il vit dans les Réglages
+  'p-coller': 0,        // le collage de videos, dans la creation
+  'p-scan': 2,          // le lecteur de QR code, dans les Reglages
+  'p-quota': 2,         // les analyses video, dans les Reglages
 }
 
 /* `p-reg-etabs` a été retiré de cette table en même temps que l'écran : la
@@ -6431,8 +6493,20 @@ async function loadGestionProcedures() {
        « En ligne » et « Brouillons » se contentent d'une ligne grise.
 
        La meme forme partout : `cl-rien`, une phrase centree. */
+    /* ⚠ LA PHRASE SUR LE QR CODE A ETE RECUPEREE DE L'ACCUEIL.
+
+       Elle disait « Collez un QR code la ou le geste se fait : on scanne, la
+       procedure s'ouvre. » C'est le geste central de l'app, celui que personne
+       ne devine seul — et le seul contenu de l'accueil qui n'existait nulle
+       part ailleurs.
+
+     ⚠ ELLE N'APPARAIT QUE SUR LA LISTE VIDE. Quelqu'un qui a deja des
+       procedures sait comment ca marche ; la lui repeter a chaque ouverture
+       en ferait un decor qu'on ne lit plus. */
     catGridEl.innerHTML =
-      '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.</div>'    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
+      '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.</div>' +
+      '<div class="cl-astuce">Collez un QR code l\u00e0 o\u00f9 le geste se fait : ' +
+      'on scanne, la proc\u00e9dure s\u2019ouvre.</div>'    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
        entreprise sans procédure laissait en mémoire les lectures de la
        précédente : la carte du haut annonçait « 4 min de formation » pendant
        que les trois sections en dessous disaient « aucun membre » et
@@ -7241,6 +7315,17 @@ function anCourbe(points, teinte, id, unite) {
   if (unite === 'min' && brut >= 60) {
     max = Math.ceil(brut / 60) * 60
     if ((max / 2) % 30) max = Math.ceil(brut / 120) * 120
+  } else if (brut <= 5) {
+    /* ⚠ SOUS SIX, ON COMPTE UN PAR UN.
+
+       L'echelle decimale arrondit au demi-ordre de grandeur : a 1 lecture,
+       elle donnait 0 / 0,5 / 1, affiches « 0 / 1 / 1 ». Deux graduations
+       portaient le meme chiffre, et l'axe devenait illisible — c'est ce que
+       montre la capture.
+
+       Sous six, on prend le sommet tel quel et l'on n'affiche que les valeurs
+       ENTIERES distinctes. Une lecture donne « 0 / 1 », pas « 0 / 1 / 1 ». */
+    max = Math.max(1, Math.ceil(brut))
   } else {
     const pas = Math.pow(10, Math.floor(Math.log10(brut)))
     max = Math.ceil(brut / (pas / 2)) * (pas / 2) || 1
@@ -7261,7 +7346,22 @@ function anCourbe(points, teinte, id, unite) {
 
   /* Trois niveaux : zero, milieu, sommet. Cinq lignes sur 128 px de haut
      quadrillent le fond au lieu de l'echelonner. */
-  const niveaux = [0, max / 2, max]
+  /* ⚠ C'EST LE MILIEU QU'ON ECARTE, JAMAIS LE SOMMET.
+
+     Mon premier filtre comparait chaque niveau au precedent DANS LE TABLEAU
+     D'ORIGINE. Sur une echelle a 1, il gardait 0 et 0,5 — tous deux distincts
+     — puis rejetait 1, dont l'arrondi egale celui de 0,5. La ligne du haut se
+     retrouvait a mi-hauteur, etiquetee « 1 », pendant que la courbe la
+     depassait. C'est ce que montrait le rendu.
+
+     Le zero et le sommet sont les deux bornes : ils bornent la lecture et ne
+     se discutent pas. Seul le milieu est facultatif — on le garde s'il porte
+     un libelle different des deux autres, on le retire sinon. */
+  const milieu = max / 2
+  const niveaux = [0, max]
+  if (Math.round(milieu) !== 0 && Math.round(milieu) !== Math.round(max)) {
+    niveaux.splice(1, 0, milieu)
+  }
   /* ⚠ L'UNITE EST LA MEME SUR TOUTE L'ECHELLE. Melanger « 45 » et « 2 h » sur
      deux reperes voisins oblige a comparer des minutes a des heures — et l'on
      s'y trompe. Si le sommet depasse l'heure, tout passe en heures. */
@@ -7540,9 +7640,26 @@ function peindreTuilesAccueil() {
        « 12 » ne se lit que si l'on sait qu'il y en avait vingt. Quand le
        forfait est inconnu — fonction absente, offre sans limite — on n'affiche
        pas de fraction inventee. */
-  const an = (typeof etatAbo !== 'undefined' && etatAbo?.analyses) || null
+  /* ⚠ DEUX SOURCES POUR LE MEME CHIFFRE, ET C'ETAIT LE DEFAUT.
+
+     L'accueil lisait `etatAbo.analyses`, rempli par `reste_analyses` au
+     chargement de l'abonnement. Les Reglages, eux, appellent `verifier_analyse`
+     directement. Resultat visible a l'ecran : « — » sur l'accueil et
+     « 246 sur 250 » dans les Reglages, au meme instant.
+
+     On lit desormais `quotaConnu`, le cache que `lireQuota` remplit — la meme
+     valeur que la ligne des Reglages, par definition.
+
+   ⚠ ET ON LE DEMANDE S'IL EST VIDE. Au premier affichage de l'accueil, personne
+     n'a encore ouvert les Reglages : le cache est nul, et le tiret reviendrait.
+     La requete part en arriere-plan et redessine quand elle repond. */
+  const an = (typeof quotaConnu !== 'undefined' && quotaConnu) || null
   const quota = Number(an?.quota) || null
   const restant = Number.isFinite(Number(an?.reste)) ? Number(an.reste) : null
+
+  if (!an && typeof lireQuota === 'function') {
+    lireQuota().then(q => { if (q) peindreTuilesAccueil() })
+  }
 
   /* ═══ LES TROIS CHIFFRES ═══
 
@@ -9586,7 +9703,35 @@ document.addEventListener('click', (e) => {
   if (choix) {
     volet.querySelectorAll('.tb-v-tri').forEach(b => b.classList.toggle('on', b === choix))
     currentCatSort = choix.dataset.tri
-    renderCategoryGrid()
+
+    /* ⚠ LE MEME GESTE QUE LE CHANGEMENT DE SEGMENT.
+
+       Le tri appelait `renderCategoryGrid()` seul : la liste se remplacait
+       d'une image a l'autre, sans transition. A cote du segment — qui floute,
+       redessine, puis revient — le contraste sautait aux yeux.
+
+       Les deux font desormais exactement la meme chose, avec les memes
+       morceaux et le meme delai. */
+    /* ⚠ ON FERME LE VOLET AVANT DE SORTIR. Mon premier essai retournait tout
+       de suite apres avoir lance l'animation : le volet de tri restait ouvert
+       par-dessus la liste. La suite de cette fonction s'en chargeait, et le
+       `return` la sautait. */
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+    document.getElementById('proc-filtre')?.setAttribute('aria-expanded', 'false')
+
+    if (MOINS_ANIM()) { renderCategoryGrid(); return }
+
+    morceauxDeLaListe().forEach(flouSortie)
+    /* Comme pour le segment : on coupe l'apparition au defilement, deux
+       animations sur la meme carte se contrarieraient. */
+    sansApparition = true
+    setTimeout(() => {
+      renderCategoryGrid()
+      sansApparition = false
+      morceauxDeLaListe().forEach(flouEntree)
+    }, 130)
+    return
   }
 
   const ouvrir = bouton && !volet.classList.contains('ouvert') && !choix
@@ -9813,7 +9958,28 @@ document.addEventListener('click', (e) => {
   if (choix) {
     volet.querySelectorAll('.tb-v-tri').forEach(b => b.classList.toggle('on', b === choix))
     currentCategorySort = choix.dataset.tri
-    renderCategoryProceduresList()
+
+    /* ⚠ LE MEME GESTE QUE SUR LA PAGE PROCEDURES. Ce tri-ci redessinait aussi
+       sans transition — le defaut etait aux deux endroits, pas a un seul. */
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+    document.getElementById('cat-filtre')?.setAttribute('aria-expanded', 'false')
+
+    if (MOINS_ANIM()) { renderCategoryProceduresList(); return }
+
+    const morceaux = [
+      document.querySelector('#p-category .proc-rang'),
+      document.getElementById('category-procedures-list'),
+    ].filter(Boolean)
+
+    morceaux.forEach(flouSortie)
+    sansApparition = true
+    setTimeout(() => {
+      renderCategoryProceduresList()
+      sansApparition = false
+      morceaux.forEach(flouEntree)
+    }, 130)
+    return
   }
 
   const ouvrir = bouton && !volet.classList.contains('ouvert') && !choix

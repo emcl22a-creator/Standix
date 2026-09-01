@@ -12723,9 +12723,15 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    Posees par-dessus le SVG plutot que dedans : celui-ci est etire en largeur,
    un texte a l'interieur le serait aussi. */
 .an-ech{ position:absolute; inset:0; pointer-events:none; }
+/* ⚠ `white-space:nowrap` ET UNE COLONNE PLUS LARGE. « 20 min » se cassait en
+   deux lignes dans les 28 px d'origine, et la seconde partait sous la ligne de
+   graduation. Les etiquettes en heures — « 1 h 30 » — auraient fini pareil.
+
+   La reserve du trace est de 34 px : 30 pour le texte plus quatre de
+   respiration avant la premiere ligne. */
 .an-ech span{
   position:absolute; left:0; transform:translateY(-50%);
-  width:28px; text-align:right;
+  width:30px; text-align:right; white-space:nowrap;
   font-size:10px; color:var(--label-3); font-variant-numeric:tabular-nums;
 }
 

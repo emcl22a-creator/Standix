@@ -12541,3 +12541,120 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   /* Pas de lisere : elle est posee SUR la carte, pas a cheval sur son bord. */
   box-shadow:none;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PAGES D'HISTORIQUE
+
+   Une feuille qui monte du bas, par-dessus l'écran d'où l'on vient. C'est ce
+   qui dit qu'on n'a pas navigué ailleurs : on a ouvert quelque chose, et on va
+   le refermer.
+
+   ⚠ ÉTAGE 80 : au-dessus de la barre du bas, qui est à 60. Une feuille qui
+     passe sous la barre laisserait croire qu'on peut encore changer d'onglet
+     par-dessous — et le geste échouerait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.histo{ position:fixed; inset:0; z-index:80; display:flex; align-items:flex-end; }
+.histo[hidden]{ display:none; }
+
+.histo-fond{
+  position:absolute; inset:0;
+  background:rgba(20,20,30,0.28);
+  -webkit-backdrop-filter:blur(2px); backdrop-filter:blur(2px);
+  animation:histoVoile 0.3s ease both;
+}
+@keyframes histoVoile{ from{ opacity:0 } to{ opacity:1 } }
+
+.histo-carte{
+  position:relative; width:100%; max-width:var(--col); margin:0 auto;
+  /* ⚠ 88 % ET NON 100 %. On doit voir un morceau de l'écran du dessous : c'est
+     ce qui fait comprendre que la page est POSÉE dessus et se referme. */
+  max-height:88dvh; display:flex; flex-direction:column;
+  background:var(--bg);
+  border-radius:26px 26px 0 0;
+  box-shadow:0 -10px 34px -12px rgba(20,20,30,0.28);
+  animation:histoMonte 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes histoMonte{
+  from{ transform:translateY(100%) } to{ transform:none }
+}
+/* La fermeture. La classe est posée par le script, qui attend la fin avant de
+   masquer — sinon l'animation serait coupée net. */
+.histo.part .histo-carte{ animation:histoDescend 0.28s cubic-bezier(0.4,0,1,1) both; }
+.histo.part .histo-fond{ animation:histoVoile 0.28s ease reverse both; }
+@keyframes histoDescend{ from{ transform:none } to{ transform:translateY(100%) } }
+
+/* La poignée : le signe qu'on peut refermer. Elle est cliquable, mais son rôle
+   premier est de dire ce que la feuille est. */
+.histo-poignee{
+  display:block; width:38px; height:5px; border-radius:100px;
+  background:rgba(60,60,67,0.22);
+  margin:9px auto 0; flex-shrink:0;
+}
+
+.histo-tete{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 24px 0; flex-shrink:0;
+}
+.histo-tete h2{
+  font-size:24px; font-weight:700; letter-spacing:-0.04em; color:var(--label);
+}
+.histo-x{
+  flex-shrink:0; width:32px; height:32px; border-radius:100px; border:none;
+  display:grid; place-items:center;
+  background:rgba(118,118,128,0.12); color:var(--label-2);
+}
+.histo-x svg{ width:15px; height:15px; }
+.histo-x:active{ transform:scale(0.92); }
+
+.histo-note{
+  padding:6px 24px 0; flex-shrink:0;
+  font-size:12.5px; color:var(--label-3); letter-spacing:-0.015em;
+}
+
+/* ⚠ C'EST LA LISTE QUI DÉFILE, PAS LA FEUILLE. Le titre et la note restent en
+   place pendant qu'on parcourt : sans cela, on perd de vue ce qu'on lit dès la
+   dixième ligne. */
+.histo-liste{
+  flex:1; min-height:0; overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  display:flex; flex-direction:column; gap:10px;
+  padding:16px 24px calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+/* Une ligne : la même matière que les cartes de dossier, en plus bas de
+   plafond — ici on parcourt, on ne choisit pas. */
+.histo-lig{
+  display:flex; align-items:center; gap:12px;
+  padding:13px 15px; border-radius:18px;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 6px 14px -12px rgba(20,20,30,0.10);
+}
+.histo-pt{ flex:0 0 8px; width:8px; height:8px; border-radius:100px; }
+.histo-co{ flex:1; min-width:0; }
+.histo-t{
+  font-size:14.5px; font-weight:600; letter-spacing:-0.025em; color:var(--label);
+  line-height:1.35;
+}
+.histo-t em{ font-style:normal; font-weight:450; color:var(--label-3); }
+.histo-q{ flex-shrink:0; font-size:12px; color:var(--label-3); white-space:nowrap; }
+
+/* Le jour, au-dessus d'un groupe de lignes. */
+.histo-jour{
+  font-size:12px; font-weight:650; letter-spacing:-0.01em; color:var(--label-3);
+  text-transform:capitalize; padding:8px 2px 0;
+}
+.histo-jour:first-child{ padding-top:0; }
+
+.histo-rien{
+  padding:40px 0; text-align:center;
+  font-size:14px; color:var(--label-3);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .histo-carte, .histo-fond,
+  .histo.part .histo-carte, .histo.part .histo-fond{ animation:none; }
+}

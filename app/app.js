@@ -9959,17 +9959,36 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
   poserPastilleSegment(b)
   filtreEtatDossiers = b.dataset.etat
 
-  /* ⚠ PLUS DE FLOU : LES CARTES SE REPLACENT.
+  /* ═══ LE SEGMENT GARDE SON FLOU, LE TRI NON ═══
 
-     La liste se floutait, se redessinait derriere ce voile, puis reapparaissait.
-     Le flou cachait le remplacement — et avec lui le deplacement, qui est
-     justement ce qu'on veut voir.
+     ⚠ LES DEUX GESTES NE FONT PAS LA MEME CHOSE, et c'est pourquoi ils n'ont
+       pas la meme animation.
 
-     ⚠ ON COUPE L'APPARITION AU DEFILEMENT. Les cartes de ce rendu portent leur
-       propre entree ; deux animations sur le meme element se contrarieraient. */
+       Le TRI reordonne les MEMES cartes : on veut voir chacune rejoindre sa
+       nouvelle place, donc elles glissent.
+
+       Le SEGMENT remplace le CONTENU : passer de « Toutes » a « Brouillons »
+       fait disparaitre la moitie de la liste et en fait apparaitre d'autres.
+       Il n'y a pas de deplacement a montrer — seulement un remplacement, que
+       le flou couvre le temps qu'il se fasse.
+
+       J'avais applique le glissement aux deux : sur le segment, des cartes
+       sans rapport semblaient se transformer les unes en les autres. */
+  if (MOINS_ANIM()) { renderCategoryGrid(); return }
+
+  morceauxDeLaListe().forEach(flouSortie)
+
+  /* ⚠ ON COUPE L'APPARITION AU DEFILEMENT. Les cartes de ce rendu portent leur
+     propre entree ; deux animations sur le meme element se contrarieraient. */
   sansApparition = true
-  reorganiserListe(document.getElementById('cat-grid'), renderCategoryGrid)
-  sansApparition = false
+
+  /* 130 ms : la duree exacte de la sortie. Redessiner plus tot couperait le
+     mouvement, plus tard laisserait un blanc. */
+  setTimeout(() => {
+    renderCategoryGrid()
+    sansApparition = false
+    morceauxDeLaListe().forEach(flouEntree)
+  }, 130)
 })
 
 /* ⚠ `load` NE SUFFIT PAS, ET C'EST POUR CELA QUE LA PASTILLE MANQUAIT AU

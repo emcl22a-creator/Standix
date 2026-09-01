@@ -10220,6 +10220,30 @@ document.getElementById('cat-retour')?.addEventListener('click', () => {
   showGestionScreen('p-list')
 })
 
+/* ⚠ ENTRER DANS UN SOUS-DOSSIER N'EST PAS UN CHANGEMENT D'ECRAN, et c'est
+     pour cela qu'il n'y avait aucune animation.
+
+   Ouvrir un dossier appelle `showGestionScreen`, qui joue le voile et relance
+   l'entree de la page. Un sous-dossier, lui, reste sur `p-category` : seul le
+   contenu change. Sans rien de plus, la liste se remplace d'une image a
+   l'autre, et l'on doute d'avoir change de niveau.
+
+   `animerEntreeCategorie` rejoue les deux gestes a la main : le voile, et
+   l'animation d'entree de l'ecran. Le resultat est identique a l'ouverture
+   d'un dossier — c'est le meme voile et la meme animation, pas une imitation.
+
+   ⚠ IL FAUT RETIRER LA CLASSE PUIS FORCER UN RECALCUL. Rejouer une animation
+     CSS deja posee ne produit rien : le navigateur ne voit aucun changement.
+     `void offsetWidth` l'oblige a constater le retrait avant l'ajout. */
+function animerEntreeCategorie() {
+  jouerVoile()
+  const ecran = document.getElementById('p-category')
+  if (!ecran) return
+  ecran.classList.remove('active')
+  void ecran.offsetWidth
+  ecran.classList.add('active')
+}
+
 function ouvrirSousDossier(nom) {
   sousDossierCourant = nom
   currentCategoryQuery = ''
@@ -10233,6 +10257,12 @@ function ouvrirSousDossier(nom) {
   }
   majTitreCategorie()
   renderCategoryProceduresList()
+  animerEntreeCategorie()
+
+  /* ⚠ ON REMONTE EN HAUT. On peut entrer dans un sous-dossier depuis le bas
+     d'une longue liste ; sans cela, sa page s'ouvrirait a mi-hauteur. */
+  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  catch { window.scrollTo(0, 0) }
 }
 
 /* Le titre porte le chemin, et le bouton « renommer le dossier » disparaît

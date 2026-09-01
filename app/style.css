@@ -12992,3 +12992,38 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 @media (prefers-reduced-motion: reduce){
   .screen.vient-droite, .screen.vient-gauche{ animation:none; }
 }
+
+
+/* ═══ « ÉCRIVEZ-NOUS » : UN NOIR SIMPLE ═══
+
+   La carte portait `an-intro-cadre`, hérité de la page Analyse : un dégradé de
+   gris très clair, une ombre à 42 % et une lueur bleue en diagonale. Trois
+   effets pour un bloc qui n'a qu'une chose à dire.
+
+   ⚠ LA LUEUR EST MASQUÉE, PAS RETIRÉE DU BALISAGE. `.an-gain-lueur` est un
+     élément à part ; le supprimer du HTML toucherait aussi la page Analyse,
+     qui l'emploie encore. */
+#p-settings .contact-carte{
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
+  border-radius:20px;
+}
+#p-settings .contact-carte .an-gain-lueur{ display:none; }
+#p-settings .contact-carte .t{ color:#FFFFFF; }
+#p-settings .contact-carte .s{ color:rgba(255,255,255,0.62); }
+/* ⚠ L'INVITE PASSE EN BLEU CLAIR, PAS EN BLEU DE MARQUE. Sur du noir,
+   `#1F4CEE` tombe à 2,98 de contraste — mesuré au moment de la bannière
+   d'accueil, et c'est le même fond ici. */
+#p-settings .contact-carte .contact-invite{ color:#7FB6F2; }
+
+/* ═══ « SE DÉCONNECTER » EN ROUGE ═══
+
+   ⚠ MES PROPRES RÈGLES ÉCRASAIENT LA CLASSE `danger`. `#p-settings .reg-nm`
+     pose `color:var(--label)` avec deux niveaux de spécificité ; la règle
+     d'origine, écrite sur `.reg-ligne.danger`, ne pesait pas assez. Il faut le
+     même préfixe pour reprendre la main.
+
+   ⚠ UN ROUGE SOMBRE, PAS LE ROUGE SYSTÈME. `#FF3B30` sur un fond blanc cassé
+     vibre et attire l'œil plus que le reste de la page — or ce bouton ne doit
+     pas être la première chose qu'on voit en arrivant dans les Réglages. */
+#p-settings .reg-ligne.danger .reg-nm{ color:#C8342B; font-weight:550; }

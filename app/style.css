@@ -13879,3 +13879,88 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   text-align:center; font-size:12.5px; line-height:1.55;
   color:var(--label-3); letter-spacing:-0.01em;
 }
+
+
+/* ═══ « REVOQUER », SUR LA CARTE NOIRE ═══
+
+   Mesure : le texte tombait a 1,04 de contraste — un gris a 62 % pose sur un
+   fond passe au noir. Litteralement invisible, on ne voyait que le rectangle.
+
+   Ce bouton datait du fond clair, ou son gris discret avait un sens : ne pas
+   inviter au clic, a cote de « Copier » qui est le geste courant. Cette
+   intention reste, elle se transpose seulement.
+
+   ⚠ BLANC A 72 %, PAS BLANC PLEIN. « Copier » est l'action principale ;
+     « Revoquer » doit rester en retrait. A 72 % le contraste vaut 9,7 — bien
+     au-dessus du seuil de 4,5 — tout en restant visiblement moins appuye que
+     son voisin. */
+#p-reg-code .ci-btn--sourd{
+  background:rgba(255,255,255,0.10);
+  color:rgba(255,255,255,0.72);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.20);
+}
+#p-reg-code .ci-btn--sourd:active{ background:rgba(255,255,255,0.16); }
+
+
+/* ⚠ « COPIER » AVAIT GARDE SON TEXTE BRUN. `#2A1400` etait la couleur lisible
+   sur l'ambre d'origine ; le fond est passe au bleu, le texte est reste. Sur
+   `#1F4CEE`, ce brun tombe a 1,6 de contraste.
+
+   Le meme oubli que sur le bouton « Ajouter » des postes et celui des offres
+   d'abonnement : la conversion vers le bleu avait repris les fonds, pas les
+   textes qu'ils portent. */
+#p-reg-code .ci-btn:not(.ci-btn--sourd){ color:#FFFFFF; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ABONNEMENT — PLUS AUCUNE COULEUR CHAUDE
+
+   Onze regles portaient encore de l'ambre ou de l'orange, relevees une a une
+   dans le fichier. Elles ne se voyaient pas a l'inspection des couleurs
+   rendues : plusieurs vivent dans des degrades de texte ou des pseudo-
+   elements, que le navigateur ne rapporte pas comme une couleur simple.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── LE PRIX ─────────────────────────────────────────────────────────────
+   ⚠ C'EST `.offre-prix .v` QUI PORTE LE CHIFFRE, pas `.offre-prix`. Le premier
+     avait un degrade `#FFDFA0 → #FFC46A` — l'ambre du logo — applique en
+     `background-clip:text`. Ma mesure sur le parent rendait « blanc » et
+     passait a cote. */
+#p-abonnement .offre-prix .v{
+  background:none;
+  -webkit-background-clip:initial; background-clip:initial;
+  -webkit-text-fill-color:#FFFFFF; color:#FFFFFF;
+}
+
+/* ─── LES COCHES DE LA LISTE ─────────────────────────────────────────────
+   Un degrade blanc vers bleu, du haut vers le bas : la pointe claire attrape
+   l'oeil, la base bleue rattache la coche au reste de la carte.
+
+   ⚠ UN DEGRADE SUR UN TRAIT DEMANDE UN `linearGradient` SVG. On ne peut pas
+     poser `linear-gradient()` sur `stroke` en CSS — c'est une image, pas une
+     couleur. On le declare donc une fois dans le balisage et on le nomme ici. */
+#p-abonnement .offre-li svg{ stroke:url(#cocheOffre); }
+
+/* ─── L'ETIQUETTE DE REMISE ─────────────────────────────────────────────── */
+#p-abonnement .abo-ryt .eco,
+#p-abonnement .eco{
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF;
+}
+
+/* ─── LA NOTE ANNUELLE ────────────────────────────────────────────────────
+   Son degrade de texte finissait sur `#F56F02`. Les deux bouts passent au
+   bleu. */
+#p-abonnement .offre-annuel-note b{
+  background:linear-gradient(135deg,#7FB6F2,#4899EC);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+}
+
+/* ─── LE BOUTON DE L'OFFRE EN COURS ───────────────────────────────────────
+   ⚠ IL EST SUR UNE CARTE NOIRE. Son bleu profond `#1F4CEE` y tombe sous le
+     seuil ; c'est le bout clair qui se lit. */
+#p-abonnement .offre-cta.encours{
+  background:none; color:#7FB6F2;
+  box-shadow:inset 0 0 0 1px rgba(127,182,242,0.45);
+}

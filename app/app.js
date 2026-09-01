@@ -6785,6 +6785,148 @@ function majPastilleBrouillons() {
   pt.classList.remove('vient'); void pt.offsetWidth; pt.classList.add('vient')
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX PAGES D'HISTORIQUE
+
+   Elles montent du bas et se referment. Le contenu est charge a l'ouverture,
+   pas au demarrage : personne ne les regarde a chaque session, et les charger
+   d'avance ferait payer a tout le monde ce que quelques-uns consultent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ TRENTE JOURS, ET LE MEME NOMBRE DES DEUX COTES. Le texte annonce « le
+   dernier mois » : si la lecture et la purge divergent, la page montrera des
+   lignes que le menage a deja effacees, ou en cachera qui existent encore. */
+const HISTO_JOURS = 30
+
+/* ⚠ ELLE EST POSEE SUR `window`, et il le faut. Les boutons « Voir plus » sont
+   construits en chaine de caracteres avec un attribut `onclick` : celui-ci
+   n'est evalue que dans la portee globale. Une fonction declaree dans un
+   module n'y est pas visible, et le clic ne ferait rien — sans erreur. */
+window.ouvrirHisto = function ouvrirHisto(quoi) {
+  const f = document.getElementById(`histo-${quoi}`)
+  if (!f) return
+  f.hidden = false
+  f.setAttribute('aria-hidden', 'false')
+  f.classList.remove('part')
+  /* ⚠ ON BLOQUE LE DEFILEMENT DE LA PAGE DU DESSOUS. Sans cela, le doigt qui
+     arrive au bout de la liste continue a faire glisser l'ecran derriere — et
+     l'on se retrouve ailleurs sans avoir rien demande. */
+  document.body.style.overflow = 'hidden'
+  ;(quoi === 'mouvements' ? remplirHistoMouvements : remplirHistoCreations)()
+}
+
+function fermerHisto(f) {
+  if (!f || f.hidden) return
+  f.classList.add('part')
+  document.body.style.overflow = ''
+  /* On attend la fin de la descente : masquer tout de suite la couperait. */
+  setTimeout(() => {
+    f.hidden = true
+    f.setAttribute('aria-hidden', 'true')
+    f.classList.remove('part')
+  }, 280)
+}
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-fermer-histo]')) fermerHisto(e.target.closest('.histo'))
+})
+/* La touche d'echappement, pour un clavier branche. */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.querySelectorAll('.histo:not([hidden])').forEach(fermerHisto)
+})
+
+/* ⚠ LE JOUR EST ECRIT EN TETE DE CHAQUE GROUPE, pas sur chaque ligne. Trente
+   lignes portant chacune leur date se lisent comme un journal de bord ; les
+   memes groupees par jour se parcourent. */
+function jourLisible(t) {
+  const d = new Date(t)
+  const auj = new Date(); auj.setHours(0, 0, 0, 0)
+  const j = new Date(d); j.setHours(0, 0, 0, 0)
+  const ecart = Math.round((auj - j) / 86400000)
+  if (ecart === 0) return "Aujourd’hui"
+  if (ecart === 1) return 'Hier'
+  return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+function heureCourte(t) {
+  return new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+}
+
+/* Les lignes, groupees par jour. `entrees` : [{ quand, html, teinte }] */
+function peindreHisto(zone, entrees, rien) {
+  if (!zone) return
+  if (!entrees.length) {
+    zone.innerHTML = `<div class="histo-rien">${rien}</div>`
+    return
+  }
+  let html = '', jourEnCours = null
+  for (const e of entrees) {
+    const j = jourLisible(e.quand)
+    if (j !== jourEnCours) { html += `<div class="histo-jour">${j}</div>`; jourEnCours = j }
+    html += `
+      <div class="histo-lig">
+        <span class="histo-pt" style="background:${e.teinte}"></span>
+        <span class="histo-co"><span class="histo-t">${e.html}</span></span>
+        <span class="histo-q">${heureCourte(e.quand)}</span>
+      </div>`
+  }
+  zone.innerHTML = html
+}
+
+function remplirHistoMouvements() {
+  const zone = document.getElementById('histo-mouvements-liste')
+  const depuis = new Date(Date.now() - HISTO_JOURS * 86400000).toISOString()
+  const PH = {
+    arrivee:      (n) => `${n} <em>a rejoint l’équipe</em>`,
+    depart:       (n) => `${n} <em>a quitté l’entreprise</em>`,
+    vers_gestion: (n) => `${n} <em>est passé en Gestion</em>`,
+    vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
+  }
+  const PT = { arrivee: '#34C759', depart: '#C8342B',
+               vers_gestion: '#1F4CEE', vers_equipe: '#4C1D95' }
+
+  /* Le repli, le temps de la requete — et definitivement si la table n'existe
+     pas encore. Voir `mouvements-membres.sql`. */
+  const repli = (cachedMembres || [])
+    .filter(m => m.created_at && m.created_at >= depuis)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(m => ({ quand: m.created_at, teinte: PT.arrivee,
+                 html: PH.arrivee(escapeHtml((m.nom || 'Un membre').trim().split(/\s+/)[0])) }))
+  peindreHisto(zone, repli, 'Aucun mouvement ce mois-ci.')
+
+  if (!currentMembre?.entreprise_id) return
+  supabase.from('mouvements_membres')
+    .select('membre_nom, type, cree_le')
+    .eq('entreprise_id', currentMembre.entreprise_id)
+    .gte('cree_le', depuis)
+    .order('cree_le', { ascending: false })
+    .limit(200)
+    .then(({ data, error }) => {
+      if (error || !data) return
+      peindreHisto(zone, data.map(mv => ({
+        quand: mv.cree_le,
+        teinte: PT[mv.type] || '#9A9AA4',
+        html: (PH[mv.type] || PH.arrivee)(
+          escapeHtml((mv.membre_nom || 'Un membre').trim().split(/\s+/)[0])),
+      })), 'Aucun mouvement ce mois-ci.')
+    })
+}
+
+function remplirHistoCreations() {
+  const zone = document.getElementById('histo-creations-liste')
+  const depuis = Date.now() - HISTO_JOURS * 86400000
+  const entrees = (allGestionProcedures || [])
+    .filter(p => p.created_at && new Date(p.created_at).getTime() >= depuis)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .map(p => ({
+      quand: p.created_at,
+      teinte: p.publiee_le ? '#34C759' : '#9A9AA4',
+      html: `${escapeHtml(p.titre || 'Sans titre')}
+             <em>dans ${escapeHtml(p.categorie || 'Sans dossier')}</em>`,
+    }))
+  peindreHisto(zone, entrees, 'Aucune procédure créée ce mois-ci.')
+}
+
 function peindreTuilesAccueil() {
   /* ═══ CE QU'IL RESTE A TERMINER ═══
 
@@ -6950,7 +7092,7 @@ function peindreTuilesAccueil() {
     if (!mvs.length) return
     zListes.innerHTML = section('Dernier mouvement',
       POINTS_MOUVEMENT[mvs[0].type] || '#9A9AA4', 'Voir plus',
-      'onclick="showGestionScreen(\'p-equipe\')"',
+      'onclick="ouvrirHisto(\'mouvements\')"',
       mvs.map(ligneMouvement))
       + zListes.innerHTML
   }
@@ -6988,7 +7130,7 @@ function peindreTuilesAccueil() {
        long passait sur deux lignes et poussait « Voir plus » a la ligne
        suivante : deux mots de moins, et la tete du bloc tient sur une. */
     zListes.innerHTML += section('Dernières créations', '#4C1D95', 'Voir plus',
-      'onclick="showGestionScreen(\'p-list\')"',
+      'onclick="ouvrirHisto(\'creations\')"',
       recentes.map(p => {
         const n = Number(p.nb_etapes) || null
         return [

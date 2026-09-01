@@ -2034,8 +2034,11 @@
   /* Même matière que le bouton principal : c'est le geste de la page. */
   .poste-ajouter{
     flex-shrink:0; height:38px; padding:0 18px; border:none; border-radius:100px;
-    background:linear-gradient(135deg,#EB5201 0%,#3A78EE 60%,#4899EC 100%);
-    color:#2A1400; font-family:inherit; font-size:14px; font-weight:700;
+    /* ⚠ LE PREMIER ARRET ETAIT RESTE ORANGE. La conversion vers le bleu avait
+       repris les deux derniers seulement : le bouton partait de `#EB5201` et
+       arrivait en bleu clair, avec un texte brun `#2A1400` par-dessus. */
+    background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+    color:#FFFFFF; font-family:inherit; font-size:14px; font-weight:700;
     box-shadow:0 5px 15px rgba(31,76,238,0.24);
   }
   .poste-ajouter:active{ opacity:0.7; }
@@ -2335,7 +2338,28 @@
      ⚠ `top` ET NON `transform`. Le sigle porte deja un `transform` dans ses
        etats — il retrecit quand le bouton travaille. Un decalage pose la
        serait efface a la premiere animation. */
-    position:relative; top:0.75px;
+    /* ⚠ −1,5 PX : LE SIGLE REMONTE, IL NE DESCEND PAS.
+
+       J'ai fait fausse route deux fois. D'abord en comparant les BOITES des
+       deux textes, puis en comparant leurs BASES — or le libelle contient un
+       « p » dont le jambage descend sous la ligne, ce qui fausse la
+       comparaison.
+
+       La bonne reference est le SOMMET : les deux commencent par une capitale,
+       « A » et « G », de meme hauteur mesuree — 10,83 px l'une et l'autre.
+
+       Releve sur l'encre, a six fois la densite, sans decalage : le sommet du
+       sigle tombe 2,33 px SOUS celui du libelle. Il fallait donc le remonter.
+       Balaye de −1 a −3 : −1,5 laisse 0,33 px d'ecart, le plus juste.
+
+       La difference vient de la boite : le sigle est centre dans une case de
+       24 px de haut, le libelle se pose sur sa ligne de base. Deux references
+       differentes, deux points de depart.
+
+     ⚠ `top` ET NON `transform`. Le sigle porte deja un `transform` dans ses
+       etats — il retrecit quand le bouton travaille. Un decalage pose la
+       serait efface a la premiere animation. */
+    position:relative; top:-1.5px;
     /* ═══ BLANC, PUIS BLEU TRES CLAIR ═══
 
        ⚠ LE DEGRADE FINISSAIT A #7FB6F2, UN BLEU FRANC. Sur un bouton bleu, le
@@ -13027,3 +13051,282 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      vibre et attire l'œil plus que le reste de la page — or ce bouton ne doit
      pas être la première chose qu'on voit en arrivant dans les Réglages. */
 #p-settings .reg-ligne.danger .reg-nm{ color:#C8342B; font-weight:550; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES SOUS-PAGES DES RÉGLAGES
+
+   Huit écrans : compte, code d'invitation, postes, langue, appareils, membre,
+   abonnement, choix du poste. Ils partagent la même ossature — une tête avec
+   flèche de retour, puis des cartes — mais gardaient l'habit d'avant : titres
+   à la taille d'un libellé, cartes à ombre de thème sombre, champs gris
+   sombre.
+
+   ⚠ UNE SEULE LISTE DE SÉLECTEURS PLUTÔT QUE HUIT BLOCS. Les huit pages ont
+     exactement les mêmes classes ; les traiter ensemble garantit qu'elles ne
+     divergeront pas, et qu'une neuvième héritera de tout sans qu'on y pense.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#p-reg-compte, #p-reg-code, #p-reg-postes, #p-reg-langue,
+#p-reg-appareils, #p-reg-poste, #p-membre, #p-abonnement{
+  --sp-fond:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+}
+
+/* ─── LA TÊTE ─────────────────────────────────────────────────────────────
+   Le titre passe à 26 px, la taille des autres pages. Il était à 19 : sur un
+   écran qui ne contient qu'une carte, un titre discret ne dit plus où l'on
+   est. */
+#p-reg-compte .detail-header, #p-reg-code .detail-header,
+#p-reg-postes .detail-header, #p-reg-langue .detail-header,
+#p-reg-appareils .detail-header, #p-reg-poste .detail-header,
+#p-membre .detail-header, #p-abonnement .detail-header{
+  display:flex; align-items:center; gap:10px;
+  margin:0 0 20px; padding:0;
+}
+#p-reg-compte .pagehead, #p-reg-code .pagehead,
+#p-reg-postes .pagehead, #p-reg-langue .pagehead,
+#p-reg-appareils .pagehead, #p-reg-poste .pagehead,
+#p-membre .pagehead, #p-abonnement .pagehead{
+  font-size:26px; font-weight:700; letter-spacing:-0.04em;
+  color:var(--label); margin:0;
+}
+
+/* ⚠ LA FLÈCHE PREND LA FORME DU BOUTON DE FERMETURE DES FEUILLES. Deux façons
+   de revenir en arrière dans la même app, c'est une de trop. */
+#p-reg-compte .back-btn, #p-reg-code .back-btn,
+#p-reg-postes .back-btn, #p-reg-langue .back-btn,
+#p-reg-appareils .back-btn, #p-reg-poste .back-btn,
+#p-membre .back-btn, #p-abonnement .back-btn{
+  flex-shrink:0; width:32px; height:32px; padding:0; border:none;
+  border-radius:100px; display:grid; place-items:center;
+  background:rgba(118,118,128,0.12); color:var(--label-2);
+}
+#p-reg-compte .back-btn svg, #p-reg-code .back-btn svg,
+#p-reg-postes .back-btn svg, #p-reg-langue .back-btn svg,
+#p-reg-appareils .back-btn svg, #p-reg-poste .back-btn svg,
+#p-membre .back-btn svg, #p-abonnement .back-btn svg{ width:15px; height:15px; }
+#p-reg-compte .back-btn:active, #p-reg-code .back-btn:active,
+#p-reg-postes .back-btn:active, #p-reg-langue .back-btn:active,
+#p-reg-appareils .back-btn:active, #p-reg-poste .back-btn:active,
+#p-membre .back-btn:active, #p-abonnement .back-btn:active{ transform:scale(0.92); }
+
+/* ─── LES CARTES ──────────────────────────────────────────────────────────
+   La matière des cartes de dossier : fond dégradé, tranche en relief, ombre
+   légère. Elles portaient encore l'ombre à 42 % du thème sombre. */
+#p-reg-compte .card, #p-reg-code .card, #p-reg-postes .card,
+#p-reg-langue .card, #p-reg-appareils .card, #p-reg-poste .card,
+#p-membre .card, #p-abonnement .card{
+  position:relative;
+  padding:16px; border-radius:20px; margin-bottom:14px;
+  background:var(--sp-fond);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+#p-reg-compte .card::before, #p-reg-code .card::before, #p-reg-postes .card::before,
+#p-reg-langue .card::before, #p-reg-appareils .card::before, #p-reg-poste .card::before,
+#p-membre .card::before, #p-abonnement .card::before{
+  content:''; position:absolute; inset:0; border-radius:inherit;
+  padding:1px; pointer-events:none; z-index:2;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.50) 16%,
+    rgba(28,28,38,0.025) 50%, rgba(28,28,38,0.09) 84%, rgba(28,28,38,0.14) 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+}
+#p-reg-compte .card > *, #p-reg-code .card > *, #p-reg-postes .card > *,
+#p-reg-langue .card > *, #p-reg-appareils .card > *, #p-reg-poste .card > *,
+#p-membre .card > *, #p-abonnement .card > *{ position:relative; z-index:3; }
+
+/* ─── LES CHAMPS ──────────────────────────────────────────────────────────
+   Même forme que la recherche des procédures : pilule, fond gris translucide,
+   pas de bordure. */
+#p-reg-compte input[type=text], #p-reg-code input[type=text],
+#p-reg-postes input[type=text], #p-reg-langue input[type=text],
+#p-membre input[type=text], #p-abonnement input[type=text],
+#p-reg-compte input[type=email], #p-reg-compte input[type=password]{
+  border:none; border-radius:100px; padding:12px 16px;
+  background:rgba(118,118,128,0.12); color:var(--label);
+  font-size:16px;
+}
+#p-reg-compte label.f, #p-reg-code label.f, #p-reg-postes label.f,
+#p-reg-langue label.f, #p-membre label.f, #p-abonnement label.f{
+  font-size:12.5px; font-weight:600; color:var(--label-2);
+  letter-spacing:-0.02em; margin-bottom:8px;
+}
+
+/* ─── LA NOTE DE BAS DE PAGE ──────────────────────────────────────────── */
+#p-reg-compte .reg-note, #p-reg-code .reg-note, #p-reg-postes .reg-note,
+#p-reg-langue .reg-note, #p-reg-appareils .reg-note, #p-reg-poste .reg-note,
+#p-membre .reg-note, #p-abonnement .reg-note{
+  font-size:12px; color:var(--label-3); line-height:1.5;
+  margin:2px 2px 0; letter-spacing:-0.01em;
+}
+
+/* ─── LE LIEN DISCRET ─────────────────────────────────────────────────── */
+#p-reg-compte .lien-doux, #p-reg-code .lien-doux, #p-membre .lien-doux{
+  display:block; width:100%; margin-top:12px; padding:6px 0;
+  border:none; background:none; font-family:inherit;
+  font-size:13.5px; color:var(--label-2); letter-spacing:-0.02em;
+}
+
+
+/* ═══ LE BANDEAU DES SOUS-PAGES ═══
+
+   `.hero.an-intro` portait un halo ambre et une ombre de theme sombre. Il
+   prend la matiere des cartes, comme tout le reste de ces pages.
+
+   ⚠ LA LUEUR EST MASQUEE, PAS SUPPRIMEE. `.hero-lueur` sert aussi a l'ecran de
+     choix d'espace, ou elle est a sa place. */
+#p-reg-postes .hero.an-intro, #p-reg-poste .hero.an-intro,
+#p-reg-code .hero.an-intro, #p-abonnement .hero.an-intro{
+  position:relative; overflow:hidden;
+  border-radius:20px; padding:16px;
+  background:var(--sp-fond);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+#p-reg-postes .hero-lueur, #p-reg-poste .hero-lueur,
+#p-reg-code .hero-lueur, #p-abonnement .hero-lueur{ display:none; }
+#p-reg-postes .hero .t, #p-reg-poste .hero .t,
+#p-reg-code .hero .t, #p-abonnement .hero .t{
+  font-size:15px; font-weight:650; letter-spacing:-0.03em; color:var(--label);
+  text-transform:none;
+}
+#p-reg-postes .hero .s, #p-reg-poste .hero .s,
+#p-reg-code .hero .s, #p-abonnement .hero .s{
+  font-size:13px; color:var(--label-3); line-height:1.5; margin-top:4px;
+  text-transform:none; letter-spacing:-0.01em;
+}
+
+/* ⚠ LES TITRES DE SECTION ETAIENT EN PETITES MAJUSCULES ESPACEES — le style
+   d'une liste de reglages systeme. Ailleurs dans l'app, un titre de section
+   s'ecrit normalement, a 14 px. */
+#p-reg-compte .fm-titre, #p-reg-code .fm-titre, #p-reg-postes .fm-titre,
+#p-reg-langue .fm-titre, #p-reg-appareils .fm-titre, #p-reg-poste .fm-titre,
+#p-membre .fm-titre, #p-abonnement .fm-titre,
+#p-reg-code .reg-titre, #p-membre .reg-titre, #p-abonnement .reg-titre{
+  font-size:14px; font-weight:650; letter-spacing:-0.025em;
+  color:var(--label); text-transform:none;
+  margin:22px 0 10px;
+}
+
+/* Le champ de saisie d'un poste, en pilule comme les autres. */
+#p-reg-postes .poste-saisie, #p-reg-postes .search-bar{
+  border:none; border-radius:100px;
+  background:rgba(118,118,128,0.12);
+}
+
+
+/* ═══ LA PAGE ABONNEMENT ═══
+
+   Trois restes du theme sombre, mesures a l'ecran :
+
+     · la pastille du rythme choisi etait NOIRE a 85 %, avec un texte bleu
+       par-dessus — un contraste de 1,4, illisible. Elle vient d'une epoque ou
+       le fond de la page etait sombre ;
+     · l'etiquette de remise gardait un texte brun `#2A1400` sur un fond deja
+       passe au bleu ;
+     · les trois icones de reassurance pointaient vers `logoOrIc`, le degrade
+       ambre du logo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* La piste et sa pastille, comme le segment des procedures. */
+#p-abonnement .abo-rythme{
+  background:rgba(118,118,128,0.10); border-radius:100px; padding:3px;
+}
+#p-abonnement .abo-ryt{
+  border-radius:100px; color:var(--label-2);
+  font-weight:600; letter-spacing:-0.02em;
+}
+#p-abonnement .abo-ryt.on{
+  background:#FFFFFF; color:var(--label);
+  box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 3px 8px -4px rgba(20,20,30,0.14);
+}
+
+/* ⚠ TEXTE BLANC, PAS BRUN. Le fond de l'etiquette est passe au bleu ; sa
+   couleur de texte etait restee celle du fond ambre d'origine. */
+#p-abonnement .eco{
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF;
+}
+
+/* ⚠ LES ICONES PRENNENT LA TEINTE DE LEUR LIGNE, pas un degrade en dur.
+   `logoOrIc` est declare en `userSpaceOnUse` sur 24 x 24 px : au-dela, tout
+   recoit sa couleur de fin. Un `currentColor` suit la taille et le theme. */
+#p-abonnement .abo-conf .ic svg{ stroke:currentColor; }
+#p-abonnement .abo-conf .cf:nth-child(1) .ic{ color:#318759; }
+#p-abonnement .abo-conf .cf:nth-child(2) .ic{ color:#3073C3; }
+#p-abonnement .abo-conf .cf:nth-child(3) .ic{ color:#6F47BB; }
+
+/* Le depliant des autres formules, en carte plutot qu'en aplat gris. */
+#p-abonnement .abo-autres{
+  background:var(--sp-fond); border-radius:100px;
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.12), 0 1px 2px rgba(20,20,30,0.04);
+  font-weight:600; letter-spacing:-0.02em; color:var(--label);
+}
+
+
+/* ═══ LA COCHE DE « CODE RECONNU » ═══
+
+   Le vert vient de `--green`, qui vaut `#1F9E42` — un vert de badge, pense
+   pour un petit point sur fond clair. Sur une pastille de 54 px, il paraissait
+   sourd.
+
+   ⚠ ON N'A PAS TOUCHE A `--green`. Cette variable sert aux pastilles « En
+     ligne » de toutes les listes, ou le vert sombre est le bon choix :
+     eclairci, il vibrerait a cote du texte. Seules les deux coches du scan
+     changent.
+
+   `#34CE61` : le meme vert, monte en luminosite. Le contraste avec le signe
+   sombre passe de 4,85 a 8,16 — la coche se detache mieux qu'avant. */
+.bienvenue .code-ic{
+  background:#34CE61;
+  box-shadow:0 0 0 6px rgba(52,206,97,0.16);
+}
+.scan-result .icon{ background:#34CE61; }
+
+
+/* ═══ LA BARRE D'OUTILS DU DECOUPAGE ═══
+
+   Trois commandes cote a cote : lecture, cadrage, annulation. Elles n'ont plus
+   de libelle — les icones suffisent, et trois mots sur une barre de 358 px
+   forcaient a tout retrecir.
+
+   ⚠ `.dv-rond` ETAIT DESSINE POUR L'IMAGE : rond noir, ombre portee, pour se
+     detacher d'une video. Dans la barre, il prend la meme forme que ses deux
+     voisins, sinon on lit deux familles de boutons. */
+.dv-outils .dv-rond{
+  flex-shrink:0; width:38px; height:38px; padding:0;
+  border:none; border-radius:100px;
+  display:grid; place-items:center;
+  background:rgba(118,118,128,0.12); color:var(--label);
+  box-shadow:none;
+}
+.dv-outils .dv-rond svg{ width:17px; height:17px; }
+.dv-outils .dv-rond:active{ transform:scale(0.94); }
+
+/* Les deux autres perdent leur texte : ils deviennent carres comme le premier. */
+.dv-outils .dv-zoom, .dv-outils .dv-annuler{
+  flex-shrink:0; width:38px; height:38px; padding:0; gap:0;
+  border-radius:100px; display:grid; place-items:center;
+}
+.dv-outils .dv-zoom svg, .dv-outils .dv-annuler svg{ width:17px; height:17px; }
+
+/* ⚠ LE CONTENEUR RESTE UNE RANGEE, mais aligne a gauche : trois pastilles
+   etalees sur toute la largeur ne se liraient plus comme un groupe.
+
+   ⚠ ET ON ANNULE LE `margin-left:auto` DE `.dv-annuler`. Il datait de l'epoque
+     ou les deux boutons portaient un libelle : il poussait « annuler » a
+     l'oppose de « tout voir », chacun a un bout. Avec trois pastilles, il en
+     laissait une seule isolee tout a droite. */
+.dv-outils{
+  display:flex; align-items:center; gap:8px; justify-content:flex-start;
+}
+.dv-outils .dv-annuler{ margin-left:0; }

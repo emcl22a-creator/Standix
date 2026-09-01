@@ -6996,13 +6996,31 @@ function peindreTuilesAccueil() {
   const enLigne = procs.filter(p => p.publiee_le).length
   const membres = (cachedMembres || []).length
 
-  /* ⚠ LE RESTE D'ANALYSES VIENT DU FORFAIT, et il faut ses DEUX nombres. Un
-     compteur sans son plafond n'apprend rien : « 12 » ne se lit que si l'on
-     sait qu'il y en avait vingt. Quand le forfait est inconnu — chargement en
-     cours, offre sans limite — on n'affiche pas de fraction inventee. */
-  const quota  = Number(cachedEntreprise?.analyses_quota) || null
-  const restant = Number.isFinite(Number(cachedEntreprise?.analyses_restantes))
-    ? Number(cachedEntreprise.analyses_restantes) : null
+  /* ═══ LE RESTE D'ANALYSES ═══
+
+     ⚠ IL VIENT DE `reste_analyses`, PAS DE LA TABLE `entreprises`.
+
+       Je lisais `cachedEntreprise.analyses_quota` et `analyses_restantes` :
+       ces deux colonnes N'EXISTENT PAS. Le compteur affichait donc un tiret,
+       sans erreur ni message — le genre de defaut qui se voit a l'ecran et
+       nulle part ailleurs.
+
+       Le vrai chiffre est rendu par la fonction serveur `reste_analyses`, sous
+       la forme `{ reste, quota }`. Elle est deja appelee par
+       `lireEtatAbonnement`, qui range sa reponse dans `etatAbo.analyses`.
+
+     ⚠ `etatAbo` EST DECLAREE PLUS BAS DANS LE FICHIER. Cela marche parce que
+       cette fonction n'est appelee qu'apres le chargement complet ; un `let`
+       en zone morte ne pose probleme que s'il est lu PENDANT l'evaluation du
+       module.
+
+     ⚠ IL FAUT SES DEUX NOMBRES. Un compteur sans son plafond n'apprend rien :
+       « 12 » ne se lit que si l'on sait qu'il y en avait vingt. Quand le
+       forfait est inconnu — fonction absente, offre sans limite — on n'affiche
+       pas de fraction inventee. */
+  const an = (typeof etatAbo !== 'undefined' && etatAbo?.analyses) || null
+  const quota = Number(an?.quota) || null
+  const restant = Number.isFinite(Number(an?.reste)) ? Number(an.reste) : null
 
   /* ═══ LES TROIS CHIFFRES ═══
 

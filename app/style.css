@@ -12219,14 +12219,20 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    environ 3 px de blanc — qui s'ajoute au remplissage. Le titre, lui, a une
    interligne normale et n'en apporte presque pas.
 
-   12,5 px en bas compensent ce blanc : les deux ecarts visibles tombent alors
-   a 18,5.
+   12,5 px en bas equilibraient exactement les deux ecarts a 18,5. Mais le bloc
+   paraissait alors serre du bas : l'oeil ne compare pas un titre a une phrase,
+   il voit du texte qui touche le bord.
+
+   18 px : la derniere ligne se detache du bord au lieu de le frôler. Le bas
+   respire alors NETTEMENT plus que le haut — 21 px contre 18 a l'encre — et
+   c'est voulu : sous un titre, on attend de l'air ; contre un bord, on voit une
+   coupure.
 
    ⚠ CETTE VALEUR DEPEND DE `line-height` SUR `.ac-ph`. La changer sans
-     retoucher ce remplissage redonnerait le desequilibre. */
+     retoucher ce remplissage decalerait de nouveau l'ensemble. */
 .ac-bloc{
   position:relative;
-  padding:14px 16px 12.5px; border-radius:20px;
+  padding:14px 16px 18px; border-radius:20px;
   background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
   box-shadow:
     inset 0 2px 2.5px -2px rgba(255,255,255,0.85),

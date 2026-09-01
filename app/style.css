@@ -12704,10 +12704,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ═══════════════════════════════════════════════════════════════════════════ */
 #p-global-analyse .proc-segm{ margin:0 0 22px; }
 
-.an-titre{
-  font-size:16px; font-weight:650; letter-spacing:-0.03em; color:var(--label);
-  margin:0 0 12px;
-}
+/* ⚠ `.an-titre` N'A PLUS D'ELEMENT : « Vue d'ensemble » a ete retire. Les trois
+   chiffres se comprennent sans qu'on les annonce. La regle est supprimee pour
+   ne pas laisser croire qu'un titre existe encore ici. */
 
 /* Le bouton d'aide, dans la tête du bloc. Même taille que le chevron de
    « Voir plus » : deux commandes de tête ne doivent pas peser différemment. */
@@ -12801,7 +12800,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-global-analyse .an-m-s,
 #p-global-analyse .an-m-q,
 #p-global-analyse .an-axe span,
-#p-global-analyse .an-titre{
+#p-global-analyse .an-vide-l{
   text-transform:none; letter-spacing:-0.02em;
 }
 #p-global-analyse .ac-eti{ font-size:14px; font-weight:650; color:var(--label); }

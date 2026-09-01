@@ -8266,7 +8266,6 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
   const enAnalyse = proc.statut === 'traitement' || proc.statut === 'redaction'
 
   el.innerHTML = `
-    ${jamaisVue ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''}
     <span class="cl-pl" style="background:${fondPlaque(teinte)}">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
@@ -8296,7 +8295,14 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
             ? `<span class="cl-etat cl-etat-neuf">${etatProcedureHtml(proc)}</span>`
             : proc.publiee_le
               ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
-              : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Brouillon</span>`}
+              : `<span class="cl-badge">${
+                  /* ⚠ LA PASTILLE EST DANS LE BADGE, pas dans la carte. Elle
+                     marque l'etat « brouillon pas encore vu » : posee sur le
+                     coin de la carte, elle pouvait se lire comme une marque de
+                     la procedure entiere. Sur le badge, elle qualifie ce que le
+                     badge annonce. */
+                  jamaisVue ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''
+                }<i style="background:#9A9AA4"></i>Brouillon</span>`}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
     </span>`

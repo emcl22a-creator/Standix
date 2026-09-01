@@ -1025,7 +1025,11 @@
        filmer une fois, l'IA découpe et rédige. Composition différente aussi,
        le dessin d'abord : deux pages qu'on distingue au premier coup d'œil.
        ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="screen active" id="p-home">
+  <!-- ⚠ L'ECRAN D'ACCUEIL EST CONSERVE MAIS N'EST PLUS ACTIF ni atteignable
+       par un onglet. Le retirer du balisage casserait les fonctions qui
+       l'ecrivent encore — elles echoueraient en silence. Il sera supprime
+       quand tout ce qui le vise aura ete nettoye. -->
+  <div class="screen" id="p-home" hidden>
 
     <!-- ═══ L'ACCUEIL, REFAIT ═══
 
@@ -1404,6 +1408,17 @@
         <span id="pm-subhead">—</span>
       </div>
       <div class="pm-rang-outils">
+        <!-- ⚠ LE JOURNAL DES MOUVEMENTS A ETE DEPLACE ICI. Il vivait sur
+             l'accueil, qui n'existe plus. C'est sa vraie place : arrivees,
+             departs et changements d'espace concernent l'equipe, et on vient
+             sur cette page pour la gerer. -->
+        <button type="button" class="an-i" onclick="ouvrirHisto('mouvements')"
+                aria-label="Voir les mouvements de l’équipe">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 7.4V12l3 1.8"/><circle cx="12" cy="12" r="8.6"/>
+          </svg>
+        </button>
         <button type="button" class="an-i" data-aide-actions
                 aria-label="À quoi servent les boutons de chaque ligne">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
@@ -2435,7 +2450,7 @@
        et la liste deviendrait trop longue pour qu'on la parcoure. -->
   <div class="screen" inert id="p-activites">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-home')" aria-label="Retour">
+      <button class="back-btn" onclick="showGestionScreen('p-list')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Mouvements de l’équipe</h1>
@@ -2454,7 +2469,7 @@
        qui mènent à deux pages de même forme. -->
   <div class="screen" inert id="p-recentes">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-home')" aria-label="Retour">
+      <button class="back-btn" onclick="showGestionScreen('p-list')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Procédures récentes</h1>
@@ -4550,7 +4565,11 @@ function layout() {
 
    L'employé n'a pas d'« Analyse » : on ne lui montre pas le temps qu'il a
    passé à lire, ça ne l'aide pas à travailler. */
-const LABELS_GESTION = ['Accueil', 'Procedures', 'Analyse', 'Reglages'];
+/* ⚠ TROIS ONGLETS, PLUS QUATRE. « Accueil » a ete retire : tout ce qu'il
+   montrait existait ailleurs — les chiffres dans Analyse, les creations dans
+   Procedures, le compte d'analyses dans Reglages. Seuls les mouvements
+   d'equipe lui etaient propres ; ils ont rejoint Reglages > Gerer l'equipe. */
+const LABELS_GESTION = ['Procedures', 'Analyse', 'Reglages'];
 const LABELS_EQUIPE  = ['Procedures', 'QR code', 'Reglages'];
 let LABELS = LABELS_GESTION;
 const ICONS = [
@@ -4593,9 +4612,13 @@ const ICONE_QR = {
 /* Les icônes suivent la liste en cours : Procédures, QR code, Réglages côté
    équipe ; Accueil, Procédures, Analyse, Réglages côté gestion. */
 function ICONES_DU_JEU() {
+  /* ⚠ L'ICONE DE LA MAISON EST ECARTEE COTE GESTION, comme son onglet.
+     `ICONS` garde ses quatre entrees : la premiere sert encore a l'espace
+     equipe le jour ou on lui remettrait un accueil, et la retirer du tableau
+     decalerait tous les indices ci-dessous. */
   return LABELS === LABELS_EQUIPE
     ? [ICONS[1], ICONE_QR, ICONS[3]]
-    : ICONS;
+    : [ICONS[1], ICONS[2], ICONS[3]];
 }
 
 const ZOOM_ICON = 1.35, ZOOM_LABEL = 1.28;

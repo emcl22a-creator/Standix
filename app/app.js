@@ -6833,30 +6833,41 @@ function peindreTuilesAccueil() {
   const restant = Number.isFinite(Number(cachedEntreprise?.analyses_restantes))
     ? Number(cachedEntreprise.analyses_restantes) : null
 
+  /* ═══ LES TROIS CHIFFRES ═══
+
+     ⚠ LEURS ICONES REPRENNENT LA MATIERE DES DOSSIERS : plaque au fond derive
+       du trait, trace peint par le degrade `palN`, reflet blanc en haut. Elles
+       portaient un aplat plat et une couleur unie — a cote des cartes de la
+       liste, cela faisait deux familles d'icones sur le meme ecran.
+
+     Les trois teintes sont les trois premieres de `PALETTE_DOSSIERS` : violet,
+     bleu, ambre. Elles ne signifient rien de particulier — elles distinguent
+     trois chiffres, comme elles distinguent trois dossiers. */
   const IC = {
-    doc: '<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/><path d="M13.6 3.4v5h5"/>',
-    gens: '<circle cx="9.4" cy="8.6" r="3.4"/><path d="M3 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.6 5.4a3.4 3.4 0 0 1 0 6.4"/>',
+    doc: '<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/><path d="M13.6 3.4v5h5"/><path d="M8.8 13h6.4"/><path d="M8.8 16.4h4.2"/>',
+    gens: '<circle cx="9.4" cy="8.6" r="3.4"/><path d="M3 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.6 5.4a3.4 3.4 0 0 1 0 6.4"/><path d="M17.2 14.6a5.8 5.8 0 0 1 3.8 5.4"/>',
     etincelle: '<path d="M12 3.4l2.1 5.1 5.1 2.1-5.1 2.1L12 17.8l-2.1-5.1-5.1-2.1 5.1-2.1Z"/>',
   }
-  const tuile = (i, val, sous, teinte) => `
+  const tuile = (i, val, sous, rang) => {
+    const t = couleurDossier(rang)
+    return `
     <div class="ac-chif">
-      <span class="ac-chif-ic" style="background:${teinte.fond};color:${teinte.trait}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+      <span class="ac-chif-ic" style="background:${fondPlaque(t)}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal${t.i})" stroke-width="1.9"
              stroke-linecap="round" stroke-linejoin="round">${i}</svg>
       </span>
       <span class="ac-chif-v">${val}</span>
       <span class="ac-chif-s">${sous}</span>
     </div>`
+  }
 
   zChiffres.innerHTML =
-    tuile(IC.doc, enLigne, `procédure${enLigne > 1 ? 's' : ''} en ligne`,
-          { fond: 'rgba(31,76,238,0.10)',  trait: '#1F4CEE' }) +
-    tuile(IC.gens, membres, `membre${membres > 1 ? 's' : ''}`,
-          { fond: 'rgba(76,29,149,0.10)',  trait: '#4C1D95' }) +
+    tuile(IC.doc, enLigne, `procédure${enLigne > 1 ? 's' : ''} en ligne`, 0) +
+    tuile(IC.gens, membres, `membre${membres > 1 ? 's' : ''}`, 1) +
     tuile(IC.etincelle,
           restant === null ? '—' : (quota ? `${restant}<em>/${quota}</em>` : restant),
-          'analyses IA restantes',
-          { fond: 'rgba(20,168,91,0.10)',  trait: '#178943' })
+          'analyses IA restantes', 2)
+
 
   /* ═══ LES DEUX DERNIERES SECTIONS ═══
 
@@ -6869,20 +6880,16 @@ function peindreTuilesAccueil() {
      ⚠ `depuisQuandCourt` ATTEND DES MILLISECONDES, pas une date. Lui passer la
        chaine de Supabase directement rendait « NaN min » — le genre d'erreur
        qui ne casse rien et s'affiche quand meme. */
-  /* ═══ LA MAQUETTE ③ : LE FAIT EN GRAND ═══
+  /* ═══ LE FAIT EN GRAND, SUR DEUX LIGNES ═══
 
-     La phrase remplace la fiche. « Emma a ouvert Processus achat » se lit d'un
-     coup ; une ligne avec un titre, un sous-titre et une heure demande trois
-     regards pour dire la meme chose.
+     Chaque bloc montre les DEUX derniers evenements. Un seul ne dit pas s'il
+     s'agit d'un rythme ou d'un hasard ; deux suffisent a le sentir, et
+     au-dela on refait la page que « Voir plus » ouvre deja.
 
-     ⚠ LE COMPLEMENT EST EN GRIS DANS LA PHRASE. Le nom du dossier ou de la
-       procedure descendait en sous-titre ; il fait desormais partie du texte,
-       en plus clair. On lit une phrase francaise, pas deux champs empiles.
-
-     ⚠ L'ETIQUETTE PORTE UN POINT DE COULEUR — vert pour une lecture, violet
-       pour une creation. C'est ce qui distingue les deux blocs au premier coup
-       d'oeil, sans avoir a lire leur titre. */
-  const section = (etiquette, teintePoint, action, surAction, phrase, pied) => `
+     ⚠ LA DATE EST SUR LA MEME LIGNE QUE LA PHRASE, poussee a droite. En
+       dessous, elle prenait une ligne pour trois caracteres et separait deux
+       evenements qui doivent se lire d'affilee. */
+  const section = (etiquette, teintePoint, action, surAction, lignes) => `
     <div class="ac-sect">
       <div class="ac-bloc">
         <div class="ac-bloc-t">
@@ -6892,8 +6899,11 @@ function peindreTuilesAccueil() {
                  stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
           </button>
         </div>
-        <div class="ac-ph">${phrase}</div>
-        <div class="ac-bas">${pied}</div>
+        ${lignes.map(([phrase, quand]) => `
+          <div class="ac-ph">
+            <span class="ac-ph-t">${phrase}</span>
+            <span class="ac-q">${quand}</span>
+          </div>`).join('')}
       </div>
     </div>`
 
@@ -6921,20 +6931,27 @@ function peindreTuilesAccueil() {
     vers_gestion: (n) => `${n} <em>est passé en Gestion</em>`,
     vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
   }
+  /* Le point de l'etiquette prend la couleur du mouvement le plus recent :
+     c'est lui qu'on lit en premier. */
   const POINTS_MOUVEMENT = {
     arrivee: '#34C759', depart: '#C8342B',
     vers_gestion: '#1F4CEE', vers_equipe: '#4C1D95',
   }
 
-  const peindreMouvement = (mv) => {
+  /* ⚠ LE PRENOM SEUL. « Emma Dupont a rejoint l'equipe » se coupe en plein
+     milieu du nom sur un ecran de 390 px ; le prenom tient. */
+  const ligneMouvement = (mv) => {
     const nom = (mv.membre_nom || 'Un membre').trim().split(/\s+/)[0]
-    const phrase = (PHRASES_MOUVEMENT[mv.type] || PHRASES_MOUVEMENT.arrivee)(escapeHtml(nom))
+    const dire = PHRASES_MOUVEMENT[mv.type] || PHRASES_MOUVEMENT.arrivee
+    return [dire(escapeHtml(nom)), depuisQuandCourt(new Date(mv.cree_le).getTime())]
+  }
+
+  const peindreMouvements = (mvs) => {
+    if (!mvs.length) return
     zListes.innerHTML = section('Dernier mouvement',
-      POINTS_MOUVEMENT[mv.type] || '#9A9AA4', 'Voir plus',
+      POINTS_MOUVEMENT[mvs[0].type] || '#9A9AA4', 'Voir plus',
       'onclick="showGestionScreen(\'p-equipe\')"',
-      phrase,
-      `<span class="ac-mini">${escapeHtml(initialesDe(mv.membre_nom || '?'))}</span>
-       <span class="ac-q">${depuisQuandCourt(new Date(mv.cree_le).getTime())}</span>`)
+      mvs.map(ligneMouvement))
       + zListes.innerHTML
   }
 
@@ -6944,39 +6961,45 @@ function peindreTuilesAccueil() {
   const arrivees = [...(cachedMembres || [])]
     .filter(m => m.created_at)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  if (arrivees[0]) {
-    peindreMouvement({ membre_nom: arrivees[0].nom, type: 'arrivee',
-                       cree_le: arrivees[0].created_at })
-  }
+    .slice(0, 2)
+    .map(m => ({ membre_nom: m.nom, type: 'arrivee', cree_le: m.created_at }))
+  peindreMouvements(arrivees)
 
   if (currentMembre?.entreprise_id) {
     supabase.from('mouvements_membres')
       .select('membre_nom, type, cree_le')
       .eq('entreprise_id', currentMembre.entreprise_id)
       .order('cree_le', { ascending: false })
-      .limit(1)
+      .limit(2)
       .then(({ data, error }) => {
         /* Table absente : on garde le repli, sans bruit dans la console —
            c'est un etat prevu, pas une panne. */
         if (error || !data?.length) return
-        peindreMouvement(data[0])
+        peindreMouvements(data)
       })
   }
 
-  /* La derniere procedure creee. */
-  const recentes = [...procs].sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  const neuve = recentes[0]
-  if (neuve) {
-    const teinte = couleurDossier(0)
-    const nbEtapes = Number(neuve.nb_etapes) || null
-    zListes.innerHTML += section('Dernière procédure créée', '#4C1D95', 'Voir plus',
-      `onclick="openAnalyse('${neuve.id}')"`,
-      `${escapeHtml(neuve.titre || 'Sans titre')}
-       <em>dans ${escapeHtml(neuve.categorie || 'Sans dossier')}</em>`,
-      `<span class="ac-q">${depuisQuandCourt(new Date(neuve.created_at).getTime())}${
-         nbEtapes ? ` · ${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}` : ''}</span>`)
+  /* Les deux dernieres procedures creees. */
+  const recentes = [...procs]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 2)
+  if (recentes.length) {
+    /* ⚠ « Dernieres creations » ET NON « Dernieres procedures creees ». Le titre
+       long passait sur deux lignes et poussait « Voir plus » a la ligne
+       suivante : deux mots de moins, et la tete du bloc tient sur une. */
+    zListes.innerHTML += section('Dernières créations', '#4C1D95', 'Voir plus',
+      'onclick="showGestionScreen(\'p-list\')"',
+      recentes.map(p => {
+        const n = Number(p.nb_etapes) || null
+        return [
+          `${escapeHtml(p.titre || 'Sans titre')}
+           <em>dans ${escapeHtml(p.categorie || 'Sans dossier')}</em>`,
+          depuisQuandCourt(new Date(p.created_at).getTime()) + (n ? ` · ${n} ét.` : ''),
+        ]
+      }))
   }
 }
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA COURBE DES CONSULTATIONS

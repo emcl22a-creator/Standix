@@ -976,14 +976,24 @@
   .mode-choice .ia-fig{ margin-bottom:2px; }
   .bande-ia .ia-fig{ flex-shrink:0; }
 
-  /* Sur un bouton blanc, un anneau blanc n'existe pas : il ne resterait qu'une
-     virgule bleue qui tourne. Le blanc y devient un bleu très pâle et le bleu
-     se fonce — c'est le même dessin, transposé pour rester lisible. */
+  /* ═══ L'ANNEAU SUR UN BOUTON PLEIN ═══
+
+     ⚠ CETTE SURCHARGE ETAIT RESTEE EN AMBRE — `#FCD9A8`, `#B44000`, `#7A2800`.
+       Elle transposait l'anneau pour qu'il se detache d'un bouton ORANGE ; le
+       bouton est bleu depuis, et c'est elle qu'on voit tourner quand on lance
+       « Generer les etapes ». Corriger `.ia-fig` seul ne suffisait pas : ce
+       selecteur-ci l'emporte des que l'anneau est dans un bouton.
+
+     Le principe reste le meme : les teintes descendent SOUS celles du fond,
+     sinon l'anneau se confond avec lui. Le bouton va de #1F4CEE a #4899EC ;
+     l'anneau prend donc du blanc — qui se detache sur du bleu franc — puis les
+     deux bleus assombris.
+
+     ⚠ ICI LE BLANC EST LE BON CHOIX, contrairement a `.ia-fig` sur fond clair
+       ou il devenait un trou. Le fond est fonce : c'est le noir qui y
+       disparaitrait. */
   .btn:not(.ghost) .ia-fig, .ia-fig.clair{
-    /* Sur un bouton ambre, le blanc de l'anneau se confondrait avec les reflets
-       du dégradé. Les trois teintes descendent sous le fond : c'est le même
-       orange, en plus sombre. */
-    --blanc:#FCD9A8; --milieu:#B44000; --bleu:#7A2800;
+    --blanc:#FFFFFF; --milieu:#BBD6F8; --bleu:#0A2E9E;
   }
 
   .ia-fig.g .pct{
@@ -12329,23 +12339,110 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 
 
-/* ─── L'ASTUCE DU JOUR ────────────────────────────────────────────────────
-   Plus petite que la phrase au-dessus, precedee d'une etiquette : c'est un
-   conseil, pas une promesse. */
-/* ⚠ PAS DE `max-width` ICI. La phrase au-dessus en a une, pour tenir sur deux
-   lignes voulues ; celle-ci est deja plus petite et precedee d'une etiquette
-   qui lui prend 70 px. La brider en plus la faisait passer sur trois lignes. */
-#p-home #ac-astuce{
-  display:flex; align-items:flex-start; gap:8px;
-  margin:12px 0 0;
-  font-size:12.5px; line-height:1.5; color:var(--label-3);
+/* ─── CE QU'IL RESTE A TERMINER ────────────────────────────────────────────
+   Une seule ligne, plus discrete que la phrase au-dessus : elle informe, elle
+   ne promet rien. */
+#p-home #ac-reste{
+  margin:10px 0 0;
+  font-size:13px; line-height:1.5; color:var(--label-3);
   letter-spacing:-0.015em;
 }
-/* ⚠ L'ETIQUETTE NE SE COMPRIME PAS. Sans `flex-shrink:0`, « Astuce » se casse
-   en deux lignes des que le conseil est long, et la puce se retrouve seule. */
-#p-home #ac-astuce b{
-  flex-shrink:0; padding:2px 8px; border-radius:100px;
-  background:rgba(31,76,238,0.10); color:#1F4CEE;
-  font-size:10.5px; font-weight:700; letter-spacing:0.03em;
-  text-transform:uppercase; line-height:1.6;
+#p-home #ac-reste[hidden]{ display:none; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PASTILLE DES BROUILLONS NON VUS
+
+   Un rond bleu sur l'onglet « Brouillons ». Sa couleur est celle du bouton
+   « Générer les étapes » — même dégradé, même sens.
+
+   ⚠ ELLE EST DANS LE FLUX, pas posée en absolu. Un badge flottant sur un
+     segment dont la largeur se calcule au pixel déborderait sur le libellé
+     voisin dès que le compte passe à deux chiffres. Ici, le bouton s'élargit
+     de ce qu'elle occupe — et la pastille glissante, qui se mesure, suit
+     toute seule.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.p-seg-pt{
+  display:inline-grid; place-items:center;
+  min-width:18px; height:18px; padding:0 5px; margin-left:6px;
+  border-radius:100px;
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF; font-size:11px; font-weight:700; letter-spacing:-0.01em;
+  line-height:1; vertical-align:middle;
+  /* ⚠ `will-change` EST ABSENT VOLONTAIREMENT : la pastille n'apparaît que
+     quelques fois par session, et une couche graphique permanente pour cela
+     coûterait plus qu'elle ne rapporte. */
+}
+.p-seg-pt[hidden]{ display:none; }
+
+/* ─── L'ARRIVÉE ───────────────────────────────────────────────────────────
+   Elle jaillit : de rien, elle dépasse sa taille, puis se pose. C'est le
+   ressort d'iOS — `cubic-bezier(0.34, 1.56, 0.64, 1)` passe au-dessus de 1
+   avant de revenir, ce qui donne le petit rebond. */
+.p-seg-pt.vient{ animation:pastilleVient 0.34s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes pastilleVient{
+  from{ transform:scale(0); opacity:0; }
+  to  { transform:scale(1); opacity:1; }
+}
+
+/* ─── LE DÉPART ───────────────────────────────────────────────────────────
+   Sans rebond : on ne rebondit pas en s'en allant. Elle se contracte et
+   s'efface, un peu plus vite qu'elle n'est venue. */
+.p-seg-pt.part{ animation:pastillePart 0.2s cubic-bezier(0.4,0,1,1) forwards; }
+@keyframes pastillePart{
+  from{ transform:scale(1); opacity:1; }
+  to  { transform:scale(0.4); opacity:0; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .p-seg-pt.vient, .p-seg-pt.part{ animation:none; }
+}
+
+
+/* ═══ L'ETAT D'UNE PROCEDURE EN COURS, DANS LA LISTE ═══
+
+   Une procedure que l'IA ecrit apparait dans « Brouillons » des sa creation,
+   avec l'anneau qui tourne a la place du badge.
+
+   ⚠ LE BADGE QUI LA REMPLACE ARRIVE EN DOUCEUR. Quand l'analyse se termine, la
+     liste se redessine : sans animation, l'anneau disparait et « Brouillon »
+     surgit a sa place dans la meme image. On voit un clignotement, pas un
+     achevement.
+
+   Le meme ressort que la pastille des non-vus — il part de rien, depasse
+   legerement, se pose. */
+/* ⚠ L'ETAT REPREND LA FORME D'UNE PILULE. `etatProcedureHtml` rend un
+   `.etat-proc` concu pour une autre page, sans fond ni bornes : pose dans la
+   ligne, il debordait sur la plaque de l'icone et son texte se collait au
+   dessin.
+
+   La pilule lui donne les memes limites qu'un badge — meme hauteur, meme
+   rayon, meme contour — pour que les deux etats occupent la meme place. */
+.cl-etat{
+  display:inline-flex; align-items:center; gap:7px;
+  padding:4px 11px 4px 9px; border-radius:100px;
+  background:#FFFFFF;
+  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.14), 0 1px 1.5px rgba(20,20,30,0.04);
+  font-size:12.5px; font-weight:500; color:var(--label-2); letter-spacing:-0.02em;
+  white-space:nowrap;
+}
+/* ⚠ `.etat-proc` EST BORNE A 13 PX DE LARGE dans sa declaration d'origine —
+   il n'y contient qu'un point, sans texte. Repris ici avec un libelle a cote,
+   son contenu debordait de la boite : la roue sortait a gauche de la pilule et
+   le mot se decalait.
+
+   On lui rend sa largeur naturelle. Le reste — fond, bordure, taille de texte
+   — est neutralise : c'est la pilule qui les porte. */
+.cl-etat .etat-proc{
+  width:auto; height:auto; flex-shrink:1;
+  display:inline-flex; align-items:center; gap:7px;
+  padding:0; background:none; border:none; font-size:inherit; color:inherit;
+}
+.cl-etat .ia-fig{ flex-shrink:0; }
+.cl-bas .cl-badge{ animation:etatArrive 0.32s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes etatArrive{
+  from{ transform:scale(0.7); opacity:0; }
+  to  { transform:scale(1);   opacity:1; }
+}
+@media (prefers-reduced-motion: reduce){
+  .cl-bas .cl-badge{ animation:none; }
 }

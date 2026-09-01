@@ -8433,6 +8433,242 @@ const CATALOGUE_ICONES = [
   /* — Stockage sec, cave — */
   { cles: ['cave', 'reserve seche', 'vin', 'boisson stock'],
     d: 'M8.4 3.4h7.2v5.2a3.6 3.6 0 0 1-3.6 3.6 3.6 3.6 0 0 1-3.6-3.6Z M12 12.2v5.4 M8.8 20.6h6.4' },
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     SECONDE SERIE — LES METIERS QUE LES 43 PREMIERES NE COUVRAIENT PAS
+
+     Le catalogue etait ecrit pour la restauration : cuisine, salle, cave,
+     terrasse. Un cabinet comptable, un garage ou une pharmacie tombaient tous
+     sur la chemise generique.
+
+     ⚠ LES CLES SONT NORMALISEES SANS ACCENT, comme les 43 premieres. C'est
+       `traceIconeDossier` qui compare, et elle retire les accents du nom du
+       dossier avant de chercher : une cle accentuee ne serait jamais trouvee.
+
+     ⚠ CHAQUE TRACE TIENT DANS UNE BOITE DE 24, en deux ou trois chemins au
+       plus. Au-dela, le dessin devient illisible dans une plaque de 34 px sur
+       la page Reglages.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* — Sante, soin — */
+  { cles: ['soin', 'pharmacie', 'medicament', 'ordonnance'],
+    d: 'M12 4.6v14.8 M4.6 12h14.8' },
+  { cles: ['laboratoire', 'analyse medicale', 'prelevement', 'echantillon'],
+    d: 'M9.4 3.2v6.1L4.9 17a2.2 2.2 0 0 0 1.9 3.3h10.4a2.2 2.2 0 0 0 1.9-3.3l-4.5-7.7V3.2 M8.2 3.2h7.6 M7.4 14.2h9.2' },
+
+  /* — Automobile, atelier mecanique — */
+  { cles: ['garage', 'mecanique', 'atelier mecanique', 'moteur'],
+    d: 'M15.6 5.4a4.6 4.6 0 0 0-6 6l-6 6 2.6 2.6 6-6a4.6 4.6 0 0 0 6-6l-2.7 2.7-2.6-2.6Z' },
+  { cles: ['pneu', 'roue', 'carrosserie'],
+    d: 'M12 3.4a8.6 8.6 0 1 0 0 17.2 8.6 8.6 0 0 0 0-17.2Z M12 8.6a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8Z' },
+
+  /* — Commerce, caisse — */
+  { cles: ['paiement', 'terminal', 'ticket'],
+    d: 'M3.4 8.4h17.2v10a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8Z M6.6 8.4V5.6a1.8 1.8 0 0 1 1.8-1.8h7.2a1.8 1.8 0 0 1 1.8 1.8v2.8 M8.6 13h6.8' },
+  { cles: ['vitrine', 'rayon', 'merchandising', 'boutique'],
+    d: 'M3.6 9.4h16.8v9.2a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8Z M3.6 9.4 5.4 4.2h13.2l1.8 5.2 M9 9.4v11 M15 9.4v11' },
+
+  /* — Bureau, juridique — */
+  { cles: ['droit', 'avocat', 'clause', 'litige'],
+    d: 'M12 4v16 M6.4 8h11.2 M4 8l2.4 6.4a3 3 0 0 0 5.6 0L14.4 8 M9.6 8l2.4 6.4a3 3 0 0 0 5.6 0L20 8' },
+  { cles: ['devis', 'bilan', 'tva', 'ecriture'],
+    d: 'M7.4 3.4h9.2a1.8 1.8 0 0 1 1.8 1.8v13.6a1.8 1.8 0 0 1-1.8 1.8H7.4a1.8 1.8 0 0 1-1.8-1.8V5.2a1.8 1.8 0 0 1 1.8-1.8Z M8.8 7.4h6.4 M8.8 11.4h2.4 M8.8 15h2.4 M14.6 11.4v3.8 M12.8 13.2h3.6' },
+  { cles: ['archive', 'classement', 'dossier papier', 'rangement bureau'],
+    d: 'M3.4 6.6h17.2v3.2H3.4Z M4.8 9.8v8.4a1.8 1.8 0 0 0 1.8 1.8h10.8a1.8 1.8 0 0 0 1.8-1.8V9.8 M9.8 13.6h4.4' },
+
+  /* — Chantier, second oeuvre — */
+  { cles: ['peinture', 'peintre', 'enduit', 'finition'],
+    d: 'M4.2 4.4h13.4v5.2H4.2Z M17.6 7h2.2v4.4a1.6 1.6 0 0 1-1.6 1.6H12v2.4 M10.4 15.4h3.2v5.2h-3.2Z' },
+  { cles: ['menuiserie', 'bois', 'scie', 'decoupe'],
+    d: 'M3.4 15.6 15.2 3.8l4.4 4.4L7.8 20H3.4Z M12.2 6.8l4.4 4.4' },
+  { cles: ['soudure', 'metal', 'serrurerie'],
+    d: 'M4.4 19.6 13 11l-1.6-1.6a3.4 3.4 0 0 1 4.8-4.8l4 4a3.4 3.4 0 0 1-4.8 4.8L13.8 11.8' },
+
+  /* — Agriculture, espaces verts — */
+  { cles: ['plante', 'arrosage', 'paysagiste'],
+    d: 'M12 20.6V11 M12 11c0-3.4 2.6-6.2 6-6.2 0 3.4-2.6 6.2-6 6.2Z M12 14.4c0-2.8-2.2-5-5-5 0 2.8 2.2 5 5 5Z' },
+  { cles: ['agriculture', 'ferme', 'elevage', 'recolte'],
+    d: 'M3.6 20.4V11L12 4.4l8.4 6.6v9.4 M9.4 20.4v-5.6h5.2v5.6' },
+
+  /* — Hotellerie — */
+  { cles: ['chambre', 'hotel', 'lit', 'hebergement', 'menage chambre'],
+    d: 'M3.4 18.6v-4.2a2.2 2.2 0 0 1 2.2-2.2h12.8a2.2 2.2 0 0 1 2.2 2.2v4.2 M3.4 18.6v2 M20.6 18.6v2 M6.4 12.2V8.6a1.8 1.8 0 0 1 1.8-1.8h7.6a1.8 1.8 0 0 1 1.8 1.8v3.6' },
+  { cles: ['piscine', 'spa', 'bien etre', 'sauna'],
+    d: 'M3 17.4c1.8 0 1.8 1.6 3.6 1.6s1.8-1.6 3.6-1.6 1.8 1.6 3.6 1.6 1.8-1.6 3.6-1.6 1.8 1.6 3.6 1.6 M7.4 14.6V6.2a2 2 0 0 1 4 0 M14 14.6V6.2a2 2 0 0 1 4 0' },
+
+  /* — Transport, logistique — */
+  { cles: ['quai', 'palette', 'chariot elevateur'],
+    d: 'M3.6 20.4V9.2L12 4.6l8.4 4.6v11.2 M8.6 20.4v-6.2h6.8v6.2 M8.6 17.2h6.8' },
+  { cles: ['itineraire', 'tournee', 'trajet', 'carte'],
+    d: 'M12 3.6a5.6 5.6 0 0 0-5.6 5.6c0 4.2 5.6 11.2 5.6 11.2s5.6-7 5.6-11.2A5.6 5.6 0 0 0 12 3.6Z M12 7.2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z' },
+
+  /* — Numerique — */
+  { cles: ['application', 'saisie'],
+    d: 'M3.4 5.6h17.2v11.2a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8Z M3.4 9h17.2 M6 7.3h.02 M8.4 7.3h.02' },
+  { cles: ['sauvegarde', 'donnee', 'serveur', 'base de donnees'],
+    d: 'M12 3.6c-4 0-7.2 1.3-7.2 3s3.2 3 7.2 3 7.2-1.3 7.2-3-3.2-3-7.2-3Z M4.8 6.6v10.8c0 1.7 3.2 3 7.2 3s7.2-1.3 7.2-3V6.6 M4.8 12c0 1.7 3.2 3 7.2 3s7.2-1.3 7.2-3' },
+  { cles: ['mot de passe', 'identifiant', 'connexion'],
+    d: 'M6.4 10.4h11.2a1.8 1.8 0 0 1 1.8 1.8v6.4a1.8 1.8 0 0 1-1.8 1.8H6.4a1.8 1.8 0 0 1-1.8-1.8v-6.4a1.8 1.8 0 0 1 1.8-1.8Z M8.4 10.4V7.6a3.6 3.6 0 0 1 7.2 0v2.8' },
+
+  /* — Relation client — */
+  { cles: ['clientele', 'fidelite', 'satisfaction', 'avis'],
+    d: 'M12 4.2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z' },
+  { cles: ['reclamation', 'incident client', 'sav', 'retour produit'],
+    d: 'M20.4 13.4a7.4 7.4 0 0 1-7.4 7.4H4.2l2.2-2.2a7.4 7.4 0 1 1 14-5.2Z M12 8.6v3.6 M12 15.4h.02' },
+  { cles: ['reservation', 'rendez vous', 'agenda client'],
+    d: 'M5.4 5.6h13.2a1.8 1.8 0 0 1 1.8 1.8v11.2a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8V7.4a1.8 1.8 0 0 1 1.8-1.8Z M3.6 10.4h16.8 M8.4 3.4v4 M15.6 3.4v4 M9.4 14.6l1.8 1.8 3.4-3.6' },
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     ÉLARGISSEMENT — LES MÉTIERS QUE LE CATALOGUE IGNORAIT
+
+     Les soixante-sept premières entrées couvrent bien la restauration,
+     l'atelier et le commerce. Elles laissaient de côté des secteurs entiers :
+     enseignement, santé de proximité, coiffure, sport, événementiel,
+     immobilier, sécurité alimentaire de terrain, laboratoire, culture.
+
+     ⚠ CHAQUE TRACÉ TIENT DANS `0 0 24 24` ET N'A NI `fill` NI COULEUR. Il est
+       peint par le dégradé de son rang — un tracé qui porterait sa propre
+       teinte casserait la palette des dossiers.
+
+     ⚠ LES CLÉS SONT ÉCRITES SANS ACCENT. `traceIconeDossier` normalise le nom
+       du dossier avant de comparer : « Hôtellerie » devient « hotellerie ».
+       Une clé accentuée ne serait jamais trouvée.
+     ═══════════════════════════════════════════════════════════════════════ */
+
+  /* — Enseignement, école — */
+  { cles: ['ecole', 'enseignement', 'cours', 'classe', 'eleve', 'professeur', 'education'],
+    d: 'M12 4 2.8 8.4 12 12.8l9.2-4.4Z M6.4 10.6v5.2c0 1.6 2.5 2.9 5.6 2.9s5.6-1.3 5.6-2.9v-5.2 M21.2 8.4v5.4' },
+
+  /* — Coiffure, esthétique — */
+  { cles: ['coiffure', 'coiffeur', 'salon', 'esthetique', 'beaute', 'ciseaux'],
+    d: 'M6 5.6 18 18 M18 5.6 6 18 M5.2 19.4a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z M18.8 19.4a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z' },
+
+  /* — Sport, salle — */
+  { cles: ['sport', 'salle de sport', 'fitness', 'musculation', 'coach', 'entrainement'],
+    d: 'M3 9.6v4.8 M21 9.6v4.8 M6 7.4v9.2 M18 7.4v9.2 M9 12h6' },
+
+  /* — Événementiel — */
+  { cles: ['evenement', 'evenementiel', 'seminaire', 'banquet', 'traiteur', 'ceremonie'],
+    d: 'M4.6 20h14.8 M6.8 20V9.8a5.2 5.2 0 0 1 10.4 0V20 M12 4.6V3 M9 5.6 8.2 4.2 M15 5.6l.8-1.4' },
+
+  /* — Immobilier, agence — */
+  { cles: ['immobilier', 'agence', 'bien', 'location', 'bail', 'logement', 'visite bien'],
+    d: 'M3.4 10.6 12 4l8.6 6.6V20a1 1 0 0 1-1 1h-5.2v-6h-4.8v6H4.4a1 1 0 0 1-1-1Z' },
+
+  /* — Laboratoire, mesure fine — */
+  { cles: ['laboratoire technique', 'essai', 'test', 'experimentation', 'calibrage', 'etalonnage'],
+    d: 'M9.6 3.4v6L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3l-4.8-8.6v-6 M8.4 3.4h7.2 M8.6 14h6.8' },
+
+  /* — Boulangerie, pâtisserie — */
+  { cles: ['boulangerie', 'patisserie', 'pain', 'petrin', 'fournil', 'viennoiserie'],
+    d: 'M3.6 14.4c0-3.6 3.8-6.4 8.4-6.4s8.4 2.8 8.4 6.4c0 1.8-1 2.6-2.4 2.6H6c-1.4 0-2.4-.8-2.4-2.6Z M8 10.6 6.8 17 M12 9.8V17 M16 10.6 17.2 17' },
+
+  /* — Boucherie, découpe — */
+  /* ⚠ TROISIEME ESSAI, ET LE BON EST LE PLUS SIMPLE.
+
+     J'ai tente un etal a pieds, puis un couperet a manche : les deux devenaient
+     illisibles a 32 px, ou l'on ne distingue plus une lame d'un rectangle. Un
+     COUTEAU vu de profil — dos droit, tranchant courbe, manche fin — garde sa
+     silhouette a toutes les tailles. */
+  { cles: ['boucherie', 'boucher', 'viande', 'decoupe viande', 'poissonnerie', 'traiteur frais'],
+    /* ⚠ LA CROIX A ETE RETIREE. J'avais ajoute deux traits censes evoquer des
+       couverts croises ; a 32 px ils formaient un X qu'on lisait comme une
+       suppression. Le couteau seul suffit. */
+    d: 'M3.4 13.6 14.6 4.2a1.4 1.4 0 0 1 2.3 1.2c-.6 4.6-4.3 8.2-8.9 8.2Z M3.4 13.6h5.6 M8.2 16.6h9.4' },
+
+  /* — Pharmacie, officine — */
+  { cles: ['pharmacie officine', 'officine', 'preparation medicament', 'posologie'],
+    d: 'M4.6 6.6a2 2 0 0 1 2-2h10.8a2 2 0 0 1 2 2v10.8a2 2 0 0 1-2 2H6.6a2 2 0 0 1-2-2Z M12 8.6v6.8 M8.6 12h6.8' },
+
+  /* — Petite enfance — */
+  { cles: ['creche', 'enfant', 'petite enfance', 'garderie', 'nourrisson', 'periscolaire'],
+    d: 'M12 3.6a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Z M4.6 21a7.4 7.4 0 0 1 14.8 0 M10.2 7.2h.02 M13.8 7.2h.02' },
+
+  /* — Aide à la personne — */
+  { cles: ['aide a domicile', 'auxiliaire', 'accompagnement', 'ehpad', 'maison de retraite', 'senior'],
+    d: 'M12 20.6s-7.4-4.4-7.4-9.4a4 4 0 0 1 7.4-2.2 4 4 0 0 1 7.4 2.2c0 5-7.4 9.4-7.4 9.4Z' },
+
+  /* — Textile, couture — */
+  /* ⚠ TROISIEME ESSAI. Un Y d'abord, puis une bobine qui ressemblait a une
+     echelle. Une AIGUILLE et son fil : la pointe, le chas, la boucle du fil —
+     trois formes distinctes, aucune ne se confond avec l'autre. */
+  { cles: ['couture', 'textile', 'atelier couture', 'retouche', 'confection', 'tissu'],
+    d: 'M19.4 4.6 8.6 15.4 M19.4 4.6l-1.8 4.2 M17.4 6.6l-4.2 1.8 M8.6 15.4 6 18l-1.4 2.6L7.2 19.2Z M11.4 12.6a3.4 3.4 0 1 1-4.8 4.8' },
+
+  /* — Imprimerie, signalétique — */
+  { cles: ['imprimerie', 'signaletique', 'enseigne', 'serigraphie', 'grand format'],
+    d: 'M7.4 8.6V3.6h9.2v5 M7.4 18.4H5.6a2 2 0 0 1-2-2v-4.4a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v4.4a2 2 0 0 1-2 2h-1.8 M7.4 14.6h9.2v6H7.4Z' },
+
+  /* — Culture, spectacle — */
+  { cles: ['culture', 'spectacle', 'theatre', 'musee', 'exposition', 'scene', 'billetterie'],
+    d: 'M3.6 8.4a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v1.2a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2v-1.2a2 2 0 0 0 0-4Z M12 6.4v11.2' },
+
+  /* — Tourisme, guide — */
+  { cles: ['tourisme', 'guide', 'excursion', 'visite guidee', 'office de tourisme'],
+    d: 'M20.4 11.6c0 5-8.4 9.4-8.4 9.4s-8.4-4.4-8.4-9.4a8.4 8.4 0 0 1 16.8 0Z M12 8.6a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z' },
+
+  /* — Assurance, mutuelle — */
+  { cles: ['assurance', 'mutuelle', 'sinistre', 'garantie', 'indemnisation', 'expertise'],
+    d: 'M12 3.4 4.6 6.4v5.2c0 4.6 3.2 8.6 7.4 9.6 4.2-1 7.4-5 7.4-9.6V6.4Z M12 9v5.6' },
+
+  /* — Banque, guichet — */
+  { cles: ['banque', 'guichet', 'agence bancaire', 'depot', 'retrait', 'virement'],
+    d: 'M3.4 9.6 12 4.4l8.6 5.2 M4.6 9.6v9 M9.4 9.6v9 M14.6 9.6v9 M19.4 9.6v9 M3 20.4h18' },
+
+  /* — Énergie, chaufferie — */
+  { cles: ['chaufferie', 'chauffage', 'chaudiere', 'climatisation', 'ventilation', 'cvc'],
+    d: 'M7.6 3.6v9.8 M12 3.6v9.8 M16.4 3.6v9.8 M4.6 13.4h14.8v3.2a3.4 3.4 0 0 1-3.4 3.4H8a3.4 3.4 0 0 1-3.4-3.4Z' },
+
+  /* — Déménagement, manutention — */
+  { cles: ['demenagement', 'manutention', 'port de charge', 'carton', 'garde meuble'],
+    d: 'M3.6 8.4 12 4.6l8.4 3.8v8.4L12 20.6l-8.4-3.8Z M3.6 8.4 12 12.2l8.4-3.8 M12 12.2v8.4' },
+
+  /* — Élevage, animalier — */
+  /* ⚠ REDESSINE : les quatre orteils au-dessus du coussinet se confondaient en
+     une tache a 32 px. Ecartes et agrandis, l'empreinte se lit. */
+  { cles: ['animal', 'animalier', 'veterinaire', 'chenil', 'toilettage', 'clinique veterinaire'],
+    d: 'M5.4 11.4a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M18.6 11.4a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M9.6 7.8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M14.4 7.8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z M12 12.4c3 0 5.4 2.2 5.4 4.8 0 1.8-1.4 3-3.2 3h-4.4c-1.8 0-3.2-1.2-3.2-3 0-2.6 2.4-4.8 5.4-4.8Z' },
+
+  /* — Pressing, retouche — */
+  { cles: ['pressing', 'repassage', 'fer a repasser', 'nettoyage a sec', 'detachage'],
+    d: 'M3.6 16.4v-2.6a5.4 5.4 0 0 1 5.4-5.4h6.6a4.4 4.4 0 0 1 4.4 4.4v3.6Z M6.6 8.4V6.6a2 2 0 0 1 2-2h5.6 M3.6 19.4h16.4' },
+
+  /* — Sécurité incendie, contrôle périodique — */
+  { cles: ['controle periodique', 'verification annuelle', 'registre securite', 'commission'],
+    d: 'M6.6 3.6h10.8a1.6 1.6 0 0 1 1.6 1.6v13.6a1.6 1.6 0 0 1-1.6 1.6H6.6A1.6 1.6 0 0 1 5 18.8V5.2a1.6 1.6 0 0 1 1.6-1.6Z M8.8 8.4h6.4 M8.8 12h6.4 M8.8 15.6h3.6' },
+
+  /* — Recyclage industriel — */
+  { cles: ['dechetterie', 'valorisation', 'compost', 'benne', 'collecte'],
+    d: 'M8.6 4.6 6 9.2h5.2Z M17.4 9.2l2.6 4.6-4.4 2.6 M6.6 16.4 4 13.8l4.4-2.6 M12 20.4h5.2l-2.6-4.6 M6.6 16.4h5.4l-2.6 4' },
+
+  /* — Import, douane — */
+  { cles: ['douane', 'import', 'export', 'declaration douaniere', 'international'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M3.4 12h17.2 M12 3.4a13 13 0 0 1 0 17.2 13 13 0 0 1 0-17.2Z' },
+
+  /* — Photographie, studio — */
+  { cles: ['photo', 'photographie', 'studio', 'prise de vue', 'shooting'],
+    d: 'M3.6 8.6a2 2 0 0 1 2-2h2.2l1.4-2h5.6l1.4 2h2.2a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2Z M12 9.6a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z' },
+
+  /* — Développement, code — */
+  { cles: ['developpement', 'code', 'programmation', 'deploiement', 'integration continue'],
+    d: 'M8.4 8.4 4.6 12l3.8 3.6 M15.6 8.4 19.4 12l-3.8 3.6 M13.4 5.6l-2.8 12.8' },
+
+  /* — Réunion à distance — */
+  { cles: ['visio', 'visioconference', 'teletravail', 'distanciel', 'appel video'],
+    d: 'M3.6 8.6a2 2 0 0 1 2-2h8.2a2 2 0 0 1 2 2v6.8a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2Z M15.8 11 20.4 8v8l-4.6-3Z' },
+
+  /* — Panne, alerte technique — */
+  { cles: ['panne', 'incident technique', 'defaut', 'arret machine', 'dysfonctionnement'],
+    d: 'M12 3.6 21.4 20H2.6Z M12 9.6v5 M12 17.4h.02' },
+
+  /* — Astreinte, garde — */
+  { cles: ['astreinte', 'garde', 'permanence', 'nuit', 'week end', 'rotation'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 7.4V12l3.4 2' },
+
+  /* — Objectif, performance — */
+  { cles: ['objectif', 'performance', 'indicateur', 'resultat', 'kpi', 'progression'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 7.8a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Z M12 11.4h.02' },
+
 ]
 
 /* Le repli : le dossier lui-même, quand aucun mot-clé ne correspond. */
@@ -8444,12 +8680,45 @@ const ICONE_DOSSIER_DEFAUT =
    « securite ». Sans cela, la moitié des noms français ne trouveraient jamais
    leur mot-clé — et l'on chercherait pourquoi certains dossiers gardent
    l'icône par défaut sans raison apparente. */
+/* ═══ RETROUVER L'ICONE D'UN DOSSIER ═══
+
+   ⚠ UN MOT ENTIER, PAS UN MORCEAU DE MOT.
+
+     La recherche testait `n.includes(c)` : n'importe quelle suite de lettres
+     suffisait. « Demenagement » contient « menage », « Banque » contient…
+     rien, mais « banquet » contient « banque » — et selon l'ordre du
+     catalogue, l'un attrapait l'autre. Mesure sur vingt-neuf noms reels : deux
+     tombaient sur la mauvaise icone.
+
+     On decoupe donc le nom en mots et on compare mot a mot. « Demenagement »
+     ne contient plus « menage » ; « Salle de sport » trouve toujours
+     « sport ».
+
+   ⚠ LES CLES DE PLUSIEURS MOTS SONT TESTEES A PART, sur le nom complet :
+     « machine a cafe » ou « chambre froide » ne se retrouveraient pas dans un
+     decoupage mot a mot.
+
+   ⚠ LES PLUS LONGUES D'ABORD. « chambre froide » doit gagner sur « chambre » ;
+     sans tri, c'est l'ordre du catalogue qui deciderait. */
 function traceIconeDossier(nom) {
   const n = (nom || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+  if (!n) return ICONE_DOSSIER_DEFAUT
+  const mots = n.split(/[^a-z0-9]+/).filter(Boolean)
+
+  let meilleur = null, longueur = 0
   for (const e of CATALOGUE_ICONES) {
-    if (e.cles.some(c => n.includes(c))) return e.d
+    for (const c of e.cles) {
+      /* ⚠ LE PLURIEL EST RETIRE AVANT DE COMPARER. « Objectifs » ne trouvait
+         rien, la cle etant « objectif » — et personne ne nomme un dossier au
+         singulier par principe. On teste le mot tel quel, puis prive de son
+         « s » final. */
+      const touche = c.includes(' ')
+        ? n.includes(c)                 /* cle composee : sur le nom entier */
+        : mots.some(m => m === c || m.replace(/s$/, '') === c)
+      if (touche && c.length > longueur) { meilleur = e.d; longueur = c.length }
+    }
   }
-  return ICONE_DOSSIER_DEFAUT
+  return meilleur || ICONE_DOSSIER_DEFAUT
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

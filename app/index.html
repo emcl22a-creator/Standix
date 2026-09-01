@@ -1408,19 +1408,14 @@
                 aria-label="À quoi servent les boutons de chaque ligne">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
         </button>
-        <div class="dd-filter" id="dd-pm-tri">
-          <button type="button" class="dd-trigger" id="dd-pm-tri-trigger" aria-label="Trier">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
-              <line x1="4" y1="7.5" x2="20" y2="7.5"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="16.5" x2="14" y2="16.5"/>
-            </svg>
-            <span id="dd-pm-tri-label" hidden>Trier : A → Z</span>
-          </button>
-          <div class="dd-menu" id="dd-pm-tri-menu">
-            <button type="button" class="selected" data-tri="az" data-label="Trier : A → Z">A → Z</button>
-            <button type="button" data-tri="neuf" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
-            <button type="button" data-tri="vieux" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
-          </div>
-        </div>
+        <!-- ⚠ LE TRI A ETE RETIRE. Trois ordres — alphabetique, du plus
+             recent, du plus ancien — pour une equipe qui compte rarement plus
+             de dix personnes. La liste est deja groupee par role, ce qui est
+             le seul classement qu'on cherche ici.
+
+             `filtreEquipeTri` reste dans le script, sur sa valeur par defaut :
+             le rendu continue de trier, on ne lui donne simplement plus le
+             choix. -->
       </div>
     </div>
 
@@ -3051,7 +3046,7 @@
     <div class="poste-saisie">
       <div class="search-bar">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        <input type="text" id="poste-nouveau" placeholder="Ex : Serveur" autocomplete="off">
+        <input type="text" id="poste-nouveau" placeholder="Ex : Responsable" autocomplete="off">
       </div>
       <button type="button" class="poste-ajouter" id="poste-ajouter">Ajouter</button>
     </div>

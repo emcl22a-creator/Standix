@@ -7058,10 +7058,18 @@ function anDureeLisible(sec) {
 }
 
 /* Les validations de la periode choisie, une seule fois par rendu. */
+/* ⚠ LA COLONNE S'APPELLE `validated_at`, PAS `created_at`.
+
+   J'avais ecrit `created_at` — le nom qu'on attend d'une table. Il n'existe pas
+   sur `validations` : le filtre ecartait donc TOUTES les lignes, et les trois
+   chiffres restaient a zero quelle que soit la periode choisie. Aucune erreur
+   nulle part, puisque `undefined` est simplement faux.
+
+   Le nom se lit dans le reste du fichier, qui l'emploie seize fois. */
 function anValidations() {
   const depuis = Date.now() - anJours * 86400000
   return (cachedValidations || []).filter(v =>
-    v.created_at && new Date(v.created_at).getTime() >= depuis)
+    v.validated_at && new Date(v.validated_at).getTime() >= depuis)
 }
 
 /* ═══ LA COURBE ═══
@@ -7178,7 +7186,7 @@ function anSerie(valides, champ) {
   const cases = [...Array(n)].map((_, i) => ({ v: 0, i }))
   const debut = Date.now() - anJours * 86400000
   for (const v of valides) {
-    const k = Math.floor((new Date(v.created_at).getTime() - debut) / (pas * 86400000))
+    const k = Math.floor((new Date(v.validated_at).getTime() - debut) / (pas * 86400000))
     if (k >= 0 && k < n) cases[k].v += champ === 'temps' ? Number(v.duree_lecture || 0) : 1
   }
   return cases.map((c, i) => {
@@ -10549,7 +10557,12 @@ function expliquerComptage() {
       "et cesse de compter tant que personne ne r\u00e9pond \u2014 un t\u00e9l\u00e9phone pos\u00e9 sur le plan " +
       "de travail n'accumule pas des heures.\n" +
       "\u2022 Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture.\n\n" +
-      "Les temps s'additionnent \u00e0 chaque visite. Les classements montrent le mois en cours.",
+      /* ⚠ LA PHRASE SUR LES CLASSEMENTS A ETE RETIREE. Elle disait « les
+         classements montrent le mois en cours » — ce n'est plus vrai depuis
+         que la page Analyse a son propre filtre de periode : 7 jours, 30 jours
+         ou un an. Une aide qui decrit un comportement disparu induit en erreur
+         plus surement qu'une aide absente. */
+      "Les temps s'additionnent \u00e0 chaque visite.",
     confirmer: 'Compris',
     annuler: null,
     danger: false,

@@ -8030,6 +8030,16 @@ function animerApparition(el, rang = 0) {
 function ligneProcedureTrouvee(proc, dossier, rang) {
   const el = document.createElement('div')
   el.className = 'cat-cell cat-cell--ligne'
+  /* ⚠ LA MEME PASTILLE QUE SUR L'ONGLET, au meme endroit — en haut a droite,
+     debordant legerement. Elle marque une procedure creee que le gerant n'a
+     pas encore ouverte.
+
+     ⚠ ELLE NE PORTE PAS DE CHIFFRE ICI, et la classe `.pt--seul` le dit. Sur
+       l'onglet, le nombre compte quelque chose : combien de procedures
+       attendent. Sur une carte, il vaudrait toujours 1 — un chiffre qui ne
+       varie jamais n'informe pas, il encombre. La pastille garde donc sa
+       couleur, sa taille et sa place, mais reste pleine. */
+  const jamaisVue = !proc.publiee_le && !brouillonsVus().has(proc.id)
   el.dataset.key = proc.id
   animerApparition(el, rang)
   const teinte = couleurDossier(rang)
@@ -8037,6 +8047,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
   const enAnalyse = proc.statut === 'traitement' || proc.statut === 'redaction'
 
   el.innerHTML = `
+    ${jamaisVue ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''}
     <span class="cl-pl" style="background:${fondPlaque(teinte)}">
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z

@@ -2875,7 +2875,10 @@
   .langue-grille{ display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
   .langue-choix{
     display:flex; align-items:center; gap:9px; padding:10px 12px; border-radius:12px;
-    border:1px solid var(--border); background:var(--bg-card); color:#fff;
+    /* ⚠ LE TEXTE ETAIT EN `#fff` : un blanc pose sur une carte blanche. Le
+       bouton paraissait vide, on ne voyait que le drapeau. Vestige du theme
+       sombre, comme partout ailleurs. */
+    border:1px solid var(--border); background:var(--bg-card); color:var(--label);
     font-family:inherit; font-size:13px; font-weight:600; text-align:left;
     transition:border-color 0.2s, background 0.2s;
   }
@@ -13004,17 +13007,16 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   to  { transform:none;            opacity:1; }
 }
 
-/* Le retour : la page parente revient de la gauche, dans l'autre sens. */
-.screen.vient-gauche{
-  animation:pageRevient 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
-}
-@keyframes pageRevient{
-  from{ transform:translateX(-18%); opacity:0; }
-  to  { transform:none;             opacity:1; }
-}
+/* ⚠ `vient-gauche` ET `pageRevient` ONT ETE RETIRES. Ils faisaient revenir la
+   page des Reglages en glissant depuis la gauche — un geste que j'avais ajoute
+   de moi-meme, alors que le retour marchait tres bien avec le voile et le
+   fondu communs a toute l'app.
+
+   Seul l'aller glisse desormais. Les regles sont supprimees pour qu'on ne les
+   croie pas encore en service. */
 
 @media (prefers-reduced-motion: reduce){
-  .screen.vient-droite, .screen.vient-gauche{ animation:none; }
+  .screen.vient-droite{ animation:none; }
 }
 
 
@@ -13217,10 +13219,36 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   margin:22px 0 10px;
 }
 
-/* Le champ de saisie d'un poste, en pilule comme les autres. */
-#p-reg-postes .poste-saisie, #p-reg-postes .search-bar{
+/* ═══ UNE SEULE PILULE, PAS TROIS ═══
+
+   ⚠ MA REGLE VISAIT DEUX CONTENEURS IMBRIQUES, et la regle generale des champs
+     touchait le troisieme. Resultat mesure : `.poste-saisie` (342 px),
+     `.search-bar` (239) et l'`input` (188) portaient tous le meme fond gris et
+     le meme rayon de 100 px — trois pilules emboitees, chacune visible sur les
+     bords de la precedente.
+
+   La forme appartient au conteneur exterieur ; ce qu'il y a dedans est
+   transparent. */
+#p-reg-postes .poste-saisie{
+  display:flex; align-items:center; gap:8px;
+  border:none; border-radius:100px; padding:0;
+  background:transparent;
+}
+#p-reg-postes .search-bar{
+  flex:1; min-width:0;
+  display:flex; align-items:center; gap:9px;
+  height:44px; padding:0 16px;
   border:none; border-radius:100px;
   background:rgba(118,118,128,0.12);
+}
+#p-reg-postes .search-bar svg{ width:17px; height:17px; flex-shrink:0; color:var(--label-3); }
+/* ⚠ LE CHAMP LUI-MEME N'A NI FOND NI FORME. C'est la barre qui les porte : un
+   champ habille par-dessus donnerait le troisieme contour. */
+#p-reg-postes #poste-nouveau{
+  flex:1; min-width:0;
+  border:none; border-radius:0; padding:0;
+  background:transparent; box-shadow:none;
+  font-size:16px; color:var(--label);
 }
 
 
@@ -13490,3 +13518,158 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   color:var(--label); text-transform:none; margin:20px 0 8px;
 }
 #p-membres .note{ font-size:13px; color:var(--label-3); padding:18px 2px; }
+
+
+/* ═══ LES DEUX ESPACES DE LA PAGE EQUIPE ═══
+
+   Mesures avant correction : 16 px entre la recherche et la ligne de compte,
+   34 px entre celle-ci et le premier titre de groupe.
+
+   ⚠ LES 34 PX CUMULAIENT TROIS MARGES : le bas de la ligne de compte (2), le
+     haut de la liste (14) et le haut du titre (20). Chacune paraissait
+     raisonnable isolement ; ensemble elles ouvraient un trou.
+
+   La liste perd sa marge haute — c'est le titre qui la porte, et il n'en faut
+   qu'une. */
+#p-membres .proc-rech-rang{ margin-bottom:10px; }
+#p-membres #pm-liste{ margin-top:0; }
+#p-membres .fm-titre:first-child{ margin-top:14px; }
+
+
+/* ═══ LES DERNIERS TEXTES BLANCS DU THEME SOMBRE ═══
+
+   Mesures un a un : ces regles posent `color:#fff` sur des elements qui vivent
+   desormais sur des cartes blanches. Le texte y est invisible — on ne voit que
+   le fond, et l'on croit l'element vide.
+
+   ⚠ ELLES SONT REECRITES ICI PLUTOT QUE MODIFIEES SUR PLACE. Chacune sert
+     aussi a l'espace Equipe, dont certains ecrans ont garde un fond sombre :
+     toucher la declaration d'origine les emporterait avec.
+
+   ⚠ `.langue-choix.actif` GARDE SON BLANC — c'est le seul cas juste. La langue
+     choisie a un fond bleu plein ; un texte sombre y tomberait sous le seuil
+     de lisibilite. Elle n'est donc pas dans la liste. */
+#p-quota .quota-reste,
+#p-reg-postes .an-intro .s b,
+#p-reg-postes .hero .s b,
+#p-reg-code .ci-txt,
+#p-reg-code .ci-txt b,
+#p-reg-langue .langue-choix:not(.actif),
+#p-reg-langue .langue-choix:not(.actif) .nm,
+#p-settings .reg-ligne,
+#p-settings .reg-identite,
+#p-reg-compte .reg-ligne, #p-reg-code .reg-ligne,
+#p-reg-postes .reg-ligne, #p-reg-langue .reg-ligne,
+#p-reg-appareils .reg-ligne, #p-membres .reg-ligne,
+#p-abonnement .reg-ligne, #p-quota .reg-ligne{
+  color:var(--label);
+}
+/* Les textes secondaires gardent leur gris. */
+#p-quota .quota-reste{ color:var(--label-2); }
+#p-reg-code .ci-txt{ color:var(--label-2); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ABONNEMENT — UNE SEULE FAMILLE DE BLEU, ET DU NOIR POUR LE TEXTE
+
+   Trois choses relevees a la mesure sur cette page :
+
+     · le bouton d'offre partait de `#EB5201` — la conversion vers le bleu
+       n'avait repris que ses deux derniers arrets — avec un texte brun
+       `#2A1400` par-dessus ;
+     · les trois icones de reassurance portaient trois teintes differentes
+       (vert, bleu, violet), sans raison : elles disent la meme chose ;
+     · les cartes gardaient l'ombre a 42 % du theme sombre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── LES CARTES D'OFFRE ────────────────────────────────────────────────── */
+#p-abonnement .offre-carte{
+  position:relative;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+/* ⚠ LA VEDETTE SE DISTINGUE PAR UN LISERE BLEU, pas par une ombre plus forte.
+   Une ombre appuyee sur fond clair fait une tache ; un contour dit « celle-ci »
+   sans peser. */
+#p-abonnement .offre-carte.vedette{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(31,76,238,0.30),
+    0 1px 2px rgba(20,20,30,0.05),
+    0 12px 26px -16px rgba(31,76,238,0.28);
+}
+
+/* ─── LE BOUTON D'OFFRE ─────────────────────────────────────────────────── */
+#p-abonnement .offre-cta{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  color:#FFFFFF;
+}
+
+/* ─── LE RUBAN DE LA VEDETTE ────────────────────────────────────────────── */
+#p-abonnement .offre-ruban{
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF;
+}
+
+/* ─── LES TROIS ICONES DE REASSURANCE ───────────────────────────────────── */
+#p-abonnement .abo-conf .ic{ color:#3073C3; }
+#p-abonnement .abo-conf .cf:nth-child(1) .ic,
+#p-abonnement .abo-conf .cf:nth-child(2) .ic,
+#p-abonnement .abo-conf .cf:nth-child(3) .ic{ color:#3073C3; }
+
+/* ─── LES TEXTES ────────────────────────────────────────────────────────── */
+#p-abonnement .offre-nom, #p-abonnement .offre-prix,
+#p-abonnement .abo-conf .cf b{ color:var(--label); }
+#p-abonnement .offre-li, #p-abonnement .offre-annuel-note,
+#p-abonnement .abo-conf .cf span{ color:var(--label-2); }
+
+/* ═══ L'ARRIVEE DES CARTES ═══
+
+   Elles apparaissent l'une apres l'autre, en montant de huit pixels.
+
+   ⚠ LE DECALAGE EST PLAFONNE A TROIS CRANS. Au-dela, la derniere carte
+     attendrait un demi-quart de seconde de plus que la premiere, et l'on
+     verrait la page se construire au lieu d'arriver.
+
+   ⚠ `both` GARDE LA PREMIERE IMAGE AVANT LE DEPART. Sans lui, les cartes
+     s'affichent en clair pendant leur delai, puis sautent a l'opacite zero
+     pour commencer — un clignotement a chaque ouverture. */
+#p-abonnement .offre-carte{
+  animation:offreArrive 0.42s cubic-bezier(0.32,0.72,0,1) both;
+}
+#p-abonnement .offre-carte:nth-of-type(2){ animation-delay:0.06s; }
+#p-abonnement .offre-carte:nth-of-type(3){ animation-delay:0.12s; }
+#p-abonnement .offre-carte:nth-of-type(n+4){ animation-delay:0.18s; }
+@keyframes offreArrive{
+  from{ opacity:0; transform:translateY(8px); }
+  to  { opacity:1; transform:none; }
+}
+@media (prefers-reduced-motion: reduce){
+  #p-abonnement .offre-carte{ animation:none; }
+}
+
+
+/* ═══ LES DEUX HALOS AMBRE DE LA VEDETTE ═══
+
+   Ils ne venaient pas de la carte mais de deux pseudo-elements et d'une ombre
+   portee — invisibles a l'inspection des couleurs de texte, visibles au rendu :
+
+     · `::before` dessinait un contour `#FEB731`, l'ambre du logo ;
+     · `::after` posait un voile `rgba(255,154,31,0.075)` sur toute la carte ;
+     · le bouton portait une ombre `rgba(253,168,30,0.45)`, une lueur orange.
+
+   ⚠ ON NE LES SUPPRIME PAS, ON LES REPEINT. Les retirer enleverait la
+     distinction de la carte vedette ; c'est leur couleur qui etait fausse, pas
+     leur role. */
+#p-abonnement .offre-carte.vedette::before{
+  background:linear-gradient(135deg,#1F4CEE,#4899EC) !important;
+}
+#p-abonnement .offre-carte.vedette::after{
+  background:rgba(72,153,236,0.06) !important;
+}
+#p-abonnement .offre-cta{
+  box-shadow:0 6px 18px -8px rgba(31,76,238,0.45);
+}

@@ -1011,6 +1011,49 @@
 
   </div>
 
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       LES DEUX PAGES D'HISTORIQUE
+
+       Elles montent du bas, par-dessus l'ecran d'ou l'on vient. C'est ce qui
+       dit qu'on n'a pas navigue ailleurs : on a ouvert quelque chose, et on va
+       le refermer.
+
+       ⚠ ELLES SONT HORS DE `.app`, au niveau du `body`. Posees dedans, elles
+         seraient prises dans son contexte d'empilement et passeraient sous la
+         barre du bas.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="histo" id="histo-mouvements" hidden aria-hidden="true">
+    <div class="histo-fond" data-fermer-histo></div>
+    <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Mouvements de l’équipe">
+      <span class="histo-poignee" data-fermer-histo></span>
+      <div class="histo-tete">
+        <h2>Mouvements</h2>
+        <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <p class="histo-note">Seul le dernier mois est conservé.</p>
+      <div class="histo-liste" id="histo-mouvements-liste"></div>
+    </div>
+  </div>
+
+  <div class="histo" id="histo-creations" hidden aria-hidden="true">
+    <div class="histo-fond" data-fermer-histo></div>
+    <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Procédures créées">
+      <span class="histo-poignee" data-fermer-histo></span>
+      <div class="histo-tete">
+        <h2>Créations</h2>
+        <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <p class="histo-note">Seul le dernier mois est affiché.</p>
+      <div class="histo-liste" id="histo-creations-liste"></div>
+    </div>
+  </div>
+
   <div class="screen" inert id="p-list">
     <!-- Le titre de la page et son compte. Il dit d'un coup d'œil ce que
          l'entreprise possède — la grille en dessous, elle, sert à chercher. -->

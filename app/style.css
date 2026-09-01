@@ -12695,3 +12695,120 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   .histo-carte, .histo-fond,
   .histo.part .histo-carte, .histo.part .histo-fond{ animation:none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ANALYSE
+
+   Elle emprunte tout à l'accueil : `.ac-chiffres`, `.ac-bloc`, `.ac-eti`. Seul
+   ce qui lui est propre — les courbes, le classement — est déclaré ici.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-global-analyse .proc-segm{ margin:0 0 22px; }
+
+.an-titre{
+  font-size:16px; font-weight:650; letter-spacing:-0.03em; color:var(--label);
+  margin:0 0 12px;
+}
+
+/* Le bouton d'aide, dans la tête du bloc. Même taille que le chevron de
+   « Voir plus » : deux commandes de tête ne doivent pas peser différemment. */
+.an-i{
+  flex-shrink:0; width:22px; height:22px; padding:0; border:none;
+  border-radius:100px; display:grid; place-items:center;
+  background:none; color:var(--label-3);
+}
+.an-i svg{ width:16px; height:16px; }
+.an-i:active{ background:rgba(118,118,128,0.12); }
+
+/* ═══ LES COURBES ═══
+
+   ⚠ LE SVG S'ÉTIRE EN LARGEUR, PAS EN HAUTEUR. `preserveAspectRatio:none` lui
+     fait remplir la carte quelle que soit la largeur de l'écran ; la hauteur
+     est fixée ici pour que la courbe garde la même allure sur tous les
+     téléphones. */
+.an-graph{ margin-top:4px; }
+.an-graph{ position:relative; }
+.an-svg{ display:block; width:100%; height:128px; overflow:visible; }
+
+/* ═══ LES GRADUATIONS, A GAUCHE ═══
+   Posees par-dessus le SVG plutot que dedans : celui-ci est etire en largeur,
+   un texte a l'interieur le serait aussi. */
+.an-ech{ position:absolute; inset:0; pointer-events:none; }
+.an-ech span{
+  position:absolute; left:0; transform:translateY(-50%);
+  width:28px; text-align:right;
+  font-size:10px; color:var(--label-3); font-variant-numeric:tabular-nums;
+}
+
+/* Les repères de date, sous l'axe. Positionnés en pourcentage pour suivre le
+   SVG qui s'étire. */
+.an-axe{ position:relative; height:16px; margin-top:-14px; box-sizing:border-box; }
+.an-axe span{
+  position:absolute; transform:translateX(-50%);
+  font-size:10.5px; color:var(--label-3); white-space:nowrap;
+}
+/* ⚠ LE PREMIER ET LE DERNIER NE SE CENTRENT PAS. Centrés comme les autres, ils
+   dépasseraient de la carte d'une demi-largeur de texte. */
+.an-axe span:first-child{ transform:translateX(0); }
+.an-axe span:last-child{ transform:translateX(-100%); }
+
+.an-note{
+  margin:12px 0 0; font-size:11.5px; color:var(--label-3);
+  line-height:1.45; letter-spacing:-0.01em;
+}
+
+/* ═══ LE CLASSEMENT DE L'ÉQUIPE ═══ */
+.an-membre{ display:flex; align-items:center; gap:12px; padding:9px 0; }
+.an-membre + .an-membre{ box-shadow:inset 0 0.5px 0 var(--separator); }
+/* ⚠ `.an-ini` A ETE RETIREE avec les initiales. Un point de rang la remplace :
+   il separe les deux entrees sans prendre de place. */
+.an-rang{
+  flex:0 0 8px; width:8px; height:8px; border-radius:100px;
+}
+.an-m-co{ flex:1; min-width:0; display:flex; flex-direction:column; }
+.an-m-t{
+  font-size:14.5px; font-weight:600; letter-spacing:-0.025em; color:var(--label);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.an-m-s{
+  font-size:12px; color:var(--label-3); margin-top:1px;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.an-m-q{
+  flex-shrink:0; font-size:13px; font-weight:600; color:var(--label-2);
+  font-variant-numeric:tabular-nums;
+}
+.an-vide-l{
+  padding:18px 0; text-align:center; font-size:13px; color:var(--label-3);
+}
+
+
+/* ═══ CE QUE L'ANCIENNE PAGE ANALYSE LAISSE DERRIÈRE ELLE ═══
+
+   L'écran `p-global-analyse` porte des règles de l'ancienne version : titres
+   en MAJUSCULES à petite taille, libellés espacés, sous-titres gris pâle. Elles
+   visaient des classes que la nouvelle page réemploie — `.ac-eti`, `.an-note`,
+   les noms de membres — et transformaient « Évolution des lectures » en
+   « ÉVOLUTION DES LECTURES », illisible sur deux lignes.
+
+   ⚠ ELLES SONT RÉÉCRITES ICI PLUTÔT QUE SUPPRIMÉES SUR PLACE : les écrans de
+     détail — équipe, catégories, temps — les citent encore, et les toucher à
+     la source les emporterait avec. */
+#p-global-analyse .ac-eti,
+#p-global-analyse .ac-q,
+#p-global-analyse .ac-chif-s,
+#p-global-analyse .an-note,
+#p-global-analyse .an-m-t,
+#p-global-analyse .an-m-s,
+#p-global-analyse .an-m-q,
+#p-global-analyse .an-axe span,
+#p-global-analyse .an-titre{
+  text-transform:none; letter-spacing:-0.02em;
+}
+#p-global-analyse .ac-eti{ font-size:14px; font-weight:650; color:var(--label); }
+#p-global-analyse .ac-q{ font-size:12px; font-weight:400; color:var(--label-3); }
+#p-global-analyse .an-m-t{ font-size:14.5px; font-weight:600; color:var(--label); }
+#p-global-analyse .an-m-s{ font-size:12px; font-weight:400; color:var(--label-3); }
+#p-global-analyse .an-m-q{ font-size:13px; font-weight:600; color:var(--label-2); }
+#p-global-analyse .an-note{ font-size:11.5px; font-weight:400; color:var(--label-3); }
+#p-global-analyse .an-axe span{ font-size:10.5px; font-weight:400; color:var(--label-3); }
+#p-global-analyse .ac-chif-s{ font-size:11.5px; font-weight:400; color:var(--label-3); }

@@ -12168,11 +12168,16 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
     0 1px 2px rgba(20,20,30,0.04),
     0 8px 18px -14px rgba(20,20,30,0.10);
 }
+/* ⚠ LA MEME PLAQUE QUE LES DOSSIERS, en plus petit. Le fond vient de
+   `fondPlaque`, le trace du degrade `palN` : c'est la meme recette, pas une
+   imitation. Le reflet du haut fait la pastille — sans lui, on aurait un carre
+   teinte pose a plat. */
 .ac-chif-ic{
-  width:34px; height:34px; border-radius:11px;
+  width:38px; height:38px; border-radius:12px;
   display:grid; place-items:center; margin-bottom:11px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
-.ac-chif-ic svg{ width:19px; height:19px; }
+.ac-chif-ic svg{ width:21px; height:21px; display:block; }
 .ac-chif-v{
   font-size:23px; font-weight:700; letter-spacing:-0.04em; line-height:1;
   color:var(--label); font-variant-numeric:tabular-nums;
@@ -12190,7 +12195,11 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 /* ⚠ `.ac-sect-t` N'A PLUS D'ELEMENT : le titre a rejoint le bloc, sous
    `.ac-bloc-t`. La regle est retiree plutot que laissee en place — elle
    laisserait croire qu'un titre existe encore au-dessus des cartes. */
+/* ⚠ `flex-shrink:0` ET `nowrap`. Sans eux, « Voir plus » se casse en deux des
+   que le titre est long — c'est ce qui arrivait avec « Dernieres procedures
+   creees ». Le titre doit ceder, pas le bouton. */
 .ac-sect-plus{
+  flex-shrink:0; white-space:nowrap;
   display:inline-flex; align-items:center; gap:3px;
   border:none; background:none; padding:4px 0 4px 8px;
   font-family:inherit; font-size:13px; font-weight:500;
@@ -12227,29 +12236,41 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
 /* L'etiquette et son point de couleur : vert pour une lecture, violet pour une
    creation. C'est ce qui distingue les deux blocs sans qu'on lise leur titre. */
+/* ⚠ 14 PX AU LIEU DE 11,5. Le titre etait plus petit que la phrase qu'il
+   annonce et se lisait comme une legende ; il nomme le bloc, il doit se voir
+   avant lui. */
 .ac-eti{
-  display:inline-flex; align-items:center; gap:7px;
-  font-size:11.5px; font-weight:600; letter-spacing:-0.01em; color:var(--label-2);
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:14px; font-weight:650; letter-spacing:-0.025em; color:var(--label);
 }
-.ac-eti i{ width:6px; height:6px; border-radius:100px; flex-shrink:0; }
+.ac-eti i{ width:7px; height:7px; border-radius:100px; flex-shrink:0; }
 
-/* ═══ LA PHRASE ═══
-   Elle porte l'information. Le complement — le dossier, la procedure — est en
-   gris DANS le texte : on lit une phrase francaise, pas deux champs empiles. */
+/* ═══ UNE LIGNE D'EVENEMENT ═══
+   La phrase a gauche, le moment a droite. Le complement — le dossier, la
+   procedure — est en gris DANS le texte : on lit une phrase francaise, pas
+   deux champs empiles.
+
+   ⚠ LE MOMENT EST SUR LA MEME LIGNE. En dessous, il prenait une ligne entiere
+     pour trois caracteres et separait deux evenements qui doivent se lire
+     d'affilee.
+
+   ⚠ `align-items:baseline` ET NON `center`. Les deux textes n'ont pas la meme
+     taille : centres, leurs lignes de base se decalent d'un pixel et demi, ce
+     qui se voit sur une ligne courte. */
 .ac-ph{
-  font-size:17px; font-weight:650; letter-spacing:-0.03em; line-height:1.32;
+  display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+  font-size:15.5px; font-weight:600; letter-spacing:-0.028em; line-height:1.4;
   color:var(--label);
 }
-.ac-ph em{ font-style:normal; font-weight:500; color:var(--label-3); }
+.ac-ph + .ac-ph{ margin-top:9px; }
+.ac-ph-t{ min-width:0; }
+.ac-ph em{ font-style:normal; font-weight:450; color:var(--label-3); }
+.ac-q{ flex-shrink:0; font-size:12px; color:var(--label-3); white-space:nowrap; }
 
-/* Le pied : les initiales et le moment. Ce qui situe, pas ce qui informe. */
-.ac-bas{ display:flex; align-items:center; gap:9px; margin-top:13px; }
-.ac-mini{
-  width:26px; height:26px; border-radius:9px; display:grid; place-items:center;
-  background:rgba(31,76,238,0.10); color:#1F4CEE;
-  font-size:10px; font-weight:700; letter-spacing:-0.01em;
-}
-.ac-q{ font-size:12.5px; color:var(--label-3); }
+/* ⚠ `.ac-bas` ET `.ac-mini` SONT RETIREES. Le pied portait les initiales et
+   l'heure sous la phrase ; les initiales ont disparu — un rond de deux lettres
+   pour un prenom deja ecrit a cote n'apprenait rien — et l'heure est remontee
+   sur la ligne. */
 /* ⚠ `.ac-lig`, `.ac-lig-t`, `.ac-lig-s`, `.ac-lig-q`, `.ac-lig-ini` ET
    `.ac-lig-pl` ONT ETE RETIREES. Elles habillaient la ligne a trois champs
    que la phrase remplace. Gardees, elles laisseraient croire qu'un tel objet
@@ -12288,9 +12309,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #p-home .ac-chif-s{
   text-transform:none; letter-spacing:-0.02em;
 }
-#p-home .ac-ph{ font-size:17px; font-weight:650; color:var(--label); letter-spacing:-0.03em; }
-#p-home .ac-q{ font-size:12.5px; font-weight:400; color:var(--label-3); }
-#p-home .ac-eti{ font-size:11.5px; font-weight:600; color:var(--label-2); }
+#p-home .ac-ph{ font-size:15.5px; font-weight:600; color:var(--label); letter-spacing:-0.028em; }
+#p-home .ac-q{ font-size:12px; font-weight:400; color:var(--label-3); }
+#p-home .ac-eti{ font-size:14px; font-weight:650; color:var(--label); }
 #p-home .ac-chif-s{ font-size:11.5px; font-weight:400; color:var(--label-3); }
 
 

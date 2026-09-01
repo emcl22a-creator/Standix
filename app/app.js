@@ -6866,7 +6866,10 @@ function peindreHisto(zone, entrees, rien) {
     html += `
       <div class="histo-lig">
         <span class="histo-pt" style="background:${e.teinte}"></span>
-        <span class="histo-co"><span class="histo-t">${e.html}</span></span>
+        <span class="histo-co">
+          <span class="histo-t">${e.html}</span>
+          ${e.sous ? `<span class="histo-s">${e.sous}</span>` : ''}
+        </span>
         <span class="histo-q">${heureCourte(e.quand)}</span>
       </div>`
   }
@@ -6906,12 +6909,13 @@ function remplirHistoMouvements() {
     .filter(m => m.created_at && m.created_at >= depuis)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .map(m => ({ quand: m.created_at, teinte: PT.arrivee,
-                 html: PH.arrivee(escapeHtml((m.nom || 'Un membre').trim().split(/\s+/)[0])) }))
+                 html: PH.arrivee(escapeHtml((m.nom || 'Un membre').trim().split(/\s+/)[0])),
+                 sous: m.poste ? escapeHtml(m.poste) : '' }))
   peindreHisto(zone, repli, 'Aucun mouvement ce mois-ci.')
 
   if (!currentMembre?.entreprise_id) return
   supabase.from('mouvements_membres')
-    .select('membre_nom, type, cree_le')
+    .select('membre_nom, membre_poste, type, cree_le')
     .eq('entreprise_id', currentMembre.entreprise_id)
     .gte('cree_le', depuis)
     .order('cree_le', { ascending: false })
@@ -6923,6 +6927,14 @@ function remplirHistoMouvements() {
         teinte: PT[mv.type] || '#9A9AA4',
         html: (PH[mv.type] || PH.arrivee)(
           escapeHtml((mv.membre_nom || 'Un membre').trim().split(/\s+/)[0])),
+        /* ⚠ LE POSTE VIENT DU JOURNAL, PAS DE `membres`. Celui de la table
+           serait le poste ACTUEL sur un evenement PASSE — quelqu'un promu chef
+           afficherait « chef » sur son arrivee d'il y a six mois, alors qu'il
+           etait commis. Et pour un depart, la ligne n'existe plus du tout.
+
+           Les mouvements enregistres avant l'ajout de la colonne n'en ont pas :
+           on n'affiche alors rien, plutot qu'un poste faux. */
+        sous: mv.membre_poste ? escapeHtml(mv.membre_poste) : '',
       })), 'Aucun mouvement ce mois-ci.')
     })
 }

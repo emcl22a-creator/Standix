@@ -223,7 +223,7 @@ const DICO = {
     "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Paste your procedure, memo or instructions here…",
     "Collez un texte, ou déposez un PDF ou un Word": "Paste a text, or drop a PDF or Word file",
     "Comment créer cette procédure ?": "How do you want to create it?",
-    "Complétez le titre et la dossier ci-dessus pour continuer.": "Fill in the title and category above to continue.",
+    "Complétez le titre et le dossier ci-dessus pour continuer.": "Fill in the title and category above to continue.",
     "Compte": "Account",
     "Consulté": "Viewed",
     "Copier ce détail": "Copy this detail",
@@ -432,7 +432,7 @@ const DICO = {
     "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Pega aquí tu procedimiento, tu nota interna, tu manual…",
     "Collez un texte, ou déposez un PDF ou un Word": "Pega un texto, o suelta un PDF o un Word",
     "Comment créer cette procédure ?": "¿Cómo crear este procedimiento?",
-    "Complétez le titre et la dossier ci-dessus pour continuer.": "Completa el título y la categoría de arriba para continuar.",
+    "Complétez le titre et le dossier ci-dessus pour continuer.": "Completa el título y la categoría de arriba para continuar.",
     "Compte": "Cuenta",
     "Consulté": "Consultado",
     "Copier ce détail": "Copiar este detalle",
@@ -635,7 +635,7 @@ const DICO = {
     "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Cole aqui o seu procedimento, a sua nota de serviço, o seu manual…",
     "Collez un texte, ou déposez un PDF ou un Word": "Cole um texto, ou largue um PDF ou Word",
     "Comment créer cette procédure ?": "Como criar este procedimento?",
-    "Complétez le titre et la dossier ci-dessus pour continuer.": "Preencha o título e a categoria acima para continuar.",
+    "Complétez le titre et le dossier ci-dessus pour continuer.": "Preencha o título e a categoria acima para continuar.",
     "Compte": "Conta",
     "Consulté": "Consultado",
     "Copier ce détail": "Copiar este detalhe",
@@ -3488,7 +3488,7 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     div.dataset.proc = x.proc.id
     div.innerHTML = `
       <div class="emp-row-name">${escapeHtml(x.proc.titre || 'Sans titre')}
-        <span class="emp-row-sous">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans cat\u00e9gorie'))}${
+        <span class="emp-row-sous">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans dossier'))}${
           n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
       </div>
       ${tempsTotalHtml(x.total, false, libelle)}`
@@ -3708,7 +3708,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
   if (!procedures.length) {
     el.innerHTML = vide({
       dessin: NEANT_CATEGORIE,
-      titre: 'Aucune cat\u00e9gorie',
+      titre: 'Aucun dossier',
       phrase: "Les cat\u00e9gories se cr\u00e9ent toutes seules \u00e0 mesure que vous ajoutez des proc\u00e9dures \u2014 Cuisine, Salle, Bar\u2026",
       action: 'Cr\u00e9er une proc\u00e9dure', geste: 'creer',
     })
@@ -3717,7 +3717,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
 
   /* À quelle dossier appartient chaque procédure. */
   const catDe = {}
-  procedures.forEach(p => { catDe[p.id] = p.categorie || 'Sans cat\u00e9gorie' })
+  procedures.forEach(p => { catDe[p.id] = p.categorie || 'Sans dossier' })
 
   const parCat = {}
   procedures.forEach(p => {
@@ -4542,7 +4542,7 @@ function peindreClassementMembre(cle, animerDes) {
           <!-- La part grise ne désigne aucune procédure : elle en réunit plusieurs. -->
           <span class="nm">${x.estAutres ? escapeHtml(x.nom || 'Autres')
             : escapeHtml(x.proc?.titre || 'Sans titre')}</span>
-          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans cat\u00e9gorie'))}${
+          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans dossier'))}${
             x.fois ? ' \u00b7 ' + x.fois + ' consultation' + (x.fois > 1 ? 's' : '') : ''}</span>
         </span>
         <span class="vl"${x.secondes ? '' : ' style="color:var(--label-3)"'}>${
@@ -5260,7 +5260,7 @@ function centreAnneauCat(cle, choix) {
   if (!choix) {
     v.textContent = String(Math.round(vue.total / 60))
     u.textContent = cle === 'all' ? 'minutes au total' : 'minutes ce mois-ci'
-    n.textContent = `${vue.classe.length} cat\u00e9gorie${vue.classe.length > 1 ? 's' : ''}`
+    n.textContent = `${vue.classe.length} dossier${vue.classe.length > 1 ? 's' : ''}`
     return
   }
   v.textContent = String(Math.round(choix.total / 60))
@@ -5638,7 +5638,7 @@ function peindreClassementProc(cle, animerDes) {
           <!-- La part grise ne désigne aucune procédure : elle en réunit plusieurs. -->
           <span class="nm">${x.estAutres ? escapeHtml(x.nom || 'Autres')
             : escapeHtml(x.proc?.titre || 'Sans titre')}</span>
-          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans cat\u00e9gorie'))}${
+          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans dossier'))}${
             n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
         </span>
         <span class="vl">${dureeLisible(x.total)}</span>
@@ -6088,58 +6088,17 @@ window.showGestionScreen = function(id, btn) {
 
   arreterToutesLesVideos()
 
-  /* ═══════════════════════════════════════════════════════════════════════
-     LES REGLAGES SE PARCOURENT LATERALEMENT
+  /* ⚠ LE GLISSEMENT LATERAL A ETE RETIRE.
 
-     Entrer dans une sous-page des Reglages fait glisser la nouvelle depuis la
-     droite ; en revenir ramene la page parente depuis la gauche. Ailleurs, le
-     voile et le fondu habituels.
+     Les pages ouvertes depuis les Reglages arrivaient en glissant depuis la
+     droite. Le geste ne se declenchait que sur ce chemin-la : selon la page
+     d'ou l'on venait, la meme destination arrivait tantot en glissant, tantot
+     en fondu. Deux comportements pour un seul bouton.
 
-     ⚠ LES DEUX GESTES S'EXCLUENT. Le voile floute tout l'ecran ; ajoute a un
-       glissement, on verrait la page arriver ET se brouiller, deux recits pour
-       un seul mouvement. Le voile est donc saute dans ce cas.
-
-     ⚠ LA CLASSE EST NETTOYEE SUR TOUS LES ECRANS AVANT D'ETRE POSEE. Laissee
-       en place, elle rejouerait le glissement la prochaine fois qu'on affiche
-       cet ecran par un autre chemin. */
-  /* ⚠ LE CRITERE EST L'ECRAN D'OU L'ON PART, PAS LE NOM DE LA CIBLE.
-
-     Je testais `id.startsWith('p-reg-')`. Or seules trois des sept destinations
-     des Reglages portent ce prefixe : les quatre autres — les analyses vidéo,
-     l'équipe, les postes, les appareils — passent par des fonctions et
-     s'appellent `p-quota`, `p-equipe`, `p-postes`, `p-reg-appareils`. Elles
-     n'avaient donc aucune animation, alors que trois voisines en avaient une.
-
-     On regarde donc D'OU l'on vient : quitter les Reglages fait glisser la
-     nouvelle page depuis la droite, y revenir ramene celle du dessous depuis
-     la gauche. Le critere vaut pour toute page ouverte de la, y compris celles
-     qu'on ajoutera. */
-  /* ⚠ SEUL L'ALLER GLISSE. Le retour vers les Reglages garde le voile et le
-     fondu de toute l'app.
-
-     J'avais ajoute un glissement inverse — la page parente revenant de la
-     gauche — en croyant completer le geste. C'etait une invention de ma part :
-     le retour fonctionnait bien avant, et rien ne demandait de le changer.
-
-   ⚠ LE CRITERE EST L'ECRAN D'OU L'ON PART, pas le nom de la cible. Sur les
-     sept destinations des Reglages, trois seulement portent le prefixe
-     `p-reg-` ; les autres s'appellent `p-quota`, `p-membres`, `p-postes`. Un
-     test sur le nom en aurait laisse quatre sans animation. */
-  const actuel = document.querySelector('.screen.active')?.id
-  const glisse = actuel === 'p-settings' && id !== 'p-settings' ? 'vient-droite' : null
-
-  /* ⚠ ON NETTOIE AVANT DE POSER. Laissee en place, la classe rejouerait le
-     glissement la prochaine fois qu'on affiche cet ecran par un autre chemin —
-     depuis la barre du bas, par exemple. */
-  document.querySelectorAll('.screen.vient-droite')
-    .forEach(s => s.classList.remove('vient-droite'))
-
-  if (glisse) {
-    const cible = document.getElementById(id)
-    if (cible) { void cible.offsetWidth; cible.classList.add(glisse) }
-  } else {
-    jouerVoile()
-  }
+     Toute l'app partage maintenant le meme geste : le voile et l'entree
+     d'ecran. Les classes `vient-droite` et `pageGlisse` sont supprimees du
+     CSS. */
+  jouerVoile()
 
   /* ⚠ ON REMONTE EN HAUT A CHAQUE CHANGEMENT DE PAGE.
 
@@ -6464,49 +6423,16 @@ async function loadGestionProcedures() {
     /* Plus rien à mesurer : le CSS déduit la hauteur du bloc dès la première
        image. L'appel qui était ici pointait vers une fonction supprimée — il
        aurait cassé la page à chaque ouverture. */
-    catGridEl.innerHTML = `
-      <div class="debut">
-        <!-- ═══ LE DESSIN : LE GESTE DEVIENT DES ETAPES ═══
+    /* ⚠ UNE PHRASE, PAS UN DESSIN.
 
-             A gauche ce qu'on filme, a droite ce qui en sort. Ce n'est pas
-             l'objet du produit, c'est sa PROMESSE.
+       Ce bloc montrait une illustration, un titre et une invite a toucher le
+       « + ». Trois elements pour dire qu'il n'y a rien — et surtout, une
+       presentation qu'on ne retrouvait nulle part ailleurs : les segments
+       « En ligne » et « Brouillons » se contentent d'une ligne grise.
 
-             ⚠ LE DEGRADE VA DU GRIS PROFOND AU NOIR, pas du noir au noir. Un
-               aplat noir est une silhouette ; c'est la variation qui donne le
-               volume et fait qu'on lit un objet plutot qu'une decoupe.
-
-             ⚠ LES DEUX DEGRADES SONT DECLARES ICI, dans le gabarit, et non
-               dans les definitions communes d'index.html. Ce bloc n'apparait
-               que sur une page vide : deux entrees de plus dans le balisage
-               partage seraient chargees a chaque ecran pour ne servir qu'ici.
-
-             ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE. Il est DANS un
-               gabarit delimite par des accents graves : un seul y fermerait la
-               chaine en plein milieu. C'est un piege deja rencontre ici. -->
-        <div class="debut-dessin">
-          <svg viewBox="0 0 120 112" fill="none" aria-hidden="true">
-            <defs>
-              <linearGradient id="dbNoir" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stop-color="#4A4A55"/><stop offset="1" stop-color="#0B0B0F"/>
-              </linearGradient>
-              <linearGradient id="dbNoirDoux" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#3A3A44"/><stop offset="1" stop-color="#111116"/>
-              </linearGradient>
-            </defs>
-            <rect x="6" y="30" width="46" height="52" rx="13" fill="url(#dbNoir)"/>
-            <path d="M25 47 L38 56 L25 65 Z" fill="#FFFFFF" opacity="0.92"/>
-            <path d="M60 56 h12" stroke="#111116" stroke-width="2.4" stroke-linecap="round" opacity="0.34"/>
-            <path d="M68 51.5 L73 56 L68 60.5" stroke="#111116" stroke-width="2.4"
-                  stroke-linecap="round" stroke-linejoin="round" opacity="0.34"/>
-            <rect x="80" y="34" width="34" height="8" rx="4" fill="url(#dbNoirDoux)"/>
-            <rect x="80" y="52" width="34" height="8" rx="4" fill="url(#dbNoirDoux)" opacity="0.66"/>
-            <rect x="80" y="70" width="22" height="8" rx="4" fill="url(#dbNoirDoux)" opacity="0.4"/>
-          </svg>
-        </div>
-        <h3>Créez votre première procédure</h3>
-        <p>Touchez le bouton <b>+</b>, en haut de la page.</p>
-      </div>
-    `    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
+       La meme forme partout : `cl-rien`, une phrase centree. */
+    catGridEl.innerHTML =
+      '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.</div>'    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
        entreprise sans procédure laissait en mémoire les lectures de la
        précédente : la carte du haut annonçait « 4 min de formation » pendant
        que les trois sections en dessous disaient « aucun membre » et
@@ -7552,11 +7478,20 @@ function peindreTuilesAccueil() {
 
   const procs = allGestionProcedures || []
 
-  /* ⚠ ON TESTE `procs.length`, PAS UN COMPTE DU MOIS. Une entreprise qui a
-     douze procedures mais aucune ce mois-ci n'est pas vide — elle a juste un
-     mois calme. L'etat vide ne concerne que le vrai depart. */
+  /* ⚠ LE BLOC D'ETAT VIDE NE S'AFFICHE PLUS JAMAIS.
+
+     Il remplacait la section « Dernieres creations » par une icone et la
+     phrase « Aucune procedure pour l'instant » — une presentation qu'on ne
+     voyait nulle part ailleurs, sur une page dont tous les autres blocs
+     gardent leur forme quoi qu'il arrive.
+
+     La section garde donc sa carte et son titre, avec une ligne grise a
+     l'interieur. On reconnait l'ecran, qu'il y ait des procedures ou non.
+
+     ⚠ IL RESTE MASQUE DANS LE BALISAGE plutot que d'etre supprime : le
+       retirer demanderait de verifier qu'aucun autre chemin ne l'affiche. */
   const vide = document.getElementById('ac-vide')
-  if (vide) vide.hidden = !!procs.length
+  if (vide) vide.hidden = true
 
   const enLigne = procs.filter(p => p.publiee_le).length
   const membres = (cachedMembres || []).length
@@ -7769,7 +7704,18 @@ function peindreTuilesAccueil() {
   const recentes = [...procs]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 2)
-  if (recentes.length) {
+
+  /* ⚠ LA SECTION S'AFFICHE MEME SANS PROCEDURE. Elle disparaissait
+     entierement, et la page changeait de forme selon le contenu : une carte de
+     moins, les autres qui remontent. Un bloc vide se lit ; un bloc absent se
+     remarque. */
+  if (!recentes.length) {
+    /* ⚠ LE MEME POINT VIOLET QUE DANS LE CAS REMPLI. Une teinte differente
+       ferait croire a un autre etat ; ce n'est que la meme section, vide. */
+    zListes.innerHTML += section('Dernières créations', '#4C1D95', 'Voir plus',
+      'onclick="ouvrirHisto(\'creations\')"',
+      [['<em>Aucune procédure créée pour le moment.</em>', '']])
+  } else {
     /* ⚠ « Dernieres creations » ET NON « Dernieres procedures creees ». Le titre
        long passait sur deux lignes et poussait « Voir plus » a la ligne
        suivante : deux mots de moins, et la tete du bloc tient sur une. */
@@ -9881,7 +9827,7 @@ let toutesProcedures = false   // vrai quand on affiche toutes les procédures
 function openCategoryProcedures(nom) {
   try { ouvrirCategorie(nom) }
   catch (e) {
-    console.error('Ouverture de la dossier :', e)
+    console.error('Ouverture du dossier :', e)
     showGestionScreen('p-category')
     const el = document.getElementById('category-procedures-list')
     if (el) el.innerHTML = `<div class="empty-state"><h3>Ouverture impossible</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
@@ -9910,14 +9856,22 @@ function openCategoryProcedures(nom) {
    ⚠ ELLE NE REMONTE PLUS DANS LE DOSSIER QUAND ON VIENT DE LA LISTE. Appeler
      `ouvrirCategorie` a la fin renverrait l'utilisateur dans un ecran qu'il
      n'avait pas ouvert. On ne navigue que si l'on y etait deja. */
+/* ⚠ `renommerSousDossier` EXISTE DEJA, plus bas dans le fichier. J'en avais
+   ecrit une seconde ici sans verifier — le module refusait de se charger,
+   « Identifier already declared », et TOUTE l'app tombait.
+
+   Celle qui existe fait mieux que la mienne : elle propose aussi de RETIRER le
+   sous-dossier, en separant les deux gestes plutot que d'interpreter un champ
+   vide. Mon doublon est retire. */
+
 async function renommerDossier(ancien, { depuisListe = false } = {}) {
   if (!ancien || (!depuisListe && toutesProcedures)) return
 
   const nouveau = await demanderTexte({
-    titre: 'Renommer la cat\u00e9gorie',
+    titre: 'Renommer le dossier',
     message: `Toutes les proc\u00e9dures class\u00e9es dans \u00ab ${ancien} \u00bb suivront.`,
     valeur: ancien,
-    placeholder: 'Nom de la cat\u00e9gorie',
+    placeholder: 'Nom du dossier',
     confirmer: 'Renommer',
   })
   if (!nouveau || nouveau === ancien) return
@@ -9928,7 +9882,7 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   if (existe) {
     const ok = await confirmDialog({
       titre: `Fusionner avec ${nouveau} ?`,
-      message: `Une cat\u00e9gorie \u00ab ${nouveau} \u00bb existe d\u00e9j\u00e0. Les proc\u00e9dures de \u00ab ${ancien} \u00bb ` +
+      message: `Un dossier \u00ab ${nouveau} \u00bb existe d\u00e9j\u00e0. Les proc\u00e9dures de \u00ab ${ancien} \u00bb ` +
         `la rejoindront, et \u00ab ${ancien} \u00bb dispara\u00eetra.`,
       confirmer: 'Fusionner', annuler: 'Annuler', danger: false,
     })
@@ -10648,7 +10602,16 @@ function carteSousDossier(nom, procs, rang = 0) {
     <span class="cl-co">
       <span class="cl-tete">
         <span class="cl-nm">${escapeHtml(nom)}</span>
-        <span class="proc-fl">\u203a</span>
+        <!-- ⚠ TROIS POINTS, PAS UNE FLECHE. La fleche ne faisait que repeter ce
+             que toute la carte fait deja : ouvrir. Les trois points ouvrent le
+             renommage, comme sur une carte de dossier — meme dessin, meme
+             place, meme geste. -->
+        <button type="button" class="cl-plus" data-menu-sd="${escapeHtml(nom)}"
+                aria-label="Renommer le sous-dossier ${escapeHtml(nom)}">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <circle cx="5.5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18.5" cy="12" r="1.7"/>
+          </svg>
+        </button>
       </span>
       <span class="cl-bas">
         ${brouillons
@@ -10659,6 +10622,16 @@ function carteSousDossier(nom, procs, rang = 0) {
     </span>`
 
   cell.onclick = (e) => {
+    /* ⚠ LES TROIS POINTS N'OUVRENT PAS LE SOUS-DOSSIER. Sans ce test, toucher
+       les trois points renommerait ET naviguerait en meme temps — exactement
+       le defaut deja rencontre sur la carte de dossier. */
+    const pts = e.target.closest('[data-menu-sd]')
+    if (pts) {
+      e.stopPropagation()
+      renommerSousDossier(pts.dataset.menuSd)
+      return
+    }
+
     /* Comme la carte de dossier : TOUTE la carte ouvre le sous-dossier. Les
        titres affichés sont un aperçu du contenu, pas un menu.
 
@@ -10707,7 +10680,25 @@ function animerEntreeCategorie() {
   jouerVoile()
   const ecran = document.getElementById('p-category')
   if (!ecran) return
+
+  /* ⚠ CE N'ETAIT PAS LA MEME ANIMATION, et voici pourquoi.
+
+     Je rejouais seulement `active`, donc `ecranEntre` : un fondu avec une
+     legere montee. Ouvrir un DOSSIER passe par `activerAvecNaissance`, qui
+     fait bien plus — l'ecran NAIT du point touche et grandit, grace a la
+     classe `nait` et aux deux variables `--ox` / `--oy`.
+
+     On refait donc les trois gestes dans le meme ordre : oublier la naissance
+     precedente, poser la nouvelle, puis activer. L'ordre compte — ajouter
+     `active` avant `nait` laisse le navigateur demarrer la mauvaise animation
+     avant de la remplacer.
+
+     ⚠ L'ORIGINE EST DEJA MESUREE. L'ecouteur en capture note le centre de la
+       carte touchee pour tout `.cat-cell`, ce qu'est une carte de sous-dossier.
+       Il n'y avait rien a ajouter de ce cote. */
   ecran.classList.remove('active')
+  oublierNaissances()
+  ouvrirDepuisCarte(ecran)
   void ecran.offsetWidth
   ecran.classList.add('active')
 }
@@ -11745,9 +11736,39 @@ function dessinerCollage() {
 
      Le calcul du poids attendu part avec elles : plus rien ne le lit. */
 
+  /* ═══ LA LIMITE SE LIT AVANT D'ETRE FRANCHIE ═══
+
+     La duree totale s'affichait seule : on decouvrait le plafond de cinq
+     minutes en le depassant, apres avoir choisi ses fichiers. Ecrite en
+     fraction — « 2 min 10 / 5 min » — la marge restante se voit des la
+     premiere video.
+
+     ⚠ BLEUE JUSQU'AU PLAFOND, ROUGE AU-DELA — deux etats, pas trois.
+
+       J'avais d'abord mis un virage ambre a 80 % : une alarme la ou il n'y a
+       rien d'alarmant, quatre minutes sur cinq etant un collage normal. Il est
+       retire.
+
+       Le rouge, lui, ne dit pas « attention » mais « refuse » : il accompagne
+       le bandeau rouge en dessous et le bouton desactive. Trois signes pour un
+       seul etat, c'est ce qu'il faut quand l'action est bloquee.
+
+     ⚠ LE SEUIL EST UNE STRICTE SUPERIORITE. A exactement cinq minutes, le
+       collage passe : `DUREE_REFUSEE` est un maximum inclus, et le test qui
+       bloque plus bas s'ecrit `secondes > DUREE_REFUSEE`. La barre doit dire
+       la meme chose que lui. */
+  const partDuree = Math.min(1, secondes / DUREE_REFUSEE)
+  const teinteDuree = secondes > DUREE_REFUSEE
+    ? 'var(--red)'
+    : 'linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%)'
+
   total.style.display = ''
   total.innerHTML = `
-    <div class="coller-tot"><span>Durée totale</span><b>${dureeCourte(secondes)}</b></div>
+    <div class="coller-tot">
+      <span>Durée totale</span>
+      <b>${dureeCourte(secondes)} <em>/ ${Math.round(DUREE_REFUSEE / 60)} min</em></b>
+    </div>
+    <div class="coller-jauge"><i style="width:${(partDuree * 100).toFixed(1)}%;background:${teinteDuree}"></i></div>
     <div class="coller-tot"><span>Temps de collage, environ</span><b>${attenteLisible(secondes * 1.05)}</b></div>`
 
   /* ═══ C'EST LA DURÉE QUI REFUSE, PAS LE POIDS ═══
@@ -11768,9 +11789,24 @@ function dessinerCollage() {
      La limite est basse et je l'assume : mieux vaut deux collages de cinq que
      l'un de sept qui échoue après trois minutes d'attente. */
   if (collageFichiers.length > COLLAGE_MAX_FICHIERS) {
-    avert.innerHTML = `<span style="color:var(--red)">Pas plus de ` +
-      `${COLLAGE_MAX_FICHIERS} vidéos à la fois. Collez-en ` +
-      `${COLLAGE_MAX_FICHIERS} d’abord, puis ajoutez le reste au résultat.</span>`
+    /* ⚠ ON DIT POURQUOI, ET ON DONNE LA SORTIE.
+
+       Le message annonçait « Pas plus de 6 vidéos » sans plus. On le lisait
+       comme un choix arbitraire — d'autant plus agaçant avec des clips courts,
+       ou l'on est bloque a six alors qu'on est loin des cinq minutes.
+
+       C'est une contrainte du telephone : au-dela, Safari cesse d'accorder des
+       lecteurs video, sans rien dire. Le collage attendrait indefiniment.
+
+       ⚠ LA MARGE RESTANTE EST RAPPELEE quand elle est confortable. « Vous etes
+         a 2 min sur 5 » transforme un refus en marche a suivre. */
+    const reste = Math.max(0, DUREE_REFUSEE - secondes)
+    avert.innerHTML = `<span style="color:var(--red)">Six vidéos à la fois, pas plus — ` +
+      `au-delà, le téléphone refuse d’en ouvrir davantage.</span><br>` +
+      `<span class="coller-sortie">Collez ces ${COLLAGE_MAX_FICHIERS} d’abord, ` +
+      `puis ajoutez le reste au résultat` +
+      (reste > 30 ? ` : il vous restera ${dureeCourte(reste)} de marge.` : '.') +
+      `</span>`
     lancer.disabled = true
   } else if (secondes > DUREE_REFUSEE) {
     avert.innerHTML = `<span style="color:var(--red)">Le total dépasse ` +
@@ -18444,7 +18480,7 @@ function ficheEquipe(proc) {
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>
     <div class="cat-name"><span class="txt">${escapeHtml(proc.titre)}</span></div>
-    <div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans cat\u00e9gorie')}</div>
+    <div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans dossier')}</div>
     <div class="cat-pct-row">
       <span class="cat-pct" style="color:${lue ? '#30D158' : 'var(--label-3)'};font-size:14px;">
         ${lue ? 'Lue' : '\u00c0 lire'}</span>
@@ -18743,9 +18779,18 @@ window.ouvrirQuota = async function() {
   carte.innerHTML = `
     <div class="quota-bloc">
       <div class="quota-chiffre">${utilisees} <em>/ ${quota}</em></div>
-      <div class="quota-legende">selon votre abonnement</div>
+      <div class="quota-legende">${q.partage
+        ? 'partag\u00e9 entre vos entreprises'
+        : 'selon votre abonnement'}</div>
       <div class="quota-barres">${barres}</div>
       <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ce mois-ci</div>
+      ${q.partage ? `<div class="quota-part">
+        <!-- ⚠ LA MENTION N'APPARAIT QUE S'IL Y A PLUSIEURS ENTREPRISES. Sinon
+             elle sous-entend un partage qui n'existe pas, et l'on cherche avec
+             qui. -->
+        Ce compteur est commun \u00e0 toutes vos entreprises : une analyse lanc\u00e9e
+        ailleurs le fait baisser ici aussi.
+      </div>` : ''}
     </div>
 
     <div class="quota-illimite">
@@ -20912,9 +20957,15 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
           : error.message)
       }
       if (!res?.ok) {
-        throw new Error(res?.raison === 'non connecte'
-          ? "Votre session a expir\u00e9. Reconnectez-vous."
-          : "L'entreprise n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e : " + (res?.raison || 'raison inconnue'))
+        /* ⚠ LA BASE RENVOIE SON PROPRE MESSAGE quand elle en a un. Le refus
+           d'une deuxieme entreprise sans abonnement n'est pas une panne : c'est
+           une regle, et elle merite d'etre dite en francais plutot que
+           traduite en « raison inconnue ». */
+        throw new Error(
+          res?.message ? res.message
+          : res?.raison === 'non connecte'
+            ? "Votre session a expir\u00e9. Reconnectez-vous."
+            : "L'entreprise n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e : " + (res?.raison || 'raison inconnue'))
       }
       entrepriseId = res.id
     }
@@ -22861,7 +22912,7 @@ window.openEditProcedure = async function(procId, mode) {
   document.getElementById('edit-titre-header').textContent = editMode === 'ai-review' ? 'Vérifier les étapes' : 'Modifier la procédure'
   document.getElementById('edit-subhead').textContent = editMode === 'ai-review'
     ? "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin"
-    : 'Modifiez le titre, la dossier ou les étapes'
+    : 'Modifiez le titre, le dossier ou les étapes'
   /* ⚠ LE BOUTON D'ENREGISTREMENT NE PUBLIE PLUS. Il disait « Publier la
      procédure » à la fin d'une analyse IA — un mot devenu faux, puisque la
      publication est maintenant un geste distinct, plus bas dans la page.

@@ -98,7 +98,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=70d246a7">
+<link rel="stylesheet" href="style.css?v=823c569c">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3025,7 +3025,7 @@
         <button type="button" class="ci-btn ci-btn--sourd" id="ci-revoquer">Révoquer</button>
       </div>
       <div class="ci-aide">Vos membres le saisissent à l'inscription. Ils
-        rejoignent en tant qu'équipe — vous pourrez en promouvoir depuis
+        rejoignent en tant qu'équipe — vous pourrez en passer en Gestion depuis
         « Gérer l'équipe ».</div>
     </div>
     <!-- Les boutons de l'ancien code de gestion ont été retirés avec lui :
@@ -3568,6 +3568,17 @@
      d'identifiants identiques dans la page, ce qui n'est pas valide. -->
 <svg width="0" height="0" aria-hidden="true" style="position:absolute">
   <defs>
+      <!-- ⚠ LE DEGRADE DES COCHES D'OFFRE. Un `stroke` ne peut pas recevoir un
+           `linear-gradient()` CSS : c'est une image, pas une couleur. Il faut
+           un `linearGradient` SVG, nomme, que le CSS appelle par `url(#…)`.
+
+           `x2="0" y2="1"` : du haut vers le bas. La pointe claire attrape
+           l'oeil, la base bleue rattache la coche a la carte. -->
+      <linearGradient id="cocheOffre" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#FFFFFF"/>
+        <stop offset="1" stop-color="#4899EC"/>
+      </linearGradient>
+
     <!-- Le logo : orange profond en bas à gauche, ambre clair en haut à droite.
          Les coordonnées sont celles du tracé lui-même (85 x 100), donc le
          dégradé se cale sur la forme quelle que soit la taille affichée —
@@ -3783,7 +3794,7 @@
 
      ⚠ A REGENERER A CHAQUE MODIFICATION de `app.js` ou `style.css`. C'est ce
        que fait `version.py`, livre a cote. -->
-<script type="module" src="app.js?v=67a06e5b"></script>
+<script type="module" src="app.js?v=c5ba0d06"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -13857,3 +13857,12 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 #histo-equipe .histo-q.vide{
   font-weight:400; color:var(--label-3);
 }
+
+
+/* La phrase sur le QR code, sous l'etat vide des procedures. Plus petite que
+   le constat au-dessus : celui-ci dit ce qui est, celle-ci dit quoi faire. */
+.cl-astuce{
+  max-width:270px; margin:10px auto 0;
+  text-align:center; font-size:12.5px; line-height:1.55;
+  color:var(--label-3); letter-spacing:-0.01em;
+}

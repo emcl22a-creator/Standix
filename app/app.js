@@ -6002,7 +6002,36 @@ window.showGestionScreen = function(id, btn) {
      body, sans quoi `position:sticky` n'a aucun effet. */
 
   arreterToutesLesVideos()
-  jouerVoile()
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LES REGLAGES SE PARCOURENT LATERALEMENT
+
+     Entrer dans une sous-page des Reglages fait glisser la nouvelle depuis la
+     droite ; en revenir ramene la page parente depuis la gauche. Ailleurs, le
+     voile et le fondu habituels.
+
+     ⚠ LES DEUX GESTES S'EXCLUENT. Le voile floute tout l'ecran ; ajoute a un
+       glissement, on verrait la page arriver ET se brouiller, deux recits pour
+       un seul mouvement. Le voile est donc saute dans ce cas.
+
+     ⚠ LA CLASSE EST NETTOYEE SUR TOUS LES ECRANS AVANT D'ETRE POSEE. Laissee
+       en place, elle rejouerait le glissement la prochaine fois qu'on affiche
+       cet ecran par un autre chemin. */
+  const versReglage = id.startsWith('p-reg-')
+  const depuisReglage = document.querySelector('.screen.active')?.id?.startsWith('p-reg-')
+  const glisse = versReglage ? 'vient-droite'
+               : (depuisReglage && id === 'p-settings') ? 'vient-gauche'
+               : null
+
+  document.querySelectorAll('.screen.vient-droite, .screen.vient-gauche')
+    .forEach(s => s.classList.remove('vient-droite', 'vient-gauche'))
+
+  if (glisse) {
+    const cible = document.getElementById(id)
+    if (cible) { void cible.offsetWidth; cible.classList.add(glisse) }
+  } else {
+    jouerVoile()
+  }
 
   /* ⚠ ON REMONTE EN HAUT A CHAQUE CHANGEMENT DE PAGE.
 

@@ -1440,25 +1440,31 @@
       <div class="card">
         <!-- ═══ LES TROIS EXEMPLES RACONTENT LA MÊME PROCÉDURE ═══
 
-             Avant : « Cuisine », « Friteuse », « Fermeture de caisse ». Trois
-             exemples justes séparément, mais qui ne vont nulle part ensemble —
-             une fermeture de caisse n'est pas rangée sous une friteuse. Lus à
-             la suite, ils n'apprenaient donc pas à quoi sert le rangement.
+             Accueil › Réception client › Accueillir un client. Le chemin se lit
+             d'un trait et montre la relation entre les trois niveaux, ce
+             qu'aucune explication ne fait aussi vite.
 
-             Maintenant : Entretien › Machine à café › Détartrer la machine à
-             café. Le chemin se lit d'un trait et montre la relation entre les
-             trois niveaux, ce qu'aucune explication ne fait aussi vite.
+             Trois exemples sans lien entre eux — « Cuisine », « Friteuse »,
+             « Fermeture de caisse » — sont justes séparément mais n'apprennent
+             rien : une fermeture de caisse n'est pas rangée sous une friteuse.
 
-             ─── POURQUOI LE CAFÉ ───
+             ─── POURQUOI L'ACCUEIL ═══
 
-             « Friteuse » suppose une cuisine professionnelle. Une machine à
-             café, il y en a dans un restaurant, un garage, un cabinet, une
-             agence — et le détartrage est la corvée que tout le monde reporte,
-             donc exactement le genre de geste qu'on écrit une fois pour ne plus
-             l'expliquer. L'exemple parle à qui découvre l'app sans savoir
-             encore ce qu'il va y mettre. -->
+             La version précédente parlait de détartrer une machine à café.
+             Meilleure qu'une friteuse, qui suppose une cuisine — mais elle
+             restait un geste d'entretien, et beaucoup d'entreprises n'en
+             écriront jamais.
+
+             Accueillir un client se fait dans un garage, un cabinet, une
+             agence, un commerce, un restaurant. C'est aussi le premier geste
+             qu'on transmet à quelqu'un qui arrive : exactement ce qu'on écrit
+             une fois pour ne plus l'expliquer.
+
+             ⚠ CES TROIS TEXTES SONT ÉCRITS DOUZE FOIS, sur quatre écrans :
+               création, étapes manuelles, découpage vidéo, modification. Les
+               changer à un seul endroit laisse trois écrans en désaccord. -->
         <label class="f">Dossier</label>
-        <input type="text" id="new-categorie" placeholder="Ex : Entretien" autocomplete="off">
+        <input type="text" id="new-categorie" placeholder="Ex : Accueil" autocomplete="off">
         <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
              Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -1474,11 +1480,11 @@
              la relation plutôt que de la décrire. -->
         <div style="margin-top:12px;">
           <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-          <input type="text" id="new-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
+          <input type="text" id="new-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
           <label class="f">Titre</label>
-          <input type="text" id="new-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
+          <input type="text" id="new-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
         </div>
       </div>
 
@@ -1654,7 +1660,7 @@
     <div id="man-entete" style="display:none;">
       <div class="card">
         <label class="f">Dossier</label>
-        <input type="text" id="man-categorie" placeholder="Ex : Entretien" autocomplete="off">
+        <input type="text" id="man-categorie" placeholder="Ex : Accueil" autocomplete="off">
         <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
              Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -1670,11 +1676,11 @@
              la relation plutôt que de la décrire. -->
         <div style="margin-top:12px;">
           <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-          <input type="text" id="man-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
+          <input type="text" id="man-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
           <label class="f">Titre</label>
-          <input type="text" id="man-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
+          <input type="text" id="man-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
         </div>
       </div>
     </div>
@@ -1730,7 +1736,7 @@
     <div id="dv-entete" style="display:none;">
       <div class="card">
         <label class="f">Dossier</label>
-        <input type="text" id="dv-categorie" placeholder="Ex : Entretien" autocomplete="off">
+        <input type="text" id="dv-categorie" placeholder="Ex : Accueil" autocomplete="off">
         <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
              Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -1746,11 +1752,11 @@
              la relation plutôt que de la décrire. -->
         <div style="margin-top:12px;">
           <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-          <input type="text" id="dv-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
+          <input type="text" id="dv-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
           <label class="f">Titre</label>
-          <input type="text" id="dv-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
+          <input type="text" id="dv-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
         </div>
       </div>
     </div>
@@ -2084,7 +2090,7 @@
          remplir autre chose. -->
     <div class="card">
       <label class="f">Dossier</label>
-      <input type="text" id="edit-categorie" placeholder="Ex : Entretien" autocomplete="off">
+      <input type="text" id="edit-categorie" placeholder="Ex : Accueil" autocomplete="off">
       <!-- ═══ LE SOUS-DOSSIER · OPTIONNEL, ET ÇA DOIT SE VOIR ═══
 
            Placé entre Dossier et Titre parce que c'est l'ordre de la pensée :
@@ -2100,11 +2106,11 @@
            la relation plutôt que de la décrire. -->
       <div style="margin-top:12px;">
         <label class="f">Sous-dossier <span class="f-opt">(optionnel)</span></label>
-        <input type="text" id="edit-sous-categorie" placeholder="Ex : Machine à café" autocomplete="off">
+        <input type="text" id="edit-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
       </div>
       <div style="margin-top:12px;">
         <label class="f">Titre</label>
-        <input type="text" id="edit-titre" placeholder="Ex : Détartrer la machine à café" autocomplete="off">
+        <input type="text" id="edit-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
       </div>
     </div>
 

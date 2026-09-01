@@ -9868,8 +9868,26 @@ function garantirVisibilite(containerEl) {
 
 // ═══════════ GESTION : création ═══════════
 function resetCreateForm() {
-  champManuel('titre').value = ''
-  champManuel('categorie').value = ''
+  /* ═══ LES TROIS CHAMPS, SUR LEURS TROIS ECRANS ═══
+
+     ⚠ `champManuel` NE REND QU'UN SEUL ELEMENT, pas les trois. Elle cherche le
+       premier qui soit visible ET rempli, et retombe sur le premier existant
+       sinon. Vider ce qu'elle renvoie laissait donc les deux autres intacts :
+       le texte saisi dans « Sous-dossier » revenait a la visite suivante.
+
+     ⚠ ET LE SOUS-DOSSIER N'ETAIT PAS VIDE DU TOUT. Seuls le titre et le
+       dossier l'etaient — la ligne manquait, simplement.
+
+     On efface donc les trois champs sur les trois ecrans qui les portent :
+     `new-` pour la creation, `man-` pour les etapes manuelles, `dv-` pour le
+     decoupage video. Une boucle plutot que neuf lignes, pour qu'un quatrieme
+     ecran n'oblige pas a se souvenir de tout modifier. */
+  for (const pre of ['new-', 'man-', 'dv-']) {
+    for (const quoi of ['titre', 'categorie', 'sous-categorie']) {
+      const el = document.getElementById(pre + quoi)
+      if (el) el.value = ''
+    }
+  }
   document.getElementById('video-input').value = ''
   document.getElementById('video-player').style.display = 'none'
   document.getElementById('video-placeholder').style.display = 'flex'

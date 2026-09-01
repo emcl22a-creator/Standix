@@ -12907,15 +12907,28 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 }
 
 
-/* ⚠ `vient-droite` ET `pageGlisse` ONT ETE RETIRES.
+/* ═══ LES PAGES DES REGLAGES ARRIVENT PAR LA DROITE ═══
 
-   Les pages ouvertes depuis les Reglages arrivaient en glissant depuis la
-   droite. Le geste ne se declenchait que sur ce chemin : selon la page d'ou
-   l'on venait, la meme destination arrivait tantot en glissant, tantot en
-   fondu — deux comportements pour un seul bouton.
+   Une liste de destinations decide, cote script : ces pages glissent toujours,
+   d'ou qu'on vienne. Le retour, lui, garde le voile commun a toute l'app.
 
-   Toute l'app partage desormais le voile et l'entree d'ecran. Les regles sont
-   supprimees pour qu'on ne les croie pas encore en service. */
+   ⚠ `translateX` ET NON `left`. Deplacer par la position force un recalcul de
+     mise en page a chaque image ; une transformation reste sur la carte
+     graphique.
+
+   ⚠ 26 % ET NON 100 %. La page ne traverse pas l'ecran : elle se pose depuis
+     le bord. Un trajet complet dure trop longtemps pour un geste qu'on repete,
+     et donne l'impression d'attendre. */
+.screen.vient-droite{
+  animation:pageGlisse 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@keyframes pageGlisse{
+  from{ transform:translateX(26%); opacity:0; }
+  to  { transform:none;            opacity:1; }
+}
+@media (prefers-reduced-motion: reduce){
+  .screen.vient-droite{ animation:none; }
+}
 
 
 /* ═══ « ÉCRIVEZ-NOUS » : UN NOIR SIMPLE ═══

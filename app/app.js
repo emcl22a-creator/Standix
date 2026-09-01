@@ -166,7 +166,11 @@ let scanLoopActive = false
 const LANGUES = [
   { code: 'fr', nom: 'Fran\u00e7ais',  drapeau: '\uD83C\uDDEB\uD83C\uDDF7' },
   { code: 'en', nom: 'English',   drapeau: '\uD83C\uDDEC\uD83C\uDDE7' },
-  { code: 'es', nom: 'Espa\u00f1ol',   drapeau: '\uD83C\uDDEA\uD83C\uDDF8' },
+  /* ⚠ L'ESPAGNOL A ETE RETIRE de la liste, mais SON DICTIONNAIRE RESTE dans le
+     fichier. Le supprimer ferait perdre plusieurs centaines de traductions
+     qu'il faudrait refaire si l'on remet la langue un jour ; il ne coute que
+     de la place dans un fichier deja charge. Pour la remettre : rajouter cette
+     ligne, rien d'autre. */
   { code: 'de', nom: 'Deutsch',    drapeau: '\uD83C\uDDE9\uD83C\uDDEA' },
 ]
 
@@ -6110,13 +6114,25 @@ window.showGestionScreen = function(id, btn) {
      nouvelle page depuis la droite, y revenir ramene celle du dessous depuis
      la gauche. Le critere vaut pour toute page ouverte de la, y compris celles
      qu'on ajoutera. */
-  const actuel = document.querySelector('.screen.active')?.id
-  const glisse = actuel === 'p-settings' && id !== 'p-settings' ? 'vient-droite'
-               : id === 'p-settings' && actuel && actuel !== 'p-settings' ? 'vient-gauche'
-               : null
+  /* ⚠ SEUL L'ALLER GLISSE. Le retour vers les Reglages garde le voile et le
+     fondu de toute l'app.
 
-  document.querySelectorAll('.screen.vient-droite, .screen.vient-gauche')
-    .forEach(s => s.classList.remove('vient-droite', 'vient-gauche'))
+     J'avais ajoute un glissement inverse — la page parente revenant de la
+     gauche — en croyant completer le geste. C'etait une invention de ma part :
+     le retour fonctionnait bien avant, et rien ne demandait de le changer.
+
+   ⚠ LE CRITERE EST L'ECRAN D'OU L'ON PART, pas le nom de la cible. Sur les
+     sept destinations des Reglages, trois seulement portent le prefixe
+     `p-reg-` ; les autres s'appellent `p-quota`, `p-membres`, `p-postes`. Un
+     test sur le nom en aurait laisse quatre sans animation. */
+  const actuel = document.querySelector('.screen.active')?.id
+  const glisse = actuel === 'p-settings' && id !== 'p-settings' ? 'vient-droite' : null
+
+  /* ⚠ ON NETTOIE AVANT DE POSER. Laissee en place, la classe rejouerait le
+     glissement la prochaine fois qu'on affiche cet ecran par un autre chemin —
+     depuis la barre du bas, par exemple. */
+  document.querySelectorAll('.screen.vient-droite')
+    .forEach(s => s.classList.remove('vient-droite'))
 
   if (glisse) {
     const cible = document.getElementById(id)
@@ -21340,7 +21356,12 @@ window.openMembres = async function() {
 
   membresEquipe = data || []
   peindreEquipe()
-  entreeContenu('p-membres')
+  /* ⚠ PLUS D'APPARITION EN CASCADE. `entreeContenu` faisait monter chaque bloc
+     l'un apres l'autre — un geste de plus sur une page qui arrive deja en
+     glissant depuis les Reglages. Deux animations superposees pour un seul
+     changement d'ecran, et la liste paraissait lente a s'installer.
+
+     La fonction reste : d'autres ecrans l'emploient. */
 }
 
 function peindreEquipe() {

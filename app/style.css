@@ -12529,23 +12529,33 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      pour son lisere ; sans cela, la pastille se placerait par rapport a la
      page et se retrouverait dans un coin de l'ecran. */
 .cat-cell--ligne{ position:relative; }
-/* ⚠ ELLE NE DEBORDE PAS DE LA CARTE, contrairement a celle de l'onglet.
+/* ═══ LA PASTILLE SUR LE BADGE « BROUILLON » ═══
 
-   A `-4px`, elle sortait dans la marge de la page — la carte touche presque le
-   bord de l'ecran, et la pastille s'y retrouvait coupee. Sur l'onglet, le
-   debordement fonctionne parce que la piste grise laisse de la place autour ;
-   ici il n'y en a pas.
+   ⚠ EXACTEMENT LE MEME DESSIN QUE SUR L'ONGLET : meme taille, meme place —
+     en haut a droite, debordant — et meme lisere. Les deux disent la meme
+     chose ; les voir differer laisserait croire a deux signes distincts.
 
-   Elle se pose donc DANS le coin, a 10 px des bords : assez loin pour ne pas
-   toucher l'arrondi, assez pres pour se lire comme une marque de coin. */
-/* ⚠ ELLE EST DECALEE A GAUCHE DU CHEVRON, pas au-dessus. A `right:10px` elle
-   tombait juste sur lui : deux marques dans le meme coin, et l'on ne savait
-   plus laquelle regarder. A 30, elle precede le chevron sur la meme ligne. */
+   ⚠ SEULE LA COULEUR DU LISERE CHANGE, et elle le doit. Sur l'onglet il prend
+     le gris de la piste ; ici le badge est pose sur une carte blanche. Un
+     lisere gris y ferait un halo sale autour du point.
+
+   ⚠ LE BADGE DOIT ETRE ANCRE. Sans `position:relative` sur `.cl-badge`, la
+     pastille se placerait par rapport a la carte et retomberait dans son coin.
+   */
+.cl-badge{ position:relative; }
 .p-seg-pt.pt--seul{
-  top:20px; right:30px;
+  /* ⚠ ELLE MORD SUR LE BADGE plutot que de flotter a son coin. Descendue de
+     -5 a -1 px : a -5 elle se detachait presque entierement de la pilule et
+     l'on hesitait sur ce qu'elle marquait. A -1, elle chevauche franchement
+     l'arrondi — le lisere blanc suffit a la detacher, et le lien avec le badge
+     se voit sans ambiguite.
+
+     ⚠ NE PAS ALLER JUSQU'A 0. A cette valeur elle serait entierement dans le
+       badge, alignee avec le point gris de gauche : on lirait deux points
+       cote a cote plutot qu'une marque posee sur une pilule. */
+  top:-1px; right:-1px;
   min-width:11px; width:11px; height:11px; padding:0;
-  /* Pas de lisere : elle est posee SUR la carte, pas a cheval sur son bord. */
-  box-shadow:none;
+  box-shadow:0 0 0 2px #FFFFFF;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

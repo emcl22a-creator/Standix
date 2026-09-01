@@ -1371,65 +1371,63 @@
   </div>
 
   <div class="screen" inert id="p-membres">
-    <div class="pagehead-row">
-      <button class="back-btn" onclick="openSettings()" aria-label="Retour">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
-      </button>
-      <h1 class="pagehead">Gérer l'équipe</h1>
-    </div>
-    <div class="subhead" id="pm-subhead">—</div>
-    <!-- ═══ LE MÊME FILTRE QUE SUR LES PROCÉDURES ═══
-
-         C'étaient trois pastilles côte à côte, une mécanique qu'on ne voyait
-         nulle part ailleurs. La page Procédures emploie un menu déroulant :
-         un seul geste à apprendre pour toute l'app.
-
-         Le bouton d'aide occupe la place laissée libre à droite. Il répond à
-         la question qu'on se pose en découvrant les deux icônes d'action —
-         une flèche et une poubelle, sans libellé. -->
-    <div class="pm-barre">
-      <div class="dd-filter" id="dd-pm-tri">
-        <button type="button" class="dd-trigger" id="dd-pm-tri-trigger">
-          <span id="dd-pm-tri-label">Trier : A → Z</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-               stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    <!-- ⚠ LA MEME OSSATURE QUE « PROCEDURES » : titre, sous-titre, recherche,
+         puis la ligne de compte avec son bouton a droite. Cette page melait les
+         trois — un rang de filtre, puis la recherche, puis la liste — et l'on
+         ne retrouvait ni l'ordre ni les formes des autres ecrans. -->
+    <div class="page-tete">
+      <div class="pm-tete-rang">
+        <button class="back-btn" onclick="openSettings()" aria-label="Retour">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <div class="dd-menu" id="dd-pm-tri-menu">
-          <button type="button" class="selected" data-tri="az" data-label="Trier : A → Z">A → Z</button>
-          <button type="button" data-tri="neuf" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
-          <button type="button" data-tri="vieux" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+        <h1>Gérer l’équipe</h1>
+      </div>
+      <p>Les rôles décident de ce que chacun voit<br>et peut modifier.</p>
+    </div>
+
+    <div class="proc-rech-rang">
+      <div class="proc-rech">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.2" y1="16.2" x2="20.6" y2="20.6"></line></svg>
+        <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- ⚠ LA LIGNE DE COMPTE PORTE LE TRI ET L'AIDE, comme celle des
+         procedures porte son bouton de filtre. Le compte etait un
+         « sous-titre » separe, et le tri un rang a lui seul : deux lignes pour
+         ce qui en occupe une ailleurs. -->
+    <div class="proc-rang">
+      <div class="proc-rang-txt">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9.4" cy="8.6" r="3.4"/><path d="M3 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.6 5.4a3.4 3.4 0 0 1 0 6.4"/>
+        </svg>
+        <span id="pm-subhead">—</span>
+      </div>
+      <div class="pm-rang-outils">
+        <button type="button" class="an-i" data-aide-actions
+                aria-label="À quoi servent les boutons de chaque ligne">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
+        </button>
+        <div class="dd-filter" id="dd-pm-tri">
+          <button type="button" class="dd-trigger" id="dd-pm-tri-trigger" aria-label="Trier">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+              <line x1="4" y1="7.5" x2="20" y2="7.5"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="16.5" x2="14" y2="16.5"/>
+            </svg>
+            <span id="dd-pm-tri-label" hidden>Trier : A → Z</span>
+          </button>
+          <div class="dd-menu" id="dd-pm-tri-menu">
+            <button type="button" class="selected" data-tri="az" data-label="Trier : A → Z">A → Z</button>
+            <button type="button" data-tri="neuf" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
+            <button type="button" data-tri="vieux" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+          </div>
         </div>
       </div>
-      <button type="button" class="an-aide pm-aide-btn" data-aide-actions=""
-              aria-label="À quoi servent les boutons de chaque ligne">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
-      </button>
     </div>
-    <div class="pm-recherche">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><line x1="16.2" y1="16.2" x2="20.6" y2="20.6"></line></svg>
-      <input type="search" id="pm-chercher" placeholder="Rechercher une personne" autocomplete="off">
-      <button type="button" class="vider" id="pm-vider" aria-label="Effacer">×</button>
-    </div>
-    <!-- ═══ LA NOTE PASSE APRÈS LA LISTE ═══
 
-         Elle occupait trois lignes AVANT les personnes : cinq blocs empilés —
-         titre, compte, tri, recherche, note — se lisaient avant d'atteindre ce
-         qu'on vient voir.
-
-         Un mode d'emploi se consulte quand on est bloqué, pas avant d'avoir
-         essayé. Descendu en pied, il reste trouvable et cesse de barrer la
-         route. Et il est raccourci : « les flèches changent le rôle » se
-         devine en touchant une flèche. -->
-    <!-- La note de pied a été retirée. Elle renvoyait vers Analyse pour voir
-         l'activité de quelqu'un — mais cette page sert à gérer les rôles, pas à
-         consulter, et personne ne vient y chercher une redirection.
-
-         Un écran qui explique où aller ailleurs avoue qu'il ne sait pas quoi
-         faire de la place. La liste suffit. -->
-    <div id="pm-liste" style="margin-top:16px;"></div>
+    <div id="pm-liste"></div>
   </div>
 
-  <div class="screen" inert id="p-create">
+<div class="screen" inert id="p-create">
     <!-- Pas de flèche de retour : on arrive ici par le « + », et la barre du bas
          suffit à repartir. Une flèche de plus à côté du titre n'ajoutait rien. -->
     <div class="detail-header">
@@ -2754,7 +2752,7 @@
       <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">Vos analyses vidéo</h1>
+      <h1 class="pagehead">Analyses vidéo AI</h1>
     </div>
     <div class="quota-carte" id="quota-carte"></div>
   </div>
@@ -2829,7 +2827,7 @@
       <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
            d'ouvrir la page. Elle sert quand on veut savoir quand ça repart. -->
       <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Vos analyses vidéo</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet"></div>

@@ -21893,10 +21893,19 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
   const nom = btn.dataset.nom || 'cette personne'
   const ok = await confirmDialog({
-    titre: `Promouvoir ${nom} ?`,
-    message: `${nom} rejoindra la gestion : cr\u00e9ation de proc\u00e9dures, suivi de l'\u00e9quipe, retrait de membres. ` +
-      `Elle perdra en revanche l'acc\u00e8s \u00e0 l'espace \u00c9quipe. Vous restez le seul \u00e0 pouvoir promouvoir.`,
-    confirmer: 'Promouvoir',
+    /* ⚠ « PASSER EN GESTION », PAS « PROMOUVOIR ».
+
+       Le mot decrivait une hierarchie ; l'app decrit un ESPACE. Le journal des
+       mouvements dit deja « est passe en Gestion », la barre du bas dit
+       « Gestion » et « Equipe » — un seul endroit parlait de promotion, et il
+       laissait croire a un grade plutot qu'a un changement d'acces.
+
+       ⚠ LA DERNIERE PHRASE SUIT. « Vous restez le seul a pouvoir promouvoir »
+         gardait le mot ecarte deux lignes plus haut. */
+    titre: `Passer ${nom} en Gestion ?`,
+    message: `${nom} rejoindra l'espace Gestion : cr\u00e9ation de proc\u00e9dures, suivi de l'\u00e9quipe, retrait de membres. ` +
+      `Elle perdra en revanche l'acc\u00e8s \u00e0 l'espace \u00c9quipe. Vous restez le seul \u00e0 pouvoir faire ce changement.`,
+    confirmer: 'Passer en Gestion',
     annuler: 'Annuler',
     danger: false,
   })
@@ -21937,7 +21946,9 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
       const p3 = await supabase.from('membres')
         .update({ role: 'gestion' }).eq('id', btn.dataset.promo).select('id')
       data = p3.data; error = p3.error
-      if (!error) toast('Promotion faite, mais la date n\u2019a pas pu être enregistrée')
+      /* ⚠ « Le changement est fait » PLUTOT QUE « Promotion faite » — le meme mot
+       ecarte de la popup deux ecrans plus haut. */
+    if (!error) toast('Le changement est fait, mais la date n\u2019a pas pu \u00eatre enregistr\u00e9e')
     }
   }
 

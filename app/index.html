@@ -1777,12 +1777,12 @@
             <!-- Les commandes vivent DANS l'image, au coin bas gauche : c'est
                  là qu'on regarde quand on découpe. Sous la vidéo, il fallait
                  quitter l'image des yeux pour appuyer. -->
-            <div class="dv-cmd" id="dv-cmd" style="display:none;">
-              <button type="button" class="dv-rond" id="dv-play" aria-label="Lecture">
-                <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>
-                <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"></rect><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"></rect></svg>
-              </button>
-            </div>
+            <!-- ⚠ LA COMMANDE DE LECTURE A QUITTE L'IMAGE. Elle est maintenant
+                 dans la barre d'outils, en premiere position — voir plus bas.
+                 Ce conteneur reste, vide et masque : le script l'affiche et le
+                 masque selon qu'une video est chargee, et le retirer ferait
+                 echouer ces appels. -->
+            <div class="dv-cmd" id="dv-cmd" style="display:none;"></div>
           <!-- Le cadre noir disait « aucune vidéo importée » : il constatait au lieu
                  d'inviter. Pointillés, icône et une phrase disent ce qu'on attend. -->
             <div class="dv-vide" id="video-placeholder">
@@ -1817,10 +1817,23 @@
       </div>
 
       <div class="dv-outils">
+        <!-- ⚠ LA LECTURE EN PREMIERE POSITION. Elle etait posee sur l'image, au
+             coin bas gauche ; elle y masquait le geste qu'on essaie de voir au
+             moment ou l'on decoupe. Dans la barre, elle precede « tout voir »
+             et « annuler » : on lit de gauche a droite ce qu'on peut faire. -->
+        <button type="button" class="dv-rond" id="dv-play" aria-label="Lecture">
+          <svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"></path></svg>
+          <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6.5" y="4.5" width="4" height="15" rx="1.4"></rect><rect x="13.5" y="4.5" width="4" height="15" rx="1.4"></rect></svg>
+        </button>
+
         <button type="button" class="dv-zoom" id="dv-zoom" aria-label="Voir toute la vidéo">
           <svg class="ic-large" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 4 4 4 4 9"></polyline><polyline points="15 4 20 4 20 9"></polyline><polyline points="9 20 4 20 4 15"></polyline><polyline points="15 20 20 20 20 15"></polyline></svg>
           <svg class="ic-serre" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 9 9 9 9 4"></polyline><polyline points="20 9 15 9 15 4"></polyline><polyline points="4 15 9 15 9 20"></polyline><polyline points="20 15 15 15 15 20"></polyline></svg>
-          <span id="dv-zoom-txt">Tout voir</span>
+          <!-- ⚠ LE LIBELLE A ETE RETIRE. Les deux icones — quatre coins qui
+               s'ecartent ou se resserrent — disent deja le geste, et le
+               script continue d'ecrire dans `dv-zoom-txt` : l'element reste,
+               masque, pour que cette ecriture n'echoue pas. -->
+          <span id="dv-zoom-txt" hidden>Tout voir</span>
         </button>
 
         <!-- Annuler la dernière coupure. Rien à voir avec un retour de cinq
@@ -1828,7 +1841,6 @@
              la reprendre, pas seulement reculer dans la vidéo. -->
         <button type="button" class="dv-annuler" id="dv-annuler" disabled="" aria-label="Annuler la dernière coupure">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"></path><polyline points="3 4 3 9 8 9"></polyline></svg>
-          Annuler la dernière modification
         </button>
       </div>
       <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
@@ -2021,7 +2033,7 @@
           </span>
         </div>
         <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Presque prêt</div>
-        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:#fff;">Vous pouvez quitter cette page.</b> Votre procédure apparaîtra dans la liste dès qu'elle sera prête.</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Vous pouvez quitter cette page.</b> Votre procédure apparaîtra dans la liste dès qu'elle sera prête.</div>
         <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button>
 
         <!-- ═══ COMBIEN DE TEMPS ? ═══

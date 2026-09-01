@@ -11104,15 +11104,23 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ⚠ LE REFLET DU HAUT RESTE, et l'ancien contour a disparu. Sur un fond
      transparent, un liseré sombre en faisait le tour et cerclait la pastille ;
      le reflet seul suffit a la poser sur la carte. */
-/* ⚠ SEULE LA PLAQUE GRANDIT, PAS SON DESSIN. Elle passe de 64 a 72 px et son
-   rayon de 19 a 21 ; l'icone reste a 32.
+/* ⚠ LA PLAQUE FAIT LA HAUTEUR DU CONTENU : 64 PX.
 
-   C'est volontaire : un dessin de 32 dans une pastille de 72 a vingt pixels de
-   marge de chaque cote, ce qui lui donne de l'air. Le faire grandir avec elle
-   rendrait le trait plus epais a l'ecran et la pastille aussi serree qu'avant
-   — on aurait une plus grosse plaque, pas une plaque plus aeree. */
+   Mesure : le nom fait 22 px, l'ecart 18, la ligne du bas 25 — soit 64 en
+   tout. La plaque en faisait 72, donc huit de trop : elle depassait de quatre
+   pixels en haut et en bas, ce qui se voit sur une carte ou tout le reste est
+   aligne.
+
+   ⚠ LES TROIS VALEURS BOUGENT ENSEMBLE. La plaque passe de 72 a 64, son rayon
+     de 21 a 19, et le dessin de 38 a 34 — la meme proportion, 53 % de la
+     plaque. N'en changer qu'une donne soit une pastille vide, soit un dessin
+     qui touche les bords.
+
+   ⚠ ET `min-height` SUR `.cl-co` SUIT. C'est lui qui donne sa hauteur a la
+     colonne de texte ; laisse a 72, il rendrait a la carte les huit pixels
+     qu'on vient de lui retirer. */
 .cl-pl{
-  flex:0 0 72px; width:72px; height:72px; border-radius:21px;
+  flex:0 0 64px; width:64px; height:64px; border-radius:19px;
   display:grid; place-items:center;
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
@@ -11123,9 +11131,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    A 38, la marge tombe a dix-sept — assez pour que le dessin respire, assez
    peu pour qu'il porte la pastille au lieu d'y etre pose.
 
-   ⚠ NE PAS DEPASSER 40 SANS BOUGER LA PLAQUE. Au-dela, le trait du dossier
+   ⚠ NE PAS DEPASSER 36 SANS BOUGER LA PLAQUE. Au-dela, le trait du dossier
      touche l'arrondi du coin, et la pastille cesse de se lire comme un cadre. */
-.cl-pl svg{ width:38px; height:38px; display:block; }
+.cl-pl svg{ width:34px; height:34px; display:block; }
 /* ═══ LA COLONNE DE TEXTE FAIT LA HAUTEUR DE LA PLAQUE ═══
 
    Le nom se cale en haut, la ligne d'information en bas — et ce bas coincide
@@ -11155,7 +11163,7 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
      choisi et l'alignement approche. */
 .cl-co{
   flex:1; min-width:0; display:flex; flex-direction:column;
-  min-height:72px; justify-content:center; gap:18px;
+  min-height:64px; justify-content:center; gap:18px;
 }
 .cl-nm{
   font-size:17.5px; font-weight:600; letter-spacing:-0.03em; line-height:1.25;

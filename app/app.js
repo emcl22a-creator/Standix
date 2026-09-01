@@ -13492,10 +13492,20 @@ function majProgressionIA() {
      Il ne reste que le temps jusqu'à la procédure finie. C'est la seule chose
      qu'on veut savoir quand on attend, et c'est ce qui permet de partir faire
      autre chose. */
-  if (aiEstimationTotale) {
-    const reste = aiEstimationTotale - ecoule
-    if (reste > 20) phrase = `Encore ${attenteLisible(reste)} avant votre proc\u00e9dure.`
-  }
+  /* ⚠ LE COMPTE A REBOURS A ETE RETIRE.
+
+     Il annonçait « Encore 30 s avant votre procedure ». Une estimation qui se
+     trompe est pire que pas d'estimation : on regarde les trente secondes
+     s'ecouler, puis on attend deux minutes de plus en se demandant si quelque
+     chose est casse.
+
+     Le temps ECOULE reste — « 2 min 40 d'analyse » — parce qu'il ne promet
+     rien : il constate. Et les deux messages plus bas prennent le relais quand
+     l'attente s'allonge vraiment.
+
+     ⚠ `aiEstimationTotale` EST CONSERVEE. Elle sert encore a la barre de
+       progression, qui avance selon cette estimation. La retirer figerait le
+       cercle a zero. */
   /* Le palier de fin a son propre message. Sans lui, on voit un chiffre figé
      sans savoir si quelque chose avance encore — c'est exactement le moment
      où l'on ferme l'onglet. */

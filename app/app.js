@@ -6875,45 +6875,98 @@ function peindreTuilesAccueil() {
      ⚠ `depuisQuandCourt` ATTEND DES MILLISECONDES, pas une date. Lui passer la
        chaine de Supabase directement rendait « NaN min » — le genre d'erreur
        qui ne casse rien et s'affiche quand meme. */
-  /* ⚠ LE TITRE EST DANS LA CARTE, PAS AU-DESSUS.
+  /* ═══ LA MAQUETTE ③ : LE FAIT EN GRAND ═══
 
-     Il flottait sur le fond de la page, separe de ce qu'il annonce par un
-     ecart. A deux sections, cela faisait quatre blocs a lire au lieu de deux :
-     un titre, un cadre, un titre, un cadre.
+     La phrase remplace la fiche. « Emma a ouvert Processus achat » se lit d'un
+     coup ; une ligne avec un titre, un sous-titre et une heure demande trois
+     regards pour dire la meme chose.
 
-     Dans la carte, le titre et son contenu forment un seul objet — et le
-     bouton « Voir plus » se rattache visiblement a ce qu'il prolonge. */
-  const section = (titre, action, surAction, corps) => `
+     ⚠ LE COMPLEMENT EST EN GRIS DANS LA PHRASE. Le nom du dossier ou de la
+       procedure descendait en sous-titre ; il fait desormais partie du texte,
+       en plus clair. On lit une phrase francaise, pas deux champs empiles.
+
+     ⚠ L'ETIQUETTE PORTE UN POINT DE COULEUR — vert pour une lecture, violet
+       pour une creation. C'est ce qui distingue les deux blocs au premier coup
+       d'oeil, sans avoir a lire leur titre. */
+  const section = (etiquette, teintePoint, action, surAction, phrase, pied) => `
     <div class="ac-sect">
       <div class="ac-bloc">
         <div class="ac-bloc-t">
-          <span>${titre}</span>
+          <span class="ac-eti"><i style="background:${teintePoint}"></i>${etiquette}</span>
           <button type="button" class="ac-sect-plus" ${surAction}>${action}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                  stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
           </button>
         </div>
-        ${corps}
+        <div class="ac-ph">${phrase}</div>
+        <div class="ac-bas">${pied}</div>
       </div>
     </div>`
 
-  /* Le dernier mouvement : la lecture la plus recente d'un membre. */
-  const lectures = [...(cachedValidations || [])]
+  /* ═══════════════════════════════════════════════════════════════════════
+     LE DERNIER MOUVEMENT D'EQUIPE
+
+     Qui arrive, qui part, qui change d'espace. Ce n'est plus une lecture de
+     procedure : une consultation dit ce que l'equipe FAIT, un mouvement dit
+     de qui elle est composee — et c'est la seconde chose qu'un gerant veut
+     savoir en ouvrant l'app.
+
+     ⚠ LA SOURCE PEUT NE PAS EXISTER ENCORE. `mouvements_membres` est cree par
+       `mouvements-membres.sql`, a executer dans Supabase. Tant qu'il ne l'est
+       pas, la requete echoue — on retombe alors sur les ARRIVEES, deduites de
+       `membres.created_at`, qui est la seule trace qu'on ait sans la table.
+
+       Les departs et les changements d'espace, eux, sont IRRECUPERABLES sans
+       elle : un depart supprime la ligne, un changement de role ecrase la
+       colonne. Un evenement passe ne se reconstitue pas a partir d'un etat
+       present.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const PHRASES_MOUVEMENT = {
+    arrivee:      (n) => `${n} <em>a rejoint l’équipe</em>`,
+    depart:       (n) => `${n} <em>a quitté l’entreprise</em>`,
+    vers_gestion: (n) => `${n} <em>est passé en Gestion</em>`,
+    vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
+  }
+  const POINTS_MOUVEMENT = {
+    arrivee: '#34C759', depart: '#C8342B',
+    vers_gestion: '#1F4CEE', vers_equipe: '#4C1D95',
+  }
+
+  const peindreMouvement = (mv) => {
+    const nom = (mv.membre_nom || 'Un membre').trim().split(/\s+/)[0]
+    const phrase = (PHRASES_MOUVEMENT[mv.type] || PHRASES_MOUVEMENT.arrivee)(escapeHtml(nom))
+    zListes.innerHTML = section('Dernier mouvement',
+      POINTS_MOUVEMENT[mv.type] || '#9A9AA4', 'Voir plus',
+      'onclick="showGestionScreen(\'p-equipe\')"',
+      phrase,
+      `<span class="ac-mini">${escapeHtml(initialesDe(mv.membre_nom || '?'))}</span>
+       <span class="ac-q">${depuisQuandCourt(new Date(mv.cree_le).getTime())}</span>`)
+      + zListes.innerHTML
+  }
+
+  /* ⚠ LE REPLI EST CALCULE TOUT DE SUITE, pas dans le `catch`. La requete est
+     asynchrone : sans lui, le bloc resterait vide le temps de l'aller-retour,
+     puis apparaitrait d'un coup. Il est remplace si la table repond. */
+  const arrivees = [...(cachedMembres || [])]
+    .filter(m => m.created_at)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  const derniere = lectures[0]
-  if (derniere) {
-    const p = procs.find(x => x.id === derniere.procedure_id)
-    const m = (cachedMembres || []).find(x => x.id === derniere.membre_id)
-    zListes.innerHTML += section('Dernier mouvement', 'Voir plus',
-      'onclick="showGestionScreen(\'p-equipe\')"', `
-      <div class="ac-lig">
-        <span class="ac-lig-ini">${escapeHtml(initialesDe(m?.nom || '?'))}</span>
-        <span class="ac-lig-co">
-          <span class="ac-lig-t">${escapeHtml(m?.nom || 'Un membre')} a consulté une procédure</span>
-          <span class="ac-lig-s">${escapeHtml(p?.titre || 'Procédure supprimée')}</span>
-        </span>
-        <span class="ac-lig-q">${depuisQuandCourt(new Date(derniere.created_at).getTime())}</span>
-      </div>`)
+  if (arrivees[0]) {
+    peindreMouvement({ membre_nom: arrivees[0].nom, type: 'arrivee',
+                       cree_le: arrivees[0].created_at })
+  }
+
+  if (currentMembre?.entreprise_id) {
+    supabase.from('mouvements_membres')
+      .select('membre_nom, type, cree_le')
+      .eq('entreprise_id', currentMembre.entreprise_id)
+      .order('cree_le', { ascending: false })
+      .limit(1)
+      .then(({ data, error }) => {
+        /* Table absente : on garde le repli, sans bruit dans la console —
+           c'est un etat prevu, pas une panne. */
+        if (error || !data?.length) return
+        peindreMouvement(data[0])
+      })
   }
 
   /* La derniere procedure creee. */
@@ -6921,23 +6974,13 @@ function peindreTuilesAccueil() {
   const neuve = recentes[0]
   if (neuve) {
     const teinte = couleurDossier(0)
-    zListes.innerHTML += section('Dernière procédure créée', 'Voir plus',
-      'onclick="showGestionScreen(\'p-list\')"', `
-      <div class="ac-lig" onclick="openAnalyse('${neuve.id}')">
-        <span class="ac-lig-pl" style="background:${fondPlaque(teinte)}">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
-                     M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2"
-                  stroke="url(#pal${teinte.i})" stroke-width="1.9"
-                  stroke-linejoin="round" stroke-linecap="round"/>
-          </svg>
-        </span>
-        <span class="ac-lig-co">
-          <span class="ac-lig-t">${escapeHtml(neuve.titre || 'Sans titre')}</span>
-          <span class="ac-lig-s">${escapeHtml(neuve.categorie || 'Sans dossier')}</span>
-        </span>
-        <span class="ac-lig-q">${depuisQuandCourt(new Date(neuve.created_at).getTime())}</span>
-      </div>`)
+    const nbEtapes = Number(neuve.nb_etapes) || null
+    zListes.innerHTML += section('Dernière procédure créée', '#4C1D95', 'Voir plus',
+      `onclick="openAnalyse('${neuve.id}')"`,
+      `${escapeHtml(neuve.titre || 'Sans titre')}
+       <em>dans ${escapeHtml(neuve.categorie || 'Sans dossier')}</em>`,
+      `<span class="ac-q">${depuisQuandCourt(new Date(neuve.created_at).getTime())}${
+         nbEtapes ? ` · ${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}` : ''}</span>`)
   }
 }
 
@@ -8525,20 +8568,32 @@ function morceauxDeLaListe() {
   ].filter(Boolean)
 }
 
+/* ⚠ LE FLOU SEUL, SANS FONDU — ET IL MONTE PLUS HAUT POUR CELA.
+
+   L'opacite faisait deux choses a la fois : elle adoucissait le geste, et
+   surtout elle CACHAIT le remplacement du contenu, qui a lieu au creux du
+   mouvement. Sans elle, le flou doit masquer seul : a 4 px on distinguait
+   encore les titres changer d'un coup, ce qui se remarque plus que
+   l'animation elle-meme. A 9, la liste devient une masse indistincte le temps
+   d'un souffle.
+
+   ⚠ `fill:forwards` RESTE INDISPENSABLE. C'est lui qui tient le flou pendant
+     qu'on remplace le contenu ; sans lui, la liste redeviendrait nette juste
+     avant de changer. */
 function flouSortie(el) {
   return el.animate(
-    [{ opacity: 1, filter: 'blur(0px)' }, { opacity: 0, filter: 'blur(4px)' }],
+    [{ filter: 'blur(0px)' }, { filter: 'blur(9px)' }],
     { duration: 190, easing: COURBE_SEGM, fill: 'forwards' })
 }
 
 function flouEntree(el, rang) {
   /* ⚠ ON ANNULE D'ABORD LA SORTIE, ET C'EST INDISPENSABLE.
 
-     Elle porte `fill:forwards` — necessaire pour que la grille reste invisible
-     pendant qu'on remplace son contenu. Mais une animation terminee en
-     `forwards` continue d'imposer sa derniere image : mesure, l'element
-     revenait a `opacity:0` des la fin de l'entree, et la liste disparaissait
-     au lieu d'apparaitre.
+     Elle porte `fill:forwards` — necessaire pour que le flou tienne pendant
+     qu'on remplace le contenu. Mais une animation terminee en `forwards`
+     continue d'imposer sa derniere image : mesure, l'element retombait a neuf
+     pixels de flou des la fin de l'entree, et la liste redevenait illisible au
+     lieu de se poser.
 
      `cancel()` la retire pour de bon. `getAnimations` les rend toutes : on ne
      peut pas se contenter de garder une reference, l'element pouvant en porter
@@ -8549,7 +8604,7 @@ function flouEntree(el, rang) {
      compte, ce qui se remarque au lieu de se sentir. */
   el.getAnimations().forEach(a => a.cancel())
   return el.animate(
-    [{ opacity: 0, filter: 'blur(4px)' }, { opacity: 1, filter: 'blur(0px)' }],
+    [{ filter: 'blur(9px)' }, { filter: 'blur(0px)' }],
     { duration: 340, easing: COURBE_SEGM })
 }
 

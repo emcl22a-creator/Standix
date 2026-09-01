@@ -3823,6 +3823,15 @@ async function rafraichirAnalyse() {
 }
 
 window.loadGlobalAnalyse = function() {
+  /* ⚠ LA NOUVELLE PAGE SE PEINT ICI, en tete. `peindreAnalyse` ne depend que
+     des donnees deja en cache — elle n'attend aucun reseau, et la page
+     apparait donc remplie du premier coup.
+
+     Le reste de la fonction sert aux ecrans de detail — equipe, categories,
+     temps — qui vivent toujours et gardent leurs propres calculs. */
+  peindreAnalyse()
+  poserPastilleSegment(document.querySelector('#an-segm .p-seg.on'), false)
+
   /* On peint d'abord avec ce qui a été préchargé au démarrage : la page
      apparaît instantanément. */
   const procedures = allGestionProcedures
@@ -6956,6 +6965,268 @@ function remplirHistoCreations() {
   peindreHisto(zone, entrees, 'Aucune procédure créée ce mois-ci.')
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ANALYSE
+
+   Trois chiffres, deux courbes, un classement. Meme grammaire que l'accueil :
+   les memes cartes, les memes plaques, la meme palette.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+let anJours = 7
+
+/* ⚠ LES SCANS DE QR CODE NE SONT PAS ENCORE COMPTES EN BASE.
+
+   Rien n'enregistre l'ouverture d'une procedure par QR code : `validations`
+   note la LECTURE, pas la maniere d'y arriver. Le chiffre affiche donc un
+   tiret plutot qu'un zero — un zero se lit comme « personne ne scanne »,
+   alors qu'on ne sait simplement pas.
+
+   Pour l'activer : ajouter une colonne `via_qr boolean` a `validations`, la
+   remplir a l'ouverture quand `cibleQR` est renseigne, et remplacer le `null`
+   ci-dessous par le compte. */
+function anScansQR(depuis) {
+  return null
+}
+
+function anDureeLisible(sec) {
+  if (!sec) return '0 min'
+  const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60)
+  if (h && m) return `${h} h ${String(m).padStart(2, '0')}`
+  if (h) return `${h} h`
+  return `${m} min`
+}
+
+/* Les validations de la periode choisie, une seule fois par rendu. */
+function anValidations() {
+  const depuis = Date.now() - anJours * 86400000
+  return (cachedValidations || []).filter(v =>
+    v.created_at && new Date(v.created_at).getTime() >= depuis)
+}
+
+/* ═══ LA COURBE ═══
+
+   ⚠ ELLE EST DESSINEE EN SVG, PAS AVEC UNE BIBLIOTHEQUE. Une courbe de sept a
+     douze points ne justifie pas d'ajouter cinquante kilo-octets a charger sur
+     un telephone en 4G.
+
+   ⚠ ET ELLE EST LISSEE PAR DES COURBES DE BEZIER. Relier les points par des
+     segments donne une ligne brisee qui se lit comme un graphique de
+     laboratoire ; le lissage la rend continue, comme sur la maquette. */
+function anCourbe(points, teinte, id, unite) {
+  /* ⚠ 34 PX RESERVES A GAUCHE POUR LES GRADUATIONS. Sans cette reserve, la
+     courbe partirait du bord et les valeurs se poseraient par-dessus. */
+  const L = 320, H = 128, mg = { g: 34, d: 6, h: 10, b: 22 }
+
+  /* ⚠ LE HAUT DE L'ECHELLE EST ARRONDI, pas egal au maximum.
+
+     A 98 lectures, une graduation « 98 » en haut se lit comme une valeur
+     mesuree alors que c'est juste le sommet de la courbe. On monte au multiple
+     rond superieur — 100 — et les trois reperes tombent alors sur des nombres
+     qu'on retient. */
+  const brut = Math.max(...points.map(p => p.v), 1)
+  /* ⚠ LE TEMPS SE COMPTE EN SOIXANTAINES, PAS EN DIZAINES.
+
+     L'echelle decimale donnait 0 / 45 / 90 minutes, affiches « 0 / 45 / 2 H » :
+     90 arrondi a l'heure fait 1,5, et l'arrondi entier le montait a 2. On
+     lisait donc un sommet de deux heures sur une courbe qui plafonne a une
+     heure et demie.
+
+     Au-dela d'une heure, l'echelle se cale sur des demi-heures : les trois
+     reperes tombent alors sur des valeurs qui s'ecrivent sans arrondi. */
+  let max
+  if (unite === 'min' && brut >= 60) {
+    max = Math.ceil(brut / 60) * 60
+    if ((max / 2) % 30) max = Math.ceil(brut / 120) * 120
+  } else {
+    const pas = Math.pow(10, Math.floor(Math.log10(brut)))
+    max = Math.ceil(brut / (pas / 2)) * (pas / 2) || 1
+  }
+
+  const px = (i) => mg.g + (L - mg.g - mg.d) * (points.length < 2 ? 0.5 : i / (points.length - 1))
+  const py = (v) => mg.h + (H - mg.h - mg.b) * (1 - v / max)
+
+  const pts = points.map((p, i) => [px(i), py(p.v)])
+  let d = `M ${pts[0][0]} ${pts[0][1]}`
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]
+    const cx = (x0 + x1) / 2
+    d += ` C ${cx} ${y0}, ${cx} ${y1}, ${x1} ${y1}`
+  }
+  const sol = H - mg.b
+  const aire = `${d} L ${pts[pts.length - 1][0]} ${sol} L ${pts[0][0]} ${sol} Z`
+
+  /* Trois niveaux : zero, milieu, sommet. Cinq lignes sur 128 px de haut
+     quadrillent le fond au lieu de l'echelonner. */
+  const niveaux = [0, max / 2, max]
+  /* ⚠ L'UNITE EST LA MEME SUR TOUTE L'ECHELLE. Melanger « 45 » et « 2 h » sur
+     deux reperes voisins oblige a comparer des minutes a des heures — et l'on
+     s'y trompe. Si le sommet depasse l'heure, tout passe en heures. */
+  const etiquette = (v) => {
+    if (unite !== 'min') return String(Math.round(v))
+    if (max < 60) return `${Math.round(v)} min`
+    const h = Math.floor(v / 60), m = Math.round(v % 60)
+    if (!v) return '0'
+    return m ? `${h} h ${m}` : `${h} h`
+  }
+
+  /* Trois reperes au maximum sous l'axe : sept dates se chevauchent sur
+     390 px, et l'on ne lit alors aucune. */
+  const marques = points.length <= 3 ? points.map((_, i) => i)
+    : [0, Math.floor((points.length - 1) / 2), points.length - 1]
+
+  return `
+    <svg viewBox="0 0 ${L} ${H}" preserveAspectRatio="none" class="an-svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="anAire${id}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="${teinte}" stop-opacity="0.22"/>
+          <stop offset="1" stop-color="${teinte}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      ${niveaux.map(v => `
+        <line x1="${mg.g}" y1="${py(v)}" x2="${L - mg.d}" y2="${py(v)}"
+              stroke="rgba(60,60,67,0.10)" stroke-width="1"
+              vector-effect="non-scaling-stroke"/>`).join('')}
+      <path d="${aire}" fill="url(#anAire${id})"/>
+      <path d="${d}" fill="none" stroke="${teinte}" stroke-width="2.2"
+            stroke-linecap="round" stroke-linejoin="round"
+            vector-effect="non-scaling-stroke"/>
+      <circle cx="${pts[pts.length - 1][0]}" cy="${pts[pts.length - 1][1]}" r="3.6" fill="${teinte}"/>
+    </svg>
+
+    <!-- ⚠ LES GRADUATIONS SONT EN HTML, PAS DANS LE SVG. Celui-ci est etire en
+         largeur pour remplir la carte : un texte a l'interieur serait etire
+         avec lui et deviendrait illisible. En HTML pose par-dessus, il garde
+         ses proportions.
+
+         ⚠ AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il est DANS un gabarit
+           delimite par des accents graves, un seul y fermerait la chaine. -->
+    <div class="an-ech">
+      ${niveaux.slice().reverse().map(v => `
+        <span style="top:${py(v) / H * 100}%">${etiquette(v)}</span>`).join('')}
+    </div>
+    <div class="an-axe" style="padding-left:${mg.g / L * 100}%">
+      ${marques.map(i => `<span style="left:${(px(i) - mg.g) / (L - mg.g) * 100}%">${points[i].jour}</span>`).join('')}
+    </div>`
+}
+
+/* Les valeurs jour par jour. Au-dela de trente jours on regroupe par semaine :
+   360 points sur 320 pixels ne font plus une courbe, mais un trait. */
+function anSerie(valides, champ) {
+  const pas = anJours <= 30 ? 1 : 7
+  const n = Math.ceil(anJours / pas)
+  const cases = [...Array(n)].map((_, i) => ({ v: 0, i }))
+  const debut = Date.now() - anJours * 86400000
+  for (const v of valides) {
+    const k = Math.floor((new Date(v.created_at).getTime() - debut) / (pas * 86400000))
+    if (k >= 0 && k < n) cases[k].v += champ === 'temps' ? Number(v.duree_lecture || 0) : 1
+  }
+  return cases.map((c, i) => {
+    const t = new Date(debut + i * pas * 86400000)
+    return { v: c.v, jour: t.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }
+  })
+}
+
+function peindreAnalyse() {
+  const zC = document.getElementById('an-chiffres')
+  if (!zC) return
+  const valides = anValidations()
+
+  const lectures = valides.length
+  const secondes = valides.reduce((s, v) => s + Number(v.duree_lecture || 0), 0)
+  const scans = anScansQR()
+
+  const IC = {
+    qr: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.6"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.6"/><path d="M13.5 13.5h3v3h-3zM19 13.5h1.5M19 19v1.5M16.5 19H15"/>',
+    oeil: '<path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/><circle cx="12" cy="12" r="3.1"/>',
+    montre: '<circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.2 2"/>',
+  }
+  const tuile = (i, val, sous, rang) => {
+    const t = couleurDossier(rang)
+    return `
+    <div class="ac-chif">
+      <span class="ac-chif-ic" style="background:${fondPlaque(t)}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal${t.i})" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round">${i}</svg>
+      </span>
+      <span class="ac-chif-v">${val}</span>
+      <span class="ac-chif-s">${sous}</span>
+    </div>`
+  }
+  zC.innerHTML =
+    tuile(IC.qr, scans === null ? '—' : scans, 'scans de QR code', 1) +
+    tuile(IC.oeil, lectures, `lecture${lectures > 1 ? 's' : ''}`, 0) +
+    tuile(IC.montre, anDureeLisible(secondes), 'passées à lire', 3)
+
+  const zT = document.getElementById('an-lect-total')
+  if (zT) zT.textContent = `${lectures} sur ${anJours} jours`
+
+  const gL = document.getElementById('an-graph-lectures')
+  if (gL) gL.innerHTML = anCourbe(anSerie(valides, 'lectures'), pointDossier(1), 'L', 'nb')
+
+  const gT = document.getElementById('an-graph-temps')
+  if (gT) {
+    const serie = anSerie(valides, 'temps').map(p => ({ ...p, v: p.v / 60 }))
+    gT.innerHTML = anCourbe(serie, pointDossier(0), 'T', 'min')
+  }
+
+  /* ═══ LES DEUX MEMBRES LES PLUS ACTIFS ═══
+
+     ⚠ ON CLASSE PAR TEMPS, PAS PAR NOMBRE DE LECTURES. Quelqu'un qui ouvre
+       vingt procedures sans les lire n'utilise pas l'app plus que celui qui en
+       lit deux en entier. */
+  const zE = document.getElementById('an-equipe')
+  if (zE) {
+    const parMembre = {}
+    for (const v of valides) {
+      if (!v.membre_id) continue
+      parMembre[v.membre_id] = (parMembre[v.membre_id] || 0) + Number(v.duree_lecture || 0)
+    }
+    const top = Object.entries(parMembre)
+      .sort((a, b) => b[1] - a[1]).slice(0, 2)
+      .map(([id, sec]) => ({ m: (cachedMembres || []).find(x => x.id === id), sec }))
+      .filter(x => x.m)
+
+    zE.innerHTML = top.length
+      ? top.map(({ m, sec }, r) => `
+        <div class="an-membre">
+          <!-- ⚠ PLUS D'INITIALES. Un rond de deux lettres a cote d'un nom
+               ecrit en entier ne dit rien de plus, et sur deux lignes il
+               occupait quarante pixels de large pour rien. Un simple point de
+               rang suffit a separer les deux entrees. -->
+          <span class="an-rang" style="background:${pointDossier(r)}"></span>
+          <span class="an-m-co">
+            <span class="an-m-t">${escapeHtml(m.nom || 'Sans nom')}</span>
+            ${m.poste ? `<span class="an-m-s">${escapeHtml(m.poste)}</span>` : ''}
+          </span>
+          <span class="an-m-q">${anDureeLisible(sec)}</span>
+        </div>`).join('')
+      : '<div class="an-vide-l">Personne n’a encore lu de procédure.</div>'
+  }
+}
+
+/* Le segment de duree. Meme mecanique que celui des procedures : la pastille
+   se mesure, l'animation est lancee en JavaScript. */
+document.getElementById('an-segm')?.addEventListener('click', (e) => {
+  const b = e.target.closest('.p-seg')
+  if (!b || b.classList.contains('on')) return
+  b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
+  b.classList.add('on')
+  anJours = Number(b.dataset.jours) || 7
+
+  const lens = document.getElementById('an-segm-lens')
+  if (lens) {
+    const p = b.parentElement.getBoundingClientRect(), r = b.getBoundingClientRect()
+    if (r.width) { lens.style.width = r.width + 'px'
+                   lens.style.transform = `translateX(${r.left - p.left - 3}px)` }
+  }
+
+  if (MOINS_ANIM()) { peindreAnalyse(); return }
+  const zones = ['an-chiffres', 'an-graph-lectures', 'an-graph-temps', 'an-equipe']
+    .map(i => document.getElementById(i)).filter(Boolean)
+  zones.forEach(flouSortie)
+  setTimeout(() => { peindreAnalyse(); zones.forEach(flouEntree) }, 130)
+})
+
 function peindreTuilesAccueil() {
   /* ═══ CE QU'IL RESTE A TERMINER ═══
 
@@ -8769,7 +9040,12 @@ document.addEventListener('click', (e) => {
      s'etire selon l'ecran. Mesurer le bouton donne la bonne place quel que
      soit le texte, et un quatrieme onglet fonctionnerait sans rien changer. */
 function poserPastilleSegment(b, animer = true, essai = 0) {
-  const lens = document.getElementById('proc-segm-lens')
+  /* ⚠ LA PASTILLE EST CELLE DU SEGMENT AUQUEL LE BOUTON APPARTIENT, pas
+     toujours `proc-segm-lens`. Deux ecrans ont un segment — Procedures et
+     Analyse — et une fonction qui viserait toujours le premier deplacerait la
+     mauvaise piece quand on change de duree. */
+  const lens = b?.parentElement?.querySelector('.p-seg-lens')
+             || document.getElementById('proc-segm-lens')
   if (!lens || !b) return
   const p = b.parentElement.getBoundingClientRect()
   const r = b.getBoundingClientRect()

@@ -12211,9 +12211,22 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
    C'est lui qui a maintenant la matiere des cartes de dossier ; la ligne, a
    l'interieur, n'est plus qu'un contenu. */
+/* ⚠ LE REMPLISSAGE DU BAS EST PLUS PETIT QUE CELUI DU HAUT, ET C'EST VOULU.
+
+   Mesure a l'encre — les lettres, pas leurs boites : avec 14 en haut et 15 en
+   bas, l'ecart reel etait de 18,5 px contre 21. La derniere ligne porte un
+   demi-interligne sous ses lettres — `line-height:1.4` sur 15,5 px laisse
+   environ 3 px de blanc — qui s'ajoute au remplissage. Le titre, lui, a une
+   interligne normale et n'en apporte presque pas.
+
+   12,5 px en bas compensent ce blanc : les deux ecarts visibles tombent alors
+   a 18,5.
+
+   ⚠ CETTE VALEUR DEPEND DE `line-height` SUR `.ac-ph`. La changer sans
+     retoucher ce remplissage redonnerait le desequilibre. */
 .ac-bloc{
   position:relative;
-  padding:14px 16px 15px; border-radius:20px;
+  padding:14px 16px 12.5px; border-radius:20px;
   background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
   box-shadow:
     inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
@@ -12495,3 +12508,36 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
    ne peut pas distinguer un element qui vient d'apparaitre d'un element
    recree a l'identique. Le passage de la roue au badge se fait donc sans
    transition, ce qui est preferable a un sursaut sur toute la liste. */
+
+
+/* ═══ LA PASTILLE SUR UNE CARTE ═══
+
+   Meme couleur, meme taille, meme place qu'a l'onglet — en haut a droite,
+   debordant legerement.
+
+   ⚠ ELLE EST PLEINE, SANS CHIFFRE. Sur l'onglet, le nombre compte combien de
+     procedures attendent ; sur une carte il vaudrait toujours 1. Un chiffre
+     qui ne varie jamais n'informe pas.
+
+   ⚠ LA CARTE DOIT ETRE ANCREE. `.cat-cell--ligne` a deja `position:relative`
+     pour son lisere ; sans cela, la pastille se placerait par rapport a la
+     page et se retrouverait dans un coin de l'ecran. */
+.cat-cell--ligne{ position:relative; }
+/* ⚠ ELLE NE DEBORDE PAS DE LA CARTE, contrairement a celle de l'onglet.
+
+   A `-4px`, elle sortait dans la marge de la page — la carte touche presque le
+   bord de l'ecran, et la pastille s'y retrouvait coupee. Sur l'onglet, le
+   debordement fonctionne parce que la piste grise laisse de la place autour ;
+   ici il n'y en a pas.
+
+   Elle se pose donc DANS le coin, a 10 px des bords : assez loin pour ne pas
+   toucher l'arrondi, assez pres pour se lire comme une marque de coin. */
+/* ⚠ ELLE EST DECALEE A GAUCHE DU CHEVRON, pas au-dessus. A `right:10px` elle
+   tombait juste sur lui : deux marques dans le meme coin, et l'on ne savait
+   plus laquelle regarder. A 30, elle precede le chevron sur la meme ligne. */
+.p-seg-pt.pt--seul{
+  top:20px; right:30px;
+  min-width:11px; width:11px; height:11px; padding:0;
+  /* Pas de lisere : elle est posee SUR la carte, pas a cheval sur son bord. */
+  box-shadow:none;
+}

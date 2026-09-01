@@ -7126,7 +7126,23 @@ function anSerie(valides, champ) {
   })
 }
 
+/* ⚠ LE RENDU DIT CE QUI A ECHOUE PLUTOT QUE DE LAISSER UN VIDE.
+
+   Une page blanche ne se debogue pas : on ne sait pas si les donnees manquent,
+   si le calcul a plante, ou si le balisage n'est pas la. Le message affiche la
+   cause a l'ecran — c'est le seul endroit ou on la verra, puisque personne
+   n'ouvre la console d'un telephone. */
 function peindreAnalyse() {
+  try { peindreAnalyseInterne() }
+  catch (e) {
+    console.error('Analyse :', e)
+    const z = document.getElementById('an-chiffres')
+    if (z) z.innerHTML = `<div class="an-vide-l">Affichage impossible : ${
+      escapeHtml((e && e.message) || 'erreur inconnue')}</div>`
+  }
+}
+
+function peindreAnalyseInterne() {
   const zC = document.getElementById('an-chiffres')
   if (!zC) return
   const valides = anValidations()
@@ -7206,8 +7222,16 @@ function peindreAnalyse() {
 
 /* Le segment de duree. Meme mecanique que celui des procedures : la pastille
    se mesure, l'animation est lancee en JavaScript. */
-document.getElementById('an-segm')?.addEventListener('click', (e) => {
-  const b = e.target.closest('.p-seg')
+/* ⚠ L'ECOUTEUR EST DELEGUE AU DOCUMENT, pas attache au segment.
+
+   `getElementById('an-segm')` est evalue UNE FOIS, au chargement du module. Si
+   l'element n'existe pas encore a cet instant — ordre des scripts, balisage
+   injecte plus tard — le `?.` avale silencieusement et AUCUN ecouteur n'est
+   jamais pose. Le bouton ne repond alors a rien, sans la moindre erreur.
+
+   Sur `document`, l'ecoute vaut pour tout ce qui existera un jour. */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#an-segm .p-seg')
   if (!b || b.classList.contains('on')) return
   b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
   b.classList.add('on')

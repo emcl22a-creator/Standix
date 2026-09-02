@@ -15660,3 +15660,27 @@ body.espace-vide .screen.active{ animation:none !important; }
    dessous passe sous lui sans le toucher, et lui imposer la meme marge la
    couperait pour rien. */
 .alerte-essai .ess-tx b{ padding-right:74px; }
+
+
+/* ⚠ LE FONDU SUIT L'INTERVALLE, PASSE A 3,5 s.
+
+   Il durait 1,6 s, calibre pour un intervalle de sept secondes. A 3,5, une
+   image ne serait nette que 1,9 s : plus de temps a se transformer qu'a se
+   montrer.
+
+   ⚠ 0,8 s LAISSE 2,7 s D'IMAGE POSEE. C'est le rapport qu'avait l'ancien
+     reglage — un peu moins d'un quart du temps en transition. */
+#scenes .scene{
+  transition:opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+             filter  0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+/* ⚠ LE FONDU PASSE A 1 s, POUR UN INTERVALLE DE 4,5 s.
+
+   A 0,8 s il etait calibre sur 3,5 ; a 4,5, une seconde garde le meme rapport
+   — 3,5 s d'image posee, un peu moins d'un quart en transition. */
+#scenes .scene{
+  transition:opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+             filter  1s cubic-bezier(0.4, 0, 0.2, 1);
+}

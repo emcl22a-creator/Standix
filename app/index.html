@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=6eb57287">
+<link rel="stylesheet" href="style.css?v=2627cbe1">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -5665,8 +5665,24 @@ function frame(now) {
      passerait dessous.
 
      Elle ne s'etire plus que dans l'espace equipe, ou le cercle n'existe pas. */
+  /* ⚠ ON SE FIE AU CERCLE, PAS AUX CLASSES.
+
+     La condition lisait « l'espace equipe est affiche ET pas d'apercu en
+     cours ». Or au retour, `en-apercu` est retiree AVANT que l'espace equipe
+     soit masque — il l'est 180 ms plus tard, apres le temps mort. Pendant ces
+     180 ms les deux etaient vraies : la barre s'etirait sur toute la largeur,
+     puis se retractait. Mesure : 344 px au lieu de 268.
+
+     La vraie question est plus simple : le cercle occupe-t-il sa place ? S'il
+     est la, la barre lui laisse la sienne. Un seul etat au lieu de deux a
+     accorder. */
+  /* ⚠ ET LE MEME INTERVALLE COTE SCRIPT. `espace-vide` est posee pendant les
+     180 ms du temps mort : sans elle ici, la boucle recalculerait une largeur
+     etiree pendant que le CSS, lui, la refuse — deux avis contraires sur la
+     meme image. */
   const apercuCible = (document.getElementById('equipe-app')?.style.display === 'block'
-    && !document.body.classList.contains('en-apercu')) ? 1 : 0;
+    && !document.body.classList.contains('en-apercu')
+    && !document.body.classList.contains('espace-vide')) ? 1 : 0;
   /* ⚠ 0,22 ET NON 0,14. Mesure sur la boucle : a 0,14 l'etirement mettait
      517 ms a se terminer, quand la goutte du cercle en prend 340. La barre
      finissait bien apres lui — deux gestes qui devraient etre un seul.

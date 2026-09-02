@@ -14804,3 +14804,71 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
   display:inline-flex;
   align-items:center;
 }
+
+
+/* ═══ LA SORTIE DE « BIENVENUE » ═══
+
+   ⚠ L'INVERSE EXACT DE `appShellIn`. Elle entre en grandissant depuis 97,5 % ;
+     elle repart en retrecissant vers la meme valeur. Un geste et son contraire,
+     pas deux gestes differents.
+
+   ⚠ `both` TIENT LA DERNIERE IMAGE. Sans lui, la carte reprendrait sa taille
+     pleine a la fin de l'animation, juste avant d'etre masquee — un sursaut de
+     quelques images, court mais visible. */
+#login-screen .login-card.sort{
+  animation:appShellOut 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes appShellOut{
+  0%  { opacity:1; transform:none; }
+  70% { opacity:0; }
+  100%{ opacity:0; transform:scale(0.975); }
+}
+@media (prefers-reduced-motion: reduce){
+  #login-screen .login-card.sort{ animation:none; opacity:0; }
+}
+
+
+/* ═══ LA FENETRE DU POSTE, SUR FOND CLAIR ═══
+
+   ⚠ TROIS REGLES DEPENDAIENT DU FOND NOIR.
+
+     `.poste-ok` avait un fond blanc et un texte sombre : sur une carte devenue
+     claire, un bouton blanc disparait. Il prend le bleu des boutons d'action,
+     comme celui de « Renommer le dossier ».
+
+     Les filets de separation entre les choix etaient calcules pour du noir ;
+     sur clair, ils ne se voyaient plus.
+
+   ⚠ `.poste-fen` GARDE `padding:0` MAIS PAS SUR `fen-co`. La liste doit courir
+     d'un bord a l'autre — ses filets seraient interrompus par une marge — mais
+     le titre et la phrase gardent la leur. */
+/* ⚠ LA LISTE NE DOIT PAS TOUCHER LE BOUTON. Sans cet espace, le dernier choix
+   et « Continuer » se collent — on croit que le bouton fait partie de la
+   liste. Seize pixels les separent, comme dans les autres fenetres. */
+.fen-pro.poste-fen .fen-co{ padding-bottom:0; }
+.fen-pro.poste-fen .poste-choix{ margin-bottom:16px; }
+.fen-pro.poste-fen .poste-choix button:last-child{ border-bottom:none; }
+
+.fen-pro.poste-fen .poste-choix{
+  margin-top:16px;
+  margin-left:-20px; margin-right:-20px;
+  border-top:0.5px solid rgba(28,28,38,0.10);
+}
+.fen-pro.poste-fen .poste-choix button{
+  border-bottom:0.5px solid rgba(28,28,38,0.08);
+  color:var(--label);
+}
+.fen-pro.poste-fen .poste-choix .r{
+  border:1.7px solid rgba(28,28,38,0.22);
+}
+
+/* ⚠ LE BOUTON PREND LA FORME DES AUTRES. `fen-p` porte deja le bleu, la
+   hauteur et le rayon ; il ne restait qu'a neutraliser l'ancien fond blanc. */
+.fen-pro.poste-fen .poste-ok{
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+  color:#FFFFFF;
+}
+.fen-pro.poste-fen .poste-ok:disabled{
+  background:rgba(28,28,38,0.085);
+  color:var(--label-3);
+}

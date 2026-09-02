@@ -24651,11 +24651,26 @@ window.addEventListener('pagehide', () => {
 })
 
 window.openEditProcedure = async function(procId, mode) {
-  /* ⚠ ON DEMANDE LE VERROU AVANT D'AFFICHER QUOI QUE CE SOIT. Ouvrir l'ecran
-     puis le refermer donnerait l'impression d'un defaut. */
   try {
     const { data, error } = await supabase.rpc('prendre_verrou', { p_procedure: procId })
     const r = Array.isArray(data) ? data[0] : data
+
+    /* ⚠ L'ERREUR REMONTE, ELLE N'EST PLUS AVALEE.
+
+       Mon `catch` silencieux devait empecher qu'une panne reseau bloque le
+       travail. Il masquait aussi les vraies pannes : le verrou ne se posait
+       pas, aucune ligne n'apparaissait en base, et rien ne le disait.
+
+       On garde le principe — l'ecran s'ouvre quand meme — mais on le dit. */
+    if (error) {
+      console.error('[verrou] prendre_verrou a echoue :', error)
+      toast('Verrou indisponible : ' + (error.message || 'erreur inconnue'))
+    } else if (!r) {
+      console.warn('[verrou] la fonction n a rien rendu')
+      toast('Verrou : reponse vide')
+    } else {
+      console.log('[verrou]', r.obtenu ? 'obtenu' : 'refuse par ' + r.par_qui)
+    }
 
     if (!error && r && r.obtenu === false) {
       await confirmDialog({
@@ -24670,7 +24685,10 @@ window.openEditProcedure = async function(procId, mode) {
     /* ⚠ UNE ERREUR RESEAU N'EMPECHE PAS DE TRAVAILLER. Bloquer l'edition parce
        que le verrou n'a pas pu etre pose ferait plus de mal que le risque
        qu'il ecarte. */
-  } catch {}
+  } catch (e) {
+    console.error('[verrou] appel impossible :', e)
+    toast('Verrou : ' + (e?.message || 'appel impossible'))
+  }
 
   pileEdition = []
   editProcedureId = procId

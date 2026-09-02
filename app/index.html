@@ -3961,7 +3961,22 @@
 
         <div id="signup-gestion-field">
           <label class="f">Nom de l'entreprise</label>
-          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;" autocomplete="organization">
+          <!-- ⚠ PAS D'EXEMPLE, UNE PRECISION.
+
+               « Ex : Le Petit Bistrot » designait un metier. Mais le remplacer
+               par un autre exemple — « Ex : Garage Martin » — ne resoudrait
+               rien : on aurait juste change de secteur, et neuf entreprises sur
+               dix ne s'y reconnaitraient toujours pas.
+
+               ⚠ CE QU'APPLE FAIT DANS CE CAS : il n'invente pas de nom propre.
+                 Sur ses champs de nom, il n'y a pas d'exemple ; sur ceux ou une
+                 hesitation est possible, il met une precision.
+
+               Et il y a une vraie hesitation ici : faut-il ecrire la raison
+               sociale — « SARL Dupont & Fils » — ou le nom qu'on emploie tous
+               les jours ? La phrase repond a la question au lieu de proposer un
+               modele a copier. -->
+            <input type="text" id="signup-entreprise-nom" placeholder="Le nom que verra votre équipe" style="margin-bottom:16px;" autocomplete="organization">
         </div>
         <div id="signup-equipe-field" style="display:none;">
           <label class="f">Code de l'entreprise (6 caractères)</label>

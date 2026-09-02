@@ -14717,3 +14717,12 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
   padding-left:14px; padding-right:14px;
   white-space:nowrap;
 }
+
+
+/* ⚠ LA CONTRAINTE, A COTE DU LIBELLE. Plus petite et plus claire que lui :
+   elle precise, elle ne nomme pas le champ. */
+.f .f-note{
+  margin-left:6px;
+  font-size:11.5px; font-weight:400;
+  color:var(--label-3); letter-spacing:-0.005em;
+}

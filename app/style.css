@@ -14674,7 +14674,20 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
 
    ⚠ ET `margin:auto` POUR LE CENTRER. Sans elle, un segment plus etroit que la
      page se collerait a gauche. */
+/* ⚠ UNE GRILLE DE DEUX COLONNES EGALES, PAS UN `flex`.
+
+   En `flex`, deux exigences se contredisent : « meme largeur » et « assez
+   large pour le contenu ». `flex:1 1 0` egalise mais coupe le texte ;
+   `min-width:max-content` protege le texte mais casse l'egalite — mesure a
+   90 px contre 126.
+
+   ⚠ `grid-template-columns: repeat(2, 1fr)` COMBINE LES DEUX. Avec
+     `width:max-content` sur la piste, la grille se dimensionne sur son contenu,
+     puis partage ce total en deux parts strictement egales. Le plus large des
+     deux impose la mesure, l'autre s'aligne dessus. */
 #abo-rythme{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
   width:max-content;
   max-width:100%;
   margin:0 auto 18px;
@@ -14684,9 +14697,23 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
    touchait presque l'offre qu'il commande, et l'on ne savait plus s'il en
    faisait partie. Dix-huit pixels les separent, comme les cartes entre elles. */
 
-/* Les deux onglets ne s'etirent plus a parts egales — ils prennent la place de
-   leur texte, plus un rembourrage. */
+/* ⚠ LES DEUX ONGLETS FONT LA MEME LARGEUR, ET C'EST L'ETIQUETTE QUI L'IMPOSE.
+
+   Mesure avant correction : « Mensuel » 102 px, « Annuel −20 % » 138 px. Le
+   segment paraissait de travers — la pastille changeait de taille en glissant,
+   et le point de bascule tombait a 43 % de la piste au lieu de la moitie.
+
+   ⚠ `flex:1 1 0` PLUTOT QUE `flex:0 0 auto`. Le premier partage la piste en
+     deux parts egales quel que soit le contenu ; le second laisse chaque
+     onglet prendre la place de son texte, et l'etiquette de remise gonflait le
+     sien.
+
+   ⚠ ET LA PISTE GARDE UNE LARGEUR AU CONTENU. Elle se dimensionne sur le plus
+     large des deux — celui qui porte l'etiquette — puis les deux se partagent
+     ce total. Le segment reste donc compact sans etre desequilibre. */
+/* ⚠ PLUS DE `flex` SUR LES ONGLETS : c'est la grille qui repartit. `white-space`
+   les garde sur une ligne — l'etiquette de remise passait sous le mot. */
 #abo-rythme .p-seg{
-  flex:0 0 auto;
-  padding-left:20px; padding-right:20px;
+  padding-left:14px; padding-right:14px;
+  white-space:nowrap;
 }

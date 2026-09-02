@@ -14250,9 +14250,9 @@ body:not(.en-apercu) #voir-equipe.revient{
   max-width:76%;
   padding:11px 13px;
   border-radius:20px;
-  background:var(--bg-card);
-  box-shadow:0 1px 2px rgba(20,20,30,0.05),
-             0 14px 30px -16px rgba(20,20,30,0.30);
+  /* ⚠ NI FOND NI OMBRE ICI. `.glassDiv` les pose, et une declaration
+     posterieure les remplacerait au lieu de s'y ajouter — c'est ce qui
+     arrivait : la pastille portait l'ombre d'une carte, pas celle du verre. */
 }
 .scene-pastille .sp-ic{
   flex:0 0 36px; width:36px; height:36px; border-radius:12px;
@@ -14435,21 +14435,12 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
 #login-screen .creer-carte .cc-ic svg{ width:24px; height:24px; }
 
 
-/* ⚠ LA PASTILLE PREND LE LISERE DES CARTES DE CREATION.
+/* ⚠ LA SURCHARGE D'OMBRE A ETE RETIREE.
 
-   Elle avait deja leur fond et leur rayon, mais pas leur contour : une ombre
-   portee seule, sans le trait clair qui dessine l'arete. Posee sur une photo,
-   elle paraissait flotter ; posee a cote des deux cartes du bas, elle n'etait
-   pas de la meme famille.
+   Elle donnait a la pastille le lisere des cartes de creation. Mais la matiere
+   demandee est celle de la BARRE, qui porte deja son propre lisere par
+   `.glassDiv` — celui-ci le remplacait au lieu de le laisser. */
 
-   ⚠ L'OMBRE PORTEE RESTE PLUS MARQUEE. Les cartes reposent sur le fond de la
-     page, cette pastille sur une photo : sans un peu plus de profondeur, elle
-     se confondrait avec l'image. */
-#login-screen .scene-pastille{
-  box-shadow:inset 0 0 0 0.5px rgba(28,28,38,0.10),
-             0 1px 2px rgba(20,20,30,0.05),
-             0 14px 30px -16px rgba(20,20,30,0.30);
-}
 
 
 /* ═══ LA FEUILLE DE CONNEXION RESPIRE UN PEU PLUS ═══
@@ -14497,8 +14488,20 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
      seule, elle se jouerait des l'affichage de l'ecran, donc avant les
      images. */
 #login-screen .login-card{ opacity:0; }
+
+/* ⚠ `appShellIn`, PAS `ecranEntre`.
+
+   `ecranEntre` est l'entree d'une PAGE a l'interieur de l'app : 12 px de
+   montee, un souffle de flou. C'est un changement d'ecran, pas une ouverture.
+
+   `appShellIn` est l'entree de l'APP elle-meme — celle qu'on voit quand
+   l'espace Gestion parait pour la premiere fois. Elle grandit depuis 97,5 %
+   sur 0,65 s, deux fois plus lentement, sans montee ni flou.
+
+   « Bienvenue » est le premier ecran qu'on voit en ouvrant Standix : c'est la
+   seconde animation qui lui revient. */
 #login-screen .login-card.prete{
-  animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1) both;
+  animation:appShellIn 0.65s cubic-bezier(0.22,1,0.36,1) both;
 }
 
 /* ⚠ ET LE VOILE SOMBRE DISPARAIT. Il assombrissait ce qu'il y avait derriere
@@ -14557,20 +14560,14 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
    ⚠ `--glass-radius` EST REDEFINI. `.glassDiv` le lit pour son rayon, et sa
      valeur par defaut vaut la moitie de la hauteur de la barre — 32 px, bien
      trop rond pour une pastille de 60 px de haut. */
-/* ⚠ LE VERRE EST PLUS EPAIS ICI : 0,62 AU LIEU DE 0,32.
+/* ⚠ EXACTEMENT LA MATIERE DE LA BARRE, SANS AUCUN ECART.
 
-   C'est le meme verre, la meme teinte, le meme flou — seule l'epaisseur
-   change, et pour une raison mesuree.
+   J'avais epaissi le verre a 62 % et pose une ombre plus marquee, pour la
+   lisibilite du texte sur la photo. C'etait s'ecarter de la matiere demandee.
 
-   Le volet du menu s'ouvre sur le fond clair de l'app ; cette pastille se pose
-   sur une PHOTO, qui change toutes les cinq secondes. A 0,32, le contraste du
-   texte tombait a 5,33 sur la scene d'entrepot — au-dessus du seuil de 4,5,
-   mais de peu, et une photo plus sombre passerait dessous.
-
-   A 0,62, l'image reste devinee derriere — le verre fait son effet — et le
-   texte tient quelle que soit la scene. */
+   La pastille ne garde donc que `.glassDiv` : meme teinte a 32 %, meme flou,
+   meme ombre, meme arete. Seul le rayon est redefini — la barre calcule le
+   sien sur sa hauteur, ce qui donnerait 32 px pour une pastille de 60. */
 #login-screen .scene-pastille{
-  background-color:rgba(var(--tint-color), 0.62);
   --glass-radius:20px;
-  box-shadow:0 14px 30px -16px rgba(20,20,30,0.30);
 }

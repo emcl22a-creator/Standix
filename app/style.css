@@ -15194,81 +15194,59 @@ body:has(#login-screen[style*="display:flex"]) #voir-equipe{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE RETOURNEMENT VERS L'APERCU EQUIPE
+   LE PASSAGE VERS L'APERCU EQUIPE
 
-   Le meme contenu, vu de l'autre cote. L'ecran pivote sur son axe vertical
-   comme une carte qu'on retourne : la gestion part de profil, l'espace equipe
-   arrive par l'autre face.
+   ⚠ LE RETOURNEMENT 3D A ETE RETIRE. Il pivotait l'ecran entier sur son axe
+     vertical — spectaculaire, mais etranger au reste de l'app : aucun autre
+     passage ne fait ca, et sur un geste qu'on repete il fatigue.
 
-   ⚠ LA PERSPECTIVE EST SUR LE PARENT, PAS SUR LA FACE. Posee sur l'element qui
-     tourne, chaque face aurait son propre point de fuite et le pivot
-     paraitrait plat — un simple ecrasement horizontal au lieu d'un volume.
+     On reprend `appShellIn`, l'entree de l'app elle-meme : le meme grandissement
+     depuis 97,5 % qu'a l'ouverture de l'espace Gestion. Un espace qui parait,
+     comme les autres.
 
-   ⚠ ET LES DEUX FACES SONT SUPERPOSEES le temps du geste. Sans cela, la
-     seconde attend que la premiere ait fini de disparaitre : on verrait un
-     trou blanc au milieu du retournement.
-   ═══════════════════════════════════════════════════════════════════════════ */
-body.retourne-vers, body.retourne-depuis{
-  perspective:1400px;
-  /* ⚠ ON BLOQUE LE DEFILEMENT LE TEMPS DU GESTE. Un ecran qui tourne pendant
-     qu'on le fait glisser donne le mal de mer. */
-  overflow:hidden;
-}
+   ⚠ ET LA BARRE NE BOUGE PAS. Elle reste posee par-dessus, hors de l'element
+     qui grandit : c'est ce qui dit qu'on n'a pas quitte la gestion. */
+/* ⚠ LES DEUX ESPACES SONT SUPERPOSES LE TEMPS DU PASSAGE.
 
-body.retourne-vers #gestion-app,
-body.retourne-vers #equipe-app,
-body.retourne-depuis #gestion-app,
-body.retourne-depuis #equipe-app{
+   Ils sont freres dans le flux : affiches ensemble sans cette regle, le second
+   se poserait SOUS le premier et la page ferait le double de haut, avec un
+   sursaut de defilement au milieu du geste.
+
+   ⚠ ET LE DEFILEMENT EST BLOQUE. Faire glisser un ecran qui grandit donne un
+     mouvement contradictoire. */
+body.retourne-vers, body.retourne-depuis{ overflow:hidden; }
+
+body.retourne-vers #gestion-app, body.retourne-vers #equipe-app,
+body.retourne-depuis #gestion-app, body.retourne-depuis #equipe-app{
   position:fixed; inset:0;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  transform-origin:50% 50%;
   overflow:hidden;
   z-index:5;
 }
 
-/* ─── ALLER : la gestion part, l'equipe arrive ─────────────────────────── */
-body.retourne-vers #gestion-app{
-  animation:faceSort 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-body.retourne-vers #equipe-app{
-  animation:faceEntre 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-/* ─── RETOUR : l'inverse, dans l'autre sens ────────────────────────────── */
-body.retourne-depuis #equipe-app{
-  animation:faceSortInv 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
+body.retourne-vers #equipe-app,
 body.retourne-depuis #gestion-app{
-  animation:faceEntreInv 0.55s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation:appShellIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  /* ⚠ CELUI QUI ARRIVE PASSE DEVANT. Sans cela, l'ordre du balisage decide —
+     et la gestion, ecrite en premier, resterait au-dessus. */
+  z-index:6;
 }
 
-/* ⚠ LA FACE QUI PART S'ARRETE A 90°, celle qui arrive DEMARRE a −90°. Elles se
-   croisent donc exactement a mi-parcours, quand aucune des deux n'est visible
-   de face — c'est ce croisement qui fait croire a un seul objet. */
-@keyframes faceSort{
-  0%  { transform:rotateY(0deg);   }
-  100%{ transform:rotateY(-90deg); }
-}
-@keyframes faceEntre{
-  0%  { transform:rotateY(90deg);  }
-  100%{ transform:rotateY(0deg);   }
-}
-@keyframes faceSortInv{
-  0%  { transform:rotateY(0deg);   }
-  100%{ transform:rotateY(90deg);  }
-}
-@keyframes faceEntreInv{
-  0%  { transform:rotateY(-90deg); }
-  100%{ transform:rotateY(0deg);   }
+/* ⚠ LA FACE QUI PART S'EFFACE SIMPLEMENT. La laisser en place derriere celle
+   qui grandit la ferait transparaitre par les bords pendant les premieres
+   images — l'espace equipe n'occupe que 97,5 % au depart. */
+body.retourne-vers #gestion-app,
+body.retourne-depuis #equipe-app{
+  animation:espaceSort 0.22s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
-/* ⚠ RESPECT DU REGLAGE SYSTEME. Un retournement de plein ecran est exactement
-   le genre de mouvement qui gene les personnes sensibles au vertige. */
+@keyframes espaceSort{
+  from{ opacity:1; }
+  to  { opacity:0; }
+}
+
 @media (prefers-reduced-motion: reduce){
-  body.retourne-vers #gestion-app, body.retourne-vers #equipe-app,
-  body.retourne-depuis #gestion-app, body.retourne-depuis #equipe-app{
+  body.retourne-vers #equipe-app, body.retourne-depuis #gestion-app,
+  body.retourne-vers #gestion-app, body.retourne-depuis #equipe-app{
     animation:none;
   }
-  body.retourne-vers, body.retourne-depuis{ perspective:none; }
 }

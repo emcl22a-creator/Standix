@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=41023392">
+<link rel="stylesheet" href="style.css?v=788ab596">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -913,7 +913,10 @@
 
            Elle ne bouge pas avec les scenes : ce qu'elle montre est vrai des
            deux cotes, au bureau comme a l'entrepot. -->
-      <div class="scene-pastille">
+      <!-- ⚠ `glassDiv` LUI DONNE LA MATIERE DU VOLET DU MENU : verre translucide,
+             flou d'arriere-plan, arete claire. Une classe partagee plutot que des
+             valeurs recopiees — le jour ou le verre change, elle suit. -->
+        <div class="scene-pastille glassDiv">
         <span class="sp-ic">
           <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal0)" stroke-width="1.9"
                stroke-linecap="round" stroke-linejoin="round">
@@ -4027,7 +4030,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=b452834a"></script>
+<script type="module" src="app.js?v=cdd671d2"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

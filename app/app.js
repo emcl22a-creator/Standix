@@ -1284,6 +1284,35 @@ document.getElementById('voir-equipe')?.addEventListener('click', () => {
      logo au demarrage et sert de fond a la feuille de connexion — la retirer
      demanderait de defaire ces deux mecanismes, pour rien.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ LA PAGE NE PARAIT QUE PRETE ═══
+
+   ⚠ ELLE S'AFFICHAIT AVANT SES IMAGES. La carte montait, puis la photo se
+     posait une demi-seconde plus tard dans son cadre reste gris. Deux entrees
+     au lieu d'une, et la seconde qu'on n'a pas demandee.
+
+   ⚠ `decode()` PLUTOT QUE `load`. `load` se declenche des que les octets sont
+     recus ; l'image doit encore etre decompressee, ce qui prend le temps d'une
+     ou deux images a l'ecran sur un telephone. `decode()` ne rend la main que
+     lorsqu'elle est prete a etre peinte, sans la moindre saccade.
+
+   ⚠ ET UN DELAI DE SECURITE. Si une image manque — 404, reseau coupe — la
+     promesse ne se resout jamais et la page resterait vide pour toujours. Au
+     bout d'une seconde et demie, on affiche quoi qu'il arrive : mieux vaut un
+     cadre vide qu'un ecran mort. */
+function attendreScenes() {
+  const images = [...document.querySelectorAll('#scenes .scene')]
+  if (!images.length) return Promise.resolve()
+
+  const pretes = Promise.all(images.map(im => {
+    /* Une image deja en cache est prete tout de suite. */
+    if (im.complete && im.naturalWidth > 0) return Promise.resolve()
+    return im.decode().catch(() => {})   // une image cassee ne bloque pas les autres
+  }))
+
+  const secours = new Promise(r => setTimeout(r, 1500))
+  return Promise.race([pretes, secours])
+}
+
 window.ouvrirBienvenue = function () {
   const cible = document.getElementById('login-screen')
   if (!cible) return
@@ -1304,7 +1333,17 @@ window.ouvrirBienvenue = function () {
   switchAuthTab('login')
   const err = document.getElementById('login-error')
   if (err) err.textContent = ''
-  demarrerScenes()
+
+  /* ⚠ TOUT PARAIT ENSEMBLE. La classe est retiree le temps du chargement : la
+     carte existe, occupe sa place, mais reste invisible. On la remet quand les
+     images sont pretes, et l'animation d'entree joue a ce moment-la — une
+     seule fois, pour l'ensemble. */
+  const carte = cible.querySelector('.login-card')
+  carte?.classList.remove('prete')
+  attendreScenes().then(() => {
+    carte?.classList.add('prete')
+    demarrerScenes()
+  })
 }
 
 window.chooseSpace = function(space) {

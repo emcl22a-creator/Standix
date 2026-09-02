@@ -15489,3 +15489,174 @@ body.espace-vide .screen.active{ animation:none !important; }
    Leurs regles restent en place mais ne s'appliquent a aucun element. Je les
    laisse plutot que de les supprimer — ce commentaire est la pour qu'on sache
    pourquoi elles ne servent a rien, si quelqu'un les croise. */
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ESSAI GRATUIT : UNE PLAQUE, UN TITRE, UN DEPLIANT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.alerte-essai .ess-haut{
+  display:flex; align-items:flex-start; gap:14px;
+}
+
+/* ═══ LA PLAQUE METALLIQUE ═══
+
+   ⚠ TROIS COUCHES, PAS UNE IMAGE.
+
+     · le fond : un degrade oblique qui va du clair au sombre, comme une
+       surface qui recoit la lumiere d'en haut a gauche ;
+     · `::before` : un liseré clair sur le bord, obtenu par un degrade masque
+       en `xor` — la meme technique que les cartes de l'app ;
+     · `::after` : un reflet oblique, plus clair au tiers superieur.
+
+   ⚠ ET LE RELIEF VIENT DE L'OMBRE INTERIEURE. Une ombre portee ferait flotter
+     la plaque au-dessus du fond ; une ombre INTERNE la creuse, ce qui se lit
+     comme du metal grave. */
+.alerte-essai .ess-plaque{
+  position:relative;
+  flex:0 0 58px; width:58px; height:58px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border-radius:16px;
+  background:linear-gradient(145deg, #F2F1EF 0%, #D9D7D3 42%, #B9B6B0 100%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,0.85),
+             inset 0 -1px 2px rgba(20,20,30,0.20),
+             0 2px 6px -3px rgba(20,20,30,0.35);
+  overflow:hidden;
+}
+
+.alerte-essai .ess-plaque::before{
+  content:''; position:absolute; inset:0;
+  border-radius:inherit;
+  padding:0.6px;
+  background:linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.10) 46%, rgba(20,20,30,0.18));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  pointer-events:none;
+}
+
+/* ⚠ LE REFLET S'ARRETE AU TIERS. Traverser toute la plaque donnerait une
+   bande, pas une lumiere. */
+.alerte-essai .ess-plaque::after{
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(118deg,
+    rgba(255,255,255,0) 18%,
+    rgba(255,255,255,0.55) 33%,
+    rgba(255,255,255,0) 46%);
+  pointer-events:none;
+}
+
+.alerte-essai .ess-n{
+  position:relative; z-index:1;
+  font-size:22px; font-weight:800; line-height:1;
+  letter-spacing:-0.03em;
+  color:#3A3A42;
+  text-shadow:0 1px 0 rgba(255,255,255,0.7);
+}
+.alerte-essai .ess-u{
+  position:relative; z-index:1;
+  margin-top:2px;
+  font-size:8px; font-weight:650; line-height:1.15;
+  letter-spacing:0.02em; text-align:center;
+  color:#6B6B74;
+  text-shadow:0 1px 0 rgba(255,255,255,0.6);
+}
+
+/* ═══ LE TEXTE ═══ */
+.alerte-essai .ess-tx{
+  flex:1; min-width:0;
+  display:flex; flex-direction:column; gap:3px;
+  padding-top:2px;
+}
+.alerte-essai .ess-tx b{
+  font-size:14.5px; font-weight:650; letter-spacing:-0.025em;
+  color:var(--label);
+}
+.alerte-essai .ess-tx i{
+  font-style:normal;
+  font-size:12.5px; line-height:1.45; letter-spacing:-0.005em;
+  color:var(--label-2);
+}
+.alerte-essai .ess-tx i b{ font-size:inherit; font-weight:650; color:var(--label); }
+
+/* ═══ LE BOUTON « Details » ═══
+
+   ⚠ DISCRET, MAIS PAS CACHE. Il ouvre une explication qu'on ne lit qu'une
+     fois : il ne doit pas rivaliser avec le titre. */
+.alerte-essai .ess-plus{
+  flex-shrink:0;
+  padding:5px 10px;
+  border:none; border-radius:100px;
+  background:rgba(118,118,128,0.12);
+  font-family:inherit; font-size:11.5px; font-weight:600;
+  letter-spacing:-0.01em; color:var(--label-2);
+}
+.alerte-essai .ess-plus:active{ transform:scale(0.94); }
+
+/* ═══ LE DEPLIANT ═══ */
+.alerte-essai .ess-details{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:0.5px solid rgba(28,28,38,0.10);
+  display:flex; flex-direction:column; gap:9px;
+}
+.alerte-essai .ess-details[hidden]{ display:none; }
+
+.alerte-essai .ess-p{
+  display:flex; align-items:flex-start; gap:9px;
+  font-size:12.5px; line-height:1.45; letter-spacing:-0.005em;
+  color:var(--label-2);
+}
+/* ⚠ UNE PASTILLE, PAS UNE PUCE DE LISTE. Les puces natives s'alignent mal avec
+   un texte sur deux lignes et n'acceptent pas de couleur propre. */
+.alerte-essai .ess-p .pt{
+  flex-shrink:0;
+  width:5px; height:5px; margin-top:7px;
+  border-radius:100px;
+  background:linear-gradient(135deg,#FFAE2E,#E8760F);
+}
+.alerte-essai .ess-p b{ font-weight:650; color:var(--label); }
+
+
+/* ⚠ LE BOUTON NE DOIT PAS ETRANGLER LE TITRE.
+
+   Mesure a l'ecran : « Essai 14 jours gratuits » passait sur deux lignes et la
+   phrase du dessous sur trois, parce que « Details » prenait 90 px sur les 342
+   disponibles. Un libelle plus court et un rembourrage resserre lui rendent
+   quarante pixels. */
+.alerte-essai .ess-plus{
+  padding:4px 9px;
+  font-size:11px;
+}
+
+/* ⚠ ET LA PLAQUE PASSE DE 58 A 54 PX. Quatre pixels de moins qui vont au
+   texte ; le chiffre reste lisible, c'est lui qu'on regarde. */
+.alerte-essai .ess-plaque{
+  flex:0 0 54px; width:54px; height:54px;
+}
+.alerte-essai .ess-n{ font-size:21px; }
+.alerte-essai .ess-u{ font-size:8.5px; }
+
+.alerte-essai .ess-haut{ gap:12px; }
+
+
+/* ⚠ LE BOUTON SORT DU FLUX.
+
+   Pose entre le texte et le bord, il volait 80 px de largeur au titre :
+   « Essai 14 jours gratuits » passait sur deux lignes et la phrase du dessous
+   sur trois. Mesure a l'ecran.
+
+   En `absolute`, il flotte en haut a droite sans rien pousser. Le texte
+   recupere toute la largeur, et l'on reserve juste une marge a droite de la
+   premiere ligne pour qu'ils ne se chevauchent pas. */
+.alerte-essai{ position:relative; }
+
+.alerte-essai .ess-plus{
+  position:absolute;
+  top:14px; right:14px;
+  z-index:2;
+}
+
+/* ⚠ SEUL LE TITRE S'ECARTE, PAS LA PHRASE. Le bouton est haut : la phrase du
+   dessous passe sous lui sans le toucher, et lui imposer la meme marge la
+   couperait pour rien. */
+.alerte-essai .ess-tx b{ padding-right:74px; }

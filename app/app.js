@@ -2711,6 +2711,11 @@ async function enterApp(membre) {
     /* Les données, une fois la charpente à l'écran. On n'attend plus AVANT
        d'afficher — on remplit APRÈS. */
     await loadGestionProcedures()
+
+    /* ⚠ ON BRANCHE L'ECOUTE UNE FOIS LA LISTE CHARGEE. Avant, elle pourrait
+       demander un rechargement d'une liste qui n'existe pas encore. */
+    ecouterProcedures()
+
     revelerApp()
     desarmerSurveillance()
     window.mesurerFluidite?.()
@@ -2732,6 +2737,11 @@ async function enterApp(membre) {
   } else {
     showEquipeScreen('e-list')
     await loadEquipeProcedures()
+
+    /* Meme chose cote equipe : une procedure publiee par la gestion doit
+       apparaitre sans qu'on ait a recharger. */
+    ecouterProcedures()
+
     await fermerBienvenue()
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('equipe-app')
@@ -3354,6 +3364,13 @@ document.querySelectorAll('.plan-card').forEach(card => {
 /* La déconnexion est appelée depuis les deux espaces : elle doit exister sur
    `window`, sinon le bouton de l'espace équipe reste muet. */
 window.signOut = async function() {
+  /* ⚠ ON COUPE L'ECOUTE AVANT DE FERMER LA SESSION.
+
+     Le canal est filtre sur l'entreprise du compte ; laisse ouvert, il
+     continuerait d'ecouter une entreprise a laquelle on n'a plus acces — et le
+     prochain compte connecte sur cet appareil recevrait ses evenements. */
+  couperEcouteProcedures()
+
   await supabase.auth.signOut()
   currentMembre = null
   // On revient sur les écrans d'accueil des deux espaces, sinon le prochain
@@ -7001,6 +7018,76 @@ function memeGrille(a, b) {
       p.etapes?.[0]?.count ?? ''].join('|')).join('~')
   return a.map(cle).join('\u00a7') === b.map(cle).join('\u00a7')
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES LISTES SE METTENT A JOUR TOUTES SEULES
+
+   ⚠ LE PROBLEME : RIEN NE RAFRAICHISSAIT LA LISTE.
+
+     Plusieurs personnes ont acces a l'espace Gestion. Quand l'une lance une
+     analyse, les autres voient la procedure en base — mais leur liste, chargee
+     une fois a l'ouverture, ne bouge plus. La roue de chargement reste figee,
+     et une procedure publiee ou supprimee n'apparait qu'au rechargement.
+
+     Le meme defaut touche le cas simple : deux onglets sur le meme compte.
+
+   ⚠ SUPABASE PREVIENT QUAND LA TABLE CHANGE. On s'abonne aux modifications de
+     `procedures`, filtrees sur l'entreprise en cours : inutile d'ecouter celles
+     des autres, et le filtre s'applique cote serveur.
+
+   ⚠ ON FERME EN ARRIERE-PLAN. Une connexion ouverte consomme de la batterie
+     pour rien quand l'app n'est pas regardee ; on la rouvre au retour.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let canalProcedures = null
+
+function ecouterProcedures() {
+  if (canalProcedures) return                       // deja branche
+  const ent = currentMembre?.entreprise_id
+  if (!ent) return
+
+  canalProcedures = supabase
+    .channel('procedures-' + ent)
+    .on('postgres_changes', {
+      event: '*',                                   // creation, modification, suppression
+      schema: 'public',
+      table: 'procedures',
+      filter: `entreprise_id=eq.${ent}`,
+    }, () => {
+      /* ⚠ ON RECHARGE, ON N'APPLIQUE PAS LE CHANGEMENT RECU.
+
+         L'evenement porte la ligne modifiee, mais les listes ont besoin des
+         etapes et des validations qui vont avec — les recalculer a la main
+         dupliquerait ce que font deja les deux fonctions de chargement.
+
+       ⚠ ET ON ATTEND UN PEU. Une analyse ecrit plusieurs fois de suite : le
+         statut, puis les etapes, puis la date. Sans ce delai, on rechargerait
+         trois fois en deux secondes. */
+      clearTimeout(canalProcedures._minuteur)
+      canalProcedures._minuteur = setTimeout(() => {
+        if (document.hidden) return                 // inutile si personne ne regarde
+        if (currentMembre?.role === 'gestion') loadGestionProcedures?.().catch(() => {})
+        else loadEquipeProcedures?.().catch(() => {})
+      }, 700)
+    })
+    .subscribe()
+}
+
+function couperEcouteProcedures() {
+  if (!canalProcedures) return
+  clearTimeout(canalProcedures._minuteur)
+  supabase.removeChannel(canalProcedures)
+  canalProcedures = null
+}
+
+/* ⚠ L'ECOUTE SUIT L'ETAT DE L'ONGLET. On la coupe en arriere-plan et on la
+   reprend au retour — avec un rechargement, car les changements survenus
+   pendant l'absence n'ont ete annonces a personne. */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { couperEcouteProcedures(); return }
+  ecouterProcedures()
+  if (currentMembre?.role === 'gestion') loadGestionProcedures?.().catch(() => {})
+  else if (currentMembre) loadEquipeProcedures?.().catch(() => {})
+})
 
 async function loadGestionProcedures() {
   // L'en-tête a été retiré de la page : ces deux repères peuvent être absents.

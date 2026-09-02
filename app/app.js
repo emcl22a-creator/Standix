@@ -1645,7 +1645,10 @@ function demarrerScenes() {
     images[i].classList.remove('visible')
     i = (i + 1) % images.length
     images[i].classList.add('visible')
-  }, 5000)
+  /* ⚠ SEPT SECONDES, PAS CINQ. Le fondu en prend maintenant 1,6 : a cinq
+     secondes d'intervalle, l'image restait nette a peine trois secondes avant
+     de repartir. Sept laissent le temps de la regarder. */
+  }, 7000)
 }
 
 function arreterScenes() {

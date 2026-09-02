@@ -14487,7 +14487,17 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
    ⚠ C'EST EXACTEMENT `ecranEntre` : 12 px de montee, un souffle de flou, meme
      duree, meme courbe. Recopier les valeurs plutot que nommer l'animation les
      aurait laissees diverger a la premiere retouche. */
-#login-screen .login-card{
+/* ⚠ LA CARTE EST INVISIBLE TANT QU'ELLE N'EST PAS `prete`.
+
+   `opacity:0` plutot que `display:none` : elle occupe deja sa place et ses
+   images se chargent. Retiree du flux, rien ne se chargerait avant de
+   l'afficher — et l'on retomberait sur ce qu'on cherche a eviter.
+
+   ⚠ L'ANIMATION EST PORTEE PAR LA CLASSE, pas par la carte. Posee sur la carte
+     seule, elle se jouerait des l'affichage de l'ecran, donc avant les
+     images. */
+#login-screen .login-card{ opacity:0; }
+#login-screen .login-card.prete{
   animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1) both;
 }
 

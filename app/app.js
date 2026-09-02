@@ -7629,51 +7629,127 @@ function remplirHistoMouvements() {
    ⚠ ELLE N'EST PAS GROUPEE PAR JOUR, contrairement aux deux autres. Un
      classement n'a pas de chronologie : c'est un ordre, pas une suite. On
      reutilise donc la ligne, pas `peindreHisto`. */
+/* ═══ LE SEGMENT DE PERIODE DE LA FEUILLE EQUIPE ═══
+
+   ⚠ IL PARTAGE `anJours` AVEC CELUI DE LA PAGE. Une seconde variable aurait
+     laisse les deux diverger : on aurait lu « 30 jours » dans la feuille et
+     « 7 jours » derriere, sans savoir lequel dit vrai.
+
+   ⚠ ET IL REPREND LE MEME GESTE : pastille qui glisse, flou sur la liste. Les
+     quatre lignes de deplacement sont celles du segment d'analyse, au nom de
+     l'element pres. */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('#eq-segm .p-seg')
+  if (!b || b.classList.contains('on')) return
+
+  b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
+  b.classList.add('on')
+  anJours = Number(b.dataset.eqJours) || 7
+
+  const lens = document.getElementById('eq-segm-lens')
+  if (lens) {
+    const p = b.parentElement.getBoundingClientRect(), r = b.getBoundingClientRect()
+    if (r.width) {
+      lens.style.width = r.width + 'px'
+      lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+    }
+  }
+
+  /* ⚠ LA PAGE DERRIERE SUIT AUSSI. On ferme la feuille sur une periode, la
+     page doit l'avoir adoptee — sinon le graphique contredit ce qu'on vient de
+     lire. */
+  document.querySelectorAll('#an-segm .p-seg').forEach(x =>
+    x.classList.toggle('on', Number(x.dataset.jours) === anJours))
+  const lensPage = document.getElementById('an-segm-lens')
+  const actifPage = document.querySelector('#an-segm .p-seg.on')
+  if (lensPage && actifPage) {
+    const p = actifPage.parentElement.getBoundingClientRect()
+    const r = actifPage.getBoundingClientRect()
+    if (r.width) {
+      lensPage.style.width = r.width + 'px'
+      lensPage.style.transform = `translateX(${r.left - p.left - 3}px)`
+    }
+  }
+
+  const zone = document.getElementById('histo-equipe-liste')
+  const note = document.getElementById('histo-equipe-note')
+  const morceaux = [zone, note].filter(Boolean)
+
+  if (MOINS_ANIM()) { remplirHistoEquipe(); peindreAnalyse?.(); return }
+
+  morceaux.forEach(flouSortie)
+  setTimeout(() => {
+    remplirHistoEquipe()
+    peindreAnalyse?.()
+    morceaux.forEach(flouEntree)
+  }, 130)
+})
+
 function remplirHistoEquipe() {
   const zone = document.getElementById('histo-equipe-liste')
   const note = document.getElementById('histo-equipe-note')
   if (!zone) return
   if (note) note.textContent = `Temps passé à lire, sur ${anJours} jours.`
 
-  /* ⚠ ON PART DES MEMBRES, PAS DES LECTURES.
-
-     La liste se construisait a partir des validations : un membre qui n'avait
-     rien lu n'apparaissait nulle part. C'est exactement l'inverse de ce qu'on
-     vient chercher ici — savoir qui lit, c'est aussi savoir qui ne lit pas.
-
-     ⚠ L'ESPACE EQUIPE SEULEMENT. La note du graphique l'annonce deja : « seuls
-       les membres de l'espace Equipe sont comptes ». La gestion ne consulte pas
-       les procedures pour les appliquer, elle les ecrit. */
   const parMembre = {}
   for (const v of anValidations()) {
     if (!v.membre_id) continue
     parMembre[v.membre_id] = (parMembre[v.membre_id] || 0) + Number(v.duree_lecture || 0)
   }
 
-  const rangs = (cachedMembres || [])
-    .filter(m => m.role === 'equipe')
+  /* ═══ LES DEUX ESPACES, SEPARES ═══
+
+     ⚠ LA GESTION LIT AUSSI. Je n'affichais que l'espace Equipe, en me disant
+       qu'un gestionnaire ecrit les procedures plutot que de les lire. C'est
+       faux dans les faits : il les relit pour les verifier, et depuis
+       l'apercu equipe il les consulte comme tout le monde. Son temps existe,
+       il n'etait simplement pas montre.
+
+     ⚠ SEPARES, PAS MELANGES. Un classement unique mettrait le gerant en tete
+       — il ouvre l'app tous les jours — et l'on ne verrait plus qui, dans
+       l'equipe, lit ou ne lit pas. C'est pourtant la seule question que cette
+       feuille sert a poser.
+
+     ⚠ L'EQUIPE EN PREMIER. C'est elle qu'on vient voir ; la gestion est le
+       complement. */
+  const parRole = (role) => (cachedMembres || [])
+    .filter(m => m.role === role)
     .map(m => ({ m, sec: parMembre[m.id] || 0 }))
-    /* ⚠ A EGALITE, ON CLASSE PAR NOM. Sans second critere, tous ceux a zero
-       s'ordonnent au hasard du chargement et changent de place a chaque
-       ouverture — on croit que la liste bouge alors que rien n'a change. */
+    /* A egalite, on classe par nom : sans second critere, tous ceux a zero
+       changent de place a chaque ouverture. */
     .sort((a, b) => b.sec - a.sec ||
       (a.m.nom || '').localeCompare(b.m.nom || '', 'fr'))
 
-  if (!rangs.length) {
-    zone.innerHTML = '<div class="histo-rien">Personne dans l’espace Équipe pour le moment.</div>'
+  const equipe = parRole('equipe')
+  const gestion = parRole('gestion')
+
+  if (!equipe.length && !gestion.length) {
+    zone.innerHTML = '<div class="histo-rien">Aucun membre pour le moment.</div>'
     return
   }
-  zone.innerHTML = rangs.map(({ m, sec }, r) => `
+
+  /* ⚠ LE TOTAL DE CHAQUE GROUPE EST DIT DANS SON TITRE. Sans lui, on doit
+     additionner de tete pour comparer les deux espaces. */
+  const total = (g) => g.reduce((s, x) => s + x.sec, 0)
+
+  const ligne = ({ m, sec }, r) => `
     <div class="histo-lig">
       <span class="histo-pt" style="background:${pointDossier(r)}"></span>
       <span class="histo-co">
         <span class="histo-t">${escapeHtml(m.nom || 'Sans nom')}</span>
         ${m.poste ? `<span class="histo-s">${escapeHtml(m.poste)}</span>` : ''}
       </span>
-      <!-- ⚠ « Aucune lecture » PLUTOT QUE « 0 min ». Un zero se lit comme une
-           mesure ; la phrase dit ce qui s'est passe, c'est-a-dire rien. -->
       <span class="histo-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : 'Aucune lecture'}</span>
-    </div>`).join('')
+    </div>`
+
+  const section = (titre, groupe) => !groupe.length ? '' : `
+    <div class="histo-groupe">
+      <span class="hg-nom">${titre}</span>
+      <span class="hg-tot">${total(groupe) ? anDureeLisible(total(groupe)) : '—'}</span>
+    </div>` + groupe.map(ligne).join('')
+
+  zone.innerHTML = section('Espace Équipe', equipe) +
+                   section('Espace Gestion', gestion)
 }
 
 function remplirHistoCreations() {

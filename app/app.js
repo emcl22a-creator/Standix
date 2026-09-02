@@ -1192,10 +1192,34 @@ window.ouvrirApercuEquipe = function () {
 
   const app = document.getElementById('gestion-app')
   const eq = document.getElementById('equipe-app')
-  if (app) app.style.display = 'none'
-  if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
 
-  window.majBarreEspace?.('equipe')
+  /* ⚠ LES DEUX FACES SONT AFFICHEES ENSEMBLE le temps du retournement.
+
+     Masquer la gestion tout de suite laisserait un trou blanc a mi-parcours :
+     la face qui part doit rester la jusqu'a ce que l'autre l'ait remplacee.
+
+   ⚠ ET ON MASQUE APRES, PAS AVANT. Les 560 ms couvrent les 550 de
+     l'animation ; dix de marge pour que la derniere image soit peinte. */
+  if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
+  document.body.classList.add('retourne-vers')
+
+  setTimeout(() => {
+    document.body.classList.remove('retourne-vers')
+    if (app) app.style.display = 'none'
+  }, 560)
+
+  /* ⚠ LA BARRE RESTE CELLE DE LA GESTION.
+
+     J'appelais ici `majBarreEspace('equipe')` : la barre passait aux quatre
+     onglets de l'employe — Procedures, QR code, Notifications, Reglages.
+
+     Or on n'a pas change d'espace, on REGARDE celui de l'equipe. Le gerant doit
+     garder sa propre navigation pour en sortir ; avec celle de l'equipe, il se
+     retrouvait devant un scanner de QR et des notifications qui ne le
+     concernent pas.
+
+   ⚠ LE CERCLE SE RETRACTE QUAND MEME : c'est `en-apercu`, posee juste au-dessus,
+     qui declenche la goutte d'eau et l'etirement — pas le changement d'espace. */
   /* ⚠ ON REMARQUE LES ONGLETS APRES AVOIR POSE `en-apercu`. La fonction lit
      cette classe pour decider d'eteindre tout le monde ; appelee avant, elle
      rallumerait celui qu'on vient de quitter. */
@@ -1217,8 +1241,15 @@ function sortirApercuEquipe() {
 
   const app = document.getElementById('gestion-app')
   const eq = document.getElementById('equipe-app')
-  if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
+
+  /* Le meme geste, dans l'autre sens : c'est la meme carte qu'on retourne. */
   if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
+  document.body.classList.add('retourne-depuis')
+
+  setTimeout(() => {
+    document.body.classList.remove('retourne-depuis')
+    if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
+  }, 560)
 
   window.majBarreEspace?.('gestion')
   window.marquerOngletActif?.()
@@ -1234,35 +1265,23 @@ function sortirApercuEquipe() {
 
 window.fermerApercuEquipe = function () {
   if (!apercuEquipe) return
-  apercuEquipe = false
-  document.body.classList.remove('en-apercu')
 
-  /* ⚠ UNE CLASSE A PART POUR LE RETOUR. Sans elle, le cercle reapparaitrait
-     d'un coup : une animation ne rejoue pas quand on retire simplement la
-     classe qui la portait.
+  /* ⚠ ELLE DELEGUE A `sortirApercuEquipe`, ET C'EST TOUT L'INTERET.
 
-     ⚠ ET ON LA RETIRE A LA FIN. Laissee en place, elle rejouerait l'apparition
-       a chaque retouche de style sur le bouton. */
-  const cercle = document.getElementById('voir-equipe')
-  if (cercle) {
-    cercle.classList.remove('revient')
-    void cercle.offsetWidth
-    cercle.classList.add('revient')
-    setTimeout(() => cercle.classList.remove('revient'), 500)
-  }
+     Les deux fonctions faisaient la meme chose cote a cote : masquer l'espace
+     equipe, remontrer la gestion, remettre la barre, rejouer la goutte d'eau du
+     cercle. J'ai ajoute le retournement a l'une et pas a l'autre — le retour par
+     un onglet pivotait, celui-ci non.
 
-  /* ⚠ LE SCANNER DOIT ETRE ARRETE. Il tourne peut-etre encore : quitter sans
-     le couper laisserait la camera allumee sur un ecran qu'on ne voit plus. */
-  stopScanner?.()
+     Une seule sortie, un seul geste. Cette fonction ne garde que ce qui lui est
+     propre : ouvrir la page des procedures a la fin. */
+  sortirApercuEquipe()
 
-  const app = document.getElementById('gestion-app')
-  const eq = document.getElementById('equipe-app')
-  if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
-  if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
-
-  window.majBarreEspace?.('gestion')
-  showGestionScreen('p-list')
+  /* ⚠ APRES LE RETOURNEMENT, pas pendant. Changer d'ecran au milieu du pivot
+     ferait tourner une page qu'on est en train de remplacer. */
+  setTimeout(() => { showGestionScreen('p-list') }, 560)
 }
+
 
 document.getElementById('voir-equipe')?.addEventListener('click', () => {
   ouvrirApercuEquipe()

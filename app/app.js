@@ -2692,6 +2692,20 @@ async function enterApp(membre) {
       appEl.classList.remove('app-shell-in')
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
+      /* ⚠ ON RETIRE LA CLASSE UNE FOIS L'ANIMATION FINIE, ET C'EST NECESSAIRE.
+
+         Laissee en place, elle rejoue a chaque fois que l'element repasse de
+         `display:none` a `display:block` — ce que fait le retour d'apercu. On
+         voyait donc `ecranEntre` sur la page, puis `appShellIn` sur l'espace
+         entier une demi-seconde apres : les deux animations d'ouverture.
+
+       ⚠ `once:true` SUFFIT. La classe est reposee a chaque ouverture d'espace
+         par la ligne ci-dessus ; l'ecouteur se rebranche avec elle. */
+      appEl.addEventListener('animationend', function partir(e) {
+        if (e.animationName !== 'appShellIn') return
+        appEl.classList.remove('app-shell-in')
+        appEl.removeEventListener('animationend', partir)
+      })
     }
     afficherBarre(true)
     mesurerOnglets()
@@ -2751,6 +2765,20 @@ async function enterApp(membre) {
       appEl.classList.remove('app-shell-in')
     } else {
       appEl.classList.remove('app-shell-in'); void appEl.offsetWidth; appEl.classList.add('app-shell-in')
+      /* ⚠ ON RETIRE LA CLASSE UNE FOIS L'ANIMATION FINIE, ET C'EST NECESSAIRE.
+
+         Laissee en place, elle rejoue a chaque fois que l'element repasse de
+         `display:none` a `display:block` — ce que fait le retour d'apercu. On
+         voyait donc `ecranEntre` sur la page, puis `appShellIn` sur l'espace
+         entier une demi-seconde apres : les deux animations d'ouverture.
+
+       ⚠ `once:true` SUFFIT. La classe est reposee a chaque ouverture d'espace
+         par la ligne ci-dessus ; l'ecouteur se rebranche avec elle. */
+      appEl.addEventListener('animationend', function partir(e) {
+        if (e.animationName !== 'appShellIn') return
+        appEl.classList.remove('app-shell-in')
+        appEl.removeEventListener('animationend', partir)
+      })
     }
     afficherBarre(true)
     mesurerOnglets()
@@ -13380,7 +13408,23 @@ function essaiTermine() {
   if (!etatAbo) return false                  // on ne sait pas encore
   if (etatAbo.statut === 'actif') return false
   if ((mesEtablissements || []).some(e => e.abonnement_statut === 'actif')) return false
-  return etatAbo.statut === 'expire'
+
+  /* ⚠ ON NE TESTE PLUS SEULEMENT `expire`.
+
+     Un abonnement ANNULE ne rend pas ce statut : `etat_abonnement` peut
+     repondre `annule`, `resilie`, ou tout autre mot que je ne peux pas lire —
+     cette fonction vit dans Supabase. Tester une valeur precise laissait donc
+     passer le cas que vous decrivez.
+
+     On inverse la question : l'acces est ferme des que l'abonnement n'est pas
+     actif ET qu'il ne reste plus de jours d'essai. Un statut nouveau bloquera
+     de lui-meme, au lieu d'ouvrir une breche silencieuse.
+
+   ⚠ `jours_restants` PROTEGE L'ESSAI EN COURS. Pendant les quatorze jours, le
+     statut n'est pas `actif` non plus — sans ce garde-fou, on bloquerait des le
+     premier jour. */
+  const j = etatAbo.jours_restants
+  return typeof j === 'number' ? j <= 0 : etatAbo.statut !== 'actif'
 }
 
 /* ⚠ DEUX TEXTES, PAS UN. Le gerant peut agir — il choisit une offre. Le membre
@@ -13460,11 +13504,18 @@ function dessinerAlerteEssai(hote) {
       <span class="tx">
         <b>${fini ? 'Votre essai est termin\u00e9'
                   : `${j} jour${j > 1 ? 's' : ''} d\u2019essai restant${j > 1 ? 's' : ''}`}</b>
-        <i>${fini ? `${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''} conserv\u00e9e${nbProc > 1 ? 's' : ''}`
+        <i>${fini ? `${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''} conserv\u00e9e${nbProc > 1 ? 's' : ''} deux mois`
                   : `Jusqu\u2019au ${dateLisible(etatAbo.fin_essai)}`}</i>
       </span>
     </div>
-    ${fini ? '' : `<div class="jauge"><i style="width:${Math.round((14 - j) / 14 * 100)}%"></i></div>`}
+    ${fini ? `
+      <!-- ⚠ CE TEXTE NE PARAIT QU'A LA FIN. Pendant l'essai, annoncer une
+           suppression serait une menace pour un service qu'on decouvre. -->
+      <div class="s" style="margin-top:8px">
+        Vos proc\u00e9dures restent conserv\u00e9es <b>deux mois</b>. Pass\u00e9 ce d\u00e9lai,
+        elles seront supprim\u00e9es d\u00e9finitivement.
+      </div>`
+      : `<div class="jauge"><i style="width:${Math.round((14 - j) / 14 * 100)}%"></i></div>`}
     ${(!fini && etatAbo.analyses)
       /* Le nombre d'abord, le total ensuite : « 11 analyses » se lit avant
          « sur 15 », et c'est le premier qui compte quand on décide de filmer
@@ -21228,6 +21279,25 @@ function carteOffre(o, opts = {}) {
 window.renderAbonnements = function() {
   const n = nombreDeMembres()
   const actuel = planActuel()
+
+  /* ⚠ LE BANDEAU D'ACCES SUSPENDU, EN TETE DE PAGE.
+
+     Il dit ce qui se passe maintenant et ce qui se passera : l'acces est
+     ferme, les procedures tiennent deux mois. Sans la seconde phrase, on
+     croirait avoir deja tout perdu — et l'on ne reviendrait pas.
+
+   ⚠ IL SUIT `essaiTermine`, la meme fonction que le verrou. Un bandeau qui
+     dirait autre chose que ce que fait l'app serait pire que pas de bandeau. */
+  const susp = document.getElementById('abo-suspendu')
+  if (susp) {
+    const ferme = essaiTermine()
+    susp.hidden = !ferme
+    if (ferme) susp.innerHTML = `
+      <span class="t">Accès suspendu</span>
+      <span class="s">Vos procédures sont conservées <b>deux mois</b>.
+        Passé ce délai, elles seront supprimées définitivement.
+        Choisissez une offre pour rouvrir l’accès.</span>`
+  }
 
   /* ⚠ ON ALIGNE LE SEGMENT SUR CE QUI EST PAYE, MAIS UNE SEULE FOIS.
 

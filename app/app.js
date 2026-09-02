@@ -20894,6 +20894,12 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
         { duration: 340, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' })
     }
 
+    /* ⚠ ON COUPE L'ANIMATION D'ARRIVEE LE TEMPS DU CHANGEMENT. Sans cela, les
+       cartes remontent de 8 px en meme temps qu'elles se defloutent — un
+       mouvement qui dit « nouvelle carte » alors que c'est la meme. */
+    const page = document.getElementById('p-abonnement')
+    page?.classList.add('sans-arrivee')
+
     morceaux.forEach(flouLent)
     setTimeout(() => {
       renderAbonnements()
@@ -20911,6 +20917,10 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
          relancerait l'animation qu'on vient d'ecarter. 380 ms couvrent les
          340 du flou d'entree. */
       setTimeout(() => liste?.classList.add('ouvert'), 380)
+
+      /* ⚠ ON REND L'ANIMATION APRES COUP. Elle doit revivre pour la prochaine
+         ouverture de la page ; 420 ms couvrent le flou d'entree et le repli. */
+      setTimeout(() => page?.classList.remove('sans-arrivee'), 420)
     }, 260)
     return
   }

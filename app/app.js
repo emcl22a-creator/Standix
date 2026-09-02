@@ -2789,7 +2789,15 @@ async function ouvrirCibleQR() {
       fermerFenetreBienvenue()
       await confirmDialog({
         titre: 'Proc\u00e9dure introuvable',
-        message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe plus, ou qui appartient \u00e0 une autre entreprise.",
+        /* ⚠ ON NE DIT PLUS « ou qui appartient a une autre entreprise ».
+
+           C'etait exact, mais cela laissait entendre que la procedure existe
+           quelque part et qu'on n'y a pas droit — de quoi croire a un probleme
+           de permissions, et chercher a qui demander l'acces.
+
+           Pour celui qui scanne, les deux cas se traitent pareil : ce code ne
+           mene a rien chez lui. La phrase courte suffit. */
+        message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe pas ou plus.",
         confirmer: 'Compris', annuler: 'Fermer', danger: false,
       })
       return
@@ -6600,6 +6608,18 @@ function jouerVoile() {
 }
 
 window.showGestionScreen = function(id, btn) {
+  /* ⚠ L'ARRIVEE DES CARTES D'ABONNEMENT REDEVIENT POSSIBLE ICI.
+
+     `sans-arrivee` est posee au changement de rythme pour empecher les cartes
+     de remonter pendant le flou. On la retire en ARRIVANT sur la page, seul
+     moment ou cette animation a un sens — et jamais apres un delai, puisque
+     retirer `animation:none` declenche l'animation au lieu de l'autoriser.
+
+   ⚠ SANS CONDITION SUR L'ECRAN VISE. Retirer une classe absente ne coute rien,
+     et la poser ici pour tout autre ecran serait sans effet : la regle ne vise
+     que `#p-abonnement`. */
+  document.getElementById('p-abonnement')?.classList.remove('sans-arrivee')
+
   /* La page de détail de la Gestion se comporte comme celle de l'Équipe :
      l'en-tête et la vidéo s'y figent. La classe neutralise l'`overflow` du
      body, sans quoi `position:sticky` n'a aucun effet. */
@@ -13940,6 +13960,76 @@ function startAiProgressSimulation() {
    loin, appelle la même fonction. */
 let aiEcranAttente = false
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA REPRISE DE L'ANALYSE AU RETOUR
+
+   ⚠ LE SONDAGE MOURAIT AVEC LA PAGE. `aiPollTimer` est un minuteur du
+     navigateur : onglet ferme, app balayee, Safari qui decharge l'arriere-plan,
+     et il disparait. L'analyse continuait cote Azure, mais plus personne ne
+     venait chercher le resultat — la procedure restait en « traitement » pour
+     toujours.
+
+   ⚠ ON NE RELANCE PAS L'ANALYSE, ON REPREND LA SURVEILLANCE. Azure a travaille
+     pendant l'absence ; le plus souvent la premiere reponse arrive tout de
+     suite, avec les etapes deja pretes.
+
+   ⚠ QUINZE MINUTES DE VALIDITE. Au-dela, on oublie : une analyse qui n'a pas
+     abouti en quinze minutes ne se debloquera pas toute seule, et sonder
+     indefiniment userait la batterie sans rien apporter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CLE_IA_EN_COURS = 'standix-ia-en-cours'
+
+function memoriserAnalyseIA(id) {
+  try {
+    localStorage.setItem(CLE_IA_EN_COURS, JSON.stringify({ id, debut: Date.now() }))
+  } catch (e) {}
+}
+
+function oublierAnalyseIA() {
+  try { localStorage.removeItem(CLE_IA_EN_COURS) } catch (e) {}
+}
+
+function analyseIAEnCours() {
+  try {
+    const brut = localStorage.getItem(CLE_IA_EN_COURS)
+    if (!brut) return null
+    const o = JSON.parse(brut)
+    if (!o?.id || Date.now() - (o.debut || 0) > 15 * 60000) { oublierAnalyseIA(); return null }
+    return o
+  } catch (e) { return null }
+}
+
+/* ⚠ ON VERIFIE L'ETAT EN BASE AVANT DE REPRENDRE.
+
+   La procedure a pu finir pendant l'absence, ou etre supprimee depuis un autre
+   appareil. Reprendre un sondage sur une procedure qui n'existe plus ferait
+   tourner le minuteur dans le vide. */
+async function reprendreAnalyseIA() {
+  if (aiPollTimer) return               // la boucle tourne deja
+  const reste = analyseIAEnCours()
+  if (!reste) return
+  if (!currentMembre?.entreprise_id) return
+
+  const { data, error } = await supabase.from('procedures')
+    .select('id, statut').eq('id', reste.id).maybeSingle()
+
+  if (error) return                      // reseau : on retentera au prochain retour
+  if (!data) { oublierAnalyseIA(); return }
+  if (data.statut !== 'traitement') { oublierAnalyseIA(); return }
+
+  aiProcedureId = reste.id
+  basculerVersAttente()
+  pollAiStatus()
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') reprendreAnalyseIA()
+})
+
+/* Au chargement aussi : rouvrir l'app depuis zero ne declenche pas
+   `visibilitychange`, l'onglet est visible d'emblee. */
+window.addEventListener('load', () => { setTimeout(reprendreAnalyseIA, 1500) })
+
 function basculerVersAttente() {
   if (aiEcranAttente) return
   const dépôt = document.getElementById('ai-upload-card')
@@ -14149,6 +14239,7 @@ function resetAiScreen() {
   aiVideoFile = null
   aiProcedureId = null
   if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+  oublierAnalyseIA()
   stopAiProgressSimulation(0)
 }
 
@@ -15043,6 +15134,15 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       .select().single()
     if (errNouvelle) throw new Error(errNouvelle.message)
     aiProcedureId = nouvelle.id
+    /* ⚠ ON RETIENT L'ANALYSE SUR L'APPAREIL.
+
+       `aiProcedureId` ne vit qu'en memoire : ferme l'onglet, il disparait, et
+       plus rien ne sait qu'une analyse etait en cours. On la note donc a cote,
+       dans un stockage qui survit a la fermeture.
+
+     ⚠ AVEC L'HEURE DE DEPART. Elle sert a abandonner une analyse trop vieille
+       plutot que de sonder pour toujours une procedure qui ne finira jamais. */
+    memoriserAnalyseIA(nouvelle.id)
     console.log('[procédure créée]', aiProcedureId)
     /* La liste se recharge sans qu'on l'attende : la procédure doit apparaître
        maintenant, pas quand le rechargement daignera finir. */
@@ -15602,6 +15702,10 @@ async function pollAiStatus() {
         const p = allGestionProcedures.find(x => x.id === aiProcedureId)
         if (p) p.statut = 'pret'
       }
+      /* ⚠ L'ANALYSE EST FINIE : on l'oublie. Sans cela, la reprise la
+         retrouverait au prochain retour et sonderait une procedure deja prete
+         — le controle en base l'ecarterait, mais autant ne pas la garder. */
+      oublierAnalyseIA()
       stopAiProgressSimulation(100)
       document.getElementById('ai-progress-card').style.display = 'none'
       document.getElementById('ai-done-card').style.display = 'block'
@@ -16132,14 +16236,28 @@ function createClipEditor(ids, api) {
   timeline.addEventListener('pointerup', endDrag)
   timeline.addEventListener('pointercancel', endDrag)
 
-  ;[['start', ids.hStart], ['end', ids.hEnd]].forEach(([kind, id]) => {
-    const h = g(id)
-    if (!h) return
-    h.addEventListener('pointerdown', (e) => { e.stopPropagation(); e.preventDefault(); beginDrag(kind, e, h) })
-    h.addEventListener('pointermove', (e) => { if (drag === kind) { e.preventDefault(); moveDrag(e.clientX) } })
-    h.addEventListener('pointerup', (e) => { e.stopPropagation(); endDrag() })
-    h.addEventListener('pointercancel', endDrag)
-  })
+  /* ⚠ LES POIGNEES NE SE DEPLACENT PLUS.
+
+     On pouvait attraper la coupure entre deux etapes et la faire glisser pour
+     changer leur duree. Ce reglage venait d'une epoque ou l'on decoupait la
+     video a la main ; l'IA le fait maintenant, et une coupure deplacee au doigt
+     ne correspond plus au texte que l'IA a ecrit pour cette etape.
+
+   ⚠ ON RETIRE LES ECOUTEURS, PAS LES POIGNEES. Elles restent visibles : ce
+     sont elles qui montrent OU s'arrete chaque etape, et c'est une information
+     utile meme quand on ne peut plus la changer.
+
+   ⚠ ET `beginDrag` RESTE, avec son mode `scrub`. C'est lui qui deplace la tete
+     de lecture quand on touche la frise — un geste different, qui ne modifie
+     rien. */
+  /* ⚠ LE FIGEAGE EST DANS LE CSS, pas ici.
+
+     J'avais pose `pointerEvents = 'none'` a cet endroit — qui se trouve dans
+     `annulerAttente`, appelee a six moments differents. Le reglage y etait
+     tantot applique, tantot ecrase.
+
+     Une regle CSS vaut tout le temps, sans dependre du moment ou une fonction
+     passe. */
 
   // ── Lecture du clip sélectionné uniquement ───────────────────────────────
   function stopClipPlayback() {
@@ -16572,6 +16690,7 @@ document.getElementById('ai-annuler')?.addEventListener('click', async () => {
   if (!supprime) return
 
   if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+  oublierAnalyseIA()
   stopAiProgressSimulation(0)
   aiProcedureId = null
   showGestionScreen('p-list')
@@ -18263,6 +18382,17 @@ async function openAnalyse(procId) {
   const qrContainer = document.getElementById('qr-container')
   qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">Génération...</div>'
   document.getElementById('qr-plaque-title').textContent = proc.titre
+
+  /* ⚠ LA MENTION D'ATTENTE SUIT L'ETAT DE PUBLICATION.
+
+     `publiee_le` est la seule source : une procedure sans date n'est pas en
+     ligne, et son QR ne menera nulle part tant qu'elle ne l'est pas.
+
+   ⚠ ON POSE LES DEUX CAS, PAS SEULEMENT L'AFFICHAGE. Sans le `hidden = true`,
+     la mention resterait visible apres publication — on l'a ouverte en
+     brouillon, publiee, et rien ne l'aurait effacee. */
+  const attente = document.getElementById('qr-attente')
+  if (attente) attente.hidden = !!proc.publiee_le
   /* ═══ LE QR NE PORTE PLUS DE CODE ═══
 
      Il embarquait le code permanent de l'entreprise, pour qu'une personne qui
@@ -18483,27 +18613,47 @@ function renderAnalyseStats() {
      part de trois heures et le texte tombe sous la carte. */
   const tete = document.createElement('div')
   tete.className = 'emp-roue'
+  /* ⚠ « membres » PLUTOT QU'« employes », ET PLUS DE RELANCE.
+
+     « Employé » designait un rang ; la gestion lit aussi ces procedures, et
+     compter tout le monde sous ce mot n'aurait plus rien voulu dire.
+
+     La phrase « il reste N personnes a relancer » a ete retiree : elle
+     transformait un compteur de lecture en liste de retardataires a poursuivre.
+     Le chiffre au-dessus dit deja ce qu'il y a a savoir. */
   tete.innerHTML = `
     <div class="ga-anneau" id="emp-anneau"></div>
     <div class="tx">
       <div class="t">${vus} sur ${nbEmployes} ${vus > 1 ? 'ont' : 'a'} vu cette proc\u00e9dure</div>
       <div class="s">${pct === 100
-        ? "Toute l'\u00e9quipe l'a ouverte au moins une fois."
-        : `Il reste <b>${nbEmployes - vus} personne${nbEmployes - vus > 1 ? 's' : ''}</b> \u00e0 relancer.`}</div>
+        ? "Tout le monde l'a ouverte au moins une fois."
+        : 'Temps de lecture compt\u00e9 par personne.'}</div>
     </div>`
   empListEl.appendChild(tete)
   dessinerAnneau('emp-anneau', pct, couleur, pct + '%')
 
-  /* Ceux qui n'ont pas lu passent devant : c'est eux qui demandent une action. */
-  const ordre = [...employes].sort((a, b) => {
-    const av = validations.some(v => v.membre_id === a.id)
-    const bv = validations.some(v => v.membre_id === b.id)
-    return av - bv
-  })
+  /* ═══ LES DEUX ESPACES, SEPARES ═══
 
-  const liste = document.createElement('div')
-  liste.className = 'emp-liste'
-  liste.innerHTML = ordre.map(e => {
+     ⚠ LA GESTION MANQUAIT A LA LISTE. `cachedEmployes` ne retient que le role
+       `equipe` ; ceux qui ecrivent les procedures n'apparaissaient donc jamais
+       parmi ceux qui les ont vues, alors qu'ils les relisent pour les verifier.
+
+     ⚠ SEPARES, PAS MELANGES. Melanges, le gerant remonterait en tete — il
+       ouvre l'app tous les jours — et l'on ne verrait plus qui, dans l'equipe,
+       a lu ou non. C'est pourtant la question que cette liste sert a poser.
+
+     ⚠ L'EQUIPE EN PREMIER, pour la meme raison. */
+  const parRole = (role) => (cachedMembres || [])
+    .filter(m => m.role === role)
+    /* Ceux qui n'ont pas lu passent devant : ce sont eux qui appellent une
+       action. A egalite, on classe par nom pour que l'ordre ne bouge pas. */
+    .sort((a, b) => {
+      const av = validations.some(v => v.membre_id === a.id)
+      const bv = validations.some(v => v.membre_id === b.id)
+      return av - bv || (a.nom || '').localeCompare(b.nom || '', 'fr')
+    })
+
+  const ligne = (e) => {
     const v = validations.find(x => x.membre_id === e.id)
     const quand = v ? ilYA(new Date(v.validated_at)) : null
     return `
@@ -18515,7 +18665,22 @@ function renderAnalyseStats() {
         </span>
         <span class="vl" style="${v ? '' : 'color:var(--red);'}">${v ? quand : 'jamais'}</span>
       </div>`
-  }).join('')
+  }
+
+  const section = (titre, groupe) => {
+    if (!groupe.length) return ''
+    const lus = groupe.filter(e => validations.some(v => v.membre_id === e.id)).length
+    return `
+      <div class="emp-groupe">
+        <span class="eg-nom">${titre}</span>
+        <span class="eg-tot">${lus} sur ${groupe.length}</span>
+      </div>` + groupe.map(ligne).join('')
+  }
+
+  const liste = document.createElement('div')
+  liste.className = 'emp-liste'
+  liste.innerHTML = section('Espace \u00c9quipe', parRole('equipe')) +
+                    section('Espace Gestion', parRole('gestion'))
   empListEl.appendChild(liste)
 }
 
@@ -21038,9 +21203,17 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
          340 du flou d'entree. */
       setTimeout(() => liste?.classList.add('ouvert'), 380)
 
-      /* ⚠ ON REND L'ANIMATION APRES COUP. Elle doit revivre pour la prochaine
-         ouverture de la page ; 420 ms couvrent le flou d'entree et le repli. */
-      setTimeout(() => page?.classList.remove('sans-arrivee'), 420)
+      /* ⚠ ON NE RETIRE PLUS LA CLASSE ICI, ET C'EST TOUT LE DEFAUT.
+
+         Je la retirais 420 ms plus tard, pour que l'animation revive a la
+         prochaine ouverture. Mais retirer `animation:none` ne fait pas
+         qu'autoriser l'animation : il la DECLENCHE. Les cartes, deja en place
+         et deja defloutees, remontaient donc de 8 px une seconde fois.
+
+         C'etait la deuxieme animation : le flou d'abord, la remontee ensuite.
+
+       ⚠ ELLE EST RETIREE A L'OUVERTURE DE LA PAGE, pas apres un delai. La
+         seule fois ou l'arrivee doit jouer, c'est quand on arrive. */
     }, 260)
     return
   }
@@ -23617,7 +23790,10 @@ async function confirmerOuvertureScan(procId, espace) {
   if (!titre) {
     await confirmDialog({
       titre: 'Proc\u00e9dure introuvable',
-      message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe plus, ou qui appartient \u00e0 une autre entreprise.",
+      /* ⚠ MEME PHRASE QU'A L'AUTRE APPEL. La popup est ecrite a deux endroits
+         — un chemin par lecture de QR, un par ouverture directe. Deux
+         formulations pour une meme situation feraient douter d'avoir compris. */
+      message: "Ce code correspond \u00e0 une proc\u00e9dure qui n'existe pas ou plus.",
       confirmer: 'Compris', annuler: 'Fermer', danger: false,
     })
     return

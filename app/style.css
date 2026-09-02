@@ -15056,3 +15056,111 @@ body:has(#equipe-app[style*="display: block"]) #bar,
 body:has(#equipe-app[style*="display:block"]) #bar{
   width:min(calc(100vw - 46px), calc(var(--col, 460px) - 40px)) !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CERCLE N'EXISTE QUE DANS L'ESPACE GESTION
+
+   ⚠ ON ENUMERAIT LES CAS OU IL DISPARAIT : barre masquee, apercu en cours,
+     feuille de connexion ouverte, espace equipe affiche. Quatre regles, et une
+     de plus a chaque ecran ajoute.
+
+     Il restait donc visible partout ailleurs — y compris pendant le chargement,
+     ce moment ou ni l'un ni l'autre des deux espaces n'est encore affiche. On
+     le voyait paraitre seul sur un ecran vide, puis disparaitre.
+
+   ⚠ ON INVERSE LA REGLE : cache par defaut, montre uniquement quand l'espace
+     Gestion est a l'ecran et qu'aucun apercu ne tourne. Un ecran nouveau n'aura
+     rien a declarer — il ne remplira pas la condition, donc le cercle restera
+     cache. C'est le defaut qui protege, pas l'enumeration.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#voir-equipe{ opacity:0; pointer-events:none; }
+
+body:has(#gestion-app[style*="display: block"]):not(.en-apercu):not(.sans-bar) #voir-equipe,
+body:has(#gestion-app[style*="display:block"]):not(.en-apercu):not(.sans-bar) #voir-equipe{
+  opacity:1; pointer-events:auto;
+}
+
+/* ⚠ ET JAMAIS PENDANT LA CONNEXION NI LE CHARGEMENT, meme si l'espace Gestion
+   est deja monte derriere la feuille. */
+body.chargement #voir-equipe,
+body:has(#login-screen[style*="display: flex"]) #voir-equipe,
+body:has(#login-screen[style*="display:flex"]) #voir-equipe{
+  opacity:0 !important; pointer-events:none;
+}
+
+
+/* ⚠ `.signe` N'EXISTE PLUS DANS LE DESSIN.
+
+   C'etait la petite etincelle en haut a droite de la coche de fin d'analyse.
+   Elle a ete retiree avec le reste : la carte annonce une procedure generee,
+   elle n'a pas besoin d'un second signe qui scintille a cote du premier.
+
+   Ses deux regles restent en place mais ne visent plus rien — je les laisse
+   plutot que de les supprimer, au cas ou le dessin reviendrait. Ce commentaire
+   est la pour qu'on sache pourquoi elles ne servent a rien. */
+
+
+/* ═══ LES DEUX GROUPES DE LA LISTE DE LECTURE ═══
+
+   Meme forme que ceux de la feuille Equipe : un nom a gauche, le compte a
+   droite. Une seule idee, deux endroits, une seule maniere de la montrer.
+
+   ⚠ LE COMPTE EST DANS LE TITRE. « 3 sur 5 » a cote de « Espace Equipe » evite
+     de compter les pastilles vertes a la main pour savoir ou en est chaque
+     groupe. */
+.emp-liste .emp-groupe{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:12px;
+  margin:16px 0 8px;
+  padding:0 2px;
+}
+.emp-liste .emp-groupe:first-child{ margin-top:8px; }
+.emp-liste .eg-nom{
+  font-size:12.5px; font-weight:650; letter-spacing:-0.015em;
+  color:var(--label-2);
+}
+.emp-liste .eg-tot{
+  font-size:12px; font-weight:600; color:var(--label-3);
+  letter-spacing:-0.01em;
+}
+
+
+/* ⚠ LA MENTION D'ATTENTE DU QR CODE.
+
+   Ambre, pas rouge : ce n'est pas une erreur. La procedure sera publiee, le
+   QR marchera — c'est un « pas encore », pas un « impossible ». */
+/* ⚠ `align-items:flex-start` ET NON `center`. Sur deux lignes, le centrage
+   vertical posait l'horloge entre les deux — detachee du texte, elle paraissait
+   flotter a cote. Elle s'aligne maintenant sur la premiere ligne.
+
+   ⚠ ET LE BLOC EST BORNE EN LARGEUR. Sans cela, la phrase s'etalait d'un bord
+     a l'autre et se coupait n'importe ou. */
+.qr-attente{
+  display:flex; align-items:flex-start; justify-content:center; gap:7px;
+  max-width:290px; margin:8px auto 14px;
+  font-size:12.5px; line-height:1.45;
+  color:#B26A00; letter-spacing:-0.01em;
+  text-align:left;
+}
+.qr-attente svg{ flex-shrink:0; width:15px; height:15px; margin-top:2px; }
+.qr-attente[hidden]{ display:none; }
+
+
+/* ═══ LES COUPURES NE SE DEPLACENT PLUS ═══
+
+   On pouvait attraper la poignee entre deux etapes et la faire glisser pour
+   changer leur duree. Ce reglage venait du decoupage manuel ; l'IA produit
+   maintenant les etapes, et une coupure deplacee au doigt ne correspond plus au
+   texte qu'elle a ecrit pour cette etape-la.
+
+   ⚠ ELLES RESTENT VISIBLES. Ce sont elles qui montrent OU chaque etape
+     s'arrete — une information utile meme quand on ne peut plus la changer.
+     Seul le doigt ne les atteint plus.
+
+   ⚠ ET LA FRISE RESTE TOUCHABLE. Elle deplace la tete de lecture, un geste
+     different qui ne modifie rien : c'est ainsi qu'on retrouve un passage. */
+#ecap-h-start, #ecap-h-end{
+  pointer-events:none;
+  cursor:default;
+}

@@ -1711,6 +1711,34 @@ function arreterScenes() {
      gestionnaire de `[data-fermer-histo]` la fermerait deja. On lui donne
      pourtant son propre attribut, `data-fermer-inscription`, pour pouvoir un
      jour vider les champs a la fermeture sans toucher aux autres feuilles. */
+/* ═══ LA FEUILLE DE CONNEXION ═══
+
+   ⚠ ELLE REUTILISE `fermerHisto`, comme celle d'inscription. Les deux feuilles
+     partagent le meme gabarit ; leur ouverture et leur fermeture doivent
+     partager le meme code, sinon l'une derivera de l'autre. */
+function ouvrirConnexion() {
+  const f = document.getElementById('feuille-connexion')
+  if (!f) return
+
+  switchAuthTab('login')
+
+  const err = document.getElementById('login-error')
+  if (err) err.textContent = ''
+
+  f.hidden = false
+  f.setAttribute('aria-hidden', 'false')
+  f.classList.remove('part')
+  document.body.style.overflow = 'hidden'
+}
+
+document.getElementById('deja-compte')?.addEventListener('click', ouvrirConnexion)
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-fermer-connexion]')) {
+    fermerHisto(document.getElementById('feuille-connexion'))
+  }
+})
+
 function ouvrirInscription(espace) {
   selectedSpace = espace
 
@@ -1722,12 +1750,15 @@ function ouvrirInscription(espace) {
      decide de ce qu'il demande — une entreprise a creer, ou un code. */
   const titre = document.getElementById('insc-titre')
   const note = document.getElementById('insc-note')
+  /* ⚠ LES MEMES MOTS QUE LA CARTE TOUCHEE. Un ecran qui reprend d'autres
+     termes que le bouton qu'on vient de toucher fait douter d'avoir clique au
+     bon endroit — et « espace » avait justement ete ecarte de ces cartes. */
   if (espace === 'gestion') {
-    if (titre) titre.textContent = 'Ouvrir un espace'
-    if (note) note.textContent = 'Cr\u00e9ez vos proc\u00e9dures avec l\u2019IA.'
+    if (titre) titre.textContent = 'Je cr\u00e9e mon entreprise'
+    if (note) note.textContent = 'Vous \u00eates g\u00e9rant ou responsable.'
   } else {
-    if (titre) titre.textContent = 'Rejoindre un espace'
-    if (note) note.textContent = 'Saisissez le code de votre \u00e9tablissement.'
+    if (titre) titre.textContent = 'J\u2019ai re\u00e7u un code'
+    if (note) note.textContent = 'Saisissez-le pour rejoindre l\u2019\u00e9quipe.'
   }
 
   /* ⚠ LES DEUX CHAMPS SONT MONTRES ICI, ET C'ETAIT LE DEFAUT.
@@ -1835,7 +1866,19 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   const email = document.getElementById('signup-email').value.trim()
   const password = document.getElementById('signup-password').value
   const entrepriseNom = document.getElementById('signup-entreprise-nom').value.trim()
-  const codeAcces = document.getElementById('signup-code-acces').value.trim()
+  /* ⚠ ON NORMALISE LE CODE AVANT DE L'ENVOYER.
+
+     `autocapitalize="characters"` est une SUGGESTION au clavier, pas une
+     garantie : un code colle depuis un message, ou tape avec un clavier tiers,
+     arrive en minuscules. La comparaison cote serveur echoue alors, et l'on
+     affiche « ce code n'existe pas » a quelqu'un qui a le bon code.
+
+     ⚠ ON RETIRE AUSSI LES ESPACES INTERNES. Un code copie depuis une
+       conversation traine souvent une espace insecable au milieu ou aux bouts,
+       que `trim()` ne voit pas toujours. */
+  const codeAcces = document.getElementById('signup-code-acces').value
+    .replace(/\s/g, '')
+    .toUpperCase()
   const errorEl = document.getElementById('login-error')
   errorEl.textContent = ''
   errorEl.style.color = 'var(--red)'
@@ -20525,10 +20568,19 @@ window.renderAbonnements = function() {
       <div class="reg-groupe">
         <button type="button" class="reg-ligne" data-abo-gerer>
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
+            <!-- ⚠ #7FB6F2, LA COULEUR DU BOUTON « Votre abonnement actuel ».
+
+                 Le degrade des coches allait du blanc au bleu : sur une ligne
+                 de reglage posee sur fond clair, sa pointe blanche
+                 disparaissait. Cette ligne parle du meme sujet que le bouton
+                 de la carte — elles portent donc la meme couleur.
+
+                 ⚠ AUCUN ACCENT GRAVE ICI : ce commentaire est DANS un gabarit
+                   delimite par des accents graves. C'est la quatrieme fois. -->
             <path d="M4 7.4h9M17.4 7.4h2.6M4 16.6h2.6M11 16.6h9"
-                  stroke="url(#cocheOffre)" stroke-width="1.9" stroke-linecap="round"/>
-            <circle cx="15.2" cy="7.4" r="2.4" stroke="url(#cocheOffre)" stroke-width="1.9"/>
-            <circle cx="8.8" cy="16.6" r="2.4" stroke="url(#cocheOffre)" stroke-width="1.9"/>
+                  stroke="#7FB6F2" stroke-width="1.9" stroke-linecap="round"/>
+            <circle cx="15.2" cy="7.4" r="2.4" stroke="#7FB6F2" stroke-width="1.9"/>
+            <circle cx="8.8" cy="16.6" r="2.4" stroke="#7FB6F2" stroke-width="1.9"/>
           </svg></span>
           <span class="reg-nm">G\u00e9rer ou r\u00e9silier mon abonnement</span>
           <span class="fl">\u203a</span>
@@ -20708,7 +20760,52 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
 
     if (MOINS_ANIM() || !morceaux.length) { renderAbonnements(); return }
 
-    morceaux.forEach(flouSortie)
+    /* ⚠ ON COUPE L'ARRIVEE DES CARTES PENDANT LE CHANGEMENT.
+
+       Chaque carte porte `aboCarte` : elle remonte de 14 px en grandissant,
+       avec un decalage de 70 ms sur la suivante. C'est juste a l'ouverture de
+       la page — mais rejoue par-dessus le flou, cela faisait deux mouvements
+       contraires en meme temps. C'est ce qui se voyait comme un flash.
+
+       On retire `ouvert` le temps du redessin : le flou seul assure le
+       passage, et les cartes se contentent de changer de contenu. */
+    const liste = document.getElementById('abo-liste')
+    liste?.classList.remove('ouvert')
+
+    /* ⚠ UN FLOU PLUS LENT QUE CELUI DES LISTES, ecrit ici plutot qu'en CSS.
+
+       `flouSortie` dure 130 ms : juste pour une liste de dossiers, dont le
+       contenu se ressemble d'un etat a l'autre. Ici ce sont des cartes
+       entieres qui changent de prix, de bouton, de texte — a cette vitesse, le
+       passage se lit comme un a-coup.
+
+       ⚠ ET LA COURBE EST SYMETRIQUE. Celle de `flouSortie` accelere jusqu'a la
+         fin : le flou arrive d'un coup. Celle-ci le laisse monter puis
+         s'installer. */
+    /* ⚠ 3 PX, ET UNE OPACITE QUI SUIT.
+
+       A 6 px, le texte d'une carte n'est plus lisible du tout : on voit une
+       tache le temps du passage, puis le contenu reapparait. C'est ce vide qui
+       se lit comme un flash — pas la vitesse.
+
+       A 3 px, les mots restent devines pendant qu'ils changent. Et l'opacite
+       accompagne le flou plutot que de le laisser seul : une image qui palit
+       en se brouillant s'efface plus doucement qu'une image qui se brouille a
+       pleine intensite. */
+    const flouLent = el => el.animate(
+      [{ filter: 'blur(0px)', opacity: 1 },
+       { filter: 'blur(3px)', opacity: 0.5 }],
+      { duration: 260, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' })
+
+    const netLent = el => {
+      el.getAnimations().forEach(a => a.cancel())
+      return el.animate(
+        [{ filter: 'blur(3px)', opacity: 0.5 },
+         { filter: 'blur(0px)', opacity: 1 }],
+        { duration: 340, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' })
+    }
+
+    morceaux.forEach(flouLent)
     setTimeout(() => {
       renderAbonnements()
       /* ⚠ ON RELIT LES ELEMENTS APRES LE REDESSIN. `renderAbonnements` remplace
@@ -20719,8 +20816,13 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
         document.getElementById('abo-autres'),
         document.querySelector('#p-abonnement .abo-hi'),
       ].filter(Boolean)
-      apres.forEach(flouEntree)
-    }, 130)
+      apres.forEach(netLent)
+
+      /* ⚠ ON REMET `ouvert` APRES L'ENTREE, pas avant : posee plus tot, elle
+         relancerait l'animation qu'on vient d'ecarter. 380 ms couvrent les
+         340 du flou d'entree. */
+      setTimeout(() => liste?.classList.add('ouvert'), 380)
+    }, 260)
     return
   }
 
@@ -20755,6 +20857,24 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      semblant. Un bouton qui ouvre une page de paiement vide coûte plus cher
      qu'un bouton qui dit « écrivez-nous ». */
   if (!o.stripe) {
+    /* ⚠ L'OFFRE ENTREPRISE OUVRE LE COURRIEL DIRECTEMENT.
+
+       Elle passait par une fenetre qui disait « ecrivez-nous », avec un bouton
+       « Nous ecrire » — deux gestes pour un seul. Le bouton de la carte dit
+       deja « Nous ecrire » : ce qu'on attend en le touchant, c'est le courriel,
+       pas une confirmation de ce qu'on vient de lire.
+
+       ⚠ LES AUTRES OFFRES SANS TARIF GARDENT LA FENETRE. Elles ont un prix
+         affiche : quelqu'un qui touche « Choisir Pro » s'attend a payer, pas a
+         ecrire. Il faut lui dire pourquoi le paiement n'est pas encore
+         possible avant d'ouvrir sa messagerie. */
+    if (o.prix === null) {
+      window.location.href = 'mailto:Standix.app@gmail.com?subject=' +
+        encodeURIComponent('Offre Entreprise') + '&body=' +
+        encodeURIComponent('Bonjour,\n\nJe souhaite en savoir plus sur l\u2019offre Entreprise.\n\n')
+      return
+    }
+
     const ok = await confirmDialog({
       titre: o.prix === null ? 'Offre Entreprise' : `Offre ${o.nom}`,
       message: o.prix === null
@@ -21785,7 +21905,9 @@ document.getElementById('es-save')?.addEventListener('click', async () => {
 document.getElementById('es-rejoindre')?.addEventListener('click', async () => {
   const btn = document.getElementById('es-rejoindre')
   const err = document.getElementById('es-code-error')
-  const code = document.getElementById('es-code').value.trim()
+  /* ⚠ MEME NORMALISATION QU'A L'INSCRIPTION. Trois champs demandent ce code
+     dans l'app ; deux d'entre eux l'envoyaient tel quel. */
+  const code = document.getElementById('es-code').value.replace(/\s/g, '').toUpperCase()
   err.style.color = 'var(--red)'
   err.textContent = ''
   if (!/^[A-Za-z0-9]{6}$/.test(code)) { err.textContent = 'Le code comporte 6 caractères.'; return }
@@ -21961,7 +22083,7 @@ document.getElementById('orph-sortir')?.addEventListener('click', () => {
 document.getElementById('orph-entrer')?.addEventListener('click', async () => {
   const btn = document.getElementById('orph-entrer')
   const err = document.getElementById('orph-erreur')
-  const code = (document.getElementById('orph-code').value || '').trim()
+  const code = (document.getElementById('orph-code').value || '').replace(/\s/g, '').toUpperCase()
   err.textContent = ''
 
   if (!/^[A-Za-z0-9]{6}$/.test(code)) { err.textContent = 'Le code compte 6 caractères.'; return }

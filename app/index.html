@@ -1,6 +1,27 @@
 <!DOCTYPE html><html lang="fr"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<!-- ═══ NE PAS GARDER CETTE PAGE EN CACHE ═══
+
+     ⚠ `index.html` EST LE SEUL FICHIER QU'ON NE PEUT PAS VERSIONNER. `app.js`
+       et `style.css` portent un `?v=` qui change avec leur contenu ; cette
+       page-ci EST l'adresse, elle n'a pas de version.
+
+       Sans consigne, Safari la garde et la ressert telle quelle — parfois
+       pendant des jours. On voit alors l'ancienne page alors que le fichier
+       deploye est le bon, et rien ne l'explique.
+
+     ⚠ LES TROIS LIGNES SONT NECESSAIRES. `no-cache` demande de revalider,
+       `no-store` interdit de conserver, `Expires: 0` couvre les caches
+       intermediaires qui ignorent les deux premieres. Chacune est ignoree par
+       une partie du parc ; ensemble elles tiennent.
+
+     ⚠ CELA NE RALENTIT PAS L'APP. Seul le balisage est redemande a chaque
+       ouverture — 450 Ko une fois, quand `app.js` et `style.css` restent en
+       cache grace a leur numero de version. -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <title>Standix</title>

@@ -1200,13 +1200,23 @@ window.ouvrirApercuEquipe = function () {
 
    ⚠ ET ON MASQUE APRES, PAS AVANT. Les 560 ms couvrent les 550 de
      l'animation ; dix de marge pour que la derniere image soit peinte. */
-  if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
-  document.body.classList.add('retourne-vers')
+  /* ⚠ RIEN, PUIS TOUT.
+
+     L'ecran se vide d'abord — 180 ms de fond nu — puis l'espace equipe arrive
+     d'un coup, en venant de loin.
+
+   ⚠ ON MONTE LE CONTENU PENDANT LE VIDE. `showEquipeScreen` et le chargement
+     des procedures s'executent alors que rien n'est visible : quand la page
+     avance, elle est deja remplie. C'est tout l'interet de ce temps mort. */
+  document.body.classList.add('espace-vide')
 
   setTimeout(() => {
-    document.body.classList.remove('retourne-vers')
     if (app) app.style.display = 'none'
-  }, 560)
+    if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
+    document.body.classList.remove('espace-vide')
+    document.body.classList.add('espace-arrive')
+    setTimeout(() => document.body.classList.remove('espace-arrive'), 640)
+  }, 180)
 
   /* ⚠ LA BARRE RESTE CELLE DE LA GESTION.
 
@@ -1243,13 +1253,16 @@ function sortirApercuEquipe() {
   const eq = document.getElementById('equipe-app')
 
   /* Le meme geste, dans l'autre sens : c'est la meme carte qu'on retourne. */
-  if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
-  document.body.classList.add('retourne-depuis')
+  /* Le meme geste au retour : on vide, puis la gestion revient de loin. */
+  document.body.classList.add('espace-vide')
 
   setTimeout(() => {
-    document.body.classList.remove('retourne-depuis')
     if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
-  }, 560)
+    if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
+    document.body.classList.remove('espace-vide')
+    document.body.classList.add('espace-arrive')
+    setTimeout(() => document.body.classList.remove('espace-arrive'), 640)
+  }, 180)
 
   window.majBarreEspace?.('gestion')
   window.marquerOngletActif?.()
@@ -1279,7 +1292,7 @@ window.fermerApercuEquipe = function () {
 
   /* ⚠ APRES LE RETOURNEMENT, pas pendant. Changer d'ecran au milieu du pivot
      ferait tourner une page qu'on est en train de remplacer. */
-  setTimeout(() => { showGestionScreen('p-list') }, 560)
+  setTimeout(() => { showGestionScreen('p-list') }, 200)
 }
 
 

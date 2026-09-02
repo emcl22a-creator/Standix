@@ -14606,3 +14606,26 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
   font-size:9.5px; font-weight:800; letter-spacing:0.02em;
   line-height:1.4;
 }
+
+
+/* ═══ L'ASTUCE DU VOLET : OU TROUVER L'APERCU EQUIPE ═══
+
+   Le cercle a droite de la barre n'a pas de libelle — c'est une icone seule.
+   Personne ne devine ce qu'elle ouvre avant de l'avoir touchee.
+
+   ⚠ ELLE EST DANS LE VOLET, PAS SOUS LE CERCLE. Une legende permanente a cote
+     du bouton encombrerait la barre pour une information qu'on ne lit qu'une
+     fois. Ici, elle se trouve la ou l'on va quand on cherche a comprendre son
+     compte.
+
+   ⚠ ET PLUS DISCRETE QUE LE RESTE. Elle explique, elle ne commande pas : plus
+     petite que le nom de l'entreprise, en gris, sans fond. */
+.tb-v-astuce{
+  display:flex; align-items:flex-start; gap:7px;
+  margin-top:9px;
+  font-size:11.5px; line-height:1.45;
+  color:var(--label-3); letter-spacing:-0.005em;
+}
+.tb-v-astuce svg{
+  flex-shrink:0; width:13px; height:13px; margin-top:2px;
+}

@@ -13504,16 +13504,23 @@ function dessinerAlerteEssai(hote) {
       <span class="tx">
         <b>${fini ? 'Votre essai est termin\u00e9'
                   : `${j} jour${j > 1 ? 's' : ''} d\u2019essai restant${j > 1 ? 's' : ''}`}</b>
-        <i>${fini ? `${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''} conserv\u00e9e${nbProc > 1 ? 's' : ''} deux mois`
+        <i>${fini ? 'Reprenez l\u00e0 o\u00f9 vous vous \u00eates arr\u00eat\u00e9'
                   : `Jusqu\u2019au ${dateLisible(etatAbo.fin_essai)}`}</i>
       </span>
     </div>
     ${fini ? `
-      <!-- ⚠ CE TEXTE NE PARAIT QU'A LA FIN. Pendant l'essai, annoncer une
-           suppression serait une menace pour un service qu'on decouvre. -->
+      <!-- ⚠ CE QU'ON A CONSTRUIT, PAS CE QU'ON VA PERDRE.
+
+           Le texte annoncait une suppression au bout de deux mois. Deux mois,
+           c'est trop loin pour peser sur la decision d'aujourd'hui, et trop
+           court pour rassurer — et une menace de destruction dit surtout « ce
+           service peut effacer votre travail ».
+
+           Les deux nombres font mieux : ils rappellent le temps passe a filmer,
+           relire et publier. C'est ce qu'il faudrait refaire ailleurs. -->
       <div class="s" style="margin-top:8px">
-        Vos proc\u00e9dures restent conserv\u00e9es <b>deux mois</b>. Pass\u00e9 ce d\u00e9lai,
-        elles seront supprim\u00e9es d\u00e9finitivement.
+        Vos <b>${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''}</b> et
+        <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> vous attendent.
       </div>`
       : `<div class="jauge"><i style="width:${Math.round((14 - j) / 14 * 100)}%"></i></div>`}
     ${(!fini && etatAbo.analyses)
@@ -21292,11 +21299,15 @@ window.renderAbonnements = function() {
   if (susp) {
     const ferme = essaiTermine()
     susp.hidden = !ferme
-    if (ferme) susp.innerHTML = `
-      <span class="t">Accès suspendu</span>
-      <span class="s">Vos procédures sont conservées <b>deux mois</b>.
-        Passé ce délai, elles seront supprimées définitivement.
-        Choisissez une offre pour rouvrir l’accès.</span>`
+    if (ferme) {
+      const np = (allGestionProcedures || []).length
+      const nm = (cachedMembres || []).length || 1
+      susp.innerHTML = `
+        <span class="t">Accès suspendu</span>
+        <span class="s">Vos <b>${np} procédure${np > 1 ? 's' : ''}</b> et
+          <b>${nm} membre${nm > 1 ? 's' : ''}</b> vous attendent.
+          Reprenez là où vous vous êtes arrêté.</span>`
+    }
   }
 
   /* ⚠ ON ALIGNE LE SEGMENT SUR CE QUI EST PAYE, MAIS UNE SEULE FOIS.

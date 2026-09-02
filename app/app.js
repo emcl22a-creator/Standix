@@ -15332,7 +15332,35 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       nom: aiVideoFile.name, type: aiVideoFile.type,
       poids: aiVideoFile.size, chemin: path,
     })
-    etape(`envoi de ${poidsLisible(aiVideoFile.size)} vers le stockage…`)
+    /* ⚠ ON AVERTIT PENDANT L'ENVOI, ET C'EST LE SEUL MOMENT OU CELA COMPTE.
+
+       Fermer la page pendant le transfert coupe la requete : Safari rend
+       « Load failed », la video n'arrive jamais sur le stockage, et rien ne
+       peut la recuperer — le fichier vit dans la memoire du navigateur, aucun
+       serveur ne peut aller le rechercher.
+
+       Une fois deposee, l'app peut etre fermee sans risque : la tache serveur
+       prend le relais. L'avertissement disparait donc de lui-meme des l'etape
+       suivante.
+
+     ⚠ UNE ESTIMATION, PAS UNE PROMESSE. Le stockage ne donne aucun suivi de
+       progression — verifie, `onUploadProgress` n'existe pas ici. On ne peut
+       donc pas afficher un compte a rebours honnete.
+
+       On annonce une fourchette calculee sur le poids, a une vitesse prudente
+       de 2 Mo/s : c'est ce qu'un reseau mobile correct donne en envoi. Mieux
+       vaut annoncer large et finir plus tot que l'inverse. */
+    const secondes = Math.max(15, Math.ceil(aiVideoFile.size / (2 * 1024 * 1024)))
+    /* ⚠ LE PLURIEL SUIT LES MINUTES ARRONDIES, pas les secondes.
+
+       Je testais `secondes >= 120`. Pour un fichier de 200 Mo, l'arrondi donne
+       2 minutes mais le compte reel est de 100 secondes : on affichait
+       « environ 2 minute ». Le pluriel doit se decider sur le nombre montre. */
+    const minutes = Math.ceil(secondes / 60)
+    const attente = secondes < 60
+      ? 'moins d\u2019une minute'
+      : `environ ${minutes} minute${minutes > 1 ? 's' : ''}`
+    etape(`envoi de ${poidsLisible(aiVideoFile.size)} \u2014 gardez l\u2019app ouverte ${attente}`)
 
     const limite = (promesse, secondes, quoi) => Promise.race([
       promesse,

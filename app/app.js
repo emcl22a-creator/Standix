@@ -1145,6 +1145,82 @@ function afficherEcranChoix() {
 }
 
 // ═══ ÉCRAN 1 : CHOIX DE L'ESPACE ═══
+/* ═══════════════════════════════════════════════════════════════════════════
+   VOIR COMME L'EQUIPE
+
+   Le cercle a droite de la barre ouvre l'espace Equipe en APERCU : on voit ce
+   que voient les employes — la liste de leurs procedures, le scanner de QR
+   code — et l'on revient d'un geste.
+
+   ⚠ CE N'EST PAS UN CHANGEMENT DE ROLE. Le membre reste en gestion cote base ;
+     seul l'affichage change. Toucher au role ferait perdre des droits le temps
+     de l'apercu, et le rendrait dependant d'une ecriture qui peut echouer.
+
+   ⚠ UN BANDEAU PERMANENT, PAS UN BOUTON RETOUR. On peut naviguer trois ecrans
+     avant de vouloir revenir ; un bouton dans un coin se perd. Le bandeau
+     reste visible et dit ou l'on est.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let apercuEquipe = false
+
+window.ouvrirApercuEquipe = function () {
+  if (apercuEquipe) return
+  apercuEquipe = true
+  document.body.classList.add('en-apercu')
+
+  const app = document.getElementById('gestion-app')
+  const eq = document.getElementById('equipe-app')
+  if (app) app.style.display = 'none'
+  if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
+
+  window.majBarreEspace?.('equipe')
+  showEquipeScreen('e-list')
+  /* ⚠ LE VRAI NOM EST `loadEquipeProcedures`. J'avais ecrit
+     `chargerProceduresEquipe`, qui n'existe pas : l'appel optionnel `?.()`
+     l'aurait avale en silence et la liste serait restee vide, sans erreur pour
+     le signaler. */
+  loadEquipeProcedures?.()
+}
+
+window.fermerApercuEquipe = function () {
+  if (!apercuEquipe) return
+  apercuEquipe = false
+  document.body.classList.remove('en-apercu')
+
+  /* ⚠ UNE CLASSE A PART POUR LE RETOUR. Sans elle, le cercle reapparaitrait
+     d'un coup : une animation ne rejoue pas quand on retire simplement la
+     classe qui la portait.
+
+     ⚠ ET ON LA RETIRE A LA FIN. Laissee en place, elle rejouerait l'apparition
+       a chaque retouche de style sur le bouton. */
+  const cercle = document.getElementById('voir-equipe')
+  if (cercle) {
+    cercle.classList.remove('revient')
+    void cercle.offsetWidth
+    cercle.classList.add('revient')
+    setTimeout(() => cercle.classList.remove('revient'), 500)
+  }
+
+  /* ⚠ LE SCANNER DOIT ETRE ARRETE. Il tourne peut-etre encore : quitter sans
+     le couper laisserait la camera allumee sur un ecran qu'on ne voit plus. */
+  stopScanner?.()
+
+  const app = document.getElementById('gestion-app')
+  const eq = document.getElementById('equipe-app')
+  if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
+  if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
+
+  window.majBarreEspace?.('gestion')
+  showGestionScreen('p-list')
+}
+
+document.getElementById('voir-equipe')?.addEventListener('click', () => {
+  ouvrirApercuEquipe()
+})
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-fermer-apercu]')) fermerApercuEquipe()
+})
+
 window.chooseSpace = function(space) {
   selectedSpace = space
   /* ═══ L'ÉCRAN DE CHOIX RESTE VISIBLE ═══

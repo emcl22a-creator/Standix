@@ -13463,6 +13463,19 @@ async function bloqueSiEssaiFini() {
   return true
 }
 
+/* ⚠ UN SEUL ECOUTEUR, POSE SUR LE DOCUMENT. L'alerte est redessinee a chaque
+   changement d'etat ; un ecouteur attache au bouton disparaitrait avec lui. */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-ess-details]')
+  if (!b) return
+  const z = b.closest('.alerte-essai')?.querySelector('.ess-details')
+  if (!z) return
+  const ouvert = !z.hidden
+  z.hidden = ouvert
+  b.setAttribute('aria-expanded', String(!ouvert))
+  b.textContent = ouvert ? 'D\u00e9tails' : 'Fermer'
+})
+
 function dessinerAlerteEssai(hote) {
   const zone = document.getElementById(hote)
   if (!zone) return
@@ -13491,60 +13504,55 @@ function dessinerAlerteEssai(hote) {
      plaque et le cadre sont ambre depuis le passage à cette palette : un trait
      bleu au milieu ne se lisait plus comme un signal, seulement comme un
      oubli. Le dessin rejoint donc son entourage. */
-  zone.className = 'alerte-essai'
+  zone.className = 'alerte-essai' + (fini ? ' finie' : '')
   zone.style.display = 'block'
+
+  /* ═══ LA PLAQUE DES QUATORZE JOURS ═══
+
+     ⚠ ELLE REMPLACE L'HORLOGE. Une icone de montre disait « le temps passe » —
+       vrai, mais anxieux. Le chiffre dit ce qu'on a : quatorze jours.
+
+     ⚠ LE METAL EST FAIT DE TROIS COUCHES SUPERPOSEES, pas d'une image : un
+       degrade de fond, un liseré clair sur le bord, et un reflet oblique.
+       C'est ce qui donne le relief sans peser un octet de plus.
+
+     ⚠ ET LE CHIFFRE CHANGE AVEC LES JOURS RESTANTS. Afficher « 14 » a
+       quelqu'un qui en a trois serait mentir sur ce qu'il lui reste. */
   zone.innerHTML = `
-    <div class="tete">
-      <span class="pic">
-        <svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)" stroke-width="1.9"
-             stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="9"/><polyline points="12 6.6 12 12 15.8 14.2"/>
-        </svg>
+    <div class="ess-haut">
+      <span class="ess-plaque" aria-hidden="true">
+        <span class="ess-n">${fini ? '0' : j}</span>
+        <!-- ⚠ « jours » SEUL SUR LA PLAQUE. Le titre dit deja « gratuits » :
+             l'ecrire aux deux endroits volait deux lignes au texte, et la
+             phrase du dessous se retrouvait a l'etroit. -->
+        <span class="ess-u">jour${(fini ? 0 : j) > 1 ? 's' : ''}</span>
       </span>
-      <span class="tx">
-        <b>${fini ? 'Votre essai est termin\u00e9'
-                  : `${j} jour${j > 1 ? 's' : ''} d\u2019essai restant${j > 1 ? 's' : ''}`}</b>
-        <i>${fini ? 'Reprenez l\u00e0 o\u00f9 vous vous \u00eates arr\u00eat\u00e9'
-                  : `Jusqu\u2019au ${dateLisible(etatAbo.fin_essai)}`}</i>
+
+      <span class="ess-tx">
+        <b>${fini ? 'Votre essai est termin\u00e9' : `Essai ${j} jour${j > 1 ? 's' : ''} gratuit${j > 1 ? 's' : ''}`}</b>
+        <i>${fini
+          ? `Vos <b>${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''}</b> et <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> vous attendent.`
+          : 'Profitez de toutes les fonctionnalit\u00e9s de Standix. Sans engagement.'}</i>
       </span>
+
+      <!-- ⚠ LE BOUTON EST EN HAUT A DROITE, hors du texte. Pose a la suite, il
+           se lirait comme un lien dans la phrase — et l'on ne saurait pas s'il
+           deplie ou s'il emmene ailleurs. -->
+      <button type="button" class="ess-plus" data-ess-details
+              aria-expanded="false" aria-controls="ess-details">D\u00e9tails</button>
     </div>
-    ${fini ? `
-      <!-- ⚠ CE QU'ON A CONSTRUIT, PAS CE QU'ON VA PERDRE.
 
-           Le texte annoncait une suppression au bout de deux mois. Deux mois,
-           c'est trop loin pour peser sur la decision d'aujourd'hui, et trop
-           court pour rassurer — et une menace de destruction dit surtout « ce
-           service peut effacer votre travail ».
-
-           Les deux nombres font mieux : ils rappellent le temps passe a filmer,
-           relire et publier. C'est ce qu'il faudrait refaire ailleurs. -->
-      <div class="s" style="margin-top:8px">
-        Vos <b>${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''}</b> et
-        <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> vous attendent.
-      </div>`
-      : `<div class="jauge"><i style="width:${Math.round((14 - j) / 14 * 100)}%"></i></div>`}
-    ${(!fini && etatAbo.analyses)
-      /* Le nombre d'abord, le total ensuite : « 11 analyses » se lit avant
-         « sur 15 », et c'est le premier qui compte quand on décide de filmer
-         ou non. À zéro on ne dit pas « 0 restantes » mais ce qu'il faut faire. */
-      ? (etatAbo.analyses.reste > 0
-          ? `<div class="s" style="margin-top:6px">
-               <b>${etatAbo.analyses.reste} analyse${etatAbo.analyses.reste > 1 ? 's' : ''} vid\u00e9o</b>
-               restante${etatAbo.analyses.reste > 1 ? 's' : ''} sur ${etatAbo.analyses.quota},
-               pour toute la dur\u00e9e de l\u2019essai.</div>`
-          : `<div class="s" style="margin-top:6px">
-               <b>Les ${etatAbo.analyses.quota} analyses de l\u2019essai ont \u00e9t\u00e9 utilis\u00e9es.</b>
-               Choisissez une offre pour continuer \u2014 vos proc\u00e9dures sont conserv\u00e9es.</div>`)
-      : ''}
-    <div class="s">${fini
-      ? `Vous \u00eates <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> : votre formule est \u00e0
-         <b>39 \u20ac par mois</b>, ou 29 \u20ac en r\u00e9glant l\u2019ann\u00e9e. Tout revient d\u00e8s le paiement.`
-      : `Vous pouvez activer votre abonnement d\u00e8s maintenant :
-         <b>les jours restants vous sont offerts</b>.`}</div>
-    <div class="actions">
-      <button type="button" class="principal" data-abo-ouvrir>${
-        fini ? 'Voir les formules' : 'Choisir mon abonnement'}</button>
-      <button type="button" class="secondaire" data-abo-plus-tard>Plus tard</button>
+    <!-- ⚠ LES QUATRE POINTS QUI COMPTENT VRAIMENT, et rien d'autre. Chacun
+         repond a une question qu'on se pose avant de s'engager. -->
+    <div class="ess-details" id="ess-details" hidden>
+      <div class="ess-p"><span class="pt"></span>
+        <span>Vous pouvez prendre un abonnement <b>quand vous voulez</b>, m\u00eame pendant l\u2019essai.</span></div>
+      <div class="ess-p"><span class="pt"></span>
+        <span><b>15 analyses vid\u00e9o</b> comprises pendant les 14 jours.</span></div>
+      <div class="ess-p"><span class="pt"></span>
+        <span>Vos proc\u00e9dures <b>ne sont jamais supprim\u00e9es</b> : reprenez quand vous voulez.</span></div>
+      <div class="ess-p"><span class="pt"></span>
+        <span>Apr\u00e8s 14 jours, l\u2019espace Gestion et l\u2019espace \u00c9quipe sont <b>bloqu\u00e9s</b> jusqu\u2019\u00e0 la souscription.</span></div>
     </div>`
 }
 

@@ -11647,39 +11647,49 @@ async function renommerSousDossier(ancien) {
   const dossier = (document.getElementById('category-titre')?.textContent || '').trim()
   if (!dossier) return
 
-  /* ═══ POURQUOI UN CHOIX AVANT LA SAISIE ═══
+  /* ⚠ PLUS DE MENU AVANT LA SAISIE.
 
-     `demanderTexte` rend `null` DANS DEUX CAS : quand on annule, et quand on
-     valide un champ vide. Impossible de les distinguer — et ici les deux
-     conséquences sont opposées : ne rien faire, ou sortir les procédures du
-     sous-dossier.
+     Les trois points ouvraient d'abord une fenetre qui demandait « renommer, ou
+     en sortir les procedures ? » — deux gestes pour une action qu'on fait dans
+     neuf cas sur dix pour renommer.
 
-     Plutôt que de deviner, on sépare les deux gestes. « Retirer » est une
-     action explicite ; « Renommer » ouvre la saisie, où un champ vide ne peut
-     plus qu'être une annulation. */
-  const quoi = await confirmDialog({
-    titre: `\u00ab ${ancien} \u00bb`,
-    message: 'Renommer ce sous-dossier, ou en sortir les proc\u00e9dures ? ' +
-      'Les sortir ne supprime rien : elles remontent en haut du dossier.',
+     On va droit au champ. Le retrait reste possible : vider le champ le
+     declenche, et la phrase sous le titre le dit.
+
+   ⚠ `demanderTexte` REND `null` QUAND LE CHAMP EST VIDE. C'est ce que fait deja
+     sa derniere ligne : `(champ.value || '').trim() || null`. On s'appuie
+     dessus plutot que d'ajouter un chemin. */
+  const saisi = await demanderTexte({
+    titre: 'Renommer le sous-dossier',
+    message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb dans \u00ab ${dossier} \u00bb suivront. ` +
+      'Videz le champ pour retirer le sous-dossier : elles remonteront en haut du dossier.',
+    valeur: ancien,
+    placeholder: 'Ex : Friteuse',
     confirmer: 'Renommer',
-    annuler: 'Retirer le sous-dossier',
-    danger: false,
   })
 
+  /* ⚠ `undefined` ET `null` NE VEULENT PAS DIRE LA MEME CHOSE ICI.
+
+     `undefined` : la fenetre a ete fermee, on ne fait rien.
+     `null`      : le champ a ete vide, on retire le sous-dossier.
+
+     Les confondre ferait disparaitre un sous-dossier a chaque fois qu'on
+     renonce. */
+  if (saisi === ancien) return                    // rien n'a change
+
+  /* ⚠ ANNULER ET VIDER LE CHAMP RENDENT LA MEME CHOSE : `null`.
+
+     Verification faite dans `demanderTexte` : le bouton « Annuler », la touche
+     d'echappement et le clic sur le fond rendent tous `null` — exactement comme
+     un champ vide. Distinguer les deux demanderait de modifier cette fonction,
+     qui sert a une dizaine d'autres endroits.
+
+     On demande donc confirmation dans les deux cas. Quelqu'un qui a annule voit
+     une question qu'il n'attendait pas, mais il repond « Annuler » et rien ne se
+     passe. L'inverse — retirer un sous-dossier parce qu'on a ferme une fenetre —
+     serait bien pire. */
   let propre
-  if (quoi) {
-    const saisi = await demanderTexte({
-      titre: 'Renommer le sous-dossier',
-      message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb dans \u00ab ${dossier} \u00bb suivront.`,
-      valeur: ancien,
-      placeholder: 'Ex : Friteuse',
-      confirmer: 'Renommer',
-    })
-    if (!saisi || saisi === ancien) return          // annulé, ou rien changé
-    propre = saisi
-  } else {
-    /* `confirmDialog` rend `false` sur le bouton de gauche ET sur la croix.
-       Une confirmation ferme la porte au retrait involontaire. */
+  if (saisi === null) {
     const sur = await confirmDialog({
       titre: 'Retirer le sous-dossier ?',
       message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb remonteront en haut de ` +
@@ -11688,6 +11698,8 @@ async function renommerSousDossier(ancien) {
     })
     if (!sur) return
     propre = null
+  } else {
+    propre = saisi
   }
 
   /* ═══ LA PORTÉE EST LIMITÉE AU DOSSIER COURANT ═══

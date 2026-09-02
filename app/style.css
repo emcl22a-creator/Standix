@@ -15302,3 +15302,67 @@ body.en-apercu #voir-equipe svg{ stroke:#FFFFFF; }
 @media (prefers-reduced-motion: reduce){
   #voir-equipe.rebondit, body.en-apercu #voir-equipe.rebondit{ animation:none; }
 }
+
+
+/* ═══ UNE SEULE ANIMATION PENDANT LE PASSAGE D'ESPACE ═══
+
+   ⚠ IL Y EN AVAIT DEUX A LA SUITE. `venirDeLoin` fait avancer l'espace entier ;
+     puis `showGestionScreen` pose `.active` sur la page ouverte, ce qui
+     declenche `ecranEntre` — sa propre montee de 12 px avec flou.
+
+     La page bougeait donc deux fois : une avec son espace, une pour elle-meme.
+
+   ⚠ ON COUPE LA SECONDE, PAS LA PREMIERE. C'est l'espace qui porte le geste ;
+     l'entree de page est faite pour un changement d'onglet ordinaire, ou rien
+     d'autre ne bouge autour. */
+body.espace-vide .screen.active,
+body.espace-arrive .screen.active{
+  animation:none !important;
+}
+
+/* ═══ LA BARRE DU HAUT NE BOUGE PAS ═══
+
+   ⚠ ELLE EST DANS L'ESPACE, donc emportee par `venirDeLoin`. Le logo Standix et
+     le bouton d'ajout avancaient avec la page — alors qu'ils sont communs aux
+     deux espaces et ne changent pas.
+
+   ⚠ `animation:none` NE SUFFIT PAS. L'element n'a pas d'animation propre : il
+     HERITE de la transformation de son parent. On l'en sort en le fixant a
+     l'ecran le temps du passage. */
+/* ⚠ ON ANIME LE CONTENU, PLUS L'ESPACE ENTIER.
+
+   `position:fixed` ne suffit pas : un parent qui porte un `transform` devient
+   le repere de ses enfants fixes, et la barre avancait avec lui. Mesure a
+   l'ecran : elle passait de 390 x 64 a 367 x 60.
+
+   On deplace donc l'animation d'un cran vers l'interieur — sur `.screen.active`
+   plutot que sur `#gestion-app`. La barre reste dehors, immobile. */
+body.espace-arrive #equipe-app,
+body.espace-arrive #gestion-app{
+  animation:none !important;
+}
+
+body.espace-arrive #equipe-app .screen.active,
+body.espace-arrive #gestion-app .screen.active{
+  animation:venirDeLoin 0.62s cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+/* ⚠ ET LA BARRE NE S'EFFACE PAS NON PLUS pendant le temps mort. `espace-vide`
+   masque l'espace entier ; on la ressort de ce masquage. */
+/* ⚠ LE VIDE DOIT ETRE IMMEDIAT. Une transition de 0,42 s existe sur ces deux
+   elements — plus longue que les 180 ms du temps mort : l'espace n'etait qu'a
+   moitie efface quand l'autre arrivait, et l'on voyait les deux.
+
+   `transition:none` fait de ce temps mort un vrai vide. */
+body.espace-vide #gestion-app,
+body.espace-vide #equipe-app{
+  opacity:0;
+  transition:none !important;
+}
+
+/* La barre reste visible et immobile pendant le vide. */
+body.espace-vide .topbar{
+  opacity:1;
+  position:fixed;
+  z-index:40;
+}

@@ -1189,6 +1189,10 @@ window.ouvrirApercuEquipe = function () {
   if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
 
   window.majBarreEspace?.('equipe')
+  /* ⚠ ON REMARQUE LES ONGLETS APRES AVOIR POSE `en-apercu`. La fonction lit
+     cette classe pour decider d'eteindre tout le monde ; appelee avant, elle
+     rallumerait celui qu'on vient de quitter. */
+  window.marquerOngletActif?.()
   showEquipeScreen('e-list')
   /* ⚠ LE VRAI NOM EST `loadEquipeProcedures`. J'avais ecrit
      `chargerProceduresEquipe`, qui n'existe pas : l'appel optionnel `?.()`
@@ -1210,6 +1214,7 @@ function sortirApercuEquipe() {
   if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
 
   window.majBarreEspace?.('gestion')
+  window.marquerOngletActif?.()
 
   const cercle = document.getElementById('voir-equipe')
   if (cercle) {
@@ -19948,21 +19953,47 @@ function nombreDeMembres() {
    prix et des limites, des choses qui se discutent. Un tracé SVG n'a rien à
    y faire. */
 function iconeOffre(cle) {
-  const t = 'stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"'
+  /* ⚠ LE DEGRADE DES COCHES, PAS CELUI DU LOGO.
+
+     Toutes ces icones etaient tracees en `logoOrIc` — l'ambre du logo, la
+     derniere couleur chaude de la page.
+
+     ⚠ ET `logoOrIc` EST DECLARE EN `userSpaceOnUse` SUR 24 x 24 PX. Ces
+       dessins sont affiches a 22 px dans une plaque de 44 : au-dela de la
+       zone declaree, tout recevait la couleur de FIN du degrade, un orange
+       plein. Les icones n'etaient donc meme pas degradees, juste orange.
+
+     `cocheOffre` est en coordonnees relatives : il suit la taille du dessin,
+     quelle qu'elle soit.
+
+   ⚠ LE TRAIT PASSE DE 1,7 A 1,9. A 22 px, un trait de 1,7 sur un dessin a
+     plusieurs traits proches — les trois tetes de « pro », les noeuds du
+     reseau — se lisait maigre a cote des coches, qui sont a 2,2. */
+  const t = 'stroke="url(#cocheOffre)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"'
   const dessins = {
     // Une personne : l'offre d'un artisan et de ses quelques mains.
     essentiel: `<circle cx="12" cy="8.2" r="3.4" ${t}/>
                 <path d="M5.6 19.4a6.4 6.4 0 0 1 12.8 0" ${t}/>`,
-    // Deux personnes côte à côte.
-    equipe: `<circle cx="9.2" cy="8.6" r="3.1" ${t}/>
-             <path d="M3.6 19.2a5.6 5.6 0 0 1 11.2 0" ${t}/>
-             <path d="M16.2 6.2a3 3 0 0 1 0 5.6M17 14.2a5.4 5.4 0 0 1 3.4 5" ${t}/>`,
-    // Un groupe : trois têtes, celle du milieu en avant.
-    pro: `<circle cx="12" cy="7.4" r="3" ${t}/>
-          <path d="M6.8 18.6a5.2 5.2 0 0 1 10.4 0" ${t}/>
-          <path d="M5.6 9.4a2.5 2.5 0 1 0 0-.1M2.6 17.4a4.4 4.4 0 0 1 2.6-3.5" ${t}/>
-          <path d="M21.4 17.4a4.4 4.4 0 0 0-2.6-3.5" ${t}/>
-          <circle cx="18.6" cy="9.3" r="2.5" ${t}/>`,
+    /* ⚠ REDESSINE. La seconde personne n'etait qu'un arc de tete et un bout
+       d'epaule — a 24 px, on lisait une silhouette coupee en deux, pas deux
+       personnes. Les deux sont maintenant entieres, la seconde plus petite et
+       en retrait. */
+    equipe: `<circle cx="9" cy="8.4" r="3.2" ${t}/>
+             <path d="M3.4 19.4a5.6 5.6 0 0 1 11.2 0" ${t}/>
+             <circle cx="17.6" cy="9.8" r="2.4" ${t}/>
+             <path d="M13.8 19.4a4 4 0 0 1 7.6-1.4" ${t}/>`,
+    /* ⚠ REDESSINE AUSSI. La tete de gauche etait tracee par un `path` en arc
+       — `a2.5 2.5 0 1 0 0-.1` — qui ne se refermait pas tout a fait : elle
+       n'avait pas la meme forme que celle de droite, un vrai cercle. Et le
+       corps du milieu manquait sous sa tete.
+
+       Trois personnes, les deux laterales plus petites et en retrait. */
+    pro: `<circle cx="12" cy="8" r="3.1" ${t}/>
+          <path d="M6.8 19.4a5.2 5.2 0 0 1 10.4 0" ${t}/>
+          <circle cx="5" cy="10.2" r="2.2" ${t}/>
+          <path d="M1.8 18.6a3.6 3.6 0 0 1 2.8-3.4" ${t}/>
+          <circle cx="19" cy="10.2" r="2.2" ${t}/>
+          <path d="M22.2 18.6a3.6 3.6 0 0 0-2.8-3.4" ${t}/>`,
     /* ═══ LE RÉSEAU, REDESSINÉ ═══
 
        Le premier essai avait trois anneaux évidés de rayon 2,6 et des traits
@@ -19980,9 +20011,9 @@ function iconeOffre(cle) {
        Le nœud du haut est un demi-pixel plus gros : c'est le parent, et la
        hiérarchie se lit sans qu'on ait à l'expliquer. */
     reseau: `<path d="M12 8.6v3.1M12 11.7 7.4 15.2M12 11.7l4.6 3.5" ${t}/>
-             <circle cx="12" cy="6.2" r="2.5" fill="url(#logoOrIc)" stroke="none"/>
-             <circle cx="6.1" cy="17.3" r="2.2" fill="url(#logoOrIc)" stroke="none"/>
-             <circle cx="17.9" cy="17.3" r="2.2" fill="url(#logoOrIc)" stroke="none"/>`,
+             <circle cx="12" cy="6.2" r="2.5" fill="url(#cocheOffre)" stroke="none"/>
+             <circle cx="6.1" cy="17.3" r="2.2" fill="url(#cocheOffre)" stroke="none"/>
+             <circle cx="17.9" cy="17.3" r="2.2" fill="url(#cocheOffre)" stroke="none"/>`,
     // Un bâtiment : au-delà du réseau, c'est une organisation.
     entreprise: `<path d="M4.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6.4a1.6 1.6 0 0 1 1.6 1.6v14.2" ${t}/>
                  <path d="M14 10.4h4a1.6 1.6 0 0 1 1.6 1.6v8.4M2.6 20.4h18.8" ${t}/>
@@ -20110,7 +20141,7 @@ function carteOffre(o, opts = {}) {
     <div class="offre-prix">
       ${surDevis ? `<span class="v">Sur devis</span>`
         : `<span class="v">${prixAffiche} €</span>
-           <span class="u">/ mois, hors taxes${rythmeChoisi === 'annuel' ? '<br>factur\u00e9 \u00e0 l\u2019ann\u00e9e' : ''}</span>`}
+           <span class="u">/ mois, hors taxes${rythmeChoisi === 'annuel' ? ', factur\u00e9 \u00e0 l\u2019ann\u00e9e' : ''}</span>`}
     </div>
 
     <!-- Un filet, pas une marge : il sépare ce qu'on paie de ce qu'on reçoit.
@@ -20158,10 +20189,10 @@ function carteOffre(o, opts = {}) {
          disparait quand l annuel est deja choisi. -->
     ${!surDevis && rythmeChoisi === 'mensuel' ? `
     <div class="offre-annuel-note">
-      <span class="et"><svg viewBox="0 0 24 24" fill="none" stroke="#FDA81E"
-        stroke-width="1.7" stroke-linejoin="round"><path d="M3.4 12.6V4.8a1.4 1.4 0 0 1 1.4-1.4h7.8
+      <span class="et"><svg viewBox="0 0 24 24" fill="none" stroke="url(#cocheOffre)"
+        stroke-width="1.9" stroke-linejoin="round"><path d="M3.4 12.6V4.8a1.4 1.4 0 0 1 1.4-1.4h7.8
         L21 11.8a1.4 1.4 0 0 1 0 2L14 20.8a1.4 1.4 0 0 1-2 0Z"/>
-        <circle cx="8" cy="8" r="1.5" fill="#FDA81E" stroke="none"/></svg></span>
+        <circle cx="8" cy="8" r="1.5" fill="#7FB6F2" stroke="none"/></svg></span>
       <!-- Le même calcul que le prix de tête : on divise le tarif annuel réel,
            sinon cette ligne annoncerait un montant que la bascule ne donnerait
            pas. -->
@@ -20412,9 +20443,43 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      bouton d'action qui déclenche le paiement. */
   const r = e.target.closest('[data-rythme]')
   if (r) {
+    if (r.dataset.rythme === rythmeChoisi) return
     rythmeChoisi = r.dataset.rythme
-    renderAbonnements()
+
+    /* ⚠ LE MEME GESTE QUE LE SEGMENT DES PROCEDURES : flouter, redessiner
+       derriere le voile, revenir. Les prix changeaient d'une image a l'autre,
+       ce qui donnait l'impression d'un defaut d'affichage plutot que d'un
+       changement voulu.
+
+       ⚠ ON NE FLOUTE PAS LE SEGMENT LUI-MEME. C'est le seul element qui ne
+         change pas — et le voir se brouiller sous le doigt qui vient de le
+         toucher romprait le lien entre le geste et son effet. */
+    const morceaux = [
+      document.getElementById('abo-vedette'),
+      document.getElementById('abo-autres'),
+      /* ⚠ `abo-hi` EST UNE CLASSE, PAS UN IDENTIFIANT. `getElementById` rendait
+         `null`, que le `filter(Boolean)` ecartait sans rien dire : la phrase
+         d'introduction ne floutait pas, seule, au milieu du reste. */
+      document.querySelector('#p-abonnement .abo-hi'),
+    ].filter(Boolean)
+
     if (navigator.vibrate) navigator.vibrate(6)
+
+    if (MOINS_ANIM() || !morceaux.length) { renderAbonnements(); return }
+
+    morceaux.forEach(flouSortie)
+    setTimeout(() => {
+      renderAbonnements()
+      /* ⚠ ON RELIT LES ELEMENTS APRES LE REDESSIN. `renderAbonnements` remplace
+         leur contenu, mais pas les conteneurs eux-memes — ils survivent. Les
+         relire coute peu et protege du jour ou ce ne serait plus vrai. */
+      const apres = [
+        document.getElementById('abo-vedette'),
+        document.getElementById('abo-autres'),
+        document.querySelector('#p-abonnement .abo-hi'),
+      ].filter(Boolean)
+      apres.forEach(flouEntree)
+    }, 130)
     return
   }
 

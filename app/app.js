@@ -24665,7 +24665,15 @@ function entretenirVerrou(procId) {
   clearInterval(verrouMinuteur)
   verrouMinuteur = setInterval(() => {
     if (document.hidden) return
-    supabase.rpc('prendre_verrou', { p_procedure: procId }).catch(() => {})
+    /* ⚠ ON RAFRAICHIT LA DATE, RIEN D'AUTRE. La condition `edite_par = moi`
+       garantit qu'on ne vole pas le verrou d'un autre si le notre a expire. */
+    supabase.auth.getUser().then(({ data: u }) => {
+      const moi = u?.user?.id
+      if (!moi) return
+      supabase.from('procedures')
+        .update({ edite_depuis: new Date().toISOString() })
+        .eq('id', procId).eq('edite_par', moi).then(() => {}, () => {})
+    }).catch(() => {})
   }, 5 * 60000)
 }
 
@@ -24674,53 +24682,100 @@ async function rendreVerrou() {
   if (!verrouTenu) return
   const id = verrouTenu
   verrouTenu = null
-  try { await supabase.rpc('rendre_verrou', { p_procedure: id }) } catch {}
+  try {
+    const { data: u } = await supabase.auth.getUser()
+    const moi = u?.user?.id
+    if (!moi) return
+    /* ⚠ ON NE REND QUE LE SIEN. Sans `eq('edite_par', moi)`, fermer l'ecran
+       libererait la procedure de quelqu'un d'autre — celui qui l'a prise
+       entre-temps, si notre verrou avait expire. */
+    await supabase.from('procedures')
+      .update({ edite_par: null, edite_depuis: null })
+      .eq('id', id).eq('edite_par', moi)
+  } catch (e) { console.warn('[verrou] non rendu :', e?.message) }
 }
 
 /* ⚠ ET ON LE REND AUSSI SI L'ONGLET SE FERME. `visibilitychange` couvre le
    balayage de l'app sur iPhone, ou `beforeunload` n'est jamais emis. */
-window.addEventListener('pagehide', () => {
-  if (verrouTenu) navigator.sendBeacon?.(
-    `${SUPABASE_URL}/rest/v1/rpc/rendre_verrou`,
-    new Blob([JSON.stringify({ p_procedure: verrouTenu })], { type: 'application/json' }))
+/* ⚠ LE VERROU SE REND AUSSI QUAND L'ONGLET SE FERME.
+
+   `sendBeacon` visait la fonction SQL, qui n'existe plus dans ce chemin. Et
+   il ne portait pas la cle d'authentification : la requete etait rejetee.
+
+   On passe donc par `visibilitychange`, qui laisse le temps d'une vraie
+   requete — Safari l'emet avant de decharger la page, contrairement a
+   `beforeunload` qu'il ignore souvent. */
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && verrouTenu) rendreVerrou()
 })
 
 window.openEditProcedure = async function(procId, mode) {
+  /* ═══ LE VERROU, SANS FONCTION SQL ═══
+
+     ⚠ LA VERSION PRECEDENTE PASSAIT PAR `prendre_verrou`, UNE FONCTION EN BASE.
+       Elle existait, les colonnes aussi, la politique autorisait l'ecriture —
+       et pourtant aucun verrou n'etait jamais pose. Trois seances de
+       diagnostic ne m'ont pas dit pourquoi.
+
+     ⚠ ON ECRIT DONC DIRECTEMENT, avec la condition DANS la requete.
+
+       `update ... where id = X and (edite_par is null or edite_par = moi or
+       edite_depuis < il y a 15 min)` : PostgreSQL n'execute qu'un seul UPDATE
+       a la fois sur une ligne. Deux personnes qui touchent « Modifier » a la
+       meme seconde ne peuvent pas reussir toutes les deux — la seconde ne
+       trouve plus de ligne a modifier.
+
+       C'est la meme garantie que la fonction, avec deux avantages : rien a
+       deployer en base, et l'erreur remonte telle quelle si quelque chose
+       cloche. */
   try {
-    const { data, error } = await supabase.rpc('prendre_verrou', { p_procedure: procId })
-    const r = Array.isArray(data) ? data[0] : data
+    const { data: u } = await supabase.auth.getUser()
+    const moi = u?.user?.id
+    if (!moi) throw new Error('session introuvable')
 
-    /* ⚠ L'ERREUR REMONTE, ELLE N'EST PLUS AVALEE.
+    const limite = new Date(Date.now() - 15 * 60000).toISOString()
 
-       Mon `catch` silencieux devait empecher qu'une panne reseau bloque le
-       travail. Il masquait aussi les vraies pannes : le verrou ne se posait
-       pas, aucune ligne n'apparaissait en base, et rien ne le disait.
+    /* ⚠ `.or()` PREND UNE CHAINE, PAS UN OBJET. Les trois conditions y sont
+       separees par des virgules ; une seule suffit pour obtenir le verrou. */
+    const { data, error } = await supabase
+      .from('procedures')
+      .update({ edite_par: moi, edite_depuis: new Date().toISOString() })
+      .eq('id', procId)
+      .or(`edite_par.is.null,edite_par.eq.${moi},edite_depuis.lt.${limite}`)
+      .select('id')
 
-       On garde le principe — l'ecran s'ouvre quand meme — mais on le dit. */
     if (error) {
-      console.error('[verrou] prendre_verrou a echoue :', error)
+      console.error('[verrou] ecriture refusee :', error)
       toast('Verrou indisponible : ' + (error.message || 'erreur inconnue'))
-    } else if (!r) {
-      console.warn('[verrou] la fonction n a rien rendu')
-      toast('Verrou : reponse vide')
-    } else {
-      console.log('[verrou]', r.obtenu ? 'obtenu' : 'refuse par ' + r.par_qui)
-    }
+    } else if (!data || data.length === 0) {
+      /* ⚠ AUCUNE LIGNE MODIFIEE : quelqu'un d'autre tient le verrou. On lit
+         alors QUI, pour que le message serve a quelque chose. */
+      let qui = 'Un gestionnaire'
+      try {
+        const { data: p } = await supabase.from('procedures')
+          .select('edite_par, entreprise_id').eq('id', procId).maybeSingle()
+        if (p?.edite_par) {
+          const { data: m } = await supabase.from('membres')
+            .select('nom').eq('user_id', p.edite_par)
+            .eq('entreprise_id', p.entreprise_id).maybeSingle()
+          if (m?.nom) qui = m.nom
+        }
+      } catch {}
 
-    if (!error && r && r.obtenu === false) {
       await confirmDialog({
         titre: 'Procédure en cours de modification',
-        message: `${r.par_qui} modifie cette procédure en ce moment. ` +
+        message: `${qui} modifie cette procédure en ce moment. ` +
           'Revenez dans quelques minutes.',
         confirmer: 'Compris', annuler: null, danger: false,
       })
       return
+    } else {
+      verrouTenu = procId
+      entretenirVerrou(procId)
     }
-    if (!error) { verrouTenu = procId; entretenirVerrou(procId) }
-    /* ⚠ UNE ERREUR RESEAU N'EMPECHE PAS DE TRAVAILLER. Bloquer l'edition parce
-       que le verrou n'a pas pu etre pose ferait plus de mal que le risque
-       qu'il ecarte. */
   } catch (e) {
+    /* ⚠ UNE PANNE RESEAU N'EMPECHE PAS DE TRAVAILLER — mais elle ne se tait
+       plus. Le silence de la version precedente m'a coute trois seances. */
     console.error('[verrou] appel impossible :', e)
     toast('Verrou : ' + (e?.message || 'appel impossible'))
   }

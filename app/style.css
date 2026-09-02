@@ -15240,9 +15240,7 @@ body.espace-vide #equipe-app{
 body.espace-vide, body.espace-arrive{ overflow:hidden; }
 
 @media (prefers-reduced-motion: reduce){
-  body.espace-arrive #equipe-app, body.espace-arrive #gestion-app{
-    animation:none;
-  }
+  
 }
 
 
@@ -15348,9 +15346,7 @@ body.espace-vide .screen.active,
    ⚠ ET LA BARRE DU HAUT NE BOUGE PLUS, puisque plus rien n'anime l'espace
      entier : c'etait la cause de son deplacement. */
 body.espace-arrive #gestion-app,
-body.espace-arrive #equipe-app{
-  animation:none;
-}
+
 
 
 
@@ -15402,3 +15398,67 @@ body.espace-vide .topbar{
    `ecranEntre` jouerait dans le vide et serait finie quand la page reparait.
    On la retient jusqu'a ce que l'espace revienne. */
 body.espace-vide .screen.active{ animation:none !important; }
+
+
+/* ═══ LE BANDEAU D'ACCES SUSPENDU ═══
+
+   ⚠ AMBRE, PAS ROUGE. Le rouge dit « erreur » ou « danger immediat » ; ici il
+     reste deux mois pour agir, et l'acces revient des qu'on souscrit. Un ton
+     d'alerte ferait fuir au lieu de faire revenir. */
+.abo-suspendu{
+  display:flex; flex-direction:column; gap:5px;
+  margin:0 0 16px;
+  padding:14px 16px;
+  border-radius:18px;
+  background:linear-gradient(150deg, rgba(255,174,46,0.14), rgba(232,118,15,0.07));
+  box-shadow:inset 0 0 0 0.5px rgba(232,118,15,0.22);
+}
+.abo-suspendu .t{
+  font-size:14px; font-weight:650; letter-spacing:-0.02em;
+  color:#8A4A00;
+}
+.abo-suspendu .s{
+  font-size:12.5px; line-height:1.5; letter-spacing:-0.005em;
+  color:#8A4A00; opacity:0.86;
+}
+.abo-suspendu .s b{ font-weight:650; opacity:1; }
+.abo-suspendu[hidden]{ display:none; }
+
+
+/* ═══ UNE SEULE ANIMATION PAR ECRAN, JAMAIS DEUX ═══
+
+   ⚠ `active` ET `fondu` PORTENT TOUTES DEUX `ecranEntre`.
+
+     `showGestionScreen` pose `fondu` quand on vient d'un onglet, puis `active`
+     juste apres. Les deux declarent la meme animation : le navigateur en lance
+     donc DEUX sur le meme element, avec un decalage d'une image. C'est le
+     doublon qu'on voit au retour de l'apercu.
+
+   ⚠ ON GARDE CELLE DE `fondu` — plus courte, faite pour un changement
+     d'onglet — et l'on coupe l'autre quand les deux sont la. Le selecteur
+     porte les deux classes, il est donc plus specifique que chacune. */
+.screen.active.fondu{
+  animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+
+
+/* ═══ ON NE COUPE PLUS L'ANIMATION DE L'ESPACE ═══
+
+   ⚠ C'ETAIT LA SECONDE ANIMATION.
+
+     `#gestion-app` porte `app-shell-in`, l'entree de l'app — 0,65 s de
+     grandissement. Je la coupais pendant `espace-arrive` avec un
+     `animation:none`. Mais retirer cette classe 640 ms plus tard ne fait pas
+     qu'autoriser l'animation : elle la DECLENCHE.
+
+     On voyait donc l'ecran arriver avec `ecranEntre`, puis l'espace entier
+     repartir avec `appShellIn` une demi-seconde apres.
+
+   ⚠ C'EST LE TROISIEME PIEGE DU MEME GENRE dans ce fichier — apres les cartes
+     d'abonnement et le passage d'espace. La regle a retenir : ne jamais couper
+     une animation par une classe qu'on retirera. Soit on ne la declare pas,
+     soit on la laisse.
+
+   ⚠ ON NE REMPLACE PAR RIEN. Plus aucune regle ne touche a l'animation de
+     l'espace pendant le passage : `app-shell-in` n'est posee qu'a l'ouverture
+     de l'app, jamais au retour d'un apercu. Il n'y a donc rien a couper. */

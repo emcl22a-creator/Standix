@@ -14726,3 +14726,81 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
   font-size:11.5px; font-weight:400;
   color:var(--label-3); letter-spacing:-0.005em;
 }
+
+
+/* ═══ LE SEGMENT DANS LA FEUILLE EQUIPE ═══
+
+   ⚠ IL PORTE LES MARGES DE LA FEUILLE. `proc-segm` est fait pour vivre dans
+     une page, entre ses marges ; pose dans une feuille, il touchait les deux
+     bords. */
+#eq-segm{
+  margin:12px 24px 0;
+}
+
+/* ═══ LES DEUX TITRES DE GROUPE ═══
+
+   ⚠ LE TOTAL EST DANS LE TITRE, a droite. Sans lui, il faut additionner de
+     tete pour comparer les deux espaces — et c'est justement la comparaison
+     qu'on vient chercher. */
+.histo-groupe{
+  display:flex; align-items:baseline; justify-content:space-between;
+  gap:12px;
+  margin:18px 0 8px;
+  padding:0 2px;
+}
+.histo-groupe:first-child{ margin-top:6px; }
+.histo-groupe .hg-nom{
+  font-size:12.5px; font-weight:650; letter-spacing:-0.015em;
+  color:var(--label-2);
+}
+.histo-groupe .hg-tot{
+  font-size:12px; font-weight:600; color:var(--label-3);
+  letter-spacing:-0.01em;
+}
+
+
+/* ═══ PAS D'ARRIVEE QUAND ON CHANGE DE RYTHME ═══
+
+   ⚠ `offreArrive` REJOUE A CHAQUE REDESSIN. Elle fait monter la carte de 8 px
+     en la revelant : c'est juste quand on arrive sur la page, la premiere fois.
+
+     Mais `renderAbonnements` recree les cartes a chaque bascule mensuel /
+     annuel, et l'animation repart — d'ou l'agrandissement qui remonte, par
+     dessus le flou. Deux gestes simultanes, dont un qui n'a pas lieu d'etre :
+     ce ne sont pas de nouvelles cartes, ce sont les memes avec un autre prix.
+
+   ⚠ LA CLASSE EST POSEE SUR LA PAGE, pas sur les cartes. Elles n'existent pas
+     encore au moment ou l'on veut couper : c'est `renderAbonnements` qui les
+     fabrique. Le parent, lui, est deja la. */
+#p-abonnement.sans-arrivee .offre-carte{
+  animation:none !important;
+}
+
+
+/* ═══ L'ETIQUETTE « −20 % » DANS SON ONGLET ═══
+
+   ⚠ L'ONGLET A PERDU SON ALIGNEMENT en passant dans une grille. `.p-seg` posait
+     `align-items:center` sur un conteneur flex ; la grille l'a remplace, et
+     `align-items` valait `normal` — mesure a l'ecran. L'etiquette flottait
+     alors de deux pixels sous le texte.
+
+   ⚠ 2 PX, C'EST PEU MAIS CELA SE VOIT. Une pastille coloree a cote d'un mot
+     attire l'oeil : le moindre decalage se lit comme un defaut d'impression.
+
+   ⚠ ET ELLE S'ECARTE DU MOT. Elle le touchait presque ; 7 px la detachent sans
+     la faire flotter. */
+#abo-rythme .p-seg{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+}
+
+/* ⚠ `line-height:1` PLUTOT QUE 1,4. Un interligne superieur a la hauteur du
+   texte ajoute un demi-pixel en haut et en bas — reparti inegalement quand la
+   hauteur totale est impaire. C'est l'origine du pixel restant. */
+#abo-rythme .eco{
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+}

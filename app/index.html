@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=f26f9f24">
+<link rel="stylesheet" href="style.css?v=4cd56ca9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2247,7 +2247,7 @@
         </div></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(147,164,192,0.07)" stroke="url(#iaFiniGrand)" stroke-width="1.6"></circle><path class="trace" d="M20.4 24.2 24.4 28.2 32 20.6" stroke="url(#iaFiniGrand)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path><g class="signe"><path d="M43.6 6.4 45 10.4l4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4Z" fill="#fff"></path></g></svg></div>
+      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(255,174,46,0.10)" stroke="url(#iaCoche)" stroke-width="1.8"></circle><path class="trace" d="M20.6 24.2 24.4 28 31.6 20.4" stroke="url(#iaCoche)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
       <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
       <button class="btn block" id="ai-view-btn">Voir la procédure</button>
@@ -2332,7 +2332,12 @@
       <div class="clip-info" id="ecap-info" style="display:none;"></div>
       <div class="capcut-hint" id="ecap-hint">Touchez une étape ci-dessous pour régler son clip</div>
       <div class="cut-toolbar">
-        <button type="button" class="btn small block" id="ecap-add-btn">+ Découper une étape ici</button>
+        <!-- ⚠ « Decouper une etape ici » A ETE RETIRE.
+
+                 Il ajoutait une coupure a la position de la tete de lecture.
+                 Comme le deplacement des poignees, il appartient au decoupage
+                 manuel : l'IA produit desormais les etapes, et en inserer une a
+                 la main creerait une etape sans texte au milieu des autres. -->
       </div>
         <div class="ed-bornes" id="ecap-bornes">
           <button type="button" class="ed-borne actif" data-borne="a"><span class="k">Début</span><span class="v" id="ecap-vd">0:00,0</span></button>
@@ -2355,7 +2360,15 @@
         <button type="button" class="clip-tool" id="ecap-undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"></path><path d="M4 9h11a5 5 0 0 1 0 10h-3"></path></svg><span>Annuler</span></button>
           <button type="button" class="clip-tool" id="ecap-play-clip"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg><span>Lire</span></button>
       </div>
-            <button type="button" class="btn ghost clip-done-btn" id="ecap-done">Terminer le réglage</button>
+            <!-- ⚠ « Terminer le reglage » A ETE RETIRE.
+
+                 Il ne portait AUCUN ecouteur : verification faite, aucune ligne
+                 de `app.js` ne l'ecoutait. Il ne fermait donc rien — on le
+                 touchait, et rien ne se passait.
+
+                 Il datait du decoupage manuel, ou l'on validait chaque reglage
+                 avant de passer au suivant. « Enregistrer les modifications »,
+                 plus bas, est le seul bouton qui conclut vraiment. -->
         <div class="ed-couv" id="ecap-couv"></div>
         <div class="ed-legende" id="ecap-legende">
           <span><i style="background:var(--green)"></i>couvert</span>
@@ -2491,6 +2504,22 @@
            l'afficher. Il dit maintenant ce qu'il PERMET : c'est ce qui décide
            de l'imprimer ou non. -->
       <div class="qr-hint">Accéder directement à la procédure en scannant le QR code</div>
+      <!-- ⚠ VISIBLE UNIQUEMENT SUR UN BROUILLON.
+
+           Un QR imprime et colle au mur ne mene a rien tant que la procedure
+           n'est pas publiee : l'equipe scanne et tombe sur une page vide, sans
+           comprendre pourquoi.
+
+           Le dire ICI, a cote du bouton de telechargement, evite d'imprimer
+           une affiche qui ne marchera pas. Sur une procedure en ligne, la
+           mention n'a plus lieu d'etre et disparait. -->
+      <div class="qr-attente" id="qr-attente" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9"/><path d="M12 7.6v5l3 1.6"/>
+        </svg>
+        Le QR code fonctionnera une fois la procédure en ligne.
+      </div>
       <button class="btn block" id="qr-download-btn">Télécharger la fiche</button>
     </div>
 
@@ -3963,7 +3992,20 @@
          donnait un trait uniforme. Celui-ci garde le blanc — qui dit « c'est
          terminé » — mais en coordonnées relatives, et il finit sur l'ambre du
          logo plutôt que d'y arriver hors cadre. -->
-    <linearGradient id="iaFiniGrand" x1="0" y1="0" x2="1" y2="1">
+    <!-- ⚠ LA COCHE DE FIN D'ANALYSE A SON PROPRE DEGRADE.
+
+       `iaFiniGrand` va du BLANC a l'ambre — juste pour un anneau pose sur du
+       sombre, mais sur la carte blanche de fin d'analyse, la moitie haute du
+       trait disparait. On voyait une coche a moitie effacee.
+
+     ⚠ CELUI-CI RESTE DANS LA FAMILLE DE L'ANNEAU : les deux teintes ambres de
+       `FM_TEINTES`, sans le blanc. La coche a donc la meme couleur que le
+       cercle qui l'entoure, et se lit d'un bout a l'autre. -->
+  <linearGradient id="iaCoche" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFAE2E"></stop>
+    <stop offset="1" stop-color="#E8760F"></stop>
+  </linearGradient>
+  <linearGradient id="iaFiniGrand" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FFFFFF"></stop>
       <stop offset="0.5" stop-color="#FFFFFF"></stop>
       <stop offset="1" stop-color="#FEC64A"></stop>
@@ -4189,7 +4231,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=2c06f7ec"></script>
+<script type="module" src="app.js?v=99bbe0e9"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

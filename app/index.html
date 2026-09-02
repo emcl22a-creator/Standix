@@ -98,7 +98,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=6545d4c2">
+<link rel="stylesheet" href="style.css?v=3f23e07f">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3827,7 +3827,7 @@
 
      ⚠ A REGENERER A CHAQUE MODIFICATION de `app.js` ou `style.css`. C'est ce
        que fait `version.py`, livre a cote. -->
-<script type="module" src="app.js?v=fae55c7b"></script>
+<script type="module" src="app.js?v=88f60686"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -3879,8 +3879,14 @@
      Un element qui ne doit pas etre vu au depart se masque dans le BALISAGE.
      Le CSS l'habille, il ne devrait pas etre seul a decider s'il existe. -->
 <div id="apercu-bandeau" hidden>
-  <span>Vous voyez l’espace Équipe</span>
-  <button type="button" data-fermer-apercu>Revenir</button>
+  <!-- ⚠ PLUS DE BOUTON « REVENIR ». Le retour se fait en touchant l'un des
+       trois onglets — c'est deja le geste naturel, et le seul dont on se sert
+       en pratique. Un bouton de plus proposait un second chemin pour la meme
+       chose, et donnait au bandeau l'allure d'une alerte a traiter.
+
+       Ce n'est plus une commande mais une MENTION : elle dit ou l'on est, elle
+       ne demande rien. -->
+  <span>Espace Équipe</span>
 </div>
 
 <button type="button" class="glassDiv" id="voir-equipe"

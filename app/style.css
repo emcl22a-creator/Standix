@@ -7189,11 +7189,15 @@ body.plus-vu .plus-flot{
 
    Les deux espaces partagent cette règle : rien ne les distingue au démarrage.
    ═══════════════════════════════════════════════════════════════════════════ */
-#gestion-app, #equipe-app, #bar{
+/* ⚠ `#voir-equipe` FAIT PARTIE DU LOT. Il ne l'etait pas : au lancement, le
+   cercle apparaissait seul sur un ecran vide, avant la barre et le contenu.
+   Ce qui arrive ensemble doit etre masque ensemble. */
+#gestion-app, #equipe-app, #bar, #voir-equipe{
   transition:opacity 0.42s cubic-bezier(0.32, 0.72, 0, 1);
 }
 body.chargement #gestion-app,
 body.chargement #equipe-app,
+body.chargement #voir-equipe,
 body.chargement #bar{
   /* `!important` ET `animation:none`. Les deux espaces portent une animation
      d'entrée propre (`app-shell-in`), et une animation l'emporte TOUJOURS sur
@@ -7207,7 +7211,7 @@ body.chargement #bar{
   pointer-events:none;
 }
 @media (prefers-reduced-motion: reduce){
-  #gestion-app, #equipe-app, #bar{ transition:none; }
+  #gestion-app, #equipe-app, #bar, #voir-equipe{ transition:none; }
 }
 
 
@@ -14075,24 +14079,32 @@ body.sans-bar #voir-equipe{ opacity:0; pointer-events:none; }
    ensemble, et le geste de retour est a portee du pouce. */
 /* ⚠ IL BAT `[hidden]`, dont le `display:none` est pose par le navigateur.
    Sans ce second selecteur, le bandeau resterait invisible pendant l'apercu. */
+/* ⚠ UNE MENTION, PAS UN BANDEAU.
+
+   Il barrait toute la largeur, en noir, avec un bouton : l'allure d'une alerte
+   qu'il faut traiter. Or il ne dit qu'une chose — ou l'on se trouve — et
+   personne n'a besoin qu'on la lui crie.
+
+   Une pastille centree, de la largeur de son texte, posee au-dessus de la
+   barre. On la voit sans qu'elle occupe la place. */
 body.en-apercu #apercu-bandeau[hidden],
 body.en-apercu #apercu-bandeau{
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  position:fixed; left:18px; right:18px;
-  bottom:calc(max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px)) + var(--bar-h) + 12px);
-  padding:11px 12px 11px 18px;
+  display:flex; align-items:center; justify-content:center;
+  position:fixed; left:50%; transform:translateX(-50%);
+  /* ⚠ `width:max-content` PLUTOT QUE `left/right`. Ancree aux deux bords, la
+     pastille s'etirait sur toute la largeur ; ici elle fait exactement la
+     taille de son texte. */
+  width:max-content; max-width:calc(100vw - 60px);
+  bottom:calc(max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px)) + var(--bar-h) + 10px);
+  padding:6px 14px;
   border-radius:100px;
-  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
-  box-shadow:0 8px 24px -12px rgba(20,20,30,0.45);
-  color:#FFFFFF; font-size:13px; letter-spacing:-0.015em;
+  background:rgba(28,28,38,0.72);
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  color:rgba(255,255,255,0.88); font-size:12px; font-weight:500;
+  letter-spacing:-0.01em; white-space:nowrap;
   z-index:200;
+  pointer-events:none;   /* elle n'est pas cliquable : elle informe */
 }
-body.en-apercu #apercu-bandeau button{
-  flex-shrink:0; border:none; padding:7px 14px; border-radius:100px;
-  background:rgba(255,255,255,0.14); color:#FFFFFF;
-  font-family:inherit; font-size:13px; font-weight:600;
-}
-body.en-apercu #apercu-bandeau button:active{ transform:scale(0.94); }
 
 /* ⚠ LE CONTENU REMONTE AU-DESSUS DU BANDEAU, qui est maintenant en bas. Sans
    cette reserve, les dernieres lignes de la liste passeraient dessous. */

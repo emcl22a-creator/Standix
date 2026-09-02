@@ -14162,3 +14162,21 @@ body:not(.en-apercu) #voir-equipe.revient{
 /* ⚠ LA LARGEUR EST PILOTEE PAR LE SCRIPT, dans la boucle de la barre. La regle
    qui etait ici posait la valeur finale d'un coup, en `!important` : elle
    sautait par-dessus l'animation au lieu de l'accompagner. */
+
+
+/* ═══ LES ICONES D'OFFRE, PLUS GRANDES ═══
+
+   21 px dans une plaque de 42 : le dessin occupait la moitie du disque, et
+   flottait au milieu d'un vide gris. Sur une carte noire, ou la plaque se
+   detache a peine, on voyait surtout le vide.
+
+   ⚠ 24 PX, PAS PLUS. Au-dela, les traits touchent le bord du cercle — j'ai
+     essaye 26, le sommet de la tete d'« essentiel » y arrivait. */
+#p-abonnement .offre-plaque svg{ width:24px; height:24px; }
+
+/* La plaque s'eclaircit sur le fond noir : son gris a 3,4 % venait d'un fond
+   clair et disparaissait completement ici. */
+#p-abonnement .offre-plaque{
+  background:rgba(255,255,255,0.07);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.10);
+}

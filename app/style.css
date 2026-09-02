@@ -15462,3 +15462,30 @@ body.espace-vide .screen.active{ animation:none !important; }
    ⚠ ON NE REMPLACE PAR RIEN. Plus aucune regle ne touche a l'animation de
      l'espace pendant le passage : `app-shell-in` n'est posee qu'a l'ouverture
      de l'app, jamais au retour d'un apercu. Il n'y a donc rien a couper. */
+
+
+/* ⚠ LES CHIFFRES EN GRAS ETAIENT BLANCS SUR FOND CLAIR.
+
+   `.alerte-essai .s b` portait `color:#fff` — hérité de l'époque où cette
+   alerte vivait sur un fond sombre. Sur le fond ambre pâle d'aujourd'hui, les
+   deux nombres disparaissaient presque : mesure a l'ecran, ils etaient plus
+   clairs que le texte ordinaire qui les entoure.
+
+   ⚠ ET C'EST EUX QUI PORTENT LE MESSAGE. « 24 procedures et 6 membres » est la
+     seule chose qui donne envie de revenir ; l'effacer revenait a n'avoir rien
+     ecrit. */
+.alerte-essai .s b{
+  color:#8A4A00;
+  font-weight:700;
+}
+
+
+/* ⚠ `#dv-bouton` ET `.dv-aide` NE VISENT PLUS RIEN.
+
+   C'etait le bouton ambre « Terminer l'etape N » du decoupage manuel, et sa
+   ligne d'aide en dessous. Tous deux ont ete retires du balisage : l'IA
+   decoupe la video, on ne le fait plus a la main.
+
+   Leurs regles restent en place mais ne s'appliquent a aucun element. Je les
+   laisse plutot que de les supprimer — ce commentaire est la pour qu'on sache
+   pourquoi elles ne servent a rien, si quelqu'un les croise. */

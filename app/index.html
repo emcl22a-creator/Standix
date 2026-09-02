@@ -994,7 +994,7 @@
           </svg>
         </span>
         <span class="cc-tx">
-          <span class="cc-t">Je crée mon entreprise</span>
+          <span class="cc-t">S’inscrire en tant que gérant</span>
           <!-- ⚠ ON DECRIT L'APP, PAS CE QUE « VOUS » FEREZ. La version d'avant
                disait « vous filmez, votre equipe retrouve » : deux camps, et le
                lecteur range d'un cote avant meme d'avoir choisi.
@@ -1002,7 +1002,9 @@
                ⚠ ET COURT. Trois lignes sous un titre de trois mots se lisent
                  comme une notice ; personne ne lit une notice pour choisir
                  entre deux boutons. -->
-          <span class="cc-s">Vous êtes gérant ou responsable.</span>
+          <!-- ⚠ ON NE REPETE PLUS « gerant ». Le titre le dit deja ; la phrase du
+               dessous doit apprendre autre chose, pas confirmer le mot d'au-dessus. -->
+          <span class="cc-s">Créez vos procédures avec l’IA.</span>
         </span>
         <span class="cc-fl">›</span>
       </button>
@@ -1016,7 +1018,7 @@
           </svg>
         </span>
         <span class="cc-tx">
-          <span class="cc-t">J’ai reçu un code</span>
+          <span class="cc-t">S’inscrire en tant qu’utilisateur</span>
           <!-- ⚠ « a tout moment » PLUTOT QUE « au moment ou le geste se fait ».
                La formule d'avant decrivait une SITUATION — on la lit, on
                l'imagine, on met une seconde a la comprendre. « A tout moment »
@@ -1025,7 +1027,10 @@
                ⚠ ET LA MEME LONGUEUR QUE SA VOISINE. Deux cartes de meme rang
                  doivent peser pareil : une phrase courte a cote d'une phrase
                  longue suggere que l'une compte moins. -->
-          <span class="cc-s">Saisissez-le pour rejoindre l’équipe.</span>
+          <!-- ⚠ « Saisissez-LE » N'AVAIT PLUS D'ANTECEDENT. Le pronom renvoyait au
+               code, nomme dans l'ancien titre « J'ai recu un code ». Le titre ne
+               le mentionne plus : la phrase doit donc nommer le code elle-meme. -->
+          <span class="cc-s">Avec le code de votre équipe.</span>
           <!-- ⚠ « Consultez » ET NON « Retrouvez ». Retrouver suppose qu'on a
                deja cherche ; consulter est le geste lui-meme. -->
         </span>
@@ -3048,11 +3053,15 @@
     <div class="reg-groupe" data-teinte="bleu">
       <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
            d'ouvrir la page. Elle sert quand on veut savoir quand ça repart. -->
-      <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
-        <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
-      </button>
-      <div class="reg-filet"></div>
+      <!-- ⚠ « Analyses vidéo AI » A REJOINT LE GROUPE « Abonnement ».
+
+        Le compteur d'analyses EST une limite de l'abonnement : c'est le
+        forfait qui fixe combien on en a par mois. Le lire sous « Votre
+        entreprise », a cote de l'equipe et des postes, laissait croire a un
+        reglage de l'etablissement.
+
+        Les deux lignes sont maintenant cote a cote : ce qu'on paie, et ce
+        qu'il en reste. -->
       <button type="button" class="reg-ligne" onclick="openMembres()">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
@@ -3074,6 +3083,11 @@
 
     <div class="reg-titre">Abonnement</div>
     <div class="reg-groupe" data-teinte="violet">
+        <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
+        <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
+      </button>
+        <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" id="ouvrir-abonnement">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
         <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
@@ -4098,7 +4112,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
              stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h2 id="insc-titre">Je crée mon entreprise</h2>
+      <h2 id="insc-titre">S’inscrire en tant que gérant</h2>
     </div>
     <p class="histo-note" id="insc-note">Créez vos procédures avec l’IA.</p>
 
@@ -4231,7 +4245,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=c242f51a"></script>
+<script type="module" src="app.js?v=5dcc2874"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

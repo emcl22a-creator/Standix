@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=a2f59942">
+<link rel="stylesheet" href="style.css?v=f8923c9a">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2800,9 +2800,19 @@
 
       <!-- Le rythme, en tête. Deux onglets dans une même piste : on voit d'un
            coup qu'il y a un choix, et lequel est actif. -->
-      <div class="abo-rythme" id="abo-rythme">
-        <button type="button" class="abo-ryt on" data-rythme="mensuel">Mensuel</button>
-        <button type="button" class="abo-ryt" data-rythme="annuel">Annuel
+      <!-- ⚠ LE MEME SEGMENT QUE « 7 jours / 30 jours / 1 an ».
+
+           Il avait sa propre structure : deux boutons dans une piste etroite,
+           sans pastille. Le fond blanc sautait d'un bouton a l'autre — d'ou
+           l'impression de brusquerie.
+
+           Il reprend maintenant `proc-segm` et sa pastille `p-seg-lens`, qui
+           GLISSE d'une position a l'autre. Memes classes, donc meme geste,
+           sans rien a maintenir en double. -->
+      <div class="proc-segm" id="abo-rythme" role="tablist">
+        <span class="p-seg-lens" id="abo-segm-lens" aria-hidden="true"></span>
+        <button type="button" class="p-seg on" data-rythme="mensuel" role="tab">Mensuel</button>
+        <button type="button" class="p-seg" data-rythme="annuel" role="tab">Annuel
           <span class="eco">−20 %</span></button>
       </div>
 
@@ -4045,7 +4055,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=c8b55a01"></script>
+<script type="module" src="app.js?v=1a79f29e"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

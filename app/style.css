@@ -14394,3 +14394,24 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
      ferait sortir de la carte ; c'est son bord gauche qui avance sur la photo,
      ce qui accentue le debordement voulu. */
 #login-screen .scene-pastille{ max-width:88%; }
+
+
+/* ═══ LES DEUX CARTES DE CREATION : LA PLAQUE CADRE LE TEXTE ═══
+
+   Mesure avant correction : plaque de 40 px, texte finissant 6 px plus bas.
+   La plaque s'arretait au milieu de la seconde ligne — elle avait l'air posee
+   a cote du texte plutot que de le cadrer.
+
+   ⚠ 46 PX, ET C'EST UNE MESURE, PAS UN CHOIX ROND. Le titre fait 18 px de
+     haut, la phrase 18 aussi, et 3 px les separent : 39 px de texte. La plaque
+     doit couvrir cela plus le decalage de sa premiere ligne — 46 place son bas
+     a la ligne de base de la phrase.
+
+   ⚠ ELLE NE DOIT PAS S'ETIRER. `align-items:flex-start` sur la carte fait que
+     la plaque garde sa hauteur ; sans `flex-shrink:0` elle se comprimerait sur
+     un ecran etroit et redeviendrait plus petite que le texte. */
+#login-screen .creer-carte .cc-ic{
+  flex:0 0 46px; width:46px; height:46px;
+  border-radius:15px;
+}
+#login-screen .creer-carte .cc-ic svg{ width:24px; height:24px; }

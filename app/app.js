@@ -1688,8 +1688,22 @@ function ouvrirInscription(espace) {
     if (note) note.textContent = 'Saisissez le code de votre \u00e9tablissement.'
   }
 
-  /* Le formulaire s'adapte a l'espace : le champ de code n'apparait que du
-     cote equipe. C'est `switchAuthTab` qui s'en charge deja. */
+  /* ⚠ LES DEUX CHAMPS SONT MONTRES ICI, ET C'ETAIT LE DEFAUT.
+
+     Je m'en remettais a `switchAuthTab` et `ajusterChampsVisibles` en croyant
+     qu'elles s'en chargeaient. La premiere ne fait que basculer entre les deux
+     formulaires ; la seconde redimensionne des zones de texte, rien de plus.
+
+     Et `ouvrirBienvenue` les masque toutes les deux en arrivant sur la page —
+     a juste titre, puisqu'on ne sait pas encore quel chemin sera pris. Restait
+     a les rouvrir au moment du choix, ce que personne ne faisait : le
+     formulaire s'ouvrait sans son champ essentiel, nom d'entreprise d'un cote,
+     code de l'autre. */
+  document.getElementById('signup-gestion-field')?.style.setProperty(
+    'display', espace === 'gestion' ? 'block' : 'none')
+  document.getElementById('signup-equipe-field')?.style.setProperty(
+    'display', espace === 'equipe' ? 'block' : 'none')
+
   switchAuthTab('signup')
   ajusterChampsVisibles?.()
 

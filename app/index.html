@@ -98,7 +98,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=3f23e07f">
+<link rel="stylesheet" href="style.css?v=2156c024">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3827,7 +3827,7 @@
 
      ⚠ A REGENERER A CHAQUE MODIFICATION de `app.js` ou `style.css`. C'est ce
        que fait `version.py`, livre a cote. -->
-<script type="module" src="app.js?v=88f60686"></script>
+<script type="module" src="app.js?v=e2afc8b9"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -4873,12 +4873,27 @@ window.majBarreEspace = function (espace) {
    `marquerOngletActif` pose `.tab-on` sur les deux couches. C'est aussi ce
    qu'attend un lecteur d'ecran, qui ne voit pas un masque. */
 function marquerOngletActif() {
+  /* ⚠ AUCUN ONGLET N'EST ALLUME PENDANT L'APERCU.
+
+     `active` reste sur sa derniere valeur — 0 le plus souvent — et
+     « Procedures » gardait donc sa marque bleue alors qu'on est ailleurs. Or
+     on n'est sur aucune des trois pages : on regarde l'espace Equipe.
+
+     Les trois onglets reviennent au repos. Ils redeviennent des sorties, ce
+     qu'ils sont : toucher l'un d'eux ramene a sa page. */
+  const enApercu = document.body.classList.contains('en-apercu')
   document.querySelectorAll('#bar .tab').forEach((t, k) => {
-    const on = k % LABELS.length === active
+    const on = !enApercu && k % LABELS.length === active
     t.classList.toggle('tab-on', on)
     t.setAttribute('aria-current', on ? 'page' : 'false')
   })
 }
+
+/* ⚠ EXPOSEE SUR `window`. Elle vit dans le module de la barre, en bas de
+   index.html ; `app.js` en a besoin pour eteindre les onglets a l'entree de
+   l'apercu. Sans cette ligne, l'appel `window.marquerOngletActif?.()` etait
+   avale en silence par l'operateur optionnel — et l'onglet restait bleu. */
+window.marquerOngletActif = marquerOngletActif;
 
 window.placerOnglet = function (i) {
   if (typeof i !== 'number' || i < 0 || i >= LABELS.length) return;

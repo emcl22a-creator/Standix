@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=b962f782">
+<link rel="stylesheet" href="style.css?v=09c37bc2">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1295,6 +1295,21 @@
                stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
       </div>
+      <!-- ⚠ LE MEME SEGMENT QUE LA PAGE ANALYSE : `proc-segm` et sa pastille
+           `p-seg-lens`. La periode changeait ailleurs, jamais ici — on ouvrait
+           la feuille sans savoir sur quelle duree on lisait, et sans pouvoir en
+           changer sans la refermer.
+
+           ⚠ SES `data-jours` SONT LES MEMES : 7, 30, 360. C'est `anJours` qui
+             les recoit, la meme variable que le segment de la page. Les deux
+             restent donc d'accord sans qu'on ait a les synchroniser. -->
+      <div class="proc-segm histo-segm" id="eq-segm" role="tablist">
+        <span class="p-seg-lens" id="eq-segm-lens" aria-hidden="true"></span>
+        <button type="button" class="p-seg on" data-eq-jours="7" role="tab">7 jours</button>
+        <button type="button" class="p-seg" data-eq-jours="30" role="tab">30 jours</button>
+        <button type="button" class="p-seg" data-eq-jours="360" role="tab">1 an</button>
+      </div>
+
       <p class="histo-note" id="histo-equipe-note">Temps passé à lire des procédures.</p>
       <div class="histo-liste" id="histo-equipe-liste"></div>
     </div>
@@ -4120,7 +4135,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=be83fc72"></script>
+<script type="module" src="app.js?v=28247720"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

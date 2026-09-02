@@ -14432,3 +14432,77 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
              0 1px 2px rgba(20,20,30,0.05),
              0 14px 30px -16px rgba(20,20,30,0.30);
 }
+
+
+/* ═══ LA FEUILLE DE CONNEXION RESPIRE UN PEU PLUS ═══
+
+   ⚠ 28 PX AU LIEU DE 20. La carte tenait sur 20 px de marge, ce qui convenait
+     a un formulaire seul. Elle porte maintenant une photo pleine largeur, une
+     pastille qui deborde et deux cartes de creation : le contenu touchait
+     presque le bord.
+
+   ⚠ SEULE LA FEUILLE DE CONNEXION CHANGE. Le meme `padding` sert aux autres
+     feuilles modales de l'app, ou 20 px restent justes — elles ne contiennent
+     qu'une liste ou un formulaire court. */
+#login-screen .login-card{
+  padding-left:28px;
+  padding-right:28px;
+}
+
+/* ⚠ LE LOGOTYPE PASSE DE 19 A 22 PX. Il etait regle pour l'ecran de choix, ou
+   il accompagnait un titre de 44 px ; ici le titre fait 30, et le mot
+   paraissait timide a cote du signe.
+
+   ⚠ LE SIGNE SUIT. Un logotype plus grand a cote d'une image inchangee
+     desequilibre le bloc : les deux grandissent du meme rapport. */
+#login-screen .logotype{ font-size:22px; }
+#login-screen .feuille-marque img{ width:24px; height:32px; }
+
+
+/* ═══ « BIENVENUE » S'OUVRE COMME UNE PAGE, PAS COMME UNE FEUILLE ═══
+
+   Elle montait du bas — `feuilleMonte`, translation de 100 % — parce qu'elle
+   etait une modale posee sur l'ecran de choix. Cet ecran a disparu du
+   parcours : « Bienvenue » est desormais la premiere page de l'app, et elle
+   doit arriver comme les autres.
+
+   ⚠ C'EST EXACTEMENT `ecranEntre` : 12 px de montee, un souffle de flou, meme
+     duree, meme courbe. Recopier les valeurs plutot que nommer l'animation les
+     aurait laissees diverger a la premiere retouche. */
+#login-screen .login-card{
+  animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1) both;
+}
+
+/* ⚠ ET LE VOILE SOMBRE DISPARAIT. Il assombrissait ce qu'il y avait derriere
+   pour dire « ceci est pose par-dessus ». Il n'y a plus rien derriere. */
+#login-screen{
+  background:var(--bg);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  align-items:flex-start;
+}
+
+/* ⚠ LA FLECHE DE RETOUR DE LA FEUILLE D'INSCRIPTION.
+
+   Elle prend la place de la croix, a gauche du titre. Meme forme que les
+   fleches de retour des sous-pages : pastille ronde, fond gris translucide. */
+/* ⚠ `justify-content:flex-start` ANNULE LE `space-between` D'ORIGINE.
+
+   `.histo-tete` etale ses enfants aux deux bouts — juste quand il y a un titre
+   a gauche et une croix a droite. Avec la fleche en tete, le titre se
+   retrouvait projete au bord oppose, mesure a 151 px du gauche.
+
+   Les deux se suivent maintenant, separes de 10 px. */
+.histo-tete--retour{
+  display:flex; align-items:center; gap:10px;
+  justify-content:flex-start;
+}
+.histo-retour{
+  flex-shrink:0; width:32px; height:32px; padding:0; border:none;
+  border-radius:100px; display:grid; place-items:center;
+  background:rgba(118,118,128,0.12); color:var(--label-2);
+}
+.histo-retour svg{ width:15px; height:15px; }
+.histo-retour:active{ transform:scale(0.92); }
+/* ⚠ LE TITRE NE POUSSE PLUS LA FLECHE. `histo-tete` etale ses enfants aux deux
+   bouts — c'etait juste avec une croix a droite. Ici les deux se suivent. */
+.histo-tete--retour h2{ margin:0; }

@@ -1267,12 +1267,17 @@ function sortirApercuEquipe() {
   window.majBarreEspace?.('gestion')
   window.marquerOngletActif?.()
 
+  /* ⚠ LE MEME REBOND QU'A L'ALLER, PAS L'ANCIENNE APPARITION EN GOUTTE.
+
+     `revient` declenchait `goutteApparait` — le cercle se depliait depuis rien.
+     Il ne disparait plus : il n'a donc rien a reformer, juste a accuser
+     reception. */
   const cercle = document.getElementById('voir-equipe')
   if (cercle) {
-    cercle.classList.remove('revient')
+    cercle.classList.remove('rebondit')
     void cercle.offsetWidth
-    cercle.classList.add('revient')
-    setTimeout(() => cercle.classList.remove('revient'), 500)
+    cercle.classList.add('rebondit')
+    setTimeout(() => cercle.classList.remove('rebondit'), 420)
   }
 }
 
@@ -1296,7 +1301,21 @@ window.fermerApercuEquipe = function () {
 }
 
 
-document.getElementById('voir-equipe')?.addEventListener('click', () => {
+document.getElementById('voir-equipe')?.addEventListener('click', (e) => {
+  /* ⚠ LE REBOND, COMME SUR UN ONGLET.
+
+     Meme mecanique que la barre : on retire la classe, on force le navigateur a
+     relire la position — `offsetWidth` suffit — puis on la remet. Sans ce
+     passage, l'animation ne rejouerait pas au second clic.
+
+   ⚠ ET ON LA RETIRE APRES 420 ms, la duree exacte du rebond. Laissee en place,
+     elle rejouerait a chaque retouche de style sur le bouton. */
+  const cercle = e.currentTarget
+  cercle.classList.remove('rebondit')
+  void cercle.offsetWidth
+  cercle.classList.add('rebondit')
+  setTimeout(() => cercle.classList.remove('rebondit'), 420)
+
   ouvrirApercuEquipe()
 })
 
@@ -6811,8 +6830,18 @@ window.showEquipeScreen = function(id, btn) {
 
   arreterToutesLesVideos()
   jouerVoile()
-  window.majBarreEspace?.('equipe')
-  window.placerOnglet?.(ONGLET_EQUIPE_PAR_ECRAN[id])
+
+  /* ⚠ PAS PENDANT L'APERCU. `showEquipeScreen` bascule la barre a chaque
+     changement d'ecran — juste pour un employe, faux pour un gerant qui
+     REGARDE l'espace equipe : il doit garder ses trois onglets pour en sortir.
+
+   ⚠ ET L'ONGLET NE SE PLACE PAS NON PLUS. `ONGLET_EQUIPE_PAR_ECRAN` donne
+     l'indice dans la liste de l'equipe ; applique a la barre de gestion, il
+     allumerait le mauvais onglet. */
+  if (!document.body.classList.contains('en-apercu')) {
+    window.majBarreEspace?.('equipe')
+    window.placerOnglet?.(ONGLET_EQUIPE_PAR_ECRAN[id])
+  }
   /* L'espace Équipe ne crée pas de procédures : le bouton n'y a pas sa place. */
   document.body.classList.remove('plus-vu')
   /* ═══ LE STICKY A BESOIN QUE LE BODY LE LAISSE FAIRE ═══

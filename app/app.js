@@ -1704,7 +1704,15 @@ function ouvrirInscription(espace) {
   document.getElementById('signup-equipe-field')?.style.setProperty(
     'display', espace === 'equipe' ? 'block' : 'none')
 
-  switchAuthTab('signup')
+  /* ⚠ ON NE BASCULE PLUS LE FORMULAIRE DE LA PAGE DU DESSOUS.
+
+     `switchAuthTab('signup')` retirait la classe `active` du formulaire de
+     connexion pour la donner a celui d'inscription. Or les deux vivent sur la
+     page « Bienvenue », DERRIERE cette feuille : en la refermant, on
+     retrouvait la page sans ses champs de connexion.
+
+     La feuille porte son propre formulaire ; celui du dessous n'a pas a
+     changer. On le laisse sur la connexion, ou il doit rester. */
   ajusterChampsVisibles?.()
 
   f.hidden = false

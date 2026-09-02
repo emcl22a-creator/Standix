@@ -1156,8 +1156,12 @@ function afficherEcranChoix() {
      épargne le choix entre les deux espaces et on l'emmène directement à
      l'inscription, avec le code déjà rempli. */
   if (cibleQR) { chooseSpace('equipe'); preparerArriveeQR(); return }
+  /* ⚠ ON OUVRE DIRECTEMENT « BIENVENUE ». L'ecran de choix reste affiche
+     DERRIERE — il porte le fond sur lequel la feuille se pose — mais on ne
+     s'y arrete plus. */
   document.getElementById('choice-screen').style.display = 'flex'
   lancerAnimationLogoChoix()
+  ouvrirBienvenue()
 }
 
 // ═══ ÉCRAN 1 : CHOIX DE L'ESPACE ═══
@@ -1263,6 +1267,45 @@ document.getElementById('voir-equipe')?.addEventListener('click', () => {
 
 /* ⚠ L'ECOUTEUR DU BOUTON « REVENIR » A ETE RETIRE avec le bouton lui-meme. Le
    retour passe par les onglets, dans `onNavigate`. */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OUVRIR LA PAGE « BIENVENUE »
+
+   ⚠ L'ECRAN DE CHOIX A DISPARU DU PARCOURS.
+
+     Il posait la question — gerant ou employe — puis la page de connexion la
+     reposait par ses deux cartes du bas. Deux ecrans pour un seul choix, et
+     celui du milieu ne montrait rien de plus.
+
+     La page « Bienvenue » arrive donc directement. Ses deux cartes mènent aux
+     deux inscriptions, exactement comme les deux boutons de l'ancien ecran.
+
+   ⚠ `choice-screen` RESTE DANS LE BALISAGE, masque. Il porte l'animation du
+     logo au demarrage et sert de fond a la feuille de connexion — la retirer
+     demanderait de defaire ces deux mecanismes, pour rien.
+   ═══════════════════════════════════════════════════════════════════════════ */
+window.ouvrirBienvenue = function () {
+  const cible = document.getElementById('login-screen')
+  if (!cible) return
+
+  /* ⚠ ON N'IMPOSE PLUS D'ESPACE. `selectedSpace` reste indefini jusqu'a ce
+     qu'une des deux cartes soit touchee : la page ne prejuge pas du role de
+     celui qui l'ouvre. */
+  selectedSpace = null
+
+  cible.style.display = 'flex'
+  cible.removeAttribute('inert')
+
+  /* Aucun des deux formulaires d'inscription n'est prerempli : c'est la carte
+     touchee qui decidera. */
+  document.getElementById('signup-gestion-field')?.style.setProperty('display', 'none')
+  document.getElementById('signup-equipe-field')?.style.setProperty('display', 'none')
+
+  switchAuthTab('login')
+  const err = document.getElementById('login-error')
+  if (err) err.textContent = ''
+  demarrerScenes()
+}
 
 window.chooseSpace = function(space) {
   selectedSpace = space
@@ -21483,6 +21526,7 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
       afficherBarre(false)
       afficherBarre(false)
       document.getElementById('choice-screen').style.display = 'flex'
+      ouvrirBienvenue()
     } else {
       await chargerEtablissements()
     }
@@ -21786,6 +21830,7 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
   afficherBarre(false)
   afficherBarre(false)
   document.getElementById('choice-screen').style.display = 'flex'
+  ouvrirBienvenue()
   toast(`Vous avez quitt\u00e9 ${nom}.`)
 })
 

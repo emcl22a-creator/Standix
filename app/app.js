@@ -9824,7 +9824,16 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
        attendent. Sur une carte, il vaudrait toujours 1 — un chiffre qui ne
        varie jamais n'informe pas, il encombre. La pastille garde donc sa
        couleur, sa taille et sa place, mais reste pleine. */
-  const jamaisVue = !proc.publiee_le && !brouillonsVus().has(proc.id)
+  /* ⚠ LE POINT BLEU NE DEPEND PLUS DE LA PUBLICATION.
+
+     Il ne paraissait que sur les brouillons : `!proc.publiee_le` en tete de
+     condition. Une procedure publiee, jamais ouverte, n'en avait donc pas — et
+     en passant de « Brouillons » a « Toutes », le point disparaissait comme si
+     on l'avait deja consultee.
+
+     Seul compte desormais ce qu'on a vu : `brouillonsVus` porte mal son nom, il
+     retient toutes les procedures ouvertes, publiees ou non. */
+  const jamaisVue = !brouillonsVus().has(proc.id)
   el.dataset.key = proc.id
   animerApparition(el, rang)
   const teinte = couleurDossier(rang)
@@ -9868,7 +9877,10 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
               ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''
 
             if (proc.publiee_le) {
-              return `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
+              /* ⚠ LA MARQUE VAUT AUSSI POUR UNE PROCEDURE EN LIGNE. Elle
+                 n'etait posee que sur le badge « Brouillon » : c'est la seconde
+                 moitie du defaut. */
+              return `<span class="cl-badge">${marque}<i style="background:#34C759"></i>En ligne</span>`
             }
             /* Non publiee : la roue seulement si l'analyse tourne VRAIMENT,
                c'est-a-dire si `etatProcedureHtml` rend autre chose qu'un
@@ -18880,6 +18892,17 @@ function etatProcedureHtml(proc) {
        politique RLS l'en empêche — donc le test ne s'y déclenche jamais. Il
        est écrit quand même : une règle qui dépend d'un filtre distant n'est
        pas une règle. */
+  /* ⚠ L'ECHEC PASSE AVANT CE TEST, ET C'ETAIT LE DEFAUT.
+
+     Cette condition attrapait tout ce qui n'est ni `traitement` ni
+     `redaction` — donc `echec` aussi. Une analyse ratee rendait un badge
+     « Brouillon » ordinaire, impossible a distinguer d'un brouillon ecrit a la
+     main. Les deux lignes d'alerte plus bas n'etaient jamais atteintes.
+
+     On les remonte : un probleme se signale avant de decrire un etat. */
+  if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a \u00e9chou\u00e9 \u2014 touchez pour relancer")
+  if (analyseBloquee(proc)) return alerte('#FA8A08', "L'analyse semble bloqu\u00e9e \u2014 touchez pour relancer")
+
   if (proc && !proc.publiee_le && proc.statut !== 'traitement' && proc.statut !== 'redaction') {
     /* ⚠ LA MEME PILULE QUE PARTOUT AILLEURS. Elle etait ambre et pleine, seule
        de son espece : dans une liste ou tous les etats sont des pilules
@@ -18889,8 +18912,10 @@ function etatProcedureHtml(proc) {
     return `<span class="cl-badge" title="Pas encore visible par votre équipe"><i style="background:#9A9AA4"></i>Brouillon</span>`
   }
 
-  if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a échoué — touchez pour relancer")
-  if (analyseBloquee(proc)) return alerte('#FA8A08', "L'analyse semble bloquée — touchez pour relancer")
+  /* ⚠ CES DEUX TESTS ONT ETE REMONTES en tete de la fonction. Les laisser ici
+     les rendait inatteignables. */
+  /* ⚠ CE TEST ETAIT UN DOUBLON, inatteignable : le badge « Brouillon » juste
+     au-dessus rendait avant lui. Le vrai est en tete de fonction. */
 
   if (proc?.statut === 'traitement' || proc?.statut === 'redaction') {
     /* La marque de l'IA, pas une roue de chargement quelconque : c'est bien

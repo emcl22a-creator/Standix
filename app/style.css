@@ -15079,8 +15079,15 @@ body:has(#equipe-app[style*="display:block"]) #voir-equipe{
 
 /* La barre reprend toute la largeur : sans cercle a loger, le decalage n'a
    plus lieu d'etre. */
-body:has(#equipe-app[style*="display: block"]) #bar,
-body:has(#equipe-app[style*="display:block"]) #bar{
+/* ⚠ SEULEMENT DANS L'ESPACE EQUIPE, PAS PENDANT L'APERCU.
+
+   Cette regle elargit la barre quand le cercle n'existe pas — c'est le cas d'un
+   employe. Mais pendant l'apercu, l'espace equipe est bien affiche ET le cercle
+   reste la : la barre passait dessous.
+
+   `:not(.en-apercu)` fait la difference que le selecteur ne pouvait pas voir. */
+body:not(.en-apercu):has(#equipe-app[style*="display: block"]) #bar,
+body:not(.en-apercu):has(#equipe-app[style*="display:block"]) #bar{
   width:min(calc(100vw - 46px), calc(var(--col, 460px) - 40px)) !important;
 }
 
@@ -15194,59 +15201,93 @@ body:has(#login-screen[style*="display:flex"]) #voir-equipe{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE PASSAGE VERS L'APERCU EQUIPE
+   LE PASSAGE VERS L'APERCU : RIEN, PUIS TOUT
 
-   ⚠ LE RETOURNEMENT 3D A ETE RETIRE. Il pivotait l'ecran entier sur son axe
-     vertical — spectaculaire, mais etranger au reste de l'app : aucun autre
-     passage ne fait ca, et sur un geste qu'on repete il fatigue.
+   ⚠ LES DEUX ESPACES NE SE CROISENT PLUS. L'un s'effacait pendant que l'autre
+     grandissait : pendant un tiers de seconde, on voyait deux pages
+     superposees, a demi transparentes.
 
-     On reprend `appShellIn`, l'entree de l'app elle-meme : le meme grandissement
-     depuis 97,5 % qu'a l'ouverture de l'espace Gestion. Un espace qui parait,
-     comme les autres.
+     Desormais l'ecran se vide d'abord — vraiment vide, le fond seul — puis
+     l'espace equipe arrive d'un coup, comme s'il venait de loin.
 
-   ⚠ ET LA BARRE NE BOUGE PAS. Elle reste posee par-dessus, hors de l'element
-     qui grandit : c'est ce qui dit qu'on n'a pas quitte la gestion. */
-/* ⚠ LES DEUX ESPACES SONT SUPERPOSES LE TEMPS DU PASSAGE.
+   ⚠ « DE LOIN » VEUT DIRE PLUS PETIT ET PLUS FLOU. Une echelle seule donne un
+     objet qui grossit ; le flou qui se resorbe en meme temps donne la
+     profondeur — c'est ce qui fait qu'on lit un eloignement plutot qu'un
+     agrandissement.
 
-   Ils sont freres dans le flux : affiches ensemble sans cette regle, le second
-   se poserait SOUS le premier et la page ferait le double de haut, avec un
-   sursaut de defilement au milieu du geste.
-
-   ⚠ ET LE DEFILEMENT EST BLOQUE. Faire glisser un ecran qui grandit donne un
-     mouvement contradictoire. */
-body.retourne-vers, body.retourne-depuis{ overflow:hidden; }
-
-body.retourne-vers #gestion-app, body.retourne-vers #equipe-app,
-body.retourne-depuis #gestion-app, body.retourne-depuis #equipe-app{
-  position:fixed; inset:0;
-  overflow:hidden;
-  z-index:5;
+   ⚠ ET IL N'ARRIVE QUE PRET. Le script attend le chargement avant de poser la
+     classe : sans cela, on verrait la page se remplir pendant qu'elle avance.
+   ═══════════════════════════════════════════════════════════════════════════ */
+body.espace-vide #gestion-app,
+body.espace-vide #equipe-app{
+  opacity:0;
+  pointer-events:none;
 }
 
-body.retourne-vers #equipe-app,
-body.retourne-depuis #gestion-app{
-  animation:appShellIn 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  /* ⚠ CELUI QUI ARRIVE PASSE DEVANT. Sans cela, l'ordre du balisage decide —
-     et la gestion, ecrite en premier, resterait au-dessus. */
-  z-index:6;
+body.espace-arrive #equipe-app,
+body.espace-arrive #gestion-app{
+  animation:venirDeLoin 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* ⚠ LA FACE QUI PART S'EFFACE SIMPLEMENT. La laisser en place derriere celle
-   qui grandit la ferait transparaitre par les bords pendant les premieres
-   images — l'espace equipe n'occupe que 97,5 % au depart. */
-body.retourne-vers #gestion-app,
-body.retourne-depuis #equipe-app{
-  animation:espaceSort 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+@keyframes venirDeLoin{
+  0%  { opacity:0; transform:scale(0.88); filter:blur(6px); }
+  40% { opacity:1; }
+  100%{ opacity:1; transform:none;        filter:blur(0px); }
 }
 
-@keyframes espaceSort{
-  from{ opacity:1; }
-  to  { opacity:0; }
-}
+/* ⚠ LE DEFILEMENT EST BLOQUE le temps du passage : une page qui avance pendant
+   qu'on la fait glisser donne deux mouvements contraires. */
+body.espace-vide, body.espace-arrive{ overflow:hidden; }
 
 @media (prefers-reduced-motion: reduce){
-  body.retourne-vers #equipe-app, body.retourne-depuis #gestion-app,
-  body.retourne-vers #gestion-app, body.retourne-depuis #equipe-app{
+  body.espace-arrive #equipe-app, body.espace-arrive #gestion-app{
     animation:none;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CERCLE RESTE ET CHANGE D'ETAT
+
+   ⚠ IL DISPARAISSAIT EN GOUTTE D'EAU. La barre s'etirait alors pour prendre sa
+     place, et l'on perdait le seul chemin de retour visible.
+
+     Il reste maintenant a l'ecran : il grossit un peu, passe au noir, et dit
+     ainsi qu'on regarde l'espace equipe. Le toucher a nouveau ramene chez soi.
+
+   ⚠ LE GROSSISSEMENT EST PLUS LARGE QUE HAUT. 1,08 contre 1,04 : un cercle qui
+     grandit pareil dans les deux sens se contente de gonfler. En s'etirant
+     d'abord par les cotes, il donne l'impression de se poser plutot que de
+     grossir.
+
+   ⚠ ET IL PORTE LES DEUX CHANGEMENTS SUR LA MEME COURBE. Couleur et taille
+     separees donneraient deux gestes ; ensemble, c'est un seul.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#voir-equipe{
+  transition:transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+             background-color 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+             box-shadow 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.en-apercu #voir-equipe{
+  /* ⚠ ON ANNULE L'ANCIENNE DISPARITION. Elle est encore declaree plus haut
+     dans ce fichier ; sans `animation:none`, elle l'emporterait sur ces
+     transitions — une animation bat toujours une declaration ordinaire. */
+  animation:none !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+
+  transform:var(--place) scale(1.08, 1.04);
+  background-color:#14141A;
+  box-shadow:0 6px 18px -8px rgba(20,20,30,0.45);
+}
+
+/* L'oeil passe au blanc sur le fond noir. */
+body.en-apercu #voir-equipe svg{ stroke:#FFFFFF; }
+
+/* ⚠ LE MOUVEMENT EST RETIRE POUR QUI LE DEMANDE, la couleur reste : elle
+   porte l'information, pas l'effet. */
+@media (prefers-reduced-motion: reduce){
+  #voir-equipe{ transition:background-color 0.2s linear; }
+  body.en-apercu #voir-equipe{ transform:var(--place); }
 }

@@ -1282,49 +1282,34 @@ window.chooseSpace = function(space) {
   ecranC.removeAttribute('inert')
   /* Le titre reprend le mot de la carte touchée : on doit reconnaître d'où
      l'on vient, sinon l'écran suivant paraît sans rapport. */
-  /* Le titre reprend le mot de la carte touchée, mais SANS le verbe : « S'inscrire
-     et créer son entreprise » en tête d'un formulaire d'inscription répéterait ce
-     que la page fait déjà voir. La carte annonce le geste, l'écran le déroule. */
-  document.getElementById('auth-title').textContent =
-    space === 'gestion' ? 'Votre entreprise' : 'Acc\u00e9der aux proc\u00e9dures'
-  document.getElementById('signup-gestion-field').style.display = space === 'gestion' ? 'block' : 'none'
-  document.getElementById('signup-equipe-field').style.display = space === 'equipe' ? 'block' : 'none'
-  /* ═══ INSCRIPTION SEULE, ET LES ONGLETS DISPARAISSENT ═══
+  /* ⚠ L'EN-TETE NE CHANGE PLUS SELON LE CHEMIN.
 
-     Quelqu'un qui vient de toucher « Créer une entreprise » veut s'inscrire.
-     J'ouvrais déjà sur le bon onglet, mais je laissais les deux visibles — la
-     connexion restait donc atteignable depuis un écran qui ne lui sert pas.
+     Ces lignes reecrivaient le titre — « Votre entreprise », « Acceder aux
+     procedures » — et la phrase du dessous, a la seconde ou la page paraissait.
+     La nouvelle page « Bienvenue » etait donc bien affichee, mais decapitee :
+     on croyait voir l'ancienne alors qu'on voyait la nouvelle, defiguree.
 
-     Or les deux chemins ne sont pas symétriques. Se connecter depuis « Créer
-     une entreprise » n'a aucun sens : on ne crée rien, le champ « Nom de
-     l'entreprise » resterait rempli sans être lu, et l'entreprise ne serait
-     jamais créée. La personne se retrouverait dans son ancien espace en
-     croyant en avoir monté un nouveau.
+     C'est ce qui a fait chercher un probleme de deploiement pendant trois
+     tours, alors que le fichier en ligne etait le bon.
 
-     Trois écrans, trois gestes, un seul possible dans chacun. C'est le même
-     traitement que « J'ai déjà un compte », dans l'autre sens. */
+     La page dit desormais la meme chose a tout le monde : elle porte ses deux
+     chemins de creation en bas, et n'a plus besoin de se reecrire selon la
+     porte empruntee.
+
+   ⚠ SEULS LES CHAMPS DU FORMULAIRE SUIVENT L'ESPACE CHOISI. C'est la vraie
+     difference entre les deux parcours : un nom d'entreprise d'un cote, un
+     code d'invitation de l'autre. */
+  document.getElementById('signup-gestion-field')?.style.setProperty(
+    'display', space === 'gestion' ? 'block' : 'none')
+  document.getElementById('signup-equipe-field')?.style.setProperty(
+    'display', space === 'equipe' ? 'block' : 'none')
+
   switchAuthTab('signup')
-  document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
-  const sous = document.getElementById('auth-sous')
-  if (sous) {
-    /* Ces phrases suivent les cartes du choix : elles disent le rôle, pas la
-       suite d'opérations. Un écran qui reprend d'autres mots que le bouton
-       qu'on vient de toucher fait douter d'avoir cliqué au bon endroit. */
-    /* ═══ UNE PHRASE QUI ACCUEILLE, PAS UNE CONSIGNE ═══
 
-       Elles disaient l'opération : « Vous créez l'entreprise », « Entrez le
-       code ». C'est ce que le formulaire montre déjà.
+  const err = document.getElementById('login-error')
+  if (err) err.textContent = ''
 
-       Une première phrase dit maintenant OÙ l'on arrive, la seconde ce qu'on va
-       y faire. C'est le geste d'Apple sur ses écrans de bienvenue : on est reçu
-       avant d'être mis au travail. */
-    sous.innerHTML = space === 'gestion'
-      ? 'Bienvenue.<br><span class="auth-sous-2">Cr\u00e9ez votre espace, invitez votre \u00e9quipe, ' +
-        'et laissez l\u2019IA \u00e9crire vos proc\u00e9dures.</span>'
-      : 'Bienvenue.<br><span class="auth-sous-2">Votre responsable vous a donn\u00e9 un code \u00e0 ' +
-        'six caract\u00e8res : il ouvre les proc\u00e9dures de votre entreprise.</span>'
-  }
-  document.getElementById('login-error').textContent = ''
+  demarrerScenes()
 }
 /* ═══ ALLER DIRECTEMENT À LA CONNEXION ═══
 
@@ -1520,18 +1505,31 @@ window.allerConnexion = function() {
      `chooseSpace`. Le masquer briserait l'illusion d'une couche posée dessus. */
   cible.style.display = 'flex'
   cible.removeAttribute('inert')
-  document.getElementById('auth-title').textContent = 'Se connecter'
-  document.getElementById('signup-gestion-field').style.display = 'none'
-  document.getElementById('signup-equipe-field').style.display = 'none'
+
+  /* ⚠ ON NE REECRIT PLUS LE TITRE NI LA PHRASE.
+
+     Ces deux lignes posaient « Se connecter » et « Content de vous revoir » :
+     la page « Bienvenue » etait donc bien affichee, mais son en-tete etait
+     remplace a la seconde ou elle paraissait. On croyait voir l'ancienne page
+     alors que c'etait la nouvelle, defiguree.
+
+     La page dit maintenant la meme chose a tout le monde. Elle porte les deux
+     chemins de creation en bas : distinguer celui qui revient de celui qui
+     arrive n'a plus lieu d'etre, et cela evitait justement ce genre de
+     reecriture invisible.
+
+   ⚠ LES DEUX CHAMPS D'INSCRIPTION SONT TESTES. Ils existaient toujours a
+     l'epoque de cette fonction ; l'un d'eux pourrait disparaitre a la prochaine
+     retouche du formulaire, et l'appel echouerait en silence. */
+  document.getElementById('signup-gestion-field')?.style.setProperty('display', 'none')
+  document.getElementById('signup-equipe-field')?.style.setProperty('display', 'none')
   switchAuthTab('login')
-  const sous = document.getElementById('auth-sous')
-  /* Pour qui revient, pas de « bienvenue » — il connaît la maison. Une phrase
-     qui reprend le fil là où il l'a laissé. */
-  if (sous) sous.innerHTML = 'Content de vous revoir.<br>' +
-    '<span class="auth-sous-2">Vos proc\u00e9dures vous attendent.</span>'
-  document.getElementById('login-error').textContent = ''
-  /* Les onglets disparaissent : il n'y a plus de second onglet utile. */
-  document.querySelector('.auth-toggle')?.setAttribute('data-cache', '1')
+
+  const err = document.getElementById('login-error')
+  if (err) err.textContent = ''
+
+  /* Les scenes tournent tant que la feuille est ouverte. */
+  demarrerScenes()
 }
 
 /* ═══ LA FEUILLE REDESCEND AVANT DE DISPARAÎTRE ═══

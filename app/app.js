@@ -7525,6 +7525,22 @@ function marquerBrouillonVu(id) {
      procedure vue il y a un an n'a plus besoin d'etre suivie. */
   try { localStorage.setItem(CLE_VUS, JSON.stringify([...vus].slice(-200))) } catch {}
   majPastilleBrouillons()
+
+  /* ⚠ LE POINT BLEU DOIT PARTIR TOUT DE SUITE.
+
+     `majPastilleBrouillons` ne touche que le compteur de l'onglet ; la carte,
+     elle, garde son point jusqu'au prochain redessin complet de la liste. En
+     revenant d'une procedure, ou apres une recherche, on la retrouvait donc
+     marquee comme jamais ouverte.
+
+   ⚠ ON EFFACE LE POINT PLUTOT QUE DE TOUT REDESSINER. Un `renderCategoryGrid`
+     rejouerait l'apparition des cartes et ferait sauter la liste sous le doigt,
+     alors qu'un seul element a change.
+
+   ⚠ ET DANS LES DEUX ESPACES. La meme procedure peut etre a l'ecran cote
+     gestion et cote equipe — l'apercu affiche les deux listes. */
+  document.querySelectorAll(`[data-key="${CSS.escape(String(id))}"] .p-seg-pt`)
+    .forEach(pt => pt.remove())
 }
 
 function majPastilleBrouillons() {
@@ -10384,9 +10400,30 @@ document.addEventListener('click', (e) => {
 /* La variable est declaree bien plus haut, avec les autres etats de la grille.
    Voir l'avertissement qui l'accompagne : la placer ici cassait la page. */
 const champRech = document.getElementById('proc-rech-champ')
+const croixRech = document.getElementById('proc-rech-x')
+
+/* ⚠ LA CROIX SUIT LE CONTENU DU CHAMP, pas la frappe. `value` couvre aussi le
+   collage, la dictee et le remplissage automatique — trois chemins qui
+   n'emettent pas toujours d'evenement clavier. */
+function majCroixRech() {
+  if (croixRech) croixRech.hidden = !champRech?.value
+}
+
 champRech?.addEventListener('input', () => {
   rechercheDossiers = champRech.value.trim().toLowerCase()
+  majCroixRech()
   renderCategoryGrid()
+})
+
+croixRech?.addEventListener('click', () => {
+  if (!champRech) return
+  champRech.value = ''
+  rechercheDossiers = ''
+  majCroixRech()
+  renderCategoryGrid()
+  /* ⚠ ON REND LE CLAVIER, ON NE LE FERME PAS. Effacer sert le plus souvent a
+     retaper autre chose ; fermer le clavier obligerait a retoucher le champ. */
+  champRech.focus()
 })
 
 /* ⚠ UN SEUL ECOUTEUR SUR LE CONTENEUR, pas trois sur les boutons. Le segment

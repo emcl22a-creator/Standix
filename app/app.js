@@ -1725,11 +1725,35 @@ let scenesMinuteur = null
 
 function demarrerScenes() {
   const zone = document.getElementById('scenes')
-  if (!zone || scenesMinuteur) return
+  if (!zone) return
+
+  /* ⚠ ON REPART DE ZERO A CHAQUE OUVERTURE, ET C'ETAIT TOUT LE DEFAUT.
+
+     La fonction sortait quand un minuteur tournait deja. Or il demarre au
+     chargement de l'app, avant que la page « Bienvenue » soit visible : quand
+     elle parait enfin, le compte est deja entame.
+
+     Mesure au banc : la premiere image restait 4,1 s au lieu de 7. Selon le
+     temps de chargement, ce pouvait etre 2 s ou 6 — d'ou l'impression de
+     durees irregulieres.
+
+   ⚠ ON ARRETE PLUTOT QUE DE SORTIR. Le premier intervalle compte alors sept
+     secondes pleines, comme les suivants. */
+  if (scenesMinuteur) { clearInterval(scenesMinuteur); scenesMinuteur = null }
   const images = [...zone.querySelectorAll('.scene')]
   if (images.length < 2) return
 
-  let i = 0
+  /* ⚠ LA PREMIERE IMAGE DURAIT PLUS LONGTEMPS QUE LES AUTRES.
+
+     Elle est visible des que la page s'affiche, mais le minuteur ne demarre
+     qu'apres `attendreScenes` — le temps que les fichiers se decodent, ou
+     1,5 s de securite si le reseau traine. Ce delai s'AJOUTAIT aux sept
+     secondes : la premiere image tenait 8,5 s, les suivantes 7.
+
+   ⚠ ON REPART DE L'IMAGE ACTIVE, pas de la premiere. `demarrerScenes` est
+     appelee depuis quatre endroits ; si le carrousel avait deja tourne, forcer
+     `i = 0` ferait un saut en arriere. */
+  let i = Math.max(0, images.findIndex(im => im.classList.contains('visible')))
   scenesMinuteur = setInterval(() => {
     /* ⚠ ON NE FAIT RIEN SI L'ONGLET EST CACHE. Le minuteur continue, mais la
        bascule est sautee : au retour, on reprend a l'image en cours au lieu
@@ -1738,12 +1762,15 @@ function demarrerScenes() {
     images[i].classList.remove('visible')
     i = (i + 1) % images.length
     images[i].classList.add('visible')
-  /* ⚠ SEPT SECONDES, PAS CINQ. Le fondu en prend maintenant 1,6 : a cinq
-     secondes d'intervalle, l'image restait nette a peine trois secondes avant
-     de repartir. Sept laissent le temps de la regarder. */
-  }, 7000)
-}
+  /* ⚠ 4,5 SECONDES, ET LE FONDU SUIT.
 
+     Le fondu reste a 1 s dans `style.css` : il laisse 3,5 s d'image posee,
+     soit un peu moins d'un quart du temps en transition — le meme rapport que
+     le reglage d'origine a sept secondes.
+
+   ⚠ LES DEUX VALEURS SONT LIEES. Si vous changez l'une, changez l'autre. */
+  }, 4500)
+}
 function arreterScenes() {
   if (!scenesMinuteur) return
   clearInterval(scenesMinuteur)

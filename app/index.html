@@ -908,45 +908,11 @@
            fetchpriority="high" decoding="async">
       <img class="scene" src="scene-bureau.webp" alt="" loading="lazy" decoding="async">
 
-      <!-- ⚠ LA PASTILLE DEBORDE L'IMAGE, en bas a droite. Elle reprend la
-           matiere de la carte d'identite des Reglages — meme fond, meme rayon,
-           meme ombre.
+            <!-- ⚠ LA PASTILLE « Procedure validee » A ETE RETIREE.
 
-           Elle ne bouge pas avec les scenes : ce qu'elle montre est vrai des
-           deux cotes, au bureau comme a l'entrepot. -->
-      <!-- ⚠ `glassDiv` LUI DONNE LA MATIERE DU VOLET DU MENU : verre translucide,
-             flou d'arriere-plan, arete claire. Une classe partagee plutot que des
-             valeurs recopiees — le jour ou le verre change, elle suit. -->
-        <div class="scene-pastille glassDiv">
-        <span class="sp-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal0)" stroke-width="1.9"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/>
-            <path d="M13.6 3.4v5h5"/><path d="M8.8 13.2h6.4M8.8 16.6h4.2"/>
-          </svg>
-        </span>
-        <span class="sp-tx">
-          <span class="sp-t">Procédure validée</span>
-          <!-- ⚠ « Former un nouveau », APRES DEUX ESSAIS RATES.
-
-               « Ouverture de caisse » supposait un commerce. « Prise de poste »
-               etait pire : c'est du vocabulaire de ressources humaines, que je
-               connais et que le gerant d'un garage n'emploie jamais. Un exemple
-               qu'il faut traduire ne montre rien.
-
-               Former quelqu'un qui arrive, tout le monde l'a fait — au bureau,
-               a l'atelier, en cuisine. Et c'est exactement ce que l'app sert a
-               faire : ecrire une fois ce qu'on repete a chaque nouveau.
-
-               ⚠ SI VOUS DEVEZ EXPLIQUER UN EXEMPLE, IL EST MAUVAIS. C'est le
-                 test que j'aurais du appliquer aux deux premiers. -->
-          <span class="sp-s">Former un nouvel arrivant</span>
-        </span>
-        <span class="sp-ok">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6"
-               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
-        </span>
-      </div>
+           Elle posait un exemple d'interface par-dessus la photo : deux choses
+           a lire au meme endroit. La scene dit deja ce que fait l'app —
+           quelqu'un a son poste, son telephone en main. -->
     </div>
 
     <div class="auth-form-wrap">
@@ -1004,7 +970,7 @@
                  entre deux boutons. -->
           <!-- ⚠ ON NE REPETE PLUS « gerant ». Le titre le dit deja ; la phrase du
                dessous doit apprendre autre chose, pas confirmer le mot d'au-dessus. -->
-          <span class="cc-s">Créez vos procédures avec l’IA.</span>
+          <span class="cc-s">Gérez vos procédures.</span>
         </span>
         <span class="cc-fl">›</span>
       </button>
@@ -1030,7 +996,10 @@
           <!-- ⚠ « Saisissez-LE » N'AVAIT PLUS D'ANTECEDENT. Le pronom renvoyait au
                code, nomme dans l'ancien titre « J'ai recu un code ». Le titre ne
                le mentionne plus : la phrase doit donc nommer le code elle-meme. -->
-          <span class="cc-s">Avec le code de votre équipe.</span>
+          <!-- ⚠ « de l'equipe » PLUTOT QUE « de votre equipe ». Quarante caracteres
+               passaient sur deux lignes quand la carte voisine en tenait une :
+               deux cartes de meme rang doivent peser pareil. -->
+          <span class="cc-s">Consultez les procédures.</span>
           <!-- ⚠ « Consultez » ET NON « Retrouvez ». Retrouver suppose qu'on a
                deja cherche ; consulter est le geste lui-meme. -->
         </span>
@@ -4252,7 +4221,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=dff0453d"></script>
+<script type="module" src="app.js?v=7f6c6c19"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

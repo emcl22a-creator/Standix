@@ -20526,9 +20526,9 @@ window.renderAbonnements = function() {
         <button type="button" class="reg-ligne" data-abo-gerer>
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
             <path d="M4 7.4h9M17.4 7.4h2.6M4 16.6h2.6M11 16.6h9"
-                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"/>
-            <circle cx="15.2" cy="7.4" r="2.4" stroke="url(#logoOrIc)" stroke-width="1.7"/>
-            <circle cx="8.8" cy="16.6" r="2.4" stroke="url(#logoOrIc)" stroke-width="1.7"/>
+                  stroke="url(#cocheOffre)" stroke-width="1.9" stroke-linecap="round"/>
+            <circle cx="15.2" cy="7.4" r="2.4" stroke="url(#cocheOffre)" stroke-width="1.9"/>
+            <circle cx="8.8" cy="16.6" r="2.4" stroke="url(#cocheOffre)" stroke-width="1.9"/>
           </svg></span>
           <span class="reg-nm">G\u00e9rer ou r\u00e9silier mon abonnement</span>
           <span class="fl">\u203a</span>

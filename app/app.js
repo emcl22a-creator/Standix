@@ -1049,9 +1049,12 @@ window.onNavigate = function (index) {
        gestion : depuis l'espace Équipe, les onglets activaient des écrans
        invisibles et l'app paraissait ne pas répondre. */
     if (currentMembre?.role === 'equipe') {
+      /* ⚠ QUATRE ONGLETS DESORMAIS : les reglages passent de 2 a 3. Une seule
+         valeur oubliee ici ouvrirait le mauvais ecran, sans rien signaler. */
       if (index === 0) showEquipeScreen('e-list')
       else if (index === 1) { showEquipeScreen('e-scan'); startScanner('equipe') }
-      else if (index === 2) openEquipeSettings()
+      else if (index === 2) { showEquipeScreen('e-notifs'); peindreNotifsEquipe() }
+      else if (index === 3) openEquipeSettings()
       return
     }
     /* ⚠ TROIS ONGLETS COTE GESTION. Procedures en premier — c'est desormais
@@ -7721,7 +7724,18 @@ function remplirHistoEquipe() {
   const zone = document.getElementById('histo-equipe-liste')
   const note = document.getElementById('histo-equipe-note')
   if (!zone) return
-  if (note) note.textContent = `Temps passé à lire, sur ${anJours} jours.`
+  /* ⚠ « sur les procedures » PLUTOT QUE « a lire ». Le temps compte aussi
+     quand on regarde une video ou qu'on suit des etapes sans lire un mot ;
+     « lire » decrivait mal ce qui est mesure. */
+  /* ⚠ « ces 7 jours » PLUTOT QUE « sur 7 jours ». La phrase disait « Temps
+     passe SUR les procedures, SUR 7 jours » — deux fois le meme mot dans une
+     ligne de sept, avec deux sens differents. */
+  /* ⚠ COURT, PARCE QUE LE SEGMENT DIT DEJA LA PERIODE.
+
+     « Temps passe sur les procedures, ces 30 derniers jours » passait sur deux
+     lignes a 360 px — et la seconde moitie repetait ce que les trois onglets
+     juste au-dessus annoncent deja. */
+  if (note) note.textContent = 'Temps passé sur les procédures.'
 
   const parMembre = {}
   for (const v of anValidations()) {
@@ -18913,6 +18927,57 @@ document.getElementById('e-visiteur-valider')?.addEventListener('click', async (
   err.style.color = 'var(--green)'
   err.textContent = 'Accès complet débloqué.'
   loadEquipeProcedures()
+})
+
+/* ═══ LES NOTIFICATIONS DE L'EQUIPE ═══
+
+   ⚠ ELLES SE LISENT DANS LES PROCEDURES DEJA CHARGEES. `allEquipeProcedures`
+     contient tout ce que le membre a le droit de voir, avec leur `publiee_le` :
+     aucune requete de plus, aucune table a creer.
+
+   ⚠ TRENTE JOURS, PAS PLUS. Au-dela, une publication n'est plus une nouvelle —
+     c'est le contenu ordinaire de l'app, et il est deja dans « Procedures ». */
+function peindreNotifsEquipe() {
+  const zone = document.getElementById('e-notifs-liste')
+  if (!zone) return
+
+  const depuis = Date.now() - 30 * 86400000
+  const recentes = (allEquipeProcedures || [])
+    .filter(p => p.publiee_le && new Date(p.publiee_le).getTime() >= depuis)
+    .sort((a, b) => new Date(b.publiee_le) - new Date(a.publiee_le))
+
+  if (!recentes.length) {
+    zone.innerHTML = '<div class="cl-rien">Aucune nouveaut\u00e9 ces trente derniers jours.</div>'
+    return
+  }
+
+  zone.innerHTML = recentes.map(p => `
+    <button type="button" class="notif-lig" data-notif="${escapeHtml(p.id)}">
+      <span class="notif-ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/>
+          <path d="M13.6 3.4v5h5"/><path d="M8.8 13.2h6.4M8.8 16.6h4.2"/>
+        </svg>
+      </span>
+      <span class="notif-co">
+        <span class="notif-t">${escapeHtml(p.titre || 'Sans titre')}</span>
+        <span class="notif-s">${escapeHtml(p.categorie || 'Sans dossier')}</span>
+      </span>
+      <span class="notif-q">${depuisQuandCourt(new Date(p.publiee_le).getTime())}</span>
+    </button>`).join('')
+}
+
+/* ⚠ TOUCHER UNE NOTIFICATION OUVRE LA PROCEDURE. Une liste qui ne mene nulle
+   part oblige a la refermer et a chercher le meme titre dans l'onglet
+   d'a cote. */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-notif]')
+  if (!b) return
+  /* ⚠ LE VRAI NOM EST `openEquipeDetail`. J'avais ecrit `ouvrirDetailEquipe`,
+     qui n'existe pas : l'appel optionnel l'aurait avale sans bruit et toucher
+     une notification n'aurait rien fait. */
+  openEquipeDetail?.(b.dataset.notif)
 })
 
 async function loadEquipeProcedures() {

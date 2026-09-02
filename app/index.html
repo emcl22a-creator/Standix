@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=d1f61c02">
+<link rel="stylesheet" href="style.css?v=f26f9f24">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1310,7 +1310,11 @@
         <button type="button" class="p-seg" data-eq-jours="360" role="tab">1 an</button>
       </div>
 
-      <p class="histo-note" id="histo-equipe-note">Temps passé à lire des procédures.</p>
+      <!-- ⚠ CE TEXTE EST REECRIT PAR LE SCRIPT des l'ouverture, avec la periode
+           choisie. Celui-ci ne se voit qu'une fraction de seconde — mais il doit
+           dire la meme chose, sinon on lit deux formulations differentes en
+           ouvrant la feuille. -->
+      <p class="histo-note" id="histo-equipe-note">Temps passé sur les procédures.</p>
       <div class="histo-liste" id="histo-equipe-liste"></div>
     </div>
   </div>
@@ -3500,9 +3504,37 @@
 
   <!-- Mon activité : ce que l'employé a lu, et le temps qu'il y a passé -->
   <div class="screen" inert id="e-settings">
-    <div class="pagehead-row">
-      
-      <h1 class="pagehead" style="margin:0;">Réglages</h1>
+    <!-- ⚠ `page-tete`, LA MEME QUE LES REGLAGES DE LA GESTION.
+
+         Cette page employait `pagehead-row` — le gabarit des sous-pages, avec
+         un titre a 24 px et sans sous-titre. Or ce n'est pas une sous-page :
+         c'est l'un des trois onglets, au meme rang que « Procedures ». Elle
+         porte donc la meme tete que les autres pages de premier niveau.
+
+       ⚠ ET LE SOUS-TITRE DIT CE QU'ON Y TROUVE. Celui de la gestion parle
+         d'equipe et d'entreprise ; ici on ne gere que son propre compte. -->
+    <!-- ⚠ LES ICONES PRENNENT `currentColor`, PAS UN DEGRADE EN DUR.
+
+         Elles etaient tracees en `url(#logoOrIc)` — l'ambre du logo — quand
+         celles de la gestion heritent de la couleur de leur plaque. C'est ce
+         qui donnait des traits orange dans des plaques bleues ou vertes.
+
+         `currentColor` suit la teinte du groupe : une seule regle CSS colore
+         les deux pages, et une teinte ajoutee demain vaudra pour les deux.
+
+    ⚠ LES GROUPES PORTENT UNE TEINTE, comme ceux de la gestion.
+
+         Sans `data-teinte`, les plaques d'icone retombent sur l'ambre par
+         defaut — c'est ce qui donnait des icones orange au milieu d'une page
+         par ailleurs identique.
+
+         Les teintes suivent l'ordre des sections : bleu pour ce qui touche a
+         l'entreprise, vert pour les preferences, gris pour le compte. Ce sont
+         celles de la gestion, moins le violet et l'ambre qui servaient a des
+         sections que l'equipe n'a pas. -->
+    <div class="page-tete">
+      <h1>Réglages</h1>
+      <p>Votre compte, votre poste<br>et le fonctionnement de l’app.</p>
     </div>
 
     <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">
@@ -3534,13 +3566,13 @@
     </div>
 
     <div class="reg-titre">Votre entreprise</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="bleu">
       <!-- La ligne « Vos entreprises » a été retirée : la carte « Vos
            établissements », plus haut sur cette page, montre les mêmes
            entreprises et permet en plus d'en changer d'un geste. Deux chemins
            vers la même chose, dont un moins bon. -->
         <button type="button" class="reg-ligne" onclick="ouvrirMonPoste()">
-          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="url(#logoOrIc)" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
           <span class="reg-nm">Votre poste</span>
           <span class="reg-val" id="e-mon-poste">—</span>
           <span class="reg-fl">›</span>
@@ -3548,12 +3580,12 @@
     </div>
 
     <div class="reg-titre">Préférences</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="vert">
       <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
         <span class="reg-ic">
           <svg viewBox="0 0 24 24" fill="none">
-            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="url(#logoOrIc)" stroke-width="1.7"></rect>
-            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linecap="round"></line>
+            <rect x="6.5" y="2.5" width="11" height="19" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect>
+            <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></line>
           </svg>
         </span>
         <span class="reg-nm">Vos appareils</span>
@@ -3561,7 +3593,7 @@
       </button>
       <div class="reg-filet"></div>
       <button type="button" class="reg-ligne" onclick="showEquipeScreen('e-reg-langue')">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="url(#logoOrIc)" stroke-width="1.7"></circle><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6"></ellipse><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="url(#logoOrIc)" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line></svg></span><span class="reg-nm">Langue</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.8" stroke="currentColor" stroke-width="1.7"></circle><ellipse cx="12" cy="12" rx="3.7" ry="8.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></ellipse><line x1="3.5" y1="9.2" x2="20.5" y2="9.2" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line><line x1="3.5" y1="14.8" x2="20.5" y2="14.8" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></line></svg></span><span class="reg-nm">Langue</span>
         <span class="reg-val" id="es-langue-val">Français</span><span class="fl">›</span>
       </button>
     </div>
@@ -3586,7 +3618,7 @@
     </div>
 
     <div class="reg-titre">Compte</div>
-    <div class="reg-groupe">
+    <div class="reg-groupe" data-teinte="gris">
       <button type="button" class="reg-ligne danger" onclick="signOut()">
         <span class="reg-nm">Se déconnecter</span>
       </button>
@@ -3670,6 +3702,28 @@
     </div>
     <div class="langue-grille" id="langue-app" style="margin-top:14px;"></div>
     <div class="reg-note">La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.</div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       LES NOTIFICATIONS DE L'EQUIPE
+
+       ⚠ ELLES LISTENT LES PROCEDURES RECEMMENT PUBLIEES. C'est la seule chose
+         qui concerne vraiment un membre d'equipe et qu'il ne peut pas deviner :
+         une procedure a change, ou une nouvelle est arrivee.
+
+         `publiee_le` porte cette date, et l'espace equipe la charge deja pour
+         filtrer ce qu'il affiche — il n'y a pas de table a creer.
+
+       ⚠ CE N'EST PAS UN JOURNAL D'ACTIVITE. Les arrivees et departs de
+         collegues regardent la gestion, pas l'equipe : les montrer ici
+         donnerait le sentiment d'etre surveille, ou de surveiller.
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="screen" inert id="e-notifs">
+    <div class="page-tete">
+      <h1>Notifications</h1>
+      <p>Les procédures publiées<br>ou mises à jour récemment.</p>
+    </div>
+    <div id="e-notifs-liste"></div>
   </div>
 
   <div class="screen" inert id="e-scan">
@@ -4135,7 +4189,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=47abd854"></script>
+<script type="module" src="app.js?v=2c06f7ec"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -4976,7 +5030,10 @@ function layout() {
    Procedures, le compte d'analyses dans Reglages. Seuls les mouvements
    d'equipe lui etaient propres ; ils ont rejoint Reglages > Gerer l'equipe. */
 const LABELS_GESTION = ['Procedures', 'Analyse', 'Reglages'];
-const LABELS_EQUIPE  = ['Procedures', 'QR code', 'Reglages'];
+/* ⚠ QUATRE ONGLETS COTE EQUIPE, comme la gestion. « Notifications » s'insere
+   avant les reglages : c'est une page qu'on consulte, pas un endroit ou l'on
+   regle quelque chose. */
+const LABELS_EQUIPE  = ['Procedures', 'QR code', 'Notifications', 'Reglages'];
 let LABELS = LABELS_GESTION;
 const ICONS = [
   {line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
@@ -5008,6 +5065,13 @@ const ICONS = [
 
    La version pleine reprend donc chaque grand carré avec son carré intérieur :
    la règle `evenodd`, déjà posée par la barre, en fait un trou. */
+
+/* ⚠ LA CLOCHE, POUR LES NOTIFICATIONS. Meme construction que les autres :
+   `line` pour le trait, `fill` pour la version pleine de l'onglet actif. */
+const ICONE_CLOCHE = {
+  line:'M18 8.6a6 6 0 1 0-12 0c0 6.2-2.4 7.4-2.4 7.4h16.8s-2.4-1.2-2.4-7.4M13.7 19.8a2 2 0 0 1-3.4 0',
+  fill:'M18 8.6a6 6 0 1 0-12 0c0 6.2-2.4 7.4-2.4 7.4h16.8s-2.4-1.2-2.4-7.4ZM13.7 19.8a2 2 0 0 1-3.4 0',
+};
 const ICONE_QR = {
   /* `plein` : toujours dessine en remplissage, actif ou non. Voir `row()`. */
   plein: true,
@@ -5023,7 +5087,7 @@ function ICONES_DU_JEU() {
      equipe le jour ou on lui remettrait un accueil, et la retirer du tableau
      decalerait tous les indices ci-dessous. */
   return LABELS === LABELS_EQUIPE
-    ? [ICONS[1], ICONE_QR, ICONS[3]]
+    ? [ICONS[1], ICONE_QR, ICONE_CLOCHE, ICONS[3]]
     : [ICONS[1], ICONS[2], ICONS[3]];
 }
 
@@ -5546,7 +5610,17 @@ function frame(now) {
      ⚠ 0,14 PAR IMAGE, ET UN SEUIL D'ARRET. Sans le seuil, la valeur
        s'approcherait indefiniment de sa cible sans l'atteindre, et la boucle
        recalculerait la largeur a chaque image pour rien. */
-  const apercuCible = document.body.classList.contains('en-apercu') ? 1 : 0;
+  /* ⚠ LA BARRE S'ETIRE AUSSI DANS L'ESPACE EQUIPE.
+
+     Le cercle « voir comme l'equipe » n'y est pas affiche — il ouvrirait un
+     apercu de l'espace ou l'on se trouve deja. La barre doit donc reprendre
+     toute la largeur, exactement comme pendant l'apercu.
+
+     ⚠ ET C'EST LA MEME VARIABLE. Un second etat aurait demande de gerer leur
+       combinaison ; ici les deux cas veulent la meme chose. */
+  const sansCercle = document.body.classList.contains('en-apercu')
+    || document.getElementById('equipe-app')?.style.display === 'block';
+  const apercuCible = sansCercle ? 1 : 0;
   /* ⚠ 0,22 ET NON 0,14. Mesure sur la boucle : a 0,14 l'etirement mettait
      517 ms a se terminer, quand la goutte du cercle en prend 340. La barre
      finissait bien apres lui — deux gestes qui devraient etre un seul.

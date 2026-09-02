@@ -20782,26 +20782,28 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
        ⚠ ET LA COURBE EST SYMETRIQUE. Celle de `flouSortie` accelere jusqu'a la
          fin : le flou arrive d'un coup. Celle-ci le laisse monter puis
          s'installer. */
-    /* ⚠ 3 PX, ET UNE OPACITE QUI SUIT.
+    /* ⚠ LE FLOU SEUL. AUCUNE OPACITE.
 
-       A 6 px, le texte d'une carte n'est plus lisible du tout : on voit une
-       tache le temps du passage, puis le contenu reapparait. C'est ce vide qui
-       se lit comme un flash — pas la vitesse.
+       J'avais ajoute `opacity: 0.5` en croyant adoucir le passage. C'etait
+       l'inverse : une carte a demi transparente laisse voir LE FOND DE LA PAGE
+       au travers. Les offres etant noires sur un fond clair, le gris remontait
+       par-dessous a mi-parcours — c'est exactement le flash decrit.
 
-       A 3 px, les mots restent devines pendant qu'ils changent. Et l'opacite
-       accompagne le flou plutot que de le laisser seul : une image qui palit
-       en se brouillant s'efface plus doucement qu'une image qui se brouille a
-       pleine intensite. */
+       Le flou, lui, ne rend rien transparent : il brouille ce qui est la sans
+       laisser passer ce qui est derriere. C'est pour cela qu'il convient ici,
+       et l'opacite jamais.
+
+     ⚠ 3 PX ET NON 6. A six pixels, le texte disparait completement : on voit
+       une tache, puis le contenu revient. A trois, les mots restent devines
+       pendant qu'ils changent. */
     const flouLent = el => el.animate(
-      [{ filter: 'blur(0px)', opacity: 1 },
-       { filter: 'blur(3px)', opacity: 0.5 }],
+      [{ filter: 'blur(0px)' }, { filter: 'blur(3px)' }],
       { duration: 260, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' })
 
     const netLent = el => {
       el.getAnimations().forEach(a => a.cancel())
       return el.animate(
-        [{ filter: 'blur(3px)', opacity: 0.5 },
-         { filter: 'blur(0px)', opacity: 1 }],
+        [{ filter: 'blur(3px)' }, { filter: 'blur(0px)' }],
         { duration: 340, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' })
     }
 

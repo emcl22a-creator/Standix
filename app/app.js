@@ -6797,7 +6797,16 @@ function arreterToutesLesVideos() {
   })
   try { stopClipPlayback?.() } catch (e) {}
 }
-window.startNewProcedure = function() {
+window.startNewProcedure = async function() {
+  /* ⚠ ON BLOQUE LA CREATION, PAS LA CONSULTATION.
+
+     Quelqu'un dont l'essai vient d'expirer garde ce qu'il a sous les yeux ;
+     c'est le geste suivant qui demande un abonnement.
+
+   ⚠ DEUX BOUTONS APPELLENT CETTE FONCTION — celui de la barre du haut et celui
+     de la page vide. Le verrou est ici, une seule fois, plutot que sur chacun. */
+  if (await bloqueSiEssaiFini()) return
+
   resetCreateForm()
   showGestionScreen('p-create')
 }
@@ -13220,6 +13229,65 @@ function dateLisible(iso) {
 
 /* L'alerte, dans le langage des autres alertes de l'app : tuile de 32 px,
    titre de 14,5, deux boutons de 38. Rien de nouveau à apprendre. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VERROU DE FIN D'ESSAI
+
+   ⚠ UNE SEULE FONCTION DECIDE. Trois endroits doivent poser la meme question —
+     ouvrir une procedure cote gestion, cote equipe, et creer. Trois copies de
+     la condition auraient diverge des la premiere retouche.
+
+   ⚠ ON NE BLOQUE QUE SI L'ESSAI EST TERMINE ET QUE PERSONNE NE PAIE. Un
+     gerant qui possede deux etablissements et paie sur l'un des deux garde
+     l'acces aux deux : c'est deja la regle du quota partage, elle vaut ici
+     aussi.
+
+   ⚠ ET JAMAIS PENDANT LE CHARGEMENT. `etatAbo` vaut `null` tant que la reponse
+     du serveur n'est pas arrivee ; bloquer par defaut ferait apparaitre la
+     fenetre une seconde a chaque ouverture de l'app, meme a un abonne.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function essaiTermine() {
+  if (!etatAbo) return false                  // on ne sait pas encore
+  if (etatAbo.statut === 'actif') return false
+  if ((mesEtablissements || []).some(e => e.abonnement_statut === 'actif')) return false
+  return etatAbo.statut === 'expire'
+}
+
+/* ⚠ DEUX TEXTES, PAS UN. Le gerant peut agir — il choisit une offre. Le membre
+   d'equipe ne peut rien faire : lui montrer un bouton de paiement l'enverrait
+   vers une page qui ne le concerne pas, et lui donnerait le sentiment qu'on
+   lui reclame de l'argent. */
+async function fenetreAbonnementRequis() {
+  const gestion = currentMembre?.role === 'gestion'
+
+  if (!gestion) {
+    await confirmDialog({
+      titre: 'Acc\u00e8s suspendu',
+      message: "L'abonnement de votre \u00e9tablissement a pris fin. " +
+        "Vos proc\u00e9dures sont conserv\u00e9es : elles reviendront d\u00e8s que " +
+        "votre responsable aura renouvel\u00e9.",
+      confirmer: 'Compris', annuler: null, danger: false,
+    })
+    return
+  }
+
+  const ok = await confirmDialog({
+    titre: 'Votre essai est termin\u00e9',
+    message: "Vos proc\u00e9dures sont conserv\u00e9es. Choisissez une offre pour " +
+      "les rouvrir et continuer \u00e0 en cr\u00e9er.",
+    confirmer: 'Voir les offres',
+    annuler: 'Plus tard',
+    danger: false,
+  })
+  if (ok) { renderAbonnements(); showGestionScreen('p-abonnement') }
+}
+
+/* Rend `true` quand l'action a ete bloquee — l'appelant s'arrete alors. */
+async function bloqueSiEssaiFini() {
+  if (!essaiTermine()) return false
+  await fenetreAbonnementRequis()
+  return true
+}
+
 function dessinerAlerteEssai(hote) {
   const zone = document.getElementById(hote)
   if (!zone) return
@@ -18264,6 +18332,10 @@ let ouvertureCourante = 0
 let retourApresAnalyse = 'p-list'
 
 async function openAnalyse(procId) {
+  /* ⚠ LE VERROU AVANT TOUT LE RESTE. Place plus bas, l'ecran aurait deja
+     commence a se monter derriere la fenetre. */
+  if (await bloqueSiEssaiFini()) return
+
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
   const depuis = document.querySelector('#gestion-app .screen.active')?.id
@@ -20341,6 +20413,8 @@ window.exporterProcedurePdf = exporterProcedurePdf
 let equipeProcCourante = null
 
 async function openEquipeDetail(procId) {
+  if (await bloqueSiEssaiFini()) return
+
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
   arreterToutesLesVideos()

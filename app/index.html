@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=ad505372">
+<link rel="stylesheet" href="style.css?v=8b048915">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -876,7 +876,8 @@
     </div>
 
     <h1 id="auth-title">Bienvenue</h1>
-    <div class="subhead" id="auth-sous">Connectez-vous à votre espace.</div>
+    <div class="subhead" id="auth-sous">Les gestes de votre métier, filmés une fois
+      et retrouvés par toute l’équipe.</div>
 
     <!-- ═══ LES DEUX SCENES ═══
 
@@ -950,7 +951,114 @@
 
     <div class="auth-form-wrap">
       <!-- Connexion -->
-      <div id="login-form" class="auth-form active">
+      <!-- ⚠ LE FORMULAIRE DE CONNEXION EST DANS SA PROPRE FEUILLE, plus bas.
+             Il occupait le haut de la page, avant les deux chemins de creation :
+             quelqu'un qui decouvre Standix tombait d'abord sur des champs qu'il
+             ne peut pas remplir. -->
+
+    </div>
+
+    <div class="error-msg" id="login-error"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LES DEUX CHEMINS DE CREATION
+
+         ⚠ DEUX CARTES DE MEME TAILLE, DE MEME MATIERE, SANS ORDRE DE VALEUR.
+
+           La version precedente offrait un segment « Se connecter / Creer un
+           compte » ou tout le monde passait par la meme porte, puis decouvrait
+           ensuite qu'il fallait un code. Le choix se fait maintenant en amont,
+           et il est dit clairement.
+
+         ⚠ AUCUNE DES DEUX N'EST « PRINCIPALE ». Un gerant sans equipe n'a rien
+           a montrer ; une equipe sans procedures n'a rien a lire. Les deux
+           roles font l'app, et rien dans le dessin ne doit suggerer que l'un
+           vaut moins que l'autre — meme fond, meme rayon, meme graisse de
+           titre.
+
+         ⚠ LE VOCABULAIRE EVITE « rejoindre » SEUL, qui sonne comme un second
+           temps. « Vous entrez dans un espace deja pret » dit la meme chose
+           sans faire attendre.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="creer-titre">Créer un compte</div>
+
+    <div class="creer-choix">
+      <button type="button" class="creer-carte" id="creer-entreprise">
+        <span class="cc-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal1)" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3.6 20.4h16.8"/>
+            <path d="M5.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6a1.6 1.6 0 0 1 1.6 1.6v14.2"/>
+            <path d="M14.6 11.4h2.8a1.6 1.6 0 0 1 1.6 1.6v7.4"/>
+            <path d="M8.4 8.4h2.6M8.4 12h2.6M8.4 15.6h2.6"/>
+          </svg>
+        </span>
+        <span class="cc-tx">
+          <span class="cc-t">Je crée mon entreprise</span>
+          <!-- ⚠ ON DECRIT L'APP, PAS CE QUE « VOUS » FEREZ. La version d'avant
+               disait « vous filmez, votre equipe retrouve » : deux camps, et le
+               lecteur range d'un cote avant meme d'avoir choisi.
+
+               ⚠ ET COURT. Trois lignes sous un titre de trois mots se lisent
+                 comme une notice ; personne ne lit une notice pour choisir
+                 entre deux boutons. -->
+          <span class="cc-s">Vous êtes gérant ou responsable.</span>
+        </span>
+        <span class="cc-fl">›</span>
+      </button>
+
+      <button type="button" class="creer-carte" id="creer-membre">
+        <span class="cc-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal3)" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8.2" r="3.4"/>
+            <path d="M5.6 19.4a6.4 6.4 0 0 1 12.8 0"/>
+          </svg>
+        </span>
+        <span class="cc-tx">
+          <span class="cc-t">J’ai reçu un code</span>
+          <!-- ⚠ « a tout moment » PLUTOT QUE « au moment ou le geste se fait ».
+               La formule d'avant decrivait une SITUATION — on la lit, on
+               l'imagine, on met une seconde a la comprendre. « A tout moment »
+               dit la meme disponibilite en trois mots.
+
+               ⚠ ET LA MEME LONGUEUR QUE SA VOISINE. Deux cartes de meme rang
+                 doivent peser pareil : une phrase courte a cote d'une phrase
+                 longue suggere que l'une compte moins. -->
+          <span class="cc-s">Saisissez-le pour rejoindre l’équipe.</span>
+          <!-- ⚠ « Consultez » ET NON « Retrouvez ». Retrouver suppose qu'on a
+               deja cherche ; consulter est le geste lui-meme. -->
+        </span>
+        <span class="cc-fl">›</span>
+      </button>
+    </div>
+
+    <!-- ⚠ UN LIEN, PAS UNE TROISIEME CARTE. Trois cartes de meme forme
+         obligeraient a lire les trois pour choisir, alors qu'il n'y a que deux
+         portes d'entree. -->
+    <button type="button" class="deja-compte" id="deja-compte">
+      Vous avez déjà un compte ? <b>Se connecter</b>
+    </button>
+  </div>
+</div>
+
+<!-- ═══ LA FEUILLE DE CONNEXION ═══
+     Meme gabarit que la feuille d'inscription, `histo-liste` compris : c'est
+     lui qui porte les marges laterales. -->
+<div class="histo" id="feuille-connexion" hidden aria-hidden="true">
+  <div class="histo-fond" data-fermer-connexion></div>
+  <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Se connecter">
+    <span class="histo-poignee" data-fermer-connexion></span>
+    <div class="histo-tete histo-tete--retour">
+      <button type="button" class="histo-retour" data-fermer-connexion aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <h2>Content de vous revoir</h2>
+    </div>
+    <p class="histo-note">Vos procédures vous attendent.</p>
+    <div class="histo-liste">
+<div id="login-form" class="auth-form active">
         <label class="f">E-mail</label>
         <!-- ═══ NOMMER LES CHAMPS POUR QUE SAFARI SE TAISE ═══
 
@@ -981,82 +1089,6 @@
              c'est-à-dire de presque tout le monde. -->
         <button type="button" class="lien-doux" id="mdp-oublie">Mot de passe oublié ?</button>
       </div>
-
-    </div>
-
-    <div class="error-msg" id="login-error"></div>
-
-    <!-- ═══════════════════════════════════════════════════════════════════
-         LES DEUX CHEMINS DE CREATION
-
-         ⚠ DEUX CARTES DE MEME TAILLE, DE MEME MATIERE, SANS ORDRE DE VALEUR.
-
-           La version precedente offrait un segment « Se connecter / Creer un
-           compte » ou tout le monde passait par la meme porte, puis decouvrait
-           ensuite qu'il fallait un code. Le choix se fait maintenant en amont,
-           et il est dit clairement.
-
-         ⚠ AUCUNE DES DEUX N'EST « PRINCIPALE ». Un gerant sans equipe n'a rien
-           a montrer ; une equipe sans procedures n'a rien a lire. Les deux
-           roles font l'app, et rien dans le dessin ne doit suggerer que l'un
-           vaut moins que l'autre — meme fond, meme rayon, meme graisse de
-           titre.
-
-         ⚠ LE VOCABULAIRE EVITE « rejoindre » SEUL, qui sonne comme un second
-           temps. « Vous entrez dans un espace deja pret » dit la meme chose
-           sans faire attendre.
-         ═══════════════════════════════════════════════════════════════════ -->
-    <div class="creer-titre">Pas encore de compte ?</div>
-
-    <div class="creer-choix">
-      <button type="button" class="creer-carte" id="creer-entreprise">
-        <span class="cc-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal1)" stroke-width="1.9"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3.6 20.4h16.8"/>
-            <path d="M5.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6a1.6 1.6 0 0 1 1.6 1.6v14.2"/>
-            <path d="M14.6 11.4h2.8a1.6 1.6 0 0 1 1.6 1.6v7.4"/>
-            <path d="M8.4 8.4h2.6M8.4 12h2.6M8.4 15.6h2.6"/>
-          </svg>
-        </span>
-        <span class="cc-tx">
-          <span class="cc-t">Ouvrir un espace</span>
-          <!-- ⚠ ON DECRIT L'APP, PAS CE QUE « VOUS » FEREZ. La version d'avant
-               disait « vous filmez, votre equipe retrouve » : deux camps, et le
-               lecteur range d'un cote avant meme d'avoir choisi.
-
-               ⚠ ET COURT. Trois lignes sous un titre de trois mots se lisent
-                 comme une notice ; personne ne lit une notice pour choisir
-                 entre deux boutons. -->
-          <span class="cc-s">Créez vos procédures avec l’IA.</span>
-        </span>
-        <span class="cc-fl">›</span>
-      </button>
-
-      <button type="button" class="creer-carte" id="creer-membre">
-        <span class="cc-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal3)" stroke-width="1.9"
-               stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8.2" r="3.4"/>
-            <path d="M5.6 19.4a6.4 6.4 0 0 1 12.8 0"/>
-          </svg>
-        </span>
-        <span class="cc-tx">
-          <span class="cc-t">Rejoindre un espace</span>
-          <!-- ⚠ « a tout moment » PLUTOT QUE « au moment ou le geste se fait ».
-               La formule d'avant decrivait une SITUATION — on la lit, on
-               l'imagine, on met une seconde a la comprendre. « A tout moment »
-               dit la meme disponibilite en trois mots.
-
-               ⚠ ET LA MEME LONGUEUR QUE SA VOISINE. Deux cartes de meme rang
-                 doivent peser pareil : une phrase courte a cote d'une phrase
-                 longue suggere que l'une compte moins. -->
-          <span class="cc-s">Les procédures, à tout moment.</span>
-          <!-- ⚠ « Consultez » ET NON « Retrouvez ». Retrouver suppose qu'on a
-               deja cherche ; consulter est le geste lui-meme. -->
-        </span>
-        <span class="cc-fl">›</span>
-      </button>
     </div>
   </div>
 </div>
@@ -3954,7 +3986,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
              stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-      <h2 id="insc-titre">Ouvrir un espace</h2>
+      <h2 id="insc-titre">Je crée mon entreprise</h2>
     </div>
     <p class="histo-note" id="insc-note">Créez vos procédures avec l’IA.</p>
 
@@ -4067,7 +4099,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=dc90ce12"></script>
+<script type="module" src="app.js?v=83cd1960"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

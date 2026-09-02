@@ -1619,16 +1619,54 @@ function arreterScenes() {
    entreprise, `equipe` demande un code. C'est `selectedSpace` qui porte la
    difference, et le formulaire s'y adapte deja — il n'y avait rien a ecrire
    de plus. */
-document.getElementById('creer-entreprise')?.addEventListener('click', () => {
-  selectedSpace = 'gestion'
-  switchAuthTab('signup')
-  document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-})
+/* ═══ LA FEUILLE D'INSCRIPTION ═══
 
-document.getElementById('creer-membre')?.addEventListener('click', () => {
-  selectedSpace = 'equipe'
+   Elle s'ouvre et se ferme comme les feuilles d'activite : meme gabarit, donc
+   meme montee, meme voile, meme descente. Rien a ecrire de ce cote.
+
+   ⚠ ON REUTILISE `fermerHisto`. La feuille porte la classe `histo` : le
+     gestionnaire de `[data-fermer-histo]` la fermerait deja. On lui donne
+     pourtant son propre attribut, `data-fermer-inscription`, pour pouvoir un
+     jour vider les champs a la fermeture sans toucher aux autres feuilles. */
+function ouvrirInscription(espace) {
+  selectedSpace = espace
+
+  const f = document.getElementById('feuille-inscription')
+  if (!f) return
+
+  /* ⚠ LE TITRE ET LA PHRASE SUIVENT LE CHEMIN CHOISI. C'est la seule
+     difference entre les deux : le formulaire est le meme, et `selectedSpace`
+     decide de ce qu'il demande — une entreprise a creer, ou un code. */
+  const titre = document.getElementById('insc-titre')
+  const note = document.getElementById('insc-note')
+  if (espace === 'gestion') {
+    if (titre) titre.textContent = 'Ouvrir un espace'
+    if (note) note.textContent = 'Cr\u00e9ez vos proc\u00e9dures avec l\u2019IA.'
+  } else {
+    if (titre) titre.textContent = 'Rejoindre un espace'
+    if (note) note.textContent = 'Saisissez le code de votre \u00e9tablissement.'
+  }
+
+  /* Le formulaire s'adapte a l'espace : le champ de code n'apparait que du
+     cote equipe. C'est `switchAuthTab` qui s'en charge deja. */
   switchAuthTab('signup')
-  document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  ajusterChampsVisibles?.()
+
+  f.hidden = false
+  f.setAttribute('aria-hidden', 'false')
+  f.classList.remove('part')
+  document.body.style.overflow = 'hidden'
+}
+
+document.getElementById('creer-entreprise')?.addEventListener('click',
+  () => ouvrirInscription('gestion'))
+document.getElementById('creer-membre')?.addEventListener('click',
+  () => ouvrirInscription('equipe'))
+
+document.addEventListener('click', (e) => {
+  if (e.target.closest('[data-fermer-inscription]')) {
+    fermerHisto(document.getElementById('feuille-inscription'))
+  }
 })
 
 window.switchAuthTab = function(tab) {

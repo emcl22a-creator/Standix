@@ -15247,47 +15247,58 @@ body.espace-vide, body.espace-arrive{ overflow:hidden; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE CERCLE RESTE ET CHANGE D'ETAT
+   LE CERCLE : LE MEME REBOND QU'UN ONGLET, ET IL PASSE AU NOIR
 
-   ⚠ IL DISPARAISSAIT EN GOUTTE D'EAU. La barre s'etirait alors pour prendre sa
-     place, et l'on perdait le seul chemin de retour visible.
+   ⚠ IL GROSSISSAIT ET RESTAIT GROS. `scale(1.08, 1.04)` tenu tout le temps de
+     l'apercu : le cercle changeait de taille pour de bon, ce qui deplacait son
+     bord et decalait l'ecart avec la barre.
 
-     Il reste maintenant a l'ecran : il grossit un peu, passe au noir, et dit
-     ainsi qu'on regarde l'espace equipe. Le toucher a nouveau ramene chez soi.
+     Il reprend maintenant `ongletRebond` — l'accuse de reception des onglets :
+     un enfoncement a 0,90 puis retour a la taille normale, en 0,42 s. Le meme
+     geste que partout ailleurs dans la barre.
 
-   ⚠ LE GROSSISSEMENT EST PLUS LARGE QUE HAUT. 1,08 contre 1,04 : un cercle qui
-     grandit pareil dans les deux sens se contente de gonfler. En s'etirant
-     d'abord par les cotes, il donne l'impression de se poser plutot que de
-     grossir.
-
-   ⚠ ET IL PORTE LES DEUX CHANGEMENTS SUR LA MEME COURBE. Couleur et taille
-     separees donneraient deux gestes ; ensemble, c'est un seul.
+   ⚠ LE NOIR, LUI, RESTE. Le rebond dit « c'est pris », la couleur dit « vous y
+     etes ». L'un passe, l'autre demeure.
    ═══════════════════════════════════════════════════════════════════════════ */
 #voir-equipe{
-  transition:transform 0.42s cubic-bezier(0.4, 0, 0.2, 1),
-             background-color 0.42s cubic-bezier(0.4, 0, 0.2, 1),
+  /* ⚠ SEULE LA COULEUR EST EN TRANSITION. Mettre `transform` ici ferait lutter
+     la transition contre l'animation de rebond — la plus lente gagnerait, et le
+     rebond paraitrait mou. */
+  transition:background-color 0.42s cubic-bezier(0.4, 0, 0.2, 1),
              box-shadow 0.42s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ⚠ LE REBOND EST PORTE PAR UNE CLASSE, posee au clic et retiree apres. Une
+   animation liee a `en-apercu` ne rejouerait pas au retour, puisque la classe
+   part au lieu d'arriver. */
+#voir-equipe.rebondit{
+  animation:cercleRebond 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ⚠ `var(--place)` DANS CHAQUE IMAGE. Le cercle est deja decale par un
+   `translateX` ; sans le repeter, il sauterait au centre le temps du rebond. */
+@keyframes cercleRebond{
+  0%  { transform:var(--place) scale(1); }
+  38% { transform:var(--place) scale(0.90); }
+  100%{ transform:var(--place) scale(1); }
+}
+
 body.en-apercu #voir-equipe{
-  /* ⚠ ON ANNULE L'ANCIENNE DISPARITION. Elle est encore declaree plus haut
-     dans ce fichier ; sans `animation:none`, elle l'emporterait sur ces
-     transitions — une animation bat toujours une declaration ordinaire. */
-  animation:none !important;
+  /* L'ancienne disparition en goutte est encore declaree plus haut : on
+     l'ecarte, sinon elle l'emporterait sur ces regles. */
+  animation:none;
   opacity:1 !important;
   pointer-events:auto !important;
 
-  transform:var(--place) scale(1.08, 1.04);
   background-color:#14141A;
   box-shadow:0 6px 18px -8px rgba(20,20,30,0.45);
 }
+body.en-apercu #voir-equipe.rebondit{
+  animation:cercleRebond 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
 
-/* L'oeil passe au blanc sur le fond noir. */
 body.en-apercu #voir-equipe svg{ stroke:#FFFFFF; }
 
-/* ⚠ LE MOUVEMENT EST RETIRE POUR QUI LE DEMANDE, la couleur reste : elle
-   porte l'information, pas l'effet. */
 @media (prefers-reduced-motion: reduce){
-  #voir-equipe{ transition:background-color 0.2s linear; }
-  body.en-apercu #voir-equipe{ transform:var(--place); }
+  #voir-equipe.rebondit, body.en-apercu #voir-equipe.rebondit{ animation:none; }
 }

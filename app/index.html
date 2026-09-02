@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=f6fa58be">
+<link rel="stylesheet" href="style.css?v=b962f782">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1080,6 +1080,7 @@
         <label class="f">Mot de passe</label>
         <input type="password" id="login-password" placeholder="••••••••"
                autocomplete="current-password" style="margin-bottom:16px;">
+        <div class="error-msg" id="connexion-error"></div>
         <button class="btn block" id="login-btn">Se connecter</button>
         <!-- ═══ SOUS LE BOUTON, PAS AU-DESSUS ═══
 
@@ -4006,7 +4007,16 @@
         <label class="f">E-mail</label>
         <input type="email" id="signup-email" placeholder="vous@entreprise.com"
                autocomplete="username" style="margin-bottom:12px;">
-        <label class="f">Mot de passe</label>
+        <!-- ⚠ LA REGLE EST DITE AVANT LA FAUTE, pas apres.
+
+             Le message « au moins 6 caracteres » n'apparaissait qu'au moment
+             de valider — et il s'affichait alors derriere la feuille, donc
+             invisible. Deux defauts qui se cumulaient.
+
+             Un libelle qui porte la contrainte evite la faute plutot que de la
+             signaler. C'est ce que fait l'app pour le code d'invitation :
+             « Code de l'entreprise (6 caracteres) ». -->
+        <label class="f">Mot de passe <span class="f-note">6 caractères minimum</span></label>
         <!-- `new-password` et non `current-password` : c'est ce qui déclenche la
              proposition d'un mot de passe fort, et ce qui empêche le
              gestionnaire de préremplir l'ancien sur un formulaire de création. -->
@@ -4076,6 +4086,17 @@
                  autocomplete="off" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
         </div>
 
+        <!-- ⚠ CHAQUE FEUILLE A SA ZONE D'ERREUR.
+
+             Il n'y en avait qu'une, `login-error`, restee sur la page
+             « Bienvenue » quand les deux formulaires sont partis dans des
+             feuilles. Le message s'affichait donc DERRIERE la feuille ouverte :
+             on ne voyait rien, et l'inscription paraissait echouer sans raison.
+
+             ⚠ AU-DESSUS DU BOUTON, pas en dessous. Le clavier occupe le bas de
+               l'ecran pendant la saisie ; un message pose sous le bouton
+               naitrait hors du champ de vision. -->
+        <div class="error-msg" id="signup-error"></div>
         <button class="btn block" id="signup-btn">Créer mon compte</button>
         <!-- L'acceptation par la création du compte. C'est la forme admise pour un
              service professionnel : le lien doit être visible et cliquable AVANT
@@ -4099,7 +4120,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=41671f0e"></script>
+<script type="module" src="app.js?v=be83fc72"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

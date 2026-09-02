@@ -1029,6 +1029,22 @@ let navDepuisOnglet = false
 window.onNavigate = function (index) {
   navDepuisOnglet = true
   try {
+    /* ⚠ UN ONGLET SORT DE L'APERCU. C'est le seul chemin de retour depuis
+       l'espace Equipe : la mention au-dessus de la barre ne fait qu'informer,
+       elle n'est pas cliquable.
+
+       ⚠ ON SORT AVANT D'AIGUILLER, et sans appeler `showGestionScreen` au
+         passage : la suite de cette fonction s'en charge, avec le bon ecran.
+         Sortir en ouvrant Procedures puis aiguiller vers Analyse afficherait
+         deux ecrans a la file.
+
+       ⚠ `navDepuisOnglet` RESTE VRAI. C'est lui qui donne au changement son
+         fondu — le meme qu'entre Procedures et Analyse. Le remettre a faux ici
+         donnerait a ce retour une animation d'ouverture depuis une carte. */
+    if (apercuEquipe) {
+      sortirApercuEquipe()
+    }
+
     /* DEUX AIGUILLAGES, UN PAR ESPACE. Il n'y en avait qu'un, celui de la
        gestion : depuis l'espace Équipe, les onglets activaient des écrans
        invisibles et l'app paraissait ne pas répondre. */
@@ -1181,6 +1197,29 @@ window.ouvrirApercuEquipe = function () {
   loadEquipeProcedures?.()
 }
 
+/* Sort de l'apercu SANS ouvrir d'ecran : l'appelant choisit lequel. */
+function sortirApercuEquipe() {
+  if (!apercuEquipe) return
+  apercuEquipe = false
+  document.body.classList.remove('en-apercu')
+  stopScanner?.()
+
+  const app = document.getElementById('gestion-app')
+  const eq = document.getElementById('equipe-app')
+  if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
+  if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
+
+  window.majBarreEspace?.('gestion')
+
+  const cercle = document.getElementById('voir-equipe')
+  if (cercle) {
+    cercle.classList.remove('revient')
+    void cercle.offsetWidth
+    cercle.classList.add('revient')
+    setTimeout(() => cercle.classList.remove('revient'), 500)
+  }
+}
+
 window.fermerApercuEquipe = function () {
   if (!apercuEquipe) return
   apercuEquipe = false
@@ -1217,9 +1256,8 @@ document.getElementById('voir-equipe')?.addEventListener('click', () => {
   ouvrirApercuEquipe()
 })
 
-document.addEventListener('click', (e) => {
-  if (e.target.closest('[data-fermer-apercu]')) fermerApercuEquipe()
-})
+/* ⚠ L'ECOUTEUR DU BOUTON « REVENIR » A ETE RETIRE avec le bouton lui-meme. Le
+   retour passe par les onglets, dans `onNavigate`. */
 
 window.chooseSpace = function(space) {
   selectedSpace = space

@@ -14629,3 +14629,64 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
 .tb-v-astuce svg{
   flex-shrink:0; width:13px; height:13px; margin-top:2px;
 }
+
+
+/* ═══ LE LIEN « DEJA UN COMPTE » ═══
+
+   ⚠ IL N'EST PAS UNE CARTE. Les deux au-dessus sont des choix a peser ; celui-
+     ci est un raccourci pour qui sait deja ou il va. Pas de fond, pas de
+     plaque, pas de fleche — juste une ligne qu'on trouve quand on la cherche. */
+#login-screen .deja-compte{
+  display:block; width:100%;
+  margin-top:16px; padding:12px 0;
+  border:none; background:none;
+  font-family:inherit; font-size:13.5px;
+  color:var(--label-2); letter-spacing:-0.015em;
+  text-align:center;
+}
+#login-screen .deja-compte b{
+  font-weight:600; color:var(--bleu, #1F4CEE);
+}
+#login-screen .deja-compte:active{ opacity:0.6; }
+
+
+/* ⚠ CETTE REGLE A ETE RETIREE : ELLE N'AURAIT RIEN FAIT.
+
+   J'avais pose une `transition:filter` sur ces trois blocs pour ralentir le
+   flou. Mais le flou n'est pas une transition — il est joue par
+   `element.animate()`, qui ecrit directement dans la pile d'animations et
+   ignore les transitions declarees.
+
+   Les durees sont donc reglees dans le script, la ou l'animation est creee. */
+
+
+/* ═══ LE SEGMENT MENSUEL / ANNUEL SE RESSERRE ═══
+
+   ⚠ IL N'A PAS BESOIN DE TOUTE LA LARGEUR. `.proc-segm` s'etale d'un bord a
+     l'autre parce que les pages Procedures et Analyse ont TROIS onglets a
+     loger. Ici il y en a deux, et deux mots courts : « Mensuel » et
+     « Annuel ». Etendu sur 342 px, le segment pesait autant que les cartes
+     qu'il commande.
+
+   ⚠ `width:max-content` PLUTOT QU'UNE LARGEUR FIXE. La pastille se calcule sur
+     la largeur reelle de la piste ; un chiffre en dur la ferait tomber a cote
+     des que le texte change — a la traduction, par exemple.
+
+   ⚠ ET `margin:auto` POUR LE CENTRER. Sans elle, un segment plus etroit que la
+     page se collerait a gauche. */
+#abo-rythme{
+  width:max-content;
+  max-width:100%;
+  margin:0 auto 18px;
+}
+
+/* ⚠ L'ESPACE AVANT LA PREMIERE CARTE. Il ne restait que 2 px : le segment
+   touchait presque l'offre qu'il commande, et l'on ne savait plus s'il en
+   faisait partie. Dix-huit pixels les separent, comme les cartes entre elles. */
+
+/* Les deux onglets ne s'etirent plus a parts egales — ils prennent la place de
+   leur texte, plus un rembourrage. */
+#abo-rythme .p-seg{
+  flex:0 0 auto;
+  padding-left:20px; padding-right:20px;
+}

@@ -98,7 +98,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=3c679e81">
+<link rel="stylesheet" href="style.css?v=6545d4c2">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3827,7 +3827,7 @@
 
      ⚠ A REGENERER A CHAQUE MODIFICATION de `app.js` ou `style.css`. C'est ce
        que fait `version.py`, livre a cote. -->
-<script type="module" src="app.js?v=f4646090"></script>
+<script type="module" src="app.js?v=fae55c7b"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -3870,10 +3870,15 @@
        celui-ci ouvre une VUE — ce que voit l'equipe. La forme le dit : un
        cercle seul, comme le « + » en haut a droite qui ouvre une action.
      ═══════════════════════════════════════════════════════════════════════ -->
-<!-- ⚠ LE BANDEAU DE L'APERCU. Il ne s'affiche que pendant l'apercu, par la
-     classe posee sur `body`. Il reste en haut, par-dessus tout, parce qu'on
-     peut naviguer plusieurs ecrans avant de vouloir revenir. -->
-<div id="apercu-bandeau">
+<!-- ⚠ LE BANDEAU DE L'APERCU, MASQUE PAR `hidden` DANS LE BALISAGE.
+
+     Il ne l'etait que par une regle CSS. Tant que `style.css` n'etait pas
+     deploye, il s'affichait dans le flux en haut de page et poussait tout le
+     contenu vers le bas : la page paraissait ne plus defiler.
+
+     Un element qui ne doit pas etre vu au depart se masque dans le BALISAGE.
+     Le CSS l'habille, il ne devrait pas etre seul a decider s'il existe. -->
+<div id="apercu-bandeau" hidden>
   <span>Vous voyez l’espace Équipe</span>
   <button type="button" data-fermer-apercu>Revenir</button>
 </div>
@@ -4744,6 +4749,9 @@ const BAR_K = 1000;        // raideur elevee : montee et retour rapides,
 const BAR_MIN_UP = 70;
 let swellStart = 0;
 const BAR_D = 2 * Math.sqrt(BAR_K);   // amortissement critique, zero rebond
+/* ⚠ ETAT DE L'ETIREMENT DE LA BARRE, entre 0 et 1. Il vit a cote des autres
+   etats de la barre pour etre lu par la meme boucle. */
+let apercuT = 0;
 let barFollow = 0;
 let barVel = 0;
 // avant tout clic, la barre reste au repos
@@ -5196,13 +5204,54 @@ function frame(now) {
 
      `--bar-h + 12` est la place prise par le cercle a droite ; la barre recule
      de sa moitie pour que l'ensemble reste centre. */
-  /* ⚠ LE DECALAGE DISPARAIT AVEC LE CERCLE. Pendant l'apercu equipe, le bouton
-     est masque : la barre doit reprendre toute la place et se recentrer, sinon
-     elle reste collee a gauche avec un vide a droite. */
-  const placeCercle = document.body.classList.contains('en-apercu')
-    ? '0px' : 'calc((var(--bar-h) + 12px) / 2)';
+  /* ═══ LA BARRE S'ETIRE QUAND LE CERCLE PART ═══
+
+     ⚠ L'ANIMATION EST PILOTEE ICI, PAS EN CSS. Ces lignes s'executent a chaque
+       image et ecrasent tout `transition` de la feuille de style : la largeur
+       aurait saute d'une valeur a l'autre malgre la transition declaree.
+
+     `apercuT` va de 0 (cercle present) a 1 (cercle parti). On l'approche par
+     pas, ce qui donne une decelération naturelle — le meme principe que le
+     gonflement juste au-dessus.
+
+     ⚠ 0,14 PAR IMAGE, ET UN SEUIL D'ARRET. Sans le seuil, la valeur
+       s'approcherait indefiniment de sa cible sans l'atteindre, et la boucle
+       recalculerait la largeur a chaque image pour rien. */
+  const apercuCible = document.body.classList.contains('en-apercu') ? 1 : 0;
+  /* ⚠ 0,22 ET NON 0,14. Mesure sur la boucle : a 0,14 l'etirement mettait
+     517 ms a se terminer, quand la goutte du cercle en prend 340. La barre
+     finissait bien apres lui — deux gestes qui devraient etre un seul.
+     A 0,22, elle atteint 99 % en 330 ms. */
+  apercuT += (apercuCible - apercuT) * 0.22;
+  if (Math.abs(apercuCible - apercuT) < 0.002) apercuT = apercuCible;
+
+  /* ⚠ UNE COURBE, PAS UNE DROITE. `t * t * (3 - 2t)` demarre et finit doux :
+     c'est ce qui fait qu'une forme parait s'etirer plutot que glisser. */
+  const e = apercuT * apercuT * (3 - 2 * apercuT);
+
+  /* ⚠ ON REMESURE ET ON REPOSE LES ONGLETS PENDANT L'ETIREMENT.
+
+     `layout()` recalcule les centres, mais ce sont `row()` et la capsule qui
+     les POSENT. Sans elles, « Reglages » restait a son ancienne place et
+     debordait sous le cercle qui reapparaissait — mesure a 364 px pour une
+     barre finissant a 291.
+
+     ⚠ SEULEMENT PENDANT LE MOUVEMENT. Reconstruire les onglets soixante fois
+       par seconde en permanence serait absurde ; ici cela ne dure qu'un tiers
+       de seconde. */
+  if (apercuT !== apercuCible) {
+    layout();
+    row(lNorm, false);
+    row(lLens, true);
+    marquerOngletActif();
+    lens.snapTo(CENTERS[active] - BAR_W / 2);
+  }
+
+  /* La place du cercle, qui se referme au fur et a mesure. */
+  barEl.style.width =
+    `calc(min(100vw - 46px, var(--col, 460px) - 40px) - (1 - ${e.toFixed(4)}) * (var(--bar-h) + 12px))`;
   barEl.style.transform =
-    `translateX(calc(-50% - ${placeCercle})) ` +
+    `translateX(calc(-50% - (1 - ${e.toFixed(4)}) * (var(--bar-h) + 12px) / 2)) ` +
     `scale(${(1 + BAR_SWELL * barFollow).toFixed(6)}) translateZ(0)`;
 
   // Aucune illumination : la barre ne fait que grossir.

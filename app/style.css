@@ -13996,3 +13996,157 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 
 /* Le bouton perd sa lueur : elle debordait de la carte et la faisait flotter. */
 #p-abonnement .offre-cta{ box-shadow:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « VOIR COMME L'EQUIPE » — LE CERCLE A DROITE DE LA BARRE
+
+   ⚠ IL PARTAGE `.glassDiv` AVEC LA BARRE, donc son fond, son flou et son
+     arete. Recopier ces valeurs les aurait fait diverger a la premiere
+     retouche du verre.
+
+   ⚠ IL SUIT LA BARRE SANS LA MESURER. Meme `bottom`, meme hauteur, meme
+     rayon — tout vient de `--bar-h`. Un calcul en JavaScript se serait
+     desynchronise au premier changement d'orientation.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#voir-equipe{
+  position:fixed;
+  /* ⚠ LA VALEUR EXACTE DE LA BARRE, recopiee de `#bar` dans index.html. J'avais
+     ecrit `+ 14px` de memoire : la barre utilise un `max()` qui garantit
+     23 px meme sans encoche. Un pixel d'ecart aurait suffi a ce que le cercle
+     ne soit pas aligne avec elle.
+
+     ⚠ C'EST LA SEULE VALEUR EN DOUBLE. Si elle change sur `#bar`, elle doit
+       changer ici. */
+  bottom:max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px));
+  /* ⚠ LE CERCLE SE PLACE PAR RAPPORT A LA BARRE, en repartant de son bord
+     droit. La barre est centree et sa largeur vaut
+     `min(100vw - 46, --col - 40) - --bar-h - 12` : son bord droit tombe donc a
+     la moitie de cette largeur, a droite du centre. Le cercle commence
+     12 px plus loin.
+
+     Une seule expression, une seule direction — c'est ce qui manquait aux deux
+     essais precedents, ou barre et cercle se calculaient l'un sur l'autre. */
+  /* ⚠ LE CERCLE SE POSE AU BORD DROIT DE L'ENSEMBLE, pas au bord de la barre.
+
+     Je partais du centre pour aller au bord droit de la BARRE, en oubliant que
+     celle-ci recule maintenant de 38 px. Mon cercle se retrouvait 38 px trop a
+     gauche — et debordait de 15 px a droite, l'ecart mesure a 50 au lieu de 12.
+
+     La bonne reference est simple : la moitie de la largeur TOTALE, moins la
+     largeur du cercle. */
+  left:50%;
+
+  width:var(--bar-h); height:var(--bar-h);
+  --glass-radius:calc(var(--bar-h) / 2);
+  border:none; padding:0;
+  display:grid; place-items:center;
+  color:var(--label);
+  z-index:60;
+
+  /* La barre est en `position:absolute` dans `.glassDiv` ; ce bouton est en
+     `fixed`. On redit la propriete apres, sinon la regle commune l'emporte. */
+  position:fixed;
+}
+#voir-equipe svg{ width:22px; height:22px; }
+/* ⚠ L'ETAT PRESSE REPETE LE DECALAGE. Un `transform` remplace le precedent :
+   ecrire `scale(0.92)` seul renverrait le cercle au centre de l'ecran le temps
+   du toucher. */
+#voir-equipe:active{ transform:var(--place) scale(0.92); }
+
+/* ⚠ IL DISPARAIT AVEC LA BARRE. Sans cette regle, il resterait seul a l'ecran
+   sur les pages qui masquent la navigation — l'ouverture d'une procedure, le
+   scanner. */
+body.sans-bar #voir-equipe{ opacity:0; pointer-events:none; }
+
+
+/* ═══ LE BANDEAU DE L'APERCU EQUIPE ═══
+
+   ⚠ IL EST MASQUE PAR DEFAUT et ne parait qu'avec `body.en-apercu`. Sans cette
+     regle, il occuperait le haut de l'ecran en permanence. */
+/* ⚠ `hidden` EST DESORMAIS POSE DANS LE BALISAGE. Cette regle reste, en
+   complement : si un script retirait l'attribut, le bandeau ne reapparaitrait
+   pas pour autant hors de l'apercu. */
+#apercu-bandeau{ display:none; }
+/* ⚠ EN BAS, PAS EN HAUT. Pose a `top:0`, le bandeau recouvrait la barre du
+   haut — logo, menu et bouton « + » disparaissaient sous lui.
+
+   En bas, il se pose au-dessus de la barre de navigation : les deux se lisent
+   ensemble, et le geste de retour est a portee du pouce. */
+/* ⚠ IL BAT `[hidden]`, dont le `display:none` est pose par le navigateur.
+   Sans ce second selecteur, le bandeau resterait invisible pendant l'apercu. */
+body.en-apercu #apercu-bandeau[hidden],
+body.en-apercu #apercu-bandeau{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  position:fixed; left:18px; right:18px;
+  bottom:calc(max(23px, calc(env(safe-area-inset-bottom, 0px) + 12px)) + var(--bar-h) + 12px);
+  padding:11px 12px 11px 18px;
+  border-radius:100px;
+  background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
+  box-shadow:0 8px 24px -12px rgba(20,20,30,0.45);
+  color:#FFFFFF; font-size:13px; letter-spacing:-0.015em;
+  z-index:200;
+}
+body.en-apercu #apercu-bandeau button{
+  flex-shrink:0; border:none; padding:7px 14px; border-radius:100px;
+  background:rgba(255,255,255,0.14); color:#FFFFFF;
+  font-family:inherit; font-size:13px; font-weight:600;
+}
+body.en-apercu #apercu-bandeau button:active{ transform:scale(0.94); }
+
+/* ⚠ LE CONTENU REMONTE AU-DESSUS DU BANDEAU, qui est maintenant en bas. Sans
+   cette reserve, les dernieres lignes de la liste passeraient dessous. */
+body.en-apercu #equipe-app{ padding-bottom:64px; }
+
+
+/* ═══ LA GOUTTE D'EAU ═══
+
+   Le cercle ne s'efface pas : il se retracte vers son centre en s'ecrasant
+   legerement, comme une goutte qu'on absorbe.
+
+   ⚠ L'ECRASEMENT FAIT TOUT LE TRAVAIL. Une simple reduction d'echelle donne
+     une bulle qui retrecit ; c'est la DEFORMATION — un peu plus large que haut
+     au depart du mouvement — qui evoque un liquide. D'ou les deux `scale`
+     differents dans l'image du milieu.
+
+   ⚠ LA COURBE DEPASSE LEGEREMENT A L'APPARITION. `cubic-bezier(0.34, 1.56,
+     0.64, 1)` monte au-dessus de 1 avant de redescendre : le cercle grossit
+     d'un cheveu de trop puis se pose. Sans ce depassement, il arrive et
+     s'arrete net — on voit une image apparaitre, pas une goutte se former.
+
+   ⚠ `transform` REPETE LE DECALAGE. Ces animations remplacent le `transform`
+     du bouton : sans le `translateX`, il partirait au centre de l'ecran le
+     temps du mouvement. */
+#voir-equipe{
+  --place:translateX(calc(
+    min(calc(50vw - 23px), calc(var(--col, 460px) / 2 - 20px)) - var(--bar-h)));
+  transform:var(--place);
+}
+
+body.en-apercu #voir-equipe{
+  pointer-events:none;
+  animation:goutteDisparait 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+body:not(.en-apercu) #voir-equipe.revient{
+  animation:goutteApparait 0.44s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes goutteDisparait{
+  0%  { transform:var(--place) scale(1, 1);       opacity:1; }
+  45% { transform:var(--place) scale(1.08, 0.86); opacity:0.9; }
+  100%{ transform:var(--place) scale(0.2, 0.34);  opacity:0; }
+}
+@keyframes goutteApparait{
+  0%  { transform:var(--place) scale(0.2, 0.34);  opacity:0; }
+  55% { transform:var(--place) scale(1.06, 0.92); opacity:1; }
+  100%{ transform:var(--place) scale(1, 1);       opacity:1; }
+}
+@media (prefers-reduced-motion: reduce){
+  body.en-apercu #voir-equipe{ animation:none; opacity:0; }
+  body:not(.en-apercu) #voir-equipe.revient{ animation:none; }
+}
+
+
+/* ⚠ LA LARGEUR EST PILOTEE PAR LE SCRIPT, dans la boucle de la barre. La regle
+   qui etait ici posait la valeur finale d'un coup, en `!important` : elle
+   sautait par-dessus l'animation au lieu de l'accompagner. */

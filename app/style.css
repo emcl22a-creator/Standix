@@ -15075,19 +15075,21 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
 body:has(#equipe-app[style*="display: block"]) #voir-equipe,
 body:has(#equipe-app[style*="display:block"]) #voir-equipe{
   opacity:0; pointer-events:none;
-}
+}/* ⚠ LA BARRE NE S'ELARGIT QUE DANS L'ESPACE EQUIPE, JAMAIS PENDANT L'APERCU.
 
-/* La barre reprend toute la largeur : sans cercle a loger, le decalage n'a
-   plus lieu d'etre. */
-/* ⚠ SEULEMENT DANS L'ESPACE EQUIPE, PAS PENDANT L'APERCU.
+   Le selecteur d'origine disait « espace equipe affiche ET pas d'apercu ». Au
+   retour, `en-apercu` est retiree 180 ms AVANT que l'espace equipe soit
+   masque : pendant ces 180 ms les deux etaient vraies, et la barre passait a
+   344 px avant de revenir a 268.
 
-   Cette regle elargit la barre quand le cercle n'existe pas — c'est le cas d'un
-   employe. Mais pendant l'apercu, l'espace equipe est bien affiche ET le cercle
-   reste la : la barre passait dessous.
+   ⚠ ON AJOUTE `espace-vide` A L'EXCLUSION. Cette classe est posee pendant tout
+     le temps mort — exactement les 180 ms ou l'ancien selecteur se trompait.
+     Elle comble l'intervalle sans rien changer aux deux etats stables.
 
-   `:not(.en-apercu)` fait la difference que le selecteur ne pouvait pas voir. */
-body:not(.en-apercu):has(#equipe-app[style*="display: block"]) #bar,
-body:not(.en-apercu):has(#equipe-app[style*="display:block"]) #bar{
+   ⚠ ET UN `!important` RESTE NECESSAIRE : la largeur ordinaire de la barre est
+     ecrite par le script a chaque image. */
+body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display: block"]) #bar,
+body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display:block"]) #bar{
   width:min(calc(100vw - 46px), calc(var(--col, 460px) - 40px)) !important;
 }
 

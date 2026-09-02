@@ -1273,6 +1273,10 @@ window.chooseSpace = function(space) {
      règle d'iOS pour toute vue présentée par-dessus. */
   const ecranC = document.getElementById('login-screen')
   ecranC.style.display = 'flex'
+  /* ⚠ LES SCENES DEMARRENT QUAND LA FEUILLE S'OUVRE, pas au chargement de
+     l'app. Un minuteur pose des le depart tournerait pendant l'ecran de choix
+     d'espace, ou l'on ne voit pas les images. */
+  demarrerScenes()
   /* On rend les champs utilisables : ils étaient `inert` pour empêcher Safari
      de proposer le remplissage depuis l'écran de choix. */
   ecranC.removeAttribute('inert')
@@ -1539,6 +1543,9 @@ window.allerConnexion = function() {
    `feuilleDescend` la fait redescendre, puis on masque au bout de 320 ms — la
    durée exacte de l'animation. */
 window.backToChoice = function() {
+  /* ⚠ ON COUPE LE MINUTEUR EN QUITTANT. Sans cela il continuerait a basculer
+     deux images invisibles, pendant toute la duree de la session. */
+  arreterScenes()
   const w = document.getElementById('login-screen')
   const carte = w?.querySelector('.login-card')
   if (!w || !carte) return
@@ -1553,23 +1560,96 @@ window.backToChoice = function() {
 }
 
 // ═══ ONGLETS Connexion / Créer un compte ═══
+/* ⚠ LES ONGLETS ONT ETE RETIRES DE LA PAGE, PAS CETTE FONCTION.
+
+   La bascule « Se connecter / Creer un compte » etait un segment en haut de
+   feuille. La page presente maintenant la connexion d'emblee, et les deux
+   chemins de creation en bas — c'est la lecture naturelle : on se connecte le
+   plus souvent, on cree un compte une fois.
+
+   ⚠ ELLE EST APPELEE DE QUATRE ENDROITS, dont l'ecran d'accueil et le retour
+     apres une deconnexion. La supprimer aurait casse ces chemins ; elle change
+     donc de forme, pas de nom.
+
+   ⚠ CHAQUE ELEMENT EST TESTE. Les trois du segment n'existent plus : sans
+     `?.`, la premiere ligne aurait leve une erreur et l'ecran de connexion ne
+     se serait plus affiche du tout. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES DEUX SCENES DE L'ECRAN DE CONNEXION
+
+   Elles alternent toutes les cinq secondes, en fondu-flou.
+
+   ⚠ UN SEUL MINUTEUR, ET IL S'ARRETE. Un `setInterval` pose au chargement
+     continuerait de tourner une fois l'app ouverte, a redessiner deux images
+     que personne ne voit. On l'arrete des que l'ecran de connexion se ferme.
+
+   ⚠ ET IL S'ARRETE AUSSI QUAND L'ONGLET PASSE EN ARRIERE-PLAN. Safari ralentit
+     les minuteurs sans les couper : au retour, plusieurs bascules se
+     rattrapent d'un coup et les images clignotent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let scenesMinuteur = null
+
+function demarrerScenes() {
+  const zone = document.getElementById('scenes')
+  if (!zone || scenesMinuteur) return
+  const images = [...zone.querySelectorAll('.scene')]
+  if (images.length < 2) return
+
+  let i = 0
+  scenesMinuteur = setInterval(() => {
+    /* ⚠ ON NE FAIT RIEN SI L'ONGLET EST CACHE. Le minuteur continue, mais la
+       bascule est sautee : au retour, on reprend a l'image en cours au lieu
+       d'en enchainer trois. */
+    if (document.hidden) return
+    images[i].classList.remove('visible')
+    i = (i + 1) % images.length
+    images[i].classList.add('visible')
+  }, 5000)
+}
+
+function arreterScenes() {
+  if (!scenesMinuteur) return
+  clearInterval(scenesMinuteur)
+  scenesMinuteur = null
+}
+
+/* ⚠ LES DEUX CHEMINS DE CREATION MENENT AU MEME FORMULAIRE.
+
+   Ils ne different que par l'espace vise : `gestion` ouvre la creation d'une
+   entreprise, `equipe` demande un code. C'est `selectedSpace` qui porte la
+   difference, et le formulaire s'y adapte deja — il n'y avait rien a ecrire
+   de plus. */
+document.getElementById('creer-entreprise')?.addEventListener('click', () => {
+  selectedSpace = 'gestion'
+  switchAuthTab('signup')
+  document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+})
+
+document.getElementById('creer-membre')?.addEventListener('click', () => {
+  selectedSpace = 'equipe'
+  switchAuthTab('signup')
+  document.getElementById('signup-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+})
+
 window.switchAuthTab = function(tab) {
-  const loginBtn = document.getElementById('tab-login-btn')
-  const signupBtn = document.getElementById('tab-signup-btn')
-  const indicator = document.getElementById('auth-indicator')
   const loginForm = document.getElementById('login-form')
   const signupForm = document.getElementById('signup-form')
 
-  indicator.style.transform = tab === 'login' ? 'translateX(0%)' : 'translateX(100%)'
-  loginBtn.classList.toggle('active', tab === 'login')
-  signupBtn.classList.toggle('active', tab === 'signup')
+  /* Le segment n'existe plus, mais on garde ces lignes protegees : si on le
+     remettait un jour, tout refonctionnerait sans y toucher. */
+  const indicator = document.getElementById('auth-indicator')
+  if (indicator) indicator.style.transform =
+    tab === 'login' ? 'translateX(0%)' : 'translateX(100%)'
+  document.getElementById('tab-login-btn')?.classList.toggle('active', tab === 'login')
+  document.getElementById('tab-signup-btn')?.classList.toggle('active', tab === 'signup')
 
-  loginForm.classList.remove('active')
-  signupForm.classList.remove('active')
-  if (tab === 'login') { loginForm.classList.add('active') } else { signupForm.classList.add('active') }
+  loginForm?.classList.remove('active')
+  signupForm?.classList.remove('active')
+  if (tab === 'login') loginForm?.classList.add('active')
+  else signupForm?.classList.add('active')
 
-  document.getElementById('login-error').textContent = ''
-  document.getElementById('login-error').style.color = 'var(--red)'
+  const err = document.getElementById('login-error')
+  if (err) { err.textContent = ''; err.style.color = 'var(--red)' }
 }
 
 // ═══ CONNEXION ═══

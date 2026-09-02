@@ -6679,6 +6679,13 @@ function jouerVoile() {
 }
 
 window.showGestionScreen = function(id, btn) {
+  /* ⚠ ON REND LE VERROU EN QUITTANT L'EDITION.
+
+     Toutes les sorties passent par ici — le bouton retour, l'enregistrement, la
+     suppression, un onglet de la barre. Le poser a un seul de ces endroits en
+     aurait laisse trois sans. */
+  if (verrouTenu && id !== 'p-edit-procedure') rendreVerrou()
+
   /* ⚠ L'ARRIVEE DES CARTES D'ABONNEMENT REDEVIENT POSSIBLE ICI.
 
      `sans-arrivee` est posee au changement de rythme pour empecher les cartes
@@ -24518,7 +24525,72 @@ document.getElementById('pub-btn')?.addEventListener('click', async () => {
   if (navigator.vibrate) navigator.vibrate(8)
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN SEUL GESTIONNAIRE A LA FOIS
+
+   ⚠ SANS VERROU, LE DERNIER A ENREGISTRER GAGNE. Deux personnes qui modifient
+     la meme procedure ecrasent mutuellement leur travail, et la premiere ne
+     sait meme pas qu'elle a perdu ses etapes.
+
+   ⚠ LA DECISION EST PRISE EN BASE. `prendre_verrou` teste et ecrit dans la
+     meme requete : deux personnes qui touchent « Modifier » a la meme seconde
+     ne peuvent pas obtenir le verrou toutes les deux.
+
+   ⚠ ET LE VERROU SE PERIME. Quinze minutes sans signe de vie et il ne compte
+     plus — sinon un onglet ferme sans prevenir bloquerait la procedure pour
+     toujours.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let verrouTenu = null
+let verrouMinuteur = null
+
+/* ⚠ ON RAFRAICHIT LA DATE PENDANT L'EDITION. Sans cela, une modification qui
+   dure plus de quinze minutes verrait son verrou expirer sous elle. */
+function entretenirVerrou(procId) {
+  clearInterval(verrouMinuteur)
+  verrouMinuteur = setInterval(() => {
+    if (document.hidden) return
+    supabase.rpc('prendre_verrou', { p_procedure: procId }).catch(() => {})
+  }, 5 * 60000)
+}
+
+async function rendreVerrou() {
+  clearInterval(verrouMinuteur)
+  if (!verrouTenu) return
+  const id = verrouTenu
+  verrouTenu = null
+  try { await supabase.rpc('rendre_verrou', { p_procedure: id }) } catch {}
+}
+
+/* ⚠ ET ON LE REND AUSSI SI L'ONGLET SE FERME. `visibilitychange` couvre le
+   balayage de l'app sur iPhone, ou `beforeunload` n'est jamais emis. */
+window.addEventListener('pagehide', () => {
+  if (verrouTenu) navigator.sendBeacon?.(
+    `${SUPABASE_URL}/rest/v1/rpc/rendre_verrou`,
+    new Blob([JSON.stringify({ p_procedure: verrouTenu })], { type: 'application/json' }))
+})
+
 window.openEditProcedure = async function(procId, mode) {
+  /* ⚠ ON DEMANDE LE VERROU AVANT D'AFFICHER QUOI QUE CE SOIT. Ouvrir l'ecran
+     puis le refermer donnerait l'impression d'un defaut. */
+  try {
+    const { data, error } = await supabase.rpc('prendre_verrou', { p_procedure: procId })
+    const r = Array.isArray(data) ? data[0] : data
+
+    if (!error && r && r.obtenu === false) {
+      await confirmDialog({
+        titre: 'Procédure en cours de modification',
+        message: `${r.par_qui} modifie cette procédure en ce moment. ` +
+          'Revenez dans quelques minutes.',
+        confirmer: 'Compris', annuler: null, danger: false,
+      })
+      return
+    }
+    if (!error) { verrouTenu = procId; entretenirVerrou(procId) }
+    /* ⚠ UNE ERREUR RESEAU N'EMPECHE PAS DE TRAVAILLER. Bloquer l'edition parce
+       que le verrou n'a pas pu etre pose ferait plus de mal que le risque
+       qu'il ecarte. */
+  } catch {}
+
   pileEdition = []
   editProcedureId = procId
   editMode = mode || 'edit'

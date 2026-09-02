@@ -98,7 +98,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=2156c024">
+<link rel="stylesheet" href="style.css?v=f9eff2c9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -848,19 +848,79 @@
 
          C'est ce que fait Apple sur ses écrans de connexion : la marque se
          présente d'un bloc, sans médaillon qui chevauche un bord. -->
+    <!-- ═══════════════════════════════════════════════════════════════════
+         L'EN-TETE : LOGO, TITRE, PHRASE, PUIS LES DEUX SCENES
+
+         L'ordre suit celui du regard : qui l'on est, ou l'on arrive, ce que
+         l'app fait — et seulement ensuite, les champs.
+         ═══════════════════════════════════════════════════════════════════ -->
     <div class="feuille-marque">
       <img data-logo alt=""><span class="logotype">Standix</span>
     </div>
-    <h1 id="auth-title">Espace Gestion</h1>
-    <!-- Le sous-titre change selon le chemin : « Connectez-vous ou créez votre
-         compte » était vrai quand les deux onglets étaient offerts. Chaque
-         écran n'ayant plus qu'un seul geste possible, il doit dire lequel. -->
-    <div class="subhead" id="auth-sous">Connectez-vous ou créez votre compte</div>
 
-    <div class="auth-toggle">
-      <div class="auth-toggle-indicator" id="auth-indicator"></div>
-      <button id="tab-login-btn" class="auth-toggle-btn active" onclick="switchAuthTab('login')">Se connecter</button>
-      <button id="tab-signup-btn" class="auth-toggle-btn" onclick="switchAuthTab('signup')">Créer un compte</button>
+    <h1 id="auth-title">Bienvenue</h1>
+    <div class="subhead" id="auth-sous">Connectez-vous à votre espace.</div>
+
+    <!-- ═══ LES DEUX SCENES ═══
+
+         ⚠ LES DEUX IMAGES SONT SUPERPOSEES, pas cote a cote. Un carrousel qui
+           fait glisser demande de mesurer, de gerer le doigt, de savoir ou l'on
+           en est. Ici, l'une s'efface pendant que l'autre parait : deux
+           elements au meme endroit, une seule classe qui bascule.
+
+         ⚠ `fetchpriority="high"` SUR LA PREMIERE. C'est la seule image visible
+           au chargement ; sans cela le navigateur la traite comme les autres et
+           la carte reste grise une seconde. -->
+    <div class="scenes" id="scenes" aria-hidden="true">
+      <!-- ⚠ L'ENTREPOT EN PREMIER. C'est la scene qui dit le mieux ce que fait
+           l'app : quelqu'un, seul a son poste, qui consulte un geste sur son
+           telephone. Le bureau montre deux personnes qui regardent ensemble —
+           juste, mais c'est la situation qu'on veut EVITER : celle ou il faut
+           demander a quelqu'un.
+
+           ⚠ `fetchpriority` SUIT L'ORDRE. Il etait sur le bureau ; laisse la,
+             le navigateur aurait charge en priorite l'image qu'on ne voit
+             pas. -->
+      <img class="scene visible" src="img/scene-entrepot.webp" alt=""
+           fetchpriority="high" decoding="async">
+      <img class="scene" src="img/scene-bureau.webp" alt="" loading="lazy" decoding="async">
+
+      <!-- ⚠ LA PASTILLE DEBORDE L'IMAGE, en bas a droite. Elle reprend la
+           matiere de la carte d'identite des Reglages — meme fond, meme rayon,
+           meme ombre.
+
+           Elle ne bouge pas avec les scenes : ce qu'elle montre est vrai des
+           deux cotes, au bureau comme a l'entrepot. -->
+      <div class="scene-pastille">
+        <span class="sp-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal0)" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/>
+            <path d="M13.6 3.4v5h5"/><path d="M8.8 13.2h6.4M8.8 16.6h4.2"/>
+          </svg>
+        </span>
+        <span class="sp-tx">
+          <span class="sp-t">Procédure validée</span>
+          <!-- ⚠ « Former un nouveau », APRES DEUX ESSAIS RATES.
+
+               « Ouverture de caisse » supposait un commerce. « Prise de poste »
+               etait pire : c'est du vocabulaire de ressources humaines, que je
+               connais et que le gerant d'un garage n'emploie jamais. Un exemple
+               qu'il faut traduire ne montre rien.
+
+               Former quelqu'un qui arrive, tout le monde l'a fait — au bureau,
+               a l'atelier, en cuisine. Et c'est exactement ce que l'app sert a
+               faire : ecrire une fois ce qu'on repete a chaque nouveau.
+
+               ⚠ SI VOUS DEVEZ EXPLIQUER UN EXEMPLE, IL EST MAUVAIS. C'est le
+                 test que j'aurais du appliquer aux deux premiers. -->
+          <span class="sp-s">Former un nouvel arrivant</span>
+        </span>
+        <span class="sp-ok">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6"
+               stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </span>
+      </div>
     </div>
 
     <div class="auth-form-wrap">
@@ -897,86 +957,82 @@
         <button type="button" class="lien-doux" id="mdp-oublie">Mot de passe oublié ?</button>
       </div>
 
-      <!-- Inscription -->
-      <div id="signup-form" class="auth-form">
-        <div style="display:flex; gap:8px; margin-bottom:12px;">
-          <div style="flex:1;">
-            <label class="f">Prénom</label>
-            <input type="text" id="signup-prenom" placeholder="Marie" autocomplete="given-name">
-          </div>
-          <div style="flex:1;">
-            <label class="f">Nom</label>
-            <input type="text" id="signup-nom" placeholder="Tissot" autocomplete="family-name">
-          </div>
-        </div>
-        <label class="f">E-mail</label>
-        <input type="email" id="signup-email" placeholder="vous@entreprise.com"
-               autocomplete="username" style="margin-bottom:12px;">
-        <label class="f">Mot de passe</label>
-        <!-- `new-password` et non `current-password` : c'est ce qui déclenche la
-             proposition d'un mot de passe fort, et ce qui empêche le
-             gestionnaire de préremplir l'ancien sur un formulaire de création. -->
-        <input type="password" id="signup-password" placeholder="••••••••"
-               autocomplete="new-password" style="margin-bottom:16px;">
-
-        <div id="signup-gestion-field">
-          <label class="f">Nom de l'entreprise</label>
-          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;" autocomplete="organization">
-        </div>
-        <div id="signup-equipe-field" style="display:none;">
-          <label class="f">Code de l'entreprise (6 caractères)</label>
-          <!-- ═══ `off`, ET NON `one-time-code` ═══
-
-               J'avais mis `one-time-code` en pensant que nommer le champ ferait
-               taire Safari. C'était l'inverse exact : `one-time-code` est le nom
-               qui lui DEMANDE de proposer un code reçu par SMS. Je lui avais
-               donc explicitement demandé d'ouvrir son clavier numérique au
-               chargement de l'app.
-
-               `off` est le bon attribut. Il n'est pas toujours respecté sur les
-               champs de mot de passe, mais il l'est sur un champ texte ordinaire
-               comme celui-ci.
-
-               ═══ L'ANCIENNE NOTE, QUI ÉTAIT FAUSSE ═══
-
-               `inert` empêche le focus, mais PAS le gestionnaire de mots de
-               passe : Safari lit le balisage, voit un champ de cinq chiffres
-               nommé « code », le prend pour un code de vérification à usage
-               unique, et propose son remplissage — clavier numérique compris,
-               au chargement de l'app.
-
-               `off` ne suffit pas seul sur iOS, qui l'ignore souvent.
-               `one-time-code` en revanche est le nom que Safari CHERCHE : le
-               lui donner explicitement lui dit que le champ est déjà géré, et
-               il cesse de proposer. C'est contre-intuitif — on nomme pour
-               faire taire — mais c'est ainsi que la spécification fonctionne. -->
-          <!-- ═══ SIX CARACTÈRES, LETTRES ET CHIFFRES ═══
-
-               `maxlength="5"` refusait le sixième — le champ était réglé pour
-               l'ancien code à cinq chiffres.
-
-               ⚠ ET `inputmode="numeric"` OUVRAIT UN CLAVIER SANS LETTRES. Le
-                 nouveau code en contient : impossible de le saisir sur
-                 téléphone. C'est le défaut le plus grave des deux, et le moins
-                 visible en relisant le code.
-
-               `autocapitalize` met en majuscules : le code s'affiche ainsi,
-               et la fonction serveur ignore la casse de toute façon. -->
-            <input type="text" id="signup-code-acces" placeholder="A1B2C3" maxlength="6"
-                   autocapitalize="characters" spellcheck="false"
-                 autocomplete="off" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
-        </div>
-
-        <button class="btn block" id="signup-btn">Créer mon compte</button>
-        <!-- L'acceptation par la création du compte. C'est la forme admise pour un
-             service professionnel : le lien doit être visible et cliquable AVANT
-             l'action, pas caché dans un pied de page. -->
-        <div class="cgu-mention">En créant votre compte, vous acceptez les
-          <a href="cgu.html" target="_blank" rel="noopener">conditions d’utilisation</a>.</div>
-      </div>
     </div>
 
     <div class="error-msg" id="login-error"></div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         LES DEUX CHEMINS DE CREATION
+
+         ⚠ DEUX CARTES DE MEME TAILLE, DE MEME MATIERE, SANS ORDRE DE VALEUR.
+
+           La version precedente offrait un segment « Se connecter / Creer un
+           compte » ou tout le monde passait par la meme porte, puis decouvrait
+           ensuite qu'il fallait un code. Le choix se fait maintenant en amont,
+           et il est dit clairement.
+
+         ⚠ AUCUNE DES DEUX N'EST « PRINCIPALE ». Un gerant sans equipe n'a rien
+           a montrer ; une equipe sans procedures n'a rien a lire. Les deux
+           roles font l'app, et rien dans le dessin ne doit suggerer que l'un
+           vaut moins que l'autre — meme fond, meme rayon, meme graisse de
+           titre.
+
+         ⚠ LE VOCABULAIRE EVITE « rejoindre » SEUL, qui sonne comme un second
+           temps. « Vous entrez dans un espace deja pret » dit la meme chose
+           sans faire attendre.
+         ═══════════════════════════════════════════════════════════════════ -->
+    <div class="creer-titre">Pas encore de compte ?</div>
+
+    <div class="creer-choix">
+      <button type="button" class="creer-carte" id="creer-entreprise">
+        <span class="cc-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal1)" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3.6 20.4h16.8"/>
+            <path d="M5.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6a1.6 1.6 0 0 1 1.6 1.6v14.2"/>
+            <path d="M14.6 11.4h2.8a1.6 1.6 0 0 1 1.6 1.6v7.4"/>
+            <path d="M8.4 8.4h2.6M8.4 12h2.6M8.4 15.6h2.6"/>
+          </svg>
+        </span>
+        <span class="cc-tx">
+          <span class="cc-t">Ouvrir un espace</span>
+          <!-- ⚠ ON DECRIT L'APP, PAS CE QUE « VOUS » FEREZ. La version d'avant
+               disait « vous filmez, votre equipe retrouve » : deux camps, et le
+               lecteur range d'un cote avant meme d'avoir choisi.
+
+               ⚠ ET COURT. Trois lignes sous un titre de trois mots se lisent
+                 comme une notice ; personne ne lit une notice pour choisir
+                 entre deux boutons. -->
+          <span class="cc-s">Créez vos procédures avec l’IA.</span>
+        </span>
+        <span class="cc-fl">›</span>
+      </button>
+
+      <button type="button" class="creer-carte" id="creer-membre">
+        <span class="cc-ic">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal3)" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="8.2" r="3.4"/>
+            <path d="M5.6 19.4a6.4 6.4 0 0 1 12.8 0"/>
+          </svg>
+        </span>
+        <span class="cc-tx">
+          <span class="cc-t">Rejoindre un espace</span>
+          <!-- ⚠ « a tout moment » PLUTOT QUE « au moment ou le geste se fait ».
+               La formule d'avant decrivait une SITUATION — on la lit, on
+               l'imagine, on met une seconde a la comprendre. « A tout moment »
+               dit la meme disponibilite en trois mots.
+
+               ⚠ ET LA MEME LONGUEUR QUE SA VOISINE. Deux cartes de meme rang
+                 doivent peser pareil : une phrase courte a cote d'une phrase
+                 longue suggere que l'une compte moins. -->
+          <span class="cc-s">Les procédures, à tout moment.</span>
+          <!-- ⚠ « Consultez » ET NON « Retrouvez ». Retrouver suppose qu'on a
+               deja cherche ; consulter est le geste lui-meme. -->
+        </span>
+        <span class="cc-fl">›</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -1142,17 +1198,6 @@
 
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       LES DEUX PAGES D'HISTORIQUE
-
-       Elles montent du bas, par-dessus l'ecran d'ou l'on vient. C'est ce qui
-       dit qu'on n'a pas navigue ailleurs : on a ouvert quelque chose, et on va
-       le refermer.
-
-       ⚠ ELLES SONT HORS DE `.app`, au niveau du `body`. Posees dedans, elles
-         seraient prises dans son contexte d'empilement et passeraient sous la
-         barre du bas.
-       ═══════════════════════════════════════════════════════════════════════ -->
   <div class="histo" id="histo-mouvements" hidden aria-hidden="true">
     <div class="histo-fond" data-fermer-histo></div>
     <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Mouvements de l’équipe">
@@ -3827,7 +3872,131 @@
 
      ⚠ A REGENERER A CHAQUE MODIFICATION de `app.js` ou `style.css`. C'est ce
        que fait `version.py`, livre a cote. -->
-<script type="module" src="app.js?v=e2afc8b9"></script>
+<!-- ═══════════════════════════════════════════════════════════════════════
+     LA FEUILLE D'INSCRIPTION
+
+     ⚠ MEME GABARIT QUE LES FEUILLES D'ACTIVITE — `histo`, `histo-fond`,
+       `histo-carte`, poignee, tete, bouton de fermeture. Elle herite donc de
+       leur montee, de leur voile et de leur descente sans une ligne de style
+       en plus.
+
+     ⚠ UNE SEULE FEUILLE POUR LES DEUX CHEMINS. « Ouvrir un espace » et
+       « Rejoindre un espace » remplissent le meme formulaire ; seuls le titre,
+       la phrase et le champ de code changent. Deux feuilles auraient double le
+       balisage et le risque de les voir diverger.
+
+     ⚠ LE FORMULAIRE EST DEPLACE, PAS RECOPIE. Il portait deja tous ses
+       identifiants et ses ecouteurs : le dupliquer aurait donne deux champs
+       `signup-email`, et le script aurait ecrit dans le mauvais.
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="histo" id="feuille-inscription" hidden aria-hidden="true">
+  <div class="histo-fond" data-fermer-inscription></div>
+  <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Créer un compte">
+    <span class="histo-poignee" data-fermer-inscription></span>
+    <div class="histo-tete">
+      <h2 id="insc-titre">Ouvrir un espace</h2>
+      <button type="button" class="histo-x" data-fermer-inscription aria-label="Fermer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <p class="histo-note" id="insc-note">Créez vos procédures avec l’IA.</p>
+
+    <div class="histo-liste" id="insc-corps">
+      <!-- Inscription -->
+      <div id="signup-form">
+        <div style="display:flex; gap:8px; margin-bottom:12px;">
+          <div style="flex:1;">
+            <label class="f">Prénom</label>
+            <input type="text" id="signup-prenom" placeholder="Marie" autocomplete="given-name">
+          </div>
+          <div style="flex:1;">
+            <label class="f">Nom</label>
+            <input type="text" id="signup-nom" placeholder="Tissot" autocomplete="family-name">
+          </div>
+        </div>
+        <label class="f">E-mail</label>
+        <input type="email" id="signup-email" placeholder="vous@entreprise.com"
+               autocomplete="username" style="margin-bottom:12px;">
+        <label class="f">Mot de passe</label>
+        <!-- `new-password` et non `current-password` : c'est ce qui déclenche la
+             proposition d'un mot de passe fort, et ce qui empêche le
+             gestionnaire de préremplir l'ancien sur un formulaire de création. -->
+        <input type="password" id="signup-password" placeholder="••••••••"
+               autocomplete="new-password" style="margin-bottom:16px;">
+
+        <div id="signup-gestion-field">
+          <label class="f">Nom de l'entreprise</label>
+          <input type="text" id="signup-entreprise-nom" placeholder="Ex : Le Petit Bistrot" style="margin-bottom:16px;" autocomplete="organization">
+        </div>
+        <div id="signup-equipe-field" style="display:none;">
+          <label class="f">Code de l'entreprise (6 caractères)</label>
+          <!-- ═══ `off`, ET NON `one-time-code` ═══
+
+               J'avais mis `one-time-code` en pensant que nommer le champ ferait
+               taire Safari. C'était l'inverse exact : `one-time-code` est le nom
+               qui lui DEMANDE de proposer un code reçu par SMS. Je lui avais
+               donc explicitement demandé d'ouvrir son clavier numérique au
+               chargement de l'app.
+
+               `off` est le bon attribut. Il n'est pas toujours respecté sur les
+               champs de mot de passe, mais il l'est sur un champ texte ordinaire
+               comme celui-ci.
+
+               ═══ L'ANCIENNE NOTE, QUI ÉTAIT FAUSSE ═══
+
+               `inert` empêche le focus, mais PAS le gestionnaire de mots de
+               passe : Safari lit le balisage, voit un champ de cinq chiffres
+               nommé « code », le prend pour un code de vérification à usage
+               unique, et propose son remplissage — clavier numérique compris,
+               au chargement de l'app.
+
+               `off` ne suffit pas seul sur iOS, qui l'ignore souvent.
+               `one-time-code` en revanche est le nom que Safari CHERCHE : le
+               lui donner explicitement lui dit que le champ est déjà géré, et
+               il cesse de proposer. C'est contre-intuitif — on nomme pour
+               faire taire — mais c'est ainsi que la spécification fonctionne. -->
+          <!-- ═══ SIX CARACTÈRES, LETTRES ET CHIFFRES ═══
+
+               `maxlength="5"` refusait le sixième — le champ était réglé pour
+               l'ancien code à cinq chiffres.
+
+               ⚠ ET `inputmode="numeric"` OUVRAIT UN CLAVIER SANS LETTRES. Le
+                 nouveau code en contient : impossible de le saisir sur
+                 téléphone. C'est le défaut le plus grave des deux, et le moins
+                 visible en relisant le code.
+
+               `autocapitalize` met en majuscules : le code s'affiche ainsi,
+               et la fonction serveur ignore la casse de toute façon. -->
+            <input type="text" id="signup-code-acces" placeholder="A1B2C3" maxlength="6"
+                   autocapitalize="characters" spellcheck="false"
+                 autocomplete="off" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
+        </div>
+
+        <button class="btn block" id="signup-btn">Créer mon compte</button>
+        <!-- L'acceptation par la création du compte. C'est la forme admise pour un
+             service professionnel : le lien doit être visible et cliquable AVANT
+             l'action, pas caché dans un pied de page. -->
+        <div class="cgu-mention">En créant votre compte, vous acceptez les
+          <a href="cgu.html" target="_blank" rel="noopener">conditions d’utilisation</a>.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+       LES DEUX PAGES D'HISTORIQUE
+
+       Elles montent du bas, par-dessus l'ecran d'ou l'on vient. C'est ce qui
+       dit qu'on n'a pas navigue ailleurs : on a ouvert quelque chose, et on va
+       le refermer.
+
+       ⚠ ELLES SONT HORS DE `.app`, au niveau du `body`. Posees dedans, elles
+         seraient prises dans son contexte d'empilement et passeraient sous la
+         barre du bas.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  
+<script type="module" src="app.js?v=f46098c2"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

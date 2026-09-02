@@ -20669,6 +20669,24 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
     if (r.dataset.rythme === rythmeChoisi) return
     rythmeChoisi = r.dataset.rythme
 
+    /* ⚠ LA PASTILLE GLISSE, EXACTEMENT COMME SUR LA PAGE ANALYSE.
+
+       Le fond blanc sautait d'un bouton a l'autre : c'est ce qui rendait le
+       changement brusque. Ces quatre lignes sont recopiees telles quelles du
+       segment « 7 jours / 30 jours / 1 an » — meme mesure, meme decalage de
+       3 px pour la marge de la piste. */
+    r.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
+    r.classList.add('on')
+
+    const lens = document.getElementById('abo-segm-lens')
+    if (lens) {
+      const p = r.parentElement.getBoundingClientRect(), b = r.getBoundingClientRect()
+      if (b.width) {
+        lens.style.width = b.width + 'px'
+        lens.style.transform = `translateX(${b.left - p.left - 3}px)`
+      }
+    }
+
     /* ⚠ LE MEME GESTE QUE LE SEGMENT DES PROCEDURES : flouter, redessiner
        derriere le voile, revenir. Les prix changeaient d'une image a l'autre,
        ce qui donnait l'impression d'un defaut d'affichage plutot que d'un

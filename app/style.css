@@ -14204,17 +14204,35 @@ body:not(.en-apercu) #voir-equipe.revient{
   object-fit:cover;
   border-radius:24px;
   opacity:0;
-  /* ⚠ LE FLOU FAIT LE PASSAGE, PAS LE SEUL FONDU. Deux images qui se croisent
-     en opacite se superposent au milieu du trajet : on voit brievement les
-     deux, et l'ensemble se brouille. Avec le flou, chacune se dissout avant
-     que l'autre ne se forme — le croisement ne se lit plus comme un calque. */
-  filter:blur(14px);
-  transform:scale(1.04);
-  transition:opacity 0.9s cubic-bezier(0.32,0.72,0,1),
-             filter   0.9s cubic-bezier(0.32,0.72,0,1),
-             transform 1.6s cubic-bezier(0.32,0.72,0,1);
+
+  /* ═══ UN PASSAGE CALME, ET TROIS RAISONS AU PRECEDENT ═══
+
+     ⚠ LA COURBE ETAIT CELLE D'UN GESTE, PAS D'UN FONDU.
+
+       `cubic-bezier(0.32, 0.72, 0, 1)` demarre vite et freine sec : c'est la
+       courbe des ecrans qu'on ouvre, ou l'elan repond au doigt. Ici personne ne
+       touche rien — l'image change seule. Une courbe symetrique convient : elle
+       part doucement, passe, et s'arrete doucement.
+
+     ⚠ LE FLOU ETAIT TROP FORT. A 14 px, l'image se defaisait completement avant
+       que l'autre ne paraisse : on voyait une bouillie entre les deux. A 7 px,
+       chacune reste reconnaissable pendant qu'elle se dissout.
+
+     ⚠ ET L'ECHELLE AJOUTAIT UN MOUVEMENT DE TROP. `scale(1.04)` faisait
+       respirer l'image en meme temps qu'elle se fondait — deux gestes
+       simultanes, dont un que personne n'a demande. Elle est retiree.
+
+     ⚠ 1,6 S PLUTOT QUE 0,9. Un fondu automatique doit durer assez longtemps
+       pour qu'on ne le remarque pas comme un evenement. En dessous d'une
+       seconde et demie, l'oeil l'attrape et le suit. */
+  filter:blur(7px);
+  transition:opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1),
+             filter  1.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.scene.visible{ opacity:1; filter:blur(0px); transform:scale(1); }
+/* ⚠ PLUS DE `transform` ICI NON PLUS. Il ramenait a `scale(1)` une echelle qui
+   n'est plus modifiee : sans effet, mais il aurait fait croire qu'un mouvement
+   subsiste. */
+.scene.visible{ opacity:1; filter:blur(0px); }
 
 @media (prefers-reduced-motion: reduce){
   .scene{ transition:opacity 0.3s linear; filter:none; transform:none; }
@@ -14506,3 +14524,43 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
 /* ⚠ LE TITRE NE POUSSE PLUS LA FLECHE. `histo-tete` etale ses enfants aux deux
    bouts — c'etait juste avec une croix a droite. Ici les deux se suivent. */
 .histo-tete--retour h2{ margin:0; }
+
+
+/* ═══ LA PASTILLE PREND LA MATIERE DU VOLET DU MENU ═══
+
+   Elle etait en `--bg-card`, un blanc opaque. Le volet qui s'ouvre sous le
+   menu du haut est en VERRE : translucide, avec un flou de ce qu'il y a
+   derriere. Posee sur une photo, la difference se voit — l'un laisse deviner
+   l'image, l'autre la masque.
+
+   ⚠ `background:none` EFFAÇAIT AUSSI LA TEINTE DU VERRE.
+
+     `.glassDiv` pose son fond par `background-color`, avec la teinte partagee
+     — blanc a 32 %. J'avais ecrit `background:none` pour retirer le blanc
+     opaque, mais cette forme courte remet TOUTES les proprietes de fond a leur
+     valeur initiale, `background-color` comprise : le flou restait, la teinte
+     partait, et la pastille devenait un simple trou trouble.
+
+     On repose donc la meme teinte, par la meme variable. Elle suivra si le
+     verre change.
+
+   ⚠ `--glass-radius` EST REDEFINI. `.glassDiv` le lit pour son rayon, et sa
+     valeur par defaut vaut la moitie de la hauteur de la barre — 32 px, bien
+     trop rond pour une pastille de 60 px de haut. */
+/* ⚠ LE VERRE EST PLUS EPAIS ICI : 0,62 AU LIEU DE 0,32.
+
+   C'est le meme verre, la meme teinte, le meme flou — seule l'epaisseur
+   change, et pour une raison mesuree.
+
+   Le volet du menu s'ouvre sur le fond clair de l'app ; cette pastille se pose
+   sur une PHOTO, qui change toutes les cinq secondes. A 0,32, le contraste du
+   texte tombait a 5,33 sur la scene d'entrepot — au-dessus du seuil de 4,5,
+   mais de peu, et une photo plus sombre passerait dessous.
+
+   A 0,62, l'image reste devinee derriere — le verre fait son effet — et le
+   texte tient quelle que soit la scene. */
+#login-screen .scene-pastille{
+  background-color:rgba(var(--tint-color), 0.62);
+  --glass-radius:20px;
+  box-shadow:0 14px 30px -16px rgba(20,20,30,0.30);
+}

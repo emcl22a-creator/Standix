@@ -1851,7 +1851,7 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
     /* Compte valide, mais rattaché à aucune entreprise : ce n'est pas une erreur
        de connexion, c'est une étape qui manque. On ouvre le champ du code plutôt
        que d'afficher un refus. */
-    document.getElementById('login-screen').style.display = 'none'
+    await fermerBienvenue()
     montrerOrphelin()
     return
   }
@@ -2535,7 +2535,7 @@ async function enterApp(membre) {
      chargement des procédures : sur une connexion lente, plusieurs secondes
      s'écoulaient pendant lesquelles un autre chemin pouvait afficher l'écran de
      choix — et les deux se superposaient, comme sur mobile. */
-  document.getElementById('login-screen').style.display = 'none'
+  await fermerBienvenue()
   document.getElementById('choice-screen').style.display = 'none'
 
   /* Avant tout : cet appareil a-t-il le droit d'entrer ? On le demande au
@@ -2625,7 +2625,7 @@ async function enterApp(membre) {
 
        Le chargement n'est pas plus rapide. Il est simplement VISIBLE, ce qui
        n'est pas la même chose mais règle le même problème. */
-    document.getElementById('login-screen').style.display = 'none'
+    await fermerBienvenue()
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('gestion-app')
     appEl.style.display = 'block'
@@ -2675,7 +2675,7 @@ async function enterApp(membre) {
   } else {
     showEquipeScreen('e-list')
     await loadEquipeProcedures()
-    document.getElementById('login-screen').style.display = 'none'
+    await fermerBienvenue()
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('equipe-app')
     appEl.style.display = 'block'
@@ -7497,6 +7497,38 @@ window.ouvrirHisto = function ouvrirHisto(quoi) {
   remplir?.()
 }
 
+/* ═══ QUITTER « BIENVENUE » PAR OU L'ON EST ENTRE ═══
+
+   ⚠ ELLE DISPARAISSAIT D'UN COUP. Un `display:none` sec, alors qu'elle etait
+     arrivee en grandissant depuis 97,5 %. Une page qui entre avec un geste et
+     sort sans rien laisse croire a une coupure, pas a un passage.
+
+   ⚠ ET LA FEUILLE OUVERTE PART AVEC ELLE. On se connecte depuis « Content de
+     vous revoir » ou « J'ai recu un code » : ces feuilles sont posees par
+     dessus, et les masquer en meme temps que le fond les ferait disparaitre
+     sans mouvement. On les referme d'abord, avec leur propre descente.
+
+   ⚠ L'APPELANT RECOIT UNE PROMESSE. Il doit pouvoir attendre la fin du geste
+     avant d'ouvrir l'espace, sinon les deux se chevauchent. */
+function fermerBienvenue() {
+  const ecran = document.getElementById('login-screen')
+  if (!ecran || ecran.style.display === 'none') return Promise.resolve()
+
+  document.querySelectorAll('.histo:not([hidden])').forEach(fermerHisto)
+
+  const carte = ecran.querySelector('.login-card')
+  if (carte) carte.classList.add('sort')
+
+  return new Promise(r => setTimeout(() => {
+    ecran.style.display = 'none'
+    ecran.setAttribute('inert', '')
+    carte?.classList.remove('sort')
+    r()
+  /* 340 ms : la duree de la sortie. La descente des feuilles en prend 280,
+     elle tient donc dedans. */
+  }, 340))
+}
+
 function fermerHisto(f) {
   if (!f || f.hidden) return
   f.classList.add('part')
@@ -11739,6 +11771,22 @@ async function proposerPosteALArrivee() {
   await chargerPostes()
   if (!postesEntreprise.length) return   // le patron n'en a pas encore défini
 
+  /* ⚠ ON LAISSE CINQ SECONDES AVANT DE DEMANDER.
+
+     La fenetre paraissait a l'instant ou l'app s'ouvrait : on venait de creer
+     son compte, on n'avait rien vu, et une question barrait deja l'ecran. La
+     premiere impression de Standix etait un formulaire de plus.
+
+     Cinq secondes suffisent a parcourir la page, comprendre ou l'on est, et
+     accueillir la question comme une suite plutot qu'un peage.
+
+   ⚠ ON VERIFIE QUE LA PERSONNE EST TOUJOURS LA. En cinq secondes elle peut
+     s'etre deconnectee, avoir renseigne son poste ailleurs, ou avoir change
+     d'entreprise. Poser la question a ce moment-la serait au mieux inutile. */
+  await new Promise(r => setTimeout(r, 5000))
+  if (currentMembre?.role !== 'equipe') return
+  if (currentMembre?.poste) return
+
   /* Plus de « plus tard » : la fenêtre ne se ferme qu'avec une réponse. La clé
      locale sert donc uniquement à ne pas reposer la question après coup. */
   const choisi = await choisirPosteFenetre()
@@ -11765,28 +11813,35 @@ function choisirPosteFenetre() {
   return new Promise((resolve) => {
     const fond = document.createElement('div')
     fond.className = 'ios-alert-backdrop'
+    /* ⚠ LA MEME MATIERE QUE « RENOMMER LE DOSSIER ».
+
+       Elle etait en `ios-alert` : un fond noir a 94 %, herite du theme sombre.
+       Toutes les autres fenetres de l'app sont passees a `fen-pro` — fond
+       clair, halo colore, deux boutons empiles. Celle-ci restait seule dans son
+       coin, et c'est la PREMIERE que voit quelqu'un qui rejoint une entreprise.
+
+     ⚠ LE HALO EST BLEU, comme celui du renommage. Il n'y a rien de dangereux
+       ici : on choisit son poste, on ne supprime rien. */
     fond.innerHTML = `
-      <div class="ios-alert poste-fen" role="dialog" aria-modal="true">
-        <div class="poste-tete">
-          <span class="ic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6"/><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6"/><line x1="3" y1="12.6" x2="21" y2="12.6"/></svg>
-          </span>
-          <div class="t">Quel est votre poste ?</div>
-          <div class="s">Vous pourrez le changer dans les r\u00e9glages.</div>
+      <div class="fen-pro poste-fen" role="dialog" aria-modal="true">
+        <span class="fen-halo bleu"></span>
+        <div class="fen-co">
+          <div class="fen-t">Quel est votre poste ?</div>
+          <div class="fen-s">Vous pourrez le changer dans les r\u00e9glages.</div>
+
+          <div class="poste-choix">
+            ${postesEntreprise.map(p => `
+              <button type="button" data-poste-choix="${escapeHtml(p.nom)}">
+                <span class="nm">${escapeHtml(p.nom)}</span><span class="r"></span>
+              </button>`).join('')}
+            <button type="button" data-poste-choix="Autre">
+              <span class="nm">Autre</span><span class="r"></span>
+            </button>
+          </div>
         </div>
 
-        <div class="poste-choix">
-          ${postesEntreprise.map(p => `
-            <button type="button" data-poste-choix="${escapeHtml(p.nom)}">
-              <span class="nm">${escapeHtml(p.nom)}</span><span class="r"></span>
-            </button>`).join('')}
-          <button type="button" data-poste-choix="Autre">
-            <span class="nm">Autre</span><span class="r"></span>
-          </button>
-        </div>
-
-        <div class="poste-pied">
-          <button type="button" class="poste-ok" disabled>Continuer</button>
+        <div class="fen-ac">
+          <button type="button" class="fen-p poste-ok" disabled>Continuer</button>
         </div>
       </div>`
     document.body.appendChild(fond)

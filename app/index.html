@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=2627cbe1">
+<link rel="stylesheet" href="style.css?v=5b527f99">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2904,6 +2904,11 @@
           <span class="eco">−20 %</span></button>
       </div>
 
+      <!-- ⚠ CE BANDEAU NE PARAIT QU'UNE FOIS L'ACCES FERME. Le script le
+           montre ; pendant l'essai il reste masque, car annoncer une
+           suppression a quelqu'un qui decouvre l'app serait une menace. -->
+      <div class="abo-suspendu" id="abo-suspendu" hidden></div>
+
       <div id="abo-vedette"></div>
 
       <!-- ═══ GÉRER OU RÉSILIER, HORS DE LA CARTE ═══
@@ -4227,7 +4232,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=fd32fbbf"></script>
+<script type="module" src="app.js?v=6442dd0b"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

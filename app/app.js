@@ -1830,7 +1830,8 @@ window.switchAuthTab = function(tab) {
 document.getElementById('login-btn')?.addEventListener('click', async () => {
   const email = document.getElementById('login-email').value.trim()
   const password = document.getElementById('login-password').value
-  const errorEl = document.getElementById('login-error')
+  const errorEl = document.getElementById('connexion-error')
+    || document.getElementById('login-error')
   const btn = document.getElementById('login-btn')
   errorEl.textContent = ''
   setButtonLoading(btn, true)
@@ -1879,7 +1880,17 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   const codeAcces = document.getElementById('signup-code-acces').value
     .replace(/\s/g, '')
     .toUpperCase()
-  const errorEl = document.getElementById('login-error')
+  /* ⚠ LA ZONE DE LA FEUILLE D'INSCRIPTION, pas celle de la page.
+
+     `login-error` est reste sur « Bienvenue » quand les deux formulaires sont
+     partis dans des feuilles. Le message s'affichait donc DERRIERE la feuille
+     ouverte : on ne voyait rien, et l'inscription paraissait echouer sans
+     raison.
+
+   ⚠ AVEC UN REPLI SUR L'ANCIENNE. Si la zone de la feuille venait a manquer,
+     mieux vaut un message mal place qu'aucun message. */
+  const errorEl = document.getElementById('signup-error')
+    || document.getElementById('login-error')
   errorEl.textContent = ''
   errorEl.style.color = 'var(--red)'
 

@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=f8923c9a">
+<link rel="stylesheet" href="style.css?v=ad505372">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1115,6 +1115,18 @@
         <div class="tb-v-tete">
           <span class="tb-v-ent" id="tb-ent-gestion">—</span>
           <span class="tb-v-role" id="tb-role-gestion">—</span>
+          <!-- ⚠ SEULEMENT COTE GESTION. L'espace Equipe n'a pas ce bouton :
+               lui montrer la meme phrase l'enverrait chercher un oeil qui
+               n'existe pas chez lui. Le volet de l'equipe est un autre bloc,
+               qui ne recoit pas cette ligne. -->
+          <span class="tb-v-astuce">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
+                 stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+            </svg>
+            Touchez l’œil, en bas à droite, pour voir l’espace Équipe.
+          </span>
         </div>
         <div class="tb-v-filet"></div>
         <button type="button" class="tb-v-opt tb-v-opt--sortie" data-deconnexion>
@@ -4055,7 +4067,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=1a79f29e"></script>
+<script type="module" src="app.js?v=dc90ce12"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

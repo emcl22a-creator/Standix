@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=5b527f99">
+<link rel="stylesheet" href="style.css?v=0a02adc0">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2015,11 +2015,16 @@
       <div class="dv-tps"><span id="dv-t">0:00</span><span id="dv-d">0:00</span></div>
 
       <div class="dv-geste">
-        <button type="button" id="dv-bouton">
-          <svg viewBox="0 0 24 24" fill="currentColor" id="dv-icone"><path d="M8 5v14l11-7z"></path></svg>
-          <span id="dv-libelle">Lancer la vidéo</span>
-        </button>
-        <div class="dv-aide" id="dv-aide">Regardez, et touchez le bouton chaque fois qu'une étape se termine.</div>
+        <!-- ⚠ LE BOUTON « Terminer l'etape N » A ETE RETIRE, avec sa ligne d'aide.
+
+             Il servait au decoupage manuel : on regardait la video et l'on
+             touchait le bouton a chaque fin de geste. L'IA fait ce travail
+             desormais — c'est la raison d'etre de cet ecran.
+
+             Il restait la comme les poignees de la frise et « Decouper une
+             etape ici », retires plus tot pour la meme raison. Sa couleur ambre
+             en faisait l'element le plus voyant de la page, pour une action qui
+             n'a plus lieu d'etre. -->
       </div>
 
       <!-- Pas d'image de présentation ici : la vidéo EST la présentation. On tire
@@ -4232,7 +4237,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=6442dd0b"></script>
+<script type="module" src="app.js?v=45fae89f"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

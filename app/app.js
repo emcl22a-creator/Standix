@@ -1812,10 +1812,10 @@ function ouvrirInscription(espace) {
        termes que le bouton qu'on vient de toucher fait douter d'avoir clique
        au bon endroit. */
     if (titre) titre.textContent = 'S\u2019inscrire en tant que g\u00e9rant'
-    if (note) note.textContent = 'Cr\u00e9ez vos proc\u00e9dures avec l\u2019IA.'
+    if (note) note.textContent = 'G\u00e9rez vos proc\u00e9dures.'
   } else {
     if (titre) titre.textContent = 'S\u2019inscrire en tant qu\u2019utilisateur'
-    if (note) note.textContent = 'Avec le code de votre \u00e9quipe.'
+    if (note) note.textContent = 'Consultez les proc\u00e9dures.'
   }
 
   /* ⚠ LES DEUX CHAMPS SONT MONTRES ICI, ET C'ETAIT LE DEFAUT.
@@ -20629,7 +20629,22 @@ const LG_O = 'rgba(255,255,255,0.32)'
 
    Le mensuel est l'offre par défaut : sans engagement, réversible. L'annuel se
    choisit, il ne s'impose pas. */
+/* ⚠ CE N'EST PLUS SEULEMENT UN ETAT D'AFFICHAGE.
+
+   Il partait toujours de « mensuel » : la page montrait donc les prix mensuels
+   a quelqu'un qui paie a l'annee, et « Votre abonnement actuel » se posait sur
+   la mauvaise carte.
+
+   La valeur de depart vient maintenant du compte ; le segment la change comme
+   avant, mais on repart du bon pied. */
 let rythmeChoisi = 'mensuel'
+let rythmeAligne = false
+
+/* Appelee a l'ouverture de la page : `cachedEntreprise` n'existe pas encore au
+   moment ou ce fichier est lu. */
+function rythmeDuCompte() {
+  return cachedEntreprise?.abonnement_rythme === 'annuel' ? 'annuel' : 'mensuel'
+}
 
 /* `AVANTAGES`, `PICTOS` et `AUSSI` ont été retirés avec l'ancienne carte : la
    nouvelle liste ses inclus directement, en lignes à coche, sans pictogramme.
@@ -21009,6 +21024,29 @@ window.renderAbonnements = function() {
   const n = nombreDeMembres()
   const actuel = planActuel()
 
+  /* ⚠ ON ALIGNE LE SEGMENT SUR CE QUI EST PAYE, MAIS UNE SEULE FOIS.
+
+     `rythmeAligne` retient qu'on l'a fait : sans lui, chaque redessin
+     ramenerait le segment sur le rythme du compte, et toucher « Mensuel »
+     quand on paie a l'annee n'aurait aucun effet visible. */
+  if (actuel && !rythmeAligne) {
+    rythmeChoisi = rythmeDuCompte()
+    rythmeAligne = true
+    const b = document.querySelector(`#abo-rythme [data-rythme="${rythmeChoisi}"]`)
+    if (b && !b.classList.contains('on')) {
+      b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
+      b.classList.add('on')
+      const lens = document.getElementById('abo-segm-lens')
+      if (lens) {
+        const p = b.parentElement.getBoundingClientRect(), r = b.getBoundingClientRect()
+        if (r.width) {
+          lens.style.width = r.width + 'px'
+          lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+        }
+      }
+    }
+  }
+
   /* ═══ CE QU'ON MONTRE EN PREMIER ═══
 
      Quand on paie déjà, c'est SON offre qui vient en tête — pas celle que la
@@ -21221,6 +21259,9 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
   if (r) {
     if (r.dataset.rythme === rythmeChoisi) return
     rythmeChoisi = r.dataset.rythme
+    /* ⚠ A PARTIR D'ICI, C'EST LE CHOIX DE LA PERSONNE. Sans ce drapeau, le
+       redessin qui suit ramenerait le segment sur le rythme du compte. */
+    rythmeAligne = true
 
     /* ⚠ LA PASTILLE GLISSE, EXACTEMENT COMME SUR LA PAGE ANALYSE.
 

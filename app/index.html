@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=2b0da575">
+<link rel="stylesheet" href="style.css?v=e85e5dc8">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2236,8 +2236,15 @@
           Combien de temps ça prend ?
         </button>
         <div class="ai-combien-co" id="ai-combien-co" hidden>
-          <p>Comptez environ <b>trois minutes d’analyse par minute de vidéo</b>,
-             plus quelques minutes d’attente au départ.</p>
+          <!-- ⚠ « Comptez environ trois minutes par minute de video » A ETE RETIRE.
+
+              Le tableau juste en dessous dit la meme chose, mais en chiffres
+              qu'on lit d'un coup d'oeil : 1 min de video, 4 a 6 min d'analyse.
+              La phrase demandait un calcul mental pour arriver au meme
+              resultat.
+
+            ⚠ LE TABLEAU ET LA NOTE RESTENT. Ils repondent a la question que
+              pose le bouton — celui-ci n'aurait plus rien a ouvrir sans eux. -->
           <table class="ai-combien-t">
             <thead><tr><th>Votre vidéo</th><th>Analyse</th></tr></thead>
             <tbody>
@@ -4245,7 +4252,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=44229bad"></script>
+<script type="module" src="app.js?v=dff0453d"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

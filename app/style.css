@@ -14338,3 +14338,59 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
    ⚠ ON NE TOUCHE PAS A `.logotype` LUI-MEME : il sert aussi a l'ecran de choix
      d'espace, ou le fond est bien sombre. */
 #login-screen .logotype{ color:var(--label); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE BIENVENUE PREND TOUT L'ECRAN
+
+   Elle etait une FEUILLE MODALE : posee en bas, sur un voile sombre, avec ce
+   qu'il y a derriere qui transparait. C'etait juste quand elle s'ouvrait par
+   dessus l'ecran de choix d'espace.
+
+   Elle est desormais la premiere chose qu'on voit en arrivant : il n'y a rien
+   derriere elle. Un voile sur du vide n'a pas de sens, et la marge du haut
+   laissait voir un gris qui n'appartient a aucun ecran.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#login-screen{
+  align-items:flex-start;
+  background:var(--bg);
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  /* ⚠ ON GARDE `feuilleVoile` DESACTIVE PLUTOT QUE DE LE RETIRER. L'animation
+     fait apparaitre le voile ; sans fond a devoiler, elle ne fait qu'un fondu
+     inutile sur la page entiere. */
+  animation:none;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+#login-screen > .login-card{
+  transform:none;
+  width:100%; max-width:var(--col);
+  /* ⚠ LA MARGE DU HAUT SUIT L'ENCOCHE. En plein ecran, le contenu commence
+     sous la barre d'etat : sans cette reserve, le logo passerait dessous. */
+  padding:calc(env(safe-area-inset-top, 0px) + 34px) 20px
+          calc(env(safe-area-inset-bottom, 0px) + 32px);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  min-height:100dvh;
+}
+/* ⚠ LA POIGNEE DISPARAIT. Elle dit « cette vue se referme en la tirant » — ce
+   qui n'est plus vrai : il n'y a rien dessous. */
+#login-screen .login-card::before{ display:none; }
+
+/* Le retour reste, mais seulement s'il y a un ecran de choix derriere. Le
+   script le masque au premier lancement. */
+#login-screen .feuille-retour{ top:calc(env(safe-area-inset-top, 0px) + 14px); }
+
+
+/* ⚠ LA PASTILLE S'ELARGIT POUR « Former un nouvel arrivant ».
+
+   Mesure : a 76 % de la photo, le texte remplissait EXACTEMENT la place —
+   132 px pour 132 disponibles. Aucune marge : sur un ecran plus etroit, ou
+   avec une police systeme un peu plus large, il serait coupe par les points de
+   suspension.
+
+   ⚠ ET ELLE DEBORDE PLUS A GAUCHE, PAS A DROITE. Elargir vers la droite la
+     ferait sortir de la carte ; c'est son bord gauche qui avance sur la photo,
+     ce qui accentue le debordement voulu. */
+#login-screen .scene-pastille{ max-width:88%; }

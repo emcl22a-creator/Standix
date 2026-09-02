@@ -1757,11 +1757,14 @@ function ouvrirInscription(espace) {
      termes que le bouton qu'on vient de toucher fait douter d'avoir clique au
      bon endroit — et « espace » avait justement ete ecarte de ces cartes. */
   if (espace === 'gestion') {
-    if (titre) titre.textContent = 'Je cr\u00e9e mon entreprise'
-    if (note) note.textContent = 'Vous \u00eates g\u00e9rant ou responsable.'
+    /* ⚠ LES MEMES MOTS QUE LA CARTE TOUCHEE. Un ecran qui reprend d'autres
+       termes que le bouton qu'on vient de toucher fait douter d'avoir clique
+       au bon endroit. */
+    if (titre) titre.textContent = 'S\u2019inscrire en tant que g\u00e9rant'
+    if (note) note.textContent = 'Cr\u00e9ez vos proc\u00e9dures avec l\u2019IA.'
   } else {
-    if (titre) titre.textContent = 'J\u2019ai re\u00e7u un code'
-    if (note) note.textContent = 'Saisissez-le pour rejoindre l\u2019\u00e9quipe.'
+    if (titre) titre.textContent = 'S\u2019inscrire en tant qu\u2019utilisateur'
+    if (note) note.textContent = 'Avec le code de votre \u00e9quipe.'
   }
 
   /* ⚠ LES DEUX CHAMPS SONT MONTRES ICI, ET C'ETAIT LE DEFAUT.
@@ -21195,6 +21198,12 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
        On retire `ouvert` le temps du redessin : le flou seul assure le
        passage, et les cartes se contentent de changer de contenu. */
     const liste = document.getElementById('abo-liste')
+    /* ⚠ ON RETIENT SI LA LISTE ETAIT DEPLIEE.
+
+       On la referme le temps du redessin — le flou seul doit porter le
+       passage. Mais il faut la remettre COMME ON L'A TROUVEE : repliee si elle
+       l'etait, depliee sinon. */
+    const listeEtaitOuverte = !!liste?.classList.contains('ouvert')
     liste?.classList.remove('ouvert')
 
     /* ⚠ UN FLOU PLUS LENT QUE CELUI DES LISTES, ecrit ici plutot qu'en CSS.
@@ -21254,7 +21263,10 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
       /* ⚠ ON REMET `ouvert` APRES L'ENTREE, pas avant : posee plus tot, elle
          relancerait l'animation qu'on vient d'ecarter. 380 ms couvrent les
          340 du flou d'entree. */
-      setTimeout(() => liste?.classList.add('ouvert'), 380)
+      /* ⚠ ET SEULEMENT SI ELLE L'ETAIT. Je la rouvrais sans condition : passer
+         en annuel depliait donc toutes les formules, alors que personne n'avait
+         touche « Voir les autres formules ». */
+      if (listeEtaitOuverte) setTimeout(() => liste?.classList.add('ouvert'), 380)
 
       /* ⚠ ON NE RETIRE PLUS LA CLASSE ICI, ET C'EST TOUT LE DEFAUT.
 

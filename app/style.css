@@ -15224,10 +15224,8 @@ body.espace-vide #equipe-app{
   pointer-events:none;
 }
 
-body.espace-arrive #equipe-app,
-body.espace-arrive #gestion-app{
-  animation:venirDeLoin 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
+/* ⚠ CETTE REGLE POSAIT `venirDeLoin` SUR L'ESPACE. Retiree : c'est
+   `ecranEntre`, deja presente sur chaque page, qui porte le passage. */
 
 @keyframes venirDeLoin{
   0%  { opacity:0; transform:scale(0.88); filter:blur(6px); }
@@ -15316,9 +15314,8 @@ body.en-apercu #voir-equipe svg{ stroke:#FFFFFF; }
      l'entree de page est faite pour un changement d'onglet ordinaire, ou rien
      d'autre ne bouge autour. */
 body.espace-vide .screen.active,
-body.espace-arrive .screen.active{
-  animation:none !important;
-}
+/* ⚠ ON NE COUPE PLUS `ecranEntre`. C'est elle, desormais, qui fait le
+   passage — la couper laisserait la page arriver sans mouvement. */
 
 /* ═══ LA BARRE DU HAUT NE BOUGE PAS ═══
 
@@ -15329,43 +15326,30 @@ body.espace-arrive .screen.active{
    ⚠ `animation:none` NE SUFFIT PAS. L'element n'a pas d'animation propre : il
      HERITE de la transformation de son parent. On l'en sort en le fixant a
      l'ecran le temps du passage. */
-/* ⚠ ON ANIME LE CONTENU, PLUS L'ESPACE ENTIER.
+/* ═══ UNE SEULE ANIMATION, CELLE QUI EXISTE DEJA ═══
 
-   `position:fixed` ne suffit pas : un parent qui porte un `transform` devient
-   le repere de ses enfants fixes, et la barre avancait avec lui. Mesure a
-   l'ecran : elle passait de 390 x 64 a 367 x 60.
+   ⚠ IL Y EN AVAIT DEUX, ET LA SECONDE VENAIT DU RETRAIT DE LA PREMIERE.
 
-   On deplace donc l'animation d'un cran vers l'interieur — sur `.screen.active`
-   plutot que sur `#gestion-app`. La barre reste dehors, immobile. */
-body.espace-arrive #equipe-app,
-body.espace-arrive #gestion-app{
-  animation:none !important;
+     `venirDeLoin` etait posee sur la page pendant `espace-arrive`, avec un
+     `!important` qui ecartait `ecranEntre`. En retirant la classe 640 ms plus
+     tard, ce `!important` disparaissait — et `ecranEntre` DEMARRAIT a ce
+     moment-la. La page avancait donc deux fois.
+
+     C'est le meme piege que l'animation des cartes d'abonnement : retirer une
+     regle `animation` ne l'annule pas, elle la declenche.
+
+   ⚠ ON GARDE `ecranEntre`, ET RIEN D'AUTRE. Elle joue deja quand la page
+     s'ouvre — 12 px de montee, un souffle de flou. Le temps mort de 180 ms
+     suffit a separer les deux espaces ; la page arrive ensuite avec sa propre
+     entree, comme n'importe quel changement d'onglet.
+
+   ⚠ ET LA BARRE DU HAUT NE BOUGE PLUS, puisque plus rien n'anime l'espace
+     entier : c'etait la cause de son deplacement. */
+body.espace-arrive #gestion-app,
+body.espace-arrive #equipe-app{
+  animation:none;
 }
 
-body.espace-arrive #equipe-app .screen.active,
-body.espace-arrive #gestion-app .screen.active{
-  animation:venirDeLoin 0.62s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-}
-
-/* ⚠ ET LA BARRE NE S'EFFACE PAS NON PLUS pendant le temps mort. `espace-vide`
-   masque l'espace entier ; on la ressort de ce masquage. */
-/* ⚠ LE VIDE DOIT ETRE IMMEDIAT. Une transition de 0,42 s existe sur ces deux
-   elements — plus longue que les 180 ms du temps mort : l'espace n'etait qu'a
-   moitie efface quand l'autre arrivait, et l'on voyait les deux.
-
-   `transition:none` fait de ce temps mort un vrai vide. */
-body.espace-vide #gestion-app,
-body.espace-vide #equipe-app{
-  opacity:0;
-  transition:none !important;
-}
-
-/* La barre reste visible et immobile pendant le vide. */
-body.espace-vide .topbar{
-  opacity:1;
-  position:fixed;
-  z-index:40;
-}
 
 
 /* ═══ LA CROIX D'EFFACEMENT DE LA RECHERCHE ═══
@@ -15396,3 +15380,23 @@ body.espace-vide .topbar{
 /* ⚠ ON CACHE LA CROIX NATIVE DE SAFARI. `type="search"` en ajoute une, qui
    ferait deux croix cote a cote sur iOS. */
 .proc-rech input::-webkit-search-cancel-button{ -webkit-appearance:none; display:none; }
+
+
+/* ⚠ LA BARRE DU HAUT RESTE VISIBLE PENDANT LE TEMPS MORT.
+
+   `espace-vide` masque l'espace entier — la barre avec, puisqu'elle vit
+   dedans. On l'en ressort : elle est commune aux deux espaces et n'a aucune
+   raison de clignoter entre les deux. */
+body.espace-vide .topbar{
+  opacity:1;
+  position:fixed;
+  z-index:40;
+}
+
+
+/* ⚠ RIEN NE BOUGE PENDANT LE TEMPS MORT.
+
+   `showGestionScreen` pose `.active` alors que l'espace est encore invisible :
+   `ecranEntre` jouerait dans le vide et serait finie quand la page reparait.
+   On la retient jusqu'a ce que l'espace revienne. */
+body.espace-vide .screen.active{ animation:none !important; }

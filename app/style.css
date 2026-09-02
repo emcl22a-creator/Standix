@@ -15366,3 +15366,33 @@ body.espace-vide .topbar{
   position:fixed;
   z-index:40;
 }
+
+
+/* ═══ LA CROIX D'EFFACEMENT DE LA RECHERCHE ═══
+
+   ⚠ ELLE EST DANS LE CHAMP, pas a cote. Posee apres, elle raccourcirait la
+     barre et decalerait tout ce qui suit des qu'elle parait.
+
+   ⚠ ET LE TEXTE S'ARRETE AVANT ELLE. Sans cette marge, une recherche longue
+     passerait dessous et l'on ne saurait plus ou toucher. */
+.proc-rech{ position:relative; }
+.proc-rech input{ padding-right:40px; }
+
+.proc-rech-x{
+  position:absolute;
+  right:8px; top:50%;
+  transform:translateY(-50%);
+  width:28px; height:28px;
+  display:grid; place-items:center;
+  border:none; border-radius:100px;
+  background:rgba(118,118,128,0.14);
+  color:var(--label-2);
+  padding:0;
+}
+.proc-rech-x svg{ width:13px; height:13px; }
+.proc-rech-x:active{ transform:translateY(-50%) scale(0.90); }
+.proc-rech-x[hidden]{ display:none; }
+
+/* ⚠ ON CACHE LA CROIX NATIVE DE SAFARI. `type="search"` en ajoute une, qui
+   ferait deux croix cote a cote sur iOS. */
+.proc-rech input::-webkit-search-cancel-button{ -webkit-appearance:none; display:none; }

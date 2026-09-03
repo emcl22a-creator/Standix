@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=615b33d5">
+<link rel="stylesheet" href="style.css?v=9df80651">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1822,6 +1822,15 @@
       <h1 class="pagehead" id="man-titre-page">Étapes manuelles</h1>
     </div>
     <div class="subhead" id="man-sous">Écrivez chaque étape dans l’ordre</div>
+        <!-- ⚠ LE VERROU SE DIT AVANT D'ETRE SUBI.
+
+             Quelqu'un dont l'acces est refuse comprend pourquoi s'il a lu la
+             regle ailleurs. Ici, celui qui edite apprend qu'il tient la place —
+             et qu'il la rend en quittant l'ecran. -->
+        <div class="edit-note" id="man-note-verrou" hidden>
+          Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran
+          une fois terminé pour la rendre aux autres gestionnaires.
+        </div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION. À la création ils
          ont déjà été demandés sur l'écran précédent, et les redemander donnerait
@@ -1897,6 +1906,15 @@
       <h1 class="pagehead" id="dv-titre-page">Découper la vidéo</h1>
     </div>
     <div class="subhead" id="dv-sous">Marquez le début et la fin de chaque étape</div>
+        <!-- ⚠ LE VERROU SE DIT AVANT D'ETRE SUBI.
+
+             Quelqu'un dont l'acces est refuse comprend pourquoi s'il a lu la
+             regle ailleurs. Ici, celui qui edite apprend qu'il tient la place —
+             et qu'il la rend en quittant l'ecran. -->
+        <div class="edit-note" id="dv-note-verrou" hidden>
+          Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran
+          une fois terminé pour la rendre aux autres gestionnaires.
+        </div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION, comme sur l'écran
          des étapes manuelles. À la création ils ont déjà été demandés sur l'écran
@@ -4244,7 +4262,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=d9fe6a55"></script>
+<script type="module" src="app.js?v=80b470c5"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

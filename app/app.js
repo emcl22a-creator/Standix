@@ -1595,7 +1595,15 @@ async function demanderReinitialisation(email, zoneErreur, bouton) {
     }
     if (err) {
       err.style.color = 'var(--label-2)'
-      err.innerHTML = `Si un compte existe pour <b>${escapeHtml(propre)}</b>, un lien vient d\u2019y \u00eatre envoy\u00e9. ` +
+      /* ⚠ ON NE DIT PLUS « SI UN COMPTE EXISTE ».
+
+         La formule protegeait un renseignement : elle empechait de savoir si
+         une adresse est inscrite. Mais elle fait douter celui qui vient de
+         demander SON propre lien — il ne sait pas s'il doit attendre.
+
+         Le compromis tient quand meme : on ne confirme toujours pas
+         l'existence du compte, on annonce simplement l'envoi. */
+      err.innerHTML = `Un lien vient d\u2019\u00eatre envoy\u00e9 \u00e0 <b>${escapeHtml(propre)}</b>. ` +
         `Pensez \u00e0 regarder dans les ind\u00e9sirables.`
     }
   } catch (e) {

@@ -16492,3 +16492,32 @@ body.espace-vide .screen.active{ animation:none !important; }
    Il reste visible quand `majTitreCategorie` y ecrit le chemin d'un
    sous-dossier : la regle ne vise que le cas vide. */
 #category-subhead:empty{ display:none; }
+
+
+/* ⚠ LE BANDEAU « Espace Utilisateur » PASSE AU NOIR.
+
+   Il etait a `rgba(28,28,38,0.72)` — un gris fonce translucide. Le flou
+   derriere laissait remonter le fond clair de la page, et l'ensemble paraissait
+   gris moyen plutot que noir.
+
+ ⚠ ON MONTE L'OPACITE PLUTOT QUE DE RETIRER LE FLOU. Le flou detache le bandeau
+   du contenu qui defile dessous ; sans lui, il collerait aux cartes. A 0,92 le
+   fond ne laisse plus rien passer d'assez clair pour delaver le noir.
+
+ ⚠ ET LE TEXTE PASSE AU BLANC PLEIN. Il etait a 90 % : sur un fond devenu plus
+   sombre, il peut se permettre d'etre net. */
+/* ⚠ LA VARIANTE `[hidden]` COMPTE, ET C'EST ELLE QUI GAGNAIT.
+
+   La regle d'origine s'ecrit `body.en-apercu #apercu-bandeau[hidden], body.en-apercu
+   #apercu-bandeau { … }`. Dans un selecteur groupe, chaque membre garde SA
+   specificite : celui qui porte `[hidden]` en a une de plus que le mien.
+
+   Le bandeau conserve cet attribut pendant l'apercu — il n'est masque que par
+   une regle plus haut. Ma couleur etait donc ecrasee par celle d'au-dessus.
+
+ ⚠ ON REPREND LES DEUX MEMBRES, a l'identique. */
+body.en-apercu #apercu-bandeau[hidden],
+body.en-apercu #apercu-bandeau{
+  background:rgba(12,12,16,0.92);
+  color:#FFFFFF;
+}

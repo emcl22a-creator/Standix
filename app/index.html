@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=88b54662">
+<link rel="stylesheet" href="style.css?v=72bb8e2c">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3662,6 +3662,21 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead" id="detail-titre">—</h1>
+          <!-- ⚠ L'ETOILE, EN HAUT A DROITE DE LA PAGE.
+
+               Elle porte le meme etat que celle des listes : `basculerFavori`
+               met les deux a jour, puisque l'une comme l'autre lit
+               `favorisEquipe`.
+
+               `margin-left:auto` la pousse au bout de la ligne sans avoir a
+               sortir du flux — la tete de page est deja en `flex`. -->
+          <button type="button" class="fav-btn fav-detail" id="detail-fav"
+                  aria-label="Mettre en favori" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85Z"/>
+            </svg>
+          </button>
     </div>
     <div class="subhead titre-cat" id="detail-subhead">—</div>
     <div class="analyse-couv" id="detail-couverture" style="display:none;"></div>
@@ -3673,9 +3688,11 @@
          équipe prend la même forme que celle de la gestion. -->
     <div class="section-title detail-etapes-tete">
       <span>Étapes de la procédure</span>
-      <div class="tiroir-ent tiroir-langue" id="tiroir-langue">
-        <span class="tiroir-liste" id="tiroir-langue-liste"></span>
-      </div>
+      <!-- ⚠ LE TIROIR DE TRADUCTION A ETE RETIRE de cette page.
+
+               Il proposait de traduire les etapes. La langue se regle une fois
+               dans Reglages ; la reposer sur chaque procedure encombrait la
+               tete de section pour un geste qu'on ne fait pas deux fois. -->
     </div>
     <!-- Le rappel des étapes faites, au-dessus de la liste. Vide tant que rien
          n'est coché : un cadre qui annoncerait « 0 étape faite » occuperait la
@@ -4387,7 +4404,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=5c03fa62"></script>
+<script type="module" src="app.js?v=118d64f2"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

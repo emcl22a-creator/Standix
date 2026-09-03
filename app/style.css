@@ -16276,3 +16276,57 @@ body.espace-vide .screen.active{ animation:none !important; }
    utile a qui publie. Cote equipe, le badge dit deja l'etat : le point
    repetait la meme chose en plus fort, et se cognait au coin du badge. */
 #equipe-app .cl-badge .p-seg-pt{ display:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BLOC « La camera est bloquee »
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ LE TEXTE EN GRAS ETAIT BLANC SUR FOND CLAIR — donc invisible.
+
+   `.scan-echec .pas b{ color:#fff }` venait d'une version ou le bloc etait
+   sombre. Le fond est passe a `--bg-card`, la couleur du gras est restee.
+
+   Ce sont justement les mots qui comptent : « Réglages », « Safari », le nom
+   du bouton a toucher. Ils disparaissaient. */
+.scan-echec .pas b{
+  color:var(--label);
+  font-weight:700;
+}
+
+/* ⚠ IL APPARAIT ET DISPARAIT, PLUS D'UN COUP.
+
+   Il s'affichait par un `innerHTML` : present ou absent, sans transition.
+   Sur un ecran ou l'on vient d'essuyer un refus, un bloc qui surgit se lit
+   comme une erreur de plus.
+
+   ⚠ ON ANIME L'OPACITE ET UN LEGER DEPLACEMENT, pas la hauteur. Le bloc
+     contient une liste de longueur variable : animer sa hauteur demanderait de
+     la mesurer, et sauterait si le texte change.
+
+   ⚠ ET LA COURBE EST CELLE DES FEUILLES DE L'APP — `0.32, 0.72, 0, 1`. Une
+     entree lente au depart, rapide a l'arrivee : c'est ce qui donne
+     l'impression que l'element se pose plutot qu'il n'arrive. */
+.scan-echec{
+  animation:scanEchecEntre 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes scanEchecEntre{
+  from{ opacity:0; transform:translateY(10px) scale(0.985); }
+  to  { opacity:1; transform:none; }
+}
+
+/* ⚠ LA SORTIE EST PLUS COURTE QUE L'ENTREE. Ce qui part n'a pas besoin d'etre
+   regarde : 0,26 s suffit, et l'ecran reste disponible plus tot. */
+.scan-echec.part{
+  animation:scanEchecSort 0.26s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes scanEchecSort{
+  from{ opacity:1; transform:none; }
+  to  { opacity:0; transform:translateY(6px) scale(0.99); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .scan-echec, .scan-echec.part{ animation:none; }
+}

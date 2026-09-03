@@ -16521,3 +16521,114 @@ body.en-apercu #apercu-bandeau{
   background:rgba(12,12,16,0.92);
   color:#FFFFFF;
 }
+
+
+/* ⚠ PLUS D'AIR ENTRE LE TITRE DU DOSSIER ET LA RECHERCHE.
+
+   Mesure a l'ecran : 41 px des deux cotes. C'est l'ecart d'une page ordinaire,
+   ou un sous-titre occupe l'espace — ici il a ete retire, et le titre se
+   retrouvait suspendu au-dessus du champ.
+
+ ⚠ 22 PX DE PLUS, PAS DAVANTAGE. Au-dela, le titre paraitrait detache de ce
+   qu'il annonce : la barre appartient encore a sa page. */
+#p-category .proc-rech-rang,
+#e-category .proc-rech-rang{
+  margin-top:22px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PHOTO DE PROFIL
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.photo-bloc{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+  margin:18px 0 4px;
+}
+
+/* ⚠ UN ROND DE 96 PX. Assez grand pour juger la photo qu'on vient de choisir,
+   assez petit pour ne pas repousser les champs hors de l'ecran. */
+.photo-rond{
+  position:relative;
+  width:96px; height:96px;
+  border:none; border-radius:100px;
+  background:rgba(118,118,128,0.10);
+  display:grid; place-items:center;
+  padding:0;
+  overflow:visible;
+}
+.photo-rond:active{ transform:scale(0.96); }
+
+.photo-rond img{
+  width:100%; height:100%;
+  border-radius:100px;
+  object-fit:cover;
+  display:block;
+}
+.photo-rond img[hidden]{ display:none; }
+
+/* ⚠ LES INITIALES EN REPLI, comme les ronds d'etablissement. Une silhouette
+   grise dirait « personne » ; deux lettres disent « vous, sans photo ». */
+.photo-init{
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  font-size:30px; font-weight:600;
+  letter-spacing:-0.02em;
+  color:var(--label-3);
+}
+.photo-rond:has(img:not([hidden])) .photo-init{ display:none; }
+
+/* ⚠ LE CRAYON DEBORDE DU ROND, en bas a droite. Pose dedans, il masquerait le
+   visage — c'est justement ce qu'on regarde. */
+.photo-crayon{
+  position:absolute;
+  right:-2px; bottom:-2px;
+  width:30px; height:30px;
+  border-radius:100px;
+  background:#1C1C22;
+  color:#FFFFFF;
+  display:grid; place-items:center;
+  box-shadow:0 0 0 3px var(--bg);
+}
+.photo-crayon svg{ width:15px; height:15px; }
+
+.photo-retirer{
+  border:none; background:none;
+  font-family:inherit; font-size:13px; font-weight:500;
+  color:var(--red);
+  padding:4px 8px;
+}
+.photo-retirer[hidden]{ display:none; }
+
+
+/* ⚠ LA PHOTO REMPLIT LE ROND DE LA LISTE DES MEMBRES.
+
+   `object-fit:cover` recadre sans deformer : une photo en paysage garde ses
+   proportions et l'on n'en voit que le centre. */
+.pm-av img{
+  width:100%; height:100%;
+  border-radius:inherit;
+  object-fit:cover;
+  display:block;
+}
+
+/* ⚠ ET LE ROND CACHE CE QUI DEPASSE. Sans cela, l'image carree deborderait
+   aux quatre coins. */
+.pm-av{ overflow:hidden; }
+
+
+/* ⚠ LE PREFIXE MANQUAIT SUR LA LAMPE DU SCANNER.
+
+   `.scan-lampe` declare `backdrop-filter` sans `-webkit-backdrop-filter` :
+   Safari l'ignore, et le bouton perd son verre depoli — il devient un rond gris
+   plat sur l'image de la camera.
+
+   Les vingt-quatre autres regles de l'app portent bien les deux. Celle-ci
+   etait la seule oubliee. */
+.scan-lampe{
+  -webkit-backdrop-filter:blur(20px);
+  backdrop-filter:blur(20px);
+}

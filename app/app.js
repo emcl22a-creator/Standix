@@ -24803,6 +24803,12 @@ window.startScanner = async function(espace) {
   const hintEl = scanEl('scan-hint')
   const video = scanEl('scan-video')
   const zone = scanEl('scan-result-zone')
+
+  /* ⚠ L'ANCIEN BLOC SORT AVANT D'ETRE REMPLACE.
+
+     `zone.innerHTML = ''` le faisait disparaitre d'un coup — y compris quand
+     on touche « Reessayer », le moment ou l'on regarde justement l'ecran. */
+  await retirerEchecScanner(zone)
   zone.innerHTML = ''
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -24994,6 +25000,20 @@ function cheminReglagesCamera() {
     ],
     repli: '',
   }
+}
+
+/* ⚠ LE BLOC PRECEDENT SORT AVANT QUE LE NOUVEAU ENTRE.
+
+   Sans cela, remplacer le contenu ferait disparaitre l'ancien d'un coup au
+   moment ou le nouveau se pose — deux gestes contraires sur la meme image.
+
+ ⚠ 260 ms, LA DUREE DE L'ANIMATION DE SORTIE. Attendre moins couperait le
+   mouvement ; attendre plus laisserait un blanc. */
+function retirerEchecScanner(zone) {
+  const vieux = zone?.querySelector('.scan-echec')
+  if (!vieux) return Promise.resolve()
+  vieux.classList.add('part')
+  return new Promise(r => setTimeout(r, 260))
 }
 
 function echecScanner(hintEl, zone, titre, detail, refus) {

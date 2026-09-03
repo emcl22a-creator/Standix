@@ -1111,6 +1111,20 @@ function afficherCoquille(espace) {
   appEl.removeAttribute('inert')
   /* APRÈS l'affichage : la barre doit être mesurable pour que sa géométrie se
      recalcule. Appelée avant, elle travaillait sur une largeur nulle. */
+  /* ⚠ LA BARRE PART DEJA A SA PLACE, AVANT DE PARAITRE.
+
+     Dans l'espace utilisateur elle prend toute la largeur — il n'y a pas de
+     cercle a loger. `apercuT` decrit cet etirement : a 0, elle s'ouvre depuis
+     la gauche.
+
+     Elle etait bien initialisee au chargement du script, en lisant l'espace
+     memorise. Mais cette cle n'est ecrite qu'a l'entree dans l'app : a la
+     PREMIERE connexion elle n'existe pas encore, et la barre repartait de 0.
+
+   ⚠ ICI, ON CONNAIT L'ESPACE. On pose la valeur juste avant de montrer la
+     barre, ce qui couvre le premier passage comme les suivants. */
+  window.poserEtirementBarre?.(espace === 'equipe' ? 1 : 0)
+
   afficherBarre(true)
   window.majBarreEspace?.(espace)
 
@@ -11086,6 +11100,11 @@ document.getElementById('proc-segm')?.addEventListener('click', (e) => {
 addEventListener('resize', () =>
   poserPastilleSegment(document.querySelector('#proc-segm .p-seg.on'), false))
 
+/* ⚠ ET CELUI DE L'EQUIPE AUSSI. La rotation du telephone change la largeur des
+   onglets : sans cet ecouteur, la pastille resterait a l'ancienne taille. */
+addEventListener('resize', () =>
+  poserPastilleSegment(document.querySelector('#e-proc-segm .p-seg.on'), false))
+
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */
 /* ⚠ LE MENU DEROULANT A ETE REMPLACE PAR LE VOLET DE LA GESTION.
@@ -11394,10 +11413,19 @@ function ouvrirCategorie(nom) {
   const procsInCategory = toutesProcedures
     ? allGestionProcedures
     : allGestionProcedures.filter(p => (p.categorie || 'Sans dossier') === nom)
-  const nbCat = new Set(allGestionProcedures.map(p => p.categorie || 'Sans dossier')).size
-  document.getElementById('category-subhead').textContent = toutesProcedures
-    ? `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''} · ${nbCat} dossier${nbCat > 1 ? 's' : ''}`
-    : `${procsInCategory.length} procédure${procsInCategory.length > 1 ? 's' : ''}`
+  /* ⚠ `nbCat` A DISPARU AVEC LE SOUS-TITRE. Il comptait les dossiers pour une
+     phrase qui n'existe plus ; le garder aurait parcouru toutes les procedures
+     a chaque ouverture pour rien. */
+  /* ⚠ LE SOUS-TITRE A ETE VIDE.
+
+     Il disait « 4 procedures » — le meme compte que la ligne sous la barre de
+     recherche, a deux lignes d'ecart.
+
+   ⚠ ON NE VIDE QUE CE CHEMIN. `majTitreCategorie` ecrit dans la meme balise le
+     CHEMIN du sous-dossier — « Cuisine › Artisanale ». Celui-la reste : sans
+     lui on ne saurait plus dans quel dossier on se trouve. */
+  const subCat = document.getElementById('category-subhead')
+  if (subCat) subCat.textContent = ''
 
   // Tout est déjà en mémoire (préchargé au démarrage) : affichage instantané, zéro attente réseau.
   const nbEmployes = cachedEmployes.length
@@ -20178,8 +20206,8 @@ function renderEquipeAccueil() {
    ⚠ QUATRE CALCULS ONT DISPARU AVEC ELLE — total, lues, reste, pourcentage.
      Ils ne servaient qu'a cette phrase ; les garder aurait fait parcourir
      toutes les procedures a chaque rendu pour rien. */
-  const mot = document.getElementById('e-compte')
-  if (mot) mot.textContent = ''
+  /* ⚠ ON NE TOUCHE PLUS A CETTE LIGNE. Elle porte desormais un texte fixe,
+     ecrit dans le balisage : la vider ici l'effacerait a chaque rendu. */
 }
 
 /* Grille des dossiers, exactement celle de l'espace gestion : anneau de
@@ -20302,6 +20330,19 @@ function renderEquipeCategories() {
   const grille = document.getElementById('e-cat-grid')
   if (!grille) return
   grille.innerHTML = ''
+
+  /* ⚠ LA PASTILLE DU SEGMENT SE POSE ICI, ET C'EST CE QUI MANQUAIT.
+
+     Elle n'etait placee qu'au CLIC sur un onglet : au premier affichage, elle
+     gardait la taille et la position par defaut du balisage — d'ou le segment
+     casse tant qu'on n'avait touche a rien.
+
+     Cote gestion, `renderCategoryGrid` fait cet appel depuis toujours ; celui
+     de l'equipe l'avait oublie.
+
+   ⚠ `false` POUR NE PAS ANIMER. Au premier rendu il n'y a pas de mouvement a
+     montrer : la pastille doit etre a sa place, pas y glisser. */
+  poserPastilleSegment(document.querySelector('#e-proc-segm .p-seg.on'), false)
 
   const nbEl = document.getElementById('e-proc-nb-dossiers')
 

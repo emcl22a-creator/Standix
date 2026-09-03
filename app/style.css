@@ -16220,3 +16220,34 @@ body.espace-vide .screen.active{ animation:none !important; }
 :root{
   --fav-masque: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85Z'/%3E%3C/svg%3E");
 }
+
+
+/* ⚠ L'ETOILE DE LA PAGE DE DETAIL.
+
+   Elle reprend `.fav-btn` mais vit dans une tete de page en `flex`, pas dans
+   une carte : `margin-left:auto` la pousse au bout de la ligne, sans
+   `position:absolute` qui la calerait sur un repere inattendu. */
+.fav-detail{
+  position:static;
+  margin-left:auto;
+  flex-shrink:0;
+  width:40px; height:40px;
+  display:grid; place-items:center;
+  border:none; border-radius:100px;
+  background:rgba(118,118,128,0.10);
+  color:var(--label-3);
+  padding:0;
+}
+.fav-detail svg{ width:21px; height:21px; }
+.fav-detail:active{ transform:scale(0.90); }
+.fav-detail[hidden]{ display:none; }
+
+/* ⚠ LE MEME BLEU QUE DANS LES LISTES, par la meme technique de masque. */
+.fav-detail.on{
+  color:transparent;
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  -webkit-mask:var(--fav-masque) center / 21px 21px no-repeat;
+  mask:var(--fav-masque) center / 21px 21px no-repeat;
+  border-radius:0;
+}
+.fav-detail.on svg{ visibility:hidden; }

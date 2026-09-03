@@ -16330,3 +16330,80 @@ body.espace-vide .screen.active{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){
   .scan-echec, .scan-echec.part{ animation:none; }
 }
+
+
+/* ⚠ LA MEME MARGE QUE COTE GESTION SUR LA PAGE D'UN DOSSIER.
+
+   `#p-category .proc-rech-rang` descend a 2 px ; celle de l'equipe gardait les
+   16 px de la regle generale. Mesure a l'ecran : 16 contre 0 sous la barre de
+   recherche.
+
+   La ligne de comptage n'est pas un bloc a part : elle appartient a la liste
+   qui suit, et doit s'en approcher. */
+#e-category .proc-rech-rang{
+  margin-bottom:2px;
+}
+
+
+/* ⚠ LE SOUS-TITRE VIDE NE DOIT PAS GARDER SA PLACE.
+
+   Vide, il laissait une ligne blanche entre le titre et la recherche. */
+#e-cat-sous:empty{ display:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA TETE DU VOLET : DEUX IDENTITES, PUIS UNE PRECISION
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ PLUS D'AIR AUTOUR. 11 px de rembourrage serraient quatre lignes contre le
+   bord ; le volet paraissait plein alors qu'il ne dit que trois choses. */
+.tb-v-tete{
+  padding:14px 14px 15px;
+}
+
+/* ⚠ L'ENTREPRISE ET LE NOM FORMENT UN BLOC. Trois pixels entre eux, contre
+   neuf avant la pastille : c'est l'ecart qui dit « ces deux-la vont
+   ensemble ». */
+.tb-v-qui{
+  margin-top:3px;
+  font-size:13px;
+  color:var(--label-2);
+}
+
+/* ⚠ LA PASTILLE DU ROLE PREND SES DISTANCES. Elle ne prolonge pas l'identite,
+   elle la qualifie. */
+.tb-v-role{
+  margin-top:11px;
+}
+
+/* ⚠ ET L'ASTUCE S'ECARTE DAVANTAGE ENCORE. C'est une phrase a lire une fois,
+   pas une donnee : elle appartient a un autre registre que ce qui precede. */
+.tb-v-astuce{
+  margin-top:13px;
+  padding-top:12px;
+  border-top:0.5px solid rgba(28,28,38,0.07);
+}
+
+
+/* ⚠ LES DEUX LIGNES DU SCANNER PASSENT AU BLANC.
+
+   Le titre n'avait aucune couleur declaree : il heritait de `--label`, le noir
+   de l'app. La consigne, elle, prenait `--label-2` — un gris moyen.
+
+   Or les deux sont posees sur l'image de la camera, par-dessus un degrade
+   noir. Un texte sombre sur une image sombre ne se lit que par son ombre
+   portee, et disparait des que la scene est claire.
+
+ ⚠ LA SECONDE LIGNE N'EST PAS D'UN BLANC PLEIN. 82 % la distingue du titre
+   sans la rendre pale : elle explique, elle ne nomme pas.
+
+ ⚠ ET L'OMBRE PORTEE RESTE. Sur un mur blanc filme en plein jour, le degrade
+   ne suffit pas : c'est elle qui detache les lettres. */
+.scan-mot b{
+  color:#FFFFFF;
+}
+
+.scan-mot span{
+  color:rgba(255,255,255,0.82);
+  text-shadow:0 1px 12px rgba(0,0,0,0.8);
+}

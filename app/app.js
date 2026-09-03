@@ -20108,6 +20108,25 @@ function renderEquipeCategories() {
     return
   }
 
+  /* ⚠ CE BLOC DOIT VENIR AVANT `parCat`, ET C'EST TOUT LE DEFAUT.
+
+     Je l'avais pose plus bas, a cote de la recherche. Or `parCat` appelle
+     `gardee` quatre cents caracteres plus haut : `const` n'est pas remonte
+     comme `function`, et le navigateur refusait le fichier entier —
+     « Cannot access 'gardee' before initialization ».
+
+   ⚠ LE SEGMENT FILTRE LES PROCEDURES, PAS LES DOSSIERS.
+
+     « Favoris » ne veut pas dire « dossiers favoris » : on garde les dossiers
+     qui CONTIENNENT au moins une procedure favorite, et l'on n'y montre
+     qu'elles. */
+  const recentes = segmentEquipe === 'recentes' ? procsVuesRecemment() : null
+  const gardee = (p) => {
+    if (segmentEquipe === 'favoris') return favorisEquipe.has(p.id)
+    if (segmentEquipe === 'recentes') return recentes.includes(p.id)
+    return true
+  }
+
   const parCat = {}
   allEquipeProcedures.filter(gardee).forEach(p => {
     const nom = p.categorie || 'Sans dossier'
@@ -20128,19 +20147,6 @@ function renderEquipeCategories() {
 
    ⚠ SANS ACCENTS NI CASSE. « Cafe » doit trouver « Café » — c'est ce que fait
      `sansAccents` cote gestion, on emploie la meme. */
-  /* ⚠ LE SEGMENT FILTRE LES PROCEDURES, PAS LES DOSSIERS.
-
-     « Favoris » ne veut pas dire « dossiers favoris » : on garde les dossiers
-     qui CONTIENNENT au moins une procedure favorite, et l'on n'y montre
-     qu'elles. Sinon toucher « Favoris » afficherait des dossiers entiers dont
-     une seule procedure interesse. */
-  const recentes = segmentEquipe === 'recentes' ? procsVuesRecemment() : null
-  const gardee = (p) => {
-    if (segmentEquipe === 'favoris') return favorisEquipe.has(p.id)
-    if (segmentEquipe === 'recentes') return recentes.includes(p.id)
-    return true
-  }
-
   const q = (rechercheEquipe || '').trim()
   const termes = q ? sansAccents(q).split(/\s+/).filter(Boolean) : []
   const correspond = (nom) => {

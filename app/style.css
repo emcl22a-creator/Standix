@@ -16461,6 +16461,34 @@ body.espace-vide .screen.active{ animation:none !important; }
 }
 
 
-/* ⚠ LA LIGNE VIDE NE DOIT PAS GARDER SA PLACE, sinon elle laisse un blanc
-   entre le titre et la recherche. */
-#e-compte:empty{ display:none; }
+/* ⚠ LA REGLE `#e-compte:empty` A ETE RETIREE : la ligne porte maintenant un
+   texte fixe, elle n'est plus jamais vide. */
+
+
+/* ⚠ LA PASTILLE SE DIVISAIT TOUJOURS PAR TROIS.
+
+   `.p-seg-lens { width: calc((100% - 6px) / 3) }` datait des segments a trois
+   onglets. Les deux qui en ont deux — celui de la gestion et celui de
+   l'utilisateur — heritaient donc d'une pastille au tiers de la largeur.
+
+   Mesure a l'ecran : 112 px de pastille pour un onglet de 168.
+
+ ⚠ C'ETAIT VISIBLE JUSQU'AU PREMIER CLIC SEULEMENT. Le script recalcule la
+   largeur en touchant un onglet, ce qui masquait le defaut — d'ou le
+   « l'element n'est plus casse quand je clique ».
+
+ ⚠ ON VISE LES DEUX SEGMENTS PAR LEUR IDENTIFIANT plutot que de compter les
+   onglets en CSS : `:has(.p-seg:nth-child(3))` marcherait, mais serait
+   illisible dans six mois. */
+#proc-segm .p-seg-lens,
+#e-proc-segm .p-seg-lens{
+  width:calc((100% - 6px) / 2);
+}
+
+
+/* ⚠ VIDE, LE SOUS-TITRE NE DOIT PAS GARDER SA PLACE — il laisserait une ligne
+   blanche entre le titre et la recherche.
+
+   Il reste visible quand `majTitreCategorie` y ecrit le chemin d'un
+   sous-dossier : la regle ne vise que le cas vide. */
+#category-subhead:empty{ display:none; }

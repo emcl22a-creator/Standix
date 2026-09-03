@@ -2680,7 +2680,46 @@ document.addEventListener('click', async (e) => {
   toast('Appareil retir\u00e9.')
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ON REFERME TOUT CE QUI COUVRE L'ECRAN
+
+   ⚠ CINQ VOILES PEUVENT RESTER OUVERTS : la fenetre d'etablissement, celle de
+     promotion, le fond de bienvenue, les alertes, le bandeau de blocage. Tous
+     sont en `position:fixed` avec un z-index de 200 a 500.
+
+     Aucun n'etait ferme au changement d'entreprise ni a l'entree dans l'app.
+     Un seul reste ouvert et l'ecran devient inerte : la barre passe dessous,
+     les boutons ne repondent plus. C'est exactement ce que vous decrivez.
+
+   ⚠ ON RETIRE PLUTOT QU'ON MASQUE. Ces elements sont crees a la volee ; les
+     masquer les laisserait s'accumuler dans la page a chaque ouverture.
+
+   ⚠ ET `overflow` REVIENT A SA VALEUR. Les feuilles modales le passent a
+     `hidden` pour empecher le defilement du fond ; oublie, il fige la page
+     entiere.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function refermerLesVoiles() {
+  const voiles = [
+    '.ios-alert-backdrop',
+    '.bienvenue-fond',
+    '.bandeau-bloc',
+  ]
+  voiles.forEach(sel =>
+    document.querySelectorAll(sel).forEach(el => el.remove()))
+
+  /* ⚠ CES DEUX-LA VIVENT DANS LE BALISAGE, on ne les supprime pas : on les
+     masque, comme leurs propres fonctions de fermeture le font. */
+  ;['fond-etab', 'fond-promu'].forEach(id => {
+    const el = document.getElementById(id)
+    if (el) { el.style.display = 'none'; el.classList.remove('ouvert') }
+  })
+
+  try { document.body.style.overflow = '' } catch (e) {}
+}
+
 async function enterApp(membre) {
+  refermerLesVoiles()
+
   /* ═══ ON CHANGE D'ENTREPRISE : ON VIDE TOUT ═══
 
      ⚠ DIX CHEMINS MENENT ICI. Creation d'entreprise, adhesion par code,
@@ -3135,7 +3174,98 @@ function finDuDemarrage() {
 /* Remplit la fiche du haut et les valeurs affichées à droite de chaque ligne.
    Une valeur à droite évite d'ouvrir la page pour savoir ce qu'elle contient :
    c'est tout l'intérêt de la grammaire d'iOS. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PHOTO DE PROFIL
+
+   ⚠ LA MEME MECANIQUE QUE LE LOGO D'ETABLISSEMENT : recadrage carre, reduction
+     a 192 px, envoi en WebP dans `procedo-logos`. Reprendre ce qui marche
+     plutot que d'ecrire un second chemin qui divergerait.
+
+   ⚠ ET ELLE EST APPLIQUEE TOUT DE SUITE, avant l'envoi. Attendre la reponse du
+     serveur pour montrer la nouvelle photo donnerait l'impression d'un bouton
+     mort pendant deux secondes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let photoTampon = null       // la photo choisie, pas encore enregistree
+
+function peindrePhotoProfil() {
+  const img = document.getElementById('photo-apercu')
+  const ini = document.getElementById('photo-initiales')
+  const ret = document.getElementById('photo-retirer')
+  if (!img) return
+
+  const url = photoTampon !== null ? photoTampon : (currentMembre?.photo_url || null)
+
+  if (url) {
+    img.src = url
+    img.hidden = false
+  } else {
+    img.removeAttribute('src')
+    img.hidden = true
+  }
+  if (ini) ini.textContent = initialesMembre(currentMembre?.nom)
+  if (ret) ret.hidden = !url
+}
+
+/* ⚠ 192 PX DE COTE, COMME LE LOGO. Le rond fait 96 px a l'ecran ; le double
+   couvre les ecrans denses, et une photo de quatre megaoctets n'y apporterait
+   rien qu'un chargement plus lent dans « Gerer l'equipe ». */
+document.getElementById('photo-choisir')?.addEventListener('click', () =>
+  document.getElementById('photo-fichier')?.click())
+
+document.getElementById('photo-fichier')?.addEventListener('change', (ev) => {
+  const f = ev.target.files[0]
+  ev.target.value = ''
+  if (!f) return
+
+  const lecteur = new FileReader()
+  lecteur.onload = () => {
+    const img = new Image()
+    img.onload = () => {
+      const cv = document.createElement('canvas')
+      cv.width = cv.height = 192
+      const ctx = cv.getContext('2d')
+      /* ⚠ ON RECADRE AU CENTRE, sur le plus petit cote. Une photo en paysage
+         etiree dans un rond deformerait le visage. */
+      const cote = Math.min(img.width, img.height)
+      ctx.drawImage(img, (img.width - cote) / 2, (img.height - cote) / 2,
+                    cote, cote, 0, 0, 192, 192)
+      photoTampon = cv.toDataURL('image/webp', 0.85)
+      peindrePhotoProfil()
+    }
+    img.onerror = () => toast("Ce fichier n'est pas une image lisible.")
+    img.src = lecteur.result
+  }
+  lecteur.readAsDataURL(f)
+})
+
+document.getElementById('photo-retirer')?.addEventListener('click', () => {
+  /* ⚠ UNE CHAINE VIDE, PAS `null`. `null` voudrait dire « rien de choisi » et
+     `peindrePhotoProfil` retomberait sur la photo enregistree. */
+  photoTampon = ''
+  peindrePhotoProfil()
+})
+
+/* ⚠ L'ENVOI SE FAIT A L'ENREGISTREMENT, pas au choix.
+
+   Deposer le fichier des qu'on le choisit laisserait des images orphelines
+   dans le seau a chaque essai. */
+async function enregistrerPhotoProfil() {
+  if (photoTampon === null) return null      // rien n'a change
+
+  if (photoTampon === '') return { photo_url: null }
+
+  const blob = await (await fetch(photoTampon)).blob()
+  const chemin = `profils/${currentMembre.id}-${Date.now()}.webp`
+  const { error } = await supabase.storage.from('procedo-logos')
+    .upload(chemin, blob, { contentType: 'image/webp', upsert: true, cacheControl: CACHE_LONG })
+  if (error) throw new Error('Dépôt de la photo refusé : ' + error.message)
+
+  const { data: pub } = supabase.storage.from('procedo-logos').getPublicUrl(chemin)
+  return { photo_url: pub?.publicUrl || null }
+}
+
 function peindreReglages() {
+  peindrePhotoProfil()
   const nom = currentMembre?.nom || ''
   const el = (i) => document.getElementById(i)
 
@@ -3533,10 +3663,34 @@ document.getElementById('settings-save-btn')?.addEventListener('click', async ()
   if (!nom) { errorEl.textContent = 'Le nom est obligatoire.'; return }
 
   setButtonLoading(btn, true)
-  const { error } = await supabase.from('membres').update({ nom }).eq('id', currentMembre.id)
+
+  /* ⚠ LA PHOTO PART AVEC LE NOM, DANS LA MEME ECRITURE.
+
+     Deux `update` separes laisseraient la fiche a moitie enregistree si le
+     second echouait — un nom neuf avec l'ancienne photo, sans rien pour le
+     dire. */
+  let champs = { nom }
+  try {
+    const photo = await enregistrerPhotoProfil()
+    if (photo) champs = { ...champs, ...photo }
+  } catch (e) {
+    setButtonLoading(btn, false)
+    errorEl.textContent = e?.message || 'La photo n’a pas pu être envoyée.'
+    return
+  }
+
+  const { error } = await supabase.from('membres').update(champs).eq('id', currentMembre.id)
   setButtonLoading(btn, false)
   if (error) { errorEl.textContent = "Erreur : " + error.message; return }
+
   currentMembre.nom = nom
+  if ('photo_url' in champs) currentMembre.photo_url = champs.photo_url
+
+  /* ⚠ LE TAMPON SE VIDE, sinon un second enregistrement renverrait la meme
+     image et creerait un doublon dans le seau. */
+  photoTampon = null
+  peindrePhotoProfil()
+
   errorEl.style.color = 'var(--green)'
   errorEl.textContent = 'Enregistré.'
 })
@@ -12699,6 +12853,10 @@ function majBoutonIA() {
 
 async function completerEtapesAvecIA() {
   if (iaCompletionEnCours) return
+
+  /* ⚠ CE CHEMIN CONSOMME AUSSI UNE ANALYSE. Il complete les etapes d'une
+     procedure existante — le cout Azure est le meme. */
+  if (await quotaEpuise()) return
   const note = document.getElementById('vid-ia-note')
 
   if (!currentVideoFile && !editVideoUrl) {
@@ -12797,13 +12955,32 @@ async function completerEtapesAvecIA() {
        Ce contrôle-ci sert à PRÉVENIR : découper une vidéo, l'envoyer, puis
        apprendre que le quota est épuisé serait une perte de temps et de
        données. Placé après le découpage et avant l'envoi. */
-    const { data: droit, error: errDroit } = await supabase.rpc('verifier_analyse')
+    /* ⚠ ON DIT DANS QUELLE ENTREPRISE, on ne la laisse plus deviner.
+
+       `verifier_analyse` prenait la premiere fiche membre venue : pour
+       quelqu'un qui appartient a deux entreprises, Postgres rendait n'importe
+       laquelle. Elle verifiait donc le quota d'une entreprise pendant qu'on
+       lancait l'analyse sur une autre.
+
+       C'est la correction deja faite sur `consommer_analyse` — celle-ci
+       l'avait manquee. */
+    const { data: droit, error: errDroit } = await supabase
+      .rpc('verifier_analyse', { p_entreprise_id: currentMembre?.entreprise_id || null })
     if (errDroit) {
       /* La fonction n'existe pas encore en base : on laisse passer plutôt que
          de bloquer la création. Le jour où le SQL est posé, le contrôle
          s'active de lui-même. */
       console.warn('[quota] contrôle indisponible :', errDroit.message)
     } else if (droit && droit.autorise === false) {
+      /* ⚠ « essai » ET « quota » NE DISENT PAS LA MEME CHOSE.
+
+         Pendant un essai, les analyses ne se renouvellent jamais : promettre
+         le 1er du mois ferait attendre pour rien. */
+      if (droit.raison === 'essai') {
+        throw new Error(
+          `Vos ${droit.quota} analyses d\u2019essai sont utilis\u00e9es. `
+          + `Choisissez une offre pour continuer \u00e0 analyser vos vid\u00e9os.`)
+      }
       if (droit.raison === 'quota') {
         throw new Error(
           `Vous avez utilis\u00e9 vos ${droit.quota} analyses vid\u00e9o de ce mois-ci. `
@@ -13925,6 +14102,55 @@ async function fenetreAbonnementRequis() {
 }
 
 /* Rend `true` quand l'action a ete bloquee — l'appelant s'arrete alors. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VERROU DU QUOTA D'ANALYSES
+
+   ⚠ AUCUN DES TROIS POINTS DE LANCEMENT NE LE VERIFIAIT. Le chiffre etait lu
+     pour l'afficher, jamais pour decider : on pouvait lancer une analyse a
+     zero restante, et chacune coute une facture Azure.
+
+   ⚠ LE QUOTA EST PARTAGE ENTRE LES ETABLISSEMENTS. `reste_analyses` le calcule
+     deja sur le proprietaire, pas sur l'entreprise : atteindre la limite sur
+     l'un ferme donc les autres, ce qui est la regle voulue.
+
+   ⚠ ON INTERROGE LA BASE A CHAQUE FOIS, sans se fier au chiffre affiche. Celui
+     de l'ecran peut dater de plusieurs minutes — le temps qu'un collegue lance
+     la sienne.
+
+   ⚠ ET UNE PANNE RESEAU NE BLOQUE PAS. Refuser une analyse parce que la
+     requete n'a pas abouti punirait le client pour un incident qui n'est pas
+     le sien. Le compteur du mois rattrapera l'ecart.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function quotaEpuise() {
+  if (!currentMembre?.entreprise_id) return false
+  try {
+    const { data, error } = await supabase
+      .rpc('reste_analyses', { p_entreprise: currentMembre.entreprise_id })
+    if (error || !data) return false
+
+    const q = Array.isArray(data) ? data[0] : data
+    if (!q || typeof q.reste !== 'number') return false
+    if (q.reste > 0) return false
+
+    await confirmDialog({
+      titre: 'Analyses épuisées',
+      message: q.partage
+        ? `Vos ${q.quota} analyses vidéo du mois sont utilisées sur l’ensemble de vos établissements. `
+          + 'Elles se renouvellent au début du mois prochain.'
+        : `Vos ${q.quota} analyses vidéo du mois sont utilisées. `
+          + 'Elles se renouvellent au début du mois prochain.',
+      confirmer: 'Voir les offres',
+      annuler: 'Plus tard',
+      danger: false,
+    }) && showGestionScreen('p-abonnement')
+
+    return true
+  } catch (e) {
+    console.warn('[quota]', e?.message)
+    return false
+  }
+}
+
 async function bloqueSiEssaiFini() {
   if (!essaiTermine()) return false
   await fenetreAbonnementRequis()
@@ -15918,6 +16144,12 @@ function verifierDureeVideo() {
 document.getElementById('ai-launch-btn')?.addEventListener('click', async () => {
   const errorEl = document.getElementById('ai-error')
   errorEl.textContent = ''
+
+  /* ⚠ LE QUOTA SE VERIFIE AVANT TOUT LE RESTE.
+
+     Plus bas la video est deja televersee : refuser a ce moment-la ferait
+     payer un envoi pour rien, et laisserait un fichier orphelin. */
+  if (await quotaEpuise()) return
   const titre = champManuel('titre').value.trim()
   const categorie = champManuel('categorie').value.trim()
 
@@ -19955,6 +20187,10 @@ async function proposerAbandon(proc) {
    avec un identifiant Azure vierge, sinon `ai-check` interrogerait l'ancienne
    analyse, celle qui a justement échoué. */
 async function proposerReprise(proc) {
+  /* ⚠ REPRENDRE, C'EST RELANCER. Une analyse qui a echoue n'a rien consomme,
+     mais la reprise, si. */
+  if (await quotaEpuise()) return
+
   const bloquee = analyseBloquee(proc)
   const raison = proc.erreur_ia ? proc.erreur_ia + ' ' : ''
 
@@ -20392,8 +20628,12 @@ function renderEquipeCategories() {
     return
   }
 
+  /* ⚠ LES SYNONYMES AUSSI SUR LA LISTE DES DOSSIERS.
+
+     Elle decoupait la saisie en mots sans passer par `termesRecherche` :
+     chercher « friteuses » au pluriel ne trouvait pas « friteuse ». */
   const q = (rechercheEquipe || '').trim()
-  const termes = q ? sansAccents(q).split(/\s+/).filter(Boolean) : []
+  const termes = q ? termesRecherche(sansAccents(q)) : []
 
   /* ═══════════════════════════════════════════════════════════════════════
      « FAVORIS » ET « VUES RECEMMENT » DONNENT UNE LISTE DE PROCEDURES
@@ -20600,8 +20840,28 @@ function renderEquipeCatListe() {
   const dansCat = equipeSousDossier
     ? duDossier.filter(p => (p.sous_categorie || '').trim() === equipeSousDossier)
     : duDossier
+  /* ⚠ LA MEME RECHERCHE QUE COTE GESTION.
+
+     Elle ne comparait que les lettres du titre : « friteuse » ne trouvait rien
+     si la procedure s'appelait « Nettoyage du bac a graisse », et « cafe » ne
+     trouvait pas « Café ».
+
+     `termesRecherche` ajoute les synonymes connus et la forme au singulier ;
+     `sansAccents` egalise les accents. Le sous-dossier devient cherchable
+     aussi : dans un dossier, taper le nom d'un sous-dossier doit ramener son
+     contenu.
+
+   ⚠ ON REPREND LA MEME FONCTION, pas une seconde version. Deux filtres
+     paralleles finiraient par comprendre des mots differents. */
   const q = equipeCatQuery
-  const vues = q ? dansCat.filter(p => p.titre.toLowerCase().includes(q)) : dansCat
+  const termesQ = q ? termesRecherche(sansAccents(q)) : []
+  const vues = q
+    ? dansCat.filter(p => {
+        const titre = sansAccents(p.titre || '')
+        const sous = sansAccents(p.sous_categorie || '')
+        return termesQ.some(t => titre.includes(t) || (sous && sous.includes(t)))
+      })
+    : dansCat
 
   /* ⚠ LE SOUS-TITRE A ETE VIDE.
 
@@ -23262,6 +23522,10 @@ document.getElementById('etab-plus')?.addEventListener('click', () => ouvrirFene
 /* Changer d'établissement, c'est changer de fiche membre : on relance l'app avec
    celle qui a été choisie, ce qui recharge procédures, équipe et droits. */
 async function basculerVersEtablissement(entrepriseId) {
+  /* ⚠ MEME NETTOYAGE ICI. La bascule ne passe pas par `enterApp` : elle change
+     `currentMembre` a la main et recharge. */
+  refermerLesVoiles()
+
   const e = mesEtablissements.find(x => x.id === entrepriseId)
   if (!e || e.id === currentMembre?.entreprise_id) return
 
@@ -24187,7 +24451,14 @@ function peindreEquipe() {
 
     return `
       <div class="pm-ligne">
-        <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${escapeHtml(initialesMembre(m.nom))}</div>
+        <!-- ⚠ LA PHOTO SI ELLE EXISTE, LES INITIALES SINON.
+
+             On garde le meme rond et la meme classe : seule la garniture
+             change. Une carte plus haute pour ceux qui ont une photo casserait
+             l'alignement de la liste. -->
+        <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${m.photo_url
+          ? `<img src="${escapeHtml(m.photo_url)}" alt="" loading="lazy">`
+          : escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
           <div class="pm-role">Depuis le ${date}</div>

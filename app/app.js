@@ -1092,8 +1092,9 @@ window.onNavigate = function (index) {
          valeur oubliee ici ouvrirait le mauvais ecran, sans rien signaler. */
       if (index === 0) showEquipeScreen('e-list')
       else if (index === 1) { showEquipeScreen('e-scan'); startScanner('equipe') }
-      else if (index === 2) { showEquipeScreen('e-notifs'); peindreNotifsEquipe() }
-      else if (index === 3) openEquipeSettings()
+      /* ⚠ LES REGLAGES PASSENT DE L'INDICE 3 A 2. « Notifications » a ete
+         retire de la barre ; laisser 3 aurait rendu le dernier onglet muet. */
+      else if (index === 2) openEquipeSettings()
       return
     }
     /* ⚠ TROIS ONGLETS COTE GESTION. Procedures en premier — c'est desormais
@@ -1409,6 +1410,21 @@ function attendreScenes() {
 window.ouvrirBienvenue = function () {
   const cible = document.getElementById('login-screen')
   if (!cible) return
+
+  /* ⚠ ON REMONTE EN HAUT, ET C'ETAIT LE DEFAUT.
+
+     Un lien partage porte `?proc=...` : le navigateur restaure alors la
+     position de defilement de la visite precedente. On atterrissait en bas de
+     la page « Bienvenue » — sur le lien « Se connecter » plutot que sur le
+     logo et le titre.
+
+     `showEquipeScreen` et `showGestionScreen` font deja ce geste a chaque
+     changement d'ecran ; celle-ci l'avait oublie.
+
+   ⚠ `instant` ET NON `smooth`. Un defilement anime au chargement se verrait
+     comme un sursaut : la page doit s'ouvrir en haut, pas y remonter. */
+  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  catch (e) { window.scrollTo(0, 0) }
 
   /* ⚠ ON N'IMPOSE PLUS D'ESPACE. `selectedSpace` reste indefini jusqu'a ce
      qu'une des deux cartes soit touchee : la page ne prejuge pas du role de
@@ -3580,6 +3596,23 @@ function remplirVoletTopbar() {
   }
   if (role) {
     role.textContent = espace === 'gestion' ? 'Espace Gestion' : 'Espace Équipe'
+  }
+
+  /* ⚠ LE NOM DE LA PERSONNE, sous l'espace.
+
+     ⚠ DEUX SOURCES, DANS CET ORDRE. `nom` sur la fiche membre est celui que la
+       personne a saisi a l'inscription ; l'adresse ne sert que de repli, quand
+       la fiche n'en porte pas — un compte cree par code d'invitation, par
+       exemple.
+
+     ⚠ ET RIEN PLUTOT QU'UN TIRET. Le CSS masque l'element quand il est vide :
+       une ligne avec un tiret ferait croire a une donnee manquante, alors qu'il
+       n'y a simplement rien a dire. */
+  const qui = document.getElementById('tb-qui-' + espace)
+  if (qui) {
+    qui.textContent = (currentMembre?.nom || '').trim()
+      || (currentMembre?.email || '').trim()
+      || ''
   }
 }
 
@@ -7009,6 +7042,14 @@ window.showEquipeScreen = function(id, btn) {
 
   arreterToutesLesVideos()
   jouerVoile()
+
+  /* ⚠ LA BARRE DU HAUT S'ANIME AUSSI COTE EQUIPE.
+
+     `animerBarreHaut` etait appelee par `showGestionScreen` et pas par
+     celle-ci : les pages de l'equipe s'ouvraient sans le mouvement du logo et
+     du titre. Les deux espaces partagent la meme barre — ils doivent partager
+     son animation. */
+  animerBarreHaut()
 
   /* ⚠ PAS PENDANT L'APERCU. `showEquipeScreen` bascule la barre a chaque
      changement d'ecran — juste pour un employe, faux pour un gerant qui
@@ -10990,7 +11031,55 @@ addEventListener('resize', () =>
 
 /* Les deux tris de l'espace équipe, sur le même mécanisme que ceux de la
    gestion : un seul endroit décide de ce qu'un menu de tri fait. */
-wireSortDropdown('dd-e-cat-sort', (sort) => { equipeCatSort = sort; renderEquipeCategories() })
+/* ⚠ LE MENU DEROULANT A ETE REMPLACE PAR LE VOLET DE LA GESTION.
+
+   `wireSortDropdown` visait `dd-e-cat-sort`, qui n'existe plus. L'ecouteur
+   ci-dessous reprend la mecanique du volet — meme bouton, meme apparence. */
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('#e-proc-filtre')
+  const choix = e.target.closest('#e-proc-tri-volet .tb-v-tri')
+  const volet = document.getElementById('e-proc-tri-volet')
+  if (!volet) return
+
+  /* ⚠ UN CLIC AILLEURS REFERME LE VOLET. Sans cela il resterait ouvert
+     par-dessus la liste, et l'on toucherait une option en croyant toucher un
+     dossier. */
+  if (!bouton && !choix) {
+    if (volet.classList.contains('ouvert')) {
+      volet.classList.remove('ouvert')
+      setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+      document.getElementById('e-proc-filtre')?.setAttribute('aria-expanded', 'false')
+    }
+    return
+  }
+
+  if (choix) {
+    equipeCatSort = choix.dataset.tri
+    volet.querySelectorAll('.tb-v-tri').forEach(x => x.classList.remove('on'))
+    choix.classList.add('on')
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+    document.getElementById('e-proc-filtre')?.setAttribute('aria-expanded', 'false')
+
+    /* ⚠ LES CARTES SE REPOSITIONNENT, ELLES NE SE FLOUTENT PAS. Le tri change
+       l'ordre : c'est le deplacement qui le montre. Le flou est reserve au
+       segment, ou le contenu change. */
+    sansApparition = true
+    reorganiserListe(document.getElementById('e-cat-grid'), renderEquipeCategories)
+    sansApparition = false
+    return
+  }
+
+  const ouvrir = !volet.classList.contains('ouvert')
+  if (ouvrir) {
+    volet.hidden = false
+    requestAnimationFrame(() => volet.classList.add('ouvert'))
+  } else {
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+  }
+  document.getElementById('e-proc-filtre')?.setAttribute('aria-expanded', String(ouvrir))
+})
 wireSortDropdown('dd-e-proc-sort', (sort) => { equipeProcSort = sort; renderEquipeCatListe() })
 
 wireSortDropdown('dd-membres-sort', (valeur) => {
@@ -20248,39 +20337,51 @@ let equipeSousDossier = null
 
 /* La carte d'un sous-dossier, côté Équipe. Même moule que la carte de dossier
    de cet espace, seule l'icône change — un dossier posé dans un autre. */
-function carteSousDossierEquipe(nom, procs) {
+function carteSousDossierEquipe(nom, procs, rang = 0) {
+  /* ⚠ LA MEME FORME QUE `carteSousDossier` COTE GESTION : plaque coloree,
+     nom, badge en bas. Elle etait en `cat-top` avec une icone doree — une
+     autre presentation pour la meme chose selon l'espace.
+
+   ⚠ SANS LES TROIS POINTS. Ils ouvrent le renommage : un employe n'a pas ce
+     droit, et un bouton qui ne fait rien vaut moins que pas de bouton.
+
+   ⚠ ET LE BADGE PARLE DE LECTURE, PAS DE PUBLICATION. « En ligne » serait vrai
+     partout ici — l'equipe ne voit que le publie. */
   const cell = document.createElement('div')
-  cell.className = 'cat-cell cat-cell--sous'
-  cell.onclick = () => ouvrirSousDossierEquipe(nom)
-  const apercu = procs.slice(0, 3)
-  const lues = procs.filter(p => equipeLues.has(p.id)).length
+  cell.className = 'cat-cell cat-cell--sous cat-cell--ligne'
+  cell.dataset.key = 'sd:' + nom
+  animerApparition(cell, rang)
+
+  const teinte = couleurDossier(rang)
+  const aLire = procs.filter(p => !equipeLues.has(p.id)).length
+
   cell.innerHTML = `
-    <div class="cat-top">
-      <span class="cat-ic">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6" stroke="url(#logoOrIc)"
-                stroke-width="1.6" stroke-opacity="0.45" stroke-linejoin="round" stroke-linecap="round"/>
-          <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
-                stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-          <line x1="6" y1="13.4" x2="22" y2="13.4" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
-        </svg>
-      </span>
-    </div>
-    <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-    <div class="cat-recent">
-      ${apercu.map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span></div>`).join('')}
-    </div>
-    <div class="cat-pied">
+    <span class="cl-pl" style="background:${fondPlaque(teinte)}">
       <svg viewBox="0 0 24 24" fill="none">
-        <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-              stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
-        <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+        <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"
+              stroke="url(#pal${teinte.i})" stroke-width="1.6" stroke-opacity="0.45"
+              stroke-linejoin="round" stroke-linecap="round"/>
+        <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"
+              stroke="url(#pal${teinte.i})" stroke-width="1.9" stroke-linejoin="round"/>
       </svg>
-      <span>${procs.length} procédure${procs.length > 1 ? 's' : ''}${lues ? ` · ${lues} lue${lues > 1 ? 's' : ''}` : ''}</span>
-      <span class="fl">\u203a</span>
-    </div>`
+    </span>
+    <span class="cl-co">
+      <span class="cl-tete">
+        <span class="cl-nm">${escapeHtml(nom)}</span>
+        <span class="proc-fl">\u203a</span>
+      </span>
+      <span class="cl-bas">
+        ${aLire
+          ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${aLire} à lire</span>`
+          : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
+        <span class="cl-n">${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
+      </span>
+    </span>`
+
+  cell.onclick = () => ouvrirSousDossierEquipe(nom)
   return cell
 }
+
 
 /* Le retour remonte d'un niveau, comme côté Gestion. Rouvrir le dossier plutôt
    que de vider la variable : `openEquipeCategorie` remet aussi le titre, le
@@ -20360,7 +20461,9 @@ function renderEquipeCatListe() {
         a.localeCompare(b, 'fr', { sensitivity: 'base' }))
       const grille = document.createElement('div')
       grille.className = 'sd-grille'
-      noms.forEach(n => grille.appendChild(carteSousDossierEquipe(n, groupes.get(n))))
+    /* ⚠ LE RANG DONNE SA TEINTE A CHAQUE CARTE et cadence son apparition. Sans
+       lui, toutes prendraient la meme couleur et entreraient ensemble. */
+    noms.forEach((n, rang) => grille.appendChild(carteSousDossierEquipe(n, groupes.get(n), rang)))
       listEl.appendChild(grille)
     }
   }
@@ -20368,7 +20471,10 @@ function renderEquipeCatListe() {
   /* Les procédures rangées ne sont pas répétées : elles sont déjà accessibles
      par leur carte, et les afficher deux fois doublerait la liste. */
   const aLister = montrerSD ? triees.filter(p => !(p.sous_categorie || '').trim()) : triees
-  aLister.forEach(p => listEl.appendChild(ficheEquipe(p)))
+  /* ⚠ LE RANG SERT A L'APPARITION EN CASCADE. Sans lui, toutes les cartes
+     entrent en meme temps — la meme animation que cote gestion attend un
+     indice. */
+  aLister.forEach((p, rang) => listEl.appendChild(ficheEquipe(p, rang)))
 }
 
 /* Une fiche de procédure, réutilisée par la dossier et par la recherche.
@@ -20414,60 +20520,76 @@ async function basculerFavori(procId, bouton) {
   if (segmentEquipe === 'favoris') renderEquipeCategories()
 }
 
-function ficheEquipe(proc) {
+function ficheEquipe(proc, rang = 0) {
+  /* ⚠ LA MEME FORME QUE COTE GESTION : `cat-cell cat-cell--ligne`, plaque
+     coloree a gauche, nom, badge en bas. Elle etait en `card proc-rich-card`,
+     une carte plus haute avec un anneau — deux presentations pour une meme
+     chose selon l'espace ou l'on se trouve.
+
+   ⚠ SANS LES TROIS POINTS. Ils ouvrent le menu qui renomme ou supprime : un
+     employe n'a pas ces droits.
+
+   ⚠ ET AVEC L'ETOILE EN HAUT A DROITE, a la place du chevron. C'est le seul
+     geste que l'equipe peut faire sur une procedure depuis la liste. */
+  const el = document.createElement('div')
+  el.className = 'cat-cell cat-cell--ligne'
+  el.dataset.key = proc.id
+  animerApparition(el, rang)
+
   const lue = equipeLues.has(proc.id)
   const nbEtapes = (equipeEtapesByProc[proc.id] || []).length
+  const teinte = couleurDossier(rang)
+  const favori = favorisEquipe.has(proc.id)
 
-  const div = document.createElement('div')
-  div.className = 'card proc-rich-card'
-  div.dataset.key = proc.id
-  div.onclick = (e) => {
-    /* ⚠ L'ETOILE N'OUVRE PAS LA PROCEDURE. Sans ce test, la mettre en favori
-       ouvrirait l'ecran de lecture dans la foulee. */
-    const fav = e.target.closest('[data-fav]')
-    if (fav) { e.stopPropagation(); basculerFavori(proc.id, fav); return }
-    openEquipeDetail(proc.id)
-  }
-  /* L'ICÔNE PORTE LE MÊME DÉGRADÉ QUE CÔTÉ GESTION.
+  el.innerHTML = `
+    <span class="cl-pl" style="background:${fondPlaque(teinte)}">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
+                 M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2"
+              stroke="url(#pal${teinte.i})" stroke-width="1.9"
+              stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="cl-co">
+      <span class="cl-tete">
+        <span class="cl-nm">${escapeHtml(proc.titre)}</span>
+      </span>
+      <span class="cl-bas">
+        ${lue
+          ? `<span class="cl-badge"><i style="background:#34C759"></i>Lue</span>`
+          : `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Pas encore lue"></span><i style="background:#3A78EE"></i>À lire</span>`}
+        <span class="cl-n">${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}</span>
+      </span>
+    </span>
 
-     Le tracé était déjà identique, seule la couleur différait : blanc à 78 %
-     ici, le dégradé ambre là-bas. Une procédure est le même objet dans les
-     deux espaces — l'employé qui devient gérant ne doit pas avoir à
-     réapprendre à quoi elle ressemble.
+    <!-- ⚠ L'ETOILE EST ENFANT DIRECT DE LA CARTE, hors du bloc de contenu.
 
-     Le commentaire est ICI et non dans le gabarit : à l'intérieur, un accent
-     grave refermerait la chaîne. C'est ce qui vient de casser le fichier. */
-  div.innerHTML = `
-    <div class="cat-top">
-      <!-- L'anneau coloré est retiré : la coche verte dit déjà que c'est lu, et
-             l'anneau gris autour d'une procédure non lue ressemblait à une jauge
-             à zéro plutôt qu'à « pas encore ouverte ». -->
-        <div class="cat-ring-wrap">
-          <div class="cat-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/><path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/><line x1="8.6" y1="12.6" x2="15.4" y2="12.6" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/><line x1="8.6" y1="16.4" x2="13" y2="16.4" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.6" stroke-linecap="round"/></svg></div>
-      </div>
-      ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
-    </div>
-    <!-- ⚠ L'ETOILE EST DANS LA TETE DE CARTE, pas sous le titre.
+         Placee dans la tete, elle se calait sur le bloc de contenu — qui porte
+         deja une position relative. Le decalage de dix pixels partait donc du
+         haut du CONTENU, pas de la carte : elle tombait au milieu.
 
-         Posee en bas, elle se serait melee au badge d'etapes et au taux de
-         lecture — trois choses a lire au meme endroit. En haut a droite, elle
-         a sa place et ne pousse rien. -->
-    <button type="button" class="fav-btn${favorisEquipe.has(proc.id) ? ' on' : ''}"
-            data-fav="${proc.id}"
-            aria-label="${favorisEquipe.has(proc.id) ? 'Retirer des favoris' : 'Mettre en favori'}">
+         Mesure a l'ecran : 28 px du haut au lieu de 10.
+
+       ⚠ AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit dans un gabarit, et
+         un seul y fermerait la chaine. -->
+    <button type="button" class="fav-btn${favori ? ' on' : ''}" data-fav="${proc.id}"
+            aria-label="${favori ? 'Retirer des favoris' : 'Mettre en favori'}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
            stroke-linejoin="round" aria-hidden="true">
         <path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85Z"/>
       </svg>
-    </button>
-    <div class="cat-name"><span class="txt">${escapeHtml(proc.titre)}</span></div>
-    <div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans dossier')}</div>
-    <div class="cat-pct-row">
-      <span class="cat-pct" style="color:${lue ? '#30D158' : 'var(--label-3)'};font-size:14px;">
-        ${lue ? 'Lue' : '\u00c0 lire'}</span>
-    </div>`
-  return div
+    </button>`
+
+  el.onclick = (e) => {
+    /* ⚠ L'ETOILE N'OUVRE PAS LA PROCEDURE. Sans ce test, la mettre en favori
+       lancerait la lecture dans la foulee. */
+    const fav = e.target.closest('[data-fav]')
+    if (fav) { e.stopPropagation(); basculerFavori(proc.id, fav); return }
+    openEquipeDetail(proc.id)
+  }
+  return el
 }
+
 
 
 /* Recherche de l'accueil : elle cherche dans toutes les procédures, toutes

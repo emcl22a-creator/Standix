@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=2837051c">
+<link rel="stylesheet" href="style.css?v=34796f47">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -4404,7 +4404,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=f0c7673a"></script>
+<script type="module" src="app.js?v=1470a603"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5295,10 +5295,35 @@ const ICONE_CLOCHE = {
   fill:'M18 8.6a6 6 0 1 0-12 0c0 6.2-2.4 7.4-2.4 7.4h16.8s-2.4-1.2-2.4-7.4ZM13.7 19.8a2 2 0 0 1-3.4 0',
 };
 const ICONE_QR = {
-  /* `plein` : toujours dessine en remplissage, actif ou non. Voir `row()`. */
   plein: true,
-  line:'M4 4h6v6H4z M6.2 6.2h1.6v1.6H6.2z M14 4h6v6h-6z M16.2 6.2h1.6v1.6h-1.6z M4 14h6v6H4z M6.2 16.2h1.6v1.6H6.2z M14.4 14.4h2.6v2.6h-2.6z M17.4 17.4H20V20h-2.6z M14.4 18.6h1.8V20h-1.8z M18.6 14.4H20v1.8h-1.4z',
-  fill:'M4 4h6v6H4z M6.2 6.2h1.6v1.6H6.2z M14 4h6v6h-6z M16.2 6.2h1.6v1.6h-1.6z M4 14h6v6H4z M6.2 16.2h1.6v1.6H6.2z M14.4 14.4h2.6v2.6h-2.6z M17.4 17.4H20V20h-2.6z M14.4 18.6h1.8V20h-1.8z M18.6 14.4H20v1.8h-1.4z',
+
+  /* ⚠ LES TROIS REPERES SONT DES CARRES ARRONDIS, plus des angles vifs.
+
+     L'ancien trace employait `M4 4h6v6H4z` : quatre coins a 90 degres. A vingt
+     pixels dans la barre, ces angles se lisaient plus durs que les autres
+     icones, toutes construites sur des rayons de 2 a 3 px.
+
+   ⚠ ET LE MOTIF DU BAS-DROITE EST SIMPLIFIE. Il portait quatre morceaux
+     distincts — un vrai code QR en miniature. A cette taille, ils se
+     confondaient en une tache : deux carres et un trait suffisent a dire
+     « QR », et se voient.
+
+   ⚠ LE MEME TRACE POUR LE CONTOUR ET LE PLEIN. `plein:true` sort cette icone
+     de la regle commune : un code se reconnait a ses carres PLEINS, sa version
+     au trait n'en avait plus l'air. */
+  line:'M5.6 4h2.8A1.6 1.6 0 0 1 10 5.6v2.8A1.6 1.6 0 0 1 8.4 10H5.6A1.6 1.6 0 0 1 4 8.4V5.6A1.6 1.6 0 0 1 5.6 4z'
+     + ' M15.6 4h2.8A1.6 1.6 0 0 1 20 5.6v2.8A1.6 1.6 0 0 1 18.4 10h-2.8A1.6 1.6 0 0 1 14 8.4V5.6A1.6 1.6 0 0 1 15.6 4z'
+     + ' M5.6 14h2.8A1.6 1.6 0 0 1 10 15.6v2.8A1.6 1.6 0 0 1 8.4 20H5.6A1.6 1.6 0 0 1 4 18.4v-2.8A1.6 1.6 0 0 1 5.6 14z'
+     + ' M15 14h1.4a1 1 0 0 1 1 1v1.4a1 1 0 0 1-1 1H15a1 1 0 0 1-1-1V15a1 1 0 0 1 1-1z'
+     + ' M19 14h1v3.4h-1z'
+     + ' M14 19h6v1h-6z',
+
+  fill:'M5.6 4h2.8A1.6 1.6 0 0 1 10 5.6v2.8A1.6 1.6 0 0 1 8.4 10H5.6A1.6 1.6 0 0 1 4 8.4V5.6A1.6 1.6 0 0 1 5.6 4z'
+     + ' M15.6 4h2.8A1.6 1.6 0 0 1 20 5.6v2.8A1.6 1.6 0 0 1 18.4 10h-2.8A1.6 1.6 0 0 1 14 8.4V5.6A1.6 1.6 0 0 1 15.6 4z'
+     + ' M5.6 14h2.8A1.6 1.6 0 0 1 10 15.6v2.8A1.6 1.6 0 0 1 8.4 20H5.6A1.6 1.6 0 0 1 4 18.4v-2.8A1.6 1.6 0 0 1 5.6 14z'
+     + ' M15 14h1.4a1 1 0 0 1 1 1v1.4a1 1 0 0 1-1 1H15a1 1 0 0 1-1-1V15a1 1 0 0 1 1-1z'
+     + ' M19 14h1v3.4h-1z'
+     + ' M14 19h6v1h-6z',
 };
 
 /* Les icônes suivent la liste en cours : Procédures, QR code, Réglages côté

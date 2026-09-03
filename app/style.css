@@ -15684,3 +15684,86 @@ body.espace-vide .screen.active{ animation:none !important; }
   transition:opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
              filter  1s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ESSAI GRATUIT : FOND NOIR, PLAQUE PLUS GRANDE, DEPLIANT EN TIROIR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ LE FOND PASSE AU NOIR. L'ambre disait « attention » ; l'essai n'est pas un
+   avertissement, c'est ce qu'on offre. Le noir le pose comme une carte, a la
+   maniere de la page Abonnement. */
+.alerte-essai{
+  background:linear-gradient(150deg, #24242C 0%, #131318 60%, #0C0C11 100%);
+  box-shadow:inset 0 0 0 0.5px rgba(255,255,255,0.09),
+             0 8px 22px -14px rgba(10,10,15,0.55);
+}
+.alerte-essai .ess-tx b{ color:#FFFFFF; }
+.alerte-essai .ess-tx i{ color:rgba(255,255,255,0.62); }
+.alerte-essai .ess-tx i b{ color:#FFFFFF; }
+.alerte-essai .ess-p{ color:rgba(255,255,255,0.66); }
+.alerte-essai .ess-p b{ color:#FFFFFF; }
+.alerte-essai .ess-details{ border-top-color:rgba(255,255,255,0.12); }
+.alerte-essai .s{ color:rgba(255,255,255,0.62); }
+.alerte-essai .s b{ color:#FFFFFF; }
+
+/* Le bouton « Details » se detache du noir sans crier. */
+.alerte-essai .ess-plus{
+  background:rgba(255,255,255,0.13);
+  color:rgba(255,255,255,0.86);
+}
+
+/* ⚠ LA PLAQUE PASSE DE 54 A 72 PX. C'est elle qui porte le decompte : elle
+   doit se lire d'un coup d'oeil, avant le titre. */
+.alerte-essai .ess-plaque{
+  flex:0 0 72px; width:72px; height:72px;
+  border-radius:20px;
+}
+.alerte-essai .ess-n{ font-size:29px; }
+.alerte-essai .ess-u{ font-size:10px; margin-top:3px; }
+
+/* ⚠ LE TITRE S'ECARTE MOINS : la plaque a pris dix-huit pixels, le bouton doit
+   les rendre. */
+.alerte-essai .ess-tx b{ padding-right:70px; }
+
+/* ═══ LE DEPLIANT S'OUVRE COMME UN TIROIR ═══
+
+   ⚠ `hidden` LE FAISAIT APPARAITRE D'UN COUP. On anime sa hauteur — mais
+     `height:auto` ne s'anime pas : le navigateur ne sait pas vers quoi aller.
+
+   ⚠ `grid-template-rows` DE 0fr A 1fr LE PERMET. C'est la seule facon d'animer
+     une hauteur inconnue sans la mesurer en JavaScript, et elle marche depuis
+     Safari 16.
+
+   ⚠ L'ENFANT A BESOIN DE `min-height:0` et `overflow:hidden`, sinon il refuse
+     de descendre sous sa hauteur naturelle et le tiroir ne se ferme pas. */
+.alerte-essai .ess-details{
+  display:grid;
+  grid-template-rows:1fr;
+  transition:grid-template-rows 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+             opacity 0.28s ease,
+             margin-top 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+             padding-top 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.alerte-essai .ess-details > *{ min-width:0; }
+
+/* ⚠ ON N'EMPLOIE PLUS `hidden` : il coupe l'element du rendu, donc de toute
+   animation. Une classe le remplace. */
+.alerte-essai .ess-details.replie{
+  grid-template-rows:0fr;
+  opacity:0;
+  margin-top:0;
+  padding-top:0;
+  border-top-color:transparent;
+}
+
+/* L'enveloppe qui se comprime. */
+.alerte-essai .ess-dedans{
+  overflow:hidden;
+  min-height:0;
+  display:flex; flex-direction:column; gap:9px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .alerte-essai .ess-details{ transition:none; }
+}

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=64bb4bea">
+<link rel="stylesheet" href="style.css?v=7d6e05ab">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3519,6 +3519,11 @@
 
                Le texte ci-dessous n'est qu'un repli, visible une fraction de
                seconde avant le premier chargement. -->
+<!-- ⚠ CE TEXTE EST FIXE, PLUS ECRIT PAR LE SCRIPT.
+
+               Il portait « Il vous reste 3 procedures a lire », retire depuis.
+               La ligne est maintenant une description de la page, comme cote
+               gestion — elle ne change pas d'un chargement a l'autre. -->
           <p id="e-compte">Suivez toutes les procédures<br>de votre organisation.</p>
         </div>
 
@@ -4424,7 +4429,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=476ec556"></script>
+<script type="module" src="app.js?v=701e892a"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5415,6 +5420,24 @@ const BAR_D = 2 * Math.sqrt(BAR_K);   // amortissement critique, zero rebond
    On l'initialise a sa valeur d'arrivee. La boucle continue de l'animer quand
    on entre ou sort de l'apercu — mais plus au demarrage. */
 let apercuT = (localStorage.getItem('procedo_espace') === 'equipe') ? 1 : 0;
+
+/* ⚠ `app.js` POSE CETTE VALEUR AVANT DE MONTRER LA BARRE.
+
+   La lecture ci-dessus couvre le rechargement d'une session existante. Mais a
+   la PREMIERE connexion, `procedo_espace` n'est pas encore ecrite : la barre
+   repartait de 0 et s'etirait depuis la gauche.
+
+   `afficherCoquille` connait l'espace a ce moment-la — elle appelle donc cette
+   fonction juste avant. */
+/* ⚠ ON NE POSE QUE `apercuT`, PAS DE CIBLE FORCEE.
+
+   `apercuCible` se recalcule seule a chaque image, en lisant si l'espace
+   utilisateur est affiche. Elle sera donc juste des la premiere boucle : il
+   suffit que la valeur de DEPART le soit aussi, pour qu'il n'y ait rien a
+   rattraper. */
+window.poserEtirementBarre = function(v) {
+  apercuT = v;
+};
 let barFollow = 0;
 let barVel = 0;
 // avant tout clic, la barre reste au repos

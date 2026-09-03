@@ -11080,7 +11080,50 @@ document.addEventListener('click', (e) => {
   }
   document.getElementById('e-proc-filtre')?.setAttribute('aria-expanded', String(ouvrir))
 })
-wireSortDropdown('dd-e-proc-sort', (sort) => { equipeProcSort = sort; renderEquipeCatListe() })
+/* ═══ LE TRI DE LA PAGE D'UN DOSSIER, COTE EQUIPE ═══
+
+   ⚠ `wireSortDropdown` VISAIT LE MENU DEROULANT, qui n'existe plus. Le volet
+     de la gestion a pris sa place — meme bouton, meme apparence.
+
+   ⚠ ET C'EST LE MEME ECOUTEUR QUE POUR LA PAGE DES DOSSIERS, a l'identifiant
+     pres. Deux mecaniques differentes pour un meme geste finiraient par
+     diverger. */
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('#e-cat-filtre')
+  const choix = e.target.closest('#e-cat-tri-volet .tb-v-tri')
+  const volet = document.getElementById('e-cat-tri-volet')
+  if (!volet) return
+
+  if (!bouton && !choix) {
+    if (volet.classList.contains('ouvert')) {
+      volet.classList.remove('ouvert')
+      setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+      document.getElementById('e-cat-filtre')?.setAttribute('aria-expanded', 'false')
+    }
+    return
+  }
+
+  if (choix) {
+    equipeProcSort = choix.dataset.tri
+    volet.querySelectorAll('.tb-v-tri').forEach(x => x.classList.remove('on'))
+    choix.classList.add('on')
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+    document.getElementById('e-cat-filtre')?.setAttribute('aria-expanded', 'false')
+    renderEquipeCatListe()
+    return
+  }
+
+  const ouvrir = !volet.classList.contains('ouvert')
+  if (ouvrir) {
+    volet.hidden = false
+    requestAnimationFrame(() => volet.classList.add('ouvert'))
+  } else {
+    volet.classList.remove('ouvert')
+    setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
+  }
+  document.getElementById('e-cat-filtre')?.setAttribute('aria-expanded', String(ouvrir))
+})
 
 wireSortDropdown('dd-membres-sort', (valeur) => {
   triMembres = valeur
@@ -20166,78 +20209,143 @@ function procsVuesRecemment() {
     .map(v => v.procedure_id)
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'UN DOSSIER, COTE EQUIPE
+
+   ⚠ LA MEME FORME QUE COTE GESTION, aux badges pres. Plaque coloree a gauche,
+     nom, badge et compteur en bas — `cat-cell cat-cell--ligne`.
+
+   ⚠ LE BADGE DIT « a lire », PAS « En ligne ». L'equipe ne voit que le publie :
+     un badge « En ligne » serait vrai partout et ne renseignerait personne.
+
+   ⚠ ET PAS DE BOUTON « ⋯ ». Il ouvre le menu qui renomme ou supprime un
+     dossier ; un employe n'a pas ces droits.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function carteDossierEquipe(nom, procs, reste, rang) {
+  const cell = document.createElement('div')
+  cell.className = 'cat-cell cat-cell--ligne'
+  cell.dataset.key = nom
+  animerApparition(cell, rang)
+  const teinte = couleurDossier(rang)
+
+  cell.innerHTML = `
+    <span class="cl-pl" style="background:${fondPlaque(teinte)}">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="${traceIconeDossier(nom)}" stroke="url(#pal${teinte.i})"
+              stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span class="cl-co">
+      <span class="cl-tete">
+        <span class="cl-nm">${escapeHtml(nom)}</span>
+        <span class="proc-fl">\u203a</span>
+      </span>
+      <span class="cl-bas">
+        ${reste
+          ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${reste} \u00e0 lire</span>`
+          : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
+        <span class="cl-n">${procs.length} proc\u00e9dure${procs.length > 1 ? 's' : ''}</span>
+      </span>
+    </span>`
+
+  cell.onclick = () => openEquipeCategorie(nom)
+  return cell
+}
+
 function renderEquipeCategories() {
   const grille = document.getElementById('e-cat-grid')
   if (!grille) return
   grille.innerHTML = ''
 
-  /* ⚠ LE COMPTE DE DOSSIERS S'ECRIT ICI, LUI.
-
-     La ligne de compte de la PAGE — « Il vous reste 3 procedures » — reste a
-     `renderEquipeAccueil` : deux fonctions sur la meme ligne se
-     contrediraient. Mais le nombre de DOSSIERS est une autre ligne, et c'est
-     cette fonction qui les connait.
-
-   ⚠ ET AVANT TOUTE SORTIE. Meme piege que cote gestion : la branche « aucune
-     procedure » sortait sans y toucher, et la ligne gardait le chiffre
-     precedent. */
-  const nbDossiers = new Set(
-    (allEquipeProcedures || []).map(p => p.categorie || 'Sans dossier')).size
   const nbEl = document.getElementById('e-proc-nb-dossiers')
-  if (nbEl) {
-    nbEl.textContent = nbDossiers
-      ? `${nbDossiers} dossier${nbDossiers > 1 ? 's' : ''}`
-      : 'Aucun dossier'
+
+  /* ⚠ L'ICONE DE LA LIGNE DE COMPTAGE SUIT CE QU'ON COMPTE.
+
+     Un dossier quand on liste des dossiers, un document quand on liste des
+     procedures. C'est ce que fait `poserIconeRang` cote gestion — on reprend
+     les memes traces. */
+  const poserIconeRang = (procedures) => {
+    const ic = document.getElementById('e-proc-rang-ic')
+    if (!ic) return
+    ic.innerHTML = procedures
+      ? `<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"></path>
+         <path d="M13.6 3.4v5h5"></path><path d="M8.8 13h6.4"></path><path d="M8.8 16.4h4.2"></path>`
+      : `<path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path>`
   }
 
-
   if (!allEquipeProcedures.length) {
-    grille.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-      <h3>Aucune procédure</h3><p>Votre responsable vous prévient dès qu'il en publie une.</p></div>`
+    if (nbEl) nbEl.textContent = 'Aucun dossier'
+    poserIconeRang(false)
+    grille.innerHTML = '<div class="cl-rien">Aucune procédure publiée pour le moment.' +
+      '<span class="cl-rien-suite">Votre responsable vous prévient dès qu’il en publie une.</span></div>'
     return
   }
 
-  /* ⚠ CE BLOC DOIT VENIR AVANT `parCat`, ET C'EST TOUT LE DEFAUT.
+  const q = (rechercheEquipe || '').trim()
+  const termes = q ? sansAccents(q).split(/\s+/).filter(Boolean) : []
 
-     Je l'avais pose plus bas, a cote de la recherche. Or `parCat` appelle
-     `gardee` quatre cents caracteres plus haut : `const` n'est pas remonte
-     comme `function`, et le navigateur refusait le fichier entier —
-     « Cannot access 'gardee' before initialization ».
+  /* ═══════════════════════════════════════════════════════════════════════
+     « FAVORIS » ET « VUES RECEMMENT » DONNENT UNE LISTE DE PROCEDURES
 
-   ⚠ LE SEGMENT FILTRE LES PROCEDURES, PAS LES DOSSIERS.
+     ⚠ ET NON DES DOSSIERS FILTRES, comme je l'avais fait d'abord.
 
-     « Favoris » ne veut pas dire « dossiers favoris » : on garde les dossiers
-     qui CONTIENNENT au moins une procedure favorite, et l'on n'y montre
-     qu'elles. */
-  const recentes = segmentEquipe === 'recentes' ? procsVuesRecemment() : null
-  const gardee = (p) => {
-    if (segmentEquipe === 'favoris') return favorisEquipe.has(p.id)
-    if (segmentEquipe === 'recentes') return recentes.includes(p.id)
-    return true
+       C'est exactement ce que fait la gestion : « Toutes » montre les
+       dossiers, « En ligne » et « Brouillons » montrent une liste plate de
+       procedures. On reprend cette regle a l'identique.
+
+       Un favori designe UNE procedure ; la montrer dans son dossier obligeait
+       a ouvrir le dossier pour la trouver.
+     ═══════════════════════════════════════════════════════════════════════ */
+  if (segmentEquipe !== 'tout') {
+    const recentes = segmentEquipe === 'recentes' ? procsVuesRecemment() : null
+    const vus = new Set()
+    const liste = []
+
+    /* ⚠ L'ORDRE DES RECENTES EST CELUI DE LECTURE, pas alphabetique : c'est
+       tout le sens de « recemment ». On parcourt donc `recentes` plutot que
+       les procedures. */
+    const source = segmentEquipe === 'recentes'
+      ? recentes.map(id => allEquipeProcedures.find(p => p.id === id)).filter(Boolean)
+      : allEquipeProcedures.filter(p => favorisEquipe.has(p.id))
+
+    for (const p of source) {
+      if (vus.has(p.id)) continue
+      if (termes.length && !termes.some(t => sansAccents(p.titre || '').includes(t))) continue
+      vus.add(p.id)
+      liste.push({ proc: p, dossier: p.categorie || 'Sans dossier' })
+    }
+
+    if (nbEl) {
+      nbEl.textContent = liste.length
+        ? `${liste.length} procédure${liste.length > 1 ? 's' : ''}`
+        : 'Aucune procédure'
+    }
+    poserIconeRang(true)
+
+    if (!liste.length) {
+      grille.innerHTML = '<div class="cl-rien">' + (segmentEquipe === 'favoris'
+        ? 'Aucun favori pour le moment.<span class="cl-rien-suite">Touchez l’étoile sur une procédure pour la retrouver ici.</span>'
+        : 'Aucune procédure lue pour le moment.<span class="cl-rien-suite">Les quatre dernières que vous ouvrirez apparaîtront ici.</span>')
+        + '</div>'
+      return
+    }
+
+    liste.forEach(({ proc, dossier }, rang) =>
+      grille.appendChild(ficheEquipe(proc, rang, dossier)))
+    return
   }
 
+  /* ═══ « TOUTES » : LES DOSSIERS ═══ */
   const parCat = {}
-  allEquipeProcedures.filter(gardee).forEach(p => {
+  allEquipeProcedures.forEach(p => {
     const nom = p.categorie || 'Sans dossier'
     if (!parCat[nom]) parCat[nom] = []
     parCat[nom].push(p)
   })
 
-  /* Le même tri que côté gestion, plus une entrée propre à l'employé :
-     « À lire d'abord » remonte les dossiers où il lui reste le plus à lire. */
   const dateCat = (n) => Math.max(...parCat[n].map(p => new Date(p.created_at || 0).getTime()))
   const resteCat = (n) => parCat[n].filter(p => !equipeLues.has(p.id)).length
 
-  /* ⚠ LA RECHERCHE PORTE SUR LE DOSSIER ET SUR SES PROCEDURES.
-
-     Chercher « friteuse » doit trouver le dossier « Cuisine » s'il contient
-     une procedure de ce nom : sinon il faudrait deja savoir dans quel dossier
-     regarder, ce qui vide la recherche de son interet.
-
-   ⚠ SANS ACCENTS NI CASSE. « Cafe » doit trouver « Café » — c'est ce que fait
-     `sansAccents` cote gestion, on emploie la meme. */
-  const q = (rechercheEquipe || '').trim()
-  const termes = q ? sansAccents(q).split(/\s+/).filter(Boolean) : []
   const correspond = (nom) => {
     if (!termes.length) return true
     const n = sansAccents(nom)
@@ -20252,9 +20360,10 @@ function renderEquipeCategories() {
       ? `${visibles.length} dossier${visibles.length > 1 ? 's' : ''}`
       : (termes.length ? 'Aucun résultat' : 'Aucun dossier')
   }
+  poserIconeRang(false)
 
-  if (!visibles.length && termes.length) {
-    grille.innerHTML = '<div class="cl-rien">Aucune procédure ne correspond à « ' +
+  if (!visibles.length) {
+    grille.innerHTML = '<div class="cl-rien">Aucun dossier ne correspond à « ' +
       escapeHtml(q) + ' ».</div>'
     return
   }
@@ -20263,52 +20372,8 @@ function renderEquipeCategories() {
     if (equipeCatSort === 'new') return dateCat(b) - dateCat(a)
     if (equipeCatSort === 'old') return dateCat(a) - dateCat(b)
     return a.localeCompare(b, 'fr')
-  }).forEach((nom, rang) => {
-    const procs = parCat[nom]
-    const lues = procs.filter(p => equipeLues.has(p.id)).length
-    const reste = procs.length - lues
-
-    /* ⚠ LA MEME CARTE QUE COTE GESTION, au badge pres.
-
-       L'ancienne avait sa propre forme : anneau de progression, icone dans un
-       carre, chevron a droite. Deux presentations pour la meme chose — un
-       employe qui passe d'un espace a l'autre devait reapprendre a lire.
-
-       On reprend `cat-cell--ligne` : meme plaque coloree, meme titre, meme
-       ligne du bas.
-
-     ⚠ LE BADGE, LUI, DIT AUTRE CHOSE. Cote gestion il annonce « 2 brouillons »
-       ou « En ligne » — l'equipe ne voit que du publie, ces mots n'ont pas de
-       sens ici. Il dit donc ce qui la concerne : ce qui reste a lire. */
-    const cell = document.createElement('div')
-    cell.className = 'cat-cell cat-cell--ligne'
-    cell.dataset.key = nom
-    animerApparition(cell, rang)
-    const teinte = couleurDossier(rang)
-
-    cell.innerHTML = `
-      <span class="cl-pl" style="background:${fondPlaque(teinte)}">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="${traceIconeDossier(nom)}" stroke="url(#pal${teinte.i})"
-                stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
-        </svg>
-      </span>
-      <span class="cl-co">
-        <span class="cl-tete">
-          <span class="cl-nm">${escapeHtml(nom)}</span>
-        </span>
-        <span class="cl-bas">
-          ${reste
-            ? `<span class="cl-badge"><i style="background:#3A78EE"></i>${
-                reste} \u00e0 lire</span>`
-            : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
-          <span class="cl-n">${procs.length} proc\u00e9dure${procs.length > 1 ? 's' : ''}</span>
-        </span>
-      </span>
-    `
-    cell.onclick = () => openEquipeCategorie(nom)
-    grille.appendChild(cell)
-  })
+  }).forEach((nom, rang) =>
+    grille.appendChild(carteDossierEquipe(nom, parCat[nom], resteCat(nom), rang)))
 }
 
 /* Écran d'une dossier : ses procédures, avec sa propre recherche. */
@@ -20418,6 +20483,21 @@ function renderEquipeCatListe() {
   document.getElementById('e-cat-sous').textContent =
     `${dansCat.length} procédure${dansCat.length > 1 ? 's' : ''} · ${lues} lue${lues > 1 ? 's' : ''}`
 
+  /* ⚠ LA LIGNE DE COMPTAGE, comme cote gestion.
+
+     Le sous-titre dit deja « 1 procedure · 0 lue » ; celle-ci compte ce qui est
+     REELLEMENT liste, sous-dossiers compris. Les deux ne disent pas la meme
+     chose : une recherche fait tomber la seconde, pas la premiere. */
+  const nbEl = document.getElementById('e-cat-nb-elements')
+  if (nbEl) {
+    const sd = new Set(vues.map(p => (p.sous_categorie || '').trim()).filter(Boolean)).size
+    const seules = vues.filter(p => !(p.sous_categorie || '').trim()).length
+    const bouts = []
+    if (sd) bouts.push(`${sd} sous-dossier${sd > 1 ? 's' : ''}`)
+    if (seules) bouts.push(`${seules} procédure${seules > 1 ? 's' : ''}`)
+    nbEl.textContent = bouts.join(' · ') || 'Aucun élément'
+  }
+
   listEl.innerHTML = ''
   if (!vues.length) {
     listEl.innerHTML = `<div class="empty-state"><h3>Aucun résultat</h3><p>Aucune procédure ne correspond à votre recherche.</p></div>`
@@ -20520,7 +20600,12 @@ async function basculerFavori(procId, bouton) {
   if (segmentEquipe === 'favoris') renderEquipeCategories()
 }
 
-function ficheEquipe(proc, rang = 0) {
+/* ⚠ `dossier` EST FACULTATIF, et il ne sert que dans les listes plates.
+
+   Dans un dossier, ecrire son nom sur chaque carte serait redondant. Dans
+   « Favoris » ou « Vues recemment », c'est au contraire la seule facon de
+   savoir d'ou vient la procedure. */
+function ficheEquipe(proc, rang = 0, dossier = null) {
   /* ⚠ LA MEME FORME QUE COTE GESTION : `cat-cell cat-cell--ligne`, plaque
      coloree a gauche, nom, badge en bas. Elle etait en `card proc-rich-card`,
      une carte plus haute avec un anneau — deux presentations pour une meme
@@ -20558,7 +20643,9 @@ function ficheEquipe(proc, rang = 0) {
         ${lue
           ? `<span class="cl-badge"><i style="background:#34C759"></i>Lue</span>`
           : `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Pas encore lue"></span><i style="background:#3A78EE"></i>À lire</span>`}
-        <span class="cl-n">${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}</span>
+        <span class="cl-n">${dossier
+          ? escapeHtml(dossier)
+          : `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`}</span>
       </span>
     </span>
 

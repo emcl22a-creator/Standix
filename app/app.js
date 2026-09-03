@@ -7321,11 +7321,27 @@ async function loadGestionProcedures() {
          « Aucune procedure » constate ; le bouton « + » est en haut a droite,
          loin du regard de quelqu'un qui vient de lire une phrase centree au
          milieu de l'ecran. La seconde ligne fait le lien. */
+      /* ⚠ L'ASTUCE DU QR CODE A ETE RETIREE.
+
+         Elle s'ajoutait sous l'invite du bouton « + » : deux conseils l'un
+         sous l'autre sur un ecran vide, dont un qui parle d'une etape qu'on
+         n'a pas encore atteinte. On ne colle pas de QR code avant d'avoir une
+         procedure. */
       '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.' +
       '<span class="cl-rien-suite">Touchez le bouton <b>+</b> en haut \u00e0 droite ' +
-      'pour cr\u00e9er une proc\u00e9dure.</span></div>' +
-      '<div class="cl-astuce">Collez un QR code l\u00e0 o\u00f9 le geste se fait : ' +
-      'on scanne, la proc\u00e9dure s\u2019ouvre.</div>'    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
+      'pour cr\u00e9er une proc\u00e9dure.</span></div>'
+
+    /* ⚠ ET LE COMPTE DE DOSSIERS DOIT SUIVRE.
+
+       Cette branche ecrit directement dans la grille, sans passer par
+       `renderCategoryGrid` — donc sans toucher au compte. Or celui-ci vient
+       d'etre peint depuis la COPIE LOCALE, qui date d'avant : on lisait
+       « 3 dossiers » au-dessus de « aucune procedure ».
+
+       Un dossier n'existe que porte par une procedure. Zero procedure, zero
+       dossier. */
+    const nbEl = document.getElementById('proc-nb-dossiers')
+    if (nbEl) nbEl.textContent = 'Aucun dossier'    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
        entreprise sans procédure laissait en mémoire les lectures de la
        précédente : la carte du haut annonçait « 4 min de formation » pendant
        que les trois sections en dessous disaient « aucun membre » et
@@ -10487,7 +10503,7 @@ function renderCategoryGrid() {
   if (nb) {
     nb.textContent = visibles.length
       ? `${visibles.length} dossier${visibles.length > 1 ? 's' : ''}`
-      : '0 dossier'
+      : 'Aucun dossier'
   }
   poserIconeRang(false)
 
@@ -11556,6 +11572,8 @@ window.ouvrirEtapesManuelles = async function(procId) {
     ? 'Annuler les modifications' : 'Tout effacer'
   el('create-error-manual').textContent = ''
   el('man-entete').style.display = manEdition ? 'block' : 'none'
+  const noteM = el('man-note-verrou')
+  if (noteM) noteM.hidden = !manEdition
 
   if (!manEdition) {
     /* En création, on reprend ce qui a été saisi sur l'écran précédent. */
@@ -17155,6 +17173,10 @@ window.ouvrirMontageVideo = async function(procId) {
     ? "Vos changements ne partent qu'\u00e0 l'enregistrement"
     : 'Marquez le d\u00e9but et la fin de chaque \u00e9tape'
   el('dv-entete').style.display = dvEdition ? 'block' : 'none'
+  /* ⚠ SEULEMENT EN MODIFICATION. A la creation, la procedure n'existe pas
+     encore : personne d'autre ne peut la tenir. */
+  const noteV = el('dv-note-verrou')
+  if (noteV) noteV.hidden = !dvEdition
 
   if (!dvEdition) return
 

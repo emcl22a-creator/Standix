@@ -16171,3 +16171,52 @@ body.espace-vide .screen.active{ animation:none !important; }
   color:var(--label-3);
 }
 .tb-v-qui:empty{ display:none; }
+
+
+/* ⚠ LA MEME MISE EN LIGNE POUR LA PAGE D'UN DOSSIER.
+
+   La regle ne visait que `#e-cat-grid` — la liste des dossiers. La page d'UN
+   dossier emploie `#equipe-procedures-list`, qui n'etait pas couvert : ses
+   cartes retombaient en colonne, plaque au-dessus du nom.
+
+   C'est le defaut de votre capture.
+
+ ⚠ ET LA GRILLE DES SOUS-DOSSIERS AUSSI. `.sd-grille` empile ses cartes en
+   colonne — c'est voulu pour la LISTE, mais chaque carte doit rester en ligne
+   a l'interieur. */
+#equipe-procedures-list .cat-cell,
+#equipe-procedures-list .sd-grille .cat-cell{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:15px;
+  padding:18px 18px 17px;
+  border-radius:16px;
+}
+
+
+/* ⚠ L'ETOILE PASSE AU BLEU, celui de « Generer les etapes ».
+
+   Elle etait doree — la couleur des favoris ailleurs, mais etrangere a cette
+   app : l'ambre y sert aux avertissements, et le dore n'apparait nulle part.
+
+   Le degrade ne peut pas remplir un trace SVG directement : on le pose en
+   fond, et le trace sert de masque. C'est la meme technique que les initiales
+   d'etablissement. */
+.cat-cell .fav-btn.on{
+  color:transparent;
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  -webkit-mask:var(--fav-masque) center / 19px 19px no-repeat;
+  mask:var(--fav-masque) center / 19px 19px no-repeat;
+  border-radius:0;
+}
+
+/* ⚠ LE MASQUE EST L'ETOILE ELLE-MEME, en SVG encode.
+
+   `mask` prend une image : on lui donne l'etoile pleine, et le degrade ne se
+   voit qu'a travers elle. Le `svg` du bouton devient inutile — on le cache. */
+.cat-cell .fav-btn.on svg{ visibility:hidden; }
+
+:root{
+  --fav-masque: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23000' d='M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85Z'/%3E%3C/svg%3E");
+}

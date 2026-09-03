@@ -16003,3 +16003,103 @@ body.espace-vide .screen.active{ animation:none !important; }
   letter-spacing:-0.015em;
   color:var(--label-3);
 }
+
+
+/* ⚠ LA GRILLE DE L'EQUIPE PASSE EN COLONNE UNIQUE.
+
+   Elle portait `.cat-grid` — deux colonnes, hérité des anciennes cartes
+   carrees. Les nouvelles cartes sont des LIGNES : a moitie de largeur, le nom
+   du dossier et le nombre de procedures se chevauchaient, visible sur le
+   rendu.
+
+ ⚠ ON REPREND LES MESURES DE `#cat-grid`, la grille de la gestion : meme
+   empilement, meme espacement de 16 px. C'est le but — que les deux espaces
+   se lisent pareil.
+
+ ⚠ ET ON ANNULE LE CADRE. `#e-cat-grid` avait un rembourrage et un arrondi qui
+   dessinaient une boite autour des cartes ; cote gestion, les cartes flottent
+   directement sur le fond. */
+#e-cat-grid{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  padding:0;
+  border-radius:0;
+  background:none;
+  box-shadow:none;
+}
+
+
+/* ⚠ LA SURCHARGE DE L'EQUIPE EST ANNULEE.
+
+   `#e-cat-grid .cat-cell` imposait `flex-direction:column` et un rembourrage :
+   c'etait la mise en page des anciennes cartes carrees, plaque au-dessus du
+   titre.
+
+   Cote gestion, la carte n'a AUCUNE regle propre — elle se dispose en ligne
+   par le seul jeu de `.cl-pl` et `.cl-co`. On remet donc l'equipe dans ce cas
+   general plutot que d'ajouter une regle de plus.
+
+ ⚠ ON NE SUPPRIME PAS L'ANCIENNE : elle est plus haut dans le fichier, et la
+   retirer sur place risquerait d'emporter du texte voisin. On l'ecrase. */
+/* ⚠ LES MEMES MESURES QUE LA CARTE DE GESTION, relevees a l'ecran :
+   18 px de rembourrage, 15 px entre la plaque et le texte.
+
+   Mon `padding:0` collait la plaque au bord — visible sur le rendu. */
+#e-cat-grid .cat-cell{
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  gap:15px;
+  padding:18px 18px 17px;
+  border-radius:16px;
+}
+
+
+/* ═══ L'ETOILE DES FAVORIS ═══
+
+   ⚠ EN HAUT A DROITE DE LA CARTE, hors du flux : posee dans le contenu, elle
+     decalerait le titre.
+
+   ⚠ ET GRISE TANT QU'ELLE N'EST PAS ACTIVE. Une etoile pleine des le depart
+     laisserait croire que tout est deja en favori. */
+.proc-rich-card{ position:relative; }
+
+.fav-btn{
+  position:absolute;
+  top:12px; right:12px;
+  z-index:2;
+  width:32px; height:32px;
+  display:grid; place-items:center;
+  border:none; border-radius:100px;
+  background:transparent;
+  color:var(--label-3);
+  padding:0;
+}
+.fav-btn svg{ width:19px; height:19px; }
+.fav-btn:active{ transform:scale(0.88); }
+
+/* ⚠ PLEINE ET DOREE UNE FOIS POSEE. Le remplissage compte autant que la
+   couleur : a dix-neuf pixels, un contour dore se lit mal. */
+.fav-btn.on{
+  color:#F5A623;
+}
+.fav-btn.on svg{
+  fill:#F5A623;
+  stroke:#F5A623;
+}
+
+
+/* ⚠ « Vues recemment » EST PLUS LONG QUE LES ONGLETS DE LA GESTION.
+
+   Mesure a l'ecran : il debordait de la pilule. Les trois onglets se partagent
+   la largeur a parts egales, et le libelle le plus long impose sa taille.
+
+   Un point de moins et un rembourrage plus serre lui rendent la place, sans
+   toucher aux onglets de la gestion. */
+#e-proc-segm .p-seg{
+  font-size:12.5px;
+  padding-left:6px;
+  padding-right:6px;
+  white-space:nowrap;
+}

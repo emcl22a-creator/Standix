@@ -4237,7 +4237,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=73fb738f"></script>
+<script type="module" src="app.js?v=57c1979b"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5387,6 +5387,45 @@ function rebuild() {
       contentW[i] = t.querySelector('span').getBoundingClientRect().width;
     });
   });
+}
+
+/* ⚠ `rebuild` DOIT ETRE JOIGNABLE DEPUIS `app.js`.
+
+   Elle vit dans le bloc `<script>` de cette page ; `app.js` est un module,
+   avec sa propre portee. Sans cette ligne, `window.rebuild?.()` ne trouvait
+   rien et l'appel disparaissait en silence. */
+window.rebuild = rebuild
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE SE REMESURE QUAND LES POLICES ARRIVENT
+
+   ⚠ ELLE SE CONSTRUIT AVANT QUE `Inter` SOIT CHARGEE.
+
+     `layout()` et `row()` mesurent la largeur de chaque libelle pour placer les
+     onglets et la capsule. Au premier affichage, le navigateur n'a pas encore
+     recu la police : il mesure « Procedures » dans la police de secours, plus
+     large ou plus etroite de plusieurs pixels.
+
+     Quand `Inter` arrive, le texte est repeint a sa vraie largeur — mais les
+     positions restent celles d'avant. Les libelles se chevauchent, la capsule
+     tombe a cote : exactement l'ecran que vous avez photographie.
+
+   ⚠ CELA N'ARRIVE QU'AU PREMIER CHARGEMENT, quand la police n'est pas encore
+     en cache. C'est pour cela que le defaut est intermittent.
+
+   ⚠ `document.fonts.ready` REND UNE PROMESSE, tenue quand toutes les polices
+     de la page sont pretes. Elle est deja tenue si elles etaient en cache :
+     dans ce cas on remesure une fois pour rien, ce qui ne coute rien.
+   ═══════════════════════════════════════════════════════════════════════════ */
+if (document.fonts && document.fonts.ready) {
+  document.fonts.ready.then(() => {
+    /* ⚠ DEUX IMAGES D'ATTENTE. La promesse est tenue des que la police est
+       decodee, mais le texte n'est repeint qu'a l'image suivante : mesurer
+       tout de suite donnerait encore les anciennes largeurs. */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (document.getElementById('bar')) rebuild()
+    }))
+  }).catch(() => {})
 }
 rebuild();
 let rt = 0;

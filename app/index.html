@@ -1,4 +1,16 @@
 <!DOCTYPE html><html lang="fr"><head>
+  <!-- ⚠ LA RESTAURATION DU DEFILEMENT EST COUPEE AVANT TOUT LE RESTE.
+
+       Elle l'etait dans `app.js` — un module, donc execute apres le parsing du
+       document. Le navigateur avait alors deja remis la page ou elle etait a
+       la visite precedente : sur un lien partage, cela envoyait en bas de la
+       page « Bienvenue ».
+
+       Ici, dans l'en-tete, cette ligne tourne avant que le corps existe. -->
+  <script>
+    try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual' } catch (e) {}
+  </script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <!-- ═══ NE PAS GARDER CETTE PAGE EN CACHE ═══
@@ -119,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=37dfa846">
+<link rel="stylesheet" href="style.css?v=9827c72f">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1122,6 +1134,13 @@
         <div class="tb-v-tete">
           <span class="tb-v-ent" id="tb-ent-gestion">—</span>
           <span class="tb-v-role" id="tb-role-gestion">—</span>
+          <!-- ⚠ LE NOM DE LA PERSONNE, SOUS L'ESPACE.
+
+               Le volet disait de quelle entreprise il s'agit et dans quel
+               espace on se trouve — mais pas QUI. Sur un telephone partage
+               entre deux membres d'equipe, c'est la premiere chose a
+               verifier avant de toucher quoi que ce soit. -->
+          <span class="tb-v-qui" id="tb-qui-gestion"></span>
           <!-- ⚠ SEULEMENT COTE GESTION. L'espace Equipe n'a pas ce bouton :
                lui montrer la meme phrase l'enverrait chercher un oeil qui
                n'existe pas chez lui. Le volet de l'equipe est un autre bloc,
@@ -3421,6 +3440,13 @@
         <div class="tb-v-tete">
           <span class="tb-v-ent" id="tb-ent-equipe">—</span>
           <span class="tb-v-role" id="tb-role-equipe">—</span>
+          <!-- ⚠ LE NOM DE LA PERSONNE, SOUS L'ESPACE.
+
+               Le volet disait de quelle entreprise il s'agit et dans quel
+               espace on se trouve — mais pas QUI. Sur un telephone partage
+               entre deux membres d'equipe, c'est la premiere chose a
+               verifier avant de toucher quoi que ce soit. -->
+          <span class="tb-v-qui" id="tb-qui-equipe"></span>
         </div>
         <div class="tb-v-filet"></div>
         <button type="button" class="tb-v-opt tb-v-opt--sortie" data-deconnexion>
@@ -3530,17 +3556,30 @@
             </svg>
             <span id="e-proc-nb-dossiers">Aucun dossier</span>
           </span>
-          <div class="dd-filter" id="dd-e-cat-sort">
-        <button type="button" class="dd-trigger" id="dd-e-cat-sort-trigger">
-          <span id="dd-e-cat-sort-label">Trier : A → Z</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="dd-menu" id="dd-e-cat-sort-menu">
-          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
-          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
-          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
-        </div>
-      </div>
+          <!-- ⚠ LE MEME BOUTON QUE COTE GESTION : une icone de curseurs qui ouvre
+               un volet, pas un menu deroulant avec son libelle.
+
+               L'ancien affichait « Trier : A → Z » en toutes lettres — plus
+               large que la ligne, et l'on lisait le reglage avant le nombre de
+               dossiers qui compte davantage. -->
+          <button type="button" class="proc-filtre" id="e-proc-filtre"
+                  aria-label="Trier les dossiers" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linecap="round">
+              <path d="M3 7.5h11M18.5 7.5H21M3 16.5h2.5M10 16.5h11"></path>
+              <circle cx="16" cy="7.5" r="2.5"></circle>
+              <circle cx="7.5" cy="16.5" r="2.5"></circle>
+            </svg>
+          </button>
+
+          <div class="tb-volet tb-volet--tri glassDiv" id="e-proc-tri-volet" role="menu" hidden>
+            <button type="button" class="tb-v-opt tb-v-tri on" data-tri="az">
+              <span class="tb-v-coche">✓</span>Nom A → Z</button>
+            <button type="button" class="tb-v-opt tb-v-tri" data-tri="new">
+              <span class="tb-v-coche">✓</span>Plus récent d’abord</button>
+            <button type="button" class="tb-v-opt tb-v-tri" data-tri="old">
+              <span class="tb-v-coche">✓</span>Plus ancien d’abord</button>
+          </div>
         </div>
 
       <!-- ⚠ LE TITRE « Dossiers » A ETE RETIRE : la ligne de compte juste
@@ -3838,27 +3877,15 @@
     <div class="reg-note">La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.</div>
   </div>
 
-  <!-- ═══════════════════════════════════════════════════════════════════
-       LES NOTIFICATIONS DE L'EQUIPE
+  <!-- ⚠ L'ECRAN « Notifications » A ETE RETIRE.
 
-       ⚠ ELLES LISTENT LES PROCEDURES RECEMMENT PUBLIEES. C'est la seule chose
-         qui concerne vraiment un membre d'equipe et qu'il ne peut pas deviner :
-         une procedure a change, ou une nouvelle est arrivee.
+           Il listait les procedures publiees dans les trente derniers jours.
+           La page Procedures dit deja la meme chose, et mieux : un point bleu
+           sur ce qui n'a pas ete ouvert, un onglet « Vues recemment » pour
+           l'inverse.
 
-         `publiee_le` porte cette date, et l'espace equipe la charge deja pour
-         filtrer ce qu'il affiche — il n'y a pas de table a creer.
-
-       ⚠ CE N'EST PAS UN JOURNAL D'ACTIVITE. Les arrivees et departs de
-         collegues regardent la gestion, pas l'equipe : les montrer ici
-         donnerait le sentiment d'etre surveille, ou de surveiller.
-       ═══════════════════════════════════════════════════════════════════ -->
-  <div class="screen" inert id="e-notifs">
-    <div class="page-tete">
-      <h1>Notifications</h1>
-      <p>Les procédures publiées<br>ou mises à jour récemment.</p>
-    </div>
-    <div id="e-notifs-liste"></div>
-  </div>
+           Son onglet est parti de la barre ; le garder ici laissait un ecran
+           que rien n'ouvrait. -->
 
   <div class="screen" inert id="e-scan">
     <!-- Le viseur, dans l'esprit des scanners d'Apple : la caméra dans un cadre
@@ -4328,7 +4355,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=61c2d76e"></script>
+<script type="module" src="app.js?v=ed88ba82"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5169,10 +5196,17 @@ function layout() {
    Procedures, le compte d'analyses dans Reglages. Seuls les mouvements
    d'equipe lui etaient propres ; ils ont rejoint Reglages > Gerer l'equipe. */
 const LABELS_GESTION = ['Procedures', 'Analyse', 'Reglages'];
-/* ⚠ QUATRE ONGLETS COTE EQUIPE, comme la gestion. « Notifications » s'insere
-   avant les reglages : c'est une page qu'on consulte, pas un endroit ou l'on
-   regle quelque chose. */
-const LABELS_EQUIPE  = ['Procedures', 'QR code', 'Notifications', 'Reglages'];
+/* ⚠ TROIS ONGLETS COTE EQUIPE, comme la gestion.
+
+   « Notifications » a ete retire. Ce qu'il montrait — les procedures publiees
+   dans les trente derniers jours — se lit deja sur la page Procedures : les
+   nouvelles y portent un point bleu, et l'onglet « Vues recemment » dit
+   l'inverse.
+
+ ⚠ ET LE COMPTE D'ONGLETS DECIDE DE LA GEOMETRIE DE LA BARRE. Passer de quatre
+   a trois elargit chaque onglet ; c'est `layout()` qui le calcule, rien a
+   ajuster a la main. */
+const LABELS_EQUIPE  = ['Procedures', 'QR code', 'Reglages'];
 let LABELS = LABELS_GESTION;
 const ICONS = [
   {line:'M3.2 10.7 12 3.4l8.8 7.3V19.6a2.2 2.2 0 0 1-2.2 2.2h-3.9v-6.4H9.3v6.4H5.4a2.2 2.2 0 0 1-2.2-2.2z',
@@ -5268,7 +5302,16 @@ let swellStart = 0;
 const BAR_D = 2 * Math.sqrt(BAR_K);   // amortissement critique, zero rebond
 /* ⚠ ETAT DE L'ETIREMENT DE LA BARRE, entre 0 et 1. Il vit a cote des autres
    etats de la barre pour etre lu par la meme boucle. */
-let apercuT = 0;
+/* ⚠ ELLE PART DEJA A SA PLACE, PLUS DE ZERO.
+
+   `apercuT` vaut 1 dans l'espace equipe — la barre y prend toute la largeur,
+   puisqu'il n'y a pas de cercle a loger. En partant de 0, elle s'etirait
+   depuis la gauche a chaque ouverture de l'app : c'est l'animation que vous
+   voyiez.
+
+   On l'initialise a sa valeur d'arrivee. La boucle continue de l'animer quand
+   on entre ou sort de l'apercu — mais plus au demarrage. */
+let apercuT = (localStorage.getItem('procedo_espace') === 'equipe') ? 1 : 0;
 let barFollow = 0;
 let barVel = 0;
 // avant tout clic, la barre reste au repos

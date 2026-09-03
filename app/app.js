@@ -355,7 +355,6 @@ const DICO = {
     'En chiffres': 'In figures',
     'Par cat\u00e9gorie': 'By category',
     'Temps par proc\u00e9dure': 'Time per procedure',
-    'Il vous reste \u00e0 lire': 'Left to read',
     'Rien ne vous attend': 'Nothing pending',
     'Taux de lecture': 'Reading rate',
     'Cette semaine': 'This week',
@@ -561,7 +560,6 @@ const DICO = {
     'En chiffres': 'En cifras',
     'Par cat\u00e9gorie': 'Por categor\u00eda',
     'Temps par proc\u00e9dure': 'Tiempo por procedimiento',
-    'Il vous reste \u00e0 lire': 'Te queda por leer',
     'Rien ne vous attend': 'Nada pendiente',
     'Taux de lecture': 'Tasa de lectura',
     'Cette semaine': 'Esta semana',
@@ -764,7 +762,6 @@ const DICO = {
     'En chiffres': 'Em n\u00fameros',
     'Par cat\u00e9gorie': 'Por categoria',
     'Temps par proc\u00e9dure': 'Tempo por procedimento',
-    'Il vous reste \u00e0 lire': 'Falta ler',
     'Rien ne vous attend': 'Nada pendente',
     'Taux de lecture': 'Taxa de leitura',
     'Cette semaine': 'Esta semana',
@@ -3595,7 +3592,7 @@ function remplirVoletTopbar() {
     ent.textContent = cachedEntreprise?.nom || currentMembre?.entreprise_nom || 'Votre entreprise'
   }
   if (role) {
-    role.textContent = espace === 'gestion' ? 'Espace Gestion' : 'Espace Équipe'
+    role.textContent = espace === 'gestion' ? 'Espace Gestion' : 'Espace Utilisateur'
   }
 
   /* ⚠ LE NOM DE LA PERSONNE, sous l'espace.
@@ -6848,6 +6845,22 @@ function jouerVoile() {
 }
 
 window.showGestionScreen = function(id, btn) {
+  /* ⚠ LA PAGE EST FERMEE ICI, EN TETE, AVANT TOUT LE RESTE.
+
+     Quatre endroits l'ouvrent — un bandeau d'essai, une alerte de quota, la
+     ligne des reglages. Poser le controle sur chacun laisserait passer le
+     cinquieme qu'on ajouterait un jour.
+
+   ⚠ EN TETE ET NON PLUS BAS : le reste de la fonction peint deja l'ecran.
+     Rediriger apres coup ferait clignoter la page interdite.
+
+   ⚠ ON RENVOIE AUX REGLAGES PLUTOT QUE DE NE RIEN FAIRE. Un bouton muet se lit
+     comme une panne ; revenir en arriere se comprend. */
+  if (id === 'p-abonnement' && !estFondateur(currentMembre)) {
+    toast('Seul le gérant de l’entreprise gère l’abonnement.')
+    id = 'p-settings'
+  }
+
   /* ⚠ ON REND LE VERROU EN QUITTANT L'EDITION.
 
      Toutes les sorties passent par ici — le bouton retour, l'enregistrement, la
@@ -6937,7 +6950,7 @@ window.showGestionScreen = function(id, btn) {
   /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
      dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
      Branché ICI plutôt qu'aux quatre endroits qui ouvrent cette page. */
-  if (id === 'p-settings') majLigneQuota()
+  if (id === 'p-settings') { majLigneQuota(); appliquerAccesAbonnement() }
   window.majBarreEspace?.('gestion')
   /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
   window.placerOnglet?.(ONGLET_PAR_ECRAN[id])
@@ -8253,7 +8266,7 @@ function remplirHistoEquipe() {
       <span class="hg-tot">${total(groupe) ? anDureeLisible(total(groupe)) : '—'}</span>
     </div>` + groupe.map(ligne).join('')
 
-  zone.innerHTML = section('Espace Équipe', equipe) +
+  zone.innerHTML = section('Espace Utilisateur', equipe) +
                    section('Espace Gestion', gestion)
 }
 
@@ -8595,7 +8608,7 @@ function peindreAnalyseInterne() {
           </span>
           <span class="an-m-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : 'Aucune lecture'}</span>
         </div>`).join('')
-      : '<div class="an-vide-l">Personne dans l’espace Équipe pour le moment.</div>'
+      : '<div class="an-vide-l">Personne dans l’espace Utilisateur pour le moment.</div>'
   }
 }
 
@@ -8649,8 +8662,8 @@ function peindreTuilesAccueil() {
     zReste.hidden = !brouillons
     if (brouillons) {
       zReste.textContent = brouillons > 1
-        ? `${brouillons} procédures sont en brouillon, en attente de publication.`
-        : `1 procédure est en brouillon, en attente de publication.`
+        ? `${brouillons} procédures sont en cours, en attente de publication.`
+        : `1 procédure est en cours, en attente de publication.`
     }
   }
 
@@ -9026,7 +9039,7 @@ function anneauPublication(enLigne, total) {
       </div>
       ${brouillons ? `
       <div class="ac-pub-pill"><i></i>${brouillons} proc\u00e9dure${
-        brouillons > 1 ? 's restent' : ' reste'} en brouillon</div>` : `
+        brouillons > 1 ? 's restent' : ' reste'} en cours</div>` : `
       <div class="ac-pub-pill ok"><i></i>Tout est accessible \u00e0 votre \u00e9quipe</div>`}
     </div>`
 
@@ -10330,7 +10343,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
                 return `<span class="cl-etat">${etat}</span>`
               }
             }
-            return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>Brouillon</span>`
+            return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>En cours</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
@@ -10395,6 +10408,23 @@ function renderCategoryGrid() {
     return termes.some(t => nom.includes(t) || titres.some(x => x.includes(t)))
   }
   let visibles = q ? sorted.filter(correspond) : sorted
+
+  /* ⚠ « En ligne » NE MONTRE QUE LES DOSSIERS QUI ONT DU PUBLIE.
+
+     L'onglet s'appelait « Toutes » et affichait tout ; il porte maintenant le
+     nom « En ligne », et le nom doit etre vrai. Un dossier dont aucune
+     procedure n'est publiee n'a rien d'en ligne.
+
+   ⚠ SEULEMENT SUR CE CHEMIN. Les onglets « En cours » passent par une autre
+     branche, plus haut : ils listent des procedures, pas des dossiers.
+
+   ⚠ ET LA RECHERCHE GARDE SA PRIORITE. Chercher « friteuse » doit la trouver
+     meme si son dossier n'a rien de publie — sinon on cherche dans le vide
+     sans comprendre pourquoi. */
+  if (!q && filtreEtatDossiers === 'tout') {
+    visibles = visibles.filter(cat =>
+      (cat.procsInCat || []).some(p => p.publiee_le))
+  }
 
   /* Le compte de la ligne de contexte. Il dit ce que la liste montre APRES
      filtrage — sinon il annoncerait six dossiers pendant qu'on en voit deux. */
@@ -10469,7 +10499,7 @@ function renderCategoryGrid() {
     if (!liste.length) {
       catGridEl.innerHTML = '<div class="cl-rien">' + (filtreEtatDossiers === 'ligne'
         ? 'Aucune procédure n’est en ligne pour le moment.'
-        : 'Aucun brouillon en attente.') + '</div>'
+        : 'Aucune procédure en cours.') + '</div>'
       return
     }
 
@@ -10552,6 +10582,22 @@ function renderCategoryGrid() {
   }
   poserIconeRang(false)
 
+  /* ⚠ UN ETAT VIDE PROPRE A « En ligne ».
+
+     Le test d'origine excluait `'tout'` : sur cet onglet, une liste vide ne
+     disait rien du tout. Maintenant qu'il filtre, elle peut l'etre alors que
+     des dossiers existent — il faut dire pourquoi. */
+  if (!visibles.length && !q && filtreEtatDossiers === 'tout') {
+    const aDesDossiers = (allCategoriesData || []).length
+    catGridEl.innerHTML = '<div class="cl-rien">' + (aDesDossiers
+      ? 'Aucune procédure n’est en ligne pour le moment.' +
+        '<span class="cl-rien-suite">Publiez une procédure pour qu’elle apparaisse ici.</span>'
+      : 'Aucune procédure n’a été créée pour le moment.' +
+        '<span class="cl-rien-suite">Touchez le bouton <b>+</b> en haut à droite ' +
+        'pour créer une procédure.</span>') + '</div>'
+    return
+  }
+
   if (!visibles.length && (q || filtreEtatDossiers !== 'tout')) {
     /* Le message dit LEQUEL des deux filtres a tout retire : sans cela, on
        cherche pourquoi la liste est vide alors qu'un segment est actif deux
@@ -10560,7 +10606,7 @@ function renderCategoryGrid() {
       ? 'Aucun dossier ne correspond à « ' + escapeHtml(rechercheDossiers) + ' ».'
       : filtreEtatDossiers === 'ligne'
         ? 'Aucune procédure n’est en ligne pour le moment.'
-        : 'Aucun brouillon en attente.') + '</div>'
+        : 'Aucune procédure en cours.') + '</div>'
     return
   }
 
@@ -10619,7 +10665,7 @@ function renderCategoryGrid() {
                 du travail. */
             brouillons
               ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${
-                  brouillons} brouillon${brouillons > 1 ? 's' : ''}</span>`
+                  brouillons} en cours</span>`
               : enLigne
                 ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
                 : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Aucune en ligne</span>`}
@@ -12012,7 +12058,7 @@ function carteSousDossier(nom, procs, rang = 0) {
       </span>
       <span class="cl-bas">
         ${brouillons
-          ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${brouillons} brouillon${brouillons > 1 ? 's' : ''}</span>`
+          ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${brouillons} en cours</span>`
           : `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`}
         <span class="cl-n">${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
       </span>
@@ -19745,7 +19791,7 @@ function etatProcedureHtml(proc) {
        blanches a point colore, elle criait sans rien dire de plus. Le point
        gris suffit — gris parce qu'il reste du travail, vert quand c'est
        publie. */
-    return `<span class="cl-badge" title="Pas encore visible par votre équipe"><i style="background:#9A9AA4"></i>Brouillon</span>`
+    return `<span class="cl-badge" title="Pas encore visible par votre équipe"><i style="background:#9A9AA4"></i>En cours</span>`
   }
 
   /* ⚠ CES DEUX TESTS ONT ETE REMONTES en tete de la fonction. Les laisser ici
@@ -20114,38 +20160,26 @@ async function loadEquipeProcedures() {
    question : combien j'en ai lu, combien il en reste. */
 function renderEquipeAccueil() {
   const h = new Date().getHours()
-  /* PAS DE « BONNE NUIT ». On souhaitait la bonne nuit avant 6 h — or celui
-     qui ouvre l'app à cette heure-là ne va pas se coucher : il ouvre le
-     restaurant, ou il termine le service. Lui dire bonne nuit, c'est le
-     saluer comme s'il partait.
-
-     Deux salutations suffisent : « Bonsoir » couvre la nuit et la soirée,
-     « Bonjour » le reste. La bascule à 5 h plutôt qu'à 6 : à cinq heures on
-     est en début de journée pour une équipe de cuisine. */
   const bonjour = (h >= 5 && h < 18) ? 'Bonjour' : 'Bonsoir'
   const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
-  /* ⚠ LE SALUT N'EST PLUS LE TITRE : c'est un surtitre, au-dessus de
-     « Procedures ». Il garde sa main — c'est elle qui le distingue d'une
-     etiquette — mais il ne prend plus la place du nom de la page. */
+
   const salut = document.getElementById('e-salut')
   if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
 
-  const total = allEquipeProcedures.length
-  const lues = allEquipeProcedures.filter(p => equipeLues.has(p.id)).length
-  const reste = total - lues
-  const pct = total ? Math.round((lues / total) * 100) : 0
+  /* ⚠ LA LIGNE SOUS LE TITRE A ETE VIDEE.
 
-  /* La seconde ligne du titre. `e-mot` a disparu avec la carte : on écrit
-     désormais dans `e-compte`, la ligne de compte de la page — c'est le même
-     rôle, à la même place que sur les pages de la gestion. */
+     Elle disait « Il vous reste 3 procedures a lire » — un decompte de ce qui
+     manque, en tete d'un ecran qu'on vient d'ouvrir. Le badge « Non lue » sur
+     chaque carte dit deja la meme chose, la ou l'on peut agir.
+
+     On la vide plutot que de retirer la balise : le CSS la referme quand elle
+     est vide, et elle reste disponible pour autre chose.
+
+   ⚠ QUATRE CALCULS ONT DISPARU AVEC ELLE — total, lues, reste, pourcentage.
+     Ils ne servaient qu'a cette phrase ; les garder aurait fait parcourir
+     toutes les procedures a chaque rendu pour rien. */
   const mot = document.getElementById('e-compte')
-  if (mot) {
-    mot.innerHTML = !total
-      ? "Aucune procédure pour l'instant."
-      : reste === 0
-        ? "Vous avez tout lu. Rien ne vous attend."
-        : `Il vous reste <b>${reste} procédure${reste > 1 ? 's' : ''}</b> à lire.`
-  }
+  if (mot) mot.textContent = ''
 }
 
 /* Grille des dossiers, exactement celle de l'espace gestion : anneau de
@@ -20214,23 +20248,12 @@ document.getElementById('e-proc-segm')?.addEventListener('click', (e) => {
   }, 130)
 })
 
-/* ⚠ LES QUATRE DERNIERES VUES, DANS L'ORDRE DE LECTURE.
+/* ⚠ `procsVuesRecemment` A ETE SUPPRIMEE avec son onglet.
 
-   `mesLectures` porte `validated_at` : la date est deja la, aucune requete de
-   plus. On trie du plus recent au plus ancien et l'on garde quatre — au-dela,
-   « recemment » ne veut plus rien dire.
+   Elle triait `mesLectures` par date pour en garder quatre. Rien d'autre ne
+   l'appelait : la laisser aurait fait une fonction morte de plus, et ce
+   fichier en compte deja. */
 
- ⚠ ET L'ON ECARTE CE QUI N'EXISTE PLUS. Une procedure supprimee reste dans les
-   validations : sans ce filtre, elle occuperait une des quatre places sans
-   pouvoir s'afficher. */
-function procsVuesRecemment() {
-  const connues = new Set((allEquipeProcedures || []).map(p => p.id))
-  return [...(mesLectures || [])]
-    .filter(v => connues.has(v.procedure_id))
-    .sort((a, b) => new Date(b.validated_at || 0) - new Date(a.validated_at || 0))
-    .slice(0, 4)
-    .map(v => v.procedure_id)
-}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA CARTE D'UN DOSSIER, COTE EQUIPE
@@ -20320,16 +20343,15 @@ function renderEquipeCategories() {
        a ouvrir le dossier pour la trouver.
      ═══════════════════════════════════════════════════════════════════════ */
   if (segmentEquipe !== 'tout') {
-    const recentes = segmentEquipe === 'recentes' ? procsVuesRecemment() : null
     const vus = new Set()
     const liste = []
 
     /* ⚠ L'ORDRE DES RECENTES EST CELUI DE LECTURE, pas alphabetique : c'est
        tout le sens de « recemment ». On parcourt donc `recentes` plutot que
        les procedures. */
-    const source = segmentEquipe === 'recentes'
-      ? recentes.map(id => allEquipeProcedures.find(p => p.id === id)).filter(Boolean)
-      : allEquipeProcedures.filter(p => favorisEquipe.has(p.id))
+    /* ⚠ UN SEUL FILTRE RESTE : les favoris. Le test sur `segmentEquipe`
+       n'avait plus qu'une branche — autant nommer ce qu'on garde. */
+    const source = allEquipeProcedures.filter(p => favorisEquipe.has(p.id))
 
     for (const p of source) {
       if (vus.has(p.id)) continue
@@ -20346,10 +20368,9 @@ function renderEquipeCategories() {
     poserIconeRang(true)
 
     if (!liste.length) {
-      grille.innerHTML = '<div class="cl-rien">' + (segmentEquipe === 'favoris'
-        ? 'Aucun favori pour le moment.<span class="cl-rien-suite">Touchez l’étoile sur une procédure pour la retrouver ici.</span>'
-        : 'Aucune procédure lue pour le moment.<span class="cl-rien-suite">Les quatre dernières que vous ouvrirez apparaîtront ici.</span>')
-        + '</div>'
+      grille.innerHTML = '<div class="cl-rien">Aucun favori pour le moment.' +
+        '<span class="cl-rien-suite">Touchez l’étoile sur une procédure ' +
+        'pour la retrouver ici.</span></div>'
       return
     }
 
@@ -23975,6 +23996,31 @@ let triEquipe = 'az'
    Deux champs valent mieux qu'un, mais ce n'en est pas moins un contournement :
    la vraie réponse serait une colonne qui dit « celui-ci a créé l'entreprise ».
    Tant qu'elle n'existe pas, on déduit. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   SEUL LE FONDATEUR VOIT L'ABONNEMENT
+
+   ⚠ UN GESTIONNAIRE INVITE N'EST PAS LE GERANT. Il peut creer et publier des
+     procedures, gerer l'equipe — mais l'abonnement engage une carte bancaire
+     et le sort de l'entreprise entiere.
+
+     `estFondateur` le distingue deja : c'est celui qui n'a pas ete promu par
+     quelqu'un d'autre.
+
+   ⚠ ON MASQUE LE TITRE, LA LIGNE ET LE FILET. Masquer la ligne seule
+     laisserait un titre « Abonnement » au-dessus d'un groupe qui ne parle plus
+     que d'analyses video.
+
+   ⚠ ET LES ANALYSES RESTENT VISIBLES. Un gestionnaire a besoin de savoir
+     combien il en reste : c'est son quota de travail, pas une question de
+     paiement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function appliquerAccesAbonnement() {
+  const permis = estFondateur(currentMembre)
+  const el = (id) => document.getElementById(id)
+  ;[el('reg-titre-abo'), el('ouvrir-abonnement'), el('reg-filet-abo')]
+    .forEach(x => { if (x) x.hidden = !permis })
+}
+
 function estFondateur(m) {
   return m?.role === 'gestion' && !m?.promu_par && !m?.promu_le
 }
@@ -25440,7 +25486,7 @@ function peindrePublication(proc) {
 
        Ta phrase, allégée : « seuls ceux qui ont accès à l'espace gestion
        peuvent y accéder » répétait « accès » deux fois en six mots. */
-    ti.textContent = 'Brouillon'
+    ti.textContent = 'En cours'
     /* ═══ UNE LIGNE, PAS TROIS ═══
 
        « Visible par l'espace gestion uniquement. Publiez-la pour que votre

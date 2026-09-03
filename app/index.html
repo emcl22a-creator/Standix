@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=34796f47">
+<link rel="stylesheet" href="style.css?v=7cf7cba7">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1133,14 +1133,15 @@
       <div class="tb-volet glassDiv" id="tb-volet-gestion" role="menu" hidden>
         <div class="tb-v-tete">
           <span class="tb-v-ent" id="tb-ent-gestion">—</span>
-          <span class="tb-v-role" id="tb-role-gestion">—</span>
-          <!-- ⚠ LE NOM DE LA PERSONNE, SOUS L'ESPACE.
+          <!-- ⚠ LE NOM SUIT L'ENTREPRISE, avant la pastille du role.
 
-               Le volet disait de quelle entreprise il s'agit et dans quel
-               espace on se trouve — mais pas QUI. Sur un telephone partage
-               entre deux membres d'equipe, c'est la premiere chose a
-               verifier avant de toucher quoi que ce soit. -->
+               Il etait dessous : on lisait « Les trois rois », puis une
+               pastille, puis un nom — l'oeil devait redescendre chercher a
+               qui appartient le compte. Les deux identites vont ensemble ;
+               le role est une precision, il vient apres. -->
           <span class="tb-v-qui" id="tb-qui-gestion"></span>
+          <span class="tb-v-role" id="tb-role-gestion">—</span>
+          
           <!-- ⚠ SEULEMENT COTE GESTION. L'espace Equipe n'a pas ce bouton :
                lui montrer la meme phrase l'enverrait chercher un oeil qui
                n'existe pas chez lui. Le volet de l'equipe est un autre bloc,
@@ -3439,14 +3440,15 @@
       <div class="tb-volet glassDiv" id="tb-volet-equipe" role="menu" hidden>
         <div class="tb-v-tete">
           <span class="tb-v-ent" id="tb-ent-equipe">—</span>
-          <span class="tb-v-role" id="tb-role-equipe">—</span>
-          <!-- ⚠ LE NOM DE LA PERSONNE, SOUS L'ESPACE.
+          <!-- ⚠ LE NOM SUIT L'ENTREPRISE, avant la pastille du role.
 
-               Le volet disait de quelle entreprise il s'agit et dans quel
-               espace on se trouve — mais pas QUI. Sur un telephone partage
-               entre deux membres d'equipe, c'est la premiere chose a
-               verifier avant de toucher quoi que ce soit. -->
+               Il etait dessous : on lisait « Les trois rois », puis une
+               pastille, puis un nom — l'oeil devait redescendre chercher a
+               qui appartient le compte. Les deux identites vont ensemble ;
+               le role est une precision, il vient apres. -->
           <span class="tb-v-qui" id="tb-qui-equipe"></span>
+          <span class="tb-v-role" id="tb-role-equipe">—</span>
+          
         </div>
         <div class="tb-v-filet"></div>
         <button type="button" class="tb-v-opt tb-v-opt--sortie" data-deconnexion>
@@ -4404,7 +4406,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=1470a603"></script>
+<script type="module" src="app.js?v=0dbdfa2c"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -137,6 +137,10 @@ let ecapEditor = null     // éditeur de clip de l'écran de modification
 let currentVideoFile = null
 let allEquipeProcedures = []
 let equipeEtapesByProc = {}
+/* ⚠ MES FAVORIS, PROPRES A MA FICHE. Un favori appartient a une personne dans
+   une entreprise : `membre_id`, pas `user_id`. */
+let favorisEquipe = new Set()
+
 let equipeLues = new Set()      // identifiants des procédures que j'ai lues
 let mesLectures = []            // mes validations, avec date et durée
 /* Les deux tris de l'espace équipe. Ils vivent à côté de la dossier courante :
@@ -19921,6 +19925,17 @@ async function loadEquipeProcedures() {
   }
 
   equipeLues = new Set(lectures.map(v => v.procedure_id))
+
+  /* ⚠ LES FAVORIS SE LISENT ICI, AVEC LE RESTE. Une requete de plus au meme
+     moment coute moins qu'un aller-retour separe a chaque ouverture.
+
+   ⚠ ET UN ECHEC NE BLOQUE RIEN : si la table n'existe pas encore, on repart
+     d'un ensemble vide. L'onglet « Favoris » sera juste toujours vide. */
+  try {
+    const { data: favs } = await supabase.from('favoris')
+      .select('procedure_id').eq('membre_id', currentMembre.id)
+    favorisEquipe = new Set((favs || []).map(f => f.procedure_id))
+  } catch (e) { favorisEquipe = new Set() }
   mesLectures = lectures   // avec la date et la durée, pour l'écran d'activité
 
   equipeEtapesByProc = {}
@@ -20009,6 +20024,59 @@ croixRechE?.addEventListener('click', () => {
   champRechE.focus()
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE SEGMENT DE L'ESPACE EQUIPE
+
+   ⚠ TROIS ETATS, PAS CEUX DE LA GESTION. « En ligne » et « Brouillons » n'ont
+     pas de sens ici : l'equipe ne voit que le publie. « Favoris » et « Vues
+     recemment » repondent aux deux questions qu'un employe se pose.
+
+   ⚠ LE MEME FLOU QUE COTE GESTION, et par la meme mecanique — on reprend
+     `flouSortie`, `flouEntree` et `poserPastilleSegment` plutot que d'ecrire
+     une seconde animation qui divergerait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ `segmentEquipe`, PAS `filtreEquipe` : ce nom est deja pris par la
+   recherche de membres, plus bas. Deux variables du meme nom dans le meme
+   fichier — le navigateur refuse de charger le script entier. */
+let segmentEquipe = 'tout'
+
+document.getElementById('e-proc-segm')?.addEventListener('click', (e) => {
+  const b = e.target.closest('.p-seg')
+  if (!b || b.classList.contains('on')) return
+  b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
+  b.classList.add('on')
+  poserPastilleSegment(b)
+  segmentEquipe = b.dataset.etat
+
+  if (MOINS_ANIM()) { renderEquipeCategories(); return }
+
+  morceauxDeLaListe().forEach(flouSortie)
+  sansApparition = true
+  setTimeout(() => {
+    renderEquipeCategories()
+    sansApparition = false
+    morceauxDeLaListe().forEach(flouEntree)
+  }, 130)
+})
+
+/* ⚠ LES QUATRE DERNIERES VUES, DANS L'ORDRE DE LECTURE.
+
+   `mesLectures` porte `validated_at` : la date est deja la, aucune requete de
+   plus. On trie du plus recent au plus ancien et l'on garde quatre — au-dela,
+   « recemment » ne veut plus rien dire.
+
+ ⚠ ET L'ON ECARTE CE QUI N'EXISTE PLUS. Une procedure supprimee reste dans les
+   validations : sans ce filtre, elle occuperait une des quatre places sans
+   pouvoir s'afficher. */
+function procsVuesRecemment() {
+  const connues = new Set((allEquipeProcedures || []).map(p => p.id))
+  return [...(mesLectures || [])]
+    .filter(v => connues.has(v.procedure_id))
+    .sort((a, b) => new Date(b.validated_at || 0) - new Date(a.validated_at || 0))
+    .slice(0, 4)
+    .map(v => v.procedure_id)
+}
+
 function renderEquipeCategories() {
   const grille = document.getElementById('e-cat-grid')
   if (!grille) return
@@ -20041,7 +20109,7 @@ function renderEquipeCategories() {
   }
 
   const parCat = {}
-  allEquipeProcedures.forEach(p => {
+  allEquipeProcedures.filter(gardee).forEach(p => {
     const nom = p.categorie || 'Sans dossier'
     if (!parCat[nom]) parCat[nom] = []
     parCat[nom].push(p)
@@ -20060,6 +20128,19 @@ function renderEquipeCategories() {
 
    ⚠ SANS ACCENTS NI CASSE. « Cafe » doit trouver « Café » — c'est ce que fait
      `sansAccents` cote gestion, on emploie la meme. */
+  /* ⚠ LE SEGMENT FILTRE LES PROCEDURES, PAS LES DOSSIERS.
+
+     « Favoris » ne veut pas dire « dossiers favoris » : on garde les dossiers
+     qui CONTIENNENT au moins une procedure favorite, et l'on n'y montre
+     qu'elles. Sinon toucher « Favoris » afficherait des dossiers entiers dont
+     une seule procedure interesse. */
+  const recentes = segmentEquipe === 'recentes' ? procsVuesRecemment() : null
+  const gardee = (p) => {
+    if (segmentEquipe === 'favoris') return favorisEquipe.has(p.id)
+    if (segmentEquipe === 'recentes') return recentes.includes(p.id)
+    return true
+  }
+
   const q = (rechercheEquipe || '').trim()
   const termes = q ? sansAccents(q).split(/\s+/).filter(Boolean) : []
   const correspond = (nom) => {
@@ -20087,59 +20168,50 @@ function renderEquipeCategories() {
     if (equipeCatSort === 'new') return dateCat(b) - dateCat(a)
     if (equipeCatSort === 'old') return dateCat(a) - dateCat(b)
     return a.localeCompare(b, 'fr')
-  }).forEach(nom => {
+  }).forEach((nom, rang) => {
     const procs = parCat[nom]
     const lues = procs.filter(p => equipeLues.has(p.id)).length
-    const pct = Math.round((lues / procs.length) * 100)
-    const couleur = pct === 100 ? 'var(--green)' : pct >= 34 ? 'var(--orange)' : 'var(--red)'
-    const c = 2 * Math.PI * 19
+    const reste = procs.length - lues
 
+    /* ⚠ LA MEME CARTE QUE COTE GESTION, au badge pres.
+
+       L'ancienne avait sa propre forme : anneau de progression, icone dans un
+       carre, chevron a droite. Deux presentations pour la meme chose — un
+       employe qui passe d'un espace a l'autre devait reapprendre a lire.
+
+       On reprend `cat-cell--ligne` : meme plaque coloree, meme titre, meme
+       ligne du bas.
+
+     ⚠ LE BADGE, LUI, DIT AUTRE CHOSE. Cote gestion il annonce « 2 brouillons »
+       ou « En ligne » — l'equipe ne voit que du publie, ces mots n'ont pas de
+       sens ici. Il dit donc ce qui la concerne : ce qui reste a lire. */
     const cell = document.createElement('div')
-    cell.className = 'cat-cell'
-    cell.onclick = () => openEquipeCategorie(nom)
-    /* ═══ LA MÊME CARTE QUE CÔTÉ GESTION ═══
+    cell.className = 'cat-cell cat-cell--ligne'
+    cell.dataset.key = nom
+    animerApparition(cell, rang)
+    const teinte = couleurDossier(rang)
 
-       Les deux avaient divergé : plaque ambre et pied à chevron d'un côté,
-       icône blanche et pastille de comptage de l'autre. Or c'est le même objet
-       — une dossier — et l'employé qui devient gérant ne doit pas avoir à
-       réapprendre à quoi elle ressemble.
-
-       Le pied dit la MÊME chose des deux côtés : le nombre de procédures de la
-       dossier. « Tout est lu » y figurait un temps — mais un pied qui change
-       de nature selon l'état ne se compare plus d'une carte à l'autre, et le
-       nombre, lui, se lit toujours. Ce qui reste à faire est déjà dit par les
-       pastilles sur les titres, juste au-dessus. */
     cell.innerHTML = `
-      <div class="cat-top">
-        <span class="cat-ic">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2.4h7.8a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"
-                  stroke="url(#logoOrIc)" stroke-width="1.7" stroke-linejoin="round"/>
-            <line x1="3" y1="10.6" x2="21" y2="10.6" stroke="url(#logoOrIc)" stroke-opacity="0.5" stroke-width="1.5"/>
-          </svg>
-        </span>
-      </div>
-      <div class="cat-name"><span class="txt">${escapeHtml(nom)}</span></div>
-      <div class="cat-recent">
-        ${[...procs]
-          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
-          .slice(0, 3)
-          /* Plus de pastille « non lu » ici. Trois procédures sur quatre en
-             portaient une — sur une carte qui n'en montre que trois, un signal
-             qui s'allume presque partout ne distingue plus rien. Le compte à
-             lire est déjà dit en haut de la page, en toutes lettres. */
-          .map(p => `<div class="cat-recent-item"><span class="txt">${escapeHtml(p.titre)}</span></div>`).join('')}
-      </div>
-      <div class="cat-pied">
+      <span class="cl-pl" style="background:${fondPlaque(teinte)}">
         <svg viewBox="0 0 24 24" fill="none">
-          <path d="M13.6 3H7.4A2 2 0 0 0 5.4 5v14a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8Z"
-                stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
-          <path d="M13.6 3v5h5" stroke="url(#logoOrIc)" stroke-width="1.8" stroke-linejoin="round"/>
+          <path d="${traceIconeDossier(nom)}" stroke="url(#pal${teinte.i})"
+                stroke-width="1.9" stroke-linejoin="round" stroke-linecap="round"/>
         </svg>
-        <span>${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
-        <span class="fl">\u203a</span>
-      </div>
+      </span>
+      <span class="cl-co">
+        <span class="cl-tete">
+          <span class="cl-nm">${escapeHtml(nom)}</span>
+        </span>
+        <span class="cl-bas">
+          ${reste
+            ? `<span class="cl-badge"><i style="background:#3A78EE"></i>${
+                reste} \u00e0 lire</span>`
+            : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
+          <span class="cl-n">${procs.length} proc\u00e9dure${procs.length > 1 ? 's' : ''}</span>
+        </span>
+      </span>
     `
+    cell.onclick = () => openEquipeCategorie(nom)
     grille.appendChild(cell)
   })
 }
@@ -20298,6 +20370,44 @@ function renderEquipeCatListe() {
    l'anneau mesure change de sens — côté gérant, la part de l'équipe qui a
    consulté ; côté employé, sa propre lecture : pleine et verte s'il l'a lue,
    vide sinon. */
+/* ⚠ METTRE OU RETIRER UN FAVORI.
+
+   ⚠ L'ECRAN CHANGE AVANT LA BASE. On bascule l'etoile tout de suite, puis on
+     ecrit : un aller-retour reseau avant de reagir donnerait l'impression d'un
+     bouton mort.
+
+     Si l'ecriture echoue, on remet l'etoile comme elle etait — mieux vaut un
+     retour en arriere visible qu'un favori qui n'existe que sur cet ecran. */
+async function basculerFavori(procId, bouton) {
+  if (!currentMembre?.id) return
+  const etait = favorisEquipe.has(procId)
+
+  if (etait) favorisEquipe.delete(procId)
+  else favorisEquipe.add(procId)
+  bouton.classList.toggle('on', !etait)
+  bouton.setAttribute('aria-label', etait ? 'Mettre en favori' : 'Retirer des favoris')
+  if (navigator.vibrate) navigator.vibrate(8)
+
+  try {
+    const { error } = etait
+      ? await supabase.from('favoris').delete()
+          .eq('membre_id', currentMembre.id).eq('procedure_id', procId)
+      : await supabase.from('favoris')
+          .insert({ membre_id: currentMembre.id, procedure_id: procId })
+    if (error) throw error
+  } catch (e) {
+    if (etait) favorisEquipe.add(procId)
+    else favorisEquipe.delete(procId)
+    bouton.classList.toggle('on', etait)
+    console.error('[favori]', e)
+    toast('Favori non enregistré : ' + (e?.message || 'erreur'))
+  }
+
+  /* ⚠ ON REPEINT SI L'ONGLET « Favoris » EST OUVERT : la procedure qu'on vient
+     de retirer doit disparaitre de la liste. */
+  if (segmentEquipe === 'favoris') renderEquipeCategories()
+}
+
 function ficheEquipe(proc) {
   const lue = equipeLues.has(proc.id)
   const nbEtapes = (equipeEtapesByProc[proc.id] || []).length
@@ -20305,7 +20415,13 @@ function ficheEquipe(proc) {
   const div = document.createElement('div')
   div.className = 'card proc-rich-card'
   div.dataset.key = proc.id
-  div.onclick = () => openEquipeDetail(proc.id)
+  div.onclick = (e) => {
+    /* ⚠ L'ETOILE N'OUVRE PAS LA PROCEDURE. Sans ce test, la mettre en favori
+       ouvrirait l'ecran de lecture dans la foulee. */
+    const fav = e.target.closest('[data-fav]')
+    if (fav) { e.stopPropagation(); basculerFavori(proc.id, fav); return }
+    openEquipeDetail(proc.id)
+  }
   /* L'ICÔNE PORTE LE MÊME DÉGRADÉ QUE CÔTÉ GESTION.
 
      Le tracé était déjà identique, seule la couleur différait : blanc à 78 %
@@ -20325,6 +20441,19 @@ function ficheEquipe(proc) {
       </div>
       ${nbEtapes ? `<div class="cat-badge">${nbEtapes} \u00e9tape${nbEtapes > 1 ? 's' : ''}</div>` : ''}
     </div>
+    <!-- ⚠ L'ETOILE EST DANS LA TETE DE CARTE, pas sous le titre.
+
+         Posee en bas, elle se serait melee au badge d'etapes et au taux de
+         lecture — trois choses a lire au meme endroit. En haut a droite, elle
+         a sa place et ne pousse rien. -->
+    <button type="button" class="fav-btn${favorisEquipe.has(proc.id) ? ' on' : ''}"
+            data-fav="${proc.id}"
+            aria-label="${favorisEquipe.has(proc.id) ? 'Retirer des favoris' : 'Mettre en favori'}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+           stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85Z"/>
+      </svg>
+    </button>
     <div class="cat-name"><span class="txt">${escapeHtml(proc.titre)}</span></div>
     <div class="carte-categorie">${escapeHtml(proc.categorie || 'Sans dossier')}</div>
     <div class="cat-pct-row">

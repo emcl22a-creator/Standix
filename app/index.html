@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=b24e8c17">
+<link rel="stylesheet" href="style.css?v=1b33f6ed">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1829,7 +1829,7 @@
              et qu'il la rend en quittant l'ecran. -->
         <div class="edit-note" id="man-note-verrou" hidden>
           Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran
-          une fois terminé pour la rendre aux autres gestionnaires.
+          une fois terminé pour la rendre accessible aux autres gestionnaires.
         </div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION. À la création ils
@@ -1913,7 +1913,7 @@
              et qu'il la rend en quittant l'ecran. -->
         <div class="edit-note" id="dv-note-verrou" hidden>
           Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran
-          une fois terminé pour la rendre aux autres gestionnaires.
+          une fois terminé pour la rendre accessible aux autres gestionnaires.
         </div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION, comme sur l'écran
@@ -3464,14 +3464,60 @@
       <!-- Le salut EST le titre de la page. L'employé n'a qu'une page ; la
            nommer « Procédures » au-dessus d'une liste de procédures n'apprend
            rien, alors que son prénom et ce qu'il lui reste à lire, oui. -->
-      <div class="page-tete">
-        <h1 id="e-salut">Bonjour</h1>
-        <p id="e-compte">—</p>
-      </div>
+      <!-- ⚠ LE SALUT PASSE AU-DESSUS DU TITRE, en petit.
 
-      <div class="list-tools">
-        <div class="section-title" style="margin:0;">Dossiers</div>
-      <div class="dd-filter" id="dd-e-cat-sort">
+             Il occupait la place du titre — « Bonjour Emilien » en 32 px, et
+             la page ne disait plus ce qu'elle contient. Un employe qui ouvre
+             l'app doit lire « Procedures » ; son prenom, il le connait.
+
+             En surtitre, il garde sa fonction — reconnaitre son espace — sans
+             prendre celle du titre. -->
+        <div class="page-tete">
+          <div class="page-salut" id="e-salut">Bonjour</div>
+          <h1>Procédures</h1>
+          <!-- ⚠ CETTE LIGNE EST ECRITE PAR LE SCRIPT, et elle dit mieux que ma
+               phrase : « Il vous reste 3 procedures a lire. » Un employe a
+               besoin de savoir ce qui l'attend, pas de qui appartient l'app.
+
+               Le texte ci-dessous n'est qu'un repli, visible une fraction de
+               seconde avant le premier chargement. -->
+          <p id="e-compte">Suivez toutes les procédures<br>de votre organisation.</p>
+        </div>
+
+        <!-- ⚠ LA MEME RECHERCHE QUE COTE GESTION, aux identifiants pres.
+             Reprendre le balisage plutot que d'en inventer un autre garantit
+             que les deux espaces vieillissent ensemble. -->
+        <div class="proc-rech-rang">
+          <div class="proc-rech" id="e-proc-rech">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="7.5"></circle><path d="M16.5 16.5 21 21"></path>
+            </svg>
+            <input type="search" id="e-proc-rech-champ" placeholder="Rechercher une procédure"
+                   autocomplete="off" autocorrect="off" spellcheck="false">
+            <button type="button" class="proc-rech-x" id="e-proc-rech-x"
+                    aria-label="Effacer la recherche" hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ⚠ PAS DE SEGMENT « En ligne / Brouillons » ICI.
+
+             L'equipe ne voit que les procedures publiees — le filtre le dit
+             dans `loadEquipeProcedures`. Trois onglets dont deux vides, ou
+             deux identiques, ne renseigneraient personne.
+
+             La ligne de comptage, elle, garde tout son sens. -->
+        <div class="proc-rang">
+          <span class="proc-rang-txt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linejoin="round" stroke-linecap="round" id="e-proc-rang-ic" aria-hidden="true">
+              <path d="M3 7.4a2 2 0 0 1 2-2h4.2l2 2H19a2 2 0 0 1 2 2v7.2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+            </svg>
+            <span id="e-proc-nb-dossiers">Aucun dossier</span>
+          </span>
+          <div class="dd-filter" id="dd-e-cat-sort">
         <button type="button" class="dd-trigger" id="dd-e-cat-sort-trigger">
           <span id="dd-e-cat-sort-label">Trier : A → Z</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -3482,7 +3528,14 @@
           <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
         </div>
       </div>
-      </div>
+        </div>
+
+      <!-- ⚠ LE TITRE « Dossiers » A ETE RETIRE : la ligne de compte juste
+             au-dessus dit deja « 2 dossiers ». Deux fois le meme mot a deux
+             lignes d'ecart.
+
+             Le menu de tri remonte dans cette ligne, comme cote gestion. -->
+        
       <div class="cat-grid" id="e-cat-grid"></div>
     </div>
   </div>
@@ -4262,7 +4315,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=9aa9456a"></script>
+<script type="module" src="app.js?v=8b066923"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=9827c72f">
+<link rel="stylesheet" href="style.css?v=88b54662">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3604,22 +3604,54 @@
     </div>
     <div class="subhead" id="e-cat-sous">—</div>
 
-    <div class="search-bar">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="e-cat-recherche" placeholder="Rechercher une procédure..." autocomplete="off">
-    </div>
+    <!-- ⚠ LA MEME BARRE QUE COTE GESTION.
 
-      <div class="dd-filter" id="dd-e-proc-sort" style="margin-bottom:12px;">
-        <button type="button" class="dd-trigger" id="dd-e-proc-sort-trigger">
-          <span id="dd-e-proc-sort-label">Trier : A → Z</span>
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-        </button>
-        <div class="dd-menu" id="dd-e-proc-sort-menu">
-          <button type="button" class="selected" data-sort="az" data-label="Trier : A → Z">A → Z</button>
-          <button type="button" data-sort="new" data-label="Trier : Nouveau → ancien">Nouveau → ancien</button>
-          <button type="button" data-sort="old" data-label="Trier : Ancien → nouveau">Ancien → nouveau</button>
+             `search-bar` etait un champ blanc, plus haut et plus clair que
+             celui de la page precedente : deux barres de recherche differentes
+             a un ecran d'intervalle. `proc-rech` est celle de toute l'app. -->
+        <div class="proc-rech-rang">
+          <div class="proc-rech">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="11" cy="11" r="7.5"></circle><path d="M16.5 16.5 21 21"></path>
+            </svg>
+            <input type="search" id="e-cat-recherche" placeholder="Rechercher une procédure"
+                   autocomplete="off" autocorrect="off" spellcheck="false">
+          </div>
         </div>
-      </div>
+
+        <!-- ⚠ ET LE MEME BOUTON DE TRI, dans une ligne de comptage.
+
+             « Trier : A → Z » ecrit en clair prenait toute la largeur. Le
+             nombre d'elements passe a gauche, l'icone a droite — comme sur la
+             page des dossiers. -->
+        <div class="proc-rang">
+          <span class="proc-rang-txt">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                 stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">
+              <path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"></path>
+              <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"></path>
+            </svg>
+            <span id="e-cat-nb-elements">—</span>
+          </span>
+          <button type="button" class="proc-filtre" id="e-cat-filtre"
+                  aria-label="Trier" aria-expanded="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.9" stroke-linecap="round">
+              <path d="M3 7.5h11M18.5 7.5H21M3 16.5h2.5M10 16.5h11"></path>
+              <circle cx="16" cy="7.5" r="2.3"></circle>
+              <circle cx="7.7" cy="16.5" r="2.3"></circle>
+            </svg>
+          </button>
+        </div>
+
+        <div class="tb-volet tb-volet--tri glassDiv" id="e-cat-tri-volet" role="menu" hidden>
+          <button type="button" class="tb-v-opt tb-v-tri on" data-tri="az">
+            <span class="tb-v-coche">✓</span>Nom A → Z</button>
+          <button type="button" class="tb-v-opt tb-v-tri" data-tri="new">
+            <span class="tb-v-coche">✓</span>Plus récent d’abord</button>
+          <button type="button" class="tb-v-opt tb-v-tri" data-tri="old">
+            <span class="tb-v-coche">✓</span>Plus ancien d’abord</button>
+        </div>
 
     <div id="equipe-procedures-list"></div>
   </div>
@@ -4355,7 +4387,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=ed88ba82"></script>
+<script type="module" src="app.js?v=5c03fa62"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5259,8 +5291,17 @@ function ICONES_DU_JEU() {
      `ICONS` garde ses quatre entrees : la premiere sert encore a l'espace
      equipe le jour ou on lui remettrait un accueil, et la retirer du tableau
      decalerait tous les indices ci-dessous. */
+  /* ⚠ TROIS ICONES COTE EQUIPE, ET LA CLOCHE A DISPARU AVEC SON ONGLET.
+
+     Le jeu en gardait quatre : documents, QR, cloche, reglages. Depuis le
+     retrait de « Notifications », la barre n'a plus que trois onglets — mais
+     ce jeu-ci n'avait pas suivi. La cloche prenait la place des reglages, qui
+     se retrouvaient sans icone.
+
+   ⚠ `ICONS[3]` EST LA MEME ROUE QUE COTE GESTION. Les deux jeux la partagent :
+     un seul dessin, une seule retouche si elle change un jour. */
   return LABELS === LABELS_EQUIPE
-    ? [ICONS[1], ICONE_QR, ICONE_CLOCHE, ICONS[3]]
+    ? [ICONS[1], ICONE_QR, ICONS[3]]
     : [ICONS[1], ICONS[2], ICONS[3]];
 }
 

@@ -25038,17 +25038,32 @@ async function rendreVerrou() {
 
 /* ⚠ ET ON LE REND AUSSI SI L'ONGLET SE FERME. `visibilitychange` couvre le
    balayage de l'app sur iPhone, ou `beforeunload` n'est jamais emis. */
-/* ⚠ LE VERROU SE REND AUSSI QUAND L'ONGLET SE FERME.
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚠ LE VERROU NE SE REND PLUS QUAND L'ONGLET PASSE EN ARRIERE-PLAN.
 
-   `sendBeacon` visait la fonction SQL, qui n'existe plus dans ce chemin. Et
-   il ne portait pas la cle d'authentification : la requete etait rejetee.
+     C'ETAIT LA CAUSE, ET ELLE VENAIT DE MOI.
 
-   On passe donc par `visibilitychange`, qui laisse le temps d'une vraie
-   requete — Safari l'emet avant de decharger la page, contrairement a
-   `beforeunload` qu'il ignore souvent. */
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && verrouTenu) rendreVerrou()
-})
+     `visibilitychange` se declenche a chaque fois que l'onglet cesse d'etre
+     regarde : basculer vers un autre onglet, verrouiller le telephone,
+     repondre a un message. J'y avais accroche la liberation du verrou en
+     pensant a la fermeture de la page.
+
+     Resultat, pendant vos essais :
+
+       1. Antoine ouvre « Modifier »          -> verrou pris
+       2. vous passez au second appareil      -> l'onglet d'Antoine se masque
+                                              -> LE VERROU EST RENDU
+       3. Emilien ouvre « Modifier »          -> la procedure est libre
+
+     Le verrou fonctionnait. Il etait relache juste avant le test.
+
+   ⚠ ON NE LE REND PLUS DU TOUT A LA FERMETURE. C'est deliberé : il expire de
+     lui-meme apres quinze minutes, et l'entretien toutes les cinq minutes ne
+     tourne que si l'onglet est visible. Un onglet ferme cesse donc de
+     rafraichir, et le verrou tombe seul.
+
+     Quinze minutes d'attente valent mieux qu'un verrou qui ne tient jamais.
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ⚠ CETTE FONCTION N'EST JAMAIS APPELEE.
 

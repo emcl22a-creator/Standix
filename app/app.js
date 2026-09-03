@@ -17172,6 +17172,13 @@ window.ouvrirMontageVideo = async function(procId) {
   el('dv-sous').textContent = dvEdition
     ? "Vos changements ne partent qu'\u00e0 l'enregistrement"
     : 'Marquez le d\u00e9but et la fin de chaque \u00e9tape'
+  /* ⚠ LA PILE REPART VIDE A CHAQUE OUVERTURE.
+
+     Elle vit dans la page : sans ce nettoyage, ouvrir une seconde procedure
+     permettrait d'annuler vers l'etat de la premiere — et de coller ses etapes
+     dans celle-ci. */
+  pileVideo = []
+
   el('dv-entete').style.display = dvEdition ? 'block' : 'none'
   /* ⚠ SEULEMENT EN MODIFICATION. A la creation, la procedure n'existe pas
      encore : personne d'autre ne peut la tenir. */
@@ -18104,33 +18111,74 @@ function dvPistePourTemps() {
 
    Une étape qui porte déjà du texte n'est pas effacée sans confirmation : ce
    serait perdre un travail de rédaction pour un geste de découpage. */
-function majBoutonAnnuler() {
-  const b = document.getElementById('dv-annuler')
-  if (b) b.disabled = videoSteps.length === 0
+/* ═══════════════════════════════════════════════════════════════════════════
+   ANNULER LA DERNIERE MANIPULATION
+
+   ⚠ LE BOUTON NE DEFAISAIT QUE LES COUPURES. Il retirait la derniere etape
+     decoupee — rien d'autre. Or sur cet ecran on peut aussi deplacer une
+     poignee, reecrire un texte, supprimer une etape du milieu : quatre gestes
+     sur cinq n'etaient pas rattrapables.
+
+   ⚠ ON GARDE L'ETAT COMPLET AVANT CHAQUE GESTE. Une copie de `videoSteps`
+     empilee a chaque manipulation ; annuler restaure la precedente. C'est la
+     meme mecanique que `pileEdition` sur l'ecran manuel — qui, elle,
+     fonctionnait deja.
+
+   ⚠ VINGT ETATS AU PLUS. Chaque copie est un texte JSON de quelques
+     kilooctets ; sans borne, une longue seance de decoupage les accumulerait
+     tous en memoire.
+
+   ⚠ ET LA PILE EST PROPRE A LA SESSION. Elle vit dans la page : la fermer
+     l'efface, et le gestionnaire d'a cote n'en voit rien. C'est bien ce qu'on
+     veut — annuler ne concerne que celui qui a fait le geste.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let pileVideo = []
+const PILE_VIDEO_MAX = 20
+
+function memoriserVideo() {
+  try {
+    pileVideo.push(JSON.stringify(videoSteps))
+    if (pileVideo.length > PILE_VIDEO_MAX) pileVideo.shift()
+  } catch (e) {}
+  majBoutonAnnuler()
 }
 
-document.getElementById('dv-annuler')?.addEventListener('click', async () => {
-  if (!videoSteps.length) return
-  const derniere = videoSteps[videoSteps.length - 1]
+function majBoutonAnnuler() {
+  const b = document.getElementById('dv-annuler')
+  /* ⚠ LE BOUTON SUIT LA PILE, PLUS LE NOMBRE D'ETAPES. On peut avoir zero
+     etape et quelque chose a annuler — la suppression de la derniere, par
+     exemple. */
+  if (b) b.disabled = pileVideo.length === 0
+}
 
-  if (String(derniere.texte || '').trim()) {
-    const ok = await confirmDialog({
-      titre: 'Retirer cette \u00e9tape ?',
-      message: `\u00ab ${derniere.texte.slice(0, 60)} \u00bb sera effac\u00e9e avec sa coupure.`,
-      confirmer: 'Retirer',
-      annuler: 'Garder',
-      danger: true,
-    })
-    if (!ok) return
-  }
+document.getElementById('dv-annuler')?.addEventListener('click', () => {
+  /* ⚠ ON RESTAURE L'ETAT PRECEDENT, ON NE RETIRE PLUS LA DERNIERE ETAPE.
 
-  const debut = derniere.timestamp_video
-  videoSteps.pop()
-  dvDebutEnCours = debut
+     L'ancien code faisait `videoSteps.pop()` : il ne savait defaire qu'une
+     coupure. Un texte reecrit, une poignee deplacee, une etape supprimee au
+     milieu — rien de tout cela n'etait rattrapable, et pire, toucher le bouton
+     apres l'un de ces gestes supprimait une etape qu'on n'avait pas touchee.
+
+   ⚠ PLUS DE CONFIRMATION NON PLUS. Annuler est deja le geste qui repare : le
+     faire confirmer ajoutait une question a une action sans risque. */
+  if (!pileVideo.length) return
+
+  try {
+    const avant = pileVideo.pop()
+    videoSteps = JSON.parse(avant)
+  } catch (e) { return }
+
+  /* ⚠ LE POINT DE DEPART SUIT L'ETAT RENDU. Sans cela, la prochaine coupure
+     partirait d'un instant qui n'a plus de sens. */
+  dvDebutEnCours = videoSteps.length
+    ? videoSteps[videoSteps.length - 1].fin_video
+    : 0
   dvSelection = videoSteps.length ? videoSteps.length - 1 : null
+
   const v = dvLecteur()
-  if (v) v.currentTime = debut
-  dvMajGeste(); renderVideoSteps(); dvMajFrise()
+  if (v) v.currentTime = dvDebutEnCours
+
+  dvMajGeste(); renderVideoSteps(); dvMajFrise(); majBoutonAnnuler()
   if (navigator.vibrate) navigator.vibrate(8)
 })
 
@@ -18231,6 +18279,9 @@ function brancherPoignee(poi, i) {
 
     /* Les deux étapes voisines se partagent l'instant : la fin de l'une EST le
        début de l'autre. Ne bouger qu'une seule des deux ouvrirait un trou. */
+    /* ⚠ ON MEMORISE AVANT DE BOUGER. Une poignee deplacee change deux etapes a
+       la fois : sans copie prealable, l'annulation ne saurait pas quoi rendre. */
+    memoriserVideo()
     videoSteps[i].fin_video = t
     if (videoSteps[i + 1]) videoSteps[i + 1].timestamp_video = t
 
@@ -18412,6 +18463,7 @@ document.getElementById('dv-bouton')?.addEventListener('click', async () => {
     return
   }
 
+  memoriserVideo()
   videoSteps.push({
     texte: '',
     timestamp_video: dvDebutEnCours,
@@ -18495,6 +18547,15 @@ function renderVideoSteps(listEl) {
     }
 
     const ta = div.querySelector('textarea')
+    /* ⚠ LE TEXTE SE MEMORISE AU DEBUT DE LA SAISIE, PAS A CHAQUE LETTRE.
+
+       `input` se declenche a chaque caractere : empiler un etat par lettre
+       remplirait la pile en une phrase, et annuler ne reculerait que d'un
+       caractere — inutile.
+
+       `focus` ne part qu'une fois, quand on entre dans le champ. Annuler rend
+       alors le texte tel qu'il etait AVANT qu'on y touche. */
+    ta.addEventListener('focus', () => { memoriserVideo() })
     ta.addEventListener('input', (e) => {
       videoSteps[i].texte = e.target.value; majBoutonIA()
     /* Même correctif que les deux autres fils : le champ s'ajuste à l'affichage,
@@ -18509,6 +18570,7 @@ function renderVideoSteps(listEl) {
     div.querySelector('.sup').addEventListener('click', (e) => {
       e.stopPropagation()
       demanderSuppressionEtape(i + 1, videoSteps[i].texte, () => {
+        memoriserVideo()
         videoSteps.splice(i, 1)
         dvSelection = null
         renderVideoSteps(); dvMajFrise(); dvMajGeste()
@@ -19892,8 +19954,9 @@ function renderEquipeAccueil() {
      est en début de journée pour une équipe de cuisine. */
   const bonjour = (h >= 5 && h < 18) ? 'Bonjour' : 'Bonsoir'
   const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
-  /* Le salut est le TITRE de la page. La main reste : c'est elle qui distingue
-     un bonjour d'une simple étiquette. */
+  /* ⚠ LE SALUT N'EST PLUS LE TITRE : c'est un surtitre, au-dessus de
+     « Procedures ». Il garde sa main — c'est elle qui le distingue d'une
+     etiquette — mais il ne prend plus la place du nom de la page. */
   const salut = document.getElementById('e-salut')
   if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
 
@@ -19917,13 +19980,59 @@ function renderEquipeAccueil() {
 
 /* Grille des dossiers, exactement celle de l'espace gestion : anneau de
    progression, nom, nombre de procédures et aperçu des titres récents. */
+/* ═══ LA RECHERCHE DE L'ESPACE EQUIPE ═══
+
+   ⚠ LA MEME MECANIQUE QUE COTE GESTION, aux identifiants pres. Deux
+     implantations differentes pour un meme geste finiraient par diverger. */
+let rechercheEquipe = ''
+
+const champRechE = document.getElementById('e-proc-rech-champ')
+const croixRechE = document.getElementById('e-proc-rech-x')
+
+function majCroixRechE() {
+  if (croixRechE) croixRechE.hidden = !champRechE?.value
+}
+
+champRechE?.addEventListener('input', () => {
+  rechercheEquipe = champRechE.value
+  majCroixRechE()
+  renderEquipeCategories()
+})
+
+croixRechE?.addEventListener('click', () => {
+  if (!champRechE) return
+  champRechE.value = ''
+  rechercheEquipe = ''
+  majCroixRechE()
+  renderEquipeCategories()
+  /* On rend le clavier : effacer sert le plus souvent a retaper autre chose. */
+  champRechE.focus()
+})
+
 function renderEquipeCategories() {
   const grille = document.getElementById('e-cat-grid')
   if (!grille) return
   grille.innerHTML = ''
 
-  /* Le compte de la page est écrit par `renderEquipeAccueil`, pas ici : deux
-     fonctions qui remplissent la même ligne finissent par se contredire. */
+  /* ⚠ LE COMPTE DE DOSSIERS S'ECRIT ICI, LUI.
+
+     La ligne de compte de la PAGE — « Il vous reste 3 procedures » — reste a
+     `renderEquipeAccueil` : deux fonctions sur la meme ligne se
+     contrediraient. Mais le nombre de DOSSIERS est une autre ligne, et c'est
+     cette fonction qui les connait.
+
+   ⚠ ET AVANT TOUTE SORTIE. Meme piege que cote gestion : la branche « aucune
+     procedure » sortait sans y toucher, et la ligne gardait le chiffre
+     precedent. */
+  const nbDossiers = new Set(
+    (allEquipeProcedures || []).map(p => p.categorie || 'Sans dossier')).size
+  const nbEl = document.getElementById('e-proc-nb-dossiers')
+  if (nbEl) {
+    nbEl.textContent = nbDossiers
+      ? `${nbDossiers} dossier${nbDossiers > 1 ? 's' : ''}`
+      : 'Aucun dossier'
+  }
+
 
   if (!allEquipeProcedures.length) {
     grille.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
@@ -19943,7 +20052,38 @@ function renderEquipeCategories() {
   const dateCat = (n) => Math.max(...parCat[n].map(p => new Date(p.created_at || 0).getTime()))
   const resteCat = (n) => parCat[n].filter(p => !equipeLues.has(p.id)).length
 
-  Object.keys(parCat).sort((a, b) => {
+  /* ⚠ LA RECHERCHE PORTE SUR LE DOSSIER ET SUR SES PROCEDURES.
+
+     Chercher « friteuse » doit trouver le dossier « Cuisine » s'il contient
+     une procedure de ce nom : sinon il faudrait deja savoir dans quel dossier
+     regarder, ce qui vide la recherche de son interet.
+
+   ⚠ SANS ACCENTS NI CASSE. « Cafe » doit trouver « Café » — c'est ce que fait
+     `sansAccents` cote gestion, on emploie la meme. */
+  const q = (rechercheEquipe || '').trim()
+  const termes = q ? sansAccents(q).split(/\s+/).filter(Boolean) : []
+  const correspond = (nom) => {
+    if (!termes.length) return true
+    const n = sansAccents(nom)
+    const titres = parCat[nom].map(p => sansAccents(p.titre || ''))
+    return termes.some(t => n.includes(t) || titres.some(x => x.includes(t)))
+  }
+
+  const visibles = Object.keys(parCat).filter(correspond)
+
+  if (nbEl) {
+    nbEl.textContent = visibles.length
+      ? `${visibles.length} dossier${visibles.length > 1 ? 's' : ''}`
+      : (termes.length ? 'Aucun résultat' : 'Aucun dossier')
+  }
+
+  if (!visibles.length && termes.length) {
+    grille.innerHTML = '<div class="cl-rien">Aucune procédure ne correspond à « ' +
+      escapeHtml(q) + ' ».</div>'
+    return
+  }
+
+  visibles.sort((a, b) => {
     if (equipeCatSort === 'new') return dateCat(b) - dateCat(a)
     if (equipeCatSort === 'old') return dateCat(a) - dateCat(b)
     return a.localeCompare(b, 'fr')
@@ -20482,6 +20622,14 @@ window.ouvrirQuota = async function() {
 
   const s = reste > 1 ? 's' : ''
 
+  /* ⚠ EN ESSAI, LE QUOTA NE SE RENOUVELLE PAS.
+
+     `essaiTermine()` ne sert qu'a bloquer ; ici on veut savoir si l'essai est
+     EN COURS. On lit donc `etatAbo` directement : statut different d'actif, et
+     des jours restants. */
+  const enEssai = !!etatAbo && etatAbo.statut !== 'actif'
+    && !(mesEtablissements || []).some(e => e.abonnement_statut === 'actif')
+
   carte.innerHTML = `
     <div class="quota-bloc">
       <div class="quota-chiffre">${utilisees} <em>/ ${quota}</em></div>
@@ -20489,7 +20637,13 @@ window.ouvrirQuota = async function() {
         ? 'partag\u00e9 entre vos entreprises'
         : 'selon votre abonnement'}</div>
       <div class="quota-barres">${barres}</div>
-      <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ce mois-ci</div>
+      <!-- ⚠ « ce mois-ci » EST FAUX PENDANT L'ESSAI.
+
+           Les quinze analyses ne se renouvellent pas au mois : elles couvrent
+           les quatorze jours, une fois. Ecrire « ce mois-ci » laissait croire
+           a un compteur qui repartirait — et l'on decouvrait le contraire au
+           mauvais moment. -->
+      <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ${enEssai ? 'pendant les 14 jours' : 'ce mois-ci'}</div>
       ${q.partage ? `<div class="quota-part">
         <!-- ⚠ LA MENTION N'APPARAIT QUE S'IL Y A PLUSIEURS ENTREPRISES. Sinon
              elle sous-entend un partage qui n'existe pas, et l'on cherche avec
@@ -20507,9 +20661,10 @@ window.ouvrirQuota = async function() {
     ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
         ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
       </button>` : ''}
-    <div class="quota-pied">
-      Renouvellement le <b>${dateRenouvellement()}</b>.
-      Les analyses non utilis\u00e9es ne se reportent pas.
+    <div class="quota-pied">${enEssai
+      ? `Ces analyses couvrent votre essai. Elles ne se renouvellent pas.`
+      : `Renouvellement le <b>${dateRenouvellement()}</b>.
+         Les analyses non utilis\u00e9es ne se reportent pas.`}
     </div>`
 
   /* ⚠ LES BARRES PARTENT DE ZERO ET SE REMPLISSENT. Deux images d'attente,

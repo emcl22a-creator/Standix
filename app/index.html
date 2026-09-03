@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=778a6c7b">
+<link rel="stylesheet" href="style.css?v=98560066">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2985,12 +2985,19 @@
   </div>
 
   <div class="screen" inert id="p-settings">
-    <div class="page-tete">
+    <!-- ⚠ L'ESSAI PASSE AU-DESSUS DU TITRE.
+
+           Il etait sous « Reglages », entre le titre et les groupes. C'est ce
+           qu'on veut voir en premier — et c'est aussi ce qui decide si l'app
+           reste utilisable. Le titre, lui, ne dit rien qu'on ne sache deja en
+           ayant touche l'onglet. -->
+        <div id="essai-reglages" class="alerte-essai" style="display: none;"></div>
+        <div class="page-tete">
       <h1>Réglages</h1>
       <p>Votre compte, votre équipe<br>et le fonctionnement de l’app.</p>
     </div>
 
-    <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div id="essai-reglages" class="alerte-essai" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
+    <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
       <div class="tete">
         <span class="pic">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
@@ -4237,7 +4244,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=d3d74dc7"></script>
+<script type="module" src="app.js?v=891fd395"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

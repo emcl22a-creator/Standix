@@ -2642,6 +2642,40 @@ document.addEventListener('click', async (e) => {
 })
 
 async function enterApp(membre) {
+  /* ═══ ON CHANGE D'ENTREPRISE : ON VIDE TOUT ═══
+
+     ⚠ DIX CHEMINS MENENT ICI. Creation d'entreprise, adhesion par code,
+       bascule d'etablissement, reconnexion, suppression du precedent… J'avais
+       corrige UN de ces chemins ; les neuf autres gardaient les procedures de
+       l'entreprise d'avant.
+
+       On voyait donc les titres d'une autre entreprise dans la liste, et
+       « aucun resultat » en touchant l'un d'eux : la liste venait du cache, la
+       base ne connaissait pas ces procedures ici.
+
+     ⚠ ON NE VIDE QUE SI L'ENTREPRISE CHANGE. Rentrer dans la meme — apres une
+       reconnexion — n'a aucune raison de tout rejeter et de refaire les
+       requetes.
+
+     ⚠ ET ON REPEINT AVANT DE CHARGER. Vider sans repeindre laisserait
+       l'ancienne liste a l'ecran jusqu'a l'arrivee des nouvelles donnees. */
+  if (currentMembre?.entreprise_id !== membre?.entreprise_id) {
+    cachedEntreprise = null
+    cachedMembres = []
+    cachedEmployes = []
+    cachedValidations = []
+    cachedEtapesByProc = {}
+    allGestionProcedures = []
+    allCategoriesData = []
+    allEquipeProcedures = []
+    currentGaData = null
+    sousDossierCourant = null
+    equipeSousDossier = null
+    etatAbo = null
+    dejaEntre = new Set()
+    try { renderCategoryGrid?.(); renderEquipeCategories?.() } catch (e) {}
+  }
+
 
   currentMembre = membre
   try {
@@ -6774,7 +6808,17 @@ window.showGestionScreen = function(id, btn) {
      Toutes les sorties passent par ici — le bouton retour, l'enregistrement, la
      suppression, un onglet de la barre. Le poser a un seul de ces endroits en
      aurait laisse trois sans. */
-  if (verrouTenu && id !== 'p-edit-procedure') rendreVerrou()
+  /* ⚠ LES DEUX ECRANS D'EDITION SONT `p-create-video` ET `p-create-manual`.
+
+     Je testais `p-edit-procedure` — l'ecran de la fonction morte, qui ne
+     s'ouvre jamais. Le verrou etait donc rendu des le premier changement
+     d'ecran, y compris en ENTRANT dans l'edition : il ne tenait aucune
+     seconde.
+
+     Le bouton « Modifier » mene a l'un de ces deux ecrans selon qu'il y a une
+     video ou non. */
+  const ECRANS_EDITION = ['p-create-video', 'p-create-manual']
+  if (verrouTenu && !ECRANS_EDITION.includes(id)) rendreVerrou()
 
   /* ⚠ L'ARRIVEE DES CARTES D'ABONNEMENT REDEVIENT POSSIBLE ICI.
 
@@ -18737,7 +18781,17 @@ async function openAnalyse(procId) {
      régler des bornes au dixième de seconde demande un autre outil. */
   /* Une procédure se modifie là où elle a été écrite : le montage si elle a une
      vidéo, le fil des étapes sinon. Plus d'éditeur à part. */
-  document.getElementById('analyse-edit-btn').onclick = () => {
+  document.getElementById('analyse-edit-btn').onclick = async () => {
+    /* ⚠ LE VERROU EST ICI, PAS DANS `openEditProcedure`.
+
+       Je l'y avais mis trois fois. Or cette fonction N'EST JAMAIS APPELEE —
+       c'est ecrit noir sur blanc dans les notes du projet, et j'ai verifie :
+       zero appel dans tout le code. Le verrou etait dans une fonction morte.
+
+       Le bouton « Modifier » passe par `ouvrirMontageVideo` ou
+       `ouvrirEtapesManuelles` selon qu'il y a une video. C'est donc ici, au
+       clic, que la question doit se poser — avant l'un ou l'autre. */
+    if (await verrouPris(procId) === false) return
     if (proc.video_url) ouvrirMontageVideo(procId)
     else ouvrirEtapesManuelles(procId)
   }
@@ -22469,6 +22523,20 @@ async function basculerVersEtablissement(entrepriseId) {
   sousDossierCourant = null
   equipeSousDossier = null
 
+  /* ⚠ TROIS CACHES MANQUAIENT ICI, vu en comparant a la liste d'`enterApp` :
+
+       · `cachedEtapesByProc` — les etapes gardaient celles de l'entreprise
+         d'avant, d'ou des procedures vides ou peuplees a tort ;
+       · `etatAbo` — l'essai de l'ancienne entreprise s'affichait sur la
+         nouvelle ;
+       · `dejaEntre` — les animations d'apparition ne rejouaient pas.
+
+   ⚠ DEUX LISTES A TENIR ACCORDEES, C'EST UNE DE TROP. Si un cache s'ajoute un
+     jour, il faudra penser aux deux endroits. */
+  cachedEtapesByProc = {}
+  etatAbo = null
+  dejaEntre = new Set()
+
   /* On ne masque plus l'app avant de recharger. Le faire rejouait l'animation
      d'entrée : la barre du haut et celle du bas repartaient de zéro, alors qu'on
      change seulement de contenu. Ce sont les procédures qui changent, pas le
@@ -22834,33 +22902,12 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const { data: fiche } = await supabase.from('membres').select('*')
         .eq('user_id', user.id).eq('entreprise_id', entrepriseId).maybeSingle()
       if (fiche) {
-        /* ⚠ ON VIDE TOUS LES CACHES, PAS SEULEMENT L'ENTREPRISE.
+        /* ⚠ LE VIDAGE DES CACHES A ETE DEPLACE DANS `enterApp`.
 
-           Seul `cachedEntreprise` etait remis a zero. Les procedures, les
-           membres, les validations et les dossiers de l'ANCIENNE entreprise
-           restaient en memoire : un compte qui creait sa propre entreprise
-           depuis un espace equipe y voyait les procedures du precedent
-           etablissement.
-
-           C'est une fuite de donnees entre entreprises — la plus grave qu'on
-           puisse avoir ici.
-
-         ⚠ LA MEME LISTE QUE `basculerVersEtablissement`. Cette fonction videt
-           deja tout correctement ; ce chemin-ci l'avait oubliee. */
-        cachedEntreprise = null
-        cachedMembres = []
-        cachedEmployes = []
-        cachedValidations = []
-        cachedEtapesByProc = {}
-        allGestionProcedures = []
-        allCategoriesData = []
-        allEquipeProcedures = []
-        currentGaData = null
-        sousDossierCourant = null
-        equipeSousDossier = null
-        etatAbo = null
-        dejaEntre = new Set()
-
+           Il etait ici, et ici seulement — un chemin sur dix. Les neuf autres
+           gardaient les donnees de l'entreprise precedente. Le mettre dans
+           `enterApp` le rend valable pour tous, et il n'y a plus qu'une seule
+           liste a tenir a jour. */
         await enterApp(fiche)
         toast(`${nom} est cr\u00e9\u00e9e. Vous en \u00eates responsable.`)
         return
@@ -24801,6 +24848,80 @@ function entretenirVerrou(procId) {
   }, 5 * 60000)
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   PRENDRE LE VERROU D'EDITION
+
+   ⚠ RETIREE DE `openEditProcedure`, QUI N'EST JAMAIS APPELEE.
+
+     J'y avais mis ce code trois fois de suite. Les notes du projet le
+     signalaient — « `openEditProcedure` n'est jamais appele » — et je ne l'ai
+     verifie qu'a la troisieme reprise : zero appel dans tout le fichier.
+
+     La fonction vit maintenant a part, et c'est le bouton « Modifier » qui
+     l'appelle.
+
+   ⚠ ELLE REND `false` QUAND L'ACCES EST REFUSE, et `true` dans tous les autres
+     cas — y compris en cas de panne reseau. Bloquer quelqu'un parce que le
+     verrou n'a pas pu etre pose ferait plus de mal que le risque qu'il ecarte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function verrouPris(procId) {
+  try {
+    const { data: u } = await supabase.auth.getUser()
+    const moi = u?.user?.id
+    if (!moi) return true
+
+    const limite = new Date(Date.now() - 15 * 60000).toISOString()
+
+    /* ⚠ LA CONDITION EST DANS LA REQUETE. PostgreSQL n'execute qu'un seul
+       `update` a la fois sur une ligne : deux personnes qui touchent
+       « Modifier » a la meme seconde ne peuvent pas reussir toutes les deux. */
+    const { data, error } = await supabase
+      .from('procedures')
+      .update({ edite_par: moi, edite_depuis: new Date().toISOString() })
+      .eq('id', procId)
+      .or(`edite_par.is.null,edite_par.eq.${moi},edite_depuis.lt.${limite}`)
+      .select('id')
+
+    if (error) {
+      console.error('[verrou]', error)
+      toast('Verrou indisponible : ' + (error.message || 'erreur'))
+      return true
+    }
+
+    if (data && data.length) {
+      verrouTenu = procId
+      entretenirVerrou(procId)
+      return true
+    }
+
+    /* Refuse : on lit QUI edite, pour que le message serve. */
+    let qui = 'Un gestionnaire'
+    try {
+      const { data: p } = await supabase.from('procedures')
+        .select('edite_par, entreprise_id').eq('id', procId).maybeSingle()
+      if (p?.edite_par) {
+        const { data: m } = await supabase.from('membres')
+          .select('nom').eq('user_id', p.edite_par)
+          .eq('entreprise_id', p.entreprise_id).maybeSingle()
+        if (m?.nom) qui = m.nom
+      }
+    } catch {}
+
+    await confirmDialog({
+      titre: 'Procédure en cours de modification',
+      message: `${qui} modifie cette procédure en ce moment. ` +
+        'Revenez dans quelques minutes.',
+      confirmer: 'Compris', annuler: null, danger: false,
+    })
+    return false
+
+  } catch (e) {
+    console.error('[verrou]', e)
+    toast('Verrou : ' + (e?.message || 'appel impossible'))
+    return true
+  }
+}
+
 async function rendreVerrou() {
   clearInterval(verrouMinuteur)
   if (!verrouTenu) return
@@ -24833,77 +24954,19 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden && verrouTenu) rendreVerrou()
 })
 
+/* ⚠ CETTE FONCTION N'EST JAMAIS APPELEE.
+
+   Aucun endroit du code ne l'invoque — verifie. Les notes du projet le
+   signalaient deja ; le bouton « Modifier » passe par `ouvrirMontageVideo` ou
+   `ouvrirEtapesManuelles`, jamais par ici.
+
+   J'y ai pose le verrou d'edition trois fois de suite avant de m'en rendre
+   compte. Il vit maintenant dans `verrouPris`, appelee depuis le bouton.
+
+ ⚠ ON LA GARDE PLUTOT QUE DE LA SUPPRIMER : elle peint l'ecran
+   `p-edit-procedure`, qui existe encore dans le balisage. Ce commentaire est
+   la pour qu'on ne perde plus de temps a la modifier. */
 window.openEditProcedure = async function(procId, mode) {
-  /* ═══ LE VERROU, SANS FONCTION SQL ═══
-
-     ⚠ LA VERSION PRECEDENTE PASSAIT PAR `prendre_verrou`, UNE FONCTION EN BASE.
-       Elle existait, les colonnes aussi, la politique autorisait l'ecriture —
-       et pourtant aucun verrou n'etait jamais pose. Trois seances de
-       diagnostic ne m'ont pas dit pourquoi.
-
-     ⚠ ON ECRIT DONC DIRECTEMENT, avec la condition DANS la requete.
-
-       `update ... where id = X and (edite_par is null or edite_par = moi or
-       edite_depuis < il y a 15 min)` : PostgreSQL n'execute qu'un seul UPDATE
-       a la fois sur une ligne. Deux personnes qui touchent « Modifier » a la
-       meme seconde ne peuvent pas reussir toutes les deux — la seconde ne
-       trouve plus de ligne a modifier.
-
-       C'est la meme garantie que la fonction, avec deux avantages : rien a
-       deployer en base, et l'erreur remonte telle quelle si quelque chose
-       cloche. */
-  try {
-    const { data: u } = await supabase.auth.getUser()
-    const moi = u?.user?.id
-    if (!moi) throw new Error('session introuvable')
-
-    const limite = new Date(Date.now() - 15 * 60000).toISOString()
-
-    /* ⚠ `.or()` PREND UNE CHAINE, PAS UN OBJET. Les trois conditions y sont
-       separees par des virgules ; une seule suffit pour obtenir le verrou. */
-    const { data, error } = await supabase
-      .from('procedures')
-      .update({ edite_par: moi, edite_depuis: new Date().toISOString() })
-      .eq('id', procId)
-      .or(`edite_par.is.null,edite_par.eq.${moi},edite_depuis.lt.${limite}`)
-      .select('id')
-
-    if (error) {
-      console.error('[verrou] ecriture refusee :', error)
-      toast('Verrou indisponible : ' + (error.message || 'erreur inconnue'))
-    } else if (!data || data.length === 0) {
-      /* ⚠ AUCUNE LIGNE MODIFIEE : quelqu'un d'autre tient le verrou. On lit
-         alors QUI, pour que le message serve a quelque chose. */
-      let qui = 'Un gestionnaire'
-      try {
-        const { data: p } = await supabase.from('procedures')
-          .select('edite_par, entreprise_id').eq('id', procId).maybeSingle()
-        if (p?.edite_par) {
-          const { data: m } = await supabase.from('membres')
-            .select('nom').eq('user_id', p.edite_par)
-            .eq('entreprise_id', p.entreprise_id).maybeSingle()
-          if (m?.nom) qui = m.nom
-        }
-      } catch {}
-
-      await confirmDialog({
-        titre: 'Procédure en cours de modification',
-        message: `${qui} modifie cette procédure en ce moment. ` +
-          'Revenez dans quelques minutes.',
-        confirmer: 'Compris', annuler: null, danger: false,
-      })
-      return
-    } else {
-      verrouTenu = procId
-      entretenirVerrou(procId)
-    }
-  } catch (e) {
-    /* ⚠ UNE PANNE RESEAU N'EMPECHE PAS DE TRAVAILLER — mais elle ne se tait
-       plus. Le silence de la version precedente m'a coute trois seances. */
-    console.error('[verrou] appel impossible :', e)
-    toast('Verrou : ' + (e?.message || 'appel impossible'))
-  }
-
   pileEdition = []
   editProcedureId = procId
   editMode = mode || 'edit'

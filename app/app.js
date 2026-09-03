@@ -984,6 +984,23 @@ function revelerApp() {
      mise en page. */
   requestAnimationFrame(() => requestAnimationFrame(() => {
     document.body.classList.remove('chargement')
+
+    /* ⚠ ON REMESURE LA BARRE UNE FOIS LE VOILE LEVE.
+
+       `body.chargement` la garde a `opacity:0` — mais elle est aussi masquee
+       plus tot par `display:none`, et `layout()` lit alors une largeur de
+       ZERO. Les trois onglets se retrouvent au meme endroit et se
+       chevauchent : c'est l'ecran casse que vous avez photographie.
+
+       Il n'apparait que si la mesure est tombee pendant que la barre etait
+       masquee — d'ou son caractere intermittent.
+
+     ⚠ DEUX IMAGES D'ATTENTE ENCORE. La classe vient d'etre retiree ; le
+       navigateur n'a pas repeint. Mesurer maintenant donnerait les memes
+       valeurs fausses. */
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (document.getElementById('bar')?.offsetWidth) window.rebuild?.()
+    }))
   }))
 }
 setTimeout(() => {
@@ -996,6 +1013,24 @@ setTimeout(() => {
 function afficherBarre(montrer) {
   const b = document.getElementById('bar')
   if (b) b.style.display = montrer ? '' : 'none'
+
+  /* ⚠ ON REMESURE DES QUE LA BARRE PARAIT, ET C'ETAIT LE DEFAUT.
+
+     `layout()` lit la largeur de la barre pour placer les onglets. Masquee,
+     elle vaut ZERO : les trois onglets se retrouvent tous au meme endroit et
+     se chevauchent — l'ecran que vous avez photographie.
+
+     La remesure n'avait lieu que si un changement d'espace attendait. Quand la
+     barre s'ouvrait sur l'espace deja en place, rien ne la recalculait.
+
+   ⚠ DEUX IMAGES D'ATTENTE. Le navigateur n'a pas encore applique le
+     `display` : mesurer tout de suite donnerait encore zero. */
+  if (montrer) {
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (document.getElementById('bar')?.offsetWidth) window.rebuild?.()
+    }))
+  }
+
   /* La barre vient d'apparaître : si un changement d'espace avait été demandé
      pendant qu'elle était masquée, il n'a rien pu faire — sa largeur valait
      zéro. On le rejoue maintenant, la mesure est possible. */
@@ -7324,6 +7359,11 @@ async function loadGestionProcedures() {
     return
   }
 
+  /* ⚠ ON AMORCE AVANT DE PEINDRE. Marquer l'existant apres le rendu ferait
+     paraitre les points bleus une fraction de seconde avant qu'ils
+     disparaissent. */
+  amorcerBrouillonsVus()
+
   renderAccueil()
   renderCategoryGrid()
   surveillerAnalyses()
@@ -7659,9 +7699,50 @@ function debutDuMois() {
    ═══════════════════════════════════════════════════════════════════════════ */
 const CLE_VUS = 'standix.brouillons.vus'
 
+/* ⚠ UNE CLE PAR COMPTE ET PAR ENTREPRISE.
+
+   `CLE_VUS` etait unique pour tout l'appareil : deux comptes sur le meme
+   navigateur partageaient la liste des procedures lues. Marc en ouvrait une,
+   Emma se connectait, elle la voyait deja marquee.
+
+   Le meme compte dans deux etablissements les melangeait aussi.
+
+ ⚠ ON REVIENT A LA CLE GLOBALE SI LE MEMBRE N'EST PAS ENCORE CHARGE. Cela
+   n'arrive qu'au tout debut, avant que la liste soit peinte. */
+function cleVus() {
+  const m = currentMembre
+  return m?.id ? `${CLE_VUS}.${m.id}` : CLE_VUS
+}
+
 function brouillonsVus() {
-  try { return new Set(JSON.parse(localStorage.getItem(CLE_VUS) || '[]')) }
+  try { return new Set(JSON.parse(localStorage.getItem(cleVus()) || '[]')) }
   catch { return new Set() }
+}
+
+/* ⚠ A LA PREMIERE ARRIVEE, TOUT EST DEJA VU.
+
+   Un membre qui rejoint une entreprise de quarante procedures les voyait
+   toutes marquees d'un point bleu. Le point ne signalait plus rien : il etait
+   partout, et l'on apprenait a ne plus le regarder.
+
+   Le point doit dire « ceci est arrive DEPUIS que vous etes la ». On marque
+   donc l'existant au premier chargement, une seule fois par compte.
+
+ ⚠ ET SEULEMENT SI LA LISTE EST DEJA CHARGEE. Appelee trop tot, elle ne
+   marquerait rien et le drapeau serait pose pour rien. */
+function amorcerBrouillonsVus() {
+  const m = currentMembre
+  if (!m?.id) return
+  const drapeau = `${CLE_VUS}.amorce.${m.id}`
+  try {
+    if (localStorage.getItem(drapeau)) return
+    const toutes = [...(allGestionProcedures || []), ...(allEquipeProcedures || [])]
+    if (!toutes.length) return
+    const vus = brouillonsVus()
+    toutes.forEach(p => p?.id && vus.add(p.id))
+    localStorage.setItem(cleVus(), JSON.stringify([...vus].slice(-200)))
+    localStorage.setItem(drapeau, '1')
+  } catch (e) {}
 }
 
 function marquerBrouillonVu(id) {
@@ -7672,7 +7753,7 @@ function marquerBrouillonVu(id) {
   /* ⚠ ON NE GARDE QUE LES DEUX CENTS DERNIERS. Sans plafond, la liste grossit
      indefiniment dans un stockage limite a quelques megaoctets — et une
      procedure vue il y a un an n'a plus besoin d'etre suivie. */
-  try { localStorage.setItem(CLE_VUS, JSON.stringify([...vus].slice(-200))) } catch {}
+  try { localStorage.setItem(cleVus(), JSON.stringify([...vus].slice(-200))) } catch {}
   majPastilleBrouillons()
 
   /* ⚠ LE POINT BLEU DOIT PARTIR TOUT DE SUITE.
@@ -13376,14 +13457,26 @@ async function lireEtatAbonnement() {
   if (!currentMembre?.entreprise_id) return null
   const { data, error } = await supabase
     .rpc('etat_abonnement', { p_entreprise: currentMembre.entreprise_id })
-  if (error || !data || !data.length) {
+  /* ⚠ LA FONCTION REND UN OBJET, PLUS UN TABLEAU.
+
+     Elle etait declaree `returns TABLE(...)` : PostgREST rendait une liste,
+     d'ou le `data[0]` plus bas. En la reecrivant en `returns json` pour reparer
+     le 400, son resultat est devenu un objet simple.
+
+     `data.length` valait donc `undefined`, la condition passait, et `etatAbo`
+     restait `null` : l'alerte d'essai ne s'affichait plus, et `essaiTermine()`
+     rendait toujours `false`.
+
+   ⚠ ON ACCEPTE LES DEUX FORMES, au cas ou elle redeviendrait une table. */
+  const brut = Array.isArray(data) ? data[0] : data
+  if (error || !brut || !brut.statut) {
     /* Sans réponse, on n'enferme personne : la migration n'est peut-être pas
        passée. Bloquer un client parce qu'une colonne manque serait pire que
        de laisser passer quelques jours de trop. */
     etatAbo = null
     return null
   }
-  etatAbo = data[0]
+  etatAbo = brut
 
   /* ═══ LE COMPTE D'ANALYSES, LU EN MÊME TEMPS ═══
 
@@ -19625,6 +19718,11 @@ async function loadEquipeProcedures() {
   })
 
   allEquipeProcedures = pretes
+
+  /* Meme chose cote equipe : ce qui existe a l'arrivee n'est pas une
+     nouveaute. */
+  amorcerBrouillonsVus()
+
   renderEquipeAccueil()
   renderEquipeCategories()
   renderBlocVisiteur()
@@ -22736,7 +22834,33 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const { data: fiche } = await supabase.from('membres').select('*')
         .eq('user_id', user.id).eq('entreprise_id', entrepriseId).maybeSingle()
       if (fiche) {
+        /* ⚠ ON VIDE TOUS LES CACHES, PAS SEULEMENT L'ENTREPRISE.
+
+           Seul `cachedEntreprise` etait remis a zero. Les procedures, les
+           membres, les validations et les dossiers de l'ANCIENNE entreprise
+           restaient en memoire : un compte qui creait sa propre entreprise
+           depuis un espace equipe y voyait les procedures du precedent
+           etablissement.
+
+           C'est une fuite de donnees entre entreprises — la plus grave qu'on
+           puisse avoir ici.
+
+         ⚠ LA MEME LISTE QUE `basculerVersEtablissement`. Cette fonction videt
+           deja tout correctement ; ce chemin-ci l'avait oubliee. */
         cachedEntreprise = null
+        cachedMembres = []
+        cachedEmployes = []
+        cachedValidations = []
+        cachedEtapesByProc = {}
+        allGestionProcedures = []
+        allCategoriesData = []
+        allEquipeProcedures = []
+        currentGaData = null
+        sousDossierCourant = null
+        equipeSousDossier = null
+        etatAbo = null
+        dejaEntre = new Set()
+
         await enterApp(fiche)
         toast(`${nom} est cr\u00e9\u00e9e. Vous en \u00eates responsable.`)
         return

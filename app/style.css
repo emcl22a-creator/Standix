@@ -15953,3 +15953,53 @@ body.espace-vide .screen.active{ animation:none !important; }
    plaque devenue plus contrastee. */
 .alerte-essai .ess-n{ color:#2E323C; }
 .alerte-essai .ess-u{ color:#646A76; }
+
+
+/* ⚠ LA NOTE S'ALIGNE SUR LE SOUS-TITRE.
+
+   Mesure a l'ecran : le sous-titre commence a 24 px du bord, le texte de la
+   note a 62 — trente-huit pixels plus loin. La note avait sa propre marge de
+   24, plus le liseré et son rembourrage.
+
+   On ramene la marge a zero : le liseré se pose sur le bord de la page, et le
+   texte reprend les 24 px du sous-titre grace au rembourrage. Les deux
+   commencent alors au meme endroit. */
+/* ⚠ LE TRAIT PASSE A GAUCHE DU TEXTE, HORS DU FLUX.
+
+   Mon rembourrage de 22 px poussait le texte de 22 px vers la droite : les
+   deux bords etaient bien a 24, mais les MOTS commencaient a 46 contre 24 pour
+   le sous-titre.
+
+   En posant le trait en `absolute`, il ne pousse plus rien. Le texte reprend
+   exactement la marge du sous-titre, et le liseré vient se placer dans les
+   24 px de rembourrage de la page — a gauche du texte, sans le decaler. */
+.edit-note{
+  position:relative;
+  margin:10px 0 0;
+  padding:9px 0;
+  border-left:none;
+}
+.edit-note::before{
+  content:'';
+  position:absolute;
+  left:-12px; top:0; bottom:0;
+  width:2px;
+  border-radius:2px;
+  background:rgba(58,120,238,0.34);
+}
+
+
+/* ⚠ LE SALUT, EN SURTITRE.
+
+   Plus petit que le titre et plus pale : il situe la page sans la nommer.
+   C'est la place qu'Apple donne a la date au-dessus de « Aujourd'hui ».
+
+ ⚠ ET IL SE COLLE AU TITRE. Quatre pixels seulement : plus loin, il flotterait
+   et l'on ne saurait plus a quoi il se rapporte. */
+.page-tete .page-salut{
+  margin:0 0 4px;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:-0.015em;
+  color:var(--label-3);
+}

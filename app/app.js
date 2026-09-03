@@ -20254,7 +20254,7 @@ function carteDossierEquipe(nom, procs, reste, rang) {
       </span>
       <span class="cl-bas">
         ${reste
-          ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${reste} \u00e0 lire</span>`
+          ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${reste} non lue${reste > 1 ? 's' : ''}</span>`
           : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
         <span class="cl-n">${procs.length} proc\u00e9dure${procs.length > 1 ? 's' : ''}</span>
       </span>
@@ -20449,7 +20449,7 @@ function carteSousDossierEquipe(nom, procs, rang = 0) {
       </span>
       <span class="cl-bas">
         ${aLire
-          ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${aLire} à lire</span>`
+          ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${aLire} non lue${aLire > 1 ? 's' : ''}</span>`
           : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
         <span class="cl-n">${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
       </span>
@@ -20682,7 +20682,7 @@ function ficheEquipe(proc, rang = 0, dossier = null) {
       <span class="cl-bas">
         ${lue
           ? `<span class="cl-badge"><i style="background:#34C759"></i>Lue</span>`
-          : `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Pas encore lue"></span><i style="background:#3A78EE"></i>À lire</span>`}
+          : `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Pas encore lue"></span><i style="background:#3A78EE"></i>Non lue</span>`}
         <span class="cl-n">${dossier
           ? escapeHtml(dossier)
           : `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`}</span>

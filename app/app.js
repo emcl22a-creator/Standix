@@ -13587,7 +13587,16 @@ function essaiTermine() {
    ⚠ `jours_restants` PROTEGE L'ESSAI EN COURS. Pendant les quatorze jours, le
      statut n'est pas `actif` non plus — sans ce garde-fou, on bloquerait des le
      premier jour. */
-  const j = etatAbo.jours_restants
+  /* ⚠ LE CHIFFRE CHANGE A MINUIT, HEURE D'EUROPE.
+
+     `jours_restants` vient de la base : c'est une difference d'HEURES divisee
+     par 24. Quelqu'un qui s'inscrit a 18 h voit donc le chiffre baisser a
+     18 h le lendemain, pas a minuit.
+
+     On recompte ici en jours de calendrier, sur le fuseau de Paris — celui de
+     vos clients. Deux dates du meme jour donnent le meme chiffre, quelle que
+     soit l'heure. */
+  const j = joursAvant(etatAbo.fin_essai)
   return typeof j === 'number' ? j <= 0 : etatAbo.statut !== 'actif'
 }
 
@@ -13634,11 +13643,36 @@ document.addEventListener('click', (e) => {
   if (!b) return
   const z = b.closest('.alerte-essai')?.querySelector('.ess-details')
   if (!z) return
-  const ouvert = !z.hidden
-  z.hidden = ouvert
+  /* ⚠ UNE CLASSE, PLUS `hidden`. L'attribut retire l'element du rendu : aucune
+     transition ne peut alors jouer. */
+  const ouvert = !z.classList.contains('replie')
+  z.classList.toggle('replie', ouvert)
   b.setAttribute('aria-expanded', String(!ouvert))
   b.textContent = ouvert ? 'D\u00e9tails' : 'Fermer'
 })
+
+/* ⚠ COMBIEN DE JOURS DE CALENDRIER AVANT UNE DATE, HEURE DE PARIS.
+
+   ⚠ ON COMPARE DES DATES, PAS DES INSTANTS. `(fin - maintenant) / 86400000`
+     donne 13,2 jours a 18 h le premier soir — arrondi a 13, alors qu'il en
+     reste bien 14 sur le calendrier.
+
+     En ramenant les deux instants a minuit dans le fuseau de Paris, la
+     difference devient un nombre entier de jours qui ne bouge qu'a minuit.
+
+   ⚠ `Europe/Paris` PLUTOT QUE L'HEURE DE L'APPAREIL. Un gerant en voyage
+     verrait sinon son compteur sauter d'un jour en changeant de fuseau. */
+function joursAvant(iso) {
+  if (!iso) return 0
+  const cle = (d) => {
+    const p = new Intl.DateTimeFormat('fr-CA', {
+      timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit',
+    }).format(d)
+    return Date.parse(p + 'T00:00:00Z')
+  }
+  const reste = Math.round((cle(new Date(iso)) - cle(new Date())) / 86400000)
+  return Math.max(0, Math.min(14, reste))
+}
 
 function dessinerAlerteEssai(hote) {
   const zone = document.getElementById(hote)
@@ -13693,7 +13727,10 @@ function dessinerAlerteEssai(hote) {
       </span>
 
       <span class="ess-tx">
-        <b>${fini ? 'Votre essai est termin\u00e9' : `Essai ${j} jour${j > 1 ? 's' : ''} gratuit${j > 1 ? 's' : ''}`}</b>
+        <!-- ⚠ LE TITRE NE COMPTE PAS LES JOURS. « Essai 14 jours gratuits »
+             nomme l'offre — elle ne retrecit pas. C'est la plaque qui porte le
+             decompte, et elle seule. -->
+        <b>${fini ? 'Votre essai est termin\u00e9' : 'Essai 14 jours gratuits'}</b>
         <i>${fini
           ? `Vos <b>${nbProc} proc\u00e9dure${nbProc > 1 ? 's' : ''}</b> et <b>${nbMembres} membre${nbMembres > 1 ? 's' : ''}</b> vous attendent.`
           : 'Profitez de toutes les fonctionnalit\u00e9s de Standix. Sans engagement.'}</i>
@@ -13708,7 +13745,11 @@ function dessinerAlerteEssai(hote) {
 
     <!-- ⚠ LES QUATRE POINTS QUI COMPTENT VRAIMENT, et rien d'autre. Chacun
          repond a une question qu'on se pose avant de s'engager. -->
-    <div class="ess-details" id="ess-details" hidden>
+    <!-- ⚠ DEUX NIVEAUX, ET IL EN FAUT DEUX. Le premier porte la grille qui
+         s'anime, le second se laisse comprimer. Un seul element ne peut pas
+         faire les deux. -->
+    <div class="ess-details replie" id="ess-details">
+      <div class="ess-dedans">
       <div class="ess-p"><span class="pt"></span>
         <span>Vous pouvez prendre un abonnement <b>quand vous voulez</b>, m\u00eame pendant l\u2019essai.</span></div>
       <div class="ess-p"><span class="pt"></span>
@@ -13717,6 +13758,7 @@ function dessinerAlerteEssai(hote) {
         <span>Vos proc\u00e9dures <b>ne sont jamais supprim\u00e9es</b> : reprenez quand vous voulez.</span></div>
       <div class="ess-p"><span class="pt"></span>
         <span>Apr\u00e8s 14 jours, l\u2019espace Gestion et l\u2019espace \u00c9quipe sont <b>bloqu\u00e9s</b> jusqu\u2019\u00e0 la souscription.</span></div>
+      </div>
     </div>`
 }
 

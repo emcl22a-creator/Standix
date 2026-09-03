@@ -17670,8 +17670,20 @@ function cocheFaiteDess(taille) {
      visuel : seule la couleur change, comme quand on coche une case. */
   const T = taille || 33
   return `<svg viewBox="0 0 30 30" width="${T}" height="${T}" fill="none" style="display:block">
-    <circle cx="15" cy="15" r="12.6" fill="#FEB731"/>
-    <path d="M10 15.2 13.4 18.6 20 11.8" stroke="#2E1B00" stroke-width="2.2"
+    <!-- ON REPREND LE DEGRADE DE « Generer les etapes », plus l'ambre.
+         Le degrade est defini ici meme, avec un identifiant qui porte la
+         taille : deux coches de tailles differentes sur la meme page auraient
+         sinon le meme nom, et la seconde ecraserait la premiere.
+         AUCUN ACCENT GRAVE ICI : ce commentaire vit dans un gabarit. -->
+    <defs>
+      <linearGradient id="cocheBleu${T}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#1F4CEE"/>
+        <stop offset="55%" stop-color="#3A78EE"/>
+        <stop offset="100%" stop-color="#4899EC"/>
+      </linearGradient>
+    </defs>
+    <circle cx="15" cy="15" r="12.6" fill="url(#cocheBleu${T})"/>
+    <path d="M10 15.2 13.4 18.6 20 11.8" stroke="#FFFFFF" stroke-width="2.4"
           stroke-linecap="round" stroke-linejoin="round"/>
   </svg>`
 }
@@ -20570,6 +20582,22 @@ function renderEquipeCatListe() {
 
      Si l'ecriture echoue, on remet l'etoile comme elle etait — mieux vaut un
      retour en arriere visible qu'un favori qui n'existe que sur cet ecran. */
+/* ⚠ UN SEUL ECOUTEUR POUR TOUTES LES ETOILES.
+
+   Celles des cartes sont recreees a chaque redessin ; un gestionnaire pose sur
+   chacune disparaitrait avec elle. Celui-ci vit sur le document et retrouve la
+   bonne par `data-fav`.
+
+ ⚠ ET IL COUVRE AUSSI CELLE DE LA PAGE DE DETAIL. Les cartes passent par leur
+   propre `onclick` — cet ecouteur ne prend que ce qui n'est pas dans une
+   carte, pour ne pas basculer deux fois. */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-fav]')
+  if (!b || b.closest('.cat-cell')) return
+  e.stopPropagation()
+  basculerFavori(b.dataset.fav, b)
+})
+
 async function basculerFavori(procId, bouton) {
   if (!currentMembre?.id) return
   const etait = favorisEquipe.has(procId)
@@ -20597,6 +20625,18 @@ async function basculerFavori(procId, bouton) {
 
   /* ⚠ ON REPEINT SI L'ONGLET « Favoris » EST OUVERT : la procedure qu'on vient
      de retirer doit disparaitre de la liste. */
+  /* ⚠ LES DEUX ETOILES SE METTENT A JOUR, celle qu'on a touchee et l'autre.
+
+     Sur la page de detail, la carte de la liste est hors de l'ecran mais
+     existe encore : la laisser dans son ancien etat ferait un decalage au
+     retour. */
+  document.querySelectorAll(`[data-fav="${CSS.escape(String(procId))}"]`)
+    .forEach(x => {
+      const est = favorisEquipe.has(procId)
+      x.classList.toggle('on', est)
+      x.setAttribute('aria-label', est ? 'Retirer des favoris' : 'Mettre en favori')
+    })
+
   if (segmentEquipe === 'favoris') renderEquipeCategories()
 }
 
@@ -21443,6 +21483,19 @@ async function openEquipeDetail(procId) {
   }
 
   document.getElementById('detail-titre').textContent = proc.titre
+
+  /* ⚠ L'ETOILE DE LA PAGE SUIT LE MEME ETAT QUE CELLES DES LISTES.
+
+     Les deux lisent `favorisEquipe` : basculer ici met a jour la liste au
+     retour, et l'inverse. Un seul ensemble, deux affichages. */
+  const favBtn = document.getElementById('detail-fav')
+  if (favBtn) {
+    const est = favorisEquipe.has(procId)
+    favBtn.hidden = false
+    favBtn.dataset.fav = procId
+    favBtn.classList.toggle('on', est)
+    favBtn.setAttribute('aria-label', est ? 'Retirer des favoris' : 'Mettre en favori')
+  }
   document.getElementById('detail-subhead').textContent =
     [proc.categorie || 'Sans dossier', proc.sous_categorie].filter(Boolean).join(' \u203a ')
   equipeProcCourante = { proc, etapes: etapes || [] }

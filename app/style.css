@@ -15912,3 +15912,44 @@ body.espace-vide .screen.active{ animation:none !important; }
   background-clip:text;
   -webkit-text-fill-color:transparent;
 }
+
+
+/* ═══ LA PLAQUE PASSE DE L'IVOIRE A L'ARGENT ═══
+
+   ⚠ SES GRIS ETAIENT CHAUDS. Mesure sur les valeurs : `#B9B6B0` a neuf points
+     de rouge de plus que de bleu. Sur un fond clair cela ne se remarque pas ;
+     sur du noir, l'oeil n'a plus rien pour comparer et la plaque tire vers
+     l'ivoire.
+
+     Les nouveaux gris penchent legerement vers le bleu — `#A9AEB8` a neuf
+     points de bleu de plus que de rouge, l'ecart exactement inverse. C'est ce
+     qui distingue l'argent de l'or blanc.
+
+   ⚠ ET L'ECART S'ELARGIT. Du blanc presque pur au gris moyen : le metal se
+     reconnait a ses contrastes francs, pas a sa couleur. Sur fond noir, un
+     degrade doux paraitrait terne.
+
+   ⚠ LE REFLET AUSSI SE DEPLACE. Il etait a 33 % ; sur une plaque plus foncee
+     en bas, il porte mieux un peu plus haut. */
+.alerte-essai .ess-plaque{
+  background:linear-gradient(145deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
+  box-shadow:inset 0 1px 1px rgba(255,255,255,0.95),
+             inset 0 -1px 2px rgba(20,24,34,0.28),
+             0 3px 8px -4px rgba(0,0,0,0.55);
+}
+
+.alerte-essai .ess-plaque::before{
+  background:linear-gradient(145deg, rgba(255,255,255,0.98), rgba(255,255,255,0.12) 44%, rgba(20,24,34,0.24));
+}
+
+.alerte-essai .ess-plaque::after{
+  background:linear-gradient(118deg,
+    rgba(255,255,255,0) 14%,
+    rgba(255,255,255,0.62) 29%,
+    rgba(255,255,255,0) 42%);
+}
+
+/* ⚠ LE CHIFFRE SUIT : un gris plus froid et plus sombre, pour tenir sur une
+   plaque devenue plus contrastee. */
+.alerte-essai .ess-n{ color:#2E323C; }
+.alerte-essai .ess-u{ color:#646A76; }

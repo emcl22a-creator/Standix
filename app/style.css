@@ -16407,3 +16407,60 @@ body.espace-vide .screen.active{ animation:none !important; }
   color:rgba(255,255,255,0.82);
   text-shadow:0 1px 12px rgba(0,0,0,0.8);
 }
+
+
+/* ⚠ LE TITRE SE RECENTRE, MAINTENANT QU'IL EST SEUL.
+
+   `.cc-tx` alignait ses deux lignes en haut — juste quand il y avait un
+   sous-titre dessous. Seul, le titre restait colle au bord superieur et la
+   carte paraissait vide en bas.
+
+   Mesure a l'ecran : 74 px de haut pour une ligne de texte de 20. */
+.creer-carte .cc-tx{
+  justify-content:center;
+}
+
+/* ⚠ ET LA CARTE PERD DE LA HAUTEUR. Elle etait dimensionnee pour deux lignes ;
+   une seule n'en demande pas autant. */
+.creer-carte{
+  padding-top:15px;
+  padding-bottom:15px;
+}
+
+
+/* ⚠ C'EST LA CARTE QUI ALIGNE EN HAUT, PAS SON TEXTE.
+
+   `.creer-carte { align-items:flex-start }` collait l'icone et le texte au
+   bord superieur — juste quand le texte faisait deux lignes et depassait
+   l'icone.
+
+   Seul, le titre reste plus court que l'icone de 46 px : il flottait en haut
+   pendant que la carte gardait sa hauteur. Mesure : 15 px au-dessus, 43 en
+   dessous.
+
+ ⚠ `center` PLUTOT QUE DE FORCER UNE HAUTEUR. La carte se dimensionne alors sur
+   son element le plus haut — l'icone — et tout se centre dessus. */
+#login-screen .creer-carte,
+.choix-ecran .creer-carte{
+  align-items:center;
+}
+
+
+/* ⚠ `hidden` NE SUFFIT PAS SUR UNE LIGNE DE REGLAGES.
+
+   `#p-settings .reg-ligne { display:flex }` est plus specifique que la regle
+   par defaut de l'attribut `hidden` : la ligne restait visible malgre lui.
+   Mesure au banc.
+
+   On le dit explicitement, avec la meme specificite. */
+#p-settings .reg-ligne[hidden],
+#e-settings .reg-ligne[hidden],
+.reg-titre[hidden],
+.reg-filet[hidden]{
+  display:none;
+}
+
+
+/* ⚠ LA LIGNE VIDE NE DOIT PAS GARDER SA PLACE, sinon elle laisse un blanc
+   entre le titre et la recherche. */
+#e-compte:empty{ display:none; }

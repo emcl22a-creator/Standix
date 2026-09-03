@@ -15767,3 +15767,33 @@ body.espace-vide .screen.active{ animation:none !important; }
 @media (prefers-reduced-motion: reduce){
   .alerte-essai .ess-details{ transition:none; }
 }
+
+
+/* ⚠ LA SECONDE LIGNE DE L'ETAT VIDE.
+
+   Plus petite et plus pale que la premiere : elle explique, elle ne repete
+   pas. Sur sa propre ligne, avec un peu d'air au-dessus. */
+.cl-rien-suite{
+  display:block;
+  margin-top:7px;
+  font-size:12.5px;
+  line-height:1.5;
+  color:var(--label-3);
+}
+.cl-rien-suite b{
+  font-weight:700;
+  color:var(--label-2);
+}
+
+
+/* ⚠ « Passer a l'offre superieure » PREND LE BLEU DE « Generer les etapes ».
+
+   Il partait de l'orange du logo pour aller au bleu : deux familles dans un
+   seul bouton, et l'orange y disait « attention » alors qu'il s'agit d'une
+   invitation.
+
+   Le meme degrade que le bouton d'analyse — `#1F4CEE → #3A78EE → #4899EC` —
+   le rattache a l'action principale de la page. */
+.quota-cta{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+}

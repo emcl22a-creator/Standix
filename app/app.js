@@ -7316,7 +7316,14 @@ async function loadGestionProcedures() {
        procedures sait comment ca marche ; la lui repeter a chaque ouverture
        en ferait un decor qu'on ne lit plus. */
     catGridEl.innerHTML =
-      '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.</div>' +
+      /* ⚠ ON DIT QUOI FAIRE, PAS SEULEMENT CE QUI MANQUE.
+
+         « Aucune procedure » constate ; le bouton « + » est en haut a droite,
+         loin du regard de quelqu'un qui vient de lire une phrase centree au
+         milieu de l'ecran. La seconde ligne fait le lien. */
+      '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.' +
+      '<span class="cl-rien-suite">Touchez le bouton <b>+</b> en haut \u00e0 droite ' +
+      'pour cr\u00e9er une proc\u00e9dure.</span></div>' +
       '<div class="cl-astuce">Collez un QR code l\u00e0 o\u00f9 le geste se fait : ' +
       'on scanne, la proc\u00e9dure s\u2019ouvre.</div>'    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
        entreprise sans procédure laissait en mémoire les lectures de la
@@ -10466,6 +10473,23 @@ function renderCategoryGrid() {
     })
     return
   }
+
+  /* ⚠ LE COMPTE MANQUAIT SUR LE FILTRE « Toutes ».
+
+     Les trois branches au-dessus l'ecrivent chacune avant de sortir — mais le
+     chemin ordinaire, celui qui peint les dossiers, ne l'ecrivait nulle part.
+     A la premiere ouverture d'un compte neuf, la ligne restait vide ; elle
+     n'apparaissait qu'apres un aller-retour par un autre filtre, qui lui
+     l'ecrivait en passant.
+
+   ⚠ ON L'ECRIT AVANT LES SORTIES ANTICIPEES, pour qu'il soit juste dans tous
+     les cas — y compris quand il n'y a aucun dossier. */
+  if (nb) {
+    nb.textContent = visibles.length
+      ? `${visibles.length} dossier${visibles.length > 1 ? 's' : ''}`
+      : '0 dossier'
+  }
+  poserIconeRang(false)
 
   if (!visibles.length && (q || filtreEtatDossiers !== 'tout')) {
     /* Le message dit LEQUEL des deux filtres a tout retire : sans cela, on

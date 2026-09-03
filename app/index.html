@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=8a674a2e">
+<link rel="stylesheet" href="style.css?v=364119aa">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3031,8 +3031,11 @@
            ayant touche l'onglet. -->
         <div id="essai-reglages" class="alerte-essai" style="display: none;"></div>
         <div class="page-tete">
-      <h1>Réglages</h1>
-      <p>Votre compte, votre équipe<br>et le fonctionnement de l’app.</p>
+      <!-- ⚠ LE TITRE SUIT L'ONGLET. Deux mots differents pour la meme page —
+             « Reglages » en haut, « Entreprise » en bas — feraient douter
+             d'etre au bon endroit. -->
+        <h1>Entreprise</h1>
+        <p>Votre équipe, vos établissements<br>et votre abonnement.</p>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -3237,6 +3240,29 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Votre compte</h1>
+    </div>
+
+    <!-- ⚠ LA PHOTO EN TETE, AVANT LES CHAMPS.
+
+         C'est ce qui identifie la personne d'un coup d'oeil dans « Gerer
+         l'equipe » ; la mettre apres le nom en ferait un accessoire.
+
+       ⚠ UN BOUTON, PAS UNE IMAGE CLIQUABLE. Le champ de fichier est masque :
+         c'est le bouton qui l'ouvre, et lui seul recoit le focus au clavier. -->
+    <div class="photo-bloc">
+      <button type="button" class="photo-rond" id="photo-choisir"
+              aria-label="Changer la photo de profil">
+        <img id="photo-apercu" alt="" hidden>
+        <span class="photo-init" id="photo-initiales">—</span>
+        <span class="photo-crayon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17v3Z"/>
+          </svg>
+        </span>
+      </button>
+      <input type="file" id="photo-fichier" accept="image/*" hidden>
+      <button type="button" class="photo-retirer" id="photo-retirer" hidden>Retirer la photo</button>
     </div>
     <div class="card" style="margin-top:14px;">
       <label class="f">Nom complet</label>
@@ -4429,7 +4455,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=c9554174"></script>
+<script type="module" src="app.js?v=4af02f52"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5269,7 +5295,15 @@ function layout() {
    montrait existait ailleurs — les chiffres dans Analyse, les creations dans
    Procedures, le compte d'analyses dans Reglages. Seuls les mouvements
    d'equipe lui etaient propres ; ils ont rejoint Reglages > Gerer l'equipe. */
-const LABELS_GESTION = ['Procedures', 'Analyse', 'Reglages'];
+/* ⚠ « Entreprise » PLUTOT QUE « Reglages ».
+
+   La page contient l'equipe, les postes, les etablissements, l'abonnement, les
+   invitations : ce ne sont pas des reglages, ce sont les decisions qui font
+   tourner l'entreprise. On n'y regle presque rien.
+
+ ⚠ DIX CARACTERES, la largeur de « Procedures ». Plus long, le libelle serrerait
+   les deux autres onglets. */
+const LABELS_GESTION = ['Procedures', 'Analyse', 'Entreprise'];
 /* ⚠ TROIS ONGLETS COTE EQUIPE, comme la gestion.
 
    « Notifications » a ete retire. Ce qu'il montrait — les procedures publiees

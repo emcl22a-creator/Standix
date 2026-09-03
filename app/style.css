@@ -16251,3 +16251,28 @@ body.espace-vide .screen.active{ animation:none !important; }
   border-radius:0;
 }
 .fav-detail.on svg{ visibility:hidden; }
+
+
+/* ⚠ LES CARTES DE LA PAGE D'UN DOSSIER SE TOUCHAIENT.
+
+   Mesure a l'ecran : zero pixel entre elles, contre seize cote gestion. Le
+   conteneur `#equipe-procedures-list` n'avait aucune regle — les cartes
+   s'empilaient sans ecart.
+
+ ⚠ LES MEMES SEIZE PIXELS, PAS UNE VALEUR PROCHE. C'est ce qui separe « pareil »
+   de « presque pareil ». */
+#equipe-procedures-list{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* La grille des sous-dossiers, a l'interieur, garde le meme rythme. */
+#equipe-procedures-list .sd-grille{ gap:16px; }
+
+/* ⚠ LE POINT BLEU DISPARAIT DE L'ESPACE EQUIPE.
+
+   Il signale cote gestion une procedure jamais consultee — une information
+   utile a qui publie. Cote equipe, le badge dit deja l'etat : le point
+   repetait la meme chose en plus fort, et se cognait au coin du badge. */
+#equipe-app .cl-badge .p-seg-pt{ display:none; }

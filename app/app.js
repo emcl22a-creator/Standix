@@ -10927,11 +10927,22 @@ const MOINS_ANIM = () => window.matchMedia('(prefers-reduced-motion: reduce)').m
 
    La ligne de compte suit — elle annonce ce que la liste contient, et ce
    nombre change en meme temps. */
+/* ⚠ ELLE NE VISAIT QUE L'ESPACE GESTION.
+
+   `#p-list .proc-rang` et `#cat-grid` n'existent pas cote equipe : le flou ne
+   trouvait rien a flouter, et le changement de segment se faisait d'un coup.
+
+ ⚠ ON CHOISIT SELON L'ESPACE OUVERT, pas en renvoyant les quatre. Flouter des
+   elements masques ne se verrait pas, mais forcerait le navigateur a les
+   recalculer pour rien. */
 function morceauxDeLaListe() {
-  return [
-    document.querySelector('#p-list .proc-rang'),
-    document.getElementById('cat-grid'),
-  ].filter(Boolean)
+  const equipe = document.getElementById('equipe-app')?.style.display === 'block'
+  const ids = equipe
+    ? ['#e-list .proc-rang', '#e-cat-grid']
+    : ['#p-list .proc-rang', '#cat-grid']
+  return ids.map(s => s.startsWith('#') && !s.includes(' ')
+    ? document.getElementById(s.slice(1))
+    : document.querySelector(s)).filter(Boolean)
 }
 
 /* ⚠ LE FLOU SEUL, SANS FONDU — ET IL MONTE PLUS HAUT POUR CELA.
@@ -20478,6 +20489,21 @@ function ouvrirSousDossierEquipe(nom) {
   renderEquipeCatListe()
 }
 
+/* ⚠ L'ICONE DE LA LIGNE SUIT CE QU'ELLE COMPTE.
+
+   Un dossier quand la liste contient des sous-dossiers, un document quand elle
+   n'a que des procedures. C'est ce que fait `poserIconeRang` sur la page des
+   dossiers — on reprend les memes traces. */
+function poserIconeCat(procedures) {
+  const ic = document.querySelector('#e-category .proc-rang-txt svg')
+  if (!ic) return
+  ic.innerHTML = procedures
+    ? `<path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"></path>
+       <path d="M13.6 3.4v5h5"></path><path d="M8.8 13h6.4"></path><path d="M8.8 16.4h4.2"></path>`
+    : `<path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6"></path>
+       <path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"></path>`
+}
+
 function renderEquipeCatListe() {
   const listEl = document.getElementById('equipe-procedures-list')
   if (!listEl) return
@@ -20491,9 +20517,17 @@ function renderEquipeCatListe() {
   const q = equipeCatQuery
   const vues = q ? dansCat.filter(p => p.titre.toLowerCase().includes(q)) : dansCat
 
-  const lues = dansCat.filter(p => equipeLues.has(p.id)).length
-  document.getElementById('e-cat-sous').textContent =
-    `${dansCat.length} procédure${dansCat.length > 1 ? 's' : ''} · ${lues} lue${lues > 1 ? 's' : ''}`
+  /* ⚠ LE SOUS-TITRE A ETE VIDE.
+
+     Il disait « 4 procedures · 0 lue » — le meme compte que la ligne sous la
+     barre de recherche, a deux lignes d'ecart. Et « 0 lue » comptait ce qui
+     manque plutot que ce qui est la : sur un dossier qu'on vient d'ouvrir,
+     c'est un reproche avant meme d'avoir commence.
+
+     On le laisse vide plutot que de retirer la balise : elle sert encore de
+     repli au premier affichage, avant que la liste soit peinte. */
+  const sousTitre = document.getElementById('e-cat-sous')
+  if (sousTitre) sousTitre.textContent = ''
 
   /* ⚠ LA LIGNE DE COMPTAGE, comme cote gestion.
 
@@ -20502,12 +20536,27 @@ function renderEquipeCatListe() {
      chose : une recherche fait tomber la seconde, pas la premiere. */
   const nbEl = document.getElementById('e-cat-nb-elements')
   if (nbEl) {
-    const sd = new Set(vues.map(p => (p.sous_categorie || '').trim()).filter(Boolean)).size
-    const seules = vues.filter(p => !(p.sous_categorie || '').trim()).length
-    const bouts = []
-    if (sd) bouts.push(`${sd} sous-dossier${sd > 1 ? 's' : ''}`)
-    if (seules) bouts.push(`${seules} procédure${seules > 1 ? 's' : ''}`)
-    nbEl.textContent = bouts.join(' · ') || 'Aucun élément'
+    /* ⚠ DANS UN SOUS-DOSSIER, ON NE COMPTE QUE DES PROCEDURES.
+
+       La ligne annonçait « 1 sous-dossier » alors qu'on venait justement
+       d'entrer dedans : elle comptait les sous-dossiers des procedures
+       affichees, or elles portent toutes celui qu'on regarde.
+
+       Quand `equipeSousDossier` est pose, il n'y a plus de niveau en dessous. */
+    if (equipeSousDossier) {
+      nbEl.textContent = vues.length
+        ? `${vues.length} procédure${vues.length > 1 ? 's' : ''}`
+        : 'Aucune procédure'
+      poserIconeCat(true)
+    } else {
+      const sd = new Set(vues.map(p => (p.sous_categorie || '').trim()).filter(Boolean)).size
+      const seules = vues.filter(p => !(p.sous_categorie || '').trim()).length
+      const bouts = []
+      if (sd) bouts.push(`${sd} sous-dossier${sd > 1 ? 's' : ''}`)
+      if (seules) bouts.push(`${seules} procédure${seules > 1 ? 's' : ''}`)
+      nbEl.textContent = bouts.join(' · ') || 'Aucun élément'
+      poserIconeCat(!sd)
+    }
   }
 
   listEl.innerHTML = ''

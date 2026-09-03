@@ -16103,3 +16103,71 @@ body.espace-vide .screen.active{ animation:none !important; }
   padding-right:6px;
   white-space:nowrap;
 }
+
+
+/* ⚠ LA GRILLE DES SOUS-DOSSIERS PASSE EN COLONNE COTE EQUIPE AUSSI.
+
+   La regle qui les met en pile ne visait que `#category-procedures-list` —
+   l'ecran de la gestion. Cote equipe, la grille restait a deux colonnes : les
+   cartes en ligne, faites pour toute la largeur, se retrouvaient a moitie et
+   leur contenu debordait. Vu sur le rendu.
+
+   Le meme reglage pour les deux listes. */
+#equipe-procedures-list .sd-grille{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  margin:0 0 16px;
+}
+
+
+/* ⚠ L'ETOILE ETAIT CALEE SUR `.proc-rich-card`, une classe que la fiche
+   n'emploie plus.
+
+   La fiche a ete refaite sur `cat-cell` — la forme de la gestion. Mon
+   `position:absolute` n'avait donc plus de repere : l'etoile retombait dans le
+   flux, au milieu de la carte, a cote du badge.
+
+ ⚠ LE REPERE EST LA CARTE, PAS LA TETE. Ancree sur `.cl-tete`, elle suivrait la
+   hauteur du titre — sur deux lignes, elle descendrait avec lui. */
+.cat-cell{ position:relative; }
+
+.cat-cell .fav-btn{
+  position:absolute;
+  top:10px; right:10px;
+  z-index:2;
+  width:34px; height:34px;
+  display:grid; place-items:center;
+  border:none; border-radius:100px;
+  background:transparent;
+  color:var(--label-3);
+  padding:0;
+}
+.cat-cell .fav-btn svg{ width:19px; height:19px; }
+.cat-cell .fav-btn:active{ transform:scale(0.88); }
+.cat-cell .fav-btn.on{ color:#F5A623; }
+.cat-cell .fav-btn.on svg{ fill:#F5A623; stroke:#F5A623; }
+
+/* ⚠ ET LE TITRE S'ECARTE DE L'ETOILE. Un titre long passerait dessous. */
+.cat-cell .cl-tete:has(.fav-btn) .cl-nm{ padding-right:34px; }
+
+
+/* ⚠ LE TITRE S'ECARTE DE L'ETOILE. Le selecteur precedent visait `.cl-tete`
+   qui la contient — elle n'y est plus. */
+.cat-cell .cl-nm{ padding-right:0; }
+.cat-cell:has(.fav-btn) .cl-nm{ padding-right:36px; }
+
+
+/* ⚠ LE NOM DE LA PERSONNE, dans la tete du volet.
+
+   Plus discret que le nom de l'entreprise, au meme niveau que le role : c'est
+   une precision, pas un titre. */
+.tb-v-qui{
+  display:block;
+  margin-top:2px;
+  font-size:12.5px;
+  font-weight:500;
+  letter-spacing:-0.01em;
+  color:var(--label-3);
+}
+.tb-v-qui:empty{ display:none; }

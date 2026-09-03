@@ -15797,3 +15797,118 @@ body.espace-vide .screen.active{ animation:none !important; }
 .quota-cta{
   background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
 }
+
+
+/* ⚠ LA NOTE DU VERROU, sous le sous-titre de l'ecran d'edition.
+
+   Plus discrete que le sous-titre : elle informe une fois, on ne la relit pas.
+   Un liseré a gauche la detache sans l'encadrer — un cadre complet en ferait
+   un avertissement, alors que c'est une precision. */
+.edit-note{
+  margin:10px 24px 0;
+  padding:9px 0 9px 12px;
+  border-left:2px solid rgba(58,120,238,0.34);
+  font-size:12.5px;
+  line-height:1.5;
+  letter-spacing:-0.005em;
+  color:var(--label-3);
+}
+.edit-note[hidden]{ display:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ESSAI GRATUIT : ALIGNEMENT, RESPIRATION, ARRONDI
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ 16 PX D'ARRONDI, COMME LES CARTES DE DOSSIER. Il etait a 18 : un ecart de
+   deux pixels ne se nomme pas, mais se voit — deux cartes cote a cote dont les
+   coins ne se repondent pas.
+
+ ⚠ ET 22 PX SOUS L'ELEMENT. Il touchait le titre « Reglages » : mesure a
+   l'ecran, zero pixel entre les deux. Un titre a besoin d'air au-dessus pour
+   se lire comme un debut. */
+.alerte-essai{
+  border-radius:16px;
+  margin:0 0 22px;
+}
+
+/* ═══ LE BLOC DU HAUT : TOUT SUIT LA PLAQUE ═══
+
+   ⚠ LE TEXTE FLOTTAIT PAR RAPPORT A ELLE. `align-items:flex-start` collait le
+     titre en haut du bloc, la plaque faisant 72 px : le texte, plus court,
+     laissait un vide sous lui et paraissait remonte.
+
+     `center` les met sur le meme axe. Le titre et la phrase se centrent
+     ensemble face au chiffre, quel que soit le nombre de lignes. */
+.alerte-essai .ess-haut{
+  align-items:center;
+  gap:14px;
+}
+
+/* ⚠ LE BOUTON RESTE EN HAUT, LUI. C'est une commande, pas du texte : sa place
+   est dans l'angle, pas au milieu d'une phrase. */
+.alerte-essai .ess-plus{
+  top:15px; right:15px;
+}
+
+/* ⚠ ET LE TITRE N'A PLUS BESOIN DE S'ECARTER AUTANT. Le bouton est plus haut
+   que lui maintenant que le texte est centre. */
+.alerte-essai .ess-tx{ padding-top:0; }
+.alerte-essai .ess-tx b{ padding-right:74px; }
+
+/* ═══ LES PASTILLES DU DEPLIANT PASSENT AU BLEU ═══
+
+   ⚠ L'AMBRE VENAIT DU LOGO. Sur le fond noir de l'element, quatre points
+     orange tiraient l'oeil vers eux au lieu du texte qu'ils annoncent — et
+     l'orange, dans cette app, sert aux avertissements.
+
+     Le bleu de « Generer les etapes » les rattache a l'action, sans crier. */
+.alerte-essai .ess-p .pt{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+}
+
+
+/* ⚠ LE TEXTE DU HAUT S'ETRANGLAIT.
+
+   La plaque est passee a 72 px et le bouton reste dans l'angle : le titre
+   tenait sur deux lignes et la phrase sur trois. Mesure a l'ecran.
+
+   Le bouton n'occupe que la premiere ligne : seul le TITRE doit s'en ecarter.
+   La phrase, plus bas, peut prendre toute la largeur. */
+.alerte-essai .ess-tx i{ padding-right:0; }
+.alerte-essai .ess-tx b{ padding-right:82px; }
+
+/* ⚠ ET LA PLAQUE REVIENT A 64 PX. A 72 elle etait juste, mais chaque pixel
+   qu'elle prend, le texte le perd — et c'est lui qui porte la phrase. Le
+   chiffre reste large et lisible. */
+.alerte-essai .ess-plaque{
+  flex:0 0 64px; width:64px; height:64px;
+  border-radius:18px;
+}
+.alerte-essai .ess-n{ font-size:26px; }
+.alerte-essai .ess-u{ font-size:9.5px; }
+
+
+/* ⚠ LES INITIALES DE L'ETABLISSEMENT PASSENT AU BLEU.
+
+   Le degrade partait de l'orange du logo — `#EB5201` — pour finir en bleu.
+   Deux familles dans deux lettres : a cette taille, on ne voit que la coupure.
+
+   Et le rond qui les porte est deja bleu, comme son liseré : le texte y
+   detonnait.
+
+ ⚠ LES DEUX EMPLACEMENTS. Le meme rond existe dans la barre du haut
+   (`.etab-rond`) et dans les reglages (`.rond-etab`). J'ai perdu du temps une
+   fois a n'en corriger qu'un : les deux se ressemblent trop pour qu'on voie
+   lequel a change.
+
+ ⚠ ET `-webkit-background-clip` AVEC. Le degrade ne colore le texte que par
+   lui ; sans le prefixe, Safari rend un bloc plein. */
+.etab-rond.actif span,
+.rond-etab.actif .rond-init,
+.rond-init{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}

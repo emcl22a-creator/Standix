@@ -119,7 +119,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=1b33f6ed">
+<link rel="stylesheet" href="style.css?v=37dfa846">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3509,6 +3509,19 @@
              deux identiques, ne renseigneraient personne.
 
              La ligne de comptage, elle, garde tout son sens. -->
+        <!-- ⚠ LE MEME SEGMENT QUE COTE GESTION, avec les etats de l'equipe.
+
+             « En ligne / Brouillons » n'a pas de sens ici : l'equipe ne voit
+             que les procedures publiees. « Favoris » et « Vues recemment »
+             repondent aux deux questions qu'un employe se pose vraiment —
+             celles que je garde, celles que je viens de lire. -->
+        <div class="proc-segm" id="e-proc-segm" role="tablist">
+          <span class="p-seg-lens" id="e-proc-segm-lens" aria-hidden="true"></span>
+          <button type="button" class="p-seg on" data-etat="tout" role="tab">Toutes</button>
+          <button type="button" class="p-seg" data-etat="favoris" role="tab">Favoris</button>
+          <button type="button" class="p-seg" data-etat="recentes" role="tab">Vues récemment</button>
+        </div>
+
         <div class="proc-rang">
           <span class="proc-rang-txt">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
@@ -4315,7 +4328,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=8b066923"></script>
+<script type="module" src="app.js?v=858de8fa"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

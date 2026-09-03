@@ -2842,6 +2842,18 @@ async function enterApp(membre) {
         appEl.removeEventListener('animationend', partir)
       })
     }
+    /* ⚠ L'ETIREMENT SE POSE AUSSI SUR CE CHEMIN.
+
+       `afficherCoquille` n'est pas le seul a montrer la barre : `enterApp` la
+       montre elle aussi, apres son animation d'entree. Ma correction
+       precedente ne couvrait qu'un chemin sur trois — c'est pourquoi
+       l'animation revenait a chaque vraie connexion.
+
+     ⚠ ON LIT LE ROLE DU MEMBRE, pas la cle memorisee : elle vient d'etre
+       ecrite quelques lignes plus haut, mais lire directement la fiche est
+       plus sur. */
+    window.poserEtirementBarre?.(membre?.role === 'equipe' ? 1 : 0)
+
     afficherBarre(true)
     mesurerOnglets()
     window.jalon?.('APP AFFICHÉE')
@@ -2915,6 +2927,18 @@ async function enterApp(membre) {
         appEl.removeEventListener('animationend', partir)
       })
     }
+    /* ⚠ L'ETIREMENT SE POSE AUSSI SUR CE CHEMIN.
+
+       `afficherCoquille` n'est pas le seul a montrer la barre : `enterApp` la
+       montre elle aussi, apres son animation d'entree. Ma correction
+       precedente ne couvrait qu'un chemin sur trois — c'est pourquoi
+       l'animation revenait a chaque vraie connexion.
+
+     ⚠ ON LIT LE ROLE DU MEMBRE, pas la cle memorisee : elle vient d'etre
+       ecrite quelques lignes plus haut, mais lire directement la fiche est
+       plus sur. */
+    window.poserEtirementBarre?.(membre?.role === 'equipe' ? 1 : 0)
+
     afficherBarre(true)
     mesurerOnglets()
     chargerLangue()

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=bfac670f">
+<link rel="stylesheet" href="style.css?v=64bb4bea">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -888,8 +888,19 @@
     </div>
 
     <h1 id="auth-title">Bienvenue</h1>
-    <div class="subhead" id="auth-sous">Les gestes de votre métier, filmés une fois
-      et retrouvés par toute l’équipe.</div>
+    <!-- ⚠ TROIS TEMPS, TROIS ACTEURS, TROIS POINTS.
+
+         L'ancienne phrase decrivait le produit en une subordonnee : « les
+         gestes de votre metier, filmes une fois et retrouves par toute
+         l'equipe ». Correcte, mais il faut la lire en entier pour comprendre.
+
+         Trois phrases courtes se lisent d'un coup d'oeil, et chacune nomme
+         qui fait quoi : vous, l'IA, l'equipe. C'est la progression du produit
+         elle-meme.
+
+       ⚠ DES POINTS, PAS DES VIRGULES. Le point marque un temps accompli ; la
+         virgule relierait ce qui doit rester distinct. -->
+    <div class="subhead" id="auth-sous">Filmez. L’IA rédige. L’équipe sait.</div>
 
     <!-- ═══ LES DEUX SCENES ═══
 
@@ -972,17 +983,13 @@
           </svg>
         </span>
         <span class="cc-tx">
-          <span class="cc-t">S’inscrire en tant que gérant</span>
-          <!-- ⚠ ON DECRIT L'APP, PAS CE QUE « VOUS » FEREZ. La version d'avant
-               disait « vous filmez, votre equipe retrouve » : deux camps, et le
-               lecteur range d'un cote avant meme d'avoir choisi.
+          <span class="cc-t">Inscription gérant</span>
+          <!-- ⚠ LE SOUS-TITRE A ETE RETIRE.
 
-               ⚠ ET COURT. Trois lignes sous un titre de trois mots se lisent
-                 comme une notice ; personne ne lit une notice pour choisir
-                 entre deux boutons. -->
-          <!-- ⚠ ON NE REPETE PLUS « gerant ». Le titre le dit deja ; la phrase du
-               dessous doit apprendre autre chose, pas confirmer le mot d'au-dessus. -->
-          <span class="cc-s">Gérez vos procédures.</span>
+               « Gérez vos procédures » sous « Inscription gérant » : le mot
+               gérant y est deux fois, et la phrase n'apprend rien que le titre
+               ne dise. Sur un ecran de choix, deux lignes valent mieux qu'une
+               ligne plus une redite. -->
         </span>
         <span class="cc-fl">›</span>
       </button>
@@ -996,24 +1003,7 @@
           </svg>
         </span>
         <span class="cc-tx">
-          <span class="cc-t">S’inscrire en tant qu’utilisateur</span>
-          <!-- ⚠ « a tout moment » PLUTOT QUE « au moment ou le geste se fait ».
-               La formule d'avant decrivait une SITUATION — on la lit, on
-               l'imagine, on met une seconde a la comprendre. « A tout moment »
-               dit la meme disponibilite en trois mots.
-
-               ⚠ ET LA MEME LONGUEUR QUE SA VOISINE. Deux cartes de meme rang
-                 doivent peser pareil : une phrase courte a cote d'une phrase
-                 longue suggere que l'une compte moins. -->
-          <!-- ⚠ « Saisissez-LE » N'AVAIT PLUS D'ANTECEDENT. Le pronom renvoyait au
-               code, nomme dans l'ancien titre « J'ai recu un code ». Le titre ne
-               le mentionne plus : la phrase doit donc nommer le code elle-meme. -->
-          <!-- ⚠ « de l'equipe » PLUTOT QUE « de votre equipe ». Quarante caracteres
-               passaient sur deux lignes quand la carte voisine en tenait une :
-               deux cartes de meme rang doivent peser pareil. -->
-          <span class="cc-s">Consultez les procédures.</span>
-          <!-- ⚠ « Consultez » ET NON « Retrouvez ». Retrouver suppose qu'on a
-               deja cherche ; consulter est le geste lui-meme. -->
+          <span class="cc-t">Inscription utilisateur</span>
         </span>
         <span class="cc-fl">›</span>
       </button>
@@ -1152,7 +1142,7 @@
               <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
               <circle cx="12" cy="12" r="3.1"/>
             </svg>
-            Touchez l’œil, en bas à droite, pour voir l’espace Équipe.
+            Touchez l’œil, en bas à droite, pour voir l’espace Utilisateur.
           </span>
         </div>
         <div class="tb-v-filet"></div>
@@ -1338,7 +1328,7 @@
            et de dossiers est desormais lisible sur chaque carte — le repeter en
            tete de page ne disait rien de plus, et donnait un chiffre a lire
            avant d'avoir vu la liste. -->
-      <p id="proc-compte">Gérez et suivez toutes les procédures<br>de votre organisation.</p>
+      <p id="proc-compte">Gérez toutes les procédures<br>de votre organisation.</p>
     </div>
 
     <!-- ═══ LA RECHERCHE, EN HAUT ═══
@@ -1395,9 +1385,19 @@
            pas glisser d'un bouton a l'autre : il faut une piece unique qu'on
            deplace. Elle est posee EN PREMIER pour rester sous les libelles. -->
       <span class="p-seg-lens" id="proc-segm-lens" aria-hidden="true"></span>
-      <button type="button" class="p-seg on" data-etat="tout" role="tab">Toutes</button>
-      <button type="button" class="p-seg" data-etat="ligne" role="tab">En ligne</button>
-      <button type="button" class="p-seg" data-etat="brouillon" role="tab">Brouillons<span
+      <!-- ⚠ DEUX ONGLETS, PLUS TROIS.
+
+            « En ligne » affichait une liste plate des procedures publiees, sans
+            dossiers — un troisieme mode d'affichage pour la meme information.
+
+            Le premier onglet garde les dossiers, mais ne montre plus que ceux
+            qui ont au moins une procedure publiee : son nom devient vrai.
+
+          ⚠ `data-etat="tout"` EST CONSERVE. Le renommer obligerait a toucher le
+            filtre, la pastille et les trois branches du rendu ; c'est le
+            LIBELLE qui change, pas l'etat. -->
+          <button type="button" class="p-seg on" data-etat="tout" role="tab">En ligne</button>
+      <button type="button" class="p-seg" data-etat="brouillon" role="tab">En cours<span
         class="p-seg-pt" id="seg-brouillons-pt" hidden></span></button>
     </div>
 
@@ -2612,7 +2612,7 @@
           </button>
         </div>
         <div class="an-graph" id="an-graph-temps"></div>
-        <p class="an-note">Seuls les membres de l’espace Équipe sont comptés.</p>
+        <p class="an-note">Seuls les membres de l’espace Utilisateur sont comptés.</p>
       </div>
     </div>
 
@@ -2637,7 +2637,7 @@
       </button>
       <div style="min-width:0;">
           <h1 class="pagehead">Équipe</h1>
-          <span class="titre-precision">Les membres de l’espace équipe</span>
+          <span class="titre-precision">Les membres de l’espace utilisateur</span>
         </div>
     </div>
 
@@ -3059,6 +3059,13 @@
          ⚠ `reg-initiales` DISPARAIT DU BALISAGE. Le script l'ecrivait ; son
            ecriture est retiree avec, sinon elle echouerait en silence a chaque
            ouverture de la page. -->
+    <!-- ⚠ UN TITRE, COMME LES AUTRES GROUPES.
+
+         Ce bloc etait le seul sans en-tete : « Vos etablissements »,
+         « Abonnement », « Preferences » en portent un, pas lui. L'oeil qui
+         descend la page trouvait donc une carte orpheline avant la premiere
+         section nommee. -->
+    <div class="reg-titre">Mon compte</div>
     <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
       <span class="tx">
         <span class="nm" id="reg-nom">—</span>
@@ -3126,13 +3133,16 @@
       <div class="reg-filet" id="reg-filet-etabs" style="display:none;"></div>
     </div>
 
-    <div class="reg-titre">Abonnement</div>
+    <!-- ⚠ LE TITRE ET SA LIGNE SE MASQUENT ENSEMBLE pour un gestionnaire
+         invite. Masquer la ligne seule laisserait un titre « Abonnement »
+         au-dessus d'un groupe qui ne parle que d'analyses video. -->
+    <div class="reg-titre" id="reg-titre-abo">Abonnement</div>
     <div class="reg-groupe" data-teinte="violet">
         <button type="button" class="reg-ligne" id="ouvrir-abonnement">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
         <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
       </button>
-        <div class="reg-filet"></div>
+        <div class="reg-filet" id="reg-filet-abo"></div>
       <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
@@ -3185,7 +3195,7 @@
     </div>
 
     <div class="reg-groupe" style="margin-top:24px;">
-          <a class="reg-ligne" href="cgu.html" target="_blank" rel="noopener">
+          <a class="reg-ligne" href="/cgu.html" target="_blank" rel="noopener">
             <span class="reg-nm">Conditions d’utilisation</span><span class="reg-fl">›</span>
           </a>
         </div>
@@ -3547,7 +3557,12 @@
           <span class="p-seg-lens" id="e-proc-segm-lens" aria-hidden="true"></span>
           <button type="button" class="p-seg on" data-etat="tout" role="tab">Toutes</button>
           <button type="button" class="p-seg" data-etat="favoris" role="tab">Favoris</button>
-          <button type="button" class="p-seg" data-etat="recentes" role="tab">Vues récemment</button>
+          <!-- ⚠ « Vues recemment » A ETE RETIRE.
+
+               Il listait les quatre dernieres procedures ouvertes. Sur une
+               entreprise qui en compte peu, il montrait souvent la meme chose
+               que « Toutes » ; le badge « Lue » dit deja ce qui a ete
+               consulte. -->
         </div>
 
         <div class="proc-rang">
@@ -3761,6 +3776,9 @@
       <p>Votre compte, votre poste<br>et le fonctionnement de l’app.</p>
     </div>
 
+    <!-- ⚠ LE MEME TITRE QUE COTE GESTION. Les deux espaces ont la meme carte ;
+         elle doit porter le meme en-tete. -->
+    <div class="reg-titre">Mon compte</div>
     <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">
       <span class="av" id="es-initiales">—</span>
       <span class="tx">
@@ -3849,7 +3867,7 @@
     </div>
 
     <div class="reg-groupe" style="margin-top:24px;">
-          <a class="reg-ligne" href="cgu.html" target="_blank" rel="noopener">
+          <a class="reg-ligne" href="/cgu.html" target="_blank" rel="noopener">
             <span class="reg-nm">Conditions d’utilisation</span><span class="reg-fl">›</span>
           </a>
         </div>
@@ -4388,7 +4406,7 @@
              service professionnel : le lien doit être visible et cliquable AVANT
              l'action, pas caché dans un pied de page. -->
         <div class="cgu-mention">En créant votre compte, vous acceptez les
-          <a href="cgu.html" target="_blank" rel="noopener">conditions d’utilisation</a>.</div>
+          <a href="/cgu.html" target="_blank" rel="noopener">conditions d’utilisation</a>.</div>
       </div>
     </div>
   </div>
@@ -4406,7 +4424,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=0dbdfa2c"></script>
+<script type="module" src="app.js?v=476ec556"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -4465,7 +4483,7 @@
 
        Ce n'est plus une commande mais une MENTION : elle dit ou l'on est, elle
        ne demande rien. -->
-  <span>Espace Équipe</span>
+  <span>Espace Utilisateur</span>
 </div>
 
 <button type="button" class="glassDiv" id="voir-equipe"

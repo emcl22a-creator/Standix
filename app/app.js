@@ -7165,7 +7165,32 @@ function jouerVoile() {
   v.classList.add('joue')
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ECRANS QUI SE PASSENT DE LA BARRE DU HAUT
+
+   ⚠ CHACUN A DEJA SON EN-TETE : un bouton retour et le nom de ce qu'on
+     regarde. La barre du logo au-dessus repete l'evidence et vole soixante
+     pixels a la lecture.
+
+   ⚠ UNE LISTE, PAS UNE REGLE DEVINEE. J'ai d'abord voulu detecter la presence
+     d'un `.detail-header` — mais certains ecrans en ont un sans devoir cacher
+     la barre. Nommer les huit est plus long a ecrire, et sans surprise.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ECRANS_PLEIN_ECRAN = new Set([
+  'p-category',        // un dossier, et ses sous-dossiers
+  'p-analyse',         // le detail d'une procedure
+  'p-create-video',    // sa modification par la video
+  'p-create-manual',   // sa modification a la main
+  'e-category',        // les memes, cote utilisateur
+  'e-detail',
+])
+
+function majBarreHaute(id) {
+  document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))
+}
+
 window.showGestionScreen = function(id, btn) {
+  majBarreHaute(id)
   /* ⚠ LA PAGE EST FERMEE ICI, EN TETE, AVANT TOUT LE RESTE.
 
      Quatre endroits l'ouvrent — un bandeau d'essai, une alerte de quota, la
@@ -7368,6 +7393,7 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 }
 
 window.showEquipeScreen = function(id, btn) {
+  majBarreHaute(id)
   /* ⚠ MEME REMISE A ZERO QUE DANS L'ESPACE GESTION. Les deux espaces ont leur
      propre fonction de navigation ; ne corriger que la premiere laisserait le
      defaut sur la moitie de l'app. */
@@ -14352,8 +14378,21 @@ function dessinerAlerteEssai(hote) {
 
      On regarde donc tous ses établissements : s'il en paie un, il ne voit plus
      ce bandeau nulle part. */
+  /* ⚠ ON NE COMPTE QUE LES ETABLISSEMENTS OU L'ON EST GESTIONNAIRE.
+
+     La condition regardait TOUS les etablissements de la personne, y compris
+     ceux ou elle est simple membre d'equipe.
+
+     Quelqu'un qui travaille dans une entreprise abonnee, puis cree la sienne,
+     ne voyait donc jamais son essai : l'abonnement de son employeur masquait
+     le bandeau. Or ce n'est pas lui qui paie, et son entreprise neuve n'est
+     couverte par rien.
+
+   ⚠ LE ROLE SUFFIT A TRANCHER. `mesEtablissements` le porte deja : « gestion »
+     veut dire que la personne repond de cet etablissement, donc de son
+     abonnement. */
   const paieAilleurs = (mesEtablissements || [])
-    .some(e => e.abonnement_statut === 'actif')
+    .some(e => e.role === 'gestion' && e.abonnement_statut === 'actif')
   if (paieAilleurs) { zone.style.display = 'none'; return }
 
   const fini = etatAbo.statut === 'expire'
@@ -24656,6 +24695,38 @@ function appliquerAccesAbonnement() {
   const el = (id) => document.getElementById(id)
   ;[el('reg-titre-abo'), el('ouvrir-abonnement'), el('reg-filet-abo')]
     .forEach(x => { if (x) x.hidden = !permis })
+
+  /* ⚠ « Analyses vidéo AI » CHANGE DE GROUPE SELON QUI REGARDE.
+
+     Pour un gestionnaire invite, le titre « Abonnement » et sa ligne sont
+     masques : la ligne des analyses restait seule dans une carte a part,
+     detachee du groupe du dessus et avec sa propre teinte.
+
+     On la deplace dans « Votre entreprise », ou elle prend le bleu du groupe.
+
+   ⚠ ET LE FILET SUIT. Une ligne ajoutee sans separateur se collerait a la
+     precedente ; les trois autres en ont un. */
+  const ligne = el('ligne-quota')
+  const groupeEnt = el('groupe-entreprise')
+  const groupeAbo = el('ouvrir-abonnement')?.parentElement
+
+  if (ligne && groupeEnt && groupeAbo) {
+    if (!permis && ligne.parentElement !== groupeEnt) {
+      const filet = document.createElement('div')
+      filet.className = 'reg-filet'
+      filet.dataset.quotaFilet = '1'
+      groupeEnt.appendChild(filet)
+      groupeEnt.appendChild(ligne)
+      groupeAbo.hidden = true
+    } else if (permis && ligne.parentElement !== groupeAbo) {
+      /* ⚠ ET L'ON SAIT REVENIR EN ARRIERE. Un fondateur qui bascule depuis un
+         etablissement ou il est simple gestionnaire doit retrouver son groupe
+         « Abonnement » complet. */
+      groupeEnt.querySelectorAll('[data-quota-filet]').forEach(x => x.remove())
+      groupeAbo.appendChild(ligne)
+      groupeAbo.hidden = false
+    }
+  }
 }
 
 function estFondateur(m) {

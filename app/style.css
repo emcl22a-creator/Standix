@@ -16672,3 +16672,89 @@ body.en-apercu #apercu-bandeau{
 #e-settings .reg-titre + .reg-identite{
   margin-top:10px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BOUTON PROFIL, DANS LA BARRE DU HAUT
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ MEME TAILLE QUE LES DEUX BARRES qu'il remplace : 40 px. Un bouton plus
+   large decalerait le logo, qui est centre sur la barre entiere. */
+.tb-profil{
+  position:relative;
+  overflow:hidden;
+  background:rgba(118,118,128,0.12);
+}
+
+.tb-profil img{
+  width:100%; height:100%;
+  border-radius:100px;
+  object-fit:cover;
+  display:block;
+}
+.tb-profil img[hidden]{ display:none; }
+
+/* ⚠ LES INITIALES PASSENT DEVANT LA SILHOUETTE. Les deux sont dans le
+   balisage : c'est le CSS qui decide laquelle se voit, selon ce qui est
+   disponible. Basculer en JavaScript demanderait trois branches. */
+.tb-init{
+  position:absolute; inset:0;
+  display:grid; place-items:center;
+  font-size:14px; font-weight:600;
+  letter-spacing:-0.02em;
+  color:var(--label-2);
+}
+.tb-init:empty{ display:none; }
+
+.tb-silhouette{
+  width:20px; height:20px;
+  color:var(--label-3);
+}
+
+/* ⚠ CHAQUE COUCHE MASQUE CELLE DU DESSOUS. Photo > initiales > silhouette. */
+.tb-profil:has(img:not([hidden])) .tb-init,
+.tb-profil:has(img:not([hidden])) .tb-silhouette,
+.tb-profil:has(.tb-init:not(:empty)) .tb-silhouette{
+  display:none;
+}
+
+.tb-profil:active{ transform:scale(0.92); }
+
+
+/* ⚠ LES INITIALES DEBORDAIENT DU ROND.
+
+   `.tb-init { inset:0 }` les cale sur le bouton — mais une regle plus generale
+   leur donnait une hauteur de ligne heritee, et deux lettres en 14 px
+   depassaient par le haut. Visible sur le rendu.
+
+   `line-height:1` les ramene a leur hauteur exacte, et `inset:0` les centre
+   dans le rond. */
+.tb-init{
+  line-height:1;
+  font-size:13px;
+}
+
+
+/* ⚠ `inset:0` ETAIT IGNORE, ET VOICI POURQUOI.
+
+   Le bouton est en `display:grid` avec `place-items:center`. Sur une grille,
+   ces proprietes s'appliquent AUSSI aux enfants positionnes en absolu : au lieu
+   d'etre etires par `inset:0`, ils sont centres a leur taille intrinseque.
+
+   Mesure a l'ecran : les initiales faisaient 2 px de haut au lieu de 40.
+
+ ⚠ ON EMPILE PAR LA GRILLE PLUTOT QUE PAR L'ABSOLU. Trois enfants dans la meme
+   cellule se superposent, et le centrage du parent fait le reste — sans
+   position, sans inset, sans conflit. */
+.tb-profil > *{
+  grid-area:1 / 1;
+}
+
+.tb-init{
+  position:static;
+  inset:auto;
+  display:block;
+  line-height:1;
+  font-size:13px;
+  font-weight:650;
+}

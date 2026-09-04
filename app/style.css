@@ -14909,24 +14909,24 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
    equipe retombait sur les valeurs d'origine.
 
    ⚠ CES REGLES SONT AJOUTEES, PAS SUBSTITUEES. Ma premiere tentative inserait
-     `#e-settings` dans les selecteurs existants par expression reguliere —
+     `#e-profil` dans les selecteurs existants par expression reguliere —
      celle-ci a avale le commentaire qui precedait chaque regle, et le
      navigateur a rejete deux cent treize regles d'un coup, dont tout le style
      de la page gestion. Rien n'est plus modifie sur place.
 
    ⚠ ELLES SONT EN FIN DE FICHIER, donc appliquees apres. A specificite egale,
      c'est la derniere qui gagne — ce qui est sans effet ici, puisqu'elles ne
-     visent que `#e-settings`.
+     visent que `#e-profil`.
    ═══════════════════════════════════════════════════════════════════════════ */
-#e-settings .reg-titre{
+#e-profil .reg-titre{
   font-size:14px; font-weight:650; letter-spacing:-0.025em;
   color:var(--label); text-transform:none;
   margin:26px 0 10px;
 }
-#e-settings .reg-titre:first-of-type{ margin-top:22px; }
-#e-settings .reg-groupe,
-#e-settings .etab-carte,
-#e-settings .reg-identite{
+#e-profil .reg-titre:first-of-type{ margin-top:22px; }
+#e-profil .reg-groupe,
+#e-profil .etab-carte,
+#e-profil .reg-identite{
   position:relative;
   border-radius:20px; overflow:hidden;
   background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
@@ -14936,9 +14936,9 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
     0 1px 2px rgba(20,20,30,0.04),
     0 8px 18px -14px rgba(20,20,30,0.10);
 }
-#e-settings .reg-groupe::before,
-#e-settings .etab-carte::before,
-#e-settings .reg-identite::before{
+#e-profil .reg-groupe::before,
+#e-profil .etab-carte::before,
+#e-profil .reg-identite::before{
   content:''; position:absolute; inset:0; border-radius:inherit;
   padding:1px; pointer-events:none; z-index:2;
   background:linear-gradient(180deg,
@@ -14948,77 +14948,77 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
   mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor; mask-composite:exclude;
 }
-#e-settings .reg-groupe > *,
-#e-settings .etab-carte > *,
-#e-settings .reg-identite > *{ position:relative; z-index:3; }
-#e-settings .reg-ligne{
+#e-profil .reg-groupe > *,
+#e-profil .etab-carte > *,
+#e-profil .reg-identite > *{ position:relative; z-index:3; }
+#e-profil .reg-ligne{
   display:flex; align-items:center; gap:13px;
   padding:13px 16px; width:100%; border:none; background:none;
   font-family:inherit; text-align:left;
 }
-#e-settings .reg-ligne:active{ background:rgba(118,118,128,0.10); }
-#e-settings .reg-ic{
+#e-profil .reg-ligne:active{ background:rgba(118,118,128,0.10); }
+#e-profil .reg-ic{
   flex:0 0 34px; width:34px; height:34px; border-radius:11px;
   display:grid; place-items:center;
   background:rgba(118,118,128,0.10); color:var(--label-2);
   box-shadow:inset 0 1px 0 rgba(255,255,255,0.55);
 }
-#e-settings .reg-groupe[data-teinte="bleu"]   .reg-ic{ background:rgba(31,76,238,0.10);  color:#3073C3; }
-#e-settings .reg-groupe[data-teinte="violet"] .reg-ic{ background:rgba(76,29,149,0.10);  color:#6F47BB; }
-#e-settings .reg-groupe[data-teinte="vert"]   .reg-ic{ background:rgba(20,83,45,0.10);   color:#318759; }
-#e-settings .reg-groupe[data-teinte="ambre"]  .reg-ic{ background:rgba(124,45,18,0.10);  color:#AC642E; }
-#e-settings .reg-groupe[data-teinte="gris"]   .reg-ic{ background:rgba(58,68,83,0.10);   color:#636D7C; }
-#e-settings .reg-ic svg{ width:19px; height:19px; }
-#e-settings .reg-nm{
+#e-profil .reg-groupe[data-teinte="bleu"]   .reg-ic{ background:rgba(31,76,238,0.10);  color:#3073C3; }
+#e-profil .reg-groupe[data-teinte="violet"] .reg-ic{ background:rgba(76,29,149,0.10);  color:#6F47BB; }
+#e-profil .reg-groupe[data-teinte="vert"]   .reg-ic{ background:rgba(20,83,45,0.10);   color:#318759; }
+#e-profil .reg-groupe[data-teinte="ambre"]  .reg-ic{ background:rgba(124,45,18,0.10);  color:#AC642E; }
+#e-profil .reg-groupe[data-teinte="gris"]   .reg-ic{ background:rgba(58,68,83,0.10);   color:#636D7C; }
+#e-profil .reg-ic svg{ width:19px; height:19px; }
+#e-profil .reg-nm{
   flex:1; min-width:0; font-size:15px; font-weight:500;
   letter-spacing:-0.025em; color:var(--label);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-#e-settings .reg-val{
+#e-profil .reg-val{
   flex-shrink:0; font-size:13.5px; color:var(--label-3);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:44%;
 }
-#e-settings .reg-fl{ flex-shrink:0; font-size:19px; color:var(--label-3); line-height:1; }
-#e-settings .reg-filet{
+#e-profil .reg-fl{ flex-shrink:0; font-size:19px; color:var(--label-3); line-height:1; }
+#e-profil .reg-filet{
   height:0.5px; background:var(--separator);
   margin-left:63px;
 }
-#e-settings .reg-identite{
+#e-profil .reg-identite{
   display:flex; align-items:center; gap:14px;
   padding:18px 16px; width:100%; border:none;
   font-family:inherit; text-align:left; margin-bottom:4px;
 }
-#e-settings .reg-identite .tx{ flex:1; min-width:0; display:flex; flex-direction:column; }
-#e-settings .reg-identite .nm{
+#e-profil .reg-identite .tx{ flex:1; min-width:0; display:flex; flex-direction:column; }
+#e-profil .reg-identite .nm{
   font-size:16px; font-weight:650; letter-spacing:-0.03em; color:var(--label);
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-#e-settings .reg-identite .st{
+#e-profil .reg-identite .st{
   font-size:13px; color:var(--label-3); margin-top:2px;
   overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
-#e-settings .reg-identite .fl{ flex-shrink:0; font-size:20px; color:var(--label-3); }
-#e-settings .reg-identite:active{ transform:scale(0.995); }
-#e-settings .etab-note{
+#e-profil .reg-identite .fl{ flex-shrink:0; font-size:20px; color:var(--label-3); }
+#e-profil .reg-identite:active{ transform:scale(0.995); }
+#e-profil .etab-note{
   font-size:12px; color:var(--label-3); line-height:1.45;
   margin:9px 2px 0; letter-spacing:-0.01em;
 }
-#e-settings .reg-version{
+#e-profil .reg-version{
   text-align:center; font-size:11.5px; color:var(--label-3);
   margin:26px 0 0; letter-spacing:-0.01em;
 }
-#e-settings .contact-carte{
+#e-profil .contact-carte{
   background:linear-gradient(152deg,#1B1B22 0%,#0B0B0F 62%);
   box-shadow:0 1px 2px rgba(20,20,30,0.06), 0 14px 30px -18px rgba(20,20,30,0.34);
   border-radius:20px;
 }
-#e-settings .contact-carte .an-gain-lueur{ display:none; }
-#e-settings .contact-carte .t{ color:#FFFFFF; }
-#e-settings .contact-carte .s{ color:rgba(255,255,255,0.62); }
-#e-settings .contact-carte .contact-invite{ color:#7FB6F2; }
-#e-settings .reg-ligne.danger .reg-nm{ color:#C8342B; font-weight:550; }
-#e-settings .reg-ligne,
-#e-settings .reg-identite{
+#e-profil .contact-carte .an-gain-lueur{ display:none; }
+#e-profil .contact-carte .t{ color:#FFFFFF; }
+#e-profil .contact-carte .s{ color:rgba(255,255,255,0.62); }
+#e-profil .contact-carte .contact-invite{ color:#7FB6F2; }
+#e-profil .reg-ligne.danger .reg-nm{ color:#C8342B; font-weight:550; }
+#e-profil .reg-ligne,
+#e-profil .reg-identite{
   color:var(--label);
 }
 
@@ -16454,7 +16454,7 @@ body.espace-vide .screen.active{ animation:none !important; }
 
    On le dit explicitement, avec la meme specificite. */
 #p-settings .reg-ligne[hidden],
-#e-settings .reg-ligne[hidden],
+#e-profil .reg-ligne[hidden],
 .reg-titre[hidden],
 .reg-filet[hidden]{
   display:none;
@@ -16669,7 +16669,7 @@ body.en-apercu #apercu-bandeau{
    doivent se lire comme un groupe — c'est deja l'ecart choisi partout
    ailleurs. */
 #p-settings .reg-titre + .reg-identite,
-#e-settings .reg-titre + .reg-identite{
+#e-profil .reg-titre + .reg-identite{
   margin-top:10px;
 }
 

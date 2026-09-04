@@ -2574,7 +2574,7 @@ window.ouvrirAppareils = async function() {
 
 document.getElementById('app-retour')?.addEventListener('click', () => {
   if (currentMembre?.role === 'gestion') showGestionScreen('p-settings')
-  else showEquipeScreen('e-settings')
+  else showEquipeScreen('e-profil')
 })
 
 function quandLisible(iso) {
@@ -3943,6 +3943,22 @@ document.addEventListener('click', (e) => {
   const dedans = e.target.closest('.tb-volet')
 
   if (e.target.closest('[data-deconnexion]')) { signOut(); return }
+
+  /* ⚠ LE BOUTON PROFIL OUVRE UNE PAGE, PLUS UN VOLET.
+
+     Le volet ne tenait que l'identite et la deconnexion. La page porte tout ce
+     qui vous appartient — le compte, les etablissements, l'app, la sortie —
+     et peut grandir sans devenir un menu a rallonge.
+
+   ⚠ ON PASSE PAR `showGestionScreen`, comme les onglets. C'est elle qui pose
+     l'animation d'entree, remonte le defilement et cale la barre : refaire ces
+     gestes a la main les ferait diverger a la premiere modification. */
+  if (bouton) {
+    const equipe = bouton.id.endsWith('equipe')
+    if (equipe) showEquipeScreen('e-profil')
+    else showGestionScreen('p-profil')
+    return
+  }
 
   document.querySelectorAll('.tb-volet').forEach(v => {
     const sien = bouton && v.id === bouton.id.replace('tb-menu-', 'tb-volet-')
@@ -6928,6 +6944,15 @@ document.getElementById('tb-analyse')?.addEventListener('click', function() {
 function poserOngletActif(id) {}
 
 const ONGLET_PAR_ECRAN = {
+  /* ⚠ LE PROFIL N'A PAS D'ONGLET, et c'est voulu.
+
+     Il s'ouvre par le bouton de la barre du haut, pas par la barre du bas.
+     Lui donner un onglet allumerait « Entreprise » alors qu'on n'y est pas.
+
+     `-1` dit « aucun » : `placerOnglet` laisse alors la pastille ou elle
+     etait, ce qui est juste — on revient d'ou l'on vient. */
+  'p-profil': -1, 'e-profil': -1,
+
   /* ⚠ TOUS LES INDICES ONT RECULE D'UN CRAN. L'onglet Accueil a ete retire :
      Procedures passe de 1 a 0, Analyse de 2 a 1, Reglages de 3 a 2.
 
@@ -7177,6 +7202,11 @@ function jouerVoile() {
      la barre. Nommer les huit est plus long a ecrire, et sans surprise.
    ═══════════════════════════════════════════════════════════════════════════ */
 const ECRANS_PLEIN_ECRAN = new Set([
+  /* ⚠ LE PROFIL AUSSI. Il s'ouvre depuis le bouton de la barre : la laisser
+     visible au-dessus montrerait le bouton qui vient de nous amener la. */
+  'p-profil',
+  'e-profil',
+
   'p-category',        // un dossier, et ses sous-dossiers
   'p-analyse',         // le detail d'une procedure
   'p-create-video',    // sa modification par la video
@@ -7384,7 +7414,7 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
   /* Équipe : Procédures 0, QR code 1, Réglages 2. */
   'e-list': 0, 'e-category': 0, 'e-detail': 0,
   'e-scan': 1,
-  'e-settings': 2, 'e-reg-compte': 2,
+  'e-profil': 2, 'e-reg-compte': 2,
   /* `reg-appareils` SANS préfixe : c'est bien son nom dans le balisage, seul
      écran de l'espace Équipe à ne pas en porter. J'ai cru à une faute et je
      l'ai « corrigé » en `e-reg-appareils` — ce qui l'aurait privé d'onglet.
@@ -12939,7 +12969,7 @@ function majLignePoste() {
 
 document.getElementById('poste-retour')?.addEventListener('click', () => {
   if (currentMembre?.role === 'gestion') showGestionScreen('p-settings')
-  else showEquipeScreen('e-settings')
+  else showEquipeScreen('e-profil')
 })
 
 /* Comment le temps est compté. Trois sections l'affichent, donc trois boutons
@@ -22304,7 +22334,7 @@ function peindreReglagesEquipe() {
 }
 
 window.openEquipeSettings = async function() {
-  showEquipeScreen('e-settings')
+  showEquipeScreen('e-profil')
   rendreChoixLangueApp()
   peindreReglagesEquipe()
   peindreAppareils()

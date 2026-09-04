@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=667d34b8">
+<link rel="stylesheet" href="style.css?v=eba6ce43">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3088,42 +3088,6 @@
          « Abonnement », « Preferences » en portent un, pas lui. L'oeil qui
          descend la page trouvait donc une carte orpheline avant la premiere
          section nommee. -->
-    <div class="reg-titre">Mon compte</div>
-    <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
-      <span class="tx">
-        <span class="nm" id="reg-nom">—</span>
-        <span class="st" id="reg-email">—</span>
-      </span>
-      <span class="fl">›</span>
-    </button>
-
-    <!-- ═══ LES ÉTABLISSEMENTS, SUR PLACE ═══
-
-         Tout se fait DANS la carte : plus de page à part. Un cercle par
-         établissement, un « + » au bout de la ligne, et la création se règle
-         dans une fenêtre qui se referme aussitôt.
-
-         Le texte du dessous n'est pas un ornement : il dit que créer est
-         gratuit, et surtout que les membres s'additionnent d'un établissement
-         à l'autre. Sans cette phrase, un gérant croira ouvrir un second
-         abonnement — et découvrira le contraire le jour où plus personne ne
-         peut entrer. -->
-    <div class="reg-titre">Vos établissements</div>
-    <div class="etab-carte">
-      <div class="etab-rang" id="etab-rang">
-        <button type="button" class="etab-plus" id="etab-ajouter"
-                aria-label="Créer un établissement">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"/><line x1="5.5" y1="12" x2="18.5" y2="12"/></svg>
-        </button>
-      </div>
-      <p class="etab-note" id="etab-note">
-        Créez une entreprise et vous en êtes le <b>gérant</b>, avec
-        <b>14 jours d’essai gratuit</b>. Touchez un logo pour basculer d’une
-        entreprise à l’autre.
-      </p>
-    </div>
-
     <div class="reg-titre">Votre entreprise</div>
     <!-- ⚠ UN IDENTIFIANT POUR Y DEPLACER « Analyses vidéo AI ». -->
     <div class="reg-groupe" id="groupe-entreprise" data-teinte="bleu">
@@ -3181,7 +3145,61 @@
       </button>
     </div>
 
-    <div class="reg-titre">Préférences</div>
+    </div>
+
+  <!-- Sous-page : le compte -->
+  <div class="screen" inert id="p-profil">
+
+    <!-- ⚠ TOUT CE QUI EST A VOUS, sur une page.
+
+         Le compte, les etablissements, les reglages de l'app, la sortie. La
+         page Entreprise garde ce qui appartient a l'entreprise : l'equipe, les
+         postes, l'abonnement.
+
+         Le partage est celui-la et pas un autre : « ce qui est a moi » d'un
+         cote, « ce qui est a nous » de l'autre. -->
+    <div class="page-tete">
+      <h1>Profil</h1>
+      <p>Votre compte, vos établissements<br>et le fonctionnement de l’app.</p>
+    </div>
+
+<div class="reg-titre">Mon compte</div>
+    <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
+      <span class="tx">
+        <span class="nm" id="reg-nom">—</span>
+        <span class="st" id="reg-email">—</span>
+      </span>
+      <span class="fl">›</span>
+    </button>
+
+    <!-- ═══ LES ÉTABLISSEMENTS, SUR PLACE ═══
+
+         Tout se fait DANS la carte : plus de page à part. Un cercle par
+         établissement, un « + » au bout de la ligne, et la création se règle
+         dans une fenêtre qui se referme aussitôt.
+
+         Le texte du dessous n'est pas un ornement : il dit que créer est
+         gratuit, et surtout que les membres s'additionnent d'un établissement
+         à l'autre. Sans cette phrase, un gérant croira ouvrir un second
+         abonnement — et découvrira le contraire le jour où plus personne ne
+         peut entrer. -->
+    <div class="reg-titre">Vos établissements</div>
+    <div class="etab-carte">
+      <div class="etab-rang" id="etab-rang">
+        <button type="button" class="etab-plus" id="etab-ajouter"
+                aria-label="Créer un établissement">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+               stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"/><line x1="5.5" y1="12" x2="18.5" y2="12"/></svg>
+        </button>
+      </div>
+      <p class="etab-note" id="etab-note">
+        Créez une entreprise et vous en êtes le <b>gérant</b>, avec
+        <b>14 jours d’essai gratuit</b>. Touchez un logo pour basculer d’une
+        entreprise à l’autre.
+      </p>
+    </div>
+
+    <div class="reg-titre">Application</div>
     <div class="reg-groupe" data-teinte="vert">
       <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
         <span class="reg-ic">
@@ -3242,15 +3260,29 @@
     </div>
 
     <div class="reg-groupe" style="margin-top:24px;">
-          <a class="reg-ligne" href="/cgu.html" target="_blank" rel="noopener">
-            <span class="reg-nm">Conditions d’utilisation</span><span class="reg-fl">›</span>
-          </a>
-        </div>
+      <a class="reg-ligne" href="/cgu.html" target="_blank" rel="noopener">
+        <span class="reg-nm">Conditions d’utilisation</span><span class="reg-fl">›</span>
+      </a>
+
+      <div class="reg-filet"></div>
+
+      <!-- ⚠ SUPPRIMER SON COMPTE N'EST PAS UNE FAVEUR, C'EST UN DROIT.
+
+           Le RGPD l'exige, et vos clients sont en Suisse et dans l'UE. Sans ce
+           bouton, quelqu'un qui veut partir doit vous ecrire — et vous etes
+           tenu de repondre sous un mois.
+
+           Il vit ici, avec la deconnexion et les conditions : ce qui met fin a
+           la relation, pas ce qui la fait tourner. -->
+      <button type="button" class="reg-ligne danger" id="supprimer-compte">
+        <span class="reg-nm">Supprimer mon compte</span>
+      </button>
+    </div>
         <div class="reg-version">Standix · version 2026-08-09 · 10h</div>
+  
   </div>
 
-  <!-- Sous-page : le compte -->
-  <div class="screen" inert id="p-reg-poste">
+<div class="screen" inert id="p-reg-poste">
     <div class="detail-header">
       <button class="back-btn" id="poste-retour" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -3843,7 +3875,7 @@
   </div>
 
   <!-- Mon activité : ce que l'employé a lu, et le temps qu'il y a passé -->
-  <div class="screen" inert id="e-settings">
+  <div class="screen" inert id="e-profil">
     <!-- ⚠ `page-tete`, LA MEME QUE LES REGLAGES DE LA GESTION.
 
          Cette page employait `pagehead-row` — le gabarit des sous-pages, avec
@@ -3873,7 +3905,7 @@
          celles de la gestion, moins le violet et l'ambre qui servaient a des
          sections que l'equipe n'a pas. -->
     <div class="page-tete">
-      <h1>Réglages</h1>
+      <h1>Profil</h1>
       <p>Votre compte, votre poste<br>et le fonctionnement de l’app.</p>
     </div>
 
@@ -3922,7 +3954,7 @@
         </button>
     </div>
 
-    <div class="reg-titre">Préférences</div>
+    <div class="reg-titre">Application</div>
     <div class="reg-groupe" data-teinte="vert">
       <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
         <span class="reg-ic">
@@ -3978,7 +4010,7 @@
   <!-- Sous-page : le compte -->
   <div class="screen" inert id="e-reg-compte">
     <div class="detail-header">
-      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="showEquipeScreen('e-profil')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Votre compte</h1>
@@ -3998,7 +4030,7 @@
   <!-- Sous-page : les entreprises -->
   <div class="screen" inert id="e-reg-poste">
     <div class="detail-header">
-      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="showEquipeScreen('e-profil')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Votre poste</h1>
@@ -4045,7 +4077,7 @@
   <!-- Sous-page : la langue -->
   <div class="screen" inert id="e-reg-langue">
     <div class="detail-header">
-      <button class="back-btn" onclick="showEquipeScreen('e-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="showEquipeScreen('e-profil')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Langue</h1>
@@ -4532,7 +4564,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=360e88a0"></script>
+<script type="module" src="app.js?v=976a80fd"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

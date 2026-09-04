@@ -21772,7 +21772,15 @@ window.ouvrirQuota = async function() {
 }
 
 window.ouvrirAbonnementDepuisQuota = function() {
-  document.getElementById('ouvrir-abonnement')?.click()
+  /* ⚠ ON OUVRE LA PAGE DIRECTEMENT, plus par un clic simule.
+
+     Cette fonction touchait `#ouvrir-abonnement`, le bouton de la page Equipe
+     — qui n'existe plus. Le clic partait dans le vide, sans erreur : la page
+     ne s'ouvrait simplement pas.
+
+     `showGestionScreen` fait le travail, et son garde-fou refuse deja l'acces
+     a qui n'est pas fondateur. */
+  showGestionScreen('p-abonnement')
 }
 
 /* Le bandeau du bas dit où l'on en est, et félicite à la dernière case. */
@@ -22709,7 +22717,7 @@ function carteOffre(o, opts = {}) {
     '<b>Toutes</b> les fonctionnalités',
   ].filter(Boolean)
 
-  return `<div class="offre-carte${opts.classe || ''}">
+  return `<div class="offre-carte${opts.classe || ''}" data-offre-cle="${o.cle}">
     <!-- Le ruban a ete retire. « Populaire » n avait pas de sens — on choisit
          son offre sur le nombre de membres, pas par gout — et « En cours »
          doublait le bouton, qui dit deja « Votre abonnement actuel ». -->
@@ -22769,7 +22777,7 @@ function carteOffre(o, opts = {}) {
                delimite par des accents graves, un seul y fermerait la chaine.
                C'est ce qui vient d'arriver a l'essai precedent. -->
         <i><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11"
-             fill="rgba(4,4,6,0.78)" stroke="rgba(127,182,242,0.42)" stroke-width="1"/>
+             fill="rgba(52,199,89,0.12)" stroke="rgba(30,158,67,0.32)" stroke-width="1"/>
            <path d="M7.6 12.3l3 3 5.8-6.4" stroke="url(#cocheOffre)" stroke-width="2.2"
              stroke-linecap="round" stroke-linejoin="round"/></svg></i>
         <span>${t}</span></div>`).join('')}
@@ -22997,7 +23005,11 @@ function marquerAboNeuf() {
   setTimeout(() => p.classList.remove('abo-neuf'), 1000)
 }
 
-document.getElementById('ouvrir-abonnement')?.addEventListener('click', () => {
+/* ⚠ CET ECOUTEUR SUIT LE BOUTON DU PROFIL.
+
+   Il refermait la liste des offres avant d'ouvrir la page — sans quoi on
+   retrouvait le panneau deplie de la derniere visite. */
+document.getElementById('profil-abonnement')?.addEventListener('click', () => {
   document.getElementById('abo-liste')?.classList.remove('ouvert')
   const b = document.getElementById('abo-autres')
   if (b) {
@@ -24675,8 +24687,11 @@ function appliquerAccesEntreprise() {
   if (s) s.hidden = !fondateur
 }
 
-document.getElementById('profil-abonnement')?.addEventListener('click', () =>
-  showGestionScreen('p-abonnement'))
+/* ⚠ L'OUVERTURE EST DANS L'AUTRE ECOUTEUR, plus haut.
+
+   J'en avais pose deux sur le meme bouton : l'un ouvrait la page, l'autre
+   refermait la liste des offres. Deux gestionnaires pour un bouton finissent
+   par se contredire — celui du haut fait les deux. */
 
 document.getElementById('quitter-entreprise')?.addEventListener('click', async () => {
   const nom = cachedEntreprise?.nom || 'cette entreprise'
@@ -24753,49 +24768,22 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
 })
 
 function appliquerAccesAbonnement() {
+  /* ⚠ CETTE FONCTION NE VISE PLUS QUE LE PROFIL.
+
+     Elle pilotait aussi le groupe « Abonnement » de la page Equipe, et
+     deplaçait « Analyses vidéo AI » d'un groupe a l'autre selon le role.
+
+     Ce groupe a quitte la page : l'abonnement engage la carte bancaire, il vit
+     avec le compte. Les analyses restent dans « Votre equipe » pour tout le
+     monde — c'est un outil de travail, pas une question d'argent.
+
+     Trente lignes de moins, et un cas de moins ou l'ecran pouvait se retrouver
+     a moitie range. */
   const permis = estFondateur(currentMembre)
   const el = (id) => document.getElementById(id)
-  ;[el('reg-titre-abo'), el('ouvrir-abonnement'), el('reg-filet-abo')]
-    .forEach(x => { if (x) x.hidden = !permis })
 
-  /* ⚠ « Analyses vidéo AI » CHANGE DE GROUPE SELON QUI REGARDE.
-
-     Pour un gestionnaire invite, le titre « Abonnement » et sa ligne sont
-     masques : la ligne des analyses restait seule dans une carte a part,
-     detachee du groupe du dessus et avec sa propre teinte.
-
-     On la deplace dans « Votre entreprise », ou elle prend le bleu du groupe.
-
-   ⚠ ET LE FILET SUIT. Une ligne ajoutee sans separateur se collerait a la
-     precedente ; les trois autres en ont un. */
-  /* ⚠ LA LIGNE DU PROFIL SUIT LA MEME REGLE.
-
-     Elle est masquee dans le balisage ; on la revele au fondateur, avec son
-     titre. Deux endroits pour la meme information, un seul controle. */
   ;[el('profil-titre-abo'), el('profil-groupe-abo')]
     .forEach(x => { if (x) x.hidden = !permis })
-
-  const ligne = el('ligne-quota')
-  const groupeEnt = el('groupe-entreprise')
-  const groupeAbo = el('ouvrir-abonnement')?.parentElement
-
-  if (ligne && groupeEnt && groupeAbo) {
-    if (!permis && ligne.parentElement !== groupeEnt) {
-      const filet = document.createElement('div')
-      filet.className = 'reg-filet'
-      filet.dataset.quotaFilet = '1'
-      groupeEnt.appendChild(filet)
-      groupeEnt.appendChild(ligne)
-      groupeAbo.hidden = true
-    } else if (permis && ligne.parentElement !== groupeAbo) {
-      /* ⚠ ET L'ON SAIT REVENIR EN ARRIERE. Un fondateur qui bascule depuis un
-         etablissement ou il est simple gestionnaire doit retrouver son groupe
-         « Abonnement » complet. */
-      groupeEnt.querySelectorAll('[data-quota-filet]').forEach(x => x.remove())
-      groupeAbo.appendChild(ligne)
-      groupeAbo.hidden = false
-    }
-  }
 }
 
 function estFondateur(m) {

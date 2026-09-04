@@ -16758,3 +16758,44 @@ body.en-apercu #apercu-bandeau{
   font-size:13px;
   font-weight:650;
 }
+
+
+/* ⚠ LES INITIALES DU BOUTON PROFIL SONT RETIREES.
+
+   Deux lettres a vingt pixels se lisaient comme un sigle, pas comme un visage.
+   Le bouton garde deux etats : la photo, ou la silhouette.
+
+ ⚠ ET LA SILHOUETTE NE SE MASQUE PLUS QUE POUR LA PHOTO. La regle precedente
+   la cachait aussi des que les initiales existaient — elles n'existent plus. */
+.tb-profil:has(img:not([hidden])) .tb-silhouette{ display:none; }
+
+/* ⚠ ELLE GROSSIT UN PEU. Seule dans le rond, elle peut occuper la place que
+   les initiales lui prenaient. */
+.tb-silhouette{
+  width:22px; height:22px;
+  color:var(--label-2);
+}
+
+
+/* ⚠ LE REPLI DU QUOTA PORTE MAINTENANT UN BOUTON.
+
+   `.quota-attente` etait une ligne de texte centree ; il lui faut de quoi
+   empiler trois choses. */
+.quota-attente{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:6px;
+  padding:26px 20px;
+  text-align:center;
+}
+
+.quota-attente-suite{
+  font-size:13px;
+  color:var(--label-3);
+}
+
+.quota-attente .btn{
+  margin-top:8px;
+  min-width:140px;
+}

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=fc7351ed">
+<link rel="stylesheet" href="style.css?v=a4b5ee0c">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1096,9 +1096,25 @@
                MILIEU DE L'ECRAN, pas au milieu de ce qui reste. Avec
                `space-between`, un bouton plus large que l'autre le decale et
                rien n'explique pourquoi. -->
-        <button type="button" class="tb-menu" id="tb-menu-gestion"
-                aria-label="Espace et compte" aria-expanded="false">
-          <i><span></span><span></span></i>
+        <!-- ⚠ UN PROFIL, PLUS DEUX BARRES.
+
+               Les deux traits disaient « un menu ». Ce volet ne contient pas un
+               menu : il dit qui vous etes, dans quelle entreprise, et permet de
+               partir. Un visage — ou des initiales — le dit d'un coup d'oeil.
+
+             ⚠ TROIS ETATS DANS LE MEME BOUTON : la photo si elle existe, les
+               initiales sinon, une silhouette en dernier recours — avant que la
+               fiche membre soit chargee. -->
+        <button type="button" class="tb-menu tb-profil" id="tb-menu-gestion"
+                aria-label="Votre profil" aria-expanded="false">
+          <img id="tb-photo-gestion" alt="" hidden>
+          <span class="tb-init" id="tb-init-gestion"></span>
+          <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8.4" r="3.6"/>
+            <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>
+          </svg>
         </button>
 
         <span class="tb-logo">
@@ -3462,9 +3478,25 @@
                MILIEU DE L'ECRAN, pas au milieu de ce qui reste. Avec
                `space-between`, un bouton plus large que l'autre le decale et
                rien n'explique pourquoi. -->
-        <button type="button" class="tb-menu" id="tb-menu-equipe"
-                aria-label="Espace et compte" aria-expanded="false">
-          <i><span></span><span></span></i>
+        <!-- ⚠ UN PROFIL, PLUS DEUX BARRES.
+
+               Les deux traits disaient « un menu ». Ce volet ne contient pas un
+               menu : il dit qui vous etes, dans quelle entreprise, et permet de
+               partir. Un visage — ou des initiales — le dit d'un coup d'oeil.
+
+             ⚠ TROIS ETATS DANS LE MEME BOUTON : la photo si elle existe, les
+               initiales sinon, une silhouette en dernier recours — avant que la
+               fiche membre soit chargee. -->
+        <button type="button" class="tb-menu tb-profil" id="tb-menu-equipe"
+                aria-label="Votre profil" aria-expanded="false">
+          <img id="tb-photo-equipe" alt="" hidden>
+          <span class="tb-init" id="tb-init-equipe"></span>
+          <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+               stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8.4" r="3.6"/>
+            <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>
+          </svg>
         </button>
 
         <span class="tb-logo">
@@ -4474,7 +4506,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=99f49a6b"></script>
+<script type="module" src="app.js?v=06e9610f"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

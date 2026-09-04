@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=d9948ce3">
+<link rel="stylesheet" href="style.css?v=d96e959d">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3125,7 +3125,8 @@
     </div>
 
     <div class="reg-titre">Votre entreprise</div>
-    <div class="reg-groupe" data-teinte="bleu">
+    <!-- ⚠ UN IDENTIFIANT POUR Y DEPLACER « Analyses vidéo AI ». -->
+    <div class="reg-groupe" id="groupe-entreprise" data-teinte="bleu">
       <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
            d'ouvrir la page. Elle sert quand on veut savoir quand ça repart. -->
       <!-- ⚠ « Analyses vidéo AI » A REJOINT LE GROUPE « Abonnement ».
@@ -3166,7 +3167,15 @@
         <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
       </button>
         <div class="reg-filet" id="reg-filet-abo"></div>
-      <button type="button" class="reg-ligne" onclick="ouvrirQuota()">
+      <!-- ⚠ CETTE LIGNE CHANGE DE GROUPE POUR UN GESTIONNAIRE INVITE.
+
+           Il ne voit pas l'abonnement : elle se retrouvait seule dans un groupe
+           dont le titre et la premiere ligne sont masques — d'ou la carte
+           detachee, avec sa propre teinte.
+
+           `appliquerAccesAbonnement` la deplace alors dans « Votre
+           entreprise », ou elle prend la teinte bleue du groupe. -->
+      <button type="button" class="reg-ligne" id="ligne-quota" onclick="ouvrirQuota()">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
@@ -4523,7 +4532,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=4b45fc6a"></script>
+<script type="module" src="app.js?v=c15063db"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

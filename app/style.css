@@ -16929,3 +16929,50 @@ body.sans-topbar .screen{
 @media (prefers-reduced-motion: reduce){
   .topbar, .screen{ transition:none; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT — REPRISE DE L'ANIMATION
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ⚠ TROIS DEFAUTS DANS MA PREMIERE VERSION.
+
+   ① ELLE MONTAIT DE TOUTE SA HAUTEUR. `translateY(-100%)` la fait glisser
+      derriere le bord de l'ecran : on la suit du regard sur soixante-quatre
+      pixels. Un mouvement long attire l'oeil sur ce qui part, alors qu'on veut
+      regarder ce qui arrive.
+
+      Douze pixels suffisent : l'oeil comprend la direction sans la suivre.
+
+   ② LE FONDU ET LE MOUVEMENT AVAIENT DEUX DUREES — 0,30 et 0,42 s. La barre
+      finissait donc transparente puis continuait de monter, invisible. C'est
+      ce qui donnait l'impression de saccade.
+
+   ③ ELLE NE REVENAIT PAS AVEC LA PAGE. Les ecrans entrent en 0,34 s
+      (`ecranEntre`) ; la barre mettait 0,42. Deux gestes decales de quatre-
+      vingts millisecondes se lisent comme deux gestes.
+
+   ⚠ ON REPREND LA DUREE ET LA COURBE DE `ecranEntre`, et le meme flou leger :
+     la barre et la page deviennent un seul mouvement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topbar{
+  transition:
+    transform 0.34s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity   0.34s cubic-bezier(0.32, 0.72, 0, 1),
+    filter    0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change:transform, opacity;
+}
+
+body.sans-topbar .topbar{
+  transform:translateX(-50%) translateY(-12px);
+  opacity:0;
+  filter:blur(2px);
+  pointer-events:none;
+}
+
+/* ⚠ LE CONTENU SUIT LA MEME COURBE ET LA MEME DUREE. C'etait deja le cas,
+   mais avec 0,42 s : il finissait apres la barre. */
+.screen{
+  transition:padding-top 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+}

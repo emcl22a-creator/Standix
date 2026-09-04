@@ -17033,3 +17033,61 @@ body.sans-topbar .topbar{
   filter:none;
   pointer-events:none;
 }
+
+
+/* ⚠ LA BARRE ET LA PAGE N'ETAIENT PAS ACCORDEES.
+
+   Mesure : la barre s'effaçait en 0,28 s avec `ease-out`, la page remontait en
+   0,34 s avec la courbe des ecrans. Soixante millisecondes d'ecart et deux
+   accelerations differentes — l'oeil lit deux gestes.
+
+ ⚠ ON ALIGNE LA PAGE SUR LA BARRE, pas l'inverse. C'est la barre qu'on regarde
+   partir ; la page ne fait que reprendre la place. Un fondu court appelle un
+   deplacement court.
+
+ ⚠ ET LA MEME COURBE. `ease-out` sur les deux : le mouvement doit ralentir au
+   meme moment, sinon la page arrive quand la barre est deja partie. */
+.screen{
+  transition:padding-top 0.28s ease-out;
+}
+
+
+/* ═══ LA PAGE ATTEND QUE LA BARRE SOIT PARTIE ═══
+
+   ⚠ LES DEUX MOUVEMENTS COMMENCAIENT ENSEMBLE. La barre s'effaçait pendant que
+     le contenu montait a sa place : on voyait le titre traverser la barre
+     encore visible. Deux choses au meme endroit au meme instant.
+
+   ⚠ 0,16 s D'ATTENTE, ET LE DEPLACEMENT DURE PLUS LONGTEMPS.
+
+     Quand la page s'ebranle, la barre est deja a 40 % d'opacite ; quand elle
+     arrive, la barre a disparu depuis longtemps. L'oeil lit une suite, pas une
+     superposition.
+
+     Total : 0,16 + 0,32 = 0,48 s. C'est plus long qu'avant, et c'est le but —
+     un enchainement se lit, un chevauchement se subit.
+
+   ⚠ AU RETOUR, L'ORDRE S'INVERSE.
+
+     La page redescend d'abord, la barre revient ensuite dans la place libre.
+     Sans cela elle reparaitrait par-dessus le contenu qui n'a pas fini de
+     bouger. */
+
+body.sans-topbar .screen{
+  transition:padding-top 0.32s cubic-bezier(0.32, 0.72, 0, 1) 0.16s;
+}
+
+/* ⚠ LE RETOUR : la page part tout de suite, la barre attend son tour. */
+.screen{
+  transition:padding-top 0.30s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.topbar{
+  transition:opacity 0.26s ease-out 0.18s;
+}
+
+/* ⚠ MAIS EN PARTANT, LA BARRE NE DOIT PAS ATTENDRE : c'est elle qui ouvre le
+   mouvement. On annule donc le retard dans ce sens. */
+body.sans-topbar .topbar{
+  transition:opacity 0.24s ease-out 0s;
+}

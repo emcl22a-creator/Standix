@@ -16632,3 +16632,43 @@ body.en-apercu #apercu-bandeau{
   -webkit-backdrop-filter:blur(20px);
   backdrop-filter:blur(20px);
 }
+
+
+/* ⚠ LA PAGE « Votre poste » DE L'EQUIPE PREND LES MEMES MESURES.
+
+   Deux regles visaient nommement `#p-reg-postes` : l'une pour l'arrondi a
+   20 px, l'autre pour le rembourrage a 16/20. L'ecran de l'equipe heritait
+   donc des valeurs generales — 22/20 et 24 px.
+
+   Mesure a l'ecran : meme classe, meme bordure ambre, mais deux geometries.
+
+ ⚠ ON REPREND LES DEUX VALEURS, pas une seule. Corriger l'arrondi sans le
+   rembourrage laisserait un ecart moins visible mais tout aussi reel. */
+/* ⚠ 16 PX PARTOUT, pas 16/20.
+
+   Mesure a l'ecran : la regle de `#p-reg-postes` donne `16px` sur les quatre
+   cotes une fois calculee — le `16px 20px` que j'avais lu vient d'une regle
+   plus generale qu'elle ecrase. */
+#e-reg-poste .an-intro,
+#p-reg-poste .an-intro{
+  border-radius:20px;
+  padding:16px;
+}
+
+
+/* ⚠ « Mon compte » ETAIT LE SEUL TITRE A 14 PX, les six autres a 10.
+
+   `.reg-identite { margin-top:14px }` datait d'avant l'ajout du titre : la
+   carte s'ecartait alors du bloc precedent, pas d'un en-tete.
+
+   Mesure a l'ecran : 14 px sous « Mon compte », 10 sous « Vos etablissements »,
+   « Votre entreprise », « Abonnement », « Preferences », « Une question ? » et
+   « Compte ».
+
+ ⚠ ON REPREND LES 10 PX, pas une valeur plus serree. Le titre et sa carte
+   doivent se lire comme un groupe — c'est deja l'ecart choisi partout
+   ailleurs. */
+#p-settings .reg-titre + .reg-identite,
+#e-settings .reg-titre + .reg-identite{
+  margin-top:10px;
+}

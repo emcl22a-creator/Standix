@@ -2954,6 +2954,21 @@ async function enterApp(membre) {
     document.getElementById('choice-screen').style.display = 'none'
     const appEl = document.getElementById('equipe-app')
     appEl.style.display = 'block'
+
+    /* ⚠ CETTE LIGNE MANQUAIT, ET C'EST LE DEFAUT.
+
+       Le bloc « gestion » juste au-dessus retire `inert` ; celui-ci l'avait
+       oublie. L'espace utilisateur restait donc inerte apres une bascule :
+       visible, mais aucun clic ne l'atteignait.
+
+       Recharger la page corrigeait, parce que `afficherCoquille` — l'autre
+       chemin d'ouverture — le retire, lui.
+
+     ⚠ `inert` NE SE VOIT PAS. L'ecran s'affiche normalement, rien ne signale
+       que les evenements sont bloques : d'ou le temps qu'il m'a fallu pour le
+       trouver. */
+    appEl.removeAttribute('inert')
+
     if (basculeSansAnimation) {
       // On retire la classe sans la remettre : aucune animation ne peut rejouer.
       appEl.classList.remove('app-shell-in')
@@ -3205,18 +3220,18 @@ let photoTampon = null       // la photo choisie, pas encore enregistree
    fraction de seconde en basculant. */
 function peindreBoutonProfil() {
   const url = currentMembre?.photo_url || null
-  const ini = initialesMembre(currentMembre?.nom)
 
+  /* ⚠ DEUX ETATS, PLUS TROIS : la photo, ou la silhouette.
+
+     Les initiales sont retirees. A vingt pixels dans une barre, deux lettres
+     grises se lisaient comme un sigle, pas comme un visage — et le bouton ne
+     disait plus « vous ». */
   ;['gestion', 'equipe'].forEach(esp => {
     const img = document.getElementById('tb-photo-' + esp)
-    const txt = document.getElementById('tb-init-' + esp)
     if (img) {
       if (url) { img.src = url; img.hidden = false }
       else { img.removeAttribute('src'); img.hidden = true }
     }
-    /* ⚠ VIDE PLUTOT QU'UN TIRET. Le CSS masque les initiales quand elles sont
-       vides, ce qui laisse paraitre la silhouette. */
-    if (txt) txt.textContent = (ini && ini !== '—') ? ini : ''
   })
 }
 
@@ -7177,7 +7192,7 @@ window.showGestionScreen = function(id, btn) {
   /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
      dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
      Branché ICI plutôt qu'aux quatre endroits qui ouvrent cette page. */
-  if (id === 'p-settings') { majLigneQuota(); appliquerAccesAbonnement() }
+  if (id === 'p-settings') { majLigneQuota(); appliquerAccesAbonnement(); appliquerAccesEntreprise() }
   window.majBarreEspace?.('gestion')
   /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
   window.placerOnglet?.(ONGLET_PAR_ECRAN[id])
@@ -11679,9 +11694,23 @@ function renderCategoryProceduresListInterne() {
 
      Le filtre s'applique AVANT la recherche : chercher « caisse » depuis
      l'intérieur de « Friteuse » ne doit pas ramener toute la cuisine. */
-  const dansLaVue = sousDossierCourant
+  /* ⚠ LE FILTRE DU SEGMENT SUIT DANS LE DOSSIER.
+
+     Il ne portait que sur la liste des dossiers : entrer dans l'un d'eux
+     montrait tout, publie ou non. L'onglet s'appelle « En ligne » — il doit le
+     rester d'un bout a l'autre du chemin, dossier puis sous-dossier.
+
+   ⚠ ET IL VAUT AUSSI POUR « En cours ». Le meme raisonnement : un dossier
+     ouvert depuis cet onglet ne doit montrer que ce qui reste a publier. */
+  const parEtat = (d) => {
+    if (filtreEtatDossiers === 'tout')      return !!d.proc.publiee_le
+    if (filtreEtatDossiers === 'brouillon') return !d.proc.publiee_le
+    return true
+  }
+
+  const dansLaVue = (sousDossierCourant
     ? currentCategoryProcsData.filter(d => (d.proc.sous_categorie || '').trim() === sousDossierCourant)
-    : currentCategoryProcsData
+    : currentCategoryProcsData).filter(parEtat)
 
   /* ═══ LA MEME RECHERCHE QUE SUR LA PAGE PROCEDURES ═══
 
@@ -20543,29 +20572,15 @@ async function loadEquipeProcedures() {
 
 /* Salutation et anneaux de l'employé. Les trois chiffres répondent à sa seule
    question : combien j'en ai lu, combien il en reste. */
-function renderEquipeAccueil() {
-  const h = new Date().getHours()
-  const bonjour = (h >= 5 && h < 18) ? 'Bonjour' : 'Bonsoir'
-  const prenom = (currentMembre?.nom || '').trim().split(' ')[0]
+/* ⚠ `renderEquipeAccueil` NE FAIT PLUS RIEN, ET C'EST VOULU.
 
-  const salut = document.getElementById('e-salut')
-  if (salut) salut.textContent = `${bonjour}${prenom ? ' ' + prenom : ''} 👋`
+   Elle ecrivait deux choses : le salut « Bonjour Emilien », retire du
+   balisage, et le decompte des procedures a lire, retire avant lui.
 
-  /* ⚠ LA LIGNE SOUS LE TITRE A ETE VIDEE.
-
-     Elle disait « Il vous reste 3 procedures a lire » — un decompte de ce qui
-     manque, en tete d'un ecran qu'on vient d'ouvrir. Le badge « Non lue » sur
-     chaque carte dit deja la meme chose, la ou l'on peut agir.
-
-     On la vide plutot que de retirer la balise : le CSS la referme quand elle
-     est vide, et elle reste disponible pour autre chose.
-
-   ⚠ QUATRE CALCULS ONT DISPARU AVEC ELLE — total, lues, reste, pourcentage.
-     Ils ne servaient qu'a cette phrase ; les garder aurait fait parcourir
-     toutes les procedures a chaque rendu pour rien. */
-  /* ⚠ ON NE TOUCHE PLUS A CETTE LIGNE. Elle porte desormais un texte fixe,
-     ecrit dans le balisage : la vider ici l'effacerait a chaque rendu. */
-}
+   On garde la fonction vide plutot que de la supprimer : elle est appelee a
+   plusieurs endroits, et les appels retirer un par un risquerait d'en manquer
+   un — qui planterait alors la page entiere. */
+function renderEquipeAccueil() {}
 
 /* Grille des dossiers, exactement celle de l'espace gestion : anneau de
    progression, nom, nombre de procédures et aperçu des titres récents. */
@@ -21422,8 +21437,24 @@ function dateRenouvellement() {
 
 async function lireQuota() {
   try {
-    const { data, error } = await supabase.rpc('verifier_analyse')
-    if (error || !data) return null
+    /* ⚠ ON DIT DANS QUELLE ENTREPRISE, comme partout ailleurs.
+
+       Cet appel etait le dernier sans argument. `verifier_analyse` prenait
+       donc la premiere fiche membre venue : pour un compte qui appartient a
+       deux entreprises, elle rendait le quota de l'une pendant qu'on regardait
+       l'autre — ou refusait, si cette fiche-la n'etait pas « gestion ».
+
+       C'est ce refus qui donnait « Le compte n'a pas pu etre lu ». */
+    const { data, error } = await supabase
+      .rpc('verifier_analyse', { p_entreprise_id: currentMembre?.entreprise_id || null })
+
+    if (error) { console.warn('[quota]', error.message); return null }
+    if (!data) return null
+
+    /* ⚠ UNE REPONSE « non autorise » N'EST PAS UNE PANNE.
+
+       Elle porte quand meme le quota et le reste : les afficher vaut mieux que
+       de montrer un tiret, qui laisse croire a un incident. */
     quotaConnu = { quota: Number(data.quota) || 0, reste: Number(data.reste) || 0 }
     return quotaConnu
   } catch (e) {
@@ -21448,8 +21479,19 @@ window.ouvrirQuota = async function() {
 
   const q = await lireQuota()
   if (!q) {
-    carte.innerHTML = '<div class="quota-attente">Le compte n\u2019a pas pu \u00eatre lu. '
-      + 'R\u00e9essayez dans un instant.</div>'
+    /* ⚠ UN BOUTON PLUTOT QU'UNE PHRASE SEULE.
+
+       « Reessayez dans un instant » demande a la personne de refaire le geste
+       — sortir de la page, y revenir — alors que l'app peut le faire elle-meme.
+
+     ⚠ ET L'ON DIT CE QU'ON SAIT. Une lecture qui echoue vient presque toujours
+       du reseau : le nommer evite de croire a un probleme de compte. */
+    carte.innerHTML =
+      '<div class="quota-attente">Le compte n\u2019a pas pu \u00eatre lu.'
+      + '<span class="quota-attente-suite">V\u00e9rifiez votre connexion.</span>'
+      + '<button type="button" class="btn ghost" id="quota-reessayer">R\u00e9essayer</button></div>'
+
+    document.getElementById('quota-reessayer')?.addEventListener('click', () => ouvrirQuota())
     return
   }
 
@@ -24440,6 +24482,96 @@ let triEquipe = 'az'
      combien il en reste : c'est son quota de travail, pas une question de
      paiement.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   QUITTER OU SUPPRIMER SON ENTREPRISE
+
+   ⚠ QUI VOIT QUOI. Le fondateur voit « Supprimer » ; tous les autres voient
+     « Quitter ». Jamais les deux : le fondateur ne peut pas quitter — sans lui
+     l'entreprise n'aurait plus de proprietaire, et l'abonnement, les quotas et
+     les droits reposent tous dessus.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function appliquerAccesEntreprise() {
+  const fondateur = estFondateur(currentMembre)
+  const q = document.getElementById('quitter-entreprise')
+  const s = document.getElementById('supprimer-entreprise')
+  if (q) q.hidden = fondateur
+  if (s) s.hidden = !fondateur
+}
+
+document.getElementById('quitter-entreprise')?.addEventListener('click', async () => {
+  const nom = cachedEntreprise?.nom || 'cette entreprise'
+
+  /* ⚠ ON DIT CE QU'ON PERD, ET CE QU'ON NE PERD PAS. « Etes-vous sur ? » ne
+     renseigne personne : la vraie question est de savoir si le travail
+     disparait avec soi. Il ne disparait pas. */
+  const ok = await confirmDialog({
+    titre: 'Quitter ' + nom + ' ?',
+    message: 'Vous perdrez l’accès à ses procédures. '
+           + 'Elles restent en place pour le reste de l’équipe. '
+           + 'Il faudra un nouveau code d’invitation pour revenir.',
+    confirmer: 'Quitter', annuler: 'Rester', danger: true,
+  })
+  if (!ok) return
+
+  const { data, error } = await supabase
+    .rpc('quitter_entreprise', { p_entreprise_id: currentMembre.entreprise_id })
+
+  if (error || !data?.ok) {
+    const r = data?.raison
+    toast(r === 'fondateur'
+      ? 'Vous avez créé cette entreprise : supprimez-la plutôt que de la quitter.'
+      : r === 'dernier_gestionnaire'
+        ? 'Vous êtes le seul gestionnaire. Promouvez quelqu’un avant de partir.'
+        : 'Impossible de quitter pour le moment.')
+    return
+  }
+
+  toast('Vous avez quitté ' + nom + '.')
+  /* ⚠ ON RECHARGE PLUTOT QUE DE BASCULER. La fiche membre n'existe plus : tout
+     ce que l'app garde en memoire la designe encore. */
+  setTimeout(() => location.reload(), 900)
+})
+
+document.getElementById('supprimer-entreprise')?.addEventListener('click', async () => {
+  const nom = cachedEntreprise?.nom || 'cette entreprise'
+
+  /* ⚠ DEUX CONFIRMATIONS, ET LA SECONDE DEMANDE LE NOM.
+
+     Une suppression irreversible ne doit pas tenir a un doigt qui glisse.
+     Retaper le nom demande de lire ce qu'on detruit. */
+  const ok = await confirmDialog({
+    titre: 'Supprimer ' + nom + ' ?',
+    message: 'Toutes les procédures, les étapes, les vidéos et les membres '
+           + 'seront effacés. Cette action est irréversible.',
+    confirmer: 'Continuer', annuler: 'Annuler', danger: true,
+  })
+  if (!ok) return
+
+  const saisi = await demanderTexte({
+    titre: 'Confirmer la suppression',
+    message: 'Tapez « ' + nom + ' » pour confirmer.',
+    placeholder: nom,
+    confirmer: 'Supprimer définitivement',
+  })
+  if (!saisi || saisi.trim().toLowerCase() !== nom.trim().toLowerCase()) {
+    if (saisi) toast('Le nom ne correspond pas. Rien n’a été supprimé.')
+    return
+  }
+
+  const { data, error } = await supabase
+    .rpc('supprimer_entreprise', { p_entreprise_id: currentMembre.entreprise_id })
+
+  if (error || !data?.ok) {
+    toast(data?.raison === 'role'
+      ? 'Seul le créateur de l’entreprise peut la supprimer.'
+      : 'La suppression a échoué. Réessayez dans quelques instants.')
+    return
+  }
+
+  toast(nom + ' a été supprimée.')
+  setTimeout(() => location.reload(), 900)
+})
+
 function appliquerAccesAbonnement() {
   const permis = estFondateur(currentMembre)
   const el = (id) => document.getElementById(id)

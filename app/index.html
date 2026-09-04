@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=42a84915">
+<link rel="stylesheet" href="style.css?v=3ba62ac6">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -4207,10 +4207,18 @@
 
            `x2="0" y2="1"` : du haut vers le bas. La pointe claire attrape
            l'oeil, la base bleue rattache la coche a la carte. -->
-      <linearGradient id="cocheOffre" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="#FFFFFF"/>
-        <stop offset="1" stop-color="#4899EC"/>
-      </linearGradient>
+      <!-- ⚠ LA COCHE PASSE AU VERT.
+
+         Elle etait blanche en haut, bleue en bas — lisible sur une carte
+         noire, invisible sur une carte blanche.
+
+         Le vert dit « inclus » sans qu'on ait a le lire, et il ne se confond
+         pas avec le bleu du bouton : deux signes bleus sur la meme carte, on
+         ne sait plus lequel est cliquable. -->
+    <linearGradient id="cocheOffre" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#34C759"/>
+      <stop offset="1" stop-color="#1E9E43"/>
+    </linearGradient>
 
     <!-- Le logo : orange profond en bas à gauche, ambre clair en haut à droite.
          Les coordonnées sont celles du tracé lui-même (85 x 100), donc le
@@ -4600,7 +4608,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=11a4e816"></script>
+<script type="module" src="app.js?v=23c49ee3"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

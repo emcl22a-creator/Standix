@@ -11011,6 +11011,10 @@ function renderCategoryGrid() {
 
     const enLigne = procsInCat.length - brouillons
 
+    /* ⚠ LE CHIFFRE SUIT L'ONGLET. Les deux nombres sont deja calcules
+       au-dessus : il n'y a qu'a choisir lequel afficher. */
+    const nbAffiche = filtreEtatDossiers === 'brouillon' ? brouillons : enLigne
+
     cell.innerHTML = `
       <span class="cl-pl" style="background:${fondPlaque(teinte)}">
         <svg viewBox="0 0 24 24" fill="none">
@@ -11046,7 +11050,7 @@ function renderCategoryGrid() {
               : enLigne
                 ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
                 : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Aucune en ligne</span>`}
-          <span class="cl-n">${procsInCat.length} procédure${procsInCat.length > 1 ? 's' : ''}</span>
+          <span class="cl-n">${nbAffiche} procédure${nbAffiche > 1 ? 's' : ''}</span>
         </span>
       </span>
     `

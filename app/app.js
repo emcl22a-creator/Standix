@@ -16814,16 +16814,27 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        obtenir un bon résultat » aide. */
     if (e.message === 'SANS_SON') {
       errorEl.textContent = ''
-      const versMontage = await confirmDialog({
+
+      /* ⚠ ON NE DIT PLUS COMMENT L'ANALYSE TRAVAILLE.
+
+         Le message expliquait que l'IA ecoute la voix pour decouper les
+         etapes. C'est vrai, mais c'est notre affaire : le client n'a pas a
+         connaitre la mecanique pour s'en servir, et la dire invite a la
+         contourner.
+
+       ⚠ UNE CONSIGNE, PAS UN DIAGNOSTIC. « Commentez ce que vous faites » dit
+         quoi faire ; « l'IA ecoute votre voix » dit pourquoi l'app a echoue.
+
+       ⚠ ET UN SEUL BOUTON. « Marquer les etapes moi-meme » menait au montage
+         manuel — un second chemin, propose au pire moment, quand on vient
+         d'echouer. Refilmer est la bonne reponse. */
+      await confirmDialog({
         titre: 'Filmez en expliquant \u00e0 voix haute',
-        message: "L'IA \u00e9coute ce que vous dites pour d\u00e9couper les \u00e9tapes. " +
-          "Cette vid\u00e9o n'a pas de son \u2014 elle ne saurait pas o\u00f9 couper.\n\n" +
-          "Refilmez en commentant vos gestes, ou marquez les \u00e9tapes vous-m\u00eame.",
-        confirmer: 'Marquer les \u00e9tapes moi-m\u00eame',
-        annuler: 'Je refilme',
+        message: 'Commentez ce que vous faites pendant que vous filmez.',
+        confirmer: 'Compris',
+        annuler: null,
         danger: false,
       })
-      if (versMontage) ouvrirMontageVideo(null)
       return
     }
 

@@ -2756,6 +2756,14 @@ async function enterApp(membre) {
 
 
   currentMembre = membre
+
+  /* ⚠ LE BOUTON PROFIL SE REMPLIT DES L'ENTREE.
+
+     `peindreReglages` le fait aussi, mais elle ne tourne qu'a l'ouverture de
+     la page Entreprise. Sans cet appel, le bouton resterait une silhouette
+     tant qu'on n'y serait pas alle. */
+  peindreBoutonProfil()
+
   try {
     localStorage.setItem('procedo_espace', membre.role)
     // Le repère du rechargement : on retient la fiche, donc l'établissement.
@@ -3187,6 +3195,31 @@ function finDuDemarrage() {
    ═══════════════════════════════════════════════════════════════════════════ */
 let photoTampon = null       // la photo choisie, pas encore enregistree
 
+/* ⚠ LE BOUTON DE LA BARRE SUIT LA MEME PHOTO.
+
+   Il lit `currentMembre.photo_url`, comme la page « Votre compte ». Changer sa
+   photo met donc les deux a jour — un seul etat, deux affichages.
+
+ ⚠ ON REMPLIT LES DEUX ESPACES A CHAQUE FOIS. Le bouton de l'espace ferme est
+   masque, pas absent : le laisser vide ferait paraitre une silhouette une
+   fraction de seconde en basculant. */
+function peindreBoutonProfil() {
+  const url = currentMembre?.photo_url || null
+  const ini = initialesMembre(currentMembre?.nom)
+
+  ;['gestion', 'equipe'].forEach(esp => {
+    const img = document.getElementById('tb-photo-' + esp)
+    const txt = document.getElementById('tb-init-' + esp)
+    if (img) {
+      if (url) { img.src = url; img.hidden = false }
+      else { img.removeAttribute('src'); img.hidden = true }
+    }
+    /* ⚠ VIDE PLUTOT QU'UN TIRET. Le CSS masque les initiales quand elles sont
+       vides, ce qui laisse paraitre la silhouette. */
+    if (txt) txt.textContent = (ini && ini !== '—') ? ini : ''
+  })
+}
+
 function peindrePhotoProfil() {
   const img = document.getElementById('photo-apercu')
   const ini = document.getElementById('photo-initiales')
@@ -3266,6 +3299,7 @@ async function enregistrerPhotoProfil() {
 
 function peindreReglages() {
   peindrePhotoProfil()
+  peindreBoutonProfil()
   const nom = currentMembre?.nom || ''
   const el = (i) => document.getElementById(i)
 
@@ -3690,6 +3724,7 @@ document.getElementById('settings-save-btn')?.addEventListener('click', async ()
      image et creerait un doublon dans le seau. */
   photoTampon = null
   peindrePhotoProfil()
+  peindreBoutonProfil()
 
   errorEl.style.color = 'var(--green)'
   errorEl.textContent = 'Enregistré.'

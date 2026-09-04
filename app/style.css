@@ -16864,9 +16864,68 @@ body.en-apercu #apercu-bandeau{
   display:block;
 }
 
-/* ⚠ ET LE SURLIGNAGE DE LECTURE SUIT LA CARTE. Il visait un point a -55 px,
-   hors de la carte : il ne se serait plus vu. */
+/* ⚠ LA BARRE VERTICALE DISPARAIT AVEC LE FIL.
+
+   Elle marquait l'etape en cours de lecture d'un trait bleu a gauche, pose a
+   -55 px — dans la marge du fil. Sur une carte, ce point tombe hors du fond.
+
+   Ma premiere correction l'avait etiree a toute la carte : le trait devenait
+   un pave bleu qui recouvrait le texte. C'etait pire que le defaut.
+
+ ⚠ ON LA RETIRE, TOUT SIMPLEMENT. La regle generale `.detail-step.en-lecture`
+   pose deja un liseré bleu et un fond legerement teinte — c'est ce que fait
+   l'espace gestion, qui n'a aucune regle propre. */
 #detail-steps.etapes-fil .detail-step.en-lecture::after{
-  left:0; right:0; top:0; bottom:0;
-  border-radius:20px;
+  display:none;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU HAUT S'EFFACE SUR LES PAGES DE DETAIL
+
+   ⚠ POURQUOI. Ces pages ont leur propre en-tete : un bouton retour et le nom
+     de ce qu'on regarde. La barre du logo au-dessus repete l'evidence — on
+     sait dans quelle app on est — et vole quarante pixels a la lecture.
+
+     C'est ce que fait iOS : la barre de navigation cede la place au contenu
+     des qu'on entre dans un detail.
+
+   ⚠ ELLE MONTE ET S'EFFACE, elle ne disparait pas d'un coup. Le mouvement dit
+     d'ou elle vient, donc ou elle reviendra.
+
+   ⚠ ET LE CONTENU REMONTE AVEC ELLE. Sans cela, la page garderait un vide de
+     quarante pixels en haut — on aurait retire la barre sans rien gagner.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topbar{
+  transition:
+    transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity   0.30s cubic-bezier(0.32, 0.72, 0, 1);
+  will-change:transform, opacity;
+}
+
+body.sans-topbar .topbar{
+  transform:translateX(-50%) translateY(-100%);
+  opacity:0;
+  pointer-events:none;
+}
+
+/* ⚠ LE CONTENU SUIT, avec la meme courbe et la meme duree : les deux
+   mouvements doivent se lire comme un seul geste.
+
+ ⚠ C'EST L'ECRAN QUI PORTE L'ESPACE, pas l'app. Mesure : 102 px de rembourrage
+   haut sur `.screen`, dont 64 pour la barre. En la retirant, on rend ces 64 px
+   au contenu — et l'en-tete de la page remonte a la place du logo. */
+.screen{
+  transition:padding-top 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+body.sans-topbar .screen{
+  padding-top:38px;
+}
+
+/* ⚠ QUI SE PASSE D'ELLE. Un dossier, un sous-dossier, une procedure, sa
+   modification : partout ou un bouton retour existe deja. */
+@media (prefers-reduced-motion: reduce){
+  .topbar, .screen{ transition:none; }
 }

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=2f648dd9">
+<link rel="stylesheet" href="style.css?v=eba9d8b9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3054,8 +3054,8 @@
       <!-- ⚠ LE TITRE SUIT L'ONGLET. Deux mots differents pour la meme page —
              « Reglages » en haut, « Entreprise » en bas — feraient douter
              d'etre au bon endroit. -->
-        <h1>Entreprise</h1>
-        <p>Votre équipe, vos établissements<br>et votre abonnement.</p>
+        <h1>Équipe</h1>
+        <p>Qui fait quoi, et qui rejoint<br>votre équipe.</p>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -3088,7 +3088,7 @@
          « Abonnement », « Preferences » en portent un, pas lui. L'oeil qui
          descend la page trouvait donc une carte orpheline avant la premiere
          section nommee. -->
-    <div class="reg-titre">Votre entreprise</div>
+    <div class="reg-titre">Votre équipe</div>
     <!-- ⚠ UN IDENTIFIANT POUR Y DEPLACER « Analyses vidéo AI ». -->
     <div class="reg-groupe" id="groupe-entreprise" data-teinte="bleu">
       <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
@@ -3139,31 +3139,31 @@
         <span class="reg-val mono" id="reg-code-val">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet" id="reg-filet-etabs" style="display:none;"></div>
-    </div>
+    
+        <div class="reg-filet"></div>
 
-    <!-- ⚠ LE TITRE ET SA LIGNE SE MASQUENT ENSEMBLE pour un gestionnaire
-         invite. Masquer la ligne seule laisserait un titre « Abonnement »
-         au-dessus d'un groupe qui ne parle que d'analyses video. -->
-    <div class="reg-titre" id="reg-titre-abo">Abonnement</div>
-    <div class="reg-groupe" data-teinte="violet">
-        <button type="button" class="reg-ligne" id="ouvrir-abonnement">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
-        <span class="reg-val" id="abo-actuel">—</span><span class="fl">›</span>
-      </button>
-        <div class="reg-filet" id="reg-filet-abo"></div>
-      <!-- ⚠ CETTE LIGNE CHANGE DE GROUPE POUR UN GESTIONNAIRE INVITE.
+        <!-- ⚠ LES ANALYSES RESTENT, L'ABONNEMENT PART.
 
-           Il ne voit pas l'abonnement : elle se retrouvait seule dans un groupe
-           dont le titre et la premiere ligne sont masques — d'ou la carte
-           detachee, avec sa propre teinte.
+             Le compteur d'analyses est un outil de travail : combien il en
+             reste pour filmer cette semaine. L'abonnement, lui, engage la
+             carte bancaire — il vit dans le Profil, avec le compte.
 
-           `appliquerAccesAbonnement` la deplace alors dans « Votre
-           entreprise », ou elle prend la teinte bleue du groupe. -->
+             La ligne rejoint donc le groupe de l'equipe pour de bon, et
+             `appliquerAccesAbonnement` n'a plus a la deplacer. -->
       <button type="button" class="reg-ligne" id="ligne-quota" onclick="ouvrirQuota()">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
-    </div>
+      </div>
+
+    <!-- ⚠ LE TITRE ET SA LIGNE SE MASQUENT ENSEMBLE pour un gestionnaire
+         invite. Masquer la ligne seule laisserait un titre « Abonnement »
+         au-dessus d'un groupe qui ne parle que d'analyses video. -->
+    <!-- ⚠ LE GROUPE « Abonnement » A ETE RETIRE DE CETTE PAGE.
+
+         Elle s'appelle « Equipe » : quatre de ses cinq lignes parlent de gens.
+         L'abonnement n'y avait plus sa place — il est dans le Profil, revele au
+         gerant seul. -->
 
     </div>
 
@@ -4600,7 +4600,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=6ed86db2"></script>
+<script type="module" src="app.js?v=11a4e816"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5448,7 +5448,7 @@ function layout() {
 
  ⚠ DIX CARACTERES, la largeur de « Procedures ». Plus long, le libelle serrerait
    les deux autres onglets. */
-const LABELS_GESTION = ['Procedures', 'Analyse', 'Entreprise'];
+const LABELS_GESTION = ['Procedures', 'Analyse', 'Equipe'];
 /* ⚠ TROIS ONGLETS COTE EQUIPE, comme la gestion.
 
    « Notifications » a ete retire. Ce qu'il montrait — les procedures publiees

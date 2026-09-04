@@ -16976,3 +16976,60 @@ body.sans-topbar .topbar{
 .screen{
   transition:padding-top 0.34s cubic-bezier(0.32, 0.72, 0, 1);
 }
+
+
+/* ⚠ `will-change` COUPAIT LE VERRE, ET C'EST MOI QUI L'AI POSE.
+
+   `will-change:transform, opacity` sur `.topbar` cree un contexte
+   d'empilement. Or `backdrop-filter` ne floute que ce qui se trouve DERRIERE
+   son contexte : enferme dans celui du parent, il n'avait plus rien a flouter.
+
+   Mesure a l'ecran : la propriete etait bien declaree sur `.topbar-card`
+   — `blur(14px) saturate(1.8)` — mais sans effet visible.
+
+ ⚠ ON LE RETIRE PLUTOT QUE DE LE DEPLACER. Il servait a annoncer l'animation
+   au navigateur ; `transform` et `opacity` sont deja traitees par le
+   compositeur sans lui. Le gain etait nul, le cout visible.
+
+ ⚠ ET LE FLOU DE SORTIE PART AVEC. `filter` cree le meme contexte : garde, il
+   couperait le verre pendant toute la transition. La barre s'efface donc sans
+   flou — c'est le prix du verre au repos, et le repos dure plus longtemps. */
+.topbar{
+  will-change:auto;
+  transition:
+    transform 0.34s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity   0.34s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+body.sans-topbar .topbar{
+  transform:translateX(-50%) translateY(-12px);
+  opacity:0;
+  filter:none;
+  pointer-events:none;
+}
+
+
+/* ═══ LA BARRE S'EFFACE, SANS BOUGER ═══
+
+   ⚠ CHOISI SUR MAQUETTE, parmi six. Le fondu seul est le plus discret : rien
+     ne glisse, rien ne se deforme, la barre cesse simplement d'etre la.
+
+   ⚠ 0,28 s ET `ease-out`, pas la courbe des ecrans.
+
+     Un fondu n'a pas de trajet : une courbe d'accompagnement — faite pour
+     donner du poids a un deplacement — n'a rien a accompagner ici. `ease-out`
+     part vite et finit doucement, ce qui convient a une disparition.
+
+   ⚠ ET PAS DE `will-change`. Il creerait un contexte d'empilement qui couperait
+     le verre depoli de la barre — le defaut que nous venons de corriger. */
+.topbar{
+  will-change:auto;
+  transition:opacity 0.28s ease-out;
+}
+
+body.sans-topbar .topbar{
+  transform:translateX(-50%);
+  opacity:0;
+  filter:none;
+  pointer-events:none;
+}

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=eba6ce43">
+<link rel="stylesheet" href="style.css?v=2f648dd9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3106,6 +3106,26 @@
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
+
+        <div class="reg-filet"></div>
+
+        <!-- ⚠ « Mouvements de l'equipe » EXISTAIT DEJA, cachee dans Analyse.
+
+             La page existe — `p-activites`, titre « Mouvements de l'equipe » —
+             mais on ne l'atteignait qu'en descendant dans les statistiques.
+             C'est pourtant une question d'entreprise : qui est arrive, qui est
+             parti.
+
+           ⚠ DEUX FLECHES QUI SE CROISENT, pas une horloge. L'horloge dirait
+             « historique » ; ce qu'on regarde, ce sont des entrees et des
+             sorties. -->
+        <button type="button" class="reg-ligne" onclick="showGestionScreen('p-activites')">
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 8h11l-3-3M20 16H9l3 3" stroke="currentColor" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg></span><span class="reg-nm">Mouvements de l’équipe</span>
+          <span class="reg-fl">›</span>
+        </button>
         <!-- Le filet du groupe : le même que partout ailleurs. -->
         <div class="reg-filet"></div>
         <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
@@ -4564,7 +4584,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=976a80fd"></script>
+<script type="module" src="app.js?v=f992c396"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5442,8 +5462,21 @@ const ICONS = [
    fill:'M6.8 5.2h10.4A2.8 2.8 0 0 1 20 8v11.2a2.8 2.8 0 0 1-2.8 2.8H6.8A2.8 2.8 0 0 1 4 19.2V8a2.8 2.8 0 0 1 2.8-2.8z M8.9 10h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 13.5h6.2a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M8.9 17h3.4a.9.9 0 1 1 0 1.8H8.9a.9.9 0 1 1 0-1.8z M9.2 2.6h5.6a1.2 1.2 0 0 1 1.2 1.2v1.4H8V3.8a1.2 1.2 0 0 1 1.2-1.2z'},
   {line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',
    fill:'M3.4 3.4h2v15.4h15.2v2H5.4a2 2 0 0 1-2-2z M7.1 13.3h2.4v5.5H7.1z M11.8 8.1h2.4v10.7h-2.4z M16.5 10.6h2.4v8.2h-2.4z'},
-  {line:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2z M15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z',
-   fill:'M12.2 2.4h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.3a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.3a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.3a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.3a2 2 0 0 1-1-1.7v-.2a2 2 0 0 0-2-2zM15 12a3 3 0 1 0-6 0 3 3 0 0 0 6 0z'},
+  {
+    /* ⚠ UN IMMEUBLE, PLUS UN ENGRENAGE.
+
+       L'engrenage venait du temps ou l'onglet s'appelait « Reglages ». Il dit
+       « on regle quelque chose » ; la page dit maintenant « Entreprise » — on
+       y gere une equipe, des postes, un abonnement.
+
+       Un batiment a etages se lit sans legende, et se distingue du document et
+       du graphique qui l'encadrent.
+
+     ⚠ LES FENETRES SONT DES TRAITS, pas des carres. A vingt pixels, quatre
+       petits carres se remplissent et l'immeuble devient un bloc. */
+    line:'M4.4 21V5.2a1.6 1.6 0 0 1 1.6-1.6h6.4a1.6 1.6 0 0 1 1.6 1.6V21 M14 10.4h4a1.6 1.6 0 0 1 1.6 1.6V21 M2.6 21h18.8 M7.6 7.8h1.2 M7.6 11.6h1.2 M7.6 15.4h1.2 M16.4 14.2h1.2 M16.4 17.6h1.2',
+    fill:'M4.4 21V5.2a1.6 1.6 0 0 1 1.6-1.6h6.4a1.6 1.6 0 0 1 1.6 1.6V21 M14 10.4h4a1.6 1.6 0 0 1 1.6 1.6V21 M2.6 21h18.8 M7.6 7.8h1.2 M7.6 11.6h1.2 M7.6 15.4h1.2 M16.4 14.2h1.2 M16.4 17.6h1.2',
+  },
 ];
 /* Le QR code, propre à l'espace Équipe. Le carré plein en version « active »
    plutôt qu'un contour épaissi : à 22 px, un contour qui s'épaissit devient une

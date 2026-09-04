@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=364119aa">
+<link rel="stylesheet" href="style.css?v=fc7351ed">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2570,7 +2570,12 @@
   <div class="screen" inert id="p-global-analyse">
     <div class="page-tete">
       <h1>Analyse</h1>
-      <p>Suivez l’impact de vos procédures<br>et l’activité de votre organisation.</p>
+      <!-- ⚠ LA SECONDE MOITIE A ETE RETIREE avec son retour a la ligne.
+
+           « et l'activite de votre organisation » disait la meme chose que la
+           premiere partie, en plus long : l'impact des procedures EST cette
+           activite. -->
+        <p>Suivez l’impact de vos procédures.</p>
     </div>
 
     <!-- ⚠ TROIS DUREES, PAS QUATRE. La maquette en montrait une quatrieme,
@@ -3223,13 +3228,20 @@
          `hero-ia` apporte le fond profond et le liseré ambre ; `hero-lueur`
          la lumière qui court derrière. Aucun style nouveau : on emploie ce qui
          existe, pour que les deux cartes ne puissent pas diverger. -->
-    <div class="hero hero-ia hero-sans-image">
-      <span class="hero-lueur"></span>
-      <div class="hero-txt">
-        <h2>Quel est votre rôle ici ?</h2>
-        <p>Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</p>
+    <!-- ⚠ LE MEME BLOC QUE « Les postes » COTE GESTION.
+
+           Il employait `hero-ia hero-sans-image` avec un `<h2>` et un `<p>` :
+           un rembourrage different, une bordure differente, une hierarchie de
+           titres differente. Deux pages qui font la meme chose a un niveau
+           d'ecart.
+
+           `hero an-intro` porte la bordure ambre et les classes `t` et `s` —
+           celles de toute l'app. -->
+      <div class="hero an-intro">
+        <span class="hero-lueur" aria-hidden="true"></span>
+        <div class="t">Quel est votre rôle ici ?</div>
+        <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
       </div>
-    </div>
     <div id="mon-poste-liste" style="margin-top:14px;"></div>
     <div class="reg-note" id="mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
   </div>
@@ -3943,13 +3955,20 @@
          `hero-ia` apporte le fond profond et le liseré ambre ; `hero-lueur`
          la lumière qui court derrière. Aucun style nouveau : on emploie ce qui
          existe, pour que les deux cartes ne puissent pas diverger. -->
-    <div class="hero hero-ia hero-sans-image">
-      <span class="hero-lueur"></span>
-      <div class="hero-txt">
-        <h2>Quel est votre rôle ici ?</h2>
-        <p>Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</p>
+    <!-- ⚠ LE MEME BLOC QUE COTE GESTION.
+
+           Il employait `hero-ia hero-sans-image` avec un `<h2>` et un `<p>` :
+           un rembourrage different, une bordure differente, une hierarchie de
+           titres differente. Deux pages qui font la meme chose a un ecran
+           d'ecart.
+
+           `hero an-intro` porte la bordure ambre et les classes `t` et `s` —
+           celles de toute l'app. -->
+      <div class="hero an-intro">
+        <span class="hero-lueur" aria-hidden="true"></span>
+        <div class="t">Quel est votre rôle ici ?</div>
+        <div class="s">Choisissez le poste qui vous correspond. Vous pourrez le changer à tout moment.</div>
       </div>
-    </div>
     <div id="e-mon-poste-liste" style="margin-top:14px;"></div>
     <div class="reg-note" id="e-mon-poste-vide" style="display:none;">Aucun poste n'a encore été défini par votre responsable.</div>
   </div>
@@ -4455,7 +4474,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=4af02f52"></script>
+<script type="module" src="app.js?v=99f49a6b"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

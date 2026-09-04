@@ -17334,3 +17334,70 @@ body.sans-topbar .screen{
 .topbar{
   transition:opacity 0.32s ease-out 0.12s;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'OFFRE — MISE EN PAGE DE LA REFERENCE
+
+   ⚠ CE QUI CHANGE : les avantages passent sur une plaque blanche encastree, le
+     bouton s'y pose en bas, et le tout gagne un arrondi plus genereux.
+
+     C'est la structure de la maquette : une carte claire, un bloc plus clair
+     encore pour la liste, et l'action au fond. Les deux niveaux de blanc
+     separent ce qu'on paie de ce qu'on reçoit sans avoir besoin d'un trait.
+
+   ⚠ ON GARDE LE DEGRADE BLEU DE L'APP. La reference emploie un bleu plat ;
+     celui de « Generer les etapes » est deja le bleu d'action de Standix, et
+     en changer ferait deux bleus pour un meme geste.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.offre-carte{
+  border-radius:26px;
+  padding:22px 20px 20px;
+}
+
+/* ⚠ LA PLAQUE EST CLAIRE SUR LA REFERENCE, ELLE SERA SOMBRE ICI.
+
+   Vos cartes d'offre sont noires — `linear-gradient(152deg,#1B1B22,#0B0B0F)`
+   — et leur texte est blanc. Ma premiere version posait un blanc franc : les
+   avantages devenaient invisibles, blanc sur blanc.
+
+   Le principe de la reference tient quand meme : un second niveau, DETACHE du
+   fond. Sur du noir, cela veut dire plus clair de quelques pourcents, pas
+   blanc. */
+.offre-inclus{
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  padding:16px 14px;
+  margin-top:16px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 10px 24px -20px rgba(0,0,0,0.6);
+}
+
+/* ⚠ LE FILET DISPARAIT AVEC. Il separait le prix des avantages ; la plaque le
+   fait mieux, et deux separations valent moins qu'une. */
+.offre-filet{ display:none; }
+
+.offre-li{
+  padding:7px 0;
+}
+
+/* ⚠ LE BOUTON ENTRE DANS LA PLAQUE, comme sur la reference : il termine le
+   bloc au lieu de flotter sous la carte. */
+.offre-cta{
+  border-radius:100px;
+  height:52px;
+  margin-top:16px;
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  color:#FFFFFF;
+  box-shadow:0 8px 22px -10px rgba(31,76,238,0.55);
+}
+
+/* ⚠ L'OFFRE EN COURS GARDE SON GRIS. Un bouton bleu sur ce qu'on paie deja
+   inviterait a repayer. */
+.offre-cta.encours{
+  background:rgba(28,28,38,0.068);
+  color:var(--label-1);
+  box-shadow:none;
+}

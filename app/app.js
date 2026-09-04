@@ -20156,10 +20156,20 @@ async function abandonnerAnalyse(proc, dejaConfirme) {
     toast('Procédure supprimée.')
     return true
   } catch (e) {
+    const brut = e instanceof Error ? e.message : String(e)
+    console.error('[suppression]', brut)
+
+    /* ⚠ MEME REGLE QUE POUR L'ANALYSE : la trace en console, une phrase claire
+       a l'ecran.
+
+       ⚠ ET UN SEUL BOUTON. « Compris » et « Fermer » faisaient la meme chose :
+         deux facons de dire d'accord, dont aucune ne repare quoi que ce soit. */
     await confirmDialog({
       titre: 'Suppression impossible',
-      message: e instanceof Error ? e.message : String(e),
-      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+      message: /row-level|policy|permission/i.test(brut)
+        ? 'Vous n’avez pas les droits pour supprimer cette procédure.'
+        : 'La procédure n’a pas pu être supprimée. Réessayez dans quelques instants.',
+      confirmer: 'Compris', annuler: null, danger: false,
     })
     return false
   }
@@ -20242,12 +20252,64 @@ async function proposerReprise(proc) {
     toast('Analyse relancée.')
     await loadGestionProcedures()
   } catch (e) {
+    const brut = e instanceof Error ? e.message : String(e)
+
+    /* ⚠ LA TRACE TECHNIQUE VA DANS LA CONSOLE, PAS A L'ECRAN.
+
+       Elle est precieuse pour vous — l'identifiant de trace Azure permet de
+       retrouver l'incident chez eux. Mais un gerant qui lit
+       « INVALID_INPUT, Value isn't valid URL » n'apprend rien et se croit
+       fautif. */
+    console.error('[relance]', brut)
+
     await confirmDialog({
       titre: 'Impossible de relancer',
-      message: e instanceof Error ? e.message : String(e),
-      confirmer: 'Compris', annuler: 'Fermer', danger: false,
+      message: messageErreurAnalyse(brut),
+      confirmer: 'Compris', annuler: null, danger: false,
     })
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TRADUIRE UNE ERREUR D'ANALYSE
+
+   ⚠ ON DIT CE QUI S'EST PASSE ET CE QU'ON PEUT FAIRE. Le message d'Azure est
+     ecrit pour un developpeur : il nomme un type d'erreur et un identifiant de
+     trace, pas une action.
+
+   ⚠ ET L'ORIGINAL RESTE EN CONSOLE. Le masquer completement rendrait le
+     diagnostic impossible le jour ou un cas nouveau apparait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function messageErreurAnalyse(brut) {
+  const t = String(brut || '')
+
+  /* ⚠ « Value isn't valid URL » VEUT DIRE QUE LA VIDEO MANQUE.
+
+     Azure recoit une adresse vide ou mal formee. Cela arrive quand le fichier
+     n'a pas fini de se televerser, ou qu'il a ete supprime du stockage depuis
+     la creation de la procedure. */
+  if (/valid URL|INVALID_INPUT/i.test(t)) {
+    return 'La vidéo de cette procédure est introuvable. '
+         + 'Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. '
+         + 'Refilmez la procédure pour relancer l’analyse.'
+  }
+
+  if (/quota|limit/i.test(t)) {
+    return 'Vos analyses vidéo sont épuisées. Elles se renouvellent au début du mois prochain.'
+  }
+
+  if (/timeout|timed out|abort/i.test(t)) {
+    return 'Le service d’analyse n’a pas répondu à temps. Réessayez dans quelques minutes.'
+  }
+
+  if (/network|fetch|Failed to fetch/i.test(t)) {
+    return 'La connexion a été interrompue. Vérifiez votre réseau et réessayez.'
+  }
+
+  /* ⚠ LE CAS INCONNU RESTE UTILISABLE. On ne montre pas le texte brut, mais on
+     dit quoi faire — et la console garde le detail pour le support. */
+  return 'L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; '
+       + 'si cela persiste, écrivez-nous depuis les réglages.'
 }
 
 function estVisiteur() { return currentMembre?.role === 'visiteur' }

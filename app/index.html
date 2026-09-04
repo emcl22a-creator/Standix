@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=a4b5ee0c">
+<link rel="stylesheet" href="style.css?v=d9948ce3">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1108,8 +1108,7 @@
         <button type="button" class="tb-menu tb-profil" id="tb-menu-gestion"
                 aria-label="Votre profil" aria-expanded="false">
           <img id="tb-photo-gestion" alt="" hidden>
-          <span class="tb-init" id="tb-init-gestion"></span>
-          <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
+                    <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="8.4" r="3.6"/>
@@ -3216,6 +3215,21 @@
       <button type="button" class="reg-ligne danger" id="logout-btn">
         <span class="reg-nm">Se déconnecter</span>
       </button>
+
+      <!-- ⚠ QUITTER ET SUPPRIMER SONT DEUX GESTES DIFFERENTS.
+
+           Quitter retire UNE personne ; l'entreprise continue sans elle.
+           Supprimer detruit tout, et c'est irreversible.
+
+           Les separer evite de choisir le mauvais dans un menu — d'ou deux
+           lignes distinctes, et la seconde reservee au fondateur. -->
+      <button type="button" class="reg-ligne danger" id="quitter-entreprise" hidden>
+        <span class="reg-nm">Quitter l’entreprise</span>
+      </button>
+
+      <button type="button" class="reg-ligne danger" id="supprimer-entreprise" hidden>
+        <span class="reg-nm">Supprimer l’entreprise</span>
+      </button>
     </div>
 
     <div class="reg-groupe" style="margin-top:24px;">
@@ -3490,8 +3504,7 @@
         <button type="button" class="tb-menu tb-profil" id="tb-menu-equipe"
                 aria-label="Votre profil" aria-expanded="false">
           <img id="tb-photo-equipe" alt="" hidden>
-          <span class="tb-init" id="tb-init-equipe"></span>
-          <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
+                    <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
                stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="8.4" r="3.6"/>
@@ -3581,7 +3594,11 @@
              En surtitre, il garde sa fonction — reconnaitre son espace — sans
              prendre celle du titre. -->
         <div class="page-tete">
-          <div class="page-salut" id="e-salut">Bonjour</div>
+          <!-- ⚠ LE SALUT A ETE RETIRE.
+
+               « Bonjour Emilien » au-dessus de « Procedures » : on le lit une
+               fois, puis il occupe une ligne a chaque ouverture. Le nom est
+               deja dans le bouton profil, en haut a gauche. -->
           <h1>Procédures</h1>
           <!-- ⚠ CETTE LIGNE EST ECRITE PAR LE SCRIPT, et elle dit mieux que ma
                phrase : « Il vous reste 3 procedures a lire. » Un employe a
@@ -4506,7 +4523,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=06e9610f"></script>
+<script type="module" src="app.js?v=b3df2521"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

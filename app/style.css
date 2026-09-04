@@ -17401,3 +17401,196 @@ body.sans-topbar .screen{
   color:var(--label-1);
   box-shadow:none;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'OFFRE PASSE AU BLANC
+
+   ⚠ ELLE ETAIT NOIRE. La reference est claire : fond blanc, texte sombre,
+     coches vertes, halos colores derriere. Tout le texte doit donc s'inverser
+     — c'est l'essentiel du travail, pas le fond lui-meme.
+
+   ⚠ TROIS HALOS, PAS UN DEGRADE. Sur la reference, l'arriere-plan est fait de
+     taches floues distinctes qui se recouvrent. Un degrade unique donnerait un
+     fondu regulier, sans le grain qu'on cherche.
+
+     `radial-gradient` les fabrique : trois cercles flous, poses a des endroits
+     differents, sur la meme couche.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#p-abonnement .offre-carte{
+  position:relative;
+  overflow:hidden;
+  background:#FFFFFF;
+  border:0.5px solid rgba(28,28,38,0.07);
+  box-shadow:
+    0 1px 2px rgba(20,20,30,0.05),
+    0 18px 40px -24px rgba(20,20,30,0.22);
+}
+
+/* ⚠ LES TROIS HALOS, DERRIERE LE CONTENU.
+
+   Bleu en haut a gauche, cyan a droite, violet en bas — les couleurs de
+   Standix. `blur` les fond ensemble sans qu'ils se melangent tout a fait. */
+#p-abonnement .offre-carte::before{
+  content:'';
+  position:absolute;
+  inset:-40% -20% auto -20%;
+  height:70%;
+  background:
+    radial-gradient(38% 60% at 22% 40%, rgba(31,76,238,0.30), transparent 70%),
+    radial-gradient(34% 54% at 62% 26%, rgba(72,153,236,0.26), transparent 70%),
+    radial-gradient(40% 58% at 88% 62%, rgba(124,58,237,0.22), transparent 70%);
+  filter:blur(26px);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ⚠ ET LE CONTENU PASSE DEVANT. Sans `z-index`, les halos le recouvriraient. */
+#p-abonnement .offre-carte > *{
+  position:relative;
+  z-index:1;
+}
+
+/* ═══ LE TEXTE S'INVERSE ═══ */
+
+#p-abonnement .offre-nom{ color:var(--label); }
+#p-abonnement .offre-prix{ color:var(--label); }
+#p-abonnement .offre-prix .v{
+  background:none;
+  -webkit-background-clip:initial;
+  background-clip:initial;
+  -webkit-text-fill-color:currentColor;
+  color:var(--label);
+}
+#p-abonnement .offre-prix .u,
+#p-abonnement .offre-prix span{ color:var(--label-3); }
+
+#p-abonnement .offre-li{ color:var(--label-2); }
+#p-abonnement .offre-li b{ color:var(--label); }
+#p-abonnement .offre-annuel-note{ color:var(--label-3); }
+
+/* ⚠ LA PLAQUE DU NOM REVIENT AU GRIS CLAIR. Elle etait a 6 % de blanc, ce qui
+   ne se voit pas sur du blanc. */
+#p-abonnement .offre-plaque{
+  background:rgba(118,118,128,0.10);
+}
+
+/* ⚠ LA PLAQUE DES AVANTAGES AUSSI. Meme raison : sur fond blanc, il faut un
+   gris tres leger pour qu'elle se detache. */
+#p-abonnement .offre-inclus{
+  background:rgba(118,118,128,0.07);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+/* ⚠ LES CARTES SE RESSERRENT. Elles occupaient toute la largeur ; la reference
+   laisse respirer les cotes, ce qui les fait paraitre posees plutot
+   qu'encastrees. */
+#p-abonnement .offre-carte{
+  max-width:330px;
+  margin-inline:auto;
+}
+
+
+/* ⚠ « Essentiel » PORTE LE VIOLET, comme l'image de reference.
+
+   Les autres offres gardent le bleu de Standix. Le violet distingue la
+   premiere marche sans la devaloriser — c'est la couleur de l'image que vous
+   m'avez montree, decoupee en trois taches comme les autres.
+
+ ⚠ ON REMPLACE LES TROIS HALOS D'UN COUP. Les surcharger un par un laisserait
+   le bleu transparaitre entre les violets. */
+#p-abonnement .offre-carte[data-offre-cle="essentiel"]::before{
+  background:
+    radial-gradient(38% 60% at 20% 42%, rgba(124,58,237,0.32), transparent 70%),
+    radial-gradient(34% 54% at 58% 24%, rgba(167,110,247,0.28), transparent 70%),
+    radial-gradient(40% 58% at 88% 60%, rgba(88,28,180,0.24), transparent 70%);
+}
+
+
+/* ⚠ LA CARTE MISE EN AVANT PORTAIT DU `!important`.
+
+   `.offre-carte.vedette::before` est declaree trois fois avec `!important`
+   — c'etait le liseré degrade de l'ancienne carte noire. Mes halos passaient
+   dessous sans jamais se voir.
+
+   Meme chose pour le fond : `.vedette` gardait son noir.
+
+ ⚠ ON REPREND LE MEME POIDS, en visant plus precisement. */
+#p-abonnement .offre-carte,
+#p-abonnement .offre-carte.vedette{
+  background:#FFFFFF !important;
+  border:0.5px solid rgba(28,28,38,0.07) !important;
+}
+
+#p-abonnement .offre-carte::before,
+#p-abonnement .offre-carte.vedette::before{
+  content:'' !important;
+  position:absolute !important;
+  inset:-40% -20% auto -20% !important;
+  height:70% !important;
+  border-radius:0 !important;
+  mask:none !important;
+  -webkit-mask:none !important;
+  filter:blur(26px) !important;
+  opacity:1 !important;
+  background:
+    radial-gradient(38% 60% at 22% 40%, rgba(31,76,238,0.30), transparent 70%),
+    radial-gradient(34% 54% at 62% 26%, rgba(72,153,236,0.26), transparent 70%),
+    radial-gradient(40% 58% at 88% 62%, rgba(124,58,237,0.22), transparent 70%) !important;
+}
+
+#p-abonnement .offre-carte[data-offre-cle="essentiel"]::before,
+#p-abonnement .offre-carte.vedette[data-offre-cle="essentiel"]::before{
+  background:
+    radial-gradient(38% 60% at 20% 42%, rgba(124,58,237,0.32), transparent 70%),
+    radial-gradient(34% 54% at 58% 24%, rgba(167,110,247,0.28), transparent 70%),
+    radial-gradient(40% 58% at 88% 60%, rgba(88,28,180,0.24), transparent 70%) !important;
+}
+
+/* ⚠ ET LA SECONDE COUCHE DE LA VEDETTE DISPARAIT. `::after` posait une lueur
+   bleue faite pour le noir ; sur du blanc elle grise la carte. */
+#p-abonnement .offre-carte.vedette::after{
+  display:none !important;
+}
+
+
+/* ⚠ LES HALOS NE SE VOYAIENT PAS : trop pales et trop hauts.
+
+   Mesure sur le rendu : poses a `inset:-40%` avec 30 % d'opacite et 26 px de
+   flou, ils sortaient presque entierement de la carte — il n'en restait qu'un
+   voile invisible sous le nom.
+
+   On les descend dans la carte, on les agrandit, et l'on monte l'opacite. Le
+   flou passe a 34 px pour qu'ils se fondent malgre leur force. */
+#p-abonnement .offre-carte::before,
+#p-abonnement .offre-carte.vedette::before{
+  inset:-18% -14% auto -14% !important;
+  height:58% !important;
+  filter:blur(34px) !important;
+  background:
+    radial-gradient(42% 66% at 20% 46%, rgba(31,76,238,0.42), transparent 72%),
+    radial-gradient(38% 58% at 60% 22%, rgba(72,153,236,0.38), transparent 72%),
+    radial-gradient(44% 62% at 90% 58%, rgba(124,58,237,0.34), transparent 72%) !important;
+}
+
+#p-abonnement .offre-carte[data-offre-cle="essentiel"]::before,
+#p-abonnement .offre-carte.vedette[data-offre-cle="essentiel"]::before{
+  background:
+    radial-gradient(42% 66% at 18% 48%, rgba(124,58,237,0.46), transparent 72%),
+    radial-gradient(38% 58% at 56% 20%, rgba(167,110,247,0.40), transparent 72%),
+    radial-gradient(44% 62% at 90% 56%, rgba(88,28,180,0.36), transparent 72%) !important;
+}
+
+
+/* ⚠ `display:none` MASQUAIT LES HALOS.
+
+   Une regle ancienne coupe `.offre-carte::before` — c'etait le liseré de la
+   carte noire, retire un jour sans que la declaration parte avec.
+
+   Mes trois radial-gradient etaient donc calcules et jamais peints : le
+   navigateur le disait, `display: none` sur le pseudo-element. */
+#p-abonnement .offre-carte::before,
+#p-abonnement .offre-carte.vedette::before{
+  display:block !important;
+}

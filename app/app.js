@@ -7202,10 +7202,13 @@ function jouerVoile() {
      la barre. Nommer les huit est plus long a ecrire, et sans surprise.
    ═══════════════════════════════════════════════════════════════════════════ */
 const ECRANS_PLEIN_ECRAN = new Set([
-  /* ⚠ LE PROFIL AUSSI. Il s'ouvre depuis le bouton de la barre : la laisser
-     visible au-dessus montrerait le bouton qui vient de nous amener la. */
-  'p-profil',
-  'e-profil',
+  /* ⚠ LE PROFIL GARDE LA BARRE, et j'avais eu tort de la retirer.
+
+     Les autres ecrans de cette liste sont des CULS-DE-SAC : on y entre pour
+     lire une procedure, on en ressort par le bouton retour. Le profil est un
+     carrefour — on y va, on en revient, on y retourne. La barre le dit.
+
+     Et son bouton reste visible : c'est le meme geste pour entrer et sortir. */
 
   'p-category',        // un dossier, et ses sous-dossiers
   'p-analyse',         // le detail d'une procedure
@@ -7327,6 +7330,17 @@ window.showGestionScreen = function(id, btn) {
      dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
      Branché ICI plutôt qu'aux quatre endroits qui ouvrent cette page. */
   if (id === 'p-settings') { majLigneQuota(); appliquerAccesAbonnement(); appliquerAccesEntreprise() }
+
+  /* ⚠ LE PROFIL A BESOIN DES MEMES CONTROLES.
+
+     Il porte maintenant l'abonnement, « Quitter » et « Supprimer » — trois
+     lignes qui dependent du role. Sans cet appel, elles resteraient masquees
+     pour tout le monde, y compris le fondateur. */
+  if (id === 'p-profil') {
+    appliquerAccesAbonnement()
+    appliquerAccesEntreprise()
+    peindrePhotoProfil()
+  }
   window.majBarreEspace?.('gestion')
   /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
   window.placerOnglet?.(ONGLET_PAR_ECRAN[id])
@@ -24661,6 +24675,9 @@ function appliquerAccesEntreprise() {
   if (s) s.hidden = !fondateur
 }
 
+document.getElementById('profil-abonnement')?.addEventListener('click', () =>
+  showGestionScreen('p-abonnement'))
+
 document.getElementById('quitter-entreprise')?.addEventListener('click', async () => {
   const nom = cachedEntreprise?.nom || 'cette entreprise'
 
@@ -24751,6 +24768,13 @@ function appliquerAccesAbonnement() {
 
    ⚠ ET LE FILET SUIT. Une ligne ajoutee sans separateur se collerait a la
      precedente ; les trois autres en ont un. */
+  /* ⚠ LA LIGNE DU PROFIL SUIT LA MEME REGLE.
+
+     Elle est masquee dans le balisage ; on la revele au fondateur, avec son
+     titre. Deux endroits pour la meme information, un seul controle. */
+  ;[el('profil-titre-abo'), el('profil-groupe-abo')]
+    .forEach(x => { if (x) x.hidden = !permis })
+
   const ligne = el('ligne-quota')
   const groupeEnt = el('groupe-entreprise')
   const groupeAbo = el('ouvrir-abonnement')?.parentElement

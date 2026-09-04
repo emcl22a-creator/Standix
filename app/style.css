@@ -16799,3 +16799,74 @@ body.en-apercu #apercu-bandeau{
   margin-top:8px;
   min-width:140px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES ETAPES DE L'ESPACE UTILISATEUR PRENNENT LA CARTE DE LA GESTION
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ⚠ CE N'ETAIT PAS LA MEME PRESENTATION. La gestion pose chaque etape sur une
+     carte blanche, arrondie a 20 px, avec ses ombres. L'equipe les alignait le
+     long d'un fil vertical, sans fond.
+
+     Deux facons de montrer la meme chose, a un espace d'ecart.
+
+   ⚠ LE FIL DISPARAIT AVEC. Il n'a de sens que sur une liste sans cartes : entre
+     des cartes, il passerait derriere elles. */
+#detail-steps.etapes-fil{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding-left:0;
+}
+
+#detail-steps.etapes-fil::before{ display:none; }
+
+/* ⚠ IL FAUT `!important` POUR ANNULER `!important`.
+
+   La regle d'origine ecrit `background:none !important` — elle etait la pour
+   effacer un fond herite, du temps ou les etapes vivaient le long d'un fil.
+   Sans le meme poids, ma regle ne passe pas, quel que soit l'ordre.
+
+   Je ne modifie pas la regle a la source : elle sert aussi a `#p-analyse`
+   dans une autre combinaison, et la toucher risquerait d'emporter du texte
+   voisin — c'est une regle de ce projet. */
+#detail-steps.etapes-fil .detail-step{
+  position:relative;
+  display:flex;
+  align-items:flex-start;
+  gap:13px;
+  padding:15px 16px !important;
+  border-radius:20px !important;
+  margin:0 !important;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%) !important;
+  border:none !important;
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.07),
+    0 1px 2px rgba(20,20,30,0.05),
+    0 10px 22px -14px rgba(20,20,30,0.14) !important;
+}
+
+/* ⚠ LA PASTILLE REVIENT DANS LE FLUX, comme cote gestion.
+
+   Elle etait posee en absolu a gauche du fil ; sur une carte, elle doit
+   occuper sa place dans la ligne — sinon elle deborderait du fond. */
+#detail-steps.etapes-fil .et-coche{
+  position:static;
+  left:auto; top:auto;
+  flex:0 0 30px;
+  width:30px; height:30px;
+  margin:1px 0 0;
+}
+#detail-steps.etapes-fil .et-coche svg{
+  width:30px; height:30px;
+  display:block;
+}
+
+/* ⚠ ET LE SURLIGNAGE DE LECTURE SUIT LA CARTE. Il visait un point a -55 px,
+   hors de la carte : il ne se serait plus vu. */
+#detail-steps.etapes-fil .detail-step.en-lecture::after{
+  left:0; right:0; top:0; bottom:0;
+  border-radius:20px;
+}

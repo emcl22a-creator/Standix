@@ -1194,8 +1194,28 @@ function afficherEcranChoix() {
      `verifierRetourMotDePasse` rend `false` immédiatement quand l'adresse ne
      porte pas `type=recovery`, donc ce contrôle ne coûte rien au démarrage
      ordinaire. */
+  /* ⚠ DEUX FORMES DE LIEN, ET SUPABASE A CHANGE LA SIENNE.
+
+     L'ancienne portait `type=recovery` dans l'adresse. La nouvelle — le flux
+     PKCE — envoie `?code=...` et rien d'autre : la bibliotheque echange ce code
+     contre une session, et la personne se retrouve simplement connectee.
+
+     C'est ce qui vous renvoyait dans vos procedures sans jamais demander le
+     nouveau mot de passe.
+
+   ⚠ ON GARDE LE TEST SUR L'ADRESSE pour l'ancienne forme, et l'on ajoute
+     l'ecoute de `PASSWORD_RECOVERY` — l'evenement que la bibliotheque emet
+     dans les DEUX cas. C'est la methode que Supabase recommande. */
   if (/type=recovery/.test((window.location.hash || '') + (window.location.search || ''))) {
     verifierRetourMotDePasse().then(() => {})
+    return
+  }
+
+  /* ⚠ ET SI UN CODE EST PRESENT, ON ATTEND L'EVENEMENT plutot que d'ouvrir
+     l'app. Sans cette pause, la page des procedures s'affiche pendant que la
+     session s'etablit, et la demande de mot de passe arriverait par-dessus. */
+  if (new URLSearchParams(window.location.search).get('code')) {
+    attendreRecuperation()
     return
   }
 
@@ -1679,9 +1699,62 @@ document.getElementById('mdp-changer-e')?.addEventListener('click', (e) => {
    Ce contrôle doit tourner AU DÉMARRAGE, avant que l'app décide où envoyer la
    personne : sans lui, elle atterrirait dans son espace sans jamais qu'on lui
    demande son nouveau mot de passe, et le lien n'aurait servi à rien. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE RETOUR DEPUIS UN LIEN DE MOT DE PASSE
+
+   ⚠ `PASSWORD_RECOVERY` EST EMIS PAR LA BIBLIOTHEQUE, pas lu dans l'adresse.
+
+     Elle le declenche des qu'une session naît d'un lien de recuperation, quel
+     que soit le flux — ancien ou PKCE. C'est le seul signal fiable.
+
+   ⚠ ON POSE L'ECOUTE AVANT D'ATTENDRE. L'evenement peut partir pendant que
+     l'on installe le gestionnaire : l'ordre compte.
+
+   ⚠ ET UN DELAI DE SECOURS. Si l'evenement ne vient pas — lien expire, code
+     deja consomme — on ne laisse pas la personne devant un ecran vide. */
+function attendreRecuperation() {
+  let fait = false
+
+  const lancer = () => {
+    if (fait) return
+    fait = true
+    verifierRetourMotDePasse().then(() => {})
+  }
+
+  try {
+    supabase.auth.onAuthStateChange((evenement) => {
+      if (evenement === 'PASSWORD_RECOVERY') lancer()
+    })
+  } catch (e) { console.warn('[recuperation]', e?.message) }
+
+  /* ⚠ QUATRE SECONDES. L'echange du code prend moins d'une seconde en temps
+     ordinaire ; au-dela, quelque chose a echoue et il vaut mieux poser la
+     question que de ne rien faire. */
+  setTimeout(() => {
+    if (!fait) {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data?.session) lancer()
+        else {
+          toast('Ce lien a expiré. Demandez-en un nouveau.')
+          ouvrirBienvenue()
+        }
+      }).catch(() => { toast('Ce lien n’a pas pu être vérifié.'); ouvrirBienvenue() })
+    }
+  }, 4000)
+}
+
 async function verifierRetourMotDePasse() {
+  /* ⚠ CE TEST BLOQUAIT LE NOUVEAU FLUX.
+
+     Il sortait des que l'adresse ne portait pas `type=recovery` — c'est-a-dire
+     a chaque fois avec le flux PKCE, ou l'adresse ne porte qu'un `code`.
+
+     `attendreRecuperation` n'appelle cette fonction que sur un vrai retour de
+     lien : le controle est deja fait plus haut, le refaire ici ne protegeait
+     de rien et fermait la porte. */
   const brut = (window.location.hash || '') + (window.location.search || '')
-  if (!/type=recovery/.test(brut)) return false
+  const parCode = new URLSearchParams(window.location.search).get('code')
+  if (!/type=recovery/.test(brut) && !parCode) return false
 
   const nouveau = await demanderTexte({
     titre: 'Nouveau mot de passe',
@@ -1689,7 +1762,13 @@ async function verifierRetourMotDePasse() {
     placeholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
     confirmer: 'Enregistrer',
   })
-  if (!nouveau) { toast('Mot de passe inchang\u00e9'); return false }
+  if (!nouveau) {
+    /* ⚠ ON NETTOIE L'ADRESSE MEME SI L'ON RENONCE. Sinon le code reste visible,
+       et recharger la page redemanderait le mot de passe indefiniment. */
+    try { history.replaceState({}, '', window.location.pathname) } catch (e) {}
+    toast('Mot de passe inchang\u00e9')
+    return false
+  }
   if (nouveau.length < 6) { toast('Six caract\u00e8res minimum'); return await verifierRetourMotDePasse() }
 
   const { error } = await supabase.auth.updateUser({ password: nouveau })

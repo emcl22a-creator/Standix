@@ -3219,6 +3219,22 @@
       </p>
     </div>
 
+    <!-- ⚠ L'ABONNEMENT PARAIT ICI AUSSI, mais pour le gerant seulement.
+
+         Il est deja dans la page Entreprise — c'est sa place naturelle,
+         puisqu'il engage l'entreprise. Mais c'est aussi ce qu'on cherche depuis
+         son profil quand on veut changer d'offre ou voir sa facture.
+
+         La ligne est masquee par defaut ; `appliquerAccesAbonnement` la revele
+         a celui qui a cree l'entreprise, comme celle de la page Entreprise. -->
+    <div class="reg-titre" id="profil-titre-abo" hidden>Abonnement</div>
+    <div class="reg-groupe" data-teinte="bleu" id="profil-groupe-abo" hidden>
+      <button type="button" class="reg-ligne" id="profil-abonnement">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
+        <span class="reg-val" id="profil-abo-actuel">—</span><span class="reg-fl">›</span>
+      </button>
+    </div>
+
     <div class="reg-titre">Application</div>
     <div class="reg-groupe" data-teinte="vert">
       <button type="button" class="reg-ligne" onclick="ouvrirAppareils()">
@@ -4584,7 +4600,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=f992c396"></script>
+<script type="module" src="app.js?v=6ed86db2"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

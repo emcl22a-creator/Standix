@@ -17696,3 +17696,36 @@ body.sans-topbar .topbar::after{
   background:#FFFFFF !important;
   box-shadow:0 1px 3px rgba(20,20,30,0.07) !important;
 }
+
+
+/* ⚠ LE VOILE S'ETEND SUR TOUTE LA LARGEUR DE L'ECRAN.
+
+   La barre est limitee a `--col` et centree : son voile s'arretait aux memes
+   bords, laissant deux bandes nettes de chaque cote sur un ecran large.
+
+   `left:50%` avec `translateX(-50%)` et `100vw` le fait deborder du parent —
+   c'est le seul moyen, un enfant ne peut pas depasser sans cela.
+
+ ⚠ ET LE FONDU DU BAS DISPARAIT. Le masque degrade effaçait la limite basse ;
+   vous le voyez comme une trainee. Un bord net vaut mieux qu'un flou qui
+   hesite. */
+.topbar::after{
+  left:50% !important;
+  right:auto !important;
+  width:100vw !important;
+  transform:translateX(-50%) !important;
+  /* ⚠ IL DESCEND DE DIX PIXELS SOUS LA BARRE.
+
+     Mesure : la barre finit a 64 px, exactement ou finissent les boutons. Le
+     voile s'arretait donc au ras du bouton +, et le contenu redevenait net a
+     un pixel de son bord.
+
+     Dix pixels de plus laissent une marge nette entre le bas des boutons et le
+     texte qui reapparait. */
+  top:0 !important;
+  bottom:-10px !important;
+  height:auto !important;
+
+  -webkit-mask:none !important;
+  mask:none !important;
+}

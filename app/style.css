@@ -18865,3 +18865,20 @@ body.sans-topbar .screen{
   width:17px; height:17px; flex:0 0 17px;
   color:var(--label-3);
 }
+
+
+/* ⚠ LES DEUX BOUTONS S'ALIGNENT SUR LA PAGE.
+
+   Mesure : le profil commençait a 32 px du bord, le `+` finissait a 34 — alors
+   que le titre et la barre de recherche sont a 24.
+
+   La barre porte bien 24 px de rembourrage, mais la carte qui la contient en
+   ajoutait 16 a gauche et 20 a droite. Ces valeurs dataient du temps ou elle
+   avait un fond : il fallait de l'air entre les boutons et son bord.
+
+   La carte n'a plus de fond depuis qu'on l'a retiree — ce rembourrage ne
+   protege plus rien. */
+.topbar-card{
+  padding-left:0 !important;
+  padding-right:0 !important;
+}

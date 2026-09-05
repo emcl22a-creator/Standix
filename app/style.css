@@ -18949,3 +18949,16 @@ body.sans-topbar .screen{
 .abo-plaque{
   background:linear-gradient(145deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
 }
+
+
+/* ⚠ LE LOGO PERD TROIS PIXELS : 26 x 37 devient 23 x 33.
+
+   Le rapport 0,70 est conserve — 23 / 33 = 0,697, soit l'ecart d'un demi-pixel
+   sur toute la hauteur.
+
+   Il respire davantage dans sa plaque, et le mot « Standix » dessous gagne en
+   presence sans avoir a grossir. */
+.abo-pl-logo{
+  width:23px;
+  height:33px;
+}

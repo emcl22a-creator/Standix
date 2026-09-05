@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=8ba0973d">
+<link rel="stylesheet" href="style.css?v=4bab3f66">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -4231,6 +4231,20 @@
          Le vert dit « inclus » sans qu'on ait a le lire, et il ne se confond
          pas avec le bleu du bouton : deux signes bleus sur la meme carte, on
          ne sait plus lequel est cliquable. -->
+    <!-- ⚠ L'ICONE DE L'OFFRE A SON PROPRE DEGRADE.
+
+         Elle partageait `cocheOffre` avec les coches de la liste. En passant
+         ces coches au vert, j'ai verdi l'icone du meme coup — ce n'etait pas
+         voulu.
+
+         `iconeOffre` reprend le bleu de « Generer les etapes ». Deux roles
+         differents, deux degrades. -->
+    <linearGradient id="iconeOffre" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1F4CEE"/>
+      <stop offset="0.55" stop-color="#3A78EE"/>
+      <stop offset="1" stop-color="#4899EC"/>
+    </linearGradient>
+
     <linearGradient id="cocheOffre" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#34C759"/>
       <stop offset="1" stop-color="#1E9E43"/>
@@ -4624,7 +4638,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=7dd5b3d6"></script>
+<script type="module" src="app.js?v=b2a2a9ac"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5511,19 +5525,22 @@ const ICONS = [
   {line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',
    fill:'M3.4 3.4h2v15.4h15.2v2H5.4a2 2 0 0 1-2-2z M7.1 13.3h2.4v5.5H7.1z M11.8 8.1h2.4v10.7h-2.4z M16.5 10.6h2.4v8.2h-2.4z'},
   {
-    /* ⚠ DEUX CURSEURS DE REGLAGE, plus un immeuble.
+    /* ⚠ DEUX CURSEURS DE REGLAGE — TROISIEME VERSION.
 
-       L'immeuble disait « votre entreprise ». L'onglet dit maintenant
-       « Gerer » : un verbe demande un geste, pas un lieu.
+       La precedente avait trois defauts, visibles une fois agrandie :
 
-       Deux curseurs se lisent comme « on ajuste des choses ici », et se
-       distinguent du document et du graphique qui les encadrent.
+       · les poignees faisaient 3,1 de rayon pour un trait de 1,8 — presque
+         aussi hautes que l'ecart entre les deux rails, l'icone paraissait
+         tassee ;
+       · les rails etaient inegaux, de 3,8 a 6,4 : rien ne les alignait ;
+       · les deux lignes etaient a 8,4 et 15,6, soit 7,2 d'ecart pour des
+         poignees de 6,2 de diametre. Elles se frolaient.
 
-     ⚠ LES POIGNEES FONT 3,1 DE RAYON, pas 2,5. A 2,5 leur cercle se remplit
-       a vingt pixels et devient un point : on perd la poignee, il ne reste
-       que deux traits pointes. Verifie aux trois tailles. */
-    line:'M3.6 8.4h4.6 M14.4 8.4H20.4 M3.6 15.6h6.4 M16.6 15.6h3.8 M11.3 8.4a3.1 3.1 0 1 0 6.2 0 3.1 3.1 0 1 0-6.2 0 M13.5 15.6a3.1 3.1 0 1 0-6.2 0 3.1 3.1 0 1 0 6.2 0',
-    fill:'M3.6 8.4h4.6 M14.4 8.4H20.4 M3.6 15.6h6.4 M16.6 15.6h3.8 M11.3 8.4a3.1 3.1 0 1 0 6.2 0 3.1 3.1 0 1 0-6.2 0 M13.5 15.6a3.1 3.1 0 1 0-6.2 0 3.1 3.1 0 1 0 6.2 0',
+     ⚠ 2,3 DE RAYON, LIGNES A 8,5 ET 15,5. La poignee fait 4,6 de diametre
+       pour 7 d'ecart : il reste de l'air entre les deux. Verifie a 20, 28
+       et 64 px contre trois autres dessins. */
+    line:'M3.5 8.5h5.2 M13.3 8.5h7.2 M3.5 15.5h7.2 M15.7 15.5h4.8 M11 8.5a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0 M13.4 15.5a2.3 2.3 0 1 0-4.6 0 2.3 2.3 0 1 0 4.6 0',
+    fill:'M3.5 8.5h5.2 M13.3 8.5h7.2 M3.5 15.5h7.2 M15.7 15.5h4.8 M11 8.5a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0 M13.4 15.5a2.3 2.3 0 1 0-4.6 0 2.3 2.3 0 1 0 4.6 0',
   },
 ];
 /* Le QR code, propre à l'espace Équipe. Le carré plein en version « active »

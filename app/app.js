@@ -3391,6 +3391,37 @@ async function enregistrerPhotoProfil() {
   return { photo_url: pub?.publicUrl || null }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE « Votre compte » SE REMPLIT SEULE
+
+   ⚠ ELLE ETAIT VIDE DEPUIS LE PROFIL. Le nom et l'adresse etaient ecrits par
+     `openSettings` — la fonction de l'onglet Gerer. La carte du Profil ouvre
+     l'ecran directement, sans passer par elle.
+
+     Les initiales s'affichaient quand meme : elles viennent d'ailleurs. C'est
+     ce qui rendait le defaut trompeur — la page paraissait chargee.
+
+   ⚠ ON REMPLIT A L'OUVERTURE DE L'ECRAN, quel que soit le chemin. C'est le seul
+     endroit par lequel tout le monde passe.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function remplirPageCompte() {
+  const nom = document.getElementById('settings-nom')
+  const mail = document.getElementById('settings-email')
+  if (!nom || !mail) return
+
+  nom.value = currentMembre?.nom || ''
+
+  /* ⚠ L'ADRESSE VIENT DE LA SESSION, pas de la fiche membre. Une personne peut
+     appartenir a deux entreprises : son adresse de connexion est unique, sa
+     fiche non. */
+  try {
+    const { data } = await supabase.auth.getUser()
+    mail.value = data?.user?.email || ''
+  } catch (e) { console.warn('[compte]', e?.message) }
+
+  peindrePhotoProfil()
+}
+
 function peindreReglages() {
   peindrePhotoProfil()
   peindreBoutonProfil()
@@ -7243,7 +7274,39 @@ function suivreDefilement() {
 
 addEventListener('scroll', suivreDefilement, { passive: true })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE BOUTON RETOUR SUIT LE CHEMIN PARCOURU
+
+   ⚠ IL ETAIT FIXE. Sept ecrans portent `showGestionScreen('p-settings')` en
+     dur dans leur bouton retour — l'abonnement, la langue, les appareils, le
+     compte…
+
+     C'etait juste du temps ou ils ne s'ouvraient que depuis Gerer. Depuis le
+     Profil, le retour ramenait a une page ou l'on n'etait jamais alle.
+
+   ⚠ ON RETIENT LA PAGE QUITTEE, plutot que de deviner. Une liste de « qui vient
+     d'ou » serait a tenir a jour a chaque nouvel ecran ; une variable se met a
+     jour seule.
+
+   ⚠ ET L'ON NE RETIENT QUE LES DEUX CARREFOURS. Retenir toutes les pages
+     ferait remonter un fil entier — retour depuis l'abonnement vers le profil,
+     puis vers la liste des procedures… Ce n'est pas ce qu'on attend d'un bouton
+     retour dans un reglage.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let pageMere = 'p-settings'
+
+const CARREFOURS = new Set(['p-settings', 'p-profil', 'e-profil'])
+
+function retourVersMere() {
+  showGestionScreen(pageMere)
+}
+window.retourVersMere = retourVersMere
+
 function majBarreHaute(id) {
+  /* ⚠ ON MEMORISE AVANT DE PARTIR. Si l'ecran qu'on quitte est un carrefour,
+     c'est vers lui que le retour ramenera. */
+  if (CARREFOURS.has(id)) pageMere = id
+
   document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))
 
   /* ⚠ ON REVERIFIE A CHAQUE PAGE. Un ecran s'ouvre en haut : le verre doit
@@ -7405,6 +7468,9 @@ window.showGestionScreen = function(id, btn) {
      Il porte maintenant l'abonnement, « Quitter » et « Supprimer » — trois
      lignes qui dependent du role. Sans cet appel, elles resteraient masquees
      pour tout le monde, y compris le fondateur. */
+  /* ⚠ LA PAGE COMPTE SE REMPLIT A CHAQUE OUVERTURE, d'ou qu'on vienne. */
+  if (id === 'p-reg-compte' || id === 'e-reg-compte') remplirPageCompte()
+
   if (id === 'p-profil') {
     appliquerAccesAbonnement()
     appliquerAccesEntreprise()
@@ -24075,8 +24141,18 @@ function peindreRangEtab(idRang, idPlus, idNote) {
        On regarde s'il est gérant QUELQUE PART, pas seulement ici : celui qui
        gère une entreprise et travaille dans une autre relève du premier cas,
        où qu'il se trouve au moment de lire. */
-    const dejaGerant = (mesEtablissements || []).some(e => e.role === 'gestion')
-      || currentMembre?.role === 'gestion'
+    /* ⚠ « Gerant » VEUT DIRE PROPRIETAIRE, pas gestionnaire.
+
+       Le test comptait `role === 'gestion'` — donc aussi un gestionnaire
+       INVITE, qui n'a jamais cree d'entreprise et ne voit meme pas la page
+       Abonnement.
+
+       Il lisait « les membres s'additionnent sur votre abonnement » sans avoir
+       d'abonnement. On regarde donc s'il a FONDE quelque chose : `promu_par`
+       vide sur une fiche « gestion ». */
+    const dejaGerant = (mesEtablissements || [])
+      .some(e => e.role === 'gestion' && !e.promu_par)
+      || estFondateur(currentMembre)
 
     note.innerHTML = plein
       ? `Vous \u00eates dans ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
@@ -24416,6 +24492,64 @@ window.ouvrirFenetreEtab = function(entrepriseId) {
   document.getElementById('etab-erreur').textContent = ''
   majFenetreEtab()
   document.getElementById('fond-etab').classList.add('on')
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   OUVRIR LA FENETRE D'ETABLISSEMENT
+
+   ⚠ CETTE FONCTION N'EXISTAIT PAS. Quatre endroits l'appelaient — le bouton
+     `+`, l'appui long sur un rond, deux autres chemins — et aucun ne la
+     definissait.
+
+     `ouvrirFenetreEtab is not defined` partait dans la console a chaque clic ;
+     rien ne se passait a l'ecran. C'est le defaut que vous decrivez.
+
+   ⚠ ELLE SERT A CREER ET A MODIFIER. L'argument decide : `null` pour une
+     creation, un identifiant pour retoucher un etablissement existant.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function ouvrirFenetreEtab(id) {
+  const fond = document.getElementById('fond-etab')
+  if (!fond) return
+
+  etabEdite = id ? (mesEtablissements || []).find(e => e.id === id) || null : null
+  etabLogoTampon = etabEdite?.logo_url || null
+
+  const el = (i) => document.getElementById(i)
+
+  if (el('etab-titre')) {
+    el('etab-titre').textContent = etabEdite
+      ? 'Modifier l’établissement'
+      : 'Nouvel établissement'
+  }
+
+  /* ⚠ LE SOUS-TITRE DIT CE QUE ÇA COUTE, et pour qui.
+
+     Le texte d'origine parlait « d'un abonnement » et « des membres qui
+     s'additionnent » — vrai pour le gerant qui paie, incomprehensible pour un
+     gestionnaire invite qui ne voit meme pas la page Abonnement. */
+  if (el('etab-sous')) {
+    el('etab-sous').textContent = etabEdite
+      ? 'Son nom et son logo apparaissent dans l’app pour toute l’équipe.'
+      : estFondateur(currentMembre)
+        ? 'Créer un établissement est gratuit. Les membres de tous vos '
+          + 'établissements comptent dans le même abonnement.'
+        : 'Vous en serez le gérant, avec 14 jours d’essai gratuit.'
+  }
+
+  if (el('etab-nom')) el('etab-nom').value = etabEdite?.nom || ''
+  if (el('etab-erreur')) el('etab-erreur').textContent = ''
+
+  /* ⚠ « Supprimer » NE PARAIT QU'EN MODIFICATION. Sur une creation, il n'y a
+     rien a supprimer. */
+  if (el('etab-supprimer')) el('etab-supprimer').hidden = !etabEdite
+
+  majFenetreEtab()
+  fond.classList.add('on')
+
+  /* ⚠ LE FOCUS ARRIVE APRES L'ANIMATION. Pose tout de suite, Safari fait
+     remonter le clavier pendant que la fenetre monte encore — les deux
+     mouvements se genent. */
+  setTimeout(() => el('etab-nom')?.focus(), 320)
 }
 
 function majFenetreEtab() {

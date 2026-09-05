@@ -17903,3 +17903,77 @@ body.sans-topbar .topbar::after{
       0 1px 2px rgba(20,20,30,0.05),
       0 18px 40px -26px rgba(20,20,30,0.20) !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE RETRAIT VERS LE CENTRE — choisi sur maquette, parmi six
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ⚠ TOUT RAPETISSE LEGEREMENT EN S'EFFAÇANT. C'est ce que fait iOS quand une
+     carte se referme : l'objet s'eloigne au lieu de disparaitre sur place.
+
+     Le mouvement est faible — 4 % — mais il suffit a dire « ca part » sans
+     voler l'attention au contenu qui monte.
+
+   ⚠ LE VOILE SUIT LE MEME GESTE. Le laisser s'effacer sans bouger le
+     detacherait des trois elements : on verrait deux choses partir.
+
+   ⚠ L'ORIGINE EST EN HAUT, pas au centre. La barre est collee au bord
+     superieur : reduire depuis son milieu la ferait descendre en partant. */
+
+.topbar{
+  transform-origin:top center;
+  transition:
+    opacity   0.32s ease-out 0.12s,
+    transform 0.36s cubic-bezier(0.32, 0.72, 0, 1) 0.12s;
+}
+
+body.sans-topbar .topbar{
+  opacity:0;
+  transform:translateX(-50%) scale(0.94);
+  transition:
+    opacity   0.30s ease-out 0s,
+    transform 0.34s cubic-bezier(0.32, 0.72, 0, 1) 0s;
+}
+
+
+/* ⚠ LA SATURATION DU VOILE BAISSE DE 1,8 A 1,25.
+
+   `saturate(1.8)` intensifie de 80 % les couleurs vues au travers : une carte
+   bleue devient franchement bleue sous le verre, plus vive que dans la page.
+   C'est ce qui donne l'impression que le voile grossit ce qu'il floute.
+
+   La valeur venait de la navbar du bas, ou elle se justifie : elle passe sur
+   un fond clair et uniforme. En haut, du contenu colore defile.
+
+ ⚠ ON GARDE LE FLOU A 14 PX. Vous ne demandez pas moins de flou, mais moins
+   d'exageration — ce sont deux reglages differents. */
+.topbar::after{
+  -webkit-backdrop-filter:blur(14px) saturate(1.25) !important;
+  backdrop-filter:blur(14px) saturate(1.25) !important;
+}
+
+
+/* ⚠ LES DEUX BOUTONS PASSENT DE 40 A 44 PX.
+
+   Quatre pixels : assez pour qu'ils pesent un peu plus a cote du logo, pas
+   assez pour toucher les bords ni serrer le mot « Standix ».
+
+ ⚠ ET LEURS DESSINS SUIVENT, sinon ils paraitraient perdus au milieu d'un rond
+   plus grand — la silhouette de 22 a 23, le `+` a l'avenant. */
+.tb-profil,
+.tb-plus{
+  width:44px !important;
+  height:44px !important;
+  flex:0 0 44px !important;
+}
+
+.tb-silhouette{
+  width:23px;
+  height:23px;
+}
+
+.tb-plus svg{
+  width:21px;
+  height:21px;
+}

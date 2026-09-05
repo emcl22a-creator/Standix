@@ -18882,3 +18882,52 @@ body.sans-topbar .screen{
   padding-left:0 !important;
   padding-right:0 !important;
 }
+
+
+/* ═══ LA PLAQUE DES CARTES PREND LA MATIERE DE L'ESSAI 14 JOURS ═══
+
+   ⚠ LE FOND ETAIT DEJA LE MEME — meme degrade d'argent froid. Ce qui manquait,
+     ce sont les DEUX COUCHES qui lui donnent son relief :
+
+     · un liseré interieur, clair en haut et sombre en bas, qui simule une
+       arete biseautee ;
+     · un reflet oblique, comme une lumiere qui glisse sur du metal.
+
+     Sans elles, la plaque etait une surface peinte ; avec, c'est un objet.
+
+   ⚠ LE CONTENU DOIT PASSER DEVANT. Les deux couches se posent par-dessus : le
+     logo et le mot ont besoin d'un `z-index` pour ne pas etre recouverts. */
+
+.abo-plaque::before{
+  content:'';
+  position:absolute; inset:0;
+  border-radius:inherit;
+  padding:0.6px;
+  background:linear-gradient(145deg,
+    rgba(255,255,255,0.98),
+    rgba(255,255,255,0.12) 44%,
+    rgba(20,24,34,0.24));
+  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  pointer-events:none;
+  z-index:2;
+}
+
+.abo-plaque::after{
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(118deg,
+    rgba(255,255,255,0) 14%,
+    rgba(255,255,255,0.62) 29%,
+    rgba(255,255,255,0) 42%);
+  pointer-events:none;
+  z-index:1;
+}
+
+.abo-pl-logo,
+.abo-pl-nom{
+  position:relative;
+  z-index:3;
+}

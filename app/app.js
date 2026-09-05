@@ -22812,10 +22812,6 @@ function carteOffreNeuve(o, opts = {}) {
           ${enCours ? '<span class="abo-sur">Votre abonnement</span>' : ''}
           <span class="abo-nom">${escapeHtml(o.nom)}</span>
 
-          <span class="abo-etat${enCours ? ' on' : ''}">
-            <i></i>${enCours ? 'Actif' : 'Non souscrit'}
-          </span>
-
           <!-- ⚠ LE NOMBRE DE MEMBRES REMONTE SOUS LE NOM.
 
                Il etait en bas, apres le filet, a cote du bouton. Mais c'est ce
@@ -22829,6 +22825,11 @@ function carteOffreNeuve(o, opts = {}) {
               <path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/>
             </svg>
             <span class="abo-m-tx">Jusqu’à <b>${o.max} membres</b></span>
+          </span>
+
+
+          <span class="abo-etat${enCours ? ' on' : ''}">
+            <i></i>${enCours ? 'Actif' : 'Non souscrit'}
           </span>
 
           ${dateRenouv

@@ -3144,25 +3144,11 @@
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
 
-        <div class="reg-filet"></div>
+        <!-- ⚠ LA LIGNE « Mouvements de l'equipe » A ETE RETIREE.
 
-        <!-- ⚠ « Mouvements de l'equipe » EXISTAIT DEJA, cachee dans Analyse.
-
-             La page existe — `p-activites`, titre « Mouvements de l'equipe » —
-             mais on ne l'atteignait qu'en descendant dans les statistiques.
-             C'est pourtant une question d'entreprise : qui est arrive, qui est
-             parti.
-
-           ⚠ DEUX FLECHES QUI SE CROISENT, pas une horloge. L'horloge dirait
-             « historique » ; ce qu'on regarde, ce sont des entrees et des
-             sorties. -->
-        <button type="button" class="reg-ligne" onclick="showGestionScreen('p-activites')">
-          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
-            <path d="M4 8h11l-3-3M20 16H9l3 3" stroke="currentColor" stroke-width="1.7"
-                  stroke-linecap="round" stroke-linejoin="round"></path>
-          </svg></span><span class="reg-nm">Mouvements de l’équipe</span>
-          <span class="reg-fl">›</span>
-        </button>
+             La page qu'elle ouvrait reste — `p-activites`, atteignable depuis
+             l'ecran Analyse comme avant. C'est le raccourci qui part, pas le
+             contenu. -->
         <!-- Le filet du groupe : le même que partout ailleurs. -->
         <div class="reg-filet"></div>
         <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
@@ -4667,7 +4653,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=ae5ca631"></script>
+<script type="module" src="app.js?v=3bffda86"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

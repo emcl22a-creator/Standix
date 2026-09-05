@@ -17977,3 +17977,117 @@ body.sans-topbar .topbar{
   width:21px;
   height:21px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ALERTE DES PLACES
+
+   ⚠ ROUGE, MAIS PAS ALARMANTE. Un fond rouge plein crierait ; un liseré et un
+     fond tres pale suffisent a dire « attention » sans donner l'impression
+     que quelque chose est casse.
+
+     Rien n'est casse : l'equipe est simplement complete.
+
+   ⚠ ET LE BOUTON MENE AUX OFFRES. Une alerte sans issue ne fait qu'inquieter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.places-alerte{
+  display:flex;
+  align-items:flex-start;
+  gap:11px;
+  margin:0 0 16px;
+  padding:14px 15px;
+  border-radius:18px;
+  background:rgba(200,52,43,0.055);
+  border:0.5px solid rgba(200,52,43,0.22);
+}
+.places-alerte[hidden]{ display:none; }
+
+.pa-ic{
+  flex:0 0 26px; width:26px; height:26px;
+  border-radius:9px;
+  display:grid; place-items:center;
+  background:rgba(200,52,43,0.12);
+  color:#C8342B;
+  margin-top:1px;
+}
+.pa-ic svg{ width:15px; height:15px; }
+
+.pa-tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.pa-tx b{
+  font-size:14px; font-weight:650; letter-spacing:-0.02em;
+  color:#C8342B;
+}
+.pa-tx i{
+  font-style:normal; font-size:12.5px; line-height:1.4;
+  color:var(--label-2);
+}
+
+/* ⚠ LE BOUTON PASSE SOUS LE TEXTE sur un telephone. A cote, il compresserait
+   la phrase a deux mots par ligne. */
+.pa-cta{
+  flex:0 0 auto;
+  align-self:center;
+  border:none;
+  font-family:inherit; font-size:12.5px; font-weight:600;
+  padding:8px 13px; border-radius:100px;
+  background:#C8342B; color:#FFFFFF;
+  white-space:nowrap;
+}
+.pa-cta:active{ transform:scale(0.97); }
+
+@media (max-width: 400px){
+  .places-alerte{ flex-wrap:wrap; }
+  .pa-cta{ width:100%; margin-top:4px; padding:10px 0; }
+}
+
+/* ⚠ A ZERO PLACE, LE LISERE SE MARQUE. Le fait accompli merite un ton plus
+   ferme que l'avertissement. */
+.places-alerte.pleine{
+  background:rgba(200,52,43,0.085);
+  border-color:rgba(200,52,43,0.34);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA DISPARITION, REPRISE
+
+   ⚠ DEUX DEFAUTS.
+
+   ① LA PAGE PARTAIT TROP TOT. Elle attendait 60 ms alors que la barre met
+      340 ms a s'effacer : le contenu montait pendant que le logo etait encore
+      la. Elle attend maintenant 340 ms — le temps exact que la barre disparaisse.
+
+   ② L'ECHELLE DISPERSAIT LES ELEMENTS. `scale(0.94)` sur `.topbar` reduit tout
+      le bloc : les deux boutons se rapprochent du centre pendant que le logo
+      retrecit sur place. Trois mouvements differents dans trois directions —
+      c'est ce qui donne l'impression d'un eparpillement.
+
+      Un fondu seul ne bouge rien. Rien ne se disperse s'il n'y a pas de
+      deplacement.
+
+   ⚠ ET UNE COURBE PLUS LENTE A LA FIN. `cubic-bezier(0.4, 0, 0.2, 1)` — la
+     courbe d'Apple : depart franc, arrivee posee. Sur un fondu, elle evite
+     l'impression de coupure seche.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topbar{
+  transform-origin:top center;
+  transition:opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1) 0.28s;
+}
+
+body.sans-topbar .topbar{
+  opacity:0;
+  transform:translateX(-50%);
+  transition:opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+}
+
+/* ⚠ LA PAGE NE BOUGE QU'APRES. 0,30 s de fondu, puis elle monte. */
+body.sans-topbar .screen{
+  transition:padding-top 0.34s cubic-bezier(0.4, 0, 0.2, 1) 0.30s;
+}
+
+/* ⚠ AU RETOUR, L'ORDRE S'INVERSE : la page redescend, la barre revient ensuite. */
+.screen{
+  transition:padding-top 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}

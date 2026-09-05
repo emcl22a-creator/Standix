@@ -19047,3 +19047,51 @@ body.sans-topbar .topbar{
 body.sans-topbar .screen{
   transition:padding-top 0.40s cubic-bezier(0.32, 0.72, 0, 1) 0s;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ELLE PART EN GLISSANT, ELLE REVIENT EN SE PRECISANT
+
+   ⚠ LE FONDU EST RETIRE. Sans lui, la barre doit sortir ENTIEREMENT du champ,
+     sinon elle resterait posee en haut de l'ecran, nette et immobile.
+
+     `translateY(-100%)` l'emmene au-dessus du bord. Elle mesure 64 px : le
+     trajet est court, et la courbe le rend rapide au depart puis calme.
+
+   ⚠ LE FLOU MONTE A 6 PX PENDANT LE TRAJET. C'est lui qui remplace le fondu :
+     un objet qui accelere se brouille. Deux pixels ne se voyaient pas sur un
+     mouvement de cette ampleur.
+
+   ⚠ AU RETOUR, RIEN NE BOUGE — SEUL LE FLOU SE DISSIPE.
+
+     La barre est deja en place, nette a l'arrivee. Elle ne glisse pas : elle
+     se precise, comme une vue qui reprend sa nettete.
+
+     C'est ce que vous decrivez, et c'est aussi plus juste : ce qui revient a sa
+     place n'a pas de trajet a refaire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ⚠ LE RETOUR : le flou seul, aucun deplacement, aucune opacite. */
+.topbar{
+  opacity:1;
+  transform:translateX(-50%);
+  filter:blur(0);
+  transition:filter 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ⚠ LE DEPART : la barre glisse hors du champ en se brouillant. */
+body.sans-topbar .topbar{
+  opacity:1;
+  transform:translateX(-50%) translateY(-100%);
+  filter:blur(6px);
+  pointer-events:none;
+  transition:
+    transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
+    filter    0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ⚠ LA PAGE GARDE LE MEME REGLAGE, pour que les deux restent lies. */
+.screen,
+body.sans-topbar .screen{
+  transition:padding-top 0.42s cubic-bezier(0.32, 0.72, 0, 1) 0s;
+}

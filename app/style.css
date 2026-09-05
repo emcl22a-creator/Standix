@@ -17594,3 +17594,33 @@ body.sans-topbar .screen{
 #p-abonnement .offre-carte.vedette::before{
   display:block !important;
 }
+
+
+/* ═══ LA CARTE DE LA BARRE DISPARAIT, ses trois elements restent ═══
+
+   ⚠ ON NE TOUCHE PAS A `.glassDiv`. Elle habille aussi les volets du haut et
+     les menus de tri — dix-sept endroits dans le balisage. La neutraliser
+     partout retirerait le verre de toute l'app.
+
+     On vise `.topbar-card`, qui ne designe que cette barre.
+
+   ⚠ LE VERRE PART AVEC LE FOND. Un `backdrop-filter` sans fond floute quand
+     meme ce qui passe dessous : on verrait une bande floue sans contour, plus
+     etrange qu'une carte.
+
+   ⚠ ET LE REMBOURRAGE RESTE. Il tient les trois elements a distance des bords
+     de l'ecran ; sans lui, le bouton profil collerait au bord. */
+.topbar-card{
+  background:none !important;
+  -webkit-backdrop-filter:none !important;
+  backdrop-filter:none !important;
+  box-shadow:none !important;
+  border:none !important;
+}
+
+/* ⚠ LES DEUX COUCHES DE LA CARTE AUSSI. `::after` posait un liseré interieur,
+   invisible seul mais qui laisserait un anneau clair sur le fond de la page. */
+.topbar-card::before,
+.topbar-card::after{
+  display:none !important;
+}

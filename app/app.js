@@ -7220,6 +7220,16 @@ const ECRANS_PLEIN_ECRAN = new Set([
 
 function majBarreHaute(id) {
   document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))
+
+  /* ⚠ LE PROFIL S'OUVRE HORS DE LA BARRE DU BAS.
+
+     Il n'appartient a aucun onglet : `hors-onglets` les eteint tous, comme
+     `en-apercu` le fait pendant l'apercu.
+
+     Sans cela, l'onglet d'ou l'on vient reste allume — on lit son profil et
+     « Procedures » paraît actif. */
+  document.body.classList.toggle('hors-onglets', id === 'p-profil' || id === 'e-profil')
+  window.marquerOngletActif?.()
 }
 
 window.showGestionScreen = function(id, btn) {

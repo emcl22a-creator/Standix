@@ -7258,7 +7258,27 @@ function majBarreHaute(id) {
 
      Sans cela, l'onglet d'ou l'on vient reste allume — on lit son profil et
      « Procedures » paraît actif. */
-  document.body.classList.toggle('hors-onglets', id === 'p-profil' || id === 'e-profil')
+  /* ⚠ CE QUI S'OUVRE DEPUIS LE PROFIL RESTE HORS DES ONGLETS.
+
+     `p-abonnement`, `p-reg-appareils`, `p-reg-langue` et `p-reg-compte` sont
+     marques « 2 » dans la table — l'onglet Gerer. C'etait juste du temps ou ils
+     ne s'ouvraient que de la.
+
+     Depuis le Profil, ils allumaient donc un onglet ou l'on n'est pas. On garde
+     la classe posee tant qu'on ne revient pas dans une vraie page d'onglet.
+
+   ⚠ ON REGARDE D'OU L'ON VIENT, pas seulement ou l'on va. Ces pages sont
+     legitimes des deux cotes : c'est le chemin qui decide, pas la destination. */
+  const DEPUIS_PROFIL = new Set([
+    'p-abonnement', 'p-reg-appareils', 'p-reg-langue', 'p-reg-compte',
+    'e-reg-appareils', 'e-reg-langue', 'e-reg-compte',
+  ])
+
+  const estProfil = id === 'p-profil' || id === 'e-profil'
+  const suiteDuProfil = DEPUIS_PROFIL.has(id)
+    && document.body.classList.contains('hors-onglets')
+
+  document.body.classList.toggle('hors-onglets', estProfil || suiteDuProfil)
   window.marquerOngletActif?.()
 }
 
@@ -7370,6 +7390,15 @@ window.showGestionScreen = function(id, btn) {
      dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
      Branché ICI plutôt qu'aux quatre endroits qui ouvrent cette page. */
   if (id === 'p-settings') { majLigneQuota(); appliquerAccesAbonnement(); appliquerAccesEntreprise() }
+
+  /* ⚠ LA PAGE DES MOUVEMENTS SE REMPLIT A SON OUVERTURE.
+
+     Elle etait vide : la fonction qui peint les mouvements ne visait que le
+     volet du haut. */
+  if (id === 'p-activites') {
+    remplirHistoMouvements('activites-tout')
+    majAlertePlaces()
+  }
 
   /* ⚠ LE PROFIL A BESOIN DES MEMES CONTROLES.
 
@@ -8496,8 +8525,17 @@ function peindreHisto(zone, entrees, rien) {
   zone.innerHTML = html
 }
 
-function remplirHistoMouvements() {
-  const zone = document.getElementById('histo-mouvements-liste')
+/* ⚠ LA MEME FONCTION SERT AU VOLET ET A LA PAGE.
+
+   Elle ecrivait toujours dans `histo-mouvements-liste`, celui du volet. La
+   page « Mouvements de l'equipe » restait donc vide : personne ne la
+   remplissait.
+
+   Un argument suffit — deux copies auraient diverge des la premiere
+   correction. */
+function remplirHistoMouvements(idZone) {
+  const zone = document.getElementById(idZone || 'histo-mouvements-liste')
+  if (!zone) return
   const depuis = new Date(Date.now() - HISTO_JOURS * 86400000).toISOString()
   const PH = {
     arrivee:      (n) => `${n} <em>a rejoint l’équipe</em>`,
@@ -24719,6 +24757,65 @@ let triEquipe = 'az'
      l'entreprise n'aurait plus de proprietaire, et l'abonnement, les quotas et
      les droits reposent tous dessus.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ALERTE DES PLACES
+
+   ⚠ ELLE NE PARAIT QU'A UNE PLACE OU ZERO.
+
+     Plus tot, elle inquieterait pour rien : un gerant a trois places libres
+     n'a pas a penser a son abonnement. Plus tard, il serait deja trop tard —
+     quelqu'un aurait essaye de rejoindre et se serait heurte a un refus.
+
+   ⚠ DEUX MESSAGES DISTINCTS. « Plus qu'une place » avertit ; « Plus aucune
+     place » constate. Le second est un fait accompli, le premier une fenetre
+     pour agir — ils ne se disent pas de la meme façon.
+
+   ⚠ ET L'ON INTERROGE LA BASE, pas le nombre affiche. `places_restantes` tient
+     compte de tous les etablissements du proprietaire.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function majAlertePlaces() {
+  const zone = document.getElementById('places-alerte')
+  if (!zone) return
+
+  if (!currentMembre?.entreprise_id) { zone.hidden = true; return }
+
+  try {
+    const { data, error } = await supabase
+      .rpc('places_restantes', { p_entreprise: currentMembre.entreprise_id })
+    if (error || data === null || data === undefined) { zone.hidden = true; return }
+
+    const reste = typeof data === 'object'
+      ? (data.reste ?? data.places ?? null)
+      : Number(data)
+
+    if (typeof reste !== 'number' || reste > 1) { zone.hidden = true; return }
+
+    const t = document.getElementById('places-titre')
+    const s = document.getElementById('places-sous')
+
+    if (reste <= 0) {
+      if (t) t.textContent = 'Plus aucune place'
+      if (s) s.textContent = 'Personne ne peut plus rejoindre votre équipe. '
+                           + 'Choisissez une offre supérieure pour en accueillir davantage.'
+      zone.classList.add('pleine')
+    } else {
+      if (t) t.textContent = 'Plus qu’une place'
+      if (s) s.textContent = 'Une seule personne peut encore rejoindre votre équipe.'
+      zone.classList.remove('pleine')
+    }
+    zone.hidden = false
+
+  } catch (e) {
+    /* ⚠ UNE PANNE NE MONTRE RIEN. Afficher « plus aucune place » sur une
+       requete qui a echoue serait pire que de se taire. */
+    console.warn('[places]', e?.message)
+    zone.hidden = true
+  }
+}
+
+document.getElementById('places-offres')?.addEventListener('click', () =>
+  showGestionScreen('p-abonnement'))
+
 function appliquerAccesEntreprise() {
   const fondateur = estFondateur(currentMembre)
   const q = document.getElementById('quitter-entreprise')

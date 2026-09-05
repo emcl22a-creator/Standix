@@ -7218,8 +7218,38 @@ const ECRANS_PLEIN_ECRAN = new Set([
   'e-detail',
 ])
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VERRE DE LA BARRE SUIT LE DEFILEMENT
+
+   ⚠ HUIT PIXELS SUFFISENT. Attendre davantage laisserait du texte passer a nu
+     derriere le logo avant que le verre arrive.
+
+   ⚠ ON NE TOUCHE LA CLASSE QUE SI ELLE CHANGE. `classList.toggle` a chaque
+     image de defilement forcerait un recalcul de style soixante fois par
+     seconde, pour rien.
+
+   ⚠ ET L'ECOUTE EST PASSIVE. Sans `passive:true`, Safari attend de savoir si
+     le gestionnaire va bloquer le geste — le defilement accroche au premier
+     mouvement du doigt.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let pageGlissee = false
+
+function suivreDefilement() {
+  const glissee = (window.scrollY || document.documentElement.scrollTop || 0) > 8
+  if (glissee === pageGlissee) return
+  pageGlissee = glissee
+  document.body.classList.toggle('page-glissee', glissee)
+}
+
+addEventListener('scroll', suivreDefilement, { passive: true })
+
 function majBarreHaute(id) {
   document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))
+
+  /* ⚠ ON REVERIFIE A CHAQUE PAGE. Un ecran s'ouvre en haut : le verre doit
+     partir, meme si l'on avait defile sur le precedent. */
+  pageGlissee = null
+  suivreDefilement()
 
   /* ⚠ LE PROFIL S'OUVRE HORS DE LA BARRE DU BAS.
 
@@ -22572,13 +22602,13 @@ function iconeOffre(cle) {
        zone declaree, tout recevait la couleur de FIN du degrade, un orange
        plein. Les icones n'etaient donc meme pas degradees, juste orange.
 
-     `cocheOffre` est en coordonnees relatives : il suit la taille du dessin,
+     `iconeOffre` est en coordonnees relatives : il suit la taille du dessin,
      quelle qu'elle soit.
 
    ⚠ LE TRAIT PASSE DE 1,7 A 1,9. A 22 px, un trait de 1,7 sur un dessin a
      plusieurs traits proches — les trois tetes de « pro », les noeuds du
      reseau — se lisait maigre a cote des coches, qui sont a 2,2. */
-  const t = 'stroke="url(#cocheOffre)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"'
+  const t = 'stroke="url(#iconeOffre)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"'
   const dessins = {
     // Une personne : l'offre d'un artisan et de ses quelques mains.
     essentiel: `<circle cx="12" cy="8.2" r="3.4" ${t}/>
@@ -22620,9 +22650,9 @@ function iconeOffre(cle) {
        Le nœud du haut est un demi-pixel plus gros : c'est le parent, et la
        hiérarchie se lit sans qu'on ait à l'expliquer. */
     reseau: `<path d="M12 8.6v3.1M12 11.7 7.4 15.2M12 11.7l4.6 3.5" ${t}/>
-             <circle cx="12" cy="6.2" r="2.5" fill="url(#cocheOffre)" stroke="none"/>
-             <circle cx="6.1" cy="17.3" r="2.2" fill="url(#cocheOffre)" stroke="none"/>
-             <circle cx="17.9" cy="17.3" r="2.2" fill="url(#cocheOffre)" stroke="none"/>`,
+             <circle cx="12" cy="6.2" r="2.5" fill="url(#iconeOffre)" stroke="none"/>
+             <circle cx="6.1" cy="17.3" r="2.2" fill="url(#iconeOffre)" stroke="none"/>
+             <circle cx="17.9" cy="17.3" r="2.2" fill="url(#iconeOffre)" stroke="none"/>`,
     // Un bâtiment : au-delà du réseau, c'est une organisation.
     entreprise: `<path d="M4.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6.4a1.6 1.6 0 0 1 1.6 1.6v14.2" ${t}/>
                  <path d="M14 10.4h4a1.6 1.6 0 0 1 1.6 1.6v8.4M2.6 20.4h18.8" ${t}/>

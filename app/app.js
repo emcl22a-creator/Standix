@@ -22902,6 +22902,25 @@ function carteOffreNeuve(o, opts = {}) {
             <span class="abo-m-tx">Jusqu’à <b>${o.max} membres</b></span>
           </span>
 
+          <!-- ⚠ « Procédures illimitées » SOUS LES MEMBRES.
+
+               Cette ligne se lit AVANT le prix : c'est l'endroit ou l'on donne
+               envie, pas ou l'on pose des conditions.
+
+               J'avais d'abord propose le nombre d'analyses. Mais « 30 analyses
+               par mois » se lit comme une limite — « seulement trente » — alors
+               que le detail est la pour les limites.
+
+               « Illimitees » repond a la vraie crainte : est-ce que je vais
+               devoir compter mes procedures ? -->
+          <span class="abo-illim">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/>
+            </svg>
+            <span>Procédures <b>illimitées</b></span>
+          </span>
+
 
           <!-- ⚠ LA PASTILLE D'ETAT A ETE RETIREE.
 

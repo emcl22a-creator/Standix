@@ -22902,18 +22902,31 @@ function carteOffreNeuve(o, opts = {}) {
         </span>
       </div>
 
-      <div class="abo-filet"></div>
+      <!-- ⚠ LE BAS DEVIENT UNE LIGNE ENTIERE, plus un bouton flotant.
 
-      <div class="abo-bas">
-        <button type="button" class="abo-detail-btn" data-tiroir="${o.cle}"
-                aria-expanded="false">
-          Voir les détails
+           Un filet pleine largeur suivi d'un petit bouton a droite laissait
+           soixante-quatre pixels de vide pour trente et un de bouton. La carte
+           paraissait inachevee.
+
+           Toute la bande est maintenant cliquable, avec le prix a gauche et le
+           chevron a droite : la zone de touche fait la largeur de la carte, et
+           le prix se lit sans ouvrir. -->
+      <button type="button" class="abo-pied" data-tiroir="${o.cle}"
+              aria-expanded="false">
+        <span class="abo-pied-g">
+          ${surDevis
+            ? '<span class="ap-devis">Sur devis</span>'
+            : `<span class="ap-prix">${mensuel} €</span>
+               <span class="ap-u">/ mois</span>`}
+        </span>
+        <span class="abo-pied-d">
+          <span class="ap-lib">Détails</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
                stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-        </button>
-      </div>
+        </span>
+      </button>
 
       <!-- ⚠ LE TIROIR EST TOUJOURS DANS LE BALISAGE, ferme par une hauteur
            nulle. Le construire au clic empecherait toute animation : on ne peut

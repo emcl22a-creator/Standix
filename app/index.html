@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=de8a1bc3">
+<link rel="stylesheet" href="style.css?v=86b63e4c">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3007,10 +3007,11 @@
       <div id="abo-gerer"></div>
       <!-- Centré et de largeur réduite : sur ton image il ne prend pas toute
            la ligne, ce qui l'empêche de concurrencer le bouton de l'offre. -->
-      <button type="button" class="abo-autres" id="abo-autres">Voir les autres formules
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
-             stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
+      <!-- ⚠ « Voir les autres formules » A ETE RETIRE.
+
+           Il cachait quatre offres derriere un clic. Sur une page qui ne sert
+           qu'a comparer, cacher ce qu'on vient comparer n'a pas de sens : la
+           liste s'affiche entiere. -->
       <div id="abo-liste"></div>
 
       <!-- Les trois garanties, en pied. Elles répondent aux trois objections
@@ -4652,7 +4653,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=98c59d12"></script>
+<script type="module" src="app.js?v=8c8c271c"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

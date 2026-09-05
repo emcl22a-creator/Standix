@@ -18322,3 +18322,154 @@ body.sans-topbar .screen{
 .abo-m-tx{ white-space:nowrap; }
 .abo-membres{ min-width:0; flex:0 1 auto; }
 .abo-detail-btn{ flex:0 0 auto; }
+
+
+/* ═══ LE LOGO GARDE SES PROPORTIONS ═══
+
+   ⚠ IL ETAIT ECRASE. Son image fait 225 x 320 — plus haute que large. Posee
+     dans un carre de 26 px sans consigne, elle etait etiree en largeur : le
+     logo grossissait au lieu de rapetisser.
+
+     `object-fit:contain` la fait tenir dans la boite sans la deformer, et une
+     hauteur plus petite que la largeur lui laisse sa forme.
+
+   ⚠ MESURE : 225 / 320 = 0,70. Pour 30 px de haut, il faut 21 de large. */
+.abo-pl-logo{
+  width:21px;
+  height:30px;
+  object-fit:contain;
+}
+
+/* ⚠ « Standix » DESCEND ET GROSSIT.
+
+   A 8,5 px il se lisait comme une mention legale. La plaque fait 62 px : il y a
+   la place pour 10,5, et pour le pousser vers le bas — le logo occupe le haut,
+   le nom repose dessous. */
+.abo-plaque{
+  gap:0;
+  justify-content:flex-start;
+  padding:11px 0 9px;
+}
+.abo-pl-nom{
+  margin-top:auto;
+  font-size:10.5px;
+  font-weight:750;
+  letter-spacing:-0.02em;
+}
+
+/* ⚠ LA COCHE N'A PLUS DE CERCLE : elle peut prendre toute la place. */
+.abo-li svg{ width:18px; height:18px; flex:0 0 18px; margin-top:2px; }
+
+/* ⚠ LES MEMBRES SOUS LE NOM, avant la pastille d'etat. */
+.abo-tx .abo-membres{
+  margin-top:6px;
+  font-size:13px;
+}
+.abo-tx .abo-etat{ margin-top:9px; }
+
+/* ⚠ LE BAS NE PORTE PLUS QUE LE BOUTON : il se met a droite. */
+.abo-bas{ justify-content:flex-end; }
+
+/* ═══ LA REMISE ANNUELLE PASSE AU BLEU ═══
+
+   ⚠ ELLE ETAIT VERTE. Le vert dit « inclus » dans cette carte — c'est la
+     couleur des coches. Sur une remise, il disait donc autre chose que ce
+     qu'il dit trois lignes plus bas.
+
+     Le bleu de « Generer les etapes » est la couleur d'action de l'app : une
+     remise est une action a saisir. */
+.abo-annee{
+  background:rgba(31,76,238,0.07);
+}
+.abo-annee-bad{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+}
+
+/* ═══ LES DEUX BOUTONS D'ACHAT ═══
+
+   ⚠ CHACUN PORTE SON PRIX. « Par an » et « Par mois » seuls obligeraient a
+     remonter chercher les montants.
+
+   ⚠ ET LE SECOND EST PLUS SOBRE. Deux boutons de meme poids ne diraient pas
+     lequel on recommande ; l'annee est la moins chere, elle porte le degrade. */
+.abo-achats{
+  display:flex; gap:9px; margin-top:15px;
+}
+.abo-achats .abo-cta{
+  flex:1; margin-top:0;
+  height:auto; min-height:54px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1px;
+  padding:9px 6px;
+}
+.ac-t{ font-size:14px; font-weight:700; letter-spacing:-0.02em; }
+.ac-s{ font-size:11.5px; font-weight:500; opacity:0.82; }
+
+.abo-cta.second{
+  background:rgba(31,76,238,0.08);
+  color:#1F4CEE;
+  box-shadow:none;
+}
+
+
+/* ⚠ LES DEUX LIGNES DES BOUTONS ETAIENT ECARTEES.
+
+   `justify-content:center` sur une boite plus haute que son contenu repartit
+   l'espace : les deux lignes se retrouvaient loin l'une de l'autre. On reduit
+   la hauteur et l'on serre le `gap`. */
+.abo-achats .abo-cta{
+  min-height:0;
+  padding:11px 6px 12px;
+  gap:2px;
+}
+.ac-s{ font-size:12px; opacity:0.9; }
+
+
+/* ⚠ `height:54px` RESTAIT, POSE PAR MA REGLE PRECEDENTE.
+
+   J'avais ecrit `min-height:0` en croyant annuler une hauteur minimale — mais
+   c'etait une hauteur FIXE. Elle imposait 54 px, et `justify-content:center`
+   repartissait l'espace excedentaire entre les deux lignes.
+
+   `height:auto` rend la boite a son contenu : le rembourrage seul decide. */
+.abo-achats .abo-cta{
+  height:auto !important;
+  min-height:0 !important;
+}
+
+
+/* ⚠ LE TITRE FAISAIT 38 PX DE HAUT POUR 14 PX DE TEXTE.
+
+   Mesure : le titre a 11 px du haut, le prix a 51 — quarante pixels d'ecart
+   pour deux lignes qui devraient se toucher.
+
+   La cause est la hauteur de ligne du bouton, heritee et calculee sur sa
+   taille de police d'origine. Les deux spans en heritaient sans que rien ne la
+   reprenne.
+
+   On la pose explicitement sur chacun. */
+.ac-t{ line-height:1.15; display:block; }
+.ac-s{ line-height:1.2; display:block; }
+
+
+/* ⚠ `.ac-t` ETAIT DEJA PRISE, et portait `min-height:38px`.
+
+   C'est la classe des tuiles de l'accueil, ou cette hauteur minimale aligne
+   les titres sur deux lignes. Mes libelles de bouton en heritaient : 38 px
+   pour quatorze pixels de texte, d'ou l'ecart.
+
+   J'ai cherche du cote de la hauteur de ligne — c'etait un nom de classe
+   deja employe ailleurs.
+
+ ⚠ ON RENOMME PLUTOT QUE DE SURCHARGER. `abo-b-t` et `abo-b-s` n'appartiennent
+   qu'a ces boutons : aucune collision possible. */
+.abo-b-t{
+  font-size:14px; font-weight:700;
+  letter-spacing:-0.02em; line-height:1.15;
+  display:block;
+}
+.abo-b-s{
+  font-size:12px; font-weight:500;
+  line-height:1.2; opacity:0.9;
+  display:block;
+}

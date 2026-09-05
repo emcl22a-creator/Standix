@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=1d1c102d">
+<link rel="stylesheet" href="style.css?v=2aa920e5">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3111,7 +3111,13 @@
         Les deux lignes sont maintenant cote a cote : ce qu'on paie, et ce
         qu'il en reste. -->
       <button type="button" class="reg-ligne" onclick="openMembres()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.7"></circle><path d="M3.4 19a5.6 5.6 0 0 1 11.2 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><circle cx="17.4" cy="9.6" r="2.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></circle><path d="M15.4 19a4.4 4.4 0 0 1 5.4-4.4" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
+        <!-- ⚠ UNE SEULE SILHOUETTE, plus deux.
+
+               L'onglet de la page porte desormais deux silhouettes. Les
+               repeter ici, trois lignes plus bas, ferait doublon — et l'on
+               gere les membres UN PAR UN : on ouvre une fiche, on change un
+               role. Le singulier est plus juste. -->
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.4" r="3.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M5.2 19.6a6.8 6.8 0 0 1 13.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
 
@@ -5525,22 +5531,20 @@ const ICONS = [
   {line:'M3.4 3.4v15.4a2 2 0 0 0 2 2h15.2 M8.2 17.2v-3.4M13 17.2V8.6M17.8 17.2v-6',
    fill:'M3.4 3.4h2v15.4h15.2v2H5.4a2 2 0 0 1-2-2z M7.1 13.3h2.4v5.5H7.1z M11.8 8.1h2.4v10.7h-2.4z M16.5 10.6h2.4v8.2h-2.4z'},
   {
-    /* ⚠ DEUX CURSEURS DE REGLAGE — TROISIEME VERSION.
+    /* ⚠ DEUX SILHOUETTES, PLUS DES CURSEURS.
 
-       La precedente avait trois defauts, visibles une fois agrandie :
+       Les curseurs de reglage etaient DEJA l'icone du bouton de tri, sur la
+       page des procedures : le meme dessin pour un onglet et pour un bouton
+       brouille les deux.
 
-       · les poignees faisaient 3,1 de rayon pour un trait de 1,8 — presque
-         aussi hautes que l'ecart entre les deux rails, l'icone paraissait
-         tassee ;
-       · les rails etaient inegaux, de 3,8 a 6,4 : rien ne les alignait ;
-       · les deux lignes etaient a 8,4 et 15,6, soit 7,2 d'ecart pour des
-         poignees de 6,2 de diametre. Elles se frolaient.
+       La page parle de gens — equipe, postes, invitations. Deux silhouettes
+       le disent sans legende.
 
-     ⚠ 2,3 DE RAYON, LIGNES A 8,5 ET 15,5. La poignee fait 4,6 de diametre
-       pour 7 d'ecart : il reste de l'air entre les deux. Verifie a 20, 28
-       et 64 px contre trois autres dessins. */
-    line:'M3.5 8.5h5.2 M13.3 8.5h7.2 M3.5 15.5h7.2 M15.7 15.5h4.8 M11 8.5a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0 M13.4 15.5a2.3 2.3 0 1 0-4.6 0 2.3 2.3 0 1 0 4.6 0',
-    fill:'M3.5 8.5h5.2 M13.3 8.5h7.2 M3.5 15.5h7.2 M15.7 15.5h4.8 M11 8.5a2.3 2.3 0 1 0 4.6 0 2.3 2.3 0 1 0-4.6 0 M13.4 15.5a2.3 2.3 0 1 0-4.6 0 2.3 2.3 0 1 0 4.6 0',
+     ⚠ LA SECONDE EST PARTIELLE, tracee a moitie derriere la premiere. Deux
+       silhouettes entieres cote a cote se remplissent a vingt pixels ; celle
+       du fond ne montre que ce qui depasse. */
+    line:'M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z M3 20.2a6.4 6.4 0 0 1 12.8 0 M16.4 11a2.9 2.9 0 1 0 0-5.8 M17 14.6a5.4 5.4 0 0 1 4 5.6',
+    fill:'M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z M3 20.2a6.4 6.4 0 0 1 12.8 0 M16.4 11a2.9 2.9 0 1 0 0-5.8 M17 14.6a5.4 5.4 0 0 1 4 5.6',
   },
 ];
 /* Le QR code, propre à l'espace Équipe. Le carré plein en version « active »

@@ -18643,3 +18643,68 @@ body.sans-topbar .screen{
    maintenant la hauteur de la plaque qui decide de l'ecart. */
 .abo-tx .abo-membres{ margin-top:0; }
 .abo-nom{ margin:0; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE FERMEE — REPRISE
+
+   ⚠ CE QUI N'ALLAIT PAS. Mesure : un filet pleine largeur, puis soixante-quatre
+     pixels de vide pour un bouton de trente et un, pousse dans un coin. La
+     carte se terminait sur du blanc.
+
+   ⚠ LE PIED DEVIENT UNE LIGNE PLEINE. Prix a gauche, « Détails » a droite,
+     toute la bande cliquable. Le filet devient sa bordure haute : un trait de
+     moins a dessiner, et il court exactement sur la zone qu'il separe.
+
+   ⚠ LE PRIX PARAIT SANS OUVRIR. C'est la premiere question qu'on se pose
+     devant une offre ; la cacher derriere un clic obligeait a deplier les cinq
+     cartes pour comparer.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.abo-carte{
+  padding:20px 18px 0;
+  overflow:hidden;
+}
+
+/* ⚠ LE FILET AUTONOME DISPARAIT : c'est la bordure du pied qui le remplace. */
+.abo-filet{ display:none; }
+
+.abo-pied{
+  display:flex; align-items:center; justify-content:space-between;
+  width:calc(100% + 36px);
+  margin:18px -18px 0;
+  padding:15px 18px;
+  border:none;
+  border-top:0.5px solid rgba(28,28,38,0.09);
+  background:none;
+  font-family:inherit;
+  text-align:left;
+  transition:background 0.18s ease-out;
+}
+.abo-pied:active{ background:rgba(28,28,38,0.035); }
+
+.abo-pied-g{ display:flex; align-items:baseline; gap:5px; }
+.ap-prix{
+  font-size:19px; font-weight:750;
+  letter-spacing:-0.03em; color:var(--label);
+}
+.ap-u{ font-size:13px; color:var(--label-3); }
+.ap-devis{ font-size:14px; font-weight:600; color:var(--label-2); }
+
+.abo-pied-d{
+  display:flex; align-items:center; gap:5px;
+  font-size:13px; font-weight:600;
+  color:var(--label-2);
+}
+.abo-pied-d svg{
+  width:15px; height:15px;
+  transition:transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.abo-pied.ouvert svg{ transform:rotate(180deg); }
+
+/* ⚠ LE TIROIR REPREND LE REMBOURRAGE que la carte a perdu en bas. */
+.abo-tiroir-in{ padding:16px 0 18px; }
+
+@media (prefers-reduced-motion: reduce){
+  .abo-pied, .abo-pied-d svg{ transition:none; }
+}

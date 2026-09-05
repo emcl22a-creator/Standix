@@ -17624,3 +17624,75 @@ body.sans-topbar .screen{
 .topbar-card::after{
   display:none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE VERRE APPARAIT QUAND LE CONTENU PASSE DESSOUS
+
+   ⚠ EN HAUT DE PAGE, LA BARRE N'A RIEN A CACHER. Le fond est uni, une plaque
+     de verre par-dessus ne ferait qu'ajouter un contour sans raison.
+
+     Des que la page glisse, du texte arrive derriere les trois elements : le
+     verre les detache, et c'est la qu'il sert.
+
+   ⚠ IL COUVRE TOUTE LA LARGEUR, pas seulement la carte. C'est le haut de
+     l'ecran entier qui doit se troubler — une pastille flottante laisserait le
+     texte net de chaque cote.
+
+   ⚠ ET IL SE FOND VERS LE BAS. Un bord net ferait une barre posee sur la page ;
+     le degradé de masque efface la limite, comme iOS.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topbar::after{
+  content:'';
+  position:absolute;
+  inset:0 0 -14px 0;
+  z-index:-1;
+  pointer-events:none;
+
+  background:rgba(245,245,249,0.62);
+  -webkit-backdrop-filter:blur(16px) saturate(1.7);
+  backdrop-filter:blur(16px) saturate(1.7);
+
+  /* ⚠ LE MASQUE EFFACE LE BORD BAS. Opaque sur les trois quarts, puis
+     transparent : le verre s'arrete sans qu'on voie ou. */
+  -webkit-mask:linear-gradient(#000 0%, #000 72%, transparent 100%);
+  mask:linear-gradient(#000 0%, #000 72%, transparent 100%);
+
+  opacity:0;
+  transition:opacity 0.24s ease-out;
+}
+
+/* ⚠ LA CLASSE VIENT DU SCRIPT, qui suit le defilement. */
+body.page-glissee .topbar::after{
+  opacity:1;
+}
+
+/* ⚠ ET IL PART AVEC LA BARRE sur les pages de detail. Sans cela, une bande
+   floue resterait en haut d'un ecran qui n'a plus de barre. */
+body.sans-topbar .topbar::after{
+  opacity:0 !important;
+}
+
+
+/* ⚠ LES PLAQUES ETAIENT TRANSLUCIDES, DONC GRISES.
+
+   `rgba(118,118,128,0.07)` sur une carte blanche donne un gris tres pale — et
+   les halos colores transparaissent au travers. La plaque paraissait sale
+   plutot que posee.
+
+   Un blanc franc la detache du fond de la carte sans la teinter, et une ombre
+   portee suffit a la faire flotter. C'est ce que fait la reference. */
+#p-abonnement .offre-inclus{
+  background:#FFFFFF !important;
+  box-shadow:
+    0 1px 2px rgba(20,20,30,0.05),
+    0 10px 24px -18px rgba(20,20,30,0.16) !important;
+}
+
+/* ⚠ LA PLAQUE DU NOM AUSSI. Meme gris, meme probleme : les halos la
+   traversaient. */
+#p-abonnement .offre-plaque{
+  background:#FFFFFF !important;
+  box-shadow:0 1px 3px rgba(20,20,30,0.07) !important;
+}

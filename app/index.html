@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=4e7e746b">
+<link rel="stylesheet" href="style.css?v=994a6cd6">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2709,7 +2709,30 @@
       </button>
       <h1 class="pagehead">Mouvements de l’équipe</h1>
     </div>
-    <div id="activites-tout"></div>
+    <!-- ⚠ L'ALERTE DES PLACES, TOUT EN HAUT.
+
+         Elle ne parait qu'a une place restante ou zero : plus tot, elle
+         inquieterait pour rien ; plus tard, il serait deja trop tard pour
+         quelqu'un qui essaie de rejoindre.
+
+         `hidden` par defaut — c'est `majAlertePlaces` qui la revele. -->
+      <div class="places-alerte" id="places-alerte" hidden>
+        <span class="pa-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3.6 21.4 20H2.6Z"></path>
+            <line x1="12" y1="9.6" x2="12" y2="14"></line>
+            <circle cx="12" cy="17" r="0.7" fill="currentColor"></circle>
+          </svg>
+        </span>
+        <span class="pa-tx">
+          <b id="places-titre">Plus qu’une place</b>
+          <i id="places-sous">Passez à l’offre supérieure pour agrandir votre équipe.</i>
+        </span>
+        <button type="button" class="pa-cta" id="places-offres">Voir les offres</button>
+      </div>
+
+      <div id="activites-tout"></div>
   </div>
 
   <!-- ═══ LES PROCÉDURES RÉCENTES, SUR LEUR PROPRE PAGE ═══
@@ -4644,7 +4667,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=b2a2a9ac"></script>
+<script type="module" src="app.js?v=ae5ca631"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

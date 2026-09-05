@@ -18931,3 +18931,21 @@ body.sans-topbar .screen{
   position:relative;
   z-index:3;
 }
+
+
+/* ⚠ LA COULEUR VENAIT DE LA MAUVAISE REGLE.
+
+   `.ess-plaque` est declaree deux fois. J'avais copie la premiere —
+   `#F2F1EF -> #D9D7D3 -> #B9B6B0`, un gris chaud — mais c'est la SECONDE qui
+   s'applique, plus bas dans le fichier :
+
+     #FBFCFD -> #DDE1E7 -> #A9AEB8
+
+   Un gris bleute, plus clair en haut et plus froid en bas. C'est ce qu'on voit
+   a l'ecran sur l'essai 14 jours.
+
+ ⚠ J'AI LU LE FICHIER AU LIEU DE MESURER. La premiere occurrence trouvee n'est
+   pas celle qui gagne — c'est une erreur que ce projet m'a deja apprise. */
+.abo-plaque{
+  background:linear-gradient(145deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
+}

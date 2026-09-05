@@ -18820,3 +18820,48 @@ body.sans-topbar .screen{
 }
 .abo-fermer svg{ width:14px; height:14px; }
 .abo-fermer:active{ transform:scale(0.98); }
+
+
+/* ⚠ LE LOGO DE LA BARRE GAGNE DEUX PIXELS.
+
+   Mesure : 24 x 28 pour un texte de 17 px a cote. Le dessin paraissait un peu
+   maigre face au mot.
+
+   26 x 30 garde son rapport — 113 / 160, soit 0,70 — et lui donne le poids qui
+   manquait. */
+/* ⚠ LE LOGO FAISAIT 22 x 31 dans sa regle, 24 x 28 a l'ecran — la difference
+   vient du rapport de l'image, qui prime.
+
+   24 x 34 le grandit tres legerement en gardant 0,70. */
+.boot-logo--topbar{
+  width:24px !important;
+  height:34px !important;
+}
+
+/* ⚠ LE MOT ETAIT DEJA A 22 PX, pas 17 comme je l'avais cru.
+
+   Ma premiere valeur — 18 — l'aurait RETRECI de quatre pixels. Je l'ai lu dans
+   `.logotype`, une autre classe : celle de l'ecran d'accueil.
+
+   23 px, un seul de plus, comme demande. */
+.tb-nom{
+  font-size:23px;
+}
+
+
+/* ⚠ LA LIGNE « Procédures illimitées », sous les membres.
+
+   Meme facture que la ligne du dessus — meme taille, meme gris, meme icone de
+   dix-sept pixels. Les deux forment un couple : combien de gens, combien de
+   procedures. */
+.abo-illim{
+  display:flex; align-items:center; gap:7px;
+  margin-top:4px;
+  font-size:13.5px;
+  color:var(--label-2);
+}
+.abo-illim b{ color:var(--label); font-weight:650; }
+.abo-illim svg{
+  width:17px; height:17px; flex:0 0 17px;
+  color:var(--label-3);
+}

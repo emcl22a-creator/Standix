@@ -22760,6 +22760,186 @@ function changementRythme(opts) {
   return rythmeChoisi !== paye
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'ABONNEMENT — NOUVELLE FORME
+
+   ⚠ TROIS ETAGES, comme la maquette :
+
+     · en haut : la plaque du logo a gauche, l'identite a droite ;
+     · un filet ;
+     · en bas : le nombre de membres, et le bouton qui ouvre le tiroir.
+
+   ⚠ LE TIROIR EST DANS LA CARTE, pas une fenetre par-dessus. Une fenetre
+     couperait le lien avec l'offre qu'on regarde ; un tiroir garde le nom et
+     le prix visibles pendant qu'on lit le detail.
+
+   ⚠ « VOTRE ABONNEMENT » NE PARAIT QUE SUR CELUI QU'ON A. Sur les autres, la
+     ligne est vide : ecrire « offre » ou « disponible » n'apprendrait rien.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function carteOffreNeuve(o, opts = {}) {
+  const enCours   = !!opts.enCours
+  const surDevis  = o.prix === null
+  const mensuel   = surDevis ? null : o.prix
+  const annuelMois = surDevis ? null : Math.round((o.an || o.prix * 0.8 * 12) / 12)
+
+  /* ⚠ LA DATE VIENT DE L'ABONNEMENT, pas d'un calcul. Ajouter trente jours a
+     aujourd'hui donnerait une date fausse des le premier decalage de
+     facturation. */
+  const dateRenouv = enCours && etatAbo?.fin_periode
+    ? new Date(etatAbo.fin_periode).toLocaleDateString('fr-FR',
+        { day: 'numeric', month: 'long', year: 'numeric' })
+    : null
+
+  return `
+    <div class="abo-carte${enCours ? ' active' : ''}" data-offre-cle="${o.cle}">
+
+      <div class="abo-haut">
+        <!-- ⚠ LA PLAQUE REPREND CELLE DES 14 JOURS. Meme argent froid, meme
+             arrondi : deux objets de la meme famille. -->
+        <span class="abo-plaque">
+          <!-- ⚠ UNE BALISE IMAGE, PAS UN SPAN. La fonction qui pose les logos cible
+               les img porteuses de data-logo et leur copie une source. Sur un
+               span, elle ne trouvait rien : la plaque restait vide.
+
+             ⚠ AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit dans un gabarit
+               delimite par des accents graves, un seul y fermerait la chaine.
+               C'est ce qui vient d'arriver. -->
+          <img class="abo-pl-logo" data-logo alt="">
+          <span class="abo-pl-nom">Standix</span>
+        </span>
+
+        <span class="abo-tx">
+          ${enCours ? '<span class="abo-sur">Votre abonnement</span>' : ''}
+          <span class="abo-nom">${escapeHtml(o.nom)}</span>
+
+          <span class="abo-etat${enCours ? ' on' : ''}">
+            <i></i>${enCours ? 'Actif' : 'Non souscrit'}
+          </span>
+
+          ${dateRenouv
+            ? `<span class="abo-renouv">Renouvellement le ${dateRenouv}</span>`
+            : ''}
+        </span>
+      </div>
+
+      <div class="abo-filet"></div>
+
+      <div class="abo-bas">
+        <span class="abo-membres">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+            <path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/>
+            <path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/>
+          </svg>
+          <span class="abo-m-tx">Jusqu’à <b>${o.max} membres</b></span>
+        </span>
+
+        <button type="button" class="abo-detail-btn" data-tiroir="${o.cle}"
+                aria-expanded="false">
+          Voir les détails
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <!-- ⚠ LE TIROIR EST TOUJOURS DANS LE BALISAGE, ferme par une hauteur
+           nulle. Le construire au clic empecherait toute animation : on ne peut
+           pas animer ce qui n'existe pas encore. -->
+      <div class="abo-tiroir" id="tiroir-${o.cle}">
+        <div class="abo-tiroir-in">
+
+          <div class="abo-prix">
+            ${surDevis
+              ? `<span class="abo-devis">${escapeHtml(o.devis || 'Sur devis')}</span>`
+              : `<span class="abo-p-v">${mensuel} €</span>
+                 <span class="abo-p-u">par mois, hors taxes</span>`}
+          </div>
+
+          ${surDevis ? '' : `
+          <!-- ⚠ LA REMISE ANNUELLE EST UN ARGUMENT, pas une note de bas de
+               page. Elle merite sa propre ligne, avec le montant reel. -->
+          <div class="abo-annee">
+            <span class="abo-annee-bad">−20 %</span>
+            <span class="abo-annee-tx">
+              <b>${annuelMois} € par mois</b> en payant à l’année
+            </span>
+          </div>`}
+
+          <div class="abo-inclus">
+            ${[
+              `Jusqu’à <b>${o.max} membres</b>`,
+              `<b>${o.analyses} analyses vidéo IA</b> par mois`,
+              `Procédures <b>illimitées</b>`,
+              `En <b>français, anglais et allemand</b>`,
+              `<b>Toutes</b> les fonctionnalités`,
+            ].map(t => `<div class="abo-li">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="11" fill="rgba(52,199,89,0.12)"
+                          stroke="rgba(30,158,67,0.32)" stroke-width="1"/>
+                  <path d="M7.6 12.3l3 3 5.8-6.4" stroke="url(#cocheOffre)"
+                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span>${t}</span>
+              </div>`).join('')}
+          </div>
+
+          <button type="button" class="abo-cta${enCours ? ' encours' : ''}"
+                  ${enCours ? 'disabled' : ''} data-offre="${o.cle}">
+            ${enCours ? 'Offre en cours' : (surDevis ? 'Nous contacter' : `Choisir · ${mensuel} € par mois`)}
+          </button>
+        </div>
+      </div>
+    </div>`
+}
+
+/* ⚠ LE TIROIR S'OUVRE PAR SA HAUTEUR REELLE, pas par `auto`.
+
+   `height:auto` ne s'anime pas — le navigateur ne sait pas vers quoi aller. On
+   mesure le contenu, on pose ce nombre, puis on repasse a `auto` une fois
+   l'animation finie pour que le tiroir suive si son contenu change.
+
+ ⚠ ET L'ON FERME LES AUTRES. Deux tiroirs ouverts obligeraient a faire defiler
+   pour comparer — c'est justement ce qu'on veut eviter. */
+document.addEventListener('click', (ev) => {
+  const b = ev.target.closest('[data-tiroir]')
+  if (!b) return
+
+  const cle = b.dataset.tiroir
+  const t = document.getElementById('tiroir-' + cle)
+  if (!t) return
+
+  const ouvert = t.classList.contains('ouvert')
+
+  document.querySelectorAll('.abo-tiroir.ouvert').forEach(a => {
+    a.style.height = a.scrollHeight + 'px'
+    void a.offsetHeight
+    a.style.height = '0px'
+    a.classList.remove('ouvert')
+    const bb = document.querySelector(`[data-tiroir="${a.id.replace('tiroir-', '')}"]`)
+    if (bb) { bb.setAttribute('aria-expanded', 'false'); bb.classList.remove('ouvert') }
+  })
+
+  if (ouvert) return
+
+  t.classList.add('ouvert')
+  b.setAttribute('aria-expanded', 'true')
+  b.classList.add('ouvert')
+
+  const h = t.scrollHeight
+  t.style.height = '0px'
+  void t.offsetHeight
+  t.style.height = h + 'px'
+
+  t.addEventListener('transitionend', function fini(e) {
+    if (e.propertyName !== 'height') return
+    t.removeEventListener('transitionend', fini)
+    if (t.classList.contains('ouvert')) t.style.height = 'auto'
+  })
+})
+
 function carteOffre(o, opts = {}) {
   const n = opts.membres || 0
   const pm = opts.detaille ? prixParMembre(o, n) : null
@@ -22996,20 +23176,16 @@ window.renderAbonnements = function() {
   })
 
   const estActuelle = mienne.cle === actuel
-  document.getElementById('abo-vedette').innerHTML = carteOffre(mienne, {
-    classe: ' vedette' + (estActuelle ? ' actuelle' : ''),
-    enCours: estActuelle,
-    gerer: estActuelle,
-    /* « Choisir <offre> » : le geste, sans le mot argent. « Essayer
-       gratuitement » aurait été plus doux mais l'essai n'est pas systématique,
-       et « Payer » ferait fuir quelqu'un à qui l'on promet 14 jours d'essai
-       trois lignes plus bas. */
-    cta: estActuelle ? 'Votre abonnement actuel'
-      : (mienne.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + mienne.nom),
-    annuel: !estActuelle,
-    membres: n,
-    detaille: true,
-  })
+  /* ⚠ LA NOUVELLE CARTE PREND LA PLACE DE L'ANCIENNE.
+
+     `carteOffre` reste dans le fichier : elle porte des cas que je n'ai pas
+     tous repris — le changement de rythme, le prix par membre. La retirer
+     maintenant, sans les avoir eprouves, ferait disparaitre du comportement
+     sans qu'on s'en apercoive.
+
+     Elle deviendra morte le jour ou vous aurez valide la nouvelle. */
+  document.getElementById('abo-vedette').innerHTML =
+    carteOffreNeuve(mienne, { enCours: estActuelle })
 
   /* ═══ GÉRER OU RÉSILIER, SOUS LA CARTE ═══
 
@@ -23051,14 +23227,18 @@ window.renderAbonnements = function() {
      donc les cartes. */
   document.getElementById('abo-liste').innerHTML = '<div class="abo-repli">' + OFFRES
     .filter(o => o.cle !== mienne.cle)
-    .map(o => carteOffre(o, {
-      classe: o.cle === actuel ? ' actuelle' : '',
-      cta: o.cle === actuel ? 'Votre abonnement actuel'
-        : (o.prix === null ? 'Nous \u00e9crire' : 'Choisir ' + o.nom),
-      /* Développées elles aussi : quelqu'un qui déplie les autres offres veut
-         comparer, et comparer des titres seuls ne dit rien. */
-      membres: n,
-    })).join('') + '</div>'
+    .map(o => carteOffreNeuve(o, { enCours: o.cle === actuel })).join('') + '</div>'
+
+  /* ⚠ LE LOGO DES PLAQUES SE POSE ICI, apres le rendu.
+
+     La fonction qui le distribue tourne au chargement de la page ; les cartes,
+     elles, sont peintes plus tard. Les balises n'existaient pas encore quand
+     elle est passee. */
+  const srcLogo = document.getElementById('logo-src')
+  if (srcLogo) {
+    document.querySelectorAll('#p-abonnement img[data-logo]')
+      .forEach(i2 => { i2.src = srcLogo.src })
+  }
 
   const rappel = document.getElementById('abo-actuel')
   if (rappel) {

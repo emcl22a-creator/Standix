@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=8902d029">
+<link rel="stylesheet" href="style.css?v=4a00acb4">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2819,7 +2819,7 @@
        pas un écran qui vit dans l'autre — d'où la page vide. -->
   <div class="screen" inert id="p-reg-appareils">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Vos appareils</h1>
@@ -2943,7 +2943,7 @@
   <!-- Les offres, présentées comme un accueil -->
   <div class="screen" inert id="p-abonnement">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Abonnement</h1>
@@ -3017,26 +3017,13 @@
       <!-- Les trois garanties, en pied. Elles répondent aux trois objections
            qui restent une fois le prix accepté : et si je me trompe, et si je
            dois donner ma carte, et si je veux partir. -->
-      <div class="abo-conf">
-        <div class="cf">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)"
-            stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.2l7.2 3v5.4c0 4.3-3 8.1-7.2 9.2
-            -4.2-1.1-7.2-4.9-7.2-9.2V6.2Z"/><path d="M9.2 12.2l2 2 3.6-4" stroke-linecap="round"/></svg></span>
-          <b>14 jours d’essai</b><span>Sans engagement</span>
-        </div>
-        <div class="cf">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)"
-            stroke-width="1.7" stroke-linejoin="round"><rect x="2.8" y="5.4" width="18.4" height="13.2" rx="2.6"/>
-            <path d="M2.8 10h18.4"/></svg></span>
-          <b>Sans carte</b><span>Aucune information bancaire</span>
-        </div>
-        <div class="cf">
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="url(#logoOrIc)"
-            stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round"><path d="M6.5 3.6v10.6l2.6-2.2 1.7 4.2
-            2.2-1-1.7-4.1h3.4Z"/><path d="M15.4 15.6l3.4 3.4M18.8 15.6l-3.4 3.4"/></svg></span>
-          <b>Résiliable</b><span>En un clic, à tout moment</span>
-        </div>
-      </div>
+      <!-- ⚠ LES TROIS ARGUMENTS ONT ETE RETIRES.
+
+           « 14 jours d'essai », « Sans carte », « Résiliable » : ils
+           rassuraient avant la souscription, mais la page les repetait sous
+           cinq cartes qui portent deja leur prix et leur bouton.
+
+           Ils appartiennent a la page d'accueil ou au site, pas ici. -->
     </div>
 
     <!-- Les conditions, en bas, là où on les cherche. Le non-report est dit
@@ -3057,7 +3044,7 @@
        reste illimité, et il faut le dire là où l'on découvre une limite. -->
   <div class="screen" inert id="p-quota">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Analyses vidéo AI</h1>
@@ -3143,6 +3130,24 @@
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.4" r="3.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M5.2 19.6a6.8 6.8 0 0 1 13.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gérer l'équipe</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
+
+        <div class="reg-filet"></div>
+
+        <!-- ⚠ « Mouvements de l'equipe » EST REVENUE.
+
+             Je l'avais retiree sur votre demande, mais la page reste — elle
+             s'appelle `p-activites` et n'etait plus atteignable que depuis
+             l'ecran Analyse.
+
+           ⚠ DEUX FLECHES QUI SE CROISENT, pas une horloge : ce qu'on regarde,
+             ce sont des entrees et des sorties. -->
+        <button type="button" class="reg-ligne" onclick="showGestionScreen('p-activites')">
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 8h11l-3-3M20 16H9l3 3" stroke="currentColor" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg></span><span class="reg-nm">Mouvements de l’équipe</span>
+          <span class="reg-fl">›</span>
+        </button>
 
         <!-- ⚠ LA LIGNE « Mouvements de l'equipe » A ETE RETIREE.
 
@@ -3386,7 +3391,7 @@
 
   <div class="screen" inert id="p-reg-compte">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Votre compte</h1>
@@ -3431,7 +3436,7 @@
   <!-- Sous-page : le code d'invitation -->
   <div class="screen" inert id="p-reg-code">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Codes d'invitation</h1>
@@ -3489,7 +3494,7 @@
        analyse par poste inexploitable. -->
   <div class="screen" inert id="p-reg-postes">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Les postes</h1>
@@ -3529,7 +3534,7 @@
 
   <div class="screen" inert id="p-reg-langue">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-settings')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Langue</h1>
@@ -4653,7 +4658,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=2ba670fe"></script>
+<script type="module" src="app.js?v=5d454e11"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

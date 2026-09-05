@@ -22877,9 +22877,14 @@ function carteOffreNeuve(o, opts = {}) {
           </span>
 
 
-          <span class="abo-etat${enCours ? ' on' : ''}">
-            <i></i>${enCours ? 'Actif' : 'Non souscrit'}
-          </span>
+          <!-- ⚠ LA PASTILLE D'ETAT A ETE RETIREE.
+
+               « Actif » repetait ce que « VOTRE ABONNEMENT » dit deja au-dessus,
+               et « Non souscrit » enonçait une evidence : si l'on regarde une
+               offre sans ce surtitre, on ne l'a pas.
+
+               Le lisere bleu de la carte suffit a distinguer celle qu'on
+               paie. -->
 
           ${dateRenouv
             ? `<span class="abo-renouv">Renouvellement le ${dateRenouv}</span>`
@@ -23206,6 +23211,9 @@ window.renderAbonnements = function() {
   if (actuel && !rythmeAligne) {
     rythmeChoisi = rythmeDuCompte()
     rythmeAligne = true
+    /* ⚠ LE SEGMENT N'EXISTE PLUS : `querySelector` rend `null` et tout ce bloc
+       est saute. On le garde tel quel plutot que de le retirer — il ne coute
+       rien et servira si vous remettez un segment un jour. */
     const b = document.querySelector(`#abo-rythme [data-rythme="${rythmeChoisi}"]`)
     if (b && !b.classList.contains('on')) {
       b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
@@ -23433,8 +23441,19 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
 
   /* Le choix du rythme : on retient et on redessine. Rien d'autre — c'est le
      bouton d'action qui déclenche le paiement. */
+  /* ⚠ CET ECOUTEUR NE VISE PLUS QUE L'ANCIEN SEGMENT, qui n'existe plus.
+
+     Mes deux boutons d'achat portent aussi `data-rythme` : sans ce filtre, un
+     clic sur « Par an » serait pris pour un changement de segment et
+     redessinerait la page au lieu de lancer le paiement.
+
+   ⚠ ON RETIENT QUAND MEME LE RYTHME. C'est lui que la fonction de paiement
+     lit, plus bas. */
   const r = e.target.closest('[data-rythme]')
-  if (r) {
+  if (r && r.classList.contains('abo-cta')) {
+    rythmeChoisi = r.dataset.rythme
+    /* on laisse passer : le gestionnaire du paiement s'en charge */
+  } else if (r) {
     if (r.dataset.rythme === rythmeChoisi) return
     rythmeChoisi = r.dataset.rythme
     /* ⚠ A PARTIR D'ICI, C'EST LE CHOIX DE LA PERSONNE. Sans ce drapeau, le

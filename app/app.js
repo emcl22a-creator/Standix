@@ -10801,7 +10801,11 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
               /* ⚠ LA MARQUE VAUT AUSSI POUR UNE PROCEDURE EN LIGNE. Elle
                  n'etait posee que sur le badge « Brouillon » : c'est la seconde
                  moitie du defaut. */
-              return `<span class="cl-badge">${marque}<i style="background:#34C759"></i>En ligne</span>`
+              /* ⚠ LA DATE PLUTOT QUE « En ligne ». Le point vert reste : il
+                 dit l'etat d'un coup d'oeil, sans occuper de largeur. */
+              const quand = depuisQuand(proc.modifie_le || proc.publiee_le || proc.created_at)
+              return `<span class="cl-badge">${marque}<i style="background:#34C759"></i>${
+                quand ? 'Modifié ' + quand : 'En ligne'}</span>`
             }
             /* Non publiee : la roue seulement si l'analyse tourne VRAIMENT,
                c'est-a-dire si `etatProcedureHtml` rend autre chose qu'un
@@ -10812,7 +10816,11 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
                 return `<span class="cl-etat">${etat}</span>`
               }
             }
-            return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>En cours</span>`
+            /* ⚠ MEME CHOSE POUR UN BROUILLON. « Commence il y a 3 semaines »
+               signale un travail laisse en plan. */
+            const quandB = depuisQuand(proc.modifie_le || proc.created_at)
+            return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>${
+              quandB ? 'Modifié ' + quandB : 'En cours'}</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
@@ -20360,6 +20368,47 @@ function analyseBloquee(proc) {
    maintenant quand elle échoue — mais elle garantit qu'un rechargement ne
    ressuscite pas une coche déjà vue. */
 const proceduresVues = new Set()
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « Modifie il y a N jours »
+
+   ⚠ CE QUI REMPLACE « En ligne ». Sous l'onglet du meme nom, ce badge ne
+     disait rien : tout ce qui s'affiche y est en ligne.
+
+     La date de modification, elle, change avec le temps — c'est la seule
+     information de la carte qui merite une place permanente. Et elle repond a
+     la vraie question : cette procedure est-elle encore a jour.
+
+   ⚠ ELLE VAUT AUSSI SOUS « En cours ». « Commence il y a 3 semaines » signale
+     un brouillon oublie ; c'est utile des deux cotes.
+
+   ⚠ ET L'ON RESTE APPROXIMATIF. « il y a 3 jours » suffit ; la minute exacte
+     n'aide personne et ferait une ligne trop longue.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function depuisQuand(iso) {
+  if (!iso) return null
+  const t = new Date(iso).getTime()
+  if (!t || Number.isNaN(t)) return null
+
+  const s = Math.max(0, Math.floor((Date.now() - t) / 1000))
+
+  if (s < 90)      return 'à l’instant'
+  if (s < 3600)    return `il y a ${Math.floor(s / 60)} min`
+  if (s < 86400)   { const h = Math.floor(s / 3600); return `il y a ${h} h` }
+
+  const j = Math.floor(s / 86400)
+  if (j === 1)     return 'hier'
+  if (j < 7)       return `il y a ${j} jours`
+  if (j < 14)      return 'la semaine dernière'
+  if (j < 60)      return `il y a ${Math.floor(j / 7)} semaines`
+
+  /* ⚠ AU-DELA DE DEUX MOIS, ON DONNE LE MOIS. « il y a 14 semaines » ne se
+     traduit pas en tete ; « en mars » se situe tout de suite. */
+  const d = new Date(iso)
+  const meme = d.getFullYear() === new Date().getFullYear()
+  return 'en ' + d.toLocaleDateString('fr-FR',
+    meme ? { month: 'long' } : { month: 'long', year: 'numeric' })
+}
 
 function etatProcedureHtml(proc) {
   const alerte = (couleur, titre) => `<div class="etat-proc souci" title="${titre}">

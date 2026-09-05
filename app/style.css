@@ -17729,3 +17729,57 @@ body.sans-topbar .topbar::after{
   -webkit-mask:none !important;
   mask:none !important;
 }
+
+
+/* ═══ LES DEUX BOUTONS PASSENT AU BLANC ═══
+
+   ⚠ LE `+` ETAIT NOIR — `#111116`. Sur une barre sans carte, deux pastilles de
+     couleurs opposees encadraient le logo : le noir tirait l'oeil a droite, le
+     gris a gauche, et le logo se retrouvait entre deux poids inegaux.
+
+     En blanc tous les deux, ils se repondent et le logo reste au centre.
+
+   ⚠ LE DESSIN PASSE AU NOIR. Un `+` blanc sur fond blanc disparaitrait. */
+.tb-plus{
+  background:#FFFFFF !important;
+  color:var(--label) !important;
+  box-shadow:
+    0 1px 2px rgba(20,20,30,0.06),
+    0 6px 16px -10px rgba(20,20,30,0.24) !important;
+}
+
+.tb-plus svg{ stroke:var(--label); }
+
+/* ⚠ LE BOUTON PROFIL PREND LE MEME BLANC. Il etait a 12 % de gris. */
+.tb-profil{
+  background:#FFFFFF !important;
+  box-shadow:
+    0 1px 2px rgba(20,20,30,0.06),
+    0 6px 16px -10px rgba(20,20,30,0.24) !important;
+}
+
+/* ═══ LE VOILE PREND LA MATIERE DE LA NAVBAR ═══
+
+   ⚠ MESURE SUR `#bar` : `blur(14px) saturate(1.8)`, fond blanc a 32 %.
+
+     Mon voile employait `blur(16px) saturate(1.7)` sur un blanc a 62 % — plus
+     flou et bien plus opaque. C'est ce blanc qui delave le contenu au lieu de
+     le troubler.
+
+   ⚠ ON GARDE LE FLOU, ON RETIRE LE BLANC. Sans aucun fond, `backdrop-filter`
+     floute quand meme : c'est le propre de cette propriete. Le voile devient
+     alors une simple zone trouble, sans teinte.
+
+   ⚠ ET IL SE RESSERRE. Il couvrait toute la largeur de l'ecran ; a `--col`
+     plus vingt pixels, il reste large sans toucher les bords. */
+/* ⚠ `--col` VAUT 460 PX, plus large qu'un telephone : la limite ne jouait
+   jamais. Mesure : 390 px de voile sur un ecran de 390.
+
+   On retire vingt pixels de chaque cote, quelle que soit la largeur — le voile
+   reste large mais ne touche plus les bords. */
+.topbar::after{
+  width:calc(100vw - 40px) !important;
+  background:none !important;
+  -webkit-backdrop-filter:blur(14px) saturate(1.8) !important;
+  backdrop-filter:blur(14px) saturate(1.8) !important;
+}

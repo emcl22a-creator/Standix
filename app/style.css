@@ -19129,7 +19129,13 @@ body.sans-topbar .screen.active{
 
   /* ⚠ ELLE MONTE DE 58 PX. La barre finit a 68 : la feuille s'arrete dix
      pixels au-dessus du logo, assez pour le couvrir sans coller au bord. */
-  padding-top:44px;
+  /* ⚠ 62 PX PLUTOT QUE 44. Le contenu commençait a 42 px du haut de l'ecran,
+     trop haut : sur un iPhone, la barre d'etat et l'encoche occupent deja les
+     premiers pixels, et le bouton retour venait s'y coller.
+
+     La feuille couvre toujours la barre — elle demarre a 0 — c'est seulement
+     son contenu qui descend. */
+  padding-top:62px;
 
   /* ⚠ ET ELLE DEBORDE SUR LES COTES, pour que ses coins arrondis se voient
      jusqu'au bord de l'ecran. */

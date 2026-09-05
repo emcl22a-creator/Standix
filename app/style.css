@@ -18933,22 +18933,19 @@ body.sans-topbar .screen{
 }
 
 
-/* ⚠ LA COULEUR VENAIT DE LA MAUVAISE REGLE.
+/* ⚠ JE M'ETAIS TROMPE DE MODELE.
 
-   `.ess-plaque` est declaree deux fois. J'avais copie la premiere —
-   `#F2F1EF -> #D9D7D3 -> #B9B6B0`, un gris chaud — mais c'est la SECONDE qui
-   s'applique, plus bas dans le fichier :
+   Quand vous avez demande « la couleur doit aussi etre la meme », j'ai copie
+   celle de l'essai 14 jours : un gris BLEUTE, `#FBFCFD -> #DDE1E7 -> #A9AEB8`.
 
-     #FBFCFD -> #DDE1E7 -> #A9AEB8
+   Mais la plaque des cartes avait deja sa couleur — un gris CHAUD, presque
+   blanc creme, `#F2F1EF -> #D9D7D3 -> #B9B6B0`. C'est celle-la que vous aviez
+   sous les yeux, et celle que vous vouliez garder.
 
-   Un gris bleute, plus clair en haut et plus froid en bas. C'est ce qu'on voit
-   a l'ecran sur l'essai 14 jours.
+   Ma correction l'a refroidie et assombrie. On revient au gris chaud : c'est la
+   valeur d'origine, deja posee plus haut dans le fichier — il suffit de ne plus
+   la surcharger. */
 
- ⚠ J'AI LU LE FICHIER AU LIEU DE MESURER. La premiere occurrence trouvee n'est
-   pas celle qui gagne — c'est une erreur que ce projet m'a deja apprise. */
-.abo-plaque{
-  background:linear-gradient(145deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
-}
 
 
 /* ⚠ LE LOGO PERD TROIS PIXELS : 26 x 37 devient 23 x 33.
@@ -18961,4 +18958,92 @@ body.sans-topbar .screen{
 .abo-pl-logo{
   width:23px;
   height:33px;
+}
+
+
+/* ⚠ LE BLEU A ETE RETIRE.
+
+   Vous preferez l'argent, et il n'avait de toute façon jamais ete deploye —
+   votre app en ligne portait encore la plaque argentee.
+
+   Les trois couleurs prelevees sur votre image restent notees ici au cas ou
+   vous y reviendriez : #74A4E2 en bas gauche, #4864B0 au centre, #071B7C en
+   haut droite, sur un axe a 45 degres. */
+
+
+
+/* ⚠ RETOUR EXACT A CE QUI EST EN LIGNE.
+
+   J'ai releve les valeurs dans votre depot plutot que de les prelever sur une
+   image : la compression d'une capture decale les couleurs de quelques unites,
+   et j'ai tourne trois fois autour sans tomber juste.
+
+     .abo-plaque   #FBFCFD -> #DDE1E7 (38 %) -> #A9AEB8
+     .abo-pl-logo  23 x 33
+
+   Ces deux regles etaient DEJA dans le fichier, lignes 18949 et 18961. Toutes
+   mes surcharges d'aujourd'hui les ecrasaient. En les retirant, l'etat
+   d'origine revient de lui-meme — rien a reecrire. */
+
+
+
+/* ⚠ LA REGLE DE COULEUR AVAIT ETE SUPPRIMEE, pas seulement surchargee.
+
+   Quand vous m'avez dit « avant c'etait mieux », j'ai retire la ligne
+   `#FBFCFD -> #DDE1E7 -> #A9AEB8` en croyant revenir en arriere. Mais c'est
+   ELLE qui etait en ligne, verifiee dans le depot a la ligne 18949 : le gris
+   chaud d'en dessous n'avait jamais ete visible.
+
+   On la repose. Le logo, lui, est deja bon a 23 x 33. */
+.abo-plaque{
+  background:linear-gradient(145deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE ET LA PAGE MONTENT ENSEMBLE
+
+   ⚠ ILS SE SUCCEDAIENT. La barre s'effaçait sur place, puis la page montait
+     apres un retard de 0,30 s. Deux gestes l'un apres l'autre, alors qu'il
+     n'en faut qu'un.
+
+   ⚠ MEME DUREE, MEME COURBE, AUCUN RETARD. C'est la seule façon d'obtenir un
+     mouvement unique : la moindre difference se voit, parce que l'oeil compare
+     deux objets qui bougent cote a cote.
+
+     0,40 s et `cubic-bezier(0.32, 0.72, 0, 1)` — la courbe des ecrans de
+     l'app, pour que ce mouvement appartienne a la meme famille que les autres.
+
+   ⚠ LA BARRE MONTE EN S'EFFAÇANT. `translateY(-14px)` : elle part dans la
+     meme direction que la page, du meme geste. Quatorze pixels, pas
+     davantage — au-dela on la suit du regard au lieu de regarder ce qui
+     arrive.
+
+   ⚠ ET LE FLOU ACCOMPAGNE LE DEPART. C'est ce que fait iOS quand une vue
+     s'efface : elle perd sa nettete en meme temps que son opacite. Deux
+     pixels suffisent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.topbar{
+  transition:
+    opacity   0.40s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.40s cubic-bezier(0.32, 0.72, 0, 1),
+    filter    0.40s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+body.sans-topbar .topbar{
+  opacity:0;
+  transform:translateX(-50%) translateY(-14px);
+  filter:blur(2px);
+  pointer-events:none;
+  transition:
+    opacity   0.40s cubic-bezier(0.32, 0.72, 0, 1),
+    transform 0.40s cubic-bezier(0.32, 0.72, 0, 1),
+    filter    0.40s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* ⚠ LA PAGE SUIT LE MEME REGLAGE, AU CENTIEME PRES. */
+.screen,
+body.sans-topbar .screen{
+  transition:padding-top 0.40s cubic-bezier(0.32, 0.72, 0, 1) 0s;
 }

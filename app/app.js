@@ -22842,6 +22842,17 @@ function carteOffreNeuve(o, opts = {}) {
   return `
     <div class="abo-carte${enCours ? ' active' : ''}" data-offre-cle="${o.cle}">
 
+      <!-- ⚠ « Votre abonnement » COIFFE LA CARTE ENTIERE.
+
+           Il etait dans la colonne de droite, au-dessus du nom : il ne
+           qualifiait donc que ce nom. Or il qualifie la carte — plaque
+           comprise.
+
+           Sorti du bloc, il court sur toute la largeur et le nom prend sa
+           place : la premiere ligne de la colonne devient le nom de l'offre,
+           qui est ce qu'on vient lire. -->
+      ${enCours ? '<span class="abo-sur">Votre abonnement</span>' : ''}
+
       <div class="abo-haut">
         <!-- ⚠ LA PLAQUE REPREND CELLE DES 14 JOURS. Meme argent froid, meme
              arrondi : deux objets de la meme famille. -->
@@ -22858,7 +22869,6 @@ function carteOffreNeuve(o, opts = {}) {
         </span>
 
         <span class="abo-tx">
-          ${enCours ? '<span class="abo-sur">Votre abonnement</span>' : ''}
           <span class="abo-nom">${escapeHtml(o.nom)}</span>
 
           <!-- ⚠ LE NOMBRE DE MEMBRES REMONTE SOUS LE NOM.
@@ -22958,7 +22968,18 @@ function carteOffreNeuve(o, opts = {}) {
              ⚠ L'ANNEE PASSE EN PREMIER. C'est l'option la moins chere ; la
                mettre en second la ferait paraitre secondaire. -->
           ${enCours
-            ? `<button type="button" class="abo-cta encours" disabled>Offre en cours</button>`
+            ? `<!-- ⚠ « Gerer ou resilier » ENTRE DANS LA CARTE.
+
+                    Elle vivait sous la carte, dans un groupe a part. Mais elle
+                    ne concerne QUE l'abonnement en cours : la poser ailleurs
+                    obligeait a chercher de quoi elle parlait.
+
+                  ⚠ ELLE REMPLACE « Offre en cours », qui etait un bouton mort.
+                    Un bouton desactive occupe la place d'une action sans en
+                    proposer aucune. -->
+               <button type="button" class="abo-cta gerer" data-abo-gerer>
+                 Gérer ou résilier mon abonnement
+               </button>`
             : surDevis
               ? `<button type="button" class="abo-cta" data-offre="${o.cle}">Nous contacter</button>`
               : `<div class="abo-achats">
@@ -23279,31 +23300,14 @@ window.renderAbonnements = function() {
 
      Elle n'apparaît que si l'on paie vraiment. Sans abonnement, « résilier »
      n'a rien à résilier, et le portail Stripe répondrait en erreur. */
+  /* ⚠ LE BLOC « Gerer ou resilier » A QUITTE CETTE PLACE.
+
+     Il est maintenant dans le tiroir de la carte en cours — la ou l'on est
+     quand on veut resilier. On vide la zone plutot que de retirer la balise :
+     elle sert de repere si vous voulez y remettre autre chose. */
   const gerer = document.getElementById('abo-gerer')
-  if (gerer) {
-    gerer.innerHTML = estActuelle ? `
-      <div class="reg-groupe">
-        <button type="button" class="reg-ligne" data-abo-gerer>
-          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none">
-            <!-- ⚠ #7FB6F2, LA COULEUR DU BOUTON « Votre abonnement actuel ».
+  if (gerer) gerer.innerHTML = ''
 
-                 Le degrade des coches allait du blanc au bleu : sur une ligne
-                 de reglage posee sur fond clair, sa pointe blanche
-                 disparaissait. Cette ligne parle du meme sujet que le bouton
-                 de la carte — elles portent donc la meme couleur.
-
-                 ⚠ AUCUN ACCENT GRAVE ICI : ce commentaire est DANS un gabarit
-                   delimite par des accents graves. C'est la quatrieme fois. -->
-            <path d="M4 7.4h9M17.4 7.4h2.6M4 16.6h2.6M11 16.6h9"
-                  stroke="#7FB6F2" stroke-width="1.9" stroke-linecap="round"/>
-            <circle cx="15.2" cy="7.4" r="2.4" stroke="#7FB6F2" stroke-width="1.9"/>
-            <circle cx="8.8" cy="16.6" r="2.4" stroke="#7FB6F2" stroke-width="1.9"/>
-          </svg></span>
-          <span class="reg-nm">G\u00e9rer ou r\u00e9silier mon abonnement</span>
-          <span class="fl">\u203a</span>
-        </button>
-      </div>` : ''
-  }
 
   /* UN SEUL ENFANT DANS LA LISTE. Le repli se fait en passant la hauteur de
      `0fr` à `1fr` — une bascule qui suppose une seule piste. Avec une carte par

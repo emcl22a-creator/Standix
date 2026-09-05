@@ -18708,3 +18708,115 @@ body.sans-topbar .screen{
 @media (prefers-reduced-motion: reduce){
   .abo-pied, .abo-pied-d svg{ transition:none; }
 }
+
+
+/* ⚠ LA DATE DE RENOUVELLEMENT SE POSE SOUS LES MEMBRES.
+
+   Les deux lignes forment le bas de la colonne : combien de gens, et jusqu'a
+   quand. `space-between` les tient ensemble contre le bas de la plaque. */
+.abo-renouv{
+  display:block;
+  margin-top:4px;
+  font-size:12px;
+  color:var(--label-3);
+}
+
+/* ⚠ LE GROUPE DU BAS. Sans lui, `space-between` ecarterait les membres de la
+   date — trois elements se repartiraient au lieu de deux. */
+.abo-tx .abo-membres{ margin-bottom:0; }
+
+
+/* ⚠ L'ECART NOM / MEMBRES PASSE DE 30 A 18 PX.
+
+   Il venait de `space-between` : la colonne s'etirait sur la hauteur de la
+   plaque et repartissait tout l'espace disponible entre les deux lignes.
+
+   On garde l'alignement — le nom en haut, la date en bas — mais on colle les
+   membres au nom : les deux disent la meme chose, quelle offre pour combien
+   de gens.
+
+ ⚠ C'EST LA DATE QUI DESCEND, seule. Un `margin-top:auto` la pousse en bas
+   sans ecarter ce qui la precede. */
+.abo-tx{ justify-content:flex-start; }
+.abo-tx .abo-membres{ margin-top:5px; }
+.abo-renouv{ margin-top:auto; padding-top:6px; }
+
+/* ⚠ LE LOGO PERD DEUX PIXELS. A 28 de large il touchait presque les bords de
+   sa plaque ; a 26 il respire, et le rapport 0,70 est conserve. */
+.abo-pl-logo{
+  width:26px;
+  height:37px;
+}
+
+
+/* ⚠ L'ANIMATION D'ARRIVEE DES CARTES EST RETIREE.
+
+   Elles montaient une par une, avec un retard croissant. C'etait juste quand
+   la liste se depliait sur un clic : le mouvement accompagnait le geste.
+
+   Maintenant qu'elles sont visibles d'emblee, cinq cartes qui remontent a
+   l'ouverture de la page font une agitation sans cause. */
+#abo-liste .offre-carte,
+#abo-liste .abo-carte,
+#abo-liste.ouvert .offre-carte,
+#abo-liste.ouvert .abo-carte{
+  animation:none !important;
+}
+
+/* ═══ LE PIED CEDE LA PLACE AU DETAIL ═══
+
+   ⚠ IL RESTAIT VISIBLE SOUS LE TIROIR OUVERT : le prix y paraissait deux fois,
+     une fois dans la ligne, une fois en grand dans le detail.
+
+     Ouvert, le pied s'efface et le tiroir prend sa hauteur. La carte ne montre
+     qu'une chose a la fois.
+
+   ⚠ ON ANIME LA HAUTEUR, pas seulement l'opacite. Un pied invisible mais
+     present laisserait un blanc de cinquante pixels sous le detail. */
+.abo-pied{
+  overflow:hidden;
+  max-height:60px;
+  transition:
+    max-height 0.30s cubic-bezier(0.32, 0.72, 0, 1),
+    opacity    0.20s ease-out,
+    padding    0.30s cubic-bezier(0.32, 0.72, 0, 1),
+    border-color 0.20s ease-out;
+}
+
+.abo-pied.ouvert{
+  max-height:0;
+  opacity:0;
+  padding-top:0; padding-bottom:0;
+  border-top-color:transparent;
+  pointer-events:none;
+}
+
+/* ⚠ LE DETAIL PREND SA PLACE, avec sa propre bordure haute — celle que le
+   pied portait. Sans elle, le tiroir flotterait sous la carte. */
+.abo-tiroir.ouvert .abo-tiroir-in{
+  border-top:0.5px solid rgba(28,28,38,0.09);
+  margin:0 -18px;
+  padding:18px 18px 20px;
+}
+
+/* ⚠ ET LES LIGNES DU DETAIL RESPIRENT DAVANTAGE. Vous les trouviez tassees :
+   quatre pixels de plus par ligne, et la plaque s'aere. */
+.abo-inclus{ gap:13px; padding:16px 14px; }
+.abo-li span{ font-size:14px; line-height:1.45; }
+.abo-annee{ margin-top:13px; padding:11px 13px; }
+.abo-prix{ padding-top:2px; }
+
+
+/* ⚠ LE BOUTON « Réduire », au bas du tiroir.
+
+   Discret : il ne doit pas rivaliser avec les deux boutons d'achat juste
+   au-dessus. Un texte gris et un chevron suffisent. */
+.abo-fermer{
+  display:flex; align-items:center; justify-content:center; gap:5px;
+  width:100%; margin-top:12px; padding:9px 0;
+  border:none; background:none;
+  font-family:inherit; font-size:12.5px; font-weight:600;
+  color:var(--label-3);
+}
+.abo-fermer svg{ width:14px; height:14px; }
+.abo-fermer:active{ transform:scale(0.98); }

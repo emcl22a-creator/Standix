@@ -17783,3 +17783,123 @@ body.sans-topbar .topbar::after{
   -webkit-backdrop-filter:blur(14px) saturate(1.8) !important;
   backdrop-filter:blur(14px) saturate(1.8) !important;
 }
+
+
+/* ⚠ LA SILHOUETTE DU BOUTON PROFIL PASSE AU NOIR.
+
+   Elle etait en `--label-2`, un gris moyen — la couleur d'un texte secondaire.
+   C'etait juste sur le rond gris d'avant : le dessin devait rester discret sur
+   un fond deja marque.
+
+   Sur le rond blanc, ce gris la fait paraitre eteinte, alors que le `+` d'en
+   face est noir. Deux boutons identiques doivent porter le meme poids. */
+.tb-silhouette{
+  color:var(--label);
+}
+
+
+/* ⚠ JE M'ETAIS TROMPE DE DIMENSION.
+
+   Vous demandiez de reduire la HAUTEUR ; j'ai reduit la largeur. Le voile
+   faisait 350 px sur un ecran de 390 — deux bandes nettes de chaque cote — et
+   descendait a 74 px, dix de plus que la barre.
+
+   On rend la pleine largeur, et l'on remonte le bas de six pixels : le voile
+   s'arrete a 68 px, juste sous les boutons qui finissent a 64. */
+.topbar::after{
+  width:100vw !important;
+  bottom:-4px !important;
+}
+
+
+/* ═══ LES HALOS PASSENT DERRIERE LA CARTE ═══
+
+   ⚠ ILS ETAIENT DEDANS. `::before` est un enfant de la carte, et `overflow:
+     hidden` le coupait a ses bords : les taches coloraient l'interieur, sous
+     le nom et le prix.
+
+     Sur la reference, la carte est blanche d'un bout a l'autre et les halos
+     debordent AUTOUR — ils l'eclairent depuis l'exterieur.
+
+   ⚠ ON RETIRE `overflow:hidden` ET L'ON SORT LES HALOS. `inset:-30px` les fait
+     depasser de trente pixels de chaque cote ; `z-index:-1` les place sous la
+     carte, qui redevient opaque.
+
+   ⚠ ET LA CARTE DOIT ETRE OPAQUE, sinon les halos transparaitraient au travers
+     — c'est deja le cas, `#FFFFFF` en dur. */
+#p-abonnement .offre-carte,
+#p-abonnement .offre-carte.vedette{
+  overflow:visible !important;
+  isolation:auto !important;
+}
+
+#p-abonnement .offre-carte::before,
+#p-abonnement .offre-carte.vedette::before{
+  inset:-30px !important;
+  width:auto !important;
+  height:auto !important;
+  z-index:-1 !important;
+  border-radius:44px !important;
+  filter:blur(38px) !important;
+}
+
+/* ⚠ LES HALOS SE REPARTISSENT SUR LE POURTOUR, plus en haut seulement.
+
+   Trois taches : une en haut a gauche, une a droite, une en bas. C'est ce que
+   montre la reference — la lueur fait le tour, elle ne coiffe pas la carte. */
+#p-abonnement .offre-carte::before{
+  background:
+    radial-gradient(46% 40% at 14% 16%, rgba(31,76,238,0.46), transparent 72%),
+    radial-gradient(42% 38% at 88% 30%, rgba(72,153,236,0.40), transparent 72%),
+    radial-gradient(50% 34% at 50% 96%, rgba(124,58,237,0.36), transparent 72%) !important;
+}
+
+#p-abonnement .offre-carte[data-offre-cle="essentiel"]::before,
+#p-abonnement .offre-carte.vedette[data-offre-cle="essentiel"]::before{
+  background:
+    radial-gradient(46% 40% at 12% 16%, rgba(124,58,237,0.50), transparent 72%),
+    radial-gradient(42% 38% at 90% 28%, rgba(167,110,247,0.44), transparent 72%),
+    radial-gradient(50% 34% at 50% 96%, rgba(88,28,180,0.40), transparent 72%) !important;
+}
+
+
+/* ═══ LES HALOS DEVIENNENT DES OMBRES COLOREES ═══
+
+   ⚠ LE PSEUDO-ELEMENT NE POUVAIT PAS PASSER DESSOUS.
+
+     La carte porte `z-index:1`, ce qui cree un contexte d'empilement. Un enfant
+     a `z-index:-1` reste DANS ce contexte : il passe derriere le contenu, mais
+     au-dessus du fond de la carte. D'ou la teinte a l'interieur, malgre le
+     blanc opaque.
+
+     Retirer le `z-index` de la carte reglerait le symptome et en creerait un
+     autre : elle passerait derriere ses voisines.
+
+   ⚠ TROIS OMBRES PORTEES FONT LE MEME TRAVAIL, et par construction elles sont
+     DEHORS. Chacune est decalee dans une direction, tres floue, sans etalement
+     — c'est exactement la lueur de la reference.
+
+   ⚠ ET LE PSEUDO-ELEMENT DISPARAIT. Le laisser ajouterait une couche invisible
+     qui compliquerait la lecture du fichier. */
+#p-abonnement .offre-carte::before,
+#p-abonnement .offre-carte.vedette::before{
+  display:none !important;
+}
+
+#p-abonnement .offre-carte{
+  box-shadow:
+    -22px -14px 46px -18px rgba(31,76,238,0.42),
+     26px  -8px 46px -18px rgba(72,153,236,0.38),
+      0px  26px 50px -22px rgba(124,58,237,0.34),
+      0 1px 2px rgba(20,20,30,0.05),
+      0 18px 40px -26px rgba(20,20,30,0.20) !important;
+}
+
+#p-abonnement .offre-carte[data-offre-cle="essentiel"]{
+  box-shadow:
+    -22px -14px 46px -18px rgba(124,58,237,0.46),
+     26px  -8px 46px -18px rgba(167,110,247,0.42),
+      0px  26px 50px -22px rgba(88,28,180,0.36),
+      0 1px 2px rgba(20,20,30,0.05),
+      0 18px 40px -26px rgba(20,20,30,0.20) !important;
+}

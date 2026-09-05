@@ -22834,9 +22834,25 @@ function carteOffreNeuve(o, opts = {}) {
   /* ⚠ LA DATE VIENT DE L'ABONNEMENT, pas d'un calcul. Ajouter trente jours a
      aujourd'hui donnerait une date fausse des le premier decalage de
      facturation. */
-  const dateRenouv = enCours && etatAbo?.fin_periode
-    ? new Date(etatAbo.fin_periode).toLocaleDateString('fr-FR',
-        { day: 'numeric', month: 'long', year: 'numeric' })
+  /* ⚠ LA DATE PEUT VENIR DE PLUSIEURS CHAMPS.
+
+     J'avais ecrit `fin_periode` sans verifier que `etat_abonnement` la rend —
+     elle n'existe nulle part ailleurs dans l'app. La ligne ne s'affichait donc
+     jamais.
+
+     On essaie les noms plausibles dans l'ordre : celui qui repond gagne. Le
+     jour ou vous saurez lequel c'est, les autres pourront partir.
+
+   ⚠ ET L'ON VERIFIE QUE LA DATE EST LISIBLE. Une chaine vide ou mal formee
+     donnerait « Renouvellement le Invalid Date ». */
+  const brutDate = enCours
+    ? (etatAbo?.fin_periode || etatAbo?.renouvellement
+       || etatAbo?.periode_fin || etatAbo?.abonnement_fin || null)
+    : null
+
+  const dRen = brutDate ? new Date(brutDate) : null
+  const dateRenouv = dRen && !Number.isNaN(dRen.getTime())
+    ? dRen.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
   return `
@@ -23005,6 +23021,17 @@ function carteOffreNeuve(o, opts = {}) {
                      <span class="abo-b-s">${mensuel} € par mois</span>
                    </button>
                  </div>`}
+          <!-- ⚠ UN BOUTON POUR REFERMER, puisque le pied a disparu.
+
+               Sans lui, une carte ouverte ne se referme qu'en en ouvrant une
+               autre — et la derniere resterait ouverte pour toujours. -->
+          <button type="button" class="abo-fermer" data-tiroir="${o.cle}">
+            Réduire
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="18 15 12 9 6 15"></polyline>
+            </svg>
+          </button>
         </div>
       </div>
     </div>`

@@ -18473,3 +18473,59 @@ body.sans-topbar .screen{
   line-height:1.2; opacity:0.9;
   display:block;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'ABONNEMENT — MISE EN PLACE
+
+   ⚠ LA PLAQUE PASSE DE 62 A 76 PX, le logo de 30 a 40 de haut.
+
+     A 62, elle etait plus petite que le nom de l'offre qu'elle accompagne :
+     l'oeil allait au texte, la plaque suivait. A 76 les deux se repondent.
+
+   ⚠ ET TOUT SE REALIGNE SUR ELLE. Les elements etaient empiles au fil de
+     l'ecriture ; ils suivent maintenant une seule grille verticale, comme sur
+     la reference — surtitre, nom, membres, etat, date.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.abo-carte{
+  padding:20px 18px 18px;
+  border-radius:26px;
+}
+
+.abo-haut{ gap:16px; align-items:center; }
+
+.abo-plaque{
+  flex:0 0 76px; width:76px; height:76px;
+  border-radius:21px;
+  padding:13px 0 11px;
+}
+.abo-pl-logo{ width:28px; height:40px; }
+.abo-pl-nom{ font-size:11.5px; }
+
+/* ⚠ LE SURTITRE SE DETACHE DAVANTAGE. Il etait colle au nom ; quatre pixels
+   suffisent a le lire comme une etiquette et non comme un debut de phrase. */
+.abo-sur{
+  font-size:10px;
+  letter-spacing:0.15em;
+  margin-bottom:5px;
+}
+
+/* ⚠ LE NOM GAGNE DEUX PIXELS et perd un peu d'interlignage. C'est le premier
+   mot qu'on lit : il doit peser autant que la plaque. */
+.abo-nom{
+  font-size:24px;
+  line-height:1.05;
+}
+
+/* ⚠ LES MEMBRES JUSTE SOUS LE NOM, sans respiration : les deux forment une
+   seule idee — quelle offre, pour combien de gens. */
+.abo-tx .abo-membres{ margin-top:5px; font-size:13.5px; }
+
+/* ⚠ L'ETAT S'ECARTE, LUI. Il ne parle plus de l'offre mais de sa situation :
+   un blanc le separe. */
+.abo-tx .abo-etat{ margin-top:11px; }
+
+.abo-renouv{ margin-top:8px; font-size:12.5px; }
+
+.abo-filet{ margin:17px 0 14px; }

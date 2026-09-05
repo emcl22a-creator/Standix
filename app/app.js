@@ -22816,6 +22816,21 @@ function carteOffreNeuve(o, opts = {}) {
             <i></i>${enCours ? 'Actif' : 'Non souscrit'}
           </span>
 
+          <!-- ⚠ LE NOMBRE DE MEMBRES REMONTE SOUS LE NOM.
+
+               Il etait en bas, apres le filet, a cote du bouton. Mais c'est ce
+               qui distingue une offre d'une autre : il doit se lire avec le nom,
+               pas dans la ligne d'action. -->
+          <span class="abo-membres">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
+              <path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/>
+              <path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/>
+            </svg>
+            <span class="abo-m-tx">Jusqu’à <b>${o.max} membres</b></span>
+          </span>
+
           ${dateRenouv
             ? `<span class="abo-renouv">Renouvellement le ${dateRenouv}</span>`
             : ''}
@@ -22825,16 +22840,6 @@ function carteOffreNeuve(o, opts = {}) {
       <div class="abo-filet"></div>
 
       <div class="abo-bas">
-        <span class="abo-membres">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/>
-            <path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/>
-            <path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/>
-          </svg>
-          <span class="abo-m-tx">Jusqu’à <b>${o.max} membres</b></span>
-        </span>
-
         <button type="button" class="abo-detail-btn" data-tiroir="${o.cle}"
                 aria-expanded="false">
           Voir les détails
@@ -22876,20 +22881,41 @@ function carteOffreNeuve(o, opts = {}) {
               `En <b>français, anglais et allemand</b>`,
               `<b>Toutes</b> les fonctionnalités`,
             ].map(t => `<div class="abo-li">
+                <!-- ⚠ LA COCHE SEULE, SANS CERCLE.
+
+                     Un rond vert autour d'une coche verte repete le signe : la
+                     coche dit deja « inclus ». Le cercle n'ajoutait qu'une
+                     tache de couleur a chaque ligne. -->
                 <svg viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="11" fill="rgba(52,199,89,0.12)"
-                          stroke="rgba(30,158,67,0.32)" stroke-width="1"/>
-                  <path d="M7.6 12.3l3 3 5.8-6.4" stroke="url(#cocheOffre)"
-                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#cocheOffre)"
+                        stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <span>${t}</span>
               </div>`).join('')}
           </div>
 
-          <button type="button" class="abo-cta${enCours ? ' encours' : ''}"
-                  ${enCours ? 'disabled' : ''} data-offre="${o.cle}">
-            ${enCours ? 'Offre en cours' : (surDevis ? 'Nous contacter' : `Choisir · ${mensuel} € par mois`)}
-          </button>
+          <!-- ⚠ DEUX BOUTONS, PAS UN AVEC UN CHOIX AILLEURS.
+
+               Le rythme se decidait par un segment en haut de page, loin de
+               l'offre. Deux boutons posent la question au moment ou l'on
+               choisit, et chacun porte son prix : rien a calculer.
+
+             ⚠ L'ANNEE PASSE EN PREMIER. C'est l'option la moins chere ; la
+               mettre en second la ferait paraitre secondaire. -->
+          ${enCours
+            ? `<button type="button" class="abo-cta encours" disabled>Offre en cours</button>`
+            : surDevis
+              ? `<button type="button" class="abo-cta" data-offre="${o.cle}">Nous contacter</button>`
+              : `<div class="abo-achats">
+                   <button type="button" class="abo-cta" data-offre="${o.cle}" data-rythme="annuel">
+                     <span class="abo-b-t">Par an</span>
+                     <span class="abo-b-s">${annuelMois} € par mois</span>
+                   </button>
+                   <button type="button" class="abo-cta second" data-offre="${o.cle}" data-rythme="mensuel">
+                     <span class="abo-b-t">Par mois</span>
+                     <span class="abo-b-s">${mensuel} € par mois</span>
+                   </button>
+                 </div>`}
         </div>
       </div>
     </div>`

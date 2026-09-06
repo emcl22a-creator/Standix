@@ -19129,13 +19129,19 @@ body.sans-topbar .screen.active{
 
   /* ⚠ ELLE MONTE DE 58 PX. La barre finit a 68 : la feuille s'arrete dix
      pixels au-dessus du logo, assez pour le couvrir sans coller au bord. */
-  /* ⚠ 62 PX PLUTOT QUE 44. Le contenu commençait a 42 px du haut de l'ecran,
-     trop haut : sur un iPhone, la barre d'etat et l'encoche occupent deja les
-     premiers pixels, et le bouton retour venait s'y coller.
+  /* ⚠ LE CONTENU REVIENT A 44 PX. J'avais descendu le contenu alors que vous
+     parliez du BORD de la feuille. */
+  padding-top:44px;
 
-     La feuille couvre toujours la barre — elle demarre a 0 — c'est seulement
-     son contenu qui descend. */
-  padding-top:62px;
+  /* ⚠ LA FEUILLE S'ARRETE A 14 PX DU HAUT.
+
+     Elle montait jusqu'au bord de l'ecran : son arrondi ne se voyait pas, et
+     rien ne disait qu'elle etait posee sur autre chose.
+
+     Mesure : les deux boutons de la barre commencent a 17 px. En s'arretant a
+     14, la feuille les couvre encore entierement — il ne reste au-dessus que
+     du fond vide. */
+  margin-top:14px;
 
   /* ⚠ ET ELLE DEBORDE SUR LES COTES, pour que ses coins arrondis se voient
      jusqu'au bord de l'ecran. */
@@ -19150,6 +19156,7 @@ body.sans-topbar .screen.active{
 .screen.active{
   transition:
     padding-top   0.44s cubic-bezier(0.32, 0.72, 0, 1),
+    margin-top    0.44s cubic-bezier(0.32, 0.72, 0, 1),
     border-radius 0.44s cubic-bezier(0.32, 0.72, 0, 1),
     box-shadow    0.44s cubic-bezier(0.32, 0.72, 0, 1);
 }

@@ -11060,8 +11060,21 @@ function animerApparition(el, rang = 0) {
     el.classList.add('vu')
     return
   }
+  /* ⚠ PLUS DE CASCADE DANS UN DOSSIER OUVERT.
+
+     Chaque carte attendait 45 ms de plus que la precedente, jusqu'a six : la
+     derniere arrivait un quart de seconde apres la premiere. On voyait la page
+     se construire au lieu de la voir.
+
+     Sur une liste longue, ce decalage a du sens — il accompagne le
+     defilement. Sur un dossier qui s'ouvre, tout est deja visible : les cartes
+     doivent etre la ensemble.
+
+   ⚠ LES CARTES HORS DE L'ECRAN GARDENT LEUR RETARD. `rang` compte depuis le
+     haut ; au-dela de la sixieme, on est en bas de l'ecran ou plus loin, et
+     l'apparition progressive redevient juste. */
   el.classList.add('cl-apparait')
-  el.style.setProperty('--retard', `${Math.min(rang, 6) * 45}ms`)
+  el.style.setProperty('--retard', rang < 6 ? '0ms' : `${(rang - 5) * 45}ms`)
   _observateurApparition.observe(el)
 }
 

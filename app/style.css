@@ -20499,3 +20499,26 @@ body.sans-topbar #e-category.active.feuille-arrive{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ⚠ LE FLOU S'ETOFFE SANS CHANGER LE GESTE.
+
+   Il valait 2 px et se dissipait a 35 % — il accompagnait la montee sans se
+   voir. Vous le voulez plus present, mais calme.
+
+   Six pixels, et il s'attarde jusqu'a 55 % au lieu de 35 : la page se precise
+   pendant plus de la moitie du trajet, au lieu d'etre deja nette a peine
+   partie.
+
+ ⚠ LA MONTEE ET L'OPACITE NE CHANGENT PAS. C'est ce que vous vouliez retrouver
+   d'avant-hier ; seul le flou est retouche.
+
+ ⚠ ET L'OPACITE FINIT AVANT LUI — a 35 %, comme avant. La page devient opaque
+   puis se precise, dans cet ordre : c'est ce qui rend le flou perceptible au
+   lieu de le noyer dans un fondu. */
+@keyframes ecranEntre{
+  0%  { opacity:0; transform:translateY(12px); filter:blur(6px); }
+  35% { opacity:1; }
+  55% { filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}

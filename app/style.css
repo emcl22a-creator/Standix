@@ -20522,3 +20522,90 @@ body.sans-topbar #e-category.active.feuille-arrive{
   55% { filter:blur(0px); }
   100%{ opacity:1; transform:none; filter:blur(0px); }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FEUILLE RESTE EN PLACE, SEUL SON CONTENU DEFILE
+
+   ⚠ ELLE REMONTAIT AVEC LA PAGE. Mesure : son bord passait de 14 px a 0 des
+     qu'on faisait glisser — parce que c'est la FENETRE qui defile, et la
+     feuille vit dedans.
+
+     On voyait donc le liseré du haut disparaitre sous la barre, puis revenir.
+
+   ⚠ ON LA FIGE ET L'ON FAIT DEFILER SON INTERIEUR. Meme principe que la page
+     des dossiers, qu'on avait deja traitee : hauteur fixe, `overflow:hidden`,
+     et un enfant qui prend ce qui reste.
+
+   ⚠ `#p-category` EST DEJA FAIT — sa liste defile seule depuis plusieurs
+     tours. Ne restent que les trois autres.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#p-analyse.active,
+#p-create-video.active,
+#p-create-manual.active{
+  height:calc(100dvh - 14px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+
+  /* ⚠ ET LE REMBOURRAGE BAS RESTE DEDANS. Sans lui, la derniere carte
+     passerait sous la barre du bas. */
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 96px);
+}
+
+/* ⚠ LE BORD ARRONDI DOIT SUIVRE. Un conteneur qui defile coupe ce qui depasse :
+   sans `border-radius` sur lui-meme, les coins du haut disparaitraient. */
+body.sans-topbar #p-analyse.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active{
+  border-radius:22px 22px 0 0;
+}
+
+
+/* ⚠ ET LA FENETRE NE DOIT PLUS DEFILER DU TOUT.
+
+   Les feuilles font maintenant defiler leur interieur — mais la fenetre le
+   pouvait encore, et c'est elle qui deplaçait le bord.
+
+   `overflow:hidden` sur le corps quand une feuille est ouverte : il n'y a plus
+   qu'un seul defilement possible, celui de la feuille.
+
+ ⚠ ON NE POSE PAS `position:fixed`. Un corps en `fixed` sort du flux et le
+   navigateur calcule mal ou sont les elements — les boutons repondent au
+   deuxieme ou troisieme doigt. C'est un piege deja rencontre sur `e-detail`,
+   et le commentaire de cette regle le documente. */
+body.sans-topbar{
+  overflow:hidden;
+  height:100dvh;
+}
+
+
+/* ⚠ LE FLOU N'ETAIT VISIBLE QUE 50 MS SUR 340.
+
+   Mesure image par image : 6,0 puis 2,6 puis 1,2 puis 0,4 — sous le seuil du
+   perceptible des la quatrieme image. J'ai passe deux tours a monter sa valeur
+   de depart sans comprendre que le probleme etait sa DISPARITION.
+
+   La cause est `cubic-bezier(0.32, 0.72, 0, 1)`, la courbe de l'ecran : elle
+   parcourt les trois quarts de sa course dans le premier quart du temps. Bonne
+   pour un deplacement — on arrive vite, on se pose — mais elle efface un flou
+   avant qu'on l'ait vu.
+
+ ⚠ LE FLOU PREND SA PROPRE COURBE. `animation-timing-function` dans une etape
+   vaut pour le segment qui suit : on met `linear` sur la premiere pour que le
+   flou decroisse regulierement, pendant que la montee garde la sienne.
+
+ ⚠ ET IL S'ETEND JUSQU'A 70 %. A 0,34 s, cela fait 240 ms de flou perceptible
+   au lieu de 50. */
+@keyframes ecranEntre{
+  0%{
+    opacity:0;
+    transform:translateY(12px);
+    filter:blur(6px);
+    animation-timing-function:linear;
+  }
+  35%{ opacity:1; }
+  70%{ filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}

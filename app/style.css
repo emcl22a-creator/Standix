@@ -19232,3 +19232,20 @@ body.sans-topbar #e-detail.active{
   height:calc(100dvh - 14px);
   padding-top:30px;
 }
+
+
+/* ⚠ ET `ecranEntre` PAR SA TROISIEME PORTE.
+
+   Ma regle `body.feuille-figee .screen.active` ne prend pas : l'animation est
+   posee sur `.screen.active` sans le corps, et les deux selecteurs ont le meme
+   poids — c'est le dernier ecrit qui gagne, pas le plus precis.
+
+   On ajoute le `!important` et l'on vise aussi l'ecran qui n'a pas encore
+   `active` au moment ou l'animation demarre. */
+body.feuille-figee .screen,
+body.feuille-figee .screen.active,
+body.feuille-figee .screen.active.nait,
+body.feuille-figee .screen.fondu{
+  animation:none !important;
+  transition:none !important;
+}

@@ -7210,8 +7210,18 @@ function activerAvecNaissance(ecran) {
      compte — celle qui declenche l'animation. */
   /* ⚠ ON NE COUPE PAS QUAND LA FEUILLE ARRIVE. `animation:none` en ligne
      l'emporte sur tout, y compris sur `feuilleArrive`. */
-  ecran.style.animation = (entreFeuilles && !(!veniantFeuille && versFeuille))
-    ? 'none' : ''
+  /* ⚠ LA CONSIGNE RESTE POSEE, on ne la vide plus.
+
+     Mesure : `pageFlou` demarrait quand meme sur la procedure. La cause est le
+     `''` de la branche negative — il efface `animation:none` de l'ecran
+     precedent au moment ou celui-ci vient d'etre pose.
+
+     On ne remet la propriete a vide que lorsqu'on en a besoin : quand la
+     feuille arrive, ou sur une page ordinaire. */
+  /* ⚠ PLUS DE CONSIGNE EN LIGNE. C'est le CSS qui decide, par une regle qui
+     vise les six ecrans-feuilles nommement. Le script ne pose plus que la
+     classe `feuille-arrive` quand il y a lieu. */
+  ecran.style.removeProperty('animation')
 
   /* ⚠ LA FEUILLE S'ANNONCE QUAND ELLE ARRIVE DE NULLE PART.
 
@@ -7224,7 +7234,18 @@ function activerAvecNaissance(ecran) {
   if (!veniantFeuille && versFeuille) {
     void ecran.offsetWidth
     ecran.classList.add('feuille-arrive')
-    setTimeout(() => ecran.classList.remove('feuille-arrive'), 500)
+
+    /* ⚠ ON NE RETIRE PLUS LA CLASSE APRES COUP.
+
+       Mesure : `feuilleArrive` finissait a 9074 ms, et `pageFlou` demarrait a
+       9157 — juste apres. En retirant la classe, `.screen.active` reprenait la
+       main et son animation partait a son tour.
+
+       Deux animations d'affilee, la seconde inutile.
+
+     ⚠ ELLE SE RETIRE A LA PROCHAINE NAVIGATION, en tete de cette meme
+       fonction : `ecran.classList.remove('feuille-arrive')` s'execute avant
+       qu'on decide s'il faut la reposer. Elle ne reste donc jamais coincee. */
   }
 
   ecran.classList.add('active')
@@ -7383,6 +7404,9 @@ let degelFeuille = null
    plus le deduire du corps : la classe a deja change quand elle s'execute. */
 let etaitFeuille = false
 
+/* ⚠ LE MINUTEUR DU RETOUR, distinct de celui du degel entre feuilles. */
+let degelRetour = null
+
 const CARREFOURS = new Set(['p-settings', 'p-profil', 'e-profil'])
 
 function retourVersMere() {
@@ -7400,6 +7424,22 @@ function majBarreHaute(id) {
      C'est pour cela que l'animation d'ouverture ne partait jamais : la
      condition « je ne venais pas d'une feuille » etait toujours fausse. */
   etaitFeuille = document.body.classList.contains('sans-topbar')
+
+  /* ⚠ ON MARQUE LE RETOUR ICI, pas dans `activerAvecNaissance`.
+
+     Cette derniere s'execute trop tard : l'animation est deja lancee quand
+     elle pose la classe. `majBarreHaute` est la premiere ligne de la
+     navigation — c'est le seul endroit sur.
+
+     Quitter une feuille vers une page ordinaire : la feuille redescend, la
+     page ne doit rien faire de plus. */
+  const retourDeFeuille = etaitFeuille && !ECRANS_PLEIN_ECRAN.has(id)
+  document.body.classList.toggle('retour-de-feuille', retourDeFeuille)
+  if (retourDeFeuille) {
+    clearTimeout(degelRetour)
+    degelRetour = setTimeout(() =>
+      document.body.classList.remove('retour-de-feuille'), 500)
+  }
 
   /* ⚠ ON MEMORISE AVANT DE PARTIR. Si l'ecran qu'on quitte est un carrefour,
      c'est vers lui que le retour ramenera. */

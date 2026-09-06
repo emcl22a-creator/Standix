@@ -7053,6 +7053,23 @@ document.addEventListener('click', (e) => {
 function ouvrirDepuisCarte(ecran) {
   if (!ecran) return
   ecran.classList.remove('nait')
+
+  /* ⚠ PAS DE NAISSANCE ENTRE DEUX FEUILLES.
+
+     Cette animation fait grandir l'ecran depuis la carte touchee. Elle a du
+     sens quand une page s'ouvre par-dessus une autre — mais entre deux
+     feuilles, la feuille est deja en place : on la voit se remettre en
+     position, et c'est exactement ce qui vous derange.
+
+   ⚠ J'AVAIS COUPE `ecranEntre` PAR LE CSS, mais elle revient ici par une
+     seconde voie : la classe `nait` la repose avec une origine calculee. Deux
+     chemins pour la meme animation. */
+  if (document.body.classList.contains('sans-topbar')
+      && ECRANS_PLEIN_ECRAN.has(ecran.id)) {
+    origineOuverture = null
+    return
+  }
+
   if (!origineOuverture) return
   ecran.style.setProperty('--ox', origineOuverture.x)
   ecran.style.setProperty('--oy', origineOuverture.y)

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=01cbeb75">
+<link rel="stylesheet" href="style.css?v=62d60644">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2606,17 +2606,12 @@
 
     <div class="ac-chiffres" id="an-chiffres"></div>
 
-    <div class="ac-sect">
-      <div class="ac-bloc">
-        <div class="ac-bloc-t">
-          <span class="ac-eti"><i style="background:#3073C3"></i>Évolution des lectures</span>
-          <span class="ac-q" id="an-lect-total">—</span>
-        </div>
-        <div class="an-graph" id="an-graph-lectures"></div>
-      </div>
-    </div>
+    <!-- ⚠ « Temps passé » PASSE AVANT « Évolution des lectures ».
 
-    <div class="ac-sect">
+           Les deux graphiques se suivaient dans l'ordre inverse. Le temps
+           passe est la mesure la plus parlante — combien de temps l'equipe
+           consacre aux procedures — et merite d'ouvrir la section. -->
+      <div class="ac-sect">
       <div class="ac-bloc">
         <div class="ac-bloc-t">
           <span class="ac-eti"><i style="background:#6F47BB"></i>Temps passé sur les procédures</span>
@@ -2633,6 +2628,16 @@
         </div>
         <div class="an-graph" id="an-graph-temps"></div>
         <p class="an-note">Seuls les membres de l’espace Utilisateur sont comptés.</p>
+      </div>
+    </div>
+
+    <div class="ac-sect">
+      <div class="ac-bloc">
+        <div class="ac-bloc-t">
+          <span class="ac-eti"><i style="background:#3073C3"></i>Évolution des lectures</span>
+          <span class="ac-q" id="an-lect-total">—</span>
+        </div>
+        <div class="an-graph" id="an-graph-lectures"></div>
       </div>
     </div>
 
@@ -2704,7 +2709,7 @@
        et la liste deviendrait trop longue pour qu'on la parcoure. -->
   <div class="screen" inert id="p-activites">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-list')" aria-label="Retour">
+      <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
       <h1 class="pagehead">Mouvements de l’équipe</h1>
@@ -3053,13 +3058,11 @@
   </div>
 
   <div class="screen" inert id="p-settings">
-    <!-- ⚠ L'ESSAI PASSE AU-DESSUS DU TITRE.
+    <!-- ⚠ LE BANDEAU D'ESSAI A QUITTE CETTE PAGE.
 
-           Il etait sous « Reglages », entre le titre et les groupes. C'est ce
-           qu'on veut voir en premier — et c'est aussi ce qui decide si l'app
-           reste utilisable. Le titre, lui, ne dit rien qu'on ne sache deja en
-           ayant touche l'onglet. -->
-        <div id="essai-reglages" class="alerte-essai" style="display: none;"></div>
+           Il est desormais en tete du Profil : l'essai concerne le compte, pas
+           l'equipe. Et le Profil est la premiere chose qu'on ouvre quand on se
+           demande ou l'on en est. -->
         <div class="page-tete">
       <!-- ⚠ LE TITRE SUIT L'ONGLET. Deux mots differents pour la meme page —
              « Reglages » en haut, « Entreprise » en bas — feraient douter
@@ -3071,9 +3074,10 @@
           voit deja juste en dessous. Repeter le sommaire d'une page longue de
           cinq lignes n'aide personne.
 
-          « Qui travaille ici, et ce que chacun peut faire » dit a quoi sert la
-          page — repartir les gens et leurs droits. -->
-        <p>Qui travaille ici, et ce que<br>chacun peut faire.</p>
+          « Les gens, les postes, les acces » nomme le perimetre sans
+          l'expliquer. Le texte precedent — « qui travaille ici, et ce que
+          chacun peut faire » — sonnait reglement interieur. -->
+        <p>Les gens, les postes,<br>les accès.</p>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -3219,8 +3223,32 @@
         <p>Votre compte et vos<br>réglages personnels.</p>
     </div>
 
+      <!-- ⚠ L'ESSAI EN PREMIER, avant meme « Mon compte ».
+
+           Quatorze jours qui defilent meritent la premiere ligne : c'est
+           l'information la plus perissable de la page, et la seule qui appelle
+           une decision.
+
+           Elle etait dans « Gerer », entre le titre et les groupes — un endroit
+           ou l'on va pour ajouter quelqu'un, pas pour penser a son abonnement. -->
+      <div id="essai-reglages" class="alerte-essai" style="display: none;"></div>
+
 <div class="reg-titre">Mon compte</div>
     <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
+      <!-- ⚠ L'AVATAR, A GAUCHE DU NOM.
+
+           La carte n'en avait pas : elle commençait par le texte, ce qui la
+           faisait ressembler a une ligne de reglage ordinaire alors qu'elle
+           represente une personne.
+
+         ⚠ DEUX COUCHES SUPERPOSEES : la photo par-dessus, les initiales
+           dessous. Quand la photo existe, elle couvre ; sinon on voit les
+           initiales. Pas de bascule a gerer. -->
+      <span class="reg-av">
+        <span class="reg-av-ini" id="reg-av-initiales">—</span>
+        <img class="reg-av-img" id="reg-av-photo" alt="" hidden>
+      </span>
+
       <span class="tx">
         <span class="nm" id="reg-nom">—</span>
         <span class="st" id="reg-email">—</span>
@@ -4658,7 +4686,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=c58a0be3"></script>
+<script type="module" src="app.js?v=d84af7ff"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

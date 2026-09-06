@@ -19131,7 +19131,9 @@ body.sans-topbar .screen.active{
      pixels au-dessus du logo, assez pour le couvrir sans coller au bord. */
   /* ⚠ LE CONTENU REVIENT A 44 PX. J'avais descendu le contenu alors que vous
      parliez du BORD de la feuille. */
-  padding-top:44px;
+  /* ⚠ 30 PX. Le contenu commençait a 56 px du haut ; il remonte de quatorze,
+     ce que la feuille a perdu en descendant. */
+  padding-top:30px;
 
   /* ⚠ LA FEUILLE S'ARRETE A 14 PX DU HAUT.
 
@@ -19180,4 +19182,24 @@ body.sans-topbar .tb-plus{
 
 @media (prefers-reduced-motion: reduce){
   .screen.active{ transition:none; }
+}
+
+
+/* ⚠ LA FEUILLE NE REJOUE PAS SON OUVERTURE ENTRE DEUX PAGES.
+
+   Quand on passe d'un dossier a une procedure, les deux sont des feuilles : la
+   feuille est deja montee, il n'y a rien a ouvrir. Mais l'ecran qui arrive
+   porte `ecranEntre`, l'animation d'entree — et par-dessus la transition de
+   marge repartait de zero.
+
+   Deux mouvements pour un seul changement de page.
+
+ ⚠ ON COUPE LA TRANSITION DE LA FEUILLE, pas l'animation d'entree. Celle-ci est
+   commune a tous les ecrans de l'app : la retirer ici la rendrait incoherente
+   avec le reste.
+
+   La classe est posee par le script juste avant de changer d'ecran, et retiree
+   apres — le temps que le nouvel ecran prenne sa place sans animer. */
+body.feuille-figee .screen.active{
+  transition:none !important;
 }

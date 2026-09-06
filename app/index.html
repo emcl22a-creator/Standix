@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=ce8b9d85">
+<link rel="stylesheet" href="style.css?v=a7d3d1bf">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -907,7 +907,13 @@
       </div>
 
       <div class="bv-bas">
-        <h1 class="bv-titre">Bienvenue</h1>
+        <!-- ⚠ CE BLOC SE CENTRE DANS L'ESPACE LIBRE.
+
+             Les actions, elles, restent en bas. Sans cette enveloppe, tout se
+             serrait au milieu et laissait cent quatre-vingt-dix pixels vides
+             sous les boutons. -->
+        <div class="bv-milieu">
+<h1 class="bv-titre">Bienvenue</h1>
         <p class="bv-phrase">Rejoignez notre application et profitez<br>de toutes ses fonctionnalités.</p>
 
         <!-- ⚠ LA MEME PLAQUE QUE L'ESSAI 14 JOURS, avec une couronne.
@@ -928,6 +934,7 @@
             <i>Découvrez toutes les fonctionnalités sans engagement.</i>
           </span>
         </button>
+        </div>
 
         <div class="bv-actions">
           <button type="button" class="bv-btn bv-btn--plein" onclick="ouvrirInscription('gestion')">

@@ -19808,3 +19808,26 @@ body.sans-topbar .screen.active.feuille-arrive{
 #p-global-analyse #an-equipe{
   min-height:64px;
 }
+
+
+/* ⚠ LES OMBRES DES CARTES ETAIENT COUPEES.
+
+   La liste porte `overflow-y:auto` pour defiler — mais `overflow` s'applique
+   aux DEUX axes des qu'on en fixe un : sur l'axe horizontal il devient `auto`
+   lui aussi, et coupe tout ce qui depasse.
+
+   Les cartes font exactement la largeur de la liste ; leurs ombres, elles,
+   debordent de quelques pixels de chaque cote. Elles etaient rasees.
+
+ ⚠ ON ELARGIT LA ZONE DE DEFILEMENT, PAS LES CARTES. Douze pixels de marge
+   negative de chaque cote, rendus par le rembourrage : la liste deborde sur
+   les cotes, les ombres ont la place, et les cartes ne bougent pas d'un pixel.
+
+ ⚠ ET L'ON INTERDIT LE DEFILEMENT HORIZONTAL, sinon ces douze pixels
+   deviendraient glissables au doigt. */
+#p-category.active #category-procedures-list,
+#e-category.active #e-category-list{
+  margin-inline:-12px;
+  padding-inline:12px;
+  overflow-x:hidden;
+}

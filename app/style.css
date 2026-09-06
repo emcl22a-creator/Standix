@@ -20443,3 +20443,59 @@ body.sans-topbar #e-category.active.feuille-arrive{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RETOUR A L'ANIMATION D'AVANT-HIER
+
+   ⚠ CE QUE C'ETAIT, releve dans votre depot avant mes modifications :
+
+     @keyframes ecranEntre{
+       0%   { opacity:0; transform:translateY(12px); filter:blur(2px); }
+       35%  { opacity:1; filter:blur(0px); }
+       100% { opacity:1; transform:none; filter:blur(0px); }
+     }
+     animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1)
+
+   ⚠ TROIS CHOSES A LA FOIS, et c'est ce qui la rendait vivante : la page monte
+     de douze pixels, s'eclaircit, et se precise. Le flou et l'opacite finissent
+     a 35 % — le reste du temps, seule la montee se poursuit.
+
+     J'ai passe six tours a chercher un flou seul. Il n'y en avait jamais eu :
+     c'est la montee qui portait le geste.
+
+   ⚠ ON ANNULE TOUTES MES SURCHARGES. Dix-huit regles se sont accumulees ;
+     celle-ci passe en dernier et les couvre toutes.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes ecranEntre{
+  0%  { opacity:0; transform:translateY(12px); filter:blur(2px); }
+  35% { opacity:1; filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:ecranEntre 0.34s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE DE CARTE, en dernier mot. */
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

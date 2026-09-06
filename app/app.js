@@ -7295,6 +7295,10 @@ addEventListener('scroll', suivreDefilement, { passive: true })
    ═══════════════════════════════════════════════════════════════════════════ */
 let pageMere = 'p-settings'
 
+/* ⚠ UN SEUL MINUTEUR POUR LE DEGEL. Sans lui, deux changements rapproches
+   laisseraient le premier degeler pendant le second. */
+let degelFeuille = null
+
 const CARREFOURS = new Set(['p-settings', 'p-profil', 'e-profil'])
 
 function retourVersMere() {
@@ -7323,8 +7327,16 @@ function majBarreHaute(id) {
     /* ⚠ ON DEGELE AU PROCHAIN RENDU. `requestAnimationFrame` deux fois : le
        premier laisse le navigateur poser les styles, le second s'execute
        apres. Un seul suffirait rarement. */
-    requestAnimationFrame(() => requestAnimationFrame(() =>
-      document.body.classList.remove('feuille-figee')))
+    /* ⚠ ON DEGELE APRES L'ANIMATION, pas au prochain rendu.
+
+       `ecranEntre` dure 0,34 s. En retirant la classe deux images plus tard,
+       l'animation reprenait a mi-course — c'est ce qui laissait le bord bouger.
+
+       On attend qu'elle soit finie. Le delai est genereux de quelques
+       centiemes : un ecran lent ne doit pas se retrouver a decouvert. */
+    clearTimeout(degelFeuille)
+    degelFeuille = setTimeout(() =>
+      document.body.classList.remove('feuille-figee'), 400)
   }
 
   document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))

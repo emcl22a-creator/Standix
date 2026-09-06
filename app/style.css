@@ -19962,3 +19962,20 @@ body.sans-topbar #p-category.active.feuille-arrive,
 body.sans-topbar #e-category.active.feuille-arrive{
   animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
 }
+
+
+/* ⚠ LES CARTES ETAIENT ECRASEES PAR LA COLONNE.
+
+   En rendant la liste defilante, je l'ai passee en `display:flex` — ses enfants
+   sont donc devenus des elements de colonne, avec `flex-shrink:1` par defaut.
+
+   Quand le contenu depasse, la colonne les COMPRIME au lieu de les laisser
+   deborder. Mesure : une carte de 99 px se retrouvait a 38, sa plaque de 64 px
+   debordant du cadre. C'est ce que vous voyez comme « coupe ».
+
+ ⚠ `flex-shrink:0` LEUR REND LEUR TAILLE. Elles gardent leur hauteur, la liste
+   deborde, et c'est justement ce debordement qui permet de faire glisser. */
+#p-category.active #category-procedures-list > *,
+#e-category.active #equipe-procedures-list > *{
+  flex:0 0 auto;
+}

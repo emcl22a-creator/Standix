@@ -19846,3 +19846,49 @@ body.sans-topbar .screen.active.feuille-arrive{
 #e-category.active #e-cat-sous{
   flex:0 0 auto;
 }
+
+
+/* ═══ LE CHANGEMENT DE PAGE PREND L'ANIMATION DU SEGMENT ═══
+
+   ⚠ VOUS AVEZ RECONNU CELLE DU SEGMENT « En ligne / En cours ». C'est celle-la
+     que vous voulez partout : elle est deja dans l'app, deja eprouvee.
+
+     Ses valeurs, relevees dans `flouEntree` :
+
+       · flou de depart  5 px
+       · duree           220 ms
+       · courbe          cubic-bezier(0.16, 1, 0.3, 1)
+
+     La mienne employait 3 px sur 220 ms avec `ease-out` — proche, mais pas
+     identique. L'oeil compare deux gestes voisins et voit la difference.
+
+   ⚠ LA COURBE EST LA VRAIE DIFFERENCE. `cubic-bezier(0.16, 1, 0.3, 1)` chute
+     tres vite puis s'attarde : le flou disparait presque aussitot et la fin se
+     pose en douceur. `ease-out` etale la meme duree plus uniformement, ce qui
+     rend le flou plus present. */
+
+@keyframes pageFlou{
+  from{ filter:blur(5px); }
+  to  { filter:blur(0); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active{
+  animation:pageFlou 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE, en dernier mot. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

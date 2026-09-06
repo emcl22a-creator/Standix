@@ -19753,3 +19753,25 @@ body.sans-topbar .screen.active.feuille-arrive{
      bas. */
   padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 96px);
 }
+
+
+/* ═══ LE FLOU SEUL, SANS FONDU ═══
+
+   ⚠ `pageFlou` FAISAIT DEUX CHOSES : `opacity:0 -> 1` et `blur(5px) -> 0`.
+     C'est l'opacite qui produisait le fondu.
+
+   ⚠ ET C'EST ELLE AUSSI QUI CAUSAIT LE CLIGNOTEMENT. Partir de zero veut dire
+     qu'a la premiere image la page est INVISIBLE : pendant deux ou trois
+     images, on voit le fond a travers — un vide d'un demi-seconde, exactement
+     ce que vous decrivez.
+
+     En restant opaque du debut a la fin, il n'y a plus de trou : la page est
+     la, simplement floue.
+
+   ⚠ LE FLOU DESCEND A 3 PX. A cinq, sans le fondu pour l'adoucir, il devenait
+     franchement visible — on lisait le flou au lieu de le sentir. */
+
+@keyframes pageFlou{
+  from{ filter:blur(3px); }
+  to  { filter:blur(0); }
+}

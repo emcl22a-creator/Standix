@@ -19249,3 +19249,43 @@ body.feuille-figee .screen.fondu{
   animation:none !important;
   transition:none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FEUILLE ARRIVE — L'ANIMATION D'OUVERTURE
+
+   ⚠ ELLE MONTE DEPUIS LE BAS, comme une feuille iOS. C'est le seul moment ou
+     un mouvement a sa place : quand la feuille n'etait pas la et qu'elle
+     arrive.
+
+     Entre deux feuilles, et au retour, rien ne bouge — c'est ce qu'on vient de
+     regler.
+
+   ⚠ LA COURBE VIENT D'APPLE : `cubic-bezier(0.32, 0.72, 0, 1)`. Depart franc,
+     arrivee posee, sans rebond. Un rebond ferait jouet.
+
+   ⚠ ET ELLE PART DE 24 PX, pas du bas de l'ecran. Une feuille qui traverse
+     tout l'ecran met trop longtemps ; vingt-quatre pixels suffisent a dire
+     « je viens de dessous ».
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes feuilleArrive{
+  from{
+    transform:translateY(24px);
+    opacity:0;
+  }
+  to{
+    transform:translateY(0);
+    opacity:1;
+  }
+}
+
+/* ⚠ ELLE NE JOUE QUE SI L'ECRAN PRECEDENT N'ETAIT PAS UNE FEUILLE. La classe
+   est posee par le script, qui seul connait l'etat d'avant. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

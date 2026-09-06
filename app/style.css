@@ -19289,3 +19289,65 @@ body.sans-topbar .screen.active.feuille-arrive{
 @media (prefers-reduced-motion: reduce){
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN SEUL FLOU POUR CHANGER DE PAGE
+
+   ⚠ TROIS ANIMATIONS SE DISPUTAIENT LE MEME MOMENT :
+
+     `ecranEntre`   — montee de 12 px, fondu, flou, 0,34 s
+     `voileArrivee` — un voile qui traverse toute la page, 0,30 s
+     `feuilleArrive` — le glissement de la feuille, 0,42 s
+
+     Elles se superposaient. C'est pour cela que couper l'une ne suffisait
+     jamais : une autre prenait le relais.
+
+   ⚠ ON GARDE DEUX GESTES, ET UNE REGLE SIMPLE.
+
+     Un FLOU pour changer de page — 0,22 s, sans deplacement. C'est ce que fait
+     iOS entre onglets : assez pour dire que ça a change, trop bref pour qu'on
+     l'attende.
+
+     Un GLISSEMENT pour ouvrir une feuille, parce qu'elle fait autre chose :
+     elle recouvre au lieu de remplacer.
+
+   ⚠ LE VOILE DISPARAIT. Il faisait doublon avec le flou, et c'est lui qui
+     donnait l'impression que le bord de la feuille bougeait.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes pageFlou{
+  from{ opacity:0; filter:blur(5px); }
+  to  { opacity:1; filter:blur(0); }
+}
+
+/* ⚠ `ecranEntre` EST REMPLACEE PARTOUT OU ELLE ETAIT POSEE. Les cinq regles
+   sont visees nommement : une seule oubliee, et l'ancien mouvement revient. */
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu{
+  animation:pageFlou 0.22s ease-out both;
+}
+
+/* ⚠ SAUF LA FEUILLE, qui garde son glissement. Elle passe apres, donc elle
+   gagne — mais le `!important` etait deja la, je le laisse. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+/* ⚠ ET LE VOILE NE SE VOIT PLUS. Je ne retire pas la balise : elle est posee
+   dans le balisage et sert peut-etre ailleurs. La masquer suffit. */
+.voile-arrivee,
+.voile-arrivee.joue{
+  animation:none !important;
+  opacity:0 !important;
+  pointer-events:none;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  .screen.active.nait,
+  .screen.fondu,
+  .screen.active.fondu{ animation:none; }
+}

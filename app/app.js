@@ -7307,6 +7307,26 @@ function majBarreHaute(id) {
      c'est vers lui que le retour ramenera. */
   if (CARREFOURS.has(id)) pageMere = id
 
+  /* ⚠ ENTRE DEUX FEUILLES, ON FIGE LA TRANSITION.
+
+     Passer d'un dossier a une procedure ne doit rien rouvrir : la feuille est
+     deja en place. Sans cela, le nouvel ecran refait le trajet depuis le bas.
+
+   ⚠ ON REGARDE L'ETAT AVANT ET APRES. Si les deux ecrans sont des feuilles, le
+     mouvement n'a pas lieu d'etre ; si l'un des deux ne l'est pas, il faut
+     l'animation. */
+  const avantFeuille = document.body.classList.contains('sans-topbar')
+  const apresFeuille = ECRANS_PLEIN_ECRAN.has(id)
+
+  if (avantFeuille && apresFeuille) {
+    document.body.classList.add('feuille-figee')
+    /* ⚠ ON DEGELE AU PROCHAIN RENDU. `requestAnimationFrame` deux fois : le
+       premier laisse le navigateur poser les styles, le second s'execute
+       apres. Un seul suffirait rarement. */
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+      document.body.classList.remove('feuille-figee')))
+  }
+
   document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))
 
   /* ⚠ ON REVERIFIE A CHAQUE PAGE. Un ecran s'ouvre en haut : le verre doit

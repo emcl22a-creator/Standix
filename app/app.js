@@ -12997,6 +12997,28 @@ document.getElementById('cat-retour')?.addEventListener('click', () => {
      CSS deja posee ne produit rien : le navigateur ne voit aucun changement.
      `void offsetWidth` l'oblige a constater le retrait avant l'ajout. */
 function animerEntreeCategorie() {
+  /* ⚠ UN SOUS-DOSSIER NE CHANGE PAS DE PAGE, seulement de contenu.
+
+     Cette fonction relançait l'animation de l'ECRAN entier — la meme qu'a
+     l'ouverture d'un dossier. Mais le titre, la recherche et les filtres
+     restent : seule la liste est remplacee.
+
+     C'est exactement ce que fait le segment « En ligne / En cours », et il a
+     deja sa reponse : `flouSortie` puis `flouEntree` sur la liste seule.
+
+   ⚠ ON REUTILISE SES DEUX FONCTIONS plutot que d'en ecrire de nouvelles. Le
+     jour ou vous changerez le flou du segment, celui-ci suivra.
+
+   ⚠ LE DELAI DE 130 MS EST CELUI DU SEGMENT. Il laisse le flou de sortie
+     s'installer avant qu'on remplace le contenu — sans quoi on verrait le
+     changement se faire a travers un flou naissant. */
+  const liste = document.getElementById('category-procedures-list')
+  if (liste) {
+    if (typeof MOINS_ANIM === 'function' && MOINS_ANIM()) return
+    flouEntree(liste)
+    return
+  }
+
   jouerVoile()
   const ecran = document.getElementById('p-category')
   if (!ecran) return
@@ -13035,6 +13057,31 @@ function ouvrirSousDossier(nom) {
     champ.placeholder = 'Rechercher une procédure'
   }
   majTitreCategorie()
+
+  /* ⚠ LE FLOU DE SORTIE, PUIS LE REMPLACEMENT.
+
+     Comme le segment : la liste se brouille, on echange son contenu pendant
+     qu'elle est floue, puis elle se precise. Sans ce temps, on verrait les
+     cartes changer a nu. */
+  /* ⚠ ON REMONTE EN HAUT AVANT DE FLOUTER, pas apres.
+
+     Mon retour anticipe sautait la remontee, quinze lignes plus bas : on
+     ouvrait un sous-dossier au milieu de sa liste. En le faisant ici, les deux
+     chemins en profitent. */
+  const listeSD = document.getElementById('category-procedures-list')
+  if (listeSD) listeSD.scrollTop = 0
+  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  catch { window.scrollTo(0, 0) }
+
+  if (listeSD && !(typeof MOINS_ANIM === 'function' && MOINS_ANIM())) {
+    flouSortie(listeSD)
+    setTimeout(() => {
+      renderCategoryProceduresList()
+      animerEntreeCategorie()
+    }, 130)
+    return
+  }
+
   renderCategoryProceduresList()
   animerEntreeCategorie()
 

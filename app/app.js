@@ -3331,6 +3331,23 @@ function peindrePhotoProfil() {
   }
   if (ini) ini.textContent = initialesMembre(currentMembre?.nom)
   if (ret) ret.hidden = !url
+
+  /* ⚠ L'AVATAR DE LA CARTE SUIT LA MEME SOURCE.
+
+     Il est peint ici et nulle part ailleurs : une seule fonction decide de ce
+     qu'on voit, donc la carte et l'ecran de reglage ne peuvent pas diverger.
+
+   ⚠ ET IL LIT `photoTampon` COMME LE RESTE. Quand on choisit une photo sans
+     l'enregistrer, elle parait deja partout — sinon la carte montrerait
+     l'ancienne pendant qu'on regarde la nouvelle. */
+  const av = document.getElementById('reg-av-photo')
+  const avIni = document.getElementById('reg-av-initiales')
+
+  if (av) {
+    if (url) { av.src = url; av.hidden = false }
+    else { av.removeAttribute('src'); av.hidden = true }
+  }
+  if (avIni) avIni.textContent = initialesMembre(currentMembre?.nom)
 }
 
 /* ⚠ 192 PX DE COTE, COMME LE LOGO. Le rond fait 96 px a l'ecran ; le double
@@ -7015,7 +7032,12 @@ const ONGLET_PAR_ECRAN = {
      ⚠ LES DEUX DERNIERES LIGNES ETAIENT RESTEES A 3, l'ancien indice des
        Reglages. Une valeur hors des trois onglets n'allume rien — et rien ne
        le signale. */
-  'p-activites': 0,
+  /* ⚠ « Mouvements de l'equipe » APPARTIENT A L'ONGLET GERER, pas Procedures.
+
+     Elle etait marquee « 0 » du temps ou on l'atteignait depuis l'ecran
+     Analyse. Depuis qu'elle s'ouvre depuis Gerer, l'onglet allume ne
+     correspondait plus a l'endroit ou l'on est. */
+  'p-activites': 2,
   'p-recentes': 0,
   'p-coller': 0,        // le collage de videos, dans la creation
   'p-scan': 2,          // le lecteur de QR code, dans les Reglages
@@ -7249,6 +7271,22 @@ function activerAvecNaissance(ecran) {
   }
 
   ecran.classList.add('active')
+
+  /* ⚠ CHAQUE ECRAN S'OUVRE EN HAUT.
+
+     Le defilement appartient a la fenetre, pas a l'ecran : en changeant de
+     page, il restait ou il etait. On ouvrait donc un sous-dossier au milieu de
+     sa liste, a la hauteur ou l'on avait quitte le precedent.
+
+   ⚠ SANS ANIMATION. `behavior:'instant'` — un defilement anime pendant qu'une
+     page arrive donne deux mouvements pour un seul changement.
+
+   ⚠ ET L'ON NE REMONTE QUE SI L'ON A BOUGE. Appeler `scrollTo` quand on est
+     deja en haut declenche un evenement de defilement pour rien, et notre
+     voile du haut y reagit. */
+  if (window.scrollY > 0) {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
 }
 
 /* ═══ LE LOGO, DÉFINI UNE FOIS ═══
@@ -7456,6 +7494,13 @@ function majBarreHaute(id) {
   const avantFeuille = document.body.classList.contains('sans-topbar')
   const apresFeuille = ECRANS_PLEIN_ECRAN.has(id)
 
+  /* ⚠ ON NE FIGE PLUS ENTRE DEUX FEUILLES.
+
+     `feuille-figee` coupait toute animation. Vous voulez le flou : la classe
+     n'a plus lieu d'etre, et c'est la regle CSS qui decide seule.
+
+     Je la garde posee pour la transition de marge — sans elle, la feuille
+     referait son trajet — mais elle ne bloque plus l'animation. */
   if (avantFeuille && apresFeuille) {
     /* ⚠ ON FIGE AUSSI L'ECRAN VISE, UN PAR UN.
 
@@ -7657,6 +7702,13 @@ window.showGestionScreen = function(id, btn) {
     appliquerAccesAbonnement()
     appliquerAccesEntreprise()
     peindrePhotoProfil()
+
+    /* ⚠ LE BANDEAU D'ESSAI SE DESSINE ICI DESORMAIS.
+
+       Il vivait dans « Gerer », et c'est cette page qui le peignait. Deplace
+       sans cet appel, il serait reste vide : la fonction existe, mais personne
+       ne l'appelait plus au bon moment. */
+    dessinerAlerteEssai('essai-reglages')
   }
   window.majBarreEspace?.('gestion')
   /* La capsule suit la page, quel que soit le chemin emprunté pour y venir. */
@@ -8442,17 +8494,52 @@ window.ouvrirActivites = async function () {
 
 /* « 2 min », « 3 h », « hier », « 12 mars ». Court, parce que cette colonne est
    étroite et qu'on ne la lit qu'en passant. */
-function depuisQuandCourt(t) {
-  if (!t) return ''
-  const m = Math.round((Date.now() - t) / 60000)
-  if (m < 2) return 'à l\u2019instant'
-  if (m < 60) return m + ' min'
-  const h = Math.round(m / 60)
-  if (h < 24) return h + ' h'
-  const j = Math.round(h / 24)
-  if (j === 1) return 'hier'
-  if (j < 8) return j + ' j'
-  return new Date(t).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+function depuisQuand(iso, court = false) {
+  if (!iso) return null
+  const t = new Date(iso).getTime()
+  if (!t || Number.isNaN(t)) return null
+
+  const s = Math.max(0, Math.floor((Date.now() - t) / 1000))
+
+  /* ⚠ DEUX FORMES : longue pour une phrase, abregee pour un badge.
+
+     « Modifie il y a 2 semaines » depasse la largeur d'une carte etroite et
+     pousse le compteur de procedures a la ligne. « Mod. 2 sem. » tient.
+
+   ⚠ ON GARDE LE POINT ABREVIATIF. « 2 sem » sans point se lit comme un mot
+     tronque par erreur ; avec, c'est une abreviation assumee. */
+  if (court) {
+    if (s < 90)    return 'à l’instant'
+    if (s < 3600)  return `${Math.floor(s / 60)} min`
+    if (s < 86400) return `${Math.floor(s / 3600)} h`
+
+    const j = Math.floor(s / 86400)
+    if (j === 1)   return 'hier'
+    if (j < 7)     return `${j} j`
+    if (j < 60)    return `${Math.floor(j / 7)} sem.`
+
+    const d = new Date(iso)
+    const meme = d.getFullYear() === new Date().getFullYear()
+    /* ⚠ LE MOIS EN TROIS LETTRES au-dela de deux mois. `toLocaleDateString`
+       rend « janv. », « fevr. » — deja abreges par la langue. */
+    return d.toLocaleDateString('fr-FR',
+      meme ? { month: 'short' } : { month: 'short', year: '2-digit' })
+  }
+
+  if (s < 90)      return 'à l’instant'
+  if (s < 3600)    return `il y a ${Math.floor(s / 60)} min`
+  if (s < 86400)   { const h = Math.floor(s / 3600); return `il y a ${h} h` }
+
+  const j = Math.floor(s / 86400)
+  if (j === 1)     return 'hier'
+  if (j < 7)       return `il y a ${j} jours`
+  if (j < 14)      return 'la semaine dernière'
+  if (j < 60)      return `il y a ${Math.floor(j / 7)} semaines`
+
+  const d = new Date(iso)
+  const meme = d.getFullYear() === new Date().getFullYear()
+  return 'en ' + d.toLocaleDateString('fr-FR',
+    meme ? { month: 'long' } : { month: 'long', year: 'numeric' })
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -11051,9 +11138,15 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
                  moitie du defaut. */
               /* ⚠ LA DATE PLUTOT QUE « En ligne ». Le point vert reste : il
                  dit l'etat d'un coup d'oeil, sans occuper de largeur. */
-              const quand = depuisQuand(proc.modifie_le || proc.publiee_le || proc.created_at)
+              /* ⚠ MEME REGLE POUR UNE PROCEDURE EN LIGNE. */
+              const modL = proc.modifie_le
+              const creeL = proc.created_at
+              const intacte = !modL
+                || (creeL && Math.abs(new Date(modL) - new Date(creeL)) < 60000)
+
+              const quand = depuisQuand(modL || proc.publiee_le || creeL, true)
               return `<span class="cl-badge">${marque}<i style="background:#34C759"></i>${
-                quand ? 'Modifié ' + quand : 'En ligne'}</span>`
+                quand ? (intacte ? 'Créé ' : 'Mod. ') + quand : 'En ligne'}</span>`
             }
             /* Non publiee : la roue seulement si l'analyse tourne VRAIMENT,
                c'est-a-dire si `etatProcedureHtml` rend autre chose qu'un
@@ -11066,9 +11159,23 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
             }
             /* ⚠ MEME CHOSE POUR UN BROUILLON. « Commence il y a 3 semaines »
                signale un travail laisse en plan. */
-            const quandB = depuisQuand(proc.modifie_le || proc.created_at)
+            /* ⚠ « Cree » SI LA PROCEDURE N'A JAMAIS ETE TOUCHEE.
+
+               `modifie_le` vaut la date de creation tant que personne n'a rien
+               change — le declencheur SQL ne l'a jamais mise a jour. Ecrire
+               « Modifie » serait faux : rien ne l'a ete.
+
+               On compare les deux dates a la minute pres : l'horodatage d'une
+               creation et celui d'un `insert` different de quelques
+               millisecondes. */
+            const mod = proc.modifie_le
+            const cree = proc.created_at
+            const jamaisTouchee = !mod
+              || (cree && Math.abs(new Date(mod) - new Date(cree)) < 60000)
+
+            const quandB = depuisQuand(mod || cree, true)
             return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>${
-              quandB ? 'Modifié ' + quandB : 'En cours'}</span>`
+              quandB ? (jamaisTouchee ? 'Créé ' : 'Mod. ') + quandB : 'En cours'}</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
@@ -20617,46 +20724,15 @@ function analyseBloquee(proc) {
    ressuscite pas une coche déjà vue. */
 const proceduresVues = new Set()
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   « Modifie il y a N jours »
+/* ⚠ L'ANCIENNE `depuisQuand` A ETE RETIREE.
 
-   ⚠ CE QUI REMPLACE « En ligne ». Sous l'onglet du meme nom, ce badge ne
-     disait rien : tout ce qui s'affiche y est en ligne.
+   Elle vivait ici, la nouvelle plus haut — deux declarations du meme nom, ce
+   que le navigateur refuse : `Identifier already declared`, et le script
+   entier ne se chargeait plus.
 
-     La date de modification, elle, change avec le temps — c'est la seule
-     information de la carte qui merite une place permanente. Et elle repond a
-     la vraie question : cette procedure est-elle encore a jour.
+   La nouvelle prend un second argument `court` pour la forme abregee des
+   badges. */
 
-   ⚠ ELLE VAUT AUSSI SOUS « En cours ». « Commence il y a 3 semaines » signale
-     un brouillon oublie ; c'est utile des deux cotes.
-
-   ⚠ ET L'ON RESTE APPROXIMATIF. « il y a 3 jours » suffit ; la minute exacte
-     n'aide personne et ferait une ligne trop longue.
-   ═══════════════════════════════════════════════════════════════════════════ */
-function depuisQuand(iso) {
-  if (!iso) return null
-  const t = new Date(iso).getTime()
-  if (!t || Number.isNaN(t)) return null
-
-  const s = Math.max(0, Math.floor((Date.now() - t) / 1000))
-
-  if (s < 90)      return 'à l’instant'
-  if (s < 3600)    return `il y a ${Math.floor(s / 60)} min`
-  if (s < 86400)   { const h = Math.floor(s / 3600); return `il y a ${h} h` }
-
-  const j = Math.floor(s / 86400)
-  if (j === 1)     return 'hier'
-  if (j < 7)       return `il y a ${j} jours`
-  if (j < 14)      return 'la semaine dernière'
-  if (j < 60)      return `il y a ${Math.floor(j / 7)} semaines`
-
-  /* ⚠ AU-DELA DE DEUX MOIS, ON DONNE LE MOIS. « il y a 14 semaines » ne se
-     traduit pas en tete ; « en mars » se situe tout de suite. */
-  const d = new Date(iso)
-  const meme = d.getFullYear() === new Date().getFullYear()
-  return 'en ' + d.toLocaleDateString('fr-FR',
-    meme ? { month: 'long' } : { month: 'long', year: 'numeric' })
-}
 
 function etatProcedureHtml(proc) {
   const alerte = (couleur, titre) => `<div class="etat-proc souci" title="${titre}">
@@ -22113,7 +22189,7 @@ window.ouvrirQuota = async function() {
            les quatorze jours, une fois. Ecrire « ce mois-ci » laissait croire
            a un compteur qui repartirait — et l'on decouvrait le contraire au
            mauvais moment. -->
-      <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ${enEssai ? 'pendant les 14 jours' : 'ce mois-ci'}</div>
+      <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ${enEssai ? 'pendant les 14 jours' : ''}</div>
       ${q.partage ? `<div class="quota-part">
         <!-- ⚠ LA MENTION N'APPARAIT QUE S'IL Y A PLUSIEURS ENTREPRISES. Sinon
              elle sous-entend un partage qui n'existe pas, et l'on cherche avec
@@ -22131,11 +22207,18 @@ window.ouvrirQuota = async function() {
     ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
         ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
       </button>` : ''}
-    <div class="quota-pied">${enEssai
-      ? `Ces analyses couvrent votre essai. Elles ne se renouvellent pas.`
-      : `Renouvellement le <b>${dateRenouvellement()}</b>.
-         Les analyses non utilis\u00e9es ne se reportent pas.`}
-    </div>`
+    ${enEssai ? '' : `<div class="quota-pied">
+      <!-- ⚠ RIEN PENDANT L'ESSAI.
+
+           « Renouvellement le 1er octobre » n'a pas de sens sans abonnement :
+           il n'y a rien a renouveler. Et « les analyses ne se reportent pas »
+           parle d'un cycle mensuel que la personne n'a pas encore.
+
+           Le pied entier disparait plutot que d'etre reecrit — pendant
+           quatorze jours, il n'y a rien a dire de plus. -->
+      Renouvellement le <b>${dateRenouvellement()}</b>.
+      Les analyses non utilis\u00e9es ne se reportent pas.
+    </div>`}`
 
   /* ⚠ LES BARRES PARTENT DE ZERO ET SE REMPLISSENT. Deux images d'attente,
      sans quoi le navigateur pose la largeur finale sans rien animer. */

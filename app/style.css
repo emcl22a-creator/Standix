@@ -19214,3 +19214,21 @@ body.feuille-figee .screen.active{
      donne l'impression que le bord se remet en position. */
   animation:none !important;
 }
+
+
+/* ⚠ `e-detail` A SA PROPRE HAUTEUR, il faut l'adapter a la feuille.
+
+   Cet ecran ne defile pas comme les autres : il occupe toute la hauteur avec
+   `height:calc(100dvh - 87px)` et son `margin-top:87px`, parce que sa liste
+   d'etapes defile a l'interieur.
+
+   Mesure : il demarrait donc a 87 px, sous la barre, au lieu des 14 px de la
+   feuille. On lui rend les soixante-treize pixels de difference.
+
+ ⚠ LA HAUTEUR SUIT. Sans elle, l'ecran depasserait du bas de l'ecran de la
+   meme quantite. */
+body.sans-topbar #e-detail.active{
+  margin-top:14px;
+  height:calc(100dvh - 14px);
+  padding-top:30px;
+}

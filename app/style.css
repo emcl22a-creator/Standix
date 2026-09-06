@@ -19932,3 +19932,33 @@ body.sans-topbar #e-detail.active .zone-etapes{
   opacity:1;
   filter:blur(0);
 }
+
+
+/* ⚠ « Creer une procedure » N'EST PAS UN DOSSIER QUI S'OUVRE.
+
+   `p-create-video` et `p-create-manual` figurent dans la liste des ecrans sans
+   barre du haut — ils heritaient donc de `carteMonte`, la montee reservee a
+   l'ouverture d'un dossier.
+
+   Mais on n'y entre pas depuis une carte : on appuie sur le `+` de la barre.
+   Rien ne monte de nulle part, c'est un changement de page comme un autre.
+
+ ⚠ ON LES SORT NOMMEMENT DE LA REGLE. Les modifier dans `ECRANS_PLEIN_ECRAN`
+   leur rendrait la barre du logo — ce n'est pas ce qu'on veut. */
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:pageFlou 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE, en dernier mot.
+
+   Ma regle precedente visait les deux ecrans de creation par leur nom — mais
+   `carteMonte` etait declaree AVANT, donc le flou l'a emporte partout, y
+   compris sur les dossiers.
+
+   On repose la montee ici, pour eux seuls. */
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}

@@ -1973,6 +1973,16 @@ document.addEventListener('click', (e) => {
   }
 })
 
+/* ⚠ EXPOSEE AU BALISAGE, sinon les boutons ne trouvent rien.
+
+   Tout le script vit dans une fonction fermee : ce qui n'est pas pose sur
+   `window` reste invisible aux attributs `onclick` du balisage. Le bouton ne
+   faisait donc rien du tout.
+
+   Les fonctions voisines — `allerConnexion`, `showGestionScreen` — sont toutes
+   exposees ainsi. */
+window.ouvrirInscription = ouvrirInscription
+
 function ouvrirInscription(espace) {
   selectedSpace = espace
 

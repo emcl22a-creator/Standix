@@ -19699,3 +19699,57 @@ body.sans-topbar .screen.active.feuille-arrive{
 @media (prefers-reduced-motion: reduce){
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE HAUT DE LA PAGE RESTE EN PLACE, SEULE LA LISTE DEFILE
+
+   ⚠ AUJOURD'HUI C'EST LA FENETRE QUI DEFILE. Le titre, la recherche et les
+     filtres partent donc avec le reste — on perd la recherche des qu'on
+     descend, alors que c'est le moment ou l'on en a besoin.
+
+   ⚠ L'ECRAN DEVIENT UNE COLONNE DE HAUTEUR FIXE. Le haut garde sa taille
+     naturelle, la liste prend ce qui reste et defile a l'interieur.
+
+     `min-height:0` sur la liste est indispensable : sans lui, un enfant de
+     colonne refuse de retrecir sous la taille de son contenu, et c'est la
+     colonne entiere qui deborde.
+
+   ⚠ ET L'ON GARDE L'INERTIE DE SAFARI — `-webkit-overflow-scrolling` — sinon
+     le defilement s'arrete net au lieu de glisser.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#p-category.active,
+#e-category.active{
+  display:flex;
+  flex-direction:column;
+  height:calc(100dvh - 14px);
+  overflow:hidden;
+  padding-bottom:0;
+}
+
+/* ⚠ LE HAUT NE SE COMPRIME PAS. Sans `flex:0 0 auto`, la colonne le
+   retrecirait pour faire de la place a la liste. */
+#p-category.active .detail-header,
+#p-category.active #category-subhead,
+#p-category.active .proc-rech-rang,
+#p-category.active .proc-rang,
+#e-category.active .detail-header,
+#e-category.active .proc-rech-rang,
+#e-category.active .proc-rang{
+  flex:0 0 auto;
+}
+
+/* ⚠ LA LISTE PREND LE RESTE ET DEFILE SEULE. */
+#p-category.active #category-procedures-list,
+#e-category.active #e-category-list{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+
+  /* ⚠ ET ELLE GARDE SON AIR EN BAS. Le rembourrage de l'ecran a disparu ; sans
+     celui-ci, la derniere carte collerait au bord et passerait sous la barre du
+     bas. */
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 96px);
+}

@@ -19641,3 +19641,19 @@ body.retour-de-feuille .screen.active{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ⚠ LE FLOU PARTOUT, Y COMPRIS A L'OUVERTURE D'UN DOSSIER.
+
+   La feuille glissait en arrivant — c'est ce que vous aviez demande deux tours
+   plus tot, puis vous m'avez dit preferer le flou partout.
+
+   Un seul geste pour tous les changements de page : c'est plus simple a tenir,
+   et rien ne justifie qu'un dossier s'ouvre autrement qu'un reglage.
+
+ ⚠ LA FEUILLE MONTE TOUJOURS. Ce qui disparait, c'est l'animation de l'ecran ;
+   le mouvement de la feuille elle-meme — sa marge, ses coins — reste, puisqu'il
+   n'est pas une animation mais une transition. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:pageFlou 0.22s ease-out both !important;
+}

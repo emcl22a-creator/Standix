@@ -19351,3 +19351,36 @@ body.sans-topbar .screen.active.feuille-arrive{
   .screen.fondu,
   .screen.active.fondu{ animation:none; }
 }
+
+
+/* ⚠ ON LAISSE LE CSS DECIDER SEUL, sans consigne en ligne.
+
+   Je tournais autour depuis plusieurs essais : poser `animation:none` par le
+   script, l'effacer, le reposer — chaque fois une navigation trouvait un
+   interstice ou la consigne n'etait pas encore la.
+
+   Une seule regle, lisible d'un coup d'oeil :
+
+     · le corps porte `sans-topbar` → on est deja dans une feuille
+     · l'ecran est une feuille → il ne s'anime pas
+
+   Sauf s'il vient d'arriver, auquel cas `feuille-arrive` le dit. */
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #p-analyse.active:not(.feuille-arrive),
+body.sans-topbar #p-create-video.active:not(.feuille-arrive),
+body.sans-topbar #p-create-manual.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive),
+body.sans-topbar #e-detail.active:not(.feuille-arrive){
+  animation:none !important;
+}
+
+
+/* ⚠ ET RIEN AU RETOUR NON PLUS.
+
+   En revenant d'une feuille vers la liste, `pageFlou` jouait sur la liste
+   pendant que la feuille redescendait. Deux choses a la fois, encore.
+
+   La classe est posee par le script le temps du retour, comme pour le reste. */
+body.retour-de-feuille .screen.active{
+  animation:none !important;
+}

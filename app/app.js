@@ -7164,7 +7164,7 @@ function activerAvecNaissance(ecran) {
 
    ⚠ ON REGARDE D'OU L'ON VIENT, pas seulement ou l'on va. Quitter une feuille
      suffit a couper, quelle que soit la destination. */
-  const veniantFeuille = document.body.classList.contains('sans-topbar')
+  const veniantFeuille = etaitFeuille
   const versFeuille = ECRANS_PLEIN_ECRAN.has(ecran.id)
   const entreFeuilles = veniantFeuille
 
@@ -7208,7 +7208,10 @@ function activerAvecNaissance(ecran) {
      Je l'avais mise au debut : `oublierNaissances` et `ouvrirDepuisCarte`
      passaient apres et remettaient tout a plat. C'est la derniere ligne qui
      compte — celle qui declenche l'animation. */
-  ecran.style.animation = entreFeuilles ? 'none' : ''
+  /* ⚠ ON NE COUPE PAS QUAND LA FEUILLE ARRIVE. `animation:none` en ligne
+     l'emporte sur tout, y compris sur `feuilleArrive`. */
+  ecran.style.animation = (entreFeuilles && !(!veniantFeuille && versFeuille))
+    ? 'none' : ''
 
   /* ⚠ LA FEUILLE S'ANNONCE QUAND ELLE ARRIVE DE NULLE PART.
 
@@ -7376,6 +7379,10 @@ let pageMere = 'p-settings'
    laisseraient le premier degeler pendant le second. */
 let degelFeuille = null
 
+/* ⚠ L'ETAT DE LA PAGE QU'ON QUITTE. Lu par `activerAvecNaissance`, qui ne peut
+   plus le deduire du corps : la classe a deja change quand elle s'execute. */
+let etaitFeuille = false
+
 const CARREFOURS = new Set(['p-settings', 'p-profil', 'e-profil'])
 
 function retourVersMere() {
@@ -7384,6 +7391,16 @@ function retourVersMere() {
 window.retourVersMere = retourVersMere
 
 function majBarreHaute(id) {
+  /* ⚠ ON RETIENT L'ETAT D'AVANT, ici et nulle part ailleurs.
+
+     `activerAvecNaissance` lisait `sans-topbar` pour savoir d'ou l'on venait —
+     mais cette fonction tourne APRES `majBarreHaute`, qui vient de poser la
+     classe. Elle voyait donc toujours l'etat d'arrivee.
+
+     C'est pour cela que l'animation d'ouverture ne partait jamais : la
+     condition « je ne venais pas d'une feuille » etait toujours fausse. */
+  etaitFeuille = document.body.classList.contains('sans-topbar')
+
   /* ⚠ ON MEMORISE AVANT DE PARTIR. Si l'ecran qu'on quitte est un carrefour,
      c'est vers lui que le retour ramenera. */
   if (CARREFOURS.has(id)) pageMere = id

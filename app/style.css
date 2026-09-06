@@ -19657,3 +19657,45 @@ body.retour-de-feuille .screen.active{
 body.sans-topbar .screen.active.feuille-arrive{
   animation:pageFlou 0.22s ease-out both !important;
 }
+
+
+/* ⚠ LA PLACE VIDE, A LA TAILLE DU BOUTON RETIRE.
+
+   La barre place ses trois elements sur des colonnes egales. Sans occupant a
+   gauche, le logo remonterait vers le bord au lieu de rester au centre de
+   l'ecran. */
+.tb-vide{
+  flex:0 0 44px;
+  width:44px;
+  height:44px;
+}
+
+
+/* ═══ A L'OUVERTURE D'UN DOSSIER, LA CARTE MONTE ═══
+
+   ⚠ NI FLOU NI FONDU. Vous vouliez un mouvement, pas un effet : la page arrive
+     depuis le bas et se pose. Rien ne se brouille, rien ne s'eclaircit — ce
+     qu'on voit, c'est un objet qui se deplace.
+
+   ⚠ 34 PX, PAS LE BAS DE L'ECRAN. Une carte qui traverse tout l'ecran met trop
+     longtemps et fait attendre ; trente-quatre pixels suffisent a dire d'ou
+     elle vient.
+
+   ⚠ ET L'OPACITE RESTE A 1 DU DEBUT A LA FIN. C'est ce qui distingue un
+     mouvement d'une apparition — sans quoi on retombe sur le fondu que vous ne
+     voulez pas. */
+
+@keyframes carteMonte{
+  from{ transform:translateY(34px); }
+  to  { transform:translateY(0); }
+}
+
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  opacity:1 !important;
+  filter:none !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

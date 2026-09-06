@@ -19979,3 +19979,175 @@ body.sans-topbar #e-category.active.feuille-arrive{
 #e-category.active #equipe-procedures-list > *{
   flex:0 0 auto;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE DE BIENVENUE
+
+   ⚠ ELLE TIENT SUR UN ECRAN, sans defiler. C'est la premiere chose qu'on voit :
+     devoir faire glisser pour trouver le bouton d'inscription serait un mauvais
+     debut.
+
+   ⚠ LE LOGO EN HAUT, LES ACTIONS EN BAS, l'espace au milieu. Le pouce atteint
+     naturellement le bas d'un telephone — c'est la que se posent les boutons.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#choice-screen .choix-ecran{
+  display:flex;
+  flex-direction:column;
+  min-height:100dvh;
+  padding:0 24px calc(env(safe-area-inset-bottom, 0px) + 28px);
+}
+
+/* ⚠ LE HAUT PREND L'ESPACE LIBRE et centre le logo dedans. */
+.bv-haut{
+  flex:1 1 auto;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:14px;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 40px);
+}
+
+.bv-logo{ display:block; width:78px; height:112px; }
+.bv-logo img{ width:100%; height:100%; object-fit:contain; display:block; }
+
+.bv-marque{
+  font-family:'Poppins', 'Inter', system-ui, sans-serif;
+  font-weight:500;
+  font-size:30px;
+  letter-spacing:-0.03em;
+  color:var(--label);
+}
+
+.bv-bas{ flex:0 0 auto; }
+
+.bv-titre{
+  margin:0;
+  font-size:38px; font-weight:800;
+  letter-spacing:-0.045em; line-height:1.05;
+  text-align:center;
+  color:var(--label);
+}
+
+.bv-phrase{
+  margin:10px 0 0;
+  font-size:15.5px; line-height:1.45;
+  text-align:center;
+  color:var(--label-2);
+}
+
+/* ═══ L'ESSAI 14 JOURS ═══
+
+   ⚠ LA MEME PLAQUE QUE PARTOUT AILLEURS — argent froid, arrondi, lisere
+     biseaute — mais avec une couronne au lieu du logo.
+
+     A cet instant la personne ne connait pas encore la marque : lui montrer le
+     logo n'apprend rien. La couronne, elle, dit ce que l'essai donne. */
+.bv-essai{
+  display:flex; align-items:center; gap:14px;
+  width:100%; margin-top:26px;
+  padding:15px 16px;
+  border:none; border-radius:20px;
+  background:rgba(31,76,238,0.07);
+  text-align:left;
+  font-family:inherit;
+}
+.bv-essai:active{ transform:scale(0.985); }
+
+.bv-ess-plaque{
+  position:relative;
+  flex:0 0 52px; width:52px; height:52px;
+  display:grid; place-items:center;
+  border-radius:16px;
+  background:linear-gradient(145deg, #FBFCFD 0%, #DDE1E7 38%, #A9AEB8 100%);
+  box-shadow:
+    inset 0 1px 1px rgba(255,255,255,0.85),
+    inset 0 -1px 2px rgba(20,20,30,0.20),
+    0 2px 6px -3px rgba(20,20,30,0.35);
+  color:#4A5060;
+}
+.bv-ess-plaque svg{ width:26px; height:26px; }
+
+.bv-ess-tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:3px; }
+.bv-ess-tx b{
+  font-size:15.5px; font-weight:650;
+  letter-spacing:-0.02em; color:#1F4CEE;
+}
+.bv-ess-tx i{
+  font-style:normal; font-size:13px; line-height:1.4;
+  color:var(--label-2);
+}
+.bv-ess-fl{ flex:0 0 auto; font-size:22px; color:var(--label-3); }
+
+/* ⚠ LES DEUX BOUTONS ET LA CONNEXION gardent leurs classes d'origine : elles
+   sont deja stylees, et les refaire creerait deux verites. */
+#choice-screen .ac-actions{ margin-top:22px; }
+#choice-screen .ac-connexion{ margin-top:18px; }
+
+@media (max-height: 700px){
+  .bv-logo{ width:62px; height:88px; }
+  .bv-titre{ font-size:32px; }
+  .bv-essai{ margin-top:18px; }
+}
+
+
+/* ⚠ LA PHOTO DE FOND A ETE RETIREE DE LA PAGE DE BIENVENUE.
+
+   Un carrousel d'images occupait tout l'ecran derriere le contenu. Il datait de
+   la version precedente, ou le texte etait blanc par-dessus.
+
+   Sur la nouvelle page, le logo est noir et le titre aussi : ils disparaissent
+   sur une photo sombre. Et votre modele ne montre pas de photo — un fond clair,
+   rien d'autre.
+
+ ⚠ ON LA MASQUE, on ne la retire pas du balisage : le script y touche encore
+   pour faire tourner les images, et supprimer les balises demanderait de
+   nettoyer aussi ce cote. */
+#choice-screen .ac-photos,
+#choice-screen .ac-fondu{
+  display:none !important;
+}
+
+/* ⚠ LE FOND REDEVIENT CELUI DE L'APP. */
+#choice-screen,
+#choice-screen .choix-ecran{
+  background:var(--bg);
+}
+
+
+/* ⚠ LES DEUX BOUTONS PRENNENT LEURS COULEURS.
+
+   Ils gardaient celles de l'ancienne page : texte blanc sur photo sombre. Sur
+   fond clair, le second devenait illisible.
+
+   Le premier est plein — c'est le chemin qu'on recommande, celui du gerant qui
+   cree l'entreprise. Le second est creux : il existe, mais il vient apres. */
+#choice-screen .ac-btn--plein{
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  color:#FFFFFF;
+  border:none;
+  box-shadow:0 8px 22px -10px rgba(31,76,238,0.55);
+}
+#choice-screen .ac-btn--plein .ac-btn-ic,
+#choice-screen .ac-btn--plein .ac-btn-tx,
+#choice-screen .ac-btn--plein .ac-btn-fl{ color:#FFFFFF; }
+#choice-screen .ac-btn--plein .ac-btn-ic{
+  background:rgba(255,255,255,0.18);
+}
+
+#choice-screen .ac-btn--creux{
+  background:#FFFFFF;
+  color:var(--label);
+  border:0.5px solid rgba(28,28,38,0.10);
+  box-shadow:0 1px 2px rgba(20,20,30,0.05);
+}
+#choice-screen .ac-btn--creux .ac-btn-tx{ color:var(--label); }
+#choice-screen .ac-btn--creux .ac-btn-fl{ color:var(--label-3); }
+#choice-screen .ac-btn--creux .ac-btn-ic{
+  background:rgba(31,76,238,0.10);
+  color:#1F4CEE;
+}
+
+/* ⚠ ET LA LIGNE DE CONNEXION EN GRIS, plus en blanc. */
+#choice-screen .ac-connexion{ color:var(--label-2); }
+#choice-screen .ac-connexion b{ color:#1F4CEE; }

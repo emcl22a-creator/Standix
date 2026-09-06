@@ -7143,6 +7143,20 @@ addEventListener('resize', () => {
 function activerAvecNaissance(ecran) {
   if (!ecran) return
 
+  /* ⚠ C'EST ICI QUE L'ANIMATION DEMARRE, pas dans `majBarreHaute`.
+
+     J'ai cherche trois fois au mauvais endroit. `majBarreHaute` s'execute bien
+     en premier et pose la classe a temps — mais l'animation ne demarre qu'au
+     moment ou l'ecran reçoit `active`, quinze lignes plus bas, dans cette
+     fonction.
+
+     Poser `animation:none` ici, juste avant, la coupe pour de bon.
+
+   ⚠ ET L'ON REND LA PROPRIETE QUAND ON N'EST PAS ENTRE DEUX FEUILLES. Sans
+     cela, un ecran fige une fois ne s'animerait plus jamais. */
+  const entreFeuilles = document.body.classList.contains('sans-topbar')
+    && ECRANS_PLEIN_ECRAN.has(ecran.id)
+
   /* ═══════════════════════════════════════════════════════════════════════
      LES ÉCRANS INACTIFS SONT INERTES
      ═══════════════════════════════════════════════════════════════════════
@@ -7177,6 +7191,14 @@ function activerAvecNaissance(ecran) {
      Ici, un fondu de 180 ms, sans déplacement. C'est ce que fait iOS entre deux
      onglets, et c'est fait pour ne pas se remarquer. */
   if (navDepuisOnglet && !ecran.classList.contains('nait')) ecran.classList.add('fondu')
+
+  /* ⚠ LA CONSIGNE SE POSE JUSTE AVANT `active`, pas en tete de fonction.
+
+     Je l'avais mise au debut : `oublierNaissances` et `ouvrirDepuisCarte`
+     passaient apres et remettaient tout a plat. C'est la derniere ligne qui
+     compte — celle qui declenche l'animation. */
+  ecran.style.animation = entreFeuilles ? 'none' : ''
+
   ecran.classList.add('active')
 }
 
@@ -7233,6 +7255,19 @@ window.poserLogosOr = function () {
 function jouerVoile() {
   const v = document.getElementById('voile-arrivee')
   if (!v) return
+
+  /* ⚠ PAS DE VOILE ENTRE DEUX FEUILLES.
+
+     Ce voile passe sur toute la page a chaque changement d'ecran. Entre deux
+     feuilles, il donne l'impression que le bord de la feuille bouge — alors
+     qu'il ne bouge pas : c'est le voile qui glisse dessus.
+
+     C'est la troisieme source de la meme gene. Les deux autres etaient
+     `ecranEntre` en CSS et la classe `nait` en JavaScript. */
+  if (document.body.classList.contains('feuille-figee')) {
+    v.classList.remove('joue')
+    return
+  }
   v.classList.remove('joue')
   void v.offsetWidth
   v.classList.add('joue')
@@ -7340,6 +7375,17 @@ function majBarreHaute(id) {
   const apresFeuille = ECRANS_PLEIN_ECRAN.has(id)
 
   if (avantFeuille && apresFeuille) {
+    /* ⚠ ON FIGE AUSSI L'ECRAN VISE, UN PAR UN.
+
+       La classe sur le corps arrive a temps — verifie — mais l'animation
+       demarre quand meme : le navigateur l'a deja mise en file au moment ou
+       l'ecran a reçu `active`, avant meme de relire les styles.
+
+       Poser `animation:none` directement sur l'element l'annule pour de bon.
+       On le retire au degel, sinon l'ecran ne s'animerait plus jamais. */
+    const vise = document.getElementById(id)
+    if (vise) vise.style.animation = 'none'
+
     document.body.classList.add('feuille-figee')
     /* ⚠ ON DEGELE AU PROCHAIN RENDU. `requestAnimationFrame` deux fois : le
        premier laisse le navigateur poser les styles, le second s'execute
@@ -7352,8 +7398,13 @@ function majBarreHaute(id) {
        On attend qu'elle soit finie. Le delai est genereux de quelques
        centiemes : un ecran lent ne doit pas se retrouver a decouvert. */
     clearTimeout(degelFeuille)
-    degelFeuille = setTimeout(() =>
-      document.body.classList.remove('feuille-figee'), 400)
+    degelFeuille = setTimeout(() => {
+      document.body.classList.remove('feuille-figee')
+      /* ⚠ ON REND SON ANIMATION A L'ECRAN. Sans cela, il ne s'animerait plus
+         jamais, meme en venant d'une page ordinaire. */
+      document.querySelectorAll('.screen[style*="animation"]')
+        .forEach(s => { s.style.animation = '' })
+    }, 400)
   }
 
   document.body.classList.toggle('sans-topbar', ECRANS_PLEIN_ECRAN.has(id))

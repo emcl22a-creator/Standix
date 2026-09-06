@@ -19892,3 +19892,43 @@ body.sans-topbar .screen.active.feuille-arrive{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ⚠ `e-detail` : LA ZONE INTERNE DOIT SUIVRE LA NOUVELLE HAUTEUR.
+
+   Cet ecran a sa propre mise en page : `height:calc(100dvh - 87px)` avec
+   `overflow:hidden`, et sa liste d'etapes defile a l'interieur.
+
+   J'ai change sa hauteur pour la feuille — `100dvh - 14px` — mais la zone
+   interne, elle, garde ses reglages d'origine. Selon l'ordre des regles, elle
+   peut se retrouver plus grande que son parent : le debordement est coupe, et
+   le doigt n'a plus rien a faire glisser.
+
+ ⚠ ON LUI DONNE `flex:1` ET `min-height:0`. Elle prend exactement ce qui reste,
+   quelle que soit la hauteur du parent — plus rien a recalculer si elle change
+   encore. */
+body.sans-topbar #e-detail.active .zone-etapes{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+
+/* ⚠ LES CARTES PRENNENT L'ANIMATION DU SEGMENT.
+
+   Elles employaient `opacity:0 -> 1` avec un flou de 2 px sur 340 ms — un
+   fondu, et une courbe differente de celle du segment « En ligne / En cours ».
+
+   On aligne : flou de 5 px, 220 ms, `cubic-bezier(0.16, 1, 0.3, 1)`, sans
+   fondu. Le meme geste partout. */
+.cl-apparait{
+  opacity:1;
+  filter:blur(5px);
+  transition:filter 0.22s cubic-bezier(0.16, 1, 0.3, 1) var(--retard, 0ms);
+}
+
+.cl-apparait.vu{
+  opacity:1;
+  filter:blur(0);
+}

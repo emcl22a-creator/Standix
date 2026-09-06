@@ -20300,3 +20300,72 @@ body.sans-topbar #p-create-manual.active{
   background:var(--bg);
   box-shadow:none; border:none; border-radius:0;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHANGEMENT DE PAGE — REPRIS
+
+   ⚠ MON ERREUR : J'AI COPIE LES DEUX TEMPS DU SEGMENT MECANIQUEMENT.
+
+     Le segment floute PUIS defloute parce qu'il remplace le contenu au milieu :
+     le flou cache l'echange. C'est sa raison d'etre.
+
+     Une page qui arrive est deja nouvelle. La voir se brouiller d'abord, alors
+     qu'elle vient d'apparaitre nette, n'a aucun sens — et c'est ce qui rendait
+     le geste desagreable.
+
+   ⚠ UN SEUL TEMPS : la page arrive floue et se precise. Rien d'autre.
+
+   ⚠ 8 PX AU DEPART, PAS 5. Sur un seul temps, le flou doit se voir tout de
+     suite ; il n'a pas le temps de s'installer.
+
+   ⚠ ET UNE COURBE QUI FREINE FORT. `cubic-bezier(0.16, 1, 0.3, 1)` : le flou
+     tombe presque entierement dans le premier tiers, puis la fin s'attarde.
+     C'est ce qui donne l'impression que la page se pose au lieu de s'arreter.
+
+   ⚠ 260 MS. Plus court, on ne voit rien ; plus long, on attend.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes pageFlou{
+  from{ filter:blur(8px); }
+  to  { filter:blur(0); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active{
+  animation:pageFlou 0.26s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}
+
+
+/* ⚠ `.feuille-arrive` L'EMPORTAIT PAR PRECISION.
+
+   Une regle ligne 20192 vise `#p-create-video.active.feuille-arrive` — trois
+   conditions contre deux pour la mienne. A `!important` egal, c'est la plus
+   precise qui gagne, pas la derniere ecrite.
+
+   On ajoute la classe a notre selecteur pour egaliser, et comme on passe
+   apres, on gagne. */
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:pageFlou 0.26s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}

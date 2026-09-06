@@ -20369,3 +20369,77 @@ body.sans-topbar #p-create-video.active.feuille-arrive,
 body.sans-topbar #p-create-manual.active.feuille-arrive{
   animation:pageFlou 0.26s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
+
+
+/* ═══ LA PAGE DE BIENVENUE — REPRISE ═══
+
+   ⚠ LE LOGO ET LE MOT SUR UNE LIGNE. Empiles, ils prenaient la moitie de
+     l'ecran ; cote a cote et reduits, le titre reprend la premiere place. */
+.bv-haut{
+  flex-direction:row;
+  gap:10px;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 32px);
+}
+
+.bv-logo{ width:30px; height:43px; }
+.bv-marque{ font-size:26px; }
+
+/* ⚠ LA PLAQUE DEVIENT UN CERCLE BLEU.
+
+   L'argent imitait une plaque de metal — juste pour le logo, qui a sa matiere
+   propre. Une couronne blanche sur un rond bleu dit la meme chose sans faire
+   semblant d'etre un objet. */
+.bv-ess-plaque{
+  flex:0 0 46px; width:46px; height:46px;
+  border-radius:100px;
+  background:linear-gradient(135deg,#1F4CEE 0%,#3A78EE 55%,#4899EC 100%);
+  box-shadow:0 6px 16px -8px rgba(31,76,238,0.6);
+  color:#FFFFFF;
+}
+.bv-ess-plaque svg{ width:23px; height:23px; }
+
+
+/* ⚠ LE FLOU EXISTAIT MAIS NE SE VOYAIT PAS.
+
+   Mesure image par image : il tombait de 8 a 3,3 px entre la premiere et la
+   deuxieme image, et passait sous 1 px avant 80 ms. A soixante images par
+   seconde, cela fait deux images visibles sur seize.
+
+   `cubic-bezier(0.16, 1, 0.3, 1)` monte a 90 % de sa course dans le premier
+   tiers : elle convient a un deplacement, ou l'on veut arriver vite puis se
+   poser. Sur un flou, elle escamote tout.
+
+ ⚠ `ease-out` ETALE LA DISPARITION. Le flou reste perceptible jusqu'a
+   mi-parcours au lieu de s'evanouir a la deuxieme image.
+
+ ⚠ ET LA DUREE MONTE A 0,30 S. Vingt-six centiemes suffisaient a un mouvement ;
+   un flou a besoin d'un peu plus pour se lire. */
+@keyframes pageFlou{
+  from{ filter:blur(10px); }
+  to  { filter:blur(0); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:pageFlou 0.30s ease-out both !important;
+}
+
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

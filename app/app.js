@@ -7175,6 +7175,23 @@ addEventListener('resize', () => {
 function activerAvecNaissance(ecran) {
   if (!ecran) return
 
+  /* ⚠ LES CARTES DEJA PEINTES SE MONTRENT TOUT DE SUITE.
+
+     L'apparition progressive attend qu'une carte entre dans l'ecran, par un
+     `IntersectionObserver`. A la premiere ouverture c'est juste : les cartes
+     arrivent au fil du defilement.
+
+     Mais en REVENANT sur un ecran, elles sont deja la et deja vues. L'observateur
+     doit pourtant les reevaluer une par une, ce qui prend un tour de rendu — et
+     l'on voit la liste apparaitre en retard.
+
+   ⚠ ON MARQUE `vu` CE QUI EST DEJA DANS L'ECRAN, avant meme d'activer. Ce qui
+     est plus bas garde son apparition progressive. */
+  ecran.querySelectorAll('.cl-apparait:not(.vu)').forEach(el => {
+    const r = el.getBoundingClientRect()
+    if (r.top < window.innerHeight) el.classList.add('vu')
+  })
+
   /* ⚠ C'EST ICI QUE L'ANIMATION DEMARRE, pas dans `majBarreHaute`.
 
      J'ai cherche trois fois au mauvais endroit. `majBarreHaute` s'execute bien

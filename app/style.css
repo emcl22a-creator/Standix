@@ -20609,3 +20609,154 @@ body.sans-topbar{
   70%{ filter:blur(0px); }
   100%{ opacity:1; transform:none; filter:blur(0px); }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE DE BIENVENUE — MISE EN PLACE
+
+   ⚠ CE QUI N'ALLAIT PAS. Mesure : l'en-tete occupait de 0 a 425 px — la moitie
+     de l'ecran, presque entierement vide — et tout le contenu se tassait dans
+     les quatre cents derniers.
+
+     Le regard tombait dans un trou avant d'atteindre quoi que ce soit.
+
+   ⚠ TROIS BLOCS, TROIS ROLES.
+
+     Le logo en haut, discret : il identifie, il n'annonce pas.
+     Le titre et l'essai au CENTRE : c'est ce qu'on doit lire.
+     Les actions en bas, la ou le pouce arrive.
+
+   ⚠ LE CENTRE EST UN VRAI CENTRE. Un seul bloc extensible entre deux fixes,
+     avec son contenu centre : le titre tombe au milieu de l'ecran quelle que
+     soit la hauteur du telephone.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#login-screen .login-card{
+  justify-content:flex-start;
+  padding-top:calc(env(safe-area-inset-top, 0px) + 26px);
+}
+
+/* ⚠ L'EN-TETE NE PREND PLUS L'ESPACE LIBRE. Il faisait 425 px a lui seul. */
+.bv-haut{
+  flex:0 0 auto;
+  padding-top:0;
+}
+
+/* ⚠ LE BLOC DU MILIEU PREND CE QUI RESTE et centre ce qu'il contient. */
+.bv-bas{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* ⚠ LE TITRE RESPIRE AU-DESSUS. Sans cette marge, il collerait au logo sur un
+   grand telephone. */
+.bv-titre{ margin-top:0; }
+.bv-phrase{ margin-top:12px; }
+.bv-essai{ margin-top:34px; }
+
+/* ⚠ LES ACTIONS SE DETACHENT DU CENTRE, sans etre collees au bord. */
+.bv-actions{ margin-top:34px; }
+#login-screen .deja-compte{ margin-top:20px; }
+
+/* ⚠ SUR UN PETIT TELEPHONE, on resserre plutot que de laisser defiler. */
+@media (max-height: 720px){
+  .bv-essai{ margin-top:22px; }
+  .bv-actions{ margin-top:22px; }
+  .bv-titre{ font-size:32px; }
+}
+
+
+/* ⚠ LE VIDE S'ETAIT DEPLACE EN BAS.
+
+   Mesure : la connexion finissait a 654 px sur un ecran de 844 — cent quatre-
+   vingt-dix pixels perdus sous les boutons.
+
+   `justify-content:center` centre le bloc entier, contenu compris ; ce qui est
+   dedans se serre au milieu et laisse deux marges egales. Sur cette page, les
+   actions doivent aller EN BAS, pas au milieu.
+
+ ⚠ ON SEPARE : le titre et l'essai centres dans ce qui reste, les actions
+   posees contre le bas. Un bloc extensible entre les deux fait le travail. */
+.bv-bas{
+  justify-content:flex-start;
+  padding-bottom:0;
+}
+
+/* ⚠ LE HAUT DU BLOC — titre, phrase, essai — prend l'espace libre et se centre
+   dedans. */
+.bv-milieu{
+  flex:1 1 auto;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* ⚠ ET LES ACTIONS RESTENT EN BAS, sans marge qui les decolle. */
+.bv-actions{ flex:0 0 auto; margin-top:0; }
+#login-screen .deja-compte{ flex:0 0 auto; }
+
+
+/* ⚠ IL RESTAIT UN TROU DE 180 PX entre l'essai et les boutons.
+
+   Le bloc du milieu se centrait dans tout l'espace libre : le titre remontait,
+   les boutons descendaient, et le vide se creusait entre les deux.
+
+   On le laisse plutot se poser SOUS l'en-tete, avec une marge fixe. Le titre
+   arrive alors a un tiers de l'ecran — la ou l'oeil tombe naturellement — et
+   la respiration se repartit au lieu de s'accumuler au meme endroit. */
+.bv-milieu{
+  justify-content:flex-start;
+  padding-top:72px;
+}
+
+/* ⚠ ET LES ACTIONS REMONTENT UN PEU, pour ne pas coller au bord. */
+.bv-actions{ margin-top:auto; margin-bottom:0; }
+
+
+/* ⚠ ON ARRETE D'ETIRER, ON POSE LES ECARTS.
+
+   Deux essais a laisser un bloc prendre l'espace libre : chaque fois le vide
+   s'est deplace ailleurs — d'abord en haut, puis en bas, puis au milieu.
+
+   Sur une page de six elements qui tient dans un ecran, il n'y a rien a
+   repartir automatiquement : on donne l'ecart voulu entre chacun, et le reste
+   se place tout seul.
+
+ ⚠ LES ECARTS, DU HAUT VERS LE BAS :
+     logo -> titre    64 px  — le titre doit se detacher
+     titre -> phrase  12
+     phrase -> essai  30
+     essai -> boutons 40  — la lecture s'arrete, l'action commence
+     boutons -> lien  20 */
+#login-screen .login-card{
+  justify-content:flex-start;
+}
+
+.bv-bas{ flex:0 0 auto; }
+
+.bv-milieu{
+  flex:0 0 auto;
+  display:block;
+  padding-top:64px;
+}
+
+.bv-titre{ margin-top:0; }
+.bv-phrase{ margin-top:12px; }
+.bv-essai{ margin-top:30px; }
+.bv-actions{ margin-top:40px; }
+#login-screen .deja-compte{ margin-top:20px; }
+
+/* ⚠ ET LE TOUT SE CENTRE VERTICALEMENT. Le bloc entier — logo compris — se
+   pose au milieu de l'ecran, quelle que soit la hauteur du telephone. */
+#login-screen .login-card{
+  justify-content:center;
+}
+.bv-haut{ margin-bottom:0; }
+
+@media (max-height: 700px){
+  .bv-milieu{ padding-top:40px; }
+  .bv-essai{ margin-top:22px; }
+  .bv-actions{ margin-top:28px; }
+}

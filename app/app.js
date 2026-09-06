@@ -13012,12 +13012,12 @@ function animerEntreeCategorie() {
    ⚠ LE DELAI DE 130 MS EST CELUI DU SEGMENT. Il laisse le flou de sortie
      s'installer avant qu'on remplace le contenu — sans quoi on verrait le
      changement se faire a travers un flou naissant. */
+  /* ⚠ CETTE FONCTION NE FLOUTE PLUS RIEN QUAND ELLE VIENT D'UN SOUS-DOSSIER.
+
+     `ouvrirSousDossier` s'en charge desormais, sur les trois zones. La laisser
+     agir ici ferait un second flou par-dessus le premier. */
   const liste = document.getElementById('category-procedures-list')
-  if (liste) {
-    if (typeof MOINS_ANIM === 'function' && MOINS_ANIM()) return
-    flouEntree(liste)
-    return
-  }
+  if (liste) return
 
   jouerVoile()
   const ecran = document.getElementById('p-category')
@@ -13068,16 +13068,28 @@ function ouvrirSousDossier(nom) {
      Mon retour anticipe sautait la remontee, quinze lignes plus bas : on
      ouvrait un sous-dossier au milieu de sa liste. En le faisant ici, les deux
      chemins en profitent. */
+  /* ⚠ ON FLOUTE TOUT L'ONGLET, comme le segment.
+
+     `morceauxDeLaListe` prend la ligne de filtres ET la grille — pas seulement
+     les cartes. Je ne floutais que la liste : le compteur « 4 procedures » et
+     le bouton de tri restaient nets pendant que le reste changeait.
+
+     Ici les memes trois zones : le sous-titre, la ligne de filtres, la liste. */
+  const zonesSD = ['category-subhead', 'category-procedures-list']
+    .map(i => document.getElementById(i))
+    .concat(document.querySelector('#p-category .proc-rang'))
+    .filter(Boolean)
+
   const listeSD = document.getElementById('category-procedures-list')
   if (listeSD) listeSD.scrollTop = 0
   try { window.scrollTo({ top: 0, behavior: 'instant' }) }
   catch { window.scrollTo(0, 0) }
 
-  if (listeSD && !(typeof MOINS_ANIM === 'function' && MOINS_ANIM())) {
-    flouSortie(listeSD)
+  if (zonesSD.length && !(typeof MOINS_ANIM === 'function' && MOINS_ANIM())) {
+    zonesSD.forEach(flouSortie)
     setTimeout(() => {
       renderCategoryProceduresList()
-      animerEntreeCategorie()
+      zonesSD.forEach(flouEntree)
     }, 130)
     return
   }

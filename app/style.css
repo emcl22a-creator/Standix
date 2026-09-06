@@ -19384,3 +19384,58 @@ body.sans-topbar #e-detail.active:not(.feuille-arrive){
 body.retour-de-feuille .screen.active{
   animation:none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANIMATION DES ECRANS — UNE SEULE REGLE, LA DERNIERE
+
+   ⚠ DIX-SEPT REGLES SE DISPUTAIENT CETTE QUESTION. Je les ai ajoutees une par
+     une au fil de vos remarques, chacune corrigeant la precedente. Elles se
+     contredisent : `pageFlou` ici, `none` la, `ecranEntre` ailleurs, et selon
+     l'ordre du fichier c'est tantot l'une tantot l'autre qui gagne.
+
+     C'est la cause des saccades que vous voyez : selon le chemin, deux
+     animations partent ensemble ou l'une s'interrompt.
+
+   ⚠ ON REPREND TOUT ICI, EN TROIS CAS ET DANS CET ORDRE. Plus bas dans le
+     fichier veut dire plus fort : ce bloc a le dernier mot sur les seize
+     autres.
+
+     ① la feuille arrive        → elle glisse
+     ② on est deja dans une feuille → rien
+     ③ tout le reste            → un flou court
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ③ LE CAS ORDINAIRE — un flou court. */
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu{
+  animation:pageFlou 0.22s ease-out both;
+}
+
+/* ② DANS UNE FEUILLE — rien du tout.
+
+   ⚠ ON VISE LE CORPS, pas l'ecran. `sans-topbar` dit « une feuille est
+     ouverte » ; peu importe lequel des six ecrans on regarde. */
+body.sans-topbar .screen.active,
+body.sans-topbar .screen.active.nait,
+body.sans-topbar .screen.fondu,
+body.sans-topbar .screen.active.fondu,
+body.retour-de-feuille .screen.active,
+body.feuille-figee .screen.active{
+  animation:none !important;
+}
+
+/* ① LA FEUILLE QUI ARRIVE — elle glisse, et elle seule.
+
+   ⚠ EN DERNIER, avec `!important`, parce qu'elle doit l'emporter sur le `none`
+     du cas ② : au moment ou elle arrive, `sans-topbar` est deja posee. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

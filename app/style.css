@@ -20151,3 +20151,93 @@ body.sans-topbar #e-category.active.feuille-arrive{
 /* ⚠ ET LA LIGNE DE CONNEXION EN GRIS, plus en blanc. */
 #choice-screen .ac-connexion{ color:var(--label-2); }
 #choice-screen .ac-connexion b{ color:#1F4CEE; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHANGEMENT DE PAGE FAIT LE MEME GESTE QUE LE SEGMENT
+
+   ⚠ CE QUI DIFFERAIT, ET QUE JE N'AVAIS PAS VU.
+
+     Je verifiais que `pageFlou` jouait, avec la bonne courbe et la bonne duree.
+     Mais je comparais une animation en UN temps a une animation en DEUX.
+
+     Le segment, mesure :
+
+       0 -> 5 px en 130 ms   (flouSortie)
+       5 -> 0 px en 220 ms   (flouEntree)
+
+     Le changement de page partait de 5 px et descendait. La moitie du geste
+     manquait : la page arrivait deja floue au lieu de se brouiller d'abord.
+
+   ⚠ ON REFAIT LES DEUX TEMPS EN CSS. Meme montee, meme descente, memes
+     courbes — celles relevees dans `flouSortie` et `flouEntree`.
+
+     Duree totale 350 ms, le point haut a 37 % : 130 sur 350.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes pageFlou{
+  0%   { filter:blur(0); }
+  37%  { filter:blur(5px); }
+  100% { filter:blur(0); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:pageFlou 0.35s linear both !important;
+}
+
+/* ⚠ `linear` PARCE QUE LES COURBES SONT DANS LES ETAPES. Une courbe globale
+   s'appliquerait entre chaque paire d'etapes et deformerait les deux temps. */
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE, en dernier mot. */
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}
+
+
+/* ⚠ LES COURBES DE CHAQUE TEMPS, pas une seule pour les deux.
+
+   Mesure de mon premier essai : le flou montait bien a 5 px, mais redescendait
+   en ligne droite — il restait a 3 px quand le segment etait deja a 0,3.
+
+   `linear` s'appliquait aux DEUX temps. Or le segment emploie deux courbes
+   distinctes : une qui accelere en montant, une qui freine en descendant.
+
+   En CSS, `animation-timing-function` dans une etape vaut pour le segment qui
+   la SUIT. On les pose donc dans les etapes elles-memes. */
+@keyframes pageFlou{
+  0%{
+    filter:blur(0);
+    animation-timing-function:cubic-bezier(0.4, 0, 1, 1);
+  }
+  37%{
+    filter:blur(5px);
+    animation-timing-function:cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  100%{ filter:blur(0); }
+}
+
+/* ⚠ ET LE BOUTON + REPREND LE FLOU. Ma regle le visait par
+   `.feuille-arrive` — une classe qu'il ne reçoit que s'il vient d'une page
+   ordinaire. Depuis une autre feuille, elle n'est pas posee et il n'avait
+   plus rien.
+
+   On le vise par son identifiant, sans condition. */
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active{
+  animation:pageFlou 0.35s linear both !important;
+}

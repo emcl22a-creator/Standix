@@ -20760,3 +20760,38 @@ body.sans-topbar{
   .bv-essai{ margin-top:22px; }
   .bv-actions{ margin-top:28px; }
 }
+
+
+/* ⚠ LA MONTEE EST RETIREE, LE FLOU RESTE.
+
+   `ecranEntre` faisait trois choses : monter de 12 px, s'eclaircir, se
+   preciser. Vous voulez garder le flou et l'opacite, mais plus le deplacement.
+
+   La page arrive donc en place et se precise — rien ne bouge.
+
+ ⚠ ON GARDE LA COURBE LINEAIRE DU FLOU, celle qui le rend visible 183 ms au
+   lieu de 50. */
+@keyframes ecranEntre{
+  0%{
+    opacity:0;
+    filter:blur(6px);
+    animation-timing-function:linear;
+  }
+  35%{ opacity:1; }
+  70%{ filter:blur(0px); }
+  100%{ opacity:1; filter:blur(0px); }
+}
+
+/* ⚠ ET LE PROFIL DEFILE, quoi qu'il arrive.
+
+   `body.sans-topbar` bloque la fenetre pour les feuilles. Si la classe reste
+   posee par accident en arrivant sur le profil — ce qui peut se produire selon
+   le chemin — la page se retrouve figee.
+
+   On l'autorise nommement : cet ecran n'est pas une feuille, il doit toujours
+   pouvoir glisser. */
+body:has(#p-profil.active),
+body:has(#e-profil.active){
+  overflow:auto !important;
+  height:auto !important;
+}

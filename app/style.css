@@ -19742,7 +19742,7 @@ body.sans-topbar .screen.active.feuille-arrive{
 
 /* ⚠ LA LISTE PREND LE RESTE ET DEFILE SEULE. */
 #p-category.active #category-procedures-list,
-#e-category.active #e-category-list{
+#e-category.active #equipe-procedures-list{
   flex:1 1 auto;
   min-height:0;
   overflow-y:auto;
@@ -19826,8 +19826,23 @@ body.sans-topbar .screen.active.feuille-arrive{
  ⚠ ET L'ON INTERDIT LE DEFILEMENT HORIZONTAL, sinon ces douze pixels
    deviendraient glissables au doigt. */
 #p-category.active #category-procedures-list,
-#e-category.active #e-category-list{
+#e-category.active #equipe-procedures-list{
   margin-inline:-12px;
   padding-inline:12px;
   overflow-x:hidden;
+}
+
+
+/* ⚠ COTE UTILISATEUR, LA LISTE S'APPELLE `equipe-procedures-list`.
+
+   J'avais ecrit `e-category-list` — un nom que j'ai suppose par symetrie avec
+   `category-procedures-list`, sans le verifier dans le balisage.
+
+   Mes regles ne visaient donc rien de ce cote : la page continuait de defiler
+   entierement. C'est ce que vous voyiez.
+
+ ⚠ LE HAUT DE CET ECRAN A AUSSI SES PROPRES NOMS. `e-cat-sous` au lieu de
+   `category-subhead` : il faut le figer nommement, lui aussi. */
+#e-category.active #e-cat-sous{
+  flex:0 0 auto;
 }

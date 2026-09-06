@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=f9f7a288">
+<link rel="stylesheet" href="style.css?v=62bb5ff1">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3642,16 +3642,16 @@
              ⚠ TROIS ETATS DANS LE MEME BOUTON : la photo si elle existe, les
                initiales sinon, une silhouette en dernier recours — avant que la
                fiche membre soit chargee. -->
-        <button type="button" class="tb-menu tb-profil" id="tb-menu-equipe"
-                aria-label="Votre profil" aria-expanded="false">
-          <img id="tb-photo-equipe" alt="" hidden>
-                    <svg class="tb-silhouette" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
-               stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="8.4" r="3.6"/>
-            <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>
-          </svg>
-        </button>
+        <!-- ⚠ LE BOUTON PROFIL A ETE RETIRE DE CET ESPACE.
+
+           L'onglet « Reglages » de la barre du bas mene deja au profil : le
+           bouton faisait doublon, et il occupait une place que le logo peut
+           prendre.
+
+         ⚠ UNE PLACE VIDE LE REMPLACE. Sans elle, le logo se decalerait vers la
+           gauche : la barre est une grille de trois colonnes egales, et il faut
+           que la premiere existe pour que la deuxieme soit au centre. -->
+        <span class="tb-vide" aria-hidden="true"></span>
 
         <span class="tb-logo">
           <div class="boot-logo boot-logo--topbar" id="topbar-logo-equipe">

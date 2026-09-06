@@ -19439,3 +19439,205 @@ body.sans-topbar .screen.active.feuille-arrive{
   .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ═══ LA PAGE DES MOUVEMENTS RESPIRE DAVANTAGE ═══
+
+   ⚠ ELLE ETAIT SERREE. Dix pixels entre les lignes, quatorze de texte : sur une
+     page qui ne contient qu'une liste, rien ne justifiait cette densite.
+
+     Les mouvements se lisent un par un — qui est arrive, qui est parti — pas en
+     bloc. Chacun merite sa place.
+
+   ⚠ ET LE POINT DE COULEUR GRANDIT. A huit pixels il se perdait dans le blanc ;
+     a dix il ancre la ligne. */
+/* ⚠ LE CONTENEUR S'APPELLE `activites-tout`, pas `histo-liste`.
+
+   `histo-liste` est celui du volet du haut ; la page en a un autre. Mes regles
+   ne visaient donc rien. */
+#activites-tout{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  padding-top:20px;
+}
+
+/* ⚠ CHAQUE LIGNE EST DEJA UNE CARTE — `padding:13px 15px` et un fond. On ne
+   remplace pas son rembourrage, on l'augmente. */
+#activites-tout .histo-lig{
+  gap:13px;
+  padding:16px 16px;
+}
+
+#activites-tout .histo-pt{
+  flex:0 0 10px;
+  width:10px; height:10px;
+  margin-top:5px;
+}
+
+#activites-tout .histo-t{
+  font-size:15px;
+  line-height:1.4;
+}
+
+#activites-tout .histo-s{
+  margin-top:3px;
+  font-size:12.5px;
+}
+
+/* ⚠ LES SEPARATEURS DE JOUR AUSSI. Ils annoncent un groupe : ils ont besoin
+   d'air au-dessus, moins en dessous — ce qui suit leur appartient. */
+#activites-tout .histo-jour{
+  margin:22px 0 6px;
+}
+#activites-tout .histo-jour:first-child{
+  margin-top:0;
+}
+
+
+/* ⚠ LE TITRE REMONTE DE DIX PIXELS.
+
+   Mesure : 34 px entre le bas de la barre et le haut du titre — la barre finit
+   a 68, le titre commençait a 102.
+
+   Le rembourrage vient de `calc(max(10px, safe-area) + 92px)` : les 92 px
+   couvrent la barre plus l'ecart. En les passant a 82, l'ecart tombe a 24 —
+   assez pour separer, assez peu pour ne plus paraitre vide.
+
+ ⚠ ON GARDE LE `max(10px, safe-area)`. C'est lui qui protege l'encoche des
+   iPhone recents ; le retirer collerait le titre a la barre d'etat sur ces
+   modeles. */
+.screen{
+  padding-top:calc(max(10px, env(safe-area-inset-top, 0px)) + 82px);
+}
+
+
+/* ═══ L'AVATAR DE LA CARTE « Mon compte » ═══
+
+   ⚠ LES DEUX COUCHES OCCUPENT LA MEME CASE. Une grille d'une seule cellule les
+     superpose : chacune est en `grid-area:1/1`, sans position absolue — donc la
+     boite garde sa taille naturelle et le reste de la carte n'a pas a s'y
+     adapter.
+
+   ⚠ ET LA PHOTO EST RECADREE, PAS DEFORMEE. Les gens envoient des portraits en
+     hauteur ; sans `object-fit:cover`, ils seraient ecrases. */
+.reg-av{
+  display:grid;
+  flex:0 0 44px;
+  width:44px; height:44px;
+  border-radius:100px;
+  overflow:hidden;
+  background:rgba(118,118,128,0.14);
+  place-items:center;
+}
+
+.reg-av-ini,
+.reg-av-img{
+  grid-area:1 / 1;
+  width:100%; height:100%;
+}
+
+.reg-av-ini{
+  display:grid; place-items:center;
+  font-size:15px; font-weight:650;
+  letter-spacing:-0.02em;
+  color:var(--label-2);
+}
+
+.reg-av-img{
+  object-fit:cover;
+  display:block;
+}
+.reg-av-img[hidden]{ display:none; }
+
+/* ⚠ LA CARTE PREND UN ECART, sinon l'avatar collerait au nom. */
+.reg-identite{
+  gap:13px;
+}
+
+
+/* ⚠ LES 11 PX DE L'ESPACE UTILISATEUR SONT RETIRES.
+
+   Mesure : meme rembourrage des deux cotes — 92 px — mais le titre commençait
+   a 103 px cote utilisateur contre 92 en gestion. La difference venait d'un
+   `margin-top:11px` pose sur `#equipe-app .page-tete`.
+
+   Son commentaire d'origine explique le SELECTEUR — pourquoi il faut viser en
+   descendant — mais pas la valeur. Elle compensait sans doute une disposition
+   qui a change depuis.
+
+ ⚠ ON NE TOUCHE PAS A LA REGLE D'ORIGINE. Elle sert peut-etre a autre chose que
+   cette marge ; on annule seulement ce qui decale. */
+#equipe-app .page-tete{
+  margin-top:0;
+}
+
+
+/* ⚠ ENTRE DEUX FEUILLES, LE FLOU PLUTOT QUE RIEN.
+
+   Je les avais rendues muettes : passer d'un dossier a un sous-dossier ne
+   montrait aucun changement, et l'on doutait que le clic ait ete pris.
+
+   Le flou court dit « ça a change » sans rien deplacer — c'est exactement ce
+   qu'il faut ici, puisque la feuille, elle, ne bouge pas.
+
+ ⚠ SEULE L'OUVERTURE GARDE SON GLISSEMENT. Elle fait autre chose : la feuille
+   n'etait pas la, elle arrive. */
+body.sans-topbar .screen.active,
+body.sans-topbar .screen.active.nait,
+body.sans-topbar .screen.fondu,
+body.sans-topbar .screen.active.fondu,
+body.feuille-figee .screen.active{
+  animation:pageFlou 0.22s ease-out both !important;
+}
+
+/* ⚠ SAUF AU RETOUR, ou la feuille redescend deja. */
+body.retour-de-feuille .screen.active{
+  animation:none !important;
+}
+
+/* ⚠ ET L'OUVERTURE, EN DERNIER, l'emporte sur le flou. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}
+
+
+/* ⚠ `feuille-figee` NE COUPE PLUS L'ANIMATION, seulement la transition.
+
+   Trois regles anterieures lui font poser `animation:none`. Elles datent du
+   moment ou vous vouliez le silence entre deux feuilles ; maintenant vous
+   voulez le flou.
+
+   On les annule ici — en dernier, donc c'est cette valeur qui gagne. */
+body.feuille-figee .screen.active,
+body.feuille-figee .screen,
+body.feuille-figee .screen.fondu,
+body.sans-topbar .screen.active,
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #p-analyse.active:not(.feuille-arrive),
+body.sans-topbar #p-create-video.active:not(.feuille-arrive),
+body.sans-topbar #p-create-manual.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive),
+body.sans-topbar #e-detail.active:not(.feuille-arrive){
+  animation:pageFlou 0.22s ease-out both !important;
+}
+
+/* ⚠ ET L'OUVERTURE GARDE SON GLISSEMENT, en dernier mot. */
+body.sans-topbar .screen.active.feuille-arrive{
+  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+body.retour-de-feuille .screen.active{
+  animation:pageFlou 0.22s ease-out both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

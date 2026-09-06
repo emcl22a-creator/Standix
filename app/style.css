@@ -19202,4 +19202,15 @@ body.sans-topbar .tb-plus{
    apres — le temps que le nouvel ecran prenne sa place sans animer. */
 body.feuille-figee .screen.active{
   transition:none !important;
+
+  /* ⚠ ET L'ANIMATION D'ENTREE AUSSI.
+
+     Mesure : le nouvel ecran arrivait a 23 px du haut puis descendait a 14. Ce
+     n'etait pas ma transition de marge — celle-la etait bien figee — mais
+     `ecranEntre`, l'animation commune a tous les ecrans : elle les fait monter
+     de douze pixels en apparaissant.
+
+     Sur une page ordinaire c'est juste. Sur une feuille deja en place, cela
+     donne l'impression que le bord se remet en position. */
+  animation:none !important;
 }

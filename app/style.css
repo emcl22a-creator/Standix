@@ -19775,3 +19775,36 @@ body.sans-topbar .screen.active.feuille-arrive{
   from{ filter:blur(3px); }
   to  { filter:blur(0); }
 }
+
+
+/* ═══ LA PAGE ANALYSE RESERVE SA PLACE AVANT D'ETRE REMPLIE ═══
+
+   ⚠ L'ECRAN S'AFFICHE VIDE, PUIS LES DONNEES ARRIVENT.
+
+     `showGestionScreen` montre la page, `loadGlobalAnalyse` la remplit juste
+     apres — mais elle interroge la base, ce qui prend quelques centaines de
+     millisecondes.
+
+     Pendant ce temps, les quatre zones font zero pixel de haut. Quand les
+     chiffres arrivent, tout ce qui est en dessous se decale d'un coup : c'est
+     le saut que vous voyez.
+
+   ⚠ ON LEUR DONNE UNE HAUTEUR MINIMALE, celle qu'elles auront une fois
+     remplies. La page ne bouge plus : le contenu se pose dans une place deja
+     faite.
+
+   ⚠ ET L'ON NE MET PAS DE SQUELETTE ANIME. Une fausse barre qui pulse attire
+     l'oeil sur l'attente au lieu de la faire oublier. */
+
+#p-global-analyse #an-chiffres{
+  min-height:96px;
+}
+
+#p-global-analyse #an-graph-temps,
+#p-global-analyse #an-graph-lectures{
+  min-height:132px;
+}
+
+#p-global-analyse #an-equipe{
+  min-height:64px;
+}

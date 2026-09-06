@@ -7154,8 +7154,19 @@ function activerAvecNaissance(ecran) {
 
    ⚠ ET L'ON REND LA PROPRIETE QUAND ON N'EST PAS ENTRE DEUX FEUILLES. Sans
      cela, un ecran fige une fois ne s'animerait plus jamais. */
-  const entreFeuilles = document.body.classList.contains('sans-topbar')
-    && ECRANS_PLEIN_ECRAN.has(ecran.id)
+  /* ⚠ ON COUPE AUSSI AU RETOUR.
+
+     Ma condition ne visait que le passage d'une feuille a une autre. En
+     revenant vers la liste, `ecranEntre` rejouait sur elle : la page d'accueil
+     remontait de douze pixels alors que la feuille redescendait.
+
+     Deux mouvements contraires au meme instant — c'est ce qu'on voyait.
+
+   ⚠ ON REGARDE D'OU L'ON VIENT, pas seulement ou l'on va. Quitter une feuille
+     suffit a couper, quelle que soit la destination. */
+  const veniantFeuille = document.body.classList.contains('sans-topbar')
+  const versFeuille = ECRANS_PLEIN_ECRAN.has(ecran.id)
+  const entreFeuilles = veniantFeuille
 
   /* ═══════════════════════════════════════════════════════════════════════
      LES ÉCRANS INACTIFS SONT INERTES
@@ -7198,6 +7209,20 @@ function activerAvecNaissance(ecran) {
      passaient apres et remettaient tout a plat. C'est la derniere ligne qui
      compte — celle qui declenche l'animation. */
   ecran.style.animation = entreFeuilles ? 'none' : ''
+
+  /* ⚠ LA FEUILLE S'ANNONCE QUAND ELLE ARRIVE DE NULLE PART.
+
+     `veniantFeuille` est faux et `versFeuille` vrai : on ouvre une feuille
+     depuis une page ordinaire. C'est le seul cas ou un mouvement se justifie.
+
+   ⚠ ON RETIRE LA CLASSE APRES. Laissee en place, elle rejouerait a chaque
+     retour sur cet ecran, meme depuis une autre feuille. */
+  ecran.classList.remove('feuille-arrive')
+  if (!veniantFeuille && versFeuille) {
+    void ecran.offsetWidth
+    ecran.classList.add('feuille-arrive')
+    setTimeout(() => ecran.classList.remove('feuille-arrive'), 500)
+  }
 
   ecran.classList.add('active')
 }

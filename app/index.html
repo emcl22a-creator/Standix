@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=fc42aad4">
+<link rel="stylesheet" href="style.css?v=ffcefc19">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -879,138 +879,71 @@
          L'ordre suit celui du regard : qui l'on est, ou l'on arrive, ce que
          l'app fait — et seulement ensuite, les champs.
          ═══════════════════════════════════════════════════════════════════ -->
-    <div class="feuille-marque">
-      <img data-logo alt=""><span class="logotype">Standix</span>
-    </div>
+    <!-- ⚠ LA PAGE DE BIENVENUE.
 
-    <h1 id="auth-title">Bienvenue</h1>
-    <!-- ⚠ TROIS TEMPS, TROIS ACTEURS, TROIS POINTS.
+           Logo en grand, titre, l'essai, les deux inscriptions, la connexion.
+           Elle tient sur un ecran sans defiler : devoir faire glisser pour
+           trouver le bouton d'inscription serait un mauvais debut. -->
 
-         L'ancienne phrase decrivait le produit en une subordonnee : « les
-         gestes de votre metier, filmes une fois et retrouves par toute
-         l'equipe ». Correcte, mais il faut la lire en entier pour comprendre.
+      <div class="bv-haut">
+        <span class="bv-logo"><img data-logo alt=""></span>
+        <span class="bv-marque">Standix</span>
+      </div>
 
-         Trois phrases courtes se lisent d'un coup d'oeil, et chacune nomme
-         qui fait quoi : vous, l'IA, l'equipe. C'est la progression du produit
-         elle-meme.
+      <div class="bv-bas">
+        <h1 class="bv-titre">Bienvenue</h1>
+        <p class="bv-phrase">Rejoignez notre application et profitez<br>de toutes ses fonctionnalités.</p>
 
-       ⚠ DES POINTS, PAS DES VIRGULES. Le point marque un temps accompli ; la
-         virgule relierait ce qui doit rester distinct. -->
-    <div class="subhead" id="auth-sous">Filmez. L’IA rédige. L’équipe sait.</div>
+        <!-- ⚠ LA MEME PLAQUE QUE L'ESSAI 14 JOURS, avec une couronne.
 
-    <!-- ═══ LES DEUX SCENES ═══
+             A cet instant la personne ne connait pas encore la marque : lui
+             montrer le logo n'apprend rien. La couronne dit ce que l'essai
+             donne. -->
+        <button type="button" class="bv-essai" onclick="ouvrirInscription('gestion')">
+          <span class="bv-ess-plaque">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.4 7.6l4.2 3.4L12 5l4.4 6 4.2-3.4-1.6 9.8H5Z"></path>
+              <path d="M5 18.4h14"></path>
+            </svg>
+          </span>
+          <span class="bv-ess-tx">
+            <b>Essai 14 jours gratuit</b>
+            <i>Découvrez toutes les fonctionnalités sans engagement.</i>
+          </span>
+          <span class="bv-ess-fl">›</span>
+        </button>
 
-         ⚠ LES DEUX IMAGES SONT SUPERPOSEES, pas cote a cote. Un carrousel qui
-           fait glisser demande de mesurer, de gerer le doigt, de savoir ou l'on
-           en est. Ici, l'une s'efface pendant que l'autre parait : deux
-           elements au meme endroit, une seule classe qui bascule.
+        <div class="bv-actions">
+          <button type="button" class="bv-btn bv-btn--plein" onclick="ouvrirInscription('gestion')">
+            <span class="bv-btn-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+                <path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"></path>
+                <circle cx="18.4" cy="16.6" r="2.4"></circle>
+                <path d="M18.4 12.6v1.2M18.4 19.4v1.2M14.9 14.6l1 .6M20.9 18l1 .6"></path>
+              </svg>
+            </span>
+            <span class="bv-btn-tx">S’inscrire gérant</span>
+          </button>
 
-         ⚠ LES DEUX FICHIERS SONT A COTE DE index.html, PAS DANS UN SOUS-DOSSIER.
-           Je les avais annonces dans `img/` ; ils ont ete deposes dans `app/`,
-           et le chemin suit — plutot que de faire deplacer deux fichiers deja
-           en ligne.
+          <button type="button" class="bv-btn bv-btn--creux" onclick="ouvrirInscription('equipe')">
+            <span class="bv-btn-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8.4" r="3.6"></circle>
+                <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"></path>
+              </svg>
+            </span>
+            <span class="bv-btn-tx">S’inscrire utilisateur</span>
+          </button>
+        </div>
 
-         ⚠ `fetchpriority="high"` SUR LA PREMIERE. C'est la seule image visible
-           au chargement ; sans cela le navigateur la traite comme les autres et
-           la carte reste grise une seconde. -->
-    <div class="scenes" id="scenes" aria-hidden="true">
-      <!-- ⚠ L'ENTREPOT EN PREMIER. C'est la scene qui dit le mieux ce que fait
-           l'app : quelqu'un, seul a son poste, qui consulte un geste sur son
-           telephone. Le bureau montre deux personnes qui regardent ensemble —
-           juste, mais c'est la situation qu'on veut EVITER : celle ou il faut
-           demander a quelqu'un.
-
-           ⚠ `fetchpriority` SUIT L'ORDRE. Il etait sur le bureau ; laisse la,
-             le navigateur aurait charge en priorite l'image qu'on ne voit
-             pas. -->
-      <img class="scene visible" src="scene-entrepot.webp" alt=""
-           fetchpriority="high" decoding="async">
-      <img class="scene" src="scene-bureau.webp" alt="" loading="lazy" decoding="async">
-
-            <!-- ⚠ LA PASTILLE « Procedure validee » A ETE RETIREE.
-
-           Elle posait un exemple d'interface par-dessus la photo : deux choses
-           a lire au meme endroit. La scene dit deja ce que fait l'app —
-           quelqu'un a son poste, son telephone en main. -->
-    </div>
-
-    <div class="auth-form-wrap">
-      <!-- Connexion -->
-      <!-- ⚠ LE FORMULAIRE DE CONNEXION EST DANS SA PROPRE FEUILLE, plus bas.
-             Il occupait le haut de la page, avant les deux chemins de creation :
-             quelqu'un qui decouvre Standix tombait d'abord sur des champs qu'il
-             ne peut pas remplir. -->
-
-    </div>
-
-    <div class="error-msg" id="login-error"></div>
-
-    <!-- ═══════════════════════════════════════════════════════════════════
-         LES DEUX CHEMINS DE CREATION
-
-         ⚠ DEUX CARTES DE MEME TAILLE, DE MEME MATIERE, SANS ORDRE DE VALEUR.
-
-           La version precedente offrait un segment « Se connecter / Creer un
-           compte » ou tout le monde passait par la meme porte, puis decouvrait
-           ensuite qu'il fallait un code. Le choix se fait maintenant en amont,
-           et il est dit clairement.
-
-         ⚠ AUCUNE DES DEUX N'EST « PRINCIPALE ». Un gerant sans equipe n'a rien
-           a montrer ; une equipe sans procedures n'a rien a lire. Les deux
-           roles font l'app, et rien dans le dessin ne doit suggerer que l'un
-           vaut moins que l'autre — meme fond, meme rayon, meme graisse de
-           titre.
-
-         ⚠ LE VOCABULAIRE EVITE « rejoindre » SEUL, qui sonne comme un second
-           temps. « Vous entrez dans un espace deja pret » dit la meme chose
-           sans faire attendre.
-         ═══════════════════════════════════════════════════════════════════ -->
-    <div class="creer-titre">Créer un compte</div>
-
-    <div class="creer-choix">
-      <button type="button" class="creer-carte" id="creer-entreprise">
-        <span class="cc-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal1)" stroke-width="1.9"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3.6 20.4h16.8"/>
-            <path d="M5.4 20.4V6.2a1.6 1.6 0 0 1 1.6-1.6h6a1.6 1.6 0 0 1 1.6 1.6v14.2"/>
-            <path d="M14.6 11.4h2.8a1.6 1.6 0 0 1 1.6 1.6v7.4"/>
-            <path d="M8.4 8.4h2.6M8.4 12h2.6M8.4 15.6h2.6"/>
-          </svg>
-        </span>
-        <span class="cc-tx">
-          <span class="cc-t">Inscription gérant</span>
-          <!-- ⚠ LE SOUS-TITRE A ETE RETIRE.
-
-               « Gérez vos procédures » sous « Inscription gérant » : le mot
-               gérant y est deux fois, et la phrase n'apprend rien que le titre
-               ne dise. Sur un ecran de choix, deux lignes valent mieux qu'une
-               ligne plus une redite. -->
-        </span>
-        <span class="cc-fl">›</span>
-      </button>
-
-      <button type="button" class="creer-carte" id="creer-membre">
-        <span class="cc-ic">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal3)" stroke-width="1.9"
-               stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8.2" r="3.4"/>
-            <path d="M5.6 19.4a6.4 6.4 0 0 1 12.8 0"/>
-          </svg>
-        </span>
-        <span class="cc-tx">
-          <span class="cc-t">Inscription utilisateur</span>
-        </span>
-        <span class="cc-fl">›</span>
-      </button>
-    </div>
-
-    <!-- ⚠ UN LIEN, PAS UNE TROISIEME CARTE. Trois cartes de meme forme
-         obligeraient a lire les trois pour choisir, alors qu'il n'y a que deux
-         portes d'entree. -->
-    <button type="button" class="deja-compte" id="deja-compte">
-      Vous avez déjà un compte ? <b>Se connecter</b>
-    </button>
+        <button type="button" class="deja-compte" id="deja-compte">
+          Vous avez déjà un compte ? <b>Se connecter</b>
+        </button>
+      </div>
   </div>
 </div>
 

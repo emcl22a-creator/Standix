@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=0d531fef">
+<link rel="stylesheet" href="style.css?v=567e4007">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -784,66 +784,62 @@
     <!-- Le logo SEUL, sans le mot. Sur une page dont le titre occupe déjà le
          tiers bas, un logotype en haut ajoute une seconde chose à lire là où
          un signe suffit à dire de qui il s'agit. -->
-    <div class="ac-marque"><img data-logo alt="Standix"></div>
+    <div class="bv-haut">
+        <span class="bv-logo"><img data-logo alt=""></span>
+        <span class="bv-marque">Standix</span>
+      </div>
 
-    <div class="ac-bas">
-      <!-- ═══ ALIGNÉ À GAUCHE, PAS CENTRÉ ═══
+      <div class="bv-bas">
+        <h1 class="bv-titre">Bienvenue</h1>
+        <p class="bv-phrase">Rejoignez notre application et profitez<br>de toutes ses fonctionnalités.</p>
 
-           Un texte centré convient à une annonce ; à gauche, il se lit comme
-           une phrase. La troisième ligne passe en ambre : elle porte le mot qui
-           compte — « procédures », ce qu'on obtient. -->
-      <h1 class="ac-titre">L’IA transforme<br>vos vidéos<br><em>en procédures.</em></h1>
-      <p class="ac-phrase">Toute l’équipe les consulte d’un scan,<br>ou dans l’app.</p>
-
-      <div class="ac-actions">
-        <!-- Chaque bouton porte une icône à gauche et un chevron à droite : on
-             lit qui l'on est, puis on voit que ça mène quelque part. -->
-        <button type="button" class="ac-btn ac-btn--plein" data-space="gestion">
-          <span class="ac-btn-ic">
-            <!-- ═══ PLUS DE COURONNE ═══
-
-                 Une couronne dit « chef » — elle place l'un au-dessus de
-                 l'autre. Or ce sont deux rôles, pas deux rangs : le gérant
-                 écrit les procédures, l'employé les lit. L'un ne vaut pas
-                 mieux que l'autre.
-
-                 Un DOSSIER OUVERT AVEC UN PLUS : celui qui crée l'espace et y
-                 range les procédures. Il dit ce qu'on fait, pas ce qu'on est.
-
-                 L'icône de l'employé — deux silhouettes — dit aussi une action :
-                 rejoindre un groupe. Les deux sont du même ordre. -->
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"
-                 stroke-linejoin="round" stroke-linecap="round">
-              <path d="M3.6 19.4V6.2a1.6 1.6 0 0 1 1.6-1.6h4l2 2.4h7.2a1.6 1.6 0 0 1 1.6 1.6v10.8
-                       a1.6 1.6 0 0 1-1.6 1.6H5.2a1.6 1.6 0 0 1-1.6-1.6Z"/>
-              <path d="M12 11.6v4.8M9.6 14h4.8"/>
+        <button type="button" class="bv-essai" onclick="ouvrirInscription('gestion')">
+          <span class="bv-ess-plaque">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3.4 7.6l4.2 3.4L12 5l4.4 6 4.2-3.4-1.6 9.8H5Z"></path>
+              <path d="M5 18.4h14"></path>
             </svg>
           </span>
-          <span class="ac-btn-tx">S’inscrire comme gérant</span>
-          <span class="ac-btn-fl">›</span>
-        </button>
-
-        <button type="button" class="ac-btn ac-btn--creux" data-space="equipe">
-          <span class="ac-btn-ic">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-                 stroke-linejoin="round"><path d="M15.6 20.2v-1.7a3.2 3.2 0 0 0-3.2-3.2H6.6a3.2 3.2 0 0 0-3.2 3.2v1.7"/>
-            <circle cx="9.5" cy="7.8" r="3.2"/><path d="M20.6 20.2v-1.7a3.2 3.2 0 0 0-2.4-3.1"/>
-            <path d="M15.1 4.9a3.2 3.2 0 0 1 0 6.1"/></svg>
+          <span class="bv-ess-tx">
+            <b>Essai 14 jours gratuit</b>
+            <i>Découvrez toutes les fonctionnalités sans engagement.</i>
           </span>
-          <!-- Raccourci : « pour accéder aux procédures » passait sur deux lignes et
-               cassait la symétrie des deux boutons. « rejoindre mon équipe » dit la
-               même chose en tenant sur une ligne. -->
-          <span class="ac-btn-tx">S’inscrire comme employé</span>
-          <span class="ac-btn-fl">›</span>
+          <span class="bv-ess-fl">›</span>
         </button>
 
-        <button type="button" class="ac-connexion" id="ac-connexion">
-          Vous avez déjà un compte ? <b>Se connecter</b>
-        </button>
+        <div class="ac-actions">
+          <button class="ac-btn ac-btn--plein" onclick="ouvrirInscription('gestion')">
+            <span class="ac-btn-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+                <path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"></path>
+                <circle cx="18.4" cy="16.6" r="2.4"></circle>
+                <path d="M18.4 12.6v1.2M18.4 19.4v1.2M14.9 14.6l1 .6M20.9 18l1 .6"></path>
+              </svg>
+            </span>
+            <span class="ac-btn-tx">S’inscrire gérant</span>
+            <span class="ac-btn-fl">›</span>
+          </button>
+
+          <button class="ac-btn ac-btn--creux" onclick="ouvrirInscription('equipe')">
+            <span class="ac-btn-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8.4" r="3.6"></circle>
+                <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"></path>
+              </svg>
+            </span>
+            <span class="ac-btn-tx">S’inscrire utilisateur</span>
+            <span class="ac-btn-fl">›</span>
+          </button>
+        </div>
+
+        <button class="ac-connexion" onclick="allerConnexion()">Vous avez déjà un compte ? <b>Se connecter</b></button>
       </div>
     </div>
   </div>
-</div>
 
 <!-- ═══ 2. CONNEXION / INSCRIPTION ═══ -->
 <!-- ═══ `inert` PENDANT QUE L'ÉCRAN EST MASQUÉ ═══

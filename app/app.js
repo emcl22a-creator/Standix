@@ -21661,14 +21661,47 @@ document.getElementById('e-cat-retour')?.addEventListener('click', () => {
   showEquipeScreen('e-list', document.querySelector('#tabbar .tab-round'))
 })
 
+/* ⚠ LA MEME CHOSE QUE COTE GESTION.
+
+   `ouvrirSousDossier` remet la liste en haut, peint, retire `feuille-arrive`,
+   puis rejoue l'animation d'ecran. Cette version-ci ne faisait que peindre :
+   on passait d'un dossier a son sous-dossier sans aucun signe.
+
+   Les quatre gestes sont repris, avec les identifiants de cet espace. */
 function ouvrirSousDossierEquipe(nom) {
   equipeSousDossier = nom
   equipeCatQuery = ''
+
   const champ = document.getElementById('e-cat-recherche')
-  if (champ) champ.value = ''
+  if (champ) {
+    champ.value = ''
+    /* ⚠ LE LIBELLE SUIT LA PAGE, comme cote gestion : un sous-dossier ne
+       contient que des procedures. */
+    champ.placeholder = 'Rechercher une procédure'
+  }
+
   document.getElementById('e-cat-titre').textContent = nom
+
+  /* ⚠ ON REMONTE AVANT DE PEINDRE, sinon on ouvre le sous-dossier au milieu de
+     sa liste. */
+  const listeE = document.getElementById('equipe-procedures-list')
+  if (listeE) listeE.scrollTop = 0
   remonterEnHaut()
+
   renderEquipeCatListe()
+
+  /* ⚠ ON RETIRE `feuille-arrive` AVANT DE REJOUER.
+
+     C'est elle qui porte `carteMonte`, la montee reservee au moment ou la
+     feuille arrive. Un sous-dossier n'est pas une arrivee : sans ce retrait, on
+     rejouerait la montee au lieu du flou. */
+  const ecranE = document.getElementById('e-category')
+  if (ecranE && !(typeof MOINS_ANIM === 'function' && MOINS_ANIM())) {
+    ecranE.classList.remove('feuille-arrive')
+    ecranE.classList.remove('active')
+    void ecranE.offsetWidth
+    ecranE.classList.add('active')
+  }
 }
 
 /* ⚠ L'ICONE DE LA LIGNE SUIT CE QU'ELLE COMPTE.

@@ -21225,3 +21225,138 @@ body.sans-topbar #e-detail.active.feuille-arrive{
 #login-screen .bv-ess-plaque svg{ width:21px; height:21px; }
 #login-screen .bv-ess-tx b{ font-size:15px; }
 #login-screen .bv-ess-tx i{ font-size:12.5px; }
+
+
+/* ═══ LA PAGE « VOTRE POSTE » ═══
+
+   ⚠ L'EN-TETE EST SOBRE. Une question en noir, une phrase en gris. Le bloc
+     degrade avec sa lueur promettait une page importante ; celle-ci ne fait
+     que lister cinq postes. */
+.poste-tete{
+  margin:0 0 20px;
+}
+
+.poste-q{
+  margin:0;
+  font-size:19px;
+  font-weight:650;
+  letter-spacing:-0.03em;
+  line-height:1.3;
+  color:var(--label);
+}
+
+.poste-s{
+  margin:6px 0 0;
+  font-size:14px;
+  line-height:1.45;
+  color:var(--label-2);
+}
+
+/* ⚠ LA COCHE PREND LA COULEUR DU BOUTON « GENERER LES ETAPES ».
+
+   Un rond et un crochet, comme lui. La couleur vient de `--blue` : c'est celle
+   du bouton une fois qu'il a fini, et elle dit la meme chose ici — c'est
+   choisi, c'est acquis. */
+.poste-coche{
+  flex-shrink:0;
+  display:block;
+  width:24px; height:24px;
+  color:var(--blue);
+  animation:cocheArrive 0.45s cubic-bezier(0.34, 1.5, 0.64, 1) both;
+}
+.poste-coche svg{ width:24px; height:24px; display:block; }
+
+
+/* ⚠ L'EN-TETE SE CALE A GAUCHE. Il heritait du centrage du « hero » qu'il
+   remplace — mais une question posee au-dessus d'une liste se lit en haut a
+   gauche, comme le reste de l'app. */
+#p-reg-poste .poste-tete,
+#e-reg-poste .poste-tete{
+  text-align:left;
+}
+
+
+/* ⚠ « SE CONNECTER » DEBORDE DE LA CARTE pour atteindre la largeur des autres.
+
+   Il faisait 308 px contre 342 : la carte le contient, et son rembourrage de
+   15 px le retrecit de chaque cote. La hauteur etait la meme — c'est la
+   largeur qui les rendait dissemblables.
+
+   Une marge negative annule le rembourrage, un rembourrage interne le rend :
+   le bouton retrouve les 342 px sans que la carte ne bouge. */
+/* ⚠ LE BOUTON RESTE DANS LA CARTE.
+
+   Trois essais a le faire deborder pour atteindre 342 px : chacun l'a laisse
+   de travers, et le dernier le faisait sortir du cadre blanc — un bouton a
+   cheval sur le bord d'une carte se lit comme un defaut.
+
+ ⚠ C'EST LA CARTE QUI S'ELARGIT. Son rembourrage lateral tombe a zero ; le
+   bouton fait alors naturellement toute sa largeur, et les champs recuperent
+   leur marge par leur propre rembourrage.
+
+   Le resultat est le meme, sans rien faire deborder. */
+#login-screen .bv-carte{
+  padding-left:0;
+  padding-right:0;
+}
+
+#login-screen .bv-carte > *:not(.bv-btn){
+  margin-left:16px;
+  margin-right:16px;
+}
+
+#login-screen .bv-carte .bv-champ{
+  width:calc(100% - 32px);
+}
+
+
+
+/* ⚠ DEUX ANIMATIONS A LA SUITE, A 640 MS D'ECART.
+
+   Mesure : `ecranRetourEspace` joue a 206 ms, puis une seconde animation part
+   a 855 ms.
+
+   La cause est le retrait de `espace-arrive`. Tant que la classe est la,
+   l'ecran suit la regle ④ ; quand elle part, il retombe sur la regle ① et le
+   navigateur voit un changement d'animation — donc il la joue.
+
+ ⚠ ON NE REJOUE PAS UNE ANIMATION SUR UN ECRAN DEJA EN PLACE. `espace-fige`
+   est posee par le script pendant le temps du basculement : elle neutralise
+   toute animation, le temps que les classes se stabilisent.
+
+   Sans elle, il faudrait retirer `espace-arrive` sans que rien ne change — ce
+   qui n'est pas possible en CSS seul. */
+body.espace-fige .screen.active,
+body.espace-fige .topbar{
+  animation:none !important;
+}
+
+
+/* ⚠ LA VRAIE CAUSE : `nait` ET `espace-arrive` EN MEME TEMPS.
+
+   Trace des mutations : au basculement, `e-list` reçoit `nait` — pose par
+   `ouvrirDepuisCarte`, puisqu'on vient du bouton oeil — puis le corps reçoit
+   `espace-arrive`.
+
+   Deux regles s'appliquent donc l'une apres l'autre, et le navigateur joue les
+   deux animations a la suite.
+
+ ⚠ PENDANT UN BASCULEMENT D'ESPACE, LA REGLE DE L'ESPACE GAGNE. On l'ecrit
+   avec `nait` dans le selecteur pour qu'elle soit plus precise que la regle de
+   naissance, et l'on neutralise cette derniere. */
+body.espace-arrive .screen.active.nait,
+body.espace-arrive .screen.active{
+  animation:ecranRetourEspace 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:50% 45%;
+}
+
+/* ⚠ ET UNE FOIS LE BASCULEMENT FINI, PLUS RIEN NE REJOUE.
+
+   `espace-fige` reste pose le temps que `espace-arrive` parte et que les
+   classes se stabilisent. Sans cela, le passage d'une regle a l'autre relance
+   une animation sur un ecran deja en place. */
+body.espace-fige .screen.active,
+body.espace-fige .screen.active.nait,
+body.espace-fige .topbar{
+  animation:none !important;
+}

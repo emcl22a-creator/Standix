@@ -9213,7 +9213,6 @@ function classementProcedures(cle, format, zoneId, noteId, note) {
         const dossier = d.sous_categorie || d.categorie || ''
         return `
         <div class="an-membre">
-          <span class="an-rang" style="background:${pointDossier(r % 5)}"></span>
           <span class="an-m-co">
             <span class="an-m-t">${escapeHtml(d.titre || 'Sans titre')}</span>
             ${dossier ? `<span class="an-m-s">${escapeHtml(dossier)}</span>` : ''}
@@ -9685,7 +9684,9 @@ function peindreAnalyseInterne() {
     z.innerHTML = top.length
       ? top.map((p, r) => `
         <div class="an-membre">
-          <span class="an-rang" style="background:${pointDossier(teinteRang)}"></span>
+          <!-- ⚠ PLUS DE POINT DE COULEUR. Il servait a distinguer deux membres
+               dans « Équipe » ; devant une procedure, il ne dit rien — le
+               classement se lit deja par l'ordre. -->
           <span class="an-m-co">
             <span class="an-m-t">${escapeHtml(titreProc(p.id))}</span>
             ${dossierProc(p.id) ? `<span class="an-m-s">${escapeHtml(dossierProc(p.id))}</span>` : ''}

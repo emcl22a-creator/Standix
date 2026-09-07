@@ -21856,3 +21856,22 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 @media (max-height: 700px){
   #login-screen .bv-slogan{ font-size:20px; }
 }
+
+
+/* ⚠ LA FEUILLE QUI PART NE DOIT PLUS SE REAJUSTER.
+
+   Mesure : deux animations tournaient sur elle en meme temps —
+   `feuilleSeDissout`, qui est le flou voulu, et une transition de
+   `padding-top`.
+
+   Cette transition vient de treize regles accumulees sur `.screen`, chacune
+   ecrite a un tour different. Quand la feuille perd `active`, son rembourrage
+   change et la transition l'anime : le contenu glisse vers le haut pendant que
+   la feuille se floute. C'est ce glissement qui gachait le geste.
+
+ ⚠ ON LA COUPE, ET L'ON GELE LE REMBOURRAGE. La feuille garde l'aspect qu'elle
+   avait au moment ou on l'a quittee, et se contente de disparaitre. */
+.screen.feuille-part{
+  transition:none !important;
+  padding-top:inherit;
+}

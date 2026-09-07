@@ -21360,3 +21360,129 @@ body.espace-fige .screen.active.nait,
 body.espace-fige .topbar{
   animation:none !important;
 }
+
+
+/* ⚠ LA SORTIE DE L'APERCU PREND L'ANIMATION ORDINAIRE.
+
+   Elle jouait `ecranRetourEspace` — la gestion redescendait de derriere,
+   depuis une echelle de 1,02. C'etait un geste a part, ecrit pour marquer le
+   changement d'espace.
+
+   Vous le voulez identique a un changement de page : le meme flou court, quel
+   que soit l'ecran qui revient.
+
+ ⚠ L'ENTREE GARDE SON GESTE. On y va par un bouton flottant, on en revient par
+   les onglets ordinaires — les deux moments ne sont pas symetriques. */
+/* ⚠ SEULE LA SORTIE PREND L'ANIMATION ORDINAIRE.
+
+   `en-apercu` n'est posee qu'a l'entree : elle distingue les deux moments. On
+   vise donc `:not(.en-apercu)` — c'est-a-dire le retour vers la gestion. */
+body.espace-arrive:not(.en-apercu) .screen.active,
+body.espace-arrive:not(.en-apercu) .screen.active.nait{
+  animation:ecranFlou 0.22s ease-out both !important;
+  transform:none !important;
+}
+
+body.espace-arrive:not(.en-apercu) .topbar{
+  animation:ecranFlou 0.22s ease-out both;
+}
+
+/* ⚠ ET L'ENTREE GARDE SA MONTEE. On y va par un bouton flottant, on en revient
+   par les onglets ordinaires : les deux moments ne sont pas symetriques. */
+body.espace-arrive.en-apercu .screen.active,
+body.espace-arrive.en-apercu .screen.active.nait{
+  animation:ecranRetourEspace 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:50% 45%;
+}
+
+
+/* ⚠ `espace-vide` DOIT TOUT TAIRE.
+
+   Trace : au debut d'une sortie, le corps porte « espace-arrive espace-vide »
+   — la premiere reste du basculement precedent, puisqu'on ne la retire plus.
+   L'ecran qui part s'animait donc une fois de plus, a 18 ms.
+
+   `espace-vide` marque le moment ou l'espace disparait : rien ne doit y
+   bouger. La regle passe en dernier et vise les deux classes ensemble pour
+   l'emporter. */
+body.espace-vide .screen.active,
+body.espace-vide .screen.active.nait,
+body.espace-vide.espace-arrive .screen.active,
+body.espace-vide.espace-arrive .screen.active.nait,
+body.espace-vide .topbar{
+  animation:none !important;
+}
+
+
+/* ═══ ① L'EN-TETE DE « VOTRE POSTE » EN NOIR ═══
+
+   ⚠ UNE CARTE PLEINE PLUTOT QU'UN TEXTE. La question devient un bloc noir a
+     texte blanc : elle se detache de la liste au lieu de s'y fondre.
+
+   ⚠ ET LA PHRASE PASSE EN BLANC ATTENUE — 62 % — plutot qu'en gris. Un gris
+     sur noir manque de contraste ; le blanc translucide garde la hierarchie
+     sans devenir illisible. */
+#p-reg-poste .poste-tete,
+#e-reg-poste .poste-tete{
+  margin:0 0 20px;
+  padding:18px 18px 19px;
+  border-radius:20px;
+  background:#101014;
+}
+
+#p-reg-poste .poste-q,
+#e-reg-poste .poste-q{
+  color:#FFFFFF;
+}
+
+#p-reg-poste .poste-s,
+#e-reg-poste .poste-s{
+  color:rgba(255,255,255,0.62);
+}
+
+
+/* ═══ ② LA FEUILLE REDESCEND EN PARTANT ═══
+
+   ⚠ L'INVERSE EXACT DE SON ARRIVEE. Elle monte de 28 px en s'agrandissant de
+     0,97 a 1 ; elle repart donc vers le bas, en se retrecissant.
+
+     Sans cela, on la voyait monter a l'ouverture puis disparaitre d'un flou —
+     deux gestes sans rapport pour un aller-retour.
+
+   ⚠ `retour-de-feuille` EST DEJA POSEE PAR LE SCRIPT, le temps du retour. Il
+     n'y avait qu'a lui donner son animation. */
+@keyframes ecranDossierPart{
+  0%  { opacity:1; transform:none; filter:blur(0px); }
+  40% { opacity:1; }
+  100%{ opacity:0; transform:translateY(28px) scale(0.97); filter:blur(3px); }
+}
+
+/* ⚠ L'ECRAN QUI REVIENT NE REJOUE PAS LA MONTEE.
+
+   Il etait deja la avant qu'on ouvre la feuille : le faire monter donnerait
+   l'impression qu'il arrive, alors qu'on le retrouve.
+
+   C'est la feuille qui descend ; lui reste en place, avec le flou ordinaire. */
+body.retour-de-feuille .screen.active{
+  animation:ecranFlou 0.22s ease-out both;
+}
+
+/* ⚠ ET C'EST LA FEUILLE QUI PART QUI DESCEND, pas celle qui arrive. */
+body.retour-de-feuille .screen:not(.active).feuille-part{
+  animation:ecranDossierPart 0.34s cubic-bezier(0.32, 0.72, 0, 1) both;
+  transform-origin:50% 100%;
+}
+
+
+/* ⚠ LA FEUILLE QUI PART RESTE AFFICHEE le temps de descendre.
+
+   `.screen` sans `.active` vaut `display:none` : elle disparaissait avant
+   d'avoir bouge. `feuille-part` la maintient a l'ecran, au-dessus de celle qui
+   arrive. */
+.screen.feuille-part{
+  display:block !important;
+  position:fixed;
+  inset:14px 0 0;
+  z-index:25;
+  pointer-events:none;
+}

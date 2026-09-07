@@ -19722,13 +19722,7 @@ body.sans-topbar #e-detail.active .zone-etapes{
 }
 
 /* ⚠ LE HAUT PREND L'ESPACE LIBRE et centre le logo dedans. */
-.bv-haut{
-  flex:1 1 auto;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-  gap:14px;
-  padding-top:calc(env(safe-area-inset-top, 0px) + 40px);
-}
+
 
 .bv-logo{ display:block; width:78px; height:112px; }
 .bv-logo img{ width:100%; height:100%; object-fit:contain; display:block; }
@@ -20032,11 +20026,7 @@ body.sans-topbar #e-detail.active .zone-etapes{
 
    ⚠ LE LOGO ET LE MOT SUR UNE LIGNE. Empiles, ils prenaient la moitie de
      l'ecran ; cote a cote et reduits, le titre reprend la premiere place. */
-.bv-haut{
-  flex-direction:row;
-  gap:10px;
-  padding-top:calc(env(safe-area-inset-top, 0px) + 32px);
-}
+
 
 .bv-logo{ width:30px; height:43px; }
 .bv-marque{ font-size:26px; }
@@ -20255,10 +20245,7 @@ body.sans-topbar{
 }
 
 /* ⚠ L'EN-TETE NE PREND PLUS L'ESPACE LIBRE. Il faisait 425 px a lui seul. */
-.bv-haut{
-  flex:0 0 auto;
-  padding-top:0;
-}
+
 
 /* ⚠ LE BLOC DU MILIEU PREND CE QUI RESTE et centre ce qu'il contient. */
 .bv-bas{
@@ -20371,7 +20358,7 @@ body.sans-topbar{
 #login-screen .login-card{
   justify-content:center;
 }
-.bv-haut{ margin-bottom:0; }
+
 
 @media (max-height: 700px){
   .bv-milieu{ padding-top:40px; }
@@ -20867,4 +20854,123 @@ body.espace-arrive .topbar{
   body .screen.active,
   body.espace-arrive .screen.active,
   body.espace-arrive .topbar{ animation:none; }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE DE BIENVENUE — PLUS COMPACTE
+
+   ⚠ LE BLOC FLOTTAIT. Mesure : 524 px de contenu sur un ecran de 844, avec
+     159 px de vide en haut et 161 en bas. Centre, certes — mais rien
+     n'accrochait le regard, et l'ensemble paraissait timide.
+
+   ⚠ ON RESSERRE ET L'ON DESCEND. Les ecarts se reduisent, le bloc gagne en
+     densite, et il se pose plus bas : le titre arrive a hauteur d'oeil, les
+     boutons a portee de pouce.
+
+   ⚠ ET LE TITRE GROSSIT. A 38 px il se noyait entre le logo et la phrase ; a
+     46 il devient ce qu'on lit en premier. C'est le seul mot qui doit porter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#login-screen .login-card{
+  justify-content:flex-end;
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 34px);
+}
+
+/* ⚠ LE LOGO PREND L'ESPACE LIBRE AU-DESSUS, sans le remplir : il reste petit
+   et discret, mais il pousse le reste vers le bas. */
+
+
+.bv-milieu{ padding-top:0; }
+
+.bv-titre{
+  font-size:46px;
+  letter-spacing:-0.05em;
+  line-height:0.98;
+}
+
+.bv-phrase{
+  margin-top:14px;
+  font-size:16px;
+}
+
+/* ⚠ LES ECARTS SE RESSERRENT : 30 et 40 px devenaient des trous entre trois
+   blocs de meme poids. */
+.bv-essai{ margin-top:26px; }
+.bv-actions{ margin-top:20px; gap:10px; }
+#login-screen .deja-compte{ margin-top:16px; }
+
+@media (max-height: 720px){
+  .bv-titre{ font-size:38px; }
+
+  .bv-essai{ margin-top:18px; }
+  .bv-actions{ margin-top:16px; }
+}
+
+
+/* ⚠ LE LOGO ETAIT DECALE A DROITE ET LE HAUT RESTAIT VIDE.
+
+   `flex:1 1 auto` sur `.bv-haut` lui faisait prendre tout l'espace libre : il
+   devenait une grande zone dont le contenu se calait a droite, faute de
+   `justify-content` sur l'axe horizontal.
+
+   Et le vide restait en haut plutot que de se repartir.
+
+ ⚠ ON REVIENT A UN BLOC DE TAILLE NATURELLE, centre, avec la marge voulue. Le
+   tout se pose au milieu de l'ecran : plus de zone extensible, plus de
+   surprise. */
+/* ⚠ LA REGLE UNIQUE DE L'EN-TETE.
+
+   Sept regles s'etaient empilees sur cet element ; six sont retirees. Celle-ci
+   redeclare tout, `display:flex` compris — il venait de la premiere, et son
+   retrait avait envoye le logo contre le bord gauche. */
+.bv-haut{
+  display:flex;
+  flex:0 0 auto;
+  flex-direction:row;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:0 0 30px;
+}
+
+#login-screen .login-card{
+  justify-content:center;
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 30px);
+}
+
+
+/* ⚠ LE TITRE A 46 PX, EN DERNIER MOT.
+
+   Sept regles se disputaient sa taille : 38, 32, 32, 46, puis 38 dans un media
+   `max-height` que Chrome applique a 844 px de haut.
+
+   Celle-ci passe apres toutes, et son media ne vise que les vrais petits
+   ecrans — sous 700 px. */
+#login-screen .bv-titre{
+  font-size:46px;
+  letter-spacing:-0.05em;
+  line-height:0.98;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-titre{ font-size:36px; }
+}
+
+
+/* ⚠ `#login-screen .login-card h1` L'EMPORTAIT.
+
+   Cette regle date de l'ancienne page de connexion : un identifiant, une
+   classe et un element, contre un identifiant et une classe pour la mienne.
+   Elle est donc plus precise, quelle que soit sa position.
+
+   On egalise en ajoutant le meme `.login-card`. */
+#login-screen .login-card .bv-titre{
+  font-size:46px;
+  letter-spacing:-0.05em;
+  line-height:0.98;
+}
+
+@media (max-height: 700px){
+  #login-screen .login-card .bv-titre{ font-size:36px; }
 }

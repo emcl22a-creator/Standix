@@ -21786,3 +21786,43 @@ body.sans-topbar #p-create-ai.active{
   animation:creationPart 0.28s cubic-bezier(0.4, 0, 1, 1) both;
   transform-origin:50% 45%;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA DISPARITION DES FEUILLES — UN FLOU, RIEN D'AUTRE
+
+   ⚠ TROIS GESTES DE DEPART COEXISTAIENT : `ecranDossierPart` en deux versions
+     — l'une qui tombait de 28 px, l'autre de 46 — et `creationPart` qui
+     reculait. Chacun ecrit a un tour different, aucun retire.
+
+   ⚠ VOUS N'EN VOULEZ QU'UN, ET SANS MOUVEMENT. La feuille reste ou elle est et
+     se dissout : le flou monte pendant qu'elle s'efface.
+
+     C'est le geste le plus discret possible — on ne regarde pas la feuille
+     partir, on regarde deja celle qui arrive.
+
+   ⚠ L'OPACITE COMMENCE APRES LE FLOU — a 30 %. Si les deux partaient ensemble,
+     la feuille disparaitrait avant d'avoir eu le temps de se brouiller, et
+     l'on ne verrait qu'un fondu.
+
+   ⚠ 0,26 S. Une disparition n'a pas a se faire admirer : elle libere la place.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes feuilleSeDissout{
+  0%  { opacity:1; filter:blur(0px); }
+  30% { opacity:1; }
+  100%{ opacity:0; filter:blur(8px); }
+}
+
+.screen.feuille-part,
+body.retour-de-feuille .screen:not(.active).feuille-part,
+.screen.feuille-part#p-create-manual,
+.screen.feuille-part#p-create-video,
+.screen.feuille-part#p-create-doc,
+.screen.feuille-part#p-create-ai{
+  animation:feuilleSeDissout 0.26s ease-out both !important;
+
+  /* ⚠ ET AUCUN DEPLACEMENT. Les anciennes regles posaient `transform` ; sans
+     ce rappel, la derniere valeur resterait. */
+  transform:none !important;
+}

@@ -21649,3 +21649,56 @@ body.retour-de-feuille .screen:not(.active).feuille-part{
 #e-reg-poste .poste-tete{
   margin:22px 0 14px;
 }
+
+
+/* ⚠ L'ECART LOGO-SLOGAN PASSE DE 40 A 30 PX. Le logo annonce, le slogan
+   explique : dix pixels de moins les rapprochent sans les coller. */
+#login-screen .bv-haut{
+  padding-bottom:30px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-haut{ padding-bottom:20px; }
+}
+
+
+/* ═══ LA DISPARITION DE LA FEUILLE, REPRISE ═══
+
+   ⚠ CE QUI N'ALLAIT PAS. Mesure image par image : elle descendait ses 28 px en
+     85 ms, puis restait figee la pendant 255 ms en s'effaçant.
+
+     Deux mouvements sans rapport : une chute brutale, puis une disparition
+     immobile. C'est ce qui la rendait desagreable.
+
+     La cause est `cubic-bezier(0.32, 0.72, 0, 1)` — la courbe des arrivees.
+     Elle freine en fin de course : parfait pour se poser, mauvais pour partir.
+
+   ⚠ UNE COURBE QUI ACCELERE. `cubic-bezier(0.4, 0, 1, 1)` fait l'inverse : la
+     feuille demarre lentement puis prend de la vitesse, comme un objet qu'on
+     laisse tomber.
+
+   ⚠ ELLE VA PLUS LOIN — 46 px au lieu de 28. On doit la voir sortir, pas la
+     voir s'arreter a mi-chemin.
+
+   ⚠ ET L'OPACITE SUIT LE MOUVEMENT au lieu de le remplacer : elle commence a
+     35 % du trajet, quand la feuille bouge deja. */
+
+@keyframes ecranDossierPart{
+  0%{
+    opacity:1;
+    transform:none;
+    filter:blur(0px);
+  }
+  35%{ opacity:1; }
+  100%{
+    opacity:0;
+    transform:translateY(46px) scale(0.965);
+    filter:blur(4px);
+  }
+}
+
+body.retour-de-feuille .screen:not(.active).feuille-part,
+.screen.feuille-part{
+  animation:ecranDossierPart 0.30s cubic-bezier(0.4, 0, 1, 1) both;
+  transform-origin:50% 100%;
+}

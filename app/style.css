@@ -21609,3 +21609,28 @@ body.retour-de-feuille .screen:not(.active).feuille-part{
 @media (max-height: 700px){
   #login-screen .bv-actions{ margin-top:4px; }
 }
+
+
+/* ⚠ LE SLOGAN PASSE DE 19 A 21 PX. Deux pixels : assez pour qu'il porte un peu
+   plus, trop peu pour changer sa place dans la hierarchie. */
+#login-screen .bv-slogan{
+  font-size:21px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:19px; }
+}
+
+
+/* ⚠ 20 PX, PAS 21. A vingt-et-un, « procedure, » passait a la ligne toute
+   seule : le slogan tenait sur trois lignes au lieu de deux, et la coupure
+   manuelle du balisage ne voulait plus rien dire.
+
+   Vingt suffit a le faire porter un peu plus, sans casser la mise en page. */
+#login-screen .bv-slogan{
+  font-size:20px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:18px; }
+}

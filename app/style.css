@@ -21937,3 +21937,18 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
   padding-top:16px;
   padding-bottom:16px;
 }
+
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER N'A PLUS DE FONDU.
+
+   `ecranDossier` partait d'`opacity:0` : la feuille apparaissait en meme temps
+   qu'elle montait. Ce fondu la rendait molle — on voyait deux choses a la
+   fois, l'arrivee et l'apparition.
+
+   Elle est pleinement visible des le depart. Seuls le deplacement et le flou
+   font le geste, comme `ecranFlou` qui ne touche que le flou. */
+@keyframes ecranDossier{
+  0%  { opacity:1; transform:translateY(28px) scale(0.97); filter:blur(3px); }
+  70% { filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}

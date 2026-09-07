@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=a2e5f980">
+<link rel="stylesheet" href="style.css?v=ed27b560">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -901,32 +901,66 @@
            Elle tient sur un ecran sans defiler : devoir faire glisser pour
            trouver le bouton d'inscription serait un mauvais debut. -->
 
+      <!-- ⚠ LA PAGE DE BIENVENUE, REFAITE.
+
+           Logo, slogan, phrase, connexion, puis les deux inscriptions.
+
+         ⚠ LES CHAMPS SONT CEUX DE LA FEUILLE DE CONNEXION — memes
+           identifiants, donc le code qui les lit fonctionne sans changement.
+           La feuille reste en place pour le bouton « Se connecter » du bas. -->
+
       <div class="bv-haut">
         <span class="bv-logo"><img data-logo alt=""></span>
         <span class="bv-marque">Standix</span>
       </div>
 
       <div class="bv-bas">
-        <!-- ⚠ CE BLOC SE CENTRE DANS L'ESPACE LIBRE.
+        <p class="bv-slogan">Filmez et l’IA crée la procédure,<br>accessible à toute l’équipe.</p>
+        <p class="bv-phrase">Accédez à votre espace et à vos procédures.</p>
 
-             Les actions, elles, restent en bas. Sans cette enveloppe, tout se
-             serrait au milieu et laissait cent quatre-vingt-dix pixels vides
-             sous les boutons. -->
-        <div class="bv-milieu">
-<h1 class="bv-titre">Bienvenue</h1>
-        <p class="bv-phrase">Rejoignez notre application et profitez<br>de toutes ses fonctionnalités.</p>
+        <!-- ⚠ LA CONNEXION D'ABORD. La plupart des gens qui ouvrent l'app ont
+             deja un compte : leur demander de chercher un bouton serait leur
+             faire perdre du temps a chaque fois. -->
+        <div class="bv-carte">
+          <div class="bv-carte-t">Se connecter</div>
 
-        <!-- ⚠ LA MEME PLAQUE QUE L'ESSAI 14 JOURS, avec une couronne.
+          <label class="bv-lab" for="bv-email">E-mail</label>
+          <input type="email" id="bv-email" class="bv-champ"
+                 placeholder="vous@gmail.com" autocomplete="username"
+                 inputmode="email" autocapitalize="off" spellcheck="false">
 
-             A cet instant la personne ne connait pas encore la marque : lui
-             montrer le logo n'apprend rien. La couronne dit ce que l'essai
-             donne. -->
+          <label class="bv-lab" for="bv-mdp">Mot de passe</label>
+          <input type="password" id="bv-mdp" class="bv-champ"
+                 placeholder="••••••••" autocomplete="current-password">
+
+          <p class="bv-err" id="bv-err"></p>
+
+          <button type="button" class="bv-btn bv-btn--plein" id="bv-connexion">
+            <span class="bv-btn-tx">Se connecter</span>
+          </button>
+
+          <button type="button" class="bv-oubli" id="bv-oubli">Mot de passe oublié ?</button>
+        </div>
+
+        <!-- ⚠ « ou s'inscrire » SEPARE LES DEUX INTENTIONS. Sans lui, les
+             quatre boutons se liraient comme une seule liste. -->
+        <div class="bv-ou"><span>ou s’inscrire</span></div>
+
+        <!-- ⚠ L'ESSAI SE PLACE AVANT LES DEUX INSCRIPTIONS.
+
+             Il dit ce que l'inscription donne : c'est l'argument, il vient
+             donc avant les boutons plutot qu'apres.
+
+           ⚠ UNE COURONNE, PAS LE LOGO. A cet instant la personne ne connait
+             pas encore la marque ; la couronne dit ce que l'essai ouvre. -->
         <button type="button" class="bv-essai" onclick="ouvrirInscription('gestion')">
           <span class="bv-ess-plaque">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M4 8.2l3.4 2.8L12 5.4l4.6 5.6L20 8.2l-1.4 8.4H5.4Z"></path><circle cx="4" cy="7.4" r="1.1"></circle><circle cx="12" cy="4.6" r="1.1"></circle><circle cx="20" cy="7.4" r="1.1"></circle>
-              <path d="M5 18.4h14"></path>
+              <path d="M4 8.2l3.4 2.8L12 5.4l4.6 5.6L20 8.2l-1.4 8.4H5.4Z"></path>
+              <circle cx="4" cy="7.4" r="1.1"></circle>
+              <circle cx="12" cy="4.6" r="1.1"></circle>
+              <circle cx="20" cy="7.4" r="1.1"></circle>
             </svg>
           </span>
           <span class="bv-ess-tx">
@@ -934,10 +968,9 @@
             <i>Découvrez toutes les fonctionnalités sans engagement.</i>
           </span>
         </button>
-        </div>
 
         <div class="bv-actions">
-          <button type="button" class="bv-btn bv-btn--plein" onclick="ouvrirInscription('gestion')">
+          <button type="button" class="bv-btn bv-btn--creux" onclick="ouvrirInscription('gestion')">
             <span class="bv-btn-ic">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
                    stroke-linecap="round" stroke-linejoin="round">
@@ -961,10 +994,6 @@
             <span class="bv-btn-tx">S’inscrire utilisateur</span>
           </button>
         </div>
-
-        <button type="button" class="deja-compte" id="deja-compte">
-          Vous avez déjà un compte ? <b>Se connecter</b>
-        </button>
       </div>
   </div>
 </div>
@@ -4652,7 +4681,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=6601c7a8"></script>
+<script type="module" src="app.js?v=fcf99704"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

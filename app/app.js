@@ -1709,8 +1709,15 @@ window.demanderReinitialisation = demanderReinitialisation
    champ saisi ; depuis les pages de compte, elle vient du champ en lecture
    seule — la personne est connectée, on connaît son adresse et lui redemander
    serait un obstacle sans raison. */
-document.getElementById('mdp-oublie')?.addEventListener('click', (e) =>
-  demanderReinitialisation(document.getElementById('login-email')?.value, 'login-error', e.currentTarget))
+/* ⚠ LES DEUX BOUTONS « MOT DE PASSE OUBLIE » — celui de la feuille et celui de
+   la page de bienvenue — partagent la meme sequence. Chacun lit le champ de
+   son propre endroit. */
+;['mdp-oublie', 'bv-oubli'].forEach(idO =>
+document.getElementById(idO)?.addEventListener('click', (e) =>
+  demanderReinitialisation(
+    document.getElementById(idO === 'bv-oubli' ? 'bv-email' : 'login-email')?.value,
+    idO === 'bv-oubli' ? 'bv-err' : 'login-error',
+    e.currentTarget)))
 
 document.getElementById('mdp-changer-g')?.addEventListener('click', (e) =>
   demanderReinitialisation(document.getElementById('settings-email')?.value, 'settings-error', e.currentTarget))
@@ -2112,12 +2119,23 @@ window.switchAuthTab = function(tab) {
 }
 
 // ═══ CONNEXION ═══
-document.getElementById('login-btn')?.addEventListener('click', async () => {
-  const email = document.getElementById('login-email').value.trim()
-  const password = document.getElementById('login-password').value
-  const errorEl = document.getElementById('connexion-error')
-    || document.getElementById('login-error')
-  const btn = document.getElementById('login-btn')
+/* ⚠ DEUX BOUTONS, UNE SEULE LOGIQUE.
+
+   La connexion existe a deux endroits : dans la feuille, et desormais sur la
+   page de bienvenue. Un seul ecouteur pour les deux, qui lit les champs de
+   l'endroit d'ou vient le clic.
+
+   Ecrire deux fois la meme sequence — lire, appeler Supabase, choisir la
+   fiche, entrer — garantirait qu'elles divergent au premier changement. */
+;['login-btn', 'bv-connexion'].forEach(idBouton =>
+document.getElementById(idBouton)?.addEventListener('click', async () => {
+  const surAccueil = idBouton === 'bv-connexion'
+  const email = document.getElementById(surAccueil ? 'bv-email' : 'login-email').value.trim()
+  const password = document.getElementById(surAccueil ? 'bv-mdp' : 'login-password').value
+  const errorEl = surAccueil
+    ? document.getElementById('bv-err')
+    : (document.getElementById('connexion-error') || document.getElementById('login-error'))
+  const btn = document.getElementById(idBouton)
   errorEl.textContent = ''
   setButtonLoading(btn, true)
 
@@ -2143,7 +2161,7 @@ document.getElementById('login-btn')?.addEventListener('click', async () => {
 
   enterApp(membre)
   setButtonLoading(btn, false)
-})
+}))
 
 // ═══ CRÉATION DE COMPTE ═══
 document.getElementById('signup-btn')?.addEventListener('click', async () => {
@@ -23077,10 +23095,18 @@ function peindreReglagesEquipe() {
 }
 
 window.openEquipeSettings = async function() {
-  showEquipeScreen('e-profil')
+  /* ⚠ ON REMPLIT AVANT D'AFFICHER, comme `openSettings` cote gestion.
+
+     L'ecran etait active en PREMIER, puis peint : il arrivait vide et se
+     remplissait sous les yeux pendant que l'animation jouait. On voyait la
+     page se construire au lieu de la voir arriver.
+
+     Trois lignes deplacees, rien d'autre — c'est l'ordre qui differait. */
   rendreChoixLangueApp()
   peindreReglagesEquipe()
   peindreAppareils()
+
+  showEquipeScreen('e-profil')
   document.getElementById('es-nom').value = currentMembre?.nom || ''
   const { data: { user } } = await supabase.auth.getUser()
   document.getElementById('es-email').value = user?.email || ''

@@ -9414,6 +9414,11 @@ function peindreAnalyseInterne() {
   const zT = document.getElementById('an-lect-total')
   if (zT) zT.textContent = `${lectures} sur ${anJours} jours`
 
+  /* ⚠ LE GRAPHIQUE DES LECTURES N'EXISTE PLUS dans le balisage.
+
+     `getElementById` rend `null`, le `if` protege deja — on garde ces deux
+     lignes plutot que de les retirer : si vous voulez le graphique de nouveau,
+     il suffira de reposer la balise. */
   const gL = document.getElementById('an-graph-lectures')
   if (gL) gL.innerHTML = anCourbe(anSerie(valides, 'lectures'), pointDossier(1), 'L', 'nb')
 
@@ -13006,9 +13011,10 @@ function carteSousDossier(nom, procs, rang = 0) {
         </button>
       </span>
       <span class="cl-bas">
-        ${brouillons
-          ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${brouillons} en cours</span>`
-          : `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`}
+        <!-- ⚠ PLUS DE BADGE D'ETAT SUR LES SOUS-DOSSIERS.
+
+             Meme raison que pour les dossiers : on est deja dans la page des
+             procedures en ligne, et le compteur a droite dit le reste. -->
         <span class="cl-n">${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
       </span>
     </span>`
@@ -25786,7 +25792,77 @@ function appliquerAccesEntreprise() {
    refermait la liste des offres. Deux gestionnaires pour un bouton finissent
    par se contredire — celui du haut fait les deux. */
 
-document.getElementById('quitter-entreprise')?.addEventListener('click', async () => {
+/* ⚠ LES DEUX ESPACES PARTAGENT CE BOUTON.
+
+   La ligne existait cote gestion seulement. Un employe qui change de travail
+   restait rattache indefiniment et devait demander a son ancien patron de le
+   retirer.
+
+   Un seul ecouteur pour les deux : le jour ou la logique change — un cas
+   d'erreur de plus, un texte different — elle change des deux cotes. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUPPRIMER SON COMPTE
+
+   ⚠ DEUX CONFIRMATIONS, ET LA SECONDE DEMANDE D'ECRIRE.
+
+     Une suppression irreversible ne doit pas tenir a un doigt qui glisse. La
+     premiere dit ce qu'on perd, la seconde oblige a taper le mot — donc a lire.
+
+   ⚠ ON DIT CE QUI RESTE, PAS SEULEMENT CE QUI PART. Quelqu'un qui supprime son
+     compte se demande si son travail disparait avec lui. Il ne disparait pas :
+     les procedures qu'il a ecrites appartiennent a l'entreprise.
+
+   ⚠ ET LE FONDATEUR EST REFUSE, cote serveur comme ici. Supprimer son compte
+     effacerait son entreprise avec son equipe — c'est une autre decision, qui
+     a son propre bouton.
+   ═══════════════════════════════════════════════════════════════════════════ */
+;['supprimer-compte', 'e-supprimer-compte'].forEach(id =>
+document.getElementById(id)?.addEventListener('click', async () => {
+
+  const ok = await confirmDialog({
+    titre: 'Supprimer votre compte ?',
+    message: 'Vous perdrez l’accès à Standix et à toutes vos entreprises. '
+           + 'Les procédures que vous avez écrites restent en place pour '
+           + 'l’équipe. Cette action est irréversible.',
+    confirmer: 'Continuer', annuler: 'Annuler', danger: true,
+  })
+  if (!ok) return
+
+  /* ⚠ « SUPPRIMER » PLUTOT QUE SON NOM. Pour une entreprise on fait retaper son
+     nom — ici il n'y a rien d'equivalent, et faire retaper son adresse
+     e-mail exposerait un identifiant a l'ecran. */
+  const saisi = await demanderTexte({
+    titre: 'Confirmer la suppression',
+    message: 'Tapez « SUPPRIMER » pour confirmer.',
+    placeholder: 'SUPPRIMER',
+    confirmer: 'Supprimer mon compte',
+  })
+  if (!saisi || saisi.trim().toUpperCase() !== 'SUPPRIMER') return
+
+  const { data, error } = await supabase.rpc('supprimer_mon_compte')
+
+  if (error || !data?.ok) {
+    /* ⚠ CHAQUE REFUS A SA RAISON, et elle dit quoi faire ensuite. */
+    const r = data?.raison
+    toast(r === 'fondateur'
+      ? 'Vous avez créé une entreprise : supprimez-la d’abord.'
+      : r === 'non_connecte'
+        ? 'Votre session a expiré. Reconnectez-vous et réessayez.'
+        : 'Suppression impossible pour le moment.')
+    return
+  }
+
+  toast('Votre compte a été supprimé.')
+
+  /* ⚠ ON DECONNECTE AVANT DE RECHARGER. Le compte n'existe plus, mais le jeton
+     de session reste dans le navigateur : sans cela, l'app tenterait de
+     recharger des donnees au nom de quelqu'un qui n'est plus la. */
+  try { await supabase.auth.signOut() } catch {}
+  setTimeout(() => location.reload(), 900)
+}))
+
+;['quitter-entreprise', 'e-quitter-entreprise'].forEach(id =>
+document.getElementById(id)?.addEventListener('click', async () => {
   const nom = cachedEntreprise?.nom || 'cette entreprise'
 
   /* ⚠ ON DIT CE QU'ON PERD, ET CE QU'ON NE PERD PAS. « Etes-vous sur ? » ne
@@ -25818,7 +25894,7 @@ document.getElementById('quitter-entreprise')?.addEventListener('click', async (
   /* ⚠ ON RECHARGE PLUTOT QUE DE BASCULER. La fiche membre n'existe plus : tout
      ce que l'app garde en memoire la designe encore. */
   setTimeout(() => location.reload(), 900)
-})
+}))
 
 document.getElementById('supprimer-entreprise')?.addEventListener('click', async () => {
   const nom = cachedEntreprise?.nom || 'cette entreprise'
@@ -25850,9 +25926,26 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
     .rpc('supprimer_entreprise', { p_entreprise_id: currentMembre.entreprise_id })
 
   if (error || !data?.ok) {
-    toast(data?.raison === 'role'
-      ? 'Seul le créateur de l’entreprise peut la supprimer.'
-      : 'La suppression a échoué. Réessayez dans quelques instants.')
+    /* ⚠ ON MONTRE LA VRAIE CAUSE, pas « réessayez ».
+
+       « La suppression a échoué » ne se debogue pas : on ne sait pas si la
+       fonction manque en base, si les droits bloquent, ou si une contrainte
+       de cle etrangere refuse l'effacement.
+
+       Le message affiche maintenant ce que Postgres a repondu — c'est le seul
+       endroit ou on le verra, puisque personne n'ouvre la console d'un
+       telephone. */
+    console.error('Suppression entreprise :', error, data)
+
+    const r = data?.raison
+    toast(
+      r === 'role'
+        ? 'Seul le créateur de l’entreprise peut la supprimer.'
+        : error?.message
+          ? 'Suppression impossible : ' + error.message
+          : r
+            ? 'Suppression refusée : ' + r
+            : 'La suppression a échoué.')
     return
   }
 

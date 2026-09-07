@@ -21048,3 +21048,13 @@ body.sans-topbar #e-detail.active.feuille-arrive{
 @media (max-height: 700px){
   #login-screen .bv-phrase{ font-size:13.5px; }
 }
+
+
+/* ⚠ LA MARQUE PASSE DE 22 A 25 PX.
+
+   Elle etait reduite en meme temps que le logo ; a cette taille elle
+   disparaissait a cote de lui. Trois pixels suffisent pour qu'ils se
+   repondent. */
+#login-screen .bv-marque{
+  font-size:25px;
+}

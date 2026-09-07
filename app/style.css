@@ -21161,3 +21161,53 @@ body.sans-topbar #e-category.active.feuille-arrive{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ⚠ L'ESPACE UTILISATEUR GRANDIT DEPUIS LE BOUTON.
+
+   `.screen.active.nait` porte deja `transform-origin` sur `--ox / --oy` — mais
+   ses regles generales, plus recentes, lui imposaient `pageFlou` : un flou sans
+   mouvement, qui ignore l'origine.
+
+   On lui rend `ecranEntre`, la seule qui grandit et monte.
+
+ ⚠ ET L'ECHELLE DE DEPART DESCEND A 0,94. `ecranEntre` ne fait que monter de
+   douze pixels ; pour qu'on voie l'ecran sortir du bouton, il faut qu'il
+   parte plus petit. */
+@keyframes ecranNait{
+  0%  { opacity:0; transform:scale(0.94) translateY(10px); filter:blur(3px); }
+  40% { opacity:1; }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+.screen.active.nait{
+  animation:ecranNait 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:var(--ox, 50%) var(--oy, 40%);
+}
+
+/* ⚠ PLUS D'AIR SOUS LE DERNIER ELEMENT. 150 px ne suffisaient pas : on remonte
+   a 200 pour qu'il se detache franchement de la barre du bas. */
+#p-category.active #category-procedures-list,
+#e-category.active #equipe-procedures-list,
+#p-analyse.active,
+#p-create-video.active,
+#p-create-manual.active{
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 200px) !important;
+}
+
+
+/* ⚠ `.nait` DOIT L'EMPORTER SUR LES REGLES GENERALES.
+
+   Mesure : la classe est bien posee et l'origine calculee — 85,9 % / 93,5 %,
+   le coin du bouton — mais `animation` valait `none`. Mes regles generales
+   visent `.screen.active` et passent apres.
+
+   On vise `.screen.active.nait` avec le corps, ce qui fait trois conditions, et
+   l'on place la regle en dernier. */
+body .screen.active.nait,
+body.sans-topbar .screen.active.nait,
+body.en-apercu .screen.active.nait{
+  animation:ecranNait 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
+  opacity:1;
+}

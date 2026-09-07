@@ -21486,3 +21486,50 @@ body.retour-de-feuille .screen:not(.active).feuille-part{
   z-index:25;
   pointer-events:none;
 }
+
+
+/* ═══ LA PAGE DE BIENVENUE — SANS FORMULAIRE ═══
+
+   ⚠ « S'INSCRIRE GERANT » PREND LE BLEU DU BOUTON « GENERER LES ETAPES ».
+
+     C'est le chemin qu'on recommande : il doit se voir. Les deux autres —
+     l'inscription utilisateur et le lien de connexion — restent en retrait. */
+#login-screen .bv-actions .bv-btn--plein,
+#login-screen .bv-actions .bv-btn:first-child{
+  background:linear-gradient(135deg, #1F4CEE 0%, #3A78EE 55%, #4899EC 100%);
+  color:#FFFFFF;
+  border:none;
+  box-shadow:0 8px 22px -10px rgba(31,76,238,0.55);
+}
+#login-screen .bv-actions .bv-btn:first-child .bv-btn-tx,
+#login-screen .bv-actions .bv-btn:first-child .bv-btn-ic{
+  color:#FFFFFF;
+}
+
+/* ⚠ ET LE SECOND RESTE CREUX, pour qu'on distingue les deux d'un coup d'oeil. */
+#login-screen .bv-actions .bv-btn:last-child{
+  background:#FFFFFF;
+  color:var(--label);
+  border:0.5px solid rgba(28,28,38,0.12);
+  box-shadow:0 1px 2px rgba(20,20,30,0.05);
+}
+#login-screen .bv-actions .bv-btn:last-child .bv-btn-ic{ color:#1F4CEE; }
+
+/* ⚠ LE LIEN DE CONNEXION, EN RETRAIT. Ceux qui reviennent le cherchent ; ils
+   n'ont pas besoin qu'on le leur mette sous les yeux. */
+.bv-deja{
+  margin:18px 0 0;
+  text-align:center;
+  font-size:14px;
+  color:var(--label-2);
+}
+
+.bv-lien{
+  padding:0;
+  border:none;
+  background:none;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:650;
+  color:#1F4CEE;
+}

@@ -8940,7 +8940,10 @@ window.ouvrirHisto = function ouvrirHisto(quoi) {
   document.body.style.overflow = 'hidden'
   const remplir = { mouvements: remplirHistoMouvements,
                     creations: remplirHistoCreations,
-                    equipe: remplirHistoEquipe }[quoi]
+                    equipe: remplirHistoEquipe,
+    vues: remplirHistoVues,
+    temps: remplirHistoTemps,
+  }[quoi]
   remplir?.()
 }
 
@@ -9172,6 +9175,67 @@ document.addEventListener('click', (e) => {
     morceaux.forEach(flouEntree)
   }, 130)
 })
+
+/* ═══ LES DEUX CLASSEMENTS EN ENTIER ═══
+
+   ⚠ MEME GABARIT QUE `remplirHistoEquipe` : on relit `anValidations()`, qui
+     suit deja le segment 7 jours / 30 jours / 1 an du volet.
+
+   ⚠ ET L'ON MONTRE TOUT, pas seulement les cinq premieres. C'est la raison
+     d'etre du volet : la carte resume, lui deroule. */
+function classementProcedures(cle, format, zoneId, noteId, note) {
+  const zone = document.getElementById(zoneId)
+  if (!zone) return
+  const n = document.getElementById(noteId)
+  if (n) n.textContent = note
+
+  const parProc = {}
+  for (const v of anValidations()) {
+    if (!v.procedure_id) continue
+    const p = parProc[v.procedure_id] || (parProc[v.procedure_id] = { vues: 0, sec: 0 })
+    p.vues += 1
+    p.sec += Number(v.duree_lecture || 0)
+  }
+
+  const info = (id) => (allGestionProcedures || []).find(x => x.id === id)
+
+  /* ⚠ LES PROCEDURES SUPPRIMEES SONT ECARTEES. Leurs lectures restent en base,
+     mais leur titre n'existe plus. */
+  const top = Object.entries(parProc)
+    .filter(([id]) => info(id))
+    .map(([id, v]) => ({ id, ...v }))
+    .sort((a, b) => b[cle] - a[cle] ||
+      (info(a.id).titre || '').localeCompare(info(b.id).titre || '', 'fr'))
+
+  zone.innerHTML = top.length
+    ? top.map((p, r) => {
+        const d = info(p.id)
+        const dossier = d.sous_categorie || d.categorie || ''
+        return `
+        <div class="an-membre">
+          <span class="an-rang" style="background:${pointDossier(r % 5)}"></span>
+          <span class="an-m-co">
+            <span class="an-m-t">${escapeHtml(d.titre || 'Sans titre')}</span>
+            ${dossier ? `<span class="an-m-s">${escapeHtml(dossier)}</span>` : ''}
+          </span>
+          <span class="an-m-q">${format(p[cle])}</span>
+        </div>`
+      }).join('')
+    : '<div class="an-vide-l">Aucune lecture sur cette période.</div>'
+}
+
+function remplirHistoVues() {
+  classementProcedures('vues',
+    (n) => n > 1 ? n + ' lectures' : '1 lecture',
+    'histo-vues-liste', 'histo-vues-note',
+    'Nombre de lectures par procédure.')
+}
+
+function remplirHistoTemps() {
+  classementProcedures('sec', anDureeLisible,
+    'histo-temps-liste', 'histo-temps-note',
+    'Temps cumulé passé sur chaque procédure.')
+}
 
 function remplirHistoEquipe() {
   const zone = document.getElementById('histo-equipe-liste')
@@ -9614,7 +9678,10 @@ function peindreAnalyseInterne() {
       .slice()
       .sort((a, b) => b[cle] - a[cle] ||
         (titreProc(a.id) || '').localeCompare(titreProc(b.id) || '', 'fr'))
-      .slice(0, 5)
+      /* ⚠ DEUX ENTREES SUR LA CARTE, comme « Équipe ». La suite est dans le
+         volet « Voir plus » : une carte d'accueil montre ce qui ressort, elle
+         ne deroule pas un classement. */
+      .slice(0, 2)
     z.innerHTML = top.length
       ? top.map((p, r) => `
         <div class="an-membre">

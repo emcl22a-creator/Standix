@@ -21043,3 +21043,65 @@ body.sans-topbar #p-category.active:not(.feuille-arrive),
 body.sans-topbar #e-category.active:not(.feuille-arrive){
   animation:ecranEntre 0.38s linear both !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RETOUR EXACT A L'ETAT DU 4 SEPTEMBRE
+
+   ⚠ RELEVE DANS VOTRE DEPOT, pas reconstitue de memoire :
+
+     @keyframes ecranEntre{
+       0%   { opacity:0; transform:translateY(12px); filter:blur(2px); }
+       35%  { opacity:1; filter:blur(0px); }
+       100% { opacity:1; transform:none; filter:blur(0px); }
+     }
+     animation:ecranEntre 0.34s cubic-bezier(0.32,0.72,0,1)
+
+   ⚠ CE QUE J'AVAIS CHANGE, ET QUI DISPARAIT :
+
+     · la montee de 12 px, que j'avais retiree
+     · le flou porte de 2 a 6 px
+     · sa courbe passee en lineaire
+     · sa fin repoussee de 35 % a 72 %
+     · la duree de 0,34 a 0,38 s
+
+     Chaque changement repondait a une demande ; l'ensemble a fini par ne plus
+     ressembler a ce qui marchait.
+
+   ⚠ ET LES SOUS-DOSSIERS SUIVENT, puisqu'ils emploient la meme animation
+     depuis le tour precedent.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes ecranEntre{
+  0%  { opacity:0; transform:translateY(12px); filter:blur(2px); }
+  35% { opacity:1; filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive,
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive){
+  animation:ecranEntre 0.34s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE DE CARTE. */
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

@@ -20936,3 +20936,110 @@ body.sans-topbar #e-category.active.feuille-arrive{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ⚠ 0,44 S ETAIT TROP. On revient a 0,38 — entre les 0,34 d'avant et les 0,44
+   que vous venez de trouver trop lents.
+
+   Le flou tient jusqu'a 72 % : environ 260 ms de flou visible, contre 240 et
+   300 aux deux essais precedents.
+
+ ⚠ ET IL REDESCEND A 6 PX, comme avant le ralentissement. Sept pixels se
+   justifiaient sur une duree plus longue ; sur celle-ci ils alourdissent. */
+@keyframes ecranEntre{
+  0%{
+    opacity:0;
+    filter:blur(6px);
+    animation-timing-function:linear;
+  }
+  40%{ opacity:1; }
+  72%{ filter:blur(0px); }
+  100%{ opacity:1; filter:blur(0px); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:ecranEntre 0.38s linear both !important;
+}
+
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}
+
+
+/* ⚠ PLUS D'AIR SOUS LE DERNIER ELEMENT.
+
+   Le rembourrage valait 96 px — la hauteur de la barre du bas plus quelques
+   pixels. Le dernier element arrivait donc EXACTEMENT au-dessus d'elle : on ne
+   pouvait pas le remonter pour le lire a l'aise, et il paraissait coince.
+
+   150 px : une fois tout en bas, le dernier element remonte d'une cinquantaine
+   de pixels au-dessus de la barre. On le voit entierement, avec de l'air
+   dessous.
+
+ ⚠ ON GARDE `env(safe-area-inset-bottom)`. Sur les iPhone a barre gestuelle, il
+   ajoute la hauteur de celle-ci — sans lui, le contenu passerait dessous. */
+#p-category.active #category-procedures-list,
+#e-category.active #equipe-procedures-list{
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 150px);
+}
+
+/* ⚠ ET LES AUTRES FEUILLES AUSSI. La procedure et les deux ecrans de creation
+   defilent aussi leur contenu ; le meme confort s'y applique. */
+#p-analyse.active,
+#p-create-video.active,
+#p-create-manual.active{
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 150px);
+}
+
+
+/* ⚠ `p-category` DOIT JOUER `ecranEntre` COMME LES AUTRES.
+
+   Mesure : il jouait `pageFlou` — une regle de mes essais precedents, restee
+   plus precise que la regle generale et donc gagnante.
+
+   Un sous-dossier doit faire exactement le geste d'un changement de page :
+   meme animation, meme duree, meme courbe.
+
+ ⚠ SAUF QUAND IL ARRIVE. `feuille-arrive` n'est posee qu'a l'ouverture du
+   dossier depuis la liste ; la montee lui reste reservee, et la regle suivante
+   passe apres celle-ci. */
+body.sans-topbar #p-category.active,
+body.sans-topbar #e-category.active{
+  animation:ecranEntre 0.38s linear both !important;
+}
+
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+
+/* ⚠ UNE REGLE ANCIENNE GAGNAIT ENCORE.
+
+   Mesure : `p-category` sans `feuille-arrive` jouait `pageFlou 0.22s` — une
+   regle d'un essai precedent, plus precise que ma regle generale et donc
+   gagnante malgre sa position.
+
+   On vise le corps ET l'ecran ET l'absence de `feuille-arrive` : trois
+   conditions, ce qui la depasse. */
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive){
+  animation:ecranEntre 0.38s linear both !important;
+}

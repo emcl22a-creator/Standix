@@ -21058,3 +21058,170 @@ body.sans-topbar #e-detail.active.feuille-arrive{
 #login-screen .bv-marque{
   font-size:25px;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE DE BIENVENUE — REFAITE
+
+   ⚠ LA CONNEXION AVANT L'INSCRIPTION. La plupart des gens qui ouvrent l'app
+     ont deja un compte : leur faire chercher un bouton chaque fois serait leur
+     faire perdre du temps.
+
+     Les nouveaux venus, eux, ne s'inscrivent qu'une fois — ils peuvent
+     descendre de trois centimetres.
+
+   ⚠ LA PAGE PEUT DEFILER. Six blocs avec deux champs de saisie ne tiennent
+     plus sur un ecran, surtout clavier ouvert. On l'accepte plutot que de tout
+     comprimer.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#login-screen .login-card{
+  display:block;
+  min-height:100dvh;
+  padding:calc(env(safe-area-inset-top, 0px) + 34px) 24px
+          calc(env(safe-area-inset-bottom, 0px) + 34px);
+  background:var(--bg);
+  box-shadow:none; border:none; border-radius:0;
+}
+
+#login-screen .bv-haut{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:10px;
+  padding:0 0 20px;
+}
+
+#login-screen .bv-logo{ width:27px; height:39px; }
+#login-screen .bv-marque{ font-size:27px; }
+
+/* ⚠ LE SLOGAN DIT CE QUE FAIT L'APP, la phrase dit ce que fait ce bouton-ci.
+   Deux roles, deux tailles. */
+#login-screen .bv-slogan{
+  margin:0;
+  font-size:19px;
+  font-weight:600;
+  line-height:1.32;
+  letter-spacing:-0.03em;
+  text-align:center;
+  color:var(--label);
+}
+
+#login-screen .bv-phrase{
+  margin:10px 0 0;
+  font-size:14px;
+  line-height:1.45;
+  text-align:center;
+  color:var(--label-2);
+}
+
+/* ═══ LA CARTE DE CONNEXION ═══ */
+
+.bv-carte{
+  margin-top:24px;
+  padding:18px 16px 16px;
+  border-radius:22px;
+  background:#FFFFFF;
+  border:0.5px solid rgba(28,28,38,0.08);
+  box-shadow:0 6px 20px -12px rgba(20,20,30,0.18);
+}
+
+.bv-carte-t{
+  margin-bottom:14px;
+  font-size:17px;
+  font-weight:650;
+  letter-spacing:-0.025em;
+  color:var(--label);
+}
+
+.bv-lab{
+  display:block;
+  margin:0 0 6px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--label-2);
+}
+
+.bv-champ{
+  width:100%;
+  margin-bottom:14px;
+  padding:13px 14px;
+  border:0.5px solid rgba(28,28,38,0.12);
+  border-radius:14px;
+  background:rgba(28,28,38,0.03);
+  font-family:inherit;
+  font-size:16px;   /* ⚠ 16 PX MINIMUM : en dessous, Safari agrandit la page
+                        au moment ou le champ prend le focus. */
+  color:var(--label);
+}
+.bv-champ:focus{
+  outline:none;
+  border-color:rgba(31,76,238,0.45);
+  background:#FFFFFF;
+}
+
+.bv-err{
+  margin:0 0 10px;
+  font-size:13px;
+  color:#D9342B;
+  min-height:0;
+}
+.bv-err:empty{ display:none; }
+
+.bv-carte .bv-btn{ margin-top:2px; }
+
+.bv-oubli{
+  display:block;
+  width:100%;
+  margin-top:12px;
+  padding:4px 0;
+  border:none; background:none;
+  font-family:inherit; font-size:13.5px;
+  color:var(--label-2);
+}
+
+/* ═══ « OU S'INSCRIRE » ═══
+
+   ⚠ UN TRAIT DE CHAQUE COTE. Sans lui, les quatre boutons se liraient comme
+     une seule liste et l'on ne verrait pas qu'on change d'intention. */
+.bv-ou{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin:24px 0 16px;
+}
+.bv-ou::before,
+.bv-ou::after{
+  content:'';
+  flex:1;
+  height:0.5px;
+  background:rgba(28,28,38,0.12);
+}
+.bv-ou span{
+  font-size:13px;
+  color:var(--label-3);
+  white-space:nowrap;
+}
+
+.bv-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin:0;
+}
+
+
+/* ⚠ L'ESSAI DANS LA NOUVELLE PAGE.
+
+   Il se place entre « ou s'inscrire » et les deux boutons : il annonce ce que
+   l'inscription donne, il vient donc avant elle. */
+#login-screen .bv-essai{
+  margin:0 0 12px;
+  padding:14px 15px;
+}
+#login-screen .bv-ess-plaque{
+  flex:0 0 42px; width:42px; height:42px;
+}
+#login-screen .bv-ess-plaque svg{ width:21px; height:21px; }
+#login-screen .bv-ess-tx b{ font-size:15px; }
+#login-screen .bv-ess-tx i{ font-size:12.5px; }

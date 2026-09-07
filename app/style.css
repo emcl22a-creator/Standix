@@ -21702,3 +21702,42 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
   animation:ecranDossierPart 0.30s cubic-bezier(0.4, 0, 1, 1) both;
   transform-origin:50% 100%;
 }
+
+
+/* ⚠ LE SLOGAN PASSE DE 20 A 24 PX.
+
+   Le texte est plus court depuis qu'il dit « pour l'equipe » : il tient sur
+   deux lignes meme a cette taille, et il porte enfin ce qu'il annonce. */
+#login-screen .bv-slogan{
+  font-size:24px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:21px; }
+}
+
+
+/* ⚠ 22 PX, PAS 24. A vingt-quatre, « procedure, » debordait et le slogan
+   passait sur trois lignes — la coupure manuelle du balisage ne tenait plus.
+
+   Vingt-deux le fait porter nettement plus qu'avant, sur deux lignes. */
+#login-screen .bv-slogan{
+  font-size:22px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:19px; }
+}
+
+
+/* ⚠ LES DEUX NOUVEAUX SEGMENTS PRENNENT LA MARGE DE CELUI DE L'EQUIPE.
+
+   Elle etait posee sur `#eq-segm` — l'identifiant du seul volet Equipe. Mes
+   volets ont leurs propres identifiants, `vues-segm` et `temps-segm` : ils
+   n'heritaient donc de rien et faisaient 390 px au lieu de 342.
+
+   Meme valeur, meme resultat : les trois volets ont le meme segment. */
+#vues-segm,
+#temps-segm{
+  margin:12px 24px 0;
+}

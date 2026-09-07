@@ -21577,3 +21577,35 @@ body.retour-de-feuille .screen:not(.active).feuille-part{
   #login-screen .bv-actions{ margin-top:20px; }
   #login-screen .bv-deja{ margin-top:18px; }
 }
+
+
+/* ⚠ TROIS ECARTS SE RESSERRENT.
+
+   Le slogan et la phrase disent la meme chose a deux niveaux : 18 px les
+   separait comme deux blocs distincts. A 8, la phrase se lit comme la suite du
+   slogan.
+
+   Et l'essai se rapproche des deux cotes — 38 et 28 px etaient des trous entre
+   trois elements de meme poids. */
+#login-screen .bv-phrase{ margin-top:8px; }
+#login-screen .bv-essai{ margin-top:26px; }
+#login-screen .bv-actions{ margin-top:18px; }
+
+@media (max-height: 700px){
+  #login-screen .bv-phrase{ margin-top:6px; }
+  #login-screen .bv-essai{ margin-top:20px; }
+  #login-screen .bv-actions{ margin-top:14px; }
+}
+
+
+/* ⚠ L'ECART ESSAI-BOUTONS MESURAIT 30 PX POUR 18 DEMANDES.
+
+   Le premier bouton porte une ombre portee de douze pixels vers le bas ; elle
+   compte dans le rectangle mesure, mais pas dans la marge.
+
+   On retire ces douze pixels pour que l'ecart VISIBLE soit celui qu'on veut. */
+#login-screen .bv-actions{ margin-top:8px; }
+
+@media (max-height: 700px){
+  #login-screen .bv-actions{ margin-top:4px; }
+}

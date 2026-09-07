@@ -20795,3 +20795,144 @@ body:has(#e-profil.active){
   overflow:auto !important;
   height:auto !important;
 }
+
+
+/* ═══ LA PAGE DES MOUVEMENTS REPREND LES VALEURS DU VOLET ═══
+
+   ⚠ J'AVAIS INVENTE MES PROPRES ESPACEMENTS. Vous m'aviez demande d'aerer la
+     page ; j'ai pose 18 px entre les lignes, un rembourrage de 16, un texte de
+     15 px — des valeurs choisies au jugement, sans regarder le volet qui
+     existait deja et qui avait le bon rendu.
+
+   ⚠ VOICI LES SIENNES, relevees dans `.histo-liste` et ses enfants :
+
+       entre les lignes   10 px
+       rembourrage        13 px en haut, 15 sur les cotes
+       le point            8 px
+       le texte         14,5 px
+       le sous-titre      12 px, 2 px sous le texte
+       les jours          12 px, 8 px d'air au-dessus
+
+   ⚠ ON ANNULE MES REGLES plutot que de les corriger une par une : celle-ci
+     passe apres et remet chaque valeur a celle du volet. */
+
+#activites-tout{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  padding:16px 0 calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+#activites-tout .histo-lig{
+  gap:12px;
+  padding:13px 15px;
+}
+
+#activites-tout .histo-pt{
+  flex:0 0 8px;
+  width:8px; height:8px;
+  margin-top:0;
+}
+
+#activites-tout .histo-t{
+  font-size:14.5px;
+  line-height:1.35;
+}
+
+#activites-tout .histo-s{
+  margin-top:2px;
+  font-size:12px;
+}
+
+#activites-tout .histo-jour{
+  margin:0;
+  padding:8px 2px 0;
+}
+#activites-tout .histo-jour:first-child{
+  padding-top:0;
+}
+
+
+/* ⚠ LA PAGE REPREND EXACTEMENT LE VOLET.
+
+   Les valeurs de contenu — ecart de 10 px, cartes a 13/15, points de 8 px,
+   texte a 14,5 — sont deja celles du volet ; un bloc anterieur les avait
+   remises. Il restait la tete de page.
+
+ ⚠ LE TITRE PASSAIT SUR DEUX LIGNES. « Mouvements de l'equipe » ne tient pas
+   sur 390 px a cette taille. Le volet dit simplement « Mouvements » — on est
+   dans l'espace de l'equipe, le reste allait de soi.
+
+ ⚠ ET LA PHRASE DU VOLET MANQUAIT. « Seul le dernier mois est conserve » : elle
+   explique pourquoi la liste s'arrete, et evite qu'on cherche plus loin. */
+#p-activites .pagehead{
+  font-size:32px;
+  letter-spacing:-0.04em;
+}
+
+#p-activites .detail-header{
+  margin-bottom:4px;
+}
+
+#p-activites .act-note{
+  margin:0 0 18px;
+  font-size:14.5px;
+  color:var(--label-2);
+  letter-spacing:-0.01em;
+}
+
+
+/* ⚠ LE FLOU RALENTIT, SANS FAIRE ATTENDRE.
+
+   Il durait 0,34 s et se dissipait a 70 % — soit 240 ms de flou perceptible.
+   Vous le voulez plus lent, mais il y a une limite : au-dela d'une demi-
+   seconde, on n'admire plus une transition, on attend une page.
+
+   0,44 s, et le flou tient jusqu'a 80 % : 350 ms de flou visible au lieu de
+   240. Un tiers de plus, sans franchir le seuil de l'attente.
+
+ ⚠ ET L'OPACITE PREND SON TEMPS AUSSI — 45 % au lieu de 35. Une page qui devient
+   opaque trop vite pendant qu'elle est encore floue parait sale ; les deux
+   doivent avancer ensemble.
+
+ ⚠ LE FLOU DE DEPART MONTE A 7 PX. Etale sur plus longtemps, il faut un peu
+   plus de matiere pour qu'il se voie au debut.
+
+ ⚠ LA COURBE RESTE LINEAIRE. C'est elle qui rend le flou perceptible sur toute
+   sa duree au lieu de le faire chuter dans les premieres images — une courbe
+   d'acceleration ici annulerait tout le benefice du ralentissement. */
+@keyframes ecranEntre{
+  0%{
+    opacity:0;
+    filter:blur(7px);
+    animation-timing-function:linear;
+  }
+  45%{ opacity:1; }
+  80%{ filter:blur(0px); }
+  100%{ opacity:1; filter:blur(0px); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive{
+  animation:ecranEntre 0.44s linear both !important;
+}
+
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

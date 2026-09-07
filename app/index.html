@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=c5badef2">
+<link rel="stylesheet" href="style.css?v=58916856">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -5619,7 +5619,11 @@ function layout() {
    Un verbe se lit comme une intention — « je vais gerer » — la ou un nom se lit
    comme un lieu. Et il couvre aussi les analyses video, qui ne sont pas de
    l'equipe. */
-const LABELS_GESTION = ['Procedures', 'Analyse', 'Gerer'];
+/* ⚠ L'ORDRE : Procedures, Equipe, Analyse.
+
+   « Gerer » devient « Equipe » — c'est ce que la page contient : les acces,
+   les mouvements, les postes. Et il passe avant Analyse. */
+const LABELS_GESTION = ['Procedures', 'Equipe', 'Analyse'];
 /* ⚠ TROIS ONGLETS COTE EQUIPE, comme la gestion.
 
    « Notifications » a ete retire. Ce qu'il montrait — les procedures publiees
@@ -5731,9 +5735,14 @@ function ICONES_DU_JEU() {
 
    ⚠ `ICONS[3]` EST LA MEME ROUE QUE COTE GESTION. Les deux jeux la partagent :
      un seul dessin, une seule retouche si elle change un jour. */
+  /* ⚠ LES DEUX DERNIERES ICONES SONT ECHANGEES COTE GESTION.
+
+     L'ordre etait Procedures, Analyse, Gerer ; il devient Procedures, Equipe,
+     Analyse. `ICONS[3]` est la silhouette de l'equipe, `ICONS[2]` le
+     graphique — on les inverse pour qu'elles suivent leurs libelles. */
   return LABELS === LABELS_EQUIPE
     ? [ICONS[1], ICONE_QR, ICONS[3]]
-    : [ICONS[1], ICONS[2], ICONS[3]];
+    : [ICONS[1], ICONS[3], ICONS[2]];
 }
 
 const ZOOM_ICON = 1.35, ZOOM_LABEL = 1.28;

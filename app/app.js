@@ -1368,6 +1368,16 @@ window.ouvrirApercuEquipe = function () {
 function sortirApercuEquipe() {
   if (!apercuEquipe) return
   apercuEquipe = false
+
+  /* ⚠ LA SENTINELLE SE LEVE EN PREMIER.
+
+     Elle etait levee trois lignes plus bas — mais `marquerOngletActif`, appelee
+     avant le delai, rappelle un ecran et declenchait une animation a 22 ms. On
+     en voyait donc deux.
+
+     Levee des l'entree dans la fonction, elle protege toute la sequence. */
+  basculeEnCours = true
+
   document.body.classList.remove('en-apercu')
   stopScanner?.()
 
@@ -1390,7 +1400,6 @@ function sortirApercuEquipe() {
 
      La classe ne fait qu'une chose — donner son animation a l'ecran actif — et
      la laisser n'a aucun effet une fois l'animation finie. */
-  basculeEnCours = true
   document.body.classList.add('espace-vide')
 
   setTimeout(() => {
@@ -7617,6 +7626,19 @@ function majBarreHaute(id) {
   const retourDeFeuille = etaitFeuille && !ECRANS_PLEIN_ECRAN.has(id)
   document.body.classList.toggle('retour-de-feuille', retourDeFeuille)
   if (retourDeFeuille) {
+    /* ⚠ ON MARQUE LA FEUILLE QUI PART, pour qu'elle redescende.
+
+       Le CSS ne peut pas la designer : elle perd `active` au moment ou l'autre
+       ecran la prend, et rien ne la distingue alors des ecrans inertes.
+
+       `feuille-part` la nomme le temps de l'animation, puis s'efface. */
+    document.querySelectorAll('.feuille-part').forEach(s => s.classList.remove('feuille-part'))
+    const partante = document.querySelector('.screen.active')
+    if (partante) {
+      partante.classList.add('feuille-part')
+      setTimeout(() => partante.classList.remove('feuille-part'), 400)
+    }
+
     clearTimeout(degelRetour)
     degelRetour = setTimeout(() =>
       document.body.classList.remove('retour-de-feuille'), 500)

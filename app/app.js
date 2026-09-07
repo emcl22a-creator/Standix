@@ -1259,6 +1259,26 @@ let apercuEquipe = false
 window.ouvrirApercuEquipe = function () {
   if (apercuEquipe) return
   apercuEquipe = true
+
+  /* ⚠ L'ESPACE GRANDIT DEPUIS LE BOUTON.
+
+     Le mecanisme existe deja : `ouvrirDepuisCarte` pose `--ox` et `--oy` sur
+     l'ecran, et `.screen.active.nait` s'anime depuis ce point plutot que depuis
+     son centre. Il servait a ouvrir une procedure depuis sa carte.
+
+     Ici c'est le meme geste : on vient d'un endroit precis de l'ecran, l'espace
+     utilisateur doit en sortir.
+
+   ⚠ ON MESURE LE BOUTON MAINTENANT, avant tout changement d'ecran : il flotte
+     en bas a droite et sa position depend de la page. */
+  const oeil = document.getElementById('voir-equipe')
+  if (oeil) {
+    const r = oeil.getBoundingClientRect()
+    origineOuverture = {
+      x: ((r.left + r.width / 2) / window.innerWidth * 100).toFixed(1) + '%',
+      y: ((r.top + r.height / 2) / window.innerHeight * 100).toFixed(1) + '%'
+    }
+  }
   document.body.classList.add('en-apercu')
 
   const app = document.getElementById('gestion-app')
@@ -1349,6 +1369,7 @@ function sortirApercuEquipe() {
     void cercle.offsetWidth
     cercle.classList.add('rebondit')
     setTimeout(() => cercle.classList.remove('rebondit'), 420)
+
   }
 }
 
@@ -21591,9 +21612,17 @@ function openEquipeCategorie(nom) {
   const champ = document.getElementById('e-cat-recherche')
   if (champ) champ.value = ''
   document.getElementById('e-cat-titre').textContent = nom
-  document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
-  activerAvecNaissance(document.getElementById('e-category'))
-  remonterEnHaut()
+
+  /* ⚠ MEME CORRECTION QUE POUR `openEquipeDetail`.
+
+     Cette fonction activait l'ecran a la main et sautait donc tout ce que
+     `showEquipeScreen` fait autour : la barre du haut, l'onglet, la classe
+     `sans-topbar` qui transforme l'ecran en feuille.
+
+     La gestion n'active jamais un ecran directement — elle passe toujours par
+     `showGestionScreen`. C'est ce qui manquait ici. */
+  showEquipeScreen('e-category')
+
   renderEquipeCatListe()
 }
 
@@ -22755,9 +22784,26 @@ async function openEquipeDetail(procId) {
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
   arreterToutesLesVideos()
-  document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
-  activerAvecNaissance(document.getElementById('e-detail'))
-  remonterEnHaut()
+
+  /* ⚠ ON PASSE PAR `showEquipeScreen`, comme la gestion par `showGestionScreen`.
+
+     Cette fonction activait l'ecran a la main :
+
+       document.querySelectorAll('#equipe-app .screen').forEach(...remove)
+       activerAvecNaissance(document.getElementById('e-detail'))
+
+     Elle sautait donc tout ce que `showEquipeScreen` fait autour — la barre du
+     haut, l'onglet allume, la classe `sans-topbar` qui transforme l'ecran en
+     feuille, la memoire de l'ecran precedent pour le bouton retour.
+
+     La feuille finissait par apparaitre, mais pas par le meme chemin : selon le
+     moment, la classe arrivait apres l'animation et l'on voyait la page se
+     mettre en place.
+
+   ⚠ `showEquipeScreen` FAIT DEJA LE RESTE — desactiver les autres ecrans,
+     appeler `activerAvecNaissance`, remonter en haut. Les trois lignes
+     supprimees etaient une reecriture partielle de son travail. */
+  showEquipeScreen('e-detail')
 
   /* Les données sont déjà en mémoire dans la plupart des cas. Mais le cache peut
      manquer : procédure créée depuis le dernier chargement, étapes ajoutées

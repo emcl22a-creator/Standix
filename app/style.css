@@ -21211,3 +21211,47 @@ body.en-apercu .screen.active.nait{
   transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
   opacity:1;
 }
+
+
+/* ⚠ `e-detail` NE DOIT PLUS ETRE MUET.
+
+   Une regle d'un ancien tour lui posait `animation:none` — elle datait du
+   moment ou vous vouliez le silence entre deux feuilles. Elle vise trois
+   conditions et l'emportait donc sur les regles generales.
+
+   Depuis, vous avez demande le flou partout. Cet ecran est le seul a etre reste
+   en arriere : c'est pour cela que l'espace utilisateur paraissait sans
+   animation.
+
+ ⚠ ON LUI REND LE MEME GESTE QUE PARTOUT, avec autant de conditions pour
+   depasser l'ancienne. */
+body.sans-topbar #e-detail.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive){
+  animation:pageFlou 0.22s ease-out both !important;
+  opacity:1 !important;
+}
+
+
+/* ⚠ MA REGLE `ecranNait` DEBORDAIT SUR LES DEUX ESPACES.
+
+   Elle visait `.screen.active.nait` — mais `nait` est posee par
+   `ouvrirDepuisCarte` a chaque ouverture depuis une carte, dans la gestion
+   comme chez l'utilisateur.
+
+   Elle a donc remplace l'animation d'origine partout, alors qu'elle etait
+   ecrite pour le seul bouton oeil.
+
+ ⚠ ON LUI REND SON PERIMETRE. `body.en-apercu` n'est posee que pendant le
+   basculement vers l'espace utilisateur : la regle ne s'applique plus qu'a ce
+   moment-la. */
+body .screen.active.nait,
+body.sans-topbar .screen.active.nait{
+  animation:ecranEntre 0.34s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
+}
+
+/* ⚠ ET LE BOUTON OEIL GARDE SA MONTEE DEPUIS LE POINT TOUCHE. */
+body.en-apercu .screen.active.nait{
+  animation:ecranNait 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
+}

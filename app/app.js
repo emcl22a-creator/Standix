@@ -1279,6 +1279,7 @@ window.ouvrirApercuEquipe = function () {
       y: ((r.top + r.height / 2) / window.innerHeight * 100).toFixed(1) + '%'
     }
   }
+  basculeEnCours = true
   document.body.classList.add('en-apercu')
 
   const app = document.getElementById('gestion-app')
@@ -1323,7 +1324,20 @@ window.ouvrirApercuEquipe = function () {
       ecranG.classList.add('active')
     }
 
-    setTimeout(() => document.body.classList.remove('espace-arrive'), 640)
+    /* ⚠ ON NETTOIE `nait`, ET L'ON NE RETIRE PLUS `espace-arrive`.
+
+       Meme correction que dans `sortirApercuEquipe` : retirer la classe fait
+       tomber l'ecran d'une regle sur une autre, et le navigateur joue la
+       nouvelle animation. On en voyait deux, separees de 670 ms.
+
+       La classe reste posee jusqu'au prochain basculement, ou elle sera
+       reposee de toute façon. Une fois l'animation finie, elle n'a plus aucun
+       effet. */
+    document.querySelectorAll('.screen.nait').forEach(s => s.classList.remove('nait'))
+
+    /* ⚠ ON BAISSE LA SENTINELLE UNE FOIS L'ANIMATION LANCEE. Le prochain
+       changement de page pourra alors retirer la classe. */
+    setTimeout(() => { basculeEnCours = false }, 450)
   }, 180)
 
   /* ⚠ LA BARRE RESTE CELLE DE LA GESTION.
@@ -1360,16 +1374,41 @@ function sortirApercuEquipe() {
   const app = document.getElementById('gestion-app')
   const eq = document.getElementById('equipe-app')
 
-  /* Le meme geste, dans l'autre sens : c'est la meme carte qu'on retourne. */
-  /* Le meme geste au retour : on vide, puis la gestion revient de loin. */
+  /* ⚠ LA SEQUENCE, RELUE EN ENTIER.
+
+     Elle enchainait cinq etapes dont je n'avais jamais vu le deroulement
+     complet : `espace-vide`, 180 ms, `espace-arrive`, un relancement force,
+     640 ms, puis le retrait.
+
+     Le defaut venait de la derniere : retirer `espace-arrive` fait tomber
+     l'ecran d'une regle sur une autre, et le navigateur joue la nouvelle
+     animation. On en voyait donc deux, separees de 670 ms.
+
+   ⚠ ON NE RETIRE PLUS RIEN. `espace-arrive` reste posee jusqu'au prochain
+     basculement, ou elle sera reposee de toute façon. Rien ne change, donc
+     rien ne se rejoue.
+
+     La classe ne fait qu'une chose — donner son animation a l'ecran actif — et
+     la laisser n'a aucun effet une fois l'animation finie. */
+  basculeEnCours = true
   document.body.classList.add('espace-vide')
 
   setTimeout(() => {
     if (eq) { eq.style.display = 'none'; eq.setAttribute('inert', '') }
     if (app) { app.style.display = 'block'; app.removeAttribute('inert') }
+
     document.body.classList.remove('espace-vide')
     document.body.classList.add('espace-arrive')
-    setTimeout(() => document.body.classList.remove('espace-arrive'), 640)
+
+    /* ⚠ ET L'ON NETTOIE `nait` TOUT DE SUITE, avant que l'animation ne parte.
+
+       Elle est posee par `ouvrirDepuisCarte` au moment du basculement. La
+       laisser ferait cohabiter deux regles sur le meme ecran. */
+    document.querySelectorAll('.screen.nait').forEach(s => s.classList.remove('nait'))
+
+    /* ⚠ ON BAISSE LA SENTINELLE UNE FOIS L'ANIMATION LANCEE. Le prochain
+       changement de page pourra alors retirer la classe. */
+    setTimeout(() => { basculeEnCours = false }, 450)
   }, 180)
 
   window.majBarreEspace?.('gestion')
@@ -7125,6 +7164,13 @@ const ONGLET_PAR_ECRAN = {
    l'unité qu'attend `transform-origin` sur un élément qui occupe tout l'écran. */
 let origineOuverture = null
 
+/* ⚠ LEVEE PENDANT UN BASCULEMENT D'ESPACE.
+
+   `activerAvecNaissance` retire `espace-arrive` a chaque changement de page —
+   sauf pendant le basculement, ou cette classe porte justement le geste qu'on
+   veut voir. */
+let basculeEnCours = false
+
 document.addEventListener('click', (e) => {
   const carte = e.target.closest('.cat-cell, .proc-rich-card, .an-lig, .emp-row, .fm-lg, .cat-recent-item')
   if (!carte) { origineOuverture = null; return }
@@ -7230,6 +7276,20 @@ addEventListener('resize', () => {
 
 function activerAvecNaissance(ecran) {
   if (!ecran) return
+
+  /* ⚠ `espace-arrive` NE SURVIT PAS AU PREMIER CHANGEMENT DE PAGE.
+
+     Elle reste posee apres un basculement — la retirer aussitot relançait une
+     seconde animation. Mais elle donne son geste a TOUT ecran actif : sans ce
+     nettoyage, ouvrir un dossier jouait `ecranRetourEspace`.
+
+   ⚠ SAUF PENDANT LE BASCULEMENT LUI-MEME. `sortirApercuEquipe` appelle cette
+     fonction dans la foulée ; retirer la classe la ferait perdre son geste
+     avant meme de l'avoir joue.
+
+     `basculeEnCours` est levee le temps du basculement, et rien d'autre ne la
+     leve. */
+  if (!basculeEnCours) document.body.classList.remove('espace-arrive')
 
   /* ⚠ LES CARTES DEJA PEINTES SE MONTRENT TOUT DE SUITE.
 
@@ -13482,7 +13542,12 @@ function peindreMonPoste() {
     return `
       <button type="button" class="an-lig" data-choix="${escapeHtml(p.nom)}">
         <span class="co"><span class="nm">${escapeHtml(p.nom)}</span></span>
-        ${choisi ? '<span class="vl" style="color:var(--blue);">\u2713</span>' : ''}
+        ${choisi ? `<span class="poste-coche">
+          <svg viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10.4" stroke="currentColor" stroke-width="2.4"></circle>
+            <polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="currentColor" stroke-width="2.4"
+                      stroke-linecap="round" stroke-linejoin="round"></polyline>
+          </svg></span>` : ''}
       </button>`
   }).join('')
 
@@ -13629,8 +13694,12 @@ function choisirPosteFenetre() {
 }
 
 function majLignePoste() {
-  const el = document.getElementById('e-mon-poste')
-  if (el) el.textContent = currentMembre?.poste || 'Non d\u00e9fini'
+  /* ⚠ LES DEUX ESPACES ONT LEUR LIGNE. Elle n'ecrivait que dans celle de
+     l'utilisateur : cote gestion, le poste choisi ne s'affichait jamais. */
+  ;['e-mon-poste', 'mon-poste'].forEach(id => {
+    const el = document.getElementById(id)
+    if (el) el.textContent = currentMembre?.poste || 'Non d\u00e9fini'
+  })
 }
 
 document.getElementById('poste-retour')?.addEventListener('click', () => {

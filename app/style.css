@@ -19185,37 +19185,6 @@ body.sans-topbar .tb-plus{
 }
 
 
-/* ⚠ LA FEUILLE NE REJOUE PAS SON OUVERTURE ENTRE DEUX PAGES.
-
-   Quand on passe d'un dossier a une procedure, les deux sont des feuilles : la
-   feuille est deja montee, il n'y a rien a ouvrir. Mais l'ecran qui arrive
-   porte `ecranEntre`, l'animation d'entree — et par-dessus la transition de
-   marge repartait de zero.
-
-   Deux mouvements pour un seul changement de page.
-
- ⚠ ON COUPE LA TRANSITION DE LA FEUILLE, pas l'animation d'entree. Celle-ci est
-   commune a tous les ecrans de l'app : la retirer ici la rendrait incoherente
-   avec le reste.
-
-   La classe est posee par le script juste avant de changer d'ecran, et retiree
-   apres — le temps que le nouvel ecran prenne sa place sans animer. */
-body.feuille-figee .screen.active{
-  transition:none !important;
-
-  /* ⚠ ET L'ANIMATION D'ENTREE AUSSI.
-
-     Mesure : le nouvel ecran arrivait a 23 px du haut puis descendait a 14. Ce
-     n'etait pas ma transition de marge — celle-la etait bien figee — mais
-     `ecranEntre`, l'animation commune a tous les ecrans : elle les fait monter
-     de douze pixels en apparaissant.
-
-     Sur une page ordinaire c'est juste. Sur une feuille deja en place, cela
-     donne l'impression que le bord se remet en position. */
-  animation:none !important;
-}
-
-
 /* ⚠ `e-detail` A SA PROPRE HAUTEUR, il faut l'adapter a la feuille.
 
    Cet ecran ne defile pas comme les autres : il occupe toute la hauteur avec
@@ -19231,23 +19200,6 @@ body.sans-topbar #e-detail.active{
   margin-top:14px;
   height:calc(100dvh - 14px);
   padding-top:30px;
-}
-
-
-/* ⚠ ET `ecranEntre` PAR SA TROISIEME PORTE.
-
-   Ma regle `body.feuille-figee .screen.active` ne prend pas : l'animation est
-   posee sur `.screen.active` sans le corps, et les deux selecteurs ont le meme
-   poids — c'est le dernier ecrit qui gagne, pas le plus precis.
-
-   On ajoute le `!important` et l'on vise aussi l'ecran qui n'a pas encore
-   `active` au moment ou l'animation demarre. */
-body.feuille-figee .screen,
-body.feuille-figee .screen.active,
-body.feuille-figee .screen.active.nait,
-body.feuille-figee .screen.fondu{
-  animation:none !important;
-  transition:none !important;
 }
 
 
@@ -19278,12 +19230,6 @@ body.feuille-figee .screen.fondu{
     transform:translateY(0);
     opacity:1;
   }
-}
-
-/* ⚠ ELLE NE JOUE QUE SI L'ECRAN PRECEDENT N'ETAIT PAS UNE FEUILLE. La classe
-   est posee par le script, qui seul connait l'etat d'avant. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -19321,21 +19267,6 @@ body.sans-topbar .screen.active.feuille-arrive{
   to  { opacity:1; filter:blur(0); }
 }
 
-/* ⚠ `ecranEntre` EST REMPLACEE PARTOUT OU ELLE ETAIT POSEE. Les cinq regles
-   sont visees nommement : une seule oubliee, et l'ancien mouvement revient. */
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu{
-  animation:pageFlou 0.22s ease-out both;
-}
-
-/* ⚠ SAUF LA FEUILLE, qui garde son glissement. Elle passe apres, donc elle
-   gagne — mais le `!important` etait deja la, je le laisse. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 /* ⚠ ET LE VOILE NE SE VOIT PLUS. Je ne retire pas la balise : elle est posee
    dans le balisage et sert peut-etre ailleurs. La masquer suffit. */
 .voile-arrivee,
@@ -19350,89 +19281,6 @@ body.sans-topbar .screen.active.feuille-arrive{
   .screen.active.nait,
   .screen.fondu,
   .screen.active.fondu{ animation:none; }
-}
-
-
-/* ⚠ ON LAISSE LE CSS DECIDER SEUL, sans consigne en ligne.
-
-   Je tournais autour depuis plusieurs essais : poser `animation:none` par le
-   script, l'effacer, le reposer — chaque fois une navigation trouvait un
-   interstice ou la consigne n'etait pas encore la.
-
-   Une seule regle, lisible d'un coup d'oeil :
-
-     · le corps porte `sans-topbar` → on est deja dans une feuille
-     · l'ecran est une feuille → il ne s'anime pas
-
-   Sauf s'il vient d'arriver, auquel cas `feuille-arrive` le dit. */
-body.sans-topbar #p-category.active:not(.feuille-arrive),
-body.sans-topbar #p-analyse.active:not(.feuille-arrive),
-body.sans-topbar #p-create-video.active:not(.feuille-arrive),
-body.sans-topbar #p-create-manual.active:not(.feuille-arrive),
-body.sans-topbar #e-category.active:not(.feuille-arrive),
-body.sans-topbar #e-detail.active:not(.feuille-arrive){
-  animation:none !important;
-}
-
-
-/* ⚠ ET RIEN AU RETOUR NON PLUS.
-
-   En revenant d'une feuille vers la liste, `pageFlou` jouait sur la liste
-   pendant que la feuille redescendait. Deux choses a la fois, encore.
-
-   La classe est posee par le script le temps du retour, comme pour le reste. */
-body.retour-de-feuille .screen.active{
-  animation:none !important;
-}
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   L'ANIMATION DES ECRANS — UNE SEULE REGLE, LA DERNIERE
-
-   ⚠ DIX-SEPT REGLES SE DISPUTAIENT CETTE QUESTION. Je les ai ajoutees une par
-     une au fil de vos remarques, chacune corrigeant la precedente. Elles se
-     contredisent : `pageFlou` ici, `none` la, `ecranEntre` ailleurs, et selon
-     l'ordre du fichier c'est tantot l'une tantot l'autre qui gagne.
-
-     C'est la cause des saccades que vous voyez : selon le chemin, deux
-     animations partent ensemble ou l'une s'interrompt.
-
-   ⚠ ON REPREND TOUT ICI, EN TROIS CAS ET DANS CET ORDRE. Plus bas dans le
-     fichier veut dire plus fort : ce bloc a le dernier mot sur les seize
-     autres.
-
-     ① la feuille arrive        → elle glisse
-     ② on est deja dans une feuille → rien
-     ③ tout le reste            → un flou court
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ③ LE CAS ORDINAIRE — un flou court. */
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu{
-  animation:pageFlou 0.22s ease-out both;
-}
-
-/* ② DANS UNE FEUILLE — rien du tout.
-
-   ⚠ ON VISE LE CORPS, pas l'ecran. `sans-topbar` dit « une feuille est
-     ouverte » ; peu importe lequel des six ecrans on regarde. */
-body.sans-topbar .screen.active,
-body.sans-topbar .screen.active.nait,
-body.sans-topbar .screen.fondu,
-body.sans-topbar .screen.active.fondu,
-body.retour-de-feuille .screen.active,
-body.feuille-figee .screen.active{
-  animation:none !important;
-}
-
-/* ① LA FEUILLE QUI ARRIVE — elle glisse, et elle seule.
-
-   ⚠ EN DERNIER, avec `!important`, parce qu'elle doit l'emporter sur le `none`
-     du cas ② : au moment ou elle arrive, `sans-topbar` est deja posee. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -19572,90 +19420,15 @@ body.sans-topbar .screen.active.feuille-arrive{
   margin-top:0;
 }
 
-
-/* ⚠ ENTRE DEUX FEUILLES, LE FLOU PLUTOT QUE RIEN.
-
-   Je les avais rendues muettes : passer d'un dossier a un sous-dossier ne
-   montrait aucun changement, et l'on doutait que le clic ait ete pris.
-
-   Le flou court dit « ça a change » sans rien deplacer — c'est exactement ce
-   qu'il faut ici, puisque la feuille, elle, ne bouge pas.
-
- ⚠ SEULE L'OUVERTURE GARDE SON GLISSEMENT. Elle fait autre chose : la feuille
-   n'etait pas la, elle arrive. */
-body.sans-topbar .screen.active,
-body.sans-topbar .screen.active.nait,
-body.sans-topbar .screen.fondu,
-body.sans-topbar .screen.active.fondu,
-body.feuille-figee .screen.active{
-  animation:pageFlou 0.22s ease-out both !important;
-}
-
-/* ⚠ SAUF AU RETOUR, ou la feuille redescend deja. */
-body.retour-de-feuille .screen.active{
-  animation:none !important;
-}
-
-/* ⚠ ET L'OUVERTURE, EN DERNIER, l'emporte sur le flou. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
-}
-
-
-/* ⚠ `feuille-figee` NE COUPE PLUS L'ANIMATION, seulement la transition.
-
-   Trois regles anterieures lui font poser `animation:none`. Elles datent du
-   moment ou vous vouliez le silence entre deux feuilles ; maintenant vous
-   voulez le flou.
-
-   On les annule ici — en dernier, donc c'est cette valeur qui gagne. */
-body.feuille-figee .screen.active,
-body.feuille-figee .screen,
-body.feuille-figee .screen.fondu,
-body.sans-topbar .screen.active,
-body.sans-topbar #p-category.active:not(.feuille-arrive),
-body.sans-topbar #p-analyse.active:not(.feuille-arrive),
-body.sans-topbar #p-create-video.active:not(.feuille-arrive),
-body.sans-topbar #p-create-manual.active:not(.feuille-arrive),
-body.sans-topbar #e-category.active:not(.feuille-arrive),
-body.sans-topbar #e-detail.active:not(.feuille-arrive){
-  animation:pageFlou 0.22s ease-out both !important;
-}
-
-/* ⚠ ET L'OUVERTURE GARDE SON GLISSEMENT, en dernier mot. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:feuilleArrive 0.42s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
-body.retour-de-feuille .screen.active{
-  animation:pageFlou 0.22s ease-out both !important;
 }
 
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
-}
-
-
-/* ⚠ LE FLOU PARTOUT, Y COMPRIS A L'OUVERTURE D'UN DOSSIER.
-
-   La feuille glissait en arrivant — c'est ce que vous aviez demande deux tours
-   plus tot, puis vous m'avez dit preferer le flou partout.
-
-   Un seul geste pour tous les changements de page : c'est plus simple a tenir,
-   et rien ne justifie qu'un dossier s'ouvre autrement qu'un reglage.
-
- ⚠ LA FEUILLE MONTE TOUJOURS. Ce qui disparait, c'est l'animation de l'ecran ;
-   le mouvement de la feuille elle-meme — sa marge, ses coins — reste, puisqu'il
-   n'est pas une animation mais une transition. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:pageFlou 0.22s ease-out both !important;
 }
 
 
@@ -19688,12 +19461,6 @@ body.sans-topbar .screen.active.feuille-arrive{
 @keyframes carteMonte{
   from{ transform:translateY(34px); }
   to  { transform:translateY(0); }
-}
-
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-  opacity:1 !important;
-  filter:none !important;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -19872,21 +19639,6 @@ body.sans-topbar .screen.active.feuille-arrive{
   to  { filter:blur(0); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active{
-  animation:pageFlou 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
-}
-
-/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE, en dernier mot. */
-body.sans-topbar .screen.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
@@ -19931,36 +19683,6 @@ body.sans-topbar #e-detail.active .zone-etapes{
 .cl-apparait.vu{
   opacity:1;
   filter:blur(0);
-}
-
-
-/* ⚠ « Creer une procedure » N'EST PAS UN DOSSIER QUI S'OUVRE.
-
-   `p-create-video` et `p-create-manual` figurent dans la liste des ecrans sans
-   barre du haut — ils heritaient donc de `carteMonte`, la montee reservee a
-   l'ouverture d'un dossier.
-
-   Mais on n'y entre pas depuis une carte : on appuie sur le `+` de la barre.
-   Rien ne monte de nulle part, c'est un changement de page comme un autre.
-
- ⚠ ON LES SORT NOMMEMENT DE LA REGLE. Les modifier dans `ECRANS_PLEIN_ECRAN`
-   leur rendrait la barre du logo — ce n'est pas ce qu'on veut. */
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:pageFlou 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
-}
-
-
-/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE, en dernier mot.
-
-   Ma regle precedente visait les deux ecrans de creation par leur nom — mais
-   `carteMonte` etait declaree AVANT, donc le flou l'a emporte partout, y
-   compris sur les dossiers.
-
-   On repose la montee ici, pour eux seuls. */
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
 }
 
 
@@ -20181,27 +19903,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
   100% { filter:blur(0); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:pageFlou 0.35s linear both !important;
-}
-
-/* ⚠ `linear` PARCE QUE LES COURBES SONT DANS LES ETAPES. Une courbe globale
-   s'appliquerait entre chaque paire d'etapes et deformerait les deux temps. */
-
-/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE, en dernier mot. */
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
@@ -20229,17 +19930,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
     animation-timing-function:cubic-bezier(0.16, 1, 0.3, 1);
   }
   100%{ filter:blur(0); }
-}
-
-/* ⚠ ET LE BOUTON + REPREND LE FLOU. Ma regle le visait par
-   `.feuille-arrive` — une classe qu'il ne reçoit que s'il vient d'une page
-   ordinaire. Depuis une autre feuille, elle n'est pas posee et il n'avait
-   plus rien.
-
-   On le vise par son identifiant, sans condition. */
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active{
-  animation:pageFlou 0.35s linear both !important;
 }
 
 
@@ -20331,43 +20021,10 @@ body.sans-topbar #p-create-manual.active{
   to  { filter:blur(0); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active{
-  animation:pageFlou 0.26s cubic-bezier(0.16, 1, 0.3, 1) both !important;
-}
-
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
-}
-
-
-/* ⚠ `.feuille-arrive` L'EMPORTAIT PAR PRECISION.
-
-   Une regle ligne 20192 vise `#p-create-video.active.feuille-arrive` — trois
-   conditions contre deux pour la mienne. A `!important` egal, c'est la plus
-   precise qui gagne, pas la derniere ecrite.
-
-   On ajoute la classe a notre selecteur pour egaliser, et comme on passe
-   apres, on gagne. */
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:pageFlou 0.26s cubic-bezier(0.16, 1, 0.3, 1) both !important;
 }
 
 
@@ -20419,25 +20076,6 @@ body.sans-topbar #p-create-manual.active.feuille-arrive{
   to  { filter:blur(0); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:pageFlou 0.30s ease-out both !important;
-}
-
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
@@ -20472,26 +20110,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
   0%  { opacity:0; transform:translateY(12px); filter:blur(2px); }
   35% { opacity:1; filter:blur(0px); }
   100%{ opacity:1; transform:none; filter:blur(0px); }
-}
-
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:ecranEntre 0.34s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
-/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE DE CARTE, en dernier mot. */
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -20912,25 +20530,6 @@ body:has(#e-profil.active){
   100%{ opacity:1; filter:blur(0px); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:ecranEntre 0.44s linear both !important;
-}
-
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
@@ -20955,25 +20554,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
   40%{ opacity:1; }
   72%{ filter:blur(0px); }
   100%{ opacity:1; filter:blur(0px); }
-}
-
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive{
-  animation:ecranEntre 0.38s linear both !important;
-}
-
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -21006,42 +20586,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
 #p-create-video.active,
 #p-create-manual.active{
   padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 150px);
-}
-
-
-/* ⚠ `p-category` DOIT JOUER `ecranEntre` COMME LES AUTRES.
-
-   Mesure : il jouait `pageFlou` — une regle de mes essais precedents, restee
-   plus precise que la regle generale et donc gagnante.
-
-   Un sous-dossier doit faire exactement le geste d'un changement de page :
-   meme animation, meme duree, meme courbe.
-
- ⚠ SAUF QUAND IL ARRIVE. `feuille-arrive` n'est posee qu'a l'ouverture du
-   dossier depuis la liste ; la montee lui reste reservee, et la regle suivante
-   passe apres celle-ci. */
-body.sans-topbar #p-category.active,
-body.sans-topbar #e-category.active{
-  animation:ecranEntre 0.38s linear both !important;
-}
-
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
-
-/* ⚠ UNE REGLE ANCIENNE GAGNAIT ENCORE.
-
-   Mesure : `p-category` sans `feuille-arrive` jouait `pageFlou 0.22s` — une
-   regle d'un essai precedent, plus precise que ma regle generale et donc
-   gagnante malgre sa position.
-
-   On vise le corps ET l'ecran ET l'absence de `feuille-arrive` : trois
-   conditions, ce qui la depasse. */
-body.sans-topbar #p-category.active:not(.feuille-arrive),
-body.sans-topbar #e-category.active:not(.feuille-arrive){
-  animation:ecranEntre 0.38s linear both !important;
 }
 
 
@@ -21078,28 +20622,6 @@ body.sans-topbar #e-category.active:not(.feuille-arrive){
   100%{ opacity:1; transform:none; filter:blur(0px); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive,
-body.sans-topbar #p-category.active:not(.feuille-arrive),
-body.sans-topbar #e-category.active:not(.feuille-arrive){
-  animation:ecranEntre 0.34s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
-/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE DE CARTE. */
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
@@ -21131,31 +20653,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
   to  { filter:blur(0); }
 }
 
-.screen.active,
-.screen.active.nait,
-.screen.fondu,
-.screen.active.fondu,
-body.sans-topbar .screen.active,
-body.feuille-figee .screen.active,
-body.retour-de-feuille .screen.active,
-body.sans-topbar #p-create-video.active,
-body.sans-topbar #p-create-manual.active,
-body.sans-topbar #p-create-video.active.feuille-arrive,
-body.sans-topbar #p-create-manual.active.feuille-arrive,
-body.sans-topbar #p-category.active:not(.feuille-arrive),
-body.sans-topbar #e-category.active:not(.feuille-arrive){
-  animation:pageFlou 0.22s ease-out both !important;
-  opacity:1 !important;
-  transform:none !important;
-}
-
-/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE DE CARTE. */
-body.sans-topbar #p-category.active.feuille-arrive,
-body.sans-topbar #e-category.active.feuille-arrive{
-  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-  opacity:1 !important;
-}
-
 @media (prefers-reduced-motion: reduce){
   .screen.active,
   body.sans-topbar .screen.active,
@@ -21180,11 +20677,6 @@ body.sans-topbar #e-category.active.feuille-arrive{
   100%{ opacity:1; transform:none; filter:blur(0px); }
 }
 
-.screen.active.nait{
-  animation:ecranNait 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-  transform-origin:var(--ox, 50%) var(--oy, 40%);
-}
-
 /* ⚠ PLUS D'AIR SOUS LE DERNIER ELEMENT. 150 px ne suffisaient pas : on remonte
    a 200 pour qu'il se detache franchement de la barre du bas. */
 #p-category.active #category-procedures-list,
@@ -21196,62 +20688,183 @@ body.sans-topbar #e-category.active.feuille-arrive{
 }
 
 
-/* ⚠ `.nait` DOIT L'EMPORTER SUR LES REGLES GENERALES.
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE RETOUR DE L'APERCU
 
-   Mesure : la classe est bien posee et l'origine calculee — 85,9 % / 93,5 %,
-   le coin du bouton — mais `animation` valait `none`. Mes regles generales
-   visent `.screen.active` et passent apres.
+   ⚠ IL N'Y AVAIT RIEN. Mesure : seul le bouton rebondissait ; l'ecran de
+     gestion reapparaissait d'un coup.
 
-   On vise `.screen.active.nait` avec le corps, ce qui fait trois conditions, et
-   l'on place la regle en dernier. */
-body .screen.active.nait,
-body.sans-topbar .screen.active.nait,
-body.en-apercu .screen.active.nait{
-  animation:ecranNait 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-  transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
-  opacity:1;
+     `espace-vide` coupe meme l'animation par un `animation:none` — c'etait
+     voulu, pour eviter qu'un ecran s'anime pendant que l'autre s'efface. Mais
+     `espace-arrive`, qui prend le relais, ne posait rien.
+
+   ⚠ ON DESCEND ET L'ON SE PRECISE. La gestion revient de derriere l'espace
+     utilisateur : elle part legerement plus grande — 1,02 — et se pose. C'est
+     le geste inverse de celui qui l'a fait partir.
+
+     Le sens compte : monter donnerait l'impression d'arriver de plus loin,
+     alors qu'on revient d'ou l'on etait.
+
+   ⚠ 0,42 S ET LA COURBE D'APPLE. Un peu plus lent que les changements de page
+     ordinaires : on ne revient pas d'une page voisine, on quitte un espace.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes espaceRevient{
+  0%{
+    opacity:0;
+    transform:scale(1.02);
+    filter:blur(5px);
+    animation-timing-function:linear;
+  }
+  40%{ opacity:1; }
+  75%{ filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+/* ⚠ LA BARRE DU HAUT SUIT, sans l'echelle. Elle est fine : la faire grandir se
+   verrait comme un defaut plutot que comme un mouvement. */
+body.espace-arrive .topbar{
+  animation:espaceRevientBarre 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+
+@keyframes espaceRevientBarre{
+  0%  { opacity:0; filter:blur(4px); }
+  55% { opacity:1; }
+  100%{ opacity:1; filter:blur(0px); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.espace-arrive .screen.active,
+  body.espace-arrive .topbar{ animation:none !important; }
 }
 
 
-/* ⚠ `e-detail` NE DOIT PLUS ETRE MUET.
+/* ═══════════════════════════════════════════════════════════════════════════
+   ① L'OUVERTURE D'UN DOSSIER — LES DEUX ESPACES
 
-   Une regle d'un ancien tour lui posait `animation:none` — elle datait du
-   moment ou vous vouliez le silence entre deux feuilles. Elle vise trois
-   conditions et l'emportait donc sur les regles generales.
+   ⚠ LA FEUILLE MONTE ET SE POSE. Elle part de vingt-huit pixels plus bas et
+     legerement plus petite — 0,97 — comme une carte qu'on souleve.
 
-   Depuis, vous avez demande le flou partout. Cet ecran est le seul a etre reste
-   en arriere : c'est pour cela que l'espace utilisateur paraissait sans
-   animation.
+     La courbe est celle d'Apple : depart franc, arrivee posee, sans rebond.
+     Un rebond ferait jouet.
 
- ⚠ ON LUI REND LE MEME GESTE QUE PARTOUT, avec autant de conditions pour
-   depasser l'ancienne. */
-body.sans-topbar #e-detail.active:not(.feuille-arrive),
-body.sans-topbar #e-category.active:not(.feuille-arrive){
-  animation:pageFlou 0.22s ease-out both !important;
-  opacity:1 !important;
+   ⚠ LE FLOU ACCOMPAGNE, IL NE MENE PAS. Trois pixels : assez pour adoucir le
+     depart, trop peu pour qu'on le remarque. Ce qu'on doit voir, c'est le
+     mouvement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes dossierOuvre{
+  0%{
+    opacity:0;
+    transform:translateY(28px) scale(0.97);
+    filter:blur(3px);
+  }
+  45%{ opacity:1; }
+  70%{ filter:blur(0px); }
+  100%{
+    opacity:1;
+    transform:none;
+    filter:blur(0px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  body.sans-topbar #p-category.active.feuille-arrive,
+  body.sans-topbar #e-category.active.feuille-arrive{ animation:none !important; }
 }
 
 
-/* ⚠ MA REGLE `ecranNait` DEBORDAIT SUR LES DEUX ESPACES.
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ANIMATION DES ECRANS — QUATRE REGLES, ET RIEN D'AUTRE
 
-   Elle visait `.screen.active.nait` — mais `nait` est posee par
-   `ouvrirDepuisCarte` a chaque ouverture depuis une carte, dans la gestion
-   comme chez l'utilisateur.
+   ⚠ CINQUANTE-ET-UNE REGLES ONT ETE RETIREES. Elles s'etaient accumulees au
+     fil de nos echanges, chacune corrigeant la precedente sans que l'ancienne
+     ne parte. Trente-trois portaient `!important`, et plus personne — moi
+     compris — ne pouvait dire laquelle gagnait a un instant donne.
 
-   Elle a donc remplace l'animation d'origine partout, alors qu'elle etait
-   ecrite pour le seul bouton oeil.
+     C'est pour cela qu'une animation pouvait etre correctement nommee sur un
+     element sans que ses valeurs ne s'appliquent : un `transform:none
+     !important` pose ailleurs figeait le deplacement.
 
- ⚠ ON LUI REND SON PERIMETRE. `body.en-apercu` n'est posee que pendant le
-   basculement vers l'espace utilisateur : la regle ne s'applique plus qu'a ce
-   moment-la. */
-body .screen.active.nait,
-body.sans-topbar .screen.active.nait{
-  animation:ecranEntre 0.34s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-  transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
+   ⚠ QUATRE SITUATIONS, QUATRE REGLES, DANS CET ORDRE.
+
+     Chacune est plus precise que la precedente, donc l'ordre suffit : aucun
+     `!important` n'est necessaire entre elles.
+
+       ① un changement de page ordinaire   → un flou court
+       ② l'ouverture d'un dossier          → la feuille monte
+       ③ entre deux feuilles               → rien
+       ④ le retour de l'apercu             → la gestion redescend
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes ecranFlou{
+  from{ filter:blur(5px); }
+  to  { filter:blur(0); }
 }
 
-/* ⚠ ET LE BOUTON OEIL GARDE SA MONTEE DEPUIS LE POINT TOUCHE. */
-body.en-apercu .screen.active.nait{
-  animation:ecranNait 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
-  transform-origin:var(--ox, 50%) var(--oy, 40%) !important;
+@keyframes ecranDossier{
+  0%  { opacity:0; transform:translateY(28px) scale(0.97); filter:blur(3px); }
+  45% { opacity:1; }
+  70% { filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+@keyframes ecranRetourEspace{
+  0%  { opacity:0; transform:scale(1.02); filter:blur(5px); }
+  40% { opacity:1; }
+  75% { filter:blur(0px); }
+  100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+
+/* ① LE CAS ORDINAIRE — un flou court, sans mouvement.
+      Procedures, Analyse, Gerer, Profil, le bouton +. */
+body .screen.active{
+  animation:ecranFlou 0.22s ease-out both;
+}
+
+
+/* ② L'OUVERTURE D'UN DOSSIER — la feuille monte et se pose.
+
+   ⚠ `feuille-arrive` N'EST POSEE QU'A L'OUVERTURE, par le script. Un
+     sous-dossier ne la reçoit pas : il tombe donc dans la regle ③. */
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:ecranDossier 0.44s cubic-bezier(0.32, 0.72, 0, 1) both;
+  transform-origin:50% 100%;
+}
+
+
+/* ③ ENTRE DEUX FEUILLES — rien.
+
+   Du dossier a la procedure, ou d'un dossier a son sous-dossier : on reste
+   dans la meme feuille, rien n'arrive de nulle part. */
+body.sans-topbar #p-analyse.active,
+body.sans-topbar #e-detail.active,
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive),
+body.feuille-figee .screen.active{
+  animation:none;
+}
+
+
+/* ④ LE RETOUR DE L'APERCU — la gestion redescend de derriere.
+
+   ⚠ EN DERNIER, DONC ELLE GAGNE sur les trois autres : quand on revient de
+     l'espace utilisateur, c'est ce geste-la qu'on veut, quel que soit l'ecran
+     qui reapparait. */
+body.espace-arrive .screen.active{
+  animation:ecranRetourEspace 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  transform-origin:50% 45%;
+}
+
+body.espace-arrive .topbar{
+  animation:ecranFlou 0.42s ease-out both;
+}
+
+
+@media (prefers-reduced-motion: reduce){
+  body .screen.active,
+  body.espace-arrive .screen.active,
+  body.espace-arrive .topbar{ animation:none; }
 }

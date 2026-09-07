@@ -7125,7 +7125,19 @@ const ONGLET_PAR_ECRAN = {
 
      `-1` dit « aucun » : `placerOnglet` laisse alors la pastille ou elle
      etait, ce qui est juste — on revient d'ou l'on vient. */
-  'p-profil': -1, 'e-profil': -1,
+  'p-profil': -1, 'e-profil': 2,
+
+  /* ⚠ LES AUTRES ECRANS DE L'ESPACE UTILISATEUR MANQUAIENT A L'APPEL.
+
+     Six d'entre eux n'etaient pas dans cette table : la pastille restait donc
+     ou elle etait, quel que soit l'ecran ouvert.
+
+     Chacun rejoint l'onglet dont il depend — un dossier et une procedure
+     relevent de « Procedures », les reglages de poste, de compte et de langue
+     relevent de « Reglages ». */
+  'e-list': 0, 'e-category': 0, 'e-detail': 0,
+  'e-scan': 1,
+  'e-reg-poste': 2, 'e-reg-compte': 2, 'e-reg-langue': 2,
 
   /* ⚠ TOUS LES INDICES ONT RECULE D'UN CRAN. L'onglet Accueil a ete retire :
      Procedures passe de 1 a 0, Analyse de 2 a 1, Reglages de 3 a 2.
@@ -7738,10 +7750,22 @@ function majBarreHaute(id) {
      legitimes des deux cotes : c'est le chemin qui decide, pas la destination. */
   const DEPUIS_PROFIL = new Set([
     'p-abonnement', 'p-reg-appareils', 'p-reg-langue', 'p-reg-compte',
-    'e-reg-appareils', 'e-reg-langue', 'e-reg-compte',
   ])
 
-  const estProfil = id === 'p-profil' || id === 'e-profil'
+  /* ⚠ LES REGLAGES DE L'ESPACE UTILISATEUR SONT SORTIS DE CETTE LISTE.
+
+     Ils s'atteignent depuis « Reglages », qui est un onglet : leur pastille
+     doit rester allumee, comme celle de n'importe quelle sous-page. */
+
+  /* ⚠ SEUL LE PROFIL DE LA GESTION EST HORS ONGLETS.
+
+     `e-profil` y figurait aussi — mais cote utilisateur, cette page EST le
+     troisieme onglet, « Reglages ». `hors-onglets` les eteignait tous : on
+     lisait ses reglages avec une barre entierement grise.
+
+     Cote gestion le profil s'ouvre par la barre du haut, il n'appartient donc
+     a aucun onglet : lui, garde la classe. */
+  const estProfil = id === 'p-profil'
   const suiteDuProfil = DEPUIS_PROFIL.has(id)
     && document.body.classList.contains('hors-onglets')
 

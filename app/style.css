@@ -21533,3 +21533,47 @@ body.retour-de-feuille .screen:not(.active).feuille-part{
   font-weight:650;
   color:#1F4CEE;
 }
+
+
+/* ═══ LA PAGE DE BIENVENUE — CENTREE ET AEREE ═══
+
+   ⚠ TOUT SE CENTRE VERTICALEMENT. La page a perdu son formulaire : elle ne
+     fait plus que 470 px sur 844, et le contenu se tassait en haut avec un
+     grand vide dessous.
+
+   ⚠ LE LOGO DESCEND ENCORE — 20 px de large au lieu de 25. Il identifie, il
+     n'annonce pas ; a cette taille il laisse toute la place au slogan.
+
+   ⚠ ET LES ECARTS S'OUVRENT. Sur une page courte, resserrer n'a plus de sens :
+     l'air devient une qualite plutot qu'une perte. */
+
+#login-screen .login-card{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  min-height:100dvh;
+  padding:calc(env(safe-area-inset-top, 0px) + 24px) 24px
+          calc(env(safe-area-inset-bottom, 0px) + 24px);
+}
+
+#login-screen .bv-haut{
+  padding:0 0 40px;
+  gap:8px;
+}
+
+#login-screen .bv-logo{ width:20px; height:29px; }
+#login-screen .bv-marque{ font-size:20px; }
+
+#login-screen .bv-bas{ flex:0 0 auto; }
+
+#login-screen .bv-phrase{ margin-top:18px; }
+#login-screen .bv-essai{ margin-top:38px; }
+#login-screen .bv-actions{ margin-top:28px; gap:13px; }
+#login-screen .bv-deja{ margin-top:26px; }
+
+@media (max-height: 700px){
+  #login-screen .bv-haut{ padding-bottom:26px; }
+  #login-screen .bv-essai{ margin-top:24px; }
+  #login-screen .bv-actions{ margin-top:20px; }
+  #login-screen .bv-deja{ margin-top:18px; }
+}

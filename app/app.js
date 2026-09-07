@@ -252,7 +252,7 @@ const DICO = {
     "Fin ici": "End here",
     "Glissez sur la frise pour naviguer dans la vidéo": "Drag the timeline to move through the video",
     "Générer les étapes": "Generate the steps",
-    "Gérer l'équipe": "Manage the team",
+    "Gestion des accès": "Access management",
     "Importez une vidéo puis coupez chaque étape": "Import a video then cut each step",
     "Informations personnelles": "Personal details",
     "Jours actifs": "Active days",
@@ -460,7 +460,7 @@ const DICO = {
     "Fin ici": "Fin aquí",
     "Glissez sur la frise pour naviguer dans la vidéo": "Desliza por la línea de tiempo para navegar por el vídeo",
     "Générer les étapes": "Generar los pasos",
-    "Gérer l'équipe": "Gestionar el equipo",
+    "Gestion des accès": "Gestión de accesos",
     "Importez une vidéo puis coupez chaque étape": "Importa un vídeo y corta cada paso",
     "Informations personnelles": "Datos personales",
     "Jours actifs": "Días activos",
@@ -662,7 +662,7 @@ const DICO = {
     "Fin ici": "Fim aqui",
     "Glissez sur la frise pour naviguer dans la vidéo": "Deslize na linha de tempo para navegar no vídeo",
     "Générer les étapes": "Gerar as etapas",
-    "Gérer l'équipe": "Gerir a equipa",
+    "Gestion des accès": "Gestão de acessos",
     "Importez une vidéo puis coupez chaque étape": "Importe um vídeo e corte cada etapa",
     "Informations personnelles": "Dados pessoais",
     "Jours actifs": "Dias ativos",
@@ -1096,9 +1096,13 @@ window.onNavigate = function (index) {
     }
     /* ⚠ TROIS ONGLETS COTE GESTION. Procedures en premier — c'est desormais
        l'ecran d'ouverture de l'app. */
+    /* ⚠ GERER PASSE EN DEUXIEME, ANALYSE EN TROISIEME.
+
+       L'ordre etait Procedures, Analyse, Gerer. Il devient Procedures, Gerer,
+       Analyse — les deux derniers sont echanges. */
     if (index === 0) showGestionScreen('p-list')
-    else if (index === 1) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
-    else if (index === 2) openSettings()
+    else if (index === 1) openSettings()
+    else if (index === 2) { showGestionScreen('p-global-analyse'); loadGlobalAnalyse() }
   } finally { navDepuisOnglet = false }
 }
 
@@ -7131,11 +7135,11 @@ const ONGLET_PAR_ECRAN = {
   'p-list': 0, 'p-category': 0, 'p-analyse': 0, 'p-edit-procedure': 0,
   'p-create': 0, 'p-create-manual': 0, 'p-create-video': 0,
   'p-create-doc': 0, 'p-create-ai': 0,
-  'p-global-analyse': 1, 'p-membre': 1, 'p-membre-fiche': 1,
-  'p-an-equipe': 1, 'p-an-categories': 1, 'p-an-temps': 1,
-  'p-settings': 2, 'p-reg-poste': 2, 'p-reg-compte': 2, 'p-reg-code': 2,
-  'p-reg-postes': 2, 'p-reg-langue': 2, 'p-reg-appareils': 2,
-  'p-abonnement': 2, 'p-membres': 2, 'p-postes': 2,
+  'p-global-analyse': 2, 'p-membre': 2, 'p-membre-fiche': 2,
+  'p-an-equipe': 2, 'p-an-categories': 2, 'p-an-temps': 2,
+  'p-settings': 1, 'p-reg-poste': 1, 'p-reg-compte': 1, 'p-reg-code': 1,
+  'p-reg-postes': 1, 'p-reg-langue': 1, 'p-reg-appareils': 1,
+  'p-abonnement': 1, 'p-membres': 1, 'p-postes': 1,
   /* ⚠ `p-quota` EST PLUS BAS, AVEC `p-scan`. Je l'avais ajoute ici aussi en
      decalant les indices : deux entrees pour la meme cle, dont seule la
      derniere compte. Sans consequence tant que les deux valent 2, mais le jour
@@ -7159,11 +7163,11 @@ const ONGLET_PAR_ECRAN = {
      Elle etait marquee « 0 » du temps ou on l'atteignait depuis l'ecran
      Analyse. Depuis qu'elle s'ouvre depuis Gerer, l'onglet allume ne
      correspondait plus a l'endroit ou l'on est. */
-  'p-activites': 2,
+  'p-activites': 1,
   'p-recentes': 0,
   'p-coller': 0,        // le collage de videos, dans la creation
-  'p-scan': 2,          // le lecteur de QR code, dans les Reglages
-  'p-quota': 2,         // les analyses video, dans les Reglages
+  'p-scan': 1,          // le lecteur de QR code, dans les Reglages
+  'p-quota': 1,         // les analyses video, dans les Reglages
 }
 
 /* `p-reg-etabs` a été retiré de cette table en même temps que l'écran : la
@@ -9534,7 +9538,13 @@ function peindreAnalyseInterne() {
   zC.innerHTML =
     tuile(IC.qr, scans === null ? '—' : scans, 'scans de QR code', 1) +
     tuile(IC.oeil, lectures, `lecture${lectures > 1 ? 's' : ''}`, 0) +
-    tuile(IC.montre, anDureeLisible(secondes), 'passées à lire', 3)
+    /* ⚠ « passées à lire » DEMANDAIT UN EFFORT. Le mot se rapportait aux heures
+       affichees au-dessus, mais il fallait reconstruire la phrase pour le
+       comprendre.
+
+       « au total sur les procédures » dit directement ce que le chiffre
+       compte. */
+    tuile(IC.montre, anDureeLisible(secondes), 'au total sur les procédures', 3)
 
   const zT = document.getElementById('an-lect-total')
   if (zT) zT.textContent = `${lectures} sur ${anJours} jours`
@@ -9563,6 +9573,66 @@ function peindreAnalyseInterne() {
      ⚠ ON CLASSE PAR TEMPS, PAS PAR NOMBRE DE LECTURES. Quelqu'un qui ouvre
        vingt procedures sans les lire n'utilise pas l'app plus que celui qui en
        lit deux en entier. */
+  /* ═══ LES DEUX CLASSEMENTS PAR PROCEDURE ═══
+
+     ⚠ MEME GABARIT QUE « Équipe » : un point de rang, un titre, son dossier en
+       dessous, la valeur a droite. Trois listes qui se lisent pareil.
+
+     ⚠ ON COMPTE SUR `valides`, deja filtre par la periode choisie. Les deux
+       cartes suivent donc le segment 7 jours / 30 jours / 1 an sans rien de
+       plus.
+
+     ⚠ ET L'ON NE MONTRE QUE LES CINQ PREMIERES. Au-dela, un classement devient
+       une liste — et la page en a deja deux autres. */
+  const parProc = {}
+  for (const v of valides) {
+    if (!v.procedure_id) continue
+    const p = parProc[v.procedure_id] || (parProc[v.procedure_id] = { vues: 0, sec: 0 })
+    p.vues += 1
+    p.sec += Number(v.duree_lecture || 0)
+  }
+
+  const titreProc = (id) => {
+    const p = (allGestionProcedures || []).find(x => x.id === id)
+    return p ? (p.titre || 'Sans titre') : null
+  }
+  const dossierProc = (id) => {
+    const p = (allGestionProcedures || []).find(x => x.id === id)
+    return p ? (p.sous_categorie || p.categorie || '') : ''
+  }
+
+  /* ⚠ ON ECARTE LES PROCEDURES SUPPRIMEES. Leurs lectures restent en base ;
+     les afficher montrerait un titre introuvable. */
+  const classees = Object.entries(parProc)
+    .filter(([id]) => titreProc(id))
+    .map(([id, v]) => ({ id, ...v }))
+
+  const peindreClassement = (zone, cle, format, teinteRang) => {
+    const z = document.getElementById(zone)
+    if (!z) return
+    const top = classees
+      .slice()
+      .sort((a, b) => b[cle] - a[cle] ||
+        (titreProc(a.id) || '').localeCompare(titreProc(b.id) || '', 'fr'))
+      .slice(0, 5)
+    z.innerHTML = top.length
+      ? top.map((p, r) => `
+        <div class="an-membre">
+          <span class="an-rang" style="background:${pointDossier(teinteRang)}"></span>
+          <span class="an-m-co">
+            <span class="an-m-t">${escapeHtml(titreProc(p.id))}</span>
+            ${dossierProc(p.id) ? `<span class="an-m-s">${escapeHtml(dossierProc(p.id))}</span>` : ''}
+          </span>
+          <span class="an-m-q">${format(p[cle])}</span>
+        </div>`).join('')
+      : '<div class="an-vide-l">Aucune lecture sur cette période.</div>'
+  }
+
+  peindreClassement('an-vues', 'vues',
+    (n) => n > 1 ? n + ' lectures' : '1 lecture', 1)
+
+  peindreClassement('an-temps-proc', 'sec', anDureeLisible, 3)
+
   const zE = document.getElementById('an-equipe')
   if (zE) {
     const parMembre = {}
@@ -11371,7 +11441,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
 
             const quandB = depuisQuand(mod || cree, true)
             return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>${
-              quandB ? (jamaisTouchee ? 'Créé ' : 'Mod. ') + quandB : 'En cours'}</span>`
+              quandB ? (jamaisTouchee ? 'Créé ' : 'Mod. ') + quandB : 'En dév.'}</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
@@ -12192,10 +12262,19 @@ document.addEventListener('click', (e) => {
   if (!volet) return
 
   if (!bouton && !choix) {
+    /* ⚠ LE BOUTON SE DETEND MEME SI LE VOLET N'ETAIT PAS `ouvert`.
+
+       La remise a `false` etait DANS le `if` : quand la classe avait deja ete
+       retiree ailleurs — un choix de tri, une navigation — le bouton gardait
+       `aria-expanded="true"`, et donc son cadre gris.
+
+       Cote gestion la ligne est hors condition ; c'est la seule difference
+       entre les deux espaces. */
+    document.getElementById('e-cat-filtre')?.setAttribute('aria-expanded', 'false')
+
     if (volet.classList.contains('ouvert')) {
       volet.classList.remove('ouvert')
       setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
-      document.getElementById('e-cat-filtre')?.setAttribute('aria-expanded', 'false')
     }
     return
   }
@@ -25943,6 +26022,16 @@ function appliquerAccesEntreprise() {
   const s = document.getElementById('supprimer-entreprise')
   if (q) q.hidden = fondateur
   if (s) s.hidden = !fondateur
+
+  /* ⚠ LE FONDATEUR N'A PAS DE POSTE.
+
+     « Votre poste » sert a un membre de dire ce qu'il fait dans l'equipe —
+     cuisine, salle, plonge. Le fondateur n'occupe pas un poste parmi d'autres :
+     il tient l'entreprise.
+
+     La ligne reste pour les gestionnaires invites, qui travaillent aussi. */
+  const lp = document.getElementById('mon-poste')?.closest('.reg-ligne')
+  if (lp) lp.hidden = fondateur
 }
 
 /* ⚠ L'OUVERTURE EST DANS L'AUTRE ECOUTEUR, plus haut.
@@ -27603,7 +27692,7 @@ function peindrePublication(proc) {
 
        Ta phrase, allégée : « seuls ceux qui ont accès à l'espace gestion
        peuvent y accéder » répétait « accès » deux fois en six mots. */
-    ti.textContent = 'En cours'
+    ti.textContent = 'En dév.'
     /* ═══ UNE LIGNE, PAS TROIS ═══
 
        « Visible par l'espace gestion uniquement. Publiez-la pour que votre

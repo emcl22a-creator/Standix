@@ -9425,7 +9425,12 @@ function peindreAnalyseInterne() {
   const gT = document.getElementById('an-graph-temps')
   if (gT) {
     const serie = anSerie(valides, 'temps').map(p => ({ ...p, v: p.v / 60 }))
-    gT.innerHTML = anCourbe(serie, pointDossier(0), 'T', 'min')
+    /* ⚠ LE RANG 3 PLUTOT QUE 0 : vert au lieu de violet.
+
+       `pointDossier` lit la palette des dossiers ; chaque rang y porte un
+       couple de teintes. Le rang 0 est le violet, le rang 3 le vert — le meme
+       que la pastille du titre. */
+    gT.innerHTML = anCourbe(serie, pointDossier(3), 'T', 'min')
   }
 
   /* ═══ LES DEUX MEMBRES LES PLUS ACTIFS ═══

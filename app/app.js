@@ -1306,6 +1306,23 @@ window.ouvrirApercuEquipe = function () {
     if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
     document.body.classList.remove('espace-vide')
     document.body.classList.add('espace-arrive')
+
+    /* ⚠ ON RELANCE L'ANIMATION DE L'ECRAN.
+
+       L'ecran de gestion n'a jamais cesse d'etre `active` : il etait seulement
+       cache derriere l'espace utilisateur. Poser une classe sur le corps ne
+       suffit donc pas — le navigateur ne voit aucun element nouveau, et ne
+       joue rien.
+
+       On retire `active`, on force un recalcul, on la repose : l'ecran
+       redevient un arrivant et l'animation part. */
+    const ecranG = document.querySelector('#gestion-app .screen.active')
+    if (ecranG) {
+      ecranG.classList.remove('active')
+      void ecranG.offsetWidth
+      ecranG.classList.add('active')
+    }
+
     setTimeout(() => document.body.classList.remove('espace-arrive'), 640)
   }, 180)
 
@@ -21686,7 +21703,15 @@ function carteSousDossierEquipe(nom, procs, rang = 0) {
   cell.dataset.key = 'sd:' + nom
   animerApparition(cell, rang)
 
-  const teinte = couleurDossier(rang)
+  /* ⚠ LE SOUS-DOSSIER EST TOUJOURS VIOLET.
+
+     La teinte suivait le rang : chaque sous-dossier prenait une couleur de la
+     palette selon sa position. Dans une liste qui melange sous-dossiers et
+     procedures, cela brouillait la lecture — deux elements de meme couleur
+     n'etaient pas de meme nature.
+
+     Le rang 0 de la palette est le violet. */
+  const teinte = couleurDossier(0)
   const aLire = procs.filter(p => !equipeLues.has(p.id)).length
 
   cell.innerHTML = `
@@ -22011,7 +22036,11 @@ function ficheEquipe(proc, rang = 0, dossier = null) {
 
   const lue = equipeLues.has(proc.id)
   const nbEtapes = (equipeEtapesByProc[proc.id] || []).length
-  const teinte = couleurDossier(rang)
+  /* ⚠ LA PROCEDURE EST TOUJOURS GRISE.
+
+     Le rang 4 de la palette. Le gris s'efface derriere le violet : c'est le
+     sous-dossier qui doit attirer l'oeil, puisqu'il mene ailleurs. */
+  const teinte = couleurDossier(4)
   const favori = favorisEquipe.has(proc.id)
 
   el.innerHTML = `

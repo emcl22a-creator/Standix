@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=fcecf6f4">
+<link rel="stylesheet" href="style.css?v=8d5f9818">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -915,7 +915,7 @@
       </div>
 
       <div class="bv-bas">
-        <p class="bv-slogan">Filmez et l’IA crée la procédure,<br>pour l’équipe.</p>
+        <p class="bv-slogan">Filmez et l’IA crée<br>la procédure, pour l’équipe.</p>
         <p class="bv-phrase">Accédez à votre espace et à vos procédures.</p>
 
         <!-- ⚠ LA CONNEXION D'ABORD. La plupart des gens qui ouvrent l'app ont
@@ -1251,7 +1251,77 @@
     </div>
   </div>
 
-  <div class="histo" id="histo-equipe" hidden aria-hidden="true">
+  <div class="histo" id="histo-vues" hidden aria-hidden="true">
+    <div class="histo-fond" data-fermer-histo></div>
+    <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Les plus lues">
+      <span class="histo-poignee" data-fermer-histo></span>
+      <div class="histo-tete">
+        <h2>Les plus lues</h2>
+        <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <!-- ⚠ LE MEME SEGMENT QUE LA PAGE ANALYSE : `proc-segm` et sa pastille
+           `p-seg-lens`. La periode changeait ailleurs, jamais ici — on ouvrait
+           la feuille sans savoir sur quelle duree on lisait, et sans pouvoir en
+           changer sans la refermer.
+
+           ⚠ SES `data-jours` SONT LES MEMES : 7, 30, 360. C'est `anJours` qui
+             les recoit, la meme variable que le segment de la page. Les deux
+             restent donc d'accord sans qu'on ait a les synchroniser. -->
+      <div class="proc-segm histo-segm" id="vues-segm" role="tablist">
+        <span class="p-seg-lens" id="vues-segm-lens" aria-hidden="true"></span>
+        <button type="button" class="p-seg on" data-vues-jours="7" role="tab">7 jours</button>
+        <button type="button" class="p-seg" data-vues-jours="30" role="tab">30 jours</button>
+        <button type="button" class="p-seg" data-vues-jours="360" role="tab">1 an</button>
+      </div>
+
+      <!-- ⚠ CE TEXTE EST REECRIT PAR LE SCRIPT des l'ouverture, avec la periode
+           choisie. Celui-ci ne se voit qu'une fraction de seconde — mais il doit
+           dire la meme chose, sinon on lit deux formulations differentes en
+           ouvrant la feuille. -->
+      <p class="histo-note" id="histo-vues-note">Nombre de lectures par procédure.</p>
+      <div class="histo-liste" id="histo-vues-liste"></div>
+    </div>
+  </div>
+
+<div class="histo" id="histo-temps" hidden aria-hidden="true">
+    <div class="histo-fond" data-fermer-histo></div>
+    <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Temps par procédure">
+      <span class="histo-poignee" data-fermer-histo></span>
+      <div class="histo-tete">
+        <h2>Temps par procédure</h2>
+        <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+               stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <!-- ⚠ LE MEME SEGMENT QUE LA PAGE ANALYSE : `proc-segm` et sa pastille
+           `p-seg-lens`. La periode changeait ailleurs, jamais ici — on ouvrait
+           la feuille sans savoir sur quelle duree on lisait, et sans pouvoir en
+           changer sans la refermer.
+
+           ⚠ SES `data-jours` SONT LES MEMES : 7, 30, 360. C'est `anJours` qui
+             les recoit, la meme variable que le segment de la page. Les deux
+             restent donc d'accord sans qu'on ait a les synchroniser. -->
+      <div class="proc-segm histo-segm" id="temps-segm" role="tablist">
+        <span class="p-seg-lens" id="temps-segm-lens" aria-hidden="true"></span>
+        <button type="button" class="p-seg on" data-temps-jours="7" role="tab">7 jours</button>
+        <button type="button" class="p-seg" data-temps-jours="30" role="tab">30 jours</button>
+        <button type="button" class="p-seg" data-temps-jours="360" role="tab">1 an</button>
+      </div>
+
+      <!-- ⚠ CE TEXTE EST REECRIT PAR LE SCRIPT des l'ouverture, avec la periode
+           choisie. Celui-ci ne se voit qu'une fraction de seconde — mais il doit
+           dire la meme chose, sinon on lit deux formulations differentes en
+           ouvrant la feuille. -->
+      <p class="histo-note" id="histo-temps-note">Temps cumulé passé sur chaque procédure.</p>
+      <div class="histo-liste" id="histo-temps-liste"></div>
+    </div>
+  </div>
+
+<div class="histo" id="histo-equipe" hidden aria-hidden="true">
     <div class="histo-fond" data-fermer-histo></div>
     <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Activité de l’équipe">
       <span class="histo-poignee" data-fermer-histo></span>
@@ -2590,6 +2660,11 @@
         <div class="ac-bloc">
           <div class="ac-bloc-t">
             <span class="ac-eti"><i style="background:#3073C3"></i>Les plus lues</span>
+          
+            <button type="button" class="ac-sect-plus" onclick="ouvrirHisto('vues')">Voir plus
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
           </div>
           <div id="an-vues"></div>
         </div>
@@ -2599,6 +2674,11 @@
         <div class="ac-bloc">
           <div class="ac-bloc-t">
             <span class="ac-eti"><i style="background:#318759"></i>Temps par procédure</span>
+          
+            <button type="button" class="ac-sect-plus" onclick="ouvrirHisto('temps')">Voir plus
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+                   stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
           </div>
           <div id="an-temps-proc"></div>
         </div>
@@ -4684,7 +4764,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=ba12bc80"></script>
+<script type="module" src="app.js?v=500b7634"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

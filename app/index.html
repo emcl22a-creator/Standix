@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=1e9459f1">
+<link rel="stylesheet" href="style.css?v=8e2eff75">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2562,7 +2562,7 @@
       <div class="ac-sect">
       <div class="ac-bloc">
         <div class="ac-bloc-t">
-          <span class="ac-eti"><i style="background:#6F47BB"></i>Temps passé sur les procédures</span>
+          <span class="ac-eti"><i style="background:#318759"></i>Temps passé sur les procédures</span>
           <!-- ⚠ LE BOUTON D'AIDE EST DANS LA TETE, pas sous le graphique. La
                question « comment ce temps est-il compte » se pose en voyant le
                chiffre, pas apres l'avoir parcouru. -->
@@ -2579,15 +2579,12 @@
       </div>
     </div>
 
-    <div class="ac-sect">
-      <div class="ac-bloc">
-        <div class="ac-bloc-t">
-          <span class="ac-eti"><i style="background:#3073C3"></i>Évolution des lectures</span>
-          <span class="ac-q" id="an-lect-total">—</span>
-        </div>
-        <div class="an-graph" id="an-graph-lectures"></div>
-      </div>
-    </div>
+    <!-- ⚠ « Évolution des lectures » A ETE RETIREE.
+
+         Le graphique disait combien de fois les procedures ont ete ouvertes,
+         jour par jour. Sur une equipe de dix personnes, la courbe ne montrait
+         que du bruit — et « Temps passe » repond deja a la question qui
+         compte : est-ce que l'equipe s'en sert. -->
 
     <div class="ac-sect">
       <div class="ac-bloc">
@@ -4048,6 +4045,21 @@
       <button type="button" class="reg-ligne danger" onclick="signOut()">
         <span class="reg-nm">Se déconnecter</span>
       </button>
+
+      <!-- ⚠ LES DEUX LIGNES QUI MANQUAIENT.
+
+           Un employe qui change de travail restait rattache indefiniment : il
+           devait demander a son ancien patron de le retirer.
+
+           Et « Supprimer mon compte » est une obligation legale — la ligne
+           existait cote gestion, pas ici. -->
+      <button type="button" class="reg-ligne danger" id="e-quitter-entreprise">
+        <span class="reg-nm">Quitter l’entreprise</span>
+      </button>
+
+      <button type="button" class="reg-ligne danger" id="e-supprimer-compte">
+        <span class="reg-nm">Supprimer mon compte</span>
+      </button>
     </div>
 
     <div class="reg-groupe" style="margin-top:24px;">
@@ -4637,7 +4649,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=dc88b3c2"></script>
+<script type="module" src="app.js?v=6eb32af9"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

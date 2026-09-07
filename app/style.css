@@ -21634,3 +21634,18 @@ body.retour-de-feuille .screen:not(.active).feuille-part{
 @media (max-height: 700px){
   #login-screen .bv-slogan{ font-size:18px; }
 }
+
+
+/* ⚠ QUATRE PIXELS SOUS LE TITRE, C'ETAIT UN COLLAGE.
+
+   La carte noire touchait presque « Votre poste » : les deux se lisaient comme
+   un seul bloc, alors que l'un nomme la page et l'autre pose une question.
+
+   Vingt-deux pixels les separent maintenant.
+
+ ⚠ ET L'ECART SOUS LA CARTE SE RESSERRE — 20 px a 14. La question et les postes
+   forment un ensemble : l'un appelle les autres. */
+#p-reg-poste .poste-tete,
+#e-reg-poste .poste-tete{
+  margin:22px 0 14px;
+}

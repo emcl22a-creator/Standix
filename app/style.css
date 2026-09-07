@@ -21875,3 +21875,65 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
   transition:none !important;
   padding-top:inherit;
 }
+
+
+/* ⚠ TOUS LES GROUPES DU PROFIL SE SEPARENT DE 24 PX.
+
+   Mesure : les ecarts valaient 384, 142 puis 24 px — les deux premiers
+   venaient des titres retires, qui portaient leur propre marge. Sans eux, les
+   groupes se retrouvaient colles ou tres eloignes selon l'endroit.
+
+   Vingt-quatre est l'ecart qui separait deja « Supprimer l'entreprise » des
+   conditions d'utilisation : on le donne a tous.
+
+ ⚠ SAUF AU PREMIER, qui suit le titre de la page. */
+#p-profil .reg-groupe,
+#e-profil .reg-groupe{
+  margin-top:24px;
+  margin-bottom:0;
+}
+
+#p-profil .reg-groupe:first-of-type,
+#e-profil .reg-groupe:first-of-type{
+  margin-top:0;
+}
+
+
+/* ⚠ LES BLOCS QUI NE SONT PAS DES GROUPES PRENNENT LE MEME ECART.
+
+   Mesure : la fiche d'identite, la carte des etablissements et le bloc
+   d'accueil portaient leurs propres marges — 14, 4 puis 0 px. Entre eux, les
+   cartes se touchaient presque, alors que les groupes se separaient de 24.
+
+   Tous les enfants directs de la page prennent maintenant le meme ecart. */
+#p-profil > .reg-identite,
+#p-profil > .etab-carte,
+#p-profil > .accueil,
+#e-profil > .reg-identite,
+#e-profil > .etab-carte,
+#e-profil > .accueil{
+  margin-top:24px;
+  margin-bottom:0;
+}
+
+/* ⚠ ET LA VERSION GARDE SON RETRAIT — elle ferme la page, elle n'est pas une
+   carte de plus. */
+#p-profil > .reg-version,
+#e-profil > .reg-version{
+  margin-top:30px;
+}
+
+
+/* ⚠ LES LIGNES DES DEUX PROFILS RESPIRENT DAVANTAGE.
+
+   Onze pixels en haut et en bas donnaient des lignes de 46 px : lisibles, mais
+   serrees pour un ecran ou l'on ne fait que choisir. Seize les portent a 56 —
+   la hauteur qu'Apple donne a ses propres reglages.
+
+ ⚠ ET LE TRAIT DE SEPARATION SUIT. Il s'arretait au bord de l'icone ; avec des
+   lignes plus hautes, ce decalage se voyait. */
+#p-profil .reg-ligne,
+#e-profil .reg-ligne{
+  padding-top:16px;
+  padding-bottom:16px;
+}

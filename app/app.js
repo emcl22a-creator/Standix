@@ -9810,7 +9810,15 @@ document.addEventListener('click', (e) => {
   }
 
   if (MOINS_ANIM()) { peindreAnalyse(); return }
-  const zones = ['an-chiffres', 'an-graph-lectures', 'an-graph-temps', 'an-equipe']
+  /* ⚠ LA LISTE DES ZONES SUIT CE QUE LA PAGE CONTIENT.
+
+     Elle nommait encore `an-graph-lectures` et `an-graph-temps`, deux
+     graphiques retires depuis — `filter(Boolean)` les ecartait en silence, si
+     bien que le defaut ne se voyait pas.
+
+     Et elle ignorait mes deux classements, qui changeaient donc sans flou
+     pendant que les tuiles se floutaient a cote. */
+  const zones = ['an-chiffres', 'an-vues', 'an-temps-proc']
     .map(i => document.getElementById(i)).filter(Boolean)
   zones.forEach(flouSortie)
   setTimeout(() => { peindreAnalyse(); zones.forEach(flouEntree) }, 130)

@@ -21741,3 +21741,48 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 #temps-segm{
   margin:12px 24px 0;
 }
+
+
+/* ═══ LES ECRANS DE CREATION ARRIVENT COMME UNE FEUILLE ═══
+
+   ⚠ ILS JOUAIENT `ecranFlou` — un flou sans mouvement. Mais ce sont des
+     feuilles : elles arrivent de nulle part, comme un dossier qu'on ouvre.
+
+     Une regle d'un tour precedent les avait sortis de `ecranDossier` parce
+     qu'ils n'ont pas de `feuille-arrive` a l'entree depuis le bouton +. On les
+     vise donc par leur identifiant. */
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-doc.active,
+body.sans-topbar #p-create-ai.active{
+  animation:ecranDossier 0.44s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  transform-origin:50% 100%;
+}
+
+
+/* ═══ ET ELLES PARTENT PLUS DOUCEMENT ═══
+
+   ⚠ `ecranDossierPart` LES FAISAIT TOMBER DE 46 PX. Ce geste convient a une
+     feuille qu'on referme apres l'avoir lue — on la repousse.
+
+     Ici on abandonne une creation ou on l'enregistre : la feuille ne doit pas
+     etre chassee, elle doit s'effacer.
+
+   ⚠ ELLE RECULE AU LIEU DE DESCENDRE. Une echelle de 0,94 sans deplacement :
+     la feuille s'eloigne du regard, comme une carte qu'on repose sur une pile.
+
+   ⚠ ET LE FLOU MENE LE GESTE — 6 px, sur une courbe qui accelere. C'est lui
+     qu'on remarque, pas le mouvement. */
+@keyframes creationPart{
+  0%  { opacity:1; transform:none; filter:blur(0px); }
+  45% { opacity:1; }
+  100%{ opacity:0; transform:scale(0.94); filter:blur(6px); }
+}
+
+.screen.feuille-part#p-create-manual,
+.screen.feuille-part#p-create-video,
+.screen.feuille-part#p-create-doc,
+.screen.feuille-part#p-create-ai{
+  animation:creationPart 0.28s cubic-bezier(0.4, 0, 1, 1) both;
+  transform-origin:50% 45%;
+}

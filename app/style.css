@@ -21105,3 +21105,59 @@ body.sans-topbar #e-category.active.feuille-arrive{
   body.sans-topbar .screen.active,
   body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE FLOU SEUL, SANS MOUVEMENT
+
+   ⚠ VOTRE DEPOT CONTIENT SIX VERSIONS DE `pageFlou`, empilees au fil de nos
+     essais. Toutes disent la meme chose : un flou qui se dissipe, sans montee
+     et sans fondu.
+
+     C'est ce que vous decrivez — et c'est bien ce qui etait deploye, meme si
+     `ecranEntre` restait declaree plus haut dans le fichier.
+
+   ⚠ ON RETIENT LA PREMIERE ET LA PLUS SOBRE : 5 px sur 220 ms, courbe
+     `ease-out`. Les suivantes montaient a 8 puis 10 px, ou ajoutaient un
+     deuxieme temps — c'etaient mes essais successifs, pas votre point de
+     depart.
+
+   ⚠ ET L'OPACITE RESTE A 1. Un fondu par-dessus le flou ferait deux effets la
+     ou vous en voulez un.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@keyframes pageFlou{
+  from{ filter:blur(5px); }
+  to  { filter:blur(0); }
+}
+
+.screen.active,
+.screen.active.nait,
+.screen.fondu,
+.screen.active.fondu,
+body.sans-topbar .screen.active,
+body.feuille-figee .screen.active,
+body.retour-de-feuille .screen.active,
+body.sans-topbar #p-create-video.active,
+body.sans-topbar #p-create-manual.active,
+body.sans-topbar #p-create-video.active.feuille-arrive,
+body.sans-topbar #p-create-manual.active.feuille-arrive,
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive){
+  animation:pageFlou 0.22s ease-out both !important;
+  opacity:1 !important;
+  transform:none !important;
+}
+
+/* ⚠ L'OUVERTURE D'UN DOSSIER GARDE SA MONTEE DE CARTE. */
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive{
+  animation:carteMonte 0.40s cubic-bezier(0.32, 0.72, 0, 1) both !important;
+  opacity:1 !important;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.active,
+  body.sans-topbar .screen.active,
+  body.sans-topbar .screen.active.feuille-arrive{ animation:none !important; }
+}

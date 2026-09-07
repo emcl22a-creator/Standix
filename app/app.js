@@ -9130,14 +9130,30 @@ function remplirHistoMouvements(idZone) {
      quatre lignes de deplacement sont celles du segment d'analyse, au nom de
      l'element pres. */
 document.addEventListener('click', (e) => {
-  const b = e.target.closest('#eq-segm .p-seg')
+  /* ⚠ LES TROIS VOLETS PARTAGENT CET ECOUTEUR.
+
+     Il ne visait que `#eq-segm`. Mes deux volets ont leurs propres segments —
+     `vues-segm` et `temps-segm` — et n'etaient donc branches a rien : cliquer
+     sur « 30 jours » ne faisait rien du tout.
+
+     On reconnait le volet par l'identifiant de son segment, et l'on en deduit
+     le nom de sa pastille et la fonction qui le repeint. */
+  const b = e.target.closest('#eq-segm .p-seg, #vues-segm .p-seg, #temps-segm .p-seg')
   if (!b || b.classList.contains('on')) return
+
+  const segm = b.parentElement
+  const quiVolet = segm.id === 'vues-segm' ? 'vues'
+                 : segm.id === 'temps-segm' ? 'temps'
+                 : 'equipe'
 
   b.parentElement.querySelectorAll('.p-seg').forEach(x => x.classList.remove('on'))
   b.classList.add('on')
-  anJours = Number(b.dataset.eqJours) || 7
+  /* ⚠ CHAQUE VOLET A SON PROPRE ATTRIBUT — `data-eq-jours`, `data-vues-jours`,
+     `data-temps-jours` — parce qu'ils sont nes d'une copie du gabarit. On lit
+     celui qui est la. */
+  anJours = Number(b.dataset.eqJours || b.dataset.vuesJours || b.dataset.tempsJours) || 7
 
-  const lens = document.getElementById('eq-segm-lens')
+  const lens = document.getElementById(segm.id + '-lens')
   if (lens) {
     const p = b.parentElement.getBoundingClientRect(), r = b.getBoundingClientRect()
     if (r.width) {
@@ -9162,15 +9178,23 @@ document.addEventListener('click', (e) => {
     }
   }
 
-  const zone = document.getElementById('histo-equipe-liste')
-  const note = document.getElementById('histo-equipe-note')
+  /* ⚠ ON REPEINT LE VOLET OUVERT, pas toujours celui de l'equipe.
+
+     Les trois listes et leurs phrases se floutent, on echange le contenu
+     pendant qu'elles sont floues, puis elles se precisent — le meme geste que
+     le segment « En ligne / En cours ». */
+  const repeindre = { equipe: remplirHistoEquipe,
+                      vues: remplirHistoVues,
+                      temps: remplirHistoTemps }[quiVolet]
+
+  const zone = document.getElementById(`histo-${quiVolet}-liste`)
+  const note = document.getElementById(`histo-${quiVolet}-note`)
   const morceaux = [zone, note].filter(Boolean)
 
-  if (MOINS_ANIM()) { remplirHistoEquipe(); peindreAnalyse?.(); return }
-
+  if (MOINS_ANIM()) { repeindre?.(); peindreAnalyse?.(); return }
   morceaux.forEach(flouSortie)
   setTimeout(() => {
-    remplirHistoEquipe()
+    repeindre?.()
     peindreAnalyse?.()
     morceaux.forEach(flouEntree)
   }, 130)

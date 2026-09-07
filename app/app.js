@@ -11560,12 +11560,15 @@ function renderCategoryGrid() {
                 La pilule est identique dans les deux cas — seul le POINT
                 change de couleur. Vert quand c'est publie, gris quand il reste
                 du travail. */
-            brouillons
-              ? `<span class="cl-badge"><i style="background:#9A9AA4"></i>${
-                  brouillons} en cours</span>`
-              : enLigne
-                ? `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`
-                : `<span class="cl-badge"><i style="background:#9A9AA4"></i>Aucune en ligne</span>`}
+            /* ⚠ PLUS DE BADGE D'ETAT SUR LES DOSSIERS.
+
+               « En ligne » et « Aucune en ligne » n'apprenaient rien : on est
+               deja dans la page des procedures en ligne, et le compteur a
+               droite dit le reste.
+
+               « X en cours » disparait aussi — vous avez choisi la carte la
+               plus sobre : un nom, un nombre. */
+            ''}
           <span class="cl-n">${nbAffiche} procédure${nbAffiche > 1 ? 's' : ''}</span>
         </span>
       </span>
@@ -12562,7 +12565,28 @@ function renderCategoryProceduresListInterne() {
           <span class="proc-fl">\u203a</span>
         </span>
         <span class="cl-bas">
-          ${etatProcedureHtml(proc) || `<span class="cl-badge"><i style="background:#34C759"></i>En ligne</span>`}
+          ${etatProcedureHtml(proc) || (() => {
+          /* ⚠ LA DATE PLUTOT QUE « En ligne ».
+
+             Dans cette page on ne voit que des procedures publiees : dire
+             qu'elles sont en ligne n'apprend rien. Leur derniere modification,
+             si.
+
+           ⚠ « Cree » QUAND RIEN N'A ETE TOUCHE. `modifie_le` vaut la date de
+             creation tant que le declencheur SQL n'a rien mis a jour — ecrire
+             « Modifie » serait faux. On compare a la minute pres, un `insert`
+             faisant differer les deux de quelques millisecondes.
+
+           ⚠ ET LA FORME COURTE : « Mod. 3 j » tient sur la carte, « Modifie il
+             y a 3 jours » pousse le compteur a la ligne. */
+          const mod = proc.modifie_le
+          const cree = proc.created_at
+          const intacte = !mod
+            || (cree && Math.abs(new Date(mod) - new Date(cree)) < 60000)
+          const quand = depuisQuand(mod || proc.publiee_le || cree, true)
+          return `<span class="cl-badge"><i style="background:#34C759"></i>${
+            quand ? (intacte ? 'Créé ' : 'Mod. ') + quand : 'En ligne'}</span>`
+        })()}
           <span class="cl-n">${detail}</span>
         </span>
       </span>

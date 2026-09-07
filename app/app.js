@@ -13043,9 +13043,6 @@ function animerEntreeCategorie() {
 
      `ouvrirSousDossier` s'en charge desormais, sur les trois zones. La laisser
      agir ici ferait un second flou par-dessus le premier. */
-  const liste = document.getElementById('category-procedures-list')
-  if (liste) return
-
   jouerVoile()
   const ecran = document.getElementById('p-category')
   if (!ecran) return
@@ -13102,26 +13099,46 @@ function ouvrirSousDossier(nom) {
      le bouton de tri restaient nets pendant que le reste changeait.
 
      Ici les memes trois zones : le sous-titre, la ligne de filtres, la liste. */
-  const zonesSD = ['category-subhead', 'category-procedures-list']
-    .map(i => document.getElementById(i))
-    .concat(document.querySelector('#p-category .proc-rang'))
-    .filter(Boolean)
-
   const listeSD = document.getElementById('category-procedures-list')
   if (listeSD) listeSD.scrollTop = 0
   try { window.scrollTo({ top: 0, behavior: 'instant' }) }
   catch { window.scrollTo(0, 0) }
 
-  if (zonesSD.length && !(typeof MOINS_ANIM === 'function' && MOINS_ANIM())) {
-    zonesSD.forEach(flouSortie)
-    setTimeout(() => {
-      renderCategoryProceduresList()
-      zonesSD.forEach(flouEntree)
-    }, 130)
-    return
-  }
+  /* ⚠ LE MEME GESTE QU'UN CHANGEMENT DE PAGE.
 
+     Il employait le flou du segment — deux temps, 130 ms de montee puis 220 de
+     descente. Mais ouvrir un sous-dossier n'est pas filtrer une liste : on
+     change d'endroit, comme lorsqu'on passe d'une procedure a l'analyse.
+
+   ⚠ ON REJOUE `ecranEntre` SUR L'ECRAN, exactement comme la navigation. On
+     retire la classe, on force un recalcul, on la repose — sans ce temps mort,
+     rejouer la meme animation ne produit rien.
+
+   ⚠ ET L'ON PEINT AVANT D'ANIMER. L'animation part de l'opacite zero : si le
+     contenu changeait pendant, on verrait l'ancien s'effacer puis le nouveau
+     apparaitre — deux gestes au lieu d'un. */
   renderCategoryProceduresList()
+
+  /* ⚠ ON REJOUE L'ANIMATION DE L'ECRAN, comme un changement de page.
+
+     `animerEntreeCategorie` fait exactement cela : elle retire `active` — la
+     classe qui porte l'animation — force un recalcul, puis la repose. Sans ce
+     temps mort, rejouer la meme animation ne produit rien.
+
+     J'y avais pose une sortie anticipee au tour ou vous vouliez le flou du
+     segment ; elle est retiree, la fonction reprend son role. */
+  /* ⚠ ON RETIRE `feuille-arrive` AVANT DE REJOUER.
+
+     `p-category` la porte depuis son ouverture, et c'est elle qui lui donne
+     `carteMonte` — la montee reservee au moment ou la feuille arrive.
+
+     Un sous-dossier n'est pas une arrivee : la feuille est deja la. Sans ce
+     retrait, on rejouerait la montee au lieu du flou.
+
+   ⚠ ELLE SERA REPOSEE A LA PROCHAINE OUVERTURE, en tete de
+     `activerAvecNaissance` — donc rien a remettre ici. */
+  document.getElementById('p-category')?.classList.remove('feuille-arrive')
+
   animerEntreeCategorie()
 
   /* ⚠ ON REMONTE EN HAUT. On peut entrer dans un sous-dossier depuis le bas

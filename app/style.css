@@ -21004,3 +21004,47 @@ body.sans-topbar #e-detail.active.feuille-arrive{
   animation:ecranDossier 0.44s cubic-bezier(0.32, 0.72, 0, 1) both;
   transform-origin:50% 100%;
 }
+
+
+/* ⚠ TROIS AJUSTEMENTS SUR LA PAGE DE BIENVENUE.
+
+   Le titre a 46 px prenait toute la largeur et ecrasait le reste. A 38 il
+   porte encore sans dominer.
+
+   Le logo passe de 30 a 25 px de large — il identifie, il n'annonce pas.
+
+   Et l'ecart entre les deux tombe de 30 a 22 px : le titre suit le logo au
+   lieu d'en etre separe. */
+#login-screen .login-card .bv-titre{
+  font-size:38px;
+}
+
+#login-screen .bv-logo{
+  width:25px;
+  height:36px;
+}
+
+#login-screen .bv-marque{
+  font-size:22px;
+}
+
+#login-screen .bv-haut{
+  padding-bottom:22px;
+}
+
+@media (max-height: 700px){
+  #login-screen .login-card .bv-titre{ font-size:32px; }
+  #login-screen .bv-haut{ padding-bottom:18px; }
+}
+
+
+/* ⚠ LA PHRASE D'ACCROCHE SE REDUIT. A 16 px elle concurrençait le titre ;
+   a 14,5 elle l'accompagne. */
+#login-screen .bv-phrase{
+  font-size:14.5px;
+  line-height:1.45;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-phrase{ font-size:13.5px; }
+}

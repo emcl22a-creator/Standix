@@ -2043,6 +2043,14 @@ function arreterScenes() {
    ⚠ ELLE REUTILISE `fermerHisto`, comme celle d'inscription. Les deux feuilles
      partagent le meme gabarit ; leur ouverture et leur fermeture doivent
      partager le meme code, sinon l'une derivera de l'autre. */
+/* ⚠ LE LIEN DE LA PAGE D'ACCUEIL OUVRE LE MEME TIROIR.
+
+   `ouvrirConnexion` porte deja toute la mecanique — l'onglet, le nettoyage de
+   l'erreur, la montee de la feuille. Il n'y avait qu'a l'y brancher. */
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#bv-aller-connexion')) ouvrirConnexion()
+})
+
 function ouvrirConnexion() {
   const f = document.getElementById('feuille-connexion')
   if (!f) return

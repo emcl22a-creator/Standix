@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=4484c6d8">
+<link rel="stylesheet" href="style.css?v=ce215b8f">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2684,18 +2684,14 @@
         </div>
       </div>
 
-      <div class="ac-sect">
-      <div class="ac-bloc">
-        <div class="ac-bloc-t">
-          <span class="ac-eti"><i style="background:#B45309"></i>Équipe</span>
-          <button type="button" class="ac-sect-plus" onclick="ouvrirHisto('equipe')">Voir plus
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
-                 stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
-          </button>
-        </div>
-        <div id="an-equipe"></div>
-      </div>
-    </div>
+      <!-- ⚠ « Équipe » A ETE RETIREE DE CETTE PAGE.
+
+           Elle classait les membres par temps de lecture. Les deux cartes
+           au-dessus disent deja ce que l'equipe consulte, procedure par
+           procedure — et c'est la question que se pose un gerant.
+
+           Son volet « Voir plus » reste en place : rien d'autre n'y menait,
+           mais le retirer demanderait de defaire toute sa mecanique. -->
   </div>
 
   <div class="screen" inert id="p-an-equipe">
@@ -3332,7 +3328,6 @@
 
          La ligne est masquee par defaut ; `appliquerAccesAbonnement` la revele
          a celui qui a cree l'entreprise, comme celle de la page Entreprise. -->
-    <div class="reg-titre" id="profil-titre-abo" hidden>Abonnement</div>
     <div class="reg-groupe" data-teinte="bleu" id="profil-groupe-abo" hidden>
       <button type="button" class="reg-ligne" id="profil-abonnement">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
@@ -4752,7 +4747,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=e1119eba"></script>
+<script type="module" src="app.js?v=7f51d3fc"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -20974,3 +20974,33 @@ body.espace-arrive .topbar{
 @media (max-height: 700px){
   #login-screen .login-card .bv-titre{ font-size:36px; }
 }
+
+
+/* ⚠ UNE PROCEDURE OUVERTE DEPUIS UNE LISTE MERITE LE MEME GESTE.
+
+   Ma regle ② ne visait que `p-category` et `e-category` — les dossiers. Mais
+   depuis « En ligne », « En cours » ou les favoris, on ouvre une PROCEDURE
+   directement : la feuille arrive de nulle part, exactement comme pour un
+   dossier.
+
+   `feuille-arrive` est deja posee dans ce cas — le script la pose des qu'on
+   vient d'un ecran qui n'est pas une feuille. Il suffisait de la viser.
+
+ ⚠ ET LA REGLE ③ NE DOIT PAS L'ANNULER. Elle vise `#p-analyse.active` sans
+   condition ; on lui ajoute `:not(.feuille-arrive)` pour qu'elle ne couvre que
+   le passage depuis un dossier. */
+body.sans-topbar #p-analyse.active:not(.feuille-arrive),
+body.sans-topbar #e-detail.active:not(.feuille-arrive),
+body.sans-topbar #p-category.active:not(.feuille-arrive),
+body.sans-topbar #e-category.active:not(.feuille-arrive),
+body.feuille-figee .screen.active{
+  animation:none;
+}
+
+body.sans-topbar #p-category.active.feuille-arrive,
+body.sans-topbar #e-category.active.feuille-arrive,
+body.sans-topbar #p-analyse.active.feuille-arrive,
+body.sans-topbar #e-detail.active.feuille-arrive{
+  animation:ecranDossier 0.44s cubic-bezier(0.32, 0.72, 0, 1) both;
+  transform-origin:50% 100%;
+}

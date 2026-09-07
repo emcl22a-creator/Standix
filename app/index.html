@@ -915,7 +915,7 @@
       </div>
 
       <div class="bv-bas">
-        <p class="bv-slogan">Filmez et l’IA crée la procédure,<br>accessible à toute l’équipe.</p>
+        <p class="bv-slogan">Filmez et l’IA crée la procédure,<br>pour l’équipe.</p>
         <p class="bv-phrase">Accédez à votre espace et à vos procédures.</p>
 
         <!-- ⚠ LA CONNEXION D'ABORD. La plupart des gens qui ouvrent l'app ont
@@ -959,7 +959,7 @@
                 <path d="M4.8 19.8a7.2 7.2 0 0 1 14.4 0"></path>
               </svg>
             </span>
-            <span class="bv-btn-tx">S’inscrire gérant</span>
+            <span class="bv-btn-tx">Inscription gérant</span>
           </button>
 
           <button type="button" class="bv-btn bv-btn--creux" onclick="ouvrirInscription('equipe')">
@@ -972,7 +972,7 @@
                 <path d="M18.4 13.6a6.4 6.4 0 0 1 3 5.8"></path>
               </svg>
             </span>
-            <span class="bv-btn-tx">S’inscrire utilisateur</span>
+            <span class="bv-btn-tx">Inscription utilisateur</span>
           </button>
         </div>
 
@@ -1311,7 +1311,6 @@
            et de dossiers est desormais lisible sur chaque carte — le repeter en
            tete de page ne disait rien de plus, et donnait un chiffre a lire
            avant d'avoir vu la liste. -->
-      <p id="proc-compte">Gérez toutes les procédures<br>de votre organisation.</p>
     </div>
 
     <!-- ═══ LA RECHERCHE, EN HAUT ═══
@@ -1380,7 +1379,7 @@
             filtre, la pastille et les trois branches du rendu ; c'est le
             LIBELLE qui change, pas l'etat. -->
           <button type="button" class="p-seg on" data-etat="tout" role="tab">En ligne</button>
-      <button type="button" class="p-seg" data-etat="brouillon" role="tab">En cours<span
+      <button type="button" class="p-seg" data-etat="brouillon" role="tab">En dév.<span
         class="p-seg-pt" id="seg-brouillons-pt" hidden></span></button>
     </div>
 
@@ -1542,7 +1541,7 @@
         <button class="back-btn" onclick="openSettings()" aria-label="Retour">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
         </button>
-        <h1>Gérer l’équipe</h1>
+        <h1>Gestion des accès</h1>
       </div>
       <p>Les rôles décident de ce que chacun voit<br>et peut modifier.</p>
     </div>
@@ -2558,7 +2557,6 @@
            « et l'activite de votre organisation » disait la meme chose que la
            premiere partie, en plus long : l'impact des procedures EST cette
            activite. -->
-        <p>Suivez l’impact de vos procédures.</p>
     </div>
 
     <!-- ⚠ TROIS DUREES, PAS QUATRE. La maquette en montrait une quatrieme,
@@ -2574,30 +2572,7 @@
 
     <div class="ac-chiffres" id="an-chiffres"></div>
 
-    <!-- ⚠ « Temps passé » PASSE AVANT « Évolution des lectures ».
-
-           Les deux graphiques se suivaient dans l'ordre inverse. Le temps
-           passe est la mesure la plus parlante — combien de temps l'equipe
-           consacre aux procedures — et merite d'ouvrir la section. -->
-      <div class="ac-sect">
-      <div class="ac-bloc">
-        <div class="ac-bloc-t">
-          <span class="ac-eti"><i style="background:#318759"></i>Temps passé sur les procédures</span>
-          <!-- ⚠ LE BOUTON D'AIDE EST DANS LA TETE, pas sous le graphique. La
-               question « comment ce temps est-il compte » se pose en voyant le
-               chiffre, pas apres l'avoir parcouru. -->
-          <button type="button" class="an-i" data-aide-temps aria-label="Comment ce temps est compté">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
-              <circle cx="12" cy="12" r="9"></circle>
-              <line x1="12" y1="11" x2="12" y2="16.5"></line>
-              <circle cx="12" cy="7.6" r="0.9" fill="currentColor" stroke="none"></circle>
-            </svg>
-          </button>
-        </div>
-        <div class="an-graph" id="an-graph-temps"></div>
-        <p class="an-note">Seuls les membres de l’espace Utilisateur sont comptés.</p>
-      </div>
-    </div>
+    
 
     <!-- ⚠ « Évolution des lectures » A ETE RETIREE.
 
@@ -2606,7 +2581,30 @@
          que du bruit — et « Temps passe » repond deja a la question qui
          compte : est-ce que l'equipe s'en sert. -->
 
-    <div class="ac-sect">
+    <!-- ⚠ DEUX CARTES SUR LE MEME GABARIT QUE « Équipe ».
+
+           Meme structure, meme classes, meme mise en page : trois listes qui se
+           lisent de la meme façon, chacune classee du plus au moins. -->
+
+      <div class="ac-sect">
+        <div class="ac-bloc">
+          <div class="ac-bloc-t">
+            <span class="ac-eti"><i style="background:#3073C3"></i>Les plus lues</span>
+          </div>
+          <div id="an-vues"></div>
+        </div>
+      </div>
+
+      <div class="ac-sect">
+        <div class="ac-bloc">
+          <div class="ac-bloc-t">
+            <span class="ac-eti"><i style="background:#318759"></i>Temps par procédure</span>
+          </div>
+          <div id="an-temps-proc"></div>
+        </div>
+      </div>
+
+      <div class="ac-sect">
       <div class="ac-bloc">
         <div class="ac-bloc-t">
           <span class="ac-eti"><i style="background:#B45309"></i>Équipe</span>
@@ -3045,7 +3043,6 @@
           « Les gens, les postes, les acces » nomme le perimetre sans
           l'expliquer. Le texte precedent — « qui travaille ici, et ce que
           chacun peut faire » — sonnait reglement interieur. -->
-        <p>Les gens, les postes, les accès.</p>
     </div>
 
     <div id="demandes-acces" class="alerte-demandes" style="display: none;"></div><div class="alerte-partage" id="alerte-partage" style="display:none;">
@@ -3099,7 +3096,7 @@
                repeter ici, trois lignes plus bas, ferait doublon — et l'on
                gere les membres UN PAR UN : on ouvre une fiche, on change un
                role. Le singulier est plus juste. -->
-          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.4" r="3.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M5.2 19.6a6.8 6.8 0 0 1 13.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></span><span class="reg-nm">Équipe</span>
+          <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8.4" r="3.6" stroke="currentColor" stroke-width="1.7"></circle><path d="M5.2 19.6a6.8 6.8 0 0 1 13.6 0" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path></svg></span><span class="reg-nm">Gestion des accès</span>
         <span class="reg-val" id="reg-nb-membres">—</span><span class="fl">›</span>
       </button>
 
@@ -3188,7 +3185,6 @@
 
            « Ce qui vous appartient » nomme le partage entre les deux pages :
            ici ce qui est a vous, la-bas ce qui est a l'entreprise. -->
-        <p>Votre compte et vos<br>réglages personnels.</p>
     </div>
 
       <!-- ⚠ L'ESSAI EN PREMIER, avant meme « Mon compte ».
@@ -3990,7 +3986,6 @@
          sections que l'equipe n'a pas. -->
     <div class="page-tete">
       <h1>Profil</h1>
-      <p>Votre compte et vos<br>réglages personnels.</p>
     </div>
 
     <!-- ⚠ LE MEME TITRE QUE COTE GESTION. Les deux espaces ont la meme carte ;
@@ -4689,7 +4684,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=fc11eedf"></script>
+<script type="module" src="app.js?v=ba12bc80"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

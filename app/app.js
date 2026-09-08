@@ -15555,11 +15555,29 @@ function appliquerBlocageEssai() {
   const expire = etatAbo && etatAbo.statut === 'expire'
   document.body.classList.toggle('abo-expire', !!expire)
 
-  /* Créer une entreprise : fermé. Sans ça, on recommencerait un essai tous
-     les quinze jours en changeant de nom. */
+  /* ⚠ LE BOUTON « + » NE DEPEND PAS DE L'ABONNEMENT D'AUTRUI.
+
+     `etatAbo` decrit l'entreprise COURANTE. Un gestionnaire invite chez
+     quelqu'un dont l'essai est fini se voyait bloquer la creation de sa PROPRE
+     premiere entreprise — alors que cet abonnement ne le concerne pas.
+
+     C'est ce qui rendait le bouton insensible au clic : `pointer-events:none`
+     l'atteignait avant meme que l'ecouteur ne soit consulte, donc rien ne se
+     passait, sans message ni explication.
+
+   ⚠ LA QUESTION EST « AI-JE FONDE UNE ENTREPRISE DONT L'ABONNEMENT A PRIS
+     FIN ? », pas « suis-je dans une entreprise expiree ? ».
+
+   ⚠ ET L'ON POSE L'ETAT EN STYLE DIRECT, qui l'emporte sur la regle
+     `body.abo-expire [data-etab-plus]` heritee. */
+  const monEntrepriseExpiree = (mesEtablissements || [])
+    .some(e => e.role === 'gestion' && !e.promu_par && e.abonnement_statut === 'expire')
+
   document.querySelectorAll('[data-etab-plus]').forEach(b => {
-    b.disabled = !!expire
-    b.title = expire ? 'Disponible avec un abonnement' : ''
+    b.disabled = monEntrepriseExpiree
+    b.title = monEntrepriseExpiree ? 'Disponible avec un abonnement' : ''
+    b.style.pointerEvents = monEntrepriseExpiree ? 'none' : 'auto'
+    b.style.opacity = monEntrepriseExpiree ? '0.4' : '1'
   })
 }
 

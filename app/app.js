@@ -7128,7 +7128,35 @@ function mesurerOnglets() {
 /* On remesure quand la police arrive : mesurée avec la police de secours, la
    largeur est fausse de quelques pixels et le libellé se retrouve rogné. */
 if (document.fonts?.ready) document.fonts.ready.then(mesurerOnglets)
-window.addEventListener('resize', mesurerOnglets)
+
+/* ═══ N'ÉCOUTER QUE LES VRAIS REDIMENSIONNEMENTS ═══
+
+   ⚠ CHROME SUR ANDROID ÉMET `resize` À CHAQUE DÉFILEMENT : sa barre d'adresse
+     se rétracte en descendant et revient en remontant, donc `innerHeight`
+     change. Mesuré : six changements de hauteur seule pour six événements.
+
+     Safari sur iPhone déplace `visualViewport` sans émettre `resize` — c'est
+     pourquoi le défaut ne se voyait que sur Chrome.
+
+   ⚠ CE QUI COMPTE ICI, C'EST LA LARGEUR. Les fonctions branchées ci-dessous
+     mesurent des libellés et des onglets : elles ne changent de résultat qu'à
+     la rotation ou au redimensionnement d'une fenêtre. La hauteur ne leur
+     apprend rien, et chaque appel force un recalcul de mise en page pendant
+     que le doigt défile.
+
+     Même mécanisme que celui de la barre du bas, dans `index.html`. */
+function surChangementDeLargeur(fn, delai = 120) {
+  let largeurConnue = window.innerWidth
+  let minuteur = 0
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === largeurConnue) return
+    largeurConnue = window.innerWidth
+    clearTimeout(minuteur)
+    minuteur = setTimeout(fn, delai)
+  })
+}
+
+surChangementDeLargeur(mesurerOnglets)
 
 /* L'espace équipe garde sa pastille glissante ; l'espace gestion n'en a plus,
    son onglet actif se déploie tout seul. La fonction ne fait donc rien quand
@@ -7375,7 +7403,10 @@ function majBoutonPlus(idEcran) {
   r.setProperty('--plus-cx', Math.round(rb.left + rb.width / 2) + 'px')
 }
 
-addEventListener('resize', () => {
+/* La largeur d'un onglet ne change qu'à la rotation. Voir
+   `surChangementDeLargeur` : la barre d'adresse de Chrome Android émettait un
+   `resize` à chaque défilement, et le bouton se remesurait sous le doigt. */
+surChangementDeLargeur(() => {
   if (document.body.classList.contains('plus-vu')) majBoutonPlus('p-list')
 })
 

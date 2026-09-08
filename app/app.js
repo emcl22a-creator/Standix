@@ -4151,9 +4151,34 @@ document.addEventListener('click', (e) => {
      l'animation d'entree, remonte le defilement et cale la barre : refaire ces
      gestes a la main les ferait diverger a la premiere modification. */
   if (bouton) {
+    /* ⚠ LE BOUTON N'AFFICHAIT QUE L'ECRAN, SANS LE REMPLIR.
+
+       `showGestionScreen('p-profil')` montre la page telle qu'elle est dans le
+       balisage : des tirets, des champs vides, aucun etablissement.
+
+       Ce sont les cinq fonctions ci-dessous qui vont chercher le nom, la
+       photo, les entreprises et les droits. Aucune n'etait appelee ici : le
+       profil paraissait vide quand on l'ouvrait par ce bouton.
+
+     ⚠ ON PEINT AVANT D'AFFICHER, pour que la page arrive complete plutot que
+       de se remplir sous les yeux. */
     const equipe = bouton.id.endsWith('equipe')
-    if (equipe) showEquipeScreen('e-profil')
-    else showGestionScreen('p-profil')
+
+    if (equipe) {
+      peindreReglagesEquipe?.()
+      peindrePhotoProfil?.()
+      peindreAppareils?.()
+      peindreRangEtab?.('e-etab-rang', 'e-etab-ajouter', 'e-etab-note')
+      showEquipeScreen('e-profil')
+    } else {
+      peindreReglages?.()
+      peindrePhotoProfil?.()
+      peindreAppareils?.()
+      peindreRangEtab?.('etab-rang', 'etab-ajouter', 'etab-note')
+      appliquerAccesEntreprise?.()
+      appliquerAccesAbonnement?.()
+      showGestionScreen('p-profil')
+    }
     return
   }
 

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=6549ef03">
+<link rel="stylesheet" href="style.css?v=32cbeae5">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -916,7 +916,6 @@
 
       <div class="bv-bas">
         <p class="bv-slogan">Filmez et l’IA crée<br>la procédure, pour l’équipe.</p>
-        <p class="bv-phrase">Accédez à votre espace et à vos procédures.</p>
 
         <!-- ⚠ LA CONNEXION D'ABORD. La plupart des gens qui ouvrent l'app ont
              deja un compte : leur demander de chercher un bouton serait leur
@@ -3272,27 +3271,25 @@
            ou l'on va pour ajouter quelqu'un, pas pour penser a son abonnement. -->
       <div id="essai-reglages" class="alerte-essai" style="display: none;"></div>
 
-    <button type="button" class="reg-identite" onclick="showGestionScreen('p-reg-compte')">
-      <!-- ⚠ L'AVATAR, A GAUCHE DU NOM.
+    <!-- ⚠ LA CARTE D'IDENTITE, REFAITE.
 
-           La carte n'en avait pas : elle commençait par le texte, ce qui la
-           faisait ressembler a une ligne de reglage ordinaire alors qu'elle
-           represente une personne.
+           Elle montrait un nom et un e-mail sur deux lignes serrees. Elle
+           porte maintenant les quatre choses qu'on cherche en ouvrant son
+           compte : la photo, le nom, le poste et l'adresse. -->
+      <button type="button" class="reg-identite id-carte" onclick="showGestionScreen('p-reg-compte')">
+        <span class="id-av">
+          <span class="reg-av-ini" id="reg-av-initiales">—</span>
+          <img class="reg-av-img" id="reg-av-photo" alt="" hidden>
+        </span>
 
-         ⚠ DEUX COUCHES SUPERPOSEES : la photo par-dessus, les initiales
-           dessous. Quand la photo existe, elle couvre ; sinon on voit les
-           initiales. Pas de bascule a gerer. -->
-      <span class="reg-av">
-        <span class="reg-av-ini" id="reg-av-initiales">—</span>
-        <img class="reg-av-img" id="reg-av-photo" alt="" hidden>
-      </span>
+        <span class="id-tx">
+          <span class="id-nom" id="reg-nom">—</span>
+          <span class="id-poste" id="reg-poste-ligne" hidden></span>
+          <span class="id-mail" id="reg-email">—</span>
+        </span>
 
-      <span class="tx">
-        <span class="nm" id="reg-nom">—</span>
-        <span class="st" id="reg-email">—</span>
-      </span>
-      <span class="fl">›</span>
-    </button>
+        <span class="id-fl">›</span>
+      </button>
 
     <!-- ═══ LES ÉTABLISSEMENTS, SUR PLACE ═══
 
@@ -4060,14 +4057,26 @@
 
     <!-- ⚠ LE MEME TITRE QUE COTE GESTION. Les deux espaces ont la meme carte ;
          elle doit porter le meme en-tete. -->
-    <button type="button" class="reg-identite" onclick="showEquipeScreen('e-reg-compte')">
-      <span class="av" id="es-initiales">—</span>
-      <span class="tx">
-        <span class="nm" id="es-nom-affiche">—</span>
-        <span class="st" id="es-email-affiche">—</span>
-      </span>
-      <span class="fl">›</span>
-    </button>
+    <!-- ⚠ LA MEME CARTE QUE COTE GESTION.
+
+           Elle n'avait qu'un rond d'initiales, sans photo : l'employe voyait
+           moins que le gerant alors que c'est le meme compte.
+
+           Les identifiants `es-` sont conserves — le script les remplit deja. -->
+      <button type="button" class="reg-identite id-carte" onclick="showEquipeScreen('e-reg-compte')">
+        <span class="id-av">
+          <span class="reg-av-ini" id="es-initiales">—</span>
+          <img class="reg-av-img" id="es-photo" alt="" hidden>
+        </span>
+
+        <span class="id-tx">
+          <span class="id-nom" id="es-nom-affiche">—</span>
+          <span class="id-poste" id="es-poste-ligne" hidden></span>
+          <span class="id-mail" id="es-email-affiche">—</span>
+        </span>
+
+        <span class="id-fl">›</span>
+      </button>
 
     <!-- La même carte que côté gestion, avec un texte adapté : un employé qui
          crée une entreprise en devient le GÉRANT, ce qui n'est pas évident.
@@ -4748,7 +4757,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=310a4918"></script>
+<script type="module" src="app.js?v=e3831519"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

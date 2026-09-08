@@ -280,7 +280,39 @@
      `env(safe-area-inset-top)` vaut 47 px sur un iPhone a encoche et 0 sur un
      ecran d'ordinateur — le `max` garde 10 px dans ce second cas, sinon la
      barre collerait au bord en navigateur. */
+  /* ═══ LA BARRE NE BOUGE PAS ═══
+
+     ⚠ UNE SEULE REGLE. Il y en avait TREIZE, etalees sur 2 300 lignes : treize
+       versions successives de son animation d'entree et de sortie — glissement,
+       fondu, flou, echelle, avec ou sans `will-change`, avec des courbes et des
+       retards chaque fois differents.
+
+       Toutes etaient MORTES. La derniere de la serie les annulait en bloc
+       (`opacity`, `transform`, `filter`, `pointer-events` et `transition` en
+       `!important`), parce que la decision finale a ete que la barre reste
+       posee : c'est la feuille `.screen.active` qui monte par-dessus elle.
+
+     ⚠ VERIFIE AVANT DE SUPPRIMER, pas deduit a la lecture. Les treize regles
+       ont ete demandees au navigateur lui-meme, puis chaque propriete calculee
+       comparee avant et apres — sur les deux etats, avec et sans
+       `body.sans-topbar`. Les deux etats etaient DEJA identiques.
+
+     ⚠ `transform-origin` EST LE SEUL RESCAPE. Il echappait au `!important` et
+       vaut donc encore `top center`. Sans transform anime il ne fait rien,
+       mais il est garde ici pour que la mesure reste identique au pixel.
+
+     ⚠ NE PAS RANIMER LA BARRE SANS RETIRER `.screen.active`. Les deux
+       geraient alors le meme espace, et le titre traverserait le verre.
+       `body.sans-topbar` ne pilote plus que deux choses, toutes deux plus bas
+       dans ce fichier : le voile flou `.topbar::after` et les boutons
+       `.tb-profil` / `.tb-plus`, qui cessent de repondre au doigt. */
   .topbar{ position:fixed; top:0; left:50%; transform:translateX(-50%); width:100%; max-width:var(--col); z-index:15;
+           transform-origin:top center;
+           /* ⚠ `none` ET NON L'ABSENCE DE LIGNE. Sans elle la valeur retombe a
+              `all 0s`, qui n'anime rien non plus — mais la barre reprendrait
+              toute transition qu'une regle ajouterait plus bas dans le fichier.
+              C'est ce que faisait le `!important` supprime. */
+           transition:none;
            padding:max(10px, env(safe-area-inset-top, 0px)) 24px 0; }
   /* ⚠ LA BARRE N'A PAS DE MARGE BASSE : elle est en `position:fixed`, donc
      hors du flux — une marge sous elle ne pousserait rien. L'ecart avec le
@@ -16888,35 +16920,7 @@ body.en-apercu #apercu-bandeau{
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA BARRE DU HAUT S'EFFACE SUR LES PAGES DE DETAIL
 
-   ⚠ POURQUOI. Ces pages ont leur propre en-tete : un bouton retour et le nom
-     de ce qu'on regarde. La barre du logo au-dessus repete l'evidence — on
-     sait dans quelle app on est — et vole quarante pixels a la lecture.
-
-     C'est ce que fait iOS : la barre de navigation cede la place au contenu
-     des qu'on entre dans un detail.
-
-   ⚠ ELLE MONTE ET S'EFFACE, elle ne disparait pas d'un coup. Le mouvement dit
-     d'ou elle vient, donc ou elle reviendra.
-
-   ⚠ ET LE CONTENU REMONTE AVEC ELLE. Sans cela, la page garderait un vide de
-     quarante pixels en haut — on aurait retire la barre sans rien gagner.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.topbar{
-  transition:
-    transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity   0.30s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change:transform, opacity;
-}
-
-body.sans-topbar .topbar{
-  transform:translateX(-50%) translateY(-100%);
-  opacity:0;
-  pointer-events:none;
-}
 
 /* ⚠ LE CONTENU SUIT, avec la meme courbe et la meme duree : les deux
    mouvements doivent se lire comme un seul geste.
@@ -16935,49 +16939,11 @@ body.sans-topbar .screen{
 /* ⚠ QUI SE PASSE D'ELLE. Un dossier, un sous-dossier, une procedure, sa
    modification : partout ou un bouton retour existe deja. */
 @media (prefers-reduced-motion: reduce){
-  .topbar, .screen{ transition:none; }
+  .screen{ transition:none; }
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA BARRE DU HAUT — REPRISE DE L'ANIMATION
-   ═══════════════════════════════════════════════════════════════════════════
 
-   ⚠ TROIS DEFAUTS DANS MA PREMIERE VERSION.
-
-   ① ELLE MONTAIT DE TOUTE SA HAUTEUR. `translateY(-100%)` la fait glisser
-      derriere le bord de l'ecran : on la suit du regard sur soixante-quatre
-      pixels. Un mouvement long attire l'oeil sur ce qui part, alors qu'on veut
-      regarder ce qui arrive.
-
-      Douze pixels suffisent : l'oeil comprend la direction sans la suivre.
-
-   ② LE FONDU ET LE MOUVEMENT AVAIENT DEUX DUREES — 0,30 et 0,42 s. La barre
-      finissait donc transparente puis continuait de monter, invisible. C'est
-      ce qui donnait l'impression de saccade.
-
-   ③ ELLE NE REVENAIT PAS AVEC LA PAGE. Les ecrans entrent en 0,34 s
-      (`ecranEntre`) ; la barre mettait 0,42. Deux gestes decales de quatre-
-      vingts millisecondes se lisent comme deux gestes.
-
-   ⚠ ON REPREND LA DUREE ET LA COURBE DE `ecranEntre`, et le meme flou leger :
-     la barre et la page deviennent un seul mouvement.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.topbar{
-  transition:
-    transform 0.34s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity   0.34s cubic-bezier(0.32, 0.72, 0, 1),
-    filter    0.34s cubic-bezier(0.32, 0.72, 0, 1);
-  will-change:transform, opacity;
-}
-
-body.sans-topbar .topbar{
-  transform:translateX(-50%) translateY(-12px);
-  opacity:0;
-  filter:blur(2px);
-  pointer-events:none;
-}
 
 /* ⚠ LE CONTENU SUIT LA MEME COURBE ET LA MEME DUREE. C'etait deja le cas,
    mais avec 0,42 s : il finissait apres la barre. */
@@ -16986,61 +16952,10 @@ body.sans-topbar .topbar{
 }
 
 
-/* ⚠ `will-change` COUPAIT LE VERRE, ET C'EST MOI QUI L'AI POSE.
-
-   `will-change:transform, opacity` sur `.topbar` cree un contexte
-   d'empilement. Or `backdrop-filter` ne floute que ce qui se trouve DERRIERE
-   son contexte : enferme dans celui du parent, il n'avait plus rien a flouter.
-
-   Mesure a l'ecran : la propriete etait bien declaree sur `.topbar-card`
-   — `blur(14px) saturate(1.8)` — mais sans effet visible.
-
- ⚠ ON LE RETIRE PLUTOT QUE DE LE DEPLACER. Il servait a annoncer l'animation
-   au navigateur ; `transform` et `opacity` sont deja traitees par le
-   compositeur sans lui. Le gain etait nul, le cout visible.
-
- ⚠ ET LE FLOU DE SORTIE PART AVEC. `filter` cree le meme contexte : garde, il
-   couperait le verre pendant toute la transition. La barre s'efface donc sans
-   flou — c'est le prix du verre au repos, et le repos dure plus longtemps. */
-.topbar{
-  will-change:auto;
-  transition:
-    transform 0.34s cubic-bezier(0.32, 0.72, 0, 1),
-    opacity   0.34s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-body.sans-topbar .topbar{
-  transform:translateX(-50%) translateY(-12px);
-  opacity:0;
-  filter:none;
-  pointer-events:none;
-}
 
 
-/* ═══ LA BARRE S'EFFACE, SANS BOUGER ═══
 
-   ⚠ CHOISI SUR MAQUETTE, parmi six. Le fondu seul est le plus discret : rien
-     ne glisse, rien ne se deforme, la barre cesse simplement d'etre la.
 
-   ⚠ 0,28 s ET `ease-out`, pas la courbe des ecrans.
-
-     Un fondu n'a pas de trajet : une courbe d'accompagnement — faite pour
-     donner du poids a un deplacement — n'a rien a accompagner ici. `ease-out`
-     part vite et finit doucement, ce qui convient a une disparition.
-
-   ⚠ ET PAS DE `will-change`. Il creerait un contexte d'empilement qui couperait
-     le verre depoli de la barre — le defaut que nous venons de corriger. */
-.topbar{
-  will-change:auto;
-  transition:opacity 0.28s ease-out;
-}
-
-body.sans-topbar .topbar{
-  transform:translateX(-50%);
-  opacity:0;
-  filter:none;
-  pointer-events:none;
-}
 
 
 /* ⚠ LA BARRE ET LA PAGE N'ETAIENT PAS ACCORDEES.
@@ -17090,15 +17005,7 @@ body.sans-topbar .screen{
   transition:padding-top 0.30s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.topbar{
-  transition:opacity 0.26s ease-out 0.18s;
-}
 
-/* ⚠ MAIS EN PARTANT, LA BARRE NE DOIT PAS ATTENDRE : c'est elle qui ouvre le
-   mouvement. On annule donc le retard dans ce sens. */
-body.sans-topbar .topbar{
-  transition:opacity 0.24s ease-out 0s;
-}
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -17296,27 +17203,6 @@ body.sans-topbar .topbar{
 }
 
 
-/* ═══ LES DEUX FINISSENT AU MEME INSTANT ═══
-
-   ⚠ CE N'ETAIT PAS LE CAS. La barre s'effaçait de 0 a 240 ms, la page montait
-     de 160 a 480 ms : elle commençait bien apres — ce qui etait voulu — mais
-     finissait 240 ms trop tard.
-
-     A l'ecran, cela donne l'inverse de l'effet cherche : la barre est encore a
-     moitie visible quand le titre est deja monte derriere elle.
-
-   ⚠ ON ALLONGE LA BARRE JUSQU'A 0,44 s, et la page va de 0,12 a 0,44.
-
-     Les deux se terminent ensemble. La barre couvre tout le geste — c'est elle
-     qui part, elle a le droit d'y mettre le temps ; la page se glisse dans sa
-     disparition et arrive quand la place est libre.
-
-   ⚠ ET LE DEPART RESTE DECALE. 0,12 s d'attente : quand la page s'ebranle, la
-     barre a deja perdu le quart de son opacite. */
-
-body.sans-topbar .topbar{
-  transition:opacity 0.44s ease-out 0s;
-}
 
 /* ⚠ MESURE : la page arrivait a 100 % des 320 ms, la barre a 400.
 
@@ -17339,9 +17225,6 @@ body.sans-topbar .screen{
   transition:padding-top 0.32s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.topbar{
-  transition:opacity 0.32s ease-out 0.12s;
-}
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -17913,36 +17796,7 @@ body.sans-topbar .topbar::after{
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LE RETRAIT VERS LE CENTRE — choisi sur maquette, parmi six
-   ═══════════════════════════════════════════════════════════════════════════
 
-   ⚠ TOUT RAPETISSE LEGEREMENT EN S'EFFAÇANT. C'est ce que fait iOS quand une
-     carte se referme : l'objet s'eloigne au lieu de disparaitre sur place.
-
-     Le mouvement est faible — 4 % — mais il suffit a dire « ca part » sans
-     voler l'attention au contenu qui monte.
-
-   ⚠ LE VOILE SUIT LE MEME GESTE. Le laisser s'effacer sans bouger le
-     detacherait des trois elements : on verrait deux choses partir.
-
-   ⚠ L'ORIGINE EST EN HAUT, pas au centre. La barre est collee au bord
-     superieur : reduire depuis son milieu la ferait descendre en partant. */
-
-.topbar{
-  transform-origin:top center;
-  transition:
-    opacity   0.32s ease-out 0.12s,
-    transform 0.36s cubic-bezier(0.32, 0.72, 0, 1) 0.12s;
-}
-
-body.sans-topbar .topbar{
-  opacity:0;
-  transform:translateX(-50%) scale(0.94);
-  transition:
-    opacity   0.30s ease-out 0s,
-    transform 0.34s cubic-bezier(0.32, 0.72, 0, 1) 0s;
-}
 
 
 /* ⚠ LA SATURATION DU VOILE BAISSE DE 1,8 A 1,25.
@@ -18057,38 +17911,7 @@ body.sans-topbar .topbar{
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA DISPARITION, REPRISE
 
-   ⚠ DEUX DEFAUTS.
-
-   ① LA PAGE PARTAIT TROP TOT. Elle attendait 60 ms alors que la barre met
-      340 ms a s'effacer : le contenu montait pendant que le logo etait encore
-      la. Elle attend maintenant 340 ms — le temps exact que la barre disparaisse.
-
-   ② L'ECHELLE DISPERSAIT LES ELEMENTS. `scale(0.94)` sur `.topbar` reduit tout
-      le bloc : les deux boutons se rapprochent du centre pendant que le logo
-      retrecit sur place. Trois mouvements differents dans trois directions —
-      c'est ce qui donne l'impression d'un eparpillement.
-
-      Un fondu seul ne bouge rien. Rien ne se disperse s'il n'y a pas de
-      deplacement.
-
-   ⚠ ET UNE COURBE PLUS LENTE A LA FIN. `cubic-bezier(0.4, 0, 0.2, 1)` — la
-     courbe d'Apple : depart franc, arrivee posee. Sur un fondu, elle evite
-     l'impression de coupure seche.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.topbar{
-  transform-origin:top center;
-  transition:opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1) 0.28s;
-}
-
-body.sans-topbar .topbar{
-  opacity:0;
-  transform:translateX(-50%);
-  transition:opacity 0.30s cubic-bezier(0.4, 0, 0.2, 1) 0s;
-}
 
 /* ⚠ LA PAGE NE BOUGE QU'APRES. 0,30 s de fondu, puis elle monte. */
 body.sans-topbar .screen{
@@ -18101,17 +17924,6 @@ body.sans-topbar .screen{
 }
 
 
-/* ⚠ LE RETOUR REVIENT A CE QU'IL ETAIT. Vous ne demandiez que la disparition.
-
-   J'avais change les deux : la barre passait de `0.32s ease-out 0.12s` a
-   `0.30s cubic-bezier(0.4, 0, 0.2, 1) 0.28s`, et la page de 0,32 a 0,28 s
-   avec une autre courbe.
-
-   On remet les valeurs d'origine. La disparition, elle, garde sa reprise —
-   fondu seul, sans echelle, et la page qui attend. */
-.topbar{
-  transition:opacity 0.32s ease-out 0.12s;
-}
 
 .screen{
   transition:padding-top 0.32s cubic-bezier(0.32, 0.72, 0, 1);
@@ -19008,47 +18820,7 @@ body.sans-topbar .screen{
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA BARRE ET LA PAGE MONTENT ENSEMBLE
 
-   ⚠ ILS SE SUCCEDAIENT. La barre s'effaçait sur place, puis la page montait
-     apres un retard de 0,30 s. Deux gestes l'un apres l'autre, alors qu'il
-     n'en faut qu'un.
-
-   ⚠ MEME DUREE, MEME COURBE, AUCUN RETARD. C'est la seule façon d'obtenir un
-     mouvement unique : la moindre difference se voit, parce que l'oeil compare
-     deux objets qui bougent cote a cote.
-
-     0,40 s et `cubic-bezier(0.32, 0.72, 0, 1)` — la courbe des ecrans de
-     l'app, pour que ce mouvement appartienne a la meme famille que les autres.
-
-   ⚠ LA BARRE MONTE EN S'EFFAÇANT. `translateY(-14px)` : elle part dans la
-     meme direction que la page, du meme geste. Quatorze pixels, pas
-     davantage — au-dela on la suit du regard au lieu de regarder ce qui
-     arrive.
-
-   ⚠ ET LE FLOU ACCOMPAGNE LE DEPART. C'est ce que fait iOS quand une vue
-     s'efface : elle perd sa nettete en meme temps que son opacite. Deux
-     pixels suffisent.
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-.topbar{
-  transition:
-    opacity   0.40s cubic-bezier(0.32, 0.72, 0, 1),
-    transform 0.40s cubic-bezier(0.32, 0.72, 0, 1),
-    filter    0.40s cubic-bezier(0.32, 0.72, 0, 1);
-}
-
-body.sans-topbar .topbar{
-  opacity:0;
-  transform:translateX(-50%) translateY(-14px);
-  filter:blur(2px);
-  pointer-events:none;
-  transition:
-    opacity   0.40s cubic-bezier(0.32, 0.72, 0, 1),
-    transform 0.40s cubic-bezier(0.32, 0.72, 0, 1),
-    filter    0.40s cubic-bezier(0.32, 0.72, 0, 1);
-}
 
 /* ⚠ LA PAGE SUIT LE MEME REGLAGE, AU CENTIEME PRES. */
 .screen,
@@ -19079,24 +18851,7 @@ body.sans-topbar .screen{
      place n'a pas de trajet a refaire.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ⚠ LE RETOUR : le flou seul, aucun deplacement, aucune opacite. */
-.topbar{
-  opacity:1;
-  transform:translateX(-50%);
-  filter:blur(0);
-  transition:filter 0.42s cubic-bezier(0.32, 0.72, 0, 1);
-}
 
-/* ⚠ LE DEPART : la barre glisse hors du champ en se brouillant. */
-body.sans-topbar .topbar{
-  opacity:1;
-  transform:translateX(-50%) translateY(-100%);
-  filter:blur(6px);
-  pointer-events:none;
-  transition:
-    transform 0.42s cubic-bezier(0.32, 0.72, 0, 1),
-    filter    0.42s cubic-bezier(0.32, 0.72, 0, 1);
-}
 
 /* ⚠ LA PAGE GARDE LE MEME REGLAGE, pour que les deux restent lies. */
 .screen,
@@ -19171,15 +18926,6 @@ body.sans-topbar .screen.active{
     box-shadow    0.44s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* ⚠ LA BARRE NE BOUGE PLUS DU TOUT. On annule tout ce qu'on lui avait pose. */
-.topbar,
-body.sans-topbar .topbar{
-  opacity:1 !important;
-  transform:translateX(-50%) !important;
-  filter:none !important;
-  pointer-events:auto !important;
-  transition:none !important;
-}
 
 /* ⚠ SAUF SES BOUTONS : caches sous la feuille, ils ne doivent plus repondre au
    doigt — sinon on toucherait le profil en visant le titre de la page. */

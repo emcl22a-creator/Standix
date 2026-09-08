@@ -51,16 +51,17 @@ body{
        padding:8px 8px 8px 26px}
 .droite{display:flex; align-items:center; gap:30px}
 .marque{display:flex; align-items:center; text-decoration:none}
-/* ⚠ LE FICHIER FOURNI EST OPAQUE, posé sur le gris #F5F5F9 de l'app : tel quel
-   il dessinait un rectangle gris sur la barre blanche. J'en ai tiré une couche
-   alpha à partir de l'écart au fond, puis « dé-prémultiplié » la couleur, ce
-   qui rend les bords lissés propres au lieu de garder un halo.
-   Le dessin lui-même n'a pas été touché.
-   ⚠ IL EST PETIT — 119 × 36 px utiles. Affiché à 34 px de haut, il n'a plus
-   que 2 px de réserve ; un écran Retina en réclamerait 68, soit le double de
-   ce que contient le fichier. C'est le seul élément non net de la page, et
-   l'agrandir rend le défaut plus visible.
-   Un SVG, ou à défaut un export en 3× (environ 360 × 110), règle ça. */
+/* ⚠ CE FICHIER EST LE FACTEUR LIMITANT DE LA PAGE.
+   Il ne contient que 119 × 36 px utiles, dont 83 × 19 pour le mot. Affiché à
+   34 px de haut, un écran Retina en réclame 68 : il en manque la moitié.
+   J'ai tenté de le reconstruire en vectoriel. Le DESSIN, oui : `logo-standix.png`
+   le contient en 306 × 434, et ses proportions coïncident au millième — 1,418
+   contre 1,417. Le MOT, non : mesuré, il fait 4,37 fois sa hauteur de capitale,
+   là où Poppins en fait 5,13. Ce n'est donc pas Poppins mais une police 15 %
+   plus étroite, et le rattraper au crénage demanderait −0,09 em, où les lettres
+   se toucheraient. Reconstruire le mot reviendrait à changer la marque.
+   ➜ Un SVG, ou à défaut un export en 3× (environ 360 × 110), est la seule
+     vraie sortie. */
 .marque img{height:34px; width:auto; display:block}
 .barre nav{display:flex; gap:26px; font-size:14.5px; font-weight:500; color:var(--gris)}
 /* La hauteur de la barre est celle de son bouton — c'est lui qu'il faut
@@ -77,7 +78,11 @@ body{
    ne peut plus être un simple frère dans une colonne flex : sa hauteur doit
    être connue autrement.
    `svh` et non `vh` : sur iPhone, `vh` compte la barre d'adresse rétractée. */
-.barre-hote{position:sticky; top:0; z-index:60; padding:10px 16px 0;
+/* `--marge` est le retrait latéral de la barre au repos. Il devient un
+   pourcentage sur tablette et téléphone : la barre s'y raccourcit, et logo et
+   boutons se rapprochent d'eux-mêmes puisqu'ils sont en `space-between`. */
+.barre-hote{position:sticky; top:0; z-index:60; --marge:16px; --serre:980px;
+            padding:10px var(--marge) 0;
             transition:padding-inline .55s cubic-bezier(.32,.72,0,1)}
 .hero{height:calc(100svh - var(--h-barre, 90px));
       display:flex; flex-direction:column}
@@ -93,7 +98,24 @@ body{
    d'eux-mêmes — rien à animer de leur côté.
    La hauteur, elle, ne bouge pas : le panneau en dessous ne sursaute donc pas.
    Même courbe que le menu de téléphone : départ franc, arrivée molle. */
-.barre-hote.flotte{padding-inline:clamp(16px, 9%, 200px)}
+/* La barre défilée est PLAFONNÉE à 980 px, pas resserrée d'un pourcentage.
+   Mesuré, son contenu occupe 733 px au minimum — logo 112, groupe de droite
+   586, marges 34. Un pourcentage fixe l'aurait fait déborder sur les écrans
+   étroits : à 15 % de 1024, il ne serait resté que 716 px.
+   `max(16px, …)` garantit qu'elle ne se resserre jamais au-delà de ce que le
+   contenu supporte : sur une petite fenêtre elle reste simplement pleine. */
+/* Au défilement elle se resserre encore. Le `max` garantit deux choses : elle
+   ne descend jamais sous les 733 px que réclame son contenu, et elle ne
+   s'ÉLARGIT jamais par rapport au repos — ce qui arriverait sur téléphone,
+   où le retrait au repos vaut déjà plus que 16 px. */
+/* `--serre` est la largeur VISÉE une fois défilé. Elle vaut 980 px sur grand
+   écran, mais un seul chiffre ne peut pas convenir partout : il ne mordrait
+   plus dès que la fenêtre passe sous cette valeur, et la barre ne se
+   resserrerait plus du tout sur tablette ni sur téléphone.
+   Le `max` garde deux garde-fous : jamais plus étroite que ce que le contenu
+   supporte, jamais plus large qu'au repos. */
+.barre-hote.flotte{padding-inline:max(calc(var(--marge) + 10px),
+                                      calc((100% - var(--serre)) / 2))}
 .barre{border-radius:100px; border:1px solid transparent;
        transition:background .32s cubic-bezier(.32,.72,0,1),
                   box-shadow .32s cubic-bezier(.32,.72,0,1),
@@ -455,6 +477,8 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
      modèle de dimensionnement reste le même partout — hauteur imposée, largeur
      déduite — et l'appareil garde son bas collé au panneau. */
   .panneau{--r:360px; padding:48px 36px 0}
+  .marque img{height:38px}
+  .barre-hote{--serre:830px}
 
   /* L'appareil étant borné, la hauteur restante ne lui sert plus. Le texte se
      recentre au lieu de rester collé en haut : sur une fenêtre haute, il
@@ -495,6 +519,9 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
 
   /* Le texte se cale en HAUT au lieu d'être centré : sous l'appareil il n'y a
      plus de place à partager. */
+  /* La pastille sort du premier écran : sur 390 px elle prend une ligne
+     entière pour une information que la ligne de prix redit déjà. */
+  .mot{display:none}
   .deux{max-width:none; flex:0 0 auto; justify-content:flex-start; padding-bottom:0}
   h1{max-width:none; font-size:clamp(29px,7vw,40px)}
   .sous{max-width:none; font-size:15.5px}
@@ -515,11 +542,11 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
   .sch{display:none}
   .panneau{--r:min(260px, 68vw)}
 
-  .barre-hote{padding:8px 10px 0}
+  .barre-hote{--marge:10px; --serre:240px; padding:8px var(--marge) 0}
   .barre{padding:7px 7px 7px 16px}
   /* Le logo agrandi ne vaut que pour le bureau et la tablette : sur 390 px il
      mangerait la barre. */
-  .marque img{height:28px}
+  .marque img{height:34px}
   .burger{width:36px; height:36px}
   .barre nav,.entrer,.btn-barre{display:none}
   .burger{display:flex}

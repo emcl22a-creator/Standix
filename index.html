@@ -123,8 +123,16 @@ body.pret .chargement-marque{animation:none; opacity:1}
    boutons se rapprochent d'eux-mêmes puisqu'ils sont en `space-between`. */
 .sentinelle{position:absolute; top:8px; height:1px; width:100%; pointer-events:none}
 .barre-hote{position:sticky; top:0; z-index:60; --marge:16px; --serre:980px;
-            padding:10px var(--marge) 0;
-            transition:padding-inline .55s cubic-bezier(.32,.72,0,1)}
+            /* La marge basse sépare la barre du panneau. Prise ici et non
+               dans le hero, elle entre dans `--h-barre` et la hauteur totale
+               reste juste au pixel. */
+            padding:10px var(--marge) 10px;
+            /* ⚠ `padding-inline` est un RACCOURCI LOGIQUE : Safari ne
+               l'interpole pas, et l'animation de la barre ne jouait pas sur
+               iPhone. Les deux côtés sont donc déclarés séparément, en
+               propriétés physiques. */
+            transition:padding-left .55s cubic-bezier(.32,.72,0,1),
+                       padding-right .55s cubic-bezier(.32,.72,0,1)}
 .hero{height:calc(100svh - var(--h-barre, 90px));
       display:flex; flex-direction:column}
 .panneau{flex:1; min-height:0}
@@ -155,8 +163,10 @@ body.pret .chargement-marque{animation:none; opacity:1}
    resserrerait plus du tout sur tablette ni sur téléphone.
    Le `max` garde deux garde-fous : jamais plus étroite que ce que le contenu
    supporte, jamais plus large qu'au repos. */
-.barre-hote.flotte{padding-inline:max(calc(var(--marge) + 10px),
-                                      calc((100% - var(--serre)) / 2))}
+.barre-hote.flotte{
+  padding-left :max(calc(var(--marge) + 10px), calc((100% - var(--serre)) / 2));
+  padding-right:max(calc(var(--marge) + 10px), calc((100% - var(--serre)) / 2));
+}
 
 /* ─── LE CONTENU SE CONDENSE AUSSI ───
    Le resserrement de la barre ne parcourt que 30 px sur téléphone contre 428
@@ -164,7 +174,7 @@ body.pret .chargement-marque{animation:none; opacity:1}
    se réduisent donc en même temps. C'est du `scale`, pas une taille : rien ne
    se remet en page, la hauteur de la barre ne bouge pas — et c'est justement
    elle qui fixe la hauteur du panneau. */
-.marque,.droite{transform-origin:left center;
+.barre .marque,.droite{transform-origin:left center;
                 transition:scale .55s cubic-bezier(.32,.72,0,1)}
 .droite{transform-origin:right center}
 .barre-hote.flotte .marque,
@@ -261,12 +271,15 @@ body.pret .chargement-marque{animation:none; opacity:1}
      la plus serrée :
      • la largeur — le repère le plus à gauche doit tenir dans le panneau :
        il occupe 0,978 r plus 205 px de bloc, d'où 51 vw − 242 px ;
-     • la hauteur — l'appareil ne doit jamais toucher la ligne de prix :
-       il mesure 1,158 r et il reste 100 svh moins 441 px une fois la barre,
-       les marges et le bloc de texte retirés, d'où 86 svh − 381 px.
+     • la hauteur — l'appareil ne doit jamais toucher le dernier texte :
+       il mesure 1,158 r et il reste 100 svh moins 473 px une fois la barre,
+       les marges et le bloc de texte retirés, d'où 86 svh − 422 px. Le terme
+       est passé de 381 à 422 quand le titre est devenu deux lignes sur
+       tablette : à 1280 il ne restait plus que 3 px entre le prix et
+       l'appareil.
      Le `clamp` borne les deux extrêmes : jamais moins de 200, jamais plus
      de 620. */
-  --r:clamp(200px, min(calc(51vw - 242px), calc(86svh - 381px)), 740px);
+  --r:clamp(200px, min(calc(51vw - 242px), calc(86svh - 422px)), 740px);
   /* 88 px = la barre plus la marge basse. Le premier ecran est donc toujours
      exactement l'ecran, quelle que soit la fenetre. */
   display:flex; flex-direction:column;
@@ -477,7 +490,7 @@ h1     {animation-delay:.13s}
    crée une RACINE D'ARRIÈRE-PLAN : le `backdrop-filter` de la barre ne voyait
    plus la page derrière elle, seulement son propre contenu — le verre était
    déclaré mais ne floutait rien. */
-.marque{animation:monte .7s cubic-bezier(.32,.72,0,1) .04s both}
+.barre .marque{animation:monte .7s cubic-bezier(.32,.72,0,1) .04s both}
 .droite{animation:monte .7s cubic-bezier(.32,.72,0,1) .12s both}
 
 /* La nappe de l'arc et la lumière du panneau respirent très lentement : c'est
@@ -621,10 +634,10 @@ h1     {animation-delay:.13s}
    raccourci réinitialise `animation-play-state` à `running`. Placée avant,
    elle était silencieusement annulée — le titre finissait son entrée derrière
    le voile et la page s'ouvrait déjà figée. */
-.texte > *,.scene,.arc,.socle,.lueur,.marque,.droite,.sch,.ic,
+.texte > *,.scene,.arc,.socle,.lueur,.barre .marque,.droite,.sch,.ic,
 .arc::before,.panneau::before{animation-play-state:paused}
 body.pret .texte > *,body.pret .scene,body.pret .arc,body.pret .socle,
-body.pret .lueur,body.pret .marque,body.pret .droite,body.pret .sch,body.pret .ic,
+body.pret .lueur,body.pret .barre .marque,body.pret .droite,body.pret .sch,body.pret .ic,
 body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
 
 @media (max-width:1280px){
@@ -678,7 +691,9 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   /* La pastille sort du premier écran : sur 390 px elle prend une ligne
      entière pour une information que la ligne de prix redit déjà. */
   .mot{display:none}
-  .deux{max-width:none; flex:0 0 auto; justify-content:flex-start; padding-bottom:0}
+  /* La scène pouvant se comprimer sur un écran court, l'écart doit être
+     RÉSERVÉ ici : sinon elle vient toucher les boutons. */
+  .deux{max-width:none; flex:0 0 auto; justify-content:flex-start; padding-bottom:26px}
   h1{max-width:none; font-size:clamp(32px, 8.2vw, 46px)}
   .sous{max-width:none; font-size:15.5px}
   .actes{width:100%; flex-direction:column; align-items:stretch; margin-top:22px}
@@ -712,7 +727,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   .sch-2{--a:125deg}   /* rapide, à gauche */
   .panneau{--r:min(260px, 68vw)}
 
-  .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 0}
+  .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 8px}
   .barre{padding:7px 7px 7px 16px}
   /* Le logo agrandi ne vaut que pour le bureau et la tablette : sur 390 px il
      mangerait la barre. */
@@ -885,20 +900,22 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
 
 <script>
 (function(){
-  /* Le voile part quand TOUT est chargé — images comprises — mais jamais avant
-     600 ms : en dessous, il clignote et donne l'impression d'un défaut.
-     Un délai de sûreté à 4 s le retire quand même si une ressource ne répond
+  /* Le voile part quand TOUT est chargé — images comprises. Sa durée suit donc
+     celle du chargement : instantanée sur une connexion rapide, plus longue
+     sinon. Un plancher d'une seconde évite le clignotement, qui se lit comme
+     un défaut plutôt que comme une ouverture.
+     Un délai de sûreté à 6 s le retire quand même si une ressource ne répond
      pas : mieux vaut une page qui s'ouvre qu'un logo qui attend pour toujours. */
   const depart=Date.now();
   let parti=false;
   const ouvre=()=>{
     if(parti) return; parti=true;
-    const reste=Math.max(0, 600-(Date.now()-depart));
+    const reste=Math.max(0, 1000-(Date.now()-depart));
     setTimeout(()=>document.body.classList.add('pret'), reste);
   };
   if(document.readyState==='complete') ouvre();
   else addEventListener('load', ouvre);
-  setTimeout(ouvre, 4000);
+  setTimeout(ouvre, 6000);
 })();
 (function(){
   const hote=document.querySelector('.barre-hote');

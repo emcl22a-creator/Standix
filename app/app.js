@@ -3466,14 +3466,21 @@ function peindrePhotoProfil() {
    ⚠ ET IL LIT `photoTampon` COMME LE RESTE. Quand on choisit une photo sans
      l'enregistrer, elle parait deja partout — sinon la carte montrerait
      l'ancienne pendant qu'on regarde la nouvelle. */
-  const av = document.getElementById('reg-av-photo')
-  const avIni = document.getElementById('reg-av-initiales')
+  /* ⚠ LES DEUX ESPACES ONT LEUR CARTE.
 
-  if (av) {
+     La photo n'etait peinte que dans celle de la gestion : cote utilisateur on
+     ne voyait qu'un rond d'initiales, alors que c'est le meme compte. */
+  ;['reg-av-photo', 'e-reg-av-photo', 'es-photo'].forEach(id => {
+    const av = document.getElementById(id)
+    if (!av) return
     if (url) { av.src = url; av.hidden = false }
     else { av.removeAttribute('src'); av.hidden = true }
-  }
-  if (avIni) avIni.textContent = initialesMembre(currentMembre?.nom)
+  })
+
+  ;['reg-av-initiales', 'e-reg-av-initiales', 'es-initiales'].forEach(id => {
+    const i = document.getElementById(id)
+    if (i) i.textContent = initialesMembre(currentMembre?.nom)
+  })
 }
 
 /* ⚠ 192 PX DE COTE, COMME LE LOGO. Le rond fait 96 px a l'ecran ; le double
@@ -3572,6 +3579,22 @@ function peindreReglages() {
   const el = (i) => document.getElementById(i)
 
   if (el('reg-nom')) el('reg-nom').textContent = nom || 'Votre compte'
+
+  /* ⚠ LE POSTE, ENTRE LE NOM ET L'ADRESSE.
+
+     Il n'apparaissait nulle part sur cette carte alors que la donnee existe.
+     Une equipe de dix a dix noms ; ce qui distingue les gens, c'est ce qu'ils
+     font.
+
+   ⚠ ET LA LIGNE DISPARAIT S'IL N'Y EN A PAS, plutot que d'afficher un tiret :
+     un poste vide n'est pas une information. */
+  ;['reg-poste-ligne', 'e-reg-poste-ligne', 'es-poste-ligne'].forEach(id => {
+    const l = el(id)
+    if (!l) return
+    const p = currentMembre?.poste
+    l.textContent = p || ''
+    l.hidden = !p
+  })
   /* ⚠ `reg-initiales` N'EXISTE PLUS dans le balisage : le rond de deux lettres
      a ete retire de la ligne d'identite. Le test `if (el(...))` protegeait
      deja l'ecriture, elle ne levait donc aucune erreur — mais une ligne qui ne
@@ -7656,12 +7679,20 @@ function majBarreHaute(id) {
        ecran la prend, et rien ne la distingue alors des ecrans inertes.
 
        `feuille-part` la nomme le temps de l'animation, puis s'efface. */
+    /* ⚠ LA FEUILLE NE SE REGARDE PAS PARTIR.
+
+       Elle etait marquee `feuille-part` pour rester affichee le temps d'une
+       animation de sortie. Mais la reference — « Abonnement » — n'en a aucune :
+       l'ecran quitte passe en `display:none` tout de suite, et seul celui qui
+       arrive s'anime.
+
+       Mesure comparee : vers Abonnement, la page partante affiche
+       `display:none`, zero animation. Au retour d'un dossier, elle restait en
+       `display:block` avec une animation en cours. C'etait la seule difference.
+
+     ⚠ ON GARDE LE NETTOYAGE. Une feuille marquee par un tour precedent doit
+       perdre sa classe, sinon elle resterait affichee indefiniment. */
     document.querySelectorAll('.feuille-part').forEach(s => s.classList.remove('feuille-part'))
-    const partante = document.querySelector('.screen.active')
-    if (partante) {
-      partante.classList.add('feuille-part')
-      setTimeout(() => partante.classList.remove('feuille-part'), 400)
-    }
 
     clearTimeout(degelRetour)
     degelRetour = setTimeout(() =>
@@ -8650,15 +8681,17 @@ async function peindreActivites() {
 /* La page entière : tout ce que la collecte a trouvé, groupé par jour. Sans ces
    en-têtes, quarante lignes de « 12 mars » se ressemblent toutes. */
 window.ouvrirActivites = async function () {
-  showGestionScreen('p-activites')
+  /* ⚠ ON CHARGE AVANT D'AFFICHER, comme « Les postes » et « Gestion des
+     acces ». La page arrive complete : le flou porte sur ce qu'on va lire, pas
+     sur un « Chargement… » remplace juste apres. */
   const zone = document.getElementById('activites-tout')
   if (!zone) return
-  zone.innerHTML = '<div class="act-vide">Chargement\u2026</div>'
 
   const faits = await collecterActivites()
   if (!faits.length) {
     zone.innerHTML = `<div class="act-vide">Rien ne s\u2019est passé ces
       ${Math.round(ACTIVITES_JOURS / 7)} dernières semaines.</div>`
+    showGestionScreen('p-activites')
     return
   }
 
@@ -8691,6 +8724,9 @@ window.ouvrirActivites = async function () {
     ${morceaux.join('')}
     <div class="fm-periode-mot">${faits.length} activité${faits.length > 1 ? 's' : ''}
       sur ${Math.round(ACTIVITES_JOURS / 7)} semaines</div>`
+
+  /* ⚠ ET L'ECRAN ARRIVE ENSUITE, deja peint. */
+  showGestionScreen('p-activites')
 }
 
 /* « 2 min », « 3 h », « hier », « 12 mars ». Court, parce que cette colonne est
@@ -9818,8 +9854,20 @@ document.addEventListener('click', (e) => {
 
      Et elle ignorait mes deux classements, qui changeaient donc sans flou
      pendant que les tuiles se floutaient a cote. */
+  /* ⚠ ON FLOUTE LES BLOCS ENTIERS, titres compris.
+
+     `an-vues` et `an-temps-proc` ne designent que les listes : les titres
+     « Les plus lues » et « Temps par procédure » restaient nets pendant que
+     leur contenu se floutait dessous.
+
+     On remonte au `.ac-bloc` qui les enveloppe — il porte le titre, la liste et
+     tout ce qu'on pourrait y ajouter plus tard. */
   const zones = ['an-chiffres', 'an-vues', 'an-temps-proc']
-    .map(i => document.getElementById(i)).filter(Boolean)
+    .map(i => {
+      const el = document.getElementById(i)
+      return el ? (el.closest('.ac-bloc') || el) : null
+    })
+    .filter(Boolean)
   zones.forEach(flouSortie)
   setTimeout(() => { peindreAnalyse(); zones.forEach(flouEntree) }, 130)
 })
@@ -13697,11 +13745,15 @@ async function chargerPostes() {
 }
 
 window.ouvrirPostes = async function() {
-  showGestionScreen('p-reg-postes')
+  /* ⚠ ON CHARGE AVANT D'AFFICHER, comme « Gestion des acces ».
+
+     Les deux pages arrivent maintenant completes : le flou d'arrivee porte sur
+     la page telle qu'on va la lire, pas sur un « Chargement… » remplace juste
+     apres. */
   document.getElementById('poste-erreur').textContent = ''
-  document.getElementById('postes-liste').innerHTML = '<div class="an-vide">Chargement\u2026</div>'
   await chargerPostes()
   peindrePostes()
+  showGestionScreen('p-reg-postes')
 }
 
 function peindrePostes() {
@@ -26353,9 +26405,15 @@ function initialesMembre(nom) {
 }
 
 window.openMembres = async function() {
-  showGestionScreen('p-membres')
+  /* ⚠ ON CHARGE AVANT D'AFFICHER.
+
+     L'ecran s'affichait en premier, puis se remplissait : on voyait
+     « Chargement… », puis les cartes s'ajouter. Le flou d'arrivee etait deja
+     fini quand le contenu arrivait, ce qui donnait l'impression d'une
+     animation differente de celle des postes.
+
+     La page attend maintenant ses donnees et arrive complete. */
   const liste = document.getElementById('pm-liste')
-  liste.innerHTML = '<div class="note">Chargement\u2026</div>'
   filtreEquipe = ''
   const champ = document.getElementById('pm-chercher')
   if (champ) champ.value = ''
@@ -26364,10 +26422,18 @@ window.openMembres = async function() {
     .from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id)
     .order('created_at', { ascending: true })
 
-  if (error) { liste.innerHTML = `<div class="note">Erreur : ${escapeHtml(error.message)}</div>`; return }
+  if (error) {
+    /* ⚠ MEME EN CAS D'ERREUR ON AFFICHE, sinon le bouton ne repondrait pas. */
+    liste.innerHTML = `<div class="note">Erreur : ${escapeHtml(error.message)}</div>`
+    showGestionScreen('p-membres')
+    return
+  }
 
   membresEquipe = data || []
   peindreEquipe()
+
+  /* ⚠ ET L'ECRAN ARRIVE ENSUITE, deja peint. */
+  showGestionScreen('p-membres')
   /* ⚠ PLUS D'APPARITION EN CASCADE. `entreeContenu` faisait monter chaque bloc
      l'un apres l'autre — un geste de plus sur une page qui arrive deja en
      glissant depuis les Reglages. Deux animations superposees pour un seul
@@ -26521,7 +26587,7 @@ function peindreEquipe() {
   liste.innerHTML =
     section('Fondateur', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
     section('Espace gestion', 'Cr\u00e9ent les proc\u00e9dures, voient l\u2019analyse, invitent du monde.', gestion) +
-    section('Espace \u00e9quipe', 'Consultent les proc\u00e9dures publi\u00e9es.', equipe)
+    section('Espace utilisateur', 'Consultent les proc\u00e9dures publi\u00e9es.', equipe)
 }
 
 /* ── La recherche ────────────────────────────────────────── */

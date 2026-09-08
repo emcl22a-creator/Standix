@@ -249,16 +249,6 @@ body.pret .chargement-marque{animation:none; opacity:1}
 .voile.ouvert .voile-bas{transition-delay:.34s}
 .voile-btn{width:100%; padding:17px 22px; font-size:16px}
 .voile-bas{margin:0; text-align:center; font-size:13px; color:var(--gris-2)}
-@media (prefers-reduced-motion:reduce){
-  .voile, .voile a, .voile-btn, .voile-bas, .burger span{transition-duration:.01ms}
-  /* Tout s'arrête : le mouvement est un agrément, jamais une condition pour
-     lire la page. */
-  *,*::before,*::after{animation:none !important; transition-duration:.01ms !important}
-  /* ⚠ Conséquence à ne pas manquer : l'animation de départ du voile étant
-     annulée elle aussi, il resterait affiché pour toujours et couvrirait le
-     site. Il est donc retiré d'un coup. */
-  body.pret .chargement{display:none}
-}
 
 /* ═══ LE PANNEAU ═══ */
 .hero{padding:0 16px 16px}
@@ -333,11 +323,12 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
       passage. Plafond final à 86 px. */
    font-size:clamp(33px, max(min(4.17vw, 60px), 3.125vw), 86px); line-height:1.075; letter-spacing:-.036em;
    color:var(--encre); margin:18px 0 0; max-width:none}
-/* La coupure du titre est ÉCRITE, pas laissée au hasard de la largeur : sur
-   tablette et téléphone il tient toujours sur deux lignes, coupées au même
-   endroit. Sur bureau la balise est masquée et l'espace qui la suit rétablit
-   la ligne unique. */
-.coupe2{display:none}
+/* La coupure du titre est ÉCRITE, pas laissée au hasard de la largeur. Il en
+   faut DEUX, à des endroits différents : sur téléphone la ligne « Filmez, l'IA
+   crée la » ne tiendrait pas, sur tablette « Filmez, l'IA crée » laisse un
+   deuxième vers trop long. Une seule est visible à la fois ; sur ordinateur
+   aucune, et les espaces rétablissent la ligne unique. */
+.c-tel,.c-tab{display:none}
 .sous{margin:14px auto 0; font-size:max(17px, .885vw); line-height:1.5; color:var(--gris); max-width:44ch}
 
 /* ─── Les deux actions ─── Le premier porte le dégradé de « Générer les
@@ -656,8 +647,8 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      recentre au lieu de rester collé en haut : sur une fenêtre haute, il
      laissait 440 px de gris nu entre le prix et le téléphone. */
   .deux{flex:1; justify-content:center; padding-bottom:14px}
-  h1{font-size:clamp(36px, 5vw, 58px)}
-  .coupe2{display:inline}
+  h1{font-size:clamp(42px, 5.8vw, 62px)}
+  .c-tab{display:inline}
   .ic{width:48px; height:48px; border-radius:15px}
   .ic svg{width:27px; height:27px}
   .sch b{font-size:13px}
@@ -676,7 +667,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   /* `0 1` et non `0 0` : sur un écran court — iPad paysage en 768 — la scène
      doit pouvoir se comprimer, sinon la page déborde de la fenêtre. */
 
-  h1{font-size:clamp(36px, 5vw, 58px)}
+  h1{font-size:clamp(42px, 5.8vw, 62px)}
   .ic{width:44px; height:44px; border-radius:14px}
   .ic svg{width:25px; height:25px}
   .sch b{font-size:12.5px}
@@ -687,7 +678,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
 
 @media (max-width:980px){
   .hero{padding:0 10px 10px}
-  .panneau{padding:34px 20px 0; border-radius:24px}
+  .panneau{padding:26px 20px 0; border-radius:24px}
   .panneau::before{--foyer:50%}
 
   /* Le texte se cale en HAUT au lieu d'être centré : sous l'appareil il n'y a
@@ -699,12 +690,28 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      RÉSERVÉ ici : sinon elle vient toucher les boutons. */
   .deux{max-width:none; flex:0 0 auto; justify-content:flex-start; padding-bottom:26px}
   h1{max-width:none; font-size:clamp(32px, 8.2vw, 46px)}
+  .c-tel{display:inline}
+  .c-tab{display:none}
   .sous{max-width:none; font-size:15.5px}
   .actes{width:100%; flex-direction:column; align-items:stretch; margin-top:22px}
   .btn{width:100%; padding:15px 22px; font-size:15px}
   .prix{font-size:12.5px}
 
-  .scene{margin-top:auto; flex:0 1 min(344px, 90vw); min-height:0}
+  /* L'appareil occupe la place disponible au lieu de laisser un trou entre les
+     boutons et lui : 96 vw le borne à la largeur du panneau, 470 px l'empêche
+     de devenir démesuré sur une tablette en portrait. La marge de 26 px sous
+     le texte reste réservée par `.deux`, la compression ne peut pas la manger. */
+  /* L'appareil ne s'arrête plus à la largeur du panneau : il PREND TOUTE LA
+     PLACE qui reste sous le texte, quitte à ce que la main soit coupée sur les
+     côtés — elle l'est déjà en bas. C'est ce qui ferme le trou du milieu.
+     `flex:0 1` fait le travail : la base est volontairement plus grande que
+     l'espace disponible, la compression la ramène à ce qui reste exactement.
+     La marge de 26 px sous le texte, réservée par `.deux`, tient bon. */
+  /* 104 vw : l'image fait à peu près la largeur du panneau, elle n'est donc
+     plus rognée sur les côtés. Sur une tablette en portrait la base dépasse la
+     place disponible et `flex:0 1` la ramène — le vide reste comblé là où il y
+     a de la hauteur, sans que l'appareil devienne énorme sur un téléphone. */
+  .scene{margin-top:auto; flex:0 1 104vw; min-height:0}
 
   .lueur{width:400px;height:400px}
 
@@ -722,7 +729,9 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      du cercle, que la règle générale de téléphone avait annulée. */
   /* Aucun repère : seul l'arc reste, derrière l'appareil. */
   .sch{display:none}
-  .panneau{--r:min(260px, 68vw)}
+  /* Le cercle suit l'appareil : son rayon est la même expression divisée par
+     1,158, le rapport hauteur de l'image sur rayon employé partout ailleurs. */
+  .panneau{--r:min(calc(104vw / 1.158), 420px)}
 
   .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 8px}
   .barre{padding:7px 7px 7px 16px}
@@ -732,6 +741,48 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   .burger{width:36px; height:36px}
   .barre nav,.entrer,.btn-barre{display:none}
   .burger{display:flex}
+}
+
+/* ═══ TABLETTE EN PORTRAIT ═══
+   Entre 600 et 980 px, la composition téléphone s'appliquait telle quelle :
+   un titre de mobile étiré sur 800 px, des boutons pleine largeur et un
+   appareil de 693 px. Le principe ici est de garder EXACTEMENT la mise en page
+   du téléphone, mais bornée et centrée — c'est ce qui la rend juste au lieu de
+   la faire paraître agrandie.
+   La contrainte de hauteur évite d'attraper un téléphone en paysage, qui a
+   bien 600 px de large mais 390 de haut. */
+@media (min-width:600px) and (max-width:980px) and (min-height:700px){
+  .panneau{padding:56px 30px 0}
+  .texte{max-width:620px; margin-inline:auto}
+  /* Les boutons restent plus étroits que le texte : à 620 px ils deviendraient
+     des barres. */
+  .actes{max-width:470px; margin-inline:auto}
+  h1{font-size:clamp(46px, 6.4vw, 60px)}
+  .c-tel{display:none}
+  .c-tab{display:inline}
+  .sous{font-size:17.5px}
+  .btn{padding:16px 22px; font-size:15.5px}
+  .deux{padding-bottom:34px}
+
+  /* L'appareil et le cercle descendent au même rapport que sur téléphone. */
+  .scene{flex:0 1 min(590px, 72vw)}
+  .panneau{--r:min(calc(72vw / 1.158), 460px)}
+
+  /* Le texte se centre dans la place qui lui reste : sur une tablette haute,
+     tout le vide tombait sinon entre les boutons et l'appareil. */
+  .deux{flex:1; justify-content:center}
+}
+
+
+@media (prefers-reduced-motion:reduce){
+  .voile, .voile a, .voile-btn, .voile-bas, .burger span{transition-duration:.01ms}
+  /* Tout s'arrête : le mouvement est un agrément, jamais une condition pour
+     lire la page. */
+  *,*::before,*::after{animation:none !important; transition-duration:.01ms !important}
+  /* ⚠ Conséquence à ne pas manquer : l'animation de départ du voile étant
+     annulée elle aussi, il resterait affiché pour toujours et couvrirait le
+     site. Il est donc retiré d'un coup. */
+  body.pret .chargement{display:none}
 }
 </style>
 </head>
@@ -804,7 +855,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
         14 jours d'essai, sans carte bancaire
       </span>
 
-      <h1>Filmez, l'IA crée<br class="coupe2"> la procédure.</h1>
+      <h1>Filmez, l'IA crée<br class="c-tel"> la<br class="c-tab"> procédure.</h1>
       <p class="sous">Accessible depuis un QR code et sur l'app.</p>
 
       <div class="actes">

@@ -218,7 +218,7 @@ body{
        les marges et le bloc de texte retirés, d'où 86 svh − 381 px.
      Le `clamp` borne les deux extrêmes : jamais moins de 200, jamais plus
      de 620. */
-  --r:clamp(200px, min(calc(51vw - 242px), calc(86svh - 381px)), 620px);
+  --r:clamp(200px, min(calc(51vw - 242px), calc(86svh - 381px)), 740px);
   /* 88 px = la barre plus la marge basse. Le premier ecran est donc toujours
      exactement l'ecran, quelle que soit la fenetre. */
   display:flex; flex-direction:column;
@@ -256,20 +256,23 @@ body{
   -webkit-backdrop-filter:blur(22px) saturate(170%);
           backdrop-filter:blur(22px) saturate(170%);
   border-radius:100px; padding:7px 15px 7px 11px;
-  font-size:13px; font-weight:500; color:var(--gris);
+  font-size:max(13px, .677vw); font-weight:500; color:var(--gris);
   box-shadow:0 4px 14px rgba(12,16,23,.045), inset 0 1px 0 rgba(255,255,255,.5);
 }
 .mot svg{width:15px;height:15px;flex-shrink:0}
 
 h1{font-family:Poppins,sans-serif; font-weight:600;
-   font-size:clamp(33px,3.8vw,54px); line-height:1.075; letter-spacing:-.036em;
+   /* Jusqu'à 1920 le titre plafonne à 54 px. Au-delà il reprend sa
+      croissance : 2,81 vw vaut exactement 54 px à 1920, donc rien ne saute au
+      passage. Nouveau plafond à 78 px. */
+   font-size:clamp(33px, max(min(3.8vw, 54px), 2.81vw), 78px); line-height:1.075; letter-spacing:-.036em;
    color:var(--encre); margin:18px 0 0; max-width:none}
-.sous{margin:14px auto 0; font-size:17px; line-height:1.5; color:var(--gris); max-width:44ch}
+.sous{margin:14px auto 0; font-size:max(17px, .885vw); line-height:1.5; color:var(--gris); max-width:44ch}
 
 /* ─── Les deux actions ─── Le premier porte le dégradé de « Générer les
        étapes » : le geste du site et celui de l'app sont le même objet. */
 .actes{display:flex; justify-content:center; gap:11px; margin-top:26px; flex-wrap:wrap}
-.btn{font-family:inherit; font-size:14.5px; font-weight:600; letter-spacing:-.012em;
+.btn{font-family:inherit; font-size:max(14.5px, .755vw); font-weight:600; letter-spacing:-.012em;
      padding:14px 24px; border-radius:100px; border:none; cursor:pointer;
      color:#fff; white-space:nowrap;
      background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
@@ -288,7 +291,7 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
        box-shadow:0 4px 14px rgba(12,16,23,.045), inset 0 1px 0 rgba(255,255,255,.5)}
 .btn-2:hover{background:rgba(255,255,255,.72); box-shadow:0 8px 20px rgba(12,16,23,.06)}
 
-.prix{margin:13px 0 0; font-size:13.5px; color:var(--gris-2)}
+.prix{margin:13px 0 0; font-size:max(13.5px, .703vw); color:var(--gris-2)}
 
 /* ─── Colonne de droite ───
    La photo est détourée : pas de cadre, pas d'ombre portée. Elle monte du bas
@@ -440,7 +443,8 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
   bottom:calc(var(--r) * sin(var(--a)));
 }
 .ic{
-  width:54px; height:54px; border-radius:17px; flex-shrink:0;
+  --ic:max(54px, 2.81vw);
+  width:var(--ic); height:var(--ic); border-radius:calc(var(--ic) * .315); flex-shrink:0;
   display:grid; place-items:center;
   /* Le fond reste un aplat — c'est le dessin qui porte le dégradé. La brillance
      vient donc d'AUTOUR : un liseré blanc net, un halo blanc serré qui détache
@@ -452,7 +456,7 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
     0 0 20px rgba(255,255,255,.95),
     0 0 44px 4px var(--halo);
 }
-.ic svg{width:31px; height:31px}
+.ic svg{width:calc(var(--ic) * .574); height:calc(var(--ic) * .574)}
 /* Aplat UNI : le dégradé est passé sur le dessin. Deux dégradés superposés
    se seraient annulés — celui du fond aurait rendu illisible le sens de
    celui du trait. */
@@ -463,9 +467,9 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
 .ic-gris  {background:#E6EAEF; --halo:rgba(85,96,111,.18)}
 
 .sch span{display:block; max-width:210px}
-.sch b{display:block; font-size:14px; font-weight:600; letter-spacing:-.018em;
+.sch b{display:block; font-size:max(14px, .729vw); font-weight:600; letter-spacing:-.018em;
        color:var(--encre); line-height:1.25}
-.sch span{font-size:12.5px; color:var(--gris-2); line-height:1.35}
+.sch span{font-size:max(12.5px, .651vw); color:var(--gris-2); line-height:1.35}
 .sch em{font-style:normal; display:block}
 /* « Rapide » tient toujours sur DEUX lignes : la coupure est écrite dans le
    texte et `nowrap` empêche les paliers étroits d'en faire trois. Le texte
@@ -476,8 +480,9 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
 
 /* Le point calculé est le coin du bloc ; on le décale pour que ce soit le
    CENTRE DE L'ICÔNE qui tombe sur l'arc, et non le bord du texte. */
-.sch-4,.sch-5{translate:-27px 50%}
-.sch-1,.sch-2,.sch-3{translate:calc(-100% + 27px) 50%;
+/* Le recentrage sur l'arc suit la taille de l'icône, qui n'est plus fixe. */
+.sch-4,.sch-5{translate:calc(max(54px, 2.81vw) / -2) 50%}
+.sch-1,.sch-2,.sch-3{translate:calc(-100% + max(54px, 2.81vw) / 2) 50%;
                      flex-direction:row-reverse; text-align:right}
 
 /* Aucun repère entre 60° et 120° : c'est là que passe le téléphone. Ils

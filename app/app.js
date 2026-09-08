@@ -7050,6 +7050,22 @@ function dateCourte(v) {
 }
 
 /* « il y a 3 jours », « hier », « aujourd'hui » — plus parlant qu'une date. */
+/* ⚠ `depuisQuandCourt` ETAIT APPELEE CINQ FOIS SANS AVOIR ETE DEFINIE.
+
+   Elle levait `ReferenceError` des le chargement de l'accueil, ce qui
+   interrompait le dessin des tuiles et de la liste des mouvements.
+
+   Un commentaire du fichier la decrivait pourtant : « `depuisQuandCourt` ATTEND
+   DES MILLISECONDES, pas une date » — la fonction avait ete documentee puis
+   perdue.
+
+ ⚠ ELLE S'APPUIE SUR `depuisQuand`, qui fait deja le travail mais prend une
+   date ISO. On convertit, et l'on demande la forme abregee. */
+function depuisQuandCourt(ms) {
+  if (!ms) return ''
+  return depuisQuand(new Date(ms).toISOString(), true) || ''
+}
+
 function ilYA(ms) {
   const jours = Math.floor((Date.now() - ms) / 86400000)
   if (jours <= 0) return "aujourd'hui"
@@ -7535,9 +7551,37 @@ window.poserLogosOr = function () {
        blanc par filtre puis par masque, alors que le fichier orange existait. */
     poserLogosOr()
   }
+  /* ⚠ UN SEUL APPEL NE SUFFISAIT PAS.
+
+     `poser()` copie le logo de `#logo-src` vers toutes les balises
+     `data-logo`. Elle ne s'executait qu'a `DOMContentLoaded` — c'est-a-dire
+     quand le balisage est lu, mais pas forcement quand les IMAGES sont
+     chargees.
+
+     Si `logo-src` n'avait pas fini de se charger a cet instant, `src.src`
+     etait vide : tous les logos de l'app restaient nus, et la barre du haut
+     paraissait cassee. Le defaut ne se voyait qu'une fois sur quelques
+     demarrages — selon la vitesse du reseau et l'etat du cache.
+
+   ⚠ ON REPOSE A CHAQUE ETAPE DU CHARGEMENT. Trois occasions plutot qu'une :
+     le balisage lu, l'image chargee, la page complete. La fonction est
+     idempotente — elle recopie la meme source — donc la rejouer ne coute
+     rien. */
+  const reposer = () => { try { poser() } catch (e) {} }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', poser)
-  } else poser()
+    document.addEventListener('DOMContentLoaded', reposer)
+  } else reposer()
+
+  /* ⚠ ET SURTOUT : QUAND L'IMAGE ELLE-MEME ARRIVE. C'est l'evenement qui
+     manquait. */
+  const srcLogo = document.getElementById('logo-src')
+  if (srcLogo) {
+    if (srcLogo.complete) reposer()
+    srcLogo.addEventListener('load', reposer)
+  }
+
+  window.addEventListener('load', reposer)
 })()
 
 /* ═══ LE VOILE, À CHAQUE ARRIVÉE ═══
@@ -26056,7 +26100,13 @@ document.getElementById('es-quitter')?.addEventListener('click', async () => {
 /* La même fenêtre sert à deux moments : un compte sans entreprise, et quelqu'un
    qui veut en rejoindre une de plus. Le besoin est le même — un code à saisir —
    seule la sortie diffère : se déconnecter dans un cas, annuler dans l'autre. */
+let suppressionEnCours = false
+
 function montrerOrphelin(enPlus) {
+  /* ⚠ RIEN PENDANT UNE SUPPRESSION D'ENTREPRISE. Voir la sentinelle posee
+     dans le bouton « Supprimer definitivement ». */
+  if (suppressionEnCours) return
+
   const f = document.getElementById('fond-orphelin')
   if (!f) return
 
@@ -26467,8 +26517,59 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
     return
   }
 
+  /* ═══ LE MENAGE DU STOCKAGE, AVANT CELUI DE LA BASE ═══
+
+     ⚠ POSTGRES NE CONNAIT PAS LES FICHIERS. La fonction SQL vide les quatorze
+       tables, mais les videos et le logo restent dans le stockage : ce sont
+       deux services distincts dans Supabase.
+
+       Sans ce passage, chaque entreprise supprimee laisse ses videos derriere
+       elle — invisibles, mais facturees.
+
+     ⚠ ON EFFACE AVANT, PAS APRES. Une fois la ligne de `membres` detruite, les
+       politiques d'acces au stockage ne nous reconnaissent plus : on perdrait
+       le droit d'effacer nos propres fichiers.
+
+     ⚠ ET L'ON N'INTERROMPT RIEN EN CAS D'ECHEC. Si le stockage refuse, la
+       suppression continue : mieux vaut une entreprise effacee avec des
+       fichiers orphelins qu'une entreprise qu'on ne peut plus supprimer. */
+  const idEnt = currentMembre.entreprise_id
+
+  /* ⚠ ON TAIT L'ECRAN « AUCUNE ENTREPRISE » PENDANT LA SUPPRESSION.
+
+     Une fois les tables vidées, l'app constate qu'on n'appartient plus a rien
+     et ouvre `montrerOrphelin` — la fenetre noire qui demande un code
+     d'invitation.
+
+     Elle n'apparaissait qu'une demi-seconde, avant le rechargement, mais elle
+     n'a aucun sens ici : on vient de supprimer son entreprise, on ne cherche
+     pas a en rejoindre une.
+
+     La sentinelle est posee AVANT le premier effacement et n'est jamais
+     levee : la page se recharge de toute façon juste apres. */
+  suppressionEnCours = true
+
+  try {
+    /* ⚠ LES VIDEOS SONT DANS UN DOSSIER AU NOM DE L'ENTREPRISE — voir
+       `${entreprise_id}/${horodatage}` a l'envoi. On liste, puis on efface. */
+    const { data: fichiers } = await supabase.storage
+      .from('procedo-videos').list(idEnt, { limit: 1000 })
+
+    if (fichiers?.length) {
+      await supabase.storage.from('procedo-videos')
+        .remove(fichiers.map(f => `${idEnt}/${f.name}`))
+    }
+
+    /* ⚠ LE LOGO EST A LA RACINE, pas dans un dossier : il porte l'identifiant
+       comme nom de fichier. On tente les extensions employees a l'envoi. */
+    await supabase.storage.from('procedo-logos')
+      .remove([`${idEnt}.png`, `${idEnt}.jpg`, `${idEnt}.jpeg`, `${idEnt}.webp`])
+  } catch (ex) {
+    console.warn('Standix · menage du stockage :', ex)
+  }
+
   const { data, error } = await supabase
-    .rpc('supprimer_entreprise', { p_entreprise_id: currentMembre.entreprise_id })
+    .rpc('supprimer_entreprise', { p_entreprise_id: idEnt })
 
   if (error || !data?.ok) {
     /* ⚠ ON MONTRE LA VRAIE CAUSE, pas « réessayez ».

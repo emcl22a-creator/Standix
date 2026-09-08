@@ -101,9 +101,10 @@ body{
   background:var(--papier);
   transform-origin:50% 50%;
 }
-.chargement-marque{--signe:30px; cursor:default;
-  animation:attend 1.7s ease-in-out infinite}
-@keyframes attend{0%,100%{opacity:1} 50%{opacity:.42}}
+/* Le logo est FIXE pendant l'attente. Une pulsation suggère un travail en
+   cours, donc une attente qui dure ; posé, il dit simplement que le site
+   s'ouvre. C'est le départ du voile qui porte le mouvement, pas lui. */
+.chargement-marque{--signe:30px; cursor:default}
 
 body.pret .chargement{
   animation:voile-part .85s cubic-bezier(.32,.72,0,1) forwards;
@@ -112,7 +113,6 @@ body.pret .chargement{
   from{opacity:1; transform:perspective(900px) translateZ(0); filter:blur(0)}
   to  {opacity:0; transform:perspective(900px) translateZ(190px); filter:blur(10px)}
 }
-body.pret .chargement-marque{animation:none; opacity:1}
 
 /* ═══ LE PREMIER ÉCRAN ═══
    La barre et le panneau valent EXACTEMENT la hauteur de l'écran, à eux deux.
@@ -195,6 +195,60 @@ body.pret .chargement-marque{animation:none; opacity:1}
           backdrop-filter:blur(26px) saturate(180%);
   box-shadow:0 8px 28px rgba(12,16,23,.08), 0 1px 2px rgba(12,16,23,.04);
 }
+
+/* ═══ LE BANDEAU ═══
+   ⚠ SUR LE CONTENU. La référence affiche « +70 % de temps gagné », « −50 %
+   d'erreurs ». Tu n'as ni utilisateurs ni mesures : ces chiffres seraient
+   inventés, et un chiffre de performance affiché sur une page de vente engage
+   — c'est de la publicité trompeuse s'il ne repose sur rien. Sur ta cible, un
+   patron de restaurant sait que personne ne mesure « −50 % d'erreurs », et tu
+   perds sa confiance à la première ligne.
+   Les trois retenus sont des FAITS sur le produit : une vidéo suffit, dix
+   minutes d'analyse — ta propre mesure, 9,6 min fixes plus 0,32 fois la durée
+   de la vidéo — et un scan pour ouvrir. Même effet visuel, rien d'invérifiable.
+
+   Le bandeau entre PAR LA GAUCHE, pas seulement en fondu : un objet qui arrive
+   d'un bord dit d'où il vient et où il repartira. */
+.bandeau{
+  position:fixed; left:22px; bottom:22px; z-index:55;
+  display:flex; align-items:stretch; gap:0;
+  padding:14px 4px; border-radius:20px;
+  background:rgba(12,16,23,.82);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
+          backdrop-filter:blur(22px) saturate(170%);
+  border:1px solid rgba(255,255,255,.1);
+  box-shadow:0 18px 44px rgba(12,16,23,.28), 0 2px 6px rgba(12,16,23,.16);
+  opacity:0; translate:-24px 0; filter:blur(6px);
+  pointer-events:none;
+  transition:opacity .5s cubic-bezier(.32,.72,0,1),
+             translate .5s cubic-bezier(.32,.72,0,1),
+             filter .5s cubic-bezier(.32,.72,0,1);
+}
+.bandeau.la{opacity:1; translate:0 0; filter:blur(0); pointer-events:auto}
+
+.bandeau > div{padding:0 20px; min-width:0}
+/* Les séparateurs sont des bordures, pas des éléments : rien à ajouter ni à
+   retirer si le nombre de blocs change. */
+.bandeau > div + div{border-left:1px solid rgba(255,255,255,.14)}
+.bandeau b{display:block; font-family:Poppins,sans-serif; font-weight:600;
+           font-size:21px; letter-spacing:-.03em; color:#fff; line-height:1.1}
+.bandeau span{display:block; font-size:12px; color:rgba(255,255,255,.62);
+              margin-top:3px; white-space:nowrap}
+
+/* Chaque bloc entre avec un léger retard sur le précédent : c'est ce décalage
+   qui fait vivre l'ensemble, pas la durée. */
+.bandeau > div{opacity:0; translate:0 8px;
+  transition:opacity .45s cubic-bezier(.32,.72,0,1) var(--d),
+             translate .45s cubic-bezier(.32,.72,0,1) var(--d)}
+.bandeau.la > div{opacity:1; translate:0 0}
+.bandeau > div:nth-child(1){--d:.10s}
+.bandeau > div:nth-child(2){--d:.17s}
+.bandeau > div:nth-child(3){--d:.24s}
+
+/* En dessous de 900 px il couvrirait l'appareil et la moitié du texte. */
+@media (max-width:900px){ .bandeau{display:none} }
+
+.fin-bandeau{height:1px}
 
 /* Provisoire : de quoi faire défiler. */
 .apres{min-height:70svh; display:grid; place-items:center;
@@ -937,9 +991,21 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
 
 </section>
 
-<!-- Provisoire : sans contenu sous le hero, il n'y a rien à faire défiler
-     et l'effet de verre ne peut pas se déclencher. -->
-<section class="apres"><p>La suite de la page viendra ici.</p></section>
+<!-- Provisoire : deux sections, pour éprouver l'apparition ET la disparition
+     du bandeau. Elles seront remplacées par le vrai contenu. -->
+<section class="apres"><p>Section 1 — la suite de la page viendra ici.</p></section>
+<section class="apres"><p>Section 2 — le bandeau disparaît à la fin de celle-ci.</p></section>
+<div class="fin-bandeau" aria-hidden="true"></div>
+<section class="apres"><p>Section 3 — plus de bandeau.</p></section>
+
+<!-- ═══ LE BANDEAU ═══
+     Trois faits VÉRIFIABLES, pas des pourcentages de performance. Voir la note
+     dans le style. -->
+<aside class="bandeau" id="bandeau" aria-label="En bref">
+  <div><b>1 vidéo</b><span>et la procédure est écrite</span></div>
+  <div><b>10 min</b><span>de la vidéo aux étapes</span></div>
+  <div><b>1 scan</b><span>pour l'ouvrir au poste</span></div>
+</aside>
 
 <script>
 (function(){
@@ -989,7 +1055,18 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      puisqu'ils lisent la même chose, la position du repère.
      `pageshow` couvre le retour par le cache de navigation, où ni l'un ni
      l'autre ne se déclenche : la page réapparaît telle qu'on l'a quittée. */
-  const relit=()=>pose(scrollY > 8);
+  /* Le bandeau apparaît passé le premier écran et se retire dès que la fin de
+     la deuxième section entre dans la vue. Les deux conditions sont lues au
+     même moment que l'état de la barre : un seul calcul, jamais de désaccord. */
+  const bandeau=document.getElementById('bandeau');
+  const finBandeau=document.querySelector('.fin-bandeau');
+
+  const relit=()=>{
+    pose(scrollY > 8);
+    const passeLeHero = scrollY > innerHeight * .45;
+    const avantLaFin  = finBandeau.getBoundingClientRect().top > innerHeight * .85;
+    bandeau.classList.toggle('la', passeLeHero && avantLaFin);
+  };
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e])=>pose(!e.isIntersecting), {threshold:0})
       .observe(sentinelle);

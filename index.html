@@ -206,6 +206,63 @@ body.pret .chargement{
   box-shadow:0 8px 28px rgba(12,16,23,.08), 0 1px 2px rgba(12,16,23,.04);
 }
 
+/* ═══ L'ÉCRAN QUI TRAVAILLE ═══
+   L'appareil du hero ne pose plus, il DÉMONTRE : les étapes s'écrivent une par
+   une, la bannière de travail s'efface, la ligne « procédure prête » arrive.
+   Puis tout s'efface et ça recommence.
+   Une seule durée pour tous — 13 s — et un décalage par élément : les cycles
+   restent alignés quel que soit le nombre d'étapes. Un cycle par élément avec
+   des durées différentes dériverait au bout de quelques tours. */
+/* ⚠ LES TROIS PHASES NE DOIVENT PAS SE CHEVAUCHER. Au premier essai la
+   bannière revenait pendant que les étapes s'effaçaient : on voyait le montage.
+   L'ordre est maintenant strict — les étapes partent (78→84 %), puis la
+   bannière revient (90 %), puis tout recommence. */
+@keyframes mq-ecrit{
+   0%{opacity:0; translate:0 7px}
+   5%{opacity:1; translate:0 0}
+  78%{opacity:1; translate:0 0}
+  84%{opacity:0; translate:0 -5px}
+ 100%{opacity:0; translate:0 -5px}
+}
+@keyframes mq-part{
+   0%,38%{opacity:1; translate:0 0}
+  46%,86%{opacity:0; translate:0 -6px}
+  94%,100%{opacity:1; translate:0 0}
+}
+@keyframes mq-arrive{
+   0%,54%{opacity:0; translate:0 7px}
+  62%,76%{opacity:1; translate:0 0}
+  82%,100%{opacity:0; translate:0 -5px}
+}
+@keyframes mq-tourne{to{rotate:360deg}}
+
+.mq-et{display:flex; gap:2.2cqw; align-items:flex-start;
+       padding:2.1cqw 2.4cqw; margin-top:1.4cqw;
+       background:#fff; border:1px solid rgba(12,16,23,.06); border-radius:2.6cqw;
+       animation:mq-ecrit 13s cubic-bezier(.32,.72,0,1) infinite}
+.mq-et:nth-of-type(1){animation-delay:.9s}
+.mq-et:nth-of-type(2){animation-delay:1.7s}
+.mq-et:nth-of-type(3){animation-delay:2.5s}
+.mq-et:nth-of-type(4){animation-delay:3.3s}
+.mq-et:nth-of-type(5){animation-delay:4.1s}
+.mq-et em{flex:0 0 auto; width:4.6cqw; height:4.6cqw; border-radius:50%;
+          background:#1F4CEE; color:#fff; font-style:normal; font-weight:600;
+          font-size:2.5cqw; display:grid; place-items:center; margin-top:.2cqw}
+.mq-et span{display:block; font-size:2.6cqw; color:var(--gris-2); line-height:1.35}
+.mq-et b{display:block; font-size:3cqw; font-weight:600; color:var(--encre)}
+
+/* La bannière tourne pendant la rédaction puis s'efface. */
+.mq-travail{animation:mq-part 13s cubic-bezier(.32,.72,0,1) infinite}
+.mq-travail svg{animation:mq-tourne 2.6s linear infinite}
+
+.mq-fin{display:flex; align-items:center; gap:2.2cqw; margin-top:2.6cqw;
+        padding:2.4cqw; border-radius:2.6cqw;
+        background:rgba(31,76,238,.07); color:#1F4CEE;
+        font-size:2.8cqw; font-weight:600;
+        animation:mq-arrive 13s cubic-bezier(.32,.72,0,1) infinite}
+.mq-fin i{width:3.4cqw; height:3.4cqw; border-radius:50%; background:#1F4CEE;
+          flex:0 0 auto}
+
 /* ═══ LE FONDU DU BAS ═══
    Apple n'emploie jamais un flou uniforme : le sien AUGMENTE vers le bord.
    Un `backdrop-filter` seul ne sait pas faire ça — il applique une valeur
@@ -304,6 +361,36 @@ body.pret .chargement{
 @media (max-width:900px){ .bandeau{display:none} }
 
 .fin-bandeau{height:1px}
+
+/* ═══ LA BARRE SUR FOND SOMBRE ═══
+   Tant qu'elle survole le panneau noir, elle en prend la matière : verre
+   sombre, texte clair, logo en silhouette blanche. Dès qu'elle en sort, elle
+   redevient claire. Sans ça son texte encre deviendrait illisible au moment
+   même où le verre apparaît.
+   ⚠ Le logo est un dessin SOMBRE : l'éclaircir ne suffit pas, il faut
+   `brightness(0)` pour l'aplatir en noir plein, puis `invert(1)` pour le
+   retourner en blanc. Son modelé disparaît — c'est le prix, et c'est ce que
+   font tous les logos posés sur du sombre.
+   Tout est en transition : la barre change d'habit pendant qu'on défile, une
+   bascule sèche se verrait comme un clignotement. */
+.barre .marque img,.logotype,.barre nav a,.entrer,.burger span{
+  transition:color .32s cubic-bezier(.32,.72,0,1),
+             filter .32s cubic-bezier(.32,.72,0,1),
+             background-color .32s cubic-bezier(.32,.72,0,1);
+}
+.barre-hote.sombre .marque img{filter:brightness(0) invert(1)}
+.barre-hote.sombre .logotype{color:#FFFFFF}
+.barre-hote.sombre nav a{color:rgba(255,255,255,.74)}
+.barre-hote.sombre nav a:hover{color:#FFFFFF}
+.barre-hote.sombre .entrer{color:rgba(255,255,255,.74)}
+.barre-hote.sombre .entrer:hover{color:#FFFFFF}
+.barre-hote.sombre .burger span{background:#FFFFFF}
+
+.barre-hote.flotte.sombre .barre{
+  background:rgba(255,255,255,.07);
+  border-color:rgba(255,255,255,.13);
+  box-shadow:0 10px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);
+}
 
 /* Provisoire : de quoi faire défiler. */
 .apres{min-height:70svh; display:grid; place-items:center;
@@ -456,8 +543,8 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
 /* ─── Les deux actions ─── Le premier porte le dégradé de « Générer les
        étapes » : le geste du site et celui de l'app sont le même objet. */
 .actes{display:flex; justify-content:center; gap:11px; margin-top:26px; flex-wrap:wrap}
-.btn{font-family:inherit; font-size:max(15.5px, .807vw); font-weight:600; letter-spacing:-.012em;
-     padding:16px 28px; border-radius:100px; border:none; cursor:pointer;
+.btn{font-family:inherit; font-size:max(14.5px, .755vw); font-weight:600; letter-spacing:-.012em;
+     padding:14px 24px; border-radius:100px; border:none; cursor:pointer;
      color:#fff; white-space:nowrap;
      background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
      box-shadow:0 6px 16px rgba(31,76,238,.24);
@@ -618,6 +705,35 @@ h1     {animation-delay:.13s}
 .barre nav a,.entrer{transition:color .25s}
 .barre nav a:hover,.entrer:hover{color:var(--encre)}
 
+/* ═══ LE GRAIN ═══
+   Un panneau bâti sur des dégradés est parfaitement lisse : mesuré, l'écart
+   type des pixels d'une zone plate valait 0,88 — autant dire rien. C'est ce
+   qui le fait paraître numérique, et c'est aussi ce qui produit les bandes
+   visibles là où un dégradé change lentement de valeur.
+   Le bruit est un `feTurbulence` en SVG, encodé dans la feuille de style :
+   aucun fichier à charger, et il se répète sur 200 px sans raccord grâce à
+   `stitchTiles`.
+   ⚠ TROIS pièges, tous mesurés plutôt que devinés.
+   1. `mix-blend-mode:overlay` et non une simple opacité : posé normalement, un
+      bruit gris éclaircirait le noir d'un voile uniforme.
+   2. Le bruit doit être OPAQUE. `feTurbulence` produit aussi du bruit sur la
+      couche alpha, et un gris semi-transparent sur du noir éclaircit malgré
+      l'incrustation — la luminance montait de 12,7 à 14,7. `feFuncA discrete`
+      force l'alpha à 1.
+   3. Sa moyenne doit valoir le GRIS MOYEN. Celle de `fractalNoise` est plus
+      claire, et l'incrustation d'un blanc sur un fond sombre éclaircit : la
+      dérive persistait à +1,0 même en baissant l'opacité à 8 %. Le
+      `feFuncR/G/B linear` la recentre sur 0,5 — dérive tombée à +0,37, et
+      l'écart type passe de 0,88 à 1,55.
+   Il est SOUS l'appareil (z-index 0, la scène est à 1) : la photo a déjà son
+   propre grain, en superposer un second la salirait. */
+.panneau::after{
+  content:''; position:absolute; inset:0; z-index:0; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cfilter%20id%3D%27n%27%20color-interpolation-filters%3D%27sRGB%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%27linear%27%20slope%3D%27.55%27%20intercept%3D%27.225%27%2F%3E%3CfeFuncG%20type%3D%27linear%27%20slope%3D%27.55%27%20intercept%3D%27.225%27%2F%3E%3CfeFuncB%20type%3D%27linear%27%20slope%3D%27.55%27%20intercept%3D%27.225%27%2F%3E%3CfeFuncA%20type%3D%27discrete%27%20tableValues%3D%271%27%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23n%29%27%2F%3E%3C%2Fsvg%3E");
+  background-size:200px 200px;
+  opacity:1; mix-blend-mode:overlay;
+}
+
 /* ═══ LE DEMI-CERCLE ═══
    C'est un disque entier, centré sur le bas du panneau : sa moitié basse
    passe sous le bord et `overflow:hidden` la coupe. Il ne reste que l'arc.
@@ -758,8 +874,9 @@ h1     {animation-delay:.13s}
    raccourci réinitialise `animation-play-state` à `running`. Placée avant,
    elle était silencieusement annulée — le titre finissait son entrée derrière
    le voile et la page s'ouvrait déjà figée. */
-.texte > *,.scene,.arc,.lueur,.barre .marque,.droite,.sch,.ic,
+.texte > *,.scene,.arc,.lueur,.mq-et,.mq-travail,.mq-fin,.barre .marque,.droite,.sch,.ic,
 .arc::before,.panneau::before{animation-play-state:paused}
+body.pret .mq-et,body.pret .mq-travail,body.pret .mq-fin,
 body.pret .texte > *,body.pret .scene,body.pret .arc,
 body.pret .lueur,body.pret .barre .marque,body.pret .droite,body.pret .sch,body.pret .ic,
 body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
@@ -976,7 +1093,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
     <div class="texte">
       <span class="mot">
         <svg viewBox="0 0 24 24" fill="none" stroke="#1F4CEE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-        14 jours d'essai, sans carte bancaire
+        Aucune procédure à rédiger
       </span>
 
       <h1>Filmez, l'IA crée<br class="c-tel"> la<br class="c-tab"> procédure.</h1>
@@ -1024,28 +1141,24 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
         <div class="ecran">
           <div class="mq">
             <div class="mq-h"><span>9:41</span><span class="mq-h-d"></span></div>
-            <div class="mq-salut">Bonjour, Emilien 👋</div>
-            <p class="mq-conseil">Collez un QR code là où le geste se fait&nbsp;:<br>on scanne, la procédure s'ouvre.</p>
+            <div class="mq-salut">Nettoyage de la trancheuse</div>
+            <p class="mq-conseil">Vidéo de 2 min 14 · filmée ce matin</p>
 
-            <div class="mq-ban">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linejoin="round"><path d="M5 19V7a2 2 0 0 1 2-2h4l2 2.6h6a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2Z"/><path d="M12 11.4v5.2M9.4 14h5.2"/></svg>
-              <span><b>Créer une procédure</b>Filmez, l'IA rédige les étapes</span>
+            <!-- La bannière annonce le travail en cours ; elle s'efface une
+                 fois les étapes écrites. -->
+            <div class="mq-ban mq-travail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v2.4M12 18.6V21M4.5 12H6.9M17.1 12h2.4M6.7 6.7l1.7 1.7M15.6 15.6l1.7 1.7M6.7 17.3l1.7-1.7M15.6 8.4l1.7-1.7"/></svg>
+              <span><b>L'IA rédige les étapes</b>d'après ce qu'elle voit dans la vidéo</span>
             </div>
 
-            <div class="mq-ch">
-              <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z"/><path d="M13.6 3.4v5h5"/><path d="M8.8 13h6.4"/><path d="M8.8 16.4h4.2"/></svg><b>12</b><span>procédures en ligne</span></div>
-              <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9.4" cy="8.6" r="3.4"/><path d="M3 20a6.4 6.4 0 0 1 12.8 0"/><path d="M16.6 5.4a3.4 3.4 0 0 1 0 6.4"/><path d="M17.2 14.6a5.8 5.8 0 0 1 3.8 5.4"/></svg><b>8</b><span>membres</span></div>
-              <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.6 13.8 9 19 10.8 13.8 12.6 12 18 10.2 12.6 5 10.8 10.2 9z"/></svg><b>14<em>/20</em></b><span>analyses IA restantes</span></div>
-            </div>
+            <div class="mq-sec">Étapes</div>
+            <div class="mq-et"><em>1</em><span><b>Débrancher la trancheuse</b>et attendre l'arrêt complet de la lame</span></div>
+            <div class="mq-et"><em>2</em><span><b>Retirer le chariot porte-produit</b>le poser à plat sur le plan de travail</span></div>
+            <div class="mq-et"><em>3</em><span><b>Démonter le protège-lame</b>desserrer les deux molettes à la main</span></div>
+            <div class="mq-et"><em>4</em><span><b>Nettoyer la lame vers l'extérieur</b>éponge non abrasive, jamais vers soi</span></div>
+            <div class="mq-et"><em>5</em><span><b>Rincer, sécher, remonter</b>vérifier le serrage avant de rebrancher</span></div>
 
-            <div class="mq-sec">Dernières procédures</div>
-            <div class="mq-l"><i></i><span><b>Nettoyage de la trancheuse</b>6 étapes · publiée hier</span></div>
-            <div class="mq-l"><i></i><span><b>Mise en route du four</b>9 étapes · publiée lundi</span></div>
-            <div class="mq-l"><i></i><span><b>Réception des livraisons</b>4 étapes · publiée vendredi</span></div>
-
-            <div class="mq-sec">Mouvements de l'équipe</div>
-            <div class="mq-l"><i class="pt"></i><span><b>Claire a validé « Ouverture »</b>il y a 2 heures</span></div>
-            <div class="mq-l"><i class="pt"></i><span><b>Malik a rejoint l'équipe</b>hier</span></div>
+            <div class="mq-fin"><i></i>Procédure prête · 5 étapes</div>
           </div>
         </div>
 
@@ -1132,8 +1245,17 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   const bandeau=document.getElementById('bandeau');
   const finBandeau=document.querySelector('.fin-bandeau');
 
+  /* La barre est « sur le noir » tant que sa boîte CHEVAUCHE celle du panneau.
+     On compare les deux rectangles plutôt qu'un seuil de défilement : le
+     panneau change de hauteur selon la fenêtre, un seuil fixe se démentirait
+     au premier redimensionnement. */
+  const panneau=document.querySelector('.panneau');
+  const barre=document.querySelector('.barre');
+
   const relit=()=>{
     pose(scrollY > 8);
+    const p=panneau.getBoundingClientRect(), b=barre.getBoundingClientRect();
+    hote.classList.toggle('sombre', b.bottom > p.top + 6 && b.top < p.bottom - 6);
     const passeLeHero = scrollY > innerHeight * .45;
     const avantLaFin  = finBandeau.getBoundingClientRect().top > innerHeight * .85;
     bandeau.classList.toggle('la', passeLeHero && avantLaFin);

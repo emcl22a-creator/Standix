@@ -28635,7 +28635,16 @@ function demanderTexte({ titre, message, valeur = '', placeholder = '', confirme
     document.body.appendChild(backdrop)
     requestAnimationFrame(() => backdrop.classList.add('shown'))
 
-    const champ = backdrop.querySelector('.ios-alert-champ')
+    /* ⚠ LA CLASSE CHERCHEE NE CORRESPONDAIT PAS A CELLE POSEE.
+
+       Le balisage ci-dessus cree `<input class="fen-champ">`, mais on cherchait
+       `.ios-alert-champ` — un nom herite d'une version anterieure de cette
+       fenetre.
+
+       `champ` valait donc `null`. Le bouton « Supprimer definitivement »
+       appelait `champ.value` et levait une erreur avant meme de fermer la
+       fenetre : rien ne se passait, sans message. */
+    const champ = backdrop.querySelector('.fen-champ')
     setTimeout(() => { champ?.focus(); champ?.select() }, 220)
 
     const fermer = (v) => {

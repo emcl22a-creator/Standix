@@ -4758,7 +4758,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=06f683ec"></script>
+<script type="module" src="app.js?v=88d83565"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5893,7 +5893,19 @@ const lens = new ActiveLens(CENTERS[0] - BAR_W / 2);
    d'entrée plutôt que des retouches éparses. */
 window.majBarreEspace = function (espace) {
   const jeu = espace === 'equipe' ? LABELS_EQUIPE : LABELS_GESTION;
-  if (jeu === LABELS) return;
+
+  /* ⚠ ON NE SORT QUE SI LA BARRE EST DEJA BATIE.
+
+     `if (jeu === LABELS) return` sortait des que l'espace demande etait celui
+     en place — sans regarder si les onglets avaient ete construits.
+
+     Au demarrage, `LABELS` vaut deja `LABELS_GESTION`. Demander « gestion »
+     ne faisait donc rien du tout : les onglets restaient a leur position
+     d'origine, 18/16/14 px, presque superposes. C'est la barre « cassee ».
+
+     `__barreBatie` distingue « rien a changer » de « rien n'a encore ete
+     fait ». */
+  if (jeu === LABELS && window.__barreBatie) return;
 
   /* ═══ JAMAIS SUR UNE BARRE MASQUÉE ═══
 
@@ -5904,8 +5916,37 @@ window.majBarreEspace = function (espace) {
      On mémorise donc l'espace demandé et on refait la barre quand elle
      apparaît. */
   const barre = document.getElementById('bar');
-  if (!barre || barre.offsetWidth < 40) { window.__espaceEnAttente = espace; return; }
+  if (!barre || barre.offsetWidth < 40) {
+    window.__espaceEnAttente = espace;
+
+    /* ⚠ ON SURVEILLE LA BARRE AU LIEU D'ATTENDRE QU'ON NOUS RAPPELLE.
+
+       L'attente n'etait relancee que par `afficherBarre()`. Si la barre
+       apparaissait autrement — un changement de classe, la fin d'une
+       animation, un chemin de code qui ne passe pas par la — l'attente
+       restait posee indefiniment.
+
+       La barre s'affichait alors sans avoir ete construite : les onglets se
+       retrouvaient tous a gauche, largeur nulle, libelles superposes. C'est
+       exactement ce qu'on voyait « des fois » au demarrage.
+
+       `ResizeObserver` regarde la barre elle-meme. Des qu'elle prend une
+       largeur, on la construit — quel que soit le chemin qui l'a affichee. */
+    if (!window.__guetBarre && typeof ResizeObserver !== 'undefined') {
+      window.__guetBarre = new ResizeObserver(() => {
+        const b = document.getElementById('bar');
+        if (b && b.offsetWidth >= 40 && window.__espaceEnAttente) {
+          const e = window.__espaceEnAttente;
+          window.__espaceEnAttente = null;
+          window.majBarreEspace(e);
+        }
+      });
+      window.__guetBarre.observe(barre);
+    }
+    return;
+  }
   window.__espaceEnAttente = null;
+  window.__barreBatie = true;
   LABELS = jeu;
   active = 0;
   layout();

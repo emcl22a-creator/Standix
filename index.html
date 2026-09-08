@@ -467,6 +467,20 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
 
 /* Le second bouton prend la matiere de verre des schemas : sur le panneau
    gris, un blanc plein aurait fait une deuxieme surface. */
+/* ─── LE BOUTON PRINCIPAL DANS LE PANNEAU SOMBRE ───
+   Blanc plein, texte encre. Il ne touche QUE celui du panneau : `.actes` le
+   restreint, et `:not(.btn-2)` épargne « Se connecter » qui porte les mêmes
+   classes. Celui de la barre et celui du menu de téléphone restent bleus.
+   L'ombre bleue héritée est remplacée par une ombre noire : une lueur bleue
+   sous un bouton blanc trahirait la couleur qu'il vient de perdre. */
+.actes .btn:not(.btn-2){
+  background:#FFFFFF; color:var(--encre);
+  box-shadow:0 6px 18px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.7);
+}
+.actes .btn:not(.btn-2):hover{
+  background:#F1F3F8; box-shadow:0 10px 26px rgba(0,0,0,.5);
+}
+
 .btn-2{color:var(--sur-noir);
        background:rgba(255,255,255,.08);
        border:1px solid rgba(255,255,255,.15);

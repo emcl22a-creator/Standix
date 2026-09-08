@@ -22269,3 +22269,36 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 @media (max-height: 700px){
   #login-screen .bv-slogan{ font-size:19px; }
 }
+
+
+/* ═══ LA PAGE NE SE DECALE PLUS AU CHANGEMENT D'ECRAN ═══
+
+   ⚠ LA CAUSE : LA BARRE DE DEFILEMENT APPARAIT ET DISPARAIT.
+
+     Mesure sur un ecran de 1280 px : la page Profil fait 1175 px de haut, les
+     autres 800. En passant de l'une a l'autre, le navigateur ajoute puis retire
+     sa barre — environ quinze pixels — et toute la colonne centree se decale
+     d'autant.
+
+     Sur telephone la barre flotte au-dessus du contenu : le defaut ne s'y voit
+     pas. Sur ordinateur et sur les tablettes en mode bureau, elle prend de la
+     place.
+
+   ⚠ `scrollbar-gutter:stable` RESERVE LA PLACE EN PERMANENCE. La gouttiere est
+     la meme qu'il y ait defilement ou non, donc rien ne bouge.
+
+     Le mot-cle est reconnu par Chrome, Edge, Firefox et Safari 16 et suivants.
+     Les navigateurs plus anciens l'ignorent — ils retrouvent le comportement
+     actuel, sans regression. */
+html{
+  scrollbar-gutter:stable;
+}
+
+/* ⚠ ET SUR LES NAVIGATEURS QUI NE LE CONNAISSENT PAS, on garde au moins une
+   colonne stable : `overflow-y:scroll` force la barre a rester affichee.
+
+   On ne l'applique qu'en secours, via `@supports not`, pour ne pas montrer une
+   barre grise inutile la ou la gouttiere suffit. */
+@supports not (scrollbar-gutter: stable){
+  html{ overflow-y:scroll; }
+}

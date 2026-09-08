@@ -25656,6 +25656,25 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
 
     /* On refuse AVANT d'écrire quoi que ce soit : créer la ligne puis
        s'apercevoir qu'elle est en trop laisserait une entreprise orpheline. */
+    /* ⚠ UNE SECONDE ENTREPRISE DEMANDE UN ABONNEMENT.
+
+       L'essai gratuit couvre la premiere : quatorze jours pour voir si l'app
+       convient. En creer une deuxieme sans avoir paye la premiere reviendrait a
+       prolonger l'essai indefiniment.
+
+     ⚠ ON NE BLOQUE QUE LA CREATION. Modifier une entreprise existante — son nom,
+       son logo — reste libre : `entrepriseId` est alors renseigne. */
+    if (!entrepriseId && (mesEtablissements || []).length >= 1) {
+      const paye = (mesEtablissements || []).some(e => e.abonnement_statut === 'actif')
+        || etatAbo?.statut === 'actif'
+      if (!paye) {
+        throw new Error(
+          'Votre premi\u00e8re entreprise n\u2019est pas encore abonn\u00e9e. ' +
+          'Activez son abonnement pour pouvoir en cr\u00e9er une seconde.'
+        )
+      }
+    }
+
     if (!entrepriseId && mesEtablissements.length >= ETABLISSEMENTS_MAX) {
       throw new Error(
         `Vous g\u00e9rez d\u00e9j\u00e0 ${ETABLISSEMENTS_MAX} \u00e9tablissements, le maximum par compte. ` +

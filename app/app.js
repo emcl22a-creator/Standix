@@ -7202,7 +7202,15 @@ const ONGLET_PAR_ECRAN = {
   'p-recentes': 0,
   'p-coller': 0,        // le collage de videos, dans la creation
   'p-scan': 1,          // le lecteur de QR code, dans les Reglages
-  'p-quota': 1,         // les analyses video, dans les Reglages
+  /* ⚠ « Analyses vidéo AI » VIENT MAINTENANT DU PROFIL.
+
+     Elle etait dans la page Equipe, donc rattachee a l'onglet 1. Depuis
+     qu'elle a rejoint « Abonnement », elle s'atteint depuis le profil — qui
+     n'appartient a aucun onglet.
+
+     Sans ce changement, l'onglet Equipe s'allumait pendant qu'on lisait son
+     quota. */
+  'p-quota': -1,         // les analyses video, dans les Reglages
 }
 
 /* `p-reg-etabs` a été retiré de cette table en même temps que l'écran : la
@@ -7782,6 +7790,10 @@ function majBarreHaute(id) {
      legitimes des deux cotes : c'est le chemin qui decide, pas la destination. */
   const DEPUIS_PROFIL = new Set([
     'p-abonnement', 'p-reg-appareils', 'p-reg-langue', 'p-reg-compte',
+
+    /* ⚠ « Analyses vidéo AI » A REJOINT CETTE LISTE avec son deplacement vers
+       le profil. Sans elle, l'onglet Equipe restait allume. */
+    'p-quota',
   ])
 
   /* ⚠ LES REGLAGES DE L'ESPACE UTILISATEUR SONT SORTIS DE CETTE LISTE.
@@ -26505,7 +26517,17 @@ function peindreEquipe() {
        Le fondateur retire n'importe qui. Un gestionnaire promu ne retire que
        des membres d'équipe : il ne doit pas pouvoir écarter ses pairs, encore
        moins celui qui l'a nommé. */
-    const supprimable = !soi && (jePeuxChangerLeRang || m.role !== 'gestion')
+    /* ⚠ TOUT GESTIONNAIRE PEUT RETIRER N'IMPORTE QUI, SAUF LE FONDATEUR.
+
+     La regle voulait `jePeuxChangerLeRang || m.role !== 'gestion'` : un
+     gestionnaire invite ne pouvait retirer que des employes, pas ses pairs.
+
+     Elle devient : tout membre de l'espace gestion retire qui il veut, a deux
+     exceptions — lui-meme, et le fondateur.
+
+   ⚠ LE FONDATEUR EST INTOUCHABLE. Le retirer laisserait une entreprise sans
+     proprietaire ; c'est lui qui la supprime, personne d'autre. */
+  const supprimable = !soi && !estFondateur(m)
     const date = m.created_at
       ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
       : '\u2014'
@@ -26627,15 +26649,24 @@ document.getElementById('p-membres')?.addEventListener('click', (e) => {
   confirmDialog({
     titre: 'Les boutons de chaque ligne',
     message:
-      "\u2022 La FL\u00c8CHE change le r\u00f4le d\u2019une personne.\n" +
-      "  Vers le haut : elle passe en gestion et pourra cr\u00e9er des proc\u00e9dures, " +
-      "voir l\u2019analyse et inviter du monde.\n" +
-      "  Vers le bas : elle repasse en \u00e9quipe et ne fait plus que lire.\n\n" +
-      "\u2022 La CROIX retire la personne de l\u2019entreprise. Son compte reste, " +
-      "mais elle perd l\u2019acc\u00e8s \u00e0 vos proc\u00e9dures. Ses lectures pass\u00e9es " +
-      "restent dans l\u2019analyse.\n\n" +
-      "Vous ne pouvez ni vous r\u00e9trograder, ni vous retirer vous-m\u00eame : " +
-      "une entreprise sans gestionnaire serait inaccessible.",
+      /* ⚠ LE TEXTE, REECRIT.
+
+         Il decrivait des symboles — « la FLECHE », « la CROIX » — en laissant
+         au lecteur le soin de deviner ce qu'ils font. Et la croix n'existe
+         plus : c'est une porte de sortie depuis plusieurs versions.
+
+         On nomme maintenant l'action, pas le dessin. */
+      "\u2022 LE PLUS ET LE MOINS changent l\u2019acc\u00e8s d\u2019une personne.\n" +
+      "  Le plus lui ouvre l\u2019espace gestion : elle pourra cr\u00e9er des " +
+      "proc\u00e9dures, voir l\u2019analyse et inviter du monde.\n" +
+      "  Le moins l\u2019en retire : elle ne fait plus que consulter les " +
+      "proc\u00e9dures publi\u00e9es.\n\n" +
+      "\u2022 LA PORTE retire la personne de l\u2019entreprise. Son compte reste, " +
+      "mais elle perd l\u2019acc\u00e8s \u00e0 vos proc\u00e9dures. Ses lectures " +
+      "pass\u00e9es restent dans l\u2019analyse.\n\n" +
+      "Vous ne pouvez ni changer votre propre acc\u00e8s, ni vous retirer " +
+      "vous-m\u00eame. Le fondateur non plus ne peut \u00eatre retir\u00e9 : " +
+      "une entreprise sans propri\u00e9taire serait ing\u00e9rable.",
     confirmer: 'Compris', annuler: '', danger: false,
   })
 })
@@ -26680,10 +26711,14 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
        ⚠ LA DERNIERE PHRASE SUIT. « Vous restez le seul a pouvoir promouvoir »
          gardait le mot ecarte deux lignes plus haut. */
-    titre: `Passer ${nom} en Gestion ?`,
-    message: `${nom} rejoindra l'espace Gestion : cr\u00e9ation de proc\u00e9dures, suivi de l'\u00e9quipe, retrait de membres. ` +
-      `Elle perdra en revanche l'acc\u00e8s \u00e0 l'espace \u00c9quipe. Vous restez le seul \u00e0 pouvoir faire ce changement.`,
-    confirmer: 'Passer en Gestion',
+    /* ⚠ ON PARLE D'ACCES, PAS DE RANG.
+
+       « Passer en Gestion » decrivait un changement de statut. Ce qui compte
+       pour celui qui decide, c'est ce que la personne pourra faire ensuite. */
+    titre: `Donner l'acc\u00e8s \u00e0 l'espace gestion \u00e0 ${nom} ?`,
+    message: `${nom} pourra cr\u00e9er des proc\u00e9dures, suivre l'\u00e9quipe et retirer des membres. ` +
+      `Elle perdra en revanche l'acc\u00e8s \u00e0 l'espace utilisateur. Vous restez le seul \u00e0 pouvoir faire ce changement.`,
+    confirmer: 'Donner l\u2019acc\u00e8s',
     annuler: 'Annuler',
     danger: false,
   })
@@ -26749,10 +26784,13 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
   const nom = btn.dataset.nom || 'cette personne'
   const ok = await confirmDialog({
-    titre: `Repasser ${nom} en \u00e9quipe ?`,
-    message: `${nom} perdra l'acc\u00e8s \u00e0 la gestion et retrouvera l'espace \u00c9quipe. ` +
-      `Les proc\u00e9dures qu'elle a cr\u00e9\u00e9es restent en place.`,
-    confirmer: 'Repasser en \u00e9quipe',
+    /* ⚠ MEME FORMULATION DANS L'AUTRE SENS, et « espace utilisateur » plutot
+       que « Équipe » — c'est le nom que porte cet espace depuis qu'il a ete
+       renomme. */
+    titre: `Donner l'acc\u00e8s \u00e0 l'espace utilisateur \u00e0 ${nom} ?`,
+    message: `${nom} perdra l'acc\u00e8s \u00e0 l'espace gestion et ne pourra plus que consulter ` +
+      `les proc\u00e9dures publi\u00e9es. Celles qu'elle a cr\u00e9\u00e9es restent en place.`,
+    confirmer: 'Donner l\u2019acc\u00e8s',
     annuler: 'Annuler',
     danger: true,
     /* La teinte rouge reste — le geste retire un accès, il mérite qu'on

@@ -24809,7 +24809,10 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
 /* Trois établissements par compte. Ce n'est pas une contrainte technique mais un
    choix : au-delà, on ne gère plus des restaurants, on gère un groupe — et un
    groupe a besoin d'autre chose qu'un sélecteur dans une barre. */
-const ETABLISSEMENTS_MAX = 3
+/* ⚠ CINQ ENTREPRISES PAR COMPTE, plus trois. Un abonne qui gere plusieurs
+   etablissements — une chaine de restaurants, plusieurs boutiques — butait sur
+   un plafond que rien ne justifiait. */
+const ETABLISSEMENTS_MAX = 5
 
 let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
 /* Vrai pendant un changement d'établissement : l'app se recharge, mais son cadre

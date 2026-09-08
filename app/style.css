@@ -22219,3 +22219,53 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 @media (max-height: 700px){
   #login-screen .bv-slogan{ font-size:19px; }
 }
+
+
+/* ⚠ 27 PX SUR TROIS LIGNES.
+
+   Sur deux lignes, la taille plafonnait a 23 px — la ligne la plus longue
+   butait contre le bord. Mesure des quatre coupures possibles :
+
+     apres « Filmez, »      17 px
+     apres « l'IA cree »    23 px
+     apres « procedure, »   21 px
+     sur trois lignes       29 px
+
+   Trois lignes laissent bien plus d'air. On s'arrete a 27 pour garder une
+   marge : a 29 la ligne du milieu touche presque les bords.
+
+ ⚠ ET L'INTERLIGNE SE RESSERRE. Trois lignes a 1,26 feraient un pave ; a 1,15
+   elles forment un bloc. */
+#login-screen .bv-slogan{
+  font-size:27px;
+  line-height:1.15;
+  letter-spacing:-0.04em;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:23px; }
+}
+
+
+/* ⚠ DEUX LIGNES A 22 PX.
+
+   Mesure des cinq coupures possibles, en cherchant a chaque fois la plus
+   grande taille tenable sur deux lignes :
+
+     apres « Filmez, »        18 px
+     apres « l'IA cree »      23 px
+     apres « procedure, »     21 px
+     apres « la procedure »   22 px
+
+   La coupure apres « l'IA cree » gagne. On pose 22 plutot que 23 : a la
+   limite exacte, une police legerement differente ferait deborder.
+
+ ⚠ L'INTERLIGNE REMONTE A 1,22 — sur deux lignes, 1,15 les collait. */
+#login-screen .bv-slogan{
+  font-size:22px;
+  line-height:1.22;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:19px; }
+}

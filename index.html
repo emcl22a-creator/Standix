@@ -89,7 +89,13 @@ body{
    ancêtre casserait le `position:fixed` du menu et le `position:sticky` de la
    barre. Ce sont ses propres animations d'entrée, simplement mises en pause,
    qui jouent le rôle de l'ouverture. */
+/* ⚠ `pointer-events:none` DÈS LE DÉPART. Un calque plein écran en
+   `position:fixed` avale les gestes de défilement sur iOS : tant que le voile
+   était là — jusqu'à 6 s sur une connexion lente, ce qui arrive quand on ouvre
+   le site depuis un lien partagé — la page ne bougeait pas, et la barre
+   semblait cassée alors qu'elle n'avait simplement rien à observer. */
 .chargement{
+  pointer-events:none;
   position:fixed; inset:0; z-index:200;
   display:grid; place-items:center;
   background:var(--papier);
@@ -101,7 +107,6 @@ body{
 
 body.pret .chargement{
   animation:voile-part .85s cubic-bezier(.32,.72,0,1) forwards;
-  pointer-events:none;
 }
 @keyframes voile-part{
   from{opacity:1; transform:perspective(900px) translateZ(0); filter:blur(0)}
@@ -515,23 +520,24 @@ h1     {animation-delay:.13s}
   /* Le trait net. Sur un panneau gris, « briller » veut dire BLANC : il n'y a
      pas d'autre façon d'être plus lumineux que le fond. Le bleu ne sert qu'à
      colorer le débord, sinon la lueur serait grise. */
-  border:2px solid #FFFFFF;
+  border:3px solid #FFFFFF;
   box-shadow:
-    0 0 10px rgba(255,255,255,1),
-    0 0 28px 2px rgba(255,255,255,.85),
-    0 0 66px 6px rgba(140,175,255,.38),
-    0 0 130px 26px rgba(96,140,240,.16);
+    0 0 8px rgba(255,255,255,1),
+    0 0 22px 3px rgba(255,255,255,1),
+    0 0 52px 8px rgba(255,255,255,.7),
+    0 0 84px 10px rgba(140,175,255,.5),
+    0 0 150px 34px rgba(96,140,240,.22);
   /* La lumière s'éteint vers le bas : un anneau d'intensité constante n'a pas
      de source, et l'œil ne lui trouve pas d'origine. */
-  -webkit-mask-image:linear-gradient(180deg,#000 0 46%,rgba(0,0,0,.34) 100%);
-          mask-image:linear-gradient(180deg,#000 0 46%,rgba(0,0,0,.34) 100%);
+  -webkit-mask-image:linear-gradient(180deg,#000 0 58%,rgba(0,0,0,.48) 100%);
+          mask-image:linear-gradient(180deg,#000 0 58%,rgba(0,0,0,.48) 100%);
 }
 /* La nappe. Un anneau épais et flou posé sous le trait : c'est elle qui donne
    l'épaisseur de la lumière, le trait seul ne fait qu'un fil. */
 .arc::before{
   content:''; position:absolute; inset:-3px; border-radius:50%;
-  border:9px solid rgba(255,255,255,.85);
-  filter:blur(13px);
+  border:13px solid rgba(255,255,255,1);
+  filter:blur(14px);
 }
 /* Un second cercle, très loin et très faible. Il ne se voit pas vraiment —
    il donne la profondeur qui manque à un cercle seul. */
@@ -578,7 +584,6 @@ h1     {animation-delay:.13s}
 }
 .sch-1 .ic{animation-duration:7.4s;  animation-delay:1.2s}
 .sch-2 .ic{animation-duration:8.6s;  animation-delay:1.6s}
-.sch-3 .ic{animation-duration:9.7s;  animation-delay:1.0s}
 .sch-4 .ic{animation-duration:8.1s;  animation-delay:1.8s}
 .sch-5 .ic{animation-duration:10.3s; animation-delay:1.4s}
 .sch:hover .ic{scale:1.07}
@@ -608,17 +613,16 @@ h1     {animation-delay:.13s}
    CENTRE DE L'ICÔNE qui tombe sur l'arc, et non le bord du texte. */
 /* Le recentrage sur l'arc suit la taille de l'icône, qui n'est plus fixe. */
 .sch-4,.sch-5{translate:calc(max(54px, 2.81vw) / -2) 50%}
-.sch-1,.sch-2,.sch-3{translate:calc(-100% + max(54px, 2.81vw) / 2) 50%;
+.sch-1,.sch-2{translate:calc(-100% + max(54px, 2.81vw) / 2) 50%;
                      flex-direction:row-reverse; text-align:right}
 
 /* Aucun repère entre 60° et 120° : c'est là que passe le téléphone. Ils
    montent le long de l'arc à gauche, le franchissent, et redescendent à
    droite — l'ordre de lecture est celui du parcours. */
-.sch-1{--a:122deg; animation-delay:.62s}   /* facile      */
-.sch-2{--a:145deg; animation-delay:.78s}   /* rapide      */
-.sch-3{--a:168deg; animation-delay:.92s}   /* une vidéo   */
-.sch-4{--a:44deg; animation-delay:.70s}    /* le QR code  */
-.sch-5{--a:18deg; animation-delay:.85s}    /* l'app       */
+.sch-1{--a:128deg; animation-delay:.62s}   /* facile      */
+.sch-2{--a:158deg; animation-delay:.78s}   /* rapide      */
+.sch-4{--a:52deg; animation-delay:.70s}    /* le QR code  */
+.sch-5{--a:22deg; animation-delay:.85s}    /* l'app       */
 
 /* ═══ ÉCRANS ÉTROITS — iPad, portables 13" ═══
    L'appareil est dimensionné par sa HAUTEUR : sur une fenêtre étroite mais
@@ -659,7 +663,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   .sch b{font-size:13px}
   .sch span{font-size:11.5px; max-width:165px}
   .sch-4,.sch-5{translate:-24px 50%}
-  .sch-1,.sch-2,.sch-3{translate:calc(-100% + 24px) 50%}
+  .sch-1,.sch-2{translate:calc(-100% + 24px) 50%}
 }
 @media (max-width:1080px){
   /* Les marges du panneau se resserrent de 22 à 16 px : les 12 px gagnés de
@@ -678,7 +682,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   .sch b{font-size:12.5px}
   .sch span{font-size:11px; max-width:116px}
   .sch-4,.sch-5{translate:-22px 50%}
-  .sch-1,.sch-2,.sch-3{translate:calc(-100% + 22px) 50%}
+  .sch-1,.sch-2{translate:calc(-100% + 22px) 50%}
 }
 
 @media (max-width:980px){
@@ -716,15 +720,8 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      55° et 125° les placent à 150 px du centre : c'est le seul endroit où ils
      mordent sur le téléphone sans sortir du panneau. Ils reprennent la formule
      du cercle, que la règle générale de téléphone avait annulée. */
+  /* Aucun repère : seul l'arc reste, derrière l'appareil. */
   .sch{display:none}
-  .sch-1,.sch-2{display:block;
-    left:calc(50% + var(--r) * cos(var(--a)));
-    bottom:calc(var(--r) * sin(var(--a)));
-    right:auto; top:auto; translate:-50% 50%}
-  /* L'icône seule : le libellé n'a pas la place, et il passerait sur l'écran. */
-  .sch-1 span,.sch-2 span{display:none}
-  .sch-1{--a:55deg}    /* facile, à droite */
-  .sch-2{--a:125deg}   /* rapide, à gauche */
   .panneau{--r:min(260px, 68vw)}
 
   .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 8px}
@@ -865,27 +862,22 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
        passe l'appareil. -->
   <div class="sch sch-1">
     <i class="ic ic-violet"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gViolet)" stroke-width="1.7" stroke-linejoin="round"><path d="M9.5 2.6 11.4 7.6 16.4 9.5 11.4 11.4 9.5 16.4 7.6 11.4 2.6 9.5 7.6 7.6z"/><path d="m17.6 14.4 1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1z" fill="url(#gViolet)" stroke="none"/></svg></i>
-    <span><b>Facile</b><em>vous filmez, l'IA rédige tout.</em></span>
+    <span><b>Facile</b><em>une vidéo, l'IA rédige.</em></span>
   </div>
 
   <div class="sch sch-2">
     <i class="ic ic-orange"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gOrange)" stroke-width="1.7" stroke-linejoin="round"><path d="M13.4 2.5 5.2 13.4h5.6l-.8 8.1 8.8-11.2h-5.9z"/></svg></i>
-    <span><b>Rapide</b><em>la procédure s'ouvre d'un<br>scan ou dans l'app.</em></span>
-  </div>
-
-  <div class="sch sch-3">
-    <i class="ic ic-bleu"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gBleu)" stroke-width="1.7" stroke-linejoin="round"><rect x="2.5" y="6.5" width="12" height="11" rx="2.6"/><path d="m14.5 10.6 5-2.5a.6.6 0 0 1 .9.5v6.8a.6.6 0 0 1-.9.5l-5-2.5z"/></svg></i>
-    <span><b>Une vidéo</b><em>l'IA écrit la procédure.</em></span>
+    <span><b>Rapide</b><em>une procédure prête<br>en quelques minutes.</em></span>
   </div>
 
   <div class="sch sch-4">
     <i class="ic ic-vert"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gVert)" stroke-width="1.7" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.8"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.8"/><path d="M13.5 13.5h4v4h-4zM21 13.5v4M13.5 21h7.5"/></svg></i>
-    <span><b>Un QR code</b><em>l'équipe scanne.</em></span>
+    <span><b>Un QR code</b><em>pour chaque procédure.</em></span>
   </div>
 
   <div class="sch sch-5">
     <i class="ic ic-gris"><svg viewBox="0 0 24 24" fill="none" stroke="url(#gGris)" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M10.4 18.4h3.2"/><path d="M9.4 7h5.2M9.4 10.6h5.2M9.4 14.2h3.4"/></svg></i>
-    <span><b>L'app</b><em>toutes les procédures.</em></span>
+    <span><b>L'app</b><em>le centre de toutes<br>vos procédures.</em></span>
   </div>
 
   </div>
@@ -936,15 +928,26 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      au moindre frémissement.
      L'écouteur reste en secours pour les navigateurs sans observateur. */
   const sentinelle=document.querySelector('.sentinelle');
-  const bascule=(dedans)=>hote.classList.toggle('flotte', !dedans);
+  const pose=(flotte)=>hote.classList.toggle('flotte', flotte);
 
+  /* LES DEUX déclencheurs, pas l'un OU l'autre.
+     L'observateur est fiable pendant l'inertie sur iOS, là où l'écouteur de
+     `scroll` est regroupé et arrive en retard. Mais certains navigateurs
+     intégrés — Instagram, Messenger, LinkedIn — le notifient mal, voire pas du
+     tout. L'écouteur reste donc en place : ils ne se contredisent jamais,
+     puisqu'ils lisent la même chose, la position du repère.
+     `pageshow` couvre le retour par le cache de navigation, où ni l'un ni
+     l'autre ne se déclenche : la page réapparaît telle qu'on l'a quittée. */
+  const relit=()=>pose(scrollY > 8);
   if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([e])=>bascule(e.isIntersecting),
-                             {threshold:0}).observe(sentinelle);
-  } else {
-    const suit=()=>bascule(scrollY<=8);
-    suit(); addEventListener('scroll', suit, {passive:true});
+    new IntersectionObserver(([e])=>pose(!e.isIntersecting), {threshold:0})
+      .observe(sentinelle);
   }
+  relit();
+  addEventListener('scroll', relit, {passive:true});
+  addEventListener('pageshow', relit);
+  addEventListener('resize', relit, {passive:true});
+  addEventListener('orientationchange', relit);
 })();
 (function(){
   const barre=document.querySelector('.barre'),

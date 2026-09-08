@@ -323,10 +323,10 @@ body.pret .chargement-marque{animation:none; opacity:1}
 .mot svg{width:15px;height:15px;flex-shrink:0}
 
 h1{font-family:Poppins,sans-serif; font-weight:600;
-   /* Jusqu'à 1920 le titre plafonne à 54 px. Au-delà il reprend sa
-      croissance : 2,81 vw vaut exactement 54 px à 1920, donc rien ne saute au
-      passage. Nouveau plafond à 78 px. */
-   font-size:clamp(33px, max(min(3.8vw, 54px), 2.81vw), 78px); line-height:1.075; letter-spacing:-.036em;
+   /* De 1440 à 1920 le titre plafonne à 60 px. Au-delà il reprend sa
+      croissance : 3,125 vw vaut exactement 60 px à 1920, donc rien ne saute au
+      passage. Plafond final à 86 px. */
+   font-size:clamp(33px, max(min(4.17vw, 60px), 3.125vw), 86px); line-height:1.075; letter-spacing:-.036em;
    color:var(--encre); margin:18px 0 0; max-width:none}
 /* La coupure du titre est ÉCRITE, pas laissée au hasard de la largeur : sur
    tablette et téléphone il tient toujours sur deux lignes, coupées au même

@@ -729,9 +729,9 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      du cercle, que la règle générale de téléphone avait annulée. */
   /* Aucun repère : seul l'arc reste, derrière l'appareil. */
   .sch{display:none}
-  /* Le cercle suit l'appareil : son rayon est la même expression divisée par
-     1,158, le rapport hauteur de l'image sur rayon employé partout ailleurs. */
-  .panneau{--r:min(calc(104vw / 1.158), 420px)}
+  /* Rayon rétabli à sa valeur d'origine : le lier à la taille de l'appareil
+     donnait un arc trop large sur téléphone. */
+  .panneau{--r:min(260px, 68vw)}
 
   .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 8px}
   .barre{padding:7px 7px 7px 16px}

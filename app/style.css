@@ -21824,7 +21824,7 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 
   /* ⚠ ET AUCUN DEPLACEMENT. Les anciennes regles posaient `transform` ; sans
      ce rappel, la derniere valeur resterait. */
-  transform:none !important;
+  
 }
 
 
@@ -21951,4 +21951,167 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
   0%  { opacity:1; transform:translateY(28px) scale(0.97); filter:blur(3px); }
   70% { filter:blur(0px); }
   100%{ opacity:1; transform:none; filter:blur(0px); }
+}
+
+
+/* ═══ LE GESTE « E » — LA FEUILLE DESCEND ET SE FLOUTE ═══
+
+   ⚠ LE MOUVEMENT MENE, LE FLOU SUIT. Vingt pixels vers le bas, une echelle qui
+     tombe a 0,97, sept pixels de flou. La feuille repart par ou elle est venue,
+     sans qu'on la voie tomber.
+
+   ⚠ COURBE QUI ACCELERE. `cubic-bezier(0.4, 0, 1, 1)` : depart lent, sortie
+     rapide — comme un objet qu'on laisse aller. La courbe des arrivees freine
+     en fin de course, ce qui donnait a la feuille l'air de s'arreter en
+     chemin.
+
+   ⚠ ET ELLE RESTE VISIBLE PLUS LONGTEMPS QUE LE MOUVEMENT. L'opacite ne tombe
+     qu'apres 40 % du trajet : sans cela on ne verrait qu'un fondu, et le
+     deplacement passerait inaperçu. */
+@keyframes feuilleDescend{
+  0%  { opacity:1; transform:none; filter:blur(0px); }
+  40% { opacity:1; }
+  100%{ opacity:0; transform:translateY(20px) scale(0.97); filter:blur(7px); }
+}
+
+.screen.feuille-part,
+body.retour-de-feuille .screen:not(.active).feuille-part,
+.screen.feuille-part#p-create-manual,
+.screen.feuille-part#p-create-video,
+.screen.feuille-part#p-create-doc,
+.screen.feuille-part#p-create-ai{
+  animation:feuilleDescend 0.30s cubic-bezier(0.4, 0, 1, 1) both !important;
+  transform-origin:50% 50%;
+
+  /* ⚠ ET RIEN D'AUTRE NE BOUGE PENDANT CE TEMPS. Treize transitions de
+     `padding-top` se sont accumulees sur `.screen` au fil des tours ; l'une
+     d'elles animait le rembourrage de la feuille pendant qu'elle partait. */
+  transition:none !important;
+  padding-top:inherit;
+}
+
+
+/* ⚠ LE `transform:none !important` D'UN TOUR PRECEDENT EST LEVE.
+
+   Il datait de « feuilleSeDissout », le geste sans mouvement : la feuille se
+   floutait sur place, donc figer sa position etait juste.
+
+   Le geste E la fait descendre — cette contrainte l'en empechait. Mesure :
+   l'opacite et le flou suivaient, mais `y` restait a zero.
+
+ ⚠ ON REDECLARE L'ANIMATION EN DERNIER plutot que de retirer l'ancienne regle :
+   une animation ne peut pas deplacer un element dont le `transform` est force,
+   mais elle reprend la main des que la contrainte disparait. */
+.screen.feuille-part,
+body.retour-de-feuille .screen:not(.active).feuille-part,
+.screen.feuille-part#p-create-manual,
+.screen.feuille-part#p-create-video,
+.screen.feuille-part#p-create-doc,
+.screen.feuille-part#p-create-ai{
+  animation:feuilleDescend 0.30s cubic-bezier(0.4, 0, 1, 1) both !important;
+  transform-origin:50% 50%;
+  transition:none !important;
+
+  /* ⚠ ON REDECLARE `transform` POUR LEVER LE `none` DE L'ANCIENNE REGLE.
+
+     `revert-layer` rend a l'element ce qu'il aurait sans cette contrainte :
+     ni valeur figee, ni valeur imposee. L'animation reprend alors la main.
+
+     Redeclarer une valeur en dur ne marcherait pas — elle ecraserait
+     l'animation, qui pilote justement cette propriete. */
+  transform:revert-layer !important;
+}
+
+
+/* ═══ LA CARTE D'IDENTITE ═══
+
+   ⚠ QUATRE CHOSES, TROIS NIVEAUX. La photo a gauche, puis le nom, le poste et
+     l'adresse empiles — du plus important au moins.
+
+   ⚠ LE POSTE EN BLEU, entre le nom et l'adresse. C'est ce qui distingue une
+     personne d'une autre dans une equipe ; l'e-mail ne sert qu'a verifier
+     qu'on est sur le bon compte. */
+
+.id-carte{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  width:100%;
+  padding:16px 14px 16px 16px;
+  border:none;
+  background:none;
+  font-family:inherit;
+  text-align:left;
+}
+
+.id-av{
+  position:relative;
+  flex:0 0 56px;
+  width:56px;
+  height:56px;
+  border-radius:18px;
+  overflow:hidden;
+  background:linear-gradient(145deg, #4C86E8, #1F4CEE);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.id-av .reg-av-ini{
+  font-size:20px;
+  font-weight:650;
+  letter-spacing:0.01em;
+  color:#FFFFFF;
+}
+
+.id-av .reg-av-img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.id-tx{
+  flex:1 1 auto;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.id-nom{
+  font-size:19px;
+  font-weight:650;
+  letter-spacing:-0.025em;
+  color:var(--label);
+
+  /* ⚠ UN NOM LONG SE COUPE plutot que de pousser la fleche hors de la carte. */
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.id-poste{
+  font-size:13.5px;
+  font-weight:600;
+  color:#1F4CEE;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.id-poste[hidden]{ display:none; }
+
+.id-mail{
+  font-size:13.5px;
+  color:var(--label-2);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.id-fl{
+  flex:0 0 auto;
+  font-size:20px;
+  color:var(--label-3);
 }

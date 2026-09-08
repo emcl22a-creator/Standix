@@ -25664,9 +25664,31 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
 
      ⚠ ON NE BLOQUE QUE LA CREATION. Modifier une entreprise existante — son nom,
        son logo — reste libre : `entrepriseId` est alors renseigne. */
-    if (!entrepriseId && (mesEtablissements || []).length >= 1) {
-      const paye = (mesEtablissements || []).some(e => e.abonnement_statut === 'actif')
-        || etatAbo?.statut === 'actif'
+    /* ⚠ ON NE COMPTE QUE LES ENTREPRISES QU'ON A FONDEES.
+
+       Ma premiere version comptait `mesEtablissements` en entier — mais cette
+       liste contient TOUTES les entreprises ou l'on est membre, y compris
+       celles ou l'on a ete invite en gestion.
+
+       Un gestionnaire invite chez quelqu'un se voyait donc refuser la creation
+       de sa propre premiere entreprise, alors qu'il n'en a fonde aucune.
+
+     ⚠ LE FONDATEUR SE RECONNAIT A `promu_par` VIDE — c'est le meme critere que
+       `estFondateur`, applique ici a chaque ligne de la liste. */
+    const fondees = (mesEtablissements || [])
+      .filter(e => e.role === 'gestion' && !e.promu_par)
+
+    if (!entrepriseId && fondees.length >= 1) {
+      /* ⚠ ON NE REGARDE QUE LES ENTREPRISES FONDEES, pas `etatAbo`.
+
+         `etatAbo` decrit l'entreprise COURANTE — celle ou l'on se trouve, qui
+         peut appartenir a quelqu'un d'autre. Quelqu'un dont la propre
+         entreprise est en essai, mais qui consulte celle d'un client abonne,
+         passait la verification.
+
+         La question est : « une des entreprises que J'AI fondees est-elle
+         abonnee ? » Rien d'autre ne compte. */
+      const paye = fondees.some(e => e.abonnement_statut === 'actif')
       if (!paye) {
         throw new Error(
           'Votre premi\u00e8re entreprise n\u2019est pas encore abonn\u00e9e. ' +

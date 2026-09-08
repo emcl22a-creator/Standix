@@ -72,6 +72,147 @@
   .pied b{color:rgba(235,235,245,.7);font-weight:700}
   a{color:#FDA81E;text-decoration:none}
   a:hover{text-decoration:underline}
+
+  /* ═══════════════════════════════════════════════════════════════════════
+     LA PALETTE DE L'APPLICATION
+
+     ⚠ LA PAGE ETAIT SOMBRE, L'APP EST CLAIRE. Un lien depuis les reglages
+       menait d'un fond #F5F5F9 a un fond #050506 : la rupture etait totale.
+
+     ⚠ ON REPREND LES MEMES VALEURS, une a une. Le fond, le texte, les deux
+       gris attenues, la bordure — celles de `style.css`.
+
+     ⚠ ET L'OR DEVIENT BLEU. Les accents employaient #FDA81E, la couleur du
+       logo. Dans l'app, ce qui se touche est bleu ; l'or n'y sert qu'a
+       l'anneau d'analyse.
+     ═══════════════════════════════════════════════════════════════════════ */
+  :root{
+    --l2:rgba(28,28,38,0.62);
+    --l3:rgba(28,28,38,0.42);
+    --bord:rgba(28,28,38,0.10);
+  }
+
+  body{
+    background:#F5F5F9;
+    color:#0F0F14;
+  }
+
+  /* ⚠ LE HALO PASSE AU BLEU ET S'ATTENUE. Sur fond clair, une tache a 30 %
+     d'opacite devient une salissure ; a 14 % elle reste une lueur. */
+  .halo{
+    background:radial-gradient(ellipse, rgba(31,76,238,.14), transparent 66%);
+  }
+
+  /* ⚠ LES CARTES SONT BLANCHES, comme celles de l'app. Un blanc translucide
+     sur fond clair ne se voit pas. */
+  .som{
+    background:#FFFFFF;
+    border:0.5px solid var(--bord);
+    box-shadow:0 6px 20px -12px rgba(20,20,30,0.18);
+  }
+
+  .som a:hover{ color:#0F0F14; }
+
+  /* ⚠ LES NUMEROS ET LES ACCENTS EN BLEU. */
+  .som a::before,
+  article .num i{
+    color:#1F4CEE;
+  }
+
+  /* ⚠ ET LES LIENS DU CORPS AUSSI. */
+  article a{ color:#1F4CEE; }
+
+  /* ⚠ LES ENCADRES IMPORTANTS PASSENT EN BLEU CLAIR.
+
+     Ils etaient en or sur fond sombre : un titre #FDA81E et un texte #FFDFA0,
+     illisibles sur du clair.
+
+     Ils reprennent la teinte de la carte « Essai 14 jours » de l'app — un fond
+     bleu tres pale, un titre bleu franc, un corps gris. */
+  .cle{
+    background:linear-gradient(145deg, rgba(31,76,238,.07), rgba(31,76,238,.04));
+    border:0.5px solid rgba(31,76,238,.14);
+  }
+  .cle .t{ color:#1F4CEE; }
+  .cle p,
+  .cle b{ color:var(--l2); }
+  .cle b{ color:#0F0F14; }
+
+  /* ⚠ LE LOGO EST UNE IMAGE ORANGE — celle du logotype colore. L'app emploie
+     sa version noire dans ses en-tetes.
+
+     `filter` la desature et la fonce sans avoir a remplacer l'image : plus
+     simple, et rien a telecharger de plus. */
+  .marque img{
+    filter:grayscale(1) brightness(0.22);
+  }
+
+  /* ═══ CE QUI RESTAIT EN BLANC OU EN OR ═══
+
+     ⚠ HUIT REGLES D'ORIGINE ECHAPPAIENT A MA PREMIERE PASSE. Elles sont
+       ecrites plus haut dans le fichier, avant mes ajouts, et visent des
+       elements que je n'avais pas nommes : les titres de section, les mots en
+       gras, les cellules de tableau, les liens.
+
+     ⚠ SUR FOND CLAIR, TOUT CE QUI ETAIT BLANC DEVIENT NOIR — la couleur du
+       texte principal de l'app, `#0F0F14`. */
+  h3,
+  p b, li b, td b,
+  td:first-child,
+  .som a:hover{
+    color:#0F0F14;
+  }
+
+  /* ⚠ ET LES LIENS PASSENT AU BLEU, comme partout dans l'app. */
+  a{ color:#1F4CEE; }
+
+  /* ⚠ LES BORDURES ET FONDS TRANSLUCIDES BLANCS NE SE VOIENT PAS sur du
+     clair : ils deviennent des gris tres pales. */
+  .som{
+    background:#FFFFFF;
+  }
+
+  td{
+    background:rgba(28,28,38,0.03);
+    border-color:rgba(28,28,38,0.10);
+  }
+
+  /* ⚠ LE PIED DE PAGE EMPLOYAIT UN BLANC ATTENUE — `rgba(235,235,245,.7)`,
+     invisible sur du clair. Il reprend le gris de l'app. */
+  .pied b{ color:var(--l2); }
+
+  /* ⚠ LES PUCES DE LISTE ETAIENT AMBREES.
+
+     `li::before` employait `rgba(253,168,30,.55)` — les gros points devant
+     chaque element. Je les avais manquees : elles ne portent pas de couleur de
+     texte, seulement une couleur de fond ou de contenu.
+
+     Elles passent au bleu, comme les numeros d'article. */
+  /* ⚠ SEULEMENT LES LISTES DU CORPS, pas celles du sommaire.
+
+     Ma premiere version visait tous les `li` : le sommaire, qui numerote ses
+     entrees par un compteur, recevait en plus un point bleu par-dessus ses
+     chiffres.
+
+     `article li` ne touche que les listes a puces des articles. */
+  article li::before{
+    background:#1F4CEE;
+  }
+
+  /* ⚠ LE POINT AMBRE DU SOMMAIRE VENAIT DE `li::before`, HERITE.
+
+     La regle d'origine `li::before` pose un rond de 5 px sur TOUT `li` — y
+     compris ceux du sommaire, qui affichent deja leur numero par `a::before`.
+
+     Sur fond sombre l'ambre se voyait peu ; sur clair, un point orange se
+     posait a cote de chaque numero.
+
+     On le retire du sommaire, ou il n'a jamais rien apporte. */
+  .som li::before{ display:none; }
+
+  /* ⚠ ET LES NUMEROS EN BLEU, en dernier pour l'emporter sur la regle
+     d'origine qui est plus haut dans le fichier. */
+  .som a::before{ color:#1F4CEE; }
 </style></head><body>
 
 <div class="tete">
@@ -198,7 +339,7 @@ inventée</b>, et l'absence de mise en garde ne signifie pas l'absence de danger
   <tr><td>Anthropic</td><td>Rédaction des étapes</td>
       <td>La transcription et les éléments reconnus</td></tr>
   <tr><td>Stripe</td><td>Paiement</td><td>Vos informations de facturation</td></tr>
-  <tr><td>Netlify</td><td>Diffusion de l'application</td><td>Aucune donnée métier</td></tr>
+  <tr><td>GitHub Pages</td><td>Diffusion de l'application</td><td>Aucune donnée métier</td></tr>
 </table>
 <p>Ces prestataires agissent sur nos instructions et sont soumis à leurs propres
 engagements de confidentialité. Les traitements ont lieu au sein de l'Union européenne
@@ -273,7 +414,7 @@ dans les conditions prévues par le code de la consommation.</p>
   Version en vigueur le <b>27 août 2026</b>.<br><br>
   <b>Standix</b> — Adrien Moine, entrepreneur individuel<br>
   SIRET 100 403 401 00019 · <a href="mailto:standix.app@gmail.com">standix.app@gmail.com</a><br>
-  Hébergement : Netlify et Supabase.
+  Hébergement : GitHub Pages et Supabase.
 </div>
 
 </div>

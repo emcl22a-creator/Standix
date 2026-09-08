@@ -7679,20 +7679,21 @@ function majBarreHaute(id) {
        ecran la prend, et rien ne la distingue alors des ecrans inertes.
 
        `feuille-part` la nomme le temps de l'animation, puis s'efface. */
-    /* ⚠ LA FEUILLE NE SE REGARDE PAS PARTIR.
+    /* ⚠ LA FEUILLE SE FLOUTE EN PARTANT.
 
-       Elle etait marquee `feuille-part` pour rester affichee le temps d'une
-       animation de sortie. Mais la reference — « Abonnement » — n'en a aucune :
-       l'ecran quitte passe en `display:none` tout de suite, et seul celui qui
-       arrive s'anime.
+       `feuille-part` la maintient affichee le temps de son depart. Le CSS lui
+       donne `ecranFlou` — le meme flou que celui des changements de page, mais
+       joue a l'envers : elle part nette et se brouille.
 
-       Mesure comparee : vers Abonnement, la page partante affiche
-       `display:none`, zero animation. Au retour d'un dossier, elle restait en
-       `display:block` avec une animation en cours. C'etait la seule difference.
-
-     ⚠ ON GARDE LE NETTOYAGE. Une feuille marquee par un tour precedent doit
+     ⚠ ON NETTOIE D'ABORD. Une feuille marquee par un depart precedent doit
        perdre sa classe, sinon elle resterait affichee indefiniment. */
     document.querySelectorAll('.feuille-part').forEach(s => s.classList.remove('feuille-part'))
+
+    const partante = document.querySelector('.screen.active')
+    if (partante) {
+      partante.classList.add('feuille-part')
+      setTimeout(() => partante.classList.remove('feuille-part'), 320)
+    }
 
     clearTimeout(degelRetour)
     degelRetour = setTimeout(() =>

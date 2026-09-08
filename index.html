@@ -315,6 +315,11 @@ h1{font-family:Poppins,sans-serif; font-weight:600;
       passage. Nouveau plafond à 78 px. */
    font-size:clamp(33px, max(min(3.8vw, 54px), 2.81vw), 78px); line-height:1.075; letter-spacing:-.036em;
    color:var(--encre); margin:18px 0 0; max-width:none}
+/* La coupure du titre est ÉCRITE, pas laissée au hasard de la largeur : sur
+   tablette et téléphone il tient toujours sur deux lignes, coupées au même
+   endroit. Sur bureau la balise est masquée et l'espace qui la suit rétablit
+   la ligne unique. */
+.coupe2{display:none}
 .sous{margin:14px auto 0; font-size:max(17px, .885vw); line-height:1.5; color:var(--gris); max-width:44ch}
 
 /* ─── Les deux actions ─── Le premier porte le dégradé de « Générer les
@@ -634,7 +639,8 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      recentre au lieu de rester collé en haut : sur une fenêtre haute, il
      laissait 440 px de gris nu entre le prix et le téléphone. */
   .deux{flex:1; justify-content:center; padding-bottom:14px}
-  h1{font-size:clamp(31px,3.9vw,46px)}
+  h1{font-size:clamp(36px, 5vw, 58px)}
+  .coupe2{display:inline}
   .ic{width:48px; height:48px; border-radius:15px}
   .ic svg{width:27px; height:27px}
   .sch b{font-size:13px}
@@ -653,7 +659,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
   /* `0 1` et non `0 0` : sur un écran court — iPad paysage en 768 — la scène
      doit pouvoir se comprimer, sinon la page déborde de la fenêtre. */
 
-  h1{font-size:clamp(34px,4.6vw,50px)}
+  h1{font-size:clamp(36px, 5vw, 58px)}
   .ic{width:44px; height:44px; border-radius:14px}
   .ic svg{width:25px; height:25px}
   .sch b{font-size:12.5px}
@@ -673,7 +679,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      entière pour une information que la ligne de prix redit déjà. */
   .mot{display:none}
   .deux{max-width:none; flex:0 0 auto; justify-content:flex-start; padding-bottom:0}
-  h1{max-width:none; font-size:clamp(29px,7vw,40px)}
+  h1{max-width:none; font-size:clamp(32px, 8.2vw, 46px)}
   .sous{max-width:none; font-size:15.5px}
   .actes{width:100%; flex-direction:column; align-items:stretch; margin-top:22px}
   .btn{width:100%; padding:15px 22px; font-size:15px}
@@ -786,7 +792,7 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
         14 jours d'essai, sans carte bancaire
       </span>
 
-      <h1>Filmez, l'IA crée la procédure.</h1>
+      <h1>Filmez, l'IA crée<br class="coupe2"> la procédure.</h1>
       <p class="sous">Accessible depuis un QR code et sur l'app.</p>
 
       <div class="actes">

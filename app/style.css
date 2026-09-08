@@ -22165,3 +22165,57 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
   transition:none !important;
   padding-top:inherit;
 }
+
+
+/* ⚠ LE SLOGAN PASSE DE 23 A 25 PX.
+
+   Le texte est plus court depuis qu'il dit « Filmez, l'IA cree » : il tient sur
+   deux lignes meme a cette taille. */
+#login-screen .bv-slogan{
+  font-size:25px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:21px; }
+}
+
+
+/* ⚠ 24 PX, PAS 25. A vingt-cinq, la premiere ligne debordait et le slogan
+   passait sur trois lignes — la coupure du balisage ne tenait plus. */
+#login-screen .bv-slogan{
+  font-size:24px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:21px; }
+}
+
+
+/* ⚠ 22 PX. Le nouveau texte — « Filmez, l'IA cree la procedure, » — est plus
+   long avant la coupure que l'ancien. A 24 comme a 25, la premiere ligne
+   deborde et le slogan passe sur trois lignes.
+
+   Vingt-deux est le maximum qui tienne sur deux. */
+#login-screen .bv-slogan{
+  font-size:22px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:19px; }
+}
+
+
+/* ⚠ 21 PX, LA LIMITE MESUREE.
+
+   Le nouveau texte — « Filmez, l'IA cree la procedure, » — est plus long avant
+   la coupure que l'ancien. Essaye a 25, 24 puis 22 : trois lignes a chaque
+   fois.
+
+   Balaye de 22 a 18 : 21 est la premiere taille ou il tient sur deux. */
+#login-screen .bv-slogan{
+  font-size:21px;
+}
+
+@media (max-height: 700px){
+  #login-screen .bv-slogan{ font-size:19px; }
+}

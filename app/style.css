@@ -22115,3 +22115,53 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
   font-size:20px;
   color:var(--label-3);
 }
+
+
+/* ⚠ LE BOUTON RETOUR SE CENTRE SUR LE TITRE, PARTOUT.
+
+   `.detail-header` emploie `align-items:flex-start` : le bouton se cale sur le
+   haut du titre. Sur un titre d'une ligne l'ecart est d'un pixel — invisible.
+   Sur « Mouvements », dont le titre est plus haut, il monte a sept : le bouton
+   flotte au-dessus du texte.
+
+   Deux pages avaient deja ete corrigees nommement, une a une. On centre a la
+   source plutot que d'en ajouter une troisieme. */
+.detail-header{
+  align-items:center;
+}
+
+
+/* ═══ LA FEUILLE QUI PART JOUE `ecranFlou`, A L'ENVERS ═══
+
+   ⚠ LE MEME FLOU QUE LES CHANGEMENTS DE PAGE. `ecranFlou` va de cinq pixels a
+     zero : la page arrive brouillee et se precise.
+
+     Au depart, on veut l'inverse — elle part nette et se brouille. Une seule
+     valeur change de sens.
+
+   ⚠ ET RIEN D'AUTRE NE BOUGE. Pas de deplacement, pas d'echelle : ce sont les
+     gestes qui vous ont deplu aux tours precedents.
+
+   ⚠ 0,22 S, LA MEME DUREE que le flou d'arrivee. Les deux moments se
+     repondent. */
+@keyframes ecranFlouPart{
+  from{ filter:blur(0px); opacity:1; }
+  to  { filter:blur(5px); opacity:0; }
+}
+
+.screen.feuille-part,
+body.retour-de-feuille .screen:not(.active).feuille-part,
+.screen.feuille-part#p-create-manual,
+.screen.feuille-part#p-create-video,
+.screen.feuille-part#p-create-doc,
+.screen.feuille-part#p-create-ai{
+  animation:ecranFlouPart 0.22s ease-out both !important;
+
+  /* ⚠ AUCUN DEPLACEMENT : d'anciennes regles en posaient un. */
+  transform:none !important;
+
+  /* ⚠ ET AUCUNE TRANSITION. Treize regles animent `padding-top` sur `.screen` ;
+     l'une d'elles ferait glisser le contenu pendant le depart. */
+  transition:none !important;
+  padding-top:inherit;
+}

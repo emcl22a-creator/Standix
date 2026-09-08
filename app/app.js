@@ -25481,6 +25481,20 @@ function ouvrirFenetreEtab(id) {
   const fond = document.getElementById('fond-etab')
   if (!fond) return
 
+  /* ⚠ ON LEVE LE `display:none` POSE EN DUR AU CHARGEMENT.
+
+     `refermerLesVoiles` ecrit `el.style.display = 'none'` sur cette fenetre a
+     chaque entree dans l'app, pour qu'aucun voile ne subsiste d'une session a
+     l'autre.
+
+     Un style direct l'emporte sur toute regle CSS. La classe `on` ne touche que
+     l'opacite : la fenetre restait donc en `display:none`, invisible, alors que
+     le clic, la classe et l'opacite etaient corrects.
+
+     C'est exactement ce que montrait le diagnostic : « fond: none op1 z420 » —
+     la fenetre etait ouverte, mais pas affichee. */
+  fond.style.removeProperty('display')
+
   etabEdite = id ? (mesEtablissements || []).find(e => e.id === id) || null : null
   etabLogoTampon = etabEdite?.logo_url || null
 

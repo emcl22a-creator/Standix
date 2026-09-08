@@ -5556,6 +5556,26 @@ function layout() {
   const bar = document.getElementById('bar');
   const rb = bar.getBoundingClientRect();
   const z = facteurZoom();
+
+  /* ⚠ UNE BARRE NON MESURABLE NE DOIT RIEN ECRIRE.
+
+     `majBarreEspace` refusait deja de batir sous 40 px de large. `layout` ne
+     le faisait pas — et c'est elle que `rebuild` appelle, depuis le
+     chargement, l'arrivee des polices et le redimensionnement.
+
+     Mesure a barre masquee : BAR_W tombe a 0, donc REST_W a (0 - 2xPAD)/N
+     — soit -2 px — et les centres a 2 / 0 / -2 au lieu de 65 / 190 / 315.
+     Les onglets se replient a gauche, la capsule saute au bord.
+
+   ⚠ ET LA GEOMETRIE FAUSSE SURVIT A L'AFFICHAGE. Rien ne la refait : le
+     guetteur ne se declenche que si `__espaceEnAttente` est pose, ce qui
+     n'est pas le cas apres un `rebuild`. La barre restait cassee jusqu'au
+     prochain changement d'espace.
+
+     On garde donc les valeurs precedentes et on rend `false` : mieux vaut une
+     geometrie d'avant, juste, qu'une geometrie de zero. */
+  if (rb.width / z < 40) return false;
+
   BAR_W = rb.width / z;
   BAR_H = rb.height / z;
 
@@ -5582,6 +5602,7 @@ function layout() {
   // du bord oppose. Marge laterale = marge verticale.
   const half = LENS.REST_W / 2;
   CENTERS = Array.from({ length: N }, (_, i) => PAD + half + LENS.REST_W * i);
+  return true;
 }
 /* ═══ DEUX ESPACES, DEUX BARRES ═══
 
@@ -6072,7 +6093,10 @@ function contains(g) {
 }
 
 function rebuild() {
-  layout();
+  /* La barre n'est pas mesurable : on ne reconstruit rien. Reconstruire sur
+     une largeur nulle repliait tous les onglets a gauche. Le guetteur plus
+     bas rappelle `rebuild` des qu'elle reprend une largeur. */
+  if (!layout()) return;
   row(lNorm, false);
   row(lLens, true);
   buildFilter('bar-filter', Math.round(BAR_W), BAR_H, BAR_H / 2);
@@ -6093,6 +6117,34 @@ function rebuild() {
    avec sa propre portee. Sans cette ligne, `window.rebuild?.()` ne trouvait
    rien et l'appel disparaissait en silence. */
 window.rebuild = rebuild
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE SE REFAIT QUAND SA LARGEUR REDEVIENT JUSTE
+
+   ⚠ MAINTENANT QUE `layout` REFUSE DE MESURER UNE BARRE MASQUEE, il faut
+     quelqu'un pour rattraper le rendez-vous manque.
+
+     Trois cas le demandent : le `rebuild` du chargement, celui de l'arrivee
+     des polices, et une rotation survenue pendant que la barre etait cachee
+     — un basculement d'espace, un ecran a bouton retour. Dans les trois, la
+     barre reparait avec la geometrie d'AVANT.
+
+   ⚠ CELUI-CI EST PERMANENT, contrairement au guetteur de `majBarreEspace` qui
+     ne s'arme que si un espace attend. Il ne lit qu'une largeur et ne se
+     declenche que si elle a bouge : `rebuild` change le contenu de la barre,
+     jamais sa largeur, donc pas de boucle.
+
+     Le seuil de 40 px est celui de `majBarreEspace` : au-dessous, la barre
+     n'est pas affichee. */
+if (typeof ResizeObserver !== 'undefined') {
+  const barreAObserver = document.getElementById('bar')
+  if (barreAObserver) {
+    new ResizeObserver(() => {
+      const large = barreAObserver.getBoundingClientRect().width / facteurZoom()
+      if (large >= 40 && Math.abs(large - BAR_W) > 1) rebuild()
+    }).observe(barreAObserver)
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA BARRE SE REMESURE QUAND LES POLICES ARRIVENT
@@ -6127,12 +6179,39 @@ if (document.fonts && document.fonts.ready) {
 }
 rebuild();
 let rt = 0;
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SEULE LA LARGEUR COMPTE
+
+   ⚠ CHROME SUR ANDROID EMET `resize` A CHAQUE DEFILEMENT. Sa barre d'adresse
+     se retracte quand on descend et revient quand on remonte : `innerHeight`
+     change de plusieurs dizaines de pixels, donc l'evenement part. Mesure :
+     six changements de hauteur seule declenchaient six `rebuild` complets.
+
+     Safari sur iPhone ne le fait pas — il deplace `visualViewport` sans
+     emettre `resize`. C'est pourquoi le defaut ne se voyait que sur Chrome.
+
+   ⚠ CE QUE CHAQUE `rebuild` FAIT PENDANT QU'ON DEFILE : il refait le balisage
+     des deux rangees d'onglets, ce qui coupe toute transition en cours, puis
+     `snapTo` TELEPORTE la capsule sur l'onglet actif. D'ou la barre qui part
+     dans tous les sens sous le doigt.
+
+   ⚠ LA LARGEUR, ELLE, NE BOUGE PAS quand la barre d'adresse glisse. Elle ne
+     change qu'a la rotation et au redimensionnement d'une fenetre — les deux
+     seuls cas ou la barre doit vraiment se refaire.
+
+     `mesurerCentreY` reste appele dans les deux cas : il ne fait que lire deux
+     rectangles, il a son propre garde-fou pour la barre masquee, et il couvre
+     le cas ou seule la HAUTEUR de la barre change. */
+let largeurConnue = innerWidth;
 addEventListener('resize', () => {
   clearTimeout(rt);
-  /* `rebuild` remesure deja par son `requestAnimationFrame` final ; l'appel
-     direct ci-dessous couvre le cas ou seule la HAUTEUR de la barre change,
-     sans reconstruction des onglets. */
-  rt = setTimeout(() => { rebuild(); mesurerCentreY(); }, 120);
+  const changeDeLargeur = innerWidth !== largeurConnue;
+  largeurConnue = innerWidth;
+  rt = setTimeout(() => {
+    if (changeDeLargeur) rebuild();
+    mesurerCentreY();
+  }, 120);
 });
 let lastKey = '';
 /* La derniere position verticale ECRITE sur la capsule. Voir l'avertissement

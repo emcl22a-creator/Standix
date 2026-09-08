@@ -26715,10 +26715,15 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
        « Passer en Gestion » decrivait un changement de statut. Ce qui compte
        pour celui qui decide, c'est ce que la personne pourra faire ensuite. */
-    titre: `Donner l'acc\u00e8s \u00e0 l'espace gestion \u00e0 ${nom} ?`,
+    /* ⚠ ON NOMME LE ROLE, PAS LE MOUVEMENT.
+
+       « Donner l'acces a l'espace gestion » decrivait un transfert ; « Definir
+       comme gestionnaire » dit ce que la personne devient. C'est plus court et
+       plus direct, et cela repond au bouton `+` sur lequel on vient d'appuyer. */
+    titre: `D\u00e9finir ${nom} comme gestionnaire ?`,
     message: `${nom} pourra cr\u00e9er des proc\u00e9dures, suivre l'\u00e9quipe et retirer des membres. ` +
       `Elle perdra en revanche l'acc\u00e8s \u00e0 l'espace utilisateur. Vous restez le seul \u00e0 pouvoir faire ce changement.`,
-    confirmer: 'Donner l\u2019acc\u00e8s',
+    confirmer: 'D\u00e9finir comme gestionnaire',
     annuler: 'Annuler',
     danger: false,
   })
@@ -26787,10 +26792,11 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
     /* ⚠ MEME FORMULATION DANS L'AUTRE SENS, et « espace utilisateur » plutot
        que « Équipe » — c'est le nom que porte cet espace depuis qu'il a ete
        renomme. */
-    titre: `Donner l'acc\u00e8s \u00e0 l'espace utilisateur \u00e0 ${nom} ?`,
+    /* ⚠ LA MEME FORME DANS L'AUTRE SENS. */
+    titre: `D\u00e9finir ${nom} comme utilisateur ?`,
     message: `${nom} perdra l'acc\u00e8s \u00e0 l'espace gestion et ne pourra plus que consulter ` +
       `les proc\u00e9dures publi\u00e9es. Celles qu'elle a cr\u00e9\u00e9es restent en place.`,
-    confirmer: 'Donner l\u2019acc\u00e8s',
+    confirmer: 'D\u00e9finir comme utilisateur',
     annuler: 'Annuler',
     danger: true,
     /* La teinte rouge reste — le geste retire un accès, il mérite qu'on

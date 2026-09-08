@@ -25083,8 +25083,24 @@ function peindreRangEtab(idRang, idPlus, idNote) {
   }
 }
 
-;['etab-ajouter', 'e-etab-ajouter'].forEach(id => {
-  document.getElementById(id)?.addEventListener('click', () => ouvrirFenetreEtab(null))
+;/* ⚠ ON ECOUTE LE DOCUMENT, PAS LE BOUTON.
+
+   L'ancienne version posait l'ecouteur une fois au chargement :
+
+     ['etab-ajouter', 'e-etab-ajouter'].forEach(id => {
+       document.getElementById(id)?.addEventListener('click', ...)
+     })
+
+   Le `?.` etait le piege. Si le bouton n'existait pas encore a cet instant —
+   parce que le profil n'avait jamais ete ouvert, ou que le rang venait d'etre
+   repeint — l'appel ne faisait rien, sans erreur ni avertissement. Le bouton
+   restait visible et cliquable, mais n'etait relie a rien.
+
+ ⚠ UN ECOUTEUR SUR LE DOCUMENT SURVIT AUX REPEINTURES. `peindreRangEtab` vide
+   et reconstruit son contenu a chaque changement d'entreprise ; un ecouteur
+   attache au bouton lui-meme disparaitrait avec lui. */
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#etab-ajouter, #e-etab-ajouter')) ouvrirFenetreEtab(null)
 })
 
 

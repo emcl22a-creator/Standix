@@ -25120,9 +25120,10 @@ function peindreRangEtab(idRang, idPlus, idNote) {
  ⚠ UN ECOUTEUR SUR LE DOCUMENT SURVIT AUX REPEINTURES. `peindreRangEtab` vide
    et reconstruit son contenu a chaque changement d'entreprise ; un ecouteur
    attache au bouton lui-meme disparaitrait avec lui. */
-document.addEventListener('click', (e) => {
-  if (e.target.closest('#etab-ajouter, #e-etab-ajouter')) ouvrirFenetreEtab(null)
-})
+/* ⚠ L'ECOUTEUR POSE AU TOUR PRECEDENT EST RETIRE.
+
+   Il faisait doublon avec celui du tiroir, qui traite desormais ce bouton en
+   premier : la fenetre s'ouvrait deux fois de suite. */
 
 
 function peindreTiroir() {
@@ -25184,6 +25185,21 @@ function fermerTiroir() {
    page — un voile avalerait le premier appui, et il faudrait toucher deux fois
    pour atteindre ce qu'on visait. Ici le même geste referme et agit. */
 document.addEventListener('click', (e) => {
+  /* ⚠ LE BOUTON « + » DE LA CARTE EST TRAITE AVANT LE TIROIR.
+
+     L'ecouteur commençait par `if (!tiroir || tiroir.style.display === 'none')
+     return` — il abandonnait des que le tiroir etait ferme.
+
+     Or le « + » de la carte des etablissements vit DANS LA PAGE, pas dans le
+     tiroir. Il n'etait donc jamais atteint : le clic partait, la condition le
+     rejetait, et rien ne se passait — sans erreur ni message.
+
+     On traite ce bouton en premier, avant toute question de tiroir. */
+  if (e.target.closest('#etab-ajouter, #e-etab-ajouter')) {
+    ouvrirFenetreEtab(null)
+    return
+  }
+
   const tiroir = elementTiroir()
   if (!tiroir || tiroir.style.display === 'none') return
 

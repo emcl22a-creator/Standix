@@ -196,6 +196,51 @@ body.pret .chargement{
   box-shadow:0 8px 28px rgba(12,16,23,.08), 0 1px 2px rgba(12,16,23,.04);
 }
 
+/* ═══ LE FONDU DU BAS ═══
+   Apple n'emploie jamais un flou uniforme : le sien AUGMENTE vers le bord.
+   Un `backdrop-filter` seul ne sait pas faire ça — il applique une valeur
+   unique. On empile donc quatre couches, chacune plus floue que la précédente
+   et masquée sur une bande plus courte : le contenu proche du bord traverse
+   les quatre, celui du haut n'en traverse qu'une. C'est ce dégradé de flou qui
+   fait la différence avec un simple voile blanc.
+   ⚠ PLUS DE VOILE BLANC. Il ajoutait un aplat par-dessus le flou : le bas de
+   l'image ne s'estompait pas, il était recouvert. Le flou seul suffit, et il
+   laisse la couleur du fond transparaître au lieu de la remplacer. */
+.fondu{
+  position:fixed; left:0; right:0; bottom:0; height:150px;
+  z-index:40; pointer-events:none;
+}
+.fondu i{position:absolute; inset:0; display:block}
+
+/* Cinq couches, et surtout des masques qui SE CHEVAUCHENT largement : chacun
+   s'éteint bien au-delà du point où le suivant commence. C'est ce recouvrement
+   qui donne la douceur — avec des bandes qui se touchent sans se recouvrir, on
+   voit les paliers, et le fondu paraît fabriqué.
+   Le flou maximal est descendu de 16 à 11 px : au-delà, le bas de l'image
+   devient une bouillie au lieu de s'estomper. */
+.fondu i:nth-child(1){
+  -webkit-backdrop-filter:blur(.6px); backdrop-filter:blur(.6px);
+  -webkit-mask-image:linear-gradient(to top,#000 0 46%,transparent 100%);
+          mask-image:linear-gradient(to top,#000 0 46%,transparent 100%)}
+.fondu i:nth-child(2){
+  -webkit-backdrop-filter:blur(1.5px); backdrop-filter:blur(1.5px);
+  -webkit-mask-image:linear-gradient(to top,#000 0 30%,transparent 74%);
+          mask-image:linear-gradient(to top,#000 0 30%,transparent 74%)}
+.fondu i:nth-child(3){
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  -webkit-mask-image:linear-gradient(to top,#000 0 18%,transparent 54%);
+          mask-image:linear-gradient(to top,#000 0 18%,transparent 54%)}
+.fondu i:nth-child(4){
+  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+  -webkit-mask-image:linear-gradient(to top,#000 0 9%,transparent 36%);
+          mask-image:linear-gradient(to top,#000 0 9%,transparent 36%)}
+.fondu i:nth-child(5){
+  -webkit-backdrop-filter:blur(11px); backdrop-filter:blur(11px);
+  -webkit-mask-image:linear-gradient(to top,#000 0 2%,transparent 20%);
+          mask-image:linear-gradient(to top,#000 0 2%,transparent 20%)}
+
+@media (max-width:980px){ .fondu{height:118px} }
+
 /* ═══ LE BANDEAU ═══
    ⚠ SUR LE CONTENU. La référence affiche « +70 % de temps gagné », « −50 %
    d'erreurs ». Tu n'as ni utilisateurs ni mesures : ces chiffres seraient
@@ -997,6 +1042,9 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
 <section class="apres"><p>Section 2 — le bandeau disparaît à la fin de celle-ci.</p></section>
 <div class="fin-bandeau" aria-hidden="true"></div>
 <section class="apres"><p>Section 3 — plus de bandeau.</p></section>
+
+<!-- ═══ LE FONDU DU BAS ═══ Quatre couches, du plus net au plus flou. -->
+<div class="fondu" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 
 <!-- ═══ LE BANDEAU ═══
      Trois faits VÉRIFIABLES, pas des pourcentages de performance. Voir la note

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=ea20fa46">
+<link rel="stylesheet" href="style.css?v=1d6bccf0">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -915,7 +915,7 @@
       </div>
 
       <div class="bv-bas">
-        <p class="bv-slogan">Filmez, l’IA crée la procédure,<br>pour l’équipe.</p>
+        <p class="bv-slogan">Filmez,<br>l’IA crée la procédure,<br>pour l’équipe.</p>
 
         <!-- ⚠ LA CONNEXION D'ABORD. La plupart des gens qui ouvrent l'app ont
              deja un compte : leur demander de chercher un bouton serait leur
@@ -3221,10 +3221,6 @@
 
              La ligne rejoint donc le groupe de l'equipe pour de bon, et
              `appliquerAccesAbonnement` n'a plus a la deplacer. -->
-      <button type="button" class="reg-ligne" id="ligne-quota" onclick="ouvrirQuota()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
-        <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
-      </button>
       </div>
 
     <!-- ⚠ LE TITRE ET SA LIGNE SE MASQUENT ENSEMBLE pour un gestionnaire
@@ -3329,6 +3325,18 @@
       <button type="button" class="reg-ligne" id="profil-abonnement">
         <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3.4l2.5 5.2 5.7.8-4.1 4 1 5.7L12 16.4 6.9 19.1l1-5.7-4.1-4 5.7-.8Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Abonnement</span>
         <span class="reg-val" id="profil-abo-actuel">—</span><span class="reg-fl">›</span>
+      </button>
+
+        <!-- ⚠ « Analyses vidéo AI » A QUITTE LA PAGE ÉQUIPE.
+
+             Elle y etait la seule ligne a ne pas parler de gens : c'est un
+             quota d'abonnement, pas un reglage d'equipe. Le titre « Équipe »
+             devient exact sans elle.
+
+             Elle rejoint « Abonnement », qui traite du meme sujet. -->
+        <button type="button" class="reg-ligne" id="ligne-quota" onclick="ouvrirQuota()">
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
+        <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
     </div>
 
@@ -4757,7 +4765,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=2639d621"></script>
+<script type="module" src="app.js?v=441d96b0"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

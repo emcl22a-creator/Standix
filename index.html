@@ -157,6 +157,18 @@ body.pret .chargement-marque{animation:none; opacity:1}
    supporte, jamais plus large qu'au repos. */
 .barre-hote.flotte{padding-inline:max(calc(var(--marge) + 10px),
                                       calc((100% - var(--serre)) / 2))}
+
+/* ─── LE CONTENU SE CONDENSE AUSSI ───
+   Le resserrement de la barre ne parcourt que 30 px sur téléphone contre 428
+   sur bureau : à cette amplitude, l'œil ne le voit pas. Le logo et les actions
+   se réduisent donc en même temps. C'est du `scale`, pas une taille : rien ne
+   se remet en page, la hauteur de la barre ne bouge pas — et c'est justement
+   elle qui fixe la hauteur du panneau. */
+.marque,.droite{transform-origin:left center;
+                transition:scale .55s cubic-bezier(.32,.72,0,1)}
+.droite{transform-origin:right center}
+.barre-hote.flotte .marque,
+.barre-hote.flotte .droite{scale:.88}
 .barre{border-radius:100px; border:1px solid transparent;
        transition:background .32s cubic-bezier(.32,.72,0,1),
                   box-shadow .32s cubic-bezier(.32,.72,0,1),
@@ -456,7 +468,12 @@ h1     {animation-delay:.13s}
 .arc  {animation:ouvre 1.2s cubic-bezier(.32,.72,0,1) .42s both}
 .socle{animation:ouvre 1.2s cubic-bezier(.32,.72,0,1) .5s both}
 .lueur{animation:ouvre 1.4s cubic-bezier(.32,.72,0,1) .5s both}
-.barre-hote{animation:monte .7s cubic-bezier(.32,.72,0,1) both}
+/* ⚠ L'ENTRÉE EST SUR LES ENFANTS, PAS SUR L'HÔTE. Une animation d'opacité
+   crée une RACINE D'ARRIÈRE-PLAN : le `backdrop-filter` de la barre ne voyait
+   plus la page derrière elle, seulement son propre contenu — le verre était
+   déclaré mais ne floutait rien. */
+.marque{animation:monte .7s cubic-bezier(.32,.72,0,1) .04s both}
+.droite{animation:monte .7s cubic-bezier(.32,.72,0,1) .12s both}
 
 /* La nappe de l'arc et la lumière du panneau respirent très lentement : c'est
    ce qui empêche la page de paraître figée une fois l'entrée terminée. */
@@ -599,10 +616,10 @@ h1     {animation-delay:.13s}
    raccourci réinitialise `animation-play-state` à `running`. Placée avant,
    elle était silencieusement annulée — le titre finissait son entrée derrière
    le voile et la page s'ouvrait déjà figée. */
-.texte > *,.scene,.arc,.socle,.lueur,.barre-hote,.sch,.ic,
+.texte > *,.scene,.arc,.socle,.lueur,.marque,.droite,.sch,.ic,
 .arc::before,.panneau::before{animation-play-state:paused}
 body.pret .texte > *,body.pret .scene,body.pret .arc,body.pret .socle,
-body.pret .lueur,body.pret .barre-hote,body.pret .sch,body.pret .ic,
+body.pret .lueur,body.pret .marque,body.pret .droite,body.pret .sch,body.pret .ic,
 body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
 
 @media (max-width:1280px){
@@ -672,7 +689,21 @@ body.pret .arc::before,body.pret .panneau::before{animation-play-state:running}
      l'appareil. À 260 px il passe derrière le téléphone et ressort par les
      côtés du panneau, qui le coupe — c'est ce qui en fait un arc et non un
      cercle posé. */
+  .prix{display:none}
+
+  /* Deux repères seulement, posés sur l'arc de part et d'autre de l'appareil.
+     55° et 125° les placent à 150 px du centre : c'est le seul endroit où ils
+     mordent sur le téléphone sans sortir du panneau. Ils reprennent la formule
+     du cercle, que la règle générale de téléphone avait annulée. */
   .sch{display:none}
+  .sch-1,.sch-2{display:block;
+    left:calc(50% + var(--r) * cos(var(--a)));
+    bottom:calc(var(--r) * sin(var(--a)));
+    right:auto; top:auto; translate:-50% 50%}
+  /* L'icône seule : le libellé n'a pas la place, et il passerait sur l'écran. */
+  .sch-1 span,.sch-2 span{display:none}
+  .sch-1{--a:55deg}    /* facile, à droite */
+  .sch-2{--a:125deg}   /* rapide, à gauche */
   .panneau{--r:min(260px, 68vw)}
 
   .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 0}

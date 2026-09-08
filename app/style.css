@@ -22302,3 +22302,17 @@ html{
 @supports not (scrollbar-gutter: stable){
   html{ overflow-y:scroll; }
 }
+
+
+/* ⚠ LA REGLE QUI BLOQUAIT LE BOUTON EST LEVEE.
+
+   `body.abo-expire [data-etab-plus]` posait `pointer-events:none` des que
+   l'entreprise COURANTE avait un essai fini — y compris quand elle appartient a
+   quelqu'un d'autre.
+
+   Le script decide maintenant lui-meme, en regardant les entreprises qu'on a
+   fondees. Il pose l'etat en style direct, ce qui l'emporte sur cette regle. */
+body.abo-expire [data-etab-plus]{
+  opacity:1;
+  pointer-events:auto;
+}

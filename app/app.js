@@ -1771,10 +1771,19 @@ document.getElementById(idO)?.addEventListener('click', (e) =>
     idO === 'bv-oubli' ? 'bv-err' : 'login-error',
     e.currentTarget)))
 
-document.getElementById('mdp-changer-g')?.addEventListener('click', (e) =>
-  demanderReinitialisation(document.getElementById('settings-email')?.value, 'settings-error', e.currentTarget))
+/* ⚠ LES DEUX BOUTONS « CHANGER LE MOT DE PASSE » VISAIENT UN CHAMP.
 
-document.getElementById('mdp-changer-e')?.addEventListener('click', (e) => {
+   `#settings-email` et `#es-email` ne sont remplis qu'a l'ouverture de « Mon
+   compte » : avant d'y etre alle, ils sont vides — et apres un changement de
+   compte sur le meme appareil, ils portaient encore l'adresse du precedent.
+   Le courriel de reinitialisation serait parti chez quelqu'un d'autre.
+
+   On lit la session. `lireAdresseSession` la redemande si besoin, ce qui
+   couvre le cas ou aucune page compte n'a encore ete ouverte. */
+document.getElementById('mdp-changer-g')?.addEventListener('click', async (e) =>
+  demanderReinitialisation(emailSession || await lireAdresseSession(), 'settings-error', e.currentTarget))
+
+document.getElementById('mdp-changer-e')?.addEventListener('click', async (e) => {
   /* L'espace Équipe n'a pas de zone d'erreur sur cette carte : on en crée une
      à la volée plutôt que d'ajouter un élément vide au balisage pour les
      rares fois où il sert. */
@@ -1785,7 +1794,7 @@ document.getElementById('mdp-changer-e')?.addEventListener('click', (e) => {
     z.id = 'es-mdp-msg'
     e.currentTarget.after(z)
   }
-  demanderReinitialisation(document.getElementById('es-email')?.value, 'es-mdp-msg', e.currentTarget)
+  demanderReinitialisation(emailSession || await lireAdresseSession(), 'es-mdp-msg', e.currentTarget)
 })
 
 /* ═══ LE RETOUR DU COURRIEL ═══
@@ -2222,6 +2231,48 @@ document.getElementById(idBouton)?.addEventListener('click', async () => {
   enterApp(membre)
   setButtonLoading(btn, false)
 }))
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   VOIR SON MOT DE PASSE
+
+   Taper un mot de passe a l'aveugle sur un telephone est la premiere cause
+   d'echec a l'inscription : on ne sait pas si la majuscule est passee, si le
+   clavier a corrige, si un caractere manque.
+
+ ⚠ ON ECOUTE LE DOCUMENT, PAS LE BOUTON. La feuille d'inscription est dans le
+   balisage des le depart, mais ce fichier a deja paye cette erreur ailleurs :
+   un `?.addEventListener` sur un element absent ne fait rien, sans erreur ni
+   avertissement, et le bouton reste cliquable sans etre relie a rien.
+
+   La delegation vaut aussi pour la suite : tout champ qui recevra la meme
+   structure marchera sans une ligne de plus.
+
+ ⚠ ON REPOSE LE CURSEUR APRES LA BASCULE. Changer le `type` d'un champ le
+   vide de sa selection : le curseur repart a la fin, et sur un mot de passe
+   qu'on etait en train de corriger au milieu, la frappe suivante atterrit au
+   mauvais endroit. On releve la position avant, on la remet apres. */
+document.addEventListener('click', (e) => {
+  const bouton = e.target.closest('[data-mdp-oeil]')
+  if (!bouton) return
+
+  const champ = document.getElementById(bouton.dataset.mdpOeil)
+  if (!champ) return
+
+  const montrer = champ.type === 'password'
+  const debut = champ.selectionStart
+  const fin = champ.selectionEnd
+
+  champ.type = montrer ? 'text' : 'password'
+  bouton.classList.toggle('vu', montrer)
+  bouton.setAttribute('aria-pressed', String(montrer))
+  bouton.setAttribute('aria-label',
+    montrer ? 'Masquer le mot de passe' : 'Afficher le mot de passe')
+
+  /* `try` parce qu'un champ `type="text"` accepte `setSelectionRange`, mais
+     tous les navigateurs ne l'autorisent pas sur tous les types. Echouer ici
+     ne doit pas empecher le mot de passe de s'afficher. */
+  try { champ.focus(); champ.setSelectionRange(debut, fin) } catch (err) {}
+})
 
 // ═══ CRÉATION DE COMPTE ═══
 document.getElementById('signup-btn')?.addEventListener('click', async () => {
@@ -3554,6 +3605,36 @@ async function enregistrerPhotoProfil() {
    ⚠ ON REMPLIT A L'OUVERTURE DE L'ECRAN, quel que soit le chemin. C'est le seul
      endroit par lequel tout le monde passe.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ADRESSE DU COMPTE A UNE SEULE SOURCE
+
+   ⚠ `#reg-email` RECOPIAIT UN CHAMP DE FORMULAIRE. Il prenait sa valeur dans
+     `#settings-email`, lui-meme rempli uniquement a l'ouverture de « Mon
+     compte ». Une copie de copie : tant qu'on n'etait pas passe par cette
+     page, la ligne d'identite du Profil montrait ce qui restait dans le champ.
+
+   ⚠ CE QUI LE RENDAIT VISIBLE : changer de compte sur le meme telephone. La
+     deconnexion vidait `procedo_membre`, les grilles et `currentMembre`, mais
+     PAS les champs ni les textes deja ecrits dans la page. Le compte suivant
+     ouvrait donc son Profil sur le nom et l'adresse du precedent — et « Mon
+     compte », qui interroge la session, affichait les bons. Exactement l'ecart
+     rapporte.
+
+   ⚠ ON GARDE UNE VARIABLE, PAS UN CHAMP. Le DOM survit au changement de
+     compte ; une variable de module se remet a null avec le reste, et la
+     lecture de la session reste au meme endroit pour tout le monde. */
+let emailSession = null
+
+async function lireAdresseSession() {
+  try {
+    const { data } = await supabase.auth.getUser()
+    emailSession = data?.user?.email || null
+  } catch (e) {
+    console.warn('[compte]', e?.message)
+  }
+  return emailSession
+}
+
 async function remplirPageCompte() {
   const nom = document.getElementById('settings-nom')
   const mail = document.getElementById('settings-email')
@@ -3564,10 +3645,8 @@ async function remplirPageCompte() {
   /* ⚠ L'ADRESSE VIENT DE LA SESSION, pas de la fiche membre. Une personne peut
      appartenir a deux entreprises : son adresse de connexion est unique, sa
      fiche non. */
-  try {
-    const { data } = await supabase.auth.getUser()
-    mail.value = data?.user?.email || ''
-  } catch (e) { console.warn('[compte]', e?.message) }
+  await lireAdresseSession()
+  mail.value = emailSession || ''
 
   peindrePhotoProfil()
 }
@@ -3630,8 +3709,19 @@ function peindreReglages() {
   if (el('reg-langue-val')) el('reg-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
   peindreReglagesEquipe()
 
-  // L'adresse vient du champ, qui est rempli au chargement du compte.
-  if (el('reg-email')) el('reg-email').textContent = el('settings-email')?.value || '\u2014'
+  /* ⚠ L'ADRESSE VIENT DE `emailSession`, PLUS DU CHAMP `#settings-email`.
+     Celui-ci n'est rempli qu'a l'ouverture de « Mon compte » : le lire ici
+     affichait l'adresse du compte precedent tant qu'on n'y etait pas alle.
+
+     Si la session n'a pas encore ete lue, on la demande et on repeint — la
+     ligne montre un tiret le temps de l'aller-retour, jamais une adresse qui
+     n'est pas la sienne. */
+  if (el('reg-email')) {
+    el('reg-email').textContent = emailSession || '\u2014'
+    if (!emailSession) lireAdresseSession().then(a => {
+      if (a && el('reg-email')) el('reg-email').textContent = a
+    })
+  }
 }
 
 /* Chaque réglage a sa page : on y entre, on en revient. C'est la navigation
@@ -3646,9 +3736,9 @@ window.openSettings = async function() {
   chargerAlertesPartage()
   showGestionScreen('p-settings')
   document.getElementById('settings-nom').value = currentMembre.nom || ''
-  const { data: userData } = await supabase.auth.getUser()
-  document.getElementById('settings-email').value = userData?.user?.email || ''
-  document.getElementById('reg-email').textContent = document.getElementById('settings-email').value || '—'
+  await lireAdresseSession()
+  document.getElementById('settings-email').value = emailSession || ''
+  document.getElementById('reg-email').textContent = emailSession || '—'
 
   // Déjà préchargé au démarrage : affichage immédiat, pas d'attente
   let entreprise = cachedEntreprise
@@ -4061,7 +4151,48 @@ window.signOut = async function() {
   } catch (e) {}
   document.getElementById('login-email').value = ''
   document.getElementById('login-password').value = ''
+  effacerTracesDuCompte()
   afficherEcranChoix()
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CE QUI RESTE ECRIT DANS LA PAGE APPARTIENT ENCORE A QUELQU'UN
+
+   ⚠ LA DECONNEXION VIDAIT LA MEMOIRE, PAS L'ECRAN. `currentMembre`,
+     `procedo_membre` et les grilles etaient bien remis a zero — mais les
+     champs et les textes deja peints restaient tels quels. L'app n'etant
+     jamais rechargee entre deux comptes, le suivant heritait du nom, de
+     l'adresse, des initiales et de la photo du precedent.
+
+   ⚠ ON VIDE PLUTOT QUE DE REPEINDRE. Repeindre demanderait de connaitre le
+     nouveau compte, qui n'existe pas encore. Un champ vide et un tiret disent
+     la verite : on ne sait pas encore.
+
+   ⚠ LES DEUX ESPACES, ET SEULEMENT LES IDENTIFIANTS QUI EXISTENT. La gestion
+     emploie le prefixe `reg-`, l'espace utilisateur `es-`. Chacun a ete
+     verifie dans le balisage : ecrire dans un identifiant absent ne leve
+     aucune erreur et laisse croire qu'un element l'attend quelque part. */
+function effacerTracesDuCompte() {
+  emailSession = null
+
+  ;['settings-nom', 'settings-email', 'es-nom', 'es-email']
+    .forEach(id => { const c = document.getElementById(id); if (c) c.value = '' })
+
+  ;['reg-nom', 'es-nom-affiche'].forEach(id => {
+    const l = document.getElementById(id); if (l) l.textContent = '\u2014'
+  })
+  ;['reg-email', 'es-email-affiche'].forEach(id => {
+    const l = document.getElementById(id); if (l) l.textContent = '\u2014'
+  })
+  ;['reg-poste-ligne', 'es-poste-ligne'].forEach(id => {
+    const l = document.getElementById(id); if (l) { l.textContent = ''; l.hidden = true }
+  })
+  ;['reg-av-initiales', 'es-initiales'].forEach(id => {
+    const l = document.getElementById(id); if (l) l.textContent = '\u2014'
+  })
+  ;['reg-av-photo', 'es-photo'].forEach(id => {
+    const i = document.getElementById(id); if (i) { i.removeAttribute('src'); i.hidden = true }
+  })
 }
 
 /* Contact depuis les réglages, dans les deux espaces. Le courriel arrive
@@ -8048,6 +8179,15 @@ window.showGestionScreen = function(id, btn) {
     appliquerAccesEntreprise()
     peindrePhotoProfil()
 
+    /* ⚠ LA LIGNE D'IDENTITE SE REPEINT ICI, ET C'EST NOUVEAU.
+
+       La page montrait la photo a jour mais gardait le nom et l'adresse
+       ecrits la derniere fois : `peindreReglages` n'etait appelee que par
+       `openSettings`, donc jamais si l'on entrait directement dans le Profil.
+       Apres un changement de compte sur le meme appareil, on lisait le nom du
+       compte precedent. */
+    peindreReglages()
+
     /* ⚠ LE BANDEAU D'ESSAI SE DESSINE ICI DESORMAIS.
 
        Il vivait dans « Gerer », et c'est cette page qui le peignait. Deplace
@@ -8194,6 +8334,15 @@ window.showEquipeScreen = function(id, btn) {
      La classe vit sur le BODY, qu'un sélecteur CSS ne peut pas atteindre
      depuis l'écran — d'où ce passage par le script. */
   document.querySelectorAll('#equipe-app .screen').forEach(s => s.classList.remove('active'))
+
+  /* ⚠ LA LIGNE D'IDENTITE SE REPEINT A CHAQUE OUVERTURE.
+
+     Seule `openEquipeSettings` la peignait. Or on entre aussi dans `e-profil`
+     par le bouton retour des sous-pages et par le bouton profil de la barre :
+     par ces chemins-la, le nom et l'adresse restaient ceux du dernier compte
+     peint. */
+  if (id === 'e-profil') peindreReglagesEquipe()
+
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
   /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
@@ -23571,7 +23720,16 @@ function peindreReglagesEquipe() {
   const nom = currentMembre?.nom || ''
   if (el('es-nom-affiche')) el('es-nom-affiche').textContent = nom || 'Votre compte'
   if (el('es-initiales')) el('es-initiales').textContent = initialesEtab(nom)
-  if (el('es-email-affiche')) el('es-email-affiche').textContent = el('es-email')?.value || '\u2014'
+  if (el('es-email-affiche')) {
+    /* ⚠ MEME DEFAUT QUE COTE GESTION : cette ligne recopiait `#es-email`, un
+       champ rempli seulement par `openEquipeSettings` — et rempli APRES
+       l'affichage de l'ecran, donc apres cette fonction. Au changement de
+       compte sur le meme appareil, elle montrait l'adresse du precedent. */
+    el('es-email-affiche').textContent = emailSession || '\u2014'
+    if (!emailSession) lireAdresseSession().then(a => {
+      if (a && el('es-email-affiche')) el('es-email-affiche').textContent = a
+    })
+  }
 
   /* Le compteur `es-nb-ent` a disparu avec sa ligne : la carte « Vos
      établissements » montre les entreprises elle-même, une par cercle. */
@@ -23593,8 +23751,12 @@ window.openEquipeSettings = async function() {
 
   showEquipeScreen('e-profil')
   document.getElementById('es-nom').value = currentMembre?.nom || ''
-  const { data: { user } } = await supabase.auth.getUser()
-  document.getElementById('es-email').value = user?.email || ''
+  await lireAdresseSession()
+  document.getElementById('es-email').value = emailSession || ''
+  /* La ligne visible suit le champ : `peindreReglagesEquipe` a tourne avant
+     que la session soit lue, elle n'avait alors qu'un tiret a poser. */
+  const aff = document.getElementById('es-email-affiche')
+  if (aff) aff.textContent = emailSession || '\u2014'
   chargerMesEntreprises()
 }
 
@@ -24909,10 +25071,41 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
 /* Trois établissements par compte. Ce n'est pas une contrainte technique mais un
    choix : au-delà, on ne gère plus des restaurants, on gère un groupe — et un
    groupe a besoin d'autre chose qu'un sélecteur dans une barre. */
-/* ⚠ CINQ ENTREPRISES PAR COMPTE, plus trois. Un abonne qui gere plusieurs
-   etablissements — une chaine de restaurants, plusieurs boutiques — butait sur
-   un plafond que rien ne justifiait. */
-const ETABLISSEMENTS_MAX = 5
+/* ⚠ SIX ENTREPRISES, ET SEULEMENT POUR CELUI QUI EN A FONDE UNE.
+
+   Le plafond etait de cinq, et la creation ouverte a tout le monde : quelqu'un
+   inscrit comme utilisateur pouvait se fabriquer une entreprise depuis son
+   profil et en devenir gerant sans jamais passer par l'inscription gerant.
+
+   Deux regles desormais, et elles sont distinctes :
+     · QUI peut creer      → celui qui a fonde au moins une entreprise
+     · COMBIEN il peut en avoir → six, comptees parmi celles qu'il a FONDEES */
+const ETABLISSEMENTS_MAX = 6
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « AVOIR CREE UN COMPTE EN TANT QUE GERANT » SE LIT DANS `promu_par`
+
+   ⚠ `role === 'gestion'` NE SUFFIT PAS. Un employe promu par son patron porte
+     ce role sans avoir jamais fonde quoi que ce soit — il ne doit pas heriter
+     du droit de creer des entreprises.
+
+   ⚠ LE FONDATEUR A `promu_par` VIDE sur une fiche « gestion ». C'est le meme
+     critere que `estFondateur`, applique a chaque ligne de la liste plutot
+     qu'a la fiche courante : quelqu'un peut gerer ici et n'etre qu'employe
+     la-bas, la question est « a-t-il fonde QUELQUE PART ».
+
+   ⚠ UN GERANT RETROGRADE NE PASSE PAS. La retrogradation remet `promu_par` a
+     null mais bascule le role sur « equipe » : les deux conditions comptent.
+
+     Ce test remplace trois copies presque identiques — `fondees`,
+     `dejaGerant`, et le filtre de la creation — qui pouvaient diverger. */
+function entreprisesFondees() {
+  return (mesEtablissements || []).filter(e => e.role === 'gestion' && !e.promu_par)
+}
+
+function peutCreerUneEntreprise() {
+  return entreprisesFondees().length > 0 || estFondateur(currentMembre)
+}
 
 let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
 /* Vrai pendant un changement d'établissement : l'app se recharge, mais son cadre
@@ -25111,7 +25304,11 @@ function peindreRangEtab(idRang, idPlus, idNote) {
   const rang = document.getElementById(idRang)
   const plus = document.getElementById(idPlus)
   const note = document.getElementById(idNote)
-  if (!rang || !plus) return
+  /* ⚠ LE « + » EST DESORMAIS FACULTATIF. Il a ete retire du balisage de
+     l'espace utilisateur : on n'y cree plus d'entreprise. Exiger sa presence
+     faisait abandonner la peinture, donc disparaitre les ronds — et avec eux
+     la bascule d'une entreprise a l'autre, qui elle reste permise. */
+  if (!rang) return
 
   const liste = mesEtablissements || []
   const courant = currentMembre?.entreprise_id
@@ -25158,13 +25355,20 @@ function peindreRangEtab(idRang, idPlus, idNote) {
       if (longue) return
       if (e.id !== courant) basculerVersEtablissement(e.id)
     })
-    rang.insertBefore(b, plus)
+    /* Sans « + », on ajoute a la fin : `insertBefore(b, null)` equivaut a
+       `appendChild`, mais on l'ecrit explicitement pour que ce soit lisible. */
+    if (plus) rang.insertBefore(b, plus); else rang.appendChild(b)
   })
 
-  /* Le « + » disparaît au plafond : proposer une création qu'on refusera
-     ensuite est pire que ne rien proposer. */
-  const plein = liste.length >= ETABLISSEMENTS_MAX
-  plus.style.display = plein ? 'none' : ''
+  /* ⚠ LE « + » NE S'AFFICHE QU'A UN FONDATEUR, et disparaît à son plafond.
+
+     Proposer une création qu'on refusera ensuite est pire que ne rien
+     proposer. Un compte créé en tant qu'utilisateur ne verra donc jamais ce
+     bouton — le refus côté `enregistrerEtablissement` reste le vrai verrou,
+     celui-ci n'est que la politesse. */
+  const peutCreer = peutCreerUneEntreprise()
+  const plein = entreprisesFondees().length >= ETABLISSEMENTS_MAX
+  if (plus) plus.style.display = (!peutCreer || plein) ? 'none' : ''
   if (note) {
     /* ═══ DEUX PHRASES, SELON QUI LIT ═══
 
@@ -25179,28 +25383,29 @@ function peindreRangEtab(idRang, idPlus, idNote) {
        On regarde s'il est gérant QUELQUE PART, pas seulement ici : celui qui
        gère une entreprise et travaille dans une autre relève du premier cas,
        où qu'il se trouve au moment de lire. */
-    /* ⚠ « Gerant » VEUT DIRE PROPRIETAIRE, pas gestionnaire.
+    /* ⚠ « Gerant » VEUT DIRE PROPRIETAIRE, pas gestionnaire. Le test comptait
+       `role === 'gestion'` — donc aussi un gestionnaire INVITE, qui n'a jamais
+       cree d'entreprise et ne voit meme pas la page Abonnement. */
+    const dejaGerant = peutCreer
 
-       Le test comptait `role === 'gestion'` — donc aussi un gestionnaire
-       INVITE, qui n'a jamais cree d'entreprise et ne voit meme pas la page
-       Abonnement.
+    /* ⚠ LA TROISIEME PHRASE EST NOUVELLE, et remplace une INVITATION.
 
-       Il lisait « les membres s'additionnent sur votre abonnement » sans avoir
-       d'abonnement. On regarde donc s'il a FONDE quelque chose : `promu_par`
-       vide sur une fiche « gestion ». */
-    const dejaGerant = (mesEtablissements || [])
-      .some(e => e.role === 'gestion' && !e.promu_par)
-      || estFondateur(currentMembre)
+       Elle disait : « Créez une entreprise et vous en êtes le gérant, avec 14
+       jours d'essai gratuit. » On la lisait sur un compte utilisateur, qui n'a
+       plus le droit de le faire : promettre puis refuser est le plus sûr moyen
+       de faire croire à une panne.
 
+       Elle décrit maintenant ce que la carte sert encore à faire — passer d'une
+       entreprise à l'autre — sans mentionner une création impossible. */
     note.innerHTML = plein
-      ? `Vous \u00eates dans ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
+      ? `Vous gérez ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
       : dejaGerant
         ? 'Cr\u00e9er un \u00e9tablissement est <b>gratuit</b>. Les membres des deux '
           + '\u00e9tablissements s\u2019additionnent sur votre abonnement : une fois le '
           + 'nombre atteint, plus personne ne peut rejoindre l\u2019un ou l\u2019autre.'
-        : 'Cr\u00e9ez une entreprise et vous en \u00eates le <b>g\u00e9rant</b>, avec '
-          + '<b>14 jours d\u2019essai gratuit</b>. Touchez un logo pour basculer '
-          + 'd\u2019une entreprise \u00e0 l\u2019autre.'
+        : 'Touchez un logo pour basculer d\u2019une entreprise \u00e0 l\u2019autre. '
+          + 'Pour rejoindre une autre entreprise, demandez son <b>code '
+          + 'd\u2019invitation</b> \u00e0 son responsable.'
   }
 }
 
@@ -25264,8 +25469,13 @@ function peindreTiroir() {
     .map(e => rondEtabHtml(e, false, `data-etab="${e.id}"`)).join('')
 
   /* Le « + » disparaît quand la limite est atteinte. Proposer un geste qu'on
-     refusera ensuite est la façon la plus sûre d'agacer quelqu'un. */
-  const peutAjouter = mesEtablissements.length < ETABLISSEMENTS_MAX
+     refusera ensuite est la façon la plus sûre d'agacer quelqu'un.
+
+     ⚠ ET IL N'APPARAIT QU'A UN FONDATEUR. Le tiroir est le second chemin vers
+       la création — le premier est la carte du profil. Ne fermer que l'un des
+       deux laisserait la porte ouverte. */
+  const peutAjouter = peutCreerUneEntreprise() &&
+    entreprisesFondees().length < ETABLISSEMENTS_MAX
 
   liste.innerHTML = rondEtabHtml(courant, true, 'data-etab-decl') +
     '<span class="tiroir-autres">' + autres +
@@ -25296,6 +25506,11 @@ document.addEventListener('click', (e) => {
 
      On traite ce bouton en premier, avant toute question de tiroir. */
   if (e.target.closest('#etab-ajouter, #e-etab-ajouter')) {
+    /* ⚠ TROISIEME PORTE, ET ELLE ECOUTE LE DOCUMENT. Le bouton est cache pour
+       qui ne peut pas creer, mais cet ecouteur repond a n'importe quel clic
+       portant le bon identifiant — y compris sur un bouton laisse visible par
+       une peinture qui n'a pas encore tourne. */
+    if (!peutCreerUneEntreprise()) return
     ouvrirFenetreEtab(null)
     return
   }
@@ -25309,6 +25524,7 @@ document.addEventListener('click', (e) => {
   const choix = e.target.closest('[data-etab]')
   if (choix) { fermerTiroir(); basculerVersEtablissement(choix.dataset.etab); return }
   if (e.target.closest('[data-etab-plus]')) {
+    if (!peutCreerUneEntreprise()) { fermerTiroir(); return }
     fermerTiroir()
     /* Un gérant crée ; un employé rejoint avec un code. Deux actions distinctes
        derrière le même bouton, parce que c'est la même intention : « j'en veux
@@ -25368,7 +25584,12 @@ function peindreBarreEtablissements() {
 
   const liste = mesEtablissements || []
   if (plus) {
-    plus.style.display = (liste.length < ETABLISSEMENTS_MAX && multiSitesAutorise())
+    /* ⚠ CINQUIEME ET DERNIER « + ». Il comptait `liste` — donc les entreprises
+       ou l'on est simplement membre — et ne demandait pas si l'on avait le
+       droit de creer. Meme regle que les quatre autres. */
+    plus.style.display = (peutCreerUneEntreprise()
+      && entreprisesFondees().length < ETABLISSEMENTS_MAX
+      && multiSitesAutorise())
       ? '' : 'none'
   }
   if (!liste.length) return
@@ -25842,8 +26063,18 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
 
      ⚠ LE FONDATEUR SE RECONNAIT A `promu_par` VIDE — c'est le meme critere que
        `estFondateur`, applique ici a chaque ligne de la liste. */
-    const fondees = (mesEtablissements || [])
-      .filter(e => e.role === 'gestion' && !e.promu_par)
+    const fondees = entreprisesFondees()
+
+    /* ⚠ SEUL UN FONDATEUR CREE. C'est le verrou, et il est ici plutot que dans
+       l'affichage : cacher un bouton n'empeche rien: cette fonction est
+       atteignable par le tiroir, par la carte du profil, et par tout appel
+       direct. */
+    if (!entrepriseId && !peutCreerUneEntreprise()) {
+      throw new Error(
+        'Seuls les comptes créés en tant que gérant peuvent ouvrir une entreprise. ' +
+        'Votre compte a été créé en tant qu’utilisateur.'
+      )
+    }
 
     if (!entrepriseId && fondees.length >= 1) {
       /* ⚠ ON NE REGARDE QUE LES ENTREPRISES FONDEES, pas `etatAbo`.
@@ -25864,10 +26095,15 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       }
     }
 
-    if (!entrepriseId && mesEtablissements.length >= ETABLISSEMENTS_MAX) {
+    /* ⚠ ON COMPTE LES ENTREPRISES FONDEES, PAS CELLES OU L'ON EST MEMBRE.
+
+       Le test portait sur `mesEtablissements` en entier. Un gerant invite chez
+       trois clients voyait donc son propre plafond baisser d'autant, alors
+       qu'il n'a rien fonde de plus. Le plafond dit combien on peut EN OUVRIR. */
+    if (!entrepriseId && fondees.length >= ETABLISSEMENTS_MAX) {
       throw new Error(
-        `Vous g\u00e9rez d\u00e9j\u00e0 ${ETABLISSEMENTS_MAX} \u00e9tablissements, le maximum par compte. ` +
-        `Retirez-en un pour en cr\u00e9er un autre, ou \u00e9crivez-nous si vous g\u00e9rez un groupe.`
+        `Vous gérez déjà ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte. ` +
+        `Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.`
       )
     }
 
@@ -26426,15 +26662,20 @@ function appliquerAccesEntreprise() {
   if (q) q.hidden = fondateur
   if (s) s.hidden = !fondateur
 
-  /* ⚠ LE FONDATEUR N'A PAS DE POSTE.
+  /* ⚠ LA LIGNE « VOTRE POSTE » EST RETIREE POUR TOUT LE MONDE.
 
-     « Votre poste » sert a un membre de dire ce qu'il fait dans l'equipe —
-     cuisine, salle, plonge. Le fondateur n'occupe pas un poste parmi d'autres :
-     il tient l'entreprise.
+     Elle etait cachee au fondateur seulement — il tient l'entreprise, il
+     n'occupe pas un poste parmi d'autres — et restait visible aux
+     gestionnaires invites, qui travaillent aussi.
 
-     La ligne reste pour les gestionnaires invites, qui travaillent aussi. */
+     Elle part entierement : « Les postes », qui administrait la liste dans
+     laquelle on choisissait, a ete retiree elle aussi. Proposer un choix dans
+     une liste qu'on ne peut plus tenir n'a plus de sens.
+
+     `hidden` est aussi pose dans le balisage, pour l'etat d'avant le premier
+     appel. Le remettre un jour demande d'oter les deux. */
   const lp = document.getElementById('mon-poste')?.closest('.reg-ligne')
-  if (lp) lp.hidden = fondateur
+  if (lp) lp.hidden = true
 }
 
 /* ⚠ L'OUVERTURE EST DANS L'AUTRE ECOUTEUR, plus haut.
@@ -26872,8 +27113,12 @@ function peindreEquipe() {
       ${parGroupe(l)}
     </div>`
 
+  /* ⚠ « GERANT » ET NON « FONDATEUR ». Le mot restait dans le code — c'est
+     `estFondateur` qui trie, et `promu_par` qui decide — mais il ne se dit
+     plus a l'ecran : personne ne se presente comme le fondateur de sa
+     boulangerie. */
   liste.innerHTML =
-    section('Fondateur', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
+    section('G\u00e9rant', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
     section('Espace gestion', 'Cr\u00e9ent les proc\u00e9dures, voient l\u2019analyse, invitent du monde.', gestion) +
     section('Espace utilisateur', 'Consultent les proc\u00e9dures publi\u00e9es.', equipe)
 }
@@ -26930,7 +27175,7 @@ document.getElementById('p-membres')?.addEventListener('click', (e) => {
       "mais elle perd l\u2019acc\u00e8s \u00e0 vos proc\u00e9dures. Ses lectures " +
       "pass\u00e9es restent dans l\u2019analyse.\n\n" +
       "Vous ne pouvez ni changer votre propre acc\u00e8s, ni vous retirer " +
-      "vous-m\u00eame. Le fondateur non plus ne peut \u00eatre retir\u00e9 : " +
+      "vous-m\u00eame. Le g\u00e9rant non plus ne peut \u00eatre retir\u00e9 : " +
       "une entreprise sans propri\u00e9taire serait ing\u00e9rable.",
     confirmer: 'Compris', annuler: '', danger: false,
   })
@@ -27102,7 +27347,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
      pas sur la seule absence d'un bouton. */
   const cible = membresEquipe.find(x => x.id === btn.dataset.membre)
   if (cible?.role === 'gestion' && !estFondateur(currentMembre)) {
-    toast("Seul le fondateur peut retirer un gestionnaire.")
+    toast("Seul le g\u00e9rant peut retirer un gestionnaire.")
     return
   }
 

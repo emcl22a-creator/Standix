@@ -1210,6 +1210,44 @@ function afficherEcranChoix() {
    ⚠ ON GARDE LE TEST SUR L'ADRESSE pour l'ancienne forme, et l'on ajoute
      l'ecoute de `PASSWORD_RECOVERY` — l'evenement que la bibliotheque emet
      dans les DEUX cas. C'est la methode que Supabase recommande. */
+  /* ═══════════════════════════════════════════════════════════════════════
+     UN RETOUR EN ERREUR N'ETAIT DETECTE NULLE PART
+
+   ⚠ C'EST LE SILENCE RAPPORTE : « ça me ramène sur l'app et rien ne se
+     passe ». Quand le lien est expiré, deja consomme, ou que l'adresse de
+     retour n'est pas autorisee, Supabase ne renvoie NI `code` NI
+     `type=recovery` : il renvoie `error`, `error_code` et
+     `error_description` — le plus souvent dans le HASH, parfois dans la
+     requete. Aucun des deux tests ci-dessous ne les voyait, donc l'app
+     poursuivait son demarrage ordinaire comme si de rien n'etait.
+
+   ⚠ ON LIT LES DEUX ENDROITS. Le hash pour le flux implicite, la requete
+     pour PKCE. `URLSearchParams` sait lire le hash une fois son `#` retire.
+
+   ⚠ ET ON NETTOIE L'ADRESSE. Sans cela, un rechargement rejoue le meme
+     message d'erreur indefiniment. */
+  const hash = new URLSearchParams((window.location.hash || '').replace(/^#/, ''))
+  const requete = new URLSearchParams(window.location.search || '')
+  const codeErreur = hash.get('error_code') || requete.get('error_code')
+  const erreurLien = hash.get('error') || requete.get('error')
+
+  if (erreurLien || codeErreur) {
+    console.warn('[mot de passe] retour en erreur', {
+      erreur: erreurLien, code: codeErreur,
+      detail: hash.get('error_description') || requete.get('error_description'),
+    })
+    history.replaceState(null, '', window.location.pathname)
+
+    /* Deux causes, deux conduites. Un lien perime se redemande ; une adresse
+       de retour non autorisee est un reglage du projet, et le dire evite de
+       chercher du cote du telephone. */
+    toast(/expired|otp_expired/i.test(String(codeErreur || erreurLien))
+      ? 'Ce lien a expiré. Demandez-en un nouveau depuis « Mot de passe oublié ».'
+      : 'Ce lien n’a pas pu être ouvert. Demandez-en un nouveau.')
+    ouvrirBienvenue()
+    return
+  }
+
   if (/type=recovery/.test((window.location.hash || '') + (window.location.search || ''))) {
     verifierRetourMotDePasse().then(() => {})
     return

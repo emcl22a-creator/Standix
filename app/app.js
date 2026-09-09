@@ -16591,8 +16591,17 @@ const AI_ETAPES = {
 }
 
 var aiPalierDepuis = null
-function startAiProgressSimulation() {
-  aiDebutAnalyse = Date.now()
+function startAiProgressSimulation(depart) {
+  /* ⚠ LE DEPART EST DONNE, PAS SUPPOSE.
+
+     Cette ligne posait `Date.now()` sans condition. Or elle est appelee par
+     `basculerVersAttente`, elle-meme appelee a CHAQUE retour sur la page :
+     le compteur repartait donc de zero a chaque fois, et le plafond de douze
+     minutes n'etait jamais atteint par quelqu'un qui quitte et revient.
+
+     Le vrai depart est deja garde dans `localStorage` par
+     `memoriserAnalyseIA` — il n'etait simplement jamais relu. */
+  aiDebutAnalyse = depart || Date.now()
   /* L'allègement est DÉJÀ fait quand on arrive ici : il ne reste qu'Azure et
      la rédaction. Le compter deux fois annoncerait le double du vrai reste. */
   aiEstimationTotale = estimerAnalyse(aiVideoDuree, false)
@@ -16656,7 +16665,17 @@ function analyseIAEnCours() {
     const brut = localStorage.getItem(CLE_IA_EN_COURS)
     if (!brut) return null
     const o = JSON.parse(brut)
-    if (!o?.id || Date.now() - (o.debut || 0) > 15 * 60000) { oublierAnalyseIA(); return null }
+    /* ⚠ LA FENETRE DOIT DEPASSER LE PLAFOND, pas l'egaler.
+
+       Elle etait de quinze minutes pour un plafond de douze : entre les deux,
+       la reprise se lancait et abandonnait proprement — mais au-dela, l'app
+       OUBLIAIT l'analyse sans rien dire. Revenir une heure plus tard ne
+       montrait aucune trace de ce qui s'etait passe.
+
+       Une heure : assez large pour qu'un retour tardif recoive toujours son
+       message d'abandon, assez etroite pour ne pas ressusciter une analyse
+       vieille d'un jour. */
+    if (!o?.id || Date.now() - (o.debut || 0) > 60 * 60000) { oublierAnalyseIA(); return null }
     return o
   } catch (e) { return null }
 }
@@ -16680,7 +16699,19 @@ async function reprendreAnalyseIA() {
   if (data.statut !== 'traitement') { oublierAnalyseIA(); return }
 
   aiProcedureId = reste.id
-  basculerVersAttente()
+
+  /* ⚠ ON REPREND AU VRAI DEPART. Sans `reste.debut`, le compteur reglait
+     zero a chaque retour : quelqu'un qui quitte et revient toutes les cinq
+     minutes ne franchissait jamais le plafond, et l'anneau tournait sans fin.
+     C'est ce qui donnait « 21 minutes » a l'ecran. */
+  basculerVersAttente(reste.debut)
+
+  /* ⚠ ET SI LE PLAFOND EST DEJA FRANCHI, ON N'INTERROGE MEME PAS. Reprendre
+     un sondage pour l'abandonner au premier tour ferait clignoter l'ecran
+     d'attente une seconde avant l'erreur. On le dit tout de suite. */
+  const trop = analyseTropLongue()
+  if (trop) { arreterAnalyseBloquee(trop, `Reprise après ${Math.round(trop / 60)} min sans résultat`); return }
+
   pollAiStatus()
 }
 
@@ -16692,7 +16723,7 @@ document.addEventListener('visibilitychange', () => {
    `visibilitychange`, l'onglet est visible d'emblee. */
 window.addEventListener('load', () => { setTimeout(reprendreAnalyseIA, 1500) })
 
-function basculerVersAttente() {
+function basculerVersAttente(depart) {
   if (aiEcranAttente) return
   const dépôt = document.getElementById('ai-upload-card')
   const attente = document.getElementById('ai-progress-card')
@@ -16702,7 +16733,7 @@ function basculerVersAttente() {
   attente.style.display = 'block'
   const zone = document.getElementById('ai-error')
   if (zone) zone.textContent = ''
-  startAiProgressSimulation()
+  startAiProgressSimulation(depart)
 }
 
 /* Un jalon va là où la personne regarde : sous le bouton tant qu'elle y est,
@@ -16831,7 +16862,14 @@ function majProgressionIA() {
   } else {
     aiPalierDepuis = null
   }
-  if (ecoule > 15 * 60) {
+  /* ⚠ CE SEUIL DEPASSAIT LE PLAFOND. Il etait a quinze minutes alors que
+     l'analyse s'arrete a douze : la phrase « l'analyse tourne toujours » ne
+     pouvait plus s'afficher — et si elle l'avait pu, elle aurait rassure
+     quelqu'un dont l'analyse venait d'etre abandonnee.
+
+     Huit minutes : assez tard pour ne pas alarmer sur une analyse normale de
+     une a trois minutes, assez tot pour prevenir avant l'arret. */
+  if (ecoule > 8 * 60) {
     phrase = t("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }
 
@@ -18346,7 +18384,58 @@ document.getElementById('ai-copier')?.addEventListener('click', async () => {
 /* Échecs consécutifs du serveur. Remis à zéro dès qu'une réponse arrive. */
 let aiEchecsSuite = 0
 
+/* ⚠ LE PLAFOND N'EXISTAIT QUE DANS UNE BRANCHE SUR TROIS.
+
+   Il etait pose a l'interieur de `if (data.status === 'processing')`. Une
+   analyse coincee en `redaction` — le cas le plus frequent, puisque Supabase
+   peut interrompre la fonction quand le client se deconnecte — ne rencontrait
+   AUCUNE limite : elle se resondait toutes les 2,5 secondes indefiniment.
+
+   Le controle est remonte ici, avant toute lecture de la reponse : quelle que
+   soit la raison pour laquelle ca ne finit pas, ca s'arrete. */
+const ANALYSE_PLAFOND_MIN = 12
+
+function analyseTropLongue() {
+  if (!aiDebutAnalyse) return 0
+  const ecoule = (Date.now() - aiDebutAnalyse) / 1000
+  return ecoule > ANALYSE_PLAFOND_MIN * 60 ? ecoule : 0
+}
+
+function arreterAnalyseBloquee(ecoule, detail) {
+  if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+  stopAiProgressSimulation(0)
+  oublierAnalyseIA()
+
+  const carte = document.getElementById('ai-progress-card')
+  if (carte) carte.style.display = 'none'
+  aiEcranAttente = false
+  const depot = document.getElementById('ai-upload-card')
+  if (depot) depot.style.display = 'block'
+
+  const zone = document.getElementById('ai-error')
+  if (zone) {
+    zone.style.color = 'var(--red)'
+    zone.textContent = `L'analyse dure depuis ${Math.round(ecoule / 60)} minutes sans aboutir. ` +
+      `Elle est probablement bloquée chez Azure.`
+  }
+  afficherDetailEchec(aiProcedureId, detail || `Arrêt après ${Math.round(ecoule)} s`)
+
+  if (aiProcedureId) {
+    supabase.from('procedures')
+      .update({ statut: 'echec', erreur_ia: `Analyse bloquée après ${Math.round(ecoule / 60)} min` })
+      .eq('id', aiProcedureId)
+      .then(() => loadGestionProcedures().catch(() => {}), () => {})
+  }
+}
+
 async function pollAiStatus() {
+  /* On mesure AVANT d'interroger le serveur : inutile de lui poser une
+     question dont on n'attendra pas la reponse. */
+  const trop = analyseTropLongue()
+  if (trop) {
+    arreterAnalyseBloquee(trop, `Aucune réponse utile après ${Math.round(trop)} s · ${aiNbSondages} sondages`)
+    return
+  }
   try {
     const checkRes = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {
       method: 'POST',
@@ -18440,24 +18529,11 @@ async function pollAiStatus() {
          quelque chose est resté en travers, et continuer d'attendre n'apprend
          plus rien. */
       const ecoule = (Date.now() - aiDebutAnalyse) / 1000
-      if (ecoule > 12 * 60) {
-        stopAiProgressSimulation(0)
-        document.getElementById('ai-progress-card').style.display = 'none'
-        aiEcranAttente = false
-        document.getElementById('ai-upload-card').style.display = 'block'
-        const zone = document.getElementById('ai-error')
-        zone.style.color = 'var(--red)'
-        zone.textContent = "L'analyse dure depuis " + Math.round(ecoule / 60) +
-          " minutes sans aboutir. Elle est probablement bloquée chez Azure."
-        afficherDetailEchec(aiProcedureId,
-          `Aucune réponse d'Azure après ${Math.round(ecoule)} s · ${aiNbSondages} sondages`)
-        if (aiProcedureId) {
-          supabase.from('procedures')
-            .update({ statut: 'echec', erreur_ia: `Analyse bloquée après ${Math.round(ecoule / 60)} min` })
-            .eq('id', aiProcedureId).then(() => loadGestionProcedures().catch(() => {}))
-        }
-        return
-      }
+      /* ⚠ LE PLAFOND A ETE REMONTE EN TETE DE `pollAiStatus`. Il ne vivait
+         que dans cette branche : une analyse coincee en `redaction` n'en
+         rencontrait aucun. Le garder ici en double laisserait deux endroits a
+         tenir d'accord — c'est ainsi qu'un seuil finit par en contredire un
+         autre. */
 
       aiNbSondages++
       const delai = aiNbSondages < 12 ? 3000 : aiNbSondages < 30 ? 5000 : 8000

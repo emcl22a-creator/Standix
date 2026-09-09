@@ -9236,6 +9236,13 @@ function marquerBrouillonVu(id) {
      gestion et cote equipe — l'apercu affiche les deux listes. */
   document.querySelectorAll(`[data-key="${CSS.escape(String(id))}"] .p-seg-pt`)
     .forEach(pt => pt.remove())
+
+  /* ⚠ ET LE POINT DU BADGE PASSE AU GRIS, pour la meme raison que la pastille
+     juste au-dessus : sans cela il resterait bleu jusqu'au prochain redessin
+     complet, et l'on retrouverait la procedure marquee « pas encore vue »
+     apres l'avoir ouverte. */
+  document.querySelectorAll(`[data-key="${CSS.escape(String(id))}"] .cl-pt-vu`)
+    .forEach(pt => { pt.style.background = '#9A9AA4' })
 }
 
 function majPastilleBrouillons() {
@@ -11897,23 +11904,48 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
             }
             /* ⚠ MEME CHOSE POUR UN BROUILLON. « Commence il y a 3 semaines »
                signale un travail laisse en plan. */
-            /* ⚠ « Cree » SI LA PROCEDURE N'A JAMAIS ETE TOUCHEE.
+            /* ═══ « CREE », TOUJOURS, ET LA DATE DE CREATION ═══
 
-               `modifie_le` vaut la date de creation tant que personne n'a rien
-               change — le declencheur SQL ne l'a jamais mise a jour. Ecrire
-               « Modifie » serait faux : rien ne l'a ete.
+             ⚠ LA COMPARAISON DE DATES NE POUVAIT PAS MARCHER POUR UNE ANALYSE
+               IA. La procedure est inseree au depart avec `statut:
+               'traitement'`, puis la ligne est mise a jour a la fin de
+               l'analyse — dix minutes plus tard, parfois davantage. Le
+               declencheur SQL pose alors `modifie_le`, et l'ecart avec
+               `created_at` depasse largement la minute de tolerance.
 
-               On compare les deux dates a la minute pres : l'horodatage d'une
-               creation et celui d'un `insert` different de quelques
-               millisecondes. */
-            const mod = proc.modifie_le
-            const cree = proc.created_at
-            const jamaisTouchee = !mod
-              || (cree && Math.abs(new Date(mod) - new Date(cree)) < 60000)
+               Resultat : « Mod. 3 min » sur une procedure que personne n'a
+               touchee. Le meme faux positif se produit a chaque changement de
+               statut, a chaque ecriture de `video_url`, a chaque publication.
 
-            const quandB = depuisQuand(mod || cree, true)
-            return `<span class="cl-badge">${marque}<i style="background:#9A9AA4"></i>${
-              quandB ? (jamaisTouchee ? 'Créé ' : 'Mod. ') + quandB : 'En dév.'}</span>`
+             ⚠ « Mod. » NE DISAIT DEJA PAS CE QU'IL PRETENDAIT. Rien dans la
+               base ne distingue une modification humaine d'une ecriture de la
+               machine : `modifie_le` s'allume pour les deux. Un libelle faux
+               vaut moins qu'un libelle plus pauvre mais juste.
+
+               Pour retablir la distinction il faudrait une colonne disant QUI
+               a modifie — cote base, pas ici.
+
+             ⚠ ET LA DATE SUIT LE LIBELLE. On affichait `modifie_le`, c'est-a-
+               dire la fin de l'analyse. C'est bien `created_at` qu'il faut
+               montrer sous le mot « Créé ». */
+            const quandB = depuisQuand(proc.created_at || proc.modifie_le, true)
+
+            /* ═══ LE POINT DIT SI LA PROCEDURE A ETE OUVERTE ═══
+
+             ⚠ IL ETAIT GRIS EN DUR. Le gris ne portait aucune information :
+               il marquait « brouillon », ce que le mot « En dév. » de l'onglet
+               dit deja.
+
+               Bleu tant qu'on ne l'a pas ouverte, gris ensuite. `jamaisVue`
+               existe deja plus haut — c'est la meme lecture que celle qui
+               posait la pastille.
+
+             ⚠ `marquerBrouillonVu` REPEINT CE POINT AU CLIC. Sans cela il
+               resterait bleu jusqu'au prochain redessin complet de la liste,
+               comme la pastille avant lui. */
+            return `<span class="cl-badge">${marque}<i class="cl-pt-vu" style="background:${
+              jamaisVue ? '#3A78EE' : '#9A9AA4'}"></i>${
+              quandB ? 'Créé ' + quandB : 'En dév.'}</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>

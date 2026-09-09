@@ -1806,7 +1806,17 @@ window.demanderReinitialisation = demanderReinitialisation
 document.getElementById(idO)?.addEventListener('click', (e) =>
   demanderReinitialisation(
     document.getElementById(idO === 'bv-oubli' ? 'bv-email' : 'login-email')?.value,
-    idO === 'bv-oubli' ? 'bv-err' : 'login-error',
+    /* ⚠ `connexion-error` ET NON `login-error`. Le second n'existe plus dans
+       le balisage — le champ a ete renomme, et cette ligne ne l'a pas suivi.
+
+       Le message partait donc dans le vide : depuis l'ecran de connexion, une
+       adresse inconnue ou un trop grand nombre de tentatives ne s'affichait
+       NULLE PART. On appuyait, rien ne se passait.
+
+       Ailleurs dans ce fichier quelqu'un avait rencontre le meme probleme et
+       ecrit un repli — `getElementById('connexion-error') ||
+       getElementById('login-error')`. Il n'avait pas ete pose ici. */
+    idO === 'bv-oubli' ? 'bv-err' : 'connexion-error',
     e.currentTarget)))
 
 /* ⚠ LES DEUX BOUTONS « CHANGER LE MOT DE PASSE » VISAIENT UN CHAMP.
@@ -3781,12 +3791,24 @@ window.openSettings = async function() {
   // Déjà préchargé au démarrage : affichage immédiat, pas d'attente
   let entreprise = cachedEntreprise
   if (!entreprise) {
-    document.getElementById('settings-code').textContent = '...'
+    /* ⚠ IL Y AVAIT ICI DEUX ECRITURES DANS `#settings-code`, QUI N'EXISTE
+       PLUS. Le champ a ete renomme `reg-code-val`, et c'est `peindreReglages`
+       qui le remplit desormais — appelee quelques lignes plus haut.
+
+       Ces deux lignes n'affichaient donc rien, mais elles ne se contentaient
+       pas d'etre inutiles : ecrites sans garde, `.textContent` sur `null` leve
+       une TypeError qui INTERROMPT `openSettings`. Tout ce qui suit — le
+       chargement de l'entreprise, le code d'invitation — ne se faisait pas.
+
+     ⚠ ET LE CHEMIN EST ATTEIGNABLE. `cachedEntreprise` est remis a `null` a la
+       deconnexion : le premier passage dans les reglages apres un changement
+       de compte tombe dans cette branche.
+
+       Elles sont retirees, pas redirigees : il n'y a rien a afficher ici. */
     const { data, error: entrepriseError } = await supabase
       .from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle()
     if (entrepriseError) {
       console.error('Erreur chargement code entreprise :', entrepriseError)
-      document.getElementById('settings-code').textContent = '—'
       return
     }
     entreprise = data
@@ -9230,6 +9252,27 @@ function amorcerBrouillonsVus() {
   } catch (e) {}
 }
 
+/* ⚠ L'INVERSE DE `marquerBrouillonVu`, ET IL N'EXISTAIT PAS.
+
+   La liste des brouillons vus ne faisait que grossir : rien n'en retirait
+   jamais un identifiant. Une procedure marquee par erreur — touchee pendant
+   son analyse, quand elle n'avait encore aucun contenu — le restait pour
+   toujours sur cet appareil.
+
+   On repeint aussi le point de la carte, sans quoi il resterait gris jusqu'au
+   prochain redessin complet de la liste. C'est la symetrie exacte de ce que
+   fait `marquerBrouillonVu` dans l'autre sens. */
+function oublierBrouillonVu(id) {
+  if (!id) return
+  const vus = brouillonsVus()
+  if (!vus.delete(id)) return
+  try { localStorage.setItem(cleVus(), JSON.stringify([...vus])) } catch {}
+  majPastilleBrouillons()
+
+  document.querySelectorAll(`[data-key="${CSS.escape(String(id))}"] .cl-pt-vu`)
+    .forEach(pt => { pt.style.background = '#3A78EE' })
+}
+
 function marquerBrouillonVu(id) {
   if (!id) return
   const vus = brouillonsVus()
@@ -11974,12 +12017,28 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
   /* Meme regle que partout : une analyse en panne se reprend la ou on la voit,
      une analyse en cours ouvre sa fenetre d'abandon. */
   el.onclick = () => {
-    /* ⚠ ON MARQUE AVANT D'OUVRIR, pas dans `openAnalyse`. Une procedure en
-       panne ou en cours d'analyse n'ouvre pas sa page — mais on l'a bien vue,
-       et la pastille doit en tenir compte. */
-    marquerBrouillonVu(proc.id)
+    /* ⚠ ON NE MARQUE QUE CE QU'ON A VRAIMENT PU LIRE.
+
+       Cette ligne marquait AVANT d'ouvrir, quel que soit l'etat, au motif
+       qu'« on l'a bien vue ». Le raisonnement confondait deux choses : en
+       cours d'analyse, on a vu un ECRAN D'ATTENTE, pas la procedure — elle
+       n'existe pas encore.
+
+       Consequence : toucher la carte pendant l'analyse, ne serait-ce que pour
+       savoir ou elle en est, eteignait le point pour toujours. La procedure
+       arrivait terminee et deja marquee lue, sans que personne n'en ait lu une
+       ligne. C'est le geste le plus naturel du monde pendant une attente de
+       dix minutes.
+
+       Meme chose pour une analyse en panne : on a vu l'echec, pas le contenu.
+       Et si on la relance, elle finira par etre prete — avec le meme oubli.
+
+       La carte en panne porte deja son propre signal, le point d'exclamation
+       orange. Le point bleu qui reste dit autre chose, et le dit justement :
+       personne n'a encore lu cette procedure. */
     if (enPanne) return proposerReprise(proc)
     if (enAnalyse) return proposerAbandon(proc)
+    marquerBrouillonVu(proc.id)
     openAnalyse(proc.id)
   }
   return el
@@ -21688,6 +21747,20 @@ function surveillerAnalyses() {
       change = true
       if (vientDeFinir) {
         toast(`\u00ab ${p.titre} \u00bb est pr\u00eate.`)
+
+        /* ⚠ UNE PROCEDURE QUI VIENT DE NAITRE N'A ETE LUE PAR PERSONNE.
+
+           On retire son identifiant de la liste des brouillons vus, pour que
+           le point bleu s'allume a coup sur.
+
+           C'est un filet, pas un doublon : le clic pendant l'analyse ne marque
+           plus rien depuis le correctif de `carteBrouillon`. Mais les
+           identifiants deja marques sur les telephones — celui d'une analyse
+           touchee avant ce correctif — resteraient eteints pour toujours,
+           puisque rien ne nettoie jamais cette liste. Ici, ils se reparent au
+           moment ou l'analyse aboutit. */
+        oublierBrouillonVu(p.id)
+
         /* ON RECHARGE DEPUIS LA BASE, on ne se contente pas de modifier l'objet
            en mémoire.
 

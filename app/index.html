@@ -3190,9 +3190,17 @@
              La page qu'elle ouvrait reste — `p-activites`, atteignable depuis
              l'ecran Analyse comme avant. C'est le raccourci qui part, pas le
              contenu. -->
-        <!-- Le filet du groupe : le même que partout ailleurs. -->
-        <div class="reg-filet"></div>
-        <button type="button" class="reg-ligne" onclick="ouvrirPostes()">
+        <!-- ⚠ « LES POSTES » EST RETIRE DE L'INTERFACE, PAS DU CODE.
+
+             La page `p-postes` existe toujours, `ouvrirPostes()` aussi : seule
+             l'entree disparait. Remettre la ligne un jour ne demande que
+             d'oter les deux `hidden`.
+
+             LE FILET PART AVEC ELLE. Il separait cette ligne de la
+             precedente ; seul, il laisserait un trait en l'air au bas du
+             groupe. `.reg-filet[hidden]` est deja prevu dans la feuille. -->
+        <div class="reg-filet" hidden></div>
+        <button type="button" class="reg-ligne" hidden onclick="ouvrirPostes()">
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
           <span class="reg-nm">Les postes</span>
           <span class="reg-fl">›</span>
@@ -3334,12 +3342,25 @@
     </div>
 
     <div class="reg-groupe" data-teinte="vert">
-      <!-- ⚠ « VOTRE POSTE » EXISTE MAINTENANT DES DEUX COTES.
+      <!-- ⚠ « VOTRE POSTE » EST RETIRE DE L'INTERFACE, PAS DU CODE.
 
-           Un gestionnaire travaille aussi : il cuisine, il sert, il repare. La
-           page existait, la fonction qui la peint sert deja les deux espaces —
-           seule l'entree manquait ici. -->
-        <button type="button" class="reg-ligne" onclick="ouvrirMonPoste()">
+           La ligne existait des deux cotes ; les deux partent, puisque « Les
+           postes » n'est plus la pour administrer la liste dans laquelle on
+           choisissait.
+
+           `ouvrirMonPoste()`, la page `p-reg-poste` et `majLignePoste()`
+           restent en place.
+
+         ⚠ LE `hidden` NE SUFFIT PAS SEUL. `appliquerAccesEntreprise` ecrit
+           `lp.hidden = fondateur` sur cette ligne a chaque ouverture du
+           Profil : pose ici seulement, l'attribut aurait ete efface pour un
+           gestionnaire invite, qui aurait continue de voir l'entree. Les deux
+           endroits sont traites.
+
+         ⚠ PAS DE FILET A OTER, contrairement a « Les postes ». Cette ligne
+           n'en a pas : « Vos appareils » la suit directement, et le groupe
+           garde ses deux autres entrees. -->
+        <button type="button" class="reg-ligne" hidden onclick="ouvrirMonPoste()">
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
           <span class="reg-nm">Votre poste</span>
           <span class="reg-val" id="mon-poste">—</span>
@@ -4077,25 +4098,42 @@
         <span class="id-fl">›</span>
       </button>
 
-    <!-- La même carte que côté gestion, avec un texte adapté : un employé qui
-         crée une entreprise en devient le GÉRANT, ce qui n'est pas évident.
-         La phrase le dit avant qu'il ne touche le « + ». -->
+    <!-- ⚠ PLUS DE « + » ICI : ON NE CREE PAS D'ENTREPRISE DEPUIS L'ESPACE
+         UTILISATEUR.
+
+         La carte portait le meme bouton que cote gestion, et sa phrase
+         invitait explicitement : « Créez une entreprise et vous en êtes le
+         gérant, avec 14 jours d'essai gratuit. » N'importe quel compte inscrit
+         comme utilisateur pouvait donc se fabriquer une entreprise sans jamais
+         passer par l'inscription gerant.
+
+         LE RANG RESTE, LUI. Il sert encore a basculer d'une entreprise a
+         l'autre pour qui appartient a plusieurs — un employe peut travailler
+         a deux endroits. Seul le geste de creation disparait.
+
+         `peindreRangEtab` tolere l'absence du bouton depuis ce changement :
+         elle abandonnait la peinture s'il manquait, ce qui aurait fait
+         disparaitre les ronds avec lui. -->
     <div class="etab-carte">
-      <div class="etab-rang" id="e-etab-rang">
-        <button type="button" class="etab-plus" id="e-etab-ajouter" data-etab-plus
-                aria-label="Créer une entreprise">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-               stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"/><line x1="5.5" y1="12" x2="18.5" y2="12"/></svg>
-        </button>
-      </div>
+      <div class="etab-rang" id="e-etab-rang"></div>
       <p class="etab-note" id="e-etab-note">
-        Créez une entreprise et vous en êtes le <b>gérant</b>, avec
-        <b>14 jours d’essai gratuit</b>. Touchez un logo pour basculer d’une
-        entreprise à l’autre.
+        Touchez un logo pour basculer d’une entreprise à l’autre.
       </p>
     </div>
 
-    <div class="reg-groupe" data-teinte="bleu">
+    <!-- ⚠ « VOTRE POSTE » EST RETIRE DE L'INTERFACE, PAS DU CODE.
+
+         `ouvrirMonPoste()`, la page `e-mon-poste` et `majLignePoste()` restent
+         en place : seule l'entree disparait.
+
+         ⚠ C'EST LE GROUPE QU'ON CACHE, PAS LA LIGNE. Le bouton etait le SEUL
+           enfant de cette carte : masquer la ligne seule aurait laisse un
+           rectangle vide de vingt pixels au milieu de la page.
+
+           Et il faut `style="display:none"` plutot que `hidden` : la feuille
+           ne prevoit `[hidden]` que pour `.reg-ligne`, `.reg-titre` et
+           `.reg-filet` — pas pour `.reg-groupe`, qui serait reste visible. -->
+    <div class="reg-groupe" data-teinte="bleu" style="display:none">
       <!-- La ligne « Vos entreprises » a été retirée : la carte « Vos
            établissements », plus haut sur cette page, montre les mêmes
            entreprises et permet en plus d'en changer d'un geste. Deux chemins
@@ -4664,8 +4702,36 @@
         <!-- `new-password` et non `current-password` : c'est ce qui déclenche la
              proposition d'un mot de passe fort, et ce qui empêche le
              gestionnaire de préremplir l'ancien sur un formulaire de création. -->
-        <input type="password" id="signup-password" placeholder="••••••••"
-               autocomplete="new-password" style="margin-bottom:16px;">
+        <!-- ⚠ LA MARGE PASSE SUR L'ENVELOPPE, pas sur le champ.
+
+             Laissee sur l'input, elle aurait pousse l'oeil de seize pixels vers
+             le bas : le bouton se positionne par rapport a l'enveloppe, et une
+             marge basse fait partie de la hauteur de celle-ci. -->
+        <div class="mdp-champ" style="margin-bottom:16px;">
+          <input type="password" id="signup-password" placeholder="••••••••"
+                 autocomplete="new-password">
+          <!-- ⚠ `type="button"` EST OBLIGATOIRE. Sans lui, un bouton dans un
+               formulaire vaut `submit` : toucher l'oeil aurait valide
+               l'inscription au lieu de montrer le mot de passe.
+
+               `aria-pressed` porte l'etat, et `aria-label` est reecrit par le
+               script : un lecteur d'ecran doit savoir si le mot de passe est
+               visible, pas seulement qu'il y a un bouton. -->
+          <button type="button" class="mdp-oeil" data-mdp-oeil="signup-password"
+                  aria-label="Afficher le mot de passe" aria-pressed="false">
+            <svg class="mdp-ouvert" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+            </svg>
+            <svg class="mdp-barre" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+              <line x1="4.2" y1="19.8" x2="19.8" y2="4.2"/>
+            </svg>
+          </button>
+        </div>
 
         <div id="signup-gestion-field">
           <label class="f">Nom de l'entreprise</label>

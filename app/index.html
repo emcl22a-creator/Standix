@@ -2329,7 +2329,7 @@
         </div></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
-      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(255,174,46,0.10)" stroke="url(#iaCoche)" stroke-width="1.8"></circle><path class="trace" d="M20.6 24.2 24.4 28 31.6 20.4" stroke="url(#iaCoche)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
+      <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(58,120,238,0.10)" stroke="url(#iaCoche)" stroke-width="1.8">></circle><path class="trace" d="M20.6 24.2 24.4 28 31.6 20.4" stroke="url(#iaCoche)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
       <div style="font-size:14px; font-weight:600; margin-bottom:4px;" id="ai-done-title">Procédure générée</div>
       <div style="font-size:12.5px; color:var(--label-2); margin-bottom:16px;" id="ai-done-sub">—</div>
       <button class="btn block" id="ai-view-btn">Voir la procédure</button>
@@ -4572,9 +4572,24 @@
      ⚠ CELUI-CI RESTE DANS LA FAMILLE DE L'ANNEAU : les deux teintes ambres de
        `FM_TEINTES`, sans le blanc. La coche a donc la meme couleur que le
        cercle qui l'entoure, et se lit d'un bout a l'autre. -->
+  <!-- ⚠ LES TROIS COULEURS DU BOUTON, DANS LE MÊME ORDRE ET AU MÊME ENDROIT.
+
+       `.btn` porte `linear-gradient(135deg, #1F4CEE 0%, #3A78EE 55%, #4899EC
+       100%)`. Ce dégradé-ci le reprend exactement : trois arrêts, dont celui
+       du milieu à 55 % — le poser à 50 % suffirait à décaler la teinte
+       centrale et les deux ne se ressembleraient plus tout à fait.
+
+       `x1/y1 → x2/y2` de 0,0 vers 1,1 correspond au 135deg du CSS : la
+       diagonale du coin haut-gauche vers le coin bas-droit.
+
+     ⚠ CE DÉGRADÉ NE SERT QU'À CETTE ICÔNE — une seule occurrence dans tout le
+       fichier, vérifié avant de le modifier. Les autres dégradés ambrés de
+       l'app (`iaFiniGrand`, `logoOrIc`, les anneaux d'analyse) ne bougent
+       pas. -->
   <linearGradient id="iaCoche" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0" stop-color="#FFAE2E"></stop>
-    <stop offset="1" stop-color="#E8760F"></stop>
+    <stop offset="0" stop-color="#1F4CEE"></stop>
+    <stop offset="0.55" stop-color="#3A78EE"></stop>
+    <stop offset="1" stop-color="#4899EC"></stop>
   </linearGradient>
   <linearGradient id="iaFiniGrand" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#FFFFFF"></stop>

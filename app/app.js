@@ -4182,10 +4182,30 @@ window.signOut = async function() {
      procédures de quelqu'un d'autre. */
   arreterSuiviPresence()
   try {
-    localStorage.removeItem('procedo_membre')
+    /* ═══ ON GARDE UNE LISTE DE CE QUI RESTE, PAS DE CE QU'ON EFFACE ═══
+
+     ⚠ LA LISTE NOIRE EN OUBLIAIT TROIS. On retirait `procedo_membre` et les
+       caches `procedo_grille_*`, mais pas `standix-analyse-en-cours`,
+       `standix-ia-en-cours` ni la liste des procedures vues — toutes trois
+       porteuses d'identifiants appartenant au compte precedent.
+
+       Une liste noire vieillit mal : chaque cle ajoutee au fil du temps doit
+       penser a s'y inscrire, et celle qui oublie ne se signale jamais.
+
+     ⚠ CE QUI SURVIT EST UN CHOIX EXPLICITE. La langue et le drapeau de
+       bienvenue appartiennent a l'APPAREIL, pas au compte : les effacer
+       remettrait l'app en anglais et rejouerait l'accueil a chaque
+       changement d'utilisateur.
+
+       `sb-*` appartient a Supabase, qui gere lui-meme sa session : y toucher
+       laisserait la bibliotheque avec un etat qu'elle croit encore valide. */
+    const aGarder = ['procedo_langue', 'procedo_bienvenue']
     Object.keys(localStorage)
-      .filter(k => k.startsWith('procedo_grille_'))
-      .forEach(k => localStorage.removeItem(k))
+      .filter(k => !aGarder.includes(k) && !k.startsWith('sb-'))
+      .forEach(k => { try { localStorage.removeItem(k) } catch (e) {} })
+
+    /* ⚠ ET LA MEMOIRE DE SESSION AUSSI. Elle n'etait pas touchee du tout. */
+    try { sessionStorage.clear() } catch (e) {}
   } catch (e) {}
   document.getElementById('login-email').value = ''
   document.getElementById('login-password').value = ''

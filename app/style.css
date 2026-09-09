@@ -22113,3 +22113,47 @@ body.abo-expire [data-etab-plus]{
 @media (max-height: 700px){
   #login-screen .bv-slogan{ font-size:clamp(20px, 6vw, 23px); }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ŒIL DU CHAMP MOT DE PASSE
+   ═══════════════════════════════════════════════════════════════════════════
+
+ ⚠ LE SÉLECTEUR VISE L'IDENTIFIANT, PAS LA CLASSE. Le champ reçoit son
+   `padding:12px` d'une règle déclarée dans une requête média, donc plus
+   spécifique qu'une règle de classe posée ici en fin de fichier. `#signup-
+   password` la dépasse quoi qu'il arrive — c'est le piège des contre-règles
+   de fin de fichier, déjà rencontré avec les bordures des cartes.
+
+ ⚠ QUARANTE-QUATRE PIXELS À DROITE, et c'est mesuré : le champ fait 44 px de
+   haut, le bouton en occupe toute la hauteur, et le texte doit s'arrêter
+   avant lui. Sans ce padding, un mot de passe long passait SOUS l'icône.
+
+ ⚠ LA ZONE TOUCHABLE FAIT TOUTE LA HAUTEUR DU CHAMP. L'icône n'en occupe que
+   20 px, mais viser 20 px du pouce sur un téléphone rate une fois sur trois.
+   Le bouton est plus grand que ce qu'il montre. */
+.mdp-champ{ position:relative; display:block; }
+.mdp-champ > input{ width:100%; margin-bottom:0; }
+#signup-password{ padding-right:44px; }
+
+.mdp-oeil{
+  position:absolute; top:0; right:0; bottom:0; width:44px;
+  display:flex; align-items:center; justify-content:center;
+  border:none; background:none; padding:0; cursor:pointer;
+  color:currentColor; opacity:0.42;
+  transition:opacity 0.18s;
+}
+.mdp-oeil:hover{ opacity:0.62; }
+.mdp-oeil:active{ opacity:0.85; }
+.mdp-oeil svg{ width:20px; height:20px; display:block; }
+
+/* ⚠ ON ÉCHANGE LES DEUX DESSINS, on n'anime rien. L'œil barré et l'œil ouvert
+   partagent le même tracé : seule la barre diffère. Basculer une classe sur le
+   bouton évite de reconstruire le SVG à chaque appui. */
+.mdp-oeil .mdp-barre{ display:none; }
+.mdp-oeil.vu .mdp-ouvert{ display:none; }
+.mdp-oeil.vu .mdp-barre{ display:block; }
+
+/* Le rectangle de mise au point suit le bouton, pas le champ : sans cette
+   règle il épousait toute la largeur de l'enveloppe. */
+.mdp-oeil:focus-visible{ outline:2px solid var(--ambre-txt); outline-offset:2px; border-radius:8px; }

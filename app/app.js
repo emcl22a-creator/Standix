@@ -17960,17 +17960,64 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       : `environ ${minutes} minute${minutes > 1 ? 's' : ''}`
     etape(`envoi de ${poidsLisible(aiVideoFile.size)} \u2014 gardez l\u2019app ouverte ${attente}`)
 
-    const limite = (promesse, secondes, quoi) => Promise.race([
-      promesse,
-      new Promise((_, rejeter) => setTimeout(
-        () => rejeter(new Error(`${quoi} : aucune réponse après ${secondes} s.`)),
-        secondes * 1000)),
-    ])
+    /* ═══════════════════════════════════════════════════════════════════════
+       LA LIMITE DE TEMPS
+
+     ⚠ ELLE ETAIT DE 90 SECONDES EN DUR, alors que la ligne du dessus annonce
+       une duree CALCULEE sur le poids. Les deux se contredisaient :
+
+         poids     ce qu'on annonce      ce qu'on accordait
+         120 Mo    « environ 1 minute »  90 s   (marge 1,5x)
+         180 Mo    « environ 2 minutes » 90 s   ABANDON AVANT LA FIN
+         400 Mo    « environ 4 minutes » 90 s   ABANDON AVANT LA FIN
+
+       Et l'estimation suppose 2 Mo/s. A 0,5 Mo/s — un reseau mobile ordinaire
+       en envoi — meme 60 Mo demandent deux minutes : abandon garanti sur une
+       video parfaitement normale, dont le transfert etait en cours.
+
+       Le delai part donc de la meme estimation, avec un facteur quatre pour
+       couvrir un reseau quatre fois plus lent que prevu, et un plancher de
+       deux minutes pour les petits fichiers.
+
+     ⚠ ON COMPARE L'HORLOGE, PAS UN `setTimeout` UNIQUE. Un `setTimeout` est
+       GELE quand l'ecran s'eteint ou qu'on change d'application : il ne tire
+       qu'au retour, et annonce alors « aucune reponse apres 90 s » apres dix
+       minutes d'attente. C'est exactement ce qui a ete rapporte.
+
+       Un intervalle court qui relit `Date.now()` voit le depassement des la
+       premiere reprise, et le message dit le temps REELLEMENT ecoule.
+
+     ⚠ LA COUPURE RESEAU EST DITE TOUT DE SUITE. `navigator.onLine` bascule
+       des que le telephone perd sa connexion : inutile d'attendre la fin d'un
+       compte a rebours pour annoncer une panne deja certaine. */
+    const limite = (promesse, secondes, quoi) => {
+      let horloge = 0
+      const surveille = new Promise((_, rejeter) => {
+        const depart = Date.now()
+        const echoue = (raison) => { clearInterval(horloge); rejeter(new Error(raison)) }
+
+        horloge = setInterval(() => {
+          if (navigator.onLine === false) {
+            return echoue(`${quoi} s’est interrompu : la connexion a été perdue.`)
+          }
+          const ecoule = Math.round((Date.now() - depart) / 1000)
+          if (ecoule >= secondes) {
+            echoue(`${quoi} : aucune réponse après ${ecoule} s.`)
+          }
+        }, 1000)
+      })
+      /* On arrête l'horloge dans les deux cas, succès comme échec : un
+         intervalle laissé en marche continue de lire `Date.now()` pour rien
+         jusqu'à la fermeture de l'onglet. */
+      return Promise.race([promesse, surveille]).finally(() => clearInterval(horloge))
+    }
+
+    const delaiEnvoi = Math.max(120, secondes * 4)
 
     const { error: uploadError } = await limite(
       supabase.storage.from('procedo-videos')
         .upload(path, aiVideoFile, { cacheControl: CACHE_LONG }),
-      90, "L'envoi de la vidéo")
+      delaiEnvoi, "L'envoi de la vidéo")
     if (uploadError) {
       /* Le message brut de Supabase est en anglais et parle d'objets et de
          seaux. On traduit le seul cas fréquent, on laisse le reste tel quel. */
@@ -18168,7 +18215,29 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       return
     }
 
+    /* ═══ LE MESSAGE, PUIS LA PORTE DE SORTIE ═══
+
+     ⚠ L'ECHEC LAISSAIT UNE IMPASSE. On revenait bien a la page de depot, mais
+       la video choisie etait perdue et rien ne disait quoi faire : il fallait
+       comprendre tout seul qu'il fallait re-selectionner le fichier et
+       reappuyer. La liste des procedures propose « touchez pour relancer » —
+       l'ecran ou l'on se trouve au moment de l'echec, non.
+
+       Le bouton relance le meme depot avec le meme fichier : `aiVideoFile`
+       n'est pas efface par le `catch`, et `launchBtn` est deja reactive juste
+       au-dessus. */
     errorEl.textContent = e.message
+
+    const relance = document.createElement('button')
+    relance.type = 'button'
+    relance.className = 'lien-doux'
+    relance.textContent = 'Relancer l’analyse'
+    relance.addEventListener('click', () => {
+      errorEl.textContent = ''
+      launchBtn.click()
+    })
+    errorEl.appendChild(document.createElement('br'))
+    errorEl.appendChild(relance)
   }
 })
 

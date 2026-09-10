@@ -13580,6 +13580,19 @@ let manEdition = null      // identifiant de la procédure modifiée, ou null
 let manDepart = null       // copie de l'état enregistré, pour pouvoir revenir
 
 window.ouvrirEtapesManuelles = async function(procId) {
+  /* ⚠ LA MODIFICATION ÉTAIT LA BRÈCHE. Après la fin de l'essai, on ne pouvait
+     plus créer ni consulter une procédure — mais on pouvait encore en ouvrir
+     une existante et la réécrire entièrement. Un accès suspendu qui laisse
+     modifier n'est pas suspendu.
+
+     `bloqueSiEssaiFini` affiche la fenêtre d'abonnement et rend `true` : on
+     sort avant d'avoir rien peint. Même verrou que `startNewProcedure`,
+     `openAnalyse` et `openEquipeDetail`.
+
+   ⚠ SEULEMENT SUR UNE PROCÉDURE EXISTANTE. Sans `procId`, c'est une création
+     — déjà bloquée en amont par `startNewProcedure`, et la bloquer deux fois
+     afficherait deux fenêtres l'une sur l'autre. */
+  if (procId && await bloqueSiEssaiFini()) return
   manEdition = procId || null
   showGestionScreen('p-create-manual')
 
@@ -19550,6 +19563,19 @@ ecapEditor = createClipEditor({
 let dvEdition = null      // identifiant de la procédure ouverte, ou null en création
 
 window.ouvrirMontageVideo = async function(procId) {
+  /* ⚠ LA MODIFICATION ÉTAIT LA BRÈCHE. Après la fin de l'essai, on ne pouvait
+     plus créer ni consulter une procédure — mais on pouvait encore en ouvrir
+     une existante et la réécrire entièrement. Un accès suspendu qui laisse
+     modifier n'est pas suspendu.
+
+     `bloqueSiEssaiFini` affiche la fenêtre d'abonnement et rend `true` : on
+     sort avant d'avoir rien peint. Même verrou que `startNewProcedure`,
+     `openAnalyse` et `openEquipeDetail`.
+
+   ⚠ SEULEMENT SUR UNE PROCÉDURE EXISTANTE. Sans `procId`, c'est une création
+     — déjà bloquée en amont par `startNewProcedure`, et la bloquer deux fois
+     afficherait deux fenêtres l'une sur l'autre. */
+  if (procId && await bloqueSiEssaiFini()) return
   dvEdition = procId || null
   showGestionScreen('p-create-video')
 

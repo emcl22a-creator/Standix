@@ -22275,6 +22275,24 @@ body.abo-expire [data-etab-plus]{
 .step-edit-item .step-titre-saisie,
 .step-row .step-titre-saisie{
   display:block;
+  /* ⚠ `.step-edit-item` EST UNE GRILLE, PAS UNE RANGÉE FLEXIBLE. Mesuré au
+     navigateur : `display:grid`, colonnes `30px 274px`. La première porte le
+     numéro de l'étape.
+
+     Un enfant ajouté sans consigne tombe dans cette première colonne et fait
+     donc 30 px de large. C'est ce qui rendait le champ invisible — j'ai
+     d'abord cru à un flex et posé `flex:0 0 100%`, qui n'a strictement aucun
+     effet dans une grille.
+
+     `grid-column: 1 / -1` lui donne toutes les colonnes, de la première à la
+     dernière, quel qu'en soit le nombre. */
+  /* ⚠ COLONNE 2, ET NON TOUTE LA LARGEUR. `1 / -1` marchait — le champ
+     devenait visible — mais il débordait de 43 px à gauche par rapport au
+     champ texte, qui vit dans la seconde colonne. Deux champs de la même
+     étape qui ne commencent pas au même endroit se lisent mal.
+
+     Mesuré : 332 px avec `1 / -1`, 289 avec `2`, comme le texte. */
+  grid-column: 2;
   width:100%;
   box-sizing:border-box;
   padding:9px 12px !important;
@@ -22306,6 +22324,7 @@ body.abo-expire [data-etab-plus]{
 /* Le filet. Un peu d'air de chaque côté : collé aux deux champs, il ferait
    croire à une bordure commune plutôt qu'à une séparation. */
 .step-filet{
+  grid-column: 2;   /* aligné sur les champs, pas sur le numéro */
   height:1px;
   margin:9px 2px;
   background:rgba(28,28,38,0.10);
@@ -22317,27 +22336,41 @@ body.abo-expire [data-etab-plus]{
    LE POINT DE VIGILANCE, DANS L'ÉDITEUR
 
  ⚠ IL NE RESSEMBLE PAS AUX AUTRES CHAMPS, ET C'EST TOUT SON RÔLE. Le titre et
-   le texte partagent le même gris ; celui-ci est ambré, avec un pictogramme
+   le texte partagent le même gris ; celui-ci est bleu, avec un pictogramme
    en tête. On le repère sans le lire — ce qui est exactement ce qu'on demande
    à une mise en garde.
 
- ⚠ L'AMBRE VIENT DE LA PALETTE DE L'APP, pas d'un rouge inventé. Le rouge est
-   réservé à ce qui échoue ou détruit : l'employer ici ferait croire à une
-   erreur de saisie. L'ambre prévient, il ne condamne pas.
+ ⚠ LE BLEU DE L'APP, `#1F4CEE` — celui de la barre de navigation, celui des
+   points « non lu », celui des boutons. Il était ambré au premier jet ; le
+   bleu rattache ce bloc au reste de l'application au lieu d'introduire une
+   quatrième couleur.
+
+   Le contraste du texte a été mesuré : `#12357F` sur ce fond très clair donne
+   plus de 9:1, largement au-dessus du seuil de lisibilité. Un bleu plus vif
+   passerait sous la barre sur un fond aussi pâle.
 
  ⚠ LE PICTOGRAMME NE SE RÉTRÉCIT PAS. `flex:0 0 auto` : sans lui, un texte de
    trois lignes l'écrase à quelques pixels et le triangle devient un trait.
    ═══════════════════════════════════════════════════════════════════════════ */
 .step-attention-bloc{
+  /* ⚠ DEUX DISPOSITIONS SE CROISENT ICI, ET LES DEUX COMPTENT.
+
+     `grid-column: 1 / -1` le place sur toute la largeur de l'étape, qui est
+     une GRILLE — sans quoi il tombait dans la colonne du numéro, à 30 px, et
+     son champ mesurait zéro : invisible, exactement ce qui a été rapporté.
+
+     `display:flex` range ensuite le pictogramme et le champ À L'INTÉRIEUR du
+     bloc. Le premier concerne le parent, le second les enfants. */
+  grid-column: 2;
   display:flex;
   align-items:flex-start;
   gap:8px;
   margin-top:9px;
   padding:9px 11px;
   border-radius:12px;
-  background:rgba(232,118,15,0.07);
-  border:0.5px solid rgba(232,118,15,0.28);
-  border-left:2.5px solid rgba(232,118,15,0.55);
+  background:rgba(31,76,238,0.06);
+  border:0.5px solid rgba(31,76,238,0.24);
+  border-left:2.5px solid rgba(31,76,238,0.55);
 }
 
 .step-attention-ic{
@@ -22345,7 +22378,7 @@ body.abo-expire [data-etab-plus]{
   width:17px;
   height:17px;
   margin-top:2px;
-  color:#B4600F;
+  color:#1F4CEE;
 }
 .step-attention-ic svg{ width:100%; height:100%; display:block; }
 
@@ -22363,7 +22396,7 @@ body.abo-expire [data-etab-plus]{
   font-family:inherit;
   font-size:14px !important;
   line-height:1.45 !important;
-  color:#8A4A0B;
+  color:#12357F;
 }
 
 .step-attention-bloc .step-attention-saisie:focus{
@@ -22372,5 +22405,42 @@ body.abo-expire [data-etab-plus]{
 }
 
 .step-attention-bloc .step-attention-saisie::placeholder{
-  color:rgba(138,74,11,0.52);
+  color:rgba(18,53,127,0.48);
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ORDRE DES RANGÉES DANS UNE ÉTAPE MANUELLE
+
+ ⚠ CETTE GRILLE PLACE TOUT EXPLICITEMENT. `#p-create-manual .man-fil` assigne
+   `grid-row` et `grid-column` au numéro, au champ texte et à la barre du bas.
+   Un élément ajouté sans consigne ne se glisse donc PAS entre eux : il va où
+   l'algorithme trouve de la place, c'est-à-dire après.
+
+   C'est ce qui faisait passer le champ texte AVANT le titre, alors que le
+   balisage donne l'inverse.
+
+ ⚠ ET `textarea` ATTRAPAIT LE CHAMP DE VIGILANCE. Le sélecteur ne distingue
+   pas les deux : le champ d'alerte recevait `grid-row:1`, la place du texte.
+   Le `:not()` l'en exclut.
+
+   L'ordre voulu, de haut en bas :
+     1  le titre
+     2  le filet
+     3  le texte de l'étape
+     4  le point de vigilance
+     5  la photo et la corbeille
+
+   Le numéro reste en rangée 1, colonne 1 — il coiffe l'étape entière.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-create-manual .man-fil .step-titre-saisie{ grid-row:1; grid-column:2; }
+#p-create-manual .man-fil .step-filet{ grid-row:2; grid-column:2; }
+#p-create-manual .man-fil textarea:not(.step-attention-saisie){ grid-row:3; grid-column:2; }
+#p-create-manual .man-fil .step-attention-bloc{ grid-row:4; grid-column:2; }
+#p-create-manual .man-fil .step-bas{ grid-row:5; grid-column:2; }
+
+/* Le champ d'alerte vit DANS son bloc, pas dans la grille de l'étape. Ces
+   deux propriétés n'y ont aucun effet, mais la règle `textarea` ci-dessus les
+   lui posait : on les annule pour que le jour où le bloc deviendrait une
+   grille, rien de fantôme ne s'y applique. */
+#p-create-manual .man-fil .step-attention-saisie{ grid-row:auto; grid-column:auto; }

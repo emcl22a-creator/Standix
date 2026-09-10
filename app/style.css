@@ -22210,3 +22210,41 @@ body.abo-expire [data-etab-plus]{
   border-radius:10px;
   display:block;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TITRE D'UNE ÉTAPE
+
+ ⚠ IL SE LIT EN COLONNE, ET C'EST TOUT SON INTÉRÊT. Huit verbes empilés
+   verticalement donnent la procédure entière en trois secondes — ce que fait
+   quelqu'un debout avant de commencer. D'où le contraste marqué avec le
+   texte : le titre doit accrocher l'œil qui descend sans lire.
+
+ ⚠ `display:block` ET UNE MARGE BASSE SERRÉE. Le titre et sa phrase forment un
+   couple ; l'espace entre eux doit être plus petit que celui qui sépare deux
+   étapes, sinon le titre semble appartenir à l'étape précédente. C'est la loi
+   de proximité, et elle se voit tout de suite quand on l'oublie.
+
+ ⚠ PAS DE MAJUSCULES FORCÉES. Un `text-transform:uppercase` sur « Détartrer le
+   groupe » rendrait le mot plus difficile à lire d'un coup d'œil, alors que
+   c'est précisément l'usage. La graisse suffit à distinguer.
+
+   Une seule ligne, coupée par des points de suspension au-delà : la base
+   limite déjà à 60 caractères, ceci couvre les écrans les plus étroits. */
+.et-titre{
+  display:block;
+  margin-bottom:3px;
+  font-size:14.5px;
+  font-weight:600;
+  letter-spacing:-0.011em;
+  color:var(--label);
+  line-height:1.3;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Sous le titre, la phrase se met légèrement en retrait de couleur : elle
+   devient le détail de ce que le titre annonce, et non une seconde voix de
+   même importance. */
+.et-titre + p{ color:var(--label-2); }

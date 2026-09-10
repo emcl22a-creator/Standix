@@ -11079,6 +11079,25 @@ function iconeAccueil(cle) {
 // Capture la position actuelle de chaque carte (identifiée par data-key) avant de les réordonner
 function captureCardPositions(containerEl) {
   const rects = new Map()
+  if (!containerEl) return rects
+
+  /* ⚠ UN CONTENEUR HORS DE L'ÉCRAN NE SE MESURE PAS.
+
+     `getBoundingClientRect` rend des zéros sur un élément dont un ancêtre est
+     en `display:none` — sans erreur, sans avertissement. Les cartes
+     glissaient alors depuis le coin haut-gauche de l'écran, toutes ensemble,
+     avec l'air d'être perdues.
+
+     Le cas se produit dès qu'une liste est redessinée pendant qu'on regarde
+     un AUTRE écran : après un renommage, après un changement de dossier.
+
+     Rendre une carte VIDE plutôt que des zéros fait passer `playCardShuffle`
+     par son cas « premier remplissage », qui ne joue aucun glissement. Les
+     cartes apparaissent simplement en place — et c'est ce qu'on veut d'une
+     liste qu'on ne regarde pas. */
+  const cadre = containerEl.getBoundingClientRect()
+  if (cadre.width < 1 || cadre.height < 1) return rects
+
   containerEl.querySelectorAll('[data-key]').forEach(el => {
     rects.set(el.dataset.key, el.getBoundingClientRect())
   })
@@ -13077,11 +13096,42 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   /* On recharge : les regroupements par dossier sont construits au chargement,
      et c'est le seul endroit qui les construit. */
   await loadGestionProcedures()
-  if (depuisListe) {
-    renderCategoryGrid()
-  } else {
-    document.getElementById('category-titre').textContent = nouveau
+
+  /* ═══ ON REGARDE L'ÉCRAN AFFICHÉ, PAS D'OÙ VIENT LE CLIC ═══
+
+   ⚠ `depuisListe` DÉCRIVAIT LE BOUTON, PAS LA PAGE. Les trois points d'une
+     carte posaient ce drapeau et faisaient redessiner la grille — même quand
+     on se trouvait DANS le dossier, à regarder ses sous-dossiers.
+
+     Deux conséquences, et ce sont exactement les deux défauts rapportés :
+
+     · Le titre de la page gardait l'ANCIEN nom. Rien ne le réécrivait, cette
+       branche ne s'occupant que de la grille.
+
+     · L'animation partait de travers. `renderCategoryGrid` mesure les cartes
+       AVANT de les remplacer, puis les fait glisser de l'ancienne position à
+       la nouvelle. Sur une grille qui n'est pas à l'écran, ces rectangles
+       valent zéro : les cartes glissaient donc depuis le coin de l'écran.
+       C'est le « on dirait qu'il est perdu ».
+
+     Le nom du dossier ouvert se lit dans le titre — la page ne le garde nulle
+     part ailleurs, comme le rappelle le commentaire du bouton `cat-renommer`. */
+  const titreEl = document.getElementById('category-titre')
+  const dansLeDossier = document.getElementById('p-category')?.classList.contains('active')
+  const ouvertIci = (titreEl?.textContent || '').trim() === ancien
+
+  if (dansLeDossier && ouvertIci) {
+    /* On est dans le dossier qu'on vient de renommer : on met le titre à jour
+       et on rouvre sous son nouveau nom. La grille se refera d'elle-même au
+       retour, avec des mesures qui auront un sens. */
+    titreEl.textContent = nouveau
     ouvrirCategorie(nouveau)
+  } else if (dansLeDossier) {
+    /* On est dans un AUTRE dossier — on a renommé un sous-dossier ou un
+       voisin. On rafraîchit ce qu'on regarde, sans toucher au titre. */
+    ouvrirCategorie((titreEl?.textContent || '').trim())
+  } else {
+    renderCategoryGrid()
   }
   toast(`${data.length} proc\u00e9dure${data.length > 1 ? 's' : ''} reclass\u00e9e${data.length > 1 ? 's' : ''}.`)
 }
@@ -14125,19 +14175,22 @@ async function renommerSousDossier(ancien) {
      renonce. */
   if (saisi === ancien) return                    // rien n'a change
 
-  /* ⚠ ANNULER ET VIDER LE CHAMP RENDENT LA MEME CHOSE : `null`.
+  /* ⚠ ON A RENONCÉ : ON NE DEMANDE RIEN.
 
-     Verification faite dans `demanderTexte` : le bouton « Annuler », la touche
-     d'echappement et le clic sur le fond rendent tous `null` — exactement comme
-     un champ vide. Distinguer les deux demanderait de modifier cette fonction,
-     qui sert a une dizaine d'autres endroits.
+     `demanderTexte` rend maintenant `undefined` quand on annule — bouton,
+     touche d'échappement ou clic sur le fond — et `null` seulement quand le
+     champ a été vidé PUIS validé.
 
-     On demande donc confirmation dans les deux cas. Quelqu'un qui a annule voit
-     une question qu'il n'attendait pas, mais il repond « Annuler » et rien ne se
-     passe. L'inverse — retirer un sous-dossier parce qu'on a ferme une fenetre —
-     serait bien pire. */
+     Avant cette distinction, les deux rendaient `null` : toucher « Annuler »
+     ouvrait « Retirer le sous-dossier ? », une question posée à quelqu'un qui
+     venait de dire non. Le compromis était assumé dans un commentaire, il
+     n'aurait pas dû l'être. */
+  if (saisi === undefined) return
+
   let propre
   if (saisi === null) {
+    /* Le champ a été vidé volontairement. On confirme quand même : effacer un
+       rangement se fait en un geste, se défait en plusieurs. */
     const sur = await confirmDialog({
       titre: 'Retirer le sous-dossier ?',
       message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb remonteront en haut de ` +
@@ -20004,6 +20057,9 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
        profondeur, avec son chiffre dedans. Il se pose sur le fil, à gauche. */
     div.innerHTML = `
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+      <input type="text" class="step-titre-saisie" maxlength="60"
+             placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
+      <div class="step-filet"></div>
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
       <div class="step-bas">
       <div class="step-img">
@@ -20022,6 +20078,19 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { manualSteps[i].texte = e.target.value; autoResizeTextarea(e.target) })
+    /* ⚠ LE TITRE S'ENREGISTRE DANS LE MEME OBJET QUE LE TEXTE. Sans cette
+       ligne, le champ se remplit a l'ecran, se relit apres un redessin — la
+       valeur est dans le balisage — et disparait a l'enregistrement. Un champ
+       qui a l'air de marcher jusqu'a la sauvegarde est pire qu'un champ
+       absent.
+
+       `trim() || null` : un champ vide vaut `null` et non chaine vide, pour
+       que la base et l'affichage voient la meme chose. */
+    const champTitre = div.querySelector('.step-titre-saisie')
+    if (champTitre) champTitre.addEventListener('input', (e) => {
+      manualSteps[i].titre = e.target.value.trim() || null
+    })
+
 
     /* Le champ ne s'ajustait qu'à LA SAISIE. Rempli par l'IA — ou relu après
        coup —, il gardait sa hauteur d'une ligne et coupait le texte au milieu.
@@ -20846,6 +20915,9 @@ function renderVideoSteps(listEl) {
     div.className = 'step-edit-item etape-montage' + (i === dvSelection ? ' sel' : '')
     div.innerHTML = `
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+      <input type="text" class="step-titre-saisie" maxlength="60"
+             placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
+      <div class="step-filet"></div>
       <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
       <!-- ═══ LE POINT DE VIGILANCE, VISIBLE ET MODIFIABLE ═══
 
@@ -20884,6 +20956,19 @@ function renderVideoSteps(listEl) {
       })
       requestAnimationFrame(() => autoResizeTextarea(av))
     }
+
+    /* ⚠ LE TITRE S'ENREGISTRE DANS LE MEME OBJET QUE LE TEXTE. Sans cette
+       ligne, le champ se remplit a l'ecran, se relit apres un redessin — la
+       valeur est dans le balisage — et disparait a l'enregistrement. Un champ
+       qui a l'air de marcher jusqu'a la sauvegarde est pire qu'un champ
+       absent.
+
+       `trim() || null` : un champ vide vaut `null` et non chaine vide, pour
+       que la base et l'affichage voient la meme chose. */
+    const champTitre = div.querySelector('.step-titre-saisie')
+    if (champTitre) champTitre.addEventListener('input', (e) => {
+      videoSteps[i].titre = e.target.value.trim() || null
+    })
 
     const ta = div.querySelector('textarea')
     /* ⚠ LE TEXTE SE MEMORISE AU DEBUT DE LA SAISIE, PAS A CHAQUE LETTRE.
@@ -21135,6 +21220,13 @@ async function publishProcedure(errorElId, btnId) {
 
   const etapesToInsert = allSteps.map((s, i) => ({
     procedure_id: newProc.id, ordre: i + 1, texte: s.texte,
+      /* ⚠ SANS CETTE LIGNE, LE CHAMP SERAIT UN LEURRE. Le titre se saisit, se
+         relit apres un redessin — la valeur est dans le balisage — et
+         disparait a l'enregistrement. Un champ qui a l'air de marcher jusqu'a
+         la sauvegarde est pire qu'un champ absent.
+
+         `|| null` : la base attend `null`, pas une chaine vide. */
+      titre: s.titre || null,
     /* Réécrit avec le reste : sans cette ligne, chaque enregistrement d'une
        procédure vidéo effaçait les points de vigilance. */
     attention: s.attention ?? null,
@@ -29503,13 +29595,28 @@ function demanderTexte({ titre, message, valeur = '', placeholder = '', confirme
       backdrop.classList.add('closing')
       setTimeout(() => { backdrop.remove(); resolve(v) }, 180)
     }
-    backdrop.querySelector('.cancel').onclick = () => fermer(null)
+    /* ═══ ANNULER N'EST PAS VIDER LE CHAMP ═══
+
+     ⚠ LES DEUX RENDAIENT `null`, ET UN APPELANT S'EN SERVAIT. Le renommage
+       d'un sous-dossier traite le champ vide comme « retirer ce sous-dossier ».
+       Annuler produisant la meme valeur, il enchainait sur « Retirer le
+       sous-dossier ? » — une question posee a quelqu'un qui venait de dire non.
+
+       Desormais :
+         `undefined` — on a renonce : bouton Annuler, touche d'echappement,
+                       clic sur le fond.
+         `null`      — le champ a ete VIDE puis valide. Un choix, pas un renoncement.
+
+     ⚠ LES QUATRE AUTRES APPELANTS NE VOIENT PAS LA DIFFERENCE : ils ecrivent
+       tous `if (!x) return`, et `undefined` comme `null` y sont faux.
+       Verifie un par un avant de toucher a cette ligne. */
+    backdrop.querySelector('.cancel').onclick = () => fermer(undefined)
     backdrop.querySelector('.ok').onclick = () => fermer((champ.value || '').trim() || null)
     champ.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); fermer((champ.value || '').trim() || null) }
-      if (e.key === 'Escape') fermer(null)
+      if (e.key === 'Escape') fermer(undefined)
     })
-    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) fermer(null) })
+    backdrop.addEventListener('click', (e) => { if (e.target === backdrop) fermer(undefined) })
   })
 }
 
@@ -29684,6 +29791,9 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
     const fin = step.fin_video != null ? step.fin_video : debut
     div.innerHTML = `
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
+      <input type="text" class="step-titre-saisie" maxlength="60"
+             placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
+      <div class="step-filet"></div>
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte || '')}</textarea>
       ${hasClip ? '' : `<div class="step-img">
           <div class="step-img-vignette${step.image_url || step.imageFichier ? ' pleine' : ''}">${step.image_url
@@ -29703,6 +29813,19 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
     `
     const textarea = div.querySelector('textarea')
     textarea.addEventListener('input', (e) => { editStepsData[i].texte = e.target.value; majBoutonIA(); autoResizeTextarea(e.target) })
+    /* ⚠ LE TITRE S'ENREGISTRE DANS LE MEME OBJET QUE LE TEXTE. Sans cette
+       ligne, le champ se remplit a l'ecran, se relit apres un redessin — la
+       valeur est dans le balisage — et disparait a l'enregistrement. Un champ
+       qui a l'air de marcher jusqu'a la sauvegarde est pire qu'un champ
+       absent.
+
+       `trim() || null` : un champ vide vaut `null` et non chaine vide, pour
+       que la base et l'affichage voient la meme chose. */
+    const champTitre = div.querySelector('.step-titre-saisie')
+    if (champTitre) champTitre.addEventListener('input', (e) => {
+      editStepsData[i].titre = e.target.value.trim() || null
+    })
+
     /* Même correctif qu'à la création : le champ s'ajuste aussi à l'affichage,
        sinon une étape longue s'ouvre coupée à la première ligne. */
     requestAnimationFrame(() => autoResizeTextarea(textarea))
@@ -29826,6 +29949,7 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
   await supabase.from('etapes').delete().eq('procedure_id', editProcedureId)
   const etapesToInsert = editStepsData.map((s, i) => ({
     procedure_id: editProcedureId, ordre: i + 1, texte: s.texte,
+      titre: s.titre || null,
     /* Même oubli que sur l'autre chemin d'écriture. Cet écran est aujourd'hui
        inatteignable — `openEditProcedure` n'est appelée nulle part — mais le
        corriger coûte une ligne, et laisser un effacement silencieux dans du

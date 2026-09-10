@@ -22474,24 +22474,30 @@ body.abo-expire [data-etab-plus]{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LA CLASSE QUI RELANCE LE VERRE
+   LE VERRE DE LA BARRE NE DOIT PAS SE RECONSTRUIRE
 
- ⚠ ELLE NE CHANGE RIEN DE VISIBLE. Un centième de pixel de flou en plus : le
-   but n'est pas l'effet, c'est de donner à WebKit une valeur différente de la
-   précédente. Sans changement, il ne refait pas le calque — et le voile reste
-   figé, nu, après la bascule vers l'aperçu.
+ ⚠ SAFARI PERD LE `backdrop-filter` QUAND LE CALQUE EST REFAIT. Pendant la
+   bascule vers l'aperçu, `body.espace-vide .topbar` fait passer la barre de
+   `z-index:15` à `z-index:40`. Ce changement de plan détruit le calque de
+   composition et en crée un neuf — WebKit ne recalcule alors plus le voile,
+   qui reste déclaré mais nu. Il fallait changer deux fois de page pour le
+   retrouver.
 
- ⚠ LE `!important` EST OBLIGATOIRE ICI. Trois autres règles posent le flou du
-   voile avec `!important`, et la dernière l'emporte : sans lui, cette classe
-   ne changerait strictement rien. C'est le dossier des cinq définitions de
-   `.topbar::after`, déjà signalé.
+   Chrome ne le fait pas : mesure faite, une bascule complète y laisse la barre
+   identique au pixel près. Ce correctif ne se vérifie que sur un iPhone.
 
- ⚠ ET LA VALEUR DOIT ÊTRE CELLE QUI GAGNE, à un centième près. La règle
-   effective est `blur(14px) saturate(1.25)` — pas le `blur(16px)` écrit en
-   tête du fichier. Reprendre la mauvaise ferait sauter le voile d'un flou à
-   l'autre le temps d'une image.
+ ⚠ `translateZ(0)` DONNE AU VOILE SON PROPRE CALQUE, EN PERMANENCE. Il n'est
+   donc plus emporté quand celui de la barre est refait. C'est une propriété
+   statique — aucune animation, rien qui bouge, rien qui clignote.
+
+ ⚠ ET IL S'AJOUTE AU `translateX` EXISTANT, il ne le remplace pas. Le voile est
+   centré par `translateX(-50%)` : écrire `translateZ(0)` seul le décalerait de
+   la moitié de sa largeur vers la droite. Les deux vont ensemble, dans cet
+   ordre.
+
+   `!important` parce que la règle d'origine en porte un.
    ═══════════════════════════════════════════════════════════════════════════ */
-.topbar.verre-relance::after{
-  -webkit-backdrop-filter:blur(14.01px) saturate(1.25) !important;
-  backdrop-filter:blur(14.01px) saturate(1.25) !important;
+.topbar::after{
+  transform:translateX(-50%) translateZ(0) !important;
+  will-change:backdrop-filter;
 }

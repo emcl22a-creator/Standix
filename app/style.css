@@ -22134,7 +22134,16 @@ body.abo-expire [data-etab-plus]{
    Le bouton est plus grand que ce qu'il montre. */
 .mdp-champ{ position:relative; display:block; }
 .mdp-champ > input{ width:100%; margin-bottom:0; }
-#signup-password{ padding-right:44px; }
+
+/* ⚠ LES DEUX CHAMPS, ET PAR IDENTIFIANT. `#signup-password` seul laissait le
+   mot de passe de la connexion passer SOUS l'icône dès qu'il était long.
+
+   Un sélecteur de classe — `.mdp-champ > input` — n'y suffirait pas : le
+   `padding:12px` vient d'une règle déclarée dans une requête média, donc plus
+   spécifique qu'une classe posée ici en fin de fichier. Les identifiants la
+   dépassent quoi qu'il arrive. */
+#signup-password,
+#login-password{ padding-right:44px; }
 
 .mdp-oeil{
   position:absolute; top:0; right:0; bottom:0; width:44px;
@@ -22157,3 +22166,31 @@ body.abo-expire [data-etab-plus]{
 /* Le rectangle de mise au point suit le bouton, pas le champ : sans cette
    règle il épousait toute la largeur de l'enveloppe. */
 .mdp-oeil:focus-visible{ outline:2px solid var(--ambre-txt); outline-offset:2px; border-radius:8px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE LOGO DE L'ENTREPRISE, DANS SA LIGNE
+
+ ⚠ IL OCCUPE LA PASTILLE, IL NE S'Y AJOUTE PAS. Les autres lignes de la page
+   portent une icône dessinée sur un fond teinté ; celle-ci porte une image.
+   Le fond et l'ombre intérieure disparaissent : un logo a le sien, et deux
+   fonds superposés se voient tout de suite.
+
+ ⚠ `contain` ET NON `cover`. Un logo d'entreprise n'est presque jamais carré.
+   `cover` remplirait la pastille en rognant les bords — c'est-à-dire en
+   coupant le nom de l'entreprise sur la moitié des logos. `contain` le pose
+   entier, quitte à laisser du vide autour.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#e-profil .reg-ic.ent-ic{
+  background:none;
+  box-shadow:none;
+  overflow:hidden;
+  padding:0;
+}
+#e-profil .reg-ic.ent-ic img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  border-radius:9px;
+  display:block;
+}

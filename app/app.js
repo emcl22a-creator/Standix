@@ -3867,6 +3867,39 @@ document.addEventListener('click', (e) => {
 
    La règle exige un séparateur — deux-points, tiret, point ou parenthèse —
    SUIVI d'une espace. « 2 minutes » n'en a pas, donc rien n'est retiré. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TITRE D'UNE ÉTAPE
+
+ ⚠ IL EST FACULTATIF, ET LE RESTERA. Les étapes écrites avant septembre 2026
+   n'en ont pas, et la colonne peut ne pas exister du tout si la migration
+   n'a pas encore été passée. Dans les deux cas `etape.titre` vaut `undefined`
+   SANS lever d'erreur — c'est le piège que le CLAUDE.md rappelle : une
+   colonne absente ne se signale jamais.
+
+   Cette fonction rend une chaîne vide dans ces cas-là, donc rien ne s'affiche
+   et rien ne casse. L'app peut être déployée avant ou après la migration.
+
+ ⚠ ON REFUSE AUSSI LE TITRE QUI RECOPIE LE TEXTE. Sur une étape de huit
+   caractères, l'IA a toutes les chances de reprendre les mêmes mots. Un titre
+   identique à la phrase qu'il coiffe ne dit rien deux fois : il la dit deux
+   fois. On le laisse tomber.
+
+   La comparaison ignore la casse, les accents et la ponctuation finale :
+   « Rincer le bac » et « Rincez le bac. » sont le même contenu pour l'œil. */
+function titreEtape(etape) {
+  const brut = (etape?.titre || '').trim()
+  if (!brut) return ''
+
+  const nu = (t) => t.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim()
+
+  const texte = nu(sansNumeroDEtape(etape.texte || ''))
+  if (nu(brut) === texte) return ''
+
+  return brut
+}
+
 function sansNumeroDEtape(texte) {
   if (!texte) return ''
   return String(texte)
@@ -21373,6 +21406,7 @@ async function openAnalyse(procId) {
       div.innerHTML = `
         <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
         <div class="et-co">
+          ${titreEtape(etape) ? `<span class="et-titre">${escapeHtml(titreEtape(etape))}</span>` : ''}
           <p>${escapeHtml(etape.texte)}</p>
           ${etape.attention ? `<div class="et-attention">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
@@ -23953,6 +23987,7 @@ async function openEquipeDetail(procId) {
       <button type="button" class="et-coche${faite ? ' f' : ''}" data-etape="${escapeHtml(etape.id)}"
               aria-label="\u00c9tape ${i + 1}"><span class="num">${numeroEtapeDess(i + 1)}</span><span class="ok">${cocheFaiteDess()}</span></button>
       <div class="et-co">
+        ${titreEtape(etape) ? `<span class="et-titre">${escapeHtml(titreEtape(etape))}</span>` : ''}
         <p>${escapeHtml(sansNumeroDEtape(etape.texte))}</p>
         <!-- La durée est À L'INTÉRIEUR du bloc de texte, après le paragraphe.
              En voisine du texte, elle en rognait la largeur : la ligne étant
@@ -24053,9 +24088,23 @@ function peindreReglagesEquipe() {
     const src = ent?.logo_url ? urlLogo(ent.logo_url) : null
 
     if (src) {
-      el('es-logo-ent').src = src
+      const img = el('es-logo-ent')
+      /* ⚠ SI L'IMAGE NE CHARGE PAS, ON RETIRE LA LIGNE ENTIÈRE.
+
+         Une adresse morte laisse une pastille vide à gauche d'un nom : un trou
+         dans la colonne d'icônes, et l'impression que l'app est cassée. Mieux
+         vaut pas de ligne qu'une ligne borgne.
+
+         `onerror` est posé AVANT `src` — l'ordre compte : une image déjà en
+         cache peut échouer avant même la fin de cette fonction. */
+      img.onerror = () => { groupeEnt.style.display = 'none' }
+      img.src = src
       el('es-ent-nom').textContent = ent.nom || 'Votre entreprise'
-      el('es-ent-role').textContent = ent.role === 'gestion' ? 'Gestion' : 'Équipe'
+
+      /* ⚠ « Utilisateur » ET NON « Équipe ». C'est le mot de l'inscription —
+         on s'inscrit « en tant qu'utilisateur », pas « en tant qu'équipe ».
+         L'app disait l'un et l'autre pour la même chose. */
+      el('es-ent-role').textContent = ent.role === 'gestion' ? 'Gestion' : 'Utilisateur'
       groupeEnt.style.display = ''
     } else {
       groupeEnt.style.display = 'none'

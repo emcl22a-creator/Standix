@@ -1298,33 +1298,6 @@ function afficherEcranChoix() {
    ═══════════════════════════════════════════════════════════════════════════ */
 let apercuEquipe = false
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   RELANCER LE VERRE DE LA BARRE
-
-   ⚠ SAFARI CESSE DE RECALCULER `backdrop-filter` APRES CERTAINES ANIMATIONS.
-     Le voile de la barre reste declare, sa valeur est intacte — mais WebKit
-     ne redessine plus le calque : la barre paraît nue jusqu'a ce qu'autre
-     chose force un recalcul. C'est ce qui se produit apres la bascule vers
-     l'apercu, et pourquoi il fallait changer deux fois de page.
-
-   ⚠ CHROME NE LE FAIT PAS. Mesure : apres une bascule complete jouee dans
-     Chromium, la barre est identique au pixel pres — zero difference. Ce
-     correctif ne se verifie donc que sur un iPhone.
-
-   ⚠ ON NE PEUT PAS TOUCHER UN `::after` DEPUIS LE SCRIPT. On passe par une
-     classe sur la barre, qui modifie le flou d'un centieme de pixel — assez
-     pour que WebKit refasse le calque, trop peu pour se voir.
-
-     Une image suffit : on repose la valeur au `requestAnimationFrame` suivant.
-     La laisser figerait le voile a une valeur legerement fausse. */
-function relancerVerreBarre() {
-  const barre = document.querySelector('.topbar')
-  if (!barre) return
-  barre.classList.add('verre-relance')
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => barre.classList.remove('verre-relance'))
-  })
-}
 
 window.ouvrirApercuEquipe = function () {
   if (apercuEquipe) return
@@ -1377,7 +1350,6 @@ window.ouvrirApercuEquipe = function () {
     if (eq) { eq.style.display = 'block'; eq.removeAttribute('inert') }
     document.body.classList.remove('espace-vide')
     document.body.classList.add('espace-arrive')
-    relancerVerreBarre()
 
     /* ⚠ ON RELANCE L'ANIMATION DE L'ECRAN.
 
@@ -1479,7 +1451,6 @@ function sortirApercuEquipe() {
 
     document.body.classList.remove('espace-vide')
     document.body.classList.add('espace-arrive')
-    relancerVerreBarre()
 
     /* ⚠ ET L'ON NETTOIE `nait` TOUT DE SUITE, avant que l'animation ne parte.
 

@@ -15153,9 +15153,13 @@ function dessinerCollage() {
     avert.textContent = 'Ajoutez au moins une seconde vidéo.'
     lancer.disabled = true
   } else {
-    avert.textContent = secondes > DUREE_CONSEILLEE
-      ? `Au-delà de deux minutes, une procédure se suit mal debout entre deux tâches.`
-      : ''
+    /* ⚠ IL Y AVAIT ICI LE MÊME CONSEIL QUE SUR L'ÉCRAN D'ANALYSE — « au-delà
+       de deux minutes, une procédure se suit mal debout entre deux tâches ».
+       Retiré des deux endroits : le refus à cinq minutes suffit à poser la
+       limite, et les deux messages rouges au-dessus disent déjà ce qui bloque.
+
+       La zone reste vide quand tout va bien : rien à signaler, rien à lire. */
+    avert.textContent = ''
     lancer.disabled = false
   }
 }
@@ -17075,11 +17079,15 @@ function chargerVideoPourIA(file) {
    transcription dépasse ce que le modèle met en forme d'un seul tenant, et
    l'échec est quasi certain. Mieux vaut le dire avant l'envoi qu'après dix
    minutes d'attente. */
-/* DEUX MINUTES, ET C'EST UN CONSEIL. Au-delà l'analyse marche parfaitement —
-   Emilien vient d'en passer une de 3 min 30. Mais l'allègement ET Azure suivent
-   tous deux la durée : moitié moins de vidéo fait moitié moins d'attente, et
-   coûte moitié moins cher en minutes Azure. Le refus, lui, reste à cinq. */
-const DUREE_CONSEILLEE = 2 * 60
+/* ⚠ `DUREE_CONSEILLEE` A ÉTÉ RETIRÉE, avec les deux conseils qu'elle pilotait.
+
+   Elle valait deux minutes et servait à afficher, sur l'écran d'analyse comme
+   sur celui de collage, qu'une procédure plus longue « se suit mal debout
+   entre deux tâches ». Les deux messages sont partis ; la constante n'était
+   plus lue nulle part — vérifié dans `app.js` comme dans `index.html`.
+
+   La laisser aurait fait croire qu'un seuil de deux minutes existe encore
+   quelque part. Il n'y a plus qu'une limite, celle du refus, juste en dessous. */
 /* Cinq minutes. Au-delà, l'analyse marcherait encore, mais deux choses la
    déconseillent : le coût Azure suit la durée à la minute près, et surtout une
    procédure de dix minutes ne se suivrait pas — on la regarde une fois, jamais deux. */
@@ -17809,30 +17817,22 @@ function verifierDureeVideo() {
      en avait pour trente secondes ou pour dix minutes, et sept minutes de
      silence passent pour une panne.
 
-     AU-DELÀ DE DEUX MINUTES, ON CONSEILLE — ON NE REFUSE PAS. Le refus reste à
-     cinq minutes. Entre les deux, la vidéo marche très bien : Emilien vient
-     d'en passer une de 3 min 30.
+     AU-DELÀ DE DEUX MINUTES, ON NE DIT PLUS RIEN DE PARTICULIER. Il y avait
+     ici un conseil — « une vidéo de deux minutes s'analyse en 3 min, et se
+     suit mieux debout entre deux tâches ». Retiré : trois lignes de morale
+     au-dessus du bouton, au moment précis où l'on veut appuyer dessus.
 
-     ⚠ ON NE PROMET PAS DE GAGNER DU TEMPS EN DÉCOUPANT. J'ai failli l'écrire :
-     « deux vidéos de moitié prendraient 5 min chacune » — vrai, mais 10 min en
-     tout contre 8 pour une seule, parce que le coût fixe se paie deux fois. Le
-     découpage ne fait pas gagner de temps total, et le coût Azure ne bouge pas
-     non plus : il se compte à la minute de vidéo.
+     ⚠ LA DURÉE D'ANALYSE RESTE AFFICHÉE, elle. Une vidéo longue tombe
+       désormais dans le même cas qu'une courte et annonce « Comptez 3 min
+       d'analyse ». Sans cela, une vidéo de 2 min 17 n'aurait rien affiché du
+       tout quand une vidéo d'une minute annonce encore son délai : la plus
+       longue en aurait dit moins que la courte.
 
-     Ce qu'on gagne est ailleurs, et c'est le vrai argument : une procédure de
-     deux minutes se regarde debout entre deux tâches, une de quatre non. */
+     Le refus reste à cinq minutes, inchangé. */
   const doitAlleger = aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX && peutComprimer()
   const estime = estimerAnalyse(aiVideoDuree, doitAlleger)
 
-  if (aiVideoDuree > DUREE_CONSEILLEE) {
-    err.innerHTML =
-      `Cette vid\u00e9o dure <b>${Math.floor(aiVideoDuree / 60)} min ` +
-      `${String(Math.round(aiVideoDuree % 60)).padStart(2, '0')}</b> \u2014 ` +
-      `comptez <b>${attenteLisible(estime)}</b> d\u2019analyse.<br>` +
-      `Une vid\u00e9o de deux minutes s\u2019analyse en ` +
-      `<b>${attenteLisible(estimerAnalyse(DUREE_CONSEILLEE, doitAlleger))}</b>, ` +
-      `et se suit mieux debout entre deux t\u00e2ches.`
-  } else if (estime) {
+  if (estime) {
     err.innerHTML = `Comptez <b>${attenteLisible(estime)}</b> d\u2019analyse.`
   } else {
     err.textContent = ''
@@ -22466,7 +22466,7 @@ function carteDossierEquipe(nom, procs, reste, rang) {
       <span class="cl-bas">
         ${reste
           ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${reste} non lue${reste > 1 ? 's' : ''}</span>`
-          : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
+          : `<span class="cl-badge"><i style="background:#34C759"></i>Lu</span>`}
         <span class="cl-n">${procs.length} proc\u00e9dure${procs.length > 1 ? 's' : ''}</span>
       </span>
     </span>`
@@ -22692,7 +22692,7 @@ function carteSousDossierEquipe(nom, procs, rang = 0) {
       <span class="cl-bas">
         ${aLire
           ? `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Non lues"></span><i style="background:#3A78EE"></i>${aLire} non lue${aLire > 1 ? 's' : ''}</span>`
-          : `<span class="cl-badge"><i style="background:#34C759"></i>Tout lu</span>`}
+          : `<span class="cl-badge"><i style="background:#34C759"></i>Lu</span>`}
         <span class="cl-n">${procs.length} procédure${procs.length > 1 ? 's' : ''}</span>
       </span>
     </span>`
@@ -24028,6 +24028,41 @@ function peindreReglagesEquipe() {
   const nom = currentMembre?.nom || ''
   if (el('es-nom-affiche')) el('es-nom-affiche').textContent = nom || 'Votre compte'
   if (el('es-initiales')) el('es-initiales').textContent = initialesEtab(nom)
+
+  /* ═══ LA LIGNE DE L'ENTREPRISE ═══
+
+     Elle porte le logo, le nom, et le rôle qu'on y tient.
+
+   ⚠ ELLE NE S'AFFICHE QUE S'IL Y A UN LOGO. Sans logo, la pastille resterait
+     vide à gauche d'un nom — un trou dans la colonne d'icônes que l'œil suit.
+     Mieux vaut pas de ligne qu'une ligne bancale.
+
+   ⚠ `e.id`, PAS `e.entreprise_id`. Les objets de `mesEtablissements` sont
+     reconstruits à la lecture : `id` y porte l'identifiant de l'ENTREPRISE,
+     `membre_id` celui de la fiche. Chercher `entreprise_id` renvoyait
+     `undefined` sur chaque ligne, sans la moindre erreur. C'est ainsi que le
+     rang s'y prend lui-même, trois fois dans ce fichier.
+
+   ⚠ ON PREND L'ENTREPRISE COURANTE, celle où la personne se trouve à cet
+     instant. Sur un compte présent dans deux entreprises, la ligne change avec
+     la bascule — c'est justement ce qu'on veut lui dire. */
+  const groupeEnt = el('es-ent-groupe')
+  if (groupeEnt) {
+    const ent = (mesEtablissements || [])
+      .find(e => e.id === currentMembre?.entreprise_id)
+    const src = ent?.logo_url ? urlLogo(ent.logo_url) : null
+
+    if (src) {
+      el('es-logo-ent').src = src
+      el('es-ent-nom').textContent = ent.nom || 'Votre entreprise'
+      el('es-ent-role').textContent = ent.role === 'gestion' ? 'Gestion' : 'Équipe'
+      groupeEnt.style.display = ''
+    } else {
+      groupeEnt.style.display = 'none'
+    }
+  }
+
+
   if (el('es-email-affiche')) {
     /* ⚠ MEME DEFAUT QUE COTE GESTION : cette ligne recopiait `#es-email`, un
        champ rempli seulement par `openEquipeSettings` — et rempli APRES
@@ -25604,11 +25639,11 @@ async function chargerEtablissements() {
 /* Les DEUX espaces portent cette carte. On peint celle qui est présente —
    les identifiants diffèrent d'un préfixe, le reste est identique. */
 function peindreListeEtab() {
-  peindreRangEtab('etab-rang', 'etab-ajouter', 'etab-note')
-  peindreRangEtab('e-etab-rang', 'e-etab-ajouter', 'e-etab-note')
+  peindreRangEtab('etab-rang', 'etab-ajouter', 'etab-note', 'gestion')
+  peindreRangEtab('e-etab-rang', 'e-etab-ajouter', 'e-etab-note', 'equipe')
 }
 
-function peindreRangEtab(idRang, idPlus, idNote) {
+function peindreRangEtab(idRang, idPlus, idNote, espace) {
   const rang = document.getElementById(idRang)
   const plus = document.getElementById(idPlus)
   const note = document.getElementById(idNote)
@@ -25620,6 +25655,23 @@ function peindreRangEtab(idRang, idPlus, idNote) {
 
   const liste = mesEtablissements || []
   const courant = currentMembre?.entreprise_id
+
+  /* ═══ COTE UTILISATEUR, LA CARTE NE SERT QU'A BASCULER ═══
+
+   ⚠ ELLE N'A PLUS DE RAISON D'ETRE AVEC UNE SEULE ENTREPRISE. On n'y cree
+     plus rien depuis l'espace utilisateur : il ne reste qu'un logo unique,
+     posé au milieu d'un cadre, sans rien à faire dessus.
+
+     Le logo de l'entreprise est desormais porte par la ligne d'identite, en
+     haut de la page — la carte devenait un doublon muet.
+
+   ⚠ AVEC DEUX ENTREPRISES OU PLUS, ELLE RESTE. Toucher un logo est le seul
+     chemin pour passer de l'une a l'autre ; la retirer enfermerait quelqu'un
+     dans l'entreprise ou il se trouve. */
+  if (espace === 'equipe') {
+    const carte = rang.closest('.etab-carte')
+    if (carte) carte.style.display = liste.length > 1 ? '' : 'none'
+  }
 
   /* On efface les cercles, jamais le « + » : il est dans le balisage, et le
      recréer à chaque peinture lui ferait perdre son écouteur. */
@@ -25705,9 +25757,17 @@ function peindreRangEtab(idRang, idPlus, idNote) {
 
        Elle décrit maintenant ce que la carte sert encore à faire — passer d'une
        entreprise à l'autre — sans mentionner une création impossible. */
+    /* ⚠ COTE UTILISATEUR, JAMAIS UN MOT SUR LA CREATION.
+
+       `dejaGerant` regarde si la personne a fonde une entreprise QUELQUE PART.
+       Quelqu'un qui gere ailleurs et travaille ici lisait donc « Créer un
+       établissement est gratuit » dans l'espace utilisateur, ou le bouton
+       n'existe plus. C'est ce qui a ete rapporte.
+
+       La note suit maintenant l'ENDROIT, pas seulement la personne. */
     note.innerHTML = plein
       ? `Vous gérez ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
-      : dejaGerant
+      : (dejaGerant && espace !== 'equipe')
         ? 'Cr\u00e9er un \u00e9tablissement est <b>gratuit</b>. Les membres des deux '
           + '\u00e9tablissements s\u2019additionnent sur votre abonnement : une fois le '
           + 'nombre atteint, plus personne ne peut rejoindre l\u2019un ou l\u2019autre.'

@@ -22248,3 +22248,66 @@ body.abo-expire [data-etab-plus]{
    devient le détail de ce que le titre annonce, et non une seconde voix de
    même importance. */
 .et-titre + p{ color:var(--label-2); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TITRE DE L'ÉTAPE, DANS L'ÉDITEUR
+
+   Un champ court au-dessus du texte, séparé par un filet. Trois écrans le
+   partagent : les étapes manuelles, le résultat de l'analyse vidéo, et la
+   modification d'une procédure.
+
+ ⚠ IL REPREND LA MISE EN FORME DU CHAMP TEXTE, EN PLUS DENSE. Deux champs
+   voisins qui ne se ressemblent pas se lisent comme deux choses sans rapport ;
+   or c'est la même étape. Même fond, même bordure, même rayon — seule la
+   graisse change, parce qu'un titre est un titre.
+
+ ⚠ LES `!important` SONT REPRIS DE LA RÈGLE VOISINE, PAS AJOUTÉS PAR CONFORT.
+   `.step-edit-item textarea` en porte sur chaque déclaration : sans eux ici,
+   une règle générale de formulaire déclarée plus haut reprendrait la main sur
+   le fond et la bordure, et le titre ne ressemblerait plus à son voisin.
+
+ ⚠ LE FILET SÉPARE, IL NE DÉCORE PAS. Sans lui, le titre et le texte forment
+   un bloc de deux champs identiques et l'on ne sait plus lequel est lequel.
+   Il est plus clair que la bordure des champs — il marque une frontière, il
+   ne dessine pas un cadre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.step-edit-item .step-titre-saisie,
+.step-row .step-titre-saisie{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  padding:9px 12px !important;
+  margin-bottom:0 !important;
+  border-radius:12px !important;
+  background:rgba(28,28,38,0.051) !important;
+  border:0.5px solid rgba(28,28,38,0.161) !important;
+  font-family:inherit;
+  font-size:14.5px !important;
+  font-weight:600;
+  letter-spacing:-0.011em;
+  color:var(--label);
+  transition:border-color 0.2s, background 0.2s;
+}
+
+.step-edit-item .step-titre-saisie:focus,
+.step-row .step-titre-saisie:focus{
+  outline:none;
+  border-color:rgba(72,153,236,0.55) !important;
+  background:rgba(72,153,236,0.07) !important;
+}
+
+.step-edit-item .step-titre-saisie::placeholder,
+.step-row .step-titre-saisie::placeholder{
+  color:var(--label-3);
+  font-weight:400;
+}
+
+/* Le filet. Un peu d'air de chaque côté : collé aux deux champs, il ferait
+   croire à une bordure commune plutôt qu'à une séparation. */
+.step-filet{
+  height:1px;
+  margin:9px 2px;
+  background:rgba(28,28,38,0.10);
+  border-radius:1px;
+}

@@ -1021,8 +1021,37 @@
         <input type="email" id="login-email" placeholder="vous@gmail.com"
                autocomplete="username" style="margin-bottom:12px;">
         <label class="f">Mot de passe</label>
-        <input type="password" id="login-password" placeholder="••••••••"
-               autocomplete="current-password" style="margin-bottom:16px;">
+        <!-- ⚠ LA MARGE PASSE SUR L'ENVELOPPE, pas sur le champ. Laissee sur
+             l'input, elle aurait pousse l'oeil de seize pixels vers le bas :
+             le bouton se positionne par rapport a l'enveloppe, et une marge
+             basse fait partie de sa hauteur.
+
+             `type="button"` est obligatoire : sans lui, un bouton dans un
+             formulaire vaut `submit`, et toucher l'oeil tenterait la connexion
+             au lieu de montrer le mot de passe.
+
+             Le reste — la bascule, l'echange des deux dessins, le curseur
+             repose apres coup — vient de l'ecouteur delegue de `app.js`, celui
+             pose pour l'inscription. Rien a ajouter cote script : il lit
+             `data-mdp-oeil` sur n'importe quel champ. -->
+        <div class="mdp-champ" style="margin-bottom:16px;">
+          <input type="password" id="login-password" placeholder="••••••••"
+                 autocomplete="current-password">
+          <button type="button" class="mdp-oeil" data-mdp-oeil="login-password"
+                  aria-label="Afficher le mot de passe" aria-pressed="false">
+            <svg class="mdp-ouvert" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+            </svg>
+            <svg class="mdp-barre" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2.4 12S6 5.6 12 5.6 21.6 12 21.6 12 18 18.4 12 18.4 2.4 12 2.4 12Z"/>
+              <circle cx="12" cy="12" r="3.1"/>
+              <line x1="4.2" y1="19.8" x2="19.8" y2="4.2"/>
+            </svg>
+          </button>
+        </div>
         <div class="error-msg" id="connexion-error"></div>
         <button class="btn block" id="login-btn">Se connecter</button>
         <!-- ═══ SOUS LE BOUTON, PAS AU-DESSUS ═══
@@ -4718,15 +4747,15 @@
         <div style="display:flex; gap:8px; margin-bottom:12px;">
           <div style="flex:1;">
             <label class="f">Prénom</label>
-            <input type="text" id="signup-prenom" placeholder="Marie" autocomplete="given-name">
+            <input type="text" id="signup-prenom" autocomplete="given-name">
           </div>
           <div style="flex:1;">
             <label class="f">Nom</label>
-            <input type="text" id="signup-nom" placeholder="Tissot" autocomplete="family-name">
+            <input type="text" id="signup-nom" autocomplete="family-name">
           </div>
         </div>
         <label class="f">E-mail</label>
-        <input type="email" id="signup-email" placeholder="vous@gmail.com"
+        <input type="email" id="signup-email"
                autocomplete="username" style="margin-bottom:12px;">
         <!-- ⚠ LA REGLE EST DITE AVANT LA FAUTE, pas apres.
 
@@ -4747,7 +4776,7 @@
              le bas : le bouton se positionne par rapport a l'enveloppe, et une
              marge basse fait partie de la hauteur de celle-ci. -->
         <div class="mdp-champ" style="margin-bottom:16px;">
-          <input type="password" id="signup-password" placeholder="••••••••"
+          <input type="password" id="signup-password"
                  autocomplete="new-password">
           <!-- ⚠ `type="button"` EST OBLIGATOIRE. Sans lui, un bouton dans un
                formulaire vaut `submit` : toucher l'oeil aurait valide
@@ -4781,7 +4810,7 @@
                juste au-dessus dit deja « Nom de l'entreprise » : la phrase
                repetait la question au lieu d'y repondre, et remplissait le
                champ d'un texte plus long que ce qu'on va y taper. -->
-            <input type="text" id="signup-entreprise-nom" placeholder="Nom" style="margin-bottom:16px;" autocomplete="organization">
+            <input type="text" id="signup-entreprise-nom" style="margin-bottom:16px;" autocomplete="organization">
         </div>
         <div id="signup-equipe-field" style="display:none;">
           <label class="f">Code de l'entreprise (6 caractères)</label>
@@ -4822,7 +4851,7 @@
 
                `autocapitalize` met en majuscules : le code s'affiche ainsi,
                et la fonction serveur ignore la casse de toute façon. -->
-            <input type="text" id="signup-code-acces" placeholder="A1B2C3" maxlength="6"
+            <input type="text" id="signup-code-acces" maxlength="6"
                    autocapitalize="characters" spellcheck="false"
                  autocomplete="off" style="margin-bottom:16px; letter-spacing:0.3em; text-align:center; font-weight:700;">
         </div>

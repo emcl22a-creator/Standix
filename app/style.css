@@ -20468,10 +20468,20 @@ body.espace-arrive .topbar{
   animation:espaceRevientBarre 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
 
+/* ⚠ LE FLOU A ETE RETIRE DE CETTE ANIMATION, PAS L'ANIMATION.
+
+   Elle portait `filter:blur(4px)` au depart. Or un `filter` sur la barre
+   redefinit le referentiel de ses enfants : pendant les 420 ms, le
+   `backdrop-filter` du voile n'avait plus rien a flouter — et sur Safari il
+   ne repartait pas ensuite. C'est ce qui faisait paraitre la barre nue au
+   retour de l'apercu.
+
+   L'apparition en fondu reste : c'est elle qui fait que la barre revient au
+   lieu de surgir. Seul le flou part. */
 @keyframes espaceRevientBarre{
-  0%  { opacity:0; filter:blur(4px); }
+  0%  { opacity:0; }
   55% { opacity:1; }
-  100%{ opacity:1; filter:blur(0px); }
+  100%{ opacity:1; }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -20599,9 +20609,25 @@ body.espace-arrive .screen.active{
   transform-origin:50% 45%;
 }
 
-body.espace-arrive .topbar{
-  animation:ecranFlou 0.42s ease-out both;
-}
+/* ⚠ LA BARRE NE SE FLOUTE PLUS AU RETOUR D'ESPACE.
+
+   Elle jouait `ecranFlou` — cinq pixels de flou qui s'effacent — à chaque
+   retour de l'aperçu. Deux règles le faisaient, l'une sur 0,42 s, l'autre sur
+   0,22 s.
+
+ ⚠ CE FLOU-LÀ N'A RIEN À VOIR AVEC LE VERRE DE LA BARRE. C'est un `filter` posé
+   sur l'élément entier, le temps d'une transition ; le verre, lui, est un
+   `backdrop-filter` sur le voile, permanent. Les deux se ressemblaient à
+   l'écran, ce qui a brouillé le diagnostic.
+
+ ⚠ ET C'ÉTAIT PROBABLEMENT LA CAUSE DE L'AUTRE DÉFAUT. Un `filter` sur un
+   élément crée un contexte de composition et redéfinit le référentiel de ses
+   enfants : pendant ces 420 ms, le `backdrop-filter` du voile n'avait plus
+   rien à flouter. Sur Safari, il ne repartait pas ensuite.
+
+   Les écrans gardent leur flou de transition — seule la barre en est
+   dispensée. */
+
 
 
 @media (prefers-reduced-motion: reduce){
@@ -21137,9 +21163,7 @@ body.espace-arrive:not(.en-apercu) .screen.active.nait{
   transform:none !important;
 }
 
-body.espace-arrive:not(.en-apercu) .topbar{
-  animation:ecranFlou 0.22s ease-out both;
-}
+/* Voir plus haut : la barre ne joue plus `ecranFlou` au retour d'espace. */
 
 /* ⚠ ET L'ENTREE GARDE SA MONTEE. On y va par un bouton flottant, on en revient
    par les onglets ordinaires : les deux moments ne sont pas symetriques. */

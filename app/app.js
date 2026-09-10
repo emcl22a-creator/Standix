@@ -29292,6 +29292,17 @@ window.openEditProcedure = async function(procId, mode) {
     /* La photo de l'étape était oubliée ici : ouvrir la modification l'effaçait
        de l'écran, et l'enregistrement la perdait pour de bon. */
     image_url: e.image_url || null,
+    /* ⚠ ET LE TITRE L'ÉTAIT AUSSI, POUR LA MÊME RAISON.
+
+       Ce `map` reconstruit chaque étape champ par champ. Tout ce qui n'y est
+       pas nommé disparaît — sans erreur, sans trace. Les titres écrits par
+       l'IA existaient bien en base, l'éditeur les ouvrait vides, et
+       l'enregistrement les aurait effacés pour de bon.
+
+       C'est le troisième champ à tomber dans ce piège après la photo et la
+       fin de clip. Toute colonne ajoutée à `etapes` doit être ajoutée ICI
+       aussi, sous peine d'être perdue à la première modification. */
+    titre: e.titre || null,
     _t: e.timestamp_video,   // horodatage brut conservé pour pouvoir recaler
   }))
 

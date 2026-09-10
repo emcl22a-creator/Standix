@@ -20095,23 +20095,42 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
-      <!-- ⚠ CE CHAMP NE RESSEMBLE PAS AUX AUTRES, ET C'EST VOULU. Un point de
-           vigilance n'est pas une ligne de plus : c'est ce qu'on lit quand on
-           s'apprête à faire une bêtise. Fond ambré, filet ambré, pictogramme
-           en tête — il se repère sans être lu.
+      <!-- ═══ LE POINT DE VIGILANCE, DANS UN TIROIR ═══
 
-           Facultatif, et vide par défaut : la plupart des étapes n'en ont pas,
-           et un champ d'alerte rempli partout ne serait plus une alerte. -->
-      <div class="step-attention-bloc">
-        <span class="step-attention-ic" aria-hidden="true">
+           Il n'apparaissait que s'il EXISTAIT DÉJÀ : on pouvait corriger celui
+           que l'IA avait écrit, jamais en ajouter un. Et l'afficher toujours
+           doublerait la hauteur de l'écran pour un cas qui concerne deux ou
+           trois étapes sur vingt.
+
+           D'où le tiroir : un bouton discret quand il n'y a rien, le champ
+           ouvert quand il y a quelque chose.
+
+         ⚠ L'ATTRIBUT aria-expanded PORTE L'ÉTAT, PAS SEULEMENT LA CLASSE.
+           Sans lui, un lecteur d'écran annonce un bouton sans dire s'il ouvre
+           ou ferme.
+
+         ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit à l'intérieur
+           d'un gabarit JavaScript, et le moindre backtick le refermerait en
+           plein milieu. Le contrôle de syntaxe l'a rattrapé une fois. -->
+      <div class="step-att-zone${step.attention ? ' ouvert' : ''}">
+        <button type="button" class="step-att-bouton" aria-expanded="${step.attention ? 'true' : 'false'}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round">
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/>
           </svg>
-        </span>
-        <textarea class="step-attention-saisie" rows="1"
-                  placeholder="Point de vigilance (facultatif)">${escapeHtml(step.attention || '')}</textarea>
+          <span>Point de vigilance</span>
+          <svg class="step-att-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="step-att-tiroir">
+          <div class="step-att-dedans">
+            <textarea class="step-attention-saisie" rows="1"
+                      placeholder="Ce qu\u2019il ne faut surtout pas faire\u2026">${escapeHtml(step.attention || '')}</textarea>
+          </div>
+        </div>
       </div>
       <div class="step-bas">
       <div class="step-img">
@@ -20146,7 +20165,30 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     /* Même logique que le titre : sans cette ligne, le champ se remplit et se
        vide à l'enregistrement. `autoResizeTextarea` parce qu'une mise en garde
        de deux lignes ne doit pas s'ouvrir coupée. */
+    /* ═══ LE TIROIR DU POINT DE VIGILANCE ═══
+
+       Le bouton bascule une classe ; toute l'animation est dans la feuille de
+       style. Le script ne fait que dire ouvert ou fermé.
+
+     ⚠ ON DONNE LE FOCUS À L'OUVERTURE. Sans cela, on touche le bouton, le
+       champ apparaît, et il faut le toucher à son tour — deux gestes pour un.
+       Le délai laisse l'animation se jouer : donner le focus pendant qu'un
+       élément grandit fait sauter la page sur iOS.
+
+     ⚠ ET ON N'EFFACE RIEN EN REFERMANT. Replier le tiroir ne doit pas perdre
+       ce qui est écrit : c'est une mise en garde, pas un brouillon. Le texte
+       reste, et le tiroir se rouvrira dessus. */
+    const zoneAtt = div.querySelector('.step-att-zone')
+    const btnAtt = div.querySelector('.step-att-bouton')
     const champAtt = div.querySelector('.step-attention-saisie')
+
+    if (btnAtt && zoneAtt) btnAtt.addEventListener('click', (e) => {
+      e.preventDefault()
+      const ouvert = zoneAtt.classList.toggle('ouvert')
+      btnAtt.setAttribute('aria-expanded', String(ouvert))
+      if (ouvert) setTimeout(() => { champAtt?.focus(); autoResizeTextarea(champAtt) }, 260)
+    })
+
     if (champAtt) {
       champAtt.addEventListener('input', (e) => {
         manualSteps[i].attention = e.target.value.trim() || null
@@ -20983,19 +21025,43 @@ function renderVideoSteps(listEl) {
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
       <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
-      <!-- ═══ LE POINT DE VIGILANCE, VISIBLE ET MODIFIABLE ═══
+      <!-- ═══ LE POINT DE VIGILANCE, DANS UN TIROIR ═══
 
-           Il n'apparaissait nulle part sur cet écran. On modifiait une
-           procédure vidéo, on enregistrait, et l'avertissement rédigé par l'IA
-           disparaissait — sans erreur, sans message.
+           Il n'apparaissait que s'il EXISTAIT DÉJÀ : on pouvait corriger celui
+           que l'IA avait écrit, jamais en ajouter un. Et l'afficher toujours
+           doublerait la hauteur de l'écran pour un cas qui concerne deux ou
+           trois étapes sur vingt.
 
-           Le champ n'est affiché QUE s'il y a quelque chose dedans : ajouter
-           une seconde zone de saisie vide à chacune des vingt étapes doublerait
-           la hauteur de l'écran pour un cas qui concerne deux ou trois d'entre
-           elles. Ce qui existe se voit et se corrige ; ce qui n'existe pas ne
-           s'invente pas ici. -->
-      ${step.attention ? `<textarea class="et-attention-saisie" rows="1"
-          placeholder="Point de vigilance\u2026">${escapeHtml(step.attention)}</textarea>` : ''}
+           D'où le tiroir : un bouton discret quand il n'y a rien, le champ
+           ouvert quand il y a quelque chose.
+
+         ⚠ L'ATTRIBUT aria-expanded PORTE L'ÉTAT, PAS SEULEMENT LA CLASSE.
+           Sans lui, un lecteur d'écran annonce un bouton sans dire s'il ouvre
+           ou ferme.
+
+         ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit à l'intérieur
+           d'un gabarit JavaScript, et le moindre backtick le refermerait en
+           plein milieu. Le contrôle de syntaxe l'a rattrapé une fois. -->
+      <div class="step-att-zone${step.attention ? ' ouvert' : ''}">
+        <button type="button" class="step-att-bouton" aria-expanded="${step.attention ? 'true' : 'false'}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/>
+          </svg>
+          <span>Point de vigilance</span>
+          <svg class="step-att-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="step-att-tiroir">
+          <div class="step-att-dedans">
+            <textarea class="step-attention-saisie" rows="1"
+                      placeholder="Ce qu\u2019il ne faut surtout pas faire\u2026">${escapeHtml(step.attention || '')}</textarea>
+          </div>
+        </div>
+      </div>
       <div class="step-bas">
         <!-- La vignette du premier plan a été retirée. Posée à côté du texte, elle
              lui laissait moins d'un tiers de la largeur : « Entrer la transaction »
@@ -21033,6 +21099,39 @@ function renderVideoSteps(listEl) {
     if (champTitre) champTitre.addEventListener('input', (e) => {
       videoSteps[i].titre = e.target.value.trim() || null
     })
+
+    /* ═══ LE TIROIR DU POINT DE VIGILANCE ═══
+
+       Le bouton bascule une classe ; toute l'animation est dans la feuille de
+       style. Le script ne fait que dire ouvert ou fermé.
+
+     ⚠ ON DONNE LE FOCUS À L'OUVERTURE. Sans cela, on touche le bouton, le
+       champ apparaît, et il faut le toucher à son tour — deux gestes pour un.
+       Le délai laisse l'animation se jouer : donner le focus pendant qu'un
+       élément grandit fait sauter la page sur iOS.
+
+     ⚠ ET ON N'EFFACE RIEN EN REFERMANT. Replier le tiroir ne doit pas perdre
+       ce qui est écrit : c'est une mise en garde, pas un brouillon. Le texte
+       reste, et le tiroir se rouvrira dessus. */
+    const zoneAtt = div.querySelector('.step-att-zone')
+    const btnAtt = div.querySelector('.step-att-bouton')
+    const champAtt = div.querySelector('.step-attention-saisie')
+
+    if (btnAtt && zoneAtt) btnAtt.addEventListener('click', (e) => {
+      e.preventDefault()
+      const ouvert = zoneAtt.classList.toggle('ouvert')
+      btnAtt.setAttribute('aria-expanded', String(ouvert))
+      if (ouvert) setTimeout(() => { champAtt?.focus(); autoResizeTextarea(champAtt) }, 260)
+    })
+
+    if (champAtt) {
+      champAtt.addEventListener('input', (e) => {
+        videoSteps[i].attention = e.target.value.trim() || null
+        autoResizeTextarea(e.target)
+      })
+      autoResizeTextarea(champAtt)
+    }
+
 
     const ta = div.querySelector('textarea')
     /* ⚠ LE TEXTE SE MEMORISE AU DEBUT DE LA SAISIE, PAS A CHAQUE LETTRE.

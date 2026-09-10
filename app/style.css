@@ -22182,6 +22182,22 @@ body.abo-expire [data-etab-plus]{
    entier, quitte à laisser du vide autour.
    ═══════════════════════════════════════════════════════════════════════════ */
 #e-profil .reg-ic.ent-ic{
+  /* ⚠ PAS DE FOND, ET UNE PASTILLE PLUS GRANDE QUE LES AUTRES.
+
+     Les autres lignes portent une icône dessinée sur un fond teinté ; ici
+     c'est une image, qui se suffit. Le fond et l'ombre intérieure partent :
+     sur une photo ou un logo, l'ombre se lit comme un défaut de l'image.
+
+   ⚠ 40 px CONTRE 34, ET LA COLONNE S'EN TROUVE DÉCALÉE DE 3 PX. C'est
+     assumé — un logo doit se reconnaître, une icône se comprend en plus
+     petit. La ligne est seule dans sa carte, donc l'écart ne se voit pas
+     face à un voisin immédiat ; il apparaît d'une carte à l'autre.
+
+     Si l'alignement l'emporte un jour sur la lisibilité, c'est ce 40 qu'il
+     faut ramener à 34, et rien d'autre. */
+  flex:0 0 40px;
+  width:40px;
+  height:40px;
   background:none;
   box-shadow:none;
   overflow:hidden;
@@ -22191,6 +22207,6 @@ body.abo-expire [data-etab-plus]{
   width:100%;
   height:100%;
   object-fit:contain;
-  border-radius:9px;
+  border-radius:10px;
   display:block;
 }

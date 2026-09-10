@@ -4098,6 +4098,30 @@
         <span class="id-fl">›</span>
       </button>
 
+    <!-- ⚠ LE LOGO DE L'ENTREPRISE TIENT SA PROPRE LIGNE.
+
+         Premier essai : un medaillon pose sur l'avatar, a la maniere d'un
+         badge iOS. `.id-av` porte `overflow:hidden` — il fallait le rentrer de
+         trois pixels vers l'interieur pour ne pas le voir coupe, ce qui donnait
+         une pastille mangee par le coin. Un contournement, pas un placement.
+
+         Ici, le logo prend la place de la pastille d'icone des autres lignes,
+         aux memes 34 px. Rien ne se superpose, et tout s'aligne sur la colonne
+         que l'oeil suit deja en descendant la page.
+
+       ⚠ PAS DE CHEVRON, PAS DE `button`. Cette ligne n'ouvre rien : elle dit
+         ou l'on travaille. Un chevron promettrait une page qui n'existe pas.
+
+         Masquee par defaut ; `peindreReglagesEquipe` l'affiche s'il y a une
+         entreprise a montrer. -->
+    <div class="reg-groupe" data-teinte="bleu" id="es-ent-groupe" style="display:none">
+      <div class="reg-ligne">
+        <span class="reg-ic ent-ic"><img id="es-logo-ent" alt=""></span>
+        <span class="reg-nm" id="es-ent-nom">—</span>
+        <span class="reg-val" id="es-ent-role"></span>
+      </div>
+    </div>
+
     <!-- ⚠ PLUS DE « + » ICI : ON NE CREE PAS D'ENTREPRISE DEPUIS L'ESPACE
          UTILISATEUR.
 

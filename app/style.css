@@ -22333,110 +22333,100 @@ body.abo-expire [data-etab-plus]{
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   LE POINT DE VIGILANCE, DANS L'ÉDITEUR
+   LE POINT DE VIGILANCE, EN TIROIR
 
- ⚠ IL NE RESSEMBLE PAS AUX AUTRES CHAMPS, ET C'EST TOUT SON RÔLE. Le titre et
-   le texte partagent le même gris ; celui-ci est bleu, avec un pictogramme
-   en tête. On le repère sans le lire — ce qui est exactement ce qu'on demande
-   à une mise en garde.
+   Un bouton discret quand il n'y a rien, un champ ouvert quand il y a quelque
+   chose. La plupart des étapes n'ont pas de mise en garde : afficher une zone
+   de saisie vide à chacune doublerait la hauteur de l'écran.
 
- ⚠ LE BLEU DE L'APP, `#1F4CEE` — celui de la barre de navigation, celui des
-   points « non lu », celui des boutons. Il était ambré au premier jet ; le
-   bleu rattache ce bloc au reste de l'application au lieu d'introduire une
-   quatrième couleur.
+ ⚠ L'ANIMATION PASSE PAR `grid-template-rows`, DE 0fr À 1fr. C'est la seule
+   façon d'animer vers une hauteur qu'on ne connaît pas : `height:auto` ne
+   s'anime pas, et `max-height` oblige à deviner une valeur — trop petite elle
+   coupe le texte, trop grande elle rend l'ouverture molle et la fermeture
+   brutale.
 
-   Le contraste du texte a été mesuré : `#12357F` sur ce fond très clair donne
-   plus de 9:1, largement au-dessus du seuil de lisibilité. Un bleu plus vif
-   passerait sous la barre sur un fond aussi pâle.
+ ⚠ `overflow:hidden` SUR L'ENFANT, PAS SUR LA GRILLE. Sans lui, le contenu
+   déborde de la rangée pendant qu'elle grandit et le tiroir clignote.
 
- ⚠ LE PICTOGRAMME NE SE RÉTRÉCIT PAS. `flex:0 0 auto` : sans lui, un texte de
-   trois lignes l'écrase à quelques pixels et le triangle devient un trait.
+   La courbe est celle d'iOS — départ franc, arrivée amortie. Elle donne
+   l'impression que le tiroir a du poids.
    ═══════════════════════════════════════════════════════════════════════════ */
-.step-attention-bloc{
-  /* ⚠ DEUX DISPOSITIONS SE CROISENT ICI, ET LES DEUX COMPTENT.
+.step-att-zone{ margin-top:8px; }
 
-     `grid-column: 1 / -1` le place sur toute la largeur de l'étape, qui est
-     une GRILLE — sans quoi il tombait dans la colonne du numéro, à 30 px, et
-     son champ mesurait zéro : invisible, exactement ce qui a été rapporté.
-
-     `display:flex` range ensuite le pictogramme et le champ À L'INTÉRIEUR du
-     bloc. Le premier concerne le parent, le second les enfants. */
-  grid-column: 2;
-  display:flex;
-  align-items:flex-start;
-  gap:8px;
-  margin-top:9px;
-  padding:9px 11px;
-  border-radius:12px;
-  background:rgba(31,76,238,0.06);
-  border:0.5px solid rgba(31,76,238,0.24);
-  border-left:2.5px solid rgba(31,76,238,0.55);
-}
-
-.step-attention-ic{
-  flex:0 0 auto;
-  width:17px;
-  height:17px;
-  margin-top:2px;
+.step-att-bouton{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:6px 10px 6px 8px;
+  border:none;
+  border-radius:9px;
+  background:rgba(31,76,238,0.07);
   color:#1F4CEE;
+  font-family:inherit;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:-0.006em;
+  cursor:pointer;
+  transition:background 0.18s;
+  -webkit-tap-highlight-color:transparent;
 }
-.step-attention-ic svg{ width:100%; height:100%; display:block; }
+.step-att-bouton:active{ background:rgba(31,76,238,0.14); }
+.step-att-bouton svg{ width:14px; height:14px; flex:0 0 auto; }
 
-/* Le champ se fond dans le bloc : c'est le bloc qui porte la couleur, pas le
-   champ. Un cadre dans un cadre ferait deux bordures pour une seule idée. */
-.step-attention-bloc .step-attention-saisie{
-  flex:1;
-  min-width:0;
-  min-height:auto !important;
-  padding:0 !important;
-  border:none !important;
-  background:none !important;
-  border-radius:0 !important;
+/* Le chevron tourne, il ne saute pas : c'est lui qui dit dans quel sens va le
+   tiroir, avant même qu'il ait bougé. */
+.step-att-chevron{
+  transition:transform 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+.step-att-zone.ouvert .step-att-chevron{ transform:rotate(180deg); }
+
+.step-att-tiroir{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows 0.34s cubic-bezier(0.32,0.72,0,1);
+}
+.step-att-zone.ouvert .step-att-tiroir{ grid-template-rows:1fr; }
+
+.step-att-dedans{
+  overflow:hidden;
+  min-height:0;   /* sans lui, Safari refuse de descendre sous la hauteur du contenu */
+}
+
+/* Le champ lui-même, une fois le tiroir ouvert. Il porte la couleur ; le
+   bouton reste sobre pour ne pas crier quand il n'y a rien à dire. */
+.step-att-zone .step-attention-saisie{
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  margin-top:7px;
+  padding:9px 11px !important;
+  border-radius:12px !important;
+  background:rgba(31,76,238,0.06) !important;
+  border:0.5px solid rgba(31,76,238,0.24) !important;
+  border-left:2.5px solid rgba(31,76,238,0.55) !important;
   resize:none;
   font-family:inherit;
   font-size:14px !important;
   line-height:1.45 !important;
   color:#12357F;
+  min-height:auto !important;
 }
-
-.step-attention-bloc .step-attention-saisie:focus{
+.step-att-zone .step-attention-saisie:focus{
   outline:none;
-  background:none !important;
+  border-color:rgba(31,76,238,0.55) !important;
+}
+.step-att-zone .step-attention-saisie::placeholder{ color:rgba(18,53,127,0.45); }
+
+/* L'ouverture ne s'anime pas pour qui a demandé moins de mouvement. Le tiroir
+   marche toujours — il apparaît, simplement, sans glisser. */
+@media (prefers-reduced-motion: reduce){
+  .step-att-tiroir, .step-att-chevron{ transition:none; }
 }
 
-.step-attention-bloc .step-attention-saisie::placeholder{
-  color:rgba(18,53,127,0.48);
-}
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   L'ORDRE DES RANGÉES DANS UNE ÉTAPE MANUELLE
-
- ⚠ CETTE GRILLE PLACE TOUT EXPLICITEMENT. `#p-create-manual .man-fil` assigne
-   `grid-row` et `grid-column` au numéro, au champ texte et à la barre du bas.
-   Un élément ajouté sans consigne ne se glisse donc PAS entre eux : il va où
-   l'algorithme trouve de la place, c'est-à-dire après.
-
-   C'est ce qui faisait passer le champ texte AVANT le titre, alors que le
-   balisage donne l'inverse.
-
- ⚠ ET `textarea` ATTRAPAIT LE CHAMP DE VIGILANCE. Le sélecteur ne distingue
-   pas les deux : le champ d'alerte recevait `grid-row:1`, la place du texte.
-   Le `:not()` l'en exclut.
-
-   L'ordre voulu, de haut en bas :
-     1  le titre
-     2  le filet
-     3  le texte de l'étape
-     4  le point de vigilance
-     5  la photo et la corbeille
-
-   Le numéro reste en rangée 1, colonne 1 — il coiffe l'étape entière.
-   ═══════════════════════════════════════════════════════════════════════════ */
 #p-create-manual .man-fil .step-titre-saisie{ grid-row:1; grid-column:2; }
 #p-create-manual .man-fil .step-filet{ grid-row:2; grid-column:2; }
 #p-create-manual .man-fil textarea:not(.step-attention-saisie){ grid-row:3; grid-column:2; }
-#p-create-manual .man-fil .step-attention-bloc{ grid-row:4; grid-column:2; }
+#p-create-manual .man-fil .step-att-zone{ grid-row:4; grid-column:2; }
 #p-create-manual .man-fil .step-bas{ grid-row:5; grid-column:2; }
 
 /* Le champ d'alerte vit DANS son bloc, pas dans la grille de l'étape. Ces
@@ -22444,3 +22434,40 @@ body.abo-expire [data-etab-plus]{
    lui posait : on les annule pour que le jour où le bloc deviendrait une
    grille, rien de fantôme ne s'y applique. */
 #p-create-manual .man-fil .step-attention-saisie{ grid-row:auto; grid-column:auto; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHAMP DE VIGILANCE GARDE SON CADRE
+
+ ⚠ IL LE PERDAIT FACE À UNE RÈGLE PLUS FORTE. `#p-create-manual .man-fil
+   textarea` pose `background:none !important` et `border:none !important` —
+   spécificité 1,2,0. Ma règle `.step-att-zone .step-attention-saisie` vaut
+   0,2,0 : deux `!important` se départagent d'abord sur la spécificité, et
+   l'identifiant l'emportait.
+
+   Le champ s'ouvrait donc nu, sans fond ni liseré, au milieu de la carte. On
+   ne voyait plus que c'était une mise en garde.
+
+   Ces sélecteurs reprennent l'identifiant pour se placer au même niveau. Le
+   dernier déclaré gagne alors, et c'est celui-ci.
+
+ ⚠ LES DEUX ÉCRANS, parce que le montage vidéo porte le même tiroir et la
+   même règle concurrente. En corriger un seul laisserait l'autre nu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-create-manual .man-fil .step-att-zone .step-attention-saisie,
+#p-create-video .man-fil .step-att-zone .step-attention-saisie{
+  margin-top:7px;
+  padding:9px 11px !important;
+  border-radius:12px !important;
+  background:rgba(31,76,238,0.06) !important;
+  border:0.5px solid rgba(31,76,238,0.24) !important;
+  border-left:2.5px solid rgba(31,76,238,0.55) !important;
+  font-size:14px !important;
+  line-height:1.45 !important;
+  color:#12357F;
+  grid-row:auto; grid-column:auto;   /* il vit dans le tiroir, pas dans la grille */
+}
+#p-create-manual .man-fil .step-att-zone .step-attention-saisie:focus,
+#p-create-video .man-fil .step-att-zone .step-attention-saisie:focus{
+  border-color:rgba(31,76,238,0.55) !important;
+}

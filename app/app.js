@@ -19627,6 +19627,23 @@ window.ouvrirMontageVideo = async function(procId) {
          que rien ne le signale. C'est le pire des trois cas — ni erreur, ni
          message, et une information de sécurité en moins. */
       attention: e.attention || null,
+      /* ⚠ ET LE TITRE TOMBAIT DANS LE MEME TROU, POUR LA MEME RAISON.
+
+         C'est le chemin qu'emprunte une procedure issue d'une analyse video :
+         `analyse-edit-btn` appelle `ouvrirMontageVideo` quand `video_url`
+         existe, et `ouvrirEtapesManuelles` sinon. Deux ecrans, deux recopies
+         a tenir a jour — j'ai corrige la seconde en croyant avoir fini.
+
+         Consequence exacte de l'oubli : les titres ecrits par l'IA
+         s'affichaient dans la procedure, disparaissaient a l'ouverture de la
+         modification, et auraient ete effaces en base au premier
+         enregistrement.
+
+       ⚠ QUATRE ENDROITS RECOPIENT UNE ETAPE CHAMP PAR CHAMP dans ce fichier.
+         Toute colonne ajoutee a `etapes` doit etre ajoutee AUX QUATRE :
+         `ouvrirEtapesManuelles`, `ouvrirMontageVideo`, `openEditProcedure`
+         et l'empreinte `etatManuel`. */
+      titre: e.titre || null,
       timestamp_video: b ? b.start : (e.timestamp_video || 0),
       fin_video: b ? b.end : (e.fin_video || 0),
       image_url: e.image_url || null,
@@ -29350,6 +29367,10 @@ window.openEditProcedure = async function(procId, mode) {
        fin de clip. Toute colonne ajoutée à `etapes` doit être ajoutée ICI
        aussi, sous peine d'être perdue à la première modification. */
     titre: e.titre || null,
+    /* Ajouté par cohérence avec les trois autres recopies. Cette fonction peint
+       `p-edit-procedure`, un écran qui n'est appelé nulle part — mais le jour
+       où elle reprendrait du service, elle ne doit pas rouvrir le même trou. */
+    attention: e.attention || null,
     _t: e.timestamp_video,   // horodatage brut conservé pour pouvoir recaler
   }))
 

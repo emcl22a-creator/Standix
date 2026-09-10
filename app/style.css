@@ -17550,32 +17550,12 @@ body.sans-topbar .screen{
   -webkit-mask:linear-gradient(#000 0%, #000 72%, transparent 100%);
   mask:linear-gradient(#000 0%, #000 72%, transparent 100%);
 
-  /* ⚠ TOUJOURS VISIBLE, PLUS SEULEMENT AU DÉFILEMENT.
-
-     Il valait `opacity:0` et n'apparaissait qu'avec `body.page-glissee`, posée
-     au-delà de huit pixels de défilement. Chaque changement de page remet le
-     défilement à zéro : le verre disparaissait donc à chaque navigation, et ne
-     revenait qu'en faisant glisser la page. Après une bascule d'espace, il
-     fallait deux changements pour le retrouver — c'est ce qui a été rapporté.
-
-     Le comportement d'origine imitait iOS, où la barre se solidifie quand le
-     contenu passe dessous. Mais ici la barre porte le logo sur un fond clair :
-     nue, elle laissait le texte défiler à travers.
-
-   ⚠ LE COÛT EST RÉEL, ET IL FAUT LE SAVOIR. Un `backdrop-filter` permanent se
-     redessine à chaque image de défilement, sur toute la largeur. Sur un
-     téléphone modeste, c'est ce qui se sent en premier. Si le défilement
-     devient pâteux, c'est ici qu'il faut revenir — pas ailleurs. */
   opacity:1;
   transition:opacity 0.24s ease-out;
 }
 
 /* ⚠ LA CLASSE VIENT DU SCRIPT, qui suit le defilement. */
-/* ⚠ `page-glissee` NE PILOTE PLUS RIEN DANS CETTE FEUILLE. Le voile est
-   désormais visible en permanence ; cette règle ne faisait que répéter la
-   valeur par défaut. La classe est toujours posée par `suivreDefilement` — on
-   la laisse : elle ne coûte rien et servira si l'on veut un jour distinguer
-   les deux états, une ombre plus marquée au défilement par exemple. */
+/* `page-glissee` ne pilote plus le voile : il est visible en permanence. */
 
 /* ⚠ ET IL PART AVEC LA BARRE sur les pages de detail. Sans cela, une bande
    floue resterait en haut d'un ecran qui n'a plus de barre. */
@@ -17688,7 +17668,9 @@ body.sans-topbar .topbar::after{
    reste large mais ne touche plus les bords. */
 .topbar::after{
   width:calc(100vw - 40px) !important;
+
   background:none !important;
+
   -webkit-backdrop-filter:blur(14px) saturate(1.8) !important;
   backdrop-filter:blur(14px) saturate(1.8) !important;
 }
@@ -22488,4 +22470,28 @@ body.abo-expire [data-etab-plus]{
 #p-create-manual .man-fil .step-att-zone .step-attention-saisie:focus,
 #p-create-video .man-fil .step-att-zone .step-attention-saisie:focus{
   border-color:rgba(31,76,238,0.55) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CLASSE QUI RELANCE LE VERRE
+
+ ⚠ ELLE NE CHANGE RIEN DE VISIBLE. Un centième de pixel de flou en plus : le
+   but n'est pas l'effet, c'est de donner à WebKit une valeur différente de la
+   précédente. Sans changement, il ne refait pas le calque — et le voile reste
+   figé, nu, après la bascule vers l'aperçu.
+
+ ⚠ LE `!important` EST OBLIGATOIRE ICI. Trois autres règles posent le flou du
+   voile avec `!important`, et la dernière l'emporte : sans lui, cette classe
+   ne changerait strictement rien. C'est le dossier des cinq définitions de
+   `.topbar::after`, déjà signalé.
+
+ ⚠ ET LA VALEUR DOIT ÊTRE CELLE QUI GAGNE, à un centième près. La règle
+   effective est `blur(14px) saturate(1.25)` — pas le `blur(16px)` écrit en
+   tête du fichier. Reprendre la mauvaise ferait sauter le voile d'un flou à
+   l'autre le temps d'une image.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.topbar.verre-relance::after{
+  -webkit-backdrop-filter:blur(14.01px) saturate(1.25) !important;
+  backdrop-filter:blur(14.01px) saturate(1.25) !important;
 }

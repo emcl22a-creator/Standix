@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=afa5f5bd">
+<link rel="stylesheet" href="style.css?v=c08f63f5">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -4151,28 +4151,20 @@
       </div>
     </div>
 
-    <!-- ⚠ PLUS DE « + » ICI : ON NE CREE PAS D'ENTREPRISE DEPUIS L'ESPACE
-         UTILISATEUR.
+    <!-- ⚠ LA CARTE « Vos établissements » N'EXISTE PLUS ICI.
 
-         La carte portait le meme bouton que cote gestion, et sa phrase
-         invitait explicitement : « Créez une entreprise et vous en êtes le
-         gérant, avec 14 jours d'essai gratuit. » N'importe quel compte inscrit
-         comme utilisateur pouvait donc se fabriquer une entreprise sans jamais
-         passer par l'inscription gerant.
+         Elle portait un rang de logos et la phrase « Touchez un logo pour
+         basculer d'une entreprise à l'autre ». Retirée de l'espace
+         utilisateur : le logo de l'entreprise courante est desormais sur la
+         ligne juste au-dessus, et cette carte n'ajoutait qu'un doublon.
 
-         LE RANG RESTE, LUI. Il sert encore a basculer d'une entreprise a
-         l'autre pour qui appartient a plusieurs — un employe peut travailler
-         a deux endroits. Seul le geste de creation disparait.
+       ⚠ CE QUE CELA COUTE, ET IL FAUT LE SAVOIR : quelqu'un present dans DEUX
+         entreprises n'a plus de chemin pour passer de l'une a l'autre depuis
+         cet espace. Le rang etait le seul. Si le cas se presente, c'est ici
+         qu'il faudra remettre un geste — pas la carte entiere.
 
-         `peindreRangEtab` tolere l'absence du bouton depuis ce changement :
-         elle abandonnait la peinture s'il manquait, ce qui aurait fait
-         disparaitre les ronds avec lui. -->
-    <div class="etab-carte">
-      <div class="etab-rang" id="e-etab-rang"></div>
-      <p class="etab-note" id="e-etab-note">
-        Touchez un logo pour basculer d’une entreprise à l’autre.
-      </p>
-    </div>
+         `peindreRangEtab` tolere l'absence de ces elements : elle sort si
+         `#e-etab-rang` manque, sans lever d'erreur. -->
 
     <!-- ⚠ « VOTRE POSTE » EST RETIRE DE L'INTERFACE, PAS DU CODE.
 
@@ -4890,7 +4882,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=88d83565"></script>
+<script type="module" src="app.js?v=eb143dfd"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

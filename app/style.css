@@ -20463,9 +20463,22 @@ body:has(#e-profil.active){
 }
 
 /* ⚠ LA BARRE DU HAUT SUIT, sans l'echelle. Elle est fine : la faire grandir se
-   verrait comme un defaut plutot que comme un mouvement. */
-body.espace-arrive .topbar{
-  animation:espaceRevientBarre 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+   verrait comme un defaut plutot que comme un mouvement.
+
+ ⚠ L'ANIMATION PORTE SUR SON CONTENU, PAS SUR ELLE. C'etait la cause du verre
+   perdu au retour de l'apercu, et la preuve a ete faite en la neutralisant :
+   le voile redevenait identique a la reference, au pixel pres.
+
+   Une animation promeut l'element dans son propre calque de composition. Le
+   voile est un pseudo-element de la barre : promue, elle emporte le voile avec
+   elle, et le `backdrop-filter` n'a plus acces a ce qui est peint dessous.
+   Avec `both`, l'etat reste jusqu'au prochain changement de page — d'ou les
+   deux navigations qu'il fallait pour retrouver la matiere.
+
+   Le logo et les deux boutons s'animent donc individuellement. Le mouvement
+   est le meme a l'oeil ; la barre, elle, ne bouge plus. */
+body.espace-arrive .topbar > *{
+  animation:espaceRevientBarre 0.42s cubic-bezier(0.32, 0.72, 0, 1) backwards;
 }
 
 /* ⚠ LE FLOU A ETE RETIRE DE CETTE ANIMATION, PAS L'ANIMATION.
@@ -20548,6 +20561,24 @@ body.espace-arrive .topbar{
        ④ le retour de l'apercu             → la gestion redescend
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   `backwards` ET NON `both` — LE MOT QUI CASSAIT LE VERRE DE LA BARRE
+
+ ⚠ `both` CONSERVE L'ÉTAT FINAL DE L'ANIMATION, INDÉFINIMENT. Ici cet état est
+   `filter:blur(0px)` : invisible, mais un `filter` — même à zéro — isole
+   l'élément dans son propre calque de composition. Le `backdrop-filter` de la
+   barre ne voit alors plus rien à flouter.
+
+ ⚠ ET LA CLASSE NE PART PAS. `espace-arrive` reste posée jusqu'au prochain
+   changement de page — c'est écrit et assumé dans `app.js`. Le `filter`
+   survivait donc à la transition, et la barre restait nue jusqu'à ce qu'on
+   change deux fois de page. C'est exactement ce qui a été rapporté.
+
+   `backwards` applique l'état de départ AVANT que l'animation commence — ce
+   qui évite le saut initial, la seule raison d'avoir mis `both` — mais ne
+   conserve rien à l'arrivée. L'élément retrouve `filter:none`, visuellement
+   identique à `blur(0)`.
+   ═══════════════════════════════════════════════════════════════════════════ */
 @keyframes ecranFlou{
   from{ filter:blur(5px); }
   to  { filter:blur(0); }
@@ -20571,7 +20602,7 @@ body.espace-arrive .topbar{
 /* ① LE CAS ORDINAIRE — un flou court, sans mouvement.
       Procedures, Analyse, Gerer, Profil, le bouton +. */
 body .screen.active{
-  animation:ecranFlou 0.22s ease-out both;
+  animation:ecranFlou 0.22s ease-out backwards;
 }
 
 
@@ -21159,7 +21190,7 @@ body.espace-fige .topbar{
    vise donc `:not(.en-apercu)` — c'est-a-dire le retour vers la gestion. */
 body.espace-arrive:not(.en-apercu) .screen.active,
 body.espace-arrive:not(.en-apercu) .screen.active.nait{
-  animation:ecranFlou 0.22s ease-out both !important;
+  animation:ecranFlou 0.22s ease-out backwards !important;
   transform:none !important;
 }
 
@@ -21242,7 +21273,7 @@ body.espace-vide .topbar{
 
    C'est la feuille qui descend ; lui reste en place, avec le flou ordinaire. */
 body.retour-de-feuille .screen.active{
-  animation:ecranFlou 0.22s ease-out both;
+  animation:ecranFlou 0.22s ease-out backwards;
 }
 
 /* ⚠ ET C'EST LA FEUILLE QUI PART QUI DESCEND, pas celle qui arrive. */
@@ -21933,7 +21964,7 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 .screen.feuille-part#p-create-video,
 .screen.feuille-part#p-create-doc,
 .screen.feuille-part#p-create-ai{
-  animation:ecranFlouPart 0.22s ease-out both !important;
+  animation:ecranFlouPart 0.22s ease-out backwards !important;
 
   /* ⚠ AUCUN DEPLACEMENT : d'anciennes regles en posaient un. */
   transform:none !important;

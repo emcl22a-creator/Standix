@@ -18471,6 +18471,30 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         .update({ statut: 'echec', erreur_ia: String(e?.message || e).slice(0, 400) })
         .eq('id', aiProcedureId)
         .then(() => loadGestionProcedures().catch(() => {}))
+
+      /* ═══ ON REND L'ANALYSE : ELLE N'A RIEN PRODUIT ═══
+
+       ⚠ LE CREDIT ETAIT CONSOMME PAR `ai-start` ET JAMAIS RENDU. Une vidéo
+         refusée par Azure, une langue non prise en charge, un envoi
+         interrompu, un serveur muet — chacun de ces échecs coûtait une analyse
+         au client, pour un résultat inexistant. Sur un forfait à quelques
+         analyses par mois, deux échecs de suite se voient tout de suite.
+
+       ⚠ ON PRECISE L'ENTREPRISE, sinon PostgREST choisit la version de
+         `rendre_analyse` à un seul argument — celle d'avant le correctif, qui
+         cherche la fiche membre avec un `limit 1` sans `order by`. Sur un
+         compte présent dans deux entreprises, le crédit repartait au hasard.
+         C'est la même précaution que dans le chemin du document.
+
+       ⚠ ET L'ECHEC DE LA RESTITUTION NE DOIT PAS MASQUER L'ECHEC D'ORIGINE.
+         On journalise, on n'interrompt rien : la personne doit lire pourquoi
+         son analyse a échoué, pas une erreur de comptabilité. */
+      supabase.rpc('rendre_analyse', {
+        p_procedure_id: aiProcedureId,
+        p_entreprise_id: currentMembre?.entreprise_id ?? null,
+      }).then(({ error: er }) => {
+        if (er) console.warn('[quota] analyse non rendue :', er.message)
+      }, () => {})
     }
 
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
@@ -18621,6 +18645,20 @@ function arreterAnalyseBloquee(ecoule, detail) {
       .update({ statut: 'echec', erreur_ia: `Analyse bloquée après ${Math.round(ecoule / 60)} min` })
       .eq('id', aiProcedureId)
       .then(() => loadGestionProcedures().catch(() => {}), () => {})
+
+    /* ⚠ CET ABANDON-CI AUSSI REND L'ANALYSE. C'est le second chemin d'échec :
+       Azure n'a jamais répondu, ou la rédaction s'est interrompue. Rien n'a
+       été produit — le client ne doit pas le payer.
+
+       Même précaution que dans l'autre chemin : on nomme l'entreprise, sinon
+       PostgREST choisit la version à un argument de `rendre_analyse`, celle
+       qui devine la fiche membre au hasard. */
+    supabase.rpc('rendre_analyse', {
+      p_procedure_id: aiProcedureId,
+      p_entreprise_id: currentMembre?.entreprise_id ?? null,
+    }).then(({ error: er }) => {
+      if (er) console.warn('[quota] analyse non rendue :', er.message)
+    }, () => {})
   }
 }
 

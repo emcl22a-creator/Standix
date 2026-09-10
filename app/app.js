@@ -13625,6 +13625,18 @@ window.ouvrirEtapesManuelles = async function(procId) {
   reinitialiserCouverture(proc.image_url || null)
   manualSteps = (etapes || []).map(e => ({
     id: e.id, texte: e.texte || '', image_url: e.image_url || null,
+    /* ⚠ C'EST ICI QUE « MODIFIER LA PROCÉDURE » CHARGE SES ÉTAPES.
+
+       Pas dans `renderEditSteps` : `openEditProcedure` peint l'écran
+       `p-edit-procedure`, qui n'est appelé nulle part — le CLAUDE.md le
+       signale déjà. La modification passe par l'écran des étapes manuelles.
+
+       Ce `map` reconstruit chaque étape champ par champ : tout ce qui n'y est
+       pas nommé disparaît sans erreur. Les titres et les points de vigilance
+       écrits par l'IA étaient perdus à l'ouverture, puis effacés en base à
+       l'enregistrement. */
+    titre: e.titre || null,
+    attention: e.attention || null,
   }))
   if (!manualSteps.length) manualSteps = [{ texte: '' }]
 
@@ -13638,7 +13650,12 @@ function etatManuel() {
     titre: document.getElementById('man-titre')?.value || '',
     categorie: document.getElementById('man-categorie')?.value || '',
     sous_categorie: lireSousDossier('man-sous-categorie'),
-    etapes: manualSteps.map(s => ({ id: s.id || null, texte: s.texte, image_url: s.image_url || null })),
+    /* ⚠ L'EMPREINTE DOIT VOIR CE QU'ON PEUT MODIFIER. Elle sert à savoir s'il
+       reste des changements non enregistrés. Sans le titre ni le point de
+       vigilance, on pouvait les corriger puis quitter l'écran sans le moindre
+       avertissement — l'app était persuadée que rien n'avait bougé. */
+    etapes: manualSteps.map(s => ({ id: s.id || null, texte: s.texte, image_url: s.image_url || null,
+      titre: s.titre || null, attention: s.attention || null })),
   })
 }
 
@@ -20061,6 +20078,24 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
       <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
+      <!-- ⚠ CE CHAMP NE RESSEMBLE PAS AUX AUTRES, ET C'EST VOULU. Un point de
+           vigilance n'est pas une ligne de plus : c'est ce qu'on lit quand on
+           s'apprête à faire une bêtise. Fond ambré, filet ambré, pictogramme
+           en tête — il se repère sans être lu.
+
+           Facultatif, et vide par défaut : la plupart des étapes n'en ont pas,
+           et un champ d'alerte rempli partout ne serait plus une alerte. -->
+      <div class="step-attention-bloc">
+        <span class="step-attention-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/>
+          </svg>
+        </span>
+        <textarea class="step-attention-saisie" rows="1"
+                  placeholder="Point de vigilance (facultatif)">${escapeHtml(step.attention || '')}</textarea>
+      </div>
       <div class="step-bas">
       <div class="step-img">
         <div class="step-img-vignette${step.image_url || step.imageFichier ? ' pleine' : ''}">${step.image_url
@@ -20090,6 +20125,18 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     if (champTitre) champTitre.addEventListener('input', (e) => {
       manualSteps[i].titre = e.target.value.trim() || null
     })
+
+    /* Même logique que le titre : sans cette ligne, le champ se remplit et se
+       vide à l'enregistrement. `autoResizeTextarea` parce qu'une mise en garde
+       de deux lignes ne doit pas s'ouvrir coupée. */
+    const champAtt = div.querySelector('.step-attention-saisie')
+    if (champAtt) {
+      champAtt.addEventListener('input', (e) => {
+        manualSteps[i].attention = e.target.value.trim() || null
+        autoResizeTextarea(e.target)
+      })
+      autoResizeTextarea(champAtt)
+    }
 
 
     /* Le champ ne s'ajustait qu'à LA SAISIE. Rempli par l'IA — ou relu après

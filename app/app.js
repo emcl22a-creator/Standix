@@ -20112,8 +20112,8 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
          ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit à l'intérieur
            d'un gabarit JavaScript, et le moindre backtick le refermerait en
            plein milieu. Le contrôle de syntaxe l'a rattrapé une fois. -->
-      <div class="step-att-zone${step.attention ? ' ouvert' : ''}">
-        <button type="button" class="step-att-bouton" aria-expanded="${step.attention ? 'true' : 'false'}">
+      <div class="step-att-zone${step.attention || step._attOuvert ? ' ouvert' : ''}">
+        <button type="button" class="step-att-bouton" aria-expanded="${step.attention || step._attOuvert ? 'true' : 'false'}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/>
@@ -20186,6 +20186,14 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
       e.preventDefault()
       const ouvert = zoneAtt.classList.toggle('ouvert')
       btnAtt.setAttribute('aria-expanded', String(ouvert))
+      /* ⚠ L'ÉTAT VIT DANS LA DONNÉE, PAS SEULEMENT DANS LA CLASSE. Ces listes
+         se redessinent en entier au moindre geste — ajouter une étape, en
+         sélectionner une autre, découper un clip. Sans cette ligne, le tiroir
+         se refermait dès qu'on touchait ailleurs.
+
+         Le souligné en tête du nom dit que le champ ne part pas en base :
+         c'est un état d'affichage, pas une donnée de la procédure. */
+      manualSteps[i]._attOuvert = ouvert
       if (ouvert) setTimeout(() => { champAtt?.focus(); autoResizeTextarea(champAtt) }, 260)
     })
 
@@ -21042,8 +21050,8 @@ function renderVideoSteps(listEl) {
          ⚠ ET AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit à l'intérieur
            d'un gabarit JavaScript, et le moindre backtick le refermerait en
            plein milieu. Le contrôle de syntaxe l'a rattrapé une fois. -->
-      <div class="step-att-zone${step.attention ? ' ouvert' : ''}">
-        <button type="button" class="step-att-bouton" aria-expanded="${step.attention ? 'true' : 'false'}">
+      <div class="step-att-zone${step.attention || step._attOuvert ? ' ouvert' : ''}">
+        <button type="button" class="step-att-bouton" aria-expanded="${step.attention || step._attOuvert ? 'true' : 'false'}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/>
@@ -21121,6 +21129,14 @@ function renderVideoSteps(listEl) {
       e.preventDefault()
       const ouvert = zoneAtt.classList.toggle('ouvert')
       btnAtt.setAttribute('aria-expanded', String(ouvert))
+      /* ⚠ L'ÉTAT VIT DANS LA DONNÉE, PAS SEULEMENT DANS LA CLASSE. Ces listes
+         se redessinent en entier au moindre geste — ajouter une étape, en
+         sélectionner une autre, découper un clip. Sans cette ligne, le tiroir
+         se refermait dès qu'on touchait ailleurs.
+
+         Le souligné en tête du nom dit que le champ ne part pas en base :
+         c'est un état d'affichage, pas une donnée de la procédure. */
+      videoSteps[i]._attOuvert = ouvert
       if (ouvert) setTimeout(() => { champAtt?.focus(); autoResizeTextarea(champAtt) }, 260)
     })
 
@@ -21165,7 +21181,19 @@ function renderVideoSteps(listEl) {
     })
 
     div.addEventListener('click', (e) => {
+      /* ⚠ CE CLIC REDESSINE TOUTE LA LISTE, ET C'EST CE QUI TUAIT LE TIROIR.
+
+         Toucher une étape la sélectionne et rejoue la vidéo à son début —
+         donc `renderVideoSteps()`, qui reconstruit le balisage de zéro. Le
+         bouton du point de vigilance ouvrait bien son tiroir, puis l'élément
+         était remplacé par un neuf, refermé. De l'extérieur : rien ne se
+         passe.
+
+         Le champ texte et la corbeille étaient déjà exclus pour la même
+         raison. Le tiroir rejoint la liste — bouton ET contenu, sans quoi
+         écrire dans le champ refermerait tout. */
       if (e.target.closest('textarea') || e.target.closest('.sup')) return
+      if (e.target.closest('.step-att-zone') || e.target.closest('.step-titre-saisie')) return
       dvSelection = i
       const v = dvLecteur()
       if (v) v.currentTime = step.timestamp_video

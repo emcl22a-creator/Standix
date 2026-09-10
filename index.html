@@ -282,7 +282,12 @@ body.pret .chargement{animation:voile-part .85s cubic-bezier(.32,.72,0,1) forwar
      son contenu, le calcul devient circulaire et l'appareil tombe à zéro —
      c'est ce qui vient de se produire sur onze formats. */
   height:100svh;
+  /* ⚠ `flex-end` : le groupe texte + image est poussé vers le BAS, et la place
+     restante tombe AU-DESSUS du titre. Avec `flex-start`, elle se logeait
+     entre le sous-titre et l'appareil — un trou au milieu de la page, d'autant
+     plus large que l'écran est haut. */
   display:flex; flex-direction:column; align-items:center;
+  justify-content:flex-end;
   /* La hauteur de la barre est reprise en marge haute : elle ne prend plus de
      place dans le flux, c'est donc ici qu'il faut la compter. */
   padding:calc(var(--h-barre, 88px) + clamp(14px, 3.4vh, 52px)) 24px 0;
@@ -334,20 +339,11 @@ h1{
    énormes sur les côtés. Sa taille vient maintenant de la LARGEUR, et son bas
    est coupé par le bord de l'écran. C'est ce que font tous les sites qui
    montrent un grand appareil : il monte du pli, il ne se pose pas dedans. */
-/* `container-type:size` fait de la scène une unité de mesure : l'appareil se
-   borne alors à la place RÉELLEMENT restante, ce qu'une valeur en `svh` ne
-   sait pas faire — elle ignore la hauteur du texte au-dessus, et les cartes
-   sortaient de l'écran sur quatre formats larges et courts. */
+/* La scène ne s'étire plus : elle fait exactement la hauteur de l'appareil et
+   se pose juste sous le texte. */
 .scene{
-  /* ⚠ `place-items:end center` et non `start` : l'appareil doit COLLER le bas
-     de la section. Aligné en haut, il laissait un vide sous lui dès que la
-     hauteur disponible dépassait la sienne — sur une fenêtre haute il flottait
-     au milieu du noir. */
-  flex:1 1 auto; min-height:0; width:100%;
-  /* Plus de bande réservée : les cartes ont disparu, et l'appareil doit
-     descendre jusqu'au bord. La barre d'action passe simplement par-dessus. */
+  flex:0 0 auto; width:100%;
   margin-top:clamp(20px,3vh,44px);
-  container-type:size;
   display:grid; place-items:end center;
 }
 .sc-in{
@@ -356,11 +352,15 @@ h1{
      s'arrête à 0,85 fois sa largeur, soit 0,85 × 1,18 = 1,00 de la hauteur
      restante — elle affleure le bord sans jamais le franchir. C'est ce rapport
      qui fixe la borne, pas un chiffre choisi à l'œil. */
-  /* ⚠ La borne DÉCOULE du rapport de l'image. `--s` est la LARGEUR ; la
-     hauteur vaut 1,428 fois plus. Pour que l'image entre entièrement dans la
-     place restante il faut `--s × 1,428 ≤ 100 cqh`, soit `--s ≤ 70 cqh`.
-     Changer d'image change donc cette valeur. */
-  --s:min(clamp(240px, 30vw, 500px), 70cqh);
+  /* ⚠ LA PLACE RESTANTE EST MESURÉE, PAS DEVINÉE. `--h-haut` est la distance
+     du haut de la section au bas du sous-titre, relevée en JavaScript et remise
+     à jour à chaque changement de taille. L'appareil prend ce qui reste, divisé
+     par 1,428 puisque `--s` est sa LARGEUR et que sa hauteur vaut 1,428 fois
+     plus.
+     Ni `svh` ni `cqh` ne pouvaient donner ce résultat : le premier ignore la
+     hauteur du texte, le second exigeait une scène étirée — donc le trou. */
+  --s:min(clamp(240px, 30vw, 500px),
+          calc((100svh - var(--h-haut, 340px) - var(--h-ecart, 32px)) / 1.428));
   position:relative;
   width:var(--s); height:calc(var(--s) * 1.428);
   /* ⚠ Mesuré sur QUINZE bandes horizontales, pas trois. En dessous de 60 % de
@@ -523,7 +523,7 @@ h1{
    pièce rapportée. */
 .btn-verre{
   background:rgba(255,255,255,.13); color:#FFFFFF;
-  padding:clamp(10px,.8vw,13px) clamp(18px,1.4vw,26px);
+  padding:clamp(10px,.95vw,15px) clamp(18px,1.4vw,26px);
   font-size:clamp(14px,1.02vw,16px);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);
 }
@@ -534,7 +534,7 @@ h1{
 .btn-bleu{
   background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
   color:#fff;
-  padding:clamp(10px,.8vw,13px) clamp(20px,1.6vw,28px);
+  padding:clamp(10px,.95vw,15px) clamp(20px,1.6vw,28px);
   font-size:clamp(14px,1.02vw,16px);
   box-shadow:0 6px 18px rgba(31,76,238,.30);
 }
@@ -631,30 +631,94 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    Trois valeurs proches — la page, la section, les cartes — donnent la
    profondeur ; deux seulement donnent un aplat.
    ═══════════════════════════════════════════════════════════════════════ */
+/* `#1D1D1F` est le gris sombre d'Apple, celui de leurs pages produit. Il est
+   plus CHAUD et plus clair que le #15181E que j'avais posé : sur du noir, un
+   gris froid tire vers le bleu et paraît sale. */
 .duo{
-  background:#15181E;
-  padding:clamp(56px, 9vh, 130px) clamp(16px, 3vw, 48px);
+  background:#1D1D1F;
+  padding:clamp(56px, 9vh, 130px) 0;
 }
+
+/* ─── LE GLISSEMENT ───
+   Deux cartes sur une ligne à toutes les tailles, qu'on fait défiler
+   horizontalement. La première tient en entier, la seconde dépasse d'un quart :
+   c'est ce débord qui dit qu'il y a une suite — une carte parfaitement cadrée
+   n'invite à rien.
+   `scroll-snap` accroche chaque carte au bord, on ne s'arrête jamais entre
+   deux. `scroll-padding` reprend la marge, sinon la carte accrochée viendrait
+   coller le bord de l'écran. */
 .duo-grille{
-  max-width:1240px; margin:0 auto;
-  display:grid; grid-template-columns:repeat(2, minmax(0,1fr));
-  gap:clamp(16px, 1.8vw, 28px);
+  display:flex; gap:clamp(14px, 1.5vw, 24px);
+  overflow-x:auto; overscroll-behavior-x:contain;
+  padding-block:0 clamp(18px, 2vw, 28px);
+  scroll-snap-type:x mandatory;
+  max-width:1240px; margin-inline:auto;
+  padding-inline:clamp(16px, 3vw, 48px);
+  scroll-padding-inline-start:clamp(16px, 3vw, 48px);
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
 }
+.duo-grille::-webkit-scrollbar{display:none}
 .duo-c{
+  /* ⚠ UN PLAFOND, PAS SEULEMENT UN POURCENTAGE. 560 px, c'est exactement la
+     moitié des 1144 px de contenu du carrousel une fois l'écart retiré : au
+     delà de 1240 px de large, les deux cartes tiennent donc EN ENTIER et rien
+     ne se fait couper. En dessous, le pourcentage reprend la main et la
+     seconde dépasse — c'est là que le glissement a un sens. */
+  flex:0 0 min(78%, 560px);
+  scroll-snap-align:start;
+  position:relative; isolation:isolate;
   background:var(--panneau);
   border-radius:clamp(20px, 1.8vw, 30px);
-  padding:clamp(24px, 2.4vw, 40px);
+  padding:clamp(22px, 2vw, 34px);
   /* ⚠ Pas de marge basse : l'appareil doit toucher le bord. `overflow:hidden`
      le fait couper par le rayon de la carte, pas par une boîte intérieure. */
   padding-bottom:0;
   overflow:hidden;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.055),
-             0 24px 60px rgba(0,0,0,.35);
+  /* Plus d'ombre portée : sur un fond déjà sombre elle n'apportait qu'une
+     salissure, et c'est elle qui obligeait à réserver 80 px sous le carrousel.
+     Le liseré suffit à détacher la carte du gris. */
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.10),
+    inset 0 0 0 1px rgba(255,255,255,.07);
   display:flex; flex-direction:column;
+}
+
+/* ─── LA MATIÈRE DES CARTES ───
+   Deux couches, et c'est leur superposition qui fait la profondeur — une seule
+   donnerait un aplat coloré.
+   ::before  deux nappes très larges et très faibles, l'une bleue en haut à
+             gauche, l'autre violette en bas à droite. Décalées, jamais
+             centrées : une lueur centrée se lit comme un projecteur, une lueur
+             excentrée comme une lumière lointaine.
+   ::after   le grain. Sans lui, des dégradés aussi étendus se découpent en
+             bandes visibles sur un écran ordinaire.
+   ⚠ Le bruit est OPAQUE et recentré sur le gris moyen, et posé en
+   incrustation : appliqué normalement, il éclaircirait le noir d'un voile. */
+.duo-c::before{
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  border-radius:inherit;
+  /* ⚠ Plus de bleu ni de violet : deux teintes sur une carte noire faisaient
+     une couleur, pas une lumière. Il ne reste qu'un reflet BLANC en haut à
+     gauche, très large et très faible — la lueur d'une source hors cadre sur
+     une surface laquée. Excentré, jamais au milieu : une lueur centrée se lit
+     comme un projecteur. */
+  background:
+    radial-gradient(130% 95% at 16% -12%,
+      rgba(255,255,255,.075) 0%, rgba(255,255,255,.025) 36%, transparent 68%),
+    radial-gradient(120% 85% at 95% 112%,
+      rgba(255,255,255,.030) 0%, rgba(255,255,255,.010) 42%, transparent 74%);
+}
+.duo-c::after{
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  border-radius:inherit;
+  background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27200%27%20height%3D%27200%27%3E%3Cfilter%20id%3D%27n%27%20color-interpolation-filters%3D%27sRGB%27%3E%3CfeTurbulence%20type%3D%27fractalNoise%27%20baseFrequency%3D%27.85%27%20numOctaves%3D%273%27%20stitchTiles%3D%27stitch%27%2F%3E%3CfeColorMatrix%20type%3D%27saturate%27%20values%3D%270%27%2F%3E%3CfeComponentTransfer%3E%3CfeFuncR%20type%3D%27linear%27%20slope%3D%27.55%27%20intercept%3D%27.225%27%2F%3E%3CfeFuncG%20type%3D%27linear%27%20slope%3D%27.55%27%20intercept%3D%27.225%27%2F%3E%3CfeFuncB%20type%3D%27linear%27%20slope%3D%27.55%27%20intercept%3D%27.225%27%2F%3E%3CfeFuncA%20type%3D%27discrete%27%20tableValues%3D%271%27%2F%3E%3C%2FfeComponentTransfer%3E%3C%2Ffilter%3E%3Crect%20width%3D%27100%25%27%20height%3D%27100%25%27%20filter%3D%27url%28%23n%29%27%2F%3E%3C%2Fsvg%3E");
+  background-size:200px 200px;
+  opacity:1; mix-blend-mode:overlay;
 }
 .duo-c h2{
   margin:0; font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(21px, 1.9vw, 32px); letter-spacing:-.022em;
+  font-size:clamp(20px, 1.6vw, 27px); letter-spacing:-.022em;
   color:#FFFFFF;
 }
 .duo-c p{
@@ -674,9 +738,16 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    Elle n'a plus de rayon : c'est la carte qui découpe, sinon on verrait deux
    arrondis l'un dans l'autre. */
 .duo-vue{
+  /* ⚠ LA TAILLE DE L'APPAREIL NE DÉPEND PLUS DE CELLE DE LA CARTE. Tant
+     qu'elle valait 62 % de sa largeur, l'élargissement des cartes au passage
+     en glissement l'a fait doubler : 655 px de large à 1440, et la section
+     mesurait deux écrans de haut. Elle a maintenant ses propres bornes.
+     La hauteur de la boîte en découle : largeur × 2,0615 pour l'appareil
+     entier, × 0,87 pour la part qu'on en montre. */
+  --tel:clamp(150px, 17vw, 232px);
   position:relative;
   margin-top:clamp(20px, 2vw, 32px);
-  aspect-ratio:1 / 1.112;
+  height:calc(var(--tel) * 2.0615 * .87);
   overflow:hidden;
 }
 
@@ -688,7 +759,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    exactement celui de la vidéo — elle s'y pose sans déformation. */
 .tel-cadre{
   position:absolute; left:50%; top:0; translate:-50% 0;
-  width:62%; aspect-ratio:1318 / 2717;
+  width:var(--tel); aspect-ratio:1318 / 2717;
 }
 .tel-video{
   position:absolute;
@@ -703,12 +774,47 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 }
 .tel-bord{position:absolute; inset:0; width:100%; height:100%; display:block}
 
-/* ⚠ UNE SEULE COLONNE sous 980 px. Côte à côte, chaque carte tomberait à
-   170 px de large sur un téléphone — l'appareil qu'elles contiendront y serait
-   illisible. */
+/* ─── L'INDICATION DE GLISSEMENT ───
+   Deux pastilles disent COMBIEN il y a de cartes et où l'on est ; la flèche
+   dit qu'on peut avancer. Elle glisse de quelques pixels en boucle lente —
+   c'est un geste suggéré, pas un clignotement.
+   ⚠ Elle DISPARAÎT au premier glissement. Une invitation qui reste après
+   qu'on l'a suivie devient un reproche. */
+/* ⚠ Elles ne servent que lorsqu'il y a quelque chose à faire glisser, et le
+   seuil ne peut PAS être une largeur d'écran : la présence d'une barre de
+   défilement verticale décale tout de quelques pixels, et à 1239 px de fenêtre
+   les cartes tenaient encore alors que l'indication s'affichait. On mesure donc
+   la piste elle-même, en JavaScript, et on ne montre l'indication que si son
+   contenu déborde vraiment. */
+.duo-pas{
+  display:flex; align-items:center; justify-content:center;
+  gap:9px; margin-top:clamp(4px, 1vh, 14px);
+}
+.duo-pas{display:none}
+.duo-pas.utile{display:flex}
+.duo-pt{
+  width:7px; height:7px; border-radius:50%;
+  background:rgba(255,255,255,.22);
+  transition:background-color .4s cubic-bezier(.28,.11,.32,1);
+}
+.duo-pt.on{background:rgba(255,255,255,.72)}
+.duo-fl{
+  width:15px; height:15px; margin-left:5px; color:rgba(255,255,255,.38);
+  animation:pousse 2.4s cubic-bezier(.28,.11,.32,1) infinite;
+  transition:opacity .5s cubic-bezier(.28,.11,.32,1);
+}
+@keyframes pousse{
+  0%,100%{translate:0 0; opacity:.38}
+  45%    {translate:5px 0; opacity:.75}
+}
+.duo-pas.vu .duo-fl{opacity:0; animation:none}
+
+/* Les cartes gardent la même proportion partout : c'est le glissement qui
+   règle le problème de place, plus le repli en colonne. */
 @media (max-width:980px){
-  .duo{padding:clamp(44px, 7vh, 80px) 16px}
-  .duo-grille{grid-template-columns:1fr; gap:16px}
+  .duo{padding:clamp(44px, 7vh, 80px) 0}
+  .duo-grille{padding-inline:16px; scroll-padding-inline-start:16px}
+  .duo-c{flex:0 0 min(82%, 560px)}
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -1012,7 +1118,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   /* ⚠ Les cartes débordaient de l'écran : à −44 % de la largeur de l'appareil,
      la carte vidéo sortait de 70 px. Elles se rapprochent, et la vignette est
      retirée — à cette taille on n'y verrait rien. */
-  .sc-in{--s:min(84vw, 70cqh)}
+  .sc-in{--s:min(84vw, calc((100svh - var(--h-haut, 300px) - var(--h-ecart, 26px)) / 1.428))}
   /* ⚠ Une rotation élargit la BOÎTE de l'élément : les cartes sortaient de
      12 px de l'écran. À cette taille l'inclinaison ne se lirait pas de toute
      façon — elle est retirée plutôt que compensée. */
@@ -1208,6 +1314,15 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     </article>
 
   </div>
+
+  <!-- ═══ L'INDICATION ═══ deux pastilles et une flèche qui glisse. -->
+  <div class="duo-pas" aria-hidden="true">
+    <i class="duo-pt on"></i><i class="duo-pt"></i>
+    <svg class="duo-fl" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 5l7 7-7 7"/>
+    </svg>
+  </div>
 </section>
 
 <!-- ═══ SECTION 3 ═══ ce que le produit change, en trois temps. -->
@@ -1313,6 +1428,55 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
       video.play().catch(()=>{});     /* refusée par le navigateur : tant pis */
     },{threshold:.35});
     oeil.observe(video);
+  }
+
+  /* Les pastilles suivent la position, la flèche s'efface au premier
+     glissement. On lit `scrollLeft` plutôt qu'un observateur : c'est la seule
+     grandeur qui compte, et elle est déjà là. */
+  const piste=document.querySelector('.duo-grille');
+  const pas=document.querySelector('.duo-pas');
+  if(piste && pas){
+    const points=[...pas.querySelectorAll('.duo-pt')];
+    let vu=false;
+
+    /* L'indication n'apparaît que si la piste déborde. Recalculé au
+       redimensionnement : on passe d'un cas à l'autre en tirant la fenêtre. */
+    const jauge=()=>pas.classList.toggle('utile', piste.scrollWidth > piste.clientWidth + 4);
+    jauge();
+    addEventListener('resize', jauge, {passive:true});
+    piste.addEventListener('scroll', ()=>{
+      const n=Math.round(piste.scrollLeft / (piste.scrollWidth - piste.clientWidth || 1));
+      points.forEach((e,i)=>e.classList.toggle('on', i===n));
+      if(!vu && piste.scrollLeft > 12){ vu=true; pas.classList.add('vu'); }
+    }, {passive:true});
+  }
+
+  /* ⚠ ON MESURE LA HAUTEUR PROPRE DU TEXTE, PAS SA POSITION. Mesurée depuis le
+     haut de la section, elle incluait le vide poussé au-dessus par
+     `justify-content:flex-end` — donc le calcul se mordait la queue : plus
+     l'appareil rapetissait, plus le vide grandissait, plus la mesure grossissait.
+     L'appareil tombait à 286 px au lieu de 384.
+     La bonne grandeur, c'est le rembourrage haut plus la hauteur du bloc de
+     texte lui-même, du surtitre au sous-titre.
+     Un `ResizeObserver` plutôt qu'un écouteur de redimensionnement : le texte
+     change aussi de hauteur quand une ligne se replie, sans que la fenêtre
+     bouge. */
+  const hh=document.querySelector('.hero');
+  const bas=document.querySelector('.sous');
+  const haut=document.querySelector('.sur');
+  if(hh && bas && haut){
+    const mesure=()=>{
+      const pad=parseFloat(getComputedStyle(hh).paddingTop) || 0;
+      const bloc=bas.getBoundingClientRect().bottom - haut.getBoundingClientRect().top;
+      const h=Math.round(pad + bloc);
+      document.documentElement.style.setProperty('--h-haut', h + 'px');
+      document.documentElement.style.setProperty('--h-ecart',
+        getComputedStyle(document.querySelector('.scene')).marginTop);
+    };
+    mesure();
+    new ResizeObserver(mesure).observe(bas);
+    new ResizeObserver(mesure).observe(haut);
+    new ResizeObserver(mesure).observe(hh);
   }
 
   const relit=()=>{

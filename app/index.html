@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=66e8332b">
+<link rel="stylesheet" href="style.css?v=ff9f1a6b">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -3115,7 +3115,10 @@
       <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">Analyses vidéo AI</h1>
+      <!-- ⚠ LE TITRE SUIT LE BOUTON. Celui du profil dit « Utilisation vidéo
+           AI » et ouvre cette page : deux noms pour un seul endroit feraient
+           douter d'avoir cliqué au bon endroit. -->
+      <h1 class="pagehead">Utilisation vidéo AI</h1>
     </div>
     <div class="quota-carte" id="quota-carte"></div>
   </div>
@@ -3130,7 +3133,10 @@
       <!-- ⚠ LE TITRE SUIT L'ONGLET. Deux mots differents pour la meme page —
              « Reglages » en haut, « Entreprise » en bas — feraient douter
              d'etre au bon endroit. -->
-        <h1>Équipe</h1>
+        <!-- ⚠ LE TITRE SUIT L'ONGLET. Celui de la barre dit « Acces » et mene
+             ici : deux noms pour un seul endroit feraient douter d'avoir
+             touche le bon. -->
+        <h1>Accès</h1>
         <!-- ⚠ IL DIT CE QU'ON PEUT FAIRE, plus ce que la page contient.
 
           « Votre equipe, vos postes et vos acces » enumerait les lignes qu'on
@@ -3365,7 +3371,7 @@
 
              Elle rejoint « Abonnement », qui traite du meme sujet. -->
         <button type="button" class="reg-ligne" id="ligne-quota" onclick="ouvrirQuota()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Analyses vidéo AI</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Utilisation vidéo AI</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
     </div>
@@ -3672,22 +3678,48 @@
   <div class="screen" inert id="etab-section-titre" style="display:none;"></div>
 </div>
 
-<!-- Aucune entreprise rattachée à ce compte -->
-<div class="fond-promu" id="fond-orphelin">
-  <div class="fen-promu" role="dialog" aria-modal="true">
-    <div class="accueil promu-carte">
-      <div class="accueil-texte">
-        <div class="t" id="orph-titre">Aucune entreprise</div>
-        <div class="s" id="orph-texte">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères
-          que votre responsable vous a communiqué.</div>
-      </div>
-      <div class="accueil-av"><span class="dispo"></span></div>
+<!-- ═══ AUCUNE ENTREPRISE — MEME FORME QUE LE RENOMMAGE ═══
+
+     C'etait une page : une carte d'accueil avec son avatar, deux boutons
+     pleine largeur sur un fond gris. Elle ressemblait a un ecran de l'app
+     alors qu'elle en interdit l'acces — on cherchait comment en sortir.
+
+     C'est maintenant une alerte, exactement celle de `confirmDialog` :
+     `fen-pro`, son halo, son titre, son champ, ses boutons empiles. Le meme
+     geste que renommer un dossier.
+
+   ⚠ LE BALISAGE REPREND SES CLASSES AU MOT PRES. Elles portent toute la mise
+     en forme et l'animation d'ouverture ; en inventer de nouvelles obligerait
+     a les tenir d'accord a chaque retouche.
+
+   ⚠ ET LES IDENTIFIANTS NE CHANGENT PAS. `montrerOrphelin` et les trois
+     ecouteurs les cherchent par leur nom : les renommer casserait tout sans
+     qu'une seule erreur ne s'affiche.
+
+   ⚠ PAS DE `inputmode="numeric"`. Le clavier n'aurait pas les lettres du
+     code — un defaut qui ne se voit pas en relisant le code, et qui rend la
+     saisie impossible sur telephone. -->
+<!-- ⚠ `display:none` AU DEPART, ET C'EST INDISPENSABLE. `.ios-alert-backdrop`
+     vaut `display:flex; inset:0; z-index:200` : sans cette ligne, le calque
+     couvrirait tout l'ecran des le chargement et avalerait chaque clic.
+     `confirmDialog` n'a pas ce souci — elle cree son calque au moment de
+     l'ouvrir, celui-ci vit dans le balisage en permanence. -->
+<div class="ios-alert-backdrop" id="fond-orphelin" style="display:none">
+  <div class="fen-pro" role="dialog" aria-modal="true">
+    <span class="fen-halo bleu"></span>
+    <div class="fen-co">
+      <div class="fen-t" id="orph-titre">Aucune entreprise</div>
+      <div class="fen-s" id="orph-texte">Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.</div>
+      <input type="text" class="fen-champ" id="orph-code" maxlength="6"
+             autocomplete="off" placeholder="A1B2C3" autocapitalize="characters"
+             spellcheck="false" style="text-align:center; letter-spacing:0.3em; font-weight:650;">
+      <div class="error-msg" id="orph-erreur" style="text-align:center; margin-top:8px;"></div>
     </div>
-    <input type="text" id="orph-code" maxlength="6" autocomplete="off" placeholder="A1B2C3" autocapitalize="characters" spellcheck="false" style="text-align:center; font-size:24px; letter-spacing:0.34em; font-weight:750; margin-top:14px;">
-    <button type="button" class="btn block" id="orph-entrer" style="margin-top:10px;">Rejoindre</button>
-    <div class="error-msg" id="orph-erreur" style="text-align:center;"></div>
-    <button type="button" class="btn ghost block" id="orph-sortir" style="margin-top:6px;">Se déconnecter</button>
-    <button type="button" class="btn ghost block" id="orph-annuler" style="margin-top:6px; display:none;">Annuler</button>
+    <div class="fen-ac">
+      <button type="button" class="fen-p" id="orph-entrer">Rejoindre</button>
+      <button type="button" class="fen-a" id="orph-sortir">Se déconnecter</button>
+      <button type="button" class="fen-a" id="orph-annuler" style="display:none;">Annuler</button>
+    </div>
   </div>
 </div>
 
@@ -4145,7 +4177,13 @@
          entreprise a montrer. -->
     <div class="reg-groupe" data-teinte="bleu" id="es-ent-groupe" style="display:none">
       <div class="reg-ligne">
-        <span class="reg-ic ent-ic"><img id="es-logo-ent" alt=""></span>
+        <span class="reg-ic ent-ic">
+          <!-- ⚠ DEUX ETATS DANS LA MEME PASTILLE. L'image quand un logo existe,
+               les initiales sinon. Sans ce second element, une entreprise sans
+               logo n'avait rien a montrer et toute la ligne disparaissait. -->
+          <img id="es-logo-ent" alt="" hidden>
+          <span class="ent-ini" id="es-ent-initiales" hidden>—</span>
+        </span>
         <span class="reg-nm" id="es-ent-nom">—</span>
         <span class="reg-val" id="es-ent-role"></span>
       </div>
@@ -4882,7 +4920,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=24d3d998"></script>
+<script type="module" src="app.js?v=3350e798"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -5763,7 +5801,7 @@ function layout() {
 
    « Gerer » devient « Equipe » — c'est ce que la page contient : les acces,
    les mouvements, les postes. Et il passe avant Analyse. */
-const LABELS_GESTION = ['Procedures', 'Equipe', 'Analyse'];
+const LABELS_GESTION = ['Procedures', 'Acces', 'Analyse'];
 /* ⚠ TROIS ONGLETS COTE EQUIPE, comme la gestion.
 
    « Notifications » a ete retire. Ce qu'il montrait — les procedures publiees
@@ -5806,8 +5844,22 @@ const ICONS = [
      ⚠ LA SECONDE EST PARTIELLE, tracee a moitie derriere la premiere. Deux
        silhouettes entieres cote a cote se remplissent a vingt pixels ; celle
        du fond ne montre que ce qui depasse. */
-    line:'M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z M3 20.2a6.4 6.4 0 0 1 12.8 0 M16.4 11a2.9 2.9 0 1 0 0-5.8 M17 14.6a5.4 5.4 0 0 1 4 5.6',
-    fill:'M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z M3 20.2a6.4 6.4 0 0 1 12.8 0 M16.4 11a2.9 2.9 0 1 0 0-5.8 M17 14.6a5.4 5.4 0 0 1 4 5.6',
+    /* ⚠ UNE CLE, PLUS DEUX SILHOUETTES. L'onglet ne dit plus « des gens » mais
+       « qui peut entrer » — ce que la page fait reellement : donner, retirer
+       et suivre des acces. Deux silhouettes disaient l'effectif ; la page ne
+       sert pas a savoir qui travaille ici, mais a decider qui a le droit
+       d'ouvrir.
+
+     ⚠ ELLE TIENT DANS LA MEME BOITE QUE LES AUTRES. Anneau centre a 8, tige
+       jusqu'a 21 : 17,2 px de large, exactement le graphique et l'engrenage.
+       Une icone plus large paraitrait plus lourde dans la barre.
+
+     ⚠ LE TRACE REMPLI EVIDE SON ANNEAU. Sans le second cercle en sens
+       inverse, la clef devient une palette pleine a vingt pixels — on ne
+       reconnait plus rien. Meme principe que la porte de la maison, deux
+       icones plus haut. */
+    line:'M8 6.2a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Z M12.4 10.6H21 M17.6 10.6v3.4 M20.4 10.6v2.6',
+    fill:'M8 6.2a4.4 4.4 0 1 0 0 8.8 4.4 4.4 0 0 0 0-8.8Zm0 2.5a1.9 1.9 0 1 1 0 3.8 1.9 1.9 0 0 1 0-3.8Z M12.2 9.4H21v2.4h-1.05v1.9h-1.9v-1.9h-1.35v2.7h-1.9v-2.7h-2.6z',
   },
 
   /* ⚠ ICONS[4] — L'ENGRENAGE DES REGLAGES.

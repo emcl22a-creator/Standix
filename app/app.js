@@ -20301,7 +20301,22 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
          Le souligné en tête du nom dit que le champ ne part pas en base :
          c'est un état d'affichage, pas une donnée de la procédure. */
       manualSteps[i]._attOuvert = ouvert
-      if (ouvert) setTimeout(() => { champAtt?.focus(); autoResizeTextarea(champAtt) }, 260)
+      /* ⚠ 260 ms MESURAIT TROP TOT. L'ouverture du tiroir dure 340 ms : a 260,
+         la grille n'a pas fini de grandir et `scrollHeight` rend une hauteur
+         trop courte. Le champ s'ouvrait coupe.
+
+         On attend la fin de la transition plutot qu'un delai devine — si la
+         duree change un jour dans la feuille de style, ceci suit. Le
+         `setTimeout` reste en filet : `transitionend` ne se declenche pas si
+         l'animation est desactivee par `prefers-reduced-motion`. */
+      if (ouvert) {
+        const finir = () => { champAtt?.focus(); if (champAtt?.value) autoResizeTextarea(champAtt) }
+        const tiroir = zoneAtt.querySelector('.step-att-tiroir')
+        let fait = false
+        const unefois = () => { if (!fait) { fait = true; finir() } }
+        tiroir?.addEventListener('transitionend', unefois, { once: true })
+        setTimeout(unefois, 420)
+      }
     })
 
     if (champAtt) {
@@ -20309,7 +20324,19 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
         manualSteps[i].attention = e.target.value.trim() || null
         autoResizeTextarea(e.target)
       })
-      autoResizeTextarea(champAtt)
+      /* ⚠ ON MESURE APRES L'AFFICHAGE, PAS PENDANT LE RENDU.
+
+         Le tiroir est une grille a `0fr` tant qu'il est ferme : la hauteur de
+         son contenu vaut alors zero, et `scrollHeight` rend une seule ligne.
+         Le champ restait donc a 20 px, et un point de vigilance de deux
+         lignes s'affichait coupe en son milieu — c'est ce qui a ete rapporte.
+
+         Deux `requestAnimationFrame` : le premier laisse le navigateur poser
+         la mise en page, le second la mesurer une fois faite. Un seul ne
+         suffit pas — la grille n'a pas encore sa hauteur a ce moment-la. */
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (champAtt.value) autoResizeTextarea(champAtt)
+      }))
     }
 
 
@@ -21244,7 +21271,22 @@ function renderVideoSteps(listEl) {
          Le souligné en tête du nom dit que le champ ne part pas en base :
          c'est un état d'affichage, pas une donnée de la procédure. */
       videoSteps[i]._attOuvert = ouvert
-      if (ouvert) setTimeout(() => { champAtt?.focus(); autoResizeTextarea(champAtt) }, 260)
+      /* ⚠ 260 ms MESURAIT TROP TOT. L'ouverture du tiroir dure 340 ms : a 260,
+         la grille n'a pas fini de grandir et `scrollHeight` rend une hauteur
+         trop courte. Le champ s'ouvrait coupe.
+
+         On attend la fin de la transition plutot qu'un delai devine — si la
+         duree change un jour dans la feuille de style, ceci suit. Le
+         `setTimeout` reste en filet : `transitionend` ne se declenche pas si
+         l'animation est desactivee par `prefers-reduced-motion`. */
+      if (ouvert) {
+        const finir = () => { champAtt?.focus(); if (champAtt?.value) autoResizeTextarea(champAtt) }
+        const tiroir = zoneAtt.querySelector('.step-att-tiroir')
+        let fait = false
+        const unefois = () => { if (!fait) { fait = true; finir() } }
+        tiroir?.addEventListener('transitionend', unefois, { once: true })
+        setTimeout(unefois, 420)
+      }
     })
 
     if (champAtt) {
@@ -21252,7 +21294,19 @@ function renderVideoSteps(listEl) {
         videoSteps[i].attention = e.target.value.trim() || null
         autoResizeTextarea(e.target)
       })
-      autoResizeTextarea(champAtt)
+      /* ⚠ ON MESURE APRES L'AFFICHAGE, PAS PENDANT LE RENDU.
+
+         Le tiroir est une grille a `0fr` tant qu'il est ferme : la hauteur de
+         son contenu vaut alors zero, et `scrollHeight` rend une seule ligne.
+         Le champ restait donc a 20 px, et un point de vigilance de deux
+         lignes s'affichait coupe en son milieu — c'est ce qui a ete rapporte.
+
+         Deux `requestAnimationFrame` : le premier laisse le navigateur poser
+         la mise en page, le second la mesurer une fois faite. Un seul ne
+         suffit pas — la grille n'a pas encore sa hauteur a ce moment-la. */
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        if (champAtt.value) autoResizeTextarea(champAtt)
+      }))
     }
 
 

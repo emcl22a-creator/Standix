@@ -22556,3 +22556,21 @@ body.abo-expire [data-etab-plus]{
   transform:translateX(-50%) translateZ(0) !important;
   will-change:backdrop-filter;
 }
+
+
+/* Les initiales, quand l'entreprise n'a pas encore de logo. Même pastille, même
+   taille : seule la matière change — un fond doux et deux lettres au lieu d'une
+   image. C'est ce que fait déjà le rang de l'espace gestion. */
+#e-profil .reg-ic.ent-ic .ent-ini{
+  display:grid;
+  place-items:center;
+  width:100%;
+  height:100%;
+  border-radius:10px;
+  background:rgba(31,76,238,0.10);
+  color:#1F4CEE;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:-0.01em;
+}
+#e-profil .reg-ic.ent-ic .ent-ini[hidden]{ display:none; }

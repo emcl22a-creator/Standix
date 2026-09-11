@@ -11990,8 +11990,17 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
                l'etat « brouillon pas encore vu » : posee sur le coin de la
                carte, elle se lirait comme une marque de la procedure entiere. */
           (() => {
-            const marque = jamaisVue
-              ? '<span class="p-seg-pt pt--seul" aria-label="Pas encore consultée"></span>' : ''
+            /* ⚠ LA PASTILLE A ETE RETIREE : ELLE FAISAIT DOUBLON.
+
+               Elle disait « pas encore consultée » — exactement ce que dit
+               deja le point du badge, bleu tant qu'on n'a pas ouvert la
+               procedure, gris ensuite. Deux marques pour un seul etat, cote a
+               cote sur la meme ligne : on cherche ce qui les distingue, et il
+               n'y a rien a trouver.
+
+               Le point du badge est le seul a rester. `aria-label` a suivi :
+               c'est lui qui porte desormais l'annonce. */
+            const marque = ''
 
             if (proc.publiee_le) {
               /* ⚠ LA MARQUE VAUT AUSSI POUR UNE PROCEDURE EN LIGNE. Elle
@@ -12059,7 +12068,8 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
              ⚠ `marquerBrouillonVu` REPEINT CE POINT AU CLIC. Sans cela il
                resterait bleu jusqu'au prochain redessin complet de la liste,
                comme la pastille avant lui. */
-            return `<span class="cl-badge">${marque}<i class="cl-pt-vu" style="background:${
+            return `<span class="cl-badge">${marque}<i class="cl-pt-vu" aria-label="${
+              jamaisVue ? 'Pas encore consultée' : 'Déjà consultée'}" style="background:${
               jamaisVue ? '#3A78EE' : '#9A9AA4'}"></i>${
               quandB ? 'Créé ' + quandB : 'En dév.'}</span>`
           })()}
@@ -24429,35 +24439,64 @@ function peindreReglagesEquipe() {
    ⚠ ON PREND L'ENTREPRISE COURANTE, celle où la personne se trouve à cet
      instant. Sur un compte présent dans deux entreprises, la ligne change avec
      la bascule — c'est justement ce qu'on veut lui dire. */
+  /* ═══ LA LIGNE DE L'ENTREPRISE ═══
+
+     Elle porte le logo, le nom, et le rôle qu'on y tient.
+
+   ⚠ ELLE NE DISPARAÎT PLUS FAUTE DE LOGO. Elle ne s'affichait qu'avec une
+     image : une entreprise qui n'en a pas encore posé n'avait donc AUCUN
+     élément la nommant dans son profil. C'est ce qui a été rapporté.
+
+     Sans logo, on montre les initiales — exactement ce que fait le rang de
+     l'espace gestion depuis toujours. Une pastille avec deux lettres vaut
+     mieux qu'une ligne absente : elle dit où l'on travaille.
+
+   ⚠ `e.id`, PAS `e.entreprise_id`. Les objets de `mesEtablissements` sont
+     reconstruits à la lecture : `id` y porte l'identifiant de l'ENTREPRISE,
+     `membre_id` celui de la fiche. Chercher `entreprise_id` renvoyait
+     `undefined` sur chaque ligne, sans la moindre erreur.
+
+   ⚠ ON PREND L'ENTREPRISE COURANTE, celle où la personne se trouve à cet
+     instant. Sur un compte présent dans deux entreprises, la ligne change
+     avec la bascule. */
   const groupeEnt = el('es-ent-groupe')
   if (groupeEnt) {
     const ent = (mesEtablissements || [])
       .find(e => e.id === currentMembre?.entreprise_id)
-    const src = ent?.logo_url ? urlLogo(ent.logo_url) : null
 
-    if (src) {
+    if (ent) {
       const img = el('es-logo-ent')
-      /* ⚠ SI L'IMAGE NE CHARGE PAS, ON RETIRE LA LIGNE ENTIÈRE.
+      const ini = el('es-ent-initiales')
+      const src = ent.logo_url ? urlLogo(ent.logo_url) : null
 
-         Une adresse morte laisse une pastille vide à gauche d'un nom : un trou
-         dans la colonne d'icônes, et l'impression que l'app est cassée. Mieux
-         vaut pas de ligne qu'une ligne borgne.
+      if (src && img) {
+        /* ⚠ `onerror` EST POSÉ AVANT `src` — l'ordre compte : une image déjà
+           en cache peut échouer avant la fin de cette fonction. En cas
+           d'échec on retombe sur les initiales, jamais sur une pastille
+           vide. */
+        img.onerror = () => {
+          img.hidden = true
+          if (ini) ini.hidden = false
+        }
+        img.src = src
+        img.hidden = false
+        if (ini) ini.hidden = true
+      } else {
+        if (img) { img.removeAttribute('src'); img.hidden = true }
+        if (ini) {
+          ini.textContent = initialesEtab(ent.nom || '')
+          ini.hidden = false
+        }
+      }
 
-         `onerror` est posé AVANT `src` — l'ordre compte : une image déjà en
-         cache peut échouer avant même la fin de cette fonction. */
-      img.onerror = () => { groupeEnt.style.display = 'none' }
-      img.src = src
       el('es-ent-nom').textContent = ent.nom || 'Votre entreprise'
-
-      /* ⚠ « Utilisateur » ET NON « Équipe ». C'est le mot de l'inscription —
-         on s'inscrit « en tant qu'utilisateur », pas « en tant qu'équipe ».
-         L'app disait l'un et l'autre pour la même chose. */
       el('es-ent-role').textContent = ent.role === 'gestion' ? 'Gestion' : 'Utilisateur'
       groupeEnt.style.display = ''
     } else {
       groupeEnt.style.display = 'none'
     }
   }
+
 
 
   if (el('es-email-affiche')) {
@@ -27181,22 +27220,38 @@ function montrerOrphelin(enPlus) {
   } else {
     el('orph-titre').textContent = 'Aucune entreprise'
     el('orph-texte').textContent =
-      "Votre compte n'est rattach\u00e9 \u00e0 aucune entreprise. Entrez le code \u00e0 6 caract\u00e8res " +
-      "que votre responsable vous a communiqu\u00e9."
+      "Votre compte n'est rattach\u00e9 \u00e0 aucune entreprise. Entrez le code \u00e0 6 caract\u00e8res."
     el('orph-sortir').style.display = 'block'
     el('orph-annuler').style.display = 'none'
   }
 
-  f.classList.add('on')
+  /* ⚠ `shown` ET NON `on`. L'alerte iOS s'ouvre avec `shown` — c'est la classe
+     que porte son CSS et son animation. L'ancien calque employait `on` : la
+     garder aurait laisse la fenetre invisible, sans la moindre erreur.
+
+     Le `requestAnimationFrame` laisse le navigateur peindre l'etat ferme avant
+     d'ajouter la classe. Sans lui, il passe directement a l'etat final et
+     l'ouverture ne s'anime pas. */
+  f.style.display = 'flex'
+  requestAnimationFrame(() => f.classList.add('shown'))
   setTimeout(() => el('orph-code')?.focus(), 320)
 }
 
-document.getElementById('orph-annuler')?.addEventListener('click', () => {
-  document.getElementById('fond-orphelin')?.classList.remove('on')
-})
+/* ⚠ ON ATTEND LA FIN DE L'ANIMATION AVANT DE MASQUER. Retirer `display` tout
+   de suite ferait disparaitre la fenetre d'un coup, sans la transition de
+   fermeture que `closing` declenche. */
+function fermerOrphelin() {
+  const f = document.getElementById('fond-orphelin')
+  if (!f) return
+  f.classList.remove('shown')
+  f.classList.add('closing')
+  setTimeout(() => { f.classList.remove('closing'); f.style.display = 'none' }, 180)
+}
+
+document.getElementById('orph-annuler')?.addEventListener('click', fermerOrphelin)
 
 document.getElementById('orph-sortir')?.addEventListener('click', () => {
-  document.getElementById('fond-orphelin')?.classList.remove('on')
+  fermerOrphelin()
   signOut()
 })
 
@@ -27231,7 +27286,7 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
     if (error) throw new Error(error.message)
     if (!cree) throw new Error("La base a refus\u00e9 l'adh\u00e9sion.")
 
-    document.getElementById('fond-orphelin').classList.remove('on')
+    fermerOrphelin()
 
     /* On entre dans la nouvelle entreprise comme MEMBRE D'ÉQUIPE, quel que soit
        le rang qu'on occupe ailleurs. Être gestionnaire chez l'un ne donne aucun

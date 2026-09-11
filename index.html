@@ -1029,8 +1029,12 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    chose.
    Il est centré dans sa tuile, et descendu comme ses voisins. */
 .tri-seul img{
-  position:absolute; left:72%; top:34%; transform:translateX(-50%);
-  width:auto; height:142%;
+  /* ⚠ 104 % — LA MÊME HAUTEUR QUE LES APPAREILS DE LA TUILE DU DESSUS. Ceux-ci
+     sont réglés en largeur (19 % de la tuile), celui-ci en hauteur : les deux
+     réglages ne se comparent pas à l'œil. Mesuré au rendu, ils font 491 px dans
+     une tuile de 471, soit 104 %. Il était à 142 %, donc 1,36 fois trop grand. */
+  position:absolute; left:72%; top:30%; transform:translateX(-50%);
+  width:auto; height:104%;
   filter:drop-shadow(0 30px 60px rgba(0,0,0,.6));
 }
 
@@ -1086,7 +1090,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   .tri-duo img{width:30%}
   .tri-haut{left:12%; top:4%}
   .tri-bas {left:56%; top:12%}
-  .tri-seul img{left:50%; transform:translateX(-50%); top:12%; height:72%}
+  .tri-seul img{left:50%; transform:translateX(-50%); top:10%; height:80%}
   .tri-c h3{max-width:none}
   /* ⚠ UN PALIER POUR LA TABLETTE. Entre 601 et 980 px, la tuile gardait le
      rapport du téléphone : 802 de large pour 626 de haut. Les appareils y ont
@@ -1096,7 +1100,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     .tri-duo img{width:23%}
     .tri-haut{left:46%; top:8%}
     .tri-bas {left:70%; top:18%}
-    .tri-seul img{left:66%; top:18%; height:108%}
+    .tri-seul img{left:66%; top:16%; height:80%}
     .tri-c h3{max-width:44%}
     .duo-c{aspect-ratio:1 / 0.86}
   }
@@ -1881,14 +1885,18 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
        avant : sans lui, notre avance se prendrait elle-même pour un geste et
        s'arrêterait au premier pas. */
     let minuteur=null, nous=false, arrete=false;
-    /* ⚠ L'AVANCE AUTOMATIQUE EST RÉSERVÉE AUX ÉCRANS ÉTROITS. Sur ordinateur
-       les tuiles sont presque toutes visibles : faire glisser tout seul y
-       déplace ce qu'on est en train de lire, sans rien montrer de neuf. Sur
-       téléphone, au contraire, elle est le seul moyen de dire qu'il y a une
-       suite.
+    /* ⚠ L'AVANCE AUTOMATIQUE EST RÉSERVÉE AUX APPAREILS QU'ON TOUCHE. Sur
+       ordinateur les tuiles sont presque toutes visibles : faire glisser tout
+       seul y déplace ce qu'on est en train de lire, sans rien montrer de neuf.
+       Au doigt, au contraire, c'est le seul moyen de dire qu'il y a une suite.
+       ⚠ LE CRITÈRE EST LE TOUCHER, PAS LA LARGEUR. Une tablette en paysage fait
+       1024 px ou plus : bornée à 980, elle était traitée comme un ordinateur.
+       `(hover: none)` désigne exactement les appareils sans souris ; la largeur
+       reste en second critère pour la fenêtre étroite sur ordinateur.
        Recalculé à chaque démarrage, donc juste aussi après un redimensionnement. */
     const bouge=()=>!matchMedia('(prefers-reduced-motion: reduce)').matches
-                  && matchMedia('(max-width: 980px)').matches;
+                  && (matchMedia('(hover: none)').matches
+                   || matchMedia('(max-width: 980px)').matches);
 
     /* ─── LE GLISSEMENT ───
        ⚠ MENÉ IMAGE PAR IMAGE, PAS PAR `behavior:'smooth'`. Le défilement doux
@@ -1942,15 +1950,28 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 
     const avance=()=>{
       const course=piste.scrollWidth - piste.clientWidth;
-      if(course<=4 || points.length<2) return;
-      const p=points.length;
-      const i=Math.min(p-1, Math.round(piste.scrollLeft / course * (p-1)));
+      if(course<=4 || cartes.length<2) return;
+      /* ⚠ ON VISE LA TUILE SUIVANTE, PAS UNE FRACTION DE LA COURSE. En
+         divisant la course en trois, le premier pas tombait ENTRE deux tuiles :
+         l'accrochage, rétabli en fin d'animation, renvoyait alors la piste à la
+         tuile la plus proche — la précédente. Sur une fenêtre de 900 px, le
+         carrousel semblait donc ne pas bouger du tout.
+         En visant l'origine d'une tuile, la position voulue EST un point
+         d'accrochage : plus rien ne la corrige. */
+      const g=piste.getBoundingClientRect().left;
+      let i=0, min=Infinity;
+      cartes.forEach((e,k)=>{
+        const d=Math.abs(e.getBoundingClientRect().left - g);
+        if(d<min){min=d; i=k;}
+      });
+      const suivant=i+1;
       /* ⚠ ON NE REVIENT PAS EN ARRIÈRE. Le retour à la première tuile faisait
          traverser toute la piste d'un coup — un mouvement brusque et sans
-         raison, puisque rien n'annonce qu'on recommence. Arrivé au bout,
-         l'avance s'arrête pour de bon. */
-      if(i >= p-1){ arrete=true; stoppe(); return; }
-      glisse(course * (i+1) / (p-1));
+         raison. Arrivé au bout, l'avance s'arrête pour de bon. */
+      if(suivant > cartes.length-1){ arrete=true; stoppe(); return; }
+      const vise=Math.min(course, cartes[suivant].offsetLeft - cartes[0].offsetLeft);
+      if(vise <= piste.scrollLeft + 2){ arrete=true; stoppe(); return; }
+      glisse(vise);
     };
     const demarre=()=>{ if(!arrete && bouge() && !minuteur) minuteur=setInterval(avance, 4200); };
     const stoppe=()=>{ clearInterval(minuteur); minuteur=null; };

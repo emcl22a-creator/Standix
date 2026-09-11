@@ -8053,6 +8053,32 @@ function majBarreHaute(id) {
       document.body.classList.remove('retour-de-feuille'), 500)
   }
 
+  /* ═══ D'UNE FEUILLE A UNE AUTRE ═══
+
+   ⚠ CE CAS N'ETAIT TRAITE NULLE PART. `retourDeFeuille` exige que la
+     destination NE SOIT PAS une feuille. Or le dossier et la page d'une
+     procedure le sont tous les deux : en passant de l'un a l'autre, la
+     partante n'etait jamais marquee. Elle perdait `active` et disparaissait
+     d'un coup, pendant que l'autre jouait sa naissance — deux gestes qui se
+     chevauchent sans se repondre.
+
+   ⚠ ET ELLE NE DOIT PAS DESCENDRE. `feuille-part` joue `feuilleDescend`,
+     le geste du RETOUR vers un ecran ordinaire. Entre deux feuilles on
+     avance, on ne revient pas : la premiere se dissout sur place pendant que
+     la seconde monte. Une feuille qui redescend pendant qu'une autre arrive
+     se lirait comme un retour en arriere.
+
+     D'ou une classe a part — meme role, autre geste. */
+  const feuilleVersFeuille = etaitFeuille && ECRANS_PLEIN_ECRAN.has(id)
+  if (feuilleVersFeuille) {
+    document.querySelectorAll('.feuille-fond').forEach(s => s.classList.remove('feuille-fond'))
+    const partante = document.querySelector('.screen.active')
+    if (partante && partante.id !== id) {
+      partante.classList.add('feuille-fond')
+      setTimeout(() => partante.classList.remove('feuille-fond'), 300)
+    }
+  }
+
   /* ⚠ ON MEMORISE AVANT DE PARTIR. Si l'ecran qu'on quitte est un carrefour,
      c'est vers lui que le retour ramenera. */
   if (CARREFOURS.has(id)) pageMere = id
@@ -17959,11 +17985,18 @@ function verifierDureeVideo() {
   const doitAlleger = aiVideoFile && aiVideoFile.size > VIDEO_POIDS_MAX && peutComprimer()
   const estime = estimerAnalyse(aiVideoDuree, doitAlleger)
 
-  if (estime) {
-    err.innerHTML = `Comptez <b>${attenteLisible(estime)}</b> d\u2019analyse.`
-  } else {
-    err.textContent = ''
-  }
+  /* ⚠ PLUS DE DURÉE ANNONCÉE SOUS LE BOUTON. Il y avait ici « Comptez 3 min
+     d'analyse. » — une estimation faite avant d'envoyer quoi que ce soit,
+     donc fausse aussi souvent que juste : elle ignore la file d'attente
+     d'Azure, qui pèse à elle seule neuf minutes fixes.
+
+     Annoncer trois minutes puis en faire douze est pire que de ne rien
+     annoncer. L'écran d'attente, lui, affiche le temps réellement écoulé.
+
+   ⚠ `estime` RESTE CALCULÉ. Il ne sert plus ici, mais `estimerAnalyse` est
+     employée ailleurs et `doitAlleger` décide de la compression. Les retirer
+     demanderait de suivre ces deux fils. */
+  err.textContent = ''
   btn.disabled = false
 }
 
@@ -18075,21 +18108,20 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     /* Les trois premières étapes durent quelques secondes : elles s'affichent
        sous le bouton, dont l'anneau tourne. On ne change pas d'écran pour si
        peu — la page disparaîtrait et reviendrait aussitôt. */
-    jalonUI('1/3 \u00b7 Pr\u00e9paration de la vid\u00e9o')
+    /* ⚠ LES JALONS NUMÉROTÉS ONT ÉTÉ RETIRÉS. « 1/3 · Allègement · 34 % ·
+       encore 2 min » comptait des étapes internes que personne n'a demandées,
+       et le pourcentage repartait à zéro à chacune — on croyait que ça
+       recommençait.
+
+       `jalonUI` reste appelée avec un texte simple : la fonction sert aussi
+       ailleurs, et la vider ici ferait disparaître tout retour pendant les
+       secondes où le bouton tourne. */
+    jalonUI('Préparation de la vidéo')
     /* Cinq secondes : au-delà, on ne fait plus patienter sous un bouton. */
     const bascule = setTimeout(basculerVersAttente, 5000)
     try {
       aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-        jalonUI(pct >= 100
-          ? '1/3 \u00b7 Finalisation de la vid\u00e9o\u2026'
-          /* LE POURCENTAGE SEUL NE DIT RIEN D'UTILE. « 34 % » sur une opération
-             dont on ignore la longueur ne renseigne pas ; « encore 2 min »
-             renseigne. L'allègement avance à la vitesse de lecture, donc le
-             reste se déduit exactement de la durée restante de la vidéo. */
-          : `1/3 \u00b7 All\u00e8gement \u00b7 ${pct}%`
-            + (aiVideoDuree
-                ? ` \u00b7 encore ${attenteLisible(aiVideoDuree * (100 - pct) / 100 * COUT_ALLEGEMENT)}`
-                : ''))
+        jalonUI(pct >= 100 ? 'Finalisation de la vidéo…' : 'Préparation de la vidéo…')
       })
     } finally { clearTimeout(bascule) }
     if (!aiEcranAttente) errorEl.textContent = ''
@@ -18183,7 +18215,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const t0 = Date.now()
     const chrono = () => `${((Date.now() - t0) / 1000).toFixed(1)} s`
     const etape = (m) => {
-      jalonUI(`2/3 · ${m}`)
+      jalonUI(m)   /* le numéro d'étape a été retiré : voir le jalon de préparation */
       console.log(`[envoi ${chrono()}] ${m}`)
     }
     etape('vérification du poids…')
@@ -18388,7 +18420,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     }
 
     errorEl.style.color = 'var(--label-3)'
-    errorEl.textContent = '3/3 \u00b7 Vid\u00e9o re\u00e7ue'
+    errorEl.textContent = 'Vid\u00e9o re\u00e7ue'
 /* ═══ ON BASCULE MAINTENANT ═══
        La vidéo est arrivée ; ce qui suit dure des minutes. C'est le moment de
        quitter la page de dépôt pour l'écran d'attente — pas avant, sinon on

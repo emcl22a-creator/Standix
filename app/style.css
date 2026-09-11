@@ -21964,7 +21964,18 @@ body.retour-de-feuille .screen:not(.active).feuille-part,
 .screen.feuille-part#p-create-video,
 .screen.feuille-part#p-create-doc,
 .screen.feuille-part#p-create-ai{
-  animation:ecranFlouPart 0.22s ease-out backwards !important;
+  /* ⚠ `both` ET NON `backwards` ICI, ET C'EST L'INVERSE DES AUTRES.
+
+     `ecranFlouPart` finit sur `opacity:0` : c'est une animation de DEPART,
+     l'ecran doit rester invisible une fois qu'elle est jouee. Avec
+     `backwards`, l'etat final n'est pas conserve — l'ecran redevenait opaque
+     d'un coup a la 220e milliseconde, en plein passage vers la page suivante.
+
+     Le passage en `backwards` etait un remplacement global sur `ecranFlou*`,
+     et il a emporte celle-ci au passage. Les autres vont de blur(5px) vers
+     blur(0), donc vers l'etat normal : ne rien conserver n'y change rien.
+     Celle-ci va vers un etat qu'il FAUT conserver. */
+  animation:ecranFlouPart 0.22s ease-out both !important;
 
   /* ⚠ AUCUN DEPLACEMENT : d'anciennes regles en posaient un. */
   transform:none !important;
@@ -22574,3 +22585,37 @@ body.abo-expire [data-etab-plus]{
   letter-spacing:-0.01em;
 }
 #e-profil .reg-ic.ent-ic .ent-ini[hidden]{ display:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   D'UNE FEUILLE A UNE AUTRE : LA PREMIERE SE DISSOUT SUR PLACE
+
+   Le dossier et la page d'une procédure sont tous deux des feuilles. En
+   passant de l'un à l'autre, la partante n'était marquée par rien : elle
+   perdait `active` et disparaissait d'un coup pendant que l'autre montait.
+
+ ⚠ ELLE NE DESCEND PAS. `.feuille-part` joue `feuilleDescend`, le geste du
+   retour. Ici on avance : la première s'efface sur place, la seconde arrive
+   par-dessus. Une feuille qui redescend pendant qu'une autre monte se lirait
+   comme un retour en arrière.
+
+ ⚠ `both` PARCE QU'ELLE FINIT INVISIBLE. Avec `backwards`, l'écran
+   redeviendrait opaque à la fin de l'animation — en plein passage.
+
+ ⚠ ET ELLE NE CAPTE PLUS LES TOUCHERS. `pointer-events:none` : pendant ces
+   300 ms elle est encore là, superposée à la nouvelle. Sans cela, un doigt
+   posé tôt toucherait l'écran qu'on vient de quitter.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.screen.feuille-fond{
+  display:block !important;
+  position:fixed;
+  inset:14px 0 0;
+  z-index:24;
+  pointer-events:none;
+  animation:feuilleSeDissout 0.26s ease-out both;
+  transform-origin:50% 50%;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .screen.feuille-fond{ animation:none; display:none !important; }
+}

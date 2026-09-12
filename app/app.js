@@ -11136,6 +11136,33 @@ function captureCardPositions(containerEl) {
    changement d'établissement : ce sont d'autres dossiers. */
 let dejaEntre = new Set()
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   UN DOSSIER RENOMMÉ RESTE LE MÊME DOSSIER
+
+ ⚠ LA CLÉ D'UNE CARTE DE DOSSIER EST SON NOM. `cell.dataset.key = nom` pour un
+   dossier, `'sd:' + nom` pour un sous-dossier — il n'y a pas d'identifiant :
+   un dossier n'existe que comme valeur de colonne sur ses procédures.
+
+   Renommer change donc l'identité aux yeux de l'animation : elle ne retrouve
+   plus l'ancienne position, traite la carte comme NEUVE et lui fait rejouer
+   son arrivée, avec le délai échelonné des nouvelles venues. Pendant ce
+   temps les voisines glissent vers leurs nouvelles places. C'est le désordre
+   rapporté.
+
+   Cette table dit à l'animation, le temps d'un redessin, que telle clé
+   remplace telle autre. Elle est consommée aussitôt : un renommage ne vaut
+   que pour le rendu qui suit.
+
+ ⚠ ELLE NE SERT QU'À L'AFFICHAGE. Rien n'en dépend côté données — si elle
+   n'est pas consommée, le pire qui arrive est une animation d'entrée. */
+const renommagesRecents = new Map()
+
+function signalerRenommage(avant, apres) {
+  if (!avant || !apres || avant === apres) return
+  renommagesRecents.set(apres, avant)
+  renommagesRecents.set('sd:' + apres, 'sd:' + avant)
+}
+
 function playCardShuffle(containerEl, oldRects) {
   // Rien à faire au tout premier remplissage d'une liste : l'écran qui vient
   // de s'ouvrir joue déjà sa propre animation d'entrée. Superposer une
@@ -11146,7 +11173,21 @@ function playCardShuffle(containerEl, oldRects) {
   // faire glisser les cartes quand on change le tri.
   const premierRemplissage = oldRects.size === 0
   containerEl.querySelectorAll('[data-key]').forEach((el, i) => {
-    const oldRect = oldRects.get(el.dataset.key)
+    /* ⚠ ON REGARDE D'ABORD SI CETTE CARTE VIENT D'ÊTRE RENOMMÉE. Sa position
+       d'avant est rangée sous son ancien nom ; sans cette ligne, elle passe
+       pour une nouvelle venue et rejoue son arrivée. */
+    const ancienneCle = renommagesRecents.get(el.dataset.key)
+    const oldRect = oldRects.get(el.dataset.key) ||
+      (ancienneCle ? oldRects.get(ancienneCle) : undefined)
+
+    if (ancienneCle) {
+      /* La carte a salué sous son ancien nom : elle ne resalue pas sous le
+         nouveau. Et la correspondance est consommée — elle ne vaut que pour
+         ce redessin. */
+      if (dejaEntre.has(ancienneCle)) dejaEntre.add(el.dataset.key)
+      renommagesRecents.delete(el.dataset.key)
+    }
+
     if (!oldRect) {
       /* « Pas de position précédente » ne veut pas dire « nouvelle » : la grille
          est vidée à chaque changement de page, et une dossier qui existe depuis
@@ -11642,6 +11683,129 @@ const CATALOGUE_ICONES = [
   /* — Objectif, performance — */
   { cles: ['objectif', 'performance', 'indicateur', 'resultat', 'kpi', 'progression'],
     d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 7.8a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Z M12 11.4h.02' },
+
+
+  /* ═══ BUREAU ET OPERATIONS ═══
+
+     Les metiers de bureau etaient couverts par « Administratif », « Finance »
+     et « Reunion » — trois entrees pour un secteur entier. Ce qui suit
+     distingue ce qu'on y fait reellement : un processus n'est pas un dossier,
+     un contrat n'est pas une facture, un archivage n'est pas un classement.
+
+   ⚠ CHAQUE TRACE TIENT DANS LA MEME BOITE, 24 × 24, epaisseur uniforme. Une
+     icone plus dense que ses voisines se lit comme une tache a vingt pixels.
+
+   ⚠ ET LES MOTS-CLES SONT CEUX QU'ON TAPE, pas ceux du dictionnaire.
+     « process » autant que « processus », « compta » autant que
+     « comptabilite » : le nom d'un dossier s'ecrit vite. */
+
+  /* — Processus, opérations — */
+  { cles: ['operation', 'operations', 'processus', 'process', 'procedure interne', 'flux', 'workflow', 'etapes'],
+    d: 'M4.6 6.8h5.2 M4.6 12h9.6 M4.6 17.2h5.2 M13.6 4.4l2.6 2.4-2.6 2.4 M17.8 9.6l2.6 2.4-2.6 2.4 M13.6 14.8l2.6 2.4-2.6 2.4' },
+
+  /* — Contrat, juridique — */
+  { cles: ['convention', 'avenant', 'mandat'],
+    d: 'M6 3.4h8.4L19 8v12a1.6 1.6 0 0 1-1.6 1.6H6A1.6 1.6 0 0 1 4.4 20V5A1.6 1.6 0 0 1 6 3.4Z M14 3.6V8h4.6 M7.6 12.6h7.4 M7.6 16h5' },
+
+  /* — Facturation, devis — */
+  { cles: ['facturation', 'devis', 'reglement', 'echeance', 'relance', 'impaye'],
+    d: 'M6.4 3.4h11.2v17l-2.2-1.6-2.2 1.6-2.2-1.6-2.2 1.6-2.4-1.6Z M9.4 8h5.2 M9.4 11.6h5.2 M9.4 15.2h3' },
+
+  /* — Comptabilité — */
+  { cles: ['compta', 'bilan', 'ecriture', 'grand livre', 'tva', 'cloture'],
+    d: 'M6 3.4h12a1.4 1.4 0 0 1 1.4 1.4v14.4A1.4 1.4 0 0 1 18 20.6H6a1.4 1.4 0 0 1-1.4-1.4V4.8A1.4 1.4 0 0 1 6 3.4Z M8 7.4h8 M8 11.4h2.4 M12.8 11.4h3.2 M8 15.4h2.4 M12.8 15.4h3.2' },
+
+  /* — Tableur, chiffres — */
+  { cles: ['tableur', 'tableau', 'excel', 'feuille de calcul', 'donnees'],
+    d: 'M4.4 5.4a1 1 0 0 1 1-1h13.2a1 1 0 0 1 1 1v13.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1Z M4.4 9.4h15.2 M9.4 9.4v10.2 M4.4 14.4h15.2' },
+
+  /* — Archivage, classement — */
+  { cles: ['archive', 'archivage', 'classement', 'classeur', 'dossier suspendu', 'rangement papier'],
+    d: 'M3.6 7.6h16.8v11.4a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4Z M3 4.6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3H3Z M9.8 11.6h4.4' },
+
+  /* — Rapport, reporting — */
+  { cles: ['rapport', 'reporting', 'compte rendu', 'synthese', 'bilan mensuel', 'tableau de bord'],
+    d: 'M6 3.4h8.4L19 8v12a1.6 1.6 0 0 1-1.6 1.6H6A1.6 1.6 0 0 1 4.4 20V5A1.6 1.6 0 0 1 6 3.4Z M14 3.6V8h4.6 M8.4 17.2v-3 M11.8 17.2v-5.4 M15.2 17.2v-2' },
+
+  /* — Courrier, tri — */
+  { cles: ['courrier', 'tri du courrier', 'poste', 'affranchissement', 'enveloppe', 'recommande'],
+    d: 'M3.6 6.8a1.4 1.4 0 0 1 1.4-1.4h14a1.4 1.4 0 0 1 1.4 1.4v10.4a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4Z M3.9 6.4 12 12.6l8.1-6.2' },
+
+  /* — Validation, tampon — */
+  { cles: ['tampon', 'cachet', 'accord', 'signature interne'],
+    d: 'M12 3.6a3.4 3.4 0 0 1 3.4 3.4c0 1.8-1.2 2.6-1.2 4.2h-4.4C9.8 9.6 8.6 8.8 8.6 7A3.4 3.4 0 0 1 12 3.6Z M7.4 14.6h9.2l1.6 3.4H5.8Z M4.6 20.4h14.8' },
+
+  /* — Intégration, arrivée — */
+  { cles: ['arrivee', 'nouveau collaborateur', 'accueil salarie', 'depart'],
+    d: 'M13.6 3.6h4.8a1.6 1.6 0 0 1 1.6 1.6v13.6a1.6 1.6 0 0 1-1.6 1.6h-4.8 M9.6 8.4 5.4 12.4l4.2 4 M5.6 12.4h9.2' },
+
+  /* — Base de données — */
+  { cles: ['base de donnees', 'donnees clients', 'fichier client', 'crm', 'referentiel'],
+    d: 'M12 3.6c4 0 7.2 1.2 7.2 2.6S16 8.8 12 8.8 4.8 7.6 4.8 6.2 8 3.6 12 3.6Z M4.8 6.2v5.6c0 1.4 3.2 2.6 7.2 2.6s7.2-1.2 7.2-2.6V6.2 M4.8 11.8v5.6c0 1.4 3.2 2.6 7.2 2.6s7.2-1.2 7.2-2.6v-5.6' },
+
+  /* — Réunion, décision — */
+  { cles: ['decision', 'comite', 'direction', 'strategie', 'arbitrage', 'point hebdo'],
+    d: 'M12 3.6v3.2 M12 6.8a5.6 5.6 0 0 1 5.6 5.6v3.2H6.4v-3.2A5.6 5.6 0 0 1 12 6.8Z M4.6 18.6h14.8 M9 21.2h6' },
+  /* ═══ ADMINISTRATION, SUITE ═══
+
+     Douze de plus, sur ce qui occupe reellement une journee de bureau : une
+     demande qu'on traite, un budget qu'on tient, un registre qu'on remplit.
+
+   ⚠ AUCUN MOT-CLE N'EST REPRIS D'UNE ENTREE PLUS HAUT. Le catalogue retient la
+     PREMIERE correspondance : un mot deja pris rendrait l'icone inatteignable,
+     presente mais jamais choisie — et introuvable sans relire les cinq cents
+     mots un par un. */
+
+  /* — Demande, ticket — */
+  { cles: ['demande', 'requete', 'reclamation', 'signalement', 'doleance'],
+    d: 'M6.6 3.6h10.8a1.6 1.6 0 0 1 1.6 1.6v13.2l-3.2-2-3.8 2-3.8-2-3.2 2V5.2a1.6 1.6 0 0 1 1.6-1.6Z M12 7.2v4.2 M12 14.2v.2' },
+
+  /* — Autorisation, habilitation — */
+  { cles: ['autorisation', 'habilitation', 'droit acces', 'permission'],
+    d: 'M12 3.4 5.2 6.2v5.2c0 4.2 2.8 7.8 6.8 8.8 4-1 6.8-4.6 6.8-8.8V6.2Z M12 9.2a1.8 1.8 0 0 1 1.8 1.8c0 .8-.5 1.2-1.1 1.6v1.8h-1.4v-1.8c-.6-.4-1.1-.8-1.1-1.6A1.8 1.8 0 0 1 12 9.2Z' },
+
+  /* — Budget, prévisionnel — */
+  { cles: ['previsionnel', 'dotation', 'cout', 'depense'],
+    d: 'M4.4 8.4a1.6 1.6 0 0 1 1.6-1.6h12a1.6 1.6 0 0 1 1.6 1.6v8.4a1.6 1.6 0 0 1-1.6 1.6H6a1.6 1.6 0 0 1-1.6-1.6Z M4.4 11.4h15.2 M7.4 15h2.6 M16.4 6.8V5.2a1.4 1.4 0 0 0-1.4-1.4H9a1.4 1.4 0 0 0-1.4 1.4v1.6' },
+
+  /* — Note de frais — */
+  { cles: ['note de frais', 'frais', 'remboursement', 'defraiement'],
+    d: 'M7 3.6h10v16.8l-2-1.4-1.6 1.4-1.4-1.4-1.6 1.4-1.4-1.4-2 1.4Z M10 8h4 M10 11.4h4 M12 13.8v3 M10.4 15h3.2' },
+
+  /* — Congés, absences — */
+  { cles: ['conge', 'rtt', 'jour pose'],
+    d: 'M4.4 6.8a1.4 1.4 0 0 1 1.4-1.4h12.4a1.4 1.4 0 0 1 1.4 1.4v11.4a1.4 1.4 0 0 1-1.4 1.4H5.8a1.4 1.4 0 0 1-1.4-1.4Z M8.4 3.6v3.4 M15.6 3.6v3.4 M4.4 10.4h15.2 M9.6 14.4l2 2 3.4-3.6' },
+
+  /* — Paie, bulletin — */
+  { cles: ['bulletin', 'salaire', 'remuneration', 'fiche de paie', 'cotisation'],
+    /* ⚠ LE SYMBOLE MONÉTAIRE A ÉTÉ ABANDONNÉ. Un « S » barré dessiné à la
+       main fait une tache à vingt pixels — c'était illisible au rendu.
+       Une pièce pleine se reconnaît à toute taille, et dit la même chose. */
+    d: 'M6.4 3.6h11.2a1.4 1.4 0 0 1 1.4 1.4v15.4H5V5a1.4 1.4 0 0 1 1.4-1.4Z M8.4 7.8h7.2 M8.4 11h4.4 M15.2 16.4a2.6 2.6 0 1 1-5.2 0 2.6 2.6 0 0 1 5.2 0Z M12.6 15.2v2.4' },
+
+  /* — Registre, consignation — */
+  { cles: ['registre', 'consignation', 'main courante', 'cahier', 'journal de bord', 'releve'],
+    d: 'M5.4 4.6a1.4 1.4 0 0 1 1.4-1.4h10.8a1.4 1.4 0 0 1 1.4 1.4v14.8a1.4 1.4 0 0 1-1.4 1.4H6.8a1.4 1.4 0 0 1-1.4-1.4Z M8.4 3.2v17.6 M11 8h5 M11 11.6h5 M11 15.2h3' },
+
+  /* — Organigramme, hiérarchie — */
+  { cles: ['organigramme', 'hierarchie', 'structure', 'departement', 'rattachement'],
+    d: 'M9.6 3.6h4.8v3.6H9.6Z M3.6 16.8h4.8v3.6H3.6Z M15.6 16.8h4.8v3.6h-4.8Z M12 7.2v4.4 M6 16.8v-2.6h12v2.6 M6 14.2h12' },
+
+  /* — Règlement intérieur — */
+  { cles: ['reglement interieur', 'politique interne', 'charte', 'directive', 'note de service'],
+    d: 'M6.4 3.6h11.2a1.4 1.4 0 0 1 1.4 1.4v14a1.4 1.4 0 0 1-1.4 1.4H6.4A1.4 1.4 0 0 1 5 19V5a1.4 1.4 0 0 1 1.4-1.4Z M8.6 7.6h6.8 M8.6 11h6.8 M8.6 14.4h4 M12 17.6v.2' },
+
+  /* — Traçabilité, historique — */
+  { cles: ['tracabilite', 'historique', 'piste audit', 'chronologie', 'antecedent'],
+    d: 'M12 4.6a7.4 7.4 0 1 0 7.4 7.4 M12 7.8v4.4l3 2 M19.4 4.6v4h-4' },
+
+  /* — Numérisation, scan — */
+  { cles: ['numerisation', 'scan', 'dematerialisation', 'scanner'],
+    d: 'M4.4 8.4V6.2A1.8 1.8 0 0 1 6.2 4.4h2.2 M15.6 4.4h2.2a1.8 1.8 0 0 1 1.8 1.8v2.2 M19.6 15.6v2.2a1.8 1.8 0 0 1-1.8 1.8h-2.2 M8.4 19.6H6.2a1.8 1.8 0 0 1-1.8-1.8v-2.2 M4 12h16' },
+
+  /* — Archives sécurisées — */
+  { cles: ['coffre', 'archives securisees', 'donnees sensibles', 'sauvegarde papier'],
+    d: 'M4.4 5.6a1.4 1.4 0 0 1 1.4-1.4h12.4a1.4 1.4 0 0 1 1.4 1.4v12.8a1.4 1.4 0 0 1-1.4 1.4H5.8a1.4 1.4 0 0 1-1.4-1.4Z M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z M12 10.6v1.4 M16.4 19.8v1.4 M7.6 19.8v1.4' },
 
 ]
 
@@ -13130,6 +13294,11 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   if (error) { toast('\u00c9chec : ' + error.message); return }
   if (!data || !data.length) { toast('La base a refus\u00e9 la modification.'); return }
 
+  /* ⚠ ON DIT À L'ANIMATION QUE C'EST LE MÊME DOSSIER. Sa clé est son nom : sans
+     cette ligne, la carte renommée passe pour une nouvelle venue, rejoue son
+     arrivée, et les voisines glissent autour d'elle. */
+  signalerRenommage(ancien, nouveau)
+
   /* On recharge : les regroupements par dossier sont construits au chargement,
      et c'est le seul endroit qui les construit. */
   await loadGestionProcedures()
@@ -14285,6 +14454,14 @@ async function renommerSousDossier(ancien) {
 
   if (error) { toast('\u00c9chec : ' + error.message); return }
   if (!data || !data.length) { toast('La base a refus\u00e9 la modification.'); return }
+
+  /* ⚠ MÊME SIGNALEMENT QUE POUR UN DOSSIER. La clé d'un sous-dossier est
+     `'sd:' + nom` : la renommer le fait passer pour un nouveau venu, qui
+     rejoue son arrivée pendant que ses voisins glissent.
+
+     `propre` vaut `null` quand on RETIRE le sous-dossier : il n'y a alors
+     aucune carte d'arrivée, et `signalerRenommage` sort d'elle-même. */
+  signalerRenommage(ancien, propre)
 
   /* On met à jour la copie en mémoire plutôt que de tout recharger : la liste
      se redessine aussitôt, sans attendre le réseau. */

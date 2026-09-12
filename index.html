@@ -316,18 +316,16 @@ h1{
   color:#FFFFFF; margin:clamp(10px,1.4vh,18px) 0 0;
 }
 
-/* ⚠ UN ESPACE, PLUS UN TEXTE. Le sous-titre est retiré mais son élément reste :
-   sur ordinateur il réserve la hauteur qu'il occupait, ce qui garde la
-   respiration entre le titre et l'appareil. Une hauteur explicite est
-   nécessaire — un paragraphe vide n'en a aucune.
-   Sur téléphone il disparaît : la place y est trop précieuse, et l'appareil
-   gagne ce que le vide aurait pris. */
+/* ⚠ LES POINTS NE DOIVENT PAS SE RETROUVER SEULS EN DÉBUT DE LIGNE quand la
+   phrase se replie. Chacun est collé à ce qui le précède par une marge posée
+   depuis le style, plutôt que par une espace insécable dans le texte : le
+   balisage reste lisible. */
 .sous{
-  margin:clamp(10px,1.4vh,16px) auto 0;
-  height:clamp(20px, 1.52vw, 25px);
-  font-size:clamp(14px, 1.05vw, 17px); line-height:1.45;
-  color:rgba(255,255,255,.66); max-width:46ch;
+  margin:clamp(12px,1.7vh,20px) auto 0;
+  font-size:clamp(14px, 1.05vw, 17.5px); line-height:1.5; letter-spacing:-.012em;
+  color:rgba(255,255,255,.6); max-width:56ch; text-wrap:balance;
 }
+.sous span{margin-right:.16em; color:rgba(255,255,255,.34)}
 
 .actes{margin-top:clamp(18px,2.6vh,34px)}
 
@@ -681,275 +679,104 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
           mask-image:linear-gradient(to top,#000 0 2%,transparent 20%)}
 
 /* ═══════════════════════════════════════════════════════════════════════
-   LA SECTION 2
-   Un titre de section, puis les points forts en carrousel. Chaque tuile porte
-   son intitulé CENTRÉ en haut, sur son propre fond, et son visuel remplit le
-   reste — jamais de texte par-dessus un sujet.
-   Les visuels ne viennent pas du même monde : une photo de terrain, un rendu
-   d'appareil, un rendu de fiche. C'est justement pourquoi chacun a sa tuile —
-   le cadre noir les sépare et le rapprochement ne choque plus.
+   LA SECTION 2 — TROIS ÉTAPES
+   ⚠ RIEN QUE DU BLANC ET DU GRIS, ET TOUT AU CENTRE. Apple ne met ni chasse
+   fixe, ni tirets techniques, ni accent de couleur dans ce genre de bloc : une
+   seule famille, deux valeurs de gris, et l'alignement central du haut en bas.
+   L'orange et le monospace faisaient « tableau de bord », pas page produit.
    ═══════════════════════════════════════════════════════════════════════ */
 .duo{
   background:#1D1D1F;
-  padding:clamp(80px, 13vh, 180px) 0 clamp(46px, 7vh, 100px);
+  padding:clamp(84px, 14vh, 190px) clamp(28px, 5.4vw, 104px) clamp(74px, 12vh, 160px);
 }
-/* ⚠ LE TITRE ET LA PISTE PARTAGENT LE MÊME BORD. Quand les tuiles tiennent
-   toutes, elles sont centrées : un titre calé sur la marge de la section ne
-   tombait plus en face de la première — jusqu'à 27 px d'écart.
-   La solution n'est PAS `width:fit-content` : sur un conteneur défilant, la
-   largeur intrinsèque vaut son minimum, et la piste s'effondrait à 377 px.
-   On calcule donc la largeur EXACTE de trois tuiles, écarts et marges compris,
-   avec les mêmes expressions que celles qui les produisent. La piste n'a alors
-   plus de jeu à centrer, et la première tuile se pose sur la marge — celle du
-   titre. */
-/* ⚠ LA PISTE VA JUSQU'AU BORD DE L'ÉCRAN. Elle n'est plus centrée dans un
-   cadre : elle commence à la marge, à gauche, et se prolonge hors champ à
-   droite. Une tuile est donc toujours coupée par le bord — c'est ce débord qui
-   dit qu'il y a une suite, bien mieux qu'une rangée bien rangée.
-   `--marge` vaut la marge de page, mais jamais moins que ce qu'il faut pour
-   caler le contenu sur un cadre de 1240 px : le titre et la première tuile
-   tombent ainsi au même endroit que le reste de la page. */
-.duo-in{
-  --marge:max(clamp(22px, 3.8vw, 68px), calc((100% - 1240px) / 2));
-  width:100%;
-}
+.duo-in{max-width:1180px; margin:0 auto; text-align:center}
 
-.duo-t{
-  padding-inline:var(--marge) clamp(22px, 3.8vw, 68px);
+.duo-sur{
+  margin:0 0 .55em;
   font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(29px, 3.2vw, 54px); letter-spacing:-.032em; line-height:1.08;
-  /* ⚠ Aligné à gauche, sur la MÊME marge que le carrousel : les deux emploient
-     `clamp(22px, 3.8vw, 68px)`, donc le titre et le bord de la première tuile
-     tombent exactement sur la même verticale. Un titre centré au-dessus d'une
-     piste qui commence à gauche flotterait sans attache. */
-  color:#FFFFFF; text-align:left;
+  font-size:clamp(14px, 1.05vw, 18px); letter-spacing:-.012em;
+  color:rgba(255,255,255,.44);
+}
+.duo-t{
+  margin:0 auto; max-width:18ch;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(32px, 4.1vw, 68px); letter-spacing:-.036em; line-height:1.06;
+  color:#FFFFFF; text-wrap:balance;
 }
 
-/* ─── LE GLISSEMENT ───
-   `scroll-snap` accroche chaque tuile au bord : on ne s'arrête jamais entre
-   deux. `scroll-padding` reprend la marge, sinon la tuile accrochée viendrait
-   coller le bord de l'écran.
-   ⚠ `safe center` et non un centrage ordinaire : dans un conteneur qui défile,
-   centrer rend le DÉBUT du contenu inatteignable dès qu'il déborde. */
 .duo-grille{
-  display:flex; gap:clamp(14px, 1.5vw, 24px);
-  justify-content:flex-start;
-  justify-content:safe center;
-  overflow-x:auto; overscroll-behavior-x:contain;
-  padding-block:clamp(24px, 3.4vh, 46px) clamp(18px, 2vw, 28px);
-  scroll-snap-type:x mandatory;
-  padding-left:var(--marge);
-  padding-right:clamp(22px, 3.8vw, 68px);
-  scroll-padding-inline-start:var(--marge);
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
+  margin-top:clamp(48px, 7vh, 96px);
+  display:grid; grid-template-columns:repeat(3, 1fr);
+  gap:clamp(14px, 1.5vw, 24px);
 }
-.duo-grille::-webkit-scrollbar{display:none}
-
+/* La tuile garde la matière de la page : un dégradé plus clair vers le haut,
+   une arête lumineuse, pas de contour. Le rayon s'élargit — Apple arrondit
+   d'autant plus que la surface est grande. */
 .duo-c{
-  /* Des tuiles larges : à 440 px, la troisième est coupée par le bord droit
-     dès 1440 px de large. */
-  flex:0 0 min(78%, 440px);
-  scroll-snap-align:start;
   position:relative; isolation:isolate; overflow:hidden;
-  /* ⚠ BEAUCOUP PLUS SOMBRE. Le dégradé partait de #191B21 — mesuré, un gris à
-     10 % de luminosité, qui sur le gris de la section ne se lisait pas comme du
-     noir. Il part maintenant de #0C0E12 et descend jusqu'au noir de la page :
-     l'écart avec le fond reste suffisant pour détacher la tuile, mais elle est
-     enfin noire.
-     Le dégradé n'est pas un aplat pour autant : il reste plus clair en haut, là
-     où se trouvent le pictogramme et la première phrase. */
+  border-radius:clamp(22px, 2vw, 34px);
+  padding:clamp(32px, 3vw, 48px) clamp(26px, 2.4vw, 38px) clamp(36px, 3.4vw, 52px);
   background:
     radial-gradient(135% 85% at 50% 0%,
       #0C0E12 0%, #08090D 42%, #050609 78%);
-  border-radius:clamp(18px, 1.6vw, 28px);
-  aspect-ratio:1 / 0.68;
-  padding:clamp(26px, 2.3vw, 38px);
-  display:flex; flex-direction:column;
-  /* ⚠ L'ARÊTE HAUTE RESTE, LE CONTOUR PART. La première donne l'impression
-     d'une surface éclairée par le haut ; le second ne faisait que dessiner la
-     boîte. C'est le contour seul qu'on retire. */
   box-shadow:inset 0 1px 0 rgba(255,255,255,.10);
+  display:flex; flex-direction:column; align-items:center;
 }
-/* ─── LE PICTOGRAMME ───
-   Petit, en haut, dans un rond de verre. Il donne un point d'entrée à l'œil
-   sans concurrencer le texte — c'est le texte qui est le sujet. */
-.duo-ic{
-  flex:0 0 auto;
-  width:clamp(48px, 4vw, 64px); aspect-ratio:1;
-  display:grid; place-items:center;
-  border-radius:50%;
-  background:rgba(255,255,255,.06);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.14),
-             inset 0 0 0 1px rgba(255,255,255,.08);
-  color:rgba(255,255,255,.88);
-}
-.duo-ic svg{width:56%; height:56%}
 
-/* ─── LE TEXTE, EN DEUX VALEURS ───
-   ⚠ La première phrase en BLANC, la suite en GRIS. C'est ce contraste qui
-   hiérarchise : on lit le bénéfice d'un coup d'œil, l'explication seulement si
-   l'on s'arrête. Deux tailles feraient un titre et un sous-titre ; deux
-   valeurs dans le même corps font une seule phrase à deux niveaux.
-   `margin-top:auto` pousse le bloc en bas : le pictogramme reste en haut, le
-   texte s'appuie sur le bord inférieur, et l'espace se loge entre les deux. */
-.duo-c h3{
-  margin:auto 0 0;
+.duo-n{
+  margin:0;
   font-family:Inter,sans-serif; font-weight:500;
-  font-size:clamp(17px, 1.32vw, 23px); letter-spacing:-.018em; line-height:1.36;
-  color:rgba(255,255,255,.52);
+  font-size:clamp(13px, .95vw, 15px); letter-spacing:-.006em;
+  color:rgba(255,255,255,.4);
 }
-/* ⚠ Le GRAS seul grossit — 1,18 fois le corps du texte gris. Les faire grandir
-   ensemble aurait simplement tout agrandi ; ici on creuse l'écart entre les
-   deux valeurs, donc on renforce la lecture en deux temps. */
-.duo-c h3 b{
-  display:block; font-weight:600; color:#FFFFFF;
-  font-size:1.18em; line-height:1.24; letter-spacing:-.022em;
-  margin-bottom:.42em;
+/* Le dessin prend la place qui reste : les trois restent alignés entre eux
+   quelle que soit la longueur du texte qui suit. */
+.duo-ill{
+  display:block; margin:clamp(30px, 3.8vh, 52px) auto;
+  color:rgba(255,255,255,.92);
 }
-.duo-c h3 span{display:block}
+.duo-ill svg{display:block; width:100%; max-width:210px; height:auto; margin-inline:auto}
 
-/* ─── L'ARRIVÉE DU TEXTE ───
-   ⚠ LE PICTOGRAMME NE BOUGE PAS. Il fait partie de la tuile, qui est là dès le
-   début ; l'animer donnait deux mouvements concurrents pour une seule arrivée.
-   Seul le texte apparaît — et il n'est PAS visible au repos : c'est en arrivant
-   sur la tuile qu'il monte, une fois, et une seule.
-   Le titre puis l'explication, à 110 ms d'écart : l'œil suit une lecture. */
+/* ⚠ PAS DE RESSORT SOUS LE TEXTE. Avec `margin:auto` sur le titre, le bloc
+   titre + paragraphe était poussé en bas : un paragraphe plus court faisait
+   donc DESCENDRE son titre, et les trois ne s'alignaient plus. Le contenu se
+   suit maintenant depuis le haut, où le dessin a une hauteur fixe — les trois
+   titres tombent à la même ligne et le surplus reste en bas de tuile. */
+.duo-c h3{
+  margin:0;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(19px, 1.55vw, 25px); letter-spacing:-.024em; line-height:1.2;
+  color:#FFFFFF;
+}
+.duo-c p{
+  margin:.6em auto 0; max-width:26ch;
+  font-family:Inter,sans-serif; font-weight:500;
+  font-size:clamp(14.5px, 1.06vw, 17px); line-height:1.5; letter-spacing:-.012em;
+  color:rgba(255,255,255,.48);
+}
+
+/* ─── L'ARRIVÉE ───
+   ⚠ `remonte` SERT AUSSI À LA SECTION 3 : elle vivait dans un bloc que j'ai
+   remplacé une fois, et les deux sections s'étaient retrouvées vides — le
+   contenu part d'une opacité nulle que seule l'animation relève. Elle est
+   déclarée ici, pour toute la page. */
 @keyframes remonte{
   from{opacity:0; translate:0 16px}
   to  {opacity:1; translate:0 0}
 }
-.duo-c h3 b,
-.duo-c h3 span{opacity:0}
-.duo-c.lu h3 b   {animation:remonte .85s cubic-bezier(.28,.11,.32,1)    0s both}
-.duo-c.lu h3 span{animation:remonte .85s cubic-bezier(.28,.11,.32,1)  .11s both}
-
-/* Mouvement réduit : tout est là d'emblée. */
+.duo-c > *{opacity:0}
+.duo-c.lu .duo-n  {animation:remonte .8s cubic-bezier(.28,.11,.32,1)    0s both}
+.duo-c.lu .duo-ill{animation:remonte .8s cubic-bezier(.28,.11,.32,1)  .09s both}
+.duo-c.lu h3      {animation:remonte .8s cubic-bezier(.28,.11,.32,1)  .18s both}
+.duo-c.lu p       {animation:remonte .8s cubic-bezier(.28,.11,.32,1)  .27s both}
 @media (prefers-reduced-motion:reduce){
-  .duo-c h3 b, .duo-c h3 span{opacity:1; translate:0 0; animation:none}
-}
-
-.duo-pas{
-  width:max-content; margin:clamp(14px, 2.4vh, 30px) auto 0;
-  display:flex; align-items:center; justify-content:center;
-  gap:9px; padding:10px 16px;
-  border-radius:999px;
-  /* La pilule suit la largeur de son contenu ; on adoucit le report. */
-  transition:padding .55s cubic-bezier(.28,.11,.32,1);
-  background:rgba(255,255,255,.055);
-  -webkit-backdrop-filter:blur(24px) saturate(180%);
-          backdrop-filter:blur(24px) saturate(180%);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.14),
-    inset 0 0 0 1px rgba(255,255,255,.08);
-}
-.duo-pt{
-  width:8px; height:8px; padding:0; border:none; cursor:pointer;
-  border-radius:50%;
-  background:rgba(255,255,255,.22);
-  transition:background-color .4s cubic-bezier(.28,.11,.32,1);
-}
-.duo-pt.on{background:rgba(255,255,255,.72)}
-/* ─── LE TIROIR ───
-   ⚠ DEUX ÉLÉMENTS, PAS UN. L'OUVERTURE se referme — sa largeur tombe à zéro et
-   elle rogne ce qu'elle contient. La FLÈCHE, elle, glisse vers la droite et
-   sort par cette ouverture qui se rétrécit. C'est la combinaison des deux qui
-   fait le tiroir : une largeur seule donnerait un écrasement, un glissement
-   seul laisserait un trou.
-   L'ouverture met un peu plus de temps que la flèche — 0,62 s contre 0,5 —
-   pour qu'elle ait fini de sortir avant que le battant ne rejoigne le bord. */
-.duo-tir{
-  flex:0 0 auto; overflow:hidden;
-  display:block; width:20px; height:15px; margin-left:0;
-  transition:width .62s cubic-bezier(.28,.11,.32,1),
-             margin-left .62s cubic-bezier(.28,.11,.32,1);
-}
-.duo-fl{
-  display:block; width:15px; height:15px; margin-left:5px;
-  color:rgba(255,255,255,.38);
-  animation:pousse 2.4s cubic-bezier(.28,.11,.32,1) infinite;
-}
-@keyframes pousse{
-  0%,100%{translate:0 0; opacity:.38}
-  45%    {translate:5px 0; opacity:.75}
-}
-.duo-fl{display:block}
-/* ⚠ LA MARGE NÉGATIVE RÉSORBE L'ÉCART. Une fois le battant fermé, sa largeur
-   vaut zéro — mais l'ESPACEMENT qui le séparait de la dernière pastille, lui,
-   compte toujours. La pilule gardait donc 9 px de plus à droite qu'à gauche.
-   On le reprend par une marge négative de la même valeur, animée en même temps
-   que la fermeture pour que rien ne saute.
-   Le battant se ferme, la flèche s'échappe par la droite.
-   ⚠ UNE ANIMATION, PAS UNE TRANSITION. La flèche est déjà animée par `pousse` ;
-   une transition ne peut pas prendre le relais d'une animation — couper
-   celle-ci ramenait l'opacité à sa valeur de base d'un coup, et la flèche
-   disparaissait en une image au lieu d'un demi-seconde. On remplace donc une
-   animation par une autre. */
-.duo-pas.vu .duo-tir{width:0; margin-left:-9px}
-.duo-pas.vu .duo-fl{
-  animation:sort .5s cubic-bezier(.28,.11,.32,1) forwards;
-}
-@keyframes sort{
-  from{opacity:.38; translate:0 0}
-  to  {opacity:0;   translate:16px 0}
+  .duo-c > *{opacity:1; translate:0 0; animation:none}
 }
 
 @media (max-width:980px){
-  .duo{padding:clamp(60px, 10vh, 110px) 0 clamp(34px, 5vh, 60px)}
-  .duo-grille{padding-inline:20px; scroll-padding-inline-start:16px}
-  .duo-t{padding-inline:20px}
-  /* ⚠ 88 %, PAS 82. Le nombre de pastilles vaut le nombre de PAGES, et une
-     page vaut une largeur de piste. À 82 % il entrait 1,2 tuile par page :
-     quatre tuiles ne faisaient que trois pages, et la quatrième pastille
-     manquait. À 88 %, une page vaut une tuile — quatre tuiles, quatre
-     pastilles. */
-  /* ⚠ Le rapport reste CARRÉ sur les écrans étroits. Les tuiles y sont deux
-     fois moins larges : à 0,80 elles ne feraient plus que 250 px de haut, et
-     le texte n'y tiendrait plus. */
-  .duo-c{flex:0 0 min(88%, 340px); aspect-ratio:1 / 0.94}
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   LA SECTION 2 bis — L'EXPLOIT
-   Un surtitre discret, un très grand titre centré, puis un paragraphe où les
-   phrases qui portent sont en BLANC et le reste en gris. C'est la mise en page
-   d'Apple pour ce genre de bloc : on ne met pas en gras, on ÉCLAIRE ce qui
-   compte et on laisse le reste dans l'ombre.
-   Le texte est justifié au centre et borné à 58 caractères : au-delà, l'œil
-   perd la ligne suivante en revenant à gauche.
-   ═══════════════════════════════════════════════════════════════════════ */
-.exp{
-  background:var(--panneau);
-  padding:clamp(90px, 15vh, 200px) clamp(22px, 3.8vw, 68px) clamp(80px, 13vh, 170px);
-}
-.exp-in{max-width:1000px; margin:0 auto; text-align:center}
-
-.exp-sur{
-  margin:0; font-size:clamp(14px, 1.05vw, 18px); font-weight:600;
-  letter-spacing:-.012em; color:rgba(255,255,255,.44);
-}
-.exp-t{
-  margin:.34em 0 0;
-  font-family:Inter,sans-serif; font-weight:600;
-  /* ⚠ Plus petit qu'un titre de section ordinaire : celui-ci fait deux lignes
-     longues. À 92 px il occupait trois lignes et écrasait le paragraphe. */
-  font-size:clamp(30px, 4.1vw, 66px); letter-spacing:-.034em; line-height:1.06;
-  color:#FFFFFF;
-}
-
-/* ⚠ LE GRIS EST LE CORPS, LE BLANC L'EXCEPTION. L'inverse — du gris surligné
-   de blanc — donnerait un texte tacheté. Ici on lit d'abord les trois phrases
-   claires, et le gris ne se lit que si l'on s'arrête. */
-.exp-p{
-  max-width:58ch; margin:clamp(30px, 4.4vh, 62px) auto 0;
-  font-family:Inter,sans-serif; font-weight:500;
-  font-size:clamp(17px, 1.5vw, 25px); letter-spacing:-.016em; line-height:1.52;
-  color:rgba(255,255,255,.40);
-}
-.exp-p b{font-weight:500; color:#FFFFFF}
-
-@media (max-width:980px){
-  .exp{padding:clamp(70px, 12vh, 130px) 20px clamp(60px, 10vh, 110px)}
+  .duo{padding:clamp(64px, 11vh, 120px) 28px clamp(54px, 9vh, 100px)}
+  .duo-grille{grid-template-columns:1fr}
+  .duo-t{max-width:none}
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -961,7 +788,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    ═══════════════════════════════════════════════════════════════════════ */
 .tri{
   background:var(--panneau);
-  padding:clamp(80px, 13vh, 180px) clamp(22px, 3.8vw, 68px) clamp(70px, 11vh, 150px);
+  padding:clamp(80px, 13vh, 180px) clamp(28px, 5.4vw, 104px) clamp(70px, 11vh, 150px);
 }
 .tri-in{max-width:1240px; margin:0 auto}
 
@@ -1028,9 +855,50 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 }
 
 @media (max-width:980px){
-  .tri{padding:clamp(60px, 10vh, 110px) 20px clamp(50px, 8vh, 90px)}
+  .tri{padding:clamp(60px, 10vh, 110px) 28px clamp(50px, 8vh, 90px)}
   .tri-vue img{height:min(53vh, 462px)}
   .tri-vue-large img{height:auto; max-height:min(51vh, 440px)}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LA SECTION 4 — CE QUI SE FILME
+   Un surtitre discret, un très grand titre centré, puis un paragraphe où les
+   phrases qui portent sont en BLANC et le reste en gris. C'est la mise en page
+   d'Apple pour ce genre de bloc : on ne met pas en gras, on ÉCLAIRE ce qui
+   compte et on laisse le reste dans l'ombre.
+   ═══════════════════════════════════════════════════════════════════════ */
+.exp{
+  background:var(--panneau);
+  padding:clamp(90px, 15vh, 200px) clamp(28px, 5.4vw, 104px) clamp(80px, 13vh, 170px);
+}
+.exp-in{max-width:1000px; margin:0 auto; text-align:center}
+
+.exp-sur{
+  margin:0; font-size:clamp(14px, 1.05vw, 18px); font-weight:600;
+  letter-spacing:-.012em; color:rgba(255,255,255,.44);
+}
+.exp-t{
+  margin:.34em 0 0;
+  font-family:Inter,sans-serif; font-weight:600;
+  /* Plus petit qu'un titre de section ordinaire : celui-ci fait deux lignes
+     longues. À 92 px il occupait trois lignes et écrasait le paragraphe. */
+  font-size:clamp(30px, 4.1vw, 66px); letter-spacing:-.034em; line-height:1.06;
+  color:#FFFFFF;
+}
+
+/* ⚠ LE GRIS EST LE CORPS, LE BLANC L'EXCEPTION. L'inverse — du gris surligné
+   de blanc — donnerait un texte tacheté. Ici on lit d'abord les phrases
+   claires, et le gris ne se lit que si l'on s'arrête. */
+.exp-p{
+  max-width:58ch; margin:clamp(30px, 4.4vh, 62px) auto 0;
+  font-family:Inter,sans-serif; font-weight:500;
+  font-size:clamp(17px, 1.5vw, 25px); letter-spacing:-.016em; line-height:1.52;
+  color:rgba(255,255,255,.40);
+}
+.exp-p b{font-weight:500; color:#FFFFFF}
+
+@media (max-width:980px){
+  .exp{padding:clamp(70px, 12vh, 130px) 28px clamp(60px, 10vh, 110px)}
 }
 
 /* Provisoire : de quoi faire défiler, le temps de rebâtir les sections. */
@@ -1279,7 +1147,15 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   /* ⚠ La scène déborde le rembourrage du hero de 8 px de chaque côté. Sans
      cela, l'appareil — large de `100vw - 16px` — sortait d'une zone de contenu
      large de `100vw - 32px`, et son centrage se décalait de 8 px. */
-  .sous{display:none}
+
+  /* ⚠ DE L'AIR EST RÉSERVÉ AVANT DE DIMENSIONNER L'APPAREIL. Sans cette part
+     mise de côté, il remplissait toute la hauteur disponible et il ne restait
+     rien à distribuer : 22 px sous la barre, 17 px avant l'appareil. On lui
+     retire donc 12 % de la hauteur de l'écran avant de le calculer, et ce sont
+     les ressorts qui s'en partagent le bénéfice.
+     La valeur suit l'écran : 56 px au minimum sur un petit téléphone, 140 au
+     plus sur une tablette haute. */
+  .hero{--air:clamp(56px, 12vh, 140px)}
 
   /* ⚠ LE VIDE SE PARTAGE AU LIEU DE S'ACCUMULER EN HAUT. Le premier écran est
      aligné en bas : tout l'espace libre tombait donc au-dessus du surtitre —
@@ -1304,7 +1180,40 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
      l'image posés, et sur un écran haut et étroit l'image est bornée par la
      LARGEUR, pas par la hauteur. L'agrandir est donc la seule façon de le
      réduire — il faudrait 124 % de la largeur de l'écran pour l'annuler. */
-  .sc-in{--s:min(calc(100vw - 16px), calc((100svh - var(--h-haut, 300px) - var(--h-ecart, 26px)) / 1.2556))}
+  /* ⚠ LA LARGEUR NE BORNE PLUS L'APPAREIL SUR ÉCRAN HAUT. À `100vw − 16px`, il
+     butait contre le bord et ne pouvait plus grandir : tout l'espace vertical
+     restant devenait du vide, réparti par les ressorts. Sur un grand téléphone
+     cela faisait deux trous.
+     Le plafond passe à 1,34 fois la largeur de l'écran : c'est alors la HAUTEUR
+     qui commande presque toujours, et l'appareil remplit ce qu'on lui donne.
+     Il déborde latéralement, mais le premier écran masque ce qui dépasse — et
+     ce qui dépasse, c'est la main, pas l'appareil, qui reste centré. */
+  .sc-in{--s:min(calc(100vw * 1.34), calc((100svh - var(--h-haut, 300px) - var(--h-ecart, 26px) - var(--air)) / 1.2555))}
+  /* ⚠ LE CENTRAGE EST CALCULÉ, PLUS DÉLÉGUÉ. Dès que l'appareil déborde de son
+     conteneur, la grille cesse de le centrer — elle le repousse au début pour
+     ne rien perdre hors champ, et il se retrouvait décalé de 69 px. Ni `left`
+     ni `transform` n'y changeaient rien, la position de départ restant
+     imprévisible.
+     Une marge gauche de `50 % − la moitié de sa largeur` le centre exactement,
+     qu'il déborde ou non, parce qu'elle ne dépend que de grandeurs connues. */
+  /* ⚠ POSITIONNEMENT ABSOLU, pour que la référence soit explicite. En flux,
+     `50 %` se rapportait à une largeur qui n'était pas celle que je croyais —
+     le décalage restait de 34 px. Ici la scène est le repère : `left:50 %` en
+     désigne le milieu et la marge négative retire la moitié de l'appareil.
+     La scène reçoit la même formule de taille, car un élément absolu ne lui
+     donne plus sa hauteur. */
+  .scene{
+    /* ⚠ `flex-shrink:0`. Sa hauteur est maintenant écrite ; sans cela le flux
+       la comprimait quand la place manquait, et l'appareil — ancré en bas —
+       débordait vers le haut jusqu'à recouvrir le titre de 106 px. */
+    flex:0 0 auto;
+    position:relative; display:block;
+    --s:min(calc(100vw * 1.34),
+            calc((100svh - var(--h-haut, 300px) - var(--h-ecart, 26px)
+                  - var(--air)) / 1.2555));
+    height:calc(var(--s) * 1.2555);
+  }
+  .sc-in{position:absolute; left:50%; bottom:0; margin-left:calc(var(--s) / -2)}
   /* ⚠ Une rotation élargit la BOÎTE de l'élément : les cartes sortaient de
      12 px de l'écran. À cette taille l'inclinaison ne se lirait pas de toute
      façon — elle est retirée plutôt que compensée. */
@@ -1351,8 +1260,12 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   .btn{padding:16px 22px; font-size:15.5px}
   .deux{padding-bottom:34px}
 
-  /* L'appareil et le cercle descendent au même rapport que sur téléphone. */
-  .scene{flex:0 1 min(590px, 72vw)}
+  /* ⚠ PLUS DE HAUTEUR IMPOSÉE ICI. Cette règle datait d'une version antérieure
+     et fixait la scène à 590 px : elle s'appliquait après le palier téléphone
+     et écrasait sa hauteur calculée. L'appareil, ancré en bas d'une boîte trop
+     courte, débordait vers le haut et recouvrait le titre de 105 px. La scène
+     garde la hauteur que lui donne le palier téléphone. */
+  .scene{flex:0 0 auto}
   .panneau{--r:min(calc(72vw / 1.158), 460px)}
 
   /* Le texte se centre dans la place qui lui reste : sur une tablette haute,
@@ -1454,9 +1367,12 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 
   <h1>Votre savoir-faire,<br>transmis simplement.</h1>
 
-  <!-- ⚠ Vide et volontairement conservé : sur ordinateur il tient l'écart
-       entre le titre et l'appareil. Le supprimer collerait les deux. -->
-  <p class="sous" aria-hidden="true"></p>
+  <!-- ⚠ L'ESPACE INSÉCABLE EST AVANT LE POINT, dans le texte. Une marge en
+       CSS ne crée aucune insécabilité : sur téléphone le point se retrouvait
+       seul en début de deuxième ligne. -->
+  <p class="sous">Formez plus vite&nbsp;<span aria-hidden="true">·</span>
+    Gagnez en efficacité&nbsp;<span aria-hidden="true">·</span>
+    Préservez votre savoir-faire</p>
 
   <!-- ═══ LA SCÈNE ═══ l'appareil, et trois fragments de l'app autour. -->
   <i class="ecart" aria-hidden="true"></i>
@@ -1474,71 +1390,80 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 
 </section>
 
-<!-- ═══ SECTION 2 ═══ les points forts, en carrousel. -->
+<!-- ═══ SECTION 2 ═══ trois étapes, en tuiles noires. -->
 <section class="duo" data-fond="sombre">
-
   <div class="duo-in">
-    <h2 class="duo-t" data-monte>Points forts</h2>
+
+    <p class="duo-sur" data-monte>Le quotidien</p>
+    <h2 class="duo-t" data-monte style="--d:90ms">Filmer, comprendre,<br>transmettre.</h2>
 
     <div class="duo-grille">
 
-    <article class="duo-c">
-      <i class="duo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3.5 20 7v5.6c0 4.3-3.2 7-8 7.9-4.8-.9-8-3.6-8-7.9V7z"/>
-        <path d="m9 12 2.2 2.2L15.5 10"/></svg></i>
-      <h3><b>Le savoir-faire reste.</b><span>Même quand la personne part.</span></h3>
-    </article>
+      <article class="duo-c">
+        <p class="duo-n">Étape 01</p>
+        <span class="duo-ill">
+          <svg viewBox="0 0 220 120" fill="none" aria-hidden="true"
+               stroke-linecap="round" stroke-linejoin="round">
+            <!-- l'appareil qui filme -->
+            <rect x="28" y="34" width="96" height="58" rx="12"
+                  stroke="currentColor" stroke-width="2.4" opacity=".9"/>
+            <path d="M132 48 164 34v58l-32-14z" stroke="currentColor" stroke-width="2.4" opacity=".9"/>
+            <circle cx="76" cy="63" r="13" stroke="currentColor" stroke-width="2.4"/>
+            <circle cx="76" cy="63" r="4.6" fill="currentColor"/>
+            <!-- le témoin d'enregistrement -->
+            <circle cx="180" cy="32" r="5" fill="currentColor"/>
+            <path d="M191 24a13 13 0 0 1 0 16M200 17a23 23 0 0 1 0 30"
+                  stroke="currentColor" stroke-width="2.2" opacity=".55"/>
+          </svg>
+        </span>
+        <h3>Formez plus vite</h3>
+        <p>Plus besoin de passer des heures à rédiger une procédure Word.
+           L'employé filme ce qu'il fait, et Standix génère la procédure.</p>
+      </article>
 
-    <article class="duo-c">
-      <i class="duo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="7.5" r="3.6"/>
-        <path d="M4.6 20.5c0-3.6 3.3-6 7.4-6s7.4 2.4 7.4 6"/></svg></i>
-      <h3><b>Autonome dès le premier jour.</b><span>Le nouveau suit la procédure seul.</span></h3>
-    </article>
+      <article class="duo-c">
+        <p class="duo-n">Étape 02</p>
+        <span class="duo-ill">
+          <svg viewBox="0 0 220 120" fill="none" aria-hidden="true"
+               stroke-linecap="round" stroke-linejoin="round">
+            <!-- les étapes, cochées l'une après l'autre -->
+            <circle cx="46" cy="34" r="11" stroke="currentColor" stroke-width="2.4"/>
+            <path d="m41 34 3.6 3.8L52 30" stroke="currentColor" stroke-width="2.4"/>
+            <path d="M70 30h108M70 40h74" stroke="currentColor" stroke-width="2.4" opacity=".9"/>
+            <circle cx="46" cy="72" r="11" stroke="currentColor" stroke-width="2.4"/>
+            <path d="m41 72 3.6 3.8L52 68" stroke="currentColor" stroke-width="2.4"/>
+            <path d="M70 68h92M70 78h62" stroke="currentColor" stroke-width="2.4" opacity=".9"/>
+            <circle cx="46" cy="106" r="11" stroke="currentColor" stroke-width="2.4" opacity=".4"/>
+            <path d="M70 102h78M70 112h52" stroke="currentColor" stroke-width="2.4" opacity=".34"/>
+          </svg>
+        </span>
+        <h3>Gagnez en efficacité</h3>
+        <p>Visionnez rapidement une procédure sur le terrain et évitez
+           les erreurs qui coûtent du temps et de l'argent.</p>
+      </article>
 
-    <article class="duo-c">
-      <i class="duo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/>
-        <rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/>
-        <rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/>
-        <path d="M13.5 13.5h3M20.5 13.5v3M13.5 17.5v3M17.5 20.5h3"/></svg></i>
-      <h3><b>Ouverte en un scan.</b><span>Par QR code au poste, ou depuis l'app.</span></h3>
-    </article>
-
-    <article class="duo-c">
-      <i class="duo-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M4 20V9.5M10 20V4.5M16 20v-8M22 20H2"/></svg></i>
-      <h3><b>L'usage, en un coup d'œil.</b><span>Temps par procédure, les plus lues, les scans.</span></h3>
-    </article>
+      <article class="duo-c">
+        <p class="duo-n">Étape 03</p>
+        <span class="duo-ill">
+          <svg viewBox="0 0 220 120" fill="none" aria-hidden="true"
+               stroke-linecap="round" stroke-linejoin="round">
+            <!-- la procédure passe d'une main à l'autre -->
+            <rect x="18" y="24" width="62" height="76" rx="10"
+                  stroke="currentColor" stroke-width="2.4" opacity=".9"/>
+            <path d="M32 46h34M32 60h26M32 74h30" stroke="currentColor" stroke-width="2.2" opacity=".5"/>
+            <rect x="140" y="24" width="62" height="76" rx="10"
+                  stroke="currentColor" stroke-width="2.4" opacity=".38"/>
+            <path d="M154 46h34M154 60h26M154 74h30" stroke="currentColor" stroke-width="2.2" opacity=".24"/>
+            <path d="M92 62h30" stroke="currentColor" stroke-width="2.6"/>
+            <path d="m118 55 8 7-8 7" stroke="currentColor" stroke-width="2.6"/>
+          </svg>
+        </span>
+        <h3>Préservez votre savoir-faire</h3>
+        <p>Lorsqu'un salarié expérimenté part, change de poste ou est absent,
+           son savoir ne disparaît pas avec lui.</p>
+      </article>
 
     </div>
-  </div>
-
-  <!-- ═══ L'INDICATION ═══ des pastilles et une flèche qui glisse. -->
-  <div class="duo-pas">
-    <span class="duo-tir" aria-hidden="true">
-      <svg class="duo-fl" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 5l7 7-7 7"/>
-      </svg>
-    </span>
-  </div>
-
-</section>
-
-<!-- ═══ SECTION 2 bis ═══ l'exploit, en un bloc de texte. -->
-<section class="exp" data-fond="sombre">
-  <div class="exp-in">
-    <p class="exp-sur" data-monte>Ce qui se filme</p>
-    <h2 class="exp-t" data-monte style="--d:90ms">Une vidéo.<br>Ou un enregistrement d'écran.</h2>
-    <p class="exp-p" data-monte style="--d:200ms">
-      Un geste au poste, une machine, un logiciel. Tout ce qui s'explique en
-      montrant devient une procédure <b>écrite, étape par étape</b>.
-    </p>
   </div>
 </section>
 
@@ -1566,6 +1491,18 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
       <p>Dans l'app, ou en scannant le QR code.</p>
     </article>
 
+  </div>
+</section>
+
+<!-- ═══ SECTION 4 ═══ l'exploit, en un bloc de texte. -->
+<section class="exp" data-fond="sombre">
+  <div class="exp-in">
+    <p class="exp-sur" data-monte>Ce qui se filme</p>
+    <h2 class="exp-t" data-monte style="--d:90ms">Une vidéo.<br>Ou un enregistrement d'écran.</h2>
+    <p class="exp-p" data-monte style="--d:200ms">
+      Un geste au poste, une machine, un logiciel. Tout ce qui s'explique en
+      montrant devient une procédure <b>écrite, étape par étape</b>.
+    </p>
   </div>
 </section>
 
@@ -1714,15 +1651,6 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     aMonter.forEach(e=>e.classList.add('vu'));
   }
 
-  /* ─── LES DEUX CARROUSELS ───
-     Le même pilotage sert aux deux sections : on le décrit une fois, on
-     l'applique à chacune. Dupliquer quarante lignes pour changer un préfixe de
-     classe, c'est se condamner à corriger deux fois chaque défaut. */
-  const carrousels=[
-    {piste:'.duo-grille', pas:'.duo-pas', pt:'duo-pt', tuile:'.duo-c'},
-  ];
-  carrousels.forEach(monteCarrousel);
-
   /* ─── LE CONTENU DES TUILES MONTE QUAND ELLES ARRIVENT À L'ÉCRAN ───
      ⚠ SORTI DU CARROUSEL. Il y vivait tant que les deux sections en avaient
      un ; la section 3 est passée en colonne, ses tuiles n'auraient plus jamais
@@ -1771,239 +1699,6 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   } else {
     aLire.forEach(e=>e.classList.add('lu'));
   }
-  function monteCarrousel(cfg){
-
-  /* ─── LA COMMANDE DU CARROUSEL ───
-     ⚠ LES PASTILLES COMPTENT LES PAGES, PAS LES TUILES. Avec une pastille par
-     tuile, les quatre ne fonctionnaient que sur téléphone : sur un écran large
-     la piste ne montre qu'une poignée de positions atteignables — cliquer sur
-     la deuxième pastille amenait déjà au bout, et les deux dernières ne
-     pouvaient plus rien faire.
-     Une page vaut une largeur de piste. Leur nombre change donc avec la
-     fenêtre, et on les reconstruit au redimensionnement. */
-  const piste=document.querySelector(cfg.piste);
-  const pas=document.querySelector(cfg.pas);
-  if(piste && pas){
-    let points=[];
-    const cartes=[...piste.querySelectorAll(cfg.tuile)];
-    let vu=false;
-
-    /* ⚠ UNE PASTILLE PAR TUILE, et non une par page. Sur ordinateur la piste
-       ne compte que deux positions atteignables : les deux dernières pastilles
-       amènent donc au même endroit. C'est un choix assumé — on préfère que le
-       compte de pastilles dise le nombre de tuiles, quitte à ce que la course
-       s'arrête avant la dernière.
-       La pastille active suit le CLIC quand il y en a eu un, et seulement à
-       défaut la position réelle : sans cela, cliquer sur la quatrième aurait
-       allumé la deuxième, faute de course restante. */
-    let demande=-1;
-    const actif=()=>{
-      if(demande>=0){ points.forEach((e,i)=>e.classList.toggle('on', i===demande)); return; }
-      const g=piste.getBoundingClientRect().left;
-      const bout = piste.scrollLeft >= piste.scrollWidth - piste.clientWidth - 4;
-      let n=cartes.length-1, min=Infinity;
-      if(!bout){
-        n=0;
-        cartes.forEach((e,i)=>{
-          const d=Math.abs(e.getBoundingClientRect().left - g);
-          if(d<min){min=d; n=i;}
-        });
-      }
-      points.forEach((e,i)=>e.classList.toggle('on', i===n));
-    };
-
-    /* ⚠ On insère avant LE TIROIR, pas avant le premier enfant : `firstChild`
-       change à chaque ajout, si bien que les pastilles se créaient dans
-       l'ordre inverse — la première commande amenait à la dernière page.
-       Et c'est bien le tiroir qu'il faut viser, pas la flèche : depuis qu'elle
-       est enfermée dedans, elle n'est plus un enfant direct de la pilule et
-       `insertBefore` refusait l'opération. */
-    const fleche=pas.querySelector('.duo-tir');
-
-    const batir=()=>{
-      const n=cartes.length;
-      if(n===points.length) return actif();
-      points.forEach(e=>e.remove());
-      points=[];
-      for(let i=0;i<n;i++){
-        const b=document.createElement('button');
-        b.type='button'; b.className=cfg.pt;
-        b.setAttribute('aria-label','Voir la vue '+(i+1));
-        b.addEventListener('click', ()=>{
-          demande=i;
-          /* La position visée est celle qui amène la tuile au bord gauche ;
-             elle est bornée par la course disponible. */
-          const course=piste.scrollWidth - piste.clientWidth;
-          const vise=Math.min(course,
-            cartes[i].offsetLeft - cartes[0].offsetLeft);
-          glisse(vise);
-          actif();
-        });
-        pas.insertBefore(b, fleche);
-      }
-      points=[...pas.querySelectorAll('.'+cfg.pt)];
-      actif();
-    };
-
-    batir();
-    addEventListener('resize', batir, {passive:true});
-
-    /* ─── L'AVANCE AUTOMATIQUE ───
-       Le carrousel tourne seul tant que la section est à l'écran. C'est ce qui
-       donne envie de lire : une rangée immobile ne se lit pas, une rangée qui
-       bouge se regarde.
-       ⚠ IL S'ARRÊTE DÉFINITIVEMENT AU PREMIER GESTE. Continuer à avancer sous
-       le doigt de quelqu'un qui explore est le défaut le plus courant de ces
-       carrousels — on reprend la main à l'utilisateur.
-       ⚠ On distingue notre propre défilement du sien par un drapeau posé juste
-       avant : sans lui, notre avance se prendrait elle-même pour un geste et
-       s'arrêterait au premier pas. */
-    let minuteur=null, nous=false, arrete=false;
-    /* ⚠ L'AVANCE AUTOMATIQUE EST RÉSERVÉE AUX APPAREILS QU'ON TOUCHE. Sur
-       ordinateur les tuiles sont presque toutes visibles : faire glisser tout
-       seul y déplace ce qu'on est en train de lire, sans rien montrer de neuf.
-       Au doigt, au contraire, c'est le seul moyen de dire qu'il y a une suite.
-       ⚠ LE CRITÈRE EST LE TOUCHER, PAS LA LARGEUR. Une tablette en paysage fait
-       1024 px ou plus : bornée à 980, elle était traitée comme un ordinateur.
-       `(hover: none)` désigne exactement les appareils sans souris ; la largeur
-       reste en second critère pour la fenêtre étroite sur ordinateur.
-       Recalculé à chaque démarrage, donc juste aussi après un redimensionnement. */
-    const bouge=()=>!matchMedia('(prefers-reduced-motion: reduce)').matches
-                  && (matchMedia('(hover: none)').matches
-                   || matchMedia('(max-width: 980px)').matches);
-
-    /* ─── LE GLISSEMENT ───
-       ⚠ MENÉ IMAGE PAR IMAGE, PAS PAR `behavior:'smooth'`. Le défilement doux
-       du navigateur suit sa propre courbe, presque linéaire, qui démarre et
-       s'arrête sec. On reprend donc la main pour employer la courbe de la
-       page — longue à l'arrivée, comme tout le reste.
-       ⚠ L'ACCROCHAGE EST SUSPENDU PENDANT LA COURSE. En `mandatory`, il tire
-       la piste vers la tuile la plus proche à chaque image et se bat contre
-       notre animation. On le rétablit à l'arrivée. */
-    /* ⚠ IL FAUT L'ORDONNÉE, PAS L'ABSCISSE. Une courbe de Bézier se décrit par
-       un paramètre t dont on tire DEUX coordonnées : x, qui est le temps, et y,
-       qui est l'avancement. Ma première version renvoyait x — le glissement
-       accélérait donc à la fin au lieu de s'y poser.
-       On cherche d'abord le t qui donne le temps écoulé, par quelques pas de
-       Newton, puis on lit y en ce point. */
-    const X=t=>{const u=1-t; return 3*u*u*t*.28 + 3*u*t*t*.32 + t*t*t;};
-    const Y=t=>{const u=1-t; return 3*u*u*t*.11 + 3*u*t*t*1  + t*t*t;};
-    const dX=t=>{const u=1-t; return 3*u*u*.28 + 6*u*t*(.32-.28) + 3*t*t*(1-.32);};
-    const courbe=s=>{
-      let t=s;
-      for(let i=0;i<5;i++){
-        const d=dX(t);
-        if(Math.abs(d)<1e-6) break;
-        t -= (X(t)-s)/d;
-        t = Math.min(1, Math.max(0, t));
-      }
-      return Y(t);
-    };
-    let piste_anim=null;
-    const glisse=(vers)=>{
-      cancelAnimationFrame(piste_anim);
-      const depart=piste.scrollLeft, delta=vers-depart, duree=760;
-      if(Math.abs(delta)<2) return;
-      nous=true;
-      piste.style.scrollSnapType='none';
-      const t0=performance.now();
-      const pas_a_pas=(t)=>{
-        const k=Math.min(1, (t-t0)/duree);
-        /* On progresse en TEMPS et on lit la courbe : la position suit donc
-           l'allure voulue, pas une interpolation linéaire. */
-        piste.scrollLeft = depart + delta * courbe(k);
-        if(k<1){ piste_anim=requestAnimationFrame(pas_a_pas); }
-        else{
-          piste.style.scrollSnapType='';
-          nous=false;
-        }
-      };
-      piste_anim=requestAnimationFrame(pas_a_pas);
-    };
-
-
-    const avance=()=>{
-      const course=piste.scrollWidth - piste.clientWidth;
-      if(course<=4 || cartes.length<2) return;
-      /* ⚠ ON VISE LA TUILE SUIVANTE, PAS UNE FRACTION DE LA COURSE. En
-         divisant la course en trois, le premier pas tombait ENTRE deux tuiles :
-         l'accrochage, rétabli en fin d'animation, renvoyait alors la piste à la
-         tuile la plus proche — la précédente. Sur une fenêtre de 900 px, le
-         carrousel semblait donc ne pas bouger du tout.
-         En visant l'origine d'une tuile, la position voulue EST un point
-         d'accrochage : plus rien ne la corrige. */
-      const g=piste.getBoundingClientRect().left;
-      let i=0, min=Infinity;
-      cartes.forEach((e,k)=>{
-        const d=Math.abs(e.getBoundingClientRect().left - g);
-        if(d<min){min=d; i=k;}
-      });
-      const suivant=i+1;
-      /* ⚠ ON NE REVIENT PAS EN ARRIÈRE. Le retour à la première tuile faisait
-         traverser toute la piste d'un coup — un mouvement brusque et sans
-         raison. Arrivé au bout, l'avance s'arrête pour de bon. */
-      if(suivant > cartes.length-1){ arrete=true; stoppe(); return; }
-      const vise=Math.min(course, cartes[suivant].offsetLeft - cartes[0].offsetLeft);
-      if(vise <= piste.scrollLeft + 2){ arrete=true; stoppe(); return; }
-      glisse(vise);
-    };
-    let premier=null;
-    const demarre=()=>{
-      if(arrete || !bouge() || minuteur) return;
-      premier=setTimeout(avance, 1400);
-      minuteur=setInterval(avance, 4200);
-    };
-    const stoppe=()=>{ clearInterval(minuteur); clearTimeout(premier); minuteur=null; };
-    const coupe=()=>{ arrete=true; stoppe(); };
-
-    /* ⚠ ON GUETTE LA SECTION, PAS LA PISTE, ET À UN QUART. Au premier pixel,
-       l'avance partait alors que la section pointait à peine sous le pli : on
-       ratait le premier pas. Au quart, on a la rangée sous les yeux quand elle
-       se met en marche.
-       ⚠ `threshold` ne convient pas ici : il mesure la part de la SECTION
-       visible, or celle-ci peut être plus haute que l'écran — le quart ne
-       serait jamais atteint sur un petit téléphone. On mesure donc nous-mêmes
-       la hauteur réellement entrée dans la fenêtre.
-       Le premier pas vient ensuite au bout de 1,4 s au lieu de 4,2 : il faut
-       qu'on voie tout de suite que ça bouge. */
-    const zone=piste.closest('section') || piste;
-    const auQuart=()=>{
-      const r=zone.getBoundingClientRect();
-      const vu=Math.min(r.bottom, innerHeight) - Math.max(r.top, 0);
-      return vu >= Math.min(r.height, innerHeight) * 0.25;
-    };
-    const jauge2=()=>{ auQuart() ? demarre() : stoppe(); };
-    if('IntersectionObserver' in window){
-      /* L'observateur sert de veilleuse : il n'allume le calcul que lorsque la
-         section approche, pour ne pas mesurer à chaque image sur toute la page. */
-      new IntersectionObserver(([e])=>{
-        e.isIntersecting ? addEventListener('scroll', jauge2, {passive:true})
-                         : (removeEventListener('scroll', jauge2), stoppe());
-        jauge2();
-      },{threshold:0}).observe(zone);
-    }
-    ['pointerdown','wheel','touchstart','keydown'].forEach(t=>
-      piste.addEventListener(t, (e)=>{ demande=-1; coupe(e); }, {passive:true}));
-    pas.addEventListener('click', coupe);
-    piste.addEventListener('scroll', ()=>{
-      actif();
-      /* La flèche s'efface au geste de l'utilisateur — notre propre avance ne
-         doit pas retirer l'invitation avant qu'il l'ait suivie.
-         ⚠ MAIS AUSSI EN BOUT DE COURSE, quelle que soit la main qui a conduit
-         là. Sur une piste de deux tuiles, l'avance automatique s'arrête à la
-         seconde : la flèche restait alors à désigner une suite qui n'existe
-         pas. */
-      const bout = piste.scrollLeft >= piste.scrollWidth - piste.clientWidth - 4;
-      if(!vu && (bout || (!nous && piste.scrollLeft > 12))){
-        vu=true; pas.classList.add('vu');
-      }
-    }, {passive:true});
-  }
-
-
-
-  }
-
   const relit=()=>{
     pose(scrollY > 8);
     /* ⚠ `- 30`, PAS `+ 20`. La section 2 commence exactement à la hauteur d'un

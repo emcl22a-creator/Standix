@@ -15433,7 +15433,15 @@ function dessinerCollage() {
   total.innerHTML = `
     <div class="coller-tot">
       <span>Durée totale</span>
-      <b>${dureeCourte(secondes)} <em>/ ${Math.round(DUREE_REFUSEE / 60)} min</em></b>
+      <!-- ⚠ LE « / 5 min » A ÉTÉ RETIRÉ. Il annonçait le plafond avant qu'on
+           l'atteigne, ce qui se défendait — mais il transformait une durée en
+           note sur cinq, et l'on se demandait ce qu'on risquait à s'en
+           approcher. La jauge en dessous dit déjà la marge, sans chiffre.
+
+           Le refus, lui, reste explicite : bandeau rouge, bouton désactivé et
+           jauge rouge quand les cinq minutes sont dépassées. Trois signes au
+           moment où ça compte valent mieux qu'un rappel permanent. -->
+      <b>${dureeCourte(secondes)}</b>
     </div>
     <div class="coller-jauge"><i style="width:${(partDuree * 100).toFixed(1)}%;background:${teinteDuree}"></i></div>
     <div class="coller-tot"><span>Temps de collage, environ</span><b>${attenteLisible(secondes * 1.05)}</b></div>`
@@ -21821,6 +21829,23 @@ async function openAnalyse(procId) {
   if (depuis && depuis !== 'p-analyse') retourApresAnalyse = depuis
   showGestionScreen('p-analyse')
 
+  /* ═══ C'EST ICI QU'ON MARQUE « VUE », PAS SUR LA CARTE ═══
+
+   ⚠ LE MARQUAGE ETAIT POSE SUR LE CLIC DE LA CARTE. Or quatorze chemins
+     ouvrent cette page : le bouton « Voir la procedure » a la fin d'une
+     analyse, une notification, un retour de modification. Aucun ne passe par
+     la carte — la procedure se lisait donc de bout en bout et gardait son
+     point bleu.
+
+     C'est ce qui a ete rapporte : analyse terminee, « Voir la procedure »,
+     lecture, retour a la liste, et le point est toujours la.
+
+   ⚠ ET LE CLIC DE LA CARTE LE FAIT ENCORE, sans dommage : `brouillonsVus` est
+     un ensemble, y ajouter deux fois la meme valeur ne change rien. Le laisser
+     evite que le point s'eteigne une fraction de seconde apres le geste au
+     lieu de l'instant meme. */
+  marquerBrouillonVu(procId)
+
   /* La coche verte ne sert qu'à annoncer « ton analyse est prête ». Une fois la
      procédure ouverte, le message a été reçu : on efface le statut, en base
      pour que ce soit vrai sur tous les appareils. */
@@ -24353,8 +24378,13 @@ async function exporterProcedurePdf(proc, etapes) {
   doc.text(sous.join('  ·  '), MARGE, y)
   y += 5
 
-  /* Un trait ambre : la seule couleur de la page, et la même que dans l'app. */
-  doc.setDrawColor(255, 122, 24)
+  /* ⚠ LE BLEU DE L'APP, `#1F4CEE`, ET NON L'AMBRE. Le commentaire d'origine
+     disait « la même que dans l'app » — c'était vrai du temps où le point de
+     vigilance était ambré. Il est bleu depuis, et un document qui circule doit
+     porter les couleurs qu'on reconnaît à l'écran.
+
+     jsPDF veut trois composantes décimales : 31, 76, 238. */
+  doc.setDrawColor(31, 76, 238)
   doc.setLineWidth(0.8)
   doc.line(MARGE, y, MARGE + 26, y)
   y += 10
@@ -24418,13 +24448,16 @@ async function exporterProcedurePdf(proc, etapes) {
     }
 
     if (att) {
-      /* Le point de vigilance garde son ambre et son filet, comme dans l'app.
+      /* Le point de vigilance garde son filet et sa couleur, comme dans l'app.
          C'est la seule chose de la page qu'on doit voir sans lire. */
-      doc.setDrawColor(255, 122, 24)
+      doc.setDrawColor(31, 76, 238)
       doc.setLineWidth(0.6)
       doc.line(MARGE + 12, y + 1, MARGE + 12, y + 1 + att.length * 5)
       doc.setFontSize(9.5)
-      doc.setTextColor(150, 80, 10)
+      /* ⚠ `#12357F` SUR BLANC, LE MEME QUE DANS L'EDITEUR. Mesuré à 10,4:1 de
+         contraste — un bleu plus vif passerait sous le seuil de lisibilité à
+         l'impression, où les encres claires se délavent. */
+      doc.setTextColor(18, 53, 127)
       doc.text(att, MARGE + 15, y + 4.4)
       y += att.length * 5 + 4
     }

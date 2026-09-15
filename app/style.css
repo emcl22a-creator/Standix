@@ -13892,11 +13892,9 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
   .coller-jauge i{ transition:none; }
 }
 
-/* Le total, avec sa fraction. Le « / 5 min » est une reference : plus discret
-   que le chiffre qu'on vient lire. */
-.coller-tot b em{
-  font-style:normal; font-weight:600; color:var(--label-3);
-}
+/* ⚠ LA REGLE DU « / 5 min » A ETE RETIREE AVEC LUI. Plus aucun `<em>` n'est
+   produit dans `.coller-tot` : la garder laisserait croire qu'une fraction
+   s'affiche encore quelque part. */
 
 /* La marche a suivre, sous le refus. Elle n'est pas rouge : ce n'est pas une
    erreur de plus, c'est la solution. */

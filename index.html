@@ -774,19 +774,6 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   color:#FFFFFF; text-wrap:balance;
 }
 
-/* ─── LE SOUS-TITRE, SOUS LE TITRE ───
-   ⚠ Le titre se colle au sous-titre (sa marge basse passe au sous-titre).
-   Gris, plus petit, aligné comme le titre : il complète, il ne rivalise pas. */
-.car-t:has(+ .car-st){margin-bottom:.4em}
-.car-st{
-  margin:0 0 clamp(34px, 5vh, 62px);
-  padding-left:var(--bord); padding-right:var(--m);
-  max-width:calc(46ch + var(--bord) + var(--m)); box-sizing:border-box;
-  font-family:Inter,sans-serif; font-weight:500;
-  font-size:clamp(18px, 1.6vw, 26px); line-height:1.42; letter-spacing:-.012em;
-  color:rgba(255,255,255,.56); text-wrap:pretty;
-}
-
 /* ⚠ `position:relative` EST INDISPENSABLE : `offsetLeft` se mesure depuis le
    premier ancêtre POSITIONNÉ. Sans lui, le retour ne revenait jamais au début.
    ⚠ LA CARTE PRÉCÉDENTE NE DOIT PAS SE VOIR, ET RIEN NE DOIT ÊTRE COUPÉ NET.
@@ -828,6 +815,10 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    Tablettes en portrait et téléphones : inchangés. */
 @media (min-width:981px){
   .car{padding-top:clamp(64px, 10.5vh, 136px); padding-bottom:clamp(48px, 7vh, 88px)}
+  /* ⚠ TITRES DES DEUX CARROUSELS UN PEU PLUS PETITS SUR ORDINATEUR
+     (environ 15 pour cent) ; le titre de la section des situations garde
+     sa taille. */
+  .car-pf .car-t, .car-s3 .car-t, .chiffres .car-t, .secu .car-t, .faq .car-t{font-size:clamp(28px, 2.9vw, 44px)}
   .car-piste{--c:min(80vw, 384px)}
 }
 /* ⚠ LES CARTES DE LA SECTION 3 SONT 5 % PLUS ÉTROITES, MÊME HAUTEUR : la
@@ -907,6 +898,9 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 }
 .pf-clair{background:linear-gradient(180deg, #FBFBFD 0%, #E8E8ED 100%)}
 .car-vue .pf-img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+/* ⚠ CARTE « PRÉSERVEZ » : photo calée EN HAUT, l'homme descend d'un cran —
+   le grand texte sur deux lignes arrivait sur sa tête. */
+.pf-3 .pf-img{object-position:50% 0%}
 .pf::before{
   content:''; position:absolute; left:0; right:0; top:0; height:48%; z-index:1;
   background:linear-gradient(180deg, rgba(0,0,0,.55) 0%, rgba(0,0,0,0) 100%);
@@ -921,24 +915,29 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   height:52%;
   background:linear-gradient(180deg, rgba(0,0,0,.68) 0%, rgba(0,0,0,.55) 50%, rgba(0,0,0,0) 100%);
 }
-.pf-txt{position:absolute; left:0; right:0; top:0; z-index:2; padding:9cqi 8cqi 0}
+.pf-txt{position:absolute; left:0; right:0; top:0; z-index:2; padding:7.5cqi 8cqi 0}
 /* ⚠ `.car-vue` DEVANT : sinon `.car-c p` (le texte sous les cartes) impose
    sa marge, sa taille et sa couleur au petit titre. */
+/* ⚠ TAILLES INVERSÉES, à la demande : le petit titre (« Formez plus vite »)
+   est le GRAND texte, la phrase dessous le petit. L'espacement des lettres
+   suit la taille (serré en grand, normal en petit). */
 .car-vue .pf-sur{
-  margin:0 0 3cqi;
-  font-family:Inter,sans-serif; font-weight:600; font-size:4.4cqi; line-height:1.2;
-  letter-spacing:-.01em; color:rgba(255,255,255,.72);
+  margin:0 0 2cqi;
+  font-family:Inter,sans-serif; font-weight:600; font-size:7.6cqi; line-height:1.05;
+  letter-spacing:-.035em; color:#FFFFFF; text-wrap:balance;
 }
 /* ⚠ LA COUPURE EST ÉCRITE (`<br>`), PAS LAISSÉE AU NAVIGATEUR : il coupait
    au milieu d'un groupe de mots. Chaque ligne est un morceau de sens. Pas
    de largeur maximale, qui forçait une troisième ligne. */
 .pf-t{
   margin:0;
-  font-family:Inter,sans-serif; font-weight:600; font-size:7.6cqi; line-height:1.1;
-  letter-spacing:-.035em; color:#FFFFFF; text-wrap:balance;
+  font-family:Inter,sans-serif; font-weight:600; font-size:max(13px, 4.4cqi); line-height:1.25;
+  letter-spacing:-.01em; color:rgba(255,255,255,.72); text-wrap:balance;
 }
-.pf-clair .pf-sur{color:#6E6E73}
-.pf-clair .pf-t{color:#1D1D1F}
+/* ⚠ COULEURS ÉCHANGÉES AVEC LES TAILLES : le grand titre en blanc, la phrase
+   dessous en gris clair — la hiérarchie d'Apple. */
+.pf-clair .pf-sur{color:#1D1D1F}
+.pf-clair .pf-t{color:#6E6E73}
 /* ⚠ SANS LIEN dans la barre du bas : les flèches restent à DROITE (sinon
    `space-between` les pousse à gauche, faute de voisin). */
 .car-pf .car-bas{justify-content:flex-end}
@@ -1159,8 +1158,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 
 @media (max-width:980px){
   .car{padding:clamp(64px, 11vh, 120px) 0 clamp(48px, 8vh, 90px)}
-  .car-t, .car-st, .car-bas{padding-left:28px; padding-right:28px}
-  .car-st{max-width:none}
+  .car-t, .car-bas{padding-left:28px; padding-right:28px}
   /* ⚠ LA CARTE LAISSE ~22 PX À LA SUIVANTE : écran − marge − espace − 22.
      Avec 84vw, l'espace de 28 px ne laissait voir que 6 px de la suivante. */
   .car{--m:28px}
@@ -1321,57 +1319,224 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   .abo-tiroir, .abo-tiroir-in > *, .abo-pied{transition:none !important}
 }
 
-/* ═══ LES SITUATIONS (section 4) ═══
-   Une grille de six tuiles sombres sur fond noir : une icône en couleur, une
-   situation, sa conséquence. Trois colonnes sur ordinateur, deux sur
-   tablette, une sur téléphone. Tout s'aligne sur la limite gauche des
-   carrousels (--bord).
-   ⚠ LES DÉGRADÉS DES ICÔNES ONT DES IDENTIFIANTS EN `tc` : ils sont globaux à
+/* ═══ LE DERNIER APPEL À L'ACTION ═══
+   Une grande question centrée, une ligne de réassurance, un bouton. */
+.fin{background:#000000; padding-top:clamp(90px, 16vh, 200px); padding-bottom:clamp(90px, 16vh, 200px)}
+.fin-in{padding-left:var(--bord); padding-right:var(--bord); text-align:center}
+.fin-t{
+  margin:0;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(34px, 4.4vw, 64px); line-height:1.06; letter-spacing:-.04em;
+  color:#F5F5F7; text-wrap:balance;
+}
+.fin-s{
+  margin:.9em 0 0;
+  font-family:Inter,sans-serif; font-weight:500;
+  font-size:clamp(17px, 1.4vw, 21px); line-height:1.4; letter-spacing:-.012em;
+  color:rgba(235,235,245,.6);
+}
+.fin-cta{
+  display:inline-flex; align-items:center; justify-content:center;
+  margin-top:clamp(28px, 3.4vh, 40px); min-height:52px; padding:0 30px;
+  border-radius:100px; text-decoration:none;
+  font-family:Inter,sans-serif; font-weight:600; font-size:17px; letter-spacing:-.012em;
+  color:#FFFFFF;
+  background:linear-gradient(135deg, #1F4CEE 0%, #3A78EE 55%, #4899EC 100%);
+  box-shadow:0 10px 26px -12px rgba(31,76,238,.8);
+  transition:filter .2s ease, scale .14s ease;
+}
+.fin-cta:hover{filter:brightness(1.08)}
+.fin-cta:active{scale:.98}
+.fin-cta:focus-visible{outline:2px solid #4899EC; outline-offset:4px}
+
+/* ═══ LE PIED DE PAGE ═══
+   Petit, gris, séparé par un filet : le logo et une phrase, trois colonnes de
+   liens, puis la ligne du bas. Aligné sur la colonne de 1 180 px du site. */
+.pied{
+  --m:clamp(28px, 5.4vw, 104px);
+  --bord:max(var(--m), calc((100% - 1180px) / 2));
+  background:#000000; color:rgba(235,235,245,.6);
+  font-family:Inter,sans-serif;
+}
+.pied-in{
+  margin-left:var(--bord); margin-right:var(--bord);
+  padding:clamp(40px, 5vh, 56px) 0 clamp(28px, 4vh, 40px);
+  border-top:1px solid rgba(255,255,255,.14);
+}
+.pied-marque{display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.pied-logo{display:inline-flex; align-items:center; gap:9px; color:#F5F5F7}
+.pied-logo img{height:22px; width:auto; display:block}
+.pied-logo .logotype{font-family:Poppins,Inter,sans-serif; font-weight:600; font-size:19px; letter-spacing:-.02em; color:#F5F5F7}
+.pied-marque p{margin:0; font-size:14px; line-height:1.4}
+.pied-cols{
+  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:28px;
+  margin-top:clamp(32px, 4vh, 44px);
+}
+.pied-col{display:flex; flex-direction:column; align-items:flex-start; gap:10px}
+.pied-col h3{
+  margin:0 0 4px;
+  font-size:13px; font-weight:600; letter-spacing:-.005em; color:#F5F5F7;
+}
+.pied-col a{
+  font-size:13px; line-height:1.4; color:rgba(235,235,245,.6); text-decoration:none;
+}
+.pied-col a:hover{color:#F5F5F7; text-decoration:underline}
+.pied-col a:focus-visible{outline:2px solid #4899EC; outline-offset:3px; border-radius:3px}
+.pied-bas{
+  display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  margin-top:clamp(32px, 4vh, 44px); padding-top:18px;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.pied-bas p{margin:0; font-size:12px; line-height:1.4; color:rgba(235,235,245,.42)}
+@media (max-width:980px){
+  .pied{--m:28px}
+  .pied-in{margin-left:28px; margin-right:28px}
+}
+@media (max-width:600px){
+  .pied-cols{grid-template-columns:1fr 1fr; row-gap:32px}
+  .pied-col:last-child{grid-column:1 / -1}
+}
+
+/* ═══ LA SÉCURITÉ (section 5) ═══
+   Six tuiles sombres sur fond noir, une icône en couleur, un titre, un fait.
+   Trois colonnes sur ordinateur, deux sur tablette, une sur téléphone (icône
+   à gauche du texte, pour que la colonne reste courte).
+   ⚠ LES DÉGRADÉS DES ICÔNES ONT DES IDENTIFIANTS EN `sc` : ils sont globaux à
    la page, un doublon en ferait peindre un autre. */
-.taches{background:#000000}
-.taches-grille{
-  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+.secu{background:#000000}
+/* ⚠ DEUX COLONNES : quatre tuiles font un carré de 2 × 2, plus calme que
+   trois colonnes avec une tuile orpheline. */
+.secu-grille{
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:clamp(14px, 1.4vw, 20px);
   padding-left:var(--bord); padding-right:var(--bord);
 }
-.tache{
+.secu-t{
   margin:0; background:#1C1C1E;
   border-radius:clamp(22px, 1.8vw, 28px);
   padding:clamp(26px, 2.5vw, 36px) clamp(24px, 2.3vw, 34px) clamp(28px, 2.6vw, 38px);
 }
-.tache svg{display:block; width:clamp(36px, 2.9vw, 44px); height:clamp(36px, 2.9vw, 44px); margin-bottom:clamp(20px, 2.2vw, 30px)}
-.tache-t{
+.secu-t svg{display:block; width:clamp(34px, 2.7vw, 42px); height:clamp(34px, 2.7vw, 42px); margin-bottom:clamp(18px, 2vw, 26px)}
+.secu-t h3{
   margin:0 0 .45em;
   font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(19px, 1.55vw, 24px); line-height:1.15; letter-spacing:-.022em;
+  font-size:clamp(19px, 1.5vw, 23px); line-height:1.15; letter-spacing:-.022em;
   color:#F5F5F7; text-wrap:balance;
 }
-.tache-p{
+.secu-t p{
   margin:0;
   font-family:Inter,sans-serif; font-weight:500;
-  font-size:clamp(15px, 1.12vw, 17px); line-height:1.47; letter-spacing:-.012em;
-  color:rgba(235,235,245,.6);
+  font-size:clamp(15px, 1.08vw, 17px); line-height:1.47; letter-spacing:-.012em;
+  color:rgba(235,235,245,.6); text-wrap:pretty;
 }
-.taches-fin{
-  margin:clamp(44px, 6.5vh, 80px) 0 0;
-  padding-left:var(--bord); padding-right:var(--bord);
-  font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(26px, 3vw, 46px); line-height:1.1; letter-spacing:-.035em;
-  color:rgba(235,235,245,.42);
+.secu-lien{margin:clamp(26px, 3.4vh, 40px) 0 0; padding-left:var(--bord); padding-right:var(--bord)}
+/* ⚠ UN LIEN EN TEXTE, AU DÉGRADÉ DU BOUTON « ESSAYER 14 JOURS » (#1F4CEE →
+   #4899EC), à la demande. Le soulignement au survol garde une couleur pleine :
+   le texte, lui, est transparent sous le dégradé. */
+.secu-bouton{
+  display:inline-block; text-decoration:none;
+  font-family:Inter,sans-serif; font-weight:600; font-size:clamp(16px, 1.15vw, 18px); letter-spacing:-.012em;
+  background:linear-gradient(135deg, #1F4CEE 0%, #3A78EE 55%, #4899EC 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#3A78EE;
 }
-.taches-fin b{font-weight:600; color:#F5F5F7; white-space:nowrap}
+.secu-bouton:hover{text-decoration:underline; text-decoration-color:#3A78EE; text-underline-offset:3px}
+.secu-bouton:focus-visible{outline:2px solid #4899EC; outline-offset:3px; border-radius:4px}
 @media (max-width:980px){
-  .taches-grille{grid-template-columns:repeat(2, minmax(0, 1fr)); padding-left:28px; padding-right:28px}
-  .taches-fin{padding-left:28px; padding-right:28px}
+  .secu-grille{padding-left:28px; padding-right:28px}
+  .secu-lien{padding-left:28px; padding-right:28px}
 }
 @media (max-width:600px){
-  .taches-grille{grid-template-columns:1fr; gap:12px}
-  /* ⚠ SUR TÉLÉPHONE, L'ICÔNE PASSE À GAUCHE DU TEXTE : six tuiles empilées,
-     icône au-dessus, faisaient une colonne trop longue. */
-  .tache{display:grid; grid-template-columns:auto 1fr; column-gap:16px; align-items:start; padding:22px 22px 24px}
-  .tache svg{grid-row:1 / span 2; width:34px; height:34px; margin:2px 0 0}
-  .tache-t{font-size:19px; margin-bottom:.3em}
-  .tache-p{font-size:15px}
+  .secu-grille{grid-template-columns:1fr; gap:12px}
+  .secu-t{display:grid; grid-template-columns:auto 1fr; column-gap:16px; align-items:start; padding:22px 22px 24px}
+  .secu-t svg{grid-row:1 / span 2; width:32px; height:32px; margin:2px 0 0}
+  .secu-t h3{font-size:19px; margin-bottom:.3em}
+  .secu-t p{font-size:15px}
+}
+
+/* ═══ LES QUESTIONS FRÉQUENTES (section 6) ═══
+   Une liste à la manière d'Apple : une question par ligne, séparées par un
+   filet fin, un « + » à droite qui tourne en croix à l'ouverture. La réponse
+   se déplie en douceur. Plusieurs réponses peuvent être ouvertes.
+   ⚠ LA RÉPONSE S'OUVRE PAR SA HAUTEUR RÉELLE (`auto` ne s'anime pas), puis
+   repasse à `auto` — même méthode que les tiroirs des tarifs. */
+.faq{background:#000000}
+.faq-liste{
+  margin-left:var(--bord); margin-right:var(--bord);
+  border-top:1px solid rgba(255,255,255,.14);
+}
+.faq-item{border-bottom:1px solid rgba(255,255,255,.14)}
+.faq-q{margin:0}
+.faq-b{
+  width:100%; display:flex; align-items:center; justify-content:space-between; gap:24px;
+  padding:clamp(20px, 2vw, 26px) 0; border:none; background:none; cursor:pointer; text-align:left;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(18px, 1.5vw, 22px); line-height:1.3; letter-spacing:-.018em;
+  color:#F5F5F7;
+}
+.faq-b:hover span{color:#FFFFFF}
+.faq-b:focus-visible{outline:2px solid #4899EC; outline-offset:4px; border-radius:6px}
+.faq-b svg{
+  flex:0 0 auto; width:22px; height:22px; color:rgba(235,235,245,.6);
+  transition:rotate .45s cubic-bezier(.3,.7,.2,1), color .2s ease;
+}
+.faq-b[aria-expanded="true"] svg{rotate:45deg; color:#F5F5F7}
+.faq-r{height:0; overflow:hidden; transition:height .42s cubic-bezier(.32,.72,0,1)}
+.faq-r p{
+  margin:0; padding:0 48px clamp(22px, 2.2vw, 28px) 0; max-width:62ch;
+  font-family:Inter,sans-serif; font-weight:500;
+  font-size:clamp(16px, 1.2vw, 18px); line-height:1.55; letter-spacing:-.01em;
+  color:rgba(235,235,245,.64);
+  opacity:0; transform:translateY(-4px);
+  transition:opacity .3s ease, transform .4s cubic-bezier(.32,.72,0,1);
+}
+.faq-r.ouvert p{opacity:1; transform:none; transition-delay:.06s}
+@media (max-width:980px){
+  .faq-liste{margin-left:28px; margin-right:28px}
+  .faq-r p{padding-right:0}
+}
+@media (prefers-reduced-motion:reduce){
+  .faq-r, .faq-r p, .faq-b svg{transition:none}
+}
+
+/* ═══ LES CHIFFRES (section 4) ═══
+   Trois colonnes de texte sur fond noir, comme les chiffres des pages
+   entreprises d'Apple : une phrase en grand avec le chiffre dedans, la source
+   en petit dessous. Pas de carte, pas d'icône.
+   ⚠ `class="car"` : elle hérite de la limite gauche (--bord). */
+.chiffres{background:#000000}
+.chiffres-grille{
+  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+  column-gap:clamp(32px, 4.5vw, 72px); row-gap:44px; margin-top:clamp(8px, 2vh, 24px);
+  padding-left:var(--bord); padding-right:var(--bord);
+}
+.chiffre{margin:0}
+/* ⚠ LE NOMBRE D'ABORD, EN TRÈS GRAND ET EN DÉGRADÉ : l'œil l'attrape avant de
+   lire. La phrase dessous, en gris, garde en blanc la partie qui compte. */
+.chiffre .chiffre-n{
+  margin:0 0 .12em;
+  font-family:Inter,sans-serif; font-weight:700;
+  font-size:clamp(64px, 7.2vw, 116px); line-height:1; letter-spacing:-.05em;
+  background:linear-gradient(135deg, #9CCBFF 0%, #4899EC 45%, #2F6BF0 100%);
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:#4899EC;
+  padding-bottom:.04em;
+}
+.chiffre .chiffre-t{
+  margin:0 0 1em; max-width:22em;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(18px, 1.45vw, 22px); line-height:1.35; letter-spacing:-.018em;
+  color:rgba(235,235,245,.6); text-wrap:pretty;
+}
+.chiffre .chiffre-t b{font-weight:600; color:#F5F5F7}
+.chiffre .chiffre-s{
+  margin:0; max-width:26em;
+  font-family:Inter,sans-serif; font-weight:500;
+  font-size:12px; line-height:1.45; letter-spacing:0;
+  color:rgba(235,235,245,.42);
+}
+@media (max-width:980px){
+  .chiffres-grille{grid-template-columns:1fr; row-gap:52px; padding-left:28px; padding-right:28px}
 }
 
 /* Surtitres et titres des sections de texte. */
@@ -1754,9 +1919,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   .exp{padding:clamp(70px, 12vh, 130px) 28px clamp(60px, 10vh, 110px)}
 }
 
-/* Provisoire : de quoi faire défiler, le temps de rebâtir les sections. */
-.apres{min-height:220vh; display:grid; place-items:center;
-       background:#1D1D1F; color:rgba(255,255,255,.42); font-size:15px}
+
 
 /* ═══ LE MENU DE TÉLÉPHONE ═══
    Les deux barres se rejoignent en croix : elles pivotent de 45° et se
@@ -2147,6 +2310,44 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
      lire la page. */
   *,*::before,*::after{animation:none !important; transition-duration:.01ms !important}
 }
+
+/* ═══ LES TARIFS SUR UNE LIGNE ═══
+   ⚠ LA SECTION N'A PLUS DE MARGE LATÉRALE : la ligne des formules va d'un bord
+   à l'autre de l'écran, comme les carrousels. Ce sont les blocs `.tar-in`
+   qui portent la marge (--m), et la ligne se cale sur --bord.
+   ⚠ `.tar-in` EN `content-box` : sa largeur maximale de 1 180 px reste celle
+   du contenu, marge en plus — son bord gauche tombe donc sur --bord. */
+.tar{
+  --m:clamp(28px, 5.4vw, 104px);
+  --bord:max(var(--m), calc((100% - 1180px) / 2));
+  padding-left:0; padding-right:0;
+}
+.tar-in{box-sizing:content-box; padding-left:var(--m); padding-right:var(--m)}
+.abo-bas{display:none}
+.abo-rail{padding-left:var(--m); padding-right:var(--m)}
+.abo-seule{margin-top:18px}
+@media (min-width:768px){
+  .abo-rail{
+    position:relative;
+    flex-wrap:nowrap; justify-content:flex-start;
+    overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory; scrollbar-width:none;
+    padding:4px var(--m) 44px var(--bord); margin-bottom:-40px;
+    scroll-padding-left:var(--bord);
+  }
+  .abo-rail::-webkit-scrollbar{display:none}
+  .abo-rail .abo-carte, .abo-seule .abo-carte{flex:0 0 clamp(320px, 34vw, 380px); max-width:none}
+  .abo-rail .abo-carte{scroll-snap-align:start}
+  .abo-bas{
+    position:relative; z-index:1;
+    display:flex; justify-content:flex-end;
+    padding:clamp(20px, 3vh, 30px) var(--bord) 0;
+  }
+  .abo-seule{justify-content:flex-start; margin-top:clamp(28px, 4vh, 44px)}
+}
+@media (max-width:980px){
+  .tar{--m:28px; padding-left:0; padding-right:0}
+}
 </style>
 </head>
 <body>
@@ -2256,13 +2457,8 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
      ⚠ IMAGES À VENIR : les fonds actuels sont des attentes. Cartes 1 et 3 :
      des personnes, photo sombre, texte blanc. Carte 2 : un objet au logo
      Standix sur fond clair, texte foncé (`.pf-clair`). -->
-<section class="car car-pf" data-fond="sombre">
+<section class="car car-pf" data-fond="sombre" id="points-forts">
   <h2 class="car-t" data-monte>Points forts.</h2>
-  <!-- ⚠ ANCIENNE SECTION 3 (la phrase seule), devenue le sous-titre. -->
-  <p class="car-st" data-monte style="--d:90ms">
-    Vos équipes apprennent plus vite, se trompent moins souvent,
-    et le savoir-faire reste dans l'entreprise.
-  </p>
 
   <div class="car-piste" tabindex="0" aria-label="Trois cartes, faites défiler latéralement">
 
@@ -2414,51 +2610,83 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- ═══ SECTION 4 ═══ les situations : six problèmes que vit toute entreprise.
-     ⚠ DES SITUATIONS, PAS DES CATÉGORIES. « Hygiène et entretien » ne parlait
-     à personne ; « Un nouveau commence lundi » parle à tout dirigeant, quel
-     que soit son métier. Chaque tuile : la situation, puis sa conséquence.
-     ⚠ `class="car"` pour hériter de la limite gauche (--bord) et des marges
-     des carrousels ; il n'y a pas de piste, le script l'ignore. -->
-<section class="car taches" data-fond="sombre">
-  <h2 class="car-t" data-monte>Ça vous arrive aussi&nbsp;?</h2>
-  <div class="taches-grille">
-      <article class="tache" data-monte style="--d:60ms">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="tcRep" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DB9FF"/><stop offset="1" stop-color="#2F6BF0"/></linearGradient></defs><g stroke="url(#tcRep)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 11a7.5 7.5 0 0 1 13-4.6L19.5 8.5"/><path d="M19.5 4.2v4.3h-4.3"/><path d="M19.5 13a7.5 7.5 0 0 1-13 4.6L4.5 15.5"/><path d="M4.5 19.8v-4.3h4.3"/></g></svg>
-        <h3 class="tache-t">Vous répétez tout, tout le temps.</h3>
-        <p class="tache-p">Les mêmes explications, encore et encore, à chaque personne.</p>
-      </article>
-      <article class="tache" data-monte style="--d:130ms">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="tcNouv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8CF0A8"/><stop offset="1" stop-color="#2DBE6C"/></linearGradient></defs><g stroke="url(#tcNouv)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="8.2" r="3.4"/><path d="M3.6 20a6.4 6.4 0 0 1 12.8 0"/><path d="M19 7.6v6M16 10.6h6"/></g></svg>
-        <h3 class="tache-t">Un nouveau commence lundi.</h3>
-        <p class="tache-p">Et personne n'a vraiment le temps de le former.</p>
-      </article>
-      <article class="tache" data-monte style="--d:200ms">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="tcDep" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD36A"/><stop offset="1" stop-color="#FF8A2B"/></linearGradient></defs><g stroke="url(#tcDep)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 4H7a1.5 1.5 0 0 0-1.5 1.5v13A1.5 1.5 0 0 0 7 20h6.5"/><path d="M10.5 12h9.5M17 9l3 3-3 3"/></g></svg>
-        <h3 class="tache-t">Votre meilleur employé s'en va.</h3>
-        <p class="tache-p">Et tout ce qu'il savait faire part avec lui.</p>
-      </article>
-      <article class="tache" data-monte style="--d:270ms">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="tcErr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF6A5C"/><stop offset="1" stop-color="#E8364A"/></linearGradient></defs><g stroke="url(#tcErr)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4.2 21 19.6H3z"/><path d="M12 10v4.4"/><path d="M12 17.1v.1"/></g></svg>
-        <h3 class="tache-t">Une erreur coûte cher.</h3>
-        <p class="tache-p">Un geste mal fait, et c'est la casse, la perte ou l'accident.</p>
-      </article>
-      <article class="tache" data-monte style="--d:340ms">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="tcEq" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9A7FF"/><stop offset="1" stop-color="#8A5CF6"/></linearGradient></defs><g stroke="url(#tcEq)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.2"/><path d="M3.5 9.6h17M8 3v3.6M16 3v3.6"/><path d="M9 14.8h6M13 12.8l2 2-2 2"/></g></svg>
-        <h3 class="tache-t">Vos équipes changent souvent.</h3>
-        <p class="tache-p">Saisonniers, intérimaires, remplaçants : tout est à réexpliquer.</p>
-      </article>
-      <article class="tache" data-monte style="--d:410ms">
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="tcCla" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#C9D1DB"/><stop offset="1" stop-color="#8E9AAB"/></linearGradient></defs><g stroke="url(#tcCla)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.2a1.6 1.6 0 0 1 1.6-1.6h4.1l2 2.1h7.7a1.6 1.6 0 0 1 1.6 1.6v8.5a1.6 1.6 0 0 1-1.6 1.6H5.1a1.6 1.6 0 0 1-1.6-1.6z"/><path d="M8.5 13.6h7"/></g></svg>
-        <h3 class="tache-t">Vos procédures dorment dans un classeur.</h3>
-        <p class="tache-p">Personne ne les lit, parce que personne ne les trouve.</p>
-      </article>
+<!-- ═══ SECTION 4 ═══ les chiffres : trois résultats d'études, à la manière d'Apple.
+     ⚠ CHIFFRES RÉELS, SOURCES VÉRIFIÉES (septembre 2026) :
+       · 5,3 h et 42 % : Panopto avec YouGov, « Workplace Knowledge and
+         Productivity Report », juillet 2018 — 1 001 salariés aux États-Unis.
+       · 12 % : Gallup, « Why the Onboarding Experience Is Key for Retention ».
+     Ne pas arrondir, ne pas reformuler au point de changer le sens.
+     · 5,3 h = attendre une information de collègues OU recréer ce qui existe
+       déjà — la phrase dit les deux.
+     · 42 % = part du savoir propre à chaque salarié, non partagé : s'il part,
+       ses collègues ne peuvent pas faire cette part de son travail.
+     · 12 % = « strongly agree » que l'entreprise fait un excellent accueil. -->
+<section class="car chiffres" data-fond="sombre">
+  <!-- ⚠ LE TITRE ANNONCE LE SUJET : sans lui, les trois chiffres arrivaient de
+       nulle part. -->
+  <h2 class="car-t" data-monte>Un savoir mal transmis coûte cher.</h2>
+  <div class="chiffres-grille">
+    <div class="chiffre" data-monte>
+      <p class="chiffre-n">5,3&nbsp;h</p>
+      <p class="chiffre-t">perdues chaque semaine par un salarié, <b>à attendre une réponse ou à refaire ce qui existe déjà.</b></p>
+      <p class="chiffre-s">Panopto et YouGov, « Workplace Knowledge and Productivity Report », 2018</p>
+    </div>
+    <div class="chiffre" data-monte style="--d:90ms">
+      <p class="chiffre-n">42&nbsp;%</p>
+      <p class="chiffre-t">de ce que sait un salarié n'est connu que de lui. <b>S'il part, ce savoir part avec lui.</b></p>
+      <p class="chiffre-s">Panopto et YouGov, « Workplace Knowledge and Productivity Report », 2018</p>
+    </div>
+    <div class="chiffre" data-monte style="--d:180ms">
+      <p class="chiffre-n">12&nbsp;%</p>
+      <p class="chiffre-t">des salariés seulement trouvent que <b>leur entreprise accueille très bien les nouveaux.</b></p>
+      <p class="chiffre-s">Gallup, « Why the Onboarding Experience Is Key for Retention »</p>
+    </div>
   </div>
-  <p class="taches-fin" data-monte>Si c'est votre cas, <b>Standix est fait pour ça.</b></p>
 </section>
 
-<!-- ═══ SECTION 5 ═══ les tarifs : les cartes d'abonnement de l'app, en sombre. -->
-<section class="tar" data-fond="sombre">
+<!-- ═══ SECTION 5 ═══ la sécurité et les données.
+     ⚠ UNIQUEMENT DES FAITS VÉRIFIÉS, repris de la fiche « securite-standix.md »
+       (conversation « 1.2 », 9 septembre 2026) et des CGU :
+       · région Supabase eu-central-1 = FRANCFORT (confirmé par Em — PAS Zurich) ;
+       · cloisonnement par la base (RLS sur les dix tables), test sans fuite ;
+       · vidéos dans un espace privé, liens signés à durée limitée ;
+       · sauvegardes quotidiennes, 7 jours, même région, chiffrées au repos ;
+       · CGU art. 4 : pas d'entraînement de modèle, pas de diffusion hors de
+         l'entreprise ; CGU art. 7 : les sous-traitants (via le bouton).
+     ⚠ QUATRE TUILES SEULEMENT, les principales (sauvegardes et prestataires
+       retirés à la demande : trop d'éléments).
+     ⚠ NE PAS AFFIRMER : une certification (ni ISO 27001 ni SOC 2), ni la région
+       d'Azure. Les photos de profil sont encore dans un espace PUBLIC : ne pas
+       écrire « tout est privé ». -->
+<section class="car secu" data-fond="sombre" id="securite">
+  <h2 class="car-t" data-monte>Vos données restent les vôtres.</h2>
+  <div class="secu-grille">
+    <article class="secu-t" data-monte style="--d:40ms">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="scEur" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7DB9FF"/><stop offset="1" stop-color="#2F6BF0"/></linearGradient></defs><g stroke="url(#scEur)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.4 3.6 5.2 3.6 8.5s-1.2 6.1-3.6 8.5c-2.4-2.4-3.6-5.2-3.6-8.5s1.2-6.1 3.6-8.5z"/></g></svg>
+      <h3>Hébergées en Europe</h3>
+      <p>Vos données sont stockées à Francfort, en Allemagne. Le RGPD s'y applique, et la Suisse reconnaît ce niveau de protection.</p>
+    </article>
+    <article class="secu-t" data-monte style="--d:110ms">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="scClo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8CF0A8"/><stop offset="1" stop-color="#2DBE6C"/></linearGradient></defs><g stroke="url(#scClo)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10.5" width="16" height="10" rx="2.2"/><path d="M8 10.5V7.8a4 4 0 0 1 8 0v2.7"/><path d="M12 14.4v2.4"/></g></svg>
+      <h3>Chaque entreprise chez elle</h3>
+      <p>La base de données elle-même empêche une entreprise de voir les procédures, les vidéos ou les membres d'une autre. Un test le vérifie.</p>
+    </article>
+    <article class="secu-t" data-monte style="--d:180ms">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="scVid" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD36A"/><stop offset="1" stop-color="#FF8A2B"/></linearGradient></defs><g stroke="url(#scVid)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2.2"/><path d="M16 10.4l5-2.9v9l-5-2.9"/><path d="M8 12h3"/></g></svg>
+      <h3>Des vidéos privées</h3>
+      <p>Elles ne se lisent que par un lien temporaire, donné à vos membres connectés. Une adresse copiée finit par expirer.</p>
+    </article>
+    <article class="secu-t" data-monte style="--d:250ms">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><defs><linearGradient id="scPro" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8FA3"/><stop offset="1" stop-color="#E8364A"/></linearGradient></defs><g stroke="url(#scPro)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5.2c0 4.4-2.9 8.1-7 9.8-4.1-1.7-7-5.4-7-9.8V6l7-3z"/><path d="M8.8 12.3l2.2 2.2 4.3-4.6"/></g></svg>
+      <h3>Vos contenus restent à vous</h3>
+      <p>Nous ne les revendons pas et ne les utilisons ni pour entraîner une IA, ni pour les montrer hors de votre entreprise.</p>
+    </article>
+  </div>
+  <p class="secu-lien" data-monte><a class="secu-bouton" href="/cgu.html#a7">Le détail dans nos conditions d'utilisation <span aria-hidden="true">›</span></a></p>
+</section>
+
+<!-- ═══ SECTION 6 ═══ les tarifs : les cartes d'abonnement de l'app, en sombre. -->
+<section class="tar" id="tarifs" data-fond="sombre">
   <div class="tar-in">
     <p class="tar-sur" data-monte>Tarifs</p>
     <h2 class="tar-t" data-monte style="--d:90ms">Le prix est affiché.<br>Pas de devis, pas d'appel.</h2>
@@ -2477,7 +2705,14 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
         </linearGradient>
       </defs>
     </svg>
-    <div class="abo-liste">
+  </div>
+
+  <!-- ⚠ LES QUATRE FORMULES PAYANTES SUR UNE LIGNE QUI GLISSE (ordinateur et
+       tablette), avec le mécanisme des carrousels : `.abo-car` est pris en
+       charge par le même script que `section.car`. Sur téléphone, colonne.
+       La formule Entreprise est À PART, en dessous. -->
+  <div class="abo-car">
+    <div class="abo-liste abo-rail" tabindex="0" aria-label="Formules, faites défiler latéralement">
 
       <article class="abo-carte" data-monte>
         <div class="abo-haut">
@@ -2655,6 +2890,22 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
         </div>
       </article>
 
+    </div>
+    <div class="abo-bas">
+      <div class="car-fleches">
+        <button class="car-f car-f-g" type="button" aria-label="Formule précédente">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7"/></svg>
+        </button>
+        <button class="car-f car-f-d" type="button" aria-label="Formule suivante">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5 16 12l-6.5 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="tar-in">
+    <div class="abo-liste abo-seule">
+
       <article class="abo-carte" data-monte>
         <div class="abo-haut">
           <span class="abo-plaque" aria-hidden="true">
@@ -2699,8 +2950,136 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- Provisoire : de quoi faire défiler, le temps de rebâtir les sections. -->
-<section class="apres"><p>La suite de la page viendra ici.</p></section>
+<!-- ═══ SECTION 7 ═══ les questions fréquentes, juste après les tarifs.
+     ⚠ RÉPONSES VÉRIFIÉES sur l'app et ses formules (vidéo de 5 min au plus ;
+       texte, PDF ou Word ; code d'invitation 15 min / 2 h / 7 jours ; FR, EN,
+       DE ; analyses par formule ; prix HT, −20 % à l'année ; durée d'analyse
+       d'après les mesures d'Em, environ 10 min). NE RIEN AJOUTER SANS
+       CONFIRMATION : fin de l'essai, lieu de stockage, compte des employés.
+     ⚠ `class="car"` pour la limite gauche (--bord). -->
+<section class="car faq" data-fond="sombre" id="faq">
+  <h2 class="car-t" data-monte>Questions fréquentes.</h2>
+  <div class="faq-liste" data-monte style="--d:90ms">
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r1" id="faq-b1">
+          <span>Faut-il installer une application ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r1" role="region" aria-labelledby="faq-b1">
+        <p>Non. Standix s'ouvre dans le navigateur, sur téléphone, tablette ou ordinateur.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r2" id="faq-b2">
+          <span>Comment l'IA crée-t-elle une procédure ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r2" role="region" aria-labelledby="faq-b2">
+        <p>Vous filmez le geste, en 5&nbsp;minutes maximum, ou vous lui donnez un document&nbsp;: un texte collé, un PDF ou un Word. L'IA découpe le contenu en étapes et les rédige. Vous relisez, vous corrigez, puis vous publiez.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r3" id="faq-b3">
+          <span>Combien de temps prend l'analyse d'une vidéo ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r3" role="region" aria-labelledby="faq-b3">
+        <p>Une dizaine de minutes en général. L'analyse tourne toute seule&nbsp;: vous pouvez faire autre chose pendant ce temps.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r4" id="faq-b4">
+          <span>Comment mon équipe accède-t-elle aux procédures ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r4" role="region" aria-labelledby="faq-b4">
+        <p>Vous partagez un code d'invitation, valable 15&nbsp;minutes, 2&nbsp;heures ou 7&nbsp;jours. Chacun rejoint l'entreprise depuis son téléphone. Les procédures s'ouvrent ensuite dans l'app, ou en scannant le QR code collé au poste.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r5" id="faq-b5">
+          <span>Dans quelles langues fonctionne Standix ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r5" role="region" aria-labelledby="faq-b5">
+        <p>En français, en anglais et en allemand.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r6" id="faq-b6">
+          <span>Qu'est-ce qu'une analyse vidéo IA ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r6" role="region" aria-labelledby="faq-b6">
+        <p>C'est une vidéo transformée en procédure par l'IA. Chaque formule en inclut un nombre par mois&nbsp;: 30 pour Essentiel, 60 pour Équipe, 120 pour Pro, 250 pour Réseau.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r7" id="faq-b7">
+          <span>Les prix sont-ils hors taxes ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r7" role="region" aria-labelledby="faq-b7">
+        <p>Oui. En payant à l'année, vous économisez 20&nbsp;%.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SECTION 8 ═══ le dernier appel à l'action.
+     ⚠ LE BOUTON MÈNE À L'APP (/app/). Les autres boutons « Essayer 14 jours »
+     du site pointent encore vers #essai, qui n'existe pas : à relier. -->
+<section class="car fin" data-fond="sombre" id="commencer">
+  <div class="fin-in">
+    <h2 class="fin-t" data-monte>Prêt à transmettre<br>votre savoir-faire&nbsp;?</h2>
+    <p class="fin-s" data-monte style="--d:90ms">14&nbsp;jours d'essai. Sans carte bancaire.</p>
+    <a class="fin-cta" href="/app/" data-monte style="--d:180ms">Essayer 14 jours</a>
+  </div>
+</section>
+
+<!-- ═══ LE PIED DE PAGE ═══
+     ⚠ LES PAGES LÉGALES SONT DANS /cgu.html (à la RACINE, pas dans app/) :
+       article 1 = qui édite Standix (tient lieu de mentions légales),
+       article 8 = données personnelles. Liens absolus, commençant par « / ». -->
+<footer class="pied" data-fond="sombre">
+  <div class="pied-in">
+    <div class="pied-marque">
+      <span class="pied-logo"><img data-signe-clair alt="" width="972" height="1354"><span class="logotype">Standix</span></span>
+      <p>Votre savoir-faire, transmis simplement.</p>
+    </div>
+    <nav class="pied-cols" aria-label="Pied de page">
+      <div class="pied-col">
+        <h3>Standix</h3>
+        <a href="#points-forts">Points forts</a>
+        <a href="#tarifs">Tarifs</a>
+        <a href="#securite">Sécurité</a>
+        <a href="#faq">Questions fréquentes</a>
+        <a href="/app/">Se connecter</a>
+      </div>
+      <div class="pied-col">
+        <h3>Informations légales</h3>
+        <a href="/cgu.html">Conditions d'utilisation</a>
+        <a href="/cgu.html#a1">Mentions légales</a>
+        <a href="/cgu.html#a8">Données personnelles</a>
+      </div>
+      <div class="pied-col">
+        <h3>Contact</h3>
+        <a href="mailto:standix.app@gmail.com">standix.app@gmail.com</a>
+      </div>
+    </nav>
+    <div class="pied-bas">
+      <p>© 2026 Standix. Tous droits réservés.</p>
+      <p>Prix indiqués hors taxes.</p>
+    </div>
+  </div>
+</footer>
 
 <script>
 (function(){
@@ -2759,6 +3138,9 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   /* ⚠ LA PREMIÈRE SECTION APRÈS LE PREMIER ÉCRAN, pas une classe précise : la
      section 2 a déjà changé plusieurs fois. */
   const deux=document.querySelector('.hero ~ section');
+  /* ⚠ LE FONDU S'ÉTEINT QUAND LE PIED DE PAGE ARRIVE : sinon il floutait la
+     dernière ligne (« © 2026 Standix »), qui ne peut pas remonter plus haut. */
+  const pied=document.querySelector('.pied');
 
   /* ⚠ La barre doit basculer sur TOUTE section sombre, pas seulement sur la
      première. Elles se déclarent elles-mêmes par `data-fond="sombre"` : en
@@ -2811,12 +3193,14 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
      ⚠ UN PASSAGE PAR SECTION `.car` : piste et flèches se cherchent DANS la
      section. Avec `document.querySelector`, les flèches du second carrousel
      auraient piloté le premier. */
-  document.querySelectorAll('section.car').forEach((sec)=>{
-    const piste=sec.querySelector('.car-piste');
+  /* ⚠ `.abo-car` : la ligne des tarifs, même mécanisme (piste `.abo-rail`,
+     cartes `.abo-carte`). */
+  document.querySelectorAll('section.car, .abo-car').forEach((sec)=>{
+    const piste=sec.querySelector('.car-piste, .abo-rail');
     const gauche=sec.querySelector('.car-f-g');
     const droite=sec.querySelector('.car-f-d');
     if(piste && gauche && droite){
-      const cartes=[...piste.querySelectorAll('.car-c')];
+      const cartes=[...piste.querySelectorAll('.car-c, .abo-carte')];
       let courant=0;
       const retrait=()=>parseFloat(getComputedStyle(piste).paddingLeft);
       const lire=()=>{
@@ -2831,7 +3215,11 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
         /* ⚠ LA BORNE GAUCHE SE LIT SUR L'INDICE (l'aimantation ne cale jamais
            sur zéro), LA DROITE SUR LE DÉFILEMENT (plusieurs cartes tiennent à
            l'écran). Deux pixels de tolérance. */
-        gauche.disabled = best === 0;
+        /* ⚠ ET LA PISTE EST REVENUE AU DÉBUT : sur un très grand écran, la ligne
+           des tarifs ne glisse que de quelques dizaines de pixels — la première
+           carte reste la plus proche du bord, et la flèche gauche ne se
+           rallumait jamais. */
+        gauche.disabled = best === 0 && piste.scrollLeft <= 2;
         /* ⚠ OU LA DERNIÈRE CARTE EST CALÉE : sur téléphone la piste peut encore
            glisser de quelques pixels au-delà (réserve + retrait), et la flèche
            restait active sans rien avoir à montrer. */
@@ -2939,6 +3327,38 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     poser(false);
     b.addEventListener('click', ()=>poser(!carte.classList.contains('retourne')));
   });
+
+  /* ─── LES QUESTIONS FRÉQUENTES ─── */
+  {
+    const vite = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.querySelectorAll('.faq-b').forEach((b)=>{
+      const r = document.getElementById(b.getAttribute('aria-controls'));
+      if(!r) return;
+      r.addEventListener('transitionend', (e)=>{
+        if(e.target === r && e.propertyName === 'height' && r.classList.contains('ouvert')) r.style.height = 'auto';
+      });
+      b.addEventListener('click', ()=>{
+        const ouvert = b.getAttribute('aria-expanded') === 'true';
+        if(ouvert){
+          r.style.height = r.scrollHeight + 'px';
+          void r.offsetHeight;
+          r.classList.remove('ouvert');
+          r.style.height = '0px';
+        } else {
+          r.classList.add('ouvert');
+          r.style.height = vite ? 'auto' : r.scrollHeight + 'px';
+        }
+        b.setAttribute('aria-expanded', ouvert ? 'false' : 'true');
+      });
+    });
+  }
+
+  /* ─── LE LOGO DU PIED DE PAGE ───
+     ⚠ Il reprend la source du logo clair du chargement (27 ko, pas dupliqué). */
+  {
+    const clair=document.querySelector('.signe-clair');
+    if(clair) document.querySelectorAll('img[data-signe-clair]').forEach(i=>{ i.src=clair.currentSrc || clair.src; });
+  }
 
   /* Un seul observateur pour tous les éléments à faire monter. On le
      débranche élément par élément : ils n'arrivent qu'une fois.
@@ -3056,7 +3476,8 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
        écran : avec une avance, la condition était déjà vraie au chargement et
        le fondu s'affichait par-dessus le premier écran. Trente pixels
        d'engagement suffisent à dire qu'on y entre vraiment. */
-    fondu.classList.toggle('la', deux.getBoundingClientRect().top < innerHeight - 30);
+    fondu.classList.toggle('la', deux.getBoundingClientRect().top < innerHeight - 30
+      && !(pied && pied.getBoundingClientRect().top < innerHeight));
     const b=barre.getBoundingClientRect();
     hote.classList.toggle('sombre', sombres.some(e=>{
       const s=e.getBoundingClientRect();

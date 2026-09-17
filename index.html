@@ -7,7 +7,37 @@
      que sur Chrome Android. Le reste est fait plus bas, en CSS et en code. -->
 <meta name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Standix — hero clair</title>
+<meta name="theme-color" content="#000000">
+<!-- ⚠ LE TITRE ET LA DESCRIPTION SONT CEUX DES APERÇUS DE PARTAGE (WhatsApp,
+     iMessage, LinkedIn…) ET DE GOOGLE. Courts, directs, fidèles à l'app.
+     ⚠ URL ABSOLUES pour l'image : les messageries ne suivent pas un chemin
+     relatif. L'image et les icônes sont à la RACINE du dépôt.
+     ⚠ L'IMAGE A CHANGÉ DE NOM (site-partage-8.jpg) : les messageries gardent
+     une image en mémoire d'après son adresse. Nouvelle image = nouveau nom.
+     ⚠ LES MESSAGERIES GARDENT L'ANCIEN APERÇU EN MÉMOIRE : pour voir le
+     nouveau, partager https://standix.app/?v=2 (ou attendre). -->
+<title>Standix — Toutes vos procédures, au même endroit</title>
+<meta name="description" content="Créez vos procédures avec l'IA, à partir d'une vidéo ou d'un document. Votre équipe les retrouve sur son téléphone, ou d'un scan de QR code. 14 jours d'essai, sans carte bancaire.">
+<link rel="canonical" href="https://standix.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Standix">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:url" content="https://standix.app/">
+<meta property="og:title" content="Standix — Toutes vos procédures, au même endroit">
+<meta property="og:description" content="Créez vos procédures avec l'IA, à partir d'une vidéo ou d'un document.">
+<meta property="og:image" content="https://standix.app/site-partage-8.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Le logo Standix et la phrase « Toutes vos procédures, au même endroit. », sur fond noir">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Standix — Toutes vos procédures, au même endroit">
+<meta name="twitter:description" content="Créez vos procédures avec l'IA, à partir d'une vidéo ou d'un document.">
+<meta name="twitter:image" content="https://standix.app/site-partage-8.jpg">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/site-favicon-32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/site-favicon-96.png">
+<link rel="apple-touch-icon" href="/site-apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
@@ -55,18 +85,22 @@ html,body{margin:0;padding:0}
    bascule le téléphone en paysage. */
 
 html{
+  background:#000000;
   -webkit-text-size-adjust:100%; text-size-adjust:100%;
 }
 /* ⚠ DEUX SECTIONS SOMBRES QUI SE SUIVENT SE CHEVAUCHENT D'UN PIXEL. La page
-   est blanche (--papier) derrière elles : quand leur jonction tombe entre
+   était blanche derrière elles (elle est noire désormais, la règle reste
+   utile entre sections claires) : quand leur jonction tombe entre
    deux pixels (hauteur fractionnaire, écran à densité non entière), un filet
    blanc atténué passait entre les deux — une ligne grise sur deux fonds
    identiques. La seconde section, peinte après, recouvre la jonction. */
 [data-fond="sombre"] + [data-fond="sombre"]{margin-top:-1px}
 
+/* ⚠ LE FOND DE LA PAGE EST NOIR : c'est lui qu'on voit quand on tire la page
+   au-delà du haut ou du bas (iPhone), et derrière toute section. */
 body{
   touch-action:manipulation;
-  background:var(--papier);
+  background:#000000;
   font-family:Inter,system-ui,sans-serif; color:var(--gris);
   -webkit-font-smoothing:antialiased;
 }

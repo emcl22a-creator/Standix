@@ -44,7 +44,15 @@
 <link rel="apple-touch-icon" href="/site-apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<!-- ⚠ INTER EST DEMANDÉ EN FONTE VARIABLE (`wght@400..700`), PLUS EN QUATRE
+     GRAISSES FIXES. Avec des graisses fixes, une valeur intermédiaire comme
+     560 n'existe pas : le navigateur remonte à la plus proche au-dessus, donc
+     600, et l'allègement des titres ne se voyait pas. La fonte variable les
+     rend toutes, et c'est un seul fichier au lieu de quatre.
+     ⚠ LA PLAGE DESCEND À 300, PAS 400 : la ligne sous le titre du premier
+     écran est en 380. Sans cette plage, elle serait ramenée à 400 et
+     l'allègement disparaîtrait sans erreur ni avertissement. -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════
    LES JETONS
@@ -361,7 +369,10 @@ body.pret .chargement{animation:voile-part .85s cubic-bezier(.32,.72,0,1) forwar
    techniquement, mais deux bleus dans le même écran — le nom et le bouton — et
    surtout un surtitre qui attire l'œil vole l'attention à la ligne qui porte le
    message. Le surtitre annonce, le titre parle. */
-.sur{margin:0; font-size:clamp(11.5px, .84vw, 14px); font-weight:600;
+/* ⚠ +10 % (à la demande) : le surtitre était à 12 px sous un titre de 66 px
+   à 1440, il ne tenait plus le couple. Une seule règle, pas de variante par
+   taille d'écran : elle vaut partout. */
+.sur{margin:0; font-size:clamp(12.5px, .93vw, 15.5px); font-weight:600;
      letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.52)}
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -395,7 +406,7 @@ body.pret .chargement{animation:voile-part .85s cubic-bezier(.32,.72,0,1) forwar
 
 
 h1{
-  font-family:Inter,sans-serif; font-weight:600;
+  font-family:Inter,sans-serif; font-weight:560;
   /* 4,9 vw : 71 px sur un écran de 1440. Le passage à 5,6 vw l'avait porté à
      81, ce qui était trop — un titre de deux lignes à cette taille occupe la
      moitié de la hauteur utile et écrase l'appareil. */
@@ -409,8 +420,18 @@ h1{
    balisage reste lisible. */
 .sous{
   margin:clamp(12px,1.7vh,20px) auto 0;
-  font-size:clamp(14px, 1.05vw, 17.5px); line-height:1.5; letter-spacing:-.012em;
+  /* ⚠ AGRANDIE SUR ORDINATEUR SEULEMENT (à la demande) : 15 px sous un titre
+     de 66 px, la ligne se perdait. Le facteur `vw` est calé sur 18 px à
+     1440 (la largeur de référence) et PLAFONNÉ À 18,5 px, atteint dès 1480 px
+     de large. Les écrans étroits ne sont pas touchés —
+     leurs trois règles `.sous` vivent dans des `@media (max-width:980px)` et
+     l'emportent de toute façon sur celle-ci. */
+  font-size:clamp(13.5px, 1.25vw, 18.5px); line-height:1.5; letter-spacing:-.012em;
   color:rgba(255,255,255,.6); max-width:56ch; text-wrap:balance;
+  /* ⚠ 380, SOUS LE 400 DU CORPS DE TEXTE (à la demande). Ne marche que grâce
+     à la plage `wght@300..700` du <link> : en 400..700, cette valeur serait
+     ramenée à 400. */
+  font-weight:380;
 }
 .sous span{margin-right:.16em; color:rgba(255,255,255,.34)}
 
@@ -802,10 +823,14 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   background:#1D1D1F;
   padding:clamp(80px, 13vh, 170px) 0 clamp(60px, 9vh, 110px);
 }
+/* ⚠ 560 ET NON 600 (à la demande : titres très légèrement allégés). Cette
+   valeur n'a d'effet QUE parce qu'Inter est chargée en fonte variable — voir
+   la balise <link> en haut du fichier. Revenir à des graisses fixes ramènerait
+   silencieusement tous ces titres à 600. */
 .car-t{
   margin:0 0 clamp(34px, 5vh, 62px);
   padding-left:var(--bord); padding-right:var(--bord);
-  font-family:Inter,sans-serif; font-weight:600;
+  font-family:Inter,sans-serif; font-weight:560;
   /* ⚠ LA TAILLE DES AUTRES TITRES DE SECTION (.pts-t, .tar-t) : plus
      grand, il pesait autant que le titre du premier écran. */
   font-size:clamp(28px, 3.4vw, 52px); letter-spacing:-.036em; line-height:1.07;
@@ -1478,7 +1503,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 .fin-in{padding-left:var(--bord); padding-right:var(--bord); text-align:center}
 .fin-t{
   margin:0;
-  font-family:Inter,sans-serif; font-weight:600;
+  font-family:Inter,sans-serif; font-weight:560;
   font-size:clamp(34px, 4.4vw, 64px); line-height:1.06; letter-spacing:-.04em;
   color:#F5F5F7; text-wrap:balance;
 }
@@ -1683,7 +1708,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 .car.cout{padding-top:clamp(78px, 13.5vh, 160px); padding-bottom:clamp(96px, 17vh, 200px)}
 .cout-t{
   margin:0 auto; max-width:19ch; padding:0 28px; box-sizing:content-box;
-  font-family:Inter,sans-serif; font-weight:600;
+  font-family:Inter,sans-serif; font-weight:560;
   font-size:clamp(30px, 4.6vw, 66px); line-height:1.08; letter-spacing:-.04em;
   color:#F5F5F7; text-align:center; text-wrap:balance;
 }
@@ -1706,11 +1731,13 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    noir. Si le fond de la section change un jour, les icônes suivent. */
 .cout-liste{
   display:grid; gap:clamp(58px, 7.8vh, 94px);
-  max-width:1120px; margin:clamp(56px, 8vh, 112px) auto 0;
+  max-width:780px; margin:clamp(56px, 8vh, 112px) auto 0;
   padding-left:28px; padding-right:28px;
 }
 @media (min-width:760px){
-  .cout-liste{grid-template-columns:repeat(3, minmax(0, 1fr)); gap:clamp(32px, 4vw, 72px)}
+  /* ⚠ DEUX COLONNES DEPUIS QU'IL NE RESTE QUE DEUX POINTS : à trois colonnes,
+     la troisième restait vide et la paire se retrouvait décalée à gauche. */
+  .cout-liste{grid-template-columns:repeat(2, minmax(0, 1fr)); gap:clamp(32px, 4vw, 72px)}
 }
 .cout-i{text-align:center}
 .cout-ic{
@@ -1744,7 +1771,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 }
 .pts-t, .tar-t{
   margin:0 auto clamp(48px, 7vh, 96px); max-width:20ch;
-  font-family:Inter,sans-serif; font-weight:600;
+  font-family:Inter,sans-serif; font-weight:560;
   font-size:clamp(28px, 3.4vw, 52px); letter-spacing:-.036em; line-height:1.07;
   color:#FFFFFF; text-wrap:balance;
 }
@@ -2778,8 +2805,14 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 
   <h1>Votre savoir-faire<br>transmis simplement.</h1>
 
-  <!-- ⚠ PLUS DE SOUS-TITRE SOUS LE TITRE (retiré à la demande). Le script qui
-       dimensionne l'appareil prend alors le titre comme bas du texte. -->
+  <!-- ⚠ LE SOUS-TITRE EST DE RETOUR (à la demande) : il avait été retiré plus
+       tôt, mais rien ne disait plus ce que fait Standix avant l'appareil.
+       ⚠ REPRENDRE LA CLASSE `.sous`, PAS UNE AUTRE : ses styles, son animation
+       d'entrée et ses règles d'écran étroit sont restés en place, et le script
+       qui dimensionne l'appareil la cherche NOMMÉMENT (`.sous`, sinon le
+       titre). Sous un autre nom, la hauteur du téléphone se recalculerait à
+       côté. -->
+  <p class="sous">Toutes vos procédures, au même endroit.</p>
 
   <!-- ═══ LA SCÈNE ═══ l'appareil, et trois fragments de l'app autour. -->
   <i class="ecart" aria-hidden="true"></i>
@@ -2988,9 +3021,14 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
      disparaît, c'est la deuxième respiration de page.
      ⚠ LE CHIFFRE DE 30 € EST UNE HYPOTHÈSE, pas une mesure : il est annoncé
      comme tel sous la liste. Ne jamais le présenter comme une donnée.
-     ⚠ NE PAS ÉCRIRE QUE DEUX HEURES DÉPASSENT LE PRIX : à 30 € de l'heure,
-     deux heures font 60 €, et l'abonnement 69 €. L'ancien texte l'affirmait,
-     c'était faux. Ici chaque bloc donne son chiffre, le lecteur compare. -->
+     ⚠ VÉRIFIER L'ARITHMÉTIQUE DE TOUTE COMPARAISON ÉCRITE ICI. Une version
+     précédente affirmait que deux heures dépassaient le prix : à 30 € de
+     l'heure, deux heures font 60 € et l'abonnement 69 € — c'était faux. La
+     comparaison actuelle porte sur une DEMI-JOURNÉE : 4 h × 30 € = 120 €,
+     contre 69 €. Elle tient, et avec de la marge.
+     ⚠ LES TROIS POINTS SONT DES BÉNÉFICES, PAS DES CHIFFRES (à la demande) :
+     temps gagné, argent économisé, savoir-faire conservé. Le titre annonce le
+     gain, la phrase le prouve en une ligne. Pas de deuxième phrase. -->
 <section class="car cout" data-fond="sombre" id="calcul">
   <p class="cout-t" data-monte>Un savoir mal transmis coûte cher.</p>
   <p class="cout-s" data-monte style="--d:90ms">Ce qu'un salarié sait faire finit par se perdre. Standix le garde,
@@ -2999,25 +3037,19 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   <div class="cout-liste">
     <div class="cout-i" data-monte style="--d:180ms">
       <svg class="cout-ic" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M32 2a30 30 0 1 0 0 60 30 30 0 0 0 0-60zm3.4 12v17.1l12.2 7-3.4 5.9L29 34.8V14h6.4z"/></svg>
-      <p class="cout-i-t">Deux heures par mois</p>
-      <p class="cout-i-x">Le temps qu'un salarié expérimenté passe à réexpliquer
-        un geste, reprendre une erreur ou accompagner un nouveau.</p>
+      <p class="cout-i-t">Gagnez du temps</p>
+      <p class="cout-i-x">Le geste est filmé une fois. Personne ne le
+        réexplique.</p>
     </div>
     <div class="cout-i" data-monte style="--d:260ms">
-      <svg class="cout-ic" viewBox="3 3 58 58" aria-hidden="true"><path fill-rule="evenodd" d="M33.5 4H12a8 8 0 0 0-8 8v21.5a8 8 0 0 0 2.34 5.66l20.5 20.5a8 8 0 0 0 11.32 0l17.5-17.5a8 8 0 0 0 0-11.32l-20.5-20.5A8 8 0 0 0 33.5 4zM19 13a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
-      <p class="cout-i-t">69 € par mois</p>
-      <p class="cout-i-x">La formule Essentiel, jusqu'à 5&nbsp;membres et autant
-        de procédures que vous voulez.</p>
-    </div>
-    <div class="cout-i" data-monte style="--d:340ms">
-      <svg class="cout-ic" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M14.5 7h35a7.5 7.5 0 0 1 7.5 7.5v35a7.5 7.5 0 0 1-7.5 7.5h-35A7.5 7.5 0 0 1 7 49.5v-35A7.5 7.5 0 0 1 14.5 7zm12 14.4v21.2L44 32 26.5 21.4z"/></svg>
-      <p class="cout-i-t">Expliqué une fois</p>
-      <p class="cout-i-x">Le geste est filmé une seule fois. Il reste ensuite
-        disponible pour toute l'équipe, même après un départ.</p>
+      <svg class="cout-ic" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M12 7h30.6a6 6 0 0 1 4.85 2.46l13.2 19a6 6 0 0 1 0 7.08l-13.2 19A6 6 0 0 1 42.6 57H12a6 6 0 0 1-6-6V13a6 6 0 0 1 6-6zm8 19a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
+      <p class="cout-i-t">Dépensez moins</p>
+      <p class="cout-i-x">69 € par mois. Moins qu'une demi-journée passée à
+        former quelqu'un.</p>
     </div>
   </div>
 
-  <p class="cout-note" data-monte style="--d:420ms">Calcul fait sur un coût horaire chargé de 30&nbsp;€. À ajuster avec vos chiffres.</p>
+  <p class="cout-note" data-monte style="--d:420ms">Comparaison faite sur un coût horaire chargé de 30&nbsp;€. À ajuster avec vos chiffres.</p>
 </section>
 
 <!-- ═══ SECTION 6 ═══ la sécurité et les données.

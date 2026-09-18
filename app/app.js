@@ -247,7 +247,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Drag to fine-tune to a tenth of a second",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Film the task while explaining out loud, the AI writes the steps",
     "Filmez puis découpez chaque étape": "Film, then cut each step",
-    "Vidéo de 5 min maximum": "Video, 5 min maximum",
+    "Limité à 5 min de vidéo": "Limited to 5 min of video",
     "Fin": "End",
     "Fin ici": "End here",
     "Glissez sur la frise pour naviguer dans la vidéo": "Drag the timeline to move through the video",
@@ -455,7 +455,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Arrastra para ajustar a la décima de segundo",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Graba la tarea explicando en voz alta, la IA genera los pasos",
     "Filmez puis découpez chaque étape": "Graba y luego corta cada paso",
-    "Vidéo de 5 min maximum": "Vídeo de 5 min máximo",
+    "Limité à 5 min de vidéo": "Limitado a 5 min de vídeo",
     "Fin": "Fin",
     "Fin ici": "Fin aquí",
     "Glissez sur la frise pour naviguer dans la vidéo": "Desliza por la línea de tiempo para navegar por el vídeo",
@@ -657,7 +657,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Arraste para ajustar ao décimo de segundo",
     "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Filme a tarefa explicando em voz alta, a IA gera as etapas",
     "Filmez puis découpez chaque étape": "Filme e depois corte cada etapa",
-    "Vidéo de 5 min maximum": "Vídeo de 5 min no máximo",
+    "Limité à 5 min de vidéo": "Limitado a 5 min de vídeo",
     "Fin": "Fim",
     "Fin ici": "Fim aqui",
     "Glissez sur la frise pour naviguer dans la vidéo": "Deslize na linha de tempo para navegar no vídeo",
@@ -14743,7 +14743,7 @@ function expliquerComptage() {
     message:
       "Le compteur tourne quand une proc\u00e9dure est OUVERTE \u00e0 l'\u00e9cran, et seulement l\u00e0.\n\n" +
       "\u2022 Il s'arr\u00eate d\u00e8s que l'app passe en arri\u00e8re-plan ou que l'\u00e9cran s'\u00e9teint.\n" +
-      "\u2022 Apr\u00e8s une minute sans le moindre geste, il demande \u00ab vous en \u00eates o\u00f9 ? \u00bb " +
+      "\u2022 Apr\u00e8s deux minutes sans le moindre geste, il demande \u00ab vous en \u00eates o\u00f9 ? \u00bb " +
       "et cesse de compter tant que personne ne r\u00e9pond \u2014 un t\u00e9l\u00e9phone pos\u00e9 sur le plan " +
       "de travail n'accumule pas des heures.\n" +
       "\u2022 Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture.\n\n" +
@@ -14762,9 +14762,54 @@ function expliquerComptage() {
 /* `expliquerDurees` a été retirée avec son bouton : elle décrivait le temps
    affiché sur les blocs Dossiers et Procédures, disparus de la page. */
 
+/* Ce que compte « Les plus lues ».
+
+   ⚠ CE N'EST PAS LA MÊME QUESTION QUE `expliquerComptage`. Celle-là explique
+     comment le TEMPS s'additionne ; celle-ci, à partir de quand une visite
+     devient une LECTURE. On croit facilement qu'ouvrir la fiche suffit, et
+     le classement paraît alors faux.
+
+   Court volontairement : trois phrases. Une aide qu'on ne lit pas jusqu'au
+   bout ne vaut pas mieux qu'une aide absente. */
+function expliquerLectures() {
+  confirmDialog({
+    titre: 'Comment les lectures sont comptées',
+    message:
+      "Une lecture est comptée quand la procédure est restée " +
+      "" + DUREE_LECTURE_MIN + " secondes à l'écran. En dessous, rien n'est " +
+      "compté : c'est un passage, pas une lecture.\n\n" +
+      "Le décompte s'arrête dès que l'app passe en arrière-plan ou que " +
+      "l'écran s'éteint.\n\n" +
+      "Une même personne qui rouvre la procédure ne compte qu'une fois.",
+    confirmer: 'Compris',
+    annuler: null,
+    danger: false,
+  })
+}
+
+/* Quand le temps se met en pause.
+
+   ⚠ TROIS PHRASES, PAS UNE DE PLUS. C'est la feuille « Temps par procédure » :
+     on y vient pour lire des chiffres, pas un mode d'emploi. La seule chose
+     qu'on ne devine pas, c'est que le compteur s'arrête tout seul. */
+function expliquerPauseTemps() {
+  confirmDialog({
+    titre: 'Quand le temps se met en pause',
+    message:
+      "Le compteur se met en pause quand la procédure reste ouverte sans " +
+      "qu'aucun geste ne soit fait à l'écran, à partir de 2 minutes.\n\n" +
+      "Il repart dès qu'on touche l'écran ou qu'on fait défiler.\n\n" +
+      "Un téléphone posé sur le plan de travail n'accumule donc pas d'heures.",
+    confirmer: 'Compris',
+    annuler: null,
+    danger: false,
+  })
+}
 
 document.addEventListener('click', (e) => {
   if (e.target.closest('[data-aide-temps]')) expliquerComptage()
+  if (e.target.closest('[data-aide-lectures]')) expliquerLectures()
+  if (e.target.closest('[data-aide-pause]')) expliquerPauseTemps()
 })
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -28510,8 +28555,17 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
    Le décompte se met en pause si la fiche est quittée ou l'app mise en veille,
    et reprend là où il s'était arrêté : lire en deux fois reste lire.
    ═══════════════════════════════════════════════════════════════════════════ */
-/* Au bout d'une minute sans un geste, on s'assure que quelqu'un est bien là. */
-const INACTIVITE_MAX = 60 * 1000
+/* Au bout de deux minutes sans un geste, on s'assure que quelqu'un est bien là.
+
+   ⚠ C'ETAIT UNE MINUTE, ET C'EST MONTE A DEUX. Une minute coupait des lectures
+     réelles : on regarde une vidéo de démonstration, on exécute l'étape qu'on
+     vient de lire, les mains dans la farine — l'écran ne bouge pas alors que la
+     personne est bel et bien en train de suivre la procédure. La question
+     tombait en plein travail, et le temps cessait d'être compté.
+
+   ⚠ CE NOMBRE EST ANNONCE A L'ECRAN, deux fois : `expliquerPauseTemps` et
+     `expliquerComptage`. Le changer ici sans changer là ferait mentir l'aide. */
+const INACTIVITE_MAX = 2 * 60 * 1000
 let derniereActivite = 0
 let lectureBase = 0            // temps déjà en base avant cette visite
 let veilleAvertie = false
@@ -28553,7 +28607,7 @@ function demarrerLecture(procId, dejaConsultee) {
   lectureTimer = setInterval(() => {
     if (document.hidden) return          // app en arrière-plan : on ne compte pas
 
-    /* L'écran n'a pas bougé depuis une minute : on demande une confirmation avant
+    /* L'écran n'a pas bougé depuis deux minutes : on demande une confirmation avant
        de continuer à compter. Sans ça, un téléphone posé sur le plan de travail
        accumulerait des heures que personne n'a passées à lire. */
     if (Date.now() - derniereActivite > INACTIVITE_MAX) {
@@ -28583,7 +28637,7 @@ function demarrerLecture(procId, dejaConsultee) {
    accumulerait des heures que personne n'a passées à lire. Le temps affiché au
    responsable perdrait alors tout sens.
 
-   Au bout d'une minute sans un seul geste, on pose donc la question. Le
+   Au bout de deux minutes sans un seul geste, on pose donc la question. Le
    décompte reprend dès qu'on répond, et rien ne se perd.
 
    Ce que la fenêtre ne dit PAS, et c'est délibéré : qu'un chronomètre tourne.
@@ -28630,9 +28684,28 @@ function arreterLecture() {
    donc à trente secondes, quelle que soit leur durée réelle. */
 function quitterLecture() {
   arreterLecture()
-  if (!lectureProcId || !currentMembre || lectureSecondes < 3) return
-  /* Sous trois secondes, on ne retient rien : c'est un passage, pas une
-     lecture. Écrire une seconde salirait la moyenne pour rien. */
+  if (!lectureProcId || !currentMembre) return
+
+  /* ⚠ LE SEUIL ÉTAIT À TROIS SECONDES, ET IL FAUSSAIT « LES PLUS LUES ».
+
+     Le classement compte les LIGNES de `validations`, une par membre et par
+     procédure. Or cette écriture-ci CRÉE la ligne quand elle n'existe pas :
+     une visite de quatre secondes en posait une, et comptait donc comme une
+     lecture — alors que `enregistrerConsultation`, le seul endroit censé
+     décider qu'une lecture a eu lieu, attend trente secondes.
+
+     Deux seuils pour une même notion, et c'est le plus bas qui l'emportait :
+     ouvrir une fiche et ressortir gonflait le classement.
+
+     ⚠ MAIS ON CONTINUE D'ÉCRIRE SUR UNE LIGNE QUI EXISTE DÉJÀ. Le seuil ne
+       protège que la NAISSANCE de la ligne. Quelqu'un qui revient dix
+       secondes sur une procédure déjà lue ne crée aucune lecture de plus :
+       ces dix secondes sont réelles, elles s'ajoutent au temps cumulé. Les
+       jeter n'aurait servi à rien. */
+  const ligneExiste = (mesLectures || []).some(v => v.procedure_id === lectureProcId)
+  if (!ligneExiste && lectureSecondes < DUREE_LECTURE_MIN) return
+  if (lectureSecondes < 1) return
+
   ecrireTempsLecture()
 }
 

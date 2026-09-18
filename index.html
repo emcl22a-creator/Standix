@@ -1635,6 +1635,78 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   color:rgba(235,235,245,.6); text-align:center; text-wrap:pretty;
 }
 
+/* ═══ LE CALCUL (section 6) ═══
+   Deux blocs côte à côte : ce que coûte la situation actuelle, ce que coûte
+   Standix. Le nombre est le contenu ; le texte l'explique.
+   ⚠ `class="car"` sur la section : elle hérite de la limite gauche (--bord). */
+.calc{background:#000000}
+.calc-duo{
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
+  column-gap:clamp(24px, 3vw, 56px); row-gap:clamp(28px, 4vw, 44px);
+  padding-left:var(--bord); padding-right:var(--bord);
+  margin-top:clamp(16px, 2.4vh, 32px);
+}
+.calc-bloc{
+  margin:0; padding:clamp(22px, 2.4vw, 34px) clamp(22px, 2.2vw, 32px);
+  border-radius:22px; background:#0E0F12;
+  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08);
+}
+.calc-lab{
+  margin:0; font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(12px, .95vw, 13px); letter-spacing:.09em; text-transform:uppercase;
+  color:rgba(235,235,245,.5);
+}
+.calc-n{
+  margin:.5em 0 0; font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(28px, 3.1vw, 46px); line-height:1.05; letter-spacing:-.035em;
+  color:#F5F5F7; text-wrap:balance;
+}
+.calc-tx{
+  margin:.75em 0 0; font-family:Inter,sans-serif; font-weight:500;
+  font-size:clamp(15px, 1.25vw, 18px); line-height:1.45; letter-spacing:-.01em;
+  color:rgba(235,235,245,.6); max-width:30ch;
+}
+.calc-note{
+  margin:clamp(20px, 2.6vh, 30px) 0 0;
+  padding-left:var(--bord); padding-right:var(--bord);
+  font-family:Inter,sans-serif; font-weight:500; font-size:clamp(13px, 1.05vw, 15px);
+  line-height:1.4; color:rgba(235,235,245,.42);
+}
+@media (max-width:760px){
+  /* ⚠ EN COLONNE SOUS 760 PX : deux blocs côte à côte y donnaient trois mots
+     par ligne. */
+  .calc-duo{grid-template-columns:1fr}
+}
+
+/* ═══ SANS RISQUE (section 7) ═══
+   Quatre garanties alignées, sur le fond clair de la fin de page. Pas de
+   phrase d'explication : chacune se suffit. */
+.sans{background:#F5F5F7}
+/* ⚠ TITRE EN ENCRE : `.car-t` est blanc par défaut (les carrousels sont
+   sombres) ; sur le fond clair il disparaissait. */
+.sans .car-t{color:#1D1D1F}
+.sans-grille{
+  /* ⚠ TROIS COLONNES (trois garanties). */
+  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:clamp(18px, 2.2vw, 40px);
+  padding-left:var(--bord); padding-right:var(--bord);
+  margin-top:clamp(16px, 2.4vh, 32px);
+}
+.sans-i{
+  margin:0; padding-top:18px;
+  border-top:1px solid rgba(0,0,0,.12);
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(17px, 1.5vw, 22px); line-height:1.25; letter-spacing:-.02em;
+  color:#1D1D1F; text-wrap:balance;
+}
+@media (max-width:860px){
+  .sans-grille{grid-template-columns:repeat(2, minmax(0, 1fr))}
+}
+@media (max-width:460px){
+  .sans-grille{grid-template-columns:1fr; gap:14px}
+  .sans-i{padding-top:14px}
+}
+
 /* Surtitres et titres des sections de texte. */
 .pts-sur, .tar-sur{
   margin:0 0 .55em;
@@ -2801,7 +2873,36 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     et le rend accessible à toute l'équipe.</p>
 </section>
 
-<!-- ═══ SECTION 5 ═══ la sécurité et les données.
+<!-- ═══ SECTION 5 ═══ le calcul : ce que coûte la situation actuelle, en face
+     du prix. C'est la raison d'acheter, placée juste avant les tarifs.
+     ⚠ LE CHIFFRE DE 30 € EST UNE HYPOTHÈSE, pas une mesure : il est annoncé
+     comme tel sous le bloc. Ne jamais le présenter comme une donnée. -->
+<section class="car calc" data-fond="sombre" id="calcul">
+  <h2 class="car-t" data-monte>Faites le calcul.</h2>
+
+  <div class="calc-duo">
+    <div class="calc-bloc" data-monte>
+      <p class="calc-lab">Aujourd'hui</p>
+      <p class="calc-n">2 h par mois</p>
+      <p class="calc-tx">Un salarié expérimenté qui réexplique un geste, reprend
+        une erreur ou accompagne un nouveau. Deux heures suffisent à dépasser le
+        prix de l'abonnement.</p>
+    </div>
+    <div class="calc-bloc" data-monte style="--d:90ms">
+      <p class="calc-lab">Avec Standix</p>
+      <p class="calc-n">69 € par mois</p>
+      <p class="calc-tx">La formule Essentiel, jusqu'à 5&nbsp;membres et autant de
+        procédures que vous voulez. Le geste est expliqué une fois, puis il
+        reste.</p>
+    </div>
+  </div>
+
+  <p class="calc-note" data-monte style="--d:180ms">Calcul fait sur un coût horaire chargé de 30&nbsp;€. À ajuster avec vos chiffres.</p>
+</section>
+
+
+
+<!-- ═══ SECTION 6 ═══ la sécurité et les données.
      ⚠ UNIQUEMENT DES FAITS VÉRIFIÉS, repris de la fiche « securite-standix.md »
        (conversation « 1.2 », 9 septembre 2026) et des CGU :
        · région Supabase eu-central-1 = FRANCFORT (confirmé par Em — PAS Zurich) ;
@@ -2870,7 +2971,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- ═══ SECTION 6 ═══ les tarifs : les cartes d'abonnement de l'app, en sombre. -->
+<!-- ═══ SECTION 7 ═══ les tarifs : les cartes d'abonnement de l'app, en sombre. -->
 <section class="tar" id="tarifs" data-fond="clair">
   <div class="tar-in">
     <p class="tar-sur" data-monte>Abonnements</p>
@@ -3135,7 +3236,21 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- ═══ SECTION 7 ═══ les questions fréquentes, juste après les tarifs.
+<!-- ═══ SECTION 8 ═══ sans risque : les quatre garanties, juste avant les prix.
+     Elle ouvre la fin de page EN CLAIR (comme les tarifs qui suivent). -->
+<section class="car sans" data-fond="clair" id="sans-risque">
+  <h2 class="car-t" data-monte>Sans risque.</h2>
+
+  <div class="sans-grille">
+    <p class="sans-i" data-monte>14 jours d'essai</p>
+    <p class="sans-i" data-monte style="--d:70ms">Sans carte bancaire</p>
+    <p class="sans-i" data-monte style="--d:140ms">Résiliable à tout moment</p>
+  </div>
+</section>
+
+
+
+<!-- ═══ SECTION 9 ═══ les questions fréquentes, juste après les tarifs.
      ⚠ L'APP EST CONÇUE POUR TÉLÉPHONE ET TABLETTE (confirmé par Em) : sur
        ordinateur, elle s'ouvre en PRÉSENTATION MOBILE. On dit qu'elle s'y
        ouvre, sans promettre une interface pensée pour le grand écran.
@@ -3221,7 +3336,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- ═══ SECTION 8 ═══ le dernier appel à l'action.
+<!-- ═══ SECTION 10 ═══ le dernier appel à l'action.
      ⚠ LE BOUTON MÈNE À L'APP (/app/). Les autres boutons « Essayer 14 jours »
      du site pointent encore vers #essai, qui n'existe pas : à relier. -->
 <section class="car fin" data-fond="clair" id="commencer">

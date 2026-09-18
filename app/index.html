@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=48f6c771">
+<link rel="stylesheet" href="style.css?v=00c87944">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1283,8 +1283,19 @@
     <div class="histo-fond" data-fermer-histo></div>
     <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Les plus lues">
       <span class="histo-poignee" data-fermer-histo></span>
+      <!-- ⚠ LE TITRE ET SON BOUTON SONT DANS UN MEME BLOC.
+           `.histo-tete` etale ses enfants aux deux bouts : pose a cote du
+           titre, le point d'interrogation serait parti se coller a la croix,
+           a l'autre bout de la ligne, et l'on n'aurait plus su a quoi il se
+           rapporte. Groupes, ils restent ensemble a gauche. -->
       <div class="histo-tete">
-        <h2>Les plus lues</h2>
+        <span class="histo-tete-t">
+          <h2>Les plus lues</h2>
+          <button type="button" class="an-i" data-aide-lectures
+                  aria-label="Comment les lectures sont comptées">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
+          </button>
+        </span>
         <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -1318,8 +1329,17 @@
     <div class="histo-fond" data-fermer-histo></div>
     <div class="histo-carte" role="dialog" aria-modal="true" aria-label="Temps par procédure">
       <span class="histo-poignee" data-fermer-histo></span>
+      <!-- ⚠ MEME GROUPEMENT QUE « Les plus lues ». `.histo-tete` etale ses
+           enfants aux deux bouts : seul, le point d'interrogation partirait se
+           coller a la croix. -->
       <div class="histo-tete">
-        <h2>Temps par procédure</h2>
+        <span class="histo-tete-t">
+          <h2>Temps par procédure</h2>
+          <button type="button" class="an-i" data-aide-pause
+                  aria-label="Quand le temps est mis en pause">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
+          </button>
+        </span>
         <button type="button" class="histo-x" data-fermer-histo aria-label="Fermer">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
                stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -1792,7 +1812,7 @@
                  achète, c'est le résultat : une procédure. Le nouveau titre le
                  dit, et la description se réduit à la seule contrainte. -->
             <div class="mode-choice-title">L’IA crée la procédure à partir d’une vidéo</div>
-            <div class="mode-choice-desc">Vidéo de 5 min maximum</div>
+            <div class="mode-choice-desc">Limité à 5 min de vidéo</div>
           </div>
           <div class="mode-choice-arrow">›</div>
         </div>
@@ -4918,7 +4938,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=1d38e7c2"></script>
+<script type="module" src="app.js?v=223879e0"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

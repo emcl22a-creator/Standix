@@ -1678,35 +1678,6 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   .calc-duo{grid-template-columns:1fr}
 }
 
-/* ═══ SANS RISQUE (section 7) ═══
-   Quatre garanties alignées, sur le fond clair de la fin de page. Pas de
-   phrase d'explication : chacune se suffit. */
-.sans{background:#F5F5F7}
-/* ⚠ TITRE EN ENCRE : `.car-t` est blanc par défaut (les carrousels sont
-   sombres) ; sur le fond clair il disparaissait. */
-.sans .car-t{color:#1D1D1F}
-.sans-grille{
-  /* ⚠ TROIS COLONNES (trois garanties). */
-  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
-  gap:clamp(18px, 2.2vw, 40px);
-  padding-left:var(--bord); padding-right:var(--bord);
-  margin-top:clamp(16px, 2.4vh, 32px);
-}
-.sans-i{
-  margin:0; padding-top:18px;
-  border-top:1px solid rgba(0,0,0,.12);
-  font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(17px, 1.5vw, 22px); line-height:1.25; letter-spacing:-.02em;
-  color:#1D1D1F; text-wrap:balance;
-}
-@media (max-width:860px){
-  .sans-grille{grid-template-columns:repeat(2, minmax(0, 1fr))}
-}
-@media (max-width:460px){
-  .sans-grille{grid-template-columns:1fr; gap:14px}
-  .sans-i{padding-top:14px}
-}
-
 /* Surtitres et titres des sections de texte. */
 .pts-sur, .tar-sur{
   margin:0 0 .55em;
@@ -2581,6 +2552,95 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 .pied .pied-col a:hover{color:#1D1D1F}
 .pied .pied-bas{border-top-color:rgba(0,0,0,.08)}
 .pied .pied-bas p{color:#86868B}
+
+/* ═══ « SANS RISQUE », SOUS-SECTION DES TARIFS ═══
+   Trois garanties sous un filet, alignées sur les cartes d'abonnement (même
+   limite gauche `--bord`). Elle a remplacé la section autonome du même nom et
+   la ligne « Sans carte bancaire. Résiliable à tout moment. ». */
+.tar-gar{
+  padding-left:var(--bord); padding-right:var(--bord);
+  margin-top:clamp(40px, 6vh, 72px); text-align:left;
+}
+.tar-gar-sur{
+  margin:0 0 clamp(14px, 1.8vh, 22px);
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(12px, .95vw, 13px); letter-spacing:.09em; text-transform:uppercase;
+  color:#86868B;
+}
+.tar-gar-grille{
+  display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+  gap:clamp(16px, 2.2vw, 40px);
+}
+.tar-gar-i{
+  margin:0; padding-top:16px;
+  border-top:1px solid rgba(0,0,0,.12);
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(16px, 1.35vw, 20px); line-height:1.25; letter-spacing:-.02em;
+  color:#1D1D1F; text-wrap:balance;
+}
+@media (max-width:560px){
+  .tar-gar-grille{grid-template-columns:1fr; gap:12px}
+  .tar-gar-i{padding-top:12px}
+}
+
+/* ═══ LES ABONNEMENTS SUR TABLETTE ═══
+   ⚠ GRILLE DE DEUX COLONNES, PAS UNE LIGNE QUI GLISSE : à cette largeur la
+   ligne ne montrait que deux cartes et demie, étriquées à 320 px, et la carte
+   Entreprise restait seule dans un grand vide. En grille, les quatre formules
+   sont visibles d'un coup et chaque carte gagne près de 180 px. */
+@media (min-width:768px) and (max-width:1100px){
+  .abo-rail{
+    display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:clamp(16px, 2.2vw, 24px);
+    overflow:visible; scroll-snap-type:none;
+  }
+  .abo-rail .abo-carte{flex:none; width:auto; max-width:none; scroll-snap-align:none}
+  /* ⚠ PLUS DE FLÈCHES : il n'y a plus rien à faire défiler. */
+  .abo-car .abo-bas{display:none}
+  /* ⚠ ENTREPRISE PREND TOUTE LA LARGEUR, sous les quatre formules : une carte
+     de 320 px seule sous une grille pleine largeur faisait un trou. */
+  .abo-seule .abo-carte{flex:none; width:100%; max-width:none}
+}
+
+
+/* ═══ TROIS RESPIRATIONS AJUSTÉES (à la demande) ═══
+   1. MOINS D'AIR ENTRE « Un savoir mal transmis coûte cher. » ET « Faites le
+      calcul. » : les deux sections cumulaient leurs marges — 242 px à 1440 px
+      de large, soit un trou plus haut que la phrase elle-même.
+   2 et 3. UN PEU PLUS D'AIR SOUS LE LIEN DES CONDITIONS (sécurité) ET SOUS LA
+      note du calcul : tous deux frôlaient le bas de leur section. */
+.car.cout{padding-bottom:clamp(48px, 7.8vh, 96px)}
+.secu .car-bas{margin-bottom:clamp(20px, 2.6vh, 36px)}
+.calc-note{margin-bottom:clamp(20px, 2.6vh, 36px)}
+
+/* ═══ TROIS JOINTURES RESSERRÉES (à la demande) ═══
+   ⚠ CHAQUE ÉCART EST LA SOMME DE DEUX MARGES, celle du bas de la section qui
+   finit et celle du haut de celle qui commence : à 1440 px de large, l'écart
+   entre « Comment ça marche. » et « Un savoir mal transmis coûte cher. »
+   atteignait 185 px. On raccourcit donc la marge du HAUT de la section qui
+   suit, jamais les deux, pour ne pas déséquilibrer la section elle-même.
+   ⚠ LES PLAFONDS DES `clamp()` COMPTENT AUTANT QUE LE FACTEUR `vh` : sur
+   tablette (1180 px de haut), c'est le plafond qui décide, pas le `vh`.
+   1. Section 3 → 4 : très légèrement (−5 %).
+   2. Section 4 → 5 : légèrement (−12 %), réparti sur les deux marges.
+   3. Section 6 → 7 : légèrement (−13 %). */
+.car.cout{padding-top:clamp(72px, 12.5vh, 148px)}
+.car.calc{padding-top:clamp(64px, 9.3vh, 132px)}
+.tar{padding-top:clamp(56px, 10vh, 104px)}
+
+
+/* ═══ LE BLOC-TITRE DES TARIFS ═══
+   ⚠ LE SURTITRE FAISAIT 14 px CONTRE 49 px POUR LE TITRE : il se perdait
+   au-dessus. Chez Apple, le surtitre et le titre forment un couple (« Security. »
+   puis « Au cœur du problème. »). On le remonte à environ 55 % du titre, et le
+   titre gagne un cran pour rester au-dessus des titres de carrousel. */
+.tar .tar-sur{
+  font-size:clamp(18px, 1.9vw, 30px);
+  letter-spacing:-.022em; line-height:1.15;
+  margin:0 0 .3em;
+}
+.tar .tar-t{font-size:clamp(30px, 3.8vw, 58px)}
+
 </style>
 </head>
 <body>
@@ -3232,25 +3292,22 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 
     </div>
 
-    <p class="tar-pied" data-monte style="--d:320ms">Sans carte bancaire. Résiliable à tout moment.</p>
+  </div>
+
+  <!-- ⚠ « SANS RISQUE » EST UNE SOUS-SECTION DES TARIFS (à la demande) : elle
+       remplace la ligne « Sans carte bancaire. Résiliable à tout moment. »,
+       qui disait déjà deux des trois garanties. -->
+  <div class="tar-gar" data-monte style="--d:320ms">
+    <p class="tar-gar-sur">Sans risque</p>
+    <div class="tar-gar-grille">
+      <p class="tar-gar-i">14 jours d'essai</p>
+      <p class="tar-gar-i">Sans carte bancaire</p>
+      <p class="tar-gar-i">Résiliable à tout moment</p>
+    </div>
   </div>
 </section>
 
-<!-- ═══ SECTION 8 ═══ sans risque : les quatre garanties, juste avant les prix.
-     Elle ouvre la fin de page EN CLAIR (comme les tarifs qui suivent). -->
-<section class="car sans" data-fond="clair" id="sans-risque">
-  <h2 class="car-t" data-monte>Sans risque.</h2>
-
-  <div class="sans-grille">
-    <p class="sans-i" data-monte>14 jours d'essai</p>
-    <p class="sans-i" data-monte style="--d:70ms">Sans carte bancaire</p>
-    <p class="sans-i" data-monte style="--d:140ms">Résiliable à tout moment</p>
-  </div>
-</section>
-
-
-
-<!-- ═══ SECTION 9 ═══ les questions fréquentes, juste après les tarifs.
+<!-- ═══ SECTION 8 ═══ les questions fréquentes, juste après les tarifs.
      ⚠ L'APP EST CONÇUE POUR TÉLÉPHONE ET TABLETTE (confirmé par Em) : sur
        ordinateur, elle s'ouvre en PRÉSENTATION MOBILE. On dit qu'elle s'y
        ouvre, sans promettre une interface pensée pour le grand écran.
@@ -3281,6 +3338,16 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
       </h3>
       <div class="faq-r" id="faq-r2" role="region" aria-labelledby="faq-b2">
         <p>L'IA de Standix crée la procédure à partir d'une vidéo ou d'un enregistrement d'écran, de 5&nbsp;minutes au maximum&nbsp;: elle découpe le contenu en étapes et les rédige. Elle peut aussi partir d'un document&nbsp;: une image, un PDF, un Word ou un texte collé.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <h3 class="faq-q">
+        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r8" id="faq-b8">
+          <span>Peut-on créer une procédure sans l'IA&nbsp;?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </h3>
+      <div class="faq-r" id="faq-r8" role="region" aria-labelledby="faq-b8">
+        <p>Oui, et en nombre illimité. Vous donnez un titre et une image de présentation, puis vous ajoutez les étapes une à une&nbsp;: chacune avec son intention, son texte et son image.</p>
       </div>
     </div>
     <div class="faq-item">
@@ -3336,7 +3403,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- ═══ SECTION 10 ═══ le dernier appel à l'action.
+<!-- ═══ SECTION 9 ═══ le dernier appel à l'action.
      ⚠ LE BOUTON MÈNE À L'APP (/app/). Les autres boutons « Essayer 14 jours »
      du site pointent encore vers #essai, qui n'existe pas : à relier. -->
 <section class="car fin" data-fond="clair" id="commencer">
@@ -3541,27 +3608,29 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
       piste.addEventListener('scroll', lire, {passive:true});
       addEventListener('resize', lire, {passive:true});
       /* ⚠ LES TITRES DES CARTES ENTRENT ET SORTENT LATÉRALEMENT (section 2).
-         On mesure l'écart entre le centre de la carte et celui de la piste :
-         la carte qui arrive vient de la droite, celle qui part glisse à
-         gauche. `requestAnimationFrame` groupe les lectures : sans lui, un
-         `scroll` sur iOS déclenche une mesure par image et la piste saccade. */
+         ⚠ LA MESURE EST LA PART VISIBLE DE LA CARTE DANS LA PISTE, pas l'écart
+         au centre : avec l'écart au centre, l'effet ne se voyait que sur
+         téléphone (une carte par écran) et restait nul sur tablette et
+         ordinateur, où trois cartes tiennent à la fois. Ici une carte entière
+         garde son titre net ; une carte coupée par le bord le voit glisser et
+         s'effacer, quelle que soit la taille de l'écran.
+         `requestAnimationFrame` groupe les lectures : sans lui, un `scroll`
+         sur iOS déclenche une mesure par image et la piste saccade. */
       const textes=[...piste.querySelectorAll('.pf-txt')];
       if(textes.length && !matchMedia('(prefers-reduced-motion:reduce)').matches){
         let enCours=false;
         const titres=()=>{
           enCours=false;
           const r=piste.getBoundingClientRect();
-          const centre=r.left + r.width/2;
           textes.forEach((t)=>{
             const c=t.closest('.pf-carte').getBoundingClientRect();
-            const ecart=(c.left + c.width/2 - centre) / r.width;
-            /* ⚠ L'EFFET DÉPEND DU NOMBRE DE CARTES VISIBLES. Sur téléphone une
-               carte remplit la piste : le titre entre et sort franchement. Sur
-               ordinateur trois cartes sont à l'écran — les effacer serait un
-               défaut, pas une animation : il ne reste qu'un léger glissement. */
-            const force=Math.min(1, Math.max(0, (c.width/r.width - .45)/.35));
-            t.style.setProperty('--x', (ecart*46*(.35 + .65*force)).toFixed(1)+'px');
-            t.style.setProperty('--o', Math.max(0, 1 - Math.abs(ecart)*1.7*force).toFixed(3));
+            const vu=Math.max(0, Math.min(c.right, r.right) - Math.max(c.left, r.left)) / c.width;
+            /* ⚠ PLEIN DÈS 88 % DE CARTE VISIBLE : sans ce palier, la carte
+               calée au bord gauche restait légèrement grisée. */
+            const p=Math.max(0, Math.min(1, (vu - .3) / .58));
+            const sens=(c.left + c.width/2) > (r.left + r.width/2) ? 1 : -1;
+            t.style.setProperty('--x', (sens * (1 - p) * 40).toFixed(1)+'px');
+            t.style.setProperty('--o', p.toFixed(3));
           });
         };
         const demande=()=>{ if(!enCours){ enCours=true; requestAnimationFrame(titres); } };

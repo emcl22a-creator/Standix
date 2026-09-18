@@ -859,18 +859,21 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   .car-pf .car-t, .car-s3 .car-t, .chiffres .car-t, .secu .car-t, .faq .car-t{font-size:clamp(28px, 2.9vw, 44px)}
   .car-piste{--c:min(80vw, 384px)}
 }
-/* ⚠ LES CARTES DE LA SECTION 3 SONT 5 % PLUS ÉTROITES, MÊME HAUTEUR : la
-   largeur est multipliée par .95 à chaque palier, et le rapport des tuiles
-   passe de .82 à .779 pour garder leur hauteur.
-   ⚠ `.car-s3 .car-piste` L'EMPORTE SUR `.car-piste` quel que soit l'ordre
+/* ⚠ LES TROIS CARROUSELS ONT LA MÊME LARGEUR DE CARTE : la largeur de base
+   est multipliée par .95 à chaque palier. La section 2 était restée à 100 %
+   et ses cartes étaient 19 px plus larges que celles des sections 3 et 6 (à
+   la demande : les trois doivent s'aligner).
+   ⚠ LA HAUTEUR SUIT LA LARGEUR (`aspect-ratio` sur `.car-vue`) et le contenu
+   aussi (il est dimensionné en `cqi`) : rien d'autre n'est à reprendre.
+   ⚠ `.car-pf .car-piste` L'EMPORTE SUR `.car-piste` quel que soit l'ordre
    (deux classes contre une). */
-.car-s3 .car-piste, .secu .car-piste{--c:calc(min(80vw, 420px) * .95)}
+.car-pf .car-piste, .car-s3 .car-piste, .secu .car-piste{--c:calc(min(80vw, 420px) * .95)}
 /* ⚠ PUIS 5 % MOINS HAUTES (.779 → .82) : la largeur ne bouge pas, et les
    images sont dimensionnées sur la largeur — les téléphones gardent leur
    taille, seul leur bas est coupé plus tôt. */
 .car-s3 .car-vue{aspect-ratio:.82}
-@media (min-width:981px){ .car-s3 .car-piste, .secu .car-piste{--c:calc(min(80vw, 384px) * .95)} }
-@media (max-width:980px){ .car-s3 .car-piste, .secu .car-piste{--c:calc(min(calc(100vw - 78px), 360px) * .95)} }
+@media (min-width:981px){ .car-pf .car-piste, .car-s3 .car-piste, .secu .car-piste{--c:calc(min(80vw, 384px) * .95)} }
+@media (max-width:980px){ .car-pf .car-piste, .car-s3 .car-piste, .secu .car-piste{--c:calc(min(calc(100vw - 78px), 360px) * .95)} }
 
 /* ⚠ SUR ORDINATEUR ET TABLETTE, AUCUN MASQUE À GAUCHE : en glissant, les
    cartes passent la limite et vont jusqu'au bord de l'écran, comme chez
@@ -968,7 +971,24 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   position:absolute; left:0; right:0; top:0; z-index:2; padding:7.5cqi 8cqi 0;
   translate:var(--x, 0) 0; opacity:var(--o, 1); will-change:translate, opacity;
 }
-@media (prefers-reduced-motion:reduce){ .pf-txt{translate:none; opacity:1} }
+/* ⚠ LE TITRE ARRIVE APRÈS LA CARTE (à la demande). La position visée est
+   recalculée à chaque image par le script ; cette transition fait que le titre
+   ne s'y rend pas d'un coup, il la rattrape. Pendant qu'on glisse, il traîne
+   donc derrière la carte, et il se pose une demi-seconde après elle.
+   ⚠ LE FONDU DURE PLUS LONGTEMPS QUE LE DÉPLACEMENT ET COMMENCE APRÈS LUI
+   (.55 s contre .45, et 60 ms de retard) : le titre finit d'apparaître une
+   fois qu'il est en place, jamais en chemin.
+   ⚠ LA CLASSE `.lisse` N'EST POSÉE QU'APRÈS LE PREMIER CALCUL : sans elle, au
+   chargement, les titres des cartes hors écran partaient de leur position
+   normale et glissaient au loin sous les yeux du visiteur. */
+.car-piste.lisse .pf-txt{
+  transition:translate .45s cubic-bezier(.22,.61,.36,1),
+             opacity .55s cubic-bezier(.22,.61,.36,1) .06s;
+}
+@media (prefers-reduced-motion:reduce){
+  .pf-txt{translate:none; opacity:1}
+  .car-piste.lisse .pf-txt{transition:none}
+}
 /* ⚠ `.car-vue` DEVANT : sinon `.car-c p` (le texte sous les cartes) impose
    sa marge, sa taille et sa couleur au petit titre. */
 /* ⚠ TAILLES INVERSÉES, à la demande : le petit titre (« Formez plus vite »)
@@ -996,7 +1016,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 .car-vue.pf-2 .pf-t{color:#515154}
 /* ⚠ SANS LIEN dans la barre du bas : les flèches restent à DROITE (sinon
    `space-between` les pousse à gauche, faute de voisin). */
-.car-pf .car-bas{justify-content:flex-end}
+.car-pf .car-bas, .car-s3 .car-bas{justify-content:flex-end}
 
 /* ⚠ PAS DE CONTOUR : COMME APPLE, LA TUILE SE DÉTACHE PAR SON FOND.
    La section est en NOIR PUR, comme les sections sombres d'Apple : toute
@@ -1049,13 +1069,52 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    éléments intérieurs d'une face (image, voile) : l'avant se voyait à
    l'envers par-dessus le dos. Cette bascule marche partout, dans les deux
    sens.
-   ⚠ 0,16 s, PAS LA MOITIÉ DE 0,85 s : avec la courbe de la rotation, la
-   carte atteint 90° à 18,8 % du temps (calculé). À 0,42 s, on voyait un
-   instant de carte vide. */
-.pf-tourne > .car-vue{visibility:visible; transition:visibility 0s linear .16s}
+
+   ⚠ LA BASCULE SUIT L'ANGLE RÉEL DE LA CARTE, PLUS UNE MINUTERIE (voir le
+   script). C'ÉTAIT LE BUG DU RETOURNEMENT. Avant, elle était réglée par
+   `transition:visibility 0s linear .16s` — 0,16 s étant le moment où la
+   rotation passe 90° SI elle démarre tout de suite. Or au TOUT PREMIER
+   retournement elle démarre en retard : le navigateur doit fabriquer les
+   plans 3D et re-graver l'image de la carte, ce qui prend 150 ms sur un
+   ordinateur et peut atteindre une demi-seconde sur un téléphone. La
+   minuterie, elle, partait à l'heure. Résultat : les faces basculaient
+   pendant que la carte était encore à plat, et on voyait l'image sauter.
+   Le script mesure donc l'angle à chaque image et pose `dos-devant` au
+   passage des 90° : peu importe que la rotation traîne, les deux restent
+   d'accord.
+
+   ⚠ NE PAS REMETTRE DE `transition` SUR `visibility` ICI. */
+.pf-tourne > .car-vue{visibility:visible}
 .pf-tourne > .pf-dos{visibility:hidden}
-.pf-carte.retourne .pf-tourne > .pf{visibility:hidden}
-.pf-carte.retourne .pf-tourne > .pf-dos{visibility:visible}
+.pf-carte.dos-devant .pf-tourne > .pf{visibility:hidden}
+.pf-carte.dos-devant .pf-tourne > .pf-dos{visibility:visible}
+/* ⚠ DE LA PLACE AU-DESSUS DES CARTES, SINON LA ROTATION EST ROGNÉE. En
+   tournant, la carte se rapproche de l'œil par un bord : la perspective
+   l'agrandit et elle déborde de 17 px AU-DESSUS de la piste (mesuré à 90°).
+   La piste rogne tout ce qui dépasse (`overflow-y:hidden`, indispensable
+   sinon la réserve du bas ouvre un défilement vertical), et le haut de la
+   carte était coupé net pendant tout le retournement.
+   ⚠ MÊME PROCÉDÉ QU'EN BAS : une réserve, annulée par une marge négative de
+   la même valeur. La mise en page ne bouge pas d'un pixel (vérifié à 1440 et
+   390 px : hauteur de section identique, carte déplacée de 1 px).
+   ⚠ SEULEMENT SUR LA SECTION 2 : c'est la seule dont les cartes se
+   retournent. */
+.car-pf .car-piste{padding-top:40px; margin-top:-40px}
+
+/* ⚠ ON PRÉPARE LES PLANS 3D AVANT LE PREMIER CLIC, PAS PENDANT. Sans ça, le
+   premier retournement met 200 ms à démarrer au lieu de 45 : le navigateur
+   fabrique les plans et re-grave l'image de la carte à ce moment-là, et on
+   voit la carte figée. La minuscule rotation force la fabrication du volume
+   3D tout de suite ; `will-change` garde les deux faces sur leur propre
+   plan. Mesuré : 210 ms en moyenne sans, 60 ms avec.
+   ⚠ `:not(.retourne)` : sans lui, cette rotation d'un centième de degré
+   aurait la même force que celle de 180° et l'emporterait selon l'ordre des
+   règles — la carte ne se retournerait plus.
+   ⚠ POSÉ SEULEMENT QUAND LA SECTION EST À L'ÉCRAN, et retiré quand elle en
+   sort : quatre grandes images gardées en mémoire en permanence coûteraient
+   cher sur téléphone pour un bouton que beaucoup ne toucheront jamais. */
+.pf-carte.pret .pf-tourne > .car-vue{will-change:transform}
+.pf-carte.pret:not(.retourne) .pf-tourne{transform:rotateY(0.01deg)}
 .car-vue.pf-dos{
   position:absolute; inset:0; aspect-ratio:auto;
   -webkit-transform:rotateY(180deg); transform:rotateY(180deg);
@@ -1635,47 +1694,45 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   color:rgba(235,235,245,.6); text-align:center; text-wrap:pretty;
 }
 
-/* ═══ LE CALCUL (section 6) ═══
-   Deux blocs côte à côte : ce que coûte la situation actuelle, ce que coûte
-   Standix. Le nombre est le contenu ; le texte l'explique.
-   ⚠ `class="car"` sur la section : elle hérite de la limite gauche (--bord). */
-.calc{background:#000000}
-.calc-duo{
-  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
-  column-gap:clamp(24px, 3vw, 56px); row-gap:clamp(28px, 4vw, 44px);
-  padding-left:var(--bord); padding-right:var(--bord);
-  margin-top:clamp(16px, 2.4vh, 32px);
+/* ═══ LA LISTE À ICÔNES (section 4) ═══
+   Remplace les deux anciennes sections « coûte cher » et « Faites le calcul. » :
+   une phrase d'accroche, son explication, puis trois points à icône — la forme
+   qu'Apple donne à ses pages produit (cf. la capture fournie).
+   ⚠ EN COLONNE SUR TÉLÉPHONE, EN TROIS COLONNES AU-DESSUS DE 760 PX : la
+   capture montre un téléphone ; sur ordinateur, trois blocs empilés laisseraient
+   deux tiers de l'écran vides, et Apple les met côte à côte.
+   ⚠ LES ICÔNES SONT DES SILHOUETTES PLEINES AVEC UN VRAI TROU (`fill-rule:
+   evenodd` dans le SVG) : le creux laisse voir le fond, il n'est PAS peint en
+   noir. Si le fond de la section change un jour, les icônes suivent. */
+.cout-liste{
+  display:grid; gap:clamp(58px, 7.8vh, 94px);
+  max-width:1120px; margin:clamp(56px, 8vh, 112px) auto 0;
+  padding-left:28px; padding-right:28px;
 }
-.calc-bloc{
-  margin:0; padding:clamp(22px, 2.4vw, 34px) clamp(22px, 2.2vw, 32px);
-  border-radius:22px; background:#0E0F12;
-  box-shadow:inset 0 0 0 .5px rgba(255,255,255,.08);
+@media (min-width:760px){
+  .cout-liste{grid-template-columns:repeat(3, minmax(0, 1fr)); gap:clamp(32px, 4vw, 72px)}
 }
-.calc-lab{
+.cout-i{text-align:center}
+.cout-ic{
+  display:block; margin:0 auto clamp(18px, 2.4vh, 28px);
+  width:clamp(42px, 4.2vw, 56px); height:auto;
+  fill:#F5F5F7;
+}
+.cout-i-t{
   margin:0; font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(12px, .95vw, 13px); letter-spacing:.09em; text-transform:uppercase;
-  color:rgba(235,235,245,.5);
+  font-size:clamp(16px, 1.35vw, 19px); letter-spacing:-.014em; color:#F5F5F7;
 }
-.calc-n{
-  margin:.5em 0 0; font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(28px, 3.1vw, 46px); line-height:1.05; letter-spacing:-.035em;
-  color:#F5F5F7; text-wrap:balance;
-}
-.calc-tx{
-  margin:.75em 0 0; font-family:Inter,sans-serif; font-weight:500;
+.cout-i-x{
+  margin:.65em auto 0; max-width:30ch;
+  font-family:Inter,sans-serif; font-weight:500;
   font-size:clamp(15px, 1.25vw, 18px); line-height:1.45; letter-spacing:-.01em;
-  color:rgba(235,235,245,.6); max-width:30ch;
+  color:rgba(235,235,245,.6); text-wrap:pretty;
 }
-.calc-note{
-  margin:clamp(20px, 2.6vh, 30px) 0 0;
-  padding-left:var(--bord); padding-right:var(--bord);
+.cout-note{
+  margin:clamp(40px, 5.5vh, 76px) auto 0; max-width:46ch;
+  padding-left:28px; padding-right:28px;
   font-family:Inter,sans-serif; font-weight:500; font-size:clamp(13px, 1.05vw, 15px);
-  line-height:1.4; color:rgba(235,235,245,.42);
-}
-@media (max-width:760px){
-  /* ⚠ EN COLONNE SOUS 760 PX : deux blocs côte à côte y donnaient trois mots
-     par ligne. */
-  .calc-duo{grid-template-columns:1fr}
+  line-height:1.4; color:rgba(235,235,245,.42); text-align:center;
 }
 
 /* Surtitres et titres des sections de texte. */
@@ -2609,9 +2666,8 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
       de large, soit un trou plus haut que la phrase elle-même.
    2 et 3. UN PEU PLUS D'AIR SOUS LE LIEN DES CONDITIONS (sécurité) ET SOUS LA
       note du calcul : tous deux frôlaient le bas de leur section. */
-.car.cout{padding-bottom:clamp(48px, 7.8vh, 96px)}
+.car.cout{padding-bottom:clamp(64px, 9.5vh, 124px)}
 .secu .car-bas{margin-bottom:clamp(20px, 2.6vh, 36px)}
-.calc-note{margin-bottom:clamp(20px, 2.6vh, 36px)}
 
 /* ═══ TROIS JOINTURES RESSERRÉES (à la demande) ═══
    ⚠ CHAQUE ÉCART EST LA SOMME DE DEUX MARGES, celle du bas de la section qui
@@ -2622,12 +2678,14 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
    ⚠ LES PLAFONDS DES `clamp()` COMPTENT AUTANT QUE LE FACTEUR `vh` : sur
    tablette (1180 px de haut), c'est le plafond qui décide, pas le `vh`.
    1. Section 3 → 4 : très légèrement (−5 %).
-   2. Section 4 → 5 : légèrement (−12 %), réparti sur les deux marges.
+   2. Section 4 → 5 : resserré une seconde fois (−25 % au total, réparti sur
+      les deux marges) pour que la section 5 se lise comme la suite de la 4.
    3. Section 6 → 7 : légèrement (−13 %). */
 .car.cout{padding-top:clamp(72px, 12.5vh, 148px)}
-.car.calc{padding-top:clamp(64px, 9.3vh, 132px)}
 .tar{padding-top:clamp(56px, 10vh, 104px)}
-
+/* 4. Section 8 → 9 : −12 %. Seule la marge du HAUT de la
+      dernière section bouge ; celle du bas tient l'écart avec le pied de page. */
+.car.fin{padding-top:clamp(76px, 13.2vh, 164px)}
 
 /* ═══ LE BLOC-TITRE DES TARIFS ═══
    ⚠ LE SURTITRE FAISAIT 14 px CONTRE 49 px POUR LE TITRE : il se perdait
@@ -2912,7 +2970,6 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 
   <div class="car-bas">
-    <a class="car-lien" href="#essai">Essayer 14 jours <span aria-hidden="true">›</span></a>
     <div class="car-fleches">
       <button class="car-f car-f-g" type="button" aria-label="Carte précédente">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7"/></svg>
@@ -2924,43 +2981,44 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   </div>
 </section>
 
-<!-- ═══ SECTION 4 ═══ une seule phrase, en grand et centrée, entre deux
-     sections très visuelles : l'affirmation, puis la réponse en gris.
-     ⚠ C'EST LA FORME D'APPLE : une phrase seule paraissait inachevée. -->
-<section class="car cout" data-fond="sombre">
+<!-- ═══ SECTION 4 ═══ l'affirmation, sa réponse en gris, puis trois points
+     à icône — la forme d'Apple (une phrase forte, puis ce qui la soutient).
+     ⚠ ELLE REMPLACE LES ANCIENNES SECTIONS 4 ET 5 : « Faites le calcul. » et
+     ses deux tuiles ont été fondues ici. Les chiffres sont conservés ; ce qui
+     disparaît, c'est la deuxième respiration de page.
+     ⚠ LE CHIFFRE DE 30 € EST UNE HYPOTHÈSE, pas une mesure : il est annoncé
+     comme tel sous la liste. Ne jamais le présenter comme une donnée.
+     ⚠ NE PAS ÉCRIRE QUE DEUX HEURES DÉPASSENT LE PRIX : à 30 € de l'heure,
+     deux heures font 60 €, et l'abonnement 69 €. L'ancien texte l'affirmait,
+     c'était faux. Ici chaque bloc donne son chiffre, le lecteur compare. -->
+<section class="car cout" data-fond="sombre" id="calcul">
   <p class="cout-t" data-monte>Un savoir mal transmis coûte cher.</p>
   <p class="cout-s" data-monte style="--d:90ms">Ce qu'un salarié sait faire finit par se perdre. Standix le garde,
     et le rend accessible à toute l'équipe.</p>
-</section>
 
-<!-- ═══ SECTION 5 ═══ le calcul : ce que coûte la situation actuelle, en face
-     du prix. C'est la raison d'acheter, placée juste avant les tarifs.
-     ⚠ LE CHIFFRE DE 30 € EST UNE HYPOTHÈSE, pas une mesure : il est annoncé
-     comme tel sous le bloc. Ne jamais le présenter comme une donnée. -->
-<section class="car calc" data-fond="sombre" id="calcul">
-  <h2 class="car-t" data-monte>Faites le calcul.</h2>
-
-  <div class="calc-duo">
-    <div class="calc-bloc" data-monte>
-      <p class="calc-lab">Aujourd'hui</p>
-      <p class="calc-n">2 h par mois</p>
-      <p class="calc-tx">Un salarié expérimenté qui réexplique un geste, reprend
-        une erreur ou accompagne un nouveau. Deux heures suffisent à dépasser le
-        prix de l'abonnement.</p>
+  <div class="cout-liste">
+    <div class="cout-i" data-monte style="--d:180ms">
+      <svg class="cout-ic" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M32 2a30 30 0 1 0 0 60 30 30 0 0 0 0-60zm3.4 12v17.1l12.2 7-3.4 5.9L29 34.8V14h6.4z"/></svg>
+      <p class="cout-i-t">Deux heures par mois</p>
+      <p class="cout-i-x">Le temps qu'un salarié expérimenté passe à réexpliquer
+        un geste, reprendre une erreur ou accompagner un nouveau.</p>
     </div>
-    <div class="calc-bloc" data-monte style="--d:90ms">
-      <p class="calc-lab">Avec Standix</p>
-      <p class="calc-n">69 € par mois</p>
-      <p class="calc-tx">La formule Essentiel, jusqu'à 5&nbsp;membres et autant de
-        procédures que vous voulez. Le geste est expliqué une fois, puis il
-        reste.</p>
+    <div class="cout-i" data-monte style="--d:260ms">
+      <svg class="cout-ic" viewBox="3 3 58 58" aria-hidden="true"><path fill-rule="evenodd" d="M33.5 4H12a8 8 0 0 0-8 8v21.5a8 8 0 0 0 2.34 5.66l20.5 20.5a8 8 0 0 0 11.32 0l17.5-17.5a8 8 0 0 0 0-11.32l-20.5-20.5A8 8 0 0 0 33.5 4zM19 13a6 6 0 1 0 0 12 6 6 0 0 0 0-12z"/></svg>
+      <p class="cout-i-t">69 € par mois</p>
+      <p class="cout-i-x">La formule Essentiel, jusqu'à 5&nbsp;membres et autant
+        de procédures que vous voulez.</p>
+    </div>
+    <div class="cout-i" data-monte style="--d:340ms">
+      <svg class="cout-ic" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M14.5 7h35a7.5 7.5 0 0 1 7.5 7.5v35a7.5 7.5 0 0 1-7.5 7.5h-35A7.5 7.5 0 0 1 7 49.5v-35A7.5 7.5 0 0 1 14.5 7zm12 14.4v21.2L44 32 26.5 21.4z"/></svg>
+      <p class="cout-i-t">Expliqué une fois</p>
+      <p class="cout-i-x">Le geste est filmé une seule fois. Il reste ensuite
+        disponible pour toute l'équipe, même après un départ.</p>
     </div>
   </div>
 
-  <p class="calc-note" data-monte style="--d:180ms">Calcul fait sur un coût horaire chargé de 30&nbsp;€. À ajuster avec vos chiffres.</p>
+  <p class="cout-note" data-monte style="--d:420ms">Calcul fait sur un coût horaire chargé de 30&nbsp;€. À ajuster avec vos chiffres.</p>
 </section>
-
-
 
 <!-- ═══ SECTION 6 ═══ la sécurité et les données.
      ⚠ UNIQUEMENT DES FAITS VÉRIFIÉS, repris de la fiche « securite-standix.md »
@@ -3098,7 +3156,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
             </div>
-            <a class="abo-cta" href="#essai">Essayer 14 jours</a>
+            <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
             <button type="button" class="abo-fermer" data-tiroir="essentiel">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
@@ -3142,7 +3200,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
             </div>
-            <a class="abo-cta" href="#essai">Essayer 14 jours</a>
+            <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
             <button type="button" class="abo-fermer" data-tiroir="equipe">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
@@ -3186,7 +3244,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
             </div>
-            <a class="abo-cta" href="#essai">Essayer 14 jours</a>
+            <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
             <button type="button" class="abo-fermer" data-tiroir="pro">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
@@ -3230,7 +3288,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
             </div>
-            <a class="abo-cta" href="#essai">Essayer 14 jours</a>
+            <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
             <button type="button" class="abo-fermer" data-tiroir="reseau">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
@@ -3347,7 +3405,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
         </button>
       </h3>
       <div class="faq-r" id="faq-r8" role="region" aria-labelledby="faq-b8">
-        <p>Oui, et en nombre illimité. Vous donnez un titre et une image de présentation, puis vous ajoutez les étapes une à une&nbsp;: chacune avec son intention, son texte et son image.</p>
+        <p>Oui, et en nombre illimité. Vous donnez un titre et une image de présentation, puis vous ajoutez les étapes une à une&nbsp;: pour chacune, ce qu'elle doit accomplir, le texte et l'image.</p>
       </div>
     </div>
     <div class="faq-item">
@@ -3390,22 +3448,13 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
         <p>C'est lorsque l'IA de Standix a été utilisée pour créer une procédure.</p>
       </div>
     </div>
-    <div class="faq-item">
-      <h3 class="faq-q">
-        <button type="button" class="faq-b" aria-expanded="false" aria-controls="faq-r7" id="faq-b7">
-          <span>Les prix sont-ils hors taxes ?</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-      </h3>
-      <div class="faq-r" id="faq-r7" role="region" aria-labelledby="faq-b7">
-        <p>Oui. En payant à l'année, vous économisez 20&nbsp;%.</p>
-      </div>
-    </div>
   </div>
 </section>
 
 <!-- ═══ SECTION 9 ═══ le dernier appel à l'action.
-     ⚠ LE BOUTON MÈNE À L'APP (/app/). Les autres boutons « Essayer 14 jours »
-     du site pointent encore vers #essai, qui n'existe pas : à relier. -->
+     ⚠ LE BOUTON MÈNE À L'APP (/app/), comme ceux des abonnements, qui s'ouvrent
+     dans un nouvel onglet. RESTENT À RELIER : les trois <button> « Essayer
+     14 jours » de la barre du haut et du menu, qui n'ont aucune action. -->
 <section class="car fin" data-fond="clair" id="commencer">
   <div class="fin-in">
     <h2 class="fin-t" data-monte>Votre savoir-faire<br>transmis simplement.</h2>
@@ -3611,32 +3660,82 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
          ⚠ LA MESURE EST LA PART VISIBLE DE LA CARTE DANS LA PISTE, pas l'écart
          au centre : avec l'écart au centre, l'effet ne se voyait que sur
          téléphone (une carte par écran) et restait nul sur tablette et
-         ordinateur, où trois cartes tiennent à la fois. Ici une carte entière
-         garde son titre net ; une carte coupée par le bord le voit glisser et
-         s'effacer, quelle que soit la taille de l'écran.
-         `requestAnimationFrame` groupe les lectures : sans lui, un `scroll`
-         sur iOS déclenche une mesure par image et la piste saccade. */
+         ordinateur, où trois cartes tiennent à la fois.
+
+         ⚠ POURQUOI ÇA SACCADAIT, ET CE QUI LE CORRIGE — trois causes, trois
+         remèdes. NE PAS REVENIR EN ARRIÈRE SANS COMPRENDRE LES TROIS.
+
+         1. ON NE SE FIAIT QU'AUX ÉVÉNEMENTS `scroll`, QUI NE TOMBENT PAS À
+            CHAQUE IMAGE. Pendant l'inertie d'un doigt sur iOS, pendant
+            l'aimantation, et pendant le défilement doux des flèches, le
+            navigateur en saute. Chaque trou devenait un saut visible du titre,
+            d'autant plus gros que la course est longue. On tourne donc en
+            BOUCLE `requestAnimationFrame` tant que ça défile (et 260 ms après
+            le dernier événement, le temps que l'aimantation se pose), puis on
+            s'arrête : une mesure par image, plus aucun trou, et rien qui
+            tourne au repos.
+
+         2. ON LISAIT `getBoundingClientRect()` CINQ FOIS PAR IMAGE. Chaque
+            lecture force le navigateur à recalculer la mise en page. On mesure
+            désormais UNE SEULE FOIS (et à chaque redimensionnement) la
+            position et la largeur des cartes, puis on ne lit plus que
+            `scrollLeft`. Par image : une lecture, et deux écritures qui ne
+            touchent qu'au compositeur (`translate` et `opacity`).
+
+         3. LA PROGRESSION ÉTAIT UNE DROITE COUPÉE NET AUX DEUX BOUTS, et
+            l'opacité une courbe puissance 1,8 qui effaçait le titre d'un coup
+            au milieu du trajet. Résultat : un démarrage brutal, une fin
+            brutale, et un texte qui disparaissait sans raison apparente. On
+            passe par un « smoothstep » (p²(3−2p)) : la vitesse part de zéro et
+            y revient, les deux bouts sont ronds. L'opacité suit exactement la
+            même courbe que le déplacement — le titre s'efface EN GLISSANT, pas
+            avant.
+
+         ⚠ AUCUNE `transition` CSS SUR `.pf-txt` : la position est déjà calculée
+         à chaque image, une transition ne ferait que la faire traîner derrière
+         le doigt. */
       const textes=[...piste.querySelectorAll('.pf-txt')];
       if(textes.length && !matchMedia('(prefers-reduced-motion:reduce)').matches){
-        let enCours=false;
-        const titres=()=>{
-          enCours=false;
-          const r=piste.getBoundingClientRect();
-          textes.forEach((t)=>{
-            const c=t.closest('.pf-carte').getBoundingClientRect();
-            const vu=Math.max(0, Math.min(c.right, r.right) - Math.max(c.left, r.left)) / c.width;
-            /* ⚠ PLEIN DÈS 88 % DE CARTE VISIBLE : sans ce palier, la carte
-               calée au bord gauche restait légèrement grisée. */
-            const p=Math.max(0, Math.min(1, (vu - .3) / .58));
-            const sens=(c.left + c.width/2) > (r.left + r.width/2) ? 1 : -1;
-            t.style.setProperty('--x', (sens * (1 - p) * 40).toFixed(1)+'px');
-            t.style.setProperty('--o', p.toFixed(3));
-          });
+        /* ⚠ LA COURSE EST UNE FRACTION DE LA CARTE, PAS UN NOMBRE DE PIXELS :
+           l'effet a la même ampleur sur téléphone et sur ordinateur. Le titre
+           part se cacher SOUS LE BORD de la carte, qui rogne ce qui dépasse
+           (`overflow:hidden` sur `.car-vue`). */
+        const COURSE=.24;
+        let geo=[], vue=0;
+        const mesure=()=>{
+          vue=piste.clientWidth;
+          geo=textes.map((t)=>{ const c=t.closest('.car-c');
+                                return {g:c.offsetLeft, l:c.offsetWidth}; });
         };
-        const demande=()=>{ if(!enCours){ enCours=true; requestAnimationFrame(titres); } };
+        const titres=()=>{
+          const d=piste.scrollLeft, fin=d + vue, mi=d + vue / 2;
+          for(let i=0; i<textes.length; i++){
+            const {g,l}=geo[i];
+            if(!l) continue;
+            const vu=Math.max(0, Math.min(g + l, fin) - Math.max(g, d)) / l;
+            let p=Math.max(0, Math.min(1, (vu - .22) / .62));
+            p=p * p * (3 - 2 * p);
+            const sens=(g + l / 2) > mi ? 1 : -1;
+            textes[i].style.setProperty('--x', (sens * (1 - p) * l * COURSE).toFixed(2)+'px');
+            textes[i].style.setProperty('--o', p.toFixed(3));
+          }
+        };
+        let tourne=false, dernier=0;
+        const boucle=()=>{
+          titres();
+          if(performance.now() - dernier < 260) requestAnimationFrame(boucle);
+          else tourne=false;
+        };
+        const demande=()=>{
+          dernier=performance.now();
+          if(!tourne){ tourne=true; requestAnimationFrame(boucle); }
+        };
         piste.addEventListener('scroll', demande, {passive:true});
-        addEventListener('resize', demande, {passive:true});
-        demande();
+        addEventListener('resize', ()=>{ mesure(); demande(); }, {passive:true});
+        mesure(); titres();
+        /* deux images d'attente : la première position est peinte SANS
+           transition, la suivante et les autres l'utilisent. */
+        requestAnimationFrame(()=>requestAnimationFrame(()=>piste.classList.add('lisse')));
       }
       const glisser=(k)=>{
         const e=cartes[Math.max(0, Math.min(cartes.length - 1, k))];
@@ -3726,8 +3825,36 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     const dos=carte.querySelector('.pf-dos');
     if(!b || !avant || !dos) return;
     const nom=b.dataset.nom || '';
+    const tourne=carte.querySelector('.pf-tourne');
+    /* ⚠ ON LIT L'ANGLE RÉEL À CHAQUE IMAGE PENDANT LA ROTATION et on bascule
+       les faces au passage des 90°. `getComputedStyle().transform` rend la
+       valeur en cours d'animation, pas la valeur d'arrivée.
+       ⚠ « none » N'EST PAS UNE MATRICE : `new DOMMatrix('none')` lève. */
+    let suit=0;
+    const angle=()=>{
+      const t=tourne && getComputedStyle(tourne).transform;
+      if(!t || t==='none') return 0;
+      const m=new DOMMatrix(t);
+      return Math.abs(Math.atan2(-m.m13, m.m11) * 180 / Math.PI);
+    };
+    const bascule=()=>carte.classList.toggle('dos-devant', angle() > 90);
+    const suivre=(fin)=>{
+      cancelAnimationFrame(suit);
+      const pas=()=>{ bascule(); if(performance.now() < fin) suit=requestAnimationFrame(pas); };
+      suit=requestAnimationFrame(pas);
+    };
+    /* Filet de sécurité si l'observateur plus bas n'existe pas. */
+    const chauffer=()=>carte.classList.add('pret');
+    b.addEventListener('pointerenter', chauffer, {once:true});
+    b.addEventListener('touchstart', chauffer, {once:true, passive:true});
+    b.addEventListener('focus', chauffer, {once:true});
+
     const poser=(r)=>{
       carte.classList.toggle('retourne', r);
+      bascule();
+      /* la rotation dure 0,85 s ; on suit 1,2 s pour couvrir un démarrage
+         tardif, puis on s'arrête — rien ne tourne au repos. */
+      suivre(performance.now() + 1200);
       b.setAttribute('aria-expanded', r ? 'true' : 'false');
       b.setAttribute('aria-label', (r ? 'Revenir à la carte : ' : 'Voir le détail : ') + nom);
       avant.setAttribute('aria-hidden', r ? 'true' : 'false');
@@ -3737,6 +3864,23 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
     poser(false);
     b.addEventListener('click', ()=>poser(!carte.classList.contains('retourne')));
   });
+
+  /* ⚠ LES PLANS 3D SONT PRÉPARÉS QUAND LA SECTION ARRIVE À L'ÉCRAN, et rendus
+     quand elle en sort (voir `.pret` dans la feuille de style). Un quart de
+     seconde d'attente : la préparation ne doit pas concurrencer l'entrée des
+     cartes, qui joue au même moment. */
+  {
+    const bloc=document.querySelector('.car-pf');
+    if(bloc && 'IntersectionObserver' in window){
+      let attente=0;
+      new IntersectionObserver(([e])=>{
+        clearTimeout(attente);
+        const cartes=bloc.querySelectorAll('.pf-carte');
+        if(e.isIntersecting) attente=setTimeout(()=>cartes.forEach(c=>c.classList.add('pret')), 250);
+        else cartes.forEach(c=>c.classList.remove('pret'));
+      }, {threshold:.15}).observe(bloc);
+    }
+  }
 
   /* ─── LES QUESTIONS FRÉQUENTES ─── */
   {

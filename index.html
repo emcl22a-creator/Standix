@@ -2350,7 +2350,12 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
      donnait un arc trop large sur téléphone. */
   .panneau{--r:min(260px, 68vw)}
 
-  .barre-hote{--marge:10px; --serre:340px; padding:8px var(--marge) 8px}
+  /* ⚠ BARRE UN PEU PLUS LONGUE SUR TÉLÉPHONE ET TABLETTE (à la demande) :
+     elle se resserrait trop en défilant. `--marge` descend de 10 à 9 px parce
+     que le retrait minimal vaut `--marge + 10` : à 10 px, ce plancher de 20 px
+     bridait la barre à 350 px sur un écran de 390, quelle que soit la valeur
+     de `--serre`. */
+  .barre-hote{--marge:9px; --serre:358px; padding:8px var(--marge) 8px}
   .barre{padding:7px 7px 7px 16px}
   /* Le logo agrandi ne vaut que pour le bureau et la tablette : sur 390 px il
      mangerait la barre. */
@@ -2494,7 +2499,7 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
   /* Largeur visée propre à la tablette en portrait : héritée du palier
      téléphone, elle valait 340 px sur un panneau de 800 — la barre se réduisait
      à un timbre. */
-  .barre-hote{--serre:560px}
+  .barre-hote{--serre:590px}
   .texte{max-width:620px; margin-inline:auto}
   /* Les boutons restent plus étroits que le texte : à 620 px ils deviendraient
      des barres. */

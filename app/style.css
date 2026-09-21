@@ -880,6 +880,31 @@
      theme sombre. */
   .ia-ecoute .lg b{ color:var(--label); font-weight:650; }
 
+  /* La langue parlée : une ligne de plus dans le même encadré, séparée par un
+     filet. Le choix se lit à droite, en bleu, comme une valeur qu'on touche.
+
+     ⚠ UN VRAI `<select>`, PAS UNE LISTE DESSINÉE. Sur iPhone, il ouvre la roue
+       du système : grande, familière, et utilisable d'une main. On retire
+       seulement son habillage pour qu'il ressemble au reste de l'app.
+
+     ⚠ 16 PX, PAS MOINS. En dessous, Safari zoome toute la page quand on
+       touche le champ, et ne dézoome pas en le quittant. */
+  .ia-ecoute .lg-langue{
+    margin-top:6px; padding-top:11px; border-top:0.5px solid var(--border);
+    cursor:pointer;
+  }
+  .ia-ecoute .lg-langue span{ flex:1; min-width:0; }
+  .ia-ecoute .lg-langue select{
+    -webkit-appearance:none; appearance:none;
+    border:none; background:transparent; font-family:inherit;
+    font-size:16px; font-weight:600; letter-spacing:-0.01em; color:var(--blue);
+    padding:2px 18px 2px 4px; text-align:right; direction:rtl;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234899EC' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 0 center; background-size:13px;
+  }
+  .ia-ecoute .lg-langue select option{ direction:ltr; }
+  .ia-ecoute .lg-langue select:focus{ outline:none; }
+
   .ai-type{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
   .ai-type button{
     display:flex; flex-direction:column; gap:3px; width:100%;
@@ -12613,6 +12638,38 @@ svg [fill^="url(#cbTrait"],   svg [stroke^="url(#cbTrait"]{
 .histo-tete h2{
   font-size:24px; font-weight:700; letter-spacing:-0.04em; color:var(--label);
 }
+/* Le titre et son bouton d'aide, solidaires, SUR LA MÊME LIGNE.
+
+   ⚠ CETTE RÈGLE A MANQUÉ UNE FOIS, ET LE BOUTON EST TOMBÉ SOUS LE TITRE.
+     `.histo-tete-t` est un `span` qui contient un `h2` — un bloc. Sans
+     `display:flex` ici, le `h2` prend toute la ligne et pousse le point
+     d'interrogation dessous. C'est ce qui s'est vu en ligne : le HTML avait
+     été publié avec son nouveau bloc, la feuille de style qui le range, non.
+
+   ⚠ `nowrap` SUR LE BLOC, PAS SUR LE TITRE. Le titre peut passer sur deux
+     lignes sur un très petit écran ; le bouton, lui, ne doit jamais partir à
+     la ligne tout seul. `flex-shrink:0` le garde entier.
+
+   ⚠ `align-items:center` : le rond se centre sur la ligne du titre, comme
+     une ponctuation, au lieu de flotter plus haut ou plus bas. */
+.histo-tete-t{
+  display:flex; flex-wrap:nowrap; align-items:center; gap:8px; min-width:0;
+}
+.histo-tete-t h2{ margin:0; white-space:nowrap; }
+/* ⚠ SUR PETIT ÉCRAN, LE TITRE RÉTRÉCIT AU LIEU DE PASSER À LA LIGNE.
+   À 360 px, « Temps par procédure » en 24 px ne tient pas à côté du bouton
+   et de la croix : il se coupait en deux, et le point d'interrogation
+   partait flotter à l'autre bout. Deux points de taille en moins suffisent. */
+@media (max-width:380px){ .histo-tete-t h2{ font-size:21px; } }
+@media (max-width:340px){ .histo-tete-t h2{ font-size:18px; } }
+.histo-tete-t .an-i{ flex-shrink:0; }
+
+/* ⚠ UN ÉCART MINIMUM AVEC LA CROIX. « Temps par procédure » est long : sur un
+   petit écran, le point d'interrogation venait toucher le bouton de
+   fermeture. `space-between` ne garantit rien quand la ligne est pleine ; ce
+   `gap`, si. */
+.histo-tete{ gap:12px; }
+
 .histo-x{
   flex-shrink:0; width:32px; height:32px; border-radius:100px; border:none;
   display:grid; place-items:center;

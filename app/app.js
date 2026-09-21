@@ -809,12 +809,14 @@ let langueApp = 'fr'
 function chargerLangue() {
   try { langueApp = localStorage.getItem('procedo_langue') || 'fr' } catch (e) { langueApp = 'fr' }
   appliquerLangue()
+  synchroniserLangueParlee()
 }
 
 function definirLangue(code) {
   langueApp = code
   try { localStorage.setItem('procedo_langue', code) } catch (e) {}
   appliquerLangue()
+  synchroniserLangueParlee()
 }
 
 /* Traduit une phrase si le dictionnaire la connaît, la laisse telle quelle
@@ -17743,6 +17745,10 @@ const LIMITE_STOCKAGE = 150 * 1024 * 1024
 let raisonCompression = ''
 
 function peutComprimer() {
+  /* ⚠ LA MÉTHODE RAPIDE COMPTE AUSSI. Sans elle, un navigateur doté de
+     WebCodecs mais pas de `captureStream` aurait été déclaré incapable
+     d'alléger — et la vidéo serait partie entière. */
+  if (typeof VideoEncoder === 'function' && typeof VideoDecoder === 'function') return true
   return typeof MediaRecorder !== 'undefined' &&
          (typeof HTMLCanvasElement.prototype.captureStream === 'function' ||
           typeof HTMLCanvasElement.prototype.webkitCaptureStream === 'function')
@@ -17796,7 +17802,214 @@ function formatEnregistrable() {
   return ''
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ALLÈGEMENT RAPIDE · PAR LE PROCESSEUR VIDÉO DU TÉLÉPHONE
+
+   L'ANCIENNE MÉTHODE REGARDE LA VIDÉO. `comprimerVideoTempsReel` la lit à
+   vitesse normale et en filme chaque image : cinq minutes de vidéo coûtent
+   cinq minutes d'attente, quel que soit le téléphone. Mesuré : 1,05 × la
+   durée. Sur une vidéo de cinq minutes, c'était la moitié de l'attente totale.
+
+   CELLE-CI NE LA REGARDE PAS. WebCodecs donne accès directement au décodeur
+   et à l'encodeur vidéo matériels — les mêmes puces que l'appareil photo
+   utilise pour enregistrer. Elles travaillent aussi vite qu'elles le peuvent,
+   pas au rythme de la lecture.
+
+   Le travail est confié à Mediabunny, une bibliothèque libre (licence MPL 2.0)
+   posée à côté de l'app : `mediabunny-1.58.1.min.mjs`. Elle n'est chargée
+   qu'au moment d'alléger — jamais pour quelqu'un qui ne fait que lire des
+   procédures.
+
+   ─── CE QUI NE CHANGE PAS ───
+   Le résultat : même cadre (1280 × 720 au plus, proportions gardées), même
+   débit (1,4 Mb/s), 24 images par seconde, en MP4. Azure reçoit le même
+   fichier qu'avant, seulement plus tôt.
+
+   Le SON n'est pas retouché quand il peut être recopié tel quel : c'est lui
+   qu'Azure transcrit, et le réencoder ne pourrait que l'abîmer.
+
+   ─── CE QUI PEUT RATER, ET CE QUI SE PASSE ALORS ───
+   Navigateur sans WebCodecs, format que le téléphone ne sait pas décoder,
+   bibliothèque qui ne se charge pas, piste son qui serait perdue : dans tous
+   ces cas, la fonction rend `null` et l'ancienne méthode prend le relais.
+   On perd le gain de temps, jamais la vidéo.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ═══ LA LANGUE PARLÉE DANS LA VIDÉO ═══
+
+   Choisie sur l'écran d'analyse, mémorisée sur cet appareil. Par défaut, celle
+   de l'interface : quelqu'un qui utilise Standix en allemand commente le plus
+   souvent en allemand.
+
+   ⚠ UN CHOIX, PAS UNE DÉDUCTION. Le mode léger d'Azure transcrit dans la
+     langue qu'on lui donne. Si on lui dit « français » pour une vidéo
+     commentée en espagnol, il ne se trompe pas bruyamment : il écrit du
+     charabia en français, et les étapes suivent. La valeur doit donc être
+     visible et modifiable. */
+/* ⚠ PAS DE `const` AU NIVEAU DU MODULE ICI. `chargerLangue`, tout en haut
+   du fichier, appelle `synchroniserLangueParlee` au démarrage — avant que
+   l'exécution n'arrive à cette ligne. Une constante déclarée ici serait alors
+   encore inaccessible, et l'app planterait au chargement. Des fonctions, elles,
+   existent dès le départ. */
+function languesParlees() { return ['fr-FR', 'en-US', 'de-DE', 'es-ES', 'it-IT', 'pt-PT'] }
+
+function langueParDefaut() {
+  return ({ fr: 'fr-FR', en: 'en-US', de: 'de-DE', es: 'es-ES', it: 'it-IT', pt: 'pt-PT' })[langueApp] || 'fr-FR'
+}
+
+function langueParlee() {
+  const choix = document.getElementById('ai-langue')?.value
+  return languesParlees().includes(choix) ? choix : langueParDefaut()
+}
+
+/* Pose la valeur affichée : le choix mémorisé s'il existe, sinon la langue de
+   l'app. Rappelée quand la langue de l'app change — tant que personne n'a
+   choisi explicitement, la langue parlée suit l'interface. */
+function synchroniserLangueParlee() {
+  const choix = document.getElementById('ai-langue')
+  if (!choix) return
+  let memo = null
+  try { memo = localStorage.getItem('standix-langue-parlee') } catch (e) {}
+  choix.value = languesParlees().includes(memo) ? memo : langueParDefaut()
+  if (!choix.dataset.branche) {
+    choix.dataset.branche = '1'
+    choix.addEventListener('change', () => {
+      try { localStorage.setItem('standix-langue-parlee', choix.value) } catch (e) {}
+    })
+  }
+}
+synchroniserLangueParlee()
+
+let mediabunny = null
+
+function webCodecsDisponible() {
+  return typeof VideoEncoder === 'function' && typeof VideoDecoder === 'function'
+}
+
+async function comprimerVideoRapide(fichier, surAvancee) {
+  if (!webCodecsDisponible()) {
+    console.log('[compression rapide] WebCodecs absent — méthode classique')
+    return null
+  }
+  const t0 = performance.now()
+  try {
+    /* Chemin relatif au document : la bibliothèque est dans le même dossier
+       que l'app, où qu'elle soit hébergée. */
+    mediabunny ||= await import(new URL('mediabunny-1.58.1.min.mjs', document.baseURI).href)
+    const { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } = mediabunny
+
+    const entree = new Input({ source: new BlobSource(fichier), formats: ALL_FORMATS })
+    const piste = await entree.getPrimaryVideoTrack()
+    if (!piste) { console.warn('[compression rapide] aucune piste vidéo lisible'); return null }
+
+    const large = piste.displayWidth, haut = piste.displayHeight
+    const duree = await entree.computeDuration()
+    if (!large || !haut || !duree) { console.warn('[compression rapide] dimensions ou durée illisibles'); return null }
+
+    /* Le même garde-fou que l'ancienne méthode : une vidéo déjà légère et
+       déjà petite ne gagnerait rien à être refaite, elle perdrait en netteté. */
+    const debitActuel = fichier.size * 8 / duree
+    if (debitActuel < VIDEO_DEBIT * 1.15 && large <= VIDEO_LARGEUR_MAX && haut <= VIDEO_HAUTEUR_MAX) {
+      raisonCompression = 'deja-legere'
+      console.log('[compression rapide] déjà légère, envoyée telle quelle')
+      return fichier
+    }
+
+    const ratio = Math.min(VIDEO_LARGEUR_MAX / large, VIDEO_HAUTEUR_MAX / haut, 1)
+    const L = Math.round(large * ratio / 2) * 2   // pair : exigé par les codecs
+    const H = Math.round(haut * ratio / 2) * 2
+
+    const cible = new BufferTarget()
+    const sortie = new Output({
+      /* `in-memory` place le sommaire du fichier AU DÉBUT : la vidéo peut
+         alors commencer à se lire dans la fiche avant d'être entièrement
+         téléchargée. Sans lui, un lecteur doit tout recevoir pour démarrer. */
+      format: new Mp4OutputFormat({ fastStart: 'in-memory' }),
+      target: cible,
+    })
+
+    const conversion = await Conversion.init({
+      input: entree,
+      output: sortie,
+      video: {
+        width: L, height: H, fit: 'fill',
+        frameRate: VIDEO_IMAGES_S,
+        codec: 'avc',
+        bitrate: VIDEO_DEBIT,
+        forceTranscode: true,
+      },
+      /* ⚠ LE SON N'A AUCUN RÉGLAGE, ET C'EST VOULU.
+
+         Donner un débit ou un format au son FORCE son réencodage — c'est la
+         règle de Mediabunny. Or Safari ne sait pas toujours encoder l'AAC :
+         la piste serait alors écartée, et l'on retomberait sur la méthode
+         lente pour rien.
+
+         Sans réglage, le son de l'iPhone (de l'AAC, que le MP4 accepte) est
+         RECOPIÉ tel quel : aucun travail, et pas la moindre perte sur ce
+         qu'Azure va transcrire. Il pèse un peu plus qu'à 96 kb/s — environ
+         4 Mo de plus sur cinq minutes, soit deux secondes d'envoi. */
+      audio: {},
+    })
+
+    /* ⚠ UNE PISTE ÉCARTÉE EST UN ÉCHEC, SURTOUT LE SON. Mediabunny préfère
+       abandonner une piste qu'il ne sait pas traiter plutôt que d'échouer :
+       on obtiendrait une vidéo muette, et Azure n'aurait plus rien à
+       transcrire. On laisse alors la main à l'ancienne méthode. */
+    const ecartees = conversion.discardedTracks || []
+    if (!conversion.isValid || ecartees.length) {
+      console.warn('[compression rapide] conversion impossible ici :',
+        ecartees.map(d => `${d.track?.type} (${d.reason})`).join(', ') || 'configuration refusée')
+      return null
+    }
+
+    conversion.onProgress = (p) => { if (surAvancee) surAvancee(Math.min(99, Math.round(p * 100))) }
+    await conversion.execute()
+    if (surAvancee) surAvancee(100)
+
+    const octets = cible.buffer
+    if (!octets || !octets.byteLength) { console.warn('[compression rapide] fichier vide'); return null }
+
+    const secondes = ((performance.now() - t0) / 1000).toFixed(1)
+    console.log(`[compression rapide] ${(fichier.size / 1048576).toFixed(1)} Mo → ` +
+      `${(octets.byteLength / 1048576).toFixed(1)} Mo en ${secondes} s, ` +
+      `pour ${duree.toFixed(0)} s de vidéo (${(duree / secondes).toFixed(1)} × plus vite que la lecture)`)
+
+    if (octets.byteLength >= fichier.size) {
+      raisonCompression = 'plus-lourde'
+      return fichier
+    }
+    return new File([octets], (fichier.name || 'video').replace(/\.[^.]+$/, '') + '.mp4',
+                    { type: 'video/mp4' })
+  } catch (e) {
+    console.warn('[compression rapide] échec, méthode classique :', e?.message || e)
+    return null
+  }
+}
+
+/* Le point d'entrée : la méthode rapide d'abord, l'ancienne en secours.
+
+   ⚠ LE COMPTEUR REPART DE ZÉRO si l'on bascule. Mieux vaut un anneau qui
+     recommence qu'un anneau qui mentirait en reprenant à 40 % un travail
+     qui, lui, repart du début. */
+/* Combien de temps l'allègement a pris, et par quelle méthode. Affiché sous la
+   vidéo : c'est la seule façon de mesurer le gain sur un iPhone, qui n'a pas
+   de console à portée de main. */
+let bilanAllegement = null
+
 async function comprimerVideo(fichier, surAvancee) {
+  raisonCompression = ''
+  const t0 = performance.now()
+  const fin = (f, methode) => {
+    bilanAllegement = { secondes: (performance.now() - t0) / 1000, methode }
+    return f
+  }
+  const rapide = await comprimerVideoRapide(fichier, surAvancee)
+  if (rapide) return fin(rapide, 'rapide')
+  if (surAvancee) surAvancee(0)
+  return fin(await comprimerVideoTempsReel(fichier, surAvancee), 'classique')
+}
+
+async function comprimerVideoTempsReel(fichier, surAvancee) {
   /* Remis à zéro à chaque appel : une raison qui traîne d'une vidéo à l'autre
      ferait accuser la mauvaise. */
   raisonCompression = ''
@@ -17806,8 +18019,14 @@ async function comprimerVideo(fichier, surAvancee) {
     return fichier
   }
 
-  if (!peutComprimer()) return abandon('navigateur',
-    'MediaRecorder ou captureStream absent')
+  /* ⚠ PAS `peutComprimer()` ICI : elle répond oui dès que WebCodecs existe.
+     Cette méthode-ci a besoin de MediaRecorder et de captureStream, et de
+     rien d'autre — on vérifie exactement ce qu'elle emploie. */
+  if (typeof MediaRecorder === 'undefined' ||
+      (typeof HTMLCanvasElement.prototype.captureStream !== 'function' &&
+       typeof HTMLCanvasElement.prototype.webkitCaptureStream !== 'function')) {
+    return abandon('navigateur', 'MediaRecorder ou captureStream absent')
+  }
 
   const type = formatEnregistrable()
   if (!type) return abandon('format',
@@ -18378,8 +18597,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        l'autre. */
     if (aiVideoFile.size < avant) {
       const part = Math.round((1 - aiVideoFile.size / avant) * 100)
+      /* ⚠ LA DURÉE EST AFFICHÉE, ET LA MÉTHODE AUSSI. « en 38 s » dit si
+         l'allègement rapide a fonctionné sur ce téléphone ; « (méthode
+         classique) » signale qu'il a dû se rabattre sur l'ancienne. */
+      const b = bilanAllegement
+      const duree = b ? ` en ${Math.max(1, Math.round(b.secondes))}\u202fs` +
+        (b.methode === 'classique' ? ' (m\u00e9thode classique)' : '') : ''
       errorEl.innerHTML = `Vid\u00e9o all\u00e9g\u00e9e : ${poidsLisible(avant)} \u2192 ` +
-        `<b>${poidsLisible(aiVideoFile.size)}</b> (\u2212${part}\u202f%)`
+        `<b>${poidsLisible(aiVideoFile.size)}</b> (\u2212${part}\u202f%)${duree}`
       console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192',
         poidsLisible(aiVideoFile.size), `(-${part} %)`)
     }
@@ -18693,6 +18918,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         procedure_id: aiProcedureId,
         video_url: urlPourAnalyse,
         avec_image: true,
+        /* ═══ LA LANGUE PARLÉE ═══
+
+           Sa présence fait passer Azure en mode léger (`Basic`), plus rapide,
+           qui ne reconnaît pas la langue seul. Sans elle, `ai-start` garde
+           l'ancien mode et la détection automatique. */
+        langue: langueParlee(),
         /* ═══ ON DIT DANS QUELLE ENTREPRISE ON TRAVAILLE ═══
 
            `consommer_analyse` le devinait, en prenant la première fiche membre

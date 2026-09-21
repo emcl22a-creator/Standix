@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=00c87944">
+<link rel="stylesheet" href="style.css?v=95c760b9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2306,8 +2306,32 @@
           </div>
           <div class="lg">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg>
-            <span><b>Ce qui est visible</b> — objets, personnes, texte à l’écran</span>
-          </div></div>
+            <span><b>Ce qui est visible</b> — objets et texte à l’écran</span>
+          </div>
+          <!-- ⚠ LA LANGUE EST DEMANDÉE, PLUS DEVINÉE.
+
+               L'analyse Azure est passée en mode léger (`Basic`) : plus
+               rapide, mais elle ne reconnaît pas la langue toute seule. Lui en
+               imposer une mauvaise produirait du charabia — c'est pour ça que
+               le choix est montré.
+
+               Pré-réglée sur la langue de l'app, et mémorisée : dans l'immense
+               majorité des cas, on n'y touche jamais.
+
+               « personnes » a été retiré de la ligne du dessus : ni l'ancien
+               ni le nouveau mode n'en tiraient quoi que ce soit. -->
+          <label class="lg lg-langue" for="ai-langue">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z"></path></svg>
+            <span><b>Langue parlée</b></span>
+            <select id="ai-langue">
+              <option value="fr-FR">Français</option>
+              <option value="en-US">English</option>
+              <option value="de-DE">Deutsch</option>
+              <option value="es-ES">Español</option>
+              <option value="it-IT">Italiano</option>
+              <option value="pt-PT">Português</option>
+            </select>
+          </label></div>
 
       
       <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
@@ -4938,7 +4962,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=223879e0"></script>
+<script type="module" src="app.js?v=cc6a9a9a"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

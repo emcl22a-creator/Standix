@@ -17247,7 +17247,33 @@ function basculerVersAttente(depart) {
 
 /* Un jalon va là où la personne regarde : sous le bouton tant qu'elle y est,
    sur l'écran d'attente une fois basculée. */
+/* ═══ LE JOURNAL DE PRÉPARATION, LISIBLE DEPUIS LE SERVEUR ═══
+   Ce que fait le téléphone avant l'envoi (allègement, son, images) ne laisse
+   aucune trace ailleurs que dans sa console — invisible sur un iPhone. Quand
+   une préparation cale, on ne pouvait que deviner. Chaque étape est donc
+   recopiée dans `procedures.journal_ia`, au plus toutes les 5 secondes. */
+let journalLignes = []
+let journalDepart = 0
+let journalMinuteur = 0
+let journalProc = null
+function journalIA(m) {
+  if (!aiProcedureId) return
+  if (journalProc !== aiProcedureId) {
+    journalProc = aiProcedureId; journalLignes = []; journalDepart = Date.now()
+  }
+  journalLignes.push(`${Math.round((Date.now() - journalDepart) / 1000)}s ${m}`)
+  if (journalLignes.length > 60) journalLignes = journalLignes.slice(-60)
+  if (journalMinuteur) return
+  journalMinuteur = setTimeout(() => {
+    journalMinuteur = 0
+    const id = journalProc
+    supabase.from('procedures').update({ journal_ia: journalLignes.join('\n').slice(-3000) })
+      .eq('id', id).then(() => {}, () => {})
+  }, 5000)
+}
+
 function jalonUI(m) {
+  if (aiLancementEnCours) journalIA(m)
   if (aiEcranAttente) { signalerEtapeIA(m); return }
   const zone = document.getElementById('ai-error')
   if (!zone) return
@@ -17733,7 +17759,7 @@ async function extraireImages(fichier, duree) {
       const data = toile.toDataURL('image/jpeg', 0.7).split(',')[1] || ''
       if (data.length > 100) images.push({ t: Math.round(t * 10) / 10, data })
     }
-    window.jalon?.(`images : ${images.length}/${n}`)
+    journalIA(`images : ${images.length}/${n}`)
     return images.length ? images : null
   } catch (e) {
     console.warn('Standix · images non extraites :', e?.message || e)
@@ -17783,7 +17809,7 @@ async function tenterAnalyseRapide({ base, son, promesseImages }) {
       if (!eImg) cheminImages = c
       else console.warn('[rapide] images non envoyées :', eImg.message)
     }
-    window.jalon?.(`rapide : fichiers envoyés en ${Math.round((Date.now() - depart) / 1000)} s`)
+    journalIA(`rapide : fichiers envoyés en ${Math.round((Date.now() - depart) / 1000)} s`)
 
     let rep
     try {
@@ -17807,6 +17833,8 @@ async function tenterAnalyseRapide({ base, son, promesseImages }) {
 
     const data = await rep.json().catch(() => ({}))
     console.log(`[rapide] ${rep.status} en ${Math.round((Date.now() - depart) / 1000)} s`, data)
+    journalIA(`rapide : réponse ${rep.status} en ${Math.round((Date.now() - depart) / 1000)} s` +
+      (data.error ? ` · ${String(data.error).slice(0, 120)}` : ''))
     if (rep.ok && data.ok) return true
     if (data.raison && !data.repli) {
       const err = new Error(data.error || 'Analyse refusée.')
@@ -18099,6 +18127,7 @@ function webCodecsDisponible() {
 async function comprimerVideoRapide(fichier, surAvancee) {
   if (!webCodecsDisponible()) {
     console.log('[compression rapide] WebCodecs absent — méthode classique')
+    journalIA('WebCodecs absent')
     return null
   }
   const t0 = performance.now()
@@ -18110,7 +18139,17 @@ async function comprimerVideoRapide(fichier, surAvancee) {
          c'est `import()` qui décide, pas l'extension. Mais un `.mjs` ne
          s'ouvre pas dans l'aperçu des fichiers (« aucun contenu disponible »),
          ce qui le faisait passer pour vide au moment de le publier. */
-    mediabunny ||= await import(new URL('mediabunny.js', document.baseURI).href)
+    /* ⚠ DEUX EMPLACEMENTS. Le fichier doit être à côté de l'app ; s'il a été
+       déposé à la racine du site, on le prend là plutôt que de retomber sur
+       la méthode lente. */
+    if (!mediabunny) {
+      try {
+        mediabunny = await import(new URL('mediabunny.js', document.baseURI).href)
+      } catch (e) {
+        journalIA('mediabunny absent à côté de l’app, essai à la racine')
+        mediabunny = await import(new URL('/mediabunny.js', document.baseURI).href)
+      }
+    }
     const { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } = mediabunny
 
     const entree = new Input({ source: new BlobSource(fichier), formats: ALL_FORMATS })
@@ -18173,6 +18212,7 @@ async function comprimerVideoRapide(fichier, surAvancee) {
        transcrire. On laisse alors la main à l'ancienne méthode. */
     const ecartees = conversion.discardedTracks || []
     if (!conversion.isValid || ecartees.length) {
+      journalIA('allègement rapide refusé : ' + (ecartees.map(d => `${d.track?.type} (${d.reason})`).join(', ') || 'configuration'))
       console.warn('[compression rapide] conversion impossible ici :',
         ecartees.map(d => `${d.track?.type} (${d.reason})`).join(', ') || 'configuration refusée')
       return null
@@ -18232,6 +18272,7 @@ async function comprimerVideoRapide(fichier, surAvancee) {
        l'erreur pour que le bouton propose de relancer. */
     if (e?.allegementBloque) throw e
     console.warn('[compression rapide] échec, méthode classique :', e?.message || e)
+    journalIA('allègement rapide impossible : ' + String(e?.message || e).slice(0, 160))
     return null
   }
 }
@@ -18251,8 +18292,12 @@ async function comprimerVideo(fichier, surAvancee) {
   const t0 = performance.now()
   const fin = (f, methode) => {
     bilanAllegement = { secondes: (performance.now() - t0) / 1000, methode }
+    journalIA(`allègement ${methode} fini en ${Math.round(bilanAllegement.secondes)} s · ` +
+      `${(fichier.size / 1048576).toFixed(0)} → ${(f.size / 1048576).toFixed(0)} Mo` +
+      (raisonCompression ? ` · ${raisonCompression}` : ''))
     return f
   }
+  journalIA(`allègement de ${(fichier.size / 1048576).toFixed(0)} Mo (${fichier.type || 'type ?'})`)
   const rapide = await comprimerVideoRapide(fichier, surAvancee)
   if (rapide) return fin(rapide, 'rapide')
   if (surAvancee) surAvancee(0)
@@ -18821,8 +18866,11 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     /* Cinq secondes : au-delà, on ne fait plus patienter sous un bouton. */
     const bascule = setTimeout(basculerVersAttente, 5000)
     try {
+      let decile = -1
       aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
         jalonUI(pct >= 100 ? 'Finalisation de la vidéo…' : 'Préparation de la vidéo…')
+        const d = Math.floor(pct / 10)
+        if (d !== decile) { decile = d; journalIA(`allègement ${pct} %`) }
       })
     } catch (e) {
       /* ⚠ CETTE ÉTAPE ÉTAIT HORS DE TOUT `catch`. Une erreur ici laissait
@@ -19208,6 +19256,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     }
 
     if (!rapideFait) {
+    journalIA('repli sur Azure Video Indexer')
     // 3. Démarrage de l'analyse Azure
     /* ═══ UN DÉLAI MAXIMAL SUR LE DÉMARRAGE ═══
 

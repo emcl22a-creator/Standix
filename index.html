@@ -2826,8 +2826,12 @@ h1{letter-spacing:-.028em}
 
 /* ─── Surtitres en étiquette produit ─── */
 .sur{
-  text-transform:none; letter-spacing:-.01em;
-  font-size:clamp(16px, 1.45vw, 22px); font-weight:600;
+  /* ⚠ MÊME ÉCRITURE QUE LE MOT « Standix » DU LOGO (à la demande) : Poppins
+     500, avec son crénage serré. Inter y était trop large et le surtitre ne
+     se lisait pas comme le nom du produit. */
+  font-family:Poppins,Inter,sans-serif; font-weight:500;
+  text-transform:none; letter-spacing:-.034em;
+  font-size:clamp(16px, 1.45vw, 22px);
   color:var(--porcelaine);
 }
 .cout-sur{
@@ -2948,7 +2952,7 @@ h1{letter-spacing:-.028em}
 .barre-hote .barre .btn.btn-barre:not(.btn-entrer):hover,
 .barre-hote.sombre .barre .btn.btn-barre:not(.btn-entrer):hover{
   background:linear-gradient(135deg, var(--bleu-a) 0%, var(--bleu-b) 62%, var(--bleu-c) 100%);
-  color:#FFFFFF; padding:11px 18px; margin-left:6px; /* plus haut (à la demande) */
+  color:#FFFFFF; padding:13px 19px; margin-left:6px; /* plus haut, puis encore un peu (à la demande) */
   font-size:13.5px; font-weight:600; text-decoration:none;
   box-shadow:0 4px 12px rgba(31,76,238,.24);
 }
@@ -2966,6 +2970,9 @@ h1{letter-spacing:-.028em}
    visibles d'un coup) : moins d'air au-dessus du titre ; et, pour Sécurité,
    moins d'air sous sa dernière ligne. */
 .car.car-pf:not(.epingle), .car.car-s3:not(.epingle), .car.secu:not(.epingle){padding-top:clamp(48px, 7vh, 96px)}
+/* ⚠ UN PEU PLUS D'AIR ENTRE « POURQUOI STANDIX » ET « SÉCURITÉ » (à la
+   demande) : +12 % sur la marge haute de Sécurité, elle seule. */
+.car.secu:not(.epingle){padding-top:clamp(54px, 7.9vh, 108px)}
 .car.secu:not(.epingle){padding-bottom:clamp(28px, 4vh, 48px)}
 .car.secu .car-bas{margin-bottom:clamp(8px, 1.2vh, 16px)}
 
@@ -2975,6 +2982,14 @@ h1{letter-spacing:-.028em}
 @media (max-width:980px), (hover:none) and (pointer:coarse){
   .car-pf .car-f, .car-s3 .car-f, .secu .car-f{display:none}
   .car-pf .car-bas, .car-s3 .car-bas{justify-content:center}
+}
+
+/* ─── UN PEU D'AIR SOUS LA BARRE, SUR ORDINATEUR (à la demande) ───
+   Le surtitre « Standix App » démarrait juste sous la barre du logo. On
+   ajoute une douzaine de pixels, seulement sur grand écran : sur téléphone
+   la hauteur est comptée au plus juste. */
+@media (min-width:981px){
+  .hero{padding-top:calc(var(--h-barre, 88px) + clamp(30px, 6.2vh, 82px))} /* puis un cran de plus (à la demande) */
 }
 
 /* ─── 7. LES CARTES DÉFILENT AVEC LA PAGE — ORDINATEUR SEULEMENT ───
@@ -3055,9 +3070,148 @@ h1   {animation:texte-cine 1.4s cubic-bezier(.16,1,.3,1) .74s both paused}
 body.pret .sc-tel, body.pret .sc-in::before, body.pret .sur, body.pret h1,
 body.pret .sous, body.pret .acte-bas{animation-play-state:running}
 
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EMPRUNTS À LA FICHE STRIPE (à la demande : ce que ce site fait et que le
+   nôtre ne faisait pas). Rien de son apparence — il est clair, plat et
+   violet, à l'opposé du nôtre — mais ses bonnes habitudes :
+   · des CHIFFRES TABULAIRES, pour que les prix s'alignent à la virgule ;
+   · les REPÈRES DE CONFIANCE juste sous le bouton d'action ;
+   · un FILET FIN pour séparer deux sections de même couleur, plutôt que
+     rien du tout ;
+   · un LIEN D'ÉVITEMENT et une marque de focus nette au clavier.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. CHIFFRES TABULAIRES ───
+   Tous les chiffres prennent la même largeur : les prix s'alignent d'une
+   carte à l'autre, et les nombres ne « sautent » plus quand ils changent. */
+.abo-carte, .tar-gar, .faq, .cout-p, .pied-bas{
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum" 1;
+}
+
+/* ─── 2. LES REPÈRES DE CONFIANCE, SOUS LE DERNIER BOUTON ─── */
+.fin-gages{
+  display:flex; flex-wrap:wrap; justify-content:center;
+  gap:6px clamp(14px, 1.6vw, 26px);
+  margin:clamp(20px, 2.6vh, 30px) 0 0;
+  font-family:Inter,sans-serif; font-weight:400;
+  font-size:clamp(13px, 1.05vw, 15px); line-height:1.45; letter-spacing:-.01em;
+  color:#86868B;
+}
+/* Un point de séparation entre chaque repère, jamais avant le premier. */
+.fin-gages span + span::before{content:'·'; margin-right:clamp(14px, 1.6vw, 26px); color:#C7C7CC}
+@media (max-width:480px){
+  .fin-gages{flex-direction:column; gap:6px}
+  .fin-gages span + span::before{content:none}
+}
+
+/* ─── 3. UN FILET ENTRE DEUX SECTIONS DE MÊME COULEUR ───
+   Les questions et la conclusion sont toutes deux blanches : sans rien, elles
+   se confondaient en une seule page sans fin. */
+.car.fin{border-top:1px solid #D6D6D6}
+
+/* ─── 4. ACCESSIBILITÉ AU CLAVIER ───
+   Le lien d'évitement ne se voit qu'à la tabulation ; et tout élément
+   actionnable montre une marque de focus nette, même si sa règle propre
+   manquait. */
+.saut{
+  position:fixed; top:10px; left:50%; translate:-50% -150%; z-index:300;
+  padding:12px 20px; border-radius:100px;
+  background:#F5F5F7; color:#1D1D1F; text-decoration:none;
+  font-family:Inter,sans-serif; font-weight:600; font-size:14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  transition:translate .3s cubic-bezier(.32,.72,0,1);
+}
+.saut:focus{translate:-50% 0}
+a:focus-visible, button:focus-visible{outline:2px solid #4899EC; outline-offset:3px}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UNE SEULE ÉCHELLE DE TAILLES, CELLE DE LA FICHE APPLE (à la demande :
+   « les tailles ne sont pas cohérentes »).
+   Apple n'emploie que quelques tailles, toujours les mêmes, et resserre le
+   crénage à mesure que le texte grandit. On fait pareil : six marches, et
+   chaque texte du site prend celle de son rôle.
+
+     --t-titre    40 → 76 px   le titre du premier écran
+     --t-section  30 → 48 px   TOUS les titres de section
+     --t-phrase   26 → 40 px   la grande phrase de « Pourquoi Standix »
+     --t-nom      18 → 24 px   les surtitres (nom du produit, Abonnements…)
+     --t-lead     16 → 19 px   les phrases d'introduction
+     --t-corps    15 → 17 px   le texte courant, les descriptions, les réponses
+     --t-action   15 → 17 px   les boutons et les liens
+     --t-petit    13 → 14 px   les mentions et le pied de page
+
+   ⚠ CE BLOC EST LE DERNIER DE LA FEUILLE : il l'emporte sur les tailles
+   écrites plus haut sans les effacer. Pour revenir en arrière, le supprimer.
+   ═══════════════════════════════════════════════════════════════════════ */
+:root{
+  --t-titre:clamp(34px, 4.9vw, 76px);
+  --t-section:clamp(30px, 3.6vw, 48px);
+  --t-phrase:clamp(26px, 3vw, 40px);
+  --t-nom:clamp(18px, 1.6vw, 24px);
+  --t-lead:clamp(16px, 1.35vw, 19px);
+  --t-corps:clamp(15px, 1.25vw, 17px);
+  --t-action:clamp(15px, 1.15vw, 17px);
+  --t-petit:clamp(13px, 1.05vw, 14px);
+}
+
+/* Le titre du premier écran. */
+h1{font-size:var(--t-titre); letter-spacing:-.028em}
+
+/* Tous les titres de section tombent sur la MÊME taille : « Vos bénéfices. »,
+   « Fonctionnement. », « Sécurité. », « Choisissez votre formule. »,
+   « Questions fréquentes. » et le dernier appel. */
+.car-t,
+.car-pf .car-t, .car-s3 .car-t, .secu .car-t, .faq .car-t,
+.pts-t, .tar-t, .tar .tar-t, .fin-t{
+  font-size:var(--t-section); letter-spacing:-.026em;
+}
+
+/* La grande phrase de « Pourquoi Standix » : un cran sous les titres. */
+.cout-p{font-size:var(--t-phrase)}
+
+/* Les surtitres : nom du produit et étiquettes de section. */
+.sur, .cout-sur, .tar-sur, .tar .tar-sur{font-size:var(--t-nom)}
+
+/* Les phrases d'introduction, sous un titre. */
+.sous, .fin-s{font-size:var(--t-lead)}
+
+/* Le texte courant : descriptions des cartes, réponses, garanties. */
+.car-c p, .faq-r p, .faq-plus, .tar-gar-i{font-size:var(--t-corps)}
+
+/* Les boutons et les liens. */
+.btn, .btn-verre, .btn-bleu, .car-lien, .voile nav a{font-size:var(--t-action)}
+
+/* Les mentions discrètes. */
+.fin-gages, .tar-gar-sur, .pied-col a, .pied-col h3, .pied-marque p{font-size:var(--t-petit)}
+
+
+
+/* ─── LE LOGO, UN PEU PLUS PETIT SUR ORDINATEUR (à la demande) ───
+   Le signe passe de 34 à 31 px ; le mot « Standix » suit tout seul, sa taille
+   étant calculée à partir de celle du signe.
+   ⚠ ET LE LOGO DU CHARGEMENT PREND EXACTEMENT LA MÊME TAILLE (à la demande) :
+   il faisait jusqu'à 45 px, l'écran d'ouverture ne se raccordait donc pas à la
+   barre qui apparaissait juste après. Une seule mesure par palier d'écran,
+   partagée par les deux. */
+@media (min-width:1281px){
+  .marque{--signe:31px}
+  .chargement .chargement-marque{--signe:31px}
+}
+@media (min-width:981px) and (max-width:1280px){
+  .marque{--signe:30px}
+  .chargement .chargement-marque{--signe:30px}
+}
+@media (max-width:980px){
+  .chargement .chargement-marque{--signe:29px}
+}
 </style>
 </head>
 <body>
+<!-- ⚠ LIEN D'ÉVITEMENT : invisible à la souris, il apparaît à la première
+     tabulation et permet de sauter la barre pour aller droit au contenu. -->
+<a class="saut" href="#points-forts">Aller au contenu</a>
 
 <svg width="0" height="0" aria-hidden="true" style="position:absolute">
   <defs>
@@ -3856,6 +4010,13 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
            et `btn btn-bleu`), en liens pour rester cliquables. -->
       <a class="btn btn-verre" href="/app/">Se connecter</a>
       <a class="btn btn-bleu" href="/app/">Essayer 14 jours</a>
+    </p>
+    <!-- ⚠ LES REPÈRES DE CONFIANCE JUSTE SOUS LE BOUTON (repris de Stripe, qui
+         place ses garanties à l'endroit où l'on décide) : prix de départ,
+         lieu d'hébergement, engagement. -->
+    <p class="fin-gages" data-monte style="--d:240ms">
+      <span>À partir de 69&nbsp;€ par mois</span>
+      <span>Résiliable à tout moment</span>
     </p>
   </div>
 </section>

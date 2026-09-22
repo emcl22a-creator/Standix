@@ -329,6 +329,7 @@ const DICO = {
     "Étapes liées": "Linked steps",
     "Étapes manuelles": "Manual steps",
     "— la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "— the procedure will appear in your list as soon as it is ready.",
+    "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "the procedure is already shown on the “En dév.” page. It will be available when the analysis is finished.",
 
     // ── espace équipe ──
     // ── navigation et en-têtes ──
@@ -537,6 +538,7 @@ const DICO = {
     "Étapes liées": "Pasos enlazados",
     "Étapes manuelles": "Pasos manuales",
     "— la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "— el procedimiento aparecerá en tu lista en cuanto esté listo.",
+    "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "el procedimiento ya aparece en la página «En dév.». Estará disponible al terminar el análisis.",
 
     // ── espace équipe ──
     'Espace \u00c9quipe': 'Espacio Equipo',
@@ -739,6 +741,7 @@ const DICO = {
     "Étapes liées": "Etapas ligadas",
     "Étapes manuelles": "Etapas manuais",
     "— la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "— o procedimento aparecerá na sua lista assim que estiver pronto.",
+    "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "o procedimento já aparece na página «En dév.». Ficará disponível no fim da análise.",
 
     // ── espace équipe ──
     'Espace \u00c9quipe': 'Espa\u00e7o Equipa',
@@ -17434,7 +17437,7 @@ function majProgressionIA() {
      par le script, corriger le balisage ne se voit pas — et l'on croit que le
      changement n'a pas ete deploye. */
   sous.innerHTML = `${phrase} <b style="color:var(--label);">${t('Vous pouvez quitter cette page')}</b> \u2014 ` +
-    escapeHtml(t("la proc\u00e9dure appara\u00eetra dans votre liste d\u00e8s qu'elle sera pr\u00eate."))
+    escapeHtml(t("la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse."))
 }
 
 function stopAiProgressSimulation(finalPct) {

@@ -12206,7 +12206,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
               const intacte = !modL
                 || (creeL && Math.abs(new Date(modL) - new Date(creeL)) < 60000)
 
-              const quand = depuisQuand(modL || proc.publiee_le || creeL, true)
+              const quand = depuisQuand(intacte ? (creeL || proc.publiee_le) : modL, true)
               return `<span class="cl-badge">${marque}<i style="background:#34C759"></i>${
                 quand ? (intacte ? 'Créé ' : 'Mod. ') + quand : 'En ligne'}</span>`
             }
@@ -12245,7 +12245,14 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
              ⚠ ET LA DATE SUIT LE LIBELLE. On affichait `modifie_le`, c'est-a-
                dire la fin de l'analyse. C'est bien `created_at` qu'il faut
                montrer sous le mot « Créé ». */
-            const quandB = depuisQuand(proc.created_at || proc.modifie_le, true)
+            /* ⚠ MIS A JOUR : LA BASE SAIT MAINTENANT DISTINGUER. `modifie_le`
+               n'est plus pose que par une modification humaine (titre,
+               dossier, image, video, etapes) — plus par le statut, l'analyse
+               ou le verrou d'edition. « Mod. » redevient donc juste. */
+            const modB = proc.modifie_le
+            const intacteB = !modB || (proc.created_at &&
+              Math.abs(new Date(modB) - new Date(proc.created_at)) < 60000)
+            const quandB = depuisQuand(intacteB ? (proc.created_at || modB) : modB, true)
 
             /* ═══ LE POINT DIT SI LA PROCEDURE A ETE OUVERTE ═══
 
@@ -12263,7 +12270,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
             return `<span class="cl-badge">${marque}<i class="cl-pt-vu" aria-label="${
               jamaisVue ? 'Pas encore consultée' : 'Déjà consultée'}" style="background:${
               jamaisVue ? '#3A78EE' : '#9A9AA4'}"></i>${
-              quandB ? 'Créé ' + quandB : 'En dév.'}</span>`
+              quandB ? (intacteB ? 'Créé ' : 'Mod. ') + quandB : 'En dév.'}</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
       </span>
@@ -13671,7 +13678,7 @@ function renderCategoryProceduresListInterne() {
           const cree = proc.created_at
           const intacte = !mod
             || (cree && Math.abs(new Date(mod) - new Date(cree)) < 60000)
-          const quand = depuisQuand(mod || proc.publiee_le || cree, true)
+          const quand = depuisQuand(intacte ? (cree || proc.publiee_le) : mod, true)
           return `<span class="cl-badge"><i style="background:#34C759"></i>${
             quand ? (intacte ? 'Créé ' : 'Mod. ') + quand : 'En ligne'}</span>`
         })()}
@@ -18171,8 +18178,38 @@ async function comprimerVideoRapide(fichier, surAvancee) {
       return null
     }
 
-    conversion.onProgress = (p) => { if (surAvancee) surAvancee(Math.min(99, Math.round(p * 100))) }
-    await conversion.execute()
+    /* ═══ UN ALLÈGEMENT QUI NE BOUGE PLUS ═══
+       Sur iPhone, l'encodeur peut se figer sans erreur (page mise en pause,
+       mémoire reprise) : `execute()` ne rend alors jamais la main, et l'anneau
+       du bouton tourne pour toujours. On surveille l'avancée : 45 secondes
+       sans progrès, page visible, on arrête et on le dit. Le temps passé hors
+       de l'app ne compte pas — l'encodeur reprend souvent au retour. */
+    let derniere = Date.now()
+    conversion.onProgress = (p) => {
+      derniere = Date.now()
+      if (surAvancee) surAvancee(Math.min(99, Math.round(p * 100)))
+    }
+    const auRetour = () => { if (document.visibilityState === 'visible') derniere = Date.now() }
+    document.addEventListener('visibilitychange', auRetour)
+    let garde = 0
+    const bloque = new Promise((_, rejeter) => {
+      garde = setInterval(() => {
+        if (document.visibilityState !== 'visible') { derniere = Date.now(); return }
+        if (Date.now() - derniere > 45000) {
+          clearInterval(garde)
+          conversion.cancel?.().catch?.(() => {})
+          const err = new Error("L'all\u00e8gement de la vid\u00e9o s'est bloqu\u00e9. Relancez l'analyse.")
+          err.allegementBloque = true
+          rejeter(err)
+        }
+      }, 2000)
+    })
+    try {
+      await Promise.race([conversion.execute(), bloque])
+    } finally {
+      clearInterval(garde)
+      document.removeEventListener('visibilitychange', auRetour)
+    }
     if (surAvancee) surAvancee(100)
 
     const octets = cible.buffer
@@ -18190,6 +18227,10 @@ async function comprimerVideoRapide(fichier, surAvancee) {
     return new File([octets], (fichier.name || 'video').replace(/\.[^.]+$/, '') + '.mp4',
                     { type: 'video/mp4' })
   } catch (e) {
+    /* Un blocage n'est pas un format refusé : la méthode classique, qui lit
+       la vidéo en temps réel, se bloquerait de la même façon. On remonte
+       l'erreur pour que le bouton propose de relancer. */
+    if (e?.allegementBloque) throw e
     console.warn('[compression rapide] échec, méthode classique :', e?.message || e)
     return null
   }
@@ -18783,6 +18824,37 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
         jalonUI(pct >= 100 ? 'Finalisation de la vidéo…' : 'Préparation de la vidéo…')
       })
+    } catch (e) {
+      /* ⚠ CETTE ÉTAPE ÉTAIT HORS DE TOUT `catch`. Une erreur ici laissait
+         l'anneau du bouton tourner pour toujours, et la procédure en
+         « traitement » dans la liste. On fait maintenant comme les autres
+         échecs : procédure en échec, retour à la page de dépôt, bouton pour
+         relancer. Rien n'a été consommé sur le quota à ce stade. */
+      aiLancementEnCours = false
+      garderEcranAllume(false)
+      const message = e?.message || "La pr\u00e9paration de la vid\u00e9o a \u00e9chou\u00e9."
+      if (aiProcedureId) {
+        supabase.from('procedures')
+          .update({ statut: 'echec', erreur_ia: String(message).slice(0, 400) })
+          .eq('id', aiProcedureId)
+          .then(() => loadGestionProcedures().catch(() => {}), () => {})
+        oublierAnalyseIA()
+      }
+      launchBtn.classList.remove('travaille'); launchBtn.disabled = false
+      stopAiProgressSimulation()
+      document.getElementById('ai-progress-card').style.display = 'none'
+      aiEcranAttente = false
+      document.getElementById('ai-upload-card').style.display = 'block'
+      errorEl.style.color = 'var(--red)'
+      errorEl.textContent = message
+      const relance = document.createElement('button')
+      relance.type = 'button'
+      relance.className = 'lien-doux'
+      relance.textContent = 'Relancer l\u2019analyse'
+      relance.addEventListener('click', () => { errorEl.textContent = ''; launchBtn.click() })
+      errorEl.appendChild(document.createElement('br'))
+      errorEl.appendChild(relance)
+      return
     } finally { clearTimeout(bascule) }
     if (!aiEcranAttente) errorEl.textContent = ''
     /* ON RESTE EN GRIS.
@@ -18855,7 +18927,23 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       `au-del\u00e0 des ${Math.round(LIMITE_STOCKAGE / 1024 / 1024)} Mo accept\u00e9s` +
       (pourquoi ? ` : ${pourquoi}.` : '.') +
       `<br>Refilmez en <b>720p \u00e0 30 images par seconde</b>, ou plus court.`
+    /* ⚠ LA PROCÉDURE ET L'ANNEAU ÉTAIENT LAISSÉS EN PLAN : « traitement »
+       dans la liste, anneau qui tourne sur le bouton. On fait le ménage. */
+    aiLancementEnCours = false
+    garderEcranAllume(false)
+    if (aiProcedureId) {
+      supabase.from('procedures')
+        .update({ statut: 'echec', erreur_ia: 'Vid\u00e9o trop lourde apr\u00e8s all\u00e8gement.' })
+        .eq('id', aiProcedureId)
+        .then(() => loadGestionProcedures().catch(() => {}), () => {})
+      oublierAnalyseIA()
+    }
+    launchBtn.classList.remove('travaille')
     launchBtn.disabled = false
+    stopAiProgressSimulation()
+    document.getElementById('ai-progress-card').style.display = 'none'
+    aiEcranAttente = false
+    document.getElementById('ai-upload-card').style.display = 'block'
     console.warn('[envoi] refus\u00e9 ·', poidsLisible(aiVideoFile.size),
       '· raison de la compression :', raisonCompression || 'aucune (elle a fonctionn\u00e9)')
     return
@@ -22943,7 +23031,7 @@ function surveillerAnalyses() {
        pas renvoyée, son état local restait « traitement », et la roue tournait
        indéfiniment alors que l'analyse était finie. */
     const { data } = await supabase.from('procedures')
-      .select('id, statut').eq('entreprise_id', currentMembre.entreprise_id)
+      .select('id, statut, video_url, created_at').eq('entreprise_id', currentMembre.entreprise_id)
     let change = false
     ;(data || []).forEach(row => {
       const p = allGestionProcedures.find(x => x.id === row.id)
@@ -22987,6 +23075,23 @@ function surveillerAnalyses() {
        le relais, depuis n'importe quelle page de l'app. */
     for (const row of (data || []).filter(r => r.statut === 'traitement' || r.statut === 'redaction')) {
       const enMemoire = allGestionProcedures.find(x => x.id === row.id)
+
+      /* ═══ UNE VIDÉO QUI N'EST JAMAIS ARRIVÉE ═══
+         Sans vidéo dix minutes après la création, l'envoi a été coupé (app
+         fermée, écran verrouillé). Aucune analyse ne peut partir : la roue
+         tournerait pour rien jusqu'au plafond. On passe la procédure en échec,
+         avec la raison. Sauf si c'est CETTE page qui est encore en train
+         d'envoyer. */
+      const age = (Date.now() - new Date(row.created_at || 0).getTime()) / 60000
+      const envoiIci = aiLancementEnCours && row.id === aiProcedureId
+      if (row.statut === 'traitement' && !row.video_url && age > 10 && !envoiIci) {
+        const raison = "La vid\u00e9o n'a pas \u00e9t\u00e9 envoy\u00e9e jusqu'au bout. Relancez l'analyse en gardant l'app ouverte."
+        const { error: er } = await supabase.from('procedures')
+          .update({ statut: 'echec', erreur_ia: raison })
+          .eq('id', row.id).eq('statut', 'traitement').is('video_url', null)
+        if (!er && enMemoire) { enMemoire.statut = 'echec'; enMemoire.erreur_ia = raison; change = true }
+        continue
+      }
       if (enMemoire && analyseBloquee(enMemoire)) continue
       try {
         const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-check`, {

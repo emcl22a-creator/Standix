@@ -17018,6 +17018,7 @@ let aiPollTimer = null
    sur l'app ne doit pas sonder pendant ce temps : le serveur ne connaît pas
    encore l'analyse, et répondrait qu'il n'y en a aucune. */
 let aiLancementEnCours = false
+let aiAllegementEnCours = false
 
 /* ═══ L'ÉCRAN RESTE ALLUMÉ PENDANT LA PRÉPARATION ═══
    Si l'écran se verrouille, le téléphone suspend la page : l'allègement et
@@ -17114,9 +17115,10 @@ function startAiProgressSimulation(depart) {
      Le vrai depart est deja garde dans `localStorage` par
      `memoriserAnalyseIA` — il n'etait simplement jamais relu. */
   aiDebutAnalyse = depart || Date.now()
-  /* L'allègement est DÉJÀ fait quand on arrive ici : il ne reste qu'Azure et
-     la rédaction. Le compter deux fois annoncerait le double du vrai reste. */
-  aiEstimationTotale = estimerAnalyse(aiVideoDuree, false)
+  /* ⚠ L'ÉCRAN D'ATTENTE S'OUVRE MAINTENANT PENDANT L'ALLÈGEMENT (cinq
+     secondes après l'appui). S'il est en cours, on le compte ; s'il est
+     fini (reprise après retour sur l'app), on ne le compte pas deux fois. */
+  aiEstimationTotale = estimerAnalyse(aiVideoDuree, aiAllegementEnCours)
   aiPalierDepuis = null
   aiNbSondages = 0
   aiEtapeCourante = 'envoi'
@@ -17591,9 +17593,19 @@ const DUREE_REFUSEE = 5 * 60
    0,3 × la durée. L'allègement rapide (WebCodecs) va plusieurs fois plus vite
    que la lecture : 0,25 × la durée, valeur prudente en attendant une mesure
    sur iPhone. */
-const COUT_ALLEGEMENT = 0.25
-const COUT_AZURE = 0.3
-const COUT_FIXE = 210
+/* ⚠ RECALÉ LE 22 SEPTEMBRE, SUR DEUX MESURES RÉELLES (analyse rapide :
+   Azure Speech + rédaction sur images).
+
+     vidéo      allègement        serveur   total mesuré   calcul
+     30 s       ~30 s             18 s      51 s           58 s
+     4 min 30   283 s (612→49 Mo) 69 s      356 s          362 s
+
+   L'allègement sur iPhone va à peu près à la vitesse de la lecture (1,05 ×
+   la durée). Le serveur prend environ 0,22 × la durée. Envoi et reste : 20 s.
+   `COUT_AZURE` garde son nom, mais c'est désormais le temps du serveur. */
+const COUT_ALLEGEMENT = 1.05
+const COUT_AZURE = 0.22
+const COUT_FIXE = 20
 
 function estimerAnalyse(dureeVideo, avecAllegement) {
   if (!dureeVideo || !isFinite(dureeVideo)) return null
@@ -18876,6 +18888,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const bascule = setTimeout(basculerVersAttente, 5000)
     try {
       let decile = -1
+      aiAllegementEnCours = true
       aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
         jalonUI(pct >= 100 ? 'Finalisation de la vidéo…' : 'Préparation de la vidéo…')
         const d = Math.floor(pct / 10)
@@ -18912,7 +18925,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       errorEl.appendChild(document.createElement('br'))
       errorEl.appendChild(relance)
       return
-    } finally { clearTimeout(bascule) }
+    } finally { clearTimeout(bascule); aiAllegementEnCours = false }
     if (!aiEcranAttente) errorEl.textContent = ''
     /* ON RESTE EN GRIS.
 

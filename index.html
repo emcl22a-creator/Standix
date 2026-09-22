@@ -3206,6 +3206,71 @@ h1{font-size:var(--t-titre); letter-spacing:-.028em}
 @media (max-width:980px){
   .chargement .chargement-marque{--signe:29px}
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LA LUMIÈRE DU PREMIER ÉCRAN : ELLE VIT, ET ELLE POUSSE L'APPAREIL EN AVANT
+   (à la demande, sur téléphone, tablette et ordinateur)
+   1. LA LAMPE RESPIRE : elle grandit et faiblit très lentement, puis revient
+      — neuf secondes par cycle, jamais deux fois au même endroit grâce à une
+      légère dérive latérale. C'est un `transform` et une opacité : la carte
+      graphique s'en charge seule, rien ne rame.
+   2. LE HAUT DE LA SECTION EST ASSOMBRI et le BAS ÉCLAIRÉ : l'œil va droit
+      à l'appareil, posé dans la lumière, tandis que le haut s'efface. C'est
+      le contraste qu'Apple crée autour de ses produits.
+   ⚠ Les deux voiles sont DERRIÈRE tout le contenu (z-index 0) et ne captent
+   aucun clic.
+   ⚠ Si l'appareil demande moins d'animations, la lampe s'immobilise.
+   ═══════════════════════════════════════════════════════════════════════ */
+@keyframes respire{
+  0%,100%{transform:translate3d(0,0,0) scale(1);      opacity:1}
+  50%    {transform:translate3d(1.5%,-1.5%,0) scale(1.09); opacity:.82}
+}
+.sc-in::before{
+  will-change:transform, opacity;
+  animation:lumiere 2.8s cubic-bezier(.16,1,.3,1) .25s both paused,
+            respire 9s cubic-bezier(.45,0,.55,1) 3.05s infinite paused;
+}
+body.pret .sc-in::before{animation-play-state:running, running}
+@media (prefers-reduced-motion:reduce){
+  .sc-in::before{animation:none}
+}
+
+/* Le voile sombre du haut et la lumière du bas.
+   ⚠ `z-index:-1` ET `isolation:isolate` SUR LA SECTION : les voiles passent
+   alors DERRIÈRE le texte et l'appareil (qui ne sont pas positionnés) mais
+   restent DEVANT le fond de la section — et ils ne débordent jamais sur les
+   sections voisines. Les placer à `z-index:0` les aurait fait passer
+   par-dessus le texte, et positionner les enfants pour compenser déplaçait
+   la barre des boutons. */
+.hero{position:relative; isolation:isolate}
+.hero .voile-haut, .hero .voile-bas{
+  position:absolute; left:0; right:0; z-index:-1; pointer-events:none;
+}
+.hero .voile-haut{
+  top:0; height:46%;
+  background:linear-gradient(to bottom, #000000 0%, rgba(0,0,0,.72) 34%, rgba(0,0,0,0) 100%);
+}
+.hero .voile-bas{
+  bottom:0; height:52%;
+  background:
+    radial-gradient(120% 82% at 50% 100%, rgba(255,236,224,.14) 0%, rgba(255,214,190,.05) 38%, transparent 72%),
+    linear-gradient(to top, rgba(255,255,255,.05) 0%, rgba(255,255,255,0) 60%);
+}
+
+/* ─── « Standix App » un peu plus petit sur ordinateur (à la demande) ───
+   Il garde la taille de l'échelle sur téléphone et tablette ; seul le grand
+   écran le rabaisse d'environ 8 %. */
+@media (min-width:981px){
+  .sur{font-size:clamp(18px, 1.46vw, 21.5px)}
+}
+
+/* ─── LE TITRE DU PREMIER ÉCRAN, PLUS GRAND SUR TABLETTE (à la demande) ───
+   Entre 641 et 1180 px, la place ne manque pas : le titre y était calé sur la
+   même pente que le téléphone et restait petit pour la largeur disponible.
+   Il passe d'environ 40 à 51 px sur un iPad en portrait. */
+@media (min-width:641px) and (max-width:1180px){
+  h1{font-size:clamp(42px, 6.2vw, 66px)}
+}
 </style>
 </head>
 <body>
@@ -3283,6 +3348,11 @@ h1{font-size:var(--t-titre); letter-spacing:-.028em}
 </div>
 
 <section class="hero" data-fond="sombre">
+
+  <!-- ⚠ DEUX VOILES DE FOND (à la demande) : le haut s'assombrit, le bas
+       s'éclaire — l'appareil se détache au maximum. Décoratifs. -->
+  <i class="voile-haut" aria-hidden="true"></i>
+  <i class="voile-bas" aria-hidden="true"></i>
 
   <p class="sur">Standix App</p>
 

@@ -2389,9 +2389,19 @@
           <table class="ai-combien-t">
             <thead><tr><th>Votre vidéo</th><th>Analyse</th></tr></thead>
             <tbody>
-              <tr><td>1 min</td><td>4 à 6 min</td></tr>
-              <tr><td>3 min</td><td>7 à 10 min</td></tr>
-              <tr><td>5 min</td><td>12 à 16 min</td></tr>
+              <!-- ⚠ CHIFFRES REFAITS SUR MESURE (21 septembre), après le passage
+                   d'Azure en mode léger et l'allègement rapide.
+
+                   Mesuré : une vidéo de 30 s a pris 4 min 20 au total, dont
+                   3 min 18 chez Azure. Ce temps-là est presque FIXE — Azure
+                   met environ trois minutes quelle que soit la longueur. La
+                   durée de la vidéo n'ajoute ensuite que peu.
+
+                   Les anciens chiffres (4-6 / 7-10 / 12-16) dataient de
+                   l'allègement lent et du mode complet d'Azure. -->
+              <tr><td>1 min</td><td>4 à 5 min</td></tr>
+              <tr><td>3 min</td><td>5 à 7 min</td></tr>
+              <tr><td>5 min</td><td>6 à 8 min</td></tr>
             </tbody>
           </table>
           <p class="ai-combien-n">Ces durées varient : la vidéo attend parfois
@@ -4962,7 +4972,7 @@
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
   
-<script type="module" src="app.js?v=cc6a9a9a"></script>
+<script type="module" src="app.js?v=74f5429e"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

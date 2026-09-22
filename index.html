@@ -2965,8 +2965,8 @@ h1{letter-spacing:-.028em}
    Quand elles ne sont pas épinglées (écran trop bas, ou toutes les cartes
    visibles d'un coup) : moins d'air au-dessus du titre ; et, pour Sécurité,
    moins d'air sous sa dernière ligne. */
-.car.car-pf, .car.car-s3, .car.secu{padding-top:clamp(48px, 7vh, 96px)}
-.car.secu{padding-bottom:clamp(28px, 4vh, 48px)}
+.car.car-pf:not(.epingle), .car.car-s3:not(.epingle), .car.secu:not(.epingle){padding-top:clamp(48px, 7vh, 96px)}
+.car.secu:not(.epingle){padding-bottom:clamp(28px, 4vh, 48px)}
 .car.secu .car-bas{margin-bottom:clamp(8px, 1.2vh, 16px)}
 
 /* ─── 6. PAS DE FLÈCHES SUR TÉLÉPHONE ET TABLETTE (à la demande) ───
@@ -2977,13 +2977,35 @@ h1{letter-spacing:-.028em}
   .car-pf .car-bas, .car-s3 .car-bas{justify-content:center}
 }
 
-/* ─── 7. (RETIRÉ) LES CARTES NE DÉFILENT PLUS AVEC LA PAGE ───
-   Essayé à la demande, puis retiré : faire avancer les cartes au rythme du
-   défilement oblige le navigateur à tout recalculer à chaque image, et sur
-   iPhone le mouvement n'était pas assez doux. Les cartes reviennent à leur
-   glissement NATIF — c'est le navigateur qui l'anime, avec son inertie et son
-   aimantation ; c'est ce qui donne la douceur d'Apple. Les sections ne
-   s'arrêtent donc plus au défilement. */
+/* ─── 7. LES CARTES DÉFILENT AVEC LA PAGE — ORDINATEUR SEULEMENT ───
+   (à la demande : gardé sur ordinateur, retiré sur téléphone et tablette, où
+   le mouvement n'était pas assez doux — là, les cartes se glissent du doigt,
+   et c'est le système qui les anime.)
+   Arrivée en haut de l'écran, la section s'ARRÊTE ; en continuant de
+   descendre, ses cartes glissent de côté jusqu'à la dernière, puis la page
+   repart. Mécanique : le script enveloppe le contenu de la section dans
+   `.car-colle`, collant (`sticky`) sur toute la hauteur de l'écran, et
+   allonge la section de la longueur à parcourir. La position des cartes est
+   déduite du défilement de la page à chaque image.
+   ⚠ Seulement si le contenu tient dans l'écran (sinon rien ne change) et
+   s'il y a vraiment des cartes à faire défiler (sur ordinateur, les trois
+   cartes de « Fonctionnement » et les deux de « Sécurité » tiennent déjà). */
+section.car.epingle{padding-top:0 !important; padding-bottom:0 !important; scroll-margin-top:0}
+section.car.epingle > .car-colle{
+  position:sticky; top:0; box-sizing:border-box;
+  display:flex; flex-direction:column;
+  /* ⚠ CONTENU CALÉ EN HAUT, PAS CENTRÉ (à la demande : moins d'espace entre
+     le haut de la section et son titre). La hauteur suit le contenu : la
+     section suivante arrive donc juste après la dernière carte. */
+  padding:calc(var(--h-barre, 72px) + clamp(22px, 3.6vh, 44px)) 0 clamp(28px, 4vh, 48px);
+}
+section.car.epingle .car-piste{scroll-snap-type:none !important; overflow-x:hidden}
+section.car.epingle{position:relative}
+section.car.epingle.serre > .car-colle{padding:calc(var(--h-barre, 72px) + 6px) 0 8px}
+section.car.epingle.serre .car-t{margin-bottom:14px}
+section.car.epingle.serre .car-bas{margin-top:8px}
+.car.car-pf.epingle{background:#000000}
+.car.car-pf.epingle > .car-colle{background:var(--carbone)}
 
 /* ═══ LA CARTE « CENTRALISEZ LES PROCÉDURES » ═══
    Un noir DIFFÉRENT du fond de la section (à la demande) : le gris très
@@ -4056,7 +4078,10 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
            glisser de quelques pixels au-delà (réserve + retrait), et la flèche
            restait active sans rien avoir à montrer. */
         droite.disabled = best === cartes.length - 1 ||
-          piste.scrollLeft >= piste.scrollWidth - piste.clientWidth - 2;
+          piste.scrollLeft >= piste.scrollWidth - piste.clientWidth - 2 ||
+          /* ordinateur, section arrêtée : la course finit quand la dernière
+             carte est entière */
+          (piste.__fin > 0 && piste.scrollLeft >= piste.__fin - 2);
       };
       piste.addEventListener('scroll', lire, {passive:true});
       addEventListener('resize', lire, {passive:true});
@@ -4136,6 +4161,12 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
         };
         piste.addEventListener('scroll', demande, {passive:true});
         addEventListener('resize', ()=>{ mesure(); demande(); }, {passive:true});
+        /* ⚠ SECTION ARRÊTÉE (ordinateur) : là, ce n'est pas le doigt qui fait
+           défiler la piste, c'est le script, à chaque image. L'événement
+           `scroll` arrive alors UNE OU DEUX IMAGES TROP TARD et les titres
+           décrochaient des cartes. Le script du défilement appelle donc cette
+           fonction lui-même, juste après avoir déplacé les cartes. */
+        piste.__titres=()=>{ mesure(); titres(); };
         mesure(); titres();
         /* deux images d'attente : la première position est peinte SANS
            transition, la suivante et les autres l'utilisent. */
@@ -4143,7 +4174,9 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
       }
       const glisser=(k)=>{
         const e=cartes[Math.max(0, Math.min(cartes.length - 1, k))];
-        piste.scrollTo({left:e.offsetLeft - retrait(), behavior:'smooth'});
+        /* ⚠ SECTION ARRÊTÉE (ordinateur) : c'est la PAGE qui descend, pas la piste. */
+        if(piste.__aller) piste.__aller(e.offsetLeft - retrait());
+        else piste.scrollTo({left:e.offsetLeft - retrait(), behavior:'smooth'});
       };
       gauche.addEventListener('click', ()=>glisser(courant - 1));
       droite.addEventListener('click', ()=>glisser(courant + 1));
@@ -4561,7 +4594,8 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
       b.setAttribute('aria-label', 'Carte ' + (k + 1) + ' sur ' + cartes.length);
       b.addEventListener('click', function(){
         var retrait = parseFloat(getComputedStyle(piste).paddingLeft) || 0;
-        piste.scrollTo({left: c.offsetLeft - retrait, behavior: 'smooth'});
+        if(piste.__aller) piste.__aller(c.offsetLeft - retrait);
+        else piste.scrollTo({left: c.offsetLeft - retrait, behavior: 'smooth'});
       });
       boite.appendChild(b);
       return b;
@@ -4587,5 +4621,141 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
 })();
 </script>
 
+<script>
+/* ═══ LES CARTES DÉFILENT AVEC LA PAGE (voir la feuille de style, point 7) ═══ */
+(function(){
+  var items = [].slice.call(document.querySelectorAll('section.car-pf, section.car-s3, section.secu')).map(function(sec){
+    var piste = sec.querySelector('.car-piste');
+    if(!piste) return null;
+    var colle = document.createElement('div');
+    colle.className = 'car-colle';
+    while(sec.firstChild) colle.appendChild(sec.firstChild);
+    sec.appendChild(colle);
+    return {sec:sec, colle:colle, piste:piste, D:0, n:0, actif:false};
+  }).filter(Boolean);
+  /* ⚠ ORDINATEUR SEULEMENT : souris ou pavé tactile, et écran large. */
+  var bureau = matchMedia('(hover:hover) and (pointer:fine) and (min-width:981px)');
+
+  function mesure(){
+    items.forEach(function(it){
+      it.sec.classList.remove('epingle', 'serre'); it.sec.style.height = ''; it.actif = false;
+      it.colle.style.top = ''; it.T = 0;
+      it.piste.__aller = null; it.piste.__fin = 0;
+      var cartes = it.piste.querySelectorAll('.car-c');
+      if(cartes.length < 2 || !bureau.matches) return;
+      var der = cartes[cartes.length - 1], cs = getComputedStyle(it.piste);
+      var marge = parseFloat(cs.scrollPaddingRight); if(!(marge >= 0)) marge = 28;
+      /* Course : jusqu'à ce que la DERNIÈRE carte soit entièrement visible,
+         pas jusqu'à la réserve de fin de piste. */
+      var D = Math.min(it.piste.scrollWidth - it.piste.clientWidth,
+                       der.offsetLeft + der.offsetWidth + marge - it.piste.clientWidth);
+      if(D < 24) return;
+      it.sec.classList.add('epingle');
+      /* Le bloc collant doit tenir en entier dans l'écran. */
+      var ecran = Math.min(innerHeight, document.documentElement.clientHeight || innerHeight);
+      /* Écran bas (petit portable) : on resserre d'abord les marges du bloc. */
+      if(it.colle.offsetHeight > ecran) it.sec.classList.add('serre');
+      if(it.colle.offsetHeight > ecran){ it.sec.classList.remove('epingle', 'serre'); return; }
+      it.D = Math.round(D); it.piste.__fin = it.D; it.n = cartes.length;
+      /* ⚠ LA SECTION S'ARRÊTE QUAND SES CARTES SONT AU CENTRE DE L'ÉCRAN (à la
+         demande), pas quand son titre touche le haut. On mesure le milieu des
+         cartes dans le bloc collant, et on colle le bloc à la hauteur qui
+         amène ce milieu au milieu de l'écran — sans jamais le faire sortir
+         de l'écran, ni en haut ni en bas. */
+      /* ⚠ MESURÉ PAR LES DÉCALAGES (`offsetTop`), PAS PAR LA POSITION À
+         L'ÉCRAN : pendant leur entrée, les cartes et le titre sont encore
+         décalés vers le bas par leur animation, et le calcul tombait à côté. */
+      var cs0 = it.piste.querySelectorAll('.car-c .car-vue');
+      var vue = cs0.length ? cs0[0] : it.piste, y0 = 0, el = vue;
+      while(el && el !== it.colle){ y0 += el.offsetTop; el = el.offsetParent; }
+      var milieu = y0 + vue.offsetHeight / 2;
+      it.T = Math.round(Math.max(0, Math.min(ecran - it.colle.offsetHeight, ecran / 2 - milieu)));
+      it.colle.style.top = it.T + 'px';
+      it.sec.style.height = (it.colle.offsetHeight + it.D) + 'px';
+      it.actif = true;
+      /* Flèches et pastilles : on fait descendre la PAGE jusqu'à la position
+         qui amène la carte voulue. */
+      it.piste.__aller = function(gauche){
+        var g = Math.max(0, Math.min(it.D, gauche));
+        var y = it.sec.getBoundingClientRect().top + scrollY - it.T + g;
+        scrollTo({top: y, behavior: 'smooth'});
+      };
+    });
+    maj();
+  }
+
+  /* ─── ATTRAPER LES CARTES À LA SOURIS ───
+     On les tire d'un côté ou de l'autre : c'est la page qu'on fait avancer,
+     donc les cartes suivent. Le clic reste possible — le glissement ne
+     commence qu'au-delà de 6 px, et le clic qui le termine est annulé. */
+  function debut(it){ return it.sec.getBoundingClientRect().top + scrollY - it.T; }
+  function pas(it){ return it.D / Math.max(1, it.n - 1); }
+  function indice(it){ return Math.max(0, Math.min(it.n - 1, Math.round((scrollY - debut(it)) / pas(it)))); }
+  function versCarte(it, k){
+    k = Math.max(0, Math.min(it.n - 1, k));
+    scrollTo({top: debut(it) + k * pas(it), behavior: 'smooth'});
+  }
+  items.forEach(function(it){
+    var msx = 0, ms0 = 0, mk0 = 0, tire = false, presse = false;
+    it.piste.addEventListener('mousedown', function(e){
+      if(!it.actif || e.button !== 0) return;
+      presse = true; tire = false; msx = e.clientX; ms0 = scrollY; mk0 = indice(it);
+    });
+    addEventListener('mousemove', function(e){
+      if(!presse || !it.actif) return;
+      var dx = e.clientX - msx;
+      if(!tire && Math.abs(dx) < 6) return;
+      tire = true;
+      var d0 = debut(it);
+      scrollTo({top: Math.max(d0, Math.min(d0 + it.D, ms0 - dx)), behavior: 'instant'});
+    });
+    addEventListener('mouseup', function(e){
+      if(!presse) return; presse = false;
+      if(!tire) return;
+      var dx = e.clientX - msx;
+      versCarte(it, mk0 + (dx < -40 ? 1 : dx > 40 ? -1 : 0));
+      setTimeout(function(){ tire = false; }, 0);
+    });
+    it.piste.addEventListener('click', function(e){
+      if(tire){ e.preventDefault(); e.stopPropagation(); }
+    }, true);
+    it.piste.addEventListener('dragstart', function(e){ if(it.actif) e.preventDefault(); });
+  });
+
+  var attente = 0;
+  function maj(){
+    attente = 0;
+    items.forEach(function(it){
+      if(!it.actif) return;
+      var r = it.sec.getBoundingClientRect();
+      var p = Math.min(1, Math.max(0, (it.T - r.top) / it.D));
+      var x = p * it.D;
+      if(Math.abs(it.piste.scrollLeft - x) > .5){
+        it.piste.scrollLeft = x;
+        /* Les titres des cartes sont recalculés DANS LA MÊME IMAGE. */
+        if(it.piste.__titres) it.piste.__titres();
+      }
+    });
+  }
+  addEventListener('scroll', function(){ if(!attente) attente = requestAnimationFrame(maj); }, {passive:true});
+  /* ⚠ SUR TÉLÉPHONE, la barre d'adresse qui se replie déclenche des
+     `resize` en plein défilement : on ne remesure que si la LARGEUR change
+     (ou une rotation), sinon la section se recalculerait sous le doigt. */
+  var largeur = innerWidth, hauteur = innerHeight;
+  addEventListener('resize', function(){
+    if(innerWidth !== largeur || Math.abs(innerHeight - hauteur) > 160){
+      largeur = innerWidth; hauteur = innerHeight;
+      requestAnimationFrame(mesure);
+    }
+  });
+  /* Les images et les polices peuvent changer les hauteurs : on mesure après
+     le chargement complet, et une première fois tout de suite. */
+  mesure();
+  addEventListener('load', mesure);
+  /* Dernière mesure juste avant que le voile ne parte (script du chargement). */
+  addEventListener('standix:mesure', mesure);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(mesure);
+})();
+</script>
 </body>
 </html>

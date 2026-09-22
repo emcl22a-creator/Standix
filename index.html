@@ -213,7 +213,11 @@ body{
 /* ⚠ Sélecteur à DEUX classes, sinon le palier étroit l'emporte : il règle
    `.marque`, et le lockup du chargement porte cette classe lui aussi — il
    retombait à 29 px sur téléphone. */
-.chargement .chargement-marque{--signe:clamp(35px, 8.4vw, 45px); cursor:default}
+/* ⚠ AUCUNE TAILLE PROPRE ICI (à la demande) : le lockup du chargement porte
+   la classe `marque`, il prend donc EXACTEMENT la taille de celui de la barre,
+   à chaque largeur d'écran. Une valeur à part signifiait un logo qui changeait
+   de taille au moment où la page s'ouvrait. */
+.chargement .chargement-marque{cursor:default}
 /* Sur le voile noir, le signe blanc et le mot en blanc. */
 .chargement-marque .signe img{opacity:0}
 .chargement-marque .signe .signe-clair{opacity:1}
@@ -3190,22 +3194,10 @@ h1{font-size:var(--t-titre); letter-spacing:-.028em}
 
 /* ─── LE LOGO, UN PEU PLUS PETIT SUR ORDINATEUR (à la demande) ───
    Le signe passe de 34 à 31 px ; le mot « Standix » suit tout seul, sa taille
-   étant calculée à partir de celle du signe.
-   ⚠ ET LE LOGO DU CHARGEMENT PREND EXACTEMENT LA MÊME TAILLE (à la demande) :
-   il faisait jusqu'à 45 px, l'écran d'ouverture ne se raccordait donc pas à la
-   barre qui apparaissait juste après. Une seule mesure par palier d'écran,
-   partagée par les deux. */
-@media (min-width:1281px){
-  .marque{--signe:31px}
-  .chargement .chargement-marque{--signe:31px}
-}
-@media (min-width:981px) and (max-width:1280px){
-  .marque{--signe:30px}
-  .chargement .chargement-marque{--signe:30px}
-}
-@media (max-width:980px){
-  .chargement .chargement-marque{--signe:29px}
-}
+   étant calculée à partir de celle du signe. Le logo du chargement porte la
+   même classe : il suit donc ces valeurs, à toutes les largeurs. */
+@media (min-width:1281px){ .marque{--signe:31px} }
+@media (min-width:981px) and (max-width:1280px){ .marque{--signe:30px} }
 
 /* ═══════════════════════════════════════════════════════════════════════
    LA LUMIÈRE DU PREMIER ÉCRAN : ELLE VIT, ET ELLE POUSSE L'APPAREIL EN AVANT
@@ -3271,6 +3263,26 @@ body.pret .sc-in::before{animation-play-state:running, running}
 @media (min-width:641px) and (max-width:1180px){
   h1{font-size:clamp(42px, 6.2vw, 66px)}
 }
+
+/* ─── LA PHRASE SOUS LE TITRE DE SECTION (motif repris de Stripe) ───
+   Chez Stripe, aucun titre n'est seul : il est suivi d'une phrase calme qui
+   explique la section. Nos sections passaient d'un titre de deux mots
+   directement aux cartes.
+   ⚠ `:has()` RAPPROCHE LE TITRE DE SA PHRASE : quand un titre est suivi d'une
+   `.car-s`, sa marge basse se réduit — les deux forment alors un bloc, et
+   c'est la phrase qui porte l'écart avec les cartes. Sur un navigateur trop
+   ancien pour `:has()`, l'écart reste simplement celui d'avant. */
+.car-s{
+  margin:0 0 clamp(30px, 4.4vh, 52px);
+  padding-left:var(--bord); padding-right:var(--bord);
+  max-width:calc(var(--bord) * 2 + 62ch); box-sizing:border-box;
+  font-family:Inter,sans-serif; font-weight:400;
+  font-size:var(--t-lead); line-height:1.45; letter-spacing:-.012em;
+  color:#86868B; text-wrap:pretty;
+}
+.car-t:has(+ .car-s){margin-bottom:clamp(10px, 1.4vh, 16px)}
+/* La section 3 a maintenant un lien à gauche de ses flèches : on les écarte. */
+.car-s3 .car-bas{justify-content:space-between}
 </style>
 </head>
 <body>
@@ -3392,6 +3404,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
      Standix sur fond clair, texte foncé (`.pf-clair`). -->
 <section class="car car-pf" data-fond="sombre" id="points-forts">
   <h2 class="car-t" data-monte>Vos bénéfices.</h2>
+  <p class="car-s" data-monte style="--d:70ms">Ce que Standix change au quotidien, pour vous comme pour votre équipe.</p>
 
   <div class="car-piste" tabindex="0" aria-label="Cinq cartes, faites défiler latéralement">
     <!-- ⚠ ORDRE DES CARTES (à la demande : « le plus marketing et design ») :
@@ -3552,6 +3565,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
   <!-- ⚠ LE TITRE : une phrase courte, tout en blanc, avec un point. Il
        résume les quatre cartes sans répéter aucune d'elles. -->
   <h2 class="car-t" data-monte>Fonctionnement.</h2>
+  <p class="car-s" data-monte style="--d:70ms">Filmez le geste une fois, l'IA rédige la procédure, votre équipe la retrouve d'un scan.</p>
 
   <!-- ⚠ LA PISTE DÉBORDE VOLONTAIREMENT DES MARGES : on doit voir un morceau de
        la carte suivante, sinon rien n'indique qu'il y en a d'autres. -->
@@ -3597,6 +3611,9 @@ body.pret .sc-in::before{animation-play-state:running, running}
   </div>
 
   <div class="car-bas">
+    <!-- ⚠ UN CHEMIN POUR CONTINUER, comme les liens bleus de Stripe et d'Apple
+         au bas de chaque chapitre. -->
+    <a class="car-lien" href="/app/">Essayer gratuitement <span aria-hidden="true">›</span></a>
     <div class="car-fleches">
       <button class="car-f car-f-g" type="button" aria-label="Carte précédente">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5 8 12l6.5 7"/></svg>
@@ -3659,6 +3676,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
        écrire « tout est privé ». -->
 <section class="car secu" data-fond="sombre" id="securite">
   <h2 class="car-t" data-monte>Sécurité.</h2>
+  <p class="car-s" data-monte style="--d:70ms">Vos vidéos et vos procédures restent les vôtres.</p>
 
   <!-- ⚠ MÊME CARROUSEL ET MÊMES CARTES QUE LA SECTION 3 (même largeur, même
        hauteur). Tout est DANS la carte, comme les cartes confidentialité

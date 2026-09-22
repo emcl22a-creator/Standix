@@ -22674,3 +22674,31 @@ body.abo-expire [data-etab-plus]{
 @media (prefers-reduced-motion: reduce){
   .screen.feuille-fond{ animation:none; display:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE LOGO DE L'ENTREPRISE, ESPACE UTILISATEUR — L'IMAGE CASSÉE
+
+ ⚠ `display:block` SUR L'IMAGE ÉCRASAIT L'ATTRIBUT `hidden`. Sans logo,
+   l'image restait donc affichée, SANS adresse : Safari y dessine son icône
+   d'image cassée, et les initiales se superposaient par-dessus.
+
+ ⚠ ET LE FOND TEINTÉ DE LA CARTE REVENAIT. La règle de teinte
+   (`[data-teinte="bleu"] .reg-ic`) est plus précise que `.reg-ic.ent-ic` :
+   la pastille gardait son fond bleu et son ombre, sous celui des initiales.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#e-profil .reg-ic.ent-ic img[hidden]{ display:none; }
+#e-profil .reg-groupe[data-teinte] .reg-ic.ent-ic{
+  background:none;
+  box-shadow:none;
+  border:none;        /* le liseré bleu de `.reg-ic` (règle générale) */
+}
+/* ⚠ `width:100%` NE SUFFISAIT PAS. Dans la grille de la pastille, le
+   pourcentage se résolvait contre une colonne taillée sur le contenu : les
+   initiales tenaient dans une bande étroite au milieu. Taille fixe, égale à
+   la pastille. */
+#e-profil .reg-ic.ent-ic .ent-ini,
+#e-profil .reg-ic.ent-ic img{
+  width:40px;
+  height:40px;
+}

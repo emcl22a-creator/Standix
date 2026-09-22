@@ -8618,6 +8618,10 @@ function memeGrille(a, b) {
          publier laissait la grille jugée identique, donc non redessinée, et
          la pastille restait. */
       p.publiee_le || '',
+      /* ⚠ LA DATE DE MODIFICATION AUSSI : c'est elle qui fait « Créé » ou
+         « Mod. 2 min » sur la ligne. Absente de la clé, une procédure qu'on
+         venait de modifier gardait « Créé 14 min » jusqu'au rechargement. */
+      p.modifie_le || '', p.created_at || '',
       p.etapes?.[0]?.count ?? ''].join('|')).join('~')
   return a.map(cle).join('\u00a7') === b.map(cle).join('\u00a7')
 }
@@ -17256,11 +17260,16 @@ let journalLignes = []
 let journalDepart = 0
 let journalMinuteur = 0
 let journalProc = null
+let journalDernier = ''
 function journalIA(m) {
   if (!aiProcedureId) return
   if (journalProc !== aiProcedureId) {
-    journalProc = aiProcedureId; journalLignes = []; journalDepart = Date.now()
+    journalProc = aiProcedureId; journalLignes = []; journalDepart = Date.now(); journalDernier = ''
   }
+  /* Le même libellé répété (« Préparation de la vidéo… » à chaque progrès)
+     noyait le journal : on ne garde que les changements. */
+  if (m === journalDernier) return
+  journalDernier = m
   journalLignes.push(`${Math.round((Date.now() - journalDepart) / 1000)}s ${m}`)
   if (journalLignes.length > 60) journalLignes = journalLignes.slice(-60)
   if (journalMinuteur) return

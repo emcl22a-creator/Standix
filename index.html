@@ -2997,6 +2997,14 @@ section.car.epingle > .car-colle{
   padding:calc(var(--h-barre, 72px) + clamp(22px, 3.6vh, 44px)) 0 clamp(28px, 4vh, 48px);
 }
 section.car.epingle .car-piste{scroll-snap-type:none !important; overflow-x:hidden}
+/* Repères d'aimantation, un par carte (voir le script). */
+section.car.epingle{position:relative}
+.car-cran{position:absolute; left:0; width:1px; height:1px; pointer-events:none}
+/* ⚠ L'AIMANTATION EST FAITE PAR LE SCRIPT, PAS PAR `scroll-snap` : sur
+   téléphone, l'aimantation du navigateur retenait la page au dernier cran
+   d'une section — il fallait deux ou trois gestes pour passer à la
+   suivante. Le script, lui, n'aimante QUE si l'on s'arrête près d'un cran,
+   à l'intérieur de la section. */
 section.car.epingle.serre > .car-colle{padding:calc(var(--h-barre, 72px) + 6px) 0 8px}
 section.car.epingle.serre .car-t{margin-bottom:14px}
 section.car.epingle.serre .car-bas{margin-top:8px}
@@ -3050,6 +3058,7 @@ h1   {animation:texte-cine 1.4s cubic-bezier(.16,1,.3,1) .74s both paused}
 .acte-bas{animation:capsule 1.3s cubic-bezier(.16,1,.3,1) 1.25s both paused}
 body.pret .sc-tel, body.pret .sc-in::before, body.pret .sur, body.pret h1,
 body.pret .sous, body.pret .acte-bas{animation-play-state:running}
+
 </style>
 </head>
 <body>
@@ -3902,16 +3911,50 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
      un défaut plutôt que comme une ouverture.
      Un délai de sûreté à 6 s le retire quand même si une ressource ne répond
      pas : mieux vaut une page qui s'ouvre qu'un logo qui attend pour toujours. */
+  /* ⚠ LE LOGO RESTE TANT QUE TOUT N'EST PAS PRÊT (à la demande : que le
+     visiteur ne voie jamais une page qui se construit sous ses yeux).
+     On attend, dans l'ordre :
+       1. le chargement complet de la page (`load`) ;
+       2. les polices (Inter, Poppins) — sinon les titres changent de forme
+          en pleine animation ;
+       3. le DÉCODAGE de chaque image (`img.decode()`) : une image chargée
+          mais pas encore décodée fait sauter la première animation qui la
+          montre (le téléphone du haut, les cartes) ;
+       4. deux images d'affichage, puis la mesure des sections dont les cartes
+          défilent (`standix:mesure`), pour que tout soit calé au premier
+          coup d'œil.
+     Plancher d'une seconde (un
+     éclair se lit comme un défaut), plafond de sûreté à 8 s (mieux vaut une
+     page qui s'ouvre qu'un logo qui attend pour toujours). */
   const depart=Date.now();
   let parti=false;
+  const avance=()=>{};
   const ouvre=()=>{
     if(parti) return; parti=true;
+    const ch=document.getElementById('chargement');
+    if(ch) ch.classList.add('fini');
     const reste=Math.max(0, 1000-(Date.now()-depart));
-    setTimeout(()=>document.body.classList.add('pret'), reste);
+    setTimeout(()=>{
+      dispatchEvent(new Event('standix:mesure'));
+      requestAnimationFrame(()=>requestAnimationFrame(()=>document.body.classList.add('pret')));
+    }, reste);
   };
-  if(document.readyState==='complete') ouvre();
-  else addEventListener('load', ouvre);
-  setTimeout(ouvre, 6000);
+  const delai=(ms)=>new Promise(r=>setTimeout(r, ms));
+  const suivi=(pr)=>pr.then(avance, avance);
+  const charge=new Promise(r=>{ if(document.readyState==='complete') r(); else addEventListener('load', ()=>r(), {once:true}); });
+  const polices=(document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  charge.then(()=>{
+    /* Les images ne sont toutes connues qu'une fois la page chargée (certaines
+       reçoivent leur source par script). */
+    const imgs=[...document.images].filter(i=>i.getAttribute('src') || i.currentSrc);
+    const decodes=imgs.map(i=>suivi(Promise.race([
+      (i.decode ? i.decode() : Promise.resolve()).catch(()=>{}),
+      delai(4000)
+    ])));
+    return Promise.all([suivi(polices), ...decodes]);
+  }).then(()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))))
+    .then(ouvre, ouvre);
+  setTimeout(ouvre, 8000);
 })();
 (function(){
   const hote=document.querySelector('.barre-hote');
@@ -4588,13 +4631,15 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
     colle.className = 'car-colle';
     while(sec.firstChild) colle.appendChild(sec.firstChild);
     sec.appendChild(colle);
-    return {sec:sec, colle:colle, piste:piste, D:0, actif:false};
+    return {sec:sec, colle:colle, piste:piste, D:0, actif:false, crans:[], marques:[]};
   }).filter(Boolean);
+  var tactile = matchMedia('(hover:none) and (pointer:coarse), (max-width:980px)');
 
   function mesure(){
     items.forEach(function(it){
       it.sec.classList.remove('epingle', 'serre'); it.sec.style.height = ''; it.actif = false;
       it.colle.style.top = ''; it.T = 0;
+      it.marques.forEach(function(m){ m.remove(); }); it.marques = []; it.crans = [];
       it.piste.__aller = null; it.piste.__fin = 0;
       var cartes = it.piste.querySelectorAll('.car-c');
       if(cartes.length < 2) return;
@@ -4628,6 +4673,19 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
       it.colle.style.top = it.T + 'px';
       it.sec.style.height = (it.colle.offsetHeight + it.D) + 'px';
       it.actif = true;
+      /* ⚠ LES CRANS (téléphone et tablette) : une position par carte. Des
+         repères invisibles, un par carte, servent de points d'aimantation à
+         la PAGE (`scroll-snap` de proximité) : quand le doigt lâche près d'une
+         carte, la page se pose pile dessus — plus de carte coupée en deux. */
+      var retrait = parseFloat(cs.paddingLeft) || 0;
+      [].forEach.call(cartes, function(c, k){
+        var g = k === cartes.length - 1 ? it.D : Math.max(0, Math.min(it.D, c.offsetLeft - retrait));
+        /* Deux cartes peuvent tomber au même endroit quand la course s'arrête
+           avant la fin (tablette) : un seul cran alors, sinon le geste
+           suivant ne mènerait nulle part. */
+        if(it.crans.length && g - it.crans[it.crans.length - 1] < 8) return;
+        it.crans.push(g);
+      });
       /* Flèches et pastilles : on fait descendre la PAGE jusqu'à la position
          qui amène la carte voulue. */
       it.piste.__aller = function(gauche){
@@ -4638,6 +4696,111 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
     });
     maj();
   }
+
+  /* ⚠ GLISSER LES CARTES DU DOIGT, DE CÔTÉ (téléphone et tablette) : le
+     geste naturel sur un carrousel, dans LES DEUX SENS. Le doigt entraîne la
+     page (donc les cartes, qui la suivent) en prise directe ; au lâcher, on va
+     à la carte suivante ou précédente selon le sens du geste. À la souris, on
+     peut attraper les cartes de la même façon. L'aimantation de la page
+     est suspendue pendant le geste, sinon elle tirerait en sens inverse. */
+  function debut(it){ return it.sec.getBoundingClientRect().top + scrollY - it.T; }
+  function indice(it){
+    var g = scrollY - debut(it), best = 0, d = Infinity;
+    it.crans.forEach(function(c, k){ var e = Math.abs(c - g); if(e < d){ d = e; best = k; } });
+    return best;
+  }
+  var racine = document.documentElement, relache = 0, pose = 0, ignore = 0;
+  /* Aller à la carte voisine (ou à la plus proche) en douceur. */
+  function versCran(it, k){
+    k = Math.max(0, Math.min(it.crans.length - 1, k));
+    ignore = Date.now() + 800;
+    scrollTo({top: debut(it) + it.crans[k], behavior: 'smooth'});
+  }
+  /* ⚠ AIMANTATION MAISON (téléphone et tablette) : quand la page s'arrête à
+     l'intérieur d'une section épinglée, on la pose en douceur sur la carte la
+     plus proche. Cela ne vaut QUE dans la course de la section : une fois la
+     dernière carte atteinte, plus rien ne retient — on ne reste jamais
+     coincé à l'entrée de la section suivante. */
+  function aimante(){
+    if(!tactile.matches || Date.now() < ignore) return;
+    items.forEach(function(it){
+      if(!it.actif || it.crans.length < 2) return;
+      var d0 = debut(it), g = scrollY - d0;
+      if(g < -4 || g > it.D + 4) return;
+      var best = it.crans[0], e = Infinity;
+      it.crans.forEach(function(c){ var v = Math.abs(c - g); if(v < e){ e = v; best = c; } });
+      var pas = it.D / (it.crans.length - 1);
+      if(e > 2 && e < pas * .5 + 2){
+        ignore = Date.now() + 700;
+        scrollTo({top: d0 + best, behavior: 'smooth'});
+      }
+    });
+  }
+  addEventListener('scroll', function(){
+    clearTimeout(pose); pose = setTimeout(aimante, 140);
+  }, {passive:true});
+  items.forEach(function(it){
+    var sx = 0, sy = 0, s0 = 0, mode = null, k0 = 0;
+
+    /* ─── À LA SOURIS (ordinateur) : on attrape les cartes et on les tire
+       d'un côté ou de l'autre, comme au doigt. Le clic normal reste possible :
+       le glissement ne commence qu'au-delà de 6 px, et le clic qui suit un
+       glissement est annulé. ─── */
+    var msx = 0, ms0 = 0, mk0 = 0, tire = false, presse = false;
+    it.piste.addEventListener('mousedown', function(e){
+      if(!it.actif || e.button !== 0) return;
+      presse = true; tire = false; msx = e.clientX; ms0 = scrollY; mk0 = indice(it);
+    });
+    addEventListener('mousemove', function(e){
+      if(!presse || !it.actif) return;
+      var dx = e.clientX - msx;
+      if(!tire && Math.abs(dx) < 6) return;
+      tire = true; ignore = Date.now() + 4000;
+      var d0 = debut(it);
+      scrollTo({top: Math.max(d0, Math.min(d0 + it.D, ms0 - dx)), behavior: 'instant'});
+    });
+    addEventListener('mouseup', function(e){
+      if(!presse) return; presse = false;
+      if(!tire) return;
+      var dx = e.clientX - msx;
+      versCran(it, mk0 + (dx < -40 ? 1 : dx > 40 ? -1 : 0));
+      setTimeout(function(){ tire = false; }, 0);
+    });
+    it.piste.addEventListener('click', function(e){
+      /* Un clic qui termine un glissement ne doit pas retourner une carte. */
+      if(tire){ e.preventDefault(); e.stopPropagation(); }
+    }, true);
+    it.piste.addEventListener('dragstart', function(e){ if(it.actif) e.preventDefault(); });
+
+    it.piste.addEventListener('touchstart', function(e){
+      if(!it.actif || !tactile.matches) return;
+      var t = e.touches[0]; sx = t.clientX; sy = t.clientY; s0 = scrollY; mode = null; k0 = indice(it);
+    }, {passive:true});
+    it.piste.addEventListener('touchmove', function(e){
+      if(!it.actif || !tactile.matches) return;
+      var t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+      if(mode === null && (Math.abs(dx) > 7 || Math.abs(dy) > 7)){
+        mode = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+        if(mode === 'h'){ clearTimeout(relache); ignore = Date.now() + 4000; }
+      }
+      if(mode !== 'h') return;
+      e.preventDefault();
+      var d0 = debut(it);
+      var y = Math.max(d0, Math.min(d0 + it.D, s0 - dx));
+      scrollTo({top: y, behavior: 'instant'});
+    }, {passive:false});
+    function fin(e){
+      if(mode !== 'h'){ mode = null; return; }
+      var t = e.changedTouches[0], dx = t.clientX - sx;
+      /* Un geste ample saute deux cartes : on suit l'élan du doigt, dans un
+         sens comme dans l'autre. */
+      var saut = Math.abs(dx) > 240 ? 2 : Math.abs(dx) > 40 ? 1 : 0;
+      mode = null;
+      versCran(it, k0 + (dx < 0 ? saut : -saut));
+    }
+    it.piste.addEventListener('touchend', fin, {passive:true});
+    it.piste.addEventListener('touchcancel', fin, {passive:true});
+  });
 
   var attente = 0;
   function maj(){
@@ -4665,6 +4828,8 @@ body.pret .sous, body.pret .acte-bas{animation-play-state:running}
      le chargement complet, et une première fois tout de suite. */
   mesure();
   addEventListener('load', mesure);
+  /* Dernière mesure juste avant que le voile ne parte (script du chargement). */
+  addEventListener('standix:mesure', mesure);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(mesure);
 })();
 </script>

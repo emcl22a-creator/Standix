@@ -1,0 +1,9 @@
+# Standix — https://standix.app
+# Les moteurs de recherche peuvent tout visiter, sauf l'application elle-même :
+# ses pages demandent un compte, elles n'ont rien à faire dans Google.
+
+User-agent: *
+Allow: /
+Disallow: /app/
+
+Sitemap: https://standix.app/sitemap.xml

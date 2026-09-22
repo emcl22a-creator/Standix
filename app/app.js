@@ -14774,15 +14774,16 @@ function expliquerComptage() {
    Court volontairement : trois phrases. Une aide qu'on ne lit pas jusqu'au
    bout ne vaut pas mieux qu'une aide absente. */
 function expliquerLectures() {
+  /* ⚠ UN TON NEUTRE, PAS UNE CONVERSATION. La première version parlait comme
+     à quelqu'un qu'on connaît — « c'est un passage, pas une lecture ». Une
+     aide dit les règles, sans commentaire ni familiarité : deux constats,
+     à la troisième personne. */
   confirmDialog({
-    titre: 'Comment les lectures sont comptées',
+    titre: 'Comment \u00e7a fonctionne',
     message:
-      "Une lecture est comptée quand la procédure est restée " +
-      "" + DUREE_LECTURE_MIN + " secondes à l'écran. En dessous, rien n'est " +
-      "compté : c'est un passage, pas une lecture.\n\n" +
-      "Le décompte s'arrête dès que l'app passe en arrière-plan ou que " +
-      "l'écran s'éteint.\n\n" +
-      "Une même personne qui rouvre la procédure ne compte qu'une fois.",
+      "Une lecture est compt\u00e9e apr\u00e8s " + DUREE_LECTURE_MIN +
+      " secondes pass\u00e9es sur la proc\u00e9dure.\n\n" +
+      "Chaque utilisateur est compt\u00e9 une seule fois par proc\u00e9dure.",
     confirmer: 'Compris',
     annuler: null,
     danger: false,
@@ -14795,13 +14796,16 @@ function expliquerLectures() {
      on y vient pour lire des chiffres, pas un mode d'emploi. La seule chose
      qu'on ne devine pas, c'est que le compteur s'arrête tout seul. */
 function expliquerPauseTemps() {
+  /* ⚠ DEUX PHRASES, SANS IMAGE NI COMMENTAIRE. La version d'avant finissait
+     sur « un téléphone posé sur le plan de travail… » : une illustration,
+     pas une règle. On dit ce que mesure le chiffre, puis quand il s'arrête. */
   confirmDialog({
-    titre: 'Quand le temps se met en pause',
+    titre: 'Comment \u00e7a fonctionne',
     message:
-      "Le compteur se met en pause quand la procédure reste ouverte sans " +
-      "qu'aucun geste ne soit fait à l'écran, à partir de 2 minutes.\n\n" +
-      "Il repart dès qu'on touche l'écran ou qu'on fait défiler.\n\n" +
-      "Un téléphone posé sur le plan de travail n'accumule donc pas d'heures.",
+      "Le temps par proc\u00e9dure correspond au temps total pass\u00e9 par les " +
+      "membres sur chaque proc\u00e9dure.\n\n" +
+      "Le temps est chronom\u00e9tr\u00e9 d\u00e8s l'ouverture de la proc\u00e9dure et se " +
+      "met en pause lorsque la page reste inactive pendant 2\u00a0minutes.",
     confirmer: 'Compris',
     annuler: null,
     danger: false,
@@ -17503,9 +17507,21 @@ const DUREE_REFUSEE = 5 * 60
 
    ON ARRONDIT VERS LE HAUT, toujours. Une attente plus courte qu'annoncée est
    une bonne surprise ; l'inverse est un mensonge. */
-const COUT_ALLEGEMENT = 1.05
-const COUT_AZURE = 0.8
-const COUT_FIXE = 60
+/* ⚠ RECALÉ LE 21 SEPTEMBRE, SUR UNE MESURE RÉELLE.
+
+   Vidéo de 30 s, mode léger d'Azure : 3 min 41 entre le démarrage chez Azure
+   et les étapes prêtes. L'ancien calcul (0,8 × durée + 60 s) annonçait
+   1 min 24 : la barre d'attente arrivait au bout bien trop tôt, puis restait
+   plantée — exactement ce qui fait croire à une panne.
+
+   Azure a un coût presque FIXE d'environ trois minutes, quelle que soit la
+   longueur ; la durée n'ajoute qu'un tiers d'elle-même. D'où 210 s fixes et
+   0,3 × la durée. L'allègement rapide (WebCodecs) va plusieurs fois plus vite
+   que la lecture : 0,25 × la durée, valeur prudente en attendant une mesure
+   sur iPhone. */
+const COUT_ALLEGEMENT = 0.25
+const COUT_AZURE = 0.3
+const COUT_FIXE = 210
 
 function estimerAnalyse(dureeVideo, avecAllegement) {
   if (!dureeVideo || !isFinite(dureeVideo)) return null
@@ -17628,6 +17644,164 @@ async function extraireBandeSon(fichier) {
     console.warn('Standix \u00b7 bande son non extraite :', e?.message || e)
     return null
   }
+}
+
+/* ═══ LES IMAGES POUR L'ANALYSE RAPIDE ═══
+
+   Une image toutes les trois secondes environ, entre 4 et 40, prises au
+   milieu de chaque tranche. Côté long : 768 px, JPEG 0,7 — assez pour lire
+   un bouton à l'écran, assez léger pour tenir en un seul envoi.
+
+   Renvoie `null` si le navigateur refuse : l'analyse rapide part alors avec
+   la parole seule, ce qui reste exploitable. */
+async function extraireImages(fichier, duree) {
+  const url = URL.createObjectURL(fichier)
+  const v = document.createElement('video')
+  v.muted = true; v.playsInline = true; v.preload = 'auto'
+  v.setAttribute('playsinline', ''); v.setAttribute('muted', '')
+  v.style.cssText = 'position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none'
+  v.src = url
+  document.body.appendChild(v)
+  const fin = Date.now() + 60000
+  const attendre = (evt, ms) => new Promise((ok, ko) => {
+    const t = setTimeout(() => { v.removeEventListener(evt, h); ko(new Error('délai ' + evt)) }, ms)
+    const h = () => { clearTimeout(t); v.removeEventListener(evt, h); ok() }
+    v.addEventListener(evt, h)
+  })
+  try {
+    if (v.readyState < 1) await attendre('loadedmetadata', 10000)
+    const d = isFinite(v.duration) && v.duration > 0 ? v.duration : duree
+    if (!d || !v.videoWidth) return null
+    /* Safari ne décode aucune image tant que la lecture n'a pas démarré une
+       fois : un départ-arrêt muet suffit. */
+    try { await v.play(); v.pause() } catch (e) {}
+
+    const n = Math.min(40, Math.max(4, Math.ceil(d / 3)))
+    const pas = d / n
+    const echelle = Math.min(1, 768 / Math.max(v.videoWidth, v.videoHeight))
+    const toile = document.createElement('canvas')
+    toile.width = Math.round(v.videoWidth * echelle)
+    toile.height = Math.round(v.videoHeight * echelle)
+    const g = toile.getContext('2d')
+    const images = []
+    for (let i = 0; i < n; i++) {
+      if (Date.now() > fin) break
+      const t = Math.min(d - 0.05, pas * (i + 0.5))
+      try {
+        const vu = attendre('seeked', 4000)
+        v.currentTime = t
+        await vu
+      } catch (e) { continue }
+      g.drawImage(v, 0, 0, toile.width, toile.height)
+      const data = toile.toDataURL('image/jpeg', 0.7).split(',')[1] || ''
+      if (data.length > 100) images.push({ t: Math.round(t * 10) / 10, data })
+    }
+    window.jalon?.(`images : ${images.length}/${n}`)
+    return images.length ? images : null
+  } catch (e) {
+    console.warn('Standix · images non extraites :', e?.message || e)
+    return null
+  } finally {
+    v.removeAttribute('src'); v.load?.(); v.remove()
+    URL.revokeObjectURL(url)
+  }
+}
+
+/* Coupe-circuit : `localStorage['standix-ia-rapide'] = 'non'` rend l'ancien
+   chemin Azure seul, sans nouvelle version de l'app. */
+function iaRapideCoupee() {
+  try { return localStorage.getItem('standix-ia-rapide') === 'non' } catch (e) { return false }
+}
+
+/* ═══ L'ANALYSE RAPIDE ═══
+
+   Transcription Azure Speech + rédaction sur images, en un seul appel qui
+   rend les étapes écrites. Renvoie `true` si c'est fait, `false` pour
+   repartir sur Azure Video Indexer. Un refus de quota, lui, est levé : il
+   vaudrait aussi pour l'autre chemin.
+
+ ⚠ SI LA RÉPONSE SE PERD (réseau, délai), le serveur a peut-être fini — ou
+   travaille encore. On relit la procédure avant de relancer Azure : sinon
+   on paierait deux analyses pour une seule vidéo. */
+async function tenterAnalyseRapide({ base, son, promesseImages }) {
+  const depart = Date.now()
+  const entreprise = currentMembre?.entreprise_id
+  try {
+    const images = await Promise.race([
+      promesseImages,
+      new Promise(ok => setTimeout(() => ok(null), 20000)),
+    ]).catch(() => null)
+
+    const cheminSon = `${base}_ia_son.wav`
+    const { error: eSon } = await supabase.storage.from('procedo-videos')
+      .upload(cheminSon, son.blob, { contentType: 'audio/wav' })
+    if (eSon) { console.warn('[rapide] son non envoyé :', eSon.message); return false }
+
+    let cheminImages = null
+    if (images && images.length) {
+      const c = `${base}_ia_images.json`
+      const { error: eImg } = await supabase.storage.from('procedo-videos')
+        .upload(c, new Blob([JSON.stringify(images)], { type: 'application/json' }),
+          { contentType: 'application/json' })
+      if (!eImg) cheminImages = c
+      else console.warn('[rapide] images non envoyées :', eImg.message)
+    }
+    window.jalon?.(`rapide : fichiers envoyés en ${Math.round((Date.now() - depart) / 1000)} s`)
+
+    let rep
+    try {
+      rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-rapide`, {
+        method: 'POST',
+        signal: AbortSignal.timeout(150000),
+        headers: await enTeteFonction(),
+        body: JSON.stringify({
+          procedure_id: aiProcedureId,
+          entreprise_id: entreprise,
+          langue: langueParlee(),
+          son: cheminSon,
+          images: cheminImages,
+          duree: aiVideoDuree || null,
+        }),
+      })
+    } catch (e) {
+      console.warn('[rapide] réponse perdue :', e?.message || e)
+      return await issueRapideIncertaine()
+    }
+
+    const data = await rep.json().catch(() => ({}))
+    console.log(`[rapide] ${rep.status} en ${Math.round((Date.now() - depart) / 1000)} s`, data)
+    if (rep.ok && data.ok) return true
+    if (data.raison && !data.repli) {
+      const err = new Error(data.error || 'Analyse refusée.')
+      err.refusQuota = true
+      throw err
+    }
+    if (rep.status >= 500 && !data.repli) return await issueRapideIncertaine()
+    return false
+  } catch (e) {
+    if (e?.refusQuota) throw e
+    console.warn('[rapide] abandon, repli sur Azure :', e?.message || e)
+    return await issueRapideIncertaine()
+  }
+}
+
+/* Relit la procédure quand on ne sait pas comment l'appel s'est terminé.
+   « traitement » : rien n'a été fait, Azure peut partir. « pret » : c'est
+   fait. « redaction » : le serveur écrit encore — on attend qu'il tranche,
+   deux minutes au plus. */
+async function issueRapideIncertaine() {
+  const limite = Date.now() + 120000
+  while (Date.now() < limite) {
+    const { data, error } = await supabase.from('procedures')
+      .select('statut').eq('id', aiProcedureId).maybeSingle()
+    if (!error && data) {
+      if (data.statut === 'traitement') return false
+      if (data.statut !== 'redaction') return true
+    }
+    await new Promise(ok => setTimeout(ok, 4000))
+  }
+  /* Toujours en rédaction : on laisse le sondage suivre. */
+  return true
 }
 
 /* Sous ce seuil, il n'y a rien à transcrire. 0,01 ≈ −40 dB : au-dessus du bruit
@@ -17816,7 +17990,7 @@ function formatEnregistrable() {
    pas au rythme de la lecture.
 
    Le travail est confié à Mediabunny, une bibliothèque libre (licence MPL 2.0)
-   posée à côté de l'app : `mediabunny-1.58.1.min.mjs`. Elle n'est chargée
+   posée à côté de l'app : `mediabunny.js` (version 1.58.1). Elle n'est chargée
    qu'au moment d'alléger — jamais pour quelqu'un qui ne fait que lire des
    procédures.
 
@@ -17893,8 +18067,13 @@ async function comprimerVideoRapide(fichier, surAvancee) {
   const t0 = performance.now()
   try {
     /* Chemin relatif au document : la bibliothèque est dans le même dossier
-       que l'app, où qu'elle soit hébergée. */
-    mediabunny ||= await import(new URL('mediabunny-1.58.1.min.mjs', document.baseURI).href)
+       que l'app, où qu'elle soit hébergée.
+
+       ⚠ EN `.js`, PAS EN `.mjs`. Le fichier est un module dans les deux cas —
+         c'est `import()` qui décide, pas l'extension. Mais un `.mjs` ne
+         s'ouvre pas dans l'aperçu des fichiers (« aucun contenu disponible »),
+         ce qui le faisait passer pour vide au moment de le publier. */
+    mediabunny ||= await import(new URL('mediabunny.js', document.baseURI).href)
     const { Input, Output, Conversion, BlobSource, BufferTarget, Mp4OutputFormat, ALL_FORMATS } = mediabunny
 
     const entree = new Input({ source: new BlobSource(fichier), formats: ALL_FORMATS })
@@ -18697,6 +18876,12 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       throw new Error('SANS_SON')
     }
 
+    /* Les images de l'analyse rapide se prennent PENDANT l'envoi de la
+       vidéo : elles sont prêtes quand on en a besoin, sans rien retarder. */
+    const promesseImages = (son && !iaRapideCoupee())
+      ? extraireImages(aiVideoFile, aiVideoDuree).catch(() => null)
+      : Promise.resolve(null)
+
     const base = `${currentMembre.entreprise_id}/${Date.now()}`
 
     // La vidéo : c'est elle qu'on rejoue, extrait par extrait, dans la fiche.
@@ -18892,6 +19077,17 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     if (procError) throw new Error(procError.message)
 
     signalerEtapeIA('L\u2019IA \u00e9coute et regarde\u2026')
+
+    /* ═══ D'ABORD LE CHEMIN RAPIDE ═══
+       Azure Speech + rédaction sur images. S'il échoue pour une raison
+       technique, tout est remis en l'état côté serveur et l'ancien chemin
+       Azure Video Indexer part juste en dessous, comme avant. */
+    let rapideFait = false
+    if (son && !iaRapideCoupee()) {
+      rapideFait = await tenterAnalyseRapide({ base, son, promesseImages })
+    }
+
+    if (!rapideFait) {
     // 3. Démarrage de l'analyse Azure
     /* ═══ UN DÉLAI MAXIMAL SUR LE DÉMARRAGE ═══
 
@@ -18938,6 +19134,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     })
     const startData = await startRes.json()
     if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")
+    }
 
     /* La coche remplace l'anneau. Sans cette classe, l'anneau continuait de
            tourner sous la coche — deux cercles et un point brillant pour dire

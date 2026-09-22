@@ -17003,6 +17003,35 @@ let aiEstimationTotale = null
 let aiEnFile = false
 let aiNbSondages = 0
 let aiPollTimer = null
+/* Vrai tant que CETTE page prépare et envoie l'analyse. La reprise au retour
+   sur l'app ne doit pas sonder pendant ce temps : le serveur ne connaît pas
+   encore l'analyse, et répondrait qu'il n'y en a aucune. */
+let aiLancementEnCours = false
+
+/* ═══ L'ÉCRAN RESTE ALLUMÉ PENDANT LA PRÉPARATION ═══
+   Si l'écran se verrouille, le téléphone suspend la page : l'allègement et
+   l'envoi s'arrêtent, et la vidéo n'arrive jamais. On demande donc au
+   navigateur de garder l'écran allumé le temps de la préparation, puis on
+   rend la main. Sans prise en charge, rien ne change. */
+let verrouEcran = null
+async function garderEcranAllume(oui) {
+  try {
+    if (oui) {
+      if (!verrouEcran && navigator.wakeLock?.request) {
+        verrouEcran = await navigator.wakeLock.request('screen')
+        verrouEcran.addEventListener?.('release', () => { verrouEcran = null })
+      }
+    } else if (verrouEcran) {
+      const v = verrouEcran; verrouEcran = null
+      await v.release()
+    }
+  } catch (e) { verrouEcran = null }
+}
+/* Le navigateur retire le verrou quand on quitte l'app : on le reprend au
+   retour si la préparation n'est pas finie. */
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && aiLancementEnCours) garderEcranAllume(true)
+})
 let aiProcedureId = null
 let aiProgressTimer = null
 let aiProgressPct = 0
@@ -17159,6 +17188,7 @@ function analyseIAEnCours() {
    tourner le minuteur dans le vide. */
 async function reprendreAnalyseIA() {
   if (aiPollTimer) return               // la boucle tourne deja
+  if (aiLancementEnCours) return        // l'envoi est en cours sur cette page
   const reste = analyseIAEnCours()
   if (!reste) return
   if (!currentMembre?.entreprise_id) return
@@ -18716,6 +18746,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
      ⚠ AVEC L'HEURE DE DEPART. Elle sert a abandonner une analyse trop vieille
        plutot que de sonder pour toujours une procedure qui ne finira jamais. */
     memoriserAnalyseIA(nouvelle.id)
+    aiLancementEnCours = true
+    garderEcranAllume(true)
     console.log('[procédure créée]', aiProcedureId)
     /* La liste se recharge sans qu'on l'attende : la procédure doit apparaître
        maintenant, pas quand le rechargement daignera finir. */
@@ -19142,6 +19174,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     launchBtn.classList.add('fini')
     launchBtn.classList.remove('travaille'); launchBtn.disabled = false
     /* La bascule a eu lieu au clic — il ne reste qu'à sonder. */
+    aiLancementEnCours = false
+    garderEcranAllume(false)
     pollAiStatus()
 
     /* La liste a déjà été rechargée à la création, tout au début. On la
@@ -19149,6 +19183,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        c'est elle qui donne sa vignette à la carte. */
     loadGestionProcedures().catch(() => {})
   } catch (e) {
+    aiLancementEnCours = false
+    garderEcranAllume(false)
     clearTimeout(bascule2)
 
     /* ═══ UN MESSAGE LISIBLE POUR UNE INTERRUPTION ═══
@@ -19506,6 +19542,26 @@ document.getElementById('ai-view-btn').onclick = () => openAnalyse(aiProcedureId
       return
     }
     // status === 'error'
+
+    /* ═══ « AUCUNE ANALYSE EN COURS » N'EST PAS TOUJOURS UN ÉCHEC ═══
+       `ai-check` le répond tant qu'aucun identifiant Azure n'existe. Or
+       l'analyse rapide n'en pose un qu'à la toute fin : pendant qu'elle
+       écrit (« redaction »), ou juste après l'envoi de la vidéo, il faut
+       simplement attendre. Le plafond de durée arrête l'attente si rien
+       n'aboutit. Sans vidéo envoyée, on le dit en clair. */
+    if (/aucune analyse en cours/i.test(String(data.message || ''))) {
+      const { data: pr } = await supabase.from('procedures')
+        .select('statut, video_url').eq('id', aiProcedureId).maybeSingle()
+      if (pr && (pr.statut === 'redaction' || (pr.statut === 'traitement' && pr.video_url))) {
+        aiNbSondages++
+        aiPollTimer = setTimeout(pollAiStatus, 4000)
+        return
+      }
+      if (pr && pr.statut === 'traitement' && !pr.video_url) {
+        data.message = "La vid\u00e9o n'a pas fini d'\u00eatre envoy\u00e9e. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse."
+      }
+    }
+
     stopAiProgressSimulation(0)
     document.getElementById('ai-progress-card').style.display = 'none'
     aiEcranAttente = false

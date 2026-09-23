@@ -3607,17 +3607,22 @@ body.polices-pretes .chargement-marque{opacity:1}
      = 2,05 em, la hauteur exacte qu'avait l'étiquette auparavant. */
   display:inline-flex; align-items:center; justify-content:center;
   line-height:1;
-  /* ⚠ PUIS UN DEMI-PIXEL PLUS HAUT (à la demande). Le décalage est écrit
-     EN PIXELS, pas en `em` : on veut exactement 0,5 px, la même valeur sur
-     ordinateur où l'étiquette écrit en 12,3 px et sur téléphone où elle
-     tombe à 10,8 — un `em` aurait donné deux décalages différents. On retire
-     le demi-pixel en haut et on le rend en bas : le texte monte, la hauteur
-     de l'étiquette ne bouge pas d'un cheveu. */
-  /* ⚠ PUIS 0,3 px VERS LA DROITE (à la demande) : on prend le tiers de
-     pixel à droite et on le rend à gauche. Là encore en PIXELS et non en
-     `em`, pour que le décalage soit le même quelle que soit la taille de
-     l'étiquette, et la largeur de celle-ci ne bouge pas. */
-  padding:calc(.525em - .5px) calc(.72em - .3px) calc(.525em + .5px) calc(.72em + .3px);
+  /* ⚠ LES DEUX DÉCALAGES FINS SONT ÉCRITS EN PIXELS, jamais en `em` : on
+     veut la même valeur sur ordinateur, où l'étiquette écrit en 12,3 px, et
+     sur téléphone où elle tombe à 10,8. La largeur et la hauteur de
+     l'étiquette ne bougent pas : ce qu'on retire d'un côté, on le rend à
+     l'autre.
+     ⚠ LA VALEUR VERTICALE EST UN MILIEU DE PALIER, PAS UN RÉGLAGE FIN. Le
+     navigateur cale les lettres sur la grille de pixels : la position ne
+     varie donc pas continûment mais par MARCHES DE 2 px. Mesuré marche par
+     marche sur ordinateur, tout l'intervalle de −0,25 à +0,50 px donne le
+     même résultat, le meilleur ; en dessous le mot tombe de 2 px, au-dessus
+     il saute de 2 px. On se place donc au MILIEU de cet intervalle, à
+     +0,125 px, pour qu'un arrondi d'un autre navigateur ou d'un autre zoom
+     ne fasse pas basculer le mot d'une marche.
+     ⚠ IL RESTE 0,38 px D'ÉCART, ET ON NE PEUT PAS FAIRE MIEUX : c'est la
+     résolution de la grille, pas un réglage à affiner. */
+  padding:calc(.525em + .125px) calc(.72em - .3px) calc(.525em - .125px) calc(.72em + .3px);
   background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
   box-shadow:0 2px 10px -2px rgba(31,76,238,.7);
 }
@@ -3652,6 +3657,23 @@ body.polices-pretes .chargement-marque{opacity:1}
    la géométrie suffit et toute retouche gâterait le résultat. */
 @media (max-width:980px){
   .sur-et{padding:calc(.613em - .5px) calc(.72em - .3px) calc(.437em + .5px) calc(.72em + .3px)}
+}
+/* ⚠ LA TABLETTE NE VEUT PAS DU DÉCALAGE HORIZONTAL (mesuré). Le tiers de
+   pixel vers la droite centre le mot sur ordinateur, mais sur tablette il
+   l'emmène à +0,75 px du centre : les lettres n'y tombent pas sur la grille
+   de pixels au même endroit. Elle reprend donc un rembourrage symétrique,
+   ce qui la ramène à +0,12 px — le meilleur résultat possible.
+   ⚠ CETTE VALEUR N'A PAS ÉTÉ CHOISIE, ELLE A ÉTÉ TROUVÉE : trente-cinq
+   combinaisons de décalage vertical et horizontal ont été rendues et
+   mesurées sur chaque appareil, et c'est celle dont le mot tombe le plus
+   près du centre. */
+@media (min-width:641px) and (max-width:980px){
+  .sur-et{
+    padding-left:.72em; padding-right:.72em;
+    /* Même raisonnement de palier qu'au-dessus : sur tablette l'intervalle
+       favorable va de −0,5 à +0,25 px, son milieu vaut donc −0,125. */
+    padding-top:calc(.613em - .125px); padding-bottom:calc(.437em + .125px);
+  }
 }
 
 @media (min-width:981px){

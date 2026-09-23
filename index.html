@@ -3306,35 +3306,37 @@ body.pret .sc-in::before{animation-play-state:running, running}
 
 /* ═══ SECTIONS 4 ET 5 ═══ */
 
-/* ─── 4. LE SURTITRE DE « POURQUOI STANDIX ? » PASSE EN PASTILLE ───
-   Même étiquette qu'au premier écran, même puce au dégradé du bouton
-   d'action : le haut de la page et le milieu se répondent, et le petit
-   texte gris posé au-dessus d'un grand bloc centré — le surtitre d'Apple —
-   disparaît.
-   ⚠ `width:fit-content` + marges automatiques PLUTÔT QU'`inline-flex` : la
-   section n'est pas centrée par `text-align`, une boîte en ligne serait
-   restée collée à gauche. La pastille du premier écran, elle, est un
-   élément d'une colonne `align-items:center` — d'où les deux recettes. */
+/* ─── 4. LE SURTITRE DE « POURQUOI STANDIX ? » : DU TEXTE, RIEN D'AUTRE ───
+   Ni pastille, ni puce, ni filet. Un surtitre qui s'annonce trop fort vole
+   l'attention du paragraphe qu'il introduit, et la pastille du premier écran
+   perd son autorité dès qu'une deuxième lui ressemble : elle doit rester
+   seule de son espèce.
+   ⚠ CE QUI ÉVITE LE SURTITRE D'APPLE, C'EST LA FORME DES LETTRES, pas leur
+   couleur. Le leur est en petites CAPITALES très espacées, dans un gris
+   sourd — c'est ce dessin-là qui signe la page produit. Ici : casse normale,
+   crénage serré, et un gris nettement plus clair, qui se lit d'un coup d'œil
+   au lieu de chuchoter. C'est aussi ce qui vend le mieux : une ligne qu'on
+   lit vaut mieux qu'une ligne qu'on devine.
+   ⚠ `width:fit-content` + marges automatiques : la section n'est pas centrée
+   par `text-align`, un bloc s'étalerait sur toute la largeur. */
 .cout-sur{
-  display:flex; align-items:center; gap:.52em;
-  width:fit-content; margin:0 auto clamp(14px, 1.8vh, 22px);
-  padding:.4em .92em .44em .8em; box-sizing:border-box;
-  border-radius:999px;
+  display:block; width:fit-content;
+  margin:0 auto clamp(14px, 1.8vh, 22px);
+  padding:0; background:none; box-shadow:none; border-radius:0;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
   font-family:Inter,sans-serif; font-weight:600;
-  font-size:15px;
-  text-transform:none; letter-spacing:-.012em;
-  color:rgba(255,255,255,.86);
-  background:rgba(255,255,255,.055);
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,.145);
-  -webkit-backdrop-filter:blur(12px) saturate(150%);
-          backdrop-filter:blur(12px) saturate(150%);
+  /* ⚠ IL SUIT LA LARGEUR DE L'ÉCRAN (à la demande). Une valeur fixe de 17 px
+     convenait au téléphone, où le paragraphe fait 26 px — un rapport de 1
+     pour 1,5. Sur un écran de 1440, ce même paragraphe monte à 40 px sans que
+     le surtitre bouge : le rapport tombait à 1 pour 2,4 et la ligne se
+     perdait au-dessus d'un mur de texte. Il monte donc à 21,6 px sur un 1440
+     et 23 px au-delà de 1530, ce qui ramène le rapport à 1 pour 1,85 —
+     proche de celui du téléphone, sans jamais concurrencer le paragraphe. */
+  font-size:clamp(17px, 1.5vw, 23px); line-height:1.3;
+  text-transform:none; letter-spacing:-.008em;
+  color:rgba(245,245,247,.78);
 }
-.cout-sur::before{
-  content:''; flex:0 0 auto;
-  width:.46em; height:.46em; border-radius:50%;
-  background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
-  box-shadow:0 0 0 .18em rgba(46,107,238,.22), 0 0 10px rgba(46,107,238,.58);
-}
+.cout-sur::before{content:none}
 
 /* ─── 5. PLUS DE FLÈCHES DANS « SÉCURITÉ » SUR ORDINATEUR (à la demande) ───
    Elles étaient déjà retirées sur les appareils tactiles ; avec cette
@@ -3416,7 +3418,24 @@ body.polices-pretes .chargement-marque{opacity:1}
    390 px garde ses 352 px). Le plafond de 470 px empêche la barre de
    s'étirer indéfiniment sur les écrans les plus larges du palier. */
 @media (max-width:640px){
-  .barre-hote{--serre:min(100vw, 470px)}
+  /* ⚠ LA BARRE S'ALIGNE SUR LES CARTES D'ABONNEMENT (à la demande) : 28 px
+     de chaque côté, la valeur de `--m` des sections sur téléphone. Elle était
+     à 9 px au repos et 19 px une fois détachée — trois retraits différents
+     sur la même page, et la barre débordait visuellement des cartes qu'elle
+     surplombe. Les deux états sont posés séparément parce qu'ils se calculent
+     autrement : le repos part de `--marge`, l'état flottant d'un `max()` dont
+     le plancher vaut `--marge + 10`. Avec 28 px, ce plancher donnerait 38 —
+     d'où la valeur écrite en clair.
+     ⚠ La barre continue de SUIVRE LA LARGEUR DE L'ÉCRAN : elle vaut
+     désormais la largeur moins 56 px, donc elle s'allonge toujours sur un
+     grand téléphone, simplement à la bonne distance du bord. */
+  /* ⚠ LE REPOS RETROUVE SON RETRAIT D'ORIGINE (à la demande) : 9 px. Seul
+     l'état FLOTTANT, celui où la barre se détache et prend son verre, est
+     calé — à 24 px, soit quatre pixels de moins que les cartes d'abonnement :
+     la barre est ainsi très légèrement plus longue qu'elles, sans les
+     déborder franchement. */
+  .barre-hote{--marge:9px; --serre:min(100vw, 470px)}
+  .barre-hote.flotte{padding-left:24px; padding-right:24px}
 }
 
 
@@ -5185,7 +5204,11 @@ body.polices-pretes .chargement-marque{opacity:1}
     }
     if(!barre) return;
     var v = getComputedStyle(barre).getPropertyValue('--signe').trim();
-    if(v) voile.style.setProperty('--signe', v);
+    /* ⚠ UN CRAN PLUS GRAND QUE CELUI DE LA BARRE (à la demande) : 10 % de
+       plus. Le facteur s'applique à `--signe`, d'où TOUT découle — hauteur du
+       signe, taille du mot, écart entre les deux : le lockup grandit sans se
+       déformer, et il reste calé sur la valeur réelle de la barre. */
+    if(v) voile.style.setProperty('--signe', 'calc(' + v + ' * 1.1)');
   }
   function montre(){ cale(); document.body.classList.add('polices-pretes'); }
   cale();

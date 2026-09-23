@@ -23,6 +23,134 @@
 <title>Standix — Toutes vos procédures, au même endroit</title>
 <meta name="description" content="Créez vos procédures avec l'IA, à partir d'une vidéo ou d'un document. Votre équipe les retrouve sur son téléphone, ou d'un scan de QR code. 14 jours d'essai, sans carte bancaire.">
 <link rel="canonical" href="https://standix.app/">
+<!-- ═══ DONNÉES STRUCTURÉES (JSON-LD) ═══
+     Ce bloc ne s'affiche pas : il DÉCRIT la page aux machines — moteurs de
+     recherche, aperçus d'IA, assistants — dans le vocabulaire qu'elles
+     partagent (schema.org). Quatre objets :
+     · Organization  : qui édite le site, son logo, son adresse de contact ;
+     · WebSite       : le site lui-même et sa langue ;
+     · SoftwareApplication : ce qu'est Standix, pour qui, à quel prix ;
+     · FAQPage       : les sept questions, recopiées MOT POUR MOT de la
+       section « Questions fréquentes ». Google sanctionne les données
+       structurées qui ne correspondent pas au texte visible — si tu changes
+       une réponse dans la page, change-la ici aussi.
+     ⚠ AUCUNE NOTE NI AVIS N'EST DÉCLARÉ (`aggregateRating`) : il n'y en a
+     pas encore, et en inventer est un motif de sanction manuelle. -->
+<script type="application/ld+json">
+{
+ "@context": "https://schema.org",
+ "@graph": [
+  {
+   "@type": "Organization",
+   "@id": "https://standix.app/#organisation",
+   "name": "Standix",
+   "url": "https://standix.app/",
+   "logo": "https://standix.app/site-favicon-96.png",
+   "email": "standix.app@gmail.com",
+   "description": "Standix crée des procédures d'entreprise à partir d'une vidéo ou d'un document, et les rend accessibles à l'équipe depuis l'application ou par QR code."
+  },
+  {
+   "@type": "WebSite",
+   "@id": "https://standix.app/#site",
+   "url": "https://standix.app/",
+   "name": "Standix",
+   "inLanguage": "fr-FR",
+   "publisher": {
+    "@id": "https://standix.app/#organisation"
+   }
+  },
+  {
+   "@type": "SoftwareApplication",
+   "@id": "https://standix.app/#application",
+   "name": "Standix",
+   "url": "https://standix.app/",
+   "applicationCategory": "BusinessApplication",
+   "operatingSystem": "Web",
+   "inLanguage": [
+    "fr",
+    "en",
+    "de"
+   ],
+   "publisher": {
+    "@id": "https://standix.app/#organisation"
+   },
+   "description": "Filmez le geste une fois : l'IA rédige la procédure, et votre équipe la retrouve sur son téléphone ou d'un scan de QR code.",
+   "offers": {
+    "@type": "Offer",
+    "price": "69",
+    "priceCurrency": "EUR",
+    "url": "https://standix.app/#tarifs",
+    "availability": "https://schema.org/InStock",
+    "description": "À partir de 69 € par mois, 14 jours d'essai sans carte bancaire."
+   }
+  },
+  {
+   "@type": "FAQPage",
+   "@id": "https://standix.app/#questions",
+   "inLanguage": "fr-FR",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Faut-il installer une application ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Non. Standix s'ouvre dans le navigateur de votre téléphone, de votre tablette ou de votre ordinateur."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Comment l'IA crée-t-elle une procédure ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "L'IA de Standix crée la procédure à partir d'une vidéo ou d'un enregistrement d'écran, de 5 minutes au maximum : elle découpe le contenu en étapes et les rédige. Elle peut aussi partir d'un document : une image, un PDF, un Word ou un texte collé."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Peut-on créer une procédure sans l'IA ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Oui, et en nombre illimité. Vous donnez un titre et une image de présentation, puis vous ajoutez les étapes une à une : pour chacune, ce qu'elle doit accomplir, le texte et l'image."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Combien de temps prend l'analyse d'une vidéo ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Comptez 1 à 2 minutes pour une vidéo d'une minute, 4 à 5 minutes pour trois minutes, et 6 à 7 minutes pour cinq minutes. Ces durées varient selon le téléphone et la vidéo."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Comment mon équipe accède-t-elle aux procédures ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Partagez un code d'invitation à vos collaborateurs : chacun rejoint l'entreprise depuis son appareil. Les procédures s'ouvrent ensuite dans l'app, ou en scannant le QR code de la procédure."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Dans quelles langues fonctionne Standix ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "En français, en anglais et en allemand."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Qu'est-ce qu'une analyse vidéo IA ?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "C'est lorsque l'IA de Standix a été utilisée pour créer une procédure."
+     }
+    }
+   ]
+  }
+ ]
+}
+</script>
+
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Standix">
 <meta property="og:locale" content="fr_FR">
@@ -3181,14 +3309,28 @@ h1{font-size:var(--t-titre); letter-spacing:-.028em}
    aucun clic.
    ⚠ Si l'appareil demande moins d'animations, la lampe s'immobilise.
    ═══════════════════════════════════════════════════════════════════════ */
+/* ⚠ LA RESPIRATION EST AMPLIFIÉE (à la demande : on doit la VOIR).
+   Elle était presque invisible : 9 % d'agrandissement et une baisse
+   d'éclat de 18 %, étalés sur 9 secondes — soit moins d'un pixel de
+   changement par seconde, sous le seuil où l'œil remarque un mouvement.
+   ⚠ ET ELLE S'INVERSE. La lampe s'ÉTEIGNAIT au milieu du cycle : une
+   lumière qui faiblit en grandissant ne ressemble à rien de réel. Elle
+   monte désormais — elle part à 78 % d'éclat, s'ouvre à 100 % au milieu du
+   souffle, puis redescend. C'est une vraie inspiration, et c'est ce
+   mouvement de clarté, plus que l'échelle, qui se voit.
+   · agrandissement : 9 % → 30 %
+   · amplitude d'éclat : 18 % → 34 %, et dans l'autre sens
+   · dérive latérale : 1,5 % → 3,2 %, pour que la lueur ne se contente pas
+     de gonfler sur place
+   · durée : 9 s → 7 s, le cycle reste lent mais devient perceptible. */
 @keyframes respire{
-  0%,100%{transform:translate3d(0,0,0) scale(1);      opacity:1}
-  50%    {transform:translate3d(1.5%,-1.5%,0) scale(1.09); opacity:.82}
+  0%,100%{transform:translate3d(0,0,0) scale(1);           opacity:.66}
+  50%    {transform:translate3d(3.2%,-2.6%,0) scale(1.30); opacity:1}
 }
 .sc-in::before{
   will-change:transform, opacity;
   animation:lumiere 2.8s cubic-bezier(.16,1,.3,1) .25s both paused,
-            respire 9s cubic-bezier(.45,0,.55,1) 3.05s infinite paused;
+            respire 7s cubic-bezier(.45,0,.55,1) 3.05s infinite paused;
 }
 body.pret .sc-in::before{animation-play-state:running, running}
 @media (prefers-reduced-motion:reduce){
@@ -3457,7 +3599,25 @@ body.polices-pretes .chargement-marque{opacity:1}
   font-style:normal; flex:0 0 auto;
   font-family:Inter,sans-serif; font-weight:600;
   font-size:.72em; letter-spacing:.07em; text-transform:uppercase;
-  color:#FFFFFF; padding:.42em .72em; border-radius:999px;
+  color:#FFFFFF; border-radius:999px;
+  /* ⚠ LE MOT EST CENTRÉ PAR CONSTRUCTION, PLUS PAR UN RÉGLAGE À LA MESURE.
+     Les rembourrages inégaux réglés au pixel ne valaient que pour UNE taille
+     de texte : le navigateur cale la ligne de base sur la grille de pixels,
+     donc le bon écart changeait entre l'ordinateur, la tablette et le
+     téléphone, où l'étiquette n'a pas la même taille.
+     La solution ne se règle pas, elle se démontre. Avec `line-height:1`, la
+     boîte de ligne vaut exactement 1 em. Les métriques d'Inter donnent une
+     hampe de 0,969 em et un jambage de 0,242 em, soit 1,211 em en tout :
+     le demi-interligne vaut donc (1 − 1,211) / 2 = −0,1055 em, ce qui place
+     la ligne d'appui à 0,8635 em du haut. La hauteur de capitale étant de
+     0,727 em, il reste 0,1365 em au-dessus des lettres… et exactement
+     0,1365 em en dessous. Le mot est centré, quelle que soit sa taille.
+     `align-items:center` centre ensuite cette boîte dans le rembourrage.
+     Le rembourrage vertical passe à 0,525 em de chaque côté : 2 × 0,525 + 1
+     = 2,05 em, la hauteur exacte qu'avait l'étiquette auparavant. */
+  display:inline-flex; align-items:center; justify-content:center;
+  line-height:1;
+  padding:.525em .72em;
   background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
   box-shadow:0 2px 10px -2px rgba(31,76,238,.7);
 }
@@ -3466,6 +3626,124 @@ body.polices-pretes .chargement-marque{opacity:1}
 .hero .sur:hover{background:rgba(255,255,255,.085)}
 .hero .sur:hover svg{translate:2px 0; opacity:.85}
 @media (prefers-reduced-motion:reduce){ .hero .sur svg{transition:none} }
+
+
+/* ⚠ SUR ORDINATEUR, « Standix App » PREND EXACTEMENT LA TAILLE DU
+   SOUS-TITRE (à la demande). Plutôt que de recopier un chiffre, on reprend
+   le JETON dont le sous-titre tire la sienne, `--t-lead` — moins 10 %, en deux
+   fois, la pastille ayant été jugée un cheveu trop grosse. Elle vaut donc
+   17,1 px là où le sous-titre en fait 19, et 14,4 px là où il en fait 16.
+   L'écart passe inaperçu, mais le lien avec le sous-titre est conservé : si
+   l'échelle de textes du site change un jour, la pastille suivra toute
+   seule, sans chiffre à reprendre.
+   L'étiquette « Nouveau » et le chevron sont dimensionnés en `em` : ils
+   suivent sans réglage. Téléphone et tablette gardent leurs 15 px, où la
+   pastille occupe déjà une bonne part de la largeur. */
+/* ⚠ UN DERNIER DÉCALAGE, POUR LES PETITS ÉCRANS SEULEMENT. La construction
+   ci-dessus centre le mot à la perfection tant que le texte est assez grand :
+   mesuré, l'écart n'est que de 0,38 px sur ordinateur, où l'étiquette écrit
+   en 12,3 px. En dessous de 981 px elle tombe à 10,8 px, et là le moteur de
+   rendu arrondit la hauteur de capitale et la ligne d'appui à des pixels
+   entiers — le mot remonte alors de près de 2 px, ce qui se voit sur une
+   étiquette de 22 px de haut. On lui rend donc 0,088 em, soit le demi-écart
+   mesuré. Vérifié stable sur quatre hauteurs d'écran : ce n'est pas un
+   hasard de rendu.
+   ⚠ La correction est volontairement ENFERMÉE dans ce palier : au-dessus,
+   la géométrie suffit et toute retouche gâterait le résultat. */
+@media (max-width:980px){
+  .sur-et{padding:.613em .72em .437em}
+}
+
+@media (min-width:981px){
+  .hero .sur{font-size:calc(var(--t-lead) * .90)}
+}
+
+/* ═══ LA CAPSULE D'ACTION DU PREMIER ÉCRAN, PLUS DISCRÈTE SUR ORDINATEUR ═══
+   (à la demande) Elle mesurait 391 × 60 px à 1440, posée par-dessus la main :
+   ses deux boutons pesaient autant que le titre et coupaient l'appareil en
+   deux. Tout descend d'un dixième — texte, rembourrages, écart entre les
+   boutons et rembourrage de la capsule elle-même — pour que les proportions
+   restent celles d'origine ; seule la taille change.
+   ⚠ RIEN N'EST TOUCHÉ SOUS 981 px : sur téléphone la capsule occupe déjà
+   presque toute la largeur, la réduire y rendrait les boutons difficiles à
+   viser au pouce. */
+@media (min-width:981px){
+  /* ⚠ L'ÉCART DE L'ORDINATEUR EST CELUI DU TÉLÉPHONE (à la demande) : 7 px,
+     la même valeur exactement, écrite là-haut dans le palier étroit. Il
+     valait 14,4 px — les deux boutons flottaient alors dans leur étui — puis
+     zéro, ce qui les soudait. Sept pixels suffisent à les séparer sans les
+     éloigner, et la capsule est identique sur tous les appareils. */
+  .acte-bas{padding:clamp(4.5px, .38vw, 5.4px); gap:7px}
+  .acte-bas .btn-verre{
+    font-size:calc(var(--t-action) * .9);
+    padding:clamp(9px, .92vw, 14.4px) clamp(16px, 1.4vw, 26px);
+  }
+  .acte-bas .btn-bleu{
+    font-size:calc(var(--t-action) * .9);
+    padding:clamp(9px, .92vw, 14.4px) clamp(18px, 1.58vw, 28px);
+  }
+}
+
+
+/* ═══ LA LAMPE PASSE DU CHAUD AU NEUTRE (à la demande) ═══
+   Elle gardait la teinte relevée sur la main de la photo — rgb(255,200,178)
+   et rgb(255,180,153), soit 17° et 16° de nuance. C'était juste
+   photographiquement, mais c'était aussi l'éclairage tungstène des pages
+   produit d'Apple, et un beige qui n'a rien à voir avec ta marque.
+   La nappe prend donc un gris très légèrement bleuté — rgb(226,232,240) puis
+   rgb(203,213,225) — qui ne colore plus rien : il éclaire, point.
+   ⚠ POSITION, TAILLE ET ANIMATION INCHANGÉES : l'appareil reste posé de la
+   même façon, la lampe respire toujours. Seule la couleur change.
+   ⚠ La nappe blanche du dessous est conservée telle quelle : c'est elle qui
+   pose l'objet sur une surface, et elle était déjà neutre.
+   ⚠ La seconde nappe est LÉGÈREMENT PLUS DENSE que l'ancienne (0,15 contre
+   0,13) : un gris rend moins de lumière apparente qu'un beige à opacité
+   égale, et sans cette compensation l'écran paraissait plus vide. */
+.sc-in::before{
+  background:
+    radial-gradient(ellipse at 50% 100%,
+      rgba(255,255,255,.27) 0%, rgba(255,255,255,.105) 28%, transparent 58%),
+    radial-gradient(ellipse at 50% 100%,
+      rgba(226,232,240,.21) 0%, rgba(203,213,225,.08) 42%, transparent 76%);
+}
+
+
+/* ═══ LES CARTES RESPIRENT DAVANTAGE SUR ORDINATEUR (à la demande) ═══
+   Deux réglages, et deux seulement :
+   · l'ÉCART entre les cartes passe de 20 à 30 px. C'est lui qui donne
+     l'impression d'espace : des cartes serrées se lisent comme un bloc, des
+     cartes détachées comme des objets qu'on peut prendre un à un.
+   · la LARGEUR gagne 2 % (365 → 392 px). Le contenu des cartes est
+     dimensionné en `cqi`, c'est-à-dire en pourcentage de la largeur de la
+     carte : tout ce qui est dedans — titre, texte, icône, rembourrage —
+     grandit donc dans la même proportion, sans une seule valeur à reprendre.
+     La hauteur suit aussi, par l'`aspect-ratio`.
+   ⚠ LE FACTEUR RESTE COMMUN AUX TROIS CARROUSELS (sections 2, 3 et
+   Sécurité) : ils doivent garder exactement la même largeur de carte, c'est
+   ce qui aligne leurs bords d'une section à l'autre.
+   ⚠ 2 % ET PAS DAVANTAGE : ces cartes ont déjà été jugées trop grosses par
+   le passé. L'espace vient ici de l'écart, pas de la taille. */
+@media (min-width:981px){
+  .car-pf .car-piste, .car-s3 .car-piste, .secu .car-piste{
+    --c:calc(min(80vw, 384px) * 1.02);
+    --g:clamp(20px, 2.1vw, 34px);
+  }
+}
+
+
+/* ═══ LE TITRE SUIT LES GRANDS TÉLÉPHONES (à la demande) ═══
+   `--t-titre` vaut `clamp(34px, 4.9vw, 76px)`. Sur téléphone, la part
+   variable ne pèse rien — 4,9 vw font 21 px sur un écran de 430 — donc c'est
+   le PLANCHER de 34 px qui s'applique, et il s'applique aussi bien à un
+   iPhone de 360 px qu'à un Pro Max de 440. Les 80 px de largeur en plus ne
+   servaient à rien.
+   Ce palier ne concerne que les téléphones à partir de 415 px : le titre y
+   suit enfin la largeur, de 35,7 px à 415 jusqu'à 38 px au plafond. Les
+   petits écrans gardent exactement leurs 34 px — c'est chez eux que
+   « transmis simplement » tient tout juste sur une ligne. */
+@media (min-width:415px) and (max-width:640px){
+  h1{font-size:clamp(35px, 8.6vw, 38px)}
+}
 
 </style>
 </head>
@@ -4234,7 +4512,7 @@ body.polices-pretes .chargement-marque{opacity:1}
         </button>
       </h3>
       <div class="faq-r" id="faq-r3" role="region" aria-labelledby="faq-b3">
-        <p>Comptez 4 à 6&nbsp;minutes pour une vidéo d'une minute, 7 à 10&nbsp;minutes pour trois minutes, et 12 à 16&nbsp;minutes pour cinq minutes. Ces durées varient.</p>
+        <p>Comptez 1 à 2&nbsp;minutes pour une vidéo d'une minute, 4 à 5&nbsp;minutes pour trois minutes, et 6 à 7&nbsp;minutes pour cinq minutes. Ces durées varient selon le téléphone et la vidéo.</p>
       </div>
     </div>
     <div class="faq-item">

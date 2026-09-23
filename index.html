@@ -3311,7 +3311,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
   display:inline-flex; align-items:center; gap:.52em;
   padding:.4em .92em .44em .8em;
   border-radius:999px;
-  font-size:clamp(14.5px, 1.13vw, 17px);
+  font-size:15px;
   color:rgba(255,255,255,.86);
   background:rgba(255,255,255,.055);
   /* Le liseré passe par `box-shadow` et non par `border` : il n'ajoute aucune
@@ -3338,7 +3338,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
    ET LA TABLETTE — à 820 px de large, 1,13 vw ne vaut que 9 px, c'est donc
    lui qui s'applique. Le rembourrage de la pastille est en `em` : elle
    grandit d'elle-même, sans nouvelle valeur à régler. */
-.sur, .hero .sur{font-size:clamp(14.5px, 1.13vw, 17px)}
+.sur, .hero .sur{font-size:15px}
 
 
 /* ⚠ SECTIONS 2 ET 3 : deux pistes ont été essayées puis écartées — le « + »
@@ -3365,7 +3365,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
   padding:.4em .92em .44em .8em; box-sizing:border-box;
   border-radius:999px;
   font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(14.5px, 1.13vw, 17px);
+  font-size:15px;
   text-transform:none; letter-spacing:-.012em;
   color:rgba(255,255,255,.86);
   background:rgba(255,255,255,.055);
@@ -3434,17 +3434,33 @@ body.polices-pretes .chargement-marque{opacity:1}
 @media (prefers-reduced-motion:reduce){ .chargement-marque{transition:none} }
 
 
-/* ═══ LES DEUX PASTILLES, UN CRAN PLUS GRANDES (à la demande) ═══
-   Sur tablette, le texte butait sur le plancher de 13 px — le facteur `vw`
-   n'y vaut que 8 px — et l'étiquette paraissait timide sous un très grand
-   titre. Le plancher passe à 14,2 px et le plafond de 15,5 à 16,8 px, soit
-   environ 9 % de plus à partir de 641 px de large.
-   ⚠ LE TÉLÉPHONE N'EST PAS TOUCHÉ : sa pastille a la largeur qu'il faut, et
-   « Pourquoi Standix ? » y tient déjà tout juste sur une ligne.
-   ⚠ Le rembourrage est en `em` : la pastille grandit d'elle-même autour de
-   son texte, ses proportions ne bougent pas. */
-@media (min-width:641px){
-  .sur, .hero .sur, .cout-sur{font-size:clamp(14.2px, 1.14vw, 16.8px)}
+/* (Un palier tablette à 14,2–16,8 px a existé ici ; il est remplacé par la
+   valeur unique de 15 px, plus bas.) */
+
+
+/* ⚠ LES DEUX PASTILLES, UN CRAN DE PLUS SUR TÉLÉPHONE UNIQUEMENT (à la
+   demande). La valeur commune est un `clamp` dont le PLANCHER sert à la fois
+   au téléphone et à la tablette — le relever aurait agrandi les deux. Une
+   valeur fixe sous 641 px ne touche donc que le téléphone : 14,5 → 16 px,
+   soit +10 %. Le rembourrage étant en `em`, la pastille suit. */
+/* ⚠ LES DEUX PASTILLES SONT À 15 px FIXES (à la demande), sur tous les
+   écrans : plus de `clamp`, plus de valeur à part pour le téléphone. Le
+   rembourrage restant en `em`, l'étiquette a la même allure partout. */
+
+
+/* ⚠ LA BARRE SUIT LA LARGEUR DES GRANDS TÉLÉPHONES (à la demande).
+   `--serre` valait 358 px en dur pour tous les écrans étroits. Sur un 390 px
+   c'était juste, mais sur un iPhone Pro Max de 440 px la barre restait à
+   358 px et se retrouvait avec 41 px de vide de chaque côté — elle avait
+   l'air courte, et elle rétrécissait franchement au défilement.
+   En la calant sur la largeur de l'écran, le retrait retombe sur son
+   plancher — `--marge + 10`, soit 19 px — et la barre prend tout ce qui
+   reste : 402 px sur un 440, contre 358 avant. Les petits écrans ne
+   bougent pas d'un pixel, leur retrait était DÉJÀ sur ce plancher (un
+   390 px garde ses 352 px). Le plafond de 470 px empêche la barre de
+   s'étirer indéfiniment sur les écrans les plus larges du palier. */
+@media (max-width:640px){
+  .barre-hote{--serre:min(100vw, 470px)}
 }
 
 </style>

@@ -3311,7 +3311,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
   display:inline-flex; align-items:center; gap:.52em;
   padding:.4em .92em .44em .8em;
   border-radius:999px;
-  font-size:clamp(13px, 1.02vw, 15.5px);
+  font-size:clamp(14.5px, 1.13vw, 17px);
   color:rgba(255,255,255,.86);
   background:rgba(255,255,255,.055);
   /* Le liseré passe par `box-shadow` et non par `border` : il n'ajoute aucune
@@ -3333,7 +3333,12 @@ body.pret .sc-in::before{animation-play-state:running, running}
 }
 /* La règle de la couche « tailles unifiées » vise `.sur` par son nom : il
    faut la reprendre ici, sinon la pastille retrouve ses 24 px. */
-.sur, .hero .sur{font-size:clamp(13px, 1.02vw, 15.5px)}
+/* ⚠ UN CRAN PLUS GRAND (à la demande) : 13 → 14,5 px au plancher, 15,5 → 17
+   au plafond, soit +11 % partout. Le plancher est ce que voient le TÉLÉPHONE
+   ET LA TABLETTE — à 820 px de large, 1,13 vw ne vaut que 9 px, c'est donc
+   lui qui s'applique. Le rembourrage de la pastille est en `em` : elle
+   grandit d'elle-même, sans nouvelle valeur à régler. */
+.sur, .hero .sur{font-size:clamp(14.5px, 1.13vw, 17px)}
 
 
 /* ⚠ SECTIONS 2 ET 3 : deux pistes ont été essayées puis écartées — le « + »
@@ -3360,7 +3365,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
   padding:.4em .92em .44em .8em; box-sizing:border-box;
   border-radius:999px;
   font-family:Inter,sans-serif; font-weight:600;
-  font-size:clamp(13px, 1.02vw, 15.5px);
+  font-size:clamp(14.5px, 1.13vw, 17px);
   text-transform:none; letter-spacing:-.012em;
   color:rgba(255,255,255,.86);
   background:rgba(255,255,255,.055);
@@ -3403,6 +3408,44 @@ body.pret .sc-in::before{animation-play-state:running, running}
    l'autre et on resserre l'écart, un lien n'ayant pas de rembourrage. */
 .fin-boutons{display:flex; align-items:center; justify-content:center;
              flex-wrap:wrap; gap:clamp(14px, 1.6vw, 26px)}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   LE LOGO DU CHARGEMENT NE S'AFFICHE PLUS AVANT SA POLICE
+   ───────────────────────────────────────────────────────────────────────
+   Les deux lockups — celui du voile et celui de la barre — ont EXACTEMENT
+   les mêmes règles : même classe `.marque`, donc même `--signe`, et le mot
+   vaut toujours le signe divisé par 1,395. Mesuré au pixel près à dix-sept
+   largeurs d'écran, de 360 à 1920 px : identiques.
+   Il restait pourtant un écart VISIBLE, et il ne venait pas des tailles
+   mais de la POLICE. La feuille Google est chargée en `display:swap` : tant
+   que Poppins n'est pas arrivée, le navigateur dessine « Standix » avec la
+   police de secours du système — Helvetica, Arial, selon la machine. Ces
+   lettres-là n'ont ni la même chasse ni la même hauteur d'œil : mesuré ici,
+   le mot perd 13 % de largeur. Or l'écran de chargement est précisément le
+   moment où la police n'est pas encore là, et la barre, découverte juste
+   après, l'affiche en Poppins. D'où deux logos qui ne se ressemblent pas.
+   Le lockup du voile attend donc sa police pour apparaître, et arrive en
+   fondu. Filet de sécurité : s'il ne se passe rien au bout de 2,5 s, il
+   s'affiche quand même — mieux vaut la police de secours qu'un voile vide.
+   ═══════════════════════════════════════════════════════════════════════ */
+.chargement-marque{opacity:0; transition:opacity .4s ease}
+body.polices-pretes .chargement-marque{opacity:1}
+@media (prefers-reduced-motion:reduce){ .chargement-marque{transition:none} }
+
+
+/* ═══ LES DEUX PASTILLES, UN CRAN PLUS GRANDES (à la demande) ═══
+   Sur tablette, le texte butait sur le plancher de 13 px — le facteur `vw`
+   n'y vaut que 8 px — et l'étiquette paraissait timide sous un très grand
+   titre. Le plancher passe à 14,2 px et le plafond de 15,5 à 16,8 px, soit
+   environ 9 % de plus à partir de 641 px de large.
+   ⚠ LE TÉLÉPHONE N'EST PAS TOUCHÉ : sa pastille a la largeur qu'il faut, et
+   « Pourquoi Standix ? » y tient déjà tout juste sur une ligne.
+   ⚠ Le rembourrage est en `em` : la pastille grandit d'elle-même autour de
+   son texte, ses proportions ne bougent pas. */
+@media (min-width:641px){
+  .sur, .hero .sur, .cout-sur{font-size:clamp(14.2px, 1.14vw, 16.8px)}
+}
 
 </style>
 </head>
@@ -5131,6 +5174,37 @@ body.pret .sc-in::before{animation-play-state:running, running}
   /* Dernière mesure juste avant que le voile ne parte (script du chargement). */
   addEventListener('standix:mesure', mesure);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(mesure);
+})();
+</script>
+<script>
+/* ⚠ LE LOGO DU VOILE ATTEND SA POLICE (voir la feuille de style).
+   ⚠ ET IL RECOPIE LA TAILLE DE CELUI DE LA BARRE, mesurée à l'instant sur
+   la page réelle. Les deux la tiennent déjà de la même règle CSS : cette
+   ligne ne change donc rien en temps normal. Elle est là pour qu'AUCUNE
+   règle, présente ou future, ne puisse les désaccorder — la taille du
+   logo du chargement n'est plus déduite, elle est copiée. */
+(function(){
+  var voile = document.querySelector('.chargement-marque');
+  if(!voile) return;
+  function cale(){
+    var marques = document.querySelectorAll('.marque');
+    var barre = null;
+    for(var i = 0; i < marques.length; i++){
+      if(marques[i] !== voile){ barre = marques[i]; break; }
+    }
+    if(!barre) return;
+    var v = getComputedStyle(barre).getPropertyValue('--signe').trim();
+    if(v) voile.style.setProperty('--signe', v);
+  }
+  function montre(){ cale(); document.body.classList.add('polices-pretes'); }
+  cale();
+  addEventListener('resize', cale);
+  if(document.fonts && document.fonts.ready){
+    document.fonts.ready.then(montre);
+    setTimeout(montre, 2500);
+  } else {
+    montre();
+  }
 })();
 </script>
 </body>

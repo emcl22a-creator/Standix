@@ -3320,6 +3320,20 @@ h1{font-size:var(--t-titre); letter-spacing:-.028em}
    apparition d'entrée. `will-change` disparaît avec elle : il réservait une
    couche graphique qui ne sert plus à rien. */
 .sc-in::before{
+  /* ⚠ LA LUEUR GRANDIT DEPUIS SON BAS, PAS DEPUIS SON CENTRE.
+     Le dégradé est un `ellipse at 50% 100%` : son foyer est posé sur le bord
+     BAS de sa boîte, et tout ce qui se trouverait sous ce bord est
+     simplement absent — la lueur est coupée net en dessous. Au repos ça ne
+     se voit pas, ce bord tombant hors de l'écran, sous l'appareil.
+     Mais l'animation d'ouverture la fait grandir de 60 % à 100 %, et avec
+     une origine au centre, cet agrandissement REMONTE le bord bas de 20 %
+     de la hauteur de la boîte — une centaine de pixels — et la coupure
+     apparaît en pleine page pendant une seconde et demie.
+     Origine au bas : le bord ne bouge plus, la lueur s'ouvre vers le haut,
+     et la coupure reste là où elle a toujours été, invisible.
+     ⚠ C'est déjà l'origine de `.sc-tel`, qui grandit lui aussi à
+     l'ouverture : les deux montent maintenant du même point. */
+  transform-origin:50% 100%;
   animation:lumiere 2.8s cubic-bezier(.16,1,.3,1) .25s both paused;
 }
 body.pret .sc-in::before{animation-play-state:running}
@@ -3361,7 +3375,17 @@ body.pret .sc-in::before{animation-play-state:running}
    même pente que le téléphone et restait petit pour la largeur disponible.
    Il passe d'environ 40 à 51 px sur un iPad en portrait. */
 @media (min-width:641px) and (max-width:1180px){
-  h1{font-size:clamp(42px, 6.2vw, 66px)}
+  /* ⚠ UN CRAN PLUS GRAND SUR LES PETITES TABLETTES (à la demande), ET LE
+     GAIN S'ESTOMPE À MESURE QUE L'ÉCRAN GRANDIT. La formule n'est plus une
+     simple part de largeur mais une part PLUS une constante : les 14 px
+     ajoutés pèsent lourd sur un écran de 768 et presque rien sur un 1024.
+     Mesuré : +4,0 px à 768, +3,4 à 820, +2,3 à 900, +0,7 à 1024 — c'est
+     bien la petite tablette qui gagne, comme demandé, sans que la grande
+     devienne démesurée.
+     ⚠ LA PART VARIABLE EST PASSÉE DE 6,2 À 4,9 vw, la valeur exacte
+     qu'emploie l'ordinateur : les deux règles ont désormais la même pente,
+     et le titre ne change plus d'allure en franchissant le palier. */
+  h1{font-size:clamp(45px, calc(4.9vw + 14px), 66px)}
 }
 
 /* ─── LA PHRASE SOUS LE TITRE DE SECTION (motif repris de Stripe) ───
@@ -3767,6 +3791,50 @@ body.polices-pretes .chargement-marque{opacity:1}
   h1{font-size:clamp(35px, 8.6vw, 38px)}
 }
 
+
+/* ═══ LA LIGNE DE RÉASSURANCE DU PREMIER ÉCRAN ═══
+   Stripe place ses garanties sous le bouton, là où le visiteur hésite. Chez
+   nous elles n'existaient qu'au tout dernier écran — quand la décision est
+   déjà prise, ou abandonnée.
+   ⚠ ORDINATEUR SEULEMENT. Sous 981 px, la capsule est déjà presque au bord
+   de l'écran et l'appareil occupe toute la hauteur : une ligne de plus s'y
+   poserait sur la main. Elle est donc masquée, et les mêmes garanties
+   restent lisibles en bas de page.
+   ⚠ LA CAPSULE REMONTE POUR LUI FAIRE PLACE : sans ça, la ligne se serait
+   glissée sous le bord de l'écran. Les deux gardent leur écart d'origine
+   avec le bas. */
+.hero-gages{display:none}
+@media (min-width:981px){
+  .acte-bas{bottom:clamp(44px, 6.4vh, 74px)}
+  .hero-gages{
+    display:flex; align-items:center; gap:1.1em;
+    position:absolute; left:50%;
+    /* ⚠ LE CENTRAGE PASSE PAR `transform`, JAMAIS PAR `translate` — le même
+       piège que pour la capsule, et je suis tombé dedans : l'animation
+       d'entrée `texte-cine` anime `translate`, elle écrasait donc le −50 %
+       dès sa première image et la ligne se retrouvait décalée de la moitié
+       de sa largeur, vers la droite. Les deux propriétés se composent, il
+       suffit de ne pas leur demander la même chose. */
+    transform:translateX(-50%);
+    bottom:clamp(14px, 2.2vh, 26px); z-index:5;
+    margin:0; white-space:nowrap;
+    font-family:Inter,sans-serif; font-weight:400;
+    font-size:var(--t-petit); letter-spacing:-.006em;
+    color:rgba(255,255,255,.44);
+    /* Les durées et les prix s'alignent, comme partout ailleurs sur le site. */
+    font-variant-numeric:tabular-nums;
+    /* ⚠ Elle arrive APRÈS la capsule dans l'ouverture cinématographique
+       (1,25 s pour la capsule, 1,45 s pour elle) : le regard lit l'action,
+       puis la garantie. Comme tout le premier écran, elle reste en pause
+       tant que la page n'est pas prête. */
+    animation:texte-cine 1.3s cubic-bezier(.16,1,.3,1) 1.45s both paused;
+  }
+  body.pret .hero-gages{animation-play-state:running}
+}
+/* Les points de séparation, plus discrets que le texte qu'ils séparent. */
+.hero-gages i{font-style:normal; color:rgba(255,255,255,.22)}
+@media (prefers-reduced-motion:reduce){ .hero-gages{animation:none} }
+
 </style>
 </head>
 <body>
@@ -3883,6 +3951,17 @@ body.polices-pretes .chargement-marque{opacity:1}
     <a class="btn btn-verre" href="/app/">Se connecter</a>
     <a class="btn btn-bleu" href="/app/">Essayer 14 jours</a>
   </div>
+
+  <!-- ⚠ LES GARANTIES À L'ENDROIT OÙ L'ON DÉCIDE (repris de Stripe, qui ne
+       les relègue jamais en bas de page). Les trois arguments sont choisis
+       pour ne RIEN RÉPÉTER du bouton juste au-dessus : « 14 jours » y est
+       déjà écrit, il n'a pas à l'être deux fois. Chacun est vérifiable —
+       l'absence d'installation est la première réponse des questions
+       fréquentes, l'absence de carte bancaire et la résiliation viennent
+       des conditions d'utilisation. -->
+  <p class="hero-gages" aria-label="Sans installation, sans carte bancaire, résiliable à tout moment">
+    Sans installation<i aria-hidden="true">·</i>Sans carte bancaire<i aria-hidden="true">·</i>Résiliable à tout moment
+  </p>
 
 </section>
 

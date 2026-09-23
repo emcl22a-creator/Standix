@@ -752,50 +752,6 @@ body.pret .sc-tel,body.pret .sc-in::before{animation-play-state:running}
 }
 [data-monte].vu{opacity:1; translate:0 0}
 
-/* ═══ LE FONDU DU BAS ═══
-   Apple n'emploie jamais un flou uniforme : le sien AUGMENTE vers le bord. Un
-   `backdrop-filter` seul ne sait pas faire ça — il applique une valeur unique.
-   On empile donc cinq couches, chacune plus floue que la précédente et masquée
-   sur une bande plus courte : le contenu proche du bord traverse les cinq,
-   celui du haut n'en traverse qu'une.
-   ⚠ Les masques se CHEVAUCHENT largement — chacun s'éteint bien au-delà du
-   point où le suivant commence. Sans ce recouvrement on voit les paliers.
-   Aucune couleur : un voile recouvrirait au lieu d'estomper.
-   Il MONTE en apparaissant, même courbe et même geste que le reste de la page.
-   Un simple fondu d'opacité serait plus discret mais aussi plus plat. */
-.fondu{
-  position:fixed; left:0; right:0; bottom:0; height:clamp(90px, 13vh, 150px);
-  z-index:40; pointer-events:none;
-  /* ⚠ 0,5 s au lieu de 1,4. À 1,4 s le fondu était encore à mi-course quand la
-     section occupait déjà l'écran : on le voyait arriver EN RETARD sur elle.
-     Il monte aussi de moins loin — 14 px — parce qu'une course courte demande
-     une distance courte, sinon le mouvement paraît saccadé. */
-  opacity:0; translate:0 14px;
-  transition:opacity .5s cubic-bezier(.28,.11,.32,1),
-             translate .5s cubic-bezier(.28,.11,.32,1);
-}
-.fondu.la{opacity:1; translate:0 0}
-.fondu i{position:absolute; inset:0; display:block}
-.fondu i:nth-child(1){
-  -webkit-backdrop-filter:blur(.6px); backdrop-filter:blur(.6px);
-  -webkit-mask-image:linear-gradient(to top,#000 0 46%,transparent 100%);
-          mask-image:linear-gradient(to top,#000 0 46%,transparent 100%)}
-.fondu i:nth-child(2){
-  -webkit-backdrop-filter:blur(1.5px); backdrop-filter:blur(1.5px);
-  -webkit-mask-image:linear-gradient(to top,#000 0 30%,transparent 74%);
-          mask-image:linear-gradient(to top,#000 0 30%,transparent 74%)}
-.fondu i:nth-child(3){
-  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
-  -webkit-mask-image:linear-gradient(to top,#000 0 18%,transparent 54%);
-          mask-image:linear-gradient(to top,#000 0 18%,transparent 54%)}
-.fondu i:nth-child(4){
-  -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
-  -webkit-mask-image:linear-gradient(to top,#000 0 9%,transparent 36%);
-          mask-image:linear-gradient(to top,#000 0 9%,transparent 36%)}
-.fondu i:nth-child(5){
-  -webkit-backdrop-filter:blur(11px); backdrop-filter:blur(11px);
-  -webkit-mask-image:linear-gradient(to top,#000 0 2%,transparent 20%);
-          mask-image:linear-gradient(to top,#000 0 2%,transparent 20%)}
 
 /* ═══════════════════════════════════════════════════════════════════════
    LA SECTION 2 — UNE PHRASE
@@ -3463,6 +3419,35 @@ body.polices-pretes .chargement-marque{opacity:1}
   .barre-hote{--serre:min(100vw, 470px)}
 }
 
+
+/* ═══ LA PASTILLE DU PREMIER ÉCRAN : FORME « BANDEAU D'ANNONCE » ═══
+   La puce ronde laisse place à une ÉTIQUETTE PLEINE, qui porte le dégradé du
+   bouton d'action, et un chevron ferme la pastille. C'est le motif que Stripe
+   place en haut de sa page d'accueil, et le seul des quatre essayés qui offre
+   un emplacement de COULEUR PLEINE pour une accroche — donc le seul qui
+   puisse vendre quelque chose.
+   ⚠ Le rembourrage gauche se resserre : l'étiquette a le sien, deux
+   rembourrages l'un dans l'autre donnaient un galet. */
+.hero .sur{
+  padding:.32em .92em .34em .34em;
+  gap:.6em;
+  text-decoration:none;
+}
+.hero .sur::before{display:none}   /* l'ancienne puce ronde */
+.sur-et{
+  font-style:normal; flex:0 0 auto;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:.72em; letter-spacing:.07em; text-transform:uppercase;
+  color:#FFFFFF; padding:.42em .72em; border-radius:999px;
+  background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
+  box-shadow:0 2px 10px -2px rgba(31,76,238,.7);
+}
+.hero .sur svg{width:.85em; height:.85em; opacity:.55; flex:0 0 auto;
+               transition:translate .18s ease, opacity .18s ease}
+.hero .sur:hover{background:rgba(255,255,255,.085)}
+.hero .sur:hover svg{translate:2px 0; opacity:.85}
+@media (prefers-reduced-motion:reduce){ .hero .sur svg{transition:none} }
+
 </style>
 </head>
 <body>
@@ -3502,7 +3487,10 @@ body.polices-pretes .chargement-marque{opacity:1}
 </div>
 
 <!-- ═══ LE FONDU DU BAS ═══ Cinq couches, du plus net au plus flou. -->
-<div class="fondu" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+<!-- ⚠ FONDU DU BAS RETIRÉ (à la demande) : cinq couches de
+     `backdrop-filter` empilées floutaient la bande basse de l'écran — donc le
+     texte vers lequel l'œil descendait — et se recomposaient à chaque image
+     du défilement. Son style et son script sont retirés eux aussi. -->
 
 <div class="sentinelle" aria-hidden="true"></div>
 <div class="barre-hote">
@@ -3546,7 +3534,11 @@ body.polices-pretes .chargement-marque{opacity:1}
   <i class="voile-haut" aria-hidden="true"></i>
   <i class="voile-bas" aria-hidden="true"></i>
 
-  <p class="sur">Standix App</p>
+  <!-- ⚠ PASTILLE D'ANNONCE (forme reprise du bandeau de stripe.com) : une
+       étiquette de couleur PLEINE, le texte, puis un chevron. C'est un LIEN :
+       chez Stripe cette pastille annonce ET emmène — elle descend ici au
+       fonctionnement, plutôt que de laisser le visiteur décider seul. -->
+  <a class="sur" href="#fonctionnement"><i class="sur-et">Nouveau</i><span>Standix App</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 
   <h1>Votre savoir-faire<br>transmis simplement</h1>
 
@@ -4416,18 +4408,7 @@ body.polices-pretes .chargement-marque{opacity:1}
      puisqu'ils lisent la même chose, la position du repère.
      `pageshow` couvre le retour par le cache de navigation, où ni l'un ni
      l'autre ne se déclenche : la page réapparaît telle qu'on l'a quittée. */
-  /* ⚠ Le fondu est commandé par l'ENTRÉE DANS LA DEUXIÈME SECTION, pas par un
-     nombre de pixels défilés : il s'allume quand son haut franchit les 82 % de
-     la fenêtre. Lié au premier écran, il arrivait trop tôt sur une fenêtre
-     courte et trop tard sur une fenêtre haute. */
-  const fondu=document.querySelector('.fondu');
   const hero=document.querySelector('.hero');
-  /* ⚠ LA PREMIÈRE SECTION APRÈS LE PREMIER ÉCRAN, pas une classe précise : la
-     section 2 a déjà changé plusieurs fois. */
-  const deux=document.querySelector('.hero ~ section');
-  /* ⚠ LE FONDU S'ÉTEINT QUAND LE PIED DE PAGE ARRIVE : sinon il floutait la
-     dernière ligne (« © 2026 Standix »), qui ne peut pas remonter plus haut. */
-  const pied=document.querySelector('.pied');
 
   /* ⚠ La barre doit basculer sur TOUTE section sombre, pas seulement sur la
      première. Elles se déclarent elles-mêmes par `data-fond="sombre"` : en
@@ -4898,12 +4879,6 @@ body.polices-pretes .chargement-marque{opacity:1}
 
   const relit=()=>{
     pose(scrollY > 8);
-    /* ⚠ `- 30`, PAS `+ 20`. La section 2 commence exactement à la hauteur d'un
-       écran : avec une avance, la condition était déjà vraie au chargement et
-       le fondu s'affichait par-dessus le premier écran. Trente pixels
-       d'engagement suffisent à dire qu'on y entre vraiment. */
-    fondu.classList.toggle('la', deux.getBoundingClientRect().top < innerHeight - 30
-      && !(pied && pied.getBoundingClientRect().top < innerHeight));
     const b=barre.getBoundingClientRect();
     hote.classList.toggle('sombre', sombres.some(e=>{
       const s=e.getBoundingClientRect();

@@ -3295,6 +3295,115 @@ body.pret .sc-in::before{animation-play-state:running, running}
 .car-t:has(+ .car-s){margin-bottom:clamp(10px, 1.4vh, 16px)}
 /* La section 3 a maintenant un lien à gauche de ses flèches : on les écarte. */
 .car-s3 .car-bas{justify-content:space-between}
+
+/* ═══ LE SURTITRE DEVIENT UNE PASTILLE (à la demande) ═══
+   Un surtitre nu posé au-dessus d'un grand titre centré, c'est la signature
+   d'une page produit Apple. La pastille contournée avec sa puce de couleur
+   est au contraire un code très répandu des sites de logiciel, qu'Apple
+   n'emploie jamais — et elle pose une touche de bleu de marque tout en haut
+   de l'écran, là où il n'y en avait aucune.
+   ⚠ `inline-flex` : la section est une colonne `align-items:center`, la
+   pastille se réduit donc à la largeur de son texte et reste centrée. Un
+   `<p>` en bloc se serait étendu sur toute la largeur.
+   ⚠ La taille du texte descend d'un cran par rapport au surtitre nu : à
+   21 px, l'étiquette devenait un gros galet au lieu d'une mention. */
+.sur{
+  display:inline-flex; align-items:center; gap:.52em;
+  padding:.4em .92em .44em .8em;
+  border-radius:999px;
+  font-size:clamp(13px, 1.02vw, 15.5px);
+  color:rgba(255,255,255,.86);
+  background:rgba(255,255,255,.055);
+  /* Le liseré passe par `box-shadow` et non par `border` : il n'ajoute aucune
+     épaisseur, la pastille garde exactement la hauteur de son rembourrage. */
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.145);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);
+          backdrop-filter:blur(12px) saturate(150%);
+}
+/* La puce bleue, avec son halo. ⚠ EXACTEMENT LE DÉGRADÉ DU BOUTON « Essayer
+   14 jours » (à la demande) : les trois mêmes bleus, dans le même ordre, sur
+   la même diagonale à 135°. Une couleur plate n'aurait pas répondu — c'est la
+   MATIÈRE du bouton qu'on retrouve, en miniature. Le halo prend le bleu du
+   milieu, comme l'ombre portée du bouton. */
+.sur::before{
+  content:''; flex:0 0 auto;
+  width:.46em; height:.46em; border-radius:50%;
+  background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
+  box-shadow:0 0 0 .18em rgba(46,107,238,.22), 0 0 10px rgba(46,107,238,.58);
+}
+/* La règle de la couche « tailles unifiées » vise `.sur` par son nom : il
+   faut la reprendre ici, sinon la pastille retrouve ses 24 px. */
+.sur, .hero .sur{font-size:clamp(13px, 1.02vw, 15.5px)}
+
+
+/* ⚠ SECTIONS 2 ET 3 : deux pistes ont été essayées puis écartées — le « + »
+   au dégradé bleu, et des coins moins ronds (21 px au lieu de 28). Le verre
+   dépoli et le rayon d'origine sont donc conservés. */
+
+
+
+
+/* ═══ SECTIONS 4 ET 5 ═══ */
+
+/* ─── 4. LE SURTITRE DE « POURQUOI STANDIX ? » PASSE EN PASTILLE ───
+   Même étiquette qu'au premier écran, même puce au dégradé du bouton
+   d'action : le haut de la page et le milieu se répondent, et le petit
+   texte gris posé au-dessus d'un grand bloc centré — le surtitre d'Apple —
+   disparaît.
+   ⚠ `width:fit-content` + marges automatiques PLUTÔT QU'`inline-flex` : la
+   section n'est pas centrée par `text-align`, une boîte en ligne serait
+   restée collée à gauche. La pastille du premier écran, elle, est un
+   élément d'une colonne `align-items:center` — d'où les deux recettes. */
+.cout-sur{
+  display:flex; align-items:center; gap:.52em;
+  width:fit-content; margin:0 auto clamp(14px, 1.8vh, 22px);
+  padding:.4em .92em .44em .8em; box-sizing:border-box;
+  border-radius:999px;
+  font-family:Inter,sans-serif; font-weight:600;
+  font-size:clamp(13px, 1.02vw, 15.5px);
+  text-transform:none; letter-spacing:-.012em;
+  color:rgba(255,255,255,.86);
+  background:rgba(255,255,255,.055);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.145);
+  -webkit-backdrop-filter:blur(12px) saturate(150%);
+          backdrop-filter:blur(12px) saturate(150%);
+}
+.cout-sur::before{
+  content:''; flex:0 0 auto;
+  width:.46em; height:.46em; border-radius:50%;
+  background:linear-gradient(135deg,var(--bleu-a) 0%,var(--bleu-b) 62%,var(--bleu-c) 100%);
+  box-shadow:0 0 0 .18em rgba(46,107,238,.22), 0 0 10px rgba(46,107,238,.58);
+}
+
+/* ─── 5. PLUS DE FLÈCHES DANS « SÉCURITÉ » SUR ORDINATEUR (à la demande) ───
+   Elles étaient déjà retirées sur les appareils tactiles ; avec cette
+   règle, la section n'en a plus nulle part. Ses deux cartes tiennent de
+   toute façon dans l'écran sur ordinateur : les flèches ne servaient à
+   rien. Le lien vers les conditions d'utilisation, seul rescapé de la
+   rangée du bas, reste à gauche comme avant. */
+@media (hover:hover) and (pointer:fine) and (min-width:981px){
+  .secu .car-fleches{display:none}
+}
+
+
+/* ═══ SECTION 8 : LE LIEN QUI REMPLACE LE SECOND BOUTON ═══
+   Même dessin que le lien à chevron des carrousels, mais posé à côté d'un
+   bouton : il doit donc partager sa hauteur et son alignement, sinon la
+   ligne se décale. */
+.fin-lien{
+  display:inline-flex; align-items:center; gap:.28em;
+  font-family:Inter,sans-serif; font-weight:500;
+  font-size:var(--t-action); letter-spacing:-.012em;
+  color:var(--lien-clair); text-decoration:none;
+}
+.fin-lien svg{width:1em; height:1em; transition:translate .18s ease}
+.fin-lien:hover{text-decoration:underline}
+.fin-lien:hover svg{translate:2px 0}
+/* La rangée mêle maintenant un bouton et un lien : on les centre l'un sur
+   l'autre et on resserre l'écart, un lien n'ayant pas de rembourrage. */
+.fin-boutons{display:flex; align-items:center; justify-content:center;
+             flex-wrap:wrap; gap:clamp(14px, 1.6vw, 26px)}
+
 </style>
 </head>
 <body>
@@ -3380,7 +3489,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
 
   <p class="sur">Standix App</p>
 
-  <h1>Votre savoir-faire<br>transmis simplement.</h1>
+  <h1>Votre savoir-faire<br>transmis simplement</h1>
 
   <!-- ⚠ LE SOUS-TITRE EST DE RETOUR (à la demande) : il avait été retiré plus
        tôt, mais rien ne disait plus ce que fait Standix avant l'appareil.
@@ -3415,7 +3524,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
      des personnes, photo sombre, texte blanc. Carte 2 : un objet au logo
      Standix sur fond clair, texte foncé (`.pf-clair`). -->
 <section class="car car-pf" data-fond="sombre" id="points-forts">
-  <h2 class="car-t" data-monte>Vos bénéfices.</h2>
+  <h2 class="car-t" data-monte>Vos bénéfices</h2>
   <p class="car-s" data-monte style="--d:70ms">Ce que Standix change au quotidien, pour vous comme pour votre équipe.</p>
 
   <div class="car-piste" tabindex="0" aria-label="Cinq cartes, faites défiler latéralement">
@@ -3576,7 +3685,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
 <section class="car car-s3" data-fond="sombre" id="fonctionnement">
   <!-- ⚠ LE TITRE : une phrase courte, tout en blanc, avec un point. Il
        résume les quatre cartes sans répéter aucune d'elles. -->
-  <h2 class="car-t" data-monte>Fonctionnement.</h2>
+  <h2 class="car-t" data-monte>Fonctionnement</h2>
   <p class="car-s" data-monte style="--d:70ms">Filmez le geste une fois. Standix crée la procédure. Votre équipe la retrouve instantanément sur l'application ou via un QR code.</p>
 
   <!-- ⚠ LA PISTE DÉBORDE VOLONTAIREMENT DES MARGES : on doit voir un morceau de
@@ -3687,7 +3796,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
        d'Azure. Les photos de profil sont encore dans un espace PUBLIC : ne pas
        écrire « tout est privé ». -->
 <section class="car secu" data-fond="sombre" id="securite">
-  <h2 class="car-t" data-monte>Sécurité.</h2>
+  <h2 class="car-t" data-monte>Sécurité</h2>
   <p class="car-s" data-monte style="--d:70ms">Vos vidéos et vos procédures restent les vôtres.</p>
 
   <!-- ⚠ MÊME CARROUSEL ET MÊMES CARTES QUE LA SECTION 3 (même largeur, même
@@ -3733,7 +3842,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
 <section class="tar" id="tarifs" data-fond="clair">
   <div class="tar-in">
     <p class="tar-sur" data-monte>Abonnements</p>
-    <h2 class="tar-t" data-monte style="--d:90ms">Choisissez votre formule.</h2>
+    <h2 class="tar-t" data-monte style="--d:90ms">Choisissez votre formule</h2>
 
     <!-- ⚠ LES CARTES D'ABONNEMENT DE L'APP, EN SOMBRE. Mêmes formules, mêmes
          prix, même construction que `carteOffreNeuve` (app.js) : plaque, nom,
@@ -4016,7 +4125,7 @@ body.pret .sc-in::before{animation-play-state:running, running}
        CONFIRMATION : fin de l'essai, lieu de stockage, compte des employés.
      ⚠ `class="car"` pour la limite gauche (--bord). -->
 <section class="car faq" data-fond="clair" id="faq">
-  <h2 class="car-t" data-monte>Questions fréquentes.</h2>
+  <h2 class="car-t" data-monte>Questions fréquentes</h2>
   <div class="faq-liste" data-monte style="--d:90ms">
     <div class="faq-item">
       <h3 class="faq-q">
@@ -4101,15 +4210,21 @@ body.pret .sc-in::before{animation-play-state:running, running}
      seuls ceux des cartes d'abonnement en ouvrent un nouveau. -->
 <section class="car fin" data-fond="clair" id="commencer">
   <div class="fin-in">
-    <h2 class="fin-t" data-monte>Votre savoir-faire<br>transmis simplement.</h2>
+    <!-- ⚠ CE TITRE NE RÉPÈTE PLUS CELUI DU PREMIER ÉCRAN (à la demande).
+         Il disait mot pour mot « Votre savoir-faire transmis simplement » :
+         la dernière phrase que lisait le visiteur était la première qu'il
+         avait déjà lue — la façon dont Apple referme ses pages produit, et
+         une occasion manquée. Le bas de page est l'endroit où l'on décide :
+         il annonce donc le PREMIER GESTE, pas la promesse. -->
+    <h2 class="fin-t" data-monte>Créez votre<br>première procédure</h2>
     <p class="fin-s" data-monte style="--d:90ms">14&nbsp;jours d'essai. Sans carte bancaire.</p>
-    <!-- ⚠ DEUX BOUTONS, MÊME PAIRE QUE LA BARRE DU HAUT : l'essai en bleu,
-         la connexion en contour. -->
+    <!-- ⚠ UNE SEULE ACTION (à la demande) : les deux boutons jumeaux étaient
+         eux aussi ceux du premier écran. « Se connecter » n'est pas une
+         décision, c'est un retour de client — il redevient un lien discret,
+         et l'essai reste seul en bouton plein. -->
     <p class="fin-boutons" data-monte style="--d:180ms">
-      <!-- ⚠ LES BOUTONS DU PREMIER ÉCRAN, à l'identique (classes `btn btn-verre`
-           et `btn btn-bleu`), en liens pour rester cliquables. -->
-      <a class="btn btn-verre" href="/app/">Se connecter</a>
       <a class="btn btn-bleu" href="/app/">Essayer 14 jours</a>
+      <a class="fin-lien" href="/app/">J'ai déjà un compte<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
     </p>
     <!-- ⚠ LES REPÈRES DE CONFIANCE JUSTE SOUS LE BOUTON (repris de Stripe, qui
          place ses garanties à l'endroit où l'on décide) : prix de départ,

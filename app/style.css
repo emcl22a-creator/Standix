@@ -23889,3 +23889,30 @@ body.abo-expire [data-etab-plus]{
   #p-global-analyse #an-equipe{ min-height:calc(64px * var(--ech)); }
   .bv-btn{ min-height:calc(54px * var(--ech)); }
 }
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA VIDÉO GARDE SES PROPORTIONS SUR GRAND ÉCRAN
+
+   Dans la fiche que lit l'équipe, la vidéo est plafonnée à 30 % de la hauteur
+   de l'écran : sans cela, une vidéo verticale mangerait toute la page et il ne
+   resterait rien pour les étapes.
+
+   Sur téléphone ce plafond ne joue jamais — un cadre de 327 px de large fait
+   184 px de haut, bien en dessous. Sur un écran large, le même cadre fait
+   500 px de haut : le plafond coupait alors la vidéo, qui flottait au milieu
+   de deux bandes noires et paraissait plus petite qu'au téléphone.
+
+   On plafonne donc la LARGEUR DU CADRE plutôt que la hauteur de la vidéo : le
+   cadre garde son format 16/9, la vidéo le remplit entièrement comme au
+   téléphone, et la hauteur ne dépasse pas 46 % de l'écran. Le cadre se centre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
+  #e-detail.active .video-frame{
+    max-width:calc(46dvh * 16 / 9);
+    margin-left:auto; margin-right:auto;
+  }
+  #e-detail.active .video-frame video{ max-height:none; }
+}

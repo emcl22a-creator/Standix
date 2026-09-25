@@ -24352,3 +24352,60 @@ body.abo-expire [data-etab-plus]{
 @media (min-width: 700px) and (min-height: 600px){
   .p-seg{ padding:calc(9.5px * var(--ech)) 0; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUR GRAND ÉCRAN, LES PAGES NE GLISSENT PLUS SUR LE CÔTÉ
+
+   Deux mouvements latéraux existent : les pages de réglages arrivent depuis la
+   droite (`vient-droite`), et la bascule d'établissement fait sortir l'écran
+   par la gauche pendant que le suivant entre par la droite.
+
+   Sur un téléphone tenu à la main, ce glissement dit d'où vient la page. Sur
+   une tablette ou un écran d'ordinateur, la colonne est large et posée : le
+   même geste donne l'impression que toute la fenêtre part de travers.
+
+   Les deux reprennent donc l'entrée ordinaire des écrans — une apparition en
+   fondu, sans déplacement.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 700px) and (min-height: 600px){
+  /* ⚠ `body` DEVANT, ET LES DEUX ÉTATS. La règle d'origine du glissement
+     (`.screen.vient-droite`) est moins précise que `body .screen.active` qui
+     vient plus bas ; mais entre le moment où le script pose la classe et celui
+     où il active l'écran, elle est seule à s'appliquer et le glissement
+     démarre. On coupe donc les deux cas. */
+  body .screen.vient-droite,
+  body .screen.active.vient-droite{
+    animation:ecranFlou 0.22s ease-out backwards !important;
+    transform:none !important;
+  }
+  .bascule-en-cours .screen.bascule-part{
+    transform:none;
+  }
+  .bascule-en-cours .screen.active:not(.bascule-part){
+    animation:ecranEntre 0.3s cubic-bezier(0.32, 0.72, 0, 1) both;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FEUILLE QUI PART RESTE DANS SA COLONNE
+
+   En sortant d'une fiche, la page qu'on quitte passe en `position:fixed` pour
+   pouvoir s'effacer par-dessus celle qui arrive. Ancrée aux deux bords de la
+   fenêtre (`inset:14px 0 0`), elle s'étalait alors sur TOUTE la largeur de
+   l'écran : sur une tablette ou un ordinateur, une page large de 744 px
+   devenait soudain large de 1 500 px le temps de disparaître.
+
+   Elle garde donc la largeur de la colonne, et reste centrée comme elle.
+
+ ⚠ PAS DE `transform` POUR LA CENTRER : une règle plus haut lui impose
+   `transform:none !important`, pour qu'aucun ancien déplacement ne revienne.
+   On la centre donc par `left`, calculé sur `--col` — qui vaut 100 % sur
+   tablette et 744 px sur ordinateur.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 700px) and (min-height: 600px){
+  .screen.feuille-part{
+    left:calc(50% - min(100%, var(--col, 460px)) / 2);
+    right:auto;
+    width:min(100%, var(--col, 460px));
+  }
+}

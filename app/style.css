@@ -22738,6 +22738,13 @@ body.abo-expire [data-etab-plus]{
    navigateur large sur un ordinateur garde la colonne de 560 px : la même
    mise en page étirée sur 1 500 px à la souris ne ressemblerait à rien.
 
+ ⚠ DEUX CONDITIONS, SÉPARÉES PAR UNE VIRGULE : soit un écran tactile d'au
+   moins 700 px, soit une fenêtre de 700 à 1400 px sur n'importe quel appareil.
+   La seconde existe pour qu'une fenêtre de navigateur rétrécie sur ordinateur
+   montre la même chose qu'une tablette — c'est ainsi qu'on vérifie le rendu
+   sans tablette sous la main. Un écran d'ordinateur en grand, au-delà de
+   1400 px, garde la colonne de 560 px.
+
  ⚠ `any-pointer` ET NON `pointer`. Un iPad AVEC CLAVIER OU SOURIS annonce
    `pointer: fine` : la règle ne s'appliquait pas, et l'app restait en colonne
    étroite sur une tablette — exactement le cas signalé. `any-pointer: coarse`
@@ -22751,7 +22758,8 @@ body.abo-expire [data-etab-plus]{
    ═══════════════════════════════════════════════════════════════════════════ */
 :root{ --ech: 1; }
 
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse){
+@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
   :root{ --ech: 1.05; --col: 100%; }
   .app{ max-width:none; }
   .topbar{ max-width:none; left:0; right:0; transform:none;
@@ -23431,7 +23439,8 @@ body.abo-expire [data-etab-plus]{
   #e-profil .reg-ic.ent-ic .ent-ini{ font-size:calc(14px * var(--ech)); }
 }
 
-@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse){
+@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 1000px) and (max-width: 1400px) and (min-height: 600px){
   :root{ --ech: 1.08; }
   .topbar{ padding-left:56px; padding-right:56px; }
   .screen{ padding-left:56px; padding-right:56px; }
@@ -23440,7 +23449,8 @@ body.abo-expire [data-etab-plus]{
 /* Les fenêtres (confirmations, feuilles) gardent une largeur FIXE : sans
    cette règle, leur texte grossissait dans une boîte inchangée et le
    contenu se serrait. Elles suivent donc la même échelle. */
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse){
+@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
   .fen-promu{ max-width:calc(360px * var(--ech)); }
   .fen-etab{ max-width:calc(340px * var(--ech)); }
   .bienvenue{ max-width:calc(330px * var(--ech)); }
@@ -23481,14 +23491,16 @@ body.abo-expire [data-etab-plus]{
   --bar-decal: calc(var(--bar-h) + 12px);
 }
 
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse){
+@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
   /* ⚠ SUR TABLETTE, LA BARRE EST CENTRÉE POUR DE BON. Le décalage passe à
      zéro : elle n'est plus poussée à gauche pour loger le cercle, qui a
      largement la place à côté d'elle. `--bar-col` descend à 480 pour que sa
      largeur reste celle d'un grand téléphone (440 px). */
   html:root{ --bar-h:68px; --bar-col:480px; --bar-decal:0px; }
 }
-@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse){
+@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 1000px) and (max-width: 1400px) and (min-height: 600px){
   html:root{ --bar-h:72px; }
 }
 
@@ -23509,7 +23521,8 @@ body.abo-expire [data-etab-plus]{
  ⚠ BLOC GÉNÉRÉ, comme celui des tailles de texte. Il se régénère, il ne se
    retouche pas à la main.
    ═══════════════════════════════════════════════════════════════════════════ */
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse){
+@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
+       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
   .brand .mark svg{ width:calc(26px * var(--ech)); height:calc(29px * var(--ech)); }
   .logo-pill svg{ width:calc(23px * var(--ech)); height:calc(27px * var(--ech)); }
   .icon-pill.alerte::after{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }

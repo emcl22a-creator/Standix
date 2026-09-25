@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=e181c801">
+<link rel="stylesheet" href="style.css?v=dff6314f">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -415,8 +415,13 @@
        disponible ; le bouton « voir comme l'equipe » a besoin de sa hauteur
        plus un ecart. On retire donc `--bar-h + 12` a sa largeur, et on la
        decale d'autant vers la gauche pour que l'ensemble reste centre. */
-    width:min(calc(100vw - 46px - var(--bar-h) - 12px),
-              calc(var(--col, 460px) - 40px - var(--bar-h) - 12px));
+    /* ⚠ `--bar-col` ET NON `--col`. Sur tablette, `--col` passe à 100 % pour que
+       les cartes prennent la largeur de l'écran ; la barre, elle, garde la
+       largeur d'un grand téléphone — une pilule étirée sur 1 300 px ne se lit
+       plus comme un objet posé sur la page. `--bar-col` vaut `--col` partout
+       ailleurs, et 560 px sur tablette (voir la fin de `style.css`). */
+    width:min(calc(100vw - 46px - var(--bar-decal)),
+              calc(var(--bar-col, 460px) - 40px - var(--bar-decal)));
     height:var(--bar-h);
     margin-/* ⚠ CENTRAGE : moitie d'ecran, puis retrait de la moitie de sa largeur.
        Cette ligne avait disparu — un de mes scripts l'avait remplacee en
@@ -6774,9 +6779,9 @@ function frame(now) {
 
   /* La place du cercle, qui se referme au fur et a mesure. */
   barEl.style.width =
-    `calc(min(100vw - 46px, var(--col, 460px) - 40px) - (1 - ${e.toFixed(4)}) * (var(--bar-h) + 12px))`;
+    `calc(min(100vw - 46px, var(--bar-col, 460px) - 40px) - (1 - ${e.toFixed(4)}) * var(--bar-decal))`;
   barEl.style.transform =
-    `translateX(calc(-50% - (1 - ${e.toFixed(4)}) * (var(--bar-h) + 12px) / 2)) ` +
+    `translateX(calc(-50% - (1 - ${e.toFixed(4)}) * var(--bar-decal) / 2)) ` +
     `scale(${(1 + BAR_SWELL * barFollow).toFixed(6)}) translateZ(0)`;
 
   // Aucune illumination : la barre ne fait que grossir.

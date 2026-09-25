@@ -22516,6 +22516,14 @@ async function openAnalyse(procId) {
 
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
+
+  /* Même précaution que dans la fiche de l'équipe : on efface la vidéo
+     précédente avant la moindre attente, et on demande son adresse signée
+     tout de suite. */
+  const procConnue = (allGestionProcedures || []).find(p => p.id === procId)
+  reinitialiserVideoFiche('analyse-video-frame', 'analyse-video', !!procConnue?.video_url)
+  const promesseVideo = procConnue?.video_url ? urlSignee(procConnue.video_url) : null
+
   const depuis = document.querySelector('#gestion-app .screen.active')?.id
   if (depuis && depuis !== 'p-analyse') retourApresAnalyse = depuis
   showGestionScreen('p-analyse')
@@ -22717,7 +22725,11 @@ async function openAnalyse(procId) {
 
   if (proc.video_url) {
     videoFrame.style.display = 'block'
-    videoEl.src = (await urlSignee(proc.video_url)) || ''
+    const adresse = (procConnue?.video_url === proc.video_url && promesseVideo)
+      ? await promesseVideo
+      : await urlSignee(proc.video_url)
+    if (perime()) return
+    videoEl.src = adresse || ''
   } else {
     videoFrame.style.display = 'none'
   }
@@ -25198,12 +25210,44 @@ window.exporterProcedurePdf = exporterProcedurePdf
    `currentAnalyseData` ; l'Équipe n'avait rien d'équivalent. */
 let equipeProcCourante = null
 
+/* ═══ LA VIDÉO D'UNE FICHE : ON EFFACE AVANT DE CHARGER ═══
+
+ ⚠ ON VOYAIT LA VIDÉO DE LA FICHE PRÉCÉDENTE. L'adresse signée s'obtient par un
+   aller-retour au serveur : pendant cette demi-seconde, l'élément gardait la
+   vidéo d'avant, déjà chargée, et l'affichait dans la nouvelle fiche.
+
+ ⚠ ET LE CADRE RESTE EN PLACE quand la nouvelle fiche a elle aussi une vidéo.
+   Le masquer puis le rouvrir faisait sauter toute la page : on voyait le cadre
+   apparaître petit, puis la mise en page se refaire.
+
+   `load()` après avoir retiré l'adresse est ce qui vide RÉELLEMENT l'image
+   affichée ; sans lui, la dernière image reste peinte. */
+function reinitialiserVideoFiche(cadreId, videoId, auraUneVideo) {
+  const v = document.getElementById(videoId)
+  const cadre = document.getElementById(cadreId)
+  if (v) {
+    try { v.pause() } catch (e) {}
+    v.removeAttribute('src')
+    v.load?.()
+  }
+  if (cadre) cadre.style.display = auraUneVideo ? 'block' : 'none'
+}
+
 async function openEquipeDetail(procId) {
   if (await bloqueSiEssaiFini()) return
 
   const monTour = ++ouvertureCourante
   const perime = () => monTour !== ouvertureCourante
   arreterToutesLesVideos()
+
+  /* ⚠ AVANT TOUTE ATTENTE. Ce qui suit interroge la base ; d'ici là, l'écran
+     montrerait la vidéo de la fiche qu'on vient de quitter. */
+  const procConnue = (allEquipeProcedures || []).find(p => p.id === procId)
+  reinitialiserVideoFiche('detail-video-frame', 'detail-video', !!procConnue?.video_url)
+  /* Et on demande l'adresse signée TOUT DE SUITE, en même temps que les étapes,
+     au lieu d'attendre qu'elles soient affichées. C'est un aller-retour de
+     moins à la suite, donc une vidéo qui arrive plus tôt. */
+  const promesseVideo = procConnue?.video_url ? urlSignee(procConnue.video_url) : null
 
   /* ⚠ ON PASSE PAR `showEquipeScreen`, comme la gestion par `showGestionScreen`.
 
@@ -25306,7 +25350,11 @@ async function openEquipeDetail(procId) {
 
   if (proc.video_url) {
     videoFrame.style.display = 'block'
-    detailVideoEl.src = (await urlSignee(proc.video_url)) || ''
+    const adresse = (procConnue?.video_url === proc.video_url && promesseVideo)
+      ? await promesseVideo
+      : await urlSignee(proc.video_url)
+    if (perime()) return
+    detailVideoEl.src = adresse || ''
   } else {
     videoFrame.style.display = 'none'
   }

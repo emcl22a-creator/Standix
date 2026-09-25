@@ -23906,13 +23906,23 @@ body.abo-expire [data-etab-plus]{
 
    On plafonne donc la LARGEUR DU CADRE plutôt que la hauteur de la vidéo : le
    cadre garde son format 16/9, la vidéo le remplit entièrement comme au
-   téléphone, et la hauteur ne dépasse pas 46 % de l'écran. Le cadre se centre.
+   téléphone, sans bande noire. Et cette largeur reste celle du téléphone —
+   la vidéo n'a aucune raison de grandir avec la colonne, ce sont les étapes
+   qu'on vient lire.
    ═══════════════════════════════════════════════════════════════════════════ */
 @media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
        (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
-  #e-detail.active .video-frame{
-    max-width:calc(46dvh * 16 / 9);
+  /* ⚠ LA VIDÉO NE SUIT PAS LA LARGEUR DE LA COLONNE. Élargie à 730 px, elle
+     occupait la moitié de l'écran et écrasait les étapes, qui sont l'objet de
+     la page. Elle garde donc la taille qu'elle a sur téléphone — 390 px, à
+     l'échelle du texte — et se centre dans la carte. */
+  #e-detail.active .video-frame,
+  #p-analyse.active .video-frame,
+  #detail-video-frame, #analyse-video-frame{
+    max-width:calc(390px * var(--ech));
     margin-left:auto; margin-right:auto;
   }
+  /* Le plafond de hauteur ne sert plus : le cadre est déjà petit, et la vidéo
+     le remplit entièrement comme au téléphone, sans bandes noires. */
   #e-detail.active .video-frame video{ max-height:none; }
 }

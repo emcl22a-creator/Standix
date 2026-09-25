@@ -24347,8 +24347,8 @@ body.abo-expire [data-etab-plus]{
 
 /* Le sélecteur « Toutes / Favoris » — et ses jumeaux « En ligne / En dév. »,
    « 7 jours / 30 jours » — gardait la hauteur du téléphone : un texte agrandi
-   dans une piste inchangée paraît à l'étroit. Trois pixels de plus de chaque
-   côté du libellé suffisent. */
+   dans une piste inchangée paraît à l'étroit. Un pixel et demi de plus de
+   chaque côté du libellé suffit. */
 @media (min-width: 700px) and (min-height: 600px){
-  .p-seg{ padding:calc(11px * var(--ech)) 0; }
+  .p-seg{ padding:calc(9.5px * var(--ech)) 0; }
 }

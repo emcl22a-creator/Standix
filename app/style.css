@@ -24344,3 +24344,11 @@ body.abo-expire [data-etab-plus]{
     width:100%;
   }
 }
+
+/* Le sélecteur « Toutes / Favoris » — et ses jumeaux « En ligne / En dév. »,
+   « 7 jours / 30 jours » — gardait la hauteur du téléphone : un texte agrandi
+   dans une piste inchangée paraît à l'étroit. Trois pixels de plus de chaque
+   côté du libellé suffisent. */
+@media (min-width: 700px) and (min-height: 600px){
+  .p-seg{ padding:calc(11px * var(--ech)) 0; }
+}

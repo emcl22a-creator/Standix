@@ -24331,6 +24331,51 @@ document.addEventListener('click', (e) => {
   basculerFavori(b.dataset.fav, b)
 })
 
+/* ═══ L'ÉTOILE RÉPOND AU DOIGT ═══
+
+   Un ressort, comme dans les applications d'Apple : l'étoile s'enfonce, repart
+   au-delà de sa taille, puis se pose. Le dépassement est ce qui donne la
+   sensation de matière — sans lui, on voit une couleur changer, pas un geste
+   qui aboutit.
+
+   Et une onde part de l'étoile quand elle s'allume. Elle est posée sur le
+   document, en position fixe, pas dans le bouton : dans les listes, l'étoile
+   allumée porte un masque qui découpe tout ce qui dépasse d'elle — l'onde y
+   serait invisible.
+
+ ⚠ ON RETIRE LA CLASSE AVANT DE LA REMETTRE. Sans cela, deux appuis de suite
+   ne rejouent pas l'animation : le navigateur ne la relance que si la classe
+   change vraiment. Le `offsetWidth` force ce recalcul.
+
+ ⚠ RIEN QUAND L'ANIMATION EST REFUSEE. `prefers-reduced-motion` est un reglage
+   d'accessibilite : on garde le changement de couleur, on retire le
+   mouvement. */
+function animerFavori(bouton, allume) {
+  if (!bouton) return
+  const sobre = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+  if (sobre) return
+
+  bouton.classList.remove('fav-pop', 'fav-pop-off')
+  void bouton.offsetWidth
+  bouton.classList.add(allume ? 'fav-pop' : 'fav-pop-off')
+  bouton.addEventListener('animationend', () => {
+    bouton.classList.remove('fav-pop', 'fav-pop-off')
+  }, { once: true })
+
+  if (!allume) return
+  const r = bouton.getBoundingClientRect()
+  if (!r.width) return
+  const onde = document.createElement('span')
+  onde.className = 'fav-onde'
+  onde.style.left = `${Math.round(r.left + r.width / 2)}px`
+  onde.style.top = `${Math.round(r.top + r.height / 2)}px`
+  onde.style.setProperty('--onde-taille', `${Math.round(r.width)}px`)
+  document.body.appendChild(onde)
+  const partir = () => onde.remove()
+  onde.addEventListener('animationend', partir, { once: true })
+  setTimeout(partir, 1000)
+}
+
 async function basculerFavori(procId, bouton) {
   if (!currentMembre?.id) return
   const etait = favorisEquipe.has(procId)
@@ -24340,6 +24385,7 @@ async function basculerFavori(procId, bouton) {
   bouton.classList.toggle('on', !etait)
   bouton.setAttribute('aria-label', etait ? 'Mettre en favori' : 'Retirer des favoris')
   if (navigator.vibrate) navigator.vibrate(8)
+  animerFavori(bouton, !etait)
 
   try {
     const { error } = etait

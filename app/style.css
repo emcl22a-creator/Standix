@@ -22726,7 +22726,7 @@ body.abo-expire [data-etab-plus]{
 
    Deux réglages, et rien d'autre :
 
-   ① LA COLONNE PREND TOUTE LA LARGEUR, moins une marge de 44 px (56 sur les
+   ① LA COLONNE PREND TOUTE LA LARGEUR, moins une marge de 44 px (76 sur les
      grandes tablettes). `--col` passe à 100 % : la barre du haut, les écrans
      et la barre du bas la suivent tous, puisqu'ils la lisent déjà.
 
@@ -22738,12 +22738,12 @@ body.abo-expire [data-etab-plus]{
    navigateur large sur un ordinateur garde la colonne de 560 px : la même
    mise en page étirée sur 1 500 px à la souris ne ressemblerait à rien.
 
- ⚠ DEUX CONDITIONS, SÉPARÉES PAR UNE VIRGULE : soit un écran tactile d'au
-   moins 700 px, soit une fenêtre de 700 à 1400 px sur n'importe quel appareil.
-   La seconde existe pour qu'une fenêtre de navigateur rétrécie sur ordinateur
-   montre la même chose qu'une tablette — c'est ainsi qu'on vérifie le rendu
-   sans tablette sous la main. Un écran d'ordinateur en grand, au-delà de
-   1400 px, garde la colonne de 560 px.
+ ⚠ SUR ORDINATEUR, L'APP RESSEMBLE À UN IPAD MINI. Le premier palier
+   s'applique à tout écran d'au moins 700 px, tactile ou non ; la colonne y est
+   seulement plafonnée à 744 px — la largeur d'un iPad mini — par la règle
+   `not (any-pointer: coarse)` plus bas. Le second palier, celui des grandes
+   tablettes, reste réservé au tactile : un écran d'ordinateur ne prend jamais
+   l'échelle de 12 %.
 
  ⚠ `any-pointer` ET NON `pointer`. Un iPad AVEC CLAVIER OU SOURIS annonce
    `pointer: fine` : la règle ne s'appliquait pas, et l'app restait en colonne
@@ -22758,8 +22758,7 @@ body.abo-expire [data-etab-plus]{
    ═══════════════════════════════════════════════════════════════════════════ */
 :root{ --ech: 1; }
 
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
+@media (min-width: 700px) and (min-height: 600px){
   :root{ --ech: 1.05; --col: 100%; }
   .app{ max-width:none; }
   .topbar{ max-width:none; left:0; right:0; transform:none;
@@ -23439,18 +23438,16 @@ body.abo-expire [data-etab-plus]{
   #e-profil .reg-ic.ent-ic .ent-ini{ font-size:calc(14px * var(--ech)); }
 }
 
-@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 1000px) and (max-width: 1400px) and (min-height: 600px){
-  :root{ --ech: 1.08; }
-  .topbar{ padding-left:56px; padding-right:56px; }
-  .screen{ padding-left:56px; padding-right:56px; }
+@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse){
+  :root{ --ech: 1.12; }
+  .topbar{ padding-left:76px; padding-right:76px; }
+  .screen{ padding-left:76px; padding-right:76px; }
 }
 
 /* Les fenêtres (confirmations, feuilles) gardent une largeur FIXE : sans
    cette règle, leur texte grossissait dans une boîte inchangée et le
    contenu se serrait. Elles suivent donc la même échelle. */
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
+@media (min-width: 700px) and (min-height: 600px){
   .fen-promu{ max-width:calc(360px * var(--ech)); }
   .fen-etab{ max-width:calc(340px * var(--ech)); }
   .bienvenue{ max-width:calc(330px * var(--ech)); }
@@ -23491,17 +23488,15 @@ body.abo-expire [data-etab-plus]{
   --bar-decal: calc(var(--bar-h) + 12px);
 }
 
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
+@media (min-width: 700px) and (min-height: 600px){
   /* ⚠ SUR TABLETTE, LA BARRE EST CENTRÉE POUR DE BON. Le décalage passe à
      zéro : elle n'est plus poussée à gauche pour loger le cercle, qui a
      largement la place à côté d'elle. `--bar-col` descend à 480 pour que sa
      largeur reste celle d'un grand téléphone (440 px). */
   html:root{ --bar-h:68px; --bar-col:480px; --bar-decal:0px; }
 }
-@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 1000px) and (max-width: 1400px) and (min-height: 600px){
-  html:root{ --bar-h:72px; }
+@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse){
+  html:root{ --bar-h:76px; }
 }
 
 
@@ -23521,8 +23516,7 @@ body.abo-expire [data-etab-plus]{
  ⚠ BLOC GÉNÉRÉ, comme celui des tailles de texte. Il se régénère, il ne se
    retouche pas à la main.
    ═══════════════════════════════════════════════════════════════════════════ */
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
+@media (min-width: 700px) and (min-height: 600px){
   .brand .mark svg{ width:calc(26px * var(--ech)); height:calc(29px * var(--ech)); }
   .logo-pill svg{ width:calc(23px * var(--ech)); height:calc(27px * var(--ech)); }
   .icon-pill.alerte::after{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }
@@ -23910,8 +23904,7 @@ body.abo-expire [data-etab-plus]{
    la vidéo n'a aucune raison de grandir avec la colonne, ce sont les étapes
    qu'on vient lire.
    ═══════════════════════════════════════════════════════════════════════════ */
-@media (min-width: 700px) and (min-height: 600px) and (any-pointer: coarse),
-       (min-width: 700px) and (max-width: 1400px) and (min-height: 600px){
+@media (min-width: 700px) and (min-height: 600px){
   /* ⚠ LA VIDÉO NE SUIT PAS LA LARGEUR DE LA COLONNE. Élargie à 730 px, elle
      occupait la moitié de l'écran et écrasait les étapes, qui sont l'objet de
      la page. Elle garde donc la taille qu'elle a sur téléphone — 390 px, à
@@ -23925,4 +23918,429 @@ body.abo-expire [data-etab-plus]{
   /* Le plafond de hauteur ne sert plus : le cadre est déjà petit, et la vidéo
      le remplit entièrement comme au téléphone, sans bandes noires. */
   #e-detail.active .video-frame video{ max-height:none; }
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES GRANDES TABLETTES : LA HAUTEUR AUSSI
+
+   Sur un iPad Pro, le texte et les icônes grossissaient mais les boîtes qui
+   les portent gardaient leur hauteur de téléphone : les lignes de liste, les
+   boutons et les champs paraissaient écrasés.
+
+   Ce bloc reprend donc, à la même échelle que le texte, les HAUTEURS et les
+   REMPLISSAGES écrits en pixels : hauteurs fixes jusqu'à 80 px, hauteurs
+   minimales, et remplissages dont aucun côté ne dépasse 28 px. Au-delà, ce ne
+   sont plus des éléments mais des blocs de mise en page.
+
+ ⚠ IL NE S'APPLIQUE QU'À PARTIR DE 1000 PX — l'iPad Pro et les fenêtres
+   larges. Les petites tablettes gardent leurs hauteurs : elles n'ont pas la
+   place en hauteur, et le texte n'y grossit que de 5 %.
+
+ ⚠ BLOC GÉNÉRÉ, comme les deux précédents. Il se régénère, il ne se retouche
+   pas à la main.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 1000px) and (min-height: 600px) and (any-pointer: coarse){
+  .alerte-demandes .principal{ height:calc(38px * var(--ech)); }
+  .alerte-demandes .secondaire{ height:calc(38px * var(--ech)); }
+  .alerte-essai .principal{ height:calc(38px * var(--ech)); }
+  .alerte-essai .secondaire{ height:calc(38px * var(--ech)); }
+  .alerte-essai .jauge{ height:calc(5px * var(--ech)); }
+  .alerte-partage .principal{ height:calc(38px * var(--ech)); }
+  .alerte-partage .secondaire{ height:calc(38px * var(--ech)); }
+  .fm-plus{ height:calc(42px * var(--ech)); }
+  .poste-ok{ height:calc(50px * var(--ech)); }
+  .poste-ajouter{ height:calc(38px * var(--ech)); }
+  .an-neant-btn{ height:calc(38px * var(--ech)); }
+  .fm-courbe{ height:calc(52px * var(--ech)); }
+  .dv-frise{ height:calc(44px * var(--ech)); }
+  #ai-launch-btn .ia-case{ height:calc(24px * var(--ech)); }
+  .dv-ia-bas .ia-case{ height:calc(24px * var(--ech)); }
+  .dv-geste button{ height:calc(56px * var(--ech)); }
+  .tiroir-liste{ height:calc(46px * var(--ech)); }
+  .offre-cta{ height:calc(52px * var(--ech)); }
+  .tiroir-langue .tiroir-liste{ height:calc(38px * var(--ech)); }
+  .pm-recherche{ height:calc(40px * var(--ech)); }
+  .ma-haut{ height:calc(58px * var(--ech)); }
+  .ma-ligne .jauge{ height:calc(4px * var(--ech)); }
+  .ed-borne{ height:calc(38px * var(--ech)); }
+  .ed-loupe{ height:calc(56px * var(--ech)); }
+  .ed-couv{ height:calc(6px * var(--ech)); }
+  .recherche-fine{ height:calc(38px * var(--ech)); }
+  .hero-card .bar{ height:calc(10px * var(--ech)); }
+  .capcut-timeline{ height:calc(64px * var(--ech)); }
+  .fen-p{ height:calc(48px * var(--ech)); }
+  .fen-a{ height:calc(44px * var(--ech)); }
+  .fen-champ{ height:calc(46px * var(--ech)); }
+  .ios-alert-choix button{ height:calc(48px * var(--ech)); }
+  .ios-alert-champ{ height:calc(42px * var(--ech)); }
+  .cat-rank .jauge{ height:calc(4px * var(--ech)); }
+  .hero-cta{ height:calc(48px * var(--ech)); }
+  .search-bar{ height:calc(38px * var(--ech)); }
+  .proc-jauge{ height:calc(5px * var(--ech)); }
+  .zoom-lien{ height:calc(32px * var(--ech)); }
+  .hero-ia .hero-cta{ height:calc(44px * var(--ech)); }
+  .quota-cta{ height:calc(46px * var(--ech)); }
+  .re-barre{ height:calc(8px * var(--ech)); }
+  .ac-seg{ height:calc(4px * var(--ech)); }
+  .pub-btn{ height:calc(30px * var(--ech)); }
+  .ci-d{ height:calc(42px * var(--ech)); }
+  .ci-btn{ height:calc(44px * var(--ech)); }
+  .proc-rech{ height:calc(42px * var(--ech)); }
+  .p-seg-pt{ height:calc(18px * var(--ech)); }
+  .an-axe{ height:calc(16px * var(--ech)); }
+  #p-reg-postes .search-bar{ height:calc(44px * var(--ech)); }
+  #p-quota .qb{ height:calc(7px * var(--ech)); }
+  .coller-jauge{ height:calc(6px * var(--ech)); }
+  .abo-cta{ height:calc(50px * var(--ech)); }
+  .fm-courbe span{ min-height:calc(3px * var(--ech)); }
+  .step-edit-item textarea{ min-height:calc(22px * var(--ech)); }
+  .ac-t{ min-height:calc(38px * var(--ech)); }
+  .ac-btn{ min-height:calc(54px * var(--ech)); }
+  .cl-co{ min-height:calc(64px * var(--ech)); }
+  .proc-rang{ min-height:calc(30px * var(--ech)); }
+  .abo-achats .abo-cta{ min-height:calc(54px * var(--ech)); }
+  #p-global-analyse #an-equipe{ min-height:calc(64px * var(--ech)); }
+  .bv-btn{ min-height:calc(54px * var(--ech)); }
+  .topbar-card{ padding:calc(10px * var(--ech)) calc(20px * var(--ech)) calc(10px * var(--ech)) calc(16px * var(--ech)); }
+  .alerte-demandes{ padding:calc(15px * var(--ech)); }
+  .alerte-demandes .secondaire{ padding:0 calc(15px * var(--ech)); }
+  .alerte-essai{ padding:calc(15px * var(--ech)); }
+  .alerte-essai .secondaire{ padding:0 calc(15px * var(--ech)); }
+  .alerte-partage{ padding:calc(15px * var(--ech)); }
+  .alerte-partage .secondaire{ padding:0 calc(15px * var(--ech)); }
+  .ent-ligne{ padding:calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  .step-edit-item:active .step-grip, .step-edit-item.attrape .ia-ecoute{ padding:calc(13px * var(--ech)) calc(15px * var(--ech)); }
+  .ia-ecoute .lg{ padding:calc(5px * var(--ech)) 0; }
+  .ia-ecoute .lg-langue select{ padding:calc(2px * var(--ech)) calc(18px * var(--ech)) calc(2px * var(--ech)) calc(4px * var(--ech)); }
+  .ai-type button{ padding:calc(13px * var(--ech)) calc(16px * var(--ech)); }
+  .man-champ{ padding:calc(14px * var(--ech)) calc(14px * var(--ech)); }
+  .man-fil .step-edit-item{ padding:0 0 calc(26px * var(--ech)); }
+  .man-fil .etape-montage{ padding:0 0 calc(26px * var(--ech)); }
+  .bande-ia{ padding:calc(11px * var(--ech)) calc(13px * var(--ech)); }
+  .doc-zone .doc-voie{ padding:calc(9px * var(--ech)) calc(12px * var(--ech)); }
+  .doc-photos-vide{ padding:calc(24px * var(--ech)) calc(18px * var(--ech)); }
+  .doc-page{ padding:calc(9px * var(--ech)) calc(10px * var(--ech)); }
+  .doc-page .oter{ padding:calc(6px * var(--ech)) calc(4px * var(--ech)); }
+  .app-ligne{ padding:calc(12px * var(--ech)); }
+  .app-ligne .ici{ padding:calc(2px * var(--ech)) calc(7px * var(--ech)); }
+  .app-ligne .oter{ padding:calc(7px * var(--ech)) calc(12px * var(--ech)); }
+  .an-ev{ padding:calc(4px * var(--ech)) calc(10px * var(--ech)); }
+  .an-trois{ padding:calc(15px * var(--ech)) 0; }
+  .an-bloc{ padding:calc(15px * var(--ech)) calc(15px * var(--ech)) calc(11px * var(--ech)); }
+  #p-global-analyse .emp-row, #p-global-analyse .cat-rank{ padding:calc(10px * var(--ech)) calc(2px * var(--ech)) !important; }
+  .an-gain{ padding:calc(18px * var(--ech)) calc(20px * var(--ech)) calc(20px * var(--ech)); }
+  .an-gain-lueur::after{ padding:calc(1px * var(--ech)); }
+  .an-intro{ padding:calc(16px * var(--ech)) calc(18px * var(--ech)); }
+  #p-an-categories .cat-rank, #p-an-temps .emp-row, #p-an-equipe .emp-row{ padding:calc(12px * var(--ech)) calc(2px * var(--ech)) !important; }
+  .fm-segm{ padding:calc(20px * var(--ech)) 0 calc(16px * var(--ech)); }
+  .fm-lg{ padding:calc(11px * var(--ech)) calc(2px * var(--ech)); }
+  .fm-rep .l{ padding:calc(11px * var(--ech)) calc(2px * var(--ech)); }
+  .fm-trois .un{ padding:calc(13px * var(--ech)) calc(10px * var(--ech)); }
+  .fm-barre button{ padding:calc(8px * var(--ech)) calc(3px * var(--ech)); }
+  button.fm-lig{ padding:calc(12px * var(--ech)) calc(2px * var(--ech)); }
+  .fm-lig{ padding:calc(12px * var(--ech)) calc(2px * var(--ech)); }
+  .emp-roue{ padding:calc(15px * var(--ech)) calc(16px * var(--ech)); }
+  .poste-tete{ padding:calc(24px * var(--ech)) calc(22px * var(--ech)) calc(16px * var(--ech)); }
+  .poste-fen .poste-choix button{ padding:calc(15px * var(--ech)) calc(22px * var(--ech)); }
+  .poste-pied{ padding:calc(16px * var(--ech)) calc(20px * var(--ech)) calc(20px * var(--ech)); }
+  .poste-ajouter{ padding:0 calc(18px * var(--ech)); }
+  .an-neant{ padding:calc(20px * var(--ech)) calc(8px * var(--ech)) calc(8px * var(--ech)); }
+  .an-neant-btn{ padding:0 calc(18px * var(--ech)); }
+  .an-lig{ padding:calc(12px * var(--ech)) calc(2px * var(--ech)); }
+  .an-vide{ padding:calc(16px * var(--ech)) 0; }
+  .an-plus{ padding:calc(11px * var(--ech)) 0 calc(3px * var(--ech)); }
+  .couv{ padding:calc(11px * var(--ech)) calc(12px * var(--ech)); }
+  #p-create-manual .couv:not(.remplie), .couv-depot:not(.remplie){ padding:calc(26px * var(--ech)) calc(18px * var(--ech)); }
+  .couv .oter{ padding:calc(6px * var(--ech)) calc(11px * var(--ech)); }
+  .dv-vide{ padding:calc(26px * var(--ech)) calc(22px * var(--ech)); }
+  .et-attention{ padding:calc(9px * var(--ech)) calc(11px * var(--ech)); }
+  .dv-vue{ padding:calc(12px * var(--ech)) 0; }
+  .dv-tps{ padding:calc(6px * var(--ech)) calc(2px * var(--ech)) 0; }
+  .dv-outils{ padding:calc(2px * var(--ech)) 0 0; }
+  .dv-zoom, .dv-annuler{ padding:calc(9px * var(--ech)) calc(14px * var(--ech)); }
+  .dv-poi .val{ padding:calc(3px * var(--ech)) calc(8px * var(--ech)); }
+  .dv-ia-bas{ padding:calc(14px * var(--ech)) 0 calc(13px * var(--ech)); }
+  .dv-geste{ padding:calc(14px * var(--ech)) 0 calc(4px * var(--ech)); }
+  .dv-aide{ padding:calc(9px * var(--ech)) calc(18px * var(--ech)) 0; }
+  .etape-montage{ padding:calc(10px * var(--ech)); }
+  .dv-encours{ padding:calc(10px * var(--ech)); }
+  .langue-choix{ padding:calc(10px * var(--ech)) calc(12px * var(--ech)); }
+  .tiroir-liste{ padding:calc(4px * var(--ech)); }
+  .bandeau-bloc{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  .offre-carte{ padding:calc(22px * var(--ech)) calc(20px * var(--ech)) calc(20px * var(--ech)); }
+  .offre-carte.vedette::before{ padding:calc(1px * var(--ech)); }
+  .offre-gerer{ padding:calc(11px * var(--ech)) 0; }
+  .reg-identite{ padding:calc(15px * var(--ech)) calc(15px * var(--ech)); }
+  .reg-ligne{ padding:calc(11px * var(--ech)) calc(14px * var(--ech)) calc(11px * var(--ech)) calc(12px * var(--ech)); }
+  .reg-ligne.danger{ padding:calc(13px * var(--ech)) calc(14px * var(--ech)); }
+  .etab-ligne{ padding:calc(11px * var(--ech)) calc(13px * var(--ech)); }
+  .etab-ligne .ici{ padding:calc(2px * var(--ech)) calc(7px * var(--ech)); }
+  .tiroir-langue .tiroir-liste{ padding:calc(3px * var(--ech)); }
+  .pm-recherche{ padding:0 calc(12px * var(--ech)); }
+  .fond-promu{ padding:calc(24px * var(--ech)); }
+  .hero.promu-carte{ padding:calc(24px * var(--ech)) 0 calc(26px * var(--ech)); }
+  .hero.promu-carte .hero-txt{ padding:0 calc(24px * var(--ech)); }
+  .fond-etab{ padding:calc(24px * var(--ech)); }
+  .fen-etab{ padding:calc(24px * var(--ech)) calc(20px * var(--ech)) calc(18px * var(--ech)); }
+  .doc-fichier-etat{ padding:calc(11px * var(--ech)) calc(13px * var(--ech)); }
+  .bienvenue-fond{ padding:calc(26px * var(--ech)); }
+  .bienvenue{ padding:calc(26px * var(--ech)) calc(22px * var(--ech)) calc(20px * var(--ech)); }
+  .bienvenue .proc{ padding:calc(13px * var(--ech)) calc(15px * var(--ech)); }
+  .bienvenue .refus{ padding:calc(9px * var(--ech)); }
+  .ai-detail{ padding:calc(12px * var(--ech)) calc(13px * var(--ech)); }
+  .ma-ligne{ padding:calc(12px * var(--ech)) calc(14px * var(--ech)); }
+  .ma-vide{ padding:calc(2px * var(--ech)) 0 calc(6px * var(--ech)); }
+  .visiteur{ padding:calc(16px * var(--ech)) calc(18px * var(--ech)); }
+  .visiteur-code .btn{ padding:0 calc(18px * var(--ech)); }
+  .qr-bandeau{ padding:calc(13px * var(--ech)) calc(15px * var(--ech)); }
+  .ed-borne{ padding:0 calc(12px * var(--ech)); }
+  .ed-alerte{ padding:calc(9px * var(--ech)) calc(11px * var(--ech)); }
+  .ed-ok{ padding:calc(10px * var(--ech)) calc(12px * var(--ech)); }
+  .lecture-etat{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  .mf-tete{ padding:calc(16px * var(--ech)) calc(18px * var(--ech)); }
+  .mf-ligne{ padding:calc(9px * var(--ech)) 0; }
+  .pm-ligne{ padding:calc(12px * var(--ech)) calc(14px * var(--ech)); }
+  .ga-segments{ padding:calc(3px * var(--ech)); }
+  .ga-segments button{ padding:calc(8px * var(--ech)) 0; }
+  .recherche-fine{ padding:0 calc(13px * var(--ech)); }
+  .ga-tuile{ padding:calc(15px * var(--ech)) calc(6px * var(--ech)) calc(13px * var(--ech)); }
+  .hero-card{ padding:calc(20px * var(--ech)) calc(18px * var(--ech)); }
+  .sop-card{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  .badge{ padding:calc(5px * var(--ech)) calc(10px * var(--ech)); }
+  .badge.extrait{ padding:calc(5px * var(--ech)) calc(11px * var(--ech)); }
+  .card{ padding:calc(16px * var(--ech)); }
+  textarea, input[type=text], input[type=email], input[type=password], input[type=file]{ padding:calc(12px * var(--ech)); }
+  .btn{ padding:calc(11px * var(--ech)) calc(20px * var(--ech)); }
+  .btn.small{ padding:calc(9px * var(--ech)) calc(16px * var(--ech)); }
+  .step-edit-item{ padding:calc(14px * var(--ech)); }
+  .step-edit-item textarea{ padding:calc(11px * var(--ech)) calc(12px * var(--ech)) !important; }
+  .step-edit-item .range{ padding:calc(3px * var(--ech)) calc(7px * var(--ech)); }
+  .step-edit-item .del{ padding:calc(4px * var(--ech)); }
+  .clip-band span{ padding:calc(1px * var(--ech)) calc(5px * var(--ech)); }
+  .fen-co{ padding:calc(26px * var(--ech)) calc(22px * var(--ech)) calc(18px * var(--ech)); }
+  .fen-ac{ padding:0 calc(18px * var(--ech)) calc(18px * var(--ech)); }
+  .fen-champ{ padding:0 calc(14px * var(--ech)); }
+  .cgu-mention{ padding:0 calc(6px * var(--ech)); }
+  .ios-alert-backdrop{ padding:calc(24px * var(--ech)); }
+  .ios-alert-champ{ padding:0 calc(13px * var(--ech)); }
+  .ios-alert-body{ padding:calc(22px * var(--ech)) calc(20px * var(--ech)) calc(19px * var(--ech)); }
+  .ios-alert-actions button{ padding:calc(15px * var(--ech)) calc(8px * var(--ech)); }
+  .clip-tool{ padding:calc(10px * var(--ech)) calc(4px * var(--ech)); }
+  .cat-rank{ padding:calc(12px * var(--ech)) calc(14px * var(--ech)); }
+  .stat-mini{ padding:calc(12px * var(--ech)) calc(8px * var(--ech)); }
+  .emp-row{ padding:calc(8px * var(--ech)) calc(13px * var(--ech)); }
+  .qr-card{ padding:calc(18px * var(--ech)); }
+  .qr-plaque{ padding:calc(18px * var(--ech)) calc(16px * var(--ech)) calc(14px * var(--ech)); }
+  .plan-card{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  #detail-steps.etapes-fil .detail-step{ padding:calc(15px * var(--ech)) calc(16px * var(--ech)) !important; }
+  .detail-step{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  .view-toggle{ padding:calc(3px * var(--ech)); }
+  .view-toggle button{ padding:calc(8px * var(--ech)) calc(4px * var(--ech)); }
+  .filter-chips{ padding:calc(3px * var(--ech)); }
+  .filter-chips button{ padding:calc(7px * var(--ech)) calc(10px * var(--ech)); }
+  .accueil{ padding:calc(15px * var(--ech)) calc(20px * var(--ech)); }
+  .hero{ padding:calc(22px * var(--ech)) calc(20px * var(--ech)) calc(22px * var(--ech)); }
+  .hero-lueur::after{ padding:calc(1.1px * var(--ech)); }
+  .hero-cta{ padding:0 calc(18px * var(--ech)); }
+  .dd-trigger{ padding:calc(4px * var(--ech)) 0; }
+  .dd-menu button{ padding:calc(12px * var(--ech)) calc(16px * var(--ech)); }
+  .search-bar{ padding:0 calc(14px * var(--ech)); }
+  .cat-cell, .proc-rich-card{ padding:calc(15px * var(--ech)) calc(15px * var(--ech)) calc(14px * var(--ech)); }
+  #cat-grid .cat-cell, #e-cat-grid .cat-cell{ padding:calc(14px * var(--ech)) calc(14px * var(--ech)) 0; }
+  .cat-pied{ padding:calc(10px * var(--ech)) 0 calc(12px * var(--ech)); }
+  .proc-rich-card{ padding:calc(14px * var(--ech)) calc(14px * var(--ech)) 0; }
+  .proc-pied{ padding:calc(11px * var(--ech)) 0 calc(13px * var(--ech)); }
+  .cat-badge{ padding:calc(4px * var(--ech)) calc(9px * var(--ech)); }
+  .cat-recent-item{ padding:calc(2px * var(--ech)) 0; }
+  .scan-result{ padding:calc(16px * var(--ech)); }
+  .scan-echec{ padding:calc(22px * var(--ech)) calc(20px * var(--ech)); }
+  .auth-toggle{ padding:calc(4px * var(--ech)); }
+  .auth-toggle-btn{ padding:calc(9px * var(--ech)) 0; }
+  .frise-fenetre{ padding:calc(6px * var(--ech)) 0; }
+  .zoom-lien{ padding:0 calc(13px * var(--ech)); }
+  .topbar-card::after{ padding:calc(0.5px * var(--ech)); }
+  .an-intro-cadre{ padding:calc(16px * var(--ech)) calc(18px * var(--ech)) calc(17px * var(--ech)); }
+  .contact-carte.an-intro-cadre{ padding:calc(16px * var(--ech)) calc(18px * var(--ech)); }
+  .hero-ia{ padding:calc(12px * var(--ech)) 0 calc(16px * var(--ech)); }
+  .hero-ia .hero-txt{ padding:0 calc(20px * var(--ech)); }
+  .topbar-pilule{ padding:calc(7px * var(--ech)); }
+  .fait-rappel{ padding:calc(11px * var(--ech)) calc(14px * var(--ech)); }
+  .etab-carte{ padding:calc(15px * var(--ech)) calc(16px * var(--ech)) calc(14px * var(--ech)); }
+  .hero.hero-sans-image{ padding:calc(20px * var(--ech)); }
+  .pc-coin{ padding:calc(18px * var(--ech)) calc(18px * var(--ech)) calc(16px * var(--ech)); }
+  .pc-qr{ padding:calc(14px * var(--ech)); }
+  .quota-carte{ padding:calc(14px * var(--ech)) calc(2px * var(--ech)) calc(4px * var(--ech)); }
+  .quota-illimite{ padding:calc(13px * var(--ech)) calc(14px * var(--ech)); }
+  #choice-screen{ padding:calc(18px * var(--ech)) calc(14px * var(--ech)); }
+  .choix-carte{ padding:calc(22px * var(--ech)) calc(18px * var(--ech)) calc(24px * var(--ech)); }
+  .cc-reco{ padding:calc(3.5px * var(--ech)) calc(9px * var(--ech)); }
+  .pq-l{ padding:calc(9px * var(--ech)) 0; }
+  .resume-ent{ padding:calc(18px * var(--ech)) calc(20px * var(--ech)) calc(16px * var(--ech)); }
+  .re-p{ padding:calc(7px * var(--ech)) 0; }
+  .coller-item{ padding:calc(10px * var(--ech)) calc(12px * var(--ech)); }
+  .coller-tot{ padding:calc(6px * var(--ech)) 0; }
+  .re-plus{ padding:calc(8px * var(--ech)) 0 calc(2px * var(--ech)); }
+  .choix-deja{ padding:calc(11px * var(--ech)) 0; }
+  .lien-doux{ padding:calc(22px * var(--ech)) 0 calc(2px * var(--ech)); }
+  .et-attention-saisie{ padding:calc(2px * var(--ech)) 0 calc(2px * var(--ech)) calc(11px * var(--ech)); }
+  .an-resume{ padding:calc(6px * var(--ech)) 0 calc(18px * var(--ech)); }
+  .an-resume-leg{ padding:0 calc(4px * var(--ech)); }
+  .ac-tete{ padding:calc(2px * var(--ech)) calc(2px * var(--ech)) calc(16px * var(--ech)); }
+  .ac-pub-bloc{ padding:calc(26px * var(--ech)) 0 calc(18px * var(--ech)); }
+  .ac-pub-pill{ padding:calc(9px * var(--ech)) calc(16px * var(--ech)) calc(9px * var(--ech)) calc(13px * var(--ech)); }
+  .ac-tuile{ padding:calc(15px * var(--ech)) calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  .ac-carte{ padding:calc(14px * var(--ech)) calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  .ac-etiq{ padding:calc(4px * var(--ech)) calc(9px * var(--ech)); }
+  .ac-l-rien{ padding:calc(2px * var(--ech)) 0 calc(4px * var(--ech)); }
+  .ac-rec{ padding:calc(10px * var(--ech)) calc(12px * var(--ech)) calc(10px * var(--ech)) calc(10px * var(--ech)); }
+  .cb-filtre .dd-trigger{ padding:calc(5px * var(--ech)) calc(9px * var(--ech)); }
+  .cb-axe{ padding:calc(1px * var(--ech)) 0 0; }
+  .cb-mois{ padding:0 calc(2px * var(--ech)); }
+  .offre-li{ padding:calc(7px * var(--ech)) 0; }
+  .abo-rythme{ padding:calc(4px * var(--ech)); }
+  .abo-ryt{ padding:calc(8px * var(--ech)) calc(16px * var(--ech)); }
+  .abo-ryt .eco{ padding:calc(2.5px * var(--ech)) calc(7px * var(--ech)); }
+  .abo-autres{ padding:calc(13px * var(--ech)) calc(22px * var(--ech)); }
+  .offre-annuel-note{ padding:calc(2px * var(--ech)) 0; }
+  .ac-lien{ padding:calc(13px * var(--ech)) calc(14px * var(--ech)); }
+  .ac-btn{ padding:0 calc(16px * var(--ech)); }
+  .ac-connexion{ padding:calc(10px * var(--ech)) 0; }
+  .pub-bandeau{ padding:calc(12px * var(--ech)) calc(12px * var(--ech)) calc(12px * var(--ech)) calc(13px * var(--ech)); }
+  .pub-btn{ padding:0 calc(15px * var(--ech)); }
+  .proc-brouillon{ padding:calc(2.5px * var(--ech)) calc(8px * var(--ech)); }
+  .ai-combien{ padding:calc(6px * var(--ech)) calc(4px * var(--ech)); }
+  .ai-combien-co{ padding:calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  .ai-combien-t th{ padding:0 0 calc(6px * var(--ech)); }
+  .ai-combien-t td{ padding:calc(7px * var(--ech)) 0; }
+  .cat-cell::before, .proc-rich-card::before{ padding:calc(1px * var(--ech)); }
+  #cat-grid .cat-cell--ligne, #category-procedures-list .cat-cell--ligne, #category-procedures-list .proc-rich-card{ padding:calc(18px * var(--ech)) calc(18px * var(--ech)) calc(17px * var(--ech)); }
+  .cl-badge{ padding:calc(4px * var(--ech)) calc(11px * var(--ech)) calc(4px * var(--ech)) calc(9px * var(--ech)); }
+  .cl-rien{ padding:calc(26px * var(--ech)) calc(4px * var(--ech)); }
+  .proc-rech{ padding:0 calc(16px * var(--ech)); }
+  .proc-segm{ padding:calc(3px * var(--ech)); }
+  .p-seg{ padding:calc(8px * var(--ech)) 0; }
+  .topbar-card.glassDiv{ padding:calc(7px * var(--ech)) calc(10px * var(--ech)) calc(7px * var(--ech)) calc(8px * var(--ech)); }
+  .tb-volet{ padding:calc(6px * var(--ech)); }
+  .tb-v-tete{ padding:calc(14px * var(--ech)) calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  .tb-v-role{ padding:calc(4px * var(--ech)) calc(11px * var(--ech)); }
+  .tb-v-opt{ padding:calc(11px * var(--ech)) calc(12px * var(--ech)); }
+  #p-analyse .pub-bandeau, #p-analyse .qr-card{ padding:calc(18px * var(--ech)); }
+  #p-analyse .detail-step{ padding:calc(15px * var(--ech)) calc(16px * var(--ech)); }
+  #p-new .mode-choice-card, #p-new .outil-card{ padding:calc(16px * var(--ech)); }
+  #p-create .mode-choice-card{ padding:calc(16px * var(--ech)); }
+  #p-create .card{ padding:calc(18px * var(--ech)); }
+  #p-create input[type=text]{ padding:calc(12px * var(--ech)) calc(16px * var(--ech)); }
+  #p-create-manual .man-fil .step-edit-item{ padding:calc(15px * var(--ech)) calc(16px * var(--ech)); }
+  .ac-chif{ padding:calc(14px * var(--ech)) calc(12px * var(--ech)) calc(13px * var(--ech)); }
+  .ac-sect-plus{ padding:calc(4px * var(--ech)) 0 calc(4px * var(--ech)) calc(8px * var(--ech)); }
+  .ac-bloc{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)) calc(18px * var(--ech)); }
+  .ac-chif::before, .ac-bloc::before{ padding:calc(1px * var(--ech)); }
+  .p-seg-pt{ padding:0 calc(5px * var(--ech)); }
+  .cl-etat{ padding:calc(4px * var(--ech)) calc(11px * var(--ech)) calc(4px * var(--ech)) calc(9px * var(--ech)); }
+  .histo-tete{ padding:calc(16px * var(--ech)) calc(24px * var(--ech)) 0; }
+  .histo-note{ padding:calc(6px * var(--ech)) calc(24px * var(--ech)) 0; }
+  .histo-lig{ padding:calc(13px * var(--ech)) calc(15px * var(--ech)); }
+  .histo-jour{ padding:calc(8px * var(--ech)) calc(2px * var(--ech)) 0; }
+  .an-membre{ padding:calc(9px * var(--ech)) 0; }
+  .an-vide-l{ padding:calc(18px * var(--ech)) 0; }
+  #p-settings .reg-groupe::before, #p-settings .etab-carte::before, #p-settings .reg-identite::before{ padding:calc(1px * var(--ech)); }
+  #p-settings .reg-ligne{ padding:calc(13px * var(--ech)) calc(16px * var(--ech)); }
+  #p-settings .reg-identite{ padding:calc(18px * var(--ech)) calc(16px * var(--ech)); }
+  #p-reg-compte .card, #p-reg-code .card, #p-reg-postes .card, #p-reg-langue .card, #p-reg-appareils .card, #p-reg-poste .card, #p-membre .card, #p-abonnement .card{ padding:calc(16px * var(--ech)); }
+  #p-reg-compte .card::before, #p-reg-code .card::before, #p-reg-postes .card::before, #p-reg-langue .card::before, #p-reg-appareils .card::before, #p-reg-poste .card::before, #p-membre .card::before, #p-abonnement .card::before{ padding:calc(1px * var(--ech)); }
+  #p-reg-compte input[type=text], #p-reg-code input[type=text], #p-reg-postes input[type=text], #p-reg-langue input[type=text], #p-membre input[type=text], #p-abonnement input[type=text], #p-reg-compte input[type=email], #p-reg-compte input[type=password]{ padding:calc(12px * var(--ech)) calc(16px * var(--ech)); }
+  #p-reg-compte .lien-doux, #p-reg-code .lien-doux, #p-membre .lien-doux{ padding:calc(6px * var(--ech)) 0; }
+  #p-reg-postes .hero.an-intro, #p-reg-poste .hero.an-intro, #p-reg-code .hero.an-intro, #p-abonnement .hero.an-intro{ padding:calc(16px * var(--ech)); }
+  #p-reg-postes .search-bar{ padding:0 calc(16px * var(--ech)); }
+  #p-abonnement .abo-rythme{ padding:calc(3px * var(--ech)); }
+  #p-quota .quota-bloc{ padding:calc(20px * var(--ech)); }
+  #p-membres .pm-ligne{ padding:calc(13px * var(--ech)) calc(15px * var(--ech)); }
+  #p-membres .pm-role{ padding:calc(2px * var(--ech)) calc(9px * var(--ech)); }
+  #p-membres .note{ padding:calc(18px * var(--ech)) calc(2px * var(--ech)); }
+  #p-abonnement .offre-ruban{ padding:calc(3px * var(--ech)) calc(10px * var(--ech)); }
+  body.en-apercu #apercu-bandeau[hidden], body.en-apercu #apercu-bandeau{ padding:calc(6px * var(--ech)) calc(14px * var(--ech)); }
+  .scene-pastille{ padding:calc(11px * var(--ech)) calc(13px * var(--ech)); }
+  .creer-carte{ padding:calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  #abo-rythme .eco{ padding:calc(2.5px * var(--ech)) calc(7px * var(--ech)); }
+  #login-screen .deja-compte{ padding:calc(8px * var(--ech)) 0; }
+  .histo-groupe{ padding:0 calc(2px * var(--ech)); }
+  #e-profil .reg-groupe::before, #e-profil .etab-carte::before, #e-profil .reg-identite::before{ padding:calc(1px * var(--ech)); }
+  #e-profil .reg-ligne{ padding:calc(13px * var(--ech)) calc(16px * var(--ech)); }
+  #e-profil .reg-identite{ padding:calc(18px * var(--ech)) calc(16px * var(--ech)); }
+  .notif-lig{ padding:calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  .emp-liste .emp-groupe{ padding:0 calc(2px * var(--ech)); }
+  .abo-suspendu{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
+  .alerte-essai .ess-plaque::before{ padding:calc(0.6px * var(--ech)); }
+  .alerte-essai .ess-plus{ padding:calc(4px * var(--ech)) calc(9px * var(--ech)); }
+  .edit-note{ padding:calc(9px * var(--ech)) 0; }
+  #e-cat-grid .cat-cell{ padding:calc(18px * var(--ech)) calc(18px * var(--ech)) calc(17px * var(--ech)); }
+  #equipe-procedures-list .cat-cell, #equipe-procedures-list .sd-grille .cat-cell{ padding:calc(18px * var(--ech)) calc(18px * var(--ech)) calc(17px * var(--ech)); }
+  .photo-retirer{ padding:calc(4px * var(--ech)) calc(8px * var(--ech)); }
+  #e-reg-poste .an-intro, #p-reg-poste .an-intro{ padding:calc(16px * var(--ech)); }
+  .quota-attente{ padding:calc(26px * var(--ech)) calc(20px * var(--ech)); }
+  #p-profil .reg-groupe::before, #p-profil .etab-carte::before, #p-profil .reg-identite::before{ padding:calc(1px * var(--ech)); }
+  #p-profil .reg-ligne{ padding:calc(13px * var(--ech)) calc(16px * var(--ech)); }
+  #p-profil .reg-identite{ padding:calc(18px * var(--ech)) calc(16px * var(--ech)); }
+  .offre-inclus{ padding:calc(16px * var(--ech)) calc(14px * var(--ech)); }
+  .places-alerte{ padding:calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  .pa-cta{ padding:calc(8px * var(--ech)) calc(13px * var(--ech)); }
+  .abo-carte{ padding:calc(20px * var(--ech)) calc(18px * var(--ech)) 0; }
+  .abo-etat{ padding:calc(5px * var(--ech)) calc(11px * var(--ech)) calc(5px * var(--ech)) calc(9px * var(--ech)); }
+  .abo-detail-btn{ padding:calc(8px * var(--ech)) calc(12px * var(--ech)); }
+  .abo-annee{ padding:calc(11px * var(--ech)) calc(13px * var(--ech)); }
+  .abo-annee-bad{ padding:calc(3px * var(--ech)) calc(8px * var(--ech)); }
+  .abo-inclus{ padding:calc(16px * var(--ech)) calc(14px * var(--ech)); }
+  .abo-plaque{ padding:calc(13px * var(--ech)) 0 calc(11px * var(--ech)); }
+  .abo-achats .abo-cta{ padding:calc(11px * var(--ech)) calc(6px * var(--ech)) calc(12px * var(--ech)); }
+  .abo-tx{ padding:calc(2px * var(--ech)) 0 calc(1px * var(--ech)); }
+  .abo-pied{ padding:calc(15px * var(--ech)) calc(18px * var(--ech)); }
+  .abo-tiroir-in{ padding:calc(16px * var(--ech)) 0 calc(18px * var(--ech)); }
+  .abo-tiroir.ouvert .abo-tiroir-in{ padding:calc(18px * var(--ech)) calc(18px * var(--ech)) calc(20px * var(--ech)); }
+  .abo-fermer{ padding:calc(9px * var(--ech)) 0; }
+  .abo-plaque::before{ padding:calc(0.6px * var(--ech)); }
+  #activites-tout .histo-lig{ padding:calc(13px * var(--ech)) calc(15px * var(--ech)); }
+  .bv-essai{ padding:calc(15px * var(--ech)) calc(16px * var(--ech)); }
+  #activites-tout .histo-jour{ padding:calc(8px * var(--ech)) calc(2px * var(--ech)) 0; }
+  #login-screen .bv-haut{ padding:0 0 calc(20px * var(--ech)); }
+  .bv-carte{ padding:calc(18px * var(--ech)) calc(16px * var(--ech)) calc(16px * var(--ech)); }
+  .bv-champ{ padding:calc(13px * var(--ech)) calc(14px * var(--ech)); }
+  .bv-oubli{ padding:calc(4px * var(--ech)) 0; }
+  #login-screen .bv-essai{ padding:calc(14px * var(--ech)) calc(15px * var(--ech)); }
+  #p-reg-poste .poste-tete, #e-reg-poste .poste-tete{ padding:calc(18px * var(--ech)) calc(18px * var(--ech)) calc(19px * var(--ech)); }
+  .id-carte{ padding:calc(16px * var(--ech)) calc(14px * var(--ech)) calc(16px * var(--ech)) calc(16px * var(--ech)); }
+  .step-edit-item .step-titre-saisie, .step-row .step-titre-saisie{ padding:calc(9px * var(--ech)) calc(12px * var(--ech)) !important; }
+  .step-att-bouton{ padding:calc(6px * var(--ech)) calc(10px * var(--ech)) calc(6px * var(--ech)) calc(8px * var(--ech)); }
+  .step-att-zone .step-attention-saisie{ padding:calc(9px * var(--ech)) calc(11px * var(--ech)) !important; }
+  #p-create-manual .man-fil .step-att-zone .step-attention-saisie, #p-create-video .man-fil .step-att-zone .step-attention-saisie{ padding:calc(9px * var(--ech)) calc(11px * var(--ech)) !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUR ORDINATEUR : LA MISE EN PAGE D'UN IPAD MINI
+
+   Sans souris ni doigt, rien ne distingue une fenêtre large d'une tablette —
+   sinon qu'on la regarde de plus loin, et qu'une colonne de 1 500 px de large
+   ne se lit pas. L'app s'y présente donc comme sur un iPad mini : colonne de
+   744 px centrée, marges de 44 px, texte à +5 %.
+
+ ⚠ `not (any-pointer: coarse)` : tout écran SANS tactile. Une tablette garde
+   sa pleine largeur, même clavier branché, puisque son écran reste tactile.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 700px) and (min-height: 600px) and (not (any-pointer: coarse)){
+  :root{ --col: 744px; }
+  .app{ max-width:var(--col); }
+  .topbar{ left:50%; right:auto; transform:translateX(-50%); max-width:var(--col); }
+}
+
+/* L'image de couverture prend la même largeur que la vidéo, juste au-dessus
+   d'elle : deux blocs de tailles différentes l'un sur l'autre se lisent comme
+   une erreur de mise en page. */
+@media (min-width: 700px) and (min-height: 600px){
+  #e-detail.active .analyse-couv img,
+  #p-analyse.active .analyse-couv img{
+    max-width:calc(390px * var(--ech));
+    max-height:none;
+    width:100%;
+  }
 }

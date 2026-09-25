@@ -45,40 +45,10 @@ async function ensureQRCode() {
   }
   return QRCode
 }
-/* ═══════════════════════════════════════════════════════════════════════════
-   LA CARTE DE BUREAU
+/* La carte de bureau (« Standix est conçu pour le téléphone et la tablette »
+   avec son code QR, dans l'angle) a été retirée : l'app s'adapte maintenant
+   aux grands écrans, il n'y a plus rien à rediriger vers le téléphone. */
 
-   Dans l'angle, au-dessus de 900 px. Elle n'empêche rien : l'app reste celle
-   du téléphone, entière.
-
-   Le code mène à la PAGE DE CONNEXION — l'adresse du site sans rien d'autre.
-   Sur son téléphone, la personne n'est probablement pas connectée : l'envoyer
-   sur une page interne la ferait rebondir sans comprendre.
-   ═══════════════════════════════════════════════════════════════════════════ */
-async function poserCarteBureau() {
-  const el = document.getElementById('pc-coin')
-  if (!el || window.innerWidth < 900) return
-
-  try {
-    const QR = await ensureQRCode()
-    const toile = document.createElement('canvas')
-    /* La racine du site, pas `location.href` : c'est là que se trouve l'écran
-       de connexion. */
-    const adresse = location.origin + location.pathname.replace(/[^/]*$/, '')
-    await QR.toCanvas(toile, adresse, {
-      width: 132, margin: 0,
-      color: { dark: '#0C0D0E', light: '#F5F5F7' },
-    })
-    document.getElementById('pc-qr')?.replaceChildren(toile)
-    el.hidden = false
-  } catch (e) {
-    /* Sans code, la carte demanderait de scanner quelque chose qui n'existe
-       pas. On ne l'affiche pas du tout. */
-    console.warn('[bureau] code QR indisponible :', e.message)
-  }
-}
-
-poserCarteBureau()
 
 async function ensureJsQR() {
   if (!jsQRLib) {

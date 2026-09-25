@@ -14225,8 +14225,18 @@ body.en-apercu #equipe-app{ padding-bottom:64px; }
      du bouton : sans le `translateX`, il partirait au centre de l'ecran le
      temps du mouvement. */
 #voir-equipe{
+  /* ⚠ `--bar-col`, LA MEME LARGEUR QUE LA BARRE. Ce cercle se place par rapport
+     au bord droit de la barre : avec `--col`, passé à 100 % sur tablette, il
+     atterrissait AU MILIEU d'elle. */
+  /* ⚠ LA MEME EQUATION QUE LA BARRE, écrite une bonne fois. Le bord droit de
+     la barre tombe à `min(50vw - 23, --bar-col/2 - 20) - --bar-decal` du
+     centre ; le cercle commence 12 px plus loin. Sur téléphone, `--bar-decal`
+     vaut `--bar-h + 12` et l'on retrouve exactement l'ancienne valeur
+     (`- --bar-h`). Sur tablette il vaut zéro, la barre est centrée, et le
+     cercle se pose à sa droite sans la chevaucher. */
   --place:translateX(calc(
-    min(calc(50vw - 23px), calc(var(--col, 460px) / 2 - 20px)) - var(--bar-h)));
+    min(calc(50vw - 23px), calc(var(--bar-col, 460px) / 2 - 20px))
+    - var(--bar-decal) + 12px));
   transform:var(--place);
 }
 
@@ -15185,7 +15195,9 @@ body:has(#equipe-app[style*="display:block"]) #voir-equipe{
      ecrite par le script a chaque image. */
 body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display: block"]) #bar,
 body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display:block"]) #bar{
-  width:min(calc(100vw - 46px), calc(var(--col, 460px) - 40px)) !important;
+  /* `--bar-col` : la barre garde sa largeur de téléphone sur tablette, comme
+     dans l'espace gestion. */
+  width:min(calc(100vw - 46px), calc(var(--bar-col, 460px) - 40px)) !important;
 }
 
 
@@ -22701,4 +22713,1161 @@ body.abo-expire [data-etab-plus]{
 #e-profil .reg-ic.ent-ic img{
   width:40px;
   height:40px;
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'ADAPTATION AUX TABLETTES
+
+   Sur une tablette, la colonne de 560 px laissait deux larges bandes vides de
+   chaque côté, et le texte restait calibré pour un écran de téléphone tenu à
+   trente centimètres.
+
+   Deux réglages, et rien d'autre :
+
+   ① LA COLONNE PREND TOUTE LA LARGEUR, moins une marge de 44 px (56 sur les
+     grandes tablettes). `--col` passe à 100 % : la barre du haut, les écrans
+     et la barre du bas la suivent tous, puisqu'ils la lisent déjà.
+
+   ② TOUT LE TEXTE GROSSIT DE 5 %, et de 8 % sur les grandes tablettes.
+     `--ech` vaut 1 partout ailleurs, donc ces règles ne changent rien sur
+     téléphone ni sur ordinateur.
+
+ ⚠ `pointer: coarse` RESTREINT AUX ÉCRANS TACTILES. Une fenêtre de navigateur
+   large sur un ordinateur garde la colonne de 560 px : la même mise en page
+   étirée sur 1 500 px à la souris ne ressemblerait à rien.
+
+ ⚠ LES TAILLES SONT ÉCRITES EN `calc(<taille d'origine> * var(--ech))`, une
+   ligne par sélecteur, reprises telles quelles de la feuille au-dessus. Si
+   une taille change là-haut, celle d'ici ne suit pas toute seule — elle
+   deviendrait fausse en silence. Ce bloc est REGÉNÉRÉ, il ne se modifie pas
+   à la main.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{ --ech: 1; }
+
+@media (min-width: 700px) and (min-height: 600px) and (pointer: coarse){
+  :root{ --ech: 1.05; --col: 100%; }
+  .app{ max-width:none; }
+  .topbar{ max-width:none; left:0; right:0; transform:none;
+           padding-left:44px; padding-right:44px; }
+  .screen{ padding-left:44px; padding-right:44px; }
+
+  html, body{ font-size:calc(17px * var(--ech)); }
+  .alerte-demandes .tx b{ font-size:calc(14.5px * var(--ech)); }
+  .alerte-demandes .tx i{ font-size:calc(12px * var(--ech)); }
+  .alerte-demandes .s{ font-size:calc(12.5px * var(--ech)); }
+  .alerte-demandes .principal{ font-size:calc(13px * var(--ech)); }
+  .alerte-demandes .secondaire{ font-size:calc(13px * var(--ech)); }
+  .alerte-essai .tx b{ font-size:calc(14.5px * var(--ech)); }
+  .alerte-essai .tx i{ font-size:calc(12px * var(--ech)); }
+  .alerte-essai .s{ font-size:calc(12.5px * var(--ech)); }
+  .alerte-essai .principal{ font-size:calc(13px * var(--ech)); }
+  .alerte-essai .secondaire{ font-size:calc(13px * var(--ech)); }
+  .alerte-partage .tx b{ font-size:calc(14.5px * var(--ech)); }
+  .alerte-partage .tx i{ font-size:calc(12px * var(--ech)); }
+  .alerte-partage .s{ font-size:calc(12.5px * var(--ech)); }
+  .alerte-partage .principal{ font-size:calc(13px * var(--ech)); }
+  .alerte-partage .secondaire{ font-size:calc(13px * var(--ech)); }
+  .greeting{ font-size:calc(14px * var(--ech)); }
+  h1.pagehead{ font-size:calc(24px * var(--ech)); }
+  .subhead{ font-size:calc(14px * var(--ech)); }
+  .ent-nom{ font-size:calc(15px * var(--ech)); }
+  .ent-role{ font-size:calc(11.5px * var(--ech)); }
+  .ent-basculer{ font-size:calc(12.5px * var(--ech)); }
+  .ia-ecoute .tt{ font-size:calc(11px * var(--ech)); }
+  .ia-ecoute .lg{ font-size:calc(13px * var(--ech)); }
+  .ia-ecoute .lg-langue select{ font-size:calc(16px * var(--ech)); }
+  .ai-type button .t{ font-size:calc(14.5px * var(--ech)); }
+  .ai-type button .s{ font-size:calc(12px * var(--ech)); }
+  .ia-fig.g .pct{ font-size:calc(19px * var(--ech)); }
+  .man-lbl{ font-size:calc(12.5px * var(--ech)); }
+  .man-champ{ font-size:calc(15px * var(--ech)); }
+  .man-fil textarea{ font-size:calc(15px * var(--ech)); }
+  .man-fil .etape-montage textarea{ font-size:calc(14.5px * var(--ech)); }
+  .img-oter{ font-size:calc(14px * var(--ech)); }
+  .bande-ia{ font-size:calc(12.5px * var(--ech)); }
+  .ai-legende .t{ font-size:calc(17px * var(--ech)); }
+  .doc-zone .t{ font-size:calc(17px * var(--ech)); }
+  .doc-zone .s{ font-size:calc(12.5px * var(--ech)); }
+  .doc-zone .doc-voie{ font-size:calc(11px * var(--ech)); }
+  .doc-zone .trois > span{ font-size:calc(11px * var(--ech)); }
+  .doc-photos-vide b{ font-size:calc(14.5px * var(--ech)); }
+  .doc-photos-vide span{ font-size:calc(12.5px * var(--ech)); }
+  .doc-page .rg{ font-size:calc(12px * var(--ech)); }
+  .doc-page .nm{ font-size:calc(13px * var(--ech)); }
+  .doc-page .oter{ font-size:calc(12.5px * var(--ech)); }
+  .titre-cat{ font-size:calc(13px * var(--ech)); }
+  .vid-ia-note{ font-size:calc(12px * var(--ech)); }
+  .man-plus{ font-size:calc(14.5px * var(--ech)); }
+  .app-ligne .nm{ font-size:calc(14px * var(--ech)); }
+  .app-ligne .st{ font-size:calc(11.5px * var(--ech)); }
+  .app-ligne .ici{ font-size:calc(9.5px * var(--ech)); }
+  .app-ligne .oter{ font-size:calc(11.5px * var(--ech)); }
+  .an-n{ font-size:calc(78px * var(--ech)); }
+  .an-n span{ font-size:calc(31px * var(--ech)); }
+  .an-q{ font-size:calc(15px * var(--ech)); }
+  .an-ev{ font-size:calc(11.5px * var(--ech)); }
+  .an-dit{ font-size:calc(14.5px * var(--ech)); }
+  .an-trois .v{ font-size:calc(19px * var(--ech)); }
+  .an-trois .v em{ font-size:calc(12px * var(--ech)); }
+  .an-trois .l{ font-size:calc(11px * var(--ech)); }
+  #p-global-analyse .cat-rank .pos{ font-size:calc(12px * var(--ech)) !important; }
+  #an-gain-t b{ font-size:calc(21px * var(--ech)); }
+  #an-gain-t em{ font-size:calc(14.5px * var(--ech)); }
+  #an-gain-s{ font-size:calc(12.5px * var(--ech)); }
+  .an-intro .t{ font-size:calc(16px * var(--ech)); }
+  .an-intro .s{ font-size:calc(12.5px * var(--ech)); }
+  #p-an-categories .fl, #p-an-temps .fl, #p-an-equipe .fl{ font-size:calc(17px * var(--ech)); }
+  .fm-nom-ligne .poste{ font-size:calc(14px * var(--ech)); }
+  .fm-segm .dedans .v{ font-size:calc(36px * var(--ech)); }
+  .fm-segm .dedans .u{ font-size:calc(12px * var(--ech)); }
+  .fm-segm .dedans .n{ font-size:calc(11px * var(--ech)); }
+  .fm-lg .nm{ font-size:calc(14.5px * var(--ech)); }
+  .fm-lg .st{ font-size:calc(11.5px * var(--ech)); }
+  .fm-lg .vl{ font-size:calc(14px * var(--ech)); }
+  .fm-plus{ font-size:calc(13.5px * var(--ech)); }
+  .fm-rep .nm{ font-size:calc(13.5px * var(--ech)); }
+  .fm-rep .vl{ font-size:calc(13.5px * var(--ech)); }
+  .fm-trois .v{ font-size:calc(20px * var(--ech)); }
+  .fm-trois .l{ font-size:calc(10.5px * var(--ech)); }
+  .fm-periode-mot{ font-size:calc(12px * var(--ech)); }
+  .fm-titre{ font-size:calc(12px * var(--ech)); }
+  .fm-lig .nm{ font-size:calc(14.5px * var(--ech)); }
+  .fm-lig .st{ font-size:calc(11.5px * var(--ech)); }
+  .fm-lig .vl{ font-size:calc(14px * var(--ech)); }
+  .fm-lig .fl{ font-size:calc(17px * var(--ech)); }
+  .temps-total b{ font-size:calc(14.5px * var(--ech)); }
+  .temps-total i{ font-size:calc(10.5px * var(--ech)); }
+  .temps-total.grand b{ font-size:calc(19px * var(--ech)); }
+  .temps-total.grand i{ font-size:calc(11.5px * var(--ech)); }
+  .emp-roue .t{ font-size:calc(14.5px * var(--ech)); }
+  .emp-roue .s{ font-size:calc(12px * var(--ech)); }
+  .poste-tete .t{ font-size:calc(19px * var(--ech)); }
+  .poste-tete .s{ font-size:calc(13px * var(--ech)); }
+  .poste-fen .poste-choix button{ font-size:calc(15.5px * var(--ech)); }
+  .poste-ok{ font-size:calc(15.5px * var(--ech)); }
+  .poste-ajouter{ font-size:calc(14px * var(--ech)); }
+  .an-neant .t{ font-size:calc(14.5px * var(--ech)); }
+  .an-neant .s{ font-size:calc(12.5px * var(--ech)); }
+  .an-neant-btn{ font-size:calc(13.5px * var(--ech)); }
+  .an-lig .nm{ font-size:calc(14.5px * var(--ech)); }
+  .an-lig .st{ font-size:calc(11.5px * var(--ech)); }
+  .an-lig .vl{ font-size:calc(14px * var(--ech)); }
+  .an-lig .fl{ font-size:calc(17px * var(--ech)); }
+  .an-vide{ font-size:calc(13px * var(--ech)); }
+  .an-compte{ font-size:calc(13px * var(--ech)); }
+  .an-plus{ font-size:calc(12px * var(--ech)); }
+  .an-plus::after{ font-size:calc(16px * var(--ech)); }
+  .an-tete b{ font-size:calc(16px * var(--ech)); }
+  .an-lien{ font-size:calc(13px * var(--ech)); }
+  .fm-nom{ font-size:calc(26px * var(--ech)); }
+  .fm-rl{ font-size:calc(13px * var(--ech)); }
+  .fm-jours span{ font-size:calc(9.5px * var(--ech)); }
+  .couv .tx .t{ font-size:calc(13.5px * var(--ech)); }
+  .couv .tx .s{ font-size:calc(11.5px * var(--ech)); }
+  #p-create-manual .couv:not(.remplie) .tx .t, .couv-depot:not(.remplie) .tx .t{ font-size:calc(14.5px * var(--ech)); }
+  .couv .oter{ font-size:calc(11.5px * var(--ech)); }
+  .dv-cadre{ font-size:calc(13px * var(--ech)); }
+  .dv-vide .t{ font-size:calc(17px * var(--ech)); }
+  .dv-vide .s{ font-size:calc(12.5px * var(--ech)); }
+  .ia-mot{ font-size:calc(15px * var(--ech)); }
+  .et-attention span{ font-size:calc(13px * var(--ech)); }
+  .dv-seg{ font-size:calc(9.5px * var(--ech)); }
+  .dv-tps{ font-size:calc(11px * var(--ech)); }
+  .dv-zoom, .dv-annuler{ font-size:calc(12.5px * var(--ech)); }
+  .dv-poi .val{ font-size:calc(11px * var(--ech)); }
+  .dv-ia-bas{ font-size:calc(15px * var(--ech)); }
+  .dv-geste button{ font-size:calc(16px * var(--ech)); }
+  .dv-aide{ font-size:calc(11.5px * var(--ech)); }
+  .etape-montage textarea{ font-size:calc(13.5px * var(--ech)); }
+  .etape-montage i{ font-size:calc(10.5px * var(--ech)); }
+  .dv-encours{ font-size:calc(13.5px * var(--ech)); }
+  .dv-encours i{ font-size:calc(10.5px * var(--ech)); }
+  .step-img-vignette .att{ font-size:calc(13px * var(--ech)); }
+  .img-toucher{ font-size:calc(12.5px * var(--ech)); }
+  .contact-carte .t{ font-size:calc(16px * var(--ech)); }
+  .contact-carte .s{ font-size:calc(12.5px * var(--ech)); }
+  .langue-choix{ font-size:calc(13px * var(--ech)); }
+  .langue-choix .dr{ font-size:calc(17px * var(--ech)); }
+  .langue-proc .ic{ font-size:calc(16px * var(--ech)); }
+  .rond-ent .ini{ font-size:calc(15px * var(--ech)); }
+  .rond-ent.plus .ini{ font-size:calc(23px * var(--ech)); }
+  .bandeau-bloc .t{ font-size:calc(14px * var(--ech)); }
+  .bandeau-bloc .s{ font-size:calc(10.5px * var(--ech)); }
+  .abo-hi h2{ font-size:calc(24px * var(--ech)); }
+  .abo-hi p{ font-size:calc(13.5px * var(--ech)); }
+  .offre-nom{ font-size:calc(20px * var(--ech)); }
+  .offre-prix .v{ font-size:calc(38px * var(--ech)); }
+  .offre-prix .u{ font-size:calc(13.5px * var(--ech)); }
+  .offre-cta{ font-size:calc(14.5px * var(--ech)); }
+  .offre-gerer{ font-size:calc(13px * var(--ech)); }
+  .offre-annuel{ font-size:calc(11.5px * var(--ech)); }
+  .reg-identite .nm{ font-size:calc(17px * var(--ech)); }
+  .reg-identite .st{ font-size:calc(12.5px * var(--ech)); }
+  .reg-identite .fl{ font-size:calc(19px * var(--ech)); }
+  .reg-titre{ font-size:calc(11px * var(--ech)); }
+  .reg-nm{ font-size:calc(15px * var(--ech)); }
+  .reg-val{ font-size:calc(14px * var(--ech)); }
+  .reg-ligne .fl{ font-size:calc(19px * var(--ech)); }
+  .reg-ligne.danger .reg-nm{ font-size:calc(15px * var(--ech)); }
+  .reg-note{ font-size:calc(12px * var(--ech)); }
+  .reg-version{ font-size:calc(11.5px * var(--ech)); }
+  .etab-ligne .rond-ent .ini{ font-size:calc(13px * var(--ech)); }
+  .etab-ligne .rond-ent.plus .ini{ font-size:calc(26px * var(--ech)); }
+  .etab-ligne .nm{ font-size:calc(14.5px * var(--ech)); }
+  .etab-ligne .st{ font-size:calc(12px * var(--ech)); }
+  .etab-ligne .ici{ font-size:calc(9.5px * var(--ech)); }
+  .etab-ligne .fl{ font-size:calc(18px * var(--ech)); }
+  .tiroir-langue .rond-ent .code{ font-size:calc(12px * var(--ech)); }
+  .pm-recherche input{ font-size:calc(15px * var(--ech)); }
+  .pm-recherche .vider{ font-size:calc(15px * var(--ech)); }
+  .fen-promu .avert{ font-size:calc(11.5px * var(--ech)); }
+  .fen-etab h3{ font-size:calc(19px * var(--ech)); }
+  .fen-etab .s{ font-size:calc(12.5px * var(--ech)); }
+  .etab-depot .mono{ font-size:calc(28px * var(--ech)); }
+  .etab-depot .appareil span{ font-size:calc(9.5px * var(--ech)); }
+  .etab-legende{ font-size:calc(12px * var(--ech)); }
+  .etab-legende button{ font-size:calc(12px * var(--ech)); }
+  .doc-ou{ font-size:calc(11px * var(--ech)); }
+  .doc-fichier-etat .ic{ font-size:calc(19px * var(--ech)); }
+  .doc-fichier-etat .n{ font-size:calc(13.5px * var(--ech)); }
+  .doc-fichier-etat .s{ font-size:calc(11.5px * var(--ech)); }
+  .bienvenue h3{ font-size:calc(20px * var(--ech)); }
+  .bienvenue .intro{ font-size:calc(12.5px * var(--ech)); }
+  .bienvenue .proc .t{ font-size:calc(16px * var(--ech)); }
+  .bienvenue .proc .c{ font-size:calc(11.5px * var(--ech)); }
+  .bienvenue .code-ic{ font-size:calc(25px * var(--ech)); }
+  .bienvenue .refus{ font-size:calc(13px * var(--ech)); }
+  .ai-detail .t{ font-size:calc(10px * var(--ech)); }
+  .ai-detail pre{ font-size:calc(10.5px * var(--ech)); }
+  .ma-serie-mot{ font-size:calc(12.5px * var(--ech)); }
+  .ma-ligne .rang{ font-size:calc(11px * var(--ech)); }
+  .ma-ligne .nom{ font-size:calc(14px * var(--ech)); }
+  .ma-ligne .quand{ font-size:calc(11.5px * var(--ech)); }
+  .ma-ligne .duree{ font-size:calc(14px * var(--ech)); }
+  .ma-vide{ font-size:calc(12.5px * var(--ech)); }
+  .visiteur-txt .t{ font-size:calc(14.5px * var(--ech)); }
+  .visiteur-txt .s{ font-size:calc(12.5px * var(--ech)); }
+  .visiteur-code input[type=text]{ font-size:calc(19px * var(--ech)); }
+  .qr-bandeau b{ font-size:calc(14.5px * var(--ech)); }
+  .qr-bandeau span{ font-size:calc(12.5px * var(--ech)); }
+  .ed-borne .k{ font-size:calc(10px * var(--ech)); }
+  .ed-borne .v{ font-size:calc(15px * var(--ech)); }
+  .ed-fleche{ font-size:calc(13px * var(--ech)); }
+  .ed-loupe-titre{ font-size:calc(11px * var(--ech)); }
+  .ed-loupe .grad{ font-size:calc(8.5px * var(--ech)); }
+  .ed-aide{ font-size:calc(11px * var(--ech)); }
+  .ed-legende{ font-size:calc(10px * var(--ech)); }
+  .ed-alerte{ font-size:calc(12px * var(--ech)); }
+  .ed-ok{ font-size:calc(12px * var(--ech)); }
+  .lecture-anneau .dedans{ font-size:calc(13px * var(--ech)); }
+  .lecture-txt .t{ font-size:calc(15px * var(--ech)); }
+  .lecture-txt .s{ font-size:calc(12px * var(--ech)); }
+  .mf-resume{ font-size:calc(12.5px * var(--ech)); }
+  .mf-chiffre{ font-size:calc(23px * var(--ech)); }
+  .mf-ligne .k{ font-size:calc(12.5px * var(--ech)); }
+  .mf-ligne .v{ font-size:calc(13px * var(--ech)); }
+  .pm-av{ font-size:calc(13px * var(--ech)); }
+  .pm-nom{ font-size:calc(14.5px * var(--ech)); }
+  .pm-soi{ font-size:calc(10px * var(--ech)); }
+  .pm-role{ font-size:calc(11.5px * var(--ech)); }
+  .ga-segments button{ font-size:calc(12.5px * var(--ech)); }
+  .recherche-fine input[type=text]{ font-size:calc(16px * var(--ech)); }
+  .recherche-fine input[type=text]::placeholder{ font-size:calc(13.5px * var(--ech)); }
+  .ga-anneau .dedans{ font-size:calc(17px * var(--ech)); }
+  .ga-anneau .unite{ font-size:calc(8.5px * var(--ech)); }
+  .ga-libelle{ font-size:calc(9.5px * var(--ech)); }
+  .ga-detail{ font-size:calc(12px * var(--ech)); }
+  .hero-card .lbl{ font-size:calc(11px * var(--ech)); }
+  .hero-card .num{ font-size:calc(44px * var(--ech)); }
+  .hero-card .sub{ font-size:calc(13px * var(--ech)); }
+  .section-title{ font-size:calc(13px * var(--ech)); }
+  .sop-card .title{ font-size:calc(15px * var(--ech)); }
+  .sop-card .meta{ font-size:calc(12px * var(--ech)); }
+  .badge{ font-size:calc(11px * var(--ech)); }
+  label.f{ font-size:calc(12px * var(--ech)); }
+  textarea, input[type=text], input[type=email], input[type=password], input[type=file]{ font-size:calc(16px * var(--ech)); }
+  .btn{ font-size:calc(14px * var(--ech)); }
+  .btn.small{ font-size:calc(12.5px * var(--ech)); }
+  .video-frame{ font-size:calc(13px * var(--ech)); }
+  .step-edit-item textarea{ font-size:calc(15px * var(--ech)) !important; }
+  .step-edit-item .step-num{ font-size:calc(12px * var(--ech)); }
+  .step-edit-item .range{ font-size:calc(10.5px * var(--ech)); }
+  .step-edit-item textarea{ font-size:calc(16px * var(--ech)); }
+  .step-edit-item .del{ font-size:calc(18px * var(--ech)); }
+  .capcut-current-time, .capcut-duration{ font-size:calc(12px * var(--ech)); }
+  .capcut-duration-sep{ font-size:calc(12px * var(--ech)); }
+  .capcut-hint{ font-size:calc(11px * var(--ech)); }
+  .clip-band span{ font-size:calc(9px * var(--ech)); }
+  .clip-info{ font-size:calc(11.5px * var(--ech)); }
+  .fen-t{ font-size:calc(18.5px * var(--ech)); }
+  .fen-s{ font-size:calc(13.5px * var(--ech)); }
+  .fen-p{ font-size:calc(15px * var(--ech)); }
+  .fen-a{ font-size:calc(14px * var(--ech)); }
+  .fen-champ{ font-size:calc(15px * var(--ech)); }
+  .cgu-mention{ font-size:calc(11.5px * var(--ech)); }
+  .titre-precision{ font-size:calc(11.5px * var(--ech)); }
+  .ios-alert-choix button{ font-size:calc(15.5px * var(--ech)); }
+  .ios-alert-champ{ font-size:calc(16px * var(--ech)); }
+  .ios-alert-title{ font-size:calc(16.5px * var(--ech)); }
+  .ios-alert-msg{ font-size:calc(13px * var(--ech)); }
+  .ios-alert-actions button{ font-size:calc(15.5px * var(--ech)); }
+  .clip-tool{ font-size:calc(10.5px * var(--ech)); }
+  .cat-rank .pos{ font-size:calc(11px * var(--ech)); }
+  .cat-rank .nom{ font-size:calc(14px * var(--ech)); }
+  .cat-rank .detail{ font-size:calc(11px * var(--ech)); }
+  .cat-rank .taux{ font-size:calc(15px * var(--ech)); }
+  .stat-mini .num{ font-size:calc(20px * var(--ech)); }
+  .stat-mini .lbl{ font-size:calc(10.5px * var(--ech)); }
+  .emp-row-sous{ font-size:calc(11.5px * var(--ech)); }
+  .emp-row-name{ font-size:calc(13.5px * var(--ech)); }
+  .emp-row-date{ font-size:calc(11.5px * var(--ech)); }
+  .check.done::after{ font-size:calc(12px * var(--ech)); }
+  .qr-plaque-title{ font-size:calc(14.5px * var(--ech)); }
+  .qr-plaque-sub{ font-size:calc(11px * var(--ech)); }
+  .qr-plaque-mark span{ font-size:calc(10px * var(--ech)); }
+  .qr-hint{ font-size:calc(12px * var(--ech)); }
+  .plan-name{ font-size:calc(15px * var(--ech)); }
+  .plan-price{ font-size:calc(15px * var(--ech)); }
+  .plan-price span{ font-size:calc(11px * var(--ech)); }
+  .plan-desc{ font-size:calc(12px * var(--ech)); }
+  .detail-step .n{ font-size:calc(12px * var(--ech)); }
+  .detail-step p{ font-size:calc(14px * var(--ech)); }
+  .view-toggle button{ font-size:calc(12px * var(--ech)); }
+  .filter-chips button{ font-size:calc(11.5px * var(--ech)); }
+  .accueil-texte .t{ font-size:calc(16px * var(--ech)); }
+  .accueil-texte .s{ font-size:calc(12.5px * var(--ech)); }
+  .hero h2{ font-size:calc(23px * var(--ech)); }
+  .hero p{ font-size:calc(13.5px * var(--ech)); }
+  .hero-cta{ font-size:calc(14.5px * var(--ech)); }
+  .dd-trigger{ font-size:calc(13.5px * var(--ech)); }
+  .dd-menu button{ font-size:calc(13.5px * var(--ech)); }
+  .mode-choice-title{ font-size:calc(14.5px * var(--ech)); }
+  .mode-choice-desc{ font-size:calc(12px * var(--ech)); }
+  .mode-choice-arrow{ font-size:calc(22px * var(--ech)); }
+  .cat-icon{ font-size:calc(24px * var(--ech)); }
+  .cat-pied{ font-size:calc(11.5px * var(--ech)); }
+  .cat-pied .fl{ font-size:calc(16px * var(--ech)); }
+  .proc-nom{ font-size:calc(15.5px * var(--ech)); }
+  .proc-meta{ font-size:calc(11.5px * var(--ech)); }
+  .proc-fl{ font-size:calc(18px * var(--ech)); }
+  .proc-taux{ font-size:calc(11.5px * var(--ech)); }
+  .cat-badge{ font-size:calc(11px * var(--ech)); }
+  .cat-name{ font-size:calc(16px * var(--ech)); }
+  .cat-pct{ font-size:calc(20px * var(--ech)); }
+  .cat-pct-label{ font-size:calc(10.5px * var(--ech)); }
+  .cat-date{ font-size:calc(10.5px * var(--ech)); }
+  .carte-categorie{ font-size:calc(11px * var(--ech)); }
+  .cat-recent-item{ font-size:calc(10.5px * var(--ech)); }
+  .search-bar input{ font-size:calc(16px * var(--ech)); }
+  .scan-mot b{ font-size:calc(20px * var(--ech)); }
+  .scan-mot span{ font-size:calc(13px * var(--ech)); }
+  .scan-echec .t{ font-size:calc(16px * var(--ech)); }
+  .scan-echec .s{ font-size:calc(13px * var(--ech)); }
+  .scan-echec .pas li{ font-size:calc(13.5px * var(--ech)); }
+  .scan-echec .pas li::before{ font-size:calc(12px * var(--ech)); }
+  .scan-echec .repli{ font-size:calc(12px * var(--ech)); }
+  .note{ font-size:calc(12.5px * var(--ech)); }
+  .empty-state h3{ font-size:calc(16px * var(--ech)); }
+  .empty-state p{ font-size:calc(13px * var(--ech)); }
+  .error-msg{ font-size:calc(13px * var(--ech)); }
+  .feuille-marque .logotype{ font-size:calc(19px * var(--ech)); }
+  #auth-sous{ font-size:calc(15px * var(--ech)); }
+  .auth-sous-2{ font-size:calc(13px * var(--ech)); }
+  #auth-title{ font-size:calc(23px * var(--ech)); }
+  .auth-toggle-btn{ font-size:calc(13px * var(--ech)); }
+  .login-card h1{ font-size:calc(22px * var(--ech)); }
+  .zoom-btn{ font-size:calc(16px * var(--ech)); }
+  .zoom-val{ font-size:calc(12px * var(--ech)); }
+  .zoom-lien{ font-size:calc(11.5px * var(--ech)); }
+  .tab-label{ font-size:calc(14px * var(--ech)); }
+  .hero-ia h2{ font-size:calc(19px * var(--ech)); }
+  .hero-ia p{ font-size:calc(13px * var(--ech)); }
+  .hero-ia .hero-cta{ font-size:calc(14px * var(--ech)); }
+  .act-jour{ font-size:calc(11.5px * var(--ech)); }
+  .rond-init{ font-size:calc(14px * var(--ech)); }
+  .page-tete h1{ font-size:calc(32px * var(--ech)); }
+  .page-tete p{ font-size:calc(13px * var(--ech)); }
+  .fait-rappel{ font-size:calc(12.5px * var(--ech)); }
+  .fait-rappel .fl{ font-size:calc(17px * var(--ech)); }
+  .contact-invite{ font-size:calc(12.5px * var(--ech)); }
+  .etab-rond{ font-size:calc(15px * var(--ech)); }
+  .etab-note{ font-size:calc(12px * var(--ech)); }
+  .pc-tete b{ font-size:calc(12.5px * var(--ech)); }
+  .pc-sous{ font-size:calc(11px * var(--ech)); }
+  .quota-attente{ font-size:calc(13px * var(--ech)); }
+  .quota-dedans .gros{ font-size:calc(52px * var(--ech)); }
+  .quota-dedans .unite{ font-size:calc(12.5px * var(--ech)); }
+  .quota-dedans .sous{ font-size:calc(12px * var(--ech)); }
+  .quota-illimite{ font-size:calc(12.5px * var(--ech)); }
+  .quota-illimite .ic{ font-size:calc(17px * var(--ech)); }
+  .quota-cta{ font-size:calc(14px * var(--ech)); }
+  .quota-pied{ font-size:calc(12.5px * var(--ech)); }
+  .choix-marque .logotype{ font-size:calc(22px * var(--ech)); }
+  .choix-bienvenue{ font-size:calc(25px * var(--ech)); }
+  .cc-reco{ font-size:calc(9px * var(--ech)); }
+  .cc-t{ font-size:calc(14.5px * var(--ech)); }
+  .cc-s{ font-size:calc(11.5px * var(--ech)); }
+  .code-gros{ font-size:calc(34px * var(--ech)); }
+  .sect-tt{ font-size:calc(11.5px * var(--ech)); }
+  .cg-txt{ font-size:calc(14px * var(--ech)); }
+  .cg-reste{ font-size:calc(12.5px * var(--ech)); }
+  .pq-p{ font-size:calc(13.5px * var(--ech)); }
+  .pq-t{ font-size:calc(11px * var(--ech)); }
+  .pq-l{ font-size:calc(13.5px * var(--ech)); }
+  .re-salut{ font-size:calc(20px * var(--ech)); }
+  .re-main{ font-size:calc(18px * var(--ech)); }
+  .re-total{ font-size:calc(12.5px * var(--ech)); }
+  .re-leg{ font-size:calc(12px * var(--ech)); }
+  .re-t{ font-size:calc(10.5px * var(--ech)); }
+  .re-p{ font-size:calc(13.5px * var(--ech)); }
+  .coller-rang{ font-size:calc(11.5px * var(--ech)); }
+  .coller-nom .txt{ font-size:calc(13px * var(--ech)); }
+  .coller-meta{ font-size:calc(11px * var(--ech)); }
+  .coller-fleche{ font-size:calc(14px * var(--ech)); }
+  .coller-tot{ font-size:calc(13px * var(--ech)); }
+  .re-plus{ font-size:calc(12.5px * var(--ech)); }
+  .f-opt{ font-size:calc(11px * var(--ech)); }
+  .sous-dossier-titre{ font-size:calc(11.5px * var(--ech)); }
+  .choix-deja{ font-size:calc(13.5px * var(--ech)); }
+  .fm-groupe{ font-size:calc(11px * var(--ech)); }
+  .lien-doux{ font-size:calc(13px * var(--ech)); }
+  .et-attention-saisie{ font-size:calc(12.5px * var(--ech)); }
+  .an-resume-centre .v{ font-size:calc(23px * var(--ech)); }
+  .an-resume-centre .u{ font-size:calc(11.5px * var(--ech)); }
+  .an-resume-leg span{ font-size:calc(11.5px * var(--ech)); }
+  .ac-salut{ font-size:calc(20px * var(--ech)); }
+  .ac-sous{ font-size:calc(14px * var(--ech)); }
+  .ac-pub-v{ font-size:calc(52px * var(--ech)); }
+  .ac-pub-v .pc{ font-size:calc(24px * var(--ech)); }
+  .ac-pub-l{ font-size:calc(13px * var(--ech)); }
+  .ac-pub-leg{ font-size:calc(12px * var(--ech)); }
+  .ac-pub-pill{ font-size:calc(13px * var(--ech)); }
+  .ac-t-t{ font-size:calc(12.5px * var(--ech)); }
+  .ac-t-v{ font-size:calc(29px * var(--ech)); }
+  .ac-t-n{ font-size:calc(11px * var(--ech)); }
+  .ac-t-n .fl{ font-size:calc(12px * var(--ech)); }
+  .ac-carte-t{ font-size:calc(13.5px * var(--ech)); }
+  .ac-carte-co .nm{ font-size:calc(14px * var(--ech)); }
+  .ac-carte-co .st{ font-size:calc(12px * var(--ech)); }
+  .ac-etiq{ font-size:calc(11px * var(--ech)); }
+  .ac-carte-fl{ font-size:calc(19px * var(--ech)); }
+  .ac-carte-quand{ font-size:calc(11.5px * var(--ech)); }
+  .ac-av{ font-size:calc(14px * var(--ech)); }
+  .ac-l-rien{ font-size:calc(12.5px * var(--ech)); }
+  .ac-t{ font-size:calc(14px * var(--ech)); }
+  .ac-v{ font-size:calc(29px * var(--ech)); }
+  .ac-n{ font-size:calc(11px * var(--ech)); }
+  .ac-pct{ font-size:calc(32px * var(--ech)); }
+  .ac-pct em{ font-size:calc(16px * var(--ech)); }
+  .ac-sect{ font-size:calc(12px * var(--ech)); }
+  .ac-rec-play{ font-size:calc(7px * var(--ech)); }
+  .ac-rec-t{ font-size:calc(14.5px * var(--ech)); }
+  .ac-rec-s{ font-size:calc(12px * var(--ech)); }
+  .ac-rec-fl{ font-size:calc(17px * var(--ech)); }
+  .ac-rec-d{ font-size:calc(11px * var(--ech)); }
+  .cb-sous{ font-size:calc(12.5px * var(--ech)); }
+  .cb-filtre .dd-trigger{ font-size:calc(11.5px * var(--ech)); }
+  .cb-axe{ font-size:calc(9.5px * var(--ech)); }
+  .cb-mois{ font-size:calc(10.5px * var(--ech)); }
+  #abo-gerer .reg-nm{ font-size:calc(14px * var(--ech)); }
+  .offre-li{ font-size:calc(13.5px * var(--ech)); }
+  .offre-li i{ font-size:calc(12px * var(--ech)); }
+  .offre-annuel, .offre-annuel-fixe{ font-size:calc(12.5px * var(--ech)); }
+  .abo-ryt{ font-size:calc(12.5px * var(--ech)); }
+  .abo-ryt .eco{ font-size:calc(9.5px * var(--ech)); }
+  .abo-autres{ font-size:calc(13.5px * var(--ech)); }
+  .abo-conf b{ font-size:calc(11px * var(--ech)); }
+  .abo-conf span:not(.ic){ font-size:calc(10.5px * var(--ech)); }
+  .offre-annuel-note{ font-size:calc(12.5px * var(--ech)); }
+  .ac-lien-t{ font-size:calc(14.5px * var(--ech)); }
+  .ac-lien-s{ font-size:calc(11.5px * var(--ech)); }
+  .ac-lien-fl{ font-size:calc(17px * var(--ech)); }
+  .ac-phrase{ font-size:calc(13.5px * var(--ech)); }
+  .ac-btn{ font-size:calc(13.5px * var(--ech)); }
+  .ac-btn-fl{ font-size:calc(19px * var(--ech)); }
+  .ac-connexion{ font-size:calc(12.5px * var(--ech)); }
+  .pub-t{ font-size:calc(14.5px * var(--ech)); }
+  .pub-s{ font-size:calc(12px * var(--ech)); }
+  .pub-btn{ font-size:calc(12.5px * var(--ech)); }
+  .proc-brouillon{ font-size:calc(10px * var(--ech)); }
+  .ci-txt{ font-size:calc(13px * var(--ech)); }
+  .ci-d{ font-size:calc(12.5px * var(--ech)); }
+  .ci-code{ font-size:calc(34px * var(--ech)); }
+  .ci-reste{ font-size:calc(12px * var(--ech)); }
+  .ci-btn{ font-size:calc(13.5px * var(--ech)); }
+  .ci-aide{ font-size:calc(11.5px * var(--ech)); }
+  .pm-gt{ font-size:calc(12px * var(--ech)); }
+  .pm-gn{ font-size:calc(11.5px * var(--ech)); }
+  .pm-gaide{ font-size:calc(11.5px * var(--ech)); }
+  .acv-t{ font-size:calc(15px * var(--ech)); }
+  .ai-combien{ font-size:calc(12.5px * var(--ech)); }
+  .ai-combien-co p{ font-size:calc(12.5px * var(--ech)); }
+  .ai-combien-t{ font-size:calc(12.5px * var(--ech)); }
+  .ai-combien-t th{ font-size:calc(11px * var(--ech)); }
+  .ai-combien-n{ font-size:calc(11.5px * var(--ech)) !important; }
+  .cl-nm{ font-size:calc(17.5px * var(--ech)); }
+  .cl-st{ font-size:calc(13.5px * var(--ech)); }
+  .cl-n{ font-size:calc(12.5px * var(--ech)); }
+  .cl-badge{ font-size:calc(12.5px * var(--ech)); }
+  .cl-rien{ font-size:calc(14px * var(--ech)); }
+  .proc-rech input{ font-size:calc(15px * var(--ech)); }
+  .p-seg{ font-size:calc(13.5px * var(--ech)); }
+  .cl-tete .proc-fl{ font-size:calc(19px * var(--ech)); }
+  .proc-rang-txt{ font-size:calc(13.5px * var(--ech)); }
+  .tb-nom{ font-size:calc(23px * var(--ech)); }
+  .tb-v-ent{ font-size:calc(16px * var(--ech)); }
+  .tb-v-role{ font-size:calc(12.5px * var(--ech)); }
+  .tb-v-opt{ font-size:calc(15px * var(--ech)); }
+  .tb-v-coche{ font-size:calc(13px * var(--ech)); }
+  #p-analyse .section-title{ font-size:calc(14px * var(--ech)); }
+  #p-analyse .detail-step p{ font-size:calc(15px * var(--ech)); }
+  #p-create .mode-choice-title{ font-size:calc(14px * var(--ech)); }
+  #p-create .mode-choice-desc{ font-size:calc(12.5px * var(--ech)); }
+  #p-create .mode-choice-arrow{ font-size:calc(19px * var(--ech)); }
+  #p-create-manual .man-fil .img-toucher{ font-size:calc(12.5px * var(--ech)); }
+  #p-create-manual .man-fil .img-oter{ font-size:calc(12px * var(--ech)); }
+  .ac-chif-v{ font-size:calc(23px * var(--ech)); }
+  .ac-chif-v em{ font-size:calc(14px * var(--ech)); }
+  .ac-chif-s{ font-size:calc(11.5px * var(--ech)); }
+  .ac-sect-plus{ font-size:calc(13px * var(--ech)); }
+  .ac-bloc-t > span{ font-size:calc(13px * var(--ech)); }
+  .ac-eti{ font-size:calc(14px * var(--ech)); }
+  .ac-ph{ font-size:calc(15.5px * var(--ech)); }
+  .ac-q{ font-size:calc(12px * var(--ech)); }
+  #p-home .ac-salut{ font-size:calc(22px * var(--ech)); }
+  #p-home .ac-ph{ font-size:calc(15.5px * var(--ech)); }
+  #p-home .ac-q{ font-size:calc(12px * var(--ech)); }
+  #p-home .ac-eti{ font-size:calc(14px * var(--ech)); }
+  #p-home .ac-chif-s{ font-size:calc(11.5px * var(--ech)); }
+  #p-home #ac-conseil{ font-size:calc(13.5px * var(--ech)); }
+  #p-home #ac-reste{ font-size:calc(13px * var(--ech)); }
+  .p-seg-pt{ font-size:calc(11px * var(--ech)); }
+  .cl-etat{ font-size:calc(12.5px * var(--ech)); }
+  .histo-tete h2{ font-size:calc(24px * var(--ech)); }
+  .histo-note{ font-size:calc(12.5px * var(--ech)); }
+  .histo-t{ font-size:calc(14.5px * var(--ech)); }
+  .histo-s{ font-size:calc(12px * var(--ech)); }
+  .histo-q{ font-size:calc(12px * var(--ech)); }
+  .histo-jour{ font-size:calc(12px * var(--ech)); }
+  .histo-rien{ font-size:calc(14px * var(--ech)); }
+  .an-ech span{ font-size:calc(10px * var(--ech)); }
+  .an-axe span{ font-size:calc(10.5px * var(--ech)); }
+  .an-note{ font-size:calc(11.5px * var(--ech)); }
+  .an-m-t{ font-size:calc(14.5px * var(--ech)); }
+  .an-m-s{ font-size:calc(12px * var(--ech)); }
+  .an-m-q{ font-size:calc(13px * var(--ech)); }
+  .an-vide-l{ font-size:calc(13px * var(--ech)); }
+  #p-global-analyse .ac-eti{ font-size:calc(14px * var(--ech)); }
+  #p-global-analyse .ac-q{ font-size:calc(12px * var(--ech)); }
+  #p-global-analyse .an-m-t{ font-size:calc(14.5px * var(--ech)); }
+  #p-global-analyse .an-m-s{ font-size:calc(12px * var(--ech)); }
+  #p-global-analyse .an-m-q{ font-size:calc(13px * var(--ech)); }
+  #p-global-analyse .an-note{ font-size:calc(11.5px * var(--ech)); }
+  #p-global-analyse .an-axe span{ font-size:calc(10.5px * var(--ech)); }
+  #p-global-analyse .ac-chif-s{ font-size:calc(11.5px * var(--ech)); }
+  #p-settings .reg-titre{ font-size:calc(14px * var(--ech)); }
+  #p-settings .reg-nm{ font-size:calc(15px * var(--ech)); }
+  #p-settings .reg-val{ font-size:calc(13.5px * var(--ech)); }
+  #p-settings .reg-fl{ font-size:calc(19px * var(--ech)); }
+  #p-settings .reg-identite .nm{ font-size:calc(16px * var(--ech)); }
+  #p-settings .reg-identite .st{ font-size:calc(13px * var(--ech)); }
+  #p-settings .reg-identite .fl{ font-size:calc(20px * var(--ech)); }
+  #p-settings .etab-note{ font-size:calc(12px * var(--ech)); }
+  #p-settings .reg-version{ font-size:calc(11.5px * var(--ech)); }
+  #p-reg-compte .pagehead, #p-reg-code .pagehead, #p-reg-postes .pagehead, #p-reg-langue .pagehead, #p-reg-appareils .pagehead, #p-reg-poste .pagehead, #p-membre .pagehead, #p-abonnement .pagehead{ font-size:calc(26px * var(--ech)); }
+  #p-reg-compte input[type=text], #p-reg-code input[type=text], #p-reg-postes input[type=text], #p-reg-langue input[type=text], #p-membre input[type=text], #p-abonnement input[type=text], #p-reg-compte input[type=email], #p-reg-compte input[type=password]{ font-size:calc(16px * var(--ech)); }
+  #p-reg-compte label.f, #p-reg-code label.f, #p-reg-postes label.f, #p-reg-langue label.f, #p-membre label.f, #p-abonnement label.f{ font-size:calc(12.5px * var(--ech)); }
+  #p-reg-compte .reg-note, #p-reg-code .reg-note, #p-reg-postes .reg-note, #p-reg-langue .reg-note, #p-reg-appareils .reg-note, #p-reg-poste .reg-note, #p-membre .reg-note, #p-abonnement .reg-note{ font-size:calc(12px * var(--ech)); }
+  #p-reg-compte .lien-doux, #p-reg-code .lien-doux, #p-membre .lien-doux{ font-size:calc(13.5px * var(--ech)); }
+  #p-reg-postes .hero .t, #p-reg-poste .hero .t, #p-reg-code .hero .t, #p-abonnement .hero .t{ font-size:calc(15px * var(--ech)); }
+  #p-reg-postes .hero .s, #p-reg-poste .hero .s, #p-reg-code .hero .s, #p-abonnement .hero .s{ font-size:calc(13px * var(--ech)); }
+  #p-reg-compte .fm-titre, #p-reg-code .fm-titre, #p-reg-postes .fm-titre, #p-reg-langue .fm-titre, #p-reg-appareils .fm-titre, #p-reg-poste .fm-titre, #p-membre .fm-titre, #p-abonnement .fm-titre, #p-reg-code .reg-titre, #p-membre .reg-titre, #p-abonnement .reg-titre{ font-size:calc(14px * var(--ech)); }
+  #p-reg-postes #poste-nouveau{ font-size:calc(16px * var(--ech)); }
+  #p-quota .quota-chiffre{ font-size:calc(34px * var(--ech)); }
+  #p-quota .quota-chiffre em{ font-size:calc(22px * var(--ech)); }
+  #p-quota .quota-legende{ font-size:calc(13px * var(--ech)); }
+  #p-quota .quota-reste{ font-size:calc(13px * var(--ech)); }
+  #p-membres .pm-rang{ font-size:calc(13px * var(--ech)); }
+  #p-membres .pm-nom{ font-size:calc(14.5px * var(--ech)); }
+  #p-membres .pm-role{ font-size:calc(11.5px * var(--ech)); }
+  #p-membres .pm-soi{ font-size:calc(11.5px * var(--ech)); }
+  #p-membres .fm-titre, #p-membres .pm-sect-t{ font-size:calc(14px * var(--ech)); }
+  #p-membres .note{ font-size:calc(13px * var(--ech)); }
+  #p-abonnement .offre-ruban{ font-size:calc(10.5px * var(--ech)); }
+  #p-quota .quota-part{ font-size:calc(12px * var(--ech)); }
+  .coller-sortie{ font-size:calc(12.5px * var(--ech)); }
+  .cl-astuce{ font-size:calc(12.5px * var(--ech)); }
+  body.en-apercu #apercu-bandeau[hidden], body.en-apercu #apercu-bandeau{ font-size:calc(12px * var(--ech)); }
+  .scene-pastille .sp-t{ font-size:calc(13.5px * var(--ech)); }
+  .scene-pastille .sp-s{ font-size:calc(11.5px * var(--ech)); }
+  .creer-titre{ font-size:calc(14px * var(--ech)); }
+  .creer-carte .cc-t{ font-size:calc(14.5px * var(--ech)); }
+  .creer-carte .cc-s{ font-size:calc(12.5px * var(--ech)); }
+  .creer-carte .cc-fl{ font-size:calc(20px * var(--ech)); }
+  #login-screen .login-card h1{ font-size:calc(30px * var(--ech)); }
+  #login-screen .subhead{ font-size:calc(15px * var(--ech)); }
+  #login-screen .logotype{ font-size:calc(22px * var(--ech)); }
+  #abo-rythme .eco{ font-size:calc(9.5px * var(--ech)); }
+  .tb-v-astuce{ font-size:calc(11.5px * var(--ech)); }
+  #login-screen .deja-compte{ font-size:calc(14px * var(--ech)); }
+  .f .f-note{ font-size:calc(11.5px * var(--ech)); }
+  .histo-groupe .hg-nom{ font-size:calc(12.5px * var(--ech)); }
+  .histo-groupe .hg-tot{ font-size:calc(12px * var(--ech)); }
+  #e-profil .reg-titre{ font-size:calc(14px * var(--ech)); }
+  #e-profil .reg-nm{ font-size:calc(15px * var(--ech)); }
+  #e-profil .reg-val{ font-size:calc(13.5px * var(--ech)); }
+  #e-profil .reg-fl{ font-size:calc(19px * var(--ech)); }
+  #e-profil .reg-identite .nm{ font-size:calc(16px * var(--ech)); }
+  #e-profil .reg-identite .st{ font-size:calc(13px * var(--ech)); }
+  #e-profil .reg-identite .fl{ font-size:calc(20px * var(--ech)); }
+  #e-profil .etab-note{ font-size:calc(12px * var(--ech)); }
+  #e-profil .reg-version{ font-size:calc(11.5px * var(--ech)); }
+  .notif-lig .notif-t{ font-size:calc(14.5px * var(--ech)); }
+  .notif-lig .notif-s{ font-size:calc(12.5px * var(--ech)); }
+  .notif-lig .notif-q{ font-size:calc(12px * var(--ech)); }
+  .emp-liste .eg-nom{ font-size:calc(12.5px * var(--ech)); }
+  .emp-liste .eg-tot{ font-size:calc(12px * var(--ech)); }
+  .qr-attente{ font-size:calc(12.5px * var(--ech)); }
+  .abo-suspendu .t{ font-size:calc(14px * var(--ech)); }
+  .abo-suspendu .s{ font-size:calc(12.5px * var(--ech)); }
+  .alerte-essai .ess-n{ font-size:calc(26px * var(--ech)); }
+  .alerte-essai .ess-u{ font-size:calc(9.5px * var(--ech)); }
+  .alerte-essai .ess-tx b{ font-size:calc(14.5px * var(--ech)); }
+  .alerte-essai .ess-tx i{ font-size:calc(12.5px * var(--ech)); }
+  .alerte-essai .ess-plus{ font-size:calc(11px * var(--ech)); }
+  .alerte-essai .ess-p{ font-size:calc(12.5px * var(--ech)); }
+  .cl-rien-suite{ font-size:calc(12.5px * var(--ech)); }
+  .edit-note{ font-size:calc(12.5px * var(--ech)); }
+  .page-tete .page-salut{ font-size:calc(14px * var(--ech)); }
+  #e-proc-segm .p-seg{ font-size:calc(12.5px * var(--ech)); }
+  .tb-v-qui{ font-size:calc(13px * var(--ech)); }
+  .photo-init{ font-size:calc(30px * var(--ech)); }
+  .photo-retirer{ font-size:calc(13px * var(--ech)); }
+  .tb-init{ font-size:calc(13px * var(--ech)); }
+  .quota-attente-suite{ font-size:calc(13px * var(--ech)); }
+  #p-profil .reg-titre{ font-size:calc(14px * var(--ech)); }
+  #p-profil .reg-nm{ font-size:calc(15px * var(--ech)); }
+  #p-profil .reg-val{ font-size:calc(13.5px * var(--ech)); }
+  #p-profil .reg-fl{ font-size:calc(19px * var(--ech)); }
+  #p-profil .reg-identite .nm{ font-size:calc(16px * var(--ech)); }
+  #p-profil .reg-identite .st{ font-size:calc(13px * var(--ech)); }
+  #p-profil .reg-identite .fl{ font-size:calc(20px * var(--ech)); }
+  #p-profil .etab-note{ font-size:calc(12px * var(--ech)); }
+  #p-profil .reg-version{ font-size:calc(11.5px * var(--ech)); }
+  .pa-tx b{ font-size:calc(14px * var(--ech)); }
+  .pa-tx i{ font-size:calc(12.5px * var(--ech)); }
+  .pa-cta{ font-size:calc(12.5px * var(--ech)); }
+  .abo-pl-nom{ font-size:calc(11.5px * var(--ech)); }
+  .abo-sur{ font-size:calc(10px * var(--ech)); }
+  .abo-nom{ font-size:calc(24px * var(--ech)); }
+  .abo-etat{ font-size:calc(12.5px * var(--ech)); }
+  .abo-renouv{ font-size:calc(12px * var(--ech)); }
+  .abo-membres{ font-size:calc(13px * var(--ech)); }
+  .abo-detail-btn{ font-size:calc(12.5px * var(--ech)); }
+  .abo-p-v{ font-size:calc(32px * var(--ech)); }
+  .abo-p-u{ font-size:calc(13px * var(--ech)); }
+  .abo-devis{ font-size:calc(15px * var(--ech)); }
+  .abo-annee-bad{ font-size:calc(12px * var(--ech)); }
+  .abo-annee-tx{ font-size:calc(12.5px * var(--ech)); }
+  .abo-li span{ font-size:calc(14px * var(--ech)); }
+  .abo-cta{ font-size:calc(15px * var(--ech)); }
+  .abo-tx .abo-membres{ font-size:calc(13.5px * var(--ech)); }
+  .ac-s{ font-size:calc(12px * var(--ech)); }
+  .abo-b-t{ font-size:calc(14px * var(--ech)); }
+  .abo-b-s{ font-size:calc(12px * var(--ech)); }
+  .abo-cta.gerer{ font-size:calc(14px * var(--ech)); }
+  .ap-prix{ font-size:calc(19px * var(--ech)); }
+  .ap-u{ font-size:calc(13px * var(--ech)); }
+  .ap-devis{ font-size:calc(14px * var(--ech)); }
+  .abo-pied-d{ font-size:calc(13px * var(--ech)); }
+  .abo-fermer{ font-size:calc(12.5px * var(--ech)); }
+  .abo-illim{ font-size:calc(13.5px * var(--ech)); }
+  #activites-tout .histo-t{ font-size:calc(14.5px * var(--ech)); }
+  #activites-tout .histo-s{ font-size:calc(12px * var(--ech)); }
+  .reg-av-ini{ font-size:calc(15px * var(--ech)); }
+  .bv-marque{ font-size:calc(26px * var(--ech)); }
+  .bv-titre{ font-size:calc(46px * var(--ech)); }
+  .bv-phrase{ font-size:calc(16px * var(--ech)); }
+  .bv-ess-tx b{ font-size:calc(15.5px * var(--ech)); }
+  .bv-ess-tx i{ font-size:calc(13px * var(--ech)); }
+  .bv-ess-fl{ font-size:calc(22px * var(--ech)); }
+  .bv-btn{ font-size:calc(16px * var(--ech)); }
+  #p-activites .pagehead{ font-size:calc(32px * var(--ech)); }
+  #p-activites .act-note{ font-size:calc(14.5px * var(--ech)); }
+  #login-screen .bv-titre{ font-size:calc(46px * var(--ech)); }
+  #login-screen .login-card .bv-titre{ font-size:calc(38px * var(--ech)); }
+  #login-screen .bv-marque{ font-size:calc(20px * var(--ech)); }
+  #login-screen .bv-phrase{ font-size:calc(14px * var(--ech)); }
+  #login-screen .bv-slogan{ font-size:calc(27px * var(--ech)); }
+  .bv-carte-t{ font-size:calc(17px * var(--ech)); }
+  .bv-lab{ font-size:calc(13px * var(--ech)); }
+  .bv-champ{ font-size:calc(16px * var(--ech)); }
+  .bv-err{ font-size:calc(13px * var(--ech)); }
+  .bv-oubli{ font-size:calc(13.5px * var(--ech)); }
+  .bv-ou span{ font-size:calc(13px * var(--ech)); }
+  #login-screen .bv-ess-tx b{ font-size:calc(15px * var(--ech)); }
+  #login-screen .bv-ess-tx i{ font-size:calc(12.5px * var(--ech)); }
+  .poste-q{ font-size:calc(19px * var(--ech)); }
+  .poste-s{ font-size:calc(14px * var(--ech)); }
+  .bv-deja{ font-size:calc(14px * var(--ech)); }
+  .bv-lien{ font-size:calc(14px * var(--ech)); }
+  .id-av .reg-av-ini{ font-size:calc(20px * var(--ech)); }
+  .id-nom{ font-size:calc(19px * var(--ech)); }
+  .id-poste{ font-size:calc(13.5px * var(--ech)); }
+  .id-mail{ font-size:calc(13.5px * var(--ech)); }
+  .id-fl{ font-size:calc(20px * var(--ech)); }
+  .et-titre{ font-size:calc(14.5px * var(--ech)); }
+  .step-edit-item .step-titre-saisie, .step-row .step-titre-saisie{ font-size:calc(14.5px * var(--ech)) !important; }
+  .step-att-bouton{ font-size:calc(13px * var(--ech)); }
+  .step-att-zone .step-attention-saisie{ font-size:calc(14px * var(--ech)) !important; }
+  #p-create-manual .man-fil .step-att-zone .step-attention-saisie, #p-create-video .man-fil .step-att-zone .step-attention-saisie{ font-size:calc(14px * var(--ech)) !important; }
+  #e-profil .reg-ic.ent-ic .ent-ini{ font-size:calc(14px * var(--ech)); }
+}
+
+@media (min-width: 1000px) and (min-height: 600px) and (pointer: coarse){
+  :root{ --ech: 1.08; }
+  .topbar{ padding-left:56px; padding-right:56px; }
+  .screen{ padding-left:56px; padding-right:56px; }
+}
+
+/* Les fenêtres (confirmations, feuilles) gardent une largeur FIXE : sans
+   cette règle, leur texte grossissait dans une boîte inchangée et le
+   contenu se serrait. Elles suivent donc la même échelle. */
+@media (min-width: 700px) and (min-height: 600px) and (pointer: coarse){
+  .fen-promu{ max-width:calc(360px * var(--ech)); }
+  .fen-etab{ max-width:calc(340px * var(--ech)); }
+  .bienvenue{ max-width:calc(330px * var(--ech)); }
+  .fen-pro{ max-width:calc(318px * var(--ech)); }
+  .ios-alert{ max-width:calc(310px * var(--ech)); }
+  .qr-attente{ max-width:calc(290px * var(--ech)); }
+  #p-abonnement .offre-carte{ max-width:calc(330px * var(--ech)); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA BARRE DU BAS NE S'ÉTIRE PAS SUR TABLETTE
+
+   Elle lit `--col` pour sa largeur : passée à 100 %, elle traversait l'écran
+   d'un bord à l'autre. Une pilule de 1 300 px portant trois onglets perdus au
+   milieu ne se lit plus comme un objet posé sur la page, et les onglets
+   s'éloignent du pouce qui tient la tablette.
+
+   Elle garde donc la largeur qu'elle a sur grand téléphone — la colonne de
+   560 px — et grandit seulement en hauteur : 68 px, puis 72 sur les grandes
+   tablettes, contre 64. Les icônes et les libellés suivent déjà `--ech`.
+
+ ⚠ LA LARGEUR PASSE PAR `--bar-col`, PAS PAR UNE RÈGLE SUR `#bar`. Le script
+   du verre, dans `index.html`, RÉÉCRIT la largeur de la barre à chaque image :
+   une règle CSS, même plus précise, était effacée à la première animation.
+   `#bar` et ce script lisent donc tous deux `--bar-col`, qui vaut `--col`
+   partout ailleurs.
+
+ ⚠ `html:root` ET NON `:root`. La déclaration d'origine de `--bar-h` vit dans
+   la balise `<style>` de `index.html`, donc APRÈS cette feuille : à
+   spécificité égale, c'est elle qui gagne. `html:root` passe d'un cran
+   devant.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  --bar-col: var(--col, 460px);
+  /* La place que la barre laisse au cercle « Voir comme l'équipe » : sa
+     largeur plus l'écart. Elle est RETIRÉE de la barre et sert aussi à la
+     décaler vers la gauche, pour que barre + cercle restent centrés. */
+  --bar-decal: calc(var(--bar-h) + 12px);
+}
+
+@media (min-width: 700px) and (min-height: 600px) and (pointer: coarse){
+  /* ⚠ SUR TABLETTE, LA BARRE EST CENTRÉE POUR DE BON. Le décalage passe à
+     zéro : elle n'est plus poussée à gauche pour loger le cercle, qui a
+     largement la place à côté d'elle. `--bar-col` descend à 480 pour que sa
+     largeur reste celle d'un grand téléphone (440 px). */
+  html:root{ --bar-h:68px; --bar-col:480px; --bar-decal:0px; }
+}
+@media (min-width: 1000px) and (min-height: 600px) and (pointer: coarse){
+  html:root{ --bar-h:72px; }
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PASTILLES ET LES ICONES SUIVENT LE TEXTE
+
+   Le texte grossissait de 5 à 8 % sur tablette, les pastilles rondes et les
+   pictogrammes restaient à leur taille de téléphone : un titre plus grand
+   posé à côté d'une icône inchangée se voit tout de suite.
+
+   Toutes les boîtes carrées de 72 px ou moins — plaques d'icône, avatars,
+   points d'état, boutons ronds — reprennent donc la même échelle. Au-delà de
+   72 px, ce ne sont plus des icônes mais des blocs de mise en page : ils
+   suivent la largeur de la colonne, pas l'échelle du texte.
+
+ ⚠ BLOC GÉNÉRÉ, comme celui des tailles de texte. Il se régénère, il ne se
+   retouche pas à la main.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 700px) and (min-height: 600px) and (pointer: coarse){
+  .brand .mark svg{ width:calc(26px * var(--ech)); height:calc(29px * var(--ech)); }
+  .logo-pill svg{ width:calc(23px * var(--ech)); height:calc(27px * var(--ech)); }
+  .icon-pill.alerte::after{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }
+  .alerte-demandes .pic{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .alerte-demandes .pic svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .alerte-essai .pic{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .alerte-essai .pic svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .alerte-partage .pic{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .alerte-partage .pic svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .icon-pill{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .icon-pill svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .ent-marque{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .ent-marque svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .ia-ecoute .lg svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .ia-fig.m{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  .ia-fig.s{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .etat-proc .ia-fig.s{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .cat-recent-item .etat-proc .ia-fig.s{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }
+  .man-fil .step-num-dess{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .man-fil .step-num-dess svg{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .img-oter{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .man-fil .step-img-vignette svg{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .man-fil .sup svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .bande-ia .p{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .man-annuler-geste svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .doc-generer .ia-coche{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .doc-generer .ia-coche svg{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .doc-zone .ic{ width:calc(62px * var(--ech)); height:calc(62px * var(--ech)); }
+  .doc-zone .ic svg{ width:calc(29px * var(--ech)); height:calc(29px * var(--ech)); }
+  .doc-zone .doc-voie svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .doc-zone .trois svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .doc-photos-vide .d{ width:calc(46px * var(--ech)); height:calc(42px * var(--ech)); }
+  .doc-photos-vide .d svg{ width:calc(46px * var(--ech)); height:calc(42px * var(--ech)); }
+  .doc-page .rg{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  .doc-page .vg{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .vid-ia svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .man-plus .d{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .man-plus .d svg{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .etat-proc{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .etat-proc svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .etat-proc.prete{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .etat-proc.prete svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .cat-recent-item .etat-proc.souci svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .app-ligne .ic{ width:calc(36px * var(--ech)); height:calc(36px * var(--ech)); }
+  .app-ligne .ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .an-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .an-ic svg{ width:calc(19px * var(--ech)); height:calc(18px * var(--ech)); }
+  .an-aide{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .an-aide svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .an-gain-ic{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .an-gain-ic svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .fm-lg .pt{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }
+  .fm-rep .ic{ width:calc(28px * var(--ech)); height:calc(28px * var(--ech)); }
+  .fm-rep .ic svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .fm-barre span{ width:calc(34px * var(--ech)); height:calc(3px * var(--ech)); }
+  .fm-lig .pt{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .emp-liste .an-lig .pt{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .poste-tete .ic{ width:calc(52px * var(--ech)); height:calc(52px * var(--ech)); }
+  .poste-tete .ic svg{ width:calc(25px * var(--ech)); height:calc(25px * var(--ech)); }
+  .poste-fen .poste-choix .r{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .poste-fen .poste-choix button.on .r::after{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .an-neant .d{ width:calc(44px * var(--ech)); height:calc(40px * var(--ech)); }
+  .an-neant .d svg{ width:calc(44px * var(--ech)); height:calc(40px * var(--ech)); }
+  .gain-aide{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  .gain-aide svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .couv .vign{ width:calc(56px * var(--ech)); height:calc(42px * var(--ech)); }
+  .couv .vign svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  #p-create-manual .couv:not(.remplie) .vign, .couv-depot:not(.remplie) .vign{ width:calc(52px * var(--ech)); height:calc(52px * var(--ech)); }
+  #p-create-manual .couv:not(.remplie) .vign svg, .couv-depot:not(.remplie) .vign svg{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .dv-vide .ic{ width:calc(62px * var(--ech)); height:calc(62px * var(--ech)); }
+  .dv-vide .ic svg{ width:calc(29px * var(--ech)); height:calc(29px * var(--ech)); }
+  .et-attention svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .dv-zoom svg, .dv-annuler svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .dv-poi::after{ width:calc(12px * var(--ech)); height:calc(14px * var(--ech)); }
+  .dv-rond{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .dv-rond svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  #ai-launch-btn .ia-coche{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .dv-ia-bas .ia-coche{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .dv-ia-bas .ia-coche svg{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .dv-play{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .dv-play svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .dv-geste svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .etape-montage .vig{ width:calc(56px * var(--ech)); height:calc(32px * var(--ech)); }
+  .etape-montage .sup{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .etape-montage .sup svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .dv-encours .vig{ width:calc(56px * var(--ech)); height:calc(32px * var(--ech)); }
+  .step-img-vignette svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .step-img-vignette{ width:calc(56px * var(--ech)); height:calc(56px * var(--ech)); }
+  .step-img-vignette .att{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .tiroir-ent{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .rond-ent{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .reg-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .reg-ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .etab-ligne .rond-ent{ width:calc(42px * var(--ech)); height:calc(42px * var(--ech)); }
+  .tiroir-langue{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .tiroir-langue .rond-ent{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .tiroir-langue .rond-ent .terre{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .pm-recherche svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .pm-recherche .vider{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .pm-rang{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .pm-rang svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .etab-depot .appareil svg{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .coche-dessin{ width:calc(66px * var(--ech)); height:calc(60px * var(--ech)); }
+  .bienvenue .salut{ width:calc(72px * var(--ech)); height:calc(72px * var(--ech)); }
+  .bienvenue .code-ic{ width:calc(54px * var(--ech)); height:calc(54px * var(--ech)); }
+  .btn-aide{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .btn-aide svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .visiteur-cadenas{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .visiteur-cadenas svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .ed-loupe .axe::before{ width:calc(12px * var(--ech)); height:calc(5px * var(--ech)); }
+  .ed-legende i{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .lecture-anneau{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .pm-av{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .pm-suppr{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .pm-suppr svg{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .recherche-fine svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .ga-anneau{ width:calc(58px * var(--ech)); height:calc(58px * var(--ech)); }
+  .step-edit-item .step-num{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .step-edit-item .del svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .capcut-play-btn{ width:calc(36px * var(--ech)); height:calc(36px * var(--ech)); }
+  .capcut-play-btn svg{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .capcut-playhead-handle{ width:calc(16px * var(--ech)); height:calc(10px * var(--ech)); }
+  .clip-handle .grip::after{ width:calc(2px * var(--ech)); height:calc(20px * var(--ech)); }
+  .fen-ic{ width:calc(54px * var(--ech)); height:calc(54px * var(--ech)); }
+  .fen-ic svg{ width:calc(25px * var(--ech)); height:calc(25px * var(--ech)); }
+  .clip-tool svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .cat-rank .pos{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .check{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .qr-corner{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .qr-plaque-mark svg{ width:calc(9px * var(--ech)); height:calc(11px * var(--ech)); }
+  .qr-plaque-mark img{ width:calc(11px * var(--ech)); height:calc(15px * var(--ech)); }
+  .back-btn{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .back-btn svg{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  #analyse-steps-list.etapes-fil .step-num-dess{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  #analyse-steps-list.etapes-fil .step-num-dess svg{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .et-coche{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .et-coche svg{ width:calc(33px * var(--ech)); height:calc(33px * var(--ech)); }
+  .detail-step .n{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .accueil-av{ width:calc(70px * var(--ech)); height:calc(70px * var(--ech)); }
+  .accueil-av .dispo{ width:calc(12px * var(--ech)); height:calc(12px * var(--ech)); }
+  .hero-cta svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .hero-qr{ width:calc(48px * var(--ech)); height:calc(48px * var(--ech)); }
+  .hero-qr svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .dd-trigger svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .mode-choice-icon{ width:calc(46px * var(--ech)); height:calc(44px * var(--ech)); }
+  .mode-choice-icon svg{ width:calc(44px * var(--ech)); height:calc(42px * var(--ech)); }
+  .cat-ring-wrap svg{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .cat-icon svg{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  #equipe-app .proc-rich-card .cat-icon svg{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  #gestion-app .proc-rich-card .cat-icon svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .cat-ic{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .cat-ic svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .cat-pied svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .cat-recent-item .etat-proc{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }
+  .cat-recent-item .etat-proc svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .cat-recent-item .etat-proc.prete{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .cat-recent-item .etat-proc.prete svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .search-bar svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .scan-result .icon{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .scan-result .icon svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .scan-cible .c{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .scan-echec .ic{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .scan-echec .ic svg{ width:calc(23px * var(--ech)); height:calc(23px * var(--ech)); }
+  .scan-echec .pas li::before{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .scan-cam{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .scan-cam svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .scan-lampe{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .scan-lampe svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .boot-logo{ width:calc(29px * var(--ech)); height:calc(41px * var(--ech)); }
+  .boot-logo--topbar{ width:calc(24px * var(--ech)) !important; height:calc(34px * var(--ech)) !important; }
+  .btn-spinner{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .feuille-retour{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .feuille-retour svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .feuille-marque img{ width:calc(21px * var(--ech)); height:calc(28px * var(--ech)); }
+  .login-card::before{ width:calc(36px * var(--ech)); height:calc(4px * var(--ech)); }
+  .zoom-btn{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .tab-pill{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .tab-round{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .tab-round svg{ width:calc(23px * var(--ech)); height:calc(23px * var(--ech)); }
+  .tab-round--primary{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .tab-round--primary svg{ width:calc(23px * var(--ech)); height:calc(23px * var(--ech)); }
+  .plus-flot svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .act-lig .act-ic, .ac-l-lig .act-ic{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .act-lig .act-ic svg, .ac-l-lig .act-ic svg{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .rond-etab{ width:calc(42px * var(--ech)); height:calc(42px * var(--ech)); }
+  .rond-logo{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .rond-plus svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .fait-rappel .p{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .fait-rappel .p svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .contact-invite svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .etab-rond{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .etab-plus{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .etab-plus svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .pc-logo{ width:calc(15px * var(--ech)); height:calc(21px * var(--ech)); }
+  .cc-reco svg{ width:calc(9px * var(--ech)); height:calc(9px * var(--ech)); }
+  .cc-rond{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .cc-rond svg{ width:calc(23px * var(--ech)); height:calc(23px * var(--ech)); }
+  .cc-fleche{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .cc-fleche svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .coller-rang{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .coller-fleche{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .re-plus svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .sous-dossier-titre svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .sd-renommer{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .sd-renommer svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .an-resume-leg i{ width:calc(9px * var(--ech)); height:calc(9px * var(--ech)); }
+  .ac-pub-leg i{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .ac-pub-pill i{ width:calc(8px * var(--ech)); height:calc(8px * var(--ech)); }
+  .ac-t-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .ac-t-ic svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .ac-t-graph{ width:calc(46px * var(--ech)); height:calc(26px * var(--ech)); }
+  .ac-courbe-pt{ width:calc(6px * var(--ech)); height:calc(6px * var(--ech)); }
+  .ac-carte-quand i{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .ac-play{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .ac-play svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .ac-av{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .ac-av-pt{ width:calc(10px * var(--ech)); height:calc(10px * var(--ech)); }
+  .ac-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .ac-ic svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .ac-rec-vue{ width:calc(52px * var(--ech)); height:calc(52px * var(--ech)); }
+  .ac-rec-play{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .ac-rec-doc svg{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .ac-ic .ia-fig.ac-ia-fige{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .offre-plaque{ width:calc(42px * var(--ech)); height:calc(42px * var(--ech)); }
+  .offre-plaque svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .abo-autres svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .abo-conf .ic{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  .abo-conf .ic svg{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .offre-li i{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .offre-annuel-note .et{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .offre-cta .fl{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .ac-marque img{ width:calc(24px * var(--ech)); height:calc(32px * var(--ech)); }
+  .ac-btn-ic{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .ac-btn-ic svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .pub-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .pub-ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .acv-ic{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .cl-pl{ width:calc(64px * var(--ech)); height:calc(64px * var(--ech)); }
+  .cl-pl svg{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .cl-plus{ width:calc(28px * var(--ech)); height:calc(22px * var(--ech)); }
+  .cl-plus svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .cl-badge i{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .proc-rech svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .proc-filtre{ width:calc(42px * var(--ech)); height:calc(42px * var(--ech)); }
+  .proc-filtre svg{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .proc-rang-txt svg{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .tb-menu{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .tb-logo .boot-logo{ width:calc(24px * var(--ech)); height:calc(28px * var(--ech)); }
+  .tb-plus{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .tb-plus svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .tb-cale{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .tb-v-opt svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  #p-analyse .detail-step .step-num-dess{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  #p-analyse .detail-step .step-num-dess svg{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .mc-pl{ width:calc(48px * var(--ech)); height:calc(48px * var(--ech)); }
+  .mc-pl svg{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  #p-create .mode-choice-icon{ width:calc(52px * var(--ech)); height:calc(52px * var(--ech)); }
+  #p-create .mode-choice-icon svg{ width:calc(28px * var(--ech)); height:calc(28px * var(--ech)); }
+  #p-create-manual .man-fil .step-num-dess{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  #p-create-manual .man-fil .step-num-dess svg{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  #p-create-manual .man-fil .step-img-vignette{ width:calc(42px * var(--ech)); height:calc(42px * var(--ech)); }
+  #p-create-manual .man-fil .step-img-vignette svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  #p-create-manual .man-fil .step-bas .del{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  #p-create-manual .man-fil .step-bas .del svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  #p-create-manual .man-fil .img-oter{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .ac-chif-ic{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .ac-chif-ic svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .ac-sect-plus svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .ac-eti i{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .p-seg-pt.pt--seul{ width:calc(11px * var(--ech)); height:calc(11px * var(--ech)); }
+  .histo-poignee{ width:calc(38px * var(--ech)); height:calc(5px * var(--ech)); }
+  .histo-x{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .histo-x svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .histo-pt{ width:calc(8px * var(--ech)); height:calc(8px * var(--ech)); }
+  .an-i{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .an-i svg{ width:calc(16px * var(--ech)); height:calc(16px * var(--ech)); }
+  .an-rang{ width:calc(8px * var(--ech)); height:calc(8px * var(--ech)); }
+  #p-settings .reg-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  #p-settings .reg-ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  #p-reg-compte .back-btn, #p-reg-code .back-btn, #p-reg-postes .back-btn, #p-reg-langue .back-btn, #p-reg-appareils .back-btn, #p-reg-poste .back-btn, #p-membre .back-btn, #p-abonnement .back-btn{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  #p-reg-compte .back-btn svg, #p-reg-code .back-btn svg, #p-reg-postes .back-btn svg, #p-reg-langue .back-btn svg, #p-reg-appareils .back-btn svg, #p-reg-poste .back-btn svg, #p-membre .back-btn svg, #p-abonnement .back-btn svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  #p-reg-postes .search-bar svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .dv-outils .dv-rond{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .dv-outils .dv-rond svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .dv-outils .dv-zoom, .dv-outils .dv-annuler{ width:calc(38px * var(--ech)); height:calc(38px * var(--ech)); }
+  .dv-outils .dv-zoom svg, .dv-outils .dv-annuler svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  #p-membres .back-btn{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  #p-membres .back-btn svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  #p-membres .dd-trigger{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  #p-membres .dd-trigger svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  #p-membres .pm-rang{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  #voir-equipe svg{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  #p-abonnement .offre-plaque svg{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .scene-pastille .sp-ic{ width:calc(36px * var(--ech)); height:calc(36px * var(--ech)); }
+  .scene-pastille .sp-ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .scene-pastille .sp-ok{ width:calc(22px * var(--ech)); height:calc(22px * var(--ech)); }
+  .scene-pastille .sp-ok svg{ width:calc(12px * var(--ech)); height:calc(12px * var(--ech)); }
+  .creer-carte .cc-ic{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .creer-carte .cc-ic svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  #login-screen .creer-carte .cc-ic{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  #login-screen .creer-carte .cc-ic svg{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  #login-screen .feuille-marque img{ width:calc(24px * var(--ech)); height:calc(32px * var(--ech)); }
+  .histo-retour{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .histo-retour svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .tb-v-astuce svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  #e-profil .reg-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  #e-profil .reg-ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .notif-lig .notif-ic{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .notif-lig .notif-ic svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  .qr-attente svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .proc-rech-x{ width:calc(28px * var(--ech)); height:calc(28px * var(--ech)); }
+  .proc-rech-x svg{ width:calc(13px * var(--ech)); height:calc(13px * var(--ech)); }
+  .alerte-essai .ess-plaque{ width:calc(64px * var(--ech)); height:calc(64px * var(--ech)); }
+  .alerte-essai .ess-p .pt{ width:calc(5px * var(--ech)); height:calc(5px * var(--ech)); }
+  .fav-btn{ width:calc(32px * var(--ech)); height:calc(32px * var(--ech)); }
+  .fav-btn svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .cat-cell .fav-btn{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .cat-cell .fav-btn svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .fav-detail{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .fav-detail svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .photo-crayon{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  .photo-crayon svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .tb-silhouette{ width:calc(23px * var(--ech)); height:calc(23px * var(--ech)); }
+  #detail-steps.etapes-fil .et-coche{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  #detail-steps.etapes-fil .et-coche svg{ width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); }
+  #p-profil .reg-ic{ width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  #p-profil .reg-ic svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .tb-profil, .tb-plus{ width:calc(44px * var(--ech)) !important; height:calc(44px * var(--ech)) !important; }
+  .pa-ic{ width:calc(26px * var(--ech)); height:calc(26px * var(--ech)); }
+  .pa-ic svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .abo-plaque{ width:calc(62px * var(--ech)); height:calc(62px * var(--ech)); }
+  .abo-pl-logo{ width:calc(23px * var(--ech)); height:calc(33px * var(--ech)); }
+  .abo-etat i{ width:calc(7px * var(--ech)); height:calc(7px * var(--ech)); }
+  .abo-membres svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  .abo-detail-btn svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .abo-li svg{ width:calc(18px * var(--ech)); height:calc(18px * var(--ech)); }
+  .abo-pied-d svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); }
+  .abo-fermer svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  .abo-illim svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+  #activites-tout .histo-pt{ width:calc(8px * var(--ech)); height:calc(8px * var(--ech)); }
+  .reg-av{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .tb-vide{ width:calc(44px * var(--ech)); height:calc(44px * var(--ech)); }
+  .bv-ess-plaque{ width:calc(46px * var(--ech)); height:calc(46px * var(--ech)); }
+  .bv-ess-plaque svg{ width:calc(23px * var(--ech)); height:calc(23px * var(--ech)); }
+  .bv-btn-ic svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .bv-logo{ width:calc(30px * var(--ech)); height:calc(43px * var(--ech)); }
+  #login-screen .bv-logo{ width:calc(20px * var(--ech)); height:calc(29px * var(--ech)); }
+  #login-screen .bv-ess-plaque{ width:calc(42px * var(--ech)); height:calc(42px * var(--ech)); }
+  #login-screen .bv-ess-plaque svg{ width:calc(21px * var(--ech)); height:calc(21px * var(--ech)); }
+  .poste-coche{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .poste-coche svg{ width:calc(24px * var(--ech)); height:calc(24px * var(--ech)); }
+  .id-av{ width:calc(56px * var(--ech)); height:calc(56px * var(--ech)); }
+  .mdp-oeil svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); }
+  #e-profil .reg-ic.ent-ic{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .step-att-bouton svg{ width:calc(14px * var(--ech)); height:calc(14px * var(--ech)); }
+  #e-profil .reg-ic.ent-ic .ent-ini, #e-profil .reg-ic.ent-ic img{ width:calc(40px * var(--ech)); height:calc(40px * var(--ech)); }
+  .fm-courbe span{ min-height:calc(3px * var(--ech)); }
+  .step-edit-item textarea{ min-height:calc(22px * var(--ech)); }
+  .ac-t{ min-height:calc(38px * var(--ech)); }
+  .ac-btn{ min-height:calc(54px * var(--ech)); }
+  .cl-co{ min-height:calc(64px * var(--ech)); }
+  .proc-rang{ min-height:calc(30px * var(--ech)); }
+  .abo-achats .abo-cta{ min-height:calc(54px * var(--ech)); }
+  #p-global-analyse #an-equipe{ min-height:calc(64px * var(--ech)); }
+  .bv-btn{ min-height:calc(54px * var(--ech)); }
 }

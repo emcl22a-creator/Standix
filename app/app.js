@@ -25233,6 +25233,26 @@ function reinitialiserVideoFiche(cadreId, videoId, auraUneVideo) {
   if (cadre) cadre.style.display = auraUneVideo ? 'block' : 'none'
 }
 
+/* ═══ ON PRÉPARE LA VIDÉO DÈS QUE LE DOIGT TOUCHE LA CARTE ═══
+
+   Afficher une vidéo demande d'abord une adresse signée au serveur : un
+   aller-retour de deux à trois dixièmes de seconde, qui ne commençait qu'une
+   fois la fiche ouverte. On le lance au TOUCHER de la carte, pendant que la
+   page s'ouvre et que les étapes se dessinent. L'adresse est gardée en
+   mémoire par `urlSignee` : à l'ouverture, elle est déjà là.
+
+   `capture` et `passive` : on écoute avant tout le monde et on ne retarde
+   aucun geste. */
+document.addEventListener('pointerdown', (e) => {
+  const cible = e.target?.closest?.('[data-proc], [data-key]')
+  if (!cible) return
+  const id = cible.dataset.proc || cible.dataset.key
+  if (!id || id.length < 30) return          // un dossier porte son nom, pas un identifiant
+  const p = (allGestionProcedures || []).find(x => x.id === id)
+         || (allEquipeProcedures || []).find(x => x.id === id)
+  if (p?.video_url) urlSignee(p.video_url)
+}, { passive: true, capture: true })
+
 async function openEquipeDetail(procId) {
   if (await bloqueSiEssaiFini()) return
 

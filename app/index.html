@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=3d1a857f">
+<link rel="stylesheet" href="style.css?v=5a5cc3e3">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1956,9 +1956,14 @@
 
      ⚠ L'ORDRE EST IMPOSÉ PAR LE NAVIGATEUR. Il n'ouvre la fenêtre « choisissez
        ce que vous voulez partager » que dans la seconde qui suit un clic. Le
-       compte à rebours vient donc APRÈS le choix, jamais avant — et c'est
-       aussi ce qu'on veut : le délai sert à préparer l'écran une fois qu'on
-       sait ce qui sera filmé.
+       décompte vient donc APRÈS le choix, jamais avant.
+
+     ⚠ ET IL NE RETARDE PLUS L'ENREGISTREMENT. Il le faisait, et ça perdait les
+       premiers gestes : le navigateur bascule sur la fenêtre partagée dès
+       qu'on l'a choisie, donc personne ne voyait ce décompte et tout le monde
+       commençait à travailler pendant. La prise démarre maintenant à la
+       seconde où le partage est accordé ; le décompte n'est plus qu'un repère
+       pour se placer.
 
      ⚠ SUR TÉLÉPHONE, AUCUN NAVIGATEUR NE SAIT FILMER L'ÉCRAN. Le téléphone,
        lui, sait le faire tout seul — beaucoup l'ignorent. On explique donc
@@ -1978,7 +1983,7 @@
       <div class="subhead">Filmez un logiciel, l’IA en écrit les étapes</div>
 
       <div class="card">
-        <label class="f">Délai avant le départ</label>
+        <label class="f">Temps pour vous placer</label>
         <div class="proc-segm" id="ecran-delai" role="tablist" style="margin-top:8px;">
           <span class="p-seg-lens" id="ecran-delai-lens" aria-hidden="true"></span>
           <button type="button" class="p-seg" data-delai="5" role="tab">5 s</button>
@@ -1986,8 +1991,9 @@
           <button type="button" class="p-seg" data-delai="15" role="tab">15 s</button>
         </div>
         <div class="note" style="margin-top:12px;">
-          Vous choisissez d’abord la fenêtre à filmer. Le compte à rebours part
-          ensuite : c’est le temps de préparer votre écran.
+          L’enregistrement démarre dès que vous avez choisi la fenêtre. Le
+          décompte ne le retarde pas : il vous laisse le temps de vous placer
+          pendant que ça tourne.
         </div>
       </div>
 
@@ -2010,9 +2016,11 @@
     <div id="ecran-mobile" style="display:none;">
       <div class="subhead">Votre téléphone sait filmer son écran</div>
       <div class="card">
+        <!-- L'explication technique — « aucun navigateur ne peut filmer
+             l'écran » — a été retirée : elle parlait du problème plutôt que
+             de ce qu'il y a à faire, juste au-dessus de la marche à suivre. -->
         <div class="note" style="margin:0 0 12px;">
-          Aucun navigateur de téléphone ne peut filmer l’écran lui-même. Votre
-          téléphone, lui, le fait — voici comment, puis revenez importer la vidéo.
+          Trois gestes, puis revenez ici importer la vidéo.
         </div>
         <div class="ecran-sys" id="ecran-mode-emploi"></div>
       </div>
@@ -5182,7 +5190,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=11181ef1"></script>
+<script type="module" src="app.js?v=3c15993b"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

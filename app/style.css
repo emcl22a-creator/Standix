@@ -24417,8 +24417,17 @@ body.abo-expire [data-etab-plus]{
    On la centre donc par `left`, calculé sur `--col` — qui vaut 100 % sur
    tablette et 744 px sur ordinateur.
    ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ `feuille-fond` A LE MÊME DÉFAUT, et il avait été oublié. C'est l'autre
+   page posée en `position:fixed` pendant une sortie — celle qui se dissout
+   en arrière-plan. Ancrée elle aussi aux deux bords de la fenêtre, elle
+   s'élargissait à toute la largeur de l'écran le temps de disparaître : on
+   voyait la page grandir et se décaler d'un côté avant de s'effacer.
+
+   Corriger l'une sans l'autre ne réglait donc le problème qu'une fois sur
+   deux, selon le chemin de sortie. */
 @media (min-width: 700px) and (min-height: 600px){
-  .screen.feuille-part{
+  .screen.feuille-part,
+  .screen.feuille-fond{
     left:calc(50% - min(100%, var(--col, 460px)) / 2);
     right:auto;
     width:min(100%, var(--col, 460px));
@@ -24923,3 +24932,63 @@ html::-webkit-scrollbar-thumb:hover{
   font-size:calc(12.5px * var(--ech)); line-height:1.45;
   color:var(--label-3);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA FEUILLE N'A PLUS DE BORD SUR GRAND ÉCRAN
+
+   Une page qui se superpose — un dossier, une procédure — est une « feuille » :
+   fond, coins arrondis en haut, et une ombre qui la décolle de ce qu'il y a
+   dessous. Sur un téléphone, elle occupe toute la largeur : on ne voit que le
+   haut de cette ombre, et elle dit exactement ce qu'elle doit dire.
+
+   Sur une tablette ou un ordinateur, la feuille ne fait plus que la largeur de
+   la colonne. L'ombre déborde alors sur ses deux CÔTÉS, contre le fond de la
+   page — mesuré : dix-sept pixels de gris de chaque bord. Ça ne se lit plus
+   comme une ombre mais comme une bordure, un cadre autour de l'app.
+
+   Le liseré du haut reste, lui : il n'a pas de flou, donc pas de débord, et
+   c'est lui qui marque la jointure avec la barre.
+   ═══════════════════════════════════════════════════════════════════════════ */
+/* ⚠ LE SEUIL EST 520 PX, PAS 700. Je l'avais aligné sur le palier tablette —
+   et c'était faux deux fois. La question n'est pas « est-ce une tablette »
+   mais « la feuille est-elle plus étroite que la fenêtre » : dès qu'elle
+   l'est, son ombre tombe à côté d'elle au lieu de passer dessous.
+
+   Une fenêtre d'ordinateur haute de moins de 600 px n'atteint aucun palier :
+   l'app y garde sa colonne de 460 px, la fenêtre en fait 800, et le bord
+   gris réapparaissait. Un téléphone couché a le même profil.
+
+   En dessous de 520 px, la feuille occupe toute la largeur : l'ombre n'a plus
+   de côté où déborder, et elle reprend son rôle. */
+@media (min-width: 520px){
+  /* ═══ L'OMBRE MONTE, ELLE NE S'ÉTALE PLUS ═══
+
+     L'ombre d'origine — flou 34, écart −16 — débordait de dix-sept pixels de
+     CHAQUE CÔTÉ de la feuille. Sur téléphone, où la feuille occupe toute la
+     largeur, ces pixels tombent hors de l'écran et personne ne les voit. Dès
+     que la feuille est plus étroite que la fenêtre, ils se posent sur le fond
+     de la page et dessinent un cadre autour de l'app.
+
+   ⚠ J'AVAIS D'ABORD TOUT SUPPRIMÉ, y compris le relief du haut. C'était trop :
+     le haut n'était pas en cause.
+
+   ⚠ PUIS J'AI ESSAYÉ UNE BANDE EN PSEUDO-ÉLÉMENT, posée au-dessus du bord.
+     Elle ne pouvait pas marcher : la feuille porte `overflow:hidden`, qui
+     découpe tout enfant sortant de sa boîte. Une `box-shadow`, elle, n'est pas
+     découpée — c'est donc elle qu'il fallait régler.
+
+     LES VALEURS SONT MESURÉES, PAS DEVINÉES. Un écart négatif rétrécit le
+     rectangle d'ombre avant de le flouter : à −22 pour un flou de 18, il ne
+     reste plus rien à déborder sur les côtés, et le décalage de 18 px vers le
+     haut fait ressortir l'ombre au-dessus. Relevé en pixels : débord latéral
+     0 (contre 17 avant), et au ras du bord haut une densité de 22 contre 20
+     à l'origine — le même relief.
+
+     En dessous de 520 px, la feuille occupe toute la largeur : l'ombre
+     d'origine reprend, elle n'a plus de côté où déborder. */
+  body.sans-topbar .screen.active{
+    box-shadow:
+      0 -1px 0 rgba(28,28,38,0.07),
+      0 -18px 18px -22px rgba(20,20,30,0.34);
+  }
+}}

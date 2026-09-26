@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=7f73a4c0">
+<link rel="stylesheet" href="style.css?v=3d1a857f">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1866,6 +1866,65 @@
        Le trait au-dessus dit cette différence mieux qu'un titre.
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="outil-sep"></div>
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       ENREGISTRER L'ÉCRAN
+
+       Même famille que « Coller plusieurs vidéos » : ce n'est pas une façon de
+       créer une procédure, c'est un OUTIL qui fabrique la vidéo. On enregistre
+       son écran, puis on revient nommer la procédure et lancer l'analyse.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       FILMER MAINTENANT
+
+       Le chemin d'avant passait par l'application Photos : on sortait de
+       Standix, on filmait, on revenait, on retrouvait le fichier. Quatre
+       étapes pour une seule intention.
+
+       La caméra s'ouvre donc ICI, et la vidéo ne sort jamais de l'app.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="card outil-card" onclick="ouvrirCameraStandix()" id="mode-card-camera">
+    <div class="mode-choice-row">
+      <div class="mode-choice-icon">
+        <span class="mc-pl" style="background:linear-gradient(150deg,rgba(251,191,92,0.22),rgba(124,45,18,0.13))">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal2)" stroke-width="1.9"
+               stroke-linejoin="round" stroke-linecap="round">
+            <path d="M3 8.4a2 2 0 0 1 2-2h2.1l1.2-1.8h7.4L17 6.4h2a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <circle cx="12" cy="12.4" r="3.5"/>
+          </svg>
+        </span>
+      </div>
+      <div class="mode-choice-text">
+        <div class="mode-choice-title">Filmer maintenant</div>
+        <div class="mode-choice-desc">La caméra s’ouvre ici, sans passer par Photos</div>
+      </div>
+      <div class="mode-choice-arrow">›</div>
+    </div>
+  </div>
+
+  <div class="card outil-card" onclick="ouvrirEnregistrementEcran()" id="mode-card-ecran">
+    <div class="mode-choice-row">
+      <div class="mode-choice-icon">
+        <span class="mc-pl" style="background:linear-gradient(150deg,rgba(253,164,175,0.24),rgba(159,18,57,0.13))">
+          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal5)" stroke-width="1.9"
+               stroke-linejoin="round" stroke-linecap="round">
+            <rect x="2.6" y="4.2" width="18.8" height="12.4" rx="2.2"/>
+            <path d="M8.4 20.4h7.2"/><path d="M12 16.6v3.8"/>
+            <circle cx="12" cy="10.4" r="2.6" fill="url(#pal5)" stroke="none"/>
+          </svg>
+        </span>
+      </div>
+      <div class="mode-choice-text">
+        <div class="mode-choice-title">Enregistrer l’écran</div>
+        <!-- ⚠ LA MÊME CARTE MÈNE À DEUX PAGES : l'enregistreur sur ordinateur,
+             le mode d'emploi du téléphone ailleurs. La description dit donc ce
+             qu'on OBTIENT, pas comment — « un compte à rebours » aurait menti
+             à la moitié des gens. -->
+        <div class="mode-choice-desc">Votre écran devient une vidéo à analyser</div>
+      </div>
+      <div class="mode-choice-arrow">›</div>
+    </div>
+  </div>
+
   <div class="card outil-card" onclick="ouvrirCollage()" id="mode-card-coller">
     <div class="mode-choice-row">
       <div class="mode-choice-icon">
@@ -1891,6 +1950,76 @@
     </div>
 
   <!-- ═══ L'ÉCRAN DE COLLAGE ═══ -->
+
+  <!-- ═══════════════════════════════════════════════════════════════════════
+       L'ÉCRAN D'ENREGISTREMENT
+
+     ⚠ L'ORDRE EST IMPOSÉ PAR LE NAVIGATEUR. Il n'ouvre la fenêtre « choisissez
+       ce que vous voulez partager » que dans la seconde qui suit un clic. Le
+       compte à rebours vient donc APRÈS le choix, jamais avant — et c'est
+       aussi ce qu'on veut : le délai sert à préparer l'écran une fois qu'on
+       sait ce qui sera filmé.
+
+     ⚠ SUR TÉLÉPHONE, AUCUN NAVIGATEUR NE SAIT FILMER L'ÉCRAN. Le téléphone,
+       lui, sait le faire tout seul — beaucoup l'ignorent. On explique donc
+       comment, plutôt que de masquer la fonction.
+       ═══════════════════════════════════════════════════════════════════════ -->
+  <div class="screen" inert id="p-ecran">
+    <div class="detail-header">
+      <button class="back-btn" onclick="showGestionScreen('p-create')" aria-label="Retour">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
+             stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <h1 class="pagehead">Enregistrer l’écran</h1>
+    </div>
+
+    <!-- ─── Sur ordinateur ─── -->
+    <div id="ecran-pc">
+      <div class="subhead">Filmez un logiciel, l’IA en écrit les étapes</div>
+
+      <div class="card">
+        <label class="f">Délai avant le départ</label>
+        <div class="proc-segm" id="ecran-delai" role="tablist" style="margin-top:8px;">
+          <span class="p-seg-lens" id="ecran-delai-lens" aria-hidden="true"></span>
+          <button type="button" class="p-seg" data-delai="5" role="tab">5 s</button>
+          <button type="button" class="p-seg" data-delai="10" role="tab">10 s</button>
+          <button type="button" class="p-seg" data-delai="15" role="tab">15 s</button>
+        </div>
+        <div class="note" style="margin-top:12px;">
+          Vous choisissez d’abord la fenêtre à filmer. Le compte à rebours part
+          ensuite : c’est le temps de préparer votre écran.
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <div class="ecran-ligne">
+          <span class="ecran-pt"></span>
+          <span>Le micro est allumé pendant l’enregistrement. Commentez à voix haute : c’est ce que l’IA écoute pour écrire les étapes.</span>
+        </div>
+        <div class="ecran-ligne">
+          <span class="ecran-pt"></span>
+          <span>Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.</span>
+        </div>
+      </div>
+
+      <button class="btn block" style="margin-top:20px;" id="ecran-demarrer">Choisir l’écran et démarrer</button>
+      <div class="error-msg" id="ecran-erreur"></div>
+    </div>
+
+    <!-- ─── Sur téléphone et tablette ─── -->
+    <div id="ecran-mobile" style="display:none;">
+      <div class="subhead">Votre téléphone sait filmer son écran</div>
+      <div class="card">
+        <div class="note" style="margin:0 0 12px;">
+          Aucun navigateur de téléphone ne peut filmer l’écran lui-même. Votre
+          téléphone, lui, le fait — voici comment, puis revenez importer la vidéo.
+        </div>
+        <div class="ecran-sys" id="ecran-mode-emploi"></div>
+      </div>
+      <button class="btn block" style="margin-top:20px;" id="ecran-importer">J’ai ma vidéo — l’utiliser</button>
+    </div>
+  </div>
+
   <div class="screen" inert id="p-coller">
     <div class="detail-header">
       <button class="back-btn" onclick="showGestionScreen('p-create')" aria-label="Retour">
@@ -4640,6 +4769,11 @@
     <linearGradient id="pal2" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#7C2D12"/><stop offset="1" stop-color="#FBBF5C"/></linearGradient>
     <linearGradient id="pal3" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#14532D"/><stop offset="1" stop-color="#5FDDA0"/></linearGradient>
     <linearGradient id="pal4" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#3A4453"/><stop offset="1" stop-color="#A5B0C0"/></linearGradient>
+    <!-- pal5 : le rouge de l'enregistrement. Il manquait — la carte
+         « Enregistrer l'écran » portait un halo corail et un dessin gris
+         acier, emprunté au mode manuel : deux couleurs qui se contredisaient
+         dans le même rond. -->
+    <linearGradient id="pal5" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#9F1239"/><stop offset="1" stop-color="#FDA4AF"/></linearGradient>
 
     <!-- ═══ LES DEUX TEINTES FIXES DE LA PAGE D'UN DOSSIER ═══
 
@@ -4971,8 +5105,84 @@
          seraient prises dans son contexte d'empilement et passeraient sous la
          barre du bas.
        ═══════════════════════════════════════════════════════════════════════ -->
-  
-<script type="module" src="app.js?v=9d26ddcd"></script>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════
+     LA CAMÉRA
+
+   ⚠ ELLE EST HORS DE `.app`, au niveau du `body`, pour la même raison que les
+     pages qui montent du bas : posée dedans, elle serait prise dans son
+     contexte d'empilement et passerait sous la barre du bas.
+
+     Elle occupe tout l'écran, sans marge ni carte. C'est voulu : pendant
+     qu'on filme, l'image est la seule chose qui compte — tout le reste de
+     l'app doit disparaître, y compris la barre d'onglets.
+
+   ⚠ L'APERÇU EST `muted`. Sans cela, le micro repart dans le haut-parleur, le
+     haut-parleur revient dans le micro, et l'appareil siffle.
+     ═══════════════════════════════════════════════════════════════════════════ -->
+<div class="cam-voile" id="cam-voile" style="display:none;">
+  <video id="cam-apercu" class="cam-apercu" autoplay muted playsinline></video>
+
+  <div class="cam-haut">
+    <button type="button" class="cam-rond" id="cam-fermer" aria-label="Fermer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+           stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+    <span class="cam-badge" id="cam-badge">Ouverture…</span>
+    <button type="button" class="scan-lampe" id="cam-lampe" aria-label="Lampe torche" style="display:none;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6v3.2a1 1 0 0 1-.3.7l-1 1a1 1 0 0 0-.3.7V20a1.4 1.4 0 0 1-2.8 0V8.6a1 1 0 0 0-.3-.7l-1-1a1 1 0 0 1-.3-.7z"></path><line x1="9" y1="6.4" x2="15" y2="6.4"></line><line x1="12" y1="12.5" x2="12" y2="15"></line></svg></button>
+  </div>
+
+  <!-- Le message d'échec prend la place de tout le reste : sans caméra, il n'y
+       a rien à commander. -->
+  <div class="cam-echec" id="cam-echec" style="display:none;"></div>
+
+  <div class="cam-bas" id="cam-bas">
+    <div class="cam-minute" id="cam-minute"><span class="cam-rouge"></span><b>0:00</b><i>sur 5:00</i></div>
+    <div class="cam-consigne" id="cam-consigne">Appuyez pour filmer · 5 min au maximum</div>
+    <div class="cam-rangee">
+      <!-- ⚠ LES DEUX BOUTONS PARTAGENT LA MÊME CASE. Le demi-tour sert avant
+           la prise, la pause pendant : ils ne coexistent jamais. Empilés dans
+           une seule case de la grille, la colonne garde sa largeur et le
+           déclencheur ne bouge pas d'un pixel quand on passe de l'un à
+           l'autre. -->
+      <div class="cam-cote">
+        <button type="button" class="cam-rond" id="cam-face" aria-label="Changer de caméra">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.5 11.5a8.5 8.5 0 0 0-14.3-4.6L3.5 9.4"/><path d="M3.5 5v4.4h4.4"/>
+            <path d="M3.5 12.5a8.5 8.5 0 0 0 14.3 4.6l2.7-2.5"/><path d="M20.5 19v-4.4h-4.4"/>
+          </svg>
+        </button>
+        <button type="button" class="cam-rond" id="cam-pause" aria-label="Mettre en pause">
+          <svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <rect x="7" y="5" width="3.6" height="14" rx="1.3"/>
+            <rect x="13.4" y="5" width="3.6" height="14" rx="1.3"/>
+          </svg>
+          <svg class="ic-repr" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M8.4 5.6a1 1 0 0 1 1.5-.87l9 6.4a1 1 0 0 1 0 1.74l-9 6.4a1 1 0 0 1-1.5-.87z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Le déclencheur. L'anneau se remplit sur cinq minutes : on voit le
+           temps qu'il reste sans avoir à lire un chiffre. -->
+      <button type="button" class="cam-decl" id="cam-decl" aria-label="Filmer">
+        <svg class="cam-anneau" viewBox="0 0 80 80" aria-hidden="true">
+          <circle class="cam-anneau-fond" cx="40" cy="40" r="36"></circle>
+          <circle class="cam-anneau-part" id="cam-anneau-part" cx="40" cy="40" r="36"></circle>
+        </svg>
+        <span class="cam-pastille" id="cam-pastille"></span>
+      </button>
+
+      <!-- « Annuler » disait faux : ce bouton ne quitte pas la caméra, il jette
+           la prise et remet le compteur à zéro. On filme à nouveau dans la
+           foulée — donc « Recommencer ». -->
+      <button type="button" class="cam-texte" id="cam-refaire">Recommencer</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="app.js?v=11181ef1"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

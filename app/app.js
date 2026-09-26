@@ -10986,9 +10986,22 @@ window.ouvrirRecentes = function () {
   })
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA VIGNETTE D'UNE PROCÉDURE DANS UNE LISTE
+
+ ⚠ ELLE POSAIT `video_url` ET `image_url` DIRECTEMENT EN `src`. Ces colonnes
+   contiennent un CHEMIN depuis que le dépôt est privé, pas une adresse : les
+   vignettes ne pouvaient plus rien charger. Elles passent maintenant par
+   `data-fichier`, que `signerMedias` remplit — comme partout ailleurs.
+
+ ⚠ ET ON PRÉFÈRE L'IMAGE D'ATTENTE À LA VIDÉO. Une liste de vingt procédures
+   faisait télécharger vingt en-têtes de vidéo, soit plusieurs méga-octets
+   pour autant de petits carrés. Le JPEG en pèse quarante kilo-octets.
+   ═══════════════════════════════════════════════════════════════════════════ */
 function vignetteProcedure(p) {
-  if (p.image_url) {
-    return `<img src="${escapeHtml(p.image_url)}" alt="" loading="lazy">`
+  const fixe = p.image_url || p.apercu_url
+  if (fixe) {
+    return `<img data-fichier="${escapeHtml(cheminFichier(fixe))}" alt="" loading="lazy">`
   }
   if (p.video_url) {
     /* ═══ POURQUOI `#t=0.1` NE SUFFIT PAS SUR IPHONE ═══
@@ -10998,13 +11011,10 @@ function vignetteProcedure(p) {
 
        Safari sur iOS l'ignore. Il charge les métadonnées — durée, dimensions —
        et laisse le cadre VIDE, jusqu'à ce qu'on lui demande explicitement une
-       position. C'est pourquoi les vignettes ne s'affichaient pas chez toi
-       alors que le dessin était correct.
-
-       Le placement est donc forcé par le code, après `loadedmetadata`. Le
-       `data-video` sert à retrouver l'élément une fois posé dans la page. */
-    return `<video data-video src="${escapeHtml(p.video_url)}#t=0.1" preload="metadata"
-                   muted playsinline></video>
+       position. Le placement est donc forcé par le code, après
+       `loadedmetadata` ; `data-video-fichier` porte le chemin à signer. */
+    return `<video data-video-fichier="${escapeHtml(cheminFichier(p.video_url))}"
+                   preload="metadata" muted playsinline></video>
             <span class="ac-rec-play">\u25B6</span>`
   }
   return `<span class="ac-rec-doc">
@@ -11014,6 +11024,27 @@ function vignetteProcedure(p) {
         <path d="M13.6 3v5h5"/>
       </svg>
     </span>`
+}
+
+/* ═══ ELLE ÉTAIT APPELÉE SANS EXISTER ═══
+
+   `preparerVignetteVideo` n'était définie nulle part : l'appel levait une
+   `ReferenceError` au milieu d'une boucle, et toute la liste des procédures
+   récentes cessait de se dessiner à la première carte. Rien ne le signalait
+   à l'écran — la page paraissait simplement vide.
+
+   Elle signe maintenant les vignettes et force la première image, ce que son
+   nom promettait. */
+function preparerVignetteVideo(racine) {
+  signerMedias(racine)
+  ;(racine || document).querySelectorAll('[data-video-fichier]:not([data-video-signe])')
+    .forEach(async (v) => {
+      v.setAttribute('data-video-signe', '1')
+      const url = await urlSignee(v.getAttribute('data-video-fichier'))
+      if (!url) return
+      v.src = url + '#t=0.1'
+      premiereImage(v)
+    })
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -15396,22 +15427,36 @@ window.ouvrirEnregistrementEcran = ouvrirEnregistrementEcran
 
 /* Le mode d'emploi du téléphone, celui de SON système. Montrer les deux
    listes obligerait à chercher la sienne. */
+/* ═══ CINQ ÉTAPES ÉTAIENT QUATRE DE TROP ═══
+
+   La liste d'origine mélangeait trois choses : régler son téléphone une fois
+   pour toutes, faire le geste, et savoir s'arrêter. Lue debout, devant la
+   machine qu'on veut filmer, elle devenait impossible à suivre.
+
+   Il n'en reste que TROIS, une par geste — ouvrir, lancer, filmer — chacune
+   tenant sur une ligne. Ce qui n'est pas un geste est sorti de la liste :
+   le réglage préalable devient une note en dessous, et on ne la lit que si
+   le bouton manque.
+
+ ⚠ « COMMENTEZ À VOIX HAUTE » RESTE EN GRAS. C'est la seule consigne dont
+   dépend le résultat : sans parole, l'IA n'a rien à écouter et ne peut pas
+   écrire les étapes. */
 function modeEmploiEcran() {
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
   const etapes = iOS
-    ? ['Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».',
-       'Ouvrez le centre de contrôle : glissez depuis le coin haut droit.',
-       'Appui LONG sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».',
-       'Ouvrez le logiciel à filmer et commentez à voix haute.',
-       'Pour arrêter : touchez l’heure en rouge, en haut à gauche.']
-    : ['Ouvrez le volet des réglages rapides : glissez depuis le haut de l’écran.',
-       'Touchez « Enregistreur d’écran » (il est parfois à faire glisser depuis la liste complète).',
-       'Activez le son du micro, puis démarrez.',
-       'Ouvrez le logiciel à filmer et commentez à voix haute.',
-       'Pour arrêter : rouvrez le volet et touchez « Arrêter ».']
+    ? ['Glissez depuis le coin haut droit de l’écran.',
+       'Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».',
+       'Filmez en <b>commentant à voix haute</b>. Pour arrêter : touchez l’heure en rouge.']
+    : ['Glissez depuis le haut de l’écran.',
+       'Touchez « Enregistreur d’écran », activez le micro, puis démarrez.',
+       'Filmez en <b>commentant à voix haute</b>. Pour arrêter : rouvrez le volet et touchez « Arrêter ».']
+  const secours = iOS
+    ? 'Le bouton n’y est pas ? Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».'
+    : 'Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.'
   return `<div class="ecran-sys-t">${iOS ? 'Sur iPhone et iPad' : 'Sur Android'}</div>`
     + etapes.map((t, i) => `<div class="ecran-etape"><span>${i + 1}</span><p>${t}</p></div>`).join('')
+    + `<div class="ecran-secours">${secours}</div>`
 }
 
 function majDelaiEcran() {
@@ -15519,16 +15564,6 @@ async function lancerPriseEcran() {
   const pisteVideo = ecranFlux?.getVideoTracks?.()[0]
   if (!pisteVideo || pisteVideo.readyState !== 'live') { nettoyerEcran(); return }
 
-  /* Le compte à rebours. Il sert aussi à la reprise : on vient de jeter une
-     prise, il faut le temps de se remettre en place. */
-  for (let reste = ecranDelai; reste > 0; reste--) {
-    voileEcran(`<div class="ecran-compte"><b>${reste}</b><span>préparez votre écran</span></div>`)
-    await new Promise(r => setTimeout(r, 1000))
-    /* La personne a fermé le partage pendant le décompte. */
-    if (pisteVideo.readyState !== 'live') { fermerVoileEcran(); nettoyerEcran(); return }
-  }
-  fermerVoileEcran()
-
   const morceaux = []
   let type = ''
   try {
@@ -15563,6 +15598,9 @@ async function lancerPriseEcran() {
       lancerPriseEcran()
       return
     }
+    /* ⚠ LU AVANT `nettoyerEcran()`, QUI REMET LE CUMUL À ZÉRO. Lu après, la
+       durée valait zéro et le garde-fou des deux secondes refusait tout. */
+    const secondes = Math.round(ecranCumul)
     const extension = (type || '').includes('mp4') ? 'mp4' : 'webm'
     const nom = `ecran-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${extension}`
     const fichier = new File(morceaux, nom, { type: type || 'video/webm' })
@@ -15575,18 +15613,51 @@ async function lancerPriseEcran() {
 
        Ici on la connaît : on l'a comptée seconde par seconde pour la pastille.
        On l'attache au fichier, `chargerVideoPourIA` la reprend. */
-    try { fichier.dureeConnue = Math.max(1, Math.round(ecranCumul)) } catch (e) {}
+    try { fichier.dureeConnue = Math.max(1, secondes) } catch (e) {}
     nettoyerEcran()
     if (!fichier.size) { toast("L'enregistrement est vide."); return }
+    /* ⚠ DEPUIS QUE LA PRISE DÉMARRE TOUT DE SUITE, fermer le partage dans la
+       seconde produit un fichier d'une seconde au lieu de rien. On ne le
+       livre pas : il n'y a rien à analyser dedans. */
+    if (secondes < 2) { toast('Enregistrement trop court.'); return }
     collageEnAttente = fichier
     showGestionScreen('p-create')
     toast('Enregistrement prêt — nommez la procédure, puis lancez l’analyse')
   }
 
+  /* ═══════════════════════════════════════════════════════════════════════
+     ON ENREGISTRE D'ABORD, ON DÉCOMPTE ENSUITE
+
+   ⚠ C'ÉTAIT L'INVERSE, ET ÇA PERDAIT LE DÉBUT. Le décompte s'écoulait avant
+     `start()`. Or le navigateur, dès qu'on a choisi la fenêtre à partager,
+     bascule dessus : personne ne voyait ce décompte, et pendant ces cinq à
+     quinze secondes on faisait déjà les premiers gestes — qui n'étaient pas
+     filmés. L'enregistrement semblait commencer « au moment où on quitte
+     l'app », en retard sur ce qu'on montrait.
+
+     La prise démarre donc ICI, à la seconde où le partage est accordé. Le
+     décompte reste, mais il ne retarde plus rien : c'est un repère pour se
+     placer, pendant que ça tourne déjà. Quelques secondes de préparation au
+     début d'une vidéo ne gênent personne — un geste manqué, si.
+     ═══════════════════════════════════════════════════════════════════════ */
   ecranEnregistreur.start(1000)
   ecranDepart = Date.now()
   ecranCumul = 0
   ecranPause = false
+
+  const enr = ecranEnregistreur   // repère : « Recommencer » en fabrique un autre
+  for (let reste = ecranDelai; reste > 0; reste--) {
+    /* Prise arrêtée, jetée ou relancée pendant le décompte : on se retire
+       sans rien peindre, sinon deux voiles se disputeraient l'écran. */
+    if (ecranEnregistreur !== enr || enr.state === 'inactive') return
+    const v = voileEcran(
+      `<div class="ecran-compte"><b>${reste}</b>` +
+      `<span><i class="ecran-rouge"></i>ça tourne déjà — placez-vous</span></div>`)
+    v.classList.remove('discret')
+    await new Promise(r => setTimeout(r, 1000))
+  }
+  if (ecranEnregistreur !== enr || enr.state === 'inactive') return
+
   peindrePastilleEcran()
   ecranMinuteur = setInterval(peindrePastilleEcran, 1000)
 }
@@ -18520,6 +18591,83 @@ async function extraireImages(fichier, duree) {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   L'IMAGE D'ATTENTE D'UNE VIDÉO
+
+   Ouvrir une procédure montrait un cadre noir pendant une à trois secondes.
+   Ce n'est pas l'app qui est lente : c'est la vidéo. Avant d'afficher quoi que
+   ce soit, le navigateur doit télécharger l'en-tête d'un fichier de vingt à
+   cinquante méga-octets, puis les premières images — sur un réseau mobile,
+   c'est long, et il n'y a aucun moyen d'accélérer ça.
+
+   On triche donc : on enregistre la PREMIÈRE IMAGE de la vidéo, en JPEG, au
+   moment de l'envoi. Quarante kilo-octets contre quarante méga-octets — mille
+   fois moins. La fiche l'affiche immédiatement, la vidéo se charge derrière,
+   et personne ne voit la différence : l'image d'attente EST la première image
+   du film.
+
+ ⚠ ON PREND L'IMAGE À UNE SECONDE, PAS À ZÉRO. Beaucoup de vidéos commencent
+   sur un fondu au noir ou sur une image de calibration ; une seconde plus
+   loin, on a quelque chose à regarder. Si la vidéo est plus courte, on prend
+   son milieu.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function imageApercu(fichier) {
+  const url = URL.createObjectURL(fichier)
+  const v = document.createElement('video')
+  v.muted = true; v.playsInline = true; v.preload = 'auto'
+  v.setAttribute('playsinline', ''); v.setAttribute('muted', '')
+  v.style.cssText = 'position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none'
+  v.src = url
+  document.body.appendChild(v)
+  const attendre = (evt, ms) => new Promise((ok, ko) => {
+    const t = setTimeout(() => { v.removeEventListener(evt, h); ko(new Error('délai ' + evt)) }, ms)
+    const h = () => { clearTimeout(t); v.removeEventListener(evt, h); ok() }
+    v.addEventListener(evt, h)
+  })
+  try {
+    if (v.readyState < 1) await attendre('loadedmetadata', 10000)
+    if (!v.videoWidth) return null
+    const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 0
+    /* Safari ne décode aucune image tant que la lecture n'a pas démarré une
+       fois : un départ-arrêt muet suffit. */
+    try { await v.play(); v.pause() } catch (e) {}
+    const t = d > 1.2 ? 1 : (d ? d / 2 : 0)
+    try { const vu = attendre('seeked', 6000); v.currentTime = t; await vu } catch (e) {}
+
+    const echelle = Math.min(1, 720 / Math.max(v.videoWidth, v.videoHeight))
+    const toile = document.createElement('canvas')
+    toile.width = Math.round(v.videoWidth * echelle)
+    toile.height = Math.round(v.videoHeight * echelle)
+    toile.getContext('2d').drawImage(v, 0, 0, toile.width, toile.height)
+    const blob = await new Promise(ok => toile.toBlob(ok, 'image/jpeg', 0.72))
+    return blob && blob.size > 500 ? blob : null
+  } catch (e) {
+    console.warn('Standix · image d\'attente non produite :', e?.message || e)
+    return null
+  } finally {
+    v.removeAttribute('src'); v.load?.(); v.remove()
+    URL.revokeObjectURL(url)
+  }
+}
+
+/* L'envoi de cette image. Séparé, parce qu'il ne doit JAMAIS faire échouer une
+   création : sans image d'attente, la fiche retrouve simplement son cadre noir
+   d'avant. On renvoie le chemin, ou rien. */
+async function envoyerApercu(cheminVideo, fichier) {
+  try {
+    const blob = await imageApercu(fichier)
+    if (!blob) return null
+    const chemin = `${cheminVideo}.jpg`
+    const { error } = await supabase.storage.from('procedo-videos')
+      .upload(chemin, blob, { contentType: 'image/jpeg', cacheControl: CACHE_LONG, upsert: true })
+    if (error) throw error
+    return chemin
+  } catch (e) {
+    console.warn('Standix · image d\'attente non envoyée :', e?.message || e)
+    return null
+  }
+}
+
 /* Coupe-circuit : `localStorage['standix-ia-rapide'] = 'non'` rend l'ancien
    chemin Azure seul, sans nouvelle version de l'app. */
 function iaRapideCoupee() {
@@ -19989,6 +20137,16 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     signalerEtapeIA('Vid\u00e9o rattach\u00e9e\u2026')
     /* La procédure existe déjà — elle a été créée avant la compression. On ne
        fait que lui rattacher sa vidéo. */
+    /* L'image d'attente se fabrique à partir du fichier qu'on a encore sous la
+       main, et s'envoie sans faire attendre : l'analyse, qui dure des minutes,
+       n'a pas à patienter derrière quarante kilo-octets. On rattache le chemin
+       à la procédure dès qu'il est là. */
+    envoyerApercu(videoUrl, aiVideoFile).then((apercu) => {
+      if (!apercu) return
+      supabase.from('procedures').update({ apercu_url: apercu }).eq('id', aiProcedureId)
+        .then(() => {}, () => {})
+    })
+
     const { error: procError } = await supabase
       .from('procedures')
       .update({ video_url: videoUrl })
@@ -23113,6 +23271,7 @@ async function publishProcedure(errorElId, btnId) {
   setButtonLoading(publishBtn, true)
 
   let videoUrl = null
+  let apercuEnRoute = null
   if (currentVideoFile) {
     const path = `${currentMembre.entreprise_id}/${Date.now()}_${currentVideoFile.name}`
     const { error: uploadError } = await supabase.storage.from('procedo-videos').upload(path, currentVideoFile, { cacheControl: CACHE_LONG })
@@ -23122,6 +23281,9 @@ async function publishProcedure(errorElId, btnId) {
       return
     }
     videoUrl = path
+    /* Même image d'attente que sur le chemin IA. Elle part en arrière-plan :
+       la publication ne doit pas attendre après elle. */
+    apercuEnRoute = envoyerApercu(path, currentVideoFile)
   }
 
   /* En modification, on met à jour la ligne existante au lieu d'en créer une
@@ -23137,6 +23299,17 @@ async function publishProcedure(errorElId, btnId) {
                   sous_categorie: sousCategorie, categorie_icone: categorieIcone,
                   video_url: videoUrl, created_by: currentMembre.id })
         .select().single()
+
+  /* L'image d'attente arrive après coup : la ligne existe déjà, on la lui
+     rattache quand elle est prête. Si elle n'arrive jamais, la fiche se
+     comporte comme avant. */
+  if (apercuEnRoute && newProc?.id) {
+    apercuEnRoute.then((apercu) => {
+      if (!apercu) return
+      supabase.from('procedures').update({ apercu_url: apercu }).eq('id', newProc.id)
+        .then(() => {}, () => {})
+    })
+  }
 
   /* Les anciennes étapes sont remplacées : c'est plus sûr que de rapprocher
      ligne à ligne, et l'ordre reste celui de l'écran. */
@@ -23249,6 +23422,10 @@ async function openAnalyse(procId) {
   const procConnue = (allGestionProcedures || []).find(p => p.id === procId)
   reinitialiserVideoFiche('analyse-video-frame', 'analyse-video', !!procConnue?.video_url)
   const promesseVideo = procConnue?.video_url ? urlSignee(procConnue.video_url) : null
+  const promesseApercu = procConnue?.apercu_url ? urlSignee(procConnue.apercu_url) : null
+  /* On branche TOUT DE SUITE, sans attendre les étapes : l'image d'attente
+     s'affiche en une fraction de seconde, la vidéo se charge derrière. */
+  poserVideoFiche(document.getElementById('analyse-video'), promesseApercu, promesseVideo, perime)
 
   const depuis = document.querySelector('#gestion-app .screen.active')?.id
   if (depuis && depuis !== 'p-analyse') retourApresAnalyse = depuis
@@ -23451,11 +23628,25 @@ async function openAnalyse(procId) {
 
   if (proc.video_url) {
     videoFrame.style.display = 'block'
+    /* Le raccourci du haut n'a pas pu servir — la procédure ne venait pas du
+       cache, ou sa vidéo a changé depuis. On refait le chemin complet. */
+    if (proc.apercu_url && !videoEl.poster) {
+      urlSignee(proc.apercu_url).then((u) => { if (u && !perime()) videoEl.poster = u }, () => {})
+    }
     const adresse = (procConnue?.video_url === proc.video_url && promesseVideo)
       ? await promesseVideo
       : await urlSignee(proc.video_url)
     if (perime()) return
-    videoEl.src = adresse || ''
+    if (adresse && videoEl.src !== adresse) {
+      videoEl.src = adresse
+      premiereImage(videoEl)
+    } else if (!adresse) {
+      videoEl.src = ''
+    }
+    /* Les procédures d'avant l'image d'attente n'en ont pas. On la fabrique
+       une fois, en arrière-plan, et toutes les ouvertures suivantes — pour
+       toute l'équipe — seront immédiates. */
+    if (!proc.apercu_url && adresse) rattraperApercu(proc.id, proc.video_url, adresse)
   } else {
     videoFrame.style.display = 'none'
   }
@@ -25573,10 +25764,23 @@ window.ouvrirQuota = async function() {
       </div>` : ''}
     </div>
 
+    <!-- ⚠ L'INFINI NE VEUT PLUS RIEN DIRE ICI. Il accompagnait « tout le reste
+         est gratuit » : sans illimité à annoncer, le symbole ∞ posé devant une
+         phrase qui parle de ce qu'on COMPTE disait exactement le contraire.
+
+         À sa place, le sujet de la phrase : une vidéo marquée du signe de
+         l'IA. C'est ce qui est compté, et c'est la seule chose comptée. -->
     <div class="quota-illimite">
-      <span class="ic">\u221e</span>
-      <span>Seules les vid\u00e9os analys\u00e9es par l\u2019IA sont compt\u00e9es.
-        <b>Tout le reste est gratuit.</b></span>
+      <span class="ic" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2.6" y="5.6" width="13.4" height="12.8" rx="2.6"/>
+          <path d="M16 10.6 20.6 8v8l-4.6-2.6"/>
+          <path d="M8.1 9.1l.72 1.88 1.88.72-1.88.72-.72 1.88-.72-1.88L5.5 11.7l1.88-.72z"
+                fill="currentColor" stroke="none"/>
+        </svg>
+      </span>
+      <span>Seules les vid\u00e9os analys\u00e9es par l\u2019IA sont compt\u00e9es.</span>
     </div>
     ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
         ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
@@ -26000,9 +26204,129 @@ function reinitialiserVideoFiche(cadreId, videoId, auraUneVideo) {
   if (v) {
     try { v.pause() } catch (e) {}
     v.removeAttribute('src')
+    /* ⚠ L'IMAGE D'ATTENTE AUSSI. Sans cette ligne, on ouvrirait une fiche sur
+       la première image de la procédure PRÉCÉDENTE — le défaut qu'on avait
+       corrigé pour la vidéo, revenu par l'affiche. */
+    v.removeAttribute('poster')
     v.load?.()
   }
   if (cadre) cadre.style.display = auraUneVideo ? 'block' : 'none'
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   POURQUOI UNE FICHE METTAIT DEUX SECONDES À MONTRER SA VIDÉO
+
+   Trois attentes s'enchaînaient, dont deux inutiles :
+
+   ① L'adresse signée n'était demandée qu'à l'ouverture. Réglé : elle part au
+     TOUCHER de la carte (voir l'écouteur `pointerdown` plus bas).
+
+   ② LE TÉLÉCHARGEMENT DE LA VIDÉO NE COMMENÇAIT QU'APRÈS LES ÉTAPES. La
+     promesse d'adresse existait dès le début, mais on ne la consommait qu'en
+     bas de la fonction, après l'attente des étapes et parfois une requête de
+     plus. Le navigateur attendait donc, sans rien à faire, pendant qu'on
+     dessinait du texte. On pose maintenant la source dès que l'adresse
+     arrive, sans rien bloquer.
+
+   ③ ET SAFARI SUR IPHONE NE PEINT RIEN. Il charge les métadonnées puis laisse
+     le cadre NOIR jusqu'à ce qu'on lui demande une position précise. C'était
+     déjà connu pour les vignettes de la liste ; la fiche, elle, ne le faisait
+     pas — d'où un grand rectangle noir là où la liste, juste avant, montrait
+     bien une image.
+
+   Reste le fond du problème : une vidéo pèse des dizaines de méga-octets, et
+   la première image ne s'affiche qu'une fois son en-tête téléchargé. D'où
+   l'image d'attente, mille fois plus légère, posée en `poster`.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function premiereImage(v) {
+  const poser = () => { try { v.currentTime = 0.1 } catch (e) {} }
+  if (v.readyState >= 1) poser()
+  else v.addEventListener('loadedmetadata', poser, { once: true })
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PROCÉDURES D'AVANT N'ONT PAS D'IMAGE D'ATTENTE
+
+   Elles ont été envoyées quand la fonction n'existait pas. Sans rattrapage,
+   elles resteraient lentes pour toujours — et ce sont justement celles que
+   l'équipe consulte le plus.
+
+   On la fabrique donc à la première ouverture par un gérant : un élément
+   vidéo caché charge juste assez du fichier pour en tirer une image, et
+   l'envoie. La procédure est réparée pour tout le monde, définitivement.
+
+ ⚠ `crossOrigin` AVANT `src`, SINON LA TOILE EST « TEINTÉE » et refuse de
+   rendre l'image. Le stockage autorise la lecture croisée ; l'attribut posé
+   après la source n'aurait aucun effet.
+
+ ⚠ UNE SEULE À LA FOIS, ET UNE SEULE FOIS. Ouvrir dix fiches ne doit pas
+   lancer dix téléchargements de plus en arrière-plan.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const apercusRattrapes = new Set()
+let rattrapageEnCours = false
+
+async function rattraperApercu(procId, cheminVideo, adresseSignee) {
+  if (!procId || !cheminVideo || !adresseSignee) return
+  if (rattrapageEnCours || apercusRattrapes.has(procId)) return
+  if (!currentMembre || currentMembre.role !== 'gestion') return
+  apercusRattrapes.add(procId)
+  rattrapageEnCours = true
+
+  const v = document.createElement('video')
+  v.crossOrigin = 'anonymous'
+  v.muted = true; v.playsInline = true; v.preload = 'auto'
+  v.setAttribute('playsinline', ''); v.setAttribute('muted', '')
+  v.style.cssText = 'position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none'
+  document.body.appendChild(v)
+  const attendre = (evt, ms) => new Promise((ok, ko) => {
+    const t = setTimeout(() => { v.removeEventListener(evt, h); ko(new Error('délai ' + evt)) }, ms)
+    const h = () => { clearTimeout(t); v.removeEventListener(evt, h); ok() }
+    v.addEventListener(evt, h)
+  })
+  try {
+    v.src = adresseSignee
+    await attendre('loadedmetadata', 20000)
+    if (!v.videoWidth) throw new Error('sans image')
+    const d = isFinite(v.duration) && v.duration > 0 ? v.duration : 0
+    try { await v.play(); v.pause() } catch (e) {}
+    try { const vu = attendre('seeked', 15000); v.currentTime = d > 1.2 ? 1 : 0; await vu } catch (e) {}
+
+    const echelle = Math.min(1, 720 / Math.max(v.videoWidth, v.videoHeight))
+    const toile = document.createElement('canvas')
+    toile.width = Math.round(v.videoWidth * echelle)
+    toile.height = Math.round(v.videoHeight * echelle)
+    toile.getContext('2d').drawImage(v, 0, 0, toile.width, toile.height)
+    const blob = await new Promise(ok => toile.toBlob(ok, 'image/jpeg', 0.72))
+    if (!blob || blob.size < 500) throw new Error('image vide')
+
+    const chemin = `${cheminVideo}.jpg`
+    const { error } = await supabase.storage.from('procedo-videos')
+      .upload(chemin, blob, { contentType: 'image/jpeg', cacheControl: CACHE_LONG, upsert: true })
+    if (error) throw error
+    await supabase.from('procedures').update({ apercu_url: chemin }).eq('id', procId)
+    const enMemoire = (allGestionProcedures || []).find(x => x.id === procId)
+    if (enMemoire) enMemoire.apercu_url = chemin
+    console.log('Standix · image d\'attente rattrapée pour', procId)
+  } catch (e) {
+    console.warn('Standix · rattrapage d\'image d\'attente abandonné :', e?.message || e)
+  } finally {
+    rattrapageEnCours = false
+    v.removeAttribute('src'); v.load?.(); v.remove()
+  }
+}
+
+function poserVideoFiche(videoEl, promesseApercu, promesseVideo, perime) {
+  if (!videoEl) return
+  if (promesseApercu) {
+    promesseApercu.then((u) => { if (u && !perime()) videoEl.poster = u }, () => {})
+  }
+  if (promesseVideo) {
+    promesseVideo.then((u) => {
+      if (!u || perime() || videoEl.src === u) return
+      videoEl.src = u
+      premiereImage(videoEl)
+    }, () => {})
+  }
 }
 
 /* ═══ ON PRÉPARE LA VIDÉO DÈS QUE LE DOIGT TOUCHE LA CARTE ═══
@@ -26022,6 +26346,7 @@ document.addEventListener('pointerdown', (e) => {
   if (!id || id.length < 30) return          // un dossier porte son nom, pas un identifiant
   const p = (allGestionProcedures || []).find(x => x.id === id)
          || (allEquipeProcedures || []).find(x => x.id === id)
+  if (p?.apercu_url) urlSignee(p.apercu_url)
   if (p?.video_url) urlSignee(p.video_url)
 }, { passive: true, capture: true })
 
@@ -26040,6 +26365,8 @@ async function openEquipeDetail(procId) {
      au lieu d'attendre qu'elles soient affichées. C'est un aller-retour de
      moins à la suite, donc une vidéo qui arrive plus tôt. */
   const promesseVideo = procConnue?.video_url ? urlSignee(procConnue.video_url) : null
+  const promesseApercu = procConnue?.apercu_url ? urlSignee(procConnue.apercu_url) : null
+  poserVideoFiche(document.getElementById('detail-video'), promesseApercu, promesseVideo, perime)
 
   /* ⚠ ON PASSE PAR `showEquipeScreen`, comme la gestion par `showGestionScreen`.
 
@@ -26142,11 +26469,19 @@ async function openEquipeDetail(procId) {
 
   if (proc.video_url) {
     videoFrame.style.display = 'block'
+    if (proc.apercu_url && !detailVideoEl.poster) {
+      urlSignee(proc.apercu_url).then((u) => { if (u && !perime()) detailVideoEl.poster = u }, () => {})
+    }
     const adresse = (procConnue?.video_url === proc.video_url && promesseVideo)
       ? await promesseVideo
       : await urlSignee(proc.video_url)
     if (perime()) return
-    detailVideoEl.src = adresse || ''
+    if (adresse && detailVideoEl.src !== adresse) {
+      detailVideoEl.src = adresse
+      premiereImage(detailVideoEl)
+    } else if (!adresse) {
+      detailVideoEl.src = ''
+    }
   } else {
     videoFrame.style.display = 'none'
   }

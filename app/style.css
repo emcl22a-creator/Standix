@@ -24480,3 +24480,363 @@ body.abo-expire [data-etab-plus]{
   .fav-btn.fav-pop-off, .fav-detail.fav-pop-off{ animation:none; }
   .fav-onde{ display:none; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENREGISTRER L'ÉCRAN
+
+   Trois familles, et une seule idée derrière chacune :
+
+   ① LES LIGNES À PUCE de la page (ce que fait le micro, les cinq minutes). Un
+     point plutôt qu'un tiret : le tiret se lit comme une soustraction.
+
+   ② LE MODE D'EMPLOI DU TÉLÉPHONE, numéroté. On y suit des gestes dans
+     l'ordre, sur un autre écran que celui-ci — le numéro sert de marque-page
+     quand on revient.
+
+   ③ LE VOILE, qui a deux états très différents :
+       · pendant le compte à rebours il prend tout l'écran et l'assombrit, pour
+         qu'on sache que rien d'autre n'est à faire ;
+       · pendant la prise il se réduit à une pastille en bas, qu'on peut
+         laisser là : l'écran filmé doit rester visible, c'est lui le sujet.
+
+     ⚠ LA PASTILLE N'EST PAS DANS LA VIDÉO. Le navigateur filme l'écran choisi,
+       pas notre page : ce qu'on ajoute ici ne s'enregistre pas. On peut donc
+       l'afficher sans salir la prise.
+
+   Les tailles sont écrites en `calc(<taille> * var(--ech))` : `--ech` vaut 1 sur
+   téléphone et grandit sur tablette, comme partout ailleurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.ecran-ligne{
+  display:flex; align-items:flex-start; gap:calc(10px * var(--ech));
+  font-size:calc(13px * var(--ech)); line-height:1.45; color:var(--label-2);
+}
+.ecran-ligne + .ecran-ligne{ margin-top:calc(11px * var(--ech)); }
+.ecran-pt{
+  flex:0 0 auto;
+  width:calc(6px * var(--ech)); height:calc(6px * var(--ech));
+  margin-top:calc(6px * var(--ech));
+  border-radius:100px;
+  background:linear-gradient(135deg,#1F4CEE 0%,#4899EC 100%);
+}
+
+.ecran-sys-t{
+  font-size:calc(12px * var(--ech)); font-weight:700; letter-spacing:0.02em;
+  text-transform:uppercase; color:var(--label-3);
+  margin-bottom:calc(10px * var(--ech));
+}
+.ecran-etape{
+  display:flex; align-items:flex-start; gap:calc(10px * var(--ech));
+  padding:calc(9px * var(--ech)) 0;
+}
+.ecran-etape + .ecran-etape{ border-top:0.5px solid var(--separator); }
+.ecran-etape > span{
+  flex:0 0 auto;
+  width:calc(21px * var(--ech)); height:calc(21px * var(--ech));
+  display:flex; align-items:center; justify-content:center;
+  border-radius:100px;
+  background:rgba(31,76,238,0.10); color:#1F4CEE;
+  font-size:calc(11.5px * var(--ech)); font-weight:700;
+  margin-top:calc(1px * var(--ech));
+}
+.ecran-etape > p{
+  margin:0; font-size:calc(13.5px * var(--ech)); line-height:1.45;
+  color:var(--label);
+}
+
+/* ─── LE VOILE ─── */
+.ecran-voile{
+  position:fixed; inset:0; z-index:9000;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(10,10,16,0.78);
+  -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  padding:24px;
+}
+
+/* Pendant la prise : plus de fond, plus de flou, plus de clic attrapé. Le
+   voile devient un simple support pour la pastille. */
+.ecran-voile.discret{
+  background:transparent;
+  -webkit-backdrop-filter:none; backdrop-filter:none;
+  align-items:flex-end; justify-content:center;
+  pointer-events:none;
+  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 26px);
+}
+.ecran-voile.discret > *{ pointer-events:auto; }
+
+.ecran-compte{ text-align:center; color:#FFFFFF; }
+.ecran-compte b{
+  display:block;
+  font-size:calc(96px * var(--ech)); font-weight:800; line-height:1;
+  letter-spacing:-0.04em;
+  font-variant-numeric:tabular-nums;
+  /* Chaque seconde réapparaît : sans ce battement, le chiffre change sans
+     qu'on voie qu'il a changé. */
+  animation:ecranBat 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ecran-compte span{
+  display:block; margin-top:14px;
+  font-size:calc(14px * var(--ech)); font-weight:600;
+  color:rgba(255,255,255,0.72);
+}
+@keyframes ecranBat{
+  0%   { opacity:0.2; transform:scale(1.28); }
+  35%  { opacity:1;   transform:scale(1); }
+  100% { opacity:1;   transform:scale(1); }
+}
+
+.ecran-prise{
+  display:flex; align-items:center; gap:calc(10px * var(--ech));
+  padding:calc(8px * var(--ech)) calc(10px * var(--ech)) calc(8px * var(--ech)) calc(14px * var(--ech));
+  border-radius:100px;
+  background:rgba(22,22,30,0.92);
+  -webkit-backdrop-filter:blur(20px) saturate(180%); backdrop-filter:blur(20px) saturate(180%);
+  box-shadow:0 10px 30px -8px rgba(0,0,0,0.5), inset 0 0 0 0.5px rgba(255,255,255,0.12);
+  color:#FFFFFF;
+}
+.ecran-prise b{
+  font-size:calc(15px * var(--ech)); font-weight:700;
+  font-variant-numeric:tabular-nums; letter-spacing:-0.01em;
+}
+.ecran-reste{
+  font-size:calc(12px * var(--ech)); color:rgba(255,255,255,0.55);
+  margin-right:calc(2px * var(--ech));
+}
+.ecran-rouge{
+  width:calc(9px * var(--ech)); height:calc(9px * var(--ech));
+  border-radius:100px; background:#E0342A;
+  box-shadow:0 0 0 4px rgba(224,52,42,0.20);
+  animation:ecranPouls 1.6s ease-in-out infinite;
+}
+@keyframes ecranPouls{
+  0%, 100% { opacity:1; }
+  50%      { opacity:0.35; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .ecran-compte b{ animation:none; }
+  .ecran-rouge{ animation:none; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CAMÉRA
+
+   Plein écran, noir, sans carte ni marge. Pendant qu'on filme, l'image est la
+   seule chose qui compte : tout le reste de l'app disparaît, y compris la
+   barre d'onglets.
+
+   LES COMMANDES FLOTTENT SUR L'IMAGE, dans deux dégradés noirs — en haut et
+   en bas. Un bandeau plein couperait l'aperçu en trois ; le dégradé rend les
+   boutons lisibles sur un fond clair sans rien retrancher de ce qu'on voit.
+
+ ⚠ LA RANGÉE DU BAS EST UNE GRILLE À TROIS COLONNES ÉGALES, et les boutons
+   latéraux se cachent en `visibility` et non en `display`. Dès qu'on filme,
+   le bouton « changer de caméra » disparaît et « Annuler » apparaît : avec
+   `display:none`, le déclencheur se serait décalé au premier appui.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cam-voile{
+  position:fixed; inset:0; z-index:9500;
+  display:flex; flex-direction:column;
+  background:#000;
+  overscroll-behavior:contain;
+  touch-action:none;
+}
+.cam-apercu{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  background:#000;
+}
+
+.cam-haut{
+  position:relative; z-index:2;
+  display:flex; align-items:center; justify-content:space-between;
+  gap:12px;
+  padding:calc(env(safe-area-inset-top, 0px) + 14px) 16px 40px;
+  background:linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 100%);
+}
+.cam-badge{
+  font-size:calc(12.5px * var(--ech)); font-weight:700; letter-spacing:0.02em;
+  color:rgba(255,255,255,0.92);
+  padding:calc(6px * var(--ech)) calc(12px * var(--ech));
+  border-radius:100px;
+  background:rgba(0,0,0,0.34);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  font-variant-numeric:tabular-nums;
+}
+
+/* Le rond de verre, commun à la croix et au demi-tour. Mêmes dimensions que
+   `.scan-lampe`, avec qui il partage la rangée du haut. */
+.cam-rond{
+  width:calc(44px * var(--ech)); height:calc(44px * var(--ech));
+  flex:0 0 auto;
+  border-radius:50%; border:none; padding:0;
+  background:rgba(28,28,38,0.36);
+  -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
+  display:flex; align-items:center; justify-content:center; color:#fff;
+}
+.cam-rond svg{ width:calc(20px * var(--ech)); height:calc(20px * var(--ech)); display:block; }
+.cam-rond:active{ transform:scale(0.92); }
+
+.cam-bas{
+  position:relative; z-index:2; margin-top:auto;
+  padding:48px 20px calc(env(safe-area-inset-bottom, 0px) + 22px);
+  background:linear-gradient(0deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0) 100%);
+}
+.cam-consigne{
+  text-align:center; margin-bottom:16px;
+  font-size:calc(12.5px * var(--ech)); font-weight:600;
+  color:rgba(255,255,255,0.66);
+}
+.cam-minute{
+  display:none; align-items:center; justify-content:center; gap:8px;
+  margin-bottom:16px;
+}
+.cam-minute b{
+  font-size:calc(16px * var(--ech)); font-weight:700; color:#fff;
+  font-variant-numeric:tabular-nums; letter-spacing:-0.01em;
+}
+.cam-minute i{
+  font-style:normal; font-size:calc(12.5px * var(--ech));
+  color:rgba(255,255,255,0.55);
+}
+.cam-rouge{
+  width:calc(9px * var(--ech)); height:calc(9px * var(--ech));
+  border-radius:100px; background:#E0342A;
+  box-shadow:0 0 0 4px rgba(224,52,42,0.20);
+  animation:camPouls 1.6s ease-in-out infinite;
+}
+@keyframes camPouls{ 0%,100%{ opacity:1 } 50%{ opacity:0.35 } }
+
+/* ⚠ LE DÉCLENCHEUR EST CENTRÉ SUR L'ÉCRAN, PAS SUR UNE COLONNE. Une grille à
+   trois colonnes le décalait dès que « Recommencer » — plus large qu'un rond
+   de 44 px — faisait grandir sa colonne. Il est donc posé au centre absolu de
+   la rangée, et les deux boutons latéraux ne peuvent plus le bouger. */
+.cam-rangee{
+  position:relative;
+  display:flex; align-items:center; justify-content:space-between;
+  min-height:calc(80px * var(--ech));
+}
+.cam-texte{
+  background:none; border:none; padding:10px;
+  font-family:inherit; font-size:calc(14px * var(--ech)); font-weight:600;
+  color:rgba(255,255,255,0.86);
+  visibility:hidden;
+}
+.cam-texte:active{ opacity:0.6; }
+
+/* ─── LE DÉCLENCHEUR ───
+   Un anneau blanc, une pastille rouge dedans. Pendant la prise, la pastille
+   se rétrécit en carré arrondi — le langage universel de « arrêter » — et
+   l'anneau se remplit sur cinq minutes. */
+.cam-decl{
+  position:absolute; left:50%; top:50%; transform:translate(-50%, -50%);
+  /* Le déclencheur grandit avec le reste sur tablette : un bouton de 80 px
+     posé au milieu d'un iPad paraît perdu. */
+  width:calc(80px * var(--ech)); height:calc(80px * var(--ech));
+  border:none; padding:0; background:none;
+  display:flex; align-items:center; justify-content:center;
+}
+.cam-anneau{
+  position:absolute; inset:0; width:100%; height:100%;
+  transform:rotate(-90deg);
+  pointer-events:none;
+}
+.cam-anneau circle{ fill:none; stroke-width:4; }
+.cam-anneau-fond{ stroke:rgba(255,255,255,0.88); }
+.cam-anneau-part{
+  stroke:#E0342A; stroke-linecap:round;
+  stroke-dasharray:226.19; stroke-dashoffset:226.19;
+  transition:stroke-dashoffset 0.25s linear;
+}
+.cam-pastille{
+  width:calc(56px * var(--ech)); height:calc(56px * var(--ech)); border-radius:100px;
+  background:#E0342A;
+  transition:width 0.22s cubic-bezier(0.32,0.72,0,1),
+             height 0.22s cubic-bezier(0.32,0.72,0,1),
+             border-radius 0.22s cubic-bezier(0.32,0.72,0,1);
+}
+.cam-decl:active .cam-pastille{ background:#B4251D; }
+
+/* ─── LA PAUSE ───
+   Le demi-tour et la pause occupent la MÊME case de la grille. Sans cet
+   empilement, la colonne de gauche changerait de largeur au premier appui et
+   le déclencheur glisserait. */
+.cam-cote{ display:grid; }
+.cam-cote > *{ grid-area:1 / 1; }
+#cam-pause{ visibility:hidden; }
+.cam-voile.filme:not(.sans-pause) #cam-pause{ visibility:visible; }
+
+#cam-pause .ic-repr{ display:none; }
+.cam-voile.pause #cam-pause .ic-pause{ display:none; }
+.cam-voile.pause #cam-pause .ic-repr{ display:block; }
+#cam-pause svg{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+/* Le triangle de reprise est optiquement décentré : sa pointe tire l'œil à
+   droite alors que sa masse est à gauche. Un pixel le remet d'aplomb. */
+#cam-pause .ic-repr{ margin-left:calc(2px * var(--ech)); }
+
+/* En pause, le point ne bat plus : il attend. C'est la seule chose qui
+   distingue une prise arrêtée d'une prise en cours quand le compteur est
+   figé — et le mot « en pause » le dit à côté. */
+.cam-voile.pause .cam-rouge{ animation:none; opacity:0.45; }
+.cam-voile.pause .cam-minute i{ color:#FBBF5C; font-weight:600; }
+
+.cam-voile.filme .cam-pastille{
+  width:calc(30px * var(--ech)); height:calc(30px * var(--ech)); border-radius:9px; }
+.cam-voile.filme .cam-consigne{ display:none; }
+.cam-voile.filme .cam-minute{ display:flex; }
+.cam-voile.filme #cam-face,
+.cam-voile.filme #cam-fermer{ visibility:hidden; }
+.cam-voile.filme #cam-refaire{ visibility:visible; }
+
+/* ─── QUAND LA CAMÉRA NE S'OUVRE PAS ───
+   Le message prend toute la place : sans image, il n'y a rien à commander. */
+.cam-echec{
+  position:relative; z-index:3;
+  flex:1; display:flex; flex-direction:column; justify-content:center;
+  gap:12px; padding:24px 26px; text-align:left;
+  color:#fff;
+}
+.cam-echec .t{ font-size:calc(18px * var(--ech)); font-weight:700; letter-spacing:-0.02em; }
+.cam-echec .s{ font-size:calc(13.5px * var(--ech)); line-height:1.5; color:rgba(255,255,255,0.68); }
+.cam-pas{ margin:0; padding-left:20px; display:grid; gap:9px; }
+.cam-pas li{ font-size:calc(14px * var(--ech)); line-height:1.45; color:rgba(255,255,255,0.92); }
+.cam-pas b{ font-weight:700; }
+.cam-echec .btn.small{ align-self:flex-start; margin-top:6px; }
+
+@media (prefers-reduced-motion: reduce){
+  .cam-rouge{ animation:none; }
+  .cam-pastille{ transition:none; }
+  .cam-anneau-part{ transition:none; }
+}
+
+/* La torche partage son dessin avec le scanner, mais pas son fond : le verre
+   du scanner (13 %) se pose sur une image sombre et cadrée ; ici il flotte
+   sur une scène qui peut être un mur blanc en plein soleil. */
+#cam-lampe{
+  background:rgba(28,28,38,0.36);
+  -webkit-backdrop-filter:blur(20px); backdrop-filter:blur(20px);
+}
+#cam-lampe.on{ background:#fff; color:#000; }
+
+/* Le bouton de pause de la pastille d'enregistrement d'écran. Plus petit que
+   « Terminer » et sans couleur : suspendre n'est pas l'action principale. */
+.ecran-mini{
+  width:calc(30px * var(--ech)); height:calc(30px * var(--ech));
+  flex:0 0 auto; padding:0; border:none; border-radius:100px;
+  background:rgba(255,255,255,0.16); color:#FFFFFF;
+  display:flex; align-items:center; justify-content:center;
+}
+.ecran-mini svg{ width:calc(15px * var(--ech)); height:calc(15px * var(--ech)); display:block; }
+.ecran-mini:active{ transform:scale(0.92); }
+.ecran-prise.pause .ecran-rouge{ animation:none; opacity:0.45; }
+.ecran-prise.pause .ecran-reste{ color:#FBBF5C; font-weight:600; }
+/* « Recommencer », dans la pastille : du texte, pas un bouton plein. Jeter une
+   prise ne doit pas se proposer aussi fort que la terminer. */
+.ecran-refaire{
+  background:none; border:none; padding:calc(6px * var(--ech)) calc(4px * var(--ech));
+  font-family:inherit; font-size:calc(12.5px * var(--ech)); font-weight:600;
+  color:rgba(255,255,255,0.62); white-space:nowrap;
+}
+.ecran-refaire:active{ opacity:0.55; }

@@ -7593,7 +7593,14 @@ body.chargement #bar{
   font-size:12.5px; line-height:1.5; color:var(--label-2);
 }
 .quota-illimite b{ color:var(--label-1); font-weight:700; }
-.quota-illimite .ic{ flex-shrink:0; font-size:17px; color:#1F4CEE; line-height:1.15; }
+/* Le symbole ∞ a laissé la place à un dessin : la règle qui le dimensionnait
+   par la taille de police ne sert plus à rien, c'est le SVG qui porte sa
+   taille. Le décalage d'un pixel aligne son axe sur la première ligne de
+   texte, qui est plus basse que le haut de sa boîte. */
+.quota-illimite .ic{ flex-shrink:0; color:#1F4CEE; display:block; margin-top:1px; }
+.quota-illimite .ic svg{
+  width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); display:block;
+}
 
 /* Le bouton n'apparaît QUE sous cinq analyses. Ailleurs il serait de la
    réclame ; ici c'est un service — la personne va se trouver bloquée. */
@@ -23113,7 +23120,8 @@ body.abo-expire [data-etab-plus]{
   .quota-dedans .unite{ font-size:calc(12.5px * var(--ech)); }
   .quota-dedans .sous{ font-size:calc(12px * var(--ech)); }
   .quota-illimite{ font-size:calc(12.5px * var(--ech)); }
-  .quota-illimite .ic{ font-size:calc(17px * var(--ech)); }
+  /* ⚠ PLUS DE `font-size` ICI : l'icône est un dessin, sa taille vit sur le
+     `svg` et suit déjà `--ech`. */
   .quota-cta{ font-size:calc(14px * var(--ech)); }
   .quota-pied{ font-size:calc(12.5px * var(--ech)); }
   .choix-marque .logotype{ font-size:calc(22px * var(--ech)); }
@@ -24840,3 +24848,78 @@ body.abo-expire [data-etab-plus]{
   color:rgba(255,255,255,0.62); white-space:nowrap;
 }
 .ecran-refaire:active{ opacity:0.55; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE NE GLISSE PLUS LATÉRALEMENT D'UN ÉCRAN À L'AUTRE
+
+   Le coupable n'était pas une animation : c'était LA BARRE DE DÉFILEMENT.
+
+   Sur un écran large, la colonne de l'app est centrée dans la fenêtre. Une
+   page courte — les Réglages, un formulaire — tient sans défilement, donc
+   sans barre ; la page suivante est plus longue, la barre apparaît, et la
+   zone utile perd ses quinze pixels d'un coup. Tout ce qui est centré saute
+   alors de sept pixels et demi sur le côté, à chaque changement de page.
+
+   Sept pixels ne se nomment pas, mais ils se voient : c'est ce basculement
+   gauche-droite d'un écran à l'autre.
+
+   On réserve donc la place en permanence, qu'elle serve ou non : la largeur
+   utile ne change plus jamais, et rien ne bouge.
+
+ ⚠ `scrollbar-gutter: stable` SEUL NE SUFFIT PAS ICI. La propriété est bien
+   calculée sur la racine — vérifié — mais le navigateur ne réserve rien dans
+   cette page ; quelque chose dans la cascade de cette feuille l'en empêche.
+   `overflow-y: scroll` réserve la place à coup sûr, et les deux ensemble
+   couvrent les deux mécanismes. Mesuré : la largeur utile reste identique sur
+   toutes les pages, courtes comme longues.
+
+   Là où les barres sont flottantes — iPhone, iPad, Mac — ces règles n'ont
+   rien à réserver et ne changent rien.
+
+   LA BARRE, ELLE, DEVIENT DISCRÈTE. Toujours présente, elle ne doit pas pour
+   autant poser un sillon gris le long d'une page qui ne défile pas : la
+   glissière est transparente, et la pastille n'apparaît que s'il y a
+   quelque chose à faire défiler.
+   ═══════════════════════════════════════════════════════════════════════════ */
+html{
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  scrollbar-color: rgba(28,28,38,0.20) transparent;   /* Firefox */
+}
+html::-webkit-scrollbar{ width:14px; }
+html::-webkit-scrollbar-track{ background:transparent; }
+/* Les petites flèches en haut et en bas : Chromium sous Linux les dessine
+   encore, personne ne s'en sert, et elles trahissent la barre sur une page
+   qui ne défile pas. */
+html::-webkit-scrollbar-button{ display:none; height:0; width:0; }
+html::-webkit-scrollbar-thumb{
+  background:rgba(28,28,38,0.20);
+  border-radius:100px;
+  border:4px solid transparent;
+  background-clip:content-box;
+}
+html::-webkit-scrollbar-thumb:hover{
+  background:rgba(28,28,38,0.34);
+  background-clip:content-box;
+}
+
+/* Le point rouge du décompte : l'enregistrement tourne déjà, il faut que ça se
+   voie sans lire la phrase. */
+.ecran-compte span i{
+  display:inline-block; vertical-align:middle;
+  width:8px; height:8px; margin-right:7px; margin-top:-2px;
+  border-radius:100px; background:#E0342A;
+  animation:ecranPouls 1.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce){ .ecran-compte span i{ animation:none; } }
+
+/* Le dépannage du mode d'emploi : ce qu'on lit SEULEMENT si le bouton n'est
+   pas là où on l'attend. Séparé de la liste et plus discret — une étape
+   numérotée de plus donnerait un geste à faire à tout le monde. */
+.ecran-secours{
+  margin-top:calc(11px * var(--ech));
+  padding-top:calc(11px * var(--ech));
+  border-top:0.5px solid var(--separator);
+  font-size:calc(12.5px * var(--ech)); line-height:1.45;
+  color:var(--label-3);
+}

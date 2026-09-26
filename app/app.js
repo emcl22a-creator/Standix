@@ -3509,8 +3509,12 @@ function peindreBoutonProfil() {
   ;['gestion', 'equipe'].forEach(esp => {
     const img = document.getElementById('tb-photo-' + esp)
     if (img) {
-      if (url) { img.src = url; img.hidden = false }
-      else { img.removeAttribute('src'); img.hidden = true }
+      if (url) {
+        img.setAttribute('data-logo-fichier', url)
+        img.removeAttribute('data-logo-signe')
+        signerLogos(img.parentElement || img)
+        img.hidden = false
+      } else { img.removeAttribute('src'); img.hidden = true }
     }
   })
 }
@@ -3524,7 +3528,14 @@ function peindrePhotoProfil() {
   const url = photoTampon !== null ? photoTampon : (currentMembre?.photo_url || null)
 
   if (url) {
-    img.src = url
+    /* Une photo qu'on vient de choisir est déjà une adresse locale : on la
+       pose telle quelle. Une photo enregistrée passe par la signature. */
+    if (url.startsWith('blob:') || url.startsWith('data:')) img.src = url
+    else {
+      img.setAttribute('data-logo-fichier', url)
+      img.removeAttribute('data-logo-signe')
+      signerLogos(img.parentElement || img)
+    }
     img.hidden = false
   } else {
     img.removeAttribute('src')
@@ -25555,7 +25566,7 @@ function peindreReglagesEquipe() {
     if (ent) {
       const img = el('es-logo-ent')
       const ini = el('es-ent-initiales')
-      const src = ent.logo_url ? urlLogo(ent.logo_url) : null
+      const src = ent.logo_url || null
 
       if (src && img) {
         /* ⚠ `onerror` EST POSÉ AVANT `src` — l'ordre compte : une image déjà
@@ -25566,7 +25577,9 @@ function peindreReglagesEquipe() {
           img.hidden = true
           if (ini) ini.hidden = false
         }
-        img.src = src
+        img.setAttribute('data-logo-fichier', src)
+        img.removeAttribute('data-logo-signe')
+        signerLogos(img.parentElement || img)
         img.hidden = false
         if (ini) ini.hidden = true
       } else {
@@ -27018,8 +27031,11 @@ function rondEtabHtml(e, estActif, attributs) {
   /* `urlLogo` et non l'adresse brute : la base peut contenir un chemin seul,
      auquel cas `src` chercherait à la racine du site. */
   const dedans = e.logo_url
-    ? `<img src="${escapeHtml(urlLogo(e.logo_url))}" alt="">`
+    ? `<img data-logo-fichier="${escapeHtml(e.logo_url)}" alt="">`
     : (e.nom ? `<span class="ini">${escapeHtml(initialesEtab(e.nom))}</span>` : '')
+  /* Le balisage part en texte ; la signature se pose juste après, quand il
+     est dans la page. */
+  queueMicrotask(() => signerLogos())
   const classes = 'rond-ent' + (estActif ? ' actif' : '') + (e.logo_url ? ' a-logo' : '')
   return `<button type="button" class="${classes}" ${attributs}>${dedans}</button>`
 }
@@ -27221,8 +27237,9 @@ function peindreRangEtab(idRang, idPlus, idNote, espace) {
 
        Un dépôt public sert son adresse telle quelle. On la pose directement. */
     b.innerHTML = e.logo_url
-      ? `<img src="${escapeHtml(urlLogo(e.logo_url))}" alt="">`
+      ? `<img data-logo-fichier="${escapeHtml(e.logo_url)}" alt="">`
       : `<span>${escapeHtml(init)}</span>`
+    signerLogos(b)
     /* Un appui bascule ; un appui LONG ouvre la fiche pour renommer ou changer
        le logo. Le geste court est celui qu'on fait vingt fois, le long celui
        qu'on fait une fois. */
@@ -27494,8 +27511,9 @@ function peindreBarreEtablissements() {
        cherchait le fichier à la racine du site. Le dépôt des logos est public,
        `urlLogo` en construit l'adresse complète. */
     const dedans = e.logo_url
-      ? `<img src="${escapeHtml(urlLogo(e.logo_url))}" alt="">`
+      ? `<img data-logo-fichier="${escapeHtml(e.logo_url)}" alt="">`
       : `<span class="rond-init">${escapeHtml(init)}</span>`
+    queueMicrotask(() => signerLogos())
     return `
       <button type="button" class="rond-etab${e.id === courant ? ' actif' : ''}"
               data-etab="${escapeHtml(e.id)}" title="${escapeHtml(e.nom || '')}"
@@ -27756,7 +27774,14 @@ function majFenetreEtab() {
   depot.classList.toggle('rempli', !!etabLogoTampon)
   if (etabLogoTampon) {
     const img = document.createElement('img')
-    img.src = etabLogoTampon
+    /* Un logo qu'on vient de déposer est une image locale ; un logo déjà
+       enregistré vit dans le dépôt et son adresse se signe. */
+    if (etabLogoTampon.startsWith('data:') || etabLogoTampon.startsWith('blob:')) {
+      img.src = etabLogoTampon
+    } else {
+      img.setAttribute('data-logo-fichier', etabLogoTampon)
+      queueMicrotask(() => signerLogos(depot))
+    }
     depot.insertBefore(img, depot.firstChild)
   }
   /* Le monogramme se met à jour pendant la frappe : on voit tout de suite ce qui
@@ -28954,7 +28979,7 @@ function peindreEquipe() {
              change. Une carte plus haute pour ceux qui ont une photo casserait
              l'alignement de la liste. -->
         <div class="pm-av${m.role === 'gestion' ? ' chef' : ''}">${m.photo_url
-          ? `<img src="${escapeHtml(m.photo_url)}" alt="" loading="lazy">`
+          ? `<img data-logo-fichier="${escapeHtml(m.photo_url)}" alt="" loading="lazy">`
           : escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
           <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">vous</span>' : ''}</div>
@@ -29029,6 +29054,9 @@ function peindreEquipe() {
     section('G\u00e9rant', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
     section('Espace gestion', 'Cr\u00e9ent les proc\u00e9dures, voient l\u2019analyse, invitent du monde.', gestion) +
     section('Espace utilisateur', 'Consultent les proc\u00e9dures publi\u00e9es.', equipe)
+  /* Les photos des membres sont dans le dépôt des logos : on signe leurs
+     adresses une fois la liste posée. */
+  signerLogos(liste)
 }
 
 /* ── La recherche ────────────────────────────────────────── */
@@ -31444,6 +31472,56 @@ function urlLogo(valeur) {
   if (v.startsWith('http')) return v
   const { data } = supabase.storage.from('procedo-logos').getPublicUrl(v)
   return data?.publicUrl || ''
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES LOGOS ET LES PHOTOS SE SIGNENT, COMME LES VIDÉOS
+
+   Le dépôt `procedo-logos` est encore PUBLIC : son adresse s'ouvre pour qui
+   la connaît, et il ne contient pas que des logos — les photos de profil des
+   membres y vivent aussi. Une photo d'employé lisible par adresse devinée
+   n'a rien à faire dans une app d'entreprise.
+
+   Ces fonctions demandent une adresse SIGNÉE, qui expire. Elles fonctionnent
+   déjà sur un dépôt public : on les pose d'abord, on vérifie que tout
+   s'affiche, et le dépôt passera en privé ensuite. Si la signature échoue,
+   on retombe sur l'adresse publique — l'image reste visible.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function cheminLogo(valeur) {
+  if (!valeur) return null
+  const v = String(valeur)
+  if (!v.startsWith('http')) return v
+  const m = v.match(/\/procedo-logos\/(.+?)(?:\?|$)/)
+  return m ? decodeURIComponent(m[1]) : null
+}
+
+async function urlLogoSignee(valeur) {
+  const chemin = cheminLogo(valeur)
+  if (!chemin) return null
+  const cle = 'logos:' + chemin
+  const connue = signatures.get(cle)
+  if (connue && connue.expire > Date.now() + 60000) return connue.url
+  try {
+    const { data, error } = await supabase.storage.from('procedo-logos')
+      .createSignedUrl(chemin, SIGNATURE_DUREE)
+    if (error || !data?.signedUrl) throw error || new Error('sans adresse')
+    signatures.set(cle, { url: data.signedUrl, expire: Date.now() + SIGNATURE_DUREE * 1000 })
+    return data.signedUrl
+  } catch (e) {
+    console.warn('Standix \u00b7 logo non sign\u00e9 :', e?.message || e)
+    return urlLogo(valeur)
+  }
+}
+
+/* Remplit les `src` des images marquées `data-logo-fichier`. Même mécanisme
+   que `signerMedias` pour les vidéos, sur l'autre dépôt. */
+async function signerLogos(racine) {
+  const cibles = (racine || document).querySelectorAll('[data-logo-fichier]:not([data-logo-signe])')
+  await Promise.all([...cibles].map(async el => {
+    el.setAttribute('data-logo-signe', '1')
+    const url = await urlLogoSignee(el.getAttribute('data-logo-fichier'))
+    if (url) el.src = url
+  }))
 }
 
 function cheminFichier(valeur) {

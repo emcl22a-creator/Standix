@@ -7501,6 +7501,7 @@ const ONGLET_PAR_ECRAN = {
   'p-activites': 1,
   'p-recentes': 0,
   'p-coller': 0,        // le collage de videos, dans la creation
+  'p-ecran': 0,         // l'enregistrement d'ecran, dans la creation
   'p-scan': 1,          // le lecteur de QR code, dans les Reglages
   /* ⚠ « Analyses vidéo AI » VIENT MAINTENANT DU PROFIL.
 
@@ -15336,6 +15337,744 @@ let collageFichiers = []      // { fichier, duree, largeur, hauteur }
 let collageResultat = null    // le Blob produit
 let collageEnAttente = null   // passée à l'écran IA, consommée une fois
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENREGISTRER L'ÉCRAN
+
+   Un gérant qui documente un logiciel filmait son écran avec un outil à côté,
+   retrouvait le fichier, puis l'importait. Tout se fait maintenant ici.
+
+ ⚠ L'ORDRE DES DEUX ÉTAPES N'EST PAS UN CHOIX. Le navigateur n'ouvre sa
+   fenêtre de partage que dans la seconde qui suit un clic : un compte à
+   rebours AVANT la ferait refuser. On demande donc l'écran d'abord, on
+   décompte ensuite — ce qui tombe juste, puisque le délai sert à préparer
+   l'écran une fois qu'on sait ce qui sera filmé.
+
+ ⚠ LE MICRO EST INDISPENSABLE, PAS OPTIONNEL. L'analyse écoute la parole pour
+   découper les étapes : un enregistrement muet est refusé plus loin dans la
+   chaîne. On le demande donc en même temps que l'écran, et on prévient si la
+   personne le refuse.
+
+ ⚠ CE QUI SORT VA DANS `collageEnAttente`, comme une vidéo collée. Les deux
+   outils fabriquent une vidéo puis rendent la main à l'écran de création :
+   deux chemins d'arrivée différents divergeraient à la première correction.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const ECRAN_DUREE_MAX = 5 * 60         // secondes, comme le reste de l'app
+let ecranDelai = 10                    // secondes de compte à rebours
+let ecranEnregistreur = null           // MediaRecorder en cours
+let ecranFlux = null                   // les pistes à couper à la fin
+let ecranMinuteur = 0
+let ecranDepart = 0
+let ecranCumul = 0      // secondes déjà enregistrées avant la pause en cours
+let ecranPause = false
+let ecranAnnule = false // « Recommencer » : la prise en cours part à la poubelle
+
+function ecranPossible() {
+  return typeof navigator !== 'undefined'
+    && !!navigator.mediaDevices?.getDisplayMedia
+}
+
+function ouvrirEnregistrementEcran() {
+  const surOrdi = ecranPossible()
+  document.getElementById('ecran-pc').style.display = surOrdi ? 'block' : 'none'
+  document.getElementById('ecran-mobile').style.display = surOrdi ? 'none' : 'block'
+  const err = document.getElementById('ecran-erreur')
+  if (err) err.textContent = ''
+
+  if (surOrdi) {
+    try {
+      const garde = Number(localStorage.getItem('standix-ecran-delai'))
+      if ([5, 10, 15].includes(garde)) ecranDelai = garde
+    } catch (e) {}
+    majDelaiEcran()
+  } else {
+    document.getElementById('ecran-mode-emploi').innerHTML = modeEmploiEcran()
+  }
+  showGestionScreen('p-ecran')
+}
+window.ouvrirEnregistrementEcran = ouvrirEnregistrementEcran
+
+/* Le mode d'emploi du téléphone, celui de SON système. Montrer les deux
+   listes obligerait à chercher la sienne. */
+function modeEmploiEcran() {
+  const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const etapes = iOS
+    ? ['Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».',
+       'Ouvrez le centre de contrôle : glissez depuis le coin haut droit.',
+       'Appui LONG sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».',
+       'Ouvrez le logiciel à filmer et commentez à voix haute.',
+       'Pour arrêter : touchez l’heure en rouge, en haut à gauche.']
+    : ['Ouvrez le volet des réglages rapides : glissez depuis le haut de l’écran.',
+       'Touchez « Enregistreur d’écran » (il est parfois à faire glisser depuis la liste complète).',
+       'Activez le son du micro, puis démarrez.',
+       'Ouvrez le logiciel à filmer et commentez à voix haute.',
+       'Pour arrêter : rouvrez le volet et touchez « Arrêter ».']
+  return `<div class="ecran-sys-t">${iOS ? 'Sur iPhone et iPad' : 'Sur Android'}</div>`
+    + etapes.map((t, i) => `<div class="ecran-etape"><span>${i + 1}</span><p>${t}</p></div>`).join('')
+}
+
+function majDelaiEcran() {
+  const piste = document.getElementById('ecran-delai')
+  if (!piste) return
+  const boutons = [...piste.querySelectorAll('.p-seg')]
+  boutons.forEach(b => b.classList.toggle('on', Number(b.dataset.delai) === ecranDelai))
+  const actif = boutons.find(b => Number(b.dataset.delai) === ecranDelai)
+  const lens = document.getElementById('ecran-delai-lens')
+  if (actif && lens) {
+    const r = actif.getBoundingClientRect(), p = piste.getBoundingClientRect()
+    lens.style.width = `${r.width}px`
+    lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+  }
+}
+
+document.getElementById('ecran-delai')?.addEventListener('click', (e) => {
+  const b = e.target.closest('.p-seg')
+  if (!b) return
+  ecranDelai = Number(b.dataset.delai)
+  try { localStorage.setItem('standix-ecran-delai', String(ecranDelai)) } catch (err) {}
+  majDelaiEcran()
+})
+
+document.getElementById('ecran-importer')?.addEventListener('click', () => {
+  showGestionScreen('p-create')
+  toast('Nommez la procédure, puis choisissez votre enregistrement')
+})
+
+/* Le voile du compte à rebours, puis la pastille rouge pendant la prise. Ils
+   sont créés à la demande : deux blocs de balisage de plus dans la page, pour
+   quelque chose qu'on voit trois minutes par mois, ne valent pas leur place. */
+function voileEcran(contenu) {
+  let v = document.getElementById('ecran-voile')
+  if (!v) {
+    v = document.createElement('div')
+    v.id = 'ecran-voile'
+    v.className = 'ecran-voile'
+    document.body.appendChild(v)
+  }
+  v.innerHTML = contenu
+  v.style.display = 'flex'
+  return v
+}
+function fermerVoileEcran() {
+  const v = document.getElementById('ecran-voile')
+  if (v) v.style.display = 'none'
+}
+
+document.getElementById('ecran-demarrer')?.addEventListener('click', async () => {
+  const err = document.getElementById('ecran-erreur')
+  err.textContent = ''
+
+  let fluxEcran = null
+  let fluxMicro = null
+  try {
+    /* Cette ligne DOIT suivre le clic immédiatement : c'est elle qui ouvre la
+       fenêtre de partage du navigateur. */
+    fluxEcran = await navigator.mediaDevices.getDisplayMedia({
+      video: { width: { ideal: 2560 }, height: { ideal: 1440 }, frameRate: { ideal: 30 } },
+      audio: false,
+    })
+  } catch (e) {
+    /* Refus de la personne, ou navigateur sans partage : ce n'est pas une
+       panne, on ne crie pas. */
+    if (e?.name !== 'NotAllowedError') {
+      err.style.color = 'var(--red)'
+      err.textContent = "Le partage d'écran n'a pas pu démarrer : " + (e?.message || e)
+    }
+    return
+  }
+
+  try {
+    fluxMicro = await navigator.mediaDevices.getUserMedia({ audio: true })
+  } catch (e) {
+    fluxEcran.getTracks().forEach(t => t.stop())
+    err.style.color = 'var(--red)'
+    err.textContent = "Sans micro, l'IA n'a rien à écouter : autorisez le microphone, puis recommencez."
+    return
+  }
+
+  const pisteVideo = fluxEcran.getVideoTracks()[0]
+  ecranFlux = new MediaStream([pisteVideo, ...fluxMicro.getAudioTracks()])
+
+  /* Arrêter le partage depuis la barre du navigateur doit arrêter la prise :
+     sinon on enregistre un écran noir jusqu'aux cinq minutes.
+
+   ⚠ POSÉ ICI, UNE SEULE FOIS. Dans `lancerPriseEcran`, « Recommencer »
+     l'ajouterait une fois de plus à chaque reprise. */
+  pisteVideo.addEventListener('ended', () => arreterEcran())
+
+  lancerPriseEcran()
+})
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PRISE ELLE-MÊME
+
+   Séparée du choix de l'écran, parce qu'on y revient : « Recommencer » jette
+   ce qui est filmé et relance ici, sur le MÊME partage. Redemander la fenêtre
+   de partage à chaque reprise serait absurde — l'écran est déjà choisi, et le
+   navigateur ne la rouvrirait de toute façon pas sans un nouveau clic.
+   ═══════════════════════════════════════════════════════════════════════════ */
+async function lancerPriseEcran() {
+  const err = document.getElementById('ecran-erreur')
+  const pisteVideo = ecranFlux?.getVideoTracks?.()[0]
+  if (!pisteVideo || pisteVideo.readyState !== 'live') { nettoyerEcran(); return }
+
+  /* Le compte à rebours. Il sert aussi à la reprise : on vient de jeter une
+     prise, il faut le temps de se remettre en place. */
+  for (let reste = ecranDelai; reste > 0; reste--) {
+    voileEcran(`<div class="ecran-compte"><b>${reste}</b><span>préparez votre écran</span></div>`)
+    await new Promise(r => setTimeout(r, 1000))
+    /* La personne a fermé le partage pendant le décompte. */
+    if (pisteVideo.readyState !== 'live') { fermerVoileEcran(); nettoyerEcran(); return }
+  }
+  fermerVoileEcran()
+
+  const morceaux = []
+  let type = ''
+  try {
+    /* ═══ LE DÉBIT EST CHOISI POUR RESTER SOUS LA LIMITE D'ENVOI ═══
+
+       Sans consigne, Chrome enregistre un 1440p autour de 8 Mb/s : cinq
+       minutes font 300 Mo, deux fois la limite acceptée. Le fichier partait
+       alors dans la compression, c'est-à-dire cinq minutes de plus sur
+       l'appareil, pour un contenu qui n'en avait pas besoin.
+
+       3 Mb/s tient cinq minutes en 112 Mo, sous la limite : l'envoi part
+       directement. Un écran s'y prête — texte net, fond immobile, l'immense
+       majorité des images identiques à la précédente. */
+    const fait = fabriquerEnregistreur(ecranFlux, 3_000_000)
+    ecranEnregistreur = fait.enr
+    type = fait.type
+  } catch (e) {
+    nettoyerEcran()
+    err.style.color = 'var(--red)'
+    err.textContent = "Ce navigateur ne sait pas enregistrer : " + (e?.message || e)
+    return
+  }
+  ecranEnregistreur.ondataavailable = (ev) => { if (ev.data?.size) morceaux.push(ev.data) }
+  ecranEnregistreur.onstop = () => {
+    /* « Recommencer » : on jette les morceaux et on repart, sans quitter le
+       partage ni la page. */
+    if (ecranAnnule) {
+      ecranAnnule = false
+      ecranEnregistreur = null
+      ecranCumul = 0
+      ecranPause = false
+      lancerPriseEcran()
+      return
+    }
+    const extension = (type || '').includes('mp4') ? 'mp4' : 'webm'
+    const nom = `ecran-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${extension}`
+    const fichier = new File(morceaux, nom, { type: type || 'video/webm' })
+    /* ═══ ON POSE LA DURÉE SUR LE FICHIER ═══
+
+       `MediaRecorder` écrit l'en-tête du WebM avant de savoir combien de temps
+       il va filmer : la durée y reste vide et le lecteur rend `Infinity`.
+       L'écran d'analyse la lisait donc comme inconnue et laissait « Lancer »
+       fermé — un enregistrement qu'on ne pouvait pas envoyer.
+
+       Ici on la connaît : on l'a comptée seconde par seconde pour la pastille.
+       On l'attache au fichier, `chargerVideoPourIA` la reprend. */
+    try { fichier.dureeConnue = Math.max(1, Math.round(ecranCumul)) } catch (e) {}
+    nettoyerEcran()
+    if (!fichier.size) { toast("L'enregistrement est vide."); return }
+    collageEnAttente = fichier
+    showGestionScreen('p-create')
+    toast('Enregistrement prêt — nommez la procédure, puis lancez l’analyse')
+  }
+
+  ecranEnregistreur.start(1000)
+  ecranDepart = Date.now()
+  ecranCumul = 0
+  ecranPause = false
+  peindrePastilleEcran()
+  ecranMinuteur = setInterval(peindrePastilleEcran, 1000)
+}
+
+/* Le temps réellement enregistré, pauses déduites — même raisonnement que pour
+   la caméra : l'heure de départ ne suffit plus dès qu'on peut suspendre. */
+function ecranEcoule() {
+  return ecranCumul + (ecranPause || !ecranDepart ? 0 : (Date.now() - ecranDepart) / 1000)
+}
+
+function basculerPauseEcran() {
+  if (!ecranEnregistreur || typeof ecranEnregistreur.pause !== 'function') return
+  if (ecranPause) {
+    try { ecranEnregistreur.resume() } catch (e) { return }
+    ecranDepart = Date.now()
+    ecranPause = false
+    ecranMinuteur = setInterval(peindrePastilleEcran, 1000)
+  } else {
+    try { ecranEnregistreur.pause() } catch (e) { return }
+    ecranCumul = ecranEcoule()
+    ecranPause = true
+    ecranDepart = 0
+    clearInterval(ecranMinuteur); ecranMinuteur = 0
+  }
+  peindrePastilleEcran()
+}
+
+function peindrePastilleEcran() {
+  const brut = ecranEcoule()
+  if (!ecranPause && brut >= ECRAN_DUREE_MAX) {
+    arreterEcran(); toast('Cinq minutes : enregistrement arrêté.'); return
+  }
+  const ecoule = Math.floor(brut)
+  const m = Math.floor(ecoule / 60), sec = String(ecoule % 60).padStart(2, '0')
+  const peutPause = typeof ecranEnregistreur?.pause === 'function'
+  const v = voileEcran(
+    `<div class="ecran-prise${ecranPause ? ' pause' : ''}">
+       <span class="ecran-rouge"></span>
+       <b>${m}:${sec}</b>
+       <span class="ecran-reste">${ecranPause ? 'en pause' : 'sur 5:00'}</span>
+       ${peutPause ? `<button type="button" class="ecran-mini" id="ecran-pause"
+          aria-label="${ecranPause ? 'Reprendre' : 'Mettre en pause'}">${
+          ecranPause
+            ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.4 5.6a1 1 0 0 1 1.5-.87l9 6.4a1 1 0 0 1 0 1.74l-9 6.4a1 1 0 0 1-1.5-.87z"/></svg>`
+            : `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.6" height="14" rx="1.3"/><rect x="13.4" y="5" width="3.6" height="14" rx="1.3"/></svg>`
+        }</button>` : ''}
+       <button type="button" class="ecran-refaire" id="ecran-refaire">Recommencer</button>
+       <button type="button" class="btn small" id="ecran-stop">Terminer</button>
+     </div>`)
+  v.classList.add('discret')
+  document.getElementById('ecran-stop').onclick = () => arreterEcran()
+  const bp = document.getElementById('ecran-pause')
+  if (bp) bp.onclick = () => basculerPauseEcran()
+  document.getElementById('ecran-refaire').onclick = () => {
+    ecranAnnule = true
+    arreterEcran()
+  }
+}
+
+function arreterEcran() {
+  /* On fige le compteur avant `stop()` : après, l'état de pause n'est plus
+     lisible et la durée posée sur le fichier serait fausse. */
+  ecranCumul = ecranEcoule()
+  ecranPause = true
+  ecranDepart = 0
+  clearInterval(ecranMinuteur); ecranMinuteur = 0
+  fermerVoileEcran()
+  const v = document.getElementById('ecran-voile')
+  if (v) v.classList.remove('discret')
+  if (ecranEnregistreur && ecranEnregistreur.state !== 'inactive') ecranEnregistreur.stop()
+  else nettoyerEcran()
+}
+
+function nettoyerEcran() {
+  clearInterval(ecranMinuteur); ecranMinuteur = 0
+  ecranPause = false
+  ecranCumul = 0
+  ecranDepart = 0
+  fermerVoileEcran()
+  const v = document.getElementById('ecran-voile')
+  if (v) v.classList.remove('discret')
+  if (ecranFlux) { ecranFlux.getTracks().forEach(t => t.stop()); ecranFlux = null }
+  ecranEnregistreur = null
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FILMER DEPUIS L'APP
+
+   Jusqu'ici, filmer une procédure demandait de SORTIR de Standix : ouvrir
+   l'appareil photo, filmer, revenir, retrouver le fichier dans une pellicule
+   où il venait d'être rangé parmi trois cents autres. Quatre étapes pour une
+   seule intention, et c'est là qu'on perdait les gens.
+
+   La caméra s'ouvre donc ici, en plein écran, avec un seul bouton. Ce qui en
+   sort part directement dans `collageEnAttente`, comme une vidéo collée ou un
+   enregistrement d'écran : trois outils, un seul chemin d'arrivée.
+
+ ⚠ ON DEMANDE 1440p, ON N'EN PROMET PAS. `getUserMedia` négocie : un appareil
+   qui ne sait pas rendra du 1080p, et c'est très bien. Le badge en haut
+   affiche ce qu'on a RÉELLEMENT obtenu, relevé sur la piste — annoncer une
+   définition qu'on n'a pas serait mentir sur la seule chose mesurable ici.
+
+ ⚠ LE DÉBIT EST PLAFONNÉ À 3,5 Mb/s, ET CE N'EST PAS UNE ÉCONOMIE. Sans
+   consigne, un téléphone enregistre son 1440p autour de 10 Mb/s : cinq
+   minutes pèsent 375 Mo, bien au-delà de la limite d'envoi. Le fichier
+   partait alors dans la compression — cinq minutes d'attente de plus, sur
+   l'appareil, pour retomber à une qualité INFÉRIEURE à ce qu'on obtient en
+   filmant directement au bon débit. À 3,5 Mb/s, cinq minutes font 135 Mo :
+   l'envoi part tel quel.
+
+ ⚠ CHANGER DE CAMÉRA PENDANT LA PRISE EST INTERDIT. Remplacer la piste d'un
+   enregistrement en cours produit un fichier que rien ne relit. Le bouton
+   disparaît donc pendant qu'on filme, plutôt que d'échouer une fois sur deux.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══ UN SEUL ENDROIT OÙ L'ON FABRIQUE UN ENREGISTREUR ═══
+
+   Le collage, l'enregistrement d'écran et la caméra construisent tous les
+   trois un `MediaRecorder`. Chacun avait sa liste de formats — celle de
+   l'écran demandait du WebM en premier, ce que Safari refuse en bloc.
+
+   `formatEnregistrable()` connaît déjà l'ordre juste (MP4 d'abord, le plus
+   largement lu, et le seul que Safari accepte). On passe donc par lui, et
+   s'il se trompe malgré tout, on laisse le navigateur choisir seul plutôt que
+   d'échouer : un fichier dans un format inattendu vaut mieux que pas de
+   fichier. */
+function fabriquerEnregistreur(flux, debitVideo) {
+  const type = formatEnregistrable()
+  const base = { videoBitsPerSecond: debitVideo, audioBitsPerSecond: AUDIO_DEBIT }
+  /* ⚠ ON RELIT `mimeType` SUR L'ENREGISTREUR, on ne renvoie pas ce qu'on a
+     demandé. Quand le navigateur choisit seul, lui seul sait ce qu'il produit
+     — et c'est cette valeur qui décide de l'extension du fichier. */
+  try {
+    const enr = new MediaRecorder(flux, type ? { ...base, mimeType: type } : base)
+    return { enr, type: enr.mimeType || type }
+  } catch (e) {
+    console.warn('Standix · format refusé par MediaRecorder :', type, e?.message || e)
+    const enr = new MediaRecorder(flux)
+    return { enr, type: enr.mimeType || '' }
+  }
+}
+
+const CAM_DUREE_MAX = ECRAN_DUREE_MAX     // les mêmes cinq minutes que partout
+const CAM_DEBIT = 3_500_000
+let camFlux = null
+let camEnregistreur = null
+let camMinuteur = 0
+let camDepart = 0
+/* ═══ LE TEMPS FILMÉ N'EST PAS LE TEMPS ÉCOULÉ ═══
+
+   Avec la pause, l'heure de départ ne suffit plus : une prise commencée à
+   10h00, mise en pause deux minutes et terminée à 10h05 ne dure pas cinq
+   minutes. On cumule donc les segments déjà filmés (`camCumul`) et on n'y
+   ajoute le segment en cours que s'il tourne vraiment.
+
+   Cette valeur décide de trois choses : le compteur affiché, l'arrêt à cinq
+   minutes, et la durée posée sur le fichier. Se tromper ici ferait refuser une
+   vidéo de quatre minutes pour dépassement. */
+let camCumul = 0
+let camPause = false
+let camFace = 'environment'               // 'environment' = arrière, 'user' = avant
+let camFilme = false
+let camAnnule = false
+
+const camVoile = () => document.getElementById('cam-voile')
+
+async function ouvrirCameraStandix() {
+  const voile = camVoile()
+  if (!voile) return
+  voile.style.display = 'flex'
+  voile.classList.remove('filme')
+  document.getElementById('cam-echec').style.display = 'none'
+  document.getElementById('cam-bas').style.display = ''
+  document.getElementById('cam-consigne').textContent =
+    'Appuyez pour filmer · 5 min au maximum'
+  majAnneauCamera(0)
+  await ouvrirFluxCamera()
+}
+window.ouvrirCameraStandix = ouvrirCameraStandix
+
+/* L'ouverture de la caméra, aussi appelée au changement de face. Elle coupe
+   toujours le flux précédent d'abord : deux caméras ouvertes en même temps,
+   certains téléphones refusent tout simplement la seconde. */
+async function ouvrirFluxCamera() {
+  couperFluxCamera()
+  const badge = document.getElementById('cam-badge')
+  badge.textContent = 'Ouverture…'
+
+  const exigeant = {
+    video: {
+      facingMode: { ideal: camFace },
+      width: { ideal: 2560, max: 2560 },
+      height: { ideal: 1440, max: 1440 },
+      frameRate: { ideal: 30 },
+    },
+    audio: { echoCancellation: true, noiseSuppression: true },
+  }
+  try {
+    camFlux = await navigator.mediaDevices.getUserMedia(exigeant)
+  } catch (e) {
+    /* ═══ UN APPAREIL PEUT REFUSER LA DEMANDE PRÉCISE, PAS LA CAMÉRA ═══
+       `max` est une contrainte dure : une caméra qui ne connaît que le 4K la
+       rejette en bloc. On retente alors sans rien exiger — mieux vaut filmer
+       dans la définition de l'appareil que ne pas filmer. */
+    if (e?.name === 'OverconstrainedError' || e?.name === 'NotFoundError') {
+      try {
+        camFlux = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: camFace } }, audio: true,
+        })
+      } catch (e2) { echecCamera(e2); return }
+    } else { echecCamera(e); return }
+  }
+
+  const v = document.getElementById('cam-apercu')
+  v.srcObject = camFlux
+  v.muted = true
+  try { await v.play() } catch (e) { /* l'attribut autoplay prend le relais */ }
+
+  /* La lampe torche : le bouton se montre seul si la caméra en a une. C'est
+     le même mécanisme que le scanner de QR codes, déjà éprouvé. */
+  try { brancherLampe(camFlux) } catch (e) {}
+  /* ⚠ LA LAMPE GARDE SA PLACE MÊME QUAND ELLE N'EXISTE PAS. `brancherLampe`
+     la cache en `display:none` ; dans une rangée à trois, le badge central
+     se serait décalé vers la droite sur tous les appareils sans torche. On
+     traduit donc en `visibility` : caché, mais toujours encombrant. */
+  const lampe = document.getElementById('cam-lampe')
+  if (lampe) {
+    const possible = lampe.style.display !== 'none'
+    lampe.style.display = 'flex'
+    lampe.style.visibility = possible ? 'visible' : 'hidden'
+  }
+
+  /* ⚠ L'APERÇU DE LA CAMÉRA AVANT EST INVERSÉ, PAS L'ENREGISTREMENT. C'est ce
+     que font tous les téléphones : on se voit comme dans un miroir, mais la
+     vidéo enregistrée est à l'endroit. Inverser les deux retournerait les
+     textes filmés. */
+  v.style.transform = camFace === 'user' ? 'scaleX(-1)' : 'none'
+
+  majBadgeCamera()
+}
+
+function majBadgeCamera() {
+  const badge = document.getElementById('cam-badge')
+  const r = camFlux?.getVideoTracks?.()[0]?.getSettings?.() || {}
+  const h = Math.min(r.width || 0, r.height || 0)   // la hauteur en paysage
+  if (!h) { badge.textContent = 'Caméra prête'; return }
+  const ips = r.frameRate ? ` · ${Math.round(r.frameRate)} i/s` : ''
+  badge.textContent = `${h}p${ips}`
+}
+
+function couperFluxCamera() {
+  if (camFlux) { camFlux.getTracks().forEach(t => t.stop()); camFlux = null }
+  const v = document.getElementById('cam-apercu')
+  if (v) v.srcObject = null
+}
+
+/* L'anneau du déclencheur se remplit sur les cinq minutes. Un chiffre dit le
+   temps écoulé ; l'anneau dit celui qui reste, sans qu'on ait à le calculer. */
+const CAM_ANNEAU = 2 * Math.PI * 36
+function majAnneauCamera(part) {
+  const c = document.getElementById('cam-anneau-part')
+  if (!c) return
+  c.style.strokeDasharray = String(CAM_ANNEAU)
+  c.style.strokeDashoffset = String(CAM_ANNEAU * (1 - Math.min(1, Math.max(0, part))))
+}
+
+function echecCamera(e) {
+  const zone = document.getElementById('cam-echec')
+  document.getElementById('cam-bas').style.display = 'none'
+  document.getElementById('cam-badge').textContent = ''
+  const nom = e?.name
+
+  if (nom === 'NotAllowedError' || nom === 'SecurityError') {
+    /* Une autorisation refusée ne se redemande jamais toute seule : le
+       navigateur ne reposera pas la question. Il faut aller la changer dans
+       ses réglages — et le chemin diffère selon l'appareil. On le donne. */
+    const c = cheminReglagesCamera()
+    zone.innerHTML =
+      `<div class="t">La caméra est bloquée</div>` +
+      `<div class="s">${escapeHtml(c.appareil)} ne donne pas accès à la caméra pour ce site.</div>` +
+      `<ol class="cam-pas">${c.etapes.map(t => `<li>${t}</li>`).join('')}</ol>` +
+      (c.repli ? `<div class="s">${c.repli}</div>` : '') +
+      `<button type="button" class="btn small" id="cam-retenter">Réessayer</button>`
+  } else if (nom === 'NotReadableError') {
+    zone.innerHTML =
+      `<div class="t">La caméra est déjà utilisée</div>` +
+      `<div class="s">Fermez l’application qui s’en sert, puis réessayez.</div>` +
+      `<button type="button" class="btn small" id="cam-retenter">Réessayer</button>`
+  } else if (!navigator.mediaDevices?.getUserMedia) {
+    zone.innerHTML =
+      `<div class="t">Ce navigateur ne donne pas accès à la caméra</div>` +
+      `<div class="s">La caméra n’est accessible qu’en HTTPS. Ouvrez Standix depuis son adresse habituelle.</div>`
+  } else {
+    zone.innerHTML =
+      `<div class="t">La caméra n’a pas pu s’ouvrir</div>` +
+      `<div class="s">${escapeHtml((nom ? nom + ' — ' : '') + (e?.message || 'raison inconnue'))}</div>` +
+      `<button type="button" class="btn small" id="cam-retenter">Réessayer</button>`
+  }
+  zone.style.display = 'flex'
+  const b = document.getElementById('cam-retenter')
+  if (b) b.onclick = () => {
+    zone.style.display = 'none'
+    document.getElementById('cam-bas').style.display = ''
+    ouvrirFluxCamera()
+  }
+}
+
+document.getElementById('cam-face')?.addEventListener('click', () => {
+  if (camFilme) return
+  camFace = camFace === 'environment' ? 'user' : 'environment'
+  ouvrirFluxCamera()
+})
+
+document.getElementById('cam-fermer')?.addEventListener('click', () => {
+  if (camFilme) return
+  fermerCamera()
+})
+
+document.getElementById('cam-refaire')?.addEventListener('click', () => {
+  if (!camFilme) return
+  camAnnule = true
+  arreterPriseCamera()
+})
+
+document.getElementById('cam-decl')?.addEventListener('click', () => {
+  if (camFilme) arreterPriseCamera()
+  else demarrerPriseCamera()
+})
+
+/* Sur ordinateur, Échap ferme — mais jamais pendant la prise : on ne perd pas
+   trois minutes de tournage sur une touche effleurée. La barre d'espace
+   déclenche, comme partout ailleurs où il y a un seul bouton. */
+document.addEventListener('keydown', (e) => {
+  if (camVoile()?.style.display !== 'flex') return
+  if (e.key === 'Escape' && !camFilme) { e.preventDefault(); fermerCamera() }
+  else if (e.key === ' ' && !e.repeat) {
+    e.preventDefault()
+    camFilme ? arreterPriseCamera() : demarrerPriseCamera()
+  }
+})
+
+function demarrerPriseCamera() {
+  if (!camFlux) return
+  const morceaux = []
+  let type = ''
+  try {
+    const fait = fabriquerEnregistreur(camFlux, CAM_DEBIT)
+    camEnregistreur = fait.enr
+    type = fait.type
+  } catch (e) {
+    echecCamera({ name: '', message: "ce navigateur ne sait pas enregistrer (" + (e?.message || e) + ")" })
+    return
+  }
+
+  camEnregistreur.ondataavailable = (ev) => { if (ev.data?.size) morceaux.push(ev.data) }
+  camEnregistreur.onstop = () => {
+    /* `arreterPriseCamera` a figé le compteur juste avant d'appeler `stop()` :
+       `camCumul` porte donc le temps réellement filmé, pauses déduites. */
+    const secondes = Math.max(1, Math.round(camCumul))
+    camFilme = false
+    camPause = false
+    clearInterval(camMinuteur); camMinuteur = 0
+    garderEcranAllume(false)
+    camVoile().classList.remove('filme', 'pause')
+    majAnneauCamera(0)
+
+    if (camAnnule) {
+      /* Rien n'est gardé, et la caméra reste ouverte : on recommence une
+         prise, on ne quitte pas la séance. */
+      camAnnule = false
+      camCumul = 0
+      document.getElementById('cam-minute').querySelector('b').textContent = '0:00'
+      return
+    }
+
+    const extension = (type || '').includes('mp4') ? 'mp4' : 'webm'
+    const nom = `camera-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${extension}`
+    const fichier = new File(morceaux, nom, { type: type || 'video/mp4' })
+    /* La durée, que le conteneur d'un enregistreur ne porte pas. Voir
+       `chargerVideoPourIA`. */
+    try { fichier.dureeConnue = secondes } catch (e) {}
+
+    fermerCamera()
+    if (!fichier.size) { toast("L’enregistrement est vide."); return }
+    collageEnAttente = fichier
+    showGestionScreen('p-create')
+    toast('Vidéo prête — nommez la procédure, puis lancez l’analyse')
+  }
+
+  /* Si la caméra se coupe seule — appel entrant, application mise en veille —
+     on garde ce qui a été filmé plutôt que de tout perdre. */
+  camFlux.getVideoTracks()[0]?.addEventListener('ended', () => {
+    if (camFilme) arreterPriseCamera()
+  })
+
+  camEnregistreur.start(1000)
+  camDepart = Date.now()
+  camCumul = 0
+  camPause = false
+  camFilme = true
+  camAnnule = false
+  camVoile().classList.add('filme')
+  camVoile().classList.remove('pause')
+  /* Un navigateur sans `pause()` — il en reste — ne doit pas montrer un
+     bouton qui ne fait rien. */
+  camVoile().classList.toggle('sans-pause', typeof camEnregistreur.pause !== 'function')
+  garderEcranAllume(true)
+  peindreMinuteurCamera()
+  camMinuteur = setInterval(peindreMinuteurCamera, 250)
+}
+
+/* Le temps réellement filmé : les segments déjà enregistrés, plus celui en
+   cours s'il tourne. */
+function camEcoule() {
+  return camCumul + (camPause || !camDepart ? 0 : (Date.now() - camDepart) / 1000)
+}
+
+function basculerPauseCamera() {
+  if (!camFilme || !camEnregistreur) return
+  if (typeof camEnregistreur.pause !== 'function') return
+
+  if (camPause) {
+    try { camEnregistreur.resume() } catch (e) { return }
+    camDepart = Date.now()
+    camPause = false
+    camVoile().classList.remove('pause')
+    camMinuteur = setInterval(peindreMinuteurCamera, 250)
+  } else {
+    try { camEnregistreur.pause() } catch (e) { return }
+    /* On fige le compteur AVANT de couper l'horloge : sinon la seconde en
+       cours serait perdue à chaque pause, et dix pauses feraient dix
+       secondes d'écart entre l'affichage et le fichier. */
+    camCumul = camEcoule()
+    camPause = true
+    camDepart = 0
+    clearInterval(camMinuteur); camMinuteur = 0
+    camVoile().classList.add('pause')
+  }
+  peindreMinuteurCamera()
+}
+
+document.getElementById('cam-pause')?.addEventListener('click', basculerPauseCamera)
+
+function peindreMinuteurCamera() {
+  const ecoule = camEcoule()
+  majAnneauCamera(ecoule / CAM_DUREE_MAX)
+  const s = Math.floor(ecoule)
+  const b = document.getElementById('cam-minute')?.querySelector('b')
+  if (b) b.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+  const i = document.getElementById('cam-minute')?.querySelector('i')
+  if (i) i.textContent = camPause ? 'en pause' : 'sur 5:00'
+  if (!camPause && ecoule >= CAM_DUREE_MAX) {
+    arreterPriseCamera()
+    toast('Cinq minutes : l’enregistrement s’arrête là.')
+  }
+}
+
+function arreterPriseCamera() {
+  /* ⚠ ON FIGE LE COMPTEUR ICI, pas dans `onstop` : entre l'appel à `stop()` et
+     l'événement, il s'écoule quelques dizaines de millisecondes — et surtout,
+     après `stop()` l'état de pause n'est plus lisible. */
+  camCumul = camEcoule()
+  camPause = true
+  camDepart = 0
+  clearInterval(camMinuteur); camMinuteur = 0
+  if (camEnregistreur && camEnregistreur.state !== 'inactive') camEnregistreur.stop()
+  else {
+    camFilme = false
+    camPause = false
+    garderEcranAllume(false)
+    camVoile()?.classList.remove('filme', 'pause')
+  }
+}
+
+function fermerCamera() {
+  clearInterval(camMinuteur); camMinuteur = 0
+  camFilme = false
+  camPause = false
+  camCumul = 0
+  camDepart = 0
+  camAnnule = false
+  camEnregistreur = null
+  garderEcranAllume(false)
+  couperFluxCamera()
+  const v = camVoile()
+  if (v) { v.classList.remove('filme', 'pause'); v.style.display = 'none' }
+}
+
 function ouvrirCollage() {
   collageFichiers = []
   collageResultat = null
@@ -17505,9 +18244,15 @@ function chargerVideoPourIA(file) {
      Le bouton s'ouvre maintenant dans `verifierDureeVideo`, une fois la durée
      lue — et seulement si elle passe. */
   document.getElementById('ai-launch-btn').disabled = true
-  aiVideoDuree = 0
+  /* ═══ UNE VIDÉO PEUT ARRIVER AVEC SA DURÉE DÉJÀ CONNUE ═══
+
+     Un WebM sorti d'un enregistreur ne porte pas la sienne : le lecteur rend
+     `Infinity`, et le bouton restait fermé pour toujours. L'enregistrement
+     d'écran compte ses secondes lui-même et les pose sur le fichier ; on les
+     prend comme point de départ, le lecteur les corrigera s'il sait faire. */
+  aiVideoDuree = Number(file?.dureeConnue) > 0 ? Number(file.dureeConnue) : 0
   player.addEventListener('loadedmetadata', () => {
-    if (isFinite(player.duration)) aiVideoDuree = player.duration
+    if (isFinite(player.duration) && player.duration > 0) aiVideoDuree = player.duration
     verifierDureeVideo()
     /* Safari sur iPhone ne peint AUCUNE image tant qu'on n'a pas demandé une
        position. `load()` ne suffit pas : le lecteur reste noir. On avance d'un

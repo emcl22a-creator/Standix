@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=eb0a3b1b">
+<link rel="stylesheet" href="style.css?v=1cd11b89">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2473,10 +2473,25 @@
 
                « personnes » a été retiré de la ligne du dessus : ni l'ancien
                ni le nouveau mode n'en tiraient quoi que ce soit. -->
-          <label class="lg lg-langue" for="ai-langue">
+          <!-- ═══════════════════════════════════════════════════════════
+               LA LANGUE S'OUVRE COMME LE TRI, PAS COMME LE SYSTÈME
+
+               C'était un `select` : le navigateur affichait SON menu, celui
+               d'iOS ou de Windows. Deux menus dans la même app doivent être
+               faits de la même chose, sinon l'un des deux paraît venir
+               d'ailleurs. Celui-ci reprend donc `.tb-volet` et `.glassDiv`,
+               exactement comme « Trier ».
+
+             ⚠ LE `select` RESTE DANS LA PAGE, MASQUÉ. Deux endroits du script
+               lisent `ai-langue.value` pour envoyer la langue à l'analyse. Le
+               remplacer aurait demandé de toucher à ces deux endroits ; le
+               garder et l'écrire depuis le volet ne casse rien, et l'app
+               continue de fonctionner si le volet ne s'ouvre pas.
+               ═══════════════════════════════════════════════════════════ -->
+          <div class="lg lg-langue" id="ai-langue-ligne">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18"></path><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18Z"></path></svg>
             <span><b>Langue parlée</b></span>
-            <select id="ai-langue">
+            <select id="ai-langue" aria-hidden="true" tabindex="-1">
               <option value="fr-FR">Français</option>
               <option value="en-US">English</option>
               <option value="de-DE">Deutsch</option>
@@ -2484,7 +2499,29 @@
               <option value="it-IT">Italiano</option>
               <option value="pt-PT">Português</option>
             </select>
-          </label></div>
+            <button type="button" class="ai-langue-btn" id="ai-langue-btn"
+                    aria-haspopup="menu" aria-expanded="false">
+              <span id="ai-langue-txt">Français</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="7 10 12 15 17 10"></polyline>
+              </svg>
+            </button>
+            <div class="tb-volet tb-volet--tri glassDiv" id="ai-langue-volet" role="menu" hidden>
+              <button type="button" class="tb-v-opt tb-v-tri tb-v-langue on" data-langue="fr-FR">
+                <span class="tb-v-coche">✓</span>Français</button>
+              <button type="button" class="tb-v-opt tb-v-tri tb-v-langue" data-langue="en-US">
+                <span class="tb-v-coche">✓</span>English</button>
+              <button type="button" class="tb-v-opt tb-v-tri tb-v-langue" data-langue="de-DE">
+                <span class="tb-v-coche">✓</span>Deutsch</button>
+              <button type="button" class="tb-v-opt tb-v-tri tb-v-langue" data-langue="es-ES">
+                <span class="tb-v-coche">✓</span>Español</button>
+              <button type="button" class="tb-v-opt tb-v-tri tb-v-langue" data-langue="it-IT">
+                <span class="tb-v-coche">✓</span>Italiano</button>
+              <button type="button" class="tb-v-opt tb-v-tri tb-v-langue" data-langue="pt-PT">
+                <span class="tb-v-coche">✓</span>Português</button>
+            </div>
+          </div></div>
 
       
       <!-- Le sélecteur de fichier est invisible et couvre le cadre : on touche
@@ -5208,7 +5245,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=ef73388c"></script>
+<script type="module" src="app.js?v=02cd9c8d"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

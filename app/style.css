@@ -897,7 +897,10 @@
   .ia-ecoute .lg-langue select{
     -webkit-appearance:none; appearance:none;
     border:none; background:transparent; font-family:inherit;
-    font-size:16px; font-weight:600; letter-spacing:-0.01em; color:var(--blue);
+    /* 14,5 et non 16 : la valeur pesait plus lourd que le libellé qu'elle
+       accompagne (13 px). Elle reste en bleu, donc reconnaissable comme un
+       choix, sans dominer la ligne. */
+    font-size:14.5px; font-weight:600; letter-spacing:-0.01em; color:var(--blue);
     padding:2px 18px 2px 4px; text-align:right; direction:rtl;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234899EC' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3C/svg%3E");
     background-repeat:no-repeat; background-position:right 0 center; background-size:13px;
@@ -1279,11 +1282,63 @@
   .ai-legende.cache{ opacity:0; max-height:0; margin-bottom:0; }
   .ai-legende .t{ display:block; font-size:17px; font-weight:700; letter-spacing:-0.03em; }
 
+  /* ═══════════════════════════════════════════════════════════════════
+     LE CADRE D'AJOUT DE LA VIDÉO
+
+   ⚠ IL RESTAIT NOIR, ET LA RAISON EST BÊTE. Le cadre du lecteur a un fond
+     noir — nécessaire, pour les bandes d'une vidéo qui n'est pas en 16/9.
+     Cette zone-ci se contentait d'un fond à 1,7 % et d'un pointillé à 18 % :
+     posés sur du noir, l'un comme l'autre disparaissent. On voyait un grand
+     rectangle noir, et rien n'indiquait qu'il fallait toucher dedans.
+
+     Elle est donc posée EN COUVERTURE du cadre (`inset:0`), avec un fond
+     opaque : le noir ne peut plus traverser.
+
+     Le rond de verre reprend le bleu de Standix et la manière d'Apple — un
+     dégradé clair, un liseré d'un demi-pixel, une ombre portée colorée et un
+     halo large et très pâle. Rien de décoratif : c'est lui qui dit où
+     appuyer. */
   .ai-vide{
-    display:block; width:100%; aspect-ratio:16/9; border-radius:16px;
-    background:rgba(28,28,38,0.017);
-    border:1.5px dashed rgba(28,28,38,0.184);
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    border-radius:16px;
+    background:linear-gradient(180deg, #FFFFFF 0%, #F6F7FC 100%);
+    border:1.5px dashed rgba(28,28,38,0.16);
+    text-align:center; padding:16px;
   }
+  .ai-vide-rond{
+    width:calc(62px * var(--ech)); height:calc(62px * var(--ech));
+    border-radius:100px; display:grid; place-items:center;
+    color:#1F4CEE;
+    background:radial-gradient(circle at 50% 34%,
+      #FFFFFF 0%, #EFF4FE 52%, #DDE8FD 100%);
+    /* ⚠ LE HALO A ÉTÉ RETIRÉ. C'était un anneau pâle de neuf pixels posé
+       autour du rond (`0 0 0 9px`). Sur le fond blanc de la zone, il ne se
+       lisait pas comme une lumière mais comme un second cercle, plus flou,
+       derrière le premier.
+
+       Il reste le relief : un liseré intérieur d'un demi-pixel, une touche de
+       blanc en haut, et l'ombre portée qui décolle le rond du fond. */
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      inset 0 0 0 0.5px rgba(31,76,238,0.12),
+      0 10px 22px -10px rgba(31,76,238,0.45);
+  }
+  .ai-vide-rond svg{
+    width:calc(25px * var(--ech)); height:calc(25px * var(--ech)); display:block;
+  }
+  .ai-vide-t{
+    margin-top:calc(15px * var(--ech));
+    font-size:calc(14.5px * var(--ech)); font-weight:700;
+    letter-spacing:-0.02em; color:var(--label);
+  }
+  .ai-vide-s{
+    margin-top:calc(4px * var(--ech));
+    font-size:calc(12px * var(--ech)); color:var(--label-3);
+  }
+  /* Le doigt posé dessus : le rond s'enfonce, comme un bouton. */
+  .dv-depot:active .ai-vide-rond{ transform:scale(0.94); }
+  .ai-vide-rond{ transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1); }
   /* De l'air entre la vidéo et ce que l'IA analyse. */
   #ai-upload-card .ia-ecoute{ margin-top:20px; }
 
@@ -22801,7 +22856,7 @@ body.abo-expire [data-etab-plus]{
   .ent-basculer{ font-size:calc(12.5px * var(--ech)); }
   .ia-ecoute .tt{ font-size:calc(11px * var(--ech)); }
   .ia-ecoute .lg{ font-size:calc(13px * var(--ech)); }
-  .ia-ecoute .lg-langue select{ font-size:calc(16px * var(--ech)); }
+  .ia-ecoute .lg-langue select{ font-size:calc(14.5px * var(--ech)); }
   .ai-type button .t{ font-size:calc(14.5px * var(--ech)); }
   .ai-type button .s{ font-size:calc(12px * var(--ech)); }
   .ia-fig.g .pct{ font-size:calc(19px * var(--ech)); }
@@ -25032,4 +25087,19 @@ html::-webkit-scrollbar-thumb:hover{
       0 -1px 0 rgba(28,28,38,0.07),
       0 -18px 18px -22px rgba(20,20,30,0.34);
   }
-}}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE LISERÉ NOIR AUTOUR DE LA ZONE D'AJOUT
+
+   La zone d'ajout couvre le cadre du lecteur, mais le cadre porte un bord
+   d'un demi-pixel : son fond noir ressortait tout autour, un filet sombre de
+   un pixel que rien n'expliquait. Mesuré : (3,3,4) au ras du bord.
+
+   Ce cadre-ci n'a donc plus ni fond ni bord — il ne fait plus que tenir la
+   proportion 16/9. Le noir passe sur le LECTEUR lui-même, qui en a besoin
+   pour les bandes d'une vidéo qui n'est pas au bon format ; la zone d'ajout,
+   elle, dessine son propre pointillé.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#ai-video-frame{ background:transparent; border:none; }
+#ai-video-player{ background:#000; border-radius:16px; }

@@ -15391,7 +15391,7 @@ let collageEnAttente = null   // passée à l'écran IA, consommée une fois
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const ECRAN_DUREE_MAX = 5 * 60         // secondes, comme le reste de l'app
-let ecranDelai = 10                    // secondes de compte à rebours
+let ecranDelai = 5                     // secondes de repère, 5 par défaut
 let ecranEnregistreur = null           // MediaRecorder en cours
 let ecranFlux = null                   // les pistes à couper à la fin
 let ecranMinuteur = 0
@@ -15399,6 +15399,7 @@ let ecranDepart = 0
 let ecranCumul = 0      // secondes déjà enregistrées avant la pause en cours
 let ecranPause = false
 let ecranAnnule = false // « Recommencer » : la prise en cours part à la poubelle
+let ecranRebours = 0    // secondes de repère restantes pour se placer
 
 function ecranPossible() {
   return typeof navigator !== 'undefined'
@@ -15417,11 +15418,20 @@ function ouvrirEnregistrementEcran() {
       const garde = Number(localStorage.getItem('standix-ecran-delai'))
       if ([5, 10, 15].includes(garde)) ecranDelai = garde
     } catch (e) {}
-    majDelaiEcran()
   } else {
     document.getElementById('ecran-mode-emploi').innerHTML = modeEmploiEcran()
   }
   showGestionScreen('p-ecran')
+  /* ⚠ APRÈS `showGestionScreen`, ET C'ÉTAIT TOUT LE DÉFAUT.
+
+     `majDelaiEcran` place la pastille blanche en la MESURANT. Appelée avant
+     l'affichage, elle mesurait un écran encore en `display:none` : toutes les
+     largeurs valaient zéro, elle écrivait `width:0px`, et la pastille
+     n'existait plus. Le libellé « 5 s » passait bien en gras, mais rien ne
+     l'entourait — aucun bouton ne paraissait choisi.
+
+     La mesure se fait donc une fois la page à l'écran. */
+  if (surOrdi) majDelaiEcran()
 }
 window.ouvrirEnregistrementEcran = ouvrirEnregistrementEcran
 
@@ -15468,8 +15478,14 @@ function majDelaiEcran() {
   const lens = document.getElementById('ecran-delai-lens')
   if (actif && lens) {
     const r = actif.getBoundingClientRect(), p = piste.getBoundingClientRect()
-    lens.style.width = `${r.width}px`
-    lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+    /* ⚠ UNE MESURE NULLE N'EST PAS UNE MESURE. Écran masqué, page en cours
+       d'animation : la largeur vaut zéro. On ne touche alors à rien — le CSS
+       pose déjà la pastille au tiers de la piste, ce qui est juste tant que
+       personne n'a changé de segment. */
+    if (r.width > 0) {
+      lens.style.width = `${r.width}px`
+      lens.style.transform = `translateX(${r.left - p.left - 3}px)`
+    }
   }
 }
 
@@ -15559,7 +15575,7 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
    de partage à chaque reprise serait absurde — l'écran est déjà choisi, et le
    navigateur ne la rouvrirait de toute façon pas sans un nouveau clic.
    ═══════════════════════════════════════════════════════════════════════════ */
-async function lancerPriseEcran() {
+function lancerPriseEcran() {
   const err = document.getElementById('ecran-erreur')
   const pisteVideo = ecranFlux?.getVideoTracks?.()[0]
   if (!pisteVideo || pisteVideo.readyState !== 'live') { nettoyerEcran(); return }
@@ -15644,20 +15660,19 @@ async function lancerPriseEcran() {
   ecranDepart = Date.now()
   ecranCumul = 0
   ecranPause = false
+  ecranRebours = 0
 
-  const enr = ecranEnregistreur   // repère : « Recommencer » en fabrique un autre
-  for (let reste = ecranDelai; reste > 0; reste--) {
-    /* Prise arrêtée, jetée ou relancée pendant le décompte : on se retire
-       sans rien peindre, sinon deux voiles se disputeraient l'écran. */
-    if (ecranEnregistreur !== enr || enr.state === 'inactive') return
-    const v = voileEcran(
-      `<div class="ecran-compte"><b>${reste}</b>` +
-      `<span><i class="ecran-rouge"></i>ça tourne déjà — placez-vous</span></div>`)
-    v.classList.remove('discret')
-    await new Promise(r => setTimeout(r, 1000))
-  }
-  if (ecranEnregistreur !== enr || enr.state === 'inactive') return
+  /* ═══ LE COMPTEUR EST LÀ DÈS LA PREMIÈRE SECONDE ═══
 
+   ⚠ IL ARRIVAIT APRÈS LE DÉCOMPTE, et c'était à l'envers. Un grand voile noir
+     couvrait l'écran pendant cinq à quinze secondes, puis le compteur
+     apparaissait. Or c'est le compteur qu'on veut voir tout de suite : c'est
+     lui qui dit que ça tourne, et l'écran qu'on filme doit rester visible.
+
+     Il n'y a donc plus de boucle d'attente : la pastille se peint
+     immédiatement, en haut au centre, et le nombre du décompte se glisse
+     dessous tant qu'il dure. Le voile reste transparent du début à la fin. */
+  ecranRebours = ecranDelai
   peindrePastilleEcran()
   ecranMinuteur = setInterval(peindrePastilleEcran, 1000)
 }
@@ -15693,11 +15708,23 @@ function peindrePastilleEcran() {
   const ecoule = Math.floor(brut)
   const m = Math.floor(ecoule / 60), sec = String(ecoule % 60).padStart(2, '0')
   const peutPause = typeof ecranEnregistreur?.pause === 'function'
+  /* ⚠ LE REPÈRE TIENT DANS LA PASTILLE, il n'a pas son propre bloc.
+
+     Il en avait un : un grand chiffre blanc posé sur la page. Sur le fond
+     clair de l'app il était illisible, et il venait cogner le logo de la
+     barre du haut. La pastille, elle, porte déjà son fond sombre — le
+     chiffre y est net partout, et rien ne se chevauche.
+
+     Il s'éteint tout seul ; la prise, elle, continue. */
+  if (ecranRebours > 0 && !ecranPause) ecranRebours--
   const v = voileEcran(
     `<div class="ecran-prise${ecranPause ? ' pause' : ''}">
        <span class="ecran-rouge"></span>
        <b>${m}:${sec}</b>
-       <span class="ecran-reste">${ecranPause ? 'en pause' : 'sur 5:00'}</span>
+       <span class="ecran-reste">${
+         ecranPause ? 'en pause'
+         : ecranRebours > 0 ? `placez-vous · ${ecranRebours}`
+         : 'sur 5:00'}</span>
        ${peutPause ? `<button type="button" class="ecran-mini" id="ecran-pause"
           aria-label="${ecranPause ? 'Reprendre' : 'Mettre en pause'}">${
           ecranPause
@@ -15736,6 +15763,7 @@ function nettoyerEcran() {
   ecranPause = false
   ecranCumul = 0
   ecranDepart = 0
+  ecranRebours = 0
   fermerVoileEcran()
   const v = document.getElementById('ecran-voile')
   if (v) v.classList.remove('discret')

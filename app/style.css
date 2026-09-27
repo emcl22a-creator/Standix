@@ -25319,3 +25319,34 @@ html::-webkit-scrollbar-thumb:hover{
   .etab-ident-s{ font-size:calc(12.5px * var(--ech)); }
   .etab-ident-fl{ font-size:calc(19px * var(--ech)); }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE D'INSCRIPTION TIENT DANS UNE COLONNE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Mesuré : sur un écran de 1440 px, les deux boutons d'inscription faisaient
+   1 377 px de large, et 961 px sur iPad. Un bouton aussi long ne se lit plus
+   comme un bouton — l'œil ne sait plus où commence l'action.
+
+   ⚠ 420 PX, PAS `--col`. La colonne de l'app vaut 744 px sur PC et la pleine
+     largeur sur tablette : c'est la mesure d'un écran de travail, qui porte
+     des listes et des cartes. Cette page-ci ne porte que trois éléments
+     empilés ; elle se lit comme un formulaire, et un formulaire se tient
+     étroit.
+
+   ⚠ À PARTIR DE 560 PX, donc aussi un grand téléphone en paysage — où le
+     problème est le même qu'un PC : beaucoup de largeur, peu de hauteur. */
+@media (min-width: 560px){
+  /* ⚠ `#login-screen` EST LA PAGE QU'ON VOIT AUJOURD'HUI — celle du slogan
+     et des deux inscriptions. `#choice-screen` est l'ancienne, gardée dans le
+     balisage mais hors parcours : on la cale pareil, pour qu'elle ne
+     ressurgisse pas un jour à 1 400 px de large. */
+  #login-screen > .login-card,
+  #choice-screen .choix-ecran{
+    width:100%;
+    max-width:420px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+}

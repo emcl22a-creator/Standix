@@ -9536,8 +9536,8 @@ function remplirHistoMouvements(idZone) {
   const PH = {
     arrivee:      (n) => `${n} <em>a rejoint l’équipe</em>`,
     depart:       (n) => `${n} <em>a quitté l’entreprise</em>`,
-    vers_gestion: (n) => `${n} <em>est passé en Gestion</em>`,
-    vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
+    vers_gestion: (n) => `${n} <em>est passé en espace Gestion</em>`,
+    vers_equipe:  (n) => `${n} <em>est passé en espace Utilisateur</em>`,
   }
   /* ⚠ LES POINTS VIENNENT DE `PALETTE_DOSSIERS`, pas d'une liste a part.
 
@@ -10480,8 +10480,8 @@ function peindreTuilesAccueil() {
   const PHRASES_MOUVEMENT = {
     arrivee:      (n) => `${n} <em>a rejoint l’équipe</em>`,
     depart:       (n) => `${n} <em>a quitté l’entreprise</em>`,
-    vers_gestion: (n) => `${n} <em>est passé en Gestion</em>`,
-    vers_equipe:  (n) => `${n} <em>est passé en Équipe</em>`,
+    vers_gestion: (n) => `${n} <em>est passé en espace Gestion</em>`,
+    vers_equipe:  (n) => `${n} <em>est passé en espace Utilisateur</em>`,
   }
   /* Le point de l'etiquette prend la couleur du mouvement le plus recent :
      c'est lui qu'on lit en premier.
@@ -16907,9 +16907,14 @@ async function lireEtatAbonnement() {
        passée. Bloquer un client parce qu'une colonne manque serait pire que
        de laisser passer quelques jours de trop. */
     etatAbo = null
+    majPastilleProfil()
     return null
   }
   etatAbo = brut
+  /* Des que l'etat est connu, la barre le dit — sans attendre que quelqu'un
+     ouvre les reglages, qui est le seul endroit ou `dessinerAlerteEssai`
+     passe. */
+  majPastilleProfil()
 
   /* ═══ LE COMPTE D'ANALYSES, LU EN MÊME TEMPS ═══
 
@@ -17112,7 +17117,35 @@ function joursAvant(iso) {
   return Math.max(0, Math.min(14, reste))
 }
 
+/* ═══ LA PASTILLE ROUGE SUR LE BOUTON PROFIL ═══
+
+   Quand l'essai est termine, l'app se bloque — mais le bandeau qui l'explique
+   vit dans les reglages. Quelqu'un qui reste sur l'accueil voit des boutons
+   qui ne repondent plus sans savoir pourquoi. La pastille porte le signal
+   jusque dans la barre du haut, sur le bouton qui mene a l'abonnement.
+
+   ⚠ ELLE SE FIE A `essaiTermine()`, PAS A `etatAbo.statut`. C'est cette
+     fonction qui tranche partout ailleurs dans l'app — y compris pour les
+     statuts autres qu'`expire` et pour le gerant qui paie un autre
+     etablissement. Un second raisonnement ici aurait fini par diverger, et
+     l'on aurait vu la pastille sur un compte qui paie. */
+function majPastilleProfil() {
+  const pt = document.getElementById('tb-alerte-gestion')
+  if (!pt) return
+  const alerte = essaiTermine()
+  pt.hidden = !alerte
+  /* Le bouton porte le sens pour la synthese vocale : la pastille elle-meme
+     est `aria-hidden`, un « ! » lu tout seul n'apprend rien. */
+  document.getElementById('tb-menu-gestion')
+    ?.setAttribute('aria-label', alerte ? 'Votre profil — votre essai est terminé' : 'Votre profil')
+}
+
 function dessinerAlerteEssai(hote) {
+  /* ⚠ ICI, ET AVANT TOUTE SORTIE. Cette fonction rend la main de quatre
+     endroits differents (pas de zone, abonnement actif, paie ailleurs…) :
+     mettre la pastille a jour plus bas l'aurait laissee allumee sur les
+     comptes qui sortent tot. */
+  majPastilleProfil()
   const zone = document.getElementById(hote)
   if (!zone) return
   if (!etatAbo || etatAbo.statut === 'actif') { zone.style.display = 'none'; return }
@@ -19212,34 +19245,64 @@ async function comprimerVideoRapide(fichier, surAvancee) {
     /* ═══ UN ALLÈGEMENT QUI NE BOUGE PLUS ═══
        Sur iPhone, l'encodeur peut se figer sans erreur (page mise en pause,
        mémoire reprise) : `execute()` ne rend alors jamais la main, et l'anneau
-       du bouton tourne pour toujours. On surveille l'avancée : 45 secondes
-       sans progrès, page visible, on arrête et on le dit. Le temps passé hors
-       de l'app ne compte pas — l'encodeur reprend souvent au retour. */
+       du bouton tourne pour toujours. On surveille donc l'avancée : passé un
+       délai sans progrès, page visible, on arrête et l'on bascule. Le temps
+       passé hors de l'app ne compte pas — l'encodeur reprend souvent au
+       retour. */
+    /* ⚠ 45 SECONDES FIXES ÉTAIENT TROP COURTES POUR UN ENREGISTREMENT D'ÉCRAN.
+
+         `getDisplayMedia` produit une vidéo à CADENCE VARIABLE : tant que rien
+         ne bouge à l'écran, aucune image n'est produite. Filmer un tableur,
+         c'est des minutes entières sans une seule image nouvelle — donc sans
+         un seul événement d'avancée. Le garde-fou tuait une conversion qui se
+         portait bien. Constaté sur PC, sur un tableur.
+
+       ⚠ LA PATIENCE SUIT DONC LA DURÉE DE LA VIDÉO : une demi-seconde par
+         seconde filmée, au moins une minute, trois au plus. */
     let derniere = Date.now()
+    let dernierPct = 0
     conversion.onProgress = (p) => {
       derniere = Date.now()
-      if (surAvancee) surAvancee(Math.min(99, Math.round(p * 100)))
+      dernierPct = Math.min(99, Math.round(p * 100))
+      if (surAvancee) surAvancee(dernierPct)
     }
     const auRetour = () => { if (document.visibilityState === 'visible') derniere = Date.now() }
     document.addEventListener('visibilitychange', auRetour)
+    const PATIENCE = Math.min(180000, Math.max(60000, Math.round(duree * 500)))
     let garde = 0
-    const bloque = new Promise((_, rejeter) => {
+    let fige = false
+    /* ⚠ ELLE SE RÉSOUT, ELLE NE REJETTE PLUS. Un blocage n'est plus une erreur
+       qui remonte jusqu'à l'utilisateur : c'est un signal pour passer à la
+       méthode classique, qui n'emploie pas WebCodecs et ne peut donc pas se
+       figer de la même façon. Perdre le gain de vitesse vaut mieux que perdre
+       l'analyse. */
+    const surveillance = new Promise((resoudre) => {
       garde = setInterval(() => {
         if (document.visibilityState !== 'visible') { derniere = Date.now(); return }
-        if (Date.now() - derniere > 45000) {
+        if (Date.now() - derniere > PATIENCE) {
           clearInterval(garde)
+          fige = true
           conversion.cancel?.().catch?.(() => {})
-          const err = new Error("L'all\u00e8gement de la vid\u00e9o s'est bloqu\u00e9. Relancez l'analyse.")
-          err.allegementBloque = true
-          rejeter(err)
+          resoudre()
         }
       }, 2000)
     })
+    /* ⚠ ON ATTRAPE À PART LE REJET DU TRAVAIL ANNULÉ. Après `cancel()`,
+       `execute()` rejette souvent — et comme la course est déjà gagnée par la
+       surveillance, ce rejet n'aurait plus personne pour l'écouter. */
+    const travail = conversion.execute()
+    travail.catch(() => {})
     try {
-      await Promise.race([conversion.execute(), bloque])
+      await Promise.race([travail, surveillance])
     } finally {
       clearInterval(garde)
       document.removeEventListener('visibilitychange', auRetour)
+    }
+    if (fige) {
+      journalIA(`allègement rapide figé à ${dernierPct} % après ${Math.round(PATIENCE / 1000)} s `
+        + `sans avancée (${large}×${haut}, ${Math.round(duree)} s) — méthode classique`)
+      console.warn('[compression rapide] figé à', dernierPct, '% — méthode classique')
+      return null
     }
     if (surAvancee) surAvancee(100)
 
@@ -19258,10 +19321,9 @@ async function comprimerVideoRapide(fichier, surAvancee) {
     return new File([octets], (fichier.name || 'video').replace(/\.[^.]+$/, '') + '.mp4',
                     { type: 'video/mp4' })
   } catch (e) {
-    /* Un blocage n'est pas un format refusé : la méthode classique, qui lit
-       la vidéo en temps réel, se bloquerait de la même façon. On remonte
-       l'erreur pour que le bouton propose de relancer. */
-    if (e?.allegementBloque) throw e
+    /* Quoi qu'il arrive ici, on rend `null` et la méthode classique prend le
+       relais. Elle lit la vidéo en temps réel, sans WebCodecs : elle est plus
+       lente, mais elle ne bute pas sur les mêmes choses. */
     console.warn('[compression rapide] échec, méthode classique :', e?.message || e)
     journalIA('allègement rapide impossible : ' + String(e?.message || e).slice(0, 160))
     return null
@@ -28482,14 +28544,76 @@ function peindreRangEtab(idRang, idPlus, idNote, espace) {
     note.innerHTML = plein
       ? `Vous gérez ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
       : (dejaGerant && espace !== 'equipe')
-        ? 'Cr\u00e9er un \u00e9tablissement est <b>gratuit</b>. Les membres des deux '
-          + '\u00e9tablissements s\u2019additionnent sur votre abonnement : une fois le '
-          + 'nombre atteint, plus personne ne peut rejoindre l\u2019un ou l\u2019autre.'
+        ? ''
         : 'Touchez un logo pour basculer d\u2019une entreprise \u00e0 l\u2019autre. '
           + 'Pour rejoindre une autre entreprise, demandez son <b>code '
           + 'd\u2019invitation</b> \u00e0 son responsable.'
+    /* ⚠ VIDE VEUT DIRE ABSENTE. Le paragraphe garderait sinon sa marge haute
+       et laisserait un blanc sous la ligne d'identite. */
+    note.hidden = !note.innerHTML
+  }
+
+  /* ═══ LA LIGNE DU NOM ET DU LOGO ═══
+
+     Elle remplace le paragraphe sur la facturation, qui disait une regle vraie
+     mais qu'on ne lit qu'une fois. Ce qu'on revient chercher, c'est
+     l'entreprise elle-meme. */
+  if (espace !== 'equipe') peindreIdentiteEtab(dejaGerant)
+}
+
+/* ⚠ SEPAREE DE `peindreRangEtab`, parce qu'elle sert aussi apres une
+   modification : renommer l'entreprise doit rafraichir cette ligne sans
+   reconstruire toute la rangee de ronds.
+
+ ⚠ AU GERANT SEUL. `dejaGerant` dit qu'on a fonde une entreprise quelque
+   part ; encore faut-il etre le gerant de CELLE-CI, d'ou `estFondateur` — le
+   meme test que partout ailleurs dans l'app. */
+function peindreIdentiteEtab(dejaGerant) {
+  const ligne = document.getElementById('etab-ident')
+  if (!ligne) return
+
+  const courant = (mesEtablissements || [])
+    .find(e => e.id === currentMembre?.entreprise_id)
+  const montrer = !!courant && !!dejaGerant && estFondateur(currentMembre)
+  ligne.hidden = !montrer
+  if (!montrer) return
+
+  const nom = (courant.nom || '').trim()
+  document.getElementById('etab-ident-nom').textContent = nom || 'Votre entreprise'
+  ligne.setAttribute('aria-label',
+    (nom || 'Votre entreprise') + ' — modifier le nom et le logo')
+
+  /* Le logo remplace les initiales quand il existe. On retire l'ancienne image
+     avant d'en poser une neuve : sans cela, chaque bascule d'entreprise en
+     empilerait une de plus. */
+  const boite = document.getElementById('etab-ident-logo')
+  boite.querySelector('img')?.remove()
+  const ini = document.getElementById('etab-ident-ini')
+  if (courant.logo_url) {
+    const img = document.createElement('img')
+    /* ⚠ `data-logo-fichier`, PAS `src`. Les logos vivent dans
+       `procedo-logos` : c'est `signerLogos` qui sait en tirer une adresse,
+       comme pour les ronds de la rangee du dessus. */
+    img.setAttribute('data-logo-fichier', courant.logo_url)
+    img.alt = ''
+    boite.appendChild(img)
+    signerLogos(boite)
+    ini.hidden = true
+  } else {
+    ini.hidden = false
+    ini.textContent = (nom || '?').split(/\s+/).slice(0, 2)
+      .map(m => m[0]).join('').toUpperCase() || '?'
   }
 }
+
+/* ⚠ SUR LE DOCUMENT, comme le « + » juste en dessous et pour la meme raison :
+   la ligne est repeinte a chaque bascule d'entreprise, un ecouteur pose sur
+   elle disparaitrait avec la peinture. */
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('#etab-ident')) return
+  const id = currentMembre?.entreprise_id
+  if (id) ouvrirFenetreEtab(id)
+})
 
 ;/* ⚠ ON ECOUTE LE DOCUMENT, PAS LE BOUTON.
 
@@ -30225,8 +30349,8 @@ function peindreEquipe() {
      boulangerie. */
   liste.innerHTML =
     section('G\u00e9rant', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
-    section('Espace gestion', 'Cr\u00e9ent les proc\u00e9dures, voient l\u2019analyse, invitent du monde.', gestion) +
-    section('Espace utilisateur', 'Consultent les proc\u00e9dures publi\u00e9es.', equipe)
+    section('Espace gestion', 'Acc\u00e8s au d\u00e9veloppement des proc\u00e9dures et aux param\u00e8tres de l\u2019entreprise.', gestion) +
+    section('Espace utilisateur', 'Acc\u00e8s uniquement aux proc\u00e9dures publi\u00e9es par l\u2019entreprise.', equipe)
   /* Les photos des membres sont dans le dépôt des logos : on signe leurs
      adresses une fois la liste posée. */
   signerLogos(liste)

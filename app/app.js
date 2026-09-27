@@ -28218,8 +28218,23 @@ function entreprisesFondees() {
   return (mesEtablissements || []).filter(e => e.role === 'gestion' && !e.promu_par)
 }
 
+/* ⚠ ON NE CRÉE PLUS D'ENTREPRISE DEPUIS UNE ENTREPRISE. Un compte, une
+   entreprise : la création passe uniquement par l'inscription.
+
+   Cette fonction commandait les trois « + » de l'app — celui de la carte du
+   profil (retiré du balisage), celui du tiroir et celui de la barre du haut —
+   et gardait aussi les deux écouteurs qui ouvraient la fenêtre de création.
+   La mettre à `false` les ferme tous d'un coup, sans avoir à démonter chacun.
+
+   ⚠ CE N'EST QU'UN VERROU D'INTERFACE. La fonction `creer_etablissement` vit
+     dans Supabase et reste appelable. Pour un choix de produit c'est
+     suffisant ; si l'on veut une vraie interdiction, elle se pose là-bas.
+
+   ⚠ LA BASCULE N'EST PAS TOUCHÉE. Un compte qui gère déjà plusieurs
+     entreprises continue de passer de l'une à l'autre par le tiroir et par la
+     barre du haut : `basculerVersEtablissement` ne dépend pas d'ici. */
 function peutCreerUneEntreprise() {
-  return entreprisesFondees().length > 0 || estFondateur(currentMembre)
+  return false
 }
 
 let mesEtablissements = []      // { id, nom, logo_url, membre_id, role }
@@ -28416,8 +28431,17 @@ async function chargerEtablissements() {
 function peindreListeEtab() {
   peindreRangEtab('etab-rang', 'etab-ajouter', 'etab-note', 'gestion')
   peindreRangEtab('e-etab-rang', 'e-etab-ajouter', 'e-etab-note', 'equipe')
+  /* ⚠ APPELÉE À PART, ET PAS DEPUIS `peindreRangEtab`. La rangée de ronds
+     n'existe plus dans le profil de gestion : `peindreRangEtab` y rend la main
+     dès sa première ligne (`if (!rang) return`), et la ligne d'identité n'était
+     donc plus jamais peinte. */
+  peindreIdentiteEtab()
 }
 
+/* ⚠ ELLE NE SERT PLUS QUE L'ESPACE UTILISATEUR. La rangée de ronds a été
+   retirée du profil de gestion : l'appel `('etab-rang', …)` rend la main dès
+   la deuxième ligne. Côté utilisateur, les ronds restent — ils sont le seul
+   chemin pour passer d'une entreprise à l'autre — mais sans « + ». */
 function peindreRangEtab(idRang, idPlus, idNote, espace) {
   const rang = document.getElementById(idRang)
   const plus = document.getElementById(idPlus)
@@ -28553,29 +28577,31 @@ function peindreRangEtab(idRang, idPlus, idNote, espace) {
     note.hidden = !note.innerHTML
   }
 
-  /* ═══ LA LIGNE DU NOM ET DU LOGO ═══
-
-     Elle remplace le paragraphe sur la facturation, qui disait une regle vraie
-     mais qu'on ne lit qu'une fois. Ce qu'on revient chercher, c'est
-     l'entreprise elle-meme. */
-  if (espace !== 'equipe') peindreIdentiteEtab(dejaGerant)
 }
 
-/* ⚠ SEPAREE DE `peindreRangEtab`, parce qu'elle sert aussi apres une
-   modification : renommer l'entreprise doit rafraichir cette ligne sans
-   reconstruire toute la rangee de ronds.
+/* ═══ LE NOM ET LE LOGO DE L'ENTREPRISE, DANS LE PROFIL ═══
 
- ⚠ AU GERANT SEUL. `dejaGerant` dit qu'on a fonde une entreprise quelque
-   part ; encore faut-il etre le gerant de CELLE-CI, d'ou `estFondateur` — le
-   meme test que partout ailleurs dans l'app. */
-function peindreIdentiteEtab(dejaGerant) {
+   C'est tout ce que contient désormais la carte des établissements : la
+   rangée de ronds et le « + » ont été retirés, on ne crée plus d'entreprise
+   depuis une entreprise.
+
+ ⚠ AU GÉRANT SEUL, et au gérant de CELLE-CI. `estFondateur` suffit à
+   trancher — le même test que partout ailleurs dans l'app. Elle ne dépend
+   plus de `peutCreerUneEntreprise`, qui rend maintenant toujours `false` et
+   l'aurait masquée pour tout le monde.
+
+ ⚠ SANS ELLE, LA CARTE ENTIÈRE DISPARAÎT. Elle en est le seul contenu : la
+   laisser afficherait un cadre blanc vide à un gestionnaire invité. */
+function peindreIdentiteEtab() {
   const ligne = document.getElementById('etab-ident')
+  const carte = document.getElementById('etab-carte')
   if (!ligne) return
 
   const courant = (mesEtablissements || [])
     .find(e => e.id === currentMembre?.entreprise_id)
-  const montrer = !!courant && !!dejaGerant && estFondateur(currentMembre)
+  const montrer = !!courant && estFondateur(currentMembre)
   ligne.hidden = !montrer
+  if (carte) carte.style.display = montrer ? '' : 'none'
   if (!montrer) return
 
   const nom = (courant.nom || '').trim()

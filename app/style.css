@@ -25103,3 +25103,91 @@ html::-webkit-scrollbar-thumb:hover{
    ═══════════════════════════════════════════════════════════════════════════ */
 #ai-video-frame{ background:transparent; border:none; }
 #ai-video-player{ background:#000; border-radius:16px; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA ZONE D'AJOUT PREND LA TAILLE DE LA VIDÉO DU DÉTAIL
+
+   Sur tablette et ordinateur, la vidéo d'une procédure est plafonnée à la
+   taille qu'elle a sur téléphone : étirée sur toute la colonne, elle écrase
+   la page. Ce plafond visait `#analyse-video-frame` et `#detail-video-frame`
+   — le cadre de la CRÉATION n'y était pas, et prenait donc toute la largeur.
+
+   Il suit maintenant la même règle : sur un même écran, les deux cadres font
+   la même taille.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (min-width: 700px) and (min-height: 600px){
+  #ai-video-frame{
+    width:100%;
+    max-width:calc(390px * var(--ech));
+    margin-left:auto; margin-right:auto;
+  }
+}
+
+/* ═══ DE L'AIR SOUS LE TITRE ═══
+   Les autres pages posent un sous-titre entre le titre et la première carte ;
+   celle-ci n'en a pas, et la carte venait se coller au bas du titre. */
+#p-create-ai #ai-upload-card{ margin-top:calc(18px * var(--ech)); }
+
+/* Le même air qu'à la page de création : sans sous-titre, la première carte
+   se collait au bas du titre. La branche téléphone, elle, garde son
+   sous-titre — lui ajouter cette marge doublerait l'écart. */
+#p-ecran #ecran-pc{ margin-top:calc(18px * var(--ech)); }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LANGUE PARLÉE : MÊME BOUTON, MÊME VOLET QUE LE TRI
+
+   Le `select` du navigateur ouvrait le menu du système — une pièce qui ne
+   ressemble à rien d'autre dans l'app. Le bouton garde exactement l'allure
+   qu'avait la valeur (bleu, 14,5 px, chevron à droite) ; c'est ce qui s'ouvre
+   dessous qui change.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#ai-langue{ display:none; }
+
+.lg-langue{ position:relative; }
+
+.ai-langue-btn{
+  display:inline-flex; align-items:center; gap:calc(4px * var(--ech));
+  border:none; background:transparent; font-family:inherit;
+  font-size:calc(14.5px * var(--ech)); font-weight:600; letter-spacing:-0.01em;
+  color:var(--blue);
+  padding:calc(2px * var(--ech)) 0 calc(2px * var(--ech)) calc(4px * var(--ech));
+}
+.ai-langue-btn svg{
+  width:calc(13px * var(--ech)); height:calc(13px * var(--ech));
+  display:block; margin-top:1px;
+  transition:transform 0.24s cubic-bezier(0.32,0.72,0,1);
+}
+.ai-langue-btn[aria-expanded="true"] svg{ transform:rotate(180deg); }
+.ai-langue-btn:active{ opacity:0.6; }
+
+/* ⚠ LE VOLET SORT SOUS LE BOUTON, PAS SOUS LA LIGNE. Ancré à droite comme
+   celui du tri, mais collé au bas de la ligne : plus haut, il recouvrirait la
+   valeur qu'on vient de toucher. */
+#ai-langue-volet{ top:calc(100% + 6px); right:0; left:auto; min-width:180px; }
+
+/* ⚠ IL S'OUVRE VERS LE HAUT QUAND LE BAS MANQUE. La ligne de la langue est la
+   dernière de la carte : sur un téléphone, un volet de six langues ouvert vers
+   le bas sort de l'écran et les trois dernières sont inatteignables. Le script
+   mesure avant d'ouvrir et pose cette classe. */
+#ai-langue-volet.vers-haut{
+  top:auto; bottom:calc(100% + 6px); transform-origin:bottom right;
+  transform:translateY(8px) scale(0.96);
+}
+#ai-langue-volet.vers-haut.ouvert{ transform:none; }
+
+/* ⚠ LA CARTE COUPE CE QUI DEPASSE (`overflow:hidden` pour arrondir le cadre
+   video). Un volet posé dedans serait tranche net au bord. On lui rend le
+   debordement le temps de l'ouverture, pas plus : en permanence, le cadre
+   video reperdrait ses coins.
+   ⚠ ET ON REMONTE `.ia-ecoute` AU-DESSUS DU BOUTON. L'encadre est en
+   `z-index:1`, le bouton « Generer les etapes » aussi et il vient apres dans
+   la page : a egalite, c'est le dernier qui gagne, et le volet passait
+   dessous. */
+#ai-upload-card.langue-ouverte{ overflow:visible; }
+#ai-upload-card.langue-ouverte .ia-ecoute{ z-index:60; }
+
+/* ⚠ LA COCHE N'EST PAS LE LIBELLE DE LA LIGNE. `.lg-langue span` met `flex:1`
+   pour que « Langue parlée » pousse la valeur à droite ; la coche est un
+   `span` elle aussi, elle s'étirait pareil et chassait chaque langue contre
+   le bord droit du volet. */
+#ai-langue-volet .tb-v-coche{ flex:0 0 16px; }

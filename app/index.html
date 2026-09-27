@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=1cd11b89">
+<link rel="stylesheet" href="style.css?v=d786b211">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1108,6 +1108,19 @@
             <circle cx="12" cy="8.4" r="3.6"/>
             <path d="M4.8 20a7.2 7.2 0 0 1 14.4 0"/>
           </svg>
+          <!-- ⚠ LA PASTILLE D'ALERTE, MASQUEE PAR DEFAUT.
+
+               Elle ne parait que quand l'essai est termine : c'est `majPastilleProfil()`
+               qui la revele. Elle est DANS le bouton pour le suivre partout ou
+               il va, et `aria-hidden` parce que le `title` du bouton dit deja
+               ce qu'elle signale — l'annoncer deux fois de suite a la
+               synthese vocale n'aide personne. -->
+          <!-- ⚠ UN `b`, PAS UN `span`. Les deux traits de l'ancienne icone de
+               menu vivent encore dans la feuille de style : `.tb-menu span`
+               impose 2 px de haut et `.tb-menu span:last-child` 13 px de
+               large. Un `span` ici devenait ce trait — une pastille de
+               13 x 2 px. Rien ne vise `b` dans cette barre. -->
+          <b class="tb-alerte" id="tb-alerte-gestion" aria-hidden="true" hidden>!</b>
         </button>
 
         <span class="tb-logo">
@@ -1659,7 +1672,7 @@
         </button>
         <h1>Gestion des accès</h1>
       </div>
-      <p>Les rôles décident de ce que chacun voit<br>et peut modifier.</p>
+      <p>Les accès de chaque membre de l’entreprise<br>décident de ce qu’il a sur son écran.</p>
     </div>
 
     <div class="proc-rech-rang">
@@ -3586,6 +3599,27 @@
                stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"/><line x1="5.5" y1="12" x2="18.5" y2="12"/></svg>
         </button>
       </div>
+      <!-- ═══ LE NOM ET LE LOGO DE L'ENTREPRISE, TOUCHABLES ═══
+
+           Ils ne se modifiaient que par un appui LONG sur un des ronds
+           ci-dessus : un geste que personne ne devine. La ligne dit ce qu'est
+           l'entreprise et s'ouvre d'un simple appui, comme la carte d'identité
+           juste au-dessus.
+
+           ⚠ ELLE NE PARAIT QU'AU GERANT. `peindreRangEtab` la revele ; un
+             gestionnaire invite ou un utilisateur ne peut pas renommer
+             l'entreprise de quelqu'un d'autre. -->
+      <button type="button" class="etab-ident" id="etab-ident" hidden>
+        <span class="etab-ident-logo" id="etab-ident-logo">
+          <span class="etab-ident-ini" id="etab-ident-ini">—</span>
+        </span>
+        <span class="etab-ident-tx">
+          <span class="etab-ident-nom" id="etab-ident-nom">—</span>
+          <span class="etab-ident-s">Nom et logo de l’entreprise</span>
+        </span>
+        <span class="etab-ident-fl" aria-hidden="true">›</span>
+      </button>
+
       <p class="etab-note" id="etab-note">
         Créez une entreprise et vous en êtes le <b>gérant</b>, avec
         <b>14 jours d’essai gratuit</b>. Touchez un logo pour basculer d’une
@@ -3837,15 +3871,15 @@
 
     <!-- ─── L'ÉTAT SANS CODE ─── -->
     <div class="card ci-vide" id="ci-vide">
-      <div class="ci-txt">Générez un code, affichez-le, et votre équipe
-        s'inscrit en le saisissant.</div>
+      <div class="ci-txt">Générez un code pour que votre équipe
+        puisse accéder aux procédures.</div>
       <div class="ci-duree">
         <button type="button" class="ci-d" data-min="15">15 minutes</button>
         <button type="button" class="ci-d" data-min="120">2 heures</button>
         <button type="button" class="ci-d" data-min="10080">7 jours</button>
       </div>
-      <div class="ci-aide">Choisissez selon la situation : quinze minutes si tout
-        le monde est là, sept jours pour un recrutement en cours.</div>
+      <div class="ci-aide">Choisissez la durée pendant laquelle le code
+        d’invitation reste valide.</div>
     </div>
 
     <!-- ─── L'ÉTAT AVEC CODE ─── -->
@@ -3856,9 +3890,9 @@
         <button type="button" class="ci-btn" id="ci-copier">Copier</button>
         <button type="button" class="ci-btn ci-btn--sourd" id="ci-revoquer">Révoquer</button>
       </div>
-      <div class="ci-aide">Vos membres le saisissent à l'inscription. Ils
-        rejoignent en tant qu'équipe — vous pourrez en passer en Gestion depuis
-        « Gérer l'équipe ».</div>
+      <div class="ci-aide">Utilisez ce code pour donner à votre équipe l’accès
+        utilisateur aux procédures. Vous pourrez ensuite leur donner accès à
+        l’espace Gestion.</div>
     </div>
     <!-- Les boutons de l'ancien code de gestion ont été retirés avec lui :
          le nouveau code porte les siens, dans sa propre carte. -->
@@ -5245,7 +5279,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=02cd9c8d"></script>
+<script type="module" src="app.js?v=d65d0945"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

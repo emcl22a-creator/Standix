@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=7b504dca">
+<link rel="stylesheet" href="style.css?v=306de771">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -453,7 +453,7 @@
        droite. C'est l'ENSEMBLE barre + ecart + cercle qui doit etre centre :
        la barre se decale donc de la moitie de `--bar-h + 12`, soit 38 px, ce
        qui ramene sa marge gauche a 23 — la meme qu'a droite. */
-    transform:translateX(calc(-50% - (var(--bar-h) + 12px) / 2)) scale(1) translateZ(0);
+    transform:translateX(calc(-50% - var(--bar-glisse))) scale(1) translateZ(0);
     /* origine en bas : la barre grandit vers le haut, son bord
        inferieur reste fige au pixel pres. */
     transform-origin:center bottom;
@@ -1894,8 +1894,10 @@
         </span>
       </div>
       <div class="mode-choice-text">
+        <!-- La ligne de description a été retirée : « La caméra s'ouvre ici,
+             sans passer par Photos » décrivait un contournement plutôt qu'une
+             action, et le titre se suffit. -->
         <div class="mode-choice-title">Filmer maintenant</div>
-        <div class="mode-choice-desc">La caméra s’ouvre ici, sans passer par Photos</div>
       </div>
       <div class="mode-choice-arrow">›</div>
     </div>
@@ -1914,12 +1916,9 @@
         </span>
       </div>
       <div class="mode-choice-text">
+        <!-- Description retirée elle aussi. Elle avait été écrite pour dire ce
+             qu'on obtient plutôt que comment — mais le titre le disait déjà. -->
         <div class="mode-choice-title">Enregistrer l’écran</div>
-        <!-- ⚠ LA MÊME CARTE MÈNE À DEUX PAGES : l'enregistreur sur ordinateur,
-             le mode d'emploi du téléphone ailleurs. La description dit donc ce
-             qu'on OBTIENT, pas comment — « un compte à rebours » aurait menti
-             à la moitié des gens. -->
-        <div class="mode-choice-desc">Votre écran devient une vidéo à analyser</div>
       </div>
       <div class="mode-choice-arrow">›</div>
     </div>
@@ -1980,27 +1979,31 @@
 
     <!-- ─── Sur ordinateur ─── -->
     <div id="ecran-pc">
-      <div class="subhead">Filmez un logiciel, l’IA en écrit les étapes</div>
+      <!-- Le sous-titre « Filmez un logiciel, l'IA en écrit les étapes » a été
+           retiré : le titre de la page le dit déjà. -->
 
       <div class="card">
-        <label class="f">Temps pour vous placer</label>
+        <!-- ⚠ LE LIBELLÉ DIT QUAND LA PRISE COMMENCE, et le paragraphe qui
+             l'expliquait en trois lignes a disparu avec lui. La phrase se
+             referme sous le sélecteur : « L'enregistrement démarre tout de
+             suite — vous avez [10 s] pour vous placer ». -->
+        <label class="f">L’enregistrement démarre tout de suite — vous avez</label>
         <div class="proc-segm" id="ecran-delai" role="tablist" style="margin-top:8px;">
           <span class="p-seg-lens" id="ecran-delai-lens" aria-hidden="true"></span>
           <button type="button" class="p-seg" data-delai="5" role="tab">5 s</button>
           <button type="button" class="p-seg" data-delai="10" role="tab">10 s</button>
           <button type="button" class="p-seg" data-delai="15" role="tab">15 s</button>
         </div>
-        <div class="note" style="margin-top:12px;">
-          L’enregistrement démarre dès que vous avez choisi la fenêtre. Le
-          décompte ne le retarde pas : il vous laisse le temps de vous placer
-          pendant que ça tourne.
-        </div>
+        <!-- ⚠ `.note` ET NON `.f` : la règle du libellé vise `label.f`, pas une
+             division. Posée sur un `div`, la classe ne peignait rien et la fin
+             de la phrase s'affichait en gros texte de paragraphe. -->
+        <div class="note" style="margin:10px 0 0;">pour vous placer</div>
       </div>
 
       <div class="card" style="margin-top:12px;">
         <div class="ecran-ligne">
           <span class="ecran-pt"></span>
-          <span>Le micro est allumé pendant l’enregistrement. Commentez à voix haute : c’est ce que l’IA écoute pour écrire les étapes.</span>
+          <span>Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.</span>
         </div>
         <div class="ecran-ligne">
           <span class="ecran-pt"></span>
@@ -5190,7 +5193,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=3c15993b"></script>
+<script type="module" src="app.js?v=5fd0d0d9"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->
@@ -6992,7 +6995,11 @@ function frame(now) {
   barEl.style.width =
     `calc(min(100vw - 46px, var(--bar-col, 460px) - 40px) - (1 - ${e.toFixed(4)}) * var(--bar-decal))`;
   barEl.style.transform =
-    `translateX(calc(-50% - (1 - ${e.toFixed(4)}) * var(--bar-decal) / 2)) ` +
+    /* ⚠ `--bar-glisse` ET NON `--bar-decal / 2`. Ce script réécrit le
+       `transform` à chaque image : sa valeur l'emporte sur celle du CSS. Avec
+       `--bar-decal`, nul sur tablette, il annulait le recul et l'ensemble
+       barre + cercle penchait à droite. */
+    `translateX(calc(-50% - (1 - ${e.toFixed(4)}) * var(--bar-glisse))) ` +
     `scale(${(1 + BAR_SWELL * barFollow).toFixed(6)}) translateZ(0)`;
 
   // Aucune illumination : la barre ne fait que grossir.

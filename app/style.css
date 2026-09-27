@@ -14241,9 +14241,14 @@ body.en-apercu #equipe-app{ padding-bottom:64px; }
      vaut `--bar-h + 12` et l'on retrouve exactement l'ancienne valeur
      (`- --bar-h`). Sur tablette il vaut zéro, la barre est centrée, et le
      cercle se pose à sa droite sans la chevaucher. */
+  /* Le bord droit de la barre tombe à `M - glisse - decal/2` du centre, où
+     `M` est la demi-largeur disponible. Le cercle commence 12 px plus loin.
+     Sur téléphone `decal` vaut deux fois `glisse` et l'on retrouve exactement
+     l'ancienne valeur ; sur tablette `decal` vaut zéro et seul le recul
+     compte. Dans les deux cas l'ensemble retombe centré. */
   --place:translateX(calc(
     min(calc(50vw - 23px), calc(var(--bar-col, 460px) / 2 - 20px))
-    - var(--bar-decal) + 12px));
+    - var(--bar-glisse) - var(--bar-decal) / 2 + 12px));
   transform:var(--place);
 }
 
@@ -23494,6 +23499,18 @@ body.abo-expire [data-etab-plus]{
      largeur plus l'écart. Elle est RETIRÉE de la barre et sert aussi à la
      décaler vers la gauche, pour que barre + cercle restent centrés. */
   --bar-decal: calc(var(--bar-h) + 12px);
+  /* ═══ CE DONT LA BARRE RECULE, ET QUI N'EST PAS CE QU'ELLE PERD ═══
+
+     Deux choses étaient confondues dans `--bar-decal` : la largeur que la
+     barre cède au cercle, et le recul qui garde l'ENSEMBLE centré. Sur
+     téléphone les deux se valent, donc rien ne se voyait. Sur tablette, où la
+     barre garde sa largeur (`--bar-decal: 0`), le recul disparaissait avec
+     elle : la barre restait centrée toute seule et le cercle pendait à sa
+     droite — l'ensemble penchait de quarante pixels.
+
+     `--bar-glisse` est donc la moitié de la place du cercle, toujours, que la
+     barre rétrécisse ou non. */
+  --bar-glisse: calc((var(--bar-h) + 12px) / 2);
 }
 
 @media (min-width: 700px) and (min-height: 600px){
@@ -24572,13 +24589,24 @@ body.abo-expire [data-etab-plus]{
 
 /* Pendant la prise : plus de fond, plus de flou, plus de clic attrapé. Le
    voile devient un simple support pour la pastille. */
+/* ⚠ EN HAUT, PLUS EN BAS. La pastille se posait au ras du bord inférieur —
+   là où vivent la barre des tâches, le dock et les notifications du système.
+   Elle s'y faisait recouvrir, et sur l'écran qu'on filme c'est aussi la zone
+   la plus encombrée. En haut au centre, elle est vue tout de suite et ne
+   masque rien de ce qu'on montre. */
 .ecran-voile.discret{
   background:transparent;
   -webkit-backdrop-filter:none; backdrop-filter:none;
-  align-items:flex-end; justify-content:center;
+  flex-direction:column; align-items:center; justify-content:flex-start;
+  gap:14px;
   pointer-events:none;
-  padding-bottom:calc(env(safe-area-inset-bottom, 0px) + 26px);
+  padding-top:calc(env(safe-area-inset-top, 0px) + 18px);
+  padding-bottom:0;
 }
+
+/* Le repère de placement vit dans la pastille, en ambre : on le distingue du
+   temps filmé sans ajouter un second bloc à l'écran. */
+.ecran-prise .ecran-reste{ font-variant-numeric:tabular-nums; }
 .ecran-voile.discret > *{ pointer-events:auto; }
 
 .ecran-compte{ text-align:center; color:#FFFFFF; }
@@ -24809,18 +24837,31 @@ body.abo-expire [data-etab-plus]{
 
 /* ─── QUAND LA CAMÉRA NE S'OUVRE PAS ───
    Le message prend toute la place : sans image, il n'y a rien à commander. */
+/* ⚠ CENTRÉ, ET PAS SEULEMENT VERTICALEMENT. Le message était calé à gauche :
+   sur un téléphone il tenait la largeur, mais sur un écran d'ordinateur il se
+   retrouvait seul dans un coin d'un grand rectangle noir, à un mètre du bouton
+   « Réessayer ». Le bloc se centre donc dans les deux sens, et son texte avec.
+
+ ⚠ ET IL NE S'ÉTIRE PAS. Sans largeur maximale, une phrase centrée traverse
+   1 500 px d'écran : l'œil perd le début de la ligne suivante. 440 px, la
+   largeur d'une colonne qui se lit. */
 .cam-echec{
   position:relative; z-index:3;
-  flex:1; display:flex; flex-direction:column; justify-content:center;
-  gap:12px; padding:24px 26px; text-align:left;
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  gap:12px; padding:24px 26px; text-align:center;
   color:#fff;
 }
+.cam-echec > *{ width:100%; max-width:440px; }
 .cam-echec .t{ font-size:calc(18px * var(--ech)); font-weight:700; letter-spacing:-0.02em; }
 .cam-echec .s{ font-size:calc(13.5px * var(--ech)); line-height:1.5; color:rgba(255,255,255,0.68); }
-.cam-pas{ margin:0; padding-left:20px; display:grid; gap:9px; }
+/* ⚠ LES NUMÉROS RENTRENT DANS LE TEXTE. Une liste numérotée centrée garde
+   sinon ses chiffres accrochés à un bord invisible, en décalage avec les
+   lignes qu'ils annoncent. */
+.cam-pas{ margin:0; padding-left:0; list-style-position:inside; display:grid; gap:9px; }
 .cam-pas li{ font-size:calc(14px * var(--ech)); line-height:1.45; color:rgba(255,255,255,0.92); }
 .cam-pas b{ font-weight:700; }
-.cam-echec .btn.small{ align-self:flex-start; margin-top:6px; }
+.cam-echec .btn.small{ align-self:center; width:auto; margin-top:6px; }
 
 @media (prefers-reduced-motion: reduce){
   .cam-rouge{ animation:none; }

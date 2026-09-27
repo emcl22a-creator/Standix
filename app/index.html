@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=306de771">
+<link rel="stylesheet" href="style.css?v=eb0a3b1b">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2434,7 +2434,22 @@
         <input type="file" id="ai-video-input" accept="video/*">
         <div class="video-frame" id="ai-video-frame">
           <video id="ai-video-player" style="display:none;" playsinline="" preload="metadata" muted=""></video>
-          <span id="ai-video-placeholder" class="ai-vide"></span>
+          <!-- ═══ LE CADRE VIDE N'EST PLUS UN RECTANGLE NOIR ═══
+               Il était vide au sens propre : une zone en pointillés posée sur
+               le fond noir du lecteur, donc invisible. On ne voyait qu'un
+               grand trou noir, sans savoir qu'il fallait toucher dedans.
+               Il porte maintenant ce qu'on vient y faire. -->
+          <span id="ai-video-placeholder" class="ai-vide">
+            <span class="ai-vide-rond">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 16.2V4.4"/><path d="m7.5 8.9 4.5-4.5 4.5 4.5"/>
+                <path d="M4.6 15.2v3.1a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2v-3.1"/>
+              </svg>
+            </span>
+            <span class="ai-vide-t">Choisir une vidéo</span>
+            <span class="ai-vide-s">MP4 ou MOV · 5 minutes au maximum</span>
+          </span>
         </div>
       </div><div class="ia-ecoute">
           <div class="tt">Ce que l’IA analyse</div>
@@ -5193,7 +5208,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=5fd0d0d9"></script>
+<script type="module" src="app.js?v=ef73388c"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

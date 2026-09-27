@@ -15832,8 +15832,13 @@ body.espace-vide .screen.active{ animation:none !important; }
 
 /* ⚠ SEUL LE TITRE S'ECARTE, PAS LA PHRASE. Le bouton est haut : la phrase du
    dessous passe sous lui sans le toucher, et lui imposer la meme marge la
-   couperait pour rien. */
-.alerte-essai .ess-tx b{ padding-right:74px; }
+   couperait pour rien.
+
+   ⚠ `> b`, LE FILS DIRECT, PAS N'IMPORTE QUEL `b`. La phrase du dessous met
+     ses chiffres en gras : sans le `>`, chacun de ces `b` recevait la marge
+     du titre. « Vos 0 procedure et 1 membre vous attendent. » se lisait avec
+     deux trous de 74 px au milieu, et coupait n'importe ou. */
+.alerte-essai .ess-tx > b{ padding-right:74px; }
 
 
 /* ⚠ LE FONDU SUIT L'INTERVALLE, PASSE A 3,5 s.
@@ -15897,8 +15902,11 @@ body.espace-vide .screen.active{ animation:none !important; }
 .alerte-essai .ess-u{ font-size:10px; margin-top:3px; }
 
 /* ⚠ LE TITRE S'ECARTE MOINS : la plaque a pris dix-huit pixels, le bouton doit
-   les rendre. */
-.alerte-essai .ess-tx b{ padding-right:70px; }
+   les rendre.
+
+   ⚠ `> b` : voir plus haut — sans lui, les gras de la phrase heritent aussi
+     de la marge du bouton. */
+.alerte-essai .ess-tx > b{ padding-right:70px; }
 
 /* ═══ LE DEPLIANT S'OUVRE COMME UN TIROIR ═══
 
@@ -16028,7 +16036,8 @@ body.espace-vide .screen.active{ animation:none !important; }
 /* ⚠ ET LE TITRE N'A PLUS BESOIN DE S'ECARTER AUTANT. Le bouton est plus haut
    que lui maintenant que le texte est centre. */
 .alerte-essai .ess-tx{ padding-top:0; }
-.alerte-essai .ess-tx b{ padding-right:74px; }
+/* ⚠ `> b` : voir plus haut. */
+.alerte-essai .ess-tx > b{ padding-right:74px; }
 
 /* ═══ LES PASTILLES DU DEPLIANT PASSENT AU BLEU ═══
 
@@ -16050,7 +16059,9 @@ body.espace-vide .screen.active{ animation:none !important; }
    Le bouton n'occupe que la premiere ligne : seul le TITRE doit s'en ecarter.
    La phrase, plus bas, peut prendre toute la largeur. */
 .alerte-essai .ess-tx i{ padding-right:0; }
-.alerte-essai .ess-tx b{ padding-right:82px; }
+/* ⚠ MEME PIEGE QU'AU-DESSUS : `> b`, sinon les gras de la phrase heritent
+   des 82 px reserves au bouton. */
+.alerte-essai .ess-tx > b{ padding-right:82px; }
 
 /* ⚠ ET LA PLAQUE REVIENT A 64 PX. A 72 elle etait juste, mais chaque pixel
    qu'elle prend, le texte le perd — et c'est lui qui porte la phrase. Le
@@ -25191,3 +25202,120 @@ html::-webkit-scrollbar-thumb:hover{
    `span` elle aussi, elle s'étirait pareil et chassait chaque langue contre
    le bord droit du volet. */
 #ai-langue-volet .tb-v-coche{ flex:0 0 16px; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PASTILLE D'ALERTE SUR LE BOUTON PROFIL
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Quand l'essai est termine, l'app est bloquee mais rien ne le dit tant qu'on
+   n'ouvre pas les reglages. La pastille porte l'information la ou l'oeil passe
+   en premier : sur le bouton qui mene a l'abonnement.
+
+   ⚠ ELLE EST ROUGE, ET C'EST LE SEUL ROUGE DE LA BARRE. Un point de couleur
+     qui ne veut rien dire ailleurs se lit immediatement comme un probleme.
+
+   ⚠ LE BOUTON DEVIENT LE REPERE. `.tb-menu` est une grille centree : sans
+     `position:relative` ici, la pastille se calerait sur le premier ancetre
+     positionne — la carte de la barre — et flotterait loin du bouton. */
+/* ⚠ LE BOUTON REPREND SON DEBORDEMENT. Il etait en `overflow:hidden` pour
+   arrondir la photo — mais la photo porte deja son propre `border-radius`,
+   donc ce rognage ne servait qu'a couper la pastille en croissant de lune.
+   Les autres contenus du bouton (silhouette, initiales) tiennent dedans. */
+.tb-profil{ position:relative; overflow:visible; }
+
+.tb-alerte{
+  position:absolute; top:-1px; right:-1px; z-index:3;
+  width:16px; height:16px; border-radius:100px;
+  display:grid; place-items:center;
+  background:#E5484D; color:#FFFFFF;
+  font-size:11px; font-weight:800; line-height:1;
+  /* ⚠ UN LISERE DE LA COULEUR DE LA BARRE, PAS UNE OMBRE. La pastille chevauche
+     le bord du bouton : sans cette bague, les deux cercles se touchent et l'on
+     ne sait plus lequel est devant. */
+  box-shadow:0 0 0 2px #F4F4F8;
+  /* Le point d'exclamation est un peu haut dans sa capsule : un cheveu de
+     descente le recentre optiquement. */
+  padding-top:0.5px;
+}
+.tb-alerte[hidden]{ display:none; }
+
+/* ⚠ ELLE SUIT L'ECHELLE COMME LE BOUTON. Sur iPad et PC, `--ech` agrandit la
+   barre : une pastille figee a 16 px y paraitrait un grain de poussiere. */
+@media (min-width:700px) and (min-height:600px){
+  .tb-alerte{
+    width:calc(16px * var(--ech)); height:calc(16px * var(--ech));
+    font-size:calc(11px * var(--ech));
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE NOM ET LE LOGO DE L'ENTREPRISE, DANS LE PROFIL DU GERANT
+   ═══════════════════════════════════════════════════════════════════════════
+
+   A la place d'un paragraphe sur la facturation : ce que le gerant vient
+   chercher, c'est son entreprise — la voir, et pouvoir la corriger.
+
+   ⚠ ELLE REPREND LA CARTE D'IDENTITE, PAS LA LIGNE DE REGLAGE. Les deux
+     portent la meme chose — une vignette, deux lignes de texte, un chevron —
+     et se suivent dans la page : une forme differente pour un contenu
+     identique se lirait comme une erreur.
+
+   ⚠ MAIS D'UN CRAN PLUS PETITE. La carte d'identite est la premiere de la
+     page ; celle-ci est dans une carte, un niveau plus bas. Un enfant de la
+     meme taille que son parent aplatit la hierarchie. */
+.etab-ident{
+  display:flex; align-items:center; gap:12px; width:100%;
+  /* ⚠ PLUS DE MARGE HAUTE NI DE FILET. Elle suivait la rangée de ronds, qui
+     a été retirée : elle est maintenant le seul contenu de la carte, et le
+     rembourrage de la carte suffit. */
+  margin-top:0; padding:0; border:none; background:none;
+  font-family:inherit; text-align:left;
+  transition:transform 0.15s cubic-bezier(0.34,1.56,0.64,1);
+}
+.etab-ident[hidden]{ display:none; }
+.etab-ident:active{ transform:scale(0.985); }
+
+/* ⚠ UN CARRE ARRONDI, PAS UN ROND. Les ronds de la ligne du dessus servent a
+   BASCULER d'une entreprise a l'autre ; celui-ci ne bascule rien, il ouvre.
+   Leur donner la meme forme laisserait croire au meme geste. */
+.etab-ident-logo{
+  position:relative; flex:0 0 46px; width:46px; height:46px;
+  border-radius:14px; overflow:hidden;
+  display:grid; place-items:center;
+  background:linear-gradient(145deg,#4C86E8,#1F4CEE);
+}
+.etab-ident-logo img{
+  position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+}
+.etab-ident-ini{
+  font-size:16px; font-weight:700; letter-spacing:0.01em; color:#FFFFFF;
+}
+
+.etab-ident-tx{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; gap:2px; }
+/* ⚠ UN NOM LONG SE COUPE, il ne pousse pas le chevron hors de la carte. */
+.etab-ident-nom{
+  font-size:16px; font-weight:650; letter-spacing:-0.022em; color:var(--label);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.etab-ident-s{
+  font-size:12.5px; font-weight:500; letter-spacing:-0.005em; color:var(--label-3);
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.etab-ident-fl{
+  flex-shrink:0; font-size:19px; line-height:1; color:var(--label-3);
+  /* Le chevron est un caractere : sa hampe le pose trop bas dans la ligne. */
+  margin-top:-2px;
+}
+
+@media (min-width:700px) and (min-height:600px){
+  .etab-ident-logo{
+    flex:0 0 calc(46px * var(--ech)); width:calc(46px * var(--ech)); height:calc(46px * var(--ech));
+    border-radius:calc(14px * var(--ech));
+  }
+  .etab-ident-ini{ font-size:calc(16px * var(--ech)); }
+  .etab-ident-nom{ font-size:calc(16px * var(--ech)); }
+  .etab-ident-s{ font-size:calc(12.5px * var(--ech)); }
+  .etab-ident-fl{ font-size:calc(19px * var(--ech)); }
+}

@@ -12867,6 +12867,67 @@ document.addEventListener('click', (e) => {
     ?.setAttribute('aria-expanded', ouvrir ? 'true' : 'false')
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LANGUE PARLÉE · LE MÊME VOLET QUE LE TRI
+
+   Un seul écouteur sur le document, comme pour le tri : il ouvre, il choisit,
+   et il ferme quand on touche à côté.
+
+ ⚠ ON ÉCRIT DANS LE `select` MASQUÉ. Deux endroits du script lisent
+   `ai-langue.value` pour dire à l'analyse quelle langue écouter. Le volet est
+   l'affichage ; la valeur, elle, continue de vivre au même endroit qu'avant.
+   ═══════════════════════════════════════════════════════════════════════════ */
+document.addEventListener('click', (e) => {
+  const volet = document.getElementById('ai-langue-volet')
+  if (!volet) return
+  const bouton = e.target.closest('#ai-langue-btn')
+  const choix = e.target.closest('#ai-langue-volet .tb-v-langue')
+  const btn = document.getElementById('ai-langue-btn')
+  const carte = document.getElementById('ai-upload-card')
+
+  const fermer = () => {
+    volet.classList.remove('ouvert')
+    setTimeout(() => {
+      if (volet.classList.contains('ouvert')) return
+      volet.hidden = true
+      // La carte reprend son `overflow:hidden` seulement une fois le volet
+      // parti : plus tôt, il serait tranché pendant qu'il se referme.
+      carte?.classList.remove('langue-ouverte')
+    }, 300)
+    btn?.setAttribute('aria-expanded', 'false')
+  }
+
+  if (choix) {
+    volet.querySelectorAll('.tb-v-langue').forEach(b => b.classList.toggle('on', b === choix))
+    const sel = document.getElementById('ai-langue')
+    if (sel) sel.value = choix.dataset.langue
+    const txt = document.getElementById('ai-langue-txt')
+    if (txt) txt.textContent = choix.textContent.replace('\u2713', '').trim()
+    fermer()
+    return
+  }
+
+  if (!bouton) { if (!e.target.closest('#ai-langue-volet')) fermer(); return }
+
+  const ouvrir = volet.hidden
+  if (ouvrir) {
+    carte?.classList.add('langue-ouverte')
+    volet.hidden = false
+    // ⚠ ON MESURE AVANT DE MONTRER. Le volet est déjà dans la page (il n'est
+    //   plus `hidden`) mais encore transparent : sa hauteur est connue, et
+    //   personne ne voit le calcul. S'il ne tient pas dessous, il s'ouvre
+    //   vers le haut.
+    //   ⚠ ON RESERVE LE BAS DE L'ECRAN, PAS SEULEMENT UNE MARGE. Le bouton
+    //     flottant « œil » y est fixe : un volet qui descend jusque-là passe
+    //     dessous et la dernière langue devient illisible.
+    const bas = btn.getBoundingClientRect().bottom
+    volet.classList.toggle('vers-haut',
+      bas + volet.offsetHeight + 104 > (window.innerHeight || 0))
+    requestAnimationFrame(() => volet.classList.add('ouvert'))
+  } else { fermer() }
+  btn?.setAttribute('aria-expanded', ouvrir ? 'true' : 'false')
+})
+
 /* ═══ LA PASTILLE SUIT LE SEGMENT CHOISI ═══
 
    ⚠ ELLE SE MESURE, ELLE NE SE CALCULE PAS. On pourrait diviser la largeur par
@@ -17147,7 +17208,7 @@ function dessinerAlerteEssai(hote) {
       <div class="ess-p"><span class="pt"></span>
         <span>Vos proc\u00e9dures <b>ne sont jamais supprim\u00e9es</b> : reprenez quand vous voulez.</span></div>
       <div class="ess-p"><span class="pt"></span>
-        <span>Apr\u00e8s 14 jours, l\u2019espace Gestion et l\u2019espace \u00c9quipe sont <b>bloqu\u00e9s</b> jusqu\u2019\u00e0 la souscription.</span></div>
+        <span>Apr\u00e8s 14 jours, l\u2019espace Gestion et l\u2019espace Utilisateur sont <b>bloqu\u00e9s</b> jusqu\u2019\u00e0 la souscription.</span></div>
       </div>
     </div>`
 }
@@ -18275,7 +18336,11 @@ function stopAiProgressSimulation(finalPct) {
 function resetAiScreen() {
   document.getElementById('ai-video-input').value = ''
   document.getElementById('ai-video-player').style.display = 'none'
-  document.getElementById('ai-video-placeholder').style.display = 'block'
+  /* ⚠ ON EFFACE LE STYLE, ON N'EN POSE PAS UN. `display:block` en style
+     direct l'emportait sur la feuille, qui demande `flex` : le rond se
+     retrouvait seul sur sa ligne, à gauche, et les deux textes se suivaient
+     sur la suivante. La chaîne vide rend la main au CSS. */
+  document.getElementById('ai-video-placeholder').style.display = ''
   /* Le bouton retrouve son état neuf. Sans ces deux lignes, il gardait la coche
      et l'anneau de l'analyse précédente : on revenait sur la page avec un bouton
      qui disait « c'est fait » alors qu'il n'y avait rien à faire. */

@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=31fea0c3">
+<link rel="stylesheet" href="style.css?v=b253ec45">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1016,7 +1016,10 @@
              de mots de passe attendent pour l'apparier au mot de passe qui
              suit. Avec `email`, certains traitent les deux séparément et
              n'enregistrent jamais le couple. -->
-        <input type="email" id="login-email" placeholder="vous@gmail.com"
+        <!-- ⚠ PAS DE `placeholder`. Le libellé « E-mail » au-dessus dit déjà
+             quoi écrire ; un exemple grisé dans le champ se lit de loin comme
+             un champ déjà rempli. -->
+        <input type="email" id="login-email"
                autocomplete="username" style="margin-bottom:12px;">
         <label class="f">Mot de passe</label>
         <!-- ⚠ LA MARGE PASSE SUR L'ENVELOPPE, pas sur le champ. Laissee sur
@@ -1033,7 +1036,9 @@
              pose pour l'inscription. Rien a ajouter cote script : il lit
              `data-mdp-oeil` sur n'importe quel champ. -->
         <div class="mdp-champ" style="margin-bottom:16px;">
-          <input type="password" id="login-password" placeholder="••••••••"
+          <!-- ⚠ NI ICI. Des points gris ressemblent à un mot de passe déjà
+               saisi : on touche l'œil pour le relire, et il n'y a rien. -->
+          <input type="password" id="login-password"
                  autocomplete="current-password">
           <button type="button" class="mdp-oeil" data-mdp-oeil="login-password"
                   aria-label="Afficher le mot de passe" aria-pressed="false">
@@ -5062,7 +5067,12 @@
              Un libelle qui porte la contrainte evite la faute plutot que de la
              signaler. C'est ce que fait l'app pour le code d'invitation :
              « Code de l'entreprise (6 caracteres) ». -->
-        <label class="f">Mot de passe <span class="f-note">6 caractères minimum</span></label>
+        <!-- ⚠ LE CHIFFRE EST ÉCRIT PAR LE SCRIPT, depuis `MDP_MIN`. Écrit ici
+             en dur, il disait 6 alors que Supabase en exige 8 : le formulaire
+             acceptait, puis le serveur refusait en anglais. Une seule source
+             désormais. Le 8 ci-dessous n'est qu'un repli si le script ne se
+             charge pas. -->
+        <label class="f">Mot de passe <span class="f-note" id="insc-mdp-min">8 caractères minimum</span></label>
         <!-- `new-password` et non `current-password` : c'est ce qui déclenche la
              proposition d'un mot de passe fort, et ce qui empêche le
              gestionnaire de préremplir l'ancien sur un formulaire de création. -->
@@ -5262,7 +5272,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=14d7bba4"></script>
+<script type="module" src="app.js?v=67b38901"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

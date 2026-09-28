@@ -1873,6 +1873,27 @@ function attendreRecuperation() {
   }, 4000)
 }
 
+/* ═══ LA LONGUEUR MINIMALE DU MOT DE PASSE ═══
+
+   ⚠ ELLE DOIT SUIVRE SUPABASE, PAS L'INVERSE. Le vrai refus vient de
+     « Minimum password length » dans Authentication → Email. Le contrôle
+     d'ici n'existe que pour éviter un aller-retour réseau et donner un
+     message en français.
+
+   ⚠ IL VALAIT 6, ÉCRIT TROIS FOIS EN DUR. Supabase est réglé sur 8 : l'app
+     laissait donc passer un mot de passe de six signes, et le refus tombait
+     ensuite en anglais, après le formulaire. Une seule constante désormais —
+     si le réglage change dans Supabase, c'est la seule ligne à toucher, et
+     le libellé de l'écran la lit aussi. */
+const MDP_MIN = 8
+
+/* Le libellé de l'écran d'inscription lit la même constante : impossible qu'il
+   annonce un chiffre et que le contrôle en applique un autre. */
+document.addEventListener('DOMContentLoaded', () => {
+  const n = document.getElementById('insc-mdp-min')
+  if (n) n.textContent = `${MDP_MIN} caract\u00e8res minimum`
+}, { once: true })
+
 async function verifierRetourMotDePasse() {
   /* ⚠ CE TEST BLOQUAIT LE NOUVEAU FLUX.
 
@@ -1899,7 +1920,7 @@ async function verifierRetourMotDePasse() {
     toast('Mot de passe inchang\u00e9')
     return false
   }
-  if (nouveau.length < 6) { toast('Six caract\u00e8res minimum'); return await verifierRetourMotDePasse() }
+  if (nouveau.length < MDP_MIN) { toast(`${MDP_MIN} caract\u00e8res minimum`); return await verifierRetourMotDePasse() }
 
   const { error } = await supabase.auth.updateUser({ password: nouveau })
   if (error) { toast('\u00c9chec : ' + error.message); return false }
@@ -2334,7 +2355,7 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
 
   if (!prenom || !nom) { errorEl.textContent = 'Merci de renseigner votre prénom et votre nom.'; return }
   if (!email || !password) { errorEl.textContent = 'E-mail et mot de passe obligatoires.'; return }
-  if (password.length < 6) { errorEl.textContent = 'Le mot de passe doit faire au moins 6 caractères.'; return }
+  if (password.length < MDP_MIN) { errorEl.textContent = `Le mot de passe doit faire au moins ${MDP_MIN} caractères.`; return }
   if (selectedSpace === 'gestion' && !entrepriseNom) { errorEl.textContent = "Merci d'indiquer le nom de votre entreprise."; return }
   /* Le code n'est plus forcément à cinq chiffres : ceux de gestion font six
      signes, lettres comprises. On accepte de 4 à 12 et on laisse la base
@@ -2373,8 +2394,17 @@ document.getElementById('signup-btn')?.addEventListener('click', async () => {
   const { data, error } = await supabase.auth.signUp({ email, password })
 
   if (error) {
-    if (error.message.includes('already registered') || error.message.includes('already exists')) {
+    const m = (error.message || '').toLowerCase()
+    if (m.includes('already registered') || m.includes('already exists')) {
       errorEl.textContent = "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter."
+    /* ⚠ « Prevent use of leaked passwords » EST ACTIVÉ dans Supabase : un mot
+       de passe déjà vu dans une fuite connue est refusé, quelle que soit sa
+       longueur. Le message d'origine arrive en anglais, précédé d'un code
+       d'erreur — illisible pour quelqu'un qui s'inscrit. */
+    } else if (m.includes('weak') || m.includes('pwned') || m.includes('leaked')) {
+      errorEl.textContent = "Ce mot de passe est trop courant : il figure dans des fuites connues. Choisissez-en un autre."
+    } else if (m.includes('at least') && m.includes('characters')) {
+      errorEl.textContent = `Le mot de passe doit faire au moins ${MDP_MIN} caractères.`
     } else {
       errorEl.textContent = "Erreur (" + (error.status || '?') + ") : " + error.message
     }

@@ -25402,3 +25402,37 @@ html::-webkit-scrollbar-thumb:hover{
   }
   .id-av .reg-av-ini{ font-size:calc(17px * var(--ech)); }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PLAQUE STANDIX DE L'ABONNEMENT, SUR PC ET TABLETTE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Le logo y était écrasé et coupé. Mesuré : 23 × 33 px sur téléphone (rapport
+   0,70, celui du dessin), mais 24 × 26 sur PC — soit 0,92. L'image était
+   comprimée en hauteur, et ce qui dépassait était rogné.
+
+   ⚠ LA CAUSE N'EST PAS LE LOGO, C'EST LA PLAQUE. Elle mesure 76 px sur
+     téléphone, mais une règle de bureau la ramenait à 62 — un réglage écrit du
+     temps où la plaque faisait cette taille, jamais repris quand elle est
+     passée à 76. Or le contenu, lui, GRANDIT sur PC (`--ech` vaut 1,05).
+
+     Plaque plus petite, contenu plus grand : il ne rentrait plus. La plaque
+     étant une boîte flexible en colonne, elle a fait ce qu'on lui demande dans
+     ce cas — comprimer ses enfants. Le logo a absorbé toute la différence.
+
+   ⚠ D'OÙ LES DEUX CORRECTIFS. La plaque reprend ses 76 px, ET le logo refuse
+     désormais d'être comprimé. Le second seul aurait débordé, le premier seul
+     aurait recassé au prochain changement de taille. */
+@media (min-width:700px) and (min-height:600px){
+  .abo-plaque{
+    flex:0 0 calc(76px * var(--ech));
+    width:calc(76px * var(--ech));
+    height:calc(76px * var(--ech));
+    border-radius:calc(21px * var(--ech));
+  }
+}
+
+/* ⚠ SUR TOUS LES ÉCRANS. Un logo qui se laisse comprimer perd ses proportions
+   sans prévenir : il vaut mieux qu'il déborde, on le verrait tout de suite. */
+.abo-pl-logo{ flex-shrink:0; }

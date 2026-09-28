@@ -25345,7 +25345,8 @@ html::-webkit-scrollbar-thumb:hover{
   #login-screen > .login-card,
   #choice-screen .choix-ecran{
     width:100%;
-    max-width:420px;
+    /* 420 → 480 : à 420 la page paraissait étroite sur un grand écran. */
+    max-width:480px;
     margin-left:auto;
     margin-right:auto;
   }

@@ -7533,7 +7533,7 @@ const ONGLET_PAR_ECRAN = {
   'p-coller': 0,        // le collage de videos, dans la creation
   'p-ecran': 0,         // l'enregistrement d'ecran, dans la creation
   'p-scan': 1,          // le lecteur de QR code, dans les Reglages
-  /* ⚠ « Analyses vidéo AI » VIENT MAINTENANT DU PROFIL.
+  /* ⚠ « Vidéo générée par l’IA Standix » VIENT MAINTENANT DU PROFIL.
 
      Elle etait dans la page Equipe, donc rattachee a l'onglet 1. Depuis
      qu'elle a rejoint « Abonnement », elle s'atteint depuis le profil — qui
@@ -8179,7 +8179,7 @@ function majBarreHaute(id) {
   const DEPUIS_PROFIL = new Set([
     'p-abonnement', 'p-reg-appareils', 'p-reg-langue', 'p-reg-compte',
 
-    /* ⚠ « Analyses vidéo AI » A REJOINT CETTE LISTE avec son deplacement vers
+    /* ⚠ « Vidéo générée par l’IA Standix » A REJOINT CETTE LISTE avec son deplacement vers
        le profil. Sans elle, l'onglet Equipe restait allume. */
     'p-quota',
   ])
@@ -8800,8 +8800,8 @@ async function loadGestionProcedures() {
          sous l'autre sur un ecran vide, dont un qui parle d'une etape qu'on
          n'a pas encore atteinte. On ne colle pas de QR code avant d'avoir une
          procedure. */
-      '<div class="cl-rien">Aucune proc\u00e9dure n\u2019a \u00e9t\u00e9 cr\u00e9\u00e9e pour le moment.' +
-      '<span class="cl-rien-suite">Touchez le bouton <b>+</b> en haut \u00e0 droite ' +
+      '<div class="cl-rien">Aucune proc\u00e9dure pour le moment.' +
+      '<span class="cl-rien-suite">Cliquez le bouton <b>+</b> ' +
       'pour cr\u00e9er une proc\u00e9dure.</span></div>'
 
     /* ⚠ ET LE COMPTE DE DOSSIERS DOIT SUIVRE.
@@ -12585,8 +12585,8 @@ function renderCategoryGrid() {
     catGridEl.innerHTML = '<div class="cl-rien">' + (aDesDossiers
       ? 'Aucune procédure n’est en ligne pour le moment.' +
         '<span class="cl-rien-suite">Publiez une procédure pour qu’elle apparaisse ici.</span>'
-      : 'Aucune procédure n’a été créée pour le moment.' +
-        '<span class="cl-rien-suite">Touchez le bouton <b>+</b> en haut à droite ' +
+      : 'Aucune procédure pour le moment.' +
+        '<span class="cl-rien-suite">Cliquez le bouton <b>+</b> ' +
         'pour créer une procédure.</span>') + '</div>'
     return
   }
@@ -17265,13 +17265,9 @@ function dessinerAlerteEssai(hote) {
     <div class="ess-details replie" id="ess-details">
       <div class="ess-dedans">
       <div class="ess-p"><span class="pt"></span>
-        <span>Vous pouvez prendre un abonnement <b>quand vous voulez</b>, m\u00eame pendant l\u2019essai.</span></div>
+        <span><b>15 analyses vid\u00e9o gratuites</b> comprises pendant les 14 jours.</span></div>
       <div class="ess-p"><span class="pt"></span>
-        <span><b>15 analyses vid\u00e9o</b> comprises pendant les 14 jours.</span></div>
-      <div class="ess-p"><span class="pt"></span>
-        <span>Vos proc\u00e9dures <b>ne sont jamais supprim\u00e9es</b> : reprenez quand vous voulez.</span></div>
-      <div class="ess-p"><span class="pt"></span>
-        <span>Apr\u00e8s 14 jours, l\u2019espace Gestion et l\u2019espace Utilisateur sont <b>bloqu\u00e9s</b> jusqu\u2019\u00e0 la souscription.</span></div>
+        <span>Apr\u00e8s 14 jours, l\u2019espace Gestion et l\u2019espace Utilisateur sont <b>suspendus</b> en attente de la souscription.</span></div>
       </div>
     </div>`
 }
@@ -25933,13 +25929,13 @@ window.ouvrirQuota = async function() {
         ? 'partag\u00e9 entre vos entreprises'
         : 'selon votre abonnement'}</div>
       <div class="quota-barres">${barres}</div>
-      <!-- ⚠ « ce mois-ci » EST FAUX PENDANT L'ESSAI.
+      <!-- ⚠ AUCUNE MENTION DE DUREE ICI, ET C'EST VOULU.
 
-           Les quinze analyses ne se renouvellent pas au mois : elles couvrent
-           les quatorze jours, une fois. Ecrire « ce mois-ci » laissait croire
-           a un compteur qui repartirait — et l'on decouvrait le contraire au
-           mauvais moment. -->
-      <div class="quota-reste">${reste} analyse${s} vid\u00e9o AI restante${s} ${enEssai ? 'pendant les 14 jours' : ''}</div>
+           « ce mois-ci » etait faux pendant l'essai (les quinze analyses
+           couvrent les quatorze jours, une fois, sans se renouveler) ; «
+           pendant les 14 jours » etait faux une fois abonne. La formulation
+           ne parle plus que du RESTE, vrai dans les deux cas. -->
+      <div class="quota-reste">${reste} analyse${s} vid\u00e9o IA Standix restant \u00e0 g\u00e9n\u00e9rer</div>
       ${q.partage ? `<div class="quota-part">
         <!-- ⚠ LA MENTION N'APPARAIT QUE S'IL Y A PLUSIEURS ENTREPRISES. Sinon
              elle sous-entend un partage qui n'existe pas, et l'on cherche avec
@@ -25949,24 +25945,9 @@ window.ouvrirQuota = async function() {
       </div>` : ''}
     </div>
 
-    <!-- ⚠ L'INFINI NE VEUT PLUS RIEN DIRE ICI. Il accompagnait « tout le reste
-         est gratuit » : sans illimité à annoncer, le symbole ∞ posé devant une
-         phrase qui parle de ce qu'on COMPTE disait exactement le contraire.
-
-         À sa place, le sujet de la phrase : une vidéo marquée du signe de
-         l'IA. C'est ce qui est compté, et c'est la seule chose comptée. -->
-    <div class="quota-illimite">
-      <span class="ic" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round">
-          <rect x="2.6" y="5.6" width="13.4" height="12.8" rx="2.6"/>
-          <path d="M16 10.6 20.6 8v8l-4.6-2.6"/>
-          <path d="M8.1 9.1l.72 1.88 1.88.72-1.88.72-.72 1.88-.72-1.88L5.5 11.7l1.88-.72z"
-                fill="currentColor" stroke="none"/>
-        </svg>
-      </span>
-      <span>Seules les vid\u00e9os analys\u00e9es par l\u2019IA sont compt\u00e9es.</span>
-    </div>
+    <!-- ⚠ LA LIGNE « Seules les vidéos analysées par l'IA sont comptées » A
+         ÉTÉ RETIRÉE, avec sa vignette. Le titre de la page le dit désormais :
+         « Vidéo générée par l'IA Standix ». -->
     ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
         ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
       </button>` : ''}
@@ -27397,8 +27378,8 @@ function carteOffreNeuve(o, opts = {}) {
           <div class="abo-inclus">
             ${[
               `Jusqu’à <b>${o.max} membres</b>`,
-              `<b>${o.analyses} analyses vidéo IA</b> par mois`,
-              `Procédures <b>illimitées</b>`,
+              `<b>${o.analyses} analyses vidéo IA</b> générées par mois par Standix`,
+              `Accès <b>illimité</b> aux procédures`,
               `En <b>français, anglais et allemand</b>`,
               `<b>Toutes</b> les fonctionnalités`,
             ].map(t => `<div class="abo-li">
@@ -27440,11 +27421,11 @@ function carteOffreNeuve(o, opts = {}) {
               ? `<button type="button" class="abo-cta" data-offre="${o.cle}">Nous contacter</button>`
               : `<div class="abo-achats">
                    <button type="button" class="abo-cta" data-offre="${o.cle}" data-rythme="annuel">
-                     <span class="abo-b-t">Par an</span>
+                     <span class="abo-b-t">Abonnement annuel</span>
                      <span class="abo-b-s">${annuelMois} € par mois</span>
                    </button>
                    <button type="button" class="abo-cta second" data-offre="${o.cle}" data-rythme="mensuel">
-                     <span class="abo-b-t">Par mois</span>
+                     <span class="abo-b-t">Abonnement mensuel</span>
                      <span class="abo-b-s">${mensuel} € par mois</span>
                    </button>
                  </div>`}
@@ -27535,8 +27516,8 @@ function carteOffre(o, opts = {}) {
      offre à l'autre, ensuite ce qui est commun à toutes. */
   const inclus = [
     o.max === Infinity ? 'Membres <b>illimités</b>' : `Jusqu'à <b>${o.max} membres</b>`,
-    o.analyses ? `<b>${o.analyses} analyses vidéo IA</b> par mois` : null,
-    'Procédures <b>illimitées</b>',
+    o.analyses ? `<b>${o.analyses} analyses vidéo IA</b> générées par mois par Standix` : null,
+    'Accès <b>illimité</b> aux procédures',
     /* « Chacun lit dans sa langue » promettait toutes les langues. Nommer les
        trois est plus honnête, et plus vendeur dans le tri-frontière bâlois où
        les trois cohabitent dans la même équipe. */
@@ -27735,11 +27716,20 @@ window.renderAbonnements = function() {
      l'en-tête suffit à nommer l'écran.
 
      Reste une phrase qui oriente : ce qu'on paie, ou ce qui conviendrait. */
+  /* \u26a0 RIEN QUAND ON N'EST PAS ENCORE ABONN\u00c9. La phrase \u00ab Choisissez le plan
+     qui correspond \u00e0 la fa\u00e7on dont votre \u00e9quipe travaille \u00bb a \u00e9t\u00e9 retir\u00e9e :
+     les cartes qui suivent le disent d'elles-m\u00eames.
+
+     Seule reste celle qui APPREND quelque chose \u2014 quelle offre on paie d\u00e9j\u00e0.
+
+   \u26a0 ET L'\u00c9L\u00c9MENT SE MASQUE QUAND IL EST VIDE. Laiss\u00e9 en place, il garderait
+     sa marge et creuserait un blanc sous le titre. */
   const sous = document.getElementById('abo-sous')
   if (sous) {
     sous.innerHTML = payee
       ? `Vous \u00eates abonn\u00e9 \u00e0 l'offre <b>${mienne.nom}</b>.`
-      : `Choisissez le plan qui correspond<br>\u00e0 la fa\u00e7on dont votre \u00e9quipe travaille.`
+      : ''
+    sous.hidden = !sous.innerHTML
   }
 
   /* Les deux onglets de rythme reflètent le choix courant. */
@@ -28140,9 +28130,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
      seraient jamais acceptées par quelqu'un qui paie. */
   const accepte = await confirmDialog({
     titre: 'Avant de continuer',
-    message: 'En souscrivant, vous acceptez les conditions d\u2019utilisation de Standix.\n\n' +
-      'Elles pr\u00e9cisent notamment que les proc\u00e9dures r\u00e9dig\u00e9es par l\u2019IA doivent \u00eatre ' +
-      'relues par vos soins avant d\u2019\u00eatre suivies.',
+    message: 'En souscrivant, vous acceptez les conditions d\u2019utilisation de Standix.',
     confirmer: 'J\u2019accepte et je continue',
     annuler: 'Lire les conditions',
     danger: false,
@@ -30186,7 +30174,7 @@ function appliquerAccesAbonnement() {
   /* ⚠ CETTE FONCTION NE VISE PLUS QUE LE PROFIL.
 
      Elle pilotait aussi le groupe « Abonnement » de la page Equipe, et
-     deplaçait « Analyses vidéo AI » d'un groupe a l'autre selon le role.
+     deplaçait « Vidéo générée par l’IA Standix » d'un groupe a l'autre selon le role.
 
      Ce groupe a quitte la page : l'abonnement engage la carte bancaire, il vit
      avec le compte. Les analyses restent dans « Votre equipe » pour tout le

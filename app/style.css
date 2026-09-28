@@ -2427,7 +2427,7 @@
      Ambre, pas rouge : le rouge dit « erreur », or rien n'est en faute ici. On
      prévient, on n'alarme pas. Et il reste DANS l'étape — une mise en garde
      séparée de son geste se lit trop tard. */
-  /* ═══ LA MARQUE « AI » DANS LES BOUTONS ═══
+  /* ═══ LA MARQUE « IA » DANS LES BOUTONS ═══
 
      Le même dégradé que l'anneau, appliqué aux lettres. Dans un bouton, l'anneau
      qui tourne entrait en concurrence avec le texte à côté : deux choses qui
@@ -2441,7 +2441,7 @@
 
        Le sigle est centre dans sa case ; le libelle du bouton, lui, se pose
        sur sa ligne de base. Deux references differentes : releve au pixel sur
-       un rendu a quatre fois la densite, la base du « AI » tombait 3 px plus
+       un rendu a quatre fois la densite, la base du « IA » tombait 3 px plus
        haut que celle de « Generer les etapes » — 0,75 px a l'ecran.
 
        C'est peu, mais sur deux mots cote a cote l'oeil le voit tout de suite :
@@ -2476,7 +2476,7 @@
 
        ⚠ LE DEGRADE FINISSAIT A #7FB6F2, UN BLEU FRANC. Sur un bouton bleu, le
          « I » — qui tombe dans le dernier tiers de la course — se confondait
-         avec le fond : on lisait « AI » avec une seconde lettre a moitie
+         avec le fond : on lisait « IA » avec une seconde lettre a moitie
          effacee, et le sigle paraissait coupe.
 
        Il va maintenant du blanc a un bleu tres pale. La nuance se voit encore
@@ -2750,7 +2750,7 @@
      À la fin  : la coche, quelques secondes, puis retour au repos. */
 /* ═══ LA MARQUE DEVIENT L'ANNEAU ═══
 
-     Au repos, on lit « AI » : c'est le nom de ce qu'on demande. Dès qu'on
+     Au repos, on lit « IA » : c'est le nom de ce qu'on demande. Dès qu'on
      appuie, les lettres s'effacent et l'anneau prend leur place — exactement
      leur place, puisqu'ils occupent la même case.
 
@@ -2758,9 +2758,9 @@
      se décale. La marque rétrécit, l'anneau grandit, et le texte glisse hors
      champ pendant ce temps. Ce qui reste est centré. */
   /* Le bouton « Générer les étapes » suit la même métamorphose que celui du
-     découpage : les lettres AI cèdent la place à l'anneau, dans la même case. */
+     découpage : les lettres IA cèdent la place à l'anneau, dans la même case. */
   /* ⚠ LA BOITE FAISAIT 24 PX DE LARGE, ET LE SIGLE EST PLUS LARGE QUE CA.
-     « AI » a 15 px en graisse 850 mesure environ 27 px : le « I » etait
+     « IA » a 15 px en graisse 850 mesure environ 27 px : le « I » etait
      coupe net par le bord de la case, ce qui donnait un sigle tronque et
      desaligne — c'est ce qu'on voit sur le bouton.
 
@@ -18428,10 +18428,14 @@ body.sans-topbar .screen{
 
  ⚠ ON RENOMME PLUTOT QUE DE SURCHARGER. `abo-b-t` et `abo-b-s` n'appartiennent
    qu'a ces boutons : aucune collision possible. */
+/* ⚠ 13 PX, ET LE MOT NE SE COUPE PLUS. Les libellés sont passés de
+   « Par an / Par mois » à « Abonnement annuel / Abonnement mensuel » :
+   à 14 px, le second tenait sur deux lignes et le premier sur une, et les
+   deux boutons ne faisaient plus la même hauteur. */
 .abo-b-t{
-  font-size:14px; font-weight:700;
-  letter-spacing:-0.02em; line-height:1.15;
-  display:block;
+  font-size:13px; font-weight:700;
+  letter-spacing:-0.025em; line-height:1.15;
+  display:block; white-space:nowrap;
 }
 .abo-b-s{
   font-size:12px; font-weight:500;
@@ -23466,7 +23470,7 @@ body.abo-expire [data-etab-plus]{
   .abo-cta{ font-size:calc(15px * var(--ech)); }
   .abo-tx .abo-membres{ font-size:calc(13.5px * var(--ech)); }
   .ac-s{ font-size:calc(12px * var(--ech)); }
-  .abo-b-t{ font-size:calc(14px * var(--ech)); }
+  .abo-b-t{ font-size:calc(13px * var(--ech)); }
   .abo-b-s{ font-size:calc(12px * var(--ech)); }
   .abo-cta.gerer{ font-size:calc(14px * var(--ech)); }
   .ap-prix{ font-size:calc(19px * var(--ech)); }
@@ -25350,4 +25354,51 @@ html::-webkit-scrollbar-thumb:hover{
     margin-left:auto;
     margin-right:auto;
   }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA CARTE D'IDENTITÉ PREND LA HAUTEUR DE CELLE DE L'ENTREPRISE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Mesuré dans le profil : 92 px contre 75 px. Les deux cartes se suivent et
+   portent la même chose — une vignette, deux lignes, un chevron — mais l'une
+   dépassait l'autre de dix-sept pixels. Deux blocs presque identiques et
+   presque alignés se lisent comme une erreur, pas comme une hiérarchie.
+
+   ⚠ TROIS ÉCARTS À RÉSORBER, PAS UN : l'avatar (56 contre 46), le rembourrage
+     (18/18 contre 15/14) et l'arrondi de la vignette. Corriger le seul avatar
+     laissait encore six pixels.
+
+   ⚠ LE NOM RESTE PLUS GRAND (19 px contre 16). C'est la carte principale de la
+     page ; lui retirer aussi sa typographie l'aurait rendue indistinguable de
+     sa voisine. Même hauteur ne veut pas dire même poids. */
+/* ⚠ LES TROIS ÉCRANS SONT NOMMÉS. `#p-profil .reg-identite` pose 18 px et
+   l'emporte sur une simple classe : il faut un identifiant pour passer
+   devant. Les trois portent la même carte, ils changent ensemble. */
+#p-profil .reg-identite.id-carte,
+#p-settings .reg-identite.id-carte,
+#e-profil .reg-identite.id-carte{ padding:15px 16px 14px; }
+
+.id-av{
+  flex:0 0 46px;
+  width:46px;
+  height:46px;
+  border-radius:14px;
+}
+.id-av .reg-av-ini{ font-size:17px; }
+
+@media (min-width:700px) and (min-height:600px){
+  #p-profil .reg-identite.id-carte,
+  #p-settings .reg-identite.id-carte,
+  #e-profil .reg-identite.id-carte{
+    padding:calc(15px * var(--ech)) calc(16px * var(--ech)) calc(14px * var(--ech));
+  }
+  .id-av{
+    flex:0 0 calc(46px * var(--ech));
+    width:calc(46px * var(--ech));
+    height:calc(46px * var(--ech));
+    border-radius:calc(14px * var(--ech));
+  }
+  .id-av .reg-av-ini{ font-size:calc(17px * var(--ech)); }
 }

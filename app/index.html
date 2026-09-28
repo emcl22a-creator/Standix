@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=b253ec45">
+<link rel="stylesheet" href="style.css?v=cbb7e243">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -913,7 +913,11 @@
       </div>
 
       <div class="bv-bas">
-        <p class="bv-slogan">Filmez, l’IA crée la<br>procédure pour l’équipe.</p>
+        <!-- ⚠ LA COUPURE EST POSÉE À LA MAIN, pas laissée au navigateur. Les
+             deux moitiés font la même longueur ; laissé libre, le texte
+             casserait après « transmis » et la seconde ligne ne porterait
+             qu'un mot. -->
+        <p class="bv-slogan">Votre savoir-faire<br>transmis simplement</p>
 
         <!-- ⚠ LA CONNEXION D'ABORD. La plupart des gens qui ouvrent l'app ont
              deja un compte : leur demander de chercher un bouton serait leur
@@ -997,7 +1001,6 @@
       </button>
       <h2>Content de vous revoir</h2>
     </div>
-    <p class="histo-note">Vos procédures vous attendent.</p>
     <div class="histo-liste">
 <div id="login-form" class="auth-form active">
         <label class="f">E-mail</label>
@@ -2406,7 +2409,7 @@
       <!-- L'anneau de l'IA plutôt qu'une étoile : le même signe que partout ailleurs
            dans l'app, et il devient une coche quand c'est fini. -->
       <button class="btn block doc-generer" style="margin-top:14px;" id="doc-generer" disabled="">
-        <span class="ia-mot">AI</span>
+        <span class="ia-mot">IA</span>
         <span class="ia-coche">
           <svg viewBox="0 0 24 24" fill="none">
             <circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle>
@@ -2546,7 +2549,7 @@
            l'image, pas un bouton système. C'est ce que faisait déjà l'écran de
            montage, et c'est le plus propre des deux. -->
       
-      <button class="btn block doc-generer" style="margin-top:14px;" id="ai-launch-btn" disabled=""><span class="ia-case"><span class="ia-mot">AI</span><span class="ia-fig m ia-roue"><span class="lum"></span></span><span class="ia-coche"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle><polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></span></span>
+      <button class="btn block doc-generer" style="margin-top:14px;" id="ai-launch-btn" disabled=""><span class="ia-case"><span class="ia-mot">IA</span><span class="ia-fig m ia-roue"><span class="lum"></span></span><span class="ia-coche"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10.4" stroke="url(#iaFini)" stroke-width="2.4"></circle><polyline points="7.8 12.4 10.6 15.2 16.2 9" stroke="url(#iaFini)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></polyline></svg></span></span>
         
         <span>Générer les étapes</span></button>
       <div class="error-msg" id="ai-error"></div>
@@ -3152,10 +3155,10 @@
       <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">Vos appareils</h1>
+      <h1 class="pagehead">Vos appareils numériques</h1>
     </div>
     <div id="p-app-liste" style="margin-top:14px;"></div>
-    <div class="reg-note">Un compte peut être utilisé sur trois appareils. Au-delà, le plus ancien est déconnecté. Retirez un appareil pour en libérer la place.</div>
+    <div class="reg-note">Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.</div>
   </div>
 
   <div class="screen" inert id="p-membre">
@@ -3377,10 +3380,10 @@
       <button class="back-btn" onclick="retourVersMere()" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <!-- ⚠ LE TITRE SUIT LE BOUTON. Celui du profil dit « Utilisation vidéo
-           AI » et ouvre cette page : deux noms pour un seul endroit feraient
-           douter d'avoir cliqué au bon endroit. -->
-      <h1 class="pagehead">Utilisation vidéo AI</h1>
+      <!-- ⚠ LE TITRE SUIT LE BOUTON. Celui du profil porte le même nom et
+           ouvre cette page : deux noms pour un seul endroit feraient douter
+           d'avoir cliqué au bon endroit. -->
+      <h1 class="pagehead">Vidéo générée par l’IA Standix</h1>
     </div>
     <div class="quota-carte" id="quota-carte"></div>
   </div>
@@ -3440,11 +3443,11 @@
          « Abonnement », « Preferences » en portent un, pas lui. L'oeil qui
          descend la page trouvait donc une carte orpheline avant la premiere
          section nommee. -->
-    <!-- ⚠ UN IDENTIFIANT POUR Y DEPLACER « Analyses vidéo AI ». -->
+    <!-- ⚠ UN IDENTIFIANT POUR Y DEPLACER « Vidéo générée par l’IA Standix ». -->
     <div class="reg-groupe" id="groupe-entreprise" data-teinte="bleu">
       <!-- Le compte est visible SANS entrer : beaucoup n'auront pas besoin
            d'ouvrir la page. Elle sert quand on veut savoir quand ça repart. -->
-      <!-- ⚠ « Analyses vidéo AI » A REJOINT LE GROUPE « Abonnement ».
+      <!-- ⚠ « Vidéo générée par l’IA Standix » A REJOINT LE GROUPE « Abonnement ».
 
         Le compteur d'analyses EST une limite de l'abonnement : c'est le
         forfait qui fixe combien on en a par mois. Le lire sous « Votre
@@ -3629,7 +3632,7 @@
         <span class="reg-val" id="profil-abo-actuel">—</span><span class="reg-fl">›</span>
       </button>
 
-        <!-- ⚠ « Analyses vidéo AI » A QUITTE LA PAGE ÉQUIPE.
+        <!-- ⚠ « Vidéo générée par l’IA Standix » A QUITTE LA PAGE ÉQUIPE.
 
              Elle y etait la seule ligne a ne pas parler de gens : c'est un
              quota d'abonnement, pas un reglage d'equipe. Le titre « Équipe »
@@ -3637,7 +3640,7 @@
 
              Elle rejoint « Abonnement », qui traite du meme sujet. -->
         <button type="button" class="reg-ligne" id="ligne-quota" onclick="ouvrirQuota()">
-        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Utilisation vidéo AI</span>
+        <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path><path d="m17 10 5-3v10l-5-3" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"></path></svg></span><span class="reg-nm">Vidéo générée par l’IA Standix</span>
         <span class="reg-val" id="reg-quota">—</span><span class="fl">›</span>
       </button>
     </div>
@@ -3675,7 +3678,7 @@
             <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></line>
           </svg>
         </span>
-        <span class="reg-nm">Vos appareils</span>
+        <span class="reg-nm">Vos appareils numériques</span>
         <span class="reg-val" id="p-nb-appareils">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet"></div>
@@ -3828,7 +3831,6 @@
       <button type="button" class="lien-doux" id="mdp-changer-g">Changer mon mot de passe</button>
       <div class="error-msg" id="settings-error"></div>
     </div>
-    <div class="reg-note">Votre nom apparaît dans l'équipe et sur les procédures que vous publiez. L'adresse ne peut pas être modifiée ici.</div>
   </div>
 
   <!-- Sous-page : le code d'invitation -->
@@ -4503,7 +4505,7 @@
             <line x1="10.4" y1="18.6" x2="13.6" y2="18.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></line>
           </svg>
         </span>
-        <span class="reg-nm">Vos appareils</span>
+        <span class="reg-nm">Vos appareils numériques</span>
         <span class="reg-val" id="e-nb-appareils">—</span><span class="fl">›</span>
       </button>
       <div class="reg-filet"></div>
@@ -4625,10 +4627,10 @@
       <button class="back-btn" id="app-retour" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
-      <h1 class="pagehead">Vos appareils</h1>
+      <h1 class="pagehead">Vos appareils numériques</h1>
     </div>
     <div id="app-liste" style="margin-top:14px;"></div>
-    <div class="reg-note">Un compte peut être utilisé sur trois appareils. Au-delà, le plus ancien est déconnecté. Retirez un appareil pour en libérer la place.</div>
+    <div class="reg-note">Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.</div>
   </div>
 
   <!-- Sous-page : la langue -->
@@ -5272,7 +5274,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=67b38901"></script>
+<script type="module" src="app.js?v=a68b9cbc"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

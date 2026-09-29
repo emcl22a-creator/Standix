@@ -831,9 +831,9 @@
   "en": "Load the video first.",
   "de": "Laden Sie zuerst das Video."
  },
- "Choisir l’écran et démarrer": {
-  "en": "Choose the screen and start",
-  "de": "Bildschirm wählen und starten"
+ "Choisir la fenêtre et démarrer": {
+  "en": "Choose the window and start",
+  "de": "Fenster wählen und starten"
  },
  "Choisir une vidéo": {
   "en": "Choose a video",
@@ -851,9 +851,17 @@
   "en": "Choose how long the invitation code stays valid.",
   "de": "Wählen Sie, wie lange der Einladungscode gültig bleibt."
  },
+ "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": {
+  "en": "Choose the window or tab to record. The control bar stays visible to you but does not appear in the video.",
+  "de": "Wählen Sie das Fenster oder den Tab für die Aufnahme. Die Steuerleiste bleibt für Sie sichtbar, erscheint aber nicht im Video."
+ },
  "Choisissez le poste qui vous correspond.": {
   "en": "Pick the role that fits you.",
   "de": "Wählen Sie die passende Position."
+ },
+ "Choisissez l’écran ou la fenêtre à filmer…": {
+  "en": "Choose the screen or window to record…",
+  "de": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…"
  },
  "Choisissez votre enregistrement avec « Choisir une vidéo »": {
   "en": "Pick your recording with “Choose a video”",
@@ -870,6 +878,10 @@
  "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": {
   "en": "Five minutes at most. Recording stops on its own.",
   "de": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst."
+ },
+ "Cliquez encore une fois sur le bouton pour choisir l’écran.": {
+  "en": "Click the button once more to choose the screen.",
+  "de": "Klicken Sie noch einmal auf die Schaltfläche, um den Bildschirm zu wählen."
  },
  "Cliquez ici pour nous écrire": {
   "en": "Click here to write to us",
@@ -1859,10 +1871,6 @@
   "en": "Playing",
   "de": "Wird abgespielt"
  },
- "Les accès de chaque membre permettent de décider l’espace auquel il a accès.": {
-  "en": "Each member's access decides which area they can open.",
-  "de": "Der Zugriff jedes Mitglieds entscheidet, welchen Bereich es öffnen kann."
- },
  "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": {
   "en": "Video analyses reset every month and do not carry over.",
   "de": "Videoauswertungen werden monatlich zurückgesetzt und nicht übertragen."
@@ -1959,9 +1967,9 @@
   "en": "Analysis done: {length} steps.",
   "de": "Auswertung fertig: {length} Schritte."
  },
- "L’enregistrement démarre tout de suite — vous avez": {
-  "en": "Recording starts right away — you have",
-  "de": "Die Aufnahme startet sofort — Sie haben"
+ "L’enregistrement démarre dans": {
+  "en": "Recording starts in",
+  "de": "Aufnahme startet in"
  },
  "L’enregistrement est vide.": {
   "en": "The recording is empty.",
@@ -2458,6 +2466,10 @@
  "Renouvellement le {dateRenouv}": {
   "en": "Renews on {dateRenouv}",
   "de": "Verlängerung am {dateRenouv}"
+ },
+ "Reprendre": {
+  "en": "Resume",
+  "de": "Fortsetzen"
  },
  "Rester": {
   "en": "Stay",
@@ -3411,6 +3423,10 @@
   "en": "the training time",
   "de": "die Einarbeitungszeit"
  },
+ "le temps de vous placer": {
+  "en": "to get ready",
+  "de": "Zeit, sich bereitzumachen"
+ },
  "le temps que vous n'avez plus à passer à expliquer": {
   "en": "the time you no longer spend explaining",
   "de": "die Zeit, die Sie nicht mehr mit Erklären verbringen"
@@ -3442,10 +3458,6 @@
  "pour créer une procédure.": {
   "en": "button to create a procedure.",
   "de": ", um eine Anleitung zu erstellen."
- },
- "pour vous placer": {
-  "en": "to get ready",
-  "de": "um sich bereitzumachen"
  },
  "premier mois avec des lectures": {
   "en": "first month with reads",

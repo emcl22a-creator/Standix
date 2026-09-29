@@ -42,9 +42,11 @@ def bloc(phrases, langue):
     lignes = []
     for fr in sorted(phrases, key=str.lower):
         cible = phrases[fr].get(langue)
-        # Une phrase identique dans les deux langues n'a rien a faire dans le
-        # dictionnaire : `t()` rend deja le francais quand il ne trouve rien.
-        if not cible or cible == fr:
+        # ⚠ UNE PHRASE IDENTIQUE DANS LES DEUX LANGUES RESTE DANS LE DICTIONNAIRE.
+        # « 1 min » se dit pareil en anglais ; absente du dictionnaire, elle
+        # serait prise pour une phrase jamais traduite et partirait a l'IA a
+        # chaque session. Presente, elle dit « deja vu, c'est bon ».
+        if not cible:
             continue
         lignes.append('    %s: %s,' % (json.dumps(cle(fr), ensure_ascii=False),
                                          json.dumps(cible, ensure_ascii=False)))

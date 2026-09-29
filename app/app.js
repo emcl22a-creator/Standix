@@ -15728,8 +15728,12 @@ function lancerPriseEcran() {
        livre pas : il n'y a rien à analyser dedans. */
     if (secondes < 2) { toast('Enregistrement trop court.'); return }
     collageEnAttente = fichier
-    showGestionScreen('p-create')
-    toast('Enregistrement prêt — nommez la procédure, puis lancez l’analyse')
+    /* ⚠ ON REVIENT SUR L'ÉCRAN D'ANALYSE, PLUS SUR LE MENU. L'outil déposait
+       sa vidéo puis renvoyait à « Créer une procédure » : il fallait y
+       retrouver soi-même la bonne carte pour que le fichier ressorte. Les
+       trois outils partent maintenant de l'écran d'analyse et y reviennent. */
+    goToCreateMode('ai')
+    toast('Enregistrement prêt — lancez l’analyse')
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
@@ -16162,8 +16166,8 @@ function demarrerPriseCamera() {
     fermerCamera()
     if (!fichier.size) { toast("L’enregistrement est vide."); return }
     collageEnAttente = fichier
-    showGestionScreen('p-create')
-    toast('Vidéo prête — nommez la procédure, puis lancez l’analyse')
+    goToCreateMode('ai')   /* voir le commentaire de l'enregistrement d'écran */
+    toast('Vidéo prête — lancez l’analyse')
   }
 
   /* Si la caméra se coupe seule — appel entrant, application mise en veille —
@@ -16876,8 +16880,8 @@ document.getElementById('coller-utiliser')?.addEventListener('click', () => {
      n'a plus qu'à nommer sa procédure. Elle n'a pas à la ressortir de ses
      photos, où elle vient à peine d'être rangée. */
   collageEnAttente = collageResultat
-  showGestionScreen('p-create')
-  toast('Vidéo prête — nommez la procédure, puis lancez l’analyse')
+  goToCreateMode('ai')   /* voir le commentaire de l'enregistrement d'écran */
+  toast('Vidéo prête — lancez l’analyse')
 })
 
 /* ═══════════════════════════════════════════════════════════════════════════

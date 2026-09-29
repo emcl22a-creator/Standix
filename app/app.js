@@ -302,6 +302,7 @@ const DICO = {
     "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont <b>suspendus</b> en attente de la souscription.": "After 14 days, the Management area and the User area are <b>paused</b> until you subscribe.",
     "Assembler": "Join",
     "Attendre": "Wait",
+    "Attention": "Caution",
     "Au total": "In total",
     "Aucun abonnement à gérer": "No subscription to manage",
     "Aucun appareil enregistré pour le moment.": "No devices yet.",
@@ -383,6 +384,7 @@ const DICO = {
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "This procedure belongs to “{nom}”. You can open it, but not the company's other procedures: for those you need your manager's code.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "This procedure has been open for a while with nothing happening. Pick up where you left off, or come back to it later.",
     "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": "This procedure has no steps yet. Tell your manager: they need to add them before it can be used.",
+    "Cette procédure n’a pas encore d’étapes.": "This procedure has no steps yet.",
     "Cette vidéo dure {min} min {sec}. L'analyse accepte jusqu'à 5 minutes.": "This video is {min} min {sec} long. The analysis takes up to 5 minutes.",
     "Cette vidéo dure {m} min {sc}. L'analyse accepte jusqu'à 5 minutes.": "This video is {m} min {sc} long. The analysis takes up to 5 minutes.",
     "Cette vidéo pèse": "This video weighs",
@@ -441,7 +443,7 @@ const DICO = {
     "Comment les lectures sont comptées": "How reads are counted",
     "Comment ça fonctionne": "How it works",
     "Commentez ce que vous faites pendant que vous filmez.": "Talk through what you do while you record.",
-    "Complétez le titre et le dossier ci-dessus pour continuer.": "Fill in the title and folder above to continue.",
+    "Complétez le titre de la procédure et le dossier de la procédure ci-dessus pour continuer.": "Fill in the procedure title and the procedure folder above to continue.",
     "Compris": "Got it",
     "comprises pendant les 14 jours.": "included during the 14 days.",
     "Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.": "Account created! Check your email to confirm, then log in.",
@@ -642,8 +644,8 @@ const DICO = {
     "La consultation n'a pas pu être enregistrée : {message}": "The read could not be saved: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Copying failed — select the text by hand.",
     "La création d'entreprise n'est pas installée sur la base. Exécutez migration-creation-entreprise.sql.": "Company creation is not set up in the database. Run migration-creation-entreprise.sql.",
+    "La langue choisie traduit aussi les étapes des procédures.": "The language you choose also translates procedure steps.",
     "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": "The language applies to the whole app. Each person can pick their own.",
-    "La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.": "The language applies to the whole app. Procedures are translated separately, from the procedure itself.",
     "La photo n’a pas pu être envoyée.": "The photo could not be sent.",
     "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "The procedure is already in Draft. It opens once the analysis is done.",
     "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "the procedure is already in Draft. It opens once the analysis is done.",
@@ -797,6 +799,7 @@ const DICO = {
     "premier mois avec des lectures": "first month with reads",
     "Presque prêt": "Almost there",
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Prices exclude tax. You change plan when your team changes, never before.",
+    "Procédure": "Procedure",
     "Procédure en cours de modification": "Procedure being edited",
     "Procédure générée": "Procedure ready",
     "Procédure introuvable": "Procedure not found",
@@ -867,6 +870,7 @@ const DICO = {
     "Résultat": "Result",
     "Révoquer": "Revoke",
     "Révoquer ce code ?": "Revoke this code?",
+    "Sans dossier": "No folder",
     "sans détail.": "no details.",
     "Sans micro, l'IA n'a rien à écouter : autorisez le microphone, puis recommencez.": "Without the microphone, the AI has nothing to listen to: allow the microphone, then try again.",
     "Sans nom": "Untitled",
@@ -922,6 +926,7 @@ const DICO = {
     "Terminer": "Finish",
     "Terminer l'étape {v}": "Finish step {v}",
     "Titre": "Title",
+    "Titre de la procédure": "Procedure title",
     "Titre de l’étape (facultatif)": "Step title (optional)",
     "Touchez <b>Réessayer</b>": "Tap <b>Try again</b>",
     "Touchez dès que ce geste-là est fini.": "Tap as soon as this move is done.",
@@ -1274,6 +1279,7 @@ const DICO = {
     "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont <b>suspendus</b> en attente de la souscription.": "Nach 14 Tagen werden Verwaltungs- und Nutzerbereich <b>pausiert</b>, bis ein Abo abgeschlossen ist.",
     "Assembler": "Zusammenfügen",
     "Attendre": "Warten",
+    "Attention": "Achtung",
     "Au total": "Insgesamt",
     "Aucun abonnement à gérer": "Kein Abo zu verwalten",
     "Aucun appareil enregistré pour le moment.": "Noch keine Geräte.",
@@ -1355,6 +1361,7 @@ const DICO = {
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "Diese Anleitung gehört zu „{nom}“. Sie können sie öffnen, die anderen Anleitungen des Unternehmens aber nicht: Dafür brauchen Sie den Code Ihrer Führungskraft.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "Diese Anleitung ist schon eine Weile offen, ohne dass sich etwas tut. Machen Sie weiter, wo Sie waren, oder kommen Sie später zurück.",
     "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": "Diese Anleitung hat noch keine Schritte. Sagen Sie Ihrer Führungskraft Bescheid: Die Schritte müssen erst ergänzt werden.",
+    "Cette procédure n’a pas encore d’étapes.": "Diese Anleitung hat noch keine Schritte.",
     "Cette vidéo dure {min} min {sec}. L'analyse accepte jusqu'à 5 minutes.": "Dieses Video dauert {min} Min. {sec}. Die Auswertung nimmt höchstens 5 Minuten an.",
     "Cette vidéo dure {m} min {sc}. L'analyse accepte jusqu'à 5 minutes.": "Dieses Video dauert {m} Min. {sc}. Die Auswertung nimmt höchstens 5 Minuten an.",
     "Cette vidéo pèse": "Dieses Video hat",
@@ -1413,7 +1420,7 @@ const DICO = {
     "Comment les lectures sont comptées": "Wie Aufrufe gezählt werden",
     "Comment ça fonctionne": "So funktioniert es",
     "Commentez ce que vous faites pendant que vous filmez.": "Erklären Sie beim Aufnehmen, was Sie tun.",
-    "Complétez le titre et le dossier ci-dessus pour continuer.": "Titel und Ordner oben ausfüllen, um fortzufahren.",
+    "Complétez le titre de la procédure et le dossier de la procédure ci-dessus pour continuer.": "Füllen Sie oben den Titel und den Ordner der Anleitung aus, um fortzufahren.",
     "Compris": "Verstanden",
     "comprises pendant les 14 jours.": "in den 14 Tagen inklusive.",
     "Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.": "Konto erstellt! Bestätigen Sie per E-Mail und melden Sie sich dann an.",
@@ -1614,8 +1621,8 @@ const DICO = {
     "La consultation n'a pas pu être enregistrée : {message}": "Der Aufruf konnte nicht gespeichert werden: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Kopieren fehlgeschlagen — markieren Sie den Text von Hand.",
     "La création d'entreprise n'est pas installée sur la base. Exécutez migration-creation-entreprise.sql.": "Die Unternehmenserstellung ist in der Datenbank nicht eingerichtet. Führen Sie migration-creation-entreprise.sql aus.",
+    "La langue choisie traduit aussi les étapes des procédures.": "Die gewählte Sprache übersetzt auch die Schritte der Anleitungen.",
     "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": "Die Sprache gilt für die ganze App. Jede Person kann ihre eigene wählen.",
-    "La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.": "Die Sprache gilt für die ganze App. Anleitungen werden einzeln übersetzt, direkt in der Anleitung.",
     "La photo n’a pas pu être envoyée.": "Das Foto konnte nicht gesendet werden.",
     "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "Die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
     "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
@@ -1769,6 +1776,7 @@ const DICO = {
     "premier mois avec des lectures": "erster Monat mit Aufrufen",
     "Presque prêt": "Fast fertig",
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher.",
+    "Procédure": "Anleitung",
     "Procédure en cours de modification": "Anleitung wird bearbeitet",
     "Procédure générée": "Anleitung fertig",
     "Procédure introuvable": "Anleitung nicht gefunden",
@@ -1839,6 +1847,7 @@ const DICO = {
     "Résultat": "Ergebnis",
     "Révoquer": "Widerrufen",
     "Révoquer ce code ?": "Diesen Code widerrufen?",
+    "Sans dossier": "Ohne Ordner",
     "sans détail.": "ohne Details.",
     "Sans micro, l'IA n'a rien à écouter : autorisez le microphone, puis recommencez.": "Ohne Mikrofon hat die KI nichts zum Zuhören: Erlauben Sie das Mikrofon und versuchen Sie es erneut.",
     "Sans nom": "Ohne Namen",
@@ -1894,6 +1903,7 @@ const DICO = {
     "Terminer": "Beenden",
     "Terminer l'étape {v}": "Schritt {v} beenden",
     "Titre": "Titel",
+    "Titre de la procédure": "Titel der Anleitung",
     "Titre de l’étape (facultatif)": "Titel des Schritts (optional)",
     "Touchez <b>Réessayer</b>": "Tippen Sie auf <b>Erneut versuchen</b>",
     "Touchez dès que ce geste-là est fini.": "Tippen Sie, sobald dieser Handgriff fertig ist.",
@@ -2560,6 +2570,12 @@ function definirLangue(code) {
   chargerTraductionsIA(code).then(() => { if (langueApp === code) appliquerLangue() })
   appliquerLangue()
   synchroniserLangueParlee()
+  // La fiche ouverte suit la nouvelle langue.
+  // Même cachée (on change la langue depuis les réglages), la dernière fiche
+  // est remise à jour : au retour, elle est déjà dans la bonne langue. On
+  // vérifie d'abord qu'elle est toujours dans la page.
+  const f = ficheOuverte
+  if (f?.etapes?.length && document.querySelector(`#${f.zoneId} [data-etape-id="${CSS.escape(f.etapes[0].id)}"]`)) traduireFicheOuverte()
 }
 
 /* ═══ LA CLÉ D'UNE PHRASE ═══
@@ -2608,7 +2624,54 @@ function tLang(phrase, params) {
   const k = cleTexte(phrase)
   const trad = DICO[langueApp]?.[k] ?? TRAD_IA[langueApp]?.[k]
   if (trad == null) demanderTraduction(k)
-  return remplirGabarit(trad ?? phrase, params)
+  const sortie = remplirGabarit(trad ?? phrase, params)
+  if (trad != null) retenirOrigine(sortie, remplirGabarit(phrase, params))
+  return sortie
+}
+
+/* ═══ RETROUVER LE FRANÇAIS D'UN TEXTE DÉJÀ TRADUIT ═══
+
+   Le bug : app en anglais, puis on choisit l'allemand (ou le français) — et
+   une bonne partie de l'écran restait en anglais, alors que la langue
+   sélectionnée était bien la nouvelle.
+
+   La cause : `appliquerLangue` retient l'ORIGINAL de chaque texte la première
+   fois qu'il le voit, et traduit toujours à partir de lui. Mais un texte écrit
+   par `tLang` pendant qu'on est en anglais arrive DÉJÀ en anglais : c'est
+   l'anglais qui était retenu comme original. Passer à l'allemand cherchait
+   alors « Steps » dans le dictionnaire français → rien → l'anglais restait.
+
+   Le remède : chaque sortie de `tLang` note d'où elle vient (sa version
+   française, trous remplis, et chaque morceau entre deux balises). Et pour
+   ce qui n'est pas passé par `tLang`, le dictionnaire se lit à l'envers. */
+const ORIGINES = new Map()
+const decoderEntites = (s) => String(s).replace(/&(amp|lt|gt|quot|#39|nbsp);/g,
+  (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: '\u00a0' })[e])
+const morceaux = (s) => decoderEntites(s).split(/<[^>]*>/).map(cleTexte)
+
+function retenirOrigine(sortie, francais) {
+  if (sortie === francais) return
+  if (ORIGINES.size > 20000) ORIGINES.clear()
+  const a = morceaux(sortie), b = morceaux(francais)
+  if (a.length !== b.length) return
+  a.forEach((x, i) => { if (x && b[i] && x !== b[i]) ORIGINES.set(x, b[i]) })
+}
+
+const inverses = {}
+function origineDe(texte) {
+  const k = cleTexte(texte)
+  if (ORIGINES.has(k)) return ORIGINES.get(k)
+  for (const l of ['en', 'de']) {
+    if (!inverses[l] || inverses[l].__taille !== Object.keys(TRAD_IA[l] || {}).length) {
+      const inv = new Map()
+      for (const src of [TRAD_IA[l] || {}, DICO[l] || {}]) for (const [fr, tr] of Object.entries(src)) inv.set(cleTexte(tr), fr)
+      inv.__taille = Object.keys(TRAD_IA[l] || {}).length
+      inverses[l] = inv
+    }
+    const fr = inverses[l].get(k)
+    if (fr != null && fr !== k) return fr
+  }
+  return texte
 }
 
 /* ═══ LES TRADUCTIONS FAITES PAR L'IA ═══
@@ -2802,7 +2865,9 @@ function appliquerLangue(zone) {
     for (const noeud of aTraiter) {
       const brut = noeud.nodeValue.trim()
       if (!brut) continue
-      if (!noeud.__vo) noeud.__vo = brut
+      /* Un texte que le code a changé depuis notre dernier passage a un nouvel
+         original. On le ramène au français s'il est arrivé déjà traduit. */
+      if (!noeud.__vo || (noeud.__vw != null && brut !== noeud.__vw)) noeud.__vo = origineDe(brut)
       /* ⚠ LES HOMONYMES : `data-tr` DONNE LE SENS.
 
          Le français emploie le même mot pour deux gestes différents.
@@ -2817,6 +2882,7 @@ function appliquerLangue(zone) {
       const cle = noeud.parentElement?.dataset?.tr
       const cible = langueApp === 'fr' ? noeud.__vo : (cle ? (dico?.[cle] ?? ia?.[cle] ?? noeud.__vo) : vers(noeud.__vo))
       if (noeud.nodeValue.trim() !== cible) noeud.nodeValue = noeud.nodeValue.replace(brut, cible)
+      noeud.__vw = cible
     }
 
     for (const attr of ATTRIBUTS_TRADUITS) {
@@ -2824,9 +2890,14 @@ function appliquerLangue(zone) {
         if (el.closest(HORS_TRADUCTION)) return
         /* Une clé de mémoire par attribut : un même bouton peut porter un
            `aria-label` et un `title` différents. */
-        const memo = '__vo_' + attr
-        if (!el[memo]) el[memo] = el.getAttribute(attr)
-        el.setAttribute(attr, vers(el[memo]))
+        const memo = '__vo_' + attr, ecrit = '__vw_' + attr
+        const actuel = el.getAttribute(attr)
+        // Même règle que pour le texte : un attribut changé par le code depuis
+        // notre passage a un nouvel original.
+        if (!el[memo] || (el[ecrit] != null && actuel !== el[ecrit])) el[memo] = origineDe(actuel)
+        const cible = vers(el[memo])
+        if (actuel !== cible) el.setAttribute(attr, cible)
+        el[ecrit] = cible
       })
     }
   }
@@ -25910,6 +25981,7 @@ async function openAnalyse(procId) {
     currentAnalyseData.etapes.forEach((etape, i) => {
       const div = document.createElement('div')
       div.className = 'detail-step'
+      div.dataset.etapeId = etape.id
       const bounds = clipBounds.get(etape.id)
       const hasClip = bounds && proc.video_url
       div.innerHTML = `
@@ -25944,6 +26016,8 @@ async function openAnalyse(procId) {
   }
 
   attacherSuiviLecture(videoEl, stepsListEl)
+  traduireFicheOuverte({ proc, etapes: currentAnalyseData.etapes, zoneId: 'analyse-steps-list',
+                         titreId: 'analyse-titre', perime })
 
   const qrContainer = document.getElementById('qr-container')
   qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">' + tLang('Génération...') + '</div>'
@@ -28217,6 +28291,24 @@ function bornePdf(s) {
 
 async function exporterProcedurePdf(proc, etapes) {
   if (!proc) return
+
+  /* ═══ LE PDF DANS LA LANGUE DE L'APP ═══
+
+     Même traduction que la fiche à l'écran, et même cache : si la fiche vient
+     d'être lue, rien n'est redemandé. En cas d'échec, le PDF part dans la
+     langue d'origine plutôt que pas du tout. */
+  if (langueApp !== 'fr' && proc.id && (etapes || []).length) {
+    try {
+      const trad = await demanderTraductionProc(proc.id, langueApp, contenuProc(proc, etapes))
+      const parId = new Map((trad.etapes || []).map(e => [e.id, e]))
+      proc = { ...proc, titre: trad.titre || proc.titre }
+      etapes = etapes.map(e => {
+        const t = parId.get(e.id)
+        return t ? { ...e, titre: t.titre || e.titre, texte: t.texte || e.texte, attention: t.attention || e.attention } : e
+      })
+    } catch (e) { /* on garde l'original */ }
+  }
+
   const jsPDF = await chargerJsPDF()
 
   /* A4 en millimètres : c'est l'unité des imprimeurs, et elle évite de
@@ -28269,7 +28361,7 @@ async function exporterProcedurePdf(proc, etapes) {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(20)
   doc.setTextColor(20, 20, 22)
-  const titre = doc.splitTextToSize(proc.titre || 'Procédure', LARGEUR)
+  const titre = doc.splitTextToSize(proc.titre || tLang('Procédure'), LARGEUR)
   doc.text(titre, MARGE, y + 6)
   y += 6 + titre.length * 8
 
@@ -28279,10 +28371,11 @@ async function exporterProcedurePdf(proc, etapes) {
   /* Le chemin complet, comme sous le titre dans l'app : « Cuisine › Friteuse ».
      Une procédure imprimée circule hors de l'app — sur un mur, dans un
      classeur — et cette ligne est la seule qui dise d'où elle vient. */
-  const chemin = [proc.categorie || 'Sans dossier', proc.sous_categorie]
+  const chemin = [proc.categorie || tLang('Sans dossier'), proc.sous_categorie]
     .filter(Boolean).join(' \u203a ')
+  const locale = { en: 'en-GB', de: 'de-DE' }[langueApp] || 'fr-FR'
   const sous = [chemin,
-                new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })]
+                new Date().toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })]
   doc.text(sous.join('  ·  '), MARGE, y)
   y += 5
 
@@ -28303,7 +28396,7 @@ async function exporterProcedurePdf(proc, etapes) {
   if (!liste.length) {
     doc.setFontSize(11)
     doc.setTextColor(120, 120, 126)
-    doc.text('Cette procédure n\u2019a pas encore d\u2019étapes.', MARGE, y)
+    doc.text(tLang('Cette procédure n\u2019a pas encore d\u2019étapes.'), MARGE, y)
   }
 
   /* ═══ LE ROND DIT DÉJÀ LE NUMÉRO ═══
@@ -28325,23 +28418,41 @@ async function exporterProcedurePdf(proc, etapes) {
     .trim()
 
   liste.forEach((e, i) => {
+    /* Le titre de l'étape, en gras au-dessus du texte, comme dans l'app.
+       `titreEtape` l'écarte quand il ne fait que répéter le texte. */
+    doc.setFont('helvetica', 'bold')
     doc.setFontSize(11)
+    const nomEtape = titreEtape(e)
+    const tit = nomEtape ? doc.splitTextToSize(nomEtape, LARGEUR - 12) : []
+    doc.setFont('helvetica', 'normal')
     const texte = doc.splitTextToSize(sansPrefixe(e.texte), LARGEUR - 12)
+    doc.setFontSize(9.5)
     const att = e.attention ? doc.splitTextToSize(e.attention, LARGEUR - 16) : null
-    place(texte.length * 5.6 + (att ? att.length * 5 + 6 : 0) + 12)
+    place(tit.length * 5.6 + texte.length * 5.6 + (att ? att.length * 5 + 11 : 0) + 12)
 
     /* Le numéro dans son rond, comme dans l'app. Le même repère d'un support à
        l'autre : on retrouve l'étape 4 au même endroit sur les deux. */
+    /* ⚠ LE CHIFFRE A LA MÊME TAILLE ET LA MÊME LIGNE QUE LE TITRE : 11 pt, gras,
+       posé sur la même ligne de pied (y + 3). Le rond est centré sur la
+       hauteur des majuscules de cette ligne (2,8 mm → milieu à y + 1,6). En
+       8,5 pt, le chiffre paraissait flotter plus haut que le titre. */
     doc.setFillColor(242, 242, 244)
-    doc.circle(MARGE + 3.4, y + 1.4, 3.4, 'F')
+    // Descendu de 0,3 mm à la demande d'Em : à l'œil, un cheveu plus bas tombe mieux.
+    doc.circle(MARGE + 3.6, y + 1.9, 3.6, 'F')
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(8.5)
-    doc.setTextColor(60, 60, 66)
-    doc.text(String(i + 1), MARGE + 3.4, y + 2.6, { align: 'center' })
+    doc.setFontSize(11)
+    doc.setTextColor(40, 40, 46)
+    doc.text(String(i + 1), MARGE + 3.6, y + 3.3, { align: 'center' })
 
-    doc.setFont('helvetica', 'normal')
     doc.setFontSize(11)
     doc.setTextColor(20, 20, 22)
+    if (tit.length) {
+      doc.setFont('helvetica', 'bold')
+      doc.text(tit, MARGE + 12, y + 3)
+      y += tit.length * 5.6
+    }
+    doc.setFont('helvetica', 'normal')
+    doc.setTextColor(tit.length ? 70 : 20, tit.length ? 70 : 20, tit.length ? 76 : 22)
     doc.text(texte, MARGE + 12, y + 3)
     y += texte.length * 5.6 + 2
 
@@ -28358,16 +28469,21 @@ async function exporterProcedurePdf(proc, etapes) {
     if (att) {
       /* Le point de vigilance garde son filet et sa couleur, comme dans l'app.
          C'est la seule chose de la page qu'on doit voir sans lire. */
+      /* Le mot « Attention » en tête, en gras : sur papier il n'y a pas
+         l'icône de l'app, et le filet seul ne dit pas ce que c'est. */
       doc.setDrawColor(31, 76, 238)
       doc.setLineWidth(0.6)
-      doc.line(MARGE + 12, y + 1, MARGE + 12, y + 1 + att.length * 5)
+      doc.line(MARGE + 12, y + 1, MARGE + 12, y + 1 + 5 + att.length * 5)
       doc.setFontSize(9.5)
       /* ⚠ `#12357F` SUR BLANC, LE MEME QUE DANS L'EDITEUR. Mesuré à 10,4:1 de
          contraste — un bleu plus vif passerait sous le seuil de lisibilité à
          l'impression, où les encres claires se délavent. */
       doc.setTextColor(18, 53, 127)
-      doc.text(att, MARGE + 15, y + 4.4)
-      y += att.length * 5 + 4
+      doc.setFont('helvetica', 'bold')
+      doc.text(tLang('Attention'), MARGE + 15, y + 4.4)
+      doc.setFont('helvetica', 'normal')
+      doc.text(att, MARGE + 15, y + 9.4)
+      y += att.length * 5 + 9
     }
 
     y += 6
@@ -28721,6 +28837,7 @@ async function openEquipeDetail(procId) {
   ;(etapes || []).forEach((etape, i) => {
     const div = document.createElement('div')
     div.className = 'detail-step'
+    div.dataset.etapeId = etape.id
     const bounds = clipBounds.get(etape.id)
     const hasClip = bounds && proc.video_url
     /* L'étape peut porter une photo du résultat attendu. On la met sous le
@@ -28777,12 +28894,9 @@ async function openEquipeDetail(procId) {
      c'était un défaut d'affichage ou une procédure incomplète. Elle le dit
      maintenant. Le cas arrive quand une analyse automatique a échoué : la
      procédure existe, ses étapes n'ont jamais été écrites. */
-  // On repart du français à chaque ouverture : une traduction est liée à une
-  // consultation, pas au compte.
-  procCouranteId = procId
-  langueProcCourante = 'fr'
-  document.getElementById('trad-note')?.remove()
-  majBoutonLangueProc()
+  // Dans la langue de l'application : l'original s'affiche, puis sa traduction.
+  traduireFicheOuverte({ proc, etapes: etapes || [], zoneId: 'detail-steps', titreId: 'detail-titre',
+                         formater: sansNumeroDEtape, perime })
 
   if (!etapes || etapes.length === 0) {
     stepsEl.innerHTML = `<div class="empty-state">
@@ -33050,152 +33164,99 @@ for (const id of ['langue-app', 'langue-app-gestion']) {
   })
 }
 
-/* ── Traduction d'une procédure ───────────────────────────────────
+/* ── Traduction des procédures ────────────────────────────────────
 
-   Les traductions sont gardées en mémoire le temps de la session : relire la
-   même procédure dans la même langue ne recoute rien et ne fait pas attendre.
-   Rien n'est écrit en base : l'original reste la référence. */
-const traductionsEnCache = {}
-let langueProcCourante = 'fr'
-let procCouranteId = null
+   La langue choisie pour l'application vaut aussi pour les procédures : un
+   employé qui a mis l'app en anglais lit ses consignes en anglais, sans rien
+   demander. Il n'y a plus de choix séparé sur la fiche.
 
-/* Le globe, dans la langue des icônes de création : trait blanc, aucun aplat. */
-const ICONE_TERRE = `<svg class="terre" viewBox="0 0 24 24" fill="none"
-  stroke="rgba(255,255,255,0.88)" stroke-width="1.7" stroke-linecap="round">
-  <circle cx="12" cy="12" r="9"/>
-  <ellipse cx="12" cy="12" rx="3.8" ry="9"/>
-  <line x1="3.4" y1="9" x2="20.6" y2="9"/>
-  <line x1="3.4" y1="15" x2="20.6" y2="15"/>
-</svg>`
+   ① La fiche s'affiche TOUT DE SUITE dans sa langue d'origine — on ne fait
+     jamais attendre quelqu'un devant un écran vide.
+   ② La traduction est demandée à `ai-traduire`, qui relit la procédure en
+     base avec les droits de la personne et garde chaque traduction :
+     la première lecture dans une langue paie l'IA, toutes les suivantes, pour
+     toute l'équipe, sont servies depuis la base.
+   ③ Une procédure modifiée change d'empreinte côté serveur : elle se
+     retraduit toute seule à la lecture suivante.
+   ④ En cas d'échec, l'original reste affiché, sans message : une consigne en
+     français vaut mieux qu'une fenêtre d'erreur au milieu du travail.
 
-function rondLangueHtml(code, estTete) {
-  const l = LANGUES.find(x => x.code === code)
-  const dedans = (estTete && langueProcCourante === 'fr')
-    ? ICONE_TERRE
-    : `<span class="code">${(l?.code || '').toUpperCase()}</span>`
-  // La tête porte déjà la langue lue : les autres sont toutes des choix.
-  const classes = 'rond-ent'
-  const attr = estTete ? 'data-langue-decl' : `data-langue-choix="${code}"`
-  return `<button type="button" class="${classes}" ${attr}
-    aria-label="${escapeHtml(l?.nom || code)}">${dedans}</button>`
+   Le texte d'origine n'est jamais écrit dans la page qu'à partir des données :
+   revenir au français repose simplement l'original. */
+const traductionsEnCache = new Map()   // `${id}:${langue}:${contenu}` → promesse
+let ficheOuverte = null                // la fiche actuellement à l'écran
+let tourTraduction = 0
+
+function contenuProc(proc, etapes) {
+  return JSON.stringify([proc?.titre || '', (etapes || []).map(e => [e.id, e.titre || '', e.texte || '', e.attention || ''])])
 }
 
-/* Le tiroir ne se dessine que sur la fiche d'une procédure, et seulement pour
-   quelqu'un qui lit — traduire n'a de sens que là. */
-function peindreTiroirLangue() {
-  const liste = document.getElementById('tiroir-langue-liste')
-  if (!liste) return
-
-  const autres = LANGUES.filter(l => l.code !== langueProcCourante)
-    .map(l => rondLangueHtml(l.code, false)).join('')
-
-  liste.innerHTML = rondLangueHtml(langueProcCourante, true) +
-    '<span class="tiroir-autres">' + autres + '</span>'
-}
-
-/* On ne REDESSINE PAS à l'ouverture ni à la fermeture : c'était la cause de
-   l'absence d'animation. `peindreTiroirLangue` remplace tout le contenu, donc
-   les ronds sont des éléments neufs — et une transition CSS ne joue pas sur un
-   élément qui vient d'apparaître : le navigateur n'a pas d'état précédent d'où
-   partir. Il suffit de basculer la classe et de laisser le CSS travailler, comme
-   le fait le tiroir des entreprises. */
-function fermerTiroirLangue() {
-  const t = document.getElementById('tiroir-langue')
-  if (t?.classList.contains('ouvert')) t.classList.remove('ouvert')
-}
-
-document.addEventListener('click', (e) => {
-  const t = document.getElementById('tiroir-langue')
-  if (!t || t.offsetParent === null) return          // fiche non affichée
-
-  if (e.target.closest('[data-langue-decl]')) {
-    t.classList.toggle('ouvert')
-    return
-  }
-  const choix = e.target.closest('[data-langue-choix]')
-  if (choix) { fermerTiroirLangue(); traduireProcedure(choix.dataset.langueChoix); return }
-  if (e.target.closest('#tiroir-langue')) return
-
-  fermerTiroirLangue()
-})
-
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermerTiroirLangue() })
-
-async function traduireProcedure(choix) {
-  if (!choix || choix === langueProcCourante) return
-
-  if (choix === 'fr') {
-    langueProcCourante = 'fr'
-    openEquipeDetail(procCouranteId)
-    return
-  }
-
-  const cle = procCouranteId + ':' + choix
-  const tete = document.querySelector('#tiroir-langue-liste > .rond-ent')
-
-  if (!traductionsEnCache[cle]) {
-    /* Pendant l'attente, le rond de tête tourne : on ne fige pas l'écran pour
-       une traduction, et on ne prétend pas non plus connaître sa durée. */
-    tete?.classList.add('patiente')
-    try {
-      const etapes = [...document.querySelectorAll('#detail-steps .detail-step p')].map(e => e.textContent)
+function demanderTraductionProc(procId, langue, contenu) {
+  const cle = `${procId}:${langue}:${contenu}`
+  if (!traductionsEnCache.has(cle)) {
+    const p = (async () => {
       const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-traduire`, {
         method: 'POST',
         headers: await enTeteFonction(),
-        body: JSON.stringify({
-          langue: choix,
-          titre: document.getElementById('detail-titre').textContent,
-          etapes,
-        }),
+        body: JSON.stringify({ procedure_id: procId, langue }),
       })
-      const data = await rep.json()
-      if (!rep.ok || data.error) throw new Error(data.error || 'La traduction a \u00e9chou\u00e9.')
-      traductionsEnCache[cle] = data
-    } catch (ex) {
-      tete?.classList.remove('patiente')
-      await confirmDialog({
-        titre: tLang('Traduction impossible'),
-        message: ex instanceof Error ? ex.message : String(ex),
-        confirmer: tLang('Compris'), annuler: tLang('Fermer'), danger: false,
-      })
-      return
-    }
-    tete?.classList.remove('patiente')
+      const data = await rep.json().catch(() => ({}))
+      if (!rep.ok || data.error || !Array.isArray(data.etapes)) throw new Error(data.error || 'traduction')
+      return data
+    })()
+    // Un échec ne reste pas en cache : on réessaiera à la prochaine ouverture.
+    p.catch(() => traductionsEnCache.delete(cle))
+    traductionsEnCache.set(cle, p)
+  }
+  return traductionsEnCache.get(cle)
+}
+
+/* Pose un contenu (l'original ou sa traduction) dans la fiche ouverte. Les
+   étapes sont retrouvées par leur identifiant, jamais par leur rang. */
+function poserContenuFiche(f, contenu) {
+  const titreEl = document.getElementById(f.titreId)
+  if (titreEl && contenu.titre) titreEl.textContent = contenu.titre
+  const parId = new Map((contenu.etapes || []).map(e => [e.id, e]))
+  document.querySelectorAll(`#${f.zoneId} .detail-step[data-etape-id]`).forEach((div) => {
+    const e = parId.get(div.dataset.etapeId)
+    if (!e) return
+    const titre = div.querySelector('.et-titre')
+    if (titre && e.titre) titre.textContent = e.titre
+    const p = div.querySelector('.et-co > p')
+    if (p && e.texte) p.textContent = f.formater ? f.formater(e.texte) : e.texte
+    const att = div.querySelector('.et-attention span')
+    if (att && e.attention) att.textContent = e.attention
+  })
+}
+
+/* Appelée par chaque fiche une fois dessinée, et à chaque changement de langue. */
+async function traduireFicheOuverte(f = ficheOuverte) {
+  if (!f) return
+  ficheOuverte = f
+  const monTour = ++tourTraduction
+  const zone = document.getElementById(f.zoneId)
+  const titreEl = document.getElementById(f.titreId)
+  const langue = langueApp
+
+  if (langue === 'fr' || !f.etapes.length) {
+    poserContenuFiche(f, { titre: f.proc.titre, etapes: f.etapes })
+    return
   }
 
-  langueProcCourante = choix
-  appliquerTraduction(traductionsEnCache[cle])
-  peindreTiroirLangue()
-}
-
-function appliquerTraduction(trad) {
-  document.getElementById('detail-titre').textContent = trad.titre
-  const lignes = [...document.querySelectorAll('#detail-steps .detail-step p')]
-  trad.etapes.forEach((texte, i) => { if (lignes[i]) lignes[i].textContent = texte })
-  majBoutonLangueProc()
-
-  /* Un bandeau rappelle qu'on lit une traduction, avec le retour à l'original à
-     portée de doigt. Une consigne de travail traduite automatiquement peut
-     comporter une nuance perdue : autant que ce soit dit. */
-  /* LE BANDEAU A ÉTÉ RETIRÉ.
-
-     Il disait « traduction automatique, l'original français fait foi » et
-     offrait un retour au français. Trois raisons de le supprimer :
-
-     La langue choisie est déjà visible en haut, dans le rond des langues — on
-     sait qu'on lit une traduction, on vient de la demander.
-
-     Revenir au français se fait au même endroit, en un geste. Un second chemin
-     vers la même action encombre sans rien apporter.
-
-     Et surtout : un employé qui ne lit pas le français n'a que faire de savoir
-     que l'original fait foi. On lui rappelle sa dépendance sans lui donner de
-     moyen d'agir. */
-}
-
-/* Conservé sous son ancien nom : la fiche l'appelle à chaque ouverture. */
-function majBoutonLangueProc() {
-  peindreTiroirLangue()
+  zone?.classList.add('trad-attente')
+  titreEl?.classList.add('trad-attente')
+  try {
+    const trad = await demanderTraductionProc(f.proc.id, langue, contenuProc(f.proc, f.etapes))
+    if (monTour !== tourTraduction || ficheOuverte !== f || langueApp !== langue || f.perime?.()) return
+    poserContenuFiche(f, trad)
+  } catch (e) {
+    // L'original reste affiché.
+  } finally {
+    if (monTour === tourTraduction) {
+      zone?.classList.remove('trad-attente')
+      titreEl?.classList.remove('trad-attente')
+    }
+  }
 }
 
 // ═══════════ ÉQUIPE : scanner ═══════════

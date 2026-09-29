@@ -15589,8 +15589,11 @@ document.getElementById('ecran-delai')?.addEventListener('click', (e) => {
 })
 
 document.getElementById('ecran-importer')?.addEventListener('click', () => {
-  showGestionScreen('p-create')
-  toast('Nommez la procédure, puis choisissez votre enregistrement')
+  /* ⚠ ON REVIENT SUR LA PAGE IA, PAS SUR LE MENU. Les trois outils vivent
+     désormais dans « L'IA transforme la vidéo en procédure » : le titre et le
+     dossier sont déjà remplis, il ne reste qu'à désigner le fichier. */
+  showGestionScreen('p-create-ai')
+  toast('Choisissez votre enregistrement avec « Choisir une vidéo »')
 })
 
 /* Le voile du compte à rebours, puis la pastille rouge pendant la prise. Ils

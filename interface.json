@@ -1,0 +1,1182 @@
+{
+ "(optionnel)": {
+  "en": "(optional)",
+  "de": "(optional)"
+ },
+ "+ Ajouter une étape": {
+  "en": "+ Add a step",
+  "de": "+ Schritt hinzufügen"
+ },
+ "1 an": {
+  "en": "1 year",
+  "de": "1 Jahr"
+ },
+ "1 min": {
+  "en": "1 min",
+  "de": "1 Min."
+ },
+ "1 à 2 min": {
+  "en": "1 to 2 min",
+  "de": "1 bis 2 Min."
+ },
+ "15 minutes": {
+  "en": "15 minutes",
+  "de": "15 Minuten"
+ },
+ "2 heures": {
+  "en": "2 hours",
+  "de": "2 Stunden"
+ },
+ "3 min": {
+  "en": "3 min",
+  "de": "3 Min."
+ },
+ "30 jours": {
+  "en": "30 days",
+  "de": "30 Tage"
+ },
+ "4 à 5 min": {
+  "en": "4 to 5 min",
+  "de": "4 bis 5 Min."
+ },
+ "5 min": {
+  "en": "5 min",
+  "de": "5 Min."
+ },
+ "6 à 7 min": {
+  "en": "6 to 7 min",
+  "de": "6 bis 7 Min."
+ },
+ "7 jours": {
+  "en": "7 days",
+  "de": "7 Tage"
+ },
+ "8 caractères minimum": {
+  "en": "8 characters minimum",
+  "de": "Mindestens 8 Zeichen"
+ },
+ "Abandonner et supprimer": {
+  "en": "Discard and delete",
+  "de": "Verwerfen und löschen"
+ },
+ "Abonnement": {
+  "en": "Subscription",
+  "de": "Abo"
+ },
+ "Accès": {
+  "en": "Access",
+  "de": "Zugriff"
+ },
+ "Accéder directement à la procédure en scannant le QR code": {
+  "en": "Go straight to the procedure by scanning the QR code",
+  "de": "Mit dem QR-Code direkt zur Anleitung"
+ },
+ "Activité": {
+  "en": "Activity",
+  "de": "Aktivität"
+ },
+ "Activité de l’équipe": {
+  "en": "Team activity",
+  "de": "Team-Aktivität"
+ },
+ "Afficher le mot de passe": {
+  "en": "Show password",
+  "de": "Passwort anzeigen"
+ },
+ "Ajouter": {
+  "en": "Add",
+  "de": "Hinzufügen"
+ },
+ "Ajouter des vidéos": {
+  "en": "Add videos",
+  "de": "Videos hinzufügen"
+ },
+ "Ajouter une page": {
+  "en": "Add a page",
+  "de": "Seite hinzufügen"
+ },
+ "Ajouter une photo": {
+  "en": "Add a photo",
+  "de": "Foto hinzufügen"
+ },
+ "Ajoutez votre document": {
+  "en": "Add your document",
+  "de": "Dokument hinzufügen"
+ },
+ "Ajoutez votre vidéo": {
+  "en": "Add your video",
+  "de": "Video hinzufügen"
+ },
+ "Analyse": {
+  "en": "Analysis",
+  "de": "Auswertung"
+ },
+ "Annuler": {
+  "en": "Cancel",
+  "de": "Abbrechen"
+ },
+ "Annuler (défaire)": {
+  "en": "Undo",
+  "de": "Rückgängig"
+ },
+ "Annuler la dernière action": {
+  "en": "Undo the last action",
+  "de": "Letzte Aktion rückgängig machen"
+ },
+ "Annuler la dernière coupure": {
+  "en": "Undo the last cut",
+  "de": "Letzten Schnitt rückgängig machen"
+ },
+ "Annuler les modifications": {
+  "en": "Discard changes",
+  "de": "Änderungen verwerfen"
+ },
+ "Appuyez pour filmer · 5 min au maximum": {
+  "en": "Press to record · 5 min at most",
+  "de": "Zum Aufnehmen drücken · höchstens 5 Min."
+ },
+ "Assembler": {
+  "en": "Join",
+  "de": "Zusammenfügen"
+ },
+ "Aucun dossier": {
+  "en": "No folders",
+  "de": "Keine Ordner"
+ },
+ "Aucun poste n'a encore été défini par votre responsable.": {
+  "en": "Your manager has not set up any roles yet.",
+  "de": "Ihre Führungskraft hat noch keine Positionen angelegt."
+ },
+ "Aucune entreprise": {
+  "en": "No company",
+  "de": "Kein Unternehmen"
+ },
+ "Aucune procédure pour l’instant": {
+  "en": "No procedures yet",
+  "de": "Noch keine Anleitungen"
+ },
+ "Bienvenue": {
+  "en": "Welcome",
+  "de": "Willkommen"
+ },
+ "Bonjour,": {
+  "en": "Hello,",
+  "de": "Hallo,"
+ },
+ "Ce mois-ci": {
+  "en": "This month",
+  "de": "Diesen Monat"
+ },
+ "Ce que l’IA analyse": {
+  "en": "What the AI looks at",
+  "de": "Was die KI auswertet"
+ },
+ "Ce qui est visible": {
+  "en": "What is on screen",
+  "de": "Was zu sehen ist"
+ },
+ "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": {
+  "en": "These times depend on your phone and your video. Keep the app open until the analysis is done.",
+  "de": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist."
+ },
+ "Changer de caméra": {
+  "en": "Switch camera",
+  "de": "Kamera wechseln"
+ },
+ "Changer la photo de profil": {
+  "en": "Change the profile photo",
+  "de": "Profilfoto ändern"
+ },
+ "Changer mon mot de passe": {
+  "en": "Change my password",
+  "de": "Passwort ändern"
+ },
+ "chevauchement": {
+  "en": "overlap",
+  "de": "Überschneidung"
+ },
+ "Choisir l’écran et démarrer": {
+  "en": "Choose the screen and start",
+  "de": "Bildschirm wählen und starten"
+ },
+ "Choisir une vidéo": {
+  "en": "Choose a video",
+  "de": "Video wählen"
+ },
+ "Choisissez la durée pendant laquelle le code d’invitation reste valide.": {
+  "en": "Choose how long the invitation code stays valid.",
+  "de": "Wählen Sie, wie lange der Einladungscode gültig bleibt."
+ },
+ "Choisissez le poste qui vous correspond.": {
+  "en": "Pick the role that fits you.",
+  "de": "Wählen Sie die passende Position."
+ },
+ "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": {
+  "en": "Five minutes at most. Recording stops on its own.",
+  "de": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst."
+ },
+ "Cliquez ici pour nous écrire": {
+  "en": "Click here to write to us",
+  "de": "Hier klicken, um uns zu schreiben"
+ },
+ "Code d'accès rapide": {
+  "en": "Quick access code",
+  "de": "Schnellzugriff-Code"
+ },
+ "Code d'invitation": {
+  "en": "Invitation code",
+  "de": "Einladungscode"
+ },
+ "Code de l'entreprise (6 caractères)": {
+  "en": "Company code (6 characters)",
+  "de": "Unternehmenscode (6 Zeichen)"
+ },
+ "Codes d'invitation": {
+  "en": "Invitation codes",
+  "de": "Einladungscodes"
+ },
+ "Coller": {
+  "en": "Paste",
+  "de": "Einfügen"
+ },
+ "Coller les vidéos": {
+  "en": "Join the videos",
+  "de": "Videos zusammenfügen"
+ },
+ "Coller plusieurs vidéos": {
+  "en": "Join several videos",
+  "de": "Mehrere Videos zusammenfügen"
+ },
+ "Collez ici votre procédure, votre note de service, votre mode d'emploi…": {
+  "en": "Paste your procedure, your memo, your instructions here…",
+  "de": "Fügen Sie hier Ihre Anleitung, Ihr Rundschreiben, Ihre Bedienungsanleitung ein…"
+ },
+ "Collez un QR code là où le geste se fait : on scanne, la procédure s’ouvre.": {
+  "en": "Put a QR code where the work happens: scan it, the procedure opens.",
+  "de": "Kleben Sie einen QR-Code dorthin, wo gearbeitet wird: scannen, und die Anleitung öffnet sich."
+ },
+ "Collez un texte, ou déposez un PDF ou un Word": {
+  "en": "Paste text, or drop in a PDF or Word file",
+  "de": "Text einfügen oder PDF- bzw. Word-Datei ablegen"
+ },
+ "Combien de temps ça prend ?": {
+  "en": "How long does it take?",
+  "de": "Wie lange dauert das?"
+ },
+ "Comment créer cette procédure ?": {
+  "en": "How do you want to build it?",
+  "de": "Wie soll sie entstehen?"
+ },
+ "Comment les lectures sont comptées": {
+  "en": "How reads are counted",
+  "de": "Wie Aufrufe gezählt werden"
+ },
+ "Complétez le titre et le dossier ci-dessus pour continuer.": {
+  "en": "Fill in the title and folder above to continue.",
+  "de": "Titel und Ordner oben ausfüllen, um fortzufahren."
+ },
+ "Conditions d’utilisation": {
+  "en": "Terms of use",
+  "de": "Nutzungsbedingungen"
+ },
+ "conditions d’utilisation": {
+  "en": "terms of use",
+  "de": "Nutzungsbedingungen"
+ },
+ "Content de vous revoir": {
+  "en": "Good to see you again",
+  "de": "Schön, Sie wiederzusehen"
+ },
+ "Copier": {
+  "en": "Copy",
+  "de": "Kopieren"
+ },
+ "Copier ce détail": {
+  "en": "Copy these details",
+  "de": "Details kopieren"
+ },
+ "couvert": {
+  "en": "covered",
+  "de": "abgedeckt"
+ },
+ "Créations": {
+  "en": "Created",
+  "de": "Erstellt"
+ },
+ "Créer mon compte": {
+  "en": "Create my account",
+  "de": "Konto erstellen"
+ },
+ "Créer un compte": {
+  "en": "Create an account",
+  "de": "Konto erstellen"
+ },
+ "Créer une procédure": {
+  "en": "New procedure",
+  "de": "Neue Anleitung"
+ },
+ "Créer une procédure avec": {
+  "en": "Build the procedure with",
+  "de": "Anleitung erstellen mit"
+ },
+ "Créer une procédure manuellement": {
+  "en": "Write the procedure yourself",
+  "de": "Anleitung selbst schreiben"
+ },
+ "Créez vos procédures avec l’IA.": {
+  "en": "Build your procedures with AI.",
+  "de": "Erstellen Sie Ihre Anleitungen mit KI."
+ },
+ "Dans l’équipe depuis": {
+  "en": "On the team since",
+  "de": "Im Team seit"
+ },
+ "Demandez le code de l'entreprise à votre responsable pour y accéder.": {
+  "en": "Ask your manager for the company code to get in.",
+  "de": "Fragen Sie Ihre Führungskraft nach dem Unternehmenscode."
+ },
+ "Depuis le début": {
+  "en": "Since the start",
+  "de": "Seit Beginn"
+ },
+ "Dernière consultation": {
+  "en": "Last opened",
+  "de": "Zuletzt geöffnet"
+ },
+ "Dezoomer": {
+  "en": "Zoom out",
+  "de": "Verkleinern"
+ },
+ "Diviser": {
+  "en": "Split",
+  "de": "Teilen"
+ },
+ "Dossier": {
+  "en": "Folder",
+  "de": "Ordner"
+ },
+ "Dossiers": {
+  "en": "Folders",
+  "de": "Ordner"
+ },
+ "Débloquer": {
+  "en": "Unlock",
+  "de": "Freischalten"
+ },
+ "Début": {
+  "en": "Start",
+  "de": "Anfang"
+ },
+ "Début ici": {
+  "en": "Start here",
+  "de": "Anfang hier"
+ },
+ "Découper la vidéo": {
+  "en": "Cut the video",
+  "de": "Video schneiden"
+ },
+ "Découvrez toutes les fonctionnalités sans engagement.": {
+  "en": "Try everything. No commitment.",
+  "de": "Alles ausprobieren. Keine Verpflichtung."
+ },
+ "Définissez les postes de votre établissement. Chaque membre choisira le sien.": {
+  "en": "Set up the roles at your site. Each member picks their own.",
+  "de": "Legen Sie die Positionen an Ihrem Standort fest. Jedes Mitglied wählt seine eigene."
+ },
+ "Détail technique": {
+  "en": "Technical details",
+  "de": "Technische Details"
+ },
+ "E-mail": {
+  "en": "Email",
+  "de": "E-Mail"
+ },
+ "Effacer la recherche": {
+  "en": "Clear the search",
+  "de": "Suche löschen"
+ },
+ "Elle apparaît en tête de la fiche. Facultative.": {
+  "en": "It appears at the top of the procedure. Optional.",
+  "de": "Erscheint oben in der Anleitung. Optional."
+ },
+ "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": {
+  "en": "It appears on the card and at the top of the procedure. Optional.",
+  "de": "Erscheint auf der Karte und oben in der Anleitung. Optional."
+ },
+ "Employés": {
+  "en": "Staff",
+  "de": "Mitarbeitende"
+ },
+ "En créant votre compte, vous acceptez les": {
+  "en": "By creating your account, you accept the",
+  "de": "Mit dem Erstellen Ihres Kontos akzeptieren Sie die"
+ },
+ "En dév.": {
+  "en": "Draft",
+  "de": "Entwurf"
+ },
+ "En ligne": {
+  "en": "Live",
+  "de": "Live"
+ },
+ "Enregistrer": {
+  "en": "Save",
+  "de": "Speichern"
+ },
+ "Enregistrer la vidéo": {
+  "en": "Save the video",
+  "de": "Video speichern"
+ },
+ "Enregistrer les modifications": {
+  "en": "Save changes",
+  "de": "Änderungen speichern"
+ },
+ "Enregistrer l’écran": {
+  "en": "Record screen",
+  "de": "Bildschirm aufnehmen"
+ },
+ "Espace Utilisateur": {
+  "en": "User area",
+  "de": "Nutzerbereich"
+ },
+ "Essai 14 jours gratuit": {
+  "en": "14 days free",
+  "de": "14 Tage kostenlos"
+ },
+ "Ex : Accueil": {
+  "en": "e.g. Front desk",
+  "de": "z. B. Empfang"
+ },
+ "Ex : Accueillir un client": {
+  "en": "e.g. Greet a customer",
+  "de": "z. B. Einen Kunden empfangen"
+ },
+ "Ex : Le Comptoir": {
+  "en": "e.g. The Counter",
+  "de": "z. B. Der Tresen"
+ },
+ "Ex : Responsable": {
+  "en": "e.g. Supervisor",
+  "de": "z. B. Leitung"
+ },
+ "Ex : Réception client": {
+  "en": "e.g. Greeting customers",
+  "de": "z. B. Kundenempfang"
+ },
+ "Facultatif · les initiales serviront sinon": {
+  "en": "Optional · initials are used otherwise",
+  "de": "Optional · sonst werden die Initialen verwendet"
+ },
+ "Faites glisser pour affiner au dixième de seconde": {
+  "en": "Drag to adjust to a tenth of a second",
+  "de": "Ziehen Sie, um auf die Zehntelsekunde genau einzustellen"
+ },
+ "Favoris": {
+  "en": "Favourites",
+  "de": "Favoriten"
+ },
+ "Fermer": {
+  "en": "Close",
+  "de": "Schließen"
+ },
+ "Fichier": {
+  "en": "File",
+  "de": "Datei"
+ },
+ "Filmer": {
+  "en": "Record",
+  "de": "Aufnehmen"
+ },
+ "Filmez la tâche en expliquant à voix haute. Cinq minutes maximum.": {
+  "en": "Record the task and talk through it out loud. Five minutes at most.",
+  "de": "Nehmen Sie die Aufgabe auf und erklären Sie sie laut. Höchstens fünf Minuten."
+ },
+ "Fin": {
+  "en": "End",
+  "de": "Ende"
+ },
+ "Fin ici": {
+  "en": "End here",
+  "de": "Ende hier"
+ },
+ "Fonctionnement des boutons": {
+  "en": "How the buttons work",
+  "de": "So funktionieren die Schaltflächen"
+ },
+ "Gestion des accès": {
+  "en": "Access",
+  "de": "Zugriff"
+ },
+ "Générer les étapes": {
+  "en": "Generate the steps",
+  "de": "Schritte erzeugen"
+ },
+ "Générez un code pour que votre équipe puisse accéder aux procédures.": {
+  "en": "Create a code so your team can open the procedures.",
+  "de": "Erstellen Sie einen Code, damit Ihr Team die Anleitungen öffnen kann."
+ },
+ "Ignorer": {
+  "en": "Dismiss",
+  "de": "Ausblenden"
+ },
+ "Inscription gérant": {
+  "en": "Owner sign-up",
+  "de": "Registrierung Inhaber"
+ },
+ "Inscription utilisateur": {
+  "en": "User sign-up",
+  "de": "Registrierung Nutzer"
+ },
+ "Inviter votre équipe": {
+  "en": "Invite your team",
+  "de": "Team einladen"
+ },
+ "Jours actifs": {
+  "en": "Active days",
+  "de": "Aktive Tage"
+ },
+ "J’ai ma vidéo — l’utiliser": {
+  "en": "I have my video — use it",
+  "de": "Video ist fertig — verwenden"
+ },
+ "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": {
+  "en": "The language applies to the whole app. Each person can pick their own.",
+  "de": "Die Sprache gilt für die ganze App. Jede Person kann ihre eigene wählen."
+ },
+ "La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.": {
+  "en": "The language applies to the whole app. Procedures are translated separately, from the procedure itself.",
+  "de": "Die Sprache gilt für die ganze App. Anleitungen werden einzeln übersetzt, direkt in der Anleitung."
+ },
+ "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
+  "en": "The procedure is already in Draft. It opens once the analysis is done.",
+  "de": "Die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
+ },
+ "Lampe torche": {
+  "en": "Flashlight",
+  "de": "Taschenlampe"
+ },
+ "Langue": {
+  "en": "Language",
+  "de": "Sprache"
+ },
+ "Langue de l’application": {
+  "en": "App language",
+  "de": "Sprache der App"
+ },
+ "Langue parlée": {
+  "en": "Spoken language",
+  "de": "Gesprochene Sprache"
+ },
+ "Le chargement n'aboutit pas": {
+  "en": "Loading is not finishing",
+  "de": "Das Laden kommt nicht zum Ende"
+ },
+ "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": {
+  "en": "The microphone is on while you record. The steps come mostly from what you say.",
+  "de": "Das Mikrofon ist während der Aufnahme an. Die Schritte entstehen vor allem aus dem, was Sie sagen."
+ },
+ "Le QR code fonctionnera une fois la procédure en ligne.": {
+  "en": "The QR code works once the procedure is live.",
+  "de": "Der QR-Code funktioniert, sobald die Anleitung live ist."
+ },
+ "Lecture": {
+  "en": "Play",
+  "de": "Abspielen"
+ },
+ "Lecture en cours": {
+  "en": "Playing",
+  "de": "Wird abgespielt"
+ },
+ "Les accès de chaque membre permettent de décider l’espace auquel il a accès.": {
+  "en": "Each member's access decides which area they can open.",
+  "de": "Der Zugriff jedes Mitglieds entscheidet, welchen Bereich es öffnen kann."
+ },
+ "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": {
+  "en": "Video analyses reset every month and do not carry over.",
+  "de": "Videoauswertungen werden monatlich zurückgesetzt und nicht übertragen."
+ },
+ "Les autres procédures ne vous sont pas accessibles": {
+  "en": "You cannot open the other procedures",
+  "de": "Die anderen Anleitungen können Sie nicht öffnen"
+ },
+ "Les membres de l’espace utilisateur": {
+  "en": "The people in the User area",
+  "de": "Die Personen im Nutzerbereich"
+ },
+ "Les plus lues": {
+  "en": "Most read",
+  "de": "Am meisten gelesen"
+ },
+ "Les postes": {
+  "en": "Roles",
+  "de": "Positionen"
+ },
+ "Limité à 5 min de vidéo": {
+  "en": "5 minutes of video at most",
+  "de": "Höchstens 5 Minuten Video"
+ },
+ "Lire": {
+  "en": "Play",
+  "de": "Abspielen"
+ },
+ "Loupe ·": {
+  "en": "Zoom ·",
+  "de": "Lupe ·"
+ },
+ "Lues": {
+  "en": "Read",
+  "de": "Gelesen"
+ },
+ "L’enregistrement démarre tout de suite — vous avez": {
+  "en": "Recording starts right away — you have",
+  "de": "Die Aufnahme startet sofort — Sie haben"
+ },
+ "L’IA crée la procédure à partir d’un document": {
+  "en": "The AI builds the procedure from a document",
+  "de": "Die KI erstellt die Anleitung aus einem Dokument"
+ },
+ "L’IA crée la procédure à partir d’une vidéo": {
+  "en": "The AI builds the procedure from a video",
+  "de": "Die KI erstellt die Anleitung aus einem Video"
+ },
+ "L’IA en tirera des étapes, que vous relirez.": {
+  "en": "The AI turns it into steps, and you check them.",
+  "de": "Die KI macht daraus Schritte, die Sie prüfen."
+ },
+ "L’IA lit le texte et en tire les étapes, dans l’ordre.": {
+  "en": "The AI reads the text and pulls out the steps, in order.",
+  "de": "Die KI liest den Text und zieht die Schritte der Reihe nach heraus."
+ },
+ "L’IA rédige la procédure": {
+  "en": "The AI writes the procedure",
+  "de": "Die KI schreibt die Anleitung"
+ },
+ "L’IA transforme la vidéo en procédure": {
+  "en": "The AI turns your video into a procedure",
+  "de": "Die KI macht aus Ihrem Video eine Anleitung"
+ },
+ "L’IA écrit les étapes à votre place": {
+  "en": "The AI writes the steps for you",
+  "de": "Die KI schreibt die Schritte für Sie"
+ },
+ "Marquez le début et la fin de chaque étape": {
+  "en": "Mark where each step starts and ends",
+  "de": "Markieren Sie Anfang und Ende jedes Schritts"
+ },
+ "Mettre en favori": {
+  "en": "Add to favourites",
+  "de": "Zu Favoriten hinzufügen"
+ },
+ "Mettre en pause": {
+  "en": "Pause",
+  "de": "Pause"
+ },
+ "Modifier": {
+  "en": "Edit",
+  "de": "Bearbeiten"
+ },
+ "Mot de passe": {
+  "en": "Password",
+  "de": "Passwort"
+ },
+ "Mot de passe oublié ?": {
+  "en": "Forgot your password?",
+  "de": "Passwort vergessen?"
+ },
+ "Mouvements": {
+  "en": "Changes",
+  "de": "Änderungen"
+ },
+ "Mouvements de l’équipe": {
+  "en": "Team changes",
+  "de": "Team-Änderungen"
+ },
+ "MP4 ou MOV · 5 minutes au maximum": {
+  "en": "MP4 or MOV · 5 minutes at most",
+  "de": "MP4 oder MOV · höchstens 5 Minuten"
+ },
+ "Nom": {
+  "en": "Last name",
+  "de": "Nachname"
+ },
+ "Nom A → Z": {
+  "en": "Name A → Z",
+  "de": "Name A → Z"
+ },
+ "Nom complet": {
+  "en": "Full name",
+  "de": "Vollständiger Name"
+ },
+ "Nom de l'entreprise": {
+  "en": "Company name",
+  "de": "Name des Unternehmens"
+ },
+ "Nom de l'établissement": {
+  "en": "Site name",
+  "de": "Name des Standorts"
+ },
+ "Nom et logo de l’entreprise": {
+  "en": "Company name and logo",
+  "de": "Name und Logo des Unternehmens"
+ },
+ "Nombre de lectures par procédure.": {
+  "en": "How many times each procedure was read.",
+  "de": "Wie oft jede Anleitung gelesen wurde."
+ },
+ "Nouvel établissement": {
+  "en": "New site",
+  "de": "Neuer Standort"
+ },
+ "Nouvelle procédure": {
+  "en": "New procedure",
+  "de": "Neue Anleitung"
+ },
+ "Ouverture…": {
+  "en": "Opening…",
+  "de": "Wird geöffnet…"
+ },
+ "Pas encore consultées": {
+  "en": "Not opened yet",
+  "de": "Noch nicht geöffnet"
+ },
+ "Passez à l’offre supérieure pour agrandir votre équipe.": {
+  "en": "Move up a plan to grow your team.",
+  "de": "Wechseln Sie in den nächsten Tarif, um Ihr Team zu vergrößern."
+ },
+ "Photo": {
+  "en": "Photo",
+  "de": "Foto"
+ },
+ "Photographier le texte": {
+  "en": "Photograph the text",
+  "de": "Text abfotografieren"
+ },
+ "Plus ancien d’abord": {
+  "en": "Oldest first",
+  "de": "Älteste zuerst"
+ },
+ "Plus qu’une place": {
+  "en": "One seat left",
+  "de": "Nur noch ein Platz"
+ },
+ "Plus récent d’abord": {
+  "en": "Newest first",
+  "de": "Neueste zuerst"
+ },
+ "Plusieurs pages possibles — vous les remettrez dans l’ordre.": {
+  "en": "Several pages are fine — you can reorder them after.",
+  "de": "Mehrere Seiten sind möglich — Sie ordnen sie danach."
+ },
+ "pour vous placer": {
+  "en": "to get ready",
+  "de": "um sich bereitzumachen"
+ },
+ "Presque prêt": {
+  "en": "Almost there",
+  "de": "Fast fertig"
+ },
+ "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": {
+  "en": "Prices exclude tax. You change plan when your team changes, never before.",
+  "de": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher."
+ },
+ "Procédure générée": {
+  "en": "Procedure ready",
+  "de": "Anleitung fertig"
+ },
+ "Procédures": {
+  "en": "Procedures",
+  "de": "Anleitungen"
+ },
+ "Procédures consultées": {
+  "en": "Procedures opened",
+  "de": "Geöffnete Anleitungen"
+ },
+ "Procédures créées": {
+  "en": "Procedures created",
+  "de": "Erstellte Anleitungen"
+ },
+ "Procédures récentes": {
+  "en": "Recent procedures",
+  "de": "Neueste Anleitungen"
+ },
+ "Profil": {
+  "en": "Profile",
+  "de": "Profil"
+ },
+ "Prénom": {
+  "en": "First name",
+  "de": "Vorname"
+ },
+ "Publier": {
+  "en": "Publish",
+  "de": "Veröffentlichen"
+ },
+ "Publier la procédure": {
+  "en": "Publish the procedure",
+  "de": "Anleitung veröffentlichen"
+ },
+ "QR code": {
+  "en": "QR code",
+  "de": "QR-Code"
+ },
+ "Quand le temps est mis en pause": {
+  "en": "When the timer pauses",
+  "de": "Wann die Zeit angehalten wird"
+ },
+ "Quel est votre rôle ici ?": {
+  "en": "What do you do here?",
+  "de": "Was machen Sie hier?"
+ },
+ "Qui fait quoi dans l'entreprise": {
+  "en": "Who does what",
+  "de": "Wer macht was"
+ },
+ "Quitter l’entreprise": {
+  "en": "Leave the company",
+  "de": "Unternehmen verlassen"
+ },
+ "Rechercher une personne": {
+  "en": "Search a person",
+  "de": "Person suchen"
+ },
+ "Rechercher une procédure": {
+  "en": "Search a procedure",
+  "de": "Anleitung suchen"
+ },
+ "Recommencer": {
+  "en": "Start over",
+  "de": "Neu beginnen"
+ },
+ "Rejoignez notre application et profitez de toutes ses fonctionnalités.": {
+  "en": "Join us and get everything the app can do.",
+  "de": "Machen Sie mit und nutzen Sie alles, was die App kann."
+ },
+ "Rejoindre": {
+  "en": "Join",
+  "de": "Beitreten"
+ },
+ "Renommer le dossier": {
+  "en": "Rename the folder",
+  "de": "Ordner umbenennen"
+ },
+ "Retirer": {
+  "en": "Remove",
+  "de": "Entfernen"
+ },
+ "Retirer la photo": {
+  "en": "Remove the photo",
+  "de": "Foto entfernen"
+ },
+ "Retour": {
+  "en": "Back",
+  "de": "Zurück"
+ },
+ "Réglages": {
+  "en": "Settings",
+  "de": "Einstellungen"
+ },
+ "Résultat": {
+  "en": "Result",
+  "de": "Ergebnis"
+ },
+ "Révoquer": {
+  "en": "Revoke",
+  "de": "Widerrufen"
+ },
+ "Scanner un code": {
+  "en": "Scan a code",
+  "de": "Code scannen"
+ },
+ "Scannez pour ouvrir la procédure": {
+  "en": "Scan to open the procedure",
+  "de": "Scannen, um die Anleitung zu öffnen"
+ },
+ "Se connecter": {
+  "en": "Log in",
+  "de": "Anmelden"
+ },
+ "Se déconnecter": {
+  "en": "Log out",
+  "de": "Abmelden"
+ },
+ "Seul le dernier mois est affiché.": {
+  "en": "Only the last month is shown.",
+  "de": "Nur der letzte Monat wird angezeigt."
+ },
+ "Seul le dernier mois est conservé.": {
+  "en": "Only the last month is kept.",
+  "de": "Nur der letzte Monat wird gespeichert."
+ },
+ "Son logo apparaîtra dans la barre.": {
+  "en": "Its logo appears in the top bar.",
+  "de": "Sein Logo erscheint in der oberen Leiste."
+ },
+ "Sous-dossier": {
+  "en": "Subfolder",
+  "de": "Unterordner"
+ },
+ "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": {
+  "en": "Standix counts reads per person. While several people share one login, you cannot tell who read what — and your records prove nothing.",
+  "de": "Standix zählt Aufrufe pro Person. Solange mehrere Personen denselben Zugang nutzen, wissen Sie nicht, wer was gelesen hat — und Ihre Nachweise belegen nichts."
+ },
+ "Supprimer": {
+  "en": "Delete",
+  "de": "Löschen"
+ },
+ "Supprimer cet établissement": {
+  "en": "Delete this site",
+  "de": "Diesen Standort löschen"
+ },
+ "Supprimer l’entreprise": {
+  "en": "Delete the company",
+  "de": "Unternehmen löschen"
+ },
+ "Supprimer mon compte": {
+  "en": "Delete my account",
+  "de": "Mein Konto löschen"
+ },
+ "sur 5:00": {
+  "en": "of 5:00",
+  "de": "von 5:00"
+ },
+ "S’inscrire en tant que gérant": {
+  "en": "Sign up as owner",
+  "de": "Als Inhaber registrieren"
+ },
+ "S’inscrire gérant": {
+  "en": "Sign up as owner",
+  "de": "Als Inhaber registrieren"
+ },
+ "S’inscrire utilisateur": {
+  "en": "Sign up as user",
+  "de": "Als Nutzer registrieren"
+ },
+ "Temps cumulé passé sur chaque procédure.": {
+  "en": "Total time spent on each procedure.",
+  "de": "Gesamte Zeit pro Anleitung."
+ },
+ "Temps de lecture par dossier": {
+  "en": "Reading time per folder",
+  "de": "Lesezeit pro Ordner"
+ },
+ "Temps de lecture par personne": {
+  "en": "Reading time per person",
+  "de": "Lesezeit pro Person"
+ },
+ "Temps de lecture par procédure": {
+  "en": "Reading time per procedure",
+  "de": "Lesezeit pro Anleitung"
+ },
+ "Temps par procédure": {
+  "en": "Time per procedure",
+  "de": "Zeit pro Anleitung"
+ },
+ "Temps passé sur les procédures.": {
+  "en": "Time spent on procedures.",
+  "de": "Zeit mit Anleitungen."
+ },
+ "Titre": {
+  "en": "Title",
+  "de": "Titel"
+ },
+ "Touchez l’œil, en bas à droite, pour voir l’espace Utilisateur.": {
+  "en": "Tap the eye, bottom right, to see the User area.",
+  "de": "Tippen Sie unten rechts auf das Auge, um den Nutzerbereich zu sehen."
+ },
+ "Touchez une étape ci-dessous pour régler son clip": {
+  "en": "Tap a step below to set its clip",
+  "de": "Tippen Sie unten auf einen Schritt, um seinen Ausschnitt zu setzen"
+ },
+ "Tout voir": {
+  "en": "See all",
+  "de": "Alle anzeigen"
+ },
+ "Toutes": {
+  "en": "All",
+  "de": "Alle"
+ },
+ "Trier": {
+  "en": "Sort",
+  "de": "Sortieren"
+ },
+ "Trier les dossiers": {
+  "en": "Sort the folders",
+  "de": "Ordner sortieren"
+ },
+ "Trois gestes, puis revenez ici importer la vidéo.": {
+  "en": "Three taps, then come back here to add the video.",
+  "de": "Drei Schritte, dann kommen Sie hierher zurück und fügen das Video hinzu."
+ },
+ "trou": {
+  "en": "gap",
+  "de": "Lücke"
+ },
+ "Télécharger en PDF": {
+  "en": "Download as PDF",
+  "de": "Als PDF herunterladen"
+ },
+ "Télécharger la fiche": {
+  "en": "Download the sheet",
+  "de": "Blatt herunterladen"
+ },
+ "Un compte est partagé": {
+  "en": "An account is being shared",
+  "de": "Ein Konto wird geteilt"
+ },
+ "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": {
+  "en": "A problem, an idea, a question about Standix? We read everything and reply as fast as we can.",
+  "de": "Ein Problem, eine Idee, eine Frage zu Standix? Wir lesen alles und antworten so schnell wie möglich."
+ },
+ "Utilisez ce code pour donner à votre équipe l’accès utilisateur aux procédures. Vous pourrez ensuite leur donner accès à l’espace Gestion.": {
+  "en": "Use this code to give your team user access to the procedures. You can give them the Management area afterwards.",
+  "de": "Mit diesem Code geben Sie Ihrem Team Nutzerzugriff auf die Anleitungen. Den Verwaltungsbereich können Sie später freigeben."
+ },
+ "Vidéo générée par l’IA Standix": {
+  "en": "Video generated by Standix AI",
+  "de": "Von der Standix-KI erzeugtes Video"
+ },
+ "Visez le QR code": {
+  "en": "Point at the QR code",
+  "de": "Auf den QR-Code richten"
+ },
+ "Voir comme l’équipe": {
+  "en": "See it as the team does",
+  "de": "So sehen, wie das Team es sieht"
+ },
+ "Voir l'équipe": {
+  "en": "See the team",
+  "de": "Team ansehen"
+ },
+ "Voir la procédure": {
+  "en": "Open the procedure",
+  "de": "Anleitung öffnen"
+ },
+ "Voir les offres": {
+  "en": "See the plans",
+  "de": "Tarife ansehen"
+ },
+ "Voir plus": {
+  "en": "See more",
+  "de": "Mehr anzeigen"
+ },
+ "Voir toute la vidéo": {
+  "en": "See the whole video",
+  "de": "Ganzes Video ansehen"
+ },
+ "Vos appareils numériques": {
+  "en": "Your devices",
+  "de": "Ihre Geräte"
+ },
+ "Vos paroles": {
+  "en": "What you say",
+  "de": "Was Sie sagen"
+ },
+ "Votre compte": {
+  "en": "Your account",
+  "de": "Ihr Konto"
+ },
+ "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": {
+  "en": "Your account is not linked to a company. Enter the 6-character code.",
+  "de": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein."
+ },
+ "Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.": {
+  "en": "Your name appears in the team list and on what you read. The email cannot be changed here.",
+  "de": "Ihr Name erscheint in der Teamliste und bei dem, was Sie lesen. Die E-Mail lässt sich hier nicht ändern."
+ },
+ "Votre poste": {
+  "en": "Your role",
+  "de": "Ihre Position"
+ },
+ "Votre profil": {
+  "en": "Your profile",
+  "de": "Ihr Profil"
+ },
+ "Votre savoir-faire transmis simplement": {
+  "en": "Your know-how, passed on simply",
+  "de": "Ihr Können, einfach weitergegeben"
+ },
+ "Votre texte": {
+  "en": "Your text",
+  "de": "Ihr Text"
+ },
+ "Votre vidéo": {
+  "en": "Your video",
+  "de": "Ihr Video"
+ },
+ "Vous avez déjà un compte ?": {
+  "en": "Already have an account?",
+  "de": "Sie haben schon ein Konto?"
+ },
+ "Vous pouvez quitter cette page.": {
+  "en": "You can leave this page.",
+  "de": "Sie können diese Seite verlassen."
+ },
+ "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": {
+  "en": "You can be logged in on 3 devices at once.",
+  "de": "Sie können auf höchstens 3 Geräten gleichzeitig angemeldet sein."
+ },
+ "Vous relirez chaque étape avant de publier.": {
+  "en": "You will check every step before publishing.",
+  "de": "Sie prüfen jeden Schritt vor dem Veröffentlichen."
+ },
+ "Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran une fois terminé pour la rendre accessible aux autres gestionnaires.": {
+  "en": "You are the only one who can edit this procedure right now. Leave this screen when you are done so other managers can open it.",
+  "de": "Nur Sie können diese Anleitung gerade bearbeiten. Verlassen Sie diesen Bildschirm, wenn Sie fertig sind, damit andere Verwalter sie öffnen können."
+ },
+ "Vérifiez et ajustez avant de continuer": {
+  "en": "Check and adjust before you continue",
+  "de": "Prüfen und anpassen, bevor Sie weitermachen"
+ },
+ "Zoomer": {
+  "en": "Zoom in",
+  "de": "Vergrößern"
+ },
+ "À lire": {
+  "en": "To read",
+  "de": "Zu lesen"
+ },
+ "Écrivez chaque étape dans l’ordre": {
+  "en": "Write each step in order",
+  "de": "Schreiben Sie jeden Schritt der Reihe nach"
+ },
+ "Écrivez chaque étape vous-même": {
+  "en": "Write each step yourself",
+  "de": "Jeden Schritt selbst schreiben"
+ },
+ "Écrivez-nous": {
+  "en": "Write to us",
+  "de": "Schreiben Sie uns"
+ },
+ "Équipe": {
+  "en": "Team",
+  "de": "Team"
+ },
+ "Étapes": {
+  "en": "Steps",
+  "de": "Schritte"
+ },
+ "Étapes de la procédure": {
+  "en": "Steps",
+  "de": "Schritte der Anleitung"
+ },
+ "Étapes liées": {
+  "en": "Linked steps",
+  "de": "Verknüpfte Schritte"
+ },
+ "Étapes manuelles": {
+  "en": "Write the steps",
+  "de": "Schritte schreiben"
+ },
+ "Éteindre la caméra": {
+  "en": "Turn off the camera",
+  "de": "Kamera ausschalten"
+ },
+ "— ce que vous expliquez pendant chaque geste": {
+  "en": "— your explanation during each move",
+  "de": "— Ihre Erklärung zu jedem Handgriff"
+ },
+ "— objets et texte à l’écran": {
+  "en": "— objects and text in the picture",
+  "de": "— Gegenstände und Text im Bild"
+ }
+}

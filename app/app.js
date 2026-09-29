@@ -25,7 +25,7 @@ try {
         <p style="color:rgba(235,235,245,0.6); font-size:13px; margin-bottom:14px;">${tLang('Vérifiez votre connexion internet, puis réessayez.')}</p>
         <div style="background:rgba(255,69,58,0.12); border:1px solid rgba(255,69,58,0.4); border-radius:10px; padding:12px; margin-bottom:20px; text-align:left;">
           <p style="color:#FF6961; font-size:11px; font-weight:700; margin-bottom:4px;">${tLang('DÉTAIL TECHNIQUE (build v3) :')}</p>
-          <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : 'Erreur inconnue (pas de message)'}</p>
+          <p style="color:#FF9B95; font-size:12px; word-break:break-word;">${(e && e.message) ? e.message : tLang('Erreur inconnue (pas de message)')}</p>
         </div>
         <button onclick="location.reload()" style="background:#fff; color:#000; padding:11px 24px; border-radius:100px; font-weight:300; font-size:14px; border:none;">${tLang('Réessayer')}</button>
       </div>
@@ -193,6 +193,8 @@ const LANGUES = [
 const DICO = {
   /* DICO:DEBUT */
   en: {
+    "(aucun détail enregistré)": "(no details recorded)",
+    "(méthode classique)": "(standard method)",
     "(optionnel)": "(optional)",
     "+ Ajouter une étape": "+ Add a step",
     ", ou plus court.": ", or shorter.",
@@ -201,6 +203,7 @@ const DICO = {
     "/ mois": "/ month",
     "/ mois, hors taxes": "/ month, excl. tax",
     "/ mois, hors taxes, facturé à l’année": "/ month, excl. tax, billed yearly",
+    "0 dossier · 0 procédure · accès complet": "0 folders · 0 procedures · full access",
     "1 an": "1 year",
     "1 min": "1 min",
     "1 procédure est en cours, en attente de publication.": "1 procedure is in draft, waiting to be published.",
@@ -257,11 +260,16 @@ const DICO = {
     "Abandonner et supprimer": "Discard and delete",
     "Abonnement": "Subscription",
     "Abonnement annuel": "Yearly subscription",
+    "abonnement complet": "subscription full",
     "Abonnement mensuel": "Monthly subscription",
     "Accès": "Access",
+    "Accès au développement des procédures et aux pages Analyse et Gestion des accès.": "Can build procedures and open the Analysis and Access pages.",
+    "accès complet": "full access",
     "Accès complet débloqué.": "Full access unlocked.",
+    "Accès gestion": "Access management",
     "Accès impossible : {message}": "Cannot get in: {message}",
     "Accès suspendu": "Access paused",
+    "Accès uniquement aux procédures publiées par l’entreprise.": "Can only see procedures the company has published.",
     "Accéder directement à la procédure en scannant le QR code": "Go straight to the procedure by scanning the QR code",
     "Accéder à l'espace Gestion": "Open the Management area",
     "Accéder à l'espace Équipe": "Open the User area",
@@ -286,55 +294,88 @@ const DICO = {
     "Analyse": "Analysis",
     "Analyse bloquée": "Analysis stuck",
     "Analyse en cours": "Analysing",
+    "Analyse refusée.": "Analysis refused.",
     "Analyse relancée.": "Analysis restarted.",
     "Analyse vidéo IA": "AI video analysis",
+    "analyses IA restantes": "AI analyses left",
     "Analyses épuisées": "No analyses left",
     "Annuler": "Cancel",
     "Annuler (défaire)": "Undo",
+    "Annuler (le code)": "Cancel code",
+    "Annuler ce code ?": "Cancel this code?",
     "Annuler la dernière action": "Undo the last action",
     "Annuler la dernière coupure": "Undo the last cut",
+    "Annuler le code": "Cancel the code",
     "Annuler les modifications": "Discard changes",
     "Annuler les modifications ?": "Discard your changes?",
     "Appareil retiré.": "Device removed.",
     "appel impossible": "call failed",
+    "Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».": "Press and hold the record button, turn on the mic, then tap “Start Recording”.",
     "Appuyez pour filmer · 5 min au maximum": "Press to record · 5 min at most",
     "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont": "After 14 days, the Management area and the User area are",
     "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont <b>suspendus</b> en attente de la souscription.": "After 14 days, the Management area and the User area are <b>paused</b> until you subscribe.",
+    "arrivés récemment": "recently joined",
+    "Arrêt après {v} s": "Stopped after {v} s",
     "Assembler": "Join",
     "Attendre": "Wait",
     "Attention": "Caution",
     "Au total": "In total",
+    "au total": "in total",
+    "au total sur les procédures": "in total on procedures",
+    "Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.": "Over one hundred people: a written availability commitment, to be discussed.",
     "Aucun abonnement à gérer": "No subscription to manage",
     "Aucun appareil enregistré pour le moment.": "No devices yet.",
     "Aucun code": "No code",
     "Aucun code d'accès libre pour le moment. Retentez dans un instant.": "No free access code right now. Try again in a moment.",
     "Aucun dossier": "No folders",
     "Aucun dossier ne correspond à « {q} ».": "No folder matches “{q}”.",
+    "Aucun dossier ne correspond à « {v} ».": "No folder matches “{v}”.",
     "Aucun employé dans l'entreprise pour le moment.": "No staff in the company yet.",
     "Aucun employé dans l'entreprise pour le moment. Partagez le code d'invitation dans Paramètres.": "No staff in the company yet. Share the invitation code from Settings.",
     "Aucun favori pour le moment.": "No favourites yet.",
+    "aucun format enregistrable — MediaRecorder.isTypeSupported refuse mp4, vp9 et webm": "no recordable format — MediaRecorder.isTypeSupported rejects mp4, vp9 and webm",
     "Aucun membre pour le moment.": "No members yet.",
+    "Aucun mouvement ce mois-ci.": "No changes this month.",
     "Aucun mouvement ces dernières semaines.": "No changes in the last few weeks.",
     "Aucun poste n'a encore été défini par votre responsable.": "Your manager has not set up any roles yet.",
     "Aucun poste pour le moment. Ajoutez-en un ci-dessous.": "No roles yet. Add one below.",
     "Aucun résultat": "No results",
+    "Aucun temps de lecture sur cette période.": "No reading time in this period.",
     "Aucun élément": "Nothing here",
+    "Aucune caméra détectée sur cet appareil.": "No camera found on this device.",
     "Aucune entreprise": "No company",
     "Aucune entreprise avec ce code.": "No company has this code.",
+    "Aucune entreprise ne correspond à ce code.": "No company matches this code.",
+    "Aucune erreur remontée.": "No errors reported.",
+    "Aucune lecture": "No reads",
+    "Aucune lecture ce mois-ci": "No reads this month",
+    "Aucune lecture pour l’instant": "No reads yet",
     "Aucune lecture sur cette période.": "No reads in this period.",
     "Aucune nouveauté ces trente derniers jours.": "Nothing new in the last thirty days.",
+    "aucune piste sonore récupérable — la vidéo en a-t-elle une ?": "no usable audio track — does the video have one?",
     "Aucune procédure": "No procedures",
+    "aucune procédure": "no procedures",
+    "Aucune procédure ces deux dernières semaines": "No procedures in the last two weeks",
+    "Aucune procédure créée ce mois-ci.": "No procedures created this month.",
     "Aucune procédure dans cette entreprise.": "No procedures in this company.",
+    "Aucune procédure en développement.": "No procedures in draft.",
     "Aucune procédure ne correspond à votre recherche.": "No procedure matches your search.",
     "Aucune procédure ne correspond à « {currentCategoryQuery} ».": "No procedure matches “{currentCategoryQuery}”.",
     "Aucune procédure ne correspond à « {q} ».": "No procedure matches “{q}”.",
+    "Aucune procédure n’est en ligne pour le moment.": "No procedures are live yet.",
     "Aucune procédure pour le moment.": "No procedures yet.",
     "Aucune procédure pour l’instant": "No procedures yet",
     "Aucune procédure publiée pour le moment.": "No procedures published yet.",
+    "Aucune réponse utile après {v} s · {aiNbSondages} sondages": "No useful answer after {v} s · {aiNbSondages} checks",
     "Aucune vidéo": "No video",
+    "Aucune vidéo à analyser.": "No video to analyse.",
     "Aucune étape": "No steps",
     "Aucune étape pour le moment.": "No steps yet.",
+    "Aujourd'hui": "Today",
+    "aujourd'hui": "today",
+    "Aujourd’hui": "Today",
     "Autre": "Other",
+    "Autres": "Others",
     "Avant de continuer": "Before you continue",
     "avant de publier : c'est vous qui connaissez le geste.": "before publishing: you are the one who knows the job.",
     "Basculer": "Switch",
@@ -345,11 +386,14 @@ const DICO = {
     "Bonjour": "Hello",
     "Bonjour {prenom}": "Hello {prenom}",
     "Bonjour,": "Hello,",
+    "Bonjour, Je souhaite en savoir plus sur l’offre Entreprise.": "Hello, I would like to know more about the Enterprise plan.",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "It is taking longer than usual, but the analysis is still running.",
+    "c'est vous qui connaissez le geste.": "you are the one who knows the job.",
     "Caméra prête": "Camera ready",
     "Caméra éteinte": "Camera off",
     "Ce code correspond à la procédure suivante.": "This code is for the following procedure.",
     "Ce code correspond à une procédure qui n'existe pas ou plus.": "This code points to a procedure that does not exist, or no longer does.",
+    "Ce code donne accès à l’espace utilisateur. Vous pourrez ensuite leur donner accès à l’espace gestion.": "This code gives access to the User area. You can then give them access to the Management area.",
     "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire.": "This company code does not exist. Check it with your manager.",
     "Ce code n'existe pas, ou il a expiré. Vérifiez-le auprès de votre gestionnaire.": "This code does not exist, or it has expired. Check it with your manager.",
     "Ce code ne correspond pas à cette entreprise.": "This code is not for this company.",
@@ -357,34 +401,44 @@ const DICO = {
     "Ce compte est déjà utilisé sur {APPAREILS_MAX} appareils. Cet appareil-ci a été déconnecté. Standix compte les lectures par personne : si votre équipe partage un seul compte, votre responsable ne sait pas qui a lu quoi. Demandez-lui votre propre accès — c'est compris dans votre abonnement.": "This account is already in use on {APPAREILS_MAX} devices. This device has been logged out. Standix counts reads per person: if your team shares one account, your manager cannot tell who read what. Ask for your own login — it is included in the subscription.",
     "Ce compte n'a pas encore d'abonnement payant. Choisissez une offre pour en activer un.": "This account has no paid subscription yet. Pick a plan to start one.",
     "Ce compteur est commun à toutes vos entreprises : une analyse lancée ailleurs le fait baisser ici aussi.": "This counter is shared by all your companies: an analysis started elsewhere lowers it here too.",
+    "Ce document ne contient presque pas de texte. S'il s'agit d'un PDF scanné, l'image du texte ne peut pas être lue.": "This document has almost no text. If it is a scanned PDF, the text in the image cannot be read.",
     "Ce fichier n'est pas une image lisible.": "This file is not a readable image.",
     "Ce lien a expiré. Demandez-en un nouveau depuis « Mot de passe oublié ».": "This link has expired. Ask for a new one from “Forgot your password?”.",
     "Ce lien a expiré. Demandez-en un nouveau.": "This link has expired. Ask for a new one.",
     "Ce lien n’a pas pu être ouvert. Demandez-en un nouveau.": "This link could not be opened. Ask for a new one.",
     "Ce lien n’a pas pu être vérifié.": "This link could not be checked.",
+    "Ce mois": "This month",
     "Ce mois-ci": "This month",
+    "ce mois-ci": "this month",
     "Ce mot de passe est trop courant : il figure dans des fuites connues. Choisissez-en un autre.": "This password is too common: it appears in known data leaks. Choose another one.",
     "Ce n'est pas celle-là": "That's not the one",
     "Ce navigateur ne donne pas accès à la caméra": "This browser gives no access to the camera",
+    "Ce navigateur ne donne pas accès à la caméra.": "This browser does not allow camera access.",
+    "ce navigateur ne sait pas enregistrer ({v})": "this browser cannot record ({v})",
     "Ce navigateur ne sait pas enregistrer : {v}": "This browser cannot record: {v}",
+    "ce poste": "this role",
     "Ce poste existe déjà.": "This role already exists.",
     "Ce que l’IA analyse": "What the AI looks at",
     "Ce qui est visible": "What is on screen",
     "Ce qu’il ne faut surtout pas faire…": "What you must not do…",
     "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "These times depend on your phone and your video. Keep the app open until the analysis is done.",
+    "cet appareil": "this device",
     "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": "This device will be logged out and free up a seat. It can come back later if a seat is free.",
+    "cet établissement": "this site",
     "Cette année": "This year",
     "Cette entreprise": "This company",
     "cette entreprise": "this company",
     "Cette entreprise est complète": "This company is full",
     "Cette offre se construit avec vous. Écrivez-nous et nous revenons vers vous rapidement.": "This plan is built with you. Write to us and we will get back to you quickly.",
     "Cette personne": "This person",
+    "cette personne": "this person",
     "Cette procédure": "This procedure",
     "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": "This procedure belongs to “{nom}”, where you already have access. Switch to that company to open it?",
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "This procedure belongs to “{nom}”. You can open it, but not the company's other procedures: for those you need your manager's code.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "This procedure has been open for a while with nothing happening. Pick up where you left off, or come back to it later.",
     "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": "This procedure has no steps yet. Tell your manager: they need to add them before it can be used.",
     "Cette procédure n’a pas encore d’étapes.": "This procedure has no steps yet.",
+    "cette semaine": "this week",
     "Cette vidéo dure {min} min {sec}. L'analyse accepte jusqu'à 5 minutes.": "This video is {min} min {sec} long. The analysis takes up to 5 minutes.",
     "Cette vidéo dure {m} min {sc}. L'analyse accepte jusqu'à 5 minutes.": "This video is {m} min {sc} long. The analysis takes up to 5 minutes.",
     "Cette vidéo pèse": "This video weighs",
@@ -392,6 +446,7 @@ const DICO = {
     "Cette vidéo pèse encore": "This video still weighs",
     "Cette vidéo pèse encore <b>{size}</b>, au-delà des {max} Mo acceptés : {pourquoi}.<br>Refilmez en <b>720p à 30 images par seconde</b>, ou plus court.": "This video is still <b>{size}</b>, over the {max} MB allowed: {pourquoi}.<br>Record again in <b>720p at 30 frames per second</b>, or shorter.",
     "Cette vidéo pèse encore <b>{size}</b>, au-delà des {max} Mo acceptés.<br>Refilmez en <b>720p à 30 images par seconde</b>, ou plus court.": "This video is still <b>{size}</b>, over the {max} MB allowed.<br>Record again in <b>720p at 30 frames per second</b>, or shorter.",
+    "Cette vidéo pèse {v} une fois allégée, au-delà des {v2} acceptés. Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.": "Even after compressing, this video is {v}, over the {v2} limit. Record a shorter clip — two or three minutes is enough for one task.",
     "Cette étape sera retirée de la procédure.": "This step will be removed from the procedure.",
     "Changer d'entreprise": "Switch company",
     "Changer d'entreprise ?": "Switch company?",
@@ -414,7 +469,9 @@ const DICO = {
     "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": "Choose the window or tab to record. The control bar stays visible to you but does not appear in the video.",
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
+    "Choisissez un mot de passe d’au moins 6 caractères.": "Choose a password with at least 6 characters.",
     "Choisissez votre enregistrement avec « Choisir une vidéo »": "Pick your recording with “Choose a video”",
+    "Chrome sur Android": "Chrome on Android",
     "Cinq minutes : enregistrement arrêté.": "Five minutes: recording stopped.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Five minutes: recording stops here.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Five minutes at most. Recording stops on its own.",
@@ -452,7 +509,9 @@ const DICO = {
     "Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.": "Account created! Check your email to confirm, then log in.",
     "Conditions d’utilisation": "Terms of use",
     "conditions d’utilisation": "terms of use",
+    "Confirmer la suppression": "Confirm deletion",
     "Connectez-vous ou créez votre compte": "Log in or create your account",
+    "connecté": "connected",
     "Connexion impossible": "Cannot connect",
     "Connexion impossible : {message}": "Cannot log in: {message}",
     "Consulter": "Open",
@@ -474,17 +533,22 @@ const DICO = {
     "Créer une procédure": "New procedure",
     "Créer une procédure avec": "Build the procedure with",
     "Créer une procédure manuellement": "Write the procedure yourself",
+    "Créez des procédures, suivez l'équipe, gérez les accès.": "Create procedures, follow your team, manage access.",
     "Créez vos procédures avec l’IA.": "Build your procedures with AI.",
     "Créez votre compte pour la consulter.": "Create your account to open it.",
     "Créez votre compte pour rejoindre « {nom} » et consulter la procédure.": "Create your account to join “{nom}” and open the procedure.",
+    "Créé": "Created",
+    "Créé {quand}": "Created {quand}",
     "Créée {v}": "Created {v}",
     "c’est la dernière étape, elle prend souvent une à trois minutes.": "this is the last step, it often takes one to three minutes.",
     "Dans l’équipe depuis": "On the team since",
     "de formation ce mois-ci": "of training this month",
+    "de lecture ce mois-ci": "of reading this month",
     "de vos procédures": "of your procedures",
     "de vos procédures<br>sont accessibles": "of your procedures<br>are available",
     "Demandez le code de l'entreprise à votre responsable pour y accéder.": "Ask your manager for the company code to get in.",
     "Depuis le début": "Since the start",
+    "depuis le début": "since the start",
     "Depuis le {date}": "Since {date}",
     "Depuis le {v}": "Since {v}",
     "depuis {depuis} minute": "for {depuis} minute",
@@ -494,6 +558,8 @@ const DICO = {
     "Derniers mouvements": "Latest changes",
     "Dernière consultation": "Last opened",
     "Dernière procédure créée": "Latest procedure created",
+    "Dernières créations": "Latest created",
+    "Dernières étapes :": "Last steps:",
     "Dezoomer": "Zoom out",
     "Disponible avec un abonnement": "Available with a subscription",
     "Diviser": "Split",
@@ -504,6 +570,9 @@ const DICO = {
     "Durée totale": "Total length",
     "Dès la première lecture, vous verrez ici": "From the first read, you will see here",
     "Dès la première lecture, vous verrez ici <b>le temps de formation</b> que vos procédures ont fait gagner à votre établissement.": "From the first read, you will see here <b>the training time</b> your procedures have saved your site.",
+    "Dès que quelqu'un ouvrira une procédure, vous verrez ici celles qui occupent le plus votre équipe.": "As soon as someone opens a procedure, you will see here which ones take up most of your team's time.",
+    "Dès que quelqu'un ouvrira une procédure, vous verrez ici où part le temps de votre équipe.": "As soon as someone opens a procedure, you will see here where your team's time goes.",
+    "Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.": "As soon as your team opens procedures, you will see here how reading time changes.",
     "Dès que votre équipe ouvrira vos procédures, vous verrez ici": "As soon as your team opens your procedures, you will see here",
     "Dès que votre équipe ouvrira vos procédures, vous verrez ici <b>le temps que vous n’avez plus à passer à expliquer</b>.": "As soon as your team opens your procedures, you will see here <b>the time you no longer spend explaining</b>.",
     "Débloquer": "Unlock",
@@ -517,6 +586,9 @@ const DICO = {
     "Définir comme utilisateur": "Make user",
     "Définir {nom} comme utilisateur ?": "Make {nom} a user?",
     "Définissez les postes de votre établissement. Chaque membre choisira le sien.": "Set up the roles at your site. Each member picks their own.",
+    "Déjà consultée": "Already read",
+    "Dépôt de la photo refusé : {message}": "Photo upload refused: {message}",
+    "Dépôt du logo refusé : {message}": "Logo upload refused: {message}",
     "Détail copié.": "Details copied.",
     "détail de son activité": "activity details",
     "Détail technique": "Technical details",
@@ -524,6 +596,7 @@ const DICO = {
     "Détails": "Details",
     "E-mail": "Email",
     "E-mail et mot de passe obligatoires.": "Email and password are required.",
+    "Edge sur Android": "Edge on Android",
     "Effacer la recherche": "Clear the search",
     "Elle apparaît en tête de la fiche. Facultative.": "It appears at the top of the procedure. Optional.",
     "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": "It appears on the card and at the top of the procedure. Optional.",
@@ -531,6 +604,7 @@ const DICO = {
     "en attente de la souscription.": "until you subscribe.",
     "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": "Waiting for a machine at our analysis provider. You can leave this page, the work carries on.",
     "En attente d’une place": "Waiting for a slot",
+    "en ce moment": "right now",
     "En cours": "In progress",
     "En créant votre compte, vous acceptez les": "By creating your account, you accept the",
     "En dév.": "Draft",
@@ -539,6 +613,7 @@ const DICO = {
     "en pause": "paused",
     "En place.": "Done.",
     "En souscrivant, vous acceptez les conditions d’utilisation de Standix.": "By subscribing, you accept Standix's terms of use.",
+    "en {v}": "in {v}",
     "Encore un peu de texte : il en faut au moins quelques phrases.": "A bit more text, please: at least a few sentences.",
     "Enregistrement impossible : {message}": "Could not save: {message}",
     "Enregistrement prêt — lancez l’analyse": "Recording ready — start the analysis",
@@ -550,31 +625,48 @@ const DICO = {
     "Enregistrer les étapes": "Save the steps",
     "Enregistrer l’écran": "Record screen",
     "Enregistré.": "Saved.",
+    "Entreprise": "Enterprise",
     "Entrez d’abord votre adresse e-mail.": "Enter your email address first.",
     "Entrez le code à 6 caractères que son responsable vous a communiqué. Elle s'ajoutera à celles que vous avez déjà.": "Enter the 6-character code their manager gave you. It will be added to the ones you already have.",
+    "environ {minutes} minute": "about {minutes} minute",
+    "environ {minutes} minutes": "about {minutes} minutes",
+    "envoi de {v} — gardez l’app ouverte {attente}": "uploading {v} — keep the app open {attente}",
     "Envoi impossible : {v}": "Could not send: {v}",
     "Envoi…": "Sending…",
     "erreur": "error",
     "Erreur ({status}) : {message}": "Error ({status}): {message}",
     "Erreur : {message}": "Error: {message}",
+    "Erreur au démarrage de l'analyse": "Error starting the analysis",
     "Erreur d'upload vidéo : {message}": "Video upload error: {message}",
+    "erreur inconnue": "unknown error",
+    "Erreur inconnue (pas de message)": "Unknown error (no message)",
     "Erreur étapes : {message}": "Steps error: {message}",
     "Espace Gestion": "Management area",
+    "Espace gestion": "Management area",
     "Espace Utilisateur": "User area",
+    "Espace utilisateur": "User area",
+    "Espace Équipe": "Team area",
     "Essai 14 jours gratuit": "14 days free",
+    "Essai 14 jours gratuits": "14-day free trial",
+    "Essentiel": "Essential",
     "et": "and",
     "Ex : Accueil": "e.g. Front desk",
     "Ex : Accueillir un client": "e.g. Greet a customer",
     "Ex : Le Comptoir": "e.g. The Counter",
     "Ex : Responsable": "e.g. Supervisor",
     "Ex : Réception client": "e.g. Greeting customers",
+    "Expire dans moins d’une heure": "Expires in less than an hour",
+    "Expire dans {heures} heures": "Expires in {heures} hours",
+    "Expire dans {jours} jours": "Expires in {jours} days",
     "Expire dans {v}": "Expires in {v}",
+    "Expiré": "Expired",
     "Exécutez migration-presences.sql.": "Run migration-presences.sql.",
     "Facultatif · les initiales serviront sinon": "Optional · initials are used otherwise",
     "Faites glisser pour affiner au dixième de seconde": "Drag to adjust to a tenth of a second",
     "Favori non enregistré : {v}": "Favourite not saved: {v}",
     "Favoris": "Favourites",
     "Fermer": "Close",
+    "Fermez l'app qui l'utilise, puis réessayez.": "Close the app using it, then try again.",
     "Fermez l’application qui s’en sert, puis réessayez.": "Close the app that is using it, then try again.",
     "Fichier": "File",
     "Fichier trop lourd : 12 Mo maximum.": "File too large: 12 MB at most.",
@@ -585,23 +677,43 @@ const DICO = {
     "Filmez la tâche en expliquant à voix haute. Cinq minutes maximum.": "Record the task and talk through it out loud. Five minutes at most.",
     "Fin": "End",
     "Fin ici": "End here",
+    "Finalisation de la vidéo…": "Finishing the video…",
+    "Firefox sur Android": "Firefox on Android",
     "Fonctionnement des boutons": "How the buttons work",
+    "forfait non renseigné": "plan not set",
+    "Format non reconnu. Acceptés : PDF, Word (.docx), texte (.txt).": "Format not recognised. Accepted: PDF, Word (.docx), text (.txt).",
     "Fusionner": "Merge",
     "Fusionner avec {nouveau} ?": "Merge with {nouveau}?",
     "Garder": "Keep",
+    "Garder le code": "Keep the code",
     "Gestion": "Management",
     "Gestion des accès": "Access",
     "Gestion indisponible": "Management unavailable",
     "gestionnaire": "a manager",
+    "Glissez depuis le coin haut droit de l’écran.": "Swipe down from the top-right corner of the screen.",
+    "Glissez depuis le haut de l’écran.": "Swipe down from the top of the screen.",
     "Génération...": "Generating…",
     "Générer les étapes": "Generate the steps",
     "Générez un code pour que votre équipe puisse accéder aux procédures.": "Create a code so your team can open the procedures.",
+    "Gérant": "Owner",
     "Gérer ou résilier mon abonnement": "Manage or cancel my subscription",
     "Gérez vos procédures.": "Manage your procedures.",
+    "Hier": "Yesterday",
+    "hier": "yesterday",
+    "hors ligne": "offline",
     "Ignorer": "Dismiss",
     "Ignorer ce signalement ?": "Dismiss this alert?",
     "Il cessera immédiatement de fonctionner. Les personnes déjà inscrites gardent leur accès.": "It stops working right away. People who already signed up keep their access.",
     "Il reparaîtra si le partage continue. Créer un compte par personne reste le seul moyen de savoir qui a lu quoi.": "It will come back if the sharing continues. One account per person is the only way to know who read what.",
+    "il y a {h} h": "{h} h ago",
+    "il y a {jours} jours": "{jours} days ago",
+    "il y a {j} jours": "{j} days ago",
+    "il y a {minutes} min": "{minutes} min ago",
+    "il y a {n} semaine": "{n} week ago",
+    "il y a {n} semaines": "{n} weeks ago",
+    "il y a {v} min": "{v} min ago",
+    "il y a {v} mois": "{v} months ago",
+    "il y a {v} semaines": "{v} weeks ago",
     "Image trop lourde : 6 Mo maximum.": "Image too large: 6 MB at most.",
     "Importez d’abord une vidéo.": "Add a video first.",
     "Importez une vidéo.": "Add a video.",
@@ -609,13 +721,18 @@ const DICO = {
     "Impossible de créer la procédure : {v}": "Could not create the procedure: {v}",
     "Impossible de lire vos appareils : {message}<br>Exécutez migration-presences.sql.": "Could not read your devices: {message}<br>Run migration-presences.sql.",
     "Impossible de lire votre fiche : {erreur}": "Could not read your profile: {erreur}",
+    "Impossible de préparer la vidéo pour l'analyse.": "Could not prepare the video for analysis.",
     "Impossible de quitter pour le moment.": "You cannot leave right now.",
     "Impossible de rejoindre l'entreprise : {m}": "Could not join the company: {m}",
     "Impossible de relancer": "Could not restart",
+    "Impossible de vérifier votre abonnement.": "Could not check your subscription.",
     "Inscription gérant": "Owner sign-up",
     "Inscription utilisateur": "User sign-up",
     "Interface en <b>français, anglais et allemand</b>": "App in <b>French, English and German</b>",
     "Inviter votre équipe": "Invite your team",
+    "Invitez votre équipe avec le code de l'entreprise.": "Invite your team with the company code.",
+    "Invitez votre équipe avec le code de l'entreprise. C'est à partir de là que vous saurez qui suit vos procédures.": "Invite your team with the company code. From then on, you will see who follows your procedures.",
+    "Invitez votre équipe pour voir l’analyse.": "Invite your team to see the analysis.",
     "jamais": "never",
     "jamais ouverte": "never opened",
     "Je continue": "Keep going",
@@ -629,37 +746,59 @@ const DICO = {
     "J’ai ma vidéo — l’utiliser": "I have my video — use it",
     "L'abonnement de votre établissement a pris fin. Vos procédures sont conservées : elles reviendront dès que votre responsable aura renouvelé.": "Your site's subscription has ended. Your procedures are kept: they come back as soon as your manager renews.",
     "L'analyse a échoué": "The analysis failed",
+    "L'analyse a échoué — touchez pour relancer": "Analysis failed — tap to retry",
     "L'analyse dure depuis {v} minutes sans aboutir. Elle est probablement bloquée chez Azure.": "The analysis has run for {v} minutes without finishing. It is probably stuck at Azure.",
+    "L'analyse semble bloquée — touchez pour relancer": "Analysis seems stuck — tap to retry",
+    "L'analyse tourne depuis plus de {ANALYSE_LIMITE_MIN} minutes, ce qui n'est pas normal. Relancer depuis le début ?": "The analysis has been running for over {ANALYSE_LIMITE_MIN} minutes, which is not normal. Start again from the beginning?",
     "L'enregistrement est vide.": "The recording is empty.",
+    "L'entreprise n'a pas été créée : {v}": "The company was not created: {v}",
+    "L'envoi de la vidéo": "Uploading the video",
     "L'espace Gestion ne vous est plus accessible. Vos procédures créées restent en place.": "You no longer have the Management area. The procedures you created stay.",
     "L'espace Équipe ne vous sera plus accessible : vous êtes maintenant de l'autre côté.": "You will no longer have the User area: you are on the other side now.",
     "L'IA a découpé la procédure.": "The AI has split the procedure.",
     "L'IA a découpé la procédure. <b>Relisez chaque étape</b> avant de publier :": "The AI has split the procedure. <b>Check every step</b> before publishing:",
     "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin": "The AI wrote these steps — fix the text or the clip timing if needed",
+    "L'IA n'a pas trouvé d'étapes dans ce document. Il décrit peut-être une situation plutôt qu'une marche à suivre.": "The AI found no steps in this document. It may describe a situation rather than a way of doing something.",
     "l'équipe": "the team",
+    "La base a refusé l'adhésion.": "The database refused to add you.",
     "La base a refusé la modification.": "The database refused the change.",
+    "La base a refusé la modification. Exécutez migration-etablissements.sql : il manque la règle d'accès « update » sur la table entreprises.": "The database refused the change. Run migration-etablissements.sql: the “update” access rule is missing on the entreprises table.",
     "La base a refusé la modification. Exécutez migration-promotion.sql.": "The database refused the change. Run migration-promotion.sql.",
+    "La base a refusé la suppression. C'est une règle d'accès : votre compte n'a pas le droit de supprimer une procédure. Il faut ajouter une règle « delete » sur la table procedures dans Supabase.": "The database refused the deletion. It is an access rule: your account may not delete a procedure. A “delete” rule must be added to the procedures table in Supabase.",
+    "La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d'accès « delete » sur la table entreprises.": "The database refused the deletion. Run migration-etablissements.sql: the “delete” access rule is missing on the entreprises table.",
     "La base a refusé le départ. Vérifiez la règle « delete » sur la table membres.": "The database refused the removal. Check the “delete” rule on the members table.",
+    "La base ne sait pas encore créer un établissement. Exécutez migration-creer-etablissement.sql.": "The database cannot create a site yet. Run migration-creer-etablissement.sql.",
     "La caméra est bloquée": "The camera is blocked",
     "La caméra est déjà utilisée": "The camera is already in use",
+    "La caméra est déjà utilisée par une autre application.": "The camera is already used by another app.",
+    "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.": "The camera only works over HTTPS. Open the app from its usual address, not a local file.",
     "La caméra n’a pas pu s’ouvrir": "The camera could not open",
     "La caméra n’est accessible qu’en HTTPS. Ouvrez Standix depuis son adresse habituelle.": "The camera only works over HTTPS. Open Standix from its usual address.",
+    "La connexion a été interrompue. Vérifiez votre réseau et réessayez.": "The connection was lost. Check your network and try again.",
     "La consultation n'a pas pu être enregistrée : {message}": "The read could not be saved: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Copying failed — select the text by hand.",
     "La création d'entreprise n'est pas installée sur la base. Exécutez migration-creation-entreprise.sql.": "Company creation is not set up in the database. Run migration-creation-entreprise.sql.",
+    "La génération a échoué.": "Generation failed.",
     "La langue choisie traduit aussi les étapes des procédures.": "The language you choose also translates procedure steps.",
-    "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": "The language applies to the whole app. Each person can pick their own.",
     "La photo n’a pas pu être envoyée.": "The photo could not be sent.",
+    "La procédure d'analyse n'a pas pu être créée.": "The procedure for the analysis could not be created.",
     "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "The procedure is already in Draft. It opens once the analysis is done.",
     "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "the procedure is already in Draft. It opens once the analysis is done.",
     "La procédure n’a pas pu être supprimée. Réessayez dans quelques instants.": "The procedure could not be deleted. Try again in a moment.",
     "La procédure reviendra telle qu'elle est enregistrée. Ce que vous venez d'écrire sera perdu.": "The procedure goes back to its saved version. What you just wrote will be lost.",
+    "La préparation de la vidéo a échoué.": "Preparing the video failed.",
+    "La préparation du lien": "Preparing the link",
+    "la semaine dernière": "last week",
     "La suppression a échoué.": "Deleting failed.",
+    "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": "The video for this procedure cannot be found. It may have been deleted, or its upload did not finish. Record the procedure again to restart the analysis.",
+    "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": "The video did not finish uploading. Keep the app open during the upload, then restart the analysis.",
+    "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "The video was not fully uploaded. Restart the analysis and keep the app open.",
     "Lampe torche": "Flashlight",
     "Lancer la vidéo": "Play the video",
     "Langue": "Language",
     "Langue de l’application": "App language",
     "Langue parlée": "Spoken language",
+    "Le bouton n’y est pas ? Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».": "Button not there? Settings › Control Centre › add “Screen Recording”.",
     "Le changement est fait, mais la date n’a pas pu être enregistrée": "The change is done, but the date could not be saved",
     "Le chargement n'aboutit pas": "Loading is not finishing",
     "Le code comporte 6 caractères.": "The code has 6 characters.",
@@ -668,16 +807,26 @@ const DICO = {
     "Le compte de {v} est utilisé sur {max} appareils.": "{v}'s account is in use on {max} devices.",
     "Le compte n’a pas pu être lu.": "The account could not be read.",
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "The timer runs while a procedure is OPEN on screen, and only then. • It stops as soon as the app goes to the background or the screen turns off. • After two minutes without any touch, it asks “where are you at?” and stops counting until someone answers — a phone left on the counter does not pile up hours. • Under three seconds, nothing is kept: that is a glance, not a read. Times add up with each visit.",
+    "Le démarrage a échoué": "Starting failed",
     "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "The microphone is on while you record. The steps come mostly from what you say.",
     "Le mot de passe doit faire au moins {MDP_MIN} caractères.": "The password must be at least {MDP_MIN} characters.",
+    "Le navigateur a refusé de lire « {name} ». Relancez le collage sans quitter cette page entre-temps.": "The browser could not read “{name}”. Start joining again without leaving this page in between.",
+    "le navigateur ne rend pas videoWidth/videoHeight": "the browser does not return videoWidth/videoHeight",
     "Le nom est obligatoire.": "The name is required.",
     "Le nom ne correspond pas. Rien n’a été supprimé.": "The name does not match. Nothing was deleted.",
     "Le nom ne peut pas être vide.": "The name cannot be empty.",
+    "Le paiement n'a pas pu s'ouvrir.": "Payment could not open.",
     "Le partage d'écran n'a pas pu démarrer : {v}": "Screen sharing could not start: {v}",
     "Le PDF n’a pas pu être créé": "The PDF could not be created",
+    "Le portail n’a pas pu s’ouvrir.": "The portal could not open.",
     "Le QR code fonctionnera une fois la procédure en ligne.": "The QR code works once the procedure is live.",
+    "Le scanner n'a pas pu démarrer.": "The scanner could not start.",
     "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": "The analysis server answered {status}{v} — procedure checked: {aiProcedureId}",
     "Le serveur d'analyse est injoignable. Réessayez dans un instant.": "The analysis server cannot be reached. Try again in a moment.",
+    "Le serveur d'analyse n'a pas répondu. Réessayez dans un instant.": "The analysis server did not respond. Try again in a moment.",
+    "Le service d’analyse n’a pas répondu à temps. Réessayez dans quelques minutes.": "The analysis service did not respond in time. Try again in a few minutes.",
+    "Le stockage a refusé la vidéo : {m}": "Storage refused the video: {m}",
+    "Le stockage a refusé un fichier de {v}. Filmez une séquence plus courte.": "Storage refused a {v} file. Record a shorter clip.",
     "le temps de formation": "the training time",
     "le temps de vous placer": "to get ready",
     "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Time per procedure is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
@@ -689,18 +838,31 @@ const DICO = {
     "Le total dépasse {n} minutes. Retirez une vidéo, ou coupez-en une.": "The total is over {n} minutes. Remove a video, or cut one.",
     "le {v}": "on {v}",
     "Lecture": "Play",
+    "lecture": "read",
+    "Lecture de votre vidéo": "Reading your video",
     "Lecture des vidéos…": "Reading the videos…",
     "Lecture du document…": "Reading the document…",
     "Lecture en cours": "Playing",
+    "lectures": "reads",
     "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": "Video analyses reset every month and do not carry over.",
     "Les arrivées, les départs et les changements de rang s’afficheront ici.": "Arrivals, departures and access changes will show up here.",
     "Les autres procédures ne vous sont pas accessibles": "You cannot open the other procedures",
+    "Les catégories se créent toutes seules à mesure que vous ajoutez des procédures — Cuisine, Salle, Bar…": "Folders appear on their own as you add procedures — Kitchen, Dining room, Bar…",
+    "Les fichiers .doc (ancien format Word) ne peuvent pas être lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.": ".doc files (old Word format) cannot be read. Save it as .docx, or copy its text above.",
     "Les membres de l’espace utilisateur": "The people in the User area",
+    "Les moins actifs": "Least active",
+    "les moins actifs": "least active",
+    "Les moins consultées": "Least read",
+    "Les mêmes fonctionnalités, sans exception.": "The same features, no exceptions.",
     "Les personnes qui l'ont choisi le gardent : seul le choix disparaît pour les prochaines.": "People who picked it keep it: only the option disappears for new people.",
+    "les plus actifs": "most active",
     "Les plus lues": "Most read",
     "Les postes": "Roles",
+    "Les procédures créées apparaissent ici pendant quinze jours. Les plus anciennes restent accessibles dans l’onglet Procédures.": "New procedures show here for two weeks. Older ones stay in the Procedures tab.",
+    "Les procédures de « {ancien} » dans « {dossier} » suivront. Videz le champ pour retirer le sous-dossier : elles remonteront en haut du dossier.": "The procedures in “{ancien}” inside “{dossier}” will follow. Clear the field to remove the subfolder: they will move up to the folder itself.",
     "Les procédures de « {ancien} » remonteront en haut de « {dossier} ». Aucune procédure n'est supprimée.": "The procedures in “{ancien}” will move to the top of “{dossier}”. No procedure is deleted.",
     "Les {etapesTotal} étapes sont faites": "All {etapesTotal} steps are done",
+    "Les étapes {i} et {v} se recoupent sur {v2} s": "Steps {i} and {v} overlap by {v2} s",
     "Limité à 5 min de vidéo": "5 minutes of video at most",
     "Lire": "Play",
     "Lire les conditions": "Read the terms",
@@ -708,20 +870,29 @@ const DICO = {
     "Loupe ·": "Zoom ·",
     "Lues": "Read",
     "L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document": "The <b>Standix AI</b> writes the procedure from a video or a document",
+    "L’analyse a échoué.": "The analysis failed.",
     "L’analyse est terminée : {length} étapes.": "Analysis done: {length} steps.",
+    "L’analyse n’a pas démarré.": "The analysis did not start.",
+    "L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; si cela persiste, écrivez-nous depuis les réglages.": "The analysis could not restart. Try again in a few minutes; if it keeps happening, write to us from the settings.",
+    "L’analyse prend trop de temps. Réessayez, ou écrivez les étapes vous-même.": "The analysis is taking too long. Try again, or write the steps yourself.",
     "L’enregistrement démarre dans": "Recording starts in",
     "L’enregistrement est vide.": "The recording is empty.",
     "L’IA crée la procédure à partir d’un document": "The AI builds the procedure from a document",
     "L’IA crée la procédure à partir d’une vidéo": "The AI builds the procedure from a video",
     "L’IA en tirera des étapes, que vous relirez.": "The AI turns it into steps, and you check them.",
     "L’IA lit le texte et en tire les étapes, dans l’ordre.": "The AI reads the text and pulls out the steps, in order.",
+    "L’IA n’a rien tiré de cette vidéo. Vérifiez que la parole est audible.": "The AI got nothing from this video. Check that the speech can be heard.",
     "L’IA rédige la procédure": "The AI writes the procedure",
     "L’IA transforme la vidéo en procédure": "The AI turns your video into a procedure",
+    "L’IA écoute et regarde…": "The AI is listening and watching…",
     "L’IA écrit les étapes à votre place": "The AI writes the steps for you",
     "L’écoute est terminée. L’IA met la procédure au propre —": "Listening is done. The AI is tidying up the procedure —",
     "Marquez le début et la fin de chaque étape": "Mark where each step starts and ends",
     "Masquer": "Hide",
     "Masquer le mot de passe": "Hide password",
+    "Membre": "Member",
+    "membre": "member",
+    "membres": "members",
     "Menu <b>Safari</b> → <b>Réglages pour ce site web</b>": "<b>Safari</b> menu → <b>Settings for This Website</b>",
     "Merci d'indiquer le nom de votre entreprise.": "Please enter your company name.",
     "Merci de renseigner votre prénom et votre nom.": "Please enter your first and last name.",
@@ -732,11 +903,15 @@ const DICO = {
     "minutes": "minutes",
     "minutes au total": "minutes in total",
     "minutes ce mois-ci": "minutes this month",
+    "Mise en forme": "Formatting",
+    "Mod. {quand}": "Edited {quand}",
     "Modifications enregistrées": "Changes saved",
     "Modifier": "Edit",
+    "Modifier la photo": "Change the photo",
     "Modifier la procédure": "Edit the procedure",
     "Modifier l’établissement": "Edit the site",
     "Modifiez le titre, le dossier ou les étapes": "Change the title, folder or steps",
+    "moins d’une minute": "less than a minute",
     "Mot de passe": "Password",
     "Mot de passe inchangé": "Password unchanged",
     "Mot de passe modifié": "Password changed",
@@ -745,11 +920,14 @@ const DICO = {
     "Mouvements de l’équipe": "Team changes",
     "Mouvements indisponibles.": "Changes unavailable.",
     "MP4 ou MOV · 5 minutes au maximum": "MP4 or MOV · 5 minutes at most",
+    "Même allégée, cette vidéo pèse {v}, au-delà des {v2} Mo acceptés. Baissez la définition de votre caméra, ou filmez plus court.": "Even compressed, this video is {v}, over the {v2} MB limit. Lower your camera resolution, or record a shorter clip.",
     "Nom": "Last name",
     "Nom A → Z": "Name A → Z",
+    "nom A → Z": "name A → Z",
     "Nom complet": "Full name",
     "Nom de l'entreprise": "Company name",
     "Nom de l'établissement": "Site name",
+    "Nom du dossier": "Folder name",
     "Nom et logo de l’entreprise": "Company name and logo",
     "Nombre de lectures par procédure.": "How many times each procedure was read.",
     "Non ajoutée : {liste} — durée illisible.": "Not added: {liste} — length unreadable.",
@@ -757,11 +935,13 @@ const DICO = {
     "Non défini": "Not set",
     "Nous contacter": "Contact us",
     "Nous écrire": "Write to us",
+    "Nouveau mot de passe": "New password",
     "Nouvel établissement": "New site",
     "Nouvelle procédure": "New procedure",
     "Offre Entreprise": "Enterprise plan",
     "Offre {nom}": "{nom} plan",
     "Offre {nom} · {prix} € par mois": "{nom} plan · €{prix} per month",
+    "Ou : menu ≡ → Paramètres → Sites et téléchargements → Autorisations des sites → Caméra.": "Or: menu ≡ → Settings → Sites and downloads → Site permissions → Camera.",
     "ou <b>{v} € par mois</b> en payant à l’année": "or <b>€{v} per month</b> when paid yearly",
     "Ouverture de la caméra...": "Opening the camera…",
     "Ouverture de la procédure...": "Opening the procedure…",
@@ -776,15 +956,25 @@ const DICO = {
     "Paiement indisponible": "Payment unavailable",
     "par mois, hors taxes": "per month, excl. tax",
     "Partagez le code d'invitation dans Paramètres.": "Share the invitation code from Settings.",
+    "partagé entre vos entreprises": "shared between your companies",
+    "Pas encore consultée": "Not read yet",
     "Pas encore consultées": "Not opened yet",
+    "Passer au mensuel · {prix} € par mois": "Switch to monthly · €{prix} per month",
+    "Passer à l'année · {v} €": "Switch to yearly · €{v}",
+    "Passer à l’offre supérieure": "Move up a plan",
     "Passez à l’offre supérieure pour agrandir votre équipe.": "Move up a plan to grow your team.",
     "Pause": "Pause",
+    "Pensez à regarder dans les indésirables.": "Check your spam folder too.",
     "Personne dans l’espace Utilisateur pour le moment.": "No one in the User area yet.",
     "Personne ne correspond à « {filtreEquipe} ».": "No one matches “{filtreEquipe}”.",
     "Personne ne peut plus rejoindre votre équipe. Choisissez une offre supérieure pour en accueillir davantage.": "No one else can join your team. Choose a bigger plan to welcome more people.",
+    "Personne pour l'instant": "No one yet",
+    "Personne pour l’instant": "No one yet",
     "Personne pour l’instant.": "No one yet.",
     "Photo": "Photo",
     "Photo de l'étape": "Step photo",
+    "Photo de l'étape {v}": "Photo of step {v}",
+    "Photo illisible : {name}": "Unreadable photo: {name}",
     "Photo trop lourde : 6 Mo maximum.": "Photo too large: 6 MB at most.",
     "Photographier le texte": "Photograph the text",
     "Placez la lecture au milieu du clip pour le diviser.": "Put the playhead in the middle of the clip to split it.",
@@ -796,6 +986,7 @@ const DICO = {
     "Plus tard": "Later",
     "Plusieurs pages possibles — vous les remettrez dans l’ordre.": "Several pages are fine — you can reorder them after.",
     "Point de vigilance": "Watch out",
+    "Poste non défini": "No role set",
     "Poste non enregistré : {message}": "Role not saved: {message}",
     "pour créer une procédure.": "button to create a procedure.",
     "premier mois avec des lectures": "first month with reads",
@@ -803,6 +994,7 @@ const DICO = {
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Prices exclude tax. You change plan when your team changes, never before.",
     "Procédure": "Procedure",
     "Procédure en cours de modification": "Procedure being edited",
+    "procédure en ligne": "procedure live",
     "Procédure générée": "Procedure ready",
     "Procédure introuvable": "Procedure not found",
     "Procédure introuvable.": "Procedure not found.",
@@ -811,10 +1003,16 @@ const DICO = {
     "Procédures": "Procedures",
     "Procédures consultées": "Procedures opened",
     "Procédures créées": "Procedures created",
+    "procédures en ligne": "procedures live",
     "Procédures récentes": "Recent procedures",
     "Profil": "Profile",
+    "Profitez de toutes les fonctionnalités de Standix. Sans engagement.": "Enjoy every Standix feature. No commitment.",
     "Prénom": "First name",
+    "Préparation": "Preparing",
+    "Préparation de la vidéo": "Preparing the video",
+    "Préparation de la vidéo…": "Preparing the video…",
     "Préparation du lecteur...": "Preparing the player…",
+    "préparation du lien d’analyse…": "preparing the analysis link…",
     "Préparation du PDF…": "Preparing the PDF…",
     "Publier": "Publish",
     "Publier la procédure": "Publish the procedure",
@@ -825,11 +1023,13 @@ const DICO = {
     "que vos procédures ont fait gagner à votre établissement.": "your procedures have saved your site.",
     "Quel est votre poste ?": "What is your role?",
     "Quel est votre rôle ici ?": "What do you do here?",
+    "Quelqu’un": "Someone",
     "Qui attend ?": "Who is waiting?",
     "Qui fait quoi dans l'entreprise": "Who does what",
     "Quitter": "Leave",
     "Quitter l’entreprise": "Leave the company",
     "Quitter {nom} ?": "Leave {nom}?",
+    "raison inconnue": "unknown reason",
     "Rallumer la caméra": "Turn the camera back on",
     "Rapprocher": "Bring together",
     "Rechargez la page, puis cliquez sur <b>Réessayer</b>": "Reload the page, then click <b>Try again</b>",
@@ -843,13 +1043,18 @@ const DICO = {
     "Rejoindre": "Join",
     "Rejoindre une entreprise": "Join a company",
     "Relancer l'analyse": "Restart the analysis",
+    "Relancer l'analyse de cette vidéo ?": "Restart the analysis of this video?",
     "Relancer l’analyse": "Restart the analysis",
     "Relisez chaque étape": "Check every step",
+    "Remplacer la photo": "Replace the photo",
+    "Renommer": "Rename",
     "Renommer le dossier": "Rename the folder",
+    "Renommer le sous-dossier": "Rename the subfolder",
     "Renommé en « {propre} »": "Renamed to “{propre}”",
     "Renouvellement le <b>{v}</b>. Les analyses non utilisées ne se reportent pas.": "Renews on <b>{v}</b>. Unused analyses do not carry over.",
     "Renouvellement le {dateRenouv}": "Renews on {dateRenouv}",
     "Reprendre": "Resume",
+    "Reprise après {v} min sans résultat": "Restarted after {v} min with no result",
     "Rester": "Stay",
     "Retirer": "Remove",
     "Retirer cet utilisateur ?": "Remove this user?",
@@ -863,6 +1068,9 @@ const DICO = {
     "Retour": "Back",
     "Retrait impossible : {message}": "Could not remove: {message}",
     "Revenez dans {nom} et touchez <b>Réessayer</b>": "Come back to {nom} and tap <b>Try again</b>",
+    "Rien de lu ce mois-ci": "Nothing read this month",
+    "Rien de lu pour l’instant": "Nothing read yet",
+    "Rien de lu sur cette période": "Nothing read in this period",
     "Rien ne s’est passé ces {v} dernières semaines.": "Nothing has happened in the last {v} weeks.",
     "Rien à afficher": "Nothing to show",
     "Réduire": "Collapse",
@@ -870,28 +1078,42 @@ const DICO = {
     "Réessayez.": "Try again.",
     "réessayez.": "try again.",
     "Réglages": "Settings",
+    "Réseau": "Network",
+    "Réseau : {v}": "Network: {v}",
     "Résultat": "Result",
     "Révoquer": "Revoke",
-    "Révoquer ce code ?": "Revoke this code?",
+    "Safari sur iPhone": "Safari on iPhone",
+    "Safari sur Mac": "Safari on Mac",
+    "Sans catégorie": "No folder",
     "Sans dossier": "No folder",
+    "sans dossier": "no folder",
     "sans détail.": "no details.",
     "Sans micro, l'IA n'a rien à écouter : autorisez le microphone, puis recommencez.": "Without the microphone, the AI has nothing to listen to: allow the microphone, then try again.",
     "Sans nom": "Untitled",
+    "Sans titre": "Untitled",
     "Scanner un code": "Scan a code",
     "Scannez pour ouvrir la procédure": "Scan to open the procedure",
     "Scans ce mois-ci": "Scans this month",
+    "scans de QR code": "QR code scans",
     "Se connecter": "Log in",
     "Se déconnecter": "Log out",
+    "selon votre abonnement": "depending on your plan",
     "Sera envoyée à la publication.": "Will be sent when published.",
     "Session expirée.": "Session expired.",
+    "Session expirée. Reconnectez-vous.": "Session expired. Please log in again.",
     "Seul le créateur de l’entreprise peut la supprimer.": "Only the person who created the company can delete it.",
     "Seul le dernier mois est affiché.": "Only the last month is shown.",
-    "Seul le dernier mois est conservé.": "Only the last month is kept.",
     "Seul le fondateur peut supprimer un établissement.": "Only the owner can delete a site.",
     "Seul le gérant de l’entreprise gère l’abonnement.": "Only the company owner manages the subscription.",
     "Seul le gérant peut retirer un gestionnaire.": "Only the owner can remove a manager.",
+    "Seule la gestion peut créer des procédures.": "Only managers can create procedures.",
+    "Seuls les comptes créés en tant que gérant peuvent ouvrir une entreprise. Votre compte a été créé en tant qu’utilisateur.": "Only accounts created as an owner can open a company. Your account was created as a user.",
+    "Si la caméra n’apparaît pas : Réglages du téléphone → Applications → le navigateur → Autorisations → Appareil photo.": "If the camera doesn't show: phone Settings → Apps → the browser → Permissions → Camera.",
+    "Si le menu n’apparaît pas : Réglages → Safari → Caméra → Autoriser.": "If the menu doesn't show: Settings → Safari → Camera → Allow.",
+    "Si l’app n’apparaît pas dans Réglages : Réglages → Confidentialité et sécurité → Caméra → {nom}.": "If the app doesn't show in Settings: Settings → Privacy & Security → Camera → {nom}.",
     "Si vous partez, plus personne ne pourra créer de procédure ni gérer l'équipe de {nom}. Nommez d'abord quelqu'un d'autre dans « Gérer l'équipe », ou supprimez l'entreprise.": "If you leave, no one will be able to create procedures or manage {nom}'s team. First appoint someone else in “Manage the team”, or delete the company.",
     "Six vidéos à la fois, pas plus — au-delà, le téléphone refuse d’en ouvrir davantage.": "Six videos at a time, no more — beyond that, the phone refuses to open any others.",
+    "son illisible, on continue": "sound unreadable, continuing",
     "Son logo apparaîtra dans la barre, à côté du vôtre.": "Its logo will appear in the top bar, next to yours.",
     "Son logo apparaîtra dans la barre.": "Its logo appears in the top bar.",
     "Son nom et son logo apparaissent dans l’app pour toute l’équipe.": "Its name and logo appear in the app for the whole team.",
@@ -906,6 +1128,7 @@ const DICO = {
     "Suppression…": "Deleting…",
     "Supprimer": "Delete",
     "Supprimer cet établissement": "Delete this site",
+    "Supprimer définitivement": "Delete for good",
     "Supprimer définitivement ?": "Delete for good?",
     "Supprimer l'étape {numero} ?": "Delete step {numero}?",
     "Supprimer l’entreprise": "Delete the company",
@@ -913,14 +1136,19 @@ const DICO = {
     "Supprimer votre compte ?": "Delete your account?",
     "Supprimer {nom} ?": "Delete {nom}?",
     "sur 5:00": "of 5:00",
+    "Sur Android": "On Android",
     "Sur devis": "On quote",
+    "Sur iPhone et iPad": "On iPhone and iPad",
     "suspendus": "paused",
     "S’inscrire en tant que gérant": "Sign up as owner",
     "S’inscrire en tant qu’utilisateur": "Sign up as user",
     "S’inscrire gérant": "Sign up as owner",
     "S’inscrire utilisateur": "Sign up as user",
+    "Tapez « SUPPRIMER » pour confirmer.": "Type “SUPPRIMER” to confirm.",
+    "Tapez « {nom} » pour confirmer.": "Type “{nom}” to confirm.",
     "Temps cumulé passé sur chaque procédure.": "Total time spent on each procedure.",
     "Temps de collage, environ": "Joining time, about",
+    "Temps de lecture compté par personne.": "Reading time counted per person.",
     "Temps de lecture par dossier": "Reading time per folder",
     "Temps de lecture par personne": "Reading time per person",
     "Temps de lecture par procédure": "Reading time per procedure",
@@ -943,8 +1171,10 @@ const DICO = {
     "Touchez un logo pour basculer d’une entreprise à l’autre. Pour rejoindre une autre entreprise, demandez son <b>code d’invitation</b> à son responsable.": "Tap a logo to switch between companies. To join another company, ask its manager for its <b>invitation code</b>.",
     "Touchez une étape ci-dessous pour régler son clip": "Tap a step below to set its clip",
     "Touchez une étape pour régler son clip": "Tap a step to set its clip",
+    "Touchez « Enregistreur d’écran », activez le micro, puis démarrez.": "Tap “Screen recorder”, turn on the mic, then start.",
     "Tout effacer": "Erase all",
     "Tout effacer ?": "Erase everything?",
+    "Tout le monde l'a ouverte au moins une fois.": "Everyone has opened it at least once.",
     "Tout voir": "See all",
     "Toute la vidéo est découpée. Corrigez les textes ci-dessous.": "The whole video is cut. Fix the texts below.",
     "Toutes": "All",
@@ -958,6 +1188,7 @@ const DICO = {
     "Trois gestes, puis revenez ici importer la vidéo.": "Three taps, then come back here to add the video.",
     "Trop d'appareils": "Too many devices",
     "trou": "gap",
+    "Trou de {v} s avant l'étape {v2}": "Gap of {v} s before step {v2}",
     "Télécharger en PDF": "Download as PDF",
     "Télécharger la fiche": "Download the sheet",
     "Un <b>PDF</b> par procédure": "A <b>PDF</b> for each procedure",
@@ -967,8 +1198,10 @@ const DICO = {
     "Un compte est utilisé sur {max} appareils.": "An account is in use on {max} devices.",
     "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter.": "An account already exists with this email. Use Log in instead.",
     "Un dossier « {nouveau} » existe déjà. Les procédures de « {ancien} » la rejoindront, et « {ancien} » disparaîtra.": "A folder “{nouveau}” already exists. The procedures in “{ancien}” will move into it, and “{ancien}” will disappear.",
+    "Un gestionnaire": "A manager",
     "Un lien vient d’être envoyé à": "A link has just been sent to",
     "Un lien vient d’être envoyé à <b>{propre}</b>.": "A link has just been sent to <b>{propre}</b>.",
+    "Un membre": "A member",
     "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "A problem, an idea, a question about Standix? We read everything and reply as fast as we can.",
     "Une erreur est survenue pendant l'analyse.": "Something went wrong during the analysis.",
     "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": "A read counts after {DUREE_LECTURE_MIN} seconds on the procedure. Each user counts once per procedure.",
@@ -978,18 +1211,24 @@ const DICO = {
     "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": "One video of <b>{size}</b>, from {n} takes. Watch it before keeping it: it is the only way to check the order is right.",
     "Une étape doit durer au moins une seconde.": "A step must last at least one second.",
     "Utilisateur": "User",
-    "Utilisez ce code pour donner à votre équipe l’accès utilisateur aux procédures. Vous pourrez ensuite leur donner accès à l’espace Gestion.": "Use this code to give your team user access to the procedures. You can give them the Management area afterwards.",
+    "Valider": "Confirm",
     "Verrou : {v}": "Lock: {v}",
     "Verrou indisponible : {message}": "Lock unavailable: {message}",
+    "Vidéo allégée : {v} →": "Video compressed: {v} →",
+    "vidéo envoyée en {v}": "video uploaded in {v}",
     "Vidéo générée par l’IA Standix": "Video generated by Standix AI",
     "Vidéo prête — lancez l’analyse": "Video ready — start the analysis",
+    "Vidéo rattachée…": "Video attached…",
     "Vidéo reçue": "Video received",
     "Visez le QR code": "Point at the QR code",
     "Voici comment le rétablir sur": "Here is how to turn it back on in",
     "Voir comme l’équipe": "See it as the team does",
+    "Voir l'autre": "See the other",
     "Voir l'équipe": "See the team",
     "Voir la procédure": "Open the procedure",
+    "Voir le code d'invitation": "See the invitation code",
     "Voir les offres": "See the plans",
+    "Voir les {n} autres": "See the {n} others",
     "Voir moins": "See less",
     "Voir plus": "See more",
     "Voir toute la vidéo": "See the whole video",
@@ -1002,11 +1241,14 @@ const DICO = {
     "Vos <b>{np} procédure</b> et <b>{nm} membres</b> vous attendent. Reprenez là où vous vous êtes arrêté.": "Your <b>{np} procedure</b> and <b>{nm} members</b> are waiting for you. Pick up where you left off.",
     "Vos <b>{np} procédures</b> et <b>{nm} membre</b> vous attendent. Reprenez là où vous vous êtes arrêté.": "Your <b>{np} procedures</b> and <b>{nm} member</b> are waiting for you. Pick up where you left off.",
     "Vos <b>{np} procédures</b> et <b>{nm} membres</b> vous attendent. Reprenez là où vous vous êtes arrêté.": "Your <b>{np} procedures</b> and <b>{nm} members</b> are waiting for you. Pick up where you left off.",
+    "Vos analyses vidéo sont épuisées. Elles se renouvellent au début du mois prochain.": "Your video analyses are used up. They renew at the start of next month.",
     "Vos appareils numériques": "Your devices",
+    "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": "Your folders exist, but no one has opened them yet this month.",
     "Vos changements ne partent qu'à l'enregistrement": "Your changes are only sent when you save",
     "Vos membres ne la verront plus. Vous pourrez la republier à tout moment ; les lectures déjà enregistrées restent dans l’analyse.": "Your members will no longer see it. You can publish it again any time; reads already counted stay in the analysis.",
     "Vos paroles": "What you say",
     "Vos procédures sont conservées. Choisissez une offre pour les rouvrir et continuer à en créer.": "Your procedures are kept. Pick a plan to open them again and keep creating.",
+    "Vos {quota} analyses d’essai sont utilisées. Choisissez une offre pour continuer à analyser vos vidéos.": "Your {quota} trial analyses are used up. Choose a plan to keep analysing your videos.",
     "Vos {quota} analyses vidéo du mois sont utilisées sur l’ensemble de vos établissements. Elles se renouvellent au début du mois prochain.": "Your {quota} video analyses for this month are used up across all your sites. They reset at the start of next month.",
     "Vos {quota} analyses vidéo du mois sont utilisées. Elles se renouvellent au début du mois prochain.": "Your {quota} video analyses for this month are used up. They reset at the start of next month.",
     "Votre abonnement": "Your subscription",
@@ -1018,17 +1260,25 @@ const DICO = {
     "Votre compte est créé. Connectez-vous pour rejoindre l'entreprise.": "Your account is created. Log in to join the company.",
     "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": "Your account is not linked to a company. Enter the 6-character code.",
     "Votre entreprise": "Your company",
+    "votre entreprise": "your company",
     "Votre essai est terminé": "Your trial has ended",
+    "votre navigateur": "your browser",
     "Votre navigateur a refusé l’accès et ne le redemandera pas tout seul.": "Your browser refused access and will not ask again on its own.",
     "Votre navigateur a refusé l’accès et ne le redemandera pas tout seul.<br>Voici comment le rétablir sur <b>{appareil}</b>.": "Your browser refused access and will not ask again on its own.<br>Here is how to turn it back on in <b>{appareil}</b>.",
+    "Votre navigateur ne sait pas assembler de vidéos.": "Your browser cannot join videos.",
+    "Votre navigateur n’accepte aucun format d’enregistrement.": "Your browser supports no recording format.",
     "Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.": "Your name appears in the team list and on what you read. The email cannot be changed here.",
     "Votre poste": "Your role",
+    "Votre première entreprise n’est pas encore abonnée. Activez son abonnement pour pouvoir en créer une seconde.": "Your first company has no subscription yet. Start its subscription to create a second one.",
     "Votre profil": "Your profile",
     "Votre profil — votre essai est terminé": "Your profile — your trial has ended",
     "Votre rôle a changé chez {ent} : vous faites de nouveau partie de <b>l'équipe</b>.": "Your access changed at {ent}: you are back in the <b>User area</b>.",
     "Votre savoir-faire transmis simplement": "Your know-how, passed on simply",
     "Votre session a expiré. Reconnectez-vous et réessayez.": "Your session has expired. Log in again and try again.",
+    "Votre session a expiré. Reconnectez-vous.": "Your session has expired. Please log in again.",
     "Votre texte": "Your text",
+    "votre téléphone n’a pas suivi la cadence — fermez les autres applications et réessayez": "your phone could not keep up — close other apps and try again",
+    "Votre téléphone n’a pas suivi la cadence. Fermez les autres applications et réessayez.": "Your phone could not keep up. Close other apps and try again.",
     "Votre vidéo": "Your video",
     "Votre équipe a atteint le nombre de membres de votre abonnement. Passez à l'offre supérieure pour leur ouvrir l'accès.": "Your team has reached the number of members in your subscription. Move up a plan to let them in.",
     "Votre équipe est trop grande pour {nom}": "Your team is too big for {nom}",
@@ -1041,9 +1291,14 @@ const DICO = {
     "Vous avez créé une entreprise : supprimez-la d’abord.": "You created a company: delete it first.",
     "Vous avez déjà un compte ?": "Already have an account?",
     "Vous avez quitté {nom}.": "You left {nom}.",
+    "Vous avez utilisé vos {quota} analyses vidéo de ce mois-ci. Elles se renouvellent le 1er du mois prochain — ou passez à l'offre supérieure pour en avoir davantage tout de suite.": "You have used your {quota} video analyses this month. They renew on the 1st of next month — or move up a plan to get more right away.",
     "Vous en serez le gérant, avec 14 jours d’essai gratuit.": "You will be its owner, with a 14-day free trial.",
     "Vous en êtes où ?": "Where are you at?",
+    "Vous faites déjà partie de {nom}.": "You are already part of {nom}.",
+    "Vous gérez déjà {ETABLISSEMENTS_MAX} entreprises, le maximum par compte. Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.": "You already manage {ETABLISSEMENTS_MAX} companies, the maximum per account. Remove one to create another, or write to us if you run a group.",
+    "Vous gérez {ETABLISSEMENTS_MAX} entreprises, le maximum par compte.": "You manage {ETABLISSEMENTS_MAX} companies, the maximum per account.",
     "Vous n'appartenez à aucune entreprise.": "You do not belong to any company.",
+    "Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.": "Can't see it? Swipe a second time to open the full list.",
     "Vous n’avez pas les droits pour supprimer cette procédure.": "You are not allowed to delete this procedure.",
     "Vous passez en espace Gestion": "You are moving to the Management area",
     "Vous perdrez l'accès à ses procédures et votre historique de lectures. Votre compte Standix reste actif : vous pourrez rejoindre une autre entreprise avec un code.": "You will lose access to its procedures and your reading history. Your Standix account stays active: you can join another company with a code.",
@@ -1055,6 +1310,7 @@ const DICO = {
     "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "You can be logged in on 3 devices at once.",
     "Vous relirez chaque étape avant de publier.": "You will check every step before publishing.",
     "Vous repassez en espace Équipe": "You are back in the User area",
+    "Vous retrouvez les procédures à lire et le scanner de QR codes.": "You will find the procedures to read and the QR code scanner.",
     "Vous êtes abonné à l'offre <b>{nom}</b>.": "You are on the <b>{nom}</b> plan.",
     "Vous êtes désormais": "You are now",
     "Vous êtes désormais <b>gestionnaire</b> de {ent}.": "You are now a <b>manager</b> at {ent}.",
@@ -1063,6 +1319,7 @@ const DICO = {
     "Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran une fois terminé pour la rendre accessible aux autres gestionnaires.": "You are the only one who can edit this procedure right now. Leave this screen when you are done so other managers can open it.",
     "Vous êtes {combien} membres, et cette offre en autorise {max}. Retirez d'abord {v} personne dans Paramètres → Votre équipe, puis revenez changer d'offre.": "You have {combien} members, and this plan allows {max}. First remove {v} person in Settings → Your team, then come back to change plan.",
     "Vous êtes {combien} membres, et cette offre en autorise {max}. Retirez d'abord {v} personnes dans Paramètres → Votre équipe, puis revenez changer d'offre.": "You have {combien} members, and this plan allows {max}. First remove {v} people in Settings → Your team, then come back to change plan.",
+    "vérification du poids…": "checking the file size…",
     "Vérification…": "Checking…",
     "Vérifier les étapes": "Check the steps",
     "Vérifiez et ajustez avant de continuer": "Check and adjust before you continue",
@@ -1076,9 +1333,12 @@ const DICO = {
     "{appareil} ne donne pas accès à la caméra pour ce site.": "{appareil} does not give this site access to the camera.",
     "{autres} autre procédure dans cette entreprise": "{autres} other procedure in this company",
     "{autres} autres procédures dans cette entreprise": "{autres} other procedures in this company",
+    "{a}, {b} et {n} autre": "{a}, {b} and {n} other",
+    "{a}, {b} et {n} autres": "{a}, {b} and {n} others",
     "{brouillons} procédures sont en cours, en attente de publication.": "{brouillons} procedures are in draft, waiting to be published.",
     "{cheminProc} · créée le {v}": "{cheminProc} · created on {v}",
     "{DOC_PAGES_MAX} pages au maximum. Au-delà, c'est un manuel entier : découpez-le en plusieurs procédures.": "{DOC_PAGES_MAX} pages at most. Beyond that it is a whole manual: split it into several procedures.",
+    "{j} j": "{j} d",
     "{lectures} sur {anJours} jours": "{lectures} over {anJours} days",
     "{length} activité sur {v} semaines": "{length} activity over {v} weeks",
     "{length} activités sur {v} semaines": "{length} activities over {v} weeks",
@@ -1094,8 +1354,11 @@ const DICO = {
     "{length} procédure(s) trouvée(s) mais aucune n'a pu être affichée. Signalez-le-moi.": "{length} procedure(s) found but none could be shown. Please tell us.",
     "{length} procédures": "{length} procedures",
     "{length} procédures reclassées.": "{length} procedures moved.",
+    "{length} sur {APPAREILS_MAX}": "{length} of {APPAREILS_MAX}",
     "{length} étape proposée · relisez avant de publier": "{length} step suggested · check before publishing",
     "{length} étapes proposées · relisez avant de publier": "{length} steps suggested · check before publishing",
+    "{lues} procédure lue": "{lues} procedure read",
+    "{lues} procédures lues": "{lues} procedures read",
     "{lus} sur {length}": "{lus} of {length}",
     "{MDP_MIN} caractères minimum": "{MDP_MIN} characters minimum",
     "{mensuel} € par mois": "€{mensuel} per month",
@@ -1112,18 +1375,38 @@ const DICO = {
     "{nom} est créée. Vous en êtes responsable.": "{nom} is created. You are in charge of it.",
     "{nom} est désormais en gestion.": "{nom} now has the Management area.",
     "{nom} est repassé en équipe.": "{nom} is back in the User area.",
-    "{nom} perdra l'accès aux procédures de l'entreprise. Son compte Standix n'est pas supprimé : elle pourra rejoindre une autre entreprise.": "{nom} will lose access to the company's procedures. Their Standix account is not deleted: they can join another company.",
+    "{nom} perdra l'accès aux procédures de l'entreprise.": "{nom} will lose access to the company's procedures.",
     "{nom} perdra l'accès à l'espace gestion et ne pourra plus que consulter les procédures publiées. Celles qu'elle a créées restent en place.": "{nom} will lose the Management area and can only open published procedures. The ones they created stay.",
     "{nom} pourra gérer les procédures, accéder à la page Analyse et à la page Accès, et retirer des membres de l’entreprise. Il n’aura plus accès à l’espace utilisateur.": "{nom} will be able to manage procedures, open the Analysis and Access pages, and remove members from the company. They will no longer have the User area.",
+    "{nom} sur iPhone": "{nom} on iPhone",
     "{nom} à {prix} € par mois. Écrivez-nous pour l'activer, nous répondons dans la journée.": "{nom} at €{prix} per month. Write to us to activate it, we reply the same day.",
     "{nom} — modifier le nom et le logo": "{nom} — edit the name and logo",
     "{n} <em>a quitté l’entreprise</em>": "{n} <em>left the company</em>",
     "{n} <em>a rejoint l’équipe</em>": "{n} <em>joined the team</em>",
     "{n} <em>est passé en espace Gestion</em>": "{n} <em>moved to the Management area</em>",
     "{n} <em>est passé en espace Utilisateur</em>": "{n} <em>moved to the User area</em>",
+    "{n} consultation": "{n} read",
+    "{n} consultations": "{n} reads",
+    "{n} dossier": "{n} folder",
+    "{n} dossiers": "{n} folders",
     "{n} membre": "{n} member",
     "{n} membres": "{n} members",
+    "{n} personne": "{n} person",
+    "{n} personnes": "{n} people",
+    "{n} procédure": "{n} procedure",
+    "{n} procédures": "{n} procedures",
+    "{n} sem.": "{n} wk",
+    "{n} sous-dossier": "{n} subfolder",
+    "{n} sous-dossiers": "{n} subfolders",
+    "{n} étape": "{n} step",
+    "{n} étape sans extrait défini": "{n} step with no clip set",
+    "{n} étapes": "{n} steps",
+    "{n} étapes sans extrait défini": "{n} steps with no clip set",
+    "{qui} a quitté l’équipe": "{qui} left the team",
+    "{qui} a été retiré·e de l’équipe": "{qui} was removed from the team",
     "{qui} modifie cette procédure en ce moment. Revenez dans quelques minutes.": "{qui} is editing this procedure right now. Come back in a few minutes.",
+    "{quoi} : aucune réponse après {ecoule} s.": "{quoi}: no answer after {ecoule} s.",
+    "{quoi} s’est interrompu : la connexion a été perdue.": "{quoi} stopped: the connection was lost.",
     "{raison}Cette procédure n'a pas de vidéo associée : l'analyse ne peut pas être relancée.": "{raison}This procedure has no video: the analysis cannot be restarted.",
     "{remplies} étape écrite. Relisez-les avant de publier.": "{remplies} step written. Check it before publishing.",
     "{remplies} étape écrite. {reste} sans texte : l’IA n’a pas entendu de parole à ces moments-là.": "{remplies} step written. {reste} without text: the AI heard no speech at those moments.",
@@ -1139,6 +1422,10 @@ const DICO = {
     "{v} doublon rapproché · vérifiez le découpage": "{v} duplicate merged · check the cuts",
     "{v} doublons rapprochés · vérifiez le découpage": "{v} duplicates merged · check the cuts",
     "{v} mots lus": "{v} words read",
+    "{v} s non couvertes au début": "{v} s not covered at the start",
+    "{v} s non couvertes à la fin": "{v} s not covered at the end",
+    "« {name} » n’a pas pu être lue.": "“{name}” could not be read.",
+    "« {name} » n’a pas répondu. Retirez-la et réessayez.": "“{name}” did not respond. Remove it and try again.",
     "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": "“{nomEntreprise}” has reached the number of members in its subscription. Your request has been passed to the person who manages it. They will let you in as soon as a seat frees up.",
     "« {nom} » ajoutée. Elle restera dans votre liste.": "“{nom}” added. It will stay in your list.",
     "« {titre} » est encore en cours d'analyse{v}. Vous ne pouvez pas la consulter avant la fin. Si vous n'en voulez plus, supprimez-la.": "“{titre}” is still being analysed{v}. You cannot open it until it is done. If you no longer want it, delete it.",
@@ -1146,10 +1433,14 @@ const DICO = {
     "« {titre} » et toutes ses étapes seront supprimées. Cette action est irréversible.": "“{titre}” and all its steps will be deleted. This cannot be undone.",
     "« {titre} » sera supprimée, avec sa vidéo et l'analyse en cours. C'est définitif.": "“{titre}” will be deleted, with its video and the analysis in progress. It is final.",
     "« {v} » sera retirée de la procédure.": "“{v}” will be removed from the procedure.",
+    "· entreprise active": "· active company",
+    "· {length} réseaux": "· {length} networks",
     "À lire": "To read",
+    "à l’instant": "just now",
     "Écartez ou resserrez les deux poignées blanches": "Pull the two white handles apart or together",
     "Échec : {message}": "Failed: {message}",
     "Échec : {v}": "Failed: {v}",
+    "écoute de la bande son… ({v})": "listening to the soundtrack… ({v})",
     "Écrivez chaque étape dans l'ordre": "Write each step in order",
     "Écrivez chaque étape dans l’ordre": "Write each step in order",
     "Écrivez chaque étape vous-même": "Write each step yourself",
@@ -1169,10 +1460,12 @@ const DICO = {
     "Éteindre la caméra": "Turn off the camera",
     "— ce que vous expliquez pendant chaque geste": "— your explanation during each move",
     "— objets et texte à l’écran": "— objects and text in the picture",
-    "• LE PLUS ET LE MOINS changent l’espace du membre. Le plus lui donne l’accès à l’espace gestion : il pourra gérer les procédures, et il aura accès à la page Analyse et à la page Accès de l’entreprise. Le moins lui donne uniquement l’accès à l’espace utilisateur : il aura uniquement accès aux procédures de l’entreprise. • LA PORTE retire la personne de l’entreprise. Ses lectures passées restent dans l’analyse. Elle n’a plus accès à l’espace de l’entreprise qui la concerne.": "• PLUS AND MINUS change the member's area.\n  Plus gives them the Management area: they can manage procedures and open the company's Analysis and Access pages.\n  Minus gives them the User area only: they can only open the company's procedures.\n\n• THE DOOR removes the person from the company. Their past reads stay in the analysis. They can no longer open the company's area.",
+    "• Le plus donne accès à l’espace gestion. • Le moins donne accès à l’espace utilisateur. • La porte retire la personne de l’entreprise.": "• The plus gives access to the Management area.\n• The minus gives access to the User area.\n• The door removes the person from the company.",
     "✓ Toute la vidéo est couverte, sans chevauchement": "✓ The whole video is covered, with no overlap",
   },
   de: {
+    "(aucun détail enregistré)": "(keine Details gespeichert)",
+    "(méthode classique)": "(Standardmethode)",
     "(optionnel)": "(optional)",
     "+ Ajouter une étape": "+ Schritt hinzufügen",
     ", ou plus court.": " oder kürzer.",
@@ -1181,6 +1474,7 @@ const DICO = {
     "/ mois": "/ Monat",
     "/ mois, hors taxes": "/ Monat, ohne Steuern",
     "/ mois, hors taxes, facturé à l’année": "/ Monat, ohne Steuern, jährlich abgerechnet",
+    "0 dossier · 0 procédure · accès complet": "0 Ordner · 0 Anleitungen · voller Zugriff",
     "1 an": "1 Jahr",
     "1 min": "1 Min.",
     "1 procédure est en cours, en attente de publication.": "1 Anleitung ist im Entwurf und wartet auf Veröffentlichung.",
@@ -1237,11 +1531,16 @@ const DICO = {
     "Abandonner et supprimer": "Verwerfen und löschen",
     "Abonnement": "Abo",
     "Abonnement annuel": "Jahresabo",
+    "abonnement complet": "Abo voll",
     "Abonnement mensuel": "Monatsabo",
     "Accès": "Zugriff",
+    "Accès au développement des procédures et aux pages Analyse et Gestion des accès.": "Kann Anleitungen erstellen und die Seiten Auswertung und Zugriffe öffnen.",
+    "accès complet": "voller Zugriff",
     "Accès complet débloqué.": "Voller Zugriff freigeschaltet.",
+    "Accès gestion": "Zugriffe verwalten",
     "Accès impossible : {message}": "Zugriff nicht möglich: {message}",
     "Accès suspendu": "Zugriff pausiert",
+    "Accès uniquement aux procédures publiées par l’entreprise.": "Sieht nur die vom Unternehmen veröffentlichten Anleitungen.",
     "Accéder directement à la procédure en scannant le QR code": "Mit dem QR-Code direkt zur Anleitung",
     "Accéder à l'espace Gestion": "Verwaltungsbereich öffnen",
     "Accéder à l'espace Équipe": "Nutzerbereich öffnen",
@@ -1266,55 +1565,88 @@ const DICO = {
     "Analyse": "Auswertung",
     "Analyse bloquée": "Auswertung hängt",
     "Analyse en cours": "Wird ausgewertet",
+    "Analyse refusée.": "Analyse abgelehnt.",
     "Analyse relancée.": "Auswertung neu gestartet.",
     "Analyse vidéo IA": "KI-Videoauswertung",
+    "analyses IA restantes": "KI-Analysen übrig",
     "Analyses épuisées": "Keine Auswertungen mehr",
     "Annuler": "Abbrechen",
     "Annuler (défaire)": "Rückgängig",
+    "Annuler (le code)": "Code aufheben",
+    "Annuler ce code ?": "Diesen Code aufheben?",
     "Annuler la dernière action": "Letzte Aktion rückgängig machen",
     "Annuler la dernière coupure": "Letzten Schnitt rückgängig machen",
+    "Annuler le code": "Code aufheben",
     "Annuler les modifications": "Änderungen verwerfen",
     "Annuler les modifications ?": "Änderungen verwerfen?",
     "Appareil retiré.": "Gerät entfernt.",
     "appel impossible": "Aufruf fehlgeschlagen",
+    "Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».": "Aufnahmetaste lange drücken, Mikrofon einschalten, dann „Aufnahme starten“.",
     "Appuyez pour filmer · 5 min au maximum": "Zum Aufnehmen drücken · höchstens 5 Min.",
     "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont": "Nach 14 Tagen sind Verwaltungs- und Nutzerbereich",
     "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont <b>suspendus</b> en attente de la souscription.": "Nach 14 Tagen werden Verwaltungs- und Nutzerbereich <b>pausiert</b>, bis ein Abo abgeschlossen ist.",
+    "arrivés récemment": "kürzlich beigetreten",
+    "Arrêt après {v} s": "Abbruch nach {v} s",
     "Assembler": "Zusammenfügen",
     "Attendre": "Warten",
     "Attention": "Achtung",
     "Au total": "Insgesamt",
+    "au total": "insgesamt",
+    "au total sur les procédures": "insgesamt auf Anleitungen",
+    "Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.": "Über hundert Personen: schriftliche Verfügbarkeitszusage, nach Absprache.",
     "Aucun abonnement à gérer": "Kein Abo zu verwalten",
     "Aucun appareil enregistré pour le moment.": "Noch keine Geräte.",
     "Aucun code": "Kein Code",
     "Aucun code d'accès libre pour le moment. Retentez dans un instant.": "Gerade ist kein freier Zugangscode verfügbar. Versuchen Sie es gleich noch einmal.",
     "Aucun dossier": "Keine Ordner",
     "Aucun dossier ne correspond à « {q} ».": "Kein Ordner passt zu „{q}“.",
+    "Aucun dossier ne correspond à « {v} ».": "Kein Ordner passt zu „{v}“.",
     "Aucun employé dans l'entreprise pour le moment.": "Noch keine Mitarbeitenden im Unternehmen.",
     "Aucun employé dans l'entreprise pour le moment. Partagez le code d'invitation dans Paramètres.": "Noch keine Mitarbeitenden im Unternehmen. Teilen Sie den Einladungscode aus den Einstellungen.",
     "Aucun favori pour le moment.": "Noch keine Favoriten.",
+    "aucun format enregistrable — MediaRecorder.isTypeSupported refuse mp4, vp9 et webm": "kein aufnehmbares Format — MediaRecorder.isTypeSupported lehnt mp4, vp9 und webm ab",
     "Aucun membre pour le moment.": "Noch keine Mitglieder.",
+    "Aucun mouvement ce mois-ci.": "Keine Änderungen diesen Monat.",
     "Aucun mouvement ces dernières semaines.": "Keine Änderungen in den letzten Wochen.",
     "Aucun poste n'a encore été défini par votre responsable.": "Ihre Führungskraft hat noch keine Positionen angelegt.",
     "Aucun poste pour le moment. Ajoutez-en un ci-dessous.": "Noch keine Positionen. Fügen Sie unten eine hinzu.",
     "Aucun résultat": "Keine Ergebnisse",
+    "Aucun temps de lecture sur cette période.": "Keine Lesezeit in diesem Zeitraum.",
     "Aucun élément": "Keine Einträge",
+    "Aucune caméra détectée sur cet appareil.": "Keine Kamera auf diesem Gerät gefunden.",
     "Aucune entreprise": "Kein Unternehmen",
     "Aucune entreprise avec ce code.": "Kein Unternehmen hat diesen Code.",
+    "Aucune entreprise ne correspond à ce code.": "Kein Unternehmen passt zu diesem Code.",
+    "Aucune erreur remontée.": "Keine Fehler gemeldet.",
+    "Aucune lecture": "Keine Aufrufe",
+    "Aucune lecture ce mois-ci": "Keine Aufrufe diesen Monat",
+    "Aucune lecture pour l’instant": "Noch keine Aufrufe",
     "Aucune lecture sur cette période.": "Keine Aufrufe in diesem Zeitraum.",
     "Aucune nouveauté ces trente derniers jours.": "Nichts Neues in den letzten dreißig Tagen.",
+    "aucune piste sonore récupérable — la vidéo en a-t-elle une ?": "keine nutzbare Tonspur — hat das Video eine?",
     "Aucune procédure": "Keine Anleitungen",
+    "aucune procédure": "keine Anleitungen",
+    "Aucune procédure ces deux dernières semaines": "Keine Anleitungen in den letzten zwei Wochen",
+    "Aucune procédure créée ce mois-ci.": "Diesen Monat wurden keine Anleitungen erstellt.",
     "Aucune procédure dans cette entreprise.": "Keine Anleitungen in diesem Unternehmen.",
+    "Aucune procédure en développement.": "Keine Anleitungen im Entwurf.",
     "Aucune procédure ne correspond à votre recherche.": "Keine Anleitung passt zu Ihrer Suche.",
     "Aucune procédure ne correspond à « {currentCategoryQuery} ».": "Keine Anleitung passt zu „{currentCategoryQuery}“.",
     "Aucune procédure ne correspond à « {q} ».": "Keine Anleitung passt zu „{q}“.",
+    "Aucune procédure n’est en ligne pour le moment.": "Noch keine Anleitung ist live.",
     "Aucune procédure pour le moment.": "Noch keine Anleitungen.",
     "Aucune procédure pour l’instant": "Noch keine Anleitungen",
     "Aucune procédure publiée pour le moment.": "Noch keine veröffentlichten Anleitungen.",
+    "Aucune réponse utile après {v} s · {aiNbSondages} sondages": "Keine brauchbare Antwort nach {v} s · {aiNbSondages} Abfragen",
     "Aucune vidéo": "Kein Video",
+    "Aucune vidéo à analyser.": "Kein Video zum Analysieren.",
     "Aucune étape": "Keine Schritte",
     "Aucune étape pour le moment.": "Noch keine Schritte.",
+    "Aujourd'hui": "Heute",
+    "aujourd'hui": "heute",
+    "Aujourd’hui": "Heute",
     "Autre": "Andere",
+    "Autres": "Andere",
     "Avant de continuer": "Bevor Sie weitermachen",
     "avant de publier : c'est vous qui connaissez le geste.": "vor dem Veröffentlichen: Sie kennen den Handgriff.",
     "Basculer": "Wechseln",
@@ -1325,11 +1657,14 @@ const DICO = {
     "Bonjour": "Hallo",
     "Bonjour {prenom}": "Hallo {prenom}",
     "Bonjour,": "Hallo,",
+    "Bonjour, Je souhaite en savoir plus sur l’offre Entreprise.": "Hallo, ich möchte mehr über den Enterprise-Tarif erfahren.",
     "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "Es dauert länger als sonst, aber die Auswertung läuft noch.",
+    "c'est vous qui connaissez le geste.": "Sie kennen den Handgriff.",
     "Caméra prête": "Kamera bereit",
     "Caméra éteinte": "Kamera aus",
     "Ce code correspond à la procédure suivante.": "Dieser Code gehört zu folgender Anleitung.",
     "Ce code correspond à une procédure qui n'existe pas ou plus.": "Dieser Code führt zu einer Anleitung, die es nicht (mehr) gibt.",
+    "Ce code donne accès à l’espace utilisateur. Vous pourrez ensuite leur donner accès à l’espace gestion.": "Dieser Code gibt Zugriff auf den Nutzerbereich. Danach können Sie ihnen Zugriff auf den Verwaltungsbereich geben.",
     "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire.": "Diesen Unternehmenscode gibt es nicht. Fragen Sie Ihre Führungskraft.",
     "Ce code n'existe pas, ou il a expiré. Vérifiez-le auprès de votre gestionnaire.": "Diesen Code gibt es nicht, oder er ist abgelaufen. Fragen Sie Ihre Führungskraft.",
     "Ce code ne correspond pas à cette entreprise.": "Dieser Code gehört nicht zu diesem Unternehmen.",
@@ -1337,34 +1672,44 @@ const DICO = {
     "Ce compte est déjà utilisé sur {APPAREILS_MAX} appareils. Cet appareil-ci a été déconnecté. Standix compte les lectures par personne : si votre équipe partage un seul compte, votre responsable ne sait pas qui a lu quoi. Demandez-lui votre propre accès — c'est compris dans votre abonnement.": "Dieses Konto wird bereits auf {APPAREILS_MAX} Geräten genutzt. Dieses Gerät wurde abgemeldet. Standix zählt Aufrufe pro Person: Teilt Ihr Team ein Konto, weiß Ihre Führungskraft nicht, wer was gelesen hat. Fragen Sie nach einem eigenen Zugang — er ist im Abo enthalten.",
     "Ce compte n'a pas encore d'abonnement payant. Choisissez une offre pour en activer un.": "Dieses Konto hat noch kein bezahltes Abo. Wählen Sie einen Tarif, um eines zu starten.",
     "Ce compteur est commun à toutes vos entreprises : une analyse lancée ailleurs le fait baisser ici aussi.": "Dieser Zähler gilt für alle Ihre Unternehmen: Eine Auswertung anderswo senkt ihn auch hier.",
+    "Ce document ne contient presque pas de texte. S'il s'agit d'un PDF scanné, l'image du texte ne peut pas être lue.": "Dieses Dokument enthält fast keinen Text. Bei einem gescannten PDF kann der Text im Bild nicht gelesen werden.",
     "Ce fichier n'est pas une image lisible.": "Diese Datei ist kein lesbares Bild.",
     "Ce lien a expiré. Demandez-en un nouveau depuis « Mot de passe oublié ».": "Dieser Link ist abgelaufen. Fordern Sie über „Passwort vergessen?“ einen neuen an.",
     "Ce lien a expiré. Demandez-en un nouveau.": "Dieser Link ist abgelaufen. Fordern Sie einen neuen an.",
     "Ce lien n’a pas pu être ouvert. Demandez-en un nouveau.": "Dieser Link ließ sich nicht öffnen. Fordern Sie einen neuen an.",
     "Ce lien n’a pas pu être vérifié.": "Dieser Link konnte nicht geprüft werden.",
+    "Ce mois": "Diesen Monat",
     "Ce mois-ci": "Diesen Monat",
+    "ce mois-ci": "diesen Monat",
     "Ce mot de passe est trop courant : il figure dans des fuites connues. Choisissez-en un autre.": "Dieses Passwort ist zu verbreitet: Es taucht in bekannten Datenlecks auf. Wählen Sie ein anderes.",
     "Ce n'est pas celle-là": "Das ist nicht die richtige",
     "Ce navigateur ne donne pas accès à la caméra": "Dieser Browser erlaubt keinen Zugriff auf die Kamera",
+    "Ce navigateur ne donne pas accès à la caméra.": "Dieser Browser erlaubt keinen Kamerazugriff.",
+    "ce navigateur ne sait pas enregistrer ({v})": "dieser Browser kann nicht aufnehmen ({v})",
     "Ce navigateur ne sait pas enregistrer : {v}": "Dieser Browser kann nicht aufnehmen: {v}",
+    "ce poste": "diese Position",
     "Ce poste existe déjà.": "Diese Position gibt es schon.",
     "Ce que l’IA analyse": "Was die KI auswertet",
     "Ce qui est visible": "Was zu sehen ist",
     "Ce qu’il ne faut surtout pas faire…": "Was Sie auf keinen Fall tun dürfen…",
     "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist.",
+    "cet appareil": "dieses Gerät",
     "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": "Dieses Gerät wird abgemeldet und gibt einen Platz frei. Es kann später wieder dazu, wenn ein Platz frei ist.",
+    "cet établissement": "dieser Standort",
     "Cette année": "Dieses Jahr",
     "Cette entreprise": "Dieses Unternehmen",
     "cette entreprise": "dieses Unternehmen",
     "Cette entreprise est complète": "Dieses Unternehmen ist voll",
     "Cette offre se construit avec vous. Écrivez-nous et nous revenons vers vous rapidement.": "Dieser Tarif entsteht gemeinsam mit Ihnen. Schreiben Sie uns, wir melden uns schnell.",
     "Cette personne": "Diese Person",
+    "cette personne": "diese Person",
     "Cette procédure": "Diese Anleitung",
     "Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?": "Diese Anleitung gehört zu „{nom}“, wo Sie schon Zugriff haben. Zu diesem Unternehmen wechseln, um sie zu öffnen?",
     "Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l'entreprise : il faut pour cela le code de votre responsable.": "Diese Anleitung gehört zu „{nom}“. Sie können sie öffnen, die anderen Anleitungen des Unternehmens aber nicht: Dafür brauchen Sie den Code Ihrer Führungskraft.",
     "Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.": "Diese Anleitung ist schon eine Weile offen, ohne dass sich etwas tut. Machen Sie weiter, wo Sie waren, oder kommen Sie später zurück.",
     "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": "Diese Anleitung hat noch keine Schritte. Sagen Sie Ihrer Führungskraft Bescheid: Die Schritte müssen erst ergänzt werden.",
     "Cette procédure n’a pas encore d’étapes.": "Diese Anleitung hat noch keine Schritte.",
+    "cette semaine": "diese Woche",
     "Cette vidéo dure {min} min {sec}. L'analyse accepte jusqu'à 5 minutes.": "Dieses Video dauert {min} Min. {sec}. Die Auswertung nimmt höchstens 5 Minuten an.",
     "Cette vidéo dure {m} min {sc}. L'analyse accepte jusqu'à 5 minutes.": "Dieses Video dauert {m} Min. {sc}. Die Auswertung nimmt höchstens 5 Minuten an.",
     "Cette vidéo pèse": "Dieses Video hat",
@@ -1372,6 +1717,7 @@ const DICO = {
     "Cette vidéo pèse encore": "Dieses Video hat noch",
     "Cette vidéo pèse encore <b>{size}</b>, au-delà des {max} Mo acceptés : {pourquoi}.<br>Refilmez en <b>720p à 30 images par seconde</b>, ou plus court.": "Dieses Video hat noch <b>{size}</b>, mehr als die erlaubten {max} MB: {pourquoi}.<br>Nehmen Sie erneut in <b>720p mit 30 Bildern pro Sekunde</b> oder kürzer auf.",
     "Cette vidéo pèse encore <b>{size}</b>, au-delà des {max} Mo acceptés.<br>Refilmez en <b>720p à 30 images par seconde</b>, ou plus court.": "Dieses Video hat noch <b>{size}</b>, mehr als die erlaubten {max} MB.<br>Nehmen Sie erneut in <b>720p mit 30 Bildern pro Sekunde</b> oder kürzer auf.",
+    "Cette vidéo pèse {v} une fois allégée, au-delà des {v2} acceptés. Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.": "Auch komprimiert ist dieses Video {v} groß, mehr als die erlaubten {v2}. Nehmen Sie kürzer auf — zwei bis drei Minuten reichen für einen Handgriff.",
     "Cette étape sera retirée de la procédure.": "Dieser Schritt wird aus der Anleitung entfernt.",
     "Changer d'entreprise": "Unternehmen wechseln",
     "Changer d'entreprise ?": "Unternehmen wechseln?",
@@ -1394,7 +1740,9 @@ const DICO = {
     "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": "Wählen Sie das Fenster oder den Tab für die Aufnahme. Die Steuerleiste bleibt für Sie sichtbar, erscheint aber nicht im Video.",
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
+    "Choisissez un mot de passe d’au moins 6 caractères.": "Wählen Sie ein Passwort mit mindestens 6 Zeichen.",
     "Choisissez votre enregistrement avec « Choisir une vidéo »": "Wählen Sie Ihre Aufnahme über „Video wählen“",
+    "Chrome sur Android": "Chrome auf Android",
     "Cinq minutes : enregistrement arrêté.": "Fünf Minuten: Aufnahme gestoppt.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Fünf Minuten: Hier endet die Aufnahme.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst.",
@@ -1432,7 +1780,9 @@ const DICO = {
     "Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.": "Konto erstellt! Bestätigen Sie per E-Mail und melden Sie sich dann an.",
     "Conditions d’utilisation": "Nutzungsbedingungen",
     "conditions d’utilisation": "Nutzungsbedingungen",
+    "Confirmer la suppression": "Löschen bestätigen",
     "Connectez-vous ou créez votre compte": "Melden Sie sich an oder erstellen Sie ein Konto",
+    "connecté": "verbunden",
     "Connexion impossible": "Verbindung nicht möglich",
     "Connexion impossible : {message}": "Anmeldung nicht möglich: {message}",
     "Consulter": "Öffnen",
@@ -1454,17 +1804,22 @@ const DICO = {
     "Créer une procédure": "Neue Anleitung",
     "Créer une procédure avec": "Anleitung erstellen mit",
     "Créer une procédure manuellement": "Anleitung selbst schreiben",
+    "Créez des procédures, suivez l'équipe, gérez les accès.": "Erstellen Sie Anleitungen, verfolgen Sie Ihr Team, verwalten Sie Zugriffe.",
     "Créez vos procédures avec l’IA.": "Erstellen Sie Ihre Anleitungen mit KI.",
     "Créez votre compte pour la consulter.": "Erstellen Sie Ihr Konto, um sie zu öffnen.",
     "Créez votre compte pour rejoindre « {nom} » et consulter la procédure.": "Erstellen Sie Ihr Konto, um „{nom}“ beizutreten und die Anleitung zu öffnen.",
+    "Créé": "Erstellt",
+    "Créé {quand}": "Erstellt {quand}",
     "Créée {v}": "Erstellt {v}",
     "c’est la dernière étape, elle prend souvent une à trois minutes.": "das ist der letzte Schritt, er dauert oft ein bis drei Minuten.",
     "Dans l’équipe depuis": "Im Team seit",
     "de formation ce mois-ci": "Einarbeitung diesen Monat",
+    "de lecture ce mois-ci": "Lesezeit diesen Monat",
     "de vos procédures": "Ihrer Anleitungen",
     "de vos procédures<br>sont accessibles": "Ihrer Anleitungen<br>sind verfügbar",
     "Demandez le code de l'entreprise à votre responsable pour y accéder.": "Fragen Sie Ihre Führungskraft nach dem Unternehmenscode.",
     "Depuis le début": "Seit Beginn",
+    "depuis le début": "seit Beginn",
     "Depuis le {date}": "Seit {date}",
     "Depuis le {v}": "Seit {v}",
     "depuis {depuis} minute": "seit {depuis} Minute",
@@ -1474,6 +1829,8 @@ const DICO = {
     "Derniers mouvements": "Letzte Änderungen",
     "Dernière consultation": "Zuletzt geöffnet",
     "Dernière procédure créée": "Zuletzt erstellte Anleitung",
+    "Dernières créations": "Zuletzt erstellt",
+    "Dernières étapes :": "Letzte Schritte:",
     "Dezoomer": "Verkleinern",
     "Disponible avec un abonnement": "Mit Abo verfügbar",
     "Diviser": "Teilen",
@@ -1484,6 +1841,9 @@ const DICO = {
     "Durée totale": "Gesamtdauer",
     "Dès la première lecture, vous verrez ici": "Ab dem ersten Aufruf sehen Sie hier",
     "Dès la première lecture, vous verrez ici <b>le temps de formation</b> que vos procédures ont fait gagner à votre établissement.": "Ab dem ersten Aufruf sehen Sie hier <b>die Einarbeitungszeit</b>, die Ihre Anleitungen Ihrem Standort gespart haben.",
+    "Dès que quelqu'un ouvrira une procédure, vous verrez ici celles qui occupent le plus votre équipe.": "Sobald jemand eine Anleitung öffnet, sehen Sie hier, welche Ihr Team am meisten beschäftigen.",
+    "Dès que quelqu'un ouvrira une procédure, vous verrez ici où part le temps de votre équipe.": "Sobald jemand eine Anleitung öffnet, sehen Sie hier, wofür Ihr Team seine Zeit verwendet.",
+    "Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.": "Sobald Ihr Team Anleitungen öffnet, sehen Sie hier, wie sich die Lesezeit entwickelt.",
     "Dès que votre équipe ouvrira vos procédures, vous verrez ici": "Sobald Ihr Team Ihre Anleitungen öffnet, sehen Sie hier",
     "Dès que votre équipe ouvrira vos procédures, vous verrez ici <b>le temps que vous n’avez plus à passer à expliquer</b>.": "Sobald Ihr Team Ihre Anleitungen öffnet, sehen Sie hier <b>die Zeit, die Sie nicht mehr mit Erklären verbringen</b>.",
     "Débloquer": "Freischalten",
@@ -1497,6 +1857,9 @@ const DICO = {
     "Définir comme utilisateur": "Zum Nutzer machen",
     "Définir {nom} comme utilisateur ?": "{nom} zum Nutzer machen?",
     "Définissez les postes de votre établissement. Chaque membre choisira le sien.": "Legen Sie die Positionen an Ihrem Standort fest. Jedes Mitglied wählt seine eigene.",
+    "Déjà consultée": "Schon gelesen",
+    "Dépôt de la photo refusé : {message}": "Foto-Upload abgelehnt: {message}",
+    "Dépôt du logo refusé : {message}": "Logo-Upload abgelehnt: {message}",
     "Détail copié.": "Details kopiert.",
     "détail de son activité": "Details der Aktivität",
     "Détail technique": "Technische Details",
@@ -1504,6 +1867,7 @@ const DICO = {
     "Détails": "Details",
     "E-mail": "E-Mail",
     "E-mail et mot de passe obligatoires.": "E-Mail und Passwort sind Pflicht.",
+    "Edge sur Android": "Edge auf Android",
     "Effacer la recherche": "Suche löschen",
     "Elle apparaît en tête de la fiche. Facultative.": "Erscheint oben in der Anleitung. Optional.",
     "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": "Erscheint auf der Karte und oben in der Anleitung. Optional.",
@@ -1511,6 +1875,7 @@ const DICO = {
     "en attente de la souscription.": "bis zum Abschluss eines Abos.",
     "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst. Sie können die Seite verlassen, es geht trotzdem weiter.",
     "En attente d’une place": "Wartet auf einen Platz",
+    "en ce moment": "gerade jetzt",
     "En cours": "Läuft",
     "En créant votre compte, vous acceptez les": "Mit dem Erstellen Ihres Kontos akzeptieren Sie die",
     "En dév.": "Entwurf",
@@ -1519,6 +1884,7 @@ const DICO = {
     "en pause": "pausiert",
     "En place.": "Erledigt.",
     "En souscrivant, vous acceptez les conditions d’utilisation de Standix.": "Mit dem Abschluss akzeptieren Sie die Nutzungsbedingungen von Standix.",
+    "en {v}": "im {v}",
     "Encore un peu de texte : il en faut au moins quelques phrases.": "Etwas mehr Text bitte: mindestens ein paar Sätze.",
     "Enregistrement impossible : {message}": "Speichern nicht möglich: {message}",
     "Enregistrement prêt — lancez l’analyse": "Aufnahme fertig — Auswertung starten",
@@ -1530,31 +1896,48 @@ const DICO = {
     "Enregistrer les étapes": "Schritte speichern",
     "Enregistrer l’écran": "Bildschirm aufnehmen",
     "Enregistré.": "Gespeichert.",
+    "Entreprise": "Enterprise",
     "Entrez d’abord votre adresse e-mail.": "Geben Sie zuerst Ihre E-Mail-Adresse ein.",
     "Entrez le code à 6 caractères que son responsable vous a communiqué. Elle s'ajoutera à celles que vous avez déjà.": "Geben Sie den 6-stelligen Code ein, den Sie von der Führungskraft bekommen haben. Er kommt zu Ihren bisherigen hinzu.",
+    "environ {minutes} minute": "etwa {minutes} Minute",
+    "environ {minutes} minutes": "etwa {minutes} Minuten",
+    "envoi de {v} — gardez l’app ouverte {attente}": "{v} wird hochgeladen — lassen Sie die App offen {attente}",
     "Envoi impossible : {v}": "Senden nicht möglich: {v}",
     "Envoi…": "Wird gesendet…",
     "erreur": "Fehler",
     "Erreur ({status}) : {message}": "Fehler ({status}): {message}",
     "Erreur : {message}": "Fehler: {message}",
+    "Erreur au démarrage de l'analyse": "Fehler beim Start der Analyse",
     "Erreur d'upload vidéo : {message}": "Fehler beim Hochladen des Videos: {message}",
+    "erreur inconnue": "unbekannter Fehler",
+    "Erreur inconnue (pas de message)": "Unbekannter Fehler (keine Meldung)",
     "Erreur étapes : {message}": "Fehler bei den Schritten: {message}",
     "Espace Gestion": "Verwaltungsbereich",
+    "Espace gestion": "Verwaltungsbereich",
     "Espace Utilisateur": "Nutzerbereich",
+    "Espace utilisateur": "Nutzerbereich",
+    "Espace Équipe": "Teambereich",
     "Essai 14 jours gratuit": "14 Tage kostenlos",
+    "Essai 14 jours gratuits": "14 Tage kostenlos testen",
+    "Essentiel": "Essential",
     "et": "und",
     "Ex : Accueil": "z. B. Empfang",
     "Ex : Accueillir un client": "z. B. Einen Kunden empfangen",
     "Ex : Le Comptoir": "z. B. Der Tresen",
     "Ex : Responsable": "z. B. Leitung",
     "Ex : Réception client": "z. B. Kundenempfang",
+    "Expire dans moins d’une heure": "Läuft in weniger als einer Stunde ab",
+    "Expire dans {heures} heures": "Läuft in {heures} Stunden ab",
+    "Expire dans {jours} jours": "Läuft in {jours} Tagen ab",
     "Expire dans {v}": "Läuft ab in {v}",
+    "Expiré": "Abgelaufen",
     "Exécutez migration-presences.sql.": "Führen Sie migration-presences.sql aus.",
     "Facultatif · les initiales serviront sinon": "Optional · sonst werden die Initialen verwendet",
     "Faites glisser pour affiner au dixième de seconde": "Ziehen Sie, um auf die Zehntelsekunde genau einzustellen",
     "Favori non enregistré : {v}": "Favorit nicht gespeichert: {v}",
     "Favoris": "Favoriten",
     "Fermer": "Schließen",
+    "Fermez l'app qui l'utilise, puis réessayez.": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut.",
     "Fermez l’application qui s’en sert, puis réessayez.": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut.",
     "Fichier": "Datei",
     "Fichier trop lourd : 12 Mo maximum.": "Datei zu groß: höchstens 12 MB.",
@@ -1565,23 +1948,43 @@ const DICO = {
     "Filmez la tâche en expliquant à voix haute. Cinq minutes maximum.": "Nehmen Sie die Aufgabe auf und erklären Sie sie laut. Höchstens fünf Minuten.",
     "Fin": "Ende",
     "Fin ici": "Ende hier",
+    "Finalisation de la vidéo…": "Video wird fertiggestellt…",
+    "Firefox sur Android": "Firefox auf Android",
     "Fonctionnement des boutons": "So funktionieren die Schaltflächen",
+    "forfait non renseigné": "Tarif nicht angegeben",
+    "Format non reconnu. Acceptés : PDF, Word (.docx), texte (.txt).": "Format nicht erkannt. Erlaubt: PDF, Word (.docx), Text (.txt).",
     "Fusionner": "Zusammenführen",
     "Fusionner avec {nouveau} ?": "Mit {nouveau} zusammenführen?",
     "Garder": "Behalten",
+    "Garder le code": "Code behalten",
     "Gestion": "Verwaltung",
     "Gestion des accès": "Zugriff",
     "Gestion indisponible": "Verwaltung nicht verfügbar",
     "gestionnaire": "Verwalter",
+    "Glissez depuis le coin haut droit de l’écran.": "Wischen Sie von der oberen rechten Ecke nach unten.",
+    "Glissez depuis le haut de l’écran.": "Wischen Sie vom oberen Bildschirmrand nach unten.",
     "Génération...": "Wird erzeugt…",
     "Générer les étapes": "Schritte erzeugen",
     "Générez un code pour que votre équipe puisse accéder aux procédures.": "Erstellen Sie einen Code, damit Ihr Team die Anleitungen öffnen kann.",
+    "Gérant": "Inhaber",
     "Gérer ou résilier mon abonnement": "Abo verwalten oder kündigen",
     "Gérez vos procédures.": "Verwalten Sie Ihre Anleitungen.",
+    "Hier": "Gestern",
+    "hier": "gestern",
+    "hors ligne": "offline",
     "Ignorer": "Ausblenden",
     "Ignorer ce signalement ?": "Diesen Hinweis ausblenden?",
     "Il cessera immédiatement de fonctionner. Les personnes déjà inscrites gardent leur accès.": "Er funktioniert sofort nicht mehr. Wer schon registriert ist, behält den Zugriff.",
     "Il reparaîtra si le partage continue. Créer un compte par personne reste le seul moyen de savoir qui a lu quoi.": "Er erscheint wieder, wenn weiter geteilt wird. Nur ein Konto pro Person zeigt, wer was gelesen hat.",
+    "il y a {h} h": "vor {h} Std.",
+    "il y a {jours} jours": "vor {jours} Tagen",
+    "il y a {j} jours": "vor {j} Tagen",
+    "il y a {minutes} min": "vor {minutes} Min.",
+    "il y a {n} semaine": "vor {n} Woche",
+    "il y a {n} semaines": "vor {n} Wochen",
+    "il y a {v} min": "vor {v} Min.",
+    "il y a {v} mois": "vor {v} Monaten",
+    "il y a {v} semaines": "vor {v} Wochen",
     "Image trop lourde : 6 Mo maximum.": "Bild zu groß: höchstens 6 MB.",
     "Importez d’abord une vidéo.": "Fügen Sie zuerst ein Video hinzu.",
     "Importez une vidéo.": "Fügen Sie ein Video hinzu.",
@@ -1589,13 +1992,18 @@ const DICO = {
     "Impossible de créer la procédure : {v}": "Anleitung konnte nicht erstellt werden: {v}",
     "Impossible de lire vos appareils : {message}<br>Exécutez migration-presences.sql.": "Ihre Geräte konnten nicht gelesen werden: {message}<br>Führen Sie migration-presences.sql aus.",
     "Impossible de lire votre fiche : {erreur}": "Ihr Profil konnte nicht gelesen werden: {erreur}",
+    "Impossible de préparer la vidéo pour l'analyse.": "Das Video konnte nicht für die Analyse vorbereitet werden.",
     "Impossible de quitter pour le moment.": "Verlassen ist gerade nicht möglich.",
     "Impossible de rejoindre l'entreprise : {m}": "Beitritt zum Unternehmen nicht möglich: {m}",
     "Impossible de relancer": "Neustart nicht möglich",
+    "Impossible de vérifier votre abonnement.": "Ihr Abo konnte nicht geprüft werden.",
     "Inscription gérant": "Registrierung Inhaber",
     "Inscription utilisateur": "Registrierung Nutzer",
     "Interface en <b>français, anglais et allemand</b>": "App auf <b>Französisch, Englisch und Deutsch</b>",
     "Inviter votre équipe": "Team einladen",
+    "Invitez votre équipe avec le code de l'entreprise.": "Laden Sie Ihr Team mit dem Unternehmenscode ein.",
+    "Invitez votre équipe avec le code de l'entreprise. C'est à partir de là que vous saurez qui suit vos procédures.": "Laden Sie Ihr Team mit dem Unternehmenscode ein. Ab dann sehen Sie, wer Ihre Anleitungen befolgt.",
+    "Invitez votre équipe pour voir l’analyse.": "Laden Sie Ihr Team ein, um die Auswertung zu sehen.",
     "jamais": "nie",
     "jamais ouverte": "nie geöffnet",
     "Je continue": "Weitermachen",
@@ -1609,37 +2017,59 @@ const DICO = {
     "J’ai ma vidéo — l’utiliser": "Video ist fertig — verwenden",
     "L'abonnement de votre établissement a pris fin. Vos procédures sont conservées : elles reviendront dès que votre responsable aura renouvelé.": "Das Abo Ihres Standorts ist abgelaufen. Ihre Anleitungen bleiben erhalten und sind wieder da, sobald Ihre Führungskraft verlängert.",
     "L'analyse a échoué": "Die Auswertung ist fehlgeschlagen",
+    "L'analyse a échoué — touchez pour relancer": "Analyse fehlgeschlagen — tippen zum Wiederholen",
     "L'analyse dure depuis {v} minutes sans aboutir. Elle est probablement bloquée chez Azure.": "Die Auswertung läuft seit {v} Minuten ohne Ergebnis. Sie hängt vermutlich bei Azure.",
+    "L'analyse semble bloquée — touchez pour relancer": "Analyse scheint zu hängen — tippen zum Wiederholen",
+    "L'analyse tourne depuis plus de {ANALYSE_LIMITE_MIN} minutes, ce qui n'est pas normal. Relancer depuis le début ?": "Die Analyse läuft seit über {ANALYSE_LIMITE_MIN} Minuten, das ist nicht normal. Von vorne neu starten?",
     "L'enregistrement est vide.": "Die Aufnahme ist leer.",
+    "L'entreprise n'a pas été créée : {v}": "Das Unternehmen wurde nicht erstellt: {v}",
+    "L'envoi de la vidéo": "Das Hochladen des Videos",
     "L'espace Gestion ne vous est plus accessible. Vos procédures créées restent en place.": "Der Verwaltungsbereich ist für Sie nicht mehr zugänglich. Ihre erstellten Anleitungen bleiben.",
     "L'espace Équipe ne vous sera plus accessible : vous êtes maintenant de l'autre côté.": "Der Nutzerbereich ist für Sie nicht mehr zugänglich: Sie sind jetzt auf der anderen Seite.",
     "L'IA a découpé la procédure.": "Die KI hat die Anleitung aufgeteilt.",
     "L'IA a découpé la procédure. <b>Relisez chaque étape</b> avant de publier :": "Die KI hat die Anleitung aufgeteilt. <b>Prüfen Sie jeden Schritt</b> vor dem Veröffentlichen:",
     "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin": "Die KI hat diese Schritte geschrieben — korrigieren Sie bei Bedarf Text oder Ausschnitt",
+    "L'IA n'a pas trouvé d'étapes dans ce document. Il décrit peut-être une situation plutôt qu'une marche à suivre.": "Die KI hat in diesem Dokument keine Schritte gefunden. Es beschreibt vielleicht eine Situation statt eines Ablaufs.",
     "l'équipe": "das Team",
+    "La base a refusé l'adhésion.": "Die Datenbank hat den Beitritt abgelehnt.",
     "La base a refusé la modification.": "Die Datenbank hat die Änderung abgelehnt.",
+    "La base a refusé la modification. Exécutez migration-etablissements.sql : il manque la règle d'accès « update » sur la table entreprises.": "Die Datenbank hat die Änderung abgelehnt. Führen Sie migration-etablissements.sql aus: Die Zugriffsregel „update“ fehlt in der Tabelle entreprises.",
     "La base a refusé la modification. Exécutez migration-promotion.sql.": "Die Datenbank hat die Änderung abgelehnt. Führen Sie migration-promotion.sql aus.",
+    "La base a refusé la suppression. C'est une règle d'accès : votre compte n'a pas le droit de supprimer une procédure. Il faut ajouter une règle « delete » sur la table procedures dans Supabase.": "Die Datenbank hat das Löschen abgelehnt. Es ist eine Zugriffsregel: Ihr Konto darf keine Anleitung löschen. In Supabase muss eine „delete“-Regel für die Tabelle procedures hinzugefügt werden.",
+    "La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d'accès « delete » sur la table entreprises.": "Die Datenbank hat das Löschen abgelehnt. Führen Sie migration-etablissements.sql aus: Die Zugriffsregel „delete“ fehlt in der Tabelle entreprises.",
     "La base a refusé le départ. Vérifiez la règle « delete » sur la table membres.": "Die Datenbank hat das Entfernen abgelehnt. Prüfen Sie die „delete“-Regel der Tabelle membres.",
+    "La base ne sait pas encore créer un établissement. Exécutez migration-creer-etablissement.sql.": "Die Datenbank kann noch keinen Standort anlegen. Führen Sie migration-creer-etablissement.sql aus.",
     "La caméra est bloquée": "Die Kamera ist blockiert",
     "La caméra est déjà utilisée": "Die Kamera wird bereits verwendet",
+    "La caméra est déjà utilisée par une autre application.": "Die Kamera wird bereits von einer anderen App genutzt.",
+    "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.": "Die Kamera funktioniert nur über HTTPS. Öffnen Sie die App über ihre übliche Adresse, nicht als lokale Datei.",
     "La caméra n’a pas pu s’ouvrir": "Die Kamera ließ sich nicht öffnen",
     "La caméra n’est accessible qu’en HTTPS. Ouvrez Standix depuis son adresse habituelle.": "Die Kamera funktioniert nur über HTTPS. Öffnen Sie Standix über die gewohnte Adresse.",
+    "La connexion a été interrompue. Vérifiez votre réseau et réessayez.": "Die Verbindung wurde unterbrochen. Prüfen Sie Ihr Netzwerk und versuchen Sie es erneut.",
     "La consultation n'a pas pu être enregistrée : {message}": "Der Aufruf konnte nicht gespeichert werden: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Kopieren fehlgeschlagen — markieren Sie den Text von Hand.",
     "La création d'entreprise n'est pas installée sur la base. Exécutez migration-creation-entreprise.sql.": "Die Unternehmenserstellung ist in der Datenbank nicht eingerichtet. Führen Sie migration-creation-entreprise.sql aus.",
+    "La génération a échoué.": "Die Erstellung ist fehlgeschlagen.",
     "La langue choisie traduit aussi les étapes des procédures.": "Die gewählte Sprache übersetzt auch die Schritte der Anleitungen.",
-    "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": "Die Sprache gilt für die ganze App. Jede Person kann ihre eigene wählen.",
     "La photo n’a pas pu être envoyée.": "Das Foto konnte nicht gesendet werden.",
+    "La procédure d'analyse n'a pas pu être créée.": "Die Anleitung für die Analyse konnte nicht erstellt werden.",
     "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "Die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
     "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
     "La procédure n’a pas pu être supprimée. Réessayez dans quelques instants.": "Die Anleitung konnte nicht gelöscht werden. Versuchen Sie es gleich noch einmal.",
     "La procédure reviendra telle qu'elle est enregistrée. Ce que vous venez d'écrire sera perdu.": "Die Anleitung kehrt zur gespeicherten Fassung zurück. Was Sie gerade geschrieben haben, geht verloren.",
+    "La préparation de la vidéo a échoué.": "Die Vorbereitung des Videos ist fehlgeschlagen.",
+    "La préparation du lien": "Die Vorbereitung des Links",
+    "la semaine dernière": "letzte Woche",
     "La suppression a échoué.": "Löschen fehlgeschlagen.",
+    "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": "Das Video dieser Anleitung ist nicht auffindbar. Vielleicht wurde es gelöscht oder nicht fertig hochgeladen. Nehmen Sie die Anleitung neu auf, um die Analyse neu zu starten.",
+    "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": "Das Video wurde nicht fertig hochgeladen. Lassen Sie die App beim Hochladen offen und starten Sie die Analyse dann neu.",
+    "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "Das Video wurde nicht vollständig hochgeladen. Starten Sie die Analyse neu und lassen Sie die App offen.",
     "Lampe torche": "Taschenlampe",
     "Lancer la vidéo": "Video abspielen",
     "Langue": "Sprache",
     "Langue de l’application": "Sprache der App",
     "Langue parlée": "Gesprochene Sprache",
+    "Le bouton n’y est pas ? Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».": "Taste fehlt? Einstellungen › Kontrollzentrum › „Bildschirmaufnahme“ hinzufügen.",
     "Le changement est fait, mais la date n’a pas pu être enregistrée": "Die Änderung ist erledigt, das Datum konnte aber nicht gespeichert werden",
     "Le chargement n'aboutit pas": "Das Laden kommt nicht zum Ende",
     "Le code comporte 6 caractères.": "Der Code hat 6 Zeichen.",
@@ -1648,16 +2078,26 @@ const DICO = {
     "Le compte de {v} est utilisé sur {max} appareils.": "Das Konto von {v} wird auf {max} Geräten genutzt.",
     "Le compte n’a pas pu être lu.": "Das Konto konnte nicht gelesen werden.",
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "Die Zeit läuft, solange eine Anleitung auf dem Bildschirm OFFEN ist, und nur dann. • Sie stoppt, sobald die App in den Hintergrund geht oder der Bildschirm ausgeht. • Nach zwei Minuten ohne Berührung fragt sie „Wie weit sind Sie?“ und zählt nicht weiter, bis jemand antwortet — ein Handy auf der Arbeitsfläche sammelt keine Stunden. • Unter drei Sekunden zählt nichts: Das ist ein Vorbeischauen, kein Lesen. Die Zeiten addieren sich bei jedem Besuch.",
+    "Le démarrage a échoué": "Der Start ist fehlgeschlagen",
     "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "Das Mikrofon ist während der Aufnahme an. Die Schritte entstehen vor allem aus dem, was Sie sagen.",
     "Le mot de passe doit faire au moins {MDP_MIN} caractères.": "Das Passwort muss mindestens {MDP_MIN} Zeichen haben.",
+    "Le navigateur a refusé de lire « {name} ». Relancez le collage sans quitter cette page entre-temps.": "Der Browser konnte „{name}“ nicht lesen. Starten Sie das Zusammenfügen neu, ohne diese Seite zwischendurch zu verlassen.",
+    "le navigateur ne rend pas videoWidth/videoHeight": "der Browser liefert kein videoWidth/videoHeight",
     "Le nom est obligatoire.": "Der Name ist Pflicht.",
     "Le nom ne correspond pas. Rien n’a été supprimé.": "Der Name stimmt nicht. Es wurde nichts gelöscht.",
     "Le nom ne peut pas être vide.": "Der Name darf nicht leer sein.",
+    "Le paiement n'a pas pu s'ouvrir.": "Die Zahlung konnte nicht geöffnet werden.",
     "Le partage d'écran n'a pas pu démarrer : {v}": "Bildschirmfreigabe konnte nicht starten: {v}",
     "Le PDF n’a pas pu être créé": "Das PDF konnte nicht erstellt werden",
+    "Le portail n’a pas pu s’ouvrir.": "Das Portal konnte nicht geöffnet werden.",
     "Le QR code fonctionnera une fois la procédure en ligne.": "Der QR-Code funktioniert, sobald die Anleitung live ist.",
+    "Le scanner n'a pas pu démarrer.": "Der Scanner konnte nicht starten.",
     "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": "Der Auswertungsserver antwortete {status}{v} — abgefragte Anleitung: {aiProcedureId}",
     "Le serveur d'analyse est injoignable. Réessayez dans un instant.": "Der Auswertungsserver ist nicht erreichbar. Versuchen Sie es gleich noch einmal.",
+    "Le serveur d'analyse n'a pas répondu. Réessayez dans un instant.": "Der Analyse-Server hat nicht geantwortet. Versuchen Sie es gleich noch einmal.",
+    "Le service d’analyse n’a pas répondu à temps. Réessayez dans quelques minutes.": "Der Analysedienst hat nicht rechtzeitig geantwortet. Versuchen Sie es in ein paar Minuten erneut.",
+    "Le stockage a refusé la vidéo : {m}": "Der Speicher hat das Video abgelehnt: {m}",
+    "Le stockage a refusé un fichier de {v}. Filmez une séquence plus courte.": "Der Speicher hat eine Datei mit {v} abgelehnt. Nehmen Sie kürzer auf.",
     "le temps de formation": "die Einarbeitungszeit",
     "le temps de vous placer": "Zeit, sich bereitzumachen",
     "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Die Zeit pro Anleitung ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt.",
@@ -1669,18 +2109,31 @@ const DICO = {
     "Le total dépasse {n} minutes. Retirez une vidéo, ou coupez-en une.": "Die Gesamtdauer liegt über {n} Minuten. Entfernen oder kürzen Sie ein Video.",
     "le {v}": "am {v}",
     "Lecture": "Abspielen",
+    "lecture": "Aufruf",
+    "Lecture de votre vidéo": "Ihr Video wird gelesen",
     "Lecture des vidéos…": "Videos werden gelesen…",
     "Lecture du document…": "Dokument wird gelesen…",
     "Lecture en cours": "Wird abgespielt",
+    "lectures": "Aufrufe",
     "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": "Videoauswertungen werden monatlich zurückgesetzt und nicht übertragen.",
     "Les arrivées, les départs et les changements de rang s’afficheront ici.": "Neuzugänge, Abgänge und Zugriffsänderungen erscheinen hier.",
     "Les autres procédures ne vous sont pas accessibles": "Die anderen Anleitungen können Sie nicht öffnen",
+    "Les catégories se créent toutes seules à mesure que vous ajoutez des procédures — Cuisine, Salle, Bar…": "Ordner entstehen von selbst, wenn Sie Anleitungen hinzufügen — Küche, Gastraum, Bar…",
+    "Les fichiers .doc (ancien format Word) ne peuvent pas être lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.": ".doc-Dateien (altes Word-Format) können nicht gelesen werden. Speichern Sie sie als .docx oder kopieren Sie den Text oben hinein.",
     "Les membres de l’espace utilisateur": "Die Personen im Nutzerbereich",
+    "Les moins actifs": "Am wenigsten aktiv",
+    "les moins actifs": "am wenigsten aktiv",
+    "Les moins consultées": "Am wenigsten gelesen",
+    "Les mêmes fonctionnalités, sans exception.": "Dieselben Funktionen, ohne Ausnahme.",
     "Les personnes qui l'ont choisi le gardent : seul le choix disparaît pour les prochaines.": "Wer sie gewählt hat, behält sie: Nur die Auswahl verschwindet für neue Personen.",
+    "les plus actifs": "am aktivsten",
     "Les plus lues": "Am meisten gelesen",
     "Les postes": "Positionen",
+    "Les procédures créées apparaissent ici pendant quinze jours. Les plus anciennes restent accessibles dans l’onglet Procédures.": "Neue Anleitungen erscheinen hier zwei Wochen lang. Ältere bleiben im Tab Anleitungen.",
+    "Les procédures de « {ancien} » dans « {dossier} » suivront. Videz le champ pour retirer le sous-dossier : elles remonteront en haut du dossier.": "Die Anleitungen aus „{ancien}“ in „{dossier}“ ziehen mit. Leeren Sie das Feld, um den Unterordner zu entfernen: Sie wandern dann in den Ordner selbst.",
     "Les procédures de « {ancien} » remonteront en haut de « {dossier} ». Aucune procédure n'est supprimée.": "Die Anleitungen aus „{ancien}“ wandern nach oben in „{dossier}“. Keine Anleitung wird gelöscht.",
     "Les {etapesTotal} étapes sont faites": "Alle {etapesTotal} Schritte sind erledigt",
+    "Les étapes {i} et {v} se recoupent sur {v2} s": "Schritte {i} und {v} überschneiden sich um {v2} s",
     "Limité à 5 min de vidéo": "Höchstens 5 Minuten Video",
     "Lire": "Abspielen",
     "Lire les conditions": "Bedingungen lesen",
@@ -1688,20 +2141,29 @@ const DICO = {
     "Loupe ·": "Lupe ·",
     "Lues": "Gelesen",
     "L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document": "Die <b>Standix-KI</b> schreibt die Anleitung aus einem Video oder Dokument",
+    "L’analyse a échoué.": "Die Analyse ist fehlgeschlagen.",
     "L’analyse est terminée : {length} étapes.": "Auswertung fertig: {length} Schritte.",
+    "L’analyse n’a pas démarré.": "Die Analyse hat nicht begonnen.",
+    "L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; si cela persiste, écrivez-nous depuis les réglages.": "Die Analyse konnte nicht neu starten. Versuchen Sie es in ein paar Minuten erneut; wenn es weiter passiert, schreiben Sie uns über die Einstellungen.",
+    "L’analyse prend trop de temps. Réessayez, ou écrivez les étapes vous-même.": "Die Analyse dauert zu lange. Versuchen Sie es erneut oder schreiben Sie die Schritte selbst.",
     "L’enregistrement démarre dans": "Aufnahme startet in",
     "L’enregistrement est vide.": "Die Aufnahme ist leer.",
     "L’IA crée la procédure à partir d’un document": "Die KI erstellt die Anleitung aus einem Dokument",
     "L’IA crée la procédure à partir d’une vidéo": "Die KI erstellt die Anleitung aus einem Video",
     "L’IA en tirera des étapes, que vous relirez.": "Die KI macht daraus Schritte, die Sie prüfen.",
     "L’IA lit le texte et en tire les étapes, dans l’ordre.": "Die KI liest den Text und zieht die Schritte der Reihe nach heraus.",
+    "L’IA n’a rien tiré de cette vidéo. Vérifiez que la parole est audible.": "Die KI konnte mit diesem Video nichts anfangen. Prüfen Sie, ob die Sprache hörbar ist.",
     "L’IA rédige la procédure": "Die KI schreibt die Anleitung",
     "L’IA transforme la vidéo en procédure": "Die KI macht aus Ihrem Video eine Anleitung",
+    "L’IA écoute et regarde…": "Die KI hört und schaut zu…",
     "L’IA écrit les étapes à votre place": "Die KI schreibt die Schritte für Sie",
     "L’écoute est terminée. L’IA met la procédure au propre —": "Das Zuhören ist fertig. Die KI bringt die Anleitung in Form —",
     "Marquez le début et la fin de chaque étape": "Markieren Sie Anfang und Ende jedes Schritts",
     "Masquer": "Ausblenden",
     "Masquer le mot de passe": "Passwort verbergen",
+    "Membre": "Mitglied",
+    "membre": "Mitglied",
+    "membres": "Mitglieder",
     "Menu <b>Safari</b> → <b>Réglages pour ce site web</b>": "Menü <b>Safari</b> → <b>Einstellungen für diese Website</b>",
     "Merci d'indiquer le nom de votre entreprise.": "Bitte geben Sie den Namen Ihres Unternehmens ein.",
     "Merci de renseigner votre prénom et votre nom.": "Bitte geben Sie Vor- und Nachnamen ein.",
@@ -1712,11 +2174,15 @@ const DICO = {
     "minutes": "Minuten",
     "minutes au total": "Minuten insgesamt",
     "minutes ce mois-ci": "Minuten diesen Monat",
+    "Mise en forme": "Formatierung",
+    "Mod. {quand}": "Geändert {quand}",
     "Modifications enregistrées": "Änderungen gespeichert",
     "Modifier": "Bearbeiten",
+    "Modifier la photo": "Foto ändern",
     "Modifier la procédure": "Anleitung bearbeiten",
     "Modifier l’établissement": "Standort bearbeiten",
     "Modifiez le titre, le dossier ou les étapes": "Titel, Ordner oder Schritte ändern",
+    "moins d’une minute": "weniger als eine Minute",
     "Mot de passe": "Passwort",
     "Mot de passe inchangé": "Passwort unverändert",
     "Mot de passe modifié": "Passwort geändert",
@@ -1725,11 +2191,14 @@ const DICO = {
     "Mouvements de l’équipe": "Team-Änderungen",
     "Mouvements indisponibles.": "Änderungen nicht verfügbar.",
     "MP4 ou MOV · 5 minutes au maximum": "MP4 oder MOV · höchstens 5 Minuten",
+    "Même allégée, cette vidéo pèse {v}, au-delà des {v2} Mo acceptés. Baissez la définition de votre caméra, ou filmez plus court.": "Auch komprimiert ist dieses Video {v} groß, mehr als die erlaubten {v2} MB. Senken Sie die Kameraauflösung oder nehmen Sie kürzer auf.",
     "Nom": "Nachname",
     "Nom A → Z": "Name A → Z",
+    "nom A → Z": "Name A → Z",
     "Nom complet": "Vollständiger Name",
     "Nom de l'entreprise": "Name des Unternehmens",
     "Nom de l'établissement": "Name des Standorts",
+    "Nom du dossier": "Ordnername",
     "Nom et logo de l’entreprise": "Name und Logo des Unternehmens",
     "Nombre de lectures par procédure.": "Wie oft jede Anleitung gelesen wurde.",
     "Non ajoutée : {liste} — durée illisible.": "Nicht hinzugefügt: {liste} — Dauer nicht lesbar.",
@@ -1737,11 +2206,13 @@ const DICO = {
     "Non défini": "Nicht festgelegt",
     "Nous contacter": "Kontakt",
     "Nous écrire": "Schreiben Sie uns",
+    "Nouveau mot de passe": "Neues Passwort",
     "Nouvel établissement": "Neuer Standort",
     "Nouvelle procédure": "Neue Anleitung",
     "Offre Entreprise": "Tarif Enterprise",
     "Offre {nom}": "Tarif {nom}",
     "Offre {nom} · {prix} € par mois": "Tarif {nom} · {prix} € pro Monat",
+    "Ou : menu ≡ → Paramètres → Sites et téléchargements → Autorisations des sites → Caméra.": "Oder: Menü ≡ → Einstellungen → Websites und Downloads → Website-Berechtigungen → Kamera.",
     "ou <b>{v} € par mois</b> en payant à l’année": "oder <b>{v} € pro Monat</b> bei jährlicher Zahlung",
     "Ouverture de la caméra...": "Kamera wird geöffnet…",
     "Ouverture de la procédure...": "Anleitung wird geöffnet…",
@@ -1756,15 +2227,25 @@ const DICO = {
     "Paiement indisponible": "Zahlung nicht verfügbar",
     "par mois, hors taxes": "pro Monat, ohne Steuern",
     "Partagez le code d'invitation dans Paramètres.": "Teilen Sie den Einladungscode aus den Einstellungen.",
+    "partagé entre vos entreprises": "geteilt zwischen Ihren Unternehmen",
+    "Pas encore consultée": "Noch nicht gelesen",
     "Pas encore consultées": "Noch nicht geöffnet",
+    "Passer au mensuel · {prix} € par mois": "Zu monatlich wechseln · {prix} € pro Monat",
+    "Passer à l'année · {v} €": "Zu jährlich wechseln · {v} €",
+    "Passer à l’offre supérieure": "Zum nächsthöheren Tarif wechseln",
     "Passez à l’offre supérieure pour agrandir votre équipe.": "Wechseln Sie in den nächsten Tarif, um Ihr Team zu vergrößern.",
     "Pause": "Pause",
+    "Pensez à regarder dans les indésirables.": "Schauen Sie auch im Spam-Ordner nach.",
     "Personne dans l’espace Utilisateur pour le moment.": "Noch niemand im Nutzerbereich.",
     "Personne ne correspond à « {filtreEquipe} ».": "Niemand passt zu „{filtreEquipe}“.",
     "Personne ne peut plus rejoindre votre équipe. Choisissez une offre supérieure pour en accueillir davantage.": "Niemand kann Ihrem Team mehr beitreten. Wählen Sie einen größeren Tarif für mehr Personen.",
+    "Personne pour l'instant": "Noch niemand",
+    "Personne pour l’instant": "Noch niemand",
     "Personne pour l’instant.": "Noch niemand.",
     "Photo": "Foto",
     "Photo de l'étape": "Foto zum Schritt",
+    "Photo de l'étape {v}": "Foto von Schritt {v}",
+    "Photo illisible : {name}": "Foto nicht lesbar: {name}",
     "Photo trop lourde : 6 Mo maximum.": "Foto zu groß: höchstens 6 MB.",
     "Photographier le texte": "Text abfotografieren",
     "Placez la lecture au milieu du clip pour le diviser.": "Setzen Sie die Wiedergabe in die Mitte des Ausschnitts, um ihn zu teilen.",
@@ -1776,6 +2257,7 @@ const DICO = {
     "Plus tard": "Später",
     "Plusieurs pages possibles — vous les remettrez dans l’ordre.": "Mehrere Seiten sind möglich — Sie ordnen sie danach.",
     "Point de vigilance": "Achtung",
+    "Poste non défini": "Keine Position festgelegt",
     "Poste non enregistré : {message}": "Position nicht gespeichert: {message}",
     "pour créer une procédure.": ", um eine Anleitung zu erstellen.",
     "premier mois avec des lectures": "erster Monat mit Aufrufen",
@@ -1783,6 +2265,7 @@ const DICO = {
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher.",
     "Procédure": "Anleitung",
     "Procédure en cours de modification": "Anleitung wird bearbeitet",
+    "procédure en ligne": "Anleitung live",
     "Procédure générée": "Anleitung fertig",
     "Procédure introuvable": "Anleitung nicht gefunden",
     "Procédure introuvable.": "Anleitung nicht gefunden.",
@@ -1791,10 +2274,16 @@ const DICO = {
     "Procédures": "Anleitungen",
     "Procédures consultées": "Geöffnete Anleitungen",
     "Procédures créées": "Erstellte Anleitungen",
+    "procédures en ligne": "Anleitungen live",
     "Procédures récentes": "Neueste Anleitungen",
     "Profil": "Profil",
+    "Profitez de toutes les fonctionnalités de Standix. Sans engagement.": "Nutzen Sie alle Funktionen von Standix. Ohne Verpflichtung.",
     "Prénom": "Vorname",
+    "Préparation": "Vorbereitung",
+    "Préparation de la vidéo": "Video wird vorbereitet",
+    "Préparation de la vidéo…": "Video wird vorbereitet…",
     "Préparation du lecteur...": "Player wird vorbereitet…",
+    "préparation du lien d’analyse…": "Analyse-Link wird vorbereitet…",
     "Préparation du PDF…": "PDF wird vorbereitet…",
     "Publier": "Veröffentlichen",
     "Publier la procédure": "Anleitung veröffentlichen",
@@ -1805,11 +2294,13 @@ const DICO = {
     "que vos procédures ont fait gagner à votre établissement.": "die Ihre Anleitungen Ihrem Standort gespart haben.",
     "Quel est votre poste ?": "Was ist Ihre Position?",
     "Quel est votre rôle ici ?": "Was machen Sie hier?",
+    "Quelqu’un": "Jemand",
     "Qui attend ?": "Wer wartet?",
     "Qui fait quoi dans l'entreprise": "Wer macht was",
     "Quitter": "Verlassen",
     "Quitter l’entreprise": "Unternehmen verlassen",
     "Quitter {nom} ?": "{nom} verlassen?",
+    "raison inconnue": "unbekannter Grund",
     "Rallumer la caméra": "Kamera wieder einschalten",
     "Rapprocher": "Zusammenrücken",
     "Rechargez la page, puis cliquez sur <b>Réessayer</b>": "Laden Sie die Seite neu und klicken Sie auf <b>Erneut versuchen</b>",
@@ -1823,13 +2314,18 @@ const DICO = {
     "Rejoindre": "Beitreten",
     "Rejoindre une entreprise": "Einem Unternehmen beitreten",
     "Relancer l'analyse": "Auswertung neu starten",
+    "Relancer l'analyse de cette vidéo ?": "Analyse dieses Videos neu starten?",
     "Relancer l’analyse": "Auswertung neu starten",
     "Relisez chaque étape": "Prüfen Sie jeden Schritt",
+    "Remplacer la photo": "Foto ersetzen",
+    "Renommer": "Umbenennen",
     "Renommer le dossier": "Ordner umbenennen",
+    "Renommer le sous-dossier": "Unterordner umbenennen",
     "Renommé en « {propre} »": "Umbenannt in „{propre}“",
     "Renouvellement le <b>{v}</b>. Les analyses non utilisées ne se reportent pas.": "Verlängerung am <b>{v}</b>. Nicht genutzte Auswertungen verfallen.",
     "Renouvellement le {dateRenouv}": "Verlängerung am {dateRenouv}",
     "Reprendre": "Fortsetzen",
+    "Reprise après {v} min sans résultat": "Neustart nach {v} Min. ohne Ergebnis",
     "Rester": "Bleiben",
     "Retirer": "Entfernen",
     "Retirer cet utilisateur ?": "Diesen Nutzer entfernen?",
@@ -1843,6 +2339,9 @@ const DICO = {
     "Retour": "Zurück",
     "Retrait impossible : {message}": "Entfernen nicht möglich: {message}",
     "Revenez dans {nom} et touchez <b>Réessayer</b>": "Kehren Sie zu {nom} zurück und tippen Sie auf <b>Erneut versuchen</b>",
+    "Rien de lu ce mois-ci": "Diesen Monat nichts gelesen",
+    "Rien de lu pour l’instant": "Noch nichts gelesen",
+    "Rien de lu sur cette période": "In diesem Zeitraum nichts gelesen",
     "Rien ne s’est passé ces {v} dernières semaines.": "In den letzten {v} Wochen ist nichts passiert.",
     "Rien à afficher": "Nichts anzuzeigen",
     "Réduire": "Einklappen",
@@ -1850,28 +2349,42 @@ const DICO = {
     "Réessayez.": "Versuchen Sie es erneut.",
     "réessayez.": "versuchen Sie es erneut.",
     "Réglages": "Einstellungen",
+    "Réseau": "Network",
+    "Réseau : {v}": "Netzwerk: {v}",
     "Résultat": "Ergebnis",
     "Révoquer": "Widerrufen",
-    "Révoquer ce code ?": "Diesen Code widerrufen?",
+    "Safari sur iPhone": "Safari auf dem iPhone",
+    "Safari sur Mac": "Safari auf dem Mac",
+    "Sans catégorie": "Ohne Ordner",
     "Sans dossier": "Ohne Ordner",
+    "sans dossier": "ohne Ordner",
     "sans détail.": "ohne Details.",
     "Sans micro, l'IA n'a rien à écouter : autorisez le microphone, puis recommencez.": "Ohne Mikrofon hat die KI nichts zum Zuhören: Erlauben Sie das Mikrofon und versuchen Sie es erneut.",
     "Sans nom": "Ohne Namen",
+    "Sans titre": "Ohne Titel",
     "Scanner un code": "Code scannen",
     "Scannez pour ouvrir la procédure": "Scannen, um die Anleitung zu öffnen",
     "Scans ce mois-ci": "Scans diesen Monat",
+    "scans de QR code": "QR-Code-Scans",
     "Se connecter": "Anmelden",
     "Se déconnecter": "Abmelden",
+    "selon votre abonnement": "je nach Abo",
     "Sera envoyée à la publication.": "Wird beim Veröffentlichen gesendet.",
     "Session expirée.": "Sitzung abgelaufen.",
+    "Session expirée. Reconnectez-vous.": "Sitzung abgelaufen. Bitte melden Sie sich erneut an.",
     "Seul le créateur de l’entreprise peut la supprimer.": "Nur wer das Unternehmen erstellt hat, kann es löschen.",
     "Seul le dernier mois est affiché.": "Nur der letzte Monat wird angezeigt.",
-    "Seul le dernier mois est conservé.": "Nur der letzte Monat wird gespeichert.",
     "Seul le fondateur peut supprimer un établissement.": "Nur der Inhaber kann einen Standort löschen.",
     "Seul le gérant de l’entreprise gère l’abonnement.": "Nur der Inhaber des Unternehmens verwaltet das Abo.",
     "Seul le gérant peut retirer un gestionnaire.": "Nur der Inhaber kann einen Verwalter entfernen.",
+    "Seule la gestion peut créer des procédures.": "Nur Verwalter können Anleitungen erstellen.",
+    "Seuls les comptes créés en tant que gérant peuvent ouvrir une entreprise. Votre compte a été créé en tant qu’utilisateur.": "Nur als Inhaber erstellte Konten können ein Unternehmen eröffnen. Ihr Konto wurde als Nutzer erstellt.",
+    "Si la caméra n’apparaît pas : Réglages du téléphone → Applications → le navigateur → Autorisations → Appareil photo.": "Wenn die Kamera nicht erscheint: Handy-Einstellungen → Apps → der Browser → Berechtigungen → Kamera.",
+    "Si le menu n’apparaît pas : Réglages → Safari → Caméra → Autoriser.": "Wenn das Menü nicht erscheint: Einstellungen → Safari → Kamera → Erlauben.",
+    "Si l’app n’apparaît pas dans Réglages : Réglages → Confidentialité et sécurité → Caméra → {nom}.": "Wenn die App nicht in den Einstellungen erscheint: Einstellungen → Datenschutz & Sicherheit → Kamera → {nom}.",
     "Si vous partez, plus personne ne pourra créer de procédure ni gérer l'équipe de {nom}. Nommez d'abord quelqu'un d'autre dans « Gérer l'équipe », ou supprimez l'entreprise.": "Wenn Sie gehen, kann niemand mehr Anleitungen erstellen oder das Team von {nom} verwalten. Ernennen Sie zuerst jemand anderen unter „Team verwalten“ oder löschen Sie das Unternehmen.",
     "Six vidéos à la fois, pas plus — au-delà, le téléphone refuse d’en ouvrir davantage.": "Sechs Videos auf einmal, nicht mehr — darüber hinaus öffnet das Telefon keine weiteren.",
+    "son illisible, on continue": "Ton nicht lesbar, es geht weiter",
     "Son logo apparaîtra dans la barre, à côté du vôtre.": "Sein Logo erscheint in der oberen Leiste neben Ihrem.",
     "Son logo apparaîtra dans la barre.": "Sein Logo erscheint in der oberen Leiste.",
     "Son nom et son logo apparaissent dans l’app pour toute l’équipe.": "Name und Logo erscheinen in der App für das ganze Team.",
@@ -1886,6 +2399,7 @@ const DICO = {
     "Suppression…": "Wird gelöscht…",
     "Supprimer": "Löschen",
     "Supprimer cet établissement": "Diesen Standort löschen",
+    "Supprimer définitivement": "Endgültig löschen",
     "Supprimer définitivement ?": "Endgültig löschen?",
     "Supprimer l'étape {numero} ?": "Schritt {numero} löschen?",
     "Supprimer l’entreprise": "Unternehmen löschen",
@@ -1893,14 +2407,19 @@ const DICO = {
     "Supprimer votre compte ?": "Ihr Konto löschen?",
     "Supprimer {nom} ?": "{nom} löschen?",
     "sur 5:00": "von 5:00",
+    "Sur Android": "Auf Android",
     "Sur devis": "Auf Anfrage",
+    "Sur iPhone et iPad": "Auf iPhone und iPad",
     "suspendus": "pausiert",
     "S’inscrire en tant que gérant": "Als Inhaber registrieren",
     "S’inscrire en tant qu’utilisateur": "Als Nutzer registrieren",
     "S’inscrire gérant": "Als Inhaber registrieren",
     "S’inscrire utilisateur": "Als Nutzer registrieren",
+    "Tapez « SUPPRIMER » pour confirmer.": "Geben Sie „SUPPRIMER“ ein, um zu bestätigen.",
+    "Tapez « {nom} » pour confirmer.": "Geben Sie „{nom}“ ein, um zu bestätigen.",
     "Temps cumulé passé sur chaque procédure.": "Gesamte Zeit pro Anleitung.",
     "Temps de collage, environ": "Dauer des Zusammenfügens, etwa",
+    "Temps de lecture compté par personne.": "Lesezeit pro Person gezählt.",
     "Temps de lecture par dossier": "Lesezeit pro Ordner",
     "Temps de lecture par personne": "Lesezeit pro Person",
     "Temps de lecture par procédure": "Lesezeit pro Anleitung",
@@ -1923,8 +2442,10 @@ const DICO = {
     "Touchez un logo pour basculer d’une entreprise à l’autre. Pour rejoindre une autre entreprise, demandez son <b>code d’invitation</b> à son responsable.": "Tippen Sie auf ein Logo, um das Unternehmen zu wechseln. Um einem anderen Unternehmen beizutreten, fragen Sie dort nach dem <b>Einladungscode</b>.",
     "Touchez une étape ci-dessous pour régler son clip": "Tippen Sie unten auf einen Schritt, um seinen Ausschnitt zu setzen",
     "Touchez une étape pour régler son clip": "Tippen Sie auf einen Schritt, um seinen Ausschnitt zu setzen",
+    "Touchez « Enregistreur d’écran », activez le micro, puis démarrez.": "Tippen Sie auf „Bildschirmaufnahme“, schalten Sie das Mikrofon ein und starten Sie.",
     "Tout effacer": "Alles löschen",
     "Tout effacer ?": "Alles löschen?",
+    "Tout le monde l'a ouverte au moins une fois.": "Alle haben sie mindestens einmal geöffnet.",
     "Tout voir": "Alle anzeigen",
     "Toute la vidéo est découpée. Corrigez les textes ci-dessous.": "Das ganze Video ist geschnitten. Korrigieren Sie die Texte unten.",
     "Toutes": "Alle",
@@ -1938,6 +2459,7 @@ const DICO = {
     "Trois gestes, puis revenez ici importer la vidéo.": "Drei Schritte, dann kommen Sie hierher zurück und fügen das Video hinzu.",
     "Trop d'appareils": "Zu viele Geräte",
     "trou": "Lücke",
+    "Trou de {v} s avant l'étape {v2}": "Lücke von {v} s vor Schritt {v2}",
     "Télécharger en PDF": "Als PDF herunterladen",
     "Télécharger la fiche": "Blatt herunterladen",
     "Un <b>PDF</b> par procédure": "Ein <b>PDF</b> pro Anleitung",
@@ -1947,8 +2469,10 @@ const DICO = {
     "Un compte est utilisé sur {max} appareils.": "Ein Konto wird auf {max} Geräten genutzt.",
     "Un compte existe déjà avec cet e-mail. Utilisez plutôt l'onglet Se connecter.": "Mit dieser E-Mail gibt es bereits ein Konto. Nutzen Sie stattdessen Anmelden.",
     "Un dossier « {nouveau} » existe déjà. Les procédures de « {ancien} » la rejoindront, et « {ancien} » disparaîtra.": "Es gibt schon einen Ordner „{nouveau}“. Die Anleitungen aus „{ancien}“ kommen dorthin, und „{ancien}“ verschwindet.",
+    "Un gestionnaire": "Ein Verwalter",
     "Un lien vient d’être envoyé à": "Ein Link wurde gerade gesendet an",
     "Un lien vient d’être envoyé à <b>{propre}</b>.": "Ein Link wurde gerade an <b>{propre}</b> gesendet.",
+    "Un membre": "Ein Mitglied",
     "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "Ein Problem, eine Idee, eine Frage zu Standix? Wir lesen alles und antworten so schnell wie möglich.",
     "Une erreur est survenue pendant l'analyse.": "Bei der Auswertung ist ein Fehler aufgetreten.",
     "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": "Ein Aufruf zählt nach {DUREE_LECTURE_MIN} Sekunden in der Anleitung. Jeder Nutzer zählt einmal pro Anleitung.",
@@ -1958,18 +2482,24 @@ const DICO = {
     "Une seule vidéo de <b>{size}</b>, à partir de {n} prises. Regardez-la avant de la garder : c’est le seul moyen de vérifier que l’ordre est le bon.": "Ein Video mit <b>{size}</b> aus {n} Aufnahmen. Sehen Sie es sich vor dem Behalten an: Nur so prüfen Sie, ob die Reihenfolge stimmt.",
     "Une étape doit durer au moins une seconde.": "Ein Schritt muss mindestens eine Sekunde dauern.",
     "Utilisateur": "Nutzer",
-    "Utilisez ce code pour donner à votre équipe l’accès utilisateur aux procédures. Vous pourrez ensuite leur donner accès à l’espace Gestion.": "Mit diesem Code geben Sie Ihrem Team Nutzerzugriff auf die Anleitungen. Den Verwaltungsbereich können Sie später freigeben.",
+    "Valider": "Bestätigen",
     "Verrou : {v}": "Sperre: {v}",
     "Verrou indisponible : {message}": "Sperre nicht verfügbar: {message}",
+    "Vidéo allégée : {v} →": "Video komprimiert: {v} →",
+    "vidéo envoyée en {v}": "Video hochgeladen in {v}",
     "Vidéo générée par l’IA Standix": "Von der Standix-KI erzeugtes Video",
     "Vidéo prête — lancez l’analyse": "Video fertig — Auswertung starten",
+    "Vidéo rattachée…": "Video verknüpft…",
     "Vidéo reçue": "Video erhalten",
     "Visez le QR code": "Auf den QR-Code richten",
     "Voici comment le rétablir sur": "So schalten Sie es wieder ein in",
     "Voir comme l’équipe": "So sehen, wie das Team es sieht",
+    "Voir l'autre": "Den anderen ansehen",
     "Voir l'équipe": "Team ansehen",
     "Voir la procédure": "Anleitung öffnen",
+    "Voir le code d'invitation": "Einladungscode ansehen",
     "Voir les offres": "Tarife ansehen",
+    "Voir les {n} autres": "Die {n} anderen ansehen",
     "Voir moins": "Weniger anzeigen",
     "Voir plus": "Mehr anzeigen",
     "Voir toute la vidéo": "Ganzes Video ansehen",
@@ -1982,11 +2512,14 @@ const DICO = {
     "Vos <b>{np} procédure</b> et <b>{nm} membres</b> vous attendent. Reprenez là où vous vous êtes arrêté.": "Ihre <b>{np} Anleitung</b> und <b>{nm} Mitglieder</b> warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben.",
     "Vos <b>{np} procédures</b> et <b>{nm} membre</b> vous attendent. Reprenez là où vous vous êtes arrêté.": "Ihre <b>{np} Anleitungen</b> und <b>{nm} Mitglied</b> warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben.",
     "Vos <b>{np} procédures</b> et <b>{nm} membres</b> vous attendent. Reprenez là où vous vous êtes arrêté.": "Ihre <b>{np} Anleitungen</b> und <b>{nm} Mitglieder</b> warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben.",
+    "Vos analyses vidéo sont épuisées. Elles se renouvellent au début du mois prochain.": "Ihre Videoanalysen sind aufgebraucht. Sie erneuern sich zu Beginn des nächsten Monats.",
     "Vos appareils numériques": "Ihre Geräte",
+    "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": "Ihre Ordner gibt es, aber diesen Monat hat sie noch niemand geöffnet.",
     "Vos changements ne partent qu'à l'enregistrement": "Ihre Änderungen werden erst beim Speichern übernommen",
     "Vos membres ne la verront plus. Vous pourrez la republier à tout moment ; les lectures déjà enregistrées restent dans l’analyse.": "Ihre Mitglieder sehen sie nicht mehr. Sie können sie jederzeit wieder veröffentlichen; bisherige Aufrufe bleiben in der Auswertung.",
     "Vos paroles": "Was Sie sagen",
     "Vos procédures sont conservées. Choisissez une offre pour les rouvrir et continuer à en créer.": "Ihre Anleitungen bleiben erhalten. Wählen Sie einen Tarif, um sie wieder zu öffnen und weitere zu erstellen.",
+    "Vos {quota} analyses d’essai sont utilisées. Choisissez une offre pour continuer à analyser vos vidéos.": "Ihre {quota} Test-Analysen sind aufgebraucht. Wählen Sie einen Tarif, um weiter Videos zu analysieren.",
     "Vos {quota} analyses vidéo du mois sont utilisées sur l’ensemble de vos établissements. Elles se renouvellent au début du mois prochain.": "Ihre {quota} Videoauswertungen dieses Monats sind an allen Standorten aufgebraucht. Sie werden Anfang nächsten Monats zurückgesetzt.",
     "Vos {quota} analyses vidéo du mois sont utilisées. Elles se renouvellent au début du mois prochain.": "Ihre {quota} Videoauswertungen dieses Monats sind aufgebraucht. Sie werden Anfang nächsten Monats zurückgesetzt.",
     "Votre abonnement": "Ihr Abo",
@@ -1998,17 +2531,25 @@ const DICO = {
     "Votre compte est créé. Connectez-vous pour rejoindre l'entreprise.": "Ihr Konto ist erstellt. Melden Sie sich an, um dem Unternehmen beizutreten.",
     "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein.",
     "Votre entreprise": "Ihr Unternehmen",
+    "votre entreprise": "Ihr Unternehmen",
     "Votre essai est terminé": "Ihre Testphase ist vorbei",
+    "votre navigateur": "Ihr Browser",
     "Votre navigateur a refusé l’accès et ne le redemandera pas tout seul.": "Ihr Browser hat den Zugriff verweigert und fragt nicht von selbst erneut.",
     "Votre navigateur a refusé l’accès et ne le redemandera pas tout seul.<br>Voici comment le rétablir sur <b>{appareil}</b>.": "Ihr Browser hat den Zugriff verweigert und fragt nicht von selbst erneut.<br>So schalten Sie ihn in <b>{appareil}</b> wieder ein.",
+    "Votre navigateur ne sait pas assembler de vidéos.": "Ihr Browser kann keine Videos zusammenfügen.",
+    "Votre navigateur n’accepte aucun format d’enregistrement.": "Ihr Browser unterstützt kein Aufnahmeformat.",
     "Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.": "Ihr Name erscheint in der Teamliste und bei dem, was Sie lesen. Die E-Mail lässt sich hier nicht ändern.",
     "Votre poste": "Ihre Position",
+    "Votre première entreprise n’est pas encore abonnée. Activez son abonnement pour pouvoir en créer une seconde.": "Ihr erstes Unternehmen hat noch kein Abo. Aktivieren Sie das Abo, um ein zweites anzulegen.",
     "Votre profil": "Ihr Profil",
     "Votre profil — votre essai est terminé": "Ihr Profil — Ihre Testphase ist vorbei",
     "Votre rôle a changé chez {ent} : vous faites de nouveau partie de <b>l'équipe</b>.": "Ihr Zugriff bei {ent} hat sich geändert: Sie sind wieder im <b>Nutzerbereich</b>.",
     "Votre savoir-faire transmis simplement": "Ihr Können, einfach weitergegeben",
     "Votre session a expiré. Reconnectez-vous et réessayez.": "Ihre Sitzung ist abgelaufen. Melden Sie sich neu an und versuchen Sie es erneut.",
+    "Votre session a expiré. Reconnectez-vous.": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "Votre texte": "Ihr Text",
+    "votre téléphone n’a pas suivi la cadence — fermez les autres applications et réessayez": "Ihr Handy kam nicht mit — schließen Sie andere Apps und versuchen Sie es erneut",
+    "Votre téléphone n’a pas suivi la cadence. Fermez les autres applications et réessayez.": "Ihr Handy kam nicht mit. Schließen Sie andere Apps und versuchen Sie es erneut.",
     "Votre vidéo": "Ihr Video",
     "Votre équipe a atteint le nombre de membres de votre abonnement. Passez à l'offre supérieure pour leur ouvrir l'accès.": "Ihr Team hat die Mitgliederzahl Ihres Abos erreicht. Wechseln Sie in den nächsten Tarif, um ihnen Zugriff zu geben.",
     "Votre équipe est trop grande pour {nom}": "Ihr Team ist zu groß für {nom}",
@@ -2021,9 +2562,14 @@ const DICO = {
     "Vous avez créé une entreprise : supprimez-la d’abord.": "Sie haben ein Unternehmen erstellt: Löschen Sie es zuerst.",
     "Vous avez déjà un compte ?": "Sie haben schon ein Konto?",
     "Vous avez quitté {nom}.": "Sie haben {nom} verlassen.",
+    "Vous avez utilisé vos {quota} analyses vidéo de ce mois-ci. Elles se renouvellent le 1er du mois prochain — ou passez à l'offre supérieure pour en avoir davantage tout de suite.": "Sie haben Ihre {quota} Videoanalysen für diesen Monat aufgebraucht. Sie erneuern sich am 1. des nächsten Monats — oder wechseln Sie zu einem höheren Tarif, um sofort mehr zu haben.",
     "Vous en serez le gérant, avec 14 jours d’essai gratuit.": "Sie werden der Inhaber, mit 14 Tagen kostenloser Testphase.",
     "Vous en êtes où ?": "Wie weit sind Sie?",
+    "Vous faites déjà partie de {nom}.": "Sie gehören bereits zu {nom}.",
+    "Vous gérez déjà {ETABLISSEMENTS_MAX} entreprises, le maximum par compte. Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.": "Sie verwalten bereits {ETABLISSEMENTS_MAX} Unternehmen, das Maximum pro Konto. Entfernen Sie eines, um ein neues anzulegen, oder schreiben Sie uns, wenn Sie eine Gruppe führen.",
+    "Vous gérez {ETABLISSEMENTS_MAX} entreprises, le maximum par compte.": "Sie verwalten {ETABLISSEMENTS_MAX} Unternehmen, das Maximum pro Konto.",
     "Vous n'appartenez à aucune entreprise.": "Sie gehören zu keinem Unternehmen.",
+    "Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.": "Nicht zu sehen? Wischen Sie ein zweites Mal, um die ganze Liste zu öffnen.",
     "Vous n’avez pas les droits pour supprimer cette procédure.": "Sie dürfen diese Anleitung nicht löschen.",
     "Vous passez en espace Gestion": "Sie wechseln in den Verwaltungsbereich",
     "Vous perdrez l'accès à ses procédures et votre historique de lectures. Votre compte Standix reste actif : vous pourrez rejoindre une autre entreprise avec un code.": "Sie verlieren den Zugriff auf die Anleitungen und Ihren Leseverlauf. Ihr Standix-Konto bleibt aktiv: Mit einem Code können Sie einem anderen Unternehmen beitreten.",
@@ -2035,6 +2581,7 @@ const DICO = {
     "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "Sie können auf höchstens 3 Geräten gleichzeitig angemeldet sein.",
     "Vous relirez chaque étape avant de publier.": "Sie prüfen jeden Schritt vor dem Veröffentlichen.",
     "Vous repassez en espace Équipe": "Sie sind wieder im Nutzerbereich",
+    "Vous retrouvez les procédures à lire et le scanner de QR codes.": "Hier finden Sie die Anleitungen und den QR-Code-Scanner.",
     "Vous êtes abonné à l'offre <b>{nom}</b>.": "Sie haben den Tarif <b>{nom}</b>.",
     "Vous êtes désormais": "Sie sind jetzt",
     "Vous êtes désormais <b>gestionnaire</b> de {ent}.": "Sie sind jetzt <b>Verwalter</b> bei {ent}.",
@@ -2043,6 +2590,7 @@ const DICO = {
     "Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran une fois terminé pour la rendre accessible aux autres gestionnaires.": "Nur Sie können diese Anleitung gerade bearbeiten. Verlassen Sie diesen Bildschirm, wenn Sie fertig sind, damit andere Verwalter sie öffnen können.",
     "Vous êtes {combien} membres, et cette offre en autorise {max}. Retirez d'abord {v} personne dans Paramètres → Votre équipe, puis revenez changer d'offre.": "Sie haben {combien} Mitglieder, dieser Tarif erlaubt {max}. Entfernen Sie zuerst {v} Person unter Einstellungen → Ihr Team und wechseln Sie dann den Tarif.",
     "Vous êtes {combien} membres, et cette offre en autorise {max}. Retirez d'abord {v} personnes dans Paramètres → Votre équipe, puis revenez changer d'offre.": "Sie haben {combien} Mitglieder, dieser Tarif erlaubt {max}. Entfernen Sie zuerst {v} Personen unter Einstellungen → Ihr Team und wechseln Sie dann den Tarif.",
+    "vérification du poids…": "Dateigröße wird geprüft…",
     "Vérification…": "Wird geprüft…",
     "Vérifier les étapes": "Schritte prüfen",
     "Vérifiez et ajustez avant de continuer": "Prüfen und anpassen, bevor Sie weitermachen",
@@ -2056,9 +2604,12 @@ const DICO = {
     "{appareil} ne donne pas accès à la caméra pour ce site.": "{appareil} erlaubt dieser Website keinen Zugriff auf die Kamera.",
     "{autres} autre procédure dans cette entreprise": "{autres} weitere Anleitung in diesem Unternehmen",
     "{autres} autres procédures dans cette entreprise": "{autres} weitere Anleitungen in diesem Unternehmen",
+    "{a}, {b} et {n} autre": "{a}, {b} und {n} weitere Person",
+    "{a}, {b} et {n} autres": "{a}, {b} und {n} weitere",
     "{brouillons} procédures sont en cours, en attente de publication.": "{brouillons} Anleitungen sind im Entwurf und warten auf Veröffentlichung.",
     "{cheminProc} · créée le {v}": "{cheminProc} · erstellt am {v}",
     "{DOC_PAGES_MAX} pages au maximum. Au-delà, c'est un manuel entier : découpez-le en plusieurs procédures.": "Höchstens {DOC_PAGES_MAX} Seiten. Mehr ist ein ganzes Handbuch: Teilen Sie es in mehrere Anleitungen auf.",
+    "{j} j": "{j} T.",
     "{lectures} sur {anJours} jours": "{lectures} in {anJours} Tagen",
     "{length} activité sur {v} semaines": "{length} Aktivität in {v} Wochen",
     "{length} activités sur {v} semaines": "{length} Aktivitäten in {v} Wochen",
@@ -2074,8 +2625,11 @@ const DICO = {
     "{length} procédure(s) trouvée(s) mais aucune n'a pu être affichée. Signalez-le-moi.": "{length} Anleitung(en) gefunden, aber keine ließ sich anzeigen. Bitte melden Sie es uns.",
     "{length} procédures": "{length} Anleitungen",
     "{length} procédures reclassées.": "{length} Anleitungen verschoben.",
+    "{length} sur {APPAREILS_MAX}": "{length} von {APPAREILS_MAX}",
     "{length} étape proposée · relisez avant de publier": "{length} Schritt vorgeschlagen · vor dem Veröffentlichen prüfen",
     "{length} étapes proposées · relisez avant de publier": "{length} Schritte vorgeschlagen · vor dem Veröffentlichen prüfen",
+    "{lues} procédure lue": "{lues} Anleitung gelesen",
+    "{lues} procédures lues": "{lues} Anleitungen gelesen",
     "{lus} sur {length}": "{lus} von {length}",
     "{MDP_MIN} caractères minimum": "Mindestens {MDP_MIN} Zeichen",
     "{mensuel} € par mois": "{mensuel} € pro Monat",
@@ -2092,18 +2646,38 @@ const DICO = {
     "{nom} est créée. Vous en êtes responsable.": "{nom} ist erstellt. Sie sind dafür verantwortlich.",
     "{nom} est désormais en gestion.": "{nom} hat jetzt den Verwaltungsbereich.",
     "{nom} est repassé en équipe.": "{nom} ist wieder im Nutzerbereich.",
-    "{nom} perdra l'accès aux procédures de l'entreprise. Son compte Standix n'est pas supprimé : elle pourra rejoindre une autre entreprise.": "{nom} verliert den Zugriff auf die Anleitungen des Unternehmens. Das Standix-Konto wird nicht gelöscht: Ein Beitritt zu einem anderen Unternehmen bleibt möglich.",
+    "{nom} perdra l'accès aux procédures de l'entreprise.": "{nom} verliert den Zugriff auf die Anleitungen des Unternehmens.",
     "{nom} perdra l'accès à l'espace gestion et ne pourra plus que consulter les procédures publiées. Celles qu'elle a créées restent en place.": "{nom} verliert den Verwaltungsbereich und kann nur noch veröffentlichte Anleitungen öffnen. Selbst erstellte Anleitungen bleiben.",
     "{nom} pourra gérer les procédures, accéder à la page Analyse et à la page Accès, et retirer des membres de l’entreprise. Il n’aura plus accès à l’espace utilisateur.": "{nom} kann dann Anleitungen verwalten, die Seiten Auswertung und Zugriff öffnen und Mitglieder aus dem Unternehmen entfernen. Der Nutzerbereich ist dann nicht mehr zugänglich.",
+    "{nom} sur iPhone": "{nom} auf dem iPhone",
     "{nom} à {prix} € par mois. Écrivez-nous pour l'activer, nous répondons dans la journée.": "{nom} für {prix} € pro Monat. Schreiben Sie uns zum Aktivieren, wir antworten noch am selben Tag.",
     "{nom} — modifier le nom et le logo": "{nom} — Name und Logo ändern",
     "{n} <em>a quitté l’entreprise</em>": "{n} <em>hat das Unternehmen verlassen</em>",
     "{n} <em>a rejoint l’équipe</em>": "{n} <em>ist dem Team beigetreten</em>",
     "{n} <em>est passé en espace Gestion</em>": "{n} <em>ist jetzt im Verwaltungsbereich</em>",
     "{n} <em>est passé en espace Utilisateur</em>": "{n} <em>ist jetzt im Nutzerbereich</em>",
+    "{n} consultation": "{n} Aufruf",
+    "{n} consultations": "{n} Aufrufe",
+    "{n} dossier": "{n} Ordner",
+    "{n} dossiers": "{n} Ordner",
     "{n} membre": "{n} Mitglied",
     "{n} membres": "{n} Mitglieder",
+    "{n} personne": "{n} Person",
+    "{n} personnes": "{n} Personen",
+    "{n} procédure": "{n} Anleitung",
+    "{n} procédures": "{n} Anleitungen",
+    "{n} sem.": "{n} Wo.",
+    "{n} sous-dossier": "{n} Unterordner",
+    "{n} sous-dossiers": "{n} Unterordner",
+    "{n} étape": "{n} Schritt",
+    "{n} étape sans extrait défini": "{n} Schritt ohne festgelegten Ausschnitt",
+    "{n} étapes": "{n} Schritte",
+    "{n} étapes sans extrait défini": "{n} Schritte ohne festgelegten Ausschnitt",
+    "{qui} a quitté l’équipe": "{qui} hat das Team verlassen",
+    "{qui} a été retiré·e de l’équipe": "{qui} wurde aus dem Team entfernt",
     "{qui} modifie cette procédure en ce moment. Revenez dans quelques minutes.": "{qui} bearbeitet diese Anleitung gerade. Kommen Sie in ein paar Minuten wieder.",
+    "{quoi} : aucune réponse après {ecoule} s.": "{quoi}: keine Antwort nach {ecoule} s.",
+    "{quoi} s’est interrompu : la connexion a été perdue.": "{quoi} wurde unterbrochen: Die Verbindung ist abgebrochen.",
     "{raison}Cette procédure n'a pas de vidéo associée : l'analyse ne peut pas être relancée.": "{raison}Diese Anleitung hat kein Video: Die Auswertung kann nicht neu gestartet werden.",
     "{remplies} étape écrite. Relisez-les avant de publier.": "{remplies} Schritt geschrieben. Prüfen Sie ihn vor dem Veröffentlichen.",
     "{remplies} étape écrite. {reste} sans texte : l’IA n’a pas entendu de parole à ces moments-là.": "{remplies} Schritt geschrieben. {reste} ohne Text: Die KI hat an diesen Stellen keine Sprache gehört.",
@@ -2119,6 +2693,10 @@ const DICO = {
     "{v} doublon rapproché · vérifiez le découpage": "{v} Doppelung zusammengeführt · Schnitte prüfen",
     "{v} doublons rapprochés · vérifiez le découpage": "{v} Doppelungen zusammengeführt · Schnitte prüfen",
     "{v} mots lus": "{v} Wörter gelesen",
+    "{v} s non couvertes au début": "{v} s am Anfang nicht abgedeckt",
+    "{v} s non couvertes à la fin": "{v} s am Ende nicht abgedeckt",
+    "« {name} » n’a pas pu être lue.": "„{name}“ konnte nicht gelesen werden.",
+    "« {name} » n’a pas répondu. Retirez-la et réessayez.": "„{name}“ reagiert nicht. Entfernen Sie sie und versuchen Sie es erneut.",
     "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": "„{nomEntreprise}“ hat die Mitgliederzahl seines Abos erreicht. Ihre Anfrage wurde an die zuständige Person weitergeleitet. Sie gibt Ihnen Zugriff, sobald ein Platz frei wird.",
     "« {nom} » ajoutée. Elle restera dans votre liste.": "„{nom}“ hinzugefügt. Sie bleibt in Ihrer Liste.",
     "« {titre} » est encore en cours d'analyse{v}. Vous ne pouvez pas la consulter avant la fin. Si vous n'en voulez plus, supprimez-la.": "„{titre}“ wird noch ausgewertet{v}. Sie können sie erst danach öffnen. Wenn Sie sie nicht mehr brauchen, löschen Sie sie.",
@@ -2126,10 +2704,14 @@ const DICO = {
     "« {titre} » et toutes ses étapes seront supprimées. Cette action est irréversible.": "„{titre}“ und alle Schritte werden gelöscht. Das lässt sich nicht rückgängig machen.",
     "« {titre} » sera supprimée, avec sa vidéo et l'analyse en cours. C'est définitif.": "„{titre}“ wird gelöscht, samt Video und laufender Auswertung. Das ist endgültig.",
     "« {v} » sera retirée de la procédure.": "„{v}“ wird aus der Anleitung entfernt.",
+    "· entreprise active": "· aktives Unternehmen",
+    "· {length} réseaux": "· {length} Netzwerke",
     "À lire": "Zu lesen",
+    "à l’instant": "gerade eben",
     "Écartez ou resserrez les deux poignées blanches": "Ziehen Sie die beiden weißen Griffe auseinander oder zusammen",
     "Échec : {message}": "Fehlgeschlagen: {message}",
     "Échec : {v}": "Fehlgeschlagen: {v}",
+    "écoute de la bande son… ({v})": "Tonspur wird angehört… ({v})",
     "Écrivez chaque étape dans l'ordre": "Schreiben Sie jeden Schritt der Reihe nach",
     "Écrivez chaque étape dans l’ordre": "Schreiben Sie jeden Schritt der Reihe nach",
     "Écrivez chaque étape vous-même": "Jeden Schritt selbst schreiben",
@@ -2149,7 +2731,7 @@ const DICO = {
     "Éteindre la caméra": "Kamera ausschalten",
     "— ce que vous expliquez pendant chaque geste": "— Ihre Erklärung zu jedem Handgriff",
     "— objets et texte à l’écran": "— Gegenstände und Text im Bild",
-    "• LE PLUS ET LE MOINS changent l’espace du membre. Le plus lui donne l’accès à l’espace gestion : il pourra gérer les procédures, et il aura accès à la page Analyse et à la page Accès de l’entreprise. Le moins lui donne uniquement l’accès à l’espace utilisateur : il aura uniquement accès aux procédures de l’entreprise. • LA PORTE retire la personne de l’entreprise. Ses lectures passées restent dans l’analyse. Elle n’a plus accès à l’espace de l’entreprise qui la concerne.": "• PLUS UND MINUS ändern den Bereich des Mitglieds.\n  Plus gibt Zugriff auf den Verwaltungsbereich: Anleitungen verwalten und die Seiten Auswertung und Zugriff des Unternehmens öffnen.\n  Minus gibt nur Zugriff auf den Nutzerbereich: nur die Anleitungen des Unternehmens öffnen.\n\n• DIE TÜR entfernt die Person aus dem Unternehmen. Ihre bisherigen Aufrufe bleiben in der Auswertung. Den Bereich des Unternehmens kann sie nicht mehr öffnen.",
+    "• Le plus donne accès à l’espace gestion. • Le moins donne accès à l’espace utilisateur. • La porte retire la personne de l’entreprise.": "• Das Plus gibt Zugriff auf den Verwaltungsbereich.\n• Das Minus gibt Zugriff auf den Nutzerbereich.\n• Die Tür entfernt die Person aus dem Unternehmen.",
     "✓ Toute la vidéo est couverte, sans chevauchement": "✓ Das ganze Video ist abgedeckt, ohne Überschneidung",
   },
   /* DICO:FIN */
@@ -2560,6 +3142,9 @@ const DICO = {
 }
 
 let langueApp = 'fr'
+/* Les dates et les nombres suivent la langue : « 26 juil. » devient « 26 Jul »
+   ou « 26. Juli ». `fr-CA` reste à part : il ne sert qu'à écrire une date ISO. */
+const localeApp = () => ({ en: 'en-GB', de: 'de-DE', es: 'es-ES', it: 'it-IT', pt: 'pt-PT' })[langueApp] || 'fr-FR'
 
 function chargerLangue() {
   try { langueApp = localStorage.getItem('procedo_langue') || 'fr' } catch (e) { langueApp = 'fr' }
@@ -2574,6 +3159,7 @@ function definirLangue(code) {
   langueApp = code
   try { localStorage.setItem('procedo_langue', code) } catch (e) {}
   chargerTraductionsIA(code).then(() => { if (langueApp === code) appliquerLangue() })
+  majNomsTraduits()
   appliquerLangue()
   synchroniserLangueParlee()
   // La fiche ouverte suit la nouvelle langue.
@@ -2626,13 +3212,93 @@ const remplirGabarit = (s, p) =>
   p ? String(s).replace(/\{(\w+)\}/g, (m, n) => (n in p ? String(p[n]) : m)) : s
 
 function tLang(phrase, params) {
-  if (langueApp === 'fr') return remplirGabarit(phrase, params)
   const k = cleTexte(phrase)
+  if (langueApp === 'fr') {
+    const fr = remplirGabarit(phrase, params)
+    // Une phrase à trous doit pouvoir être retraduite plus tard, trous compris.
+    if (params) retenirOrigine(fr, fr, k, params, phrase)
+    return fr
+  }
   const trad = DICO[langueApp]?.[k] ?? TRAD_IA[langueApp]?.[k]
   if (trad == null) demanderTraduction(k)
-  const sortie = remplirGabarit(trad ?? phrase, params)
-  if (trad != null) retenirOrigine(sortie, remplirGabarit(phrase, params))
+  /* ⚠ LES ESPACES DE BORD SONT GARDÉS. « Créé » + date, « … au propre — » +
+     suite : la traduction du dictionnaire n'a pas d'espace final, et l'on
+     obtenait « Createdjust now ». */
+  const bords = trad == null ? ['', ''] : [phrase.match(/^\s*/)[0], phrase.match(/\s*$/)[0]]
+  const sortie = bords[0] + remplirGabarit(trad == null ? phrase : String(trad).trim(), paramsNoms(params)) + bords[1]
+  retenirOrigine(sortie, remplirGabarit(phrase, params), k, params, phrase)
   return sortie
+}
+
+/* ═══ LES NOMS DE L'ENTREPRISE : DOSSIERS, SOUS-DOSSIERS, TITRES ═══
+
+   Traduits par la fonction `traduire-noms` (voir son en-tête : contexte de
+   tous les dossiers, codes et noms propres intouchables, garde-fou sur les
+   chiffres, cache par entreprise). Ici, on ne fait que les AFFICHER :
+
+   - le dictionnaire passe d'abord — un libellé d'interface reste le libellé ;
+   - puis, un texte qui est exactement un nom connu prend sa traduction,
+     « Cuisine › Friteuse » compris ;
+   - un nom passé en trou d'une phrase (« {cheminProc} · créée le {v} ») est
+     traduit aussi.
+
+ ⚠ LES CHAMPS DE SAISIE NE SONT JAMAIS TOUCHÉS : on modifie une procédure
+   dans sa langue d'origine, c'est elle qui est enregistrée. */
+let NOMS = new Map()
+let nomsEnCours = ''
+
+function cleNoms(eid, langue) { return `standix_noms_${eid}_${langue}` }
+
+function nomTraduit(texte) {
+  if (langueApp === 'fr' || !NOMS.size || typeof texte !== 'string') return null
+  const k = cleTexte(texte)
+  if (!k) return null
+  if (NOMS.has(k)) return NOMS.get(k)
+  if (k.includes(' \u203a ')) {
+    const morceaux = k.split(' \u203a ')
+    const trad = morceaux.map(m => NOMS.get(m) ?? m)
+    return trad.some((t, i) => t !== morceaux[i]) ? trad.join(' \u203a ') : null
+  }
+  return null
+}
+
+function paramsNoms(params) {
+  if (!params || langueApp === 'fr' || !NOMS.size) return params
+  const o = {}
+  for (const [cle, v] of Object.entries(params)) o[cle] = (typeof v === 'string' && nomTraduit(v)) || v
+  return o
+}
+
+async function majNomsTraduits() {
+  const eid = currentMembre?.entreprise_id, langue = langueApp
+  if (!eid || langue === 'fr') { NOMS = new Map(); return }
+  // La copie locale d'abord : l'écran est traduit avant même la réponse.
+  try {
+    const o = JSON.parse(localStorage.getItem(cleNoms(eid, langue)) || 'null')
+    NOMS = new Map(o ? Object.entries(o) : [])
+  } catch (e) { NOMS = new Map() }
+  if (NOMS.size) appliquerLangue()
+  const cle = eid + ':' + langue
+  if (nomsEnCours === cle) return
+  nomsEnCours = cle
+  try {
+    const rep = await fetch(`${SUPABASE_URL}/functions/v1/traduire-noms`, {
+      method: 'POST', headers: await enTeteFonction(),
+      body: JSON.stringify({ langue, entreprise_id: eid }),
+    })
+    const data = await rep.json().catch(() => ({}))
+    if (!rep.ok || data.error) return
+    if (langueApp !== langue || currentMembre?.entreprise_id !== eid) return
+    const tout = { ...(data.dossiers || {}), ...(data.sous || {}), ...(data.titres || {}) }
+    NOMS = new Map(Object.entries(tout))
+    try { localStorage.setItem(cleNoms(eid, langue), JSON.stringify(tout)) } catch (e) {}
+    appliquerLangue()
+    if (ficheOuverte) traduireFicheOuverte()
+  } catch (e) {
+    // Sans réponse, les noms restent dans leur langue d'origine.
+  } finally {
+    if (nomsEnCours === cle) nomsEnCours = ''
+  }
 }
 
 /* ═══ RETROUVER LE FRANÇAIS D'UN TEXTE DÉJÀ TRADUIT ═══
@@ -2647,30 +3313,63 @@ function tLang(phrase, params) {
    l'anglais qui était retenu comme original. Passer à l'allemand cherchait
    alors « Steps » dans le dictionnaire français → rien → l'anglais restait.
 
-   Le remède : chaque sortie de `tLang` note d'où elle vient (sa version
-   française, trous remplis, et chaque morceau entre deux balises). Et pour
-   ce qui n'est pas passé par `tLang`, le dictionnaire se lit à l'envers. */
+   Le remède : chaque sortie de `tLang` note d'où elle vient — sa CLÉ, ses
+   TROUS et la place du morceau entre deux balises. Changer de langue refait
+   alors la phrase entière dans la nouvelle langue, trous compris. Pour ce qui
+   n'est pas passé par `tLang`, le dictionnaire se lit à l'envers.
+
+ ⚠ LA CLÉ ET LES TROUS, PAS SEULEMENT LE FRANÇAIS REMPLI. Une première version
+   ne gardait que « L'analyse tourne depuis plus de 12 minutes… » : une phrase
+   remplie n'est dans aucun dictionnaire, et l'observateur la remettait en
+   français par-dessus la bonne traduction. */
 const ORIGINES = new Map()
 const decoderEntites = (s) => String(s).replace(/&(amp|lt|gt|quot|#39|nbsp);/g,
   (m, e) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: '\u00a0' })[e])
 const morceaux = (s) => decoderEntites(s).split(/<[^>]*>/).map(cleTexte)
 
-function retenirOrigine(sortie, francais) {
-  if (sortie === francais) return
+function retenirOrigine(sortie, francais, cle, params, brut) {
   if (ORIGINES.size > 20000) ORIGINES.clear()
-  const a = morceaux(sortie), b = morceaux(francais)
+  const a = morceaux(sortie), b = decoderEntites(francais).split(/<[^>]*>/)
   if (a.length !== b.length) return
-  a.forEach((x, i) => { if (x && b[i] && x !== b[i]) ORIGINES.set(x, b[i]) })
+  a.forEach((x, i) => { if (x) ORIGINES.set(x, { fr: b[i].trim(), cle, params, i, brut }) })
+}
+
+/* D'où vient ce texte ? → { fr } ou { fr, cle, params, i } */
+function sourceDe(texte) {
+  const k = cleTexte(texte)
+  return ORIGINES.get(k) || { fr: origineDe(texte) }
+}
+
+/* La même phrase dans la langue affichée. `null` si le texte n'a pas de clé. */
+function rendreSource(src) {
+  if (!src?.cle) return null
+  const phrase = langueApp === 'fr' ? (src.brut ?? src.cle) : (DICO[langueApp]?.[src.cle] ?? TRAD_IA[langueApp]?.[src.cle])
+  if (phrase == null) return src.fr
+  const sortie = remplirGabarit(phrase, langueApp === 'fr' ? src.params : paramsNoms(src.params))
+  /* ⚠ LE MORCEAU BRUT, PAS LA CLÉ NORMALISÉE : les retours à la ligne font
+     partie du texte (une popup à puces les affiche). Normalisé, « •…\n•… »
+     revenait sur une seule ligne. */
+  const m = decoderEntites(sortie).split(/<[^>]*>/)[src.i]?.trim()
+  if (!m) return src.fr
+  retenirOrigine(sortie, remplirGabarit(src.brut ?? src.cle, src.params), src.cle, src.params, src.brut)
+  return m
 }
 
 const inverses = {}
 function origineDe(texte) {
   const k = cleTexte(texte)
-  if (ORIGINES.has(k)) return ORIGINES.get(k)
   for (const l of ['en', 'de']) {
     if (!inverses[l] || inverses[l].__taille !== Object.keys(TRAD_IA[l] || {}).length) {
       const inv = new Map()
-      for (const src of [TRAD_IA[l] || {}, DICO[l] || {}]) for (const [fr, tr] of Object.entries(src)) inv.set(cleTexte(tr), fr)
+      /* ⚠ DEUX PHRASES FRANÇAISES PEUVENT AVOIR LA MÊME TRADUCTION : « Accès »
+         et « Gestion des accès » donnent toutes deux « Access ». La dernière
+         lue l'emportait, et l'onglet « Accès » de la barre revenait en
+         français sous le nom « Gestion des accès ». La plus courte gagne :
+         c'est presque toujours le libellé d'un bouton ou d'un onglet. */
+      for (const src of [TRAD_IA[l] || {}, DICO[l] || {}]) for (const [fr, tr] of Object.entries(src)) {
+        const k = cleTexte(tr), deja = inv.get(k)
+        if (deja == null || fr.length < deja.length) inv.set(k, fr)
+      }
       inv.__taille = Object.keys(TRAD_IA[l] || {}).length
       inverses[l] = inv
     }
@@ -2855,7 +3554,7 @@ function appliquerLangue(zone) {
     const trad = dico?.[k] ?? ia?.[k]
     // Un texte du balisage inconnu part à l'IA ; le contenu de l'entreprise, jamais.
     if (trad == null && TEXTES_DU_BALISAGE.has(k)) demanderTraduction(k)
-    return trad ?? vo
+    return trad ?? nomTraduit(vo) ?? vo
   }
   document.documentElement.lang = langueApp
 
@@ -2873,7 +3572,7 @@ function appliquerLangue(zone) {
       if (!brut) continue
       /* Un texte que le code a changé depuis notre dernier passage a un nouvel
          original. On le ramène au français s'il est arrivé déjà traduit. */
-      if (!noeud.__vo || (noeud.__vw != null && brut !== noeud.__vw)) noeud.__vo = origineDe(brut)
+      if (!noeud.__vo || (noeud.__vw != null && brut !== noeud.__vw)) noeud.__vo = sourceDe(brut)
       /* ⚠ LES HOMONYMES : `data-tr` DONNE LE SENS.
 
          Le français emploie le même mot pour deux gestes différents.
@@ -2886,7 +3585,10 @@ function appliquerLangue(zone) {
          à la place du texte. À l'écran, en français, rien ne change : on lit
          toujours « Annuler ». Seule la traduction apprend lequel des deux. */
       const cle = noeud.parentElement?.dataset?.tr
-      const cible = langueApp === 'fr' ? noeud.__vo : (cle ? (dico?.[cle] ?? ia?.[cle] ?? noeud.__vo) : vers(noeud.__vo))
+      const src = noeud.__vo
+      const cible = cle
+        ? (langueApp === 'fr' ? src.fr : (dico?.[cle] ?? ia?.[cle] ?? src.fr))
+        : (rendreSource(src) ?? vers(src.fr))
       if (noeud.nodeValue.trim() !== cible) noeud.nodeValue = noeud.nodeValue.replace(brut, cible)
       noeud.__vw = cible
     }
@@ -2900,8 +3602,8 @@ function appliquerLangue(zone) {
         const actuel = el.getAttribute(attr)
         // Même règle que pour le texte : un attribut changé par le code depuis
         // notre passage a un nouvel original.
-        if (!el[memo] || (el[ecrit] != null && actuel !== el[ecrit])) el[memo] = origineDe(actuel)
-        const cible = vers(el[memo])
+        if (!el[memo] || (el[ecrit] != null && actuel !== el[ecrit])) el[memo] = sourceDe(actuel)
+        const cible = rendreSource(el[memo]) ?? vers(el[memo].fr)
         if (actuel !== cible) el.setAttribute(attr, cible)
         el[ecrit] = cible
       })
@@ -3894,7 +4596,7 @@ async function demanderReinitialisation(email, zoneErreur, bouton) {
          Le compromis tient quand meme : on ne confirme toujours pas
          l'existence du compte, on annonce simplement l'envoi. */
       err.innerHTML = `${tLang('Un lien vient d’être envoyé à <b>{propre}</b>.', { propre: escapeHtml(propre) })} ` +
-        `Pensez \u00e0 regarder dans les ind\u00e9sirables.`
+        tLang('Pensez à regarder dans les indésirables.')
     }
   } catch (e) {
     if (err) { err.style.color = 'var(--red)'; err.textContent = tLang('Envoi impossible : {v}', { v: e?.message || e }) }
@@ -4076,10 +4778,10 @@ async function verifierRetourMotDePasse() {
   if (!/type=recovery/.test(brut) && !parCode) return false
 
   const nouveau = await demanderTexte({
-    titre: 'Nouveau mot de passe',
-    message: 'Choisissez un mot de passe d\u2019au moins 6 caract\u00e8res.',
+    titre: tLang('Nouveau mot de passe'),
+    message: tLang('Choisissez un mot de passe d\u2019au moins 6 caract\u00e8res.'),
     placeholder: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022',
-    confirmer: 'Enregistrer',
+    confirmer: tLang('Enregistrer'),
   })
   if (!nouveau) {
     /* ⚠ ON NETTOIE L'ADRESSE MEME SI L'ON RENONCE. Sinon le code reste visible,
@@ -4715,12 +5417,12 @@ function armerSurveillance() {
       .map(j => Math.round(j[1]) + ' ms \u00b7 ' + j[0]).join('\n')
 
     detail.textContent = [
-      derniereErreur ? 'Erreur : ' + derniereErreur : 'Aucune erreur remont\u00e9e.',
+      derniereErreur ? 'Erreur : ' + derniereErreur : tLang('Aucune erreur remont\u00e9e.'),
       '',
-      'Derni\u00e8res \u00e9tapes :',
+      tLang('Derni\u00e8res \u00e9tapes :'),
       etapes || '(aucune)',
       '',
-      'R\u00e9seau : ' + (navigator.onLine ? 'connect\u00e9' : 'hors ligne'),
+      tLang('Réseau : {v}', { v: navigator.onLine ? tLang('connecté') : tLang('hors ligne') }),
       'Espace : ' + (currentMembre?.role || '\u2014'),
     ].join('\n')
 
@@ -4966,13 +5668,13 @@ function quandLisible(iso) {
   if (!iso) return ''
   const d = new Date(iso)
   const minutes = Math.floor((Date.now() - d) / 60000)
-  if (minutes < 2) return 'en ce moment'
-  if (minutes < 60) return `il y a ${minutes} min`
-  if (minutes < 1440) return `il y a ${Math.floor(minutes / 60)} h`
+  if (minutes < 2) return tLang('en ce moment')
+  if (minutes < 60) return tLang('il y a {minutes} min', { minutes })
+  if (minutes < 1440) return tLang('il y a {h} h', { h: Math.floor(minutes / 60) })
   const jours = Math.floor(minutes / 1440)
-  if (jours === 1) return 'hier'
-  if (jours < 7) return `il y a ${jours} jours`
-  return 'le ' + d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })
+  if (jours === 1) return tLang('hier')
+  if (jours < 7) return tLang('il y a {jours} jours', { jours })
+  return tLang('le {v}', { v: d.toLocaleDateString(localeApp(), { day: '2-digit', month: 'short' }) })
 }
 
 async function peindreAppareils() {
@@ -5081,7 +5783,7 @@ async function peindreAppareils() {
   /* Le compteur dit ce que la liste montre. Il comptait les appareils actifs
      dans la demi-heure, alors que la liste les affichait tous — deux nombres
      différents pour la même chose, et c'est le petit qui était annoncé. */
-  const val = `${liste.length} sur ${APPAREILS_MAX}`
+  const val = tLang('{length} sur {APPAREILS_MAX}', { length: liste.length, APPAREILS_MAX })
   for (const id of ['e-nb-appareils', 'p-nb-appareils']) {
     const e = document.getElementById(id)
     if (e) e.textContent = val
@@ -5113,12 +5815,12 @@ async function peindreAppareils() {
         <span class="nm">${escapeHtml(a.nom || 'Appareil')}${vivant ? '<span class="ici">' + tLang('actif') + '</span>' : ''}</span>
         <span class="st">${quandLisible(a.derniere_fois)}${
             a.reseaux.length > 1
-              ? ' \u00b7 ' + a.reseaux.length + ' r\u00e9seaux'
+              ? ' ' + tLang('· {length} réseaux', { length: a.reseaux.length })
               : (a.reseaux[0] ? ' \u00b7 ' + escapeHtml(a.reseaux[0]) : '')
           }</span>
       </span>
       <button type="button" class="oter" data-appareil="${a.lignes.join(',')}"
-        data-nom="${escapeHtml(a.nom || 'cet appareil')}">${tLang('Retirer')}</button>
+        data-nom="${escapeHtml(a.nom || tLang('cet appareil'))}">${tLang('Retirer')}</button>
     </div>`
   }).join('')
   el.insertAdjacentHTML('afterbegin', noteReseau)
@@ -5601,7 +6303,7 @@ async function proposerEntrepriseDuQR(code) {
   const { data: dejaMembre } = await supabase
     .from('membres').select('*').eq('user_id', user.id).eq('entreprise_id', ent.id).maybeSingle()
 
-  const nom = ent.nom || 'cette entreprise'
+  const nom = ent.nom || tLang('cette entreprise')
   const ok = await confirmDialog({
     titre: dejaMembre ? tLang('Changer d\'entreprise ?') : tLang('Consulter cette procédure ?'),
     message: dejaMembre ? tLang('Cette procédure appartient à « {nom} », où vous avez déjà un accès. Basculer vers cette entreprise pour la consulter ?', { nom }) : tLang('Cette procédure appartient à « {nom} ». Vous pourrez la consulter, mais pas les autres procédures de l\'entreprise : il faut pour cela le code de votre responsable.', { nom }),
@@ -5802,7 +6504,7 @@ async function enregistrerPhotoProfil() {
   const chemin = `profils/${currentMembre.id}-${Date.now()}.webp`
   const { error } = await supabase.storage.from('procedo-logos')
     .upload(chemin, blob, { contentType: 'image/webp', upsert: true, cacheControl: CACHE_LONG })
-  if (error) throw new Error('Dépôt de la photo refusé : ' + error.message)
+  if (error) throw new Error(tLang('Dépôt de la photo refusé : {message}', { message: error.message }))
 
   const { data: pub } = supabase.storage.from('procedo-logos').getPublicUrl(chemin)
   return { photo_url: pub?.publicUrl || null }
@@ -6231,12 +6933,12 @@ async function peindreResumeEntreprise() {
    dans 3 jours » se retient, « dans 71 heures » ne dit rien. */
 function resteAvant(expire) {
   const ms = new Date(expire).getTime() - Date.now()
-  if (ms <= 0) return { texte: 'Expiré', bientot: true, mort: true }
+  if (ms <= 0) return { texte: tLang('Expiré'), bientot: true, mort: true }
   const jours = Math.floor(ms / 86400000)
   const heures = Math.floor(ms / 3600000)
-  if (jours >= 2) return { texte: `Expire dans ${jours} jours`, bientot: false }
-  if (heures >= 2) return { texte: `Expire dans ${heures} heures`, bientot: true }
-  return { texte: 'Expire dans moins d\u2019une heure', bientot: true }
+  if (jours >= 2) return { texte: tLang('Expire dans {jours} jours', { jours }), bientot: false }
+  if (heures >= 2) return { texte: tLang('Expire dans {heures} heures', { heures }), bientot: true }
+  return { texte: tLang('Expire dans moins d\u2019une heure'), bientot: true }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -6342,9 +7044,10 @@ document.getElementById('ci-copier')?.addEventListener('click', async () => {
 document.getElementById('ci-revoquer')?.addEventListener('click', async () => {
   if (!currentMembre?.entreprise_id) return
   const ok = await confirmDialog({
-    titre: tLang('Révoquer ce code ?'),
+    titre: tLang('Annuler ce code ?'),
     message: tLang('Il cessera immédiatement de fonctionner. Les personnes déjà inscrites gardent leur accès.'),
-    confirmer: tLang('Révoquer'), annuler: tLang('Annuler'), danger: true,
+    // Deux boutons « Annuler » côte à côte ne se distingueraient pas.
+    confirmer: tLang('Annuler le code'), annuler: tLang('Garder le code'), danger: true,
   })
   if (!ok) return
   const { error } = await supabase.rpc('revoquer_code_invite', {
@@ -6504,7 +7207,7 @@ function effacerTracesDuCompte() {
 /* Contact depuis les réglages, dans les deux espaces. Le courriel arrive
    prérempli avec l'espace et le nom : je sais tout de suite à qui je réponds. */
 function ouvrirContact() {
-  const espace = currentMembre?.role === 'gestion' ? 'Gestion' : 'Équipe'
+  const espace = currentMembre?.role === 'gestion' ? tLang('Gestion') : tLang('Équipe')
   const sujet = encodeURIComponent('Standix · ' + espace)
   const corps = encodeURIComponent(
     '\n\n\u2014\n' + (currentMembre?.nom || '') + ' \u00b7 espace ' + espace)
@@ -6837,7 +7540,7 @@ function casesCourbe(validations, membres) {
          Le mois est ajouté à chacun — « 1 août · 13 août · 25 août ». Trois
          mots de plus, et la ligne devient lisible sans effort. */
       cases.push({ deb, fin: new Date(now.getFullYear(), now.getMonth(), j + 1), total: 0,
-                   nom: `${j} ${deb.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '')}` })
+                   nom: `${j} ${deb.toLocaleDateString(localeApp(), { month: 'short' }).replace('.', '')}` })
     }
   } else if (courbePeriode === 'annee') {
     /* Les douze mois de l'année en cours, de janvier à aujourd'hui. */
@@ -6856,7 +7559,7 @@ function casesCourbe(validations, membres) {
       /* Une seule année affichée : le mois suffit, l'année serait répétée
          douze fois pour rien. */
       cases.push({ deb, fin: new Date(now.getFullYear(), m + 1, 1), total: 0,
-                   nom: deb.toLocaleDateString('fr-FR', { month: 'short' }).replace('.', '') })
+                   nom: deb.toLocaleDateString(localeApp(), { month: 'short' }).replace('.', '') })
     }
   } else {
     /* Depuis l'arrivée du deuxième membre, mois par mois. Plafonné à vingt-quatre
@@ -6870,7 +7573,7 @@ function casesCourbe(validations, membres) {
          « janv » deux fois sans qu'on sache lequel est lequel. L'année s'ajoute
          en deux chiffres, pour ne pas allonger la ligne. */
       cases.push({ deb: new Date(c), fin: new Date(c.getFullYear(), c.getMonth() + 1, 1), total: 0,
-                   nom: c.toLocaleDateString('fr-FR', { month: 'short', year: '2-digit' })
+                   nom: c.toLocaleDateString(localeApp(), { month: 'short', year: '2-digit' })
                          .replace('.', '') })
       c.setMonth(c.getMonth() + 1)
     }
@@ -6922,8 +7625,8 @@ function renderCourbe(validations, membres) {
   if (!brut || cases.length < 2) {
     el.innerHTML = vide({
       dessin: NEANT_PROCEDURE,
-      titre: 'Rien de lu sur cette période',
-      phrase: 'Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.',
+      titre: tLang('Rien de lu sur cette période'),
+      phrase: tLang('Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.'),
     })
     return
   }
@@ -7005,7 +7708,7 @@ function renderGaStats() {
   const debut = new Date()
   debut.setDate(1); debut.setHours(0, 0, 0, 0)
   const dansPeriode = validations.filter(v => new Date(v.validated_at) >= debut)
-  const libelle = 'ce mois-ci'
+  const libelle = tLang('ce mois-ci')
 
   const el = (i) => document.getElementById(i)
 
@@ -7090,7 +7793,7 @@ function renderGainTemps(validations, procedures) {
   /* La phrase « soit N minutes par personne » a été retirée : elle redécoupait
      le chiffre du titre sans rien apprendre. Il ne reste que ce qui compte —
      ces lectures sont tracées. */
-  s.innerHTML = 'Chaque lecture est dat\u00e9e et nominative.'
+  s.innerHTML = tLang('Chaque lecture est dat\u00e9e et nominative.')
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -7145,8 +7848,8 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
   if (!classement.length) {
     el.innerHTML = vide({          // le conteneur est déjà vide, on peut écraser
       dessin: NEANT_PROCEDURE,
-      titre: 'Rien de lu ce mois-ci',
-      phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe.",
+      titre: tLang('Rien de lu ce mois-ci'),
+      phrase: tLang("D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe."),
     })
     return
   }
@@ -7174,9 +7877,9 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
          que pour elles : sinon la dernière couleur ambre serait sautée. */
       vus.forEach(v => { if (!v.estAutres) v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
       el.appendChild(anneauResume(vus, x => x.total,
-        x => x.estAutres ? x.nom : (x.proc?.titre || 'Sans titre'),
+        x => x.estAutres ? x.nom : (x.proc?.titre || tLang('Sans titre')),
         dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
-        'de lecture ce mois-ci', true))
+        tLang('de lecture ce mois-ci'), true))
     }
   }
 
@@ -7198,9 +7901,9 @@ function renderTempsLecture(procedures, dansPeriode, libelle, cible, tout) {
     div.className = 'emp-row'
     div.dataset.proc = x.proc.id
     div.innerHTML = `
-      <div class="emp-row-name">${escapeHtml(x.proc.titre || 'Sans titre')}
-        <span class="emp-row-sous">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans dossier'))}${
-          n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
+      <div class="emp-row-name">${escapeHtml(x.proc.titre || tLang('Sans titre'))}
+        <span class="emp-row-sous">${(x.estAutres ? tLang('Les moins consult\u00e9es') : escapeHtml(x.proc?.categorie || tLang('Sans dossier')))}${
+          n ? ' \u00b7 ' + (n > 1 ? tLang('{n} personnes', { n }) : tLang('{n} personne', { n })) : ''}</span>
       </div>
       ${tempsTotalHtml(x.total, false, libelle)}`
     div.addEventListener('click', () => openAnalyse(x.proc.id))
@@ -7256,7 +7959,7 @@ function dessinerAnneau(id, pct, couleur, texte, unite) {
    d'une dossier à l'autre quelle que soit leur taille. */
 /* « Voir les 1 autres » ne se dit pas. Une seule formule, employée partout. */
 function libelleVoirAutres(n) {
-  return n === 1 ? "Voir l'autre" : `Voir les ${n} autres`
+  return n === 1 ? tLang("Voir l'autre") : tLang('Voir les {n} autres', { n })
 }
 
 /* L'état vide d'une section. Une phrase grise centrée ne dit rien : elle ne fait
@@ -7419,16 +8122,16 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
   if (!procedures.length) {
     el.innerHTML = vide({
       dessin: NEANT_CATEGORIE,
-      titre: 'Aucun dossier',
-      phrase: "Les cat\u00e9gories se cr\u00e9ent toutes seules \u00e0 mesure que vous ajoutez des proc\u00e9dures \u2014 Cuisine, Salle, Bar\u2026",
-      action: 'Cr\u00e9er une proc\u00e9dure', geste: 'creer',
+      titre: tLang('Aucun dossier'),
+      phrase: tLang("Les cat\u00e9gories se cr\u00e9ent toutes seules \u00e0 mesure que vous ajoutez des proc\u00e9dures \u2014 Cuisine, Salle, Bar\u2026"),
+      action: tLang('Cr\u00e9er une proc\u00e9dure'), geste: 'creer',
     })
     return
   }
 
   /* À quelle dossier appartient chaque procédure. */
   const catDe = {}
-  procedures.forEach(p => { catDe[p.id] = p.categorie || 'Sans dossier' })
+  procedures.forEach(p => { catDe[p.id] = p.categorie || tLang('Sans dossier') })
 
   const parCat = {}
   procedures.forEach(p => {
@@ -7449,8 +8152,8 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
   if (!classement.some(c => c.total)) {
     el.innerHTML = vide({
       dessin: NEANT_CATEGORIE,
-      titre: 'Rien de lu ce mois-ci',
-      phrase: "Vos cat\u00e9gories existent, mais personne ne les a encore ouvertes ce mois-ci.",
+      titre: tLang('Rien de lu ce mois-ci'),
+      phrase: tLang("Vos cat\u00e9gories existent, mais personne ne les a encore ouvertes ce mois-ci."),
     })
     return
   }
@@ -7504,7 +8207,7 @@ function renderTopCategories(procedures, validationsPeriode, nbEmployes, periodL
         dureeLisible(avecTemps.reduce((x, c) => x + c.total, 0)),
         /* « lues » ne disait ni de quoi ni sur quelle période. Le centre porte
            une durée : il doit dire que c'est du temps de lecture, et quand. */
-        'de lecture ce mois-ci', true))
+        tLang('de lecture ce mois-ci'), true))
     }
   }
 
@@ -7823,7 +8526,7 @@ function tempsTotalHtml(secondes, grand, libelle) {
      une procédure filtrée sur la période. Écrire « au total » sous un chiffre
      qui ne l'est pas serait un mensonge discret, donc le pire. */
   const t = Number(secondes) || 0
-  const mot = libelle || 'au total'
+  const mot = libelle || tLang('au total')
   return `<span class="temps-total${grand ? ' grand' : ''}">` +
     (t ? `<b>${dureeLisible(t)}</b><i>${escapeHtml(mot)}</i>`
        : `${tLang('<b>—</b><i>aucune lecture</i>')}`) +
@@ -7970,7 +8673,7 @@ async function peindreFicheMembre() {
 
   const derniere = siennes.map(v => new Date(v.validated_at)).sort((a, b) => b - a)[0]
   el('fm-derniere').textContent = derniere ? ilYA(derniere) : tLang('jamais')
-  el('fm-arrivee').textContent = m.created_at ? tLang('le {v}', { v: new Date(m.created_at).toLocaleDateString('fr-FR') }) : '\u2014'
+  el('fm-arrivee').textContent = m.created_at ? tLang('le {v}', { v: new Date(m.created_at).toLocaleDateString(localeApp()) }) : '\u2014'
 }
 
 /* L'anneau d'une période. Chaque part occupe une fraction du tour proportionnelle
@@ -8202,7 +8905,7 @@ function centreAnneauMembre(cle, choix) {
 
   v.textContent = choix.secondes ? String(Math.round(choix.secondes / 60)) : '0'
   u.textContent = choix.secondes ? tLang('minutes') : tLang('jamais ouverte')
-  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || 'Autres') : (choix.proc?.titre || 'Sans titre')) +
+  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || tLang('Autres')) : (choix.proc?.titre || tLang('Sans titre'))) +
     (choix.fois ? ` \u00b7 ${choix.fois} fois` : '')
 }
 
@@ -8305,10 +9008,10 @@ function peindreClassementMembre(cle, animerDes) {
         <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
         <span class="co">
           <!-- La part grise ne désigne aucune procédure : elle en réunit plusieurs. -->
-          <span class="nm">${x.estAutres ? escapeHtml(x.nom || 'Autres')
-            : escapeHtml(x.proc?.titre || 'Sans titre')}</span>
-          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans dossier'))}${
-            x.fois ? ' \u00b7 ' + x.fois + ' consultation' + (x.fois > 1 ? 's' : '') : ''}</span>
+          <span class="nm">${x.estAutres ? escapeHtml(x.nom || tLang('Autres'))
+            : escapeHtml(x.proc?.titre || tLang('Sans titre'))}</span>
+          <span class="st">${(x.estAutres ? tLang('Les moins consult\u00e9es') : escapeHtml(x.proc?.categorie || tLang('Sans dossier')))}${
+            x.fois ? ' \u00b7 ' + (x.fois > 1 ? tLang('{n} consultations', { n: x.fois }) : tLang('{n} consultation', { n: x.fois })) : ''}</span>
         </span>
         <span class="vl"${x.secondes ? '' : ' style="color:var(--label-3)"'}>${
           x.secondes ? dureeLisible(x.secondes) : 'jamais'}</span>
@@ -8387,9 +9090,9 @@ function renderMembresListe() {
   if (!employes.length) {
     el.innerHTML = vide({
       dessin: NEANT_EQUIPE,
-      titre: 'Personne pour l\'instant',
-      phrase: "Invitez votre \u00e9quipe avec le code de l'entreprise. C'est \u00e0 partir de l\u00e0 que vous saurez qui suit vos proc\u00e9dures.",
-      action: 'Voir le code d\'invitation', geste: 'inviter',
+      titre: tLang('Personne pour l\'instant'),
+      phrase: tLang("Invitez votre \u00e9quipe avec le code de l'entreprise. C'est \u00e0 partir de l\u00e0 que vous saurez qui suit vos proc\u00e9dures."),
+      action: tLang('Voir le code d\'invitation'), geste: 'inviter',
     })
     return
   }
@@ -8442,9 +9145,9 @@ function renderMembresListe() {
          que pour elles : sinon la dernière couleur ambre serait sautée. */
       vus.forEach(v => { if (!v.estAutres) v.couleur = FM_TEINTES[t++ % FM_TEINTES.length] })
       el.appendChild(anneauResume(vus, x => x.total,
-        x => x.estAutres ? x.nom : (x.m?.nom || 'Sans nom'),
+        x => x.estAutres ? x.nom : (x.m?.nom || tLang('Sans nom')),
         dureeLisible(avecTemps.reduce((a, x) => a + x.total, 0)),
-        'de lecture ce mois-ci', true))
+        tLang('de lecture ce mois-ci'), true))
     }
   }
 
@@ -8458,10 +9161,10 @@ function renderMembresListe() {
     /* Le temps total, et non plus une série de jours : ce que la personne a
        réellement passé sur vos procédures. */
         div.innerHTML = `
-      <div class="emp-row-name">${escapeHtml(s.m.nom || 'Sans nom')}
-        <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) : 'Poste non d\u00e9fini'}</span>
+      <div class="emp-row-name">${escapeHtml(s.m.nom || tLang('Sans nom'))}
+        <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) : tLang('Poste non d\u00e9fini')}</span>
       </div>
-      ${tempsTotalHtml(s.total, false, 'ce mois-ci')}`
+      ${tempsTotalHtml(s.total, false, tLang('ce mois-ci'))}`
     el.appendChild(div)
   })
 
@@ -8625,7 +9328,7 @@ function peindreAnEquipe() {
     vue.classe = tous.map(m => {
       const siennes = lot.filter(v => v.membre_id === m.id)
       return {
-        membre: m, nom: m.nom || 'Sans nom',
+        membre: m, nom: m.nom || tLang('Sans nom'),
         gestion: m.role === 'gestion',
         total: siennes.reduce((t, v) => t + Number(v.duree_lecture || 0), 0),
         lues: new Set(siennes.map(v => v.procedure_id)).size,
@@ -8738,7 +9441,7 @@ function centreAnneauEq(cle, choix) {
   }
   v.textContent = String(Math.round(choix.total / 60))
   u.textContent = tLang('minutes')
-  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || 'Autres') : choix.nom)
+  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || tLang('Autres')) : choix.nom)
 }
 
 function peindreClassementEq(cle, animerDes) {
@@ -8749,9 +9452,9 @@ function peindreClassementEq(cle, animerDes) {
   if (!vue.classe.length) {
     el.innerHTML = vide({
       dessin: NEANT_EQUIPE,
-      titre: 'Personne pour l\u2019instant',
-      phrase: "Invitez votre \u00e9quipe avec le code de l'entreprise.",
-      action: "Voir le code d'invitation", geste: 'inviter',
+      titre: tLang('Personne pour l\u2019instant'),
+      phrase: tLang("Invitez votre \u00e9quipe avec le code de l'entreprise."),
+      action: tLang("Voir le code d'invitation"), geste: 'inviter',
     })
     return
   }
@@ -8787,7 +9490,7 @@ function peindreClassementEq(cle, animerDes) {
               data-part="${rang}" ${x.estAutres ? '' : `data-membre="${escapeHtml(x.membre.id)}"`}>
         <span class="pt" style="background:${x.couleur || 'rgba(255,255,255,0.14)'}"></span>
         <span class="co">
-          <span class="nm">${escapeHtml(x.estAutres ? (x.nom || 'Autres') : x.nom)}</span>
+          <span class="nm">${escapeHtml(x.estAutres ? (x.nom || tLang('Autres')) : x.nom)}</span>
           <!-- ═══ LA GESTION N'EST PAS MESURÉE ═══
 
                « 0 procédure lue » et « jamais » à côté d'un gestionnaire
@@ -8798,10 +9501,10 @@ function peindreClassementEq(cle, animerDes) {
 
                Sa ligne garde son nom et son rang. Elle est là parce qu'on a
                demandé à voir tous les membres, pas pour être comparée. -->
-          <span class="st">${x.estAutres ? 'Les moins actifs'
-            : x.gestion ? (x.membre.poste ? escapeHtml(x.membre.poste) : 'Gestion')
+          <span class="st">${x.estAutres ? tLang('Les moins actifs')
+            : x.gestion ? (x.membre.poste ? escapeHtml(x.membre.poste) : tLang('Gestion'))
             : (x.membre.poste ? escapeHtml(x.membre.poste) + ' \u00b7 ' : '') +
-              x.lues + ' proc\u00e9dure' + (x.lues > 1 ? 's' : '') + ' lue' + (x.lues > 1 ? 's' : '')}</span>
+              (x.lues > 1 ? tLang('{lues} procédures lues', { lues: x.lues }) : tLang('{lues} procédure lue', { lues: x.lues }))}</span>
         </span>
         ${x.gestion ? '' : `<span class="vl"${x.total ? '' : ' style="color:var(--label-3)"'}>${
           x.total ? dureeLisible(x.total) : 'jamais'}</span>`}
@@ -8890,8 +9593,8 @@ function periodeCourante() {
     dansPeriode: debut
       ? currentGaData.validations.filter(v => new Date(v.validated_at) >= debut)
       : currentGaData.validations,
-    libelle: currentGaPeriod === 'week' ? 'cette semaine'
-      : currentGaPeriod === 'month' ? 'ce mois-ci' : 'au total',
+    libelle: currentGaPeriod === 'week' ? tLang('cette semaine')
+      : currentGaPeriod === 'month' ? tLang('ce mois-ci') : tLang('au total'),
   }
 }
 
@@ -8924,7 +9627,7 @@ function peindreAnCategories() {
       if (!s) return
       const pr = (procedures || []).find(x => x.id === v.procedure_id)
       if (!pr) return
-      const nom = pr.categorie || 'Sans cat\u00e9gorie'
+      const nom = pr.categorie || tLang('Sans cat\u00e9gorie')
       if (!parCat[nom]) parCat[nom] = { nom, total: 0, lecteurs: new Set(), procs: new Set() }
       parCat[nom].total += s
       parCat[nom].lecteurs.add(v.membre_id)
@@ -9038,8 +9741,8 @@ function peindreClassementCat(cle, animerDes) {
   if (!vue.classe.length) {
     el.innerHTML = vide({
       dessin: NEANT_CATEGORIE,
-      titre: cle === 'all' ? 'Aucune lecture pour l\u2019instant' : 'Aucune lecture ce mois-ci',
-      phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici o\u00f9 part le temps de votre \u00e9quipe.",
+      titre: cle === 'all' ? tLang('Aucune lecture pour l\u2019instant') : tLang('Aucune lecture ce mois-ci'),
+      phrase: tLang("D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici o\u00f9 part le temps de votre \u00e9quipe."),
     })
     return
   }
@@ -9337,7 +10040,7 @@ function centreAnneauProc(cle, choix) {
   }
   v.textContent = String(Math.round(choix.total / 60))
   u.textContent = tLang('minutes')
-  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || 'Autres') : (choix.proc?.titre || 'Sans titre'))
+  n.textContent = escapeHtml(choix.estAutres ? (choix.nom || tLang('Autres')) : (choix.proc?.titre || tLang('Sans titre')))
 }
 
 /* Le classement. Trois lignes, puis un bouton qui déplie le reste — la forme
@@ -9350,8 +10053,8 @@ function peindreClassementProc(cle, animerDes) {
   if (!vue.classe.length) {
     el.innerHTML = vide({
       dessin: NEANT_PROCEDURE,
-      titre: cle === 'all' ? 'Rien de lu pour l\u2019instant' : 'Rien de lu ce mois-ci',
-      phrase: "D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe.",
+      titre: cle === 'all' ? tLang('Rien de lu pour l\u2019instant') : tLang('Rien de lu ce mois-ci'),
+      phrase: tLang("D\u00e8s que quelqu'un ouvrira une proc\u00e9dure, vous verrez ici celles qui occupent le plus votre \u00e9quipe."),
     })
     return
   }
@@ -9397,10 +10100,10 @@ function peindreClassementProc(cle, animerDes) {
         <span class="pt" style="background:${x.couleur}"></span>
         <span class="co">
           <!-- La part grise ne désigne aucune procédure : elle en réunit plusieurs. -->
-          <span class="nm">${x.estAutres ? escapeHtml(x.nom || 'Autres')
-            : escapeHtml(x.proc?.titre || 'Sans titre')}</span>
-          <span class="st">${(x.estAutres ? 'Les moins consult\u00e9es' : escapeHtml(x.proc?.categorie || 'Sans dossier'))}${
-            n ? ' \u00b7 ' + n + ' personne' + (n > 1 ? 's' : '') : ''}</span>
+          <span class="nm">${x.estAutres ? escapeHtml(x.nom || tLang('Autres'))
+            : escapeHtml(x.proc?.titre || tLang('Sans titre'))}</span>
+          <span class="st">${(x.estAutres ? tLang('Les moins consult\u00e9es') : escapeHtml(x.proc?.categorie || tLang('Sans dossier')))}${
+            n ? ' \u00b7 ' + (n > 1 ? tLang('{n} personnes', { n }) : tLang('{n} personne', { n })) : ''}</span>
         </span>
         <span class="vl">${dureeLisible(x.total)}</span>
       </button>`
@@ -9515,7 +10218,7 @@ function majBarreProc() {
    s'ouvre depuis la page Équipe complète, où tout le monde figure. */
 
 function dateCourte(v) {
-  return new Date(v).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+  return new Date(v).toLocaleDateString(localeApp(), { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
 /* « il y a 3 jours », « hier », « aujourd'hui » — plus parlant qu'une date. */
@@ -9537,11 +10240,11 @@ function depuisQuandCourt(ms) {
 
 function ilYA(ms) {
   const jours = Math.floor((Date.now() - ms) / 86400000)
-  if (jours <= 0) return "aujourd'hui"
-  if (jours === 1) return 'hier'
-  if (jours < 7) return `il y a ${jours} jours`
-  if (jours < 31) return `il y a ${Math.floor(jours / 7)} semaine${jours >= 14 ? 's' : ''}`
-  return `il y a ${Math.floor(jours / 30)} mois`
+  if (jours <= 0) return tLang("aujourd'hui")
+  if (jours === 1) return tLang('hier')
+  if (jours < 7) return tLang('il y a {jours} jours', { jours })
+  if (jours < 31) return (jours >= 14 ? tLang('il y a {n} semaines', { n: Math.floor(jours / 7) }) : tLang('il y a {n} semaine', { n: Math.floor(jours / 7) }))
+  return tLang('il y a {v} mois', { v: Math.floor(jours / 30) })
 }
 
 /* Place la pastille sous l'onglet actif. Sur un écran ouvert sans passer par
@@ -10895,6 +11598,7 @@ document.addEventListener('visibilitychange', () => {
 })
 
 async function loadGestionProcedures() {
+  majNomsTraduits()
   // L'en-tête a été retiré de la page : ces deux repères peuvent être absents.
   const subheadEl = document.getElementById('p-list-subhead')
   const catGridEl = document.getElementById('cat-grid')
@@ -10947,7 +11651,7 @@ async function loadGestionProcedures() {
 
   if (procedures.length === 0) {
     renderAccueil()
-      ecrireSous(`0 dossier · 0 procédure · accès complet`)
+      ecrireSous(tLang(`0 dossier · 0 procédure · accès complet`))
     /* Meme raison qu'au-dessus : le sous-titre est fixe, ce chemin n'a plus
        rien a y ecrire. */
     /* Plus rien à mesurer : le CSS déduit la hauteur du bloc dès la première
@@ -11052,16 +11756,16 @@ async function loadGestionProcedures() {
 
   const categoriesMap = {}
   procedures.forEach(p => {
-    const nom = p.categorie || 'Sans dossier'
+    const nom = p.categorie || tLang('Sans dossier')
     if (!categoriesMap[nom]) categoriesMap[nom] = '📁'
   })
 
   const nbCategories = Object.keys(categoriesMap).length
-  ecrireSous(`${nbCategories} dossier${nbCategories > 1 ? 's' : ''} · ${procedures.length} procédure${procedures.length > 1 ? 's' : ''} · accès complet`)
+  ecrireSous((nbCategories > 1 ? tLang('{n} dossiers', { n: nbCategories }) : tLang('{n} dossier', { n: nbCategories })) + ' · ' + (procedures.length > 1 ? tLang('{n} procédures', { n: procedures.length }) : tLang('{n} procédure', { n: procedures.length })) + ' · ' + tLang('accès complet'))
 
   allCategoriesData = []
   for (const [nom, icone] of Object.entries(categoriesMap)) {
-    const procsInCat = procedures.filter(p => (p.categorie || 'Sans dossier') === nom) // déjà trié du plus récent au plus ancien
+    const procsInCat = procedures.filter(p => (p.categorie || tLang('Sans dossier')) === nom) // déjà trié du plus récent au plus ancien
 
     // Taux moyen de consultation de la dossier (moyenne des taux de chaque procédure)
     let avgPct = 0
@@ -11151,7 +11855,7 @@ const ACTIVITES_JOURS = 45
    finissent par ne plus dire la même chose. */
 async function collecterActivites() {
   const membres = cachedMembres || []
-  const nomDe = (id) => membres.find(m => m.id === id)?.nom || 'Quelqu\u2019un'
+  const nomDe = (id) => membres.find(m => m.id === id)?.nom || tLang('Quelqu’un')
   const depuis = Date.now() - ACTIVITES_JOURS * 86400000
   const faits = []
 
@@ -11167,7 +11871,7 @@ async function collecterActivites() {
          balisage à coups d'expression régulière — fragile et inutile quand la
          valeur est là, juste au-dessus. */
       nom: m.nom || '',
-      texte: `${tLang('<b>{v}</b> a rejoint l’équipe', { v: escapeHtml(m.nom || 'Quelqu\u2019un') })}`,
+      texte: `${tLang('<b>{v}</b> a rejoint l’équipe', { v: escapeHtml(m.nom || tLang('Quelqu’un')) })}`,
       detail: m.poste ? escapeHtml(m.poste) : '',
     })
   })
@@ -11177,7 +11881,7 @@ async function collecterActivites() {
     faits.push({
       quand: Date.parse(m.promu_le), genre: 'promotion',
       nom: m.nom || '',
-      texte: `${tLang('<b>{v}</b> est passé·e en gestion', { v: escapeHtml(m.nom || 'Quelqu\u2019un') })}`,
+      texte: `${tLang('<b>{v}</b> est passé·e en gestion', { v: escapeHtml(m.nom || tLang('Quelqu’un')) })}`,
       detail: m.promu_par ? 'par ' + escapeHtml(nomDe(m.promu_par)) : '',
     })
   })
@@ -11195,13 +11899,13 @@ async function collecterActivites() {
       .order('created_at', { ascending: false })
       .limit(40)
     ;(data || []).forEach(m => {
-      const qui = `<b>${escapeHtml(m.nom || 'Quelqu\u2019un')}</b>`
+      const qui = `<b>${escapeHtml(m.nom || tLang('Quelqu’un'))}</b>`
       faits.push({
         quand: Date.parse(m.created_at), genre: m.genre === 'depart' ? 'depart' : 'retrait',
         nom: m.nom || '',
         texte: m.genre === 'depart'
-          ? `${qui} a quitté l\u2019équipe`
-          : `${qui} a été retiré\u00b7e de l\u2019équipe`,
+          ? tLang('{qui} a quitté l’équipe', { qui })
+          : tLang('{qui} a été retiré·e de l’équipe', { qui }),
         detail: [m.poste, m.par_nom ? 'par ' + escapeHtml(m.par_nom) : null]
           .filter(Boolean).map(escapeHtml).join(' \u00b7 '),
       })
@@ -11221,8 +11925,8 @@ async function collecterActivites() {
       faits.push({
         quand: Date.parse(d.created_at), genre: 'refus',
         nom: d.nom || d.email || '',
-        texte: `${tLang('<b>{v}</b> n’a pas pu vous rejoindre', { v: escapeHtml(d.nom || d.email || 'Quelqu\u2019un') })}`,
-        detail: 'abonnement complet',
+        texte: `${tLang('<b>{v}</b> n’a pas pu vous rejoindre', { v: escapeHtml(d.nom || d.email || tLang('Quelqu’un')) })}`,
+        detail: tLang('abonnement complet'),
       })
     })
   }
@@ -11308,7 +12012,7 @@ window.ouvrirActivites = async function () {
     return
   }
 
-  const jour = (t) => new Date(t).toLocaleDateString('fr-FR',
+  const jour = (t) => new Date(t).toLocaleDateString(localeApp(),
     { weekday: 'long', day: 'numeric', month: 'long' })
   const aujourdhui = jour(Date.now())
   const hier = jour(Date.now() - 86400000)
@@ -11319,7 +12023,7 @@ window.ouvrirActivites = async function () {
     const j = jour(f.quand)
     if (j !== dernier) {
       dernier = j
-      const nom = j === aujourdhui ? "Aujourd'hui" : j === hier ? 'Hier' : j
+      const nom = j === aujourdhui ? tLang("Aujourd'hui") : j === hier ? tLang('Hier') : j
       morceaux.push(`<div class="act-jour">${escapeHtml(nom)}</div>`)
     }
     morceaux.push(ligneActivite(f))
@@ -11358,37 +12062,37 @@ function depuisQuand(iso, court = false) {
    ⚠ ON GARDE LE POINT ABREVIATIF. « 2 sem » sans point se lit comme un mot
      tronque par erreur ; avec, c'est une abreviation assumee. */
   if (court) {
-    if (s < 90)    return 'à l’instant'
+    if (s < 90)    return tLang('à l’instant')
     if (s < 3600)  return `${Math.floor(s / 60)} min`
     if (s < 86400) return `${Math.floor(s / 3600)} h`
 
     const j = Math.floor(s / 86400)
-    if (j === 1)   return 'hier'
-    if (j < 7)     return `${j} j`
-    if (j < 60)    return `${Math.floor(j / 7)} sem.`
+    if (j === 1)   return tLang('hier')
+    if (j < 7)     return tLang('{j} j', { j })
+    if (j < 60)    return tLang('{n} sem.', { n: Math.floor(j / 7) })
 
     const d = new Date(iso)
     const meme = d.getFullYear() === new Date().getFullYear()
     /* ⚠ LE MOIS EN TROIS LETTRES au-dela de deux mois. `toLocaleDateString`
        rend « janv. », « fevr. » — deja abreges par la langue. */
-    return d.toLocaleDateString('fr-FR',
+    return d.toLocaleDateString(localeApp(),
       meme ? { month: 'short' } : { month: 'short', year: '2-digit' })
   }
 
-  if (s < 90)      return 'à l’instant'
-  if (s < 3600)    return `il y a ${Math.floor(s / 60)} min`
-  if (s < 86400)   { const h = Math.floor(s / 3600); return `il y a ${h} h` }
+  if (s < 90)      return tLang('à l’instant')
+  if (s < 3600)    return tLang('il y a {v} min', { v: Math.floor(s / 60) })
+  if (s < 86400)   { const h = Math.floor(s / 3600); return tLang('il y a {h} h', { h }) }
 
   const j = Math.floor(s / 86400)
-  if (j === 1)     return 'hier'
-  if (j < 7)       return `il y a ${j} jours`
-  if (j < 14)      return 'la semaine dernière'
-  if (j < 60)      return `il y a ${Math.floor(j / 7)} semaines`
+  if (j === 1)     return tLang('hier')
+  if (j < 7)       return tLang('il y a {j} jours', { j })
+  if (j < 14)      return tLang('la semaine dernière')
+  if (j < 60)      return tLang('il y a {v} semaines', { v: Math.floor(j / 7) })
 
   const d = new Date(iso)
   const meme = d.getFullYear() === new Date().getFullYear()
-  return 'en ' + d.toLocaleDateString('fr-FR',
-    meme ? { month: 'long' } : { month: 'long', year: 'numeric' })
+  return tLang('en {v}', { v: d.toLocaleDateString(localeApp(),
+    meme ? { month: 'long' } : { month: 'long', year: 'numeric' }) })
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -11707,13 +12411,13 @@ function jourLisible(t) {
   const auj = new Date(); auj.setHours(0, 0, 0, 0)
   const j = new Date(d); j.setHours(0, 0, 0, 0)
   const ecart = Math.round((auj - j) / 86400000)
-  if (ecart === 0) return "Aujourd’hui"
-  if (ecart === 1) return 'Hier'
-  return d.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
+  if (ecart === 0) return tLang("Aujourd’hui")
+  if (ecart === 1) return tLang('Hier')
+  return d.toLocaleDateString(localeApp(), { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
 function heureCourte(t) {
-  return new Date(t).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  return new Date(t).toLocaleTimeString(localeApp(), { hour: '2-digit', minute: '2-digit' })
 }
 
 /* Les lignes, groupees par jour. `entrees` : [{ quand, html, teinte }] */
@@ -11782,9 +12486,9 @@ function remplirHistoMouvements(idZone) {
     .filter(m => m.created_at && m.created_at >= depuis)
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .map(m => ({ quand: m.created_at, teinte: PT.arrivee,
-                 html: PH.arrivee(escapeHtml((m.nom || 'Un membre').trim().split(/\s+/)[0])),
+                 html: PH.arrivee(escapeHtml((m.nom || tLang('Un membre')).trim().split(/\s+/)[0])),
                  sous: m.poste ? escapeHtml(m.poste) : '' }))
-  peindreHisto(zone, repli, 'Aucun mouvement ce mois-ci.')
+  peindreHisto(zone, repli, tLang('Aucun mouvement ce mois-ci.'))
 
   if (!currentMembre?.entreprise_id) return
   supabase.from('mouvements_membres')
@@ -11799,7 +12503,7 @@ function remplirHistoMouvements(idZone) {
         quand: mv.cree_le,
         teinte: PT[mv.type] || '#9A9AA4',
         html: (PH[mv.type] || PH.arrivee)(
-          escapeHtml((mv.membre_nom || 'Un membre').trim().split(/\s+/)[0])),
+          escapeHtml((mv.membre_nom || tLang('Un membre')).trim().split(/\s+/)[0])),
         /* ⚠ LE POSTE VIENT DU JOURNAL, PAS DE `membres`. Celui de la table
            serait le poste ACTUEL sur un evenement PASSE — quelqu'un promu chef
            afficherait « chef » sur son arrivee d'il y a six mois, alors qu'il
@@ -11808,7 +12512,7 @@ function remplirHistoMouvements(idZone) {
            Les mouvements enregistres avant l'ajout de la colonne n'en ont pas :
            on n'affiche alors rien, plutot qu'un poste faux. */
         sous: mv.membre_poste ? escapeHtml(mv.membre_poste) : '',
-      })), 'Aucun mouvement ce mois-ci.')
+      })), tLang('Aucun mouvement ce mois-ci.'))
     })
 }
 
@@ -11938,7 +12642,7 @@ function classementProcedures(cle, format, zoneId, noteId, note) {
         return `
         <div class="an-membre">
           <span class="an-m-co">
-            <span class="an-m-t">${escapeHtml(d.titre || 'Sans titre')}</span>
+            <span class="an-m-t">${escapeHtml(d.titre || tLang('Sans titre'))}</span>
             ${dossier ? `<span class="an-m-s">${escapeHtml(dossier)}</span>` : ''}
           </span>
           <span class="an-m-q">${format(p[cle])}</span>
@@ -11951,13 +12655,13 @@ function remplirHistoVues() {
   classementProcedures('vues',
     (n) => n > 1 ? n + ' lectures' : '1 lecture',
     'histo-vues-liste', 'histo-vues-note',
-    'Nombre de lectures par procédure.')
+    tLang('Nombre de lectures par procédure.'))
 }
 
 function remplirHistoTemps() {
   classementProcedures('sec', anDureeLisible,
     'histo-temps-liste', 'histo-temps-note',
-    'Temps cumulé passé sur chaque procédure.')
+    tLang('Temps cumulé passé sur chaque procédure.'))
 }
 
 function remplirHistoEquipe() {
@@ -12022,10 +12726,10 @@ function remplirHistoEquipe() {
     <div class="histo-lig">
       <span class="histo-pt" style="background:${pointDossier(r)}"></span>
       <span class="histo-co">
-        <span class="histo-t">${escapeHtml(m.nom || 'Sans nom')}</span>
+        <span class="histo-t">${escapeHtml(m.nom || tLang('Sans nom'))}</span>
         ${m.poste ? `<span class="histo-s">${escapeHtml(m.poste)}</span>` : ''}
       </span>
-      <span class="histo-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : 'Aucune lecture'}</span>
+      <span class="histo-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : tLang('Aucune lecture')}</span>
     </div>`
 
   const section = (titre, groupe) => !groupe.length ? '' : `
@@ -12034,8 +12738,8 @@ function remplirHistoEquipe() {
       <span class="hg-tot">${total(groupe) ? anDureeLisible(total(groupe)) : '—'}</span>
     </div>` + groupe.map(ligne).join('')
 
-  zone.innerHTML = section('Espace Utilisateur', equipe) +
-                   section('Espace Gestion', gestion)
+  zone.innerHTML = section(tLang('Espace Utilisateur'), equipe) +
+                   section(tLang('Espace Gestion'), gestion)
 }
 
 function remplirHistoCreations() {
@@ -12051,7 +12755,7 @@ function remplirHistoCreations() {
       teinte: pointDossier(p.publiee_le ? 3 : 4),
       html: `${tLang('{v} <em>dans {v2}</em>', { v: escapeHtml(p.titre || 'Sans titre'), v2: escapeHtml(p.categorie || 'Sans dossier') })}`,
     }))
-  peindreHisto(zone, entrees, 'Aucune procédure créée ce mois-ci.')
+  peindreHisto(zone, entrees, tLang('Aucune procédure créée ce mois-ci.'))
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -12274,7 +12978,7 @@ function anSerie(valides, champ) {
   }
   return cases.map((c, i) => {
     const t = new Date(debut + i * pas * 86400000)
-    return { v: c.v, jour: t.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }
+    return { v: c.v, jour: t.toLocaleDateString(localeApp(), { day: 'numeric', month: 'short' }) }
   })
 }
 
@@ -12321,15 +13025,15 @@ function peindreAnalyseInterne() {
     </div>`
   }
   zC.innerHTML =
-    tuile(IC.qr, scans === null ? '—' : scans, 'scans de QR code', 1) +
-    tuile(IC.oeil, lectures, `lecture${lectures > 1 ? 's' : ''}`, 0) +
+    tuile(IC.qr, scans === null ? '—' : scans, tLang('scans de QR code'), 1) +
+    tuile(IC.oeil, lectures, (lectures > 1 ? tLang('lectures') : tLang('lecture')), 0) +
     /* ⚠ « passées à lire » DEMANDAIT UN EFFORT. Le mot se rapportait aux heures
        affichees au-dessus, mais il fallait reconstruire la phrase pour le
        comprendre.
 
        « au total sur les procédures » dit directement ce que le chiffre
        compte. */
-    tuile(IC.montre, anDureeLisible(secondes), 'au total sur les procédures', 3)
+    tuile(IC.montre, anDureeLisible(secondes), tLang('au total sur les procédures'), 3)
 
   const zT = document.getElementById('an-lect-total')
   if (zT) zT.textContent = tLang('{lectures} sur {anJours} jours', { lectures, anJours })
@@ -12379,7 +13083,7 @@ function peindreAnalyseInterne() {
 
   const titreProc = (id) => {
     const p = (allGestionProcedures || []).find(x => x.id === id)
-    return p ? (p.titre || 'Sans titre') : null
+    return p ? (p.titre || tLang('Sans titre')) : null
   }
   const dossierProc = (id) => {
     const p = (allGestionProcedures || []).find(x => x.id === id)
@@ -12403,7 +13107,7 @@ function peindreAnalyseInterne() {
      `cachedMembres` porte TOUS les membres, gérant compris — d'où le « <= 1 ».
      On dit alors quoi faire pour que ces cartes se remplissent. */
   const seulLeGerant = (cachedMembres || []).length <= 1
-  const INVITER = 'Invitez votre équipe pour voir l’analyse.'
+  const INVITER = tLang('Invitez votre équipe pour voir l’analyse.')
 
   const peindreClassement = (zone, cle, format, teinteRang, vide) => {
     const z = document.getElementById(zone)
@@ -12433,10 +13137,10 @@ function peindreAnalyseInterne() {
 
   peindreClassement('an-vues', 'vues',
     (n) => n > 1 ? n + ' lectures' : '1 lecture', 1,
-    'Aucune lecture sur cette période.')
+    tLang('Aucune lecture sur cette période.'))
 
   peindreClassement('an-temps-proc', 'sec', anDureeLisible, 3,
-    'Aucun temps de lecture sur cette période.')
+    tLang('Aucun temps de lecture sur cette période.'))
 
   const zE = document.getElementById('an-equipe')
   if (zE) {
@@ -12465,10 +13169,10 @@ function peindreAnalyseInterne() {
                rang suffit a separer les deux entrees. -->
           <span class="an-rang" style="background:${pointDossier(r)}"></span>
           <span class="an-m-co">
-            <span class="an-m-t">${escapeHtml(m.nom || 'Sans nom')}</span>
+            <span class="an-m-t">${escapeHtml(m.nom || tLang('Sans nom'))}</span>
             ${m.poste ? `<span class="an-m-s">${escapeHtml(m.poste)}</span>` : ''}
           </span>
-          <span class="an-m-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : 'Aucune lecture'}</span>
+          <span class="an-m-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : tLang('Aucune lecture')}</span>
         </div>`).join('')
       : '<div class="an-vide-l">' + tLang('Personne dans l’espace Utilisateur pour le moment.') + '</div>'
   }
@@ -12644,11 +13348,11 @@ function peindreTuilesAccueil() {
   }
 
   zChiffres.innerHTML =
-    tuile(IC.doc, enLigne, `procédure${enLigne > 1 ? 's' : ''} en ligne`, 0) +
-    tuile(IC.gens, membres, `membre${membres > 1 ? 's' : ''}`, 1) +
+    tuile(IC.doc, enLigne, (enLigne > 1 ? tLang('procédures en ligne') : tLang('procédure en ligne')), 0) +
+    tuile(IC.gens, membres, (membres > 1 ? tLang('membres') : tLang('membre')), 1) +
     tuile(IC.etincelle,
           restant === null ? '—' : (quota ? `${restant}<em>/${quota}</em>` : restant),
-          'analyses IA restantes', 2)
+          tLang('analyses IA restantes'), 2)
 
 
   /* ═══ LES DEUX DERNIERES SECTIONS ═══
@@ -12730,7 +13434,7 @@ function peindreTuilesAccueil() {
   /* ⚠ LE PRENOM SEUL. « Emma Dupont a rejoint l'equipe » se coupe en plein
      milieu du nom sur un ecran de 390 px ; le prenom tient. */
   const ligneMouvement = (mv) => {
-    const nom = (mv.membre_nom || 'Un membre').trim().split(/\s+/)[0]
+    const nom = (mv.membre_nom || tLang('Un membre')).trim().split(/\s+/)[0]
     const dire = PHRASES_MOUVEMENT[mv.type] || PHRASES_MOUVEMENT.arrivee
     return [dire(escapeHtml(nom)), depuisQuandCourt(new Date(mv.cree_le).getTime())]
   }
@@ -12750,8 +13454,8 @@ function peindreTuilesAccueil() {
      on l'insere en tete sinon. */
   const peindreMouvements = (mvs) => {
     if (!mvs.length) return
-    const html = section('Dernier mouvement',
-      POINTS_MOUVEMENT[mvs[0].type] || '#9A9AA4', 'Voir plus',
+    const html = section(tLang('Dernier mouvement'),
+      POINTS_MOUVEMENT[mvs[0].type] || '#9A9AA4', tLang('Voir plus'),
       'onclick="ouvrirHisto(\'mouvements\')"',
       mvs.map(ligneMouvement))
 
@@ -12805,14 +13509,14 @@ function peindreTuilesAccueil() {
   if (!recentes.length) {
     /* ⚠ LE MEME POINT VIOLET QUE DANS LE CAS REMPLI. Une teinte differente
        ferait croire a un autre etat ; ce n'est que la meme section, vide. */
-    zListes.innerHTML += section('Dernières créations', '#4C1D95', 'Voir plus',
+    zListes.innerHTML += section(tLang('Dernières créations'), '#4C1D95', tLang('Voir plus'),
       'onclick="ouvrirHisto(\'creations\')"',
       [['' + tLang('<em>Aucune procédure créée pour le moment.</em>') + '', '']])
   } else {
     /* ⚠ « Dernieres creations » ET NON « Dernieres procedures creees ». Le titre
        long passait sur deux lignes et poussait « Voir plus » a la ligne
        suivante : deux mots de moins, et la tete du bloc tient sur une. */
-    zListes.innerHTML += section('Dernières créations', '#4C1D95', 'Voir plus',
+    zListes.innerHTML += section(tLang('Dernières créations'), '#4C1D95', tLang('Voir plus'),
       'onclick="ouvrirHisto(\'creations\')"',
       recentes.map(p => {
         const n = Number(p.nb_etapes) || null
@@ -13033,7 +13737,7 @@ function tuileAnalyses(utilisees, quota) {
       <span class="ac-t-v">${quota ? `${utilisees} / ${quota}`
         : (utilisees != null ? String(utilisees) : '\u2014')}</span>
     </div>
-    <div class="ac-t-n">${quota ? 'selon votre abonnement' : 'forfait non renseign\u00e9'}</div>
+    <div class="ac-t-n">${quota ? tLang('selon votre abonnement') : tLang('forfait non renseign\u00e9')}</div>
     ${quota ? `<div class="ac-jauge">${segments}</div>` : ''}`
   return el
 }
@@ -13070,8 +13774,8 @@ function peindreListesAccueil() {
           </span>` : ''}
         </span>
         <span class="ac-carte-co">
-          <span class="nm">${escapeHtml(derniere.titre || 'Sans titre')}</span>
-          <span class="st">${escapeHtml(derniere.sous_categorie || derniere.categorie || 'Sans dossier')}</span>
+          <span class="nm">${escapeHtml(derniere.titre || tLang('Sans titre'))}</span>
+          <span class="st">${escapeHtml(derniere.sous_categorie || derniere.categorie || tLang('Sans dossier'))}</span>
           <!-- ilYA et non depuisQuandCourt : sur une étiquette, « il y a
                2 jours » se lit mieux que le « 2 j » d'une colonne de liste.
                ⚠ AUCUN ACCENT GRAVE ICI : ce commentaire est dans un gabarit
@@ -13182,8 +13886,8 @@ window.ouvrirRecentes = function () {
   if (!liste.length) {
     zone.innerHTML = vide({
       dessin: NEANT_PROCEDURE,
-      titre: 'Aucune procédure ces deux dernières semaines',
-      phrase: 'Les procédures créées apparaissent ici pendant quinze jours. Les plus anciennes restent accessibles dans l\u2019onglet Procédures.',
+      titre: tLang('Aucune procédure ces deux dernières semaines'),
+      phrase: tLang('Les procédures créées apparaissent ici pendant quinze jours. Les plus anciennes restent accessibles dans l\u2019onglet Procédures.'),
     })
     return
   }
@@ -13194,18 +13898,18 @@ window.ouvrirRecentes = function () {
     el.className = 'an-bloc ac-rec'
     el.addEventListener('click', () => openAnalyse(p.id))
 
-    const chemin = [p.categorie || 'Sans dossier', p.sous_categorie].filter(Boolean).join(' \u203a ')
+    const chemin = [p.categorie || tLang('Sans dossier'), p.sous_categorie].filter(Boolean).join(' \u203a ')
     const n = p.etapes?.[0]?.count ?? 0
     /* La date en clair plutôt qu'un « il y a N jours » : sur quinze jours, on
        retient mieux « mardi 12 » qu'un compte à rebours. */
-    const quand = new Date(p.created_at).toLocaleDateString('fr-FR',
+    const quand = new Date(p.created_at).toLocaleDateString(localeApp(),
       { weekday: 'long', day: 'numeric', month: 'long' })
 
     el.innerHTML = `
       <span class="ac-rec-vue">${vignetteProcedure(p)}</span>
       <span class="ac-rec-txt">
-        <span class="ac-rec-t">${escapeHtml(p.titre || 'Sans titre')}</span>
-        <span class="ac-rec-s">${escapeHtml(chemin)}${n ? ` \u00b7 ${n} \u00e9tape${n > 1 ? 's' : ''}` : ''}</span>
+        <span class="ac-rec-t">${escapeHtml(p.titre || tLang('Sans titre'))}</span>
+        <span class="ac-rec-s">${escapeHtml(chemin)}${n ? ' · ' + (n > 1 ? tLang('{n} étapes', { n }) : tLang('{n} étape', { n })) : ''}</span>
         <span class="ac-rec-d">${escapeHtml(quand)}</span>
       </span>
       <span class="ac-rec-fl">\u203a</span>`
@@ -14397,12 +15101,17 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
   const enPanne = proc.statut === 'echec' || analyseBloquee(proc)
   const enAnalyse = proc.statut === 'traitement' || proc.statut === 'redaction'
 
+  /* ⚠ DANS « EN DÉV. », LE DESSIN EST TOUJOURS GRIS — le même que celui des
+     procédures dans la page d'un dossier. Les couleurs tournantes servent à
+     distinguer des dossiers ; une liste de brouillons n'a rien à distinguer
+     de cette façon, et le gris dit « pas encore en ligne ». */
+  const gris = filtreEtatDossiers === 'brouillon'
   el.innerHTML = `
-    <span class="cl-pl" style="background:${fondPlaque(teinte)}">
+    <span class="cl-pl${gris ? ' cl-pl--proc' : ''}"${gris ? '' : ` style="background:${fondPlaque(teinte)}"`}>
       <svg viewBox="0 0 24 24" fill="none">
         <path d="M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z
                  M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2"
-              stroke="url(#pal${teinte.i})" stroke-width="1.9"
+              stroke="url(#${gris ? 'palProc' : 'pal' + teinte.i})" stroke-width="1.9"
               stroke-linejoin="round" stroke-linecap="round"/>
       </svg>
     </span>
@@ -14456,7 +15165,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
 
               const quand = depuisQuand(intacte ? (creeL || proc.publiee_le) : modL, true)
               return `<span class="cl-badge">${marque}<i style="background:#34C759"></i>${
-                quand ? (intacte ? 'Créé ' : 'Mod. ') + quand : 'En ligne'}</span>`
+                quand ? (intacte ? tLang('Créé {quand}', { quand }) : tLang('Mod. {quand}', { quand })) : tLang('En ligne')}</span>`
             }
             /* Non publiee : la roue seulement si l'analyse tourne VRAIMENT,
                c'est-a-dire si `etatProcedureHtml` rend autre chose qu'un
@@ -14516,11 +15225,11 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
                resterait bleu jusqu'au prochain redessin complet de la liste,
                comme la pastille avant lui. */
             return `<span class="cl-badge">${marque}<i class="cl-pt-vu" aria-label="${
-              jamaisVue ? 'Pas encore consultée' : 'Déjà consultée'}" style="background:${
+              jamaisVue ? tLang('Pas encore consultée') : tLang('Déjà consultée')}" style="background:${
               jamaisVue ? '#3A78EE' : '#9A9AA4'}"></i>${
-              quandB ? (intacteB ? 'Créé ' : 'Mod. ') + quandB : 'En dév.'}</span>`
+              quandB ? (intacteB ? tLang('Créé {quand}', { quand: quandB }) : tLang('Mod. {quand}', { quand: quandB })) : tLang('En dév.')}</span>`
           })()}
-        <span class="cl-n">${escapeHtml(dossier || 'Sans dossier')}</span>
+        <span class="cl-n">${escapeHtml(dossier || tLang('Sans dossier'))}</span>
       </span>
     </span>`
 
@@ -14687,8 +15396,8 @@ function renderCategoryGrid() {
 
     if (!liste.length) {
       catGridEl.innerHTML = '<div class="cl-rien">' + (filtreEtatDossiers === 'ligne'
-        ? 'Aucune procédure n’est en ligne pour le moment.'
-        : 'Aucune procédure en développement.') + '</div>'
+        ? tLang('Aucune procédure n’est en ligne pour le moment.')
+        : tLang('Aucune procédure en développement.')) + '</div>'
       return
     }
 
@@ -14775,9 +15484,9 @@ function renderCategoryGrid() {
   if (!visibles.length && !q && filtreEtatDossiers === 'tout') {
     const aDesDossiers = (allCategoriesData || []).length
     catGridEl.innerHTML = '<div class="cl-rien">' + (aDesDossiers
-      ? 'Aucune procédure n’est en ligne pour le moment.' +
+      ? tLang('Aucune procédure n’est en ligne pour le moment.') +
         '<span class="cl-rien-suite">' + tLang('Publiez une procédure pour qu’elle apparaisse ici.') + '</span>'
-      : 'Aucune procédure pour le moment.' +
+      : tLang('Aucune procédure pour le moment.') +
         '<span class="cl-rien-suite">' + tLang('Cliquez le bouton <b>+</b>') + ' ' +
         '' + tLang('pour créer une procédure.') + '</span>') + '</div>'
     return
@@ -14788,10 +15497,10 @@ function renderCategoryGrid() {
        cherche pourquoi la liste est vide alors qu'un segment est actif deux
        lignes plus haut. */
     catGridEl.innerHTML = '<div class="cl-rien">' + (q
-      ? 'Aucun dossier ne correspond à « ' + escapeHtml(rechercheDossiers) + ' ».'
+      ? tLang('Aucun dossier ne correspond à « {v} ».', { v: escapeHtml(rechercheDossiers) })
       : filtreEtatDossiers === 'ligne'
-        ? 'Aucune procédure n’est en ligne pour le moment.'
-        : 'Aucune procédure en développement.') + '</div>'
+        ? tLang('Aucune procédure n’est en ligne pour le moment.')
+        : tLang('Aucune procédure en développement.')) + '</div>'
     return
   }
 
@@ -15464,8 +16173,8 @@ document.addEventListener('click', (e) => {
 wireSortDropdown('dd-membres-sort', (valeur) => {
   triMembres = valeur
   const libelles = {
-    actifs: 'les plus actifs', inactifs: 'les moins actifs',
-    az: 'nom A → Z', recents: 'arrivés récemment',
+    actifs: tLang('les plus actifs'), inactifs: tLang('les moins actifs'),
+    az: tLang('nom A → Z'), recents: tLang('arrivés récemment'),
   }
   const lbl = document.querySelector('#dd-membres-sort .dd-label')
   if (lbl) lbl.textContent = tLang('Trier : {v}', { v: libelles[valeur] || valeur })
@@ -15550,7 +16259,7 @@ function openCategoryProcedures(nom) {
     console.error('Ouverture du dossier :', e)
     showGestionScreen('p-category')
     const el = document.getElementById('category-procedures-list')
-    if (el) el.innerHTML = `<div class="empty-state"><h3>${tLang('Ouverture impossible')}</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
+    if (el) el.innerHTML = `<div class="empty-state"><h3>${tLang('Ouverture impossible')}</h3><p>${escapeHtml((e && e.message) || tLang('erreur inconnue'))}</p></div>`
   }
 }
 
@@ -15588,11 +16297,10 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
   if (!ancien || (!depuisListe && toutesProcedures)) return
 
   const nouveau = await demanderTexte({
-    titre: 'Renommer le dossier',
-    message: `Toutes les proc\u00e9dures class\u00e9es dans \u00ab ${ancien} \u00bb suivront.`,
+    titre: tLang('Renommer le dossier'),
     valeur: ancien,
-    placeholder: 'Nom du dossier',
-    confirmer: 'Renommer',
+    placeholder: tLang('Nom du dossier'),
+    confirmer: tLang('Renommer'),
   })
   if (!nouveau || nouveau === ancien) return
 
@@ -15707,7 +16415,7 @@ function ouvrirCategorie(nom) {
   dossierCourantNom = nom
   const procsInCategory = toutesProcedures
     ? allGestionProcedures
-    : allGestionProcedures.filter(p => (p.categorie || 'Sans dossier') === nom)
+    : allGestionProcedures.filter(p => (p.categorie || tLang('Sans dossier')) === nom)
   /* ⚠ `nbCat` A DISPARU AVEC LE SOUS-TITRE. Il comptait les dossiers pour une
      phrase qui n'existe plus ; le garder aurait parcouru toutes les procedures
      a chaque ouverture pour rien. */
@@ -15744,7 +16452,7 @@ function renderCategoryProceduresList() {
     // Plutôt qu'une liste vide sans explication, on affiche ce qui a échoué.
     console.error('Rendu de la liste des procédures :', e)
     const el = document.getElementById('category-procedures-list')
-    if (el) el.innerHTML = `<div class="empty-state"><h3>${tLang('Affichage impossible')}</h3><p>${escapeHtml((e && e.message) || 'erreur inconnue')}</p></div>`
+    if (el) el.innerHTML = `<div class="empty-state"><h3>${tLang('Affichage impossible')}</h3><p>${escapeHtml((e && e.message) || tLang('erreur inconnue'))}</p></div>`
   }
 
   /* Seules les nouveautés s'animent. */
@@ -15792,7 +16500,7 @@ function renderCategoryProceduresListInterne() {
     ? dansLaVue.filter(d => {
         const titre = sansAccents(d.proc.titre || '')
         // En vue globale, on peut aussi chercher par nom de dossier
-        const cat = toutesProcedures ? sansAccents(d.proc.categorie || 'sans dossier') : ''
+        const cat = toutesProcedures ? sansAccents(d.proc.categorie || tLang('sans dossier')) : ''
         /* Le sous-dossier est cherchable partout, pas seulement en vue globale :
            dans un dossier, taper « friteuse » doit ramener son contenu — c'est
            même le premier réflexe une fois qu'on s'est mis à ranger. */
@@ -15825,10 +16533,11 @@ function renderCategoryProceduresListInterne() {
     const nbP = (filtered || []).length
     const morceaux = []
     if (sousDossiers.size) {
-      morceaux.push(`${sousDossiers.size} sous-dossier${sousDossiers.size > 1 ? 's' : ''}`)
+      morceaux.push(sousDossiers.size > 1 ? tLang('{n} sous-dossiers', { n: sousDossiers.size }) : tLang('{n} sous-dossier', { n: sousDossiers.size }))
     }
-    morceaux.push(nbP ? `${nbP} procédure${nbP > 1 ? 's' : ''}` : 'aucune procédure')
-    nbEl.textContent = morceaux.join(' \u00b7 ')
+    morceaux.push(nbP ? (nbP > 1 ? tLang('{n} procédures', { n: nbP }) : tLang('{n} procédure', { n: nbP })) : tLang('aucune procédure'))
+    // Un morceau par élément : chacun se retraduit seul au changement de langue.
+    nbEl.innerHTML = morceaux.map(m => `<span>${escapeHtml(m)}</span>`).join(' \u00b7 ')
 
     /* ⚠ L'ICONE SUIT CE QU'ON COMPTE. Dans un sous-dossier il n'y a que des
        procedures : y laisser deux chemises annoncait un rangement qui n'existe
@@ -15939,8 +16648,8 @@ function renderCategoryProceduresListInterne() {
        se demander d'où elle sort. */
     const montrerSous = (currentCategoryQuery || toutesProcedures) && proc.sous_categorie
     const detail = [
-      `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`,
-      toutesProcedures ? escapeHtml(proc.categorie || 'Sans dossier') : '',
+      (nbEtapes > 1 ? tLang('{n} étapes', { n: nbEtapes }) : tLang('{n} étape', { n: nbEtapes })),
+      toutesProcedures ? escapeHtml(proc.categorie || tLang('Sans dossier')) : '',
       montrerSous ? escapeHtml(proc.sous_categorie) : '',
     ].filter(Boolean).join(' \u00b7 ')
 
@@ -15994,7 +16703,7 @@ function renderCategoryProceduresListInterne() {
             || (cree && Math.abs(new Date(mod) - new Date(cree)) < 60000)
           const quand = depuisQuand(intacte ? (cree || proc.publiee_le) : mod, true)
           return `<span class="cl-badge"><i style="background:#34C759"></i>${
-            quand ? (intacte ? 'Créé ' : 'Mod. ') + quand : 'En ligne'}</span>`
+            quand ? (intacte ? tLang('Créé {quand}', { quand }) : tLang('Mod. {quand}', { quand })) : tLang('En ligne')}</span>`
         })()}
           <span class="cl-n">${detail}</span>
         </span>
@@ -16253,7 +16962,7 @@ document.getElementById('dv-retour')?.addEventListener('click', () => {
 let anPeriodeLongue = 'month'   // 'month' | 'all'
 
 function anLibelle() {
-  return anPeriodeLongue === 'all' ? 'depuis le d\u00e9but' : 'ce mois-ci'
+  return anPeriodeLongue === 'all' ? tLang('depuis le d\u00e9but') : tLang('ce mois-ci')
 }
 
 function anValidationsPeriode() {
@@ -16711,12 +17420,11 @@ async function renommerSousDossier(ancien) {
      sa derniere ligne : `(champ.value || '').trim() || null`. On s'appuie
      dessus plutot que d'ajouter un chemin. */
   const saisi = await demanderTexte({
-    titre: 'Renommer le sous-dossier',
-    message: `Les proc\u00e9dures de \u00ab ${ancien} \u00bb dans \u00ab ${dossier} \u00bb suivront. ` +
-      'Videz le champ pour retirer le sous-dossier : elles remonteront en haut du dossier.',
+    titre: tLang('Renommer le sous-dossier'),
+    message: tLang('Les procédures de « {ancien} » dans « {dossier} » suivront. Videz le champ pour retirer le sous-dossier : elles remonteront en haut du dossier.', { ancien, dossier }),
     valeur: ancien,
     placeholder: 'Ex : Friteuse',
-    confirmer: 'Renommer',
+    confirmer: tLang('Renommer'),
   })
 
   /* ⚠ `undefined` ET `null` NE VEULENT PAS DIRE LA MEME CHOSE ICI.
@@ -16828,7 +17536,7 @@ function peindrePostes() {
 
   el.querySelectorAll('[data-poste]').forEach(b => {
     b.addEventListener('click', async () => {
-      const nom = postesEntreprise.find(x => x.id === b.dataset.poste)?.nom || 'ce poste'
+      const nom = postesEntreprise.find(x => x.id === b.dataset.poste)?.nom || tLang('ce poste')
       const ok = await confirmDialog({
         titre: tLang('Retirer {nom} ?', { nom }),
         message: tLang('Les personnes qui l\'ont choisi le gardent : seul le choix disparaît pour les prochaines.'),
@@ -17247,7 +17955,7 @@ async function completerEtapesAvecIA() {
       urlAnalyse = sig.signedUrl
       jalon('3/5 \u00b7 Vid\u00e9o retrouv\u00e9e\u2026')
     }
-    if (!urlAnalyse) throw new Error("Aucune vid\u00e9o \u00e0 analyser.")
+    if (!urlAnalyse) throw new Error(tLang("Aucune vid\u00e9o \u00e0 analyser."))
 
     /* ═══ LE QUOTA, AVANT DE DÉPENSER ═══
 
@@ -17287,19 +17995,16 @@ async function completerEtapesAvecIA() {
          le 1er du mois ferait attendre pour rien. */
       if (droit.raison === 'essai') {
         throw new Error(
-          `Vos ${droit.quota} analyses d\u2019essai sont utilis\u00e9es. `
-          + `Choisissez une offre pour continuer \u00e0 analyser vos vid\u00e9os.`)
+          tLang('Vos {quota} analyses d’essai sont utilisées. Choisissez une offre pour continuer à analyser vos vidéos.', { quota: droit.quota }))
       }
       if (droit.raison === 'quota') {
         throw new Error(
-          `Vous avez utilis\u00e9 vos ${droit.quota} analyses vid\u00e9o de ce mois-ci. `
-          + `Elles se renouvellent le 1er du mois prochain \u2014 ou passez \u00e0 l'offre `
-          + `sup\u00e9rieure pour en avoir davantage tout de suite.`)
+          tLang('Vous avez utilisé vos {quota} analyses vidéo de ce mois-ci. Elles se renouvellent le 1er du mois prochain — ou passez à l\'offre supérieure pour en avoir davantage tout de suite.', { quota: droit.quota }))
       }
       if (droit.raison === 'role') {
-        throw new Error("Seule la gestion peut cr\u00e9er des proc\u00e9dures.")
+        throw new Error(tLang("Seule la gestion peut cr\u00e9er des proc\u00e9dures."))
       }
-      throw new Error("Impossible de v\u00e9rifier votre abonnement.")
+      throw new Error(tLang("Impossible de v\u00e9rifier votre abonnement."))
     }
 
     jalon('4/5 \u00b7 Ouverture de l\u2019analyse\u2026')
@@ -17323,7 +18028,7 @@ async function completerEtapesAvecIA() {
       })
       .select().single()
     if (errTemp) throw new Error(errTemp.message)
-    if (!temp?.id) throw new Error("La proc\u00e9dure d'analyse n'a pas pu \u00eatre cr\u00e9\u00e9e.")
+    if (!temp?.id) throw new Error(tLang("La proc\u00e9dure d'analyse n'a pas pu \u00eatre cr\u00e9\u00e9e."))
     tempId = temp.id
 
     /* 3. L'analyse, puis l'attente. */
@@ -17334,7 +18039,7 @@ async function completerEtapesAvecIA() {
     })
     
     const dep = await rep.json()
-    if (!rep.ok || dep.error) throw new Error(dep.error || "L\u2019analyse n\u2019a pas d\u00e9marr\u00e9.")
+    if (!rep.ok || dep.error) throw new Error(dep.error || tLang("L\u2019analyse n\u2019a pas d\u00e9marr\u00e9."))
 
     /* `ai-start` a répondu : l'analyse est décomptée. À partir d'ici, tout
        échec doit la rendre — c'est ce que fait le bloc d'erreur plus bas.
@@ -17344,7 +18049,7 @@ async function completerEtapesAvecIA() {
     jalon('5/5 \u00b7 Analyse du son et de l\u2019image\u2026')
     const textes = await attendreEtapesIA(tempId)
     if (!textes.length) {
-      throw new Error("L\u2019IA n\u2019a rien tir\u00e9 de cette vid\u00e9o. V\u00e9rifiez que la parole est audible.")
+      throw new Error(tLang("L\u2019IA n\u2019a rien tir\u00e9 de cette vid\u00e9o. V\u00e9rifiez que la parole est audible."))
     }
 
     /* 4. On répartit. Les deux listes sont dans le même ordre chronologique :
@@ -17548,7 +18253,7 @@ async function attendreEtapesIA(procId) {
     }
     if (data.status === 'error' || data.error) {
       oublierAnalyse()
-      throw new Error(data.error || "L\u2019analyse a \u00e9chou\u00e9.")
+      throw new Error(data.error || tLang("L\u2019analyse a \u00e9chou\u00e9."))
     }
 
     tour++
@@ -17556,7 +18261,7 @@ async function attendreEtapesIA(procId) {
     await new Promise(r => setTimeout(r, delai))
   }
   oublierAnalyse()
-  throw new Error("L\u2019analyse prend trop de temps. R\u00e9essayez, ou \u00e9crivez les \u00e9tapes vous-m\u00eame.")
+  throw new Error(tLang("L\u2019analyse prend trop de temps. R\u00e9essayez, ou \u00e9crivez les \u00e9tapes vous-m\u00eame."))
 }
 
 /* L'annulation de l'écran de modification. Elle a sa PROPRE pile : les deux
@@ -17723,16 +18428,16 @@ function modeEmploiEcran() {
   const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
   const etapes = iOS
-    ? ['Glissez depuis le coin haut droit de l’écran.',
-       'Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».',
+    ? [tLang('Glissez depuis le coin haut droit de l’écran.'),
+       tLang('Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».'),
        '' + tLang('Filmez en <b>commentant à voix haute</b>. Pour arrêter : touchez l’heure en rouge.') + '']
-    : ['Glissez depuis le haut de l’écran.',
-       'Touchez « Enregistreur d’écran », activez le micro, puis démarrez.',
+    : [tLang('Glissez depuis le haut de l’écran.'),
+       tLang('Touchez « Enregistreur d’écran », activez le micro, puis démarrez.'),
        '' + tLang('Filmez en <b>commentant à voix haute</b>. Pour arrêter : rouvrez le volet et touchez « Arrêter ».') + '']
   const secours = iOS
-    ? 'Le bouton n’y est pas ? Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».'
-    : 'Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.'
-  return `<div class="ecran-sys-t">${iOS ? 'Sur iPhone et iPad' : 'Sur Android'}</div>`
+    ? tLang('Le bouton n’y est pas ? Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».')
+    : tLang('Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.')
+  return `<div class="ecran-sys-t">${iOS ? tLang('Sur iPhone et iPad') : tLang('Sur Android')}</div>`
     + etapes.map((t, i) => `<div class="ecran-etape"><span>${i + 1}</span><p>${t}</p></div>`).join('')
     + `<div class="ecran-secours">${secours}</div>`
 }
@@ -18391,7 +19096,7 @@ function echecCamera(e) {
   } else {
     zone.innerHTML =
       `<div class="t">${tLang('La caméra n’a pas pu s’ouvrir')}</div>` +
-      `<div class="s">${escapeHtml((nom ? nom + ' — ' : '') + (e?.message || 'raison inconnue'))}</div>` +
+      `<div class="s">${escapeHtml((nom ? nom + ' — ' : '') + (e?.message || tLang('raison inconnue')))}</div>` +
       `<button type="button" class="btn small" id="cam-retenter">${tLang('Réessayer')}</button>`
   }
   zone.style.display = 'flex'
@@ -18446,7 +19151,7 @@ function demarrerPriseCamera() {
     camEnregistreur = fait.enr
     type = fait.type
   } catch (e) {
-    echecCamera({ name: '', message: "ce navigateur ne sait pas enregistrer (" + (e?.message || e) + ")" })
+    echecCamera({ name: '', message: tLang('ce navigateur ne sait pas enregistrer ({v})', { v: e?.message || e }) })
     return
   }
 
@@ -18814,9 +19519,9 @@ window.retirerCollage = function (i) {
 
 /* ═══ LE COLLAGE ═══ */
 async function collerLesVideos(surAvancee) {
-  if (!peutComprimer()) throw new Error('Votre navigateur ne sait pas assembler de vidéos.')
+  if (!peutComprimer()) throw new Error(tLang('Votre navigateur ne sait pas assembler de vidéos.'))
   const type = formatEnregistrable()
-  if (!type) throw new Error('Votre navigateur n’accepte aucun format d’enregistrement.')
+  if (!type) throw new Error(tLang('Votre navigateur n’accepte aucun format d’enregistrement.'))
 
   /* Le cadre vient de la PREMIÈRE vidéo, ramenée à 1280 de large. Les suivantes
      s'y inscrivent en gardant leurs proportions, avec des bandes noires si
@@ -19011,12 +19716,12 @@ async function collerLesVideos(surAvancee) {
       await new Promise((ok, ko) => {
         if (v.readyState >= 1) { ok(); return }
         const minuteur = setTimeout(
-          () => ko(new Error(`« ${f.fichier.name} » n’a pas répondu. Retirez-la et réessayez.`)),
+          () => ko(new Error(tLang('« {name} » n’a pas répondu. Retirez-la et réessayez.', { name: f.fichier.name }))),
           15000)
         v.onloadedmetadata = () => { clearTimeout(minuteur); ok() }
         v.onerror = () => {
           clearTimeout(minuteur)
-          ko(new Error(`« ${f.fichier.name} » n’a pas pu être lue.`))
+          ko(new Error(tLang('« {name} » n’a pas pu être lue.', { name: f.fichier.name })))
         }
       })
 
@@ -19066,8 +19771,7 @@ async function collerLesVideos(surAvancee) {
            vaut mieux que de recopier le message du navigateur, que personne
            ne peut interpréter. */
         throw new Error(e?.name === 'NotAllowedError'
-          ? 'Le navigateur a refusé de lire « ' + f.fichier.name + ' ». '
-            + 'Relancez le collage sans quitter cette page entre-temps.'
+          ? tLang('Le navigateur a refusé de lire « {name} ». Relancez le collage sans quitter cette page entre-temps.', { name: f.fichier.name })
           : (e?.message || String(e)))
       }
       await new Promise((ok) => {
@@ -19105,7 +19809,7 @@ async function collerLesVideos(surAvancee) {
   const part = attendues ? images / attendues : 1
   console.log('[collage] images :', images, 'sur', Math.round(attendues), `(${Math.round(part * 100)} %)`)
   if (attendues > 0 && part < 0.66) {
-    throw new Error('Votre téléphone n’a pas suivi la cadence. Fermez les autres applications et réessayez.')
+    throw new Error(tLang('Votre téléphone n’a pas suivi la cadence. Fermez les autres applications et réessayez.'))
   }
 
   const ext = type.includes('mp4') ? 'mp4' : 'webm'
@@ -19287,7 +19991,7 @@ async function lireEtatAbonnement() {
 
 function dateLisible(iso) {
   if (!iso) return ''
-  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+  return new Date(iso).toLocaleDateString(localeApp(), { day: 'numeric', month: 'long' })
 }
 
 /* L'alerte, dans le langage des autres alertes de l'app : tuile de 32 px,
@@ -19553,10 +20257,10 @@ function dessinerAlerteEssai(hote) {
         <!-- ⚠ LE TITRE NE COMPTE PAS LES JOURS. « Essai 14 jours gratuits »
              nomme l'offre — elle ne retrecit pas. C'est la plaque qui porte le
              decompte, et elle seule. -->
-        <b>${fini ? 'Votre essai est termin\u00e9' : 'Essai 14 jours gratuits'}</b>
+        <b>${fini ? tLang('Votre essai est termin\u00e9') : tLang('Essai 14 jours gratuits')}</b>
         <i>${fini
           ? `${(nbProc > 1 ? (nbMembres > 1 ? tLang('Vos <b>{nbProc} procédures</b> et <b>{nbMembres} membres</b> vous attendent.', { nbProc, nbMembres }) : tLang('Vos <b>{nbProc} procédures</b> et <b>{nbMembres} membre</b> vous attendent.', { nbProc, nbMembres })) : (nbMembres > 1 ? tLang('Vos <b>{nbProc} procédure</b> et <b>{nbMembres} membres</b> vous attendent.', { nbProc, nbMembres }) : tLang('Vos <b>{nbProc} procédure</b> et <b>{nbMembres} membre</b> vous attendent.', { nbProc, nbMembres })))}`
-          : 'Profitez de toutes les fonctionnalit\u00e9s de Standix. Sans engagement.'}</i>
+          : tLang('Profitez de toutes les fonctionnalit\u00e9s de Standix. Sans engagement.')}</i>
       </span>
 
       <!-- ⚠ LE BOUTON EST EN HAUT A DROITE, hors du texte. Pose a la suite, il
@@ -19798,10 +20502,10 @@ async function peindreDemandesAcces() {
 
   /* On nomme les gens. « 3 personnes attendent » reste une statistique ;
      « Marc, Julie et 1 autre » sont des collègues à qui l'on ferme la porte. */
-  const noms = data.map(d => (d.nom || d.email || 'Quelqu\u2019un').split(' ')[0])
+  const noms = data.map(d => (d.nom || d.email || tLang('Quelqu’un')).split(' ')[0])
   const liste = noms.length === 1 ? noms[0]
     : noms.length === 2 ? `${noms[0]} et ${noms[1]}`
-    : `${noms[0]}, ${noms[1]} et ${noms.length - 2} autre${noms.length > 3 ? 's' : ''}`
+    : (noms.length > 3 ? tLang('{a}, {b} et {n} autres', { a: noms[0], b: noms[1], n: noms.length - 2 }) : tLang('{a}, {b} et {n} autre', { a: noms[0], b: noms[1], n: noms.length - 2 }))
 
   zone.style.display = 'block'
   zone.innerHTML = `
@@ -19834,7 +20538,7 @@ document.addEventListener('click', async (e) => {
   await confirmDialog({
     titre: tLang('En attente d’une place'),
     message: (data || []).map(d =>
-      `• ${d.nom || d.email || 'Quelqu\u2019un'}`).join('\n') || tLang('Personne pour l’instant.'),
+      `• ${d.nom || d.email || tLang('Quelqu’un')}`).join('\n') || tLang('Personne pour l’instant.'),
     confirmer: tLang('Fermer'),
     annuler: tLang('Voir les offres'),
   /* ⚠ LE POINT-VIRGULE SÉPARAIT DEUX INSTRUCTIONS. Écrit
@@ -19997,7 +20701,7 @@ async function pagesEnBase64() {
       type: p.fichier.type || 'image/jpeg',
       donnees: String(r.result).split(',')[1],
     })
-    r.onerror = () => reject(new Error('Photo illisible : ' + p.fichier.name))
+    r.onerror = () => reject(new Error(tLang('Photo illisible : {name}', { name: p.fichier.name })))
     r.readAsDataURL(p.fichier)
   })))
 }
@@ -20120,10 +20824,10 @@ async function extraireTexte(fichier) {
   }
 
   if (nom.endsWith('.doc')) {
-    throw new Error("Les fichiers .doc (ancien format Word) ne peuvent pas \u00eatre lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.")
+    throw new Error(tLang("Les fichiers .doc (ancien format Word) ne peuvent pas \u00eatre lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus."))
   }
 
-  throw new Error("Format non reconnu. Acceptés : PDF, Word (.docx), texte (.txt).")
+  throw new Error(tLang("Format non reconnu. Acceptés : PDF, Word (.docx), texte (.txt)."))
 }
 
 document.getElementById('doc-fichier')?.addEventListener('change', async (e) => {
@@ -20148,7 +20852,7 @@ document.getElementById('doc-fichier')?.addEventListener('change', async (e) => 
   try {
     const texte = (await extraireTexte(fichier)).replace(/\s+\n/g, '\n').trim()
     if (texte.length < 40) {
-      throw new Error("Ce document ne contient presque pas de texte. S'il s'agit d'un PDF scann\u00e9, l'image du texte ne peut pas \u00eatre lue.")
+      throw new Error(tLang("Ce document ne contient presque pas de texte. S'il s'agit d'un PDF scann\u00e9, l'image du texte ne peut pas \u00eatre lue."))
     }
     docTexteExtrait = texte
     docNomFichier = fichier.name
@@ -20157,7 +20861,7 @@ document.getElementById('doc-fichier')?.addEventListener('change', async (e) => 
     const mots = texte.split(/\s+/).length
     etat.innerHTML = `<span class="ic">\u2705</span><span class="tx">
       <span class="n">${escapeHtml(fichier.name)}</span>
-      <span class="s">${tLang('{v} mots lus', { v: mots.toLocaleString('fr-FR') })}</span></span>`
+      <span class="s">${tLang('{v} mots lus', { v: mots.toLocaleString(localeApp()) })}</span></span>`
   } catch (ex) {
     docTexteExtrait = ''
     etat.style.display = 'none'
@@ -20208,9 +20912,9 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
         body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64() }),
     })
     const data = await rep.json()
-    if (!rep.ok || data.error) throw new Error(data.error || 'La g\u00e9n\u00e9ration a \u00e9chou\u00e9.')
+    if (!rep.ok || data.error) throw new Error(data.error || tLang('La g\u00e9n\u00e9ration a \u00e9chou\u00e9.'))
     if (!Array.isArray(data.etapes) || data.etapes.length === 0) {
-      throw new Error("L'IA n'a pas trouv\u00e9 d'\u00e9tapes dans ce document. Il d\u00e9crit peut-\u00eatre une situation plut\u00f4t qu'une marche \u00e0 suivre.")
+      throw new Error(tLang("L'IA n'a pas trouv\u00e9 d'\u00e9tapes dans ce document. Il d\u00e9crit peut-\u00eatre une situation plut\u00f4t qu'une marche \u00e0 suivre."))
     }
 
     /* On remplit l'éditeur manuel plutôt que de publier : la personne relit,
@@ -20344,9 +21048,9 @@ const AI_ETAPES = {
 
      On garde celle du bas : elle est en gras, elle enchaîne sur ce qui se
      passera ensuite, et elle vaut pour toutes les phases. */
-  envoi:         { titre: 'Pr\u00e9paration', sous: '' },
-  transcription: { titre: 'Lecture de votre vid\u00e9o', sous: '' },
-  redaction:     { titre: 'Mise en forme', sous: '' },
+  envoi:         { titre: tLang('Pr\u00e9paration'), sous: '' },
+  transcription: { titre: tLang('Lecture de votre vid\u00e9o'), sous: '' },
+  redaction:     { titre: tLang('Mise en forme'), sous: '' },
 }
 
 var aiPalierDepuis = null
@@ -20471,7 +21175,7 @@ async function reprendreAnalyseIA() {
      un sondage pour l'abandonner au premier tour ferait clignoter l'ecran
      d'attente une seconde avant l'erreur. On le dit tout de suite. */
   const trop = analyseTropLongue()
-  if (trop) { arreterAnalyseBloquee(trop, `Reprise après ${Math.round(trop / 60)} min sans résultat`); return }
+  if (trop) { arreterAnalyseBloquee(trop, tLang('Reprise après {v} min sans résultat', { v: Math.round(trop / 60) })); return }
 
   pollAiStatus()
 }
@@ -21190,7 +21894,7 @@ async function tenterAnalyseRapide({ base, son, promesseImages }) {
       (data.error ? ` · ${String(data.error).slice(0, 120)}` : ''))
     if (rep.ok && data.ok) return true
     if (data.raison && !data.repli) {
-      const err = new Error(data.error || 'Analyse refusée.')
+      const err = new Error(data.error || tLang('Analyse refusée.'))
       err.refusQuota = true
       throw err
     }
@@ -21707,7 +22411,7 @@ async function comprimerVideoTempsReel(fichier, surAvancee) {
 
   const type = formatEnregistrable()
   if (!type) return abandon('format',
-    'aucun format enregistrable — MediaRecorder.isTypeSupported refuse mp4, vp9 et webm')
+    tLang('aucun format enregistrable — MediaRecorder.isTypeSupported refuse mp4, vp9 et webm'))
 
   const lecteur = document.createElement('video')
   lecteur.src = URL.createObjectURL(fichier)
@@ -21789,7 +22493,7 @@ async function comprimerVideoTempsReel(fichier, surAvancee) {
        rien — la compression coûte une minute d'attente à l'utilisateur. */
     const large = lecteur.videoWidth, haut = lecteur.videoHeight
     if (!large || !haut) return abandon('dimensions',
-      'le navigateur ne rend pas videoWidth/videoHeight')
+      tLang('le navigateur ne rend pas videoWidth/videoHeight'))
 
     const duree = lecteur.duration
     if (duree && isFinite(duree) && duree > 0) {
@@ -21880,7 +22584,7 @@ async function comprimerVideoTempsReel(fichier, surAvancee) {
     }
 
     if (!sonOk) return abandon('audio-vide',
-      'aucune piste sonore récupérable — la vidéo en a-t-elle une ?')
+      tLang('aucune piste sonore récupérable — la vidéo en a-t-elle une ?'))
 
     const morceaux = []
     /* Le débit AUDIO était laissé au navigateur, qui prend souvent 128 kb/s ou
@@ -22241,14 +22945,14 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        `jalonUI` reste appelée avec un texte simple : la fonction sert aussi
        ailleurs, et la vider ici ferait disparaître tout retour pendant les
        secondes où le bouton tourne. */
-    jalonUI('Préparation de la vidéo')
+    jalonUI(tLang('Préparation de la vidéo'))
     /* Cinq secondes : au-delà, on ne fait plus patienter sous un bouton. */
     const bascule = setTimeout(basculerVersAttente, 5000)
     try {
       let decile = -1
       aiAllegementEnCours = true
       aiVideoFile = await comprimerVideo(aiVideoFile, (pct) => {
-        jalonUI(pct >= 100 ? 'Finalisation de la vidéo…' : 'Préparation de la vidéo…')
+        jalonUI(pct >= 100 ? tLang('Finalisation de la vidéo…') : tLang('Préparation de la vidéo…'))
         const d = Math.floor(pct / 10)
         if (d !== decile) { decile = d; journalIA(`allègement ${pct} %`) }
       })
@@ -22260,7 +22964,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
          relancer. Rien n'a été consommé sur le quota à ce stade. */
       aiLancementEnCours = false
       garderEcranAllume(false)
-      const message = e?.message || "La pr\u00e9paration de la vid\u00e9o a \u00e9chou\u00e9."
+      const message = e?.message || tLang("La pr\u00e9paration de la vid\u00e9o a \u00e9chou\u00e9.")
       if (aiProcedureId) {
         supabase.from('procedures')
           .update({ statut: 'echec', erreur_ia: String(message).slice(0, 400) })
@@ -22313,8 +23017,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
          classique) » signale qu'il a dû se rabattre sur l'ancienne. */
       const b = bilanAllegement
       const duree = b ? ` en ${Math.max(1, Math.round(b.secondes))}\u202fs` +
-        (b.methode === 'classique' ? ' (m\u00e9thode classique)' : '') : ''
-      errorEl.innerHTML = `Vid\u00e9o all\u00e9g\u00e9e : ${poidsLisible(avant)} \u2192 ` +
+        (b.methode === 'classique' ? tLang(' (m\u00e9thode classique)') : '') : ''
+      errorEl.innerHTML = tLang('Vidéo allégée : {v} →', { v: poidsLisible(avant) }) + ' ' +
         `<b>${poidsLisible(aiVideoFile.size)}</b> (\u2212${part}\u202f%)${duree}`
       console.log('Vid\u00e9o all\u00e9g\u00e9e :', poidsLisible(avant), '\u2192',
         poidsLisible(aiVideoFile.size), `(-${part} %)`)
@@ -22345,8 +23049,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       'deja-legere': 'elle \u00e9tait d\u00e9j\u00e0 au d\u00e9bit le plus bas',
       'echec': 'l\u2019all\u00e8gement s\u2019est interrompu',
       'plus-lourde': 'l\u2019all\u00e8gement l\u2019aurait alourdie',
-      'images-perdues': 'votre t\u00e9l\u00e9phone n\u2019a pas suivi la cadence — '
-        + 'fermez les autres applications et r\u00e9essayez',
+      'images-perdues': tLang('votre téléphone n’a pas suivi la cadence — fermez les autres applications et réessayez'),
     }
     const pourquoi = explications[raisonCompression]
     errorEl.style.color = 'var(--red)'
@@ -22401,25 +23104,23 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       jalonUI(m)   /* le numéro d'étape a été retiré : voir le jalon de préparation */
       console.log(`[envoi ${chrono()}] ${m}`)
     }
-    etape('vérification du poids…')
+    etape(tLang('vérification du poids…'))
     // 1. Upload de la vidéo
     /* Dernier rempart sur le poids : le contrôle à la sélection peut être
        contourné si le fichier change sans repasser par l'événement. */
     /* Ce contrôle vient APRÈS la compression : c'est le poids réel de ce qu'on
      s'apprête à envoyer qui compte, pas celui du fichier d'origine. */
   if (aiVideoFile.size > VIDEO_POIDS_MAX) {
-    throw new Error(`Même allégée, cette vidéo pèse ${poidsLisible(aiVideoFile.size)}, ` +
-      `au-delà des ${Math.round(VIDEO_POIDS_MAX / 1024 / 1024)} Mo acceptés. ` +
-      `Baissez la définition de votre caméra, ou filmez plus court.`)
+    throw new Error(tLang('Même allégée, cette vidéo pèse {v}, au-delà des {v2} Mo acceptés. Baissez la définition de votre caméra, ou filmez plus court.', { v: poidsLisible(aiVideoFile.size), v2: Math.round(VIDEO_POIDS_MAX / 1024 / 1024) }))
   }
 
 
     /* On extrait la bande son AVANT d'envoyer quoi que ce soit. Si elle est
        muette, on refuse tout de suite : transférer 40 Mo puis attendre cinq
        minutes pour annoncer l'échec serait la pire façon de l'apprendre. */
-    etape(`écoute de la bande son… (${poidsLisible(aiVideoFile.size)})`)
+    etape(tLang('écoute de la bande son… ({v})', { v: poidsLisible(aiVideoFile.size) }))
     const son = await extraireBandeSon(aiVideoFile)
-    etape(son ? `son mesuré : crête ${son.crete.toFixed(3)}` : 'son illisible, on continue')
+    etape(son ? `son mesuré : crête ${son.crete.toFixed(3)}` : tLang('son illisible, on continue'))
 
     if (son && son.crete < SON_SEUIL) {
       throw new Error('SANS_SON')
@@ -22445,9 +23146,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        c'est « votre vidéo est trop longue ». */
     if (aiVideoFile.size > LIMITE_STOCKAGE) {
       throw new Error(
-        `Cette vidéo pèse ${poidsLisible(aiVideoFile.size)} une fois allégée, ` +
-        `au-delà des ${poidsLisible(LIMITE_STOCKAGE)} acceptés. ` +
-        `Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.`)
+        tLang('Cette vidéo pèse {v} une fois allégée, au-delà des {v2} acceptés. Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.', { v: poidsLisible(aiVideoFile.size), v2: poidsLisible(LIMITE_STOCKAGE) }))
     }
 
     const path = `${base}_${aiVideoFile.name}`
@@ -22491,9 +23190,9 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        « environ 2 minute ». Le pluriel doit se decider sur le nombre montre. */
     const minutes = Math.ceil(secondes / 60)
     const attente = secondes < 60
-      ? 'moins d\u2019une minute'
-      : `environ ${minutes} minute${minutes > 1 ? 's' : ''}`
-    etape(`envoi de ${poidsLisible(aiVideoFile.size)} \u2014 gardez l\u2019app ouverte ${attente}`)
+      ? tLang('moins d\u2019une minute')
+      : (minutes > 1 ? tLang('environ {minutes} minutes', { minutes }) : tLang('environ {minutes} minute', { minutes }))
+    etape(tLang('envoi de {v} — gardez l’app ouverte {attente}', { v: poidsLisible(aiVideoFile.size), attente }))
 
     /* ═══════════════════════════════════════════════════════════════════════
        LA LIMITE DE TEMPS
@@ -22533,11 +23232,11 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
         horloge = setInterval(() => {
           if (navigator.onLine === false) {
-            return echoue(`${quoi} s’est interrompu : la connexion a été perdue.`)
+            return echoue(tLang('{quoi} s’est interrompu : la connexion a été perdue.', { quoi }))
           }
           const ecoule = Math.round((Date.now() - depart) / 1000)
           if (ecoule >= secondes) {
-            echoue(`${quoi} : aucune réponse après ${ecoule} s.`)
+            echoue(tLang('{quoi} : aucune réponse après {ecoule} s.', { quoi, ecoule }))
           }
         }, 1000)
       })
@@ -22552,19 +23251,18 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
     const { error: uploadError } = await limite(
       supabase.storage.from('procedo-videos')
         .upload(path, aiVideoFile, { cacheControl: CACHE_LONG }),
-      delaiEnvoi, "L'envoi de la vidéo")
+      delaiEnvoi, tLang("L'envoi de la vidéo"))
     if (uploadError) {
       /* Le message brut de Supabase est en anglais et parle d'objets et de
          seaux. On traduit le seul cas fréquent, on laisse le reste tel quel. */
       const m = String(uploadError.message || '')
       console.error('[envoi] refus du stockage :', uploadError)
       if (/exceed|too large|maximum/i.test(m)) {
-        throw new Error(`Le stockage a refusé un fichier de ${poidsLisible(aiVideoFile.size)}. ` +
-          `Filmez une séquence plus courte.`)
+        throw new Error(tLang('Le stockage a refusé un fichier de {v}. Filmez une séquence plus courte.', { v: poidsLisible(aiVideoFile.size) }))
       }
-      throw new Error("Le stockage a refusé la vidéo : " + m)
+      throw new Error(tLang('Le stockage a refusé la vidéo : {m}', { m }))
     }
-    etape(`vidéo envoyée en ${chrono()}`)
+    etape(tLang('vidéo envoyée en {v}', { v: chrono() }))
     /* On garde le CHEMIN, pas une URL publique. Le bucket est privé depuis le
      passage aux liens signés : `getPublicUrl` rendait une adresse qui ne
      s'ouvre plus. La fiche signera ce chemin au moment de lire la vidéo.
@@ -22601,10 +23299,10 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        chemin nu ne s'ouvre pas, et l'analyse échouerait sans qu'on sache
        pourquoi. */
     if (urlPourAnalyse === videoUrl) {
-      etape('préparation du lien d’analyse…')
+      etape(tLang('préparation du lien d’analyse…'))
       const { data: sigVid } = await limite(supabase.storage.from('procedo-videos')
-        .createSignedUrl(videoUrl, 6 * 3600), 30, 'La préparation du lien')
-      if (!sigVid?.signedUrl) throw new Error("Impossible de pr\u00e9parer la vid\u00e9o pour l'analyse.")
+        .createSignedUrl(videoUrl, 6 * 3600), 30, tLang('La préparation du lien'))
+      if (!sigVid?.signedUrl) throw new Error(tLang("Impossible de pr\u00e9parer la vid\u00e9o pour l'analyse."))
       urlPourAnalyse = sigVid.signedUrl
     }
 
@@ -22616,7 +23314,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        change d'écran pour trois secondes. */
     clearTimeout(bascule2)
     basculerVersAttente()
-    signalerEtapeIA('Vid\u00e9o rattach\u00e9e\u2026')
+    signalerEtapeIA(tLang('Vid\u00e9o rattach\u00e9e\u2026'))
     /* La procédure existe déjà — elle a été créée avant la compression. On ne
        fait que lui rattacher sa vidéo. */
     /* L'image d'attente se fabrique à partir du fichier qu'on a encore sous la
@@ -22635,7 +23333,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       .eq('id', aiProcedureId)
     if (procError) throw new Error(procError.message)
 
-    signalerEtapeIA('L\u2019IA \u00e9coute et regarde\u2026')
+    signalerEtapeIA(tLang('L\u2019IA \u00e9coute et regarde\u2026'))
 
     /* ═══ D'ABORD LE CHEMIN RAPIDE ═══
        Azure Speech + rédaction sur images. S'il échoue pour une raison
@@ -22693,7 +23391,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       }),
     })
     const startData = await startRes.json()
-    if (!startRes.ok || startData.error) throw new Error(startData.error || "Erreur au démarrage de l'analyse")
+    if (!startRes.ok || startData.error) throw new Error(startData.error || tLang("Erreur au démarrage de l'analyse"))
     }
 
     /* La coche remplace l'anneau. Sans cette classe, l'anneau continuait de
@@ -22723,7 +23421,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
        On le remplace par ce qui s'est réellement passé. */
     if (e?.name === 'TimeoutError' || /timed out/i.test(String(e?.message || ''))) {
-      e = new Error("Le serveur d'analyse n'a pas répondu. Réessayez dans un instant.")
+      e = new Error(tLang("Le serveur d'analyse n'a pas répondu. Réessayez dans un instant."))
     }
 
     /* La procédure existe déjà en base : on ne peut plus faire comme si rien
@@ -22847,7 +23545,7 @@ async function afficherDetailEchec(procId, message) {
       .select('erreur_ia, azure_video_id, statut').eq('id', procId).maybeSingle()
     if (data) {
       detail = [
-        data.erreur_ia || message || '(aucun d\u00e9tail enregistr\u00e9)',
+        data.erreur_ia || message || tLang('(aucun d\u00e9tail enregistr\u00e9)'),
         '',
         'proc\u00e9dure : ' + procId,
         'statut : ' + (data.statut || '\u2014'),
@@ -22901,7 +23599,7 @@ function arreterAnalyseBloquee(ecoule, detail) {
     zone.style.color = 'var(--red)'
     zone.textContent = tLang('L\'analyse dure depuis {v} minutes sans aboutir. Elle est probablement bloquée chez Azure.', { v: Math.round(ecoule / 60) })
   }
-  afficherDetailEchec(aiProcedureId, detail || `Arrêt après ${Math.round(ecoule)} s`)
+  afficherDetailEchec(aiProcedureId, detail || tLang('Arrêt après {v} s', { v: Math.round(ecoule) }))
 
   if (aiProcedureId) {
     supabase.from('procedures')
@@ -22930,7 +23628,7 @@ async function pollAiStatus() {
      question dont on n'attendra pas la reponse. */
   const trop = analyseTropLongue()
   if (trop) {
-    arreterAnalyseBloquee(trop, `Aucune réponse utile après ${Math.round(trop)} s · ${aiNbSondages} sondages`)
+    arreterAnalyseBloquee(trop, tLang('Aucune réponse utile après {v} s · {aiNbSondages} sondages', { v: Math.round(trop), aiNbSondages }))
     return
   }
   try {
@@ -23083,7 +23781,7 @@ document.getElementById('ai-view-btn').onclick = () => openAnalyse(aiProcedureId
         return
       }
       if (pr && pr.statut === 'traitement' && !pr.video_url) {
-        data.message = "La vid\u00e9o n'a pas fini d'\u00eatre envoy\u00e9e. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse."
+        data.message = tLang("La vid\u00e9o n'a pas fini d'\u00eatre envoy\u00e9e. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.")
       }
     }
 
@@ -23427,15 +24125,15 @@ function createClipEditor(ids, api) {
     const probs = []
     for (let i = 1; i < clips.length; i++) {
       const ecart = clips[i].a - clips[i - 1].b
-      if (ecart > 0.5) probs.push({ txt: `Trou de ${ecart.toFixed(1).replace('.', ',')} s avant l'étape ${i + 1}` })
-      if (ecart < -0.5) probs.push({ grave: true, txt: `Les étapes ${i} et ${i + 1} se recoupent sur ${(-ecart).toFixed(1).replace('.', ',')} s` })
+      if (ecart > 0.5) probs.push({ txt: tLang('Trou de {v} s avant l\'étape {v2}', { v: ecart.toFixed(1).replace('.', ','), v2: i + 1 }) })
+      if (ecart < -0.5) probs.push({ grave: true, txt: tLang('Les étapes {i} et {v} se recoupent sur {v2} s', { i, v: i + 1, v2: (-ecart).toFixed(1).replace('.', ',') }) })
     }
-    if (clips[0].a > 0.5) probs.push({ txt: `${clips[0].a.toFixed(1).replace('.', ',')} s non couvertes au début` })
+    if (clips[0].a > 0.5) probs.push({ txt: tLang('{v} s non couvertes au début', { v: clips[0].a.toFixed(1).replace('.', ',') }) })
     const fin = clips[clips.length - 1].b
-    if (fin < d - 0.5) probs.push({ txt: `${(d - fin).toFixed(1).replace('.', ',')} s non couvertes à la fin` })
+    if (fin < d - 0.5) probs.push({ txt: tLang('{v} s non couvertes à la fin', { v: (d - fin).toFixed(1).replace('.', ',') }) })
 
     if (incompletes > 0) {
-      probs.unshift({ txt: `${incompletes} étape${incompletes > 1 ? 's' : ''} sans extrait défini` })
+      probs.unshift({ txt: (incompletes > 1 ? tLang('{n} étapes sans extrait défini', { n: incompletes }) : tLang('{n} étape sans extrait défini', { n: incompletes })) })
     }
 
     if (al) al.innerHTML = probs.length
@@ -24474,7 +25172,7 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
           ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
           : ''}</div>
         <button type="button" class="img-toucher" aria-label="Photo de l'étape">
-          <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
+          <span class="lg">${step.image_url || step.imageFichier ? tLang('Modifier la photo') : tLang('Ajouter une photo')}</span>
         </button>
         <input type="file" accept="image/*" class="fichier">
       </div>
@@ -24585,10 +25283,10 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     const toucherPhoto = async () => {
       if (!(manualSteps[i].image_url || manualSteps[i].imageFichier)) { champFichier.click(); return }
       const choix = await choisirAction({
-        titre: `Photo de l'\u00e9tape ${i + 1}`,
+        titre: tLang('Photo de l\'étape {v}', { v: i + 1 }),
         options: [
-          { cle: 'changer', libelle: 'Remplacer la photo' },
-          { cle: 'retirer', libelle: 'Retirer la photo', danger: true },
+          { cle: 'changer', libelle: tLang('Remplacer la photo') },
+          { cle: 'retirer', libelle: tLang('Retirer la photo'), danger: true },
         ],
       })
       if (choix === 'changer') champFichier.click()
@@ -26090,10 +26788,10 @@ async function openAnalyse(procId) {
      rangement de la date, qui n'en fait pas partie.
 
      Sans sous-dossier, la ligne est celle d'avant, au caractère près. */
-  const cheminProc = [proc.categorie || 'Sans dossier', proc.sous_categorie]
+  const cheminProc = [proc.categorie || tLang('Sans dossier'), proc.sous_categorie]
     .filter(Boolean).join(' \u203a ')
   document.getElementById('analyse-subhead').textContent =
-    tLang('{cheminProc} · créée le {v}', { cheminProc, v: new Date(proc.created_at).toLocaleDateString('fr-FR') })
+    tLang('{cheminProc} · créée le {v}', { cheminProc, v: new Date(proc.created_at).toLocaleDateString(localeApp()) })
 
   renderAnalyseStats()
 
@@ -26312,7 +27010,7 @@ function composerFicheQR(qrCanvas, titre) {
   // Consigne
   g.fillStyle = 'rgba(20,21,24,0.45)'
   g.font = '500 24px Inter, -apple-system, system-ui, sans-serif'
-  g.fillText('Scannez pour ouvrir la procédure', L / 2, y + 6)
+  g.fillText(tLang('Scannez pour ouvrir la procédure'), L / 2, y + 6)
 
   // Filet et signature
   y += 44
@@ -26399,7 +27097,7 @@ function renderAnalyseStats() {
   const nbEmployes = employes.length
   const nbConsulte = validationsInPeriod.length
   const taux = nbEmployes > 0 ? Math.round((nbConsulte / nbEmployes) * 100) : 0
-  const periodLabel = currentAnalysePeriod === 'week' ? 'cette semaine' : currentAnalysePeriod === 'month' ? 'ce mois-ci' : 'au total'
+  const periodLabel = currentAnalysePeriod === 'week' ? tLang('cette semaine') : currentAnalysePeriod === 'month' ? tLang('ce mois-ci') : tLang('au total')
 
 
   const empListEl = document.getElementById('analyse-emp-list')
@@ -26435,8 +27133,8 @@ function renderAnalyseStats() {
     <div class="tx">
       <div class="t">${(vus > 1 ? tLang('{vus} sur {nbEmployes} ont vu cette procédure', { vus, nbEmployes }) : tLang('{vus} sur {nbEmployes} a vu cette procédure', { vus, nbEmployes }))}</div>
       <div class="s">${pct === 100
-        ? "Tout le monde l'a ouverte au moins une fois."
-        : 'Temps de lecture compt\u00e9 par personne.'}</div>
+        ? tLang("Tout le monde l'a ouverte au moins une fois.")
+        : tLang('Temps de lecture compt\u00e9 par personne.')}</div>
     </div>`
   empListEl.appendChild(tete)
   dessinerAnneau('emp-anneau', pct, couleur, pct + '%')
@@ -26469,8 +27167,8 @@ function renderAnalyseStats() {
       <div class="an-lig">
         <span class="pt" style="background:${v ? 'var(--green)' : 'var(--red)'}"></span>
         <span class="co">
-          <span class="nm">${escapeHtml(e.nom || 'Membre')}</span>
-          <span class="st">${e.poste ? escapeHtml(e.poste) : 'Poste non d\u00e9fini'}</span>
+          <span class="nm">${escapeHtml(e.nom || tLang('Membre'))}</span>
+          <span class="st">${e.poste ? escapeHtml(e.poste) : tLang('Poste non d\u00e9fini')}</span>
         </span>
         <span class="vl" style="${v ? '' : 'color:var(--red);'}">${v ? quand : 'jamais'}</span>
       </div>`
@@ -26488,8 +27186,8 @@ function renderAnalyseStats() {
 
   const liste = document.createElement('div')
   liste.className = 'emp-liste'
-  liste.innerHTML = section('Espace \u00c9quipe', parRole('equipe')) +
-                    section('Espace Gestion', parRole('gestion'))
+  liste.innerHTML = section(tLang('Espace \u00c9quipe'), parRole('equipe')) +
+                    section(tLang('Espace Gestion'), parRole('gestion'))
   empListEl.appendChild(liste)
 }
 
@@ -26574,7 +27272,7 @@ function surveillerAnalyses() {
       const age = (Date.now() - new Date(row.created_at || 0).getTime()) / 60000
       const envoiIci = aiLancementEnCours && row.id === aiProcedureId
       if (row.statut === 'traitement' && !row.video_url && age > 10 && !envoiIci) {
-        const raison = "La vid\u00e9o n'a pas \u00e9t\u00e9 envoy\u00e9e jusqu'au bout. Relancez l'analyse en gardant l'app ouverte."
+        const raison = tLang("La vid\u00e9o n'a pas \u00e9t\u00e9 envoy\u00e9e jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.")
         const { error: er } = await supabase.from('procedures')
           .update({ statut: 'echec', erreur_ia: raison })
           .eq('id', row.id).eq('statut', 'traitement').is('video_url', null)
@@ -26710,8 +27408,8 @@ function etatProcedureHtml(proc) {
      main. Les deux lignes d'alerte plus bas n'etaient jamais atteintes.
 
      On les remonte : un probleme se signale avant de decrire un etat. */
-  if (proc?.statut === 'echec') return alerte('#FF453A', "L'analyse a \u00e9chou\u00e9 \u2014 touchez pour relancer")
-  if (analyseBloquee(proc)) return alerte('#FA8A08', "L'analyse semble bloqu\u00e9e \u2014 touchez pour relancer")
+  if (proc?.statut === 'echec') return alerte('#FF453A', tLang("L'analyse a \u00e9chou\u00e9 \u2014 touchez pour relancer"))
+  if (analyseBloquee(proc)) return alerte('#FA8A08', tLang("L'analyse semble bloqu\u00e9e \u2014 touchez pour relancer"))
 
   if (proc && !proc.publiee_le && proc.statut !== 'traitement' && proc.statut !== 'redaction') {
     /* ⚠ LA MEME PILULE QUE PARTOUT AILLEURS. Elle etait ambre et pleine, seule
@@ -26782,9 +27480,7 @@ async function abandonnerAnalyse(proc, dejaConfirme) {
     if (error) throw new Error(error.message)
     if (!effacees || effacees.length === 0) {
       throw new Error(
-        "La base a refusé la suppression. C'est une règle d'accès : votre compte " +
-        "n'a pas le droit de supprimer une procédure. Il faut ajouter une règle " +
-        "« delete » sur la table procedures dans Supabase.")
+        tLang('La base a refusé la suppression. C\'est une règle d\'accès : votre compte n\'a pas le droit de supprimer une procédure. Il faut ajouter une règle « delete » sur la table procedures dans Supabase.'))
     }
 
     const carte = carteDeProcedure(proc.id)
@@ -26866,8 +27562,8 @@ async function proposerReprise(proc) {
   const ok = await confirmDialog({
     titre: bloquee ? tLang('Analyse bloquée') : tLang('L\'analyse a échoué'),
     message: raison + (bloquee
-      ? `L'analyse tourne depuis plus de ${ANALYSE_LIMITE_MIN} minutes, ce qui n'est pas normal. Relancer depuis le début ?`
-      : 'Relancer l\'analyse de cette vidéo ?'),
+      ? tLang('L\'analyse tourne depuis plus de {ANALYSE_LIMITE_MIN} minutes, ce qui n\'est pas normal. Relancer depuis le début ?', { ANALYSE_LIMITE_MIN })
+      : tLang('Relancer l\'analyse de cette vidéo ?')),
     confirmer: tLang('Relancer l\'analyse'),
     annuler: tLang('Supprimer'),
     danger: false,
@@ -26887,7 +27583,7 @@ async function proposerReprise(proc) {
       body: JSON.stringify({ procedure_id: proc.id, video_url: proc.video_url }),
     })
     const data = await rep.json()
-    if (!rep.ok || data.error) throw new Error(data.error || "Le démarrage a échoué")
+    if (!rep.ok || data.error) throw new Error(data.error || tLang("Le démarrage a échoué"))
 
     toast(tLang('Analyse relancée.'))
     await loadGestionProcedures()
@@ -26929,27 +27625,24 @@ function messageErreurAnalyse(brut) {
      n'a pas fini de se televerser, ou qu'il a ete supprime du stockage depuis
      la creation de la procedure. */
   if (/valid URL|INVALID_INPUT/i.test(t)) {
-    return 'La vidéo de cette procédure est introuvable. '
-         + 'Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. '
-         + 'Refilmez la procédure pour relancer l’analyse.'
+    return tLang('La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.')
   }
 
   if (/quota|limit/i.test(t)) {
-    return 'Vos analyses vidéo sont épuisées. Elles se renouvellent au début du mois prochain.'
+    return tLang('Vos analyses vidéo sont épuisées. Elles se renouvellent au début du mois prochain.')
   }
 
   if (/timeout|timed out|abort/i.test(t)) {
-    return 'Le service d’analyse n’a pas répondu à temps. Réessayez dans quelques minutes.'
+    return tLang('Le service d’analyse n’a pas répondu à temps. Réessayez dans quelques minutes.')
   }
 
   if (/network|fetch|Failed to fetch/i.test(t)) {
-    return 'La connexion a été interrompue. Vérifiez votre réseau et réessayez.'
+    return tLang('La connexion a été interrompue. Vérifiez votre réseau et réessayez.')
   }
 
   /* ⚠ LE CAS INCONNU RESTE UTILISABLE. On ne montre pas le texte brut, mais on
      dit quoi faire — et la console garde le detail pour le support. */
-  return 'L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; '
-       + 'si cela persiste, écrivez-nous depuis les réglages.'
+  return tLang('L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; si cela persiste, écrivez-nous depuis les réglages.')
 }
 
 function estVisiteur() { return currentMembre?.role === 'visiteur' }
@@ -27049,8 +27742,8 @@ function peindreNotifsEquipe() {
         </svg>
       </span>
       <span class="notif-co">
-        <span class="notif-t">${escapeHtml(p.titre || 'Sans titre')}</span>
-        <span class="notif-s">${escapeHtml(p.categorie || 'Sans dossier')}</span>
+        <span class="notif-t">${escapeHtml(p.titre || tLang('Sans titre'))}</span>
+        <span class="notif-s">${escapeHtml(p.categorie || tLang('Sans dossier'))}</span>
       </span>
       <span class="notif-q">${depuisQuandCourt(new Date(p.publiee_le).getTime())}</span>
     </button>`).join('')
@@ -27069,6 +27762,7 @@ document.addEventListener('click', (e) => {
 })
 
 async function loadEquipeProcedures() {
+  majNomsTraduits()
   /* Un visiteur arrivé par QR n'a accès qu'à la procédure scannée. On ne
      demande donc que celle-là : les autres ne sont jamais chargées, il n'y a
      rien à masquer ni à contourner côté navigateur. */
@@ -27351,7 +28045,7 @@ function renderEquipeCategories() {
       if (vus.has(p.id)) continue
       if (termes.length && !termes.some(t => sansAccents(p.titre || '').includes(t))) continue
       vus.add(p.id)
-      liste.push({ proc: p, dossier: p.categorie || 'Sans dossier' })
+      liste.push({ proc: p, dossier: p.categorie || tLang('Sans dossier') })
     }
 
     if (nbEl) {
@@ -27373,7 +28067,7 @@ function renderEquipeCategories() {
   /* ═══ « TOUTES » : LES DOSSIERS ═══ */
   const parCat = {}
   allEquipeProcedures.forEach(p => {
-    const nom = p.categorie || 'Sans dossier'
+    const nom = p.categorie || tLang('Sans dossier')
     if (!parCat[nom]) parCat[nom] = []
     parCat[nom].push(p)
   })
@@ -27566,7 +28260,7 @@ function poserIconeCat(procedures) {
 function renderEquipeCatListe() {
   const listEl = document.getElementById('equipe-procedures-list')
   if (!listEl) return
-  const duDossier = allEquipeProcedures.filter(p => (p.categorie || 'Sans dossier') === equipeCatCourante)
+  const duDossier = allEquipeProcedures.filter(p => (p.categorie || tLang('Sans dossier')) === equipeCatCourante)
   /* Dans un sous-dossier, on ne voit que lui — y compris pour la recherche :
      chercher depuis l'intérieur de « Friteuse » ne doit pas ramener toute la
      cuisine. */
@@ -27629,9 +28323,9 @@ function renderEquipeCatListe() {
       const sd = new Set(vues.map(p => (p.sous_categorie || '').trim()).filter(Boolean)).size
       const seules = vues.filter(p => !(p.sous_categorie || '').trim()).length
       const bouts = []
-      if (sd) bouts.push(`${sd} sous-dossier${sd > 1 ? 's' : ''}`)
-      if (seules) bouts.push(`${seules} procédure${seules > 1 ? 's' : ''}`)
-      nbEl.textContent = bouts.join(' · ') || tLang('Aucun élément')
+      if (sd) bouts.push(sd > 1 ? tLang('{n} sous-dossiers', { n: sd }) : tLang('{n} sous-dossier', { n: sd }))
+      if (seules) bouts.push((seules > 1 ? tLang('{n} procédures', { n: seules }) : tLang('{n} procédure', { n: seules })))
+      nbEl.innerHTML = bouts.length ? bouts.map(m => `<span>${escapeHtml(m)}</span>`).join(' · ') : escapeHtml(tLang('Aucun élément'))
       poserIconeCat(!sd)
     }
   }
@@ -27861,7 +28555,7 @@ function ficheEquipe(proc, rang = 0, dossier = null) {
           : `<span class="cl-badge"><span class="p-seg-pt pt--seul" aria-label="Pas encore lue"></span>${tLang('<i style="background:#3A78EE"></i>Non lue')}</span>`}
         <span class="cl-n">${dossier
           ? escapeHtml(dossier)
-          : `${nbEtapes} étape${nbEtapes > 1 ? 's' : ''}`}</span>
+          : (nbEtapes > 1 ? tLang('{n} étapes', { n: nbEtapes }) : tLang('{n} étape', { n: nbEtapes }))}</span>
       </span>
     </span>
 
@@ -27876,7 +28570,7 @@ function ficheEquipe(proc, rang = 0, dossier = null) {
        ⚠ AUCUN ACCENT GRAVE DANS CE COMMENTAIRE : il vit dans un gabarit, et
          un seul y fermerait la chaine. -->
     <button type="button" class="fav-btn${favori ? ' on' : ''}" data-fav="${proc.id}"
-            aria-label="${favori ? 'Retirer des favoris' : 'Mettre en favori'}">
+            aria-label="${favori ? tLang('Retirer des favoris') : tLang('Mettre en favori')}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
            stroke-linejoin="round" aria-hidden="true">
         <path d="M12 3.6l2.6 5.3 5.8.85-4.2 4.1 1 5.75L12 16.9l-5.2 2.7 1-5.75-4.2-4.1 5.8-.85Z"/>
@@ -28099,7 +28793,7 @@ let quotaConnu = null
 function dateRenouvellement() {
   const d = new Date()
   const p = new Date(d.getFullYear(), d.getMonth() + 1, 1)
-  return p.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' })
+  return p.toLocaleDateString(localeApp(), { day: 'numeric', month: 'long' })
     .replace(/^1 /, '1er ')
 }
 
@@ -28220,8 +28914,8 @@ window.ouvrirQuota = async function() {
     <div class="quota-bloc">
       <div class="quota-chiffre">${utilisees} <em>/ ${quota}</em></div>
       <div class="quota-legende">${q.partage
-        ? 'partag\u00e9 entre vos entreprises'
-        : 'selon votre abonnement'}</div>
+        ? tLang('partag\u00e9 entre vos entreprises')
+        : tLang('selon votre abonnement')}</div>
       <div class="quota-barres">${barres}</div>
       <!-- ⚠ AUCUNE MENTION DE DUREE ICI, ET C'EST VOULU.
 
@@ -28242,7 +28936,7 @@ window.ouvrirQuota = async function() {
          ÉTÉ RETIRÉE, avec sa vignette. Le titre de la page le dit désormais :
          « Vidéo générée par l'IA Standix ». -->
     ${reste <= 5 ? `<button type="button" class="quota-cta" onclick="ouvrirAbonnementDepuisQuota()">
-        ${reste === 0 ? 'Passer \u00e0 l\u2019offre sup\u00e9rieure' : 'Voir les offres'}
+        ${reste === 0 ? tLang('Passer \u00e0 l\u2019offre sup\u00e9rieure') : tLang('Voir les offres')}
       </button>` : ''}
     ${enEssai ? '' : `<div class="quota-pied">
       <!-- ⚠ RIEN PENDANT L'ESSAI.
@@ -28530,7 +29224,7 @@ async function exporterProcedurePdf(proc, etapes) {
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(20)
   doc.setTextColor(20, 20, 22)
-  const titre = doc.splitTextToSize(proc.titre || tLang('Procédure'), LARGEUR)
+  const titre = doc.splitTextToSize(nomTraduit(proc.titre) || proc.titre || tLang('Procédure'), LARGEUR)
   doc.text(titre, MARGE, y + 6)
   y += 6 + titre.length * 8
 
@@ -28540,7 +29234,7 @@ async function exporterProcedurePdf(proc, etapes) {
   /* Le chemin complet, comme sous le titre dans l'app : « Cuisine › Friteuse ».
      Une procédure imprimée circule hors de l'app — sur un mur, dans un
      classeur — et cette ligne est la seule qui dise d'où elle vient. */
-  const chemin = [proc.categorie || tLang('Sans dossier'), proc.sous_categorie]
+  const chemin = [nomTraduit(proc.categorie) || proc.categorie || tLang('Sans dossier'), nomTraduit(proc.sous_categorie) || proc.sous_categorie]
     .filter(Boolean).join(' \u203a ')
   const locale = { en: 'en-GB', de: 'de-DE' }[langueApp] || 'fr-FR'
   const sous = [chemin,
@@ -28949,7 +29643,7 @@ async function openEquipeDetail(procId) {
     favBtn.setAttribute('aria-label', est ? tLang('Retirer des favoris') : tLang('Mettre en favori'))
   }
   document.getElementById('detail-subhead').textContent =
-    [proc.categorie || 'Sans dossier', proc.sous_categorie].filter(Boolean).join(' \u203a ')
+    [proc.categorie || tLang('Sans dossier'), proc.sous_categorie].filter(Boolean).join(' \u203a ')
   equipeProcCourante = { proc, etapes: etapes || [] }
 
   const videoFrame = document.getElementById('detail-video-frame')
@@ -29220,13 +29914,13 @@ async function chargerMesEntreprises() {
 
   el.innerHTML = mesAdhesions.map(a => {
     const actuelle = a.id === currentMembre?.id
-    const nom = a.entreprises?.nom || 'Entreprise'
-    const role = a.role === 'gestion' ? 'Gestion' : 'Équipe'
+    const nom = a.entreprises?.nom || tLang('Entreprise')
+    const role = a.role === 'gestion' ? tLang('Gestion') : tLang('Équipe')
     return `
       <div class="ent-ligne${actuelle ? ' actuelle' : ''}" data-membre="${a.id}">
         <div class="ent-info">
           <div class="ent-nom">${escapeHtml(nom)}</div>
-          <div class="ent-role">${role}${actuelle ? ' · entreprise active' : ''}</div>
+          <div class="ent-role">${role}${actuelle ? ' ' + tLang('· entreprise active') : ''}</div>
         </div>
         ${actuelle
           ? '<span class="ent-marque"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>'
@@ -29351,10 +30045,10 @@ const OFFRES = [
      la grille garde sa logique, seul le niveau change.
 
      Pro et Réseau ne bougent pas — ils étaient déjà largement positifs. */
-  { cle: 'essentiel',  nom: 'Essentiel',  max: 5,   analyses: 30,  prix: 69,  an: 660,  stripe: true },
-  { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,  analyses: 60,  prix: 129, an: 1236, stripe: true },
+  { cle: 'essentiel',  nom: tLang('Essentiel'),  max: 5,   analyses: 30,  prix: 69,  an: 660,  stripe: true },
+  { cle: 'equipe',     nom: tLang('\u00c9quipe'),     max: 15,  analyses: 60,  prix: 129, an: 1236, stripe: true },
   { cle: 'pro',        nom: 'Pro',        max: 40,  analyses: 120, prix: 239, an: 2268, stripe: true },
-  { cle: 'reseau',     nom: 'R\u00e9seau',     max: 100, analyses: 250, prix: 499, an: 4788, stripe: true },
+  { cle: 'reseau',     nom: tLang('R\u00e9seau'),     max: 100, analyses: 250, prix: 499, an: 4788, stripe: true },
   /* ⚠ `analyses: Infinity` MANQUAIT, ET LA CARTE AFFICHAIT « undefined ».
 
      Les quatre offres chiffrees portent un nombre ; celle-ci n'avait rien du
@@ -29364,9 +30058,8 @@ const OFFRES = [
 
      `Infinity` plutot que `null` : c'est deja ce que `max` porte sur cette
      meme offre, et `ligneAnalyses` sait le mettre en mots. */
-  { cle: 'entreprise', nom: 'Entreprise', max: Infinity, analyses: Infinity, prix: null,
-    devis: "Au-del\u00e0 de cent personnes, engagement de disponibilit\u00e9 \u00e9crit " +
-           "pour une discussion." },
+  { cle: 'entreprise', nom: tLang('Entreprise'), max: Infinity, analyses: Infinity, prix: null,
+    devis: tLang('Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.') },
 ]
 
 
@@ -29579,7 +30272,7 @@ function carteOffreNeuve(o, opts = {}) {
 
   const dRen = brutDate ? new Date(brutDate) : null
   const dateRenouv = dRen && !Number.isNaN(dRen.getTime())
-    ? dRen.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+    ? dRen.toLocaleDateString(localeApp(), { day: 'numeric', month: 'long', year: 'numeric' })
     : null
 
   return `
@@ -29698,7 +30391,7 @@ function carteOffreNeuve(o, opts = {}) {
 
           <div class="abo-prix">
             ${surDevis
-              ? `<span class="abo-devis">${escapeHtml(o.devis || 'Sur devis')}</span>`
+              ? `<span class="abo-devis">${escapeHtml(o.devis || tLang('Sur devis'))}</span>`
               : `<span class="abo-p-v">${mensuel} €</span>
                  <span class="abo-p-u">${tLang('par mois, hors taxes')}</span>`}
           </div>
@@ -29951,7 +30644,7 @@ function carteOffre(o, opts = {}) {
            pas. -->
       ${tLang('ou <b>{v} € par mois</b> en payant à l’année', { v: Math.round((o.an || o.prix * 0.8 * 12) / 12) })}
     </div>` : ''}
-    ${surDevis ? `<div class="offre-annuel-fixe">${o.devis || 'Les mêmes fonctionnalités, sans exception.'}</div>` : ''}
+    ${surDevis ? `<div class="offre-annuel-fixe">${o.devis || tLang('Les mêmes fonctionnalités, sans exception.')}</div>` : ''}
 
     ${opts.cta ? `<button type="button" class="offre-cta${opts.enCours ? ' encours' : ''}"
       ${opts.enCours && !changementRythme(opts) ? 'disabled' : ''} data-offre="${o.cle}">${
@@ -29966,8 +30659,8 @@ function carteOffre(o, opts = {}) {
          de trésorerie d'avance. */
       opts.enCours && changementRythme(opts)
         ? (rythmeChoisi === 'annuel'
-            ? `Passer \u00e0 l'ann\u00e9e \u00b7 ${o.an || Math.round(o.prix * 0.8 * 12)} \u20ac`
-            : `Passer au mensuel \u00b7 ${o.prix} \u20ac par mois`)
+            ? tLang('Passer à l\'année · {v} €', { v: o.an || Math.round(o.prix * 0.8 * 12) })
+            : tLang('Passer au mensuel · {prix} € par mois', { prix: o.prix }))
       : opts.enCours ? opts.cta
       : o.prix === null ? opts.cta
       /* Le bouton annonce EXACTEMENT ce qui sera pr\u00e9lev\u00e9. \u00ab Activer \u00bb tout court
@@ -30225,14 +30918,14 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
         }),
       })
       const data = await rep.json()
-      if (!rep.ok || !data.url) throw new Error(data.error || 'Le portail n\u2019a pas pu s\u2019ouvrir.')
+      if (!rep.ok || !data.url) throw new Error(data.error || tLang('Le portail n\u2019a pas pu s\u2019ouvrir.'))
       window.location.href = data.url
     } catch (err) {
       g.disabled = false
       g.textContent = av
       await confirmDialog({
         titre: tLang('Gestion indisponible'),
-        message: String(err?.message || err),
+        message: tLang(String(err?.message || err)),
         confirmer: tLang('Fermer'),
         annuler: null,
         danger: false,
@@ -30438,8 +31131,8 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
          possible avant d'ouvrir sa messagerie. */
     if (o.prix === null) {
       window.location.href = 'mailto:Standix.app@gmail.com?subject=' +
-        encodeURIComponent('Offre Entreprise') + '&body=' +
-        encodeURIComponent('Bonjour,\n\nJe souhaite en savoir plus sur l\u2019offre Entreprise.\n\n')
+        encodeURIComponent(tLang('Offre Entreprise')) + '&body=' +
+        encodeURIComponent(tLang('Bonjour,\n\nJe souhaite en savoir plus sur l\u2019offre Entreprise.\n\n'))
       return
     }
 
@@ -30450,7 +31143,7 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
       annuler: tLang('Fermer'),
     })
     if (ok) window.location.href = 'mailto:Standix.app@gmail.com?subject=' +
-      encodeURIComponent('Offre ' + o.nom)
+      encodeURIComponent(tLang('Offre {nom}', { nom: o.nom }))
     return
   }
 
@@ -30494,14 +31187,14 @@ document.getElementById('p-abonnement')?.addEventListener('click', async (e) => 
       }),
     })
     const data = await rep.json()
-    if (!rep.ok || !data.url) throw new Error(data.error || "Le paiement n'a pas pu s'ouvrir.")
+    if (!rep.ok || !data.url) throw new Error(data.error || tLang("Le paiement n'a pas pu s'ouvrir."))
     window.location.href = data.url
   } catch (err) {
     b.disabled = false
     b.textContent = libelle
     await confirmDialog({
       titre: tLang('Paiement indisponible'),
-      message: String(err?.message || err),
+      message: tLang(String(err?.message || err)),
       confirmer: tLang('Fermer'),
       annuler: tLang('Réessayer'),
       danger: false,
@@ -30921,7 +31614,7 @@ function peindreRangEtab(idRang, idPlus, idNote, espace) {
 
        La note suit maintenant l'ENDROIT, pas seulement la personne. */
     note.innerHTML = plein
-      ? `Vous gérez ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte.`
+      ? tLang('Vous gérez {ETABLISSEMENTS_MAX} entreprises, le maximum par compte.', { ETABLISSEMENTS_MAX })
       : (dejaGerant && espace !== 'equipe')
         ? ''
         : tLang('Touchez un logo pour basculer d’une entreprise à l’autre. Pour rejoindre une autre entreprise, demandez son <b>code d’invitation</b> à son responsable.')
@@ -31193,7 +31886,7 @@ function peindreBarreEtablissements() {
     return `
       <button type="button" class="rond-etab${e.id === courant ? ' actif' : ''}"
               data-etab="${escapeHtml(e.id)}" title="${escapeHtml(e.nom || '')}"
-              aria-label="${escapeHtml(e.nom || 'Établissement')}">${dedans}</button>`
+              aria-label="${escapeHtml(e.nom || tLang('Établissement'))}">${dedans}</button>`
   }).join('')
 
   zone.querySelectorAll('[data-etab]').forEach(b => {
@@ -31458,7 +32151,7 @@ function majFenetreEtab() {
   mono.style.display = etabLogoTampon ? 'none' : 'block'
   document.getElementById('etab-legende').innerHTML = etabLogoTampon
     ? '<button type="button" data-etab-retirer>' + tLang('Retirer le logo') + '</button>'
-    : 'Facultatif \u00b7 les initiales serviront sinon'
+    : tLang('Facultatif \u00b7 les initiales serviront sinon')
   document.getElementById('etab-ok').disabled = nom.length < 2
 }
 
@@ -31506,7 +32199,7 @@ document.getElementById('etab-fichier')?.addEventListener('change', (ev) => {
 
 document.getElementById('etab-supprimer')?.addEventListener('click', async () => {
   if (!etabEdite) return
-  const nom = etabEdite.nom || 'cet \u00e9tablissement'
+  const nom = etabEdite.nom || tLang('cet \u00e9tablissement')
 
   /* On revérifie AU CLIC, pas seulement à l'affichage. Masquer un bouton ne
      protège de rien : il suffit de le réafficher depuis la console. Le contrôle
@@ -31550,8 +32243,7 @@ document.getElementById('etab-supprimer')?.addEventListener('click', async () =>
       .delete().eq('id', etabEdite.id).select('id')
     if (error) throw new Error(error.message)
     if (!data || !data.length) {
-      throw new Error("La base a refus\u00e9 la suppression. Ex\u00e9cutez migration-etablissements.sql : " +
-        "il manque la r\u00e8gle d'acc\u00e8s \u00ab delete \u00bb sur la table entreprises.")
+      throw new Error(tLang('La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d\'accès « delete » sur la table entreprises.'))
     }
 
     const partait = etabEdite.id === currentMembre?.entreprise_id
@@ -31654,8 +32346,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
        direct. */
     if (!entrepriseId && !peutCreerUneEntreprise()) {
       throw new Error(
-        'Seuls les comptes créés en tant que gérant peuvent ouvrir une entreprise. ' +
-        'Votre compte a été créé en tant qu’utilisateur.'
+        tLang('Seuls les comptes créés en tant que gérant peuvent ouvrir une entreprise. Votre compte a été créé en tant qu’utilisateur.')
       )
     }
 
@@ -31672,8 +32363,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const paye = fondees.some(e => e.abonnement_statut === 'actif')
       if (!paye) {
         throw new Error(
-          'Votre premi\u00e8re entreprise n\u2019est pas encore abonn\u00e9e. ' +
-          'Activez son abonnement pour pouvoir en cr\u00e9er une seconde.'
+          tLang('Votre première entreprise n’est pas encore abonnée. Activez son abonnement pour pouvoir en créer une seconde.')
         )
       }
     }
@@ -31685,8 +32375,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
        qu'il n'a rien fonde de plus. Le plafond dit combien on peut EN OUVRIR. */
     if (!entrepriseId && fondees.length >= ETABLISSEMENTS_MAX) {
       throw new Error(
-        `Vous gérez déjà ${ETABLISSEMENTS_MAX} entreprises, le maximum par compte. ` +
-        `Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.`
+        tLang('Vous gérez déjà {ETABLISSEMENTS_MAX} entreprises, le maximum par compte. Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.', { ETABLISSEMENTS_MAX })
       )
     }
 
@@ -31708,8 +32397,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const { data: res, error } = await supabase.rpc('creer_etablissement', { p_nom: nom })
       if (error) {
         throw new Error(/function .* does not exist|not find the function/i.test(error.message)
-          ? "La base ne sait pas encore cr\u00e9er un \u00e9tablissement. "
-            + "Ex\u00e9cutez migration-creer-etablissement.sql."
+          ? tLang('La base ne sait pas encore créer un établissement. Exécutez migration-creer-etablissement.sql.')
           : error.message)
       }
       if (!res?.ok) {
@@ -31720,8 +32408,8 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
         throw new Error(
           res?.message ? res.message
           : res?.raison === 'non connecte'
-            ? "Votre session a expir\u00e9. Reconnectez-vous."
-            : "L'entreprise n'a pas \u00e9t\u00e9 cr\u00e9\u00e9e : " + (res?.raison || 'raison inconnue'))
+            ? tLang("Votre session a expir\u00e9. Reconnectez-vous.")
+            : tLang('L\'entreprise n\'a pas été créée : {v}', { v: res?.raison || 'raison inconnue' }))
       }
       entrepriseId = res.id
     }
@@ -31733,7 +32421,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
       const chemin = `${entrepriseId}/logo-${Date.now()}.webp`
       const { error: eU } = await supabase.storage.from('procedo-logos')
         .upload(chemin, blob, { contentType: 'image/webp', upsert: true, cacheControl: CACHE_LONG })
-      if (eU) throw new Error("D\u00e9p\u00f4t du logo refus\u00e9 : " + eU.message)
+      if (eU) throw new Error(tLang('Dépôt du logo refusé : {message}', { message: eU.message }))
       const { data: pub } = supabase.storage.from('procedo-logos').getPublicUrl(chemin)
       logoUrl = pub?.publicUrl || null
       logoAChange = true
@@ -31756,8 +32444,7 @@ document.getElementById('etab-ok')?.addEventListener('click', async () => {
         .update(aMettreAJour).eq('id', entrepriseId).select('id')
       if (eMaj) throw new Error(eMaj.message)
       if (!maj || maj.length === 0) {
-        throw new Error("La base a refus\u00e9 la modification. Ex\u00e9cutez migration-etablissements.sql : " +
-          "il manque la r\u00e8gle d'acc\u00e8s \u00ab update \u00bb sur la table entreprises.")
+        throw new Error(tLang('La base a refusé la modification. Exécutez migration-etablissements.sql : il manque la règle d\'accès « update » sur la table entreprises.'))
       }
     }
 
@@ -31910,7 +32597,7 @@ async function jeSuisLeDernierGestionnaire() {
 }
 
 document.getElementById('es-quitter')?.addEventListener('click', async () => {
-  const nom = cachedEntreprise?.nom || 'cette entreprise'
+  const nom = cachedEntreprise?.nom || tLang('cette entreprise')
 
   if (await jeSuisLeDernierGestionnaire()) {
     await confirmDialog({
@@ -32042,15 +32729,15 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
 
   try {
     const ent = await entrepriseParCode(code)
-    if (!ent) throw new Error("Aucune entreprise ne correspond \u00e0 ce code.")
+    if (!ent) throw new Error(tLang("Aucune entreprise ne correspond \u00e0 ce code."))
 
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) throw new Error('Session expir\u00e9e. Reconnectez-vous.')
+    if (!user) throw new Error(tLang('Session expir\u00e9e. Reconnectez-vous.'))
 
     // Déjà dedans ? On le dit plutôt que de créer une seconde fiche.
     const { data: dejaLa } = await supabase.from('membres')
       .select('id').eq('user_id', user.id).eq('entreprise_id', ent.id).maybeSingle()
-    if (dejaLa) throw new Error(`Vous faites d\u00e9j\u00e0 partie de ${ent.nom}.`)
+    if (dejaLa) throw new Error(tLang('Vous faites déjà partie de {nom}.', { nom: ent.nom }))
 
     /* La place est-elle libre ? Si l'entreprise est complète, la demande est
        déposée et l'on s'arrête ici. */
@@ -32059,7 +32746,7 @@ document.getElementById('orph-entrer')?.addEventListener('click', async () => {
       .insert({ user_id: user.id, entreprise_id: ent.id, nom: '', role: 'equipe' })
       .select('*').maybeSingle()
     if (error) throw new Error(error.message)
-    if (!cree) throw new Error("La base a refus\u00e9 l'adh\u00e9sion.")
+    if (!cree) throw new Error(tLang("La base a refus\u00e9 l'adh\u00e9sion."))
 
     fermerOrphelin()
 
@@ -32090,7 +32777,7 @@ async function verifierPromotion(membre) {
   if (!membre.promu_le) return
 
   const promu = membre.role === 'gestion'
-  const ent = cachedEntreprise?.nom || 'votre entreprise'
+  const ent = cachedEntreprise?.nom || tLang('votre entreprise')
   const el = (i) => document.getElementById(i)
 
   if (promu) {
@@ -32100,7 +32787,7 @@ async function verifierPromotion(membre) {
     el('promu-titre').textContent = tLang('Vous passez en espace Gestion')
     el('promu-texte').innerHTML =
       `${tLang('Vous êtes désormais <b>gestionnaire</b> de {ent}.', { ent: escapeHtml(ent) })} ` +
-      `Cr\u00e9ez des proc\u00e9dures, suivez l'\u00e9quipe, g\u00e9rez les acc\u00e8s.`
+      tLang('Créez des procédures, suivez l\'équipe, gérez les accès.')
     el('promu-entrer').textContent = tLang('Accéder à l\'espace Gestion')
     el('promu-avert').textContent =
       tLang('L\'espace Équipe ne vous sera plus accessible : vous êtes maintenant de l\'autre côté.')
@@ -32108,7 +32795,7 @@ async function verifierPromotion(membre) {
     el('promu-titre').textContent = tLang('Vous repassez en espace Équipe')
     el('promu-texte').innerHTML =
       `${tLang('Votre rôle a changé chez {ent} : vous faites de nouveau partie de <b>l\'équipe</b>.', { ent: escapeHtml(ent) })} ` +
-      `Vous retrouvez les proc\u00e9dures \u00e0 lire et le scanner de QR codes.`
+      tLang('Vous retrouvez les procédures à lire et le scanner de QR codes.')
     el('promu-entrer').textContent = tLang('Accéder à l\'espace Équipe')
     el('promu-avert').textContent =
       tLang('L\'espace Gestion ne vous est plus accessible. Vos procédures créées restent en place.')
@@ -32316,10 +33003,10 @@ document.getElementById(id)?.addEventListener('click', async () => {
      nom — ici il n'y a rien d'equivalent, et faire retaper son adresse
      e-mail exposerait un identifiant a l'ecran. */
   const saisi = await demanderTexte({
-    titre: 'Confirmer la suppression',
-    message: 'Tapez « SUPPRIMER » pour confirmer.',
+    titre: tLang('Confirmer la suppression'),
+    message: tLang('Tapez « SUPPRIMER » pour confirmer.'),
     placeholder: 'SUPPRIMER',
-    confirmer: 'Supprimer mon compte',
+    confirmer: tLang('Supprimer mon compte'),
   })
   if (!saisi || saisi.trim().toUpperCase() !== 'SUPPRIMER') return
 
@@ -32343,7 +33030,7 @@ document.getElementById(id)?.addEventListener('click', async () => {
 
 ;['quitter-entreprise', 'e-quitter-entreprise'].forEach(id =>
 document.getElementById(id)?.addEventListener('click', async () => {
-  const nom = cachedEntreprise?.nom || 'cette entreprise'
+  const nom = cachedEntreprise?.nom || tLang('cette entreprise')
 
   /* ⚠ ON DIT CE QU'ON PERD, ET CE QU'ON NE PERD PAS. « Etes-vous sur ? » ne
      renseigne personne : la vraie question est de savoir si le travail
@@ -32371,7 +33058,7 @@ document.getElementById(id)?.addEventListener('click', async () => {
 }))
 
 document.getElementById('supprimer-entreprise')?.addEventListener('click', async () => {
-  const nom = cachedEntreprise?.nom || 'cette entreprise'
+  const nom = cachedEntreprise?.nom || tLang('cette entreprise')
 
   /* ⚠ DEUX CONFIRMATIONS, ET LA SECONDE DEMANDE LE NOM.
 
@@ -32385,10 +33072,10 @@ document.getElementById('supprimer-entreprise')?.addEventListener('click', async
   if (!ok) return
 
   const saisi = await demanderTexte({
-    titre: 'Confirmer la suppression',
-    message: 'Tapez « ' + nom + ' » pour confirmer.',
+    titre: tLang('Confirmer la suppression'),
+    message: tLang('Tapez « {nom} » pour confirmer.', { nom }),
     placeholder: nom,
-    confirmer: 'Supprimer définitivement',
+    confirmer: tLang('Supprimer définitivement'),
   })
   if (!saisi || saisi.trim().toLowerCase() !== nom.trim().toLowerCase()) {
     if (saisi) toast(tLang('Le nom ne correspond pas. Rien n’a été supprimé.'))
@@ -32610,7 +33297,7 @@ function peindreEquipe() {
      proprietaire ; c'est lui qui la supprime, personne d'autre. */
   const supprimable = !soi && !estFondateur(m)
     const date = m.created_at
-      ? new Date(m.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+      ? new Date(m.created_at).toLocaleDateString(localeApp(), { day: '2-digit', month: 'short', year: 'numeric' })
       : '\u2014'
 
     return `
@@ -32624,7 +33311,7 @@ function peindreEquipe() {
           ? `<img data-logo-fichier="${escapeHtml(m.photo_url)}" alt="" loading="lazy">`
           : escapeHtml(initialesMembre(m.nom))}</div>
         <div class="pm-info">
-          <div class="pm-nom">${escapeHtml(m.nom || 'Sans nom')}${soi ? ' <span class="pm-soi">' + tLang('vous') + '</span>' : ''}</div>
+          <div class="pm-nom">${escapeHtml(m.nom || tLang('Sans nom'))}${soi ? ' <span class="pm-soi">' + tLang('vous') + '</span>' : ''}</div>
           <div class="pm-role">${tLang('Depuis le {date}', { date })}</div>
         </div>
         ${promouvable ? `<button type="button" class="pm-rang" data-promo="${m.id}"
@@ -32678,11 +33365,13 @@ function peindreEquipe() {
 
   /* Une section vide ne s'affiche pas : un intitulé « Gestion » suivi de rien
      laisse croire à un chargement en cours. */
-  const section = (titre, aide, l) => !l.length ? '' : `
+  /* Le compte se lit « — 3 membres » après l'intitulé. Pas de compte pour le
+     gérant : il n'y en a qu'un, le chiffre « 1 » n'apprenait rien. */
+  const section = (titre, aide, l, compter = true) => !l.length ? '' : `
     <div class="pm-groupe">
       <div class="pm-gtete">
         <span class="pm-gt">${titre}</span>
-        <span class="pm-gn">${l.length}</span>
+        ${compter ? `<span class="pm-gn">— ${l.length > 1 ? tLang('{n} membres', { n: l.length }) : tLang('{n} membre', { n: l.length })}</span>` : ''}
       </div>
       ${aide ? `<div class="pm-gaide">${aide}</div>` : ''}
       ${parGroupe(l)}
@@ -32697,9 +33386,9 @@ function peindreEquipe() {
        se faire, \u00e0 un endroit o\u00f9 aucun bouton ne le propose : la ligne du
        g\u00e9rant ne porte ni promotion, ni retrait. Elle r\u00e9pondait \u00e0 une question
        que personne ne pose. `section` n'\u00e9crit plus rien quand l'aide est vide. */
-    section('G\u00e9rant', '', fondateurs) +
-    section('Espace gestion', 'Acc\u00e8s au d\u00e9veloppement des proc\u00e9dures et aux param\u00e8tres de l\u2019entreprise.', gestion) +
-    section('Espace utilisateur', 'Acc\u00e8s uniquement aux proc\u00e9dures publi\u00e9es par l\u2019entreprise.', equipe)
+    section(tLang('G\u00e9rant'), '', fondateurs, false) +
+    section(tLang('Espace gestion'), tLang('Accès au développement des procédures et aux pages Analyse et Gestion des accès.'), gestion) +
+    section(tLang('Espace utilisateur'), tLang('Acc\u00e8s uniquement aux proc\u00e9dures publi\u00e9es par l\u2019entreprise.'), equipe)
   /* Les photos des membres sont dans le dépôt des logos : on signe leurs
      adresses une fois la liste posée. */
   signerLogos(liste)
@@ -32755,7 +33444,7 @@ document.getElementById('p-membres')?.addEventListener('click', (e) => {
          faire : se changer soi-meme, retirer le gerant. Or les boutons ne sont
          pas affiches dans ces cas-la — l'aide repondait a une question que
          l'ecran ne pose jamais. */
-      tLang('• LE PLUS ET LE MOINS changent l’espace du membre.\n  Le plus lui donne l’accès à l’espace gestion : il pourra gérer les procédures, et il aura accès à la page Analyse et à la page Accès de l’entreprise.\n  Le moins lui donne uniquement l’accès à l’espace utilisateur : il aura uniquement accès aux procédures de l’entreprise.\n\n• LA PORTE retire la personne de l’entreprise. Ses lectures passées restent dans l’analyse. Elle n’a plus accès à l’espace de l’entreprise qui la concerne.'),
+      tLang('• Le plus donne accès à l’espace gestion.\n• Le moins donne accès à l’espace utilisateur.\n• La porte retire la personne de l’entreprise.'),
     confirmer: tLang('Compris'), annuler: '', danger: false,
   })
 })
@@ -32789,7 +33478,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   // ne se garde pas sur la seule absence d'un bouton.
   if (!estFondateur(currentMembre)) return
 
-  const nom = btn.dataset.nom || 'cette personne'
+  const nom = btn.dataset.nom || tLang('cette personne')
   const ok = await confirmDialog({
     /* ⚠ « PASSER EN GESTION », PAS « PROMOUVOIR ».
 
@@ -32880,7 +33569,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   if (!btn) return
   if (!estFondateur(currentMembre)) return
 
-  const nom = btn.dataset.nom || 'cette personne'
+  const nom = btn.dataset.nom || tLang('cette personne')
   const ok = await confirmDialog({
     /* ⚠ MEME FORMULATION DANS L'AUTRE SENS, et « espace utilisateur » plutot
        que « Équipe » — c'est le nom que porte cet espace depuis qu'il a ete
@@ -32935,7 +33624,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
   const ok = await confirmDialog({
     titre: tLang('Retirer cet utilisateur ?'),
-    message: tLang('{nom} perdra l\'accès aux procédures de l\'entreprise. Son compte Standix n\'est pas supprimé : elle pourra rejoindre une autre entreprise.', { nom: btn.dataset.nom || tLang('Cette personne') }),
+    message: tLang('{nom} perdra l\'accès aux procédures de l\'entreprise.', { nom: btn.dataset.nom || tLang('Cette personne') }),
     confirmer: tLang('Retirer'),
     annuler: tLang('Annuler'),
     danger: true,
@@ -33384,7 +34073,9 @@ function demanderTraductionProc(procId, langue, contenu) {
    étapes sont retrouvées par leur identifiant, jamais par leur rang. */
 function poserContenuFiche(f, contenu) {
   const titreEl = document.getElementById(f.titreId)
-  if (titreEl && contenu.titre) titreEl.textContent = contenu.titre
+  // Le titre de la liste et celui de la fiche doivent être le même mot.
+  const titre = (langueApp !== 'fr' && nomTraduit(f.proc.titre)) || contenu.titre
+  if (titreEl && titre) titreEl.textContent = titre
   const parId = new Map((contenu.etapes || []).map(e => [e.id, e]))
   document.querySelectorAll(`#${f.zoneId} .detail-step[data-etape-id]`).forEach((div) => {
     const e = parId.get(div.dataset.etapeId)
@@ -33449,8 +34140,8 @@ window.startScanner = async function(espace) {
   zone.innerHTML = ''
 
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    echecScanner(hintEl, zone, "Ce navigateur ne donne pas accès à la caméra.",
-      "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.")
+    echecScanner(hintEl, zone, tLang("Ce navigateur ne donne pas accès à la caméra."),
+      tLang("La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local."))
     return
   }
 
@@ -33481,13 +34172,13 @@ window.startScanner = async function(espace) {
       /* Le cinquième argument déclenche la marche à suivre détaillée. */
       echecScanner(hintEl, zone, '', '', true)
     } else if (nom === 'NotFoundError' || nom === 'OverconstrainedError') {
-      echecScanner(hintEl, zone, "Aucune caméra détectée sur cet appareil.", '')
+      echecScanner(hintEl, zone, tLang("Aucune caméra détectée sur cet appareil."), '')
     } else if (nom === 'NotReadableError') {
-      echecScanner(hintEl, zone, "La caméra est déjà utilisée par une autre application.",
-        "Fermez l'app qui l'utilise, puis réessayez.")
+      echecScanner(hintEl, zone, tLang("La caméra est déjà utilisée par une autre application."),
+        tLang("Fermez l'app qui l'utilise, puis réessayez."))
     } else {
-      echecScanner(hintEl, zone, "Le scanner n'a pas pu démarrer.",
-        (nom ? nom + ' — ' : '') + ((e && e.message) || 'raison inconnue'))
+      echecScanner(hintEl, zone, tLang("Le scanner n'a pas pu démarrer."),
+        (nom ? nom + ' — ' : '') + ((e && e.message) || tLang('raison inconnue')))
     }
   }
 }
@@ -33502,7 +34193,7 @@ window.startScanner = async function(espace) {
    On détecte donc l'appareil et on donne les touches à suivre, dans l'ordre. */
 /* La consigne sous le titre, dans l'image. Elle sert aussi à dire où en est
    l'ouverture de la caméra — mais elle revient toujours à son texte d'origine. */
-const CONSIGNE = 'Visez le QR code'
+const CONSIGNE = tLang('Visez le QR code')
 
 function remettreConsigne(el) {
   if (el) el.textContent = CONSIGNE
@@ -33542,28 +34233,27 @@ function cheminReglagesCamera() {
     if (criOS || fxiOS || edgiOS) {
       const nom = criOS ? 'Chrome' : fxiOS ? 'Firefox' : 'Edge'
       return {
-        appareil: `${nom} sur iPhone`,
+        appareil: tLang('{nom} sur iPhone', { nom }),
         etapes: [
           `${tLang('Ouvrez <b>Réglages</b> → <b>{nom}</b>', { nom })}`,
           '' + tLang('Activez <b>Caméra</b>') + '',
           `${tLang('Revenez dans {nom} et touchez <b>Réessayer</b>', { nom })}`,
         ],
-        repli: `Si l\u2019app n\u2019appara\u00eet pas dans R\u00e9glages : R\u00e9glages \u2192 ` +
-               `Confidentialit\u00e9 et s\u00e9curit\u00e9 \u2192 Cam\u00e9ra \u2192 ${nom}.`,
+        repli: tLang('Si l’app n’apparaît pas dans Réglages : Réglages → Confidentialité et sécurité → Caméra → {nom}.', { nom }),
       }
     }
 
     /* Safari. Le `ᴀA` est en bas depuis iOS 15, en haut avant : on ne dit pas
        où, seulement dans quelle barre. */
     return {
-      appareil: 'Safari sur iPhone',
+      appareil: tLang('Safari sur iPhone'),
       etapes: [
         '' + tLang('Touchez le <b>ᴀA</b> dans la barre d’adresse') + '',
         '' + tLang('Choisissez <b>Réglages du site web</b>') + '',
         '' + tLang('Mettez <b>Caméra</b> sur <b>Autoriser</b>') + '',
         '' + tLang('Touchez <b>Réessayer</b>') + '',
       ],
-      repli: 'Si le menu n\u2019appara\u00eet pas : R\u00e9glages \u2192 Safari \u2192 Cam\u00e9ra \u2192 Autoriser.',
+      repli: tLang('Si le menu n\u2019appara\u00eet pas : R\u00e9glages \u2192 Safari \u2192 Cam\u00e9ra \u2192 Autoriser.'),
     }
   }
 
@@ -33581,14 +34271,13 @@ function cheminReglagesCamera() {
           '' + tLang('Mettez <b>Caméra</b> sur <b>Autoriser</b>') + '',
           '' + tLang('Touchez <b>Réessayer</b>') + '',
         ],
-        repli: 'Ou : menu \u2261 \u2192 Param\u00e8tres \u2192 Sites et t\u00e9l\u00e9chargements \u2192 ' +
-               'Autorisations des sites \u2192 Cam\u00e9ra.',
+        repli: tLang('Ou : menu ≡ → Paramètres → Sites et téléchargements → Autorisations des sites → Caméra.'),
       }
     }
 
     if (firefox) {
       return {
-        appareil: 'Firefox sur Android',
+        appareil: tLang('Firefox sur Android'),
         etapes: [
           '' + tLang('Touchez le <b>cadenas</b> à gauche de l’adresse') + '',
           '' + tLang('Ouvrez <b>Autorisations du site</b>') + '',
@@ -33601,15 +34290,14 @@ function cheminReglagesCamera() {
 
     /* Chrome et Edge partagent la même interface sur Android. */
     return {
-      appareil: edge ? 'Edge sur Android' : 'Chrome sur Android',
+      appareil: edge ? tLang('Edge sur Android') : tLang('Chrome sur Android'),
       etapes: [
         '' + tLang('Touchez le <b>cadenas</b> à gauche de l’adresse') + '',
         '' + tLang('Ouvrez <b>Autorisations</b> ou <b>Paramètres du site</b>') + '',
         '' + tLang('Mettez <b>Caméra</b> sur <b>Autoriser</b>') + '',
         '' + tLang('Touchez <b>Réessayer</b>') + '',
       ],
-      repli: 'Si la cam\u00e9ra n\u2019appara\u00eet pas : R\u00e9glages du t\u00e9l\u00e9phone \u2192 Applications ' +
-             '\u2192 le navigateur \u2192 Autorisations \u2192 Appareil photo.',
+      repli: tLang('Si la caméra n’apparaît pas : Réglages du téléphone → Applications → le navigateur → Autorisations → Appareil photo.'),
     }
   }
 
@@ -33618,7 +34306,7 @@ function cheminReglagesCamera() {
   const safariMac = /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua)
   if (safariMac) {
     return {
-      appareil: 'Safari sur Mac',
+      appareil: tLang('Safari sur Mac'),
       etapes: [
         '' + tLang('Menu <b>Safari</b> → <b>Réglages pour ce site web</b>') + '',
         '' + tLang('Mettez <b>Caméra</b> sur <b>Autoriser</b>') + '',
@@ -33629,7 +34317,7 @@ function cheminReglagesCamera() {
   }
 
   return {
-    appareil: 'votre navigateur',
+    appareil: tLang('votre navigateur'),
     etapes: [
       '' + tLang('Cliquez sur le <b>cadenas</b> à gauche de l’adresse') + '',
       '' + tLang('Mettez <b>Caméra</b> sur <b>Autoriser</b>') + '',
@@ -34045,7 +34733,7 @@ function peindrePublication(proc) {
 /* La date en toutes lettres : « 12 août » plutôt qu'une date technique. */
 function dateEnClair(iso) {
   try {
-    return new Date(iso).toLocaleDateString('fr-FR',
+    return new Date(iso).toLocaleDateString(localeApp(),
       { day: 'numeric', month: 'long', year: 'numeric' })
   } catch { return '—' }
 }
@@ -34198,7 +34886,7 @@ async function verrouPris(procId) {
     }
 
     /* Refuse : on lit QUI edite, pour que le message serve. */
-    let qui = 'Un gestionnaire'
+    let qui = tLang('Un gestionnaire')
     try {
       const { data: p } = await supabase.from('procedures')
         .select('edite_par, entreprise_id').eq('id', procId).maybeSingle()
@@ -34303,7 +34991,7 @@ window.openEditProcedure = async function(procId, mode) {
     bande.style.display = editMode === 'ai-review' ? 'flex' : 'none'
     document.getElementById('edit-bande-txt').innerHTML =
       "" + tLang('L\'IA a découpé la procédure. <b>Relisez chaque étape</b> avant de publier :') + " " +
-      "c'est vous qui connaissez le geste."
+      tLang("c'est vous qui connaissez le geste.")
   }
   reinitialiserCouverture(null)
 
@@ -34647,7 +35335,7 @@ function choisirAction({ titre, options }) {
   })
 }
 
-function demanderTexte({ titre, message, valeur = '', placeholder = '', confirmer = 'Valider', annuler = 'Annuler' }) {
+function demanderTexte({ titre, message, valeur = '', placeholder = '', confirmer = tLang('Valider'), annuler = tLang('Annuler') }) {
   return new Promise((resolve) => {
     const backdrop = document.createElement('div')
     backdrop.className = 'ios-alert-backdrop'
@@ -34744,7 +35432,7 @@ const ICONE_QUESTION = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColo
   <circle cx="12" cy="12" r="9"/><path d="M9.5 9.4a2.6 2.6 0 1 1 3.4 2.5c-.7.3-.9.8-.9 1.5v.4"/>
   <line x1="12" y1="16.8" x2="12" y2="16.8"/></svg>`
 
-function confirmDialog({ titre, message, confirmer = 'Supprimer', annuler = 'Annuler',
+function confirmDialog({ titre, message, confirmer = tLang('Supprimer'), annuler = tLang('Annuler'),
                          danger = true, accompli = false, icone = null,
                          html = '' }) {
   /* `html` n'est PAS échappé, contrairement à `message`. Il n'est employé que
@@ -34917,7 +35605,7 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
             ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
             : ''}</div>
           <button type="button" class="img-toucher" aria-label="Photo de l'étape">
-            <span class="lg">${step.image_url || step.imageFichier ? 'Modifier la photo' : 'Ajouter une photo'}</span>
+            <span class="lg">${step.image_url || step.imageFichier ? tLang('Modifier la photo') : tLang('Ajouter une photo')}</span>
           </button>
           <input type="file" accept="image/*" class="fichier">
       </div>`}
@@ -34953,10 +35641,10 @@ document.getElementById('edit-steps-list')?.addEventListener('click', (e) => {
       const toucherPhoto = async () => {
         if (!(editStepsData[i].image_url || editStepsData[i].imageFichier)) { champFichier.click(); return }
         const choix = await choisirAction({
-          titre: `Photo de l'\u00e9tape ${i + 1}`,
+          titre: tLang('Photo de l\'étape {v}', { v: i + 1 }),
           options: [
-            { cle: 'changer', libelle: 'Remplacer la photo' },
-            { cle: 'retirer', libelle: 'Retirer la photo', danger: true },
+            { cle: 'changer', libelle: tLang('Remplacer la photo') },
+            { cle: 'retirer', libelle: tLang('Retirer la photo'), danger: true },
           ],
         })
         if (choix === 'changer') champFichier.click()

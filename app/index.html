@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=f88ccb37">
+<link rel="stylesheet" href="style.css?v=94376b77">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1877,96 +1877,21 @@
       </div>
 
   <!-- ═══════════════════════════════════════════════════════════════════════
-       COLLER PLUSIEURS VIDÉOS EN UNE SEULE
+       LES TROIS OUTILS ONT DÉMÉNAGÉ
 
-       Séparé des trois cartes du dessus, et volontairement : ce n'est pas une
-       quatrième façon de créer une procédure, c'est un OUTIL. On l'emploie
-       avant de créer, quand le geste a été filmé en plusieurs fois — puis on
-       revient à « L'IA transforme la vidéo » avec un seul fichier.
+       « Filmer maintenant », « Enregistrer l’écran » et « Coller plusieurs
+       vidéos » vivaient ici, sous un filet. Ce n’étaient pas des façons de
+       créer une procédure : ce sont des outils qui FABRIQUENT le fichier que
+       l’IA analysera ensuite. Six cartes identiques ne disaient pas cette
+       différence, et le filet était un signal trop faible.
 
-       Le trait au-dessus dit cette différence mieux qu'un titre.
+       Ils sont maintenant dans « L’IA transforme la vidéo en procédure »,
+       juste sous la zone de dépôt — là où le besoin se pose : je dois fournir
+       une vidéo et je n’en ai pas.
+
+       Ce menu ne garde donc que trois choix, et ils produisent trois résultats
+       différents : une vidéo, un document, des étapes écrites à la main.
        ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="outil-sep"></div>
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       ENREGISTRER L'ÉCRAN
-
-       Même famille que « Coller plusieurs vidéos » : ce n'est pas une façon de
-       créer une procédure, c'est un OUTIL qui fabrique la vidéo. On enregistre
-       son écran, puis on revient nommer la procédure et lancer l'analyse.
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <!-- ═══════════════════════════════════════════════════════════════════════
-       FILMER MAINTENANT
-
-       Le chemin d'avant passait par l'application Photos : on sortait de
-       Standix, on filmait, on revenait, on retrouvait le fichier. Quatre
-       étapes pour une seule intention.
-
-       La caméra s'ouvre donc ICI, et la vidéo ne sort jamais de l'app.
-       ═══════════════════════════════════════════════════════════════════════ -->
-  <div class="card outil-card" onclick="ouvrirCameraStandix()" id="mode-card-camera">
-    <div class="mode-choice-row">
-      <div class="mode-choice-icon">
-        <span class="mc-pl" style="background:linear-gradient(150deg,rgba(251,191,92,0.22),rgba(124,45,18,0.13))">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal2)" stroke-width="1.9"
-               stroke-linejoin="round" stroke-linecap="round">
-            <path d="M3 8.4a2 2 0 0 1 2-2h2.1l1.2-1.8h7.4L17 6.4h2a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            <circle cx="12" cy="12.4" r="3.5"/>
-          </svg>
-        </span>
-      </div>
-      <div class="mode-choice-text">
-        <!-- La ligne de description a été retirée : « La caméra s'ouvre ici,
-             sans passer par Photos » décrivait un contournement plutôt qu'une
-             action, et le titre se suffit. -->
-        <div class="mode-choice-title">Filmer maintenant</div>
-      </div>
-      <div class="mode-choice-arrow">›</div>
-    </div>
-  </div>
-
-  <div class="card outil-card" onclick="ouvrirEnregistrementEcran()" id="mode-card-ecran">
-    <div class="mode-choice-row">
-      <div class="mode-choice-icon">
-        <span class="mc-pl" style="background:linear-gradient(150deg,rgba(253,164,175,0.24),rgba(159,18,57,0.13))">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal5)" stroke-width="1.9"
-               stroke-linejoin="round" stroke-linecap="round">
-            <rect x="2.6" y="4.2" width="18.8" height="12.4" rx="2.2"/>
-            <path d="M8.4 20.4h7.2"/><path d="M12 16.6v3.8"/>
-            <circle cx="12" cy="10.4" r="2.6" fill="url(#pal5)" stroke="none"/>
-          </svg>
-        </span>
-      </div>
-      <div class="mode-choice-text">
-        <!-- Description retirée elle aussi. Elle avait été écrite pour dire ce
-             qu'on obtient plutôt que comment — mais le titre le disait déjà. -->
-        <div class="mode-choice-title">Enregistrer l’écran</div>
-      </div>
-      <div class="mode-choice-arrow">›</div>
-    </div>
-  </div>
-
-  <div class="card outil-card" onclick="ouvrirCollage()" id="mode-card-coller">
-    <div class="mode-choice-row">
-      <div class="mode-choice-icon">
-        <span class="mc-pl" style="background:linear-gradient(150deg,rgba(95,221,160,0.22),rgba(20,83,45,0.14))">
-          <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal3)" stroke-width="1.9"
-               stroke-linejoin="round" stroke-linecap="round">
-            <rect x="2.6" y="4.4" width="8" height="6"  rx="1.8"/>
-            <rect x="2.6" y="13.6" width="8" height="6" rx="1.8"/>
-            <path d="M12.6 12h3.2"/><path d="M14.6 10 16.6 12l-2 2"/>
-            <rect x="17.4" y="7.6" width="4.4" height="8.8" rx="1.8"/>
-          </svg>
-        </span>
-      </div>
-      <div class="mode-choice-text">
-        <div class="mode-choice-title">Coller plusieurs vidéos</div>
-        <!-- « Un geste filmé en plusieurs fois » décrivait la situation ;
-             la nouvelle phrase décrit ce que l'outil FAIT. -->
-        <div class="mode-choice-desc">Plusieurs vidéos deviennent une seule</div>
-      </div>
-      <div class="mode-choice-arrow">›</div>
-    </div>
-  </div>
     </div>
 
   <!-- ═══ L'ÉCRAN DE COLLAGE ═══ -->
@@ -2471,6 +2396,58 @@
             <span class="ai-vide-t">Choisir une vidéo</span>
             <span class="ai-vide-s">MP4 ou MOV · 5 minutes au maximum</span>
           </span>
+        </div>
+
+        <!-- ═══ TROIS FAÇONS DE FABRIQUER LA VIDÉO ═══
+
+             Elles vivaient dans le menu « Créer une procédure », sous un filet,
+             au milieu des modes de création. Elles sont ici parce que c'est ici
+             que le besoin se pose : la zone de dépôt demande une vidéo, et l'on
+             n'en a pas forcément une.
+
+           ⚠ TROIS BOUTONS COMPACTS, PAS TROIS CARTES. La page porte déjà la
+             zone de dépôt, deux lignes d'explication, la langue et le bouton :
+             trois cartes pleines auraient poussé « Générer les étapes » sous la
+             ligne de flottaison.
+
+           ⚠ « Choisir une vidéo » RESTE L'ACTION PRINCIPALE. Ces trois-là sont
+             en retrait, en dessous : on ne les lit que si la première ne
+             convient pas. -->
+        <div class="src-rang">
+          <button type="button" class="src-opt" onclick="ouvrirCameraStandix()" id="src-camera">
+            <span class="src-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 8.4a2 2 0 0 1 2-2h2.1l1.2-1.8h7.4L17 6.4h2a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <circle cx="12" cy="12.4" r="3.5"/>
+              </svg>
+            </span>
+            <span class="src-tx">Filmer</span>
+          </button>
+
+          <button type="button" class="src-opt" onclick="ouvrirEnregistrementEcran()" id="src-ecran">
+            <span class="src-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.6" y="4.2" width="18.8" height="12.4" rx="2.2"/>
+                <path d="M8.4 20.4h7.2"/><path d="M12 16.6v3.8"/>
+              </svg>
+            </span>
+            <span class="src-tx">Enregistrer<br>l’écran</span>
+          </button>
+
+          <button type="button" class="src-opt" onclick="ouvrirCollage()" id="src-coller">
+            <span class="src-ic">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2.6" y="4.4" width="8" height="6" rx="1.8"/>
+                <rect x="2.6" y="13.6" width="8" height="6" rx="1.8"/>
+                <path d="M12.6 12h3.2"/><path d="M14.6 10 16.6 12l-2 2"/>
+                <rect x="17.4" y="7.6" width="4.4" height="8.8" rx="1.8"/>
+              </svg>
+            </span>
+            <span class="src-tx">Assembler</span>
+          </button>
         </div>
       </div><div class="ia-ecoute">
           <div class="tt">Ce que l’IA analyse</div>
@@ -5274,7 +5251,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=a68b9cbc"></script>
+<script type="module" src="app.js?v=1c464c43"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

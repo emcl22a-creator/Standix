@@ -1,0 +1,37 @@
+# Traduction de l'interface Standix — fr · en · de
+
+Décidé le 29 septembre 2026 avec Em : **méthode combinée** (dictionnaire livré avec l'app + IA qui comble automatiquement les phrases nouvelles), **en commençant par le visible, puis le JavaScript**.
+
+## Où ça vit
+
+- `app/traduction/interface.json` — **la source**. Une entrée par phrase : la clé est la phrase française, avec sa version `en` et `de`.
+- `app/traduction/construire.py` — recopie `interface.json` dans `app.js`, entre les repères `/* DICO:DEBUT */` et `/* DICO:FIN */`. Ne touche à rien d'autre.
+- `app/traduction/GLOSSAIRE.md` — les mots de la maison (procédure → *Anleitung*, espace Gestion → *Verwaltungsbereich*, IA → *KI*…). À respecter pour chaque nouvelle traduction.
+
+Pour ajouter ou corriger : modifier `interface.json`, lancer `python3 traduction/construire.py`, recalculer les empreintes dans `index.html`.
+
+## Comment marche le moteur (`app.js`)
+
+- **La clé est la phrase française elle-même.** Changer le français rend la traduction orpheline → la phrase repasse en français (voulu : mieux que de l'anglais périmé).
+- **`cleTexte`** normalise les espaces : une phrase réindentée dans le balisage garde sa traduction.
+- **`appliquerLangue` parcourt toute la page** (`document.body`), plus une liste de racines. Mesuré : 42 textes dans 8 fenêtres échappaient à l'ancienne liste, dont la barre du bas et les fenêtres de connexion.
+- **`translate="no"`** exclut un élément (à poser sur le contenu de l'entreprise : noms de dossiers, titres, noms de personnes).
+- **`data-tr="…"`** désambiguïse les homonymes. Ex. `<span data-tr="Annuler (défaire)">Annuler</span>` → *Undo* au lieu de *Cancel*. Le français affiché ne change pas.
+- Traduit aussi `placeholder`, `aria-label`, `title`.
+- **`chargerLangue()` tourne au démarrage** (`auDemarrage`, garde `readyState`). Avant, elle n'était appelée qu'après connexion : les écrans d'accueil restaient en français. ⚠ `DOMContentLoaded` est déjà passé quand le module s'exécute — ne jamais s'y abonner sans garde.
+- **La barre du bas se traduit dans `row()`** (index.html), avant la mesure de la capsule. `row()` a quatre appelants.
+
+## État au 29 septembre 2026
+
+**Étape 1 faite :** les 295 textes du balisage (+ placeholders, libellés vocaux) en anglais et allemand. Mesuré sur toute la page : 0 texte resté en français, 0 débordement sur 375 et 430 px, homonymes justes.
+
+**Étape 2 à faire :**
+1. Les ~939 textes fabriqués par `app.js` (toasts, fenêtres, listes). Beaucoup contiennent des variables (`${nom} pourra…`) et des pluriels → à convertir en gabarits, pas en concaténations.
+2. Brancher l'IA pour traduire automatiquement toute phrase absente du dictionnaire. `ai-traduire` (fonction existante, Claude) montre le chemin. Cache en base, repli ensuite dans `interface.json`.
+3. Poser `translate="no"` sur les conteneurs de contenu de l'entreprise.
+
+**Hors menu mais conservés :** les dictionnaires espagnol et portugais. Leurs clés suivent l'ancien français — à reprendre avant de rouvrir ces langues.
+
+## Fautes françaises corrigées au passage
+
+« Renommer **la** dossier » et « le titre et **la** dossier » → *le* dossier (reste d'un remplacement catégorie → dossier). Onglets « Procedures », « Acces », « Reglages » → accents rétablis.

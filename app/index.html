@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=e174851d">
+<link rel="stylesheet" href="style.css?v=7d8b416e">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1680,7 +1680,6 @@
         </button>
         <h1>Gestion des accès</h1>
       </div>
-      <p>Les accès de chaque membre permettent de décider l’espace auquel il a accès.</p>
     </div>
 
     <div class="proc-rech-rang">
@@ -1928,7 +1927,7 @@
              l'expliquait en trois lignes a disparu avec lui. La phrase se
              referme sous le sélecteur : « L'enregistrement démarre tout de
              suite — vous avez [10 s] pour vous placer ». -->
-        <label class="f">L’enregistrement démarre tout de suite — vous avez</label>
+        <label class="f">L’enregistrement démarre dans</label>
         <div class="proc-segm" id="ecran-delai" role="tablist" style="margin-top:8px;">
           <span class="p-seg-lens" id="ecran-delai-lens" aria-hidden="true"></span>
           <button type="button" class="p-seg" data-delai="5" role="tab">5 s</button>
@@ -1938,7 +1937,7 @@
         <!-- ⚠ `.note` ET NON `.f` : la règle du libellé vise `label.f`, pas une
              division. Posée sur un `div`, la classe ne peignait rien et la fin
              de la phrase s'affichait en gros texte de paragraphe. -->
-        <div class="note" style="margin:10px 0 0;">pour vous placer</div>
+        <div class="note" style="margin:10px 0 0;">le temps de vous placer</div>
       </div>
 
       <div class="card" style="margin-top:12px;">
@@ -1950,9 +1949,16 @@
           <span class="ecran-pt"></span>
           <span>Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.</span>
         </div>
+        <!-- ⚠ ON FILME UNE FENÊTRE OU UN ONGLET, JAMAIS L'ÉCRAN ENTIER : c'est ce
+             qui garde la barre de contrôle hors de la vidéo (voir app.js,
+             « LA BARRE RESTE HORS DE LA VIDÉO »). -->
+        <div class="ecran-ligne">
+          <span class="ecran-pt"></span>
+          <span>Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.</span>
+        </div>
       </div>
 
-      <button class="btn block" style="margin-top:20px;" id="ecran-demarrer">Choisir l’écran et démarrer</button>
+      <button class="btn block" style="margin-top:20px;" id="ecran-demarrer">Choisir la fenêtre et démarrer</button>
       <div class="error-msg" id="ecran-erreur"></div>
     </div>
 
@@ -5275,7 +5281,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=66569537"></script>
+<script type="module" src="app.js?v=4537f73e"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -11216,6 +11216,10 @@ window.showGestionScreen = function(id, btn) {
      pour tout le monde, y compris le fondateur. */
   /* ⚠ LA PAGE COMPTE SE REMPLIT A CHAQUE OUVERTURE, d'ou qu'on vienne. */
   if (id === 'p-reg-compte' || id === 'e-reg-compte') remplirPageCompte()
+  /* ⚠ LA LISTE DES LANGUES SE DESSINE À CHAQUE OUVERTURE DE LA PAGE.
+     Elle n'était remplie que par `openSettings` : en arrivant par le bouton
+     du profil (en haut à gauche), la page Langue s'ouvrait vide. */
+  if (id === 'p-reg-langue') rendreChoixLangueApp()
 
   if (id === 'p-profil') {
     appliquerAccesAbonnement()
@@ -11335,6 +11339,8 @@ const ONGLET_EQUIPE_PAR_ECRAN = {
 
 window.showEquipeScreen = function(id, btn) {
   majBarreHaute(id)
+  // Même raison que côté gestion : la page Langue se remplit à l'ouverture.
+  if (id === 'e-reg-langue') rendreChoixLangueApp()
   /* ⚠ MEME REMISE A ZERO QUE DANS L'ESPACE GESTION. Les deux espaces ont leur
      propre fonction de navigation ; ne corriger que la premiere laisserait le
      defaut sur la moitie de l'app. */

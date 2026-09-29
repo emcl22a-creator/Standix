@@ -1,4 +1,12 @@
 {
+ "(aucun détail enregistré)": {
+  "en": "(no details recorded)",
+  "de": "(keine Details gespeichert)"
+ },
+ "(méthode classique)": {
+  "en": "(standard method)",
+  "de": "(Standardmethode)"
+ },
  "(optionnel)": {
   "en": "(optional)",
   "de": "(optional)"
@@ -30,6 +38,10 @@
  "/ mois, hors taxes, facturé à l’année": {
   "en": "/ month, excl. tax, billed yearly",
   "de": "/ Monat, ohne Steuern, jährlich abgerechnet"
+ },
+ "0 dossier · 0 procédure · accès complet": {
+  "en": "0 folders · 0 procedures · full access",
+  "de": "0 Ordner · 0 Anleitungen · voller Zugriff"
  },
  "1 an": {
   "en": "1 year",
@@ -263,9 +275,17 @@
   "en": "Access",
   "de": "Zugriff"
  },
+ "Accès au développement des procédures et aux pages Analyse et Gestion des accès.": {
+  "en": "Can build procedures and open the Analysis and Access pages.",
+  "de": "Kann Anleitungen erstellen und die Seiten Auswertung und Zugriffe öffnen."
+ },
  "Accès complet débloqué.": {
   "en": "Full access unlocked.",
   "de": "Voller Zugriff freigeschaltet."
+ },
+ "Accès gestion": {
+  "en": "Access management",
+  "de": "Zugriffe verwalten"
  },
  "Accès impossible : {message}": {
   "en": "Cannot get in: {message}",
@@ -274,6 +294,10 @@
  "Accès suspendu": {
   "en": "Access paused",
   "de": "Zugriff pausiert"
+ },
+ "Accès uniquement aux procédures publiées par l’entreprise.": {
+  "en": "Can only see procedures the company has published.",
+  "de": "Sieht nur die vom Unternehmen veröffentlichten Anleitungen."
  },
  "Accéder directement à la procédure en scannant le QR code": {
   "en": "Go straight to the procedure by scanning the QR code",
@@ -367,6 +391,10 @@
   "en": "Analysing",
   "de": "Wird ausgewertet"
  },
+ "Analyse refusée.": {
+  "en": "Analysis refused.",
+  "de": "Analyse abgelehnt."
+ },
  "Analyse relancée.": {
   "en": "Analysis restarted.",
   "de": "Auswertung neu gestartet."
@@ -387,6 +415,14 @@
   "en": "Undo",
   "de": "Rückgängig"
  },
+ "Annuler (le code)": {
+  "en": "Cancel code",
+  "de": "Code aufheben"
+ },
+ "Annuler ce code ?": {
+  "en": "Cancel this code?",
+  "de": "Diesen Code aufheben?"
+ },
  "Annuler la dernière action": {
   "en": "Undo the last action",
   "de": "Letzte Aktion rückgängig machen"
@@ -394,6 +430,10 @@
  "Annuler la dernière coupure": {
   "en": "Undo the last cut",
   "de": "Letzten Schnitt rückgängig machen"
+ },
+ "Annuler le code": {
+  "en": "Cancel the code",
+  "de": "Code aufheben"
  },
  "Annuler les modifications": {
   "en": "Discard changes",
@@ -407,6 +447,10 @@
   "en": "Device removed.",
   "de": "Gerät entfernt."
  },
+ "Appui long sur le bouton d’enregistrement, activez le micro, puis « Démarrer ».": {
+  "en": "Press and hold the record button, turn on the mic, then tap “Start Recording”.",
+  "de": "Aufnahmetaste lange drücken, Mikrofon einschalten, dann „Aufnahme starten“."
+ },
  "Appuyez pour filmer · 5 min au maximum": {
   "en": "Press to record · 5 min at most",
   "de": "Zum Aufnehmen drücken · höchstens 5 Min."
@@ -418,6 +462,10 @@
  "Après 14 jours, l’espace Gestion et l’espace Utilisateur sont <b>suspendus</b> en attente de la souscription.": {
   "en": "After 14 days, the Management area and the User area are <b>paused</b> until you subscribe.",
   "de": "Nach 14 Tagen werden Verwaltungs- und Nutzerbereich <b>pausiert</b>, bis ein Abo abgeschlossen ist."
+ },
+ "Arrêt après {v} s": {
+  "en": "Stopped after {v} s",
+  "de": "Abbruch nach {v} s"
  },
  "Assembler": {
   "en": "Join",
@@ -434,6 +482,10 @@
  "Au total": {
   "en": "In total",
   "de": "Insgesamt"
+ },
+ "Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.": {
+  "en": "Over one hundred people: a written availability commitment, to be discussed.",
+  "de": "Über hundert Personen: schriftliche Verfügbarkeitszusage, nach Absprache."
  },
  "Aucun abonnement à gérer": {
   "en": "No subscription to manage",
@@ -459,6 +511,10 @@
   "en": "No folder matches “{q}”.",
   "de": "Kein Ordner passt zu „{q}“."
  },
+ "Aucun dossier ne correspond à « {v} ».": {
+  "en": "No folder matches “{v}”.",
+  "de": "Kein Ordner passt zu „{v}“."
+ },
  "Aucun employé dans l'entreprise pour le moment.": {
   "en": "No staff in the company yet.",
   "de": "Noch keine Mitarbeitenden im Unternehmen."
@@ -474,6 +530,10 @@
  "Aucun membre pour le moment.": {
   "en": "No members yet.",
   "de": "Noch keine Mitglieder."
+ },
+ "Aucun mouvement ce mois-ci.": {
+  "en": "No changes this month.",
+  "de": "Keine Änderungen diesen Monat."
  },
  "Aucun mouvement ces dernières semaines.": {
   "en": "No changes in the last few weeks.",
@@ -491,9 +551,17 @@
   "en": "No results",
   "de": "Keine Ergebnisse"
  },
+ "Aucun temps de lecture sur cette période.": {
+  "en": "No reading time in this period.",
+  "de": "Keine Lesezeit in diesem Zeitraum."
+ },
  "Aucun élément": {
   "en": "Nothing here",
   "de": "Keine Einträge"
+ },
+ "Aucune caméra détectée sur cet appareil.": {
+  "en": "No camera found on this device.",
+  "de": "Keine Kamera auf diesem Gerät gefunden."
  },
  "Aucune entreprise": {
   "en": "No company",
@@ -502,6 +570,26 @@
  "Aucune entreprise avec ce code.": {
   "en": "No company has this code.",
   "de": "Kein Unternehmen hat diesen Code."
+ },
+ "Aucune entreprise ne correspond à ce code.": {
+  "en": "No company matches this code.",
+  "de": "Kein Unternehmen passt zu diesem Code."
+ },
+ "Aucune erreur remontée.": {
+  "en": "No errors reported.",
+  "de": "Keine Fehler gemeldet."
+ },
+ "Aucune lecture": {
+  "en": "No reads",
+  "de": "Keine Aufrufe"
+ },
+ "Aucune lecture ce mois-ci": {
+  "en": "No reads this month",
+  "de": "Keine Aufrufe diesen Monat"
+ },
+ "Aucune lecture pour l’instant": {
+  "en": "No reads yet",
+  "de": "Noch keine Aufrufe"
  },
  "Aucune lecture sur cette période.": {
   "en": "No reads in this period.",
@@ -515,9 +603,21 @@
   "en": "No procedures",
   "de": "Keine Anleitungen"
  },
+ "Aucune procédure ces deux dernières semaines": {
+  "en": "No procedures in the last two weeks",
+  "de": "Keine Anleitungen in den letzten zwei Wochen"
+ },
+ "Aucune procédure créée ce mois-ci.": {
+  "en": "No procedures created this month.",
+  "de": "Diesen Monat wurden keine Anleitungen erstellt."
+ },
  "Aucune procédure dans cette entreprise.": {
   "en": "No procedures in this company.",
   "de": "Keine Anleitungen in diesem Unternehmen."
+ },
+ "Aucune procédure en développement.": {
+  "en": "No procedures in draft.",
+  "de": "Keine Anleitungen im Entwurf."
  },
  "Aucune procédure ne correspond à votre recherche.": {
   "en": "No procedure matches your search.",
@@ -531,6 +631,10 @@
   "en": "No procedure matches “{q}”.",
   "de": "Keine Anleitung passt zu „{q}“."
  },
+ "Aucune procédure n’est en ligne pour le moment.": {
+  "en": "No procedures are live yet.",
+  "de": "Noch keine Anleitung ist live."
+ },
  "Aucune procédure pour le moment.": {
   "en": "No procedures yet.",
   "de": "Noch keine Anleitungen."
@@ -543,9 +647,17 @@
   "en": "No procedures published yet.",
   "de": "Noch keine veröffentlichten Anleitungen."
  },
+ "Aucune réponse utile après {v} s · {aiNbSondages} sondages": {
+  "en": "No useful answer after {v} s · {aiNbSondages} checks",
+  "de": "Keine brauchbare Antwort nach {v} s · {aiNbSondages} Abfragen"
+ },
  "Aucune vidéo": {
   "en": "No video",
   "de": "Kein Video"
+ },
+ "Aucune vidéo à analyser.": {
+  "en": "No video to analyse.",
+  "de": "Kein Video zum Analysieren."
  },
  "Aucune étape": {
   "en": "No steps",
@@ -555,8 +667,20 @@
   "en": "No steps yet.",
   "de": "Noch keine Schritte."
  },
+ "Aujourd'hui": {
+  "en": "Today",
+  "de": "Heute"
+ },
+ "Aujourd’hui": {
+  "en": "Today",
+  "de": "Heute"
+ },
  "Autre": {
   "en": "Other",
+  "de": "Andere"
+ },
+ "Autres": {
+  "en": "Others",
   "de": "Andere"
  },
  "Avant de continuer": {
@@ -595,6 +719,10 @@
   "en": "Hello,",
   "de": "Hallo,"
  },
+ "Bonjour, Je souhaite en savoir plus sur l’offre Entreprise.": {
+  "en": "Hello, I would like to know more about the Enterprise plan.",
+  "de": "Hallo, ich möchte mehr über den Enterprise-Tarif erfahren."
+ },
  "C'est plus long que d'habitude, mais l'analyse tourne toujours.": {
   "en": "It is taking longer than usual, but the analysis is still running.",
   "de": "Es dauert länger als sonst, aber die Auswertung läuft noch."
@@ -614,6 +742,10 @@
  "Ce code correspond à une procédure qui n'existe pas ou plus.": {
   "en": "This code points to a procedure that does not exist, or no longer does.",
   "de": "Dieser Code führt zu einer Anleitung, die es nicht (mehr) gibt."
+ },
+ "Ce code donne accès à l’espace utilisateur. Vous pourrez ensuite leur donner accès à l’espace gestion.": {
+  "en": "This code gives access to the User area. You can then give them access to the Management area.",
+  "de": "Dieser Code gibt Zugriff auf den Nutzerbereich. Danach können Sie ihnen Zugriff auf den Verwaltungsbereich geben."
  },
  "Ce code entreprise n'existe pas. Vérifiez-le auprès de votre gestionnaire.": {
   "en": "This company code does not exist. Check it with your manager.",
@@ -643,6 +775,10 @@
   "en": "This counter is shared by all your companies: an analysis started elsewhere lowers it here too.",
   "de": "Dieser Zähler gilt für alle Ihre Unternehmen: Eine Auswertung anderswo senkt ihn auch hier."
  },
+ "Ce document ne contient presque pas de texte. S'il s'agit d'un PDF scanné, l'image du texte ne peut pas être lue.": {
+  "en": "This document has almost no text. If it is a scanned PDF, the text in the image cannot be read.",
+  "de": "Dieses Dokument enthält fast keinen Text. Bei einem gescannten PDF kann der Text im Bild nicht gelesen werden."
+ },
  "Ce fichier n'est pas une image lisible.": {
   "en": "This file is not a readable image.",
   "de": "Diese Datei ist kein lesbares Bild."
@@ -663,6 +799,10 @@
   "en": "This link could not be checked.",
   "de": "Dieser Link konnte nicht geprüft werden."
  },
+ "Ce mois": {
+  "en": "This month",
+  "de": "Diesen Monat"
+ },
  "Ce mois-ci": {
   "en": "This month",
   "de": "Diesen Monat"
@@ -678,6 +818,10 @@
  "Ce navigateur ne donne pas accès à la caméra": {
   "en": "This browser gives no access to the camera",
   "de": "Dieser Browser erlaubt keinen Zugriff auf die Kamera"
+ },
+ "Ce navigateur ne donne pas accès à la caméra.": {
+  "en": "This browser does not allow camera access.",
+  "de": "Dieser Browser erlaubt keinen Kamerazugriff."
  },
  "Ce navigateur ne sait pas enregistrer : {v}": {
   "en": "This browser cannot record: {v}",
@@ -779,6 +923,10 @@
   "en": "This video is still <b>{size}</b>, over the {max} MB allowed.<br>Record again in <b>720p at 30 frames per second</b>, or shorter.",
   "de": "Dieses Video hat noch <b>{size}</b>, mehr als die erlaubten {max} MB.<br>Nehmen Sie erneut in <b>720p mit 30 Bildern pro Sekunde</b> oder kürzer auf."
  },
+ "Cette vidéo pèse {v} une fois allégée, au-delà des {v2} acceptés. Filmez une séquence plus courte — deux à trois minutes suffisent pour un geste.": {
+  "en": "Even after compressing, this video is {v}, over the {v2} limit. Record a shorter clip — two or three minutes is enough for one task.",
+  "de": "Auch komprimiert ist dieses Video {v} groß, mehr als die erlaubten {v2}. Nehmen Sie kürzer auf — zwei bis drei Minuten reichen für einen Handgriff."
+ },
  "Cette étape sera retirée de la procédure.": {
   "en": "This step will be removed from the procedure.",
   "de": "Dieser Schritt wird aus der Anleitung entfernt."
@@ -863,9 +1011,17 @@
   "en": "Choose the screen or window to record…",
   "de": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…"
  },
+ "Choisissez un mot de passe d’au moins 6 caractères.": {
+  "en": "Choose a password with at least 6 characters.",
+  "de": "Wählen Sie ein Passwort mit mindestens 6 Zeichen."
+ },
  "Choisissez votre enregistrement avec « Choisir une vidéo »": {
   "en": "Pick your recording with “Choose a video”",
   "de": "Wählen Sie Ihre Aufnahme über „Video wählen“"
+ },
+ "Chrome sur Android": {
+  "en": "Chrome on Android",
+  "de": "Chrome auf Android"
  },
  "Cinq minutes : enregistrement arrêté.": {
   "en": "Five minutes: recording stopped.",
@@ -1007,6 +1163,10 @@
   "en": "Terms of use",
   "de": "Nutzungsbedingungen"
  },
+ "Confirmer la suppression": {
+  "en": "Confirm deletion",
+  "de": "Löschen bestätigen"
+ },
  "Connectez-vous ou créez votre compte": {
   "en": "Log in or create your account",
   "de": "Melden Sie sich an oder erstellen Sie ein Konto"
@@ -1091,6 +1251,10 @@
   "en": "Write the procedure yourself",
   "de": "Anleitung selbst schreiben"
  },
+ "Créez des procédures, suivez l'équipe, gérez les accès.": {
+  "en": "Create procedures, follow your team, manage access.",
+  "de": "Erstellen Sie Anleitungen, verfolgen Sie Ihr Team, verwalten Sie Zugriffe."
+ },
  "Créez vos procédures avec l’IA.": {
   "en": "Build your procedures with AI.",
   "de": "Erstellen Sie Ihre Anleitungen mit KI."
@@ -1102,6 +1266,14 @@
  "Créez votre compte pour rejoindre « {nom} » et consulter la procédure.": {
   "en": "Create your account to join “{nom}” and open the procedure.",
   "de": "Erstellen Sie Ihr Konto, um „{nom}“ beizutreten und die Anleitung zu öffnen."
+ },
+ "Créé": {
+  "en": "Created",
+  "de": "Erstellt"
+ },
+ "Créé {quand}": {
+  "en": "Created {quand}",
+  "de": "Erstellt {quand}"
  },
  "Créée {v}": {
   "en": "Created {v}",
@@ -1142,6 +1314,14 @@
  "Dernière procédure créée": {
   "en": "Latest procedure created",
   "de": "Zuletzt erstellte Anleitung"
+ },
+ "Dernières créations": {
+  "en": "Latest created",
+  "de": "Zuletzt erstellt"
+ },
+ "Dernières étapes :": {
+  "en": "Last steps:",
+  "de": "Letzte Schritte:"
  },
  "Dezoomer": {
   "en": "Zoom out",
@@ -1186,6 +1366,18 @@
  "Dès la première lecture, vous verrez ici <b>le temps de formation</b> que vos procédures ont fait gagner à votre établissement.": {
   "en": "From the first read, you will see here <b>the training time</b> your procedures have saved your site.",
   "de": "Ab dem ersten Aufruf sehen Sie hier <b>die Einarbeitungszeit</b>, die Ihre Anleitungen Ihrem Standort gespart haben."
+ },
+ "Dès que quelqu'un ouvrira une procédure, vous verrez ici celles qui occupent le plus votre équipe.": {
+  "en": "As soon as someone opens a procedure, you will see here which ones take up most of your team's time.",
+  "de": "Sobald jemand eine Anleitung öffnet, sehen Sie hier, welche Ihr Team am meisten beschäftigen."
+ },
+ "Dès que quelqu'un ouvrira une procédure, vous verrez ici où part le temps de votre équipe.": {
+  "en": "As soon as someone opens a procedure, you will see here where your team's time goes.",
+  "de": "Sobald jemand eine Anleitung öffnet, sehen Sie hier, wofür Ihr Team seine Zeit verwendet."
+ },
+ "Dès que votre équipe ouvrira des procédures, vous verrez ici comment le temps de lecture évolue.": {
+  "en": "As soon as your team opens procedures, you will see here how reading time changes.",
+  "de": "Sobald Ihr Team Anleitungen öffnet, sehen Sie hier, wie sich die Lesezeit entwickelt."
  },
  "Dès que votre équipe ouvrira vos procédures, vous verrez ici": {
   "en": "As soon as your team opens your procedures, you will see here",
@@ -1239,6 +1431,18 @@
   "en": "Set up the roles at your site. Each member picks their own.",
   "de": "Legen Sie die Positionen an Ihrem Standort fest. Jedes Mitglied wählt seine eigene."
  },
+ "Déjà consultée": {
+  "en": "Already read",
+  "de": "Schon gelesen"
+ },
+ "Dépôt de la photo refusé : {message}": {
+  "en": "Photo upload refused: {message}",
+  "de": "Foto-Upload abgelehnt: {message}"
+ },
+ "Dépôt du logo refusé : {message}": {
+  "en": "Logo upload refused: {message}",
+  "de": "Logo-Upload abgelehnt: {message}"
+ },
  "Détail copié.": {
   "en": "Details copied.",
   "de": "Details kopiert."
@@ -1258,6 +1462,10 @@
  "E-mail et mot de passe obligatoires.": {
   "en": "Email and password are required.",
   "de": "E-Mail und Passwort sind Pflicht."
+ },
+ "Edge sur Android": {
+  "en": "Edge on Android",
+  "de": "Edge auf Android"
  },
  "Effacer la recherche": {
   "en": "Clear the search",
@@ -1355,6 +1563,10 @@
   "en": "Saved.",
   "de": "Gespeichert."
  },
+ "Entreprise": {
+  "en": "Enterprise",
+  "de": "Enterprise"
+ },
  "Entrez d’abord votre adresse e-mail.": {
   "en": "Enter your email address first.",
   "de": "Geben Sie zuerst Ihre E-Mail-Adresse ein."
@@ -1379,9 +1591,17 @@
   "en": "Error: {message}",
   "de": "Fehler: {message}"
  },
+ "Erreur au démarrage de l'analyse": {
+  "en": "Error starting the analysis",
+  "de": "Fehler beim Start der Analyse"
+ },
  "Erreur d'upload vidéo : {message}": {
   "en": "Video upload error: {message}",
   "de": "Fehler beim Hochladen des Videos: {message}"
+ },
+ "Erreur inconnue (pas de message)": {
+  "en": "Unknown error (no message)",
+  "de": "Unbekannter Fehler (keine Meldung)"
  },
  "Erreur étapes : {message}": {
   "en": "Steps error: {message}",
@@ -1395,9 +1615,29 @@
   "en": "User area",
   "de": "Nutzerbereich"
  },
+ "Espace gestion": {
+  "en": "Management area",
+  "de": "Verwaltungsbereich"
+ },
+ "Espace utilisateur": {
+  "en": "User area",
+  "de": "Nutzerbereich"
+ },
+ "Espace Équipe": {
+  "en": "Team area",
+  "de": "Teambereich"
+ },
  "Essai 14 jours gratuit": {
   "en": "14 days free",
   "de": "14 Tage kostenlos"
+ },
+ "Essai 14 jours gratuits": {
+  "en": "14-day free trial",
+  "de": "14 Tage kostenlos testen"
+ },
+ "Essentiel": {
+  "en": "Essential",
+  "de": "Essential"
  },
  "Ex : Accueil": {
   "en": "e.g. Front desk",
@@ -1419,9 +1659,25 @@
   "en": "e.g. Greeting customers",
   "de": "z. B. Kundenempfang"
  },
+ "Expire dans moins d’une heure": {
+  "en": "Expires in less than an hour",
+  "de": "Läuft in weniger als einer Stunde ab"
+ },
+ "Expire dans {heures} heures": {
+  "en": "Expires in {heures} hours",
+  "de": "Läuft in {heures} Stunden ab"
+ },
+ "Expire dans {jours} jours": {
+  "en": "Expires in {jours} days",
+  "de": "Läuft in {jours} Tagen ab"
+ },
  "Expire dans {v}": {
   "en": "Expires in {v}",
   "de": "Läuft ab in {v}"
+ },
+ "Expiré": {
+  "en": "Expired",
+  "de": "Abgelaufen"
  },
  "Exécutez migration-presences.sql.": {
   "en": "Run migration-presences.sql.",
@@ -1446,6 +1702,10 @@
  "Fermer": {
   "en": "Close",
   "de": "Schließen"
+ },
+ "Fermez l'app qui l'utilise, puis réessayez.": {
+  "en": "Close the app using it, then try again.",
+  "de": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut."
  },
  "Fermez l’application qui s’en sert, puis réessayez.": {
   "en": "Close the app that is using it, then try again.",
@@ -1487,9 +1747,21 @@
   "en": "End here",
   "de": "Ende hier"
  },
+ "Finalisation de la vidéo…": {
+  "en": "Finishing the video…",
+  "de": "Video wird fertiggestellt…"
+ },
+ "Firefox sur Android": {
+  "en": "Firefox on Android",
+  "de": "Firefox auf Android"
+ },
  "Fonctionnement des boutons": {
   "en": "How the buttons work",
   "de": "So funktionieren die Schaltflächen"
+ },
+ "Format non reconnu. Acceptés : PDF, Word (.docx), texte (.txt).": {
+  "en": "Format not recognised. Accepted: PDF, Word (.docx), text (.txt).",
+  "de": "Format nicht erkannt. Erlaubt: PDF, Word (.docx), Text (.txt)."
  },
  "Fusionner": {
   "en": "Merge",
@@ -1503,6 +1775,10 @@
   "en": "Keep",
   "de": "Behalten"
  },
+ "Garder le code": {
+  "en": "Keep the code",
+  "de": "Code behalten"
+ },
  "Gestion": {
   "en": "Management",
   "de": "Verwaltung"
@@ -1514,6 +1790,14 @@
  "Gestion indisponible": {
   "en": "Management unavailable",
   "de": "Verwaltung nicht verfügbar"
+ },
+ "Glissez depuis le coin haut droit de l’écran.": {
+  "en": "Swipe down from the top-right corner of the screen.",
+  "de": "Wischen Sie von der oberen rechten Ecke nach unten."
+ },
+ "Glissez depuis le haut de l’écran.": {
+  "en": "Swipe down from the top of the screen.",
+  "de": "Wischen Sie vom oberen Bildschirmrand nach unten."
  },
  "Génération...": {
   "en": "Generating…",
@@ -1527,6 +1811,10 @@
   "en": "Create a code so your team can open the procedures.",
   "de": "Erstellen Sie einen Code, damit Ihr Team die Anleitungen öffnen kann."
  },
+ "Gérant": {
+  "en": "Owner",
+  "de": "Inhaber"
+ },
  "Gérer ou résilier mon abonnement": {
   "en": "Manage or cancel my subscription",
   "de": "Abo verwalten oder kündigen"
@@ -1534,6 +1822,10 @@
  "Gérez vos procédures.": {
   "en": "Manage your procedures.",
   "de": "Verwalten Sie Ihre Anleitungen."
+ },
+ "Hier": {
+  "en": "Yesterday",
+  "de": "Gestern"
  },
  "Ignorer": {
   "en": "Dismiss",
@@ -1579,6 +1871,10 @@
   "en": "Could not read your profile: {erreur}",
   "de": "Ihr Profil konnte nicht gelesen werden: {erreur}"
  },
+ "Impossible de préparer la vidéo pour l'analyse.": {
+  "en": "Could not prepare the video for analysis.",
+  "de": "Das Video konnte nicht für die Analyse vorbereitet werden."
+ },
  "Impossible de quitter pour le moment.": {
   "en": "You cannot leave right now.",
   "de": "Verlassen ist gerade nicht möglich."
@@ -1590,6 +1886,10 @@
  "Impossible de relancer": {
   "en": "Could not restart",
   "de": "Neustart nicht möglich"
+ },
+ "Impossible de vérifier votre abonnement.": {
+  "en": "Could not check your subscription.",
+  "de": "Ihr Abo konnte nicht geprüft werden."
  },
  "Inscription gérant": {
   "en": "Owner sign-up",
@@ -1606,6 +1906,18 @@
  "Inviter votre équipe": {
   "en": "Invite your team",
   "de": "Team einladen"
+ },
+ "Invitez votre équipe avec le code de l'entreprise.": {
+  "en": "Invite your team with the company code.",
+  "de": "Laden Sie Ihr Team mit dem Unternehmenscode ein."
+ },
+ "Invitez votre équipe avec le code de l'entreprise. C'est à partir de là que vous saurez qui suit vos procédures.": {
+  "en": "Invite your team with the company code. From then on, you will see who follows your procedures.",
+  "de": "Laden Sie Ihr Team mit dem Unternehmenscode ein. Ab dann sehen Sie, wer Ihre Anleitungen befolgt."
+ },
+ "Invitez votre équipe pour voir l’analyse.": {
+  "en": "Invite your team to see the analysis.",
+  "de": "Laden Sie Ihr Team ein, um die Auswertung zu sehen."
  },
  "Je continue": {
   "en": "Keep going",
@@ -1647,6 +1959,10 @@
   "en": "The AI wrote these steps — fix the text or the clip timing if needed",
   "de": "Die KI hat diese Schritte geschrieben — korrigieren Sie bei Bedarf Text oder Ausschnitt"
  },
+ "L'IA n'a pas trouvé d'étapes dans ce document. Il décrit peut-être une situation plutôt qu'une marche à suivre.": {
+  "en": "The AI found no steps in this document. It may describe a situation rather than a way of doing something.",
+  "de": "Die KI hat in diesem Dokument keine Schritte gefunden. Es beschreibt vielleicht eine Situation statt eines Ablaufs."
+ },
  "L'abonnement de votre établissement a pris fin. Vos procédures sont conservées : elles reviendront dès que votre responsable aura renouvelé.": {
   "en": "Your site's subscription has ended. Your procedures are kept: they come back as soon as your manager renews.",
   "de": "Das Abo Ihres Standorts ist abgelaufen. Ihre Anleitungen bleiben erhalten und sind wieder da, sobald Ihre Führungskraft verlängert."
@@ -1655,13 +1971,33 @@
   "en": "The analysis failed",
   "de": "Die Auswertung ist fehlgeschlagen"
  },
+ "L'analyse a échoué — touchez pour relancer": {
+  "en": "Analysis failed — tap to retry",
+  "de": "Analyse fehlgeschlagen — tippen zum Wiederholen"
+ },
  "L'analyse dure depuis {v} minutes sans aboutir. Elle est probablement bloquée chez Azure.": {
   "en": "The analysis has run for {v} minutes without finishing. It is probably stuck at Azure.",
   "de": "Die Auswertung läuft seit {v} Minuten ohne Ergebnis. Sie hängt vermutlich bei Azure."
  },
+ "L'analyse semble bloquée — touchez pour relancer": {
+  "en": "Analysis seems stuck — tap to retry",
+  "de": "Analyse scheint zu hängen — tippen zum Wiederholen"
+ },
+ "L'analyse tourne depuis plus de {ANALYSE_LIMITE_MIN} minutes, ce qui n'est pas normal. Relancer depuis le début ?": {
+  "en": "The analysis has been running for over {ANALYSE_LIMITE_MIN} minutes, which is not normal. Start again from the beginning?",
+  "de": "Die Analyse läuft seit über {ANALYSE_LIMITE_MIN} Minuten, das ist nicht normal. Von vorne neu starten?"
+ },
  "L'enregistrement est vide.": {
   "en": "The recording is empty.",
   "de": "Die Aufnahme ist leer."
+ },
+ "L'entreprise n'a pas été créée : {v}": {
+  "en": "The company was not created: {v}",
+  "de": "Das Unternehmen wurde nicht erstellt: {v}"
+ },
+ "L'envoi de la vidéo": {
+  "en": "Uploading the video",
+  "de": "Das Hochladen des Videos"
  },
  "L'espace Gestion ne vous est plus accessible. Vos procédures créées restent en place.": {
   "en": "You no longer have the Management area. The procedures you created stay.",
@@ -1671,17 +2007,37 @@
   "en": "You will no longer have the User area: you are on the other side now.",
   "de": "Der Nutzerbereich ist für Sie nicht mehr zugänglich: Sie sind jetzt auf der anderen Seite."
  },
+ "La base a refusé l'adhésion.": {
+  "en": "The database refused to add you.",
+  "de": "Die Datenbank hat den Beitritt abgelehnt."
+ },
  "La base a refusé la modification.": {
   "en": "The database refused the change.",
   "de": "Die Datenbank hat die Änderung abgelehnt."
+ },
+ "La base a refusé la modification. Exécutez migration-etablissements.sql : il manque la règle d'accès « update » sur la table entreprises.": {
+  "en": "The database refused the change. Run migration-etablissements.sql: the “update” access rule is missing on the entreprises table.",
+  "de": "Die Datenbank hat die Änderung abgelehnt. Führen Sie migration-etablissements.sql aus: Die Zugriffsregel „update“ fehlt in der Tabelle entreprises."
  },
  "La base a refusé la modification. Exécutez migration-promotion.sql.": {
   "en": "The database refused the change. Run migration-promotion.sql.",
   "de": "Die Datenbank hat die Änderung abgelehnt. Führen Sie migration-promotion.sql aus."
  },
+ "La base a refusé la suppression. C'est une règle d'accès : votre compte n'a pas le droit de supprimer une procédure. Il faut ajouter une règle « delete » sur la table procedures dans Supabase.": {
+  "en": "The database refused the deletion. It is an access rule: your account may not delete a procedure. A “delete” rule must be added to the procedures table in Supabase.",
+  "de": "Die Datenbank hat das Löschen abgelehnt. Es ist eine Zugriffsregel: Ihr Konto darf keine Anleitung löschen. In Supabase muss eine „delete“-Regel für die Tabelle procedures hinzugefügt werden."
+ },
+ "La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d'accès « delete » sur la table entreprises.": {
+  "en": "The database refused the deletion. Run migration-etablissements.sql: the “delete” access rule is missing on the entreprises table.",
+  "de": "Die Datenbank hat das Löschen abgelehnt. Führen Sie migration-etablissements.sql aus: Die Zugriffsregel „delete“ fehlt in der Tabelle entreprises."
+ },
  "La base a refusé le départ. Vérifiez la règle « delete » sur la table membres.": {
   "en": "The database refused the removal. Check the “delete” rule on the members table.",
   "de": "Die Datenbank hat das Entfernen abgelehnt. Prüfen Sie die „delete“-Regel der Tabelle membres."
+ },
+ "La base ne sait pas encore créer un établissement. Exécutez migration-creer-etablissement.sql.": {
+  "en": "The database cannot create a site yet. Run migration-creer-etablissement.sql.",
+  "de": "Die Datenbank kann noch keinen Standort anlegen. Führen Sie migration-creer-etablissement.sql aus."
  },
  "La caméra est bloquée": {
   "en": "The camera is blocked",
@@ -1691,6 +2047,14 @@
   "en": "The camera is already in use",
   "de": "Die Kamera wird bereits verwendet"
  },
+ "La caméra est déjà utilisée par une autre application.": {
+  "en": "The camera is already used by another app.",
+  "de": "Die Kamera wird bereits von einer anderen App genutzt."
+ },
+ "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.": {
+  "en": "The camera only works over HTTPS. Open the app from its usual address, not a local file.",
+  "de": "Die Kamera funktioniert nur über HTTPS. Öffnen Sie die App über ihre übliche Adresse, nicht als lokale Datei."
+ },
  "La caméra n’a pas pu s’ouvrir": {
   "en": "The camera could not open",
   "de": "Die Kamera ließ sich nicht öffnen"
@@ -1698,6 +2062,10 @@
  "La caméra n’est accessible qu’en HTTPS. Ouvrez Standix depuis son adresse habituelle.": {
   "en": "The camera only works over HTTPS. Open Standix from its usual address.",
   "de": "Die Kamera funktioniert nur über HTTPS. Öffnen Sie Standix über die gewohnte Adresse."
+ },
+ "La connexion a été interrompue. Vérifiez votre réseau et réessayez.": {
+  "en": "The connection was lost. Check your network and try again.",
+  "de": "Die Verbindung wurde unterbrochen. Prüfen Sie Ihr Netzwerk und versuchen Sie es erneut."
  },
  "La consultation n'a pas pu être enregistrée : {message}": {
   "en": "The read could not be saved: {message}",
@@ -1711,17 +2079,21 @@
   "en": "Company creation is not set up in the database. Run migration-creation-entreprise.sql.",
   "de": "Die Unternehmenserstellung ist in der Datenbank nicht eingerichtet. Führen Sie migration-creation-entreprise.sql aus."
  },
+ "La génération a échoué.": {
+  "en": "Generation failed.",
+  "de": "Die Erstellung ist fehlgeschlagen."
+ },
  "La langue choisie traduit aussi les étapes des procédures.": {
   "en": "The language you choose also translates procedure steps.",
   "de": "Die gewählte Sprache übersetzt auch die Schritte der Anleitungen."
  },
- "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": {
-  "en": "The language applies to the whole app. Each person can pick their own.",
-  "de": "Die Sprache gilt für die ganze App. Jede Person kann ihre eigene wählen."
- },
  "La photo n’a pas pu être envoyée.": {
   "en": "The photo could not be sent.",
   "de": "Das Foto konnte nicht gesendet werden."
+ },
+ "La procédure d'analyse n'a pas pu être créée.": {
+  "en": "The procedure for the analysis could not be created.",
+  "de": "Die Anleitung für die Analyse konnte nicht erstellt werden."
  },
  "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
   "en": "The procedure is already in Draft. It opens once the analysis is done.",
@@ -1735,9 +2107,29 @@
   "en": "The procedure goes back to its saved version. What you just wrote will be lost.",
   "de": "Die Anleitung kehrt zur gespeicherten Fassung zurück. Was Sie gerade geschrieben haben, geht verloren."
  },
+ "La préparation de la vidéo a échoué.": {
+  "en": "Preparing the video failed.",
+  "de": "Die Vorbereitung des Videos ist fehlgeschlagen."
+ },
+ "La préparation du lien": {
+  "en": "Preparing the link",
+  "de": "Die Vorbereitung des Links"
+ },
  "La suppression a échoué.": {
   "en": "Deleting failed.",
   "de": "Löschen fehlgeschlagen."
+ },
+ "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": {
+  "en": "The video for this procedure cannot be found. It may have been deleted, or its upload did not finish. Record the procedure again to restart the analysis.",
+  "de": "Das Video dieser Anleitung ist nicht auffindbar. Vielleicht wurde es gelöscht oder nicht fertig hochgeladen. Nehmen Sie die Anleitung neu auf, um die Analyse neu zu starten."
+ },
+ "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": {
+  "en": "The video did not finish uploading. Keep the app open during the upload, then restart the analysis.",
+  "de": "Das Video wurde nicht fertig hochgeladen. Lassen Sie die App beim Hochladen offen und starten Sie die Analyse dann neu."
+ },
+ "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": {
+  "en": "The video was not fully uploaded. Restart the analysis and keep the app open.",
+  "de": "Das Video wurde nicht vollständig hochgeladen. Starten Sie die Analyse neu und lassen Sie die App offen."
  },
  "Lampe torche": {
   "en": "Flashlight",
@@ -1766,6 +2158,10 @@
  "Le QR code fonctionnera une fois la procédure en ligne.": {
   "en": "The QR code works once the procedure is live.",
   "de": "Der QR-Code funktioniert, sobald die Anleitung live ist."
+ },
+ "Le bouton n’y est pas ? Réglages › Centre de contrôle › ajoutez « Enregistrement de l’écran ».": {
+  "en": "Button not there? Settings › Control Centre › add “Screen Recording”.",
+  "de": "Taste fehlt? Einstellungen › Kontrollzentrum › „Bildschirmaufnahme“ hinzufügen."
  },
  "Le changement est fait, mais la date n’a pas pu être enregistrée": {
   "en": "The change is done, but the date could not be saved",
@@ -1799,6 +2195,10 @@
   "en": "The timer runs while a procedure is OPEN on screen, and only then. • It stops as soon as the app goes to the background or the screen turns off. • After two minutes without any touch, it asks “where are you at?” and stops counting until someone answers — a phone left on the counter does not pile up hours. • Under three seconds, nothing is kept: that is a glance, not a read. Times add up with each visit.",
   "de": "Die Zeit läuft, solange eine Anleitung auf dem Bildschirm OFFEN ist, und nur dann. • Sie stoppt, sobald die App in den Hintergrund geht oder der Bildschirm ausgeht. • Nach zwei Minuten ohne Berührung fragt sie „Wie weit sind Sie?“ und zählt nicht weiter, bis jemand antwortet — ein Handy auf der Arbeitsfläche sammelt keine Stunden. • Unter drei Sekunden zählt nichts: Das ist ein Vorbeischauen, kein Lesen. Die Zeiten addieren sich bei jedem Besuch."
  },
+ "Le démarrage a échoué": {
+  "en": "Starting failed",
+  "de": "Der Start ist fehlgeschlagen"
+ },
  "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": {
   "en": "The microphone is on while you record. The steps come mostly from what you say.",
   "de": "Das Mikrofon ist während der Aufnahme an. Die Schritte entstehen vor allem aus dem, was Sie sagen."
@@ -1806,6 +2206,10 @@
  "Le mot de passe doit faire au moins {MDP_MIN} caractères.": {
   "en": "The password must be at least {MDP_MIN} characters.",
   "de": "Das Passwort muss mindestens {MDP_MIN} Zeichen haben."
+ },
+ "Le navigateur a refusé de lire « {name} ». Relancez le collage sans quitter cette page entre-temps.": {
+  "en": "The browser could not read “{name}”. Start joining again without leaving this page in between.",
+  "de": "Der Browser konnte „{name}“ nicht lesen. Starten Sie das Zusammenfügen neu, ohne diese Seite zwischendurch zu verlassen."
  },
  "Le nom est obligatoire.": {
   "en": "The name is required.",
@@ -1819,9 +2223,21 @@
   "en": "The name cannot be empty.",
   "de": "Der Name darf nicht leer sein."
  },
+ "Le paiement n'a pas pu s'ouvrir.": {
+  "en": "Payment could not open.",
+  "de": "Die Zahlung konnte nicht geöffnet werden."
+ },
  "Le partage d'écran n'a pas pu démarrer : {v}": {
   "en": "Screen sharing could not start: {v}",
   "de": "Bildschirmfreigabe konnte nicht starten: {v}"
+ },
+ "Le portail n’a pas pu s’ouvrir.": {
+  "en": "The portal could not open.",
+  "de": "Das Portal konnte nicht geöffnet werden."
+ },
+ "Le scanner n'a pas pu démarrer.": {
+  "en": "The scanner could not start.",
+  "de": "Der Scanner konnte nicht starten."
  },
  "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": {
   "en": "The analysis server answered {status}{v} — procedure checked: {aiProcedureId}",
@@ -1830,6 +2246,22 @@
  "Le serveur d'analyse est injoignable. Réessayez dans un instant.": {
   "en": "The analysis server cannot be reached. Try again in a moment.",
   "de": "Der Auswertungsserver ist nicht erreichbar. Versuchen Sie es gleich noch einmal."
+ },
+ "Le serveur d'analyse n'a pas répondu. Réessayez dans un instant.": {
+  "en": "The analysis server did not respond. Try again in a moment.",
+  "de": "Der Analyse-Server hat nicht geantwortet. Versuchen Sie es gleich noch einmal."
+ },
+ "Le service d’analyse n’a pas répondu à temps. Réessayez dans quelques minutes.": {
+  "en": "The analysis service did not respond in time. Try again in a few minutes.",
+  "de": "Der Analysedienst hat nicht rechtzeitig geantwortet. Versuchen Sie es in ein paar Minuten erneut."
+ },
+ "Le stockage a refusé la vidéo : {m}": {
+  "en": "Storage refused the video: {m}",
+  "de": "Der Speicher hat das Video abgelehnt: {m}"
+ },
+ "Le stockage a refusé un fichier de {v}. Filmez une séquence plus courte.": {
+  "en": "Storage refused a {v} file. Record a shorter clip.",
+  "de": "Der Speicher hat eine Datei mit {v} abgelehnt. Nehmen Sie kürzer auf."
  },
  "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": {
   "en": "Time per procedure is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
@@ -1859,6 +2291,10 @@
   "en": "Play",
   "de": "Abspielen"
  },
+ "Lecture de votre vidéo": {
+  "en": "Reading your video",
+  "de": "Ihr Video wird gelesen"
+ },
  "Lecture des vidéos…": {
   "en": "Reading the videos…",
   "de": "Videos werden gelesen…"
@@ -1883,9 +2319,29 @@
   "en": "You cannot open the other procedures",
   "de": "Die anderen Anleitungen können Sie nicht öffnen"
  },
+ "Les catégories se créent toutes seules à mesure que vous ajoutez des procédures — Cuisine, Salle, Bar…": {
+  "en": "Folders appear on their own as you add procedures — Kitchen, Dining room, Bar…",
+  "de": "Ordner entstehen von selbst, wenn Sie Anleitungen hinzufügen — Küche, Gastraum, Bar…"
+ },
+ "Les fichiers .doc (ancien format Word) ne peuvent pas être lus. Enregistrez-le en .docx, ou copiez son texte ci-dessus.": {
+  "en": ".doc files (old Word format) cannot be read. Save it as .docx, or copy its text above.",
+  "de": ".doc-Dateien (altes Word-Format) können nicht gelesen werden. Speichern Sie sie als .docx oder kopieren Sie den Text oben hinein."
+ },
  "Les membres de l’espace utilisateur": {
   "en": "The people in the User area",
   "de": "Die Personen im Nutzerbereich"
+ },
+ "Les moins actifs": {
+  "en": "Least active",
+  "de": "Am wenigsten aktiv"
+ },
+ "Les moins consultées": {
+  "en": "Least read",
+  "de": "Am wenigsten gelesen"
+ },
+ "Les mêmes fonctionnalités, sans exception.": {
+  "en": "The same features, no exceptions.",
+  "de": "Dieselben Funktionen, ohne Ausnahme."
  },
  "Les personnes qui l'ont choisi le gardent : seul le choix disparaît pour les prochaines.": {
   "en": "People who picked it keep it: only the option disappears for new people.",
@@ -1899,6 +2355,14 @@
   "en": "Roles",
   "de": "Positionen"
  },
+ "Les procédures créées apparaissent ici pendant quinze jours. Les plus anciennes restent accessibles dans l’onglet Procédures.": {
+  "en": "New procedures show here for two weeks. Older ones stay in the Procedures tab.",
+  "de": "Neue Anleitungen erscheinen hier zwei Wochen lang. Ältere bleiben im Tab Anleitungen."
+ },
+ "Les procédures de « {ancien} » dans « {dossier} » suivront. Videz le champ pour retirer le sous-dossier : elles remonteront en haut du dossier.": {
+  "en": "The procedures in “{ancien}” inside “{dossier}” will follow. Clear the field to remove the subfolder: they will move up to the folder itself.",
+  "de": "Die Anleitungen aus „{ancien}“ in „{dossier}“ ziehen mit. Leeren Sie das Feld, um den Unterordner zu entfernen: Sie wandern dann in den Ordner selbst."
+ },
  "Les procédures de « {ancien} » remonteront en haut de « {dossier} ». Aucune procédure n'est supprimée.": {
   "en": "The procedures in “{ancien}” will move to the top of “{dossier}”. No procedure is deleted.",
   "de": "Die Anleitungen aus „{ancien}“ wandern nach oben in „{dossier}“. Keine Anleitung wird gelöscht."
@@ -1906,6 +2370,10 @@
  "Les {etapesTotal} étapes sont faites": {
   "en": "All {etapesTotal} steps are done",
   "de": "Alle {etapesTotal} Schritte sind erledigt"
+ },
+ "Les étapes {i} et {v} se recoupent sur {v2} s": {
+  "en": "Steps {i} and {v} overlap by {v2} s",
+  "de": "Schritte {i} und {v} überschneiden sich um {v2} s"
  },
  "Limité à 5 min de vidéo": {
   "en": "5 minutes of video at most",
@@ -1951,6 +2419,10 @@
   "en": "The AI reads the text and pulls out the steps, in order.",
   "de": "Die KI liest den Text und zieht die Schritte der Reihe nach heraus."
  },
+ "L’IA n’a rien tiré de cette vidéo. Vérifiez que la parole est audible.": {
+  "en": "The AI got nothing from this video. Check that the speech can be heard.",
+  "de": "Die KI konnte mit diesem Video nichts anfangen. Prüfen Sie, ob die Sprache hörbar ist."
+ },
  "L’IA rédige la procédure": {
   "en": "The AI writes the procedure",
   "de": "Die KI schreibt die Anleitung"
@@ -1959,13 +2431,33 @@
   "en": "The AI turns your video into a procedure",
   "de": "Die KI macht aus Ihrem Video eine Anleitung"
  },
+ "L’IA écoute et regarde…": {
+  "en": "The AI is listening and watching…",
+  "de": "Die KI hört und schaut zu…"
+ },
  "L’IA écrit les étapes à votre place": {
   "en": "The AI writes the steps for you",
   "de": "Die KI schreibt die Schritte für Sie"
  },
+ "L’analyse a échoué.": {
+  "en": "The analysis failed.",
+  "de": "Die Analyse ist fehlgeschlagen."
+ },
  "L’analyse est terminée : {length} étapes.": {
   "en": "Analysis done: {length} steps.",
   "de": "Auswertung fertig: {length} Schritte."
+ },
+ "L’analyse n’a pas démarré.": {
+  "en": "The analysis did not start.",
+  "de": "Die Analyse hat nicht begonnen."
+ },
+ "L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; si cela persiste, écrivez-nous depuis les réglages.": {
+  "en": "The analysis could not restart. Try again in a few minutes; if it keeps happening, write to us from the settings.",
+  "de": "Die Analyse konnte nicht neu starten. Versuchen Sie es in ein paar Minuten erneut; wenn es weiter passiert, schreiben Sie uns über die Einstellungen."
+ },
+ "L’analyse prend trop de temps. Réessayez, ou écrivez les étapes vous-même.": {
+  "en": "The analysis is taking too long. Try again, or write the steps yourself.",
+  "de": "Die Analyse dauert zu lange. Versuchen Sie es erneut oder schreiben Sie die Schritte selbst."
  },
  "L’enregistrement démarre dans": {
   "en": "Recording starts in",
@@ -1995,6 +2487,10 @@
   "en": "Hide password",
   "de": "Passwort verbergen"
  },
+ "Membre": {
+  "en": "Member",
+  "de": "Mitglied"
+ },
  "Menu <b>Safari</b> → <b>Réglages pour ce site web</b>": {
   "en": "<b>Safari</b> menu → <b>Settings for This Website</b>",
   "de": "Menü <b>Safari</b> → <b>Einstellungen für diese Website</b>"
@@ -2023,6 +2519,14 @@
   "en": "Pause",
   "de": "Pause"
  },
+ "Mise en forme": {
+  "en": "Formatting",
+  "de": "Formatierung"
+ },
+ "Mod. {quand}": {
+  "en": "Edited {quand}",
+  "de": "Geändert {quand}"
+ },
  "Modifications enregistrées": {
   "en": "Changes saved",
   "de": "Änderungen gespeichert"
@@ -2030,6 +2534,10 @@
  "Modifier": {
   "en": "Edit",
   "de": "Bearbeiten"
+ },
+ "Modifier la photo": {
+  "en": "Change the photo",
+  "de": "Foto ändern"
  },
  "Modifier la procédure": {
   "en": "Edit the procedure",
@@ -2071,6 +2579,10 @@
   "en": "Changes unavailable.",
   "de": "Änderungen nicht verfügbar."
  },
+ "Même allégée, cette vidéo pèse {v}, au-delà des {v2} Mo acceptés. Baissez la définition de votre caméra, ou filmez plus court.": {
+  "en": "Even compressed, this video is {v}, over the {v2} MB limit. Lower your camera resolution, or record a shorter clip.",
+  "de": "Auch komprimiert ist dieses Video {v} groß, mehr als die erlaubten {v2} MB. Senken Sie die Kameraauflösung oder nehmen Sie kürzer auf."
+ },
  "Nom": {
   "en": "Last name",
   "de": "Nachname"
@@ -2090,6 +2602,10 @@
  "Nom de l'établissement": {
   "en": "Site name",
   "de": "Name des Standorts"
+ },
+ "Nom du dossier": {
+  "en": "Folder name",
+  "de": "Ordnername"
  },
  "Nom et logo de l’entreprise": {
   "en": "Company name and logo",
@@ -2119,6 +2635,10 @@
   "en": "Write to us",
   "de": "Schreiben Sie uns"
  },
+ "Nouveau mot de passe": {
+  "en": "New password",
+  "de": "Neues Passwort"
+ },
  "Nouvel établissement": {
   "en": "New site",
   "de": "Neuer Standort"
@@ -2138,6 +2658,10 @@
  "Offre {nom} · {prix} € par mois": {
   "en": "{nom} plan · €{prix} per month",
   "de": "Tarif {nom} · {prix} € pro Monat"
+ },
+ "Ou : menu ≡ → Paramètres → Sites et téléchargements → Autorisations des sites → Caméra.": {
+  "en": "Or: menu ≡ → Settings → Sites and downloads → Site permissions → Camera.",
+  "de": "Oder: Menü ≡ → Einstellungen → Websites und Downloads → Website-Berechtigungen → Kamera."
  },
  "Ouverture de la caméra...": {
   "en": "Opening the camera…",
@@ -2187,9 +2711,25 @@
   "en": "Share the invitation code from Settings.",
   "de": "Teilen Sie den Einladungscode aus den Einstellungen."
  },
+ "Pas encore consultée": {
+  "en": "Not read yet",
+  "de": "Noch nicht gelesen"
+ },
  "Pas encore consultées": {
   "en": "Not opened yet",
   "de": "Noch nicht geöffnet"
+ },
+ "Passer au mensuel · {prix} € par mois": {
+  "en": "Switch to monthly · €{prix} per month",
+  "de": "Zu monatlich wechseln · {prix} € pro Monat"
+ },
+ "Passer à l'année · {v} €": {
+  "en": "Switch to yearly · €{v}",
+  "de": "Zu jährlich wechseln · {v} €"
+ },
+ "Passer à l’offre supérieure": {
+  "en": "Move up a plan",
+  "de": "Zum nächsthöheren Tarif wechseln"
  },
  "Passez à l’offre supérieure pour agrandir votre équipe.": {
   "en": "Move up a plan to grow your team.",
@@ -2198,6 +2738,10 @@
  "Pause": {
   "en": "Pause",
   "de": "Pause"
+ },
+ "Pensez à regarder dans les indésirables.": {
+  "en": "Check your spam folder too.",
+  "de": "Schauen Sie auch im Spam-Ordner nach."
  },
  "Personne dans l’espace Utilisateur pour le moment.": {
   "en": "No one in the User area yet.",
@@ -2211,6 +2755,14 @@
   "en": "No one else can join your team. Choose a bigger plan to welcome more people.",
   "de": "Niemand kann Ihrem Team mehr beitreten. Wählen Sie einen größeren Tarif für mehr Personen."
  },
+ "Personne pour l'instant": {
+  "en": "No one yet",
+  "de": "Noch niemand"
+ },
+ "Personne pour l’instant": {
+  "en": "No one yet",
+  "de": "Noch niemand"
+ },
  "Personne pour l’instant.": {
   "en": "No one yet.",
   "de": "Noch niemand."
@@ -2222,6 +2774,14 @@
  "Photo de l'étape": {
   "en": "Step photo",
   "de": "Foto zum Schritt"
+ },
+ "Photo de l'étape {v}": {
+  "en": "Photo of step {v}",
+  "de": "Foto von Schritt {v}"
+ },
+ "Photo illisible : {name}": {
+  "en": "Unreadable photo: {name}",
+  "de": "Foto nicht lesbar: {name}"
  },
  "Photo trop lourde : 6 Mo maximum.": {
   "en": "Photo too large: 6 MB at most.",
@@ -2266,6 +2826,10 @@
  "Point de vigilance": {
   "en": "Watch out",
   "de": "Achtung"
+ },
+ "Poste non défini": {
+  "en": "No role set",
+  "de": "Keine Position festgelegt"
  },
  "Poste non enregistré : {message}": {
   "en": "Role not saved: {message}",
@@ -2327,9 +2891,25 @@
   "en": "Profile",
   "de": "Profil"
  },
+ "Profitez de toutes les fonctionnalités de Standix. Sans engagement.": {
+  "en": "Enjoy every Standix feature. No commitment.",
+  "de": "Nutzen Sie alle Funktionen von Standix. Ohne Verpflichtung."
+ },
  "Prénom": {
   "en": "First name",
   "de": "Vorname"
+ },
+ "Préparation": {
+  "en": "Preparing",
+  "de": "Vorbereitung"
+ },
+ "Préparation de la vidéo": {
+  "en": "Preparing the video",
+  "de": "Video wird vorbereitet"
+ },
+ "Préparation de la vidéo…": {
+  "en": "Preparing the video…",
+  "de": "Video wird vorbereitet…"
  },
  "Préparation du PDF…": {
   "en": "Preparing the PDF…",
@@ -2370,6 +2950,10 @@
  "Quel est votre rôle ici ?": {
   "en": "What do you do here?",
   "de": "Was machen Sie hier?"
+ },
+ "Quelqu’un": {
+  "en": "Someone",
+  "de": "Jemand"
  },
  "Qui attend ?": {
   "en": "Who is waiting?",
@@ -2443,6 +3027,10 @@
   "en": "Restart the analysis",
   "de": "Auswertung neu starten"
  },
+ "Relancer l'analyse de cette vidéo ?": {
+  "en": "Restart the analysis of this video?",
+  "de": "Analyse dieses Videos neu starten?"
+ },
  "Relancer l’analyse": {
   "en": "Restart the analysis",
   "de": "Auswertung neu starten"
@@ -2451,9 +3039,21 @@
   "en": "Check every step",
   "de": "Prüfen Sie jeden Schritt"
  },
+ "Remplacer la photo": {
+  "en": "Replace the photo",
+  "de": "Foto ersetzen"
+ },
+ "Renommer": {
+  "en": "Rename",
+  "de": "Umbenennen"
+ },
  "Renommer le dossier": {
   "en": "Rename the folder",
   "de": "Ordner umbenennen"
+ },
+ "Renommer le sous-dossier": {
+  "en": "Rename the subfolder",
+  "de": "Unterordner umbenennen"
  },
  "Renommé en « {propre} »": {
   "en": "Renamed to “{propre}”",
@@ -2470,6 +3070,10 @@
  "Reprendre": {
   "en": "Resume",
   "de": "Fortsetzen"
+ },
+ "Reprise après {v} min sans résultat": {
+  "en": "Restarted after {v} min with no result",
+  "de": "Neustart nach {v} Min. ohne Ergebnis"
  },
  "Rester": {
   "en": "Stay",
@@ -2523,6 +3127,18 @@
   "en": "Come back to {nom} and tap <b>Try again</b>",
   "de": "Kehren Sie zu {nom} zurück und tippen Sie auf <b>Erneut versuchen</b>"
  },
+ "Rien de lu ce mois-ci": {
+  "en": "Nothing read this month",
+  "de": "Diesen Monat nichts gelesen"
+ },
+ "Rien de lu pour l’instant": {
+  "en": "Nothing read yet",
+  "de": "Noch nichts gelesen"
+ },
+ "Rien de lu sur cette période": {
+  "en": "Nothing read in this period",
+  "de": "In diesem Zeitraum nichts gelesen"
+ },
  "Rien ne s’est passé ces {v} dernières semaines.": {
   "en": "Nothing has happened in the last {v} weeks.",
   "de": "In den letzten {v} Wochen ist nichts passiert."
@@ -2547,6 +3163,14 @@
   "en": "Settings",
   "de": "Einstellungen"
  },
+ "Réseau": {
+  "en": "Network",
+  "de": "Network"
+ },
+ "Réseau : {v}": {
+  "en": "Network: {v}",
+  "de": "Netzwerk: {v}"
+ },
  "Résultat": {
   "en": "Result",
   "de": "Ergebnis"
@@ -2555,9 +3179,17 @@
   "en": "Revoke",
   "de": "Widerrufen"
  },
- "Révoquer ce code ?": {
-  "en": "Revoke this code?",
-  "de": "Diesen Code widerrufen?"
+ "Safari sur Mac": {
+  "en": "Safari on Mac",
+  "de": "Safari auf dem Mac"
+ },
+ "Safari sur iPhone": {
+  "en": "Safari on iPhone",
+  "de": "Safari auf dem iPhone"
+ },
+ "Sans catégorie": {
+  "en": "No folder",
+  "de": "Ohne Ordner"
  },
  "Sans dossier": {
   "en": "No folder",
@@ -2570,6 +3202,10 @@
  "Sans nom": {
   "en": "Untitled",
   "de": "Ohne Namen"
+ },
+ "Sans titre": {
+  "en": "Untitled",
+  "de": "Ohne Titel"
  },
  "Scanner un code": {
   "en": "Scan a code",
@@ -2599,6 +3235,10 @@
   "en": "Session expired.",
   "de": "Sitzung abgelaufen."
  },
+ "Session expirée. Reconnectez-vous.": {
+  "en": "Session expired. Please log in again.",
+  "de": "Sitzung abgelaufen. Bitte melden Sie sich erneut an."
+ },
  "Seul le créateur de l’entreprise peut la supprimer.": {
   "en": "Only the person who created the company can delete it.",
   "de": "Nur wer das Unternehmen erstellt hat, kann es löschen."
@@ -2606,10 +3246,6 @@
  "Seul le dernier mois est affiché.": {
   "en": "Only the last month is shown.",
   "de": "Nur der letzte Monat wird angezeigt."
- },
- "Seul le dernier mois est conservé.": {
-  "en": "Only the last month is kept.",
-  "de": "Nur der letzte Monat wird gespeichert."
  },
  "Seul le fondateur peut supprimer un établissement.": {
   "en": "Only the owner can delete a site.",
@@ -2622,6 +3258,26 @@
  "Seul le gérant peut retirer un gestionnaire.": {
   "en": "Only the owner can remove a manager.",
   "de": "Nur der Inhaber kann einen Verwalter entfernen."
+ },
+ "Seule la gestion peut créer des procédures.": {
+  "en": "Only managers can create procedures.",
+  "de": "Nur Verwalter können Anleitungen erstellen."
+ },
+ "Seuls les comptes créés en tant que gérant peuvent ouvrir une entreprise. Votre compte a été créé en tant qu’utilisateur.": {
+  "en": "Only accounts created as an owner can open a company. Your account was created as a user.",
+  "de": "Nur als Inhaber erstellte Konten können ein Unternehmen eröffnen. Ihr Konto wurde als Nutzer erstellt."
+ },
+ "Si la caméra n’apparaît pas : Réglages du téléphone → Applications → le navigateur → Autorisations → Appareil photo.": {
+  "en": "If the camera doesn't show: phone Settings → Apps → the browser → Permissions → Camera.",
+  "de": "Wenn die Kamera nicht erscheint: Handy-Einstellungen → Apps → der Browser → Berechtigungen → Kamera."
+ },
+ "Si le menu n’apparaît pas : Réglages → Safari → Caméra → Autoriser.": {
+  "en": "If the menu doesn't show: Settings → Safari → Camera → Allow.",
+  "de": "Wenn das Menü nicht erscheint: Einstellungen → Safari → Kamera → Erlauben."
+ },
+ "Si l’app n’apparaît pas dans Réglages : Réglages → Confidentialité et sécurité → Caméra → {nom}.": {
+  "en": "If the app doesn't show in Settings: Settings → Privacy & Security → Camera → {nom}.",
+  "de": "Wenn die App nicht in den Einstellungen erscheint: Einstellungen → Datenschutz & Sicherheit → Kamera → {nom}."
  },
  "Si vous partez, plus personne ne pourra créer de procédure ni gérer l'équipe de {nom}. Nommez d'abord quelqu'un d'autre dans « Gérer l'équipe », ou supprimez l'entreprise.": {
   "en": "If you leave, no one will be able to create procedures or manage {nom}'s team. First appoint someone else in “Manage the team”, or delete the company.",
@@ -2683,6 +3339,10 @@
   "en": "Delete this site",
   "de": "Diesen Standort löschen"
  },
+ "Supprimer définitivement": {
+  "en": "Delete for good",
+  "de": "Endgültig löschen"
+ },
  "Supprimer définitivement ?": {
   "en": "Delete for good?",
   "de": "Endgültig löschen?"
@@ -2707,9 +3367,17 @@
   "en": "Delete {nom}?",
   "de": "{nom} löschen?"
  },
+ "Sur Android": {
+  "en": "On Android",
+  "de": "Auf Android"
+ },
  "Sur devis": {
   "en": "On quote",
   "de": "Auf Anfrage"
+ },
+ "Sur iPhone et iPad": {
+  "en": "On iPhone and iPad",
+  "de": "Auf iPhone und iPad"
  },
  "S’inscrire en tant que gérant": {
   "en": "Sign up as owner",
@@ -2727,6 +3395,14 @@
   "en": "Sign up as user",
   "de": "Als Nutzer registrieren"
  },
+ "Tapez « SUPPRIMER » pour confirmer.": {
+  "en": "Type “SUPPRIMER” to confirm.",
+  "de": "Geben Sie „SUPPRIMER“ ein, um zu bestätigen."
+ },
+ "Tapez « {nom} » pour confirmer.": {
+  "en": "Type “{nom}” to confirm.",
+  "de": "Geben Sie „{nom}“ ein, um zu bestätigen."
+ },
  "Temps cumulé passé sur chaque procédure.": {
   "en": "Total time spent on each procedure.",
   "de": "Gesamte Zeit pro Anleitung."
@@ -2734,6 +3410,10 @@
  "Temps de collage, environ": {
   "en": "Joining time, about",
   "de": "Dauer des Zusammenfügens, etwa"
+ },
+ "Temps de lecture compté par personne.": {
+  "en": "Reading time counted per person.",
+  "de": "Lesezeit pro Person gezählt."
  },
  "Temps de lecture par dossier": {
   "en": "Reading time per folder",
@@ -2823,6 +3503,10 @@
   "en": "Tap a step to set its clip",
   "de": "Tippen Sie auf einen Schritt, um seinen Ausschnitt zu setzen"
  },
+ "Touchez « Enregistreur d’écran », activez le micro, puis démarrez.": {
+  "en": "Tap “Screen recorder”, turn on the mic, then start.",
+  "de": "Tippen Sie auf „Bildschirmaufnahme“, schalten Sie das Mikrofon ein und starten Sie."
+ },
  "Tout effacer": {
   "en": "Erase all",
   "de": "Alles löschen"
@@ -2830,6 +3514,10 @@
  "Tout effacer ?": {
   "en": "Erase everything?",
   "de": "Alles löschen?"
+ },
+ "Tout le monde l'a ouverte au moins une fois.": {
+  "en": "Everyone has opened it at least once.",
+  "de": "Alle haben sie mindestens einmal geöffnet."
  },
  "Tout voir": {
   "en": "See all",
@@ -2879,6 +3567,10 @@
   "en": "Too many devices",
   "de": "Zu viele Geräte"
  },
+ "Trou de {v} s avant l'étape {v2}": {
+  "en": "Gap of {v} s before step {v2}",
+  "de": "Lücke von {v} s vor Schritt {v2}"
+ },
  "Télécharger en PDF": {
   "en": "Download as PDF",
   "de": "Als PDF herunterladen"
@@ -2915,6 +3607,10 @@
   "en": "A folder “{nouveau}” already exists. The procedures in “{ancien}” will move into it, and “{ancien}” will disappear.",
   "de": "Es gibt schon einen Ordner „{nouveau}“. Die Anleitungen aus „{ancien}“ kommen dorthin, und „{ancien}“ verschwindet."
  },
+ "Un gestionnaire": {
+  "en": "A manager",
+  "de": "Ein Verwalter"
+ },
  "Un lien vient d’être envoyé à": {
   "en": "A link has just been sent to",
   "de": "Ein Link wurde gerade gesendet an"
@@ -2922,6 +3618,10 @@
  "Un lien vient d’être envoyé à <b>{propre}</b>.": {
   "en": "A link has just been sent to <b>{propre}</b>.",
   "de": "Ein Link wurde gerade an <b>{propre}</b> gesendet."
+ },
+ "Un membre": {
+  "en": "A member",
+  "de": "Ein Mitglied"
  },
  "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": {
   "en": "A problem, an idea, a question about Standix? We read everything and reply as fast as we can.",
@@ -2959,9 +3659,9 @@
   "en": "User",
   "de": "Nutzer"
  },
- "Utilisez ce code pour donner à votre équipe l’accès utilisateur aux procédures. Vous pourrez ensuite leur donner accès à l’espace Gestion.": {
-  "en": "Use this code to give your team user access to the procedures. You can give them the Management area afterwards.",
-  "de": "Mit diesem Code geben Sie Ihrem Team Nutzerzugriff auf die Anleitungen. Den Verwaltungsbereich können Sie später freigeben."
+ "Valider": {
+  "en": "Confirm",
+  "de": "Bestätigen"
  },
  "Verrou : {v}": {
   "en": "Lock: {v}",
@@ -2971,6 +3671,10 @@
   "en": "Lock unavailable: {message}",
   "de": "Sperre nicht verfügbar: {message}"
  },
+ "Vidéo allégée : {v} →": {
+  "en": "Video compressed: {v} →",
+  "de": "Video komprimiert: {v} →"
+ },
  "Vidéo générée par l’IA Standix": {
   "en": "Video generated by Standix AI",
   "de": "Von der Standix-KI erzeugtes Video"
@@ -2978,6 +3682,10 @@
  "Vidéo prête — lancez l’analyse": {
   "en": "Video ready — start the analysis",
   "de": "Video fertig — Auswertung starten"
+ },
+ "Vidéo rattachée…": {
+  "en": "Video attached…",
+  "de": "Video verknüpft…"
  },
  "Vidéo reçue": {
   "en": "Video received",
@@ -2995,6 +3703,10 @@
   "en": "See it as the team does",
   "de": "So sehen, wie das Team es sieht"
  },
+ "Voir l'autre": {
+  "en": "See the other",
+  "de": "Den anderen ansehen"
+ },
  "Voir l'équipe": {
   "en": "See the team",
   "de": "Team ansehen"
@@ -3003,9 +3715,17 @@
   "en": "Open the procedure",
   "de": "Anleitung öffnen"
  },
+ "Voir le code d'invitation": {
+  "en": "See the invitation code",
+  "de": "Einladungscode ansehen"
+ },
  "Voir les offres": {
   "en": "See the plans",
   "de": "Tarife ansehen"
+ },
+ "Voir les {n} autres": {
+  "en": "See the {n} others",
+  "de": "Die {n} anderen ansehen"
  },
  "Voir moins": {
   "en": "See less",
@@ -3055,9 +3775,17 @@
   "en": "Your <b>{np} procedures</b> and <b>{nm} members</b> are waiting for you. Pick up where you left off.",
   "de": "Ihre <b>{np} Anleitungen</b> und <b>{nm} Mitglieder</b> warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben."
  },
+ "Vos analyses vidéo sont épuisées. Elles se renouvellent au début du mois prochain.": {
+  "en": "Your video analyses are used up. They renew at the start of next month.",
+  "de": "Ihre Videoanalysen sind aufgebraucht. Sie erneuern sich zu Beginn des nächsten Monats."
+ },
  "Vos appareils numériques": {
   "en": "Your devices",
   "de": "Ihre Geräte"
+ },
+ "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": {
+  "en": "Your folders exist, but no one has opened them yet this month.",
+  "de": "Ihre Ordner gibt es, aber diesen Monat hat sie noch niemand geöffnet."
  },
  "Vos changements ne partent qu'à l'enregistrement": {
   "en": "Your changes are only sent when you save",
@@ -3074,6 +3802,10 @@
  "Vos procédures sont conservées. Choisissez une offre pour les rouvrir et continuer à en créer.": {
   "en": "Your procedures are kept. Pick a plan to open them again and keep creating.",
   "de": "Ihre Anleitungen bleiben erhalten. Wählen Sie einen Tarif, um sie wieder zu öffnen und weitere zu erstellen."
+ },
+ "Vos {quota} analyses d’essai sont utilisées. Choisissez une offre pour continuer à analyser vos vidéos.": {
+  "en": "Your {quota} trial analyses are used up. Choose a plan to keep analysing your videos.",
+  "de": "Ihre {quota} Test-Analysen sind aufgebraucht. Wählen Sie einen Tarif, um weiter Videos zu analysieren."
  },
  "Vos {quota} analyses vidéo du mois sont utilisées sur l’ensemble de vos établissements. Elles se renouvellent au début du mois prochain.": {
   "en": "Your {quota} video analyses for this month are used up across all your sites. They reset at the start of next month.",
@@ -3127,6 +3859,14 @@
   "en": "Your browser refused access and will not ask again on its own.<br>Here is how to turn it back on in <b>{appareil}</b>.",
   "de": "Ihr Browser hat den Zugriff verweigert und fragt nicht von selbst erneut.<br>So schalten Sie ihn in <b>{appareil}</b> wieder ein."
  },
+ "Votre navigateur ne sait pas assembler de vidéos.": {
+  "en": "Your browser cannot join videos.",
+  "de": "Ihr Browser kann keine Videos zusammenfügen."
+ },
+ "Votre navigateur n’accepte aucun format d’enregistrement.": {
+  "en": "Your browser supports no recording format.",
+  "de": "Ihr Browser unterstützt kein Aufnahmeformat."
+ },
  "Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.": {
   "en": "Your name appears in the team list and on what you read. The email cannot be changed here.",
   "de": "Ihr Name erscheint in der Teamliste und bei dem, was Sie lesen. Die E-Mail lässt sich hier nicht ändern."
@@ -3134,6 +3874,10 @@
  "Votre poste": {
   "en": "Your role",
   "de": "Ihre Position"
+ },
+ "Votre première entreprise n’est pas encore abonnée. Activez son abonnement pour pouvoir en créer une seconde.": {
+  "en": "Your first company has no subscription yet. Start its subscription to create a second one.",
+  "de": "Ihr erstes Unternehmen hat noch kein Abo. Aktivieren Sie das Abo, um ein zweites anzulegen."
  },
  "Votre profil": {
   "en": "Your profile",
@@ -3155,9 +3899,17 @@
   "en": "Your session has expired. Log in again and try again.",
   "de": "Ihre Sitzung ist abgelaufen. Melden Sie sich neu an und versuchen Sie es erneut."
  },
+ "Votre session a expiré. Reconnectez-vous.": {
+  "en": "Your session has expired. Please log in again.",
+  "de": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an."
+ },
  "Votre texte": {
   "en": "Your text",
   "de": "Ihr Text"
+ },
+ "Votre téléphone n’a pas suivi la cadence. Fermez les autres applications et réessayez.": {
+  "en": "Your phone could not keep up. Close other apps and try again.",
+  "de": "Ihr Handy kam nicht mit. Schließen Sie andere Apps und versuchen Sie es erneut."
  },
  "Votre vidéo": {
   "en": "Your video",
@@ -3199,6 +3951,10 @@
   "en": "You left {nom}.",
   "de": "Sie haben {nom} verlassen."
  },
+ "Vous avez utilisé vos {quota} analyses vidéo de ce mois-ci. Elles se renouvellent le 1er du mois prochain — ou passez à l'offre supérieure pour en avoir davantage tout de suite.": {
+  "en": "You have used your {quota} video analyses this month. They renew on the 1st of next month — or move up a plan to get more right away.",
+  "de": "Sie haben Ihre {quota} Videoanalysen für diesen Monat aufgebraucht. Sie erneuern sich am 1. des nächsten Monats — oder wechseln Sie zu einem höheren Tarif, um sofort mehr zu haben."
+ },
  "Vous en serez le gérant, avec 14 jours d’essai gratuit.": {
   "en": "You will be its owner, with a 14-day free trial.",
   "de": "Sie werden der Inhaber, mit 14 Tagen kostenloser Testphase."
@@ -3207,9 +3963,25 @@
   "en": "Where are you at?",
   "de": "Wie weit sind Sie?"
  },
+ "Vous faites déjà partie de {nom}.": {
+  "en": "You are already part of {nom}.",
+  "de": "Sie gehören bereits zu {nom}."
+ },
+ "Vous gérez déjà {ETABLISSEMENTS_MAX} entreprises, le maximum par compte. Retirez-en une pour en créer une autre, ou écrivez-nous si vous gérez un groupe.": {
+  "en": "You already manage {ETABLISSEMENTS_MAX} companies, the maximum per account. Remove one to create another, or write to us if you run a group.",
+  "de": "Sie verwalten bereits {ETABLISSEMENTS_MAX} Unternehmen, das Maximum pro Konto. Entfernen Sie eines, um ein neues anzulegen, oder schreiben Sie uns, wenn Sie eine Gruppe führen."
+ },
+ "Vous gérez {ETABLISSEMENTS_MAX} entreprises, le maximum par compte.": {
+  "en": "You manage {ETABLISSEMENTS_MAX} companies, the maximum per account.",
+  "de": "Sie verwalten {ETABLISSEMENTS_MAX} Unternehmen, das Maximum pro Konto."
+ },
  "Vous n'appartenez à aucune entreprise.": {
   "en": "You do not belong to any company.",
   "de": "Sie gehören zu keinem Unternehmen."
+ },
+ "Vous ne le voyez pas ? Glissez une seconde fois pour ouvrir la liste complète.": {
+  "en": "Can't see it? Swipe a second time to open the full list.",
+  "de": "Nicht zu sehen? Wischen Sie ein zweites Mal, um die ganze Liste zu öffnen."
  },
  "Vous n’avez pas les droits pour supprimer cette procédure.": {
   "en": "You are not allowed to delete this procedure.",
@@ -3254,6 +4026,10 @@
  "Vous repassez en espace Équipe": {
   "en": "You are back in the User area",
   "de": "Sie sind wieder im Nutzerbereich"
+ },
+ "Vous retrouvez les procédures à lire et le scanner de QR codes.": {
+  "en": "You will find the procedures to read and the QR code scanner.",
+  "de": "Hier finden Sie die Anleitungen und den QR-Code-Scanner."
  },
  "Vous êtes abonné à l'offre <b>{nom}</b>.": {
   "en": "You are on the <b>{nom}</b> plan.",
@@ -3311,21 +4087,93 @@
   "en": "Zoom in",
   "de": "Vergrößern"
  },
+ "abonnement complet": {
+  "en": "subscription full",
+  "de": "Abo voll"
+ },
+ "accès complet": {
+  "en": "full access",
+  "de": "voller Zugriff"
+ },
  "actif": {
   "en": "active",
   "de": "aktiv"
+ },
+ "analyses IA restantes": {
+  "en": "AI analyses left",
+  "de": "KI-Analysen übrig"
  },
  "appel impossible": {
   "en": "call failed",
   "de": "Aufruf fehlgeschlagen"
  },
+ "arrivés récemment": {
+  "en": "recently joined",
+  "de": "kürzlich beigetreten"
+ },
+ "au total": {
+  "en": "in total",
+  "de": "insgesamt"
+ },
+ "au total sur les procédures": {
+  "en": "in total on procedures",
+  "de": "insgesamt auf Anleitungen"
+ },
+ "aucun format enregistrable — MediaRecorder.isTypeSupported refuse mp4, vp9 et webm": {
+  "en": "no recordable format — MediaRecorder.isTypeSupported rejects mp4, vp9 and webm",
+  "de": "kein aufnehmbares Format — MediaRecorder.isTypeSupported lehnt mp4, vp9 und webm ab"
+ },
+ "aucune piste sonore récupérable — la vidéo en a-t-elle une ?": {
+  "en": "no usable audio track — does the video have one?",
+  "de": "keine nutzbare Tonspur — hat das Video eine?"
+ },
+ "aucune procédure": {
+  "en": "no procedures",
+  "de": "keine Anleitungen"
+ },
+ "aujourd'hui": {
+  "en": "today",
+  "de": "heute"
+ },
  "avant de publier : c'est vous qui connaissez le geste.": {
   "en": "before publishing: you are the one who knows the job.",
   "de": "vor dem Veröffentlichen: Sie kennen den Handgriff."
  },
+ "c'est vous qui connaissez le geste.": {
+  "en": "you are the one who knows the job.",
+  "de": "Sie kennen den Handgriff."
+ },
+ "ce mois-ci": {
+  "en": "this month",
+  "de": "diesen Monat"
+ },
+ "ce navigateur ne sait pas enregistrer ({v})": {
+  "en": "this browser cannot record ({v})",
+  "de": "dieser Browser kann nicht aufnehmen ({v})"
+ },
+ "ce poste": {
+  "en": "this role",
+  "de": "diese Position"
+ },
+ "cet appareil": {
+  "en": "this device",
+  "de": "dieses Gerät"
+ },
+ "cet établissement": {
+  "en": "this site",
+  "de": "dieser Standort"
+ },
  "cette entreprise": {
   "en": "this company",
   "de": "dieses Unternehmen"
+ },
+ "cette personne": {
+  "en": "this person",
+  "de": "diese Person"
+ },
+ "cette semaine": {
+  "en": "this week",
+  "de": "diese Woche"
  },
  "chevauchement": {
   "en": "overlap",
@@ -3339,6 +4187,10 @@
   "en": "terms of use",
   "de": "Nutzungsbedingungen"
  },
+ "connecté": {
+  "en": "connected",
+  "de": "verbunden"
+ },
  "couvert": {
   "en": "covered",
   "de": "abgedeckt"
@@ -3351,6 +4203,10 @@
   "en": "of training this month",
   "de": "Einarbeitung diesen Monat"
  },
+ "de lecture ce mois-ci": {
+  "en": "of reading this month",
+  "de": "Lesezeit diesen Monat"
+ },
  "de vos procédures": {
   "en": "of your procedures",
   "de": "Ihrer Anleitungen"
@@ -3358,6 +4214,10 @@
  "de vos procédures<br>sont accessibles": {
   "en": "of your procedures<br>are available",
   "de": "Ihrer Anleitungen<br>sind verfügbar"
+ },
+ "depuis le début": {
+  "en": "since the start",
+  "de": "seit Beginn"
  },
  "depuis {depuis} minute": {
   "en": "for {depuis} minute",
@@ -3379,21 +4239,93 @@
   "en": "until you subscribe.",
   "de": "bis zum Abschluss eines Abos."
  },
+ "en ce moment": {
+  "en": "right now",
+  "de": "gerade jetzt"
+ },
  "en pause": {
   "en": "paused",
   "de": "pausiert"
+ },
+ "en {v}": {
+  "en": "in {v}",
+  "de": "im {v}"
+ },
+ "environ {minutes} minute": {
+  "en": "about {minutes} minute",
+  "de": "etwa {minutes} Minute"
+ },
+ "environ {minutes} minutes": {
+  "en": "about {minutes} minutes",
+  "de": "etwa {minutes} Minuten"
+ },
+ "envoi de {v} — gardez l’app ouverte {attente}": {
+  "en": "uploading {v} — keep the app open {attente}",
+  "de": "{v} wird hochgeladen — lassen Sie die App offen {attente}"
  },
  "erreur": {
   "en": "error",
   "de": "Fehler"
  },
+ "erreur inconnue": {
+  "en": "unknown error",
+  "de": "unbekannter Fehler"
+ },
  "et": {
   "en": "and",
   "de": "und"
  },
+ "forfait non renseigné": {
+  "en": "plan not set",
+  "de": "Tarif nicht angegeben"
+ },
  "gestionnaire": {
   "en": "a manager",
   "de": "Verwalter"
+ },
+ "hier": {
+  "en": "yesterday",
+  "de": "gestern"
+ },
+ "hors ligne": {
+  "en": "offline",
+  "de": "offline"
+ },
+ "il y a {h} h": {
+  "en": "{h} h ago",
+  "de": "vor {h} Std."
+ },
+ "il y a {jours} jours": {
+  "en": "{jours} days ago",
+  "de": "vor {jours} Tagen"
+ },
+ "il y a {j} jours": {
+  "en": "{j} days ago",
+  "de": "vor {j} Tagen"
+ },
+ "il y a {minutes} min": {
+  "en": "{minutes} min ago",
+  "de": "vor {minutes} Min."
+ },
+ "il y a {n} semaine": {
+  "en": "{n} week ago",
+  "de": "vor {n} Woche"
+ },
+ "il y a {n} semaines": {
+  "en": "{n} weeks ago",
+  "de": "vor {n} Wochen"
+ },
+ "il y a {v} min": {
+  "en": "{v} min ago",
+  "de": "vor {v} Min."
+ },
+ "il y a {v} mois": {
+  "en": "{v} months ago",
+  "de": "vor {v} Monaten"
+ },
+ "il y a {v} semaines": {
+  "en": "{v} weeks ago",
+  "de": "vor {v} Wochen"
  },
  "jamais": {
   "en": "never",
@@ -3419,6 +4351,14 @@
   "en": "the procedure is already in Draft. It opens once the analysis is done.",
   "de": "die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
  },
+ "la semaine dernière": {
+  "en": "last week",
+  "de": "letzte Woche"
+ },
+ "le navigateur ne rend pas videoWidth/videoHeight": {
+  "en": "the browser does not return videoWidth/videoHeight",
+  "de": "der Browser liefert kein videoWidth/videoHeight"
+ },
  "le temps de formation": {
   "en": "the training time",
   "de": "die Einarbeitungszeit"
@@ -3435,6 +4375,30 @@
   "en": "on {v}",
   "de": "am {v}"
  },
+ "lecture": {
+  "en": "read",
+  "de": "Aufruf"
+ },
+ "lectures": {
+  "en": "reads",
+  "de": "Aufrufe"
+ },
+ "les moins actifs": {
+  "en": "least active",
+  "de": "am wenigsten aktiv"
+ },
+ "les plus actifs": {
+  "en": "most active",
+  "de": "am aktivsten"
+ },
+ "membre": {
+  "en": "member",
+  "de": "Mitglied"
+ },
+ "membres": {
+  "en": "members",
+  "de": "Mitglieder"
+ },
  "minutes": {
   "en": "minutes",
   "de": "Minuten"
@@ -3447,6 +4411,14 @@
   "en": "minutes this month",
   "de": "Minuten diesen Monat"
  },
+ "moins d’une minute": {
+  "en": "less than a minute",
+  "de": "weniger als eine Minute"
+ },
+ "nom A → Z": {
+  "en": "name A → Z",
+  "de": "Name A → Z"
+ },
  "ou <b>{v} € par mois</b> en payant à l’année": {
   "en": "or <b>€{v} per month</b> when paid yearly",
   "de": "oder <b>{v} € pro Monat</b> bei jährlicher Zahlung"
@@ -3454,6 +4426,10 @@
  "par mois, hors taxes": {
   "en": "per month, excl. tax",
   "de": "pro Monat, ohne Steuern"
+ },
+ "partagé entre vos entreprises": {
+  "en": "shared between your companies",
+  "de": "geteilt zwischen Ihren Unternehmen"
  },
  "pour créer une procédure.": {
   "en": "button to create a procedure.",
@@ -3463,17 +4439,49 @@
   "en": "first month with reads",
   "de": "erster Monat mit Aufrufen"
  },
+ "procédure en ligne": {
+  "en": "procedure live",
+  "de": "Anleitung live"
+ },
+ "procédures en ligne": {
+  "en": "procedures live",
+  "de": "Anleitungen live"
+ },
+ "préparation du lien d’analyse…": {
+  "en": "preparing the analysis link…",
+  "de": "Analyse-Link wird vorbereitet…"
+ },
  "que vos procédures ont fait gagner à votre établissement.": {
   "en": "your procedures have saved your site.",
   "de": "die Ihre Anleitungen Ihrem Standort gespart haben."
+ },
+ "raison inconnue": {
+  "en": "unknown reason",
+  "de": "unbekannter Grund"
  },
  "réessayez.": {
   "en": "try again.",
   "de": "versuchen Sie es erneut."
  },
+ "sans dossier": {
+  "en": "no folder",
+  "de": "ohne Ordner"
+ },
  "sans détail.": {
   "en": "no details.",
   "de": "ohne Details."
+ },
+ "scans de QR code": {
+  "en": "QR code scans",
+  "de": "QR-Code-Scans"
+ },
+ "selon votre abonnement": {
+  "en": "depending on your plan",
+  "de": "je nach Abo"
+ },
+ "son illisible, on continue": {
+  "en": "sound unreadable, continuing",
+  "de": "Ton nicht lesbar, es geht weiter"
  },
  "sont accessibles": {
   "en": "are available",
@@ -3491,9 +4499,25 @@
   "en": "gap",
   "de": "Lücke"
  },
+ "vidéo envoyée en {v}": {
+  "en": "video uploaded in {v}",
+  "de": "Video hochgeladen in {v}"
+ },
  "votre autre établissement": {
   "en": "your other site",
   "de": "Ihr anderer Standort"
+ },
+ "votre entreprise": {
+  "en": "your company",
+  "de": "Ihr Unternehmen"
+ },
+ "votre navigateur": {
+  "en": "your browser",
+  "de": "Ihr Browser"
+ },
+ "votre téléphone n’a pas suivi la cadence — fermez les autres applications et réessayez": {
+  "en": "your phone could not keep up — close other apps and try again",
+  "de": "Ihr Handy kam nicht mit — schließen Sie andere Apps und versuchen Sie es erneut"
  },
  "vous": {
   "en": "you",
@@ -3502,6 +4526,10 @@
  "vous attendent. Reprenez là où vous vous êtes arrêté.": {
   "en": "are waiting for you. Pick up where you left off.",
   "de": "warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben."
+ },
+ "vérification du poids…": {
+  "en": "checking the file size…",
+  "de": "Dateigröße wird geprüft…"
  },
  "{DOC_PAGES_MAX} pages au maximum. Au-delà, c'est un manuel entier : découpez-le en plusieurs procédures.": {
   "en": "{DOC_PAGES_MAX} pages at most. Beyond that it is a whole manual: split it into several procedures.",
@@ -3539,6 +4567,14 @@
   "en": "{autres} other procedures in this company",
   "de": "{autres} weitere Anleitungen in diesem Unternehmen"
  },
+ "{a}, {b} et {n} autre": {
+  "en": "{a}, {b} and {n} other",
+  "de": "{a}, {b} und {n} weitere Person"
+ },
+ "{a}, {b} et {n} autres": {
+  "en": "{a}, {b} and {n} others",
+  "de": "{a}, {b} und {n} weitere"
+ },
  "{brouillons} procédures sont en cours, en attente de publication.": {
   "en": "{brouillons} procedures are in draft, waiting to be published.",
   "de": "{brouillons} Anleitungen sind im Entwurf und warten auf Veröffentlichung."
@@ -3546,6 +4582,10 @@
  "{cheminProc} · créée le {v}": {
   "en": "{cheminProc} · created on {v}",
   "de": "{cheminProc} · erstellt am {v}"
+ },
+ "{j} j": {
+  "en": "{j} d",
+  "de": "{j} T."
  },
  "{lectures} sur {anJours} jours": {
   "en": "{lectures} over {anJours} days",
@@ -3607,6 +4647,10 @@
   "en": "{length} procedures moved.",
   "de": "{length} Anleitungen verschoben."
  },
+ "{length} sur {APPAREILS_MAX}": {
+  "en": "{length} of {APPAREILS_MAX}",
+  "de": "{length} von {APPAREILS_MAX}"
+ },
  "{length} étape proposée · relisez avant de publier": {
   "en": "{length} step suggested · check before publishing",
   "de": "{length} Schritt vorgeschlagen · vor dem Veröffentlichen prüfen"
@@ -3614,6 +4658,14 @@
  "{length} étapes proposées · relisez avant de publier": {
   "en": "{length} steps suggested · check before publishing",
   "de": "{length} Schritte vorgeschlagen · vor dem Veröffentlichen prüfen"
+ },
+ "{lues} procédure lue": {
+  "en": "{lues} procedure read",
+  "de": "{lues} Anleitung gelesen"
+ },
+ "{lues} procédures lues": {
+  "en": "{lues} procedures read",
+  "de": "{lues} Anleitungen gelesen"
  },
  "{lus} sur {length}": {
   "en": "{lus} of {length}",
@@ -3675,9 +4727,9 @@
   "en": "{nom} is back in the User area.",
   "de": "{nom} ist wieder im Nutzerbereich."
  },
- "{nom} perdra l'accès aux procédures de l'entreprise. Son compte Standix n'est pas supprimé : elle pourra rejoindre une autre entreprise.": {
-  "en": "{nom} will lose access to the company's procedures. Their Standix account is not deleted: they can join another company.",
-  "de": "{nom} verliert den Zugriff auf die Anleitungen des Unternehmens. Das Standix-Konto wird nicht gelöscht: Ein Beitritt zu einem anderen Unternehmen bleibt möglich."
+ "{nom} perdra l'accès aux procédures de l'entreprise.": {
+  "en": "{nom} will lose access to the company's procedures.",
+  "de": "{nom} verliert den Zugriff auf die Anleitungen des Unternehmens."
  },
  "{nom} perdra l'accès à l'espace gestion et ne pourra plus que consulter les procédures publiées. Celles qu'elle a créées restent en place.": {
   "en": "{nom} will lose the Management area and can only open published procedures. The ones they created stay.",
@@ -3686,6 +4738,10 @@
  "{nom} pourra gérer les procédures, accéder à la page Analyse et à la page Accès, et retirer des membres de l’entreprise. Il n’aura plus accès à l’espace utilisateur.": {
   "en": "{nom} will be able to manage procedures, open the Analysis and Access pages, and remove members from the company. They will no longer have the User area.",
   "de": "{nom} kann dann Anleitungen verwalten, die Seiten Auswertung und Zugriff öffnen und Mitglieder aus dem Unternehmen entfernen. Der Nutzerbereich ist dann nicht mehr zugänglich."
+ },
+ "{nom} sur iPhone": {
+  "en": "{nom} on iPhone",
+  "de": "{nom} auf dem iPhone"
  },
  "{nom} à {prix} € par mois. Écrivez-nous pour l'activer, nous répondons dans la journée.": {
   "en": "{nom} at €{prix} per month. Write to us to activate it, we reply the same day.",
@@ -3711,6 +4767,22 @@
   "en": "{n} <em>moved to the User area</em>",
   "de": "{n} <em>ist jetzt im Nutzerbereich</em>"
  },
+ "{n} consultation": {
+  "en": "{n} read",
+  "de": "{n} Aufruf"
+ },
+ "{n} consultations": {
+  "en": "{n} reads",
+  "de": "{n} Aufrufe"
+ },
+ "{n} dossier": {
+  "en": "{n} folder",
+  "de": "{n} Ordner"
+ },
+ "{n} dossiers": {
+  "en": "{n} folders",
+  "de": "{n} Ordner"
+ },
  "{n} membre": {
   "en": "{n} member",
   "de": "{n} Mitglied"
@@ -3719,9 +4791,69 @@
   "en": "{n} members",
   "de": "{n} Mitglieder"
  },
+ "{n} personne": {
+  "en": "{n} person",
+  "de": "{n} Person"
+ },
+ "{n} personnes": {
+  "en": "{n} people",
+  "de": "{n} Personen"
+ },
+ "{n} procédure": {
+  "en": "{n} procedure",
+  "de": "{n} Anleitung"
+ },
+ "{n} procédures": {
+  "en": "{n} procedures",
+  "de": "{n} Anleitungen"
+ },
+ "{n} sem.": {
+  "en": "{n} wk",
+  "de": "{n} Wo."
+ },
+ "{n} sous-dossier": {
+  "en": "{n} subfolder",
+  "de": "{n} Unterordner"
+ },
+ "{n} sous-dossiers": {
+  "en": "{n} subfolders",
+  "de": "{n} Unterordner"
+ },
+ "{n} étape": {
+  "en": "{n} step",
+  "de": "{n} Schritt"
+ },
+ "{n} étape sans extrait défini": {
+  "en": "{n} step with no clip set",
+  "de": "{n} Schritt ohne festgelegten Ausschnitt"
+ },
+ "{n} étapes": {
+  "en": "{n} steps",
+  "de": "{n} Schritte"
+ },
+ "{n} étapes sans extrait défini": {
+  "en": "{n} steps with no clip set",
+  "de": "{n} Schritte ohne festgelegten Ausschnitt"
+ },
+ "{qui} a quitté l’équipe": {
+  "en": "{qui} left the team",
+  "de": "{qui} hat das Team verlassen"
+ },
+ "{qui} a été retiré·e de l’équipe": {
+  "en": "{qui} was removed from the team",
+  "de": "{qui} wurde aus dem Team entfernt"
+ },
  "{qui} modifie cette procédure en ce moment. Revenez dans quelques minutes.": {
   "en": "{qui} is editing this procedure right now. Come back in a few minutes.",
   "de": "{qui} bearbeitet diese Anleitung gerade. Kommen Sie in ein paar Minuten wieder."
+ },
+ "{quoi} : aucune réponse après {ecoule} s.": {
+  "en": "{quoi}: no answer after {ecoule} s.",
+  "de": "{quoi}: keine Antwort nach {ecoule} s."
+ },
+ "{quoi} s’est interrompu : la connexion a été perdue.": {
+  "en": "{quoi} stopped: the connection was lost.",
+  "de": "{quoi} wurde unterbrochen: Die Verbindung ist abgebrochen."
  },
  "{raison}Cette procédure n'a pas de vidéo associée : l'analyse ne peut pas être relancée.": {
   "en": "{raison}This procedure has no video: the analysis cannot be restarted.",
@@ -3783,6 +4915,22 @@
   "en": "{v} words read",
   "de": "{v} Wörter gelesen"
  },
+ "{v} s non couvertes au début": {
+  "en": "{v} s not covered at the start",
+  "de": "{v} s am Anfang nicht abgedeckt"
+ },
+ "{v} s non couvertes à la fin": {
+  "en": "{v} s not covered at the end",
+  "de": "{v} s am Ende nicht abgedeckt"
+ },
+ "« {name} » n’a pas pu être lue.": {
+  "en": "“{name}” could not be read.",
+  "de": "„{name}“ konnte nicht gelesen werden."
+ },
+ "« {name} » n’a pas répondu. Retirez-la et réessayez.": {
+  "en": "“{name}” did not respond. Remove it and try again.",
+  "de": "„{name}“ reagiert nicht. Entfernen Sie sie und versuchen Sie es erneut."
+ },
  "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": {
   "en": "“{nomEntreprise}” has reached the number of members in its subscription. Your request has been passed to the person who manages it. They will let you in as soon as a seat frees up.",
   "de": "„{nomEntreprise}“ hat die Mitgliederzahl seines Abos erreicht. Ihre Anfrage wurde an die zuständige Person weitergeleitet. Sie gibt Ihnen Zugriff, sobald ein Platz frei wird."
@@ -3810,6 +4958,14 @@
  "« {v} » sera retirée de la procédure.": {
   "en": "“{v}” will be removed from the procedure.",
   "de": "„{v}“ wird aus der Anleitung entfernt."
+ },
+ "· entreprise active": {
+  "en": "· active company",
+  "de": "· aktives Unternehmen"
+ },
+ "· {length} réseaux": {
+  "en": "· {length} networks",
+  "de": "· {length} Netzwerke"
  },
  "À lire": {
   "en": "To read",
@@ -3895,6 +5051,14 @@
   "en": "Turn off the camera",
   "de": "Kamera ausschalten"
  },
+ "à l’instant": {
+  "en": "just now",
+  "de": "gerade eben"
+ },
+ "écoute de la bande son… ({v})": {
+  "en": "listening to the soundtrack… ({v})",
+  "de": "Tonspur wird angehört… ({v})"
+ },
  "— ce que vous expliquez pendant chaque geste": {
   "en": "— your explanation during each move",
   "de": "— Ihre Erklärung zu jedem Handgriff"
@@ -3903,9 +5067,9 @@
   "en": "— objects and text in the picture",
   "de": "— Gegenstände und Text im Bild"
  },
- "• LE PLUS ET LE MOINS changent l’espace du membre. Le plus lui donne l’accès à l’espace gestion : il pourra gérer les procédures, et il aura accès à la page Analyse et à la page Accès de l’entreprise. Le moins lui donne uniquement l’accès à l’espace utilisateur : il aura uniquement accès aux procédures de l’entreprise. • LA PORTE retire la personne de l’entreprise. Ses lectures passées restent dans l’analyse. Elle n’a plus accès à l’espace de l’entreprise qui la concerne.": {
-  "en": "• PLUS AND MINUS change the member's area.\n  Plus gives them the Management area: they can manage procedures and open the company's Analysis and Access pages.\n  Minus gives them the User area only: they can only open the company's procedures.\n\n• THE DOOR removes the person from the company. Their past reads stay in the analysis. They can no longer open the company's area.",
-  "de": "• PLUS UND MINUS ändern den Bereich des Mitglieds.\n  Plus gibt Zugriff auf den Verwaltungsbereich: Anleitungen verwalten und die Seiten Auswertung und Zugriff des Unternehmens öffnen.\n  Minus gibt nur Zugriff auf den Nutzerbereich: nur die Anleitungen des Unternehmens öffnen.\n\n• DIE TÜR entfernt die Person aus dem Unternehmen. Ihre bisherigen Aufrufe bleiben in der Auswertung. Den Bereich des Unternehmens kann sie nicht mehr öffnen."
+ "• Le plus donne accès à l’espace gestion.\n• Le moins donne accès à l’espace utilisateur.\n• La porte retire la personne de l’entreprise.": {
+  "en": "• The plus gives access to the Management area.\n• The minus gives access to the User area.\n• The door removes the person from the company.",
+  "de": "• Das Plus gibt Zugriff auf den Verwaltungsbereich.\n• Das Minus gibt Zugriff auf den Nutzerbereich.\n• Die Tür entfernt die Person aus dem Unternehmen."
  },
  "✓ Toute la vidéo est couverte, sans chevauchement": {
   "en": "✓ The whole video is covered, with no overlap",

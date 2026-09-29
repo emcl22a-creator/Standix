@@ -406,16 +406,19 @@ const DICO = {
     "Chargement…": "Loading…",
     "Chargez d'abord la vidéo.": "Load the video first.",
     "chevauchement": "overlap",
-    "Choisir l’écran et démarrer": "Choose the screen and start",
+    "Choisir la fenêtre et démarrer": "Choose the window and start",
     "Choisir une vidéo": "Choose a video",
     "Choisissez <b>Réglages du site web</b>": "Choose <b>Website Settings</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Choose at least two videos. They are joined in the order you put them.",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Choose how long the invitation code stays valid.",
+    "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": "Choose the window or tab to record. The control bar stays visible to you but does not appear in the video.",
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
+    "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
     "Choisissez votre enregistrement avec « Choisir une vidéo »": "Pick your recording with “Choose a video”",
     "Cinq minutes : enregistrement arrêté.": "Five minutes: recording stopped.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Five minutes: recording stops here.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Five minutes at most. Recording stops on its own.",
+    "Cliquez encore une fois sur le bouton pour choisir l’écran.": "Click the button once more to choose the screen.",
     "Cliquez ici pour nous écrire": "Click here to write to us",
     "Cliquez le bouton": "Click the",
     "Cliquez le bouton <b>+</b>": "Click the <b>+</b> button",
@@ -676,6 +679,7 @@ const DICO = {
     "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": "The analysis server answered {status}{v} — procedure checked: {aiProcedureId}",
     "Le serveur d'analyse est injoignable. Réessayez dans un instant.": "The analysis server cannot be reached. Try again in a moment.",
     "le temps de formation": "the training time",
+    "le temps de vous placer": "to get ready",
     "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Time per procedure is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
     "le temps que vous n'avez plus à passer à expliquer": "the time you no longer spend explaining",
     "Le titre est obligatoire (en haut de la page précédente).": "The title is required (at the top of the previous page).",
@@ -688,7 +692,6 @@ const DICO = {
     "Lecture des vidéos…": "Reading the videos…",
     "Lecture du document…": "Reading the document…",
     "Lecture en cours": "Playing",
-    "Les accès de chaque membre permettent de décider l’espace auquel il a accès.": "Each member's access decides which area they can open.",
     "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": "Video analyses reset every month and do not carry over.",
     "Les arrivées, les départs et les changements de rang s’afficheront ici.": "Arrivals, departures and access changes will show up here.",
     "Les autres procédures ne vous sont pas accessibles": "You cannot open the other procedures",
@@ -706,7 +709,7 @@ const DICO = {
     "Lues": "Read",
     "L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document": "The <b>Standix AI</b> writes the procedure from a video or a document",
     "L’analyse est terminée : {length} étapes.": "Analysis done: {length} steps.",
-    "L’enregistrement démarre tout de suite — vous avez": "Recording starts right away — you have",
+    "L’enregistrement démarre dans": "Recording starts in",
     "L’enregistrement est vide.": "The recording is empty.",
     "L’IA crée la procédure à partir d’un document": "The AI builds the procedure from a document",
     "L’IA crée la procédure à partir d’une vidéo": "The AI builds the procedure from a video",
@@ -795,7 +798,6 @@ const DICO = {
     "Point de vigilance": "Watch out",
     "Poste non enregistré : {message}": "Role not saved: {message}",
     "pour créer une procédure.": "button to create a procedure.",
-    "pour vous placer": "to get ready",
     "premier mois avec des lectures": "first month with reads",
     "Presque prêt": "Almost there",
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Prices exclude tax. You change plan when your team changes, never before.",
@@ -847,6 +849,7 @@ const DICO = {
     "Renommé en « {propre} »": "Renamed to “{propre}”",
     "Renouvellement le <b>{v}</b>. Les analyses non utilisées ne se reportent pas.": "Renews on <b>{v}</b>. Unused analyses do not carry over.",
     "Renouvellement le {dateRenouv}": "Renews on {dateRenouv}",
+    "Reprendre": "Resume",
     "Rester": "Stay",
     "Retirer": "Remove",
     "Retirer cet utilisateur ?": "Remove this user?",
@@ -1383,16 +1386,19 @@ const DICO = {
     "Chargement…": "Wird geladen…",
     "Chargez d'abord la vidéo.": "Laden Sie zuerst das Video.",
     "chevauchement": "Überschneidung",
-    "Choisir l’écran et démarrer": "Bildschirm wählen und starten",
+    "Choisir la fenêtre et démarrer": "Fenster wählen und starten",
     "Choisir une vidéo": "Video wählen",
     "Choisissez <b>Réglages du site web</b>": "Wählen Sie <b>Website-Einstellungen</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Wählen Sie mindestens zwei Videos. Sie werden in der Reihenfolge zusammengefügt, in die Sie sie bringen.",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Wählen Sie, wie lange der Einladungscode gültig bleibt.",
+    "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": "Wählen Sie das Fenster oder den Tab für die Aufnahme. Die Steuerleiste bleibt für Sie sichtbar, erscheint aber nicht im Video.",
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
+    "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
     "Choisissez votre enregistrement avec « Choisir une vidéo »": "Wählen Sie Ihre Aufnahme über „Video wählen“",
     "Cinq minutes : enregistrement arrêté.": "Fünf Minuten: Aufnahme gestoppt.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Fünf Minuten: Hier endet die Aufnahme.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst.",
+    "Cliquez encore une fois sur le bouton pour choisir l’écran.": "Klicken Sie noch einmal auf die Schaltfläche, um den Bildschirm zu wählen.",
     "Cliquez ici pour nous écrire": "Hier klicken, um uns zu schreiben",
     "Cliquez le bouton": "Tippen Sie auf",
     "Cliquez le bouton <b>+</b>": "Tippen Sie auf <b>+</b>",
@@ -1653,6 +1659,7 @@ const DICO = {
     "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": "Der Auswertungsserver antwortete {status}{v} — abgefragte Anleitung: {aiProcedureId}",
     "Le serveur d'analyse est injoignable. Réessayez dans un instant.": "Der Auswertungsserver ist nicht erreichbar. Versuchen Sie es gleich noch einmal.",
     "le temps de formation": "die Einarbeitungszeit",
+    "le temps de vous placer": "Zeit, sich bereitzumachen",
     "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Die Zeit pro Anleitung ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt.",
     "le temps que vous n'avez plus à passer à expliquer": "die Zeit, die Sie nicht mehr mit Erklären verbringen",
     "Le titre est obligatoire (en haut de la page précédente).": "Der Titel ist Pflicht (oben auf der vorigen Seite).",
@@ -1665,7 +1672,6 @@ const DICO = {
     "Lecture des vidéos…": "Videos werden gelesen…",
     "Lecture du document…": "Dokument wird gelesen…",
     "Lecture en cours": "Wird abgespielt",
-    "Les accès de chaque membre permettent de décider l’espace auquel il a accès.": "Der Zugriff jedes Mitglieds entscheidet, welchen Bereich es öffnen kann.",
     "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": "Videoauswertungen werden monatlich zurückgesetzt und nicht übertragen.",
     "Les arrivées, les départs et les changements de rang s’afficheront ici.": "Neuzugänge, Abgänge und Zugriffsänderungen erscheinen hier.",
     "Les autres procédures ne vous sont pas accessibles": "Die anderen Anleitungen können Sie nicht öffnen",
@@ -1683,7 +1689,7 @@ const DICO = {
     "Lues": "Gelesen",
     "L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document": "Die <b>Standix-KI</b> schreibt die Anleitung aus einem Video oder Dokument",
     "L’analyse est terminée : {length} étapes.": "Auswertung fertig: {length} Schritte.",
-    "L’enregistrement démarre tout de suite — vous avez": "Die Aufnahme startet sofort — Sie haben",
+    "L’enregistrement démarre dans": "Aufnahme startet in",
     "L’enregistrement est vide.": "Die Aufnahme ist leer.",
     "L’IA crée la procédure à partir d’un document": "Die KI erstellt die Anleitung aus einem Dokument",
     "L’IA crée la procédure à partir d’une vidéo": "Die KI erstellt die Anleitung aus einem Video",
@@ -1772,7 +1778,6 @@ const DICO = {
     "Point de vigilance": "Achtung",
     "Poste non enregistré : {message}": "Position nicht gespeichert: {message}",
     "pour créer une procédure.": ", um eine Anleitung zu erstellen.",
-    "pour vous placer": "um sich bereitzumachen",
     "premier mois avec des lectures": "erster Monat mit Aufrufen",
     "Presque prêt": "Fast fertig",
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher.",
@@ -1824,6 +1829,7 @@ const DICO = {
     "Renommé en « {propre} »": "Umbenannt in „{propre}“",
     "Renouvellement le <b>{v}</b>. Les analyses non utilisées ne se reportent pas.": "Verlängerung am <b>{v}</b>. Nicht genutzte Auswertungen verfallen.",
     "Renouvellement le {dateRenouv}": "Verlängerung am {dateRenouv}",
+    "Reprendre": "Fortsetzen",
     "Rester": "Bleiben",
     "Retirer": "Entfernen",
     "Retirer cet utilisateur ?": "Diesen Nutzer entfernen?",
@@ -10991,7 +10997,16 @@ async function loadGestionProcedures() {
        Un dossier n'existe que porte par une procedure. Zero procedure, zero
        dossier. */
     const nbEl = document.getElementById('proc-nb-dossiers')
-    if (nbEl) nbEl.textContent = tLang('Aucun dossier')    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
+    if (nbEl) nbEl.textContent = tLang('Aucun dossier')
+    /* ⚠ LA COPIE LOCALE ET LES DOSSIERS EN MÉMOIRE SONT VIDÉS AUSSI.
+
+       Le bug : on supprimait la dernière procédure, la base était vide… et
+       elle réapparaissait dans « En dév. ». Cette branche sortait sans toucher
+       à `allCategoriesData`, rempli plus haut depuis la COPIE LOCALE — celle
+       d'avant la suppression. Changer de segment redessinait depuis elle. Et
+       la copie, jamais réécrite, la remontait à chaque ouverture de l'app. */
+    allCategoriesData = []
+    try { localStorage.removeItem(cleCache(entrepriseId)) } catch (e) {}    /* On vide TOUT avant de sortir. Sans ça, changer d'établissement vers une
        entreprise sans procédure laissait en mémoire les lectures de la
        précédente : la carte du haut annonçait « 4 min de formation » pendant
        que les trois sections en dessous disaient « aucun membre » et
@@ -17784,16 +17799,62 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
 
   let fluxEcran = null
   let fluxMicro = null
+
+  /* ═══ LA BARRE FLOTTANTE, OUVERTE D'ABORD ═══
+
+     Chrome et Edge savent ouvrir une petite fenêtre qui reste AU-DESSUS de
+     toutes les autres, même quand on passe sur Excel ou un autre logiciel.
+     La barre (compte à rebours, chronomètre, pause, terminer) y vit pendant
+     toute la prise.
+
+   ⚠ ELLE DOIT S'OUVRIR DANS LA SECONDE DU CLIC, comme la fenêtre de partage :
+     le navigateur ne l'autorise qu'en réponse directe à un geste. On l'ouvre
+     donc AVANT de demander l'écran. Si elle ne s'ouvre pas (Firefox, Safari),
+     la barre reste dans la page, comme avant. */
+  await ouvrirFenetreFlottante()
+
   try {
-    /* Cette ligne DOIT suivre le clic immédiatement : c'est elle qui ouvre la
-       fenêtre de partage du navigateur. */
+    /* Cette ligne suit le clic de près : c'est elle qui ouvre la fenêtre de
+       partage du navigateur. */
+    /* ═══ LA BARRE RESTE HORS DE LA VIDÉO ═══
+
+       La barre flottante est une vraie fenêtre, au-dessus de tout. Si l'on
+       filmait l'ÉCRAN ENTIER, elle serait donc dans la vidéo — et un site
+       web n'a aucun moyen de se cacher d'une capture d'écran complète (seules
+       les applications installées, comme Loom, le peuvent).
+
+       On filme donc une FENÊTRE ou un ONGLET : le navigateur n'enregistre que
+       le contenu de cette fenêtre, pas ce qui flotte par-dessus. La barre
+       reste visible pour la personne, partout, et absente de la vidéo.
+
+       `monitorTypeSurfaces: 'exclude'` retire « Écran entier » du choix
+       (Chrome, Edge) ; `selfBrowserSurface: 'exclude'` retire l'onglet
+       Standix lui-même, qu'on n'a aucune raison de filmer. */
     fluxEcran = await navigator.mediaDevices.getDisplayMedia({
-      video: { width: { ideal: 2560 }, height: { ideal: 1440 }, frameRate: { ideal: 30 } },
+      video: { width: { ideal: 2560 }, height: { ideal: 1440 }, frameRate: { ideal: 30 },
+               displaySurface: 'window' },
       audio: false,
+      monitorTypeSurfaces: 'exclude',
+      selfBrowserSurface: 'exclude',
+      surfaceSwitching: 'include',
     })
+    /* Un navigateur qui ignore ces consignes a pu laisser choisir l'écran
+       entier : la barre flottante y serait filmée. On la replie alors dans la
+       page, qui, elle, n'apparaît que si l'on revient sur Standix. */
+    const surface = fluxEcran.getVideoTracks()[0]?.getSettings?.().displaySurface
+    if (surface === 'monitor') fermerFenetreFlottante()
   } catch (e) {
     /* Refus de la personne, ou navigateur sans partage : ce n'est pas une
        panne, on ne crie pas. */
+    fermerFenetreFlottante()
+    /* Un navigateur qui exige le geste pour le partage aussi : la fenêtre
+       flottante l'a utilisé. On s'en souvient et on ne l'ouvre plus. */
+    if (e?.name === 'InvalidStateError' && ecranPipTente) {
+      try { localStorage.setItem('standix-ecran-sans-pip', '1') } catch (x) {}
+      err.style.color = 'var(--red)'
+      err.textContent = tLang('Cliquez encore une fois sur le bouton pour choisir l’écran.')
+      return
+    }
     if (e?.name !== 'NotAllowedError') {
       err.style.color = 'var(--red)'
       err.textContent = tLang('Le partage d\'écran n\'a pas pu démarrer : {v}', { v: e?.message || e })
@@ -17805,6 +17866,7 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
     fluxMicro = await navigator.mediaDevices.getUserMedia({ audio: true })
   } catch (e) {
     fluxEcran.getTracks().forEach(t => t.stop())
+    fermerFenetreFlottante()
     err.style.color = 'var(--red)'
     err.textContent = tLang('Sans micro, l\'IA n\'a rien à écouter : autorisez le microphone, puis recommencez.')
     return
@@ -17902,39 +17964,46 @@ function lancerPriseEcran() {
   }
 
   /* ═══════════════════════════════════════════════════════════════════════
-     ON ENREGISTRE D'ABORD, ON DÉCOMPTE ENSUITE
+     LE COMPTE À REBOURS D'ABORD, L'ENREGISTREMENT ENSUITE
 
-   ⚠ C'ÉTAIT L'INVERSE, ET ÇA PERDAIT LE DÉBUT. Le décompte s'écoulait avant
-     `start()`. Or le navigateur, dès qu'on a choisi la fenêtre à partager,
-     bascule dessus : personne ne voyait ce décompte, et pendant ces cinq à
-     quinze secondes on faisait déjà les premiers gestes — qui n'étaient pas
-     filmés. L'enregistrement semblait commencer « au moment où on quitte
-     l'app », en retard sur ce qu'on montrait.
+   ⚠ LE BUG : les deux tournaient EN MÊME TEMPS. La prise démarrait dès le
+     partage accordé, et le décompte « placez-vous · 5 » défilait à côté du
+     chronomètre — on voyait deux compteurs, et les secondes de préparation
+     finissaient dans la vidéo.
 
-     La prise démarre donc ICI, à la seconde où le partage est accordé. Le
-     décompte reste, mais il ne retarde plus rien : c'est un repère pour se
-     placer, pendant que ça tourne déjà. Quelques secondes de préparation au
-     début d'une vidéo ne gênent personne — un geste manqué, si.
+     Pourquoi c'était fait ainsi : sans barre flottante, le décompte restait
+     dans la page, invisible dès qu'on passait sur l'écran filmé. On gardait
+     donc la prise ouverte pour ne pas perdre les premiers gestes.
+
+     Maintenant la barre flotte au-dessus de tout (Chrome, Edge) : le décompte
+     se voit où qu'on soit. Il s'écoule SEUL, puis l'enregistrement démarre à
+     0:00. Le chronomètre n'apparaît qu'à ce moment-là.
      ═══════════════════════════════════════════════════════════════════════ */
-  ecranEnregistreur.start(1000)
+  ecranCumul = 0
+  ecranPause = false
+  ecranDepart = 0
+  ecranRebours = ecranDelai
+  clearInterval(ecranMinuteur)
+  peindrePastilleEcran()
+  ecranMinuteur = setInterval(tictacEcran, 1000)
+}
+
+/* Une seconde : soit le décompte avance (et lance la prise à zéro), soit le
+   chronomètre se repeint. */
+function tictacEcran() {
+  if (ecranRebours > 0) {
+    ecranRebours--
+    if (ecranRebours === 0) demarrerEnregistreurEcran()
+  }
+  peindrePastilleEcran()
+}
+
+function demarrerEnregistreurEcran() {
+  if (!ecranEnregistreur || ecranEnregistreur.state !== 'inactive') return
+  try { ecranEnregistreur.start(1000) } catch (e) { arreterEcran(); return }
   ecranDepart = Date.now()
   ecranCumul = 0
   ecranPause = false
-  ecranRebours = 0
-
-  /* ═══ LE COMPTEUR EST LÀ DÈS LA PREMIÈRE SECONDE ═══
-
-   ⚠ IL ARRIVAIT APRÈS LE DÉCOMPTE, et c'était à l'envers. Un grand voile noir
-     couvrait l'écran pendant cinq à quinze secondes, puis le compteur
-     apparaissait. Or c'est le compteur qu'on veut voir tout de suite : c'est
-     lui qui dit que ça tourne, et l'écran qu'on filme doit rester visible.
-
-     Il n'y a donc plus de boucle d'attente : la pastille se peint
-     immédiatement, en haut au centre, et le nombre du décompte se glisse
-     dessous tant qu'il dure. Le voile reste transparent du début à la fin. */
-  ecranRebours = ecranDelai
-  peindrePastilleEcran()
-  ecranMinuteur = setInterval(peindrePastilleEcran, 1000)
 }
 
 /* Le temps réellement enregistré, pauses déduites — même raisonnement que pour
@@ -17949,7 +18018,7 @@ function basculerPauseEcran() {
     try { ecranEnregistreur.resume() } catch (e) { return }
     ecranDepart = Date.now()
     ecranPause = false
-    ecranMinuteur = setInterval(peindrePastilleEcran, 1000)
+    ecranMinuteur = setInterval(tictacEcran, 1000)
   } else {
     try { ecranEnregistreur.pause() } catch (e) { return }
     ecranCumul = ecranEcoule()
@@ -17961,47 +18030,124 @@ function basculerPauseEcran() {
 }
 
 function peindrePastilleEcran() {
+  const enRebours = ecranRebours > 0
   const brut = ecranEcoule()
-  if (!ecranPause && brut >= ECRAN_DUREE_MAX) {
+  if (!enRebours && !ecranPause && brut >= ECRAN_DUREE_MAX) {
     arreterEcran(); toast(tLang('Cinq minutes : enregistrement arrêté.')); return
   }
   const ecoule = Math.floor(brut)
   const m = Math.floor(ecoule / 60), sec = String(ecoule % 60).padStart(2, '0')
-  const peutPause = typeof ecranEnregistreur?.pause === 'function'
-  /* ⚠ LE REPÈRE TIENT DANS LA PASTILLE, il n'a pas son propre bloc.
+  const peutPause = !enRebours && typeof ecranEnregistreur?.pause === 'function'
 
-     Il en avait un : un grand chiffre blanc posé sur la page. Sur le fond
-     clair de l'app il était illisible, et il venait cogner le logo de la
-     barre du haut. La pastille, elle, porte déjà son fond sombre — le
-     chiffre y est net partout, et rien ne se chevauche.
-
-     Il s'éteint tout seul ; la prise, elle, continue. */
-  if (ecranRebours > 0 && !ecranPause) ecranRebours--
-  const v = voileEcran(
-    `<div class="ecran-prise${ecranPause ? ' pause' : ''}">
+  /* Pendant le décompte : un seul nombre, celui du décompte, et rien qui
+     ressemble à un chronomètre. Le point rouge n'apparaît qu'une fois la
+     prise lancée — c'est lui qui dit « ça enregistre ». */
+  const html = enRebours
+    ? `<div class="ecran-prise attente">
+         <span class="ecran-attente-t">${tLang('L’enregistrement démarre dans')}</span>
+         <b class="ecran-attente-n">${ecranRebours}</b>
+         <button type="button" class="ecran-refaire" data-ecran="annuler">${tLang('Annuler')}</button>
+       </div>`
+    : `<div class="ecran-prise${ecranPause ? ' pause' : ''}">
        <span class="ecran-rouge"></span>
        <b>${m}:${sec}</b>
-       <span class="ecran-reste">${
-         ecranPause ? 'en pause'
-         : ecranRebours > 0 ? `placez-vous · ${ecranRebours}`
-         : 'sur 5:00'}</span>
-       ${peutPause ? `<button type="button" class="ecran-mini" id="ecran-pause"
-          aria-label="${ecranPause ? 'Reprendre' : 'Mettre en pause'}">${
+       <span class="ecran-reste">${ecranPause ? tLang('en pause') : tLang('sur 5:00')}</span>
+       ${peutPause ? `<button type="button" class="ecran-mini" data-ecran="pause"
+          aria-label="${ecranPause ? tLang('Reprendre') : tLang('Mettre en pause')}">${
           ecranPause
             ? `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.4 5.6a1 1 0 0 1 1.5-.87l9 6.4a1 1 0 0 1 0 1.74l-9 6.4a1 1 0 0 1-1.5-.87z"/></svg>`
             : `<svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="5" width="3.6" height="14" rx="1.3"/><rect x="13.4" y="5" width="3.6" height="14" rx="1.3"/></svg>`
         }</button>` : ''}
-       <button type="button" class="ecran-refaire" id="ecran-refaire">${tLang('Recommencer')}</button>
-       <button type="button" class="btn small" id="ecran-stop">${tLang('Terminer')}</button>
-     </div>`)
-  v.classList.add('discret')
-  document.getElementById('ecran-stop').onclick = () => arreterEcran()
-  const bp = document.getElementById('ecran-pause')
-  if (bp) bp.onclick = () => basculerPauseEcran()
-  document.getElementById('ecran-refaire').onclick = () => {
-    ecranAnnule = true
-    arreterEcran()
+       <button type="button" class="ecran-refaire" data-ecran="refaire">${tLang('Recommencer')}</button>
+       <button type="button" class="btn small" data-ecran="stop">${tLang('Terminer')}</button>
+     </div>`
+
+  /* La barre va dans la fenêtre flottante si elle est ouverte, sinon dans la
+     page. Jamais aux deux endroits. */
+  let v
+  const zone = zoneFenetreFlottante()
+  if (zone) {
+    fermerVoileEcran()
+    zone.innerHTML = html
+    v = zone
+  } else {
+    v = voileEcran(html)
+    v.classList.add('discret')
   }
+  v.onclick = (e) => {
+    const b = e.target.closest('[data-ecran]')
+    if (!b) return
+    const quoi = b.dataset.ecran
+    if (quoi === 'stop') arreterEcran()
+    else if (quoi === 'pause') basculerPauseEcran()
+    else if (quoi === 'annuler') { nettoyerEcran() }
+    else if (quoi === 'refaire') { ecranAnnule = true; arreterEcran() }
+  }
+}
+
+/* ═══ LA FENÊTRE FLOTTANTE (Document Picture-in-Picture) ═══
+
+   Une vraie petite fenêtre du navigateur, toujours au premier plan, même
+   au-dessus d'Excel. On y recopie la feuille de style de l'app pour que la
+   barre y soit dessinée à l'identique. */
+let ecranPip = null
+let ecranPipTente = false
+
+async function ouvrirFenetreFlottante() {
+  ecranPipTente = false
+  let sansPip = false
+  try { sansPip = localStorage.getItem('standix-ecran-sans-pip') === '1' } catch (e) {}
+  if (sansPip || !window.documentPictureInPicture?.requestWindow) return null
+  if (ecranPip && !ecranPip.closed) return ecranPip
+  ecranPipTente = true
+  try {
+    const w = await window.documentPictureInPicture.requestWindow({ width: 520, height: 74 })
+    const d = w.document
+    d.documentElement.lang = document.documentElement.lang
+    /* Les règles sont recopiées TELLES QUELLES depuis la page, plutôt que de
+       faire recharger la feuille : la fenêtre s'affiche stylée tout de suite,
+       sans attendre le réseau. Une feuille d'un autre site (les polices) ne
+       se lit pas : on lui met un simple lien. */
+    for (const f of document.styleSheets) {
+      try {
+        const c = d.createElement('style')
+        c.textContent = [...f.cssRules].map(r => r.cssText).join('\n')
+        d.head.appendChild(c)
+      } catch (e) {
+        if (f.href) { const l = d.createElement('link'); l.rel = 'stylesheet'; l.href = f.href; d.head.appendChild(l) }
+      }
+    }
+    const st = d.createElement('style')
+    st.textContent = `html,body{margin:0;height:100%;background:#16161E;overflow:hidden}
+      body{display:flex;align-items:center;justify-content:center}
+      #pip-zone{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
+      #pip-zone .ecran-prise{box-shadow:none;background:transparent;padding-left:8px}
+      .pip-msg{color:rgba(255,255,255,0.72);font:600 13px/1.3 -apple-system,system-ui,sans-serif;padding:0 16px;text-align:center}`
+    d.head.appendChild(st)
+    d.title = 'Standix'
+    d.body.innerHTML = `<div id="pip-zone"><div class="pip-msg">${tLang('Choisissez l’écran ou la fenêtre à filmer…')}</div></div>`
+    /* Fermée à la main pendant la prise : la barre revient dans la page, la
+       prise continue. */
+    w.addEventListener('pagehide', () => {
+      if (ecranPip === w) { ecranPip = null; if (ecranFlux) peindrePastilleEcran() }
+    })
+    ecranPip = w
+    return w
+  } catch (e) {
+    ecranPip = null
+    return null
+  }
+}
+
+function zoneFenetreFlottante() {
+  if (!ecranPip || ecranPip.closed) return null
+  return ecranPip.document.getElementById('pip-zone')
+}
+
+function fermerFenetreFlottante() {
+  const w = ecranPip
+  ecranPip = null
+  try { if (w && !w.closed) w.close() } catch (e) {}
 }
 
 function arreterEcran() {
@@ -18028,7 +18174,11 @@ function nettoyerEcran() {
   const v = document.getElementById('ecran-voile')
   if (v) v.classList.remove('discret')
   if (ecranFlux) { ecranFlux.getTracks().forEach(t => t.stop()); ecranFlux = null }
+  /* ⚠ Un enregistreur prêt mais jamais lancé (annulé pendant le décompte). */
+  const enr = ecranEnregistreur
   ecranEnregistreur = null
+  try { if (enr && enr.state !== 'inactive') { enr.onstop = null; enr.stop() } } catch (e) {}
+  fermerFenetreFlottante()
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -25880,7 +26030,26 @@ async function openAnalyse(procId) {
        on replie la carte : la personne voit la procédure qu'elle vient de
        supprimer s'en aller. La ligne est déjà effacée en base, l'animation ne
        fait que raconter ce qui s'est passé. */
-    showGestionScreen(retourApresAnalyse)
+    /* ⚠ ON NE REVIENT QUE SUR UNE LISTE DE PROCÉDURES.
+
+       Le bug : ouverte depuis « Procédure générée » (bouton « Voir la
+       procédure »), la fiche retenait l'écran de l'IA comme point de retour.
+       Supprimer y renvoyait — sur un écran qui annonçait encore une procédure
+       qui n'existait plus. Seuls les écrans qui LISTENT des procédures sont
+       un retour valable ; sinon, la page Procédures. */
+    const cat0 = proc?.categorie
+    const resteDansDossier = allGestionProcedures.some(x => x.id !== procId && x.categorie === cat0)
+    const LISTES = ['p-list', 'p-category', 'p-home', 'p-recentes']
+    let retour = LISTES.includes(retourApresAnalyse) ? retourApresAnalyse : 'p-list'
+    if (retour === 'p-category' && !resteDansDossier) retour = 'p-list'
+    retourApresAnalyse = 'p-list'
+    // L'IA ne doit plus rien retenir d'une procédure effacée.
+    if (typeof aiProcedureId !== 'undefined' && aiProcedureId === procId) {
+      if (aiPollTimer) { clearTimeout(aiPollTimer); aiPollTimer = null }
+      oublierAnalyseIA()
+      aiProcedureId = null
+    }
+    showGestionScreen(retour)
     const carte = carteDeProcedure(procId)
     if (carte) await replierCarte(carte)
 
@@ -34646,19 +34815,45 @@ function toast(texte) {
     el = document.createElement('div')
     el.id = 'mini-toast'
     el.style.cssText = 'position:fixed; left:50%; bottom:118px; transform:translateX(-50%) translateY(10px);' +
-      'z-index:150; background:rgba(44,44,48,0.92); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);' +
+      'z-index:150; background:#000; -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px);' +
       'border:0.5px solid rgba(255,255,255,0.18); border-radius:100px; padding:11px 20px; font-size:13px;' +
       'font-weight:300; color:#fff; max-width:88vw; text-align:center; opacity:0;' +
       'transition:opacity 0.25s ease, transform 0.25s cubic-bezier(0.22,1,0.36,1); pointer-events:none;'
     document.body.appendChild(el)
   }
   el.textContent = texte
-  requestAnimationFrame(() => { el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)' })
+  /* ⚠ LE COMPTE DES 2,4 s PART QUAND LA NOTIFICATION EST VRAIMENT VUE.
+
+     Le bug : « Enregistrement prêt — lancez l'analyse » restait figée à
+     l'écran. Ce message part quand on clique « Terminer » dans la barre
+     flottante, alors que l'onglet Standix est caché derrière Excel. Un onglet
+     caché ne peint plus : l'apparition (en `requestAnimationFrame`) attendait
+     le retour sur l'onglet, mais la disparition (en `setTimeout`) avait déjà
+     eu lieu pendant l'absence. Au retour, la notification s'allumait… et
+     plus rien ne l'éteignait.
+
+     On attend donc que l'onglet soit visible, on affiche, et c'est seulement
+     là que le délai de disparition commence. */
+  const montrer = () => requestAnimationFrame(() => {
+    el.style.opacity = '1'
+    el.style.transform = 'translateX(-50%) translateY(0)'
+    clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => {
+      el.style.opacity = '0'
+      el.style.transform = 'translateX(-50%) translateY(10px)'
+    }, 2400)
+  })
   clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => {
-    el.style.opacity = '0'
-    el.style.transform = 'translateX(-50%) translateY(10px)'
-  }, 2400)
+  if (document.hidden) {
+    const auRetour = () => {
+      if (document.hidden) return
+      document.removeEventListener('visibilitychange', auRetour)
+      montrer()
+    }
+    document.addEventListener('visibilitychange', auRetour)
+  } else {
+    montrer()
+  }
 }
 
 // Icône corbeille commune à toutes les listes d'étapes

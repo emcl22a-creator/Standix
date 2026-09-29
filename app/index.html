@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=94376b77">
+<link rel="stylesheet" href="style.css?v=e5faa975">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1680,7 +1680,7 @@
         </button>
         <h1>Gestion des accès</h1>
       </div>
-      <p>Les accès de chaque membre de l’entreprise<br>décident de ce qu’il a sur son écran.</p>
+      <p>Les accès de chaque membre permettent<br>de décider l’espace auquel il a accès.</p>
     </div>
 
     <div class="proc-rech-rang">
@@ -1707,7 +1707,7 @@
              departs et changements d'espace concernent l'equipe, et on vient
              sur cette page pour la gerer. -->
         <button type="button" class="an-i" data-aide-actions
-                aria-label="À quoi servent les boutons de chaque ligne">
+                aria-label="Fonctionnement des boutons">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"></circle><path d="M9.3 9.1a2.8 2.8 0 0 1 5.4 1c0 1.9-2.7 2.3-2.7 4" stroke-linecap="round"></path><circle cx="12" cy="17.2" r="0.95" fill="currentColor" stroke="none"></circle></svg>
         </button>
         <!-- ⚠ LE TRI A ETE RETIRE. Trois ordres — alphabetique, du plus
@@ -3597,6 +3597,31 @@
 
     </div>
 
+    <!-- ⚠ LA MEME LIGNE QUE DANS L'ESPACE UTILISATEUR (`es-ent-groupe`).
+
+         Un gestionnaire invite n'avait RIEN, dans son profil, qui nomme
+         l'entreprise ou il travaille : la carte au-dessus ne parait qu'au
+         gerant, puisque lui seul en modifie le nom et le logo.
+
+         Celle-ci n'ouvre rien — pas de chevron, pas de `button` : elle dit ou
+         l'on est, et quel acces on y a.
+
+       ⚠ ELLE NE PARAIT QU'EN L'ABSENCE DE LA CARTE DU GERANT. Les deux
+         montrent le meme logo et le meme nom : cote a cote, ce serait un
+         doublon. C'est `peindreReglages` qui tranche, pas le balisage.
+
+         Masquee par defaut ; `peindreReglages` l'affiche s'il y a lieu. -->
+    <div class="reg-groupe" data-teinte="bleu" id="pg-ent-groupe" style="display:none">
+      <div class="reg-ligne">
+        <span class="reg-ic ent-ic">
+          <img id="pg-logo-ent" alt="" hidden>
+          <span class="ent-ini" id="pg-ent-initiales" hidden>—</span>
+        </span>
+        <span class="reg-nm" id="pg-ent-nom">—</span>
+        <span class="reg-val" id="pg-ent-role"></span>
+      </div>
+    </div>
+
     <!-- ⚠ L'ABONNEMENT PARAIT ICI AUSSI, mais pour le gerant seulement.
 
          Il est deja dans la page Entreprise — c'est sa place naturelle,
@@ -5253,7 +5278,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=a5bab3fc"></script>
+<script type="module" src="app.js?v=ac8549e5"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

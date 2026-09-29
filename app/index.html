@@ -1916,7 +1916,7 @@
        ═══════════════════════════════════════════════════════════════════════ -->
   <div class="screen" inert id="p-ecran">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-create')" aria-label="Retour">
+      <button class="back-btn" onclick="showGestionScreen('p-create-ai')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
              stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
@@ -1963,8 +1963,7 @@
 
     <!-- ─── Sur téléphone et tablette ─── -->
     <div id="ecran-mobile" style="display:none;">
-      <div class="subhead">Votre téléphone sait filmer son écran</div>
-      <div class="card">
+      <div class="card" style="margin-top:14px;">
         <!-- L'explication technique — « aucun navigateur ne peut filmer
              l'écran » — a été retirée : elle parlait du problème plutôt que
              de ce qu'il y a à faire, juste au-dessus de la marche à suivre. -->
@@ -1979,7 +1978,7 @@
 
   <div class="screen" inert id="p-coller">
     <div class="detail-header">
-      <button class="back-btn" onclick="showGestionScreen('p-create')" aria-label="Retour">
+      <button class="back-btn" onclick="showGestionScreen('p-create-ai')" aria-label="Retour">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"
              stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
       </button>
@@ -1987,7 +1986,7 @@
     </div>
 
     <input type="file" id="coller-input" accept="video/*" multiple style="display:none;">
-    <button class="btn ghost block" id="coller-ajouter">Ajouter des vidéos</button>
+    <button class="btn ghost block" id="coller-ajouter" style="margin-top:8px;">Ajouter des vidéos</button>
 
     <div id="coller-liste" style="margin-top:14px;"></div>
 
@@ -5254,7 +5253,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=617d62af"></script>
+<script type="module" src="app.js?v=a5bab3fc"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -291,10 +291,6 @@
   "en": "Open the procedure",
   "de": "Anleitung öffnen"
  },
- "actif": {
-  "en": "active",
-  "de": "aktiv"
- },
  "Activez <b>Caméra</b>": {
   "en": "Turn on <b>Camera</b>",
   "de": "Aktivieren Sie <b>Kamera</b>"
@@ -411,10 +407,6 @@
   "en": "Device removed.",
   "de": "Gerät entfernt."
  },
- "appel impossible": {
-  "en": "call failed",
-  "de": "Aufruf fehlgeschlagen"
- },
  "Appuyez pour filmer · 5 min au maximum": {
   "en": "Press to record · 5 min at most",
   "de": "Zum Aufnehmen drücken · höchstens 5 Min."
@@ -434,6 +426,10 @@
  "Attendre": {
   "en": "Wait",
   "de": "Warten"
+ },
+ "Attention": {
+  "en": "Caution",
+  "de": "Achtung"
  },
  "Au total": {
   "en": "In total",
@@ -566,10 +562,6 @@
  "Avant de continuer": {
   "en": "Before you continue",
   "de": "Bevor Sie weitermachen"
- },
- "avant de publier : c'est vous qui connaissez le geste.": {
-  "en": "before publishing: you are the one who knows the job.",
-  "de": "vor dem Veröffentlichen: Sie kennen den Handgriff."
  },
  "Basculer": {
   "en": "Switch",
@@ -723,10 +715,6 @@
   "en": "This company",
   "de": "Dieses Unternehmen"
  },
- "cette entreprise": {
-  "en": "this company",
-  "de": "dieses Unternehmen"
- },
  "Cette entreprise est complète": {
   "en": "This company is full",
   "de": "Dieses Unternehmen ist voll"
@@ -758,6 +746,10 @@
  "Cette procédure n'a pas encore d'étapes. Prévenez votre responsable : il doit les ajouter avant que la procédure soit utilisable.": {
   "en": "This procedure has no steps yet. Tell your manager: they need to add them before it can be used.",
   "de": "Diese Anleitung hat noch keine Schritte. Sagen Sie Ihrer Führungskraft Bescheid: Die Schritte müssen erst ergänzt werden."
+ },
+ "Cette procédure n’a pas encore d’étapes.": {
+  "en": "This procedure has no steps yet.",
+  "de": "Diese Anleitung hat noch keine Schritte."
  },
  "Cette vidéo dure {min} min {sec}. L'analyse accepte jusqu'à 5 minutes.": {
   "en": "This video is {min} min {sec} long. The analysis takes up to 5 minutes.",
@@ -838,10 +830,6 @@
  "Chargez d'abord la vidéo.": {
   "en": "Load the video first.",
   "de": "Laden Sie zuerst das Video."
- },
- "chevauchement": {
-  "en": "overlap",
-  "de": "Überschneidung"
  },
  "Choisir l’écran et démarrer": {
   "en": "Choose the screen and start",
@@ -991,17 +979,13 @@
   "en": "Talk through what you do while you record.",
   "de": "Erklären Sie beim Aufnehmen, was Sie tun."
  },
- "Complétez le titre et le dossier ci-dessus pour continuer.": {
-  "en": "Fill in the title and folder above to continue.",
-  "de": "Titel und Ordner oben ausfüllen, um fortzufahren."
+ "Complétez le titre de la procédure et le dossier de la procédure ci-dessus pour continuer.": {
+  "en": "Fill in the procedure title and the procedure folder above to continue.",
+  "de": "Füllen Sie oben den Titel und den Ordner der Anleitung aus, um fortzufahren."
  },
  "Compris": {
   "en": "Got it",
   "de": "Verstanden"
- },
- "comprises pendant les 14 jours.": {
-  "en": "included during the 14 days.",
-  "de": "in den 14 Tagen inklusive."
  },
  "Compte créé ! Vérifiez vos e-mails pour confirmer, puis connectez-vous.": {
   "en": "Account created! Check your email to confirm, then log in.",
@@ -1009,10 +993,6 @@
  },
  "Conditions d’utilisation": {
   "en": "Terms of use",
-  "de": "Nutzungsbedingungen"
- },
- "conditions d’utilisation": {
-  "en": "terms of use",
   "de": "Nutzungsbedingungen"
  },
  "Connectez-vous ou créez votre compte": {
@@ -1071,10 +1051,6 @@
   "en": "Fix the texts below, or go back to keep cutting.",
   "de": "Korrigieren Sie die Texte unten oder gehen Sie zurück, um weiter zu schneiden."
  },
- "couvert": {
-  "en": "covered",
-  "de": "abgedeckt"
- },
  "Créations": {
   "en": "Created",
   "de": "Erstellt"
@@ -1119,25 +1095,9 @@
   "en": "Created {v}",
   "de": "Erstellt {v}"
  },
- "c’est la dernière étape, elle prend souvent une à trois minutes.": {
-  "en": "this is the last step, it often takes one to three minutes.",
-  "de": "das ist der letzte Schritt, er dauert oft ein bis drei Minuten."
- },
  "Dans l’équipe depuis": {
   "en": "On the team since",
   "de": "Im Team seit"
- },
- "de formation ce mois-ci": {
-  "en": "of training this month",
-  "de": "Einarbeitung diesen Monat"
- },
- "de vos procédures": {
-  "en": "of your procedures",
-  "de": "Ihrer Anleitungen"
- },
- "de vos procédures<br>sont accessibles": {
-  "en": "of your procedures<br>are available",
-  "de": "Ihrer Anleitungen<br>sind verfügbar"
  },
  "Demandez le code de l'entreprise à votre responsable pour y accéder.": {
   "en": "Ask your manager for the company code to get in.",
@@ -1154,18 +1114,6 @@
  "Depuis le {v}": {
   "en": "Since {v}",
   "de": "Seit {v}"
- },
- "depuis {depuis} minute": {
-  "en": "for {depuis} minute",
-  "de": "seit {depuis} Minute"
- },
- "depuis {depuis} minutes": {
-  "en": "for {depuis} minutes",
-  "de": "seit {depuis} Minuten"
- },
- "depuis {v} · {v2} s": {
-  "en": "since {v} · {v2} s",
-  "de": "seit {v} · {v2} s"
  },
  "Dernier mouvement": {
   "en": "Latest change",
@@ -1214,6 +1162,10 @@
  "Durée totale": {
   "en": "Total length",
   "de": "Gesamtdauer"
+ },
+ "DÉTAIL TECHNIQUE (build v3) :": {
+  "en": "TECHNICAL DETAILS (build v3):",
+  "de": "TECHNISCHE DETAILS (Build v3):"
  },
  "Dès la première lecture, vous verrez ici": {
   "en": "From the first read, you will see here",
@@ -1279,17 +1231,9 @@
   "en": "Details copied.",
   "de": "Details kopiert."
  },
- "détail de son activité": {
-  "en": "activity details",
-  "de": "Details der Aktivität"
- },
  "Détail technique": {
   "en": "Technical details",
   "de": "Technische Details"
- },
- "DÉTAIL TECHNIQUE (build v3) :": {
-  "en": "TECHNICAL DETAILS (build v3):",
-  "de": "TECHNISCHE DETAILS (Build v3):"
  },
  "Détails": {
   "en": "Details",
@@ -1319,10 +1263,6 @@
   "en": "Staff",
   "de": "Mitarbeitende"
  },
- "en attente de la souscription.": {
-  "en": "until you subscribe.",
-  "de": "bis zum Abschluss eines Abos."
- },
  "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": {
   "en": "Waiting for a machine at our analysis provider. You can leave this page, the work carries on.",
   "de": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst. Sie können die Seite verlassen, es geht trotzdem weiter."
@@ -1350,10 +1290,6 @@
  "En ligne": {
   "en": "Live",
   "de": "Live"
- },
- "en pause": {
-  "en": "paused",
-  "de": "pausiert"
  },
  "En place.": {
   "en": "Done.",
@@ -1423,10 +1359,6 @@
   "en": "Sending…",
   "de": "Wird gesendet…"
  },
- "erreur": {
-  "en": "error",
-  "de": "Fehler"
- },
  "Erreur ({status}) : {message}": {
   "en": "Error ({status}): {message}",
   "de": "Fehler ({status}): {message}"
@@ -1454,10 +1386,6 @@
  "Essai 14 jours gratuit": {
   "en": "14 days free",
   "de": "14 Tage kostenlos"
- },
- "et": {
-  "en": "and",
-  "de": "und"
  },
  "Ex : Accueil": {
   "en": "e.g. Front desk",
@@ -1575,10 +1503,6 @@
   "en": "Management unavailable",
   "de": "Verwaltung nicht verfügbar"
  },
- "gestionnaire": {
-  "en": "a manager",
-  "de": "Verwalter"
- },
  "Génération...": {
   "en": "Generating…",
   "de": "Wird erzeugt…"
@@ -1671,14 +1595,6 @@
   "en": "Invite your team",
   "de": "Team einladen"
  },
- "jamais": {
-  "en": "never",
-  "de": "nie"
- },
- "jamais ouverte": {
-  "en": "never opened",
-  "de": "nie geöffnet"
- },
  "Je continue": {
   "en": "Keep going",
   "de": "Weitermachen"
@@ -1686,14 +1602,6 @@
  "Je reviendrai": {
   "en": "I'll come back",
   "de": "Später weiter"
- },
- "jour": {
-  "en": "day",
-  "de": "Tag"
- },
- "jours": {
-  "en": "days",
-  "de": "Tage"
  },
  "Jours actifs": {
   "en": "Active days",
@@ -1714,6 +1622,18 @@
  "J’ai ma vidéo — l’utiliser": {
   "en": "I have my video — use it",
   "de": "Video ist fertig — verwenden"
+ },
+ "L'IA a découpé la procédure.": {
+  "en": "The AI has split the procedure.",
+  "de": "Die KI hat die Anleitung aufgeteilt."
+ },
+ "L'IA a découpé la procédure. <b>Relisez chaque étape</b> avant de publier :": {
+  "en": "The AI has split the procedure. <b>Check every step</b> before publishing:",
+  "de": "Die KI hat die Anleitung aufgeteilt. <b>Prüfen Sie jeden Schritt</b> vor dem Veröffentlichen:"
+ },
+ "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin": {
+  "en": "The AI wrote these steps — fix the text or the clip timing if needed",
+  "de": "Die KI hat diese Schritte geschrieben — korrigieren Sie bei Bedarf Text oder Ausschnitt"
  },
  "L'abonnement de votre établissement a pris fin. Vos procédures sont conservées : elles reviendront dès que votre responsable aura renouvelé.": {
   "en": "Your site's subscription has ended. Your procedures are kept: they come back as soon as your manager renews.",
@@ -1738,22 +1658,6 @@
  "L'espace Équipe ne vous sera plus accessible : vous êtes maintenant de l'autre côté.": {
   "en": "You will no longer have the User area: you are on the other side now.",
   "de": "Der Nutzerbereich ist für Sie nicht mehr zugänglich: Sie sind jetzt auf der anderen Seite."
- },
- "L'IA a découpé la procédure.": {
-  "en": "The AI has split the procedure.",
-  "de": "Die KI hat die Anleitung aufgeteilt."
- },
- "L'IA a découpé la procédure. <b>Relisez chaque étape</b> avant de publier :": {
-  "en": "The AI has split the procedure. <b>Check every step</b> before publishing:",
-  "de": "Die KI hat die Anleitung aufgeteilt. <b>Prüfen Sie jeden Schritt</b> vor dem Veröffentlichen:"
- },
- "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin": {
-  "en": "The AI wrote these steps — fix the text or the clip timing if needed",
-  "de": "Die KI hat diese Schritte geschrieben — korrigieren Sie bei Bedarf Text oder Ausschnitt"
- },
- "l'équipe": {
-  "en": "the team",
-  "de": "das Team"
  },
  "La base a refusé la modification.": {
   "en": "The database refused the change.",
@@ -1795,13 +1699,13 @@
   "en": "Company creation is not set up in the database. Run migration-creation-entreprise.sql.",
   "de": "Die Unternehmenserstellung ist in der Datenbank nicht eingerichtet. Führen Sie migration-creation-entreprise.sql aus."
  },
+ "La langue choisie traduit aussi les étapes des procédures.": {
+  "en": "The language you choose also translates procedure steps.",
+  "de": "Die gewählte Sprache übersetzt auch die Schritte der Anleitungen."
+ },
  "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": {
   "en": "The language applies to the whole app. Each person can pick their own.",
   "de": "Die Sprache gilt für die ganze App. Jede Person kann ihre eigene wählen."
- },
- "La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.": {
-  "en": "The language applies to the whole app. Procedures are translated separately, from the procedure itself.",
-  "de": "Die Sprache gilt für die ganze App. Anleitungen werden einzeln übersetzt, direkt in der Anleitung."
  },
  "La photo n’a pas pu être envoyée.": {
   "en": "The photo could not be sent.",
@@ -1810,10 +1714,6 @@
  "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
   "en": "The procedure is already in Draft. It opens once the analysis is done.",
   "de": "Die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
- },
- "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
-  "en": "the procedure is already in Draft. It opens once the analysis is done.",
-  "de": "die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
  },
  "La procédure n’a pas pu être supprimée. Réessayez dans quelques instants.": {
   "en": "The procedure could not be deleted. Try again in a moment.",
@@ -1846,6 +1746,14 @@
  "Langue parlée": {
   "en": "Spoken language",
   "de": "Gesprochene Sprache"
+ },
+ "Le PDF n’a pas pu être créé": {
+  "en": "The PDF could not be created",
+  "de": "Das PDF konnte nicht erstellt werden"
+ },
+ "Le QR code fonctionnera une fois la procédure en ligne.": {
+  "en": "The QR code works once the procedure is live.",
+  "de": "Der QR-Code funktioniert, sobald die Anleitung live ist."
  },
  "Le changement est fait, mais la date n’a pas pu être enregistrée": {
   "en": "The change is done, but the date could not be saved",
@@ -1903,14 +1811,6 @@
   "en": "Screen sharing could not start: {v}",
   "de": "Bildschirmfreigabe konnte nicht starten: {v}"
  },
- "Le PDF n’a pas pu être créé": {
-  "en": "The PDF could not be created",
-  "de": "Das PDF konnte nicht erstellt werden"
- },
- "Le QR code fonctionnera une fois la procédure en ligne.": {
-  "en": "The QR code works once the procedure is live.",
-  "de": "Der QR-Code funktioniert, sobald die Anleitung live ist."
- },
  "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": {
   "en": "The analysis server answered {status}{v} — procedure checked: {aiProcedureId}",
   "de": "Der Auswertungsserver antwortete {status}{v} — abgefragte Anleitung: {aiProcedureId}"
@@ -1919,17 +1819,9 @@
   "en": "The analysis server cannot be reached. Try again in a moment.",
   "de": "Der Auswertungsserver ist nicht erreichbar. Versuchen Sie es gleich noch einmal."
  },
- "le temps de formation": {
-  "en": "the training time",
-  "de": "die Einarbeitungszeit"
- },
  "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": {
   "en": "Time per procedure is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
   "de": "Die Zeit pro Anleitung ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt."
- },
- "le temps que vous n'avez plus à passer à expliquer": {
-  "en": "the time you no longer spend explaining",
-  "de": "die Zeit, die Sie nicht mehr mit Erklären verbringen"
  },
  "Le titre est obligatoire (en haut de la page précédente).": {
   "en": "The title is required (at the top of the previous page).",
@@ -1950,10 +1842,6 @@
  "Le total dépasse {n} minutes. Retirez une vidéo, ou coupez-en une.": {
   "en": "The total is over {n} minutes. Remove a video, or cut one.",
   "de": "Die Gesamtdauer liegt über {n} Minuten. Entfernen oder kürzen Sie ein Video."
- },
- "le {v}": {
-  "en": "on {v}",
-  "de": "am {v}"
  },
  "Lecture": {
   "en": "Play",
@@ -2039,18 +1927,6 @@
   "en": "The <b>Standix AI</b> writes the procedure from a video or a document",
   "de": "Die <b>Standix-KI</b> schreibt die Anleitung aus einem Video oder Dokument"
  },
- "L’analyse est terminée : {length} étapes.": {
-  "en": "Analysis done: {length} steps.",
-  "de": "Auswertung fertig: {length} Schritte."
- },
- "L’enregistrement démarre tout de suite — vous avez": {
-  "en": "Recording starts right away — you have",
-  "de": "Die Aufnahme startet sofort — Sie haben"
- },
- "L’enregistrement est vide.": {
-  "en": "The recording is empty.",
-  "de": "Die Aufnahme ist leer."
- },
  "L’IA crée la procédure à partir d’un document": {
   "en": "The AI builds the procedure from a document",
   "de": "Die KI erstellt die Anleitung aus einem Dokument"
@@ -2079,9 +1955,25 @@
   "en": "The AI writes the steps for you",
   "de": "Die KI schreibt die Schritte für Sie"
  },
+ "L’analyse est terminée : {length} étapes.": {
+  "en": "Analysis done: {length} steps.",
+  "de": "Auswertung fertig: {length} Schritte."
+ },
+ "L’enregistrement démarre tout de suite — vous avez": {
+  "en": "Recording starts right away — you have",
+  "de": "Die Aufnahme startet sofort — Sie haben"
+ },
+ "L’enregistrement est vide.": {
+  "en": "The recording is empty.",
+  "de": "Die Aufnahme ist leer."
+ },
  "L’écoute est terminée. L’IA met la procédure au propre —": {
   "en": "Listening is done. The AI is tidying up the procedure —",
   "de": "Das Zuhören ist fertig. Die KI bringt die Anleitung in Form —"
+ },
+ "MP4 ou MOV · 5 minutes au maximum": {
+  "en": "MP4 or MOV · 5 minutes at most",
+  "de": "MP4 oder MOV · höchstens 5 Minuten"
  },
  "Marquez le début et la fin de chaque étape": {
   "en": "Mark where each step starts and ends",
@@ -2122,18 +2014,6 @@
  "Mettre en pause": {
   "en": "Pause",
   "de": "Pause"
- },
- "minutes": {
-  "en": "minutes",
-  "de": "Minuten"
- },
- "minutes au total": {
-  "en": "minutes in total",
-  "de": "Minuten insgesamt"
- },
- "minutes ce mois-ci": {
-  "en": "minutes this month",
-  "de": "Minuten diesen Monat"
  },
  "Modifications enregistrées": {
   "en": "Changes saved",
@@ -2182,10 +2062,6 @@
  "Mouvements indisponibles.": {
   "en": "Changes unavailable.",
   "de": "Änderungen nicht verfügbar."
- },
- "MP4 ou MOV · 5 minutes au maximum": {
-  "en": "MP4 or MOV · 5 minutes at most",
-  "de": "MP4 oder MOV · höchstens 5 Minuten"
  },
  "Nom": {
   "en": "Last name",
@@ -2255,10 +2131,6 @@
   "en": "{nom} plan · €{prix} per month",
   "de": "Tarif {nom} · {prix} € pro Monat"
  },
- "ou <b>{v} € par mois</b> en payant à l’année": {
-  "en": "or <b>€{v} per month</b> when paid yearly",
-  "de": "oder <b>{v} € pro Monat</b> bei jährlicher Zahlung"
- },
  "Ouverture de la caméra...": {
   "en": "Opening the camera…",
   "de": "Kamera wird geöffnet…"
@@ -2302,10 +2174,6 @@
  "Paiement indisponible": {
   "en": "Payment unavailable",
   "de": "Zahlung nicht verfügbar"
- },
- "par mois, hors taxes": {
-  "en": "per month, excl. tax",
-  "de": "pro Monat, ohne Steuern"
  },
  "Partagez le code d'invitation dans Paramètres.": {
   "en": "Share the invitation code from Settings.",
@@ -2395,18 +2263,6 @@
   "en": "Role not saved: {message}",
   "de": "Position nicht gespeichert: {message}"
  },
- "pour créer une procédure.": {
-  "en": "button to create a procedure.",
-  "de": ", um eine Anleitung zu erstellen."
- },
- "pour vous placer": {
-  "en": "to get ready",
-  "de": "um sich bereitzumachen"
- },
- "premier mois avec des lectures": {
-  "en": "first month with reads",
-  "de": "erster Monat mit Aufrufen"
- },
  "Presque prêt": {
   "en": "Almost there",
   "de": "Fast fertig"
@@ -2414,6 +2270,10 @@
  "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": {
   "en": "Prices exclude tax. You change plan when your team changes, never before.",
   "de": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher."
+ },
+ "Procédure": {
+  "en": "Procedure",
+  "de": "Anleitung"
  },
  "Procédure en cours de modification": {
   "en": "Procedure being edited",
@@ -2463,13 +2323,13 @@
   "en": "First name",
   "de": "Vorname"
  },
- "Préparation du lecteur...": {
-  "en": "Preparing the player…",
-  "de": "Player wird vorbereitet…"
- },
  "Préparation du PDF…": {
   "en": "Preparing the PDF…",
   "de": "PDF wird vorbereitet…"
+ },
+ "Préparation du lecteur...": {
+  "en": "Preparing the player…",
+  "de": "Player wird vorbereitet…"
  },
  "Publier": {
   "en": "Publish",
@@ -2494,10 +2354,6 @@
  "Quand le temps est mis en pause": {
   "en": "When the timer pauses",
   "de": "Wann die Zeit angehalten wird"
- },
- "que vos procédures ont fait gagner à votre établissement.": {
-  "en": "your procedures have saved your site.",
-  "de": "die Ihre Anleitungen Ihrem Standort gespart haben."
  },
  "Quel est votre poste ?": {
   "en": "What is your role?",
@@ -2675,10 +2531,6 @@
   "en": "Try again.",
   "de": "Versuchen Sie es erneut."
  },
- "réessayez.": {
-  "en": "try again.",
-  "de": "versuchen Sie es erneut."
- },
  "Réglages": {
   "en": "Settings",
   "de": "Einstellungen"
@@ -2695,9 +2547,9 @@
   "en": "Revoke this code?",
   "de": "Diesen Code widerrufen?"
  },
- "sans détail.": {
-  "en": "no details.",
-  "de": "ohne Details."
+ "Sans dossier": {
+  "en": "No folder",
+  "de": "Ohne Ordner"
  },
  "Sans micro, l'IA n'a rien à écouter : autorisez le microphone, puis recommencez.": {
   "en": "Without the microphone, the AI has nothing to listen to: allow the microphone, then try again.",
@@ -2779,10 +2631,6 @@
   "en": "Its name and logo appear in the app for the whole team.",
   "de": "Name und Logo erscheinen in der App für das ganze Team."
  },
- "sont accessibles": {
-  "en": "are available",
-  "de": "sind verfügbar"
- },
  "Sous-dossier": {
   "en": "Subfolder",
   "de": "Unterordner"
@@ -2847,17 +2695,9 @@
   "en": "Delete {nom}?",
   "de": "{nom} löschen?"
  },
- "sur 5:00": {
-  "en": "of 5:00",
-  "de": "von 5:00"
- },
  "Sur devis": {
   "en": "On quote",
   "de": "Auf Anfrage"
- },
- "suspendus": {
-  "en": "paused",
-  "de": "pausiert"
  },
  "S’inscrire en tant que gérant": {
   "en": "Sign up as owner",
@@ -2914,6 +2754,10 @@
  "Titre": {
   "en": "Title",
   "de": "Titel"
+ },
+ "Titre de la procédure": {
+  "en": "Procedure title",
+  "de": "Titel der Anleitung"
  },
  "Titre de l’étape (facultatif)": {
   "en": "Step title (optional)",
@@ -3022,10 +2866,6 @@
  "Trop d'appareils": {
   "en": "Too many devices",
   "de": "Zu viele Geräte"
- },
- "trou": {
-  "en": "gap",
-  "de": "Lücke"
  },
  "Télécharger en PDF": {
   "en": "Download as PDF",
@@ -3239,10 +3079,6 @@
   "en": "Your subscription is active. Thank you!",
   "de": "Ihr Abo ist aktiv. Danke!"
  },
- "votre autre établissement": {
-  "en": "your other site",
-  "de": "Ihr anderer Standort"
- },
  "Votre compte": {
   "en": "Your account",
   "de": "Ihr Konto"
@@ -3331,17 +3167,9 @@
   "en": "Your team has not started yet",
   "de": "Ihr Team hat noch nicht angefangen"
  },
- "vous": {
-  "en": "you",
-  "de": "Sie"
- },
  "Vous appartenez déjà à cette entreprise.": {
   "en": "You already belong to this company.",
   "de": "Sie gehören bereits zu diesem Unternehmen."
- },
- "vous attendent. Reprenez là où vous vous êtes arrêté.": {
-  "en": "are waiting for you. Pick up where you left off.",
-  "de": "warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben."
  },
  "Vous avez créé cette entreprise : supprimez-la plutôt que de la quitter.": {
   "en": "You created this company: delete it rather than leave it.",
@@ -3383,13 +3211,13 @@
   "en": "You will lose access to its procedures and your reading history. Your Standix account stays active: you can join another company with a code.",
   "de": "Sie verlieren den Zugriff auf die Anleitungen und Ihren Leseverlauf. Ihr Standix-Konto bleibt aktiv: Mit einem Code können Sie einem anderen Unternehmen beitreten."
  },
- "Vous perdrez l’accès à ses procédures. Elles restent en place pour le reste de l’équipe. Il faudra un nouveau code d’invitation pour revenir.": {
-  "en": "You will lose access to its procedures. They stay for the rest of the team. You will need a new invitation code to come back.",
-  "de": "Sie verlieren den Zugriff auf die Anleitungen. Sie bleiben für den Rest des Teams. Für die Rückkehr brauchen Sie einen neuen Einladungscode."
- },
  "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": {
   "en": "You will lose access to Standix and all your companies. The procedures you wrote stay for the team. This cannot be undone.",
   "de": "Sie verlieren den Zugriff auf Standix und alle Ihre Unternehmen. Die Anleitungen, die Sie geschrieben haben, bleiben für das Team. Das lässt sich nicht rückgängig machen."
+ },
+ "Vous perdrez l’accès à ses procédures. Elles restent en place pour le reste de l’équipe. Il faudra un nouveau code d’invitation pour revenir.": {
+  "en": "You will lose access to its procedures. They stay for the rest of the team. You will need a new invitation code to come back.",
+  "de": "Sie verlieren den Zugriff auf die Anleitungen. Sie bleiben für den Rest des Teams. Für die Rückkehr brauchen Sie einen neuen Einladungscode."
  },
  "Vous pourrez le changer dans les réglages.": {
   "en": "You can change it in the settings.",
@@ -3471,6 +3299,206 @@
   "en": "Zoom in",
   "de": "Vergrößern"
  },
+ "actif": {
+  "en": "active",
+  "de": "aktiv"
+ },
+ "appel impossible": {
+  "en": "call failed",
+  "de": "Aufruf fehlgeschlagen"
+ },
+ "avant de publier : c'est vous qui connaissez le geste.": {
+  "en": "before publishing: you are the one who knows the job.",
+  "de": "vor dem Veröffentlichen: Sie kennen den Handgriff."
+ },
+ "cette entreprise": {
+  "en": "this company",
+  "de": "dieses Unternehmen"
+ },
+ "chevauchement": {
+  "en": "overlap",
+  "de": "Überschneidung"
+ },
+ "comprises pendant les 14 jours.": {
+  "en": "included during the 14 days.",
+  "de": "in den 14 Tagen inklusive."
+ },
+ "conditions d’utilisation": {
+  "en": "terms of use",
+  "de": "Nutzungsbedingungen"
+ },
+ "couvert": {
+  "en": "covered",
+  "de": "abgedeckt"
+ },
+ "c’est la dernière étape, elle prend souvent une à trois minutes.": {
+  "en": "this is the last step, it often takes one to three minutes.",
+  "de": "das ist der letzte Schritt, er dauert oft ein bis drei Minuten."
+ },
+ "de formation ce mois-ci": {
+  "en": "of training this month",
+  "de": "Einarbeitung diesen Monat"
+ },
+ "de vos procédures": {
+  "en": "of your procedures",
+  "de": "Ihrer Anleitungen"
+ },
+ "de vos procédures<br>sont accessibles": {
+  "en": "of your procedures<br>are available",
+  "de": "Ihrer Anleitungen<br>sind verfügbar"
+ },
+ "depuis {depuis} minute": {
+  "en": "for {depuis} minute",
+  "de": "seit {depuis} Minute"
+ },
+ "depuis {depuis} minutes": {
+  "en": "for {depuis} minutes",
+  "de": "seit {depuis} Minuten"
+ },
+ "depuis {v} · {v2} s": {
+  "en": "since {v} · {v2} s",
+  "de": "seit {v} · {v2} s"
+ },
+ "détail de son activité": {
+  "en": "activity details",
+  "de": "Details der Aktivität"
+ },
+ "en attente de la souscription.": {
+  "en": "until you subscribe.",
+  "de": "bis zum Abschluss eines Abos."
+ },
+ "en pause": {
+  "en": "paused",
+  "de": "pausiert"
+ },
+ "erreur": {
+  "en": "error",
+  "de": "Fehler"
+ },
+ "et": {
+  "en": "and",
+  "de": "und"
+ },
+ "gestionnaire": {
+  "en": "a manager",
+  "de": "Verwalter"
+ },
+ "jamais": {
+  "en": "never",
+  "de": "nie"
+ },
+ "jamais ouverte": {
+  "en": "never opened",
+  "de": "nie geöffnet"
+ },
+ "jour": {
+  "en": "day",
+  "de": "Tag"
+ },
+ "jours": {
+  "en": "days",
+  "de": "Tage"
+ },
+ "l'équipe": {
+  "en": "the team",
+  "de": "das Team"
+ },
+ "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
+  "en": "the procedure is already in Draft. It opens once the analysis is done.",
+  "de": "die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
+ },
+ "le temps de formation": {
+  "en": "the training time",
+  "de": "die Einarbeitungszeit"
+ },
+ "le temps que vous n'avez plus à passer à expliquer": {
+  "en": "the time you no longer spend explaining",
+  "de": "die Zeit, die Sie nicht mehr mit Erklären verbringen"
+ },
+ "le {v}": {
+  "en": "on {v}",
+  "de": "am {v}"
+ },
+ "minutes": {
+  "en": "minutes",
+  "de": "Minuten"
+ },
+ "minutes au total": {
+  "en": "minutes in total",
+  "de": "Minuten insgesamt"
+ },
+ "minutes ce mois-ci": {
+  "en": "minutes this month",
+  "de": "Minuten diesen Monat"
+ },
+ "ou <b>{v} € par mois</b> en payant à l’année": {
+  "en": "or <b>€{v} per month</b> when paid yearly",
+  "de": "oder <b>{v} € pro Monat</b> bei jährlicher Zahlung"
+ },
+ "par mois, hors taxes": {
+  "en": "per month, excl. tax",
+  "de": "pro Monat, ohne Steuern"
+ },
+ "pour créer une procédure.": {
+  "en": "button to create a procedure.",
+  "de": ", um eine Anleitung zu erstellen."
+ },
+ "pour vous placer": {
+  "en": "to get ready",
+  "de": "um sich bereitzumachen"
+ },
+ "premier mois avec des lectures": {
+  "en": "first month with reads",
+  "de": "erster Monat mit Aufrufen"
+ },
+ "que vos procédures ont fait gagner à votre établissement.": {
+  "en": "your procedures have saved your site.",
+  "de": "die Ihre Anleitungen Ihrem Standort gespart haben."
+ },
+ "réessayez.": {
+  "en": "try again.",
+  "de": "versuchen Sie es erneut."
+ },
+ "sans détail.": {
+  "en": "no details.",
+  "de": "ohne Details."
+ },
+ "sont accessibles": {
+  "en": "are available",
+  "de": "sind verfügbar"
+ },
+ "sur 5:00": {
+  "en": "of 5:00",
+  "de": "von 5:00"
+ },
+ "suspendus": {
+  "en": "paused",
+  "de": "pausiert"
+ },
+ "trou": {
+  "en": "gap",
+  "de": "Lücke"
+ },
+ "votre autre établissement": {
+  "en": "your other site",
+  "de": "Ihr anderer Standort"
+ },
+ "vous": {
+  "en": "you",
+  "de": "Sie"
+ },
+ "vous attendent. Reprenez là où vous vous êtes arrêté.": {
+  "en": "are waiting for you. Pick up where you left off.",
+  "de": "warten auf Sie. Machen Sie weiter, wo Sie aufgehört haben."
+ },
+ "{DOC_PAGES_MAX} pages au maximum. Au-delà, c'est un manuel entier : découpez-le en plusieurs procédures.": {
+  "en": "{DOC_PAGES_MAX} pages at most. Beyond that it is a whole manual: split it into several procedures.",
+  "de": "Höchstens {DOC_PAGES_MAX} Seiten. Mehr ist ein ganzes Handbuch: Teilen Sie es in mehrere Anleitungen auf."
+ },
+ "{MDP_MIN} caractères minimum": {
+  "en": "{MDP_MIN} characters minimum",
+  "de": "Mindestens {MDP_MIN} Zeichen"
+ },
  "{actifs} sur {length} personne": {
   "en": "{actifs} of {length} person",
   "de": "{actifs} von {length} Person"
@@ -3506,10 +3534,6 @@
  "{cheminProc} · créée le {v}": {
   "en": "{cheminProc} · created on {v}",
   "de": "{cheminProc} · erstellt am {v}"
- },
- "{DOC_PAGES_MAX} pages au maximum. Au-delà, c'est un manuel entier : découpez-le en plusieurs procédures.": {
-  "en": "{DOC_PAGES_MAX} pages at most. Beyond that it is a whole manual: split it into several procedures.",
-  "de": "Höchstens {DOC_PAGES_MAX} Seiten. Mehr ist ein ganzes Handbuch: Teilen Sie es in mehrere Anleitungen auf."
  },
  "{lectures} sur {anJours} jours": {
   "en": "{lectures} over {anJours} days",
@@ -3583,21 +3607,9 @@
   "en": "{lus} of {length}",
   "de": "{lus} von {length}"
  },
- "{MDP_MIN} caractères minimum": {
-  "en": "{MDP_MIN} characters minimum",
-  "de": "Mindestens {MDP_MIN} Zeichen"
- },
  "{mensuel} € par mois": {
   "en": "€{mensuel} per month",
   "de": "{mensuel} € pro Monat"
- },
- "{nb_etapes} étape générée par l'IA — vérifiez et modifiez si besoin avant de publier": {
-  "en": "{nb_etapes} step written by the AI — check and edit it if needed before publishing",
-  "de": "{nb_etapes} Schritt von der KI geschrieben — prüfen und bei Bedarf ändern, bevor Sie veröffentlichen"
- },
- "{nb_etapes} étapes générées par l'IA — vérifiez et modifiez si besoin avant de publier": {
-  "en": "{nb_etapes} steps written by the AI — check and edit them if needed before publishing",
-  "de": "{nb_etapes} Schritte von der KI geschrieben — prüfen und bei Bedarf ändern, bevor Sie veröffentlichen"
  },
  "{nbAffiche} procédure": {
   "en": "{nbAffiche} procedure",
@@ -3606,6 +3618,14 @@
  "{nbAffiche} procédures": {
   "en": "{nbAffiche} procedures",
   "de": "{nbAffiche} Anleitungen"
+ },
+ "{nb_etapes} étape générée par l'IA — vérifiez et modifiez si besoin avant de publier": {
+  "en": "{nb_etapes} step written by the AI — check and edit it if needed before publishing",
+  "de": "{nb_etapes} Schritt von der KI geschrieben — prüfen und bei Bedarf ändern, bevor Sie veröffentlichen"
+ },
+ "{nb_etapes} étapes générées par l'IA — vérifiez et modifiez si besoin avant de publier": {
+  "en": "{nb_etapes} steps written by the AI — check and edit them if needed before publishing",
+  "de": "{nb_etapes} Schritte von der KI geschrieben — prüfen und bei Bedarf ändern, bevor Sie veröffentlichen"
  },
  "{ne} établissements": {
   "en": "{ne} sites",

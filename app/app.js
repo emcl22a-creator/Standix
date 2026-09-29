@@ -158,218 +158,628 @@ const LANGUES = [
 
    La clé est la phrase française elle-même. Une phrase absente reste en
    français plutôt que d'afficher un code technique. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TRADUCTIONS DE L'INTERFACE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ═══ LA CLÉ, C'EST LA PHRASE FRANÇAISE ELLE-MÊME ═══
+
+   Pas de code comme `btn_save`. On écrit le français dans le balisage, et
+   c'est ce français qui sert de clé ici. Trois conséquences, et ce sont les
+   trois raisons du choix :
+
+   ① On lit le fichier source et on comprend l'écran sans rien ouvrir d'autre.
+   ② Une phrase jamais traduite s'affiche EN FRANÇAIS, jamais vide et jamais
+      en `btn_save_42`. Le pire cas reste lisible.
+   ③ Changer le français change la clé : la traduction devient orpheline et la
+      phrase repasse en français. C'est voulu — mieux vaut du français juste
+      qu'un anglais qui décrit l'ancienne version du bouton.
+
+ ⚠ LA COMPARAISON IGNORE LES ESPACES ET LES RETOURS À LA LIGNE. Une phrase
+   écrite sur trois lignes dans le balisage, avec l'indentation au milieu,
+   doit trouver sa traduction quand même. Voir `cleTexte`.
+
+   ═══ ESPAGNOL ET PORTUGAIS ═══
+
+   Leurs dictionnaires datent d'avant, et les deux langues ont été retirées du
+   menu. On les garde : ils ne coûtent que de la place, et les perdre
+   obligerait à refaire plusieurs centaines de traductions le jour où l'on
+   rouvre ces langues.
+
+ ⚠ ILS N'ONT PAS ÉTÉ MIS À JOUR. Leurs clés suivent l'ancien français, pas
+   celui d'aujourd'hui. À reprendre avant de remettre `es` ou `pt` dans
+   `LANGUES`.
+   ═══════════════════════════════════════════════════════════════════════════ */
 const DICO = {
+  /* DICO:DEBUT */
   en: {
-    // ── espace gestion ──
-    "Vous pouvez quitter cette page": "You can leave this page",
-    "la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "the procedure will appear in your list as soon as it is ready.",
-    "Préparation": "Getting ready",
-    "Vous pouvez quitter cette page, l'analyse continue.": "You can leave this page — we'll keep going.",
-    "Lecture de votre vidéo": "Reading your video",
-    "Mise en forme": "Almost there",
-    "Presque prêt": "Almost ready",
-    "C'est plus long que d'habitude, mais l'analyse tourne toujours.": "This is taking longer than usual, but the analysis is still running.",
-    "Collez votre texte ci-dessous, ou déposez un fichier. L'IA en tirera des étapes\n        que vous pourrez": "Paste your text below, or drop a file. The AI will draw steps from it that you can",
-    ". Au-delà, l'analyse devient longue et le découpage moins fiable — filmez plutôt une procédure par vidéo.": ". Beyond that, the analysis gets long and the cutting less reliable — film one procedure per video instead.",
+    "(optionnel)": "(optional)",
     "+ Ajouter une étape": "+ Add a step",
-    "+ Découper une étape ici": "+ Cut a step here",
-    "Abandonner et supprimer": "Cancel and delete",
+    "1 an": "1 year",
+    "1 à 2 min": "1 to 2 min",
+    "2 heures": "2 hours",
+    "30 jours": "30 days",
+    "4 à 5 min": "4 to 5 min",
+    "6 à 7 min": "6 to 7 min",
+    "7 jours": "7 days",
+    "8 caractères minimum": "8 characters minimum",
+    "Abandonner et supprimer": "Discard and delete",
+    "Abonnement": "Subscription",
+    "Accès": "Access",
+    "Accéder directement à la procédure en scannant le QR code": "Go straight to the procedure by scanning the QR code",
     "Activité": "Activity",
-    "Actuel": "Current",
-    "Analyse": "Analytics",
-    "Analyse en cours...": "Analysing…",
-    "Analyse en cours": "Analysis in progress",
-    "Ancien → nouveau": "Oldest → newest",
+    "Activité de l’équipe": "Team activity",
+    "Afficher le mot de passe": "Show password",
+    "Ajouter": "Add",
+    "Ajouter des vidéos": "Add videos",
+    "Ajouter une page": "Add a page",
+    "Ajouter une photo": "Add a photo",
+    "Ajoutez votre document": "Add your document",
+    "Ajoutez votre vidéo": "Add your video",
+    "Analyse": "Analysis",
     "Annuler": "Cancel",
-    "Arrivés récemment": "Recently joined",
-    "Aucune vidéo importée": "No video imported",
-    "Autorisez la caméra pour scanner": "Allow the camera to scan",
-    "Bonjour 👋": "Hello 👋",
-    "Dossier": "Category",
-    "Dossiers les plus consultées": "Most viewed categories",
+    "Annuler (défaire)": "Undo",
+    "Annuler la dernière action": "Undo the last action",
+    "Annuler la dernière coupure": "Undo the last cut",
+    "Annuler les modifications": "Discard changes",
+    "Appuyez pour filmer · 5 min au maximum": "Press to record · 5 min at most",
+    "Assembler": "Join",
+    "Aucun dossier": "No folders",
+    "Aucun poste n'a encore été défini par votre responsable.": "Your manager has not set up any roles yet.",
+    "Aucune entreprise": "No company",
+    "Aucune procédure pour l’instant": "No procedures yet",
+    "Bienvenue": "Welcome",
+    "Bonjour,": "Hello,",
     "Ce mois-ci": "This month",
-    "Cette semaine": "This week",
-    "Chaque étape découpée se lie automatiquement au moment de la vidéo où vous étiez.": "Each step you cut is automatically linked to the point in the video you were at.",
-    "Chargement...": "Loading…",
-    "Chargement…": "Loading…",
+    "Ce que l’IA analyse": "What the AI looks at",
+    "Ce qui est visible": "What is on screen",
+    "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "These times depend on your phone and your video. Keep the app open until the analysis is done.",
+    "Changer de caméra": "Switch camera",
+    "Changer la photo de profil": "Change the profile photo",
+    "Changer mon mot de passe": "Change my password",
+    "chevauchement": "overlap",
+    "Choisir l’écran et démarrer": "Choose the screen and start",
+    "Choisir une vidéo": "Choose a video",
+    "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Choose how long the invitation code stays valid.",
+    "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
+    "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Five minutes at most. Recording stops on its own.",
+    "Cliquez ici pour nous écrire": "Click here to write to us",
     "Code d'accès rapide": "Quick access code",
-    "Code d'invitation équipe": "Team invitation code",
-    "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Paste your procedure, memo or instructions here…",
-    "Collez un texte, ou déposez un PDF ou un Word": "Paste a text, or drop a PDF or Word file",
-    "Comment créer cette procédure ?": "How do you want to create it?",
-    "Complétez le titre et le dossier ci-dessus pour continuer.": "Fill in the title and category above to continue.",
-    "Compte": "Account",
-    "Consulté": "Viewed",
-    "Copier ce détail": "Copy this detail",
-    "Copier le code": "Copy the code",
+    "Code d'invitation": "Invitation code",
+    "Code de l'entreprise (6 caractères)": "Company code (6 characters)",
+    "Codes d'invitation": "Invitation codes",
+    "Coller": "Paste",
+    "Coller les vidéos": "Join the videos",
+    "Coller plusieurs vidéos": "Join several videos",
+    "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Paste your procedure, your memo, your instructions here…",
+    "Collez un QR code là où le geste se fait : on scanne, la procédure s’ouvre.": "Put a QR code where the work happens: scan it, the procedure opens.",
+    "Collez un texte, ou déposez un PDF ou un Word": "Paste text, or drop in a PDF or Word file",
+    "Combien de temps ça prend ?": "How long does it take?",
+    "Comment créer cette procédure ?": "How do you want to build it?",
+    "Comment les lectures sont comptées": "How reads are counted",
+    "Complétez le titre et le dossier ci-dessus pour continuer.": "Fill in the title and folder above to continue.",
+    "Conditions d’utilisation": "Terms of use",
+    "conditions d’utilisation": "terms of use",
+    "Content de vous revoir": "Good to see you again",
+    "Copier": "Copy",
+    "Copier ce détail": "Copy these details",
+    "couvert": "covered",
+    "Créations": "Created",
+    "Créer mon compte": "Create my account",
+    "Créer un compte": "Create an account",
+    "Créer une procédure": "New procedure",
+    "Créer une procédure avec": "Build the procedure with",
+    "Créer une procédure manuellement": "Write the procedure yourself",
+    "Créez vos procédures avec l’IA.": "Build your procedures with AI.",
+    "Dans l’équipe depuis": "On the team since",
+    "Demandez le code de l'entreprise à votre responsable pour y accéder.": "Ask your manager for the company code to get in.",
+    "Depuis le début": "Since the start",
+    "Dernière consultation": "Last opened",
+    "Dezoomer": "Zoom out",
     "Diviser": "Split",
+    "Dossier": "Folder",
+    "Dossiers": "Folders",
+    "Débloquer": "Unlock",
     "Début": "Start",
     "Début ici": "Start here",
-    "Découper une vidéo": "Cut a video",
-    "Détail technique": "Technical detail",
+    "Découper la vidéo": "Cut the video",
+    "Découvrez toutes les fonctionnalités sans engagement.": "Try everything. No commitment.",
+    "Définissez les postes de votre établissement. Chaque membre choisira le sien.": "Set up the roles at your site. Each member picks their own.",
+    "Détail technique": "Technical details",
     "E-mail": "Email",
-    "Employés": "Employees",
+    "Effacer la recherche": "Clear the search",
+    "Elle apparaît en tête de la fiche. Facultative.": "It appears at the top of the procedure. Optional.",
+    "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": "It appears on the card and at the top of the procedure. Optional.",
+    "Employés": "Staff",
+    "En créant votre compte, vous acceptez les": "By creating your account, you accept the",
+    "En dév.": "Draft",
+    "En ligne": "Live",
     "Enregistrer": "Save",
+    "Enregistrer la vidéo": "Save the video",
     "Enregistrer les modifications": "Save changes",
-    "Espace Gestion": "Manager space",
-    "Ex : Cuisine": "e.g. Kitchen",
-    "Ex : Fermeture de caisse": "e.g. Cash register closing",
-    "Faites glisser pour affiner au dixième de seconde": "Drag to fine-tune to a tenth of a second",
-    "Filmez la tâche en expliquant à voix haute, l'IA génère les étapes": "Film the task while explaining out loud, the AI writes the steps",
-    "Filmez puis découpez chaque étape": "Film, then cut each step",
-    "Limité à 5 min de vidéo": "Limited to 5 min of video",
+    "Enregistrer l’écran": "Record screen",
+    "Espace Utilisateur": "User area",
+    "Essai 14 jours gratuit": "14 days free",
+    "Ex : Accueil": "e.g. Front desk",
+    "Ex : Accueillir un client": "e.g. Greet a customer",
+    "Ex : Le Comptoir": "e.g. The Counter",
+    "Ex : Responsable": "e.g. Supervisor",
+    "Ex : Réception client": "e.g. Greeting customers",
+    "Facultatif · les initiales serviront sinon": "Optional · initials are used otherwise",
+    "Faites glisser pour affiner au dixième de seconde": "Drag to adjust to a tenth of a second",
+    "Favoris": "Favourites",
+    "Fermer": "Close",
+    "Fichier": "File",
+    "Filmer": "Record",
+    "Filmez la tâche en expliquant à voix haute. Cinq minutes maximum.": "Record the task and talk through it out loud. Five minutes at most.",
     "Fin": "End",
     "Fin ici": "End here",
-    "Glissez sur la frise pour naviguer dans la vidéo": "Drag the timeline to move through the video",
+    "Fonctionnement des boutons": "How the buttons work",
+    "Gestion des accès": "Access",
     "Générer les étapes": "Generate the steps",
-    "Gestion des accès": "Access management",
-    "Importez une vidéo puis coupez chaque étape": "Import a video then cut each step",
-    "Informations personnelles": "Personal details",
+    "Générez un code pour que votre équipe puisse accéder aux procédures.": "Create a code so your team can open the procedures.",
+    "Ignorer": "Dismiss",
+    "Inscription gérant": "Owner sign-up",
+    "Inscription utilisateur": "User sign-up",
+    "Inviter votre équipe": "Invite your team",
     "Jours actifs": "Active days",
-    "Jusqu'à 10 membres · fonctionnalités essentielles": "Up to 10 members · essential features",
-    "Jusqu'à 25 membres · IA incluse · vérification vidéo": "Up to 25 members · AI included · video check",
-    "L'IA transforme la vidéo en une procédure": "The AI turns the video into a procedure",
-    "L'IA rédige la procédure à partir d'un document": "The AI writes the procedure from a document",
-    "L'IA lit votre document…": "The AI is reading your document…",
-    "L'IA travaille au mieux sur des vidéos de": "The AI works best on videos of",
-    "Votre procédure apparaîtra dans la liste dès qu'elle sera prête.": "Your procedure will appear in your list as soon as it's ready.",
-    "Lancer l'analyse": "Start the analysis",
-    "Les moins actifs": "Least active",
-    "Les plus actifs": "Most active",
+    "J’ai ma vidéo — l’utiliser": "I have my video — use it",
+    "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": "The language applies to the whole app. Each person can pick their own.",
+    "La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.": "The language applies to the whole app. Procedures are translated separately, from the procedure itself.",
+    "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "The procedure is already in Draft. It opens once the analysis is done.",
+    "Lampe torche": "Flashlight",
+    "Langue": "Language",
+    "Langue de l’application": "App language",
+    "Langue parlée": "Spoken language",
+    "Le chargement n'aboutit pas": "Loading is not finishing",
+    "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "The microphone is on while you record. The steps come mostly from what you say.",
+    "Le QR code fonctionnera une fois la procédure en ligne.": "The QR code works once the procedure is live.",
+    "Lecture": "Play",
+    "Lecture en cours": "Playing",
+    "Les accès de chaque membre permettent de décider l’espace auquel il a accès.": "Each member's access decides which area they can open.",
+    "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": "Video analyses reset every month and do not carry over.",
+    "Les autres procédures ne vous sont pas accessibles": "You cannot open the other procedures",
+    "Les membres de l’espace utilisateur": "The people in the User area",
+    "Les plus lues": "Most read",
+    "Les postes": "Roles",
+    "Limité à 5 min de vidéo": "5 minutes of video at most",
     "Lire": "Play",
+    "Loupe ·": "Zoom ·",
     "Lues": "Read",
-    "Membres illimités · multi-sites": "Unlimited members · multi-site",
+    "L’enregistrement démarre tout de suite — vous avez": "Recording starts right away — you have",
+    "L’IA crée la procédure à partir d’un document": "The AI builds the procedure from a document",
+    "L’IA crée la procédure à partir d’une vidéo": "The AI builds the procedure from a video",
+    "L’IA en tirera des étapes, que vous relirez.": "The AI turns it into steps, and you check them.",
+    "L’IA lit le texte et en tire les étapes, dans l’ordre.": "The AI reads the text and pulls out the steps, in order.",
+    "L’IA rédige la procédure": "The AI writes the procedure",
+    "L’IA transforme la vidéo en procédure": "The AI turns your video into a procedure",
+    "L’IA écrit les étapes à votre place": "The AI writes the steps for you",
+    "Marquez le début et la fin de chaque étape": "Mark where each step starts and ends",
+    "Mettre en favori": "Add to favourites",
+    "Mettre en pause": "Pause",
     "Modifier": "Edit",
-    "Mois": "Month",
+    "Mot de passe": "Password",
+    "Mot de passe oublié ?": "Forgot your password?",
+    "Mouvements": "Changes",
+    "Mouvements de l’équipe": "Team changes",
+    "MP4 ou MOV · 5 minutes au maximum": "MP4 or MOV · 5 minutes at most",
+    "Nom": "Last name",
     "Nom A → Z": "Name A → Z",
     "Nom complet": "Full name",
-    "Nouveau → ancien": "Newest → oldest",
+    "Nom de l'entreprise": "Company name",
+    "Nom de l'établissement": "Site name",
+    "Nom et logo de l’entreprise": "Company name and logo",
+    "Nombre de lectures par procédure.": "How many times each procedure was read.",
+    "Nouvel établissement": "New site",
     "Nouvelle procédure": "New procedure",
-    "Ont consulté": "Have viewed",
-    "Paramètres": "Settings",
-    "Partagez ce code à votre équipe pour qu'elle puisse créer son compte et accéder aux procédures": "Share this code with your team so they can create an account and access the procedures",
-    "Pas encore consultées": "Not viewed yet",
-    "Procédure générée": "Procedure generated",
+    "Ouverture…": "Opening…",
+    "Pas encore consultées": "Not opened yet",
+    "Passez à l’offre supérieure pour agrandir votre équipe.": "Move up a plan to grow your team.",
+    "Photographier le texte": "Photograph the text",
+    "Plus ancien d’abord": "Oldest first",
+    "Plus qu’une place": "One seat left",
+    "Plus récent d’abord": "Newest first",
+    "Plusieurs pages possibles — vous les remettrez dans l’ordre.": "Several pages are fine — you can reorder them after.",
+    "pour vous placer": "to get ready",
+    "Presque prêt": "Almost there",
+    "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Prices exclude tax. You change plan when your team changes, never before.",
+    "Procédure générée": "Procedure ready",
     "Procédures": "Procedures",
-    "Procédures consultées": "Procedures viewed",
-    "Procédures les plus consultées": "Most viewed procedures",
+    "Procédures consultées": "Procedures opened",
+    "Procédures créées": "Procedures created",
+    "Procédures récentes": "Recent procedures",
+    "Profil": "Profile",
+    "Prénom": "First name",
+    "Publier": "Publish",
     "Publier la procédure": "Publish the procedure",
-    "Quelques secondes. Vous relirez chaque étape ensuite.": "A few seconds. You will review each step afterwards.",
-    "Rechercher une procédure...": "Search a procedure…",
-    "Retirer une personne lui coupe immédiatement l'accès aux procédures de l'entreprise. Son compte Standix reste actif : elle pourra rejoindre une autre entreprise avec un nouveau code.": "Removing someone immediately cuts their access to the company procedures. Their Standix account stays active: they can join another company with a new code.",
+    "Quand le temps est mis en pause": "When the timer pauses",
+    "Quel est votre rôle ici ?": "What do you do here?",
+    "Qui fait quoi dans l'entreprise": "Who does what",
+    "Quitter l’entreprise": "Leave the company",
+    "Rechercher une personne": "Search a person",
+    "Rechercher une procédure": "Search a procedure",
+    "Recommencer": "Start over",
+    "Rejoignez notre application et profitez de toutes ses fonctionnalités.": "Join us and get everything the app can do.",
+    "Rejoindre": "Join",
+    "Renommer le dossier": "Rename the folder",
+    "Retirer": "Remove",
+    "Retirer la photo": "Remove the photo",
+    "Retour": "Back",
+    "Réglages": "Settings",
+    "Résultat": "Result",
+    "Révoquer": "Revoke",
     "Scanner un code": "Scan a code",
     "Scannez pour ouvrir la procédure": "Scan to open the procedure",
-    "Se déconnecter": "Sign out",
-    "Semaine": "Week",
-    "Terminer le réglage": "Finish adjusting",
+    "Se connecter": "Log in",
+    "Se déconnecter": "Log out",
+    "Seul le dernier mois est affiché.": "Only the last month is shown.",
+    "Seul le dernier mois est conservé.": "Only the last month is kept.",
+    "Son logo apparaîtra dans la barre.": "Its logo appears in the top bar.",
+    "Sous-dossier": "Subfolder",
+    "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": "Standix counts reads per person. While several people share one login, you cannot tell who read what — and your records prove nothing.",
+    "Supprimer": "Delete",
+    "Supprimer cet établissement": "Delete this site",
+    "Supprimer l’entreprise": "Delete the company",
+    "Supprimer mon compte": "Delete my account",
+    "sur 5:00": "of 5:00",
+    "S’inscrire en tant que gérant": "Sign up as owner",
+    "S’inscrire gérant": "Sign up as owner",
+    "S’inscrire utilisateur": "Sign up as user",
+    "Temps cumulé passé sur chaque procédure.": "Total time spent on each procedure.",
+    "Temps de lecture par dossier": "Reading time per folder",
+    "Temps de lecture par personne": "Reading time per person",
+    "Temps de lecture par procédure": "Reading time per procedure",
+    "Temps par procédure": "Time per procedure",
+    "Temps passé sur les procédures.": "Time spent on procedures.",
     "Titre": "Title",
-    "Total": "Total",
-    "Touchez une étape ci-dessous pour régler son clip": "Tap a step below to adjust its clip",
-    "Tous les membres de l'équipe": "All team members",
-    "Trier : A → Z": "Sort: A → Z",
-    "Trier : les plus actifs": "Sort: most active",
-    "Télécharger la fiche": "Download the sheet",
-    "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "A problem, an idea, a question about Standix? We read everything and reply as soon as we can.",
-    "Une consigne écrite, une fiche, un mode d'emploi": "A written instruction, a sheet, a manual",
-    "Une question ?": "A question?",
-    "Visez le QR code affiché sur un poste pour ouvrir sa procédure": "Point at the QR code displayed at a station to open its procedure",
-    "Voir la procédure": "View the procedure",
-    "Votre abonnement": "Your plan",
-    "Votre compte et votre abonnement": "Your account and your plan",
-    "Votre texte": "Your text",
-    "Votre équipe": "Your team",
-    "Vous pouvez quitter cette page": "You can leave this page",
-    "Vue d'ensemble de votre entreprise": "Overview of your company",
-    "Vérifiez et ajustez avant de continuer": "Check and adjust before continuing",
-    "avant publication.": "before publishing.",
-    "chevauchement": "overlap",
-    "couvert": "covered",
-    "moins de 5 minutes": "under 5 minutes",
-    "ou": "or",
-    "relire et corriger": "review and correct",
+    "Touchez l’œil, en bas à droite, pour voir l’espace Utilisateur.": "Tap the eye, bottom right, to see the User area.",
+    "Touchez une étape ci-dessous pour régler son clip": "Tap a step below to set its clip",
+    "Tout voir": "See all",
+    "Toutes": "All",
+    "Trier": "Sort",
+    "Trier les dossiers": "Sort the folders",
+    "Trois gestes, puis revenez ici importer la vidéo.": "Three taps, then come back here to add the video.",
     "trou": "gap",
-    "Accéder directement à la procédure en scannant le QR code": "Scan the QR code to open the procedure straight away",
+    "Télécharger en PDF": "Download as PDF",
+    "Télécharger la fiche": "Download the sheet",
+    "Un compte est partagé": "An account is being shared",
+    "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "A problem, an idea, a question about Standix? We read everything and reply as fast as we can.",
+    "Utilisez ce code pour donner à votre équipe l’accès utilisateur aux procédures. Vous pourrez ensuite leur donner accès à l’espace Gestion.": "Use this code to give your team user access to the procedures. You can give them the Management area afterwards.",
+    "Vidéo générée par l’IA Standix": "Video generated by Standix AI",
+    "Visez le QR code": "Point at the QR code",
+    "Voir comme l’équipe": "See it as the team does",
+    "Voir l'équipe": "See the team",
+    "Voir la procédure": "Open the procedure",
+    "Voir les offres": "See the plans",
+    "Voir plus": "See more",
+    "Voir toute la vidéo": "See the whole video",
+    "Vos appareils numériques": "Your devices",
+    "Vos paroles": "What you say",
+    "Votre compte": "Your account",
+    "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": "Your account is not linked to a company. Enter the 6-character code.",
+    "Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.": "Your name appears in the team list and on what you read. The email cannot be changed here.",
+    "Votre poste": "Your role",
+    "Votre profil": "Your profile",
+    "Votre savoir-faire transmis simplement": "Your know-how, passed on simply",
+    "Votre texte": "Your text",
+    "Votre vidéo": "Your video",
+    "Vous avez déjà un compte ?": "Already have an account?",
+    "Vous pouvez quitter cette page.": "You can leave this page.",
+    "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "You can be logged in on 3 devices at once.",
+    "Vous relirez chaque étape avant de publier.": "You will check every step before publishing.",
+    "Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran une fois terminé pour la rendre accessible aux autres gestionnaires.": "You are the only one who can edit this procedure right now. Leave this screen when you are done so other managers can open it.",
+    "Vérifiez et ajustez avant de continuer": "Check and adjust before you continue",
+    "Zoomer": "Zoom in",
     "À lire": "To read",
-    "Écrivez chaque étape dans l'ordre": "Write each step in order",
+    "Écrivez chaque étape dans l’ordre": "Write each step in order",
     "Écrivez chaque étape vous-même": "Write each step yourself",
-    "Écrivez les étapes, ou découpez une vidéo": "Write the steps, or cut a video",
     "Écrivez-nous": "Write to us",
+    "Équipe": "Team",
     "Étapes": "Steps",
-    "Étapes de la procédure": "Procedure steps",
+    "Étapes de la procédure": "Steps",
     "Étapes liées": "Linked steps",
-    "Étapes manuelles": "Manual steps",
-    "— la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "— the procedure will appear in your list as soon as it is ready.",
-    "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "the procedure is already shown on the “En dév.” page. It will be available when the analysis is finished.",
-
-    // ── espace équipe ──
-    // ── navigation et en-têtes ──
-    'Espace \u00c9quipe': 'Team space',
-    'Proc\u00e9dures': 'Procedures',
-    'Activit\u00e9': 'Activity',
-    'Cat\u00e9gories': 'Categories',
-    'Param\u00e8tres': 'Settings',
-    'Scanner un code': 'Scan a code',
-    'Mon activit\u00e9': 'My activity',
-    'Bonjour \uD83D\uDC4B': 'Hello \uD83D\uDC4B',
-    'Chargement\u2026': 'Loading\u2026',
-    // ── accueil et listes ──
-    'Rechercher une proc\u00e9dure': 'Search a procedure',
-    'Rechercher dans cette cat\u00e9gorie': 'Search in this category',
-    'Cat\u00e9gorie': 'Category',
-    '\u00c0 lire': 'To read',
-    'Lue': 'Read',
-    'Lues': 'Read',
-    'Temps total': 'Total time',
-    "Jours d'affil\u00e9e": 'Day streak',
-    'En tout': 'In total',
-    // ── écran d'activité ──
-    'En chiffres': 'In figures',
-    'Par cat\u00e9gorie': 'By category',
-    'Temps par proc\u00e9dure': 'Time per procedure',
-    'Rien ne vous attend': 'Nothing pending',
-    'Taux de lecture': 'Reading rate',
-    'Cette semaine': 'This week',
-    'Temps moyen par proc\u00e9dure': 'Average time per procedure',
-    'Journ\u00e9es actives': 'Active days',
-    'Derni\u00e8re lecture': 'Last read',
-    'Plus longue lecture': 'Longest read',
-    // ── fiche d'une procédure ──
-    'Lire dans une autre langue': 'Read in another language',
-    '\u00c9tapes de la proc\u00e9dure': 'Procedure steps',
-    'Lecture en cours': 'Reading',
-    'Proc\u00e9dure consult\u00e9e': 'Procedure read',
-    'Aucune \u00e9tape': 'No steps',
-    'Les autres proc\u00e9dures ne vous sont pas accessibles': 'The other procedures are not available to you',
-    "Demandez le code de l'entreprise \u00e0 votre responsable pour y acc\u00e9der.": 'Ask your manager for the company code to access them.',
-    // ── scanner ──
-    'Autorisez la cam\u00e9ra pour scanner': 'Allow the camera to scan',
-    'Visez le QR code': 'Point at the QR code',
-    'Code reconnu': 'Code recognised',
-    'Acc\u00e9der \u00e0 la proc\u00e9dure': 'Open the procedure',
-    "Ce n'est pas celle-l\u00e0": "That's not the one",
-    'Bienvenue': 'Welcome',
-    // ── réglages ──
-    'Votre compte et votre entreprise': 'Your account and your company',
-    'Vos informations': 'Your details',
-    'Nom complet': 'Full name',
-    'E-mail': 'Email',
-    'Enregistrer': 'Save',
-    'Langue': 'Language',
-    "Langue de l'application": 'App language',
-    'Vos entreprises': 'Your companies',
-    'Rejoindre': 'Join',
-    'Rejoindre une autre entreprise': 'Join another company',
-    'D\u00e9bloquer': 'Unlock',
-    "Entrez le code \u00e0 6 caract\u00e8res que votre responsable vous a communiqu\u00e9. Il sera retenu : l'entreprise appara\u00eetra dans la liste au-dessus.":
-      'Enter the 6-character code your manager gave you. It will be remembered: the company will appear in the list above.',
-    'Une question ?': 'A question?',
-    '\u00c9crivez-nous': 'Write to us',
-    'Un souci, une id\u00e9e, une question sur Standix ? Nous lisons tout et nous r\u00e9pondons au plus vite.':
-      'A problem, an idea, a question about Standix? We read everything and reply as soon as we can.',
-    'Compte': 'Account',
-    'Se d\u00e9connecter': 'Sign out',
+    "Étapes manuelles": "Write the steps",
+    "Éteindre la caméra": "Turn off the camera",
+    "— ce que vous expliquez pendant chaque geste": "— your explanation during each move",
+    "— objets et texte à l’écran": "— objects and text in the picture",
   },
-
+  de: {
+    "(optionnel)": "(optional)",
+    "+ Ajouter une étape": "+ Schritt hinzufügen",
+    "1 an": "1 Jahr",
+    "1 min": "1 Min.",
+    "1 à 2 min": "1 bis 2 Min.",
+    "15 minutes": "15 Minuten",
+    "2 heures": "2 Stunden",
+    "3 min": "3 Min.",
+    "30 jours": "30 Tage",
+    "4 à 5 min": "4 bis 5 Min.",
+    "5 min": "5 Min.",
+    "6 à 7 min": "6 bis 7 Min.",
+    "7 jours": "7 Tage",
+    "8 caractères minimum": "Mindestens 8 Zeichen",
+    "Abandonner et supprimer": "Verwerfen und löschen",
+    "Abonnement": "Abo",
+    "Accès": "Zugriff",
+    "Accéder directement à la procédure en scannant le QR code": "Mit dem QR-Code direkt zur Anleitung",
+    "Activité": "Aktivität",
+    "Activité de l’équipe": "Team-Aktivität",
+    "Afficher le mot de passe": "Passwort anzeigen",
+    "Ajouter": "Hinzufügen",
+    "Ajouter des vidéos": "Videos hinzufügen",
+    "Ajouter une page": "Seite hinzufügen",
+    "Ajouter une photo": "Foto hinzufügen",
+    "Ajoutez votre document": "Dokument hinzufügen",
+    "Ajoutez votre vidéo": "Video hinzufügen",
+    "Analyse": "Auswertung",
+    "Annuler": "Abbrechen",
+    "Annuler (défaire)": "Rückgängig",
+    "Annuler la dernière action": "Letzte Aktion rückgängig machen",
+    "Annuler la dernière coupure": "Letzten Schnitt rückgängig machen",
+    "Annuler les modifications": "Änderungen verwerfen",
+    "Appuyez pour filmer · 5 min au maximum": "Zum Aufnehmen drücken · höchstens 5 Min.",
+    "Assembler": "Zusammenfügen",
+    "Aucun dossier": "Keine Ordner",
+    "Aucun poste n'a encore été défini par votre responsable.": "Ihre Führungskraft hat noch keine Positionen angelegt.",
+    "Aucune entreprise": "Kein Unternehmen",
+    "Aucune procédure pour l’instant": "Noch keine Anleitungen",
+    "Bienvenue": "Willkommen",
+    "Bonjour,": "Hallo,",
+    "Ce mois-ci": "Diesen Monat",
+    "Ce que l’IA analyse": "Was die KI auswertet",
+    "Ce qui est visible": "Was zu sehen ist",
+    "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist.",
+    "Changer de caméra": "Kamera wechseln",
+    "Changer la photo de profil": "Profilfoto ändern",
+    "Changer mon mot de passe": "Passwort ändern",
+    "chevauchement": "Überschneidung",
+    "Choisir l’écran et démarrer": "Bildschirm wählen und starten",
+    "Choisir une vidéo": "Video wählen",
+    "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Wählen Sie, wie lange der Einladungscode gültig bleibt.",
+    "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
+    "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst.",
+    "Cliquez ici pour nous écrire": "Hier klicken, um uns zu schreiben",
+    "Code d'accès rapide": "Schnellzugriff-Code",
+    "Code d'invitation": "Einladungscode",
+    "Code de l'entreprise (6 caractères)": "Unternehmenscode (6 Zeichen)",
+    "Codes d'invitation": "Einladungscodes",
+    "Coller": "Einfügen",
+    "Coller les vidéos": "Videos zusammenfügen",
+    "Coller plusieurs vidéos": "Mehrere Videos zusammenfügen",
+    "Collez ici votre procédure, votre note de service, votre mode d'emploi…": "Fügen Sie hier Ihre Anleitung, Ihr Rundschreiben, Ihre Bedienungsanleitung ein…",
+    "Collez un QR code là où le geste se fait : on scanne, la procédure s’ouvre.": "Kleben Sie einen QR-Code dorthin, wo gearbeitet wird: scannen, und die Anleitung öffnet sich.",
+    "Collez un texte, ou déposez un PDF ou un Word": "Text einfügen oder PDF- bzw. Word-Datei ablegen",
+    "Combien de temps ça prend ?": "Wie lange dauert das?",
+    "Comment créer cette procédure ?": "Wie soll sie entstehen?",
+    "Comment les lectures sont comptées": "Wie Aufrufe gezählt werden",
+    "Complétez le titre et le dossier ci-dessus pour continuer.": "Titel und Ordner oben ausfüllen, um fortzufahren.",
+    "Conditions d’utilisation": "Nutzungsbedingungen",
+    "conditions d’utilisation": "Nutzungsbedingungen",
+    "Content de vous revoir": "Schön, Sie wiederzusehen",
+    "Copier": "Kopieren",
+    "Copier ce détail": "Details kopieren",
+    "couvert": "abgedeckt",
+    "Créations": "Erstellt",
+    "Créer mon compte": "Konto erstellen",
+    "Créer un compte": "Konto erstellen",
+    "Créer une procédure": "Neue Anleitung",
+    "Créer une procédure avec": "Anleitung erstellen mit",
+    "Créer une procédure manuellement": "Anleitung selbst schreiben",
+    "Créez vos procédures avec l’IA.": "Erstellen Sie Ihre Anleitungen mit KI.",
+    "Dans l’équipe depuis": "Im Team seit",
+    "Demandez le code de l'entreprise à votre responsable pour y accéder.": "Fragen Sie Ihre Führungskraft nach dem Unternehmenscode.",
+    "Depuis le début": "Seit Beginn",
+    "Dernière consultation": "Zuletzt geöffnet",
+    "Dezoomer": "Verkleinern",
+    "Diviser": "Teilen",
+    "Dossier": "Ordner",
+    "Dossiers": "Ordner",
+    "Débloquer": "Freischalten",
+    "Début": "Anfang",
+    "Début ici": "Anfang hier",
+    "Découper la vidéo": "Video schneiden",
+    "Découvrez toutes les fonctionnalités sans engagement.": "Alles ausprobieren. Keine Verpflichtung.",
+    "Définissez les postes de votre établissement. Chaque membre choisira le sien.": "Legen Sie die Positionen an Ihrem Standort fest. Jedes Mitglied wählt seine eigene.",
+    "Détail technique": "Technische Details",
+    "E-mail": "E-Mail",
+    "Effacer la recherche": "Suche löschen",
+    "Elle apparaît en tête de la fiche. Facultative.": "Erscheint oben in der Anleitung. Optional.",
+    "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": "Erscheint auf der Karte und oben in der Anleitung. Optional.",
+    "Employés": "Mitarbeitende",
+    "En créant votre compte, vous acceptez les": "Mit dem Erstellen Ihres Kontos akzeptieren Sie die",
+    "En dév.": "Entwurf",
+    "En ligne": "Live",
+    "Enregistrer": "Speichern",
+    "Enregistrer la vidéo": "Video speichern",
+    "Enregistrer les modifications": "Änderungen speichern",
+    "Enregistrer l’écran": "Bildschirm aufnehmen",
+    "Espace Utilisateur": "Nutzerbereich",
+    "Essai 14 jours gratuit": "14 Tage kostenlos",
+    "Ex : Accueil": "z. B. Empfang",
+    "Ex : Accueillir un client": "z. B. Einen Kunden empfangen",
+    "Ex : Le Comptoir": "z. B. Der Tresen",
+    "Ex : Responsable": "z. B. Leitung",
+    "Ex : Réception client": "z. B. Kundenempfang",
+    "Facultatif · les initiales serviront sinon": "Optional · sonst werden die Initialen verwendet",
+    "Faites glisser pour affiner au dixième de seconde": "Ziehen Sie, um auf die Zehntelsekunde genau einzustellen",
+    "Favoris": "Favoriten",
+    "Fermer": "Schließen",
+    "Fichier": "Datei",
+    "Filmer": "Aufnehmen",
+    "Filmez la tâche en expliquant à voix haute. Cinq minutes maximum.": "Nehmen Sie die Aufgabe auf und erklären Sie sie laut. Höchstens fünf Minuten.",
+    "Fin": "Ende",
+    "Fin ici": "Ende hier",
+    "Fonctionnement des boutons": "So funktionieren die Schaltflächen",
+    "Gestion des accès": "Zugriff",
+    "Générer les étapes": "Schritte erzeugen",
+    "Générez un code pour que votre équipe puisse accéder aux procédures.": "Erstellen Sie einen Code, damit Ihr Team die Anleitungen öffnen kann.",
+    "Ignorer": "Ausblenden",
+    "Inscription gérant": "Registrierung Inhaber",
+    "Inscription utilisateur": "Registrierung Nutzer",
+    "Inviter votre équipe": "Team einladen",
+    "Jours actifs": "Aktive Tage",
+    "J’ai ma vidéo — l’utiliser": "Video ist fertig — verwenden",
+    "La langue vaut pour toute l'application. Chaque employé peut choisir la sienne de son côté.": "Die Sprache gilt für die ganze App. Jede Person kann ihre eigene wählen.",
+    "La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.": "Die Sprache gilt für die ganze App. Anleitungen werden einzeln übersetzt, direkt in der Anleitung.",
+    "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "Die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
+    "Lampe torche": "Taschenlampe",
+    "Langue": "Sprache",
+    "Langue de l’application": "Sprache der App",
+    "Langue parlée": "Gesprochene Sprache",
+    "Le chargement n'aboutit pas": "Das Laden kommt nicht zum Ende",
+    "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "Das Mikrofon ist während der Aufnahme an. Die Schritte entstehen vor allem aus dem, was Sie sagen.",
+    "Le QR code fonctionnera une fois la procédure en ligne.": "Der QR-Code funktioniert, sobald die Anleitung live ist.",
+    "Lecture": "Abspielen",
+    "Lecture en cours": "Wird abgespielt",
+    "Les accès de chaque membre permettent de décider l’espace auquel il a accès.": "Der Zugriff jedes Mitglieds entscheidet, welchen Bereich es öffnen kann.",
+    "Les analyses vidéo se renouvellent chaque mois et ne se reportent pas.": "Videoauswertungen werden monatlich zurückgesetzt und nicht übertragen.",
+    "Les autres procédures ne vous sont pas accessibles": "Die anderen Anleitungen können Sie nicht öffnen",
+    "Les membres de l’espace utilisateur": "Die Personen im Nutzerbereich",
+    "Les plus lues": "Am meisten gelesen",
+    "Les postes": "Positionen",
+    "Limité à 5 min de vidéo": "Höchstens 5 Minuten Video",
+    "Lire": "Abspielen",
+    "Loupe ·": "Lupe ·",
+    "Lues": "Gelesen",
+    "L’enregistrement démarre tout de suite — vous avez": "Die Aufnahme startet sofort — Sie haben",
+    "L’IA crée la procédure à partir d’un document": "Die KI erstellt die Anleitung aus einem Dokument",
+    "L’IA crée la procédure à partir d’une vidéo": "Die KI erstellt die Anleitung aus einem Video",
+    "L’IA en tirera des étapes, que vous relirez.": "Die KI macht daraus Schritte, die Sie prüfen.",
+    "L’IA lit le texte et en tire les étapes, dans l’ordre.": "Die KI liest den Text und zieht die Schritte der Reihe nach heraus.",
+    "L’IA rédige la procédure": "Die KI schreibt die Anleitung",
+    "L’IA transforme la vidéo en procédure": "Die KI macht aus Ihrem Video eine Anleitung",
+    "L’IA écrit les étapes à votre place": "Die KI schreibt die Schritte für Sie",
+    "Marquez le début et la fin de chaque étape": "Markieren Sie Anfang und Ende jedes Schritts",
+    "Mettre en favori": "Zu Favoriten hinzufügen",
+    "Mettre en pause": "Pause",
+    "Modifier": "Bearbeiten",
+    "Mot de passe": "Passwort",
+    "Mot de passe oublié ?": "Passwort vergessen?",
+    "Mouvements": "Änderungen",
+    "Mouvements de l’équipe": "Team-Änderungen",
+    "MP4 ou MOV · 5 minutes au maximum": "MP4 oder MOV · höchstens 5 Minuten",
+    "Nom": "Nachname",
+    "Nom A → Z": "Name A → Z",
+    "Nom complet": "Vollständiger Name",
+    "Nom de l'entreprise": "Name des Unternehmens",
+    "Nom de l'établissement": "Name des Standorts",
+    "Nom et logo de l’entreprise": "Name und Logo des Unternehmens",
+    "Nombre de lectures par procédure.": "Wie oft jede Anleitung gelesen wurde.",
+    "Nouvel établissement": "Neuer Standort",
+    "Nouvelle procédure": "Neue Anleitung",
+    "Ouverture…": "Wird geöffnet…",
+    "Pas encore consultées": "Noch nicht geöffnet",
+    "Passez à l’offre supérieure pour agrandir votre équipe.": "Wechseln Sie in den nächsten Tarif, um Ihr Team zu vergrößern.",
+    "Photo": "Foto",
+    "Photographier le texte": "Text abfotografieren",
+    "Plus ancien d’abord": "Älteste zuerst",
+    "Plus qu’une place": "Nur noch ein Platz",
+    "Plus récent d’abord": "Neueste zuerst",
+    "Plusieurs pages possibles — vous les remettrez dans l’ordre.": "Mehrere Seiten sind möglich — Sie ordnen sie danach.",
+    "pour vous placer": "um sich bereitzumachen",
+    "Presque prêt": "Fast fertig",
+    "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher.",
+    "Procédure générée": "Anleitung fertig",
+    "Procédures": "Anleitungen",
+    "Procédures consultées": "Geöffnete Anleitungen",
+    "Procédures créées": "Erstellte Anleitungen",
+    "Procédures récentes": "Neueste Anleitungen",
+    "Prénom": "Vorname",
+    "Publier": "Veröffentlichen",
+    "Publier la procédure": "Anleitung veröffentlichen",
+    "QR code": "QR-Code",
+    "Quand le temps est mis en pause": "Wann die Zeit angehalten wird",
+    "Quel est votre rôle ici ?": "Was machen Sie hier?",
+    "Qui fait quoi dans l'entreprise": "Wer macht was",
+    "Quitter l’entreprise": "Unternehmen verlassen",
+    "Rechercher une personne": "Person suchen",
+    "Rechercher une procédure": "Anleitung suchen",
+    "Recommencer": "Neu beginnen",
+    "Rejoignez notre application et profitez de toutes ses fonctionnalités.": "Machen Sie mit und nutzen Sie alles, was die App kann.",
+    "Rejoindre": "Beitreten",
+    "Renommer le dossier": "Ordner umbenennen",
+    "Retirer": "Entfernen",
+    "Retirer la photo": "Foto entfernen",
+    "Retour": "Zurück",
+    "Réglages": "Einstellungen",
+    "Résultat": "Ergebnis",
+    "Révoquer": "Widerrufen",
+    "Scanner un code": "Code scannen",
+    "Scannez pour ouvrir la procédure": "Scannen, um die Anleitung zu öffnen",
+    "Se connecter": "Anmelden",
+    "Se déconnecter": "Abmelden",
+    "Seul le dernier mois est affiché.": "Nur der letzte Monat wird angezeigt.",
+    "Seul le dernier mois est conservé.": "Nur der letzte Monat wird gespeichert.",
+    "Son logo apparaîtra dans la barre.": "Sein Logo erscheint in der oberen Leiste.",
+    "Sous-dossier": "Unterordner",
+    "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": "Standix zählt Aufrufe pro Person. Solange mehrere Personen denselben Zugang nutzen, wissen Sie nicht, wer was gelesen hat — und Ihre Nachweise belegen nichts.",
+    "Supprimer": "Löschen",
+    "Supprimer cet établissement": "Diesen Standort löschen",
+    "Supprimer l’entreprise": "Unternehmen löschen",
+    "Supprimer mon compte": "Mein Konto löschen",
+    "sur 5:00": "von 5:00",
+    "S’inscrire en tant que gérant": "Als Inhaber registrieren",
+    "S’inscrire gérant": "Als Inhaber registrieren",
+    "S’inscrire utilisateur": "Als Nutzer registrieren",
+    "Temps cumulé passé sur chaque procédure.": "Gesamte Zeit pro Anleitung.",
+    "Temps de lecture par dossier": "Lesezeit pro Ordner",
+    "Temps de lecture par personne": "Lesezeit pro Person",
+    "Temps de lecture par procédure": "Lesezeit pro Anleitung",
+    "Temps par procédure": "Zeit pro Anleitung",
+    "Temps passé sur les procédures.": "Zeit mit Anleitungen.",
+    "Titre": "Titel",
+    "Touchez l’œil, en bas à droite, pour voir l’espace Utilisateur.": "Tippen Sie unten rechts auf das Auge, um den Nutzerbereich zu sehen.",
+    "Touchez une étape ci-dessous pour régler son clip": "Tippen Sie unten auf einen Schritt, um seinen Ausschnitt zu setzen",
+    "Tout voir": "Alle anzeigen",
+    "Toutes": "Alle",
+    "Trier": "Sortieren",
+    "Trier les dossiers": "Ordner sortieren",
+    "Trois gestes, puis revenez ici importer la vidéo.": "Drei Schritte, dann kommen Sie hierher zurück und fügen das Video hinzu.",
+    "trou": "Lücke",
+    "Télécharger en PDF": "Als PDF herunterladen",
+    "Télécharger la fiche": "Blatt herunterladen",
+    "Un compte est partagé": "Ein Konto wird geteilt",
+    "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "Ein Problem, eine Idee, eine Frage zu Standix? Wir lesen alles und antworten so schnell wie möglich.",
+    "Utilisez ce code pour donner à votre équipe l’accès utilisateur aux procédures. Vous pourrez ensuite leur donner accès à l’espace Gestion.": "Mit diesem Code geben Sie Ihrem Team Nutzerzugriff auf die Anleitungen. Den Verwaltungsbereich können Sie später freigeben.",
+    "Vidéo générée par l’IA Standix": "Von der Standix-KI erzeugtes Video",
+    "Visez le QR code": "Auf den QR-Code richten",
+    "Voir comme l’équipe": "So sehen, wie das Team es sieht",
+    "Voir l'équipe": "Team ansehen",
+    "Voir la procédure": "Anleitung öffnen",
+    "Voir les offres": "Tarife ansehen",
+    "Voir plus": "Mehr anzeigen",
+    "Voir toute la vidéo": "Ganzes Video ansehen",
+    "Vos appareils numériques": "Ihre Geräte",
+    "Vos paroles": "Was Sie sagen",
+    "Votre compte": "Ihr Konto",
+    "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein.",
+    "Votre nom apparaît dans l'équipe et sur vos lectures. L'adresse ne peut pas être modifiée ici.": "Ihr Name erscheint in der Teamliste und bei dem, was Sie lesen. Die E-Mail lässt sich hier nicht ändern.",
+    "Votre poste": "Ihre Position",
+    "Votre profil": "Ihr Profil",
+    "Votre savoir-faire transmis simplement": "Ihr Können, einfach weitergegeben",
+    "Votre texte": "Ihr Text",
+    "Votre vidéo": "Ihr Video",
+    "Vous avez déjà un compte ?": "Sie haben schon ein Konto?",
+    "Vous pouvez quitter cette page.": "Sie können diese Seite verlassen.",
+    "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "Sie können auf höchstens 3 Geräten gleichzeitig angemeldet sein.",
+    "Vous relirez chaque étape avant de publier.": "Sie prüfen jeden Schritt vor dem Veröffentlichen.",
+    "Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran une fois terminé pour la rendre accessible aux autres gestionnaires.": "Nur Sie können diese Anleitung gerade bearbeiten. Verlassen Sie diesen Bildschirm, wenn Sie fertig sind, damit andere Verwalter sie öffnen können.",
+    "Vérifiez et ajustez avant de continuer": "Prüfen und anpassen, bevor Sie weitermachen",
+    "Zoomer": "Vergrößern",
+    "À lire": "Zu lesen",
+    "Écrivez chaque étape dans l’ordre": "Schreiben Sie jeden Schritt der Reihe nach",
+    "Écrivez chaque étape vous-même": "Jeden Schritt selbst schreiben",
+    "Écrivez-nous": "Schreiben Sie uns",
+    "Équipe": "Team",
+    "Étapes": "Schritte",
+    "Étapes de la procédure": "Schritte der Anleitung",
+    "Étapes liées": "Verknüpfte Schritte",
+    "Étapes manuelles": "Schritte schreiben",
+    "Éteindre la caméra": "Kamera ausschalten",
+    "— ce que vous expliquez pendant chaque geste": "— Ihre Erklärung zu jedem Handgriff",
+    "— objets et texte à l’écran": "— Gegenstände und Text im Bild",
+  },
+  /* DICO:FIN */
   es: {
     // ── espace gestion ──
     "Préparation": "Preparando",
@@ -572,7 +982,6 @@ const DICO = {
     'Compte': 'Cuenta',
     'Se d\u00e9connecter': 'Cerrar sesi\u00f3n',
   },
-
   pt: {
     // ── espace gestion ──
     "Préparation": "A preparar",
@@ -792,34 +1201,88 @@ function definirLangue(code) {
   synchroniserLangueParlee()
 }
 
+/* ═══ LA CLÉ D'UNE PHRASE ═══
+
+   Le balisage coupe ses longues phrases sur plusieurs lignes, avec
+   l'indentation au milieu : le noeud de texte contient alors des retours à la
+   ligne et des paquets d'espaces que personne ne voit à l'écran.
+
+   Sans cette normalisation, une phrase réindentée perdait sa traduction — sans
+   la moindre erreur, juste du français qui réapparaît. On compare donc des
+   phrases à espaces uniques, et le dictionnaire est écrit de la même façon. */
+const cleTexte = (s) => String(s).replace(/\s+/g, ' ').trim()
+
 /* Traduit une phrase si le dictionnaire la connaît, la laisse telle quelle
    sinon. Une phrase manquante reste en français : c'est moins gênant qu'un
    libellé vide ou qu'un code technique à l'écran. */
 function t(phrase) {
   if (langueApp === 'fr') return phrase
-  return DICO[langueApp]?.[phrase] || phrase
+  return DICO[langueApp]?.[cleTexte(phrase)] || phrase
 }
 
-/* Parcourt les textes de l'espace équipe et remplace ceux que le dictionnaire
-   connaît. On ne touche qu'aux correspondances EXACTES : un titre de procédure
-   ou un nom de dossier ne figure pas dans le dictionnaire, il ne risque donc
-   jamais d'être modifié. */
-function appliquerLangue() {
-  /* Les deux espaces sont traduits, et entièrement : 127 libellés côté gestion,
-     44 côté équipe. Un espace à moitié traduit est plus déroutant qu'un espace
-     en français — c'est tout ou rien. */
-  const racines = [
-    document.getElementById('equipe-app'),
-    document.getElementById('tabbar'),
-    document.getElementById('gestion-app'),
-    document.getElementById('tabbar'),
-  ].filter(Boolean)
+/* ═══════════════════════════════════════════════════════════════════════════
+   ON REPEINT TOUTE L'INTERFACE DANS LA LANGUE CHOISIE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   On parcourt les noeuds de texte et on remplace ceux que le dictionnaire
+   connaît, à la phrase exacte près. Un titre de procédure ou un nom de dossier
+   n'y figure pas : il ne risque donc jamais d'être modifié.
+
+ ⚠ LES ÉCRANS DE CONNEXION SONT DEDANS, ET ILS N'Y ÉTAIENT PAS. La liste des
+   racines s'arrêtait aux deux espaces et à la barre : tout ce qu'on voit AVANT
+   d'être connecté — bienvenue, inscription, connexion — restait en français
+   quelle que soit la langue. C'est pourtant le premier écran que voit un
+   nouvel arrivant.
+
+ ⚠ ET LES TEXTES QUI NE SONT PAS DU TEXTE. Un bouton sans libellé écrit porte
+   son sens dans `aria-label` : c'est ce que lit à voix haute un lecteur
+   d'écran, et c'est ce qu'affiche l'infobulle. Ils restaient en français pour
+   quelqu'un qui navigue à l'oreille — donc la moitié de l'app inaccessible.
+   `placeholder`, `aria-label` et `title` sont traités comme le reste.
+
+ ⚠ ON MÉMORISE L'ORIGINAL SUR CHAQUE NOEUD (`__vo`). Sans lui, revenir au
+   français après deux changements de langue serait impossible : on ne saurait
+   plus de quelle phrase on est parti.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const ATTRIBUTS_TRADUITS = ['placeholder', 'aria-label', 'title']
+
+/* ⚠ ON PARCOURT TOUTE LA PAGE, PLUS UNE LISTE DE RACINES.
+
+   La liste nommait cinq conteneurs. Mesuré : QUARANTE-DEUX textes vivaient
+   en dehors, dans huit fenêtres posées directement sous `<body>` — la barre
+   de navigation du bas (la liste visait `#tabbar`, qui n'est pas elle), les
+   fenêtres de connexion et d'inscription, « Aucune entreprise », « Nouvel
+   établissement », l'écran de la caméra. Ils restaient en français quelle que
+   soit la langue.
+
+   Une liste à tenir à jour à la main oublie chaque nouvelle fenêtre. Le
+   document entier ne peut rien oublier.
+
+ ⚠ CE QUI NE DOIT JAMAIS ÊTRE TRADUIT porte `translate="no"` — l'attribut HTML
+   standard, que respectent aussi les traducteurs des navigateurs. Un nom de
+   dossier, un titre de procédure, le nom d'un collègue : c'est le contenu de
+   l'entreprise, pas l'interface. Le remplacement se fait à la phrase exacte,
+   donc un texte libre ne risque rien ; mais un dossier nommé tout juste
+   « Équipe » deviendrait « Team ». `translate="no"` le protège.
+
+ ⚠ ET LES SCRIPTS, LES STYLES : leur texte n'est pas affiché. */
+const HORS_TRADUCTION = 'script, style, template, [translate="no"]'
+
+function appliquerLangue(zone) {
+  /* Sans argument, toute la page. Avec une zone, elle seule : c'est ce que
+     fait la barre du bas quand elle se reconstruit — repasser tout le
+     document à chaque bascule d'espace serait du travail pour rien. */
+  const racines = [zone || document.body].filter(Boolean)
 
   const dico = DICO[langueApp]
+  const vers = (vo) => (langueApp === 'fr' ? vo : (dico?.[cleTexte(vo)] || vo))
   document.documentElement.lang = langueApp
 
   for (const racine of racines) {
-    const parcours = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT)
+    const parcours = document.createTreeWalker(racine, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => n.parentElement?.closest(HORS_TRADUCTION)
+        ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT,
+    })
     const aTraiter = []
     let n
     while ((n = parcours.nextNode())) aTraiter.push(n)
@@ -827,19 +1290,43 @@ function appliquerLangue() {
     for (const noeud of aTraiter) {
       const brut = noeud.nodeValue.trim()
       if (!brut) continue
-      // On garde l'original une fois pour toutes : sans lui, repasser en
-      // français après deux changements de langue serait impossible.
       if (!noeud.__vo) noeud.__vo = brut
-      const cible = langueApp === 'fr' ? noeud.__vo : (dico?.[noeud.__vo] || noeud.__vo)
+      /* ⚠ LES HOMONYMES : `data-tr` DONNE LE SENS.
+
+         Le français emploie le même mot pour deux gestes différents.
+         « Enregistrer » veut dire filmer OU sauvegarder ; « Annuler » veut dire
+         abandonner OU défaire. Indexé sur le seul mot, le dictionnaire ne peut
+         en retenir qu'un sens — et l'autre bouton s'affiche faux, dans une
+         langue que l'auteur ne lit peut-être pas.
+
+         Le parent qui porte `data-tr="Annuler (défaire)"` fournit alors la clé
+         à la place du texte. À l'écran, en français, rien ne change : on lit
+         toujours « Annuler ». Seule la traduction apprend lequel des deux. */
+      const cle = noeud.parentElement?.dataset?.tr
+      const cible = langueApp === 'fr' ? noeud.__vo : (cle ? (dico?.[cle] || noeud.__vo) : vers(noeud.__vo))
       if (noeud.nodeValue.trim() !== cible) noeud.nodeValue = noeud.nodeValue.replace(brut, cible)
     }
-    // Les textes d'invite des champs de saisie
-    racine.querySelectorAll('[placeholder]').forEach(el => {
-      if (!el.__vo) el.__vo = el.getAttribute('placeholder')
-      el.setAttribute('placeholder', langueApp === 'fr' ? el.__vo : (dico?.[el.__vo] || el.__vo))
-    })
+
+    for (const attr of ATTRIBUTS_TRADUITS) {
+      racine.querySelectorAll('[' + attr + ']').forEach(el => {
+        if (el.closest(HORS_TRADUCTION)) return
+        /* Une clé de mémoire par attribut : un même bouton peut porter un
+           `aria-label` et un `title` différents. */
+        const memo = '__vo_' + attr
+        if (!el[memo]) el[memo] = el.getAttribute(attr)
+        el.setAttribute(attr, vers(el[memo]))
+      })
+    }
   }
 }
+
+/* ⚠ EXPOSÉE POUR LA BARRE DU BAS.
+
+   La barre est construite par le script de `index.html`, qui ne voit pas ce
+   module. Elle réécrit ses onglets par `innerHTML` à chaque bascule d'espace —
+   avec les libellés FRANÇAIS de `LABELS_GESTION` / `LABELS_EQUIPE`. Sans ce
+   rappel, les onglets repassaient en français dès qu'on changeait d'espace. */
+window.traduireZone = (el) => { if (el) appliquerLangue(el) }
 
 let selectedSpace = 'gestion' // espace choisi sur le premier écran
 
@@ -1889,10 +2376,41 @@ const MDP_MIN = 8
 
 /* Le libellé de l'écran d'inscription lit la même constante : impossible qu'il
    annonce un chiffre et que le contrôle en applique un autre. */
-document.addEventListener('DOMContentLoaded', () => {
+/* ═══ CE QUI SE POSE AU DÉMARRAGE ═══
+
+ ⚠ PAS DE `DOMContentLoaded` ICI — IL EST DÉJÀ PASSÉ.
+
+   Ce fichier est un module (`type="module"`) qui importe Supabase depuis un
+   CDN. Le temps que cette ligne s'exécute, le navigateur a presque toujours
+   fini de lire la page : `readyState` vaut déjà `interactive`, l'événement a
+   été émis, et un écouteur inscrit maintenant ne se déclenche JAMAIS. Mesuré.
+
+   C'est ce qui arrivait : les deux lignes ci-dessous ne tournaient pas. Le
+   minimum du mot de passe s'affichait juste quand même, mais seulement parce
+   qu'il était aussi écrit en dur dans le balisage — et la langue enregistrée,
+   elle, n'était jamais posée sur les écrans de connexion.
+
+   Même garde que pour les logos, plus bas dans ce fichier : si la page est
+   encore en lecture on attend l'événement, sinon on agit tout de suite. */
+function auDemarrage() {
   const n = document.getElementById('insc-mdp-min')
   if (n) n.textContent = `${MDP_MIN} caract\u00e8res minimum`
-}, { once: true })
+
+  /* LA LANGUE SE POSE DÈS L'OUVERTURE, AVANT TOUTE CONNEXION.
+
+     `chargerLangue` n'était appelée qu'en entrant dans l'un des deux espaces.
+     Tout ce qui précède — bienvenue, inscription, connexion — restait donc en
+     français quelle que soit la langue enregistrée. C'est le premier écran
+     d'un nouvel arrivant, celui où il décide s'il comprend l'app.
+
+     La langue vit dans `localStorage` : elle survit à la déconnexion et se lit
+     sans compte. L'appel d'après connexion reste — il repeint les écrans des
+     deux espaces, qui n'existent pas encore à cet instant. */
+  chargerLangue()
+}
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', auDemarrage, { once: true })
+} else auDemarrage()
 
 async function verifierRetourMotDePasse() {
   /* ⚠ CE TEST BLOQUAIT LE NOUVEAU FLUX.
@@ -3770,8 +4288,7 @@ function peindreReglages() {
     el('reg-nb-etabs').textContent = ne > 1 ? `${ne} \u00e9tablissements` : '1 \u00e9tablissement'
   }
 
-  const l = LANGUES.find(x => x.code === langueApp)
-  if (el('reg-langue-val')) el('reg-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
+  ecrireValeurLangue('reg-langue-val')
   peindreReglagesEquipe()
 
   /* ⚠ L'ADRESSE VIENT DE `emailSession`, PLUS DU CHAMP `#settings-email`.
@@ -26921,8 +27438,7 @@ function peindreReglagesEquipe() {
 
   /* Le compteur `es-nb-ent` a disparu avec sa ligne : la carte « Vos
      établissements » montre les entreprises elle-même, une par cercle. */
-  const l = LANGUES.find(x => x.code === langueApp)
-  if (el('es-langue-val')) el('es-langue-val').textContent = l?.nom || 'Fran\u00e7ais'
+  ecrireValeurLangue('es-langue-val')
 }
 
 window.openEquipeSettings = async function() {
@@ -31077,13 +31593,48 @@ async function enregistrerConsultation() {
 
 /* Le même sélecteur dans les deux espaces : le gérant a autant de raisons de
    changer de langue que ses équipiers. */
+/* La valeur de la ligne « Langue » dans les reglages : le drapeau, puis le
+   nom. On la lit alors sans ouvrir la page.
+
+ ⚠ `innerHTML` ET NON `textContent`, puisqu'il y a une balise. Le contenu
+   vient de `LANGUES`, une table ecrite dans ce fichier — jamais de la base,
+   jamais d'une saisie. */
+function ecrireValeurLangue(id) {
+  const e = document.getElementById(id)
+  if (!e) return
+  const l = LANGUES.find(x => x.code === langueApp) || LANGUES[0]
+  e.innerHTML = `<span class="reg-dr" aria-hidden="true">${l.drapeau}</span>${l.nom}`
+}
+
+/* ═══ LE CHOIX DE LA LANGUE ═══
+
+   Une liste d'une colonne, dans une seule carte : le style de `.lgx-liste`,
+   ou tout est explique. Ce qui compte ici :
+
+ ⚠ `aria-checked` ET `role="radio"`, PAS UN SIMPLE BOUTON. Trois boutons dont
+   un porte une coche ne disent rien a un lecteur d'ecran : il annonce trois
+   fois « bouton ». Declares en radios, ils s'annoncent « Français,
+   selectionne, 1 sur 3 ».
+
+ ⚠ LE DRAPEAU EST DECORATIF : `aria-hidden`. Lu a voix haute, il ajouterait
+   « drapeau de la France » devant chaque nom.
+
+ ⚠ LA COCHE EST UN TRACE, pas le caractere « ✓ » : voir `.lgx-co`. */
 function rendreChoixLangueApp() {
-  const balisage = LANGUES.map(l => `
-    <button type="button" class="langue-choix${l.code === langueApp ? ' actif' : ''}" data-langue="${l.code}">
-      <span class="dr">${l.drapeau}</span>
-      <span class="nm">${l.nom}</span>
-      ${l.code === langueApp ? '<span class="coche">\u2713</span>' : ''}
-    </button>`).join('')
+  const COCHE = '<svg class="lgx-co" viewBox="0 0 24 24" fill="none" aria-hidden="true">'
+    + '<path d="M4.8 12.7l5 5 9.4-10.4" stroke-width="2.4" '
+    + 'stroke-linecap="round" stroke-linejoin="round"/></svg>'
+
+  const balisage = LANGUES.map(l => {
+    const ici = l.code === langueApp
+    return `
+    <button type="button" role="radio" aria-checked="${ici}"
+            class="lgx-opt${ici ? ' actif' : ''}" data-langue="${l.code}">
+      <span class="lgx-dr" aria-hidden="true">${l.drapeau}</span>
+      <span class="lgx-tx"><span class="lgx-nm">${l.nom}</span></span>
+      ${ici ? COCHE : ''}
+    </button>`
+  }).join('')
 
   for (const id of ['langue-app', 'langue-app-gestion']) {
     const zone = document.getElementById(id)

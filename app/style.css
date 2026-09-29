@@ -25649,3 +25649,14 @@ html::-webkit-scrollbar-thumb:hover{
 #p-membres .page-tete p, .dv-geste .s{
   text-wrap:balance;
 }
+
+/* Traduction d'une procédure en cours : l'original reste lisible, un peu
+   estompé, le temps que la version traduite arrive. */
+.trad-attente{opacity:.55;transition:opacity .25s ease}
+#detail-steps,#analyse-steps-list,#detail-titre,#analyse-titre{transition:opacity .25s ease}
+
+
+/* « Créer une procédure » à la taille du titre « Procédures » de la liste. */
+#p-create .detail-header .pagehead{ font-size:calc(32px * var(--ech, 1)); letter-spacing:-0.045em; line-height:1.06; }
+/* De l'air entre le titre et la carte des champs : 4 px → 14 px. */
+#p-create .detail-header + .card{ margin-top:14px; }

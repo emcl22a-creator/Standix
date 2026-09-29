@@ -3787,6 +3787,29 @@ function peindreReglages() {
       if (a && el('reg-email')) el('reg-email').textContent = a
     })
   }
+
+  /* \u2550\u2550\u2550 LA LIGNE DE L'ENTREPRISE, POUR QUI N'EST PAS GERANT \u2550\u2550\u2550
+
+     LE PROFIL D'UN GESTIONNAIRE INVITE NE NOMMAIT PAS SON ENTREPRISE. La carte
+     du dessus \u2014 logo et nom, modifiables \u2014 ne parait qu'au gerant ; quelqu'un
+     qu'on venait de faire passer en gestion perdait donc, en changeant
+     d'espace, le seul element qui lui disait ou il travaillait.
+
+     C'est la meme ligne que dans l'espace utilisateur, peinte par la meme
+     fonction : voir `peindreLigneEntreprise`.
+
+   \u26a0 ON LA MASQUE AU GERANT. Sa carte montre deja ce logo et ce nom ; les deux
+     l'une sous l'autre feraient un doublon. La condition est calquee sur celle
+     de `peindreIdentiteEtab`, pour que les deux ne puissent pas se contredire. */
+  const sienne = (mesEtablissements || [])
+    .find(e => e.id === currentMembre?.entreprise_id)
+  if (sienne && estFondateur(currentMembre)) {
+    const g = el('pg-ent-groupe')
+    if (g) g.style.display = 'none'
+  } else {
+    peindreLigneEntreprise('pg-ent-groupe', 'pg-logo-ent', 'pg-ent-initiales',
+                           'pg-ent-nom', 'pg-ent-role')
+  }
 }
 
 /* Chaque réglage a sa page : on y entre, on en revient. C'est la navigation
@@ -4443,7 +4466,23 @@ document.addEventListener('click', (e) => {
     return
   }
 
-  document.querySelectorAll('.tb-volet').forEach(v => {
+  /* ⚠ SEULEMENT LES VOLETS DE LA BARRE DU HAUT, PAS TOUS LES `.tb-volet`.
+
+     LE BOUTON DE TRI RESTAIT ENCERCLE, LE MENU NE SE REFERMAIT PLUS D'UN
+     SECOND APPUI, ET UN TRI CHOISI LAISSAIT LE VOLET OUVERT. Trois symptomes,
+     une seule cause : cette boucle.
+
+     Les menus de tri — `proc-tri-volet`, `e-proc-tri-volet`, et leurs jumeaux
+     — empruntent la classe `tb-volet` pour son APPARENCE. Ils ont chacun leur
+     propre ecouteur. Mais celui-ci, pose plus haut dans le fichier, s'executait
+     AVANT eux sur le meme clic et leur retirait `ouvert` dans le dos : arrives
+     a leur tour, ils lisaient un etat qui n'etait plus le vrai et decidaient a
+     l'envers.
+
+     Le filtre `[id^="tb-volet-"]` ne garde que les deux volets dont cet
+     ecouteur est reellement le maitre : `tb-volet-gestion` et
+     `tb-volet-equipe`, ceux que la ligne suivante deduit d'un `tb-menu-`. */
+  document.querySelectorAll('.tb-volet[id^="tb-volet-"]').forEach(v => {
     const sien = bouton && v.id === bouton.id.replace('tb-menu-', 'tb-volet-')
     const ouvrir = (sien && !v.classList.contains('ouvert')) || dedans === v
     if (ouvrir) {
@@ -10205,7 +10244,20 @@ function peindreAnalyseInterne() {
     .filter(([id]) => titreProc(id))
     .map(([id, v]) => ({ id, ...v }))
 
-  const peindreClassement = (zone, cle, format, teinteRang) => {
+  /* ═══ QUAND IL N'Y A PERSONNE À MESURER ═══
+
+     « Aucune lecture sur cette période » laissait croire à un creux — comme si
+     l'équipe avait simplement peu lu cette semaine-là. Or, tant que personne
+     n'a été invité, il n'y a pas d'équipe du tout : aucune période n'y
+     changera rien, et la phrase envoyait chercher un problème là où il n'y en
+     a pas.
+
+     `cachedMembres` porte TOUS les membres, gérant compris — d'où le « <= 1 ».
+     On dit alors quoi faire pour que ces cartes se remplissent. */
+  const seulLeGerant = (cachedMembres || []).length <= 1
+  const INVITER = 'Invitez votre équipe pour voir l’analyse.'
+
+  const peindreClassement = (zone, cle, format, teinteRang, vide) => {
     const z = document.getElementById(zone)
     if (!z) return
     const top = classees
@@ -10228,13 +10280,15 @@ function peindreAnalyseInterne() {
           </span>
           <span class="an-m-q">${format(p[cle])}</span>
         </div>`).join('')
-      : '<div class="an-vide-l">Aucune lecture sur cette période.</div>'
+      : `<div class="an-vide-l">${seulLeGerant ? INVITER : vide}</div>`
   }
 
   peindreClassement('an-vues', 'vues',
-    (n) => n > 1 ? n + ' lectures' : '1 lecture', 1)
+    (n) => n > 1 ? n + ' lectures' : '1 lecture', 1,
+    'Aucune lecture sur cette période.')
 
-  peindreClassement('an-temps-proc', 'sec', anDureeLisible, 3)
+  peindreClassement('an-temps-proc', 'sec', anDureeLisible, 3,
+    'Aucun temps de lecture sur cette période.')
 
   const zE = document.getElementById('an-equipe')
   if (zE) {
@@ -12492,7 +12546,7 @@ function renderCategoryGrid() {
     if (!liste.length) {
       catGridEl.innerHTML = '<div class="cl-rien">' + (filtreEtatDossiers === 'ligne'
         ? 'Aucune procédure n’est en ligne pour le moment.'
-        : 'Aucune procédure en cours.') + '</div>'
+        : 'Aucune procédure en développement.') + '</div>'
       return
     }
 
@@ -12599,7 +12653,7 @@ function renderCategoryGrid() {
       ? 'Aucun dossier ne correspond à « ' + escapeHtml(rechercheDossiers) + ' ».'
       : filtreEtatDossiers === 'ligne'
         ? 'Aucune procédure n’est en ligne pour le moment.'
-        : 'Aucune procédure en cours.') + '</div>'
+        : 'Aucune procédure en développement.') + '</div>'
     return
   }
 
@@ -13168,10 +13222,22 @@ document.addEventListener('click', (e) => {
      par-dessus la liste, et l'on toucherait une option en croyant toucher un
      dossier. */
   if (!bouton && !choix) {
+    /* ⚠ LE BOUTON SE DETEND MEME SI LE VOLET N'ETAIT PLUS `ouvert`.
+
+       LE BOUTON RESTAIT ENCERCLE. La remise a `false` etait DANS le `if`, et
+       la classe avait deja ete retiree — par l'ecouteur general des `.tb-volet`
+       qui, pose plus haut dans le fichier, s'execute AVANT celui-ci sur le
+       meme clic. Arrive ici, la condition etait donc fausse : le volet se
+       fermait bien, mais `aria-expanded` gardait `true`, et avec lui le fond
+       gris que `.proc-filtre[aria-expanded="true"]` pose.
+
+       Le meme defaut avait ete corrige sur `#e-cat-filtre` ; celui-ci avait
+       ete oublie. Cote gestion la ligne est hors condition depuis toujours. */
+    document.getElementById('e-proc-filtre')?.setAttribute('aria-expanded', 'false')
+
     if (volet.classList.contains('ouvert')) {
       volet.classList.remove('ouvert')
       setTimeout(() => { if (!volet.classList.contains('ouvert')) volet.hidden = true }, 300)
-      document.getElementById('e-proc-filtre')?.setAttribute('aria-expanded', 'false')
     }
     return
   }
@@ -25017,8 +25083,11 @@ function renderEquipeCategories() {
   if (!allEquipeProcedures.length) {
     if (nbEl) nbEl.textContent = 'Aucun dossier'
     poserIconeRang(false)
-    grille.innerHTML = '<div class="cl-rien">Aucune procédure publiée pour le moment.' +
-      '<span class="cl-rien-suite">Votre responsable vous prévient dès qu’il en publie une.</span></div>'
+    /* ⚠ LA SECONDE LIGNE A ETE RETIREE. Elle promettait un avertissement —
+       « votre responsable vous prévient » — que Standix ne garantit pas : rien
+       dans l'app ne le notifie, et rien n'oblige le responsable à le faire.
+       La première ligne dit déjà tout ce qui est vrai. */
+    grille.innerHTML = '<div class="cl-rien">Aucune procédure publiée pour le moment.</div>'
     return
   }
 
@@ -26768,90 +26837,76 @@ let mesAdhesions = []
 /* Les valeurs à droite de chaque ligne : on sait ce que contient une page sans
    l'ouvrir. C'est tout l'intérêt de cette grammaire, et elle vaut ici comme
    côté gestion — les deux espaces se ressemblent désormais. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA LIGNE « OU JE TRAVAILLE » · LOGO, NOM, ACCES
+   ═══════════════════════════════════════════════════════════════════════════
+
+   Le logo de l'entreprise courante, son nom, et l'espace ou l'on se trouve.
+   Elle n'ouvre rien : elle dit ou l'on est.
+
+ ⚠ LA MEME LIGNE DANS LES DEUX ESPACES. Elle n'existait que cote utilisateur :
+   quelqu'un qui passait en gestion perdait le seul element qui nommait son
+   entreprise dans son profil. Elle est maintenant peinte par cette fonction
+   pour les deux, avec des identifiants differents mais un seul dessin — deux
+   copies auraient fini par diverger.
+
+ ⚠ SANS LOGO, LES INITIALES. Une entreprise qui n'a pas encore pose d'image ne
+   doit pas faire disparaitre la ligne : une pastille a deux lettres vaut mieux
+   qu'une absence.
+
+ ⚠ `e.id`, PAS `e.entreprise_id`. Les objets de `mesEtablissements` sont
+   reconstruits a la lecture : `id` y porte l'identifiant de l'ENTREPRISE.
+
+   Rend `true` si la ligne est affichee — l'espace gestion s'en sert pour ne
+   pas la doubler avec la carte modifiable du gerant. */
+function peindreLigneEntreprise(idGroupe, idLogo, idIni, idNom, idRole) {
+  const el = (i) => document.getElementById(i)
+  const groupe = el(idGroupe)
+  if (!groupe) return false
+
+  const ent = (mesEtablissements || [])
+    .find(e => e.id === currentMembre?.entreprise_id)
+
+  if (!ent) { groupe.style.display = 'none'; return false }
+
+  const img = el(idLogo)
+  const ini = el(idIni)
+  const src = ent.logo_url || null
+
+  if (src && img) {
+    /* ⚠ `onerror` EST POSE AVANT `src` — l'ordre compte : une image deja en
+       cache peut echouer avant la fin de cette fonction. En cas d'echec on
+       retombe sur les initiales, jamais sur une pastille vide. */
+    img.onerror = () => { img.hidden = true; if (ini) ini.hidden = false }
+    img.setAttribute('data-logo-fichier', src)
+    img.removeAttribute('data-logo-signe')
+    signerLogos(img.parentElement || img)
+    img.hidden = false
+    if (ini) ini.hidden = true
+  } else {
+    if (img) { img.removeAttribute('src'); img.hidden = true }
+    if (ini) { ini.textContent = initialesEtab(ent.nom || ''); ini.hidden = false }
+  }
+
+  if (el(idNom)) el(idNom).textContent = ent.nom || 'Votre entreprise'
+  if (el(idRole)) el(idRole).textContent = ent.role === 'gestion' ? 'Gestion' : 'Utilisateur'
+  groupe.style.display = ''
+  return true
+}
+
 function peindreReglagesEquipe() {
   const el = (i) => document.getElementById(i)
   const nom = currentMembre?.nom || ''
   if (el('es-nom-affiche')) el('es-nom-affiche').textContent = nom || 'Votre compte'
   if (el('es-initiales')) el('es-initiales').textContent = initialesEtab(nom)
 
-  /* ═══ LA LIGNE DE L'ENTREPRISE ═══
+  /* ⚠ LE CORPS DE CETTE LIGNE A DEMENAGE dans `peindreLigneEntreprise`.
 
-     Elle porte le logo, le nom, et le rôle qu'on y tient.
-
-   ⚠ ELLE NE S'AFFICHE QUE S'IL Y A UN LOGO. Sans logo, la pastille resterait
-     vide à gauche d'un nom — un trou dans la colonne d'icônes que l'œil suit.
-     Mieux vaut pas de ligne qu'une ligne bancale.
-
-   ⚠ `e.id`, PAS `e.entreprise_id`. Les objets de `mesEtablissements` sont
-     reconstruits à la lecture : `id` y porte l'identifiant de l'ENTREPRISE,
-     `membre_id` celui de la fiche. Chercher `entreprise_id` renvoyait
-     `undefined` sur chaque ligne, sans la moindre erreur. C'est ainsi que le
-     rang s'y prend lui-même, trois fois dans ce fichier.
-
-   ⚠ ON PREND L'ENTREPRISE COURANTE, celle où la personne se trouve à cet
-     instant. Sur un compte présent dans deux entreprises, la ligne change avec
-     la bascule — c'est justement ce qu'on veut lui dire. */
-  /* ═══ LA LIGNE DE L'ENTREPRISE ═══
-
-     Elle porte le logo, le nom, et le rôle qu'on y tient.
-
-   ⚠ ELLE NE DISPARAÎT PLUS FAUTE DE LOGO. Elle ne s'affichait qu'avec une
-     image : une entreprise qui n'en a pas encore posé n'avait donc AUCUN
-     élément la nommant dans son profil. C'est ce qui a été rapporté.
-
-     Sans logo, on montre les initiales — exactement ce que fait le rang de
-     l'espace gestion depuis toujours. Une pastille avec deux lettres vaut
-     mieux qu'une ligne absente : elle dit où l'on travaille.
-
-   ⚠ `e.id`, PAS `e.entreprise_id`. Les objets de `mesEtablissements` sont
-     reconstruits à la lecture : `id` y porte l'identifiant de l'ENTREPRISE,
-     `membre_id` celui de la fiche. Chercher `entreprise_id` renvoyait
-     `undefined` sur chaque ligne, sans la moindre erreur.
-
-   ⚠ ON PREND L'ENTREPRISE COURANTE, celle où la personne se trouve à cet
-     instant. Sur un compte présent dans deux entreprises, la ligne change
-     avec la bascule. */
-  const groupeEnt = el('es-ent-groupe')
-  if (groupeEnt) {
-    const ent = (mesEtablissements || [])
-      .find(e => e.id === currentMembre?.entreprise_id)
-
-    if (ent) {
-      const img = el('es-logo-ent')
-      const ini = el('es-ent-initiales')
-      const src = ent.logo_url || null
-
-      if (src && img) {
-        /* ⚠ `onerror` EST POSÉ AVANT `src` — l'ordre compte : une image déjà
-           en cache peut échouer avant la fin de cette fonction. En cas
-           d'échec on retombe sur les initiales, jamais sur une pastille
-           vide. */
-        img.onerror = () => {
-          img.hidden = true
-          if (ini) ini.hidden = false
-        }
-        img.setAttribute('data-logo-fichier', src)
-        img.removeAttribute('data-logo-signe')
-        signerLogos(img.parentElement || img)
-        img.hidden = false
-        if (ini) ini.hidden = true
-      } else {
-        if (img) { img.removeAttribute('src'); img.hidden = true }
-        if (ini) {
-          ini.textContent = initialesEtab(ent.nom || '')
-          ini.hidden = false
-        }
-      }
-
-      el('es-ent-nom').textContent = ent.nom || 'Votre entreprise'
-      el('es-ent-role').textContent = ent.role === 'gestion' ? 'Gestion' : 'Utilisateur'
-      groupeEnt.style.display = ''
-    } else {
-      groupeEnt.style.display = 'none'
-    }
-  }
-
-
+     L'espace GESTION porte desormais la meme ligne, et deux copies du meme
+     dessin finissent toujours par diverger — l'une recoit une correction que
+     l'autre n'a pas. Il n'y en a plus qu'une, appelee depuis les deux. */
+  peindreLigneEntreprise('es-ent-groupe', 'es-logo-ent', 'es-ent-initiales',
+                         'es-ent-nom', 'es-ent-role')
 
   if (el('es-email-affiche')) {
     /* ⚠ MEME DEFAUT QUE COTE GESTION : cette ligne recopiait `#es-email`, un
@@ -27049,11 +27104,34 @@ const OFFRES = [
   { cle: 'equipe',     nom: '\u00c9quipe',     max: 15,  analyses: 60,  prix: 129, an: 1236, stripe: true },
   { cle: 'pro',        nom: 'Pro',        max: 40,  analyses: 120, prix: 239, an: 2268, stripe: true },
   { cle: 'reseau',     nom: 'R\u00e9seau',     max: 100, analyses: 250, prix: 499, an: 4788, stripe: true },
-  { cle: 'entreprise', nom: 'Entreprise', max: Infinity, prix: null,
-    devis: "Au-del\u00e0 de cent personnes, on en discute : accompagnement \u00e0 la mise " +
-           "en place, interlocuteur d\u00e9di\u00e9, engagement de disponibilit\u00e9 \u00e9crit." },
+  /* ⚠ `analyses: Infinity` MANQUAIT, ET LA CARTE AFFICHAIT « undefined ».
+
+     Les quatre offres chiffrees portent un nombre ; celle-ci n'avait rien du
+     tout. Un des deux gabarits ecrivait donc « undefined analyses video IA »
+     en toutes lettres, l'autre escamotait la ligne — deux defauts pour un
+     seul oubli.
+
+     `Infinity` plutot que `null` : c'est deja ce que `max` porte sur cette
+     meme offre, et `ligneAnalyses` sait le mettre en mots. */
+  { cle: 'entreprise', nom: 'Entreprise', max: Infinity, analyses: Infinity, prix: null,
+    devis: "Au-del\u00e0 de cent personnes, engagement de disponibilit\u00e9 \u00e9crit " +
+           "pour une discussion." },
 ]
 
+
+/* La ligne du quota d'analyses, pour les deux gabarits de carte.
+
+ ⚠ UNE SEULE ECRITURE POUR LES DEUX. Ils la composaient chacun de leur cote,
+   et ils ne s'accordaient deja plus : l'un affichait « undefined » quand le
+   nombre manquait, l'autre retirait la ligne. Rend `null` quand il n'y a rien
+   a dire — les appelants filtrent. */
+function ligneAnalyses(o) {
+  if (o.analyses == null) return null
+  const combien = Number.isFinite(o.analyses)
+    ? `${o.analyses} analyses vid\u00e9o IA`
+    : `Une infinit\u00e9 d\u2019analyses vid\u00e9o IA`
+  return `<b>${combien}</b> g\u00e9n\u00e9r\u00e9es par mois par Standix`
+}
 
 function nombreDeMembres() {
   return Math.max(1, (cachedMembres || []).length)
@@ -27384,13 +27462,17 @@ function carteOffreNeuve(o, opts = {}) {
 
           <div class="abo-inclus">
             ${[
-              `<b>${o.analyses} analyses vidéo IA</b> générées par mois par Standix`,
+              ligneAnalyses(o),
               `Un <b>QR code</b> par procédure`,
               `Un <b>PDF</b> par procédure`,
               `L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document`,
               `<b>Rédiger soi-même</b> la procédure`,
               `Interface en <b>français, anglais et allemand</b>`,
-            ].map(t => `<div class="abo-li">
+              /* ⚠ ON FILTRE. `ligneAnalyses` rend `null` quand l'offre ne
+                 porte aucun quota : sans ce filtre, la carte afficherait une
+                 coche suivie du mot « null ». C'est exactement le defaut qui
+                 s'ecrivait « undefined » ici. */
+            ].filter(Boolean).map(t => `<div class="abo-li">
                 <!-- ⚠ LA COCHE SEULE, SANS CERCLE.
 
                      Un rond vert autour d'une coche verte repete le signe : la
@@ -27523,7 +27605,7 @@ function carteOffre(o, opts = {}) {
   /* Les inclus, dans l'ordre de ce qu'on compare : d'abord ce qui change d'une
      offre à l'autre, ensuite ce qui est commun à toutes. */
   const inclus = [
-    o.analyses ? `<b>${o.analyses} analyses vidéo IA</b> générées par mois par Standix` : null,
+    ligneAnalyses(o),
     'Un <b>QR code</b> par procédure',
     'Un <b>PDF</b> par procédure',
     'L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document',
@@ -30394,7 +30476,7 @@ function peindreEquipe() {
         <span class="pm-gt">${titre}</span>
         <span class="pm-gn">${l.length}</span>
       </div>
-      <div class="pm-gaide">${aide}</div>
+      ${aide ? `<div class="pm-gaide">${aide}</div>` : ''}
       ${parGroupe(l)}
     </div>`
 
@@ -30403,7 +30485,11 @@ function peindreEquipe() {
      plus a l'ecran : personne ne se presente comme le fondateur de sa
      boulangerie. */
   liste.innerHTML =
-    section('G\u00e9rant', 'A cr\u00e9\u00e9 l\u2019entreprise. Son acc\u00e8s ne peut pas \u00eatre retir\u00e9.', fondateurs) +
+    /* \u26a0 PAS DE LIGNE D'AIDE SOUS \u00ab G\u00c9RANT \u00bb. Elle disait ce qui ne peut PAS
+       se faire, \u00e0 un endroit o\u00f9 aucun bouton ne le propose : la ligne du
+       g\u00e9rant ne porte ni promotion, ni retrait. Elle r\u00e9pondait \u00e0 une question
+       que personne ne pose. `section` n'\u00e9crit plus rien quand l'aide est vide. */
+    section('G\u00e9rant', '', fondateurs) +
     section('Espace gestion', 'Acc\u00e8s au d\u00e9veloppement des proc\u00e9dures et aux param\u00e8tres de l\u2019entreprise.', gestion) +
     section('Espace utilisateur', 'Acc\u00e8s uniquement aux proc\u00e9dures publi\u00e9es par l\u2019entreprise.', equipe)
   /* Les photos des membres sont dans le dépôt des logos : on signe leurs
@@ -30445,7 +30531,7 @@ document.getElementById('dd-pm-tri-menu')?.addEventListener('click', (e) => {
 document.getElementById('p-membres')?.addEventListener('click', (e) => {
   if (!e.target.closest('[data-aide-actions]')) return
   confirmDialog({
-    titre: 'Les boutons de chaque ligne',
+    titre: 'Fonctionnement des boutons',
     message:
       /* ⚠ LE TEXTE, REECRIT.
 
@@ -30453,18 +30539,24 @@ document.getElementById('p-membres')?.addEventListener('click', (e) => {
          au lecteur le soin de deviner ce qu'ils font. Et la croix n'existe
          plus : c'est une porte de sortie depuis plusieurs versions.
 
-         On nomme maintenant l'action, pas le dessin. */
-      "\u2022 LE PLUS ET LE MOINS changent l\u2019acc\u00e8s d\u2019une personne.\n" +
-      "  Le plus lui ouvre l\u2019espace gestion : elle pourra cr\u00e9er des " +
-      "proc\u00e9dures, voir l\u2019analyse et inviter du monde.\n" +
-      "  Le moins l\u2019en retire : elle ne fait plus que consulter les " +
-      "proc\u00e9dures publi\u00e9es.\n\n" +
-      "\u2022 LA PORTE retire la personne de l\u2019entreprise. Son compte reste, " +
-      "mais elle perd l\u2019acc\u00e8s \u00e0 vos proc\u00e9dures. Ses lectures " +
-      "pass\u00e9es restent dans l\u2019analyse.\n\n" +
-      "Vous ne pouvez ni changer votre propre acc\u00e8s, ni vous retirer " +
-      "vous-m\u00eame. Le g\u00e9rant non plus ne peut \u00eatre retir\u00e9 : " +
-      "une entreprise sans propri\u00e9taire serait ing\u00e9rable.",
+         On nomme maintenant l'action, pas le dessin. Et on la dit en termes
+         d'ESPACES — « espace gestion », « espace utilisateur » — qui sont
+         les mots employes partout ailleurs dans l'app.
+
+       ⚠ LE DERNIER PARAGRAPHE A ETE RETIRE. Il enumerait ce qu'on ne peut PAS
+         faire : se changer soi-meme, retirer le gerant. Or les boutons ne sont
+         pas affiches dans ces cas-la — l'aide repondait a une question que
+         l'ecran ne pose jamais. */
+      "\u2022 LE PLUS ET LE MOINS changent l\u2019espace du membre.\n" +
+      "  Le plus lui donne l\u2019acc\u00e8s \u00e0 l\u2019espace gestion : il " +
+      "pourra g\u00e9rer les proc\u00e9dures, et il aura acc\u00e8s \u00e0 la " +
+      "page Analyse et \u00e0 la page Acc\u00e8s de l\u2019entreprise.\n" +
+      "  Le moins lui donne uniquement l\u2019acc\u00e8s \u00e0 l\u2019espace " +
+      "utilisateur : il aura uniquement acc\u00e8s aux proc\u00e9dures de " +
+      "l\u2019entreprise.\n\n" +
+      "\u2022 LA PORTE retire la personne de l\u2019entreprise. Ses lectures " +
+      "pass\u00e9es restent dans l\u2019analyse. Elle n\u2019a plus acc\u00e8s " +
+      "\u00e0 l\u2019espace de l\u2019entreprise qui la concerne.",
     confirmer: 'Compris', annuler: '', danger: false,
   })
 })
@@ -30513,14 +30605,20 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
 
        « Passer en Gestion » decrivait un changement de statut. Ce qui compte
        pour celui qui decide, c'est ce que la personne pourra faire ensuite. */
-    /* ⚠ ON NOMME LE ROLE, PAS LE MOUVEMENT.
+    /* ⚠ ON REVIENT AU TRANSFERT D'ACCES, ET ON NOMME LES PAGES.
 
-       « Donner l'acces a l'espace gestion » decrivait un transfert ; « Definir
-       comme gestionnaire » dit ce que la personne devient. C'est plus court et
-       plus direct, et cela repond au bouton `+` sur lequel on vient d'appuyer. */
-    titre: `D\u00e9finir ${nom} comme gestionnaire ?`,
-    message: `${nom} pourra cr\u00e9er des proc\u00e9dures, suivre l'\u00e9quipe et retirer des membres. ` +
-      `Elle perdra en revanche l'acc\u00e8s \u00e0 l'espace utilisateur. Vous restez le seul \u00e0 pouvoir faire ce changement.`,
+       « Definir comme gestionnaire » nommait un titre ; l'app ne distribue
+       pas des titres mais des ESPACES. Le message disait « suivre l'equipe »,
+       formule vague : on cite maintenant les deux pages qui s'ouvrent,
+       Analyse et Acces, sous les noms qu'elles portent dans la barre du bas.
+
+     ⚠ LA DERNIERE PHRASE A ETE RETIREE. « Vous restez le seul a pouvoir
+       faire ce changement » parlait du lecteur, pas de la personne concernee,
+       au moment ou il faut juste decider oui ou non. */
+    titre: `Donner \u00e0 ${nom} l\u2019acc\u00e8s \u00e0 l\u2019espace gestion ?`,
+    message: `${nom} pourra g\u00e9rer les proc\u00e9dures, acc\u00e9der \u00e0 la page ` +
+      `Analyse et \u00e0 la page Acc\u00e8s, et retirer des membres de l\u2019entreprise. ` +
+      `Il n\u2019aura plus acc\u00e8s \u00e0 l\u2019espace utilisateur.`,
     confirmer: 'D\u00e9finir comme gestionnaire',
     annuler: 'Annuler',
     danger: false,

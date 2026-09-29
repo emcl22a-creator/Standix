@@ -25658,5 +25658,18 @@ html::-webkit-scrollbar-thumb:hover{
 
 /* « Créer une procédure » à la taille du titre « Procédures » de la liste. */
 #p-create .detail-header .pagehead{ font-size:calc(32px * var(--ech, 1)); letter-spacing:-0.045em; line-height:1.06; }
-/* De l'air entre le titre et la carte des champs : 4 px → 14 px. */
-#p-create .detail-header + .card{ margin-top:14px; }
+/* De l'air entre le titre et la carte des champs : 4 px → 20 px. */
+#p-create .detail-header + .card{ margin-top:20px; }
+
+/* Le compte à rebours de l'enregistrement d'écran : un seul nombre, en ambre,
+   sans point rouge ni chronomètre — la prise n'a pas encore commencé. */
+.ecran-attente-t{
+  font-size:calc(12.5px * var(--ech)); font-weight:600;
+  color:rgba(255,255,255,0.72); white-space:nowrap;
+}
+.ecran-prise.attente b.ecran-attente-n{
+  font-size:calc(18px * var(--ech)); color:#FBBF5C;
+  min-width:1.3em; text-align:center;
+  animation:ecranBat 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce){ .ecran-prise.attente b.ecran-attente-n{ animation:none; } }

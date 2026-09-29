@@ -131,7 +131,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=0f78672e">
+<link rel="stylesheet" href="style.css?v=e174851d">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1730,11 +1730,6 @@
     <div class="detail-header">
       <h1 class="pagehead">Créer une procédure</h1>
     </div>
-    <!-- ⚠ LE SOUS-TITRE DIT CE QUE FAIT L'IA, pas ce que fait
-           l'utilisateur. « Ecrivez les etapes, ou decoupez une video »
-           decrivait un travail manuel — or c'est le modele qui decoupe et qui
-           redige. La phrase promet le resultat, pas la corvee. -->
-      <div class="subhead">L’IA écrit les étapes à votre place</div>
 
     <!-- Les mêmes champs que les écrans de modification : même libellé, même
            cadre, même taille. Une carte supplémentaire autour de deux champs
@@ -1785,13 +1780,13 @@
           <input type="text" id="new-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
-          <label class="f">Titre</label>
+          <label class="f">Titre de la procédure</label>
           <input type="text" id="new-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
         </div>
       </div>
 
     <div class="section-title">Comment créer cette procédure ?</div>
-    <div class="note" id="mode-choice-note" style="margin-top:0; margin-bottom:10px;">Complétez le titre et le dossier ci-dessus pour continuer.</div>
+    <div class="note" id="mode-choice-note" style="margin-top:0; margin-bottom:10px;">Complétez le titre de la procédure et le dossier de la procédure ci-dessus pour continuer.</div>
 
     <!-- L'ordre va du plus au moins probable, pas du plus simple au plus
          complexe. Le premier choix est celui qu'on prend sans lire les autres :
@@ -4648,7 +4643,7 @@
     </div>
     <div class="lgx-liste" id="langue-app" role="radiogroup"
          aria-label="Langue de l’application" style="margin-top:14px;"></div>
-    <div class="reg-note">La langue vaut pour toute l'application. Les procédures se traduisent à part, depuis leur fiche.</div>
+    <div class="reg-note">La langue choisie traduit aussi les étapes des procédures.</div>
   </div>
 
   <!-- ⚠ L'ECRAN « Notifications » A ETE RETIRE.
@@ -5280,7 +5275,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=1e386950"></script>
+<script type="module" src="app.js?v=66569537"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

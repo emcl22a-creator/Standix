@@ -27311,7 +27311,7 @@ function carteOffreNeuve(o, opts = {}) {
                  stroke-linecap="round" stroke-linejoin="round">
               <path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/>
             </svg>
-            <span>Procédures <b>illimitées</b></span>
+            <span><b>Accès illimité</b> aux procédures</span>
           </span>
 
 
@@ -27381,11 +27381,12 @@ function carteOffreNeuve(o, opts = {}) {
 
           <div class="abo-inclus">
             ${[
-              `Jusqu’à <b>${o.max} membres</b>`,
               `<b>${o.analyses} analyses vidéo IA</b> générées par mois par Standix`,
-              `Accès <b>illimité</b> aux procédures`,
-              `En <b>français, anglais et allemand</b>`,
-              `<b>Toutes</b> les fonctionnalités`,
+              `Un <b>QR code</b> par procédure`,
+              `Un <b>PDF</b> par procédure`,
+              `L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document`,
+              `<b>Rédiger soi-même</b> la procédure`,
+              `Interface en <b>français, anglais et allemand</b>`,
             ].map(t => `<div class="abo-li">
                 <!-- ⚠ LA COCHE SEULE, SANS CERCLE.
 
@@ -27519,14 +27520,17 @@ function carteOffre(o, opts = {}) {
   /* Les inclus, dans l'ordre de ce qu'on compare : d'abord ce qui change d'une
      offre à l'autre, ensuite ce qui est commun à toutes. */
   const inclus = [
-    o.max === Infinity ? 'Membres <b>illimités</b>' : `Jusqu'à <b>${o.max} membres</b>`,
     o.analyses ? `<b>${o.analyses} analyses vidéo IA</b> générées par mois par Standix` : null,
-    'Accès <b>illimité</b> aux procédures',
-    /* « Chacun lit dans sa langue » promettait toutes les langues. Nommer les
-       trois est plus honnête, et plus vendeur dans le tri-frontière bâlois où
-       les trois cohabitent dans la même équipe. */
-    'En <b>français, anglais et allemand</b>',
-    '<b>Toutes</b> les fonctionnalités',
+    'Un <b>QR code</b> par procédure',
+    'Un <b>PDF</b> par procédure',
+    'L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document',
+    '<b>Rédiger soi-même</b> la procédure',
+    /* ⚠ CETTE LIGNE SUIT LE MENU DES LANGUES, PAS LES DICTIONNAIRES. `LANGUES`
+       propose fr / en / de ; or il n'existe AUCUN dictionnaire allemand —
+       choisir Deutsch laisse l'app en français. Les dictionnaires espagnol et
+       portugais, eux, existent mais ont été retirés du menu. À remettre
+       d'aplomb : soit traduire en allemand, soit rouvrir es / pt. */
+    'Interface en <b>français, anglais et allemand</b>',
   ].filter(Boolean)
 
   return `<div class="offre-carte${opts.classe || ''}" data-offre-cle="${o.cle}">

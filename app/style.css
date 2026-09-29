@@ -2983,7 +2983,16 @@
   .contact-carte .t{ font-size:16px; font-weight:700; letter-spacing:-0.03em; }
   .contact-carte .s{ font-size:12.5px; color:var(--label-2); margin-top:3px; line-height:1.45; }
 
-  /* ═══ Choix de la langue ═══ */
+  /* ═══ Choix de la langue — ANCIENNE GRILLE, PLUS AUCUN BALISAGE NE LA PORTE ═══
+
+     `.langue-grille` et `.langue-choix` ont ete remplacees par la liste
+     `.lgx-*`, plus bas dans ce bloc. Elles sont laissees en place parce
+     qu'elles sont INERTES — aucune balise de l'app ne porte plus ces classes,
+     verifie — et que leurs declarations sont eparpillees en cinq endroits du
+     fichier, dont une liste de selecteurs partagee avec dix autres ecrans.
+     Les arracher coutait plus cher que de les laisser dormir.
+
+   ⚠ NE RIEN AJOUTER ICI. Le choix de la langue se regle dans `.lgx-liste`. */
   .langue-grille{ display:grid; grid-template-columns:repeat(2,1fr); gap:7px; }
   .langue-choix{
     display:flex; align-items:center; gap:9px; padding:10px 12px; border-radius:12px;
@@ -2998,6 +3007,95 @@
   .langue-choix .nm{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .langue-choix.actif{ border-color:#fff; background:rgba(28,28,38,0.102); }
   .langue-choix .coche{ color:#1F4CEE; font-weight:800; flex-shrink:0; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE CHOIX DE LA LANGUE · UNE LISTE, PLUS UNE GRILLE
+   ═══════════════════════════════════════════════════════════════════════════
+
+   ═══ CE QU'IL Y AVAIT, ET POURQUOI ÇA N'ALLAIT PAS ═══
+
+   Deux colonnes de pavés. Avec trois langues, la troisième restait seule sur
+   sa ligne, à moitié de largeur : un trou à droite que l'œil lit comme une
+   case manquante. Et le nombre de langues bougera — chaque ajout rejoue ce
+   tirage au sort entre une grille pleine et une grille bancale.
+
+   Une colonne ne pose jamais cette question. C'est aussi la forme que prend
+   ce choix partout chez Apple — Réglages › Langue, le sélecteur de pays en
+   pied de apple.com : une liste, un nom par ligne, une coche sur celui qui
+   est retenu.
+
+   ═══ CE QUI FAIT LE STYLE, LIGNE À LIGNE ═══
+
+   ① UNE SEULE CARTE, PAS TROIS BOÎTES. Les options ne sont pas trois objets
+      posés côte à côte : c'est un choix, donc un objet. Le bord et l'ombre
+      sont ceux de `.reg-groupe`, la carte de réglages que porte déjà chaque
+      page de l'app — la page Langue cesse d'être une exception.
+
+   ② DES FILETS EN RETRAIT. Le trait qui sépare deux lignes part APRÈS la
+      pastille, pas du bord. C'est le détail qui distingue une liste iOS d'un
+      tableau : le regard descend la colonne des noms, et le filet l'y aide au
+      lieu de trancher la carte en tranches.
+
+   ③ LA COCHE, PAS LE FOND. L'ancienne version teintait toute la case en bleu.
+      Sur une carte blanche, cela criait plus fort que le nom lui-même. Ici
+      c'est le nom qui s'épaissit et une coche bleue qui se pose à droite —
+      exactement le poids que le sujet mérite.
+
+   ⚠ LA COCHE EST UN SVG, PAS LE CARACTÈRE « ✓ ». Le glyphe change de dessin
+     et d'alignement d'une police système à l'autre ; le tracé, non.
+
+   ④ L'APPUI COLORE TOUTE LA LIGNE, bord à bord, comme une ligne de Réglages.
+      Un pavé qui rétrécit sous le doigt dirait « bouton » ; ici on choisit
+      dans une liste.
+
+ ⚠ NOUVELLES CLASSES (`lgx-`) PLUTÔT QUE RÉÉCRITURE DE `.langue-choix`.
+   Cette classe traîne QUATRE déclarations éparpillées dans ce fichier — une
+   pour le rayon, une pour l'état actif, une pour la couleur du texte sur les
+   écrans clairs, une pour l'échelle du PC. Les corriger toutes sans en
+   oublier une était le vrai risque ; un nom neuf n'en hérite d'aucune. */
+.lgx-liste{
+  border-radius:18px; overflow:hidden;
+  background:var(--bg-card); border:1px solid var(--border);
+  box-shadow:0 1px 2px rgba(16,18,28,0.04), 0 6px 18px rgba(16,18,28,0.05);
+}
+.lgx-opt{
+  position:relative;
+  display:flex; align-items:center; gap:13px;
+  width:100%; padding:12px 14px;
+  background:none; border:none; text-align:left;
+  font-family:inherit; color:var(--label);
+  -webkit-tap-highlight-color:transparent;
+  transition:background 0.18s ease;
+}
+/* Le filet, posé sur la ligne du dessous et décalé à hauteur des noms. */
+.lgx-opt + .lgx-opt::before{
+  content:''; position:absolute; left:61px; right:0; top:0; height:1px;
+  background:var(--border);
+}
+.lgx-opt:active{ background:rgba(28,28,38,0.05); }
+
+/* La pastille du drapeau : le même carré arrondi que `.reg-ic`, pour que la
+   colonne d'icônes de l'app garde son alignement d'une page à l'autre.
+   ⚠ ELLE A UN FOND. Sur certains systèmes le drapeau ne s'affiche pas et
+     laisse deux lettres (« FR ») : posées sur une pastille, elles passent
+     pour un pictogramme ; nues sur le blanc, pour un défaut. */
+.lgx-dr{
+  flex:0 0 34px; width:34px; height:34px; border-radius:10px;
+  display:grid; place-items:center; font-size:19px; line-height:1;
+  background:rgba(28,28,38,0.05);
+}
+.lgx-tx{ flex:1; min-width:0; display:flex; flex-direction:column; gap:1px; }
+.lgx-nm{
+  font-size:15.5px; font-weight:600; letter-spacing:-0.012em; color:var(--label);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.lgx-opt.actif .lgx-nm{ font-weight:700; }
+.lgx-co{ flex:0 0 auto; width:19px; height:19px; display:block; color:#1F4CEE; }
+.lgx-co path{ stroke:currentColor; }
+
+/* Le drapeau sur la ligne « Langue » des réglages, devant le nom. La valeur y
+   devient lisible d'un coup d'œil, sans ouvrir la page. */
+.reg-val .reg-dr{ margin-right:6px; font-size:14px; }
 
   /* Le bouton de langue sur une fiche de procédure */
   .langue-proc{
@@ -10855,6 +10953,11 @@ body:has(#e-detail.active) #equipe-app{
   font-size:11.5px; line-height:1.45; color:var(--label-3);
   margin-bottom:11px;
 }
+/* ⚠ UNE SECTION SANS LIGNE D'AIDE GARDE SON AIR. C'est « Gérant » : son aide
+   a été retirée, et l'intitulé se retrouvait collé au premier nom. Le blanc
+   que posait `.pm-gaide` est repris ici, sur la première ligne qui suit
+   directement l'intitulé — les autres sections gardent le leur, inchangé. */
+.pm-gtete + .pm-ligne{ margin-top:11px; }
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -22984,6 +23087,15 @@ body.abo-expire [data-etab-plus]{
   .contact-carte .s{ font-size:calc(12.5px * var(--ech)); }
   .langue-choix{ font-size:calc(13px * var(--ech)); }
   .langue-choix .dr{ font-size:calc(17px * var(--ech)); }
+  /* La liste des langues suit l'echelle du bureau, comme le reste. Le filet
+     part a `14 + 34 + 13` pixels mis a l'echelle : le calcul doit rester
+     accorde au `padding`, a la pastille et a l'ecart de `.lgx-opt`. */
+  .lgx-nm{ font-size:calc(15.5px * var(--ech)); }
+  .lgx-dr{ font-size:calc(19px * var(--ech));
+           flex-basis:calc(34px * var(--ech));
+           width:calc(34px * var(--ech)); height:calc(34px * var(--ech)); }
+  .lgx-co{ width:calc(19px * var(--ech)); height:calc(19px * var(--ech)); }
+  .lgx-opt + .lgx-opt::before{ left:calc(61px * var(--ech)); }
   .langue-proc .ic{ font-size:calc(16px * var(--ech)); }
   .rond-ent .ini{ font-size:calc(15px * var(--ech)); }
   .rond-ent.plus .ini{ font-size:calc(23px * var(--ech)); }
@@ -24169,6 +24281,8 @@ body.abo-expire [data-etab-plus]{
   .etape-montage{ padding:calc(10px * var(--ech)); }
   .dv-encours{ padding:calc(10px * var(--ech)); }
   .langue-choix{ padding:calc(10px * var(--ech)) calc(12px * var(--ech)); }
+  .lgx-opt{ padding:calc(12px * var(--ech)) calc(14px * var(--ech));
+             gap:calc(13px * var(--ech)); }
   .tiroir-liste{ padding:calc(4px * var(--ech)); }
   .bandeau-bloc{ padding:calc(14px * var(--ech)) calc(16px * var(--ech)); }
   .offre-carte{ padding:calc(22px * var(--ech)) calc(20px * var(--ech)) calc(20px * var(--ech)); }
@@ -25489,7 +25603,14 @@ html::-webkit-scrollbar-thumb:hover{
    lignes, les deux autres sur une : sans cela, les trois boutons n'auraient
    pas la même hauteur. `align-items:stretch` est le défaut du conteneur, il
    suffit de ne pas le contrarier. */
-.src-tx{ display:block; }
+/* ⚠ LE LIBELLÉ SE COUPE TOUT SEUL, PLUS PAR UN `<br>`.
+
+   « Enregistrer<br>l'écran » était coupé à la main. Traduit mot par mot, cela
+   donnait « Aufnehmen / Bildschirm » en allemand — dans l'ordre français, donc
+   faux : l'allemand dit « Bildschirm aufnehmen ». La phrase est désormais
+   d'un seul tenant, et `balance` la répartit sur deux lignes égales, dans
+   l'ordre de chaque langue. */
+.src-tx{ display:block; text-wrap:balance; }
 
 @media (min-width:700px) and (min-height:600px){
   .src-rang{ gap:calc(8px * var(--ech)); margin-top:calc(12px * var(--ech)); }
@@ -25504,4 +25625,27 @@ html::-webkit-scrollbar-thumb:hover{
     border-radius:calc(10px * var(--ech));
   }
   .src-ic svg{ width:calc(17px * var(--ech)); height:calc(17px * var(--ech)); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PHRASES QUI TIENNENT SUR DEUX LIGNES
+   ═══════════════════════════════════════════════════════════════════════════
+
+   CINQ PHRASES ÉTAIENT COUPÉES À LA MAIN par un `<br>` posé au bon endroit —
+   en français. Or le moteur de traduction travaille noeud de texte par noeud
+   de texte : un `<br>` au milieu d'une phrase la coupe en DEUX entrées de
+   dictionnaire, chacune traduite sans connaître l'autre. En allemand, où le
+   verbe part à la fin, la coupure tombait au hasard et la phrase se lisait à
+   l'envers.
+
+   Le `<br>` est retiré ; c'est le navigateur qui équilibre les deux lignes,
+   dans chaque langue, avec `text-wrap:balance`. C'est aussi ce que fait Apple
+   sur ses titres.
+
+ ⚠ `balance` NE S'APPLIQUE QU'AUX COURTS BLOCS (quatre lignes au plus, par
+   spécification). C'est exactement le cas ici, et sur les navigateurs qui ne
+   le connaissent pas encore la phrase se coupe normalement : rien ne casse. */
+.bv-phrase, .bv-slogan, #ac-conseil,
+#p-membres .page-tete p, .dv-geste .s{
+  text-wrap:balance;
 }

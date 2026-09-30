@@ -1011,6 +1011,10 @@
   "en": "Choose how long the invitation code stays valid.",
   "de": "Wählen Sie, wie lange der Einladungscode gültig bleibt."
  },
+ "Choisissez la fenêtre de votre logiciel : la barre Standix n’apparaîtra pas dans la vidéo.": {
+  "en": "Choose your program’s window: the Standix bar won’t appear in the video.",
+  "de": "Wählen Sie das Fenster Ihres Programms: Die Standix-Leiste erscheint nicht im Video."
+ },
  "Choisissez le poste qui vous correspond.": {
   "en": "Pick the role that fits you.",
   "de": "Wählen Sie die passende Position."
@@ -1039,6 +1043,10 @@
   "en": "Five minutes: recording stops here.",
   "de": "Fünf Minuten: Hier endet die Aufnahme."
  },
+ "Cinq minutes au maximum.": {
+  "en": "Five minutes maximum.",
+  "de": "Höchstens fünf Minuten."
+ },
  "Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.": {
   "en": "Five minutes maximum. On the entire screen, the Standix bar also appears in the video.",
   "de": "Höchstens fünf Minuten. Bei gesamtem Bildschirm ist die Standix-Leiste auch im Video zu sehen."
@@ -1066,6 +1074,10 @@
  "Cliquez sur le <b>cadenas</b> à gauche de l’adresse": {
   "en": "Click the <b>padlock</b> left of the address",
   "de": "Klicken Sie auf das <b>Schloss</b> links neben der Adresse"
+ },
+ "Cliquez sur l’étoile pour ajouter la procédure dans les favoris.": {
+  "en": "Click the star to add the procedure to your favorites.",
+  "de": "Klicken Sie auf den Stern, um die Anleitung zu den Favoriten hinzuzufügen."
  },
  "Cochez chaque étape en la réalisant": {
   "en": "Tick each step as you do it",
@@ -1505,7 +1517,7 @@
  },
  "En cours": {
   "en": "In progress",
-  "de": "Läuft"
+  "de": "In Arbeit"
  },
  "En créant votre compte, vous acceptez les": {
   "en": "By creating your account, you accept the",
@@ -2114,6 +2126,10 @@
  "La procédure d'analyse n'a pas pu être créée.": {
   "en": "The procedure for the analysis could not be created.",
   "de": "Die Anleitung für die Analyse konnte nicht erstellt werden."
+ },
+ "La procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": {
+  "en": "The procedure is already in In progress. It opens once the analysis is done.",
+  "de": "Die Anleitung steht bereits unter In Arbeit. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
  },
  "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
   "en": "The procedure is already in Draft. It opens once the analysis is done.",
@@ -4394,6 +4410,10 @@
  "l'équipe": {
   "en": "the team",
   "de": "das Team"
+ },
+ "la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": {
+  "en": "the procedure is already in In progress. It opens once the analysis is done.",
+  "de": "die Anleitung steht bereits unter In Arbeit. Sie lässt sich öffnen, sobald die Auswertung fertig ist."
  },
  "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": {
   "en": "the procedure is already in Draft. It opens once the analysis is done.",

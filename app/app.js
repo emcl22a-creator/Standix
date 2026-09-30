@@ -665,6 +665,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Drag to adjust to a tenth of a second",
     "Favori non enregistré : {v}": "Favourite not saved: {v}",
     "Favoris": "Favourites",
+    "Fenêtre choisie.": "Window selected.",
     "Fermer": "Close",
     "Fermez l'app qui l'utilise, puis réessayez.": "Close the app using it, then try again.",
     "Fermez l’application qui s’en sert, puis réessayez.": "Close the app that is using it, then try again.",
@@ -795,6 +796,7 @@ const DICO = {
     "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "The video was not fully uploaded. Restart the analysis and keep the app open.",
     "Lampe torche": "Flashlight",
     "Lancer la vidéo": "Play the video",
+    "Lancer l’enregistrement": "Start recording",
     "Langue": "Language",
     "Langue de l’application": "App language",
     "Langue parlée": "Spoken language",
@@ -1061,6 +1063,7 @@ const DICO = {
     "Retirer de l’espace équipe ?": "Remove from the User area?",
     "Retirer des favoris": "Remove from favourites",
     "Retirer la photo": "Remove the photo",
+    "Retirer la vidéo": "Remove the video",
     "Retirer le logo": "Remove the logo",
     "Retirer le sous-dossier ?": "Remove the subfolder?",
     "Retirer {nom} ?": "Remove {nom}?",
@@ -1936,6 +1939,7 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Ziehen Sie, um auf die Zehntelsekunde genau einzustellen",
     "Favori non enregistré : {v}": "Favorit nicht gespeichert: {v}",
     "Favoris": "Favoriten",
+    "Fenêtre choisie.": "Fenster ausgewählt.",
     "Fermer": "Schließen",
     "Fermez l'app qui l'utilise, puis réessayez.": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut.",
     "Fermez l’application qui s’en sert, puis réessayez.": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut.",
@@ -2066,6 +2070,7 @@ const DICO = {
     "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "Das Video wurde nicht vollständig hochgeladen. Starten Sie die Analyse neu und lassen Sie die App offen.",
     "Lampe torche": "Taschenlampe",
     "Lancer la vidéo": "Video abspielen",
+    "Lancer l’enregistrement": "Aufnahme starten",
     "Langue": "Sprache",
     "Langue de l’application": "Sprache der App",
     "Langue parlée": "Gesprochene Sprache",
@@ -2332,6 +2337,7 @@ const DICO = {
     "Retirer de l’espace équipe ?": "Aus dem Nutzerbereich entfernen?",
     "Retirer des favoris": "Aus Favoriten entfernen",
     "Retirer la photo": "Foto entfernen",
+    "Retirer la vidéo": "Video entfernen",
     "Retirer le logo": "Logo entfernen",
     "Retirer le sous-dossier ?": "Unterordner entfernen?",
     "Retirer {nom} ?": "{nom} entfernen?",
@@ -18511,61 +18517,65 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
   let fluxEcran = null
   let fluxMicro = null
 
-  /* ═══ LA BARRE FLOTTANTE, OUVERTE D'ABORD ═══
+  /* ═══ LE PARTAGE ET LA BARRE FLOTTANTE, DANS LE MÊME CLIC ═══
 
      Chrome et Edge savent ouvrir une petite fenêtre qui reste AU-DESSUS de
      toutes les autres, même quand on passe sur Excel ou un autre logiciel.
-     La barre (compte à rebours, chronomètre, pause, terminer) y vit pendant
-     toute la prise.
+     La barre Standix (compte à rebours, chronomètre, pause, recommencer,
+     terminer) y vit pendant toute la prise.
 
-   ⚠ ELLE DOIT S'OUVRIR DANS LA SECONDE DU CLIC, comme la fenêtre de partage :
-     le navigateur ne l'autorise qu'en réponse directe à un geste. On l'ouvre
-     donc AVANT de demander l'écran. Si elle ne s'ouvre pas (Firefox, Safari),
-     la barre reste dans la page, comme avant. */
-  await ouvrirFenetreFlottante()
+   ⚠ LE BUG : LA BARRE STANDIX N'APPARAISSAIT PAS. Le navigateur n'autorise ces
+     deux fenêtres (partage d'écran, barre flottante) qu'en réponse directe à
+     un clic, et le clic ne vaut qu'UNE fois. On ouvrait la barre d'abord : elle
+     « consommait » le clic, le partage était refusé, et l'app retenait alors
+     de ne plus jamais ouvrir la barre. On ne voyait que la bande grise de
+     Chrome (« Partage de cet onglet… »), que le navigateur ajoute lui-même et
+     qu'aucun site ne peut retirer.
 
+     Maintenant :
+       1. le partage est demandé EN PREMIER ;
+       2. la barre flottante est demandée dans la même seconde ;
+       3. si le navigateur refuse la barre (clic déjà consommé), on garde
+          l'écran Standix au premier plan et un bouton « Lancer
+          l'enregistrement » s'affiche : ce second clic ouvre la barre, puis
+          le compte à rebours commence.
+
+     ⚠ LA BARRE RESTE HORS DE LA VIDÉO : on filme une FENÊTRE ou un ONGLET,
+       jamais l'écran entier (`monitorTypeSurfaces: 'exclude'`). Le navigateur
+       n'enregistre que le contenu de la fenêtre choisie, pas ce qui flotte
+       par-dessus. */
+  try { localStorage.removeItem('standix-ecran-sans-pip') } catch (x) {}
+  const pipPossible = !!window.documentPictureInPicture?.requestWindow
+  let controle = null
+  try { if (window.CaptureController) controle = new CaptureController() } catch (x) {}
+
+  let pEcran
   try {
-    /* Cette ligne suit le clic de près : c'est elle qui ouvre la fenêtre de
-       partage du navigateur. */
-    /* ═══ LA BARRE RESTE HORS DE LA VIDÉO ═══
-
-       La barre flottante est une vraie fenêtre, au-dessus de tout. Si l'on
-       filmait l'ÉCRAN ENTIER, elle serait donc dans la vidéo — et un site
-       web n'a aucun moyen de se cacher d'une capture d'écran complète (seules
-       les applications installées, comme Loom, le peuvent).
-
-       On filme donc une FENÊTRE ou un ONGLET : le navigateur n'enregistre que
-       le contenu de cette fenêtre, pas ce qui flotte par-dessus. La barre
-       reste visible pour la personne, partout, et absente de la vidéo.
-
-       `monitorTypeSurfaces: 'exclude'` retire « Écran entier » du choix
-       (Chrome, Edge) ; `selfBrowserSurface: 'exclude'` retire l'onglet
-       Standix lui-même, qu'on n'a aucune raison de filmer. */
-    fluxEcran = await navigator.mediaDevices.getDisplayMedia({
+    pEcran = navigator.mediaDevices.getDisplayMedia({
       video: { width: { ideal: 2560 }, height: { ideal: 1440 }, frameRate: { ideal: 30 },
                displaySurface: 'window' },
       audio: false,
       monitorTypeSurfaces: 'exclude',
       selfBrowserSurface: 'exclude',
       surfaceSwitching: 'include',
+      ...(controle ? { controller: controle } : {}),
     })
-    /* Un navigateur qui ignore ces consignes a pu laisser choisir l'écran
-       entier : la barre flottante y serait filmée. On la replie alors dans la
-       page, qui, elle, n'apparaît que si l'on revient sur Standix. */
+  } catch (e) { pEcran = Promise.reject(e) }
+  let pip = null
+  const pPip = pipPossible ? ouvrirFenetreFlottante().then(w => { pip = w }, () => { pip = null }) : Promise.resolve()
+
+  try {
+    fluxEcran = await pEcran
+    /* Sans barre flottante, on reste sur l'écran Standix pour le second clic.
+       À régler tout de suite après le choix : le navigateur ne l'accepte que
+       dans cet instant-là. */
+    try { controle?.setFocusBehavior?.(pip || !pipPossible ? 'focus-captured-surface' : 'no-focus-change') } catch (x) {}
+    await pPip
     const surface = fluxEcran.getVideoTracks()[0]?.getSettings?.().displaySurface
-    if (surface === 'monitor') fermerFenetreFlottante()
+    if (surface === 'monitor') { fermerFenetreFlottante(); pip = null }
   } catch (e) {
-    /* Refus de la personne, ou navigateur sans partage : ce n'est pas une
-       panne, on ne crie pas. */
     fermerFenetreFlottante()
-    /* Un navigateur qui exige le geste pour le partage aussi : la fenêtre
-       flottante l'a utilisé. On s'en souvient et on ne l'ouvre plus. */
-    if (e?.name === 'InvalidStateError' && ecranPipTente) {
-      try { localStorage.setItem('standix-ecran-sans-pip', '1') } catch (x) {}
-      err.style.color = 'var(--red)'
-      err.textContent = tLang('Cliquez encore une fois sur le bouton pour choisir l’écran.')
-      return
-    }
+    /* Refus de la personne : ce n'est pas une panne, on ne crie pas. */
     if (e?.name !== 'NotAllowedError') {
       err.style.color = 'var(--red)'
       err.textContent = tLang('Le partage d\'écran n\'a pas pu démarrer : {v}', { v: e?.message || e })
@@ -18593,8 +18603,33 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
      l'ajouterait une fois de plus à chaque reprise. */
   pisteVideo.addEventListener('ended', () => arreterEcran())
 
+  // La barre flottante n'a pas pu s'ouvrir avec le premier clic : on en demande un second.
+  if (pipPossible && !zoneFenetreFlottante() && !(fluxEcran.getVideoTracks()[0]?.getSettings?.().displaySurface === 'monitor')) {
+    demanderSecondClicEcran()
+    return
+  }
   lancerPriseEcran()
 })
+
+/* Le second clic : il ouvre la barre flottante (le navigateur l'accepte, c'est
+   un geste neuf), puis lance le compte à rebours. */
+function demanderSecondClicEcran() {
+  const v = voileEcran(`<div class="ecran-prise attente">
+      <span class="ecran-attente-t">${tLang('Fenêtre choisie.')}</span>
+      <button type="button" class="btn small" data-ecran="go">${tLang('Lancer l’enregistrement')}</button>
+      <button type="button" class="ecran-refaire" data-ecran="annuler">${tLang('Annuler')}</button>
+    </div>`)
+  v.classList.add('discret')
+  v.onclick = async (e) => {
+    const b = e.target.closest('[data-ecran]')
+    if (!b) return
+    if (b.dataset.ecran === 'annuler') { nettoyerEcran(); return }
+    if (b.dataset.ecran === 'go') {
+      await ouvrirFenetreFlottante()
+      lancerPriseEcran()
+    }
+  }
+}
 
 /* ═══════════════════════════════════════════════════════════════════════════
    LA PRISE ELLE-MÊME
@@ -18806,9 +18841,7 @@ let ecranPipTente = false
 
 async function ouvrirFenetreFlottante() {
   ecranPipTente = false
-  let sansPip = false
-  try { sansPip = localStorage.getItem('standix-ecran-sans-pip') === '1' } catch (e) {}
-  if (sansPip || !window.documentPictureInPicture?.requestWindow) return null
+  if (!window.documentPictureInPicture?.requestWindow) return null
   if (ecranPip && !ecranPip.closed) return ecranPip
   ecranPipTente = true
   try {
@@ -21413,6 +21446,8 @@ function resetAiScreen() {
      retrouvait seul sur sa ligne, à gauche, et les deux textes se suivaient
      sur la suivante. La chaîne vide rend la main au CSS. */
   document.getElementById('ai-video-placeholder').style.display = ''
+  const oter = document.getElementById('ai-video-oter')
+  if (oter) oter.hidden = true
   /* Le bouton retrouve son état neuf. Sans ces deux lignes, il gardait la coche
      et l'anneau de l'analyse précédente : on revenait sur la page avec un bouton
      qui disait « c'est fait » alors qu'il n'y avait rien à faire. */
@@ -21448,6 +21483,34 @@ function resetAiScreen() {
   stopAiProgressSimulation(0)
 }
 
+/* ═══ LA CROIX : RETIRER LA VIDÉO CHOISIE ═══
+
+   On revient au cadre vide « Choisir une vidéo », sans quitter la page : le
+   titre et le dossier restent remplis.
+
+ ⚠ LE CLIC NE DOIT PAS TRAVERSER. La croix est posée au-dessus du champ de
+   fichier invisible qui couvre tout le cadre : sans `stopPropagation` et
+   `preventDefault`, retirer la vidéo rouvrirait aussitôt le choix d'un fichier. */
+document.getElementById('ai-video-oter')?.addEventListener('click', (e) => {
+  e.preventDefault()
+  e.stopPropagation()
+  const player = document.getElementById('ai-video-player')
+  try { player.pause() } catch (x) {}
+  if (player.src?.startsWith('blob:')) { try { URL.revokeObjectURL(player.src) } catch (x) {} }
+  player.removeAttribute('src')
+  try { player.load() } catch (x) {}
+  player.style.display = 'none'
+  document.getElementById('ai-video-placeholder').style.display = ''
+  document.getElementById('ai-video-input').value = ''
+  e.currentTarget.hidden = true
+  aiVideoFile = null
+  aiVideoDuree = 0
+  const bLance = document.getElementById('ai-launch-btn')
+  if (bLance) { bLance.disabled = true; bLance.classList.remove('travaille', 'fini') }
+  const errEl = document.getElementById('ai-error')
+  if (errEl) errEl.textContent = ''
+})
+
 document.getElementById('ai-video-input')?.addEventListener('change', (e) => {
   const file = e.target.files[0]
   if (!file) return
@@ -21467,6 +21530,8 @@ function chargerVideoPourIA(file) {
   player.src = url
   player.style.display = 'block'
   document.getElementById('ai-video-placeholder').style.display = 'none'
+  const oter = document.getElementById('ai-video-oter')
+  if (oter) oter.hidden = false
   /* ═══ LE BOUTON RESTE FERMÉ TANT QU'ON NE SAIT PAS ═══
 
      Il était activé ICI, avant que la durée soit connue — `loadedmetadata`

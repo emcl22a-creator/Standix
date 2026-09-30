@@ -143,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=c088fa04">
+<link rel="stylesheet" href="style.css?v=018b5d6d">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1542,7 +1542,7 @@
             filtre, la pastille et les trois branches du rendu ; c'est le
             LIBELLE qui change, pas l'etat. -->
           <button type="button" class="p-seg on" data-etat="tout" role="tab">En ligne</button>
-      <button type="button" class="p-seg" data-etat="brouillon" role="tab">En dév.<span
+      <button type="button" class="p-seg" data-etat="brouillon" role="tab">En cours<span
         class="p-seg-pt" id="seg-brouillons-pt" hidden></span></button>
     </div>
 
@@ -1957,14 +1957,12 @@
           <span class="ee-n"><b>1</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
           <div class="ee-c">
             <div class="ee-t">Choisissez ce que vous filmez</div>
-            <div class="ee-s">Pour filmer un logiciel, prenez « Écran entier ».</div>
             <button type="button" class="btn small ee-b" id="ecran-demarrer">Choisir l’écran</button>
           </div>
         </div>
         <div class="ee" data-e="2">
           <span class="ee-n"><b>2</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
           <div class="ee-c">
-            <div class="ee-t">Lancez l’enregistrement</div>
             <button type="button" class="btn small ee-b" id="ecran-lancer" disabled>Lancer l’enregistrement</button>
           </div>
         </div>
@@ -1983,7 +1981,7 @@
         </div>
         <div class="ecran-ligne">
           <span class="ecran-pt"></span>
-          <span>Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.</span>
+          <span>Cinq minutes au maximum.</span>
         </div>
       </div>
       <div class="error-msg" id="ecran-erreur"></div>
@@ -2484,15 +2482,8 @@
       </div>
 
       <div class="ia-ecoute">
-          <div class="tt">Ce que l’IA analyse</div>
-          <div class="lg">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0"></path><line x1="12" y1="18" x2="12" y2="21.5"></line></svg>
-            <span><b>Vos paroles</b> — ce que vous expliquez pendant chaque geste</span>
-          </div>
-          <div class="lg">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"></path><circle cx="12" cy="12" r="2.8"></circle></svg>
-            <span><b>Ce qui est visible</b> — objets et texte à l’écran</span>
-          </div>
+          <!-- Le bloc « Ce que l’IA analyse » (paroles, ce qui est visible) a été
+               retiré à la demande d'Em : il ne reste que la langue parlée. -->
           <!-- ⚠ LA LANGUE EST DEMANDÉE, PLUS DEVINÉE.
 
                L'analyse Azure est passée en mode léger (`Basic`) : plus
@@ -2582,7 +2573,7 @@
           </span>
         </div>
         <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Presque prêt</div>
-        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Vous pouvez quitter cette page.</b> La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Vous pouvez quitter cette page.</b> La procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.</div>
         <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button>
 
         <!-- ═══ COMBIEN DE TEMPS ? ═══
@@ -4359,6 +4350,13 @@
           </button>
     </div>
     <div class="subhead titre-cat" id="detail-subhead">—</div>
+    <div class="zone-etapes">
+    <!-- ⚠ L'IMAGE DE PRÉSENTATION DÉFILE AVEC LES ÉTAPES (demande d'Em).
+         Elle était au-dessus de la zone qui défile, donc figée pendant qu'on
+         faisait glisser les étapes. L'image, la vidéo, le titre « Étapes de la
+         procédure » et le rappel sont maintenant DANS la zone qui défile, dans
+         le même ordre qu'avant : en haut de page, rien ne change à l'œil. Seuls
+         le titre de la procédure et son dossier restent fixes. -->
     <div class="analyse-couv" id="detail-couverture" style="display:none;"></div>
     <div class="video-frame" id="detail-video-frame" style="display:none;">
       <video id="detail-video" controls="" playsinline="" webkit-playsinline="" preload="metadata"></video>
@@ -4382,7 +4380,6 @@
          Les étapes ET le bloc de fin y sont ensemble : le second arrive après
          la dernière étape, comme une conclusion. Posé en dehors, il aurait
          occupé le bas de l'écran en permanence. -->
-    <div class="zone-etapes">
     <div id="detail-steps"></div>
     <div class="confirm-bar">
       <div class="lecture-etat" id="lecture-etat">
@@ -4523,7 +4520,8 @@
            établissements », plus haut sur cette page, montre les mêmes
            entreprises et permet en plus d'en changer d'un geste. Deux chemins
            vers la même chose, dont un moins bon. -->
-        <button type="button" class="reg-ligne" onclick="ouvrirMonPoste()">
+        <!-- Masquée : le poste n'est plus utilisé dans l'app (demande d'Em). -->
+        <button type="button" class="reg-ligne" hidden onclick="ouvrirMonPoste()">
           <span class="reg-ic"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="7.4" width="18" height="12.6" rx="2.6" stroke="currentColor" stroke-width="1.7"></rect><path d="M9 7.4V5.8A1.8 1.8 0 0 1 10.8 4h2.4A1.8 1.8 0 0 1 15 5.8v1.6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"></path><line x1="3" y1="12.6" x2="21" y2="12.6" stroke="currentColor" stroke-opacity="0.45" stroke-width="1.6"></line></svg></span>
           <span class="reg-nm">Votre poste</span>
           <span class="reg-val" id="e-mon-poste">—</span>
@@ -5309,7 +5307,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=b9653048"></script>
+<script type="module" src="app.js?v=b4746a1e"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

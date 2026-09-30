@@ -14619,6 +14619,24 @@ body:not(.en-apercu) #voir-equipe.revient{
 }
 
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   ⚠ `body.vu-login`, `body.vu-equipe`, `body.vu-gestion` REMPLACENT
+   `body:has(#… [style*="display…"])`.
+
+   Ces sélecteurs lisaient le `display` écrit en ligne sur les trois
+   conteneurs. Juste, mais ruineux : parce qu'un `:has()` portait sur
+   l'attribut `style`, TOUTE écriture de style n'importe où dans la page (la
+   barre du bas en anime un à chaque image) obligeait le navigateur à
+   revérifier le corps de page et à recalculer des centaines d'éléments.
+
+   Les trois classes disent exactement la même chose : le petit script en fin
+   d'`index.html` (« LE CORPS DE PAGE SAIT CE QUI EST AFFICHÉ ») recopie l'état
+   des trois conteneurs, avec le même test de sous-chaîne, à chaque changement.
+
+   ⚠ `:not(#_)` REND LA SPÉCIFICITÉ D'ORIGINE. L'identifiant dans le `:has()`
+     pesait (1,0,0) ; sans ce `:not`, ces règles auraient perdu face à
+     d'autres qu'elles battaient jusque-là. Aucun élément ne s'appelle `_`.
+   ═══════════════════════════════════════════════════════════════════════════ */
 /* ⚠ NI BARRE NI CERCLE SUR L'ECRAN DE CONNEXION.
 
    La navigation appartient a l'app ouverte ; sur la feuille de connexion elle
@@ -14629,10 +14647,10 @@ body:not(.en-apercu) #voir-equipe.revient{
    ⚠ ON VISE L'ETAT DE LA FEUILLE, pas une classe posee sur `body`. `:has()`
      lit le `display` en ligne que le script ecrit : aucune classe a poser, rien
      a retirer au retour, donc rien a oublier. */
-body:has(#login-screen[style*="display:flex"]) #bar,
-body:has(#login-screen[style*="display: flex"]) #bar,
-body:has(#login-screen[style*="display:flex"]) #voir-equipe,
-body:has(#login-screen[style*="display: flex"]) #voir-equipe{
+body.vu-login:not(#_) #bar,
+body.vu-login:not(#_) #bar,
+body.vu-login:not(#_) #voir-equipe,
+body.vu-login:not(#_) #voir-equipe{
   opacity:0; pointer-events:none;
 }
 
@@ -15347,8 +15365,8 @@ body:has(#login-screen[style*="display: flex"]) #voir-equipe{
    Il ouvre un apercu de l'espace equipe — depuis l'espace equipe, il ne mene
    nulle part. Et la barre a quatre onglets ici : la place lui manque de toute
    facon. */
-body:has(#equipe-app[style*="display: block"]) #voir-equipe,
-body:has(#equipe-app[style*="display:block"]) #voir-equipe{
+body.vu-equipe:not(#_) #voir-equipe,
+body.vu-equipe:not(#_) #voir-equipe{
   opacity:0; pointer-events:none;
 }/* ⚠ LA BARRE NE S'ELARGIT QUE DANS L'ESPACE EQUIPE, JAMAIS PENDANT L'APERCU.
 
@@ -15363,8 +15381,8 @@ body:has(#equipe-app[style*="display:block"]) #voir-equipe{
 
    ⚠ ET UN `!important` RESTE NECESSAIRE : la largeur ordinaire de la barre est
      ecrite par le script a chaque image. */
-body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display: block"]) #bar,
-body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display:block"]) #bar{
+body.vu-equipe:not(#_):not(.en-apercu):not(.espace-vide) #bar,
+body.vu-equipe:not(#_):not(.en-apercu):not(.espace-vide) #bar{
   /* `--bar-col` : la barre garde sa largeur de téléphone sur tablette, comme
      dans l'espace gestion. */
   width:min(calc(100vw - 46px), calc(var(--bar-col, 460px) - 40px)) !important;
@@ -15389,16 +15407,16 @@ body:not(.en-apercu):not(.espace-vide):has(#equipe-app[style*="display:block"]) 
    ═══════════════════════════════════════════════════════════════════════════ */
 #voir-equipe{ opacity:0; pointer-events:none; }
 
-body:has(#gestion-app[style*="display: block"]):not(.en-apercu):not(.sans-bar) #voir-equipe,
-body:has(#gestion-app[style*="display:block"]):not(.en-apercu):not(.sans-bar) #voir-equipe{
+body.vu-gestion:not(#_):not(.en-apercu):not(.sans-bar) #voir-equipe,
+body.vu-gestion:not(#_):not(.en-apercu):not(.sans-bar) #voir-equipe{
   opacity:1; pointer-events:auto;
 }
 
 /* ⚠ ET JAMAIS PENDANT LA CONNEXION NI LE CHARGEMENT, meme si l'espace Gestion
    est deja monte derriere la feuille. */
 body.chargement #voir-equipe,
-body:has(#login-screen[style*="display: flex"]) #voir-equipe,
-body:has(#login-screen[style*="display:flex"]) #voir-equipe{
+body.vu-login:not(#_) #voir-equipe,
+body.vu-login:not(#_) #voir-equipe{
   opacity:0 !important; pointer-events:none;
 }
 
@@ -22900,6 +22918,24 @@ body.abo-expire [data-etab-plus]{
   height:40px;
 }
 
+/* ⚠ LE LOGO A LA TAILLE DE L'AVATAR DE LA CARTE DU DESSUS : 46 px, arrondi
+   14 px (`.id-av`). Les deux vignettes sont l'une sous l'autre, sur la même
+   colonne : deux tailles différentes se voyaient tout de suite. */
+#e-profil #es-ent-groupe .reg-ic.ent-ic{
+  width:46px;
+  height:46px;
+  flex:0 0 46px;
+  border-radius:14px;
+}
+#e-profil #es-ent-groupe .reg-ic.ent-ic .ent-ini,
+#e-profil #es-ent-groupe .reg-ic.ent-ic img{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  object-fit:cover;
+}
+#e-profil #es-ent-groupe .reg-ic.ent-ic .ent-ini{ font-size:16px; }
+
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -25688,3 +25724,30 @@ html::-webkit-scrollbar-thumb:hover{
 .ai-video-oter[hidden]{ display:none; }
 .ai-video-oter svg{ width:16px; height:16px; display:block; }
 .ai-video-oter:active{ transform:scale(0.9); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ATTEND D'ÊTRE COMPLÈTE
+
+   Posée par `poserPorte` (app.js) le temps que les images visibles, les
+   polices et les données de l'écran soient prêtes — jamais plus de 0,9 s.
+   Puis tout paraît ensemble.
+
+ ⚠ `opacity` ET NON `display` : l'écran reste mis en page, donc mesurable. Les
+   pastilles, la barre du bas et le défilement ont besoin de ses dimensions.
+
+ ⚠ LES ANIMATIONS SONT EN PAUSE, pas coupées. L'entrée de l'écran (flou,
+   montée, feuille) attend au premier instant et se joue quand la page paraît
+   — sinon elle se serait déroulée dans le vide.
+
+ ⚠ `!important` : une animation l'emporte sur une déclaration ordinaire, et
+   l'entrée de l'écran anime justement son opacité.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.screen.page-attend{
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+.screen.page-attend,
+.screen.page-attend *{
+  animation-play-state:paused !important;
+}

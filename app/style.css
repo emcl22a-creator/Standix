@@ -25810,5 +25810,24 @@ html::-webkit-scrollbar-thumb:hover{
 .ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-n svg,
 .ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-n svg{ display:block; }
 .ecran-etapes[data-etape="2"] .ee[data-e="1"] .ee-b,
-.ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-b,
-.ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-b{ display:none; }
+.ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-b{ display:none; }
+/* L'étape 2 n'a plus de titre : une fois faite, son bouton reste, éteint,
+   à côté de la coche — sinon la coche resterait seule. */
+.ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-b{ opacity:0.45; }
+
+/* Favoris vides : la phrase est seule, sans titre au-dessus. */
+.cl-rien-suite.cl-rien-seule{ margin-top:0; }
+
+/* Étape 2 sans titre : le bouton seul, aligné sur le numéro. */
+.ecran-etapes .ee[data-e="2"] .ee-c{ padding-top:0; }
+.ecran-etapes .ee[data-e="2"] .ee-b{ margin-top:0; }
+
+
+/* ═══ LES NOMS EN SEMI-GRAS (demande d'Em) ═══
+   Le nom du compte et celui de l'entreprise, dans Réglages et Profil,
+   passent en semi-gras (600) : ils restent la ligne principale de leur carte
+   sans peser plus que le titre de la page. */
+.id-nom,
+.etab-ident-nom,
+#p-settings #pg-ent-nom,
+#e-profil #es-ent-nom{ font-weight:600; }

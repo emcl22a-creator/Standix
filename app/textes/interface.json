@@ -979,9 +979,9 @@
   "en": "Load the video first.",
   "de": "Laden Sie zuerst das Video."
  },
- "Choisir la fenêtre et démarrer": {
-  "en": "Choose the window and start",
-  "de": "Fenster wählen und starten"
+ "Choisir l’écran et démarrer": {
+  "en": "Choose the screen and start",
+  "de": "Bildschirm wählen und starten"
  },
  "Choisir une vidéo": {
   "en": "Choose a video",
@@ -998,10 +998,6 @@
  "Choisissez la durée pendant laquelle le code d’invitation reste valide.": {
   "en": "Choose how long the invitation code stays valid.",
   "de": "Wählen Sie, wie lange der Einladungscode gültig bleibt."
- },
- "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": {
-  "en": "Choose the window or tab to record. The control bar stays visible to you but does not appear in the video.",
-  "de": "Wählen Sie das Fenster oder den Tab für die Aufnahme. Die Steuerleiste bleibt für Sie sichtbar, erscheint aber nicht im Video."
  },
  "Choisissez le poste qui vous correspond.": {
   "en": "Pick the role that fits you.",
@@ -1698,10 +1694,6 @@
  "Favoris": {
   "en": "Favourites",
   "de": "Favoriten"
- },
- "Fenêtre choisie.": {
-  "en": "Window selected.",
-  "de": "Fenster ausgewählt."
  },
  "Fermer": {
   "en": "Close",
@@ -4994,6 +4986,14 @@
  "Échec : {v}": {
   "en": "Failed: {v}",
   "de": "Fehlgeschlagen: {v}"
+ },
+ "Écran choisi.": {
+  "en": "Screen selected.",
+  "de": "Bildschirm ausgewählt."
+ },
+ "Écran entier, fenêtre ou onglet : vous choisissez. Si vous filmez l’écran entier, la barre de contrôle apparaîtra aussi dans la vidéo.": {
+  "en": "Whole screen, window or tab: you choose. If you record the whole screen, the control bar will also appear in the video.",
+  "de": "Ganzer Bildschirm, Fenster oder Tab: Sie wählen. Wenn Sie den ganzen Bildschirm aufnehmen, erscheint die Steuerleiste auch im Video."
  },
  "Écrivez chaque étape dans l'ordre": {
   "en": "Write each step in order",

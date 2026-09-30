@@ -1949,16 +1949,15 @@
           <span class="ecran-pt"></span>
           <span>Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.</span>
         </div>
-        <!-- ⚠ ON FILME UNE FENÊTRE OU UN ONGLET, JAMAIS L'ÉCRAN ENTIER : c'est ce
-             qui garde la barre de contrôle hors de la vidéo (voir app.js,
-             « LA BARRE RESTE HORS DE LA VIDÉO »). -->
+        <!-- Écran entier possible (logiciels hors du navigateur) : la barre
+             est alors filmée aussi. Voir app.js, « UN CLIC POUR CHOISIR ». -->
         <div class="ecran-ligne">
           <span class="ecran-pt"></span>
-          <span>Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.</span>
+          <span>Écran entier, fenêtre ou onglet : vous choisissez. Si vous filmez l’écran entier, la barre de contrôle apparaîtra aussi dans la vidéo.</span>
         </div>
       </div>
 
-      <button class="btn block" style="margin-top:20px;" id="ecran-demarrer">Choisir la fenêtre et démarrer</button>
+      <button class="btn block" style="margin-top:20px;" id="ecran-demarrer">Choisir l’écran et démarrer</button>
       <div class="error-msg" id="ecran-erreur"></div>
     </div>
 
@@ -5283,7 +5282,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=fcd4125b"></script>
+<script type="module" src="app.js?v=96ce33a8"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

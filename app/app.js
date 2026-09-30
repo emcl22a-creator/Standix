@@ -3797,9 +3797,54 @@ async function noterScanQR() {
    erreur avec l'écran de démarrage.
    ═══════════════════════════════════════════════════════════════════════════ */
 let appRevelee = false
+
+/* ═══ AU DÉMARRAGE, ON ATTEND AUSSI LES POLICES ET LES IMAGES ═══
+
+   Les données étaient attendues, pas le reste : l'app paraissait dans la
+   police du système, puis basculait en Inter une seconde plus tard — tout le
+   texte changeait de largeur sous les yeux. Même chose pour le logo de
+   l'entreprise et les images du premier écran.
+
+ ⚠ LA FEUILLE DES POLICES EST CHARGEE SANS BLOQUER (`media="print"`). Tant
+   qu'elle n'est pas là, `document.fonts` ne sait même pas qu'Inter existe :
+   on attend donc d'abord la feuille, puis on force une mise en page pour que
+   les polices utilisées partent en téléchargement, et alors seulement
+   `document.fonts.ready` veut dire quelque chose.
+
+ ⚠ PLAFOND DE 1,5 S. Au-delà, on montre quand même : une police en retard
+   vaut mieux qu'un écran vide. Aux ouvertures suivantes, tout vient du cache
+   et l'attente est nulle. */
+function policesPretes() {
+  if (!document.fonts) return Promise.resolve()
+  const lien = document.querySelector('link[href*="fonts.googleapis.com"]')
+  const feuille = new Promise(r => {
+    if (!lien || lien.sheet) return r()
+    lien.addEventListener('load', () => r(), { once: true })
+    lien.addEventListener('error', () => r(), { once: true })
+  })
+  return feuille.then(() => {
+    void document.body.offsetHeight
+    return document.fonts.ready
+  }).catch(() => {})
+}
+
+function attendreDemarrage() {
+  const plafond = new Promise(r => setTimeout(r, 1500))
+  /* Les images : toutes celles du premier écran, barre du haut comprise — les
+     données viennent d'arriver, les logos qu'elles apportent aussi. */
+  const tout = policesPretes()
+    .then(() => porteCourante?.promesse)
+    .then(() => Promise.all(imagesQuiRetiennent(document.body).map(attendreImage)))
+  return Promise.race([tout, plafond]).catch(() => {})
+}
+
 function revelerApp() {
   if (appRevelee) return
   appRevelee = true
+  attendreDemarrage().then(leverVoileApp)
+}
+
+function leverVoileApp() {
   /* Une image d'attente : le rendu qui vient de se faire doit être PEINT avant
      qu'on ne lève le voile, sinon on découvre une page encore en cours de
      mise en page. */
@@ -4534,12 +4579,33 @@ document.getElementById('ac-connexion')?.addEventListener('click', () => allerCo
   if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return
 
   let n = 0, minuteur = null
+  const ecranChoix = document.getElementById('choice-screen')
   const suivante = () => {
+    /* ⚠ RIEN QUAND L'ÉCRAN D'ACCUEIL EST MASQUÉ — donc tout le temps qu'on
+       passe dans l'app. Le minuteur changeait de photo toutes les cinq
+       secondes derrière l'app, et chaque changement faisait recalculer les
+       styles de la page pour rien. */
+    if (ecranChoix && ecranChoix.style.display === 'none') return
     photos[n].classList.remove('on')
     n = (n + 1) % photos.length
     photos[n].classList.add('on')
   }
-  const lancer = () => { if (!minuteur) minuteur = setInterval(suivante, 5000) }
+  /* Les photos sont des fichiers (voir `index.html`) : la suivante est
+     demandée pendant que la précédente est affichée, pour qu'elle soit prête
+     au moment du fondu. Seulement quand l'écran d'accueil est visible. */
+  const dejaDemandees = new Set()
+  const prechargerSuivante = () => {
+    if (ecranChoix && ecranChoix.style.display === 'none') return
+    const ph = photos[(n + 1) % photos.length]
+    const m = /url\(["']?([^"')]+)/.exec(ph.style.backgroundImage || '')
+    if (!m || dejaDemandees.has(m[1])) return
+    dejaDemandees.add(m[1])
+    const i = new Image(); i.src = m[1]
+  }
+  const lancer = () => {
+    if (!minuteur) minuteur = setInterval(() => { suivante(); prechargerSuivante() }, 5000)
+    setTimeout(prechargerSuivante, 1500)
+  }
   const arreter = () => { clearInterval(minuteur); minuteur = null }
 
   document.addEventListener('visibilitychange', () => {
@@ -5888,6 +5954,103 @@ function refermerLesVoiles() {
   try { document.body.style.overflow = '' } catch (e) {}
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PRÉLECTURE : LES PREMIÈRES REQUÊTES PARTENT TÔT
+
+   `enterApp` lance ici exactement les requêtes que `loadGestionProcedures` ou
+   `loadEquipeProcedures` feront ensuite, pendant que le serveur contrôle
+   l'appareil. Quand le chargement arrive, les réponses sont déjà là (ou en
+   route) : il les reprend au lieu de redemander.
+
+ ⚠ UNE SEULE UTILISATION. `prendrePrelecture` la rend puis l'oublie : un
+   rechargement ultérieur (retour de veille, temps réel) repart du réseau.
+ ⚠ MÊME ENTREPRISE, MOINS DE 20 SECONDES. Sinon on l'ignore.
+ ⚠ LES MÊMES REQUÊTES, AU CARACTÈRE PRÈS. Modifier l'une sans l'autre
+   rendrait des données différentes selon le chemin : les deux sont écrites
+   dans des fonctions partagées, `requetesGestion` et `requetesEquipe`.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let prelecture = null
+
+function requetesGestion(entrepriseId) {
+  return Promise.all([
+    supabase.from('procedures').select('*, etapes(count)').eq('entreprise_id', entrepriseId)
+      .order('created_at', { ascending: false }),
+    supabase.from('membres').select('*').eq('entreprise_id', entrepriseId),
+    supabase.from('entreprises').select('*').eq('id', entrepriseId).maybeSingle(),
+  ])
+}
+
+/* Côté équipe : les procédures publiées, mes lectures et mes favoris ne
+   dépendent pas les uns des autres — ils partent ensemble. Les favoris
+   attendaient la fin des deux premières requêtes : un aller-retour de plus. */
+function requetesEquipe(membre) {
+  return Promise.all([
+    supabase.from('procedures').select('*')
+      .eq('entreprise_id', membre.entreprise_id)
+      .not('publiee_le', 'is', null)
+      .order('titre'),
+    supabase.from('validations').select('procedure_id, validated_at, duree_lecture').eq('membre_id', membre.id),
+    Promise.resolve(supabase.from('favoris').select('procedure_id').eq('membre_id', membre.id))
+      .catch(() => ({ data: null })),
+  ])
+}
+
+function lancerPrelecture(membre) {
+  /* Déjà lancée pour la même entreprise (depuis `checkExistingSession`, avec
+     la fiche retenue de la dernière ouverture) : on la garde. */
+  const cle = !membre?.entreprise_id ? null
+    : membre.role === 'gestion' ? 'gestion:' + membre.entreprise_id
+    : (!membre.procedure_visitee ? 'equipe:' + membre.id : null)
+  if (cle && prelecture?.cle === cle && Date.now() - prelecture.t < 20000) return
+  prelecture = null
+  try {
+    if (!membre?.entreprise_id) return
+    if (membre.role === 'gestion') {
+      const promesse = requetesGestion(membre.entreprise_id)
+      /* Les lectures dépendent de la liste des procédures : elles partent dès
+         que celle-ci arrive, sans attendre la fin du contrôle de l'appareil.
+         Même requête que dans `loadGestionProcedures`, sur les mêmes
+         identifiants, dans le même ordre. */
+      const validations = promesse.then(([rp]) => {
+        const ids = (rp?.data || []).map(p => p.id)
+        return ids.length ? supabase.from('validations').select('*').in('procedure_id', ids) : null
+      })
+      validations.catch(() => {})
+      prelecture = { cle: 'gestion:' + membre.entreprise_id, t: Date.now(), promesse, validations }
+    } else if (!membre.procedure_visitee) {
+      const promesse = requetesEquipe(membre)
+      /* Les étapes des procédures prêtes, dès que la liste arrive. Le
+         chargement ne les reprend que pour exactement les mêmes procédures
+         (voir `loadEquipeProcedures`). */
+      const etapes = promesse.then(([rp]) => {
+        const ids = (rp?.data || []).filter(p => p.statut !== 'traitement').map(p => p.id)
+        return supabase.from('etapes').select('*').in('procedure_id', ids).order('ordre')
+          .then(r => ({ ids: ids.join(','), r }))
+      })
+      etapes.catch(() => {})
+      prelecture = { cle: 'equipe:' + membre.id, t: Date.now(), promesse, etapes }
+    }
+    /* Une erreur réseau ne doit pas remonter comme « non gérée » : le
+       chargement la retrouvera en reprenant la promesse. */
+    prelecture?.promesse.catch(() => {})
+  } catch (e) { prelecture = null }
+}
+
+let validationsPrelues = null
+let etapesPrelues = null
+function prendrePrelecture(cle) {
+  const p = prelecture
+  prelecture = null
+  validationsPrelues = null
+  etapesPrelues = null
+  if (p && p.cle === cle && Date.now() - p.t < 20000) {
+    validationsPrelues = p.validations || null
+    etapesPrelues = p.etapes || null
+    return p.promesse
+  }
+  return null
+}
+
 async function enterApp(membre) {
   refermerLesVoiles()
 
@@ -5939,7 +6102,24 @@ async function enterApp(membre) {
     localStorage.setItem('procedo_espace', membre.role)
     // Le repère du rechargement : on retient la fiche, donc l'établissement.
     localStorage.setItem('procedo_membre', String(membre.id))
+    /* L'entreprise aussi : à la prochaine ouverture, `checkExistingSession`
+       lance les premières lectures avant même d'avoir relu la fiche. */
+    localStorage.setItem('procedo_entreprise', String(membre.entreprise_id || ''))
   } catch (e) {}
+
+  /* ⚠ LE CONTRÔLE DE L'APPAREIL ET LES PREMIÈRES REQUÊTES PARTENT ENSEMBLE.
+
+     `signalerPresence` était attendu seul, puis seulement la liste des
+     procédures était demandée : deux allers-retours réseau à la file avant de
+     voir quoi que ce soit — et le premier passe par une fonction serveur, la
+     plus lente à répondre.
+
+     On lance donc les deux maintenant. La décision ne change pas : on attend
+     toujours la réponse du contrôle avant d'ouvrir l'app, et un appareil
+     refusé ne voit rien (l'app reste masquée, les données préparées ne sont
+     jamais affichées). Voir `lancerPrelecture`. */
+  const presenceEnCours = signalerPresence(membre)
+  lancerPrelecture(membre)
 
   /* On masque les écrans d'accueil AVANT toute attente. Ils l'étaient après le
      chargement des procédures : sur une connexion lente, plusieurs secondes
@@ -5951,8 +6131,9 @@ async function enterApp(membre) {
   /* Avant tout : cet appareil a-t-il le droit d'entrer ? On le demande au
      serveur, ici plutôt qu'à la connexion, pour couvrir aussi la reprise de
      session. */
-  const autorise = await signalerPresence(membre)
+  const autorise = await presenceEnCours
   if (!autorise) {
+    prelecture = null
     await supabase.auth.signOut()
     currentMembre = null
     document.getElementById('gestion-app').style.display = 'none'
@@ -6388,7 +6569,9 @@ let photoTampon = null       // la photo choisie, pas encore enregistree
    masque, pas absent : le laisser vide ferait paraitre une silhouette une
    fraction de seconde en basculant. */
 function peindreBoutonProfil() {
-  const url = currentMembre?.photo_url || null
+  /* ⚠ LE BOUTON DE LA BARRE GARDE TOUJOURS LA SILHOUETTE (choix d'Em). La
+     photo ne s'affiche que dans la carte des réglages. */
+  const url = null
 
   /* ⚠ DEUX ETATS, PLUS TROIS : la photo, ou la silhouette.
 
@@ -6445,11 +6628,31 @@ function peindrePhotoProfil() {
 
      La photo n'etait peinte que dans celle de la gestion : cote utilisateur on
      ne voyait qu'un rond d'initiales, alors que c'est le meme compte. */
+  /* ⚠ L'ADRESSE ENREGISTREE N'EST PAS UNE IMAGE LISIBLE. La photo est rangée
+     dans un stockage privé : il faut une adresse signée, comme pour l'aperçu
+     ci-dessus. La poser telle quelle dans `src` donnait l'icône d'image cassée
+     de Safari — le « ? » — par-dessus les initiales.
+
+   ⚠ ET L'IMAGE RESTE CACHEE TANT QU'ELLE N'EST PAS CHARGEE. Les initiales
+     restent visibles pendant le chargement, et si l'image échoue on les garde :
+     jamais d'icône cassée. */
   ;['reg-av-photo', 'e-reg-av-photo', 'es-photo'].forEach(id => {
     const av = document.getElementById(id)
     if (!av) return
-    if (url) { av.src = url; av.hidden = false }
-    else { av.removeAttribute('src'); av.hidden = true }
+    av.onload = () => { av.hidden = false }
+    av.onerror = () => { av.hidden = true }
+    /* ⚠ LA MEME PHOTO, DEJA CHARGEE, RESTE AFFICHEE. La cacher pour la
+       recharger ferait passer les initiales une fraction de seconde. */
+    if (url && av.getAttribute('data-logo-fichier') === url && av.complete && av.naturalWidth) {
+      av.hidden = false
+      return
+    }
+    av.hidden = true
+    if (!url) { av.removeAttribute('src'); av.removeAttribute('data-logo-fichier'); return }
+    if (url.startsWith('blob:') || url.startsWith('data:')) { av.removeAttribute('data-logo-fichier'); av.src = url; return }
+    av.setAttribute('data-logo-fichier', url)
+    av.removeAttribute('data-logo-signe')
+    signerLogos(av.parentElement || av)
   })
 
   ;['reg-av-initiales', 'e-reg-av-initiales', 'es-initiales'].forEach(id => {
@@ -6676,7 +6879,12 @@ function peindreReglages() {
 
 window.openSettings = async function() {
   rendreChoixLangueApp()
-  chargerEtablissements()
+  /* Au plus une relecture par minute en ouvrant les Réglages : la liste des
+     entreprises vient d'être lue au démarrage, et la redemander à chaque
+     ouverture redessinait les logos une seconde après l'arrivée sur la page.
+     Créer ou modifier une entreprise appelle `chargerEtablissements` en
+     direct : là, la liste est toujours relue. */
+  chargerEtablissementsSiAncien()
   peindreReglages()
   peindreAppareils()
   chargerAlertesPartage()
@@ -7189,6 +7397,8 @@ window.signOut = async function() {
      aucune erreur et laisse croire qu'un element l'attend quelque part. */
 function effacerTracesDuCompte() {
   emailSession = null
+  /* Les adresses signées des images du compte, en mémoire et sur l'appareil. */
+  try { oublierSignatures() } catch (e) {}
 
   ;['settings-nom', 'settings-email', 'es-nom', 'es-email']
     .forEach(id => { const c = document.getElementById(id); if (c) c.value = '' })
@@ -10564,6 +10774,167 @@ surChangementDeLargeur(() => {
   if (document.body.classList.contains('plus-vu')) majBoutonPlus('p-list')
 })
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LA PAGE ATTEND D'ÊTRE COMPLÈTE, PUIS PARAÎT D'UN BLOC
+
+   Demande d'Em : une page ne doit pas se construire sous les yeux — le titre,
+   puis la photo, puis le logo, puis les images des étapes. Elle reste vide le
+   temps que tout soit prêt, et tout paraît en même temps.
+
+   Ce qu'on attend, pour l'écran qu'on ouvre :
+     1. les données « retenues » par la fonction qui l'ouvre (`retenirPage`) ;
+     2. les polices, si elles sont encore en chargement ;
+     3. les images VISIBLES en haut de l'écran : celles dont l'adresse signée
+        est en route (`data-en-signature`) ou qui se téléchargent encore.
+   Les images plus bas dans la page ne retiennent rien : on ne les voit pas en
+   arrivant.
+
+ ⚠ QUAND TOUT EST DÉJÀ LÀ, RIEN NE CHANGE. Le contrôle se fait dans une
+   micro-tâche, avant que le navigateur ne peigne : la classe est posée puis
+   retirée sans qu'aucune image n'ait été dessinée entre les deux. C'est le
+   cas de la grande majorité des changements de page.
+
+ ⚠ JAMAIS PLUS DE `PORTE_MAX_MS`. Une image qui ne vient pas, un réseau
+   coupé : la page paraît quand même, avec ce qu'elle a. Une page vide qui ne
+   s'ouvre jamais serait bien pire qu'une image en retard.
+
+ ⚠ `var` ET NON `let` : `activerAvecNaissance` peut être appelée avant que le
+   script n'ait atteint ces lignes ; un `let` serait alors en zone morte.
+   ═══════════════════════════════════════════════════════════════════════════ */
+var PORTE_MAX_MS = 900
+var porteCourante = null
+var retenuesPage = new Set()
+var dernierEcranPorte = null
+
+/* Une fonction qui ouvre une page puis charge ses données s'en sert :
+   `const liberer = retenirPage()` … `liberer()`. La page attend jusque-là
+   (dans la limite du plafond). */
+function retenirPage() {
+  let liberer
+  const p = new Promise(r => { liberer = r })
+  retenuesPage.add(p)
+  p.then(() => retenuesPage.delete(p))
+  /* ⚠ UNE RETENUE S'ÉTEINT TOUTE SEULE. Une fonction qui attend une réponse de
+     la personne (une fenêtre « abonnement requis ») ne rendrait jamais la
+     main : toutes les pages suivantes attendraient leur plafond. */
+  setTimeout(liberer, PORTE_MAX_MS + 600)
+  if (porteCourante && !porteCourante.ouverte) porteCourante.promesses.push(p)
+  return liberer
+}
+
+/* Une promesse qui fait partie de la page qu'on ouvre (la traduction d'une
+   fiche, par exemple) : la page l'attend, si elle n'est pas déjà ouverte.
+   Rend la promesse telle quelle. */
+function joindreAPage(promesse) {
+  if (porteCourante && !porteCourante.ouverte && promesse && typeof promesse.then === 'function') {
+    porteCourante.promesses.push(Promise.resolve(promesse).catch(() => {}))
+  }
+  return promesse
+}
+
+/* Les images qui retiennent la page : visibles (ou masquées en attendant leur
+   chargement), dans le premier écran, et pas encore prêtes. */
+function imagesQuiRetiennent(racine) {
+  const vh = window.innerHeight || 800
+  const liste = []
+  racine.querySelectorAll('img').forEach(img => {
+    const enSignature = img.hasAttribute('data-en-signature')
+    const src = img.getAttribute('src')
+    const enChargement = !!src && !img.complete
+    if (!enSignature && !enChargement) return
+    /* Une image masquée par `hidden` se mesure par son parent : c'est lui qui
+       tient sa place (la photo de profil attend ainsi derrière les initiales). */
+    const cadre = img.hidden ? img.parentElement : img
+    if (!cadre || !cadre.getClientRects().length) return
+    const r = cadre.getBoundingClientRect()
+    if (r.top > vh + 40 || r.bottom < -40) return
+    liste.push(img)
+  })
+  return liste
+}
+
+function attendreImage(img) {
+  return new Promise(resoudre => {
+    let fini = false
+    let mo = null
+    const finir = () => {
+      if (fini) return
+      fini = true
+      mo?.disconnect()
+      img.removeEventListener('load', verifier)
+      img.removeEventListener('error', finir)
+      resoudre()
+    }
+    function verifier() {
+      if (fini) return
+      if (!img.isConnected) return finir()
+      if (img.hasAttribute('data-en-signature')) return
+      if (!img.getAttribute('src')) return finir()
+      if (!img.complete) return
+      /* `decode` : l'image est prête à être peinte, pas seulement reçue. Sans
+         lui, elle pourrait encore paraître une image après la page. */
+      if (img.naturalWidth && img.decode) img.decode().then(finir, finir)
+      else finir()
+    }
+    mo = new MutationObserver(verifier)
+    mo.observe(img, { attributes: true, attributeFilter: ['src', 'data-en-signature'] })
+    img.addEventListener('load', verifier)
+    img.addEventListener('error', finir)
+    verifier()
+  })
+}
+
+async function evaluerPorte(porte) {
+  try {
+    /* 1. Les données retenues. On reboucle : une fonction peut en retenir une
+       autre pendant qu'on attend la première. */
+    let vues = 0
+    while (!porte.ouverte && porte.promesses.length > vues) {
+      const lot = porte.promesses.slice(vues)
+      vues = porte.promesses.length
+      await Promise.all(lot)
+    }
+    if (porte.ouverte) return
+
+    /* 2 et 3. Les polices et les images, ensemble. */
+    const attentes = []
+    if (document.fonts && document.fonts.status === 'loading') attentes.push(document.fonts.ready)
+    imagesQuiRetiennent(porte.ecran).forEach(img => attentes.push(attendreImage(img)))
+    if (attentes.length) await Promise.all(attentes)
+  } catch (e) {
+    console.warn('Standix · attente de page :', e?.message || e)
+  }
+  porte.ouvrir()
+}
+
+function poserPorte(ecran) {
+  /* La page précédente, si elle attendait encore, s'ouvre tout de suite : on
+     ne garde jamais deux attentes à la fois. */
+  porteCourante?.ouvrir()
+
+  /* ⚠ LE MEME ECRAN REPEINT N'ATTEND PAS. Revenir sur la page qu'on regarde
+     déjà (un rafraîchissement, un onglet retouché) la ferait disparaître un
+     instant — un clignotement, l'inverse de ce qu'on cherche. */
+  const memeEcran = dernierEcranPorte === ecran.id
+  dernierEcranPorte = ecran.id
+  if (memeEcran) return
+
+  const porte = { ecran, promesses: [...retenuesPage], ouverte: false }
+  porte.promesse = new Promise(r => { porte.resoudre = r })
+  porte.ouvrir = () => {
+    if (porte.ouverte) return
+    porte.ouverte = true
+    clearTimeout(porte.minuteur)
+    ecran.classList.remove('page-attend')
+    if (porteCourante === porte) porteCourante = null
+    porte.resoudre()
+  }
+  porteCourante = porte
+  ecran.classList.add('page-attend')
+  porte.minuteur = setTimeout(porte.ouvrir, PORTE_MAX_MS)
+  queueMicrotask(() => evaluerPorte(porte))
+}
+
 function activerAvecNaissance(ecran) {
   if (!ecran) return
 
@@ -10593,7 +10964,14 @@ function activerAvecNaissance(ecran) {
 
    ⚠ ON MARQUE `vu` CE QUI EST DEJA DANS L'ECRAN, avant meme d'activer. Ce qui
      est plus bas garde son apparition progressive. */
+  /* ⚠ SANS MESURE QUAND L'ÉCRAN N'EST PAS ENCORE AFFICHÉ — le cas habituel :
+     l'appelant vient de retirer `active` à tous les écrans. Un élément dans un
+     écran masqué mesure 0 × 0 en haut à gauche : il passait donc toujours le
+     test, mais chaque mesure forçait le navigateur à refaire toute la mise en
+     page de l'état précédent. Même résultat, sans ce calcul perdu. */
+  const dejaAffiche = ecran.classList.contains('active') || ecran.classList.contains('feuille-fond')
   ecran.querySelectorAll('.cl-apparait:not(.vu)').forEach(el => {
+    if (!dejaAffiche) { el.classList.add('vu'); return }
     const r = el.getBoundingClientRect()
     if (r.top < window.innerHeight) el.classList.add('vu')
   })
@@ -10640,9 +11018,12 @@ function activerAvecNaissance(ecran) {
      `inert` retire un bloc du focus, du remplissage et de la lecture d'écran.
      On le pose sur tous les écrans et on le lève sur celui qu'on montre — un
      seul endroit, puisque toutes les bascules passent ici. */
+  /* ⚠ ON NE TOUCHE QUE CE QUI CHANGE. Reposer `inert` sur la quarantaine
+     d'écrans qui l'ont déjà faisait retravailler le navigateur (styles,
+     observateurs) à chaque changement de page, pour un résultat identique. */
   document.querySelectorAll('.screen').forEach(s => {
-    if (s === ecran) s.removeAttribute('inert')
-    else s.setAttribute('inert', '')
+    if (s === ecran) { if (s.hasAttribute('inert')) s.removeAttribute('inert') }
+    else if (!s.hasAttribute('inert')) s.setAttribute('inert', '')
   })
 
   oublierNaissances()
@@ -10703,6 +11084,12 @@ function activerAvecNaissance(ecran) {
        qu'on decide s'il faut la reposer. Elle ne reste donc jamais coincee. */
   }
 
+  /* ⚠ L'ATTENTE SE POSE JUSTE AVANT `active` : l'écran devient affiché (donc
+     mesurable) mais reste transparent tant que ses images ne sont pas prêtes.
+     Voir `poserPorte`. Une erreur ici ne doit jamais empêcher la page de
+     s'ouvrir. */
+  try { poserPorte(ecran) } catch (e) { ecran.classList.remove('page-attend') }
+
   ecran.classList.add('active')
 
   /* ⚠ CHAQUE ECRAN S'OUVRE EN HAUT.
@@ -10717,9 +11104,23 @@ function activerAvecNaissance(ecran) {
    ⚠ ET L'ON NE REMONTE QUE SI L'ON A BOUGE. Appeler `scrollTo` quand on est
      deja en haut declenche un evenement de defilement pour rien, et notre
      voile du haut y reagit. */
-  if (window.scrollY > 0) {
+  /* ⚠ ET L'ON NE LIT MÊME PAS LA POSITION SI L'ON VIENT DE REMONTER. Lire
+     `scrollY` juste après avoir affiché l'écran force le navigateur à refaire
+     toute la mise en page sur-le-champ — puis une seconde fois à l'image
+     suivante. Or `showGestionScreen` et `showEquipeScreen` remontent en haut
+     quelques lignes avant d'appeler cette fonction : la position vaut 0. */
+  if (!hautDemande && window.scrollY > 0) {
     window.scrollTo({ top: 0, behavior: 'instant' })
   }
+}
+
+/* Vrai le temps de la tâche en cours, après un `scrollTo(0)` de navigation.
+   Retombe tout seul à la micro-tâche suivante. */
+var hautDemande = false
+function marquerHautDemande() {
+  if (hautDemande) return
+  hautDemande = true
+  queueMicrotask(() => { hautDemande = false })
 }
 
 /* ═══ LE LOGO, DÉFINI UNE FOIS ═══
@@ -11199,7 +11600,7 @@ window.showGestionScreen = function(id, btn) {
      ⚠ `instant` ET NON `smooth`. La nouvelle page arrive deja avec son voile
        et son fondu ; y ajouter un defilement anime ferait deux mouvements
        simultanes, et l'on verrait l'ancienne page glisser sous la nouvelle. */
-  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  try { window.scrollTo({ top: 0, behavior: 'instant' }); marquerHautDemande() }
   catch { window.scrollTo(0, 0) }
   /* Le compte d'analyses se relit à chaque ouverture des Réglages : il change
      dès qu'une analyse est lancée, et un chiffre périmé vaut moins que rien.
@@ -11258,9 +11659,9 @@ window.showGestionScreen = function(id, btn) {
   ajusterChampsVisibles()
   /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
      fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
-  lireEtatAbonnement().then(() => {
+  lireEtatAbonnementSiAncien().then(() => {
     dessinerAlerteEssai('essai-reglages')
-    peindreDemandesAcces()
+    peindreDemandesAccesSiAncien()
     appliquerBlocageEssai()
   })
   poserOngletActif(id)
@@ -11283,6 +11684,9 @@ window.showGestionScreen = function(id, btn) {
 // ouvrant une dossier depuis le bas de la grille, on atterrissait sur un
 // écran plus court en gardant la position de défilement — donc sur du vide.
 function remonterEnHaut() {
+  /* Déjà en haut dans cette même tâche (voir `marquerHautDemande`) : un
+     second `scrollTo` forcerait une mise en page complète pour rien. */
+  if (hautDemande) return
   window.scrollTo({ top: 0, behavior: 'auto' })
 }
 
@@ -11350,7 +11754,7 @@ window.showEquipeScreen = function(id, btn) {
   /* ⚠ MEME REMISE A ZERO QUE DANS L'ESPACE GESTION. Les deux espaces ont leur
      propre fonction de navigation ; ne corriger que la premiere laisserait le
      defaut sur la moitie de l'app. */
-  try { window.scrollTo({ top: 0, behavior: 'instant' }) }
+  try { window.scrollTo({ top: 0, behavior: 'instant' }); marquerHautDemande() }
   catch { window.scrollTo(0, 0) }
 
   arreterToutesLesVideos()
@@ -11402,9 +11806,9 @@ window.showEquipeScreen = function(id, btn) {
   ajusterChampsVisibles()
   /* L'état de l'abonnement se relit à chaque changement d'écran plutôt qu'une
      fois au démarrage : l'essai peut expirer pendant qu'on utilise l'app. */
-  lireEtatAbonnement().then(() => {
+  lireEtatAbonnementSiAncien().then(() => {
     dessinerAlerteEssai('essai-reglages')
-    peindreDemandesAcces()
+    peindreDemandesAccesSiAncien()
     appliquerBlocageEssai()
   })
   /* Le bouton suit l'écran : il n'a de sens que là où la caméra tourne. En
@@ -11631,16 +12035,14 @@ async function loadGestionProcedures() {
   // Membres et entreprise ne dépendent pas des procédures : les trois requêtes
   // partent ensemble au lieu de s'attendre. Un aller-retour réseau économisé,
   // c'est autant de gagné avant l'affichage.
+  /* Si `enterApp` les a déjà lancées (voir `lancerPrelecture`), on reprend
+     ses réponses au lieu de redemander. */
   const [
     { data: procedures, error },
     { data: membresFrais },
     { data: entrepriseRow },
-  ] = await Promise.all([
-    supabase.from('procedures').select('*, etapes(count)').eq('entreprise_id', currentMembre.entreprise_id)
-      .order('created_at', { ascending: false }),
-    supabase.from('membres').select('*').eq('entreprise_id', currentMembre.entreprise_id),
-    supabase.from('entreprises').select('*').eq('id', currentMembre.entreprise_id).maybeSingle(),
-  ])
+  ] = await (prendrePrelecture('gestion:' + currentMembre.entreprise_id)
+    || requetesGestion(currentMembre.entreprise_id))
   const fullMembres = membresFrais
 
   window.jalon?.('procédures + membres reçus')
@@ -11739,7 +12141,11 @@ async function loadGestionProcedures() {
   // Absolument tout ce dont les autres pages ont besoin est chargé ici, en une
   // seule salve parallèle, pendant que l'écran de chargement est encore affiché.
   // Résultat : une fois l'app ouverte, plus aucune page n'attend le réseau.
-  const { data: fullValidations } = await supabase
+  /* Reprise de la prélecture si elle a porté sur exactement ces procédures
+     (voir `lancerPrelecture`) ; sinon, la requête habituelle. */
+  const prelues = validationsPrelues
+  validationsPrelues = null
+  const { data: fullValidations } = (prelues && await prelues) || await supabase
     .from('validations').select('*').in('procedure_id', procIds)
 
   // Les étapes sont de loin la plus grosse table et l'écran d'accueil n'en a
@@ -19951,7 +20357,36 @@ let docNomFichier = ''
 
 let etatAbo = null   // { statut, jours_restants, fin_essai }
 
-async function lireEtatAbonnement() {
+/* ═══ L'ÉTAT DE L'ABONNEMENT : RELU AU PLUS UNE FOIS PAR MINUTE EN NAVIGUANT ═══
+
+   Chaque changement de page le redemandait au serveur (plus le compte
+   d'analyses et les demandes d'accès) : deux à trois requêtes par geste, et
+   une page qui se repeignait une fois la réponse arrivée.
+
+   `lireEtatAbonnementSiAncien` — employée par la navigation seulement —
+   reprend la dernière lecture si elle a moins d'une minute. L'intention
+   d'origine reste tenue : un essai qui expire pendant qu'on utilise l'app est
+   vu dans la minute.
+
+ ⚠ TOUT AUTRE APPEL RESTE FRAIS. `lireEtatAbonnement` (retour de paiement,
+   etc.) interroge toujours le serveur, et sa réponse devient la « dernière
+   lecture » que la navigation reprendra. */
+let _etatAboPromesse = null
+let _etatAboLu = 0
+let _etatAboEntreprise = null
+function lireEtatAbonnement() {
+  _etatAboLu = Date.now()
+  _etatAboEntreprise = currentMembre?.entreprise_id || null
+  _etatAboPromesse = lireEtatAbonnementReseau()
+  return _etatAboPromesse
+}
+function lireEtatAbonnementSiAncien() {
+  if (_etatAboPromesse && _etatAboEntreprise === (currentMembre?.entreprise_id || null)
+      && Date.now() - _etatAboLu < 60000) return _etatAboPromesse
+  return lireEtatAbonnement()
+}
+
+async function lireEtatAbonnementReseau() {
   if (!currentMembre?.entreprise_id) return null
   const { data, error } = await supabase
     .rpc('etat_abonnement', { p_entreprise: currentMembre.entreprise_id })
@@ -20502,7 +20937,19 @@ async function verifierPlaceLibre(entrepriseId, nomEntreprise) {
 
    Rouge, et non ambre : il y a de l'argent en jeu et quelqu'un attend. C'est
    la seule alerte de l'app qui coûte un client si on l'ignore. */
+/* Même principe que l'abonnement : en naviguant, au plus une lecture par
+   minute. Les autres appels (après une acceptation, etc.) restent frais. */
+let _demandesLu = 0
+let _demandesEntreprise = null
+function peindreDemandesAccesSiAncien() {
+  if (_demandesEntreprise === (currentMembre?.entreprise_id || null)
+      && Date.now() - _demandesLu < 60000) return
+  return peindreDemandesAcces()
+}
+
 async function peindreDemandesAcces() {
+  _demandesLu = Date.now()
+  _demandesEntreprise = currentMembre?.entreprise_id || null
   const zone = document.getElementById('demandes-acces')
   if (!zone || !currentMembre?.entreprise_id) return
   if (currentMembre.role !== 'gestion') { zone.style.display = 'none'; return }
@@ -26930,8 +27377,9 @@ async function openAnalyse(procId) {
   }
 
   attacherSuiviLecture(videoEl, stepsListEl)
-  traduireFicheOuverte({ proc, etapes: currentAnalyseData.etapes, zoneId: 'analyse-steps-list',
-                         titreId: 'analyse-titre', perime })
+  /* La traduction fait partie de la page : elle la retient aussi (voir `joindreAPage`). */
+  joindreAPage(traduireFicheOuverte({ proc, etapes: currentAnalyseData.etapes, zoneId: 'analyse-steps-list',
+                         titreId: 'analyse-titre', perime }))
 
   const qrContainer = document.getElementById('qr-container')
   qrContainer.innerHTML = '<div style="font-size:11px; color:rgba(20,21,24,0.45);">' + tLang('Génération...') + '</div>'
@@ -27831,7 +28279,21 @@ async function loadEquipeProcedures() {
         .not('publiee_le', 'is', null)
         .order('titre')
 
-  const { data: procedures, error } = await requete
+  /* ⚠ HORS VISITEUR, TROIS REQUÊTES PARTENT ENSEMBLE : les procédures, mes
+     lectures, mes favoris (voir `requetesEquipe`). Elles attendaient les unes
+     les autres alors qu'aucune n'a besoin des autres. Seules les étapes
+     dépendent des procédures ; elles suivent.
+     `enterApp` a pu les lancer en avance : on reprend alors ses réponses. */
+  let procedures, error, mesValidations, favsPrelus
+  if (estVisiteur()) {
+    ;({ data: procedures, error } = await requete)
+  } else {
+    const [rProc, rVal, rFav] = await (prendrePrelecture('equipe:' + currentMembre.id)
+      || requetesEquipe(currentMembre))
+    procedures = rProc.data; error = rProc.error
+    mesValidations = rVal.data
+    favsPrelus = rFav || { data: null }
+  }
   if (error) { console.error(error); return }
 
   // Une procédure encore en analyse n'a aucune étape : inutile de la proposer.
@@ -27840,10 +28302,22 @@ async function loadEquipeProcedures() {
   // Étapes de TOUTES les procédures et mes validations, chargées d'un coup :
   // chaque fiche s'ouvrira ensuite instantanément.
   const procIds = pretes.map(p => p.id)
-  const [{ data: mesValidations }, { data: toutesEtapes }] = await Promise.all([
-    supabase.from('validations').select('procedure_id, validated_at, duree_lecture').eq('membre_id', currentMembre.id),
-    supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
-  ])
+  let toutesEtapes
+  const etapesPretes = etapesPrelues
+  etapesPrelues = null
+  if (favsPrelus) {
+    /* Reprises de la prélecture si elles portent sur exactement les mêmes
+       procédures ; sinon, la requête habituelle. */
+    const pre = etapesPretes && await etapesPretes.catch(() => null)
+    if (pre && pre.ids === procIds.join(',') && !pre.r?.error) toutesEtapes = pre.r.data
+    else ({ data: toutesEtapes } = await supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'))
+  } else {
+    const [rV, rE] = await Promise.all([
+      supabase.from('validations').select('procedure_id, validated_at, duree_lecture').eq('membre_id', currentMembre.id),
+      supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre'),
+    ])
+    mesValidations = rV.data; toutesEtapes = rE.data
+  }
   /* La colonne `duree_lecture` peut ne pas exister encore en base : dans ce cas
      la requête échoue en entier et on perdait TOUTES les lectures, donc les
      coches de « déjà lu ». On redemande alors sans elle. */
@@ -27862,7 +28336,7 @@ async function loadEquipeProcedures() {
    ⚠ ET UN ECHEC NE BLOQUE RIEN : si la table n'existe pas encore, on repart
      d'un ensemble vide. L'onglet « Favoris » sera juste toujours vide. */
   try {
-    const { data: favs } = await supabase.from('favoris')
+    const { data: favs } = favsPrelus || await supabase.from('favoris')
       .select('procedure_id').eq('membre_id', currentMembre.id)
     favorisEquipe = new Set((favs || []).map(f => f.procedure_id))
   } catch (e) { favorisEquipe = new Set() }
@@ -29805,8 +30279,9 @@ async function openEquipeDetail(procId) {
      maintenant. Le cas arrive quand une analyse automatique a échoué : la
      procédure existe, ses étapes n'ont jamais été écrites. */
   // Dans la langue de l'application : l'original s'affiche, puis sa traduction.
-  traduireFicheOuverte({ proc, etapes: etapes || [], zoneId: 'detail-steps', titreId: 'detail-titre',
-                         formater: sansNumeroDEtape, perime })
+  /* La traduction fait partie de la page : elle la retient aussi (voir `joindreAPage`). */
+  joindreAPage(traduireFicheOuverte({ proc, etapes: etapes || [], zoneId: 'detail-steps', titreId: 'detail-titre',
+                         formater: sansNumeroDEtape, perime }))
 
   if (!etapes || etapes.length === 0) {
     stepsEl.innerHTML = `<div class="empty-state">
@@ -31418,7 +31893,16 @@ function elementListeTiroir() {
     : document.getElementById('tiroir-liste-eq')
 }
 
+let _etabLu = 0
+let _etabMembre = null
+function chargerEtablissementsSiAncien() {
+  if (_etabMembre === (currentMembre?.id || null) && Date.now() - _etabLu < 60000) return
+  return chargerEtablissements()
+}
+
 async function chargerEtablissements() {
+  _etabLu = Date.now()
+  _etabMembre = currentMembre?.id || null
   /* ON NE DÉPEND PLUS DU TIROIR.
 
      Cette fonction sortait aussitôt si le tiroir était absent du balisage. Il a
@@ -31507,6 +31991,42 @@ async function chargerEtablissements() {
   peindreTiroir()
   peindreBarreEtablissements()
   peindreListeEtab()
+  prechaufferImages()
+}
+
+/* ═══ LES IMAGES DES RÉGLAGES SONT PRÊTES AVANT QU'ON Y AILLE ═══
+
+   La photo de profil et les logos des entreprises ne servent que dans les
+   réglages. Sans rien faire, on ne les demandait qu'en ouvrant la page — qui
+   devait alors les attendre.
+
+   On les demande ici, au calme, une fois l'app affichée : adresse signée,
+   téléchargement, décodage. En ouvrant les réglages, tout est déjà là et la
+   page paraît immédiatement.
+
+ ⚠ `requestIdleCallback` : rien de tout cela ne doit ralentir l'affichage de
+   la première page. On passe après.
+ ⚠ UNE FOIS PAR ADRESSE. Rappelée à chaque rechargement des entreprises,
+   elle ne refait rien pour une image déjà préparée. */
+const imagesPrechauffees = new Set()
+function prechaufferImages() {
+  const faire = () => {
+    const fichiers = [currentMembre?.photo_url, ...(mesEtablissements || []).map(e => e.logo_url)]
+      .filter(f => f && !imagesPrechauffees.has(f))
+    fichiers.forEach(async f => {
+      imagesPrechauffees.add(f)
+      try {
+        const url = await urlLogoSignee(f)
+        if (!url) return
+        const img = new Image()
+        img.decoding = 'async'
+        img.src = url
+        await img.decode?.()
+      } catch (e) {}
+    })
+  }
+  if ('requestIdleCallback' in window) requestIdleCallback(faire, { timeout: 2500 })
+  else setTimeout(faire, 800)
 }
 
 /* La même liste dans les réglages, pour changer un logo plus tard. Chaque ligne
@@ -35841,6 +36361,51 @@ document.getElementById('edit-save-btn')?.addEventListener('click', async () => 
 const SIGNATURE_DUREE = 3600            // une heure
 const signatures = new Map()            // chemin → { url, expire }
 
+/* ═══ LES ADRESSES SIGNÉES SURVIVENT AU RECHARGEMENT ═══
+
+   Chaque image (logo, photo, image d'étape) demandait une nouvelle adresse au
+   serveur à chaque ouverture de l'app : un aller-retour réseau AVANT même de
+   commencer à télécharger l'image. Et comme l'adresse changeait à chaque
+   fois, le navigateur ne pouvait pas resservir l'image qu'il avait déjà.
+
+   On garde donc les adresses encore valables sur l'appareil. Au rechargement,
+   la même adresse est réutilisée : pas d'aller-retour, et l'image sort du
+   cache du navigateur — elle paraît avec la page.
+
+ ⚠ ELLES EXPIRENT COMME AVANT (une heure) et on ne relit que celles qui ont
+   encore au moins deux minutes devant elles.
+
+ ⚠ EFFACÉES À LA DÉCONNEXION (voir `signOut`) : le compte suivant sur le même
+   appareil ne doit rien hériter du précédent.
+
+ ⚠ 300 AU PLUS. Le stockage du navigateur est limité ; au-delà, on garde les
+   plus récentes. */
+const CLE_SIGNATURES = 'standix_signatures_v1'
+try {
+  const brut = JSON.parse(localStorage.getItem(CLE_SIGNATURES) || '{}')
+  const seuil = Date.now() + 120000
+  for (const [k, v] of Object.entries(brut)) {
+    if (v && typeof v.url === 'string' && v.expire > seuil) signatures.set(k, v)
+  }
+} catch (e) {}
+
+let _minuteurSignatures = null
+function memoriserSignatures() {
+  clearTimeout(_minuteurSignatures)
+  _minuteurSignatures = setTimeout(() => {
+    try {
+      const seuil = Date.now() + 120000
+      const garde = [...signatures].filter(([, v]) => v.expire > seuil).slice(-300)
+      localStorage.setItem(CLE_SIGNATURES, JSON.stringify(Object.fromEntries(garde)))
+    } catch (e) {}
+  }, 500)
+}
+function oublierSignatures() {
+  signatures.clear()
+  clearTimeout(_minuteurSignatures)
+  try { localStorage.removeItem(CLE_SIGNATURES) } catch (e) {}
+}
+
 /* ═══ L'ADRESSE D'UN LOGO ═══
 
    `procedo-logos` est PUBLIC, contrairement à `procedo-videos` : son adresse
@@ -35886,6 +36451,7 @@ async function urlLogoSignee(valeur) {
       .createSignedUrl(chemin, SIGNATURE_DUREE)
     if (error || !data?.signedUrl) throw error || new Error('sans adresse')
     signatures.set(cle, { url: data.signedUrl, expire: Date.now() + SIGNATURE_DUREE * 1000 })
+    memoriserSignatures()
     return data.signedUrl
   } catch (e) {
     console.warn('Standix \u00b7 logo non sign\u00e9 :', e?.message || e)
@@ -35899,8 +36465,13 @@ async function signerLogos(racine) {
   const cibles = (racine || document).querySelectorAll('[data-logo-fichier]:not([data-logo-signe])')
   await Promise.all([...cibles].map(async el => {
     el.setAttribute('data-logo-signe', '1')
-    const url = await urlLogoSignee(el.getAttribute('data-logo-fichier'))
-    if (url) el.src = url
+    /* ⚠ `data-en-signature` : l'adresse est en route. La page qui s'ouvre
+       attend ces images-là avant de paraître (voir `poserPorte`). */
+    el.setAttribute('data-en-signature', '')
+    try {
+      const url = await urlLogoSignee(el.getAttribute('data-logo-fichier'))
+      if (url && el.getAttribute('src') !== url) el.src = url
+    } finally { el.removeAttribute('data-en-signature') }
   }))
 }
 
@@ -35930,6 +36501,7 @@ async function urlSignee(valeur) {
       .createSignedUrl(chemin, SIGNATURE_DUREE)
     if (error || !data?.signedUrl) throw error || new Error('sans adresse')
     signatures.set(chemin, { url: data.signedUrl, expire: Date.now() + SIGNATURE_DUREE * 1000 })
+    memoriserSignatures()
     return data.signedUrl
   } catch (e) {
     console.warn('Standix \u00b7 adresse non sign\u00e9e :', e?.message || e)
@@ -35945,12 +36517,15 @@ async function signerMedias(racine) {
   const cibles = (racine || document).querySelectorAll('[data-fichier]:not([data-signe])')
   await Promise.all([...cibles].map(async el => {
     el.setAttribute('data-signe', '1')
-    const url = await urlSignee(el.getAttribute('data-fichier'))
-    if (url) el.src = url
-    else {
-      /* Le fichier a disparu du dépôt : on retire le cadre qui l'entourait. */
-      el.closest('.detail-step-img, .analyse-couv, .step-img-vignette')?.remove()
-    }
+    el.setAttribute('data-en-signature', '')      // voir `signerLogos`
+    try {
+      const url = await urlSignee(el.getAttribute('data-fichier'))
+      if (url) { if (el.getAttribute('src') !== url) el.src = url }
+      else {
+        /* Le fichier a disparu du dépôt : on retire le cadre qui l'entourait. */
+        el.closest('.detail-step-img, .analyse-couv, .step-img-vignette')?.remove()
+      }
+    } finally { el.removeAttribute('data-en-signature') }
   }))
 }
 
@@ -35972,19 +36547,34 @@ try {
         let dernierEspace = null
         try { dernierEspace = localStorage.getItem('procedo_espace') } catch (e) {}
         afficherCoquille(dernierEspace || 'gestion')
+
+        /* ⚠ LES PREMIÈRES LECTURES PARTENT TOUT DE SUITE, avec la fiche de la
+           dernière ouverture (entreprise, rôle). Elles ne seront reprises que
+           si la fiche relue ci-dessous désigne la même entreprise — sinon
+           elles sont ignorées et le chargement repart du réseau. Les règles
+           d'accès de la base s'appliquent comme toujours : on ne lit que ce
+           que ce compte a le droit de lire. */
+        try {
+          const idRetenu = localStorage.getItem('procedo_membre')
+          const eidRetenue = localStorage.getItem('procedo_entreprise')
+          if (idRetenu && eidRetenue && dernierEspace) {
+            lancerPrelecture({ id: idRetenu, role: dernierEspace, entreprise_id: eidRetenue })
+          }
+        } catch (e) {}
         document.body.classList.remove('booting')
         window.jalon?.('ossature affichée')
-        /* Deux mesures côte à côte pour savoir d'où vient la lenteur :
-           - un appel direct à l'API, sans passer par la bibliothèque ;
-           - la même chose via la bibliothèque, qui rafraîchit le jeton au passage.
-           Si le premier est rapide et le second lent, le coupable est le
-           rafraîchissement du jeton d'authentification, pas le réseau. */
-        try {
-          await fetch(`${SUPABASE_URL}/rest/v1/membres?select=id&limit=1`, {
+        /* ⚠ L'APPEL DE DIAGNOSTIC A ÉTÉ RETIRÉ D'ICI. Un appel direct à l'API
+           était ATTENDU avant la fiche membre, pour comparer sa durée à celle
+           de la bibliothèque. Il ne servait qu'à la mesure — et ajoutait un
+           aller-retour réseau complet à CHAQUE ouverture de l'app.
+           S'il faut refaire cette mesure, la relancer avec `?debug=1` et sans
+           `await`. */
+        if (/[?&]debug=1/.test(location.search)) {
+          fetch(`${SUPABASE_URL}/rest/v1/membres?select=id&limit=1`, {
             headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-          })
-          window.jalon?.('test : appel direct à la base')
-        } catch (e) { window.jalon?.('test : appel direct échoué') }
+          }).then(() => window.jalon?.('test : appel direct à la base'),
+                  () => window.jalon?.('test : appel direct échoué'))
+        }
 
         /* Une session existe : on le signale tout de suite. Le filet de secours
            des six secondes s'en sert pour ne PAS afficher l'écran de choix
@@ -36051,3 +36641,39 @@ document.getElementById('pdf-gestion')?.addEventListener('click', (e) =>
   exporterDepuis(currentAnalyseData, e.currentTarget))
 document.getElementById('pdf-equipe')?.addEventListener('click', (e) =>
   exporterDepuis(equipeProcCourante, e.currentTarget))
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES PAGES QUI S'OUVRENT PUIS SE REMPLISSENT RETIENNENT LEUR APPARITION
+
+   Ces fonctions affichent l'écran PUIS vont chercher ce qu'il contient (les
+   étapes d'une procédure, le compte d'analyses, la liste des appareils). La
+   page se montrait donc à moitié vide, puis se remplissait sous les yeux.
+
+   Enveloppées ici, elles retiennent la page (`retenirPage`) jusqu'à leur fin :
+   l'écran reste vide, puis paraît rempli — dans la limite de `PORTE_MAX_MS`.
+
+ ⚠ EN FIN DE FICHIER, EXPRÈS. Les fonctions `window.…` ne sont définies qu'au
+   moment où le script passe sur leur ligne ; les envelopper plus haut
+   envelopperait `undefined`.
+
+ ⚠ LA MEME FONCTION, LE MEME RÉSULTAT. L'enveloppe rend exactement ce que
+   rend la fonction d'origine, erreur comprise : elle ne fait que tenir la
+   page le temps de son travail.
+   ═══════════════════════════════════════════════════════════════════════════ */
+function retenirPendant(fn) {
+  if (typeof fn !== 'function' || fn.__retient) return fn
+  const enveloppe = function (...args) {
+    const liberer = retenirPage()
+    let r
+    try { r = fn.apply(this, args) } catch (e) { liberer(); throw e }
+    Promise.resolve(r).then(liberer, liberer)
+    return r
+  }
+  enveloppe.__retient = true
+  return enveloppe
+}
+openAnalyse = retenirPendant(openAnalyse)
+openEquipeDetail = retenirPendant(openEquipeDetail)
+window.ouvrirQuota = retenirPendant(window.ouvrirQuota)
+window.ouvrirAppareils = retenirPendant(window.ouvrirAppareils)

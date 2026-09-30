@@ -469,6 +469,7 @@ const DICO = {
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Choose at least two videos. They are joined in the order you put them.",
     "Choisissez ce que vous filmez": "Choose what to record",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Choose how long the invitation code stays valid.",
+    "Choisissez la fenêtre de votre logiciel : la barre Standix n’apparaîtra pas dans la vidéo.": "Choose your program’s window: the Standix bar won’t appear in the video.",
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Choose a password with at least 6 characters.",
@@ -476,6 +477,7 @@ const DICO = {
     "Chrome sur Android": "Chrome on Android",
     "Cinq minutes : enregistrement arrêté.": "Five minutes: recording stopped.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Five minutes: recording stops here.",
+    "Cinq minutes au maximum.": "Five minutes maximum.",
     "Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.": "Five minutes maximum. On the entire screen, the Standix bar also appears in the video.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Five minutes at most. Recording stops on its own.",
     "Cliquez encore une fois sur le bouton pour choisir l’écran.": "Click the button once more to choose the screen.",
@@ -483,6 +485,7 @@ const DICO = {
     "Cliquez le bouton": "Click the",
     "Cliquez le bouton <b>+</b>": "Click the <b>+</b> button",
     "Cliquez sur le <b>cadenas</b> à gauche de l’adresse": "Click the <b>padlock</b> left of the address",
+    "Cliquez sur l’étoile pour ajouter la procédure dans les favoris.": "Click the star to add the procedure to your favorites.",
     "Cochez chaque étape en la réalisant": "Tick each step as you do it",
     "Code copié": "Code copied",
     "Code d'accès rapide": "Quick access code",
@@ -787,6 +790,8 @@ const DICO = {
     "La langue choisie traduit aussi les étapes des procédures.": "The language you choose also translates procedure steps.",
     "La photo n’a pas pu être envoyée.": "The photo could not be sent.",
     "La procédure d'analyse n'a pas pu être créée.": "The procedure for the analysis could not be created.",
+    "La procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": "The procedure is already in In progress. It opens once the analysis is done.",
+    "la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": "the procedure is already in In progress. It opens once the analysis is done.",
     "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "The procedure is already in Draft. It opens once the analysis is done.",
     "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "the procedure is already in Draft. It opens once the analysis is done.",
     "La procédure n’a pas pu être supprimée. Réessayez dans quelques instants.": "The procedure could not be deleted. Try again in a moment.",
@@ -1754,6 +1759,7 @@ const DICO = {
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Wählen Sie mindestens zwei Videos. Sie werden in der Reihenfolge zusammengefügt, in die Sie sie bringen.",
     "Choisissez ce que vous filmez": "Wählen Sie, was Sie aufnehmen",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Wählen Sie, wie lange der Einladungscode gültig bleibt.",
+    "Choisissez la fenêtre de votre logiciel : la barre Standix n’apparaîtra pas dans la vidéo.": "Wählen Sie das Fenster Ihres Programms: Die Standix-Leiste erscheint nicht im Video.",
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Wählen Sie ein Passwort mit mindestens 6 Zeichen.",
@@ -1761,6 +1767,7 @@ const DICO = {
     "Chrome sur Android": "Chrome auf Android",
     "Cinq minutes : enregistrement arrêté.": "Fünf Minuten: Aufnahme gestoppt.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Fünf Minuten: Hier endet die Aufnahme.",
+    "Cinq minutes au maximum.": "Höchstens fünf Minuten.",
     "Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.": "Höchstens fünf Minuten. Bei gesamtem Bildschirm ist die Standix-Leiste auch im Video zu sehen.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst.",
     "Cliquez encore une fois sur le bouton pour choisir l’écran.": "Klicken Sie noch einmal auf die Schaltfläche, um den Bildschirm zu wählen.",
@@ -1768,6 +1775,7 @@ const DICO = {
     "Cliquez le bouton": "Tippen Sie auf",
     "Cliquez le bouton <b>+</b>": "Tippen Sie auf <b>+</b>",
     "Cliquez sur le <b>cadenas</b> à gauche de l’adresse": "Klicken Sie auf das <b>Schloss</b> links neben der Adresse",
+    "Cliquez sur l’étoile pour ajouter la procédure dans les favoris.": "Klicken Sie auf den Stern, um die Anleitung zu den Favoriten hinzuzufügen.",
     "Cochez chaque étape en la réalisant": "Haken Sie jeden Schritt ab, sobald er erledigt ist",
     "Code copié": "Code kopiert",
     "Code d'accès rapide": "Schnellzugriff-Code",
@@ -1893,7 +1901,7 @@ const DICO = {
     "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst. Sie können die Seite verlassen, es geht trotzdem weiter.",
     "En attente d’une place": "Wartet auf einen Platz",
     "en ce moment": "gerade jetzt",
-    "En cours": "Läuft",
+    "En cours": "In Arbeit",
     "En créant votre compte, vous acceptez les": "Mit dem Erstellen Ihres Kontos akzeptieren Sie die",
     "En dév.": "Entwurf",
     "En développement": "Entwurf",
@@ -2072,6 +2080,8 @@ const DICO = {
     "La langue choisie traduit aussi les étapes des procédures.": "Die gewählte Sprache übersetzt auch die Schritte der Anleitungen.",
     "La photo n’a pas pu être envoyée.": "Das Foto konnte nicht gesendet werden.",
     "La procédure d'analyse n'a pas pu être créée.": "Die Anleitung für die Analyse konnte nicht erstellt werden.",
+    "La procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": "Die Anleitung steht bereits unter In Arbeit. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
+    "la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": "die Anleitung steht bereits unter In Arbeit. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
     "La procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "Die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
     "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "die Anleitung steht bereits unter Entwurf. Sie lässt sich öffnen, sobald die Auswertung fertig ist.",
     "La procédure n’a pas pu être supprimée. Réessayez dans quelques instants.": "Die Anleitung konnte nicht gelöscht werden. Versuchen Sie es gleich noch einmal.",
@@ -2901,7 +2911,7 @@ const DICO = {
     "Étapes liées": "Pasos enlazados",
     "Étapes manuelles": "Pasos manuales",
     "— la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "— el procedimiento aparecerá en tu lista en cuanto esté listo.",
-    "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "el procedimiento ya aparece en la página «En dév.». Estará disponible al terminar el análisis.",
+    "la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": "el procedimiento ya aparece en la página «En dév.». Estará disponible al terminar el análisis.",
 
     // ── espace équipe ──
     'Espace \u00c9quipe': 'Espacio Equipo',
@@ -3103,7 +3113,7 @@ const DICO = {
     "Étapes liées": "Etapas ligadas",
     "Étapes manuelles": "Etapas manuais",
     "— la procédure apparaîtra dans votre liste dès qu'elle sera prête.": "— o procedimento aparecerá na sua lista assim que estiver pronto.",
-    "la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse.": "o procedimento já aparece na página «En dév.». Ficará disponível no fim da análise.",
+    "la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.": "o procedimento já aparece na página «En dév.». Ficará disponível no fim da análise.",
 
     // ── espace équipe ──
     'Espace \u00c9quipe': 'Espa\u00e7o Equipa',
@@ -6396,9 +6406,11 @@ async function enterApp(membre) {
     if (cibleQR) ouvrirCibleQR()
   }
 
-  /* Une fois l'app à l'écran, pas avant : la question arrive sur une interface
-     qu'on reconnaît, pas sur un fond gris de chargement. */
-  setTimeout(() => proposerPosteALArrivee(), 700)
+  /* ⚠ LA FENÊTRE « QUEL EST VOTRE POSTE ? » NE S'OUVRE PLUS À L'ARRIVÉE.
+     Demande d'Em : en créant un compte et en rejoignant une entreprise, on
+     ne doit pas tomber sur cette question. Le poste reste réglable dans les
+     Réglages (« Mon poste »), et le gérant peut toujours l'attribuer.
+     `proposerPosteALArrivee` est gardée, mais plus appelée. */
 }
 
 /* Ouvre la procédure visée par le QR, dans l'espace où l'on se trouve. Un
@@ -6784,6 +6796,29 @@ async function lireAdresseSession() {
   return emailSession
 }
 
+/* ═══ LE BLOC PHOTO SERT AUX DEUX PAGES « Votre compte » ═══
+
+   Demande d'Em : l'espace utilisateur doit pouvoir changer sa photo
+   exactement comme la gestion. Plutôt que de dupliquer le bloc (et ses
+   identifiants, que tout le code de la photo vise déjà), on DÉPLACE l'unique
+   `.photo-bloc` dans la page qu'on ouvre, juste avant sa carte. Un seul bloc,
+   un seul comportement, impossible que les deux divergent.
+
+ ⚠ LE TAMPON EST REMIS À ZÉRO À CHAQUE OUVERTURE : une photo choisie puis
+   abandonnée d'un côté ne doit pas réapparaître de l'autre. */
+function placerBlocPhoto(idEcran) {
+  const bloc = document.querySelector('.photo-bloc')
+  const ecran = document.getElementById(idEcran)
+  if (!bloc || !ecran) return
+  if (bloc.parentElement !== ecran) {
+    const carte = ecran.querySelector(':scope > .card')
+    if (carte) ecran.insertBefore(bloc, carte)
+    else ecran.appendChild(bloc)
+  }
+  photoTampon = null
+  peindrePhotoProfil()
+}
+
 async function remplirPageCompte() {
   const nom = document.getElementById('settings-nom')
   const mail = document.getElementById('settings-email')
@@ -6819,9 +6854,9 @@ function peindreReglages() {
   ;['reg-poste-ligne', 'e-reg-poste-ligne', 'es-poste-ligne'].forEach(id => {
     const l = el(id)
     if (!l) return
-    const p = currentMembre?.poste
-    l.textContent = p || ''
-    l.hidden = !p
+    /* ⚠ LE POSTE N'EST PLUS AFFICHÉ NULLE PART (demande d'Em). */
+    l.textContent = ''
+    l.hidden = true
   })
   /* ⚠ `reg-initiales` N'EXISTE PLUS dans le balisage : le rond de deux lettres
      a ete retire de la ligne d'identite. Le test `if (el(...))` protegeait
@@ -8874,7 +8909,7 @@ async function peindreFicheMembre() {
 
   const el = (i) => document.getElementById(i)
   el('fm-nom').textContent = m.nom || tLang('Sans nom')
-  el('fm-poste').textContent = m.poste || ''
+  el('fm-poste').textContent = ''   // le poste n'est plus affiché (demande d'Em)
 
   const siennes = (validations || []).filter(v => v.membre_id === ficheMembreId)
   const debutMois = new Date()
@@ -9399,9 +9434,7 @@ function renderMembresListe() {
     /* Le temps total, et non plus une série de jours : ce que la personne a
        réellement passé sur vos procédures. */
         div.innerHTML = `
-      <div class="emp-row-name">${escapeHtml(s.m.nom || tLang('Sans nom'))}
-        <span class="emp-row-sous">${s.m.poste ? escapeHtml(s.m.poste) : tLang('Poste non d\u00e9fini')}</span>
-      </div>
+      <div class="emp-row-name">${escapeHtml(s.m.nom || tLang('Sans nom'))}</div>
       ${tempsTotalHtml(s.total, false, tLang('ce mois-ci'))}`
     el.appendChild(div)
   })
@@ -9740,9 +9773,8 @@ function peindreClassementEq(cle, animerDes) {
                Sa ligne garde son nom et son rang. Elle est là parce qu'on a
                demandé à voir tous les membres, pas pour être comparée. -->
           <span class="st">${x.estAutres ? tLang('Les moins actifs')
-            : x.gestion ? (x.membre.poste ? escapeHtml(x.membre.poste) : tLang('Gestion'))
-            : (x.membre.poste ? escapeHtml(x.membre.poste) + ' \u00b7 ' : '') +
-              (x.lues > 1 ? tLang('{lues} procédures lues', { lues: x.lues }) : tLang('{lues} procédure lue', { lues: x.lues }))}</span>
+            : x.gestion ? tLang('Gestion')
+            : (x.lues > 1 ? tLang('{lues} procédures lues', { lues: x.lues }) : tLang('{lues} procédure lue', { lues: x.lues }))}</span>
         </span>
         ${x.gestion ? '' : `<span class="vl"${x.total ? '' : ' style="color:var(--label-3)"'}>${
           x.total ? dureeLisible(x.total) : 'jamais'}</span>`}
@@ -11644,7 +11676,7 @@ window.showGestionScreen = function(id, btn) {
      lignes qui dependent du role. Sans cet appel, elles resteraient masquees
      pour tout le monde, y compris le fondateur. */
   /* ⚠ LA PAGE COMPTE SE REMPLIT A CHAQUE OUVERTURE, d'ou qu'on vienne. */
-  if (id === 'p-reg-compte' || id === 'e-reg-compte') remplirPageCompte()
+  if (id === 'p-reg-compte' || id === 'e-reg-compte') { placerBlocPhoto(id); remplirPageCompte() }
   /* ⚠ LA LISTE DES LANGUES SE DESSINE À CHAQUE OUVERTURE DE LA PAGE.
      Elle n'était remplie que par `openSettings` : en arrivant par le bouton
      du profil (en haut à gauche), la page Langue s'ouvrait vide. */
@@ -11823,6 +11855,7 @@ window.showEquipeScreen = function(id, btn) {
      par ces chemins-la, le nom et l'adresse restaient ceux du dernier compte
      peint. */
   if (id === 'e-profil') peindreReglagesEquipe()
+  if (id === 'e-reg-compte') placerBlocPhoto(id)
 
   activerAvecNaissance(document.getElementById(id))
   ajusterChampsVisibles()
@@ -12312,7 +12345,7 @@ async function collecterActivites() {
          valeur est là, juste au-dessus. */
       nom: m.nom || '',
       texte: `${tLang('<b>{v}</b> a rejoint l’équipe', { v: escapeHtml(m.nom || tLang('Quelqu’un')) })}`,
-      detail: m.poste ? escapeHtml(m.poste) : '',
+      detail: '',
     })
   })
 
@@ -12346,7 +12379,7 @@ async function collecterActivites() {
         texte: m.genre === 'depart'
           ? tLang('{qui} a quitté l’équipe', { qui })
           : tLang('{qui} a été retiré·e de l’équipe', { qui }),
-        detail: [m.poste, m.par_nom ? 'par ' + escapeHtml(m.par_nom) : null]
+        detail: [m.par_nom ? 'par ' + escapeHtml(m.par_nom) : null]
           .filter(Boolean).map(escapeHtml).join(' \u00b7 '),
       })
     })
@@ -12927,7 +12960,7 @@ function remplirHistoMouvements(idZone) {
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .map(m => ({ quand: m.created_at, teinte: PT.arrivee,
                  html: PH.arrivee(escapeHtml((m.nom || tLang('Un membre')).trim().split(/\s+/)[0])),
-                 sous: m.poste ? escapeHtml(m.poste) : '' }))
+                 sous: '' }))
   peindreHisto(zone, repli, tLang('Aucun mouvement ce mois-ci.'))
 
   if (!currentMembre?.entreprise_id) return
@@ -12951,7 +12984,7 @@ function remplirHistoMouvements(idZone) {
 
            Les mouvements enregistres avant l'ajout de la colonne n'en ont pas :
            on n'affiche alors rien, plutot qu'un poste faux. */
-        sous: mv.membre_poste ? escapeHtml(mv.membre_poste) : '',
+        sous: '',
       })), tLang('Aucun mouvement ce mois-ci.'))
     })
 }
@@ -13167,7 +13200,6 @@ function remplirHistoEquipe() {
       <span class="histo-pt" style="background:${pointDossier(r)}"></span>
       <span class="histo-co">
         <span class="histo-t">${escapeHtml(m.nom || tLang('Sans nom'))}</span>
-        ${m.poste ? `<span class="histo-s">${escapeHtml(m.poste)}</span>` : ''}
       </span>
       <span class="histo-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : tLang('Aucune lecture')}</span>
     </div>`
@@ -13610,7 +13642,6 @@ function peindreAnalyseInterne() {
           <span class="an-rang" style="background:${pointDossier(r)}"></span>
           <span class="an-m-co">
             <span class="an-m-t">${escapeHtml(m.nom || tLang('Sans nom'))}</span>
-            ${m.poste ? `<span class="an-m-s">${escapeHtml(m.poste)}</span>` : ''}
           </span>
           <span class="an-m-q${sec ? '' : ' vide'}">${sec ? anDureeLisible(sec) : tLang('Aucune lecture')}</span>
         </div>`).join('')
@@ -15667,7 +15698,7 @@ function ligneProcedureTrouvee(proc, dossier, rang) {
             return `<span class="cl-badge">${marque}<i class="cl-pt-vu" aria-label="${
               jamaisVue ? tLang('Pas encore consultée') : tLang('Déjà consultée')}" style="background:${
               jamaisVue ? '#3A78EE' : '#9A9AA4'}"></i>${
-              quandB ? (intacteB ? tLang('Créé {quand}', { quand: quandB }) : tLang('Mod. {quand}', { quand: quandB })) : tLang('En dév.')}</span>`
+              quandB ? (intacteB ? tLang('Créé {quand}', { quand: quandB }) : tLang('Mod. {quand}', { quand: quandB })) : tLang('En cours')}</span>`
           })()}
         <span class="cl-n">${escapeHtml(dossier || tLang('Sans dossier'))}</span>
       </span>
@@ -18973,7 +19004,13 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
   try {
     fluxEcran = await navigator.mediaDevices.getDisplayMedia({
       video: { width: { ideal: 2560 }, height: { ideal: 1440 }, frameRate: { ideal: 30 },
-               displaySurface: 'monitor' },
+               /* ⚠ « FENÊTRE » PROPOSÉE EN PREMIER (choix d'Em). En filmant la
+                  seule fenêtre du logiciel, la barre Standix — une fenêtre à
+                  part — n'apparaît jamais dans la vidéo, tout en restant
+                  visible pour la personne. Un site ne peut pas s'effacer d'une
+                  capture de l'écran entier : seuls les logiciels installés
+                  savent le faire. L'écran entier reste proposé. */
+               displaySurface: 'window' },
       audio: false,
       selfBrowserSurface: 'exclude',
       surfaceSwitching: 'include',
@@ -19640,7 +19677,15 @@ async function ouvrirFluxCamera() {
      que font tous les téléphones : on se voit comme dans un miroir, mais la
      vidéo enregistrée est à l'endroit. Inverser les deux retournerait les
      textes filmés. */
-  v.style.transform = camFace === 'user' ? 'scaleX(-1)' : 'none'
+  /* ⚠ SUR ORDINATEUR, LA WEBCAM REGARDE LA PERSONNE : aperçu en miroir aussi
+     (demande d'Em). On le reconnaît à la piste — `facingMode: 'user'` — ou,
+     quand la webcam ne dit rien de son orientation (cas courant sur PC), à
+     l'absence d'écran tactile. La caméra arrière d'un téléphone, elle, dit
+     `environment` et reste à l'endroit. */
+  const reglage = camFlux?.getVideoTracks?.()[0]?.getSettings?.() || {}
+  const surPC = !(navigator.maxTouchPoints > 0) && !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+  const face = reglage.facingMode || (surPC ? 'user' : camFace)
+  v.style.transform = face === 'user' ? 'scaleX(-1)' : 'none'
 
   majBadgeCamera()
 }
@@ -22027,7 +22072,7 @@ function majProgressionIA() {
      par le script, corriger le balisage ne se voit pas — et l'on croit que le
      changement n'a pas ete deploye. */
   sous.innerHTML = `${phrase} <b style="color:var(--label);">${tLang('Vous pouvez quitter cette page')}</b> \u2014 ` +
-    escapeHtml(tLang("la procédure est déjà affichée dans la page En dév. Elle sera accessible à la fin de l’analyse."))
+    escapeHtml(tLang("la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse."))
 }
 
 function stopAiProgressSimulation(finalPct) {
@@ -27901,7 +27946,6 @@ function renderAnalyseStats() {
         <span class="pt" style="background:${v ? 'var(--green)' : 'var(--red)'}"></span>
         <span class="co">
           <span class="nm">${escapeHtml(e.nom || tLang('Membre'))}</span>
-          <span class="st">${e.poste ? escapeHtml(e.poste) : tLang('Poste non d\u00e9fini')}</span>
         </span>
         <span class="vl" style="${v ? '' : 'color:var(--red);'}">${v ? quand : 'jamais'}</span>
       </div>`
@@ -28813,8 +28857,9 @@ function renderEquipeCategories() {
     poserIconeRang(true)
 
     if (!liste.length) {
-      grille.innerHTML = '<div class="cl-rien">' + tLang('Aucun favori pour le moment.') + '' +
-        '<span class="cl-rien-suite">' + tLang('Touchez l’étoile sur une procédure pour la retrouver ici.') + '</span></div>'
+      /* Une seule phrase, celle qui dit quoi faire (demande d'Em). */
+      grille.innerHTML = '<div class="cl-rien"><span class="cl-rien-suite cl-rien-seule">'
+        + tLang('Cliquez sur l’étoile pour ajouter la procédure dans les favoris.') + '</span></div>'
       return
     }
 
@@ -32473,6 +32518,14 @@ function peindreIdentiteEtab() {
        comme pour les ronds de la rangee du dessus. */
     img.setAttribute('data-logo-fichier', courant.logo_url)
     img.alt = ''
+    /* Si le logo ne peut vraiment pas s'afficher : les initiales, jamais
+       l'icône d'image cassée. */
+    img.addEventListener('logo-echec', () => {
+      img.remove()
+      ini.hidden = false
+      ini.textContent = (nom || '?').split(/\s+/).slice(0, 2)
+        .map(m => m[0]).join('').toUpperCase() || '?'
+    })
     boite.appendChild(img)
     signerLogos(boite)
     ini.hidden = true
@@ -33318,10 +33371,24 @@ document.getElementById('es-save')?.addEventListener('click', async () => {
   err.textContent = ''
   if (!nom) { err.textContent = tLang('Le nom ne peut pas être vide.'); return }
   setButtonLoading(btn, true)
-  const { error } = await supabase.from('membres').update({ nom }).eq('id', currentMembre.id)
+  /* La photo part avec le nom, dans la même écriture — comme côté gestion. */
+  let champs = { nom }
+  try {
+    const photo = await enregistrerPhotoProfil()
+    if (photo) champs = { ...champs, ...photo }
+  } catch (e) {
+    setButtonLoading(btn, false)
+    err.textContent = e?.message || tLang('La photo n’a pas pu être envoyée.')
+    return
+  }
+  const { error } = await supabase.from('membres').update(champs).eq('id', currentMembre.id)
   setButtonLoading(btn, false)
   if (error) { err.textContent = tLang('Erreur : {message}', { message: error.message }); return }
   currentMembre.nom = nom
+  if ('photo_url' in champs) currentMembre.photo_url = champs.photo_url
+  photoTampon = null
+  peindrePhotoProfil()
+  peindreReglagesEquipe?.()
   err.style.color = 'var(--green)'
   err.textContent = tLang('Enregistré.')
 })
@@ -34446,7 +34513,7 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
     entreprise_id: currentMembre.entreprise_id,
     genre: 'retrait',
     nom: btn.dataset.nom || cible?.nom || null,
-    poste: cible?.poste || null,
+    poste: null,   // le poste n'est plus utilisé (demande d'Em)
     par_nom: currentMembre.nom || null,
   }).then(({ error: e }) => {
     if (e) console.warn('[mouvements] non consigné :', e.message)
@@ -35521,7 +35588,7 @@ function peindrePublication(proc) {
 
        Ta phrase, allégée : « seuls ceux qui ont accès à l'espace gestion
        peuvent y accéder » répétait « accès » deux fois en six mots. */
-    ti.textContent = tLang('En dév.')
+    ti.textContent = tLang('En cours')
     /* ═══ UNE LIGNE, PAS TROIS ═══
 
        « Visible par l'espace gestion uniquement. Publiez-la pour que votre
@@ -36678,6 +36745,13 @@ function cheminLogo(valeur) {
   return m ? decodeURIComponent(m[1]) : null
 }
 
+function oublierSignatureLogo(valeur) {
+  const chemin = cheminLogo(valeur)
+  if (!chemin) return
+  signatures.delete('logos:' + chemin)
+  memoriserSignatures()
+}
+
 async function urlLogoSignee(valeur) {
   const chemin = cheminLogo(valeur)
   if (!chemin) return null
@@ -36703,6 +36777,28 @@ async function signerLogos(racine) {
   const cibles = (racine || document).querySelectorAll('[data-logo-fichier]:not([data-logo-signe])')
   await Promise.all([...cibles].map(async el => {
     el.setAttribute('data-logo-signe', '1')
+    /* ⚠ UNE IMAGE QUI NE SE CHARGE PAS N'EST JAMAIS LAISSÉE CASSÉE.
+       1er échec : l'adresse gardée n'était peut-être plus valable (elle a
+       expiré, la clé du serveur a changé) — on l'oublie et on en redemande
+       une neuve. 2e échec : on masque l'image et on prévient la page
+       (`logo-echec`), qui montre alors ses initiales. */
+    if (!el.__secoursLogo && el.tagName === 'IMG') {
+      el.__secoursLogo = true
+      el.addEventListener('error', () => {
+        if (!el.getAttribute('src')) return
+        if (!el.__relance) {
+          el.__relance = true
+          oublierSignatureLogo(el.getAttribute('data-logo-fichier'))
+          el.removeAttribute('data-logo-signe')
+          el.removeAttribute('src')
+          signerLogos(el.parentElement || el)
+          return
+        }
+        el.hidden = true
+        el.dispatchEvent(new CustomEvent('logo-echec', { bubbles: true }))
+      })
+      el.addEventListener('load', () => { el.__relance = false })
+    }
     /* ⚠ `data-en-signature` : l'adresse est en route. La page qui s'ouvre
        attend ces images-là avant de paraître (voir `poserPorte`). */
     el.setAttribute('data-en-signature', '')

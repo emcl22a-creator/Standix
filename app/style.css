@@ -25673,3 +25673,18 @@ html::-webkit-scrollbar-thumb:hover{
   animation:ecranBat 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (prefers-reduced-motion: reduce){ .ecran-prise.attente b.ecran-attente-n{ animation:none; } }
+
+/* La croix qui retire la vidéo choisie, en haut à droite du cadre. Au-dessus
+   du champ de fichier invisible (z-index 2) pour recevoir le clic. */
+.ai-video-oter{
+  position:absolute; top:10px; right:10px; z-index:3;
+  width:32px; height:32px; padding:0; border:none; border-radius:100px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(20,20,26,0.62); color:#fff;
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px);
+  box-shadow:0 2px 8px rgba(0,0,0,0.25), inset 0 0 0 0.5px rgba(255,255,255,0.18);
+  cursor:pointer;
+}
+.ai-video-oter[hidden]{ display:none; }
+.ai-video-oter svg{ width:16px; height:16px; display:block; }
+.ai-video-oter:active{ transform:scale(0.9); }

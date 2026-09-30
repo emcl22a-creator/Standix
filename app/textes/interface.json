@@ -1699,6 +1699,10 @@
   "en": "Favourites",
   "de": "Favoriten"
  },
+ "Fenêtre choisie.": {
+  "en": "Window selected.",
+  "de": "Fenster ausgewählt."
+ },
  "Fermer": {
   "en": "Close",
   "de": "Schließen"
@@ -2138,6 +2142,10 @@
  "Lancer la vidéo": {
   "en": "Play the video",
   "de": "Video abspielen"
+ },
+ "Lancer l’enregistrement": {
+  "en": "Start recording",
+  "de": "Aufnahme starten"
  },
  "Langue": {
   "en": "Language",
@@ -3098,6 +3106,10 @@
  "Retirer la photo": {
   "en": "Remove the photo",
   "de": "Foto entfernen"
+ },
+ "Retirer la vidéo": {
+  "en": "Remove the video",
+  "de": "Video entfernen"
  },
  "Retirer le logo": {
   "en": "Remove the logo",

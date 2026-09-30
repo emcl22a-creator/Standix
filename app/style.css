@@ -25751,3 +25751,64 @@ html::-webkit-scrollbar-thumb:hover{
 .screen.page-attend *{
   animation-play-state:paused !important;
 }
+
+
+/* Les trois sources, une fois une vidéo choisie : la rangée est retirée
+   (voir `montrerSourcesVideo`). `display:flex` l'emporterait sinon sur
+   l'attribut `hidden`. */
+.src-rang[hidden]{ display:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ENREGISTRER L'ÉCRAN · LES TROIS ÉTAPES
+
+   L'étape en cours est pleine : pastille bleue, texte net, bouton actif.
+   Les suivantes attendent, estompées. Celles qui sont faites prennent une
+   coche verte et rangent leur bouton. `data-etape` est posé sur la carte
+   par `majEtapeEcran` (app.js).
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ecran-etapes{ padding:6px 18px; }
+.ecran-etapes .ee{
+  display:flex; gap:14px; align-items:flex-start;
+  padding:14px 0;
+  transition:opacity 0.35s cubic-bezier(0.32,0.72,0,1), filter 0.35s cubic-bezier(0.32,0.72,0,1);
+}
+.ecran-etapes .ee + .ee{ border-top:0.5px solid rgba(28,28,38,0.10); }
+.ecran-etapes .ee-n{
+  flex:0 0 30px; width:30px; height:30px; border-radius:50%;
+  display:grid; place-items:center;
+  background:rgba(118,118,128,0.12); color:var(--label-2);
+  font-size:14px; font-weight:700;
+  transition:background 0.3s, color 0.3s, transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+.ecran-etapes .ee-n svg{ width:16px; height:16px; display:none; }
+.ecran-etapes .ee-c{ flex:1 1 auto; min-width:0; padding-top:4px; }
+.ecran-etapes .ee-t{ font-size:15.5px; font-weight:650; letter-spacing:-0.015em; color:var(--label); text-wrap:balance; }
+.ecran-etapes .ee-s{ font-size:13.5px; line-height:1.4; color:var(--label-2); margin-top:3px; text-wrap:pretty; }
+.ecran-etapes .ee-b{ margin-top:11px; }
+
+/* À venir : estompée, bouton inerte. */
+.ecran-etapes[data-etape="1"] .ee[data-e="2"],
+.ecran-etapes[data-etape="1"] .ee[data-e="3"],
+.ecran-etapes[data-etape="2"] .ee[data-e="3"]{ opacity:0.42; }
+
+/* En cours : pastille bleue. */
+.ecran-etapes[data-etape="1"] .ee[data-e="1"] .ee-n,
+.ecran-etapes[data-etape="2"] .ee[data-e="2"] .ee-n,
+.ecran-etapes[data-etape="3"] .ee[data-e="3"] .ee-n{
+  background:#1F4CEE; color:#fff; transform:scale(1.06);
+}
+
+/* Faite : coche verte, bouton rangé. */
+.ecran-etapes[data-etape="2"] .ee[data-e="1"] .ee-n,
+.ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-n,
+.ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-n{ background:#34C759; color:#fff; }
+.ecran-etapes[data-etape="2"] .ee[data-e="1"] .ee-n b,
+.ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-n b,
+.ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-n b{ display:none; }
+.ecran-etapes[data-etape="2"] .ee[data-e="1"] .ee-n svg,
+.ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-n svg,
+.ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-n svg{ display:block; }
+.ecran-etapes[data-etape="2"] .ee[data-e="1"] .ee-b,
+.ecran-etapes[data-etape="3"] .ee[data-e="1"] .ee-b,
+.ecran-etapes[data-etape="3"] .ee[data-e="2"] .ee-b{ display:none; }

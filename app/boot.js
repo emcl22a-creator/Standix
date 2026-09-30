@@ -29,7 +29,13 @@
     })
   }, true)
 
-  ;(function cadencePendantLeToucher() {
+  /* ⚠ SEULEMENT AVEC ?debug=1. Cette boucle demandait une image au navigateur
+     soixante fois par seconde, en permanence, pour un chiffre que seul le
+     panneau de diagnostic affiche. Sans ce panneau, elle empêchait juste le
+     téléphone de se mettre au repos entre deux gestes. */
+  var DEBUG = /[?&]debug=1/.test(location.search)
+
+  ;DEBUG && (function cadencePendantLeToucher() {
     var images = 0, debut = null, dernier = 0
     function tic(t) {
       if (debut !== null) {
@@ -118,7 +124,7 @@
 
   // Le résumé se rafraîchit tout seul : appuis et défilement se mesurent
   // après coup, il ne faut pas attendre un nouveau jalon pour les voir.
-  setInterval(majPanneau, 700)
+  if (DEBUG) setInterval(majPanneau, 700)
 
   jalon('page lue')
   requestAnimationFrame(function () { requestAnimationFrame(function () { jalon('première image affichée') }) })

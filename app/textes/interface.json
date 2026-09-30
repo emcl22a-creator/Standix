@@ -379,6 +379,10 @@
   "en": "Add your video",
   "de": "Video hinzufügen"
  },
+ "Allez sur votre logiciel et expliquez à voix haute": {
+  "en": "Go to your program and explain out loud",
+  "de": "Wechseln Sie zu Ihrem Programm und erklären Sie laut"
+ },
  "Analyse": {
   "en": "Analysis",
   "de": "Auswertung"
@@ -979,6 +983,10 @@
   "en": "Load the video first.",
   "de": "Laden Sie zuerst das Video."
  },
+ "Choisir l’écran": {
+  "en": "Choose the screen",
+  "de": "Bildschirm wählen"
+ },
  "Choisir l’écran et démarrer": {
   "en": "Choose the screen and start",
   "de": "Bildschirm wählen und starten"
@@ -994,6 +1002,10 @@
  "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": {
   "en": "Choose at least two videos. They are joined in the order you put them.",
   "de": "Wählen Sie mindestens zwei Videos. Sie werden in der Reihenfolge zusammengefügt, in die Sie sie bringen."
+ },
+ "Choisissez ce que vous filmez": {
+  "en": "Choose what to record",
+  "de": "Wählen Sie, was Sie aufnehmen"
  },
  "Choisissez la durée pendant laquelle le code d’invitation reste valide.": {
   "en": "Choose how long the invitation code stays valid.",
@@ -1026,6 +1038,10 @@
  "Cinq minutes : l’enregistrement s’arrête là.": {
   "en": "Five minutes: recording stops here.",
   "de": "Fünf Minuten: Hier endet die Aufnahme."
+ },
+ "Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.": {
+  "en": "Five minutes maximum. On the entire screen, the Standix bar also appears in the video.",
+  "de": "Höchstens fünf Minuten. Bei gesamtem Bildschirm ist die Standix-Leiste auch im Video zu sehen."
  },
  "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": {
   "en": "Five minutes at most. Recording stops on its own.",
@@ -1519,6 +1535,10 @@
   "en": "A bit more text, please: at least a few sentences.",
   "de": "Etwas mehr Text bitte: mindestens ein paar Sätze."
  },
+ "Enregistrement Standix": {
+  "en": "Standix recording",
+  "de": "Standix-Aufnahme"
+ },
  "Enregistrement impossible : {message}": {
   "en": "Could not save: {message}",
   "de": "Speichern nicht möglich: {message}"
@@ -2003,6 +2023,10 @@
   "en": "You will no longer have the User area: you are on the other side now.",
   "de": "Der Nutzerbereich ist für Sie nicht mehr zugänglich: Sie sind jetzt auf der anderen Seite."
  },
+ "La barre flottante n’a pas pu s’ouvrir sur ce navigateur ({v}). La barre reste dans la page.": {
+  "en": "The floating bar couldn’t open in this browser ({v}). The bar stays in the page.",
+  "de": "Die schwebende Leiste konnte in diesem Browser nicht geöffnet werden ({v}). Die Leiste bleibt auf der Seite."
+ },
  "La base a refusé l'adhésion.": {
   "en": "The database refused to add you.",
   "de": "Die Datenbank hat den Beitritt abgelehnt."
@@ -2139,6 +2163,10 @@
   "en": "Start recording",
   "de": "Aufnahme starten"
  },
+ "Lancez l’enregistrement": {
+  "en": "Start recording",
+  "de": "Aufnahme starten"
+ },
  "Langue": {
   "en": "Language",
   "de": "Sprache"
@@ -2198,6 +2226,10 @@
  "Le démarrage a échoué": {
   "en": "Starting failed",
   "de": "Der Start ist fehlgeschlagen"
+ },
+ "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": {
+  "en": "The microphone is on: the steps are written from what you say.",
+  "de": "Das Mikrofon ist an: Die Schritte entstehen aus dem, was Sie sagen."
  },
  "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": {
   "en": "The microphone is on while you record. The steps come mostly from what you say.",
@@ -2835,6 +2867,10 @@
   "en": "Role not saved: {message}",
   "de": "Position nicht gespeichert: {message}"
  },
+ "Pour filmer un logiciel, prenez « Écran entier ».": {
+  "en": "To record a program, pick “Entire screen”.",
+  "de": "Um ein Programm aufzunehmen, wählen Sie „Gesamter Bildschirm“."
+ },
  "Presque prêt": {
   "en": "Almost there",
   "de": "Fast fertig"
@@ -2942,6 +2978,10 @@
  "Quand le temps est mis en pause": {
   "en": "When the timer pauses",
   "de": "Wann die Zeit angehalten wird"
+ },
+ "Quand vous avez fini, touchez « Terminer » dans la barre Standix.": {
+  "en": "When you’re done, tap “Finish” in the Standix bar.",
+  "de": "Wenn Sie fertig sind, tippen Sie in der Standix-Leiste auf „Beenden“."
  },
  "Quel est votre poste ?": {
   "en": "What is your role?",
@@ -3638,6 +3678,10 @@
  "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": {
   "en": "A read counts after {DUREE_LECTURE_MIN} seconds on the procedure. Each user counts once per procedure.",
   "de": "Ein Aufruf zählt nach {DUREE_LECTURE_MIN} Sekunden in der Anleitung. Jeder Nutzer zählt einmal pro Anleitung."
+ },
+ "Une petite barre Standix s’ouvre et reste au-dessus de vos logiciels.": {
+  "en": "A small Standix bar opens and stays on top of your programs.",
+  "de": "Eine kleine Standix-Leiste öffnet sich und bleibt über Ihren Programmen."
  },
  "Une procédure vous attend": {
   "en": "A procedure is waiting for you",

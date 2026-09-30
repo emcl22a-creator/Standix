@@ -291,6 +291,7 @@ const DICO = {
     "Ajoutez au moins une étape.": "Add at least one step.",
     "Ajoutez votre document": "Add your document",
     "Ajoutez votre vidéo": "Add your video",
+    "Allez sur votre logiciel et expliquez à voix haute": "Go to your program and explain out loud",
     "Analyse": "Analysis",
     "Analyse bloquée": "Analysis stuck",
     "Analyse en cours": "Analysing",
@@ -461,10 +462,12 @@ const DICO = {
     "Chargement…": "Loading…",
     "Chargez d'abord la vidéo.": "Load the video first.",
     "chevauchement": "overlap",
+    "Choisir l’écran": "Choose the screen",
     "Choisir l’écran et démarrer": "Choose the screen and start",
     "Choisir une vidéo": "Choose a video",
     "Choisissez <b>Réglages du site web</b>": "Choose <b>Website Settings</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Choose at least two videos. They are joined in the order you put them.",
+    "Choisissez ce que vous filmez": "Choose what to record",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Choose how long the invitation code stays valid.",
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
@@ -473,6 +476,7 @@ const DICO = {
     "Chrome sur Android": "Chrome on Android",
     "Cinq minutes : enregistrement arrêté.": "Five minutes: recording stopped.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Five minutes: recording stops here.",
+    "Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.": "Five minutes maximum. On the entire screen, the Standix bar also appears in the video.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Five minutes at most. Recording stops on its own.",
     "Cliquez encore une fois sur le bouton pour choisir l’écran.": "Click the button once more to choose the screen.",
     "Cliquez ici pour nous écrire": "Click here to write to us",
@@ -616,6 +620,7 @@ const DICO = {
     "Encore un peu de texte : il en faut au moins quelques phrases.": "A bit more text, please: at least a few sentences.",
     "Enregistrement impossible : {message}": "Could not save: {message}",
     "Enregistrement prêt — lancez l’analyse": "Recording ready — start the analysis",
+    "Enregistrement Standix": "Standix recording",
     "Enregistrement trop court.": "Recording too short.",
     "Enregistrement…": "Saving…",
     "Enregistrer": "Save",
@@ -759,6 +764,7 @@ const DICO = {
     "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin": "The AI wrote these steps — fix the text or the clip timing if needed",
     "L'IA n'a pas trouvé d'étapes dans ce document. Il décrit peut-être une situation plutôt qu'une marche à suivre.": "The AI found no steps in this document. It may describe a situation rather than a way of doing something.",
     "l'équipe": "the team",
+    "La barre flottante n’a pas pu s’ouvrir sur ce navigateur ({v}). La barre reste dans la page.": "The floating bar couldn’t open in this browser ({v}). The bar stays in the page.",
     "La base a refusé l'adhésion.": "The database refused to add you.",
     "La base a refusé la modification.": "The database refused the change.",
     "La base a refusé la modification. Exécutez migration-etablissements.sql : il manque la règle d'accès « update » sur la table entreprises.": "The database refused the change. Run migration-etablissements.sql: the “update” access rule is missing on the entreprises table.",
@@ -795,6 +801,7 @@ const DICO = {
     "Lampe torche": "Flashlight",
     "Lancer la vidéo": "Play the video",
     "Lancer l’enregistrement": "Start recording",
+    "Lancez l’enregistrement": "Start recording",
     "Langue": "Language",
     "Langue de l’application": "App language",
     "Langue parlée": "Spoken language",
@@ -808,6 +815,7 @@ const DICO = {
     "Le compte n’a pas pu être lu.": "The account could not be read.",
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "The timer runs while a procedure is OPEN on screen, and only then. • It stops as soon as the app goes to the background or the screen turns off. • After two minutes without any touch, it asks “where are you at?” and stops counting until someone answers — a phone left on the counter does not pile up hours. • Under three seconds, nothing is kept: that is a glance, not a read. Times add up with each visit.",
     "Le démarrage a échoué": "Starting failed",
+    "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": "The microphone is on: the steps are written from what you say.",
     "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "The microphone is on while you record. The steps come mostly from what you say.",
     "Le mot de passe doit faire au moins {MDP_MIN} caractères.": "The password must be at least {MDP_MIN} characters.",
     "Le navigateur a refusé de lire « {name} ». Relancez le collage sans quitter cette page entre-temps.": "The browser could not read “{name}”. Start joining again without leaving this page in between.",
@@ -989,6 +997,7 @@ const DICO = {
     "Poste non défini": "No role set",
     "Poste non enregistré : {message}": "Role not saved: {message}",
     "pour créer une procédure.": "button to create a procedure.",
+    "Pour filmer un logiciel, prenez « Écran entier ».": "To record a program, pick “Entire screen”.",
     "premier mois avec des lectures": "first month with reads",
     "Presque prêt": "Almost there",
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Prices exclude tax. You change plan when your team changes, never before.",
@@ -1020,6 +1029,7 @@ const DICO = {
     "Publiée — votre équipe peut la lire": "Published — your team can read it",
     "QR code": "QR code",
     "Quand le temps est mis en pause": "When the timer pauses",
+    "Quand vous avez fini, touchez « Terminer » dans la barre Standix.": "When you’re done, tap “Finish” in the Standix bar.",
     "que vos procédures ont fait gagner à votre établissement.": "your procedures have saved your site.",
     "Quel est votre poste ?": "What is your role?",
     "Quel est votre rôle ici ?": "What do you do here?",
@@ -1206,6 +1216,7 @@ const DICO = {
     "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "A problem, an idea, a question about Standix? We read everything and reply as fast as we can.",
     "Une erreur est survenue pendant l'analyse.": "Something went wrong during the analysis.",
     "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": "A read counts after {DUREE_LECTURE_MIN} seconds on the procedure. Each user counts once per procedure.",
+    "Une petite barre Standix s’ouvre et reste au-dessus de vos logiciels.": "A small Standix bar opens and stays on top of your programs.",
     "Une procédure vous attend": "A procedure is waiting for you",
     "Une seule personne peut encore rejoindre votre équipe.": "Only one more person can join your team.",
     "Une seule vidéo de": "Only one video of",
@@ -1565,6 +1576,7 @@ const DICO = {
     "Ajoutez au moins une étape.": "Fügen Sie mindestens einen Schritt hinzu.",
     "Ajoutez votre document": "Dokument hinzufügen",
     "Ajoutez votre vidéo": "Video hinzufügen",
+    "Allez sur votre logiciel et expliquez à voix haute": "Wechseln Sie zu Ihrem Programm und erklären Sie laut",
     "Analyse": "Auswertung",
     "Analyse bloquée": "Auswertung hängt",
     "Analyse en cours": "Wird ausgewertet",
@@ -1735,10 +1747,12 @@ const DICO = {
     "Chargement…": "Wird geladen…",
     "Chargez d'abord la vidéo.": "Laden Sie zuerst das Video.",
     "chevauchement": "Überschneidung",
+    "Choisir l’écran": "Bildschirm wählen",
     "Choisir l’écran et démarrer": "Bildschirm wählen und starten",
     "Choisir une vidéo": "Video wählen",
     "Choisissez <b>Réglages du site web</b>": "Wählen Sie <b>Website-Einstellungen</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Wählen Sie mindestens zwei Videos. Sie werden in der Reihenfolge zusammengefügt, in die Sie sie bringen.",
+    "Choisissez ce que vous filmez": "Wählen Sie, was Sie aufnehmen",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Wählen Sie, wie lange der Einladungscode gültig bleibt.",
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
@@ -1747,6 +1761,7 @@ const DICO = {
     "Chrome sur Android": "Chrome auf Android",
     "Cinq minutes : enregistrement arrêté.": "Fünf Minuten: Aufnahme gestoppt.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Fünf Minuten: Hier endet die Aufnahme.",
+    "Cinq minutes au maximum. En écran entier, la barre Standix apparaît aussi dans la vidéo.": "Höchstens fünf Minuten. Bei gesamtem Bildschirm ist die Standix-Leiste auch im Video zu sehen.",
     "Cinq minutes au maximum. L’enregistrement s’arrête seul au bout.": "Höchstens fünf Minuten. Die Aufnahme stoppt von selbst.",
     "Cliquez encore une fois sur le bouton pour choisir l’écran.": "Klicken Sie noch einmal auf die Schaltfläche, um den Bildschirm zu wählen.",
     "Cliquez ici pour nous écrire": "Hier klicken, um uns zu schreiben",
@@ -1890,6 +1905,7 @@ const DICO = {
     "Encore un peu de texte : il en faut au moins quelques phrases.": "Etwas mehr Text bitte: mindestens ein paar Sätze.",
     "Enregistrement impossible : {message}": "Speichern nicht möglich: {message}",
     "Enregistrement prêt — lancez l’analyse": "Aufnahme fertig — Auswertung starten",
+    "Enregistrement Standix": "Standix-Aufnahme",
     "Enregistrement trop court.": "Aufnahme zu kurz.",
     "Enregistrement…": "Wird gespeichert…",
     "Enregistrer": "Speichern",
@@ -2033,6 +2049,7 @@ const DICO = {
     "L'IA a généré ces étapes — corrigez le texte ou le moment du clip si besoin": "Die KI hat diese Schritte geschrieben — korrigieren Sie bei Bedarf Text oder Ausschnitt",
     "L'IA n'a pas trouvé d'étapes dans ce document. Il décrit peut-être une situation plutôt qu'une marche à suivre.": "Die KI hat in diesem Dokument keine Schritte gefunden. Es beschreibt vielleicht eine Situation statt eines Ablaufs.",
     "l'équipe": "das Team",
+    "La barre flottante n’a pas pu s’ouvrir sur ce navigateur ({v}). La barre reste dans la page.": "Die schwebende Leiste konnte in diesem Browser nicht geöffnet werden ({v}). Die Leiste bleibt auf der Seite.",
     "La base a refusé l'adhésion.": "Die Datenbank hat den Beitritt abgelehnt.",
     "La base a refusé la modification.": "Die Datenbank hat die Änderung abgelehnt.",
     "La base a refusé la modification. Exécutez migration-etablissements.sql : il manque la règle d'accès « update » sur la table entreprises.": "Die Datenbank hat die Änderung abgelehnt. Führen Sie migration-etablissements.sql aus: Die Zugriffsregel „update“ fehlt in der Tabelle entreprises.",
@@ -2069,6 +2086,7 @@ const DICO = {
     "Lampe torche": "Taschenlampe",
     "Lancer la vidéo": "Video abspielen",
     "Lancer l’enregistrement": "Aufnahme starten",
+    "Lancez l’enregistrement": "Aufnahme starten",
     "Langue": "Sprache",
     "Langue de l’application": "Sprache der App",
     "Langue parlée": "Gesprochene Sprache",
@@ -2082,6 +2100,7 @@ const DICO = {
     "Le compte n’a pas pu être lu.": "Das Konto konnte nicht gelesen werden.",
     "Le compteur tourne quand une procédure est OUVERTE à l'écran, et seulement là. • Il s'arrête dès que l'app passe en arrière-plan ou que l'écran s'éteint. • Après deux minutes sans le moindre geste, il demande « vous en êtes où ? » et cesse de compter tant que personne ne répond — un téléphone posé sur le plan de travail n'accumule pas des heures. • Sous trois secondes, rien n'est retenu : c'est un passage, pas une lecture. Les temps s'additionnent à chaque visite.": "Die Zeit läuft, solange eine Anleitung auf dem Bildschirm OFFEN ist, und nur dann. • Sie stoppt, sobald die App in den Hintergrund geht oder der Bildschirm ausgeht. • Nach zwei Minuten ohne Berührung fragt sie „Wie weit sind Sie?“ und zählt nicht weiter, bis jemand antwortet — ein Handy auf der Arbeitsfläche sammelt keine Stunden. • Unter drei Sekunden zählt nichts: Das ist ein Vorbeischauen, kein Lesen. Die Zeiten addieren sich bei jedem Besuch.",
     "Le démarrage a échoué": "Der Start ist fehlgeschlagen",
+    "Le micro est allumé : les étapes sont rédigées à partir de ce que vous dites.": "Das Mikrofon ist an: Die Schritte entstehen aus dem, was Sie sagen.",
     "Le micro est allumé pendant l’enregistrement. Les étapes sont rédigées principalement à partir de ce qu’on entend dans la vidéo.": "Das Mikrofon ist während der Aufnahme an. Die Schritte entstehen vor allem aus dem, was Sie sagen.",
     "Le mot de passe doit faire au moins {MDP_MIN} caractères.": "Das Passwort muss mindestens {MDP_MIN} Zeichen haben.",
     "Le navigateur a refusé de lire « {name} ». Relancez le collage sans quitter cette page entre-temps.": "Der Browser konnte „{name}“ nicht lesen. Starten Sie das Zusammenfügen neu, ohne diese Seite zwischendurch zu verlassen.",
@@ -2263,6 +2282,7 @@ const DICO = {
     "Poste non défini": "Keine Position festgelegt",
     "Poste non enregistré : {message}": "Position nicht gespeichert: {message}",
     "pour créer une procédure.": ", um eine Anleitung zu erstellen.",
+    "Pour filmer un logiciel, prenez « Écran entier ».": "Um ein Programm aufzunehmen, wählen Sie „Gesamter Bildschirm“.",
     "premier mois avec des lectures": "erster Monat mit Aufrufen",
     "Presque prêt": "Fast fertig",
     "Prix hors taxes. Vous changez d'offre quand l'équipe change, jamais avant.": "Preise ohne Steuern. Sie wechseln den Tarif, wenn Ihr Team wächst — nie vorher.",
@@ -2294,6 +2314,7 @@ const DICO = {
     "Publiée — votre équipe peut la lire": "Veröffentlicht — Ihr Team kann sie lesen",
     "QR code": "QR-Code",
     "Quand le temps est mis en pause": "Wann die Zeit angehalten wird",
+    "Quand vous avez fini, touchez « Terminer » dans la barre Standix.": "Wenn Sie fertig sind, tippen Sie in der Standix-Leiste auf „Beenden“.",
     "que vos procédures ont fait gagner à votre établissement.": "die Ihre Anleitungen Ihrem Standort gespart haben.",
     "Quel est votre poste ?": "Was ist Ihre Position?",
     "Quel est votre rôle ici ?": "Was machen Sie hier?",
@@ -2480,6 +2501,7 @@ const DICO = {
     "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "Ein Problem, eine Idee, eine Frage zu Standix? Wir lesen alles und antworten so schnell wie möglich.",
     "Une erreur est survenue pendant l'analyse.": "Bei der Auswertung ist ein Fehler aufgetreten.",
     "Une lecture est comptée après {DUREE_LECTURE_MIN} secondes passées sur la procédure. Chaque utilisateur est compté une seule fois par procédure.": "Ein Aufruf zählt nach {DUREE_LECTURE_MIN} Sekunden in der Anleitung. Jeder Nutzer zählt einmal pro Anleitung.",
+    "Une petite barre Standix s’ouvre et reste au-dessus de vos logiciels.": "Eine kleine Standix-Leiste öffnet sich und bleibt über Ihren Programmen.",
     "Une procédure vous attend": "Eine Anleitung wartet auf Sie",
     "Une seule personne peut encore rejoindre votre équipe.": "Nur noch eine Person kann Ihrem Team beitreten.",
     "Une seule vidéo de": "Nur ein Video mit",
@@ -18812,6 +18834,8 @@ function ouvrirEnregistrementEcran() {
   } else {
     document.getElementById('ecran-mode-emploi').innerHTML = modeEmploiEcran()
   }
+  /* On repart de l'étape 1, sauf si une prise est en cours. */
+  if (surOrdi && !ecranFlux) majEtapeEcran(1)
   showGestionScreen('p-ecran')
   /* ⚠ APRÈS `showGestionScreen`, ET C'ÉTAIT TOUT LE DÉFAUT.
 
@@ -18986,12 +19010,164 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
      l'ajouterait une fois de plus à chaque reprise. */
   pisteVideo.addEventListener('ended', () => arreterEcran())
 
-  /* La barre flottante demande un geste neuf : on propose « Lancer
-     l'enregistrement ». Sans barre flottante possible (Safari, Firefox), le
-     compte à rebours démarre tout de suite, dans la page. */
-  if (window.documentPictureInPicture?.requestWindow) { demanderSecondClicEcran(); return }
+  /* ⚠ ÉTAPE 2 SUR LA PAGE. La barre flottante demande un geste neuf : le
+     bouton « Lancer l'enregistrement » s'active, en bleu, sous l'étape 1
+     cochée. On prépare dès maintenant la barre de secours (voir
+     `preparerBarreVideo`) pour qu'elle puisse s'ouvrir dans ce même clic. */
+  preparerBarreVideo()
+  majEtapeEcran(2)
+  try { document.getElementById('ecran-lancer')?.focus({ preventScroll: true }) } catch (x) {}
+})
+
+/* ═══ L'ÉTAPE EN COURS, SUR LA PAGE ═══ 1 : choisir · 2 : lancer · 3 : filmer */
+function majEtapeEcran(n) {
+  const carte = document.getElementById('ecran-etapes')
+  if (carte) carte.dataset.etape = String(n)
+  const lancer = document.getElementById('ecran-lancer')
+  if (lancer) lancer.disabled = n !== 2
+  const choisir = document.getElementById('ecran-demarrer')
+  if (choisir) choisir.disabled = n !== 1
+}
+
+/* ═══ ÉTAPE 2 : OUVRIR LA BARRE STANDIX, PUIS LE COMPTE À REBOURS ═══
+
+   ⚠ DEUX BARRES POSSIBLES, DANS CET ORDRE.
+     1. La fenêtre Standix complète (Document Picture-in-Picture) : chrono,
+        Pause, Recommencer, Terminer. Chrome et Edge récents.
+     2. Si elle ne s'ouvre pas — c'est ce qui arrivait chez Em sous Edge : la
+        barre restait dans la page et disparaissait dès qu'on passait sur un
+        logiciel —, une petite VIDÉO flottante (Picture-in-Picture classique)
+        qui affiche le chrono. Elle flotte elle aussi au-dessus de tout, et
+        porte les boutons du système : pause / lecture, et le bouton rouge
+        « raccrocher » pour Terminer (`brancherControlesVideo`).
+   Dans les deux cas, la barre reste AUSSI dans la page, pour qui revient
+   dans le navigateur. */
+document.getElementById('ecran-lancer')?.addEventListener('click', async () => {
+  const err = document.getElementById('ecran-erreur')
+  if (err) { err.textContent = ''; err.style.color = '' }
+  const barre = await ouvrirBarreFlottante()
+  if (!barre && err) {
+    err.style.color = 'var(--label-2)'
+    err.textContent = tLang('La barre flottante n’a pas pu s’ouvrir sur ce navigateur ({v}). La barre reste dans la page.', { v: ecranPipErreur || '?' })
+  }
+  majEtapeEcran(3)
   lancerPriseEcran()
 })
+
+let ecranPipErreur = ''
+
+async function ouvrirBarreFlottante() {
+  ecranPipErreur = ''
+  if (window.documentPictureInPicture?.requestWindow) {
+    const w = await ouvrirFenetreFlottante()
+    if (w && !w.closed) return 'fenetre'
+  } else {
+    ecranPipErreur = 'Document PiP indisponible'
+  }
+  if (ecranPipVideo && document.pictureInPictureEnabled) {
+    try {
+      dessinerBarreVideo()
+      await ecranPipVideo.requestPictureInPicture()
+      brancherControlesVideo(true)
+      return 'video'
+    } catch (e) {
+      ecranPipErreur += (ecranPipErreur ? ' · ' : '') + (e?.name || e?.message || 'refus')
+    }
+  }
+  return null
+}
+
+/* ═══ LA BARRE DE SECOURS : UNE PETITE VIDÉO QUI AFFICHE LE CHRONO ═══
+
+   Un `canvas` dessine la barre (décompte, puis point rouge et chrono), une
+   vidéo invisible le diffuse, et c'est cette vidéo qu'on met en
+   Picture-in-Picture. Préparée dès le partage accordé : au clic sur
+   « Lancer », elle doit déjà avoir une image, sinon le navigateur refuse. */
+let ecranPipVideo = null
+let ecranCanvas = null
+let ecranCanvasFlux = null
+
+function preparerBarreVideo() {
+  if (ecranPipVideo || !document.pictureInPictureEnabled) return
+  try {
+    const c = document.createElement('canvas')
+    c.width = 640; c.height = 132
+    const v = document.createElement('video')
+    v.muted = true; v.playsInline = true
+    v.setAttribute('aria-hidden', 'true')
+    v.style.cssText = 'position:fixed;left:0;top:0;width:4px;height:4px;opacity:0.01;pointer-events:none;z-index:-1'
+    document.body.appendChild(v)
+    ecranCanvas = c
+    dessinerBarreVideo()
+    ecranCanvasFlux = c.captureStream(4)
+    v.srcObject = ecranCanvasFlux
+    v.play().catch(() => {})
+    ecranPipVideo = v
+    setTimeout(dessinerBarreVideo, 120)
+  } catch (e) { ecranPipVideo = null; ecranCanvas = null }
+}
+
+function dessinerBarreVideo() {
+  const c = ecranCanvas
+  if (!c) return
+  const x = c.getContext('2d')
+  const W = c.width, H = c.height
+  const police = '-apple-system, "Segoe UI", Inter, system-ui, sans-serif'
+  x.fillStyle = '#16161E'; x.fillRect(0, 0, W, H)
+  x.textBaseline = 'middle'
+  if (ecranRebours > 0) {
+    /* Le texte se réduit s'il le faut : il ne doit jamais toucher le chiffre,
+       quelle que soit la langue. */
+    const phrase = tLang('L’enregistrement démarre dans')
+    let taille = 30
+    x.font = `600 ${taille}px ${police}`
+    while (taille > 16 && x.measureText(phrase).width > W - 34 - 130) { taille -= 1; x.font = `600 ${taille}px ${police}` }
+    x.fillStyle = 'rgba(255,255,255,0.78)'; x.textAlign = 'left'
+    x.fillText(phrase, 34, H / 2)
+    x.fillStyle = '#FEC64A'; x.font = `700 64px ${police}`; x.textAlign = 'right'
+    x.fillText(String(ecranRebours), W - 40, H / 2 + 2)
+  } else if (ecranEnregistreur && ecranEnregistreur.state !== 'inactive') {
+    const e = Math.floor(ecranEcoule())
+    const t = `${Math.floor(e / 60)}:${String(e % 60).padStart(2, '0')}`
+    if (ecranPause) {
+      x.fillStyle = '#FEC64A'; x.fillRect(34, H / 2 - 16, 10, 32); x.fillRect(52, H / 2 - 16, 10, 32)
+    } else {
+      x.fillStyle = '#FF3B30'; x.beginPath(); x.arc(50, H / 2, 15, 0, Math.PI * 2); x.fill()
+    }
+    x.fillStyle = '#fff'; x.font = `700 58px ${police}`; x.textAlign = 'left'
+    x.fillText(t, 84, H / 2 + 2)
+    x.fillStyle = 'rgba(255,255,255,0.6)'; x.font = `600 28px ${police}`; x.textAlign = 'right'
+    x.fillText(ecranPause ? tLang('en pause') : tLang('sur 5:00'), W - 34, H / 2)
+  } else {
+    x.fillStyle = 'rgba(255,255,255,0.78)'; x.font = `600 30px ${police}`; x.textAlign = 'center'
+    x.fillText('Standix', W / 2, H / 2)
+  }
+  try { ecranCanvasFlux?.getVideoTracks?.()[0]?.requestFrame?.() } catch (e) {}
+}
+
+/* Les boutons que le système place sur la vidéo flottante : pause / lecture,
+   et le bouton rouge « raccrocher » pour Terminer. */
+function brancherControlesVideo(actif) {
+  const ms = navigator.mediaSession
+  if (!ms) return
+  const poser = (a, f) => { try { ms.setActionHandler(a, f) } catch (e) {} }
+  if (!actif) { ['play', 'pause', 'hangup'].forEach(a => poser(a, null)); return }
+  try { ms.metadata = new MediaMetadata({ title: tLang('Enregistrement Standix') }) } catch (e) {}
+  poser('play', () => { if (ecranPause) basculerPauseEcran() })
+  poser('pause', () => { if (!ecranPause && ecranRebours === 0) basculerPauseEcran() })
+  poser('hangup', () => arreterEcran())
+}
+
+function fermerBarreVideo() {
+  brancherControlesVideo(false)
+  const v = ecranPipVideo
+  ecranPipVideo = null
+  try { if (document.pictureInPictureElement === v) document.exitPictureInPicture().catch(() => {}) } catch (e) {}
+  try { ecranCanvasFlux?.getTracks().forEach(t => t.stop()) } catch (e) {}
+  ecranCanvasFlux = null
+  ecranCanvas = null
+  try { v?.remove() } catch (e) {}
+}
 
 /* Le second clic : il ouvre la barre flottante (le navigateur l'accepte, c'est
    un geste neuf), puis lance le compte à rebours. */
@@ -19202,6 +19378,8 @@ function peindrePastilleEcran() {
     v = voileEcran(html)
     v.classList.add('discret')
   }
+  dessinerBarreVideo()
+  try { if (navigator.mediaSession && ecranPipVideo) navigator.mediaSession.playbackState = ecranPause ? 'paused' : 'playing' } catch (x) {}
   v.onclick = (e) => {
     const b = e.target.closest('[data-ecran]')
     if (!b) return
@@ -19261,6 +19439,8 @@ async function ouvrirFenetreFlottante() {
     return w
   } catch (e) {
     ecranPip = null
+    ecranPipErreur = e?.name || e?.message || 'refus'
+    console.warn('Standix · fenêtre flottante refusée :', e?.name, e?.message)
     return null
   }
 }
@@ -19305,6 +19485,8 @@ function nettoyerEcran() {
   ecranEnregistreur = null
   try { if (enr && enr.state !== 'inactive') { enr.onstop = null; enr.stop() } } catch (e) {}
   fermerFenetreFlottante()
+  fermerBarreVideo()
+  majEtapeEcran(1)
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -21871,6 +22053,7 @@ function resetAiScreen() {
   document.getElementById('ai-video-placeholder').style.display = ''
   const oter = document.getElementById('ai-video-oter')
   if (oter) oter.hidden = true
+  montrerSourcesVideo(true, false)
   /* Le bouton retrouve son état neuf. Sans ces deux lignes, il gardait la coche
      et l'anneau de l'analyse précédente : on revenait sur la page avec un bouton
      qui disait « c'est fait » alors qu'il n'y avait rien à faire. */
@@ -21914,6 +22097,59 @@ function resetAiScreen() {
  ⚠ LE CLIC NE DOIT PAS TRAVERSER. La croix est posée au-dessus du champ de
    fichier invisible qui couvre tout le cadre : sans `stopPropagation` et
    `preventDefault`, retirer la vidéo rouvrirait aussitôt le choix d'un fichier. */
+/* ═══════════════════════════════════════════════════════════════════════════
+   LES TROIS SOURCES (Filmer, Enregistrer l'écran, Assembler) S'EFFACENT
+   QUAND UNE VIDÉO EST CHOISIE
+
+   Demande d'Em : avec une vidéo en place, ces trois boutons n'ont plus rien à
+   proposer. Ils disparaissent, et reviennent si l'on retire la vidéo (croix).
+
+   Le geste est celui d'iOS : chaque bouton rétrécit légèrement, se floute et
+   s'efface, l'un après l'autre à quelques centièmes d'écart, pendant que la
+   rangée se referme en hauteur — le contenu du dessous remonte en douceur au
+   lieu de sauter. Le retour joue la même chose à l'envers.
+
+ ⚠ ANIMATIONS WEB (`animate`), PAS DE CLASSES. La hauteur de la rangée varie
+   avec la langue et la taille d'écran : on la mesure au moment du geste.
+ ⚠ `hidden` À LA FIN : une fois fermée, la rangée ne prend plus aucune place
+   et ses boutons ne sont plus atteignables au clavier.
+ ⚠ SANS ANIMATION si le système demande moins de mouvement, ou si `anime`
+   est faux (remise à zéro de la page). */
+function montrerSourcesVideo(montrer, anime) {
+  const rang = document.querySelector('#ai-upload-card .src-rang')
+  if (!rang) return
+  const boutons = [...rang.children]
+  rang.getAnimations().forEach(a => a.cancel())
+  boutons.forEach(b => b.getAnimations().forEach(a => a.cancel()))
+  const calme = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  const dejaVisible = !rang.hidden
+  if (!anime || calme || montrer === dejaVisible) { rang.hidden = !montrer; return }
+
+  const courbe = 'cubic-bezier(0.32, 0.72, 0, 1)'
+  rang.hidden = false
+  const h = rang.offsetHeight
+  const mt = getComputedStyle(rang).marginTop
+  const ouvert = { height: h + 'px', marginTop: mt, overflow: 'hidden' }
+  const ferme = { height: '0px', marginTop: '0px', overflow: 'hidden' }
+  const bVisible = { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' }
+  const bCache = { opacity: 0, transform: 'scale(0.9)', filter: 'blur(6px)' }
+
+  if (!montrer) {
+    boutons.forEach((b, i) => b.animate([bVisible, bCache],
+      { duration: 260, delay: i * 35, easing: courbe, fill: 'forwards' }))
+    const a = rang.animate([ouvert, ferme], { duration: 420, delay: 90, easing: courbe, fill: 'forwards' })
+    a.onfinish = () => {
+      rang.hidden = true
+      a.cancel()
+      boutons.forEach(b => b.getAnimations().forEach(x => x.cancel()))
+    }
+  } else {
+    rang.animate([ferme, ouvert], { duration: 420, easing: courbe })
+    boutons.forEach((b, i) => b.animate([bCache, bVisible],
+      { duration: 380, delay: 120 + i * 45, easing: courbe, fill: 'backwards' }))
+  }
+}
+
 document.getElementById('ai-video-oter')?.addEventListener('click', (e) => {
   e.preventDefault()
   e.stopPropagation()
@@ -21926,6 +22162,7 @@ document.getElementById('ai-video-oter')?.addEventListener('click', (e) => {
   document.getElementById('ai-video-placeholder').style.display = ''
   document.getElementById('ai-video-input').value = ''
   e.currentTarget.hidden = true
+  montrerSourcesVideo(true, true)
   aiVideoFile = null
   aiVideoDuree = 0
   const bLance = document.getElementById('ai-launch-btn')
@@ -21955,6 +22192,7 @@ function chargerVideoPourIA(file) {
   document.getElementById('ai-video-placeholder').style.display = 'none'
   const oter = document.getElementById('ai-video-oter')
   if (oter) oter.hidden = false
+  montrerSourcesVideo(false, true)
   /* ═══ LE BOUTON RESTE FERMÉ TANT QU'ON NE SAIT PAS ═══
 
      Il était activé ICI, avant que la durée soit connue — `loadedmetadata`

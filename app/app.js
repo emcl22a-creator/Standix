@@ -461,12 +461,11 @@ const DICO = {
     "Chargement…": "Loading…",
     "Chargez d'abord la vidéo.": "Load the video first.",
     "chevauchement": "overlap",
-    "Choisir la fenêtre et démarrer": "Choose the window and start",
+    "Choisir l’écran et démarrer": "Choose the screen and start",
     "Choisir une vidéo": "Choose a video",
     "Choisissez <b>Réglages du site web</b>": "Choose <b>Website Settings</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Choose at least two videos. They are joined in the order you put them.",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Choose how long the invitation code stays valid.",
-    "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": "Choose the window or tab to record. The control bar stays visible to you but does not appear in the video.",
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Choose a password with at least 6 characters.",
@@ -665,7 +664,6 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Drag to adjust to a tenth of a second",
     "Favori non enregistré : {v}": "Favourite not saved: {v}",
     "Favoris": "Favourites",
-    "Fenêtre choisie.": "Window selected.",
     "Fermer": "Close",
     "Fermez l'app qui l'utilise, puis réessayez.": "Close the app using it, then try again.",
     "Fermez l’application qui s’en sert, puis réessayez.": "Close the app that is using it, then try again.",
@@ -1444,6 +1442,8 @@ const DICO = {
     "Échec : {message}": "Failed: {message}",
     "Échec : {v}": "Failed: {v}",
     "écoute de la bande son… ({v})": "listening to the soundtrack… ({v})",
+    "Écran choisi.": "Screen selected.",
+    "Écran entier, fenêtre ou onglet : vous choisissez. Si vous filmez l’écran entier, la barre de contrôle apparaîtra aussi dans la vidéo.": "Whole screen, window or tab: you choose. If you record the whole screen, the control bar will also appear in the video.",
     "Écrivez chaque étape dans l'ordre": "Write each step in order",
     "Écrivez chaque étape dans l’ordre": "Write each step in order",
     "Écrivez chaque étape vous-même": "Write each step yourself",
@@ -1735,12 +1735,11 @@ const DICO = {
     "Chargement…": "Wird geladen…",
     "Chargez d'abord la vidéo.": "Laden Sie zuerst das Video.",
     "chevauchement": "Überschneidung",
-    "Choisir la fenêtre et démarrer": "Fenster wählen und starten",
+    "Choisir l’écran et démarrer": "Bildschirm wählen und starten",
     "Choisir une vidéo": "Video wählen",
     "Choisissez <b>Réglages du site web</b>": "Wählen Sie <b>Website-Einstellungen</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Wählen Sie mindestens zwei Videos. Sie werden in der Reihenfolge zusammengefügt, in die Sie sie bringen.",
     "Choisissez la durée pendant laquelle le code d’invitation reste valide.": "Wählen Sie, wie lange der Einladungscode gültig bleibt.",
-    "Choisissez la fenêtre ou l’onglet à filmer. La barre de contrôle reste visible pour vous, mais n’apparaît pas dans la vidéo.": "Wählen Sie das Fenster oder den Tab für die Aufnahme. Die Steuerleiste bleibt für Sie sichtbar, erscheint aber nicht im Video.",
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Wählen Sie ein Passwort mit mindestens 6 Zeichen.",
@@ -1939,7 +1938,6 @@ const DICO = {
     "Faites glisser pour affiner au dixième de seconde": "Ziehen Sie, um auf die Zehntelsekunde genau einzustellen",
     "Favori non enregistré : {v}": "Favorit nicht gespeichert: {v}",
     "Favoris": "Favoriten",
-    "Fenêtre choisie.": "Fenster ausgewählt.",
     "Fermer": "Schließen",
     "Fermez l'app qui l'utilise, puis réessayez.": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut.",
     "Fermez l’application qui s’en sert, puis réessayez.": "Schließen Sie die App, die sie nutzt, und versuchen Sie es erneut.",
@@ -2718,6 +2716,8 @@ const DICO = {
     "Échec : {message}": "Fehlgeschlagen: {message}",
     "Échec : {v}": "Fehlgeschlagen: {v}",
     "écoute de la bande son… ({v})": "Tonspur wird angehört… ({v})",
+    "Écran choisi.": "Bildschirm ausgewählt.",
+    "Écran entier, fenêtre ou onglet : vous choisissez. Si vous filmez l’écran entier, la barre de contrôle apparaîtra aussi dans la vidéo.": "Ganzer Bildschirm, Fenster oder Tab: Sie wählen. Wenn Sie den ganzen Bildschirm aufnehmen, erscheint die Steuerleiste auch im Video.",
     "Écrivez chaque étape dans l'ordre": "Schreiben Sie jeden Schritt der Reihe nach",
     "Écrivez chaque étape dans l’ordre": "Schreiben Sie jeden Schritt der Reihe nach",
     "Écrivez chaque étape vous-même": "Jeden Schritt selbst schreiben",
@@ -18517,64 +18517,41 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
   let fluxEcran = null
   let fluxMicro = null
 
-  /* ═══ LE PARTAGE ET LA BARRE FLOTTANTE, DANS LE MÊME CLIC ═══
+  /* ═══ UN CLIC POUR CHOISIR, UN CLIC POUR LANCER ═══
 
-     Chrome et Edge savent ouvrir une petite fenêtre qui reste AU-DESSUS de
-     toutes les autres, même quand on passe sur Excel ou un autre logiciel.
-     La barre Standix (compte à rebours, chronomètre, pause, recommencer,
-     terminer) y vit pendant toute la prise.
+   ⚠ LE PARTAGE SEUL DANS LE PREMIER CLIC. On ouvrait aussi la barre
+     flottante dans le même geste : la petite fenêtre prenait le premier plan
+     et Chrome refermait aussitôt la fenêtre de choix de l'écran — « la page
+     où l'on choisit l'écran ne s'ouvre pas ».
 
-   ⚠ LE BUG : LA BARRE STANDIX N'APPARAISSAIT PAS. Le navigateur n'autorise ces
-     deux fenêtres (partage d'écran, barre flottante) qu'en réponse directe à
-     un clic, et le clic ne vaut qu'UNE fois. On ouvrait la barre d'abord : elle
-     « consommait » le clic, le partage était refusé, et l'app retenait alors
-     de ne plus jamais ouvrir la barre. On ne voyait que la bande grise de
-     Chrome (« Partage de cet onglet… »), que le navigateur ajoute lui-même et
-     qu'aucun site ne peut retirer.
+     Aucun navigateur ne laisse un site filmer sans ce choix : c'est une
+     règle de sécurité. On le réduit donc à un seul geste, avec « Écran
+     entier » proposé en premier (pour filmer les logiciels hors du
+     navigateur), fenêtres et onglets restant disponibles.
 
-     Maintenant :
-       1. le partage est demandé EN PREMIER ;
-       2. la barre flottante est demandée dans la même seconde ;
-       3. si le navigateur refuse la barre (clic déjà consommé), on garde
-          l'écran Standix au premier plan et un bouton « Lancer
-          l'enregistrement » s'affiche : ce second clic ouvre la barre, puis
-          le compte à rebours commence.
+     Ensuite, l'écran Standix reste au premier plan (`no-focus-change`) et
+     propose « Lancer l'enregistrement » : ce second clic ouvre la barre
+     flottante, puis le compte à rebours laisse le temps d'aller sur sa page.
 
-     ⚠ LA BARRE RESTE HORS DE LA VIDÉO : on filme une FENÊTRE ou un ONGLET,
-       jamais l'écran entier (`monitorTypeSurfaces: 'exclude'`). Le navigateur
-       n'enregistre que le contenu de la fenêtre choisie, pas ce qui flotte
-       par-dessus. */
+   ⚠ ÉCRAN ENTIER = LA BARRE EST DANS LA VIDÉO. Un site ne peut pas se cacher
+     d'une capture de l'écran complet ; en filmant une fenêtre ou un onglet,
+     elle n'y est pas. C'est dit sur la page, et c'est le choix d'Em. */
   try { localStorage.removeItem('standix-ecran-sans-pip') } catch (x) {}
-  const pipPossible = !!window.documentPictureInPicture?.requestWindow
   let controle = null
   try { if (window.CaptureController) controle = new CaptureController() } catch (x) {}
 
-  let pEcran
   try {
-    pEcran = navigator.mediaDevices.getDisplayMedia({
+    fluxEcran = await navigator.mediaDevices.getDisplayMedia({
       video: { width: { ideal: 2560 }, height: { ideal: 1440 }, frameRate: { ideal: 30 },
-               displaySurface: 'window' },
+               displaySurface: 'monitor' },
       audio: false,
-      monitorTypeSurfaces: 'exclude',
       selfBrowserSurface: 'exclude',
       surfaceSwitching: 'include',
       ...(controle ? { controller: controle } : {}),
     })
-  } catch (e) { pEcran = Promise.reject(e) }
-  let pip = null
-  const pPip = pipPossible ? ouvrirFenetreFlottante().then(w => { pip = w }, () => { pip = null }) : Promise.resolve()
-
-  try {
-    fluxEcran = await pEcran
-    /* Sans barre flottante, on reste sur l'écran Standix pour le second clic.
-       À régler tout de suite après le choix : le navigateur ne l'accepte que
-       dans cet instant-là. */
-    try { controle?.setFocusBehavior?.(pip || !pipPossible ? 'focus-captured-surface' : 'no-focus-change') } catch (x) {}
-    await pPip
-    const surface = fluxEcran.getVideoTracks()[0]?.getSettings?.().displaySurface
-    if (surface === 'monitor') { fermerFenetreFlottante(); pip = null }
+    // Tout de suite après le choix : le navigateur ne l'accepte que dans cet instant.
+    try { controle?.setFocusBehavior?.('no-focus-change') } catch (x) {}
   } catch (e) {
-    fermerFenetreFlottante()
     /* Refus de la personne : ce n'est pas une panne, on ne crie pas. */
     if (e?.name !== 'NotAllowedError') {
       err.style.color = 'var(--red)'
@@ -18603,11 +18580,10 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
      l'ajouterait une fois de plus à chaque reprise. */
   pisteVideo.addEventListener('ended', () => arreterEcran())
 
-  // La barre flottante n'a pas pu s'ouvrir avec le premier clic : on en demande un second.
-  if (pipPossible && !zoneFenetreFlottante() && !(fluxEcran.getVideoTracks()[0]?.getSettings?.().displaySurface === 'monitor')) {
-    demanderSecondClicEcran()
-    return
-  }
+  /* La barre flottante demande un geste neuf : on propose « Lancer
+     l'enregistrement ». Sans barre flottante possible (Safari, Firefox), le
+     compte à rebours démarre tout de suite, dans la page. */
+  if (window.documentPictureInPicture?.requestWindow) { demanderSecondClicEcran(); return }
   lancerPriseEcran()
 })
 
@@ -18615,7 +18591,7 @@ document.getElementById('ecran-demarrer')?.addEventListener('click', async () =>
    un geste neuf), puis lance le compte à rebours. */
 function demanderSecondClicEcran() {
   const v = voileEcran(`<div class="ecran-prise attente">
-      <span class="ecran-attente-t">${tLang('Fenêtre choisie.')}</span>
+      <span class="ecran-attente-t">${tLang('Écran choisi.')}</span>
       <button type="button" class="btn small" data-ecran="go">${tLang('Lancer l’enregistrement')}</button>
       <button type="button" class="ecran-refaire" data-ecran="annuler">${tLang('Annuler')}</button>
     </div>`)

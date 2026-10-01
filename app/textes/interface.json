@@ -4099,6 +4099,10 @@
   "en": "You can leave this page",
   "de": "Sie können diese Seite verlassen"
  },
+ "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours.": {
+  "en": "You can leave this page and find the procedure on the In progress page.",
+  "de": "Sie können diese Seite verlassen und die Anleitung auf der Seite „In Arbeit“ wiederfinden."
+ },
  "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.": {
   "en": "You can leave this page and find the procedure on the In progress page. It will be available when the analysis is finished.",
   "de": "Sie können diese Seite verlassen und die Anleitung auf der Seite „In Arbeit“ wiederfinden. Sie ist nach Abschluss der Auswertung verfügbar."

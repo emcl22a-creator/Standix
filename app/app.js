@@ -608,6 +608,7 @@ const DICO = {
     "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": "It appears on the card and at the top of the procedure. Optional.",
     "Employés": "Staff",
     "en attente de la souscription.": "until you subscribe.",
+    "En attente d’une machine chez notre prestataire d’analyse.": "Waiting for a machine at our analysis provider.",
     "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": "Waiting for a machine at our analysis provider. You can leave this page, the work carries on.",
     "En attente d’une place": "Waiting for a slot",
     "en ce moment": "right now",
@@ -803,6 +804,8 @@ const DICO = {
     "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": "The video for this procedure cannot be found. It may have been deleted, or its upload did not finish. Record the procedure again to restart the analysis.",
     "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": "The video did not finish uploading. Keep the app open during the upload, then restart the analysis.",
     "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "The video was not fully uploaded. Restart the analysis and keep the app open.",
+    "Laissez Standix ouverte jusqu’à la fin de l’analyse.": "Keep Standix open until the analysis is finished.",
+    "Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.": "Keep Standix open: the procedure is already shown on the In progress page and will be available when the analysis is finished.",
     "Lampe torche": "Flashlight",
     "Lancer la vidéo": "Play the video",
     "Lancer l’enregistrement": "Start recording",
@@ -1137,6 +1140,7 @@ const DICO = {
     "Sous-dossier": "Subfolder",
     "Sous-dossier retiré": "Subfolder removed",
     "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": "Standix counts reads per person. While several people share one login, you cannot tell who read what — and your records prove nothing.",
+    "Standix était fermée : la préparation de la vidéo s’est mise en pause. Elle reprend maintenant.": "Standix was closed: preparing the video was paused. It is resuming now.",
     "Suppression impossible": "Cannot delete",
     "Suppression impossible : {message}": "Cannot delete: {message}",
     "Suppression impossible pour le moment.": "Cannot delete right now.",
@@ -1323,6 +1327,7 @@ const DICO = {
     "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": "You will lose access to Standix and all your companies. The procedures you wrote stay for the team. This cannot be undone.",
     "Vous pourrez le changer dans les réglages.": "You can change it in the settings.",
     "Vous pouvez quitter cette page": "You can leave this page",
+    "Vous pouvez quitter cette page, mais pas l’app.": "You can leave this page, but not the app.",
     "Vous pouvez quitter cette page.": "You can leave this page.",
     "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "You can be logged in on 3 devices at once.",
     "Vous relirez chaque étape avant de publier.": "You will check every step before publishing.",
@@ -1432,6 +1437,7 @@ const DICO = {
     "{reste} analyse vidéo IA Standix restant à générer": "{reste} Standix AI video analysis left to generate",
     "{reste} analyses vidéo IA Standix restant à générer": "{reste} Standix AI video analyses left to generate",
     "{reste} sur {quota}": "{reste} of {quota}",
+    "{temps} d’analyse.": "{temps} of analysis.",
     "{vus} sur {length} lues": "{vus} of {length} read",
     "{vus} sur {nbEmployes} a vu cette procédure": "{vus} of {nbEmployes} has seen this procedure",
     "{vus} sur {nbEmployes} ont vu cette procédure": "{vus} of {nbEmployes} have seen this procedure",
@@ -1898,6 +1904,7 @@ const DICO = {
     "Elle apparaît sur sa carte et en tête de la fiche. Facultative.": "Erscheint auf der Karte und oben in der Anleitung. Optional.",
     "Employés": "Mitarbeitende",
     "en attente de la souscription.": "bis zum Abschluss eines Abos.",
+    "En attente d’une machine chez notre prestataire d’analyse.": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst.",
     "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst. Sie können die Seite verlassen, es geht trotzdem weiter.",
     "En attente d’une place": "Wartet auf einen Platz",
     "en ce moment": "gerade jetzt",
@@ -2093,6 +2100,8 @@ const DICO = {
     "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": "Das Video dieser Anleitung ist nicht auffindbar. Vielleicht wurde es gelöscht oder nicht fertig hochgeladen. Nehmen Sie die Anleitung neu auf, um die Analyse neu zu starten.",
     "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": "Das Video wurde nicht fertig hochgeladen. Lassen Sie die App beim Hochladen offen und starten Sie die Analyse dann neu.",
     "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "Das Video wurde nicht vollständig hochgeladen. Starten Sie die Analyse neu und lassen Sie die App offen.",
+    "Laissez Standix ouverte jusqu’à la fin de l’analyse.": "Lassen Sie Standix bis zum Ende der Auswertung geöffnet.",
+    "Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.": "Lassen Sie Standix geöffnet: Die Anleitung erscheint bereits auf der Seite „In Arbeit“ und ist nach Abschluss der Auswertung verfügbar.",
     "Lampe torche": "Taschenlampe",
     "Lancer la vidéo": "Video abspielen",
     "Lancer l’enregistrement": "Aufnahme starten",
@@ -2427,6 +2436,7 @@ const DICO = {
     "Sous-dossier": "Unterordner",
     "Sous-dossier retiré": "Unterordner entfernt",
     "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": "Standix zählt Aufrufe pro Person. Solange mehrere Personen denselben Zugang nutzen, wissen Sie nicht, wer was gelesen hat — und Ihre Nachweise belegen nichts.",
+    "Standix était fermée : la préparation de la vidéo s’est mise en pause. Elle reprend maintenant.": "Standix war geschlossen: Die Vorbereitung des Videos wurde angehalten. Sie läuft jetzt weiter.",
     "Suppression impossible": "Löschen nicht möglich",
     "Suppression impossible : {message}": "Löschen nicht möglich: {message}",
     "Suppression impossible pour le moment.": "Löschen ist gerade nicht möglich.",
@@ -2613,6 +2623,7 @@ const DICO = {
     "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": "Sie verlieren den Zugriff auf Standix und alle Ihre Unternehmen. Die Anleitungen, die Sie geschrieben haben, bleiben für das Team. Das lässt sich nicht rückgängig machen.",
     "Vous pourrez le changer dans les réglages.": "Sie können das in den Einstellungen ändern.",
     "Vous pouvez quitter cette page": "Sie können diese Seite verlassen",
+    "Vous pouvez quitter cette page, mais pas l’app.": "Sie können diese Seite verlassen, aber nicht die App.",
     "Vous pouvez quitter cette page.": "Sie können diese Seite verlassen.",
     "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "Sie können auf höchstens 3 Geräten gleichzeitig angemeldet sein.",
     "Vous relirez chaque étape avant de publier.": "Sie prüfen jeden Schritt vor dem Veröffentlichen.",
@@ -2722,6 +2733,7 @@ const DICO = {
     "{reste} analyse vidéo IA Standix restant à générer": "{reste} Standix-KI-Videoauswertung übrig",
     "{reste} analyses vidéo IA Standix restant à générer": "{reste} Standix-KI-Videoauswertungen übrig",
     "{reste} sur {quota}": "{reste} von {quota}",
+    "{temps} d’analyse.": "{temps} Auswertung.",
     "{vus} sur {length} lues": "{vus} von {length} gelesen",
     "{vus} sur {nbEmployes} a vu cette procédure": "{vus} von {nbEmployes} hat diese Anleitung gesehen",
     "{vus} sur {nbEmployes} ont vu cette procédure": "{vus} von {nbEmployes} haben diese Anleitung gesehen",
@@ -16861,6 +16873,8 @@ async function renommerDossier(ancien, { depuisListe = false } = {}) {
 
 /* Les deux points d'entree. */
 document.getElementById('cat-renommer')?.addEventListener('click', () => {
+  // Dans un sous-dossier, c'est lui qu'on renomme, pas le dossier parent.
+  if (sousDossierCourant) { renommerSousDossier(sousDossierCourant); return }
   /* Le nom courant se lit dans le titre : c'est la seule source de verite, la
      page ne le garde nulle part ailleurs. */
   renommerDossier((document.getElementById('category-titre')?.textContent || '').trim())
@@ -17834,12 +17848,13 @@ function majTitreCategorie() {
     /* Le sous-titre porte le chemin : sans lui, on ne sait plus dans quel
        dossier on se trouve — deux entreprises peuvent avoir un « Friteuse ». */
     if (sub) sub.textContent = `${dossierCourantNom} \u203a ${sousDossierCourant}`
-    /* Le crayon renommerait le DOSSIER, ce que personne n'attend ici. Le
-       sous-dossier se renomme depuis sa carte, dans le dossier parent. */
-    if (r) r.style.display = 'none'
+    /* ⚠ LE CRAYON RENOMME ICI LE SOUS-DOSSIER (demande d'Em). Il etait
+       masque, parce qu'il renommait le dossier parent ; le clic regarde
+       maintenant ou l'on se trouve — voir le gestionnaire de `cat-renommer`. */
+    if (r) { r.style.display = ''; r.setAttribute('aria-label', tLang('Renommer le sous-dossier')); r.title = tLang('Renommer le sous-dossier') }
   } else {
     if (t) t.textContent = dossierCourantNom
-    if (r) r.style.display = ''
+    if (r) { r.style.display = ''; r.setAttribute('aria-label', tLang('Renommer le dossier')); r.title = tLang('Renommer le dossier') }
   }
 }
 
@@ -17890,7 +17905,11 @@ function elementIntertitre(nom, compte, renommable) {
    il est plus naturel qu'un bouton « supprimer » qui ferait craindre pour les
    procédures elles-mêmes. On le dit dans la fenêtre. */
 async function renommerSousDossier(ancien) {
-  const dossier = (document.getElementById('category-titre')?.textContent || '').trim()
+  /* ⚠ LE DOSSIER PARENT, PAS LE TITRE. Depuis l'interieur d'un sous-dossier,
+     le titre de la page porte le nom du SOUS-dossier : le lire ici aurait
+     cherche des procedures dans un dossier qui n'existe pas. */
+  const dossier = (sousDossierCourant ? dossierCourantNom
+    : (document.getElementById('category-titre')?.textContent || '')).trim()
   if (!dossier) return
 
   /* ⚠ PLUS DE MENU AVANT LA SAISIE.
@@ -17979,6 +17998,12 @@ async function renommerSousDossier(ancien) {
     l.forEach(p => {
       if (p.categorie === dossier && p.sous_categorie === ancien) p.sous_categorie = propre
     })
+  }
+  /* On etait DANS ce sous-dossier : le titre suit son nouveau nom. S'il a ete
+     retire, on remonte dans le dossier parent — il n'y a plus rien ou rester. */
+  if (sousDossierCourant === ancien) {
+    sousDossierCourant = propre
+    majTitreCategorie()
   }
   renderCategoryProceduresList()
   toast(propre ? tLang('Renommé en « {propre} »', { propre }) : tLang('Sous-dossier retiré'))
@@ -21674,6 +21699,29 @@ let aiPollTimer = null
 let aiLancementEnCours = false
 let aiAllegementEnCours = false
 
+/* ═══ L'APP QUITTEE PENDANT LA PREPARATION ═══
+
+   La preparation (allegement de la video, son, images, envoi) se fait SUR LE
+   TELEPHONE. Quand on quitte Standix, l'iPhone la met en pause : rien n'est
+   envoye, mais le compteur continue. On revenait six minutes plus tard sur
+   « 6 min d'analyse » et une roue qui tournait, sans savoir que rien
+   n'avait avance.
+
+   On note donc l'absence, et au retour on le dit en clair pendant vingt
+   secondes : la preparation etait en pause, elle reprend maintenant. */
+let aiCacheDepuis = 0
+let aiReprisLe = 0
+document.addEventListener('visibilitychange', () => {
+  if (!aiLancementEnCours) { aiCacheDepuis = 0; return }
+  if (document.visibilityState === 'hidden') { aiCacheDepuis = Date.now(); return }
+  if (aiCacheDepuis && Date.now() - aiCacheDepuis > 10000) {
+    aiReprisLe = Date.now()
+    journalIA(`app quittée ${Math.round((Date.now() - aiCacheDepuis) / 1000)} s pendant la préparation`)
+    if (aiEcranAttente) majProgressionIA()
+  }
+  aiCacheDepuis = 0
+})
+
 /* ═══ L'ÉCRAN RESTE ALLUMÉ PENDANT LA PRÉPARATION ═══
    Si l'écran se verrouille, le téléphone suspend la page : l'allègement et
    l'envoi s'arrêtent, et la vidéo n'arrive jamais. On demande donc au
@@ -21758,6 +21806,39 @@ const AI_ETAPES = {
 }
 
 var aiPalierDepuis = null
+/* ═══ L'ANNEAU NE DOIT JAMAIS S'ARRETER PENDANT L'ANALYSE ═══
+
+   Sur iPhone, une animation CSS peut rester figee apres un passage en
+   arriere-plan (verrouillage, autre app) : Safari la met en pause et ne la
+   relance pas toujours. Pour quelqu'un qui attend, un anneau immobile veut
+   dire « c'est bloque ».
+
+   On verifie donc, au retour sur l'app et toutes les cinq secondes, que ses
+   deux calques tournent ; sinon on les relance. `getAnimations` ne force
+   pas de mise en page, et rien n'est ecrit quand tout tourne deja. */
+function relancerRoueIA() {
+  const fig = document.querySelector('#ai-progress-card .ia-fig')
+  if (!fig || fig.classList.contains('fini')) return
+  const carte = document.getElementById('ai-progress-card')
+  if (!carte || carte.style.display === 'none') return
+  for (const calque of fig.querySelectorAll('.lum, .halo')) {
+    const anims = typeof calque.getAnimations === 'function' ? calque.getAnimations() : null
+    if (anims && anims.length) {
+      for (const a of anims) if (a.playState !== 'running') { try { a.play() } catch (e) {} }
+    } else if (anims) {
+      /* Plus aucune animation attachee : on la remet en la retirant puis
+         en la rendant a la feuille de style. */
+      calque.style.animation = 'none'
+      void calque.offsetWidth
+      calque.style.animation = ''
+    }
+  }
+}
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') setTimeout(relancerRoueIA, 60)
+})
+window.addEventListener('pageshow', () => setTimeout(relancerRoueIA, 60))
+
 function startAiProgressSimulation(depart) {
   /* ⚠ LE DEPART EST DONNE, PAS SUPPOSE.
 
@@ -21769,6 +21850,11 @@ function startAiProgressSimulation(depart) {
      Le vrai depart est deja garde dans `localStorage` par
      `memoriserAnalyseIA` — il n'etait simplement jamais relu. */
   aiDebutAnalyse = depart || Date.now()
+  /* ⚠ L'ANNEAU REPART A CHAQUE ANALYSE. `fini` est pose a la fin d'une
+     analyse reussie et arrete sa rotation ; rien ne le retirait. La deuxieme
+     analyse de la session demarrait donc avec un anneau fige. */
+  document.querySelector('#ai-progress-card .ia-fig')?.classList.remove('fini')
+  relancerRoueIA()
   /* ⚠ L'ÉCRAN D'ATTENTE S'OUVRE MAINTENANT PENDANT L'ALLÈGEMENT (cinq
      secondes après l'appui). S'il est en cours, on le compte ; s'il est
      fini (reprise après retour sur l'app), on ne le compte pas deux fois. */
@@ -21956,6 +22042,8 @@ function majProgressionIA() {
   const ecoule = (Date.now() - aiDebutAnalyse) / 1000
   const min = Math.floor(ecoule / 60), sec = Math.floor(ecoule % 60)
   const temps = min > 0 ? `${min} min ${String(sec).padStart(2, '0')}` : `${sec} s`
+  // Toutes les cinq secondes : l'anneau tourne-t-il toujours ? Voir `relancerRoueIA`.
+  if (sec % 5 === 0) relancerRoueIA()
 
   /* `info` a été retiré : la phrase n'affiche plus le nom de l'étape, donc
      `AI_ETAPES` n'est plus lu ici. La table reste dans le fichier — elle
@@ -22005,7 +22093,9 @@ function majProgressionIA() {
      Annoncer « encore 3 min » puis rester dix minutes est pire que de ne rien
      annoncer : on croit à une panne. */
   if (aiEnFile) {
-    sous.textContent = tLang('En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.')
+    sous.innerHTML = escapeHtml(tLang('En attente d’une machine chez notre prestataire d’analyse.')) +
+      ` <b style="color:var(--label);">${escapeHtml(tLang('Vous pouvez quitter cette page, mais pas l’app.'))}</b> ` +
+      escapeHtml(tLang('Laissez Standix ouverte jusqu’à la fin de l’analyse.'))
     return
   }
 
@@ -22013,7 +22103,7 @@ function majProgressionIA() {
      durée. On dit alors le temps ÉCOULÉ, faute de pouvoir dire le restant.
      Toujours sans nom d'étape : le titre changeait toutes les quarante
      secondes et brouillait la lecture. */
-  let phrase = `${temps} d\u2019analyse.`
+  let phrase = tLang('{temps} d’analyse.', { temps })
 
   /* ═══ LE TEMPS QUI RESTE, PAS SEULEMENT CELUI QUI PASSE ═══
 
@@ -22071,6 +22161,9 @@ function majProgressionIA() {
   if (ecoule > 8 * 60) {
     phrase = tLang("C'est plus long que d'habitude, mais l'analyse tourne toujours.")
   }
+  if (aiLancementEnCours && aiReprisLe && Date.now() - aiReprisLe < 20000) {
+    phrase = tLang('Standix était fermée : la préparation de la vidéo s’est mise en pause. Elle reprend maintenant.')
+  }
 
   /* ⚠ IL Y AVAIT DEUX `color:#fff`, PAS UN.
 
@@ -22086,8 +22179,11 @@ function majProgressionIA() {
    ⚠ CHERCHER LES DEUX. Quand un texte est ecrit a la fois dans le balisage et
      par le script, corriger le balisage ne se voit pas — et l'on croit que le
      changement n'a pas ete deploye. */
-  sous.innerHTML = `${phrase} <b style="color:var(--label);">${tLang('Vous pouvez quitter cette page')}</b> \u2014 ` +
-    escapeHtml(tLang("la procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse."))
+  /* ⚠ « QUITTER LA PAGE », PAS « QUITTER L'APP ». L'analyse rapide est
+     menee depuis le telephone : fermer Standix ou passer longtemps sur une
+     autre app peut la couper. On le dit en clair. */
+  sous.innerHTML = `${phrase} <b style="color:var(--label);">${tLang('Vous pouvez quitter cette page, mais pas l’app.')}</b> ` +
+    escapeHtml(tLang('Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.'))
 }
 
 function stopAiProgressSimulation(finalPct) {
@@ -28130,10 +28226,14 @@ function surveillerAnalyses() {
 
 /* Au-delà de ce délai, une analyse encore « en traitement » n'avance
    manifestement plus : Azure a lâché, ou personne n'a constaté la fin. */
-const ANALYSE_LIMITE_MIN = 25
+/* ⚠ 20 MINUTES, COMME LE SERVEUR. La tache `cloturer-analyses-bloquees`
+   passe en « echec » toute analyse plus vieille ; l'app montre le meme point
+   d'exclamation sans attendre son passage. « redaction » compte aussi : une
+   redaction coupee en route restait sinon une roue qui tourne pour toujours. */
+const ANALYSE_LIMITE_MIN = 20
 
 function analyseBloquee(proc) {
-  if (proc?.statut !== 'traitement') return false
+  if (proc?.statut !== 'traitement' && proc?.statut !== 'redaction') return false
   const depart = new Date(proc.created_at || 0).getTime()
   if (!depart) return false
   return (Date.now() - depart) / 60000 > ANALYSE_LIMITE_MIN
@@ -30367,6 +30467,10 @@ async function openEquipeDetail(procId) {
      montrerait la vidéo de la fiche qu'on vient de quitter. */
   const procConnue = (allEquipeProcedures || []).find(p => p.id === procId)
   reinitialiserVideoFiche('detail-video-frame', 'detail-video', !!procConnue?.video_url)
+  /* Une nouvelle fiche commence en haut : sans cela, la zone gardait la
+     position de la precedente et l'image de presentation etait deja passee. */
+  const zoneDefile = document.querySelector('#e-detail .zone-etapes')
+  if (zoneDefile && zoneDefile.scrollTop) zoneDefile.scrollTop = 0
   /* Et on demande l'adresse signée TOUT DE SUITE, en même temps que les étapes,
      au lieu d'attendre qu'elles soient affichées. C'est un aller-retour de
      moins à la suite, donc une vidéo qui arrive plus tôt. */

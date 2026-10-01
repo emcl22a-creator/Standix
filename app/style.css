@@ -17185,6 +17185,17 @@ body.en-apercu #apercu-bandeau{
   display:none;
 }
 
+/* ⚠ LE CADRE BLEU DE L'ETAPE CHOISIE, COMME COTE GESTION.
+
+   La classe `en-lecture` etait bien posee au clic, mais la carte ci-dessus
+   ecrit `border:none !important` et son fond blanc `!important` avec un
+   identifiant devant : la regle generale `.detail-step.en-lecture` perdait,
+   et rien ne se voyait. Meme declaration, meme poids que la carte. */
+#detail-steps.etapes-fil .detail-step.en-lecture{
+  border:1.5px solid rgba(31,76,238,0.45) !important;
+  background:rgba(72,153,236,0.09) !important;
+}
+
 
 
 

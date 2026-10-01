@@ -347,6 +347,10 @@
   "en": "Add videos",
   "de": "Videos hinzufügen"
  },
+ "Ajouter si besoin": {
+  "en": "Add if needed",
+  "de": "Bei Bedarf hinzufügen"
+ },
  "Ajouter une page": {
   "en": "Add a page",
   "de": "Seite hinzufügen"
@@ -2643,6 +2647,10 @@
   "en": "Even compressed, this video is {v}, over the {v2} MB limit. Lower your camera resolution, or record a shorter clip.",
   "de": "Auch komprimiert ist dieses Video {v} groß, mehr als die erlaubten {v2} MB. Senken Sie die Kameraauflösung oder nehmen Sie kürzer auf."
  },
+ "Ne quittez pas l’application.": {
+  "en": "Do not leave the app.",
+  "de": "Verlassen Sie die App nicht."
+ },
  "Nom": {
   "en": "Last name",
   "de": "Nachname"
@@ -4091,6 +4099,10 @@
   "en": "You can leave this page",
   "de": "Sie können diese Seite verlassen"
  },
+ "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.": {
+  "en": "You can leave this page and find the procedure on the In progress page. It will be available when the analysis is finished.",
+  "de": "Sie können diese Seite verlassen und die Anleitung auf der Seite „In Arbeit“ wiederfinden. Sie ist nach Abschluss der Auswertung verfügbar."
+ },
  "Vous pouvez quitter cette page, mais pas l’app.": {
   "en": "You can leave this page, but not the app.",
   "de": "Sie können diese Seite verlassen, aber nicht die App."
@@ -5094,6 +5106,10 @@
  "Écrivez chaque étape vous-même": {
   "en": "Write each step yourself",
   "de": "Jeden Schritt selbst schreiben"
+ },
+ "Écrivez ici ce qu’il faut faire": {
+  "en": "Write here what needs to be done",
+  "de": "Schreiben Sie hier, was zu tun ist"
  },
  "Écrivez-nous": {
   "en": "Write to us",

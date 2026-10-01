@@ -1329,6 +1329,7 @@ const DICO = {
     "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": "You will lose access to Standix and all your companies. The procedures you wrote stay for the team. This cannot be undone.",
     "Vous pourrez le changer dans les réglages.": "You can change it in the settings.",
     "Vous pouvez quitter cette page": "You can leave this page",
+    "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours.": "You can leave this page and find the procedure on the In progress page.",
     "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.": "You can leave this page and find the procedure on the In progress page. It will be available when the analysis is finished.",
     "Vous pouvez quitter cette page, mais pas l’app.": "You can leave this page, but not the app.",
     "Vous pouvez quitter cette page.": "You can leave this page.",
@@ -2629,6 +2630,7 @@ const DICO = {
     "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": "Sie verlieren den Zugriff auf Standix und alle Ihre Unternehmen. Die Anleitungen, die Sie geschrieben haben, bleiben für das Team. Das lässt sich nicht rückgängig machen.",
     "Vous pourrez le changer dans les réglages.": "Sie können das in den Einstellungen ändern.",
     "Vous pouvez quitter cette page": "Sie können diese Seite verlassen",
+    "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours.": "Sie können diese Seite verlassen und die Anleitung auf der Seite „In Arbeit“ wiederfinden.",
     "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.": "Sie können diese Seite verlassen und die Anleitung auf der Seite „In Arbeit“ wiederfinden. Sie ist nach Abschluss der Auswertung verfügbar.",
     "Vous pouvez quitter cette page, mais pas l’app.": "Sie können diese Seite verlassen, aber nicht die App.",
     "Vous pouvez quitter cette page.": "Sie können diese Seite verlassen.",
@@ -22105,7 +22107,7 @@ function majProgressionIA() {
   if (aiEnFile) {
     sous.innerHTML = escapeHtml(tLang('En attente d’une machine chez notre prestataire d’analyse.')) +
       ` <b style="color:var(--label);">${escapeHtml(tLang('Ne quittez pas l’application.'))}</b> ` +
-      escapeHtml(tLang('Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.'))
+      escapeHtml(tLang('Vous pouvez quitter cette page et retrouver la procédure dans la page En cours.'))
     return
   }
 
@@ -22193,7 +22195,7 @@ function majProgressionIA() {
      menee depuis le telephone : fermer Standix ou passer longtemps sur une
      autre app peut la couper. On le dit en clair. */
   sous.innerHTML = `${phrase} <b style="color:var(--label);">${tLang('Ne quittez pas l’application.')}</b> ` +
-    escapeHtml(tLang('Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.'))
+    escapeHtml(tLang('Vous pouvez quitter cette page et retrouver la procédure dans la page En cours.'))
 }
 
 function stopAiProgressSimulation(finalPct) {
@@ -25671,10 +25673,16 @@ document.getElementById('ecap-play-btn')?.addEventListener('click', () => {
    `aria-expanded` accompagne l'état : un lecteur d'écran doit savoir si le
    bloc est ouvert, sans quoi le bouton semble ne rien faire. */
 document.getElementById('ai-combien-btn')?.addEventListener('click', (e) => {
-  const co = document.getElementById('ai-combien-co')
-  if (!co) return
-  const ouvert = co.hidden
-  co.hidden = !ouvert
+  /* ⚠ LE TIROIR S'OUVRE EN DOUCEUR (demande d'Em), comme celui du point de
+     vigilance : la hauteur passe de `0fr` à `1fr` dans une grille — aucune
+     mesure à faire — pendant que le contenu se précise. Toute l'animation est
+     dans la feuille de style ; ici on ne fait que dire ouvert ou fermé.
+     `inert` garde le contenu replié hors de portée du clavier. */
+  const tiroir = document.getElementById('ai-combien-tiroir')
+  if (!tiroir) return
+  const ouvert = !tiroir.classList.contains('ouvert')
+  tiroir.classList.toggle('ouvert', ouvert)
+  tiroir.inert = !ouvert
   e.currentTarget.setAttribute('aria-expanded', String(ouvert))
   e.currentTarget.textContent = ouvert ? tLang('Masquer') : tLang('Combien de temps ça prend ?')
 })

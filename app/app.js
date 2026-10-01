@@ -283,6 +283,7 @@ const DICO = {
     "Afficher le mot de passe": "Show password",
     "Ajouter": "Add",
     "Ajouter des vidéos": "Add videos",
+    "Ajouter si besoin": "Add if needed",
     "Ajouter une page": "Add a page",
     "Ajouter une photo": "Add a photo",
     "Ajouter une étape": "Add a step",
@@ -937,6 +938,7 @@ const DICO = {
     "Mouvements indisponibles.": "Changes unavailable.",
     "MP4 ou MOV · 5 minutes au maximum": "MP4 or MOV · 5 minutes at most",
     "Même allégée, cette vidéo pèse {v}, au-delà des {v2} Mo acceptés. Baissez la définition de votre caméra, ou filmez plus court.": "Even compressed, this video is {v}, over the {v2} MB limit. Lower your camera resolution, or record a shorter clip.",
+    "Ne quittez pas l’application.": "Do not leave the app.",
     "Nom": "Last name",
     "Nom A → Z": "Name A → Z",
     "nom A → Z": "name A → Z",
@@ -1327,6 +1329,7 @@ const DICO = {
     "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": "You will lose access to Standix and all your companies. The procedures you wrote stay for the team. This cannot be undone.",
     "Vous pourrez le changer dans les réglages.": "You can change it in the settings.",
     "Vous pouvez quitter cette page": "You can leave this page",
+    "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.": "You can leave this page and find the procedure on the In progress page. It will be available when the analysis is finished.",
     "Vous pouvez quitter cette page, mais pas l’app.": "You can leave this page, but not the app.",
     "Vous pouvez quitter cette page.": "You can leave this page.",
     "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "You can be logged in on 3 devices at once.",
@@ -1469,6 +1472,7 @@ const DICO = {
     "Écrivez chaque étape dans l'ordre": "Write each step in order",
     "Écrivez chaque étape dans l’ordre": "Write each step in order",
     "Écrivez chaque étape vous-même": "Write each step yourself",
+    "Écrivez ici ce qu’il faut faire": "Write here what needs to be done",
     "Écrivez-nous": "Write to us",
     "Équipe": "Team",
     "Établissement": "Site",
@@ -1579,6 +1583,7 @@ const DICO = {
     "Afficher le mot de passe": "Passwort anzeigen",
     "Ajouter": "Hinzufügen",
     "Ajouter des vidéos": "Videos hinzufügen",
+    "Ajouter si besoin": "Bei Bedarf hinzufügen",
     "Ajouter une page": "Seite hinzufügen",
     "Ajouter une photo": "Foto hinzufügen",
     "Ajouter une étape": "Schritt hinzufügen",
@@ -2233,6 +2238,7 @@ const DICO = {
     "Mouvements indisponibles.": "Änderungen nicht verfügbar.",
     "MP4 ou MOV · 5 minutes au maximum": "MP4 oder MOV · höchstens 5 Minuten",
     "Même allégée, cette vidéo pèse {v}, au-delà des {v2} Mo acceptés. Baissez la définition de votre caméra, ou filmez plus court.": "Auch komprimiert ist dieses Video {v} groß, mehr als die erlaubten {v2} MB. Senken Sie die Kameraauflösung oder nehmen Sie kürzer auf.",
+    "Ne quittez pas l’application.": "Verlassen Sie die App nicht.",
     "Nom": "Nachname",
     "Nom A → Z": "Name A → Z",
     "nom A → Z": "Name A → Z",
@@ -2623,6 +2629,7 @@ const DICO = {
     "Vous perdrez l’accès à Standix et à toutes vos entreprises. Les procédures que vous avez écrites restent en place pour l’équipe. Cette action est irréversible.": "Sie verlieren den Zugriff auf Standix und alle Ihre Unternehmen. Die Anleitungen, die Sie geschrieben haben, bleiben für das Team. Das lässt sich nicht rückgängig machen.",
     "Vous pourrez le changer dans les réglages.": "Sie können das in den Einstellungen ändern.",
     "Vous pouvez quitter cette page": "Sie können diese Seite verlassen",
+    "Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.": "Sie können diese Seite verlassen und die Anleitung auf der Seite „In Arbeit“ wiederfinden. Sie ist nach Abschluss der Auswertung verfügbar.",
     "Vous pouvez quitter cette page, mais pas l’app.": "Sie können diese Seite verlassen, aber nicht die App.",
     "Vous pouvez quitter cette page.": "Sie können diese Seite verlassen.",
     "Vous pouvez vous connecter simultanément sur un maximum de 3 appareils.": "Sie können auf höchstens 3 Geräten gleichzeitig angemeldet sein.",
@@ -2765,6 +2772,7 @@ const DICO = {
     "Écrivez chaque étape dans l'ordre": "Schreiben Sie jeden Schritt der Reihe nach",
     "Écrivez chaque étape dans l’ordre": "Schreiben Sie jeden Schritt der Reihe nach",
     "Écrivez chaque étape vous-même": "Jeden Schritt selbst schreiben",
+    "Écrivez ici ce qu’il faut faire": "Schreiben Sie hier, was zu tun ist",
     "Écrivez-nous": "Schreiben Sie uns",
     "Équipe": "Team",
     "Établissement": "Standort",
@@ -17337,13 +17345,15 @@ window.ouvrirEtapesManuelles = async function(procId) {
 
   const el = (i) => document.getElementById(i)
   el('man-titre-page').textContent = manEdition ? tLang('Modifier la procédure') : tLang('Étapes manuelles')
-  el('man-sous').textContent = manEdition ? tLang('Vos changements ne partent qu\'à l\'enregistrement') : tLang('Écrivez chaque étape dans l\'ordre')
+  /* ⚠ EN MODIFICATION, PAS DE SOUS-TITRE (demande d'Em) : la phrase « Vos
+     changements ne partent qu'à l'enregistrement » et la note du verrou ont
+     été retirées. Le bouton « Enregistrer les modifications » le dit déjà. */
+  el('man-sous').textContent = manEdition ? '' : tLang('Écrivez chaque étape dans l\'ordre')
+  el('man-sous').style.display = manEdition ? 'none' : ''
   el('publish-btn-manual').textContent = manEdition ? tLang('Enregistrer les modifications') : tLang('Publier la procédure')
   el('man-annuler').textContent = manEdition ? tLang('Annuler les modifications') : tLang('Tout effacer')
   el('create-error-manual').textContent = ''
   el('man-entete').style.display = manEdition ? 'block' : 'none'
-  const noteM = el('man-note-verrou')
-  if (noteM) noteM.hidden = !manEdition
 
   if (!manEdition) {
     /* En création, on reprend ce qui a été saisi sur l'écran précédent. */
@@ -22094,8 +22104,8 @@ function majProgressionIA() {
      annoncer : on croit à une panne. */
   if (aiEnFile) {
     sous.innerHTML = escapeHtml(tLang('En attente d’une machine chez notre prestataire d’analyse.')) +
-      ` <b style="color:var(--label);">${escapeHtml(tLang('Vous pouvez quitter cette page, mais pas l’app.'))}</b> ` +
-      escapeHtml(tLang('Laissez Standix ouverte jusqu’à la fin de l’analyse.'))
+      ` <b style="color:var(--label);">${escapeHtml(tLang('Ne quittez pas l’application.'))}</b> ` +
+      escapeHtml(tLang('Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.'))
     return
   }
 
@@ -22182,8 +22192,8 @@ function majProgressionIA() {
   /* ⚠ « QUITTER LA PAGE », PAS « QUITTER L'APP ». L'analyse rapide est
      menee depuis le telephone : fermer Standix ou passer longtemps sur une
      autre app peut la couper. On le dit en clair. */
-  sous.innerHTML = `${phrase} <b style="color:var(--label);">${tLang('Vous pouvez quitter cette page, mais pas l’app.')}</b> ` +
-    escapeHtml(tLang('Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.'))
+  sous.innerHTML = `${phrase} <b style="color:var(--label);">${tLang('Ne quittez pas l’application.')}</b> ` +
+    escapeHtml(tLang('Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.'))
 }
 
 function stopAiProgressSimulation(finalPct) {
@@ -25490,7 +25500,9 @@ window.ouvrirMontageVideo = async function(procId) {
      Cette page ne sert qu'à découper — soit une procédure qu'on modifie, soit
      une vidéo qu'on remonte. */
   el('dv-titre-page').textContent = dvEdition ? tLang('Modifier la procédure') : tLang('Découper la vidéo')
-  el('dv-sous').textContent = dvEdition ? tLang('Vos changements ne partent qu\'à l\'enregistrement') : tLang('Marquez le début et la fin de chaque étape')
+  // En modification, pas de sous-titre — même retrait que sur l'écran manuel.
+  el('dv-sous').textContent = dvEdition ? '' : tLang('Marquez le début et la fin de chaque étape')
+  el('dv-sous').style.display = dvEdition ? 'none' : ''
   /* ⚠ LA PILE REPART VIDE A CHAQUE OUVERTURE.
 
      Elle vit dans la page : sans ce nettoyage, ouvrir une seconde procedure
@@ -25499,10 +25511,20 @@ window.ouvrirMontageVideo = async function(procId) {
   pileVideo = []
 
   el('dv-entete').style.display = dvEdition ? 'block' : 'none'
+  /* ⚠ EN MODIFICATION, LA VIDÉO N'EST PLUS UN OUTIL (demande d'Em).
+     · La frise de découpe, ses boutons (lecture, tout voir, annuler) et les
+       deux temps disparaissent — voir `.dv-edition` dans la feuille.
+     · La vidéo ne se remplace plus : le sélecteur de fichier, posé sur le
+       cadre, est désactivé.
+     · Elle reste regardable : on lui rend les commandes du navigateur, puisque
+       le bouton de lecture de la barre est parti avec elle. */
+  el('p-create-video')?.classList.toggle('dv-edition', !!dvEdition)
+  const choixVideo = el('video-input')
+  if (choixVideo) choixVideo.disabled = !!dvEdition
+  const lecteurDv = el('video-player')
+  if (lecteurDv) lecteurDv.controls = !!dvEdition
   /* ⚠ SEULEMENT EN MODIFICATION. A la creation, la procedure n'existe pas
      encore : personne d'autre ne peut la tenir. */
-  const noteV = el('dv-note-verrou')
-  if (noteV) noteV.hidden = !dvEdition
 
   if (!dvEdition) return
 
@@ -26005,7 +26027,14 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
   listEl.innerHTML = ''
   manualSteps.forEach((step, i) => {
     const div = document.createElement('div')
-    div.className = 'step-edit-item'
+    /* ⚠ UNE SEULE CHOSE À REMPLIR AU DÉPART (demande d'Em). Une carte neuve
+       montrait trois champs — titre, texte, vigilance — plus une photo : qui
+       découvre l'écran ne savait pas par où commencer. Il ne reste que le
+       texte de l'étape ; le titre, le point de vigilance et la photo sont
+       rangés sous « Ajouter si besoin ». `sans-titre` masque le champ du
+       titre tant qu'on ne l'a pas demandé ; une étape qui en a déjà un le
+       montre toujours. */
+    div.className = 'step-edit-item' + (step.titre || step._titreOuvert ? '' : ' sans-titre')
     div.dataset.index = i
     /* Le numéro est dessiné dans le langage des icônes de création : une fiche en
        profondeur, avec son chiffre dedans. Il se pose sur le fil, à gauche. */
@@ -26014,7 +26043,13 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
       <input type="text" class="step-titre-saisie" maxlength="60"
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
-      <textarea rows="1" placeholder="Décrire cette étape...">${escapeHtml(step.texte)}</textarea>
+      <textarea rows="1" placeholder="${escapeHtml(tLang('Écrivez ici ce qu’il faut faire'))}">${escapeHtml(step.texte)}</textarea>
+      <div class="step-outils">
+        <span class="step-outils-lbl">${tLang('Ajouter si besoin')}</span>
+        <button type="button" class="step-titre-bouton">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6h14M12 6v13"/></svg>
+          <span>${tLang('Titre')}</span>
+        </button>
       <!-- ═══ LE POINT DE VIGILANCE, DANS UN TIROIR ═══
 
            Il n'apparaissait que s'il EXISTAIT DÉJÀ : on pouvait corriger celui
@@ -26060,11 +26095,12 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
           ? `<button type="button" class="img-oter" aria-label="Retirer la photo">×</button>`
           : ''}</div>
         <button type="button" class="img-toucher" aria-label="Photo de l'étape">
-          <span class="lg">${step.image_url || step.imageFichier ? tLang('Modifier la photo') : tLang('Ajouter une photo')}</span>
+          <span class="lg">${step.image_url || step.imageFichier ? tLang('Modifier la photo') : tLang('Photo')}</span>
         </button>
         <input type="file" accept="image/*" class="fichier">
       </div>
       <span class="del">${TRASH_SVG}</span>
+      </div>
       </div>
     `
     const textarea = div.querySelector('textarea')
@@ -26080,6 +26116,15 @@ document.getElementById('manual-steps-list')?.addEventListener('click', (e) => {
     const champTitre = div.querySelector('.step-titre-saisie')
     if (champTitre) champTitre.addEventListener('input', (e) => {
       manualSteps[i].titre = e.target.value.trim() || null
+    })
+    /* La pastille « Titre » fait paraître le champ et y pose le curseur.
+       `_titreOuvert` le garde ouvert aux redessins — même principe que
+       `_attOuvert` pour le point de vigilance. */
+    div.querySelector('.step-titre-bouton')?.addEventListener('click', (e) => {
+      e.preventDefault()
+      manualSteps[i]._titreOuvert = true
+      div.classList.remove('sans-titre')
+      champTitre?.focus()
     })
 
     /* Même logique que le titre : sans cette ligne, le champ se remplit et se
@@ -26278,7 +26323,13 @@ function peindreCouverture() {
     bloc.classList.toggle('remplie', !!source)
 
     if (source) {
-      vign.innerHTML = `<img src="${source}" alt="">`
+      /* ⚠ L'IMAGE DÉJÀ EN LIGNE EST UN CHEMIN DANS LE SEAU PRIVÉ, pas une
+         adresse. Posée telle quelle en `src`, elle donnait une vignette
+         cassée en modification. On passe par la signature, comme partout. */
+      vign.innerHTML = couvertureFichier
+        ? `<img src="${source}" alt="">`
+        : `<img data-fichier="${escapeHtml(cheminFichier(source))}" alt="">`
+      if (!couvertureFichier) signerMedias(vign)
       oter.style.display = 'block'
       sous.textContent = couvertureFichier ? tLang('Sera envoyée à la publication.') : tLang('En place.')
     } else {
@@ -26971,13 +27022,25 @@ function renderVideoSteps(listEl) {
     const div = document.createElement('div')
     /* Le même fil qu'à la création manuelle : numéro dessiné, trait, extrait
        monté sur l'étape. La vignette prend la place de la photo. */
+    /* ⚠ LA MÊME PRÉSENTATION QUE LES ÉTAPES MANUELLES (demande d'Em) : un
+       seul champ à remplir, le titre et le point de vigilance rangés sous
+       « Ajouter si besoin ». Ici il n'y a PAS de photo par étape — la vidéo
+       montre déjà le geste, et l'extrait de l'étape se rejoue d'un toucher.
+       Voir `renderManualSteps` pour le détail de `sans-titre`. */
     div.className = 'step-edit-item etape-montage' + (i === dvSelection ? ' sel' : '')
+      + (step.titre || step._titreOuvert ? '' : ' sans-titre')
     div.innerHTML = `
       <span class="step-num-dess">${numeroEtapeDess(i + 1)}</span>
       <input type="text" class="step-titre-saisie" maxlength="60"
              placeholder="Titre de l\u2019\u00e9tape (facultatif)" value="${escapeHtml(step.titre || '')}">
       <div class="step-filet"></div>
-      <textarea rows="1" placeholder="D\u00e9crire cette \u00e9tape\u2026">${escapeHtml(step.texte || '')}</textarea>
+      <textarea rows="1" placeholder="${escapeHtml(tLang('Écrivez ici ce qu’il faut faire'))}">${escapeHtml(step.texte || '')}</textarea>
+      <div class="step-outils">
+        <span class="step-outils-lbl">${tLang('Ajouter si besoin')}</span>
+        <button type="button" class="step-titre-bouton">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6h14M12 6v13"/></svg>
+          <span>${tLang('Titre')}</span>
+        </button>
       <!-- ═══ LE POINT DE VIGILANCE, DANS UN TIROIR ═══
 
            Il n'apparaissait que s'il EXISTAIT DÉJÀ : on pouvait corriger celui
@@ -27023,8 +27086,10 @@ function renderVideoSteps(listEl) {
              elle, suffit à se repérer, et le bouton la rejoue. -->
         <span class="badge extrait">\u25b6 ${dvFmt(step.timestamp_video)}\u2013${dvFmt(step.fin_video)}</span>
         <button type="button" class="sup del" aria-label="Supprimer">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+          <svg class="sup-croix" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+          <span class="sup-corbeille">${TRASH_SVG}</span>
         </button>
+      </div>
       </div>`
 
 
@@ -27051,6 +27116,13 @@ function renderVideoSteps(listEl) {
     const champTitre = div.querySelector('.step-titre-saisie')
     if (champTitre) champTitre.addEventListener('input', (e) => {
       videoSteps[i].titre = e.target.value.trim() || null
+    })
+    div.querySelector('.step-titre-bouton')?.addEventListener('click', (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      videoSteps[i]._titreOuvert = true
+      div.classList.remove('sans-titre')
+      champTitre?.focus()
     })
 
     /* ═══ LE TIROIR DU POINT DE VIGILANCE ═══
@@ -27165,7 +27237,7 @@ function renderVideoSteps(listEl) {
          raison. Le tiroir rejoint la liste — bouton ET contenu, sans quoi
          écrire dans le champ refermerait tout. */
       if (e.target.closest('textarea') || e.target.closest('.sup')) return
-      if (e.target.closest('.step-att-zone') || e.target.closest('.step-titre-saisie')) return
+      if (e.target.closest('.step-att-zone') || e.target.closest('.step-titre-saisie') || e.target.closest('.step-titre-bouton')) return
       dvSelection = i
       const v = dvLecteur()
       if (v) v.currentTime = step.timestamp_video
@@ -34246,7 +34318,12 @@ function peindreEquipe() {
     : triEquipe === 'vieux' ? (parDate(a, b) || parNom(a, b))
     : (parNom(a, b) || parDate(a, b)))
 
-  const jePeuxChangerLeRang = estFondateur(currentMembre)
+  /* ⚠ DEUX DROITS DISTINCTS (demande d'Em, 1er octobre 2026).
+     · DONNER l'accès à la gestion : tout gestionnaire, gérant compris.
+     · le RETIRER à un gestionnaire : le gérant seul. Un gestionnaire ne peut
+       pas écarter ses pairs de la gestion. */
+  const jePeuxPromouvoir = currentMembre?.role === 'gestion'
+  const jePeuxRetrograder = estFondateur(currentMembre)
 
   /* ═══════════════════════════════════════════════════════════════════════
      TROIS GROUPES, PAS UNE LISTE
@@ -34263,10 +34340,10 @@ function peindreEquipe() {
      ═══════════════════════════════════════════════════════════════════════ */
   const ligne = (m) => {
     const soi = m.id === currentMembre.id
-    const promouvable = jePeuxChangerLeRang && !soi && m.role !== 'gestion'
+    const promouvable = jePeuxPromouvoir && !soi && m.role !== 'gestion'
     /* On ne rétrograde pas un fondateur : ce serait se retirer soi-même la
        dernière clé de l'entreprise. */
-    const retrogradable = jePeuxChangerLeRang && !soi && m.role === 'gestion' && !estFondateur(m)
+    const retrogradable = jePeuxRetrograder && !soi && m.role === 'gestion' && !estFondateur(m)
 
     /* Qui peut retirer qui.
        Le fondateur retire n'importe qui. Un gestionnaire promu ne retire que
@@ -34462,8 +34539,9 @@ document.getElementById('pm-liste')?.addEventListener('click', async (e) => {
   if (!btn) return
 
   // Deuxième verrou, côté app : le bouton n'est déjà pas affiché, mais un droit
-  // ne se garde pas sur la seule absence d'un bouton.
-  if (!estFondateur(currentMembre)) return
+  // ne se garde pas sur la seule absence d'un bouton. Tout gestionnaire peut
+  // donner l'accès à la gestion — voir `jePeuxPromouvoir`.
+  if (currentMembre?.role !== 'gestion') return
 
   const nom = btn.dataset.nom || tLang('cette personne')
   const ok = await confirmDialog({

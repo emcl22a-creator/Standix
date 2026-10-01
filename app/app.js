@@ -15363,6 +15363,20 @@ function fondPlaque(t) {
   return `linear-gradient(150deg,${rgba(t.trait[1], 0.22)},${rgba(t.trait[0], 0.14)})`
 }
 
+/* ═══ LA COULEUR QU'A PRISE CHAQUE DOSSIER DANS SA LISTE ═══
+
+   Un sous-dossier porte la teinte de son dossier parent. La teinte d'un
+   dossier depend de sa place dans la liste AFFICHEE (tri, recherche, onglet) :
+   on retient donc celle qu'il avait au moment ou on l'a vu, plutot que de la
+   recalculer — sinon le sous-dossier pourrait changer de couleur par rapport
+   a la carte sur laquelle on vient de cliquer.
+   Cle : 'g:' + nom cote gestion, 'e:' + nom cote equipe. */
+const rangsDossiers = new Map()
+let dossierOuvertGestion = null
+function teinteDossierParent(cle) {
+  return couleurDossier(rangsDossiers.get(cle) ?? 0)
+}
+
 function couleurDossier(rang) {
   return PALETTE_DOSSIERS[rang % PALETTE_DOSSIERS.length]
 }
@@ -15995,6 +16009,7 @@ function renderCategoryGrid() {
 
     /* La couleur du dossier, tiree de son nom. Voir `couleurDossier`. */
     const teinte = couleurDossier(rang)
+    rangsDossiers.set('g:' + nom, rang)
     const brouillons = procsInCat.filter(p => !p.publiee_le).length
 
     const enLigne = procsInCat.length - brouillons
@@ -16856,6 +16871,7 @@ function renommerDossierDepuisListe(nom) {
 
 function ouvrirCategorie(nom) {
   toutesProcedures = (nom == null)
+  dossierOuvertGestion = nom
   showGestionScreen('p-category')
   document.getElementById('category-titre').textContent = toutesProcedures ? tLang('Toutes les procédures') : nom
   /* Rien à renommer quand on regarde tout : « Toutes les procédures » n'est pas
@@ -17584,11 +17600,10 @@ function carteSousDossier(nom, procs, rang = 0) {
   animerApparition(cell, rang)
   const recents = procs.slice(0, 3)
   const brouillons = procs.filter(p => !p.publiee_le).length
-  /* ⚠ LA COULEUR SUIT LE RANG, COMME SUR LA LISTE DES DOSSIERS. Seule
-     l'ICONE est fixe ici — c'est elle qui dit « ceci est un sous-dossier ».
-     La teinte, elle, sert a distinguer les sous-dossiers entre eux, et huit
-     chemises violettes d'affilee n'en distinguaient aucune. */
-  const teinte = couleurDossier(rang)
+  /* ⚠ LA COULEUR EST CELLE DU DOSSIER PARENT. Un sous-dossier appartient a
+     son dossier : il en reprend la teinte, pour qu'on voie d'un coup d'oeil
+     qu'on est toujours « dans » la meme chemise. Voir `rangsDossiers`. */
+  const teinte = teinteDossierParent('g:' + dossierOuvertGestion)
 
   /* ⚠ ICONE FIXE, COMME POUR LES PROCEDURES. Tout ce qui est sur cette page
      appartient deja au meme dossier : varier les dessins ne distinguerait
@@ -28739,6 +28754,7 @@ document.getElementById('e-proc-segm')?.addEventListener('click', (e) => {
      dossier ; un employe n'a pas ces droits.
    ═══════════════════════════════════════════════════════════════════════════ */
 function carteDossierEquipe(nom, procs, reste, rang) {
+  rangsDossiers.set('e:' + nom, rang)
   const cell = document.createElement('div')
   cell.className = 'cat-cell cat-cell--ligne'
   cell.dataset.key = nom
@@ -28956,15 +28972,10 @@ function carteSousDossierEquipe(nom, procs, rang = 0) {
   cell.dataset.key = 'sd:' + nom
   animerApparition(cell, rang)
 
-  /* ⚠ LE SOUS-DOSSIER EST TOUJOURS VIOLET.
-
-     La teinte suivait le rang : chaque sous-dossier prenait une couleur de la
-     palette selon sa position. Dans une liste qui melange sous-dossiers et
-     procedures, cela brouillait la lecture — deux elements de meme couleur
-     n'etaient pas de meme nature.
-
-     Le rang 0 de la palette est le violet. */
-  const teinte = couleurDossier(0)
+  /* ⚠ LE SOUS-DOSSIER PREND LA COULEUR DE SON DOSSIER PARENT — la meme
+     regle que cote gestion. Tous les sous-dossiers d'un dossier ont donc la
+     meme teinte, celle de la carte sur laquelle on a clique. */
+  const teinte = teinteDossierParent('e:' + equipeCatCourante)
   const aLire = procs.filter(p => !equipeLues.has(p.id)).length
 
   cell.innerHTML = `

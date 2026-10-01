@@ -143,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=b15131c0">
+<link rel="stylesheet" href="style.css?v=255d3ef9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2573,7 +2573,7 @@
           </span>
         </div>
         <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Presque prêt</div>
-        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Vous pouvez quitter cette page.</b> La procédure est déjà affichée dans la page En cours. Elle sera accessible à la fin de l’analyse.</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Vous pouvez quitter cette page, mais pas l’app.</b> Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.</div>
         <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button>
 
         <!-- ═══ COMBIEN DE TEMPS ? ═══
@@ -4350,17 +4350,17 @@
           </button>
     </div>
     <div class="subhead titre-cat" id="detail-subhead">—</div>
-    <div class="zone-etapes">
-    <!-- ⚠ L'IMAGE DE PRÉSENTATION DÉFILE AVEC LES ÉTAPES (demande d'Em).
-         Elle était au-dessus de la zone qui défile, donc figée pendant qu'on
-         faisait glisser les étapes. L'image, la vidéo, le titre « Étapes de la
-         procédure » et le rappel sont maintenant DANS la zone qui défile, dans
-         le même ordre qu'avant : en haut de page, rien ne change à l'œil. Seuls
-         le titre de la procédure et son dossier restent fixes. -->
-    <div class="analyse-couv" id="detail-couverture" style="display:none;"></div>
+    <!-- ⚠ LA VIDÉO RESTE FIXE, AU-DESSUS DE LA ZONE QUI DÉFILE (demande d'Em).
+         On la regarde pendant qu'on lit les étapes : elle ne doit pas partir
+         avec elles. Les extraits se lancent depuis les étapes, plus bas. -->
     <div class="video-frame" id="detail-video-frame" style="display:none;">
       <video id="detail-video" controls="" playsinline="" webkit-playsinline="" preload="metadata"></video>
     </div>
+    <div class="zone-etapes">
+    <!-- ⚠ L'IMAGE DE PRÉSENTATION, ELLE, DÉFILE AVEC LES ÉTAPES. Sur une
+         procédure manuelle, c'est elle qui ouvre la page ; figée, elle
+         prenait de la place pendant toute la lecture. -->
+    <div class="analyse-couv" id="detail-couverture" style="display:none;"></div>
     <!-- Le sélecteur de langue était seul au milieu d'un grand vide. Il rejoint la
          ligne du titre des étapes : même place, aucun espace perdu, et la fiche
          équipe prend la même forme que celle de la gestion. -->
@@ -5306,7 +5306,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=84f4ea41"></script>
+<script type="module" src="app.js?v=b4e06040"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

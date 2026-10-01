@@ -26168,3 +26168,47 @@ html::-webkit-scrollbar-thumb:hover{
 #p-create-video:not(.dv-edition) .step-outils{ display:contents; }
 #p-create-video:not(.dv-edition) .step-outils-lbl,
 #p-create-video:not(.dv-edition) .step-titre-bouton{ display:none; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   « COMBIEN DE TEMPS ÇA PREND ? » — LE TIROIR S'OUVRE EN DOUCEUR
+
+   Demande d'Em : le bloc apparaissait d'un coup. Il se déplie maintenant avec
+   la courbe de l'app (`0.32, 0.72, 0, 1`), celle des feuilles et du tiroir du
+   point de vigilance : départ franc, arrivée longue et amortie.
+
+   · LA HAUTEUR : une grille qui passe de `0fr` à `1fr`. Rien à mesurer.
+   · LE CONTENU : il monte de 8 px, se précise (flou → net) et s'éclaircit,
+     un temps après le début de l'ouverture — on voit la place se faire, puis
+     le texte s'y poser. En refermant, il s'efface d'abord, puis la place se
+     reprend.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.ai-combien-tiroir{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows 0.46s cubic-bezier(0.32,0.72,0,1);
+}
+.ai-combien-tiroir.ouvert{ grid-template-rows:1fr; }
+.ai-combien-dedans{ overflow:hidden; min-height:0; }
+.ai-combien-tiroir .ai-combien-co{
+  opacity:0;
+  transform:translateY(-8px) scale(0.985);
+  filter:blur(5px);
+  transform-origin:50% 0;
+  transition:
+    opacity 0.18s ease,
+    transform 0.46s cubic-bezier(0.32,0.72,0,1),
+    filter 0.18s ease;
+}
+.ai-combien-tiroir.ouvert .ai-combien-co{
+  opacity:1;
+  transform:none;
+  filter:none;
+  transition:
+    opacity 0.34s ease 0.08s,
+    transform 0.5s cubic-bezier(0.32,0.72,0,1) 0.04s,
+    filter 0.34s ease 0.08s;
+}
+@media (prefers-reduced-motion: reduce){
+  .ai-combien-tiroir, .ai-combien-tiroir .ai-combien-co{ transition:none; }
+}

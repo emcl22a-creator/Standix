@@ -143,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=763a77a9">
+<link rel="stylesheet" href="style.css?v=928f1bdd">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2555,7 +2555,7 @@
           </span>
         </div>
         <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Presque prêt</div>
-        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Ne quittez pas l’application.</b> Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Ne quittez pas l’application.</b> Vous pouvez quitter cette page et retrouver la procédure dans la page En cours.</div>
         <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button>
 
         <!-- ═══ COMBIEN DE TEMPS ? ═══
@@ -2568,10 +2568,11 @@
              s'inquiéter n'a pas à lire un tableau. Il ne s'ouvre que pour
              celui qui se demande si c'est normal. -->
         <button type="button" class="ai-combien" id="ai-combien-btn"
-                aria-expanded="false" aria-controls="ai-combien-co">
+                aria-expanded="false" aria-controls="ai-combien-tiroir">
           Combien de temps ça prend ?
         </button>
-        <div class="ai-combien-co" id="ai-combien-co" hidden>
+        <div class="ai-combien-tiroir" id="ai-combien-tiroir" inert><div class="ai-combien-dedans">
+        <div class="ai-combien-co" id="ai-combien-co">
           <!-- ⚠ « Comptez environ trois minutes par minute de video » A ETE RETIRE.
 
               Le tableau juste en dessous dit la meme chose, mais en chiffres
@@ -2604,7 +2605,7 @@
           </table>
           <p class="ai-combien-n">Ces durées varient selon le téléphone et la
              vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.</p>
-        </div></div>
+        </div></div></div></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
       <div class="coche-dessin"><svg viewBox="0 0 52 48" fill="none"><circle cx="26" cy="24" r="21" stroke="rgba(147,164,192,0.20)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="16.5" stroke="rgba(147,164,192,0.34)" stroke-width="1.5"></circle><circle cx="26" cy="24" r="12" fill="rgba(58,120,238,0.10)" stroke="url(#iaCoche)" stroke-width="1.8">></circle><path class="trace" d="M20.6 24.2 24.4 28 31.6 20.4" stroke="url(#iaCoche)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>
@@ -5288,7 +5289,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=d5e8e9d1"></script>
+<script type="module" src="app.js?v=f3a1a6e6"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

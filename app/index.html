@@ -143,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=868fef2a">
+<link rel="stylesheet" href="style.css?v=763a77a9">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2042,15 +2042,6 @@
       <h1 class="pagehead" id="man-titre-page">Étapes manuelles</h1>
     </div>
     <div class="subhead" id="man-sous">Écrivez chaque étape dans l’ordre</div>
-        <!-- ⚠ LE VERROU SE DIT AVANT D'ETRE SUBI.
-
-             Quelqu'un dont l'acces est refuse comprend pourquoi s'il a lu la
-             regle ailleurs. Ici, celui qui edite apprend qu'il tient la place —
-             et qu'il la rend en quittant l'ecran. -->
-        <div class="edit-note" id="man-note-verrou" hidden>
-          Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran
-          une fois terminé pour la rendre accessible aux autres gestionnaires.
-        </div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION. À la création ils
          ont déjà été demandés sur l'écran précédent, et les redemander donnerait
@@ -2078,7 +2069,7 @@
           <input type="text" id="man-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
-          <label class="f">Titre</label>
+          <label class="f">Titre de la procédure</label>
           <input type="text" id="man-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
         </div>
       </div>
@@ -2126,15 +2117,6 @@
       <h1 class="pagehead" id="dv-titre-page">Découper la vidéo</h1>
     </div>
     <div class="subhead" id="dv-sous">Marquez le début et la fin de chaque étape</div>
-        <!-- ⚠ LE VERROU SE DIT AVANT D'ETRE SUBI.
-
-             Quelqu'un dont l'acces est refuse comprend pourquoi s'il a lu la
-             regle ailleurs. Ici, celui qui edite apprend qu'il tient la place —
-             et qu'il la rend en quittant l'ecran. -->
-        <div class="edit-note" id="dv-note-verrou" hidden>
-          Vous êtes seul à pouvoir modifier cette procédure. Quittez cet écran
-          une fois terminé pour la rendre accessible aux autres gestionnaires.
-        </div>
 
     <!-- Dossier et titre n'apparaissent QU'EN MODIFICATION, comme sur l'écran
          des étapes manuelles. À la création ils ont déjà été demandés sur l'écran
@@ -2163,7 +2145,7 @@
           <input type="text" id="dv-sous-categorie" placeholder="Ex : Réception client" autocomplete="off">
         </div>
         <div style="margin-top:12px;">
-          <label class="f">Titre</label>
+          <label class="f">Titre de la procédure</label>
           <input type="text" id="dv-titre" placeholder="Ex : Accueillir un client" autocomplete="off">
         </div>
       </div>
@@ -2573,7 +2555,7 @@
           </span>
         </div>
         <div style="font-size:19px; font-weight:750; letter-spacing:-0.035em;" id="ai-progress-title">Presque prêt</div>
-        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Vous pouvez quitter cette page, mais pas l’app.</b> Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.</div>
+        <div style="font-size:13px; color:var(--label-2); line-height:1.45; margin-top:6px;" id="ai-progress-sub"><b style="color:var(--label);">Ne quittez pas l’application.</b> Vous pouvez quitter cette page et retrouver la procédure dans la page En cours. Elle sera accessible à la fin de l’analyse.</div>
         <button type="button" class="btn small ghost block" style="margin-top:20px; color:#FF453A;" id="ai-annuler">Abandonner et supprimer</button>
 
         <!-- ═══ COMBIEN DE TEMPS ? ═══
@@ -5306,7 +5288,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=b4e06040"></script>
+<script type="module" src="app.js?v=d5e8e9d1"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

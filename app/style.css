@@ -8302,11 +8302,9 @@ body:has(#e-detail.active) #equipe-app{
      barre, pour que la dernière étape reste lisible. */
   padding-top:18px;
   padding-bottom:122px;
-
-  mask-image:linear-gradient(180deg,
-    transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
-  -webkit-mask-image:linear-gradient(180deg,
-    transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%);
+  /* ⚠ LE FONDU DES BORDS A ETE RETIRE (demande d'Em). Il estompait le haut
+     de la video et des cartes au passage du bord : la coupe est maintenant
+     nette, comme dans le reste de l'app. */
 }
 /* Le bloc de fin respire après la dernière étape. */
 #e-detail.active .zone-etapes .confirm-bar{ margin-top:22px; }
@@ -25302,7 +25300,12 @@ html::-webkit-scrollbar-thumb:hover{
 /* ═══ DE L'AIR SOUS LE TITRE ═══
    Les autres pages posent un sous-titre entre le titre et la première carte ;
    celle-ci n'en a pas, et la carte venait se coller au bas du titre. */
-#p-create-ai #ai-upload-card{ margin-top:calc(18px * var(--ech)); }
+#p-create-ai #ai-upload-card,
+#p-create-ai #ai-progress-card,
+#p-create-ai #ai-done-card{ margin-top:calc(18px * var(--ech)); }
+/* ⚠ LA CARTE D'ATTENTE ET CELLE DE REUSSITE PRENNENT LA PLACE DU DEPOT au
+   meme endroit, sous le titre : sans la meme marge, « Analyse en cours »
+   venait se coller au titre des que l'analyse demarrait. */
 
 /* Le même air qu'à la page de création : sans sous-titre, la première carte
    se collait au bas du titre. La branche téléphone, elle, garde son

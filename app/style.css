@@ -25848,3 +25848,323 @@ html::-webkit-scrollbar-thumb:hover{
 .etab-ident-nom,
 #p-settings #pg-ent-nom,
 #e-profil #es-ent-nom{ font-weight:600; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE LOGO DE L'ENTREPRISE, PAGE PROFIL DE LA GESTION — L'IMAGE CASSÉE
+
+ ⚠ TOUTES LES RÈGLES DE LA PASTILLE `.ent-ic` VISAIENT `#e-profil` SEUL.
+   La même ligne existe côté gestion (`#pg-ent-groupe`, montrée à un
+   gestionnaire qui n'est pas le fondateur) : son image n'avait AUCUNE
+   taille. Le logo s'affichait à sa taille réelle, débordait de la carte et
+   recouvrait le nom. On lui donne la même pastille que l'espace utilisateur :
+   46 px, arrondi 14 px, comme l'avatar de la carte du dessus.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#pg-ent-groupe .reg-ic.ent-ic,
+#pg-ent-groupe[data-teinte] .reg-ic.ent-ic{
+  flex:0 0 46px;
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  background:none;
+  box-shadow:none;
+  border:none;
+  overflow:hidden;
+  padding:0;
+}
+#pg-ent-groupe .reg-ic.ent-ic img,
+#pg-ent-groupe .reg-ic.ent-ic .ent-ini{
+  width:46px;
+  height:46px;
+  border-radius:14px;
+  display:block;
+  object-fit:cover;
+}
+#pg-ent-groupe .reg-ic.ent-ic .ent-ini{
+  display:grid;
+  place-items:center;
+  background:rgba(31,76,238,0.10);
+  color:#1F4CEE;
+  font-size:16px;
+  font-weight:600;
+  letter-spacing:-0.01em;
+}
+#pg-ent-groupe .reg-ic.ent-ic img[hidden],
+#pg-ent-groupe .reg-ic.ent-ic .ent-ini[hidden]{ display:none; }
+
+/* Sur PC et tablette, la pastille suit l'échelle de l'avatar (`.id-av`),
+   dans les deux espaces — sinon le logo restait plus petit que l'avatar. */
+@media (min-width:700px) and (min-height:600px){
+  #pg-ent-groupe .reg-ic.ent-ic,
+  #pg-ent-groupe[data-teinte] .reg-ic.ent-ic,
+  #e-profil #es-ent-groupe .reg-ic.ent-ic{
+    flex:0 0 calc(46px * var(--ech));
+    width:calc(46px * var(--ech));
+    height:calc(46px * var(--ech));
+    border-radius:calc(14px * var(--ech));
+  }
+  #pg-ent-groupe .reg-ic.ent-ic img,
+  #pg-ent-groupe .reg-ic.ent-ic .ent-ini,
+  #e-profil #es-ent-groupe .reg-ic.ent-ic img,
+  #e-profil #es-ent-groupe .reg-ic.ent-ic .ent-ini{
+    width:calc(46px * var(--ech));
+    height:calc(46px * var(--ech));
+    border-radius:calc(14px * var(--ech));
+  }
+  #pg-ent-groupe .reg-ic.ent-ic .ent-ini,
+  #e-profil #es-ent-groupe .reg-ic.ent-ic .ent-ini{ font-size:calc(16px * var(--ech)); }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUR PC, LA FICHE D'UNE PROCÉDURE GARDE LA PLACE DE LA BARRE
+
+ ⚠ C'ÉTAIT LA SEULE PAGE QUI LA RENDAIT. `html:has(#e-detail.active)` pose
+   `overflow:hidden` sur la racine pour bloquer la page derrière la liste des
+   étapes. Sur la racine, Chrome et Edge ne réservent alors plus la gouttière,
+   malgré `scrollbar-gutter:stable` : la barre partait, la largeur utile
+   passait de 1265 à 1280 px, et toute la page glissait de 7 px à chaque
+   ouverture et fermeture d'une fiche. Mesuré page par page : toutes les
+   autres restent à 1265.
+
+ ⚠ ON GARDE `scroll` SUR LA RACINE, À LA SOURIS SEULEMENT. Le blocage reste
+   assuré par le corps (`overflow:hidden`) et par `#equipe-app`, borné à la
+   fenêtre : il n'y a rien à faire défiler, la barre reste vide. Les écrans
+   tactiles gardent la règle d'origine — leurs barres flottent, il n'y a pas
+   de place à réserver.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (hover:hover) and (pointer:fine){
+  html:has(#e-detail.active){
+    overflow-y:scroll;
+  }
+}
+
+
+/* ═══ MODIFIER UNE PROCÉDURE : DE L'AIR SOUS LE TITRE ═══
+   Le sous-titre a été retiré en modification (demande d'Em) : la première
+   carte venait se coller au titre. Même écart que les autres pages sans
+   sous-titre (`#p-create-ai #ai-upload-card`). */
+#man-entete,
+#dv-entete{ margin-top:calc(18px * var(--ech, 1)); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODIFIER UNE PROCÉDURE VIDÉO : PLUS DE DÉCOUPE
+
+   Demande d'Em : en modification, la vidéo n'est plus modifiable. La frise,
+   la barre (lecture, tout voir, annuler) et les deux temps sont masqués ; le
+   sélecteur de fichier posé sur le cadre ne capte plus le doigt. La classe
+   est posée par `ouvrirMontageVideo` et retirée en création, qui garde son
+   outil de découpe intact.
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-create-video.dv-edition .dv-vue,
+#p-create-video.dv-edition .dv-outils,
+#p-create-video.dv-edition .dv-tps{ display:none !important; }
+#p-create-video.dv-edition #video-input{ display:none !important; pointer-events:none; }
+/* ⚠ PLUS DE ZONE DE DÉPÔT. `.dv-cadre:has(.dv-vide)` posait les pointillés
+   dès que l'invitation existait dans la page — masquée ou non. En
+   modification, la vidéo est montrée comme sur la fiche : cadre noir, 16/9. */
+#p-create-video.dv-edition .dv-cadre,
+#p-create-video.dv-edition .dv-cadre:has(.dv-vide){
+  cursor:default;
+  background:#000;
+  border:0.5px solid var(--border);
+  aspect-ratio:16/9;
+  min-height:0;
+}
+#p-create-video.dv-edition .dv-vide{ display:none !important; }
+
+
+/* ═══ MODIFIER UNE PROCÉDURE VIDÉO : LA VIDÉO SANS CARTE AUTOUR ═══
+   Demande d'Em : la carte blanche qui encadrait la vidéo disparaît, et la
+   vidéo prend sa place — même largeur, même arrondi que la carte. En
+   création, la carte reste : elle porte la zone de dépôt. */
+#p-create-video.dv-edition #dv-carte{
+  padding:0 !important;
+  background:none !important;
+  box-shadow:none !important;
+  border:none !important;
+  overflow:hidden;
+}
+#p-create-video.dv-edition #dv-carte .dv-cadre,
+#p-create-video.dv-edition #dv-carte .dv-cadre:has(.dv-vide){
+  border:none;
+  border-radius:inherit;
+}
+
+
+/* ═══ MODIFIER UNE PROCÉDURE VIDÉO : LES DEUX ÉCARTS AUTOUR DE LA VIDÉO ═══
+   Demande d'Em. Au-dessus : 12 → 24 px entre la carte « dossier, sous-dossier,
+   titre » et la vidéo, qui se touchaient presque. En dessous : 56 → 40 px
+   jusqu'à la première étape — le bloc `.dv-geste`, vide depuis le retrait du
+   bouton de découpe, gardait 18 px pour rien. */
+#p-create-video.dv-edition #dv-carte{ margin-top:calc(24px * var(--ech, 1)); }
+#p-create-video.dv-edition .dv-geste{ display:none; }
+/* Sans `.dv-geste`, les marges se fondent et l'écart tombait à 26 px — trop
+   d'un coup. 40 px : « légèrement » moins que 56. */
+#p-create-video.dv-edition #video-steps-list{ margin-top:calc(40px * var(--ech, 1)); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ÉTAPES MANUELLES : UNE SEULE CHOSE À REMPLIR (demande d'Em, 1er octobre)
+
+   La carte de l'étape reste. Mais elle montrait d'emblée trois champs et une
+   photo : qui n'a jamais vu l'écran ne savait pas lequel était attendu.
+
+   · LE TEXTE DE L'ÉTAPE EST LE SEUL CHAMP VISIBLE, dans un cadre — c'est là
+     qu'on écrit.
+   · LE RESTE EST FACULTATIF ET LE DIT : sous « Ajouter si besoin », trois
+     pastilles — Titre, Point de vigilance, Photo. Chacune fait paraître son
+     champ quand on la touche.
+   · Une étape qui a déjà un titre le montre toujours (modification).
+
+ ⚠ `.step-att-zone` ET `.step-bas` PASSENT EN `display:contents` dans la
+   rangée `.step-outils` : leurs enfants s'alignent avec la pastille « Titre »
+   sans changer leur balisage ni leurs écouteurs.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-edit-item.sans-titre .step-titre-saisie,
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-edit-item.sans-titre .step-filet{ display:none; }
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-edit-item.sans-titre textarea:not(.step-attention-saisie){ grid-row:1; }
+
+/* Le champ de l'étape : le même cadre que celui du titre. */
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-edit-item textarea:not(.step-attention-saisie){
+  background:rgba(28,28,38,0.051) !important;
+  border:0.5px solid rgba(28,28,38,0.161) !important;
+  border-radius:12px !important;
+  padding:10px 12px !important;
+  min-height:44px;
+  transition:border-color 0.2s, background 0.2s;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-edit-item textarea:not(.step-attention-saisie):focus{
+  outline:none;
+  border-color:rgba(72,153,236,0.55) !important;
+  background:rgba(72,153,236,0.07) !important;
+}
+
+/* La rangée « Ajouter si besoin ». Elle prend toute la largeur de la carte,
+   numéro compris : trois pastilles et la corbeille n'y tiendraient pas sinon. */
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils{
+  grid-row:4; grid-column:1 / -1;
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 6px;
+  margin-top:10px;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils-lbl{
+  /* Le libellé partage sa ligne avec la corbeille ; les pastilles suivent
+     sur la ligne d'après. Avec la corbeille au bout des pastilles, la rangée
+     débordait et la corbeille tombait seule sur une troisième ligne. */
+  flex:1 1 calc(100% - 44px); order:0;
+  font-size:11.5px; font-weight:500; letter-spacing:-0.004em;
+  color:var(--label-3);
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-att-zone,
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-bas{ display:contents; }
+
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-titre-bouton,
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-att-bouton,
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-img{
+  order:2;
+  display:inline-flex; align-items:center; gap:5px; flex:0 0 auto;
+  margin:0; padding:6px 10px 6px 8px;
+  border:none; border-radius:100px;
+  background:rgba(28,28,38,0.05); color:var(--label-2);
+  font-family:inherit; font-size:12.5px; font-weight:500; letter-spacing:-0.006em;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-titre-bouton svg,
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-att-bouton svg{ width:14px; height:14px; flex:0 0 auto; }
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-att-chevron{ display:none; }
+/* Le titre est déjà là : sa pastille n'a plus rien à proposer. */
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-edit-item:not(.sans-titre) .step-titre-bouton{ display:none; }
+/* Ouvert ou rempli, le point de vigilance prend sa couleur. */
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-att-zone.ouvert .step-att-bouton{
+  background:rgba(31,76,238,0.08); color:#1F4CEE;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-att-tiroir{ flex:0 0 100%; order:9; }
+
+/* La photo : une pastille tant qu'il n'y en a pas, la vignette seule ensuite. */
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-img-vignette{
+  flex:0 0 14px; width:14px; height:14px; border-radius:0;
+  background:none; border:none; color:inherit; overflow:visible;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-img-vignette svg{ width:14px; height:14px; }
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .img-toucher{ font-size:12.5px; color:inherit; letter-spacing:-0.006em; }
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-img:has(.step-img-vignette.pleine){
+  padding:0; background:none; border-radius:0;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-img-vignette.pleine{
+  flex:0 0 36px; width:36px; height:36px; border-radius:10px;
+  border:0.5px solid rgba(28,28,38,0.10); overflow:hidden;
+}
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .step-img-vignette.pleine + .img-toucher{ display:none; }
+
+:is(#p-create-manual, #p-create-video.dv-edition) .man-fil .step-outils .del{ order:1; margin-left:auto; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODIFIER UNE PROCÉDURE VIDÉO : LES ÉTAPES EN CARTES, COMME LES MANUELLES
+
+   Demande d'Em : la même présentation des étapes que sur « Étapes manuelles ».
+   Le bloc ci-dessus (un seul champ, « Ajouter si besoin ») s'applique déjà aux
+   deux pages par `:is(...)`. Il restait à donner à la liste vidéo la CARTE
+   elle-même : elle suivait encore le fil vertical, numéro posé sur un trait.
+
+ ⚠ SEULEMENT EN MODIFICATION (`.dv-edition`). En création, l'écran de découpe
+   garde son fil et sa frise : les règles du bas de ce bloc y rendent la
+   nouvelle rangée invisible, pour qu'il reste exactement comme avant.
+
+ ⚠ PAS DE PASTILLE « PHOTO » : une procédure vidéo n'a pas de photo par étape.
+   À sa place, l'extrait de l'étape (▶ 0:00–0:07).
+   ═══════════════════════════════════════════════════════════════════════════ */
+#p-create-video.dv-edition .man-fil{
+  padding-left:0;
+  display:flex; flex-direction:column; gap:10px;
+}
+#p-create-video.dv-edition .man-fil::before{ display:none; }
+#p-create-video.dv-edition .man-fil .step-edit-item{
+  display:grid; grid-template-columns:30px 1fr; gap:6px 13px;
+  align-items:start;
+  padding:15px 16px; border-radius:20px; margin:0; border:none;
+  background:linear-gradient(157deg,#FFFFFF 0%,#FEFEFF 42%,#FAFAFC 78%,#F7F7FA 100%);
+  box-shadow:
+    inset 0 2px 2.5px -2px rgba(255,255,255,0.85),
+    inset 0 -2px 2.5px -2px rgba(28,28,38,0.06),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+/* L'étape dont l'extrait vient d'être lancé : le même liseré bleu que sur la fiche. */
+#p-create-video.dv-edition .man-fil .step-edit-item.sel{
+  box-shadow:
+    inset 0 0 0 1.5px rgba(31,76,238,0.45),
+    0 1px 2px rgba(20,20,30,0.04),
+    0 8px 18px -14px rgba(20,20,30,0.10);
+}
+#p-create-video.dv-edition .man-fil .step-num-dess{
+  position:static; left:auto; top:auto; filter:none;
+  grid-row:1; grid-column:1; width:30px; height:30px; margin:1px 0 0;
+}
+#p-create-video.dv-edition .man-fil .step-num-dess svg{ width:30px; height:30px; }
+#p-create-video.dv-edition .man-fil .step-titre-saisie{ grid-row:1; grid-column:2; }
+#p-create-video.dv-edition .man-fil .step-filet{ grid-row:2; grid-column:2; }
+#p-create-video.dv-edition .man-fil textarea:not(.step-attention-saisie){
+  grid-row:3; grid-column:2; min-width:0; font-size:15px; font-weight:400; line-height:1.5;
+}
+#p-create-video.dv-edition .man-fil .step-edit-item.sans-titre textarea:not(.step-attention-saisie){ grid-row:1; }
+
+/* L'extrait prend la place de la pastille « Photo », au bout de la rangée. */
+#p-create-video.dv-edition .man-fil .step-outils .badge.extrait{
+  order:2; margin:0 0 0 auto;
+}
+/* La corbeille, comme sur les étapes manuelles — la croix reste pour la découpe. */
+#p-create-video.dv-edition .man-fil .step-outils .sup{
+  order:1; margin-left:auto; width:32px; height:32px; border-radius:100px;
+  background:none; border:none; color:#C8342B; display:grid; place-items:center;
+}
+#p-create-video.dv-edition .man-fil .step-outils .sup .sup-croix{ display:none; }
+#p-create-video.dv-edition .man-fil .step-outils .sup .sup-corbeille{ display:grid; }
+#p-create-video.dv-edition .man-fil .step-outils .sup .sup-corbeille svg{ width:17px; height:17px; }
+
+/* ─── En création : rien ne change ─────────────────────────────────────── */
+.etape-montage .sup .sup-corbeille{ display:none; }
+#p-create-video:not(.dv-edition) .step-outils{ display:contents; }
+#p-create-video:not(.dv-edition) .step-outils-lbl,
+#p-create-video:not(.dv-edition) .step-titre-bouton{ display:none; }

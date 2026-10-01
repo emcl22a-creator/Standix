@@ -1507,6 +1507,10 @@
   "en": "Staff",
   "de": "Mitarbeitende"
  },
+ "En attente d’une machine chez notre prestataire d’analyse.": {
+  "en": "Waiting for a machine at our analysis provider.",
+  "de": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst."
+ },
  "En attente d’une machine chez notre prestataire d’analyse. Vous pouvez quitter cette page, le travail continue.": {
   "en": "Waiting for a machine at our analysis provider. You can leave this page, the work carries on.",
   "de": "Wir warten auf einen freien Rechner bei unserem Auswertungsdienst. Sie können die Seite verlassen, es geht trotzdem weiter."
@@ -2166,6 +2170,14 @@
  "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": {
   "en": "The video was not fully uploaded. Restart the analysis and keep the app open.",
   "de": "Das Video wurde nicht vollständig hochgeladen. Starten Sie die Analyse neu und lassen Sie die App offen."
+ },
+ "Laissez Standix ouverte jusqu’à la fin de l’analyse.": {
+  "en": "Keep Standix open until the analysis is finished.",
+  "de": "Lassen Sie Standix bis zum Ende der Auswertung geöffnet."
+ },
+ "Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.": {
+  "en": "Keep Standix open: the procedure is already shown on the In progress page and will be available when the analysis is finished.",
+  "de": "Lassen Sie Standix geöffnet: Die Anleitung erscheint bereits auf der Seite „In Arbeit“ und ist nach Abschluss der Auswertung verfügbar."
  },
  "Lampe torche": {
   "en": "Flashlight",
@@ -3371,6 +3383,10 @@
   "en": "Standix counts reads per person. While several people share one login, you cannot tell who read what — and your records prove nothing.",
   "de": "Standix zählt Aufrufe pro Person. Solange mehrere Personen denselben Zugang nutzen, wissen Sie nicht, wer was gelesen hat — und Ihre Nachweise belegen nichts."
  },
+ "Standix était fermée : la préparation de la vidéo s’est mise en pause. Elle reprend maintenant.": {
+  "en": "Standix was closed: preparing the video was paused. It is resuming now.",
+  "de": "Standix war geschlossen: Die Vorbereitung des Videos wurde angehalten. Sie läuft jetzt weiter."
+ },
  "Suppression impossible": {
   "en": "Cannot delete",
   "de": "Löschen nicht möglich"
@@ -4074,6 +4090,10 @@
  "Vous pouvez quitter cette page": {
   "en": "You can leave this page",
   "de": "Sie können diese Seite verlassen"
+ },
+ "Vous pouvez quitter cette page, mais pas l’app.": {
+  "en": "You can leave this page, but not the app.",
+  "de": "Sie können diese Seite verlassen, aber nicht die App."
  },
  "Vous pouvez quitter cette page.": {
   "en": "You can leave this page.",
@@ -4954,6 +4974,10 @@
  "{reste} sur {quota}": {
   "en": "{reste} of {quota}",
   "de": "{reste} von {quota}"
+ },
+ "{temps} d’analyse.": {
+  "en": "{temps} of analysis.",
+  "de": "{temps} Auswertung."
  },
  "{vus} sur {length} lues": {
   "en": "{vus} of {length} read",

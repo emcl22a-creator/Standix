@@ -8345,7 +8345,10 @@ body:has(#e-detail.active) #equipe-app{
 
    Portée limitée à `#e-detail` : la fiche de gestion emploie les mêmes classes
    et n'a pas été demandée. */
-#e-detail.active .detail-etapes-tete{ margin-bottom:0; }
+#e-detail.active .detail-etapes-tete{ margin-top:14px; margin-bottom:8px; }
+/* ⚠ DEMANDE D'EM : un peu d'air sous « Étapes de la procédure » (0 → 8 px
+   jusqu'a la premiere carte, qui venait toucher le titre) et un peu moins
+   au-dessus (40 → 32 px depuis la video : 18 de la zone + 14 ici). */
 #e-detail.active .detail-etapes-tete .tiroir-langue{
   margin-top:-6px; margin-bottom:-6px;   /* ligne : 38 px → 26 px */
 }

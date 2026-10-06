@@ -519,6 +519,7 @@ const DICO = {
     "Confirmer la suppression": "Confirm deletion",
     "Connectez-vous ou créez votre compte": "Log in or create your account",
     "connecté": "connected",
+    "Connexion en cours": "Connecting",
     "Connexion impossible": "Cannot connect",
     "Connexion impossible : {message}": "Cannot log in: {message}",
     "Consulter": "Open",
@@ -702,6 +703,7 @@ const DICO = {
     "Glissez depuis le coin haut droit de l’écran.": "Swipe down from the top-right corner of the screen.",
     "Glissez depuis le haut de l’écran.": "Swipe down from the top of the screen.",
     "Génération...": "Generating…",
+    "Générer la procédure": "Generate the procedure",
     "Générer les étapes": "Generate the steps",
     "Générez un code pour que votre équipe puisse accéder aux procédures.": "Create a code so your team can open the procedures.",
     "Gérant": "Owner",
@@ -837,6 +839,7 @@ const DICO = {
     "Le PDF n’a pas pu être créé": "The PDF could not be created",
     "Le portail n’a pas pu s’ouvrir.": "The portal could not open.",
     "Le QR code fonctionnera une fois la procédure en ligne.": "The QR code works once the procedure is live.",
+    "Le réseau ne répond pas encore. Standix réessaie automatiquement.": "The network is not responding yet. Standix is retrying automatically.",
     "Le scanner n'a pas pu démarrer.": "The scanner could not start.",
     "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": "The analysis server answered {status}{v} — procedure checked: {aiProcedureId}",
     "Le serveur d'analyse est injoignable. Réessayez dans un instant.": "The analysis server cannot be reached. Try again in a moment.",
@@ -1281,6 +1284,7 @@ const DICO = {
     "Votre compte a été supprimé.": "Your account has been deleted.",
     "Votre compte est créé, mais la session n'est pas active. Connectez-vous pour créer votre entreprise.": "Your account is created, but you are not logged in yet. Log in to create your company.",
     "Votre compte est créé. Connectez-vous pour rejoindre l'entreprise.": "Your account is created. Log in to join the company.",
+    "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères pour accéder aux procédures.": "Your account is not linked to a company. Enter the 6-character code to access the procedures.",
     "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": "Your account is not linked to a company. Enter the 6-character code.",
     "Votre entreprise": "Your company",
     "votre entreprise": "your company",
@@ -1820,6 +1824,7 @@ const DICO = {
     "Confirmer la suppression": "Löschen bestätigen",
     "Connectez-vous ou créez votre compte": "Melden Sie sich an oder erstellen Sie ein Konto",
     "connecté": "verbunden",
+    "Connexion en cours": "Verbindung wird hergestellt",
     "Connexion impossible": "Verbindung nicht möglich",
     "Connexion impossible : {message}": "Anmeldung nicht möglich: {message}",
     "Consulter": "Öffnen",
@@ -2003,6 +2008,7 @@ const DICO = {
     "Glissez depuis le coin haut droit de l’écran.": "Wischen Sie von der oberen rechten Ecke nach unten.",
     "Glissez depuis le haut de l’écran.": "Wischen Sie vom oberen Bildschirmrand nach unten.",
     "Génération...": "Wird erzeugt…",
+    "Générer la procédure": "Anleitung erzeugen",
     "Générer les étapes": "Schritte erzeugen",
     "Générez un code pour que votre équipe puisse accéder aux procédures.": "Erstellen Sie einen Code, damit Ihr Team die Anleitungen öffnen kann.",
     "Gérant": "Inhaber",
@@ -2138,6 +2144,7 @@ const DICO = {
     "Le PDF n’a pas pu être créé": "Das PDF konnte nicht erstellt werden",
     "Le portail n’a pas pu s’ouvrir.": "Das Portal konnte nicht geöffnet werden.",
     "Le QR code fonctionnera une fois la procédure en ligne.": "Der QR-Code funktioniert, sobald die Anleitung live ist.",
+    "Le réseau ne répond pas encore. Standix réessaie automatiquement.": "Das Netzwerk antwortet noch nicht. Standix versucht es automatisch erneut.",
     "Le scanner n'a pas pu démarrer.": "Der Scanner konnte nicht starten.",
     "Le serveur d'analyse a répondu {status}{v} — procédure interrogée : {aiProcedureId}": "Der Auswertungsserver antwortete {status}{v} — abgefragte Anleitung: {aiProcedureId}",
     "Le serveur d'analyse est injoignable. Réessayez dans un instant.": "Der Auswertungsserver ist nicht erreichbar. Versuchen Sie es gleich noch einmal.",
@@ -2582,6 +2589,7 @@ const DICO = {
     "Votre compte a été supprimé.": "Ihr Konto wurde gelöscht.",
     "Votre compte est créé, mais la session n'est pas active. Connectez-vous pour créer votre entreprise.": "Ihr Konto ist erstellt, aber Sie sind noch nicht angemeldet. Melden Sie sich an, um Ihr Unternehmen zu erstellen.",
     "Votre compte est créé. Connectez-vous pour rejoindre l'entreprise.": "Ihr Konto ist erstellt. Melden Sie sich an, um dem Unternehmen beizutreten.",
+    "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères pour accéder aux procédures.": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein, um auf die Anleitungen zuzugreifen.",
     "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein.",
     "Votre entreprise": "Ihr Unternehmen",
     "votre entreprise": "Ihr Unternehmen",
@@ -2855,6 +2863,7 @@ const DICO = {
     "Fin": "Fin",
     "Fin ici": "Fin aquí",
     "Glissez sur la frise pour naviguer dans la vidéo": "Desliza por la línea de tiempo para navegar por el vídeo",
+    "Générer la procédure": "Generar el procedimiento",
     "Générer les étapes": "Generar los pasos",
     "Gestion des accès": "Gestión de accesos",
     "Importez une vidéo puis coupez chaque étape": "Importa un vídeo y corta cada paso",
@@ -3057,6 +3066,7 @@ const DICO = {
     "Fin": "Fim",
     "Fin ici": "Fim aqui",
     "Glissez sur la frise pour naviguer dans la vidéo": "Deslize na linha de tempo para navegar no vídeo",
+    "Générer la procédure": "Gerar o procedimento",
     "Générer les étapes": "Gerar as etapas",
     "Gestion des accès": "Gestão de acessos",
     "Importez une vidéo puis coupez chaque étape": "Importe um vídeo e corte cada etapa",
@@ -5995,8 +6005,19 @@ function refermerLesVoiles() {
     '.bienvenue-fond',
     '.bandeau-bloc',
   ]
+  /* ⚠ ON NE RETIRE QUE CE QUI A ÉTÉ CRÉÉ À LA VOLÉE. La fenêtre « Aucune
+     entreprise » (`#fond-orphelin`) porte la classe `ios-alert-backdrop`, mais
+     elle vit dans le balisage : cette boucle la SUPPRIMAIT à la première
+     entrée dans l'app. `montrerOrphelin` ne la trouvait plus et sortait sans
+     rien dire — « Rejoindre une entreprise » ne s'ouvrait plus, et un compte
+     retiré de son entreprise ne voyait jamais la fenêtre, jusqu'au
+     rechargement de la page. Tout élément qui porte un identifiant est du
+     balisage : on le masque au lieu de le retirer. */
   voiles.forEach(sel =>
-    document.querySelectorAll(sel).forEach(el => el.remove()))
+    document.querySelectorAll(sel).forEach(el => {
+      if (el.id) { el.style.display = 'none'; el.classList.remove('shown', 'closing', 'ouvert') }
+      else el.remove()
+    }))
 
   /* ⚠ CES DEUX-LA VIVENT DANS LE BALISAGE, on ne les supprime pas : on les
      masque, comme leurs propres fonctions de fermeture le font. */
@@ -12085,11 +12106,41 @@ function couperEcouteProcedures() {
    pendant l'absence n'ont ete annonces a personne. */
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { couperEcouteProcedures(); return }
-  ecouterProcedures()
-  if (currentMembre?.role === 'gestion') loadGestionProcedures?.().catch(() => {})
-  else if (currentMembre) loadEquipeProcedures?.().catch(() => {})
+  /* Si la bibliothèque refuse de rebrancher l'écoute (l'ancienne connexion
+     n'a pas fini de se fermer), le rechargement doit partir quand même. */
+  try { ecouterProcedures() }
+  catch (e) { canalProcedures = null; console.warn('Standix \u00b7 \u00e9coute :', e?.message || e) }
+  rafraichirAuRetour(0)
 })
 
+/* ═══ AU RETOUR SUR L'APP, LE PREMIER ESSAI PEUT ÉCHOUER — EN SILENCE ═══
+
+   Un téléphone qui rouvre une app lui rend souvent une connexion endormie :
+   la toute première requête tombe, la suivante passe. Le chargement affichait
+   alors « Liste non actualisée : Load failed » à chaque retour — un message
+   d'erreur pour une panne d'une seconde, que personne n'avait provoquée.
+
+   Le rechargement du retour se tait donc, et réessaie deux fois (2 s, puis
+   4 s). La liste déjà à l'écran reste en place pendant ce temps. Les
+   chargements demandés par la personne, eux, continuent de dire ce qui ne va
+   pas. */
+let chargementDiscret = false
+let listeEnPanne = false
+function rafraichirAuRetour(essai) {
+  if (!currentMembre || document.hidden) return
+  const charger = currentMembre.role === 'gestion' ? loadGestionProcedures : loadEquipeProcedures
+  chargementDiscret = true
+  listeEnPanne = false
+  Promise.resolve()
+    .then(() => charger())
+    .catch(() => { listeEnPanne = true })
+    .finally(() => {
+      chargementDiscret = false
+      if (listeEnPanne && essai < 2) setTimeout(() => rafraichirAuRetour(essai + 1), 2000 * (essai + 1))
+    })
+}
+
+let tourPrechargeEtapes = 0
 async function loadGestionProcedures() {
   majNomsTraduits()
   // L'en-tête a été retiré de la page : ces deux repères peuvent être absents.
@@ -12100,8 +12151,21 @@ async function loadGestionProcedures() {
 
   /* La copie d'abord : l'écran se remplit avant même que la requête parte. */
   const entrepriseId = currentMembre.entreprise_id
-  const copie = lireGrille(entrepriseId)
-  if (copie) {
+  /* ⚠ AU RETOUR SUR L'APP, LA LISTE NE REMONTE PLUS EN HAUT.
+
+     Ce chargement repart à chaque retour sur Standix. Il repeignait d'abord
+     la grille depuis la copie locale — alors qu'elle était DÉJÀ à l'écran.
+     La vider puis la remplir remettait la page tout en haut : on quittait
+     l'app au milieu de sa liste, on la retrouvait au début.
+
+     La copie ne sert qu'à remplir un écran vide. Quand la grille est déjà
+     peinte, c'est elle la référence : on compare ce qui arrive à ce qui est
+     affiché, et on ne redessine que si quelque chose a changé. */
+  const dejaPeinte = allCategoriesData.length > 0 && !!catGridEl?.children.length
+  const copie = dejaPeinte
+    ? { categories: allCategoriesData, sous: subheadEl?.textContent || '' }
+    : lireGrille(entrepriseId)
+  if (copie && !dejaPeinte) {
     allCategoriesData = copie.categories
     allGestionProcedures = copie.categories.flatMap(c => c.procsInCat || [])
     renderCategoryGrid()
@@ -12126,7 +12190,11 @@ async function loadGestionProcedures() {
   if (error) {
     /* Si la copie est déjà à l'écran, une panne réseau ne doit pas l'effacer :
        on garde ce qui est là et on le signale, sans vider la page. */
-    if (copie) { toast(tLang('Liste non actualisée : {message}', { message: error.message })); return }
+    listeEnPanne = true
+    if (copie) {
+      if (!chargementDiscret) toast(tLang('Liste non actualisée : {message}', { message: error.message }))
+      return
+    }
     ecrireSous("Erreur : " + error.message); return
   }
   allGestionProcedures = procedures
@@ -12229,8 +12297,14 @@ async function loadGestionProcedures() {
   // pas besoin : on les charge en arrière-plan pendant que l'app s'affiche.
   // Les écrans qui en dépendent attendent cette promesse — déjà résolue en
   // pratique le temps qu'on y arrive.
+  /* ⚠ LE DERNIER CHARGEMENT LANCÉ EST LE SEUL QUI ÉCRIT. Deux chargements
+     peuvent se chevaucher (un enregistrement, puis l'annonce en direct du même
+     changement). Si le plus ancien répondait en dernier, il remettait en
+     mémoire des étapes déjà remplacées. */
+  const tourEtapes = ++tourPrechargeEtapes
   preloadEtapes = supabase.from('etapes').select('*').in('procedure_id', procIds).order('ordre')
-    .then(({ data }) => {
+    .then(({ data, error }) => {
+      if (tourEtapes !== tourPrechargeEtapes || error) return
       cachedEtapesByProc = {}
       ;(data || []).forEach(e => {
         if (!cachedEtapesByProc[e.procedure_id]) cachedEtapesByProc[e.procedure_id] = []
@@ -12303,9 +12377,23 @@ async function loadGestionProcedures() {
      disparaissent. */
   amorcerBrouillonsVus()
 
-  renderAccueil()
-  renderCategoryGrid()
+  gardantLaPosition(() => {
+    renderAccueil()
+    renderCategoryGrid()
+  })
   surveillerAnalyses()
+}
+
+/* Redessiner une liste la vide un instant : la page, devenue trop courte,
+   remonte en haut. On note où l'on était et on y revient dans la même tâche,
+   avant que le navigateur n'ait peint quoi que ce soit. Sans effet au premier
+   affichage (la page est déjà en haut) ni quand la liste n'est pas à l'écran. */
+function gardantLaPosition(peindre) {
+  const y = window.scrollY
+  peindre()
+  if (y > 0 && Math.abs(window.scrollY - y) > 1) {
+    try { window.scrollTo({ top: y, behavior: 'instant' }) } catch (e) { window.scrollTo(0, y) }
+  }
 }
 
 /* ═══ Carte d'accueil ═══
@@ -27213,10 +27301,9 @@ function renderVideoSteps(listEl) {
     ta.addEventListener('focus', () => { memoriserVideo() })
     ta.addEventListener('input', (e) => {
       videoSteps[i].texte = e.target.value; majBoutonIA()
-    /* Même correctif que les deux autres fils : le champ s'ajuste à l'affichage,
-       pas seulement à la saisie. Les textes écrits par l'IA s'ouvraient coupés
-       à la première ligne. */
-    requestAnimationFrame(() => autoResizeTextarea(textarea))
+      /* Une ligne appelait ici `autoResizeTextarea(textarea)` : ce nom
+         n'existe pas dans cette fonction, et chaque lettre tapée levait une
+         erreur. L'ajustement se fait juste en dessous, sur le bon champ. */
       autoResizeTextarea(e.target)
     })
     ta.addEventListener('focus', () => { dvSelection = i; dvMajFrise() })
@@ -27503,6 +27590,28 @@ async function publishProcedure(errorElId, btnId) {
   dvEdition = null
   manualSteps = []
   videoSteps = []
+  if (modifiait) {
+    /* ⚠ LA FICHE ET LE PDF MONTRAIENT L'ANCIENNE VERSION.
+
+       Les étapes sont gardées en mémoire pour que la fiche s'ouvre sans
+       attendre. Rien ne mettait cette copie à jour après un enregistrement :
+       `loadGestionProcedures` la refait, mais il est lancé sans attente, et
+       `openAnalyse` — appelée sur la ligne suivante — lisait la copie d'AVANT.
+       La base contenait la bonne version ; l'écran et le PDF, non. On
+       corrigeait un texte, on ajoutait un point de vigilance, et le PDF
+       sortait sans.
+
+       On jette donc la copie de cette procédure : `openAnalyse` relit alors
+       ses étapes en base. Et la ligne en mémoire reçoit tout de suite le
+       titre, le dossier et l'image qu'on vient d'enregistrer. */
+    delete cachedEtapesByProc[modifiait]
+    const enMemoire = (allGestionProcedures || []).find(p => p.id === modifiait)
+    if (enMemoire && newProc) {
+      Object.assign(enMemoire, newProc)
+      if (urlCouv) enMemoire.image_url = urlCouv
+      enMemoire.etapes = [{ count: etapesToInsert.length }]
+    }
+  }
   loadGestionProcedures()
   if (modifiait) { openAnalyse(modifiait); toast(tLang('Modifications enregistrées')) }
   else showGestionScreen('p-list')
@@ -28771,7 +28880,7 @@ async function loadEquipeProcedures() {
     mesValidations = rVal.data
     favsPrelus = rFav || { data: null }
   }
-  if (error) { console.error(error); return }
+  if (error) { listeEnPanne = true; console.error(error); return }
 
   // Une procédure encore en analyse n'a aucune étape : inutile de la proposer.
   const pretes = (procedures || []).filter(p => p.statut !== 'traitement')
@@ -28831,9 +28940,11 @@ async function loadEquipeProcedures() {
      nouveaute. */
   amorcerBrouillonsVus()
 
-  renderEquipeAccueil()
-  renderEquipeCategories()
-  renderBlocVisiteur()
+  gardantLaPosition(() => {
+    renderEquipeAccueil()
+    renderEquipeCategories()
+    renderBlocVisiteur()
+  })
 }
 
 /* Salutation et anneaux de l'employé. Les trois chiffres répondent à sa seule
@@ -30717,6 +30828,15 @@ async function openEquipeDetail(procId) {
       <div class="et-co">
         ${titreEtape(etape) ? `<span class="et-titre">${escapeHtml(titreEtape(etape))}</span>` : ''}
         <p>${escapeHtml(sansNumeroDEtape(etape.texte))}</p>
+        <!-- ⚠ LE POINT DE VIGILANCE MANQUAIT ICI. La fiche de la Gestion
+             l'affichait, celle de l'espace utilisateur non : le gabarit ne le
+             nommait pas. Or c'est l'utilisateur qui exécute le geste — c'est
+             lui qui doit lire « ce qu'il ne faut surtout pas faire ». Même
+             bloc, même place que côté Gestion : sous le texte. -->
+        ${etape.attention ? `<div class="et-attention">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.2 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.2a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          <span>${escapeHtml(etape.attention)}</span>
+        </div>` : ''}
         <!-- La durée est À L'INTÉRIEUR du bloc de texte, après le paragraphe.
              En voisine du texte, elle en rognait la largeur : la ligne étant
              horizontale, chaque phrase perdait la place de la pastille. -->
@@ -33749,7 +33869,7 @@ function montrerOrphelin(enPlus) {
   } else {
     el('orph-titre').textContent = tLang('Aucune entreprise')
     el('orph-texte').textContent =
-      tLang('Votre compte n\'est rattaché à aucune entreprise. Entrez le code à 6 caractères.')
+      tLang('Votre compte n\'est rattaché à aucune entreprise. Entrez le code à 6 caractères pour accéder aux procédures.')
     el('orph-sortir').style.display = 'block'
     el('orph-annuler').style.display = 'none'
   }
@@ -37070,54 +37190,213 @@ function escapeHtml(str) {
   return div.innerHTML
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE DÉMARRAGE ATTEND LE RÉSEAU AU LIEU DE CONCLURE À TORT
+
+   ⚠ LE DÉFAUT : « L'APP PLANTE QUAND J'Y REVIENS ».
+
+     Quand on quitte Standix un moment, le téléphone finit souvent par la
+     décharger. Au retour il la ROUVRE DE ZÉRO — et à cet instant précis la
+     connexion du téléphone n'est pas encore réveillée. Le démarrage posait
+     alors deux questions au serveur, et prenait une absence de réponse pour
+     une réponse :
+
+     • la fiche membre ne revient pas → « Votre compte n'est rattaché à
+       aucune entreprise ». Faux : la question n'était jamais arrivée ;
+     • la session, expirée pendant l'absence, ne peut pas être renouvelée →
+       écran « Bienvenue », comme si on avait été déconnecté ;
+     • la requête reste pendue, sans erreur → page blanche, sans fin.
+
+     Dans les trois cas, l'écran restait faux même une fois le réseau revenu.
+
+   ⚠ UNE PANNE N'EST PAS UNE RÉPONSE. On ne conclut « pas de session » que si
+     l'appareil n'en garde plus aucune, et « aucune entreprise » que si la
+     base a réellement répondu par une liste vide. Tout le reste est une
+     attente : on l'affiche, et on redemande — tout seul, puis dès que le
+     réseau revient ou qu'on revient sur l'app.
+
+   ⚠ CHAQUE QUESTION A UN DÉLAI. Une requête pendue ne rend jamais la main :
+     sans plafond, la boucle ne repartirait pas.
+   ═══════════════════════════════════════════════════════════════════════════ */
+const CLE_SESSION_RANGEE = 'sb-' + new URL(SUPABASE_URL).hostname.split('.')[0] + '-auth-token'
+function sessionRangee() {
+  try { return !!localStorage.getItem(CLE_SESSION_RANGEE) } catch (e) { return false }
+}
+
+function avecDelai(promesse, ms) {
+  return Promise.race([
+    Promise.resolve(promesse).catch(e => ({ error: e, erreur: e?.message || 'erreur' })),
+    new Promise(r => setTimeout(() => r({ horsDelai: true }), ms)),
+  ])
+}
+
+let reveilReseau = null
+function attendreProchainEssai(essai) {
+  return new Promise(ok => {
+    let fini = false
+    const auRetour = () => { if (!document.hidden) fin() }
+    const fin = () => {
+      if (fini) return
+      fini = true
+      clearTimeout(minuteur)
+      window.removeEventListener('online', fin)
+      document.removeEventListener('visibilitychange', auRetour)
+      reveilReseau = null
+      ok()
+    }
+    const minuteur = setTimeout(fin, Math.min(4000, 1500 * 2 ** essai))
+    window.addEventListener('online', fin)
+    document.addEventListener('visibilitychange', auRetour)
+    reveilReseau = fin
+  })
+}
+
+/* La fenêtre d'attente. Elle porte un identifiant : `refermerLesVoiles` la
+   masque donc sans la retirer du balisage. */
+function montrerAttenteReseau() {
+  let f = document.getElementById('fond-reseau')
+  if (!f) {
+    f = document.createElement('div')
+    f.className = 'ios-alert-backdrop'
+    f.id = 'fond-reseau'
+    f.innerHTML =
+      '<div class="fen-pro" role="alertdialog" aria-live="polite">' +
+        '<span class="fen-halo bleu"></span>' +
+        '<div class="fen-co">' +
+          '<div class="reseau-roue" aria-hidden="true"></div>' +
+          '<div class="fen-t">' + tLang('Connexion en cours') + '</div>' +
+          '<div class="fen-s">' + tLang('Le réseau ne répond pas encore. Standix réessaie automatiquement.') + '</div>' +
+        '</div>' +
+        '<div class="fen-ac">' +
+          '<button type="button" class="fen-p" id="reseau-essai">' + tLang('Réessayer') + '</button>' +
+          '<button type="button" class="fen-a" id="reseau-sortir">' + tLang('Se déconnecter') + '</button>' +
+        '</div>' +
+      '</div>'
+    document.body.appendChild(f)
+    /* « Réessayer » RECHARGE la page. Réveiller la boucle ne suffirait pas
+       quand une requête est restée pendue sur une connexion morte : la
+       bibliothèque attend toujours sa réponse. Une page neuve repart sur des
+       connexions neuves. */
+    f.querySelector('#reseau-essai').addEventListener('click', () => location.reload())
+    f.querySelector('#reseau-sortir').addEventListener('click', async () => {
+      /* `local` : on efface la session de CET appareil sans rien demander au
+         serveur — il ne répond justement pas. */
+      try { await avecDelai(supabase.auth.signOut({ scope: 'local' }), 2500) } catch (e) {}
+      try { localStorage.removeItem(CLE_SESSION_RANGEE) } catch (e) {}
+      location.reload()
+    })
+  }
+  if (f.style.display === 'flex') return
+  f.classList.remove('closing')
+  f.style.display = 'flex'
+  requestAnimationFrame(() => f.classList.add('shown'))
+}
+
+function cacherAttenteReseau() {
+  const f = document.getElementById('fond-reseau')
+  if (!f || f.style.display !== 'flex') return
+  f.classList.remove('shown')
+  f.classList.add('closing')
+  setTimeout(() => { f.classList.remove('closing'); f.style.display = 'none' }, 180)
+}
+
 // ═══ RESTER CONNECTÉ : vérifie s'il existe déjà une session au chargement ═══
 try {
   ;(async function checkExistingSession() {
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      window.jalon?.('session vérifiée')
-      if (session) {
-        // Une session existe : l'app va s'ouvrir, on en montre l'ossature
-        // pendant que la base répond, au lieu de laisser l'écran nu.
-        let dernierEspace = null
-        try { dernierEspace = localStorage.getItem('procedo_espace') } catch (e) {}
-        afficherCoquille(dernierEspace || 'gestion')
+      /* L'appareil garde une session : le filet de secours des six secondes
+         ne doit pas afficher l'écran de choix pendant qu'on l'interroge. */
+      const promise = sessionRangee()
+      if (promise) window.__procedoSessionEnCours = true
 
-        /* ⚠ LES PREMIÈRES LECTURES PARTENT TOUT DE SUITE, avec la fiche de la
-           dernière ouverture (entreprise, rôle). Elles ne seront reprises que
-           si la fiche relue ci-dessous désigne la même entreprise — sinon
-           elles sont ignorées et le chargement repart du réseau. Les règles
-           d'accès de la base s'appliquent comme toujours : on ne lit que ce
-           que ce compte a le droit de lire. */
-        try {
-          const idRetenu = localStorage.getItem('procedo_membre')
-          const eidRetenue = localStorage.getItem('procedo_entreprise')
-          if (idRetenu && eidRetenue && dernierEspace) {
-            lancerPrelecture({ id: idRetenu, role: dernierEspace, entreprise_id: eidRetenue })
+      let session = null
+      let fiches = null
+      let ossature = false
+      /* Un réseau seulement lent : passé quatre secondes, on dit qu'on attend
+         plutôt que de laisser une page vide. */
+      const minuteurLent = promise ? setTimeout(montrerAttenteReseau, 4000) : 0
+
+      for (let essai = 0; ; essai++) {
+        const rs = await avecDelai(supabase.auth.getSession(), 7000)
+        session = rs?.data?.session || null
+        if (essai === 0) window.jalon?.('session vérifiée')
+
+        if (!session) {
+          /* Pas de session rendue. C'est une vraie déconnexion si la
+             bibliothèque a répondu sans erreur, ou si elle a elle-même effacé
+             la session de l'appareil (jeton refusé par le serveur). Sinon,
+             c'est le réseau : on attend. */
+          const panne = rs?.horsDelai || rs?.error
+          if (!panne || !sessionRangee()) break
+        } else {
+          if (!ossature) {
+            ossature = true
+            // Une session existe : l'app va s'ouvrir, on en montre l'ossature
+            // pendant que la base répond, au lieu de laisser l'écran nu.
+            let dernierEspace = null
+            try { dernierEspace = localStorage.getItem('procedo_espace') } catch (e) {}
+            afficherCoquille(dernierEspace || 'gestion')
+
+            /* ⚠ LES PREMIÈRES LECTURES PARTENT TOUT DE SUITE, avec la fiche de la
+               dernière ouverture (entreprise, rôle). Elles ne seront reprises que
+               si la fiche relue ci-dessous désigne la même entreprise — sinon
+               elles sont ignorées et le chargement repart du réseau. Les règles
+               d'accès de la base s'appliquent comme toujours : on ne lit que ce
+               que ce compte a le droit de lire. */
+            try {
+              const idRetenu = localStorage.getItem('procedo_membre')
+              const eidRetenue = localStorage.getItem('procedo_entreprise')
+              if (idRetenu && eidRetenue && dernierEspace) {
+                lancerPrelecture({ id: idRetenu, role: dernierEspace, entreprise_id: eidRetenue })
+              }
+            } catch (e) {}
+            document.body.classList.remove('booting')
+            window.jalon?.('ossature affichée')
+            /* ⚠ L'APPEL DE DIAGNOSTIC A ÉTÉ RETIRÉ D'ICI. Un appel direct à l'API
+               était ATTENDU avant la fiche membre, pour comparer sa durée à celle
+               de la bibliothèque. Il ne servait qu'à la mesure — et ajoutait un
+               aller-retour réseau complet à CHAQUE ouverture de l'app.
+               S'il faut refaire cette mesure, la relancer avec `?debug=1` et sans
+               `await`. */
+            if (/[?&]debug=1/.test(location.search)) {
+              fetch(`${SUPABASE_URL}/rest/v1/membres?select=id&limit=1`, {
+                headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+              }).then(() => window.jalon?.('test : appel direct à la base'),
+                      () => window.jalon?.('test : appel direct échoué'))
+            }
+            /* Une session existe : on le signale tout de suite. Le filet de secours
+               des six secondes s'en sert pour ne PAS afficher l'écran de choix
+               pendant que la fiche membre arrive — sur une connexion lente, il
+               passait devant et recouvrait l'app. */
+            window.__procedoSessionEnCours = true
           }
-        } catch (e) {}
-        document.body.classList.remove('booting')
-        window.jalon?.('ossature affichée')
-        /* ⚠ L'APPEL DE DIAGNOSTIC A ÉTÉ RETIRÉ D'ICI. Un appel direct à l'API
-           était ATTENDU avant la fiche membre, pour comparer sa durée à celle
-           de la bibliothèque. Il ne servait qu'à la mesure — et ajoutait un
-           aller-retour réseau complet à CHAQUE ouverture de l'app.
-           S'il faut refaire cette mesure, la relancer avec `?debug=1` et sans
-           `await`. */
-        if (/[?&]debug=1/.test(location.search)) {
-          fetch(`${SUPABASE_URL}/rest/v1/membres?select=id&limit=1`, {
-            headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
-          }).then(() => window.jalon?.('test : appel direct à la base'),
-                  () => window.jalon?.('test : appel direct échoué'))
+          const rf = await avecDelai(lireFichesMembre(session.user.id), 7000)
+          if (rf && !rf.horsDelai && !rf.erreur && !rf.error) {
+            fiches = rf.fiches
+            /* Les lectures lancées en avance pendant la panne ont échoué :
+               on ne les reprend pas, le chargement repartira du réseau. */
+            if (essai > 0) prelecture = null
+            break
+          }
         }
 
-        /* Une session existe : on le signale tout de suite. Le filet de secours
-           des six secondes s'en sert pour ne PAS afficher l'écran de choix
-           pendant que la fiche membre arrive — sur une connexion lente, il
-           passait devant et recouvrait l'app. */
-        window.__procedoSessionEnCours = true
-        const { data: fiches } = await supabase
-          .from('membres').select('*').eq('user_id', session.user.id)
+        window.jalon?.('réseau absent au démarrage, essai ' + (essai + 1))
+        montrerAttenteReseau()
+        await attendreProchainEssai(essai)
+      }
+      clearTimeout(minuteurLent)
+      cacherAttenteReseau()
+
+      /* L'ossature a pu paraître avant qu'on apprenne que la session n'est
+         plus valable : on la retire, l'écran de choix ne doit rien recouvrir. */
+      if (!session && ossature) {
+        for (const id of ['gestion-app', 'equipe-app']) {
+          const el = document.getElementById(id)
+          if (el) el.style.display = 'none'
+        }
+      }
+
+      if (session) {
         const membre = choisirFicheMembre(fiches)
         if (!membre && (fiches || []).length === 0) {
           window.__procedoLoaded = true
@@ -37156,13 +37435,37 @@ try {
    différente : la Gestion dans `currentAnalyseData`, l'Équipe dans
    `equipeProcCourante`. Le PDF, lui, est le même — c'est la même procédure,
    et rien ne justifierait que le papier diffère selon qui l'imprime. */
+async function lireProcedureFraiche(procId) {
+  if (!procId) return null
+  try {
+    const rep = await avecDelai(Promise.all([
+      supabase.from('procedures').select('*').eq('id', procId).maybeSingle(),
+      supabase.from('etapes').select('*').eq('procedure_id', procId).order('ordre'),
+    ]), 6000)
+    if (!Array.isArray(rep)) return null                    // délai dépassé, ou panne
+    const [rp, re] = rep
+    if (rp.error || re.error || !rp.data || !(re.data || []).length) return null
+    return { proc: rp.data, etapes: re.data }
+  } catch (e) { return null }
+}
+
 async function exporterDepuis(source, bouton) {
   if (!source?.proc) { toast(tLang('Ouvrez d’abord une procédure')); return }
   const avant = bouton.textContent
   bouton.disabled = true
   bouton.textContent = tLang('Préparation du PDF…')
   try {
-    await exporterProcedurePdf(source.proc, source.etapes)
+    /* ⚠ LE PDF PART DE LA BASE, PAS DE LA MÉMOIRE.
+
+       Un PDF s'imprime, s'affiche au mur, se transmet : il doit dire ce que
+       dit la procédure MAINTENANT. La copie en mémoire peut dater — d'une
+       modification faite à l'instant, ou faite par quelqu'un d'autre pendant
+       que la fiche était ouverte. On relit donc la procédure et ses étapes
+       juste avant d'écrire. Si le réseau ne répond pas dans les six
+       secondes, le PDF part avec ce que l'écran affiche plutôt que pas du
+       tout. */
+    const frais = await lireProcedureFraiche(source.proc.id)
+    await exporterProcedurePdf(frais?.proc || source.proc, frais?.etapes || source.etapes)
   } catch (e) {
     console.warn('[pdf]', e?.message || e)
     toast(tLang('Le PDF n’a pas pu être créé'))

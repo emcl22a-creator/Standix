@@ -26212,3 +26212,75 @@ html::-webkit-scrollbar-thumb:hover{
 @media (prefers-reduced-motion: reduce){
   .ai-combien-tiroir, .ai-combien-tiroir .ai-combien-co{ transition:none; }
 }
+
+/* ═══ LA FENÊTRE « CONNEXION EN COURS » ═══
+   Elle paraît quand l'app se rouvre avant que le réseau du téléphone ne soit
+   réveillé. Une petite roue au-dessus du titre : on attend, rien n'est cassé. */
+#fond-reseau{ z-index:400; }
+#fond-reseau .reseau-roue{
+  width:26px; height:26px; margin:2px auto 14px; border-radius:50%;
+  border:2.5px solid rgba(31,76,238,0.18); border-top-color:#1F4CEE;
+  animation:reseau-tourne 0.85s linear infinite;
+}
+@keyframes reseau-tourne{ to{ transform:rotate(360deg); } }
+@media (prefers-reduced-motion:reduce){
+  #fond-reseau .reseau-roue{ animation-duration:2.4s; }
+}
+
+/* ═══ MODIFIER UNE PROCÉDURE VIDÉO : LA VIDÉO RESTE EN HAUT ═══
+   Demande d'Em : comme dans la fiche de l'espace utilisateur, la vidéo ne
+   part plus avec la page. On descend dans les étapes, elle reste sous les
+   yeux — on corrige un texte en regardant le geste — et les étapes passent
+   DERRIÈRE elle.
+
+   ⚠ `sticky`, PAS LA MÉCANIQUE DE LA FICHE. La fiche fige toute la page et ne
+     fait défiler qu'une zone ; ici la carte « dossier, titre » est AU-DESSUS
+     de la vidéo et doit, elle, partir avec la page. `sticky` fait exactement
+     cela : la vidéo monte normalement, puis s'arrête en haut.
+
+   ⚠ LE CACHE (`::before`) EST CE QUI FAIT DISPARAÎTRE LES ÉTAPES. Sans lui on
+     les verrait dépasser au-dessus de la vidéo et sur ses côtés. Il porte la
+     couleur de la page et déborde jusqu'aux bords. Il ne remonte que de la
+     hauteur de l'arrêt (12 px) : plus haut, il mordrait sur la carte du titre
+     tant que la page n'a pas défilé.
+
+   ⚠ `overflow:visible` SUR LA CARTE, sinon le cache serait rogné ; l'arrondi
+     de la vidéo est donc tenu par le cadre lui-même.
+
+   ⚠ SEULEMENT EN MODIFICATION (`.dv-edition`), et seulement si l'écran est
+     assez haut : sur un téléphone couché, une vidéo figée mangerait toute la
+     place. */
+@media (min-height:560px){
+  #p-create-video.dv-edition #dv-carte{
+    position:sticky;
+    /* ⚠ NÉGATIF, ET C'EST VOULU. La page a 30 px de marge intérieure en haut,
+       et un élément « collant » s'arrête sous cette marge, pas au bord. -18
+       l'arrête donc à 12 px du haut de la page (30 - 18). */
+    top:-18px;
+    z-index:4;
+    overflow:visible;
+  }
+  /* L'arrondi descend de la carte jusqu'au cadre, qui le découpe lui-même. */
+  #p-create-video.dv-edition #dv-carte .dv-depot{ border-radius:inherit; }
+  /* ⚠ PLAFONNÉE À 40 % DE LA HAUTEUR. Sur un téléphone la vidéo fait déjà
+     moins : rien ne change. Sur un grand écran elle prenait toute la largeur
+     — 635 px de haut — et, figée, ne laissait plus voir aucune étape. Le
+     cadre garde son format 16/9, donc il rétrécit et se centre. */
+  #p-create-video.dv-edition #dv-carte .dv-cadre{
+    overflow:hidden; max-height:40dvh; margin-inline:auto;
+  }
+  #p-create-video.dv-edition #dv-carte::before{
+    content:''; position:absolute; z-index:-1;
+    left:-60px; right:-60px;
+    top:calc(-12px * var(--ech, 1)); bottom:calc(-10px * var(--ech, 1));
+    background:var(--fond-page-dv, #F5F5F9);
+    /* `.card::before` porte un arrondi et un filet : ici ce n'est qu'un cache,
+       il ne doit pas se voir. */
+    border-radius:0; box-shadow:none; border:none;
+    pointer-events:none;
+  }
+  /* Un champ qu'on touche ne doit pas venir se ranger sous la vidéo. */
+  #p-create-video.dv-edition .man-fil :is(input, textarea){
+    scroll-margin-top:calc(56.25vw + 48px);
+  }
+}

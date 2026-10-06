@@ -3927,6 +3927,10 @@
   "en": "Your account is created. Log in to join the company.",
   "de": "Ihr Konto ist erstellt. Melden Sie sich an, um dem Unternehmen beizutreten."
  },
+ "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères pour accéder aux procédures.": {
+  "en": "Your account is not linked to a company. Enter the 6-character code to access the procedures.",
+  "de": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein, um auf die Anleitungen zuzugreifen."
+ },
  "Votre compte n'est rattaché à aucune entreprise. Entrez le code à 6 caractères.": {
   "en": "Your account is not linked to a company. Enter the 6-character code.",
   "de": "Ihr Konto gehört zu keinem Unternehmen. Geben Sie den 6-stelligen Code ein."
@@ -5194,5 +5198,17 @@
  "✓ Toute la vidéo est couverte, sans chevauchement": {
   "en": "✓ The whole video is covered, with no overlap",
   "de": "✓ Das ganze Video ist abgedeckt, ohne Überschneidung"
+ },
+ "Connexion en cours": {
+  "en": "Connecting",
+  "de": "Verbindung wird hergestellt"
+ },
+ "Le réseau ne répond pas encore. Standix réessaie automatiquement.": {
+  "en": "The network is not responding yet. Standix is retrying automatically.",
+  "de": "Das Netzwerk antwortet noch nicht. Standix versucht es automatisch erneut."
+ },
+ "Générer la procédure": {
+  "en": "Generate the procedure",
+  "de": "Anleitung erzeugen"
  }
 }

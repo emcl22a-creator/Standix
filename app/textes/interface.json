@@ -851,10 +851,6 @@
   "en": "What you must not do…",
   "de": "Was Sie auf keinen Fall tun dürfen…"
  },
- "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": {
-  "en": "These times depend on your phone and your video. Keep the app open until the analysis is done.",
-  "de": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist."
- },
  "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": {
   "en": "This device will be logged out and free up a seat. It can come back later if a seat is free.",
   "de": "Dieses Gerät wird abgemeldet und gibt einen Platz frei. Es kann später wieder dazu, wenn ein Platz frei ist."
@@ -5210,5 +5206,41 @@
  "Générer la procédure": {
   "en": "Generate the procedure",
   "de": "Anleitung erzeugen"
+ },
+ "Ces durées varient en fonction de l’appareil et de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": {
+  "en": "These times depend on your device and your video. Keep the app open until the analysis is done.",
+  "de": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist."
+ },
+ "Télécharger le QR code": {
+  "en": "Download the QR code",
+  "de": "QR-Code herunterladen"
+ },
+ "Vos dossiers": {
+  "en": "Your folders",
+  "de": "Ihre Ordner"
+ },
+ "Sous-dossiers de {nom}": {
+  "en": "Subfolders of {nom}",
+  "de": "Unterordner von {nom}"
+ },
+ "« {nom} » sera un nouveau dossier.": {
+  "en": "“{nom}” will be a new folder.",
+  "de": "„{nom}“ wird ein neuer Ordner."
+ },
+ "« {nom} » sera un nouveau sous-dossier.": {
+  "en": "“{nom}” will be a new subfolder.",
+  "de": "„{nom}“ wird ein neuer Unterordner."
+ },
+ "La vidéo n’a pas été envoyée jusqu’au bout : Standix a été fermée ou mise en veille pendant sa préparation. Choisissez à nouveau la vidéo et gardez l’application ouverte jusqu’à l’écran d’attente.": {
+  "en": "The video was not fully sent: Standix was closed or put to sleep while preparing it. Choose the video again and keep the app open until the waiting screen.",
+  "de": "Das Video wurde nicht vollständig gesendet: Standix wurde während der Vorbereitung geschlossen oder in den Ruhezustand versetzt. Wählen Sie das Video erneut und lassen Sie die App bis zum Wartebildschirm geöffnet."
+ },
+ "L’analyse dure depuis {v} minutes sans aboutir. Relancez-la.": {
+  "en": "The analysis has been running for {v} minutes without finishing. Start it again.",
+  "de": "Die Auswertung läuft seit {v} Minuten ohne Ergebnis. Starten Sie sie erneut."
+ },
+ "Préparation interrompue sur l’appareil": {
+  "en": "Preparation interrupted on the device",
+  "de": "Vorbereitung auf dem Gerät unterbrochen"
  }
 }

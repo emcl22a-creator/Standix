@@ -143,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=93380817">
+<link rel="stylesheet" href="style.css?v=b51b6d02">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -1881,7 +1881,7 @@
         <div class="mode-choice-row">
           <div class="mode-choice-icon">
             <span class="mc-pl" style="background:linear-gradient(150deg,rgba(165,176,192,0.24),rgba(58,68,83,0.14))">
-              <svg viewBox="0 0 24 24" fill="none" stroke="url(#pal4)" stroke-width="1.9"
+              <svg viewBox="0 0 24 24" fill="none" stroke="url(#palProc)" stroke-width="1.9"
                    stroke-linejoin="round" stroke-linecap="round">
                 <path d="M12 20.4h8.4"></path>
                 <path d="M15.6 4.2a2 2 0 0 1 2.8 2.8L7.6 17.8 3.8 18.8l1-3.8Z"></path>
@@ -2603,8 +2603,8 @@
               <tr><td>5 min</td><td>6 à 7 min</td></tr>
             </tbody>
           </table>
-          <p class="ai-combien-n">Ces durées varient selon le téléphone et la
-             vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.</p>
+          <p class="ai-combien-n">Ces durées varient en fonction de l’appareil et
+             de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.</p>
         </div></div></div></div>
 
     <div class="card" id="ai-done-card" style="display:none; text-align:center; padding:28px 20px;">
@@ -2881,7 +2881,7 @@
         </svg>
         Le QR code fonctionnera une fois la procédure en ligne.
       </div>
-      <button class="btn block" id="qr-download-btn">Télécharger la fiche</button>
+      <button class="btn block" id="qr-download-btn">Télécharger le QR code</button>
     </div>
 
     <div class="section-title">Employés</div>
@@ -4870,7 +4870,9 @@
     <linearGradient id="pal1" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#0C4A9E"/><stop offset="1" stop-color="#6BB6FF"/></linearGradient>
     <linearGradient id="pal2" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#7C2D12"/><stop offset="1" stop-color="#FBBF5C"/></linearGradient>
     <linearGradient id="pal3" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#14532D"/><stop offset="1" stop-color="#5FDDA0"/></linearGradient>
-    <linearGradient id="pal4" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#3A4453"/><stop offset="1" stop-color="#A5B0C0"/></linearGradient>
+    <!-- pal4 : le rouge rosé de l'enregistrement d'écran (comme pal5), à la place
+         du gris. Le gris reste celui des procédures (`palProc`). -->
+    <linearGradient id="pal4" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse"><stop stop-color="#9F1239"/><stop offset="1" stop-color="#FDA4AF"/></linearGradient>
     <!-- pal5 : le rouge de l'enregistrement. Il manquait — la carte
          « Enregistrer l'écran » portait un halo corail et un dessin gris
          acier, emprunté au mode manuel : deux couleurs qui se contredisaient
@@ -5289,7 +5291,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=d7032ca7"></script>
+<script type="module" src="app.js?v=54398b4f"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

@@ -26284,3 +26284,151 @@ html::-webkit-scrollbar-thumb:hover{
     scroll-margin-top:calc(56.25vw + 48px);
   }
 }
+
+/* ═══ PC ET TABLETTE : LA VIDÉO PREND TOUTE LA LARGEUR ═══
+   Demande d'Em : la vidéo était plafonnée à la taille du téléphone (390 px),
+   centrée avec deux grands vides à gauche et à droite. Elle prend maintenant
+   toute la largeur de la page, comme les étapes en dessous — dans la fiche de
+   l'espace utilisateur ET dans celle de la Gestion. Le cadre garde son format
+   16/9 : la vidéo le remplit, sans bandes noires.
+
+   ⚠ CE QUI REMPLACE L'ANCIENNE RÈGLE. Elle est plus haut dans ce fichier
+     (« LA VIDÉO GARDE SES PROPORTIONS SUR GRAND ÉCRAN ») ; celle-ci, écrite
+     après et aussi précise, l'emporte. */
+@media (min-width: 700px) and (min-height: 600px){
+  #e-detail.active .video-frame,
+  #p-analyse.active .video-frame,
+  #detail-video-frame, #analyse-video-frame{
+    width:100%;
+    max-width:none;
+  }
+}
+
+/* ⚠ À L'HORIZONTALE, LA VIDÉO NE RESTE PLUS FIGÉE EN HAUT.
+
+   Sur un écran couché (PC, tablette en paysage), une vidéo de toute la
+   largeur fait 600 à 700 px de haut : figée, elle laissait une bande de
+   100 px pour lire les étapes. On garde donc la grande vidéo, et c'est la
+   page entière qui défile — la vidéo monte avec elle, comme sur la fiche de
+   la Gestion.
+
+   À la verticale (tablette tenue droite, téléphone), rien ne change : la
+   vidéo occupe moins de la moitié de l'écran et reste figée en haut. */
+@media (min-width: 700px) and (min-height: 600px) and (min-aspect-ratio: 5/4){
+  #e-detail.active,
+  body.sans-topbar #e-detail.active{
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:contain;
+  }
+  #e-detail.active .zone-etapes,
+  body.sans-topbar #e-detail.active .zone-etapes{
+    flex:0 0 auto;
+    min-height:auto;
+    overflow:visible;
+  }
+}
+
+/* ═══ LA FICHE DE LA GESTION : LA VIDÉO RESTE EN HAUT ═══
+   Demande d'Em : comme dans la fiche de l'espace utilisateur, la vidéo ne
+   part plus avec la page. Le titre et le bandeau « Publier » montent
+   normalement ; la vidéo s'arrête en haut, et tout ce qui suit — étapes, PDF,
+   QR code, lectures de l'équipe — passe DERRIÈRE elle.
+
+   ⚠ `sticky`, comme sur la page de modification d'une procédure vidéo, et
+     pour la même raison : ce qui est au-dessus de la vidéo doit partir avec
+     la page, seule la vidéo s'arrête.
+
+   ⚠ `top:-18px` : la page a 30 px de marge intérieure en haut, et un élément
+     « collant » s'arrête sous cette marge. -18 l'arrête à 12 px du haut.
+
+   ⚠ LE CACHE (`::before`) fait disparaître les cartes derrière la vidéo — sans
+     lui, on les verrait dépasser au-dessus et sur les côtés. Le cadre garde
+     donc `overflow:visible`, et c'est la vidéo qui porte l'arrondi.
+
+   ⚠ MÊME RÈGLE QUE LA FICHE DE L'ÉQUIPE POUR LES ÉCRANS COUCHÉS. Sur PC et
+     tablette en paysage, la vidéo fait toute la largeur — 600 à 700 px de
+     haut. Figée, elle ne laisserait rien voir : elle défile alors avec la
+     page. Et sur un téléphone couché (moins de 560 px de haut), pareil. */
+@media (min-height:560px) and (max-aspect-ratio: 5/4), (min-height:560px) and (max-width:699px){
+  #p-analyse.active #analyse-video-frame{
+    position:sticky;
+    top:-18px;
+    z-index:4;
+    overflow:visible;
+  }
+  #p-analyse.active #analyse-video-frame video{ border-radius:inherit; }
+  #p-analyse.active #analyse-video-frame::before{
+    content:''; position:absolute; z-index:-1;
+    left:-60px; right:-60px;
+    top:calc(-12px * var(--ech, 1)); bottom:-10px;
+    background:#F5F5F9;
+    pointer-events:none;
+  }
+}
+
+/* ═══ LE TIROIR DES DOSSIERS EXISTANTS ═══
+   Sous les champs « Dossier » et « Sous-dossier ». Même mouvement que le
+   tiroir « Combien de temps ça prend ? » : la hauteur s'ouvre (grille 0fr →
+   1fr, la courbe d'Apple), le contenu passe du flou au net, et les pastilles
+   arrivent l'une après l'autre. */
+.td-tiroir{
+  display:grid;
+  grid-template-rows:0fr;
+  transition:grid-template-rows 0.46s cubic-bezier(0.32,0.72,0,1);
+}
+.td-tiroir.ouvert{ grid-template-rows:1fr; }
+.td-dedans{ overflow:hidden; min-height:0; }
+.td-co{
+  padding:calc(10px * var(--ech, 1)) 1px calc(2px * var(--ech, 1));
+  opacity:0; transform:translateY(-6px) scale(0.985); filter:blur(5px);
+  transform-origin:50% 0;
+  transition:opacity 0.18s ease, transform 0.46s cubic-bezier(0.32,0.72,0,1), filter 0.18s ease;
+}
+.td-tiroir.ouvert .td-co{
+  opacity:1; transform:none; filter:none;
+  transition:opacity 0.3s ease 0.06s, transform 0.5s cubic-bezier(0.32,0.72,0,1) 0.03s, filter 0.3s ease 0.06s;
+}
+.td-tete{
+  font-size:calc(11.5px * var(--ech, 1)); font-weight:600; letter-spacing:-0.005em;
+  color:var(--label-2); margin:0 2px calc(8px * var(--ech, 1));
+}
+.td-liste{ display:flex; flex-wrap:wrap; gap:calc(7px * var(--ech, 1)); }
+.td-puce{
+  display:inline-flex; align-items:center; gap:calc(7px * var(--ech, 1));
+  padding:calc(7px * var(--ech, 1)) calc(12px * var(--ech, 1)) calc(7px * var(--ech, 1)) calc(10px * var(--ech, 1));
+  border-radius:100px;
+  background:rgba(28,28,38,0.045);
+  border:0.5px solid rgba(28,28,38,0.10);
+  color:var(--label-1);
+  font:inherit; font-size:calc(14px * var(--ech, 1)); font-weight:550; letter-spacing:-0.01em;
+  cursor:pointer; -webkit-tap-highlight-color:transparent;
+  opacity:0; transform:translateY(4px) scale(0.96);
+  transition:transform 0.38s cubic-bezier(0.32,0.72,0,1), opacity 0.26s ease, background 0.15s ease;
+}
+.td-tiroir.ouvert .td-puce{
+  opacity:1; transform:none;
+  transition-delay:calc(0.05s + var(--i, 0) * 0.025s);
+}
+.td-puce:active{ transform:scale(0.95); background:rgba(31,76,238,0.10); transition-delay:0s; }
+@media (hover:hover) and (pointer:fine){
+  .td-puce:hover{ background:rgba(31,76,238,0.07); border-color:rgba(31,76,238,0.22); }
+}
+.td-puce b{ font-weight:750; color:#1F4CEE; }
+.td-point{
+  width:calc(10px * var(--ech, 1)); height:calc(10px * var(--ech, 1));
+  border-radius:50%; flex:0 0 auto;
+  background:linear-gradient(135deg, #6BB6FF, #0C4A9E);
+}
+.td-nb{
+  font-size:calc(12px * var(--ech, 1)); font-weight:600; color:var(--label-2);
+  font-variant-numeric:tabular-nums;
+}
+.td-nouveau{
+  font-size:calc(12.5px * var(--ech, 1)); color:var(--label-2);
+  margin:calc(9px * var(--ech, 1)) 2px 0; line-height:1.4;
+}
+.td-liste + .td-nouveau{ margin-top:calc(10px * var(--ech, 1)); }
+@media (prefers-reduced-motion: reduce){
+  .td-tiroir, .td-co, .td-puce{ transition:none !important; }
+}

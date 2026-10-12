@@ -423,7 +423,7 @@ const DICO = {
     "Ce que l’IA analyse": "What the AI looks at",
     "Ce qui est visible": "What is on screen",
     "Ce qu’il ne faut surtout pas faire…": "What you must not do…",
-    "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "These times depend on your phone and your video. Keep the app open until the analysis is done.",
+    "Ces durées varient en fonction de l’appareil et de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "These times depend on your device and your video. Keep the app open until the analysis is done.",
     "cet appareil": "this device",
     "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": "This device will be logged out and free up a seat. It can come back later if a seat is free.",
     "cet établissement": "this site",
@@ -807,6 +807,7 @@ const DICO = {
     "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": "The video for this procedure cannot be found. It may have been deleted, or its upload did not finish. Record the procedure again to restart the analysis.",
     "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": "The video did not finish uploading. Keep the app open during the upload, then restart the analysis.",
     "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "The video was not fully uploaded. Restart the analysis and keep the app open.",
+    "La vidéo n’a pas été envoyée jusqu’au bout : Standix a été fermée ou mise en veille pendant sa préparation. Choisissez à nouveau la vidéo et gardez l’application ouverte jusqu’à l’écran d’attente.": "The video was not fully sent: Standix was closed or put to sleep while preparing it. Choose the video again and keep the app open until the waiting screen.",
     "Laissez Standix ouverte jusqu’à la fin de l’analyse.": "Keep Standix open until the analysis is finished.",
     "Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.": "Keep Standix open: the procedure is already shown on the In progress page and will be available when the analysis is finished.",
     "Lampe torche": "Flashlight",
@@ -891,6 +892,7 @@ const DICO = {
     "Lues": "Read",
     "L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document": "The <b>Standix AI</b> writes the procedure from a video or a document",
     "L’analyse a échoué.": "The analysis failed.",
+    "L’analyse dure depuis {v} minutes sans aboutir. Relancez-la.": "The analysis has been running for {v} minutes without finishing. Start it again.",
     "L’analyse est terminée : {length} étapes.": "Analysis done: {length} steps.",
     "L’analyse n’a pas démarré.": "The analysis did not start.",
     "L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; si cela persiste, écrivez-nous depuis les réglages.": "The analysis could not restart. Try again in a few minutes; if it keeps happening, write to us from the settings.",
@@ -1036,6 +1038,7 @@ const DICO = {
     "Préparation du lecteur...": "Preparing the player…",
     "préparation du lien d’analyse…": "preparing the analysis link…",
     "Préparation du PDF…": "Preparing the PDF…",
+    "Préparation interrompue sur l’appareil": "Preparation interrupted on the device",
     "Publier": "Publish",
     "Publier la procédure": "Publish the procedure",
     "Publiez une procédure pour qu’elle apparaisse ici.": "Publish a procedure for it to show up here.",
@@ -1144,6 +1147,7 @@ const DICO = {
     "sont accessibles": "are available",
     "Sous-dossier": "Subfolder",
     "Sous-dossier retiré": "Subfolder removed",
+    "Sous-dossiers de {nom}": "Subfolders of {nom}",
     "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": "Standix counts reads per person. While several people share one login, you cannot tell who read what — and your records prove nothing.",
     "Standix était fermée : la préparation de la vidéo s’est mise en pause. Elle reprend maintenant.": "Standix was closed: preparing the video was paused. It is resuming now.",
     "Suppression impossible": "Cannot delete",
@@ -1216,6 +1220,7 @@ const DICO = {
     "Trou de {v} s avant l'étape {v2}": "Gap of {v} s before step {v2}",
     "Télécharger en PDF": "Download as PDF",
     "Télécharger la fiche": "Download the sheet",
+    "Télécharger le QR code": "Download the QR code",
     "Un <b>PDF</b> par procédure": "A <b>PDF</b> for each procedure",
     "Un <b>QR code</b> par procédure": "A <b>QR code</b> for each procedure",
     "Un code est actif": "A code is active",
@@ -1271,6 +1276,7 @@ const DICO = {
     "Vos appareils numériques": "Your devices",
     "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": "Your folders exist, but no one has opened them yet this month.",
     "Vos changements ne partent qu'à l'enregistrement": "Your changes are only sent when you save",
+    "Vos dossiers": "Your folders",
     "Vos membres ne la verront plus. Vous pourrez la republier à tout moment ; les lectures déjà enregistrées restent dans l’analyse.": "Your members will no longer see it. You can publish it again any time; reads already counted stay in the analysis.",
     "Vos paroles": "What you say",
     "Vos procédures sont conservées. Choisissez une offre pour les rouvrir et continuer à en créer.": "Your procedures are kept. Pick a plan to open them again and keep creating.",
@@ -1459,6 +1465,8 @@ const DICO = {
     "« {name} » n’a pas répondu. Retirez-la et réessayez.": "“{name}” did not respond. Remove it and try again.",
     "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": "“{nomEntreprise}” has reached the number of members in its subscription. Your request has been passed to the person who manages it. They will let you in as soon as a seat frees up.",
     "« {nom} » ajoutée. Elle restera dans votre liste.": "“{nom}” added. It will stay in your list.",
+    "« {nom} » sera un nouveau dossier.": "“{nom}” will be a new folder.",
+    "« {nom} » sera un nouveau sous-dossier.": "“{nom}” will be a new subfolder.",
     "« {titre} » est encore en cours d'analyse{v}. Vous ne pouvez pas la consulter avant la fin. Si vous n'en voulez plus, supprimez-la.": "“{titre}” is still being analysed{v}. You cannot open it until it is done. If you no longer want it, delete it.",
     "« {titre} » est prête.": "“{titre}” is ready.",
     "« {titre} » et toutes ses étapes seront supprimées. Cette action est irréversible.": "“{titre}” and all its steps will be deleted. This cannot be undone.",
@@ -1728,7 +1736,7 @@ const DICO = {
     "Ce que l’IA analyse": "Was die KI auswertet",
     "Ce qui est visible": "Was zu sehen ist",
     "Ce qu’il ne faut surtout pas faire…": "Was Sie auf keinen Fall tun dürfen…",
-    "Ces durées varient selon le téléphone et la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist.",
+    "Ces durées varient en fonction de l’appareil et de la vidéo. Gardez l’application ouverte jusqu’à la fin de l’analyse.": "Diese Zeiten hängen von Ihrem Gerät und Ihrem Video ab. Lassen Sie die App offen, bis die Auswertung fertig ist.",
     "cet appareil": "dieses Gerät",
     "Cet appareil sera déconnecté et libérera une place. Il pourra revenir plus tard s'il en reste une.": "Dieses Gerät wird abgemeldet und gibt einen Platz frei. Es kann später wieder dazu, wenn ein Platz frei ist.",
     "cet établissement": "dieser Standort",
@@ -2112,6 +2120,7 @@ const DICO = {
     "La vidéo de cette procédure est introuvable. Elle a peut-être été supprimée, ou son envoi ne s’est pas terminé. Refilmez la procédure pour relancer l’analyse.": "Das Video dieser Anleitung ist nicht auffindbar. Vielleicht wurde es gelöscht oder nicht fertig hochgeladen. Nehmen Sie die Anleitung neu auf, um die Analyse neu zu starten.",
     "La vidéo n'a pas fini d'être envoyée. Gardez l'app ouverte pendant l'envoi, puis relancez l'analyse.": "Das Video wurde nicht fertig hochgeladen. Lassen Sie die App beim Hochladen offen und starten Sie die Analyse dann neu.",
     "La vidéo n'a pas été envoyée jusqu'au bout. Relancez l'analyse en gardant l'app ouverte.": "Das Video wurde nicht vollständig hochgeladen. Starten Sie die Analyse neu und lassen Sie die App offen.",
+    "La vidéo n’a pas été envoyée jusqu’au bout : Standix a été fermée ou mise en veille pendant sa préparation. Choisissez à nouveau la vidéo et gardez l’application ouverte jusqu’à l’écran d’attente.": "Das Video wurde nicht vollständig gesendet: Standix wurde während der Vorbereitung geschlossen oder in den Ruhezustand versetzt. Wählen Sie das Video erneut und lassen Sie die App bis zum Wartebildschirm geöffnet.",
     "Laissez Standix ouverte jusqu’à la fin de l’analyse.": "Lassen Sie Standix bis zum Ende der Auswertung geöffnet.",
     "Laissez Standix ouverte : la procédure est déjà affichée dans la page En cours et sera accessible à la fin de l’analyse.": "Lassen Sie Standix geöffnet: Die Anleitung erscheint bereits auf der Seite „In Arbeit“ und ist nach Abschluss der Auswertung verfügbar.",
     "Lampe torche": "Taschenlampe",
@@ -2196,6 +2205,7 @@ const DICO = {
     "Lues": "Gelesen",
     "L’<b>IA Standix</b> rédige la procédure depuis une vidéo ou un document": "Die <b>Standix-KI</b> schreibt die Anleitung aus einem Video oder Dokument",
     "L’analyse a échoué.": "Die Analyse ist fehlgeschlagen.",
+    "L’analyse dure depuis {v} minutes sans aboutir. Relancez-la.": "Die Auswertung läuft seit {v} Minuten ohne Ergebnis. Starten Sie sie erneut.",
     "L’analyse est terminée : {length} étapes.": "Auswertung fertig: {length} Schritte.",
     "L’analyse n’a pas démarré.": "Die Analyse hat nicht begonnen.",
     "L’analyse n’a pas pu redémarrer. Réessayez dans quelques minutes ; si cela persiste, écrivez-nous depuis les réglages.": "Die Analyse konnte nicht neu starten. Versuchen Sie es in ein paar Minuten erneut; wenn es weiter passiert, schreiben Sie uns über die Einstellungen.",
@@ -2341,6 +2351,7 @@ const DICO = {
     "Préparation du lecteur...": "Player wird vorbereitet…",
     "préparation du lien d’analyse…": "Analyse-Link wird vorbereitet…",
     "Préparation du PDF…": "PDF wird vorbereitet…",
+    "Préparation interrompue sur l’appareil": "Vorbereitung auf dem Gerät unterbrochen",
     "Publier": "Veröffentlichen",
     "Publier la procédure": "Anleitung veröffentlichen",
     "Publiez une procédure pour qu’elle apparaisse ici.": "Veröffentlichen Sie eine Anleitung, damit sie hier erscheint.",
@@ -2449,6 +2460,7 @@ const DICO = {
     "sont accessibles": "sind verfügbar",
     "Sous-dossier": "Unterordner",
     "Sous-dossier retiré": "Unterordner entfernt",
+    "Sous-dossiers de {nom}": "Unterordner von {nom}",
     "Standix compte les lectures par personne. Tant que plusieurs employés utilisent le même accès, vous ne savez pas qui a lu quoi — et vos relevés ne prouvent rien.": "Standix zählt Aufrufe pro Person. Solange mehrere Personen denselben Zugang nutzen, wissen Sie nicht, wer was gelesen hat — und Ihre Nachweise belegen nichts.",
     "Standix était fermée : la préparation de la vidéo s’est mise en pause. Elle reprend maintenant.": "Standix war geschlossen: Die Vorbereitung des Videos wurde angehalten. Sie läuft jetzt weiter.",
     "Suppression impossible": "Löschen nicht möglich",
@@ -2521,6 +2533,7 @@ const DICO = {
     "Trou de {v} s avant l'étape {v2}": "Lücke von {v} s vor Schritt {v2}",
     "Télécharger en PDF": "Als PDF herunterladen",
     "Télécharger la fiche": "Blatt herunterladen",
+    "Télécharger le QR code": "QR-Code herunterladen",
     "Un <b>PDF</b> par procédure": "Ein <b>PDF</b> pro Anleitung",
     "Un <b>QR code</b> par procédure": "Ein <b>QR-Code</b> pro Anleitung",
     "Un code est actif": "Ein Code ist aktiv",
@@ -2576,6 +2589,7 @@ const DICO = {
     "Vos appareils numériques": "Ihre Geräte",
     "Vos catégories existent, mais personne ne les a encore ouvertes ce mois-ci.": "Ihre Ordner gibt es, aber diesen Monat hat sie noch niemand geöffnet.",
     "Vos changements ne partent qu'à l'enregistrement": "Ihre Änderungen werden erst beim Speichern übernommen",
+    "Vos dossiers": "Ihre Ordner",
     "Vos membres ne la verront plus. Vous pourrez la republier à tout moment ; les lectures déjà enregistrées restent dans l’analyse.": "Ihre Mitglieder sehen sie nicht mehr. Sie können sie jederzeit wieder veröffentlichen; bisherige Aufrufe bleiben in der Auswertung.",
     "Vos paroles": "Was Sie sagen",
     "Vos procédures sont conservées. Choisissez une offre pour les rouvrir et continuer à en créer.": "Ihre Anleitungen bleiben erhalten. Wählen Sie einen Tarif, um sie wieder zu öffnen und weitere zu erstellen.",
@@ -2764,6 +2778,8 @@ const DICO = {
     "« {name} » n’a pas répondu. Retirez-la et réessayez.": "„{name}“ reagiert nicht. Entfernen Sie sie und versuchen Sie es erneut.",
     "« {nomEntreprise} » a atteint le nombre de membres de son abonnement. Votre demande a été transmise à la personne qui la gère. Elle vous ouvrira l'accès dès qu'une place se libère.": "„{nomEntreprise}“ hat die Mitgliederzahl seines Abos erreicht. Ihre Anfrage wurde an die zuständige Person weitergeleitet. Sie gibt Ihnen Zugriff, sobald ein Platz frei wird.",
     "« {nom} » ajoutée. Elle restera dans votre liste.": "„{nom}“ hinzugefügt. Sie bleibt in Ihrer Liste.",
+    "« {nom} » sera un nouveau dossier.": "„{nom}“ wird ein neuer Ordner.",
+    "« {nom} » sera un nouveau sous-dossier.": "„{nom}“ wird ein neuer Unterordner.",
     "« {titre} » est encore en cours d'analyse{v}. Vous ne pouvez pas la consulter avant la fin. Si vous n'en voulez plus, supprimez-la.": "„{titre}“ wird noch ausgewertet{v}. Sie können sie erst danach öffnen. Wenn Sie sie nicht mehr brauchen, löschen Sie sie.",
     "« {titre} » est prête.": "„{titre}“ ist fertig.",
     "« {titre} » et toutes ses étapes seront supprimées. Cette action est irréversible.": "„{titre}“ und alle Schritte werden gelöscht. Das lässt sich nicht rückgängig machen.",
@@ -2911,6 +2927,7 @@ const DICO = {
     "Tous les membres de l'équipe": "Todos los miembros del equipo",
     "Trier : A → Z": "Ordenar: A → Z",
     "Trier : les plus actifs": "Ordenar: los más activos",
+    "Télécharger le QR code": "Descargar el código QR",
     "Télécharger la fiche": "Descargar la ficha",
     "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "¿Un problema, una idea, una duda sobre Standix? Lo leemos todo y respondemos lo antes posible.",
     "Une consigne écrite, une fiche, un mode d'emploi": "Una instrucción escrita, una ficha, un manual",
@@ -3114,6 +3131,7 @@ const DICO = {
     "Tous les membres de l'équipe": "Todos os membros da equipa",
     "Trier : A → Z": "Ordenar: A → Z",
     "Trier : les plus actifs": "Ordenar: os mais ativos",
+    "Télécharger le QR code": "Descarregar o código QR",
     "Télécharger la fiche": "Descarregar a ficha",
     "Un souci, une idée, une question sur Standix ? Nous lisons tout et nous répondons au plus vite.": "Um problema, uma ideia, uma dúvida sobre o Standix? Lemos tudo e respondemos o mais depressa possível.",
     "Une consigne écrite, une fiche, un mode d'emploi": "Uma instrução escrita, uma ficha, um manual",
@@ -4350,6 +4368,11 @@ function sortirApercuEquipe() {
 
   document.body.classList.remove('en-apercu')
   stopScanner?.()
+  /* ⚠ LA LECTURE S'ARRÊTE AUSSI ICI. Quitter l'aperçu depuis une fiche ne
+     passe pas par `showEquipeScreen` : la fiche restait « ouverte » derrière
+     l'espace Gestion, le compteur tournait, et deux minutes plus tard la
+     fenêtre « Vous en êtes où ? » surgissait au milieu d'une analyse vidéo. */
+  quitterLecture()
 
   const app = document.getElementById('gestion-app')
   const eq = document.getElementById('equipe-app')
@@ -15425,7 +15448,10 @@ const PALETTE_DOSSIERS = [
   { i:1, trait:['#0C4A9E','#6BB6FF'] },   /* bleu   */
   { i:2, trait:['#7C2D12','#FBBF5C'] },   /* ambre  */
   { i:3, trait:['#14532D','#5FDDA0'] },   /* vert   */
-  { i:4, trait:['#3A4453','#A5B0C0'] },   /* gris   */
+  /* Le 5e était un gris. Remplacé par le rouge rosé de « Enregistrer
+     l'écran » (dégradé `pal5`), demande d'Em : le gris se confondait avec
+     les procédures, toujours grises, et paraissait éteint à côté des autres. */
+  { i:4, trait:['#9F1239','#FDA4AF'] },   /* rouge rosé */
 ]
 
 /* ═══ LA TEINTE D'UN POINT, TIREE DE LA MEME PALETTE ═══
@@ -21783,6 +21809,12 @@ await new Promise(r => setTimeout(r, 900))
 let aiVideoFile = null
 let aiVideoDuree = 0        // durée de la vidéo, pour estimer le temps d'analyse
 let aiDebutAnalyse = 0      // heure de démarrage de l'analyse
+/* Ce qu'on sait du chemin parcouru, pour dire VRAI en cas de blocage :
+   la vidéo est-elle arrivée sur le serveur ? Azure a-t-il été sollicité ?
+   Sans ça, tout blocage était mis sur le dos d'Azure — même quand la vidéo
+   n'avait jamais quitté le téléphone. */
+let aiVideoArrivee = false
+let aiCheminAzure = false
 /* L'attente totale attendue, en secondes, posée au démarrage. Elle sert à dire
    ce qu'il RESTE plutôt que ce qui s'est écoulé. `null` quand on ne sait pas —
    la durée de la vidéo n'est pas toujours lisible — et on retombe alors sur
@@ -22047,7 +22079,7 @@ async function reprendreAnalyseIA() {
   if (!currentMembre?.entreprise_id) return
 
   const { data, error } = await supabase.from('procedures')
-    .select('id, statut').eq('id', reste.id).maybeSingle()
+    .select('id, statut, video_url, azure_video_id').eq('id', reste.id).maybeSingle()
 
   if (error) return                      // reseau : on retentera au prochain retour
   if (!data) { oublierAnalyseIA(); return }
@@ -22060,6 +22092,21 @@ async function reprendreAnalyseIA() {
      minutes ne franchissait jamais le plafond, et l'anneau tournait sans fin.
      C'est ce qui donnait « 21 minutes » a l'ecran. */
   basculerVersAttente(reste.debut)
+  aiVideoArrivee = !!data.video_url
+  aiCheminAzure = !!data.azure_video_id && data.azure_video_id !== 'rapide'
+
+  /* ⚠ UNE VIDÉO QUI N'EST PAS ARRIVÉE NE VIENDRA PLUS.
+
+     La préparation (allègement, son, images, envoi) se fait DANS cette page,
+     avec le fichier en mémoire. Si la page a été rechargée ou fermée avant
+     l'envoi, ce fichier est perdu : rien ne reprendra. On faisait pourtant
+     tourner l'anneau jusqu'au plafond de douze minutes, puis on accusait
+     Azure, qui n'avait rien reçu. On le dit tout de suite, au retour. */
+  if (!aiVideoArrivee) {
+    arreterAnalyseBloquee(Math.max(0, (Date.now() - (reste.debut || Date.now())) / 1000),
+      tLang('Préparation interrompue sur l’appareil'))
+    return
+  }
 
   /* ⚠ ET SI LE PLAFOND EST DEJA FRANCHI, ON N'INTERROGE MEME PAS. Reprendre
      un sondage pour l'abandonner au premier tour ferait clignoter l'ecran
@@ -23904,6 +23951,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
        plutot que de sonder pour toujours une procedure qui ne finira jamais. */
     memoriserAnalyseIA(nouvelle.id)
     aiLancementEnCours = true
+    aiVideoArrivee = false
+    aiCheminAzure = false
     garderEcranAllume(true)
     console.log('[procédure créée]', aiProcedureId)
     /* La liste se recharge sans qu'on l'attende : la procédure doit apparaître
@@ -24320,6 +24369,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
       .update({ video_url: videoUrl })
       .eq('id', aiProcedureId)
     if (procError) throw new Error(procError.message)
+    aiVideoArrivee = true
 
     signalerEtapeIA(tLang('L\u2019IA \u00e9coute et regarde\u2026'))
 
@@ -24334,6 +24384,7 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
 
     if (!rapideFait) {
     journalIA('repli sur Azure Video Indexer')
+    aiCheminAzure = true
     // 3. Démarrage de l'analyse Azure
     /* ═══ UN DÉLAI MAXIMAL SUR LE DÉMARRAGE ═══
 
@@ -24582,16 +24633,28 @@ function arreterAnalyseBloquee(ecoule, detail) {
   const depot = document.getElementById('ai-upload-card')
   if (depot) depot.style.display = 'block'
 
+  /* ⚠ LE MESSAGE DIT OÙ ÇA A BLOQUÉ. Il accusait toujours Azure — y compris
+     quand la vidéo n'avait jamais quitté l'appareil : Azure n'avait alors
+     rien reçu, et le message envoyait chercher la panne au mauvais endroit. */
+  const minutes = Math.round(ecoule / 60)
+  const message = !aiVideoArrivee
+    ? tLang('La vidéo n’a pas été envoyée jusqu’au bout : Standix a été fermée ou mise en veille pendant sa préparation. Choisissez à nouveau la vidéo et gardez l’application ouverte jusqu’à l’écran d’attente.')
+    : aiCheminAzure
+      ? tLang('L\'analyse dure depuis {v} minutes sans aboutir. Elle est probablement bloquée chez Azure.', { v: minutes })
+      : tLang('L’analyse dure depuis {v} minutes sans aboutir. Relancez-la.', { v: minutes })
+  const raison = !aiVideoArrivee
+    ? 'Vidéo jamais arrivée sur le serveur (préparation interrompue sur l’appareil)'
+    : `Analyse bloquée après ${minutes} min` + (aiCheminAzure ? ' (Azure)' : '')
   const zone = document.getElementById('ai-error')
   if (zone) {
     zone.style.color = 'var(--red)'
-    zone.textContent = tLang('L\'analyse dure depuis {v} minutes sans aboutir. Elle est probablement bloquée chez Azure.', { v: Math.round(ecoule / 60) })
+    zone.textContent = message
   }
   afficherDetailEchec(aiProcedureId, detail || tLang('Arrêt après {v} s', { v: Math.round(ecoule) }))
 
   if (aiProcedureId) {
     supabase.from('procedures')
-      .update({ statut: 'echec', erreur_ia: `Analyse bloquée après ${Math.round(ecoule / 60)} min` })
+      .update({ statut: 'echec', erreur_ia: raison })
       .eq('id', aiProcedureId)
       .then(() => loadGestionProcedures().catch(() => {}), () => {})
 
@@ -28008,27 +28071,73 @@ async function openAnalyse(procId) {
   qrContainer.innerHTML = ''
   qrContainer.appendChild(canvas)
 
-  document.getElementById('qr-download-btn').onclick = async () => {
-    const filename = `${proc.titre.replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-|-$/g, '')}-qr.png`
-    // On n'exporte pas le QR nu mais la fiche entière : titre, consigne et
-    // logo. Un carré noir et blanc collé sur un mur sans rien autour ne dit
-    // à personne ce qu'il ouvre.
-    const dataUrl = composerFicheQR(canvas, proc.titre)
-    // Sur mobile (surtout iPhone), le téléchargement direct ne marche pas toujours :
-    // on propose d'abord le partage natif (qui permet "Enregistrer l'image"), sinon on retombe sur le téléchargement classique.
-    try {
-      const blob = await (await fetch(dataUrl)).blob()
-      const file = new File([blob], filename, { type: 'image/png' })
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: proc.titre })
-        return
-      }
-    } catch (e) { /* on retombe sur le téléchargement classique ci-dessous */ }
+  document.getElementById('qr-download-btn').onclick = async (ev) => {
+    /* ═══ LE QR CODE PART EN PDF ═══
+       Demande d'Em. Cette fiche est faite pour être imprimée et collée au mur.
+       Une image s'imprimait à une taille au hasard, selon l'imprimante et le
+       logiciel ; le PDF sort sur une page A4, la fiche centrée, à la bonne
+       taille, nette — on l'ouvre et on imprime.
 
-    const link = document.createElement('a')
-    link.download = filename
-    link.href = dataUrl
-    link.click()
+       On n'exporte toujours pas le QR nu mais la fiche entière : titre,
+       consigne et logo. Un carré noir et blanc collé sur un mur sans rien
+       autour ne dit à personne ce qu'il ouvre.
+
+       Un filet gris très léger entoure la fiche : c'est le trait de coupe. */
+    const bouton = ev?.currentTarget
+    const avant = bouton?.textContent
+    if (bouton) { bouton.disabled = true; bouton.textContent = tLang('Préparation du PDF…') }
+    try {
+      /* Les accents sont retirés du nom : certains systèmes les refusent dans
+         un téléchargement et rebaptisent alors le fichier « download ». */
+      const nomFichier = `${proc.titre.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'standix'}-qr-code.pdf`
+      const fiche = composerFicheQR(canvas, proc.titre, 3)
+      const dims = await new Promise((ok, non) => {
+        const i = new Image()
+        i.onload = () => ok({ l: i.naturalWidth, h: i.naturalHeight })
+        i.onerror = non
+        i.src = fiche
+      })
+      const jsPDF = await chargerJsPDF()
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' })
+      /* 140 mm de large : un QR d'environ 9 cm, lisible à plus d'un mètre.
+         Si un titre de trois lignes rendait la fiche trop haute pour la page,
+         on la réduit pour qu'elle tienne. */
+      let l = 140, h = l * dims.h / dims.l
+      if (h > 250) { h = 250; l = h * dims.l / dims.h }
+      const x = (210 - l) / 2, y = Math.max(20, (297 - h) / 2 - 8)
+      doc.addImage(fiche, 'PNG', x, y, l, h)
+      doc.setDrawColor(215, 215, 220)
+      doc.setLineWidth(0.2)
+      doc.roundedRect(x, y, l, h, 6, 6, 'S')
+      const blob = doc.output('blob')
+
+      /* Sur iPhone, le téléchargement direct ne marche pas toujours : on
+         propose d'abord le partage du système (« Enregistrer dans Fichiers »,
+         « Imprimer »), sinon on télécharge. */
+      try {
+        const file = new File([blob], nomFichier, { type: 'application/pdf' })
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: proc.titre })
+          return
+        }
+      } catch (e) {
+        if (e?.name === 'AbortError') return           // partage annulé : rien à faire
+      }
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.download = nomFichier
+      link.href = url
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 4000)
+    } catch (e) {
+      console.warn('[qr pdf]', e?.message || e)
+      toast(tLang('Le PDF n’a pas pu être créé'))
+    } finally {
+      if (bouton) { bouton.disabled = false; bouton.textContent = avant }
+    }
   }
 }
 
@@ -28039,7 +28148,7 @@ async function openAnalyse(procId) {
 /* Dessine la fiche à imprimer : plaque blanche, QR, titre de la procédure,
    consigne de scan et signature Standix avec son logo. Rendue en haute définition pour
    rester nette une fois imprimée. */
-function composerFicheQR(qrCanvas, titre) {
+function composerFicheQR(qrCanvas, titre, k = 1) {
   const L = 760, cote = 470
   const marge = 62
   const c = document.createElement('canvas')
@@ -28051,9 +28160,12 @@ function composerFicheQR(qrCanvas, titre) {
   const hauteurTitre = lignes.length * 44
   const H = marge + cote + 40 + hauteurTitre + 30 + 34 + 44 + marge
 
-  c.width = L
-  c.height = H
+  /* `k` agrandit le dessin sans rien changer à la mise en page : le PDF
+     demande la fiche trois fois plus fine, pour une impression nette. */
+  c.width = L * k
+  c.height = H * k
   const g = c.getContext('2d')
+  g.scale(k, k)
 
   // Plaque
   g.fillStyle = '#FFFFFF'
@@ -34909,6 +35021,12 @@ function demarrerLecture(procId, dejaConsultee) {
 
   lectureTimer = setInterval(() => {
     if (document.hidden) return          // app en arrière-plan : on ne compte pas
+    /* ⚠ LA FICHE DOIT ÊTRE À L'ÉCRAN. Demande d'Em : la question « Vous en
+       êtes où ? » ne doit venir QUE sur le détail d'une procédure resté
+       immobile. Si la fiche n'est plus visible (autre page, retour dans
+       l'espace Gestion), on ne compte rien et on ne demande rien ; et le
+       délai repart de zéro au retour sur la fiche. */
+    if (!ficheLectureVisible()) { derniereActivite = Date.now(); return }
 
     /* L'écran n'a pas bougé depuis deux minutes : on demande une confirmation avant
        de continuer à compter. Sans ça, un téléphone posé sur le plan de travail
@@ -34955,6 +35073,7 @@ function demarrerLecture(procId, dejaConsultee) {
 })
 
 async function demanderSiPresent() {
+  if (!ficheLectureVisible()) { veilleAvertie = false; return }
   const ok = await confirmDialog({
     titre: tLang('Vous en êtes où ?'),
     message: tLang('Cette procédure est ouverte depuis un moment sans que rien ne bouge. Reprenez où vous en étiez, ou revenez-y plus tard.'),
@@ -34970,9 +35089,19 @@ async function demanderSiPresent() {
      n'est perdu, et le temps resté à l'écran ensuite ne sera pas compté. */
   if (!ok) {
     quitterLecture()
-    if (currentMembre?.role === 'gestion') showGestionScreen('p-list')
+    /* Un gérant qui lit par l'œil est dans l'espace utilisateur : on le
+       ramène à la liste de CET espace, pas à celle de la Gestion. */
+    if (currentMembre?.role === 'gestion' && !apercuEquipe) showGestionScreen('p-list')
     else showEquipeScreen('e-list')
   }
+}
+
+function ficheLectureVisible() {
+  const fiche = document.getElementById('e-detail')
+  if (!fiche || !fiche.classList.contains('active')) return false
+  const espace = document.getElementById('equipe-app')
+  if (!espace || espace.style.display === 'none' || espace.hasAttribute('inert')) return false
+  return fiche.getClientRects().length > 0
 }
 
 function arreterLecture() {
@@ -37515,3 +37644,184 @@ openAnalyse = retenirPendant(openAnalyse)
 openEquipeDetail = retenirPendant(openEquipeDetail)
 window.ouvrirQuota = retenirPendant(window.ouvrirQuota)
 window.ouvrirAppareils = retenirPendant(window.ouvrirAppareils)
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LE TIROIR DES DOSSIERS EXISTANTS
+
+   Demande d'Em : en créant une procédure, on retapait à la main le nom d'un
+   dossier qui existe déjà — au risque d'en créer un second, « Cuisine » à
+   côté de « cuisine ». Dès qu'on touche le champ « Dossier », un tiroir
+   s'ouvre dessous (même mouvement que « Combien de temps ça prend ? ») avec
+   les dossiers de l'entreprise, les plus remplis d'abord. On touche, c'est
+   rempli.
+
+   ⚠ CE QUI LE REND « INTELLIGENT »
+     • Il se filtre au fil de la frappe, sans tenir compte des accents ni des
+       majuscules : « cui » trouve « Cuisine ». Les noms qui COMMENCENT par
+       ce qu'on tape passent devant ceux qui le contiennent.
+     • Le dossier choisi, le curseur passe au sous-dossier — et son tiroir
+       propose les sous-dossiers DE CE DOSSIER-LÀ, pas tous.
+     • Un nom qui n'existe pas encore est dit clairement : « sera un nouveau
+       dossier ». On sait qu'on en crée un, on n'en crée pas un par erreur.
+     • Rien à proposer (première procédure, dossier tout neuf) : pas de tiroir.
+
+   ⚠ LES PASTILLES NE VOLENT PAS LE CLAVIER. `pointerdown` est annulé : sans
+     cela, toucher une pastille ferait perdre le focus au champ, le tiroir se
+     fermerait avant le clic, et sur iPhone le clavier sauterait.
+
+   Branché sur les quatre écrans qui portent ces deux champs : création,
+   étapes manuelles, montage vidéo, modification. */
+const TIROIR_DOSSIERS_ECRANS = ['new', 'man', 'dv', 'edit']
+
+function cleDossier(s) {
+  return sansAccents(String(s || '')).toLowerCase().replace(/\s+/g, ' ').trim()
+}
+
+/* Les dossiers de l'entreprise, avec leur nombre de procédures. */
+function dossiersExistants() {
+  const parNom = new Map()
+  for (const p of (allGestionProcedures || [])) {
+    const nom = String(p?.categorie || '').trim()
+    if (!nom) continue
+    const k = cleDossier(nom)
+    const e = parNom.get(k) || { nom, n: 0 }
+    e.n++
+    parNom.set(k, e)
+  }
+  return [...parNom.values()]
+}
+
+/* Les sous-dossiers d'UN dossier. */
+function sousDossiersExistants(dossier) {
+  const kd = cleDossier(dossier)
+  if (!kd) return []
+  const parNom = new Map()
+  for (const p of (allGestionProcedures || [])) {
+    if (cleDossier(p?.categorie) !== kd) continue
+    const nom = String(p?.sous_categorie || '').trim()
+    if (!nom) continue
+    const k = cleDossier(nom)
+    const e = parNom.get(k) || { nom, n: 0 }
+    e.n++
+    parNom.set(k, e)
+  }
+  return [...parNom.values()]
+}
+
+/* Trie et filtre : d'abord ce qui commence par la saisie, puis ce qui la
+   contient ; à égalité, le plus rempli, puis l'ordre alphabétique. */
+function filtrerDossiers(liste, saisie) {
+  const q = cleDossier(saisie)
+  const rang = (e) => {
+    const k = cleDossier(e.nom)
+    if (!q) return 0
+    if (k.startsWith(q)) return 0
+    if (k.split(' ').some(m => m.startsWith(q))) return 1
+    if (k.includes(q)) return 2
+    return -1
+  }
+  return liste
+    .map(e => ({ ...e, r: rang(e) }))
+    .filter(e => e.r >= 0)
+    .sort((a, b) => a.r - b.r || b.n - a.n || a.nom.localeCompare(b.nom))
+    .slice(0, 12)
+}
+
+/* Met en gras la partie tapée, pour qu'on voie POURQUOI ce nom est proposé. */
+function surlignerSaisie(nom, saisie) {
+  const q = cleDossier(saisie)
+  if (!q) return escapeHtml(nom)
+  const i = cleDossier(nom).indexOf(q)
+  if (i < 0) return escapeHtml(nom)
+  return escapeHtml(nom.slice(0, i)) + '<b>' + escapeHtml(nom.slice(i, i + q.length)) +
+         '</b>' + escapeHtml(nom.slice(i + q.length))
+}
+
+function brancherTiroirDossiers(prefixe) {
+  const champCat = document.getElementById(prefixe + '-categorie')
+  const champSous = document.getElementById(prefixe + '-sous-categorie')
+  if (!champCat || champCat.dataset.tiroir) return
+
+  const fabriquer = (champ, sorte) => {
+    champ.dataset.tiroir = '1'
+    const t = document.createElement('div')
+    t.className = 'td-tiroir'
+    t.setAttribute('inert', '')
+    t.innerHTML = '<div class="td-dedans"><div class="td-co"></div></div>'
+    champ.insertAdjacentElement('afterend', t)
+    const co = t.querySelector('.td-co')
+
+    const fermer = () => { t.classList.remove('ouvert'); t.setAttribute('inert', '') }
+    const ouvrir = () => { t.classList.add('ouvert'); t.removeAttribute('inert') }
+
+    const peindre = () => {
+      const saisie = champ.value
+      const tous = sorte === 'cat' ? dossiersExistants() : sousDossiersExistants(champCat.value)
+      if (!tous.length) { fermer(); return }
+      const exact = tous.some(e => cleDossier(e.nom) === cleDossier(saisie))
+      const liste = filtrerDossiers(tous, saisie)
+      /* Le nom tapé est déjà exactement un dossier, et c'est le seul qui
+         correspond : le choix est fait, le tiroir n'a plus rien à dire. */
+      if (exact && liste.length <= 1) { fermer(); return }
+      /* « Nouveau dossier » seulement quand RIEN ne correspond : tant qu'une
+         pastille ressemble à la saisie, c'est sans doute elle qu'on cherche. */
+      const nouveau = !exact && !liste.length && cleDossier(saisie).length >= 2
+      if (!liste.length && !nouveau) { fermer(); return }
+
+      const tete = sorte === 'cat'
+        ? tLang('Vos dossiers')
+        : tLang('Sous-dossiers de {nom}', { nom: champCat.value.trim() })
+      const teinte = (nom) => {
+        if (sorte !== 'cat') return ''
+        const c = teinteDossierParent('g:' + nom)?.trait
+        return c ? ` style="background:linear-gradient(135deg, ${c[1]}, ${c[0]})"` : ''
+      }
+      co.innerHTML =
+        (liste.length ? `<div class="td-tete">${escapeHtml(tete)}</div>` : '') +
+        (liste.length ? '<div class="td-liste">' + liste.map((e, i) =>
+          `<button type="button" class="td-puce" style="--i:${i}" data-nom="${escapeHtml(e.nom)}">` +
+            (sorte === 'cat' ? `<span class="td-point"${teinte(e.nom)}></span>` : '') +
+            `<span class="td-nom">${surlignerSaisie(e.nom, saisie)}</span>` +
+            `<span class="td-nb">${e.n}</span>` +
+          '</button>').join('') + '</div>' : '') +
+        (nouveau ? `<div class="td-nouveau">${escapeHtml(sorte === 'cat'
+            ? tLang('« {nom} » sera un nouveau dossier.', { nom: saisie.trim() })
+            : tLang('« {nom} » sera un nouveau sous-dossier.', { nom: saisie.trim() }))}</div>` : '')
+      ouvrir()
+    }
+
+    champ.addEventListener('focus', peindre)
+    champ.addEventListener('input', (e) => { if (e.isTrusted !== false) peindre() })
+    champ.addEventListener('blur', () => setTimeout(() => {
+      if (document.activeElement !== champ) fermer()
+    }, 140))
+    champ.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermer() })
+
+    t.addEventListener('pointerdown', (e) => { if (e.target.closest('.td-puce')) e.preventDefault() })
+    t.addEventListener('click', (e) => {
+      const puce = e.target.closest('.td-puce')
+      if (!puce) return
+      champ.value = puce.dataset.nom
+      /* Les autres écouteurs du champ (bouton « Continuer », brouillon)
+         doivent voir la nouvelle valeur. */
+      champ.dispatchEvent(new Event('input', { bubbles: true }))
+      fermer()
+      const suivant = sorte === 'cat'
+        ? champSous
+        : document.getElementById(prefixe + '-titre')
+      if (suivant) {
+        suivant.focus()
+        if (sorte === 'cat' && champSous) champSous.dispatchEvent(new Event('focus'))
+      }
+    })
+    return { peindre, fermer }
+  }
+
+  const tCat = fabriquer(champCat, 'cat')
+  const tSous = champSous ? fabriquer(champSous, 'sous') : null
+  /* Changer de dossier change les sous-dossiers proposés. */
+  champCat.addEventListener('input', () => { if (document.activeElement === champSous) tSous?.peindre() })
+}
+
+TIROIR_DOSSIERS_ECRANS.forEach(brancherTiroirDossiers)

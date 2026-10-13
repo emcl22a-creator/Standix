@@ -14860,11 +14860,11 @@ const CATALOGUE_ICONES = [
     d: 'M4.4 7.4h11.2v6a4.4 4.4 0 0 1-4.4 4.4H8.8a4.4 4.4 0 0 1-4.4-4.4Z M15.6 9.4h1.8a2.4 2.4 0 0 1 0 4.8h-1.8 M4.4 21h12' },
 
   /* — Hygiène, nettoyage — */
-  { cles: ['nettoyage', 'menage', 'hygiene', 'proprete', 'desinfection', 'plonge', 'lavage'],
+  { cles: ['nettoyage', 'menage', 'hygiene', 'proprete', 'desinfection', 'lavage'],
     d: 'M10.6 3.4h3.6v4.2h-3.6Z M8.4 7.6h8v3.2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2Z M12.4 12.8v3.4 M9.6 20.6h5.6a1.4 1.4 0 0 0 1.4-1.4 3 3 0 0 0-3-3h-2.4a3 3 0 0 0-3 3 1.4 1.4 0 0 0 1.4 1.4Z' },
 
   /* — Chaîne du froid — */
-  { cles: ['froid', 'temperature', 'frigo', 'chambre froide', 'congelation'],
+  { cles: ['froid', 'frigo', 'chambre froide', 'congelation'],
     d: 'M12 3v18 M5.5 6.8 18.5 17.2 M18.5 6.8 5.5 17.2 M12 6.6 9.6 4.8 M12 6.6l2.4-1.8 M12 17.4l-2.4 1.8 M12 17.4l2.4 1.8' },
 
   /* — Informatique — */
@@ -14876,7 +14876,7 @@ const CATALOGUE_ICONES = [
     d: 'M3.4 7.4a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v9.2a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M3.4 10.2h17.2 M7 14.6h3.4' },
 
   /* — Achats — */
-  { cles: ['achat', 'approvisionnement', 'commande', 'fournisseur', 'vente'],
+  { cles: ['achat', 'approvisionnement', 'commande', 'fournisseur'],
     d: 'M3.4 4.4h2.4l2.2 10.4a1.8 1.8 0 0 0 1.8 1.4h7.4a1.8 1.8 0 0 0 1.8-1.4l1.4-6.6H6.6 M9.6 20a1 1 0 1 0 0-.1 M17 20a1 1 0 1 0 0-.1' },
 
   /* — Livraison — */
@@ -14884,11 +14884,11 @@ const CATALOGUE_ICONES = [
     d: 'M2.6 6.6a1.6 1.6 0 0 1 1.6-1.6h8.6v10.4H2.6Z M12.8 9h3.6l3 3.4v3H12.8Z M6.4 18.4a1.6 1.6 0 1 0 0-.1 M16.6 18.4a1.6 1.6 0 1 0 0-.1' },
 
   /* — Stock — */
-  { cles: ['stock', 'inventaire', 'reserve', 'magasin', 'entrepot'],
+  { cles: ['stock', 'inventaire', 'reserve'],
     d: 'M3.4 7.6 12 3.4l8.6 4.2v8.8L12 20.6l-8.6-4.2Z M3.4 7.6 12 11.8l8.6-4.2 M12 11.8v8.8' },
 
   /* — Ressources humaines — */
-  { cles: ['ressources humaines', 'rh', 'equipe', 'personnel', 'recrutement', 'collaborateur', 'onboarding'],
+  { cles: ['ressources humaines', 'rh', 'equipe', 'personnel', 'collaborateur', 'onboarding'],
     d: 'M8.6 11.4a3.4 3.4 0 1 0 0-.1 M2.8 20a5.8 5.8 0 0 1 11.6 0 M16.6 4.6a3.4 3.4 0 0 1 0 6.6 M17.2 14.6a5.8 5.8 0 0 1 4 5.4' },
 
   /* — Formation — */
@@ -14904,7 +14904,7 @@ const CATALOGUE_ICONES = [
     d: 'M13.4 2.6 4.6 13.4h6.2l-1.2 8 8.8-10.8h-6.2Z' },
 
   /* — Plomberie — */
-  { cles: ['plomberie', 'eau', 'fuite', 'canalisation', 'sanitaire'],
+  { cles: ['plomberie', 'fuite', 'canalisation', 'sanitaire'],
     d: 'M12 3.4s6 6.4 6 10.4a6 6 0 0 1-12 0c0-4 6-10.4 6-10.4Z M9.4 14.2a2.6 2.6 0 0 0 2.6 2.6' },
 
   /* — Chantier — */
@@ -14912,7 +14912,7 @@ const CATALOGUE_ICONES = [
     d: 'M3.6 15.6a8.4 8.4 0 0 1 16.8 0 M10.4 15.4V5.6a1.6 1.6 0 0 1 3.2 0v9.8 M2.6 18.6h18.8' },
 
   /* — Communication — */
-  { cles: ['communication', 'marketing', 'annonce', 'affichage', 'reseaux sociaux'],
+  { cles: ['communication', 'marketing', 'annonce', 'affichage'],
     d: 'M3.4 9.6h3.8l7.2-4.6v14l-7.2-4.6H3.4Z M18.4 9a4 4 0 0 1 0 6' },
 
   /* — Planning — */
@@ -14936,7 +14936,7 @@ const CATALOGUE_ICONES = [
     d: 'M8.2 3.6 10 7.4l-2 1.6a11.4 11.4 0 0 0 5.6 5.6l1.6-2 3.8 1.8v3.2a1.6 1.6 0 0 1-1.8 1.6C10.6 18.6 5.4 13.4 4.6 5.4a1.6 1.6 0 0 1 1.6-1.8Z' },
 
   /* — Clés, ouverture, fermeture — */
-  { cles: ['ouverture', 'fermeture', 'cle', 'verrouillage', 'acces', 'serrure'],
+  { cles: ['ouverture', 'fermeture', 'verrouillage', 'acces'],
     d: 'M15.4 3.6a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z M11.6 12 4 19.6v2.2h3v-2.2h2.2v-2.2h2.2' },
 
   /* — Alarme — */
@@ -15024,7 +15024,7 @@ const CATALOGUE_ICONES = [
      ═══════════════════════════════════════════════════════════════════════ */
 
   /* — Sante, soin — */
-  { cles: ['soin', 'pharmacie', 'medicament', 'ordonnance'],
+  { cles: ['soin', 'pharmacie', 'ordonnance'],
     d: 'M12 4.6v14.8 M4.6 12h14.8' },
   { cles: ['laboratoire', 'analyse medicale', 'prelevement', 'echantillon'],
     d: 'M9.4 3.2v6.1L4.9 17a2.2 2.2 0 0 0 1.9 3.3h10.4a2.2 2.2 0 0 0 1.9-3.3l-4.5-7.7V3.2 M8.2 3.2h7.6 M7.4 14.2h9.2' },
@@ -15038,7 +15038,7 @@ const CATALOGUE_ICONES = [
   /* — Commerce, caisse — */
   { cles: ['paiement', 'terminal', 'ticket'],
     d: 'M3.4 8.4h17.2v10a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8Z M6.6 8.4V5.6a1.8 1.8 0 0 1 1.8-1.8h7.2a1.8 1.8 0 0 1 1.8 1.8v2.8 M8.6 13h6.8' },
-  { cles: ['vitrine', 'rayon', 'merchandising', 'boutique'],
+  { cles: ['vitrine', 'rayon', 'merchandising'],
     d: 'M3.6 9.4h16.8v9.2a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8Z M3.6 9.4 5.4 4.2h13.2l1.8 5.2 M9 9.4v11 M15 9.4v11' },
 
   /* — Bureau, juridique — */
@@ -15054,7 +15054,7 @@ const CATALOGUE_ICONES = [
     d: 'M4.2 4.4h13.4v5.2H4.2Z M17.6 7h2.2v4.4a1.6 1.6 0 0 1-1.6 1.6H12v2.4 M10.4 15.4h3.2v5.2h-3.2Z' },
   { cles: ['menuiserie', 'bois', 'scie', 'decoupe'],
     d: 'M3.4 15.6 15.2 3.8l4.4 4.4L7.8 20H3.4Z M12.2 6.8l4.4 4.4' },
-  { cles: ['soudure', 'metal', 'serrurerie'],
+  { cles: ['soudure', 'metal'],
     d: 'M4.4 19.6 13 11l-1.6-1.6a3.4 3.4 0 0 1 4.8-4.8l4 4a3.4 3.4 0 0 1-4.8 4.8L13.8 11.8' },
 
   /* — Agriculture, espaces verts — */
@@ -15064,13 +15064,13 @@ const CATALOGUE_ICONES = [
     d: 'M3.6 20.4V11L12 4.4l8.4 6.6v9.4 M9.4 20.4v-5.6h5.2v5.6' },
 
   /* — Hotellerie — */
-  { cles: ['chambre', 'hotel', 'lit', 'hebergement', 'menage chambre'],
+  { cles: ['chambre', 'lit', 'hebergement', 'menage chambre'],
     d: 'M3.4 18.6v-4.2a2.2 2.2 0 0 1 2.2-2.2h12.8a2.2 2.2 0 0 1 2.2 2.2v4.2 M3.4 18.6v2 M20.6 18.6v2 M6.4 12.2V8.6a1.8 1.8 0 0 1 1.8-1.8h7.6a1.8 1.8 0 0 1 1.8 1.8v3.6' },
-  { cles: ['piscine', 'spa', 'bien etre', 'sauna'],
+  { cles: ['piscine'],
     d: 'M3 17.4c1.8 0 1.8 1.6 3.6 1.6s1.8-1.6 3.6-1.6 1.8 1.6 3.6 1.6 1.8-1.6 3.6-1.6 1.8 1.6 3.6 1.6 M7.4 14.6V6.2a2 2 0 0 1 4 0 M14 14.6V6.2a2 2 0 0 1 4 0' },
 
   /* — Transport, logistique — */
-  { cles: ['quai', 'palette', 'chariot elevateur'],
+  { cles: ['quai', 'palette'],
     d: 'M3.6 20.4V9.2L12 4.6l8.4 4.6v11.2 M8.6 20.4v-6.2h6.8v6.2 M8.6 17.2h6.8' },
   { cles: ['itineraire', 'tournee', 'trajet', 'carte'],
     d: 'M12 3.6a5.6 5.6 0 0 0-5.6 5.6c0 4.2 5.6 11.2 5.6 11.2s5.6-7 5.6-11.2A5.6 5.6 0 0 0 12 3.6Z M12 7.2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z' },
@@ -15078,13 +15078,13 @@ const CATALOGUE_ICONES = [
   /* — Numerique — */
   { cles: ['application', 'saisie'],
     d: 'M3.4 5.6h17.2v11.2a1.8 1.8 0 0 1-1.8 1.8H5.2a1.8 1.8 0 0 1-1.8-1.8Z M3.4 9h17.2 M6 7.3h.02 M8.4 7.3h.02' },
-  { cles: ['sauvegarde', 'donnee', 'serveur', 'base de donnees'],
+  { cles: ['sauvegarde', 'donnee', 'base de donnees'],
     d: 'M12 3.6c-4 0-7.2 1.3-7.2 3s3.2 3 7.2 3 7.2-1.3 7.2-3-3.2-3-7.2-3Z M4.8 6.6v10.8c0 1.7 3.2 3 7.2 3s7.2-1.3 7.2-3V6.6 M4.8 12c0 1.7 3.2 3 7.2 3s7.2-1.3 7.2-3' },
   { cles: ['mot de passe', 'identifiant', 'connexion'],
     d: 'M6.4 10.4h11.2a1.8 1.8 0 0 1 1.8 1.8v6.4a1.8 1.8 0 0 1-1.8 1.8H6.4a1.8 1.8 0 0 1-1.8-1.8v-6.4a1.8 1.8 0 0 1 1.8-1.8Z M8.4 10.4V7.6a3.6 3.6 0 0 1 7.2 0v2.8' },
 
   /* — Relation client — */
-  { cles: ['clientele', 'fidelite', 'satisfaction', 'avis'],
+  { cles: ['clientele', 'satisfaction'],
     d: 'M12 4.2l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4-3.9-3.8 5.4-.8Z' },
   { cles: ['reclamation', 'incident client', 'sav', 'retour produit'],
     d: 'M20.4 13.4a7.4 7.4 0 0 1-7.4 7.4H4.2l2.2-2.2a7.4 7.4 0 1 1 14-5.2Z M12 8.6v3.6 M12 15.4h.02' },
@@ -15113,7 +15113,7 @@ const CATALOGUE_ICONES = [
     d: 'M12 4 2.8 8.4 12 12.8l9.2-4.4Z M6.4 10.6v5.2c0 1.6 2.5 2.9 5.6 2.9s5.6-1.3 5.6-2.9v-5.2 M21.2 8.4v5.4' },
 
   /* — Coiffure, esthétique — */
-  { cles: ['coiffure', 'coiffeur', 'salon', 'esthetique', 'beaute', 'ciseaux'],
+  { cles: ['coiffure', 'coiffeur', 'salon', 'beaute', 'ciseaux'],
     d: 'M6 5.6 18 18 M18 5.6 6 18 M5.2 19.4a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z M18.8 19.4a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4Z' },
 
   /* — Sport, salle — */
@@ -15143,7 +15143,7 @@ const CATALOGUE_ICONES = [
      illisibles a 32 px, ou l'on ne distingue plus une lame d'un rectangle. Un
      COUTEAU vu de profil — dos droit, tranchant courbe, manche fin — garde sa
      silhouette a toutes les tailles. */
-  { cles: ['boucherie', 'boucher', 'viande', 'decoupe viande', 'poissonnerie', 'traiteur frais'],
+  { cles: ['boucherie', 'boucher', 'viande', 'decoupe viande', 'traiteur frais'],
     /* ⚠ LA CROIX A ETE RETIREE. J'avais ajoute deux traits censes evoquer des
        couverts croises ; a 32 px ils formaient un X qu'on lisait comme une
        suppression. Le couteau seul suffit. */
@@ -15173,7 +15173,7 @@ const CATALOGUE_ICONES = [
     d: 'M7.4 8.6V3.6h9.2v5 M7.4 18.4H5.6a2 2 0 0 1-2-2v-4.4a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v4.4a2 2 0 0 1-2 2h-1.8 M7.4 14.6h9.2v6H7.4Z' },
 
   /* — Culture, spectacle — */
-  { cles: ['culture', 'spectacle', 'theatre', 'musee', 'exposition', 'scene', 'billetterie'],
+  { cles: ['culture', 'theatre', 'musee', 'exposition', 'scene'],
     d: 'M3.6 8.4a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v1.2a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2v-1.2a2 2 0 0 0 0-4Z M12 6.4v11.2' },
 
   /* — Tourisme, guide — */
@@ -15266,11 +15266,11 @@ const CATALOGUE_ICONES = [
     d: 'M6 3.4h8.4L19 8v12a1.6 1.6 0 0 1-1.6 1.6H6A1.6 1.6 0 0 1 4.4 20V5A1.6 1.6 0 0 1 6 3.4Z M14 3.6V8h4.6 M7.6 12.6h7.4 M7.6 16h5' },
 
   /* — Facturation, devis — */
-  { cles: ['facturation', 'devis', 'reglement', 'echeance', 'relance', 'impaye'],
+  { cles: ['facturation', 'reglement', 'echeance', 'relance', 'impaye'],
     d: 'M6.4 3.4h11.2v17l-2.2-1.6-2.2 1.6-2.2-1.6-2.2 1.6-2.4-1.6Z M9.4 8h5.2 M9.4 11.6h5.2 M9.4 15.2h3' },
 
   /* — Comptabilité — */
-  { cles: ['compta', 'bilan', 'ecriture', 'grand livre', 'tva', 'cloture'],
+  { cles: ['compta', 'grand livre', 'cloture'],
     d: 'M6 3.4h12a1.4 1.4 0 0 1 1.4 1.4v14.4A1.4 1.4 0 0 1 18 20.6H6a1.4 1.4 0 0 1-1.4-1.4V4.8A1.4 1.4 0 0 1 6 3.4Z M8 7.4h8 M8 11.4h2.4 M12.8 11.4h3.2 M8 15.4h2.4 M12.8 15.4h3.2' },
 
   /* — Tableur, chiffres — */
@@ -15278,7 +15278,7 @@ const CATALOGUE_ICONES = [
     d: 'M4.4 5.4a1 1 0 0 1 1-1h13.2a1 1 0 0 1 1 1v13.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1Z M4.4 9.4h15.2 M9.4 9.4v10.2 M4.4 14.4h15.2' },
 
   /* — Archivage, classement — */
-  { cles: ['archive', 'archivage', 'classement', 'classeur', 'dossier suspendu', 'rangement papier'],
+  { cles: ['archivage', 'classeur', 'dossier suspendu', 'rangement papier'],
     d: 'M3.6 7.6h16.8v11.4a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4Z M3 4.6a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3H3Z M9.8 11.6h4.4' },
 
   /* — Rapport, reporting — */
@@ -15298,7 +15298,7 @@ const CATALOGUE_ICONES = [
     d: 'M13.6 3.6h4.8a1.6 1.6 0 0 1 1.6 1.6v13.6a1.6 1.6 0 0 1-1.6 1.6h-4.8 M9.6 8.4 5.4 12.4l4.2 4 M5.6 12.4h9.2' },
 
   /* — Base de données — */
-  { cles: ['base de donnees', 'donnees clients', 'fichier client', 'crm', 'referentiel'],
+  { cles: ['donnees clients', 'fichier client', 'crm', 'referentiel'],
     d: 'M12 3.6c4 0 7.2 1.2 7.2 2.6S16 8.8 12 8.8 4.8 7.6 4.8 6.2 8 3.6 12 3.6Z M4.8 6.2v5.6c0 1.4 3.2 2.6 7.2 2.6s7.2-1.2 7.2-2.6V6.2 M4.8 11.8v5.6c0 1.4 3.2 2.6 7.2 2.6s7.2-1.2 7.2-2.6v-5.6' },
 
   /* — Réunion, décision — */
@@ -15315,7 +15315,7 @@ const CATALOGUE_ICONES = [
      mots un par un. */
 
   /* — Demande, ticket — */
-  { cles: ['demande', 'requete', 'reclamation', 'signalement', 'doleance'],
+  { cles: ['demande', 'requete', 'signalement', 'doleance'],
     d: 'M6.6 3.6h10.8a1.6 1.6 0 0 1 1.6 1.6v13.2l-3.2-2-3.8 2-3.8-2-3.2 2V5.2a1.6 1.6 0 0 1 1.6-1.6Z M12 7.2v4.2 M12 14.2v.2' },
 
   /* — Autorisation, habilitation — */
@@ -15365,6 +15365,217 @@ const CATALOGUE_ICONES = [
   { cles: ['coffre', 'archives securisees', 'donnees sensibles', 'sauvegarde papier'],
     d: 'M4.4 5.6a1.4 1.4 0 0 1 1.4-1.4h12.4a1.4 1.4 0 0 1 1.4 1.4v12.8a1.4 1.4 0 0 1-1.4 1.4H5.8a1.4 1.4 0 0 1-1.4-1.4Z M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Z M12 10.6v1.4 M16.4 19.8v1.4 M7.6 19.8v1.4' },
 
+
+  /* ═══ ÉLARGISSEMENT : 48 DESSINS DE PLUS ═══
+
+     Demande d'Em : la bibliothèque laissait trop de dossiers sur l'icône par
+     défaut. Ajouts sur ce que font réellement les entreprises qui utilisent
+     Standix : bar et restauration, commerce, logistique, santé et beauté,
+     numérique et bâtiment, vie d'équipe, loisirs.
+
+   ⚠ VINGT-CINQ MOTS ONT CHANGÉ DE DESSIN, parce que le nouveau dit mieux la
+     chose : « poissonnerie » quitte la boucherie pour le poisson, « hôtel »
+     quitte le lit pour la sonnette de réception, « température » quitte le
+     flocon pour le thermomètre, « clé » quitte la porte pour le trousseau.
+     Ils ont été RETIRÉS de leur ancienne entrée : le catalogue retient la
+     première correspondance, un mot en double rendrait l'un des deux dessins
+     inatteignable.
+
+   ⚠ MÊME BOÎTE, MÊME TRAIT : 24 × 24, contours seulement, rien de plein. Un
+     dessin plus chargé que ses voisins se lit comme une tache à vingt pixels. */
+
+  /* — Vin — */
+  { cles: ['vins', 'sommelier', 'sommellerie', 'degustation', 'oenologie', 'carte des vins'],
+    d: 'M8 3.6h8l-.4 4.6a3.6 3.6 0 0 1-7.2 0Z M12 11.8v7.6 M8.4 20.4h7.2' },
+
+  /* — Cocktail — */
+  { cles: ['cocktail', 'cocktails', 'mixologie', 'shaker', 'aperitif', 'mocktail'],
+    d: 'M4.6 4.4h14.8L12 12.4Z M12 12.4v7.6 M8.4 20.4h7.2 M15.6 4.4l2.4-1.8' },
+
+  /* — Bière — */
+  { cles: ['biere', 'bieres', 'pression', 'fut', 'futs', 'tireuse', 'brasserie'],
+    d: 'M5.6 7h9.6v11.8a1.6 1.6 0 0 1-1.6 1.6H7.2a1.6 1.6 0 0 1-1.6-1.6Z M15.2 9.6h2a2 2 0 0 1 2 2v2.6a2 2 0 0 1-2 2h-2 M8.8 10.4v6.4 M12 10.4v6.4 M5.6 7a2.6 2.6 0 0 1 2.6-2.8h4.4A2.6 2.6 0 0 1 15.2 7' },
+
+  /* — Pizza — */
+  { cles: ['pizza', 'pizzas', 'pizzeria', 'pizzaiolo', 'four a pizza'],
+    d: 'M4.2 6.4a19 19 0 0 1 15.6 0L12 20.6Z M5.8 9.4a15.4 15.4 0 0 1 12.4 0 M10.6 12.4h.02 M13.6 13.4h.02 M12 16.4h.02' },
+
+  /* — Burger — */
+  { cles: ['burger', 'burgers', 'hamburger', 'snack', 'fast food', 'restauration rapide', 'snacking'],
+    d: 'M4.4 10.6a7.6 6.4 0 0 1 15.2 0Z M3.8 13.4h16.4 M4.4 16.2h15.2v.4a2 2 0 0 1-2 2H6.4a2 2 0 0 1-2-2Z' },
+
+  /* — Glace — */
+  { cles: ['glace', 'glaces', 'glacier', 'sorbet', 'creme glacee', 'dessert', 'desserts'],
+    d: 'M7.4 10.8h9.2L12 21Z M7.4 10.8a4.6 4.6 0 1 1 9.2 0' },
+
+  /* — Poisson — */
+  { cles: ['poissonnerie', 'poisson', 'poissons', 'maree', 'fruits de mer', 'crustace', 'crustaces', 'peche'],
+    d: 'M6.4 12c2.4-3.4 5.2-5 8-5 2.8 0 5 2 6 5-1 3-3.2 5-6 5-2.8 0-5.6-1.6-8-5Z M6.4 12 3.2 8.6v6.8Z M16.2 10.8h.02' },
+
+  /* — Fromage — */
+  { cles: ['fromage', 'fromages', 'fromagerie', 'cremerie', 'affinage', 'cremier'],
+    d: 'M3.6 13.8 14.8 5.4l5.6 4.2v8.8H3.6Z M3.6 13.8h16.8 M8 16.4h.02 M14.6 10.6h.02 M17.2 15.6h.02' },
+
+  /* — Plonge — */
+  { cles: ['plonge', 'lave vaisselle', 'vaisselle', 'plongeur', 'lavage vaisselle'],
+    d: 'M5 3.6h14a1.4 1.4 0 0 1 1.4 1.4v14a1.4 1.4 0 0 1-1.4 1.4H5A1.4 1.4 0 0 1 3.6 19V5A1.4 1.4 0 0 1 5 3.6Z M3.6 7.8h16.8 M7 5.7h.02 M10 5.7h.02 M12 10.6a3.8 3.8 0 1 1 0 7.6 3.8 3.8 0 0 1 0-7.6Z' },
+
+  /* — À emporter — */
+  { cles: ['a emporter', 'vente a emporter', 'click and collect', 'drive', 'take away', 'commande en ligne', 'emporter'],
+    d: 'M6 8h12l-1 12.4H7Z M6 8l1.4-4.4h9.2L18 8 M10 11.6a2 2 0 0 0 4 0' },
+
+  /* — Hôtel — */
+  { cles: ['hotel', 'hotellerie', 'reception hotel', 'conciergerie', 'concierge', 'room service', 'hebergement touristique'],
+    d: 'M3.6 17.4h16.8 M5 17.4a7 7 0 0 1 14 0 M12 10.4V8.4 M10.2 8.4h3.6 M3.6 20h16.8' },
+
+  /* — Épicerie — */
+  { cles: ['epicerie', 'panier', 'courses', 'supermarche', 'superette', 'mise en rayon', 'primeur', 'fruits et legumes'],
+    d: 'M3.4 9.6h17.2l-1.8 9.2a1.6 1.6 0 0 1-1.6 1.4H6.8a1.6 1.6 0 0 1-1.6-1.4Z M8.2 9.6 11 4 M15.8 9.6 13 4 M9 13.2v3.6 M12 13.2v3.6 M15 13.2v3.6' },
+
+  /* — Boutique — */
+  { cles: ['vente', 'magasin', 'boutique', 'commerce', 'retail', 'vendeur', 'vendeuse', 'point de vente'],
+    d: 'M5.4 8h13.2l-1 12.4H6.4Z M9 8V6.6a3 3 0 0 1 6 0V8' },
+
+  /* — Prix — */
+  { cles: ['prix', 'etiquettes', 'tarif', 'tarifs', 'promotion', 'promotions', 'solde', 'soldes', 'demarque'],
+    d: 'M3.6 12.4V4.6a1 1 0 0 1 1-1h7.8l8 8a1.4 1.4 0 0 1 0 2l-6.8 6.8a1.4 1.4 0 0 1-2 0Z M8 8h.02' },
+
+  /* — Code-barres — */
+  { cles: ['code barre', 'code barres', 'codes barres', 'gencod', 'scannette', 'reference article'],
+    d: 'M4 6.6V4.4h2.2 M17.8 4.4H20v2.2 M20 17.4v2.2h-2.2 M6.2 19.6H4v-2.2 M7.4 8v8 M10 8v8 M12.4 8v8 M14.2 8v8 M16.6 8v8' },
+
+  /* — Fidélité — */
+  { cles: ['avis', 'fidelite', 'avis clients', 'note client', 'programme fidelite', 'carte fidelite', 'etoile'],
+    d: 'M12 3.6l2.6 5.4 5.8.8-4.2 4.1 1 5.8L12 17l-5.2 2.7 1-5.8-4.2-4.1 5.8-.8Z' },
+
+  /* — Réseaux sociaux — */
+  { cles: ['reseaux sociaux', 'instagram', 'facebook', 'tiktok', 'linkedin', 'publication', 'community management', 'community manager'],
+    d: 'M4.4 5.6a1.6 1.6 0 0 1 1.6-1.6h12a1.6 1.6 0 0 1 1.6 1.6v9.2a1.6 1.6 0 0 1-1.6 1.6H10l-4 3.6v-3.6H6a1.6 1.6 0 0 1-1.6-1.6Z M12 13.2s-3.2-1.8-3.2-4a1.7 1.7 0 0 1 3.2-.8 1.7 1.7 0 0 1 3.2.8c0 2.2-3.2 4-3.2 4Z' },
+
+  /* — Entrepôt — */
+  { cles: ['entrepot', 'entrepots', 'plateforme logistique', 'preparation de commandes', 'preparateur', 'magasinier'],
+    d: 'M3.6 9 12 4.2 20.4 9v11.2H3.6Z M7.4 20.2v-6.6h9.2v6.6 M7.4 16.8h9.2' },
+
+  /* — Chariot élévateur — */
+  { cles: ['chariot elevateur', 'cariste', 'transpalette', 'gerbeur', 'caces', 'manutention mecanique'],
+    d: 'M4.4 4v13.8h4.4 M9.6 11h6.4l2.8 3.8v3.4H9.6Z M11.4 7.2h3.6V11 M11.8 20.4a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8Z M16.8 20.4a1.4 1.4 0 1 0 0-2.8 1.4 1.4 0 0 0 0 2.8Z' },
+
+  /* — Vélo — */
+  { cles: ['velo', 'velos', 'coursier', 'cycliste', 'trottinette', 'mobilite douce'],
+    d: 'M6 18.4a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8Z M18 18.4a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8Z M6 15l3.6-6.2h5.6L18 15 M9.6 8.8 12.2 15H6 M8.4 6.2h2.8' },
+
+  /* — Voyage — */
+  { cles: ['voyage', 'voyages', 'deplacement', 'deplacements', 'mission', 'valise', 'bagage', 'bagagerie', 'deplacement professionnel'],
+    d: 'M4.4 8.4a1.4 1.4 0 0 1 1.4-1.4h12.4a1.4 1.4 0 0 1 1.4 1.4v10a1.4 1.4 0 0 1-1.4 1.4H5.8a1.4 1.4 0 0 1-1.4-1.4Z M9 7V5.2A1.2 1.2 0 0 1 10.2 4h3.6A1.2 1.2 0 0 1 15 5.2V7 M9 7v12.8 M15 7v12.8' },
+
+  /* — Bateau — */
+  { cles: ['bateau', 'bateaux', 'port', 'nautique', 'marina', 'croisiere', 'ancre', 'navigation'],
+    d: 'M12 7.4a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8Z M12 7.4v13 M8.4 10.4h7.2 M4.6 13.4a7.4 7.4 0 0 0 14.8 0' },
+
+  /* — Parking — */
+  { cles: ['parking', 'stationnement', 'place de parking', 'voiturier', 'garage souterrain'],
+    d: 'M5.4 3.6h13.2a1.8 1.8 0 0 1 1.8 1.8v13.2a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8V5.4a1.8 1.8 0 0 1 1.8-1.8Z M10 16.8V7.2h3.2a2.6 2.6 0 0 1 0 5.2H10' },
+
+  /* — Dentaire — */
+  { cles: ['dentaire', 'dentiste', 'cabinet dentaire', 'orthodontie', 'orthodontiste', 'dent'],
+    d: 'M8 3.8c1.4 0 2.6.8 4 .8s2.6-.8 4-.8a3.8 3.8 0 0 1 3.6 4.6c-.6 3-1.4 5-2 8.2-.4 2-1.4 3.6-2.4 3.6s-1.2-1.4-1.6-3.4c-.2-1.2-.6-2-1.6-2s-1.4.8-1.6 2c-.4 2-.6 3.4-1.6 3.4s-2-1.6-2.4-3.6c-.6-3.2-1.4-5.2-2-8.2A3.8 3.8 0 0 1 8 3.8Z' },
+
+  /* — Optique — */
+  { cles: ['optique', 'opticien', 'lunettes', 'lentilles', 'examen de vue', 'monture'],
+    d: 'M3.4 14a3.4 3.4 0 1 0 6.8 0 3.4 3.4 0 0 0-6.8 0Z M13.8 14a3.4 3.4 0 1 0 6.8 0 3.4 3.4 0 0 0-6.8 0Z M10.2 13.4c1.2-.8 2.4-.8 3.6 0 M3.8 12.6 5.6 7.2 M20.2 12.6 18.4 7.2' },
+
+  /* — Esthétique — */
+  { cles: ['esthetique', 'onglerie', 'manucure', 'pedicure', 'institut', 'institut de beaute', 'maquillage', 'epilation', 'estheticienne'],
+    d: 'M9 10.6h6a1.6 1.6 0 0 1 1.6 1.6v6.6a1.6 1.6 0 0 1-1.6 1.6H9a1.6 1.6 0 0 1-1.6-1.6v-6.6A1.6 1.6 0 0 1 9 10.6Z M10.2 10.6V7.6h3.6v3 M10.8 7.6V3.6h2.4v4' },
+
+  /* — Spa — */
+  { cles: ['bien etre', 'sauna', 'spa', 'massage', 'massages', 'relaxation', 'hammam', 'balneo'],
+    d: 'M12 19.6c-4.4 0-7.6-2.8-8.4-6.6 3 0 5.6 1.2 7 3.2 M12 19.6c4.4 0 7.6-2.8 8.4-6.6-3 0-5.6 1.2-7 3.2 M12 19.6c-2-1.8-3-4-3-6.8s1.2-5.2 3-6.8c1.8 1.6 3 4 3 6.8s-1 5-3 6.8Z' },
+
+  /* — Médicament — */
+  { cles: ['medicament', 'medicaments', 'pilulier', 'distribution des medicaments'],
+    d: 'M10.6 4.6a4 4 0 0 1 5.6 0l3.2 3.2a4 4 0 0 1 0 5.6l-6 6a4 4 0 0 1-5.6 0l-3.2-3.2a4 4 0 0 1 0-5.6Z M7.6 10.6l5.8 5.8' },
+
+  /* — Défibrillateur — */
+  { cles: ['defibrillateur', 'dae', 'reanimation', 'massage cardiaque', 'arret cardiaque', 'gestes qui sauvent'],
+    d: 'M12 20s-7.6-4.4-7.6-10A4.4 4.4 0 0 1 12 7.4 4.4 4.4 0 0 1 19.6 10c0 5.6-7.6 10-7.6 10Z M12.8 9.8l-2.2 3.4h2.8l-2.2 3.4' },
+
+  /* — Température — */
+  { cles: ['temperature', 'temperatures', 'thermometre', 'releve de temperature', 'sonde', 'chaine du froid'],
+    d: 'M10 13.6V5.2a2 2 0 0 1 4 0v8.4a3.8 3.8 0 1 1-4 0Z M12 9v6.4' },
+
+  /* — Eau — */
+  { cles: ['eau', 'lavage des mains', 'hydraulique', 'fuites', 'eau potable', 'legionelle'],
+    d: 'M12 3.6s6 6.4 6 10.6a6 6 0 0 1-12 0C6 10 12 3.6 12 3.6Z M9.4 14.8a2.6 2.6 0 0 0 2.6 2.4' },
+
+  /* — EPI — le gilet à bandes réfléchissantes. Un casque se confondait avec
+     la sonnette de l'hôtel : deux dômes au même format. */
+  { cles: ['epi', 'casque', 'protection individuelle', 'equipement de protection', 'gilet', 'harnais', 'port du casque'],
+    d: 'M8.4 3.6 5 5.6v14.6h5.4v-7.6h3.2v7.6H19V5.6l-3.4-2-1.8 3.4h-3.6Z M5 13h5.4 M13.6 13H19' },
+
+  /* — Wi-Fi — */
+  { cles: ['wifi', 'wi fi', 'internet', 'box internet', 'routeur'],
+    d: 'M3.6 9.4a12 12 0 0 1 16.8 0 M6.4 12.4a8 8 0 0 1 11.2 0 M9.2 15.4a4 4 0 0 1 5.6 0 M12 18.4h.02' },
+
+  /* — Serveur — */
+  { cles: ['serveur', 'serveurs', 'baie', 'salle serveur', 'cloud', 'nas'],
+    d: 'M4.4 4.6h15.2v5.4H4.4Z M4.4 14h15.2v5.4H4.4Z M7.4 7.3h.02 M7.4 16.7h.02 M10.4 7.3h6 M10.4 16.7h6' },
+
+  /* — Smartphone — */
+  { cles: ['smartphone', 'mobile', 'portable', 'tablette', 'pda', 'telephone portable'],
+    d: 'M7.4 3.4h9.2a1.4 1.4 0 0 1 1.4 1.4v14.4a1.4 1.4 0 0 1-1.4 1.4H7.4A1.4 1.4 0 0 1 6 19.2V4.8a1.4 1.4 0 0 1 1.4-1.4Z M11 17.4h2' },
+
+  /* — Batterie — */
+  { cles: ['batterie', 'batteries', 'recharge', 'borne de recharge', 'vehicule electrique', 'chargeur', 'onduleur'],
+    d: 'M4 8.4a1.4 1.4 0 0 1 1.4-1.4h11.8a1.4 1.4 0 0 1 1.4 1.4v7.2a1.4 1.4 0 0 1-1.4 1.4H5.4A1.4 1.4 0 0 1 4 15.6Z M20.2 10.4v3.2 M11.8 9l-2 3h3.2l-2 3' },
+
+  /* — Solaire — */
+  { cles: ['solaire', 'panneau solaire', 'panneaux solaires', 'photovoltaique', 'canicule', 'ete'],
+    d: 'M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z M12 2.8v2 M12 19.2v2 M2.8 12h2 M19.2 12h2 M5.5 5.5l1.4 1.4 M17.1 17.1l1.4 1.4 M5.5 18.5l1.4-1.4 M17.1 6.9l1.4-1.4' },
+
+  /* — Météo — */
+  { cles: ['meteo', 'intemperie', 'intemperies', 'pluie', 'neige', 'hiver', 'saison', 'saisonnier'],
+    d: 'M7.4 17.6a4 4 0 0 1-.4-8 5.4 5.4 0 0 1 10.4 1.4 3.4 3.4 0 0 1-.4 6.6Z M9 20.4l.6-1 M12.6 20.4l.6-1' },
+
+  /* — Clés — */
+  { cles: ['serrurerie', 'serrure', 'cle', 'cles', 'serrures', 'trousseau', 'double des cles', 'remise des cles'],
+    d: 'M8.4 15.6a4.2 4.2 0 1 1 0-8.4 4.2 4.2 0 0 1 0 8.4Z M12.4 11.4h8 M17.4 11.4v3 M20.4 11.4v2.2' },
+
+  /* — Ascenseur — */
+  { cles: ['ascenseur', 'ascenseurs', 'monte charge', 'escalator', 'elevateur'],
+    d: 'M5.4 3.6h13.2a1.8 1.8 0 0 1 1.8 1.8v13.2a1.8 1.8 0 0 1-1.8 1.8H5.4a1.8 1.8 0 0 1-1.8-1.8V5.4a1.8 1.8 0 0 1 1.8-1.8Z M9 16.4V7.6 M6.8 9.8 9 7.6l2.2 2.2 M15 7.6v8.8 M12.8 14.2l2.2 2.2 2.2-2.2' },
+
+  /* — Idée — */
+  { cles: ['idee', 'idees', 'innovation', 'amelioration', 'amelioration continue', 'suggestion', 'suggestions', 'boite a idees', 'creativite'],
+    d: 'M9.4 17.4h5.2 M10 20.4h4 M12 3.6a5.6 5.6 0 0 1 3.4 10.1c-.6.5-1 1.2-1 2v1.7H9.6v-1.7c0-.8-.4-1.5-1-2A5.6 5.6 0 0 1 12 3.6Z' },
+
+  /* — Projet — */
+  { cles: ['projet', 'projets', 'jalon', 'jalons', 'lancement', 'roadmap', 'gestion de projet', 'feuille de route'],
+    d: 'M5.4 20.6V3.8 M5.4 4.4h11.4l-2.4 3.8 2.4 3.8H5.4' },
+
+  /* — Recrutement — */
+  { cles: ['recrutement', 'embauche', 'candidat', 'candidats', 'candidature', 'entretien d embauche', 'offre d emploi', 'sourcing'],
+    d: 'M10.6 3.6a7 7 0 1 1 0 14 7 7 0 0 1 0-14Z M15.6 15.6l4.8 4.8 M10.6 7.4a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M7.4 14.8c.6-1.4 1.8-2.2 3.2-2.2s2.6.8 3.2 2.2' },
+
+  /* — Entretien — */
+  { cles: ['entretien annuel', 'entretiens annuels', 'feedback', 'retour d experience', 'echange', 'dialogue', 'one to one', 'point individuel'],
+    d: 'M3.6 6.4a1.4 1.4 0 0 1 1.4-1.4h9a1.4 1.4 0 0 1 1.4 1.4v5.6a1.4 1.4 0 0 1-1.4 1.4H8.6l-3 2.6v-2.6H5a1.4 1.4 0 0 1-1.4-1.4Z M15.4 9.4H19a1.4 1.4 0 0 1 1.4 1.4v5.6a1.4 1.4 0 0 1-1.4 1.4h-.6v2.6l-3-2.6h-4.4a1.4 1.4 0 0 1-1.4-1.4v-1.4' },
+
+  /* — Check-list — */
+  { cles: ['check list', 'checklist', 'liste de controle', 'audit interne', 'inspection', 'controle interne', 'tournee de controle'],
+    d: 'M8.4 4.4H6.6A1.6 1.6 0 0 0 5 6v13.4A1.6 1.6 0 0 0 6.6 21h10.8a1.6 1.6 0 0 0 1.6-1.6V6a1.6 1.6 0 0 0-1.6-1.6h-1.8 M9 3h6v2.8H9Z M8.6 13l2 2 4.6-4.6' },
+
+  /* — Musique — */
+  { cles: ['musique', 'sonorisation', 'sono', 'dj', 'playlist', 'concert', 'instrument'],
+    d: 'M9 17.6V5.4l10-1.8v12 M9 17.6a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 0 1 4.8 0Z M19 15.6a2.4 2.4 0 1 1-4.8 0 2.4 2.4 0 0 1 4.8 0Z M9 9.2l10-1.8' },
+
+  /* — Jeux — */
+  { cles: ['jeu', 'jeux', 'loisirs', 'ludotheque', 'escape game', 'salle de jeux', 'bowling'],
+    d: 'M7.2 8h9.6a4 4 0 0 1 3.9 3.1l.9 4.4a2.4 2.4 0 0 1-4.2 2.1L15.4 16H8.6l-2 1.6a2.4 2.4 0 0 1-4.2-2.1l.9-4.4A4 4 0 0 1 7.2 8Z M8 10.8v3.2 M6.4 12.4h3.2 M15.6 11.6h.02 M17.4 13.4h.02' },
+
+  /* — Billetterie — */
+  { cles: ['spectacle', 'billetterie', 'billet', 'billets', 'spectacles', 'cinema', 'controle des billets', 'entree'],
+    d: 'M5 6.4h14a1.4 1.4 0 0 1 1.4 1.4v2.6a1.8 1.8 0 0 0 0 3.6v2.6a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4V14a1.8 1.8 0 0 0 0-3.6V7.8A1.4 1.4 0 0 1 5 6.4Z M15 6.6v1.6 M15 11.2v1.6 M15 15.8v1.6' },
 ]
 
 /* Le repli : le dossier lui-même, quand aucun mot-clé ne correspond. */
@@ -15400,6 +15611,10 @@ function traceIconeDossier(nom) {
   const n = (nom || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   if (!n) return ICONE_DOSSIER_DEFAUT
   const mots = n.split(/[^a-z0-9]+/).filter(Boolean)
+  /* ⚠ LES CLÉS COMPOSÉES SE CHERCHENT DANS LE NOM REMIS À PLAT : tirets et
+     apostrophes deviennent des espaces. « Check-list » ne trouvait pas
+     « check list », ni « Entretien d'embauche » « entretien d embauche ». */
+  const aPlat = mots.join(' ')
 
   let meilleur = null, longueur = 0
   for (const e of CATALOGUE_ICONES) {
@@ -15409,7 +15624,7 @@ function traceIconeDossier(nom) {
          singulier par principe. On teste le mot tel quel, puis prive de son
          « s » final. */
       const touche = c.includes(' ')
-        ? n.includes(c)                 /* cle composee : sur le nom entier */
+        ? aPlat.includes(c)             /* cle composee : sur le nom entier */
         : mots.some(m => m === c || m.replace(/s$/, '') === c)
       if (touche && c.length > longueur) { meilleur = e.d; longueur = c.length }
     }
@@ -37709,8 +37924,13 @@ function sousDossiersExistants(dossier) {
   return [...parNom.values()]
 }
 
-/* Trie et filtre : d'abord ce qui commence par la saisie, puis ce qui la
-   contient ; à égalité, le plus rempli, puis l'ordre alphabétique. */
+/* Filtre, puis range de A à Z.
+
+   ⚠ DE A À Z, ET PLUS PAR NOMBRE DE PROCÉDURES (demande d'Em). Le tiroir se
+     lit comme la liste : dans l'ordre alphabétique, et les couleurs se
+     suivent dans l'ordre de la palette — violet, bleu, ambre, vert, rouge
+     rosé, puis on recommence. Rangées par taille, les couleurs tombaient au
+     hasard et deux violets se suivaient. */
 function filtrerDossiers(liste, saisie) {
   const q = cleDossier(saisie)
   const rang = (e) => {
@@ -37724,8 +37944,8 @@ function filtrerDossiers(liste, saisie) {
   return liste
     .map(e => ({ ...e, r: rang(e) }))
     .filter(e => e.r >= 0)
-    .sort((a, b) => a.r - b.r || b.n - a.n || a.nom.localeCompare(b.nom))
-    .slice(0, 12)
+    .sort((a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' }))
+    .slice(0, 20)
 }
 
 /* Met en gras la partie tapée, pour qu'on voie POURQUOI ce nom est proposé. */
@@ -37772,9 +37992,14 @@ function brancherTiroirDossiers(prefixe) {
       const tete = sorte === 'cat'
         ? tLang('Vos dossiers')
         : tLang('Sous-dossiers de {nom}', { nom: champCat.value.trim() })
+      /* La couleur suit la place du dossier dans l'ordre de A à Z de TOUS
+         les dossiers — pas dans la liste filtrée : un dossier garde sa couleur
+         pendant qu'on tape. */
+      const ordreAZ = tous.map(e => e.nom)
+        .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }))
       const teinte = (nom) => {
         if (sorte !== 'cat') return ''
-        const c = teinteDossierParent('g:' + nom)?.trait
+        const c = couleurDossier(Math.max(0, ordreAZ.indexOf(nom)))?.trait
         return c ? ` style="background:linear-gradient(135deg, ${c[1]}, ${c[0]})"` : ''
       }
       co.innerHTML =
@@ -37807,19 +38032,35 @@ function brancherTiroirDossiers(prefixe) {
          doivent voir la nouvelle valeur. */
       champ.dispatchEvent(new Event('input', { bubbles: true }))
       fermer()
-      const suivant = sorte === 'cat'
-        ? champSous
-        : document.getElementById(prefixe + '-titre')
-      if (suivant) {
-        suivant.focus()
-        if (sorte === 'cat' && champSous) champSous.dispatchEvent(new Event('focus'))
-      }
+      /* ⚠ ON NE DÉPLACE PLUS LE CURSEUR TOUT SEUL (demande d'Em).
+
+         Le dossier choisi, le curseur sautait dans « Sous-dossier » : le
+         téléphone faisait alors défiler l'écran jusqu'au champ et rouvrait le
+         clavier — un mouvement que la personne n'avait pas demandé.
+
+         On range maintenant le clavier, et on se contente d'OUVRIR le tiroir
+         des sous-dossiers de ce dossier, sans toucher au champ. On choisit une
+         pastille, ou on touche le champ pour écrire : c'est la personne qui
+         décide, et l'écran ne bouge pas. */
+      champ.blur()
+      if (sorte === 'cat') tiroirSous?.peindre()
     })
+
+    /* Un tiroir ouvert sans que son champ ait le curseur ne reçoit jamais de
+       `blur` : il se ferme donc dès qu'on touche ailleurs. */
+    document.addEventListener('pointerdown', (e) => {
+      if (!t.classList.contains('ouvert')) return
+      if (t.contains(e.target) || e.target === champ) return
+      if (document.activeElement === champ) return     // le `blur` s'en charge
+      fermer()
+    }, true)
     return { peindre, fermer }
   }
 
+  let tiroirSous = null
   const tCat = fabriquer(champCat, 'cat')
   const tSous = champSous ? fabriquer(champSous, 'sous') : null
+  tiroirSous = tSous
   /* Changer de dossier change les sous-dossiers proposés. */
   champCat.addEventListener('input', () => { if (document.activeElement === champSous) tSous?.peindre() })
 }

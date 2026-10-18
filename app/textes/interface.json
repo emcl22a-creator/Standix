@@ -2323,10 +2323,6 @@
   "en": "Storage refused a {v} file. Record a shorter clip.",
   "de": "Der Speicher hat eine Datei mit {v} abgelehnt. Nehmen Sie kürzer auf."
  },
- "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": {
-  "en": "Time per procedure is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
-  "de": "Die Zeit pro Anleitung ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt."
- },
  "Le titre est obligatoire (en haut de la page précédente).": {
   "en": "The title is required (at the top of the previous page).",
   "de": "Der Titel ist Pflicht (oben auf der vorigen Seite)."
@@ -3506,10 +3502,6 @@
  "Temps de lecture par procédure": {
   "en": "Reading time per procedure",
   "de": "Lesezeit pro Anleitung"
- },
- "Temps par procédure": {
-  "en": "Time per procedure",
-  "de": "Zeit pro Anleitung"
  },
  "Temps passé sur les procédures.": {
   "en": "Time spent on procedures.",
@@ -5242,5 +5234,21 @@
  "Préparation interrompue sur l’appareil": {
   "en": "Preparation interrupted on the device",
   "de": "Vorbereitung auf dem Gerät unterbrochen"
+ },
+ "La durée de lecture correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": {
+  "en": "Reading time is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
+  "de": "Die Lesedauer ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt."
+ },
+ "Durée de lecture": {
+  "en": "Reading time",
+  "de": "Lesedauer"
+ },
+ "Et {n} autres · tapez pour affiner": {
+  "en": "And {n} more · type to narrow down",
+  "de": "Und {n} weitere · tippen zum Eingrenzen"
+ },
+ "Et 1 autre · tapez pour affiner": {
+  "en": "And 1 more · type to narrow down",
+  "de": "Und 1 weiterer · tippen zum Eingrenzen"
  }
 }

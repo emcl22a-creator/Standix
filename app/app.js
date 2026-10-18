@@ -575,6 +575,7 @@ const DICO = {
     "Donnez un nom au poste.": "Give the role a name.",
     "Dossier": "Folder",
     "Dossiers": "Folders",
+    "Durée de lecture": "Reading time",
     "Durée totale": "Total length",
     "Dès la première lecture, vous verrez ici": "From the first read, you will see here",
     "Dès la première lecture, vous verrez ici <b>le temps de formation</b> que vos procédures ont fait gagner à votre établissement.": "From the first read, you will see here <b>the training time</b> your procedures have saved your site.",
@@ -660,6 +661,8 @@ const DICO = {
     "Essai 14 jours gratuits": "14-day free trial",
     "Essentiel": "Essential",
     "et": "and",
+    "Et 1 autre · tapez pour affiner": "And 1 more · type to narrow down",
+    "Et {n} autres · tapez pour affiner": "And {n} more · type to narrow down",
     "Ex : Accueil": "e.g. Front desk",
     "Ex : Accueillir un client": "e.g. Greet a customer",
     "Ex : Le Comptoir": "e.g. The Counter",
@@ -790,6 +793,7 @@ const DICO = {
     "La consultation n'a pas pu être enregistrée : {message}": "The read could not be saved: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Copying failed — select the text by hand.",
     "La création d'entreprise n'est pas installée sur la base. Exécutez migration-creation-entreprise.sql.": "Company creation is not set up in the database. Run migration-creation-entreprise.sql.",
+    "La durée de lecture correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Reading time is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
     "La génération a échoué.": "Generation failed.",
     "La langue choisie traduit aussi les étapes des procédures.": "The language you choose also translates procedure steps.",
     "La photo n’a pas pu être envoyée.": "The photo could not be sent.",
@@ -850,7 +854,6 @@ const DICO = {
     "Le stockage a refusé un fichier de {v}. Filmez une séquence plus courte.": "Storage refused a {v} file. Record a shorter clip.",
     "le temps de formation": "the training time",
     "le temps de vous placer": "to get ready",
-    "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Time per procedure is the total time members spent on each procedure. The timer starts when the procedure opens and pauses when the page stays idle for 2 minutes.",
     "le temps que vous n'avez plus à passer à expliquer": "the time you no longer spend explaining",
     "Le titre est obligatoire (en haut de la page précédente).": "The title is required (at the top of the previous page).",
     "Le titre est obligatoire (page précédente).": "The title is required (previous page).",
@@ -1181,7 +1184,6 @@ const DICO = {
     "Temps de lecture par dossier": "Reading time per folder",
     "Temps de lecture par personne": "Reading time per person",
     "Temps de lecture par procédure": "Reading time per procedure",
-    "Temps par procédure": "Time per procedure",
     "Temps passé sur les procédures.": "Time spent on procedures.",
     "Terminer": "Finish",
     "Terminer l'étape {v}": "Finish step {v}",
@@ -1888,6 +1890,7 @@ const DICO = {
     "Donnez un nom au poste.": "Geben Sie der Position einen Namen.",
     "Dossier": "Ordner",
     "Dossiers": "Ordner",
+    "Durée de lecture": "Lesedauer",
     "Durée totale": "Gesamtdauer",
     "Dès la première lecture, vous verrez ici": "Ab dem ersten Aufruf sehen Sie hier",
     "Dès la première lecture, vous verrez ici <b>le temps de formation</b> que vos procédures ont fait gagner à votre établissement.": "Ab dem ersten Aufruf sehen Sie hier <b>die Einarbeitungszeit</b>, die Ihre Anleitungen Ihrem Standort gespart haben.",
@@ -1973,6 +1976,8 @@ const DICO = {
     "Essai 14 jours gratuits": "14 Tage kostenlos testen",
     "Essentiel": "Essential",
     "et": "und",
+    "Et 1 autre · tapez pour affiner": "Und 1 weiterer · tippen zum Eingrenzen",
+    "Et {n} autres · tapez pour affiner": "Und {n} weitere · tippen zum Eingrenzen",
     "Ex : Accueil": "z. B. Empfang",
     "Ex : Accueillir un client": "z. B. Einen Kunden empfangen",
     "Ex : Le Comptoir": "z. B. Der Tresen",
@@ -2103,6 +2108,7 @@ const DICO = {
     "La consultation n'a pas pu être enregistrée : {message}": "Der Aufruf konnte nicht gespeichert werden: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Kopieren fehlgeschlagen — markieren Sie den Text von Hand.",
     "La création d'entreprise n'est pas installée sur la base. Exécutez migration-creation-entreprise.sql.": "Die Unternehmenserstellung ist in der Datenbank nicht eingerichtet. Führen Sie migration-creation-entreprise.sql aus.",
+    "La durée de lecture correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Die Lesedauer ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt.",
     "La génération a échoué.": "Die Erstellung ist fehlgeschlagen.",
     "La langue choisie traduit aussi les étapes des procédures.": "Die gewählte Sprache übersetzt auch die Schritte der Anleitungen.",
     "La photo n’a pas pu être envoyée.": "Das Foto konnte nicht gesendet werden.",
@@ -2163,7 +2169,6 @@ const DICO = {
     "Le stockage a refusé un fichier de {v}. Filmez une séquence plus courte.": "Der Speicher hat eine Datei mit {v} abgelehnt. Nehmen Sie kürzer auf.",
     "le temps de formation": "die Einarbeitungszeit",
     "le temps de vous placer": "Zeit, sich bereitzumachen",
-    "Le temps par procédure correspond au temps total passé par les membres sur chaque procédure. Le temps est chronométré dès l'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.": "Die Zeit pro Anleitung ist die Gesamtzeit, die Mitglieder mit jeder Anleitung verbracht haben. Die Zeit läuft ab dem Öffnen und pausiert, wenn die Seite 2 Minuten lang unbenutzt bleibt.",
     "le temps que vous n'avez plus à passer à expliquer": "die Zeit, die Sie nicht mehr mit Erklären verbringen",
     "Le titre est obligatoire (en haut de la page précédente).": "Der Titel ist Pflicht (oben auf der vorigen Seite).",
     "Le titre est obligatoire (page précédente).": "Der Titel ist Pflicht (vorige Seite).",
@@ -2494,7 +2499,6 @@ const DICO = {
     "Temps de lecture par dossier": "Lesezeit pro Ordner",
     "Temps de lecture par personne": "Lesezeit pro Person",
     "Temps de lecture par procédure": "Lesezeit pro Anleitung",
-    "Temps par procédure": "Zeit pro Anleitung",
     "Temps passé sur les procédures.": "Zeit mit Anleitungen.",
     "Terminer": "Beenden",
     "Terminer l'étape {v}": "Schritt {v} beenden",
@@ -18663,7 +18667,7 @@ function expliquerPauseTemps() {
   confirmDialog({
     titre: tLang('Comment ça fonctionne'),
     message:
-      tLang('Le temps par procédure correspond au temps total passé par les membres sur chaque procédure.\n\nLe temps est chronométré dès l\'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.'),
+      tLang('La durée de lecture correspond au temps total passé par les membres sur chaque procédure.\n\nLe temps est chronométré dès l\'ouverture de la procédure et se met en pause lorsque la page reste inactive pendant 2 minutes.'),
     confirmer: tLang('Compris'),
     annuler: null,
     danger: false,
@@ -37958,6 +37962,44 @@ function surlignerSaisie(nom, saisie) {
          '</b>' + escapeHtml(nom.slice(i + q.length))
 }
 
+/* ═══ LA FENÊTRE DES DOSSIERS ═══
+
+   ⚠ UNE FENÊTRE, PLUS UN TIROIR DE PASTILLES (demande d'Em). Les pastilles
+     s'empilaient sous le champ : avec dix dossiers c'était lisible, avec cent
+     elles poussaient le formulaire hors de l'écran. La liste flotte maintenant
+     au-dessus du formulaire, dans la même matière que le menu « Filtrer »
+     (`.glassDiv`), une ligne par dossier, et elle DÉFILE : sa hauteur ne
+     dépend plus du nombre de dossiers.
+
+   ⚠ L'ORDRE EST CELUI QU'ON ATTEND EN TAPANT. Champ vide : tout, de A à Z.
+     Des lettres tapées : d'abord les noms qui COMMENCENT par elles (ou dont
+     un mot commence par elles), puis ceux qui les contiennent — chaque
+     groupe de A à Z. Taper « ca » montre « Caisse » avant « Mise en place ».
+
+   ⚠ AU-DELÀ DE 60 LIGNES, on n'en dessine pas plus : la dernière ligne dit
+     combien il en reste et invite à taper quelques lettres de plus.
+
+   La couleur du point suit toujours la place du dossier dans l'ordre de A à
+   Z de TOUS les dossiers : elle ne change pas pendant qu'on tape. */
+/* ⚠ TROIS LIGNES, PAS PLUS (demande d'Em). La fenêtre propose ; elle ne
+   présente pas un catalogue. Trois suggestions se lisent d'un coup d'œil, et
+   les lettres tapées font le reste — la dernière ligne dit combien d'autres
+   attendent derrière. */
+const FENETRE_DOSSIERS_MAX = 3
+
+function classerPourFenetre(liste, saisie) {
+  const q = cleDossier(saisie)
+  const az = (a, b) => a.nom.localeCompare(b.nom, 'fr', { sensitivity: 'base' })
+  if (!q) return liste.slice().sort(az)
+  const debut = [], dedans = []
+  for (const e of liste) {
+    const k = cleDossier(e.nom)
+    if (k.startsWith(q) || k.split(' ').some(m => m.startsWith(q))) debut.push(e)
+    else if (k.includes(q)) dedans.push(e)
+  }
+  return debut.sort(az).concat(dedans.sort(az))
+}
+
 function brancherTiroirDossiers(prefixe) {
   const champCat = document.getElementById(prefixe + '-categorie')
   const champSous = document.getElementById(prefixe + '-sous-categorie')
@@ -37965,54 +38007,70 @@ function brancherTiroirDossiers(prefixe) {
 
   const fabriquer = (champ, sorte) => {
     champ.dataset.tiroir = '1'
-    const t = document.createElement('div')
-    t.className = 'td-tiroir'
-    t.setAttribute('inert', '')
-    t.innerHTML = '<div class="td-dedans"><div class="td-co"></div></div>'
-    champ.insertAdjacentElement('afterend', t)
-    const co = t.querySelector('.td-co')
+    /* Une ancre de hauteur nulle juste sous le champ : la fenêtre s'y accroche
+       et flotte par-dessus ce qui suit, sans rien pousser. */
+    const ancre = document.createElement('div')
+    ancre.className = 'td-ancre'
+    ancre.innerHTML = '<div class="td-menu glassDiv" role="listbox" hidden></div>'
+    champ.insertAdjacentElement('afterend', ancre)
+    const t = ancre.querySelector('.td-menu')
 
-    const fermer = () => { t.classList.remove('ouvert'); t.setAttribute('inert', '') }
-    const ouvrir = () => { t.classList.add('ouvert'); t.removeAttribute('inert') }
+    let minuteurFermeture = 0
+    const fermer = () => {
+      if (!t.classList.contains('ouvert')) return
+      t.classList.remove('ouvert')
+      clearTimeout(minuteurFermeture)
+      minuteurFermeture = setTimeout(() => { if (!t.classList.contains('ouvert')) t.hidden = true }, 280)
+    }
+    const ouvrir = () => {
+      clearTimeout(minuteurFermeture)
+      if (t.classList.contains('ouvert')) return
+      t.hidden = false
+      void t.offsetWidth                 // l'état fermé est peint avant l'animation
+      t.classList.add('ouvert')
+    }
 
     const peindre = () => {
       const saisie = champ.value
       const tous = sorte === 'cat' ? dossiersExistants() : sousDossiersExistants(champCat.value)
-      if (!tous.length) { fermer(); return }
+      /* Rien à proposer ET rien de tapé : pas de fenêtre. Un dossier tout neuf
+         n'a aucun sous-dossier, mais si l'on tape, on dit qu'il sera créé. */
+      if (!tous.length && cleDossier(saisie).length < 2) { fermer(); return }
       const exact = tous.some(e => cleDossier(e.nom) === cleDossier(saisie))
-      const liste = filtrerDossiers(tous, saisie)
-      /* Le nom tapé est déjà exactement un dossier, et c'est le seul qui
-         correspond : le choix est fait, le tiroir n'a plus rien à dire. */
+      const liste = classerPourFenetre(tous, saisie)
+      /* Le nom tapé est exactement un dossier, et c'est le seul qui
+         correspond : le choix est fait, la fenêtre n'a plus rien à dire. */
       if (exact && liste.length <= 1) { fermer(); return }
-      /* « Nouveau dossier » seulement quand RIEN ne correspond : tant qu'une
-         pastille ressemble à la saisie, c'est sans doute elle qu'on cherche. */
+      /* « Sera un nouveau dossier » seulement quand RIEN ne correspond : tant
+         qu'une ligne ressemble à la saisie, c'est sans doute elle qu'on
+         cherche, et on ne dit pas « nouveau » à mi-mot. */
       const nouveau = !exact && !liste.length && cleDossier(saisie).length >= 2
       if (!liste.length && !nouveau) { fermer(); return }
 
       const tete = sorte === 'cat'
         ? tLang('Vos dossiers')
         : tLang('Sous-dossiers de {nom}', { nom: champCat.value.trim() })
-      /* La couleur suit la place du dossier dans l'ordre de A à Z de TOUS
-         les dossiers — pas dans la liste filtrée : un dossier garde sa couleur
-         pendant qu'on tape. */
-      const ordreAZ = tous.map(e => e.nom)
-        .sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' }))
-      const teinte = (nom) => {
-        if (sorte !== 'cat') return ''
-        const c = couleurDossier(Math.max(0, ordreAZ.indexOf(nom)))?.trait
-        return c ? ` style="background:linear-gradient(135deg, ${c[1]}, ${c[0]})"` : ''
-      }
-      co.innerHTML =
+      /* ⚠ PLUS DE POINTS DE COULEUR (demande d'Em). À la manière d'Apple : un
+         pictogramme au trait, d'une seule teinte — le dessin du dossier
+         lui-même (celui de la liste des procédures), et pour un sous-dossier
+         le simple dossier. La couleur ne disait rien ici : c'était un rang. */
+      const glyphe = (nom) =>
+        `<svg class="td-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${
+          sorte === 'cat' ? traceIconeDossier(nom) : ICONE_DOSSIER_DEFAUT}"/></svg>`
+      const montrees = liste.slice(0, FENETRE_DOSSIERS_MAX)
+      const reste = liste.length - montrees.length
+      t.innerHTML =
         (liste.length ? `<div class="td-tete">${escapeHtml(tete)}</div>` : '') +
-        (liste.length ? '<div class="td-liste">' + liste.map((e, i) =>
-          `<button type="button" class="td-puce" style="--i:${i}" data-nom="${escapeHtml(e.nom)}">` +
-            (sorte === 'cat' ? `<span class="td-point"${teinte(e.nom)}></span>` : '') +
+        montrees.map(e =>
+          `<button type="button" class="td-ligne" role="option" data-nom="${escapeHtml(e.nom)}">` +
+            glyphe(e.nom) +
             `<span class="td-nom">${surlignerSaisie(e.nom, saisie)}</span>` +
-            `<span class="td-nb">${e.n}</span>` +
-          '</button>').join('') + '</div>' : '') +
-        (nouveau ? `<div class="td-nouveau">${escapeHtml(sorte === 'cat'
+          '</button>').join('') +
+        (reste > 0 ? `<div class="td-reste">${escapeHtml((reste === 1 ? tLang('Et 1 autre · tapez pour affiner') : tLang('Et {n} autres · tapez pour affiner', { n: reste })))}</div>` : '') +
+        (nouveau ? `<div class="td-nouveau"><span class="td-plus">+</span><span>${escapeHtml(sorte === 'cat'
             ? tLang('« {nom} » sera un nouveau dossier.', { nom: saisie.trim() })
-            : tLang('« {nom} » sera un nouveau sous-dossier.', { nom: saisie.trim() }))}</div>` : '')
+            : tLang('« {nom} » sera un nouveau sous-dossier.', { nom: saisie.trim() }))}</span></div>` : '')
+      t.scrollTop = 0
       ouvrir()
     }
 
@@ -38023,42 +38081,37 @@ function brancherTiroirDossiers(prefixe) {
     }, 140))
     champ.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermer() })
 
-    t.addEventListener('pointerdown', (e) => { if (e.target.closest('.td-puce')) e.preventDefault() })
+    /* ⚠ LES LIGNES NE VOLENT PAS LE CLAVIER : `pointerdown` est annulé, sinon
+       le champ perdait le curseur et la fenêtre se fermait avant le clic.
+       Mais on laisse faire le défilement de la liste au doigt : seul l'appui
+       sur une LIGNE est retenu, pas celui sur le fond de la fenêtre. */
+    t.addEventListener('pointerdown', (e) => { if (e.target.closest('.td-ligne')) e.preventDefault() })
     t.addEventListener('click', (e) => {
-      const puce = e.target.closest('.td-puce')
-      if (!puce) return
-      champ.value = puce.dataset.nom
-      /* Les autres écouteurs du champ (bouton « Continuer », brouillon)
-         doivent voir la nouvelle valeur. */
+      const ligne = e.target.closest('.td-ligne')
+      if (!ligne) return
+      champ.value = ligne.dataset.nom
       champ.dispatchEvent(new Event('input', { bubbles: true }))
       fermer()
-      /* ⚠ ON NE DÉPLACE PLUS LE CURSEUR TOUT SEUL (demande d'Em).
-
-         Le dossier choisi, le curseur sautait dans « Sous-dossier » : le
-         téléphone faisait alors défiler l'écran jusqu'au champ et rouvrait le
-         clavier — un mouvement que la personne n'avait pas demandé.
-
-         On range maintenant le clavier, et on se contente d'OUVRIR le tiroir
-         des sous-dossiers de ce dossier, sans toucher au champ. On choisit une
-         pastille, ou on touche le champ pour écrire : c'est la personne qui
-         décide, et l'écran ne bouge pas. */
+      /* ⚠ ON NE DÉPLACE PAS LE CURSEUR TOUT SEUL (demande d'Em) : le clavier
+         se range, l'écran ne bouge pas, et la fenêtre des sous-dossiers de ce
+         dossier s'ouvre sans toucher au champ. */
       champ.blur()
       if (sorte === 'cat') tiroirSous?.peindre()
     })
 
-    /* Un tiroir ouvert sans que son champ ait le curseur ne reçoit jamais de
-       `blur` : il se ferme donc dès qu'on touche ailleurs. */
+    /* Ouverte sans que son champ ait le curseur, la fenêtre ne reçoit jamais
+       de `blur` : elle se ferme dès qu'on touche ailleurs. */
     document.addEventListener('pointerdown', (e) => {
       if (!t.classList.contains('ouvert')) return
       if (t.contains(e.target) || e.target === champ) return
-      if (document.activeElement === champ) return     // le `blur` s'en charge
+      if (document.activeElement === champ) return
       fermer()
     }, true)
     return { peindre, fermer }
   }
 
   let tiroirSous = null
-  const tCat = fabriquer(champCat, 'cat')
+  fabriquer(champCat, 'cat')
   const tSous = champSous ? fabriquer(champSous, 'sous') : null
   tiroirSous = tSous
   /* Changer de dossier change les sous-dossiers proposés. */

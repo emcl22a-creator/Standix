@@ -465,7 +465,6 @@ const DICO = {
     "chevauchement": "overlap",
     "Choisir l’écran": "Choose the screen",
     "Choisir l’écran et démarrer": "Choose the screen and start",
-    "Choisir une vidéo": "Choose a video",
     "Choisissez <b>Réglages du site web</b>": "Choose <b>Website Settings</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Choose at least two videos. They are joined in the order you put them.",
     "Choisissez ce que vous filmez": "Choose what to record",
@@ -474,7 +473,7 @@ const DICO = {
     "Choisissez le poste qui vous correspond.": "Pick the role that fits you.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Choose the screen or window to record…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Choose a password with at least 6 characters.",
-    "Choisissez votre enregistrement avec « Choisir une vidéo »": "Pick your recording with “Choose a video”",
+    "Choisissez votre enregistrement avec « Importer une vidéo »": "Pick your recording with “Import a video”",
     "Chrome sur Android": "Chrome on Android",
     "Cinq minutes : enregistrement arrêté.": "Five minutes: recording stopped.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Five minutes: recording stops here.",
@@ -621,6 +620,7 @@ const DICO = {
     "En développement": "Draft",
     "En ligne": "Live",
     "en pause": "paused",
+    "En pause pendant votre absence — reprenez quand vous voulez.": "Paused while you were away — resume whenever you like.",
     "En place.": "Done.",
     "En souscrivant, vous acceptez les conditions d’utilisation de Standix.": "By subscribing, you accept Standix's terms of use.",
     "en {v}": "in {v}",
@@ -634,6 +634,7 @@ const DICO = {
     "Enregistrer la vidéo": "Save the video",
     "Enregistrer les modifications": "Save changes",
     "Enregistrer les étapes": "Save the steps",
+    "Enregistrer l’image": "Save image",
     "Enregistrer l’écran": "Record screen",
     "Enregistré.": "Saved.",
     "Entreprise": "Enterprise",
@@ -729,6 +730,7 @@ const DICO = {
     "il y a {v} mois": "{v} months ago",
     "il y a {v} semaines": "{v} weeks ago",
     "Image trop lourde : 6 Mo maximum.": "Image too large: 6 MB at most.",
+    "Importer une vidéo": "Import a video",
     "Importez d’abord une vidéo.": "Add a video first.",
     "Importez une vidéo.": "Add a video.",
     "Impossible de créer l'entreprise{v}. {message}": "Could not create the company{v}. {message}",
@@ -783,12 +785,14 @@ const DICO = {
     "La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d'accès « delete » sur la table entreprises.": "The database refused the deletion. Run migration-etablissements.sql: the “delete” access rule is missing on the entreprises table.",
     "La base a refusé le départ. Vérifiez la règle « delete » sur la table membres.": "The database refused the removal. Check the “delete” rule on the members table.",
     "La base ne sait pas encore créer un établissement. Exécutez migration-creer-etablissement.sql.": "The database cannot create a site yet. Run migration-creer-etablissement.sql.",
+    "La caméra a été rouverte pendant la prise : votre vidéo est en {n} parties. Appuyez sur « Coller les vidéos » pour en faire une seule.": "The camera was reopened during the recording: your video is in {n} parts. Tap “Join the videos” to make a single one.",
     "La caméra est bloquée": "The camera is blocked",
     "La caméra est déjà utilisée": "The camera is already in use",
     "La caméra est déjà utilisée par une autre application.": "The camera is already used by another app.",
     "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.": "The camera only works over HTTPS. Open the app from its usual address, not a local file.",
     "La caméra n’a pas pu s’ouvrir": "The camera could not open",
     "La caméra n’est accessible qu’en HTTPS. Ouvrez Standix depuis son adresse habituelle.": "The camera only works over HTTPS. Open Standix from its usual address.",
+    "La caméra se rouvre…": "The camera is reopening…",
     "La connexion a été interrompue. Vérifiez votre réseau et réessayez.": "The connection was lost. Check your network and try again.",
     "La consultation n'a pas pu être enregistrée : {message}": "The read could not be saved: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Copying failed — select the text by hand.",
@@ -911,6 +915,8 @@ const DICO = {
     "L’IA transforme la vidéo en procédure": "The AI turns your video into a procedure",
     "L’IA écoute et regarde…": "The AI is listening and watching…",
     "L’IA écrit les étapes à votre place": "The AI writes the steps for you",
+    "L’image n’a pas pu être créée": "The image could not be created",
+    "L’image se range dans Photos. Le PDF s’imprime sur une page A4.": "The image goes to Photos. The PDF prints on an A4 page.",
     "L’écoute est terminée. L’IA met la procédure au propre —": "Listening is done. The AI is tidying up the procedure —",
     "Marquez le début et la fin de chaque étape": "Mark where each step starts and ends",
     "Masquer": "Hide",
@@ -990,6 +996,7 @@ const DICO = {
     "Passer à l’offre supérieure": "Move up a plan",
     "Passez à l’offre supérieure pour agrandir votre équipe.": "Move up a plan to grow your team.",
     "Pause": "Pause",
+    "PDF à imprimer": "PDF to print",
     "Pensez à regarder dans les indésirables.": "Check your spam folder too.",
     "Personne dans l’espace Utilisateur pour le moment.": "No one in the User area yet.",
     "Personne ne correspond à « {filtreEquipe} ».": "No one matches “{filtreEquipe}”.",
@@ -1780,7 +1787,6 @@ const DICO = {
     "chevauchement": "Überschneidung",
     "Choisir l’écran": "Bildschirm wählen",
     "Choisir l’écran et démarrer": "Bildschirm wählen und starten",
-    "Choisir une vidéo": "Video wählen",
     "Choisissez <b>Réglages du site web</b>": "Wählen Sie <b>Website-Einstellungen</b>",
     "Choisissez au moins deux vidéos. Elles seront collées dans l’ordre où vous les rangez.": "Wählen Sie mindestens zwei Videos. Sie werden in der Reihenfolge zusammengefügt, in die Sie sie bringen.",
     "Choisissez ce que vous filmez": "Wählen Sie, was Sie aufnehmen",
@@ -1789,7 +1795,7 @@ const DICO = {
     "Choisissez le poste qui vous correspond.": "Wählen Sie die passende Position.",
     "Choisissez l’écran ou la fenêtre à filmer…": "Wählen Sie den Bildschirm oder das Fenster für die Aufnahme…",
     "Choisissez un mot de passe d’au moins 6 caractères.": "Wählen Sie ein Passwort mit mindestens 6 Zeichen.",
-    "Choisissez votre enregistrement avec « Choisir une vidéo »": "Wählen Sie Ihre Aufnahme über „Video wählen“",
+    "Choisissez votre enregistrement avec « Importer une vidéo »": "Wählen Sie Ihre Aufnahme über „Video importieren“",
     "Chrome sur Android": "Chrome auf Android",
     "Cinq minutes : enregistrement arrêté.": "Fünf Minuten: Aufnahme gestoppt.",
     "Cinq minutes : l’enregistrement s’arrête là.": "Fünf Minuten: Hier endet die Aufnahme.",
@@ -1936,6 +1942,7 @@ const DICO = {
     "En développement": "Entwurf",
     "En ligne": "Live",
     "en pause": "pausiert",
+    "En pause pendant votre absence — reprenez quand vous voulez.": "Pausiert, während Sie weg waren — fahren Sie fort, wann Sie möchten.",
     "En place.": "Erledigt.",
     "En souscrivant, vous acceptez les conditions d’utilisation de Standix.": "Mit dem Abschluss akzeptieren Sie die Nutzungsbedingungen von Standix.",
     "en {v}": "im {v}",
@@ -1949,6 +1956,7 @@ const DICO = {
     "Enregistrer la vidéo": "Video speichern",
     "Enregistrer les modifications": "Änderungen speichern",
     "Enregistrer les étapes": "Schritte speichern",
+    "Enregistrer l’image": "Bild sichern",
     "Enregistrer l’écran": "Bildschirm aufnehmen",
     "Enregistré.": "Gespeichert.",
     "Entreprise": "Enterprise",
@@ -2044,6 +2052,7 @@ const DICO = {
     "il y a {v} mois": "vor {v} Monaten",
     "il y a {v} semaines": "vor {v} Wochen",
     "Image trop lourde : 6 Mo maximum.": "Bild zu groß: höchstens 6 MB.",
+    "Importer une vidéo": "Video importieren",
     "Importez d’abord une vidéo.": "Fügen Sie zuerst ein Video hinzu.",
     "Importez une vidéo.": "Fügen Sie ein Video hinzu.",
     "Impossible de créer l'entreprise{v}. {message}": "Unternehmen konnte nicht erstellt werden{v}. {message}",
@@ -2098,12 +2107,14 @@ const DICO = {
     "La base a refusé la suppression. Exécutez migration-etablissements.sql : il manque la règle d'accès « delete » sur la table entreprises.": "Die Datenbank hat das Löschen abgelehnt. Führen Sie migration-etablissements.sql aus: Die Zugriffsregel „delete“ fehlt in der Tabelle entreprises.",
     "La base a refusé le départ. Vérifiez la règle « delete » sur la table membres.": "Die Datenbank hat das Entfernen abgelehnt. Prüfen Sie die „delete“-Regel der Tabelle membres.",
     "La base ne sait pas encore créer un établissement. Exécutez migration-creer-etablissement.sql.": "Die Datenbank kann noch keinen Standort anlegen. Führen Sie migration-creer-etablissement.sql aus.",
+    "La caméra a été rouverte pendant la prise : votre vidéo est en {n} parties. Appuyez sur « Coller les vidéos » pour en faire une seule.": "Die Kamera wurde während der Aufnahme neu geöffnet: Ihr Video besteht aus {n} Teilen. Tippen Sie auf „Videos zusammenfügen“, um eines daraus zu machen.",
     "La caméra est bloquée": "Die Kamera ist blockiert",
     "La caméra est déjà utilisée": "Die Kamera wird bereits verwendet",
     "La caméra est déjà utilisée par une autre application.": "Die Kamera wird bereits von einer anderen App genutzt.",
     "La caméra n'est accessible qu'en HTTPS. Ouvrez l'app depuis son adresse habituelle plutôt qu'un fichier local.": "Die Kamera funktioniert nur über HTTPS. Öffnen Sie die App über ihre übliche Adresse, nicht als lokale Datei.",
     "La caméra n’a pas pu s’ouvrir": "Die Kamera ließ sich nicht öffnen",
     "La caméra n’est accessible qu’en HTTPS. Ouvrez Standix depuis son adresse habituelle.": "Die Kamera funktioniert nur über HTTPS. Öffnen Sie Standix über die gewohnte Adresse.",
+    "La caméra se rouvre…": "Die Kamera wird neu geöffnet…",
     "La connexion a été interrompue. Vérifiez votre réseau et réessayez.": "Die Verbindung wurde unterbrochen. Prüfen Sie Ihr Netzwerk und versuchen Sie es erneut.",
     "La consultation n'a pas pu être enregistrée : {message}": "Der Aufruf konnte nicht gespeichert werden: {message}",
     "La copie a échoué — sélectionnez le texte à la main.": "Kopieren fehlgeschlagen — markieren Sie den Text von Hand.",
@@ -2226,6 +2237,8 @@ const DICO = {
     "L’IA transforme la vidéo en procédure": "Die KI macht aus Ihrem Video eine Anleitung",
     "L’IA écoute et regarde…": "Die KI hört und schaut zu…",
     "L’IA écrit les étapes à votre place": "Die KI schreibt die Schritte für Sie",
+    "L’image n’a pas pu être créée": "Das Bild konnte nicht erstellt werden",
+    "L’image se range dans Photos. Le PDF s’imprime sur une page A4.": "Das Bild wird in Fotos gespeichert. Das PDF wird auf einer A4-Seite gedruckt.",
     "L’écoute est terminée. L’IA met la procédure au propre —": "Das Zuhören ist fertig. Die KI bringt die Anleitung in Form —",
     "Marquez le début et la fin de chaque étape": "Markieren Sie Anfang und Ende jedes Schritts",
     "Masquer": "Ausblenden",
@@ -2305,6 +2318,7 @@ const DICO = {
     "Passer à l’offre supérieure": "Zum nächsthöheren Tarif wechseln",
     "Passez à l’offre supérieure pour agrandir votre équipe.": "Wechseln Sie in den nächsten Tarif, um Ihr Team zu vergrößern.",
     "Pause": "Pause",
+    "PDF à imprimer": "PDF zum Drucken",
     "Pensez à regarder dans les indésirables.": "Schauen Sie auch im Spam-Ordner nach.",
     "Personne dans l’espace Utilisateur pour le moment.": "Noch niemand im Nutzerbereich.",
     "Personne ne correspond à « {filtreEquipe} ».": "Niemand passt zu „{filtreEquipe}“.",
@@ -3247,9 +3261,38 @@ function chargerLangue() {
   synchroniserLangueParlee()
 }
 
+/* ═══ LA LANGUE DANS LAQUELLE UNE PROCÉDURE EST ÉCRITE ═══
+
+   Demande d'Em : les étapes s'écrivent dans la langue de l'app de la personne
+   qui CRÉE la procédure — c'est elle qui relit, corrige et publie. La langue
+   parlée dans la vidéo ne sert qu'à la transcription.
+
+   Elle est posée une fois, à la création (`procedures.langue_origine`), et ne
+   bouge plus : modifier une procédure ne la réécrit pas dans une autre langue.
+   Chacun lit ensuite dans la sienne, par `ai-traduire`. Les procédures d'avant
+   ce changement sont en français. */
+const LANGUES_ECRITURE = ['fr', 'en', 'de', 'es', 'it', 'pt']
+function langueRedaction() { return LANGUES_ECRITURE.includes(langueApp) ? langueApp : 'fr' }
+function langueOrigine(proc) { return LANGUES_ECRITURE.includes(proc?.langue_origine) ? proc.langue_origine : 'fr' }
+
+/* ═══ LA LANGUE DE CHAQUE MEMBRE EST CONNUE DU SERVEUR ═══
+
+   C'est ce qui permet de traduire une procédure À L'AVANCE, dans les langues
+   que l'équipe lit vraiment (`ai-traduire`, mode `pretraduire`), au lieu de
+   faire attendre le premier qui l'ouvre. Écrite au démarrage et à chaque
+   changement de langue ; une seule écriture si rien n'a changé. */
+function noterLangueMembre() {
+  const m = currentMembre
+  if (!m?.user_id || m.langue === langueApp || !LANGUES_ECRITURE.includes(langueApp)) return
+  m.langue = langueApp
+  supabase.from('membres').update({ langue: langueApp }).eq('user_id', m.user_id)
+    .then(({ error }) => { if (error) console.warn('[langue] non notée :', error.message) }, () => {})
+}
+
 function definirLangue(code) {
   langueApp = code
   try { localStorage.setItem('procedo_langue', code) } catch (e) {}
+  noterLangueMembre()
   chargerTraductionsIA(code).then(() => { if (langueApp === code) appliquerLangue() })
   majNomsTraduits()
   appliquerLangue()
@@ -6192,6 +6235,7 @@ async function enterApp(membre) {
 
 
   currentMembre = membre
+  noterLangueMembre()
 
   /* ⚠ LE BOUTON PROFIL SE REMPLIT DES L'ENTREE.
 
@@ -18881,6 +18925,7 @@ async function completerEtapesAvecIA() {
         titre: '\u2014 analyse en cours \u2014',
         created_by: currentMembre.id,
         statut: 'traitement',
+        langue_origine: langueRedaction(),
       })
       .select().single()
     if (errTemp) throw new Error(errTemp.message)
@@ -19333,7 +19378,7 @@ document.getElementById('ecran-importer')?.addEventListener('click', () => {
      désormais dans « L'IA transforme la vidéo en procédure » : le titre et le
      dossier sont déjà remplis, il ne reste qu'à désigner le fichier. */
   showGestionScreen('p-create-ai')
-  toast(tLang('Choisissez votre enregistrement avec « Choisir une vidéo »'))
+  toast(tLang('Choisissez votre enregistrement avec « Importer une vidéo »'))
 })
 
 /* Le voile du compte à rebours, puis la pastille rouge pendant la prise. Ils
@@ -20044,6 +20089,16 @@ async function ouvrirFluxCamera() {
   v.muted = true
   try { await v.play() } catch (e) { /* l'attribut autoplay prend le relais */ }
 
+  /* Si la caméra se coupe seule — appel entrant, autre app qui la prend — on
+     ne perd rien : la prise se met en pause et la caméra se rouvre (voir
+     `camRevenir`). Avant, la prise s'arrêtait net et partait à l'analyse. */
+  const flux = camFlux
+  flux.getVideoTracks()[0]?.addEventListener('ended', () => {
+    if (flux !== camFlux) return
+    if (camFilme && !camPause) { basculerPauseCamera(); camPauseAuto = true }
+    camRevenir()
+  })
+
   /* La lampe torche : le bouton se montre seul si la caméra en a une. C'est
      le même mécanisme que le scanner de QR codes, déjà éprouvé. */
   try { brancherLampe(camFlux) } catch (e) {}
@@ -20102,7 +20157,10 @@ function majAnneauCamera(part) {
 
 function echecCamera(e) {
   const zone = document.getElementById('cam-echec')
-  document.getElementById('cam-bas').style.display = 'none'
+  /* ⚠ PENDANT UNE PRISE, LE BOUTON D'ARRÊT RESTE. Si la caméra ne se rouvre
+     pas au retour dans l'app, ce qui a déjà été filmé doit pouvoir partir :
+     l'arrêt garde les parties rangées. */
+  if (!camFilme) document.getElementById('cam-bas').style.display = 'none'
   document.getElementById('cam-badge').textContent = ''
   const nom = e?.name
 
@@ -20175,74 +20233,186 @@ document.addEventListener('keydown', (e) => {
   }
 })
 
+/* ═══ QUAND ON QUITTE L'APP PENDANT LA PRISE ═══
+
+   Signalé par Em : filmer, mettre en pause, passer dans une autre app, revenir
+   — l'écran de la caméra reste NOIR. On pouvait reprendre, mais on filmait à
+   l'aveugle.
+
+   ─── CE QUI SE PASSE ───
+
+   L'iPhone retire la caméra à une page qui passe en arrière-plan. Au retour,
+   selon les cas, il la rend (la piste redevient active) ou ne la rend jamais
+   (la piste reste coupée, ou se termine). Et même quand il la rend, l'aperçu
+   est resté arrêté : rien ne le relançait.
+
+   ─── CE QU'ON FAIT ───
+
+   1. En partant, la prise se met en PAUSE d'elle-même : le temps passé
+      ailleurs n'est pas compté, et rien n'est filmé pendant l'absence.
+   2. Au retour, on laisse au téléphone un instant pour rendre la caméra.
+      S'il la rend, on relance seulement l'aperçu : la prise continue, dans
+      le même fichier.
+   3. S'il ne la rend pas, on rouvre la caméra. Un enregistreur ne sait pas
+      changer de caméra en cours de route (voir plus haut : le fichier ne se
+      relit plus). On range donc ce qui a été filmé comme une PREMIÈRE PARTIE,
+      et la reprise commence une seconde partie, sur la caméra rouverte.
+   4. À la fin, une seule partie part directement à l'analyse, comme avant.
+      Plusieurs parties s'ouvrent dans « Assembler », déjà rangées dans
+      l'ordre : un appui les réunit en une vidéo. */
+let camParties = []        // les parties déjà terminées : { fichier, duree }
+let camCoupure = null      // la promesse d'une partie qu'on est en train de ranger
+let camArretDemande = false  // « Stop » ou « Recommencer » a été touché
+let camPauseAuto = false   // la pause vient de la sortie de l'app, pas d'un appui
+
 function demarrerPriseCamera() {
   if (!camFlux) return
-  const morceaux = []
-  let type = ''
-  try {
-    const fait = fabriquerEnregistreur(camFlux, CAM_DEBIT)
-    camEnregistreur = fait.enr
-    type = fait.type
-  } catch (e) {
-    echecCamera({ name: '', message: tLang('ce navigateur ne sait pas enregistrer ({v})', { v: e?.message || e }) })
-    return
-  }
-
-  camEnregistreur.ondataavailable = (ev) => { if (ev.data?.size) morceaux.push(ev.data) }
-  camEnregistreur.onstop = () => {
-    /* `arreterPriseCamera` a figé le compteur juste avant d'appeler `stop()` :
-       `camCumul` porte donc le temps réellement filmé, pauses déduites. */
-    const secondes = Math.max(1, Math.round(camCumul))
-    camFilme = false
-    camPause = false
-    clearInterval(camMinuteur); camMinuteur = 0
-    garderEcranAllume(false)
-    camVoile().classList.remove('filme', 'pause')
-    majAnneauCamera(0)
-
-    if (camAnnule) {
-      /* Rien n'est gardé, et la caméra reste ouverte : on recommence une
-         prise, on ne quitte pas la séance. */
-      camAnnule = false
-      camCumul = 0
-      document.getElementById('cam-minute').querySelector('b').textContent = '0:00'
-      return
-    }
-
-    const extension = (type || '').includes('mp4') ? 'mp4' : 'webm'
-    const nom = `camera-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}.${extension}`
-    const fichier = new File(morceaux, nom, { type: type || 'video/mp4' })
-    /* La durée, que le conteneur d'un enregistreur ne porte pas. Voir
-       `chargerVideoPourIA`. */
-    try { fichier.dureeConnue = secondes } catch (e) {}
-
-    fermerCamera()
-    if (!fichier.size) { toast(tLang('L’enregistrement est vide.')); return }
-    collageEnAttente = fichier
-    goToCreateMode('ai')   /* voir le commentaire de l'enregistrement d'écran */
-    toast(tLang('Vidéo prête — lancez l’analyse'))
-  }
-
-  /* Si la caméra se coupe seule — appel entrant, application mise en veille —
-     on garde ce qui a été filmé plutôt que de tout perdre. */
-  camFlux.getVideoTracks()[0]?.addEventListener('ended', () => {
-    if (camFilme) arreterPriseCamera()
-  })
-
-  camEnregistreur.start(1000)
-  camDepart = Date.now()
+  camParties = []
   camCumul = 0
+  camArretDemande = false
+  if (!lancerEnregistreurCamera()) return
+  camDepart = Date.now()
   camPause = false
+  camPauseAuto = false
   camFilme = true
   camAnnule = false
   camVoile().classList.add('filme')
   camVoile().classList.remove('pause')
-  /* Un navigateur sans `pause()` — il en reste — ne doit pas montrer un
-     bouton qui ne fait rien. */
-  camVoile().classList.toggle('sans-pause', typeof camEnregistreur.pause !== 'function')
   garderEcranAllume(true)
   peindreMinuteurCamera()
   camMinuteur = setInterval(peindreMinuteurCamera, 250)
+}
+
+/* Un enregistreur pour UNE partie, sur la caméra ouverte en ce moment. */
+function lancerEnregistreurCamera() {
+  const morceaux = []
+  let enr, type = ''
+  try {
+    const fait = fabriquerEnregistreur(camFlux, CAM_DEBIT)
+    enr = fait.enr
+    type = fait.type
+  } catch (e) {
+    echecCamera({ name: '', message: tLang('ce navigateur ne sait pas enregistrer ({v})', { v: e?.message || e }) })
+    return false
+  }
+  camEnregistreur = enr
+  enr.ondataavailable = (ev) => { if (ev.data?.size) morceaux.push(ev.data) }
+  enr.onstop = () => {
+    const extension = (type || '').includes('mp4') ? 'mp4' : 'webm'
+    const n = camParties.length + 1
+    const nom = `camera-${new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-')}${n > 1 ? '-' + n : ''}.${extension}`
+    const fichier = morceaux.length ? new File(morceaux, nom, { type: type || 'video/mp4' }) : null
+    /* La durée de CETTE partie : le total filmé, moins les parties d'avant. */
+    const duree = Math.max(1, Math.round(camCumul - camParties.reduce((t, x) => t + x.duree, 0)))
+    /* ⚠ UN ENREGISTREUR S'ARRÊTE AUSSI TOUT SEUL : quand la caméra meurt,
+       il n'a plus rien à enregistrer et se ferme. Ce n'est pas un appui sur
+       « Stop » — la prise ne doit pas partir à l'analyse pendant qu'on est
+       dans une autre app. On le traite comme une coupure : la partie est
+       rangée, la prise passe en pause, la caméra se rouvrira au retour. */
+    if (camCoupure || (camFilme && !camArretDemande && enr === camEnregistreur)) {
+      if (!camCoupure) {
+        if (!camPause) {
+          camCumul = camEcoule()
+          camPause = true
+          camPauseAuto = true
+          camDepart = 0
+          clearInterval(camMinuteur); camMinuteur = 0
+          camVoile().classList.add('pause')
+          peindreMinuteurCamera()
+        }
+        camEnregistreur = null
+      }
+      /* Une partie rangée en attendant la caméra rouverte : la prise, elle,
+         continue — on ne touche ni à l'écran ni au compteur. */
+      const d = Math.max(1, Math.round(camCumul - camParties.reduce((t, x) => t + x.duree, 0)))
+      if (fichier?.size && !camAnnule) camParties.push({ fichier, duree: d })
+      const fini = camCoupure
+      camCoupure = null
+      fini?.ok()
+      if (!fini) camRevenir()
+      return
+    }
+    /* La caméra a été fermée entre-temps : plus personne n'attend ce fichier. */
+    if (!camFilme) return
+    terminerPriseCamera(fichier?.size ? { fichier, duree } : null)
+  }
+  enr.start(1000)
+  /* Un navigateur sans `pause()` — il en reste — ne doit pas montrer un
+     bouton qui ne fait rien. */
+  camVoile().classList.toggle('sans-pause', typeof enr.pause !== 'function')
+  return true
+}
+
+/* Range la partie en cours et libère l'enregistreur. La prise reste en pause. */
+function couperPartieCamera() {
+  const enr = camEnregistreur
+  if (!enr || enr.state === 'inactive') { camEnregistreur = null; return Promise.resolve() }
+  return new Promise((ok) => {
+    camCoupure = { ok }
+    camEnregistreur = null
+    try { enr.stop() } catch (e) { camCoupure = null; ok() }
+    /* Un enregistreur qui ne répond plus ne doit pas bloquer la reprise. */
+    setTimeout(() => { if (camCoupure?.ok === ok) { camCoupure = null; ok() } }, 3000)
+  })
+}
+
+/* La fin de la prise : la dernière partie (s'il y en a une) rejoint les autres. */
+function terminerPriseCamera(derniere) {
+  camArretDemande = false
+  camFilme = false
+  camPause = false
+  camPauseAuto = false
+  clearInterval(camMinuteur); camMinuteur = 0
+  garderEcranAllume(false)
+  camVoile().classList.remove('filme', 'pause')
+  majAnneauCamera(0)
+
+  if (camAnnule) {
+    /* Rien n'est gardé, et la caméra reste ouverte : on recommence une
+       prise, on ne quitte pas la séance. */
+    camAnnule = false
+    camCumul = 0
+    camParties = []
+    camEnregistreur = null
+    peindreMinuteurCamera()   // « 0:00 », et plus « en pause »
+    if (!camFlux) ouvrirFluxCamera()
+    return
+  }
+
+  const parties = [...camParties, ...(derniere ? [derniere] : [])]
+  camParties = []
+  fermerCamera()
+  if (!parties.length) { toast(tLang('L’enregistrement est vide.')); return }
+
+  if (parties.length === 1) {
+    const { fichier, duree } = parties[0]
+    /* La durée, que le conteneur d'un enregistreur ne porte pas. Voir
+       `chargerVideoPourIA`. */
+    try { fichier.dureeConnue = duree } catch (e) {}
+    collageEnAttente = fichier
+    goToCreateMode('ai')   /* voir le commentaire de l'enregistrement d'écran */
+    toast(tLang('Vidéo prête — lancez l’analyse'))
+    return
+  }
+  ouvrirPartiesDansAssembler(parties)
+}
+
+/* ⚠ L'ASSEMBLAGE NE PART PAS TOUT SEUL. Sur iPhone, il doit démarrer dans un
+   appui (voir `collerLesVideos`) : lancé d'ici, après l'arrêt de la caméra,
+   le téléphone le refuserait. Les parties sont donc posées dans l'écran, dans
+   l'ordre, et le bouton « Coller les vidéos » est le seul geste qui reste. */
+async function ouvrirPartiesDansAssembler(parties) {
+  ouvrirCollage()
+  for (const { fichier, duree } of parties) {
+    let m = { duree: 0, largeur: 0, hauteur: 0 }
+    try { m = await lireMeta(fichier) } catch (e) {}
+    collageFichiers.push({ fichier, ...m, duree: m.duree || duree })
+  }
+  dessinerCollage()
+  const avert = document.getElementById('coller-avert')
+  if (avert && !document.getElementById('coller-lancer')?.disabled) {
+    avert.textContent = tLang('La caméra a été rouverte pendant la prise : votre vidéo est en {n} parties. Appuyez sur « Coller les vidéos » pour en faire une seule.', { n: parties.length })
+  }
 }
 
 /* Le temps réellement filmé : les segments déjà enregistrés, plus celui en
@@ -20252,16 +20422,27 @@ function camEcoule() {
 }
 
 function basculerPauseCamera() {
-  if (!camFilme || !camEnregistreur) return
-  if (typeof camEnregistreur.pause !== 'function') return
+  if (!camFilme) return
 
   if (camPause) {
-    try { camEnregistreur.resume() } catch (e) { return }
+    /* La reprise attend la caméra : si elle est en train d'être rouverte, un
+       appui de trop ne doit pas lancer un enregistreur sur rien. */
+    if (camCoupure || !camFlux) { toast(tLang('La caméra se rouvre…')); return }
+    if (!camEnregistreur) {
+      /* La partie d'avant a été rangée : on en commence une nouvelle. */
+      if (!lancerEnregistreurCamera()) return
+    } else {
+      if (typeof camEnregistreur.resume !== 'function') return
+      try { camEnregistreur.resume() } catch (e) { return }
+    }
     camDepart = Date.now()
     camPause = false
+    camPauseAuto = false
     camVoile().classList.remove('pause')
+    clearInterval(camMinuteur)
     camMinuteur = setInterval(peindreMinuteurCamera, 250)
   } else {
+    if (!camEnregistreur || typeof camEnregistreur.pause !== 'function') return
     try { camEnregistreur.pause() } catch (e) { return }
     /* On fige le compteur AVANT de couper l'horloge : sinon la seconde en
        cours serait perdue à chaque pause, et dix pauses feraient dix
@@ -20291,30 +20472,97 @@ function peindreMinuteurCamera() {
   }
 }
 
-function arreterPriseCamera() {
+async function arreterPriseCamera() {
   /* ⚠ ON FIGE LE COMPTEUR ICI, pas dans `onstop` : entre l'appel à `stop()` et
      l'événement, il s'écoule quelques dizaines de millisecondes — et surtout,
      après `stop()` l'état de pause n'est plus lisible. */
   camCumul = camEcoule()
   camPause = true
   camDepart = 0
+  camArretDemande = true
   clearInterval(camMinuteur); camMinuteur = 0
+  /* Une partie en train d'être rangée : on attend qu'elle le soit, sinon elle
+     manquerait au résultat. */
+  if (camCoupure) await new Promise((ok) => {
+    const t = setInterval(() => { if (!camCoupure) { clearInterval(t); ok() } }, 50)
+  })
   if (camEnregistreur && camEnregistreur.state !== 'inactive') camEnregistreur.stop()
+  else if (camFilme) terminerPriseCamera(null)   // seules les parties déjà rangées
   else {
-    camFilme = false
     camPause = false
     garderEcranAllume(false)
     camVoile()?.classList.remove('filme', 'pause')
   }
 }
 
+/* ─── 1. EN PARTANT : PAUSE ─── */
+function camPartir() {
+  if (camVoile()?.style.display !== 'flex') return
+  if (camFilme && !camPause && camEnregistreur) {
+    basculerPauseCamera()
+    if (camPause) camPauseAuto = true
+  }
+}
+
+/* ─── 2 ET 3. AU RETOUR : L'APERÇU, OU LA CAMÉRA ─── */
+let camReveil = 0
+async function camRevenir() {
+  if (camVoile()?.style.display !== 'flex') return
+  if (document.visibilityState !== 'visible') return
+  if (document.getElementById('cam-echec')?.style.display === 'flex') return
+  const jeton = ++camReveil
+  const piste = () => camFlux?.getVideoTracks?.()[0]
+  const vivante = () => { const p = piste(); return !!p && p.readyState === 'live' && !p.muted }
+
+  /* Le téléphone rend la caméra en quelques centaines de millisecondes,
+     quand il la rend. On lui laisse une seconde et demie. */
+  for (let i = 0; i < 15 && !vivante(); i++) {
+    await new Promise((ok) => setTimeout(ok, 100))
+    if (jeton !== camReveil) return
+  }
+
+  if (vivante()) {
+    /* La caméra est revenue : seul l'aperçu est à relancer. */
+    const v = document.getElementById('cam-apercu')
+    if (v) {
+      v.srcObject = null
+      v.srcObject = camFlux
+      v.muted = true
+      try { await v.play() } catch (e) {}
+    }
+  } else {
+    /* Elle n'est pas revenue : on la rouvre. Pendant une prise, la partie
+       filmée est rangée d'abord. */
+    if (camFilme) {
+      if (!camPause) { basculerPauseCamera(); camPauseAuto = true }
+      await couperPartieCamera()
+      if (jeton !== camReveil) return
+    }
+    await ouvrirFluxCamera()
+  }
+  if (camFilme && camPauseAuto && jeton === camReveil) {
+    toast(tLang('En pause pendant votre absence — reprenez quand vous voulez.'))
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') camPartir()
+  else camRevenir()
+})
+window.addEventListener('pagehide', camPartir)
+window.addEventListener('pageshow', camRevenir)
+
 function fermerCamera() {
   clearInterval(camMinuteur); camMinuteur = 0
+  camReveil++
   camFilme = false
   camPause = false
+  camPauseAuto = false
   camCumul = 0
   camDepart = 0
   camAnnule = false
+  camParties = []
+  camCoupure = null
   camEnregistreur = null
   garderEcranAllume(false)
   couperFluxCamera()
@@ -21983,7 +22231,7 @@ document.getElementById('doc-generer')?.addEventListener('click', async () => {
       method: 'POST',
       signal: AbortSignal.timeout(60000),
       headers: await enTeteFonction(),
-        body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64() }),
+        body: JSON.stringify({ titre, categorie, texte, images: await pagesEnBase64(), langue: langueRedaction() }),
     })
     const data = await rep.json()
     if (!rep.ok || data.error) throw new Error(data.error || tLang('La g\u00e9n\u00e9ration a \u00e9chou\u00e9.'))
@@ -22613,7 +22861,7 @@ function resetAiScreen() {
 
 /* ═══ LA CROIX : RETIRER LA VIDÉO CHOISIE ═══
 
-   On revient au cadre vide « Choisir une vidéo », sans quitter la page : le
+   On revient au cadre vide « Importer une vidéo », sans quitter la page : le
    titre et le dossier restent remplis.
 
  ⚠ LE CLIC NE DOIT PAS TRAVERSER. La croix est posée au-dessus du champ de
@@ -24156,6 +24404,8 @@ document.getElementById('ai-launch-btn')?.addEventListener('click', async () => 
         sous_categorie: lireSousDossier('new-sous-categorie'),
         created_by: currentMembre.id,
         statut: 'traitement',
+        /* L'IA écrira les étapes dans cette langue (voir `langueRedaction`). */
+        langue_origine: langueRedaction(),
       })
       .select().single()
     if (errNouvelle) throw new Error(errNouvelle.message)
@@ -27713,6 +27963,12 @@ function formatTime(sec) {
 // Insertion des étapes. Si la colonne `fin_video` n'existe pas encore en base,
 // on réessaie sans elle : l'app continue de fonctionner (fin déduite comme avant).
 async function insertEtapes(rows) {
+  const res = await insererEtapes(rows)
+  // Les étapes viennent de changer : l'équipe les recevra déjà traduites.
+  if (!res?.error) pretraduireProcedure(rows?.[0]?.procedure_id, true)
+  return res
+}
+async function insererEtapes(rows) {
   let res = await supabase.from('etapes').insert(rows)
   // Replis successifs si la base n'a pas encore les colonnes ajoutées.
   if (res.error && /image_url/i.test(res.error.message || '')) {
@@ -27796,7 +28052,8 @@ async function publishProcedure(errorElId, btnId) {
     : await supabase.from('procedures')
         .insert({ entreprise_id: currentMembre.entreprise_id, titre, categorie,
                   sous_categorie: sousCategorie, categorie_icone: categorieIcone,
-                  video_url: videoUrl, created_by: currentMembre.id })
+                  video_url: videoUrl, created_by: currentMembre.id,
+                  langue_origine: langueRedaction() })
         .select().single()
 
   /* L'image d'attente arrive après coup : la ligne existe déjà, on la lui
@@ -27941,6 +28198,12 @@ async function openAnalyse(procId) {
      précédente avant la moindre attente, et on demande son adresse signée
      tout de suite. */
   const procConnue = (allGestionProcedures || []).find(p => p.id === procId)
+  /* La gestion ouvre la procédure (souvent juste après l'analyse IA) : on
+     demande déjà sa traduction dans les langues de l'équipe. Une fois par
+     session ; jamais pendant que l'IA écrit encore les étapes. */
+  if ((procConnue?.etapes?.[0]?.count || 0) > 0 && !['traitement', 'redaction'].includes(procConnue?.statut)) {
+    pretraduireProcedure(procId)
+  }
   reinitialiserVideoFiche('analyse-video-frame', 'analyse-video', !!procConnue?.video_url)
   const promesseVideo = procConnue?.video_url ? urlSignee(procConnue.video_url) : null
   const promesseApercu = procConnue?.apercu_url ? urlSignee(procConnue.apercu_url) : null
@@ -28290,27 +28553,34 @@ async function openAnalyse(procId) {
   qrContainer.innerHTML = ''
   qrContainer.appendChild(canvas)
 
-  document.getElementById('qr-download-btn').onclick = async (ev) => {
-    /* ═══ LE QR CODE PART EN PDF ═══
-       Demande d'Em. Cette fiche est faite pour être imprimée et collée au mur.
-       Une image s'imprimait à une taille au hasard, selon l'imprimante et le
-       logiciel ; le PDF sort sur une page A4, la fiche centrée, à la bonne
-       taille, nette — on l'ouvre et on imprime.
+  document.getElementById('qr-download-btn').onclick = () => {
+    /* ═══ IMAGE OU PDF : ON DEMANDE ═══
 
-       On n'exporte toujours pas le QR nu mais la fiche entière : titre,
-       consigne et logo. Un carré noir et blanc collé sur un mur sans rien
-       autour ne dit à personne ce qu'il ouvre.
+       Le QR code partait en PDF (demande d'Em, pour l'imprimer à la bonne
+       taille). Mais sur iPhone, un PDF ne se range que dans « Fichiers » : la
+       fenêtre de partage ne propose pas « Enregistrer l'image », et on ne
+       pouvait plus le garder dans Photos ni l'envoyer comme une photo.
 
-       Un filet gris très léger entoure la fiche : c'est le trait de coupe. */
-    const bouton = ev?.currentTarget
-    const avant = bouton?.textContent
-    if (bouton) { bouton.disabled = true; bouton.textContent = tLang('Préparation du PDF…') }
-    try {
-      /* Les accents sont retirés du nom : certains systèmes les refusent dans
-         un téléchargement et rebaptisent alors le fichier « download ». */
-      const nomFichier = `${proc.titre.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'standix'}-qr-code.pdf`
-      const fiche = composerFicheQR(canvas, proc.titre, 3)
+       Le bouton demande donc ce qu'on veut :
+       • « Enregistrer l'image » — une image PNG nette de la fiche ; la
+         fenêtre de partage d'iPhone propose alors « Enregistrer l'image »,
+         qui la range dans Photos ;
+       • « PDF à imprimer » — la page A4 d'avant, la fiche centrée.
+
+     ⚠ LES DEUX FICHIERS SE PRÉPARENT DÈS L'OUVERTURE DE LA FENÊTRE. Safari
+       n'ouvre la fenêtre de partage que dans l'instant qui suit un appui : si
+       l'on fabriquait le fichier APRÈS le choix, ce délai pouvait être
+       dépassé et le partage refusé. Quand on appuie, le fichier est prêt.
+
+       On n'exporte jamais le QR nu mais la fiche entière : titre, consigne et
+       logo. Un carré noir et blanc collé sur un mur ne dit à personne ce qu'il
+       ouvre. */
+    const base = proc.titre.normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^A-Za-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'standix'
+    const fiche = composerFicheQR(canvas, proc.titre, 3)
+    const enImage = fetch(fiche).then(r => r.blob())
+      .then(b => new File([b], `${base}-qr-code.png`, { type: 'image/png' }))
+    const enPdf = (async () => {
       const dims = await new Promise((ok, non) => {
         const i = new Image()
         i.onload = () => ok({ l: i.naturalWidth, h: i.naturalHeight })
@@ -28320,43 +28590,79 @@ async function openAnalyse(procId) {
       const jsPDF = await chargerJsPDF()
       const doc = new jsPDF({ unit: 'mm', format: 'a4' })
       /* 140 mm de large : un QR d'environ 9 cm, lisible à plus d'un mètre.
-         Si un titre de trois lignes rendait la fiche trop haute pour la page,
-         on la réduit pour qu'elle tienne. */
+         Un titre de trois lignes qui rendrait la fiche trop haute la réduit. */
       let l = 140, h = l * dims.h / dims.l
       if (h > 250) { h = 250; l = h * dims.l / dims.h }
       const x = (210 - l) / 2, y = Math.max(20, (297 - h) / 2 - 8)
-      doc.addImage(fiche, 'PNG', x, y, l, h)
-      doc.setDrawColor(215, 215, 220)
+      /* ⚠ 'FAST' : L'IMAGE EST COMPRESSÉE. Sans cet argument, jsPDF range la
+         fiche décompressée, pixel par pixel : le PDF pesait 21 Mo pour une
+         seule page — trop lourd pour un courriel, long à ouvrir. */
+      doc.addImage(fiche, 'PNG', x, y, l, h, undefined, 'FAST')
+      doc.setDrawColor(215, 215, 220)        // le trait de coupe, très léger
       doc.setLineWidth(0.2)
       doc.roundedRect(x, y, l, h, 6, 6, 'S')
-      const blob = doc.output('blob')
+      return new File([doc.output('blob')], `${base}-qr-code.pdf`, { type: 'application/pdf' })
+    })()
+    enImage.catch(() => {}); enPdf.catch(() => {})
 
-      /* Sur iPhone, le téléchargement direct ne marche pas toujours : on
-         propose d'abord le partage du système (« Enregistrer dans Fichiers »,
-         « Imprimer »), sinon on télécharge. */
+    const donner = async (promesse, messageEchec) => {
       try {
-        const file = new File([blob], nomFichier, { type: 'application/pdf' })
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: proc.titre })
-          return
+        const file = await promesse
+        /* Le partage du système d'abord (iPhone : « Enregistrer l'image »,
+           « Enregistrer dans Fichiers », « Imprimer »), sinon on télécharge. */
+        try {
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file], title: proc.titre })
+            return
+          }
+        } catch (e) {
+          if (e?.name === 'AbortError') return         // partage annulé : rien à faire
         }
+        const url = URL.createObjectURL(file)
+        const link = document.createElement('a')
+        link.download = file.name
+        link.href = url
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        setTimeout(() => URL.revokeObjectURL(url), 4000)
       } catch (e) {
-        if (e?.name === 'AbortError') return           // partage annulé : rien à faire
+        console.warn('[qr]', e?.message || e)
+        toast(messageEchec)
       }
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.download = nomFichier
-      link.href = url
-      document.body.appendChild(link)
-      link.click()
-      link.remove()
-      setTimeout(() => URL.revokeObjectURL(url), 4000)
-    } catch (e) {
-      console.warn('[qr pdf]', e?.message || e)
-      toast(tLang('Le PDF n’a pas pu être créé'))
-    } finally {
-      if (bouton) { bouton.disabled = false; bouton.textContent = avant }
     }
+
+    const fond = document.createElement('div')
+    fond.className = 'ios-alert-backdrop'
+    fond.innerHTML = `
+      <div class="fen-pro" role="dialog" aria-modal="true">
+        <span class="fen-halo bleu"></span>
+        <div class="fen-co">
+          <div class="fen-t">${escapeHtml(tLang('Télécharger le QR code'))}</div>
+          <div class="fen-s">${escapeHtml(tLang('L’image se range dans Photos. Le PDF s’imprime sur une page A4.'))}</div>
+        </div>
+        <div class="fen-ac">
+          <button type="button" class="fen-p" data-qr="image">${escapeHtml(tLang('Enregistrer l’image'))}</button>
+          <button type="button" class="fen-a" data-qr="pdf">${escapeHtml(tLang('PDF à imprimer'))}</button>
+          <button type="button" class="fen-a" data-qr="non">${escapeHtml(tLang('Annuler'))}</button>
+        </div>
+      </div>`
+    document.body.appendChild(fond)
+    requestAnimationFrame(() => fond.classList.add('shown'))
+    const fermer = () => {
+      fond.classList.remove('shown')
+      fond.classList.add('closing')
+      setTimeout(() => fond.remove(), 200)
+    }
+    fond.addEventListener('click', (e) => {
+      const choix = e.target.closest('[data-qr]')?.dataset.qr
+      if (!choix && e.target !== fond) return
+      fermer()
+      /* ⚠ APPELÉ DANS L'APPUI MÊME, sans attente avant : c'est ce qui
+         autorise Safari à ouvrir la fenêtre de partage. */
+      if (choix === 'image') donner(enImage, tLang('L’image n’a pas pu être créée'))
+      else if (choix === 'pdf') donner(enPdf, tLang('Le PDF n’a pas pu être créé'))
+    })
   }
 }
 
@@ -29266,6 +29572,7 @@ async function loadEquipeProcedures() {
   })
 
   allEquipeProcedures = pretes
+  prechargerTraductions(pretes, equipeEtapesByProc)
 
   /* Meme chose cote equipe : ce qui existe a l'arrivee n'est pas une
      nouveaute. */
@@ -30597,7 +30904,7 @@ async function exporterProcedurePdf(proc, etapes) {
      Même traduction que la fiche à l'écran, et même cache : si la fiche vient
      d'être lue, rien n'est redemandé. En cas d'échec, le PDF part dans la
      langue d'origine plutôt que pas du tout. */
-  if (langueApp !== 'fr' && proc.id && (etapes || []).length) {
+  if (langueApp !== langueOrigine(proc) && proc.id && (etapes || []).length) {
     try {
       const trad = await demanderTraductionProc(proc.id, langueApp, contenuProc(proc, etapes))
       const parId = new Map((trad.etapes || []).map(e => [e.id, e]))
@@ -33428,6 +33735,7 @@ async function basculerVersEtablissement(entrepriseId) {
   if (!membre) return
 
   currentMembre = membre
+  noterLangueMembre()
 
   /* ═══════════════════════════════════════════════════════════════════════
      ON VIDE TOUS LES CACHES, PAS SEULEMENT L'ENTREPRISE
@@ -35590,17 +35898,70 @@ function contenuProc(proc, etapes) {
   return JSON.stringify([proc?.titre || '', (etapes || []).map(e => [e.id, e.titre || '', e.texte || '', e.attention || ''])])
 }
 
-function demanderTraductionProc(procId, langue, contenu) {
-  const cle = `${procId}:${langue}:${contenu}`
+/* ═══ LES TRADUCTIONS RESTENT SUR L'APPAREIL ═══
+
+   Demande d'Em : raccourcir l'attente avant que les étapes apparaissent dans
+   la langue choisie. Trois choses changent ensemble :
+
+   ① Chaque traduction reçue est gardée sur l'appareil, avec l'empreinte du
+     texte d'origine. Rouvrir une procédure — même après avoir fermé l'app —
+     l'affiche traduite à l'instant, sans réseau. Si le texte d'origine a
+     changé, l'empreinte ne correspond plus et l'on redemande.
+   ② À l'ouverture de la liste, on va chercher en arrière-plan les traductions
+     déjà prêtes sur le serveur (`cache_seul` : jamais d'appel à l'IA ici).
+   ③ Côté gestion, chaque enregistrement et chaque publication demande au
+     serveur de traduire tout de suite dans les langues de l'équipe
+     (`pretraduire`). Le premier employé qui ouvre la procédure n'attend plus.
+
+   Le reste du chemin ne bouge pas : l'original s'affiche d'abord, et un échec
+   le laisse en place.
+
+ ⚠ EFFACÉES À LA DÉCONNEXION avec le reste (voir `signOut`). */
+const CLE_TRADUCTIONS = 'standix_traductions_v1'
+const TRADUCTIONS_MAX = 150
+
+function empreinteTexte(t) {
+  // FNV-1a sur 32 bits : assez pour reconnaître un texte qui a changé.
+  let h = 0x811c9dc5
+  for (let i = 0; i < t.length; i++) { h ^= t.charCodeAt(i); h = Math.imul(h, 0x01000193) }
+  return (h >>> 0).toString(36) + ':' + t.length
+}
+function lireTraductionsLocales() {
+  try { return JSON.parse(localStorage.getItem(CLE_TRADUCTIONS) || '{}') || {} } catch (e) { return {} }
+}
+function traductionLocale(procId, langue, contenu) {
+  const t = lireTraductionsLocales()[`${procId}:${langue}`]
+  return t && t.h === empreinteTexte(contenu) && Array.isArray(t.d?.etapes) ? t.d : null
+}
+function rangerTraductionLocale(procId, langue, contenu, data) {
+  try {
+    const tout = lireTraductionsLocales()
+    tout[`${procId}:${langue}`] = { h: empreinteTexte(contenu), t: Date.now(),
+      d: { titre: data.titre, etapes: data.etapes } }
+    const cles = Object.keys(tout)
+    if (cles.length > TRADUCTIONS_MAX) {
+      cles.sort((a, b) => (tout[a].t || 0) - (tout[b].t || 0))
+        .slice(0, cles.length - TRADUCTIONS_MAX).forEach(k => delete tout[k])
+    }
+    localStorage.setItem(CLE_TRADUCTIONS, JSON.stringify(tout))
+  } catch (e) { /* stockage plein ou refusé : on garde la mémoire vive */ }
+}
+
+function demanderTraductionProc(procId, langue, contenu, cacheSeul = false) {
+  const locale = traductionLocale(procId, langue, contenu)
+  if (locale) return Promise.resolve(locale)
+  const cle = `${procId}:${langue}:${contenu}${cacheSeul ? ':cache' : ''}`
   if (!traductionsEnCache.has(cle)) {
     const p = (async () => {
       const rep = await fetch(`${SUPABASE_URL}/functions/v1/ai-traduire`, {
         method: 'POST',
         headers: await enTeteFonction(),
-        body: JSON.stringify({ procedure_id: procId, langue }),
+        body: JSON.stringify(cacheSeul ? { procedure_id: procId, langue, cache_seul: true } : { procedure_id: procId, langue }),
       })
       const data = await rep.json().catch(() => ({}))
+      if (cacheSeul && rep.ok && data.absent) return null
       if (!rep.ok || data.error || !Array.isArray(data.etapes)) throw new Error(data.error || 'traduction')
+      rangerTraductionLocale(procId, langue, contenu, data)
       return data
     })()
     // Un échec ne reste pas en cache : on réessaiera à la prochaine ouverture.
@@ -35608,6 +35969,50 @@ function demanderTraductionProc(procId, langue, contenu) {
     traductionsEnCache.set(cle, p)
   }
   return traductionsEnCache.get(cle)
+}
+
+/* ② LE PRÉCHARGEMENT. Les procédures de la liste dont la traduction est déjà
+   prête sur le serveur la reçoivent maintenant, trois à la fois, en arrière-
+   plan. Ce qui n'est pas prêt n'est PAS demandé à l'IA ici : la fiche s'en
+   chargera si on l'ouvre. */
+let tourPrechargementTrad = 0
+function prechargerTraductions(procs, etapesParProc) {
+  const langue = langueApp
+  const monTour = ++tourPrechargementTrad
+  const file = (procs || [])
+    .filter(p => p?.id && langueOrigine(p) !== langue && (etapesParProc?.[p.id] || []).length)
+    .map(p => ({ p, contenu: contenuProc(p, etapesParProc[p.id]) }))
+    .filter(x => !traductionLocale(x.p.id, langue, x.contenu))
+    .slice(0, 60)
+  if (!file.length) return
+  const suivant = async () => {
+    while (file.length) {
+      if (monTour !== tourPrechargementTrad || langueApp !== langue) return
+      const { p, contenu } = file.shift()
+      try { await demanderTraductionProc(p.id, langue, contenu, true) } catch (e) {}
+    }
+  }
+  // Après le premier affichage : la liste passe avant.
+  setTimeout(() => { suivant(); suivant(); suivant() }, 1200)
+}
+
+/* ③ LA TRADUCTION À L'AVANCE, demandée par la gestion. Le serveur répond tout
+   de suite et travaille ensuite seul : on n'attend rien, et un échec ne
+   change rien pour la personne qui enregistre. */
+const pretraduitesCetteSession = new Set()
+function pretraduireProcedure(procId, force = false) {
+  if (!procId || currentMembre?.role !== 'gestion') return
+  if (!force && pretraduitesCetteSession.has(procId)) return
+  pretraduitesCetteSession.add(procId)
+  ;(async () => {
+    try {
+      await fetch(`${SUPABASE_URL}/functions/v1/ai-traduire`, {
+        method: 'POST',
+        headers: await enTeteFonction(),
+        body: JSON.stringify({ procedure_id: procId, pretraduire: true }),
+      })
+    } catch (e) { pretraduitesCetteSession.delete(procId) }
+  })()
 }
 
 /* Pose un contenu (l'original ou sa traduction) dans la fiche ouverte. Les
@@ -35639,10 +36044,18 @@ async function traduireFicheOuverte(f = ficheOuverte) {
   const titreEl = document.getElementById(f.titreId)
   const langue = langueApp
 
-  if (langue === 'fr' || !f.etapes.length) {
+  /* ⚠ LA LANGUE D'ORIGINE N'EST PLUS FORCÉMENT LE FRANÇAIS. Une procédure
+     créée depuis une app en anglais est écrite en anglais : c'est elle qu'on
+     montre telle quelle à qui lit en anglais, et qu'on traduit pour qui lit
+     en français. */
+  if (langue === langueOrigine(f.proc) || !f.etapes.length) {
     poserContenuFiche(f, { titre: f.proc.titre, etapes: f.etapes })
     return
   }
+
+  /* Déjà traduite sur cet appareil : tout de suite, sans voile d'attente. */
+  const locale = traductionLocale(f.proc.id, langue, contenuProc(f.proc, f.etapes))
+  if (locale) { poserContenuFiche(f, locale); return }
 
   zone?.classList.add('trad-attente')
   titreEl?.classList.add('trad-attente')
@@ -36310,6 +36723,7 @@ document.getElementById('pub-btn')?.addEventListener('click', async () => {
 
   if (error) { toast(tLang('Échec : {message}', { message: error.message })); return }
   peindrePublication(data)
+  if (!retrait) pretraduireProcedure(editProcedureId, true)
 
   /* ═══ RÉPERCUTER LE CHANGEMENT PARTOUT ═══
 
@@ -37051,6 +37465,13 @@ function toast(texte) {
     document.body.appendChild(el)
   }
   el.textContent = texte
+  /* ⚠ PAR-DESSUS LA CAMÉRA. Elle couvre tout l'écran (z-index 9500) : un
+     message posé dessous ne se voyait pas. Il passe au-dessus, et en haut,
+     sous la définition — en bas, il cacherait le compteur et le bouton. */
+  const surCamera = document.getElementById('cam-voile')?.style.display === 'flex'
+  el.style.zIndex = surCamera ? '9600' : '150'
+  el.style.bottom = surCamera ? 'auto' : '118px'
+  el.style.top = surCamera ? 'calc(env(safe-area-inset-top, 0px) + 78px)' : 'auto'
   /* ⚠ LE COMPTE DES 2,4 s PART QUAND LA NOTIFICATION EST VRAIMENT VUE.
 
      Le bug : « Enregistrement prêt — lancez l'analyse » restait figée à
@@ -37968,24 +38389,30 @@ function surlignerSaisie(nom, saisie) {
      s'empilaient sous le champ : avec dix dossiers c'était lisible, avec cent
      elles poussaient le formulaire hors de l'écran. La liste flotte maintenant
      au-dessus du formulaire, dans la même matière que le menu « Filtrer »
-     (`.glassDiv`), une ligne par dossier, et elle DÉFILE : sa hauteur ne
-     dépend plus du nombre de dossiers.
+     (`.glassDiv`), une ligne par dossier.
 
-   ⚠ L'ORDRE EST CELUI QU'ON ATTEND EN TAPANT. Champ vide : tout, de A à Z.
-     Des lettres tapées : d'abord les noms qui COMMENCENT par elles (ou dont
-     un mot commence par elles), puis ceux qui les contiennent — chaque
-     groupe de A à Z. Taper « ca » montre « Caisse » avant « Mise en place ».
+   ⚠ TROIS LIGNES, PAS PLUS (demande d'Em). La fenêtre propose ; elle ne
+     présente pas un catalogue. Les lettres tapées font le reste, et la
+     dernière ligne dit combien d'autres attendent derrière.
 
-   ⚠ AU-DELÀ DE 60 LIGNES, on n'en dessine pas plus : la dernière ligne dit
-     combien il en reste et invite à taper quelques lettres de plus.
+   ⚠ L'ORDRE EST CELUI QU'ON ATTEND EN TAPANT. Champ vide : de A à Z. Des
+     lettres tapées : d'abord les noms qui COMMENCENT par elles (ou dont un
+     mot commence par elles), puis ceux qui les contiennent — chaque groupe de
+     A à Z.
 
-   La couleur du point suit toujours la place du dossier dans l'ordre de A à
-   Z de TOUS les dossiers : elle ne change pas pendant qu'on tape. */
-/* ⚠ TROIS LIGNES, PAS PLUS (demande d'Em). La fenêtre propose ; elle ne
-   présente pas un catalogue. Trois suggestions se lisent d'un coup d'œil, et
-   les lettres tapées font le reste — la dernière ligne dit combien d'autres
-   attendent derrière. */
+   ⚠ NI POINT DE COULEUR NI NOMBRE (demande d'Em). À la manière d'Apple : un
+     pictogramme au trait, d'une seule teinte, et le nom. Le dossier montre
+     son propre dessin (celui de la liste des procédures) ; le sous-dossier,
+     le même dessin que ses cartes dans l'app — deux chemises l'une derrière
+     l'autre. */
 const FENETRE_DOSSIERS_MAX = 3
+
+/* Le dessin des cartes de sous-dossier (`carteSousDossier`) : la chemise du
+   fond, plus pâle, puis celle de devant. Les deux tracés sont repris tels
+   quels pour que la fenêtre et la page du dossier montrent le même objet. */
+const GLYPHE_SOUS_DOSSIER =
+  '<path d="M2.4 6.6a1.7 1.7 0 0 1 1.7-1.7h3.3l1.6 1.9h6" stroke-opacity="0.45" stroke-width="1.5"/>' +
+  '<path d="M6 10.2a2 2 0 0 1 2-2h3.4l1.7 2h6.9a2 2 0 0 1 2 2v6.6a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2Z"/>'
 
 function classerPourFenetre(liste, saisie) {
   const q = cleDossier(saisie)
@@ -38033,8 +38460,9 @@ function brancherTiroirDossiers(prefixe) {
     const peindre = () => {
       const saisie = champ.value
       const tous = sorte === 'cat' ? dossiersExistants() : sousDossiersExistants(champCat.value)
-      /* Rien à proposer ET rien de tapé : pas de fenêtre. Un dossier tout neuf
-         n'a aucun sous-dossier, mais si l'on tape, on dit qu'il sera créé. */
+      /* ⚠ RIEN À PROPOSER NE VEUT PAS DIRE RIEN À DIRE. Un dossier tout neuf
+         n'a aucun sous-dossier : si l'on tape, on dit qu'il sera créé. On ne
+         se tait que si rien n'est tapé. */
       if (!tous.length && cleDossier(saisie).length < 2) { fermer(); return }
       const exact = tous.some(e => cleDossier(e.nom) === cleDossier(saisie))
       const liste = classerPourFenetre(tous, saisie)
@@ -38050,13 +38478,9 @@ function brancherTiroirDossiers(prefixe) {
       const tete = sorte === 'cat'
         ? tLang('Vos dossiers')
         : tLang('Sous-dossiers de {nom}', { nom: champCat.value.trim() })
-      /* ⚠ PLUS DE POINTS DE COULEUR (demande d'Em). À la manière d'Apple : un
-         pictogramme au trait, d'une seule teinte — le dessin du dossier
-         lui-même (celui de la liste des procédures), et pour un sous-dossier
-         le simple dossier. La couleur ne disait rien ici : c'était un rang. */
       const glyphe = (nom) =>
-        `<svg class="td-ic" viewBox="0 0 24 24" aria-hidden="true"><path d="${
-          sorte === 'cat' ? traceIconeDossier(nom) : ICONE_DOSSIER_DEFAUT}"/></svg>`
+        `<svg class="td-ic" viewBox="0 0 24 24" aria-hidden="true">${
+          sorte === 'cat' ? `<path d="${traceIconeDossier(nom)}"/>` : GLYPHE_SOUS_DOSSIER}</svg>`
       const montrees = liste.slice(0, FENETRE_DOSSIERS_MAX)
       const reste = liste.length - montrees.length
       t.innerHTML =
@@ -38066,11 +38490,12 @@ function brancherTiroirDossiers(prefixe) {
             glyphe(e.nom) +
             `<span class="td-nom">${surlignerSaisie(e.nom, saisie)}</span>` +
           '</button>').join('') +
-        (reste > 0 ? `<div class="td-reste">${escapeHtml((reste === 1 ? tLang('Et 1 autre · tapez pour affiner') : tLang('Et {n} autres · tapez pour affiner', { n: reste })))}</div>` : '') +
+        (reste > 0 ? `<div class="td-reste">${escapeHtml(reste === 1
+            ? tLang('Et 1 autre · tapez pour affiner')
+            : tLang('Et {n} autres · tapez pour affiner', { n: reste }))}</div>` : '') +
         (nouveau ? `<div class="td-nouveau"><span class="td-plus">+</span><span>${escapeHtml(sorte === 'cat'
             ? tLang('« {nom} » sera un nouveau dossier.', { nom: saisie.trim() })
             : tLang('« {nom} » sera un nouveau sous-dossier.', { nom: saisie.trim() }))}</span></div>` : '')
-      t.scrollTop = 0
       ouvrir()
     }
 
@@ -38082,9 +38507,7 @@ function brancherTiroirDossiers(prefixe) {
     champ.addEventListener('keydown', (e) => { if (e.key === 'Escape') fermer() })
 
     /* ⚠ LES LIGNES NE VOLENT PAS LE CLAVIER : `pointerdown` est annulé, sinon
-       le champ perdait le curseur et la fenêtre se fermait avant le clic.
-       Mais on laisse faire le défilement de la liste au doigt : seul l'appui
-       sur une LIGNE est retenu, pas celui sur le fond de la fenêtre. */
+       le champ perdait le curseur et la fenêtre se fermait avant le clic. */
     t.addEventListener('pointerdown', (e) => { if (e.target.closest('.td-ligne')) e.preventDefault() })
     t.addEventListener('click', (e) => {
       const ligne = e.target.closest('.td-ligne')

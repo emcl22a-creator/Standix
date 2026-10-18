@@ -143,7 +143,7 @@
 <link rel="modulepreload" href="./supabase.js">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Poppins:wght@400;500;600&amp;display=swap"></noscript>
-<link rel="stylesheet" href="style.css?v=a5387116">
+<link rel="stylesheet" href="style.css?v=b90cdd4e">
 <style>
   /* ---- Verre : CSS EXACT du depot archisvaze/liquid-glass ---- */
   :root{
@@ -2398,13 +2398,16 @@
                Il porte maintenant ce qu'on vient y faire. -->
           <span id="ai-video-placeholder" class="ai-vide">
             <span class="ai-vide-rond">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              <!-- Un dessin, comme l'appareil photo de « Filmer » : un cadre de
+                   vidéo et son bouton lecture. La flèche d'envoi disait
+                   « partager », pas « vidéo ». -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                    stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 16.2V4.4"/><path d="m7.5 8.9 4.5-4.5 4.5 4.5"/>
-                <path d="M4.6 15.2v3.1a2 2 0 0 0 2 2h10.8a2 2 0 0 0 2-2v-3.1"/>
+                <rect x="2.8" y="4.6" width="18.4" height="14.8" rx="3.4"/>
+                <path d="M10.2 9.3v5.4a.6.6 0 0 0 .9.5l4.3-2.7a.6.6 0 0 0 0-1l-4.3-2.7a.6.6 0 0 0-.9.5Z"/>
               </svg>
             </span>
-            <span class="ai-vide-t">Choisir une vidéo</span>
+            <span class="ai-vide-t">Importer une vidéo</span>
             <span class="ai-vide-s">MP4 ou MOV · 5 minutes au maximum</span>
           </span>
         </div>
@@ -2423,7 +2426,7 @@
            trois cartes pleines auraient poussé « Générer les étapes » sous la
            ligne de flottaison.
 
-         ⚠ « Choisir une vidéo » RESTE L'ACTION PRINCIPALE. Ces trois-là sont
+         ⚠ « Importer une vidéo » RESTE L'ACTION PRINCIPALE. Ces trois-là sont
            en retrait, en dessous : on ne les lit que si la première ne
            convient pas. -->
       <div class="src-rang">
@@ -5291,7 +5294,7 @@
   </div>
 </div>
 
-<script type="module" src="app.js?v=6f1f9b07"></script>
+<script type="module" src="app.js?v=6458994e"></script>
 
 <!-- Filet de sécurité : si le script principal (module) échoue à charger
      (réseau, bloqueur de pub, etc.) ou prend trop de temps, on force l'affichage -->

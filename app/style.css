@@ -26367,68 +26367,95 @@ html::-webkit-scrollbar-thumb:hover{
   }
 }
 
-/* ═══ LE TIROIR DES DOSSIERS EXISTANTS ═══
-   Sous les champs « Dossier » et « Sous-dossier ». Même mouvement que le
-   tiroir « Combien de temps ça prend ? » : la hauteur s'ouvre (grille 0fr →
-   1fr, la courbe d'Apple), le contenu passe du flou au net, et les pastilles
-   arrivent l'une après l'autre. */
-.td-tiroir{
-  display:grid;
-  grid-template-rows:0fr;
-  transition:grid-template-rows 0.46s cubic-bezier(0.32,0.72,0,1);
+/* ═══ LA FENÊTRE DES DOSSIERS EXISTANTS ═══
+   Sous les champs « Dossier » et « Sous-dossier ». Même matière et même
+   mouvement que le menu « Filtrer » (`.tb-volet` + `.glassDiv`) : elle
+   descend de quelques pixels en grandissant depuis le champ, et flotte
+   par-dessus le formulaire au lieu de le pousser.
+
+   ⚠ ELLE DÉFILE. Sa hauteur est plafonnée : cent dossiers tiennent dans la
+     même fenêtre que cinq, et le formulaire ne bouge pas. */
+.td-ancre{ position:relative; height:0; z-index:60; }
+.td-menu{
+  --glass-radius:20px;
+  position:absolute; top:calc(8px * var(--ech, 1)); left:0; right:0;
+  padding:calc(6px * var(--ech, 1));
+  max-height:min(calc(330px * var(--ech, 1)), 46vh);
+  overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
+  opacity:0; transform:translateY(-8px) scale(0.97);
+  transform-origin:top center; pointer-events:none;
+  transition:opacity 0.2s cubic-bezier(0.32,0.72,0,1),
+             transform 0.28s cubic-bezier(0.32,0.72,0,1);
 }
-.td-tiroir.ouvert{ grid-template-rows:1fr; }
-.td-dedans{ overflow:hidden; min-height:0; }
-.td-co{
-  padding:calc(10px * var(--ech, 1)) 1px calc(2px * var(--ech, 1));
-  opacity:0; transform:translateY(-6px) scale(0.985); filter:blur(5px);
-  transform-origin:50% 0;
-  transition:opacity 0.18s ease, transform 0.46s cubic-bezier(0.32,0.72,0,1), filter 0.18s ease;
+.td-menu.ouvert{ opacity:1; transform:none; pointer-events:auto; }
+/* ⚠ LE VERRE EST PLUS ÉPAIS QU'AILLEURS. À 32 % de blanc, le menu « Filtrer »
+   flotte sur des cartes ; celle-ci flotte sur des CHAMPS ET DES LIBELLÉS, qui
+   transparaissaient sous les noms de dossiers et se lisaient en même temps.
+   Même flou, même filet, même ombre — seulement plus opaque. */
+.td-menu.glassDiv{
+  background-color:rgba(250,250,252,0.86);
+  -webkit-backdrop-filter:blur(22px) saturate(1.8);
+  backdrop-filter:blur(22px) saturate(1.8);
 }
-.td-tiroir.ouvert .td-co{
-  opacity:1; transform:none; filter:none;
-  transition:opacity 0.3s ease 0.06s, transform 0.5s cubic-bezier(0.32,0.72,0,1) 0.03s, filter 0.3s ease 0.06s;
-}
+/* ⚠ LA CARTE DU FORMULAIRE COUPE CE QUI DÉPASSE (`overflow:hidden`) : la
+   fenêtre était tranchée à son bord, trois lignes visibles sur quarante.
+   Le temps qu'elle est ouverte, la carte laisse dépasser. */
+.card:has(.td-menu:not([hidden])){ overflow:visible; }
+/* ⚠ ET SON BLOC PASSE DEVANT SES VOISINS. Chaque ligne du formulaire est un
+   bloc `position:relative; z-index:1` : celui du sous-dossier peignait la
+   fenêtre SOUS le bloc « Titre », venu après lui. Le bloc qui porte la
+   fenêtre ouverte monte d'un étage le temps qu'elle est là. */
+:has(> .td-ancre > .td-menu:not([hidden])){ position:relative; z-index:70; }
+.td-menu[hidden]{ display:none; }
+.td-menu::-webkit-scrollbar{ width:0; height:0; }
+
 .td-tete{
+  padding:calc(8px * var(--ech, 1)) calc(12px * var(--ech, 1)) calc(4px * var(--ech, 1));
   font-size:calc(11.5px * var(--ech, 1)); font-weight:600; letter-spacing:-0.005em;
-  color:var(--label-2); margin:0 2px calc(8px * var(--ech, 1));
+  color:var(--label-2);
 }
-.td-liste{ display:flex; flex-wrap:wrap; gap:calc(7px * var(--ech, 1)); }
-.td-puce{
-  display:inline-flex; align-items:center; gap:calc(7px * var(--ech, 1));
-  padding:calc(7px * var(--ech, 1)) calc(12px * var(--ech, 1)) calc(7px * var(--ech, 1)) calc(10px * var(--ech, 1));
-  border-radius:100px;
-  background:rgba(28,28,38,0.045);
-  border:0.5px solid rgba(28,28,38,0.10);
-  color:var(--label-1);
-  font:inherit; font-size:calc(14px * var(--ech, 1)); font-weight:550; letter-spacing:-0.01em;
-  cursor:pointer; -webkit-tap-highlight-color:transparent;
-  opacity:0; transform:translateY(4px) scale(0.96);
-  transition:transform 0.38s cubic-bezier(0.32,0.72,0,1), opacity 0.26s ease, background 0.15s ease;
+.td-ligne{
+  display:flex; align-items:center; gap:calc(11px * var(--ech, 1)); width:100%;
+  padding:calc(11px * var(--ech, 1)) calc(12px * var(--ech, 1));
+  border:none; background:none; border-radius:13px;
+  font-family:inherit; font-size:calc(15px * var(--ech, 1)); letter-spacing:-0.02em;
+  color:var(--label); text-align:left; cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
 }
-.td-tiroir.ouvert .td-puce{
-  opacity:1; transform:none;
-  transition-delay:calc(0.05s + var(--i, 0) * 0.025s);
-}
-.td-puce:active{ transform:scale(0.95); background:rgba(31,76,238,0.10); transition-delay:0s; }
+.td-ligne:active{ background:rgba(60,60,67,0.07); }
 @media (hover:hover) and (pointer:fine){
-  .td-puce:hover{ background:rgba(31,76,238,0.07); border-color:rgba(31,76,238,0.22); }
+  .td-ligne:hover{ background:rgba(60,60,67,0.05); }
 }
-.td-puce b{ font-weight:750; color:#1F4CEE; }
-.td-point{
-  width:calc(10px * var(--ech, 1)); height:calc(10px * var(--ech, 1));
-  border-radius:50%; flex:0 0 auto;
-  background:linear-gradient(135deg, #6BB6FF, #0C4A9E);
+.td-ligne + .td-ligne{ margin-top:1px; }
+.td-nom{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.td-nom{ font-weight:500; }
+/* Comme Spotlight : la partie tapée en gras, dans la même couleur. Le bleu
+   faisait deux couleurs de texte sur une ligne. */
+.td-nom b{ font-weight:700; color:inherit; }
+/* Le pictogramme, au trait, d'une seule teinte — le bleu des éléments
+   actionnables d'iOS. Ni pastille ni dégradé. */
+.td-ic{
+  width:calc(21px * var(--ech, 1)); height:calc(21px * var(--ech, 1)); flex:0 0 auto;
+  fill:none; stroke:#1F4CEE; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round;
 }
-.td-nb{
-  font-size:calc(12px * var(--ech, 1)); font-weight:600; color:var(--label-2);
-  font-variant-numeric:tabular-nums;
+/* Le nombre de procédures à droite du nom a été retiré (demande d'Em) :
+   la liste ne montre que les noms. */
+.td-reste{
+  padding:calc(10px * var(--ech, 1)) calc(12px * var(--ech, 1)) calc(8px * var(--ech, 1));
+  font-size:calc(12.5px * var(--ech, 1)); color:var(--label-2);
 }
 .td-nouveau{
-  font-size:calc(12.5px * var(--ech, 1)); color:var(--label-2);
-  margin:calc(9px * var(--ech, 1)) 2px 0; line-height:1.4;
+  display:flex; align-items:center; gap:calc(11px * var(--ech, 1));
+  padding:calc(11px * var(--ech, 1)) calc(12px * var(--ech, 1));
+  font-size:calc(13.5px * var(--ech, 1)); color:var(--label-2); line-height:1.35;
 }
-.td-liste + .td-nouveau{ margin-top:calc(10px * var(--ech, 1)); }
+.td-tete + .td-nouveau, .td-ligne + .td-nouveau, .td-reste + .td-nouveau{
+  border-top:0.5px solid rgba(60,60,67,0.12); margin-top:4px;
+}
+.td-plus{
+  width:calc(10px * var(--ech, 1)); flex:0 0 auto; text-align:center;
+  font-weight:700; color:#1F4CEE;
+}
 @media (prefers-reduced-motion: reduce){
-  .td-tiroir, .td-co, .td-puce{ transition:none !important; }
+  .td-menu{ transition:none !important; }
 }

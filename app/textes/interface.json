@@ -991,9 +991,9 @@
   "en": "Choose the screen and start",
   "de": "Bildschirm wählen und starten"
  },
- "Choisir une vidéo": {
-  "en": "Choose a video",
-  "de": "Video wählen"
+ "Importer une vidéo": {
+  "en": "Import a video",
+  "de": "Video importieren"
  },
  "Choisissez <b>Réglages du site web</b>": {
   "en": "Choose <b>Website Settings</b>",
@@ -1027,9 +1027,9 @@
   "en": "Choose a password with at least 6 characters.",
   "de": "Wählen Sie ein Passwort mit mindestens 6 Zeichen."
  },
- "Choisissez votre enregistrement avec « Choisir une vidéo »": {
-  "en": "Pick your recording with “Choose a video”",
-  "de": "Wählen Sie Ihre Aufnahme über „Video wählen“"
+ "Choisissez votre enregistrement avec « Importer une vidéo »": {
+  "en": "Pick your recording with “Import a video”",
+  "de": "Wählen Sie Ihre Aufnahme über „Video importieren“"
  },
  "Chrome sur Android": {
   "en": "Chrome on Android",
@@ -5250,5 +5250,33 @@
  "Et 1 autre · tapez pour affiner": {
   "en": "And 1 more · type to narrow down",
   "de": "Und 1 weiterer · tippen zum Eingrenzen"
+ },
+ "L’image se range dans Photos. Le PDF s’imprime sur une page A4.": {
+  "en": "The image goes to Photos. The PDF prints on an A4 page.",
+  "de": "Das Bild wird in Fotos gespeichert. Das PDF wird auf einer A4-Seite gedruckt."
+ },
+ "Enregistrer l’image": {
+  "en": "Save image",
+  "de": "Bild sichern"
+ },
+ "PDF à imprimer": {
+  "en": "PDF to print",
+  "de": "PDF zum Drucken"
+ },
+ "L’image n’a pas pu être créée": {
+  "en": "The image could not be created",
+  "de": "Das Bild konnte nicht erstellt werden"
+ },
+ "La caméra a été rouverte pendant la prise : votre vidéo est en {n} parties. Appuyez sur « Coller les vidéos » pour en faire une seule.": {
+  "en": "The camera was reopened during the recording: your video is in {n} parts. Tap “Join the videos” to make a single one.",
+  "de": "Die Kamera wurde während der Aufnahme neu geöffnet: Ihr Video besteht aus {n} Teilen. Tippen Sie auf „Videos zusammenfügen“, um eines daraus zu machen."
+ },
+ "La caméra se rouvre…": {
+  "en": "The camera is reopening…",
+  "de": "Die Kamera wird neu geöffnet…"
+ },
+ "En pause pendant votre absence — reprenez quand vous voulez.": {
+  "en": "Paused while you were away — resume whenever you like.",
+  "de": "Pausiert, während Sie weg waren — fahren Sie fort, wann Sie möchten."
  }
 }

@@ -5243,14 +5243,6 @@
   "en": "Reading time",
   "de": "Lesedauer"
  },
- "Et {n} autres · tapez pour affiner": {
-  "en": "And {n} more · type to narrow down",
-  "de": "Und {n} weitere · tippen zum Eingrenzen"
- },
- "Et 1 autre · tapez pour affiner": {
-  "en": "And 1 more · type to narrow down",
-  "de": "Und 1 weiterer · tippen zum Eingrenzen"
- },
  "L’image se range dans Photos. Le PDF s’imprime sur une page A4.": {
   "en": "The image goes to Photos. The PDF prints on an A4 page.",
   "de": "Das Bild wird in Fotos gespeichert. Das PDF wird auf einer A4-Seite gedruckt."

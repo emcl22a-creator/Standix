@@ -662,8 +662,6 @@ const DICO = {
     "Essai 14 jours gratuits": "14-day free trial",
     "Essentiel": "Essential",
     "et": "and",
-    "Et 1 autre · tapez pour affiner": "And 1 more · type to narrow down",
-    "Et {n} autres · tapez pour affiner": "And {n} more · type to narrow down",
     "Ex : Accueil": "e.g. Front desk",
     "Ex : Accueillir un client": "e.g. Greet a customer",
     "Ex : Le Comptoir": "e.g. The Counter",
@@ -1984,8 +1982,6 @@ const DICO = {
     "Essai 14 jours gratuits": "14 Tage kostenlos testen",
     "Essentiel": "Essential",
     "et": "und",
-    "Et 1 autre · tapez pour affiner": "Und 1 weiterer · tippen zum Eingrenzen",
-    "Et {n} autres · tapez pour affiner": "Und {n} weitere · tippen zum Eingrenzen",
     "Ex : Accueil": "z. B. Empfang",
     "Ex : Accueillir un client": "z. B. Einen Kunden empfangen",
     "Ex : Le Comptoir": "z. B. Der Tresen",
@@ -38391,9 +38387,10 @@ function surlignerSaisie(nom, saisie) {
      au-dessus du formulaire, dans la même matière que le menu « Filtrer »
      (`.glassDiv`), une ligne par dossier.
 
-   ⚠ TROIS LIGNES, PAS PLUS (demande d'Em). La fenêtre propose ; elle ne
-     présente pas un catalogue. Les lettres tapées font le reste, et la
-     dernière ligne dit combien d'autres attendent derrière.
+   ⚠ TROIS LIGNES VISIBLES, LES AUTRES EN FAISANT GLISSER (demande d'Em).
+     La fenêtre garde la hauteur de trois dossiers ; les suivants sont
+     dessous, et l'on fait défiler la liste du doigt. Un léger fondu en bas
+     dit qu'il en reste. Plus de ligne « Et 6 autres · tapez pour affiner ».
 
    ⚠ L'ORDRE EST CELUI QU'ON ATTEND EN TAPANT. Champ vide : de A à Z. Des
      lettres tapées : d'abord les noms qui COMMENCENT par elles (ou dont un
@@ -38460,10 +38457,11 @@ function brancherTiroirDossiers(prefixe) {
     const peindre = () => {
       const saisie = champ.value
       const tous = sorte === 'cat' ? dossiersExistants() : sousDossiersExistants(champCat.value)
-      /* ⚠ RIEN À PROPOSER NE VEUT PAS DIRE RIEN À DIRE. Un dossier tout neuf
-         n'a aucun sous-dossier : si l'on tape, on dit qu'il sera créé. On ne
-         se tait que si rien n'est tapé. */
-      if (!tous.length && cleDossier(saisie).length < 2) { fermer(); return }
+      /* ⚠ UN DOSSIER SANS SOUS-DOSSIER N'OUVRE PAS DE FENÊTRE (demande d'Em) :
+         il n'y a rien à proposer, même quand on tape. Pour les dossiers, on
+         ne se tait que si rien n'est tapé — un premier dossier s'annonce
+         encore comme nouveau. */
+      if (!tous.length && (sorte === 'sous' || cleDossier(saisie).length < 2)) { fermer(); return }
       const exact = tous.some(e => cleDossier(e.nom) === cleDossier(saisie))
       const liste = classerPourFenetre(tous, saisie)
       /* Le nom tapé est exactement un dossier, et c'est le seul qui
@@ -38481,22 +38479,34 @@ function brancherTiroirDossiers(prefixe) {
       const glyphe = (nom) =>
         `<svg class="td-ic" viewBox="0 0 24 24" aria-hidden="true">${
           sorte === 'cat' ? `<path d="${traceIconeDossier(nom)}"/>` : GLYPHE_SOUS_DOSSIER}</svg>`
-      const montrees = liste.slice(0, FENETRE_DOSSIERS_MAX)
-      const reste = liste.length - montrees.length
       t.innerHTML =
         (liste.length ? `<div class="td-tete">${escapeHtml(tete)}</div>` : '') +
-        montrees.map(e =>
+        (liste.length ? '<div class="td-defile">' + liste.map(e =>
           `<button type="button" class="td-ligne" role="option" data-nom="${escapeHtml(e.nom)}">` +
             glyphe(e.nom) +
             `<span class="td-nom">${surlignerSaisie(e.nom, saisie)}</span>` +
-          '</button>').join('') +
-        (reste > 0 ? `<div class="td-reste">${escapeHtml(reste === 1
-            ? tLang('Et 1 autre · tapez pour affiner')
-            : tLang('Et {n} autres · tapez pour affiner', { n: reste }))}</div>` : '') +
+          '</button>').join('') + '</div>' : '') +
         (nouveau ? `<div class="td-nouveau"><span class="td-plus">+</span><span>${escapeHtml(sorte === 'cat'
             ? tLang('« {nom} » sera un nouveau dossier.', { nom: saisie.trim() })
             : tLang('« {nom} » sera un nouveau sous-dossier.', { nom: saisie.trim() }))}</span></div>` : '')
       ouvrir()
+      cadrerDefilement()
+    }
+
+    /* ⚠ LA HAUTEUR EST MESURÉE, PAS DEVINÉE. Trois lignes, c'est l'écart entre
+       le haut de la première et le haut de la quatrième — quelle que soit la
+       taille du texte (`--ech`) ou un nom qui passe sur deux lignes. */
+    const cadrerDefilement = () => {
+      const zone = t.querySelector('.td-defile')
+      if (!zone) return
+      const lignes = zone.querySelectorAll('.td-ligne')
+      zone.style.maxHeight = lignes.length > FENETRE_DOSSIERS_MAX
+        ? `${lignes[FENETRE_DOSSIERS_MAX].offsetTop - lignes[0].offsetTop}px` : ''
+      zone.scrollTop = 0
+      const suite = () => zone.classList.toggle('suite',
+        zone.scrollTop + zone.clientHeight < zone.scrollHeight - 2)
+      zone.addEventListener('scroll', suite, { passive: true })
+      suite()
     }
 
     champ.addEventListener('focus', peindre)
@@ -38516,10 +38526,11 @@ function brancherTiroirDossiers(prefixe) {
       champ.dispatchEvent(new Event('input', { bubbles: true }))
       fermer()
       /* ⚠ ON NE DÉPLACE PAS LE CURSEUR TOUT SEUL (demande d'Em) : le clavier
-         se range, l'écran ne bouge pas, et la fenêtre des sous-dossiers de ce
-         dossier s'ouvre sans toucher au champ. */
+         se range et l'écran ne bouge pas.
+
+       ⚠ ET LA FENÊTRE DES SOUS-DOSSIERS NE S'OUVRE PLUS TOUTE SEULE (demande
+         d'Em) : elle attend qu'on touche le champ « Sous-dossier ». */
       champ.blur()
-      if (sorte === 'cat') tiroirSous?.peindre()
     })
 
     /* Ouverte sans que son champ ait le curseur, la fenêtre ne reçoit jamais
@@ -38533,10 +38544,8 @@ function brancherTiroirDossiers(prefixe) {
     return { peindre, fermer }
   }
 
-  let tiroirSous = null
   fabriquer(champCat, 'cat')
   const tSous = champSous ? fabriquer(champSous, 'sous') : null
-  tiroirSous = tSous
   /* Changer de dossier change les sous-dossiers proposés. */
   champCat.addEventListener('input', () => { if (document.activeElement === champSous) tSous?.peindre() })
 }

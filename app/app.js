@@ -14874,6 +14874,15 @@ function playCardShuffle(containerEl, oldRects) {
      est normalisé avant la comparaison : « Sécurité » devient « securite ».
      Un mot-clé accentué dans cette table ne serait jamais trouvé.
 
+   ⚠ UN MOT À DEUX SENS N'EST PAS UNE CLÉ (21/10, à la manière d'Apple : une
+     icône fausse est pire qu'une icône neutre). « garde » donnait l'icône de
+     l'astreinte à « Chien de garde », « poste » le courrier à « Fiche de
+     poste », « frais » la note de frais à « Produits frais ». Ces mots-là ne
+     sont plus des clés ; seules restent des expressions sans ambiguïté
+     (« garde de nuit », « la poste », « note de frais »). Dans le doute, le
+     dossier garde son dessin simple. Avant d'ajouter une clé d'un seul mot,
+     se demander s'il a un autre sens courant dans un nom de dossier.
+
    ⚠ LES TRACÉS SONT EN TRAIT, PAS EN APLAT. Ils sont peints par
      `stroke="url(#palN)"` avec le dégradé du dossier ; un tracé prévu pour
      être rempli ressortirait en pâté noir.
@@ -14892,11 +14901,11 @@ const CATALOGUE_ICONES = [
     d: 'M3.4 8.6a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M9 6.6V5a1.4 1.4 0 0 1 1.4-1.4h3.2A1.4 1.4 0 0 1 15 5v1.6 M12 10.4v6 M9 13.4h6' },
 
   /* — Cuisine — */
-  { cles: ['cuisine', 'chef', 'plat', 'recette', 'restauration', 'friteuse', 'four'],
+  { cles: ['cuisine', 'chef de cuisine', 'chef cuisinier', 'plat', 'recette', 'restauration', 'friteuse', 'four'],
     d: 'M7 20h10 M7.6 16.6h8.8 M12 3.4a3.4 3.4 0 0 0-3.3 2.7 3 3 0 0 0-.5 5.9v4.6h7.6v-4.6a3 3 0 0 0-.5-5.9A3.4 3.4 0 0 0 12 3.4Z' },
 
   /* — Salle, service — */
-  { cles: ['salle', 'service', 'table', 'dressage', 'couvert', 'restaurant'],
+  { cles: ['salle', 'service en salle', 'service a table', 'dressage', 'couvert', 'restaurant'],
     d: 'M6.4 3.4v7.2a2.2 2.2 0 0 0 4.4 0V3.4 M8.6 10.8V20.6 M16.4 3.4c-1.5 0-2.4 1.6-2.4 4s.9 3.6 2.4 3.6V20.6' },
 
   /* — Café, bar — */
@@ -14912,7 +14921,7 @@ const CATALOGUE_ICONES = [
     d: 'M12 3v18 M5.5 6.8 18.5 17.2 M18.5 6.8 5.5 17.2 M12 6.6 9.6 4.8 M12 6.6l2.4-1.8 M12 17.4l-2.4 1.8 M12 17.4l2.4 1.8' },
 
   /* — Informatique — */
-  { cles: ['informatique', 'systeme', 'reseau', 'logiciel', 'ordinateur', 'sap', 'erp', 'outil numerique'],
+  { cles: ['informatique', 'systeme informatique', 'reseau', 'logiciel', 'ordinateur', 'sap', 'erp', 'outil numerique'],
     d: 'M3.4 5.6a2 2 0 0 1 2-2h13.2a2 2 0 0 1 2 2v8.2a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M8.4 20.4h7.2 M12 15.8v4.6' },
 
   /* — Finance — */
@@ -14972,7 +14981,7 @@ const CATALOGUE_ICONES = [
     d: 'M13.6 3.4H7.4a2 2 0 0 0-2 2v13.2a2 2 0 0 0 2 2h9.2a2 2 0 0 0 2-2V8.4Z M13.6 3.4v5h5 M8.8 13h6.4 M8.8 16.4h4.2' },
 
   /* — Accueil, réception — */
-  { cles: ['accueil', 'reception', 'standard', 'visiteur', 'client'],
+  { cles: ['accueil', 'reception', 'visiteur', 'client'],
     d: 'M3.4 18.6h17.2 M4.6 18.6v-4.2a7.4 7.4 0 0 1 14.8 0v4.2 M12 7V4.4 M12 4.4a1.2 1.2 0 1 0 0-.1' },
 
   /* — Téléphone — */
@@ -14992,7 +15001,7 @@ const CATALOGUE_ICONES = [
     d: 'M3.4 7.6a2 2 0 0 1 2-2h7.6a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5.4a2 2 0 0 1-2-2Z M15 10.6l5.6-3.2v9.2L15 13.4Z' },
 
   /* — Déchets, tri — */
-  { cles: ['dechet', 'poubelle', 'tri', 'recyclage', 'ordure'],
+  { cles: ['dechet', 'poubelle', 'tri des dechets', 'tri selectif', 'recyclage', 'ordure'],
     d: 'M4.4 6.6h15.2 M9.4 6.6V4.8a1.4 1.4 0 0 1 1.4-1.4h2.4a1.4 1.4 0 0 1 1.4 1.4v1.8 M6.4 6.6l.9 12.2a2 2 0 0 0 2 1.8h5.4a2 2 0 0 0 2-1.8l.9-12.2 M10.2 10.4v6 M13.8 10.4v6' },
 
   /* — Allergènes — */
@@ -15088,7 +15097,7 @@ const CATALOGUE_ICONES = [
   /* — Bureau, juridique — */
   { cles: ['droit', 'avocat', 'clause', 'litige'],
     d: 'M12 4v16 M6.4 8h11.2 M4 8l2.4 6.4a3 3 0 0 0 5.6 0L14.4 8 M9.6 8l2.4 6.4a3 3 0 0 0 5.6 0L20 8' },
-  { cles: ['devis', 'bilan', 'tva', 'ecriture'],
+  { cles: ['devis', 'bilan', 'tva', 'ecriture comptable'],
     d: 'M7.4 3.4h9.2a1.8 1.8 0 0 1 1.8 1.8v13.6a1.8 1.8 0 0 1-1.8 1.8H7.4a1.8 1.8 0 0 1-1.8-1.8V5.2a1.8 1.8 0 0 1 1.8-1.8Z M8.8 7.4h6.4 M8.8 11.4h2.4 M8.8 15h2.4 M14.6 11.4v3.8 M12.8 13.2h3.6' },
   { cles: ['archive', 'classement', 'dossier papier', 'rangement bureau'],
     d: 'M3.4 6.6h17.2v3.2H3.4Z M4.8 9.8v8.4a1.8 1.8 0 0 0 1.8 1.8h10.8a1.8 1.8 0 0 0 1.8-1.8V9.8 M9.8 13.6h4.4' },
@@ -15116,7 +15125,7 @@ const CATALOGUE_ICONES = [
   /* — Transport, logistique — */
   { cles: ['quai', 'palette'],
     d: 'M3.6 20.4V9.2L12 4.6l8.4 4.6v11.2 M8.6 20.4v-6.2h6.8v6.2 M8.6 17.2h6.8' },
-  { cles: ['itineraire', 'tournee', 'trajet', 'carte'],
+  { cles: ['itineraire', 'tournee', 'trajet', 'carte routiere', 'plan d acces'],
     d: 'M12 3.6a5.6 5.6 0 0 0-5.6 5.6c0 4.2 5.6 11.2 5.6 11.2s5.6-7 5.6-11.2A5.6 5.6 0 0 0 12 3.6Z M12 7.2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z' },
 
   /* — Numerique — */
@@ -15153,7 +15162,7 @@ const CATALOGUE_ICONES = [
      ═══════════════════════════════════════════════════════════════════════ */
 
   /* — Enseignement, école — */
-  { cles: ['ecole', 'enseignement', 'cours', 'classe', 'eleve', 'professeur', 'education'],
+  { cles: ['ecole', 'enseignement', 'cours particuliers', 'salle de classe', 'eleve', 'professeur', 'education'],
     d: 'M12 4 2.8 8.4 12 12.8l9.2-4.4Z M6.4 10.6v5.2c0 1.6 2.5 2.9 5.6 2.9s5.6-1.3 5.6-2.9v-5.2 M21.2 8.4v5.4' },
 
   /* — Coiffure, esthétique — */
@@ -15169,11 +15178,11 @@ const CATALOGUE_ICONES = [
     d: 'M4.6 20h14.8 M6.8 20V9.8a5.2 5.2 0 0 1 10.4 0V20 M12 4.6V3 M9 5.6 8.2 4.2 M15 5.6l.8-1.4' },
 
   /* — Immobilier, agence — */
-  { cles: ['immobilier', 'agence', 'bien', 'location', 'bail', 'logement', 'visite bien'],
+  { cles: ['immobilier', 'agence immobiliere', 'bien immobilier', 'location immobiliere', 'bail', 'logement', 'visite bien'],
     d: 'M3.4 10.6 12 4l8.6 6.6V20a1 1 0 0 1-1 1h-5.2v-6h-4.8v6H4.4a1 1 0 0 1-1-1Z' },
 
   /* — Laboratoire, mesure fine — */
-  { cles: ['laboratoire technique', 'essai', 'test', 'experimentation', 'calibrage', 'etalonnage'],
+  { cles: ['laboratoire technique', 'banc d essai', 'test qualite', 'experimentation', 'calibrage', 'etalonnage'],
     d: 'M9.6 3.4v6L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3l-4.8-8.6v-6 M8.4 3.4h7.2 M8.6 14h6.8' },
 
   /* — Boulangerie, pâtisserie — */
@@ -15202,7 +15211,7 @@ const CATALOGUE_ICONES = [
     d: 'M12 3.6a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Z M4.6 21a7.4 7.4 0 0 1 14.8 0 M10.2 7.2h.02 M13.8 7.2h.02' },
 
   /* — Aide à la personne — */
-  { cles: ['aide a domicile', 'auxiliaire', 'accompagnement', 'ehpad', 'maison de retraite', 'senior'],
+  { cles: ['aide a domicile', 'auxiliaire', 'ehpad', 'maison de retraite', 'senior'],
     d: 'M12 20.6s-7.4-4.4-7.4-9.4a4 4 0 0 1 7.4-2.2 4 4 0 0 1 7.4 2.2c0 5-7.4 9.4-7.4 9.4Z' },
 
   /* — Textile, couture — */
@@ -15217,19 +15226,19 @@ const CATALOGUE_ICONES = [
     d: 'M7.4 8.6V3.6h9.2v5 M7.4 18.4H5.6a2 2 0 0 1-2-2v-4.4a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v4.4a2 2 0 0 1-2 2h-1.8 M7.4 14.6h9.2v6H7.4Z' },
 
   /* — Culture, spectacle — */
-  { cles: ['culture', 'theatre', 'musee', 'exposition', 'scene'],
+  { cles: ['theatre', 'musee', 'exposition', 'scene'],
     d: 'M3.6 8.4a2 2 0 0 1 2-2h12.8a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v1.2a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2v-1.2a2 2 0 0 0 0-4Z M12 6.4v11.2' },
 
   /* — Tourisme, guide — */
-  { cles: ['tourisme', 'guide', 'excursion', 'visite guidee', 'office de tourisme'],
+  { cles: ['tourisme', 'guide touristique', 'excursion', 'visite guidee', 'office de tourisme'],
     d: 'M20.4 11.6c0 5-8.4 9.4-8.4 9.4s-8.4-4.4-8.4-9.4a8.4 8.4 0 0 1 16.8 0Z M12 8.6a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z' },
 
   /* — Assurance, mutuelle — */
-  { cles: ['assurance', 'mutuelle', 'sinistre', 'garantie', 'indemnisation', 'expertise'],
+  { cles: ['assurance', 'mutuelle', 'sinistre', 'garantie', 'indemnisation'],
     d: 'M12 3.4 4.6 6.4v5.2c0 4.6 3.2 8.6 7.4 9.6 4.2-1 7.4-5 7.4-9.6V6.4Z M12 9v5.6' },
 
   /* — Banque, guichet — */
-  { cles: ['banque', 'guichet', 'agence bancaire', 'depot', 'retrait', 'virement'],
+  { cles: ['banque', 'guichet', 'agence bancaire', 'depot bancaire', 'depot d especes', 'retrait d especes', 'virement'],
     d: 'M3.4 9.6 12 4.4l8.6 5.2 M4.6 9.6v9 M9.4 9.6v9 M14.6 9.6v9 M19.4 9.6v9 M3 20.4h18' },
 
   /* — Énergie, chaufferie — */
@@ -15267,7 +15276,7 @@ const CATALOGUE_ICONES = [
     d: 'M3.6 8.6a2 2 0 0 1 2-2h2.2l1.4-2h5.6l1.4 2h2.2a2 2 0 0 1 2 2v8.8a2 2 0 0 1-2 2H5.6a2 2 0 0 1-2-2Z M12 9.6a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z' },
 
   /* — Développement, code — */
-  { cles: ['developpement', 'code', 'programmation', 'deploiement', 'integration continue'],
+  { cles: ['developpement', 'programmation', 'deploiement', 'integration continue'],
     d: 'M8.4 8.4 4.6 12l3.8 3.6 M15.6 8.4 19.4 12l-3.8 3.6 M13.4 5.6l-2.8 12.8' },
 
   /* — Réunion à distance — */
@@ -15279,7 +15288,7 @@ const CATALOGUE_ICONES = [
     d: 'M12 3.6 21.4 20H2.6Z M12 9.6v5 M12 17.4h.02' },
 
   /* — Astreinte, garde — */
-  { cles: ['astreinte', 'garde', 'permanence', 'nuit', 'week end', 'rotation'],
+  { cles: ['astreinte', 'garde de nuit', 'permanence', 'nuit', 'week end', 'rotation'],
     d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 7.4V12l3.4 2' },
 
   /* — Objectif, performance — */
@@ -15330,15 +15339,15 @@ const CATALOGUE_ICONES = [
     d: 'M6 3.4h8.4L19 8v12a1.6 1.6 0 0 1-1.6 1.6H6A1.6 1.6 0 0 1 4.4 20V5A1.6 1.6 0 0 1 6 3.4Z M14 3.6V8h4.6 M8.4 17.2v-3 M11.8 17.2v-5.4 M15.2 17.2v-2' },
 
   /* — Courrier, tri — */
-  { cles: ['courrier', 'tri du courrier', 'poste', 'affranchissement', 'enveloppe', 'recommande'],
+  { cles: ['courrier', 'tri du courrier', 'la poste', 'bureau de poste', 'affranchissement', 'enveloppe', 'recommande'],
     d: 'M3.6 6.8a1.4 1.4 0 0 1 1.4-1.4h14a1.4 1.4 0 0 1 1.4 1.4v10.4a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4Z M3.9 6.4 12 12.6l8.1-6.2' },
 
   /* — Validation, tampon — */
-  { cles: ['tampon', 'cachet', 'accord', 'signature interne'],
+  { cles: ['tampon', 'cachet', 'signature interne'],
     d: 'M12 3.6a3.4 3.4 0 0 1 3.4 3.4c0 1.8-1.2 2.6-1.2 4.2h-4.4C9.8 9.6 8.6 8.8 8.6 7A3.4 3.4 0 0 1 12 3.6Z M7.4 14.6h9.2l1.6 3.4H5.8Z M4.6 20.4h14.8' },
 
   /* — Intégration, arrivée — */
-  { cles: ['arrivee', 'nouveau collaborateur', 'accueil salarie', 'depart'],
+  { cles: ['arrivee collaborateur', 'nouveau collaborateur', 'accueil salarie', 'depart collaborateur'],
     d: 'M13.6 3.6h4.8a1.6 1.6 0 0 1 1.6 1.6v13.6a1.6 1.6 0 0 1-1.6 1.6h-4.8 M9.6 8.4 5.4 12.4l4.2 4 M5.6 12.4h9.2' },
 
   /* — Base de données — */
@@ -15371,7 +15380,7 @@ const CATALOGUE_ICONES = [
     d: 'M4.4 8.4a1.6 1.6 0 0 1 1.6-1.6h12a1.6 1.6 0 0 1 1.6 1.6v8.4a1.6 1.6 0 0 1-1.6 1.6H6a1.6 1.6 0 0 1-1.6-1.6Z M4.4 11.4h15.2 M7.4 15h2.6 M16.4 6.8V5.2a1.4 1.4 0 0 0-1.4-1.4H9a1.4 1.4 0 0 0-1.4 1.4v1.6' },
 
   /* — Note de frais — */
-  { cles: ['note de frais', 'frais', 'remboursement', 'defraiement'],
+  { cles: ['note de frais', 'frais professionnels', 'remboursement', 'defraiement'],
     d: 'M7 3.6h10v16.8l-2-1.4-1.6 1.4-1.4-1.4-1.6 1.4-1.4-1.4-2 1.4Z M10 8h4 M10 11.4h4 M12 13.8v3 M10.4 15h3.2' },
 
   /* — Congés, absences — */
@@ -15390,7 +15399,7 @@ const CATALOGUE_ICONES = [
     d: 'M5.4 4.6a1.4 1.4 0 0 1 1.4-1.4h10.8a1.4 1.4 0 0 1 1.4 1.4v14.8a1.4 1.4 0 0 1-1.4 1.4H6.8a1.4 1.4 0 0 1-1.4-1.4Z M8.4 3.2v17.6 M11 8h5 M11 11.6h5 M11 15.2h3' },
 
   /* — Organigramme, hiérarchie — */
-  { cles: ['organigramme', 'hierarchie', 'structure', 'departement', 'rattachement'],
+  { cles: ['organigramme', 'hierarchie', 'departement', 'rattachement'],
     d: 'M9.6 3.6h4.8v3.6H9.6Z M3.6 16.8h4.8v3.6H3.6Z M15.6 16.8h4.8v3.6h-4.8Z M12 7.2v4.4 M6 16.8v-2.6h12v2.6 M6 14.2h12' },
 
   /* — Règlement intérieur — */
@@ -15437,7 +15446,7 @@ const CATALOGUE_ICONES = [
     d: 'M4.6 4.4h14.8L12 12.4Z M12 12.4v7.6 M8.4 20.4h7.2 M15.6 4.4l2.4-1.8' },
 
   /* — Bière — */
-  { cles: ['biere', 'bieres', 'pression', 'fut', 'futs', 'tireuse', 'brasserie'],
+  { cles: ['biere', 'bieres', 'biere pression', 'fut', 'futs', 'tireuse', 'brasserie'],
     d: 'M5.6 7h9.6v11.8a1.6 1.6 0 0 1-1.6 1.6H7.2a1.6 1.6 0 0 1-1.6-1.6Z M15.2 9.6h2a2 2 0 0 1 2 2v2.6a2 2 0 0 1-2 2h-2 M8.8 10.4v6.4 M12 10.4v6.4 M5.6 7a2.6 2.6 0 0 1 2.6-2.8h4.4A2.6 2.6 0 0 1 15.2 7' },
 
   /* — Pizza — */
@@ -15509,11 +15518,11 @@ const CATALOGUE_ICONES = [
     d: 'M6 18.4a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8Z M18 18.4a3.4 3.4 0 1 1 0-6.8 3.4 3.4 0 0 1 0 6.8Z M6 15l3.6-6.2h5.6L18 15 M9.6 8.8 12.2 15H6 M8.4 6.2h2.8' },
 
   /* — Voyage — */
-  { cles: ['voyage', 'voyages', 'deplacement', 'deplacements', 'mission', 'valise', 'bagage', 'bagagerie', 'deplacement professionnel'],
+  { cles: ['voyage', 'voyages', 'deplacement', 'deplacements', 'ordre de mission', 'valise', 'bagage', 'bagagerie', 'deplacement professionnel'],
     d: 'M4.4 8.4a1.4 1.4 0 0 1 1.4-1.4h12.4a1.4 1.4 0 0 1 1.4 1.4v10a1.4 1.4 0 0 1-1.4 1.4H5.8a1.4 1.4 0 0 1-1.4-1.4Z M9 7V5.2A1.2 1.2 0 0 1 10.2 4h3.6A1.2 1.2 0 0 1 15 5.2V7 M9 7v12.8 M15 7v12.8' },
 
   /* — Bateau — */
-  { cles: ['bateau', 'bateaux', 'port', 'nautique', 'marina', 'croisiere', 'ancre', 'navigation'],
+  { cles: ['bateau', 'bateaux', 'port', 'nautique', 'marina', 'croisiere', 'ancre', 'navigation maritime'],
     d: 'M12 7.4a1.9 1.9 0 1 1 0-3.8 1.9 1.9 0 0 1 0 3.8Z M12 7.4v13 M8.4 10.4h7.2 M4.6 13.4a7.4 7.4 0 0 0 14.8 0' },
 
   /* — Parking — */
@@ -15525,11 +15534,11 @@ const CATALOGUE_ICONES = [
     d: 'M8 3.8c1.4 0 2.6.8 4 .8s2.6-.8 4-.8a3.8 3.8 0 0 1 3.6 4.6c-.6 3-1.4 5-2 8.2-.4 2-1.4 3.6-2.4 3.6s-1.2-1.4-1.6-3.4c-.2-1.2-.6-2-1.6-2s-1.4.8-1.6 2c-.4 2-.6 3.4-1.6 3.4s-2-1.6-2.4-3.6c-.6-3.2-1.4-5.2-2-8.2A3.8 3.8 0 0 1 8 3.8Z' },
 
   /* — Optique — */
-  { cles: ['optique', 'opticien', 'lunettes', 'lentilles', 'examen de vue', 'monture'],
+  { cles: ['optique', 'opticien', 'lunettes', 'lentilles de contact', 'examen de vue', 'monture'],
     d: 'M3.4 14a3.4 3.4 0 1 0 6.8 0 3.4 3.4 0 0 0-6.8 0Z M13.8 14a3.4 3.4 0 1 0 6.8 0 3.4 3.4 0 0 0-6.8 0Z M10.2 13.4c1.2-.8 2.4-.8 3.6 0 M3.8 12.6 5.6 7.2 M20.2 12.6 18.4 7.2' },
 
   /* — Esthétique — */
-  { cles: ['esthetique', 'onglerie', 'manucure', 'pedicure', 'institut', 'institut de beaute', 'maquillage', 'epilation', 'estheticienne'],
+  { cles: ['esthetique', 'onglerie', 'manucure', 'pedicure', 'institut de beaute', 'maquillage', 'epilation', 'estheticienne'],
     d: 'M9 10.6h6a1.6 1.6 0 0 1 1.6 1.6v6.6a1.6 1.6 0 0 1-1.6 1.6H9a1.6 1.6 0 0 1-1.6-1.6v-6.6A1.6 1.6 0 0 1 9 10.6Z M10.2 10.6V7.6h3.6v3 M10.8 7.6V3.6h2.4v4' },
 
   /* — Spa — */
@@ -15562,7 +15571,7 @@ const CATALOGUE_ICONES = [
     d: 'M3.6 9.4a12 12 0 0 1 16.8 0 M6.4 12.4a8 8 0 0 1 11.2 0 M9.2 15.4a4 4 0 0 1 5.6 0 M12 18.4h.02' },
 
   /* — Serveur — */
-  { cles: ['serveur', 'serveurs', 'baie', 'salle serveur', 'cloud', 'nas'],
+  { cles: ['serveur', 'serveurs', 'baie', 'salle serveur', 'nas'],
     d: 'M4.4 4.6h15.2v5.4H4.4Z M4.4 14h15.2v5.4H4.4Z M7.4 7.3h.02 M7.4 16.7h.02 M10.4 7.3h6 M10.4 16.7h6' },
 
   /* — Smartphone — */
@@ -15570,7 +15579,7 @@ const CATALOGUE_ICONES = [
     d: 'M7.4 3.4h9.2a1.4 1.4 0 0 1 1.4 1.4v14.4a1.4 1.4 0 0 1-1.4 1.4H7.4A1.4 1.4 0 0 1 6 19.2V4.8a1.4 1.4 0 0 1 1.4-1.4Z M11 17.4h2' },
 
   /* — Batterie — */
-  { cles: ['batterie', 'batteries', 'recharge', 'borne de recharge', 'vehicule electrique', 'chargeur', 'onduleur'],
+  { cles: ['batterie', 'batteries', 'recharge', 'chargeur', 'onduleur'],
     d: 'M4 8.4a1.4 1.4 0 0 1 1.4-1.4h11.8a1.4 1.4 0 0 1 1.4 1.4v7.2a1.4 1.4 0 0 1-1.4 1.4H5.4A1.4 1.4 0 0 1 4 15.6Z M20.2 10.4v3.2 M11.8 9l-2 3h3.2l-2 3' },
 
   /* — Solaire — */
@@ -15578,7 +15587,7 @@ const CATALOGUE_ICONES = [
     d: 'M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z M12 2.8v2 M12 19.2v2 M2.8 12h2 M19.2 12h2 M5.5 5.5l1.4 1.4 M17.1 17.1l1.4 1.4 M5.5 18.5l1.4-1.4 M17.1 6.9l1.4-1.4' },
 
   /* — Météo — */
-  { cles: ['meteo', 'intemperie', 'intemperies', 'pluie', 'neige', 'hiver', 'saison', 'saisonnier'],
+  { cles: ['meteo', 'intemperie', 'intemperies', 'pluie', 'saison', 'saisonnier'],
     d: 'M7.4 17.6a4 4 0 0 1-.4-8 5.4 5.4 0 0 1 10.4 1.4 3.4 3.4 0 0 1-.4 6.6Z M9 20.4l.6-1 M12.6 20.4l.6-1' },
 
   /* — Clés — */
@@ -15620,6 +15629,1446 @@ const CATALOGUE_ICONES = [
   /* — Billetterie — */
   { cles: ['spectacle', 'billetterie', 'billet', 'billets', 'spectacles', 'cinema', 'controle des billets', 'entree'],
     d: 'M5 6.4h14a1.4 1.4 0 0 1 1.4 1.4v2.6a1.8 1.8 0 0 0 0 3.6v2.6a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4V14a1.8 1.8 0 0 0 0-3.6V7.8A1.4 1.4 0 0 1 5 6.4Z M15 6.6v1.6 M15 11.2v1.6 M15 15.8v1.6' },
+
+  /* ═══ AJOUTS DU 21/10 · 81 DESSINS (demande d'Em) ═══
+     Transport, sport, santé, restauration, bâtiment, sécurité au travail,
+     numérique, commerce, services publics. « cloud », « neige », « hiver »,
+     « borne de recharge » et « vehicule electrique » ont quitté leurs anciennes
+     entrées : ces dessins-ci les montrent mieux. */
+
+  /* — Fleuriste — */
+  { cles: ['fleur', 'fleurs', 'fleuriste', 'bouquet', 'composition florale', 'art floral'],
+    d: 'M12 21v-8 M12 13c-3 0-4.6-2-4.6-4.2 0-1.4.9-2.4 2-2.6C9.8 4.6 10.8 3.4 12 3.4s2.2 1.2 2.6 2.8c1.1.2 2 1.2 2 2.6C16.6 11 15 13 12 13Z M12 17.4c-1.6-1.8-3.8-2.2-5.4-1.6.6 2 2.8 3.2 5.4 2.6 M12 17.4c1.6-1.8 3.8-2.2 5.4-1.6-.6 2-2.8 3.2-5.4 2.6' },
+
+  /* — Librairie — */
+  { cles: ['livre', 'livres', 'librairie', 'bibliotheque', 'lecture', 'mediatheque'],
+    d: 'M12 6.6c-1.8-1.4-4.4-2-7.4-1.8v13c3-.2 5.6.4 7.4 1.8 1.8-1.4 4.4-2 7.4-1.8v-13c-3-.2-5.6.4-7.4 1.8Z M12 6.6v13' },
+
+  /* — Manuel, notice — */
+  { cles: ['manuel', 'mode d emploi', 'notice', 'documentation', 'guide utilisateur', 'fiche technique'],
+    d: 'M6 3.6h9.4L19 7.2v12.2a1.4 1.4 0 0 1-1.4 1.4H6a1.4 1.4 0 0 1-1.4-1.4V5A1.4 1.4 0 0 1 6 3.6Z M15.2 3.8v3.6h3.6 M11.8 11.4a1.6 1.6 0 1 1 1.6 1.6c-.8 0-1.2.6-1.2 1.4 M12.2 17.2h.02' },
+
+  /* — Carburant — */
+  { cles: ['carburant', 'station service', 'essence', 'gazole', 'diesel', 'pompe a essence', 'plein'],
+    d: 'M5 20.4V5.4A1.6 1.6 0 0 1 6.6 3.8h6.8A1.6 1.6 0 0 1 15 5.4v15 M3.8 20.4h12.4 M7.4 7.6h5.2v3.6H7.4Z M15 9.4h1.6a1.6 1.6 0 0 1 1.6 1.6v5.2a1.4 1.4 0 0 0 2.8 0V8.6l-2.4-2.4' },
+
+  /* — Taxi — */
+  { cles: ['taxi', 'vtc', 'chauffeur prive', 'course vtc'],
+    d: 'M5.4 11.4 7 7.2a1.6 1.6 0 0 1 1.5-1h7a1.6 1.6 0 0 1 1.5 1l1.6 4.2 M4.2 11.4h15.6a1 1 0 0 1 1 1v4.2a1 1 0 0 1-1 1H4.2a1 1 0 0 1-1-1v-4.2a1 1 0 0 1 1-1Z M6 17.6v1.8 M18 17.6v1.8 M7 14.4h.02 M17 14.4h.02 M10 3.8h4v2.4h-4Z' },
+
+  /* — Avion, aéroport — */
+  { cles: ['avion', 'aeroport', 'vol commercial', 'aerien', 'aerienne', 'compagnie aerienne', 'embarquement', 'piste d atterrissage'],
+    d: 'M10.6 20.4 12 17l1.4 3.4 M12 17V12.4 M12 3.6c.8 0 1.4.8 1.4 1.8v4.4l7 4.2v1.8l-7-2v3.2 M12 3.6c-.8 0-1.4.8-1.4 1.8v4.4l-7 4.2v1.8l7-2v3.2' },
+
+  /* — Train, gare — */
+  { cles: ['train', 'trains', 'gare', 'ferroviaire', 'tgv', 'tram', 'tramway', 'metro'],
+    d: 'M7 3.6h10a2 2 0 0 1 2 2v9.2a2.4 2.4 0 0 1-2.4 2.4H7.4A2.4 2.4 0 0 1 5 14.8V5.6a2 2 0 0 1 2-2Z M5 10.4h14 M8.6 13.8h.02 M15.4 13.8h.02 M8 17.2 6 20.4 M16 17.2l2 3.2' },
+
+  /* — Bus, autocar — */
+  { cles: ['bus', 'autobus', 'autocar', 'car scolaire', 'navette', 'transport scolaire'],
+    d: 'M5.4 3.6h13.2a1.4 1.4 0 0 1 1.4 1.4v11.6a1.4 1.4 0 0 1-1.4 1.4H5.4A1.4 1.4 0 0 1 4 16.6V5a1.4 1.4 0 0 1 1.4-1.4Z M4 11.4h16 M4 7.4h16 M7.4 14.4h.02 M16.6 14.4h.02 M7 18v2.4 M17 18v2.4' },
+
+  /* — Camping — */
+  { cles: ['camping', 'tente', 'bivouac', 'mobil home', 'glamping', 'randonnee'],
+    d: 'M12 4.4 3.4 19.6h17.2Z M12 4.4l-1.6-2 M12 4.4l1.6-2 M12 12.4l-3.4 7.2 M12 12.4l3.4 7.2' },
+
+  /* — Ski, montagne — */
+  { cles: ['ski', 'montagne', 'station de ski', 'remontee', 'remontees mecaniques', 'piste', 'pistes', 'alpinisme'],
+    d: 'M2.8 19.6 9 9.4l3.4 5 2.4-3.4 6.4 8.6Z M7.4 12l1.6 1.4 1.6-1.2' },
+
+  /* — Plage, baignade — */
+  { cles: ['plage', 'baignade', 'maitre nageur', 'sauvetage', 'surveillance de baignade', 'bord de mer'],
+    d: 'M3 19.4c1.5 0 1.5-1 3-1s1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 1.5-1 3-1 1.5 1 3 1 M12.6 16.4 9.2 6.4 M4.4 9.2C6 5.4 10.8 3.6 14.6 5.4a7.4 7.4 0 0 1 4 4.4Z' },
+
+  /* — Golf — */
+  { cles: ['golf', 'green', 'parcours de golf', 'caddie'],
+    d: 'M8.6 20.4V3.6l7.6 3.2-7.6 3.2 M4.4 20.4c0-1.6 3.4-2.6 7.6-2.6s7.6 1 7.6 2.6' },
+
+  /* — Tennis, padel — */
+  { cles: ['tennis', 'padel', 'raquette', 'squash', 'badminton', 'ping pong'],
+    d: 'M10 3.6a5.4 5.4 0 1 1 0 10.8 5.4 5.4 0 0 1 0-10.8Z M13.8 12.8l6.2 6.2 M5 7.4h10 M5 10.6h10 M8.4 3.9v10.2 M11.6 3.9v10.2 M18.6 3.8a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z' },
+
+  /* — Football, stade — */
+  { cles: ['football', 'foot', 'stade', 'match', 'ballon', 'terrain de sport', 'club sportif'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 8.4l3.2 2.3-1.2 3.8h-4l-1.2-3.8Z M12 8.4V5.2 M15.2 10.7l3-1 M14 14.5l1.8 2.6 M10 14.5l-1.8 2.6 M8.8 10.7l-3-1' },
+
+  /* — Yoga, bien-être — */
+  { cles: ['yoga', 'meditation', 'pilates', 'stretching', 'sophrologie', 'relaxation guidee'],
+    d: 'M12 3.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M12 9v5 M5 11.4l3.6 1L12 9l3.4 3.4 3.6-1 M7 19.4l5-2.6 5 2.6 M4.4 19.4h15.2' },
+
+  /* — Consultation médicale — */
+  { cles: ['consultation medicale', 'medecin', 'cabinet medical', 'patient', 'patients', 'stethoscope', 'generaliste'],
+    d: 'M6.4 3.6v4.6a4 4 0 0 0 8 0V3.6 M10.4 12.2v2.4a4.4 4.4 0 0 0 8.8 0v-2 M19.2 9.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z' },
+
+  /* — Hôpital — */
+  { cles: ['hopital', 'clinique', 'service hospitalier', 'bloc operatoire', 'hospitalisation', 'urgences hospitalieres'],
+    d: 'M4.4 20.4V7.4a1.4 1.4 0 0 1 1.4-1.4H9V3.6h6V6h3.2a1.4 1.4 0 0 1 1.4 1.4v13 M3 20.4h18 M12 8.6v5 M9.5 11.1h5 M10.2 20.4v-3h3.6v3' },
+
+  /* — Kinésithérapie — */
+  { cles: ['kine', 'kinesitherapie', 'kinesitherapeute', 'reeducation', 'physiotherapie', 'osteopathie', 'osteopathe'],
+    d: 'M12 3.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M8.4 20.4 10 14.4l2-3 2 3 1.6 6 M7 10.4l3-1.6h4l3 1.6 M12 11.4V8.8' },
+
+  /* — Vaccination — */
+  { cles: ['vaccin', 'vaccins', 'vaccination', 'injection', 'seringue', 'prise de sang'],
+    d: 'M17.2 3.4l3.4 3.4 M18.9 5.1l-3 3 M16.4 7.6l-8.6 8.6-2.6.6.6-2.6 8.6-8.6Z M5.2 16.8 3.4 18.6 M11.6 8.6l2 2 M9.6 10.6l2 2' },
+
+  /* — Masque, gestes barrières — */
+  { cles: ['masque', 'masques', 'covid', 'epidemie', 'gestes barrieres', 'barriere sanitaire', 'grippe'],
+    d: 'M5 9.2c2.4-1.4 4.8-2 7-2s4.6.6 7 2v4.4c0 2.6-3.2 4.8-7 4.8s-7-2.2-7-4.8Z M5 10.4H3.6a1.4 1.4 0 0 0-1.4 1.4c0 1.6 1.2 2.8 2.8 2.8 M19 10.4h1.4a1.4 1.4 0 0 1 1.4 1.4c0 1.6-1.2 2.8-2.8 2.8 M8.6 11.6h6.8 M8.6 14.2h6.8' },
+
+  /* — Gants — */
+  { cles: ['gant', 'gants', 'gants jetables', 'port des gants', 'gants de protection'],
+    d: 'M7.4 20.4v-3.6L4.6 12a1.4 1.4 0 0 1 2.4-1.4l1.6 2.2V5.4a1.3 1.3 0 0 1 2.6 0v5 M11.2 10V4.2a1.3 1.3 0 0 1 2.6 0V10 M13.8 10.2V5.4a1.3 1.3 0 0 1 2.6 0v5.2 M16.4 10.6V7.6a1.3 1.3 0 0 1 2.6 0v6.6a6.2 6.2 0 0 1-2.2 4.6v1.6' },
+
+  /* — Couteaux, affûtage — */
+  { cles: ['couteau', 'couteaux', 'affutage', 'aiguisage', 'tranchant', 'coupure'],
+    d: 'M20.4 3.6 9.4 14.6l-2.4-2.4c4-5 8.4-7.6 13.4-8.6Z M9.4 14.6l-4.8 4.8a1.4 1.4 0 0 0 2 2l4.8-4.8' },
+
+  /* — Chocolat, confiserie — */
+  { cles: ['chocolat', 'chocolaterie', 'confiserie', 'bonbon', 'bonbons', 'praline', 'cacao'],
+    d: 'M6 3.6h12a1.4 1.4 0 0 1 1.4 1.4v14a1.4 1.4 0 0 1-1.4 1.4H6A1.4 1.4 0 0 1 4.6 19V5A1.4 1.4 0 0 1 6 3.6Z M4.6 9.2h14.8 M4.6 14.8h14.8 M12 3.6v16.8' },
+
+  /* — Thé, infusion — */
+  { cles: ['salon de the', 'infusion', 'infusions', 'theiere', 'tisane', 'the vert'],
+    d: 'M5 9.4h11.4v3.8a5.7 5.7 0 0 1-11.4 0Z M16.4 10.4h1.4a2 2 0 0 1 0 4h-1.6 M8.4 6.4c0-1 1-1.2 1-2.2 M11.4 6.4c0-1 1-1.2 1-2.2 M4 20.4h13' },
+
+  /* — Sushi, asiatique — */
+  { cles: ['sushi', 'sushis', 'japonais', 'asiatique', 'wok', 'ramen', 'nouilles', 'chinois', 'thai'],
+    d: 'M4.4 11.4h15.2 M5.4 11.4a6.6 6.6 0 0 0 13.2 0 M8.4 20h7.2 M17.4 3.4 12 9.8 M20.4 4.8 13.6 10' },
+
+  /* — Salade, végétarien — */
+  { cles: ['salade', 'salades', 'vegetarien', 'vegan', 'vegetal', 'legume', 'legumes', 'crudites'],
+    d: 'M3.6 11.4h16.8a8.4 8.4 0 0 1-16.8 0Z M12 11.4c0-3.4 1.6-6 4.6-6.8.4 3-1.2 5.6-4.6 6.8Z M12 11.4C10.6 8.8 8.4 7.6 6 8c.2 1.6 1.6 3 3.6 3.4' },
+
+  /* — Petit-déjeuner, buffet — */
+  { cles: ['petit dejeuner', 'brunch', 'buffet', 'oeuf', 'oeufs', 'viennoiseries buffet'],
+    d: 'M3.4 15.4a8.6 8.6 0 0 1 17.2 0Z M2.6 18.4h18.8 M12 4.4v2.4 M14 8.6a2 2 0 1 1-4 0' },
+
+  /* — Barbecue, grill — */
+  { cles: ['barbecue', 'bbq', 'grill', 'grillade', 'grillades', 'plancha', 'rotisserie', 'braise'],
+    d: 'M4 9.4h16a8 8 0 0 1-16 0Z M7.4 17l-1.8 3.4 M16.6 17l1.8 3.4 M12 17.4v3 M8.4 6.4c0-1 1-1.4 1-2.6 M12 6.4c0-1 1-1.4 1-2.6 M15.6 6.4c0-1 1-1.4 1-2.6' },
+
+  /* — Crêpes, gaufres — */
+  { cles: ['crepe', 'crepes', 'creperie', 'gaufre', 'gaufres', 'pancake', 'galette'],
+    d: 'M4 6.6h16v10.8H4Z M4 10.2h16 M4 13.8h16 M9.4 6.6v10.8 M14.6 6.6v10.8' },
+
+  /* — Sandwich — */
+  { cles: ['sandwich', 'sandwichs', 'sandwicherie', 'panini', 'wrap', 'croque monsieur', 'bagel'],
+    d: 'M3.6 10.4 12 4.8l8.4 5.6Z M3.6 10.4h16.8v2.4H3.6Z M3.6 15.2c1.4 0 1.4-1 2.8-1s1.4 1 2.8 1 1.4-1 2.8-1 1.4 1 2.8 1 1.4-1 2.8-1 1.4 1 2.8 1 M3.6 17.4h16.8v1.6H3.6Z' },
+
+  /* — Soupe — */
+  { cles: ['soupe', 'soupes', 'potage', 'bouillon', 'veloute', 'pot au feu'],
+    d: 'M3.6 11.4h16.8a8.4 8.4 0 0 1-16.8 0Z M8 7.6c0-1.2 1.2-1.6 1.2-2.8 M12 7.6c0-1.2 1.2-1.6 1.2-2.8 M14.6 3.6 19 8' },
+
+  /* — Huile de friture — */
+  { cles: ['huile', 'huiles', 'huile usagee', 'vidange friteuse', 'bain de friture', 'graisse'],
+    d: 'M10 3.6h4 M10.4 3.6v3l-3 3.2a3 3 0 0 0-.8 2v7.2a1.4 1.4 0 0 0 1.4 1.4h8a1.4 1.4 0 0 0 1.4-1.4v-7.2a3 3 0 0 0-.8-2l-3-3.2v-3 M6.6 14h10.8' },
+
+  /* — Épices, assaisonnement — */
+  { cles: ['epice', 'epices', 'assaisonnement', 'condiment', 'condiments', 'sel et poivre', 'poivre'],
+    d: 'M8.6 3.6h6.8v3.2H8.6Z M8 6.8h8l1 3.2v9a1.4 1.4 0 0 1-1.4 1.4H8.4A1.4 1.4 0 0 1 7 19v-9Z M10.4 13.4h.02 M13.6 13.4h.02 M12 16h.02 M10.6 4.8h.02 M13.4 4.8h.02' },
+
+  /* — Gâteau, anniversaire — */
+  { cles: ['gateau', 'gateaux', 'anniversaire', 'anniversaires', 'fete', 'fetes', 'celebration'],
+    d: 'M4 20.4h16 M5.4 20.4v-6.6a1.4 1.4 0 0 1 1.4-1.4h10.4a1.4 1.4 0 0 1 1.4 1.4v6.6 M5.4 16.4c1.2 0 1.2-1 2.2-1s1 1 2.2 1 1.2-1 2.2-1 1 1 2.2 1 1.2-1 2.2-1 1 1 2.2 1 M12 12.4V9 M12 6.6c-.8 0-1.2-.6-1.2-1.2 0-1 1.2-2 1.2-2s1.2 1 1.2 2c0 .6-.4 1.2-1.2 1.2Z' },
+
+  /* — Cadeau — */
+  { cles: ['cadeau', 'cadeaux', 'carte cadeau', 'cheque cadeau', 'emballage cadeau', 'offre speciale'],
+    d: 'M4 9.4h16v3H4Z M5.4 12.4h13.2v8H5.4Z M12 9.4v11 M12 9.4c-1-2.6-2.6-4-4-4a1.8 1.8 0 0 0 0 3.6c1.4.4 2.8.4 4 .4Z M12 9.4c1-2.6 2.6-4 4-4a1.8 1.8 0 0 1 0 3.6c-1.4.4-2.8.4-4 .4Z' },
+
+  /* — Chaussures, cordonnerie — */
+  { cles: ['chaussure', 'chaussures', 'cordonnerie', 'cordonnier', 'basket', 'baskets', 'botte', 'bottes'],
+    d: 'M3.4 16.6V8.4h4.2l1.4 2.4 3.2.8 5.6 1.4a3.4 3.4 0 0 1 2.6 3.2v.4Z M3.4 16.6v2h17.2v-2 M10.4 11.2l-.8 1.8 M13 11.8l-.8 1.8' },
+
+  /* — Bijouterie, horlogerie — */
+  { cles: ['bijou', 'bijoux', 'bijouterie', 'joaillerie', 'montre', 'montres', 'horlogerie', 'horloger'],
+    d: 'M6.6 9.2 9 4.4h6l2.4 4.8L12 19.6Z M6.6 9.2h10.8 M10.6 9.2 12 19.6l1.4-10.4 M9 4.4l1.6 4.8 M15 4.4l-1.6 4.8' },
+
+  /* — Cybersécurité — */
+  { cles: ['cybersecurite', 'cyber', 'phishing', 'hameconnage', 'virus', 'antivirus', 'piratage', 'ransomware'],
+    d: 'M9 7.4V6a3 3 0 0 1 6 0v1.4 M7.6 7.4h8.8a1 1 0 0 1 1 1v5.4a5.4 5.4 0 0 1-10.8 0V8.4a1 1 0 0 1 1-1Z M12 10.4v6.4 M3.8 10.6h3.8 M16.4 10.6h3.8 M3.8 16.4h3.8 M16.4 16.4h3.8 M5 4.8l2.2 2 M19 4.8l-2.2 2' },
+
+  /* — Cloud — */
+  { cles: ['cloud', 'nuage informatique', 'stockage en ligne', 'drive en ligne', 'hebergement web', 'saas'],
+    d: 'M7 18.4a4.4 4.4 0 0 1-.6-8.8 5.6 5.6 0 0 1 10.8-1.2 4.6 4.6 0 0 1 .4 10Z M12 16.4v-5 M9.8 13.6l2.2-2.2 2.2 2.2' },
+
+  /* — Intelligence artificielle — */
+  { cles: ['intelligence artificielle', 'chatgpt', 'ia generative', 'assistant ia', 'prompt', 'prompts', 'agent ia'],
+    d: 'M11 3.6l1.6 4.6 4.6 1.6-4.6 1.6L11 16l-1.6-4.6L4.8 9.8l4.6-1.6Z M17.6 13.6l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8Z' },
+
+  /* — Robot, automatisation — */
+  { cles: ['robot', 'robots', 'automate', 'automates', 'automatisation', 'robotique', 'cobot'],
+    d: 'M6 8.4h12a1.4 1.4 0 0 1 1.4 1.4v8.2a1.4 1.4 0 0 1-1.4 1.4H6A1.4 1.4 0 0 1 4.6 18V9.8A1.4 1.4 0 0 1 6 8.4Z M12 8.4V5 M12 3.4a.8.8 0 1 1 0 1.6.8.8 0 0 1 0-1.6Z M9.2 12.4v1.4 M14.8 12.4v1.4 M9.6 16.4h4.8 M2.6 12.4v3 M21.4 12.4v3' },
+
+  /* — Usine, production — */
+  { cles: ['usine', 'usines', 'production', 'fabrication', 'ligne de production', 'industrie', 'industriel', 'manufacture'],
+    d: 'M3.4 20.4V10.6l5 3V10.6l5 3V10.6l5 3V4.4h2.2v16Z M2.6 20.4h18.8 M7 17.2h1.6 M11.4 17.2H13 M15.8 17.2h1.6' },
+
+  /* — Réglages, paramétrage — */
+  { cles: ['parametrage', 'parametres', 'reglage', 'reglages', 'configuration', 'preferences', 'setup'],
+    d: 'M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z M12 3.4v2.4 M12 18.2v2.4 M3.4 12h2.4 M18.2 12h2.4 M5.9 5.9l1.7 1.7 M16.4 16.4l1.7 1.7 M5.9 18.1l1.7-1.7 M16.4 7.6l1.7-1.7' },
+
+  /* — Outils, bricolage — */
+  { cles: ['outil', 'outils', 'boite a outils', 'cle a molette', 'bricolage', 'tournevis', 'outillage'],
+    d: 'M8.4 3.6h9.2a1 1 0 0 1 1 1v2.6a1 1 0 0 1-1 1H8.4L5.6 5.9Z M12.2 8.2v11.4a.9.9 0 0 0 1.8 0V8.2' },
+
+  /* — Toiture, charpente — */
+  { cles: ['toit', 'toiture', 'toitures', 'couvreur', 'charpente', 'charpentier', 'zinguerie', 'tuile'],
+    d: 'M2.6 12.4 12 4.4l9.4 8 M5.4 10.2v9.4h13.2v-9.4 M15.6 6.8V4.4h2.2v4.2 M9.4 19.6v-5h5.2v5' },
+
+  /* — Vitres, vitrerie — */
+  { cles: ['vitre', 'vitres', 'lavage des vitres', 'vitrier', 'vitrerie', 'fenetre', 'fenetres', 'miroiterie'],
+    d: 'M5 3.6h14v16.8H5Z M12 3.6v16.8 M5 12h14 M7.6 8.6l2-2 M14.6 15.6l2-2' },
+
+  /* — Carrelage, sols — */
+  { cles: ['carrelage', 'carreleur', 'faience', 'sol', 'sols', 'revetement de sol', 'parquet', 'dallage'],
+    d: 'M3.6 3.6h16.8v16.8H3.6Z M3.6 9.2h16.8 M3.6 14.8h16.8 M9.2 3.6v5.6 M14.8 3.6v5.6 M6.4 9.2v5.6 M12 9.2v5.6 M17.6 9.2v5.6 M9.2 14.8v5.6 M14.8 14.8v5.6' },
+
+  /* — Travail en hauteur — */
+  { cles: ['echafaudage', 'travail en hauteur', 'echelle', 'echelles', 'nacelle', 'escabeau', 'harnais antichute'],
+    d: 'M7 3.4v17.2 M17 3.4v17.2 M7 6.6h10 M7 10.4h10 M7 14.2h10 M7 18h10' },
+
+  /* — Gaz — */
+  { cles: ['gaz', 'bouteille de gaz', 'detection gaz', 'gaz naturel', 'propane', 'butane'],
+    d: 'M9 3.6h6 M12 3.6v2 M7.6 9a4.4 4.4 0 0 1 8.8 0v10a1.4 1.4 0 0 1-1.4 1.4H9A1.4 1.4 0 0 1 7.6 19Z M12 11.4c-1 1-1.6 1.8-1.6 2.8a1.6 1.6 0 0 0 3.2 0c0-1-.6-1.8-1.6-2.8Z' },
+
+  /* — Produits chimiques — */
+  { cles: ['produit chimique', 'produits chimiques', 'chimique', 'chimie', 'fds', 'fiche de donnees de securite', 'toxique', 'corrosif', 'produits dangereux'],
+    d: 'M9.4 3.6h5.2 M10.2 3.6v5.4L4.8 18.4a1.4 1.4 0 0 0 1.2 2h12a1.4 1.4 0 0 0 1.2-2L13.8 9V3.6 M7.4 14h9.2' },
+
+  /* — Bruit, protection auditive — */
+  { cles: ['bruit', 'protection auditive', 'casque antibruit', 'bouchons d oreilles', 'decibel', 'decibels', 'acoustique'],
+    d: 'M4.4 14.4V12a7.6 7.6 0 0 1 15.2 0v2.4 M4.4 13.4h2.4a1 1 0 0 1 1 1v4.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1Z M19.6 13.4h-2.4a1 1 0 0 0-1 1v4.2a1 1 0 0 0 1 1h1.4a1 1 0 0 0 1-1Z' },
+
+  /* — Ergonomie, postures — */
+  { cles: ['ergonomie', 'posture', 'postures', 'gestes et postures', 'tms', 'mal de dos', 'port de charges lourdes'],
+    d: 'M12 3.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M12 8.6v6 M8 20.4l4-5.8 4 5.8 M8 11.4h8 M6.4 15.4h3.2v3.6H6.4Z' },
+
+  /* — Accessibilité — */
+  { cles: ['accessibilite', 'handicap', 'pmr', 'fauteuil roulant', 'personne a mobilite reduite', 'rampe d acces', 'inclusion'],
+    d: 'M11 3.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M11 8.4v5.2h5l2.4 5 M11 10.6h4 M8.4 10.6a5 5 0 1 0 6.6 7' },
+
+  /* — Pause, repas du personnel — */
+  { cles: ['pause', 'pauses', 'pause dejeuner', 'pause cafe', 'repas du personnel', 'temps de pause'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M10 8.8v6.4 M14 8.8v6.4' },
+
+  /* — Cantine, self — */
+  { cles: ['cantine', 'self', 'self service', 'refectoire', 'restaurant d entreprise', 'restauration collective', 'plateau repas'],
+    d: 'M12 6.4a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Z M5.4 6.4v3.2 M4.2 6.4v2.4a1.2 1.2 0 0 0 2.4 0V6.4 M5.4 9.8v4.6 M18.4 6.4c1.2 1 1.4 2.8.6 4.2h-.6v3.8 M3 17.4h18 M3.8 17.4l1 3h14.4l1-3' },
+
+  /* — Élections du personnel — */
+  { cles: ['cse', 'elections professionnelles', 'representant du personnel', 'representants du personnel', 'vote', 'votes', 'election', 'scrutin'],
+    d: 'M4 12.4h16v8H4Z M8 12.4V7l5.6-3.4 2.8 4.4-5.6 3.4 M2.6 20.4h18.8 M9.6 16.4h4.8' },
+
+  /* — Certification, diplôme — */
+  { cles: ['certification', 'certifications', 'certificat', 'certificats', 'diplome', 'diplomes', 'qualification', 'label'],
+    d: 'M12 3.4a5.6 5.6 0 1 1 0 11.2 5.6 5.6 0 0 1 0-11.2Z M9.4 9l1.8 1.8 3.4-3.4 M8.8 13.6 7.4 20.4l4.6-2.4 4.6 2.4-1.4-6.8' },
+
+  /* — Langues, traduction — */
+  { cles: ['langue', 'langues', 'traduction', 'traducteur', 'interprete', 'anglais', 'allemand', 'italien'],
+    d: 'M3.6 5h8.8 M8 3.4V5 M10.6 5c-.6 3.6-3 6.4-6.4 8 M5.8 8.4c1.2 2 3 3.6 5.2 4.6 M12.4 20.6l4-9.4 4 9.4 M13.8 17.6h5.2' },
+
+  /* — Environnement, RSE — */
+  { cles: ['environnement', 'rse', 'ecologie', 'developpement durable', 'carbone', 'bilan carbone', 'eco geste', 'eco gestes', 'biodiversite'],
+    d: 'M5 19c0-8 5.4-13.4 15-14.4C19 14 14 19.4 6 19.4 M5 19c2.4-4 5.4-6.6 9.4-8.4' },
+
+  /* — Équitation — */
+  { cles: ['equitation', 'cheval', 'chevaux', 'ecurie', 'ecuries', 'centre equestre', 'poney', 'haras'],
+    d: 'M7.4 4.4H4.8v7a7.2 7.2 0 0 0 14.4 0v-7h-2.6v7a4.6 4.6 0 0 1-9.2 0Z M6.1 7.6h.02 M17.9 7.6h.02 M6.9 13.6h.02 M17.1 13.6h.02' },
+
+  /* — Vigne, vendanges — */
+  { cles: ['vigne', 'vignes', 'vignoble', 'vendange', 'vendanges', 'viticulture', 'viticulteur', 'domaine viticole', 'raisin'],
+    d: 'M12 7.6a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 11a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15 11a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M12 14.4a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M12 7.6V5.4c0-1 .6-1.6 1.6-2 M12 5.6c1.4-1.4 3.4-1.6 5-1-.6 1.6-2.4 2.4-4.4 2.2' },
+
+  /* — Forêt, élagage — */
+  { cles: ['foret', 'forets', 'bucheron', 'elagage', 'elagueur', 'tronconneuse', 'abattage', 'sylviculture', 'bois de chauffage'],
+    d: 'M12 3.4 6.4 11h3l-4 5.4h13.2l-4-5.4h3Z M12 16.4v4' },
+
+  /* — Neige, déneigement — */
+  { cles: ['neige', 'deneigement', 'salage', 'hiver', 'verglas', 'chasse neige', 'viabilite hivernale'],
+    d: 'M12 3v18 M4.2 7.5l15.6 9 M4.2 16.5l15.6-9 M9.6 4.6 12 6.6l2.4-2 M9.6 19.4l2.4-2 2.4 2 M3.6 10.4l3.2.6-1 3 M20.4 13.6l-3.2-.6 1-3' },
+
+  /* — Mairie, service public — */
+  { cles: ['mairie', 'collectivite', 'collectivites', 'administration publique', 'etat civil', 'service public', 'prefecture'],
+    d: 'M12 3.4 3.4 8h17.2Z M4.4 20.4h15.2 M3.4 20.4h17.2 M6 10.4v7.6 M10 10.4v7.6 M14 10.4v7.6 M18 10.4v7.6 M4.4 18h15.2' },
+
+  /* — Mariage — */
+  { cles: ['mariage', 'mariages', 'wedding', 'noces', 'alliance', 'alliances', 'fiancailles'],
+    d: 'M9 9a5.6 5.6 0 1 1 0 11.2A5.6 5.6 0 0 1 9 9Z M15 9a5.6 5.6 0 1 1 0 11.2 M13.4 7.4 15 4.4l1.6 3 M12.6 4.4h4.8' },
+
+  /* — Podcast, radio — */
+  { cles: ['podcast', 'podcasts', 'radio', 'micro', 'microphone', 'enregistrement audio', 'studio son', 'voix off'],
+    d: 'M9.4 3.4h5.2v9a2.6 2.6 0 0 1-5.2 0Z M6 10.4a6 6 0 0 0 12 0 M12 16.4v4 M8.6 20.4h6.8' },
+
+  /* — Presse, newsletter — */
+  { cles: ['presse ecrite', 'journal', 'journaux', 'magazine', 'newsletter', 'revue de presse', 'communique', 'gazette'],
+    d: 'M4.4 4.4h12.4v14.2a1.8 1.8 0 0 0 1.8 1.8H6.2a1.8 1.8 0 0 1-1.8-1.8Z M16.8 8.4h2.8v10.2a1.8 1.8 0 0 1-3.6 0 M7.4 8h6.4v3.6H7.4Z M7.4 14.4h6.4 M7.4 17h6.4' },
+
+  /* — Graphisme, design — */
+  { cles: ['graphisme', 'graphiste', 'design', 'designer', 'maquette', 'charte graphique', 'logo', 'identite visuelle', 'infographie'],
+    d: 'M12 3.4a8.6 8.6 0 0 0 0 17.2c1 0 1.6-.8 1.6-1.6 0-1.4-1.2-1.6-1.2-2.8 0-.8.6-1.4 1.4-1.4H16a4.6 4.6 0 0 0 4.6-4.6c0-3.8-3.8-6.8-8.6-6.8Z M7.6 11.4h.02 M9.6 7.6h.02 M14.2 7.4h.02 M17 10.6h.02' },
+
+  /* — Site web, e-commerce — */
+  { cles: ['site web', 'site internet', 'e commerce', 'ecommerce', 'boutique en ligne', 'vente en ligne', 'web'],
+    d: 'M3.6 4.6h16.8a1 1 0 0 1 1 1v12.8a1 1 0 0 1-1 1H3.6a1 1 0 0 1-1-1V5.6a1 1 0 0 1 1-1Z M2.6 8.6h18.8 M5.4 6.6h.02 M7.6 6.6h.02 M9.8 6.6h.02 M7 12.6h10 M7 15.6h6' },
+
+  /* — Recherche, veille — */
+  { cles: ['recherche', 'veille', 'benchmark', 'etude de marche', 'etude', 'analyse concurrentielle', 'prospection'],
+    d: 'M10.4 3.6a6.8 6.8 0 1 1 0 13.6 6.8 6.8 0 0 1 0-13.6Z M15.2 15.2l5.2 5.2' },
+
+  /* — Ambulance — */
+  { cles: ['ambulance', 'ambulancier', 'transport sanitaire', 'samu', 'transport de patients'],
+    d: 'M2.6 16.6V7.4a1.4 1.4 0 0 1 1.4-1.4h10.4v10.6 M14.4 9.4h3.6l3.4 3.6v3.6h-1.6 M5.6 16.6H2.6 M14.4 16.6H10 M7.8 14.4a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4Z M17.2 14.4a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4Z M8.4 8.4v4 M6.4 10.4h4' },
+
+  /* — Borne de recharge — */
+  { cles: ['borne de recharge', 'bornes de recharge', 'vehicule electrique', 'voiture electrique', 'irve'],
+    d: 'M5 20.4V5.4A1.6 1.6 0 0 1 6.6 3.8h6.8A1.6 1.6 0 0 1 15 5.4v15 M3.8 20.4h12.4 M10.6 7 8.2 11h3.6L9.4 15 M15 9.4h1.6a1.6 1.6 0 0 1 1.6 1.6v4.6a1.4 1.4 0 0 0 2.8 0V9.4 M19.6 5.6v3.8' },
+
+  /* — Éclairage — */
+  { cles: ['eclairage', 'lumiere', 'lumieres', 'luminaire', 'luminaires', 'lampe', 'lampes', 'ampoule'],
+    d: 'M12 3.4v3 M7 6.4h10l2.4 6.6H4.6Z M9.6 13a2.4 2.4 0 0 0 4.8 0 M12 17v1.4 M7.2 16.6l-1 1 M16.8 16.6l1 1' },
+
+  /* — Portes, portail — */
+  { cles: ['porte', 'portes', 'portail', 'portails', 'porte coupe feu', 'entree de service', 'issue de secours'],
+    d: 'M6 20.4V4.6A1 1 0 0 1 7 3.6h10a1 1 0 0 1 1 1v15.8 M3.6 20.4h16.8 M14.6 12h.02' },
+
+  /* — Escaliers, étages — */
+  { cles: ['escalier', 'escaliers', 'etage', 'etages', 'palier', 'cage d escalier'],
+    d: 'M3.6 20.4h4.6v-4.6h4.6v-4.6h4.6V6.6h3' },
+
+  /* — Toilettes — */
+  { cles: ['toilettes', 'wc', 'sanitaires', 'lavabo', 'urinoir', 'papier toilette'],
+    d: 'M7.4 3.6h4.6v6.4H7.4Z M5 10h12.4a5.4 5.4 0 0 1-5.4 5.4H9.4l.8 5H6.6L7.4 15A3.6 3.6 0 0 1 5 11.6Z' },
+
+  /* — Douches, vestiaire humide — */
+  { cles: ['douche', 'douches', 'salle de bain', 'salles de bain', 'baignoire'],
+    d: 'M5.4 20.4V7a3.4 3.4 0 0 1 6.8 0v.6 M9 9.4h6.4 M10.4 12.4l-.6 1.4 M12.2 12.4v1.4 M14 12.4l.6 1.4 M10 16l-.6 1.4 M12.2 16v1.4 M14.4 16l.6 1.4' },
+
+  /* — Distributeur automatique — */
+  { cles: ['distributeur', 'distributeurs', 'distributeur automatique', 'vending', 'fontaine a eau', 'machine a snack'],
+    d: 'M5.4 3.4h13.2a1 1 0 0 1 1 1v15.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1V4.4a1 1 0 0 1 1-1Z M7.4 6.4h6.4v8.2H7.4Z M16.4 6.4v1.6 M16.4 10.4v1.6 M7.4 17.4h6.4 M16 17.4h.02' },
+
+  /* — Verrerie, casse — */
+  { cles: ['verre', 'verres', 'verrerie', 'casse', 'bris de verre', 'verre casse'],
+    d: 'M7 3.6h10l-1.4 16.8H8.4Z M7.6 9.4h8.8 M10.6 12.4l1.2 1.6-1 1.4 1 1.6' },
+
+  /* — Funéraire — */
+  { cles: ['funeraire', 'pompes funebres', 'obseques', 'ceremonie funeraire', 'crematorium'],
+    d: 'M10.4 20.4V9.4c0-1 .7-1.6 1.6-1.6s1.6.6 1.6 1.6v11 M8.4 20.4h7.2 M12 5.4c-.8 0-1.2-.6-1.2-1.2 0-.8 1.2-1.6 1.2-1.6s1.2.8 1.2 1.6c0 .6-.4 1.2-1.2 1.2Z' },
+
+  /* — Tatouage, piercing — */
+  { cles: ['tatouage', 'tatouages', 'tatoueur', 'piercing', 'salon de tatouage', 'dermographe'],
+    d: 'M19.4 3.6 16 7 M17.6 5.4l1 1 M15.4 6.4l2.2 2.2-8.8 8.8-2.4.2.2-2.4Z M6.4 17.6l-2.8 2.8 M10.4 11.6l2 2' },
+
+  /* ═══ AJOUTS DU 21/10, SECONDE SÉRIE · 73 DESSINS (demande d'Em) ═══
+     Alimentation, agriculture, BTP, industrie, sécurité au travail, commerce,
+     ventes, RH, santé, animaux. Mêmes règles : aucun mot à double sens
+     (« chat », « souris », « monde », « don » ont été écartés). */
+
+  /* — Food truck — */
+  { cles: ['food truck', 'foodtruck', 'camion restaurant', 'cuisine ambulante'],
+    d: 'M2.8 6.4h11.4v10.4H2.8Z M14.2 9.4h3.6l3.4 3.6v3.8h-7 M5.4 9.4h6.2v3H5.4Z M6.6 16.8a1.8 1.8 0 1 1 0 .01Z M17.4 16.8a1.8 1.8 0 1 1 0 .01Z' },
+
+  /* — Kebab, tacos — */
+  { cles: ['kebab', 'kebabs', 'doner', 'tacos', 'shawarma', 'grec sandwich'],
+    d: 'M12 2.8v3 M8.4 5.8h7.2l-.8 10.8a2.8 2.8 0 0 1-5.6 0Z M8.8 9.4h6.4 M9 12.8h6 M12 19.4v1.8' },
+
+  /* — Jus, smoothie — */
+  { cles: ['jus', 'jus de fruits', 'smoothie', 'smoothies', 'bar a jus', 'presse agrumes', 'milkshake'],
+    d: 'M7 7.4h10l-1.4 12.2a1.4 1.4 0 0 1-1.4 1.2H9.8a1.4 1.4 0 0 1-1.4-1.2Z M12.6 7.4l1.6-4.6h2.4 M7.6 12h8.8' },
+
+  /* — Fruits — */
+  { cles: ['fruit', 'fruits', 'agrume', 'agrumes', 'pomme', 'pommes', 'verger'],
+    d: 'M12 7.4c-1.4-1.2-4.6-1.4-6.2 1-1.8 2.8-.6 7.6 2 10 1.2 1.2 2.6 1.4 4.2.6 1.6.8 3 .6 4.2-.6 2.6-2.4 3.8-7.2 2-10-1.6-2.4-4.8-2.2-6.2-1Z M12 7.4c0-1.8.6-3.2 1.8-4.2 M12.6 5.4c1.4-1 3-1.2 4.4-.6-.8 1.4-2.4 2-4 1.8' },
+
+  /* — Produits laitiers — */
+  { cles: ['lait', 'laitier', 'laitiers', 'produits laitiers', 'yaourt', 'yaourts', 'creme fraiche'],
+    d: 'M9 2.8h6v2.6l2 3.2v11a1.4 1.4 0 0 1-1.4 1.4H8.4A1.4 1.4 0 0 1 7 19.6v-11l2-3.2Z M7 11.4h10 M9 5.4h6' },
+
+  /* — Volaille — */
+  { cles: ['volaille', 'volailles', 'poulet', 'poulets', 'dinde', 'canard', 'poulet roti'],
+    d: 'M13.4 14.6c2.6-.4 5-2.6 5-5.6a5 5 0 0 0-9.6-2c-.8 1.8-1 4-1 5.6l-2.4 2.4 M9.6 14.4l-3.4 3.4 M5.2 16.4a1.4 1.4 0 1 0 1.4 2.8 M7.6 18.8a1.4 1.4 0 1 0 2.8 1.4' },
+
+  /* — Date limite, DLC — */
+  { cles: ['dlc', 'ddm', 'date limite', 'date limite de consommation', 'peremption', 'date de peremption', 'perime', 'perimes'],
+    d: 'M4.4 6.4a1.4 1.4 0 0 1 1.4-1.4h12.4a1.4 1.4 0 0 1 1.4 1.4v12.4a1.4 1.4 0 0 1-1.4 1.4H5.8a1.4 1.4 0 0 1-1.4-1.4Z M4.4 9.8h15.2 M8.4 3.2v3.2 M15.6 3.2v3.2 M9.6 12.8l4.8 4.8 M14.4 12.8l-4.8 4.8' },
+
+  /* — Nuisibles — */
+  { cles: ['nuisibles', 'nuisible', 'deratisation', 'desinsectisation', 'rongeur', 'rongeurs', 'cafard', 'cafards', 'insecte', 'insectes', 'piege'],
+    d: 'M12 8.4a3.2 3.2 0 0 1 3.2 3.2v3.6a3.2 3.2 0 0 1-6.4 0v-3.6A3.2 3.2 0 0 1 12 8.4Z M10 8.8 8.6 6.6 M14 8.8l1.4-2.2 M8.8 12H5.6 M15.2 12h3.2 M8.8 15.6l-2.8 1.6 M15.2 15.6l2.8 1.6 M12 11v7.4 M4 4l16 16' },
+
+  /* — Laverie — */
+  { cles: ['laverie', 'laverie automatique', 'lave linge', 'machine a laver', 'seche linge', 'buanderie'],
+    d: 'M5.4 3.4h13.2a1 1 0 0 1 1 1v15.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1V4.4a1 1 0 0 1 1-1Z M4.4 7.4h15.2 M12 10a4.2 4.2 0 1 1 0 8.4 4.2 4.2 0 0 1 0-8.4Z M7 5.4h.02 M9.4 5.4h.02 M10 15c1.2-.8 2.8-.8 4 0' },
+
+  /* — Distillerie — */
+  { cles: ['distillerie', 'distillation', 'alambic', 'spiritueux', 'whisky', 'rhum', 'gin', 'eau de vie', 'liqueur'],
+    d: 'M9.4 2.8h5.2 M10.2 2.8v4.4a5 5 0 0 0-3.4 4.8v7.4a1.4 1.4 0 0 0 1.4 1.4h7.6a1.4 1.4 0 0 0 1.4-1.4V12a5 5 0 0 0-3.4-4.8V2.8 M6.8 13.4h10.4 M6.8 17h10.4' },
+
+  /* — Apiculture — */
+  { cles: ['apiculture', 'apiculteur', 'abeille', 'abeilles', 'ruche', 'ruches', 'miel'],
+    d: 'M12 3.4 19.4 7.7v8.6L12 20.6l-7.4-4.3V7.7Z M12 8.4l3.6 2.1v4.2L12 16.8l-3.6-2.1v-4.2Z' },
+
+  /* — Tracteur, machines agricoles — */
+  { cles: ['tracteur', 'tracteurs', 'machine agricole', 'machines agricoles', 'moisson', 'moissonneuse', 'labour'],
+    d: 'M7.4 12.4a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z M17.4 15.4a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Z M4 12.8V7.4h6.4l1.6 5.4h4.4V9.4h2.4l1.4 4.6 M11.4 16.4h3.6 M15.2 9.4V5.4' },
+
+  /* — Pelouse, tonte — */
+  { cles: ['tonte', 'tondeuse', 'gazon', 'pelouse', 'debroussaillage', 'debroussailleuse'],
+    d: 'M19.6 4 15.6 12 M4.4 12h12.4v3.6H4.4Z M6.8 15.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M14.4 15.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M2.6 21h18.8' },
+
+  /* — Éolien — */
+  { cles: ['eolienne', 'eoliennes', 'eolien', 'parc eolien', 'energie renouvelable', 'energies renouvelables'],
+    d: 'M12 9.6a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z M12 12.4v8.2 M9 20.6h6 M12 9.6 13 3c.2-.8-1.6-1-1.8-.2Z M13.2 11.6l5.6 3.6c.6.5 1.6-.9 1-1.4Z M10.8 11.6l-5.6 3.6c-.6.5-1.6-.9-1-1.4Z' },
+
+  /* — Assainissement, eaux usées — */
+  { cles: ['assainissement', 'station d epuration', 'eaux usees', 'epuration', 'egout', 'egouts', 'fosse septique', 'vidange de fosse'],
+    d: 'M3.4 8.4h17.2 M5.4 8.4v8.2a3.8 3.8 0 0 0 3.8 3.8h5.6a3.8 3.8 0 0 0 3.8-3.8V8.4 M12 11.4c-1.4 1.6-2.2 2.8-2.2 3.8a2.2 2.2 0 0 0 4.4 0c0-1-.8-2.2-2.2-3.8Z M8 3.6c0 1 .8 1.4.8 2.4 M12 3.6c0 1 .8 1.4.8 2.4 M16 3.6c0 1 .8 1.4.8 2.4' },
+
+  /* — Maçonnerie, béton — */
+  { cles: ['maconnerie', 'macon', 'macons', 'beton', 'ciment', 'mortier', 'parpaing', 'gros oeuvre'],
+    d: 'M3.4 6.4h17.2v4.2H3.4Z M3.4 10.6h17.2v4.2H3.4Z M3.4 14.8h17.2V19H3.4Z M10.6 6.4v4.2 M7 10.6v4.2 M14.4 10.6v4.2 M10.6 14.8V19 M17.6 6.4v4.2' },
+
+  /* — Isolation — */
+  { cles: ['isolation', 'isolant', 'isolants', 'isolation thermique', 'laine de verre', 'calorifugeage'],
+    d: 'M3.4 4.4h17.2 M3.4 19.6h17.2 M5 12c1.2-3 2.6-3 3.8 0s2.6 3 3.8 0 2.6-3 3.8 0 2.6 3 3.8 0' },
+
+  /* — Grue, levage — */
+  { cles: ['grue', 'grues', 'levage', 'pont roulant', 'elingage', 'palan', 'engin de levage'],
+    d: 'M6.4 20.4V4.4 M4 20.4h7 M6.4 4.4h14 M6.4 4.4 3.4 7.2h3 M9.6 4.4 6.4 8.2 M17 4.4v7 M15.6 11.4h2.8v2.4h-2.8Z M2.6 7.2v0' },
+
+  /* — Usinage, CNC — */
+  { cles: ['usinage', 'cnc', 'fraiseuse', 'fraisage', 'tourneur', 'decolletage', 'commande numerique'],
+    d: 'M12 3.4l1.6 2.6 3-.6.6 3 2.6 1.6-1.6 2.6 1.6 2.6-2.6 1.6-.6 3-3-.6L12 20.6l-1.6-2.6-3 .6-.6-3-2.6-1.6L5.8 12l-1.6-2.6 2.6-1.6.6-3 3 .6Z M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z' },
+
+  /* — Imprimante 3D — */
+  { cles: ['impression 3d', 'imprimante 3d', 'prototype', 'prototypage', 'fabrication additive'],
+    d: 'M4.4 3.4h15.2v17.2H4.4Z M4.4 7.4h15.2 M10.4 7.4v2.4h3.2V7.4 M12 9.8v1.6 M8.4 17.4l1.6-3.2h4l1.6 3.2Z M4.4 17.4h15.2' },
+
+  /* — Vidéoprojecteur — */
+  { cles: ['videoprojecteur', 'projecteur', 'ecran de projection', 'retroprojecteur', 'projection', 'slides'],
+    d: 'M3.4 9.4h17.2a1 1 0 0 1 1 1v5.2a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1v-5.2a1 1 0 0 1 1-1Z M15.4 10.6a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8Z M5.4 13h4 M6 16.6l-1 2.2 M18 16.6l1 2.2 M12 9.4V7 M8 5.4l1.4 1.4 M16 5.4l-1.4 1.4' },
+
+  /* — Audioprothèse — */
+  { cles: ['audioprothesiste', 'audioprothese', 'appareil auditif', 'appareils auditifs', 'audition', 'surdite'],
+    d: 'M8 9.4a5 5 0 0 1 10 0c0 2.2-1.2 3.2-2.4 4.4-1 1-1 2.2-1 3.2a3 3 0 0 1-5.2 2 M10.6 9.4a2.4 2.4 0 0 1 4.8 0 M4.4 7.4c-.8 1.6-.8 3.6 0 5.2 M6.6 8.6c-.4.8-.4 2 0 2.8' },
+
+  /* — Radiologie, imagerie — */
+  { cles: ['radiologie', 'radiographie', 'imagerie medicale', 'irm', 'echographie', 'scanner medical', 'mammographie'],
+    d: 'M4.4 3.4h15.2v17.2H4.4Z M12 6.4v11.2 M9 8.4c1 .6 5 .6 6 0 M8.4 11.2c1.2.6 6 .6 7.2 0 M8.6 14c1.2.6 5.6.6 6.8 0' },
+
+  /* — Agent de sécurité — */
+  { cles: ['agent de securite', 'agents de securite', 'vigile', 'vigiles', 'securite privee', 'ssiap', 'rondier'],
+    d: 'M12 3.4a3.4 3.4 0 1 1 0 6.8 3.4 3.4 0 0 1 0-6.8Z M5 20.6a7 7 0 0 1 14 0 M8.6 4.8h6.8 M8.4 3.6 12 2.2l3.6 1.4 M12 13.6l1 2 2.2.3-1.6 1.6.4 2.2-2-1-2 1 .4-2.2-1.6-1.6 2.2-.3Z' },
+
+  /* — Auto-école — */
+  { cles: ['auto ecole', 'permis de conduire', 'moniteur auto ecole', 'code de la route', 'conduite accompagnee', 'examen du permis'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M3.6 11h6.4 M14 11h6.4 M12 14v6.6' },
+
+  /* — Moto, scooter — */
+  { cles: ['moto', 'motos', 'scooter', 'scooters', 'deux roues', 'motard', 'livraison en scooter'],
+    d: 'M5.4 13.4a3.4 3.4 0 1 1 0 6.8 3.4 3.4 0 0 1 0-6.8Z M18.6 13.4a3.4 3.4 0 1 1 0 6.8 3.4 3.4 0 0 1 0-6.8Z M5.4 16.8h6l3-5.4h-4.6 M14.4 11.4l4.2 5.4 M14.4 11.4l-1.2-4h3' },
+
+  /* — Poids lourd — */
+  { cles: ['poids lourd', 'poids lourds', 'semi remorque', 'routier', 'routiers', 'camion', 'camions', 'chauffeur poids lourd'],
+    d: 'M2.6 5.4h11v11h-11Z M13.6 9.4h3.8l3.4 3.8v3.2h-7.2 M6.2 16.4a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M17.6 16.4a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M15.4 11.4h2.2' },
+
+  /* — Covoiturage — */
+  { cles: ['covoiturage', 'autopartage', 'vehicule partage', 'voiture partagee'],
+    d: 'M5.4 13.4 7 9.2a1.6 1.6 0 0 1 1.5-1h7a1.6 1.6 0 0 1 1.5 1l1.6 4.2 M4.2 13.4h15.6a1 1 0 0 1 1 1v3.4a1 1 0 0 1-1 1H4.2a1 1 0 0 1-1-1v-3.4a1 1 0 0 1 1-1Z M6 18.8v1.6 M18 18.8v1.6 M8.4 2.8a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M15.6 2.8a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z' },
+
+  /* — Bureau, poste de travail — */
+  { cles: ['poste de travail', 'postes de travail', 'espace de travail', 'open space', 'bureaux', 'amenagement de bureau'],
+    d: 'M3.4 11.4h17.2 M5 11.4v9 M19 11.4v9 M14.4 11.4v4.6H19 M8.4 3.4h7.2v5.4H8.4Z M12 8.8v2.6' },
+
+  /* — Fournitures, papeterie — */
+  { cles: ['fournitures', 'fourniture', 'papeterie', 'fournitures de bureau', 'consommables', 'stylo', 'stylos'],
+    d: 'M14.6 4.2l5.2 5.2-10.6 10.6H4v-5.2Z M12.8 6l5.2 5.2 M4 20l3-1.2-1.8-1.8Z' },
+
+  /* — Sondage, questionnaire — */
+  { cles: ['sondage', 'sondages', 'questionnaire', 'questionnaires', 'enquete', 'enquetes', 'formulaire', 'formulaires'],
+    d: 'M6 3.6h12a1.4 1.4 0 0 1 1.4 1.4v14a1.4 1.4 0 0 1-1.4 1.4H6A1.4 1.4 0 0 1 4.6 19V5A1.4 1.4 0 0 1 6 3.6Z M8 8.4a.9.9 0 1 1 0 .01Z M8 12.4a.9.9 0 1 1 0 .01Z M8 16.4a.9.9 0 1 1 0 .01Z M11 8.4h5 M11 12.4h5 M11 16.4h3.4' },
+
+  /* — Évaluation, notation — */
+  { cles: ['evaluation', 'evaluations', 'notation', 'grille d evaluation', 'auto evaluation', 'appreciation'],
+    d: 'M12 3.4l2.6 5.4 5.8.8-4.2 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.2-4.1 5.8-.8Z' },
+
+  /* — Chronomètre, minuterie — */
+  { cles: ['chronometre', 'minuterie', 'minuteur', 'temps de cuisson', 'timer', 'chrono'],
+    d: 'M12 7.4a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Z M12 14V10.6 M10 3.4h4 M12 3.4v4 M18.2 7.2l1.4-1.4' },
+
+  /* — Notifications — */
+  { cles: ['notification', 'notifications', 'sonnette', 'cloche', 'alertes', 'alerte client'],
+    d: 'M6.4 16.4V11a5.6 5.6 0 0 1 11.2 0v5.4l1.6 1.6H4.8Z M10.2 20.4a2 2 0 0 0 3.6 0 M12 3.4v2' },
+
+  /* — Récompense, challenge — */
+  { cles: ['recompense', 'recompenses', 'challenge', 'challenges', 'concours', 'trophee', 'trophees', 'prime', 'primes', 'gratification'],
+    d: 'M8 3.4h8v5.4a4 4 0 0 1-8 0Z M8 5.4H4.6c0 2.6 1.4 4.4 3.6 4.6 M16 5.4h3.4c0 2.6-1.4 4.4-3.6 4.6 M12 12.8v3.6 M8.4 20.4h7.2l-1-4H9.4Z' },
+
+  /* — Team building — */
+  { cles: ['team building', 'cohesion d equipe', 'sortie d equipe', 'seminaire d equipe', 'afterwork', 'esprit d equipe'],
+    d: 'M12 4.4a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4Z M5.6 7.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M18.4 7.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M8 19.6v-3.4a4 4 0 0 1 8 0v3.4 M2.8 18v-1.6a2.8 2.8 0 0 1 4.6-2.2 M21.2 18v-1.6a2.8 2.8 0 0 0-4.6-2.2' },
+
+  /* — Accident du travail — */
+  { cles: ['accident du travail', 'accidents du travail', 'accident', 'accidents', 'blessure', 'blessures', 'presqu accident', 'declaration d accident'],
+    d: 'M12 3.4 21 19.2H3Z M12 9.6v4.6 M12 16.6h.02' },
+
+  /* — Document unique, risques — */
+  { cles: ['document unique', 'duerp', 'evaluation des risques', 'risques professionnels', 'analyse des risques', 'prevention des risques'],
+    d: 'M6 3.6h12a1.4 1.4 0 0 1 1.4 1.4v14a1.4 1.4 0 0 1-1.4 1.4H6A1.4 1.4 0 0 1 4.6 19V5A1.4 1.4 0 0 1 6 3.6Z M12 7.6l4.2 7.4H7.8Z M12 10.2v2 M12 13.6h.02 M8 18h8' },
+
+  /* — Signalisation, balisage — */
+  { cles: ['signalisation', 'panneau', 'panneaux', 'balisage', 'marquage au sol', 'pictogramme', 'pictogrammes'],
+    d: 'M12 2.8 20.4 11.2 12 19.6 3.6 11.2Z M12 19.6v1.8 M9.4 21.4h5.2 M12 8v3.6 M12 14h.02' },
+
+  /* — Cadenas, consignation — */
+  { cles: ['cadenas', 'consignation electrique', 'loto', 'condamnation', 'verrouillage machine', 'mise en securite'],
+    d: 'M7.4 10.4V7.6a4.6 4.6 0 0 1 9.2 0v2.8 M5.4 10.4h13.2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1Z M12 14v2.6' },
+
+  /* — Lunettes de protection — */
+  { cles: ['lunettes de protection', 'lunettes de securite', 'visiere', 'protection des yeux', 'masque de soudure'],
+    d: 'M3 9.4h18 M4 9.4v4.4a2.6 2.6 0 0 0 2.6 2.6h2.2a2.6 2.6 0 0 0 2.4-1.6l.8-1.8.8 1.8a2.6 2.6 0 0 0 2.4 1.6h2.2a2.6 2.6 0 0 0 2.6-2.6V9.4' },
+
+  /* — Chaussures de sécurité — */
+  { cles: ['chaussures de securite', 'chaussure de securite', 'bottes de securite', 'coque de protection'],
+    d: 'M3.4 16.4V6.4h5l1.2 3.4 6.8 2.2a4.4 4.4 0 0 1 3.2 4.2v.2Z M3.4 16.4v2.4h16.8v-2.4 M14.6 11.4a3.4 3.4 0 0 1 4.4 3.6' },
+
+  /* — Mobilier — */
+  { cles: ['mobilier', 'meuble', 'meubles', 'ameublement', 'canape', 'fauteuil', 'chaise', 'chaises'],
+    d: 'M5.4 11.4V7a2.6 2.6 0 0 1 2.6-2.6h8A2.6 2.6 0 0 1 18.6 7v4.4 M3.4 11.4a2 2 0 0 1 4 0v2h9.2v-2a2 2 0 0 1 4 0v5.4H3.4Z M5.4 16.8v2.6 M18.6 16.8v2.6' },
+
+  /* — Décoration — */
+  { cles: ['decoration', 'deco', 'decorateur', 'decoratrice', 'vase', 'amenagement interieur', 'home staging'],
+    d: 'M9 3.4h6 M9.6 3.4v3a6 6 0 0 0-3.6 5.6c0 3 1.4 5.8 2.6 8.4h6.8c1.2-2.6 2.6-5.4 2.6-8.4a6 6 0 0 0-3.6-5.6v-3 M7.6 13.4h8.8' },
+
+  /* — Marché, forains — */
+  { cles: ['marche hebdomadaire', 'marche couvert', 'forain', 'forains', 'etal', 'etals', 'commercant ambulant', 'stand'],
+    d: 'M3.4 9.4 5 4.4h14l1.6 5 M3.4 9.4c0 1.2.9 2 2 2s2-.8 2-2c0 1.2.9 2 2 2s2-.8 2-2c0 1.2.9 2 2 2s2-.8 2-2c0 1.2.9 2 2 2s2-.8 2-2 M5 11.4v9 M19 11.4v9 M3.4 20.4h17.2 M9 20.4v-5h6v5' },
+
+  /* — Tabac, presse — */
+  { cles: ['bureau de tabac', 'tabac', 'buraliste', 'loterie', 'jeux a gratter', 'pmu', 'francaise des jeux'],
+    d: 'M3.4 13.4h13.2v3.4H3.4Z M16.6 13.4h1.6v3.4h-1.6 M19.8 13.4v3.4 M17 10.4c0-1.4 1.6-1.4 1.6-2.8S17 6.2 17 4.8 M19.6 10.4c0-1.4 1.6-1.4 1.6-2.8' },
+
+  /* — Cimetière, marbrerie — */
+  { cles: ['plaque funeraire', 'marbrerie', 'marbrier', 'cimetiere', 'concession funeraire'],
+    d: 'M7.4 20.4V9a4.6 4.6 0 0 1 9.2 0v11.4 M5.4 20.4h13.2 M12 9.4v5.2 M10 11.4h4' },
+
+  /* — Clinique esthétique — */
+  { cles: ['chirurgie esthetique', 'medecine esthetique', 'injections esthetiques', 'laser esthetique', 'dermatologie', 'dermatologue'],
+    d: 'M12 3.4a5 5 0 0 1 5 5c0 3-1.4 5.2-2.4 6.6-.8 1.2-1.4 2.4-1.4 3.6v1.8h-2.4v-1.8c0-1.2-.6-2.4-1.4-3.6C8.4 13.6 7 11.4 7 8.4a5 5 0 0 1 5-5Z M18.6 3.6l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6Z' },
+
+  /* — Psychologie, écoute — */
+  { cles: ['cellule d ecoute', 'soutien psychologique', 'bien etre au travail', 'qualite de vie au travail', 'qvt', 'risques psychosociaux'],
+    d: 'M12 20.4s-7.6-4.4-7.6-10a4.4 4.4 0 0 1 7.6-3 4.4 4.4 0 0 1 7.6 3c0 5.6-7.6 10-7.6 10Z M8.6 11.4h2l1-2 1.6 4 1-2h1.4' },
+
+  /* — Don du sang, collecte — */
+  { cles: ['don du sang', 'collecte de sang', 'donneur', 'donneurs', 'dons alimentaires'],
+    d: 'M12 3.4c3 3.8 5.4 7 5.4 10a5.4 5.4 0 0 1-10.8 0c0-3 2.4-6.2 5.4-10Z M12 11.4v5 M9.5 13.9h5' },
+
+  /* — Association, bénévolat — */
+  { cles: ['association', 'associations', 'benevole', 'benevoles', 'benevolat', 'solidarite', 'humanitaire', 'ong'],
+    d: 'M3.4 13.4l3.4-3.4 4 1.4 2.4-1.8a1.6 1.6 0 0 1 2 2.4l-3.4 2.6 M3.4 13.4v4.2l3.6 1.4h6.2l7.4-4.6a1.4 1.4 0 0 0-1.4-2.4l-4.2 2.2 M12 3.4c1.6 0 2.8 1.2 2.8 2.6 0 2.2-2.8 3.8-2.8 3.8S9.2 8.2 9.2 6c0-1.4 1.2-2.6 2.8-2.6Z' },
+
+  /* — Garde d'animaux, pension — */
+  { cles: ['pension canine', 'pension pour animaux', 'garde d animaux', 'pet sitting', 'chien', 'chiens', 'chiot', 'chiots'],
+    d: 'M6.4 9.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M17.6 9.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M9.6 4.6a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M14.4 4.6a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M12 11.6c-2.6 0-5 3.6-5 6 0 1.4 1 2.4 2.4 2.4 1 0 1.6-.6 2.6-.6s1.6.6 2.6.6c1.4 0 2.4-1 2.4-2.4 0-2.4-2.4-6-5-6Z' },
+
+  /* — Aquarium, animalerie — */
+  { cles: ['animalerie', 'aquarium', 'aquariums', 'aquariophilie', 'poissons d ornement', 'oiseaux', 'rongeurs de compagnie'],
+    d: 'M3.6 12c2.4-3.8 6-5.4 10-5.4 2.8 0 4.6 1 6 2.4l1.8-2.4v10.8L19.6 15c-1.4 1.4-3.2 2.4-6 2.4-4 0-7.6-1.6-10-5.4Z M8.4 11h.02' },
+
+  /* — Location de matériel — */
+  { cles: ['location de materiel', 'location materiel', 'loueur', 'materiel en location', 'location d engins'],
+    d: 'M4.4 9.4h15.2v10.4a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1Z M3.4 6.4h17.2v3H3.4Z M9.6 12.6h4.8 M12 3.4 9 6.4 M12 3.4l3 3' },
+
+  /* — Sous-traitance, prestataires — */
+  { cles: ['sous traitance', 'sous traitant', 'sous traitants', 'prestataire', 'prestataires', 'partenaire', 'partenaires', 'fournisseur externe'],
+    d: 'M10 14a3.6 3.6 0 0 1 0-5.1l2.6-2.6a3.6 3.6 0 0 1 5.1 5.1l-1.3 1.3 M14 10a3.6 3.6 0 0 1 0 5.1l-2.6 2.6a3.6 3.6 0 0 1-5.1-5.1l1.3-1.3' },
+
+  /* — Ventes, chiffre d'affaires — */
+  { cles: ['chiffre d affaires', 'ventes', 'objectifs de vente', 'croissance', 'statistiques de vente', 'commercial', 'commerciaux'],
+    d: 'M3.4 20.4h17.2 M5.4 16.4l4.4-4.4 3.2 3.2 6.6-7 M14.6 8.2h5v5' },
+
+  /* — Prospection, CRM — */
+  { cles: ['prospect', 'prospects', 'lead', 'leads', 'pipeline commercial', 'relance commerciale', 'rendez vous commercial', 'devis client'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 7.4a4.6 4.6 0 1 1 0 9.2 4.6 4.6 0 0 1 0-9.2Z M12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z M18.4 3.4l-5.6 7.8' },
+
+  /* — Négociation, accord commercial — */
+  { cles: ['negociation', 'negociations', 'partenariat', 'partenariats', 'poignee de main', 'conclusion de vente'],
+    d: 'M4 8.4h14.4 M14.8 4.8l3.6 3.6-3.6 3.6 M20 15.6H5.6 M9.2 12l-3.6 3.6 3.6 3.6' },
+
+  /* — Export, international — */
+  { cles: ['export international', 'marches internationaux', 'filiale', 'filiales', 'planete', 'mondial'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M3.4 12h17.2 M12 3.4c2.4 2.4 3.6 5.4 3.6 8.6s-1.2 6.2-3.6 8.6c-2.4-2.4-3.6-5.4-3.6-8.6s1.2-6.2 3.6-8.6Z' },
+
+  /* — Fiscalité, impôts — */
+  { cles: ['impot', 'impots', 'fiscalite', 'fiscal', 'declaration fiscale', 'taxe', 'taxes'],
+    d: 'M6 3.6h12a1.4 1.4 0 0 1 1.4 1.4v14a1.4 1.4 0 0 1-1.4 1.4H6A1.4 1.4 0 0 1 4.6 19V5A1.4 1.4 0 0 1 6 3.6Z M9 15l6-6 M9.4 9.4h.02 M14.6 14.6h.02' },
+
+  /* — Investissement — */
+  { cles: ['investissement', 'investissements', 'financement', 'levee de fonds', 'subvention', 'subventions', 'aide financiere'],
+    d: 'M12 20.4V11 M12 11c0-3.6 2.6-6.2 6.4-6.4.2 3.8-2.6 6.4-6.4 6.4Z M12 14c0-3-2.2-5.2-5.4-5.4-.2 3.2 2.2 5.4 5.4 5.4Z M7.4 20.4h9.2' },
+
+  /* — Retraite — */
+  { cles: ['retraite', 'retraites', 'depart en retraite', 'pension de retraite', 'fin de carriere'],
+    d: 'M5.4 20.4c0-4 1-7 3-9 M8.4 11.4a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4Z M8.4 11.4l2.4 3.6h3 M10.4 15v5.4 M16.4 4.4v16 M16.4 4.4c1.6 0 2.6 1 2.6 2.4' },
+
+  /* — Télétravail — */
+  { cles: ['travail a domicile', 'home office', 'bureau a domicile', 'travail hybride'],
+    d: 'M3.4 11 12 3.8l8.6 7.2 M5.4 9.4v11h13.2v-11 M8.4 13.4h7.2v4.4H8.4Z M7 19.6h10' },
+
+  /* — Mentorat, parrainage — */
+  { cles: ['mentorat', 'mentor', 'parrainage', 'parrain', 'marraine', 'binome', 'tutorat', 'tuteur'],
+    d: 'M8 3.4a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8Z M16.4 7a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M3.6 20.4v-4.6a4.4 4.4 0 0 1 8.8 0v4.6 M13 20.4v-3.6a3.4 3.4 0 0 1 6.8 0v3.6 M11.4 12.4l2.6-1' },
+
+  /* — Stagiaires, alternance — */
+  { cles: ['stagiaire', 'stagiaires', 'stage', 'stages', 'alternance', 'alternant', 'alternants', 'apprenti', 'apprentis'],
+    d: 'M12 4.4 2.6 8.8 12 13.2l9.4-4.4Z M6.4 10.6v4.4c0 1.6 2.6 3 5.6 3s5.6-1.4 5.6-3v-4.4 M21.4 8.8v5' },
+
+  /* — Diversité, égalité — */
+  { cles: ['diversite', 'egalite', 'egalite professionnelle', 'parite', 'non discrimination', 'harcelement', 'referent harcelement'],
+    d: 'M4.4 9.4h15.2 M4.4 14.6h15.2' },
+
+  /* — Langue des signes — */
+  { cles: ['langue des signes', 'malentendant', 'malentendants', 'sourd', 'sourds', 'lsf'],
+    d: 'M8.4 20.4v-3L5.6 12.6a1.3 1.3 0 0 1 2.2-1.4l1.4 2V6.4a1.2 1.2 0 0 1 2.4 0v5 M11.6 10.4V4.8a1.2 1.2 0 0 1 2.4 0v5.6 M14 10.4V6a1.2 1.2 0 0 1 2.4 0v8a5.4 5.4 0 0 1-2.4 4.4v2 M19 4.4c.8.6 1.2 1.6 1.2 2.6 M17.8 2.8c1.6 1 2.6 2.6 2.6 4.4' },
+
+  /* — Bébés, puériculture — */
+  { cles: ['puericulture', 'bebe', 'bebes', 'biberon', 'biberons', 'change bebe', 'table a langer', 'nurserie'],
+    d: 'M9.4 2.8h5.2v2.6H9.4Z M8.4 5.4h7.2l.8 2.4v11.4a1.4 1.4 0 0 1-1.4 1.4H9a1.4 1.4 0 0 1-1.4-1.4V7.8Z M8 11h3 M8 14h3 M8 17h3' },
+
+  /* — Jouets, ludique — */
+  { cles: ['jouet', 'jouets', 'magasin de jouets', 'peluche', 'peluches', 'jeux educatifs', 'jeux de societe'],
+    d: 'M8.4 8.4a4.6 4.6 0 1 1 7.2 0 M7 6.6a2.2 2.2 0 1 1 1.4-3.4 M17 6.6a2.2 2.2 0 1 0-1.4-3.4 M6.4 14a5.6 5.6 0 0 1 11.2 0v4.4a2 2 0 0 1-2 2H8.4a2 2 0 0 1-2-2Z M10.2 6.4h.02 M13.8 6.4h.02 M11 9.2h2' },
+
+  /* — Électroménager — */
+  { cles: ['electromenager', 'gros electromenager', 'petit electromenager', 'refrigerateur', 'four micro ondes', 'micro ondes', 'lave vaisselle domestique'],
+    d: 'M6.4 3.4h11.2a1 1 0 0 1 1 1v15.2a1 1 0 0 1-1 1H6.4a1 1 0 0 1-1-1V4.4a1 1 0 0 1 1-1Z M5.4 9.4h13.2 M8.4 5.6v1.8 M8.4 11.6v3' },
+
+  /* — Matériel informatique — */
+  { cles: ['materiel informatique', 'parc informatique', 'peripherique', 'peripheriques', 'clavier', 'ecran', 'ecrans'],
+    d: 'M3.4 4.4h17.2v11H3.4Z M9.4 19.6h5.2 M12 15.4v4.2' },
+
+  /* — Bornes de commande — */
+  { cles: ['borne de commande', 'bornes de commande', 'borne interactive', 'kiosque', 'commande en borne', 'ecran tactile'],
+    d: 'M6.4 2.8h11.2a1 1 0 0 1 1 1v11.4a1 1 0 0 1-1 1H6.4a1 1 0 0 1-1-1V3.8a1 1 0 0 1 1-1Z M9.4 16.2l-1 4.2h7.2l-1-4.2 M10 9.4l1.6 1.6 3-3' },
+
+  /* — Réseaux électriques, câblage — */
+  { cles: ['cablage', 'cables', 'cable', 'gaine', 'prise electrique', 'prises electriques', 'rallonge'],
+    d: 'M8.4 3.4v4 M15.6 3.4v4 M6.4 7.4h11.2v3.4a5.6 5.6 0 0 1-11.2 0Z M12 16.4v1.8a2.4 2.4 0 0 0 2.4 2.4h4' },
+
+  /* ═══ AJOUTS DU 21/10, TROISIÈME SÉRIE · 200 DESSINS (demande d'Em) ═══
+     Quatre familles de cinquante. Écartés pour double sens : « carrefour »
+     et « casino » (enseignes), « tache », « especes », « licence », « pied »,
+     « route », « emissions », « pepiniere », « boules », « vagues »… */
+
+  /* ─── ALIMENTATION, RESTAURATION ─── */
+
+  /* — Pâtes fraîches, raviolis — */
+  { cles: ['pates fraiches', 'pates', 'raviolis', 'ravioli', 'lasagnes', 'tortellini', 'gnocchi'],
+    d: 'M3.6 13h16.8a8.4 8.4 0 0 1-16.8 0Z M6.4 13c0-2 1.2-2 1.2-4s1.2-2 1.2-4 M10 13c0-2 1.2-2 1.2-4s1.2-2 1.2-4 M15.8 13V7.4 M14.4 3.4v2.6a1.4 1.4 0 0 0 2.8 0V3.4 M15.8 3.4v2.6' },
+
+  /* — Riz, céréales — */
+  { cles: ['riz', 'risotto', 'cereales', 'semoule', 'quinoa', 'cuiseur a riz'],
+    d: 'M3.6 12.4h16.8a8.4 8.4 0 0 1-16.8 0Z M6 12.4c0-3.4 2.6-5.6 6-5.6s6 2.2 6 5.6 M9.4 9.6h.02 M12 8.8h.02 M14.6 9.6h.02 M10.6 11h.02 M13.4 11h.02' },
+
+  /* — Hot-dog — */
+  { cles: ['hot dog', 'hot dogs', 'hotdog', 'hotdogs', 'saucisse de francfort'],
+    d: 'M2.8 12.4c0 3 2 5 5 5h8.4c3 0 5-2 5-5 M4 10h16a2 2 0 0 1 0 4H4a2 2 0 0 1 0-4Z M6.4 12c.8-.8 1.6-.8 2.4 0s1.6.8 2.4 0 1.6-.8 2.4 0 1.6.8 2.4 0' },
+
+  /* — Frites, friterie — */
+  { cles: ['frites', 'friterie', 'pommes frites', 'cornet de frites', 'baraque a frites'],
+    d: 'M6 10.4h12l-1.6 10H7.6Z M8 10.4V5 M10.4 10.4V3.6 M13.6 10.4V4.4 M16 10.4V5.6 M8.2 14.4h7.6' },
+
+  /* — Popcorn — */
+  { cles: ['popcorn', 'popcorns', 'pop corn', 'pop corns', 'pop corn cinema'],
+    d: 'M5.4 9.4h13.2l-1.8 11H7.2Z M10 9.4l.4 11 M14 9.4l-.4 11 M6 9.4a2 2 0 0 1 2.6-2.6 2.2 2.2 0 0 1 3.4-1.4 2.2 2.2 0 0 1 3.4 1.4A2 2 0 0 1 18 9.4' },
+
+  /* — Biscuits, cookies — */
+  { cles: ['biscuit', 'biscuits', 'cookie', 'cookies', 'biscuiterie', 'petits gateaux'],
+    d: 'M20 12.6A8 8 0 1 1 11.4 4a2.4 2.4 0 0 0 3 3 2.4 2.4 0 0 0 3.2 3.2A2.4 2.4 0 0 0 20 12.6Z M8.6 10h.02 M12 13.6h.02 M8.8 15.4h.02 M15.4 15.2h.02' },
+
+  /* — Beignets, donuts — */
+  { cles: ['beignet', 'beignets', 'donut', 'donuts', 'doughnut', 'churros'],
+    d: 'M3 12c0-3.4 4-6 9-6s9 2.6 9 6-4 6-9 6-9-2.6-9-6Z M9.4 11.4c0-1 1.2-1.6 2.6-1.6s2.6.6 2.6 1.6-1.2 1.4-2.6 1.4-2.6-.4-2.6-1.4Z M3.4 12.6c1.4 1.4 2.4 0 3.6 1s2 1.6 3.4.8 2.6-1 3.6 0 2.4.8 3.6-.4 2.4-.8 3-1.4' },
+
+  /* — Croissant — */
+  { cles: ['croissant', 'croissants', 'pain au chocolat', 'pains au chocolat', 'chocolatine'],
+    d: 'M3.4 14.6c1.6-5.8 5-9.4 8.6-9.4s7 3.6 8.6 9.4c-1.2 1-2.6.8-3.4-.2-.8 2-2.6 3-5.2 3s-4.4-1-5.2-3c-.8 1-2.2 1.2-3.4.2Z M9.4 6.2l1 6 M14.6 6.2l-1 6' },
+
+  /* — Macarons — */
+  { cles: ['macaron', 'macarons', 'patisserie fine', 'petits fours', 'mignardise', 'mignardises'],
+    d: 'M3.4 8.4h17.2v8.4H3.4Z M7 10.6a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M12 10.6a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M17 10.6a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M3.4 8.4 5.4 5h13.2l2 3.4' },
+
+  /* — Muffins, cupcakes — */
+  { cles: ['muffin', 'muffins', 'cupcake', 'cupcakes', 'madeleine', 'madeleines'],
+    d: 'M6 12.4h12l-1.4 8H7.4Z M9.4 12.4l.6 8 M14.6 12.4l-.6 8 M5.4 12.4c-.4-3 1.6-5 4-5 .6-1.6 1.8-2.4 2.6-2.4s2 .8 2.6 2.4c2.4 0 4.4 2 4 5 M12 5V3.4' },
+
+  /* — Torréfaction, barista — */
+  { cles: ['torrefaction', 'torrefacteur', 'barista', 'baristas', 'grains de cafe', 'cafe de specialite', 'espresso'],
+    d: 'M12 3.6c4.4 0 7 3.6 7 8.4s-2.6 8.4-7 8.4-7-3.6-7-8.4 2.6-8.4 7-8.4Z M12 3.6c-1.6 2.6-1.6 5.6 0 8.4s1.6 5.8 0 8.4' },
+
+  /* — Champagne, crémant — */
+  { cles: ['champagne', 'champagnes', 'cremant', 'mousseux', 'prosecco', 'flute a champagne'],
+    d: 'M6.4 3.4h4.4l-.4 6a1.8 1.8 0 0 1-3.6 0Z M8.6 11.2v7.4 M6.4 18.6h4.4 M13.2 3.4h4.4l-.4 6a1.8 1.8 0 0 1-3.6 0Z M15.4 11.2v7.4 M13.2 18.6h4.4 M11.2 2.4l.6-.8 M12.4 3.2l.8-.4' },
+
+  /* — Cidre — */
+  { cles: ['cidre', 'cidres', 'cidrerie', 'calvados', 'jus de pomme'],
+    d: 'M10 2.8h4v3l2 2.6v11.2a1.4 1.4 0 0 1-1.4 1.4H9.4A1.4 1.4 0 0 1 8 19.6V8.4l2-2.6Z M12 12.2c-.8-.6-2.6-.6-2.6 1.4s1.4 3.2 2.6 2.4c1.2.8 2.6-.4 2.6-2.4s-1.8-2-2.6-1.4Z M12 12.2c0-.8.4-1.4 1-1.6' },
+
+  /* — Eau, carafe — */
+  { cles: ['eau minerale', 'eaux minerales', 'carafe', 'carafes', 'pichet', 'pichets', 'carafe d eau'],
+    d: 'M6.4 3.6h9.4l-1 3.2c1.8 1.4 2.8 3.6 2.8 6.2v6a1.4 1.4 0 0 1-1.4 1.4H8a1.4 1.4 0 0 1-1.4-1.4v-6c0-2.6 1-4.8 2.8-6.2Z M17.6 9.4h1a2 2 0 0 1 2 2v2.4a2 2 0 0 1-2 2h-1 M7.2 12.4c1.6-.8 3.2-.8 4.8 0s3.2.8 4.8 0' },
+
+  /* — Sodas, canettes — */
+  { cles: ['soda', 'sodas', 'canette', 'canettes', 'boisson gazeuse', 'boissons gazeuses', 'limonade'],
+    d: 'M8 4.4h8a.6.6 0 0 1 .6.6v14a.6.6 0 0 1-.6.6H8a.6.6 0 0 1-.6-.6V5a.6.6 0 0 1 .6-.6Z M7.4 7h9.2 M7.4 17h9.2 M10.4 4.4 11 2.8h2 M11 11.4h.02 M13 13.2h.02 M11.4 14.6h.02' },
+
+  /* — Charcuterie — */
+  { cles: ['charcuterie', 'charcuteries', 'jambon', 'saucisson', 'salaison', 'terrine', 'pate en croute'],
+    d: 'M8.6 6.6a5.4 5.4 0 1 1 0 10.8 5.4 5.4 0 0 1 0-10.8Z M7 10.4h.02 M10.2 9.4h.02 M9 13.4h.02 M11 12.6h.02 M11.6 7.2h6a3.2 3.2 0 0 1 3.2 3.2v3.2a3.2 3.2 0 0 1-3.2 3.2h-6 M20.8 12h1' },
+
+  /* — Saucisses, merguez — */
+  { cles: ['saucisse', 'saucisses', 'merguez', 'chipolata', 'chipolatas', 'boudin'],
+    d: 'M4.4 14.6c4.6 0 8.6-3.6 9.2-8.2a1.8 1.8 0 0 1 3.6.4c-.8 6.4-6.2 11.4-12.8 11.4a1.8 1.8 0 0 1 0-3.6Z M2.6 16.4h-.8 M15.4 4.6l.2-.8 M7.6 15.4l.6.8 M10.6 13.4l.8.6 M12.8 10.4l.9.4' },
+
+  /* — Champignons — */
+  { cles: ['champignon', 'champignons', 'cueillette', 'champignonniere', 'truffe', 'truffes'],
+    d: 'M3.6 11.4C3.6 7 7.4 3.8 12 3.8s8.4 3.2 8.4 7.6Z M9.4 11.4l-.6 7.4a1.6 1.6 0 0 0 1.6 1.6h3.2a1.6 1.6 0 0 0 1.6-1.6l-.6-7.4 M9 7.6h.02 M14.4 8h.02 M12 6h.02' },
+
+  /* — Farine, meunerie — */
+  { cles: ['farine', 'farines', 'meunerie', 'minoterie', 'meunier', 'moulin a farine'],
+    d: 'M7 6.4 5.4 19a1.4 1.4 0 0 0 1.4 1.6h10.4a1.4 1.4 0 0 0 1.4-1.6L17 6.4 M7 6.4c1.6-.8 3.2-1.6 5-1.6s3.4.8 5 1.6 M9.4 4.8 8.6 3 M14.6 4.8l.8-1.8 M12 10v7 M12 12.2l-1.6-1.2 M12 12.2l1.6-1.2 M12 14.4l-1.6-1.2 M12 14.4l1.6-1.2' },
+
+  /* — Sucre — */
+  { cles: ['sucre', 'sucres', 'sucrerie', 'morceaux de sucre', 'sucre en morceaux', 'edulcorant'],
+    d: 'M4.4 12.4h7.2v7.2H4.4Z M12.4 12.4h7.2v7.2h-7.2Z M8.4 4.8h7.2v7.2H8.4Z M6.6 15h.02 M9.4 17.2h.02 M14.6 15h.02 M17.4 17.2h.02 M10.6 7.4h.02 M13.4 9.6h.02' },
+
+  /* — Confitures, conserves — */
+  { cles: ['confiture', 'confitures', 'conserve', 'conserves', 'bocal', 'bocaux'],
+    d: 'M7.4 3.4h9.2v2.8H7.4Z M6.6 6.2h10.8a1 1 0 0 1 1 1v12.4a1.4 1.4 0 0 1-1.4 1.4H7a1.4 1.4 0 0 1-1.4-1.4V7.2a1 1 0 0 1 1-1Z M8.4 11h7.2v5.4H8.4Z' },
+
+  /* — Épicerie fine, terroir — */
+  { cles: ['epicerie fine', 'terroir', 'produits du terroir', 'produits locaux', 'circuit court', 'producteur local', 'producteurs locaux'],
+    d: 'M12 21s-6.4-5.6-6.4-10.6a6.4 6.4 0 0 1 12.8 0C18.4 15.4 12 21 12 21Z M10 12.4c0-2.6 1.4-4.2 4-4.6.2 2.6-1.4 4.4-4 4.6Z' },
+
+  /* — Produits bio — */
+  { cles: ['bio', 'produit bio', 'produits bio', 'agriculture biologique', 'label bio', 'biologique'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 17v-5 M12 12c0-2.6 1.6-4.4 4-4.6.2 2.6-1.6 4.4-4 4.6Z M12 13.6c0-2-1.2-3.4-3.2-3.6-.2 2 1.2 3.4 3.2 3.6Z' },
+
+  /* — Nutrition, diététique — */
+  { cles: ['nutrition', 'dietetique', 'dieteticien', 'dieteticienne', 'nutritionniste', 'equilibre alimentaire', 'regime alimentaire'],
+    d: 'M15 9 6.8 17.2c-1 1-2.4 1.4-3.2.6s-.4-2.2.6-3.2L12.4 6.4a2 2 0 0 1 2.6 2.6Z M14.4 6.8l2-3.4 M15.4 7.8l3.4-1.2 M15.2 7.2l3-2.6 M8.4 12.6l1.4 1.4 M10.8 10.4l1 1' },
+
+  /* — Mixeur, robot de cuisine — */
+  { cles: ['mixeur', 'blender', 'robot de cuisine', 'robot culinaire', 'thermomix', 'robot patissier'],
+    d: 'M7.4 3.4h9.2l-1.2 11H8.6Z M7 14.4h10l1 4v2H6v-2Z M10.2 3.4l.6 11 M12 17.4h.02' },
+
+  /* — Casseroles, ustensiles — */
+  { cles: ['casserole', 'casseroles', 'ustensile', 'ustensiles', 'batterie de cuisine', 'faitout'],
+    d: 'M3.4 10.4h13.2v5.6a3.4 3.4 0 0 1-3.4 3.4H6.8a3.4 3.4 0 0 1-3.4-3.4Z M16.6 12h4 M2.6 10.4h14.8 M8.4 7.4c0-1 1-1.4 1-2.4 M11.6 7.4c0-1 1-1.4 1-2.4' },
+
+  /* — Fouet — */
+  { cles: ['fouet', 'fouets', 'monter les blancs', 'creme fouettee', 'fouetter'],
+    d: 'M12 21v-6 M12 15c-2.4 0-4-3.4-4-6.6S9.6 3 12 3s4 2.2 4 5.4-1.6 6.6-4 6.6Z M12 15c-.8 0-1.4-3-1.4-6.4S11.2 3 12 3s1.4 2.2 1.4 5.6S12.8 15 12 15Z' },
+
+  /* — Tartes, pâte — */
+  { cles: ['tarte', 'tartes', 'rouleau a patisserie', 'pate a tarte', 'pate brisee', 'pate feuilletee'],
+    d: 'M6.4 5.4h11.2a1.6 1.6 0 0 1 0 3.2H6.4a1.6 1.6 0 0 1 0-3.2Z M2.6 7h3.8 M17.6 7h3.8 M4.4 13.4h15.2l-1.6 5H6Z M4.4 13.4c1.2-1 2.6-1 3.8 0s2.6 1 3.8 0 2.6-1 3.8 0 2.6 1 3.8 0' },
+
+  /* — Planche à découper — */
+  { cles: ['planche a decouper', 'planches a decouper', 'planche de decoupe', 'billot'],
+    d: 'M4.4 7.4h11.6a1.6 1.6 0 0 1 1.6 1.6v1.2h1.6a1.4 1.4 0 0 1 0 2.8h-1.6V15a1.6 1.6 0 0 1-1.6 1.6H4.4A1.6 1.6 0 0 1 2.8 15V9a1.6 1.6 0 0 1 1.6-1.6Z M5.6 10.4h4 M5.6 13.4h6.4' },
+
+  /* — Hotte, extraction — */
+  { cles: ['hotte', 'hottes', 'hotte aspirante', 'filtre a graisse', 'filtres a graisse', 'extraction des fumees'],
+    d: 'M9.4 3.4h5.2v5H9.4Z M9.4 8.4h5.2l5 6.2H4.4Z M3.4 14.6h17.2v2H3.4Z M7 21c.6-1 .6-1.4 0-2.4 M12 21c.6-1 .6-1.4 0-2.4 M17 21c.6-1 .6-1.4 0-2.4' },
+
+  /* — Glaçons — */
+  { cles: ['glacon', 'glacons', 'machine a glacons', 'glace pilee', 'bac a glacons'],
+    d: 'M4.4 10.4 9.6 8l5.2 2.4v6L9.6 18.8l-5.2-2.4Z M4.4 10.4l5.2 2.4 5.2-2.4 M9.6 12.8v6 M13.6 5.4l3.2-1.6 3.2 1.6v3.8l-3.2 1.6-3.2-1.6Z M13.6 5.4l3.2 1.6 3.2-1.6 M16.8 7v3.8' },
+
+  /* — Mise sous vide — */
+  { cles: ['sous vide', 'mise sous vide', 'machine sous vide', 'emballage sous vide', 'cuisson sous vide'],
+    d: 'M7 4.4h10v15.2H7Z M7 7h10 M2.4 12h3.4 M4.4 10.6 5.8 12l-1.4 1.4 M21.6 12h-3.4 M19.6 10.6 18.2 12l1.4 1.4 M12 10c1.6 0 2.6 1 2.6 2.4S13.6 15 12 15s-2.6-1.2-2.6-2.6S10.4 10 12 10Z' },
+
+  /* — Menu du jour — */
+  { cles: ['menu', 'menus', 'menu du jour', 'carte du restaurant', 'formule midi', 'plat du jour'],
+    d: 'M6 3.6h12v16.8H6Z M9.6 7v3.2 M8.6 7v2.2a1 1 0 0 0 2 0V7 M9.6 10.2V17 M14.4 7c1 .8 1.2 2.4.6 3.6h-.6V17' },
+
+  /* — Addition, pourboires — */
+  { cles: ['pourboire', 'pourboires', 'encaissement en salle', 'partage de l addition'],
+    d: 'M6 3.4h12v17.2l-2-1.4-2 1.4-2-1.4-2 1.4-2-1.4-2 1.4Z M9 8h6 M9 11h6 M9 14h3' },
+
+  /* — Prise de commande — */
+  { cles: ['prise de commande', 'prises de commande', 'bon de commande', 'bloc commande', 'commande en salle'],
+    d: 'M6 4.4h12v16H6Z M8.6 2.8v3.2 M12 2.8v3.2 M15.4 2.8v3.2 M8.6 10h6.8 M8.6 13h6.8 M8.6 16h4' },
+
+  /* — Livreurs, repas livrés — */
+  { cles: ['livreur', 'livreurs', 'livraison de repas', 'livraison a domicile', 'uber eats', 'deliveroo', 'sac isotherme'],
+    d: 'M6.4 7.4h11.2v12.4H6.4Z M6.4 11.4h11.2 M10 7.4V5.6h4v1.8 M2.4 12.4h2.2 M2.4 15.4h2.2 M3.4 18.4h1.2' },
+
+  /* — File d'attente — */
+  { cles: ['file d attente', 'liste d attente', 'temps d attente', 'attente client', 'gestion des files'],
+    d: 'M5 6.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M12 6.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M19 6.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M2.6 15.4a2.4 2.4 0 0 1 4.8 0 M9.6 15.4a2.4 2.4 0 0 1 4.8 0 M16.6 15.4a2.4 2.4 0 0 1 4.8 0 M3.4 19.4h17.2 M17.4 17.6l3 1.8-3 1.8' },
+
+  /* — Tapas, planche apéritive — */
+  { cles: ['tapas', 'planche aperitive', 'planche mixte', 'mezze', 'amuse bouche', 'amuse bouches', 'antipasti'],
+    d: 'M2.8 15.4h18.4v2.2a1 1 0 0 1-1 1H3.8a1 1 0 0 1-1-1Z M5.2 15.4a2 2 0 1 1 4 0 M10.6 12h3.4v3.4h-3.4Z M17.4 15.4V8.6 M17.4 6.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z' },
+
+  /* — Fruits de mer, écailler — */
+  { cles: ['plateau de fruits de mer', 'ecailler', 'ecaillers', 'huitre', 'huitres', 'ouverture des huitres', 'coquillage', 'coquillages'],
+    d: 'M12 20.4 3.6 9.6C5 5.8 8.2 3.6 12 3.6s7 2.2 8.4 6Z M12 20.4 7 5 M12 20.4V3.6 M12 20.4 17 5 M9.2 20.4h5.6' },
+
+  /* — Épicé, curry — */
+  { cles: ['curry', 'currys', 'cuisine indienne', 'tandoori', 'piment', 'piments', 'plat epice'],
+    d: 'M8.4 8.6c-2.4 2-3.6 5.4-3.4 9.4 0 1.4 1.2 2.2 2.4 1.6 4.6-2.2 9.4-6 10.6-10.6.4-1.6-.8-3-2.4-3-2.6 0-5.2.6-7.2 2.6Z M15.4 6c.2-1.4 1-2.4 2.4-2.8' },
+
+  /* — Cuisine mexicaine — */
+  { cles: ['cuisine mexicaine', 'burrito', 'burritos', 'nachos', 'guacamole', 'quesadilla', 'tex mex'],
+    d: 'M3.4 17.4a8.6 8.6 0 0 1 17.2 0Z M6.4 17.4a5.6 5.6 0 0 1 11.2 0 M5 12.2c.8-.8 1.6.2 2.4-.6 M9.4 9.6c.8-.6 1.6.4 2.4-.2 M14 9.8c.8-.4 1.4.6 2.2 0' },
+
+  /* — Dim sum, bouchées vapeur — */
+  { cles: ['dim sum', 'raviolis vapeur', 'bouchee vapeur', 'bouchees vapeur', 'panier vapeur', 'gyoza', 'gyozas'],
+    d: 'M3.4 12.4h17.2v4.6a2.4 2.4 0 0 1-2.4 2.4H5.8a2.4 2.4 0 0 1-2.4-2.4Z M3.4 15.4h17.2 M6.4 12.4c0-2.2 1.4-3.6 3-3.6s3 1.4 3 3.6 M11.6 12.4c0-2.2 1.4-3.6 3-3.6s3 1.4 3 3.6 M9.4 8.8V8 M14.6 8.8V8' },
+
+  /* — Dressage des desserts — */
+  { cles: ['dressage dessert', 'dessert a l assiette', 'salade de fruits', 'assiette dessert', 'dressage assiette'],
+    d: 'M3 15.4h18 M4.6 15.4c.4 2 3.6 3.4 7.4 3.4s7-1.4 7.4-3.4 M8.4 15.4a3.6 3.6 0 0 1 7.2 0 M12 11.8c.4-1.8 1.8-2.8 3.4-2.6-.2 1.6-1.6 2.6-3.4 2.6Z M7 12.4l-1-1' },
+
+  /* — Fondue, raclette — */
+  { cles: ['fondue', 'fondues', 'raclette', 'raclettes', 'fondue savoyarde', 'caquelon'],
+    d: 'M5.4 10.4h13.2v3.2a6.6 6.6 0 0 1-13.2 0Z M7 20.4h10 M9 18.8l-.8 1.6 M15 18.8l.8 1.6 M14 10.4 18.4 3.4 M10 10.4 7.4 3.8' },
+
+  /* — Couscous, tajine — */
+  { cles: ['couscous', 'tajine', 'tajines', 'cuisine marocaine', 'cuisine orientale'],
+    d: 'M12 3.4v1.6 M12 5c-1.4 3.4-4.4 6.6-8.6 8.4h17.2C16.4 11.6 13.4 8.4 12 5Z M3 13.4h18 M4.4 13.4c.4 2.6 3.6 4.2 7.6 4.2s7.2-1.6 7.6-4.2' },
+
+  /* — Poke bowl — */
+  { cles: ['poke bowl', 'poke', 'pokes', 'buddha bowl', 'bol complet', 'bowl'],
+    d: 'M3.4 12.4h17.2a8.6 8.6 0 0 1-17.2 0Z M12 3.4c1.6 0 3 1.6 3 3.6s-1.4 4.2-3 4.2-3-2.2-3-4.2 1.4-3.6 3-3.6Z M12 6.4a.9.9 0 1 1 0 1.8' },
+
+  /* — Bento, lunch box — */
+  { cles: ['bento', 'bentos', 'lunch box', 'lunchbox', 'boite repas', 'gamelle'],
+    d: 'M3.4 6.4h17.2v12H3.4Z M11.4 6.4v12 M11.4 12.4h9.2 M5.6 9.4h.02 M8.4 10.6h.02 M6.4 14.6h.02 M9.2 15.6h.02' },
+
+  /* — Barbe à papa — */
+  { cles: ['barbe a papa', 'confiserie foraine', 'pomme d amour', 'chouchous', 'sucre file'],
+    d: 'M12 21V13.4 M12 13.4c-3.4 0-6-2.2-6-5s2.4-5 5-5c1 0 1.6.4 2 .8.6-.4 1.2-.6 2-.6 2.2 0 3 2.2 3 4.2 0 3.2-2.6 5.6-6 5.6Z M9.4 8c.8-1 2.4-1.2 3.4-.2' },
+
+  /* — Plateau de fromages — */
+  { cles: ['plateau de fromages', 'plateau de fromage', 'fromager', 'cave a fromages', 'fromages affines'],
+    d: 'M3.4 16.4V11l14-5.6 3.2 5.6v5.4Z M3.4 11h17.2 M7.4 13.6h.02 M12 14.4a1.2 1.2 0 1 1 0 .01Z M16.4 13.4h.02 M2.4 19.4h19.2' },
+
+  /* — Boissons chaudes — */
+  { cles: ['boissons chaudes', 'boisson chaude', 'chocolat chaud', 'vin chaud', 'cappuccino', 'latte', 'mug', 'mugs'],
+    d: 'M5.4 9.4h11v8.4a2.6 2.6 0 0 1-2.6 2.6H8a2.6 2.6 0 0 1-2.6-2.6Z M16.4 11.4h1.4a2 2 0 0 1 0 4h-1.4 M5.4 9.4c0-1.6 1.2-2.6 2.6-2.4.4-1.4 1.6-2.2 2.8-2.2s2.4.8 2.8 2.2c1.4-.2 2.8.8 2.8 2.4 M9 13h.02 M12 15h.02' },
+
+  /* ─── SANTÉ, BEAUTÉ, SPORT, LOISIRS, ÉDUCATION ─── */
+
+  /* — Pédiatrie — */
+  { cles: ['pediatrie', 'pediatre', 'pediatres', 'consultation pediatrique', 'soins aux enfants', 'service pediatrique'],
+    d: 'M12 4.4a7.6 7.6 0 1 1 0 15.2 7.6 7.6 0 0 1 0-15.2Z M12 4.4c-1.6 0-2.2 1.8-.8 2.6 M9.4 11h.02 M14.6 11h.02 M9.8 14.4c1.2 1.2 3.2 1.2 4.4 0' },
+
+  /* — Maternité, sage-femme — */
+  { cles: ['maternite', 'sage femme', 'sages femmes', 'accouchement', 'obstetrique', 'landau', 'poussette'],
+    d: 'M11.4 3.6v7.2H4.2A7.2 7.2 0 0 1 11.4 3.6Z M4.2 10.8h14.4a7.2 7.2 0 0 1-14.4 0 M18.6 10.8V7.6h2 M7.4 17.6a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z M15.4 17.6a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z' },
+
+  /* — Cardiologie — */
+  { cles: ['cardiologie', 'cardiologue', 'electrocardiogramme', 'ecg', 'cardiaque', 'rythme cardiaque'],
+    d: 'M3.4 5.4h17.2v11.2H3.4Z M5.6 11h3l1.4-3 2 6 1.4-3h5 M9.4 20.4h5.2 M12 16.6v3.8' },
+
+  /* — Orthophonie — */
+  { cles: ['orthophonie', 'orthophoniste', 'troubles du langage', 'reeducation vocale', 'diction', 'prononciation'],
+    d: 'M3.6 13c2.4-2.6 5.4-3.6 8.4-1.2 3-2.4 6-1.4 8.4 1.2-2.4 2.8-5.4 3.8-8.4 3.8S6 15.8 3.6 13Z M3.6 13h16.8 M8.4 5.6l.8 2 M12 4.6V7 M15.6 5.6l-.8 2' },
+
+  /* — Podologie — */
+  { cles: ['podologie', 'podologue', 'semelles orthopediques', 'orthese plantaire'],
+    d: 'M8.6 10.6c-.8 2.6-.6 5.2.4 7.4.8 1.8 2.2 3 3.6 3s2.4-1.2 2.4-2.8c0-1.8-1.4-2.6-1.4-4.6 0-1.8 1.4-2.8 1.4-4.4A2.6 2.6 0 0 0 12.4 7c-1.8 0-3.2 1.6-3.8 3.6Z M9 4.2h.02 M11.4 3.6h.02 M13.8 3.8h.02 M15.8 4.8h.02 M17.2 6.4h.02' },
+
+  /* — Soins infirmiers — */
+  { cles: ['infirmier', 'infirmiere', 'infirmiers', 'infirmieres', 'soins infirmiers', 'cabinet infirmier'],
+    d: 'M12 3.4a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z M4.6 20.6a7.4 7.4 0 0 1 14.8 0 M12 13.4v4.4 M9.8 15.6h4.4' },
+
+  /* — Aide-soignant — */
+  { cles: ['aide soignant', 'aide soignante', 'aides soignants', 'toilette patient', 'aide a la toilette', 'nursing'],
+    d: 'M3.4 15.4l3.4-3.4 4 1.4 2.4-1.8a1.6 1.6 0 0 1 2 2.4l-3.4 2.6 M3.4 15.4V19l3.6 1.4h6.2l7.4-4.6a1.4 1.4 0 0 0-1.4-2.4l-4.2 2.2 M12 2.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M9.4 10.4V9a2.6 2.6 0 0 1 5.2 0v1.4' },
+
+  /* — Lit médicalisé — */
+  { cles: ['lit medicalise', 'lits medicalises', 'materiel medical', 'chambre patient', 'chambre d hopital', 'brancard'],
+    d: 'M3.4 7v13 M3.4 15.4h17.2v5 M3.4 12.4h4.6l2-2.4h7.4a3.2 3.2 0 0 1 3.2 3.2v2.2 M5.8 8.6a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M17.4 3v3.6 M15.6 4.8h3.6' },
+
+  /* — Béquilles, attelle — */
+  { cles: ['bequille', 'bequilles', 'attelle', 'attelles', 'platre', 'entorse', 'fracture'],
+    d: 'M6.4 3.4h11.2 M7.6 3.4l3.2 10.6 M16.4 3.4l-3.2 10.6 M9 9h6 M10.8 14h2.4 M12 14v6.6 M10.6 20.6h2.8' },
+
+  /* — Pansements, plaies — */
+  { cles: ['pansement', 'pansements', 'plaie', 'plaies', 'cicatrisation', 'compresse', 'compresses'],
+    d: 'M14.8 3.8l5.4 5.4a1.6 1.6 0 0 1 0 2.2l-8.8 8.8a1.6 1.6 0 0 1-2.2 0l-5.4-5.4a1.6 1.6 0 0 1 0-2.2l8.8-8.8a1.6 1.6 0 0 1 2.2 0Z M9.4 12 12 9.4 14.6 12 12 14.6Z' },
+
+  /* — Tension artérielle — */
+  { cles: ['tension arterielle', 'tensiometre', 'prise de tension', 'hypertension', 'pouls', 'constantes vitales'],
+    d: 'M9.4 4.4a5.6 5.6 0 1 1 0 11.2 5.6 5.6 0 0 1 0-11.2Z M9.4 10l2.4-2.4 M9.4 15.6v1.6a3.2 3.2 0 0 0 3.2 3.2H16 M18.2 16.4a2.2 2.2 0 1 1 0 4.4 2.2 2.2 0 0 1 0-4.4Z' },
+
+  /* — Barbier — */
+  { cles: ['barbier', 'barbiers', 'barbe', 'rasage', 'barber shop', 'tondeuse a barbe'],
+    d: 'M8.4 3.4h7.2 M8.4 20.6h7.2 M9.4 3.4h5.2v17.2H9.4Z M9.4 7.6l5.2-2.6 M9.4 11.4l5.2-2.6 M9.4 15.2l5.2-2.6 M9.4 19l5.2-2.6' },
+
+  /* — Parfumerie — */
+  { cles: ['parfum', 'parfums', 'parfumerie', 'eau de toilette', 'fragrance', 'vaporisateur'],
+    d: 'M7.4 9.4h9.2a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H7.4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1Z M12 6.4v3 M10 3.4h4v3h-4Z M16.6 4.4h2.4 M16.6 6.2l2 1' },
+
+  /* — Bronzage, solarium — */
+  { cles: ['bronzage', 'solarium', 'cabine uv', 'autobronzant', 'creme solaire', 'transat'],
+    d: 'M17 3.4a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8Z M17 1.2v.8 M17 10.4v.8 M21.8 5.8H21 M13 5.8h-.8 M20.4 2.4l-.6.6 M14.2 8.6l-.6.6 M20.4 9.2l-.6-.6 M3 17.4h11.4l3.6-5.6 M6 17.4l-1.8 3.4 M12.6 17.4l1.8 3.4 M3 14.4h7.8' },
+
+  /* — Running — */
+  { cles: ['running', 'jogging', 'marathon', 'course a pied', 'coureur', 'trail'],
+    d: 'M14.4 3.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M8.4 9.4l3.4-1.6 3 2.2 2.4 2.6 M11.8 7.8l-1.6 5 3.4 2.6-.8 4.8 M10.2 12.8 8 17l-3.6.6' },
+
+  /* — Boxe, arts martiaux — */
+  { cles: ['boxe', 'boxeur', 'arts martiaux', 'judo', 'karate', 'dojo', 'taekwondo', 'mma'],
+    d: 'M7.4 13V8.4a4.8 4.8 0 0 1 4.8-4.8h1.2a4.8 4.8 0 0 1 4.8 4.8v4.4a4.6 4.6 0 0 1-4.6 4.6H10a2.6 2.6 0 0 1-2.6-2.6Z M7.4 11.4H5.6a1.6 1.6 0 0 0 0 3.2h1.8 M9 17.4v3.2h7.4v-3.2 M11.2 7.4c1.6 0 3 .8 3.6 2' },
+
+  /* — Danse — */
+  { cles: ['danse', 'danseur', 'danseuse', 'ballet', 'ecole de danse', 'salle de danse', 'choregraphie'],
+    d: 'M12 3.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M7 6.4l5 2.6 5-2.6 M12 9v4.6 M8.6 13.6h6.8 M12 13.6l-2.6 7 M12 13.6l4.4 3.6' },
+
+  /* — Escalade — */
+  { cles: ['escalade', 'mur d escalade', 'grimpe', 'bloc d escalade', 'salle d escalade', 'assurage'],
+    d: 'M5 20.6 8.2 3.4h10.4l-1.8 17.2Z M10 6.8a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z M15.4 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z M12.2 10.6a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z M15.6 13.4a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z M9 15a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z' },
+
+  /* — Basketball — */
+  { cles: ['basketball', 'basket ball', 'panier de basket', 'terrain de basket', 'dunk'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M3.4 12h17.2 M12 3.4v17.2 M6 5.8c2 1.6 3 3.8 3 6.2s-1 4.6-3 6.2 M18 5.8c-2 1.6-3 3.8-3 6.2s1 4.6 3 6.2' },
+
+  /* — Volley, handball — */
+  { cles: ['volley', 'volleyball', 'beach volley', 'handball', 'hand ball'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 12c0-3.4 1.6-6.4 4.4-7.8 M12 12c-3 1.6-6.4 1.6-8.6 0 M12 12c2.8 1.8 4.2 4.8 4 8.2' },
+
+  /* — Rugby — */
+  { cles: ['rugby', 'ballon ovale', 'melee', 'essai transforme', 'rugbyman'],
+    d: 'M5.4 18.6c-1.8-1.8-1-6.8 2.6-10.6s8.8-4.4 10.6-2.6 1 6.8-2.6 10.6-8.8 4.4-10.6 2.6Z M8.6 15.4l6.8-6.8 M10.2 11.6l2.2 2.2 M12 9.8l2.2 2.2' },
+
+  /* — Patinoire, hockey — */
+  { cles: ['patinoire', 'patinage', 'patin a glace', 'patins', 'hockey', 'hockey sur glace'],
+    d: 'M6.4 4.4h4v5.4l6 2.4a2.6 2.6 0 0 1 1.6 2.4v1H6.4Z M4.4 19.4h15.2a1.4 1.4 0 0 0 1.4-1.4 M8.4 15.6v3.8 M15.6 15.6v3.8' },
+
+  /* — Billard — */
+  { cles: ['billard', 'billards', 'queue de billard', 'snooker', 'salle de billard'],
+    d: 'M9.4 9.4a6 6 0 1 1 0 12 6 6 0 0 1 0-12Z M9.4 13a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8Z M14.6 9.8l6-6.4' },
+
+  /* — Fléchettes — */
+  { cles: ['flechettes', 'flechette', 'jeu de flechettes', 'cible de flechettes', 'darts'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M12 7.4a4.6 4.6 0 1 1 0 9.2 4.6 4.6 0 0 1 0-9.2Z M12 11a1 1 0 1 1 0 2 1 1 0 0 1 0-2Z M3.4 12h3 M17.6 12h3 M12 3.4v3 M12 17.6v3' },
+
+  /* — Échecs — */
+  { cles: ['echecs', 'jeu d echecs', 'echiquier', 'tournoi d echecs', 'club d echecs'],
+    d: 'M12 3v3 M10.6 4.4h2.8 M9.4 6.8h5.2l-1 5h-3.2Z M8.4 11.8h7.2 M9 11.8l-1 6h8l-1-6 M6.4 17.8h11.2v2.6H6.4Z' },
+
+  /* — Cartes, casino — */
+  { cles: ['poker', 'jeu de cartes', 'cartes a jouer', 'blackjack', 'croupier'],
+    d: 'M8.4 5.4l7.4-2 3.6 13.4-7.4 2 M4.6 6.6h7.6v14H4.6Z M8.4 11c-1.4 1.2-2 2-2 2.8a1 1 0 0 0 2 .2 1 1 0 0 0 2-.2c0-.8-.6-1.6-2-2.8Z M8.4 14v1.8' },
+
+  /* — Université, campus — */
+  { cles: ['universite', 'universites', 'campus', 'faculte', 'etudiant', 'etudiants', 'enseignement superieur'],
+    d: 'M12 3.4v3 M12 3.4h3v1.8h-3 M6.4 11a5.6 5.6 0 0 1 11.2 0 M4.4 11h15.2v9.4H4.4Z M9.6 20.4V16h4.8v4.4 M7 13.6h.02 M17 13.6h.02' },
+
+  /* — Calculatrice — */
+  { cles: ['calculatrice', 'calculatrices', 'calcul', 'calculs', 'mathematiques', 'maths'],
+    d: 'M6.4 3.4h11.2a1 1 0 0 1 1 1v15.2a1 1 0 0 1-1 1H6.4a1 1 0 0 1-1-1V4.4a1 1 0 0 1 1-1Z M8.4 6.4h7.2v3H8.4Z M8.6 12.6h.02 M12 12.6h.02 M15.4 12.6h.02 M8.6 15.6h.02 M12 15.6h.02 M15.4 15.6h.02 M8.6 18.4h.02 M12 18.4h.02 M15.4 18.4h.02' },
+
+  /* — Microscope, sciences — */
+  { cles: ['microscope', 'microscopes', 'sciences', 'recherche scientifique', 'chercheur'],
+    d: 'M10.6 3.4 13.6 5 9.8 11.6 6.8 10Z M6.4 13.6h6 M12.4 8.4a5.4 5.4 0 0 1 1.8 9.4 M7.4 20.4h11 M14.2 17.8v2.6' },
+
+  /* — Piano — */
+  { cles: ['piano', 'pianos', 'pianiste', 'conservatoire', 'cours de musique', 'clavier musical'],
+    d: 'M3.4 5.4h17.2v13.2H3.4Z M7.7 12v6.6 M12 12v6.6 M16.3 12v6.6 M6.6 5.4h2.2V12H6.6Z M10.9 5.4h2.2V12h-2.2Z M15.2 5.4h2.2V12h-2.2Z' },
+
+  /* — Guitare — */
+  { cles: ['guitare', 'guitares', 'guitariste', 'luthier', 'lutherie', 'ukulele'],
+    d: 'M14.4 9.6l5.6-5.6 M18.4 2.6l3 3 M13 11c-.6-1.8-2.6-2.6-4.4-1.8-1 .4-1.4 1.4-2.2 1.8-1.6.6-3.2.6-3.6 2.4-.6 2.4 1.6 4.6 3 6s3.6 3.6 6 3c1.8-.4 1.8-2 2.4-3.6.4-.8 1.4-1.2 1.8-2.2.8-1.8 0-3.8-1.8-4.4Z M9.4 13.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z' },
+
+  /* — Cirque — */
+  { cles: ['cirque', 'cirques', 'chapiteau', 'acrobate', 'jongleur', 'clown', 'arts du cirque'],
+    d: 'M3.4 19.6 5 11.4 12 5l7 6.4 1.6 8.2Z M12 5V2.6l2.4.8L12 4.2 M12 5l-3 14.6 M12 5l3 14.6' },
+
+  /* — Parc d'attractions — */
+  { cles: ['parc d attractions', 'parc de loisirs', 'manege', 'maneges', 'grande roue', 'fete foraine', 'attraction'],
+    d: 'M12 4.4a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Z M12 4.4v13.2 M5.4 11h13.2 M7.4 6.4l9.2 9.2 M16.6 6.4l-9.2 9.2 M8.4 20.6 12 11l3.6 9.6 M6.6 20.6h10.8' },
+
+  /* — Zoo, parc animalier — */
+  { cles: ['zoo', 'zoos', 'parc animalier', 'safari', 'soigneur animalier', 'elephant'],
+    d: 'M12 6.4a4.4 4.4 0 0 1 4.4 4.4v3a2 2 0 0 1-1.6 2v2.4a1.4 1.4 0 0 1-2.8 0V16 M12 6.4a4.4 4.4 0 0 0-4.4 4.4v3c0 1.2.8 2 2 2 M7.6 9.4C5.4 8 3.4 9 3.4 11.6s1.6 4.4 4.6 4 M16.4 9.4c2.2-1.4 4.2-.4 4.2 2.2s-1.6 4.4-4.6 4 M10.4 11h.02 M13.6 11h.02' },
+
+  /* — Centre de loisirs — */
+  { cles: ['centre de loisirs', 'colonie de vacances', 'colonies de vacances', 'animateur', 'animatrice', 'animation enfants', 'cerf volant'],
+    d: 'M12 3l6 6-6 9-6-9Z M6 9h12 M12 3v15 M12 18c-1 1.6-2.4 2.4-4 2.4 M9.6 19.6l-.8-1.2' },
+
+  /* — Plongée sous-marine — */
+  { cles: ['plongee', 'plongee sous marine', 'plongeur sous marin', 'apnee', 'snorkeling'],
+    d: 'M3.4 9.4h13.2v4.2a2.4 2.4 0 0 1-2.4 2.4h-1.8l-1.6-2-1.6 2H5.8a2.4 2.4 0 0 1-2.4-2.4Z M19.4 4v10.4a4 4 0 0 1-4 4h-2' },
+
+  /* — Pétanque — */
+  { cles: ['petanque', 'boulodrome', 'cochonnet', 'jeu de boules'],
+    d: 'M7 10.4a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z M16.4 12.4a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z M12.6 5a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z M3.6 14h6.8 M13 16h6.8 M2.6 21h18.8' },
+
+  /* — Tir à l'arc — */
+  { cles: ['tir a l arc', 'archer', 'archerie', 'arc et fleches', 'stand de tir'],
+    d: 'M6.4 3.4c5.4 1.6 8.8 5.4 8.8 8.6s-3.4 7-8.8 8.6 M6.4 3.4v17.2 M3.4 12h17.2 M17.6 9.4l3 2.6-3 2.6' },
+
+  /* — Kayak, aviron — */
+  { cles: ['kayak', 'canoe', 'aviron', 'pagaie', 'rafting', 'sports nautiques'],
+    d: 'M2.8 15.4c3-2 6-3 9.2-3s6.2 1 9.2 3c-3 1.6-6 2.4-9.2 2.4s-6.2-.8-9.2-2.4Z M4.4 8.4h15.2 M3 6.8v3.2 M21 6.8v3.2 M12 8.4v4' },
+
+  /* — Surf, glisse — */
+  { cles: ['surf', 'surfeur', 'planche a voile', 'paddle', 'kitesurf', 'glisse'],
+    d: 'M3 16.4c0-5 3.6-9 8.4-9 3 0 5 2 5 4.4 0 1.8-1.4 3-3 3-1.4 0-2.4-1-2.4-2.2 M3 20.4h18' },
+
+  /* — Skateboard, roller — */
+  { cles: ['skateboard', 'skate', 'skatepark', 'planche a roulettes', 'roller', 'rollers'],
+    d: 'M2.6 10.4c.4 1.4 1.4 2.2 2.8 2.2h13.2c1.4 0 2.4-.8 2.8-2.2 M7.4 15.6a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M16.6 15.6a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M7.4 12.6v3 M16.6 12.6v3' },
+
+  /* — Arbitre, sifflet — */
+  { cles: ['arbitre', 'arbitres', 'arbitrage sportif', 'sifflet', 'carton jaune', 'juge arbitre'],
+    d: 'M9 10.4h11.6v3.6h-6.8 M13.6 14.6a4.6 4.6 0 1 1-4.6-4.2 M9 13.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M4.4 6.4l1.4 1.4 M8 4.4v2' },
+
+  /* — Podium, compétition — */
+  { cles: ['podium', 'competition', 'competitions', 'championnat', 'tournoi', 'classement sportif', 'medaille'],
+    d: 'M3.4 20.4V14h5.4v6.4 M8.8 20.4V10.4h6.4v10 M15.2 20.4v-8h5.4v8 M2.6 20.4h18.8 M12 3.4l.8 1.8 1.8.2-1.4 1.2.4 1.8-1.6-1-1.6 1 .4-1.8-1.4-1.2 1.8-.2Z' },
+
+  /* — Luminothérapie — */
+  { cles: ['luminotherapie', 'lampe de luminotherapie', 'therapie par la lumiere', 'lampe de jour'],
+    d: 'M7.4 4.4h9.2v11.2H7.4Z M12 15.6v4.8 M8.4 20.4h7.2 M3.4 7.4h1.6 M3.4 10h1.6 M3.4 12.6h1.6 M19 7.4h1.6 M19 10h1.6 M19 12.6h1.6' },
+
+  /* — Acupuncture — */
+  { cles: ['acupuncture', 'acupuncteur', 'medecine chinoise', 'auriculotherapie'],
+    d: 'M6.4 3.4l4.8 9 M17.6 3.4l-4.8 9 M12 3v9.4 M12 15.4a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Z' },
+
+  /* — Herboristerie, phytothérapie — */
+  { cles: ['herboristerie', 'herboriste', 'phytotherapie', 'plantes medicinales', 'naturopathie', 'naturopathe', 'tisanes medicinales'],
+    d: 'M3.4 11.4h17.2a8.6 8.6 0 0 1-17.2 0 M14.4 11.4l4-7.4 M6.6 8.6c0-2.4 1.6-4.4 4-4.6.2 2.4-1.6 4.4-4 4.6Z' },
+
+  /* — Ophtalmologie — */
+  { cles: ['ophtalmologie', 'ophtalmologue', 'ophtalmo', 'acuite visuelle', 'test de vision', 'orthoptiste'],
+    d: 'M5.4 3.4h13.2v17.2H5.4Z M10 6.4h4 M9.4 9.4h5.2 M10.4 12.4h3.2 M10.8 15h2.4 M11.2 17.6h1.6' },
+
+  /* — ORL — */
+  { cles: ['orl', 'oto rhino', 'otoscope', 'gorge', 'sinus', 'otite'],
+    d: 'M3.4 20.6l5.4-5.4 M8.8 15.2l2-2 M10.8 13.2a4.4 4.4 0 0 0 6.2 0l3.4-3.4-6.2-6.2-3.4 3.4a4.4 4.4 0 0 0 0 6.2Z M15.4 6.4l2.2 2.2' },
+
+  /* — Gériatrie — */
+  { cles: ['geriatrie', 'gerontologie', 'deambulateur', 'personnes agees', 'personne agee', 'prevention des chutes'],
+    d: 'M7.4 5.4h9.2 M8 5.4 6 20.4 M16 5.4l2 15 M6.8 13h10.4 M5 20.4h2 M17 20.4h2' },
+
+  /* — Handisport — */
+  { cles: ['handisport', 'sport adapte', 'basket fauteuil', 'paralympique', 'parasport'],
+    d: 'M8.4 10.4a5.6 5.6 0 1 0 5.4 7 M8.4 3a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M8.4 7.6V13h5.4l2.4 4.4 M17.6 4.4a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Z' },
+
+  /* ─── BTP, INDUSTRIE, ÉNERGIE, TRANSPORT, AGRICULTURE ─── */
+
+  /* — Pelleteuse, terrassement — */
+  { cles: ['pelleteuse', 'pelleteuses', 'excavatrice', 'terrassement', 'engin de chantier', 'engins de chantier', 'mini pelle'],
+    d: 'M5.4 17.4h8.4a2 2 0 0 1 0 4H5.4a2 2 0 0 1 0-4Z M4.6 17.4v-4.6h3.2l1.4-3.2h3.4v7.8 M12.6 12.4l4.2-6.8 3.6 2.8 M20.4 8.4l.4 3.8-3.4-.4Z' },
+
+  /* — Bétonnière — */
+  { cles: ['betonniere', 'betonnieres', 'toupie beton', 'camion toupie', 'malaxeur'],
+    d: 'M2.6 16.4v-6h4.4l1.4 2h.8 M9.2 12.4l7.4-4.6a3.4 3.4 0 0 1 4.4 4.4l-3 5.2H9.2Z M12.4 10.4l2.8 7 M2.6 16.4h6.6 M5.6 16.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M15.4 17.6a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z' },
+
+  /* — Brouette — */
+  { cles: ['brouette', 'brouettes', 'diable de manutention', 'transport de gravats'],
+    d: 'M6.6 9.4h12l-2 5.4H8.4Z M16.4 16.2a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M14.8 14.8l1.6 1.4 M8.4 14.8 3.4 11.6 M9.4 14.8 8.4 19.6' },
+
+  /* — Pelle, bêche — */
+  { cles: ['pelle', 'pelles', 'beche', 'beches'],
+    d: 'M10.2 3.4h3.6 M12 3.4v9.4 M8.4 12.8h7.2v3.8a3.6 3.6 0 0 1-7.2 0Z' },
+
+  /* — Perceuse, perforateur — */
+  { cles: ['perceuse', 'perceuses', 'perforateur', 'visseuse', 'percage', 'perceuse visseuse'],
+    d: 'M5 6.4h10.4a2 2 0 0 1 2 2v1.6a2 2 0 0 1-2 2H5a1.6 1.6 0 0 1-1.6-1.6V8A1.6 1.6 0 0 1 5 6.4Z M17.4 9.2h3.2 M8.2 12h4l1.2 7.4a1 1 0 0 1-1 1.2H9.6a1 1 0 0 1-1-.8Z M6.4 6.4V4.4' },
+
+  /* — Niveau, topographie — */
+  { cles: ['niveau a bulle', 'geometre', 'geometres', 'topographie', 'topographe', 'nivellement', 'bornage'],
+    d: 'M2.8 9.4h18.4v5.2H2.8Z M9.4 10.6h5.2v2.8H9.4Z M12 11.2a.8.8 0 1 1 0 1.6.8.8 0 0 1 0-1.6Z M5.4 9.4v2 M18.6 9.4v2' },
+
+  /* — Mètre ruban, mesures — */
+  { cles: ['metre ruban', 'prise de mesures', 'metrage', 'metre laser', 'releve de cotes'],
+    d: 'M4 6.4h10a2 2 0 0 1 2 2V16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.4a2 2 0 0 1 2-2Z M9 9.4a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z M16 15.4h5.4V18H16 M18.6 15.4v1.2 M20.4 15.4v1.2' },
+
+  /* — Architecte, plans — */
+  { cles: ['architecte', 'architectes', 'architecture', 'plans de construction', 'permis de construire', 'dessinateur', 'bureau d etudes'],
+    d: 'M12 3.4v2.2 M12 5.6a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M11 8.6 6.4 20.4 M13 8.6l4.6 11.8 M8.4 15.4h7.2' },
+
+  /* — Cônes de chantier — */
+  { cles: ['cone de chantier', 'cones de chantier', 'cone de signalisation', 'cones de signalisation', 'balisage de chantier'],
+    d: 'M9.8 4.4h4.4l4 14.6H5.8Z M8.6 9.6h6.8 M7.4 14.2h9.2 M3.6 19h16.8v1.8H3.6Z' },
+
+  /* — Barrières, grillage — */
+  { cles: ['barriere', 'barrieres', 'grillage', 'portillon', 'barriere de chantier', 'palissade', 'garde corps'],
+    d: 'M3.4 8.4h17.2v4.4H3.4Z M7.6 8.4l-2.8 4.4 M12.6 8.4l-2.8 4.4 M17.6 8.4l-2.8 4.4 M6 12.8v7.6 M18 12.8v7.6 M4 20.4h4 M16 20.4h4' },
+
+  /* — Voirie, route — */
+  { cles: ['voirie', 'chaussee', 'enrobe', 'goudron', 'travaux routiers'],
+    d: 'M8.6 3.6 4 20.4 M15.4 3.6 20 20.4 M12 4v2.6 M12 9.6v3 M12 16v4.4' },
+
+  /* — Génie civil, ouvrage d'art — */
+  { cles: ['genie civil', 'ouvrage d art', 'ouvrages d art', 'viaduc', 'travaux publics'],
+    d: 'M2.6 9.4h18.8 M2.6 6.4h18.8 M4.4 9.4v11 M19.6 9.4v11 M4.4 20.4c0-4.2 3.4-7.4 7.6-7.4s7.6 3.2 7.6 7.4 M8.4 9.4v4.4 M12 9.4v3.4 M15.6 9.4v4.4' },
+
+  /* — Mine, granulats — */
+  { cles: ['mine', 'mines', 'granulats', 'carriere de pierre', 'extraction miniere', 'minerai', 'gravier'],
+    d: 'M4.4 6.4C8 3.2 13.6 3.2 17.4 5.6 M11 4.4 4 19.4 M14 15.4l2.6-3 3.6 1.4 1 4.2-2.6 2.4H15Z' },
+
+  /* — Pétrole, raffinerie — */
+  { cles: ['petrole', 'raffinerie', 'hydrocarbure', 'hydrocarbures', 'forage petrolier', 'petrochimie'],
+    d: 'M3.4 20.4h17.2 M8 20.4l2.6-10.6 2.6 10.6 M3.4 7.4l14.4-3 M10.6 9.8V6 M17.8 4.4a2.6 2.6 0 0 1 2.6 2.6v2.4 M20.4 9.4v11 M3.4 7.4v3' },
+
+  /* — Nucléaire, radioprotection — */
+  { cles: ['nucleaire', 'centrale nucleaire', 'radioprotection', 'radioactivite', 'rayonnements ionisants', 'zone controlee'],
+    d: 'M13.5 9.4 16 5.1A8 8 0 0 0 8 5.1l2.5 4.3a3 3 0 0 1 3 0Z M15 12h5a8 8 0 0 1-4 6.9l-2.5-4.3A3 3 0 0 0 15 12Z M10.5 14.6 8 18.9A8 8 0 0 1 4 12h5a3 3 0 0 0 1.5 2.6Z M12 10.6a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z' },
+
+  /* — Barrage, hydroélectrique — */
+  { cles: ['barrage', 'barrages', 'hydroelectrique', 'hydroelectricite', 'centrale hydraulique', 'retenue d eau'],
+    d: 'M3.4 8.4c1.4 0 1.4-1 2.8-1s1.4 1 2.8 1 M3.4 12c1.4 0 1.4-1 2.8-1s1.4 1 2.8 1 M10 4.4h3.4l3.2 16h-9Z M3.4 20.4h17.2 M18.6 7.6l-1.4 3h2l-1.4 3' },
+
+  /* — Compteur, relevé — */
+  { cles: ['compteur', 'compteurs', 'releve de compteur', 'releve des compteurs', 'compteur electrique', 'compteur d eau', 'sous comptage'],
+    d: 'M5.4 3.4h13.2a1 1 0 0 1 1 1v15.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1V4.4a1 1 0 0 1 1-1Z M7.6 6.6h8.8v3.4H7.6Z M9.8 6.6v3.4 M12 6.6v3.4 M14.2 6.6v3.4 M8 17.4a4 4 0 0 1 8 0 M12 17.4l1.8-2.2' },
+
+  /* — Groupe électrogène — */
+  { cles: ['groupe electrogene', 'groupes electrogenes', 'generateur', 'generateurs', 'alimentation de secours'],
+    d: 'M3.4 7.4h17.2v10H3.4Z M12.8 9.6l-2 3h2.4l-2 3 M6.4 17.4v2.4 M17.6 17.4v2.4 M16.4 7.4V4.4h2.4' },
+
+  /* — Pompe à chaleur — */
+  { cles: ['pompe a chaleur', 'pompes a chaleur', 'pompe', 'pompes', 'station de pompage', 'unite exterieure'],
+    d: 'M3.4 5.4h17.2v13.2H3.4Z M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8Z M12 12c0-2 1.2-3.2 3-3 M12 12c-1.6 1.2-3.4.8-4-1 M12 12c1 1.8.2 3.4-1.6 3.8 M5.4 18.6v1.8 M18.6 18.6v1.8' },
+
+  /* — Vannes, robinetterie — */
+  { cles: ['vanne', 'vannes', 'robinetterie', 'robinet', 'robinets', 'clapet', 'clapets'],
+    d: 'M2.6 14h5 M2.6 18.4h5 M16.4 14h5 M16.4 18.4h5 M7.6 12.4h8.8v7.6H7.6Z M12 12.4V6.4 M7.4 6.4h9.2 M7.4 5v2.8 M16.6 5v2.8' },
+
+  /* — Tuyauterie — */
+  { cles: ['tuyauterie', 'tuyau', 'tuyaux', 'tuyauteur', 'reseau de tuyaux'],
+    d: 'M3.4 6.4h8.6a6 6 0 0 1 6 6v8 M3.4 11h8.6a1.4 1.4 0 0 1 1.4 1.4v8 M3.4 5.4v6.6 M12.4 20.4h6.6' },
+
+  /* — Compresseur, air comprimé — */
+  { cles: ['compresseur', 'compresseurs', 'air comprime', 'reseau d air'],
+    d: 'M5.4 9.4h13.2a3.4 3.4 0 0 1 0 6.8H5.4a3.4 3.4 0 0 1 0-6.8Z M12 9.4V6.4 M12 3.4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z M7 16.2v2.2 M17 16.2v2.2 M5.4 18.4h3.2 M15.4 18.4h3.2' },
+
+  /* — Convoyeur, tapis roulant — */
+  { cles: ['convoyeur', 'convoyeurs', 'tapis roulant', 'tapis roulants', 'ligne de convoyage', 'bande transporteuse'],
+    d: 'M4.4 14.4h15.2a2.4 2.4 0 0 1 0 4.8H4.4a2.4 2.4 0 0 1 0-4.8Z M8.4 16.8h.02 M12 16.8h.02 M15.6 16.8h.02 M8.4 7.4h7.2v7H8.4Z' },
+
+  /* — Chaudronnerie, tôlerie — */
+  { cles: ['chaudronnerie', 'chaudronnier', 'tolerie', 'tolier', 'pliage de tole', 'travail des metaux'],
+    d: 'M3.4 16.4l6-6h11.2l-6 6Z M3.4 16.4v3h11.2l6-6v-3 M14.6 16.4v3' },
+
+  /* — Plasturgie, moulage — */
+  { cles: ['plasturgie', 'moulage', 'injection plastique', 'matiere plastique', 'thermoformage'],
+    d: 'M4.4 5.4h6.4v13.2H4.4Z M13.2 5.4h6.4v13.2h-6.4Z M10.8 9.4H8.6a2.6 2.6 0 0 0 0 5.2h2.2 M13.2 9.4h2.2a2.6 2.6 0 0 1 0 5.2h-2.2' },
+
+  /* — Industrie pharmaceutique — */
+  { cles: ['industrie pharmaceutique', 'production pharmaceutique', 'laboratoire pharmaceutique', 'gelule', 'gelules'],
+    d: 'M4.6 14.6l10-10a3.4 3.4 0 0 1 4.8 4.8l-10 10a3.4 3.4 0 0 1-4.8-4.8Z M9.6 9.6l4.8 4.8' },
+
+  /* — Agroalimentaire, conserverie — */
+  { cles: ['agroalimentaire', 'industrie alimentaire', 'conserverie', 'conserve industrielle', 'boite de conserve', 'boites de conserve', 'usine alimentaire'],
+    d: 'M6 5.4c0-1.1 2.7-2 6-2s6 .9 6 2v13.2c0 1.1-2.7 2-6 2s-6-.9-6-2Z M6 5.4c0 1.1 2.7 2 6 2s6-.9 6-2 M6 9.4c0 1.1 2.7 2 6 2s6-.9 6-2 M6 15c0 1.1 2.7 2 6 2s6-.9 6-2' },
+
+  /* — Conteneur — */
+  { cles: ['conteneur', 'conteneurs', 'container', 'containers', 'fret maritime', 'transport maritime'],
+    d: 'M2.6 7.4h18.8v10.2H2.6Z M6.4 7.4v10.2 M10.2 7.4v10.2 M14 7.4v10.2 M17.8 7.4v10.2' },
+
+  /* — Drone — */
+  { cles: ['drone', 'drones', 'prise de vue aerienne', 'telepilote', 'pilote de drone'],
+    d: 'M10 10h4v4h-4Z M10 10 7 7 M14 10l3-3 M10 14l-3 3 M14 14l3 3 M3.4 6.2h4.8 M15.8 6.2h4.8 M3.4 17.8h4.8 M15.8 17.8h4.8' },
+
+  /* — Hélicoptère — */
+  { cles: ['helicoptere', 'helicopteres', 'heliport', 'helistation', 'evacuation aerienne'],
+    d: 'M3.4 4.4h13.2 M10 4.4v3 M6.4 13a5.6 5.6 0 0 1 5.6-5.6h1a4.6 4.6 0 0 1 0 9.2H9.6A3.2 3.2 0 0 1 6.4 13.4Z M17.6 12h3.6 M21.2 10v4 M8.4 20.4h7.2 M10 16.6v3.8 M14 16.6v3.8' },
+
+  /* — Point relais, consigne — */
+  { cles: ['point relais', 'points relais', 'consigne colis', 'casier colis', 'casiers colis', 'locker', 'lockers'],
+    d: 'M3.4 3.4h17.2v17.2H3.4Z M3.4 9.2h17.2 M3.4 14.8h17.2 M12 3.4v17.2 M7 6.4h1.4 M15.6 6.4H17 M7 12h1.4 M15.6 12H17 M7 17.6h1.4 M15.6 17.6H17' },
+
+  /* — RFID, NFC — */
+  { cles: ['rfid', 'nfc', 'sans contact', 'puce rfid', 'etiquette rfid', 'badge sans contact'],
+    d: 'M3.4 7.4h11v9.2h-11Z M17 9.2a4 4 0 0 1 0 5.6 M19.4 7a7.2 7.2 0 0 1 0 10' },
+
+  /* — GPS, géolocalisation — */
+  { cles: ['gps', 'geolocalisation', 'suivi de vehicule', 'suivi des vehicules', 'geofencing', 'traceur gps'],
+    d: 'M12 5.4a6.6 6.6 0 1 1 0 13.2 6.6 6.6 0 0 1 0-13.2Z M12 9.6a2.4 2.4 0 1 1 0 4.8 2.4 2.4 0 0 1 0-4.8Z M12 2.6v2.8 M12 18.6v2.8 M2.6 12h2.8 M18.6 12h2.8' },
+
+  /* — Autoroute, péage — */
+  { cles: ['autoroute', 'autoroutes', 'peage', 'peages', 'gare de peage', 'badge telepeage'],
+    d: 'M3.4 8.4h6v12h-6Z M2.6 8.4 6.4 5l3.8 3.4 M4.8 11h3.2v3H4.8Z M9.4 13.4h11.2v2.2H9.4Z M12.8 13.4l-1.4 2.2 M16.2 13.4l-1.4 2.2 M19.6 13.4 18.2 15.6 M2.6 20.4h18.8' },
+
+  /* — Feux tricolores, carrefour — */
+  { cles: ['feu tricolore', 'feux tricolores', 'feux de signalisation', 'intersection'],
+    d: 'M8.4 2.8h7.2v15.2H8.4Z M12 5.2a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z M12 9a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z M12 12.8a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z M12 18v3.4' },
+
+  /* — Serre, horticulture — */
+  { cles: ['serre', 'serres', 'horticulture', 'horticulteur', 'culture sous serre', 'maraichage'],
+    d: 'M3.4 20.4V11a8.6 8.6 0 0 1 17.2 0v9.4 M2.6 20.4h18.8 M12 2.4v18 M3.4 13.4h17.2 M7.4 4v16.4 M16.6 4v16.4' },
+
+  /* — Irrigation, goutte à goutte — */
+  { cles: ['irrigation', 'goutte a goutte', 'arroseur', 'arroseurs', 'asperseur', 'systeme d arrosage'],
+    d: 'M2.6 7.4h18.8 M6.4 7.4v2.4 M12 7.4v2.4 M17.6 7.4v2.4 M6.4 12.4c-1 1.3-1.6 2.2-1.6 3a1.6 1.6 0 0 0 3.2 0c0-.8-.6-1.7-1.6-3Z M12 14.4c-1 1.3-1.6 2.2-1.6 3a1.6 1.6 0 0 0 3.2 0c0-.8-.6-1.7-1.6-3Z M17.6 12.4c-1 1.3-1.6 2.2-1.6 3a1.6 1.6 0 0 0 3.2 0c0-.8-.6-1.7-1.6-3Z' },
+
+  /* — Semences, semis — */
+  { cles: ['semence', 'semences', 'semis', 'graine', 'graines', 'ensemencement', 'plantation'],
+    d: 'M3.4 18.4c3-1.4 14.2-1.4 17.2 0 M12 4.6c1.4 1 1.4 3.4 0 4.4-1.4-1-1.4-3.4 0-4.4Z M7 9c1.4 1 1.4 3.4 0 4.4-1.4-1-1.4-3.4 0-4.4Z M17 9c1.4 1 1.4 3.4 0 4.4-1.4-1-1.4-3.4 0-4.4Z' },
+
+  /* — Moutons, berger — */
+  { cles: ['mouton', 'moutons', 'berger', 'bergere', 'ovin', 'ovins', 'brebis', 'tonte des moutons'],
+    d: 'M7.6 8.6a2.4 2.4 0 0 1 4-1.4 2.4 2.4 0 0 1 4 .4 2.4 2.4 0 0 1 2.6 3.4 2.4 2.4 0 0 1-1.4 4 2.4 2.4 0 0 1-3.6 1.4 2.4 2.4 0 0 1-4 0 2.4 2.4 0 0 1-2.4-3.4 2.4 2.4 0 0 1 .8-4.4Z M6.6 9.4c-1.6-.4-3 .6-3.2 2s1 2.6 2.6 2.6 M9.4 16.6v3.6 M14.6 16.6v3.6' },
+
+  /* — Porcs, porcherie — */
+  { cles: ['porc', 'porcs', 'porcherie', 'porcin', 'porcins', 'cochon', 'cochons'],
+    d: 'M12 5.4a7.4 7 0 1 1 0 14 7.4 7 0 0 1 0-14Z M9.4 13.4h5.2a1.6 1.6 0 0 1 0 3.2H9.4a1.6 1.6 0 0 1 0-3.2Z M10.6 15h.02 M13.4 15h.02 M6.4 7 5 3.6 8.6 5 M17.6 7 19 3.6 15.4 5 M9.6 10.6h.02 M14.4 10.6h.02' },
+
+  /* — Poulailler, poules — */
+  { cles: ['poulailler', 'poules', 'poule', 'poules pondeuses', 'pondoir', 'oeufs frais', 'elevage avicole'],
+    d: 'M6 11.4c0-3.4 2.4-6 5.4-6 1.6 0 2.6 1 2.8 2.4l3.8-1.2c1.2 4.8-1.2 10.6-6.6 10.6C8 17.2 6 14.6 6 11.4Z M6.2 9.4 4 10.4l2.2.8 M8.4 5.8l.6-1.8 1.2 1.4 1-1.2.4 1.6 M8.8 8.8h.02 M10.4 17.2v3 M13.4 17v3.2' },
+
+  /* — Pollution, qualité de l'air — */
+  { cles: ['pollution', 'qualite de l air', 'polluants', 'particules fines', 'emissions polluantes'],
+    d: 'M3.4 9.4h11.2a2.6 2.6 0 1 0-2.6-2.6 M3.4 13.4h15.2a2.6 2.6 0 1 1-2.6 2.6 M3.4 17.4h7 M18.6 8.4h.02 M20 11h.02 M7 20.2h.02' },
+
+  /* — Lavage auto — */
+  { cles: ['lavage auto', 'station de lavage', 'car wash', 'nettoyage vehicule', 'nettoyage des vehicules', 'lavage voiture'],
+    d: 'M5.4 15.4l1.4-3.8a1.6 1.6 0 0 1 1.5-1h7.4a1.6 1.6 0 0 1 1.5 1l1.4 3.8 M4.4 15.4h15.2v3.6H4.4Z M6.4 19v1.6 M17.6 19v1.6 M8 17.2h.02 M16 17.2h.02 M8 4.4c-.8 1-1.2 1.6-1.2 2.2a1.2 1.2 0 0 0 2.4 0c0-.6-.4-1.2-1.2-2.2Z M12 3.4c-.8 1-1.2 1.6-1.2 2.2a1.2 1.2 0 0 0 2.4 0c0-.6-.4-1.2-1.2-2.2Z M16 4.4c-.8 1-1.2 1.6-1.2 2.2a1.2 1.2 0 0 0 2.4 0c0-.6-.4-1.2-1.2-2.2Z' },
+
+  /* — Contrôle technique — */
+  { cles: ['controle technique', 'controles techniques', 'contre visite', 'visite technique', 'centre de controle'],
+    d: 'M2.6 15.4 4 11.8a1.6 1.6 0 0 1 1.5-1h6.2a1.6 1.6 0 0 1 1.5 1l1.4 3.6v3H2.6Z M5.2 18.4V20 M12 18.4V20 M17.6 3.4a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2Z M16 7l1.2 1.2 2-2.2' },
+
+  /* — Vidange, huile moteur — */
+  { cles: ['vidange', 'vidanges', 'huile moteur', 'changement d huile', 'lubrifiant', 'lubrification'],
+    d: 'M4.4 10.4h9.2l2.4-2.4 5 2-6 6.4H4.4Z M8 10.4V7.6h3v2.8 M19.4 13.6c-.6.8-1 1.4-1 2a1 1 0 0 0 2 0c0-.6-.4-1.2-1-2Z' },
+
+  /* — Remorquage, dépanneuse — */
+  { cles: ['remorquage', 'depanneuse', 'depanneuses', 'fourriere', 'enlevement de vehicule', 'assistance routiere'],
+    d: 'M2.6 16.4V9.4h5.2l2 3h2.6v4 M12.4 16.4h6.8 M12.4 12.4l6-6.4 M18.4 6v4.4a1.4 1.4 0 0 1-2.8 0 M5.6 16.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M16.6 16.4a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z' },
+
+  /* — Location de voiture — */
+  { cles: ['location de voiture', 'location de voitures', 'loueur de voitures', 'voiture de location', 'vehicule de location', 'agence de location'],
+    d: 'M3.4 13.4l1.6-4.2a1.6 1.6 0 0 1 1.5-1h7a1.6 1.6 0 0 1 1.5 1l1.6 4.2 M2.6 13.4h14.8v4H2.6Z M4.4 17.4V19 M15.6 17.4V19 M18 3.4a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Z M18 8.6v4.4 M18 10.6h1.6 M18 12.2h1.2' },
+
+  /* — Réservoir, citerne — */
+  { cles: ['reservoir', 'reservoirs', 'citerne', 'citernes', 'cuve', 'cuves', 'stockage de liquides'],
+    d: 'M6.4 6.4c0-1.6 2.6-2.8 5.6-2.8s5.6 1.2 5.6 2.8v13.2H6.4Z M6.4 6.4c0 1.6 2.6 2.8 5.6 2.8s5.6-1.2 5.6-2.8 M4.4 19.6h15.2 M14.4 11.4v8.2 M16.4 11.4v8.2 M14.4 13.4h2 M14.4 15.6h2 M14.4 17.8h2' },
+
+  /* — Silo, stockage de grain — */
+  { cles: ['silo', 'silos', 'stockage de grain', 'stockage des cereales', 'cooperative agricole', 'ble'],
+    d: 'M4.4 8.4a3.8 3.8 0 0 1 7.6 0v12H4.4Z M4.4 12h7.6 M4.4 16h7.6 M2.8 20.4h18.4 M17 20.4V9 M17 12.4c-1.6-.4-2.4-1.6-2.4-3 1.6.4 2.4 1.6 2.4 3Z M17 12.4c1.6-.4 2.4-1.6 2.4-3-1.6.4-2.4 1.6-2.4 3Z M17 16c-1.6-.4-2.4-1.6-2.4-3 1.6.4 2.4 1.6 2.4 3Z M17 16c1.6-.4 2.4-1.6 2.4-3-1.6.4-2.4 1.6-2.4 3Z' },
+
+  /* — Amiante, déchets dangereux — */
+  { cles: ['amiante', 'desamiantage', 'dechets dangereux', 'dechet dangereux', 'matieres dangereuses', 'fut de dechets'],
+    d: 'M6.4 4.4h11.2v15.2H6.4Z M6.4 8h11.2 M6.4 16h11.2 M12 9.8l2.6 4.6H9.4Z' },
+
+  /* ─── BUREAU, NUMÉRIQUE, COMMERCE, SERVICES ─── */
+
+  /* — Sablier, délais — */
+  { cles: ['sablier', 'delai', 'delais', 'echeancier', 'date butoir', 'temps imparti'],
+    d: 'M6.4 3.4h11.2 M6.4 20.6h11.2 M7.6 3.4v2.8c0 2.4 2 3.8 4.4 5.8 2.4-2 4.4-3.4 4.4-5.8V3.4 M7.6 20.6v-2.8c0-2.4 2-3.8 4.4-5.8 2.4 2 4.4 3.4 4.4 5.8v2.8 M9.6 18.4h4.8' },
+
+  /* — Pièces jointes — */
+  { cles: ['piece jointe', 'pieces jointes', 'fichier joint', 'fichiers joints'],
+    d: 'M15.4 7.4 8.6 14.2a1.8 1.8 0 0 0 2.6 2.6l7.4-7.4a3.6 3.6 0 0 0-5.1-5.1L6 11.8a5.4 5.4 0 0 0 7.6 7.6l5.4-5.4' },
+
+  /* — Armoires, placards — */
+  { cles: ['armoire', 'armoires', 'placard', 'placards', 'armoire de rangement', 'meuble de rangement'],
+    d: 'M5 3.4h14a1 1 0 0 1 1 1v15.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4.4a1 1 0 0 1 1-1Z M12 3.4v17.2 M10 11v2 M14 11v2 M6.4 20.6v1.2 M17.6 20.6v1.2' },
+
+  /* — Cartes de visite, annuaire — */
+  { cles: ['carte de visite', 'cartes de visite', 'annuaire', 'repertoire', 'coordonnees', 'fiche contact'],
+    d: 'M3.4 6h17.2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z M8.4 9.2a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M5.4 15.6c.4-1.2 1.6-2 3-2s2.6.8 3 2 M14 10h4.6 M14 13h4.6' },
+
+  /* — Tableau blanc — */
+  { cles: ['tableau blanc', 'brainstorming', 'paperboard', 'atelier d idees', 'tableau effacable', 'remue meninges'],
+    d: 'M3.4 4h17.2v11.4H3.4Z M12 15.4v2.4 M8.6 20.6l3.4-2.8 3.4 2.8 M6.4 8l2.4 2.4 2-2 2.4 2.4 M14.4 11.4h3' },
+
+  /* — Post-it, pense-bête — */
+  { cles: ['post it', 'postit', 'pense bete', 'pense betes', 'memo', 'note adhesive', 'notes adhesives'],
+    d: 'M4.4 4.4h15.2v10l-5.2 5.2H4.4Z M19.6 14.4h-5.2v5.2 M7.6 8.4h8.8 M7.6 11.4h5.6' },
+
+  /* — Liste de tâches — */
+  { cles: ['liste de taches', 'to do', 'todo', 'to do list', 'choses a faire'],
+    d: 'M9.4 6.4h11 M9.4 12h11 M9.4 17.6h11 M3.6 6.4l1.2 1.2 2.2-2.4 M3.6 12l1.2 1.2 2.2-2.4 M4.6 16.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z' },
+
+  /* — Carte bancaire — */
+  { cles: ['carte bancaire', 'cartes bancaires', 'cb', 'carte de credit', 'paiement par carte', 'paiement sans contact'],
+    d: 'M3.4 5.4h17.2a1 1 0 0 1 1 1v11.2a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V6.4a1 1 0 0 1 1-1Z M2.4 9.6h19.2 M5.6 14.6h4 M15.6 14.6h2.8' },
+
+  /* — Espèces, fond de caisse — */
+  { cles: ['billets de banque', 'monnaie', 'fond de caisse', 'argent liquide', 'comptage des especes', 'rendu monnaie'],
+    d: 'M2.6 6.4h18.8v11.2H2.6Z M12 9.4a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2Z M5.4 9.4v.02 M18.6 14.6v.02 M2.6 9.4a3 3 0 0 0 3-3 M21.4 9.4a3 3 0 0 1-3-3 M2.6 14.6a3 3 0 0 1 3 3 M21.4 14.6a3 3 0 0 0-3 3' },
+
+  /* — Tirelire, épargne — */
+  { cles: ['tirelire', 'epargne', 'plan d epargne', 'epargne salariale', 'interessement'],
+    d: 'M18.4 10.4h1.6a1 1 0 0 1 1 1v2a1 1 0 0 1-1 1h-1.4a6.4 6.4 0 0 1-2.6 2.6V19a1 1 0 0 1-1 1H13a1 1 0 0 1-1-1v-.8h-2V19a1 1 0 0 1-1 1H7.4a1 1 0 0 1-1-1v-2.4A6.4 6.4 0 0 1 11.6 6h1.4a6.4 6.4 0 0 1 5.4 4.4Z M9.6 6.2A2.4 2.4 0 1 1 13.8 4 M15 10.8h.02 M3.4 9.6c.6 1 1.6 1.4 2.8 1.2' },
+
+  /* — Bourse, marchés financiers — */
+  { cles: ['bourse', 'marches financiers', 'actions en bourse', 'cours de bourse', 'portefeuille boursier', 'trading'],
+    d: 'M5.4 6.4v3 M5.4 15.4v3 M3.8 9.4h3.2v6H3.8Z M12 4v3 M12 13v3.4 M10.4 7h3.2v6h-3.2Z M18.6 8.4v2.6 M18.6 16.4v3 M17 11h3.2v5.4H17Z' },
+
+  /* — Brevets, propriété intellectuelle — */
+  { cles: ['brevet', 'brevets', 'propriete intellectuelle', 'marque deposee', 'depot de marque', 'droit d auteur', 'copyright'],
+    d: 'M12 3.4a8.6 8.6 0 1 1 0 17.2 8.6 8.6 0 0 1 0-17.2Z M15 9.8a3.6 3.6 0 1 0 0 4.4' },
+
+  /* — Double authentification — */
+  { cles: ['double authentification', '2fa', 'authentification forte', 'code de verification', 'code sms', 'validation en deux etapes'],
+    d: 'M7.4 2.8h9.2a1.4 1.4 0 0 1 1.4 1.4v15.6a1.4 1.4 0 0 1-1.4 1.4H7.4A1.4 1.4 0 0 1 6 19.8V4.2a1.4 1.4 0 0 1 1.4-1.4Z M8.4 11.4h7.2v4.2H8.4Z M9.8 11.4v-1.2a2.2 2.2 0 0 1 4.4 0v1.2 M11 18.4h2' },
+
+  /* — Empreinte digitale — */
+  { cles: ['empreinte digitale', 'empreintes digitales', 'biometrie', 'biometrique', 'reconnaissance faciale', 'lecteur d empreinte'],
+    d: 'M7.4 5.6a8 8 0 0 1 12.4 6.4c0 1.4-.2 2.6-.6 3.8 M4.4 9.4a8 8 0 0 0-.2 2.6c0 1.4.2 2.4.6 3.4 M8 18.6A9 9 0 0 1 7 12a5 5 0 0 1 10 0c0 2.6-.4 4.8-1.4 6.8 M12 12c0 3.4-.6 6-1.8 8.6 M14.8 15.2c-.4 1.8-1 3.4-1.8 4.8' },
+
+  /* — QR code — */
+  { cles: ['qr code', 'qr codes', 'code qr', 'codes qr', 'flashcode', 'scan qr'],
+    d: 'M3.6 3.6h6.4v6.4H3.6Z M14 3.6h6.4v6.4H14Z M3.6 14h6.4v6.4H3.6Z M6.2 6.2h1.2v1.2H6.2Z M16.6 6.2h1.2v1.2h-1.2Z M6.2 16.6h1.2v1.2H6.2Z M14 14h2.6v2.6H14Z M17.8 17.8h2.6v2.6h-2.6Z M14 19.6h1.4 M19.6 14v1.4' },
+
+  /* — Téléchargement — */
+  { cles: ['telechargement', 'telechargements', 'telecharger', 'download', 'export de fichier', 'fichier a telecharger'],
+    d: 'M12 3.6v11.2 M7.4 10.4l4.6 4.6 4.6-4.6 M4.4 15.6v2.8a2 2 0 0 0 2 2h11.2a2 2 0 0 0 2-2v-2.8' },
+
+  /* — Mises à jour — */
+  { cles: ['mise a jour', 'mises a jour', 'update', 'updates', 'nouvelle version', 'montee de version'],
+    d: 'M19.4 9.6A7.6 7.6 0 0 0 5.6 8 M4.6 14.4A7.6 7.6 0 0 0 18.4 16 M19.6 4.6v5h-5 M4.4 19.4v-5h5' },
+
+  /* — Bugs, anomalies — */
+  { cles: ['bug', 'bugs', 'anomalie', 'anomalies', 'remontee de bug'],
+    d: 'M8.4 3.4h7.2l5 5v7.2l-5 5H8.4l-5-5V8.4Z M12 7.6v5.2 M12 16.2h.02' },
+
+  /* — API, intégration logicielle — */
+  { cles: ['api', 'apis', 'webhook', 'webhooks', 'integration logicielle', 'connecteur', 'connecteurs', 'synchronisation'],
+    d: 'M8.4 7.4 3.6 12l4.8 4.6 M15.6 7.4l4.8 4.6-4.8 4.6 M13.4 5.4l-2.8 13.2' },
+
+  /* — Tablettes — */
+  { cles: ['tablettes', 'ipad', 'tablette tactile', 'tablette numerique', 'tablettes tactiles'],
+    d: 'M5 2.8h14a1.4 1.4 0 0 1 1.4 1.4v15.6a1.4 1.4 0 0 1-1.4 1.4H5a1.4 1.4 0 0 1-1.4-1.4V4.2A1.4 1.4 0 0 1 5 2.8Z M10.6 18.2h2.8' },
+
+  /* — Ordinateur portable — */
+  { cles: ['ordinateur portable', 'ordinateurs portables', 'laptop', 'laptops', 'pc portable', 'macbook'],
+    d: 'M5 5h14a1 1 0 0 1 1 1v9.4H4V6a1 1 0 0 1 1-1Z M2.4 15.4h19.2l-1 2.6a1.4 1.4 0 0 1-1.3.9H4.7a1.4 1.4 0 0 1-1.3-.9Z M10.4 17.2h3.2' },
+
+  /* — Support technique — */
+  { cles: ['support technique', 'helpdesk', 'help desk', 'centre d appels', 'call center', 'assistance technique', 'service support'],
+    d: 'M4.6 13.4V12a7.4 7.4 0 0 1 14.8 0v1.4 M4.6 12.6h1.8a1 1 0 0 1 1 1v3.2a1 1 0 0 1-1 1H5.6a1 1 0 0 1-1-1Z M19.4 12.6h-1.8a1 1 0 0 0-1 1v3.2a1 1 0 0 0 1 1h.8a1 1 0 0 0 1-1Z M19.4 16.8c0 2.2-1.8 3.8-4.4 3.8h-2.2' },
+
+  /* — Messagerie instantanée — */
+  { cles: ['messagerie instantanee', 'teams', 'slack', 'whatsapp', 'chat en ligne', 'groupe whatsapp', 'discussion d equipe'],
+    d: 'M4 5.4h12.4a1.4 1.4 0 0 1 1.4 1.4v6.8a1.4 1.4 0 0 1-1.4 1.4H9.4L5.4 18.4V15H4a1.4 1.4 0 0 1-1.4-1.4V6.8A1.4 1.4 0 0 1 4 5.4Z M7 10.2h.02 M10.2 10.2h.02 M13.4 10.2h.02 M20.4 9v6.4a1.4 1.4 0 0 1-1.4 1.4h-.6v2.8l-3.2-2.8' },
+
+  /* — Webinaire, streaming — */
+  { cles: ['webinaire', 'webinaires', 'webinar', 'streaming', 'diffusion en direct', 'live stream', 'retransmission'],
+    d: 'M3.4 5h17.2a1 1 0 0 1 1 1v10.4a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z M10 8.6v5.2l4.4-2.6Z M8.4 20.6h7.2' },
+
+  /* — Boîte aux lettres — */
+  { cles: ['boite aux lettres', 'boites aux lettres', 'boite postale', 'releve du courrier', 'casier courrier'],
+    d: 'M8 6.4h8.8a4 4 0 0 1 4 4v6.6H4V10.4a4 4 0 0 1 4-4Z M4 10.4a4 4 0 0 1 8 0V17 M12 17v3.6 M15.4 6.4V3.4h2.8v1.8h-2.8 M6.2 11h3.6' },
+
+  /* — Sacs, cabas — */
+  { cles: ['sac', 'sacs', 'cabas', 'sac shopping', 'sacs shopping', 'sac en papier', 'tote bag'],
+    d: 'M5 8.4h14l-1.2 11a1.4 1.4 0 0 1-1.4 1.2H7.6a1.4 1.4 0 0 1-1.4-1.2Z M8.6 10.4V7a3.4 3.4 0 0 1 6.8 0v3.4' },
+
+  /* — Mannequins, vitrine — */
+  { cles: ['mannequin', 'mannequins', 'habillage vitrine', 'habillage de vitrine', 'visual merchandising', 'etalagiste'],
+    d: 'M12 2.8a1.8 1.8 0 1 1 0 3.6 1.8 1.8 0 0 1 0-3.6Z M8.4 8.4c1-.8 2.2-1.2 3.6-1.2s2.6.4 3.6 1.2l-.6 5.2c-.4 1-1.6 1.4-3 1.4s-2.6-.4-3-1.4Z M12 15v5.6 M8.6 20.6h6.8' },
+
+  /* — Cabine d'essayage — */
+  { cles: ['cabine d essayage', 'cabines d essayage', 'essayage', 'essayages', 'salon d essayage'],
+    d: 'M4.4 3.4h15.2 M5.6 3.4v17.2 M5.6 5.4c2 1.6 2 3.4 0 5 M5.6 10.4c2 1.6 2 3.4 0 5 M11 8.4h7.4v12.2H11Z M14.6 10.4a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z' },
+
+  /* — Vêtements, prêt-à-porter — */
+  { cles: ['vetement', 'vetements', 'pret a porter', 'habillement', 'textile mode', 'tee shirt', 't shirt'],
+    d: 'M8.4 3.6 3.4 6.4l1.8 4 2.2-1v11.2h9.2V9.4l2.2 1 1.8-4-5-2.8c-.4 1.4-1.8 2.4-3.6 2.4s-3.2-1-3.6-2.4Z' },
+
+  /* — Cintres, penderie — */
+  { cles: ['cintre', 'cintres', 'penderie', 'portant', 'portants', 'dressing'],
+    d: 'M12 7.4V6.2a1.6 1.6 0 1 1 1.6 1.6 M12 7.4 2.8 15.4a1 1 0 0 0 .6 1.8h17.2a1 1 0 0 0 .6-1.8Z' },
+
+  /* — Parapluie — */
+  { cles: ['parapluie', 'parapluies', 'porte parapluie', 'jour de pluie', 'temps de pluie'],
+    d: 'M12 3.4v1.4 M3 12.4a9 9 0 0 1 18 0c-1-.8-2-1.2-3-1.2s-2 .4-3 1.2c-1-.8-2-1.2-3-1.2s-2 .4-3 1.2c-1-.8-2-1.2-3-1.2s-2 .4-3 1.2Z M12 12.4v6a2 2 0 0 1-4 0' },
+
+  /* — Clés USB, stockage — */
+  { cles: ['cle usb', 'cles usb', 'stockage amovible', 'disque dur', 'disque dur externe', 'support amovible'],
+    d: 'M8.4 9.4h7.2v10a1.4 1.4 0 0 1-1.4 1.4h-4.4a1.4 1.4 0 0 1-1.4-1.4Z M9.6 9.4V3.6h4.8v5.8 M11 5.6h.02 M13 5.6h.02' },
+
+  /* — Plastifieuse, reliure — */
+  { cles: ['plastifieuse', 'plastification', 'reliure', 'relieuse', 'spirale', 'reliure de documents'],
+    d: 'M6 3.6h12v16.8H6Z M4.2 6.4H7.8 M4.2 9.8H7.8 M4.2 13.2H7.8 M4.2 16.6H7.8 M10.6 8h4.4 M10.6 11h4.4 M10.6 14h2.8' },
+
+  /* — Destructeur de documents — */
+  { cles: ['destructeur de documents', 'destructeur de papier', 'broyeur', 'broyeur de documents', 'destruction de documents', 'documents confidentiels'],
+    d: 'M7.4 3.4h9.2v6.4H7.4Z M3.4 9.8h17.2v4H3.4Z M7 13.8v6.8 M10 13.8v5.4 M12 13.8v6.8 M14 13.8v5.4 M17 13.8v6.8' },
+
+  /* — Heures supplémentaires — */
+  { cles: ['heures supplementaires', 'heure supplementaire', 'heures sup', 'temps de travail', 'compteur d heures', 'recuperation d heures'],
+    d: 'M11.4 20.6a8.6 8.6 0 1 1 8.6-8.6 M11.4 7.6v4.4l2.8 1.6 M18 15v5.6 M15.2 17.8h5.6' },
+
+  /* — Fin de contrat — */
+  { cles: ['fin de contrat', 'rupture conventionnelle', 'demission', 'licenciement', 'solde de tout compte', 'preavis'],
+    d: 'M6 3.6h8.6L18 7v4 M6 3.6a1.4 1.4 0 0 0-1.4 1.4v14a1.4 1.4 0 0 0 1.4 1.4h6 M14.4 3.8V7.2H18 M8 9.4h5 M8 12.4h4 M15 14.4l5 5 M20 14.4l-5 5' },
+
+  /* — Domotique, télécommande — */
+  { cles: ['domotique', 'telecommande', 'telecommandes', 'maison connectee', 'batiment connecte', 'gestion technique du batiment', 'gtb'],
+    d: 'M8.4 2.8h7.2a1.4 1.4 0 0 1 1.4 1.4v15.6a1.4 1.4 0 0 1-1.4 1.4H8.4A1.4 1.4 0 0 1 7 19.8V4.2a1.4 1.4 0 0 1 1.4-1.4Z M12 5.8a1.4 1.4 0 1 1 0 2.8 1.4 1.4 0 0 1 0-2.8Z M10 12h.02 M14 12h.02 M10 15h.02 M14 15h.02 M10 18h.02 M14 18h.02' },
+
+  /* — Avantages salariés — */
+  { cles: ['avantages salaries', 'avantages sociaux', 'tickets restaurant', 'titres restaurant', 'cheques vacances', 'comite d entreprise', 'oeuvres sociales'],
+    d: 'M3.4 7.4h17.2v3.4a1.8 1.8 0 0 0 0 3.6v3.4H3.4v-3.4a1.8 1.8 0 0 0 0-3.6Z M12 9.4l.8 1.6 1.8.3-1.3 1.3.3 1.8-1.6-.8-1.6.8.3-1.8-1.3-1.3 1.8-.3Z' },
+
+  /* — Prévoyance — */
+  { cles: ['prevoyance', 'contrat de prevoyance', 'incapacite de travail', 'invalidite', 'arret de travail', 'arret maladie'],
+    d: 'M12 3.4c2.6 1.8 5.2 2.6 7.6 2.6 0 7.4-3 12.2-7.6 14.6C7.4 18.2 4.4 13.4 4.4 6c2.4 0 5-.8 7.6-2.6Z M12 8.6v6.4 M8.8 11.8h6.4' },
+
+  /* — Médecine du travail — */
+  { cles: ['medecine du travail', 'visite medicale', 'visites medicales', 'sante au travail', 'medecin du travail', 'aptitude medicale'],
+    d: 'M5 8.4h14a1 1 0 0 1 1 1v9.2a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.4a1 1 0 0 1 1-1Z M9 8.4V6.2A1.4 1.4 0 0 1 10.4 4.8h3.2A1.4 1.4 0 0 1 15 6.2v2.2 M12 11v5.4 M9.3 13.7h5.4' },
+
+  /* — Point de rassemblement — */
+  { cles: ['point de rassemblement', 'points de rassemblement', 'zone de rassemblement', 'rassemblement', 'appel des presents'],
+    d: 'M12 3.4a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M5.4 8.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M18.6 8.4a1.6 1.6 0 1 1 0 3.2 1.6 1.6 0 0 1 0-3.2Z M9.4 13.6v-1a2.6 2.6 0 0 1 5.2 0v1 M3 16.4v-.6a2.4 2.4 0 0 1 4.6-1 M21 16.4v-.6a2.4 2.4 0 0 0-4.6-1 M3.4 20.4c2.4-1.4 5.4-2.2 8.6-2.2s6.2.8 8.6 2.2' },
+
+  /* — Fax, télécopie — */
+  { cles: ['fax', 'telecopie', 'telecopieur', 'envoi par fax', 'numero de fax'],
+    d: 'M7.4 3.4h7.6l2 2v4H7.4Z M4.4 9.4h15.2a1 1 0 0 1 1 1v8.2a1 1 0 0 1-1 1H4.4a1 1 0 0 1-1-1v-8.2a1 1 0 0 1 1-1Z M7 13h.02 M10 13h.02 M7 16h.02 M10 16h.02 M13.6 12.4h4v4.4h-4Z' },
+
+  /* — Interphone, visiophone — */
+  { cles: ['interphone', 'interphones', 'visiophone', 'visiophones', 'sonnette d entree'],
+    d: 'M7 2.8h10a1.4 1.4 0 0 1 1.4 1.4v15.6a1.4 1.4 0 0 1-1.4 1.4H7a1.4 1.4 0 0 1-1.4-1.4V4.2A1.4 1.4 0 0 1 7 2.8Z M9 5.6h6v4.6H9Z M9.4 13.2h5.2 M9.4 15.4h5.2 M12 17.8a.6.6 0 1 1 0 1.2.6.6 0 0 1 0-1.2Z' },
+
+  /* — Objets trouvés — */
+  { cles: ['objets trouves', 'objet trouve', 'objets perdus', 'objet perdu', 'oubli client', 'oublis clients'],
+    d: 'M4.4 9.4h15.2v10.2a1 1 0 0 1-1 1H5.4a1 1 0 0 1-1-1Z M3.4 6.4h17.2v3H3.4Z M10.6 13.2a1.6 1.6 0 1 1 2.2 1.5c-.5.2-.8.6-.8 1.1v.4 M12 18.2h.02' },
+
+  /* — Panneau d'affichage — */
+  { cles: ['panneau d affichage', 'affichage obligatoire', 'tableau d affichage', 'panneau liege', 'affichage du personnel', 'informations obligatoires'],
+    d: 'M3.4 4.4h17.2v12.4H3.4Z M8.4 16.8l-1.6 3.8 M15.6 16.8l1.6 3.8 M6.4 7.4h4.4v4.4H6.4Z M13.4 7.4h4.2 M13.4 10h4.2 M13.4 12.6h4.2 M6.4 13.8h4.4' },
+
+  /* — Intranet — */
+  { cles: ['intranet', 'portail interne', 'extranet', 'reseau interne', 'espace collaborateur', 'espace salarie'],
+    d: 'M3.4 4.6h17.2a1 1 0 0 1 1 1v12.8a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V5.6a1 1 0 0 1 1-1Z M2.4 8.6h19.2 M5.6 11.4h5v5.4h-5Z M13.4 11.4h5 M13.4 14h5 M13.4 16.8h3' },
+
+  /* — Charte informatique — */
+  { cles: ['charte informatique', 'bon usage informatique', 'regles informatiques', 'politique de securite informatique', 'usage du materiel'],
+    d: 'M3.4 4.4h13.2a1 1 0 0 1 1 1v8.2a1 1 0 0 1-1 1H3.4a1 1 0 0 1-1-1V5.4a1 1 0 0 1 1-1Z M7.6 18.4h4.8 M10 14.6v3.8 M15.4 12.4h6.2v8.2h-6.2Z M17 15h3 M17 17.6h3' },
+
+  /* — Normes ISO — */
+  { cles: ['iso 9001', 'iso 14001', 'norme iso', 'normes iso', 'certification iso', 'management de la qualite', 'systeme qualite'],
+    d: 'M12 3.4l2.2 1.6 2.6-.2.8 2.6 2.2 1.4-.8 2.6.8 2.6-2.2 1.4-.8 2.6-2.6-.2L12 19.4l-2.2-1.6-2.6.2-.8-2.6-2.2-1.4.8-2.6-.8-2.6 2.2-1.4.8-2.6 2.6.2Z M8.8 11.6l2.2 2.2 4.2-4.2' },
+
+  /* — Licences logicielles — */
+  { cles: ['licences logicielles', 'abonnement logiciel', 'abonnements logiciels', 'cle de licence'],
+    d: 'M5 3.6h10l4 4v12.8H5Z M14.6 3.8v4h4 M9.6 11a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M11.6 13h4.4 M14.6 13v2' },
+
+  /* — Chèques, chéquier — */
+  { cles: ['cheque', 'cheques', 'chequier', 'remise de cheques', 'encaissement de cheques', 'cheque bancaire'],
+    d: 'M2.6 6.4h18.8v11.2H2.6Z M5.4 10h7.6 M5.4 13.6h4 M14.4 15.4c1.2-2.8 2.8-3.8 4.4-3.4-1.6 1.2-1.8 2.6-.4 3.4' },
 ]
 
 /* Le repli : le dossier lui-même, quand aucun mot-clé ne correspond. */
@@ -15651,7 +17100,25 @@ const ICONE_DOSSIER_DEFAUT =
 
    ⚠ LES PLUS LONGUES D'ABORD. « chambre froide » doit gagner sur « chambre » ;
      sans tri, c'est l'ordre du catalogue qui deciderait. */
+/* ═══ LA RÉPONSE EST GARDÉE ═══
+
+   Le catalogue grandit (plus de 500 dessins, près de 3 000 mots-clés) : le
+   parcourir à chaque dessin de carte finirait par se sentir. Le même nom
+   donnant toujours le même dessin, la réponse est retenue la première fois ;
+   les fois suivantes, elle est rendue sans rien parcourir. */
+const ICONES_TROUVEES = new Map()
+
 function traceIconeDossier(nom) {
+  const cle = String(nom || '')
+  const deja = ICONES_TROUVEES.get(cle)
+  if (deja) return deja
+  const trace = chercherIconeDossier(cle)
+  if (ICONES_TROUVEES.size > 2000) ICONES_TROUVEES.clear()
+  ICONES_TROUVEES.set(cle, trace)
+  return trace
+}
+
+function chercherIconeDossier(nom) {
   const n = (nom || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   if (!n) return ICONE_DOSSIER_DEFAUT
   const mots = n.split(/[^a-z0-9]+/).filter(Boolean)

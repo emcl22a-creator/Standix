@@ -26454,3 +26454,101 @@ html::-webkit-scrollbar-thumb:hover{
 @media (prefers-reduced-motion: reduce){
   .td-menu{ transition:none !important; }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUR PC, UNE SEULE BARRE DE DÉFILEMENT, TOUJOURS AU MÊME ENDROIT
+
+ ⚠ IL Y EN AVAIT DEUX SUR LES FEUILLES. Le dossier, la fiche d'une procédure
+   et ses deux écrans de modification font défiler leur INTÉRIEUR (la feuille
+   reste en place, son contenu glisse). Leur barre se dessinait donc au bord
+   de la colonne, à 1085 px — pendant que la fenêtre gardait la sienne au bord
+   de l'écran (`overflow-y:scroll`, réservée pour que rien ne se décale).
+
+   En changeant de page, on voyait les deux, puis l'une disparaître.
+
+ ⚠ À LA SOURIS, C'EST LA FENÊTRE QUI DÉFILE, PARTOUT. Les feuilles reprennent
+   leur hauteur naturelle et la page entière glisse, comme la liste des
+   procédures. Une seule barre, toujours au bord droit, sur toutes les pages.
+
+   `overflow-x:clip` coupe ce qui dépasse sur les côtés SANS créer de zone de
+   défilement — `hidden` en recréerait une, et la deuxième barre reviendrait.
+   Mesuré : avec `hidden` sur le corps, il redevenait défilant pendant 60 ms
+   à l'ouverture d'une fiche, et les deux barres se montraient.
+
+ ⚠ LES ÉCRANS TACTILES NE CHANGENT PAS. Téléphone et tablette gardent la
+   feuille fixe au contenu qui glisse : leurs barres flottent et
+   disparaissent, il n'y en a jamais deux à l'écran.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (hover:hover) and (pointer:fine){
+  body.sans-topbar{
+    overflow-x:clip;
+    overflow-y:visible;
+    height:auto;
+    min-height:0;
+  }
+  body.sans-topbar #p-analyse.active,
+  body.sans-topbar #p-create-video.active,
+  body.sans-topbar #p-create-manual.active,
+  body.sans-topbar #p-category.active,
+  body.sans-topbar #e-category.active{
+    height:auto;
+    min-height:calc(100dvh - 14px);
+    overflow-x:clip;
+    overflow-y:visible;
+  }
+  /* ⚠ ET UNE FEUILLE COURTE NE DOIT PAS DÉFILER. La feuille descend de 14 px
+     sous le haut de l'écran ; l'app, elle, gardait sa hauteur d'écran
+     entière : 900 + 14 = 914 px pour une fenêtre de 900. Un dossier vide
+     montrait une barre pour glisser de 14 px. C'est la feuille qui porte la
+     hauteur de l'écran (moins ses 14 px) ; le corps et l'app la suivent.
+     Côté utilisateur, l'app ajoutait encore 64 px de marge en bas : la
+     feuille a déjà la sienne. */
+  body.sans-topbar #gestion-app,
+  body.sans-topbar #equipe-app{
+    min-height:0;
+    padding-bottom:0;
+  }
+  body.sans-topbar #p-category.active #category-procedures-list,
+  body.sans-topbar #e-category.active #equipe-procedures-list{
+    flex:0 0 auto;
+    min-height:auto;
+    overflow-x:clip;
+    overflow-y:visible;
+  }
+
+  /* ⚠ LA VIDÉO QUI RESTE EN HAUT S'ARRÊTE AU BORD DE LA FENÊTRE. Son
+     `top:-18px` était calculé pour la feuille, qui a 30 px de marge en haut.
+     C'est maintenant la fenêtre qui défile, sans marge : -18 l'aurait coupée.
+     12 px la posent au même endroit qu'avant. */
+  body.sans-topbar #p-create-video.dv-edition #dv-carte,
+  body.sans-topbar #p-analyse.active #analyse-video-frame{
+    top:12px;
+  }
+}
+
+/* ⚠ LA FICHE CÔTÉ UTILISATEUR, MÊME CHOSE. Sur un écran couché, elle faisait
+   déjà défiler toute sa page — mais à l'intérieur d'elle-même, d'où une barre
+   au bord de la colonne. À la souris, c'est la fenêtre qui s'en charge.
+
+   ⚠ SEULEMENT SUR ÉCRAN COUCHÉ. Debout, la vidéo reste figée en haut et seule
+   la liste des étapes glisse : c'est un autre dessin, on n'y touche pas. */
+@media (hover:hover) and (pointer:fine) and (min-width:700px) and (min-height:600px) and (min-aspect-ratio:5/4){
+  body.sans-topbar:has(#e-detail.active){
+    overflow-x:clip;
+    overflow-y:visible;
+    height:auto;
+    min-height:0;
+  }
+  body.sans-topbar:has(#e-detail.active) #equipe-app{
+    height:auto;
+    min-height:0;
+    overflow:visible;
+  }
+  body.sans-topbar #e-detail.active{
+    height:auto;
+    min-height:calc(100dvh - 14px);
+    overflow-x:clip;
+    overflow-y:visible;
+  }
+}

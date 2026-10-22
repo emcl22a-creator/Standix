@@ -18938,9 +18938,13 @@ body.sans-topbar .screen{
    Ma premiere valeur — 18 — l'aurait RETRECI de quatre pixels. Je l'ai lu dans
    `.logotype`, une autre classe : celle de l'ecran d'accueil.
 
-   23 px, un seul de plus, comme demande. */
+   23 px, un seul de plus, comme demande.
+
+ ⚠ PUIS 25,5 PX (22 octobre) : « légèrement plus grand », essayé à 25 puis
+   26, retenu à 25,5. L'image du logo, elle, garde ses 24 x 34. La version
+   grand écran, plus bas (`calc(… * var(--ech))`), suit la même valeur. */
 .tb-nom{
-  font-size:23px;
+  font-size:25.5px;
 }
 
 
@@ -23464,7 +23468,7 @@ body.abo-expire [data-etab-plus]{
   .p-seg{ font-size:calc(13.5px * var(--ech)); }
   .cl-tete .proc-fl{ font-size:calc(19px * var(--ech)); }
   .proc-rang-txt{ font-size:calc(13.5px * var(--ech)); }
-  .tb-nom{ font-size:calc(23px * var(--ech)); }
+  .tb-nom{ font-size:calc(25.5px * var(--ech)); }
   .tb-v-ent{ font-size:calc(16px * var(--ech)); }
   .tb-v-role{ font-size:calc(12.5px * var(--ech)); }
   .tb-v-opt{ font-size:calc(15px * var(--ech)); }

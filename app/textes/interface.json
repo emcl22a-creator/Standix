@@ -131,9 +131,9 @@
   "en": "<b>15 free video analyses</b> included during the 14 days.",
   "de": "<b>15 kostenlose Videoauswertungen</b> in den 14 Tagen inklusive."
  },
- "<b>Accès illimité</b> aux procédures": {
-  "en": "<b>Unlimited access</b> to procedures",
-  "de": "<b>Unbegrenzter Zugriff</b> auf Anleitungen"
+ "Procédures <b>illimitées</b>": {
+  "en": "<b>Unlimited</b> procedures",
+  "de": "<b>Unbegrenzte</b> Anleitungen"
  },
  "<b>Mouvements de l’équipe</b>": {
   "en": "<b>Team changes</b>",
@@ -1966,6 +1966,10 @@
  "Jusqu’à <b>{max} membres</b>": {
   "en": "Up to <b>{max} members</b>",
   "de": "Bis zu <b>{max} Mitglieder</b>"
+ },
+ "Plus de <b>{max} membres</b>": {
+  "en": "More than <b>{max} members</b>",
+  "de": "Mehr als <b>{max} Mitglieder</b>"
  },
  "J’accepte et je continue": {
   "en": "I accept and continue",

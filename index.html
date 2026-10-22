@@ -4464,16 +4464,14 @@ body.pret .hv{animation-play-state:running}
    · B — LE ZOOM DOUX : à l'arrivée la carte est un peu en retrait (88 % de
      sa taille, réduite autour de son bord du haut, qui ne bouge donc pas) ;
      en descendant elle grandit jusqu'à sa vraie taille. Aucune rotation.
-   · C — LA MISE AU POINT : à l'arrivée elle est légèrement floue (6 px) ;
-     elle devient nette en arrivant au centre de l'écran.
+   · C — LA MISE AU POINT (le flou au départ) A ÉTÉ RETIRÉE à la demande :
+     la carte est toujours nette.
    `--p` va de 0 (en retrait, floue) à 1 (à sa taille, nette) : 1 quand le
    CENTRE de la carte atteint le centre de l'écran. Le script qui suit
    « LE CARROUSEL DES VIDÉOS » le calcule en le LISSANT (chaque image
    rattrape une part de l'écart) : les crans de la molette ne donnent aucun
-   à-coup. Il publie aussi le flou, `--mise-au-point`, et le remplace par
-   `none` une fois la carte nette : un filtre laissé en place, même à 0 px,
-   peut adoucir le contour fin.
-   En remontant, elle recule et redevient floue.
+   à-coup.
+   En remontant, elle recule.
    ⚠ La montée d'ensemble de `.hv` (`monte`) est coupée ici ; la carte
    arrive en fondu avec les boutons.
    ⚠ PAS DE REFLET LUMINEUX (retiré à la demande). PAS DE `will-change`
@@ -4499,7 +4497,6 @@ body.pret .hv{animation-play-state:running}
   .hv-cadre{
     transform-origin:50% 0%;
     transform:scale(calc(.88 + .12 * var(--p, 1)));
-    filter:var(--mise-au-point, none);
     /* ⚠ PAS DE `will-change` : il fige la carte dans une image calculée une
        fois, que le navigateur étire ensuite — le contour fin s'y amincit
        jusqu'à disparaître par moments. Sans lui, chaque image est redessinée
@@ -4646,6 +4643,13 @@ body.pret .hero.pc-a h1{animation-play-state:running}
 }
 .hero.pc-a h1 .ligne + .ligne > span{animation-delay:.12s}
 body.pret .hero.pc-a h1 .ligne > span{animation-play-state:running}
+/* ⚠ SUR ORDINATEUR, LA LUMIÈRE PART UN PEU PLUS TÔT (à la demande) : un
+   départ NÉGATIF la fait commencer 0,25 s plus loin dans son passage ; la
+   vitesse et la courbe ne changent pas. */
+@media (min-width:981px){
+  .hero.pc-a h1 .ligne > span{animation-delay:-.25s}
+  .hero.pc-a h1 .ligne + .ligne > span{animation-delay:-.13s}
+}
 @keyframes allume{
   from{background-position:100% 0}
   to  {background-position:0% 0}
@@ -4817,6 +4821,26 @@ body.pret .hero.pc-a .aube{animation-play-state:running}
         rgba(245,245,247,.19) 40%, rgba(245,245,247,.13) 56%,
         rgba(245,245,247,.075) 70%, rgba(245,245,247,.03) 84%, transparent 98%);
   }
+}
+
+/* ═══ LE GROSSISSEMENT AUSSI SUR TABLETTE ET TÉLÉPHONE (à la demande) ═══
+   Comme sur ordinateur, la carte part un peu en retrait et grandit jusqu'à
+   sa vraie taille au rythme du défilement (`--p`, calculé et lissé par le
+   même script), mais plus discrètement : 90 % sur tablette, 94 % sur
+   téléphone, où la carte est déjà petite. Elle grandit autour de son
+   CENTRE : sa place en bas de l'écran et les espaces ne changent pas.
+   Pas de flou. */
+@media (max-width:980px){
+  .hero.pc-a .hv-cadre{
+    transform-origin:50% 50%;
+    transform:scale(calc(var(--z0, .94) + (1 - var(--z0, .94)) * var(--p, 1)));
+  }
+}
+@media (min-width:600px) and (max-width:980px){
+  .hero.pc-a .hv-cadre{--z0:.90}
+}
+@media (max-width:980px) and (prefers-reduced-motion:reduce){
+  .hero.pc-a .hv-cadre{transform:none}
 }
 
 /* La carte vidéo garde son entrée, décalée pour arriver après les boutons. */
@@ -5053,9 +5077,9 @@ body.pret .barre-hote{animation-play-state:running}
   })();
   </script>
   <script>
-  /* ORDINATEUR : la carte se rapproche et fait le point au rythme du
-     défilement (voir « LA CARTE VIDÉO SE RAPPROCHE ET FAIT LE POINT » dans
-     le style).
+  /* TOUS LES ÉCRANS : la carte grandit au rythme du défilement (voir « LA
+     CARTE VIDÉO SE RAPPROCHE ET FAIT LE POINT » dans le style, et « LE
+     GROSSISSEMENT AUSSI SUR TABLETTE ET TÉLÉPHONE »).
      La CIBLE vient de la position de la carte : 0 tant que la page est en
      haut, 1 quand le centre de la carte atteint le centre de l'écran.
      La VALEUR AFFICHÉE rattrape la cible de 12 % de l'écart à chaque image :
@@ -5077,12 +5101,7 @@ body.pret .barre-hote{animation-play-state:running}
       fin=Math.max(200, haut + r.height / 2 - innerHeight / 2);
     }
     function calculer(){ cible=Math.min(1, Math.max(0, (scrollY - debut) / (fin - debut))); }
-    /* Le flou va de 6 px à 0 ; une fois net, plus de filtre du tout. */
-    function appliquer(){
-      hv.style.setProperty('--p', val.toFixed(4));
-      var flou=(1 - val) * 6;
-      hv.style.setProperty('--mise-au-point', flou < .05 ? 'none' : 'blur(' + flou.toFixed(2) + 'px)');
-    }
+    function appliquer(){ hv.style.setProperty('--p', val.toFixed(4)); }
     function peindre(){
       val += (cible - val) * .12;
       if(Math.abs(cible - val) < .0005) val=cible;
@@ -5091,11 +5110,11 @@ body.pret .barre-hote{animation-play-state:running}
     }
     function relancer(){ calculer(); if(!boucle) boucle=requestAnimationFrame(peindre); }
     function demarrer(){
-      if(!pc.matches || calme.matches){ hv.style.removeProperty('--p'); hv.style.removeProperty('--mise-au-point'); return; }
+      if(calme.matches){ hv.style.removeProperty('--p'); return; }
       mesurer(); calculer(); val=cible; appliquer();
     }
     demarrer();
-    addEventListener('scroll', function(){ if(pc.matches && !calme.matches) relancer(); }, {passive:true});
+    addEventListener('scroll', function(){ if(!calme.matches) relancer(); }, {passive:true});
     addEventListener('resize', demarrer);
     addEventListener('load', demarrer);
   })();

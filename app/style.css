@@ -26527,6 +26527,47 @@ html::-webkit-scrollbar-thumb:hover{
   }
 }
 
+/* ⚠ LA DEUXIÈME BARRE QUI RESTAIT UNE DEMI-SECONDE : C'ÉTAIT LE CORPS.
+
+   `overflow-x:hidden` sur `body` (tout en haut de cette feuille) fait de lui
+   une zone de défilement à part entière — le navigateur passe alors l'axe
+   vertical en `auto`. Tant que rien ne dépasse, on ne le voit pas.
+
+   Mais chaque page arrive en montant de 12 px (`ecranEntre`), et l'aperçu
+   arrive en grossissant (`scale(1.02)`). Pendant l'animation, la page dépasse
+   le corps de quelques pixels : le corps dessinait SA barre, juste à gauche
+   de celle de la fenêtre, puis la retirait à la fin du mouvement. Mesuré
+   image par image en revenant sur « Procédures » : deux barres de 85 à
+   455 ms, puis une seule.
+
+ ⚠ `clip` AU LIEU DE `hidden`. Il coupe pareil ce qui dépasse sur les côtés,
+   mais ne fait pas du corps une zone de défilement : plus de deuxième barre
+   possible. La première ligne (`hidden`) reste pour les navigateurs qui ne
+   connaissent pas `clip` — ils gardent le comportement d'avant.
+
+ ⚠ LES RÈGLES QUI BLOQUAIENT LE CORPS PASSENT AUSSI À `clip`. Sur PC, c'est
+   la fenêtre qui défile, pas le corps : `hidden` n'y bloquait rien, il
+   ajoutait seulement une zone de défilement de plus. */
+@media (hover:hover) and (pointer:fine){
+  body{
+    overflow-x:hidden;
+    overflow-x:clip;
+  }
+  body.espace-vide,
+  body.espace-arrive,
+  body:has(#e-detail.active){
+    overflow:hidden;
+    overflow:clip;
+  }
+  /* Le profil forçait `auto !important` pour ne jamais rester figé. Sur PC
+     le corps n'a pas à défiler : `visible` laisse la fenêtre le faire. */
+  body:has(#p-profil.active),
+  body:has(#e-profil.active){
+    overflow-x:clip !important;
+    overflow-y:visible !important;
+  }
+}
+
 /* ⚠ LA FICHE CÔTÉ UTILISATEUR, MÊME CHOSE. Sur un écran couché, elle faisait
    déjà défiler toute sa page — mais à l'intérieur d'elle-même, d'où une barre
    au bord de la colonne. À la souris, c'est la fenêtre qui s'en charge.

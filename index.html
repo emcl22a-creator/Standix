@@ -4457,27 +4457,27 @@ body.pret .hv{animation-play-state:running}
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   ORDINATEUR : LA CARTE VIDÉO SE LÈVE AU RYTHME DE LA MOLETTE (à la demande)
-   Comme une carte à jouer : à l'arrivée elle est INCLINÉE vers l'arrière
-   (32° autour de son bord du bas, légèrement réduite) ; en descendant, elle
-   se redresse ; elle est droite quand elle est entièrement visible. En
-   remontant, elle se recouche.
-   `--p` va de 0 (couchée) à 1 (debout). C'est le script qui suit
-   « LE CARROUSEL DES VIDÉOS » qui le calcule, en le LISSANT : chaque image
-   rattrape une part de l'écart, si bien que les crans de la molette ne
-   donnent aucun à-coup — la carte suit avec une légère inertie.
-   À l'arrivée, elle apparaît simplement en fondu, déjà inclinée.
-   ⚠ 32° ET PAS DAVANTAGE : la carte pivote sur son bord du bas, qui est
-   sous l'écran à l'arrivée. Plus couchée, son haut descendait si bas
-   qu'on ne la voyait plus du tout à l'arrivée (essayé à 58°).
-   ⚠ ELLE EST AUSSI REMONTÉE DE 90 px quand elle est couchée, et redescend
-   en se levant : sans cela son haut, en basculant, tombait d'une centaine
-   de pixels et la carte n'était presque plus visible à l'arrivée sur un
-   portable. Les 90 px restent dans l'espace libre sous les boutons.
-   ⚠ La perspective est posée sur la carte (`.hv-c`), le mouvement sur son
-   cadre (`.hv-cadre`) : un élément ne peut pas être sa propre perspective.
-   ⚠ La montée d'ensemble de `.hv` (`monte`) est coupée ici.
-   ⚠ PAS DE REFLET LUMINEUX (retiré à la demande).
+   ORDINATEUR : LA CARTE VIDÉO SE RAPPROCHE ET FAIT LE POINT AU RYTHME DE LA
+   MOLETTE (à la demande, 22 oct. 2026 — idées B + C ; remplace la carte
+   qui se levait comme une carte à jouer)
+   ═══════════════════════════════════════════════════════════════════════
+   · B — LE ZOOM DOUX : à l'arrivée la carte est un peu en retrait (88 % de
+     sa taille, réduite autour de son bord du haut, qui ne bouge donc pas) ;
+     en descendant elle grandit jusqu'à sa vraie taille. Aucune rotation.
+   · C — LA MISE AU POINT : à l'arrivée elle est légèrement floue (6 px) ;
+     elle devient nette en arrivant au centre de l'écran.
+   `--p` va de 0 (en retrait, floue) à 1 (à sa taille, nette) : 1 quand le
+   CENTRE de la carte atteint le centre de l'écran. Le script qui suit
+   « LE CARROUSEL DES VIDÉOS » le calcule en le LISSANT (chaque image
+   rattrape une part de l'écart) : les crans de la molette ne donnent aucun
+   à-coup. Il publie aussi le flou, `--mise-au-point`, et le remplace par
+   `none` une fois la carte nette : un filtre laissé en place, même à 0 px,
+   peut adoucir le contour fin.
+   En remontant, elle recule et redevient floue.
+   ⚠ La montée d'ensemble de `.hv` (`monte`) est coupée ici ; la carte
+   arrive en fondu avec les boutons.
+   ⚠ PAS DE REFLET LUMINEUX (retiré à la demande). PAS DE `will-change`
+   (il fige la carte en image et le contour fin s'y amincit).
    ═══════════════════════════════════════════════════════════════════════ */
 @media (min-width:981px){
   .hv{animation:none}
@@ -4496,22 +4496,21 @@ body.pret .hv{animation-play-state:running}
   /* « Voir le fonctionnement » mène ici (`#presentation`) : la carte doit
      s'arrêter sous la barre flottante, pas dessous. */
   .hv{scroll-margin-top:64px}
-  .hv-c{perspective:1800px; perspective-origin:50% 0%}
   .hv-cadre{
-    transform-origin:50% 100%;
-    transform:translateY(calc((1 - var(--p, 1)) * -90px)) rotateX(calc((1 - var(--p, 1)) * 32deg)) scale(calc(.95 + .05 * var(--p, 1)));
+    transform-origin:50% 0%;
+    transform:scale(calc(.88 + .12 * var(--p, 1)));
+    filter:var(--mise-au-point, none);
     /* ⚠ PAS DE `will-change` : il fige la carte dans une image calculée une
        fois, que le navigateur étire ensuite — le contour fin s'y amincit
        jusqu'à disparaître par moments. Sans lui, chaque image est redessinée
        nette. */
-    -webkit-backface-visibility:hidden; backface-visibility:hidden;
     animation:hv-fondu 1.1s cubic-bezier(.25,.1,.25,1) .85s both paused;
   }
   body.pret .hv-cadre{animation-play-state:running}
 }
 @keyframes hv-fondu{ from{opacity:0} to{opacity:1} }
 @media (min-width:981px) and (prefers-reduced-motion:reduce){
-  .hv-cadre{animation:none; transform:none}
+  .hv-cadre{animation:none; transform:none; filter:none}
 }
 
 /* ═══ ORDINATEUR : LE MENU À DEUX BARRES, COMME SUR TÉLÉPHONE (à la demande)
@@ -4575,38 +4574,54 @@ body.pret .hv{animation-play-state:running}
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   SECTION 1 : L'ENTRÉE DU TEXTE — A + B + C (à la demande, 22 oct. 2026)
+   SECTION 1 : L'ENTRÉE DU TEXTE — A + C (à la demande, 22 oct. 2026)
    Tous les écrans. Remplace les anciennes entrées (`monte`, `texte-cine`,
    `capsule`) de la pastille, du titre, du sous-titre et des boutons.
-   · B — LE RIDEAU : chaque ligne du titre monte depuis derrière son propre
-     bord bas, invisible (`.ligne` coupe ce qui dépasse).
-   · C — LE TITRE S'ALLUME : la ligne arrive gris foncé, puis une lumière la
-     traverse de gauche à droite et la laisse blanche. C'est un dégradé posé
-     DANS les lettres (`background-clip:text`) qui glisse.
+   · C — LE TITRE S'ALLUME : le titre est là d'emblée, gris foncé, et une
+     lumière le traverse aussitôt de gauche à droite et le laisse blanc.
+     C'est un dégradé posé DANS les lettres (`background-clip:text`) qui
+     glisse.
+   ⚠ LE RIDEAU (B, chaque ligne montant de derrière son bord bas) A ÉTÉ
+     RETIRÉ (à la demande : on voyait le titre coupé en deux). Le titre ne
+     bouge plus, seule la lumière passe.
    · A — LE FONDU : pastille, sous-titre et boutons apparaissent en fondu
      avec 14 px de montée, vite, l'un après l'autre.
-   Ordre (dès que tout est chargé) : pastille .25 s · ligne 1 .40 s ·
-   ligne 2 .52 s · sous-titre .85 s · boutons 1 s · carte 1,15 s · la lumière
-   passe de .95 s à 3,3 s.
+   Ordre (dès que tout est chargé) : barre, pastille et titre gris (en
+   fondu de .45 s) 0 s ·
+   lumière sur la ligne 1 0 s, sur la ligne 2 .12 s, finie vers 2,3 s ·
+   sous-titre .40 s · boutons .55 s · carte .70 s.
+   ⚠ PAS D'ATTENTE AU DÉPART (à la demande : le titre mettait trop de temps
+   à commencer). Le site apparaît, le titre bouge aussitôt.
    ⚠ PROPRIÉTÉS DÉTAILLÉES SEULEMENT (`animation-name`, `-delay`…) : le
    raccourci `animation` remettrait `play-state` à `running` et tout
    jouerait avant que tout soit chargé.
    ⚠ L'ÉTAT AU REPOS EST L'ÉTAT FINAL (titre blanc, en place) : avec
    « réduire les animations », la règle générale coupe tout et le texte
    s'affiche directement, net.
-   ⚠ LES MARGES NÉGATIVES DE `.ligne` ET DE SON `<span>` donnent de la place
-   aux jambages (le « p » de « simplement ») et aux débords du « f » : sans
-   elles, le rideau et le dégradé les couperaient. Elles ne changent rien à
-   la mise en page.
+   ⚠ LES MARGES NÉGATIVES DU `<span>` de chaque `.ligne` donnent de la
+   place aux jambages (le « p » de « simplement ») et aux débords du « f » :
+   sans elles, le dégradé ne couvrirait pas le bas des lettres. Elles ne
+   changent rien à la mise en page.
    ═══════════════════════════════════════════════════════════════════════ */
-/* ⚠ `flex` ET NON `block` : entre deux blocs, les marges négatives de
-   `.ligne` FUSIONNERAIENT (la plus grande l'emporte au lieu de s'additionner)
-   et le titre gagnait 8 px. Entre éléments flex, elles ne fusionnent jamais.
-   Les lignes restent étirées : l'alignement du texte ne change pas. */
-.hero.pc-a h1{animation:none; display:flex; flex-direction:column}
-.hero.pc-a h1 .ligne{
-  display:block; overflow:hidden;
-  padding:.1em .1em .2em; margin:-.1em -.1em -.2em;
+/* Une `.ligne` par ligne, empilées ; elles restent étirées, donc
+   l'alignement du texte ne change pas. */
+.hero.pc-a h1{display:flex; flex-direction:column}
+.hero.pc-a h1 .ligne{display:block}
+/* ⚠ LE TITRE SORT DU NOIR EN FONDU (à la demande) : 0,45 s, sans bouger,
+   pendant que la lumière commence à passer. Sans lui, le titre gris
+   apparaissait d'un coup, sur une seule image. */
+.hero.pc-a h1{
+  animation-name:titre-fondu;
+  animation-duration:.45s;
+  animation-timing-function:cubic-bezier(.25,.1,.25,1);
+  animation-delay:0s;
+  animation-fill-mode:both;
+  animation-play-state:paused;
+}
+body.pret .hero.pc-a h1{animation-play-state:running}
+@keyframes titre-fondu{
+  from{opacity:0}
+  to  {opacity:1}
 }
 .hero.pc-a h1 .ligne > span{
   display:inline-block;
@@ -4622,19 +4637,15 @@ body.pret .hv{animation-play-state:running}
   background-size:300% 100%;
   background-position:0% 0;
   -webkit-background-clip:text; background-clip:text;
-  animation-name:rideau, allume;
-  animation-duration:1.15s, 2.2s;
-  animation-timing-function:cubic-bezier(.16,1,.3,1), cubic-bezier(.4,0,.2,1);
-  animation-delay:.4s, .95s;
-  animation-fill-mode:both, both;
-  animation-play-state:paused, paused;
+  animation-name:allume;
+  animation-duration:2.2s;
+  animation-timing-function:cubic-bezier(.3,0,.2,1);
+  animation-delay:0s;
+  animation-fill-mode:both;
+  animation-play-state:paused;
 }
-.hero.pc-a h1 .ligne + .ligne > span{animation-delay:.52s, 1.07s}
-body.pret .hero.pc-a h1 .ligne > span{animation-play-state:running, running}
-@keyframes rideau{
-  from{transform:translateY(110%)}
-  to  {transform:translateY(0)}
-}
+.hero.pc-a h1 .ligne + .ligne > span{animation-delay:.12s}
+body.pret .hero.pc-a h1 .ligne > span{animation-play-state:running}
 @keyframes allume{
   from{background-position:100% 0}
   to  {background-position:0% 0}
@@ -4647,10 +4658,10 @@ body.pret .hero.pc-a h1 .ligne > span{animation-play-state:running, running}
   animation-fill-mode:both;
   animation-play-state:paused;
 }
-.hero.pc-a .sur     {animation-delay:.25s}
-.hero.pc-a .sous    {animation-delay:.85s}
+.hero.pc-a .sur     {animation-delay:0s}
+.hero.pc-a .sous    {animation-delay:.4s}
 .hero.pc-a .pc-liens,
-.hero.pc-a .acte-bas{animation-delay:1s}
+.hero.pc-a .acte-bas{animation-delay:.55s}
 body.pret .hero.pc-a .sur, body.pret .hero.pc-a .sous,
 body.pret .hero.pc-a .pc-liens, body.pret .hero.pc-a .acte-bas{animation-play-state:running}
 @keyframes fondu-monte{
@@ -4658,8 +4669,166 @@ body.pret .hero.pc-a .pc-liens, body.pret .hero.pc-a .acte-bas{animation-play-st
   to  {opacity:1; translate:0 0}
 }
 
+/* ─── TÉLÉPHONE : LE TITRE UN CRAN PLUS GRAND (à la demande, ≈ +4 %) ───
+   ⚠ « transmis simplement » est la ligne la plus longue : elle vaut 9,53
+   fois la taille de la police. Le titre suit donc la largeur disponible
+   (écran − 32 px de marges), divisée par 9,7 pour garder une petite marge,
+   et ne descend jamais sous les 34 px d'avant. Sur un écran de 360 px, il
+   n'y a pas de place pour plus : il y reste à 34 px. Au-delà de la limite,
+   la ligne se casserait en deux. */
+@media (max-width:414px){
+  .hero.pc-a h1{font-size:max(34px, min(35.5px, calc((100vw - 32px) / 9.7)))}
+}
+@media (min-width:415px) and (max-width:599px){
+  .hero.pc-a h1{font-size:clamp(36.4px, 8.95vw, 39.5px)}
+}
+
+/* ─── LE MOT « STANDIX » DE LA BARRE, UN CRAN PLUS GRAND (à la demande,
+   22 oct. 2026 : +5 %) ─── Seulement dans la barre ; le symbole, l'écart
+   entre les deux et le logo du pied de page ne changent pas. */
+.barre-hote .barre .marque .logotype{font-size:calc(var(--signe) / 1.395 * 1.05)}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   « STANDIX APP » AU-DESSUS DU TITRE — TOUS LES ÉCRANS (à la demande,
+   22 oct. 2026 ; « app » en minuscules)
+   ═══════════════════════════════════════════════════════════════════════
+   Écrit comme le mot « Standix » du logo de la barre : Poppins 500, lettres
+   resserrées de la même façon (−0,044 em), blanc Apple. Environ la moitié
+   de la taille du titre sur téléphone, un peu moins sur grand écran, comme
+   le nom d'un produit au-dessus d'un titre chez Apple.
+   ⚠ IL NE PREND AUCUNE PLACE : sa hauteur vaut exactement sa taille
+   (`line-height:1`) et sa marge haute la retire (`margin-top:-1em`). Le
+   titre, le texte, les boutons et la carte restent au pixel près où ils
+   étaient. L'écart avec le titre est la marge haute du titre lui-même.
+   ⚠ TAILLES ENTIÈRES (pas de `vw`) : une taille à virgule laisse un
+   dixième de pixel entre sa hauteur et sa marge, et le titre bougeait
+   d'autant.
+   ⚠ SUR ORDINATEUR, IL REMPLACE LA PASTILLE « Nouveau · Standix App » (à la
+   demande). La pastille reste dans la page, INVISIBLE : elle garde sa
+   place, donc le titre ne bouge pas, et le texte se pose sur elle. Pour la
+   remettre : retirer la règle `.hero.pc-a .sur{visibility:hidden…}`.
+   ⚠ CACHÉ SUR LES TÉLÉPHONES ET TABLETTES TRÈS BAS (moins de 620 px de
+   haut : petit iPhone, téléphone couché) : il toucherait la barre. */
+.hero.pc-a .marque-app{
+  display:block; position:relative; z-index:3;
+  margin:-1em auto 0; padding:0;
+  font-family:Poppins,sans-serif; font-weight:500;
+  font-size:18px; line-height:1; letter-spacing:-.044em;
+  color:#F5F5F7; text-align:center; white-space:nowrap;
+  animation-name:fondu-monte;
+  animation-duration:.8s;
+  animation-timing-function:cubic-bezier(.28,.11,.32,1);
+  animation-delay:0s;
+  animation-fill-mode:both;
+  animation-play-state:paused;
+}
+body.pret .hero.pc-a .marque-app{animation-play-state:running}
+@media (min-width:600px) and (max-width:980px){
+  .hero.pc-a .marque-app{font-size:22px}
+}
+@media (min-width:768px) and (max-width:980px){
+  .hero.pc-a .marque-app{font-size:24px}
+}
+@media (min-width:981px){
+  .hero.pc-a .sur{visibility:hidden; pointer-events:none}
+  .hero.pc-a .marque-app{font-size:26px; order:1}
+}
+@media (min-width:1280px){
+  .hero.pc-a .marque-app{font-size:30px}
+}
+@media (min-width:1680px){
+  .hero.pc-a .marque-app{font-size:32px}
+}
+@media (max-width:980px) and (max-height:619px){
+  .hero.pc-a .marque-app{display:none}
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   L'AUBE : LE BAS DE LA SECTION 1 S'ÉCLAIRE (à la demande, 22 oct. 2026 —
+   idée C, en blanc-gris Apple)
+   ═══════════════════════════════════════════════════════════════════════
+   Une lumière blanc-gris (#F5F5F7, très transparente) monte du bas de la
+   section, autour et sous la carte vidéo. Légère au chargement (à moitié),
+   elle
+   s'intensifie à mesure qu'on descend : le script publie `--aube` (0 en
+   haut de page, 1 quand le bas de la section arrive aux trois cinquièmes
+   de l'écran). Tous les écrans.
+   ⚠ ELLE S'ÉTEINT AVANT LE BAS DE LA SECTION (masque) : la jonction avec la
+   section 2 garde exactement sa couleur, donc reste invisible.
+   ⚠ DEUX COUCHES : `.aube` porte l'arrivée en fondu (avec la carte),
+   `.aube::before` la lumière et son intensité. Une seule couche ne pourrait
+   pas avoir les deux : l'animation écraserait l'opacité réglée au défilement.
+   ⚠ `z-index:-1` dans la section (isolée) : sous tout son contenu, au-dessus
+   de son fond. `pointer-events:none` : elle ne prend jamais un clic. */
+.hero.pc-a .aube{
+  position:absolute; left:0; right:0; bottom:0; height:100%;
+  z-index:-1; pointer-events:none; display:block;
+  animation-name:aube-arrive;
+  animation-duration:1.6s;
+  animation-timing-function:cubic-bezier(.25,.1,.25,1);
+  animation-delay:.5s;
+  animation-fill-mode:backwards;
+  animation-play-state:paused;
+}
+body.pret .hero.pc-a .aube{animation-play-state:running}
+@keyframes aube-arrive{
+  from{opacity:0}
+  to  {opacity:1}
+}
+.hero.pc-a .aube::before{
+  content:''; position:absolute; inset:0;
+  /* ⚠ S'ÉTALE HAUT (à la demande) : l'ellipse est plus haute que la
+     section, la lumière monte jusqu'au niveau des boutons en s'éteignant. */
+  background:radial-gradient(ellipse 80% 118% at 50% 100%,
+      rgba(245,245,247,.30) 0%, rgba(245,245,247,.21) 24%,
+      rgba(245,245,247,.12) 46%, rgba(245,245,247,.055) 66%,
+      rgba(245,245,247,.018) 82%, transparent 96%);
+  /* ⚠ PAS DE COUPURE AVEC LA SECTION 2 (à la demande) : la lumière s'éteint
+     en courbe douce (« smoothstep ») sur le dernier tiers, et arrive à zéro
+     SANS PENTE. Un fondu en ligne droite la faisait tomber d'un coup juste
+     avant la jonction, et on devinait une ligne. */
+  --fin-aube:linear-gradient(to top,
+      transparent 0%, rgba(0,0,0,.028) 3.2%, rgba(0,0,0,.104) 6.4%,
+      rgba(0,0,0,.216) 9.6%, rgba(0,0,0,.352) 12.8%, rgba(0,0,0,.5) 16%,
+      rgba(0,0,0,.648) 19.2%, rgba(0,0,0,.784) 22.4%, rgba(0,0,0,.896) 25.6%,
+      rgba(0,0,0,.972) 28.8%, #000 32%);
+  -webkit-mask-image:var(--fin-aube);
+          mask-image:var(--fin-aube);
+  opacity:calc(.5 + .5 * var(--aube, 0));
+}
+/* ⚠ SUR TÉLÉPHONE ET TABLETTE, UN PEU PLUS BAS (à la demande) : l'ellipse
+   est moins haute (100 % au lieu de 118 %), la lumière s'arrête un peu
+   plus bas ; sa force autour de la carte ne change presque pas. */
+@media (max-width:980px){
+  .hero.pc-a .aube::before{
+    background:radial-gradient(ellipse 80% 100% at 50% 100%,
+        rgba(245,245,247,.30) 0%, rgba(245,245,247,.21) 24%,
+        rgba(245,245,247,.12) 46%, rgba(245,245,247,.055) 66%,
+        rgba(245,245,247,.018) 82%, transparent 96%);
+  }
+}
+/* ⚠ SUR ORDINATEUR, ENCORE PLUS HAUT (à la demande) : la section dépasse
+   l'écran, la lumière reste forte plus longtemps en remontant et ne
+   s'éteint que vers le titre. */
+@media (min-width:981px){
+  .hero.pc-a .aube::before{
+    background:radial-gradient(ellipse 86% 100% at 50% 100%,
+        rgba(245,245,247,.30) 0%, rgba(245,245,247,.25) 22%,
+        rgba(245,245,247,.19) 40%, rgba(245,245,247,.13) 56%,
+        rgba(245,245,247,.075) 70%, rgba(245,245,247,.03) 84%, transparent 98%);
+  }
+}
+
 /* La carte vidéo garde son entrée, décalée pour arriver après les boutons. */
-.hero.pc-a .hv, .hero.pc-a .hv-cadre{animation-delay:1.15s}
+.hero.pc-a .hv, .hero.pc-a .hv-cadre{animation-delay:.7s}
+/* ⚠ LA CARTE ARRIVE EN MÊME TEMPS QUE LES DEUX BOUTONS (à la demande) :
+   même départ (.55 s) et même durée (.8 s), sur tous les écrans. La
+   lumière qui l'entoure part avec elle. */
+.hero.pc-a .hv{animation-delay:.55s; animation-duration:.8s}
+.hero.pc-a .aube{animation-delay:.55s; animation-duration:1s}
+@media (min-width:981px){
+  .hero.pc-a .hv-cadre{animation-delay:.55s; animation-duration:.8s}
+}
 
 /* ═══════════════════════════════════════════════════════════════════════
    RIEN N'APPARAÎT AVANT QUE TOUT SOIT CHARGÉ (à la demande, 22 oct. 2026)
@@ -4687,7 +4856,7 @@ body:not(.pret) > .hero > *{visibility:hidden}
   animation-name:barre-arrive;
   animation-duration:.9s;
   animation-timing-function:cubic-bezier(.25,.1,.25,1);
-  animation-delay:.1s;
+  animation-delay:0s;
   animation-fill-mode:backwards;
   animation-play-state:paused;
 }
@@ -4766,6 +4935,8 @@ body.pret .barre-hote{animation-play-state:running}
        s'éclaire — l'appareil se détache au maximum. Décoratifs. -->
   <i class="voile-haut" aria-hidden="true"></i>
   <i class="voile-bas" aria-hidden="true"></i>
+  <!-- L'AUBE : la lumière blanc-gris du bas de la section (décorative). -->
+  <i class="aube" aria-hidden="true"></i>
 
   <!-- ⚠ PASTILLE D'ANNONCE (forme reprise du bandeau de stripe.com) : une
        étiquette de couleur PLEINE, le texte, puis un chevron. C'est un LIEN :
@@ -4773,10 +4944,14 @@ body.pret .barre-hote{animation-play-state:running}
        fonctionnement, plutôt que de laisser le visiteur décider seul. -->
   <a class="sur" href="#presentation"><i class="sur-et">Nouveau</i><span>Standix App</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
 
-  <!-- ⚠ UNE `.ligne` PAR LIGNE DU TITRE : c'est elle qui sert de rideau (la
-       ligne monte depuis derrière son bord bas), et le `<span>` intérieur
-       porte la lumière qui la traverse. Changer le texte ici, garder les
-       deux enveloppes. -->
+  <!-- ⚠ UNE `.ligne` PAR LIGNE DU TITRE : le `<span>` intérieur porte la
+       lumière qui la traverse, ligne par ligne. Changer le texte ici,
+       garder les deux enveloppes. -->
+  <!-- « Standix app » (a minuscule, à la demande) AU-DESSUS DU TITRE, sur
+       tous les écrans ; sur ordinateur il remplace la pastille ci-dessus
+       (restée invisible). Écrit comme le logo de la barre. Il ne prend
+       aucune place : voir `.marque-app`. -->
+  <p class="marque-app">Standix app</p>
   <h1><span class="ligne"><span>Votre savoir-faire</span></span> <span class="ligne"><span>transmis simplement</span></span></h1>
 
   <!-- ⚠ LE SOUS-TITRE EST DE RETOUR (à la demande) : il avait été retiré plus
@@ -4878,10 +5053,11 @@ body.pret .barre-hote{animation-play-state:running}
   })();
   </script>
   <script>
-  /* ORDINATEUR : la carte se lève au rythme du défilement (voir « LA CARTE
-     VIDÉO SE LÈVE AU RYTHME DE LA MOLETTE » dans le style).
+  /* ORDINATEUR : la carte se rapproche et fait le point au rythme du
+     défilement (voir « LA CARTE VIDÉO SE RAPPROCHE ET FAIT LE POINT » dans
+     le style).
      La CIBLE vient de la position de la carte : 0 tant que la page est en
-     haut, 1 quand le bas de la carte atteint 92 % de la hauteur de l'écran.
+     haut, 1 quand le centre de la carte atteint le centre de l'écran.
      La VALEUR AFFICHÉE rattrape la cible de 12 % de l'écart à chaque image :
      c'est ce lissage qui rend le mouvement soyeux à la molette.
      ⚠ La position de départ est relevée UNE fois, page en haut, puis à
@@ -4895,22 +5071,28 @@ body.pret .barre-hote{animation-play-state:running}
       var c=hv.querySelector('.hv-c'); if(!c) return;
       var r=c.getBoundingClientRect(), haut=r.top + scrollY;
       debut=0;
-      /* Défilement nécessaire pour que le bas de la carte arrive à 92 %
-         de l'écran ; au moins 200 px, pour que le geste existe même sur un
-         très grand écran où la carte est visible d'emblée. */
-      fin=Math.max(200, haut + r.height - innerHeight * .92);
+      /* Défilement nécessaire pour que le centre de la carte arrive au
+         centre de l'écran ; au moins 200 px, pour que le geste existe même
+         sur un très grand écran où la carte est visible d'emblée. */
+      fin=Math.max(200, haut + r.height / 2 - innerHeight / 2);
     }
     function calculer(){ cible=Math.min(1, Math.max(0, (scrollY - debut) / (fin - debut))); }
+    /* Le flou va de 6 px à 0 ; une fois net, plus de filtre du tout. */
+    function appliquer(){
+      hv.style.setProperty('--p', val.toFixed(4));
+      var flou=(1 - val) * 6;
+      hv.style.setProperty('--mise-au-point', flou < .05 ? 'none' : 'blur(' + flou.toFixed(2) + 'px)');
+    }
     function peindre(){
       val += (cible - val) * .12;
       if(Math.abs(cible - val) < .0005) val=cible;
-      hv.style.setProperty('--p', val.toFixed(4));
+      appliquer();
       boucle = val===cible ? 0 : requestAnimationFrame(peindre);
     }
     function relancer(){ calculer(); if(!boucle) boucle=requestAnimationFrame(peindre); }
     function demarrer(){
-      if(!pc.matches || calme.matches){ hv.style.removeProperty('--p'); return; }
-      mesurer(); calculer(); val=cible; hv.style.setProperty('--p', val.toFixed(4));
+      if(!pc.matches || calme.matches){ hv.style.removeProperty('--p'); hv.style.removeProperty('--mise-au-point'); return; }
+      mesurer(); calculer(); val=cible; appliquer();
     }
     demarrer();
     addEventListener('scroll', function(){ if(pc.matches && !calme.matches) relancer(); }, {passive:true});
@@ -6162,6 +6344,26 @@ body.pret .barre-hote{animation-play-state:running}
   ecrit(); hote.classList.add('suivie');
   addEventListener('scroll', lit, {passive:true});
   addEventListener('pageshow', lit);
+})();
+/* ─── L'AUBE DE LA SECTION 1 ───
+   Publie `--aube` sur la section : 0 en haut de page, 1 quand son bas
+   arrive aux trois cinquièmes de l'écran. Lu une fois par image au plus. */
+(function(){
+  const hero=document.querySelector('.hero.pc-a');
+  if(!hero) return;
+  let bas=0, attente=0;
+  const mesure=()=>{ bas=hero.getBoundingClientRect().bottom + scrollY; maj(); };
+  const maj=()=>{
+    attente=0;
+    const fin=Math.max(1, bas - innerHeight*.6);
+    const p=Math.max(0, Math.min(1, scrollY/fin));
+    hero.style.setProperty('--aube', p.toFixed(3));
+  };
+  addEventListener('scroll', ()=>{ if(!attente) attente=requestAnimationFrame(maj); }, {passive:true});
+  addEventListener('resize', mesure, {passive:true});
+  addEventListener('load', mesure);
+  addEventListener('standix:mesure', mesure);
+  mesure();
 })();
 (function(){
   const barre=document.querySelector('.barre'),

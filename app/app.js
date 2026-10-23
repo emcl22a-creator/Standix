@@ -323,7 +323,7 @@ const DICO = {
     "Au total": "In total",
     "au total": "in total",
     "au total sur les procédures": "in total on procedures",
-    "Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.": "Over one hundred people: a written availability commitment, to be discussed.",
+    "Au-delà de trente personnes, un tarif établi avec vous : nombre de sites, accompagnement, engagement.": "Over thirty people: a price set with you — number of sites, support, commitment.",
     "Aucun abonnement à gérer": "No subscription to manage",
     "Aucun appareil enregistré pour le moment.": "No devices yet.",
     "Aucun code": "No code",
@@ -430,6 +430,7 @@ const DICO = {
     "Cette entreprise": "This company",
     "cette entreprise": "this company",
     "Cette entreprise est complète": "This company is full",
+    "Cette formule n'est pas encore disponible au paiement. Écrivez-nous, nous l'activons pour vous.": "This plan can't be paid online yet. Write to us and we'll activate it for you.",
     "Cette offre se construit avec vous. Écrivez-nous et nous revenons vers vous rapidement.": "This plan is built with you. Write to us and we will get back to you quickly.",
     "Cette personne": "This person",
     "cette personne": "this person",
@@ -1644,7 +1645,7 @@ const DICO = {
     "Au total": "Insgesamt",
     "au total": "insgesamt",
     "au total sur les procédures": "insgesamt auf Anleitungen",
-    "Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.": "Über hundert Personen: schriftliche Verfügbarkeitszusage, nach Absprache.",
+    "Au-delà de trente personnes, un tarif établi avec vous : nombre de sites, accompagnement, engagement.": "Über dreißig Personen: ein mit Ihnen vereinbarter Preis — Anzahl der Standorte, Begleitung, Laufzeit.",
     "Aucun abonnement à gérer": "Kein Abo zu verwalten",
     "Aucun appareil enregistré pour le moment.": "Noch keine Geräte.",
     "Aucun code": "Kein Code",
@@ -1751,6 +1752,7 @@ const DICO = {
     "Cette entreprise": "Dieses Unternehmen",
     "cette entreprise": "dieses Unternehmen",
     "Cette entreprise est complète": "Dieses Unternehmen ist voll",
+    "Cette formule n'est pas encore disponible au paiement. Écrivez-nous, nous l'activons pour vous.": "Dieser Tarif kann noch nicht online bezahlt werden. Schreiben Sie uns, wir schalten ihn für Sie frei.",
     "Cette offre se construit avec vous. Écrivez-nous et nous revenons vers vous rapidement.": "Dieser Tarif entsteht gemeinsam mit Ihnen. Schreiben Sie uns, wir melden uns schnell.",
     "Cette personne": "Diese Person",
     "cette personne": "diese Person",
@@ -33234,38 +33236,40 @@ function rythmeDuCompte() {
    quelqu'un viendra réclamer six mois d'un coup.
    ═══════════════════════════════════════════════════════════════════════════ */
 const OFFRES = [
-  /* ═══ LA GRILLE DU 22 OCTOBRE 2026 ═══
+  /* ═══ LA GRILLE DU 22 OCTOBRE 2026 (version finale de la soirée) ═══
 
      Décidée par Em :
-       Essentiel  jusqu'à   5 membres ·  40 analyses par mois ·    99 €
-       Équipe     jusqu'à  15 membres ·  60 analyses par mois ·   290 €
-       Pro        jusqu'à  40 membres ·  70 analyses par mois ·   890 €
-       Réseau     jusqu'à 100 membres · 200 analyses par mois · 4 990 €
-                  (299, 899 et 4 999 au départ, arrondis le même soir ;
-                   Essentiel garde 99 €, prix d'appel)
-                  (80 au départ, porté à 200 le même soir : l'offre du haut
-                   doit nettement dépasser Pro, et 200 analyses coûtent moins
-                   de 20 € sur le chemin rapide)
+       Essentiel   jusqu'à  5 membres · 40 analyses par mois ·  99 €
+       Équipe      jusqu'à 15 membres · 50 analyses par mois · 199 €
+       Pro         jusqu'à 30 membres · 60 analyses par mois · 299 €
+       Entreprise  au-delà de 30 membres · sur devis
+
+     ⚠ RÉSEAU (100 membres) N'EST PLUS VENDU. Au-delà de trente personnes,
+     on discute : prix, sites, accompagnement. Un ancien abonné Réseau garde
+     son palier en base (`quota_analyses` connaît encore « reseau ») ; l'écran
+     d'abonnement retombe alors sur l'offre conseillée pour sa taille.
+
+     LE PRIX PAR MEMBRE BAISSE À CHAQUE PALIER — 19,80 €, 13,30 €, 10 € —
+     comme chez tous les concurrents relevés (Trainual, Poka, Scribe).
 
      L'ANNUEL SE PAIE EN UNE FOIS, AVEC 15 % DE REMISE. Douze mois moins
-     quinze pour cent, arrondis à la dizaine : 1 010 · 2 960 · 9 080 · 50 900.
+     quinze pour cent, arrondis à la dizaine : 1 010 · 2 030 · 3 050.
      L'étiquette « −15 % » de la carte se CALCULE à partir de ces deux
      montants : changer `an` suffit, elle suit.
 
-     LE COÛT D'UNE ANALYSE NE PÈSE PLUS. Mesuré en octobre sur le chemin
+     LE COÛT D'UNE ANALYSE NE PÈSE PAS. Mesuré en octobre sur le chemin
      rapide (Azure Speech + Claude) : 0,04 € pour une minute de vidéo, 0,09 €
-     pour cinq. Même au secours Azure Video Indexer, 80 analyses de cinq
-     minutes coûtent moins de 40 €, et les 200 de Réseau moins de 100 €. La marge se joue sur le temps passé, pas
-     sur l'IA.
+     pour cinq. 60 analyses de cinq minutes coûtent moins de 6 € — moins de
+     30 € même si toutes passaient par le secours Azure Video Indexer.
 
-     ⚠ LE QUOTA EST AUSSI ÉCRIT EN BASE (`quota_analyses`, `quota_du_forfait`)
-     et LE PRIX CHEZ STRIPE (`stripe-checkout`). Les trois doivent dire la
-     même chose : changer l'un sans les autres afficherait un chiffre et en
-     appliquerait un autre. */
-  { cle: 'essentiel',  nom: tLang('Essentiel'),  max: 5,   analyses: 40, prix: 99,   an: 1010,  stripe: true },
-  { cle: 'equipe',     nom: tLang('\u00c9quipe'),     max: 15,  analyses: 60, prix: 290,  an: 2960,  stripe: true },
-  { cle: 'pro',        nom: 'Pro',        max: 40,  analyses: 70, prix: 890,  an: 9080,  stripe: true },
-  { cle: 'reseau',     nom: tLang('R\u00e9seau'),     max: 100, analyses: 200, prix: 4990, an: 50900, stripe: true },
+     ⚠ LA GRILLE EST ÉCRITE À CINQ ENDROITS, ET ILS DOIVENT DIRE LA MÊME
+     CHOSE : ici ; en base (`quota_analyses`, `quota_du_forfait`,
+     `plafond_membres`) ; dans `stripe-checkout` (montants attendus,
+     plafonds) ; dans `stripe-webhook` (plafonds) ; sur le site (`index.html`
+     à la racine). Le document du projet `claude/tarifs.md` en tient la liste. */
+  { cle: 'essentiel',  nom: tLang('Essentiel'),  max: 5,   analyses: 40, prix: 99,  an: 1010, stripe: true },
+  { cle: 'equipe',     nom: tLang('\u00c9quipe'),     max: 15,  analyses: 50, prix: 199, an: 2030, stripe: true },
+  { cle: 'pro',        nom: 'Pro',        max: 30,  analyses: 60, prix: 299, an: 3050, stripe: true },
   /* ⚠ `analyses: Infinity` MANQUAIT, ET LA CARTE AFFICHAIT « undefined ».
 
      Les quatre offres chiffrees portent un nombre ; celle-ci n'avait rien du
@@ -33276,7 +33280,7 @@ const OFFRES = [
      `Infinity` plutot que `null` : c'est deja ce que `max` porte sur cette
      meme offre, et `ligneAnalyses` sait le mettre en mots. */
   { cle: 'entreprise', nom: tLang('Entreprise'), max: Infinity, analyses: Infinity, prix: null,
-    devis: tLang('Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.') },
+    devis: tLang('Au-delà de trente personnes, un tarif établi avec vous : nombre de sites, accompagnement, engagement.') },
 ]
 
 

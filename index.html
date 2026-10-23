@@ -77,11 +77,11 @@
    "description": "Filmez le geste une fois : l'IA rédige la procédure, et votre équipe la retrouve sur son téléphone ou d'un scan de QR code.",
    "offers": {
     "@type": "Offer",
-    "price": "69",
+    "price": "99",
     "priceCurrency": "EUR",
     "url": "https://standix.app/#tarifs",
     "availability": "https://schema.org/InStock",
-    "description": "À partir de 69 € par mois, 14 jours d'essai sans carte bancaire."
+    "description": "À partir de 99 € par mois, 14 jours d'essai sans carte bancaire."
    }
   },
   {
@@ -5346,8 +5346,10 @@ body.pret .barre-hote{animation-play-state:running}
      ⚠ VÉRIFIER L'ARITHMÉTIQUE DE TOUTE COMPARAISON ÉCRITE ICI. Une version
      précédente affirmait que deux heures dépassaient le prix : à 30 € de
      l'heure, deux heures font 60 € et l'abonnement 69 € — c'était faux. La
-     comparaison actuelle porte sur une DEMI-JOURNÉE : 4 h × 30 € = 120 €,
-     contre 69 €. Elle tient, et avec de la marge.
+     comparaison portait ensuite sur une DEMI-JOURNÉE : 4 h × 30 € = 120 €,
+     contre 69 €. ⚠ DEPUIS LE 22 OCTOBRE 2026, L'ENTRÉE DE GAMME EST À 99 € :
+     la demi-journée (120 €) dépasse encore le prix, mais de peu. Toute
+     comparaison chiffrée remise ici doit être refaite avec 99.
      ⚠ LES TROIS POINTS SONT DES BÉNÉFICES, PAS DES CHIFFRES (à la demande) :
      temps gagné, argent économisé, savoir-faire conservé. Le titre annonce le
      gain, la phrase le prouve en une ligne. Pas de deuxième phrase. -->
@@ -5450,7 +5452,11 @@ body.pret .barre-hote{animation-play-state:running}
     </svg>
   </div>
 
-  <!-- ⚠ LES QUATRE FORMULES PAYANTES SUR UNE LIGNE QUI GLISSE (ordinateur et
+  <!-- ⚠ LA PLUS CHÈRE EN PREMIER (22 octobre 2026, demande d'Em) : Pro,
+       Équipe, Essentiel. L'app range ses cartes dans le même ordre.
+       ⚠ RÉSEAU (100 membres) A ÉTÉ RETIRÉ : au-delà de 30 membres, c'est
+       l'offre Entreprise, sur devis, plus bas.
+       ⚠ LES QUATRE FORMULES PAYANTES SUR UNE LIGNE QUI GLISSE (ordinateur et
        tablette), avec le mécanisme des carrousels : `.abo-car` est pris en
        charge par le même script que `section.car`. Sur téléphone, colonne.
        La formule Entreprise est À PART, en dessous. -->
@@ -5464,39 +5470,39 @@ body.pret .barre-hote{animation-play-state:running}
             <span class="abo-pl-nom">Standix</span>
           </span>
           <div class="abo-tx">
-            <h3 class="abo-nom">Essentiel</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>5 membres</b></span></span>
+            <h3 class="abo-nom">Pro</h3>
+            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>30 membres</b></span></span>
             <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
           </div>
         </div>
 
-        <button type="button" class="abo-pied" data-tiroir="essentiel" aria-expanded="false" aria-controls="tiroir-essentiel">
+        <button type="button" class="abo-pied" data-tiroir="pro" aria-expanded="false" aria-controls="tiroir-pro">
           <span class="abo-pied-g">
-            <span class="ap-prix">69 €</span>
+            <span class="ap-prix">299 €</span>
             <span class="ap-u">/ mois</span>
           </span>
           <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </button>
 
-        <div class="abo-tiroir" id="tiroir-essentiel">
+        <div class="abo-tiroir" id="tiroir-pro">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-p-v">69 €</span>
+              <span class="abo-p-v">299 €</span>
               <span class="abo-p-u">par mois, hors taxes</span>
             </div>
             <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>55 € par mois</b> en payant à l’année</span>
+              <span class="abo-annee-bad">−15 %</span>
+              <span class="abo-annee-tx"><b>254 € par mois</b> en payant à l’année</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>5 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>30 analyses vidéo IA</b> par mois</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>30 membres</b></span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>60 analyses vidéo IA</b> par mois</span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
             </div>
             <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
-            <button type="button" class="abo-fermer" data-tiroir="essentiel">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
+            <button type="button" class="abo-fermer" data-tiroir="pro">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
       </article>
@@ -5516,7 +5522,7 @@ body.pret .barre-hote{animation-play-state:running}
 
         <button type="button" class="abo-pied" data-tiroir="equipe" aria-expanded="false" aria-controls="tiroir-equipe">
           <span class="abo-pied-g">
-            <span class="ap-prix">129 €</span>
+            <span class="ap-prix">199 €</span>
             <span class="ap-u">/ mois</span>
           </span>
           <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
@@ -5525,16 +5531,16 @@ body.pret .barre-hote{animation-play-state:running}
         <div class="abo-tiroir" id="tiroir-equipe">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-p-v">129 €</span>
+              <span class="abo-p-v">199 €</span>
               <span class="abo-p-u">par mois, hors taxes</span>
             </div>
             <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>103 € par mois</b> en payant à l’année</span>
+              <span class="abo-annee-bad">−15 %</span>
+              <span class="abo-annee-tx"><b>169 € par mois</b> en payant à l’année</span>
             </div>
             <div class="abo-inclus">
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>15 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>60 analyses vidéo IA</b> par mois</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>50 analyses vidéo IA</b> par mois</span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
@@ -5552,83 +5558,39 @@ body.pret .barre-hote{animation-play-state:running}
             <span class="abo-pl-nom">Standix</span>
           </span>
           <div class="abo-tx">
-            <h3 class="abo-nom">Pro</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>40 membres</b></span></span>
+            <h3 class="abo-nom">Essentiel</h3>
+            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>5 membres</b></span></span>
             <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
           </div>
         </div>
 
-        <button type="button" class="abo-pied" data-tiroir="pro" aria-expanded="false" aria-controls="tiroir-pro">
+        <button type="button" class="abo-pied" data-tiroir="essentiel" aria-expanded="false" aria-controls="tiroir-essentiel">
           <span class="abo-pied-g">
-            <span class="ap-prix">239 €</span>
+            <span class="ap-prix">99 €</span>
             <span class="ap-u">/ mois</span>
           </span>
           <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </button>
 
-        <div class="abo-tiroir" id="tiroir-pro">
+        <div class="abo-tiroir" id="tiroir-essentiel">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-p-v">239 €</span>
+              <span class="abo-p-v">99 €</span>
               <span class="abo-p-u">par mois, hors taxes</span>
             </div>
             <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>189 € par mois</b> en payant à l’année</span>
+              <span class="abo-annee-bad">−15 %</span>
+              <span class="abo-annee-tx"><b>84 € par mois</b> en payant à l’année</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>40 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>120 analyses vidéo IA</b> par mois</span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>5 membres</b></span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>40 analyses vidéo IA</b> par mois</span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
             </div>
             <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
-            <button type="button" class="abo-fermer" data-tiroir="pro">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-          </div>
-        </div>
-      </article>
-
-      <article class="abo-carte" data-monte>
-        <div class="abo-haut">
-          <span class="abo-plaque" aria-hidden="true">
-            <img class="abo-pl-logo" data-signe-fonce alt="">
-            <span class="abo-pl-nom">Standix</span>
-          </span>
-          <div class="abo-tx">
-            <h3 class="abo-nom">Réseau</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Jusqu’à <b>100 membres</b></span></span>
-            <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
-          </div>
-        </div>
-
-        <button type="button" class="abo-pied" data-tiroir="reseau" aria-expanded="false" aria-controls="tiroir-reseau">
-          <span class="abo-pied-g">
-            <span class="ap-prix">499 €</span>
-            <span class="ap-u">/ mois</span>
-          </span>
-          <span class="abo-pied-d"><span>Détails</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
-        </button>
-
-        <div class="abo-tiroir" id="tiroir-reseau">
-          <div class="abo-tiroir-in">
-            <div class="abo-prix">
-              <span class="abo-p-v">499 €</span>
-              <span class="abo-p-u">par mois, hors taxes</span>
-            </div>
-            <div class="abo-annee">
-              <span class="abo-annee-bad">−20 %</span>
-              <span class="abo-annee-tx"><b>399 € par mois</b> en payant à l’année</span>
-            </div>
-            <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Jusqu’à <b>100 membres</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>250 analyses vidéo IA</b> par mois</span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Toutes</b> les fonctionnalités</span></div>
-            </div>
-            <a class="abo-cta" href="/app/" target="_blank" rel="noopener">Essayer 14 jours</a>
-            <button type="button" class="abo-fermer" data-tiroir="reseau">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
+            <button type="button" class="abo-fermer" data-tiroir="essentiel">Réduire <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
           </div>
         </div>
       </article>
@@ -5657,7 +5619,7 @@ body.pret .barre-hote{animation-play-state:running}
           </span>
           <div class="abo-tx">
             <h3 class="abo-nom">Entreprise</h3>
-            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Plus de <b>100 membres</b></span></span>
+            <span class="abo-membres"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.4 11.2a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M3 20.2a6.4 6.4 0 0 1 12.8 0"/><path d="M16.4 11a2.9 2.9 0 1 0 0-5.8"/><path d="M17 14.6a5.4 5.4 0 0 1 4 5.6"/></svg><span class="abo-m-tx">Plus de <b>30 membres</b></span></span>
             <span class="abo-illim"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18.2 8.4a3.6 3.6 0 0 1 0 7.2c-2 0-3.2-1.6-4.6-3.6S11 8.4 9 8.4a3.6 3.6 0 0 0 0 7.2c2 0 3.2-1.6 4.6-3.6"/></svg><span>Procédures <b>illimitées</b></span></span>
           </div>
         </div>
@@ -5672,10 +5634,10 @@ body.pret .barre-hote{animation-play-state:running}
         <div class="abo-tiroir" id="tiroir-entreprise">
           <div class="abo-tiroir-in">
             <div class="abo-prix">
-              <span class="abo-devis">Au-delà de cent personnes, on en discute : accompagnement à la mise en place, interlocuteur dédié, engagement de disponibilité écrit.</span>
+              <span class="abo-devis">Au-delà de trente personnes, on en discute : accompagnement à la mise en place, interlocuteur dédié, engagement de disponibilité écrit.</span>
             </div>
             <div class="abo-inclus">
-              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Plus de 100 membres</b></span></div>
+              <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Plus de 30 membres</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span><b>Analyses vidéo IA</b> selon vos besoins</span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Procédures <b>illimitées</b></span></div>
               <div class="abo-li"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5.2 12.6l4.4 4.4 9.2-10" stroke="url(#aboCoche)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>En <b>français, anglais et allemand</b></span></div>
@@ -5710,7 +5672,7 @@ body.pret .barre-hote{animation-play-state:running}
        ouvre, sans promettre une interface pensée pour le grand écran.
      ⚠ RÉPONSES VÉRIFIÉES sur l'app et ses formules (vidéo de 5 min au plus ;
        texte, PDF ou Word ; code d'invitation 15 min / 2 h / 7 jours ; FR, EN,
-       DE ; analyses par formule ; prix HT, −20 % à l'année ; durée d'analyse
+       DE ; analyses par formule ; prix HT, −15 % à l'année ; durée d'analyse
        d'après les mesures d'Em, environ 10 min). NE RIEN AJOUTER SANS
        CONFIRMATION : fin de l'essai, lieu de stockage, compte des employés.
      ⚠ `class="car"` pour la limite gauche (--bord). -->
@@ -5820,7 +5782,7 @@ body.pret .barre-hote{animation-play-state:running}
          place ses garanties à l'endroit où l'on décide) : prix de départ,
          lieu d'hébergement, engagement. -->
     <p class="fin-gages" data-monte style="--d:240ms">
-      <span>À partir de 69&nbsp;€ par mois</span>
+      <span>À partir de 99&nbsp;€ par mois</span>
       <span>Résiliable à tout moment</span>
     </p>
   </div>

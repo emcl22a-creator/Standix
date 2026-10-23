@@ -34008,7 +34008,6 @@ window.renderAbonnements = function() {
     b.classList.toggle('on', b.dataset.rythme === rythmeChoisi)
   })
 
-  const estActuelle = mienne.cle === actuel
   /* ⚠ LA NOUVELLE CARTE PREND LA PLACE DE L'ANCIENNE.
 
      `carteOffre` reste dans le fichier : elle porte des cas que je n'ai pas
@@ -34017,8 +34016,22 @@ window.renderAbonnements = function() {
      sans qu'on s'en apercoive.
 
      Elle deviendra morte le jour ou vous aurez valide la nouvelle. */
+  /* ⚠ L'ORDRE PRIME SUR LA RECOMMANDATION (23 octobre 2026, demande d'Em).
+
+     La tête de page montrait l'offre conseillée pour la taille de l'équipe —
+     Essentiel pour un essai à un membre — puis les autres, de la plus chère à
+     la moins chère. On lisait donc 99, 299, 199 : les offres paraissaient
+     dans le désordre.
+
+     Désormais TOUTES les offres suivent le même ordre, de la plus chère à la
+     moins chère, Entreprise en dernier. La première prend la place de tête
+     (`abo-vedette`) pour garder les animations d'entrée ; l'offre payée reste
+     reconnaissable à son bouton « Gérer ou résilier », et la phrase du haut
+     dit toujours laquelle on a. */
+  const parPrixDecroissant = [...OFFRES].sort((a, b) => (b.prix ?? -1) - (a.prix ?? -1))
+  const tete = parPrixDecroissant[0]
   document.getElementById('abo-vedette').innerHTML =
-    carteOffreNeuve(mienne, { enCours: estActuelle })
+    carteOffreNeuve(tete, { enCours: tete.cle === actuel })
 
   /* ═══ GÉRER OU RÉSILIER, SOUS LA CARTE ═══
 
@@ -34041,17 +34054,16 @@ window.renderAbonnements = function() {
      `0fr` à `1fr` — une bascule qui suppose une seule piste. Avec une carte par
      enfant, chacune créait sa propre piste et rien ne se refermait. On enveloppe
      donc les cartes. */
-  /* ⚠ LA PLUS CHÈRE EN PREMIER (22 octobre 2026, demande d'Em). Réseau, puis
-     Pro, Équipe, Essentiel ; Entreprise, sur devis, ferme la liste. Vue
+  /* ⚠ LA PLUS CHÈRE EN PREMIER (22 octobre 2026, demande d'Em). Pro, puis
+     Équipe, Essentiel ; Entreprise, sur devis, ferme la liste. Vue
      d'abord, l'offre la plus chère sert de repère et les suivantes paraissent
      plus accessibles. Le site range ses cartes dans le même ordre.
 
      ⚠ ON TRIE UNE COPIE, PAS `OFFRES`. Ailleurs, l'ordre croissant de `OFFRES`
      sert à trouver l'offre qui convient à un nombre de membres : le retourner
      là ferait conseiller Réseau à tout le monde. */
-  const parPrixDecroissant = [...OFFRES].sort((a, b) => (b.prix ?? -1) - (a.prix ?? -1))
   document.getElementById('abo-liste').innerHTML = '<div class="abo-repli">' + parPrixDecroissant
-    .filter(o => o.cle !== mienne.cle)
+    .filter(o => o.cle !== tete.cle)
     .map(o => carteOffreNeuve(o, { enCours: o.cle === actuel })).join('') + '</div>'
 
   /* ⚠ LE LOGO DES PLAQUES SE POSE ICI, apres le rendu.

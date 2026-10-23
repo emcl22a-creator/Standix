@@ -26597,3 +26597,52 @@ html::-webkit-scrollbar-thumb:hover{
     overflow-y:visible;
   }
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SUR PC, LA VIDÉO DE LA FICHE RESTE EN HAUT ET LES ÉTAPES PASSENT DERRIÈRE
+
+ ⚠ ELLE PARTAIT AVEC LA PAGE. La règle « À L'HORIZONTALE, LA VIDÉO NE RESTE
+   PLUS FIGÉE EN HAUT » datait du temps où la vidéo prenait toute la largeur
+   — 600 à 700 px de haut : figée, elle ne laissait rien voir des étapes.
+   Mesuré le 23 octobre 2026 sur 1440 × 900 : 369 px, la vidéo défilait hors
+   de l'écran dès les premières étapes (demande d'Em : comme sur téléphone).
+
+ ⚠ ON LA PLAFONNE À 40 % DE LA HAUTEUR DE L'ÉCRAN. Sa LARGEUR suit, pour
+   garder le format 16/9 : `min(100 %, 40dvh × 16/9)`. Un portable de 768 px
+   de haut garde ainsi plus de la moitié de l'écran pour lire les étapes.
+
+ ⚠ `top:12px` PARCE QUE C'EST LA FENÊTRE QUI DÉFILE (voir « SUR PC, UNE
+   SEULE BARRE DE DÉFILEMENT »). Le cache (`::before`) recouvre les douze
+   pixels du dessus et les côtés : sans lui, on verrait les cartes dépasser
+   autour de la vidéo en passant dessous.
+
+ ⚠ À LA SOURIS SEULEMENT. Téléphones et tablettes gardent leurs règles. */
+@media (hover:hover) and (pointer:fine) and (min-width:700px) and (min-height:600px){
+  body.sans-topbar #p-analyse.active #analyse-video-frame,
+  body.sans-topbar #e-detail.active #detail-video-frame{
+    position:sticky;
+    top:12px;
+    z-index:4;
+    overflow:visible;
+    width:min(100%, calc(40dvh * 16 / 9));
+    max-width:none;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  body.sans-topbar #p-analyse.active #analyse-video-frame video,
+  body.sans-topbar #e-detail.active #detail-video-frame video{
+    border-radius:inherit;
+    max-height:none;
+  }
+  body.sans-topbar #p-analyse.active #analyse-video-frame::before,
+  body.sans-topbar #e-detail.active #detail-video-frame::before{
+    content:''; position:absolute; z-index:-1;
+    /* Assez large pour couvrir la colonne des étapes, ombres comprises,
+       même quand la vidéo est plus étroite que la colonne. */
+    left:-50vw; right:-50vw;
+    top:-13px; bottom:-12px;
+    background:var(--bg);
+    pointer-events:none;
+  }
+}

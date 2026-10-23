@@ -491,9 +491,9 @@
   "en": "In total",
   "de": "Insgesamt"
  },
- "Au-delà de cent personnes, engagement de disponibilité écrit pour une discussion.": {
-  "en": "Over one hundred people: a written availability commitment, to be discussed.",
-  "de": "Über hundert Personen: schriftliche Verfügbarkeitszusage, nach Absprache."
+ "Au-delà de trente personnes, un tarif établi avec vous : nombre de sites, accompagnement, engagement.": {
+  "en": "Over thirty people: a price set with you — number of sites, support, commitment.",
+  "de": "Über dreißig Personen: ein mit Ihnen vereinbarter Preis — Anzahl der Standorte, Begleitung, Laufzeit."
  },
  "Aucun abonnement à gérer": {
   "en": "No subscription to manage",
@@ -1966,6 +1966,10 @@
  "Jusqu’à <b>{max} membres</b>": {
   "en": "Up to <b>{max} members</b>",
   "de": "Bis zu <b>{max} Mitglieder</b>"
+ },
+ "Cette formule n'est pas encore disponible au paiement. Écrivez-nous, nous l'activons pour vous.": {
+  "en": "This plan can't be paid online yet. Write to us and we'll activate it for you.",
+  "de": "Dieser Tarif kann noch nicht online bezahlt werden. Schreiben Sie uns, wir schalten ihn für Sie frei."
  },
  "Plus de <b>{max} membres</b>": {
   "en": "More than <b>{max} members</b>",
